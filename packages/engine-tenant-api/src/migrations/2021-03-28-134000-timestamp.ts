@@ -21,8 +21,6 @@ ALTER TABLE person_password_reset
 	ALTER used_at TYPE TIMESTAMPTZ;
 `
 
-export default async function (builder: MigrationBuilder) {
+export default async function(builder: MigrationBuilder) {
 	builder.sql(sql)
 }
-
-

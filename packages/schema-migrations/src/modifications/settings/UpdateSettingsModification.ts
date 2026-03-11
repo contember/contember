@@ -28,11 +28,9 @@ export class UpdateSettingsModificationHandler implements ModificationHandler<Up
 		}
 	}
 
-
 	describe() {
 		return { message: `Change settings of ${this.data.key}` }
 	}
-
 }
 
 export const updateSettingsModification = createModificationType({
@@ -42,10 +40,12 @@ export const updateSettingsModification = createModificationType({
 
 export class UpdateSettingsDiffer implements Differ {
 	createDiff(originalSchema: Schema, updatedSchema: Schema) {
-		const allKeys = Array.from(new Set([
-			...Object.keys(originalSchema.settings),
-			...Object.keys(updatedSchema.settings),
-		] as (keyof Settings.Schema)[]))
+		const allKeys = Array.from(
+			new Set([
+				...Object.keys(originalSchema.settings),
+				...Object.keys(updatedSchema.settings),
+			] as (keyof Settings.Schema)[]),
+		)
 
 		return allKeys
 			.filter(key => !deepEqual(originalSchema.settings[key], updatedSchema.settings[key]))
@@ -66,20 +66,16 @@ export class UpdateSettingsDiffer implements Differ {
 	}
 }
 
-
-
 export interface SetSettingsModificationData<K extends keyof Settings.Schema = keyof Settings.Schema> {
 	op: 'set'
 	key: K
 	value: Settings.Schema[K]
 }
 
-
 export interface UnsetSettingsModificationData<K extends keyof Settings.Schema = keyof Settings.Schema> {
 	op: 'unset'
 	key: K
 }
-
 
 export type UpdateSettingsModificationData =
 	| SetSettingsModificationData

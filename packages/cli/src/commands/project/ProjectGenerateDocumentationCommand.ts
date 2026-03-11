@@ -6,8 +6,7 @@ import { SchemaLoader } from '../../lib/schema/SchemaLoader'
 import { validateSchemaAndPrintErrors } from '../../lib/schema/SchemaValidationHelper'
 import { SchemaVersionBuilder } from '@contember/migrations-client'
 
-type Args = {
-}
+type Args = {}
 
 type Options = {
 	source?: 'migrations' | 'definition'

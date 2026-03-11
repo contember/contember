@@ -2,7 +2,6 @@ import { DatabaseContext, LatestTransactionIdByStageQuery } from '@contember/eng
 import { Timer } from '../application'
 import { IncomingMessage, ServerResponse } from 'node:http'
 
-
 const NotModifiedHeaderName = 'x-contember-ref'
 
 export interface NotModifiedCheckResult {

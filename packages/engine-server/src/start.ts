@@ -106,11 +106,10 @@ process.on('warning', message => {
 			},
 		})
 		terminationJobs.push(async () => {
-			(await runningWorker).end()
+			;(await runningWorker).end()
 		})
 		await runningWorker
 		logger.info(`Contember Worker ${workerName} started.`)
-
 	}
 
 	const applicationWorker = serverConfig.applicationWorker
@@ -133,7 +132,8 @@ process.on('warning', message => {
 			if (applicationWorker === 'all') {
 				for (const workerName of container.applicationWorkers.getWorkerNames()) {
 					await workerManager.start({
-						workerCount, env: {
+						workerCount,
+						env: {
 							CONTEMBER_APPLICATION_WORKER: workerName,
 						},
 					})
@@ -158,7 +158,6 @@ process.on('warning', message => {
 		}
 		printStarted()
 	}
-
 })().catch(e => {
 	logger.crit(e)
 	process.exit(1)

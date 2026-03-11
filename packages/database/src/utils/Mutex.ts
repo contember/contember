@@ -45,5 +45,4 @@ export class Mutex {
 }
 
 export class MutexDeadlockError extends Error {
-
 }

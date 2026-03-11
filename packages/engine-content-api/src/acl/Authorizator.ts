@@ -1,6 +1,5 @@
 import { Acl } from '@contember/schema'
 
-
 export type AuthorizationResult = 'yes' | 'no' | 'maybe'
 
 export class Authorizator {
@@ -31,7 +30,11 @@ export class Authorizator {
 		return this.permissions[entity]?.operations[operation]?.[field] ?? false
 	}
 
-	getFieldPermissions(operation: Acl.Operation.create | Acl.Operation.read | Acl.Operation.update, entity: string, field: string): AuthorizationResult {
+	getFieldPermissions(
+		operation: Acl.Operation.create | Acl.Operation.read | Acl.Operation.update,
+		entity: string,
+		field: string,
+	): AuthorizationResult {
 		const fieldPermissions = this.getFieldPredicate(operation, entity, field)
 		if (!fieldPermissions) {
 			return 'no'
@@ -48,7 +51,6 @@ export class Authorizator {
 		}
 		return 'maybe'
 	}
-
 
 	isCustomPrimaryAllowed(entity: string): boolean {
 		return this.permissions?.[entity]?.operations?.customPrimary ?? this.defaultCustomPrimary

@@ -4,10 +4,7 @@ import { CreateInputProcessor } from './CreateInputProcessor'
 import { ImplementationException, UserError } from '../exception'
 import { MapperInput } from '../mapper'
 
-export class CreateInputVisitor<Result> implements
-	Model.ColumnVisitor<Promise<Result[]>>,
-	Model.RelationByTypeVisitor<Promise<Result[]>> {
-
+export class CreateInputVisitor<Result> implements Model.ColumnVisitor<Promise<Result[]>>, Model.RelationByTypeVisitor<Promise<Result[]>> {
 	constructor(
 		private readonly createInputProcessor: CreateInputProcessor<Result>,
 		private readonly schema: Model.Schema,
@@ -15,10 +12,12 @@ export class CreateInputVisitor<Result> implements
 	) {}
 
 	public async visitColumn(context: Model.ColumnContext): Promise<Result[]> {
-		return [await this.createInputProcessor.column({
-			...context,
-			input: this.data[context.column.name] as Input.ColumnValue,
-		})]
+		return [
+			await this.createInputProcessor.column({
+				...context,
+				input: this.data[context.column.name] as Input.ColumnValue,
+			}),
+		]
 	}
 
 	public visitManyHasManyInverse(context: Model.ManyHasManyInverseContext) {

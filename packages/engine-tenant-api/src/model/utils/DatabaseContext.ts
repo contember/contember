@@ -3,7 +3,6 @@ import { Providers } from '../providers'
 import { CommandBus } from '../commands'
 import { BatchLoaderArgs, initBatchLoader, ItemLoader } from '../../utils/batchQuery'
 
-
 export class DatabaseContext<Conn extends Connection.ConnectionLike = Connection.ConnectionLike> {
 	private loaders = new Map<BatchLoaderArgs<any, any, any>, ItemLoader<any, any>>()
 

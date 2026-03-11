@@ -32,21 +32,20 @@ class GoogleFormEmbedHandler implements EmbedHandler<string> {
 		if (!url.host.endsWith('docs.google.com')) {
 			return undefined
 		}
-		const matches = url.pathname.match(/^\/forms\/d(\/e)?\/([^\/]+).*$/)
+		const matches = url.pathname.match(/^\/forms\/d(\/e)?\/([^/]+).*$/)
 
 		if (!matches) {
 			return undefined
 		}
 		if (matches[1] === undefined) {
 			alert(
-				this.options.nonEmbedLinkWarning ??
-					'Detected a Google Form but the link supplied cannot be reliably embedded.\n\n' +
-						"If you wish to embed the form, please return to Google Forms and use the 'Send' button in the top right corner to get a correct link.",
+				this.options.nonEmbedLinkWarning
+					?? 'Detected a Google Form but the link supplied cannot be reliably embedded.\n\n'
+						+ "If you wish to embed the form, please return to Google Forms and use the 'Send' button in the top right corner to get a correct link.",
 			)
 			return undefined
 		}
 		return matches[2]
-
 	}
 
 	public renderEmbed() {

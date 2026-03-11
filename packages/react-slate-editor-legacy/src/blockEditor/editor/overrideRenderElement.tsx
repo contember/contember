@@ -5,7 +5,6 @@ import { ErrorBoundary } from 'react-error-boundary'
 import { ReactEditor } from 'slate-react'
 import { ComponentType, ReactNode } from 'react'
 
-
 export interface OverrideRenderElementOptions {
 	renderSortableBlock: ComponentType<{ children: ReactNode; element: Element }>
 }

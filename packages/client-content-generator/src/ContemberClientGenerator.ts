@@ -3,7 +3,6 @@ import { EnumTypeSchemaGenerator } from './EnumTypeSchemaGenerator'
 import { EntityTypeSchemaGenerator } from './EntityTypeSchemaGenerator'
 import { NameSchemaGenerator } from './NameSchemaGenerator'
 
-
 export class ContemberClientGenerator {
 	constructor(
 		private readonly nameSchemaGenerator: NameSchemaGenerator = new NameSchemaGenerator(),

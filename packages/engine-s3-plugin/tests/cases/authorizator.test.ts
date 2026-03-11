@@ -1,4 +1,4 @@
-import { test, expect } from 'bun:test'
+import { expect, test } from 'bun:test'
 import { S3ObjectAuthorizator } from '../../src'
 
 test('required read pattern', () => {
@@ -12,7 +12,6 @@ test('required upload pattern', () => {
 	expect(() => authorizator.verifyUploadAccess({ key: 'foo/lorem.jpg', size: null })).not.toThrow()
 	expect(() => authorizator.verifyUploadAccess({ key: 'lorem.jpg', size: null })).toThrow('Upload access forbidden for object key lorem.jpg')
 })
-
 
 test('max upload size', () => {
 	const authorizator = new S3ObjectAuthorizator([{ pattern: '**', maxSize: 1024 }], [])

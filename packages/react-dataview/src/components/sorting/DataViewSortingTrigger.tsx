@@ -10,7 +10,9 @@ export interface DataViewSortingTriggerAttributes {
 	['data-current']: DataViewSortingDirection | 'none'
 }
 
-const SlotType = Slot as React.ForwardRefExoticComponent<React.ButtonHTMLAttributes<HTMLButtonElement> & React.RefAttributes<HTMLButtonElement> & DataViewSortingTriggerAttributes>
+const SlotType = Slot as React.ForwardRefExoticComponent<
+	React.ButtonHTMLAttributes<HTMLButtonElement> & React.RefAttributes<HTMLButtonElement> & DataViewSortingTriggerAttributes
+>
 
 export interface DataViewSortingTriggerProps {
 	action?: DataViewSortingDirectionAction
@@ -74,7 +76,6 @@ export const DataViewSortingTrigger = forwardRef<HTMLButtonElement, DataViewSort
 		const active = !!action && action !== 'next' && orderDirection === actionToState[action]
 
 		const { onClick, ...otherProps } = props as React.ButtonHTMLAttributes<HTMLButtonElement>
-
 
 		return (
 			<SlotType

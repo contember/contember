@@ -24,9 +24,11 @@ export class RealmKeyGenerator {
 		container: EntityFieldMarkersContainer,
 	): EntityRealmKey {
 		// The static prefix serves to really emphasize that this is *NOT* just a uuid
-		return `key${GLUE}${this.parentStateIdCache.getOptionalKeyId(
-			parent,
-		)}${GLUE}${placeholderName}${id}${GLUE}${this.markerIdCache.getId(container)}`
+		return `key${GLUE}${
+			this.parentStateIdCache.getOptionalKeyId(
+				parent,
+			)
+		}${GLUE}${placeholderName}${id}${GLUE}${this.markerIdCache.getId(container)}`
 	}
 
 	public static getRealmKey(id: RuntimeId, blueprint: EntityRealmBlueprint): EntityRealmKey {

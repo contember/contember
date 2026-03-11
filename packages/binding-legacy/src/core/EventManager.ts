@@ -13,16 +13,7 @@ import type { PlaceholderName } from '@contember/binding-common'
 import { assertNever } from '@contember/binding-common'
 import type { Config } from './Config'
 import type { DirtinessTracker } from './DirtinessTracker'
-import {
-	EntityListState,
-	EntityRealmState,
-	FieldState,
-	getEntityMarker,
-	RootStateNode,
-	StateINode,
-	StateIterator,
-	StateNode,
-} from './state'
+import { EntityListState, EntityRealmState, FieldState, getEntityMarker, RootStateNode, StateINode, StateIterator, StateNode } from './state'
 import type { TreeStore } from './TreeStore'
 import type { UpdateMetadata } from './UpdateMetadata'
 import type { EventListenersStore } from '@contember/binding-common'
@@ -120,9 +111,9 @@ export class EventManager {
 
 		if (this.isFrozenWhileUpdating) {
 			throw new BindingError(
-				`Trying to perform an update while the whole accessor tree is already updating. This is most likely caused ` +
-					`by updating the accessor tree while rendering or from within the 'update' event handler, which is a no-op. ` +
-					`If you wish to mutate the tree in reaction to other changes, use the 'beforeUpdate' event.`,
+				`Trying to perform an update while the whole accessor tree is already updating. This is most likely caused `
+					+ `by updating the accessor tree while rendering or from within the 'update' event handler, which is a no-op. `
+					+ `If you wish to mutate the tree in reaction to other changes, use the 'beforeUpdate' event.`,
 			)
 		}
 
@@ -222,8 +213,8 @@ export class EventManager {
 				if (import.meta.env.DEV) {
 					if (justUpdated.unpersistedChangesCount < 0) {
 						console.error(
-							`We have *JUST* reached a completely invalid state. From now on, anything can (and likely will) ` +
-								`go wrong. This is definitely a bug. Please try to report whatever led to this situation.`,
+							`We have *JUST* reached a completely invalid state. From now on, anything can (and likely will) `
+								+ `go wrong. This is definitely a bug. Please try to report whatever led to this situation.`,
 						)
 					}
 				}
@@ -233,7 +224,10 @@ export class EventManager {
 				if (parent === undefined) {
 					this.rootsWithPendingUpdates.add(justUpdated)
 
-					if (!(justUpdated.blueprint.type === 'subTree' && justUpdated.blueprint.marker.parameters.isCreating && justUpdated.blueprint.marker.parameters.isUnpersisted)) {
+					if (
+						!(justUpdated.blueprint.type === 'subTree' && justUpdated.blueprint.marker.parameters.isCreating
+							&& justUpdated.blueprint.marker.parameters.isUnpersisted)
+					) {
 						this.dirtinessTracker.increaseBy(changesDelta)
 					}
 				} else {
@@ -263,12 +257,11 @@ export class EventManager {
 
 		for (const state of agenda) {
 			// yes, the calls are same, but this way we can avoid type casting
-			const updateListeners =
-				state.type === 'field'
-					? this.getEventDispatchers(state, { type: 'update' }, [state.getAccessor()])
-					: state.type === 'entityRealm'
-						? this.getEventDispatchers(state, { type: 'update' }, [state.getAccessor()])
-						: this.getEventDispatchers(state, { type: 'update' }, [state.getAccessor()])
+			const updateListeners = state.type === 'field'
+				? this.getEventDispatchers(state, { type: 'update' }, [state.getAccessor()])
+				: state.type === 'entityRealm'
+				? this.getEventDispatchers(state, { type: 'update' }, [state.getAccessor()])
+				: this.getEventDispatchers(state, { type: 'update' }, [state.getAccessor()])
 
 			if (updateListeners !== undefined) {
 				for (const handler of updateListeners) {
@@ -412,8 +405,8 @@ export class EventManager {
 			if (import.meta.env.DEV) {
 				if (callbackQueue.length) {
 					throw new BindingError(
-						`Exceeded the ${eventType} settle limit. Your code likely contains a deadlock. ` +
-							`If that's not the case, raise the settle limit from DataBindingProvider.`,
+						`Exceeded the ${eventType} settle limit. Your code likely contains a deadlock. `
+							+ `If that's not the case, raise the settle limit from DataBindingProvider.`,
 					)
 				}
 			}
@@ -441,7 +434,7 @@ export class EventManager {
 					switch (state.type) {
 						case 'field':
 							for (const listener of listeners) {
-								(listener as FieldAccessor.BeforeUpdateListener)(state.getAccessor())
+								;(listener as FieldAccessor.BeforeUpdateListener)(state.getAccessor())
 							}
 							break
 						case 'entityRealm':
@@ -458,8 +451,8 @@ export class EventManager {
 				this.triggerOnInitialize()
 			}
 			throw new BindingError(
-				`Maximum stabilization limit of updates caused by 'beforeUpdate' exceeded. ` +
-					`This likely means there is an infinite feedback loop in your code.`,
+				`Maximum stabilization limit of updates caused by 'beforeUpdate' exceeded. `
+					+ `This likely means there is an infinite feedback loop in your code.`,
 			)
 		})
 	}
@@ -468,12 +461,11 @@ export class EventManager {
 		this.syncTransaction(() => {
 			for (const state of this.newlyInitializedWithListeners) {
 				// yes, the calls are same, but this way we can avoid type casting
-				const listeners =
-					state.type === 'field'
-						? this.getEventDispatchers(state, { type: 'initialize' }, [state.getAccessor, this.batchUpdatesOptions])
-						: state.type === 'entityRealm'
-							? this.getEventDispatchers(state, { type: 'initialize' }, [state.getAccessor, this.batchUpdatesOptions])
-							: this.getEventDispatchers(state, { type: 'initialize' }, [state.getAccessor, this.batchUpdatesOptions])
+				const listeners = state.type === 'field'
+					? this.getEventDispatchers(state, { type: 'initialize' }, [state.getAccessor, this.batchUpdatesOptions])
+					: state.type === 'entityRealm'
+					? this.getEventDispatchers(state, { type: 'initialize' }, [state.getAccessor, this.batchUpdatesOptions])
+					: this.getEventDispatchers(state, { type: 'initialize' }, [state.getAccessor, this.batchUpdatesOptions])
 
 				if (listeners) {
 					for (const listener of listeners) {
@@ -495,10 +487,9 @@ export class EventManager {
 			for (const [, subTreeState] of StateIterator.eachRootState(this.treeStore)) {
 				for (const iNode of StateIterator.depthFirstINodes(subTreeState)) {
 					// yes, the calls are same, but this way we can avoid type casting
-					const dispatchers =
-						iNode.type === 'entityRealm'
-							? this.getEventDispatchers(iNode, { type: 'persistError' }, [iNode.getAccessor, options])
-							: this.getEventDispatchers(iNode, { type: 'persistError' }, [iNode.getAccessor, options])
+					const dispatchers = iNode.type === 'entityRealm'
+						? this.getEventDispatchers(iNode, { type: 'persistError' }, [iNode.getAccessor, options])
+						: this.getEventDispatchers(iNode, { type: 'persistError' }, [iNode.getAccessor, options])
 					if (dispatchers === undefined) {
 						continue
 					}
@@ -533,8 +524,7 @@ export class EventManager {
 
 	public getEventListeners<
 		State extends StateNode,
-		EventListenerTypes extends
-		Exclude<State['eventListeners'], undefined> extends EventListenersStore<infer Map> ? [keyof Map, Map] : never,
+		EventListenerTypes extends Exclude<State['eventListeners'], undefined> extends EventListenersStore<infer Map> ? [keyof Map, Map] : never,
 		EventType extends EventListenerTypes[0],
 	>(state: State, event: { type: EventType; key?: string }): Set<Exclude<EventListenerTypes[1][EventType], undefined>> | undefined {
 		if (!state.eventListeners) {
@@ -547,8 +537,7 @@ export class EventManager {
 
 	public getEventDispatchers<
 		State extends StateNode,
-		EventListenerTypes extends
-		Exclude<State['eventListeners'], undefined> extends EventListenersStore<infer Map> ? [keyof Map, Map] : never,
+		EventListenerTypes extends Exclude<State['eventListeners'], undefined> extends EventListenersStore<infer Map> ? [keyof Map, Map] : never,
 		EventType extends EventListenerTypes[0],
 	>(
 		state: State,
@@ -572,12 +561,11 @@ export class EventManager {
 		rejections.forEach(it => console.error(it.reason))
 		if (import.meta.env.DEV) {
 			throw new BindingError(
-				`A ${handler} handler returned a promise that rejected. ` +
-					`This is a no-op that will fail silently in production.`,
+				`A ${handler} handler returned a promise that rejected. `
+					+ `This is a no-op that will fail silently in production.`,
 			)
 		}
 	}
-
 
 	private validateWithoutChanges(initialCount: number, eventType: string): void {
 		const changesCountAfter = this.dirtinessTracker.getTotalTouchCount()
@@ -586,8 +574,8 @@ export class EventManager {
 				// This isn't bulletproof. They could e.g. undo a change and make another one which would
 				// slip through this detection. But for most cases, it should be good enough and not too expensive.
 				throw new BindingError(
-					`A ${eventType} event handler cannot be asynchronous and alter the accessor tree at the same time. ` +
-					`To achieve this, prepare your data asynchronously but only touch the tree from a returned callback.`,
+					`A ${eventType} event handler cannot be asynchronous and alter the accessor tree at the same time. `
+						+ `To achieve this, prepare your data asynchronously but only touch the tree from a returned callback.`,
 				)
 			}
 		}

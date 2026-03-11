@@ -26,7 +26,6 @@ export class LaxSchemaConverter {
 		const builder = new LaxSchemaBuilder(this.schema, this.conventions)
 		return builder.build()
 	}
-
 }
 
 class LaxSchemaBuilder {
@@ -44,10 +43,8 @@ class LaxSchemaBuilder {
 			for (const [fieldName, fieldDefinition] of Object.entries(entityDefinition.fields)) {
 				if (isColumnDefinition(fieldDefinition)) {
 					this.processColumn(entityName, fieldName, fieldDefinition)
-
 				} else if (fieldDefinition.type === 'enum') {
 					this.processEnum(entityName, fieldName, fieldDefinition)
-
 				} else {
 					this.processRelation(entityName, fieldName, fieldDefinition)
 				}
@@ -187,7 +184,6 @@ class LaxSchemaBuilder {
 		const entity = this.getEntity(entityName)
 		;(entity.fields as Writable<Model.Entity['fields']>)[field.name] = field
 	}
-
 
 	private getEntity(entityName: string): Model.Entity {
 		return this.entities[entityName] ??= {

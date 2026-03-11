@@ -9,16 +9,19 @@ import { EntityList, EntityListBaseProps } from './EntityList'
 import { Field } from './Field'
 import { TreeNodeEnvironmentFactory } from '@contember/binding'
 
-export type HasManyProps<ListProps = never, EntityProps = never> = SugaredRelativeEntityList & {
-	children?: ReactNode
-	variables?: Environment.ValuesMapWithFactory
-} & (
-	| {}
-	| {
-		listComponent: ComponentType<ListProps & EntityListBaseProps>
-		listProps?: ListProps
-		  }
-)
+export type HasManyProps<ListProps = never, EntityProps = never> =
+	& SugaredRelativeEntityList
+	& {
+		children?: ReactNode
+		variables?: Environment.ValuesMapWithFactory
+	}
+	& (
+		| {}
+		| {
+			listComponent: ComponentType<ListProps & EntityListBaseProps>
+			listProps?: ListProps
+		}
+	)
 
 /**
  * @group Data binding
@@ -40,8 +43,7 @@ export const HasMany = Component(
 				{props.children}
 			</EntityList>
 		),
-		generateBranchMarker: (props, fields, environment) =>
-			MarkerFactory.createRelativeEntityListFields(props, environment, fields),
+		generateBranchMarker: (props, fields, environment) => MarkerFactory.createRelativeEntityListFields(props, environment, fields),
 	},
 	'HasMany',
 ) as <ListProps, EntityProps>(props: HasManyProps<ListProps, EntityProps>) => ReactElement

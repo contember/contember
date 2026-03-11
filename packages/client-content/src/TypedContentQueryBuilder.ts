@@ -2,14 +2,11 @@ import { ContentClientInput, MutationResult, SchemaTypeLike, TransactionResult }
 import { ContentMutation, ContentQuery, TypedEntitySelection, TypedEntitySelectionCallback } from './nodes'
 import { MutationTransactionOptions } from './ContentQueryBuilder'
 
-
 export type TypedContentEntitySelectionOrCallback<TSchema extends SchemaTypeLike, TEntityName extends keyof TSchema['entities'] & string, TValue> =
 	| TypedEntitySelection<TSchema, TEntityName, TSchema['entities'][TEntityName], TValue>
 	| TypedEntitySelectionCallback<TSchema, TEntityName, TSchema['entities'][TEntityName], TValue>
 
-
 export interface TypedContentQueryBuilder<TSchema extends SchemaTypeLike> {
-
 	fragment<EntityName extends keyof TSchema['entities'] & string>(
 		name: EntityName,
 	): TypedEntitySelection<TSchema, EntityName, TSchema['entities'][EntityName], {}>
@@ -73,4 +70,3 @@ export interface TypedContentQueryBuilder<TSchema extends SchemaTypeLike> {
 		options?: MutationTransactionOptions,
 	): ContentMutation<TransactionResult<Values>>
 }
-

@@ -7,7 +7,6 @@ export type DateRangeFilterArtifacts = {
 	nullCondition?: boolean
 }
 
-
 const toLocalIsoString = (date: Date) => {
 	const tzo = -date.getTimezoneOffset()
 	const dif = tzo >= 0 ? '+' : '-'
@@ -16,14 +15,14 @@ const toLocalIsoString = (date: Date) => {
 		return '0'.repeat(Math.max(0, length - str.length)) + str
 	}
 
-	return pad(date.getFullYear(), 4) +
-		'-' + pad(date.getMonth() + 1) +
-		'-' + pad(date.getDate()) +
-		'T' + pad(date.getHours()) +
-		':' + pad(date.getMinutes()) +
-		':' + pad(date.getSeconds()) +
-		dif + pad(Math.floor(Math.abs(tzo) / 60)) +
-		':' + pad(Math.abs(tzo) % 60)
+	return pad(date.getFullYear(), 4)
+		+ '-' + pad(date.getMonth() + 1)
+		+ '-' + pad(date.getDate())
+		+ 'T' + pad(date.getHours())
+		+ ':' + pad(date.getMinutes())
+		+ ':' + pad(date.getSeconds())
+		+ dif + pad(Math.floor(Math.abs(tzo) / 60))
+		+ ':' + pad(Math.abs(tzo) % 60)
 }
 
 export const createDateFilter = createFieldFilterHandler<DateRangeFilterArtifacts>({

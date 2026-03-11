@@ -8,7 +8,6 @@ import { Literal } from '../Literal'
 import { createSubQueryLiteralFactory, SubQueryExpression } from './internal/Subqueries'
 
 class DeleteBuilder<Result extends DeleteBuilder.DeleteResult> implements Returning.Aware, With.Aware, Where.Aware, QueryBuilder {
-
 	private constructor(private readonly options: DeleteBuilder.Options) {}
 
 	public static create(): DeleteBuilder<DeleteBuilder.AffectedRows> {
@@ -68,12 +67,14 @@ namespace DeleteBuilder {
 	export type AffectedRows = number
 	export type DeleteResult = AffectedRows | Returning.Result[]
 
-	export type Options = {
-		from: string | undefined
-		returning: Returning
-		using: { [alias: string]: string }
-	} & With.Options &
-	Where.Options
+	export type Options =
+		& {
+			from: string | undefined
+			returning: Returning
+			using: { [alias: string]: string }
+		}
+		& With.Options
+		& Where.Options
 }
 
 export { DeleteBuilder }

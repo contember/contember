@@ -7,7 +7,6 @@ const v1_3preset: Settings.Schema = {
 	},
 }
 
-
 const v1_4preset: Settings.Schema = {
 	tenant: {
 		inviteExpirationMinutes: 60 * 24 * 7, // 7 days
@@ -28,7 +27,6 @@ const v2_0preset: Settings.Schema = {
 		useExistsInHasManyFilter: true,
 	},
 }
-
 
 const v2_1preset: Settings.Schema = {
 	...v2_0preset,

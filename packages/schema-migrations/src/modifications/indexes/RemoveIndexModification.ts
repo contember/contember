@@ -1,17 +1,12 @@
 import { MigrationBuilder } from '@contember/database-migrations'
 import { Schema } from '@contember/schema'
 import { SchemaUpdater, updateEntity, updateModel } from '../utils/schemaUpdateUtils'
-import {
-	createModificationType,
-	Differ,
-	ModificationHandler,
-	ModificationHandlerCreateSqlOptions,
-} from '../ModificationHandler'
+import { createModificationType, Differ, ModificationHandler, ModificationHandlerCreateSqlOptions } from '../ModificationHandler'
 import deepEqual from 'fast-deep-equal'
 import { getIndexColumns } from './utils'
 import { wrapIdentifier } from '../../utils/dbHelpers'
 
-export class RemoveIndexModificationHandler implements ModificationHandler<RemoveIndexModificationData>  {
+export class RemoveIndexModificationHandler implements ModificationHandler<RemoveIndexModificationData> {
 	constructor(private readonly data: RemoveIndexModificationData, private readonly schema: Schema) {}
 
 	public createSql(builder: MigrationBuilder, { databaseMetadata, invalidateDatabaseMetadata }: ModificationHandlerCreateSqlOptions): void {
@@ -70,7 +65,6 @@ export const removeIndexModification = createModificationType({
 	handler: RemoveIndexModificationHandler,
 })
 
-
 export type RemoveIndexModificationData =
 	| {
 		entityName: string
@@ -84,7 +78,6 @@ export type RemoveIndexModificationData =
 	}
 
 export class RemoveIndexDiffer implements Differ {
-
 	createDiff(originalSchema: Schema, updatedSchema: Schema) {
 		return Object.values(originalSchema.model.entities).flatMap(entity =>
 			entity.indexes
@@ -101,8 +94,8 @@ export class RemoveIndexDiffer implements Differ {
 					removeIndexModification.createModification({
 						entityName: entity.name,
 						fields: index.fields,
-					}),
-				),
+					})
+				)
 		)
 	}
 }

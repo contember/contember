@@ -7,13 +7,13 @@
 import { Context } from 'react';
 import { DataViewProps } from '@contember/react-dataview';
 import { EntityAccessor } from '@contember/react-binding';
-import { EntityName } from '@contember/react-binding';
-import { JSX as JSX_2 } from 'react/jsx-runtime';
+import { EntityName } from '@contember/binding-common';
+import { JSX } from 'react/jsx-runtime';
 import { default as React_2 } from 'react';
 import { ReactElement } from 'react';
 import { ReactNode } from 'react';
-import { SugarableHasOneRelation } from '@contember/react-binding';
-import { SugaredFilter } from '@contember/react-binding';
+import { SugarableHasOneRelation } from '@contember/binding-common';
+import { SugaredFilter } from '@contember/binding-common';
 import { SugaredQualifiedEntityList } from '@contember/react-binding';
 import { SugaredRelativeEntityList } from '@contember/react-binding';
 import { SugaredRelativeSingleEntity } from '@contember/react-binding';
@@ -45,7 +45,7 @@ export const Select: React_2.NamedExoticComponent<{
 export const SelectCurrentEntitiesContext: Context<EntityAccessor[]>;
 
 // @public (undocumented)
-export const SelectDataView: (props: SelectDataViewProps) => JSX_2.Element;
+export const SelectDataView: (props: SelectDataViewProps) => JSX.Element;
 
 // @public (undocumented)
 export type SelectDataViewProps = Omit<DataViewProps, 'entities'> & {
@@ -53,9 +53,9 @@ export type SelectDataViewProps = Omit<DataViewProps, 'entities'> & {
 };
 
 // @public (undocumented)
-export const SelectEachValue: ({ children }: {
+export const SelectEachValue: (input: {
     children: ReactNode;
-}) => JSX_2.Element[];
+}) => JSX.Element[];
 
 // @public (undocumented)
 export interface SelectEvents {
@@ -85,9 +85,9 @@ export type SelectItemTriggerProps = {
 };
 
 // @public (undocumented)
-export const SelectNewItem: ({ children }: {
+export const SelectNewItem: (input: {
     children: ReactNode;
-}) => JSX_2.Element | null;
+}) => JSX.Element | null;
 
 // @public (undocumented)
 export const SelectOption: React_2.ForwardRefExoticComponent<SelectOptionProps & React_2.RefAttributes<HTMLElement>>;
@@ -106,9 +106,9 @@ entityName: EntityName;
 }>;
 
 // @public (undocumented)
-export const SelectPlaceholder: ({ children }: {
+export const SelectPlaceholder: (input: {
     children: ReactNode;
-}) => JSX_2.Element | null;
+}) => JSX.Element | null;
 
 // @public (undocumented)
 export type SelectProps = {

@@ -1,12 +1,7 @@
-import {
-	DisableApiKeyErrorCode,
-	DisableApiKeyResponse,
-	MutationDisableApiKeyArgs,
-	MutationResolvers,
-} from '../../../schema'
+import { DisableApiKeyErrorCode, DisableApiKeyResponse, MutationDisableApiKeyArgs, MutationResolvers } from '../../../schema'
 import { GraphQLResolveInfo } from 'graphql'
 import { TenantResolverContext } from '../../TenantResolverContext'
-import { PermissionActions, ApiKeyManager } from '../../../model'
+import { ApiKeyManager, PermissionActions } from '../../../model'
 import { createErrorResponse } from '../../errorUtils'
 
 export class DisableApiKeyMutationResolver implements MutationResolvers {

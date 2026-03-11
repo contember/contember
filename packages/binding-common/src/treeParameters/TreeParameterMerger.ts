@@ -47,8 +47,8 @@ export class TreeParameterMerger {
 	): HasManyRelation {
 		if (original.initialEntityCount !== fresh.initialEntityCount) {
 			throw new BindingError(
-				`Detected hasMany relations on the same field '${original.field}' with different preferred initial ` +
-					`entity counts: '${original.initialEntityCount}' and '${fresh.initialEntityCount}' respectively.`,
+				`Detected hasMany relations on the same field '${original.field}' with different preferred initial `
+					+ `entity counts: '${original.initialEntityCount}' and '${fresh.initialEntityCount}' respectively.`,
 			)
 		}
 		return {
@@ -122,8 +122,8 @@ export class TreeParameterMerger {
 	): QualifiedEntityList | UnconstrainedQualifiedEntityList {
 		if (original.initialEntityCount !== fresh.initialEntityCount) {
 			throw new BindingError(
-				`Detected sub trees of the same entity '${original.entityName}' with different preferred initial ` +
-					`entity counts: '${original.initialEntityCount}' and '${fresh.initialEntityCount}' respectively.`,
+				`Detected sub trees of the same entity '${original.entityName}' with different preferred initial `
+					+ `entity counts: '${original.initialEntityCount}' and '${fresh.initialEntityCount}' respectively.`,
 			)
 		}
 
@@ -171,9 +171,16 @@ export class TreeParameterMerger {
 		}
 	}
 
-	public static mergeSingleField(original: Omit<RelativeSingleField, 'hasOneRelationPath'>, fresh: Omit<RelativeSingleField, 'hasOneRelationPath'>): Omit<RelativeSingleField, 'hasOneRelationPath'> {
+	public static mergeSingleField(
+		original: Omit<RelativeSingleField, 'hasOneRelationPath'>,
+		fresh: Omit<RelativeSingleField, 'hasOneRelationPath'>,
+	): Omit<RelativeSingleField, 'hasOneRelationPath'> {
 		if (original.defaultValue !== undefined && fresh.defaultValue !== undefined && original.defaultValue !== fresh.defaultValue) {
-			throw new BindingError(`MarkerTreeGenerator merging: multiple fields "${original.field}" with different defaultValue found: ${JSON.stringify([original.defaultValue, fresh.defaultValue])}, `)
+			throw new BindingError(
+				`MarkerTreeGenerator merging: multiple fields "${original.field}" with different defaultValue found: ${
+					JSON.stringify([original.defaultValue, fresh.defaultValue])
+				}, `,
+			)
 		}
 		return {
 			field: original.field,
@@ -183,7 +190,6 @@ export class TreeParameterMerger {
 			eventListeners: this.mergeEventStore(original.eventListeners, fresh.eventListeners),
 		}
 	}
-
 
 	public static mergeSetOnCreate(original: SetOnCreate, fresh: SetOnCreate): SetOnCreate {
 		if (original === undefined && fresh === undefined) {
@@ -272,7 +278,6 @@ export class TreeParameterMerger {
 		}
 	}
 
-
 	private static mergeEventStore<Events extends GenericEventsMap>(
 		original: EventListenersStore<Events> | undefined,
 		fresh: EventListenersStore<Events> | undefined,
@@ -338,7 +343,6 @@ export class TreeParameterMerger {
 		}
 		return this.mergeSets(original, fresh)
 	}
-
 
 	private static mergeFieldMeta(
 		original: FieldMeta,

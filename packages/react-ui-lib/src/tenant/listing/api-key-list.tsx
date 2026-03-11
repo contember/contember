@@ -18,8 +18,10 @@ export const ApiKeyList = (props: { controller?: { current?: MemberListControlle
 			deleteFailed: dict.tenant.apiKeyList.deleteFailed,
 		}}
 		tableHeaders={[dict.tenant.apiKeyList.description]}
-		tableColumns={it => <>
-			<TableCell key="description">{it.identity.description ?? dict.tenant.apiKeyList.unnamed}</TableCell>
-		</>}
+		tableColumns={it => (
+			<>
+				<TableCell key="description">{it.identity.description ?? dict.tenant.apiKeyList.unnamed}</TableCell>
+			</>
+		)}
 	/>
 )

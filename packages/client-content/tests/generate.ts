@@ -10,4 +10,3 @@ await fs.mkdir(dir, { recursive: true })
 for (const [name, content] of Object.entries(result)) {
 	await fs.writeFile(join(dir, name), content, 'utf8')
 }
-

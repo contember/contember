@@ -19,31 +19,35 @@ class GenerateUploadUrlMutationBuilder {
 			const fileParameters = parameters[alias]
 			if (fileParameters.suffix || fileParameters.fileName || fileParameters.extension) {
 				const { contentType, prefix, expiration, acl, size, suffix, fileName, extension } = fileParameters
-				selectionItems.push(new GraphQlField(alias, 'generateUploadUrl', {
-					input: {
-						value: { contentType, prefix, expiration, acl, size, suffix, fileName, extension },
-						graphQlType: 'S3GenerateSignedUploadInput',
-					},
-				}, GenerateUploadUrlMutationBuilder.generateUploadUrlFields))
+				selectionItems.push(
+					new GraphQlField(alias, 'generateUploadUrl', {
+						input: {
+							value: { contentType, prefix, expiration, acl, size, suffix, fileName, extension },
+							graphQlType: 'S3GenerateSignedUploadInput',
+						},
+					}, GenerateUploadUrlMutationBuilder.generateUploadUrlFields),
+				)
 			} else {
-				selectionItems.push(new GraphQlField(alias, 'generateUploadUrl', {
-					contentType: {
-						graphQlType: 'String',
-						value: fileParameters.contentType,
-					},
-					expiration: {
-						graphQlType: 'Int',
-						value: fileParameters.expiration,
-					},
-					prefix: {
-						graphQlType: 'String',
-						value: fileParameters.prefix,
-					},
-					acl: {
-						graphQlType: 'S3Acl',
-						value: fileParameters.acl,
-					},
-				}, GenerateUploadUrlMutationBuilder.generateUploadUrlFields))
+				selectionItems.push(
+					new GraphQlField(alias, 'generateUploadUrl', {
+						contentType: {
+							graphQlType: 'String',
+							value: fileParameters.contentType,
+						},
+						expiration: {
+							graphQlType: 'Int',
+							value: fileParameters.expiration,
+						},
+						prefix: {
+							graphQlType: 'String',
+							value: fileParameters.prefix,
+						},
+						acl: {
+							graphQlType: 'S3Acl',
+							value: fileParameters.acl,
+						},
+					}, GenerateUploadUrlMutationBuilder.generateUploadUrlFields),
+				)
 			}
 		}
 

@@ -14,7 +14,6 @@ import { TreeNodeUtils } from '../utils/TreeNodeUtils'
 import { whereToFilter } from '../utils/whereToFilter'
 
 export class TreeNodeEnvironmentFactory {
-
 	public static createEnvironmentForEntityListSubtree(
 		environment: Environment,
 		sugaredEntityList: SugaredQualifiedEntityList | SugaredUnconstrainedQualifiedEntityList,
@@ -27,7 +26,6 @@ export class TreeNodeEnvironmentFactory {
 			entityList = QueryLanguage.desugarUnconstrainedQualifiedEntityList(sugaredEntityList, environment)
 			rootWhere = {} as const
 			expectedCardinality = 'zero'
-
 		} else {
 			entityList = QueryLanguage.desugarQualifiedEntityList(sugaredEntityList, environment)
 			rootWhere = entityList.filter ?? {}
@@ -53,10 +51,9 @@ export class TreeNodeEnvironmentFactory {
 		let expectedCardinality: Environment.SubTreeNode['expectedCardinality']
 
 		if (sugaredEntityList.isCreating) {
-			rootWhere = { } as const
+			rootWhere = {} as const
 			expectedCardinality = 'zero'
 			entity = QueryLanguage.desugarUnconstrainedQualifiedSingleEntity(sugaredEntityList, environment)
-
 		} else {
 			entity = QueryLanguage.desugarQualifiedSingleEntity(sugaredEntityList, environment)
 			rootWhere = whereToFilter(entity.where)
@@ -133,5 +130,4 @@ export class TreeNodeEnvironmentFactory {
 		}
 		return environment
 	}
-
 }

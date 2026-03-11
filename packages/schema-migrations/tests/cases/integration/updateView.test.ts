@@ -37,137 +37,136 @@ namespace ViewEntityUpdatedSchema1 {
 	}
 }
 
-
-describe('update a view 1', () => testMigrations({
-	original: createSchema(ViewEntityOriginalSchema),
-	updated: createSchema(ViewEntityUpdatedSchema1),
-	diff: [
-		{
-			modification: 'removeEntity',
-			entityName: 'Author3',
-		},
-		{
-			modification: 'removeEntity',
-			entityName: 'Author2',
-		},
-		{
-			modification: 'removeEntity',
-			entityName: 'Author',
-		},
-		{
-			modification: 'createView',
-			entity: {
-				name: 'Author',
-				primary: 'id',
-				primaryColumn: 'id',
-				unique: [],
-				fields: {
-					id: {
-						name: 'id',
-						columnName: 'id',
-						nullable: false,
-						type: 'Uuid',
-						columnType: 'uuid',
-					},
-					name: {
-						name: 'name',
-						columnName: 'name',
-						nullable: true,
-						type: 'String',
-						columnType: 'text',
-					},
-				},
-				tableName: 'author',
-				view: {
-					sql: "SELECT null as id, 'Jack' AS name",
-				},
-				eventLog: {
-					enabled: true,
-				},
-				indexes: [],
+describe('update a view 1', () =>
+	testMigrations({
+		original: createSchema(ViewEntityOriginalSchema),
+		updated: createSchema(ViewEntityUpdatedSchema1),
+		diff: [
+			{
+				modification: 'removeEntity',
+				entityName: 'Author3',
 			},
-		},
-		{
-			modification: 'createView',
-			entity: {
-				name: 'Author2',
-				primary: 'id',
-				primaryColumn: 'id',
-				unique: [],
-				fields: {
-					id: {
-						name: 'id',
-						columnName: 'id',
-						nullable: false,
-						type: 'Uuid',
-						columnType: 'uuid',
-					},
-					name: {
-						name: 'name',
-						columnName: 'name',
-						nullable: true,
-						type: 'String',
-						columnType: 'text',
-					},
-				},
-				tableName: 'author2',
-				view: {
-					sql: 'SELECT * FROM author',
-					dependencies: [
-						'Author',
-					],
-				},
-				eventLog: {
-					enabled: true,
-				},
-				indexes: [],
+			{
+				modification: 'removeEntity',
+				entityName: 'Author2',
 			},
-		},
-		{
-			modification: 'createView',
-			entity: {
-				name: 'Author3',
-				primary: 'id',
-				primaryColumn: 'id',
-				unique: [],
-				fields: {
-					id: {
-						name: 'id',
-						columnName: 'id',
-						nullable: false,
-						type: 'Uuid',
-						columnType: 'uuid',
-					},
-					name: {
-						name: 'name',
-						columnName: 'name',
-						nullable: true,
-						type: 'String',
-						columnType: 'text',
-					},
-				},
-				tableName: 'author3',
-				view: {
-					sql: 'SELECT * FROM author2',
-					dependencies: [
-						'Author2',
-					],
-				},
-				eventLog: {
-					enabled: true,
-				},
-				indexes: [],
+			{
+				modification: 'removeEntity',
+				entityName: 'Author',
 			},
-		},
-	],
-	sql: SQL`DROP VIEW "author3";
+			{
+				modification: 'createView',
+				entity: {
+					name: 'Author',
+					primary: 'id',
+					primaryColumn: 'id',
+					unique: [],
+					fields: {
+						id: {
+							name: 'id',
+							columnName: 'id',
+							nullable: false,
+							type: 'Uuid',
+							columnType: 'uuid',
+						},
+						name: {
+							name: 'name',
+							columnName: 'name',
+							nullable: true,
+							type: 'String',
+							columnType: 'text',
+						},
+					},
+					tableName: 'author',
+					view: {
+						sql: "SELECT null as id, 'Jack' AS name",
+					},
+					eventLog: {
+						enabled: true,
+					},
+					indexes: [],
+				},
+			},
+			{
+				modification: 'createView',
+				entity: {
+					name: 'Author2',
+					primary: 'id',
+					primaryColumn: 'id',
+					unique: [],
+					fields: {
+						id: {
+							name: 'id',
+							columnName: 'id',
+							nullable: false,
+							type: 'Uuid',
+							columnType: 'uuid',
+						},
+						name: {
+							name: 'name',
+							columnName: 'name',
+							nullable: true,
+							type: 'String',
+							columnType: 'text',
+						},
+					},
+					tableName: 'author2',
+					view: {
+						sql: 'SELECT * FROM author',
+						dependencies: [
+							'Author',
+						],
+					},
+					eventLog: {
+						enabled: true,
+					},
+					indexes: [],
+				},
+			},
+			{
+				modification: 'createView',
+				entity: {
+					name: 'Author3',
+					primary: 'id',
+					primaryColumn: 'id',
+					unique: [],
+					fields: {
+						id: {
+							name: 'id',
+							columnName: 'id',
+							nullable: false,
+							type: 'Uuid',
+							columnType: 'uuid',
+						},
+						name: {
+							name: 'name',
+							columnName: 'name',
+							nullable: true,
+							type: 'String',
+							columnType: 'text',
+						},
+					},
+					tableName: 'author3',
+					view: {
+						sql: 'SELECT * FROM author2',
+						dependencies: [
+							'Author2',
+						],
+					},
+					eventLog: {
+						enabled: true,
+					},
+					indexes: [],
+				},
+			},
+		],
+		sql: SQL`DROP VIEW "author3";
 DROP VIEW "author2";
 DROP VIEW "author";
 CREATE VIEW "author" AS SELECT null as id, 'Jack' AS name;
 CREATE VIEW "author2" AS SELECT * FROM author;
 CREATE VIEW "author3" AS SELECT * FROM author2;`,
-}))
-
+	}))
 
 namespace ViewEntityUpdatedSchema2 {
 	@def.View("SELECT null as id, 'John' AS name")
@@ -186,98 +185,98 @@ namespace ViewEntityUpdatedSchema2 {
 	}
 }
 
-describe('update a view 2', () => testMigrations({
-	original: createSchema(ViewEntityOriginalSchema),
-	updated: createSchema(ViewEntityUpdatedSchema2),
-	diff: [
-		{
-			modification: 'removeEntity',
-			entityName: 'Author3',
-		},
-		{
-			modification: 'removeEntity',
-			entityName: 'Author2',
-		},
-		{
-			modification: 'createView',
-			entity: {
-				name: 'Author2',
-				primary: 'id',
-				primaryColumn: 'id',
-				unique: [],
-				fields: {
-					id: {
-						name: 'id',
-						columnName: 'id',
-						nullable: false,
-						type: 'Uuid',
-						columnType: 'uuid',
-					},
-					name: {
-						name: 'name',
-						columnName: 'name',
-						nullable: true,
-						type: 'String',
-						columnType: 'text',
-					},
-				},
-				tableName: 'author2',
-				view: {
-					sql: 'SELECT id, name FROM author',
-					dependencies: [
-						'Author',
-					],
-				},
-				eventLog: {
-					enabled: true,
-				},
-				indexes: [],
+describe('update a view 2', () =>
+	testMigrations({
+		original: createSchema(ViewEntityOriginalSchema),
+		updated: createSchema(ViewEntityUpdatedSchema2),
+		diff: [
+			{
+				modification: 'removeEntity',
+				entityName: 'Author3',
 			},
-		},
-		{
-			modification: 'createView',
-			entity: {
-				name: 'Author3',
-				primary: 'id',
-				primaryColumn: 'id',
-				unique: [],
-				fields: {
-					id: {
-						name: 'id',
-						columnName: 'id',
-						nullable: false,
-						type: 'Uuid',
-						columnType: 'uuid',
-					},
-					name: {
-						name: 'name',
-						columnName: 'name',
-						nullable: true,
-						type: 'String',
-						columnType: 'text',
-					},
-				},
-				tableName: 'author3',
-				view: {
-					sql: 'SELECT * FROM author2',
-					dependencies: [
-						'Author2',
-					],
-				},
-				eventLog: {
-					enabled: true,
-				},
-				indexes: [],
+			{
+				modification: 'removeEntity',
+				entityName: 'Author2',
 			},
-		},
-	],
-	sql: SQL`DROP VIEW "author3";
+			{
+				modification: 'createView',
+				entity: {
+					name: 'Author2',
+					primary: 'id',
+					primaryColumn: 'id',
+					unique: [],
+					fields: {
+						id: {
+							name: 'id',
+							columnName: 'id',
+							nullable: false,
+							type: 'Uuid',
+							columnType: 'uuid',
+						},
+						name: {
+							name: 'name',
+							columnName: 'name',
+							nullable: true,
+							type: 'String',
+							columnType: 'text',
+						},
+					},
+					tableName: 'author2',
+					view: {
+						sql: 'SELECT id, name FROM author',
+						dependencies: [
+							'Author',
+						],
+					},
+					eventLog: {
+						enabled: true,
+					},
+					indexes: [],
+				},
+			},
+			{
+				modification: 'createView',
+				entity: {
+					name: 'Author3',
+					primary: 'id',
+					primaryColumn: 'id',
+					unique: [],
+					fields: {
+						id: {
+							name: 'id',
+							columnName: 'id',
+							nullable: false,
+							type: 'Uuid',
+							columnType: 'uuid',
+						},
+						name: {
+							name: 'name',
+							columnName: 'name',
+							nullable: true,
+							type: 'String',
+							columnType: 'text',
+						},
+					},
+					tableName: 'author3',
+					view: {
+						sql: 'SELECT * FROM author2',
+						dependencies: [
+							'Author2',
+						],
+					},
+					eventLog: {
+						enabled: true,
+					},
+					indexes: [],
+				},
+			},
+		],
+		sql: SQL`DROP VIEW "author3";
 DROP VIEW "author2";
 CREATE VIEW "author2" AS SELECT id, name FROM author;
 CREATE VIEW "author3" AS SELECT * FROM author2;
 `,
-}))
-
+	}))
 
 namespace ViewEntityUpdatedSchema3 {
 	@def.View("SELECT null as id, 'John' AS name")
@@ -296,55 +295,55 @@ namespace ViewEntityUpdatedSchema3 {
 	}
 }
 
-describe('update a view 3', () => testMigrations({
-	original: createSchema(ViewEntityOriginalSchema),
-	updated: createSchema(ViewEntityUpdatedSchema3),
-	diff: [
-		{
-			modification: 'removeEntity',
-			entityName: 'Author3',
-		},
-		{
-			modification: 'createView',
-			entity: {
-				name: 'Author3',
-				primary: 'id',
-				primaryColumn: 'id',
-				unique: [],
-				fields: {
-					id: {
-						name: 'id',
-						columnName: 'id',
-						nullable: false,
-						type: 'Uuid',
-						columnType: 'uuid',
-					},
-					name: {
-						name: 'name',
-						columnName: 'name',
-						nullable: true,
-						type: 'String',
-						columnType: 'text',
-					},
-				},
-				tableName: 'author3',
-				view: {
-					sql: 'SELECT id, name FROM author2',
-					dependencies: [
-						'Author2',
-					],
-				},
-				eventLog: {
-					enabled: true,
-				},
-				indexes: [],
+describe('update a view 3', () =>
+	testMigrations({
+		original: createSchema(ViewEntityOriginalSchema),
+		updated: createSchema(ViewEntityUpdatedSchema3),
+		diff: [
+			{
+				modification: 'removeEntity',
+				entityName: 'Author3',
 			},
-		},
-	],
-	sql: SQL`DROP VIEW "author3";
+			{
+				modification: 'createView',
+				entity: {
+					name: 'Author3',
+					primary: 'id',
+					primaryColumn: 'id',
+					unique: [],
+					fields: {
+						id: {
+							name: 'id',
+							columnName: 'id',
+							nullable: false,
+							type: 'Uuid',
+							columnType: 'uuid',
+						},
+						name: {
+							name: 'name',
+							columnName: 'name',
+							nullable: true,
+							type: 'String',
+							columnType: 'text',
+						},
+					},
+					tableName: 'author3',
+					view: {
+						sql: 'SELECT id, name FROM author2',
+						dependencies: [
+							'Author2',
+						],
+					},
+					eventLog: {
+						enabled: true,
+					},
+					indexes: [],
+				},
+			},
+		],
+		sql: SQL`DROP VIEW "author3";
 CREATE VIEW "author3" AS SELECT id, name FROM author2;`,
-}))
-
+	}))
 
 namespace ViewEntityUpdatedSchema4 {
 	@def.View("SELECT null as id, 'Jack' AS name")
@@ -363,132 +362,133 @@ namespace ViewEntityUpdatedSchema4 {
 	}
 }
 
-describe('update a view 4', () => testMigrations({
-	original: createSchema(ViewEntityOriginalSchema),
-	updated: createSchema(ViewEntityUpdatedSchema4),
-	diff: [
-		{
-			modification: 'removeEntity',
-			entityName: 'Author3',
-		},
-		{
-			modification: 'removeEntity',
-			entityName: 'Author2',
-		},
-		{
-			modification: 'removeEntity',
-			entityName: 'Author',
-		},
-		{
-			modification: 'createView',
-			entity: {
-				name: 'Author',
-				primary: 'id',
-				primaryColumn: 'id',
-				unique: [],
-				fields: {
-					id: {
-						name: 'id',
-						columnName: 'id',
-						nullable: false,
-						type: 'Uuid',
-						columnType: 'uuid',
-					},
-					name: {
-						name: 'name',
-						columnName: 'name',
-						nullable: true,
-						type: 'String',
-						columnType: 'text',
-					},
-				},
-				tableName: 'author',
-				view: {
-					sql: "SELECT null as id, 'Jack' AS name",
-				},
-				eventLog: {
-					enabled: true,
-				},
-				indexes: [],
+describe('update a view 4', () =>
+	testMigrations({
+		original: createSchema(ViewEntityOriginalSchema),
+		updated: createSchema(ViewEntityUpdatedSchema4),
+		diff: [
+			{
+				modification: 'removeEntity',
+				entityName: 'Author3',
 			},
-		},
-		{
-			modification: 'createView',
-			entity: {
-				name: 'Author2',
-				primary: 'id',
-				primaryColumn: 'id',
-				unique: [],
-				fields: {
-					id: {
-						name: 'id',
-						columnName: 'id',
-						nullable: false,
-						type: 'Uuid',
-						columnType: 'uuid',
-					},
-					name: {
-						name: 'name',
-						columnName: 'name',
-						nullable: true,
-						type: 'String',
-						columnType: 'text',
-					},
-				},
-				tableName: 'author2',
-				view: {
-					sql: 'SELECT id, name FROM author',
-					dependencies: [
-						'Author',
-					],
-				},
-				eventLog: {
-					enabled: true,
-				},
-				indexes: [],
+			{
+				modification: 'removeEntity',
+				entityName: 'Author2',
 			},
-		},
-		{
-			modification: 'createView',
-			entity: {
-				name: 'Author3',
-				primary: 'id',
-				primaryColumn: 'id',
-				unique: [],
-				fields: {
-					id: {
-						name: 'id',
-						columnName: 'id',
-						nullable: false,
-						type: 'Uuid',
-						columnType: 'uuid',
-					},
-					name: {
-						name: 'name',
-						columnName: 'name',
-						nullable: true,
-						type: 'String',
-						columnType: 'text',
-					},
-				},
-				tableName: 'author3',
-				view: {
-					sql: 'SELECT id, name FROM author2',
-					dependencies: [
-						'Author2',
-					],
-				},
-				eventLog: {
-					enabled: true,
-				},
-				indexes: [],
+			{
+				modification: 'removeEntity',
+				entityName: 'Author',
 			},
-		},
-	],
-	sql: SQL`DROP VIEW "author3";
+			{
+				modification: 'createView',
+				entity: {
+					name: 'Author',
+					primary: 'id',
+					primaryColumn: 'id',
+					unique: [],
+					fields: {
+						id: {
+							name: 'id',
+							columnName: 'id',
+							nullable: false,
+							type: 'Uuid',
+							columnType: 'uuid',
+						},
+						name: {
+							name: 'name',
+							columnName: 'name',
+							nullable: true,
+							type: 'String',
+							columnType: 'text',
+						},
+					},
+					tableName: 'author',
+					view: {
+						sql: "SELECT null as id, 'Jack' AS name",
+					},
+					eventLog: {
+						enabled: true,
+					},
+					indexes: [],
+				},
+			},
+			{
+				modification: 'createView',
+				entity: {
+					name: 'Author2',
+					primary: 'id',
+					primaryColumn: 'id',
+					unique: [],
+					fields: {
+						id: {
+							name: 'id',
+							columnName: 'id',
+							nullable: false,
+							type: 'Uuid',
+							columnType: 'uuid',
+						},
+						name: {
+							name: 'name',
+							columnName: 'name',
+							nullable: true,
+							type: 'String',
+							columnType: 'text',
+						},
+					},
+					tableName: 'author2',
+					view: {
+						sql: 'SELECT id, name FROM author',
+						dependencies: [
+							'Author',
+						],
+					},
+					eventLog: {
+						enabled: true,
+					},
+					indexes: [],
+				},
+			},
+			{
+				modification: 'createView',
+				entity: {
+					name: 'Author3',
+					primary: 'id',
+					primaryColumn: 'id',
+					unique: [],
+					fields: {
+						id: {
+							name: 'id',
+							columnName: 'id',
+							nullable: false,
+							type: 'Uuid',
+							columnType: 'uuid',
+						},
+						name: {
+							name: 'name',
+							columnName: 'name',
+							nullable: true,
+							type: 'String',
+							columnType: 'text',
+						},
+					},
+					tableName: 'author3',
+					view: {
+						sql: 'SELECT id, name FROM author2',
+						dependencies: [
+							'Author2',
+						],
+					},
+					eventLog: {
+						enabled: true,
+					},
+					indexes: [],
+				},
+			},
+		],
+		sql: SQL`DROP VIEW "author3";
 DROP VIEW "author2";
 DROP VIEW "author";
 CREATE VIEW "author" AS SELECT null as id, 'Jack' AS name;
 CREATE VIEW "author2" AS SELECT id, name FROM author;
 CREATE VIEW "author3" AS SELECT id, name FROM author2;`,
-}))
+	}))

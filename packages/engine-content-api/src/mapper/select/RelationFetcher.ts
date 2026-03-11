@@ -28,13 +28,12 @@ type FetchOneHasManyGroupsArgs = {
 	ids: Input.PrimaryValue[]
 }
 
-type ManyHasManyBaseArgs =
-	& {
-		mapper: Mapper
-		ids: Input.PrimaryValue[]
-		relationPath: Model.AnyRelationContext[]
-		relationContext: Model.ManyHasManyInverseContext | Model.ManyHasManyOwningContext
-	}
+type ManyHasManyBaseArgs = {
+	mapper: Mapper
+	ids: Input.PrimaryValue[]
+	relationPath: Model.AnyRelationContext[]
+	relationContext: Model.ManyHasManyInverseContext | Model.ManyHasManyOwningContext
+}
 type CountManyHasManyGroupArgs =
 	& ManyHasManyBaseArgs
 	& {
@@ -179,14 +178,18 @@ export class RelationFetcher {
 		return this.buildManyHasManyGroups(targetEntity, joiningColumns, result, junctionValues)
 	}
 
-	private resolveJoiningColumns({ relationType, joiningTable }: { joiningTable: Model.JoiningTable; relationType: 'manyHasManyOwning' | 'manyHasManyInverse' }): JoiningColumns {
-		return relationType === 'manyHasManyOwning' ? {
-			sourceColumn: joiningTable.joiningColumn,
-			targetColumn: joiningTable.inverseJoiningColumn,
-		} : {
-			sourceColumn: joiningTable.inverseJoiningColumn,
-			targetColumn: joiningTable.joiningColumn,
-		}
+	private resolveJoiningColumns(
+		{ relationType, joiningTable }: { joiningTable: Model.JoiningTable; relationType: 'manyHasManyOwning' | 'manyHasManyInverse' },
+	): JoiningColumns {
+		return relationType === 'manyHasManyOwning'
+			? {
+				sourceColumn: joiningTable.joiningColumn,
+				targetColumn: joiningTable.inverseJoiningColumn,
+			}
+			: {
+				sourceColumn: joiningTable.inverseJoiningColumn,
+				targetColumn: joiningTable.joiningColumn,
+			}
 	}
 
 	private buildManyHasManyGroups(
@@ -232,7 +235,7 @@ export class RelationFetcher {
 			['junction_', column.sourceColumn.columnName],
 			(orderable, qb) => {
 				if (object.args.orderBy) {
-					[qb, orderable] = this.orderBuilder.build(
+					;[qb, orderable] = this.orderBuilder.build(
 						qb,
 						orderable,
 						targetEntity,
@@ -268,19 +271,21 @@ export class RelationFetcher {
 
 		const where = this.predicateInjector.inject(targetEntity, objectArgs.filter || {}, relationPath[relationPath.length - 1])
 		const hasWhere = where && Object.keys(where).length > 0
-		const hasFieldOrderBy =
-			objectArgs.orderBy &&
-			objectArgs.orderBy.length > 0 &&
-			!objectArgs.orderBy[0]._random &&
-			objectArgs.orderBy[0]._randomSeeded === undefined
+		const hasFieldOrderBy = objectArgs.orderBy
+			&& objectArgs.orderBy.length > 0
+			&& !objectArgs.orderBy[0]._random
+			&& objectArgs.orderBy[0]._randomSeeded === undefined
 
 		if (hasWhere || hasFieldOrderBy) {
 			const path = this.pathFactory.create([])
-			qb = qb.join(targetEntity.tableName, path.alias, condition =>
-				condition.compareColumns(['junction_', column.targetColumn.columnName], Operator.eq, [
-					path.alias,
-					targetEntity.primaryColumn,
-				]),
+			qb = qb.join(
+				targetEntity.tableName,
+				path.alias,
+				condition =>
+					condition.compareColumns(['junction_', column.targetColumn.columnName], Operator.eq, [
+						path.alias,
+						targetEntity.primaryColumn,
+					]),
 			)
 		}
 

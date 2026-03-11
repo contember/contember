@@ -22,7 +22,7 @@ export class PasswordResetManager {
 		private readonly mailer: UserMailer,
 		private readonly projectManager: ProjectManager,
 		private readonly passwordStrengthValidator: PasswordStrengthValidator,
-	) { }
+	) {}
 
 	public async createPasswordResetRequest(
 		dbContext: DatabaseContext,
@@ -72,7 +72,7 @@ export class PasswordResetManager {
 				[AuthLogService.Key]: authLogData,
 			})
 		}
-		const resetPasswordResult =  await dbContext.commandBus.execute(new ResetPasswordCommand(token, password))
+		const resetPasswordResult = await dbContext.commandBus.execute(new ResetPasswordCommand(token, password))
 		if (!resetPasswordResult.ok) {
 			return new ResponseError(resetPasswordResult.error, resetPasswordResult.errorMessage, {
 				...resetPasswordResult.metadata ?? {},
@@ -85,9 +85,13 @@ export class PasswordResetManager {
 	}
 }
 
-export type ResetPasswordResponse = Response<{
-	[AuthLogService.Key]: AuthLogService.Bag
-}, ResetPasswordErrorCode, {
-	weakPasswordReasons?: WeakPasswordReason[]
-	[AuthLogService.Key]: AuthLogService.Bag
-}>
+export type ResetPasswordResponse = Response<
+	{
+		[AuthLogService.Key]: AuthLogService.Bag
+	},
+	ResetPasswordErrorCode,
+	{
+		weakPasswordReasons?: WeakPasswordReason[]
+		[AuthLogService.Key]: AuthLogService.Bag
+	}
+>

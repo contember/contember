@@ -4,7 +4,6 @@ import { faker } from '@faker-js/faker'
 
 faker.seed(123)
 
-
 const nameGenerator = uniqGenerator(faker.company.name)
 
 export default printMutation([

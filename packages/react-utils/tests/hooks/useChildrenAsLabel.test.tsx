@@ -1,3 +1,4 @@
+// dprint-ignore-file
 import { createPortal } from 'react-dom'
 import { describe, expect, it } from 'bun:test'
 import { getChildrenAsLabel } from '../../src'

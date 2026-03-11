@@ -59,21 +59,21 @@ export class FieldOperations {
 				if (import.meta.env.DEV) {
 					if (newValue !== fieldState.value && (fieldState.touchLog !== undefined || entity.hasIdSetInStone)) {
 						throw new BindingError(
-							`Trying to set the '${PRIMARY_KEY_NAME}' field for the second time. This is prohibited.\n` +
-								`Once set, it is immutable.`,
+							`Trying to set the '${PRIMARY_KEY_NAME}' field for the second time. This is prohibited.\n`
+								+ `Once set, it is immutable.`,
 						)
 					}
 					if (typeof newValue !== 'string' || !uuidValidate(newValue)) {
 						throw new BindingError(
-							`Invalid value supplied for the '${PRIMARY_KEY_NAME}' field. ` +
-								`Expecting a valid uuid but '${newValue}' was given.\n` +
-								`Hint: you may use 'FieldAccessor.asUuid.setToUuid()'.`,
+							`Invalid value supplied for the '${PRIMARY_KEY_NAME}' field. `
+								+ `Expecting a valid uuid but '${newValue}' was given.\n`
+								+ `Hint: you may use 'FieldAccessor.asUuid.setToUuid()'.`,
 						)
 					}
 					if (this.treeStore.entityStore.has(ServerId.formatUniqueValue(newValue, entity.entityName))) {
 						throw new BindingError(
-							`Trying to set the '${PRIMARY_KEY_NAME}' field to '${newValue}' which is a valid uuid but is not unique. ` +
-								`It is already in use by an existing entity.`,
+							`Trying to set the '${PRIMARY_KEY_NAME}' field to '${newValue}' which is a valid uuid but is not unique. `
+								+ `It is already in use by an existing entity.`,
 						)
 					}
 				}
@@ -98,21 +98,19 @@ export class FieldOperations {
 				field.touchLog.add(agent)
 				field.value = newValue
 
-				const resolvedValue =
-					field.fieldMarker.defaultValue === undefined
-						? newValue
-						: newValue === null
-							? field.fieldMarker.defaultValue
-							: newValue
+				const resolvedValue = field.fieldMarker.defaultValue === undefined
+					? newValue
+					: newValue === null
+					? field.fieldMarker.defaultValue
+					: newValue
 				const normalizedPersistedValue = field.persistedValue === undefined ? null : field.persistedValue
 				const hadUnpersistedChangesBefore = field.hasUnpersistedChanges
 				const hasUnpersistedChangesNow = resolvedValue !== normalizedPersistedValue
 				field.hasUnpersistedChanges = hasUnpersistedChangesNow
 
-				const shouldInfluenceUpdateCount =
-					!getEntityMarker(parent).fields.hasAtLeastOneBearingField ||
-					!field.fieldMarker.isNonbearing ||
-					field.persistedValue !== undefined
+				const shouldInfluenceUpdateCount = !getEntityMarker(parent).fields.hasAtLeastOneBearingField
+					|| !field.fieldMarker.isNonbearing
+					|| field.persistedValue !== undefined
 
 				let changesDelta = EventManager.NO_CHANGES_DIFFERENCE
 

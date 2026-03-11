@@ -54,4 +54,3 @@ test('insert author with id', async () => {
 		permissions: new AllowAllPermissionFactory().create(schema, true),
 	})
 })
-

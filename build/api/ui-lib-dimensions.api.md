@@ -5,7 +5,7 @@
 ```ts
 
 import { DataViewSortingDirections } from '@contember/react-dataview';
-import { JSX as JSX_2 } from 'react/jsx-runtime';
+import { JSX } from 'react/jsx-runtime';
 import { NamedExoticComponent } from 'react';
 import { ReactNode } from 'react';
 import { SugaredQualifiedEntityList } from '@contember/interface';
@@ -13,10 +13,10 @@ import { SugaredRelativeSingleEntity } from '@contember/interface';
 import { SugaredRelativeSingleField } from '@contember/interface';
 
 // @public (undocumented)
-export const DimensionLabel: ({ label, dimensionValue }: {
+export const DimensionLabel: (input: {
     label: ReactNode;
     dimensionValue: ReactNode;
-}) => JSX_2.Element;
+}) => JSX.Element;
 
 // @public (undocumented)
 export const DimensionsSwitcher: NamedExoticComponent<DimensionsSwitcherProps>;
@@ -46,7 +46,7 @@ export type SideDimensionsProps = {
     as: string;
     field: SugaredRelativeSingleEntity['field'];
     children: ReactNode;
-    renderLabel?: ({ label, dimensionValue }: RenderLabelProps) => ReactNode;
+    renderLabel?: (input: RenderLabelProps) => ReactNode;
 };
 
 // (No @packageDocumentation comment for this package)

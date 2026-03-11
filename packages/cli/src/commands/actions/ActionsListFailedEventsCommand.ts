@@ -2,8 +2,7 @@ import { Command, CommandConfiguration, Input } from '@contember/cli-common'
 import { RemoteProjectResolver } from '../../lib/project/RemoteProjectResolver'
 import { ActionsClient } from '../../lib/actions/ActionsClient'
 import chalkTable from 'chalk-table'
-type Args = {
-}
+type Args = {}
 
 type Options = {
 	project?: string
@@ -65,6 +64,5 @@ export class ActionsListFailedEventsCommand extends Command<Args, Options> {
 			})),
 		)
 		console.log(table)
-
 	}
 }

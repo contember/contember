@@ -16,20 +16,22 @@ class AuthLogService {
 			? dataContainer[AuthLogService.Key] as AuthLogService.Bag
 			: undefined
 
-		await db.commandBus.execute(new CreateAuthLogEntryCommand({
-			success: data.response.ok,
-			personInputIdentifier: data.personInput ?? authData?.data?.personInput,
-			personId: data.personId ?? authData?.data?.personId,
-			invokedById: ctx.identityId,
-			type: data.type,
-			identityProviderId: data.identityProviderId ?? authData?.data?.identityProviderId,
-			errorCode: data.response.ok ? null : data.response.error,
-			personTokenId: data.tokenId ?? authData?.data?.tokenId,
-			errorMessage: data.response.ok ? undefined : data.response.errorMessage,
-			ipAddress: ctx.clientIp,
-			userAgent: ctx.userAgent,
-			metadata: {},
-		}))
+		await db.commandBus.execute(
+			new CreateAuthLogEntryCommand({
+				success: data.response.ok,
+				personInputIdentifier: data.personInput ?? authData?.data?.personInput,
+				personId: data.personId ?? authData?.data?.personId,
+				invokedById: ctx.identityId,
+				type: data.type,
+				identityProviderId: data.identityProviderId ?? authData?.data?.identityProviderId,
+				errorCode: data.response.ok ? null : data.response.error,
+				personTokenId: data.tokenId ?? authData?.data?.tokenId,
+				errorMessage: data.response.ok ? undefined : data.response.errorMessage,
+				ipAddress: ctx.clientIp,
+				userAgent: ctx.userAgent,
+				metadata: {},
+			}),
+		)
 	}
 }
 

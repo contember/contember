@@ -37,9 +37,7 @@ export class ValidationQueriesProvider {
 				data: { type: new GraphQLNonNull(dataType) },
 			},
 			resolve: (parent, args, context: Context, info) =>
-				context.timer(`GraphQL.query.${info.fieldName}`, () =>
-					context.executionContainer.validationResolver.validateCreate(entity, args),
-				),
+				context.timer(`GraphQL.query.${info.fieldName}`, () => context.executionContainer.validationResolver.validateCreate(entity, args)),
 		}
 	}
 
@@ -62,9 +60,7 @@ export class ValidationQueriesProvider {
 				data: { type: new GraphQLNonNull(dataType) },
 			},
 			resolve: (parent, args, context: Context, info) =>
-				context.timer(`GraphQL.query.${info.fieldName}`, () =>
-					context.executionContainer.validationResolver.validateUpdate(entity, args),
-				),
+				context.timer(`GraphQL.query.${info.fieldName}`, () => context.executionContainer.validationResolver.validateUpdate(entity, args)),
 		}
 	}
 }

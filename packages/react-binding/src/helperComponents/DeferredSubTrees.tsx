@@ -1,5 +1,5 @@
 import { ReactNode, useCallback, useEffect, useState } from 'react'
-import { TreeRootIdProvider, useBindingOperations, useHasEntity, useEnvironment } from '../accessorPropagation'
+import { TreeRootIdProvider, useBindingOperations, useEnvironment, useHasEntity } from '../accessorPropagation'
 import { Component } from '../coreComponents'
 import { useEntityBeforePersist } from '../entityEvents'
 import { EntityFieldMarkersContainer, EntityFieldsWithHoistablesMarker } from '@contember/binding'
@@ -20,7 +20,7 @@ type LoadState =
 	| {
 		name: 'success'
 		treeRootId: TreeRootId | undefined
-	  }
+	}
 
 /**
  * @group Data binding

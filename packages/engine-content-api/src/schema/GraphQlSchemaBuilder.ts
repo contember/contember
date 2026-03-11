@@ -63,9 +63,7 @@ export class GraphQlSchemaBuilder {
 			queries.set('transaction', {
 				type: queryTransactionType,
 				resolve: async (parent, args, context: Context, info) => {
-					return context.timer(`GraphQL.query.${info.fieldName}`, () =>
-						context.executionContainer.readResolver.resolveTransaction(info),
-					)
+					return context.timer(`GraphQL.query.${info.fieldName}`, () => context.executionContainer.readResolver.resolveTransaction(info))
 				},
 			})
 		}
@@ -105,13 +103,17 @@ export class GraphQlSchemaBuilder {
 				type: new GraphQLNonNull(
 					mutationTransactionType,
 				),
-				resolve: async (parent, args: { options?: { deferForeignKeyConstraints?: boolean; deferUniqueConstraints?: boolean } }, context: Context, info) => {
+				resolve: async (
+					parent,
+					args: { options?: { deferForeignKeyConstraints?: boolean; deferUniqueConstraints?: boolean } },
+					context: Context,
+					info,
+				) => {
 					return context.timer(`GraphQL.mutation.${info.fieldName}`, () =>
 						context.executionContainer.mutationResolver.resolveTransaction(info, {
 							deferForeignKeyConstraints: args.options?.deferForeignKeyConstraints ?? false,
 							deferUniqueConstraints: args.options?.deferUniqueConstraints ?? false,
-						}),
-					)
+						}))
 				},
 			})
 			mutations.set('query', {
@@ -137,7 +139,6 @@ export class GraphQlSchemaBuilder {
 				description: 'TODO',
 			}),
 		})
-
 
 		return {
 			query: queryObjectType,

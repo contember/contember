@@ -7,8 +7,6 @@ import { CaseStatement } from './CaseStatement'
 import { formatColumnIdentifier } from '../utils'
 
 export class ColumnExpressionFactory {
-	constructor() {}
-
 	public select(columnName: QueryBuilder.ColumnIdentifier): Literal {
 		return new Literal(formatColumnIdentifier(columnName))
 	}

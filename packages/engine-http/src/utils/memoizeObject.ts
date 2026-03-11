@@ -1,4 +1,3 @@
-
 export const createMemoizer = <T extends object>(canonicalizeValue: (value: T) => string) => {
 	const cache = new Map<string, WeakRef<T>>()
 	const canonicalValueCache = new WeakMap<T, string>()
@@ -34,5 +33,4 @@ export const createMemoizer = <T extends object>(canonicalizeValue: (value: T) =
 
 		return stableObj
 	}
-
 }

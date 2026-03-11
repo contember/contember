@@ -17,7 +17,9 @@ export class ResolversFactory {
 	}
 
 	create(): Resolvers {
-		const resolvers: Resolvers<ActionsContext> & { Mutation: Required<Resolvers<ActionsContext>['Mutation']> } & { Query: Required<Resolvers<ActionsContext>['Query']> } = {
+		const resolvers: Resolvers<ActionsContext> & { Mutation: Required<Resolvers<ActionsContext>['Mutation']> } & {
+			Query: Required<Resolvers<ActionsContext>['Query']>
+		} = {
 			Json: JSONType,
 			DateTime: DateTimeType,
 			Uuid: UuidType,

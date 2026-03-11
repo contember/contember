@@ -20,8 +20,7 @@ export interface ReferenceElement extends ElementWithReference {
 	type: typeof referenceElementType
 }
 
-export const isReferenceElement = (node: Node): node is ReferenceElement =>
-	Element.isElement(node) && node.type === referenceElementType
+export const isReferenceElement = (node: Node): node is ReferenceElement => Element.isElement(node) && node.type === referenceElementType
 
 export interface ReferenceElementOptions {
 	referenceDiscriminationField: RelativeSingleField | undefined

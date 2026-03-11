@@ -9,7 +9,9 @@ export interface DataViewVisibilityTriggerAttributes {
 	['data-current']?: ''
 }
 
-const SlotType = Slot as React.ForwardRefExoticComponent<React.ButtonHTMLAttributes<HTMLButtonElement> & React.RefAttributes<HTMLButtonElement> & DataViewVisibilityTriggerAttributes>
+const SlotType = Slot as React.ForwardRefExoticComponent<
+	React.ButtonHTMLAttributes<HTMLButtonElement> & React.RefAttributes<HTMLButtonElement> & DataViewVisibilityTriggerAttributes
+>
 
 export interface DataViewVisibilityTriggerProps {
 	name: string

@@ -18,12 +18,13 @@ export const BoardSortableColumnDragOverlay = ({ children }: {
 			<DragOverlay>
 				<BoardCurrentColumnContext.Provider value={activeItem}>
 					<AccessorTree state={accessorTreeState}>
-						{isEntityAccessor(activeItem.value) ?
-							<Entity accessor={activeItem.value}>
-								{children}
-							</Entity>
-							: children
-						}
+						{isEntityAccessor(activeItem.value)
+							? (
+								<Entity accessor={activeItem.value}>
+									{children}
+								</Entity>
+							)
+							: children}
 					</AccessorTree>
 				</BoardCurrentColumnContext.Provider>
 			</DragOverlay>

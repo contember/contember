@@ -65,5 +65,3 @@ test('same predicate on row and field level', async () => {
 		},
 	})
 })
-
-

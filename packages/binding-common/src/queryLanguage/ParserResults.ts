@@ -1,9 +1,4 @@
-import {
-	EntityName,
-	FieldName,
-	Filter,
-	UniqueWhere,
-} from '../treeParameters'
+import { EntityName, FieldName, Filter, UniqueWhere } from '../treeParameters'
 
 export interface ParsedQualifiedSingleEntity {
 	where: UniqueWhere
@@ -72,7 +67,7 @@ export interface ParsedTaggedMapEntry {
 
 export interface ParsedTaggedMapLiteralValue {
 	type: 'literal'
-	value:  string | number
+	value: string | number
 }
 
 export interface ParsedTaggedMapVariableValue {

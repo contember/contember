@@ -1,28 +1,28 @@
 export { SchemaMigrator } from '@contember/schema-migrations'
 
-export { typeDefs, devTypeDefs, Schema } from './schema'
+export { devTypeDefs, Schema, typeDefs } from './schema'
 
 export {
+	type Command,
 	type ContentQueryExecutor,
 	type ContentQueryExecutorContext,
 	type ContentQueryExecutorQuery,
 	type ContentQueryExecutorResult,
 	type DatabaseContext,
 	DatabaseContextFactory,
-	type Command,
 	formatSchemaName,
 	getJunctionTables,
 	Identity,
 	LatestTransactionIdByStageQuery,
 	ProjectInitializer,
 	ProjectMigrator,
+	type SchemaMeta,
+	SchemaProvider,
+	type SchemaWithMeta,
 	type Stage,
 	StageBySlugQuery,
 	StageCreator,
 	StagesQuery,
-	SchemaProvider,
-	type SchemaMeta,
-	type SchemaWithMeta,
 } from './model'
 export * from './SystemContainer'
 export * from './resolvers'

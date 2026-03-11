@@ -8,7 +8,6 @@ export enum S3Providers {
 	cloudserver = 'cloudserver',
 }
 
-
 export const s3ConfigSchema = Typesafe.intersection(
 	Typesafe.object({
 		bucket: Typesafe.string,

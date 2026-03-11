@@ -1,6 +1,6 @@
 import { Model } from '@contember/schema'
 import { expect, test } from 'bun:test'
-import { createSchema, c } from '../../../src'
+import { c, createSchema } from '../../../src'
 import { extendEntity, FieldDefinition } from '../../../src/model/definition'
 import { DecoratorFunction } from '../../../src/utils'
 
@@ -25,7 +25,6 @@ namespace ExtendedModel {
 
 	addField('lead', c.stringColumn())(Article)
 }
-
 
 test('add a field to entity using an extension', () => {
 	const schema = createSchema(ExtendedModel)

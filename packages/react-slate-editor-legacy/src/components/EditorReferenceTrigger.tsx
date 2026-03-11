@@ -12,8 +12,7 @@ export interface EditorReferenceTriggerProps {
 	referenceType: OptionallyVariableFieldValue
 	children: ReactElement
 }
-export const EditorReferenceTrigger = ({ referenceType, ... props }: EditorReferenceTriggerProps) => {
-
+export const EditorReferenceTrigger = ({ referenceType, ...props }: EditorReferenceTriggerProps) => {
 	const editor = useSlate() as EditorWithBlocks
 	const editorReferenceBlocks = useEditorReferenceBlocks()
 	const environment = useEnvironment()

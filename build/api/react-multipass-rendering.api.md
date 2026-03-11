@@ -7,7 +7,6 @@
 import type { ElementType } from 'react';
 import type { ReactElement } from 'react';
 import type { ReactNode } from 'react';
-import type { ReactText } from 'react';
 
 // @public (undocumented)
 export class BranchNode<Props extends {} = {}, StaticContext = undefined, FactoryMethodName extends ValidFactoryName = string, ChildrenRepresentation = any, ReducedChildrenRepresentation = any, Representation = any> {
@@ -123,7 +122,7 @@ export type StaticContextFactory<Props extends {}, StaticContext> = (props: Prop
 export type SyntheticChildrenFactory<Props extends {}, StaticContext> = (props: Props, staticContext: StaticContext) => ReactNode;
 
 // @public (undocumented)
-export type UnconstrainedLeafRepresentationFactory<Props extends {}, Representation, StaticContext> = (node: ReactText | ReactElement<Props, any> | boolean | null | undefined, staticContext: StaticContext) => Representation;
+export type UnconstrainedLeafRepresentationFactory<Props extends {}, Representation, StaticContext> = (node: string | number | bigint | ReactElement<Props, any> | boolean | null | undefined, staticContext: StaticContext) => Representation;
 
 // @public (undocumented)
 export type UseSiteBranchNodeRepresentationFactory<Props extends {}, ChildrenRepresentation, Representation, StaticContext> = (node: ReactElement<Props, any>, childrenRepresentation: ChildrenRepresentation, staticContext: StaticContext) => Representation;

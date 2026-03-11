@@ -34,4 +34,3 @@ test('Format date query', async () => {
 		},
 	})
 })
-

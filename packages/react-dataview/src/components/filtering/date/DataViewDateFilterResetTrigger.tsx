@@ -9,7 +9,6 @@ import { useDataViewFilterName } from '../../../contexts'
 const SlotType = Slot as React.ForwardRefExoticComponent<React.ButtonHTMLAttributes<HTMLButtonElement> & React.RefAttributes<HTMLButtonElement>>
 
 export interface DataViewDateFilterResetTriggerProps {
-
 	/**
 	 * The name of the filter. If not provided, it will be inferred from the context
 	 */
@@ -47,7 +46,6 @@ export interface DataViewDateFilterResetTriggerProps {
  */
 export const DataViewDateFilterResetTrigger = forwardRef<HTMLButtonElement, DataViewDateFilterResetTriggerProps>(
 	({ name, type, ...props }, ref) => {
-		// eslint-disable-next-line react-hooks/rules-of-hooks
 		name ??= useDataViewFilterName()
 		const [state, setFilter] = useDataViewFilter<DateRangeFilterArtifacts>(name)
 

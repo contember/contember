@@ -4,9 +4,9 @@ const uuidPattern = /^[0-9a-f]{8}-?[0-9a-f]{4}-?[0-9a-f]{4}-?[0-9a-f]{4}-?[0-9a-
 /** dashes are optional */
 const isUuid = (value: string): boolean => {
 	return (
-		value.length <= 36 &&
-		value.length >= 32 &&
-		value.match(uuidPattern) !== null
+		value.length <= 36
+		&& value.length >= 32
+		&& value.match(uuidPattern) !== null
 	)
 }
 

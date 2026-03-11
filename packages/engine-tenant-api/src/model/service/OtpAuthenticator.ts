@@ -47,6 +47,6 @@ export class OtpAuthenticator {
 }
 
 type SecretLike = { uri: string } | { secret: string }
-const getSecret = function (otp: SecretLike): Secret {
+const getSecret = function(otp: SecretLike): Secret {
 	return 'uri' in otp ? (URI.parse(otp.uri).secret) : Secret.fromBase32(otp.secret)
 }

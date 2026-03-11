@@ -1,12 +1,4 @@
-import {
-	Editor,
-	Element as SlateElement,
-	Node as SlateNode,
-	Path as SlatePath,
-	Range as SlateRange,
-	Text,
-	Transforms,
-} from 'slate'
+import { Editor, Element as SlateElement, Node as SlateNode, Path as SlatePath, Range as SlateRange, Text, Transforms } from 'slate'
 import { ContemberEditor } from '../../../editor'
 import { isListItemElement, ListItemElement, listItemElementPlugin } from './ListItemElement'
 import { OrderedListElement, orderedListElementPlugin } from './OrderedListElement'
@@ -20,7 +12,8 @@ export const withLists = ({ renderListItem, renderUnorderedList, renderOrderedLi
 	renderListItem: ElementRenderer<ListItemElement>
 	renderOrderedList: ElementRenderer<OrderedListElement>
 	renderUnorderedList: ElementRenderer<UnorderedListElement>
-}) => <E extends Editor>(editor: E): E => {
+}) =>
+<E extends Editor>(editor: E): E => {
 	const {
 		insertBreak,
 		onKeyDown,
@@ -123,9 +116,9 @@ export const withLists = ({ renderListItem, renderUnorderedList, renderOrderedLi
 		onKeyDown: event => {
 			// TODO this should also work for expanded selections
 			if (
-				(event.key !== 'Tab' && event.key !== 'Enter') ||
-				!editor.selection ||
-				!SlateRange.isCollapsed(editor.selection)
+				(event.key !== 'Tab' && event.key !== 'Enter')
+				|| !editor.selection
+				|| !SlateRange.isCollapsed(editor.selection)
 			) {
 				return onKeyDown(event)
 			}
@@ -142,7 +135,7 @@ export const withLists = ({ renderListItem, renderUnorderedList, renderOrderedLi
 
 			if (event.key === 'Tab') {
 				if (editor.isDefaultElement(closestBlockElement)) {
-					[closestBlockElement, closestBlockPath] = Editor.parent(editor, closestBlockPath)
+					;[closestBlockElement, closestBlockPath] = Editor.parent(editor, closestBlockPath)
 				}
 				if (!isListItemElement(closestBlockElement)) {
 					return onKeyDown(event)
@@ -195,8 +188,6 @@ export const withLists = ({ renderListItem, renderUnorderedList, renderOrderedLi
 			return onKeyDown(event)
 		},
 	})
-
-
 
 	return editor
 }

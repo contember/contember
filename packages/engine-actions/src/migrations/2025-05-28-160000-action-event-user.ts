@@ -11,6 +11,6 @@ ALTER TABLE actions_event
 ADD COLUMN IF NOT EXISTS user_agent TEXT DEFAULT NULL;
 `
 
-export default async function (builder: MigrationBuilder) {
+export default async function(builder: MigrationBuilder) {
 	builder.sql(sql)
 }

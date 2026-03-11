@@ -7,13 +7,4 @@ import OneHasOneBuilder from './builder/OneHasOneBuilder'
 import FieldBuilder from './builder/FieldBuilder'
 import * as SchemaDefinition from './definition'
 
-export {
-	SchemaBuilder,
-	ColumnBuilder,
-	ManyHasManyBuilder,
-	OneHasManyBuilder,
-	ManyHasOneBuilder,
-	OneHasOneBuilder,
-	FieldBuilder,
-	SchemaDefinition,
-}
+export { ColumnBuilder, FieldBuilder, ManyHasManyBuilder, ManyHasOneBuilder, OneHasManyBuilder, OneHasOneBuilder, SchemaBuilder, SchemaDefinition }

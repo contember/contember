@@ -1,6 +1,5 @@
 import { Providers } from '../providers'
 
-
 export type MaybePassword = Password | typeof NoPassword
 
 export const NoPassword = {

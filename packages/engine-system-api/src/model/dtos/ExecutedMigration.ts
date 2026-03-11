@@ -11,7 +11,6 @@ export class ExecutedMigration implements Migration {
 		public readonly executedAt: Date,
 		public readonly checksum: string | null,
 		public readonly type: 'schema' | 'content',
-
 	) {
 		this.version = MigrationVersionHelper.extractVersion(name)
 	}

@@ -1,7 +1,7 @@
 import { MigrationBuilder } from '@contember/database-migrations'
 import { SystemMigrationArgs } from './types'
 
-export default async function (builder: MigrationBuilder, args: SystemMigrationArgs) {
+export default async function(builder: MigrationBuilder, args: SystemMigrationArgs) {
 	builder.createTable(
 		{
 			name: 'schema_migration',

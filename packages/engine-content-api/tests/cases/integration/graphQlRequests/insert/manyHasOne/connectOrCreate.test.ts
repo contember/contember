@@ -8,9 +8,7 @@ import { testUuid } from '../../../../../src/testUuid'
 test('create posts and connect/create author (exists, many has one)', async () => {
 	await execute({
 		schema: new SchemaBuilder()
-			.entity('Post', e =>
-				e.column('publishedAt', c => c.type(Model.ColumnType.DateTime)).manyHasOne('author', r => r.target('Author')),
-			)
+			.entity('Post', e => e.column('publishedAt', c => c.type(Model.ColumnType.DateTime)).manyHasOne('author', r => r.target('Author')))
 			.entity('Author', e => e.column('name', c => c.type(Model.ColumnType.String).unique()))
 			.buildSchema(),
 		query: GQL`
@@ -48,13 +46,10 @@ test('create posts and connect/create author (exists, many has one)', async () =
 	})
 })
 
-
 test('create posts and connect/create author (not exists, many has one)', async () => {
 	await execute({
 		schema: new SchemaBuilder()
-			.entity('Post', e =>
-				e.column('publishedAt', c => c.type(Model.ColumnType.DateTime)).manyHasOne('author', r => r.target('Author')),
-			)
+			.entity('Post', e => e.column('publishedAt', c => c.type(Model.ColumnType.DateTime)).manyHasOne('author', r => r.target('Author')))
 			.entity('Author', e => e.column('name', c => c.type(Model.ColumnType.String).unique()))
 			.buildSchema(),
 		query: GQL`
@@ -101,6 +96,3 @@ test('create posts and connect/create author (not exists, many has one)', async 
 		},
 	})
 })
-
-
-

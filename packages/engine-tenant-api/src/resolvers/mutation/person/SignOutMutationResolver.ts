@@ -17,7 +17,8 @@ export class SignOutMutationResolver implements MutationResolvers {
 
 		if (personApiKeyId?.type === ApiKey.Type.PERMANENT) {
 			return createErrorResponse(
-				'NOT_POSSIBLE_SIGN_OUT_WITH_PERMANENT_API_KEY', 'Only session API keys can be used for person sign out.',
+				'NOT_POSSIBLE_SIGN_OUT_WITH_PERMANENT_API_KEY',
+				'Only session API keys can be used for person sign out.',
 			)
 		}
 

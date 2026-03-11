@@ -12,7 +12,9 @@ export class SystemResolverContextFactory {
 		private readonly authorizator: Authorizator<Identity>,
 	) {}
 
-	public async create({ getSchema, identity, project, db }: Pick<SystemResolverContext, 'getSchema' | 'db' | 'identity' | 'project'>): Promise<SystemResolverContext> {
+	public async create(
+		{ getSchema, identity, project, db }: Pick<SystemResolverContext, 'getSchema' | 'db' | 'identity' | 'project'>,
+	): Promise<SystemResolverContext> {
 		const stagePermissionsFactory = new StagePermissionsFactory(getSchema)
 		const loaders = new Map<LoaderFactory<any, any>, ItemLoader<any, any>>()
 		return {

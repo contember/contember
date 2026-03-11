@@ -2,7 +2,6 @@ import { Input } from './input'
 import { JSONValue } from './json'
 
 export namespace Model {
-
 	export type Entity<Fields extends string = string> = {
 		readonly name: string
 		readonly primary: string
@@ -53,7 +52,7 @@ export namespace Model {
 		readonly columnName: string
 	}
 
-	export type ColumnTypeDefinition<T extends ColumnType = ColumnType>  =
+	export type ColumnTypeDefinition<T extends ColumnType = ColumnType> =
 		& Field<T>
 		& {
 			readonly columnType: string
@@ -70,12 +69,94 @@ export namespace Model {
 
 	export type Collation =
 		// generic
-		| 'und-x-icu' | 'C' | 'ucs_basic' | 'unicode' | 'POSIX' | 'default'
+		| 'und-x-icu'
+		| 'C'
+		| 'ucs_basic'
+		| 'unicode'
+		| 'POSIX'
+		| 'default'
 		// some languages
-		| 'cs-x-icu' | 'sk-x-icu' | 'da-x-icu' | 'de-x-icu' | 'en-x-icu' | 'es-x-icu' | 'fr-x-icu' | 'it-x-icu' | 'ja-x-icu' | 'ko-x-icu' | 'nl-x-icu' | 'pl-x-icu' | 'pt-x-icu' | 'ru-x-icu' | 'sv-x-icu' | 'tr-x-icu' | 'zh-x-icu' | 'hu-x-icu' | 'fi-x-icu' | 'el-x-icu' | 'bg-x-icu' | 'hr-x-icu' | 'ro-x-icu' | 'sl-x-icu' | 'sr-x-icu' | 'uk-x-icu' | 'vi-x-icu' | 'th-x-icu' | 'ar-x-icu' | 'he-x-icu' | 'hi-x-icu' | 'id-x-icu' | 'ms-x-icu' | 'fil-x-icu' | 'sw-x-icu' | 'ta-x-icu' | 'te-x-icu' | 'ml-x-icu' | 'bn-x-icu' | 'gu-x-icu' | 'kn-x-icu' | 'mr-x-icu' | 'pa-x-icu' | 'ur-x-icu' | 'or-x-icu' | 'si-x-icu' | 'th-x-icu' | 'lo-x-icu' | 'my-x-icu' | 'ka-x-icu' | 'am-x-icu' | 'ti-x-icu' | 'ne-x-icu' | 'dz-x-icu' | 'kok-x-icu' | 'syr-x-icu' | 'sd-x-icu' | 'bo-x-icu' | 'km-x-icu' | 'mn-x-icu' | 'lo-x-icu' | 'gl-x-icu' | 'eu-x-icu' | 'ca-x-icu' | 'af-x-icu' | 'is-x-icu' | 'mk-x-icu' | 'sq-x-icu' | 'hy-x-icu' | 'mt-x-icu' | 'cy-x-icu' | 'et-x-icu' | 'lv-x-icu' | 'lt-x-icu' | 'tg-x-icu' | 'fa-x-icu' | 'ps-x-icu' | 'ks-x-icu' | 'sd-x'
+		| 'cs-x-icu'
+		| 'sk-x-icu'
+		| 'da-x-icu'
+		| 'de-x-icu'
+		| 'en-x-icu'
+		| 'es-x-icu'
+		| 'fr-x-icu'
+		| 'it-x-icu'
+		| 'ja-x-icu'
+		| 'ko-x-icu'
+		| 'nl-x-icu'
+		| 'pl-x-icu'
+		| 'pt-x-icu'
+		| 'ru-x-icu'
+		| 'sv-x-icu'
+		| 'tr-x-icu'
+		| 'zh-x-icu'
+		| 'hu-x-icu'
+		| 'fi-x-icu'
+		| 'el-x-icu'
+		| 'bg-x-icu'
+		| 'hr-x-icu'
+		| 'ro-x-icu'
+		| 'sl-x-icu'
+		| 'sr-x-icu'
+		| 'uk-x-icu'
+		| 'vi-x-icu'
+		| 'th-x-icu'
+		| 'ar-x-icu'
+		| 'he-x-icu'
+		| 'hi-x-icu'
+		| 'id-x-icu'
+		| 'ms-x-icu'
+		| 'fil-x-icu'
+		| 'sw-x-icu'
+		| 'ta-x-icu'
+		| 'te-x-icu'
+		| 'ml-x-icu'
+		| 'bn-x-icu'
+		| 'gu-x-icu'
+		| 'kn-x-icu'
+		| 'mr-x-icu'
+		| 'pa-x-icu'
+		| 'ur-x-icu'
+		| 'or-x-icu'
+		| 'si-x-icu'
+		| 'th-x-icu'
+		| 'lo-x-icu'
+		| 'my-x-icu'
+		| 'ka-x-icu'
+		| 'am-x-icu'
+		| 'ti-x-icu'
+		| 'ne-x-icu'
+		| 'dz-x-icu'
+		| 'kok-x-icu'
+		| 'syr-x-icu'
+		| 'sd-x-icu'
+		| 'bo-x-icu'
+		| 'km-x-icu'
+		| 'mn-x-icu'
+		| 'lo-x-icu'
+		| 'gl-x-icu'
+		| 'eu-x-icu'
+		| 'ca-x-icu'
+		| 'af-x-icu'
+		| 'is-x-icu'
+		| 'mk-x-icu'
+		| 'sq-x-icu'
+		| 'hy-x-icu'
+		| 'mt-x-icu'
+		| 'cy-x-icu'
+		| 'et-x-icu'
+		| 'lv-x-icu'
+		| 'lt-x-icu'
+		| 'tg-x-icu'
+		| 'fa-x-icu'
+		| 'ps-x-icu'
+		| 'ks-x-icu'
+		| 'sd-x'
 		// fallback
 		| string & {}
-
 
 	export enum RelationType {
 		OneHasOne = 'OneHasOne',
@@ -99,7 +180,7 @@ export namespace Model {
 
 	export type AnyRelation = AnyInverseRelation | AnyOwningRelation
 
-	export type Relation<T extends RelationType = RelationType>=
+	export type Relation<T extends RelationType = RelationType> =
 		& Field<T>
 		& {
 			readonly name: string
@@ -243,7 +324,6 @@ export namespace Model {
 		readonly method?: IndexMethod
 	}
 
-
 	export interface ColumnContext {
 		entity: Model.Entity
 		column: Model.AnyColumn
@@ -314,7 +394,6 @@ export namespace Model {
 		targetEntity: Model.Entity
 		targetRelation: Model.OneHasOneInverseRelation | null
 	}
-
 
 	export interface ColumnVisitor<T> {
 		visitColumn(context: ColumnContext): T

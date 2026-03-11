@@ -27,7 +27,6 @@ export default class ColumnProcessor implements FieldProcessor<ColumnBuilder.Opt
 			nullable: options.nullable === undefined ? true : options.nullable,
 		}
 		if (type === Model.ColumnType.Enum) {
-			// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
 			return { ...common, type: type, columnType: options.enumName! }
 		}
 		return {

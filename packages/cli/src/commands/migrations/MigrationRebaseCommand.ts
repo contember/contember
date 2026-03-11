@@ -18,7 +18,6 @@ export class MigrationRebaseCommand extends Command<Args, Options> {
 		super()
 	}
 
-
 	protected configure(configuration: CommandConfiguration<Args, Options>): void {
 		configuration.description('Rebase migrations on filesystem and in local instance')
 		configuration.argument('migration').variadic()
@@ -29,7 +28,6 @@ export class MigrationRebaseCommand extends Command<Args, Options> {
 	}
 
 	protected async execute(input: Input<Args, Options>): Promise<void> {
-
 		const migrationNames = input.getArgument('migration')
 
 		const migrations: Migration[] = []

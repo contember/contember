@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/ban-ts-comment */
 import { describe, expect, test } from 'bun:test'
 import { ContentClientInput } from '../../../src'
 import { ContemberClientEntities, FragmentOf, FragmentType, queryBuilder } from '../../client'
@@ -75,9 +74,10 @@ describe('ts types', () => {
 	test('has one field on fragment type', async () => {
 		const fragment = qb.fragment('Post', it => it.$('author', it => it.$$().$('posts', it => it.$('id'))))
 		type fragmentType = FragmentType<typeof fragment>
-		expectTypeOf<fragmentType>().toEqualTypeOf<{ author: ({ id: string; name: string | null; email: string | null } & { posts: { id: string }[] }) | null }>()
+		expectTypeOf<fragmentType>().toEqualTypeOf<
+			{ author: ({ id: string; name: string | null; email: string | null } & { posts: { id: string }[] }) | null }
+		>()
 	})
-
 
 	test('has one without arg', async () => {
 		qb.list('Post', {}, it => it.$('author', it => it.$$()))
@@ -88,13 +88,13 @@ describe('ts types', () => {
 	})
 
 	test('has one with invalid arg', async () => {
-		qb.list('Post', {}, it => it
-			.$('author',
-				// @ts-expect-error
-				{ filter: { foo: { eq: 'xx' } } },
-				it => it.$$(),
-			),
-		)
+		qb.list('Post', {}, it =>
+			it
+				.$(
+					'author', // @ts-expect-error
+					{ filter: { foo: { eq: 'xx' } } },
+					it => it.$$(),
+				))
 	})
 
 	test('has many without arg', async () => {
@@ -102,35 +102,32 @@ describe('ts types', () => {
 	})
 
 	test('has many with arg', async () => {
-		qb.list('Post', {}, it => it.$('locales', { filter: { locale: { code: { eq: 'cs' } } } },  it => it.$$()))
+		qb.list('Post', {}, it => it.$('locales', { filter: { locale: { code: { eq: 'cs' } } } }, it => it.$$()))
 	})
 
 	test('has many with invalid arg', async () => {
-		qb.list('Post', {}, it => it
-			.$('locales',
-				// @ts-expect-error
-				{ filter: { locale: { eq: 'cs' } } },
-				it => it.$$(),
-			),
-		)
+		qb.list('Post', {}, it =>
+			it
+				.$(
+					'locales', // @ts-expect-error
+					{ filter: { locale: { eq: 'cs' } } },
+					it => it.$$(),
+				))
 	})
 
 	test('reduced has may', async () => {
-		qb.list('Post', {}, it => it.$('localesByLocale', { by: { locale: { code: 'cs' } } },  it => it.$$()))
+		qb.list('Post', {}, it => it.$('localesByLocale', { by: { locale: { code: 'cs' } } }, it => it.$$()))
 	})
 
 	test('reduced has may - invalid "by"', async () => {
-		qb.list('Post',
-			{},
-			it => it
-				.$('localesByLocale',
-					// @ts-expect-error
+		qb.list('Post', {}, it =>
+			it
+				.$(
+					'localesByLocale', // @ts-expect-error
 					{ by: { locale: {} } },
 					qb.fragment('PostLocale'),
-				),
-		)
+				))
 	})
-
 
 	test('invalid field', async () => {
 		expect(() => {

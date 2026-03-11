@@ -24,11 +24,13 @@ export class ManyHasManyInverseDefinition extends FieldDefinition<ManyHasManyInv
 		}
 	}
 
-	protected withOption<K extends keyof ManyHasManyInverseDefinitionOptions>(key: K, value: ManyHasManyInverseDefinitionOptions[K]): ManyHasManyInverseDefinition {
+	protected withOption<K extends keyof ManyHasManyInverseDefinitionOptions>(
+		key: K,
+		value: ManyHasManyInverseDefinitionOptions[K],
+	): ManyHasManyInverseDefinition {
 		return new ManyHasManyInverseDefinition({ ...this.options, [key]: value })
 	}
 }
-
 
 export function manyHasManyInverse(target: EntityConstructor, ownedBy: string): ManyHasManyInverseDefinition {
 	return new ManyHasManyInverseDefinition({ target, ownedBy })

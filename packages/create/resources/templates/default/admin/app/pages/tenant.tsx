@@ -64,7 +64,7 @@ export const Security = () => {
 export const Members = () => {
 	const projectSlug = useProjectSlug()!
 	const showToast = useShowToast()
-	const memberListController = useRef<MemberListController>()
+	const memberListController = useRef<MemberListController>(undefined)
 
 	return (
 		<>
@@ -110,7 +110,7 @@ export const Members = () => {
 export const ApiKeys = () => {
 	const projectSlug = useProjectSlug()!
 	const showToast = useShowToast()
-	const memberListController = useRef<MemberListController>()
+	const memberListController = useRef<MemberListController>(undefined)
 
 	return (
 		<>

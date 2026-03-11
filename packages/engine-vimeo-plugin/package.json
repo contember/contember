@@ -27,12 +27,12 @@
     "@contember/typesafe": "workspace:*"
   },
   "devDependencies": {
-    "@types/node": "^20.17.22",
-    "graphql": "^16.9.0"
+    "@types/node": "catalog:",
+    "graphql": "catalog:"
   },
   "peerDependencies": {
-    "graphql": ">= 14.6.0",
-    "pg": "^8.9.0"
+    "graphql": "catalog:",
+    "pg": "catalog:"
   },
   "type": "module"
 }

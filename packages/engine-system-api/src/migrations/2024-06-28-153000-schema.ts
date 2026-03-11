@@ -15,6 +15,6 @@ CREATE TABLE "schema"
 );
 `
 
-export default async function (builder: MigrationBuilder) {
+export default async function(builder: MigrationBuilder) {
 	builder.sql(sql)
 }

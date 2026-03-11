@@ -7,9 +7,11 @@ export function useOnWindowResize(
 ) {
 	const scopedConsoleRef = useScopedConsoleRef('useOnWindowResize')
 
-	const callbackRef = useRef(callback); callbackRef.current = callback
+	const callbackRef = useRef(callback)
+	callbackRef.current = callback
 	const lastTimeStamp = useRef<number>(0)
 
+	// biome-ignore lint/correctness/useExhaustiveDependencies: intentional
 	useLayoutEffect(() => {
 		let timeoutID: ReturnType<typeof setTimeout>
 

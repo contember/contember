@@ -8,9 +8,7 @@ import { testUuid } from '../../../../src/testUuid'
 test('delete author and with restrict on posts', async () => {
 	await execute({
 		schema: new SchemaBuilder()
-			.entity('Post', entity =>
-				entity.manyHasOne('author', relation => relation.target('Author')),
-			)
+			.entity('Post', entity => entity.manyHasOne('author', relation => relation.target('Author')))
 			.entity('Author', entity => entity.column('name', column => column.type(Model.ColumnType.String)))
 			.buildSchema(),
 		query: GQL`
@@ -39,7 +37,7 @@ test('delete author and with restrict on posts', async () => {
 				{
 					sql: SQL`delete from "public"."author" where "id" in (?)`,
 					parameters: [testUuid(1)],
-					response: { },
+					response: {},
 				},
 			]),
 		],
@@ -53,13 +51,10 @@ test('delete author and with restrict on posts', async () => {
 	})
 })
 
-
 test('delete author with restrict on posts - declined', async () => {
 	await execute({
 		schema: new SchemaBuilder()
-			.entity('Post', entity =>
-				entity.manyHasOne('author', relation => relation.target('Author')),
-			)
+			.entity('Post', entity => entity.manyHasOne('author', relation => relation.target('Author')))
 			.entity('Author', entity => entity.column('name', column => column.type(Model.ColumnType.String)))
 			.buildSchema(),
 		query: GQL`
@@ -92,14 +87,13 @@ test('delete author with restrict on posts - declined', async () => {
 			data: {
 				deleteAuthor: {
 					ok: false,
-					errorMessage: 'Execution has failed:\n' +
-						'unknown field: ForeignKeyConstraintViolation (Cannot delete 123e4567-e89b-12d3-a456-000000000001 row(s) of entity Author, because it is still referenced from 123e4567-e89b-12d3-a456-000000000002 row(s) of entity Post in relation author. OnDelete behaviour of this relation is set to "restrict". You might consider changing it to "setNull" or "cascade".)',
+					errorMessage: 'Execution has failed:\n'
+						+ 'unknown field: ForeignKeyConstraintViolation (Cannot delete 123e4567-e89b-12d3-a456-000000000001 row(s) of entity Author, because it is still referenced from 123e4567-e89b-12d3-a456-000000000002 row(s) of entity Post in relation author. OnDelete behaviour of this relation is set to "restrict". You might consider changing it to "setNull" or "cascade".)',
 				},
 			},
 		},
 	})
 })
-
 
 namespace DeleteModelView {
 	export class Author {
@@ -139,7 +133,7 @@ test('delete author with restrict on a view - should be ignored', async () => {
 				{
 					sql: SQL`delete from "public"."author" where "id" in (?)`,
 					parameters: [testUuid(1)],
-					response: { },
+					response: {},
 				},
 			]),
 		],
@@ -152,4 +146,3 @@ test('delete author with restrict on a view - should be ignored', async () => {
 		},
 	})
 })
-

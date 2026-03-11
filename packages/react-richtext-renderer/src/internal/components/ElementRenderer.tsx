@@ -9,7 +9,6 @@ import type { RichTextLeaf } from '../../types/structure/RichTextLeaf'
 import { RichTextBlock } from '../../types/RichTextBlock'
 import { RichTextRenderingOptions } from '../../types/RichTextRenderingOptions'
 
-
 export interface ElementRendererProps<
 	CustomElements extends RichTextElement = never,
 	CustomLeaves extends RichTextLeaf = RichTextLeaf,
@@ -27,7 +26,11 @@ export function ElementRenderer<
 	const referenceMetadata = useReferenceMetadata<CustomElements, CustomLeaves>(element, options, block)
 
 	const fallback = (
-		<RenderElementFallback<CustomElements, CustomLeaves> element={element as BuiltinElements<CustomElements, CustomLeaves>} options={options} block={block}>
+		<RenderElementFallback<CustomElements, CustomLeaves>
+			element={element as BuiltinElements<CustomElements, CustomLeaves>}
+			options={options}
+			block={block}
+		>
 			{children}
 		</RenderElementFallback>
 	)

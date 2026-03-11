@@ -5,7 +5,6 @@ import { GQL, SQL } from '../../../../../src/tags'
 import { PermissionFactory } from '../../../../../../src'
 import { testUuid } from '../../../../../src/testUuid'
 
-
 namespace RelationAclManyHasOne {
 	export const readerRole = c.createRole('reader')
 
@@ -30,7 +29,6 @@ namespace RelationAclManyHasOne {
 	}
 }
 
-
 test('can read same entity only over relation of some rows - many has one', async () => {
 	const schema = createSchema(RelationAclManyHasOne)
 
@@ -51,7 +49,8 @@ test('can read same entity only over relation of some rows - many has one', asyn
         }`,
 		executes: [
 			{
-				sql: SQL`select "root_"."title" as "root_title", "root_"."disclose_author" = ? as "root___predicate_discloseAuthor_eq_true", "root_"."author_id" as "root_author", "root_"."id" as "root_id" 
+				sql:
+					SQL`select "root_"."title" as "root_title", "root_"."disclose_author" = ? as "root___predicate_discloseAuthor_eq_true", "root_"."author_id" as "root_author", "root_"."id" as "root_id" 
 from "public"."article" as "root_"`,
 				response: {
 					rows: [
@@ -71,7 +70,8 @@ from "public"."article" as "root_"`,
 				},
 			},
 			{
-				sql: SQL`select "root_"."id" as "root_id", "root_"."name" as "root_name", "root_"."id" as "root_id" from "public"."author" as "root_" where "root_"."id" in (?)`,
+				sql:
+					SQL`select "root_"."id" as "root_id", "root_"."name" as "root_name", "root_"."id" as "root_id" from "public"."author" as "root_" where "root_"."id" in (?)`,
 				parameters: [testUuid(10)],
 				response: {
 					rows: [
@@ -102,8 +102,6 @@ from "public"."article" as "root_"`,
 	})
 })
 
-
-
 namespace RelationAclManyHasMany {
 	export const readerRole = c.createRole('reader')
 
@@ -128,7 +126,6 @@ namespace RelationAclManyHasMany {
 	}
 }
 
-
 test('can read same entity only over relation of some rows - many has many', async () => {
 	const schema = createSchema(RelationAclManyHasMany)
 
@@ -149,7 +146,8 @@ test('can read same entity only over relation of some rows - many has many', asy
         }`,
 		executes: [
 			{
-				sql: SQL`select "root_"."title" as "root_title", "root_"."disclose_author" = ? as "root___predicate_discloseauthor_eq_true", "root_"."id" as "root_id", "root_"."id" as "root_id" 
+				sql:
+					SQL`select "root_"."title" as "root_title", "root_"."disclose_author" = ? as "root___predicate_discloseauthor_eq_true", "root_"."id" as "root_id", "root_"."id" as "root_id" 
 from "public"."article" as "root_"`,
 				response: {
 					rows: [
@@ -167,7 +165,8 @@ from "public"."article" as "root_"`,
 				},
 			},
 			{
-				sql: SQL`select "junction_"."author_id", "junction_"."article_id" from "public"."article_authors" as "junction_" where "junction_"."article_id" in (?)`,
+				sql:
+					SQL`select "junction_"."author_id", "junction_"."article_id" from "public"."article_authors" as "junction_" where "junction_"."article_id" in (?)`,
 				parameters: [testUuid(1)],
 				response: {
 					rows: [
@@ -222,5 +221,3 @@ from "public"."article" as "root_"`,
 		},
 	})
 })
-
-

@@ -13,13 +13,13 @@ namespace PermissionActions {
 		idp = 'idp',
 	}
 
-
 	export const CONFIGURE = Authorizator.createAction(Resources.system, 'configure')
 	export const CONFIG_VIEW = Authorizator.createAction(Resources.system, 'viewConfig')
 
 	export const IDENTITY_VIEW_PERMISSIONS = Authorizator.createAction(Resources.identity, 'viewPermissions')
 	export const IDENTITY_ADD_GLOBAL_ROLES = (roles?: readonly string[]) => Authorizator.createAction(Resources.identity, 'addGlobalRoles', { roles })
-	export const IDENTITY_REMOVE_GLOBAL_ROLES = (roles?: readonly string[]) => Authorizator.createAction(Resources.identity, 'removeGlobalRoles', { roles })
+	export const IDENTITY_REMOVE_GLOBAL_ROLES = (roles?: readonly string[]) =>
+		Authorizator.createAction(Resources.identity, 'removeGlobalRoles', { roles })
 
 	export const PERSON_DISABLE = (roles?: readonly string[]) => Authorizator.createAction(Resources.person, 'disable', { roles })
 
@@ -41,7 +41,8 @@ namespace PermissionActions {
 	export const PERSON_CREATE_SESSION_KEY = (roles?: readonly string[]) => Authorizator.createAction(Resources.person, 'createSessionToken', { roles })
 
 	export const PERSON_INVITE = (memberships: readonly Acl.Membership[]) => Authorizator.createAction(Resources.person, 'invite', { memberships })
-	export const PERSON_INVITE_UNMANAGED = (memberships: readonly Acl.Membership[]) => Authorizator.createAction(Resources.person, 'invite_unmanaged', { memberships })
+	export const PERSON_INVITE_UNMANAGED = (memberships: readonly Acl.Membership[]) =>
+		Authorizator.createAction(Resources.person, 'invite_unmanaged', { memberships })
 
 	export const PROJECT_VIEW = Authorizator.createAction(Resources.project, 'view')
 	export const PROJECT_SET_SECRET = Authorizator.createAction(Resources.project, 'setSecret')
@@ -50,11 +51,14 @@ namespace PermissionActions {
 	export const PROJECT_CREATE = Authorizator.createAction(Resources.project, 'create')
 	export const ENTRYPOINT_DEPLOY = Authorizator.createAction(Resources.entrypoint, 'deployEntrypoint')
 
-	export const PROJECT_VIEW_MEMBER = (memberships: readonly Acl.Membership[]) => Authorizator.createAction(Resources.project, 'viewMembers', { memberships })
-	export const PROJECT_ADD_MEMBER = (memberships: readonly Acl.Membership[]) => Authorizator.createAction(Resources.project, 'addMember', { memberships })
-	export const PROJECT_REMOVE_MEMBER = (memberships: readonly Acl.Membership[]) => Authorizator.createAction(Resources.project, 'removeMember', { memberships })
-	export const PROJECT_UPDATE_MEMBER = (memberships: readonly Acl.Membership[]) => Authorizator.createAction(Resources.project, 'updateMember', { memberships })
-
+	export const PROJECT_VIEW_MEMBER = (memberships: readonly Acl.Membership[]) =>
+		Authorizator.createAction(Resources.project, 'viewMembers', { memberships })
+	export const PROJECT_ADD_MEMBER = (memberships: readonly Acl.Membership[]) =>
+		Authorizator.createAction(Resources.project, 'addMember', { memberships })
+	export const PROJECT_REMOVE_MEMBER = (memberships: readonly Acl.Membership[]) =>
+		Authorizator.createAction(Resources.project, 'removeMember', { memberships })
+	export const PROJECT_UPDATE_MEMBER = (memberships: readonly Acl.Membership[]) =>
+		Authorizator.createAction(Resources.project, 'updateMember', { memberships })
 
 	export const API_KEY_CREATE = Authorizator.createAction(Resources.apiKey, 'create')
 	export const API_KEY_CREATE_GLOBAL = (roles?: readonly string[]) => Authorizator.createAction(Resources.apiKey, 'createGlobal', { roles })

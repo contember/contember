@@ -76,7 +76,6 @@ export const Cents = () => {
 	)
 }
 
-
 export const SelectOrType = () => (
 	<Binding>
 		<Slots.Title>
@@ -89,10 +88,14 @@ export const SelectOrType = () => (
 
 		<EntitySubTree entity="InputRoot(unique = unique)" setOnCreate="(unique = unique)">
 			<div className="space-y-4">
-				<SelectOrTypeField field="textValue" label="Text" options={{
-					a: 'Option A',
-					b: 'Option B',
-				}} />
+				<SelectOrTypeField
+					field="textValue"
+					label="Text"
+					options={{
+						a: 'Option A',
+						b: 'Option B',
+					}}
+				/>
 				<Divider />
 				<InputField field="dummy" label="Dummy to trigger dirty state" />
 			</div>
@@ -167,16 +170,21 @@ export const EnumRadio = () => {
 			<EntitySubTree entity="InputRoot(unique = unique)" setOnCreate="(unique = unique)">
 				<div className="space-y-4">
 					<RadioEnumField field="enumValue" label="Some enum" required={required} />
-					<RadioEnumField field="enumValue" label="Enum with boolean, numbers and null" options={[
-						{ value: 'a', label: 'Option A' },
-						{ value: 'b', label: 'Option B' },
-						{ value: 'c', label: 'Option C' },
-						{ value: true, label: 'True' },
-						{ value: false, label: 'False' },
-						{ value: 1, label: 'One' },
-						{ value: 2, label: 'Two' },
-						{ value: null, label: 'No value' },
-					]} required={required} />
+					<RadioEnumField
+						field="enumValue"
+						label="Enum with boolean, numbers and null"
+						options={[
+							{ value: 'a', label: 'Option A' },
+							{ value: 'b', label: 'Option B' },
+							{ value: 'c', label: 'Option C' },
+							{ value: true, label: 'True' },
+							{ value: false, label: 'False' },
+							{ value: 1, label: 'One' },
+							{ value: 2, label: 'Two' },
+							{ value: null, label: 'No value' },
+						]}
+						required={required}
+					/>
 					<Divider />
 					<InputField field="dummy" label="Dummy to trigger dirty state" />
 				</div>
@@ -184,7 +192,6 @@ export const EnumRadio = () => {
 		</Binding>
 	)
 }
-
 
 export const CheckboxList = () => {
 	return (
@@ -215,16 +222,22 @@ const FillValue = () => {
 
 	return (
 		<>
-			<Button variant="secondary" onClick={() => {
-				textField.updateValue('Co')
-				intField.updateValue(101)
-			}}>
+			<Button
+				variant="secondary"
+				onClick={() => {
+					textField.updateValue('Co')
+					intField.updateValue(101)
+				}}
+			>
 				Fill invalid
 			</Button>
-			<Button variant="secondary" onClick={() => {
-				textField.updateValue('Contember')
-				intField.updateValue(99)
-			}}>
+			<Button
+				variant="secondary"
+				onClick={() => {
+					textField.updateValue('Contember')
+					intField.updateValue(99)
+				}}
+			>
 				Fill valid
 			</Button>
 			<Button variant="secondary" onClick={() => checkbox.updateValue(null)}>Set checkbox null</Button>
@@ -251,10 +264,15 @@ export const ClientValidation = () => (
 				</div>
 
 				<InputField field="textValue" label="Name" description="3-16 characters" required inputProps={{ pattern: '\\w{3,16}' }} />
-				<InputField field="intValue" label="Number" description="max 100" inputProps={{
-					required: true,
-					max: 100,
-				}} />
+				<InputField
+					field="intValue"
+					label="Number"
+					description="max 100"
+					inputProps={{
+						required: true,
+						max: 100,
+					}}
+				/>
 				<CheckboxField field="boolValue" label="Required" description="Required" inputProps={{ required: true }} />
 				<Divider />
 				<InputField field="dummy" label="Dummy to trigger dirty state" />
@@ -270,15 +288,15 @@ const SlugDescription = () => (
 		<ul className="list-disc pl-6 space-y-1">
 			<li>
 				Display-only prefix: <Code>http://google.com</Code>
-				<span className="text-gray-600 text-sm"> (shown but not saved)</span>
+				<span className="text-gray-600 text-sm">(shown but not saved)</span>
 			</li>
 			<li>
 				Fixed prefix: <Code>/article/</Code>
-				<span className="text-gray-600 text-sm"> (saved, cannot be modified)</span>
+				<span className="text-gray-600 text-sm">(saved, cannot be modified)</span>
 			</li>
 			<li>
 				Optional prefix: <Code>foo/</Code>
-				<span className="text-gray-600 text-sm"> (saved, can be removed)</span>
+				<span className="text-gray-600 text-sm">(saved, can be removed)</span>
 			</li>
 		</ul>
 	</div>
@@ -312,7 +330,6 @@ export const Slug = () => (
 	</Binding>
 )
 
-
 export const ServerRules = () => (
 	<Binding>
 		<Slots.Title>
@@ -333,25 +350,27 @@ export const ServerRules = () => (
 	</Binding>
 )
 
-export const CustomError = () => <>
-	<Binding>
-		<Slots.Actions>
-			<PersistButton />
-		</Slots.Actions>
-		<EntitySubTree entity={'InputRoot(unique=unique)'} setOnCreate={'(unique=unique)'}>
-			<div className={'space-y-4'}>
-				<InputFieldWithCustomError field={'textValue'} label={'Text'} description={'Hello world'} />
-			</div>
-		</EntitySubTree>
-	</Binding>
-</>
+export const CustomError = () => (
+	<>
+		<Binding>
+			<Slots.Actions>
+				<PersistButton />
+			</Slots.Actions>
+			<EntitySubTree entity={'InputRoot(unique=unique)'} setOnCreate={'(unique=unique)'}>
+				<div className={'space-y-4'}>
+					<InputFieldWithCustomError field={'textValue'} label={'Text'} description={'Hello world'} />
+				</div>
+			</EntitySubTree>
+		</Binding>
+	</>
+)
 
 const InputFieldWithCustomError = Component<InputFieldProps>(
 	() => {
 		useEntityBeforePersist(entityAccessor => {
 			const field = entityAccessor().getField('textValue')
 
-			if (field.value != 'Hello world') {
+			if (field.value !== 'Hello world') {
 				field.addError('You must enter "Hello world"')
 			}
 		})

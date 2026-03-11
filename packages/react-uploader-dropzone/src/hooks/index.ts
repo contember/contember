@@ -1,3 +1,1 @@
-export {
-	useUploaderDropzoneState,
-} from '../internal/contexts'
+export { useUploaderDropzoneState } from '../internal/contexts'

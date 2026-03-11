@@ -49,8 +49,7 @@ const BlockRepeaterContentWrapperUI = uic('div', {
 	baseClass: 'flex flex-col gap-2',
 })
 
-export type DefaultBlockRepeaterProps =
-	& BlockRepeaterProps
+export type DefaultBlockRepeaterProps = BlockRepeaterProps
 
 const [BlockRepeaterEditModeContext, useBlockRepeaterEditMode] = createRequiredContext<boolean>('BlockRepeaterEditMode')
 
@@ -94,7 +93,7 @@ const [BlockRepeaterEditModeContext, useBlockRepeaterEditMode] = createRequiredC
 export const DefaultBlockRepeater = Component<DefaultBlockRepeaterProps>(({ children, ...props }) => {
 	const [editMode, setEditMode] = useState(false)
 	return (
-		<BlockRepeater {...props}>
+		<BlockRepeater {...props as BlockRepeaterProps}>
 			<StaticRender>
 				{children}
 			</StaticRender>
@@ -160,7 +159,6 @@ const BlockRepeaterSortable = Component<{
 						<BlockRepeaterContent />
 					</BlockRepeaterDragOverlayUI>
 				</RepeaterSortableDragOverlay>
-
 			</BlockRepeaterItemsWrapperUI>
 		</RepeaterSortable>
 	)
@@ -186,7 +184,6 @@ const BlockRepeaterAddButtons = ({ index }: { index?: RepeaterAddItemIndex }) =>
 	)
 }
 
-
 const BlockRepeaterContent = () => {
 	const entity = useEntity()
 	const block = useBlockRepeaterCurrentBlock()
@@ -205,14 +202,15 @@ const BlockRepeaterContent = () => {
 			</div>
 		)
 	}
-	return <>
-		<div className="p-4 cursor-pointer hover:bg-gray-50 " onClick={() => setEditEntity(true)}>
-			{children}
-		</div>
-		<BlockRepeaterEditSheetInner open={editEntity} setOpen={setEditEntity} />
-	</>
+	return (
+		<>
+			<div className="p-4 cursor-pointer hover:bg-gray-50 " onClick={() => setEditEntity(true)}>
+				{children}
+			</div>
+			<BlockRepeaterEditSheetInner open={editEntity} setOpen={setEditEntity} />
+		</>
+	)
 }
-
 
 const BlockRepeaterAddItemBefore = ({ sortableBy }: { sortableBy: DefaultBlockRepeaterProps['sortableBy'] }) => {
 	const entity = useEntity()

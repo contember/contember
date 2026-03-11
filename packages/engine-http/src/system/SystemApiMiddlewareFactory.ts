@@ -4,7 +4,6 @@ import { HttpErrorResponse } from '../common'
 import { SystemGraphQLContextFactory } from './SystemGraphQLContextFactory'
 import { GraphQLKoaState } from '../graphql'
 
-
 export class SystemApiMiddlewareFactory {
 	constructor(
 		private readonly debug: boolean,
@@ -34,8 +33,7 @@ export class SystemApiMiddlewareFactory {
 						id: authResult.identityId,
 						roles: authResult.roles,
 					},
-				),
-			)
+				))
 			logger.debug('Memberships fetched', { memberships })
 
 			if (memberships.length === 0) {
@@ -57,17 +55,18 @@ export class SystemApiMiddlewareFactory {
 				})
 				const handler = projectGroup.systemGraphQLHandler
 
-				await timer('GraphQL', () => handler({
-					request: koa.request,
-					response: koa.response,
-					createContext: ({ operation }) => {
-						(koa.state as GraphQLKoaState).graphql = {
-							operationName: operation,
-						}
+				await timer('GraphQL', () =>
+					handler({
+						request: koa.request,
+						response: koa.response,
+						createContext: ({ operation }) => {
+							;(koa.state as GraphQLKoaState).graphql = {
+								operationName: operation,
+							}
 
-						return graphqlContext
-					},
-				}))
+							return graphqlContext
+						},
+					}))
 				logger.debug('System query finished')
 			})
 		}

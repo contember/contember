@@ -1,4 +1,11 @@
-import { AudioFileDataExtractorProps, FileUrlDataExtractorProps, GenericFileMetadataExtractorProps, getAudioFileDataExtractor, getFileUrlDataExtractor, getGenericFileMetadataExtractor } from '../extractors'
+import {
+	AudioFileDataExtractorProps,
+	FileUrlDataExtractorProps,
+	GenericFileMetadataExtractorProps,
+	getAudioFileDataExtractor,
+	getFileUrlDataExtractor,
+	getGenericFileMetadataExtractor,
+} from '../extractors'
 import { FileType } from '../types'
 
 export type AudioFileTypeProps =

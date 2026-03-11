@@ -1,12 +1,4 @@
-import {
-	Editor,
-	Element as SlateElement,
-	Node as SlateNode,
-	NodeEntry,
-	Path as SlatePath,
-	Text,
-	Transforms,
-} from 'slate'
+import { Editor, Element as SlateElement, Node as SlateNode, NodeEntry, Path as SlatePath, Text, Transforms } from 'slate'
 import { ContemberEditor } from '../../../../editor'
 import type { ListItemElement } from '../ListItemElement'
 import type { OrderedListElement } from '../OrderedListElement'
@@ -33,9 +25,8 @@ export const indentListItem = (
 		let [previousListItem, previousListItemPath] = previousListEntry
 
 		const lastPreviousListItemChild = previousListItem.children[previousListItem.children.length - 1]
-		const previousEndsWithCompatibleList =
-			SlateElement.isElement(lastPreviousListItemChild) &&
-			ContemberEditor.isElementType(
+		const previousEndsWithCompatibleList = SlateElement.isElement(lastPreviousListItemChild)
+			&& ContemberEditor.isElementType(
 				lastPreviousListItemChild,
 				parentListElement.type,
 				ContemberEditor.elementToSpecifics(parentListElement) as any,

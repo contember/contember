@@ -10,12 +10,14 @@ type StringToBoolean<T> = T extends 'true' | 'false' ? boolean : T
 type ConfigSchema = Record<string, Record<string, ClassValue>>
 
 export type ConfigVariants<T extends ConfigSchema | undefined> = T extends ConfigSchema ? {
-	[Variant in keyof T]?: StringToBoolean<keyof T[Variant]> | null | undefined;
-} : {}
+		[Variant in keyof T]?: StringToBoolean<keyof T[Variant]> | null | undefined
+	}
+	: {}
 
 type ConfigVariantsMulti<T extends ConfigSchema | undefined> = T extends ConfigSchema ? {
-	[Variant in keyof T]?: StringToBoolean<keyof T[Variant]> | StringToBoolean<keyof T[Variant]>[] | undefined;
-} : {}
+		[Variant in keyof T]?: StringToBoolean<keyof T[Variant]> | StringToBoolean<keyof T[Variant]>[] | undefined
+	}
+	: {}
 
 type DataAttr<T extends ConfigSchema | undefined> = T extends ConfigSchema ? `data-${keyof T & string}` : never
 type DataAttrValue = boolean | string | number | undefined | null
@@ -24,9 +26,12 @@ type Config<T extends ConfigSchema | undefined, El extends React.ElementType> = 
 	baseClass?: ClassValue
 	variants?: T
 	passVariantProps?: string[]
-	defaultProps?: Partial<React.ComponentProps<El> & {
-		[K in `data-${string}`]?: DataAttrValue
-	}>
+	defaultProps?: Partial<
+		& React.ComponentProps<El>
+		& {
+			[K in `data-${string}`]?: DataAttrValue
+		}
+	>
 	defaultVariants?: ConfigVariants<T>
 	compoundVariants?: ((ConfigVariants<T> | ConfigVariantsMulti<T>) & { className?: string })[]
 	variantsAsDataAttrs?: (keyof ConfigVariants<T>)[]
@@ -42,7 +47,10 @@ export const uiconfig = <T extends ConfigSchema | undefined>(config: Config<T, C
 
 export type NoInfer<T> = T & { [K in keyof T]: T[K] }
 
-export const uic = <El extends React.ElementType, Variants extends ConfigSchema | undefined = undefined>(Component: El, config: Config<Variants, NoInfer<El>>) => {
+export const uic = <El extends React.ElementType, Variants extends ConfigSchema | undefined = undefined>(
+	Component: El,
+	config: Config<Variants, NoInfer<El>>,
+) => {
 	const cls = cva<any>(config?.baseClass as any, {
 		variants: config?.variants,
 		defaultVariants: config?.defaultVariants,
@@ -50,11 +58,14 @@ export const uic = <El extends React.ElementType, Variants extends ConfigSchema 
 	})
 	const passVariantProps = config?.passVariantProps ? new Set(config.passVariantProps) : undefined
 
-	const component = forwardRef<React.ElementRef<El>, React.ComponentProps<El> & {
-		asChild?: boolean
-		children?: ReactNode
-		className?: string
-	} & ConfigVariants<Variants>>((props, ref) => {
+	const component = forwardRef<
+		React.ComponentRef<El>,
+		React.ComponentProps<El> & {
+			asChild?: boolean
+			children?: ReactNode
+			className?: string
+		} & ConfigVariants<Variants>
+	>((props, ref) => {
 		const { className: classNameProp, children: childrenBase, ...rest } = props
 
 		const variants: Record<string, string> = {}
@@ -98,7 +109,6 @@ export const uic = <El extends React.ElementType, Variants extends ConfigSchema 
 				config?.afterChildren,
 			]
 		}
-
 
 		const innerEl = (
 			<FinalComponent

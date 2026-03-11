@@ -1,4 +1,4 @@
-import { expect, test, describe } from 'bun:test'
+import { describe, expect, test } from 'bun:test'
 import { conditionSchema } from '../../../src/type-schema'
 import { Model } from '@contember/schema'
 import { createSchema, SchemaDefinition as def } from '@contember/schema-definition'
@@ -43,7 +43,6 @@ describe('where schema', () => {
 		expect(whereSchema({ schema, entity: schema.entities.Article })(where)).toStrictEqual(where)
 	})
 
-
 	test('where with relation', () => {
 		const where = {
 			tags: { name: { eq: 'xx' } },
@@ -55,35 +54,37 @@ describe('where schema', () => {
 		const where = {
 			name: { eq: 'foo' },
 		}
-		expect(() => whereSchema({
-			schema,
-			entity: schema.entities.Article,
-		})(where)).toThrow('value at root: extra property name found')
+		expect(() =>
+			whereSchema({
+				schema,
+				entity: schema.entities.Article,
+			})(where)
+		).toThrow('value at root: extra property name found')
 	})
-
 
 	test('undefined field in relation', () => {
 		const where = {
 			tags: {
 				caption: { eq: 'foo' },
-
 			},
 		}
-		expect(() => whereSchema({
-			schema,
-			entity: schema.entities.Article,
-		})(where)).toThrow('value at path /tags: extra property caption found')
+		expect(() =>
+			whereSchema({
+				schema,
+				entity: schema.entities.Article,
+			})(where)
+		).toThrow('value at path /tags: extra property caption found')
 	})
-
 
 	test('invalid condition', () => {
 		const where = {
 			title: { xx: 'foo' },
 		}
-		expect(() => whereSchema({
-			schema,
-			entity: schema.entities.Article,
-		})(where)).toThrow('value at path /title: extra property xx found')
+		expect(() =>
+			whereSchema({
+				schema,
+				entity: schema.entities.Article,
+			})(where)
+		).toThrow('value at path /title: extra property xx found')
 	})
-
 })

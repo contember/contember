@@ -1,4 +1,4 @@
-import { expect, it, describe } from 'bun:test'
+import { describe, expect, it } from 'bun:test'
 import { GenerateUploadUrlMutationBuilder } from '../../../src'
 
 describe('generate upload url mutation builder', () => {
@@ -10,7 +10,7 @@ describe('generate upload url mutation builder', () => {
 				},
 			}),
 		).toStrictEqual({
-			  'query': `mutation($String_0: String) {
+			'query': `mutation($String_0: String) {
 	mySingleImage: generateUploadUrl(contentType: $String_0) {
 		url
 		publicUrl
@@ -22,9 +22,9 @@ describe('generate upload url mutation builder', () => {
 	}
 }
 `,
-			  'variables': {
-			    'String_0': 'image/png',
-			  },
+			'variables': {
+				'String_0': 'image/png',
+			},
 		})
 	})
 
@@ -43,7 +43,7 @@ describe('generate upload url mutation builder', () => {
 			}),
 		).toStrictEqual(
 			{
-			  'query': `mutation($String_0: String, $String_1: String, $Int_2: Int, $String_3: String, $S3Acl_4: S3Acl) {
+				'query': `mutation($String_0: String, $String_1: String, $Int_2: Int, $String_3: String, $S3Acl_4: S3Acl) {
 	myPng: generateUploadUrl(contentType: $String_0) {
 		url
 		publicUrl
@@ -64,13 +64,13 @@ describe('generate upload url mutation builder', () => {
 	}
 }
 `,
-			  'variables': {
-			    'Int_2': 123456,
-			    'S3Acl_4': 'PUBLIC_READ',
-			    'String_0': 'image/png',
-			    'String_1': 'audio/mpeg',
-			    'String_3': 'foo',
-			  },
+				'variables': {
+					'Int_2': 123456,
+					'S3Acl_4': 'PUBLIC_READ',
+					'String_0': 'image/png',
+					'String_1': 'audio/mpeg',
+					'String_3': 'foo',
+				},
 			},
 		)
 	})

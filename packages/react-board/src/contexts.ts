@@ -6,7 +6,6 @@ const _BoardMethodsContext = createRequiredContext<BoardMethods<any>>('BoardMeth
 export const BoardMethodsContext = _BoardMethodsContext[0]
 export const useBoardMethods = _BoardMethodsContext[1] as <T extends BoardColumnValue = BoardColumnValue>() => BoardMethods<T>
 
-
 const BoardColumnsContext_ = createRequiredContext<BoardColumnNode[]>('BoardColumnsContext')
 /** @internal */
 export const BoardColumnsContext = BoardColumnsContext_[0]

@@ -16,7 +16,6 @@ interface CreateInputProcessor<Result = void> {
 }
 
 namespace CreateInputProcessor {
-
 	export interface HasOneRelationProcessor<Context, Result> {
 		nothing?: (context: Context & { input: undefined }) => Promise<Result>
 		connect: (context: Context & { input: Input.UniqueWhere | CheckedPrimary }) => Promise<Result>
@@ -31,4 +30,4 @@ namespace CreateInputProcessor {
 	}
 }
 
-export { type CreateInputProcessor }
+export type { CreateInputProcessor }

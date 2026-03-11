@@ -4,7 +4,6 @@ import { ResolversFactory } from '../resolvers/ResolversFactory'
 import { schema as graphqlDocument } from '../schema/actions.graphql'
 import { ActionsContext } from '../resolvers/ActionsContext'
 
-
 export type ActionsGraphQLHandler = GraphQLQueryHandler<ActionsContext>
 
 export class ActionsGraphQLHandlerFactory {

@@ -5,7 +5,6 @@ import { Editable, useSlate } from 'slate-react'
 type EditableProps = typeof Editable extends (p: infer P) => any ? P : never
 
 export interface EditorEditableCanvasProps extends EditableProps {
-
 }
 
 export const EditorEditableCanvas = (editableProps: EditorEditableCanvasProps) => {

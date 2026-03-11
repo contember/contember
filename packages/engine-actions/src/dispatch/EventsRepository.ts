@@ -1,18 +1,8 @@
-import {
-	Client,
-	Connection,
-	Literal,
-	LockModifier,
-	LockType,
-	Operator,
-	SelectBuilder,
-	UpdateBuilder,
-} from '@contember/database'
+import { Client, Connection, Literal, LockModifier, LockType, Operator, SelectBuilder, UpdateBuilder } from '@contember/database'
 import { EventRow, HandledEvent } from './types'
 import { Actions } from '@contember/schema'
 import { eventsToProcessSpecification, eventsToProcessStateSpecification } from '../model/EventsToProcessSpecification'
 import { notify } from '../utils/notifyChannel'
-
 
 const ACK_TIMEOUT_MS = 1_000 * 60 * 10 // 10 minutes
 const DEFAULT_REPEAT_INTERVAL_MS = 5_000 // 5 seconds
@@ -20,7 +10,6 @@ const DEFAULT_MAX_ATTEMPTS = 10
 const DEFAULT_BATCH_SIZE = 1
 
 export class EventsRepository {
-
 	public async fetchBatch(actions: Actions.Schema, db: Client): Promise<FetchBatchResult> {
 		const primaryEvent = (await this.fetchInternal(db, 1))[0]
 		if (!primaryEvent) {
@@ -36,7 +25,6 @@ export class EventsRepository {
 		return { ok: true, events: [primaryEvent, ...batch], target }
 	}
 
-
 	private async fetchBackOff(db: Client): Promise<number | undefined> {
 		const result = await SelectBuilder.create<{ ms: number }>()
 			.from('actions_event')
@@ -49,20 +37,19 @@ export class EventsRepository {
 		return result.length ? Math.max(0, result[0].ms) : undefined
 	}
 
-
 	private async fetchInternal(db: Client, limit: number, targetName?: string): Promise<EventRow[]> {
 		const visibleAt = new Date()
 		visibleAt.setTime(visibleAt.getTime() + ACK_TIMEOUT_MS)
 		return await UpdateBuilder.create()
 			.table('actions_event')
-			.with('events', qb => qb
-				.select(it => it.raw('*'))
-				.from('actions_event')
-				.match(eventsToProcessSpecification)
-				.where(targetName ? { target: targetName } : {})
-				.limit(limit)
-				.lock(LockType.forNoKeyUpdate, LockModifier.skipLocked),
-			)
+			.with('events', qb =>
+				qb
+					.select(it => it.raw('*'))
+					.from('actions_event')
+					.match(eventsToProcessSpecification)
+					.where(targetName ? { target: targetName } : {})
+					.limit(limit)
+					.lock(LockType.forNoKeyUpdate, LockModifier.skipLocked))
 			.values<EventRow>({
 				state: 'processing',
 				last_state_change: new Date(),
@@ -92,13 +79,18 @@ export class EventsRepository {
 		await UpdateBuilder.create()
 			.table('actions_event')
 			.values<EventRow>({
-				state: it => it.raw(`
+				state: it =>
+					it.raw(
+						`
 					CASE 
 					WHEN num_retries = 0 THEN 
 						?::__SCHEMA__.actions_trigger_state 
 					ELSE 
 					?::__SCHEMA__.actions_trigger_state END
-				`, 'created', 'retrying'),
+				`,
+						'created',
+						'retrying',
+					),
 				last_state_change: new Date(),
 				visible_at: new Date(),
 			})
@@ -136,19 +128,23 @@ export class EventsRepository {
 		const numRetries = event.row.num_retries + 1
 		const now = new Date()
 		const nextAttempt = new Date()
-		nextAttempt.setTime(nextAttempt.getTime() + (event.target?.initialRepeatIntervalMs ?? DEFAULT_REPEAT_INTERVAL_MS) * Math.pow(2, event.row.num_retries))
+		nextAttempt.setTime(
+			nextAttempt.getTime() + (event.target?.initialRepeatIntervalMs ?? DEFAULT_REPEAT_INTERVAL_MS) * Math.pow(2, event.row.num_retries),
+		)
 		await UpdateBuilder.create()
 			.table('actions_event')
 			.values<EventRow>({
 				last_state_change: now,
 				num_retries: numRetries,
 				log: JSON.stringify([...event.row.log, event.result]) as any,
-				...(numRetries < (event.target?.maxAttempts ?? DEFAULT_MAX_ATTEMPTS) ? {
-					state: 'retrying',
-					visible_at: nextAttempt,
-				} : {
-					state: 'failed',
-				}),
+				...(numRetries < (event.target?.maxAttempts ?? DEFAULT_MAX_ATTEMPTS)
+					? {
+						state: 'retrying',
+						visible_at: nextAttempt,
+					}
+					: {
+						state: 'failed',
+					}),
 			})
 			.where({ id: event.row.id })
 			.execute(db)
@@ -157,16 +153,21 @@ export class EventsRepository {
 	private async markFailedOnUnknownTarget(db: Client, targetName: string, primaryEventId: string) {
 		await UpdateBuilder.create()
 			.table('actions_event')
-			.where(it => it.or(it => it
-				.and(it => it
-					.in('state', ['retrying', 'created', 'processing'])
-					.compare('visible_at', Operator.lte, 'now')
-					.compare('target', Operator.eq, targetName),
+			.where(it =>
+				it.or(it =>
+					it
+						.and(it =>
+							it
+								.in('state', ['retrying', 'created', 'processing'])
+								.compare('visible_at', Operator.lte, 'now')
+								.compare('target', Operator.eq, targetName)
+						)
+						.and(it =>
+							it
+								.compare('id', Operator.eq, primaryEventId)
+						)
 				)
-				.and(it => it
-					.compare('id', Operator.eq, primaryEventId),
-				),
-			))
+			)
 			.values<EventRow>({
 				// intentionally not retrying
 				last_state_change: new Date(),

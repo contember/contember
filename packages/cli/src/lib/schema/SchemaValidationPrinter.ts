@@ -1,6 +1,5 @@
 import { ValidationError } from '@contember/schema-utils'
 
-
 export const printValidationErrors = (errors: ValidationError[], message?: string) => {
 	if (errors.length === 0) {
 		return

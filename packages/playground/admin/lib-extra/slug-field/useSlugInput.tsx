@@ -1,4 +1,12 @@
-import { Environment, FieldAccessor, SugaredRelativeSingleField, useDesugaredRelativeSingleField, useEntity, useEnvironment, useField } from '@contember/react-binding'
+import {
+	Environment,
+	FieldAccessor,
+	SugaredRelativeSingleField,
+	useDesugaredRelativeSingleField,
+	useEntity,
+	useEnvironment,
+	useField,
+} from '@contember/react-binding'
 import { FormInputHandler } from '@contember/react-form'
 import { useCallback, useEffect, useMemo, useRef } from 'react'
 import { SlugInputOwnProps } from './FormSlugInput'
@@ -20,7 +28,6 @@ export const useSlugInput = ({
 	persistedSoftPrefix,
 	slugify,
 }: UseSlugValueProps) => {
-
 	const field = useField<string>(fieldName)
 	const normalizedUnpersistedHardPrefix = useNormalizedPrefix(unpersistedHardPrefix)
 	const normalizedPersistedHardPrefix = useNormalizedPrefix(persistedHardPrefix)
@@ -40,7 +47,6 @@ export const useSlugInput = ({
 			.replaceAll(/[^/]+/g, it => slugify(it))
 	}, [slugify])
 
-
 	const entity = useEntity()
 	const getEntityAccessor = entity.getAccessor
 	const desugaredField = useDesugaredRelativeSingleField(fieldName)
@@ -52,9 +58,7 @@ export const useSlugInput = ({
 			}
 			return getEntityAccessor().getField(it).getAccessor
 		})
-
 	}, [getEntityAccessor, derivedFromNormalized])
-
 
 	const createSlug = useCallback(() => {
 		const accessors = fieldAccessorGetters.map(it => it())
@@ -90,6 +94,7 @@ export const useSlugInput = ({
 		})
 	}, [createSlug, desugaredField, getEntityAccessor])
 
+	// biome-ignore lint/correctness/useExhaustiveDependencies: intentional
 	useEffect(() => {
 		const targetField = getEntityAccessor().getField(desugaredField)
 		if (targetField.value !== null) {

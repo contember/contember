@@ -2,7 +2,6 @@ import { boldMark, boldMarkPlugin } from './boldMark'
 import { EditorPlugin } from '../../../types'
 import { createMarkHtmlDeserializer } from '../../behaviour'
 
-
 export const withBold = (): EditorPlugin => editor => {
 	editor.registerMark(boldMarkPlugin)
 	editor.htmlDeserializer.registerPlugin(

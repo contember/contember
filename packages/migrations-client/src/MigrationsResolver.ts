@@ -4,7 +4,6 @@ import { isSchemaMigration, MigrationFile } from './MigrationFile'
 import { MigrationVersionHelper } from '@contember/engine-common'
 
 export class MigrationsResolver {
-
 	constructor(private readonly migrationFilesManager: MigrationFilesManager) {}
 
 	public get directory(): string {
@@ -31,9 +30,7 @@ export class MigrationsResolver {
 	public async findSchemaMigrationByVersion(version: string): Promise<Migration | null> {
 		const migrations = await this.getSchemaMigrations()
 		return migrations
-			.find(it =>
-				MigrationVersionHelper.extractVersion(it.version) === MigrationVersionHelper.extractVersion(version),
-			)
+			.find(it => MigrationVersionHelper.extractVersion(it.version) === MigrationVersionHelper.extractVersion(version))
 			?? null
 	}
 

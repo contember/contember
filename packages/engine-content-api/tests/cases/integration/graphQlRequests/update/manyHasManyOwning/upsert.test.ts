@@ -28,7 +28,8 @@ test('upsert - exists', async () => {
 					response: { rows: [{ id: testUuid(1) }] },
 				},
 				{
-					sql: SQL`with "newData_" as (select ? :: text as "name", "root_"."name" as "name_old__", "root_"."id"  from "public"."category" as "root_"  where "root_"."id" = ?) 
+					sql:
+						SQL`with "newData_" as (select ? :: text as "name", "root_"."name" as "name_old__", "root_"."id"  from "public"."category" as "root_"  where "root_"."id" = ?) 
 						update  "public"."category" set  "name" =  "newData_"."name"   from "newData_"  where "category"."id" = "newData_"."id"  returning "name_old__"`,
 					parameters: ['Lorem', testUuid(1)],
 					response: { rows: [{ name_old__: 'Foo' }] },
@@ -57,9 +58,11 @@ test('upsert - not exists', async () => {
 		query: GQL`mutation {
         updatePost(
             by: {id: "${testUuid(2)}"},
-            data: {categories: [{upsert: {by: {id: "${testUuid(
-		1,
-	)}"}, update: {name: "Lorem"}, create: {name: "Ipsum"}}}]}
+            data: {categories: [{upsert: {by: {id: "${
+			testUuid(
+				1,
+			)
+		}"}, update: {name: "Lorem"}, create: {name: "Ipsum"}}}]}
           ) {
           ok
         }
@@ -104,5 +107,3 @@ test('upsert - not exists', async () => {
 		},
 	})
 })
-
-

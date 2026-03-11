@@ -6,7 +6,6 @@ import { CheckIcon, PlusIcon, XIcon } from 'lucide-react'
 import { PopoverContent } from '../ui/popover'
 import { dict } from '../dict'
 
-
 export const SelectInputWrapperUI = uic('div', {
 	baseClass: 'w-full max-w-md relative',
 })
@@ -36,7 +35,7 @@ export const SelectListItemUI = uic(Button, {
 		variant: 'ghost',
 		size: 'sm',
 	},
-	afterChildren: <CheckIcon className="h-3 w-3 opacity-0 group-data-[selected]:opacity-100 ml-auto"/>,
+	afterChildren: <CheckIcon className="h-3 w-3 opacity-0 group-data-[selected]:opacity-100 ml-auto" />,
 })
 
 export const SelectDefaultPlaceholderUI = () => <span className={'text-gray-400'}>{dict.select.placeholder}</span>
@@ -58,7 +57,7 @@ export const MultiSelectItemDragOverlayUI = uic('span', {
 
 export const MultiSelectItemRemoveButtonUI = uic('span', {
 	baseClass: 'bg-gray-100 border-l border-gray-200 py-1 px-2 rounded-r text-black inline-flex items-center justify-center hover:bg-gray-300',
-	afterChildren: <XIcon className={'w-3 h-3'}/>,
+	afterChildren: <XIcon className={'w-3 h-3'} />,
 	defaultProps: {
 		tabIndex: 0,
 		role: 'button',
@@ -78,5 +77,8 @@ export const SelectPopoverContent = uic(PopoverContent, {
 	},
 })
 
-
-export const SelectCreateNewTrigger = forwardRef<HTMLButtonElement, {}>((props, ref) => <Button variant="outline" size="icon" ref={ref} {...props}><PlusIcon className="w-3 h-3" /></Button>)
+export const SelectCreateNewTrigger = forwardRef<HTMLButtonElement, {}>((props, ref) => (
+	<Button variant="outline" size="icon" ref={ref} {...props}>
+		<PlusIcon className="w-3 h-3" />
+	</Button>
+))

@@ -6,7 +6,7 @@ import { useId } from '@contember/react-utils'
  * Returns a function that registers the given element as a target for the given slot name.
  * You should use it in the `ref` prop of the element you want to register.
  */
-export const useTargetElementRegistrar = (name: string, aliases?: string[]): ((element: HTMLElement | null) => void) => {
+export const useTargetElementRegistrar = (name: string, aliases?: string[]): (element: HTMLElement | null) => void => {
 	const id = useId()
 	const [element, setElement] = useState<HTMLElement | null>(null)
 	const { unregisterSlotTarget, registerSlotTarget } = useTargetsRegistryContext()

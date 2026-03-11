@@ -3,12 +3,7 @@ import { ReactEditor } from 'slate-react'
 import { getTableElementColumnCount, getTableElementRowCount, TableElement } from './TableElement'
 import { createEmptyTableRowElement, isTableRowElement, TableRowElement, tableRowElementType } from './TableRowElement'
 import { ContemberEditor } from '../../../editor'
-import {
-	createEmptyTableCellElement,
-	isTableCellElement,
-	TableCellElement,
-	tableCellElementType,
-} from './TableCellElement'
+import { createEmptyTableCellElement, isTableCellElement, TableCellElement, tableCellElementType } from './TableCellElement'
 
 export class TableModifications {
 	public static deleteTableColumn(editor: Editor, element: TableElement, index: number) {
@@ -122,8 +117,7 @@ export class TableModifications {
 		})
 
 		// If none have it or the majority does but not all.
-		const shouldSetScope =
-			-currentStatusScore === rowCount || (currentStatusScore > 0 && currentStatusScore !== rowCount)
+		const shouldSetScope = -currentStatusScore === rowCount || (currentStatusScore > 0 && currentStatusScore !== rowCount)
 
 		forEachCellInColumn(editor, element, columnIndex, ([, cellPath]) => {
 			Transforms.setNodes(
@@ -162,4 +156,3 @@ const copyTableCell = (tableCellElement: TableCellElement): TableCellElement => 
 	type: tableCellElementType,
 	children: [{ text: '' }],
 })
-

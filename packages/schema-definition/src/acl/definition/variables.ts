@@ -1,7 +1,11 @@
 import { Role } from './roles'
 import { Acl, Input } from '@contember/schema'
 
-export class VariableDefinition<Name extends string = string, Roles extends Role<string> = Role<string>, Variable extends Acl.Variable = Acl.Variable> {
+export class VariableDefinition<
+	Name extends string = string,
+	Roles extends Role<string> = Role<string>,
+	Variable extends Acl.Variable = Acl.Variable,
+> {
 	constructor(
 		public readonly name: Name,
 		public readonly roles: Roles[],

@@ -30,6 +30,10 @@ export class BijectiveIndexedMap<K, V> implements Map<K, V> {
     // (undocumented)
     get(key: K): V | undefined;
     // (undocumented)
+    getOrInsert(key: K, defaultValue: V): V;
+    // (undocumented)
+    getOrInsertComputed(key: K, callback: (key: K) => V): V;
+    // (undocumented)
     has(key: K): boolean;
     // (undocumented)
     keys(): MapIterator<K>;

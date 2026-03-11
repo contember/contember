@@ -25,11 +25,14 @@ export default () => {
 				</h1>
 			</Slots.Title>
 			<p>
-				Minimal example of DataView. For most cases, you will want to use <Link to="grid"><a className="underline">DataGrid</a></Link> instead.
+				Minimal example of DataView. For most cases, you will want to use{' '}
+				<Link to="grid">
+					<a className="underline">DataGrid</a>
+				</Link>{' '}
+				instead.
 			</p>
 
 			<Binding>
-
 				<DataView
 					entities="GridArticle"
 					initialSorting={{
@@ -43,7 +46,6 @@ export default () => {
 								<Input />
 							</DataViewTextFilterInput>
 						</DataViewFilterScope>
-
 					</div>
 					<DataViewLoaderState refreshing initial>
 						Loading...
@@ -72,7 +74,8 @@ export default () => {
 										</TableCell>
 										<TableCell>
 											<HasMany field="tags">
-												<Field field="name" />{', '}
+												<Field field="name" />
+												{', '}
 											</HasMany>
 										</TableCell>
 										<TableCell>
@@ -83,7 +86,6 @@ export default () => {
 							</TableBody>
 						</Table>
 					</DataViewLoaderState>
-
 
 					<div className="flex gap-2">
 						<DataViewChangePageTrigger page="previous">

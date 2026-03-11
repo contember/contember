@@ -4,7 +4,6 @@ import { FileWithMeta, UploaderEvents } from '../../types'
 import { useGetPreviewUrls } from './useGetPreviewUrls'
 import { useUploaderClient } from '../../contexts'
 
-
 export const useUploaderDoUpload = ({ onBeforeUpload, onError, onProgress, onSuccess, onStartUpload, onAfterUpload }: UploaderEvents) => {
 	const getPreviewUrl = useGetPreviewUrls()
 	const defaultUploader = useUploaderClient()
@@ -78,7 +77,5 @@ export const useUploaderDoUpload = ({ onBeforeUpload, onError, onProgress, onSuc
 				onError?.({ file, error: e, fileType })
 			}
 		}))
-
-
 	}, [defaultUploader, getPreviewUrl, onAfterUpload, onBeforeUpload, onError, onProgress, onStartUpload, onSuccess])
 }

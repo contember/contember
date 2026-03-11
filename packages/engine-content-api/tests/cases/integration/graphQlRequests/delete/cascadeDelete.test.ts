@@ -8,12 +8,8 @@ import { testUuid } from '../../../../src/testUuid'
 test('delete author with posts and locales cascade delete', async () => {
 	await execute({
 		schema: new SchemaBuilder()
-			.entity('Post', entity =>
-				entity.manyHasOne('author', relation => relation.target('Author').onDelete(Model.OnDelete.cascade)),
-			)
-			.entity('PostLocales', entity =>
-				entity.manyHasOne('post', relation => relation.target('Post').onDelete(Model.OnDelete.cascade)),
-			)
+			.entity('Post', entity => entity.manyHasOne('author', relation => relation.target('Author').onDelete(Model.OnDelete.cascade)))
+			.entity('PostLocales', entity => entity.manyHasOne('post', relation => relation.target('Post').onDelete(Model.OnDelete.cascade)))
 			.entity('Author', entity => entity.column('name', column => column.type(Model.ColumnType.String)))
 			.buildSchema(),
 		query: GQL`
@@ -35,19 +31,21 @@ test('delete author with posts and locales cascade delete', async () => {
 					response: { rows: [{ id: testUuid(1), allowed: true }] },
 				},
 				{
-					sql: SQL`select "root_"."id" as "id", "root_"."author_id" as "ref", true as "allowed" from "public"."post" as "root_" where "root_"."author_id" in (?)`,
+					sql:
+						SQL`select "root_"."id" as "id", "root_"."author_id" as "ref", true as "allowed" from "public"."post" as "root_" where "root_"."author_id" in (?)`,
 					parameters: [testUuid(1)],
 					response: { rows: [{ id: testUuid(2), allowed: true }] },
 				},
 				{
-					sql: SQL`select "root_"."id" as "id", "root_"."post_id" as "ref", true as "allowed" from "public"."post_locales" as "root_" where "root_"."post_id" in (?)`,
+					sql:
+						SQL`select "root_"."id" as "id", "root_"."post_id" as "ref", true as "allowed" from "public"."post_locales" as "root_" where "root_"."post_id" in (?)`,
 					parameters: [testUuid(2)],
 					response: { rows: [{ id: testUuid(3), allowed: true }] },
 				},
 				{
 					sql: SQL`delete from "public"."author" where "id" in (?)`,
 					parameters: [testUuid(1)],
-					response: { },
+					response: {},
 				},
 			]),
 		],
@@ -61,13 +59,10 @@ test('delete author with posts and locales cascade delete', async () => {
 	})
 })
 
-
 test('delete author with posts (denied) ', async () => {
 	await execute({
 		schema: new SchemaBuilder()
-			.entity('Post', entity =>
-				entity.manyHasOne('author', relation => relation.target('Author').onDelete(Model.OnDelete.cascade)),
-			)
+			.entity('Post', entity => entity.manyHasOne('author', relation => relation.target('Author').onDelete(Model.OnDelete.cascade)))
 			.entity('Author', entity => entity.column('name', column => column.type(Model.ColumnType.String)))
 			.buildSchema(),
 		query: GQL`
@@ -90,7 +85,8 @@ test('delete author with posts (denied) ', async () => {
 					response: { rows: [{ id: testUuid(1), allowed: true }] },
 				},
 				{
-					sql: SQL`select "root_"."id" as "id", "root_"."author_id" as "ref", true as "allowed" from "public"."post" as "root_" where "root_"."author_id" in (?)`,
+					sql:
+						SQL`select "root_"."id" as "id", "root_"."author_id" as "ref", true as "allowed" from "public"."post" as "root_" where "root_"."author_id" in (?)`,
 					parameters: [testUuid(1)],
 					response: { rows: [{ id: testUuid(2), ref: testUuid(1), allowed: false }] },
 				},
@@ -100,13 +96,10 @@ test('delete author with posts (denied) ', async () => {
 			data: {
 				deleteAuthor: {
 					ok: false,
-					errorMessage: 'Execution has failed:\n' +
-						'unknown field: ForeignKeyConstraintViolation (Cannot delete 123e4567-e89b-12d3-a456-000000000001 row(s) of entity Author, because it is still referenced from 123e4567-e89b-12d3-a456-000000000002 row(s) of entity Post in relation author. OnDelete behaviour of this relation is set to "cascade". This is possibly caused by ACL denial.)',
+					errorMessage: 'Execution has failed:\n'
+						+ 'unknown field: ForeignKeyConstraintViolation (Cannot delete 123e4567-e89b-12d3-a456-000000000001 row(s) of entity Author, because it is still referenced from 123e4567-e89b-12d3-a456-000000000002 row(s) of entity Post in relation author. OnDelete behaviour of this relation is set to "cascade". This is possibly caused by ACL denial.)',
 				},
 			},
 		},
 	})
 })
-
-
-

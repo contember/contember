@@ -15,17 +15,21 @@ export function useSlotTargetsFactory<R extends SlotTargetComponentsRecord<strin
 			if (override) {
 				return override
 			} else {
-				return createElement(Fragment, {}, ...slots.map(slot => {
-					if (slot in SlotTargets) {
-						const Target = SlotTargets[slot] as ReturnType<typeof createSlotTargetComponent<typeof slot>>
+				return createElement(
+					Fragment,
+					{},
+					...slots.map(slot => {
+						if (slot in SlotTargets) {
+							const Target = SlotTargets[slot] as ReturnType<typeof createSlotTargetComponent<typeof slot>>
 
-						return createElement(Target, {
-							key: `multi-element:${slot}`,
-						})
-					} else {
-						throw new Error(`Slot target "${slot}" was not found within the targets passed to factory.`)
-					}
-				}))
+							return createElement(Target, {
+								key: `multi-element:${slot}`,
+							})
+						} else {
+							throw new Error(`Slot target "${slot}" was not found within the targets passed to factory.`)
+						}
+					}),
+				)
 			}
 		} else {
 			return null

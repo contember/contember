@@ -18,7 +18,8 @@ export default () => (
 		<div className="max-w-2xl">
 			<div className="space-y-6 text-gray-700">
 				<p>
-					The Entity Subtree feature enables dynamic loading and refreshing of entity data. This example demonstrates how to implement real-time data updates:
+					The Entity Subtree feature enables dynamic loading and refreshing of entity data. This example demonstrates how to implement real-time data
+					updates:
 				</p>
 
 				<ol className="list-decimal list-inside">
@@ -78,7 +79,7 @@ const LoadSingle = () => {
 	const entity = 'ExtendTreeSingle(unique = unique)'
 	const [state, { reload }] = useEntitySubTreeLoader(
 		{ entity },
-		useMemo(() => (<Value />), []),
+		useMemo(() => <Value />, []),
 	)
 
 	const isContentReady = state.state === 'loaded' || state.state === 'refreshing'

@@ -11,7 +11,6 @@ const schema = createSchema({
 	Item,
 })
 describe('Logical AND rule', () => {
-
 	it('fails when value not valid', async () => {
 		await testCreate({
 			schema,

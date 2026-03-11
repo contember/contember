@@ -18,13 +18,15 @@ export interface ReferencesPluginArgs {
 	discriminationField: SugaredRelativeSingleField['field']
 }
 
-
 export const withReferences = (args: ReferencesPluginArgs): EditorPlugin => {
 	return {
 		extendEditor: ({ editor, children, environment, entity }) => {
-			const blocks = getEditorReferenceBlocks(children, TreeNodeEnvironmentFactory.createEnvironmentForEntityList(environment, {
-				field: args.field,
-			}))
+			const blocks = getEditorReferenceBlocks(
+				children,
+				TreeNodeEnvironmentFactory.createEnvironmentForEntityList(environment, {
+					field: args.field,
+				}),
+			)
 			for (const block of Object.values(blocks)) {
 				editor.registerElement({
 					type: block.name,
@@ -60,9 +62,12 @@ export const withReferences = (args: ReferencesPluginArgs): EditorPlugin => {
 			const env = useEnvironment()
 
 			const editorReferenceBlocks = useMemo(() => {
-				return getEditorReferenceBlocks(children, TreeNodeEnvironmentFactory.createEnvironmentForEntityList(env, {
-					field: args.field,
-				}))
+				return getEditorReferenceBlocks(
+					children,
+					TreeNodeEnvironmentFactory.createEnvironmentForEntityList(env, {
+						field: args.field,
+					}),
+				)
 			}, [children, env])
 			useCleanupReferences({ field: args.field, editor })
 

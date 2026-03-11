@@ -1,6 +1,5 @@
 import { mkdir, writeFile } from 'node:fs/promises'
 import { join } from 'node:path'
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore-line
 import autocannon from 'autocannon'
 import { createHttpOptions, graphqlRequest } from './http'
@@ -12,11 +11,11 @@ const readStdin = (): Promise<string> => {
 		process.stdin.resume()
 		process.stdin.setEncoding('utf8')
 
-		process.stdin.on('data', function (chunk) {
+		process.stdin.on('data', function(chunk) {
 			data += chunk
 		})
 
-		process.stdin.on('end', function () {
+		process.stdin.on('end', function() {
 			resolve(data)
 		})
 	})
@@ -32,7 +31,6 @@ const sleep = (delay: number) => new Promise(resolve => setTimeout(resolve, dela
 	const variables = {}
 
 	const contentEndpoint = `${process.env.CONTEMBER_API_URL}/content/benchmark/live`
-	// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
 	const accessToken = process.env.CONTEMBER_ROOT_TOKEN!
 
 	const queryGql = await readStdin()
@@ -46,7 +44,7 @@ const sleep = (delay: number) => new Promise(resolve => setTimeout(resolve, dela
 					query: queryGql,
 					authorizationToken: accessToken,
 					variables,
-				}),
+				})
 			),
 		)
 	}

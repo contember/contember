@@ -23,7 +23,6 @@ export const FractionalAmountField = Component(({ field, label, description, req
 	</FormFieldScope>
 ))
 
-
 const FractionalAmountInput = Component<FractionalAmountFieldProps>(({
 	field,
 	inputProps,
@@ -36,6 +35,7 @@ const FractionalAmountInput = Component<FractionalAmountFieldProps>(({
 	const inputRef = useRef<HTMLInputElement>(null)
 	const fieldAccessor = useField(field)
 
+	// biome-ignore lint/correctness/useExhaustiveDependencies: intentional
 	useEffect(() => {
 		inputRef.current?.setSelectionRange(selection.current, selection.current)
 	}, [fieldAccessor.value])
@@ -62,5 +62,9 @@ const FractionalAmountInput = Component<FractionalAmountFieldProps>(({
 		</FormInput>
 	)
 }, ({ field, isNonbearing, defaultValue }) => {
-	return <FormInput field={field} isNonbearing={isNonbearing} defaultValue={defaultValue}><input /></FormInput>
+	return (
+		<FormInput field={field} isNonbearing={isNonbearing} defaultValue={defaultValue}>
+			<input />
+		</FormInput>
+	)
 })

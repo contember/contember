@@ -49,8 +49,8 @@ export class MarkerComparator {
 					}
 					// TODO be more specific
 					throw new LocalizedBindingError(
-						`The relation '${candidateMarker.parameters.field}' exists but its parameters don't match exactly. ` +
-							`Check that all relation parameters are the same.`,
+						`The relation '${candidateMarker.parameters.field}' exists but its parameters don't match exactly. `
+							+ `Check that all relation parameters are the same.`,
 						[candidateMarker],
 					)
 				}
@@ -61,8 +61,8 @@ export class MarkerComparator {
 			}
 			try {
 				if (
-					(candidateMarker instanceof HasOneRelationMarker && fromSuperset instanceof HasOneRelationMarker) ||
-					(candidateMarker instanceof HasManyRelationMarker && fromSuperset instanceof HasManyRelationMarker)
+					(candidateMarker instanceof HasOneRelationMarker && fromSuperset instanceof HasOneRelationMarker)
+					|| (candidateMarker instanceof HasManyRelationMarker && fromSuperset instanceof HasManyRelationMarker)
 				) {
 					this.assertSubsetOf(candidateMarker.fields, fromSuperset.fields)
 				}
@@ -81,8 +81,8 @@ export class MarkerComparator {
 
 			if (fromSuperset === undefined) {
 				if (
-					candidateMarker instanceof FieldMarker &&
-					(candidateMarker.fieldName === PRIMARY_KEY_NAME || candidateMarker.fieldName === TYPENAME_KEY_NAME)
+					candidateMarker instanceof FieldMarker
+					&& (candidateMarker.fieldName === PRIMARY_KEY_NAME || candidateMarker.fieldName === TYPENAME_KEY_NAME)
 				) {
 					continue
 				}
@@ -98,5 +98,5 @@ export class MarkerComparator {
 		return true
 	}
 
-	//private static assertAreMarkersSubsetOf(): {}
+	// private static assertAreMarkersSubsetOf(): {}
 }

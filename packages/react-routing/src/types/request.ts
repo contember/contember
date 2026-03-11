@@ -19,7 +19,6 @@ export type RequestChange = (currentState: RequestState) => IncompleteRequestSta
 export type DynamicRequestParameters = RequestParameters<RoutingParameter>
 export type IncompleteRequestState = Partial<RequestState<DynamicRequestParameters>> & { pageName: string } | null
 
-
 export interface RequestChangeEvent {
 	readonly request: RequestState
 	readonly abortNavigation: () => void
@@ -28,4 +27,3 @@ export interface RequestChangeEvent {
 export type RequestChangeHandler = (event: RequestChangeEvent) => void
 export type RoutingParameterResolver = (name: string) => RequestParameterValue | undefined
 export type RoutingLinkTarget = string | RequestChange | IncompleteRequestState
-

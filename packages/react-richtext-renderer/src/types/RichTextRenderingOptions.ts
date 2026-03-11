@@ -6,7 +6,7 @@ import { RichTextReferenceMetadata } from './RichTextReferenceMetadata'
 export type UndefinedReferenceHandler<
 	CustomElements extends RichTextElement = never,
 	CustomLeaves extends RichTextLeaf = RichTextLeaf,
-	Reference extends RichTextReference = RichTextReference
+	Reference extends RichTextReference = RichTextReference,
 > = (referenceId: string) => void | RichTextReferenceMetadata<CustomElements, CustomLeaves, Reference>
 
 export type RichTextRenderingOptions<

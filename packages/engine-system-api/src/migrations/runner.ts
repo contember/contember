@@ -66,7 +66,6 @@ const migrations = {
 	'2025-03-14-110000-fix-missing-index': _20250314110000fixmissingindex,
 }
 
-
 export class SystemMigrationsRunner {
 	constructor(
 		private readonly databaseContextFactory: DatabaseContextFactory,
@@ -86,16 +85,18 @@ export class SystemMigrationsRunner {
 			}
 			const migrationResolver = new GroupMigrationsResolver(
 				new SnapshotMigrationResolver(snapshot, migrations),
-				Object.fromEntries(Object.entries(this.migrationGroups).map(
-					([group, it]) => [
-						group,
-						new SnapshotMigrationResolver(
-							it.snapshot,
-							it.migrations,
-							group.replace(/[^-_\w]+/g, '-'),
-							migrations,
-						),
-					]),
+				Object.fromEntries(
+					Object.entries(this.migrationGroups).map(
+						([group, it]) => [
+							group,
+							new SnapshotMigrationResolver(
+								it.snapshot,
+								it.migrations,
+								group.replace(/[^-_\w]+/g, '-'),
+								migrations,
+							),
+						],
+					),
 				),
 			)
 			const migrationsRunner = new DbMigrationsRunner(connection, this.project.systemSchema, migrationResolver)
@@ -106,7 +107,6 @@ export class SystemMigrationsRunner {
 					const dbContextMigrations = this.databaseContextFactory.create(connection)
 					return this.databaseMetadataResolver.resolveMetadata(dbContextMigrations.client, schema)
 				},
-
 			})
 		})
 		await singleConnection.end()

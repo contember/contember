@@ -14,7 +14,7 @@ export class EventManager<E extends EventMap> implements EventEmitter<E> {
 	} = {}
 
 	public on<K extends keyof E>(event: K, cb: E[K]): EventUnlisten {
-		(this.listeners[event] ??= []).push(cb)
+		;(this.listeners[event] ??= []).push(cb)
 		return () => {
 			return this.listeners[event] = this.listeners[event]?.filter(it => it !== cb)
 		}

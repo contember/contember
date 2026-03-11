@@ -9,13 +9,10 @@ type Result = [
 	string,
 	GraphQLFieldConfig<any, any> & {
 		extensions: PaginatedHasManyFieldProviderExtension
-	}
+	},
 ]
 
-export class PaginatedHasManyFieldProviderVisitor implements
-	Model.ColumnVisitor<Result[]>,
-	Model.RelationByTypeVisitor<Result[]> {
-
+export class PaginatedHasManyFieldProviderVisitor implements Model.ColumnVisitor<Result[]>, Model.RelationByTypeVisitor<Result[]> {
 	constructor(private readonly paginatedFieldFactory: PaginatedFieldConfigFactory) {}
 
 	visitOneHasMany({ targetEntity, relation }: Model.OneHasManyContext) {

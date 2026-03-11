@@ -8,15 +8,9 @@ import {
 	ModificationHandlerCreateSqlOptions,
 	ModificationHandlerOptions,
 } from '../ModificationHandler'
-import {
-	createEventTrigger,
-	createEventTrxTrigger,
-	dropEventTrigger,
-	dropEventTrxTrigger,
-} from '../utils/sqlUpdateUtils'
+import { createEventTrigger, createEventTrxTrigger, dropEventTrigger, dropEventTrxTrigger } from '../utils/sqlUpdateUtils'
 
 export class ToggleEventLogModificationHandler implements ModificationHandler<ToggleEventLogModificationData> {
-
 	constructor(
 		private readonly data: ToggleEventLogModificationData,
 		private readonly schema: Schema,
@@ -86,6 +80,5 @@ export class ToggleEventLogDiffer implements Differ {
 				}
 				return []
 			})
-
 	}
 }

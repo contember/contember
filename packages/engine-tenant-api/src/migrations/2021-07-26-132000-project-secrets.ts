@@ -18,6 +18,6 @@ CREATE INDEX project_secret_project_index
 	ON project_secret (project_id);
 `
 
-export default async function (builder: MigrationBuilder) {
+export default async function(builder: MigrationBuilder) {
 	builder.sql(sql)
 }

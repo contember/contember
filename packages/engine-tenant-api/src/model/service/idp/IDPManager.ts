@@ -55,7 +55,6 @@ export class IDPManager {
 		})
 	}
 
-
 	public async enableIDP(db: DatabaseContext, slug: string): Promise<EnableIDPResponse> {
 		return await db.transaction(async db => {
 			const existing = await db.queryHandler.fetch(new IdentityProviderBySlugQuery(slug))
@@ -109,10 +108,12 @@ export class IDPManager {
 				throw e
 			}
 
-			await db.commandBus.execute(new UpdateIdpCommand(existing.id, {
-				...data,
-				configuration: data.configuration ? newConfiguration : undefined,
-			}))
+			await db.commandBus.execute(
+				new UpdateIdpCommand(existing.id, {
+					...data,
+					configuration: data.configuration ? newConfiguration : undefined,
+				}),
+			)
 
 			return new ResponseOk(null)
 		})

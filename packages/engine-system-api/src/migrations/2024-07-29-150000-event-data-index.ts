@@ -6,6 +6,6 @@ CREATE INDEX IF NOT EXISTS system_event_data_row_id_1 ON event_data USING btree 
 DROP INDEX IF EXISTS system_event_row_id;
 `
 
-export default async function (builder: MigrationBuilder) {
+export default async function(builder: MigrationBuilder) {
 	builder.sql(sql)
 }

@@ -29,7 +29,6 @@ export class UpdateViewModificationHandler implements ModificationHandler<Update
 	describe() {
 		return { message: `Update SQL definition of a view` }
 	}
-
 }
 
 export interface UpdateViewModificationData {

@@ -17,7 +17,6 @@ export const signInMutation = TenantApi
 		options => options.alias('mutation'),
 	)
 
-
 export const useSignInMutation = createTenantMutation(signInMutation, {
 	apiToken: LoginToken,
 })

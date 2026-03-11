@@ -1,4 +1,10 @@
-import { ChangeMyPasswordResponse, ChangePasswordResponse, MutationChangeMyPasswordArgs, MutationChangePasswordArgs, MutationResolvers } from '../../../schema'
+import {
+	ChangeMyPasswordResponse,
+	ChangePasswordResponse,
+	MutationChangeMyPasswordArgs,
+	MutationChangePasswordArgs,
+	MutationResolvers,
+} from '../../../schema'
 import { GraphQLResolveInfo } from 'graphql'
 import { TenantResolverContext } from '../../TenantResolverContext'
 import { IdentityScope, PasswordChangeManager, PermissionActions, PersonQuery } from '../../../model'

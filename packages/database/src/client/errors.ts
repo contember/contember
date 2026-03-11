@@ -56,5 +56,3 @@ export class InvalidDataError extends QueryError {}
 export class TransactionAbortedError extends QueryError {}
 
 export class CannotCommitError extends DatabaseError {}
-
-

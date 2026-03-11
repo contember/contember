@@ -1,5 +1,5 @@
 import { Acl, Model, Schema, Validation } from '@contember/schema'
-import { Authorizator, GraphQlSchemaBuilderFactory, ExecutionContainerFactory } from '../../src'
+import { Authorizator, ExecutionContainerFactory, GraphQlSchemaBuilderFactory } from '../../src'
 import { AllowAllPermissionFactory, emptySchema } from '@contember/schema-utils'
 import { executeGraphQlTest } from './testGraphql'
 import { Client, emptyDatabaseMetadata } from '@contember/database'
@@ -91,7 +91,7 @@ export const execute = async (test: Test) => {
 	executionContainerFactory.hooks.push(it => {
 		return it.setupService('mapperFactory', mapperFactory => {
 			mapperFactory.hooks.push(mapper => {
-				(mapper as any).systemVariablesSetupDone = Promise.resolve(true)
+				;(mapper as any).systemVariablesSetupDone = Promise.resolve(true)
 			})
 		})
 	})

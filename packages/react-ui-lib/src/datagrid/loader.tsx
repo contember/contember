@@ -42,11 +42,6 @@ export const DataGridLoader = ({ children }: { children: ReactNode }) => (
 	</>
 )
 
+const DataGridOverlayLoader = () => <Loader position={'absolute'} />
 
-const DataGridOverlayLoader = () => (
-	<Loader position={'absolute'} />
-)
-
-const DataGridInitialLoader = () => (
-	<Loader position={'static'} />
-)
+const DataGridInitialLoader = () => <Loader position={'static'} />

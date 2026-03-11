@@ -6,6 +6,6 @@ SET data = jsonb_build_object('version', coalesce(substring(data ->> 'file', 0, 
 WHERE type = 'run_migration';
 `
 
-export default async function (builder: MigrationBuilder) {
+export default async function(builder: MigrationBuilder) {
 	builder.sql(sql)
 }

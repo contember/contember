@@ -1,7 +1,6 @@
 import { Stream, Transform } from 'node:stream'
 import { Buffer } from 'node:buffer'
 
-
 export class LineTransform extends Transform {
 	private chunks: Buffer[] = []
 
@@ -35,10 +34,10 @@ export class LineTransform extends Transform {
 	}
 }
 
-
-export const readStream = async (stream: Stream) => new Promise<Buffer>((resolve, reject) => {
-	const chunks: Buffer[] = []
-	stream.on('error', err => reject(err))
-	stream.on('data', chunk => chunks.push(chunk))
-	stream.on('end', () => resolve(Buffer.concat(chunks)))
-})
+export const readStream = async (stream: Stream) =>
+	new Promise<Buffer>((resolve, reject) => {
+		const chunks: Buffer[] = []
+		stream.on('error', err => reject(err))
+		stream.on('data', chunk => chunks.push(chunk))
+		stream.on('end', () => resolve(Buffer.concat(chunks)))
+	})

@@ -3,7 +3,6 @@ import { InputValidation as v } from '@contember/schema-definition'
 import { SchemaDefinition as d } from '@contember/schema-definition'
 import { createSchema, testCreate } from '../utils'
 
-
 class Item {
 	@v.assert(v.rules.maxLength(5), 'failure')
 	value = d.stringColumn()

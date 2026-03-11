@@ -1,10 +1,4 @@
-import {
-	Event,
-	QueryEventsInProcessingArgs,
-	QueryEventsToProcessArgs,
-	QueryFailedEventsArgs,
-	QueryResolvers,
-} from '../../schema'
+import { Event, QueryEventsInProcessingArgs, QueryEventsToProcessArgs, QueryFailedEventsArgs, QueryResolvers } from '../../schema'
 import { ActionsContext } from '../ActionsContext'
 import { EventsToProcessQuery } from '../../../model/EventsToProcessQuery'
 import { EventRow } from '../../../model/types'
@@ -54,7 +48,6 @@ export class EventsQueryResolver implements QueryResolvers<ActionsContext> {
 	}
 
 	private mapEventRows(rows: EventRow[], stagesMap: Record<string, string>): Event[] {
-
 		return rows.map(row => ({
 			id: row.id,
 			createdAt: row.created_at,

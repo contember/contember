@@ -1,4 +1,4 @@
-import { test, expect } from 'bun:test'
+import { expect, test } from 'bun:test'
 import { createTester, rand } from '../../src/tester'
 import { createSchema } from '@contember/schema-definition'
 import { Acl } from '@contember/schema'
@@ -90,7 +90,6 @@ test('does not send an email and sets given password', async () => {
 													values: [languageId],
 												},
 											],
-
 										},
 									],
 								},
@@ -102,4 +101,3 @@ test('does not send an email and sets given password', async () => {
 		},
 	})
 })
-

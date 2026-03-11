@@ -8,8 +8,7 @@ import { MapperInput } from '../../types'
 
 type Context = Model.OneHasOneInverseContext
 
-export class OneHasOneInverseCreateInputProcessor implements CreateInputProcessor.HasOneRelationProcessor<Context, SqlCreateInputProcessorResult>  {
-
+export class OneHasOneInverseCreateInputProcessor implements CreateInputProcessor.HasOneRelationProcessor<Context, SqlCreateInputProcessorResult> {
 	constructor(
 		private readonly mapper: Mapper,
 	) {
@@ -24,7 +23,6 @@ export class OneHasOneInverseCreateInputProcessor implements CreateInputProcesso
 			return await this.connectInternal({ ...context, input: new CheckedPrimary(owner) }, primary)
 		}
 	}
-
 
 	public async create(
 		{ input, targetRelation, targetEntity }: Context & { input: MapperInput.CreateDataInput },
@@ -54,7 +52,6 @@ export class OneHasOneInverseCreateInputProcessor implements CreateInputProcesso
 		{ entity, targetEntity, targetRelation, relation, input }: Context & { input: CheckedPrimary },
 		primary: Input.PrimaryValue,
 	) {
-
 		const currentInverseSideOfOwner = await this.mapper.selectField(targetEntity, input, targetRelation.name)
 		const orphanResult: MutationResultList = []
 		if (currentInverseSideOfOwner) {

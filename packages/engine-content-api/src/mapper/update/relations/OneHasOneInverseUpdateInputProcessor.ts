@@ -15,14 +15,16 @@ import { MapperInput } from '../../types'
 
 type Context = Model.OneHasOneInverseContext
 
-export class OneHasOneInverseUpdateInputProcessor implements UpdateInputProcessor.HasOneRelationInputProcessor<Context, SqlUpdateInputProcessorResult>{
+export class OneHasOneInverseUpdateInputProcessor
+	implements UpdateInputProcessor.HasOneRelationInputProcessor<Context, SqlUpdateInputProcessorResult>
+{
 	constructor(
 		private readonly primaryValue: Input.PrimaryValue,
 		private readonly mapper: Mapper,
 	) {
 	}
 
-	public async connect({ input, ...ctx  }: Model.OneHasOneInverseContext & { input: Input.UniqueWhere | CheckedPrimary }) {
+	public async connect({ input, ...ctx }: Model.OneHasOneInverseContext & { input: Input.UniqueWhere | CheckedPrimary }) {
 		return async () => {
 			const [newOwner, err] = await this.mapper.getPrimaryValue(ctx.targetEntity, input)
 			if (err) return [err]
@@ -41,7 +43,6 @@ export class OneHasOneInverseUpdateInputProcessor implements UpdateInputProcesso
 			return await this.createInternal({ ...ctx, input: input.create })
 		}
 	}
-
 
 	public async create(ctx: Model.OneHasOneInverseContext & { input: MapperInput.CreateDataInput }) {
 		return async () => {
@@ -156,7 +157,9 @@ export class OneHasOneInverseUpdateInputProcessor implements UpdateInputProcesso
 		return result
 	}
 
-	private async createInternal({ entity, targetEntity, targetRelation, input }: Model.OneHasOneInverseContext & { input: MapperInput.CreateDataInput }) {
+	private async createInternal(
+		{ entity, targetEntity, targetRelation, input }: Model.OneHasOneInverseContext & { input: MapperInput.CreateDataInput },
+	) {
 		const [currentOwner] = await this.mapper.getPrimaryValue(targetEntity, {
 			[targetRelation.name]: { [entity.primary]: this.primaryValue },
 		})

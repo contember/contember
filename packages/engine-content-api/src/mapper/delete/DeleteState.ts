@@ -33,7 +33,6 @@ export class DeleteState {
 		this.failResult.push(...Array.isArray(result) ? result : [result])
 	}
 
-
 	public isPlannedDelete(entityName: string, primary: Input.PrimaryValue): boolean {
 		return this.plannedDelete.isDeleted(entityName, primary)
 	}

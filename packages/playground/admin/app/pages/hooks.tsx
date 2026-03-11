@@ -18,14 +18,12 @@ export const ContentApi = () => {
 	)
 
 	const [updateValueState, updateValueMutation] = useContentMutation(
-		(variables: { id: string; value: number }) =>
-			queryBuilder.update('HooksValue', { by: { id: variables.id }, data: { value: variables.value } }),
+		(variables: { id: string; value: number }) => queryBuilder.update('HooksValue', { by: { id: variables.id }, data: { value: variables.value } }),
 		{ onResponse: refreshList },
 	)
 
 	const [deleteValueState, deleteValueMutation] = useContentMutation(
-		(variables: { id: string }) =>
-			queryBuilder.delete('HooksValue', { by: { id: variables.id } }),
+		(variables: { id: string }) => queryBuilder.delete('HooksValue', { by: { id: variables.id } }),
 		{ onResponse: refreshList },
 	)
 
@@ -46,43 +44,45 @@ export const ContentApi = () => {
 			</Slots.Actions>
 
 			<div className="space-y-4">
-				{'data' in items && items.data.length ? items.data.map(item => (
-					<div
-						key={item.id}
-						className="flex items-center gap-3 p-4 bg-white even:bg-gray-50 rounded-lg"
-					>
-						<div className="flex gap-2">
+				{'data' in items && items.data.length
+					? items.data.map(item => (
+						<div
+							key={item.id}
+							className="flex items-center gap-3 p-4 bg-white even:bg-gray-50 rounded-lg"
+						>
+							<div className="flex gap-2">
+								<Button
+									size="sm"
+									variant="secondary"
+									disabled={mutating}
+									onClick={() => updateValueMutation({ id: item.id, value: item.value + 1 })}
+								>
+									+
+								</Button>
+								<Button
+									size="sm"
+									variant="secondary"
+									disabled={mutating}
+									onClick={() => updateValueMutation({ id: item.id, value: item.value - 1 })}
+								>
+									-
+								</Button>
+							</div>
+
+							<span className="text-lg font-medium w-12 text-center">{item.value}</span>
+
 							<Button
 								size="sm"
-								variant="secondary"
+								variant="destructive"
 								disabled={mutating}
-								onClick={() => updateValueMutation({ id: item.id, value: item.value + 1 })}
+								onClick={() => deleteValueMutation({ id: item.id })}
+								className="ml-auto"
 							>
-								+
-							</Button>
-							<Button
-								size="sm"
-								variant="secondary"
-								disabled={mutating}
-								onClick={() => updateValueMutation({ id: item.id, value: item.value - 1 })}
-							>
-								-
+								Delete
 							</Button>
 						</div>
-
-						<span className="text-lg font-medium w-12 text-center">{item.value}</span>
-
-						<Button
-							size="sm"
-							variant="destructive"
-							disabled={mutating}
-							onClick={() => deleteValueMutation({ id: item.id })}
-							className="ml-auto"
-						>
-							Delete
-						</Button>
-					</div>
-				)) : <div className="p-4 bg-white rounded-lg">Try to add new item</div>}
+					))
+					: <div className="p-4 bg-white rounded-lg">Try to add new item</div>}
 			</div>
 		</div>
 	)

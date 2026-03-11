@@ -63,8 +63,9 @@ export class TreeStore {
 		| {
 			fieldBackToParent: FieldName
 			parent: EntityRealmState
-		  }
-		| undefined {
+		}
+		| undefined
+	{
 		const blueprint = entityRealm.blueprint
 		if (blueprint.parent === undefined) {
 			return undefined
@@ -153,7 +154,7 @@ export class TreeStore {
 					? QueryLanguage.desugarUnconstrainedQualifiedEntityList(
 						aliasOrParameters as SugaredUnconstrainedQualifiedEntityList,
 						environment,
-					  )
+					)
 					: QueryLanguage.desugarQualifiedEntityList(aliasOrParameters as SugaredQualifiedEntityList, environment),
 				environment,
 			)
@@ -163,7 +164,7 @@ export class TreeStore {
 					? QueryLanguage.desugarUnconstrainedQualifiedSingleEntity(
 						aliasOrParameters as SugaredUnconstrainedQualifiedSingleEntity,
 						environment,
-					  )
+					)
 					: QueryLanguage.desugarQualifiedSingleEntity(aliasOrParameters as SugaredQualifiedSingleEntity, environment),
 				environment,
 			)

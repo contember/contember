@@ -43,5 +43,5 @@ export interface DataViewLoaderStateProps {
  */
 export const DataViewLoaderState = ({ children, ...props }: DataViewLoaderStateProps) => {
 	const state = useDataViewLoaderState()
-	return props[state] ? <>{children}</> : null
+	return (props as Record<string, boolean | undefined>)[state] ? <>{children}</> : null
 }

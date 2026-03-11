@@ -72,7 +72,6 @@ export class UploadImageListItem {
 
 // === medium ===
 
-
 export const UploadMediaType = c.createEnum('image', 'video', 'audio', 'file')
 
 export class UploadMedium {
@@ -87,7 +86,6 @@ export class UploadMedium {
 
 export class UploadList {
 	items = c.oneHasMany(UploadListItem, 'list').orderBy('order')
-
 }
 export class UploadListItem {
 	list = c.manyHasOne(UploadList, 'items').cascadeOnDelete().notNull()

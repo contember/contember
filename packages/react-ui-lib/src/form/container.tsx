@@ -25,25 +25,31 @@ export const FormContainer = Component(
 		const inner = (
 			<FormContainerUI>
 				<FormLabelWrapperUI>
-					{label && labelMiddleware(<>
-						<FormLabel>
-							<FormLabelUI required={required}>
-								{label}
-							</FormLabelUI>
-						</FormLabel>
-					</>)}
+					{label && labelMiddleware(
+						<>
+							<FormLabel>
+								<FormLabelUI required={required}>
+									{label}
+								</FormLabelUI>
+							</FormLabel>
+						</>,
+					)}
 				</FormLabelWrapperUI>
 				<div>
 					{children}
 				</div>
-				{(description || errorsNode || state?.errors?.length || errorsList?.length) ? <div>
-					{description && <FormDescriptionUI>{description}</FormDescriptionUI>}
+				{(description || errorsNode || state?.errors?.length || errorsList?.length)
+					? (
+						<div>
+							{description && <FormDescriptionUI>{description}</FormDescriptionUI>}
 
-					<FormError formatter={errorFormatter}>
-						<FormErrorUI />
-					</FormError>
-					{errorsNode}
-				</div> : null}
+							<FormError formatter={errorFormatter}>
+								<FormErrorUI />
+							</FormError>
+							{errorsNode}
+						</div>
+					)
+					: null}
 			</FormContainerUI>
 		)
 

@@ -2,7 +2,6 @@ import { Client } from '../client'
 import { wrapIdentifier } from './sql'
 import { DatabaseMetadata } from '../metadata'
 
-
 export type ConstraintType = 'foreignKey' | 'unique'
 
 export class ConstraintHelper {

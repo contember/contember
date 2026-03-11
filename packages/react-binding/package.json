@@ -35,16 +35,16 @@
     "@contember/react-client": "workspace:*",
     "@contember/react-utils": "workspace:*",
     "@contember/utilities": "workspace:*",
-    "@radix-ui/react-slot": "^1.1.0",
-    "@radix-ui/primitive": "^0.1.0"
+    "@radix-ui/react-slot": "catalog:",
+    "@radix-ui/primitive": "catalog:"
   },
   "peerDependencies": {
-    "react": "^18 || ^19",
-    "react-dom": "^18 || ^19"
+    "react": "catalog:",
+    "react-dom": "catalog:"
   },
   "devDependencies": {
-    "@types/js-levenshtein": "1.1.3",
-    "react": "^18.3.1",
-    "react-dom": "^18.3.1"
+    "@types/js-levenshtein": "catalog:",
+    "react": "catalog:",
+    "react-dom": "catalog:"
   }
 }

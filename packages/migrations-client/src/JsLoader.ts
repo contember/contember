@@ -9,7 +9,6 @@ export class JsLoader implements MigrationFileLoader {
 	) {
 	}
 
-
 	public async load(file: MigrationFile): Promise<MigrationContent> {
 		const exports = await this.jsExecutor(file.path)
 		if (!('default' in exports) && !('query' in exports) && !('queries' in exports)) {
@@ -29,7 +28,6 @@ export class JsLoader implements MigrationFileLoader {
 				}
 				return migration
 			},
-
 		}
 	}
 }

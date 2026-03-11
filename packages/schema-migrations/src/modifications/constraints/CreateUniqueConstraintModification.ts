@@ -1,12 +1,7 @@
 import { MigrationBuilder } from '@contember/database-migrations'
 import { Model, Schema } from '@contember/schema'
 import { SchemaUpdater, updateEntity, updateModel } from '../utils/schemaUpdateUtils'
-import {
-	createModificationType,
-	Differ,
-	ModificationHandler,
-	ModificationHandlerCreateSqlOptions,
-} from '../ModificationHandler'
+import { createModificationType, Differ, ModificationHandler, ModificationHandlerCreateSqlOptions } from '../ModificationHandler'
 import { wrapIdentifier } from '../../utils/dbHelpers'
 import { getUniqueConstraintColumns } from './utils'
 import deepEqual from 'fast-deep-equal'
@@ -17,8 +12,7 @@ export class CreateUniqueConstraintModificationHandler implements ModificationHa
 
 	public createSql(builder: MigrationBuilder, { invalidateDatabaseMetadata }: ModificationHandlerCreateSqlOptions): void {
 		const entity = this.schema.model.entities[this.data.entityName]
-		const shouldExecuteSql =
-			!entity.view
+		const shouldExecuteSql = !entity.view
 			|| (this.data.unique.index && entity.view.materialized)
 		if (!shouldExecuteSql) {
 			return
@@ -48,7 +42,6 @@ export class CreateUniqueConstraintModificationHandler implements ModificationHa
 			builder.sql(`ALTER TABLE ${tableNameId} ADD UNIQUE (${columnNameIds.join(', ')})${checkModifier}`)
 		}
 
-
 		invalidateDatabaseMetadata()
 	}
 
@@ -66,13 +59,14 @@ export class CreateUniqueConstraintModificationHandler implements ModificationHa
 
 	describe({ createdEntities }: { createdEntities: string[] }) {
 		return {
-			message: `Create unique ${this.data.unique.index ? 'index' : 'constraint'} (${this.data.unique.fields.join(', ')}) on entity ${this.data.entityName}`,
+			message: `Create unique ${this.data.unique.index ? 'index' : 'constraint'} (${
+				this.data.unique.fields.join(', ')
+			}) on entity ${this.data.entityName}`,
 			failureWarning: !createdEntities.includes(this.data.entityName)
 				? 'Make sure no conflicting rows exists, otherwise this may fail in runtime.'
 				: undefined,
 		}
 	}
-
 }
 
 export const createUniqueConstraintModification = createModificationType({
@@ -90,10 +84,12 @@ export class CreateUniqueConstraintDiffer implements Differ {
 		return Object.values(updatedSchema.model.entities).flatMap(entity =>
 			entity.unique
 				.filter(it => !originalSchema.model.entities[entity.name].unique.find(uniq => deepEqual(uniq.fields, it.fields)))
-				.map(unique => createUniqueConstraintModification.createModification({
-					entityName: entity.name,
-					unique,
-				})),
+				.map(unique =>
+					createUniqueConstraintModification.createModification({
+						entityName: entity.name,
+						unique,
+					})
+				)
 		)
 	}
 }

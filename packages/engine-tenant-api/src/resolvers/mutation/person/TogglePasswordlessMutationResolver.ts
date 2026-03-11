@@ -40,5 +40,4 @@ export class TogglePasswordlessMutationResolver implements Pick<MutationResolver
 
 		return { ok: true }
 	}
-
 }

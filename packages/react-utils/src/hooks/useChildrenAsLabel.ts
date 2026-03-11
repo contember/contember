@@ -11,7 +11,6 @@ function normalize(text: string): string {
  *
  * @param node - The children to walk through.
  * @returns String representation of the text content or undefined if there is no text content.
- *
  */
 export function getChildrenAsLabel(node: ReactNode): string | undefined {
 	if (typeof node === 'string' || typeof node === 'number') {
@@ -27,18 +26,19 @@ export function getChildrenAsLabel(node: ReactNode): string | undefined {
 			if (child === null || child === undefined || typeof child === 'boolean') {
 			} else if (typeof child === 'string') {
 				label.push(child)
-			} else if (typeof child === 'number') {
-				label.push(child)
+			} else if (typeof child === 'number' || typeof child === 'bigint') {
+				label.push(String(child))
 			} else if (Array.isArray(child)) {
 				const childLabel = getChildrenAsLabel(child)
 
 				if (childLabel) {
 					label.push(childLabel)
 				}
-			} else {
-				// ReactElement | JSXElementConstructor | ReactPortal
-				if ('props' in child && 'children' in child.props) {
-					const childLabel = getChildrenAsLabel(child.props.children)
+			} else if (typeof child === 'object') {
+				// ReactElement | ReactPortal | Iterable
+				const props = 'props' in child ? child.props as Record<string, unknown> : null
+				if (props && 'children' in props) {
+					const childLabel = getChildrenAsLabel(props.children as ReactNode)
 
 					if (childLabel) {
 						label.push(childLabel)
@@ -65,7 +65,6 @@ export function getChildrenAsLabel(node: ReactNode): string | undefined {
  *
  * @param node - The children to walk through.
  * @returns String representation of the text content or undefined if there is no text content.
- *
  */
 export function useChildrenAsLabel(node: ReactNode): string | undefined {
 	return useMemo(() => getChildrenAsLabel(node), [node])

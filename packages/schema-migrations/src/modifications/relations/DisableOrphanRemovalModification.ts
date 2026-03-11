@@ -5,7 +5,6 @@ import { isOwningRelation } from '@contember/schema-utils'
 import { updateRelations } from '../utils/diffUtils'
 
 export class DisableOrphanRemovalModificationHandler implements ModificationHandler<DisableOrphanRemovalModificationData> {
-
 	constructor(private readonly data: DisableOrphanRemovalModificationData, private readonly schema: Schema) {}
 
 	public createSql(): void {}
@@ -41,12 +40,12 @@ export class DisableOrphanRemovalDiffer implements Differ {
 	createDiff(originalSchema: Schema, updatedSchema: Schema) {
 		return updateRelations(originalSchema, updatedSchema, ({ originalRelation, updatedRelation, updatedEntity }) => {
 			if (
-				isOwningRelation(originalRelation) &&
-				isOwningRelation(updatedRelation) &&
-				originalRelation.type === Model.RelationType.OneHasOne &&
-				updatedRelation.type === Model.RelationType.OneHasOne &&
-				originalRelation.orphanRemoval &&
-				!updatedRelation.orphanRemoval
+				isOwningRelation(originalRelation)
+				&& isOwningRelation(updatedRelation)
+				&& originalRelation.type === Model.RelationType.OneHasOne
+				&& updatedRelation.type === Model.RelationType.OneHasOne
+				&& originalRelation.orphanRemoval
+				&& !updatedRelation.orphanRemoval
 			) {
 				return disableOrphanRemovalModification.createModification({
 					entityName: updatedEntity.name,

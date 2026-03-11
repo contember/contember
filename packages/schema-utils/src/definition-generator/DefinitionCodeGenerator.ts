@@ -1,15 +1,8 @@
 import { Model, Schema, Writable } from '@contember/schema'
-import {
-	acceptFieldVisitor,
-	DefaultNamingConventions,
-	isInverseRelation,
-	NamingConventions,
-	resolveDefaultColumnType,
-} from '../model'
+import { acceptFieldVisitor, DefaultNamingConventions, isInverseRelation, NamingConventions, resolveDefaultColumnType } from '../model'
 import { printJsValue } from '../utils/printJsValue'
 import { DefinitionNamingConventions } from './DefinitionNamingConventions'
 import { AclDefinitionCodeGenerator } from './AclDefinitionCodeGenerator'
-
 
 export class DefinitionCodeGenerator {
 	constructor(
@@ -57,7 +50,6 @@ ${Object.values(entity.fields).map(field => this.generateField({ field, entity, 
 		return `@c.Index(${fieldsList})`
 	}
 
-
 	private generateView({ entity }: { entity: Model.Entity }): string | undefined {
 		if (!entity.view) {
 			return undefined
@@ -85,7 +77,6 @@ ${Object.values(entity.fields).map(field => this.generateField({ field, entity, 
 				throw new Error(`Value ${providedValue} is not defined in enum ${enumName}`)
 			}
 			return `${enumName}.${enumValueKey}`
-
 		}
 		const formatOrderBy = (orderBy?: readonly Model.OrderBy[]) => {
 			return orderBy?.map(it => {
@@ -157,13 +148,18 @@ ${Object.values(entity.fields).map(field => this.generateField({ field, entity, 
 				if (!relation.joiningTable.eventLog.enabled) {
 					joiningTable.eventLog = { enabled: false }
 				}
-				if (columnNames[0] !== relation.joiningTable.joiningColumn.columnName || relation.joiningTable.joiningColumn.onDelete !== Model.OnDelete.cascade) {
+				if (
+					columnNames[0] !== relation.joiningTable.joiningColumn.columnName || relation.joiningTable.joiningColumn.onDelete !== Model.OnDelete.cascade
+				) {
 					joiningTable.joiningColumn = {
 						columnName: relation.joiningTable.joiningColumn.columnName,
 						onDelete: relation.joiningTable.joiningColumn.onDelete,
 					}
 				}
-				if (columnNames[1] !== relation.joiningTable.inverseJoiningColumn.columnName || relation.joiningTable.inverseJoiningColumn.onDelete !== Model.OnDelete.cascade) {
+				if (
+					columnNames[1] !== relation.joiningTable.inverseJoiningColumn.columnName
+					|| relation.joiningTable.inverseJoiningColumn.onDelete !== Model.OnDelete.cascade
+				) {
 					joiningTable.inverseJoiningColumn = {
 						columnName: relation.joiningTable.inverseJoiningColumn.columnName,
 						onDelete: relation.joiningTable.inverseJoiningColumn.onDelete,
@@ -215,7 +211,6 @@ ${Object.values(entity.fields).map(field => this.generateField({ field, entity, 
 			parts.push(`typeAlias(${printJsValue(column.typeAlias)})`)
 		}
 
-
 		// todo: sequence
 		// todo: maybe single column unique()
 
@@ -226,7 +221,6 @@ ${Object.values(entity.fields).map(field => this.generateField({ field, entity, 
 		return this.definitionNamingConventions.formatIdentifier(id)
 	}
 }
-
 
 const ColumnToMethodMapping: {
 	[K in Exclude<Model.ColumnType, Model.ColumnType.Enum>]: string

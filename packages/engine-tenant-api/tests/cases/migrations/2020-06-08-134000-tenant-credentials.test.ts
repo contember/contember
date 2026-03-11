@@ -1,6 +1,6 @@
 import migration from '../../../src/migrations/2020-06-08-134000-tenant-credentials'
 import { createMigrationBuilder } from '@contember/database-migrations'
-import { test, expect } from 'bun:test'
+import { expect, test } from 'bun:test'
 
 let uuidNum = 0
 export const testUuid = () => '123e4567-e89b-12d3-a456-' + (uuidNum++).toString().padStart(12, '0')

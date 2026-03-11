@@ -10,7 +10,8 @@ export interface MigrationFile {
 	getContent: () => Promise<MigrationContent>
 }
 
-export const isSchemaMigration = (content: MigrationContent): content is SchemaMigration => typeof content !== 'function' && 'modifications' in content
+export const isSchemaMigration = (content: MigrationContent): content is SchemaMigration =>
+	typeof content !== 'function' && 'modifications' in content
 
 export type ResolvedMigrationContent =
 	| SchemaMigration
@@ -52,4 +53,3 @@ export type ContentMigrationQuery = {
 	stage?: string
 	checkMutationResult?: boolean
 }
-

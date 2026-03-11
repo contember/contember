@@ -1,5 +1,6 @@
 import {
-	createEntityModification, createViewModification,
+	createEntityModification,
+	createViewModification,
 	emptyModificationDescriptionContext,
 	ModificationDescription,
 	ModificationDescriptionContext,
@@ -73,7 +74,8 @@ export class MigrationDescriber {
 				},
 				{
 					createdEntities,
-				})
+				},
+			)
 			schema = description.schema
 			result.push(description)
 		}

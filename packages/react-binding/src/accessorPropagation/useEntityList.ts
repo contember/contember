@@ -28,16 +28,13 @@ function useEntityList(
 	}, [entityKey, getEntityByKey, relativeEntityList])
 
 	if (relativeEntityList) {
-		// eslint-disable-next-line react-hooks/rules-of-hooks
 		useConstantLengthInvariant(
 			relativeEntityList.hasOneRelationPath,
 			'Cannot change the length of the hasOneRelation path!',
 		)
-		// eslint-disable-next-line react-hooks/rules-of-hooks
 		const [entityList, { update }] = useAccessorUpdateSubscription(getEntityList)
 
 		if (relativeEntityList.hasOneRelationPath.length) {
-			// eslint-disable-next-line react-hooks/rules-of-hooks
 			useOnConnectionUpdate(relativeEntityList.hasOneRelationPath[0].field, update)
 		}
 

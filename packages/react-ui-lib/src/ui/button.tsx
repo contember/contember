@@ -1,7 +1,8 @@
 import { uic, uiconfig } from '../utils'
 
 export const buttonConfig = uiconfig({
-	baseClass: 'inline-flex items-center justify-center rounded-md text-sm font-medium whitespace-nowrap transition-colors focus-visible:outline-hidden focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 transition-all',
+	baseClass:
+		'inline-flex items-center justify-center rounded-md text-sm font-medium whitespace-nowrap transition-colors focus-visible:outline-hidden focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 transition-all',
 	variants: {
 		variant: {
 			default: 'bg-primary text-primary-foreground shadow-sm hover:bg-primary/90',

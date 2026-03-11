@@ -29,7 +29,4 @@ describe('Min length rule', () => {
 			errors: [],
 		})
 	})
-
 })
-
-

@@ -4,8 +4,8 @@ import { createTenantMutation } from '../../useTenantMutation'
 export const changeMyProfile = TenantApi.mutation$
 	.changeMyProfile(
 		TenantApi
-		  .changeMyProfileResponse$$
-		  .error(TenantApi.changeMyProfileError$$),
+			.changeMyProfileResponse$$
+			.error(TenantApi.changeMyProfileError$$),
 		options => options.alias('mutation'),
 	)
 

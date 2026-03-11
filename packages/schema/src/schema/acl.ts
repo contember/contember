@@ -6,7 +6,6 @@ export namespace Acl {
 		entity = 'entity',
 		predefined = 'predefined',
 		condition = 'condition',
-
 		// currently unsupported
 		// enum = 'enum',
 		// column = 'column',
@@ -16,9 +15,7 @@ export namespace Acl {
 		| EntityVariable
 		| PredefinedVariable
 		| ConditionVariable
-		// | EnumVariable | ColumnValueVariable
-
-
+	// | EnumVariable | ColumnValueVariable
 
 	export type EntityVariable = {
 		readonly type: VariableType.entity
@@ -31,7 +28,6 @@ export namespace Acl {
 		readonly type: VariableType.predefined
 		readonly value: PredefinedVariableValue
 	}
-
 
 	export type ConditionVariable = {
 		readonly type: VariableType.condition
@@ -49,7 +45,7 @@ export namespace Acl {
 	// 	fieldName: string
 	// }
 
-	export type PredicateVariable = string //{ name: string }
+	export type PredicateVariable = string // { name: string }
 	export type PredicateDefinition<E = never> = Input.Where<PredicateVariable | Input.Condition | E>
 
 	export type PredicateMap = { readonly [name: string]: PredicateDefinition }
@@ -107,7 +103,7 @@ export namespace Acl {
 
 	export type TenantPermissions = {
 		readonly invite?: MembershipMatchRule
-		readonly unmanagedInvite?:MembershipMatchRule
+		readonly unmanagedInvite?: MembershipMatchRule
 		readonly view?: MembershipMatchRule
 		readonly manage?: MembershipMatchRule
 	}
@@ -153,7 +149,7 @@ export namespace Acl {
 	export type RolePermissions =
 		& BaseRolePermissions
 		& {
-			readonly [key: string] : JSONValue
+			readonly [key: string]: JSONValue
 		}
 	export type Permissions = {
 		readonly [entity: string]: EntityPermissions

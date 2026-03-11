@@ -10,7 +10,7 @@ export const createAlignHandler = (direction: AlignDirection): {
 	isActive?: (args: { editor: Editor }) => boolean
 	shouldDisplay?: (args: { editor: Editor }) => boolean
 	toggle: (args: { editor: Editor }) => void
-}	=> ({
+} => ({
 	shouldDisplay: ({ editor }) => {
 		return Array.from(Editor.nodes(editor, { match: it => isAlignTarget(editor, it, direction) })).length > 0
 	},
@@ -25,6 +25,3 @@ export const createAlignHandler = (direction: AlignDirection): {
 		})
 	},
 })
-
-
-

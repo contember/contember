@@ -7,7 +7,7 @@ export type ContentQueryOptions = QueryExecutorOptions
 
 export type ContentQueryResult<T> = readonly [
 	state: ContentQueryState<T>,
-	meta: () => void
+	meta: () => void,
 ]
 
 export type ContentQueryState<Result> =
@@ -35,7 +35,6 @@ export function useContentQuery<T>(
 	stateRef.current = state
 	useConstantValueInvariant(query instanceof ContentOperation, 'cannot change between single and multiple queries')
 
-	// eslint-disable-next-line react-hooks/rules-of-hooks
 	const queryMemo = query instanceof ContentOperation ? query : useObjectMemo(query)
 	const optionsMemo = useObjectMemo(options)
 
@@ -59,7 +58,6 @@ export function useContentQuery<T>(
 			}
 			setState({ state: 'error', error: e })
 		}
-
 	}, [client, queryMemo, optionsMemo])
 
 	useEffect(() => {

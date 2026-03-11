@@ -4,7 +4,7 @@ import { FieldAccessor, useEntityBeforePersist } from '@contember/react-binding'
 
 export const useFormInputValidationHandler = (field: FieldAccessor<any>) => {
 	const accessorGetter = field.getAccessor
-	const validationMessage = useRef<string>()
+	const validationMessage = useRef<string>(undefined)
 	const [focus, setFocus] = React.useState(false)
 	const inputRef = React.useRef<HTMLInputElement>(null)
 	useEntityBeforePersist(useCallback(() => {

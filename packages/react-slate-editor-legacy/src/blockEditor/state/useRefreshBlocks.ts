@@ -9,7 +9,7 @@ import {
 	useDesugaredRelativeSingleField,
 	useEntityBeforePersist,
 } from '@contember/react-binding'
-import { Descendant, Editor, Element as SlateElement, Element } from 'slate'
+import { Descendant, Editor, Element, Element as SlateElement } from 'slate'
 import { isElementWithReference } from '../elements'
 import { useGetParentEntityRef } from '../useGetParentEntityRef'
 import { MutableRefObject, useCallback } from 'react'
@@ -17,21 +17,33 @@ import { BlockElementCache } from './useBlockElementCache'
 import { BlockElementPathRefs } from './useBlockElementPathRefs'
 import { isInitialSlateState } from '../utils/isInitialSlateState'
 
-
 export type RefreshBlocks = (args?: { forceInitialBlock?: boolean }) => void
 
-export const useRefreshBlocks = ({ editor, sortedBlocksRef, sortableBy, contentField, blockList, blockElementCache, blockElementPathRefs, referencesField, monolithicReferencesMode, trashFakeBlockId }: {
-	editor: Editor
-	sortedBlocksRef: MutableRefObject<EntityAccessor[]>
-	contentField: SugaredFieldProps['field']
-	sortableBy: SugaredFieldProps['field']
-	blockList: SugaredRelativeEntityList
-	blockElementCache: BlockElementCache
-	blockElementPathRefs: BlockElementPathRefs
-	referencesField?: SugaredRelativeEntityList | string
-	monolithicReferencesMode?: boolean
-	trashFakeBlockId: MutableRefObject<EntityId | undefined>
-}) => {
+export const useRefreshBlocks = (
+	{
+		editor,
+		sortedBlocksRef,
+		sortableBy,
+		contentField,
+		blockList,
+		blockElementCache,
+		blockElementPathRefs,
+		referencesField,
+		monolithicReferencesMode,
+		trashFakeBlockId,
+	}: {
+		editor: Editor
+		sortedBlocksRef: MutableRefObject<EntityAccessor[]>
+		contentField: SugaredFieldProps['field']
+		sortableBy: SugaredFieldProps['field']
+		blockList: SugaredRelativeEntityList
+		blockElementCache: BlockElementCache
+		blockElementPathRefs: BlockElementPathRefs
+		referencesField?: SugaredRelativeEntityList | string
+		monolithicReferencesMode?: boolean
+		trashFakeBlockId: MutableRefObject<EntityId | undefined>
+	},
+) => {
 	const desugaredBlockList = useDesugaredRelativeEntityList(blockList)
 	const desugaredBlockContentField = useDesugaredRelativeSingleField(contentField)
 	const desugaredSortableByField = useDesugaredRelativeSingleField(sortableBy)
@@ -98,8 +110,8 @@ export const useRefreshBlocks = ({ editor, sortedBlocksRef, sortableBy, contentF
 						const originalElement = blockElementCache.get(block)
 						const currentElement = editor.children[newBlockOrder]
 						if (
-							originalElement !== currentElement ||
-							block.getField(desugaredSortableByField).value !== newBlockOrder
+							originalElement !== currentElement
+							|| block.getField(desugaredSortableByField).value !== newBlockOrder
 						) {
 							block
 								.getField(desugaredSortableByField)
@@ -180,5 +192,17 @@ export const useRefreshBlocks = ({ editor, sortedBlocksRef, sortableBy, contentF
 			}
 			cleanupStack()
 		})
-	}, [blockElementCache, blockElementPathRefs, desugaredBlockContentField, desugaredBlockList, desugaredSortableByField, editor, getParentEntityRef, monolithicReferencesMode, referencesField, sortedBlocksRef, trashFakeBlockId])
+	}, [
+		blockElementCache,
+		blockElementPathRefs,
+		desugaredBlockContentField,
+		desugaredBlockList,
+		desugaredSortableByField,
+		editor,
+		getParentEntityRef,
+		monolithicReferencesMode,
+		referencesField,
+		sortedBlocksRef,
+		trashFakeBlockId,
+	])
 }

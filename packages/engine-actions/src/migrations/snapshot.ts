@@ -1,6 +1,6 @@
 import { MigrationBuilder } from '@contember/database-migrations'
 
-export default async function (builder: MigrationBuilder) {
+export default async function(builder: MigrationBuilder) {
 	builder.sql(`
 		CREATE TYPE ACTIONS_TRIGGER_STATE AS ENUM (
 			'created' ,

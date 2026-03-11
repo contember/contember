@@ -1,10 +1,4 @@
-import type {
-	EntityListSubTreeMarker,
-	EntitySubTreeMarker,
-	HasManyRelationMarker,
-	HasOneRelationMarker,
-	MeaningfulMarker,
-} from './markers'
+import type { EntityListSubTreeMarker, EntitySubTreeMarker, HasManyRelationMarker, HasOneRelationMarker, MeaningfulMarker } from './markers'
 import { BindingError } from './BindingError'
 
 export class LocalizedBindingError extends BindingError {

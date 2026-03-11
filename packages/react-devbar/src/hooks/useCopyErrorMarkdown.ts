@@ -99,11 +99,12 @@ type CopyMarkdownProps = {
 
 export const useCopyErrorMarkdown = ({ currentError, currentErrorSource }: CopyMarkdownProps) => {
 	const [copyStatus, setCopyStatus] = useState<'idle' | 'copying' | 'success' | 'error'>('idle')
-	
+
+	// biome-ignore lint/correctness/useExhaustiveDependencies: intentional
 	useEffect(() => {
 		setCopyStatus('idle')
 	}, [currentError])
-	
+
 	const handleCopyMarkdown = async () => {
 		setCopyStatus('copying')
 		try {
@@ -115,8 +116,6 @@ export const useCopyErrorMarkdown = ({ currentError, currentErrorSource }: CopyM
 			setCopyStatus('error')
 		}
 	}
-
-
 
 	const isClipboardSupported = !!navigator?.clipboard
 

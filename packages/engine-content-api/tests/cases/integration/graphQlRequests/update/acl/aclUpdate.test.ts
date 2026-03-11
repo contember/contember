@@ -1,7 +1,7 @@
 import { test } from 'bun:test'
 import { execute, failedTransaction, sqlTransaction } from '../../../../../src/test'
 import { c, createSchema, SchemaBuilder } from '@contember/schema-definition'
-import {  Model } from '@contember/schema'
+import { Model } from '@contember/schema'
 import { GQL, SQL } from '../../../../../src/tags'
 import { testUuid } from '../../../../../src/testUuid'
 
@@ -45,7 +45,8 @@ test('update name', async () => {
 					response: { rows: [{ id: testUuid(1) }] },
 				},
 				{
-					sql: SQL`with "newData_" as (select ? :: text as "name", "root_"."name" as "name_old__", "root_"."id"  from "public"."author" as "root_"  where "root_"."id" = ? and "root_"."name" in (?, ?)) 
+					sql:
+						SQL`with "newData_" as (select ? :: text as "name", "root_"."name" as "name_old__", "root_"."id"  from "public"."author" as "root_"  where "root_"."id" = ? and "root_"."name" in (?, ?)) 
 						update  "public"."author" set  "name" =  "newData_"."name"   from "newData_"  where "author"."id" = "newData_"."id" and "newData_"."name" in (?, ?)  returning "name_old__"`,
 					parameters: ['John', testUuid(1), 'John', 'Jack', 'John', 'Jack'],
 					response: { rows: [{ name_old__: 'John' }] },
@@ -102,7 +103,8 @@ test('update name - denied', async () => {
 					response: { rows: [{ id: testUuid(1) }] },
 				},
 				{
-					sql: SQL`with "newData_" as (select ? :: text as "name", "root_"."name" as "name_old__", "root_"."id"  from "public"."author" as "root_"  where false) 
+					sql:
+						SQL`with "newData_" as (select ? :: text as "name", "root_"."name" as "name_old__", "root_"."id"  from "public"."author" as "root_"  where false) 
 							update  "public"."author" set  "name" =  "newData_"."name"   from "newData_"  where "author"."id" = "newData_"."id" and false  returning "name_old__"`,
 					parameters: ['John'],
 					response: { rows: [] },
@@ -125,10 +127,7 @@ test('update m:n', async () => {
 			.entity('Post', e =>
 				e
 					.column('name', c => c.type(Model.ColumnType.String))
-					.manyHasMany('categories', r =>
-						r.target('Category', e => e.column('name', c => c.type(Model.ColumnType.String))).inversedBy('posts'),
-					),
-			)
+					.manyHasMany('categories', r => r.target('Category', e => e.column('name', c => c.type(Model.ColumnType.String))).inversedBy('posts')))
 			.buildSchema(),
 		permissions: {
 			Post: {
@@ -255,8 +254,6 @@ test('update m:n', async () => {
 	})
 })
 
-
-
 namespace ConnectWithAclOnRead {
 	export const editor = c.createRole('editor')
 
@@ -276,7 +273,6 @@ namespace ConnectWithAclOnRead {
 		isPublic = c.boolColumn().notNull()
 		slug = c.stringColumn().notNull().unique()
 	}
-
 }
 
 test('connect category', async () => {
@@ -306,7 +302,8 @@ test('connect category', async () => {
 					response: { rows: [{ id: testUuid(2) }] },
 				},
 				{
-					sql: SQL`with "newData_" as (select ? :: uuid as "category_id", "root_"."category_id" as "category_id_old__", "root_"."id" from "public"."article" as "root_"  where "root_"."id" = ?) 
+					sql:
+						SQL`with "newData_" as (select ? :: uuid as "category_id", "root_"."category_id" as "category_id_old__", "root_"."id" from "public"."article" as "root_"  where "root_"."id" = ?) 
 update "public"."article" set  "category_id" =  "newData_"."category_id" from "newData_"  where "article"."id" = "newData_"."id"  returning "category_id_old__"`,
 					parameters: [testUuid(2), testUuid(1)],
 					response: { rows: [{ category_id_old__: null }] },

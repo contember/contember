@@ -81,9 +81,7 @@ export class UpdateColumnNameModificationHandler implements ModificationHandler<
 						visitOneHasOneInverse: () => {
 							throw new Error('Cannot rename column of one-to-one inverse relation')
 						},
-					},
-					),
-				),
+					})),
 			),
 		)
 	}

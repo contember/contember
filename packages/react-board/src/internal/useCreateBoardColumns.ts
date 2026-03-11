@@ -10,7 +10,6 @@ export const useCreateBoardColumns = <ColumnValue extends BoardColumnValue>({ gr
 	columnIdGetter: (column: ColumnValue) => string | number
 	groupItemsByColumn: UseGroupItemsByColumn
 }): BoardColumnNode<ColumnValue>[] => {
-
 	return useMemo(() => {
 		const itemsByColumn = groupItemsByColumn(items)
 
@@ -25,7 +24,6 @@ export const useCreateBoardColumns = <ColumnValue extends BoardColumnValue>({ gr
 		]
 		let index = 0
 
-
 		for (const column of columns) {
 			result.push({
 				id: columnIdGetter(column),
@@ -35,6 +33,5 @@ export const useCreateBoardColumns = <ColumnValue extends BoardColumnValue>({ gr
 			})
 		}
 		return result
-
 	}, [columnIdGetter, columns, groupItemsByColumn, items])
 }

@@ -5,7 +5,7 @@ import { randomString } from '../internal/utils/randomInt'
 import { calculateHash } from '../internal/utils/hashing'
 import { ActivatePasswordlessOtpErrorCode } from '@contember/graphql-client-tenant'
 
-const usePasswordlessParams = (): {localStorageRequestId: string | null; urlRequestId: string | null; urlToken: string | null} => {
+const usePasswordlessParams = (): { localStorageRequestId: string | null; urlRequestId: string | null; urlToken: string | null } => {
 	const localStorageValue = localStorage.getItem(PASSWORDLESS_REQUEST_STORAGE_KEY) ?? null
 	const urlParams = new URLSearchParams(window.location.search)
 	const requestId = urlParams.get('request_id')
@@ -18,7 +18,7 @@ export type PasswordlessResponseHandlerState =
 	| { type: 'empty' }
 	| { type: 'otp_activating' }
 	| { type: 'otp_activated'; otp: string }
-	| { type: 'otp_activation_failed'; error: ActivatePasswordlessOtpErrorCode | 'UNKNOWN_ERROR'}
+	| { type: 'otp_activation_failed'; error: ActivatePasswordlessOtpErrorCode | 'UNKNOWN_ERROR' }
 	| { type: 'can_proceed_to_login' }
 
 export const usePasswordlessOtpActivator = ({ otpLength = 6, otpChars = '0123456789ABCDEF' }: {
@@ -39,8 +39,9 @@ export const usePasswordlessOtpActivator = ({ otpLength = 6, otpChars = '0123456
 		return { type: 'empty' }
 	})
 
+	// biome-ignore lint/correctness/useExhaustiveDependencies: intentional
 	useEffect(() => {
-		(async () => {
+		;(async () => {
 			if (state.type === 'otp_activating') {
 				const otpCode = randomString(otpLength, otpChars)
 				try {

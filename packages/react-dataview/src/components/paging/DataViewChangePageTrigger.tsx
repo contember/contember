@@ -9,7 +9,9 @@ export interface DataViewChangePageTriggerAttributes {
 	['data-current']?: string
 }
 
-const SlotType = Slot as React.ForwardRefExoticComponent<React.ButtonHTMLAttributes<HTMLButtonElement> & React.RefAttributes<HTMLButtonElement> & DataViewChangePageTriggerAttributes>
+const SlotType = Slot as React.ForwardRefExoticComponent<
+	React.ButtonHTMLAttributes<HTMLButtonElement> & React.RefAttributes<HTMLButtonElement> & DataViewChangePageTriggerAttributes
+>
 
 export interface DataViewChangePageTriggerProps {
 	/**

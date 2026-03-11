@@ -25,7 +25,7 @@ export class ContentApiSpecificCache<ObjectKey extends object, Value> {
 
 		const cacheValue = cacheMap.get(scalarKey)
 
-		let timer: ReturnType<typeof setTimeout> | undefined = undefined
+		let timer: ReturnType<typeof setTimeout> | undefined
 		if (this.options.ttlSeconds) {
 			// wrap to WeakRef so the Map can be garbage-collected, when ObjectKey is garbage collected
 			const cacheMapRef = new WeakRef(cacheMap)

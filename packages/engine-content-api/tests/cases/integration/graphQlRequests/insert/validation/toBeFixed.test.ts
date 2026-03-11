@@ -6,9 +6,7 @@ import { Model, Validation } from '@contember/schema'
 import { InputValidation as v, SchemaBuilder } from '@contember/schema-definition'
 
 const bookSchema = new SchemaBuilder()
-	.entity('Book', entity =>
-		entity.column('name', c => c.type(Model.ColumnType.String)).oneHasMany('tags', r => r.target('Tag')),
-	)
+	.entity('Book', entity => entity.column('name', c => c.type(Model.ColumnType.String)).oneHasMany('tags', r => r.target('Tag')))
 	.entity('Tag', e => e.column('label'))
 	.buildSchema()
 
@@ -27,8 +25,6 @@ const bookValidation: Validation.Schema = {
 
 test.skip('insert book with validation - failed', async () => {
 	// fixme
-	return
-
 	await execute({
 		schema: bookSchema,
 		validation: bookValidation,
@@ -96,8 +92,6 @@ test.skip('insert book with validation - failed', async () => {
 
 test.skip('insert book with validation - ok', async () => {
 	// fixme
-	return
-
 	await execute({
 		schema: bookSchema,
 		validation: bookValidation,
@@ -157,5 +151,3 @@ test.skip('insert book with validation - ok', async () => {
 		},
 	})
 })
-
-

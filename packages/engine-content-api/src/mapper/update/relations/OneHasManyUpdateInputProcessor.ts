@@ -8,7 +8,7 @@ import { MapperInput } from '../../types'
 
 type Context = Model.OneHasManyContext
 
-export class OneHasManyUpdateInputProcessor implements UpdateInputProcessor.HasManyRelationInputProcessor<Context, SqlUpdateInputProcessorResult>{
+export class OneHasManyUpdateInputProcessor implements UpdateInputProcessor.HasManyRelationInputProcessor<Context, SqlUpdateInputProcessorResult> {
 	constructor(
 		private readonly mapper: Mapper,
 	) {
@@ -75,7 +75,7 @@ export class OneHasManyUpdateInputProcessor implements UpdateInputProcessor.HasM
 				{ ...where, [targetRelation.name]: { [entity.primary]: primary } },
 				{
 					...update,
-				// [targetRelation.name]: {connect: thisPrimary}
+					// [targetRelation.name]: {connect: thisPrimary}
 				},
 			)
 			if (result[0].result === MutationResultType.notFoundError) {

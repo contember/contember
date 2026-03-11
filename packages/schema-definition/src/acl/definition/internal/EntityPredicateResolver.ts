@@ -80,7 +80,6 @@ export class EntityPredicatesResolver {
 			return predicateNames[0]
 		}
 
-
 		const predicate = { or: predicateNames.map(it => this.predicates[it]) }
 		const origName = predicateNames.every(it => this.generatedNames.has(it)) ? createPredicateName(predicate) : predicateNames.join('_or_')
 		let predicateName = origName
@@ -102,7 +101,6 @@ export class EntityPredicatesResolver {
 		return Object.fromEntries(Object.entries(this.predicates).filter(([name]) => this.usedPredicates.includes(name)))
 	}
 
-
 	private static resolvePredicate(
 		model: Model.Schema,
 		entity: Model.Entity,
@@ -116,7 +114,9 @@ export class EntityPredicatesResolver {
 					return ctx.value.name
 				}
 				if (ctx.value instanceof PredicateEvaluationReference) {
-					throw `Predicate references are allowed only on relations. \nYou cannot use "can${upperCaseFirst(ctx.value.operation)}(${ctx.value.field ? JSON.stringify(ctx.value.field) : ''})" on a column "${ctx.column.name}" of entity "${ctx.entity.name}".`
+					throw `Predicate references are allowed only on relations. \nYou cannot use "can${upperCaseFirst(ctx.value.operation)}(${
+						ctx.value.field ? JSON.stringify(ctx.value.field) : ''
+					})" on a column "${ctx.column.name}" of entity "${ctx.entity.name}".`
 				}
 				return ctx.value
 			},
@@ -138,7 +138,7 @@ export class EntityPredicatesResolver {
 						return { [ctx.targetEntity.primary]: { isNull: false } }
 					}
 					const predicates = (whens as WhenDefinition[]).map(it =>
-						EntityPredicatesResolver.resolvePredicate(model, ctx.targetEntity, it, rolePermissionsByEntity),
+						EntityPredicatesResolver.resolvePredicate(model, ctx.targetEntity, it, rolePermissionsByEntity)
 					)
 					if (predicates.length > 1) {
 						return { or: predicates }

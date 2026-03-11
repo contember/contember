@@ -13,14 +13,15 @@ export type UseDataViewFilteringArgs =
 	}
 	& DataViewFilteringProps
 
-
 export type UseDataViewFilteringResult = {
 	state: DataViewFilteringState
 	methods: DataViewFilteringMethods
 }
 
 const emptyObject = {}
-export const useDataViewFiltering = ({ dataViewKey, initialFilters, filteringStateStorage, filterTypes = emptyObject, resetPage, entities }: UseDataViewFilteringArgs): UseDataViewFilteringResult => {
+export const useDataViewFiltering = (
+	{ dataViewKey, initialFilters, filteringStateStorage, filterTypes = emptyObject, resetPage, entities }: UseDataViewFilteringArgs,
+): UseDataViewFilteringResult => {
 	const [filters, setFilters] = useStoredState<DataViewFilteringStoredState>(
 		filteringStateStorage ?? 'null',
 		...getDataViewFilteringStorageArgs({
@@ -68,8 +69,6 @@ export const useDataViewFiltering = ({ dataViewKey, initialFilters, filteringSta
 		}), [filters, resolvedFilters, filterTypes]),
 		methods: useMemo(() => ({
 			setFilter,
-		}),
-		[setFilter],
-		),
+		}), [setFilter]),
 	}
 }

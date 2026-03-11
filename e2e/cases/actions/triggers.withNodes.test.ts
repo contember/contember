@@ -3,7 +3,6 @@ import { expect, test } from 'bun:test'
 import { createTester, gql } from '../../src/tester'
 
 namespace ActionsModel {
-
 	@c.Watch({
 		name: 'article_watch',
 		withNodes: true,
@@ -45,7 +44,6 @@ namespace ActionsModel {
 	export class TagKind {
 		name = c.stringColumn().notNull()
 	}
-
 }
 
 test('triggers: watch withNodes - delete entity', async () => {
@@ -77,32 +75,36 @@ test('triggers: watch withNodes - delete entity', async () => {
 	const revisionId = res.body.data.createArticle.node.revisions[0].id
 	const localeId = res.body.data.createArticle.node.revisions[0].locales[0].id
 	const tagId = res.body.data.createArticle.node.revisions[0].locales[0].tags[0].id
-	const result = await tester(gql`
+	const result = await tester(
+		gql`
         mutation($tagId: UUID!) {
             deleteArticleRevisionLocaleTag(by: {id: $tagId}) {
 				ok
 				errorMessage
 			}
         }
-	`, { variables: { tagId } })
+	`,
+		{ variables: { tagId } },
+	)
 	expect(result.body.errors).toBeUndefined()
 	expect(result.body.data.deleteArticleRevisionLocaleTag).toEqual({
 		ok: true,
 		errorMessage: null,
 	})
-	const resultEvents = await tester(gql`
+	const resultEvents = await tester(
+		gql`
 	query {
 		eventsToProcess {
 			payload
 		}
 	}
 
-	`, {
-		path: '/actions/' + tester.projectSlug,
-	})
+	`,
+		{
+			path: '/actions/' + tester.projectSlug,
+		},
+	)
 		.expect(200)
-
-
 
 	expect(resultEvents.body.data.eventsToProcess).toMatchObject([
 		{
@@ -240,9 +242,6 @@ test('triggers: watch withNodes - delete entity', async () => {
 	])
 })
 
-
-
-
 test('triggers: watch withNodes - update scalar', async () => {
 	const schema = createSchema(ActionsModel)
 	const tester = await createTester(schema)
@@ -272,32 +271,36 @@ test('triggers: watch withNodes - update scalar', async () => {
 	const revisionId = res.body.data.createArticle.node.revisions[0].id
 	const localeId = res.body.data.createArticle.node.revisions[0].locales[0].id
 	const tagId = res.body.data.createArticle.node.revisions[0].locales[0].tags[0].id
-	const result = await tester(gql`
+	const result = await tester(
+		gql`
         mutation($tagId: UUID!) {
             updateArticleRevisionLocaleTag(by: {id: $tagId}, data: {name: "tag2"}) {
 				ok
 				errorMessage
 			}
         }
-	`, { variables: { tagId } })
+	`,
+		{ variables: { tagId } },
+	)
 	expect(result.body.errors).toBeUndefined()
 	expect(result.body.data.updateArticleRevisionLocaleTag).toEqual({
 		ok: true,
 		errorMessage: null,
 	})
-	const resultEvents = await tester(gql`
+	const resultEvents = await tester(
+		gql`
 	query {
 		eventsToProcess {
 			payload
 		}
 	}
 
-	`, {
-		path: '/actions/' + tester.projectSlug,
-	})
+	`,
+		{
+			path: '/actions/' + tester.projectSlug,
+		},
+	)
 		.expect(200)
-
-
 
 	expect(resultEvents.body.data.eventsToProcess).toMatchObject([
 		{
@@ -441,8 +444,6 @@ test('triggers: watch withNodes - update scalar', async () => {
 	])
 })
 
-
-
 test('triggers: watch withNodes - update relation', async () => {
 	const schema = createSchema(ActionsModel)
 	const tester = await createTester(schema)
@@ -472,32 +473,36 @@ test('triggers: watch withNodes - update relation', async () => {
 	const revisionId = res.body.data.createArticle.node.revisions[0].id
 	const localeId = res.body.data.createArticle.node.revisions[0].locales[0].id
 	const tagId = res.body.data.createArticle.node.revisions[0].locales[0].tags[0].id
-	const result = await tester(gql`
+	const result = await tester(
+		gql`
         mutation($tagId: UUID!) {
             updateArticleRevisionLocaleTag(by: {id: $tagId}, data: {kind: {create: {name: "kind2"}}}) {
 				ok
 				errorMessage
 			}
         }
-	`, { variables: { tagId } })
+	`,
+		{ variables: { tagId } },
+	)
 	expect(result.body.errors).toBeUndefined()
 	expect(result.body.data.updateArticleRevisionLocaleTag).toEqual({
 		ok: true,
 		errorMessage: null,
 	})
-	const resultEvents = await tester(gql`
+	const resultEvents = await tester(
+		gql`
 	query {
 		eventsToProcess {
 			payload
 		}
 	}
 
-	`, {
-		path: '/actions/' + tester.projectSlug,
-	})
+	`,
+		{
+			path: '/actions/' + tester.projectSlug,
+		},
+	)
 		.expect(200)
-
-
 
 	expect(resultEvents.body.data.eventsToProcess).toMatchObject([
 		{

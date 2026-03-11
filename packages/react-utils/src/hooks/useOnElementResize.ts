@@ -11,7 +11,8 @@ export function useOnElementResize(
 	const scopedConsoleRef = useScopedConsoleRef('useOnElementResize')
 
 	const { box = 'border-box' } = options
-	const callbackRef = useRef(callback); callbackRef.current = callback
+	const callbackRef = useRef(callback)
+	callbackRef.current = callback
 	const lastTimeStamp = useRef<number>(0)
 
 	useLayoutEffect(() => {

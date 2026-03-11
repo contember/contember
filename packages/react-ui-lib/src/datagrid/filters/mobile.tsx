@@ -4,10 +4,9 @@ import { createContext, ReactNode, useContext } from 'react'
 
 export const DataGridShowFiltersContext = createContext(true)
 
-export const DataGridFilterMobileHiding = ({ name,  children }: { name?: string; children: ReactNode }) => {
-	// eslint-disable-next-line react-hooks/rules-of-hooks
+export const DataGridFilterMobileHiding = ({ name, children }: { name?: string; children: ReactNode }) => {
 	name ??= useDataViewFilterName()
-	const [,, { isEmpty }] = useDataViewFilter(name)
+	const [, , { isEmpty }] = useDataViewFilter(name)
 	const isActive = !isEmpty
 	const alwaysShow = useContext(DataGridShowFiltersContext)
 	return (

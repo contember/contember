@@ -36,7 +36,7 @@ export class InviteManager {
 		private readonly providers: Providers,
 		private readonly mailer: UserMailer,
 		private readonly projectSchemaResolver: ProjectSchemaResolver,
-	) { }
+	) {}
 
 	async invite(
 		dbContext: DatabaseContext,
@@ -64,22 +64,28 @@ export class InviteManager {
 			if (!person) {
 				const identityId = await trx.commandBus.execute(new CreateIdentityCommand([TenantRole.PERSON]))
 
-				generatedPassword = password ??
-					(method === 'CREATE_PASSWORD' ? (await this.providers.randomBytes(9)).toString('base64') : null)
+				generatedPassword = password
+					?? (method === 'CREATE_PASSWORD' ? (await this.providers.randomBytes(9)).toString('base64') : null)
 				const passwordWrapper = generatedPassword !== null ? new PasswordPlain(generatedPassword) : NoPassword
 
-				person = await trx.commandBus.execute(new CreatePersonCommand({
-					identityId,
-					email,
-					name,
-					password: passwordWrapper,
-				}))
+				person = await trx.commandBus.execute(
+					new CreatePersonCommand({
+						identityId,
+						email,
+						name,
+						password: passwordWrapper,
+					}),
+				)
 				if (method === 'RESET_PASSWORD') {
-					const result = await trx.commandBus.execute(CreatePersonTokenCommand.createPasswordResetRequest(person.id, await this.getInviteExpiration(project.slug)))
+					const result = await trx.commandBus.execute(
+						CreatePersonTokenCommand.createPasswordResetRequest(person.id, await this.getInviteExpiration(project.slug)),
+					)
 					resetToken = result.token
 				}
 				if (passwordResetTokenHash) {
-					await trx.commandBus.execute(new SavePersonTokenCommand(person.id, passwordResetTokenHash, 'password_reset', await this.getInviteExpiration(project.slug)))
+					await trx.commandBus.execute(
+						new SavePersonTokenCommand(person.id, passwordResetTokenHash, 'password_reset', await this.getInviteExpiration(project.slug)),
+					)
 				}
 			}
 			for (const membershipUpdate of createAppendMembershipVariables(memberships)) {
@@ -114,5 +120,5 @@ export class InviteManager {
 export type InviteResponse = Response<InviteResult, InviteErrorCode>
 
 export class InviteResult {
-	constructor(public readonly person: Omit<PersonRow, 'roles'>, public readonly isNew: boolean) { }
+	constructor(public readonly person: Omit<PersonRow, 'roles'>, public readonly isNew: boolean) {}
 }

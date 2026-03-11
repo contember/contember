@@ -18,18 +18,24 @@ export class AddMailTemplateCommand implements Command<void> {
 				use_layout: this.mailTemplate.useLayout,
 				reply_to: this.mailTemplate.replyTo,
 			})
-			.onConflict(ConflictActionType.update, this.mailTemplate.projectId ? {
-				columns: ['project_id', 'mail_type', 'variant'],
-				where: it => it.isNotNull('project_id'),
-			} : {
-				columns: ['mail_type', 'variant'],
-				where: it => it.isNull('project_id'),
-			}, {
-				reply_to: expr => expr.select(['excluded', 'reply_to']),
-				subject: expr => expr.select(['excluded', 'subject']),
-				content: expr => expr.select(['excluded', 'content']),
-				use_layout: expr => expr.select(['excluded', 'use_layout']),
-			})
+			.onConflict(
+				ConflictActionType.update,
+				this.mailTemplate.projectId
+					? {
+						columns: ['project_id', 'mail_type', 'variant'],
+						where: it => it.isNotNull('project_id'),
+					}
+					: {
+						columns: ['mail_type', 'variant'],
+						where: it => it.isNull('project_id'),
+					},
+				{
+					reply_to: expr => expr.select(['excluded', 'reply_to']),
+					subject: expr => expr.select(['excluded', 'subject']),
+					content: expr => expr.select(['excluded', 'content']),
+					use_layout: expr => expr.select(['excluded', 'use_layout']),
+				},
+			)
 			.execute(db)
 	}
 }

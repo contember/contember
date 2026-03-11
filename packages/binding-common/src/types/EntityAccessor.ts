@@ -80,7 +80,7 @@ namespace EntityAccessor {
 	export type FieldValuePairs =
 		| {
 			[field: string]: FieldValue
-		  }
+		}
 		| Iterable<[SugaredRelativeSingleField | string, FieldValue]>
 
 	export type FieldData = Map<FieldName, FieldDatum>

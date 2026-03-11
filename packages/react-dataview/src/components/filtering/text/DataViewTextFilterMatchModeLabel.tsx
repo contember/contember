@@ -32,7 +32,6 @@ export interface DataViewTextFilterMatchModeLabelProps {
  * ```
  */
 export const DataViewTextFilterMatchModeLabel = ({ name, render }: DataViewTextFilterMatchModeLabelProps) => {
-	// eslint-disable-next-line react-hooks/rules-of-hooks
 	name ??= useDataViewFilterName()
 	const [state] = useDataViewFilter<TextFilterArtifacts>(name)
 

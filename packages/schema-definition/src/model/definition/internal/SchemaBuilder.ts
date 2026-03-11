@@ -8,7 +8,7 @@ import { EntityRegistry } from './EntityRegistry'
 import { EnumRegistry } from './EnumRegistry'
 import { ColumnDefinition } from '../fieldDefinitions'
 import { applyEntityExtensions } from '../extensions'
-import { StrictOptions, StrictDefinitionValidator } from '../../../strict'
+import { StrictDefinitionValidator, StrictOptions } from '../../../strict'
 
 export class SchemaBuilder {
 	private entityRegistry = new EntityRegistry()
@@ -64,7 +64,6 @@ export class SchemaBuilder {
 					}
 					return { ...acc, [field.name]: field }
 				}, {})
-
 
 			const entity: Model.Entity = {
 				name: entityName,

@@ -18,7 +18,6 @@ export type MigrationArgs<Args> =
 		connection: Connection.ConnectionLike
 	}
 
-
 export interface RunMigration {
 	name: string
 	group: string | null

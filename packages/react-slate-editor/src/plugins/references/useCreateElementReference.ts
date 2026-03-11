@@ -1,11 +1,18 @@
 import { Editor } from 'slate'
-import { EntityAccessor, generateUuid, PRIMARY_KEY_NAME, SugaredRelativeEntityList, SugaredRelativeSingleField, useBindingOperations } from '@contember/react-binding'
+import {
+	EntityAccessor,
+	generateUuid,
+	PRIMARY_KEY_NAME,
+	SugaredRelativeEntityList,
+	SugaredRelativeSingleField,
+	useBindingOperations,
+} from '@contember/react-binding'
 import { useGetReferenceEntityList } from './useGetReferenceEntityList'
 import { useReferentiallyStableCallback } from '@contember/react-utils'
 
 export type CreateElementReferences = (
 	referenceType: string,
-	initialize?: EntityAccessor.BatchUpdatesHandler
+	initialize?: EntityAccessor.BatchUpdatesHandler,
 ) => EntityAccessor
 
 export const useCreateElementReference = ({ referencesField, referenceDiscriminationField, editor }: {

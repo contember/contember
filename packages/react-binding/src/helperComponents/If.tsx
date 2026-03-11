@@ -36,9 +36,7 @@ export const If = Component<IfProps>(({ condition, ...props }) => {
 	return typeof condition !== 'function'
 		? <IfFilter condition={condition} {...props} />
 		: <IfCallback condition={condition} {...props} />
-},
-'If',
-)
+}, 'If')
 
 const IfCallback = Component<IfCallbackProps>(
 	({ children, condition, then, else: elseIn }) => {
@@ -48,11 +46,13 @@ const IfCallback = Component<IfCallbackProps>(
 		return <>{evaluated ? (children ?? then) : elseIn}</>
 	},
 	({ children, then, else: elseIn }) => {
-		return <>
-			{children}
-			{then}
-			{elseIn}
-		</>
+		return (
+			<>
+				{children}
+				{then}
+				{elseIn}
+			</>
+		)
 	},
 	'IfCallback',
 )
@@ -74,12 +74,14 @@ const IfFilter = Component<IfFilterProps>(
 		const collectedFields = new FilterFieldsCollector(env.getSchema(), desugaredFilter).collectFields(env.getSubTreeNode().entity)
 		const additionalFields = <>{Array.from(collectedFields).map(it => <Field field={it} key={it} />)}</>
 
-		return <>
-			{additionalFields}
-			{children}
-			{then}
-			{elseIn}
-		</>
+		return (
+			<>
+				{additionalFields}
+				{children}
+				{then}
+				{elseIn}
+			</>
+		)
 	},
 	'IfFilter',
 )

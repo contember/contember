@@ -12,14 +12,16 @@ export type DimensionRendererProps = {
 export const DimensionRenderer = Component<DimensionRendererProps>(({ dimension, as, children }, env) => {
 	const dimensions = env.getDimensionOrElse(dimension, [])
 
-	return <>
-		{dimensions.map(value => (
-			<EnvironmentMiddleware
-				create={it => it.withVariables({ [as]: value })}
-				key={value}
-			>
-				{children}
-			</EnvironmentMiddleware>
-		))}
-	</>
+	return (
+		<>
+			{dimensions.map(value => (
+				<EnvironmentMiddleware
+					create={it => it.withVariables({ [as]: value })}
+					key={value}
+				>
+					{children}
+				</EnvironmentMiddleware>
+			))}
+		</>
+	)
 })

@@ -6,7 +6,7 @@ export type DataViewNullFilterState = 'include' | 'exclude' | 'none'
 
 export type UseDataViewNullFilterResult = [
 	state: DataViewNullFilterState,
-	set: (action: DataViewSetNullFilterAction) => void
+	set: (action: DataViewSetNullFilterAction) => void,
 ]
 
 export const useDataViewNullFilter = (name: string): UseDataViewNullFilterResult => {
@@ -49,7 +49,8 @@ export const useDataViewNullFilter = (name: string): UseDataViewNullFilterResult
 	const currentState: DataViewNullFilterState = state?.nullCondition
 		? 'include'
 		: state?.nullCondition === false
-			? 'exclude' : 'none'
+		? 'exclude'
+		: 'none'
 
 	return [currentState, cb]
 }

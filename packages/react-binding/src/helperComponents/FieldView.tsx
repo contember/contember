@@ -16,11 +16,11 @@ export type FieldViewProps =
 		| {
 			render: (...accessors: FieldAccessor[]) => ReactNode
 			field: string | SugaredRelativeSingleField
-		  }
+		}
 		| {
 			render: (...accessors: FieldAccessor[]) => ReactNode
 			fields: Array<string | SugaredRelativeSingleField>
-		  }
+		}
 	)
 
 /**
@@ -39,12 +39,11 @@ export type FieldViewProps =
 export const FieldView = Component<FieldViewProps>(
 	props => {
 		const { fallbackIfUnpersisted, render } = props
-		const fields =
-			'fields' in props && Array.isArray(props.fields)
-				? props.fields
-				: 'field' in props && props.field
-					? [props.field]
-					: throwBindingError(`FieldView: failed to supply either the 'field' or the 'fields' prop.`)
+		const fields = 'fields' in props && Array.isArray(props.fields)
+			? props.fields
+			: 'field' in props && props.field
+			? [props.field]
+			: throwBindingError(`FieldView: failed to supply either the 'field' or the 'fields' prop.`)
 
 		useConstantLengthInvariant(
 			fields,
@@ -79,18 +78,15 @@ export const FieldView = Component<FieldViewProps>(
 		return <>{output}</>
 	},
 	props => {
-		const fields =
-			'fields' in props && Array.isArray(props.fields)
-				? props.fields
-				: 'field' in props && props.field
-					? [props.field]
-					: throwBindingError(`FieldView: failed to supply either the 'field' or the 'fields' prop.`)
+		const fields = 'fields' in props && Array.isArray(props.fields)
+			? props.fields
+			: 'field' in props && props.field
+			? [props.field]
+			: throwBindingError(`FieldView: failed to supply either the 'field' or the 'fields' prop.`)
 		return (
 			<>
 				{props.fallbackIfUnpersisted}
-				{fields.map((field, i) => (
-					<SugaredField key={i} field={field} />
-				))}
+				{fields.map((field, i) => <SugaredField key={i} field={field} />)}
 			</>
 		)
 	},
@@ -138,7 +134,12 @@ export type FieldViewComponentSignature = {
 		props:
 			& FieldViewCommonProps
 			& {
-				fields: [string | SugaredRelativeSingleField, string | SugaredRelativeSingleField, string | SugaredRelativeSingleField, string | SugaredRelativeSingleField]
+				fields: [
+					string | SugaredRelativeSingleField,
+					string | SugaredRelativeSingleField,
+					string | SugaredRelativeSingleField,
+					string | SugaredRelativeSingleField,
+				]
 				render: (field1: FieldAccessor<FV1>, field2: FieldAccessor<FV2>, field3: FieldAccessor<FV3>, field4: FieldAccessor<FV4>) => ReactNode
 			},
 	): ReactElement | null
@@ -147,8 +148,20 @@ export type FieldViewComponentSignature = {
 		props:
 			& FieldViewCommonProps
 			& {
-				fields: [string | SugaredRelativeSingleField, string | SugaredRelativeSingleField, string | SugaredRelativeSingleField, string | SugaredRelativeSingleField, string | SugaredRelativeSingleField]
-				render: (field1: FieldAccessor<FV1>, field2: FieldAccessor<FV2>, field3: FieldAccessor<FV3>, field4: FieldAccessor<FV4>, field5: FieldAccessor<FV5>) => ReactNode
+				fields: [
+					string | SugaredRelativeSingleField,
+					string | SugaredRelativeSingleField,
+					string | SugaredRelativeSingleField,
+					string | SugaredRelativeSingleField,
+					string | SugaredRelativeSingleField,
+				]
+				render: (
+					field1: FieldAccessor<FV1>,
+					field2: FieldAccessor<FV2>,
+					field3: FieldAccessor<FV3>,
+					field4: FieldAccessor<FV4>,
+					field5: FieldAccessor<FV5>,
+				) => ReactNode
 			},
 	): ReactElement | null
 

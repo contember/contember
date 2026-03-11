@@ -1,4 +1,4 @@
-import { BoardTaskStatus, ContemberClientEntities, ContemberClientEnums, GridArticleState, ContemberClientNames } from '../../api/client'
+import { BoardTaskStatus, ContemberClientEntities, ContemberClientEnums, ContemberClientNames, GridArticleState } from '../../api/client'
 import { createEnumFormatter } from '~/lib/formatting'
 import { ReactNode } from 'react'
 import { EnumOptionsFormatter, FieldLabelFormatter } from '~/lib/labels'
@@ -58,14 +58,15 @@ export const fieldLabels = {
 	},
 } satisfies {
 	[E in keyof ContemberClientEntities]?: {
-		[F in (keyof ContemberClientEntities[E]['columns']) | (keyof ContemberClientEntities[E]['hasOne']) | (keyof ContemberClientEntities[E]['hasMany'])]?: ReactNode
+		[
+			F in (keyof ContemberClientEntities[E]['columns']) | (keyof ContemberClientEntities[E]['hasOne']) | (keyof ContemberClientEntities[E]['hasMany'])
+		]?: ReactNode
 	}
 }
 
 export const fieldLabelFormatter: FieldLabelFormatter = (entityName, fieldName) => {
 	return (fieldLabels as any)[entityName]?.[fieldName] ?? fieldName
 }
-
 
 export const enumLabels = {
 	GridArticleState: {

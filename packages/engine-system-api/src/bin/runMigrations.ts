@@ -2,9 +2,7 @@ import { SystemMigrationsRunner } from '../migrations'
 import { DatabaseContextFactory, emptyVersionedSchema, SchemaProvider } from '../model'
 import { DatabaseMetadataResolver, emptyDatabaseMetadata } from '@contember/database'
 import { createLogger, PrettyPrintLoggerHandler } from '@contember/logger'
-
-
-(async () => {
+;(async () => {
 	const dbConfig = {
 		database: process.env.PGDATABASE as string,
 		host: process.env.PGHOST as string,
@@ -27,10 +25,8 @@ import { createLogger, PrettyPrintLoggerHandler } from '@contember/logger'
 			resolveMetadata: () => Promise.resolve(emptyDatabaseMetadata),
 		} as unknown as DatabaseMetadataResolver,
 	)
-	// eslint-disable-next-line no-console
 	await migrationsRunner.run(createLogger(new PrettyPrintLoggerHandler(process.stderr)))
 })().catch(e => {
-	// eslint-disable-next-line no-console
 	console.error(e)
 	process.exit(1)
 })

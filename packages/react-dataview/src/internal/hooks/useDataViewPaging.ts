@@ -13,9 +13,9 @@ type UseDataViewPagingArgs =
 	}
 	& DataViewPagingProps
 
-
-
-export const useDataViewPaging = ({ dataViewKey, initialItemsPerPage, pagingSettingsStorage, currentPageStateStorage, ...args }: UseDataViewPagingArgs): {
+export const useDataViewPaging = (
+	{ dataViewKey, initialItemsPerPage, pagingSettingsStorage, currentPageStateStorage, ...args }: UseDataViewPagingArgs,
+): {
 	state: DataViewPagingState
 	info: DataViewPagingInfo
 	methods: DataViewPagingMethods
@@ -32,10 +32,8 @@ export const useDataViewPaging = ({ dataViewKey, initialItemsPerPage, pagingSett
 		...getDataViewPagingSettingStorageArgs({
 			dataViewKey,
 			initialItemsPerPage,
-		},
-		),
+		}),
 	)
-
 
 	const pagingState = useMemo(() => {
 		return {
@@ -77,7 +75,6 @@ export const useDataViewPaging = ({ dataViewKey, initialItemsPerPage, pagingSett
 					})
 				},
 				goToPage: (page: number | 'first' | 'next' | 'previous' | 'last') => {
-
 					setCurrentPageState(val => {
 						const newPage = (() => {
 							const current = val.pageIndex

@@ -19,7 +19,6 @@ export type DataBindingProviderProps<StateProps> =
 	}
 	& DataBindingProviderStateComponent<StateProps>
 
-
 /**
  * The `DataBindingProvider` is a root component for all other data binding related components.
  *

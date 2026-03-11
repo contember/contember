@@ -1,5 +1,5 @@
 import { ProjectSchemaResolver } from '../type'
-import { MembershipValidationError, MembershipValidationErrorType, MembershipResolver } from '@contember/schema-utils'
+import { MembershipResolver, MembershipValidationError, MembershipValidationErrorType } from '@contember/schema-utils'
 import { Acl } from '@contember/schema'
 
 export class MembershipValidator {

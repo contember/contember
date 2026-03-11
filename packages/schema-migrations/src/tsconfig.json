@@ -2,8 +2,7 @@
 	"extends": "../tsconfig.settings.json",
 	"compilerOptions": {
 		"outDir": "../dist/types",
-		"esModuleInterop": true,
-		"downlevelIteration": true
+		"esModuleInterop": true
 	},
 	"references": [
 		{ "path": "../../database-migrations/src" },

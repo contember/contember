@@ -4,10 +4,7 @@ import { UpdateInputProcessor } from './UpdateInputProcessor'
 import { ImplementationException, UserError } from '../exception'
 import { MapperInput } from '../mapper'
 
-export class UpdateInputVisitor<Result> implements
-	Model.ColumnVisitor<Promise<Result[]>>,
-	Model.RelationByTypeVisitor<Promise<Result[]>> {
-
+export class UpdateInputVisitor<Result> implements Model.ColumnVisitor<Promise<Result[]>>, Model.RelationByTypeVisitor<Promise<Result[]>> {
 	constructor(
 		private readonly updateInputProcessor: UpdateInputProcessor<Result>,
 		private readonly schema: Model.Schema,
@@ -15,11 +12,13 @@ export class UpdateInputVisitor<Result> implements
 	) {}
 
 	public async visitColumn({ entity, column }: Model.ColumnContext): Promise<Result[]> {
-		return [await this.updateInputProcessor.column({
-			entity,
-			column,
-			input: this.data[column.name] as Input.ColumnValue,
-		})]
+		return [
+			await this.updateInputProcessor.column({
+				entity,
+				column,
+				input: this.data[column.name] as Input.ColumnValue,
+			}),
+		]
 	}
 
 	public visitManyHasManyInverse(context: Model.ManyHasManyInverseContext) {
@@ -74,7 +73,7 @@ export class UpdateInputVisitor<Result> implements
 		processor: UpdateInputProcessor.HasOneRelationInputProcessor<Context, Result>,
 		context: Context,
 		input: MapperInput.UpdateOneRelationInput | undefined,
-	): Promise< Result[]> {
+	): Promise<Result[]> {
 		if (input === undefined || input === null) {
 			return Promise.resolve([])
 		}

@@ -31,7 +31,7 @@ export interface DataViewLayoutProps {
  * ## Example
  * ```tsx
  * <DataViewLayout name={'grid'} label="Grid">
- *     //  Grid layout content here 
+ *     //  Grid layout content here
  * </DataViewLayout>
  * ```
  */

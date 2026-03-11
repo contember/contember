@@ -11,7 +11,6 @@ export type Dependency = {
 	name: string
 }
 
-
 export class PackageWorkspace {
 	constructor(
 		private readonly packageManager: PackageManager,
@@ -94,4 +93,3 @@ export class PackageWorkspace {
 		return updated
 	}
 }
-

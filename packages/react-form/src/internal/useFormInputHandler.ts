@@ -125,10 +125,10 @@ const toLocalDate = (date: Date) => {
 		return '0'.repeat(Math.max(0, length - str.length)) + str
 	}
 
-	return pad(date.getFullYear(), 4) +
-		'-' + pad(date.getMonth() + 1) +
-		'-' + pad(date.getDate()) +
-		'T' + pad(date.getHours()) +
-		':' + pad(date.getMinutes()) +
-		':' + pad(date.getSeconds())
+	return pad(date.getFullYear(), 4)
+		+ '-' + pad(date.getMonth() + 1)
+		+ '-' + pad(date.getDate())
+		+ 'T' + pad(date.getHours())
+		+ ':' + pad(date.getMinutes())
+		+ ':' + pad(date.getSeconds())
 }

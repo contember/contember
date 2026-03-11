@@ -25,4 +25,4 @@ namespace QueryBuilder {
 	}
 }
 
-export { type QueryBuilder }
+export type { QueryBuilder }

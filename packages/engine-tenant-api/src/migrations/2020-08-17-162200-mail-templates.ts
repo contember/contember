@@ -17,6 +17,6 @@ CREATE INDEX mail_template_project_index
 	ON mail_template(project_id);
 `
 
-export default async function (builder: MigrationBuilder) {
+export default async function(builder: MigrationBuilder) {
 	builder.sql(sql)
 }

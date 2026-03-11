@@ -1,8 +1,7 @@
 import { Command, CommandConfiguration, Input } from '@contember/cli-common'
 import { MigrationExecutionFacade } from '../../lib/migrations/MigrationExecutionFacade'
 
-type Args = {
-}
+type Args = {}
 
 type Options = {
 	until?: string

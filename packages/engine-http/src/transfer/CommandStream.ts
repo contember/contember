@@ -32,14 +32,11 @@ async function* readCommands(lines: AsyncIterable<string>) {
 	for await (let line of lines) {
 		try {
 			yield Command(JSON.parse(line))
-
 		} catch (e) {
 			if (e instanceof SyntaxError) {
 				throw new ImportError(`Line ${line} is not valid JSON`)
-
 			} else if (e instanceof Typesafe.ParseError) {
 				throw new ImportError(`Line ${line} is not valid command`)
-
 			} else {
 				throw e
 			}

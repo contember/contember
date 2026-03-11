@@ -8,7 +8,6 @@ import { useSetSessionToken } from '@contember/react-client'
 import { SignInMutationResult, useSignInMutation } from '../../hooks'
 import { useRedirectToBacklinkCallback } from '../../internal/hooks/useRedirectToBacklink'
 
-
 export type LoginFormValues = {
 	email: string
 	password: string
@@ -98,7 +97,6 @@ export const LoginForm = ({ children, expiration = DEFAULT_LOGIN_EXPIRATION, onS
 			{children}
 		</TenantForm>
 	)
-
 }
 const errorToField: Record<TenantApi.SignInErrorCode, keyof LoginFormValues | undefined> = {
 	'INVALID_PASSWORD': 'password',

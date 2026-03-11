@@ -7,13 +7,13 @@ export class Author {
 
 	emailValidated = d.boolColumn().notNull()
 
+	// dprint-ignore
 	@(v.when(v.rules.on('emailValidated', v.rules.equals(true))).assertPattern(/.+@.+/, 'E-mail is not valid'))
 	email = d.stringColumn().notNull()
 }
 
 const schema = createSchema({ Author })
 describe('Validation conditions', () => {
-
 	it('succeeds when rule condition is not true', async () => {
 		await testCreate({
 			schema,

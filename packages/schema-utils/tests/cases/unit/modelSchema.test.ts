@@ -1,4 +1,4 @@
-import { expect, describe, test } from 'bun:test'
+import { describe, expect, test } from 'bun:test'
 import { modelSchema } from '../../../src/type-schema'
 import { Model } from '@contember/schema'
 
@@ -17,9 +17,9 @@ describe('model schema', () => {
 
 	// Array of invalid PostgreSQL data type examples
 	const invalidDataTypes = [
-		'varchar(255',           // Missing closing parenthesis
-		'character(10))',        // Extra closing parenthesis
-		'numeric(,2)',           // Missing first parameter
+		'varchar(255', // Missing closing parenthesis
+		'character(10))', // Extra closing parenthesis
+		'numeric(,2)', // Missing first parameter
 		'geometry(Point,4326))', // Extra closing parenthesis
 		'VARCHAR(255) COLLATE "de_DE" (extra text)', // Extra text outside the valid pattern
 		'VARCHAR(255) COLLATE "de_DE', // Missing closing quote

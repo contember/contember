@@ -12,8 +12,6 @@ export class CommandBus<ConnectionType extends Connection.ConnectionLike = Conne
 	async transaction<T>(
 		transactionScope: (wrapper: CommandBus<Connection.TransactionLike>) => Promise<T> | T,
 	): Promise<T> {
-		return await this.client.transaction(client =>
-			transactionScope(new CommandBus<Connection.TransactionLike>(client, this.providers)),
-		)
+		return await this.client.transaction(client => transactionScope(new CommandBus<Connection.TransactionLike>(client, this.providers)))
 	}
 }

@@ -62,5 +62,3 @@ export const baseEditorPlugins = {
 	strikeThrough: withStrikeThrough(),
 	underline: withUnderline(),
 } satisfies Record<string, EditorPlugin>
-
-

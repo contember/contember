@@ -2,7 +2,6 @@ import { ActionsDefinition as actions, createSchema, SchemaDefinition as def } f
 import { test } from 'bun:test'
 import { createTester, gql } from '../../src/tester'
 namespace ActionsModel {
-
 	@actions.watch({
 		name: 'article_watch',
 		watch: `
@@ -16,7 +15,6 @@ namespace ActionsModel {
 	export class Article {
 		title = def.stringColumn().unique()
 	}
-
 }
 
 test('triggers: root watch', async () => {
@@ -39,16 +37,19 @@ test('triggers: root watch', async () => {
             }
         }
 	`)
-	await tester(gql`
+	await tester(
+		gql`
 	query {
 		eventsToProcess {
 			payload
 		}
 	}
 	
-	`, {
-		path: '/actions/' + tester.projectSlug,
-	})
+	`,
+		{
+			path: '/actions/' + tester.projectSlug,
+		},
+	)
 		.expect(200)
 		.expect({
 			data: {
@@ -84,12 +85,9 @@ test('triggers: root watch', async () => {
 				}],
 			},
 		})
-
 })
 
-
 test('triggers: root watch - noop', async () => {
-
 	const schema = createSchema(ActionsModel)
 	const tester = await createTester(schema)
 
@@ -109,16 +107,19 @@ test('triggers: root watch - noop', async () => {
             }
         }
 	`)
-	await tester(gql`
+	await tester(
+		gql`
         query {
             eventsToProcess {
                 payload
             }
         }
 
-	`, {
-		path: '/actions/' + tester.projectSlug,
-	})
+	`,
+		{
+			path: '/actions/' + tester.projectSlug,
+		},
+	)
 		.expect(200)
 		.expect({
 			data: {
@@ -139,9 +140,7 @@ test('triggers: root watch - noop', async () => {
 				}],
 			},
 		})
-
 })
-
 
 test('triggers: root delete', async () => {
 	const schema = createSchema(ActionsModel)
@@ -164,17 +163,19 @@ test('triggers: root delete', async () => {
         }
 	`)
 
-
-	await tester(gql`
+	await tester(
+		gql`
         query {
             eventsToProcess {
                 payload
             }
         }
 
-	`, {
-		path: '/actions/' + tester.projectSlug,
-	})
+	`,
+		{
+			path: '/actions/' + tester.projectSlug,
+		},
+	)
 		.expect(200)
 		.expect({
 			data: {
@@ -192,8 +193,7 @@ test('triggers: root delete', async () => {
 						operation: 'watch',
 						selection: { id: articleId, title: 'Hello world' },
 					},
-				},
-				{
+				}, {
 					payload: {
 						id: articleId,
 						entity: 'Article',
@@ -210,4 +210,3 @@ test('triggers: root delete', async () => {
 			},
 		})
 })
-

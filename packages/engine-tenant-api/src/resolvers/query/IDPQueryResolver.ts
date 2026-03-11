@@ -4,7 +4,6 @@ import { TenantResolverContext } from '../TenantResolverContext'
 import { IDPManager } from '../../model/service/idp/IDPManager'
 
 export class IDPQueryResolver implements QueryResolvers {
-
 	constructor(
 		private readonly idpManager: IDPManager,
 	) {

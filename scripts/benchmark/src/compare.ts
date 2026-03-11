@@ -1,6 +1,5 @@
 import { access, readdir, readFile } from 'node:fs/promises'
 import * as path from 'node:path'
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore-line
 import autocannonCompare from 'autocannon-compare'
 
@@ -12,7 +11,6 @@ const exists = async (path: string) => {
 		return false
 	}
 }
-
 ;(async () => {
 	const [{}, {}, aName, bName] = process.argv
 	const resultsPath = path.join(__dirname, '/../../results/')

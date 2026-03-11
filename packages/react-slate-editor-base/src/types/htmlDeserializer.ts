@@ -19,7 +19,7 @@ export interface HtmlDeserializerPlugin {
 			element: HTMLElement
 			next: HtmlDeserializerNextCallback
 			cumulativeTextAttrs: HtmlDeserializerTextAttrs
-		}
+		},
 	) => SlateElement[] | SlateElement | null
 	processInlinePaste?: (
 		args: {
@@ -27,7 +27,7 @@ export interface HtmlDeserializerPlugin {
 			element: HTMLElement
 			next: HtmlDeserializerNextCallback
 			cumulativeTextAttrs: HtmlDeserializerTextAttrs
-		}
+		},
 	) => Descendant[] | Descendant | null
 	processAttributesPaste?: (args: {
 		deserializer: HtmlDeserializer

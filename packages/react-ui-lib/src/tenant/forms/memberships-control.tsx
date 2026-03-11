@@ -31,22 +31,34 @@ export const MembershipsControl = ({ setMemberships, memberships, roles }: Membe
 
 	return (
 		<div className="flex flex-col gap-4">
-			{remainingRoles.length ? <div>
-				<DropdownMenu>
-					<DropdownMenuTrigger asChild>
-						<Button variant="outline" className="flex gap-2"><PlusIcon className="w-4 h-4"/>{dict.tenant.invite.addRole}</Button>
-					</DropdownMenuTrigger>
-					<DropdownMenuContent>
-						{remainingRoles.map(role => <DropdownMenuItem
-							key={role}
-							onClick={() => setMemberships([...memberships, {
-								role: role,
-								variables: [],
-							}])}
-						>{roles?.[role].label}</DropdownMenuItem>)}
-					</DropdownMenuContent>
-				</DropdownMenu>
-			</div> : null}
+			{remainingRoles.length
+				? (
+					<div>
+						<DropdownMenu>
+							<DropdownMenuTrigger asChild>
+								<Button variant="outline" className="flex gap-2">
+									<PlusIcon className="w-4 h-4" />
+									{dict.tenant.invite.addRole}
+								</Button>
+							</DropdownMenuTrigger>
+							<DropdownMenuContent>
+								{remainingRoles.map(role => (
+									<DropdownMenuItem
+										key={role}
+										onClick={() =>
+											setMemberships([...memberships, {
+												role: role,
+												variables: [],
+											}])}
+									>
+										{roles?.[role].label}
+									</DropdownMenuItem>
+								))}
+							</DropdownMenuContent>
+						</DropdownMenu>
+					</div>
+				)
+				: null}
 			{memberships.map(membership => {
 				const role = roles?.[membership.role]
 				return (
@@ -58,7 +70,7 @@ export const MembershipsControl = ({ setMemberships, memberships, roles }: Membe
 								variant="ghost"
 								type="button"
 							>
-								<XIcon className="w-4 h-4"/>
+								<XIcon className="w-4 h-4" />
 							</Button>
 						</div>
 						<div>
@@ -80,8 +92,8 @@ export const MembershipsControl = ({ setMemberships, memberships, roles }: Membe
 																...it.variables.filter(it => it.name !== variableName),
 																{ name: variableName, values: newValues },
 															],
-														}),
-													)
+														}
+													))
 												}}
 											/>
 										</div>

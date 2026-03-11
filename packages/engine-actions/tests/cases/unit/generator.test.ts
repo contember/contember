@@ -3,7 +3,6 @@ import { SchemaDefinition as def } from '@contember/schema-definition'
 import { Actions, Model } from '@contember/schema'
 import { expect, test } from 'bun:test'
 
-
 const assert = {
 	equal: (a: any, b: any) => expect(a).toEqual(b),
 	deepStrictEqual: (a: any, b: any) => expect(a).toStrictEqual(b),
@@ -34,21 +33,24 @@ test('first level many-has-many owning', () => {
 	const node = [['topics', {}, ['name']]] as const
 	const trigger = createTrigger(node)
 	const listeners = createEmptyListeners([], trigger)
-	listeners.junctionListeners.set('Author', new Map([
-		['topics', [
-			{
-				type: 'junction',
-				path: [],
-				rootEntity: schema.entities.Author,
-				context: {
-					type: 'owning',
-					entity: schema.entities.Author,
-					relation: schema.entities.Author.fields.topics as Model.ManyHasManyOwningRelation,
+	listeners.junctionListeners.set(
+		'Author',
+		new Map([
+			['topics', [
+				{
+					type: 'junction',
+					path: [],
+					rootEntity: schema.entities.Author,
+					context: {
+						type: 'owning',
+						entity: schema.entities.Author,
+						relation: schema.entities.Author.fields.topics as Model.ManyHasManyOwningRelation,
+					},
+					trigger,
 				},
-				trigger,
-			},
-		]],
-	]))
+			]],
+		]),
+	)
 
 	listeners.indirectListeners.set('AuthorTopic', [{
 		type: 'indirect',
@@ -59,31 +61,32 @@ test('first level many-has-many owning', () => {
 		path: ['topics'],
 	}])
 
-
 	assert.deepStrictEqual(testBuilder(node), listeners)
 })
 
 test('first level many-has-many inverse', () => {
-
 	const node = [['followers', {}, ['name']]] as const
 	const trigger = createTrigger(node)
 
 	const listeners = createEmptyListeners([], trigger)
-	listeners.junctionListeners.set('User', new Map([
-		['following', [
-			{
-				type: 'junction',
-				path: [],
-				rootEntity: schema.entities.Author,
-				context: {
-					type: 'inverse',
-					entity: schema.entities.Author,
-					relation: schema.entities.Author.fields.followers as Model.ManyHasManyInverseRelation,
+	listeners.junctionListeners.set(
+		'User',
+		new Map([
+			['following', [
+				{
+					type: 'junction',
+					path: [],
+					rootEntity: schema.entities.Author,
+					context: {
+						type: 'inverse',
+						entity: schema.entities.Author,
+						relation: schema.entities.Author.fields.followers as Model.ManyHasManyInverseRelation,
+					},
+					trigger,
 				},
-				trigger,
-			},
-		]],
-	]))
+			]],
+		]),
+	)
 	listeners.indirectListeners.set('User', [{
 		type: 'indirect',
 		rootEntity: schema.entities.Author,
@@ -94,7 +97,6 @@ test('first level many-has-many inverse', () => {
 	}])
 	assert.deepStrictEqual(testBuilder(node), listeners)
 })
-
 
 test('first level one-has-one owning', () => {
 	const node = [['avatar', {}, ['url']]] as const
@@ -160,9 +162,7 @@ test('first level one-has-many', () => {
 	assert.deepStrictEqual(testBuilder(node), listeners)
 })
 
-
 test('second level one-has-one owning', () => {
-
 	const node = [['articles', {}, [['image', {}, ['url']]]]] as const
 
 	const trigger = createTrigger(node)
@@ -188,7 +188,6 @@ test('second level one-has-one owning', () => {
 	assert.deepStrictEqual(testBuilder(node), listeners)
 })
 
-
 test('second level one-has-one inverse', () => {
 	const node = [['articles', {}, [['settings', {}, ['visible']]]]] as const
 
@@ -212,10 +211,8 @@ test('second level one-has-one inverse', () => {
 		path: ['articles'],
 	}])
 
-
 	assert.deepStrictEqual(testBuilder(node), listeners)
 })
-
 
 test('second level one-has-many', () => {
 	const node = [['articles', {}, [['comments', {}, ['content']]]]] as const
@@ -244,9 +241,7 @@ test('second level one-has-many', () => {
 	assert.deepStrictEqual(testBuilder(node), listeners)
 })
 
-
 test('third level many-has-one', () => {
-
 	const node = [['articles', {}, [['comments', {}, [['author', {}, ['name']]]]]]] as const
 	const trigger = createTrigger(node)
 
@@ -281,10 +276,7 @@ test('third level many-has-one', () => {
 	assert.deepStrictEqual(testBuilder(node), listeners)
 })
 
-
 test('second level many-has-one', () => {
-
-
 	const node = [['articles', {}, [['category', {}, ['name']]]]] as const
 	const trigger = createTrigger(node)
 	const listeners = createEmptyListeners([], trigger)
@@ -309,27 +301,28 @@ test('second level many-has-one', () => {
 	assert.deepStrictEqual(testBuilder(node), listeners)
 })
 
-
 test('second level many-has-many owning', () => {
-
 	const node = [['articles', {}, [['tags', {}, ['name']]]]] as const
 	const trigger = createTrigger(node)
 	const listeners = createEmptyListeners([], trigger)
-	listeners.junctionListeners.set('Article', new Map([
-		['tags', [
-			{
-				type: 'junction',
-				path: ['articles'],
-				rootEntity: schema.entities.Author,
-				context: {
-					entity: schema.entities.Article,
-					relation: schema.entities.Article.fields.tags as Model.ManyHasManyOwningRelation,
-					type: 'owning',
+	listeners.junctionListeners.set(
+		'Article',
+		new Map([
+			['tags', [
+				{
+					type: 'junction',
+					path: ['articles'],
+					rootEntity: schema.entities.Author,
+					context: {
+						entity: schema.entities.Article,
+						relation: schema.entities.Article.fields.tags as Model.ManyHasManyOwningRelation,
+						type: 'owning',
+					},
+					trigger,
 				},
-				trigger,
-			},
-		]],
-	]))
+			]],
+		]),
+	)
 
 	listeners.indirectListeners.set('Tag', [{
 		type: 'indirect',
@@ -339,7 +332,6 @@ test('second level many-has-many owning', () => {
 		relations: new Set(),
 		path: ['articles', 'tags'],
 	}])
-
 
 	listeners.indirectListeners.set('Article', [{
 		type: 'indirect',
@@ -354,25 +346,27 @@ test('second level many-has-many owning', () => {
 })
 
 test('second level many-has-many inverse', () => {
-
 	const node = [['articles', {}, [['likedBy', {}, ['name']]]]] as const
 	const trigger = createTrigger(node)
 	const listeners = createEmptyListeners([], trigger)
-	listeners.junctionListeners.set('User', new Map([
-		['likes', [
-			{
-				type: 'junction',
-				path: ['articles'],
-				rootEntity: schema.entities.Author,
-				context: {
-					type: 'inverse',
-					entity: schema.entities.Article,
-					relation: schema.entities.Article.fields.likedBy as Model.ManyHasManyInverseRelation,
+	listeners.junctionListeners.set(
+		'User',
+		new Map([
+			['likes', [
+				{
+					type: 'junction',
+					path: ['articles'],
+					rootEntity: schema.entities.Author,
+					context: {
+						type: 'inverse',
+						entity: schema.entities.Article,
+						relation: schema.entities.Article.fields.likedBy as Model.ManyHasManyInverseRelation,
+					},
+					trigger,
 				},
-				trigger,
-			},
-		]],
-	]))
+			]],
+		]),
+	)
 
 	listeners.indirectListeners.set('User', [{
 		type: 'indirect',
@@ -382,7 +376,6 @@ test('second level many-has-many inverse', () => {
 		relations: new Set(),
 		path: ['articles', 'likedBy'],
 	}])
-
 
 	listeners.indirectListeners.set('Article', [{
 		type: 'indirect',
@@ -395,7 +388,6 @@ test('second level many-has-many inverse', () => {
 
 	assert.deepStrictEqual(testBuilder(node), listeners)
 })
-
 
 test('all above', () => {
 	const node = [
@@ -413,70 +405,78 @@ test('all above', () => {
 			['category', {}, ['name']],
 			['tags', {}, ['name']],
 			['likedBy', {}, ['name']],
-
 		]],
 	] as const
 	const trigger = createTrigger(node)
 	const listeners = createEmptyListeners(['name', 'avatar', 'supervisor'], trigger)
-	listeners.junctionListeners.set('Author', new Map([
-		['topics', [
-			{
-				type: 'junction',
-				path: [],
-				rootEntity: schema.entities.Author,
-				context: {
-					type: 'owning',
-					entity: schema.entities.Author,
-					relation: schema.entities.Author.fields.topics as Model.ManyHasManyOwningRelation,
+	listeners.junctionListeners.set(
+		'Author',
+		new Map([
+			['topics', [
+				{
+					type: 'junction',
+					path: [],
+					rootEntity: schema.entities.Author,
+					context: {
+						type: 'owning',
+						entity: schema.entities.Author,
+						relation: schema.entities.Author.fields.topics as Model.ManyHasManyOwningRelation,
+					},
+					trigger,
 				},
-				trigger,
-			},
-		]],
-	]))
-	listeners.junctionListeners.set('User', new Map([
-		['following', [
-			{
-				type: 'junction',
-				path: [],
-				rootEntity: schema.entities.Author,
-				context: {
-					type: 'inverse',
-					entity: schema.entities.Author,
-					relation: schema.entities.Author.fields.followers as Model.ManyHasManyInverseRelation,
+			]],
+		]),
+	)
+	listeners.junctionListeners.set(
+		'User',
+		new Map([
+			['following', [
+				{
+					type: 'junction',
+					path: [],
+					rootEntity: schema.entities.Author,
+					context: {
+						type: 'inverse',
+						entity: schema.entities.Author,
+						relation: schema.entities.Author.fields.followers as Model.ManyHasManyInverseRelation,
+					},
+					trigger,
 				},
-				trigger,
-			},
-		]],
-		['likes', [
-			{
-				type: 'junction',
-				path: ['articles'],
-				rootEntity: schema.entities.Author,
-				context: {
-					type: 'inverse',
-					entity: schema.entities.Article,
-					relation: schema.entities.Article.fields.likedBy as Model.ManyHasManyInverseRelation,
+			]],
+			['likes', [
+				{
+					type: 'junction',
+					path: ['articles'],
+					rootEntity: schema.entities.Author,
+					context: {
+						type: 'inverse',
+						entity: schema.entities.Article,
+						relation: schema.entities.Article.fields.likedBy as Model.ManyHasManyInverseRelation,
+					},
+					trigger,
 				},
-				trigger,
-			},
-		]],
-	]))
+			]],
+		]),
+	)
 
-	listeners.junctionListeners.set('Article', new Map([
-		['tags', [
-			{
-				type: 'junction',
-				path: ['articles'],
-				rootEntity: schema.entities.Author,
-				context: {
-					type: 'owning',
-					entity: schema.entities.Article,
-					relation: schema.entities.Article.fields.tags as Model.ManyHasManyOwningRelation,
+	listeners.junctionListeners.set(
+		'Article',
+		new Map([
+			['tags', [
+				{
+					type: 'junction',
+					path: ['articles'],
+					rootEntity: schema.entities.Author,
+					context: {
+						type: 'owning',
+						entity: schema.entities.Article,
+						relation: schema.entities.Article.fields.tags as Model.ManyHasManyOwningRelation,
+					},
+					trigger,
 				},
-				trigger,
-			},
-		]],
-	]))
+			]],
+		]),
+	)
 
 	listeners.indirectListeners.set('AuthorTopic', [{
 		type: 'indirect',
@@ -569,7 +569,6 @@ test('all above', () => {
 		path: ['articles', 'comments'],
 	}])
 
-
 	listeners.indirectListeners.set('Category', [{
 		type: 'indirect',
 		rootEntity: schema.entities.Author,
@@ -596,7 +595,6 @@ test('all above', () => {
 		path: ['articles'],
 	}])
 
-
 	listeners.indirectListeners.set('AuthorTopic', [{
 		type: 'indirect',
 		rootEntity: schema.entities.Author,
@@ -608,7 +606,6 @@ test('all above', () => {
 
 	assert.deepStrictEqual(testBuilder(node), listeners)
 })
-
 
 namespace WatchModel {
 	export class Author {

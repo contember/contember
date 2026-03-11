@@ -7,9 +7,7 @@ import { testUuid } from '../../../../../src/testUuid'
 test('Categories with children filtered by back-referenced parent', async () => {
 	await execute({
 		schema: new SchemaBuilder()
-			.entity('Category', entity =>
-				entity.manyHasOne('parent', r => r.inversedBy('children').target('Category')).column('name'),
-			)
+			.entity('Category', entity => entity.manyHasOne('parent', r => r.inversedBy('children').target('Category')).column('name'))
 			.buildSchema(),
 		query: GQL`
         query {
@@ -79,4 +77,3 @@ test('Categories with children filtered by back-referenced parent', async () => 
 		},
 	})
 })
-

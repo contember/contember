@@ -34,7 +34,6 @@ export interface DataViewTextFilterResetTriggerProps {
  */
 export const DataViewTextFilterResetTrigger = forwardRef<HTMLButtonElement, DataViewTextFilterResetTriggerProps>(
 	({ name, ...props }: DataViewTextFilterResetTriggerProps, ref) => {
-		// eslint-disable-next-line react-hooks/rules-of-hooks
 		name ??= useDataViewFilterName()
 		const [state, setFilter] = useDataViewFilter<TextFilterArtifacts>(name)
 		const resetFilter = useCallback(() => {

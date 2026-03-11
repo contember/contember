@@ -11,8 +11,7 @@ test('insert site with empty settings', async () => {
 			.entity('Site', entity =>
 				entity
 					.column('name', c => c.type(Model.ColumnType.String))
-					.oneHasOne('setting', r => r.target('SiteSetting').inversedBy('site')),
-			)
+					.oneHasOne('setting', r => r.target('SiteSetting').inversedBy('site')))
 			.entity('SiteSetting', e => e.column('url', c => c.type(Model.ColumnType.String)))
 			.buildSchema(),
 		query: GQL`
@@ -57,4 +56,3 @@ test('insert site with empty settings', async () => {
 		},
 	})
 })
-

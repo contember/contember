@@ -20,7 +20,6 @@ export class UpdateValidationSchemaModificationHandler implements ModificationHa
 	describe() {
 		return { message: 'Update validation schema' }
 	}
-
 }
 
 export interface UpdateValidationSchemaModificationData {

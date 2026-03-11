@@ -17,7 +17,7 @@ export type EditorTemplate =
 	}
 
 export const getEditorTemplate = (blockContents: ReactNode, env: Environment): EditorTemplate => {
-	let contentOutlet: ContentOutletProps | undefined = undefined
+	let contentOutlet: ContentOutletProps | undefined
 	const processed = editorTemplateAnalyzer.processChildren(blockContents, env)
 
 	const nodesBefore: ReactNode[] = []

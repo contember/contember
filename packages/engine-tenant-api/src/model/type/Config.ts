@@ -21,9 +21,11 @@ export type ConfigRow = {
 	login_max_token_expiration: IPostgresInterval | null
 }
 
-
-export type Config = Omit<{
-	[K in keyof ConfigSchema]: {
-		[K2 in keyof ConfigSchema[K]]: Exclude<ConfigSchema[K][K2], Interval>
-	}
-}, '__typename'>
+export type Config = Omit<
+	{
+		[K in keyof ConfigSchema]: {
+			[K2 in keyof ConfigSchema[K]]: Exclude<ConfigSchema[K][K2], Interval>
+		}
+	},
+	'__typename'
+>

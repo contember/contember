@@ -1,4 +1,4 @@
-import { Editor as SlateEditor, Editor, Element as SlateElement, Node as SlateNode, Range as SlateRange, Transforms } from 'slate'
+import { Editor, Editor as SlateEditor, Element as SlateElement, Node as SlateNode, Range as SlateRange, Transforms } from 'slate'
 import { EditorElementPlugin, ElementRenderer } from '../../../types'
 
 export const horizontalRuleElementType = 'horizontalRule' as const
@@ -16,7 +16,9 @@ export const isHorizontalRuleElementActive = (editor: Editor) => {
 	return !!hr
 }
 
-export const horizontalRuleElementPlugin = ({ render }: { render: ElementRenderer<HorizontalRuleElement> }): EditorElementPlugin<HorizontalRuleElement> => ({
+export const horizontalRuleElementPlugin = (
+	{ render }: { render: ElementRenderer<HorizontalRuleElement> },
+): EditorElementPlugin<HorizontalRuleElement> => ({
 	type: horizontalRuleElementType,
 	render,
 	isVoid: true,

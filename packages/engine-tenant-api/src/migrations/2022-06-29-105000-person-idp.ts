@@ -17,6 +17,6 @@ CREATE UNIQUE INDEX person_identity_provider_identifier
 	ON person_identity_provider (identity_provider_id, external_identifier);
 `
 
-export default async function (builder: MigrationBuilder) {
+export default async function(builder: MigrationBuilder) {
 	builder.sql(sql)
 }

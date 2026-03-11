@@ -27,33 +27,36 @@ export interface DefaultSelectDataViewProps {
 	children: ReactNode
 }
 
-export const DefaultSelectDataView = Component< DefaultSelectDataViewProps>(({ children, initialSorting, queryField }) => {
-	return <>
-		<SelectDataView initialSorting={initialSorting} queryField={queryField}>
-			<DefaultSelectDataViewRenderer>
-				{children}
-			</DefaultSelectDataViewRenderer>
-		</SelectDataView>
-	</>
+export const DefaultSelectDataView = Component<DefaultSelectDataViewProps>(({ children, initialSorting, queryField }) => {
+	return (
+		<>
+			<SelectDataView initialSorting={initialSorting} queryField={queryField}>
+				<DefaultSelectDataViewRenderer>
+					{children}
+				</DefaultSelectDataViewRenderer>
+			</SelectDataView>
+		</>
+	)
 })
 
-const DefaultSelectDataViewRenderer = Component<{children: ReactNode}>(({ children }) => <>
-	<SelectListInner filterToolbar={<SelectDefaultFilter />}>
-		<SelectOption>
-			<SelectItemTrigger>
-				<SelectListItemUI>
-					{children}
-				</SelectListItemUI>
-			</SelectItemTrigger>
-		</SelectOption>
-	</SelectListInner>
-</>)
+const DefaultSelectDataViewRenderer = Component<{ children: ReactNode }>(({ children }) => (
+	<>
+		<SelectListInner filterToolbar={<SelectDefaultFilter />}>
+			<SelectOption>
+				<SelectItemTrigger>
+					<SelectListItemUI>
+						{children}
+					</SelectListItemUI>
+				</SelectItemTrigger>
+			</SelectOption>
+		</SelectListInner>
+	</>
+))
 
-export type SelectListProps =
-	& {
-		children: ReactNode
-		filterToolbar?: ReactNode
-	}
+export type SelectListProps = {
+	children: ReactNode
+	filterToolbar?: ReactNode
+}
 
 export const SelectListInner = Component(({ children, filterToolbar }: SelectListProps) => {
 	return (
@@ -94,8 +97,10 @@ export const SelectListInner = Component(({ children, filterToolbar }: SelectLis
 		</DataViewInfiniteLoadProvider>
 	)
 }, ({ children, filterToolbar }) => {
-	return <>
-		{filterToolbar}
-		{children}
-	</>
+	return (
+		<>
+			{filterToolbar}
+			{children}
+		</>
+	)
 })

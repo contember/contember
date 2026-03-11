@@ -5,9 +5,9 @@ import { wrapIdentifier } from '@contember/database'
 import { Model } from '@contember/schema'
 import { acceptFieldVisitor } from '@contember/schema-utils'
 
-export default async function (builder: MigrationBuilder, args: MigrationArgs<SystemMigrationArgs>) {
+export default async function(builder: MigrationBuilder, args: MigrationArgs<SystemMigrationArgs>) {
 	const schema = (await args.schemaResolver(args.connection)).schema
-	const stages = (await args.connection.query<{schema: string}>('SELECT schema FROM stage')).rows
+	const stages = (await args.connection.query<{ schema: string }>('SELECT schema FROM stage')).rows
 	const metadataByStage: Record<string, DatabaseMetadata> = {}
 
 	for (const entity of Object.values(schema.model.entities)) {
@@ -36,7 +36,6 @@ export default async function (builder: MigrationBuilder, args: MigrationArgs<Sy
 				const columnNameIds = columns.map(wrapIdentifier)
 
 				builder.sql(`CREATE INDEX ON ${wrapIdentifier(stage.schema)}.${tableNameId} (${columnNameIds.join(', ')})`)
-
 			}
 		}
 	}

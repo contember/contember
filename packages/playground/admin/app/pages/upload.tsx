@@ -5,7 +5,16 @@ import { Slots } from '~/lib/layout'
 import { AudioField, FileField, ImageField, ImageRepeaterField, VideoField } from '~/lib/form'
 import { Dialog, DialogContent, DialogTrigger } from '~/lib/ui/dialog'
 import { Button } from '~/lib/ui/button'
-import { DataGrid, DataGridColumn, DataGridLoader, DataGridPagination, DataGridTable, DataGridTextColumn, DataGridTiles, DataGridToolbar } from '~/lib/datagrid'
+import {
+	DataGrid,
+	DataGridColumn,
+	DataGridLoader,
+	DataGridPagination,
+	DataGridTable,
+	DataGridTextColumn,
+	DataGridTiles,
+	DataGridToolbar,
+} from '~/lib/datagrid'
 import { UploadedImageView, UploaderDropzoneAreaUI } from '~/lib/upload'
 import { UseEntity } from '~/app/components/UseEntity'
 import { EntityAccessor, Field } from '@contember/interface'
@@ -27,19 +36,28 @@ const imageFields: FileUrlDataExtractorProps & GenericFileMetadataExtractorProps
 const SelectImage = () => {
 	const entity = useEntity()
 
-	return <SelectImageInner connect={it => {
-		entity.connectEntityAtField('image', it)
-	}} closeOnSelect />
+	return (
+		<SelectImageInner
+			connect={it => {
+				entity.connectEntityAtField('image', it)
+			}}
+			closeOnSelect
+		/>
+	)
 }
 
 const SelectImageRepeater = () => {
 	const entity = useEntity()
 
-	return <SelectImageInner connect={it => {
-		entity.getEntityList('imageList.items').createNewEntity(entity => {
-			entity().connectEntityAtField('image', it)
-		})
-	}} />
+	return (
+		<SelectImageInner
+			connect={it => {
+				entity.getEntityList('imageList.items').createNewEntity(entity => {
+					entity().connectEntityAtField('image', it)
+				})
+			}}
+		/>
+	)
 }
 
 const SelectImageInner = ({ connect, closeOnSelect }: { connect: (entity: EntityAccessor) => void; closeOnSelect?: boolean }) => {
@@ -54,21 +72,34 @@ const SelectImageInner = ({ connect, closeOnSelect }: { connect: (entity: Entity
 					<DataGridToolbar></DataGridToolbar>
 					<DataGridLoader>
 						<DataGridTiles className="md:grid-cols-[repeat(auto-fill,minmax(10rem,1fr))]">
-							<UseEntity render={it => (
-								<div className="relative border rounded border-gray-200 shadow hover:shadow-md hover:border-yellow-500" onClick={() => {
-									it && connect(it)
-									closeOnSelect && setOpen(false)
-								}}>
-									<UploadedImageView {...imageFields} />
-								</div>
-							)} />
+							<UseEntity
+								render={it => (
+									<div
+										className="relative border rounded border-gray-200 shadow hover:shadow-md hover:border-yellow-500"
+										onClick={() => {
+											it && connect(it)
+											closeOnSelect && setOpen(false)
+										}}
+									>
+										<UploadedImageView {...imageFields} />
+									</div>
+								)}
+							/>
 						</DataGridTiles>
 						<DataGridTable>
 							<DataGridColumn headerClassName="w-0">
-								<UseEntity render={it => (<Button onClick={() => {
-									it && connect(it)
-									closeOnSelect && setOpen(false)
-								}}>Select</Button>)} />
+								<UseEntity
+									render={it => (
+										<Button
+											onClick={() => {
+												it && connect(it)
+												closeOnSelect && setOpen(false)
+											}}
+										>
+											Select
+										</Button>
+									)}
+								/>
 							</DataGridColumn>
 							<DataGridTextColumn field="url" header="URL">
 								<Field field="url" />
@@ -101,7 +132,7 @@ export const Image = () => (
 				{...imageFields}
 				label="Image file"
 				description="Some description of the image file."
-				dropzonePlaceholder={(
+				dropzonePlaceholder={
 					<UploaderDropzoneAreaUI className="w-60">
 						<UploadIcon className="w-12 h-12 text-gray-400" />
 						<div className="font-semibold text-sm">{dict.uploader.dropFiles}</div>
@@ -113,12 +144,11 @@ export const Image = () => (
 							</div>
 						</div>
 					</UploaderDropzoneAreaUI>
-				)}
+				}
 			/>
 		</EntitySubTree>
 	</Binding>
 )
-
 
 export const ImageTrivial = () => (
 	<Binding>
@@ -238,7 +268,7 @@ export const ImageList = () => (
 				{...imageFields}
 				label="Image file"
 				description="Some description of the image file."
-				dropzonePlaceholder={(
+				dropzonePlaceholder={
 					<UploaderDropzoneAreaUI className="w-60">
 						<UploadIcon className="w-12 h-12 text-gray-400" />
 						<div className="font-semibold text-sm">{dict.uploader.dropFiles}</div>
@@ -250,7 +280,7 @@ export const ImageList = () => (
 							</div>
 						</div>
 					</UploaderDropzoneAreaUI>
-				)}
+				}
 			/>
 		</EntitySubTree>
 	</Binding>

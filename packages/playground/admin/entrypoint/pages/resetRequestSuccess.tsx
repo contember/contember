@@ -19,7 +19,9 @@ export default () => (
 					An email with password reset instructions has been sent to your email address.
 				</div>
 				<div className="text-center text-gray-500">
-					<Link to="passwordReset"><a className="underline">{dict.tenant.passwordResetRequest.entryCode}</a></Link>
+					<Link to="passwordReset">
+						<a className="underline">{dict.tenant.passwordResetRequest.entryCode}</a>
+					</Link>
 				</div>
 			</div>
 		</CardContent>

@@ -3,10 +3,11 @@ import { ResponseError } from '../model/utils/Response'
 type Error<T> = { code: T; developerMessage: string }
 type ErrorResponse<T, Meta = {}> = { ok: false; error: Error<T> & Meta; errors: [Error<T> & Meta] }
 
-
-export function createErrorResponse <const T extends string, Meta extends {} | undefined>(responseError: ResponseError<T, Meta>): ErrorResponse<T, Meta>
-export function createErrorResponse <const T extends string>(code: T, developerMessage: string): ErrorResponse<T>
-export function createErrorResponse (codeOrErrorResponse: string | ResponseError<any>, developerMessage?: string): ErrorResponse<any> {
+export function createErrorResponse<const T extends string, Meta extends {} | undefined>(
+	responseError: ResponseError<T, Meta>,
+): ErrorResponse<T, Meta>
+export function createErrorResponse<const T extends string>(code: T, developerMessage: string): ErrorResponse<T>
+export function createErrorResponse(codeOrErrorResponse: string | ResponseError<any>, developerMessage?: string): ErrorResponse<any> {
 	if (typeof codeOrErrorResponse === 'string') {
 		if (!developerMessage) {
 			throw new Error('Developer message is required when passing a string as code.')

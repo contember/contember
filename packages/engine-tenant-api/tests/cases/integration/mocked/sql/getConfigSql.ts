@@ -1,4 +1,4 @@
-import { ExpectedQuery } from '@contember/database-tester/src'
+import { ExpectedQuery } from '@contember/database-tester'
 import PostgresInterval from 'postgres-interval'
 export const getConfigSql = (): ExpectedQuery => ({
 	sql: `select *  from "tenant"."config"`,

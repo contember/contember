@@ -21,7 +21,7 @@ export const LoaderIcon = uic(Loader2Icon, {
 	},
 })
 
-export const Loader = ({  size, ...props }: LoaderProps) => {
+export const Loader = ({ size, ...props }: LoaderProps) => {
 	return (
 		<Overlay {...props}>
 			<LoaderIcon size={size} />

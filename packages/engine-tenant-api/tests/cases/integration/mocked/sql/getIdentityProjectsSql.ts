@@ -1,6 +1,6 @@
 import { SQL } from '../../../../src/tags'
 
-export const getIdentityProjectsSql = function ({ identityId, projectId }: { identityId: string; projectId: string }) {
+export const getIdentityProjectsSql = function({ identityId, projectId }: { identityId: string; projectId: string }) {
 	return {
 		sql: SQL`SELECT "project"."id", "project"."name", "project"."slug", "project"."config"
 				 FROM "tenant"."project"

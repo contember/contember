@@ -22,7 +22,6 @@ test('event manager: connection and client', async () => {
 	end()
 })
 
-
 test('event manager: connection and client with transaction', async () => {
 	const [connection, end] = createConnectionMockAlt([
 		{ sql: 'BEGIN' },
@@ -39,7 +38,6 @@ test('event manager: connection and client with transaction', async () => {
 	await client.transaction(async trx => {
 		trx.eventManager.on(EventManager.Event.queryStart, ({ sql }) => events.push({ sql, source: 'transaction' }))
 		await trx.query('SELECT 1')
-
 	})
 	await client.query('SELECT 2')
 	await connection.query('SELECT 3')
@@ -58,7 +56,6 @@ test('event manager: connection and client with transaction', async () => {
 	end()
 })
 
-
 test('event manager: connection and client with scopes', async () => {
 	const [connection, end] = createConnectionMockAlt([
 		{ sql: 'SELECT 1' },
@@ -73,7 +70,6 @@ test('event manager: connection and client with scopes', async () => {
 	await client.scope(async conn => {
 		conn.eventManager.on(EventManager.Event.queryStart, ({ sql }) => events.push({ sql, source: 'scoped' }))
 		await conn.query('SELECT 1')
-
 	})
 	await client.query('SELECT 2')
 	await connection.query('SELECT 3')
@@ -87,7 +83,6 @@ test('event manager: connection and client with scopes', async () => {
 	])
 	end()
 })
-
 
 test('event manager: connection and client with transaction and savepoint', async () => {
 	const [connection, end] = createConnectionMockAlt([
@@ -111,9 +106,7 @@ test('event manager: connection and client with transaction and savepoint', asyn
 		await trx.transaction(async savepoint => {
 			savepoint.eventManager.on(EventManager.Event.queryStart, ({ sql }) => events.push({ sql, source: 'savepoint' }))
 			await savepoint.query('SELECT 2')
-
 		})
-
 	})
 	await client.query('SELECT 3')
 	await connection.query('SELECT 4')

@@ -52,7 +52,6 @@ const oneHasOneInverseRelationSchema = Typesafe.object({
 })
 const oneHasOneInverseRelationSchemaCheck: Typesafe.Equals<Model.OneHasOneInverseRelation, ReturnType<typeof oneHasOneInverseRelationSchema>> = true
 
-
 const oneHasOneOwningRelationSchema = Typesafe.intersection(
 	Typesafe.object({
 		type: Typesafe.literal(Model.RelationType.OneHasOne),
@@ -69,9 +68,12 @@ const oneHasOneOwningRelationSchema = Typesafe.intersection(
 
 const oneHasOneOwningRelationSchemaCheck: Typesafe.Equals<Model.OneHasOneOwningRelation, ReturnType<typeof oneHasOneOwningRelationSchema>> = true
 
-const eventLogSchema = Typesafe.coalesce(Typesafe.object({
-	enabled: Typesafe.boolean,
-}), { enabled: true }) as Typesafe.Type<{ readonly enabled: boolean }>
+const eventLogSchema = Typesafe.coalesce(
+	Typesafe.object({
+		enabled: Typesafe.boolean,
+	}),
+	{ enabled: true },
+) as Typesafe.Type<{ readonly enabled: boolean }>
 
 const manyHasManyOwningRelationSchema = Typesafe.intersection(
 	Typesafe.object({
@@ -90,7 +92,8 @@ const manyHasManyOwningRelationSchema = Typesafe.intersection(
 		orderBy: orderBySchema,
 	}),
 )
-const manyHasManyOwningRelationSchemaCheck: Typesafe.Equals<Model.ManyHasManyOwningRelation, ReturnType<typeof manyHasManyOwningRelationSchema>> = true
+const manyHasManyOwningRelationSchemaCheck: Typesafe.Equals<Model.ManyHasManyOwningRelation, ReturnType<typeof manyHasManyOwningRelationSchema>> =
+	true
 
 const manyHasManyInverseRelationSchema = Typesafe.intersection(
 	Typesafe.object({
@@ -103,7 +106,8 @@ const manyHasManyInverseRelationSchema = Typesafe.intersection(
 		orderBy: orderBySchema,
 	}),
 )
-const manyHasManyInverseRelationSchemaCheck: Typesafe.Equals<Model.ManyHasManyInverseRelation, ReturnType<typeof manyHasManyInverseRelationSchema>> = true
+const manyHasManyInverseRelationSchemaCheck: Typesafe.Equals<Model.ManyHasManyInverseRelation, ReturnType<typeof manyHasManyInverseRelationSchema>> =
+	true
 
 const intersectionSchema = Typesafe.intersection(
 	Typesafe.object({
@@ -161,7 +165,6 @@ const viewSchemaInner = Typesafe.intersection(
 )
 const viewSchemaCheck: Typesafe.Equals<Model.View, ReturnType<typeof viewSchemaInner>> = true
 const viewSchema: Typesafe.Type<Model.View> = viewSchemaInner
-
 
 const indexSchemaBase = Typesafe.intersection(
 	Typesafe.object({
@@ -231,4 +234,3 @@ export const modelSchema = Typesafe.object({
 	entities: Typesafe.record(Typesafe.string, entitySchema),
 	enums: Typesafe.record(Typesafe.string, Typesafe.array(Typesafe.string)),
 })
-

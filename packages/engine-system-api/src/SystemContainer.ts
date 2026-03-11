@@ -1,11 +1,6 @@
 import { AccessEvaluator, Authorizator } from '@contember/authorization'
 import { Builder, Container } from '@contember/dic'
-import {
-	MigrationDescriber,
-	ModificationHandlerFactory,
-	SchemaDiffer,
-	SchemaMigrator,
-} from '@contember/schema-migrations'
+import { MigrationDescriber, ModificationHandlerFactory, SchemaDiffer, SchemaMigrator } from '@contember/schema-migrations'
 import {
 	ContentQueryExecutor,
 	EventResponseBuilder,
@@ -64,55 +59,65 @@ export class SystemContainerFactory {
 	}
 	public createBuilder({ identityFetcher }: Args) {
 		return new Builder({})
-			.addService('providers', () =>
-				this.providers)
-			.addService('modificationHandlerFactory', () =>
-				this.modificationHandlerFactory)
-			.addService('identityFetcher', () =>
-				identityFetcher)
-			.addService('schemaMigrator', ({ modificationHandlerFactory }) =>
-				new SchemaMigrator(modificationHandlerFactory))
-			.addService('executedMigrationsResolver', ({}) =>
-				new ExecutedMigrationsResolver())
-			.addService('schemaProvider', ({ executedMigrationsResolver, schemaMigrator }) =>
-				new SchemaProvider(executedMigrationsResolver, schemaMigrator))
-			.addService('accessEvaluator', ({}) =>
-				new AccessEvaluator.PermissionEvaluator(new PermissionsFactory().create()))
-			.addService('authorizator', ({ accessEvaluator }): Authorizator =>
-				new Authorizator.Default(accessEvaluator))
-			.addService('migrationDescriber', ({ modificationHandlerFactory }) =>
-				new MigrationDescriber(modificationHandlerFactory))
-			.addService('databaseMetadataResolver', () =>
-				new DatabaseMetadataResolver())
-			.addService('migrationsDatabaseMetadataResolverStoreFactory', ({ databaseMetadataResolver }) =>
-				new MigrationsDatabaseMetadataResolverStoreFactory(databaseMetadataResolver))
-			.addService('projectMigrator', ({ migrationDescriber, schemaProvider, executedMigrationsResolver, migrationsDatabaseMetadataResolverStoreFactory }) =>
-				new ProjectMigrator(migrationDescriber, schemaProvider, executedMigrationsResolver, migrationsDatabaseMetadataResolverStoreFactory, this.contentQueryExecutor))
-			.addService('projectTruncateExecutor', () =>
-				new ProjectTruncateExecutor())
-			.addService('migrationAlterer', ({ schemaProvider }) =>
-				new MigrationAlterer(schemaProvider))
-			.addService('eventResponseBuilder', ({ identityFetcher }) =>
-				new EventResponseBuilder(identityFetcher))
-			.addService('stagesQueryResolver', () =>
-				new StagesQueryResolver())
-			.addService('executedMigrationsQueryResolver', () =>
-				new ExecutedMigrationsQueryResolver())
-			.addService('migrateMutationResolver', ({ projectMigrator }) =>
-				new MigrateMutationResolver(projectMigrator))
-			.addService('truncateMutationResolver', ({ projectTruncateExecutor }) =>
-				new TruncateMutationResolver(projectTruncateExecutor))
-			.addService('migrationAlterMutationResolver', ({ migrationAlterer }) =>
-				new MigrationAlterMutationResolver(migrationAlterer))
-			.addService('eventsQueryResolver', ({ eventResponseBuilder }) =>
-				new EventsQueryResolver(eventResponseBuilder))
-			.addService('eventOldValuesResolver', () =>
-				new EventOldValuesResolver())
-			.addService('schemaQueryResolver', () =>
-				new SchemaQueryResolver())
-			.addService('systemResolversFactory', ({ stagesQueryResolver, executedMigrationsQueryResolver, migrateMutationResolver, truncateMutationResolver, migrationAlterMutationResolver, eventsQueryResolver, eventOldValuesResolver, schemaQueryResolver }) =>
-				new ResolverFactory(stagesQueryResolver, executedMigrationsQueryResolver, migrateMutationResolver, truncateMutationResolver, migrationAlterMutationResolver, eventsQueryResolver, eventOldValuesResolver, schemaQueryResolver))
-			.addService('resolverContextFactory', ({ authorizator }) =>
-				new SystemResolverContextFactory(authorizator))
+			.addService('providers', () => this.providers)
+			.addService('modificationHandlerFactory', () => this.modificationHandlerFactory)
+			.addService('identityFetcher', () => identityFetcher)
+			.addService('schemaMigrator', ({ modificationHandlerFactory }) => new SchemaMigrator(modificationHandlerFactory))
+			.addService('executedMigrationsResolver', ({}) => new ExecutedMigrationsResolver())
+			.addService('schemaProvider', ({ executedMigrationsResolver, schemaMigrator }) => new SchemaProvider(executedMigrationsResolver, schemaMigrator))
+			.addService('accessEvaluator', ({}) => new AccessEvaluator.PermissionEvaluator(new PermissionsFactory().create()))
+			.addService('authorizator', ({ accessEvaluator }): Authorizator => new Authorizator.Default(accessEvaluator))
+			.addService('migrationDescriber', ({ modificationHandlerFactory }) => new MigrationDescriber(modificationHandlerFactory))
+			.addService('databaseMetadataResolver', () => new DatabaseMetadataResolver())
+			.addService(
+				'migrationsDatabaseMetadataResolverStoreFactory',
+				({ databaseMetadataResolver }) => new MigrationsDatabaseMetadataResolverStoreFactory(databaseMetadataResolver),
+			)
+			.addService(
+				'projectMigrator',
+				({ migrationDescriber, schemaProvider, executedMigrationsResolver, migrationsDatabaseMetadataResolverStoreFactory }) =>
+					new ProjectMigrator(
+						migrationDescriber,
+						schemaProvider,
+						executedMigrationsResolver,
+						migrationsDatabaseMetadataResolverStoreFactory,
+						this.contentQueryExecutor,
+					),
+			)
+			.addService('projectTruncateExecutor', () => new ProjectTruncateExecutor())
+			.addService('migrationAlterer', ({ schemaProvider }) => new MigrationAlterer(schemaProvider))
+			.addService('eventResponseBuilder', ({ identityFetcher }) => new EventResponseBuilder(identityFetcher))
+			.addService('stagesQueryResolver', () => new StagesQueryResolver())
+			.addService('executedMigrationsQueryResolver', () => new ExecutedMigrationsQueryResolver())
+			.addService('migrateMutationResolver', ({ projectMigrator }) => new MigrateMutationResolver(projectMigrator))
+			.addService('truncateMutationResolver', ({ projectTruncateExecutor }) => new TruncateMutationResolver(projectTruncateExecutor))
+			.addService('migrationAlterMutationResolver', ({ migrationAlterer }) => new MigrationAlterMutationResolver(migrationAlterer))
+			.addService('eventsQueryResolver', ({ eventResponseBuilder }) => new EventsQueryResolver(eventResponseBuilder))
+			.addService('eventOldValuesResolver', () => new EventOldValuesResolver())
+			.addService('schemaQueryResolver', () => new SchemaQueryResolver())
+			.addService(
+				'systemResolversFactory',
+				({
+					stagesQueryResolver,
+					executedMigrationsQueryResolver,
+					migrateMutationResolver,
+					truncateMutationResolver,
+					migrationAlterMutationResolver,
+					eventsQueryResolver,
+					eventOldValuesResolver,
+					schemaQueryResolver,
+				}) =>
+					new ResolverFactory(
+						stagesQueryResolver,
+						executedMigrationsQueryResolver,
+						migrateMutationResolver,
+						truncateMutationResolver,
+						migrationAlterMutationResolver,
+						eventsQueryResolver,
+						eventOldValuesResolver,
+						schemaQueryResolver,
+					),
+			)
+			.addService('resolverContextFactory', ({ authorizator }) => new SystemResolverContextFactory(authorizator))
 	}
 }

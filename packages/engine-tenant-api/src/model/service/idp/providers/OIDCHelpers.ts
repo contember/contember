@@ -4,7 +4,10 @@ import { IDPValidationError } from '../IDPValidationError'
 import { IDPResponseError } from '../IDPResponseError'
 import { IDPResponse, InitIDPAuthResult } from '../IdentityProviderHandler'
 
-export const initOIDCAuth = async (client: Client, { redirectUrl, scope, responseMode }: { redirectUrl: string; scope?: string; responseMode?: string }): Promise<InitIDPAuthResult> => {
+export const initOIDCAuth = async (
+	client: Client,
+	{ redirectUrl, scope, responseMode }: { redirectUrl: string; scope?: string; responseMode?: string },
+): Promise<InitIDPAuthResult> => {
 	const nonce = generators.nonce()
 	const state = generators.state()
 	const url = client.authorizationUrl({
@@ -21,7 +24,12 @@ export const initOIDCAuth = async (client: Client, { redirectUrl, scope, respons
 	}
 }
 
-export const handleOIDCResponse = async (client: Client, { sessionData, redirectUrl, ...otherData }: OIDCResponseData, fetchUserInfo?: boolean, returnOIDCResult?: boolean): Promise<IDPResponse> => {
+export const handleOIDCResponse = async (
+	client: Client,
+	{ sessionData, redirectUrl, ...otherData }: OIDCResponseData,
+	fetchUserInfo?: boolean,
+	returnOIDCResult?: boolean,
+): Promise<IDPResponse> => {
 	const params = 'parameters' in otherData ? otherData.parameters : client.callbackParams(otherData.url)
 	if (params.state && !sessionData?.state) {
 		throw new IDPValidationError(`state is present in parameters, but missing in session data`)

@@ -1,8 +1,5 @@
 import { c } from '@contember/schema-definition'
 
-
-
-
 export class LegacyEditorContent {
 	unique = c.enumColumn(c.createEnum('unique')).default('unique').notNull().unique()
 	blocks = c.oneHasMany(LegacyEditorBlock, 'content').orderBy('order')
@@ -45,4 +42,3 @@ export class LegacyEditorLink {
 export class LegacyEditorImage {
 	url = c.stringColumn()
 }
-

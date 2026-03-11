@@ -75,17 +75,21 @@ export const MemberList = ({ filter, labels, tableColumns, controller, tableHead
 										<span>
 											{dict.tenant.memberList.action}
 										</span>
-										<Button variant="outline" onClick={refresh} className="ml-auto" size="sm"><RefreshCwIcon className="w-3 h-3" /></Button>
+										<Button variant="outline" onClick={refresh} className="ml-auto" size="sm">
+											<RefreshCwIcon className="w-3 h-3" />
+										</Button>
 									</div>
 								</TableHead>
 							</TableRow>
 						</TableHeader>
-						{'data' in query && query.data.length === 0 &&
-							<TableRow>
-								<TableCell colSpan={tableHeaders.length + 2}>
-									{dict.tenant.memberList.noResults}
-								</TableCell>
-							</TableRow>}
+						{'data' in query && query.data.length === 0
+							&& (
+								<TableRow>
+									<TableCell colSpan={tableHeaders.length + 2}>
+										{dict.tenant.memberList.noResults}
+									</TableCell>
+								</TableRow>
+							)}
 						{'data' in query && query.data.slice(0, perPage).map(it => (
 							<TableRow key={it.identity.id}>
 								{tableColumns(it)}
@@ -99,7 +103,6 @@ export const MemberList = ({ filter, labels, tableColumns, controller, tableHead
 										title={labels.deleteConfirmation}
 									/>
 									<EditMembershipDialog projectSlug={projectSlug} identityId={it.identity.id} onSuccess={refresh} roles={roles} />
-
 								</TableCell>
 							</TableRow>
 						))}
@@ -119,14 +122,17 @@ export const MemberList = ({ filter, labels, tableColumns, controller, tableHead
 	}
 }
 
-const EditMembershipDialog = ({ projectSlug, identityId, onSuccess, roles }: { projectSlug: string; identityId: string; onSuccess: () => void; roles?: RolesConfig }) => {
-
+const EditMembershipDialog = (
+	{ projectSlug, identityId, onSuccess, roles }: { projectSlug: string; identityId: string; onSuccess: () => void; roles?: RolesConfig },
+) => {
 	const showToast = useShowToast()
 	const [open, setOpen] = useState(false)
 	return (
 		<Dialog open={open} onOpenChange={setOpen}>
 			<DialogTrigger asChild>
-				<Button variant="outline"><PencilIcon className="w-3 h-3" /></Button>
+				<Button variant="outline">
+					<PencilIcon className="w-3 h-3" />
+				</Button>
 			</DialogTrigger>
 			<DialogContent>
 				<UpdateProjectMemberForm

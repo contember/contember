@@ -14,7 +14,7 @@ export enum ForeignKeyDeleteAction {
 	restrict = 'r',
 	cascade = 'c',
 	setnull = 'n',
-	setdefault = 'd'
+	setdefault = 'd',
 }
 
 export type ForeignKeyFilter = Partial<ForeignKeyConstraintMetadata>

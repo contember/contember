@@ -33,7 +33,8 @@ const RepeaterDragOverlayUI = uic('div', {
 	baseClass: 'rounded-sm border border-gray-300 p-4 relative bg-gray-100/60 backdrop-blur-xs',
 })
 const RepeaterHandleUI = uic('button', {
-	baseClass: 'absolute top-1/2 -left-7 h-6 w-6 flex justify-end align-center opacity-10 group-hover/repeater-item:opacity-30 hover:!opacity-100 transition-opacity -translate-y-1/2',
+	baseClass:
+		'absolute top-1/2 -left-7 h-6 w-6 flex justify-end align-center opacity-10 group-hover/repeater-item:opacity-30 hover:!opacity-100 transition-opacity -translate-y-1/2',
 	beforeChildren: <GripVerticalIcon size={16} />,
 })
 const RepeaterEmptyUI = uic('div', {
@@ -52,10 +53,12 @@ export const RepeaterAddItemButton = ({ children, index }: { children?: React.Re
 	<RepeaterAddItemTrigger index={index}>
 		<div>
 			<Button variant={'link'} size={'sm'} className={'gap-1 px-0'}>
-				{children || <>
-					<PlusCircleIcon size={16} />
-					<span>{dict.repeater.addItem}</span>
-				</>}
+				{children || (
+					<>
+						<PlusCircleIcon size={16} />
+						<span>{dict.repeater.addItem}</span>
+					</>
+				)}
 			</Button>
 		</div>
 	</RepeaterAddItemTrigger>
@@ -67,9 +70,11 @@ export const RepeaterAddItemButton = ({ children, index }: { children?: React.Re
 export const RepeaterRemoveItemButton = ({ children }: { children?: React.ReactNode }) => (
 	<RepeaterRemoveItemTrigger>
 		<Button variant={'link'} size={'sm'} className={'gap-1 px-0 group/button'}>
-			{children || <>
-				<Trash2Icon className={'group-hover/button:text-red-600'} size={16} />
-			</>}
+			{children || (
+				<>
+					<Trash2Icon className={'group-hover/button:text-red-600'} size={16} />
+				</>
+			)}
 		</Button>
 	</RepeaterRemoveItemTrigger>
 )
@@ -124,10 +129,12 @@ const DefaultRepeaterInner = Component<DefaultRepeaterProps>(({ title, children,
 
 	if (!isSortable) {
 		return (
-			<Repeater {...props}>
+			<Repeater {...props as RepeaterProps}>
 				<RepeaterWrapperUI>
 					{title && <h3 className={'font-medium'}>{title}</h3>}
-					{(addButtonPosition === 'before' || addButtonPosition === 'around') && <RepeaterAddItemButton index="first">{addButtonLabel}</RepeaterAddItemButton>}
+					{(addButtonPosition === 'before' || addButtonPosition === 'around') && (
+						<RepeaterAddItemButton index="first">{addButtonLabel}</RepeaterAddItemButton>
+					)}
 					<RepeaterEmpty>
 						<RepeaterEmptyUI>
 							{dict.repeater.empty}
@@ -144,10 +151,12 @@ const DefaultRepeaterInner = Component<DefaultRepeaterProps>(({ title, children,
 		)
 	}
 	return (
-		<Repeater {...props}>
+		<Repeater {...props as RepeaterProps}>
 			<RepeaterWrapperUI>
 				{title && <h3 className={'font-medium'}>{title}</h3>}
-				{(addButtonPosition === 'before' || addButtonPosition === 'around') && <RepeaterAddItemButton index="first">{addButtonLabel}</RepeaterAddItemButton>}
+				{(addButtonPosition === 'before' || addButtonPosition === 'around') && (
+					<RepeaterAddItemButton index="first">{addButtonLabel}</RepeaterAddItemButton>
+				)}
 				<RepeaterSortable>
 					<RepeaterEmpty>
 						<RepeaterEmptyUI>

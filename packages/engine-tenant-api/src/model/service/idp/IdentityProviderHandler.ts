@@ -10,10 +10,9 @@ export type IDPResponse = {
 } & Record<string, unknown>
 
 export interface IdentityProviderHandler<Configuration extends {}> {
-
 	initAuth: (configuration: Configuration, data: unknown) => Promise<InitIDPAuthResult>
 
-	processResponse: (configuration: Configuration, responseData: unknown) =>  Promise<IDPResponse>
+	processResponse: (configuration: Configuration, responseData: unknown) => Promise<IDPResponse>
 
 	validateConfiguration: (config: unknown) => Configuration
 

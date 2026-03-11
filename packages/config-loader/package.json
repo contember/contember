@@ -23,11 +23,11 @@
     }
   },
   "devDependencies": {
-    "@types/js-yaml": "^4.0.9",
-    "@types/node": "^20.17.22"
+    "@types/js-yaml": "catalog:",
+    "@types/node": "catalog:"
   },
   "dependencies": {
-    "js-yaml": "^4.1.0"
+    "js-yaml": "catalog:"
   },
   "type": "module"
 }

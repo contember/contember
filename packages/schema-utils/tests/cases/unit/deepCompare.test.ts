@@ -1,4 +1,4 @@
-import { expect, describe, test } from 'bun:test'
+import { describe, expect, test } from 'bun:test'
 import { compareArraysIgnoreOrder } from '../../../src'
 
 describe('deep compare', () => {
@@ -38,7 +38,6 @@ describe('deep compare', () => {
 		expect(actual).toStrictEqual([{
 			path: [],
 			message: 'Array item: {"foo":"bar"} not found in [{"lorem":"ipsum"},{"lorem":"ipsum"}]',
-		}],
-		)
+		}])
 	})
 })

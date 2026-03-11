@@ -4,8 +4,6 @@ import { testUuid } from '../../../../src/testUuid'
 import { describe, it } from 'bun:test'
 
 describe('Required validation', () => {
-
-
 	it('create fails when column value is not set', async () => {
 		class Author {
 			@v.required('Author name is required')

@@ -82,5 +82,4 @@ export const schema = new Schema(SchemaPreprocessor.processRawSchema({
 		},
 	],
 	enums: [],
-},
-))
+}))

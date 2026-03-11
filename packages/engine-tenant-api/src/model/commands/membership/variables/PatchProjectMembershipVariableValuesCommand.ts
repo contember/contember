@@ -18,15 +18,13 @@ export class PatchProjectMembershipVariableValuesCommand implements Command<stri
 						membership_id: this.membershipId,
 						variable: this.name,
 					})
-					.select(expr => expr.raw('jsonb_array_elements_text(value)'), 'value'),
-			)
+					.select(expr => expr.raw('jsonb_array_elements_text(value)'), 'value'))
 			.with('filtered', qb => qb.from('current').where(expr => expr.not(expr => expr.in('value', [...this.remove]))))
 			.with('new_list', qb =>
 				qb
 					.select(['filtered', 'value'])
 					.from('filtered')
-					.unionDistinct(qb => qb.select(expr => expr.raw('*')).from(new Literal('unnest(?::text[])', [this.append]))),
-			)
+					.unionDistinct(qb => qb.select(expr => expr.raw('*')).from(new Literal('unnest(?::text[])', [this.append]))))
 			.with('new', qb => qb.from('new_list').select(expr => expr.raw(`coalesce(jsonb_agg(value), ?::jsonb)`, '[]'), 'value'))
 			.into('project_membership_variable')
 			.from(qb => qb.from('new'))

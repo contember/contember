@@ -1,10 +1,4 @@
-import {
-	Link,
-	type RoleCondition,
-	type RoutingLinkTarget,
-	useCurrentRequest,
-	useProjectUserRoles,
-} from '@contember/interface'
+import { Link, type RoleCondition, type RoutingLinkTarget, useCurrentRequest, useProjectUserRoles } from '@contember/interface'
 import { createContext } from '@contember/react-utils'
 import { VariantProps } from 'class-variance-authority'
 import { ChevronRight } from 'lucide-react'
@@ -55,7 +49,7 @@ const useHasActiveChild = (children: ReactNode) => {
 		const checkChild = (child: ReactNode): boolean => {
 			if (!isValidElement(child)) return false
 
-			const { to, children: grandChildren } = child.props
+			const { to, children: grandChildren } = child.props as Record<string, any>
 
 			if (to && isMatchingPage(to)) return true
 
@@ -110,9 +104,7 @@ export const MenuItem = ({ icon, label, to, children, role, expandedByDefault, .
 					<SidebarMenuButton isActive={isActive} tooltip={label} {...menuButtonProps}>
 						{icon}
 						<span>{label}</span>
-						{hasChildren && (
-							<ChevronRight className="ml-auto transition-transform duration-200" />
-						)}
+						{hasChildren && <ChevronRight className="ml-auto transition-transform duration-200" />}
 					</SidebarMenuButton>
 				</CollapsibleTrigger>
 				{hasChildren && (

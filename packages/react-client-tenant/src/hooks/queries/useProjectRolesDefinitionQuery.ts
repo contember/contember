@@ -8,8 +8,7 @@ const projectRolesDefinitionFragment = TenantApi.roleDefinition$$
 		TenantApi.roleVariableDefinition$$
 			.on(TenantApi.roleConditionVariableDefinition$$)
 			.on(TenantApi.roleEntityVariableDefinition$$)
-			.on(TenantApi.rolePredefinedVariableDefinition$$)
-		,
+			.on(TenantApi.rolePredefinedVariableDefinition$$),
 	)
 
 export type ProjectRoleDefinition = ModelType<typeof projectRolesDefinitionFragment>

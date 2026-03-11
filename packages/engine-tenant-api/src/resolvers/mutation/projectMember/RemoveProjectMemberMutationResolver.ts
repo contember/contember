@@ -1,9 +1,4 @@
-import {
-	MutationRemoveProjectMemberArgs,
-	MutationResolvers,
-	RemoveProjectMemberErrorCode,
-	RemoveProjectMemberResponse,
-} from '../../../schema'
+import { MutationRemoveProjectMemberArgs, MutationResolvers, RemoveProjectMemberErrorCode, RemoveProjectMemberResponse } from '../../../schema'
 import { TenantResolverContext } from '../../TenantResolverContext'
 import { PermissionActions, ProjectManager, ProjectMemberManager } from '../../../model'
 import { createErrorResponse, createProjectNotFoundResponse } from '../../errorUtils'

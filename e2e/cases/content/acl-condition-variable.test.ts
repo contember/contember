@@ -1,6 +1,6 @@
 import { expect, test } from 'bun:test'
 import { createTester, gql } from '../../src/tester'
-import { createSchema, SchemaDefinition as def, AclDefinition as acl } from '@contember/schema-definition'
+import { AclDefinition as acl, createSchema, SchemaDefinition as def } from '@contember/schema-definition'
 
 namespace ArticleModel {
 	export const readerRole = acl.createRole('reader')
@@ -44,11 +44,13 @@ test('ACL: condition variable', async () => {
 		})
 		.expect(200)
 
-
 	const email = `john+${Date.now()}@doe.com`
 	const identityId = await tester.tenant.signUp(email)
 	const authKey = await tester.tenant.signIn(email)
-	await tester.tenant.addProjectMember(identityId, tester.projectSlug, { role: 'reader', variables: [{ name: 'subscription', values: [JSON.stringify({ gte: '2022-01-01' })] }] })
+	await tester.tenant.addProjectMember(identityId, tester.projectSlug, {
+		role: 'reader',
+		variables: [{ name: 'subscription', values: [JSON.stringify({ gte: '2022-01-01' })] }],
+	})
 
 	await tester(
 		gql`

@@ -1,12 +1,6 @@
 import { Editor, Editor as SlateEditor, Element as SlateElement, Point, Range as SlateRange, Transforms } from 'slate'
 import { ContemberEditor } from '../../../editor'
-import {
-	ejectHeadingElement,
-	HeadingElement,
-	headingElementPlugin,
-	headingElementType,
-	isHeadingElement,
-} from './HeadingElement'
+import { ejectHeadingElement, HeadingElement, headingElementPlugin, headingElementType, isHeadingElement } from './HeadingElement'
 import { headingHtmlDeserializer } from './HeadingHtmlDeserializer'
 import { ElementRenderer } from '../../../types'
 
@@ -16,7 +10,6 @@ export const withHeadings = ({ render }: { render: ElementRenderer<HeadingElemen
 		insertBreak,
 		deleteBackward,
 	} = editor
-
 
 	editor.registerElement(headingElementPlugin({ render }))
 	editor.htmlDeserializer.registerPlugin(headingHtmlDeserializer)
@@ -68,8 +61,6 @@ export const withHeadings = ({ render }: { render: ElementRenderer<HeadingElemen
 			)
 		)
 	}
-
-
 
 	editor.insertBreak = () => {
 		SlateEditor.withoutNormalizing(editor, () => {

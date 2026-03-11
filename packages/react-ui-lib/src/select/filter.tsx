@@ -4,7 +4,6 @@ import { DataViewHasFilterType, DataViewQueryFilterName, DataViewTextFilterInput
 import { dict } from '../dict'
 import { memo } from 'react'
 
-
 export const SelectDefaultFilter = memo(() => (
 	<DataViewHasFilterType name={DataViewQueryFilterName}>
 		<DataViewTextFilterInput name={DataViewQueryFilterName}>

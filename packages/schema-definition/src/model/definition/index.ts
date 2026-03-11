@@ -5,7 +5,7 @@ import 'reflect-metadata'
 import { FieldDefinition } from './fieldDefinitions'
 import { isEntityConstructor } from '../../utils'
 import { DefaultNamingConventions } from '@contember/schema-utils'
-import { StrictOptions, StrictDefinitionValidator } from '../../strict'
+import { StrictDefinitionValidator, StrictOptions } from '../../strict'
 
 export * from './fieldDefinitions'
 export * from './EventLogDefinition'
@@ -14,7 +14,7 @@ export * from './OrderByDefinition'
 export * from './EnumDefinition'
 export * from './UniqueDefinition'
 export * from './ViewDefinition'
-export { extendEntity, type EntityExtension } from './extensions'
+export { type EntityExtension, extendEntity } from './extensions'
 
 export abstract class Entity {
 	[key: string]: FieldDefinition<any> | undefined

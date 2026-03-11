@@ -11,7 +11,6 @@ export const RepeaterEntityListAccessorContext = RepeaterEntityListAccessorConte
  */
 export const useRepeaterEntityListAccessor = RepeaterEntityListAccessorContext_[1]
 
-
 const RepeaterSortedEntitiesContext_ = createRequiredContext<EntityAccessor[]>('RepeaterSortedEntitiesContext')
 /** @internal */
 export const RepeaterSortedEntitiesContext = RepeaterSortedEntitiesContext_[0]

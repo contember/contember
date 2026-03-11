@@ -4,13 +4,15 @@ import { WorkspaceCreateCommand } from './commands'
 import { TemplateInstaller } from './lib/TemplateInstaller'
 import { resourcesDir } from './paths'
 import { FileSystem } from './lib/FileSystem'
-
-(async () => {
+;(async () => {
 	const commandManager = new CommandManager({
-		['workspace']: () => new WorkspaceCreateCommand(new TemplateInstaller(
-			resourcesDir,
-			new FileSystem(),
-		)),
+		['workspace']: () =>
+			new WorkspaceCreateCommand(
+				new TemplateInstaller(
+					resourcesDir,
+					new FileSystem(),
+				),
+			),
 	})
 
 	const nodeVersion = process.version.match(/^v?(\d+)\..+$/)
@@ -20,7 +22,6 @@ import { FileSystem } from './lib/FileSystem'
 	const app = new Application(commandManager, `Contember installer`)
 	await app.runCommand('workspace', process.argv.slice(2))
 })().catch(e => {
-	// eslint-disable-next-line no-console
 	console.log(e)
 	process.exit(1)
 })

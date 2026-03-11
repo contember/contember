@@ -22,13 +22,14 @@ export default () => (
 			<Link to="form/authorCreate">
 				<AnchorButton>Create author</AnchorButton>
 			</Link>
-
 		</Slots.Actions>
 
 		<DefaultDataGrid entities="FormArticle">
 			<DataGridTextColumn header="Internal name" field="internalName">
 				<Link to="form/articleEdit(id: $entity.id)">
-					<AnchorButton variant="link"><Field field="internalName" /></AnchorButton>
+					<AnchorButton variant="link">
+						<Field field="internalName" />
+					</AnchorButton>
 				</Link>
 			</DataGridTextColumn>
 		</DefaultDataGrid>
@@ -37,7 +38,9 @@ export default () => (
 		<DefaultDataGrid entities="FormTag">
 			<DataGridTextColumn header="Name" field="name">
 				<Link to="form/tagEdit(id: $entity.id)">
-					<AnchorButton variant="link"><Field field="name" /></AnchorButton>
+					<AnchorButton variant="link">
+						<Field field="name" />
+					</AnchorButton>
 				</Link>
 			</DataGridTextColumn>
 		</DefaultDataGrid>
@@ -46,7 +49,9 @@ export default () => (
 		<DefaultDataGrid entities="FormAuthor">
 			<DataGridTextColumn header="Name" field="name">
 				<Link to="form/authorEdit(id: $entity.id)">
-					<AnchorButton variant="link"><Field field="name" /></AnchorButton>
+					<AnchorButton variant="link">
+						<Field field="name" />
+					</AnchorButton>
 				</Link>
 			</DataGridTextColumn>
 		</DefaultDataGrid>
@@ -147,7 +152,9 @@ export const ArticleForm = Component(() => (
 	<>
 		<EnvironmentMiddleware create={it => it.withDimensions({ locale: ['cs', 'en'] })}>
 			<SideDimensions dimension="locale" field="locales(locale = $currentLocale)" as="currentLocale">
-				<h2 className="text-2xl"><Variable name="currentLocale" /></h2>
+				<h2 className="text-2xl">
+					<Variable name="currentLocale" />
+				</h2>
 				<ArticleLocaleForm />
 			</SideDimensions>
 		</EnvironmentMiddleware>
@@ -164,7 +171,6 @@ export const ArticleForm = Component(() => (
 			<SelectField field="author" createNewForm={<ArticleAuthorForm />}>
 				<Field field="name" />
 			</SelectField>
-
 		</Slots.Sidebar>
 	</>
 ))

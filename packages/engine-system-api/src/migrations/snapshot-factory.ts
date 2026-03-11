@@ -40,6 +40,5 @@ $$
 		EXECUTE FORMAT('ALTER FUNCTION trigger_event() SET SEARCH_PATH = %s', QUOTE_IDENT(CURRENT_SCHEMA()));
 	END
 $$`)
-
 	}
 }

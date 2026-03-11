@@ -12,12 +12,13 @@ export const UploaderEachFile = ({ children, state, fallback }: {
 	if (files.length === 0) {
 		return <>{fallback}</>
 	}
-	return <>
-		{files.map(fileState =>
-			(
+	return (
+		<>
+			{files.map(fileState => (
 				<UploaderFileStateContext.Provider key={fileState.file.id} value={fileState}>
 					{children}
 				</UploaderFileStateContext.Provider>
 			))}
-	</>
+		</>
+	)
 }

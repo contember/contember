@@ -12,7 +12,12 @@ export class RolesManager {
 		return this.patchGlobalRoles(dbContext, identityId, [], roles)
 	}
 
-	private async patchGlobalRoles(dbContext: DatabaseContext, identityId: string, addRoles: readonly string[], removeRoles: readonly string[]): Promise<Response<null, GlobalRolesErrorCode>> {
+	private async patchGlobalRoles(
+		dbContext: DatabaseContext,
+		identityId: string,
+		addRoles: readonly string[],
+		removeRoles: readonly string[],
+	): Promise<Response<null, GlobalRolesErrorCode>> {
 		const rolesValidationError = this.validateRoles([...addRoles, ...removeRoles])
 		if (rolesValidationError) {
 			return rolesValidationError
@@ -23,7 +28,6 @@ export class RolesManager {
 		}
 		return new ResponseOk(null)
 	}
-
 
 	private validateRoles(roles: string[]): Response<null, GlobalRolesErrorCode> | null {
 		for (const role of roles) {

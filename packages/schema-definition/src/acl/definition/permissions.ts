@@ -25,15 +25,12 @@ export type AllowDefinitionFactory<E> = (args: {
 }) => AllowDefinition<E>
 
 export const allow = <E, R extends Role<string>>(role: R | R[], args: AllowDefinition<E> | AllowDefinitionFactory<E>): DecoratorFunction<E> => {
-	return (entity: EntityConstructor<E>) => {
-		(Array.isArray(role) ? role : [role]).forEach(role => {
+	return (entity: EntityConstructor<E>, context?: ClassDecoratorContext) => {
+		;(Array.isArray(role) ? role : [role]).forEach(role => {
 			allowDefinitionsStore.update(entity, val => [...val, {
 				factory: typeof args === 'function' ? args : () => args,
 				role,
-			}])
+			}], context)
 		})
 	}
 }
-
-
-

@@ -2,9 +2,7 @@ import { Schema } from '@contember/schema'
 import { SchemaUpdater, updateEveryEntity, updateModel } from '../utils/schemaUpdateUtils'
 import { createModificationType, Differ, ModificationHandler } from '../ModificationHandler'
 
-export class RemoveIndexNamesModificationHandler implements ModificationHandler<RemoveIndexNamesModificationData>  {
-	constructor() {}
-
+export class RemoveIndexNamesModificationHandler implements ModificationHandler<RemoveIndexNamesModificationData> {
 	public createSql(): void {
 	}
 
@@ -35,7 +33,6 @@ export const removeIndexNamesModification = createModificationType({
 	id: 'removeIndexNames',
 	handler: RemoveIndexNamesModificationHandler,
 })
-
 
 export type RemoveIndexNamesModificationData = {}
 

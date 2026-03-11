@@ -13,13 +13,11 @@ test('Posts with categories and its cz locale (many has many owning + one has ma
 			.entity('Category', entity =>
 				entity
 					.column('visible', c => c.type(Model.ColumnType.Bool))
-					.oneHasMany('locales', relation => relation.target('CategoryLocale')),
-			)
+					.oneHasMany('locales', relation => relation.target('CategoryLocale')))
 			.entity('CategoryLocale', entity =>
 				entity
 					.column('name', column => column.type(Model.ColumnType.String))
-					.column('locale', column => column.type(Model.ColumnType.Enum, { enumName: 'locale' })),
-			)
+					.column('locale', column => column.type(Model.ColumnType.Enum, { enumName: 'locale' })))
 			.buildSchema(),
 		query: GQL`
         query {
@@ -201,8 +199,7 @@ test('Categories with posts and author (many has many inverse + many has one)', 
 			.entity('Post', entity =>
 				entity
 					.manyHasMany('categories', relation => relation.target('Category').inversedBy('posts'))
-					.manyHasOne('author', relation => relation.target('Author')),
-			)
+					.manyHasOne('author', relation => relation.target('Author')))
 			.entity('Category', entity => entity)
 			.entity('Author', entity => entity.column('name', column => column.type(Model.ColumnType.String)))
 			.buildSchema(),
@@ -353,4 +350,3 @@ test('Categories with posts and author (many has many inverse + many has one)', 
 		},
 	})
 })
-

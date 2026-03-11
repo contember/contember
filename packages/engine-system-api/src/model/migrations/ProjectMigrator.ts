@@ -57,12 +57,11 @@ export class ProjectMigrator {
 		const metadataStore = this.migrationsDatabaseMetadataResolverStoreFactory.create(db)
 
 		for (const migration of sorted) {
-
 			if (migration.type === 'schema') {
 				const formatVersion = migration.formatVersion
 
 				for (const modification of migration.modifications) {
-					[schema] = await this.applyModification(
+					;[schema] = await this.applyModification(
 						db.client,
 						stages,
 						schema,
@@ -93,7 +92,6 @@ export class ProjectMigrator {
 				// event log uses deferred constraint triggers, we need to fire them before ALTER
 				await db.client.query(`SET CONSTRAINTS ALL IMMEDIATE`)
 				await db.client.query(`SET CONSTRAINTS ALL DEFERRED`)
-
 			}
 			id = await db.commandBus.execute(new SaveMigrationCommand(migration))
 		}
@@ -101,15 +99,17 @@ export class ProjectMigrator {
 			throw new ImplementationException()
 		}
 
-		await db.commandBus.execute(new SaveSchemaCommand({
-			schema,
-			meta: {
-				id,
-				updatedAt: new Date(),
-				version: sorted[sorted.length - 1].version,
-				checksum: calculateSchemaChecksum(schema),
-			},
-		}))
+		await db.commandBus.execute(
+			new SaveSchemaCommand({
+				schema,
+				meta: {
+					id,
+					updatedAt: new Date(),
+					version: sorted[sorted.length - 1].version,
+					checksum: calculateSchemaChecksum(schema),
+				},
+			}),
+		)
 	}
 
 	private async executeContentMigration({ query, stages, version, ...ctx }: {
@@ -185,8 +185,8 @@ export class ProjectMigrator {
 				if (errors.length > 0) {
 					throw new InvalidSchemaError(
 						migration.version,
-						'Migration generates invalid schema: \n' +
-						errors.map(it => `${it.path.join('.')}: [${it.code}] ${it.message}`).join('\n'),
+						'Migration generates invalid schema: \n'
+							+ errors.map(it => `${it.path.join('.')}: [${it.code}] ${it.message}`).join('\n'),
 					)
 				}
 			}
@@ -198,8 +198,8 @@ export class ProjectMigrator {
 		if (errors.length > 0) {
 			throw new InvalidSchemaError(
 				toExecute[toExecute.length - 1].version,
-				'Migration generates invalid schema: \n' +
-				errors.map(it => it.path.join('.') + ': ' + it.message).join('\n'),
+				'Migration generates invalid schema: \n'
+					+ errors.map(it => it.path.join('.') + ': ' + it.message).join('\n'),
 			)
 		}
 		return toExecute

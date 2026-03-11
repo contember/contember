@@ -16,7 +16,6 @@ export const useBlockElementCache = ({ editor, blockList, sortableBy, contentFie
 	sortableBy: SugaredFieldProps['field']
 	contentField: SugaredFieldProps['field']
 }): BlockElementCache => {
-
 	const [blockElementCache] = useState(() => new WeakMap<EntityAccessor, SlateElement>())
 	const desugaredSortableByField = useDesugaredRelativeSingleField(sortableBy)
 	const desugaredBlockContentField = useDesugaredRelativeSingleField(contentField)
@@ -34,8 +33,7 @@ export const useBlockElementCache = ({ editor, blockList, sortableBy, contentFie
 					if (cachedElement !== undefined) {
 						continue
 					}
-					const blockIndex =
-						blockEntity.getField<number>(desugaredSortableByField).value!
+					const blockIndex = blockEntity.getField<number>(desugaredSortableByField).value!
 					if (editor.children.length < blockIndex) {
 						continue
 					}

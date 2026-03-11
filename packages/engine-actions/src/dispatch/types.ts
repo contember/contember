@@ -3,7 +3,7 @@ import { Actions } from '@contember/schema'
 import { EventRow } from '../model/types'
 import { VariablesMap } from '../model/VariablesManager'
 
-export { type EventRow }
+export type { EventRow }
 
 export interface InvokeHandler<Target extends Actions.AnyTarget> {
 	handle(args: InvokeHandlerArgs<Target>): Promise<HandledEvent[]>
@@ -29,4 +29,3 @@ export type InvocationResult = {
 	code?: number
 	response?: string
 }
-

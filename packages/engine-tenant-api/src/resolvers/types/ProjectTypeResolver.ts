@@ -31,7 +31,12 @@ export class ProjectTypeResolver implements ProjectResolvers {
 			throw new UserInputError(`Cannot use both deprecated memberType parameter and new input parameter`)
 		}
 
-		const members = await this.projectMemberManager.getProjectMembers(context.db, parent.id, verifier, args.input ?? { filter: { memberType: args.memberType } })
+		const members = await this.projectMemberManager.getProjectMembers(
+			context.db,
+			parent.id,
+			verifier,
+			args.input ?? { filter: { memberType: args.memberType } },
+		)
 		return members.map(it => ({
 			...it,
 			identity: { ...it.identity, projects: [] },

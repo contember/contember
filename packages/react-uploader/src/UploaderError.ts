@@ -17,4 +17,3 @@ export class UploaderError extends Error {
 		super(`File upload failed: ${options.type}`)
 	}
 }
-

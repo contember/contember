@@ -13,9 +13,7 @@ test('one has many - default ordering', async () => {
 					r
 						.ownedBy('menu')
 						.orderBy('order')
-						.target('MenuItem', e => e.column('heading').column('order', c => c.type(Model.ColumnType.Int))),
-				),
-			)
+						.target('MenuItem', e => e.column('heading').column('order', c => c.type(Model.ColumnType.Int)))))
 			.buildSchema(),
 		query: GQL`
         query {
@@ -79,10 +77,13 @@ order by "root_"."order" asc, "root_"."id" asc`,
 test('many has many - default ordering', async () => {
 	await execute({
 		schema: new SchemaBuilder()
-			.entity('Post', entity =>
-				entity.manyHasMany('categories', relation =>
-					relation.target('Category', e => e.column('name', c => c.type(Model.ColumnType.String))).orderBy('name'),
-				),
+			.entity(
+				'Post',
+				entity =>
+					entity.manyHasMany(
+						'categories',
+						relation => relation.target('Category', e => e.column('name', c => c.type(Model.ColumnType.String))).orderBy('name'),
+					),
 			)
 			.buildSchema(),
 		query: GQL`
@@ -155,4 +156,3 @@ from  "public"."category" as "root_"   where "root_"."id" in (?, ?)`,
 		},
 	})
 })
-

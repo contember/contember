@@ -1,11 +1,5 @@
 import * as Slate from 'slate'
-import {
-	BindingError,
-	EntityAccessor,
-	EntityListAccessor,
-	SugaredRelativeEntityList,
-	useEntityList,
-} from '@contember/react-binding'
+import { BindingError, EntityAccessor, EntityListAccessor, SugaredRelativeEntityList, useEntityList } from '@contember/react-binding'
 import { MutableRefObject, useCallback } from 'react'
 import { useConstantValueInvariant } from '@contember/react-utils'
 
@@ -24,18 +18,15 @@ export const useGetReferenceEntityList = ({
 	useConstantValueInvariant(referencesField)
 	useConstantValueInvariant(monolithicReferencesMode)
 	if (!referencesField) {
-		// eslint-disable-next-line react-hooks/rules-of-hooks
 		return useCallback(() => {
 			throw new BindingError(
-				`BlockEditor: trying to get or insert a referenced element but referencing has not been correctly set up. ` +
-				`Check the BlockEditor props.`,
+				`BlockEditor: trying to get or insert a referenced element but referencing has not been correctly set up. `
+					+ `Check the BlockEditor props.`,
 			)
 		}, [])
 	}
 	return monolithicReferencesMode
-		// eslint-disable-next-line react-hooks/rules-of-hooks
 		? useGetMonolithicReferenceList({ referencesField })
-		// eslint-disable-next-line react-hooks/rules-of-hooks
 		: useGetPerBlockReferenceList({ referencesField, sortedBlocksRef: sortedBlocksRef })
 }
 

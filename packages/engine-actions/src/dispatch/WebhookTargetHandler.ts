@@ -1,5 +1,5 @@
 import { Actions, ActionsPayload } from '@contember/schema'
-import { EventRow, HandledEvent, InvokeHandler, InvokeHandlerArgs  } from './types'
+import { EventRow, HandledEvent, InvokeHandler, InvokeHandlerArgs } from './types'
 import { VariablesMap } from '../model/VariablesManager'
 import * as Typesafe from '@contember/typesafe'
 import { FetcherResponse, WebhookFetcher } from './WebhookFetcher'
@@ -19,7 +19,7 @@ const ResponseType = Typesafe.noExtraProps(Typesafe.object({
 	),
 }))
 
-type EventResponseFactory = (eventRow: EventRow) => ({ ok: boolean; code?: number; response?: string; errorMessage?: string; durationMs?: number })
+type EventResponseFactory = (eventRow: EventRow) => { ok: boolean; code?: number; response?: string; errorMessage?: string; durationMs?: number }
 
 export class WebhookTargetHandler implements InvokeHandler<Actions.WebhookTarget> {
 	constructor(
@@ -35,14 +35,12 @@ export class WebhookTargetHandler implements InvokeHandler<Actions.WebhookTarget
 
 		let eventResponseFactory: EventResponseFactory
 		try {
-
 			const response = await this.fetch(timeoutMs ?? DEFAULT_TIMEOUT_MS, target, variables, events)
 
 			eventResponseFactory = this.createResponseFactory({
 				response: response,
 				events,
 			})
-
 		} catch (e) {
 			logger.warn(e)
 			const errorMessages = this.extractErrorMessages(e)
@@ -73,7 +71,8 @@ export class WebhookTargetHandler implements InvokeHandler<Actions.WebhookTarget
 			})
 		}
 
-		if (response.responseText.trim() === ''
+		if (
+			response.responseText.trim() === ''
 			|| !response.headers.get('content-type')?.toLowerCase().includes('json')
 		) {
 			return () => ({
@@ -93,7 +92,7 @@ export class WebhookTargetHandler implements InvokeHandler<Actions.WebhookTarget
 			const responseData = ResponseType(parsedJson)
 			const eventsInBatch = new Set(events.map(it => it.id))
 			const failedEvents = Object.fromEntries(responseData.failures?.map(it => [it.eventId, it]) ?? [])
-			const missingEvents =  Object.keys(failedEvents).filter(it => !eventsInBatch.has(it))
+			const missingEvents = Object.keys(failedEvents).filter(it => !eventsInBatch.has(it))
 
 			if (missingEvents.length) {
 				return () => ({
@@ -140,10 +139,17 @@ export class WebhookTargetHandler implements InvokeHandler<Actions.WebhookTarget
 		})
 	}
 
-	private async doFetch(target: Actions.WebhookTarget, variables: VariablesMap, abortController: AbortController, events: EventRow[]): Promise<FetcherResponse> {
+	private async doFetch(
+		target: Actions.WebhookTarget,
+		variables: VariablesMap,
+		abortController: AbortController,
+		events: EventRow[],
+	): Promise<FetcherResponse> {
 		const resolvedUrl = this.resolveVariables(target.url, variables)
-		const resolvedHeaders = Object.fromEntries(Object.entries(target.headers ?? {})
-			.map(([key, value]) => [key, this.resolveVariables(value, variables)]))
+		const resolvedHeaders = Object.fromEntries(
+			Object.entries(target.headers ?? {})
+				.map(([key, value]) => [key, this.resolveVariables(value, variables)]),
+		)
 
 		return await this.fetcher.fetch(resolvedUrl, {
 			method: 'POST',

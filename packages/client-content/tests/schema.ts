@@ -5,7 +5,6 @@ namespace Schema {
 		code = c.stringColumn().unique().notNull()
 	}
 
-
 	export class Author {
 		name = c.stringColumn()
 		email = c.stringColumn()
@@ -32,6 +31,5 @@ namespace Schema {
 		posts = c.manyHasManyInverse(Post, 'tags')
 	}
 }
-
 
 export const schema = createSchema(Schema)

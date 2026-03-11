@@ -17,8 +17,8 @@ const entityExtensionsStore = createMetadataStore<EntityExtension[]>([])
 
 export type EntityExtension = (args: EntityExtensionArgs) => Model.Entity
 export const extendEntity = <T>(extension: EntityExtension): DecoratorFunction<T> => {
-	return function (cls: EntityConstructor) {
-		entityExtensionsStore.update(cls, current => [...current, extension])
+	return function(cls: EntityConstructor, context?: ClassDecoratorContext) {
+		entityExtensionsStore.update(cls, current => [...current, extension], context)
 	}
 }
 

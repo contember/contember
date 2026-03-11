@@ -58,6 +58,6 @@ CREATE TABLE "project_member" (
 CREATE UNIQUE INDEX project_member_project_id_person_id ON "project_member" ("project_id", "person_id");
 CREATE INDEX "project_member_person_id" ON "project_member" ("person_id");`
 
-export default async function (builder: MigrationBuilder) {
+export default async function(builder: MigrationBuilder) {
 	builder.sql(sql)
 }

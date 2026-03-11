@@ -72,4 +72,3 @@ test('insert author (with acl)', async () => {
 		},
 	})
 })
-

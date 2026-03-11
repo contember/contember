@@ -1,4 +1,4 @@
-import {  expect, test } from 'bun:test'
+import { expect, test } from 'bun:test'
 import { createTester, gql } from '../../src/tester'
 import { createSchema, SchemaDefinition as def } from '@contember/schema-definition'
 
@@ -8,9 +8,7 @@ namespace TagModel {
 	}
 }
 
-
 test('Content API: X-Contember-Ref header', async () => {
-
 	const tester = await createTester(createSchema(TagModel))
 
 	// Check that X-Contember-Ref work for empty schema

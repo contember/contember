@@ -33,18 +33,18 @@
     "@contember/schema": "workspace:*",
     "@contember/schema-migrations": "workspace:*",
     "@contember/schema-utils": "workspace:*",
-    "@graphql-tools/utils": "^10.5.5",
-    "graphql-tag": "^2.12.6"
+    "@graphql-tools/utils": "catalog:",
+    "graphql-tag": "catalog:"
   },
   "devDependencies": {
     "@contember/schema-definition": "workspace:*",
-    "@types/node": "^20.17.22",
-    "graphql": "^16.9.0",
-    "pg": "^8.12.0"
+    "@types/node": "catalog:",
+    "graphql": "catalog:",
+    "pg": "catalog:"
   },
   "peerDependencies": {
-    "graphql": ">= 14.6.0",
-    "pg": "^8.9.0"
+    "graphql": "catalog:",
+    "pg": "catalog:"
   },
   "type": "module"
 }

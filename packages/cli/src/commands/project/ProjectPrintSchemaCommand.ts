@@ -14,8 +14,7 @@ import { SchemaLoader } from '../../lib/schema/SchemaLoader'
 import { SchemaVersionBuilder } from '@contember/migrations-client'
 import { validateSchemaAndPrintErrors } from '../../lib/schema/SchemaValidationHelper'
 
-type Args = {
-}
+type Args = {}
 
 type Options = {
 	role?: string[]
@@ -50,7 +49,6 @@ export class ProjectPrintSchemaCommand extends Command<Args, Options> {
 
 	protected async execute(input: Input<Args, Options>): Promise<number> {
 		const format = input.getOption('format') || 'graphql'
-
 
 		const schema = input.getOption('source') === 'migrations'
 			? await this.schemaVersionBuilder.buildSchema()

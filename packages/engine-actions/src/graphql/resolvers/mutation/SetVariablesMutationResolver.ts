@@ -9,7 +9,6 @@ export class SetVariablesMutationResolver implements MutationResolvers<ActionsCo
 	) {
 	}
 
-
 	async setVariables(parent: unknown, { args }: MutationSetVariablesArgs, ctx: ActionsContext) {
 		await ctx.requireAccess(ActionsAuthorizationActions.VARIABLES_SET)
 

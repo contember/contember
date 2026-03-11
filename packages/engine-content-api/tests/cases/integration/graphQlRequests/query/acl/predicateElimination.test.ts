@@ -100,7 +100,8 @@ test('predicate with OR', async () => {
 				},
 			},
 			{
-				sql: `select "root_"."id" as "root_id", "root_"."url" as "root_url", "root_"."id" as "root_id"  from "public"."image" as "root_"  where "root_"."id" in (?)`,
+				sql:
+					`select "root_"."id" as "root_id", "root_"."url" as "root_url", "root_"."id" as "root_id"  from "public"."image" as "root_"  where "root_"."id" in (?)`,
 				parameters: [testUuid(2)],
 				response: {
 					rows: [
@@ -126,5 +127,3 @@ test('predicate with OR', async () => {
 		},
 	})
 })
-
-

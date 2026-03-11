@@ -1,4 +1,3 @@
-import * as ReactDOM from 'react-dom'
 import { Buffer } from 'buffer'
 import { DevErrorManager, ErrorBus } from './DevErrorManager'
 import { ReactElement } from 'react'
@@ -9,11 +8,7 @@ const getErrorContainer = () => {
 	const errorElementId = '__contember__dev__error__container__element'
 	let errorContainer = document.getElementById(errorElementId)
 
-	if (errorContainer) {
-		// eslint-disable-next-line react/no-deprecated
-		ReactDOM.unmountComponentAtNode(errorContainer)
-
-	} else {
+	if (!errorContainer) {
 		errorContainer = document.createElement('div')
 		errorContainer.id = errorElementId
 		document.body.appendChild(errorContainer)
@@ -24,7 +19,6 @@ const getErrorContainer = () => {
 
 const devErrorHandler = (renderer: ErrorReactRenderer): TryRun => {
 	const errorBus = new ErrorBus()
-
 	;(window as any).Buffer = Buffer
 	window.addEventListener('error', e => {
 		if (e.message.startsWith('ResizeObserver')) {
@@ -76,7 +70,6 @@ const prodErrorHandler = (renderer: ErrorReactRenderer): TryRun => {
 		}
 	}
 }
-
 
 export const createErrorHandler = (renderer: ErrorReactRenderer) => {
 	if (import.meta.env.DEV) {

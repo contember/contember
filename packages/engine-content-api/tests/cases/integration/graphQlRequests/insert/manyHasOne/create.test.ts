@@ -8,9 +8,7 @@ import { testUuid } from '../../../../../src/testUuid'
 test('insert posts with author (many has one)', async () => {
 	await execute({
 		schema: new SchemaBuilder()
-			.entity('Post', e =>
-				e.column('publishedAt', c => c.type(Model.ColumnType.DateTime)).manyHasOne('author', r => r.target('Author')),
-			)
+			.entity('Post', e => e.column('publishedAt', c => c.type(Model.ColumnType.DateTime)).manyHasOne('author', r => r.target('Author')))
 			.entity('Author', e => e.column('name', c => c.type(Model.ColumnType.String)))
 			.buildSchema(),
 		query: GQL`
@@ -69,5 +67,3 @@ test('insert posts with author (many has one)', async () => {
 		},
 	})
 })
-
-

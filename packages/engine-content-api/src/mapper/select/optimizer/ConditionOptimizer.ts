@@ -13,25 +13,18 @@ export class ConditionOptimizer {
 			(Object.entries(condition) as ObjectEntry<typeof condition>[]).map(([key, value]) => {
 				if (value === undefined || value === null) {
 					return undefined
-
 				} else if (key === 'always') {
 					return true
-
 				} else if (key === 'and') {
 					return optimizeAnd(value.map(it => this.optimize(it)))
-
 				} else if (key === 'or') {
 					return optimizeOr(value.map(it => this.optimize(it)))
-
 				} else if (key === 'in' && value.length === 0) {
 					return false
-
 				} else if (key === 'notIn' && value.length === 0) {
 					return true
-
 				} else if (key === 'not') {
 					return optimizeNot(this.optimize(value))
-
 				} else {
 					return { [key]: value }
 				}

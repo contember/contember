@@ -4,7 +4,6 @@ export interface DevErrorBadgeProps {
 	errorCount: number
 }
 
-
 const className = (cls?: string | null) => cls ? `cui-devErrorBadge-${cls}` : 'cui-devErrorBadge'
 
 export function DevErrorBadge({ errorCount, onOpen, onClear }: DevErrorBadgeProps) {

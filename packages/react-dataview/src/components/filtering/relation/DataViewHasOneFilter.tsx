@@ -40,15 +40,15 @@ export interface DataViewHasOneFilterProps {
  * ## Example
  * ```tsx
  * <DataViewHasOneFilter field="author">
- *     //  Filter controls here 
+ *     //  Filter controls here
  * <DataViewFilterName>
  * ```
  */
-export const DataViewHasOneFilter = Component< DataViewHasOneFilterProps>(({ children, field, name, options }) => {
+export const DataViewHasOneFilter = Component<DataViewHasOneFilterProps>(({ children, field, name, options }) => {
 	const nameResolved = getFilterName(name, field)
 	const optionsResolved = useDataViewHasOneFilterOptions({ options, field })
 	const args = useMemo(() => {
-		return { options: optionsResolved  }
+		return { options: optionsResolved }
 	}, [optionsResolved])
 	return (
 		<DataViewFilterNameContext.Provider value={nameResolved}>
@@ -58,17 +58,18 @@ export const DataViewHasOneFilter = Component< DataViewHasOneFilterProps>(({ chi
 		</DataViewFilterNameContext.Provider>
 	)
 }, ({ name, field, children }) => {
-	return <>
-		<DataViewFilter name={getFilterName(name, field)} filterHandler={createHasOneFilter(field)} />
-	</>
+	return (
+		<>
+			<DataViewFilter name={getFilterName(name, field)} filterHandler={createHasOneFilter(field)} />
+		</>
+	)
 })
-
 
 const useDataViewHasOneFilterOptions = ({ options, field }: Pick<DataViewHasOneFilterProps, 'options' | 'field'>) => {
 	const environment = useEnvironment()
 	const fields = useMemo(() => {
 		const desugared = QueryLanguage.desugarRelativeSingleEntity({ field }, environment)
-		return  desugared.hasOneRelationPath.map(it => it.field)
+		return desugared.hasOneRelationPath.map(it => it.field)
 	}, [environment, field])
 	const fieldEntityName = useFieldEntityName(fields)
 

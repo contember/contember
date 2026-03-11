@@ -26,20 +26,23 @@ import { useRef } from 'react'
 export function useExpectSameValueReference<T>(next: T, shouldThrow: boolean = false) {
 	const previous = useRef(next)
 
-	if (next !== previous.current
+	if (
+		next !== previous.current
 		&& typeof next === 'object'
 		&& typeof previous.current === 'object'
 		&& deepEqual(next, previous.current)
 	) {
 		if (import.meta.env.DEV) {
 			console.error(
-				'Previous and next values do not match in reference although match in value. ' +
-				'Try declaring constants outside of the component scope. ' +
-				'Otherwise try to memoize callbacks with useCallback, ' +
-				'useReferentiallyStableCallback useEvent, useRef or useMemo.', {
+				'Previous and next values do not match in reference although match in value. '
+					+ 'Try declaring constants outside of the component scope. '
+					+ 'Otherwise try to memoize callbacks with useCallback, '
+					+ 'useReferentiallyStableCallback useEvent, useRef or useMemo.',
+				{
 					previous: previous.current,
 					next,
-				})
+				},
+			)
 		}
 
 		if (shouldThrow) {

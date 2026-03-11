@@ -18,19 +18,18 @@ export default () => {
 						{/*<TableHead>secondaryValue</TableHead>*/}
 						<TableHead>input</TableHead>
 					</TableRow>
-
 				</TableHeader>
 				<TableBody>
 					<EntityListSubTree entities="AclRestrictedValue">
 						<TableRow>
 							<TableCell>
-								<Field field="canRead" format={formatBoolean}/>
+								<Field field="canRead" format={formatBoolean} />
 							</TableCell>
 							{/*<TableCell>*/}
 							{/*	<Field field="canReadSecondary" format={formatBoolean}/>*/}
 							{/*</TableCell>*/}
 							<TableCell>
-								<Field field="canEdit" format={formatBoolean}/>
+								<Field field="canEdit" format={formatBoolean} />
 							</TableCell>
 							{/*<TableCell>*/}
 							{/*	<Field field="primaryValue"/><br/>*/}
@@ -51,32 +50,36 @@ export default () => {
 	)
 }
 
-
-export const MetaView = Component<{field: string}>(({ field }) => {
+export const MetaView = Component<{ field: string }>(({ field }) => {
 	const entity = useEntity()
 
-	return <>
-		R: {formatBoolean(entity.getFieldMeta(field).readable ?? null) ?? '?'}{' '}
-		U: {formatBoolean(entity.getFieldMeta(field).updatable ?? null) ?? '?'}
-	</>
-
+	return (
+		<>
+			R: {formatBoolean(entity.getFieldMeta(field).readable ?? null) ?? '?'} U: {formatBoolean(entity.getFieldMeta(field).updatable ?? null) ?? '?'}
+		</>
+	)
 }, ({ field }) => {
 	return <Field field={field} withMeta={['readable', 'updatable']} />
 })
 
-
-export const AclAwareInputField = Component<{field: string}>(({ field }) => {
+export const AclAwareInputField = Component<{ field: string }>(({ field }) => {
 	const entity = useEntity()
 	if (entity.getFieldMeta(field).readable === false) {
 		return 'unavailable'
 	}
 
-	return <InputField field={field} inputProps={{
-		readOnly: entity.getFieldMeta(field).updatable === false,
-	}} />
-
+	return (
+		<InputField
+			field={field}
+			inputProps={{
+				readOnly: entity.getFieldMeta(field).updatable === false,
+			}}
+		/>
+	)
 }, ({ field }) => {
-	return <>
-		<Field field={field} withMeta={['readable', 'updatable']} />
-	</>
+	return (
+		<>
+			<Field field={field} withMeta={['readable', 'updatable']} />
+		</>
+	)
 })

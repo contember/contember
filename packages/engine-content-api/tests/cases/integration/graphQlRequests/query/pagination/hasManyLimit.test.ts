@@ -12,10 +12,7 @@ test('many has many with where, limit and orderBy', async () => {
 				e
 					.column('title', c => c.type(Model.ColumnType.String))
 					.column('locale', c => c.type(Model.ColumnType.String))
-					.manyHasMany('categories', r =>
-						r.target('Category', e => e.column('title', c => c.type(Model.ColumnType.String))).inversedBy('posts'),
-					),
-			)
+					.manyHasMany('categories', r => r.target('Category', e => e.column('title', c => c.type(Model.ColumnType.String))).inversedBy('posts')))
 			.buildSchema(),
 		query: GQL`
         query {
@@ -133,11 +130,8 @@ test('one has many with where, limit and orderBy', async () => {
 							.target('Post', e =>
 								e
 									.column('title', c => c.type(Model.ColumnType.String))
-									.column('locale', c => c.type(Model.ColumnType.String)),
-							)
-							.ownedBy('author'),
-					),
-			)
+									.column('locale', c => c.type(Model.ColumnType.String)))
+							.ownedBy('author')))
 			.buildSchema(),
 		query: GQL`
         query {
@@ -222,4 +216,3 @@ test('one has many with where, limit and orderBy', async () => {
 		},
 	})
 })
-

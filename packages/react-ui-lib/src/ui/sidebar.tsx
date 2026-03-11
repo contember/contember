@@ -3,18 +3,7 @@ import { dataAttribute } from '@contember/utilities'
 import { Slot } from '@radix-ui/react-slot'
 import { cva, VariantProps } from 'class-variance-authority'
 import { PanelLeft } from 'lucide-react'
-import {
-	ComponentProps,
-	CSSProperties,
-	ElementRef,
-	forwardRef,
-	PropsWithChildren,
-	ReactNode,
-	useCallback,
-	useEffect,
-	useMemo,
-	useState,
-} from 'react'
+import { ComponentProps, CSSProperties, ElementRef, forwardRef, PropsWithChildren, ReactNode, useCallback, useEffect, useMemo, useState } from 'react'
 import { cn, uic } from '../utils'
 import { useIsMobile } from '../utils/use-mobile'
 import { Button } from './button'
@@ -52,7 +41,10 @@ interface SidebarProviderProps extends PropsWithChildren {
 const [ctx, useSidebar] = createRequiredContext<SidebarContext>('SidebarContext')
 
 export const SidebarProvider = ({
-	defaultOpen = true, open: openProp, onOpenChange, children,
+	defaultOpen = true,
+	open: openProp,
+	onOpenChange,
+	children,
 }: SidebarProviderProps) => {
 	const isMobile = useIsMobile()
 	const [openMobile, setOpenMobile] = useState(false)
@@ -70,6 +62,7 @@ export const SidebarProvider = ({
 				_setOpen(openState)
 			}
 
+			// biome-ignore lint/suspicious/noDocumentCookie: sidebar state persistence
 			document.cookie = `${SIDEBAR_COOKIE_NAME}=${openState}; path=/; max-age=${SIDEBAR_COOKIE_MAX_AGE}`
 		},
 		[onOpenChange, open],
@@ -80,8 +73,8 @@ export const SidebarProvider = ({
 	useEffect(() => {
 		const handleKeyDown = (event: KeyboardEvent) => {
 			if (
-				event.key === SIDEBAR_KEYBOARD_SHORTCUT &&
-				(event.metaKey || event.ctrlKey)
+				event.key === SIDEBAR_KEYBOARD_SHORTCUT
+				&& (event.metaKey || event.ctrlKey)
 			) {
 				event.preventDefault()
 				toggleSidebar()
@@ -92,6 +85,7 @@ export const SidebarProvider = ({
 		return () => window.removeEventListener('keydown', handleKeyDown)
 	}, [toggleSidebar])
 
+	// biome-ignore lint/correctness/useExhaustiveDependencies: intentional
 	const contextValue = useMemo(
 		() => ({
 			state: open ? 'expanded' : 'collapsed',
@@ -116,7 +110,8 @@ export const SidebarProvider = ({
 SidebarProvider.displayName = 'SidebarProvider'
 
 export const SidebarLayout = uic('div', {
-	baseClass: 'group/sidebar-wrapper grid min-h-svh w-full has-[[data-variant=inset]]:bg-sidebar max-h-screen max-w-[100vw] overflow-y-auto md:grid-cols-[auto_1fr_auto]',
+	baseClass:
+		'group/sidebar-wrapper grid min-h-svh w-full has-[[data-variant=inset]]:bg-sidebar max-h-screen max-w-[100vw] overflow-y-auto md:grid-cols-[auto_1fr_auto]',
 	// Add grid template columns
 	style: {
 		'--sidebar-width': SIDEBAR_WIDTH,
@@ -169,7 +164,8 @@ const SidebarDesktopGap = uic('div', {
 	],
 	variants: {
 		variant: {
-			floating: 'group-data-[collapsible=icon]:w-[calc(var(--sidebar-width-icon)_+_theme(spacing.4))] 2xl:group-data-[collapsible=icon]:w-[calc(var(--sidebar-width-icon-large)_+_theme(spacing.4))]',
+			floating:
+				'group-data-[collapsible=icon]:w-[calc(var(--sidebar-width-icon)_+_theme(spacing.4))] 2xl:group-data-[collapsible=icon]:w-[calc(var(--sidebar-width-icon-large)_+_theme(spacing.4))]',
 			inset: 'group-data-[collapsible=icon]:w-5',
 			sidebar: 'group-data-[collapsible=icon]:w-(--sidebar-width-icon) 2xl:group-data-[collapsible=icon]:w-(--sidebar-width-icon-large)',
 		},
@@ -181,20 +177,25 @@ const SidebarInner = uic('div', {
 	baseClass: 'duration-200 fixed inset-y-0 z-10 hidden h-svh transition-[left,right,width] ease-linear md:block',
 	variants: {
 		side: {
-			left: 'left-0 group-data-[collapsible=offcanvas]:left-[calc(var(--sidebar-width)*-1)] 2xl:group-data-[collapsible=offcanvas]:left-[calc(var(--sidebar-width-large)*-1)]',
-			right: 'right-0 group-data-[collapsible=offcanvas]:right-[calc(var(--sidebar-width)*-1)] 2xl:group-data-[collapsible=offcanvas]:right-[calc(var(--sidebar-width-large)*-1)]',
+			left:
+				'left-0 group-data-[collapsible=offcanvas]:left-[calc(var(--sidebar-width)*-1)] 2xl:group-data-[collapsible=offcanvas]:left-[calc(var(--sidebar-width-large)*-1)]',
+			right:
+				'right-0 group-data-[collapsible=offcanvas]:right-[calc(var(--sidebar-width)*-1)] 2xl:group-data-[collapsible=offcanvas]:right-[calc(var(--sidebar-width-large)*-1)]',
 		},
 		variant: {
-			floating: 'p-2 w-(--sidebar-width) 2xl:w-(--sidebar-width-large) group-data-[collapsible=icon]:w-[calc(var(--sidebar-width-icon)_+_theme(spacing.4)_+2px)] 2xl:group-data-[collapsible=icon]:w-[calc(var(--sidebar-width-icon-large)_+_theme(spacing.4)_+2px)]',
+			floating:
+				'p-2 w-(--sidebar-width) 2xl:w-(--sidebar-width-large) group-data-[collapsible=icon]:w-[calc(var(--sidebar-width-icon)_+_theme(spacing.4)_+2px)] 2xl:group-data-[collapsible=icon]:w-[calc(var(--sidebar-width-icon-large)_+_theme(spacing.4)_+2px)]',
 			inset: 'p-2 w-(--sidebar-width) 2xl:w-(--sidebar-width-large) group-data-[collapsible=icon]:w-5',
-			sidebar: 'w-(--sidebar-width) 2xl:w-(--sidebar-width-large) group-data-[collapsible=icon]:w-(--sidebar-width-icon) group-data-[side=left]:border-r group-data-[side=left]:border-gray-200 group-data-[side=right]:border-l 2xl:group-data-[collapsible=icon]:w-(--sidebar-width-icon-large)',
+			sidebar:
+				'w-(--sidebar-width) 2xl:w-(--sidebar-width-large) group-data-[collapsible=icon]:w-(--sidebar-width-icon) group-data-[side=left]:border-r group-data-[side=left]:border-gray-200 group-data-[side=right]:border-l 2xl:group-data-[collapsible=icon]:w-(--sidebar-width-icon-large)',
 		},
 	},
 	variantsAsDataAttrs: ['variant', 'side'],
-	wrapInner: ({ children }) =>
+	wrapInner: ({ children }) => (
 		<div data-sidebar="sidebar" className="grid h-full w-full grid-rows-[auto_1fr_auto]">
 			{children}
-		</div>,
+		</div>
+	),
 	displayName: 'SidebarInner',
 })
 
@@ -251,7 +252,6 @@ export const Sidebar = forwardRef<HTMLDivElement, SidebarProps>(
 )
 Sidebar.displayName = 'Sidebar'
 
-
 export const SidebarTrigger = forwardRef<ElementRef<typeof Button>, ComponentProps<typeof Button>>(({
 	className,
 	onClick,
@@ -260,10 +260,18 @@ export const SidebarTrigger = forwardRef<ElementRef<typeof Button>, ComponentPro
 	const { toggleSidebar } = useSidebar()
 
 	return (
-		<Button ref={ref} data-sidebar="trigger" variant="ghost" size="icon" className={cn('h-7 w-7', className)} onClick={event => {
-			onClick?.(event)
-			toggleSidebar()
-		}} {...props}>
+		<Button
+			ref={ref}
+			data-sidebar="trigger"
+			variant="ghost"
+			size="icon"
+			className={cn('h-7 w-7', className)}
+			onClick={event => {
+				onClick?.(event)
+				toggleSidebar()
+			}}
+			{...props}
+		>
 			<PanelLeft size={16} />
 			<span className="sr-only">Toggle Sidebar</span>
 		</Button>
@@ -473,7 +481,9 @@ export const SidebarMenuButton = forwardRef<HTMLAnchorElement, SidebarMenuButton
 					side="right"
 					align="center"
 					hidden={state !== 'collapsed' || isMobile}
-				>{tooltip}</TooltipContent>
+				>
+					{tooltip}
+				</TooltipContent>
 			</Tooltip>
 		)
 	},
@@ -497,7 +507,8 @@ export const SidebarMenuAction = uic('button', {
 	},
 	variants: {
 		showInHover: {
-			true: 'group-focus-within/menu-item:opacity-100 group-hover/menu-item:opacity-100 data-[state=open]:opacity-100 peer-data-[active=true]/menu-button:text-sidebar-accent-foreground md:opacity-0',
+			true:
+				'group-focus-within/menu-item:opacity-100 group-hover/menu-item:opacity-100 data-[state=open]:opacity-100 peer-data-[active=true]/menu-button:text-sidebar-accent-foreground md:opacity-0',
 		},
 	},
 	displayName: '',

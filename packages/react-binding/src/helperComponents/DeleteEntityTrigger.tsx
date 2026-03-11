@@ -6,11 +6,9 @@ import { useEntity } from '../accessorPropagation'
 import { useMutationState } from '../accessorTree'
 import { composeEventHandlers } from '@radix-ui/primitive'
 
-
 const SlotType = Slot as React.ForwardRefExoticComponent<React.ButtonHTMLAttributes<HTMLButtonElement> & React.RefAttributes<HTMLButtonElement>>
 
 export interface DeleteEntityTriggerProps {
-
 	/**
 	 * If true, binding will trigger persist immediately after the entity is deleted.
 	 */
@@ -61,11 +59,11 @@ export const DeleteEntityTrigger = ({ immediatePersist, onPersistError, onPersis
 		}
 	}, [parentEntity, immediatePersist, triggerPersist])
 
+	// biome-ignore lint/correctness/useExhaustiveDependencies: intentional
 	useEffect(() => {
 		if (!immediatePersist && (onPersistError || onPersistSuccess)) {
 			console.warn('DeleteEntityTrigger: onPersistError and onPersistSuccess are ignored when immediatePersist is not true.')
 		}
-		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [])
 
 	const { onClick, ...otherProps } = props as React.ButtonHTMLAttributes<HTMLButtonElement>

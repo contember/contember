@@ -47,7 +47,6 @@ test('Content API: assume identity', async () => {
 		.set('X-Contember-assume-identity', assumedIdentityId)
 		.expect(200)
 
-
 	await tester(
 		gql`
 			query {
@@ -62,7 +61,6 @@ test('Content API: assume identity', async () => {
 		.expect({ data: { events: [{ tableName: 'tag', identityId: assumedIdentityId }] } })
 		.expect(200)
 })
-
 
 test('Content API: assume identity is declined', async () => {
 	const tester = await createTester(createSchema(TagModel, schema => {
@@ -107,7 +105,6 @@ test('Content API: assume identity is declined', async () => {
 	)
 		.set('X-Contember-assume-identity', assumedIdentityId)
 		.expect(200)
-
 
 	await tester(
 		gql`

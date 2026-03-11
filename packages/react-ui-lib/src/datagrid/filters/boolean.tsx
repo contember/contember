@@ -60,7 +60,6 @@ const DataGridBooleanFilterList = () => (
 	</>
 )
 
-
 const DataGridBooleanFilterSelect = ({ label }: {
 	label?: ReactNode
 }) => (
@@ -83,9 +82,7 @@ export const DataGridBooleanFilterControls = () => {
 			<div className={'flex gap-2'}>
 				{[true, false].map(it => (
 					<DataViewBooleanFilterTrigger action={'toggle'} value={it} key={it.toString()}>
-						<Button size={'lg'} className={'w-full data-[active]:shadow-inner data-[active]:text-blue-500'}
-							variant={'outline'}>
-
+						<Button size={'lg'} className={'w-full data-[active]:shadow-inner data-[active]:text-blue-500'} variant={'outline'}>
 							<span className={'text-xs font-semibold'}>
 								{formatBoolean(it)}
 							</span>

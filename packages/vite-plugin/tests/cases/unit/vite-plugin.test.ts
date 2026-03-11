@@ -1,6 +1,6 @@
-import { describe, it, expect, beforeEach, afterEach, spyOn, mock } from 'bun:test'
+import { afterEach, beforeEach, describe, expect, it, mock, spyOn } from 'bun:test'
 import contember from '../../../src'
-import { ConfigEnv, UserConfig, Plugin } from 'vite'
+import { ConfigEnv, Plugin, UserConfig } from 'vite'
 
 const invokePluginHook = (plugin: Plugin, hookName: string, ...args: any[]) => {
 	const hook = plugin[hookName]
@@ -15,7 +15,7 @@ const invokePluginHook = (plugin: Plugin, hookName: string, ...args: any[]) => {
 const createMockServer = () => {
 	return {
 		middlewares: {
-			use: mock(() => { }),
+			use: mock(() => {}),
 		},
 	}
 }
@@ -84,7 +84,7 @@ describe('contember vite plugin', () => {
 
 		it('should handle SPA routing middleware correctly', () => {
 			const plugin = contember({ appPath: '/app' })
-			const mockServerMiddleware = mock(() => { })
+			const mockServerMiddleware = mock(() => {})
 			const mockServer = { middlewares: { use: mockServerMiddleware } }
 
 			invokePluginHook(plugin, 'configureServer', mockServer)
@@ -105,7 +105,7 @@ describe('contember vite plugin', () => {
 
 			testCases.forEach(([url, expected]) => {
 				const req = { url }
-				const next = mock(() => { })
+				const next = mock(() => {})
 
 				middleware(req, {}, next)
 
@@ -139,7 +139,7 @@ describe('contember vite plugin', () => {
 
 		it('should handle invalid DSN format', () => {
 			process.env.CONTEMBER_DSN = 'invalid-dsn'
-			const consoleSpy = spyOn(console, 'warn').mockImplementation(() => { })
+			const consoleSpy = spyOn(console, 'warn').mockImplementation(() => {})
 			const plugin = contember()
 			const configResult = getPluginConfigResult(plugin)
 

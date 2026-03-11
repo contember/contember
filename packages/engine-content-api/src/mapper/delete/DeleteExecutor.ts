@@ -158,7 +158,6 @@ export class DeleteExecutor {
 		return await this.processDeleteResult(state, mapper, entity, result, orphanRemovals)
 	}
 
-
 	private async collectOnDeleteInfo(state: DeleteState, mapper: Mapper, entity: Model.Entity, values: Input.PrimaryValue[]): Promise<void> {
 		if (values.length === 0) {
 			return
@@ -210,7 +209,6 @@ export class DeleteExecutor {
 		await this.processDeleteResult(state, mapper, entity, result, orphanRemovals)
 	}
 
-
 	private async collectSetNullResult(
 		state: DeleteState,
 		mapper: Mapper,
@@ -239,7 +237,6 @@ export class DeleteExecutor {
 			+ ' OnDelete behaviour of this relation is set to "set null". This is possibly caused by ACL denial.'
 		state.pushFailResult(new MutationConstraintViolationError([], ConstraintType.foreignKey, message))
 	}
-
 
 	private async collectRestrictResult(
 		state: DeleteState,
@@ -278,7 +275,6 @@ export class DeleteExecutor {
 			const entity = getEntity(this.schema, orphanRemoval[0])
 			const orphanResult = await this.collectDeleteInfo(state, mapper, entity, { [entity.primary]: { in: orphanRemoval[1] } })
 			deleteQueue.push([entity, orphanResult])
-
 		} while (true)
 	}
 
@@ -294,7 +290,11 @@ export class DeleteExecutor {
 		return orphanColumns.reduce((qb, column) => qb.select(['root_', column], `_${column}`), qb)
 	}
 
-	private createFetchByIdQueryBuilder(entity: Model.Entity, relation: Model.ManyHasOneRelation | Model.OneHasOneOwningRelation, values: Input.PrimaryValue[]) {
+	private createFetchByIdQueryBuilder(
+		entity: Model.Entity,
+		relation: Model.ManyHasOneRelation | Model.OneHasOneOwningRelation,
+		values: Input.PrimaryValue[],
+	) {
 		return SelectBuilder.create<EntityReferenceRow>()
 			.from(entity.tableName, 'root_')
 			.select(['root_', entity.primaryColumn], 'id')
@@ -302,10 +302,9 @@ export class DeleteExecutor {
 			.where(expr => expr.in(['root_', relation.joiningColumn.columnName], values))
 	}
 
-	private filterPlannedForDelete<R extends {id: Input.PrimaryValue}>(state: DeleteState, entity: Model.Entity, values: R[]): R[] {
+	private filterPlannedForDelete<R extends { id: Input.PrimaryValue }>(state: DeleteState, entity: Model.Entity, values: R[]): R[] {
 		return values.filter(it => !state.isPlannedDelete(entity.name, it.id))
 	}
-
 
 	private async processDeleteResult(
 		state: DeleteState,

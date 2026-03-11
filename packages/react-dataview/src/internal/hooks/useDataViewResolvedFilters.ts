@@ -21,8 +21,9 @@ export const useDataViewResolvedFilters = ({
 	}, [filterTypes, filters, environment, entities])
 }
 
-
-export const resolveFilters = ({ filterTypes, filters, environment, entities }: UseDataViewResolvedFiltersArgs & { environment: Environment }): Filter<never> => {
+export const resolveFilters = (
+	{ filterTypes, filters, environment, entities }: UseDataViewResolvedFiltersArgs & { environment: Environment },
+): Filter<never> => {
 	const ands: Filter[] = []
 	for (const [key, value] of Object.entries(filters)) {
 		const handler = filterTypes?.[key]

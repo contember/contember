@@ -33,7 +33,7 @@ export interface DataViewIsDefinedFilterProps {
  * ## Example
  * ```tsx
  * <DataViewIsDefinedFilter field="profilePicture">
- *   //  Filter controls here 
+ *   //  Filter controls here
  * </DataViewIsDefinedFilter>
  * ```
  */

@@ -1,7 +1,14 @@
 import nodeAssert from 'node:assert'
 import supertest from 'supertest'
 import { Schema } from '@contember/schema'
-import { Migration, MigrationVersionHelper, ModificationHandlerFactory, SchemaDiffer, SchemaMigrator, VERSION_LATEST } from '@contember/schema-migrations'
+import {
+	Migration,
+	MigrationVersionHelper,
+	ModificationHandlerFactory,
+	SchemaDiffer,
+	SchemaMigrator,
+	VERSION_LATEST,
+} from '@contember/schema-migrations'
 import { emptySchema } from '@contember/schema-utils'
 import { afterEach, beforeEach, expect } from 'bun:test'
 import { TenantClient } from './TenantClient'
@@ -21,13 +28,11 @@ beforeEach(() => {
 	latestError = null
 })
 
-afterEach(ctx => {
+afterEach(() => {
 	// if (latestError !== null && ctx.task.result.state === 'fail') {
-	// 	// eslint-disable-next-line no-console
 	// 	console.error(latestError)
 	// }
 })
-
 
 export const executeGraphql = (
 	path: string,
@@ -54,13 +59,11 @@ export const executeGraphql = (
 	return result
 }
 
-
 const createMigrations = (schema: Schema) => {
 	const modificationHandlerFactory = new ModificationHandlerFactory(ModificationHandlerFactory.defaultFactoryMap)
 	const differ = new SchemaDiffer(new SchemaMigrator(modificationHandlerFactory))
 	return differ.diffSchemas(emptySchema, schema)
 }
-
 
 const executeMigrations = async (projectSlug: string, modifications: Migration.Modification[], fullName: string = '2024-07-01-120000-init') => {
 	const version = MigrationVersionHelper.extractVersion(fullName)
@@ -83,7 +86,8 @@ const executeMigrations = async (projectSlug: string, modifications: Migration.M
 					name: fullName,
 				}],
 			},
-		})
+		},
+	)
 		.expect(response => {
 			expect(response.body.data).toStrictEqual({
 				migrate: {
@@ -108,7 +112,8 @@ export const createTester = async (schema: Schema) => {
 
 	const queryCb = (
 		query: string,
-		options: { path?: string; authorizationToken?: string; variables?: Record<string, any> } = {}) => {
+		options: { path?: string; authorizationToken?: string; variables?: Record<string, any> } = {},
+	) => {
 		return executeGraphql(options.path ?? '/content/' + projectSlug + '/live', query, options)
 	}
 	queryCb.projectSlug = projectSlug
@@ -128,7 +133,6 @@ export const consumeMails = async () => {
 	})
 	return messages
 }
-
 
 const mailHogUrl = String(process.env.MAILHOG_URL)
 

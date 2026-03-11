@@ -1,9 +1,4 @@
-import {
-	GraphQlClientError,
-	useCurrentContentGraphQlClient,
-	useCurrentSystemGraphQlClient,
-	useTenantGraphQlClient,
-} from '@contember/react-client'
+import { GraphQlClientError, useCurrentContentGraphQlClient, useCurrentSystemGraphQlClient, useTenantGraphQlClient } from '@contember/react-client'
 import { ReactNode, useCallback, useEffect, useRef, useState } from 'react'
 import type { TreeRootAccessor } from '@contember/binding'
 import { DataBinding, Environment, TreeStore } from '@contember/binding'
@@ -30,7 +25,7 @@ export const useDataBinding = ({
 	const environment = useEnvironment()
 	const environmentWithSchema = useEnvironmentWithSchema(environment)
 
-	const currentTreeStore = useRef<TreeStore>()
+	const currentTreeStore = useRef<TreeStore>(undefined)
 	const isMountedRef = useIsMounted()
 
 	const [state, setState] = useState<AccessorTreeState & { binding?: DataBinding<ReactNode> }>({
@@ -41,23 +36,27 @@ export const useDataBinding = ({
 	const resetDataBinding = useCallback((environment: Environment, newStore: boolean) => {
 		const onUpdate = (data: TreeRootAccessor<ReactNode>, binding: DataBinding<ReactNode>) => {
 			if (isMountedRef.current) {
-				setState(it => it.name === 'error' || it.binding !== binding ? it : {
-					name: 'initialized',
-					environment,
-					binding,
-					data,
-				})
+				setState(it =>
+					it.name === 'error' || it.binding !== binding ? it : {
+						name: 'initialized',
+						environment,
+						binding,
+						data,
+					}
+				)
 			}
 		}
 
 		const onError = (error: GraphQlClientError, binding: DataBinding<ReactNode>) => {
 			if (isMountedRef.current) {
-				setState(it => it.binding !== binding ? it :  {
-					name: 'error',
-					environment,
-					binding,
-					error,
-				})
+				setState(it =>
+					it.binding !== binding ? it : {
+						name: 'error',
+						environment,
+						binding,
+						error,
+					}
+				)
 			}
 		}
 
@@ -90,9 +89,7 @@ export const useDataBinding = ({
 			},
 		)
 		setState({ binding, environment, name: 'initializing' })
-
 	}, [contentClient, systemClient, tenantClient, isMountedRef, refreshOnPersist, skipStateUpdateAfterPersist])
-
 
 	useEffect(() => {
 		if (environmentWithSchema) {

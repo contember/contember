@@ -9,7 +9,6 @@ export type TextFilterArtifacts = {
 	nullCondition?: boolean
 }
 
-
 export const createTextFilter = createFieldFilterHandler<TextFilterArtifacts>({
 	createCondition: filter => {
 		const condition = filter.query !== '' ? createGenericTextCellFilterCondition(filter) : {}

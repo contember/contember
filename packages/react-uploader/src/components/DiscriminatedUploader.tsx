@@ -39,7 +39,6 @@ export const DiscriminatedUploader = Component<DiscriminatedUploaderProps>(({ ba
 		accept: resolveAllAcceptedMimes(Object.values(types).map(it => it.accept)),
 	}), [types])
 
-
 	return (
 		<UploaderStateContext.Provider value={files}>
 			<UploaderUploadFilesContext.Provider value={onDrop}>

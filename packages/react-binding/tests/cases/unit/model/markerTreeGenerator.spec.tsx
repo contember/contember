@@ -1,4 +1,4 @@
-import { expect, it, describe } from 'bun:test'
+import { describe, expect, it } from 'bun:test'
 import {
 	EntityFieldMarker,
 	EntityFieldMarkersContainer,
@@ -6,7 +6,8 @@ import {
 	EntityListSubTreeMarker,
 	EntitySubTree,
 	EntitySubTreeMarker,
-	Environment, EventListenersStore,
+	Environment,
+	EventListenersStore,
 	Field,
 	FieldMarker,
 	HasMany,
@@ -182,7 +183,6 @@ describe('Marker tree generator', () => {
 						},
 					],
 				},
-
 			],
 			enums: [],
 		}))
@@ -237,7 +237,10 @@ describe('Marker tree generator', () => {
 			environment,
 		)
 
-		const idMarker = [PRIMARY_KEY_NAME, new FieldMarker({ field: PRIMARY_KEY_NAME, defaultValue: undefined, eventListeners: undefined, isNonbearing: false, meta: [] })] as const
+		const idMarker = [
+			PRIMARY_KEY_NAME,
+			new FieldMarker({ field: PRIMARY_KEY_NAME, defaultValue: undefined, eventListeners: undefined, isNonbearing: false, meta: [] }),
+		] as const
 		const fooEntity = schema.getEntity('Foo')
 		const barEntity = schema.getEntity('Bar')
 		const subTreeEnv = environment.withSubTree({
@@ -286,33 +289,40 @@ describe('Marker tree generator', () => {
 				true,
 				new Map([
 					idMarker,
-					['same', new FieldMarker({
-						field: 'same',
-						defaultValue: undefined,
-						eventListeners: undefined,
-						isNonbearing: false,
-						meta: [],
-					})],
-					['name', new FieldMarker({
-						field: 'name',
-						defaultValue: undefined,
-						eventListeners: undefined,
-						// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-						// @ts-ignore
-						hasOneRelationPath: [],
-						isNonbearing: false,
-						meta: [],
-					})],
-					['surname', new FieldMarker({
-						field: 'surname',
-						defaultValue: undefined,
-						eventListeners: undefined,
-						// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-						// @ts-ignore
-						hasOneRelationPath: [],
-						isNonbearing: false,
-						meta: [],
-					})],
+					[
+						'same',
+						new FieldMarker({
+							field: 'same',
+							defaultValue: undefined,
+							eventListeners: undefined,
+							isNonbearing: false,
+							meta: [],
+						}),
+					],
+					[
+						'name',
+						new FieldMarker({
+							field: 'name',
+							defaultValue: undefined,
+							eventListeners: undefined,
+							// @ts-ignore
+							hasOneRelationPath: [],
+							isNonbearing: false,
+							meta: [],
+						}),
+					],
+					[
+						'surname',
+						new FieldMarker({
+							field: 'surname',
+							defaultValue: undefined,
+							eventListeners: undefined,
+							// @ts-ignore
+							hasOneRelationPath: [],
+							isNonbearing: false,
+							meta: [],
+						}),
+					],
 				]),
 				new Map([
 					[PRIMARY_KEY_NAME, idMarker[1].placeholderName],
@@ -332,10 +342,13 @@ describe('Marker tree generator', () => {
 				// forceCreation: false,
 				isNonbearing: false,
 				reducedBy: undefined,
-				eventListeners: new EventListenersStore(undefined, new Map([
-					['beforePersist', new Set([onBeforePersist2])],
-					['initialize', new Set([onInit7, onInit8])],
-				])),
+				eventListeners: new EventListenersStore(
+					undefined,
+					new Map([
+						['beforePersist', new Set([onBeforePersist2])],
+						['initialize', new Set([onInit7, onInit8])],
+					]),
+				),
 				expectedMutation: 'anyMutation',
 				meta: [],
 			},
@@ -344,16 +357,18 @@ describe('Marker tree generator', () => {
 				new Map<PlaceholderName, EntityFieldMarker>([
 					idMarker,
 					[innerHasMany.placeholderName, innerHasMany],
-					['hasOneField', new FieldMarker({
-						field: 'hasOneField',
-						defaultValue: undefined,
-						eventListeners: undefined,
-						// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-						// @ts-ignore
-						hasOneRelationPath: [],
-						isNonbearing: false,
-						meta: [],
-					})],
+					[
+						'hasOneField',
+						new FieldMarker({
+							field: 'hasOneField',
+							defaultValue: undefined,
+							eventListeners: undefined,
+							// @ts-ignore
+							hasOneRelationPath: [],
+							isNonbearing: false,
+							meta: [],
+						}),
+					],
 				]),
 				new Map([
 					[PRIMARY_KEY_NAME, idMarker[1].placeholderName],
@@ -363,8 +378,6 @@ describe('Marker tree generator', () => {
 			),
 			hasOneEnv,
 		)
-
-
 
 		const outerHasMany = new HasManyRelationMarker(
 			{
@@ -386,16 +399,18 @@ describe('Marker tree generator', () => {
 				true,
 				new Map<PlaceholderName, EntityFieldMarker>([
 					idMarker,
-					['hasManyField', new FieldMarker({
-						field: 'hasManyField',
-						defaultValue: undefined,
-						eventListeners: undefined,
-						// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-						// @ts-ignore
-						hasOneRelationPath: [],
-						isNonbearing: false,
-						meta: [],
-					})],
+					[
+						'hasManyField',
+						new FieldMarker({
+							field: 'hasManyField',
+							defaultValue: undefined,
+							eventListeners: undefined,
+							// @ts-ignore
+							hasOneRelationPath: [],
+							isNonbearing: false,
+							meta: [],
+						}),
+					],
 					[hasOne.placeholderName, hasOne],
 				]),
 				new Map([
@@ -416,10 +431,13 @@ describe('Marker tree generator', () => {
 				isNonbearing: false,
 				setOnCreate: undefined,
 				// forceCreation: false,
-				eventListeners: new EventListenersStore(undefined, new Map([
-					['beforePersist', new Set([onBeforePersist1])],
-					['initialize', new Set([onInit1, onInit2, onInit3, onInit4])],
-				])),
+				eventListeners: new EventListenersStore(
+					undefined,
+					new Map([
+						['beforePersist', new Set([onBeforePersist1])],
+						['initialize', new Set([onInit1, onInit2, onInit3, onInit4])],
+					]),
+				),
 				expectedMutation: 'anyMutation',
 				alias: undefined,
 			},
@@ -428,16 +446,18 @@ describe('Marker tree generator', () => {
 				new Map<PlaceholderName, EntityFieldMarker>([
 					idMarker,
 					[outerHasMany.placeholderName, outerHasMany],
-					['fooField', new FieldMarker({
-						field: 'fooField',
-						defaultValue: undefined,
-						eventListeners: undefined,
-						// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-						// @ts-ignore
-						hasOneRelationPath: [],
-						isNonbearing: false,
-						meta: [],
-					})],
+					[
+						'fooField',
+						new FieldMarker({
+							field: 'fooField',
+							defaultValue: undefined,
+							eventListeners: undefined,
+							// @ts-ignore
+							hasOneRelationPath: [],
+							isNonbearing: false,
+							meta: [],
+						}),
+					],
 				]),
 				new Map([
 					[PRIMARY_KEY_NAME, idMarker[1].placeholderName],
@@ -467,16 +487,18 @@ describe('Marker tree generator', () => {
 			},
 			new EntityFieldMarkersContainer(
 				true,
-				new Map<PlaceholderName, EntityFieldMarker>([idMarker, ['whatever', new FieldMarker({
-					field: 'whatever',
-					defaultValue: undefined,
-					eventListeners: undefined,
-					// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-					// @ts-ignore
-					hasOneRelationPath: [],
-					isNonbearing: false,
-					meta: [],
-				})]]),
+				new Map<PlaceholderName, EntityFieldMarker>([idMarker, [
+					'whatever',
+					new FieldMarker({
+						field: 'whatever',
+						defaultValue: undefined,
+						eventListeners: undefined,
+						// @ts-ignore
+						hasOneRelationPath: [],
+						isNonbearing: false,
+						meta: [],
+					}),
+				]]),
 				new Map([
 					[PRIMARY_KEY_NAME, idMarker[1].placeholderName],
 					['whatever', 'whatever'],

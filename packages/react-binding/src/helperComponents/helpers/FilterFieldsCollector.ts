@@ -9,7 +9,6 @@ export class FilterFieldsCollector {
 	) {
 	}
 
-
 	collectFields(entity: SchemaEntity): Set<string> {
 		const result = new Set<string>()
 		this.collectFieldsInternal(this.rootFilter, entity, [], result)
@@ -23,16 +22,16 @@ export class FilterFieldsCollector {
 					throw new BindingError()
 				}
 				value?.forEach(it => this.collectFieldsInternal(it, entity, path, result))
-
 			} else if (key === 'not') {
 				this.collectFieldsInternal(value as Filter, entity, path, result)
-
 			} else {
 				const field = entity.fields.get(key)
 				if (!field) {
-					throw new BindingError(`Invalid field: the name "${key}" does not exist on entity "${entity.name}" `
-						+ `in a ${path.length === 0 ? 'root' : `path "${path.join('.')}"`} of a following filter:\n`
-						+ JSON.stringify(this.rootFilter, null, '  '))
+					throw new BindingError(
+						`Invalid field: the name "${key}" does not exist on entity "${entity.name}" `
+							+ `in a ${path.length === 0 ? 'root' : `path "${path.join('.')}"`} of a following filter:\n`
+							+ JSON.stringify(this.rootFilter, null, '  '),
+					)
 				}
 				if (field.__typename === '_Column') {
 					result.add([...path, key].join('.'))

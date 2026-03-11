@@ -32,7 +32,8 @@ test('update (composed unique)', async () => {
 					},
 				},
 				{
-					sql: SQL`with "newData_" as (select ? :: text as "title", "root_"."title" as "title_old__", "root_"."id", "root_"."locale", "root_"."post_id"  from "public"."post_locale" as "root_"  where "root_"."id" = ?) 
+					sql:
+						SQL`with "newData_" as (select ? :: text as "title", "root_"."title" as "title_old__", "root_"."id", "root_"."locale", "root_"."post_id"  from "public"."post_locale" as "root_"  where "root_"."id" = ?) 
 							update  "public"."post_locale" set  "title" =  "newData_"."title"   from "newData_"  where "post_locale"."id" = "newData_"."id"  returning "title_old__"`,
 					parameters: ['Hello', testUuid(1)],
 					response: { rows: [{ title_old__: 'Hi' }] },
@@ -77,12 +78,11 @@ test('update (incomplete composed unique)', async () => {
 					errors: [
 						{
 							type: 'NonUniqueWhereInput',
-							message:
-								'Provided where is not unique for entity PostLocale:\n' +
-								'Provided value: {"post":{"id":"123e4567-e89b-12d3-a456-000000000002"}}\n' +
-								'Known unique key combinations:\n' +
-								'\t - id\n' +
-								'\t - locale, post',
+							message: 'Provided where is not unique for entity PostLocale:\n'
+								+ 'Provided value: {"post":{"id":"123e4567-e89b-12d3-a456-000000000002"}}\n'
+								+ 'Known unique key combinations:\n'
+								+ '\t - id\n'
+								+ '\t - locale, post',
 						},
 					],
 				},
@@ -90,4 +90,3 @@ test('update (incomplete composed unique)', async () => {
 		},
 	})
 })
-

@@ -11,13 +11,11 @@ import { OneHasManyCreateInputProcessor } from './relations/OneHasManyCreateInpu
 import { ManyHasOneCreateInputProcessor } from './relations/ManyHasOneCreateInputProcessor'
 import { ManyHasManyCreateInputProcessor } from './relations/ManyHasManyCreateInputProcessor'
 
-
 export type SqlCreateInputProcessorResult = MutationResultList | ((ctx: { primary: Input.PrimaryValue }) => Promise<MutationResultList>)
 export class SqlCreateInputProcessor implements CreateInputProcessor<SqlCreateInputProcessorResult> {
-
-	private oneHasOneInverseCreateInputProcessor:  OneHasOneInverseCreateInputProcessor
-	private oneHasOneOwningCreateInputProcessor:  OneHasOneOwningCreateInputProcessor
-	private oneHasManyCreateInputProcessor:  OneHasManyCreateInputProcessor
+	private oneHasOneInverseCreateInputProcessor: OneHasOneInverseCreateInputProcessor
+	private oneHasOneOwningCreateInputProcessor: OneHasOneOwningCreateInputProcessor
+	private oneHasManyCreateInputProcessor: OneHasManyCreateInputProcessor
 	private manyHasOneCreateInputProcessor: ManyHasOneCreateInputProcessor
 	private manyHasManyCreateInputProcessor: ManyHasManyCreateInputProcessor
 
@@ -69,7 +67,6 @@ export class SqlCreateInputProcessor implements CreateInputProcessor<SqlCreateIn
 		create: hasManyProcessor(ctx => this.oneHasManyCreateInputProcessor.create(ctx)),
 		connectOrCreate: hasManyProcessor(ctx => this.oneHasManyCreateInputProcessor.connectOrCreate(ctx)),
 	}
-
 
 	oneHasOneOwning: CreateInputProcessor<SqlCreateInputProcessorResult>['oneHasOneOwning'] = {
 		nothing: async ctx => {

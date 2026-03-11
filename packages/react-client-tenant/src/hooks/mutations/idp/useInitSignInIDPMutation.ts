@@ -3,7 +3,6 @@ import { LoginToken } from '../../useTenantApi'
 import { createTenantMutation } from '../../useTenantMutation'
 import { ModelType } from 'graphql-ts-client-api'
 
-
 export type InitSignInIDPMutationVariables = {
 	identityProvider: string
 	data: {
@@ -24,6 +23,10 @@ const InitSignInIDPMutation = TenantApi
 		options => options.alias('mutation'),
 	)
 
-export const useInitSignInIDPMutation = createTenantMutation<InitSignInIDPMutationResult, TenantApi.InitSignInIDPErrorCode, InitSignInIDPMutationVariables>(InitSignInIDPMutation, {
+export const useInitSignInIDPMutation = createTenantMutation<
+	InitSignInIDPMutationResult,
+	TenantApi.InitSignInIDPErrorCode,
+	InitSignInIDPMutationVariables
+>(InitSignInIDPMutation, {
 	apiToken: LoginToken,
 })

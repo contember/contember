@@ -3,7 +3,6 @@ import { ReactNode, useEffect } from 'react'
 import { useFetchIdentity } from '../hooks'
 import { IdentityContext, IdentityMethodsContext, IdentityStateContext } from '../contexts'
 
-
 export interface IdentityProviderProps {
 	children: ReactNode
 }
@@ -18,7 +17,6 @@ export const IdentityProvider: React.FC<IdentityProviderProps> = ({ children }) 
 			refreshIdentity()
 		}
 	}, [sessionToken, refreshIdentity])
-
 
 	const hasIdentity = identity !== undefined
 	useEffect(() => {

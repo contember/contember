@@ -1,9 +1,4 @@
-import {
-	useId,
-	useOnElementClickOutsideCallback,
-	useReferentiallyStableCallback,
-	useWindowSize,
-} from '@contember/react-utils'
+import { useId, useOnElementClickOutsideCallback, useReferentiallyStableCallback, useWindowSize } from '@contember/react-utils'
 import { dataAttribute } from '@contember/utilities'
 import { type PropsWithChildren, type ReactNode, useCallback, useEffect, useRef, useState } from 'react'
 
@@ -22,6 +17,7 @@ export const DevBar = ({
 		setExpanded(expanded => !expanded)
 	})
 
+	// biome-ignore lint/correctness/useExhaustiveDependencies: intentional
 	useEffect(() => {
 		function handleKeyDown(event: KeyboardEvent) {
 			if (event.code === 'KeyJ' && (event.ctrlKey || event.metaKey)) {
@@ -96,12 +92,10 @@ export const DevPanel = ({ heading, icon, children, preview }: DevPanelProps) =>
 
 		const handleClickOutside = (event: MouseEvent) => {
 			const rect = dialog.getBoundingClientRect()
-			const isInDialog = (
-				rect.top <= event.clientY &&
-				event.clientY <= rect.top + rect.height &&
-				rect.left <= event.clientX &&
-				event.clientX <= rect.left + rect.width
-			)
+			const isInDialog = rect.top <= event.clientY
+				&& event.clientY <= rect.top + rect.height
+				&& rect.left <= event.clientX
+				&& event.clientX <= rect.left + rect.width
 
 			if (!isInDialog) {
 				dialog.close()

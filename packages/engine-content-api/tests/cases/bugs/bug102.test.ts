@@ -12,17 +12,12 @@ test('Filter by has many with additional join', async () => {
 			.entity('Person', entity =>
 				entity
 					.column('shortName')
-					.oneHasMany('locales', relation =>
-						relation.target('PersonLocale').onDelete(Model.OnDelete.cascade).ownedBy('person').ownerNotNull(),
-					),
-			)
+					.oneHasMany('locales', relation => relation.target('PersonLocale').onDelete(Model.OnDelete.cascade).ownedBy('person').ownerNotNull()))
 			.entity('PersonLocale', entity =>
 				entity
 					.unique(['locale', 'person'])
 					.manyHasOne('locale', relation => relation.target('Language').notNull())
-					.column('urlSlug'),
-			)
-
+					.column('urlSlug'))
 			.buildSchema(),
 		query: GQL`
       query {
@@ -83,5 +78,3 @@ where "root_locale"."slug" = ? and "root_"."person_id" in (?)`,
 		},
 	})
 })
-
-

@@ -5,7 +5,6 @@ import { GQL, SQL } from '../../../../../src/tags'
 import { PermissionFactory } from '../../../../../../src'
 import { testUuid } from '../../../../../src/testUuid'
 
-
 namespace RowPredicateSubset {
 	export const ownerRole = acl.createRole('owner')
 	export const personIdVariable = acl.createPredefinedVariable('personId', 'personID', ownerRole)
@@ -36,7 +35,6 @@ namespace RowPredicateSubset {
 		resources = def.oneHasMany(Resource, 'owner')
 	}
 }
-
 
 test('owner predicate with isNull', async () => {
 	const schema = createSchema(RowPredicateSubset)
@@ -73,5 +71,3 @@ test('owner predicate with isNull', async () => {
 		},
 	})
 })
-
-

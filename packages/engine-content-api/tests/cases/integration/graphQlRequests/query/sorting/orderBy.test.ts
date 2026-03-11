@@ -35,7 +35,6 @@ test('Entity - explicit order by, default asc', async () => {
 	})
 })
 
-
 test('Entity - explicit order by desc', async () => {
 	await execute({
 		schema: new SchemaBuilder()

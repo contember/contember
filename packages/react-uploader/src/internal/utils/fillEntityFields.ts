@@ -10,7 +10,7 @@ export const executeExtractors = async ({ fileType, file, result }: { fileType: 
 	if (file.abortController.signal.aborted) {
 		return undefined
 	}
-	return ({ entity }: {entity: EntityAccessor}) => {
+	return ({ entity }: { entity: EntityAccessor }) => {
 		entity.batchUpdates(getAccessor => {
 			fileType.extractors?.forEach(it => {
 				return it.populateFields?.({ entity: getAccessor(), result })
@@ -21,6 +21,5 @@ export const executeExtractors = async ({ fileType, file, result }: { fileType: 
 				}
 			})
 		})
-
 	}
 }

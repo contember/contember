@@ -6,28 +6,30 @@ import { expect } from 'bun:test'
 export const createConnectionMockAlt = (...queries: { sql: string; timeout?: number; result?: any }[][]): [Connection, () => void] => {
 	const connectionMocks: (PgClient & { assertEmpty: () => void })[] = []
 	for (const queriesSet of queries) {
-		connectionMocks.push(new class extends EventEmitter {
-			connect() {
-				return Promise.resolve()
-			}
+		connectionMocks.push(
+			new class extends EventEmitter {
+				connect() {
+					return Promise.resolve()
+				}
 
-			end() {
-				return Promise.resolve()
-			}
+				end() {
+					return Promise.resolve()
+				}
 
-			async query(sql: string) {
-				const query = queriesSet.shift()
-				expect(query).toBeDefined()
-				expect(sql).toEqual(query?.sql as string)
-				await new Promise<void>(resolve => setTimeout(resolve, query?.timeout ?? 1))
+				async query(sql: string) {
+					const query = queriesSet.shift()
+					expect(query).toBeDefined()
+					expect(sql).toEqual(query?.sql as string)
+					await new Promise<void>(resolve => setTimeout(resolve, query?.timeout ?? 1))
 
-				return query?.result
-			}
+					return query?.result
+				}
 
-			assertEmpty() {
-				expect(queriesSet).toStrictEqual([])
-			}
-		})
+				assertEmpty() {
+					expect(queriesSet).toStrictEqual([])
+				}
+			}(),
+		)
 	}
 	const allMocks = [...connectionMocks]
 	const pool = new Pool(() => {

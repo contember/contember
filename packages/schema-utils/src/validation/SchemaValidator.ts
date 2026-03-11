@@ -19,22 +19,23 @@ export class SchemaValidator {
 		const aclValidator = new AclValidator(schema.model)
 		const aclErrors = aclValidator.validate(schema.acl)
 
-
 		const validationValidator = new ValidationValidator(schema.model)
 		const validationErrors = validationValidator.validate(schema.validation)
 
 		const actionsValidator = new ActionsValidator(schema.model)
-		const actionsErrors  = actionsValidator.validate(schema.actions)
+		const actionsErrors = actionsValidator.validate(schema.actions)
 
 		const allErrors = [...aclErrors, ...modelErrors, ...validationErrors, ...actionsErrors]
 		if (skippedErrors.length === 0) {
 			return allErrors
 		}
 		return allErrors.filter(
-			err => !skippedErrors.some(
-				rule => err.code === rule.code
-					&& (!rule.path || err.path.join('.') === rule.path),
-			),
+			err =>
+				!skippedErrors.some(
+					rule =>
+						err.code === rule.code
+						&& (!rule.path || err.path.join('.') === rule.path),
+				),
 		)
 	}
 }

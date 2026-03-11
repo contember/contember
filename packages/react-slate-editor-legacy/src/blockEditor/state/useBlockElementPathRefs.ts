@@ -1,11 +1,6 @@
 import { Editor, PathRef } from 'slate'
 import { useCallback, useState } from 'react'
-import {
-	EntityId,
-	SugaredRelativeEntityList,
-	useDesugaredRelativeEntityList,
-	useEntityPersistSuccess,
-} from '@contember/react-binding'
+import { EntityId, SugaredRelativeEntityList, useDesugaredRelativeEntityList, useEntityPersistSuccess } from '@contember/react-binding'
 
 export type BlockElementPathRefs = Map<EntityId, PathRef>
 export const useBlockElementPathRefs = ({ editor, blockList }: {

@@ -1,5 +1,12 @@
 import { ContentClient, ContentQueryBuilder, GraphQlClient, GraphQlClientError } from '@contember/client'
-import type { DataBindingEventListenerMap, DataBindingTransactionResult, EntityId, Environment, MarkerTreeRoot, TreeRootId } from '@contember/binding-common'
+import type {
+	DataBindingEventListenerMap,
+	DataBindingTransactionResult,
+	EntityId,
+	Environment,
+	MarkerTreeRoot,
+	TreeRootId,
+} from '@contember/binding-common'
 import {
 	assertNever,
 	AsyncBatchUpdatesOptions,
@@ -31,7 +38,6 @@ import type { UpdateMetadata } from './UpdateMetadata'
 import { getCombinedSignal } from './utils'
 import { createQueryBuilder } from '@contember/binding-common'
 import { DataBindingExtendAborted } from '@contember/binding-common'
-
 
 export class DataBinding<Node> {
 	private readonly accessorErrorManager: AccessorErrorManager
@@ -131,15 +137,17 @@ export class DataBinding<Node> {
 
 			let response: DataBindingTransactionResult
 			try {
-				response = await this.contentClient.mutate(this.queryBuilder.transaction(mutations, {
-					deferForeignKeyConstraints: true,
-				}), {
-					signal,
-					onBeforeRequest: ({ query, variables }) => {
-						// eslint-disable-next-line no-console
-						console.debug(query, variables)
+				response = await this.contentClient.mutate(
+					this.queryBuilder.transaction(mutations, {
+						deferForeignKeyConstraints: true,
+					}),
+					{
+						signal,
+						onBeforeRequest: ({ query, variables }) => {
+							console.debug(query, variables)
+						},
 					},
-				})
+				)
 			} catch (e) {
 				if (e instanceof GraphQlClientError) {
 					this.onError(e, this)
@@ -156,7 +164,6 @@ export class DataBinding<Node> {
 				return await this.processSuccessfulPersistResult(response, operations, onPersistSuccess)
 			} else {
 				if (response.errorMessage) {
-					// eslint-disable-next-line no-console
 					console.debug(response.errorMessage)
 				}
 
@@ -169,7 +176,6 @@ export class DataBinding<Node> {
 					type: 'invalidInput',
 					response,
 				})
-
 			}
 		})
 	}
@@ -198,7 +204,11 @@ export class DataBinding<Node> {
 		return result
 	}
 
-	private async processSuccessfulPersistResult(mutationData: DataBindingTransactionResult, operations: SubMutationOperation[], onPersistSuccess: PersistOptions['onPersistSuccess']) {
+	private async processSuccessfulPersistResult(
+		mutationData: DataBindingTransactionResult,
+		operations: SubMutationOperation[],
+		onPersistSuccess: PersistOptions['onPersistSuccess'],
+	) {
 		const persistedEntityIds = Object.values(mutationData.data).map(it => it.node?.id).filter((id): id is EntityId => id !== undefined)
 		const result: SuccessfulPersistResult = {
 			type: 'justSuccess',
@@ -268,7 +278,7 @@ export class DataBinding<Node> {
 		if (options.signal?.aborted) {
 			return Promise.reject(DataBindingExtendAborted)
 		}
-		const markerTreeRoot =  this.createMarkerTree(newFragment, options.environment ?? this.environment)
+		const markerTreeRoot = this.createMarkerTree(newFragment, options.environment ?? this.environment)
 
 		if (!options.force && this.treeStore.effectivelyHasTreeRoot(markerTreeRoot)) {
 			// This isn't perfectly accurate as theoretically, we could already have all the data necessary but this
@@ -385,7 +395,6 @@ export class DataBinding<Node> {
 		return await this.contentClient.query(query, {
 			signal,
 			onBeforeRequest: ({ query, variables }) => {
-				// eslint-disable-next-line no-console
 				console.debug(query, variables)
 			},
 		})

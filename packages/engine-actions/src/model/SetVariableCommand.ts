@@ -2,7 +2,6 @@ import { Command } from '@contember/engine-system-api'
 import { ConflictActionType, InsertBuilder, Literal } from '@contember/database'
 
 export class SetVariableCommand implements Command<void> {
-
 	constructor(
 		private readonly name: string,
 		private readonly value: string,

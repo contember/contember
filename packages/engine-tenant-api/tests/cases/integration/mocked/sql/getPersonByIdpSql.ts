@@ -6,7 +6,8 @@ export const getPersonByIdpSql = (args: {
 	externalIdentifier: string
 	response: null | { personId: string; password?: string; identityId: string; email: string; roles: string[]; otpUri?: string }
 }): ExpectedQuery => ({
-	sql: SQL`SELECT "person"."id", "person"."password_hash", "person"."otp_uri", "person"."otp_activated_at", "person"."identity_id", "person"."email", "person"."name", "person"."disabled_at", "person"."passwordless_enabled", "identity"."roles"
+	sql:
+		SQL`SELECT "person"."id", "person"."password_hash", "person"."otp_uri", "person"."otp_activated_at", "person"."identity_id", "person"."email", "person"."name", "person"."disabled_at", "person"."passwordless_enabled", "identity"."roles"
 	         FROM "tenant"."person"
 		        INNER JOIN "tenant"."identity" AS "identity" ON "identity"."id" = "person"."identity_id"
 				INNER JOIN  "tenant"."person_identity_provider" as "idp" on  "idp"."person_id" = "person"."id"
@@ -26,7 +27,7 @@ export const getPersonByIdpSql = (args: {
 					otp_activated_at: args.response.otpUri ? new Date() : null,
 					disabled_at: null,
 				},
-			  ]
+			]
 			: [],
 	},
 })

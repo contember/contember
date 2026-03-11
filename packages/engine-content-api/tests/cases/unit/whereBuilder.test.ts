@@ -31,7 +31,14 @@ const createWhere = (schema: Schema, where: Input.OptionalWhere) => {
 	const joinBuilder = new JoinBuilder(schema.model)
 	const conditionBuilder = new ConditionBuilder()
 	const whereOptimizer = new WhereOptimizer(schema.model, new ConditionOptimizer())
-	const whereBuilder = new WhereBuilder(schema.model, joinBuilder, conditionBuilder, pathFactory, whereOptimizer, schema.settings.useExistsInHasManyFilter === true)
+	const whereBuilder = new WhereBuilder(
+		schema.model,
+		joinBuilder,
+		conditionBuilder,
+		pathFactory,
+		whereOptimizer,
+		schema.settings.useExistsInHasManyFilter === true,
+	)
 
 	const qb = SelectBuilder.create()
 		.from('author', 'root_')
@@ -74,7 +81,6 @@ describe('where builder', () => {
 		)
 	})
 
-
 	it('where on has-many relation with isNull', () => {
 		const schema = createSchema(WhereBuilderModel)
 		const where = createWhere(schema, {
@@ -114,7 +120,6 @@ describe('where builder', () => {
 		)
 	})
 
-
 	it('where without nested has-many', () => {
 		const schema: Schema = { ...createSchema(WhereBuilderModel) }
 		const where = createWhere(schema, {
@@ -135,7 +140,6 @@ describe('where builder', () => {
 		)
 	})
 
-
 	it('handles nulls', () => {
 		const schema: Schema = { ...createSchema(WhereBuilderModel) }
 		const where = createWhere(schema, {
@@ -155,7 +159,6 @@ describe('where builder', () => {
 		)
 	})
 })
-
 
 const compareWhere = (actual: string, expected: string) => {
 	const normalize = (s: string) => s.replaceAll(/\s+/g, ' ').trim()

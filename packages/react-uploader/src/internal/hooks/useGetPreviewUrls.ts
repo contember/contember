@@ -17,5 +17,3 @@ export const useGetPreviewUrls = () => {
 		return previewUrl
 	}, [])
 }
-
-

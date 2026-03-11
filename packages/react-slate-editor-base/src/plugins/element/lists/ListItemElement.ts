@@ -1,4 +1,4 @@
-import { Editor as SlateEditor, Editor, Element as SlateElement, Node as SlateNode, Transforms } from 'slate'
+import { Editor, Editor as SlateEditor, Element as SlateElement, Node as SlateNode, Transforms } from 'slate'
 import { ContemberEditor } from '../../../editor'
 import { isListElement } from './ListElement'
 import { EditorElementPlugin, ElementRenderer } from '../../../types'
@@ -14,7 +14,6 @@ export const isListItemElement = (
 	element: SlateNode,
 	suchThat?: Partial<ListItemElement>,
 ): element is ListItemElement => ContemberEditor.isElementType(element, listItemElementType, suchThat)
-
 
 export const listItemElementPlugin = ({ render }: { render: ElementRenderer<ListItemElement> }): EditorElementPlugin<ListItemElement> => ({
 	type: listItemElementType,

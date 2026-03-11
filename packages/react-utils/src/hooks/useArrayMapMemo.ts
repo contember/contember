@@ -20,9 +20,9 @@ export const useArrayMapMemo = <Item, OutputItem>(
 	// in the sense that the items are identical, albeit computed via a different map function, we still want to
 	// preserve the referential equality of the original. Hence the second memo.
 
-	// eslint-disable-next-line react-hooks/exhaustive-deps
+	// biome-ignore lint/correctness/useExhaustiveDependencies: intentional
 	const mapped = useMemo(() => items.map(map), [map, ...items])
 
-	// eslint-disable-next-line react-hooks/exhaustive-deps
+	// biome-ignore lint/correctness/useExhaustiveDependencies: intentional
 	return useMemo(() => mapped, mapped) // This is deliberately not `[mapped]`
 }

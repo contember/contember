@@ -4,7 +4,10 @@ import { SetStateAction } from 'react'
 
 export type DataViewFilterArtifact = Serializable
 
-export type DataViewSetFilter = <FA extends DataViewFilterArtifact = DataViewFilterArtifact>(key: string, filter: SetStateAction<FA | undefined>) => void
+export type DataViewSetFilter = <FA extends DataViewFilterArtifact = DataViewFilterArtifact>(
+	key: string,
+	filter: SetStateAction<FA | undefined>,
+) => void
 
 /**
  * Methods for filtering. Available using {@link useDataViewFilteringMethods}.

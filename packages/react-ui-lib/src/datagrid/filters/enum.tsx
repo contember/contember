@@ -49,18 +49,16 @@ export type DataGridEnumFilterProps =
  * <DataGridEnumFilter field={'status'} />
  * ```
  */
-export const DataGridEnumFilter = Component(({ options, label, ...props }: DataGridEnumFilterProps) =>
-	(
-		<DataViewEnumFilter {...props}>
-			<DataGridFilterMobileHiding>
-				<DataGridSingleFilterUI>
-					<DataGridEnumFilterSelect options={options} label={label ?? <DataViewFieldLabel field={props.field} />} />
-					<DataGridEnumFilterList options={options} />
-				</DataGridSingleFilterUI>
-			</DataGridFilterMobileHiding>
-		</DataViewEnumFilter>
-	))
-
+export const DataGridEnumFilter = Component(({ options, label, ...props }: DataGridEnumFilterProps) => (
+	<DataViewEnumFilter {...props}>
+		<DataGridFilterMobileHiding>
+			<DataGridSingleFilterUI>
+				<DataGridEnumFilterSelect options={options} label={label ?? <DataViewFieldLabel field={props.field} />} />
+				<DataGridEnumFilterList options={options} />
+			</DataGridSingleFilterUI>
+		</DataGridFilterMobileHiding>
+	</DataViewEnumFilter>
+))
 
 /**
  * Props for {@link DataGridEnumListFilter}.
@@ -71,7 +69,6 @@ export type DataGridEnumListFilterProps =
 		options?: Record<string, ReactNode>
 		label?: ReactNode
 	}
-
 
 /**
  * Enum list filter for DataGrid with default UI.
@@ -84,18 +81,16 @@ export type DataGridEnumListFilterProps =
  * <DataGridEnumFilter field={'status'} />
  * ```
  */
-export const DataGridEnumListFilter = Component(({ options, label, ...props }: DataGridEnumListFilterProps) =>
-	(
-		<DataViewEnumListFilter {...props}>
-			<DataGridFilterMobileHiding>
-				<DataGridSingleFilterUI>
-					<DataGridEnumFilterSelect options={options} label={label ?? <DataViewFieldLabel field={props.field} />} />
-					<DataGridEnumFilterList options={options} />
-				</DataGridSingleFilterUI>
-			</DataGridFilterMobileHiding>
-		</DataViewEnumListFilter>
-	))
-
+export const DataGridEnumListFilter = Component(({ options, label, ...props }: DataGridEnumListFilterProps) => (
+	<DataViewEnumListFilter {...props}>
+		<DataGridFilterMobileHiding>
+			<DataGridSingleFilterUI>
+				<DataGridEnumFilterSelect options={options} label={label ?? <DataViewFieldLabel field={props.field} />} />
+				<DataGridEnumFilterList options={options} />
+			</DataGridSingleFilterUI>
+		</DataGridFilterMobileHiding>
+	</DataViewEnumListFilter>
+))
 
 /**
  * Props for {@link DataGridEnumFieldTooltip}.
@@ -108,7 +103,9 @@ export type DataGridEnumFieldTooltipProps = Omit<DataViewEnumFilterProps, 'child
  * ## Props {@link DataGridEnumFieldTooltipProps}
  * field, label, ?name, ?options
  */
-export const DataGridEnumFieldTooltip = ({ children, actions, value, ...props }: DataGridEnumFieldTooltipProps & { children: ReactNode; value: string; actions?: ReactNode }) => (
+export const DataGridEnumFieldTooltip = (
+	{ children, actions, value, ...props }: DataGridEnumFieldTooltipProps & { children: ReactNode; value: string; actions?: ReactNode },
+) => (
 	<DataViewEnumFilter {...props}>
 		<TooltipProvider>
 			<Tooltip>
@@ -130,7 +127,6 @@ export const DataGridEnumFieldTooltip = ({ children, actions, value, ...props }:
 		</TooltipProvider>
 	</DataViewEnumFilter>
 )
-
 
 const DataGridEnumFilterList = ({ options }: {
 	options?: Record<string, ReactNode>
@@ -159,7 +155,6 @@ const DataGridEnumFilterSelectItem = ({ value, children, filterFactory }: {
 	children: ReactNode
 	filterFactory: (value: string) => UseDataViewEnumFilter
 }) => {
-
 	const [current, setFilter] = filterFactory(value)
 	const include = useCallback(() => setFilter('toggleInclude'), [setFilter])
 	const exclude = useCallback(() => setFilter('toggleExclude'), [setFilter])
@@ -171,9 +166,8 @@ const DataGridEnumFilterSelectItem = ({ value, children, filterFactory }: {
 			{children}
 		</DataGridFilterSelectItemUI>
 	)
-
 }
-const DataGridEnumFilterSelect = ({  options, label }: {
+const DataGridEnumFilterSelect = ({ options, label }: {
 	options?: Record<string, ReactNode>
 	label?: ReactNode
 }) => {

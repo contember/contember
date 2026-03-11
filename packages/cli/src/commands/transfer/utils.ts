@@ -1,7 +1,6 @@
 import { Input } from '@contember/cli-common'
 import prompts from 'prompts'
 
-
 export const confirmImport = async (input: Input<{}, { yes: boolean }>): Promise<boolean> => {
 	if (input.getOption('yes')) {
 		return true

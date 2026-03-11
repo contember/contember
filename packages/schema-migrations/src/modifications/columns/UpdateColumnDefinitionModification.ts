@@ -8,7 +8,7 @@ import { wrapIdentifier } from '../../utils/dbHelpers'
 import { getColumnSqlType } from '../utils/columnUtils'
 import { fillSeed, formatSeedExpression } from './columnUtils'
 
-export class UpdateColumnDefinitionModificationHandler implements ModificationHandler<UpdateColumnDefinitionModificationData>  {
+export class UpdateColumnDefinitionModificationHandler implements ModificationHandler<UpdateColumnDefinitionModificationData> {
 	constructor(private readonly data: UpdateColumnDefinitionModificationData, private readonly schema: Schema) {}
 
 	public createSql(builder: MigrationBuilder): void {
@@ -29,7 +29,9 @@ export class UpdateColumnDefinitionModificationHandler implements ModificationHa
 		const columnNameWrapped = wrapIdentifier(oldColumn.columnName)
 		const isChangedToArray = !oldColumn.list && newColumn.list
 		const usingCast = isChangedToArray
-			? `CASE WHEN ${columnNameWrapped} IS NULL THEN ${newColumn.nullable ? 'NULL' : `ARRAY[]::${columnType}`} ELSE ARRAY[${columnNameWrapped}]::${columnType} END`
+			? `CASE WHEN ${columnNameWrapped} IS NULL THEN ${
+				newColumn.nullable ? 'NULL' : `ARRAY[]::${columnType}`
+			} ELSE ARRAY[${columnNameWrapped}]::${columnType} END`
 			: `${columnNameWrapped}::${columnType}`
 
 		const seedExpression = formatSeedExpression({
@@ -79,7 +81,7 @@ export class UpdateColumnDefinitionModificationHandler implements ModificationHa
 			if (oldColumn.sequence.precedence !== newColumn.sequence.precedence) {
 				seqAlter.push(`SET GENERATED ${newColumn.sequence.precedence}`)
 			}
-			if (oldColumn.sequence.start !== newColumn.sequence.start && typeof newColumn.sequence.start == 'number') {
+			if (oldColumn.sequence.start !== newColumn.sequence.start && typeof newColumn.sequence.start === 'number') {
 				seqAlter.push(`SET START WITH ${newColumn.sequence.start}`)
 			}
 			if (newColumn.sequence.restart) {

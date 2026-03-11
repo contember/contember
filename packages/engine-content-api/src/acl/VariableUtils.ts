@@ -1,12 +1,10 @@
 import { Acl, Input } from '@contember/schema'
 import { getRoleVariables, ParsedMembership } from '@contember/schema-utils'
 
-
 export const createAclVariables = (
 	aclSchema: Acl.Schema,
 	memberships: readonly ParsedMembership[],
 ): Acl.VariablesMap => {
-
 	const variablesEntries = memberships.flatMap(
 		membership => {
 			const roleVariables = getRoleVariables(membership.role, aclSchema)

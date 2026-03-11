@@ -23,7 +23,7 @@ function useDesugaredRelativeSingleEntity(
 ): RelativeSingleEntity | undefined {
 	const environment = useEnvironment()
 
-	let normalizedSugared: SugaredRelativeSingleEntity | undefined = undefined
+	let normalizedSugared: SugaredRelativeSingleEntity | undefined
 	let hasEntity: boolean
 
 	if (sugaredRelativeSingleEntity === undefined) {
@@ -48,9 +48,8 @@ function useDesugaredRelativeSingleEntity(
 						setOnCreate: normalizedSugared?.setOnCreate,
 					},
 					environment,
-				  )
+				)
 				: undefined,
-		// eslint-disable-next-line react-hooks/exhaustive-deps
 		[normalizedSugared?.field, normalizedSugared?.isNonbearing, normalizedSugared?.setOnCreate, environment, hasEntity],
 	)
 }

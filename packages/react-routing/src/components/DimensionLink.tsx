@@ -24,7 +24,7 @@ export const DimensionLink = Component<DimensionLinkProps>(({ dimension, value, 
 	const currentDimensionValue = useCurrentRequest()?.dimensions[dimension] ?? emptyDim
 	const isActive = useMemo(() => currentDimensionValue.includes(value), [currentDimensionValue, value])
 
-	const changeRequest = useCallback< RequestChange>(it => {
+	const changeRequest = useCallback<RequestChange>(it => {
 		if (!it) {
 			return null
 		}

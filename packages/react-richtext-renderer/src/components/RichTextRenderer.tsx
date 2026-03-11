@@ -4,7 +4,6 @@ import type { RichTextLeaf } from '../types/structure/RichTextLeaf'
 import { RichTextFieldRenderer, RichTextFieldRendererProps } from './RichTextFieldRenderer'
 import { RichTextBlocksRenderer, RichTextBlocksRendererProps } from './RichTextBlocksRenderer'
 
-
 export type RichTextRendererProps<
 	CustomElements extends RichTextElement = never,
 	CustomLeaves extends RichTextLeaf = RichTextLeaf,
@@ -20,7 +19,6 @@ export const RichTextRenderer = memo(function RichTextRenderer<
 	CustomElements extends RichTextElement = never,
 	CustomLeaves extends RichTextLeaf = RichTextLeaf,
 >(props: RichTextRendererProps<CustomElements, CustomLeaves>) {
-
 	if ('source' in props) {
 		return <RichTextFieldRenderer<CustomElements, CustomLeaves> {...props} />
 	}

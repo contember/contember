@@ -9,7 +9,6 @@ export const ExtensionKey = 'OperationMeta'
 
 export const readOperationMeta = (data: Record<string, unknown> | undefined | null): OperationMeta => {
 	if (!data) {
-		debugger
 		throw new ImplementationException()
 	}
 	const meta = data[ExtensionKey]
@@ -19,7 +18,7 @@ export const readOperationMeta = (data: Record<string, unknown> | undefined | nu
 	return meta
 }
 
-export const enum Operation {
+export enum Operation {
 	create = 'create',
 	update = 'update',
 	upsert = 'upsert',

@@ -34,8 +34,7 @@ export const HasOne = Component(
 				{props.children}
 			</Entity>
 		),
-		generateBranchMarker: (props, fields, environment) =>
-			MarkerFactory.createRelativeSingleEntityFields(props, environment, fields),
+		generateBranchMarker: (props, fields, environment) => MarkerFactory.createRelativeSingleEntityFields(props, environment, fields),
 	},
 	'HasOne',
 ) as <EntityProps extends {}>(props: HasOneProps<EntityProps>) => ReactElement

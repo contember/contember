@@ -48,5 +48,5 @@ export const FormRadioInput = Component<FormRadioItemProps>(({ field, value, def
 		/>
 	)
 }, ({ field, isNonbearing, defaultValue }) => {
-	return <Field field={field} isNonbearing={isNonbearing} defaultValue={defaultValue}/>
+	return <Field field={field} isNonbearing={isNonbearing} defaultValue={defaultValue} />
 })

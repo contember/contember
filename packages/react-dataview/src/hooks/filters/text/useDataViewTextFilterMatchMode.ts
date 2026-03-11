@@ -15,5 +15,4 @@ export const useDataViewTextFilterMatchMode = (name: string, mode: TextFilterArt
 	}, [setFilter, mode])
 
 	return [state?.mode === mode, cb]
-
 }

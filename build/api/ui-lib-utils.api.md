@@ -6,8 +6,8 @@
 
 import { ClassValue } from 'clsx';
 import { ComponentProps } from 'react';
+import { ComponentRef } from 'react';
 import { ComponentType } from 'react';
-import { ElementRef } from 'react';
 import { ForwardRefExoticComponent } from 'react';
 import { PropsWithoutRef } from 'react';
 import { ReactNode } from 'react';
@@ -37,7 +37,7 @@ export const uic: <El extends React.ElementType, Variants extends ConfigSchema |
 asChild?: boolean;
 children?: ReactNode;
 className?: string;
-} & ConfigVariants<Variants>> & RefAttributes<ElementRef<El>>>;
+} & ConfigVariants<Variants>> & RefAttributes<ComponentRef<El>>>;
 
 // @public (undocumented)
 export const uiconfig: <T extends ConfigSchema | undefined>(config: Config<T, ComponentType<{}>>) => Config<T, ComponentType<{}>>;

@@ -33,7 +33,7 @@ export class AllowAllPermissionFactory {
 					...(this.operations.includes(Acl.Operation.delete)
 						? {
 							delete: true,
-						  }
+						}
 						: {}),
 					...(allowCustomPrimary ? { customPrimary: true } : {}),
 				},

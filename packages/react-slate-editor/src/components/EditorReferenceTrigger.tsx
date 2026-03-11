@@ -9,14 +9,16 @@ export interface EditorReferenceTriggerProps {
 	initialize?: EntityAccessor.BatchUpdatesHandler
 	children: ReactElement
 }
-export const EditorReferenceTrigger = ({ referenceType, initialize, ... props }: EditorReferenceTriggerProps) => {
-
+export const EditorReferenceTrigger = ({ referenceType, initialize, ...props }: EditorReferenceTriggerProps) => {
 	const { insertElementWithReference } = useEditorReferenceMethods()
 	const onClick = useCallback(() => {
-
-		insertElementWithReference({
-			type: referenceType,
-		}, referenceType, initialize)
+		insertElementWithReference(
+			{
+				type: referenceType,
+			},
+			referenceType,
+			initialize,
+		)
 	}, [initialize, insertElementWithReference, referenceType])
 
 	return <Slot onClick={onClick} {...props} />

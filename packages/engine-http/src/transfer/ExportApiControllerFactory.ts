@@ -27,7 +27,6 @@ export class ExportApiControllerFactory {
 
 			try {
 				exportRequest = ExportRequest(request.body)
-
 			} catch (e) {
 				if (e instanceof ParseError) {
 					return new HttpErrorResponse(400, `Invalid request body: ${e.message}`)
@@ -48,15 +47,16 @@ export class ExportApiControllerFactory {
 				const systemContext = projectContainer.systemReadDatabaseContext
 				const schemaWithMeta = await projectContainer.contentSchemaResolver.getSchema({ db: systemContext, normalize: true })
 				const schema = schemaWithMeta?.schema ?? emptySchema
-				const { effective: memberships } = await timer('MembershipFetch', () => projectGroup.projectMembershipResolver.resolveMemberships({
-					request: { get: () => '' },
-					acl: schema.acl,
-					projectSlug: project.slug,
-					identity: {
-						identityId: authResult.identityId,
-						roles: authResult.roles,
-					},
-				}))
+				const { effective: memberships } = await timer('MembershipFetch', () =>
+					projectGroup.projectMembershipResolver.resolveMemberships({
+						request: { get: () => '' },
+						acl: schema.acl,
+						projectSlug: project.slug,
+						identity: {
+							identityId: authResult.identityId,
+							roles: authResult.roles,
+						},
+					}))
 
 				const projectRoles = memberships.map(it => it.role)
 
@@ -71,7 +71,8 @@ export class ExportApiControllerFactory {
 				projectContainers[project.slug] = projectContainer
 			}
 
-			koa.compress = true
+			const koaCtx = koa as any
+			koaCtx.compress = true
 			response.status = 200
 			response.res.setHeader('Content-Type', 'application/x-ndjson') // https://github.com/ndjson/ndjson-spec
 			response.body = Readable.from(toBuffer(this.exportExecutor.export(exportRequest, projectContainers)))

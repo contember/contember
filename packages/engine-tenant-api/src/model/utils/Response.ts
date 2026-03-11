@@ -17,4 +17,3 @@ export class ResponseError<const Error, Metadata extends {} | undefined = undefi
 		public readonly metadata?: Metadata,
 	) {}
 }
-

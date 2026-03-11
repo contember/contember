@@ -3,7 +3,7 @@ import { createModificationType, ModificationHandler } from '../ModificationHand
 import { applyPatch, Operation } from 'rfc6902'
 import deepCopy from '../../utils/deepCopy'
 
-export class PatchAclSchemaModificationHandler implements ModificationHandler<PatchAclSchemaModificationData>{
+export class PatchAclSchemaModificationHandler implements ModificationHandler<PatchAclSchemaModificationData> {
 	constructor(private readonly data: PatchAclSchemaModificationData) {}
 
 	public createSql(): void {}

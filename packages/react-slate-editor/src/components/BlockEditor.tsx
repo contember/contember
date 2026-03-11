@@ -14,7 +14,6 @@ export interface BlockEditorProps {
 
 export const BlockEditor = Component<BlockEditorProps>(
 	props => {
-
 		const {
 			children,
 			plugins,
@@ -31,7 +30,10 @@ export const BlockEditor = Component<BlockEditorProps>(
 		const handleEditorOnChange = useReferentiallyStableCallback((value: any) => {
 			const contentJson = typeof value === 'object' && value !== null ? { formatVersion: 2, children: value } : null
 
-			if (contentJson && contentField.value && typeof contentField.value === 'object' && 'children' in contentField.value && contentField.value.children === value) {
+			if (
+				contentJson && contentField.value && typeof contentField.value === 'object' && 'children' in contentField.value
+				&& contentField.value.children === value
+			) {
 				return
 			}
 
@@ -84,15 +86,16 @@ const SyncValue = ({ nodes }: { nodes: Descendant[] }) => {
 	useEffect(() => {
 		if (editor.children !== nodes && JSON.stringify(editor.children) !== JSON.stringify(nodes)) {
 			withoutNormalizing(editor, () => {
-				for (const [, childPath] of Node.children(editor, [], {
-					reverse: true,
-				})) {
+				for (
+					const [, childPath] of Node.children(editor, [], {
+						reverse: true,
+					})
+				) {
 					removeNodes(editor, { at: childPath })
 				}
 				insertNodes(editor, nodes)
 			})
 		}
-
 	}, [editor, nodes])
 	return null
 }

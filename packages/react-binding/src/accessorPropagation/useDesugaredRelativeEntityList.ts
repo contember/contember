@@ -23,7 +23,7 @@ function useDesugaredRelativeEntityList(
 ): RelativeEntityList | undefined {
 	const environment = useEnvironment()
 
-	let normalizedSugared: SugaredRelativeEntityList | undefined = undefined
+	let normalizedSugared: SugaredRelativeEntityList | undefined
 	let hasList: boolean
 
 	if (sugaredRelativeEntityList === undefined) {
@@ -51,9 +51,8 @@ function useDesugaredRelativeEntityList(
 						orderBy: normalizedSugared?.orderBy,
 					},
 					environment,
-				  )
+				)
 				: undefined,
-		// eslint-disable-next-line react-hooks/exhaustive-deps
 		[
 			normalizedSugared?.field,
 			normalizedSugared?.setOnCreate,

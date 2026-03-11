@@ -7,7 +7,7 @@ export class WeakIdCache<K extends object> {
 		let existing = this.cache.get(key)
 
 		if (existing === undefined) {
-			this.cache.set(key, (existing = this.seedToId(this.seed++)))
+			this.cache.set(key, existing = this.seedToId(this.seed++))
 		}
 		return existing
 	}

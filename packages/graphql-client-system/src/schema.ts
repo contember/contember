@@ -1,1 +1,1 @@
-export { type Schema } from '@contember/schema'
+export type { Schema } from '@contember/schema'

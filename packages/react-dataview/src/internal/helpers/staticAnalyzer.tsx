@@ -1,7 +1,7 @@
 import { dataViewSelectionEnvironmentExtension } from '../../env/dataViewSelectionEnvironmentExtension'
 import { createUnionTextFilter } from '../../filterTypes'
 import { DataViewFilter, DataViewFilterProps, DataViewLayout, DataViewLayoutProps, DataViewProps, DataViewQueryFilterName } from '../../components'
-import { EntityListSubTreeMarker, Environment, FieldMarker, HasOneRelationMarker, MeaningfulMarker } from '@contember/react-binding'
+import { EntityFieldMarkersContainer, EntityListSubTreeMarker, Environment, FieldMarker, HasOneRelationMarker } from '@contember/react-binding'
 import { EntityListSubTree, MarkerTreeGenerator } from '@contember/react-binding'
 import { ChildrenAnalyzer, Leaf } from '@contember/react-multipass-rendering'
 import { DataViewFilterHandler, DataViewSelectionLayout } from '../../types'
@@ -29,7 +29,6 @@ const createDataViewReactNode = (props: DataViewProps, env: Environment) => {
 	return [entityListSubTree, envWithSelectionState] as const
 }
 
-
 const getQueryField = (props: DataViewProps, env: Environment) => {
 	if (props.queryField) {
 		return props.queryField
@@ -46,11 +45,9 @@ const getQueryField = (props: DataViewProps, env: Environment) => {
 		throw new Error()
 	}
 	return extractStringFields(marker)
-
 }
 
 const getFilterTypes = (props: DataViewProps, env: Environment, filterBoxes: DataViewFilterBox[]) => {
-
 	const queryField = getQueryField(props, env)
 
 	const filterTypes: Record<string, DataViewFilterHandler<any>> = props.filterTypes ?? {}
@@ -60,18 +57,18 @@ const getFilterTypes = (props: DataViewProps, env: Environment, filterBoxes: Dat
 	for (const filterBox of filterBoxes) {
 		if (filterBox.props.name in filterTypes) {
 			const existingFilter = filterTypes[filterBox.props.name]
-			if (!filterBox.props.filterHandler.identifier
+			if (
+				!filterBox.props.filterHandler.identifier
 				|| !existingFilter.identifier
 				|| (filterBox.props.filterHandler.identifier.id === existingFilter.identifier.id
-					&& deepEqual(filterBox.props.filterHandler.identifier.params, existingFilter.identifier.params)
-				)) {
+					&& deepEqual(filterBox.props.filterHandler.identifier.params, existingFilter.identifier.params))
+			) {
 				continue
 			}
 			throw new Error(`Filter with name ${filterBox.props.name} already exists with different parameters:
 #1: ${existingFilter.identifier.id.toString()} / ${JSON.stringify(existingFilter.identifier)}
 #2: ${filterBox.props.filterHandler.identifier.id.toString()} / ${JSON.stringify(filterBox.props.filterHandler.identifier)}`)
 		}
-
 
 		filterTypes[filterBox.props.name] = filterBox.props.filterHandler
 	}
@@ -92,7 +89,6 @@ class DataViewLayoutBox {
 const filterLeaf = new Leaf(node => new DataViewFilterBox(node.props), DataViewFilter)
 const layoutLeaf = new Leaf(node => new DataViewLayoutBox(node.props), DataViewLayout)
 
-
 const dataViewFilterAnalyzer = new ChildrenAnalyzer<
 	DataViewFilterBox,
 	never,
@@ -110,8 +106,7 @@ const dataViewLayoutAnalyzer = new ChildrenAnalyzer<
 	staticContextFactoryName: 'generateEnvironment',
 })
 
-
-const extractStringFields = (marker: Exclude<MeaningfulMarker, FieldMarker>): string[] => {
+const extractStringFields = (marker: { environment: Environment; fields: EntityFieldMarkersContainer }): string[] => {
 	const node = marker.environment.getSubTreeNode()
 	const textFields = []
 	for (const field of marker.fields.markers.values()) {

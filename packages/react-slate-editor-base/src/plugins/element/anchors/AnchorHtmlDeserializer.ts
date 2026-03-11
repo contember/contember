@@ -1,6 +1,6 @@
 import { HtmlDeserializerPlugin } from '../../../types'
 
-export const anchorHtmlDeserializer: HtmlDeserializerPlugin  = {
+export const anchorHtmlDeserializer: HtmlDeserializerPlugin = {
 	processInlinePaste: ({ element, next, cumulativeTextAttrs }) => {
 		if (element.tagName === 'A' && element.getAttribute('href')) {
 			const href = element.getAttribute('href')

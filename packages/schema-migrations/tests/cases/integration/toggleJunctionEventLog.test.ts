@@ -24,33 +24,35 @@ namespace EventLogDisabled {
 	}
 }
 
-describe('event log junction - disable', () => testMigrations({
-	original: createSchema(EventLogNoConfig),
-	updated: createSchema(EventLogDisabled),
-	diff: [
-		{
-			modification: 'toggleJunctionEventLog',
-			entityName: 'Author',
-			fieldName: 'tags',
-			enabled: false,
-		},
-	],
-	sql: SQL `DROP TRIGGER "log_event" ON "author_tags";
+describe('event log junction - disable', () =>
+	testMigrations({
+		original: createSchema(EventLogNoConfig),
+		updated: createSchema(EventLogDisabled),
+		diff: [
+			{
+				modification: 'toggleJunctionEventLog',
+				entityName: 'Author',
+				fieldName: 'tags',
+				enabled: false,
+			},
+		],
+		sql: SQL`DROP TRIGGER "log_event" ON "author_tags";
 	DROP TRIGGER "log_event_trx" ON "author_tags";`,
-}))
+	}))
 
-describe('event log junction - enable', () => testMigrations({
-	original: createSchema(EventLogDisabled),
-	updated: createSchema(EventLogNoConfig),
-	diff: [
-		{
-			modification: 'toggleJunctionEventLog',
-			entityName: 'Author',
-			fieldName: 'tags',
-			enabled: true,
-		},
-	],
-	sql: SQL`CREATE TRIGGER "log_event"
+describe('event log junction - enable', () =>
+	testMigrations({
+		original: createSchema(EventLogDisabled),
+		updated: createSchema(EventLogNoConfig),
+		diff: [
+			{
+				modification: 'toggleJunctionEventLog',
+				entityName: 'Author',
+				fieldName: 'tags',
+				enabled: true,
+			},
+		],
+		sql: SQL`CREATE TRIGGER "log_event"
 		AFTER INSERT OR UPDATE OR DELETE
 		ON "author_tags"
 		FOR EACH ROW
@@ -61,4 +63,4 @@ describe('event log junction - enable', () => testMigrations({
 		DEFERRABLE INITIALLY DEFERRED
 		FOR EACH ROW
 	EXECUTE PROCEDURE "system"."trigger_event_commit"();`,
-}))
+	}))

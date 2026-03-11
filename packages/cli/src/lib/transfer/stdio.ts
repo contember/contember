@@ -6,4 +6,3 @@ export const printProgressLine = (message: string) => {
 	process.stdout.cursorTo(0)
 	process.stdout.write(message)
 }
-

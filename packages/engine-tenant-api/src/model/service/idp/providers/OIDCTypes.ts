@@ -49,7 +49,6 @@ export const OIDCResponseData = Typesafe.intersection(
 			nonce: Typesafe.string,
 			state: Typesafe.string,
 		}),
-
 	}),
 )
 

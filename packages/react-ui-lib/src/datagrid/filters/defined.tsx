@@ -64,7 +64,6 @@ const DataGridIsDefinedFilterList = () => (
 	</>
 )
 
-
 const DataGridIsDefinedFilterSelect = ({ label }: {
 	label?: ReactNode
 }) => (

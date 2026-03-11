@@ -32,16 +32,16 @@
     "@contember/react-binding": "workspace:*",
     "@contember/react-utils": "workspace:*",
     "@contember/utilities": "workspace:*",
-    "@radix-ui/react-slot": "^1.1.0",
-    "path-to-regexp": "^6.2.2"
+    "@radix-ui/react-slot": "catalog:",
+    "path-to-regexp": "catalog:"
   },
   "peerDependencies": {
-    "react": "^18 || ^19",
-    "react-dom": "^18 || ^19"
+    "react": "catalog:",
+    "react-dom": "catalog:"
   },
   "devDependencies": {
-    "react": "^18.3.1",
-    "react-dom": "^18.3.1"
+    "react": "catalog:",
+    "react-dom": "catalog:"
   },
   "repository": {
     "type": "git",

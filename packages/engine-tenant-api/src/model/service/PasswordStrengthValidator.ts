@@ -1,12 +1,19 @@
 import { Config } from '../type/Config'
 import { blacklist } from '../utils/blacklist'
 import { WeakPasswordReason } from '../../schema'
-import { ResponseError, Response, ResponseOk } from '../utils/Response'
+import { Response, ResponseError, ResponseOk } from '../utils/Response'
 
 export class PasswordStrengthValidator {
-	public async verify<const Code extends string>(password: string, passwordConfig: Config['password'], errorCode: Code): Promise<ResponseOk<null> | ResponseError<Code, {
-		weakPasswordReasons: WeakPasswordReason[]
-	}>> {
+	public async verify<const Code extends string>(
+		password: string,
+		passwordConfig: Config['password'],
+		errorCode: Code,
+	): Promise<
+		| ResponseOk<null>
+		| ResponseError<Code, {
+			weakPasswordReasons: WeakPasswordReason[]
+		}>
+	> {
 		const failureReasons: WeakPasswordReason[] = []
 		const developerMessage: string[] = []
 
@@ -17,12 +24,16 @@ export class PasswordStrengthValidator {
 
 		if (passwordConfig.requireUppercase > 0 && (password.match(/[A-Z]/g) || []).length < passwordConfig.requireUppercase) {
 			failureReasons.push('MISSING_UPPERCASE')
-			developerMessage.push(`Password must contain at least ${passwordConfig.requireUppercase} uppercase letter${passwordConfig.requireUppercase > 1 ? 's' : ''}.`)
+			developerMessage.push(
+				`Password must contain at least ${passwordConfig.requireUppercase} uppercase letter${passwordConfig.requireUppercase > 1 ? 's' : ''}.`,
+			)
 		}
 
 		if (passwordConfig.requireLowercase > 0 && (password.match(/[a-z]/g) || []).length < passwordConfig.requireLowercase) {
 			failureReasons.push('MISSING_LOWERCASE')
-			developerMessage.push(`Password must contain at least ${passwordConfig.requireLowercase} lowercase letter${passwordConfig.requireLowercase > 1 ? 's' : ''}.`)
+			developerMessage.push(
+				`Password must contain at least ${passwordConfig.requireLowercase} lowercase letter${passwordConfig.requireLowercase > 1 ? 's' : ''}.`,
+			)
 		}
 
 		if (passwordConfig.requireDigit > 0 && (password.match(/\d/g) || []).length < passwordConfig.requireDigit) {
@@ -32,7 +43,9 @@ export class PasswordStrengthValidator {
 
 		if (passwordConfig.requireSpecial > 0 && (password.match(/[!@#$%^&*(),.?":{}|<>]/g) || []).length < passwordConfig.requireSpecial) {
 			failureReasons.push('MISSING_SPECIAL')
-			developerMessage.push(`Password must contain at least ${passwordConfig.requireSpecial} special character${passwordConfig.requireSpecial > 1 ? 's' : ''}.`)
+			developerMessage.push(
+				`Password must contain at least ${passwordConfig.requireSpecial} special character${passwordConfig.requireSpecial > 1 ? 's' : ''}.`,
+			)
 		}
 
 		if (passwordConfig.pattern && !new RegExp(passwordConfig.pattern).test(password)) {
@@ -52,7 +65,6 @@ export class PasswordStrengthValidator {
 		}
 		return new ResponseOk(null)
 	}
-
 
 	private isBlacklisted(password: string): boolean {
 		return blacklist.has(password) || blacklist.has(this.decodeLeetspeak(password))
@@ -82,4 +94,3 @@ namespace PasswordStrengthValidator {
 		| { ok: true }
 		| { ok: false; reasons: WeakPasswordReason[]; message: string }
 }
-

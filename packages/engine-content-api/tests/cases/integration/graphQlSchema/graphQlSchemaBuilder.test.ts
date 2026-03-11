@@ -2,17 +2,10 @@ import { graphql, printSchema } from 'graphql'
 import { Acl, Model } from '@contember/schema'
 import * as fs from 'node:fs/promises'
 import * as path from 'node:path'
-import {
-	AllowAllPermissionFactory,
-	SchemaBuilder,
-	SchemaDefinition,
-	c,
-	createSchema,
-	SchemaDefinition as def,
-} from '@contember/schema-definition'
+import { AllowAllPermissionFactory, c, createSchema, SchemaBuilder, SchemaDefinition, SchemaDefinition as def } from '@contember/schema-definition'
 import { Authorizator, GraphQlSchemaBuilderFactory, PermissionFactory } from '../../../../src'
 import * as model from './model'
-import { expect, describe, it } from 'bun:test'
+import { describe, expect, it } from 'bun:test'
 import { dirname } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
@@ -63,20 +56,21 @@ const testSchema = async (test: Test) => {
 describe('GraphQL schema builder', () => {
 	it('column types', async () => {
 		await testSchema({
-			schema: () => createSchema({
-				Columns: class Columns {
-					string = c.stringColumn()
-					int = c.intColumn()
-					float = c.doubleColumn()
-					boolean = c.boolColumn()
-					date = c.dateColumn()
-					dateTime = c.dateTimeColumn()
-					json = c.jsonColumn()
-					uuid = c.uuidColumn()
-					time = c.timeColumn()
-					enum = c.enumColumn(c.createEnum('a', 'b', 'c'))
-				},
-			}).model,
+			schema: () =>
+				createSchema({
+					Columns: class Columns {
+						string = c.stringColumn()
+						int = c.intColumn()
+						float = c.doubleColumn()
+						boolean = c.boolColumn()
+						date = c.dateColumn()
+						dateTime = c.dateTimeColumn()
+						json = c.jsonColumn()
+						uuid = c.uuidColumn()
+						time = c.timeColumn()
+						enum = c.enumColumn(c.createEnum('a', 'b', 'c'))
+					},
+				}).model,
 			permissions: schema => new AllowAllPermissionFactory().create(schema),
 			graphQlSchemaFile: 'schema-column-types.gql',
 		})
@@ -89,17 +83,13 @@ describe('GraphQL schema builder', () => {
 					.entity('Author', e =>
 						e
 							.column('name', c => c.type(Model.ColumnType.String))
-							.oneHasMany('posts', r => r.target('Post').ownedBy('author')),
-					)
+							.oneHasMany('posts', r => r.target('Post').ownedBy('author')))
 					.entity('Category', e => e.column('name', c => c.type(Model.ColumnType.String)))
 					.entity('Post', e =>
 						e
 							.column('publishedAt', c => c.type(Model.ColumnType.DateTime))
-							.oneHasMany('locales', r =>
-								r.target('PostLocale', e => e.column('title', c => c.type(Model.ColumnType.String))),
-							)
-							.manyHasMany('categories', r => r.target('Category').inversedBy('posts')),
-					),
+							.oneHasMany('locales', r => r.target('PostLocale', e => e.column('title', c => c.type(Model.ColumnType.String))))
+							.manyHasMany('categories', r => r.target('Category').inversedBy('posts'))),
 			permissions: schema => new AllowAllPermissionFactory().create(schema),
 			graphQlSchemaFile: 'schema-basic.gql',
 		})
@@ -112,8 +102,7 @@ describe('GraphQL schema builder', () => {
 					e
 						.column('a', c => c.type(Model.ColumnType.String))
 						.column('b', c => c.type(Model.ColumnType.String))
-						.column('c', c => c.type(Model.ColumnType.String)),
-				),
+						.column('c', c => c.type(Model.ColumnType.String))),
 			permissions: () => ({
 				Test: {
 					predicates: {},
@@ -143,8 +132,7 @@ describe('GraphQL schema builder', () => {
 				builder.entity('Test', e =>
 					e
 						.column('a', c => c.type(Model.ColumnType.String))
-						.column('b', c => c.type(Model.ColumnType.String)),
-				),
+						.column('b', c => c.type(Model.ColumnType.String))),
 			permissions: () => ({
 				Test: {
 					predicates: {},
@@ -161,14 +149,12 @@ describe('GraphQL schema builder', () => {
 		})
 	})
 
-
 	it('conditionally restricted read of some fields', async () => {
 		await testSchema({
 			schema: builder =>
 				builder.entity('Test', e =>
 					e
-						.column('a', c => c.type(Model.ColumnType.String).notNull()),
-				),
+						.column('a', c => c.type(Model.ColumnType.String).notNull())),
 			permissions: () => ({
 				Test: {
 					predicates: {
@@ -188,14 +174,12 @@ describe('GraphQL schema builder', () => {
 		})
 	})
 
-
 	it('conditionally restricted read of whole row', async () => {
 		await testSchema({
 			schema: builder =>
 				builder.entity('Test', e =>
 					e
-						.column('a', c => c.type(Model.ColumnType.String).notNull()),
-				),
+						.column('a', c => c.type(Model.ColumnType.String).notNull())),
 			permissions: () => ({
 				Test: {
 					predicates: {
@@ -219,10 +203,7 @@ describe('GraphQL schema builder', () => {
 		builder.entity('Root', e =>
 			e
 				.column('foo', c => c.type(Model.ColumnType.String))
-				.oneHasMany('r', r =>
-					r.target('OneHasManyEntity', e => e.column('a', c => c.type(Model.ColumnType.String))).ownedBy('r2'),
-				),
-		)
+				.oneHasMany('r', r => r.target('OneHasManyEntity', e => e.column('a', c => c.type(Model.ColumnType.String))).ownedBy('r2')))
 
 	it('ACL with relations - everything allowed', async () => {
 		await testSchema({
@@ -320,10 +301,7 @@ describe('GraphQL schema builder', () => {
 								e
 									.unique(['locale', 'post'])
 									.column('locale', c => c.type(Model.ColumnType.String))
-									.column('title', c => c.type(Model.ColumnType.String)),
-							),
-						),
-				),
+									.column('title', c => c.type(Model.ColumnType.String))))),
 			permissions: schema => new AllowAllPermissionFactory().create(schema),
 			graphQlSchemaFile: 'schema-has-many-reduction.gql',
 		})
@@ -339,8 +317,7 @@ describe('GraphQL schema builder', () => {
 						entity
 							.column('unique', column => column.type(Model.ColumnType.Enum, { enumName: 'one' }).unique().notNull())
 							.oneHasOne('introVideo', relation => relation.target('Video').notNull().inversedBy('frontPageForIntro'))
-							.oneHasMany('inHouseVideos', relation => relation.target('Video').ownedBy('frontPage')),
-					),
+							.oneHasMany('inHouseVideos', relation => relation.target('Video').ownedBy('frontPage'))),
 			permissions: schema => new AllowAllPermissionFactory().create(schema),
 			graphQlSchemaFile: 'schema-bug-66.gql',
 		})
@@ -375,17 +352,13 @@ describe('GraphQL schema builder', () => {
 					.entity('Author', e =>
 						e
 							.column('name', c => c.type(Model.ColumnType.String))
-							.oneHasMany('posts', r => r.target('Post').ownedBy('author')),
-					)
+							.oneHasMany('posts', r => r.target('Post').ownedBy('author')))
 					.entity('Category', e => e.column('name', c => c.type(Model.ColumnType.String)))
 					.entity('Post', e =>
 						e
 							.column('publishedAt', c => c.type(Model.ColumnType.DateTime))
-							.oneHasMany('locales', r =>
-								r.target('PostLocale', e => e.column('title', c => c.type(Model.ColumnType.String))),
-							)
-							.manyHasMany('categories', r => r.target('Category').inversedBy('posts')),
-					),
+							.oneHasMany('locales', r => r.target('PostLocale', e => e.column('title', c => c.type(Model.ColumnType.String))))
+							.manyHasMany('categories', r => r.target('Category').inversedBy('posts'))),
 			permissions: schema => new AllowAllPermissionFactory().create(schema, true),
 			graphQlSchemaFile: 'schema-custom-primary.gql',
 		})
@@ -393,13 +366,11 @@ describe('GraphQL schema builder', () => {
 
 	it('aliased type', async () => {
 		await testSchema({
-			schema: builder =>
-				builder.entity('Author', e => e.column('name', c => c.type(Model.ColumnType.String).typeAlias('AuthorName'))),
+			schema: builder => builder.entity('Author', e => e.column('name', c => c.type(Model.ColumnType.String).typeAlias('AuthorName'))),
 			permissions: schema => new AllowAllPermissionFactory().create(schema),
 			graphQlSchemaFile: 'schema-aliased-type.gql',
 		})
 	})
-
 
 	it('view entity', async () => {
 		await testSchema({
@@ -421,7 +392,6 @@ describe('GraphQL schema builder', () => {
 			graphQlSchemaFile: 'schema-no-root-ops.gql',
 		})
 	})
-
 
 	it('array', async () => {
 		const schema = createSchema({

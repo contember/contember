@@ -2,14 +2,7 @@ import { useMemo } from 'react'
 import { arrayMove } from './arrayMove'
 
 import { RepeaterMethods } from '../types'
-import {
-	BindingError,
-	EntityAccessor,
-	EntityListAccessor,
-	RelativeSingleField,
-	repairEntitiesOrder,
-	sortEntities,
-} from '@contember/react-binding'
+import { BindingError, EntityAccessor, EntityListAccessor, RelativeSingleField, repairEntitiesOrder, sortEntities } from '@contember/react-binding'
 
 export const useCreateRepeaterMethods = ({ accessor, sortableBy }: {
 	accessor: EntityListAccessor
@@ -43,34 +36,36 @@ export const useCreateRepeaterMethods = ({ accessor, sortableBy }: {
 				preprocess?.(getEntity, options)
 			})
 		},
-		moveItem: sortableBy ? (entity, index) => {
-			if (!sortableBy) {
-				throw new BindingError('Cannot move item without sortableBy field')
-			}
-
-			const entities = accessorGetter()
-			const sortedEntities = sortEntities(Array.from(entities), sortableBy)
-			const currentIndex = sortedEntities.findIndex(it => it.id === entity.id)
-			if (currentIndex === -1) {
-				throw new BindingError('Cannot move item that is not in the list')
-			}
-			const resolvedIndex = (() => {
-				switch (index) {
-					case 'first':
-						return 0
-					case 'last':
-						return sortedEntities.length - 1
-					case 'previous':
-						return currentIndex - 1
-					case 'next':
-						return currentIndex + 1
-					default:
-						return index
+		moveItem: sortableBy
+			? (entity, index) => {
+				if (!sortableBy) {
+					throw new BindingError('Cannot move item without sortableBy field')
 				}
-			})()
-			const newSorted = arrayMove(sortedEntities, currentIndex, resolvedIndex)
-			repairEntitiesOrder(sortableBy, newSorted)
-		} : undefined,
+
+				const entities = accessorGetter()
+				const sortedEntities = sortEntities(Array.from(entities), sortableBy)
+				const currentIndex = sortedEntities.findIndex(it => it.id === entity.id)
+				if (currentIndex === -1) {
+					throw new BindingError('Cannot move item that is not in the list')
+				}
+				const resolvedIndex = (() => {
+					switch (index) {
+						case 'first':
+							return 0
+						case 'last':
+							return sortedEntities.length - 1
+						case 'previous':
+							return currentIndex - 1
+						case 'next':
+							return currentIndex + 1
+						default:
+							return index
+					}
+				})()
+				const newSorted = arrayMove(sortedEntities, currentIndex, resolvedIndex)
+				repairEntitiesOrder(sortableBy, newSorted)
+			}
+			: undefined,
 		removeItem: (entity: EntityAccessor) => {
 			if (sortableBy) {
 				const entities = accessorGetter()

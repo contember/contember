@@ -21,25 +21,35 @@ export default () => {
 			</CardHeader>
 			<CardContent>
 				{otpActivation.type === 'otp_activating' && <Loader />}
-				{otpActivation.type === 'otp_activation_failed' && <div className="text-red-500 text-center">
-					{dict.tenant.otpActivation.errorMessages[otpActivation.error]}
-				</div>}
-				{otpActivation.type === 'otp_activated' && <div className="flex flex-col items-center gap-4">
-					<p className="text-lg text-center">
-						Enter the following code where you initiated signing in:
-					</p>
-					<div className="text-4xl font-bold border p-2 rounded font-mono">
-						{otpActivation.otp}
+				{otpActivation.type === 'otp_activation_failed' && (
+					<div className="text-red-500 text-center">
+						{dict.tenant.otpActivation.errorMessages[otpActivation.error]}
 					</div>
-
-				</div>}
-				{otpActivation.type === 'can_proceed_to_login' && <PasswordlessSignInForm onSuccess={() => {
-					redirect('index')
-				}} requestId={requestId} token={token?.toString()} validationType="token">
-					<form>
-						<PasswordlessSignInFormFields type="token" />
-					</form>
-				</PasswordlessSignInForm>}
+				)}
+				{otpActivation.type === 'otp_activated' && (
+					<div className="flex flex-col items-center gap-4">
+						<p className="text-lg text-center">
+							Enter the following code where you initiated signing in:
+						</p>
+						<div className="text-4xl font-bold border p-2 rounded font-mono">
+							{otpActivation.otp}
+						</div>
+					</div>
+				)}
+				{otpActivation.type === 'can_proceed_to_login' && (
+					<PasswordlessSignInForm
+						onSuccess={() => {
+							redirect('index')
+						}}
+						requestId={requestId}
+						token={token?.toString()}
+						validationType="token"
+					>
+						<form>
+							<PasswordlessSignInFormFields type="token" />
+						</form>
+					</PasswordlessSignInForm>
+				)}
 			</CardContent>
 			<CardFooter>
 				<Link to="index">
@@ -51,4 +61,3 @@ export default () => {
 		</Card>
 	)
 }
-

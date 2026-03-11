@@ -11,10 +11,11 @@ export interface DataViewEnumFilterTriggerAttributes {
 	['data-current']: DataViewEnumFilterCurrent
 }
 
-const SlotType = Slot as React.ForwardRefExoticComponent<React.ButtonHTMLAttributes<HTMLButtonElement> & React.RefAttributes<HTMLButtonElement> & DataViewEnumFilterTriggerAttributes>
+const SlotType = Slot as React.ForwardRefExoticComponent<
+	React.ButtonHTMLAttributes<HTMLButtonElement> & React.RefAttributes<HTMLButtonElement> & DataViewEnumFilterTriggerAttributes
+>
 
 export interface DataViewEnumFilterTriggerProps {
-
 	/**
 	 * The name of the filter. If not provided, the component will attempt to infer it from the context.
 	 */
@@ -65,7 +66,6 @@ export interface DataViewEnumFilterTriggerProps {
  */
 export const DataViewEnumFilterTrigger = forwardRef<HTMLButtonElement, DataViewEnumFilterTriggerProps>(
 	({ name, action = 'include', value, ...props }: DataViewEnumFilterTriggerProps, ref) => {
-		// eslint-disable-next-line react-hooks/rules-of-hooks
 		name ??= useDataViewFilterName()
 		const [current, setFilter] = useDataViewEnumFilter(name, value)
 		const toggleFilter = useCallback(() => {

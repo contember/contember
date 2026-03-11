@@ -6,6 +6,6 @@ export type PossibleEntityShapeInMigrations =
 	& Omit<Model.Entity, 'eventLog' | 'indexes' | 'unique'>
 	& {
 		eventLog?: Model.Entity['eventLog']
-		indexes?: (readonly  Model.Index[]) | Readonly<Record<string, Model.Index>>
-		unique: (readonly  (Model.UniqueConstraint | Model.UniqueIndex)[]) | Readonly<Record<string, Model.UniqueConstraint>>
+		indexes?: (readonly Model.Index[]) | Readonly<Record<string, Model.Index>>
+		unique: (readonly (Model.UniqueConstraint | Model.UniqueIndex)[]) | Readonly<Record<string, Model.UniqueConstraint>>
 	}

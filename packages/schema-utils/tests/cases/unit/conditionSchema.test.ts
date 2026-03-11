@@ -1,4 +1,4 @@
-import { expect, test, describe } from 'bun:test'
+import { describe, expect, test } from 'bun:test'
 import { conditionSchema } from '../../../src/type-schema'
 import { Model } from '@contember/schema'
 
@@ -30,7 +30,6 @@ describe('condition schema', () => {
 		}
 		expect(() => conditionSchema(Model.ColumnType.Int)(condition)).toThrow('value at root: extra property containsCI found')
 	})
-
 
 	test('accept non-json condition for unknown type', () => {
 		const condition = {

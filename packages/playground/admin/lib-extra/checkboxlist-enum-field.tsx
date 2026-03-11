@@ -26,7 +26,10 @@ export const CheckboxListEnumField = Component<CheckboxListEnumFieldProps>(({ fi
 	)
 }, ({ field, isNonbearing, defaultValue }) => <Field field={field} isNonbearing={isNonbearing} defaultValue={defaultValue} />)
 
-type CheckboxListEnumFieldInnerProps = Pick<CheckboxListEnumFieldProps, 'field' | 'options' | 'orientation' | 'inputProps' | 'defaultValue' | 'isNonbearing' | 'required'>
+type CheckboxListEnumFieldInnerProps = Pick<
+	CheckboxListEnumFieldProps,
+	'field' | 'options' | 'orientation' | 'inputProps' | 'defaultValue' | 'isNonbearing' | 'required'
+>
 
 const CheckboxListEnumFieldInner: React.FC<CheckboxListEnumFieldInnerProps> = ({ field, inputProps, options, orientation }) => {
 	const enumLabelsFormatter = useEnumOptionsFormatter()

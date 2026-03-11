@@ -25,7 +25,6 @@ export class ProjectMembershipResolver {
 		projectSlug: string
 		identity: { identityId: string; personId?: string; roles?: readonly string[] }
 	}): Promise<{ effective: readonly ParsedMembership[]; fetched: readonly Acl.Membership[] }> {
-
 		const explicitMemberships = await this.projectMembershipFetcher.fetchMemberships(projectSlug, {
 			id: identity.identityId,
 			roles: identity.roles,
@@ -48,7 +47,6 @@ export class ProjectMembershipResolver {
 
 		const assumedMemberships = this.readAssumedMemberships(request)
 		if (assumedMemberships !== null) {
-
 			if (assumedMemberships.length === 0) {
 				throwNotAllowed()
 			}
@@ -57,15 +55,14 @@ export class ProjectMembershipResolver {
 			if (parsedMemberships.errors.length > 0) {
 				throw new HttpErrorResponse(
 					400,
-					`Invalid memberships in ${assumeMembershipHeader} header:\n` +
-					parsedMemberships.errors.map(it => JSON.stringify(it)).join('\n'),
+					`Invalid memberships in ${assumeMembershipHeader} header:\n`
+						+ parsedMemberships.errors.map(it => JSON.stringify(it)).join('\n'),
 				)
 			}
 			this.verifyAssumedRoles(explicitMemberships, acl, assumedMemberships)
 
 			return { effective: parsedMemberships.memberships, fetched: explicitMemberships }
 		}
-
 
 		const explicitProjectRoles = explicitMemberships.map(it => it.role)
 		const implicitRolesToAssign = implicitRoles.filter(it => !explicitProjectRoles.includes(it))

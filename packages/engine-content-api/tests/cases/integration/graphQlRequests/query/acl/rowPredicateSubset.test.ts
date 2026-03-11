@@ -1,4 +1,4 @@
-import { SchemaDefinition as def, AclDefinition as acl, createSchema } from '@contember/schema-definition'
+import { AclDefinition as acl, createSchema, SchemaDefinition as def } from '@contember/schema-definition'
 import { Acl } from '@contember/schema'
 import { test } from 'bun:test'
 import { execute } from '../../../../../src/test'
@@ -6,9 +6,9 @@ import { GQL, SQL } from '../../../../../src/tags'
 import { testUuid } from '../../../../../src/testUuid'
 import { PermissionFactory } from '../../../../../../src'
 
-
 namespace RowPredicateSubset {
 	export const readerRole = acl.createRole('reader')
+
 	@acl.allow(readerRole, {
 		when: {
 			isPublished: { eq: true },
@@ -31,8 +31,6 @@ namespace RowPredicateSubset {
 		content = def.stringColumn()
 	}
 }
-
-
 
 test('row level predicate includes main predicate', async () => {
 	const schema = createSchema(RowPredicateSubset)
@@ -100,5 +98,3 @@ test('row level predicate includes main predicate', async () => {
 		},
 	})
 })
-
-

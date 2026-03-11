@@ -28,12 +28,12 @@ type BoardIndexItem =
 
 type BoardIndex = Record<UniqueIdentifier, BoardIndexItem>
 
-
 const useBoardIndex = (columns: BoardColumnNode[]): BoardIndex => {
-	return useMemo(() => Object.fromEntries(columns.flatMap((column): [UniqueIdentifier, BoardIndexItem][] => [
-		[column.id, { type: 'column', column }],
-		...column.items.map((item): [UniqueIdentifier, BoardIndexItem] => [item.id, { type: 'item', column, item }]),
-	])), [columns])
+	return useMemo(() =>
+		Object.fromEntries(columns.flatMap((column): [UniqueIdentifier, BoardIndexItem][] => [
+			[column.id, { type: 'column', column }],
+			...column.items.map((item): [UniqueIdentifier, BoardIndexItem] => [item.id, { type: 'item', column, item }]),
+		])), [columns])
 }
 
 export const BoardSortable = ({ children }: {
@@ -62,7 +62,6 @@ export const BoardSortable = ({ children }: {
 		setActiveId(null)
 	}
 
-
 	const onDragEnd = useCallback(({ active, over }: DragEndEvent) => {
 		setActiveId(null)
 
@@ -82,7 +81,6 @@ export const BoardSortable = ({ children }: {
 			return
 		}
 	}, [boardIndex, columns.length, moveColumn, moveItem])
-
 
 	return (
 		<DndContext
@@ -105,5 +103,4 @@ export const BoardSortable = ({ children }: {
 			</BoardActiveColumnContext.Provider>
 		</DndContext>
 	)
-
 }

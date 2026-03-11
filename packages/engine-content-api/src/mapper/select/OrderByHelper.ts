@@ -17,8 +17,8 @@ export class OrderByHelper {
 		const hasLimit = typeof objectNode.args.limit === 'number'
 		const hasOffset = typeof objectNode.args.offset === 'number'
 		if (
-			(!hasLimit && !hasOffset && !hasOrderBy) ||
-			(hasOrderBy && (inputOrder[0]._random || inputOrder[0]._randomSeeded !== undefined))
+			(!hasLimit && !hasOffset && !hasOrderBy)
+			|| (hasOrderBy && (inputOrder[0]._random || inputOrder[0]._randomSeeded !== undefined))
 		) {
 			return objectNode
 		}

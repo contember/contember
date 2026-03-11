@@ -13,7 +13,7 @@ export type Json =
 	| readonly Json[]
 	| JsonObject
 
-export interface Type<T extends Json | {readonly [K in string]?: Json} | undefined = Json> {
+export interface Type<T extends Json | { readonly [K in string]?: Json } | undefined = Json> {
 	(input: unknown, path?: PropertyKey[]): T
 	readonly inner?: any
 }
@@ -59,7 +59,6 @@ export const boolean = ((): Type<boolean> => {
 		return input
 	}
 })()
-
 
 export const scalar = ((): Type<Scalar> => {
 	return (input: unknown, path: PropertyKey[] = []): Scalar => {
@@ -109,9 +108,11 @@ export const anyJson = ((): Type<Json> => {
 export const anyJsonObject = ((): Type<JsonObject> => {
 	return (input: unknown, path: PropertyKey[] = []): JsonObject => {
 		if (input === null || typeof input !== 'object') throw ParseError.format(input, path, 'object')
-		return Object.fromEntries(Object.entries(input).map(([key, value]) => {
-			return [key, anyJson(value, [...path, key])]
-		}))
+		return Object.fromEntries(
+			Object.entries(input).map(([key, value]) => {
+				return [key, anyJson(value, [...path, key])]
+			}),
+		)
 	}
 })()
 
@@ -160,17 +161,19 @@ export const object = <T extends Record<string, Type<Json>>>(inner: T): Type<{ r
 export const partial = <T extends Record<string, Type<Json | undefined>>>(inner: T) => {
 	const type = (input: unknown, path: PropertyKey[] = []): { readonly [P in keyof T]?: Exclude<ReturnType<T[P]>, undefined> } => {
 		if (input === null || typeof input !== 'object') throw ParseError.format(input, path, 'object')
-		return Object.fromEntries(Object.entries(inner ?? {}).flatMap(([k, v]) => {
-			const newPath = [...path, k]
-			if (!(k in (input as object)) || (input as any)[k] === undefined) {
-				return []
-			}
-			const val = v((input as any)[k], newPath)
-			if (val === undefined) {
-				return []
-			}
-			return [[k, val]]
-		})) as any
+		return Object.fromEntries(
+			Object.entries(inner ?? {}).flatMap(([k, v]) => {
+				const newPath = [...path, k]
+				if (!(k in (input as object)) || (input as any)[k] === undefined) {
+					return []
+				}
+				const val = v((input as any)[k], newPath)
+				if (val === undefined) {
+					return []
+				}
+				return [[k, val]]
+			}),
+		) as any
 	}
 
 	type.inner = inner
@@ -181,7 +184,7 @@ export const partial = <T extends Record<string, Type<Json | undefined>>>(inner:
 export const noExtraProps = <T extends JsonObject>(inner: Type<T>) => {
 	const type = (input: unknown, path: PropertyKey[] = []): T => {
 		const result = inner(input, path)
-		if (!(typeof input === 'object' && typeof input !== null && typeof result === 'object' && result !== null)) {
+		if (!(typeof input === 'object' && input !== null && typeof result === 'object' && result !== null)) {
 			return result
 		}
 		const resultProps = new Set(Object.keys(result))
@@ -197,7 +200,6 @@ export const noExtraProps = <T extends JsonObject>(inner: Type<T>) => {
 
 	return type
 }
-
 
 export const record = <K extends Type<string>, T extends Type<Json>>(key: K, value: T): Type<{ readonly [P in ReturnType<K>]: ReturnType<T> }> => {
 	const type = (input: unknown, path: PropertyKey[] = []): { readonly [P in ReturnType<K>]: ReturnType<T> } => {
@@ -216,7 +218,6 @@ export const record = <K extends Type<string>, T extends Type<Json>>(key: K, val
 
 	return type
 }
-
 
 export const union = <T extends Type<Json>[]>(...inner: T): Type<ReturnType<Unpacked<T>>> => {
 	const type = (input: unknown, path: PropertyKey[] = []): ReturnType<Unpacked<T>> => {
@@ -277,7 +278,10 @@ export const partiallyDiscriminatedUnion = <T extends Type<JsonObject>[]>(field:
 	return type
 }
 
-export const discriminatedUnion = <F extends string, T extends {[key: string]: JsonObject}>(field: F, inner: {[K in keyof T]: Type<T[K]>}): Type<{ [K in keyof T]: { [X in F]: K } & T[K] }[keyof T]> => {
+export const discriminatedUnion = <F extends string, T extends { [key: string]: JsonObject }>(
+	field: F,
+	inner: { [K in keyof T]: Type<T[K]> },
+): Type<{ [K in keyof T]: { [X in F]: K } & T[K] }[keyof T]> => {
 	const type = (input: unknown, path: PropertyKey[] = []): { [K in keyof T]: { [X in F]: K } & T[K] }[keyof T] => {
 		if (input === null || typeof input !== 'object') throw ParseError.format(input, path, 'object')
 		const key = (input as any)[field]
@@ -289,7 +293,6 @@ export const discriminatedUnion = <F extends string, T extends {[key: string]: J
 		const { [field]: _, ...inputWithoutDiscr } = input
 
 		return { [field]: key, ...discriminatedType(inputWithoutDiscr, path) }
-
 	}
 	type.inner = inner
 
@@ -318,8 +321,9 @@ export const tuple = <T extends Type<Json>[]>(...inner: T): Type<TupleFromTupled
 	return type
 }
 
-type DiscriminatedTupleUnionType<T extends Record<string, Type<Json>[]>> =
-	{ [K in keyof T]: (readonly [K, ...TupleFromTupledType<T[K]>]) }[keyof T & string]
+type DiscriminatedTupleUnionType<T extends Record<string, Type<Json>[]>> = {
+	[K in keyof T]: (readonly [K, ...TupleFromTupledType<T[K]>])
+}[keyof T & string]
 
 export const discriminatedTupleUnion = <T extends Record<string, Type<Json>[]>>(inner: T): Type<DiscriminatedTupleUnionType<T>> => {
 	const type = (input: unknown, path: PropertyKey[] = []): DiscriminatedTupleUnionType<T> => {
@@ -377,13 +381,16 @@ export const nullable = <T extends Json>(inner: Type<T>): Type<T | null> => {
 	return type
 }
 
-export const preprocess = <Input extends Json>(inner: Type<Input>, transform: (input: unknown) => unknown) => (input: unknown, path: PropertyKey[] = []): Input => {
-	return inner(transform(input), path)
-}
+export const preprocess =
+	<Input extends Json>(inner: Type<Input>, transform: (input: unknown) => unknown) => (input: unknown, path: PropertyKey[] = []): Input => {
+		return inner(transform(input), path)
+	}
 
-export const transform = <Input extends Json, Result extends Json>(inner: Type<Input>, transform: (value: Input, input: unknown, path: PropertyKey[]) => Result) => (input: unknown, path: PropertyKey[] = []): Result => {
-	return transform(inner(input, path), input, path)
-}
+export const transform =
+	<Input extends Json, Result extends Json>(inner: Type<Input>, transform: (value: Input, input: unknown, path: PropertyKey[]) => Result) =>
+	(input: unknown, path: PropertyKey[] = []): Result => {
+		return transform(inner(input, path), input, path)
+	}
 
 export const coalesce = <T extends Json, F extends Json>(inner: Type<T>, fallback: F): Type<T | F> => {
 	const type = (input: unknown, path: PropertyKey[] = []): T | F => {
@@ -406,12 +413,10 @@ export const valueAt = (input: any, path: PropertyKey[]): unknown | undefined =>
 	return value
 }
 
-type EqualsWrapped<T> = T extends infer R & {}
-	? {
+type EqualsWrapped<T> = T extends infer R & {} ? {
 		[P in keyof R]: R[P]
 	}
 	: never
 
-export type Equals<A, B> = (<T>() => T extends EqualsWrapped<A> ? 1 : 2) extends <T>() => T extends EqualsWrapped<B> ? 1 : 2
-	? true
+export type Equals<A, B> = (<T>() => T extends EqualsWrapped<A> ? 1 : 2) extends <T>() => T extends EqualsWrapped<B> ? 1 : 2 ? true
 	: false

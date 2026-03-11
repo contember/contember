@@ -29,7 +29,7 @@ export class PaginatedHasManyExecutionHandler implements SelectExecutionHandler<
 						entity,
 						objectNode.extensions.relationName,
 						new PaginatedHasManyCountVisitor(ids, objectNode, this.relationFetcher, mapper, context.relationPath),
-					  )
+					)
 					: {}
 
 				const nodes = pagination.nodeField
@@ -38,7 +38,7 @@ export class PaginatedHasManyExecutionHandler implements SelectExecutionHandler<
 						entity,
 						objectNode.extensions.relationName,
 						new PaginatedHasManyNodesVisitor(ids, pagination.nodeField, this.relationFetcher, mapper, context.relationPath),
-					  )
+					)
 					: undefined
 				const result = new Map<Input.PrimaryValue, any>()
 				for (const id of ids) {

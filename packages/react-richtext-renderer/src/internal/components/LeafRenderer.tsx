@@ -31,6 +31,6 @@ export function LeafRenderer<
 				fallback,
 				children: leaf.text,
 			},
-		  )
+		)
 		: fallback
 }

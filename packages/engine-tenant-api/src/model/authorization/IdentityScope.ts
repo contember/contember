@@ -1,4 +1,4 @@
-import { AuthorizationScope, AccessNode } from '@contember/authorization'
+import { AccessNode, AuthorizationScope } from '@contember/authorization'
 import { TenantRole } from './Roles'
 import { Identity } from './Identity'
 

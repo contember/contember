@@ -21,7 +21,7 @@ export function useOnElementMouseEnterDelayedCallback(
 		const refValue = unwrapRefValue(refOrElement)
 
 		if (refValue) {
-			let timeoutID: ReturnType<typeof setTimeout> | undefined = undefined
+			let timeoutID: ReturnType<typeof setTimeout> | undefined
 
 			function handleMouseEnter(event: MouseEvent) {
 				clearTimeout(timeoutID)

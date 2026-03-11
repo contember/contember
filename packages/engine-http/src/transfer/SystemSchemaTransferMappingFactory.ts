@@ -34,10 +34,8 @@ export class SystemSchemaTransferMappingFactory {
 				for (const column of Object.values(table.columns)) {
 					if (column.name === 'stage_slug') {
 						builder = builder.select(['stage', 'slug'], 'stage_slug')
-
 					} else if (column.type === Model.ColumnType.Json || column.type === Model.ColumnType.Date || column.type === Model.ColumnType.DateTime) {
 						builder = builder.select(expr => expr.raw(`${wrapIdentifier('stage_transaction')}.${wrapIdentifier(column.name)}::text`))
-
 					} else {
 						builder = builder.select(['stage_transaction', column.name])
 					}
@@ -61,13 +59,13 @@ export class SystemSchemaTransferMappingFactory {
 			},
 
 			createRowParser: async (db, columns, baseType) => {
-				const stages = await db.selectBuilder<{id: string; slug: string}>()
+				const stages = await db.selectBuilder<{ id: string; slug: string }>()
 					.select('id')
 					.select('slug')
 					.from('stage')
 					.getResult(db)
 
-				const stageSlugToId = new Map(stages.map(row => ([row.slug, row.id])))
+				const stageSlugToId = new Map(stages.map(row => [row.slug, row.id]))
 				const stageSlugColumnIndex = columns.indexOf('stage_slug')
 
 				if (stageSlugColumnIndex < 0) {
@@ -118,10 +116,8 @@ export class SystemSchemaTransferMappingFactory {
 				for (const column of Object.values(table.columns)) {
 					if (column.name === 'schema_version') {
 						builder = builder.select(['schema_migration', 'version'], 'schema_version')
-
 					} else if (column.type === Model.ColumnType.Json || column.type === Model.ColumnType.Date || column.type === Model.ColumnType.DateTime) {
 						builder = builder.select(expr => expr.raw(`${wrapIdentifier('event_data')}.${wrapIdentifier(column.name)}::text`))
-
 					} else {
 						builder = builder.select(['event_data', column.name])
 					}
@@ -151,13 +147,13 @@ export class SystemSchemaTransferMappingFactory {
 			},
 
 			createRowParser: async (db, columns, baseType) => {
-				const schemaMigrations = await db.selectBuilder<{id: string; version: string}>()
+				const schemaMigrations = await db.selectBuilder<{ id: string; version: string }>()
 					.select('id')
 					.select('version')
 					.from('schema_migration')
 					.getResult(db)
 
-				const versionToId = new Map(schemaMigrations.map(row => ([row.version, row.id])))
+				const versionToId = new Map(schemaMigrations.map(row => [row.version, row.id]))
 				const schemaVersionColumnIndex = columns.indexOf('schema_version')
 
 				if (schemaVersionColumnIndex < 0) {

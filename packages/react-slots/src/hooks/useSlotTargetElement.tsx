@@ -33,10 +33,12 @@ const useSlotTargetElementDev = (name: string): HTMLElement | null | undefined =
 		// we delay the warning a bit.
 		if (target === undefined) {
 			const handle = setTimeout(() => {
-				console.warn(`Page "${window.location.href}" tried to create a portal to a Slot named "${name}" `
-					+ `but there seem to be no target for it in the layout. However, this might be you intention `
-					+ `or a temporary state in between the renders. Make sure you have added a target for it `
-					+ `in your layout so it can be rendered next time.`)
+				console.warn(
+					`Page "${window.location.href}" tried to create a portal to a Slot named "${name}" `
+						+ `but there seem to be no target for it in the layout. However, this might be you intention `
+						+ `or a temporary state in between the renders. Make sure you have added a target for it `
+						+ `in your layout so it can be rendered next time.`,
+				)
 			}, 1000)
 			return () => {
 				clearTimeout(handle)

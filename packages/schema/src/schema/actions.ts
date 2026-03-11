@@ -4,8 +4,7 @@ export namespace Actions {
 	export type SelectionNodeSub = readonly [name: string, args: JSONObject, fields: SelectionNode]
 	export type SelectionNode = readonly (string | SelectionNodeSub)[]
 
-	export type AnyTarget =
-		| WebhookTarget
+	export type AnyTarget = WebhookTarget
 
 	export type WebhookTarget = {
 		readonly type: 'webhook'

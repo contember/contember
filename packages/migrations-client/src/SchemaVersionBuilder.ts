@@ -25,8 +25,7 @@ export class SchemaVersionBuilder {
 		return (await this.migrationsResolver.getSchemaMigrations())
 			.filter(({ version }) => condition(version))
 			.reduce<Schema>(
-				(schema, { modifications, formatVersion }) =>
-					this.schemaMigrator.applyModifications(schema, modifications, formatVersion),
+				(schema, { modifications, formatVersion }) => this.schemaMigrator.applyModifications(schema, modifications, formatVersion),
 				initialSchema,
 			)
 	}

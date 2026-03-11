@@ -261,7 +261,7 @@ export default printMutation([
 			},
 		},
 	}),
-	...Array.from({ length: 30 }).map((_, i) => {
+	...Array.from({ length: 3000 }).map((_, i) => {
 		const publishedAt = new Date()
 		publishedAt.setDate(publishedAt.getDate() + i)
 		return queryBuilder.create('GridArticle', {

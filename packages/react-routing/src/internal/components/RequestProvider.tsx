@@ -5,7 +5,6 @@ import { AddRequestListenerContext, CurrentRequestContext, PushRequestContext, u
 import { populateRequest } from '../utils/populateRequest'
 import { useRequestChangeListeners } from '../hooks/useRequestChangeListeners'
 
-
 export const RequestProvider: FC<{ children: ReactNode }> = ({ children }) => {
 	const routing = useRouting()
 	const [request, setRequest] = useState<RequestState>(() => populateRequest(routing, window.location))
@@ -59,8 +58,6 @@ export const RequestProvider: FC<{ children: ReactNode }> = ({ children }) => {
 		[fireListeners, pushHistoryState],
 	)
 
-
-
 	return (
 		<CurrentRequestContext.Provider value={request}>
 			<PushRequestContext.Provider value={pushRequest}>
@@ -71,4 +68,3 @@ export const RequestProvider: FC<{ children: ReactNode }> = ({ children }) => {
 		</CurrentRequestContext.Provider>
 	)
 }
-

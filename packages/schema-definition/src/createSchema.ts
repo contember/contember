@@ -4,7 +4,7 @@ import * as AclDefinition from './acl/definition'
 import * as ActionsDefinition from './actions/definition'
 import { Model, Schema } from '@contember/schema'
 import { emptySchema } from '@contember/schema-utils'
-import { allStrict, StrictOptions, StrictDefinitionValidator } from './strict'
+import { allStrict, StrictDefinitionValidator, StrictOptions } from './strict'
 
 export const createSchema = (definitions: Record<string, any>, modifyCallback?: (schema: Schema) => Schema, options?: {
 	strict?: boolean | StrictOptions

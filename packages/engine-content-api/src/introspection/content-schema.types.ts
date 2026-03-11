@@ -61,7 +61,7 @@ export type _LiteralArgument = {
 export enum _OnDeleteBehaviour {
 	Cascade = 'cascade',
 	Restrict = 'restrict',
-	SetNull = 'setNull'
+	SetNull = 'setNull',
 }
 
 export type _OrderBy = {
@@ -72,7 +72,7 @@ export type _OrderBy = {
 
 export enum _OrderByDirection {
 	Asc = 'asc',
-	Desc = 'desc'
+	Desc = 'desc',
 }
 
 export type _PathArgument = {
@@ -98,7 +98,7 @@ export type _Relation = _Field & {
 
 export enum _RelationSide {
 	Inverse = 'inverse',
-	Owning = 'owning'
+	Owning = 'owning',
 }
 
 export type _Rule = {

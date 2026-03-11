@@ -27,6 +27,6 @@ ALTER TABLE "project_member"
   ALTER "identity_id" SET NOT NULL;
 `
 
-export default async function (builder: MigrationBuilder) {
+export default async function(builder: MigrationBuilder) {
 	builder.sql(sql)
 }

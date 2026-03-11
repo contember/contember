@@ -32,5 +32,4 @@ test('read view with variable', async () => {
 			expect(response.body.data.listFoo[0].name).toBe('2024-07-01-120000-init')
 		})
 		.expect(200)
-
 })

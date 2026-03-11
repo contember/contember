@@ -1,8 +1,8 @@
 import { describe, expect, test } from 'bun:test'
 import { svgSizeProps } from '../../src'
 
-describe('@contember/utilities', function () {
-	test('@contember/utilities.svgViewBox', function () {
+describe('@contember/utilities', function() {
+	test('@contember/utilities.svgViewBox', function() {
 		expect(svgSizeProps(100)).toEqual({
 			width: 100,
 			height: 100,

@@ -4,4 +4,3 @@ export interface Stage {
 	readonly slug: string
 	readonly schema: string
 }
-

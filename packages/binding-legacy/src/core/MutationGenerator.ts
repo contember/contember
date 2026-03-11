@@ -1,5 +1,5 @@
 import { ContentMutation, ContentQueryBuilder, Input } from '@contember/client'
-import { ClientGeneratedUuid,  ReceivedEntityData, ServerId } from '@contember/binding-common'
+import { ClientGeneratedUuid, ReceivedEntityData, ServerId } from '@contember/binding-common'
 import { BindingError } from '@contember/binding-common'
 import { PRIMARY_KEY_NAME, TYPENAME_KEY_NAME } from '@contember/binding-common'
 import { EntityFieldMarkers, FieldMarker, HasManyRelationMarker, HasOneRelationMarker } from '@contember/binding-common'
@@ -11,7 +11,6 @@ import { MutationAlias } from './requestAliases'
 import { EntityListState, EntityRealmState, EntityRealmStateStub, EntityState, FieldState, getEntityMarker, StateIterator } from './state'
 import type { TreeStore } from './TreeStore'
 import { EntityFieldPersistedData, EntityFieldPersistedValue } from '../accessorTree'
-
 
 type ProcessedPlaceholdersByEntity = Map<EntityState, Set<PlaceholderName>>
 
@@ -34,7 +33,6 @@ export type PersistMutationResult = {
 
 // TODO enforce correct expected mutations in dev mode.
 export class MutationGenerator {
-
 	private aliasCounter = 1
 	private processedPlaceholdersByEntity: ProcessedPlaceholdersByEntity = new Map()
 	private processedDeletes = new Set<string>()
@@ -59,7 +57,10 @@ export class MutationGenerator {
 					continue
 				}
 				if (subTreeState.type === 'entityRealm') {
-					if (subTreeState.blueprint.type === 'subTree' && subTreeState.blueprint.marker.parameters.isCreating && subTreeState.blueprint.marker.parameters.isUnpersisted) {
+					if (
+						subTreeState.blueprint.type === 'subTree' && subTreeState.blueprint.marker.parameters.isCreating
+						&& subTreeState.blueprint.marker.parameters.isUnpersisted
+					) {
 						continue
 					}
 					const subMutation = this.createMutation(
@@ -73,7 +74,10 @@ export class MutationGenerator {
 						operations.push(subMutation[1])
 					}
 				} else if (subTreeState.type === 'entityList') {
-					if (subTreeState.blueprint.type === 'subTree' && subTreeState.blueprint.marker.parameters.isCreating && subTreeState.blueprint.marker.parameters.isUnpersisted) {
+					if (
+						subTreeState.blueprint.type === 'subTree' && subTreeState.blueprint.marker.parameters.isCreating
+						&& subTreeState.blueprint.marker.parameters.isUnpersisted
+					) {
 						continue
 					}
 					for (const childState of subTreeState.children.values()) {
@@ -198,7 +202,7 @@ export class MutationGenerator {
 	): ContentMutation<any> {
 		return this.qb.delete(entityName, {
 			by: { [PRIMARY_KEY_NAME]: deletedId },
-		}, it  => it.$(PRIMARY_KEY_NAME).$('__typename'))
+		}, it => it.$(PRIMARY_KEY_NAME).$('__typename'))
 	}
 
 	private createUpdateMutation(
@@ -245,7 +249,7 @@ export class MutationGenerator {
 		let processedPlaceholders = this.processedPlaceholdersByEntity.get(currentState.entity)
 
 		if (processedPlaceholders === undefined) {
-			this.processedPlaceholdersByEntity.set(currentState.entity, (processedPlaceholders = new Set()))
+			this.processedPlaceholdersByEntity.set(currentState.entity, processedPlaceholders = new Set())
 		}
 
 		if (currentState.type === 'entityRealmStub') {
@@ -255,12 +259,13 @@ export class MutationGenerator {
 
 		const result: Input.CreateDataInput = {}
 		for (const siblingState of StateIterator.eachSiblingRealm(currentState)) {
-
 			const pathBack = this.treeStore.getPathBackToParent(siblingState)
 
-			const nonbearingFields: Array<| { type: 'field'; marker: FieldMarker; fieldState: FieldState }
-			| { type: 'hasOne'; marker: HasOneRelationMarker; fieldState: EntityRealmState | EntityRealmStateStub }
-			| { type: 'hasMany'; marker: HasManyRelationMarker; fieldState: EntityListState }> = []
+			const nonbearingFields: Array<
+				| { type: 'field'; marker: FieldMarker; fieldState: FieldState }
+				| { type: 'hasOne'; marker: HasOneRelationMarker; fieldState: EntityRealmState | EntityRealmStateStub }
+				| { type: 'hasMany'; marker: HasManyRelationMarker; fieldState: EntityListState }
+			> = []
 
 			for (const [placeholderName, fieldState] of siblingState.children) {
 				if (processedPlaceholders.has(placeholderName)) {
@@ -274,8 +279,8 @@ export class MutationGenerator {
 						const placeholderName = marker.placeholderName
 
 						if (
-							placeholderName === TYPENAME_KEY_NAME ||
-							(placeholderName === PRIMARY_KEY_NAME && !(siblingState.entity.id instanceof ClientGeneratedUuid))
+							placeholderName === TYPENAME_KEY_NAME
+							|| (placeholderName === PRIMARY_KEY_NAME && !(siblingState.entity.id instanceof ClientGeneratedUuid))
 						) {
 							continue
 						}
@@ -407,9 +412,9 @@ export class MutationGenerator {
 					const field = setOnCreate[key]
 
 					if (
-						typeof field === 'string' ||
-						typeof field === 'number' ||
-						field === null
+						typeof field === 'string'
+						|| typeof field === 'number'
+						|| field === null
 					) {
 						result[key] = field
 					} else {
@@ -488,7 +493,7 @@ export class MutationGenerator {
 		let processedPlaceholders = this.processedPlaceholdersByEntity.get(currentState.entity)
 
 		if (processedPlaceholders === undefined) {
-			this.processedPlaceholdersByEntity.set(currentState.entity, (processedPlaceholders = new Set()))
+			this.processedPlaceholdersByEntity.set(currentState.entity, processedPlaceholders = new Set())
 		}
 
 		const pathBack = this.treeStore.getPathBackToParent(currentState)
@@ -530,13 +535,10 @@ export class MutationGenerator {
 
 						const persistedValue = entityData?.get?.(placeholderName)?.value
 						if (reducedBy === undefined) {
-
 							const relationData = this.getUpdateOneRelationInput(currentState, fieldState, persistedValue, placeholderName)
 							if (relationData !== undefined) {
 								result[marker.parameters.field] = relationData
 							}
-
-
 						} else {
 							const relationData = this.getUpdateManyRelationForReducedInput(currentState, fieldState, persistedValue, placeholderName, reducedBy)
 							if (relationData !== undefined) {
@@ -547,7 +549,6 @@ export class MutationGenerator {
 									result[marker.parameters.field] = relationData
 								}
 							}
-
 						}
 						break
 					}
@@ -595,7 +596,7 @@ export class MutationGenerator {
 			if (persistedValue.value === runtimeId.value) {
 				// The persisted and currently referenced ids match, and so this is an update.
 				if (fieldState.type === 'entityRealmStub') {
-					return undefined// …unless we're dealing with a stub. There cannot be any updates there.
+					return undefined // …unless we're dealing with a stub. There cannot be any updates there.
 				}
 				const input = this.getUpdateDataInput(fieldState)
 				if (input === undefined) {
@@ -628,7 +629,6 @@ export class MutationGenerator {
 				return {
 					connect: { [PRIMARY_KEY_NAME]: runtimeId.value },
 				}
-
 			}
 			// The currently present entity doesn't exist on the server. Try if creating yields anything…
 			const createInput = this.getCreateDataInput(fieldState)
@@ -667,7 +667,6 @@ export class MutationGenerator {
 		placeholderName: PlaceholderName,
 		reducedBy: UniqueWhere,
 	): Input.UpdateManyRelationInput | undefined {
-
 		const runtimeId = fieldState.entity.id
 		const alias = MutationAlias.encodeEntityId(runtimeId)
 
@@ -747,7 +746,6 @@ export class MutationGenerator {
 		fieldState: EntityListState,
 		persistedEntityIds: Set<EntityId>,
 	): Input.UpdateManyRelationInput | undefined {
-
 		const input: Input.UpdateManyRelationInput = []
 		for (const childState of fieldState.children.values()) {
 			const runtimeId = childState.entity.id
@@ -798,7 +796,6 @@ export class MutationGenerator {
 						alias,
 						delete: { [PRIMARY_KEY_NAME]: removedId },
 					})
-
 				} else if (removalType === 'disconnect') {
 					// TODO also potentially update
 
@@ -814,7 +811,6 @@ export class MutationGenerator {
 
 		return input.length === 0 ? undefined : input
 	}
-
 
 	private createAlias(): string {
 		return `op_${this.aliasCounter++}`

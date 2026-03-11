@@ -4,9 +4,9 @@ import { BindingError } from '@contember/binding'
 
 const getRejecter = (operation: string) => () => {
 	throw new BindingError(
-		`Trying to ${operation} but data binding is unavailable. You likely used a bound component outside ` +
-			`<DataBindingProvider /> or it tried to reach its accessor whilst the tree was in an non-interactive state ` +
-			`(e.g. still loading).`,
+		`Trying to ${operation} but data binding is unavailable. You likely used a bound component outside `
+			+ `<DataBindingProvider /> or it tried to reach its accessor whilst the tree was in an non-interactive state `
+			+ `(e.g. still loading).`,
 	)
 }
 

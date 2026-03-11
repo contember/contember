@@ -10,8 +10,8 @@ const ToggleGroupContext = React.createContext<ToggleProps>({
 
 const ToggleGroup = React.forwardRef<
 	React.ElementRef<typeof ToggleGroupPrimitive.Root>,
-	React.ComponentPropsWithoutRef<typeof ToggleGroupPrimitive.Root> &
-	ToggleProps
+	& React.ComponentPropsWithoutRef<typeof ToggleGroupPrimitive.Root>
+	& ToggleProps
 >(({ className, variant, size, children, ...props }, ref) => (
 	<ToggleGroupPrimitive.Root
 		ref={ref}
@@ -30,12 +30,16 @@ const ToggleGroupItemInner = uic(ToggleGroupPrimitive.Item, toggleConfig)
 
 const ToggleGroupItem = React.forwardRef<
 	React.ElementRef<typeof ToggleGroupPrimitive.Item>,
-	React.ComponentPropsWithoutRef<typeof ToggleGroupPrimitive.Item> &
-	ToggleProps
+	& React.ComponentPropsWithoutRef<typeof ToggleGroupPrimitive.Item>
+	& ToggleProps
 >(({ className, children, variant, size, ...props }, ref) => {
 	const context = React.useContext(ToggleGroupContext)
 
-	return <ToggleGroupItemInner ref={ref} className={className} variant={context.variant || variant} size={context.size || size} {...props}>{children}</ToggleGroupItemInner>
+	return (
+		<ToggleGroupItemInner ref={ref} className={className} variant={context.variant || variant} size={context.size || size} {...props}>
+			{children}
+		</ToggleGroupItemInner>
+	)
 })
 
 ToggleGroupItem.displayName = ToggleGroupPrimitive.Item.displayName

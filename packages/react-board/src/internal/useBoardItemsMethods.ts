@@ -5,12 +5,12 @@ import {
 	EntityAccessor,
 	EntityListAccessor,
 	RelativeSingleField,
-	repairEntitiesOrder, sortEntities,
+	repairEntitiesOrder,
+	sortEntities,
 } from '@contember/react-binding'
 import { BoardColumnKey, UseGroupItemsByColumn } from './useGroupItemsByColumn'
 import { arrayMove } from '../utils/arrayMove'
 import { BoardAddItemMethod, BoardColumnValue, BoardMethods, BoardMoveItemMethod, BoardRemoveItemMethod } from '../types'
-
 
 export type UseBoardItemsMethodsProps<ColumnValue extends BoardColumnValue> = {
 	itemEntities: EntityListAccessor
@@ -33,7 +33,6 @@ export const useBoardItemsMethods = <ColumnValue extends BoardColumnValue>({
 	columnIdGetter,
 	sortScope = 'column',
 }: UseBoardItemsMethodsProps<ColumnValue>): BoardItemsMethods<ColumnValue> => {
-
 	const itemEntitiesEntitiesGetter = itemEntities.getAccessor
 
 	const getSortScopeItems = useCallback((column: string | number | null) => {
@@ -77,14 +76,12 @@ export const useBoardItemsMethods = <ColumnValue extends BoardColumnValue>({
 
 		const resolvedIndex = resolveScopedIndex(columnId, index) ?? sortScopeItems.length
 
-
 		itemEntities.createNewEntity((getEntity, options) => {
 			sortScopeItems.splice(resolvedIndex, 0, getEntity())
 			repairEntitiesOrder(desugaredSortableByField, sortScopeItems)
 			resolvedPreprocess?.(getEntity, options)
 		})
 	}, [columnIdGetter, connectItemToColumn, desugaredSortableByField, getSortScopeItems, itemEntitiesEntitiesGetter, resolveScopedIndex])
-
 
 	const moveItem = useMemo<BoardMoveItemMethod<ColumnValue> | undefined>(() => {
 		if (!desugaredSortableByField) {
@@ -105,7 +102,6 @@ export const useBoardItemsMethods = <ColumnValue extends BoardColumnValue>({
 				return
 			}
 
-
 			// sort scope is column
 			const itemEntities = itemEntitiesEntitiesGetter()
 			const groupedItems = groupItemsByColumn(itemEntities)
@@ -118,9 +114,18 @@ export const useBoardItemsMethods = <ColumnValue extends BoardColumnValue>({
 			const newColumnItems = groupedItems.get(columnId)?.slice() ?? []
 			newColumnItems.splice(index, 0, entity)
 			repairEntitiesOrder(desugaredSortableByField, newColumnItems)
-
 		}
-	}, [columnIdGetter, connectItemToColumn, desugaredSortableByField, getDiscriminatorValue, getSortScopeItems, groupItemsByColumn, itemEntitiesEntitiesGetter, resolveScopedIndex, sortScope])
+	}, [
+		columnIdGetter,
+		connectItemToColumn,
+		desugaredSortableByField,
+		getDiscriminatorValue,
+		getSortScopeItems,
+		groupItemsByColumn,
+		itemEntitiesEntitiesGetter,
+		resolveScopedIndex,
+		sortScope,
+	])
 
 	const removeItem = useCallback<BoardRemoveItemMethod>(entity => {
 		if (desugaredSortableByField) {

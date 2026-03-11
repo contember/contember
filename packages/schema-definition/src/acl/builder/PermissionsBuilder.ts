@@ -38,9 +38,7 @@ class PermissionsBuilder {
 			entitySelector = EntitySelector.named(...entitySelector)
 		}
 		const entitySelectorWithType = entitySelector
-		const entities = Object.values(this.schema.entities).filter(entity =>
-			entitySelectorWithType.matches(this.schema, entity),
-		)
+		const entities = Object.values(this.schema.entities).filter(entity => entitySelectorWithType.matches(this.schema, entity))
 		return new EntityPermissionsBuilder(this, entities)
 	}
 

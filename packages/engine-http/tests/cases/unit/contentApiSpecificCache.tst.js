@@ -14,7 +14,6 @@ import { ContentApiSpecificCache } from '../../../dist/production/content/Conten
 		const objectKey = {}
 		const cache = new ContentApiSpecificCache({})
 		assert.ok(cache.fetch(objectKey, '', () => value) === value)
-		// eslint-disable-next-line no-console
 		console.log('create value OK')
 	})()
 
@@ -27,7 +26,6 @@ import { ContentApiSpecificCache } from '../../../dist/production/content/Conten
 		assert.ok(cache.fetch(objectKey, '', () => {
 			throw new Error('should not happen')
 		}) === value)
-		// eslint-disable-next-line no-console
 		console.log('repeated fetch OK')
 	})()
 
@@ -53,7 +51,6 @@ import { ContentApiSpecificCache } from '../../../dist/production/content/Conten
 
 		const value2 = {}
 		assert.ok(cache.fetch(objectKey, '', () => value2) === value2)
-		// eslint-disable-next-line no-console
 		console.log('weakmap clear OK')
 	})()
 
@@ -75,7 +72,6 @@ import { ContentApiSpecificCache } from '../../../dist/production/content/Conten
 			throw new Error('should not happen')
 		})
 
-		// eslint-disable-next-line no-console
 		console.log('ttl not expired OK')
 	})()
 
@@ -98,7 +94,6 @@ import { ContentApiSpecificCache } from '../../../dist/production/content/Conten
 			})
 		}
 
-		// eslint-disable-next-line no-console
 		console.log('ttl renew OK')
 	})()
 
@@ -120,10 +115,8 @@ import { ContentApiSpecificCache } from '../../../dist/production/content/Conten
 		const value2 = {}
 		assert.ok(cache.fetch(objectKey, '', () => value2) === value2)
 
-		// eslint-disable-next-line no-console
 		console.log('ttl expired OK')
 	})()
 
-	// eslint-disable-next-line no-console
 	console.log('content api cache test DONE')
 })()

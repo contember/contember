@@ -87,7 +87,7 @@ export type DataGridHasManyFilterProps =
  * ```
  */
 export const DataGridHasManyFilter = Component(({ label, children, ...props }: DataGridHasManyFilterProps) => (
-	<DataViewHasManyFilter {...props} >
+	<DataViewHasManyFilter {...props}>
 		<DataGridFilterMobileHiding>
 			<DataGridRelationFilterInner label={label ?? <DataViewHasManyLabel field={props.field} />}>
 				{children}
@@ -144,16 +144,18 @@ export type DataGridHasOneTooltipProps =
  * </HasOne>
  * ```
  */
-export const DataGridHasOneTooltip = Component<DataGridHasOneTooltipProps>(({ children, actions, ...props }) => (<>
-	<DataViewHasOneFilter {...props}>
-		<DataGridRelationFieldTooltipInner actions={actions}>
+export const DataGridHasOneTooltip = Component<DataGridHasOneTooltipProps>(({ children, actions, ...props }) => (
+	<>
+		<DataViewHasOneFilter {...props as DataViewHasOneFilterProps}>
+			<DataGridRelationFieldTooltipInner actions={actions}>
+				{children}
+			</DataGridRelationFieldTooltipInner>
+		</DataViewHasOneFilter>
+		<StaticRender>
 			{children}
-		</DataGridRelationFieldTooltipInner>
-	</DataViewHasOneFilter>
-	<StaticRender>
-		{children}
-	</StaticRender>
-</>))
+		</StaticRender>
+	</>
+))
 
 /**
  * Props for {@link DataGridHasManyTooltip}.
@@ -187,16 +189,18 @@ export type DataGridHasManyTooltipProps =
  * ```
  */
 export const DataGridHasManyTooltip = Component<DataGridHasManyTooltipProps>(({ children, actions, ...props }) => {
-	return (<>
-		<DataViewHasManyFilter {...props}>
-			<DataGridRelationFieldTooltipInner actions={actions}>
+	return (
+		<>
+			<DataViewHasManyFilter {...props as DataViewHasManyFilterProps}>
+				<DataGridRelationFieldTooltipInner actions={actions}>
+					{children}
+				</DataGridRelationFieldTooltipInner>
+			</DataViewHasManyFilter>
+			<StaticRender>
 				{children}
-			</DataGridRelationFieldTooltipInner>
-		</DataViewHasManyFilter>
-		<StaticRender>
-			{children}
-		</StaticRender>
-	</>)
+			</StaticRender>
+		</>
+	)
 })
 
 const DataGridRelationFieldTooltipInner = Component(({ children, actions }: { children: ReactNode; actions?: ReactNode }) => (
@@ -242,7 +246,9 @@ export const DataGridRelationFilteredItemsList = ({ children }: {
 	</>
 )
 
-const [, useFilterFactory, FilterFactoryContextProvider] = createRequiredContext<(value: EntityId) => UseDataViewRelationFilterResult>('FilterFactoryContext')
+const [, useFilterFactory, FilterFactoryContextProvider] = createRequiredContext<(value: EntityId) => UseDataViewRelationFilterResult>(
+	'FilterFactoryContext',
+)
 
 type DataGridRelationFilterSelectItemProps = {
 	children: ReactNode
@@ -267,7 +273,6 @@ const DataGridRelationFilterSelectItem = forwardRef<HTMLButtonElement, DataGridR
 		</DataGridFilterSelectItemUI>
 	)
 })
-
 
 const DataGridRelationFilterSelect = ({ children, queryField, label }: {
 	queryField?: DataViewUnionFilterFields
@@ -315,12 +320,13 @@ type DataGridRelationFilterControlsInnerProps = {
 	children: ReactNode
 }
 const DataGridRelationFilterControlsInner = Component<DataGridRelationFilterControlsInnerProps>(({ children }) => {
-
-	return <>
-		<SelectListInner filterToolbar={<SelectDefaultFilter />}>
-			<DataGridRelationFilterSelectItem>
-				{children}
-			</DataGridRelationFilterSelectItem>
-		</SelectListInner>
-	</>
+	return (
+		<>
+			<SelectListInner filterToolbar={<SelectDefaultFilter />}>
+				<DataGridRelationFilterSelectItem>
+					{children}
+				</DataGridRelationFilterSelectItem>
+			</SelectListInner>
+		</>
+	)
 })

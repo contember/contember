@@ -3,7 +3,10 @@ import { GraphQLListener } from './execution'
 
 type Query = { sql: string; bindings: any; elapsed?: number; error?: string; meta?: any; rowCount?: number }
 
-export const createDbQueriesListener = <Context extends { requestDebug: boolean } | {}>(dbResolver: (state: Context) => Client, globalDebug: boolean): GraphQLListener<Context> => ({
+export const createDbQueriesListener = <Context extends { requestDebug: boolean } | {}>(
+	dbResolver: (state: Context) => Client,
+	globalDebug: boolean,
+): GraphQLListener<Context> => ({
 	onExecute: ({ context }) => {
 		if (!globalDebug && !(context as any).requestDebug) {
 			return
@@ -32,7 +35,7 @@ export const createDbQueriesListener = <Context extends { requestDebug: boolean 
 				const extensions = response.extensions || (response.extensions = {})
 				extensions.dbQueries = queries.map(it => ({
 					...it,
-					path: (it.meta && it.meta.path) || [],
+					path: (it.meta?.path) || [],
 				}))
 			},
 		}

@@ -9,19 +9,21 @@ export const BoardEachItem = ({ children }: {
 }) => {
 	const currentColumn = useBoardCurrentColumn()
 
-	return <>
-		{currentColumn.items.map((item, index) => {
-			return (
-				<BoardEachItemInner
-					key={item.id}
-					item={item}
-					column={currentColumn}
-				>
-					{children}
-				</BoardEachItemInner>
-			)
-		})}
-	</>
+	return (
+		<>
+			{currentColumn.items.map((item, index) => {
+				return (
+					<BoardEachItemInner
+						key={item.id}
+						item={item}
+						column={currentColumn}
+					>
+						{children}
+					</BoardEachItemInner>
+				)
+			})}
+		</>
+	)
 }
 BoardEachItem.staticRender = ({ children }: { children: ReactNode }) => {
 	return <BoardItem>{children}</BoardItem>
@@ -31,7 +33,6 @@ const BoardEachItemInner = ({ children, item, column }: {
 	children: ReactNode
 	column: BoardColumnNode
 	item: BoardItemNode
-
 }) => {
 	const itemWithColumn = useMemo(() => ({
 		...item,

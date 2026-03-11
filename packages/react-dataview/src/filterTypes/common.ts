@@ -7,7 +7,6 @@ export type RelationFilterArtifacts = {
 	nullCondition?: boolean
 }
 
-
 export type GenericTextCellFilterArtifacts = {
 	mode?: 'matches' | 'matchesExactly' | 'startsWith' | 'endsWith' | 'doesNotMatch'
 	query?: string

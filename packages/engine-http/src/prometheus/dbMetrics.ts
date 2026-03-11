@@ -1,9 +1,7 @@
-// eslint-disable-next-line @typescript-eslint/triple-slash-reference
 /// <reference path="../../types/prom-client/index.d.ts" />
 import prom from 'prom-client'
 import { Connection, EventManager, PoolStats, poolStatsDescription } from '@contember/database'
 import { CustomMetric } from './CustomMetric'
-
 
 const labelNames = ['contember_project' as const, 'contember_module' as const, 'contember_project_group' as const, 'database_instance']
 type LabelNames = typeof labelNames[number]
@@ -34,8 +32,8 @@ export const createDbMetricsRegistrar = (registry: prom.Registry): DatabaseMetri
 }
 
 const createDbPoolMetricsCollector = (registry: prom.Registry) => {
-
-	const descriptionSuffix = 'Dimensions: contember_module (tenant or content; system is not used since it uses the same connection), contember_project_group, contember_project for contember_module=content, database_instance (single, primary, replica).'
+	const descriptionSuffix =
+		'Dimensions: contember_module (tenant or content; system is not used since it uses the same connection), contember_project_group, contember_project for contember_module=content, database_instance (single, primary, replica).'
 	const totalCount = new prom.Gauge({
 		registers: [registry],
 		name: `contember_db_pool_total_count`,
@@ -51,7 +49,8 @@ const createDbPoolMetricsCollector = (registry: prom.Registry) => {
 	const waitingCount = new prom.Gauge({
 		registers: [registry],
 		name: `contember_db_pool_waiting_count`,
-		help: `The number of queued requests waiting on a client when all clients are checked out. It can be helpful to monitor this number to see if you need to adjust the size of the pool. ${descriptionSuffix}`,
+		help:
+			`The number of queued requests waiting on a client when all clients are checked out. It can be helpful to monitor this number to see if you need to adjust the size of the pool. ${descriptionSuffix}`,
 		labelNames,
 	})
 	const maxCount = new prom.Gauge({
@@ -72,7 +71,7 @@ const createDbPoolMetricsCollector = (registry: prom.Registry) => {
 		help: `Number of connections that are checked out. ${descriptionSuffix}`,
 		labelNames,
 	})
-	const statCounters: {[K in keyof PoolStats]: CustomMetric<LabelNames>} = {} as any
+	const statCounters: { [K in keyof PoolStats]: CustomMetric<LabelNames> } = {} as any
 	for (const [key, description] of Object.entries(poolStatsDescription)) {
 		const customMetric = new CustomMetric<LabelNames>({
 			name: `contember_db_pool_${key}`,

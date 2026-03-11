@@ -6,18 +6,23 @@ const id1 = 'bff057b3-11f7-4bc7-abe3-1f2ef266824d'
 const id2 = '1cdb828f-62f0-4ae5-9b2c-e53b3e7584ef'
 test('read membership with entity variable', () => {
 	const reader = new MembershipResolver()
-	const result = reader.resolve({
-		roles: {
-			editor: {
-				variables: {
-					localeID: { type: Acl.VariableType.entity, entityName: 'Locale' },
+	const result = reader.resolve(
+		{
+			roles: {
+				editor: {
+					variables: {
+						localeID: { type: Acl.VariableType.entity, entityName: 'Locale' },
+					},
+					entities: {},
 				},
-				entities: {},
 			},
 		},
-	}, [
-		{ role: 'editor', variables: [{ name: 'localeID', values: [id1] }] },
-	], MembershipResolver.UnknownIdentity, false)
+		[
+			{ role: 'editor', variables: [{ name: 'localeID', values: [id1] }] },
+		],
+		MembershipResolver.UnknownIdentity,
+		false,
+	)
 	expect(result.errors).toStrictEqual([])
 	expect(result.memberships).toStrictEqual([
 		{ role: 'editor', variables: [{ name: 'localeID', condition: { in: [id1] } }] },
@@ -26,18 +31,23 @@ test('read membership with entity variable', () => {
 
 test('read fails when variable is not provided', () => {
 	const reader = new MembershipResolver()
-	const result = reader.resolve({
-		roles: {
-			editor: {
-				variables: {
-					localeID: { type: Acl.VariableType.entity, entityName: 'Locale' },
+	const result = reader.resolve(
+		{
+			roles: {
+				editor: {
+					variables: {
+						localeID: { type: Acl.VariableType.entity, entityName: 'Locale' },
+					},
+					entities: {},
 				},
-				entities: {},
 			},
 		},
-	}, [
-		{ role: 'editor', variables: [] },
-	], MembershipResolver.UnknownIdentity, false)
+		[
+			{ role: 'editor', variables: [] },
+		],
+		MembershipResolver.UnknownIdentity,
+		false,
+	)
 	expect(result.errors).toEqual([{
 		error: MembershipValidationErrorType.VARIABLE_EMPTY,
 		role: 'editor',
@@ -73,18 +83,23 @@ test('read membership with predefined variable', () => {
 
 test('read membership with condition variable', () => {
 	const reader = new MembershipResolver()
-	const result = reader.resolve({
-		roles: {
-			editor: {
-				variables: {
-					cond: { type: Acl.VariableType.condition },
+	const result = reader.resolve(
+		{
+			roles: {
+				editor: {
+					variables: {
+						cond: { type: Acl.VariableType.condition },
+					},
+					entities: {},
 				},
-				entities: {},
 			},
 		},
-	}, [
-		{ role: 'editor', variables: [{ name: 'cond', values: [JSON.stringify({ eq: 'foo' })] }] },
-	], MembershipResolver.UnknownIdentity, false)
+		[
+			{ role: 'editor', variables: [{ name: 'cond', values: [JSON.stringify({ eq: 'foo' })] }] },
+		],
+		MembershipResolver.UnknownIdentity,
+		false,
+	)
 	expect(result.errors).toStrictEqual([])
 	expect(result.memberships).toStrictEqual([
 		{ role: 'editor', variables: [{ name: 'cond', condition: { eq: 'foo' } }] },
@@ -104,7 +119,8 @@ test('fails when trying to override predefined variable with stored', () => {
 		},
 	}, [
 		{
-			role: 'editor', variables: [
+			role: 'editor',
+			variables: [
 				{ name: 'self', values: [id2] },
 			],
 		},
@@ -121,7 +137,6 @@ test('fails when trying to override predefined variable with stored', () => {
 	])
 })
 
-
 test('read overridden predefined variable with assume', () => {
 	const reader = new MembershipResolver()
 	const result = reader.resolve({
@@ -135,7 +150,8 @@ test('read overridden predefined variable with assume', () => {
 		},
 	}, [
 		{
-			role: 'editor', variables: [
+			role: 'editor',
+			variables: [
 				{ name: 'self', values: [id2] },
 			],
 		},
@@ -148,21 +164,25 @@ test('read overridden predefined variable with assume', () => {
 	])
 })
 
-
 test('fails on invalid condition', () => {
 	const reader = new MembershipResolver()
-	const result = reader.resolve({
-		roles: {
-			editor: {
-				variables: {
-					cond: { type: Acl.VariableType.condition },
+	const result = reader.resolve(
+		{
+			roles: {
+				editor: {
+					variables: {
+						cond: { type: Acl.VariableType.condition },
+					},
+					entities: {},
 				},
-				entities: {},
 			},
 		},
-	}, [
-		{ role: 'editor', variables: [{ name: 'cond', values: [JSON.stringify('abcd')] }] },
-	], MembershipResolver.UnknownIdentity, false)
+		[
+			{ role: 'editor', variables: [{ name: 'cond', values: [JSON.stringify('abcd')] }] },
+		],
+		MembershipResolver.UnknownIdentity,
+		false,
+	)
 
 	expect(result.errors).toEqual([{
 		error: MembershipValidationErrorType.VARIABLE_INVALID,
@@ -178,8 +198,7 @@ test('fails on invalid condition', () => {
 test('fails on undefined role', () => {
 	const reader = new MembershipResolver()
 	const result = reader.resolve({
-		roles: {
-		},
+		roles: {},
 	}, [
 		{ role: 'editor', variables: [{ name: 'cond', values: [JSON.stringify('abcd')] }] },
 	], {
@@ -197,16 +216,21 @@ test('fails on undefined role', () => {
 
 test('fails on undefined variable', () => {
 	const reader = new MembershipResolver()
-	const result = reader.resolve({
-		roles: {
-			editor: {
-				variables: {},
-				entities: {},
+	const result = reader.resolve(
+		{
+			roles: {
+				editor: {
+					variables: {},
+					entities: {},
+				},
 			},
 		},
-	}, [
-		{ role: 'editor', variables: [{ name: 'cond', values: [JSON.stringify('abcd')] }] },
-	], MembershipResolver.UnknownIdentity, false)
+		[
+			{ role: 'editor', variables: [{ name: 'cond', values: [JSON.stringify('abcd')] }] },
+		],
+		MembershipResolver.UnknownIdentity,
+		false,
+	)
 
 	expect(result.errors).toEqual([{
 		error: MembershipValidationErrorType.VARIABLE_NOT_FOUND,
@@ -219,21 +243,25 @@ test('fails on undefined variable', () => {
 	])
 })
 
-
 test('use fallback value', () => {
 	const reader = new MembershipResolver()
-	const result = reader.resolve({
-		roles: {
-			editor: {
-				variables: {
-					localeID: { type: Acl.VariableType.condition, fallback: { always: true } },
+	const result = reader.resolve(
+		{
+			roles: {
+				editor: {
+					variables: {
+						localeID: { type: Acl.VariableType.condition, fallback: { always: true } },
+					},
+					entities: {},
 				},
-				entities: {},
 			},
 		},
-	}, [
-		{ role: 'editor', variables: [] },
-	], MembershipResolver.UnknownIdentity, false)
+		[
+			{ role: 'editor', variables: [] },
+		],
+		MembershipResolver.UnknownIdentity,
+		false,
+	)
 	expect(result.errors).toStrictEqual([])
 
 	expect(result.memberships).toStrictEqual([

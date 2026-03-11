@@ -7,7 +7,6 @@ import { useDataViewFilterName } from '../../../contexts'
 const SlotInput = Slot as React.ForwardRefExoticComponent<React.InputHTMLAttributes<HTMLInputElement> & React.RefAttributes<HTMLInputElement>>
 
 export interface DataViewDateFilterInputProps {
-
 	/**
 	 * The name of the filter. If not provided, the component will attempt to infer it from the context.
 	 */
@@ -45,7 +44,6 @@ export interface DataViewDateFilterInputProps {
  */
 export const DataViewDateFilterInput = forwardRef<HTMLInputElement, DataViewDateFilterInputProps>(
 	({ name, type, ...props }: DataViewDateFilterInputProps, ref) => {
-		// eslint-disable-next-line react-hooks/rules-of-hooks
 		name ??= useDataViewFilterName()
 
 		return (

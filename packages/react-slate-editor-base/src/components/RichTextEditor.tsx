@@ -26,13 +26,13 @@ export const RichTextEditor: FunctionComponent<RichTextEditorProps> = Component(
 
 		const desugaredField = useMemo(
 			() => QueryLanguage.desugarRelativeSingleField(props, environment),
+			// biome-ignore lint/correctness/useExhaustiveDependencies: props is stable via Component HOC
 			[environment, props],
 		)
 		const fieldAccessor = useMemo(() => entity.getField<string>(desugaredField), [entity, desugaredField])
 
 		// The cache is questionable, really.
 		const [contemberFieldElementCache] = useState(() => new WeakMap<FieldAccessor<string>, SlateElement[]>())
-
 
 		const [editor] = useState(() => {
 			const { editor } = createEditor({
@@ -120,4 +120,3 @@ export const RichTextEditor: FunctionComponent<RichTextEditorProps> = Component(
 	),
 	'RichTextEditor',
 )
-

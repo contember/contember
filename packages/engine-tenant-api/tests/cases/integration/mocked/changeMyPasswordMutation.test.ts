@@ -58,17 +58,23 @@ test('changes my password - weak', async () => {
 				},
 			},
 		},
-		expectedAuthLog: { 'type': 'password_change', 'response': { ok: false, error: 'TOO_WEAK',
-			errorMessage: 'Password must contain at least 1 uppercase letter. Password is blacklisted.',
-			metadata: {
-		 weakPasswordReasons: [
-			 'MISSING_UPPERCASE',
-			 'BLACKLISTED',
-		 ],
-	 } }, 'personId': testUuid(1) },
+		expectedAuthLog: {
+			'type': 'password_change',
+			'response': {
+				ok: false,
+				error: 'TOO_WEAK',
+				errorMessage: 'Password must contain at least 1 uppercase letter. Password is blacklisted.',
+				metadata: {
+					weakPasswordReasons: [
+						'MISSING_UPPERCASE',
+						'BLACKLISTED',
+					],
+				},
+			},
+			'personId': testUuid(1),
+		},
 	})
 })
-
 
 test('changes my password - invalid current password', async () => {
 	const personId = testUuid(1)
@@ -94,7 +100,10 @@ test('changes my password - invalid current password', async () => {
 				},
 			},
 		},
-		expectedAuthLog: { 'type': 'password_change', 'response': { 'ok': false, 'error': 'INVALID_PASSWORD', 'errorMessage': 'Password does not match' }, 'personId': testUuid(1) },
+		expectedAuthLog: {
+			'type': 'password_change',
+			'response': { 'ok': false, 'error': 'INVALID_PASSWORD', 'errorMessage': 'Password does not match' },
+			'personId': testUuid(1),
+		},
 	})
 })
-

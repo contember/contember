@@ -42,7 +42,7 @@ export interface DataViewHasManyFilterProps {
  * ## Example
  * ```tsx
  * <DataViewHasManyFilter field="tags">
- *     //  Filter controls here 
+ *     //  Filter controls here
  * <DataViewFilterName>
  * ```
  */
@@ -60,11 +60,12 @@ export const DataViewHasManyFilter = Component<DataViewHasManyFilterProps>(({ fi
 		</DataViewFilterNameContext.Provider>
 	)
 }, ({ name, field, children }) => {
-	return <>
-		<DataViewFilter name={getFilterName(name, field)} filterHandler={createHasManyFilter(field)} />
-	</>
+	return (
+		<>
+			<DataViewFilter name={getFilterName(name, field)} filterHandler={createHasManyFilter(field)} />
+		</>
+	)
 })
-
 
 const useDataViewHasManyFilterOptions = ({ options, field }: Pick<DataViewHasManyFilterProps, 'options' | 'field'>) => {
 	const environment = useEnvironment()

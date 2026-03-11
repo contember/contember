@@ -1,4 +1,4 @@
-import { SchemaDefinition as def, createSchema } from '@contember/schema-definition'
+import { createSchema, SchemaDefinition as def } from '@contember/schema-definition'
 
 namespace ManyScalarsSchema {
 	export class Foo {
@@ -12,7 +12,6 @@ namespace ManyScalarsSchema {
 		uuidCol = def.uuidColumn()
 	}
 }
-
 
 namespace EnumSchema {
 	export class Foo {
@@ -39,7 +38,6 @@ namespace OneHasManySchema {
 		manyHasOneRel = def.manyHasOne(Foo, 'oneHasManyRel')
 	}
 }
-
 
 namespace ManyHasManySchema {
 	export class Foo {

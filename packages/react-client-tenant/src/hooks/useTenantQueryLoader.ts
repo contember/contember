@@ -11,7 +11,10 @@ export type TenantQueryLoaderMethods = {
 	refresh: () => void
 }
 
-export const useTenantQueryLoader = <TVariables extends object, Result>(fetcher: (variables: TVariables) => Promise<Result>, variables: TVariables): [TenantQueryLoaderState<Result>, TenantQueryLoaderMethods] => {
+export const useTenantQueryLoader = <TVariables extends object, Result>(
+	fetcher: (variables: TVariables) => Promise<Result>,
+	variables: TVariables,
+): [TenantQueryLoaderState<Result>, TenantQueryLoaderMethods] => {
 	const [state, setState] = useState<TenantQueryLoaderState<Result>>({ state: 'loading' })
 	const stateRef = useRef(state)
 	stateRef.current = state
@@ -37,9 +40,7 @@ export const useTenantQueryLoader = <TVariables extends object, Result>(fetcher:
 			}
 			setState({ state: 'error', error: e })
 		}
-
 	}, [fetcher, variablesMemo])
-
 
 	useEffect(() => {
 		triggerLoad()

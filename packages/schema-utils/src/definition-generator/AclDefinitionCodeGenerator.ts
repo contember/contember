@@ -3,21 +3,21 @@ import { IndentDecider, Literal, printJsValue } from '../utils/printJsValue'
 import { Acl, Model, Schema } from '@contember/schema'
 import { DefinitionNamingConventions } from './DefinitionNamingConventions'
 
-
 const indentFirstLevel: IndentDecider = (val, path) => path.length === 0
 
 export class AclDefinitionCodeGenerator {
-
 	constructor(
 		private readonly definitionNamingConventions = new DefinitionNamingConventions(),
 	) {
 	}
 
 	public generateRoles({ acl }: { acl: Acl.Schema }): string {
-		return Object.entries(acl.roles).map(([name, values]) => this.generateRole({
-			name,
-			values,
-		})).join('')
+		return Object.entries(acl.roles).map(([name, values]) =>
+			this.generateRole({
+				name,
+				values,
+			})
+		).join('')
 	}
 
 	private generateRole({ name, values }: { name: string; values: Acl.RolePermissions }): string {
@@ -52,7 +52,7 @@ export class AclDefinitionCodeGenerator {
 		return variablesOutput.join('')
 	}
 
-	public generateEntityAcl({ entity, schema }: { entity: Model.Entity; schema: Schema  }): string {
+	public generateEntityAcl({ entity, schema }: { entity: Model.Entity; schema: Schema }): string {
 		const aclOutput: string[] = []
 		const numberOfEntityFieldsWithoutId = Object.keys(entity.fields).length - 1
 		for (const [roleName, roleDefinition] of Object.entries(schema.acl.roles)) {
@@ -110,7 +110,6 @@ export class AclDefinitionCodeGenerator {
 		for (const op of ['read', 'create', 'update'] as const) {
 			const fields = Object.entries(operations[op] ?? {}).filter(([, it]) => it === predicate).map(([it]) => it)
 			if (fields.length === 0) {
-				continue
 			} else if (fields.length === numberOfEntityFieldsWithoutId) {
 				result[op] = true
 			} else {

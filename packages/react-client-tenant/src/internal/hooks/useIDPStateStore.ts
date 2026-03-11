@@ -2,7 +2,7 @@ import { useCallback } from 'react'
 
 export type IDPState = { provider: string; sessionData: any }
 
-export const useIDPStateStore = (): {get: () => IDPState | null; set: (state: IDPState) => void} => {
+export const useIDPStateStore = (): { get: () => IDPState | null; set: (state: IDPState) => void } => {
 	return {
 		get: useCallback(() => {
 			const item = sessionStorage.getItem('idp')

@@ -50,9 +50,7 @@ export class WhereTypeProvider {
 
 		const possibleUniqueWhereFields = getFieldsForUniqueWhere(this.schema, entity)
 		const uniqueKeys: (readonly string[])[] = possibleUniqueWhereFields.filter(uniqueKey =>
-			uniqueKey.every(it =>
-				acceptFieldVisitor(this.schema, entityName, it, new FieldAccessVisitor(Acl.Operation.read, this.authorizator)),
-			),
+			uniqueKey.every(it => acceptFieldVisitor(this.schema, entityName, it, new FieldAccessVisitor(Acl.Operation.read, this.authorizator)))
 		)
 		for (const uniqueKey of uniqueKeys) {
 			combinations.push(uniqueKey.join(', '))

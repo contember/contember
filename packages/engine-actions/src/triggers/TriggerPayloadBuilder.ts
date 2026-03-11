@@ -23,7 +23,10 @@ export class TriggerPayloadBuilder {
 		const selections = await this.fetchSelection(filteredEvents)
 		const triggerType = filteredEvents[0].listener.trigger.type
 		if (triggerType === 'basic') {
-			return filteredEvents.map(it => ({ trigger: it.listener.trigger.name, ...this.buildBaseEventPayloads(it, it.selection ?? selections[it.primary]) }))
+			return filteredEvents.map(it => ({
+				trigger: it.listener.trigger.name,
+				...this.buildBaseEventPayloads(it, it.selection ?? selections[it.primary]),
+			}))
 		}
 		if (triggerType === 'watch') {
 			return this.buildWatchEventPayloads(filteredEvents, selections)
@@ -35,9 +38,13 @@ export class TriggerPayloadBuilder {
 		if (event.listener.type === 'delete' && event.listener.trigger.selection) {
 			const input = this.convertSelectionNode(event.listener.trigger.selection)
 
-			const selection = await this.mapper.selectUnique(event.entity, input.withArg('by', {
-				[event.entity.primary]: event.primary,
-			}), [])
+			const selection = await this.mapper.selectUnique(
+				event.entity,
+				input.withArg('by', {
+					[event.entity.primary]: event.primary,
+				}),
+				[],
+			)
 			return { ...event, selection }
 		}
 		return event
@@ -152,14 +159,20 @@ export class TriggerPayloadBuilder {
 		return await this.mapper.selectAssoc(entity, input, [], entity.primary)
 	}
 
-
 	private convertSelectionNode(node: Actions.SelectionNode, nodeName = 'root', path: string[] = []): ObjectNode<Input.ListQueryInput> {
-		return new ObjectNode(nodeName, nodeName, node.map(it => {
-			const [field, args, selection] = Array.isArray(it) ? it : [it, undefined, undefined]
-			if (selection === undefined || selection.length === 0) {
-				return new FieldNode(field, field, {})
-			}
-			return this.convertSelectionNode(selection, field, [...path, nodeName]).withArgs(args)
-		}), {}, {}, path)
+		return new ObjectNode(
+			nodeName,
+			nodeName,
+			node.map(it => {
+				const [field, args, selection] = Array.isArray(it) ? it : [it, undefined, undefined]
+				if (selection === undefined || selection.length === 0) {
+					return new FieldNode(field, field, {})
+				}
+				return this.convertSelectionNode(selection, field, [...path, nodeName]).withArgs(args)
+			}),
+			{},
+			{},
+			path,
+		)
 	}
 }

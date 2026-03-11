@@ -8,14 +8,13 @@ import { testUuid } from '../../../../../src/testUuid'
 test('Post locale ordered by author name', async () => {
 	await execute({
 		schema: new SchemaBuilder()
-			.entity('PostLocale', entity =>
-				entity.manyHasOne('post', r =>
-					r.target('Post', e =>
-						e.manyHasOne('author', r =>
-							r.target('Author', e => e.column('name', c => c.type(Model.ColumnType.String))),
-						),
+			.entity(
+				'PostLocale',
+				entity =>
+					entity.manyHasOne(
+						'post',
+						r => r.target('Post', e => e.manyHasOne('author', r => r.target('Author', e => e.column('name', c => c.type(Model.ColumnType.String))))),
 					),
-				),
 			)
 			.buildSchema(),
 		query: GQL`
@@ -47,4 +46,3 @@ test('Post locale ordered by author name', async () => {
 		},
 	})
 })
-

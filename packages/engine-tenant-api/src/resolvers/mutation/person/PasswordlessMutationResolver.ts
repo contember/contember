@@ -1,6 +1,7 @@
 import {
 	ActivatePasswordlessOtpResponse,
-	InitSignInPasswordlessResponse, MutationActivatePasswordlessOtpArgs,
+	InitSignInPasswordlessResponse,
+	MutationActivatePasswordlessOtpArgs,
 	MutationInitSignInPasswordlessArgs,
 	MutationResolvers,
 	MutationSignInPasswordlessArgs,
@@ -12,7 +13,9 @@ import { createErrorResponse } from '../../errorUtils'
 import { SignInResponseFactory } from '../../responseHelpers/SignInResponseFactory'
 import { PasswordlessSignInManager } from '../../../model/service/PasswordlessSignInManager'
 
-export class PasswordlessMutationResolver implements Pick<MutationResolvers, 'initSignInPasswordless' | 'signInPasswordless' | 'activatePasswordlessOtp'> {
+export class PasswordlessMutationResolver
+	implements Pick<MutationResolvers, 'initSignInPasswordless' | 'signInPasswordless' | 'activatePasswordlessOtp'>
+{
 	constructor(
 		private readonly passwordlessSignInManager: PasswordlessSignInManager,
 		private readonly signInResponseFactory: SignInResponseFactory,
@@ -78,7 +81,11 @@ export class PasswordlessMutationResolver implements Pick<MutationResolvers, 'in
 		}
 	}
 
-	async activatePasswordlessOtp(parent: any, args: MutationActivatePasswordlessOtpArgs, context: TenantResolverContext): Promise<ActivatePasswordlessOtpResponse> {
+	async activatePasswordlessOtp(
+		parent: any,
+		args: MutationActivatePasswordlessOtpArgs,
+		context: TenantResolverContext,
+	): Promise<ActivatePasswordlessOtpResponse> {
 		await context.requireAccess({
 			action: PermissionActions.PERSON_PASSWORDLESS_SIGN_IN,
 			message: 'You are not allowed to activate passwordless OTP',

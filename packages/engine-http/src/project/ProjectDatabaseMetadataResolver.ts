@@ -3,7 +3,6 @@ import { DatabaseContext } from '@contember/engine-system-api'
 import { Schema } from '@contember/schema'
 
 export class ProjectDatabaseMetadataResolver {
-
 	private cache: WeakMap<Schema, Map<string, DatabaseMetadata>> = new WeakMap()
 
 	constructor(

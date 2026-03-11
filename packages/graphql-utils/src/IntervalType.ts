@@ -16,7 +16,6 @@ const shortenInterval = (str: string) => {
 	return shorten
 }
 
-
 export const IntervalType = new GraphQLScalarType({
 	name: 'Interval',
 	serialize: str => {

@@ -1,35 +1,35 @@
-import { ReactNode, createContext, memo, useContext, useMemo, useRef } from 'react'
+import { createContext, memo, ReactNode, useContext, useMemo, useRef } from 'react'
 import { isNoopScopedConsole, noopScopedConsole } from './Constants'
 import { ScopedConsoleContextType } from './Types'
 
 function createPrefixedConsole(message: string, prefixedConsole?: ScopedConsoleContextType): ScopedConsoleContextType {
 	return {
 		error: function error(...parameters: any[]) {
-			(prefixedConsole ?? console).error(message, ...parameters)
+			;(prefixedConsole ?? console).error(message, ...parameters)
 		},
-		errored: function errored<T>(message: string, value: T): T {
-			(prefixedConsole ?? console).error(message, value)
+		errored: function errored<T,>(message: string, value: T): T {
+			;(prefixedConsole ?? console).error(message, value)
 			return value
 		},
 		log: function log(...parameters: any[]) {
-			(prefixedConsole ?? console).log(message, ...parameters)
+			;(prefixedConsole ?? console).log(message, ...parameters)
 		},
-		logged: function logged<T>(message: string, value: T): T {
-			(prefixedConsole ?? console).log(message, value)
+		logged: function logged<T,>(message: string, value: T): T {
+			;(prefixedConsole ?? console).log(message, value)
 			return value
 		},
 		trace: function trace(...parameters: any[]) {
-			(prefixedConsole ?? console).trace(message, ...parameters)
+			;(prefixedConsole ?? console).trace(message, ...parameters)
 		},
-		traced: function traced<T>(message: string, value: T): T {
-			(prefixedConsole ?? console).trace(message, value)
+		traced: function traced<T,>(message: string, value: T): T {
+			;(prefixedConsole ?? console).trace(message, value)
 			return value
 		},
 		warn: function warn(...parameters: any[]) {
-			(prefixedConsole ?? console).warn(message, ...parameters)
+			;(prefixedConsole ?? console).warn(message, ...parameters)
 		},
-		warned: function warned<T>(message: string, value: T): T {
-			(prefixedConsole ?? console).warn(message, value)
+		warned: function warned<T,>(message: string, value: T): T {
+			;(prefixedConsole ?? console).warn(message, value)
 			return value
 		},
 	}

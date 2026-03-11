@@ -11,8 +11,7 @@ export const findRelationsWithOrphanRemoval = (schema: Model.Schema, entity: Mod
 			visitManyHasManyOwning: () => null,
 			visitOneHasOneInverse: () => null,
 			visitOneHasMany: () => null,
-			visitOneHasOneOwning: ({ relation, targetEntity }) =>
-				relation.orphanRemoval ? [targetEntity, relation] : null,
+			visitOneHasOneOwning: ({ relation, targetEntity }) => relation.orphanRemoval ? [targetEntity, relation] : null,
 			visitManyHasOne: () => null,
 		}),
 	).filter((it): it is OneHasOneOwningRelationTuple => it !== null)
@@ -31,7 +30,7 @@ export const findOwningRelations = (schema: Model.Schema, entity: Model.Entity):
 				visitOneHasMany: () => null,
 				visitOneHasOneOwning: ({ relation }): EntityOwningRelationTuple => [entity, relation],
 				visitManyHasOne: ({ relation }): EntityOwningRelationTuple => [entity, relation],
-			}),
+			})
 		)
 		.reduce<EntityOwningRelationTuple[]>(
 			(acc, value) => [

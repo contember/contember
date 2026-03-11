@@ -6,7 +6,6 @@ import { Logger } from '@contember/logger'
 import { ImplementationException } from '../ImplementationException'
 
 export class DispatchWorkerSupervisorFactory {
-
 	constructor(
 		private projectDispatcherFactory: ProjectDispatcherFactory,
 	) {
@@ -74,21 +73,23 @@ export class DispatchWorkerSupervisor implements Runnable {
 				throw e
 			}
 		}
-		const projectTracker = new Supervisor(new AcquiringListener(
-			tenantContainer.databaseContext.client,
-			'project_updated',
-			async () => {
-				logger.debug('Project config change detected, reloading dispatch workers')
-				await endProjectWorkers()
-				try {
-					await startWorkers(true)
-				} catch (e) {
-					logger.error(e, { message: 'Dispatch workers reload failed, terminating' })
-					await endAll()
-					onError(e)
-				}
-			},
-		))
+		const projectTracker = new Supervisor(
+			new AcquiringListener(
+				tenantContainer.databaseContext.client,
+				'project_updated',
+				async () => {
+					logger.debug('Project config change detected, reloading dispatch workers')
+					await endProjectWorkers()
+					try {
+						await startWorkers(true)
+					} catch (e) {
+						logger.error(e, { message: 'Dispatch workers reload failed, terminating' })
+						await endAll()
+						onError(e)
+					}
+				},
+			),
+		)
 
 		const runningProjectTracker = await projectTracker.run({
 			logger,

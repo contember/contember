@@ -18,7 +18,6 @@ import { resolveOrderBy } from '../internal/hooks/useDataViewSorting'
 import { collectStaticInfo } from '../internal/helpers/staticAnalyzer'
 import { getDataViewKey } from '../internal/helpers/getDataViewKey'
 
-
 export type DataViewProps =
 	& {
 		children: ReactNode
@@ -52,12 +51,10 @@ export const DataView = Component<DataViewProps>((props, env) => {
 		</ControlledDataView>
 	)
 }, (props, env) => {
-	return (
-		<DataViewLoader children={props.children} state={resolveInitialState(props, env)} />
-	)
+	return <DataViewLoader children={props.children} state={resolveInitialState(props, env)} />
 })
 
-const getStoredValue = <V, >(storage: StateStorageOrName | StateStorageOrName[], ...[key, initializer]: DataViewStoredStateArgs<V>): V => {
+const getStoredValue = <V,>(storage: StateStorageOrName | StateStorageOrName[], ...[key, initializer]: DataViewStoredStateArgs<V>): V => {
 	const storageInstance = getStateStorage(storage)
 	const storedValue = storageInstance.getItem(key)
 	return initializer(storedValue as V)
@@ -67,11 +64,23 @@ const resolveInitialState = (props: DataViewProps, env: Environment) => {
 	const dataViewKey = getDataViewKey(env, props)
 	const { filterTypes, layouts } = collectStaticInfo(props, env)
 
-	const pageSettingsStorage = getStoredValue(props.pagingSettingsStorage ?? 'null', ...getDataViewPagingSettingStorageArgs({ dataViewKey, initialItemsPerPage: props.initialItemsPerPage }))
+	const pageSettingsStorage = getStoredValue(
+		props.pagingSettingsStorage ?? 'null',
+		...getDataViewPagingSettingStorageArgs({ dataViewKey, initialItemsPerPage: props.initialItemsPerPage }),
+	)
 	const currentPageStorage = getStoredValue(props.currentPageStateStorage ?? 'null', ...getDataViewCurrentPageStorageArgs({ dataViewKey }))
-	const selectionStorage = getStoredValue(props.selectionStateStorage ?? 'null', ...getDataViewSelectionStorageArgs({ dataViewKey, initialSelection: props.initialSelection, defaultLayout: layouts[0]?.name }))
-	const filterArtifacts = getStoredValue(props.filteringStateStorage ?? 'null', ...getDataViewFilteringStorageArgs({ dataViewKey, initialFilters: props.initialFilters }))
-	const sortingStorage = getStoredValue(props.sortingStateStorage ?? 'null', ...getDataViewSortingStorageArgs({ dataViewKey, initialSorting: props.initialSorting }))
+	const selectionStorage = getStoredValue(
+		props.selectionStateStorage ?? 'null',
+		...getDataViewSelectionStorageArgs({ dataViewKey, initialSelection: props.initialSelection, defaultLayout: layouts[0]?.name }),
+	)
+	const filterArtifacts = getStoredValue(
+		props.filteringStateStorage ?? 'null',
+		...getDataViewFilteringStorageArgs({ dataViewKey, initialFilters: props.initialFilters }),
+	)
+	const sortingStorage = getStoredValue(
+		props.sortingStateStorage ?? 'null',
+		...getDataViewSortingStorageArgs({ dataViewKey, initialSorting: props.initialSorting }),
+	)
 
 	const entities = QueryLanguage.desugarQualifiedEntityList({ entities: props.entities }, env)
 	const resolvedFilter = resolveFilters({ entities, filterTypes, filters: filterArtifacts, environment: env })
@@ -98,4 +107,3 @@ const resolveInitialState = (props: DataViewProps, env: Environment) => {
 		},
 	}
 }
-

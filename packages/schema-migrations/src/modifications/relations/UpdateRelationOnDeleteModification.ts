@@ -1,12 +1,7 @@
 import { MigrationBuilder } from '@contember/database-migrations'
 import { Model, Schema } from '@contember/schema'
 import { SchemaUpdater, updateEntity, updateField, updateModel } from '../utils/schemaUpdateUtils'
-import {
-	createModificationType,
-	Differ,
-	ModificationHandler,
-	ModificationHandlerCreateSqlOptions,
-} from '../ModificationHandler'
+import { createModificationType, Differ, ModificationHandler, ModificationHandlerCreateSqlOptions } from '../ModificationHandler'
 import { isIt } from '../../utils/isIt'
 import { updateRelations } from '../utils/diffUtils'
 import { acceptRelationTypeVisitor } from '@contember/schema-utils'
@@ -72,10 +67,10 @@ export class UpdateRelationOnDeleteDiffer implements Differ {
 	createDiff(originalSchema: Schema, updatedSchema: Schema) {
 		return updateRelations(originalSchema, updatedSchema, ({ originalRelation, updatedRelation, updatedEntity }) => {
 			if (
-				originalRelation.type === updatedRelation.type &&
-				isIt<Model.JoiningColumnRelation>(updatedRelation, 'joiningColumn') &&
-				isIt<Model.JoiningColumnRelation>(originalRelation, 'joiningColumn') &&
-				updatedRelation.joiningColumn.onDelete !== originalRelation.joiningColumn.onDelete
+				originalRelation.type === updatedRelation.type
+				&& isIt<Model.JoiningColumnRelation>(updatedRelation, 'joiningColumn')
+				&& isIt<Model.JoiningColumnRelation>(originalRelation, 'joiningColumn')
+				&& updatedRelation.joiningColumn.onDelete !== originalRelation.joiningColumn.onDelete
 			) {
 				return updateRelationOnDeleteModification.createModification({
 					entityName: updatedEntity.name,

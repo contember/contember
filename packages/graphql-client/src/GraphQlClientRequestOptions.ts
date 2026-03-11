@@ -11,7 +11,7 @@ export interface GraphQlClientOptions extends GraphQlClientBaseOptions {
 	readonly fetcher?: (input: RequestInfo, init?: RequestInit) => Promise<Response>
 }
 
-export interface GraphQlClientRequestOptions extends GraphQlClientBaseOptions{
+export interface GraphQlClientRequestOptions extends GraphQlClientBaseOptions {
 	readonly variables?: GraphQlClientVariables
 	readonly signal?: AbortSignal
 }

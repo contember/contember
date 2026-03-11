@@ -1,10 +1,4 @@
-import {
-	GraphQLBoolean,
-	GraphQLInputFieldConfig,
-	GraphQLInputFieldConfigMap,
-	GraphQLInputObjectType,
-	GraphQLInputType,
-} from 'graphql'
+import { GraphQLBoolean, GraphQLInputFieldConfig, GraphQLInputFieldConfigMap, GraphQLInputObjectType, GraphQLInputType } from 'graphql'
 import { acceptFieldVisitor, getEntity } from '@contember/schema-utils'
 import { GqlTypeName } from '../utils'
 import { Acl, Model } from '@contember/schema'

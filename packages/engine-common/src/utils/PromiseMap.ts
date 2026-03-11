@@ -1,4 +1,4 @@
-export class PromiseMap<K, V> extends Map<K, Promise<V>>{
+export class PromiseMap<K, V> extends Map<K, Promise<V>> {
 	async fetch(key: K, generator: (key: K) => Promise<V>): Promise<V> {
 		const value = this.get(key)
 		if (value !== undefined) {

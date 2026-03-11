@@ -31,7 +31,7 @@ class SoundCloudEmbedHandler implements EmbedHandler<string> {
 			return undefined
 		}
 		const trackUrl = iframeUrl.searchParams.get('url') || ''
-		const matches = trackUrl.match(/^https:\/\/api\.soundcloud\.com\/tracks\/([^\/]*)$/)
+		const matches = trackUrl.match(/^https:\/\/api\.soundcloud\.com\/tracks\/([^/]*)$/)
 
 		if (!matches) {
 			return undefined

@@ -12,7 +12,6 @@ export const withParagraphs = ({ render }: { render: ElementRenderer<ParagraphEl
 
 	editor.registerElement(paragraphElementPlugin({ render }))
 
-
 	editor.canToggleElement = (elementType, suchThat) => {
 		// This only allows numbered paragraphs at the top level.
 		// TODO this is pretty bad but in order to fix this, we'd also have to fix toggleElement and there's no time now.
@@ -35,7 +34,7 @@ export const withParagraphs = ({ render }: { render: ElementRenderer<ParagraphEl
 		}
 		const [closestBlockElement, closestBlockPath] = closestBlockEntry
 
-		return closestBlockPath.length === 1 &&  SlateElement.isElement(closestBlockElement) && closestBlockElement.type === paragraphElementType
+		return closestBlockPath.length === 1 && SlateElement.isElement(closestBlockElement) && closestBlockElement.type === paragraphElementType
 	}
 
 	editor.deleteBackward = unit => {

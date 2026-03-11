@@ -121,7 +121,7 @@ export default class EntityPermissionsBuilder {
 				tuple(
 					it,
 					Object.values(it.fields).filter(field => fieldSelectorConst.matches(this.schema, it, field)),
-				),
+				)
 			)
 			.reduce<[Model.Entity, Model.AnyField][]>(
 				(acc, [entity, fields]) => [...acc, ...fields.map(it => tuple(entity, it))],

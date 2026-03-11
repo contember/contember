@@ -85,7 +85,9 @@ const Folder = Component(
 					<Button size="sm" variant="ghost" onClick={() => setExpanded(!expanded)}>
 						{!expanded ? <ChevronDownIcon size={16} /> : <ChevronUpIcon size={16} />}
 					</Button>
-					<span><Field field="name" /></span>
+					<span>
+						<Field field="name" />
+					</span>
 				</div>
 				<div className="ml-4">
 					{expanded && <FolderLoader parent={parent} />}
@@ -108,7 +110,6 @@ export const Dataview = () => (
 	</Binding>
 )
 
-
 const DataViewGrid = Component<{ parent: string | null }>(({ parent }) => {
 	return (
 		<DataGrid
@@ -119,19 +120,21 @@ const DataViewGrid = Component<{ parent: string | null }>(({ parent }) => {
 			<DataGridToolbar />
 
 			<DataGridLoader>
-				<DataViewLayout name="rows" label={(
-					<>
-						<RowsIcon className={'w-3 h-3'} />
-						<span>Rows</span>
-					</>
-				)}>
+				<DataViewLayout
+					name="rows"
+					label={
+						<>
+							<RowsIcon className={'w-3 h-3'} />
+							<span>Rows</span>
+						</>
+					}
+				>
 					<div className="grid gap-2">
 						<DataViewEachRow>
 							<DataViewFolderRow />
 						</DataViewEachRow>
 					</div>
 				</DataViewLayout>
-
 			</DataGridLoader>
 		</DataGrid>
 	)
@@ -147,10 +150,16 @@ const DataViewFolderRow = Component(
 					<Button size="sm" variant="ghost" onClick={() => setExpanded(!expanded)}>
 						{!expanded ? <ChevronDownIcon size={16} /> : <ChevronUpIcon size={16} />}
 					</Button>
-					<span><Field field="name" /></span>
+					<span>
+						<Field field="name" />
+					</span>
 				</div>
 
-				{expanded && <div className="ml-4 mt-4 border rounded border-gray-200 p-2"><DataViewGrid parent={parent} /></div>}
+				{expanded && (
+					<div className="ml-4 mt-4 border rounded border-gray-200 p-2">
+						<DataViewGrid parent={parent} />
+					</div>
+				)}
 			</>
 		)
 	},
@@ -195,21 +204,25 @@ const DialogDataGrid = Component(() => {
 			</div>
 
 			<DataGridLoader>
-				<DataViewLayout name="rows" label={(
-					<>
-						<RowsIcon className="w-3 h-3" />
-						<span>Rows</span>
-					</>
-				)}>
+				<DataViewLayout
+					name="rows"
+					label={
+						<>
+							<RowsIcon className="w-3 h-3" />
+							<span>Rows</span>
+						</>
+					}
+				>
 					<div className="grid gap-2">
 						<DataViewEachRow>
 							<div className="flex gap-2 border border-gray-200 rounded">
-								<span><Field field="name" /></span>
+								<span>
+									<Field field="name" />
+								</span>
 							</div>
 						</DataViewEachRow>
 					</div>
 				</DataViewLayout>
-
 			</DataGridLoader>
 		</DataGrid>
 	)

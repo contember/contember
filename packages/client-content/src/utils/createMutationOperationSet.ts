@@ -8,7 +8,6 @@ export const createMutationOperationSet = (
 		| ContentMutation<any>
 		| ContentMutation<any>[],
 ): ContentOperationSet<any> => {
-
 	if (input instanceof ContentOperation) {
 		return new ContentOperationSet(
 			[new GraphQlField('mut', input.fieldName, input.args, input.selection)],
@@ -32,11 +31,14 @@ export const createMutationOperationSet = (
 			}
 			return new GraphQlField(alias, mutation.fieldName, mutation.args, mutation.selection)
 		}),
-		res => Object.fromEntries(Object.entries(input).map(([alias, mutation]) => {
-			if (mutation.type === 'query') {
-				return [alias, mutation.parse(res[alias]?.value ?? null)]
-			}
-			return [alias, mutation.parse(res[alias] ?? null)]
-		})),
+		res =>
+			Object.fromEntries(
+				Object.entries(input).map(([alias, mutation]) => {
+					if (mutation.type === 'query') {
+						return [alias, mutation.parse(res[alias]?.value ?? null)]
+					}
+					return [alias, mutation.parse(res[alias] ?? null)]
+				}),
+			),
 	)
 }

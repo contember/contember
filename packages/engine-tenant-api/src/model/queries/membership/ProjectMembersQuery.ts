@@ -3,7 +3,6 @@ import { MemberType, ProjectMembersInput } from '../../../schema'
 import { ImplementationException } from '../../../exceptions'
 
 export class ProjectMembersQuery extends DatabaseQuery<ProjectMembersQueryResult> {
-
 	constructor(
 		private readonly projectId: string,
 		private readonly projectMemberInput: ProjectMembersInput,
@@ -16,12 +15,15 @@ export class ProjectMembersQuery extends DatabaseQuery<ProjectMembersQueryResult
 			.select('id')
 			.select('description')
 			.from('identity')
-			.where(it => it.exists(
-				builder => builder
-					.from('project_membership')
-					.where(expr => expr.columnsEq(['project_membership', 'identity_id'], ['identity', 'id']))
-					.where({ project_id: this.projectId }),
-			))
+			.where(it =>
+				it.exists(
+					builder =>
+						builder
+							.from('project_membership')
+							.where(expr => expr.columnsEq(['project_membership', 'identity_id'], ['identity', 'id']))
+							.where({ project_id: this.projectId }),
+				)
+			)
 			.match(qb => {
 				const identityId = this.projectMemberInput.filter?.identityId
 				return identityId ? qb.where(it => it.in(['identity', 'id'], identityId)) : qb
@@ -37,7 +39,6 @@ export class ProjectMembersQuery extends DatabaseQuery<ProjectMembersQueryResult
 					.where(expr => expr.columnsEq(['person', 'identity_id'], ['identity', 'id']))
 					.match(qb => email ? qb.where(it => it.in('email', email)) : qb)
 					.match(qb => personId ? qb.where(it => it.in(['person', 'id'], personId)) : qb)
-
 
 				if (email || personId || memberType === 'PERSON') {
 					return qb.where(it => it.exists(personQuery))

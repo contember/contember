@@ -12,11 +12,11 @@ export const Input = () => (
 		</Slots.Title>
 
 		<Slots.Actions>
-			<PersistButton/>
+			<PersistButton />
 		</Slots.Actions>
 
 		<EntitySubTree entity="InputRoot(unique = unique)" setOnCreate="(unique = unique)">
-			<UseFieldComponent field="intValue"/>
+			<UseFieldComponent field="intValue" />
 		</EntitySubTree>
 	</Binding>
 )
@@ -43,7 +43,5 @@ const UseFieldComponent = Component<MyComponentProps>(
 		)
 	},
 	// When using hooks in the render function above, specify `staticRender` as the second argument to `Component` to ensure all data is properly registered.
-	({ field }) => (
-		<Field field={field} />
-	),
+	({ field }) => <Field field={field} />,
 )

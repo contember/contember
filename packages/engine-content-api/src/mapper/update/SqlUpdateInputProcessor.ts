@@ -11,7 +11,7 @@ import { MutationResultList } from '../Result'
 import { ManyHasOneUpdateInputProcessor } from './relations/ManyHasOneUpdateInputProcessor'
 import { MapperInput } from '../types'
 
-export type SqlUpdateInputProcessorResult = MutationResultList | ((ctx: { primary: Input.PrimaryValue}) => Promise<MutationResultList>)
+export type SqlUpdateInputProcessorResult = MutationResultList | ((ctx: { primary: Input.PrimaryValue }) => Promise<MutationResultList>)
 
 export class SqlUpdateInputProcessor implements UpdateInputProcessor<SqlUpdateInputProcessorResult> {
 	private oneHasOneInverseUpdateInputProcessor: OneHasOneInverseUpdateInputProcessor

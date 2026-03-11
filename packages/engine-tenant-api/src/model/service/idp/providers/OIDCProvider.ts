@@ -33,7 +33,6 @@ export class OIDCProvider implements IdentityProviderHandler<OIDCConfiguration> 
 		)
 	}
 
-
 	getPublicConfiguration({ clientSecret, ...config }: OIDCConfiguration): Partial<OIDCConfiguration> {
 		return config
 	}

@@ -4,7 +4,6 @@ import { SchemaBuilder } from '@contember/schema-definition'
 import { GQL, SQL } from '../../../../../src/tags'
 import { testUuid } from '../../../../../src/testUuid'
 
-
 test('Posts with filtered tags', async () => {
 	await execute({
 		schema: new SchemaBuilder()
@@ -31,7 +30,8 @@ test('Posts with filtered tags', async () => {
 				},
 			},
 			{
-				sql: SQL`select "junction_"."tag_id", "junction_"."post_id"  from "public"."post_tags" as "junction_" inner join  "public"."tag" as "root_" on  "junction_"."tag_id" = "root_"."id"  where "junction_"."post_id" in (?, ?) and "root_"."name" = ?`,
+				sql:
+					SQL`select "junction_"."tag_id", "junction_"."post_id"  from "public"."post_tags" as "junction_" inner join  "public"."tag" as "root_" on  "junction_"."tag_id" = "root_"."id"  where "junction_"."post_id" in (?, ?) and "root_"."name" = ?`,
 				parameters: [testUuid(1), testUuid(2), 'Foo'],
 				response: {
 					rows: [
@@ -78,8 +78,6 @@ test('Posts with filtered tags', async () => {
 		},
 	})
 })
-
-
 
 test('Posts with paginated tags (many has many owning)', async () => {
 	await execute({
@@ -193,8 +191,7 @@ test('Posts with paginated tags (many has many owning)', async () => {
 	})
 })
 
-
-test.only('large number of posts - use array', async () => {
+test('large number of posts - use array', async () => {
 	const ids = Array.from({ length: 1000 }).map((it, index) => testUuid(index + 1))
 	await execute({
 		schema: new SchemaBuilder()
@@ -221,7 +218,8 @@ test.only('large number of posts - use array', async () => {
 				},
 			},
 			{
-				sql: SQL`select "junction_"."tag_id", "junction_"."post_id"  from "public"."post_tags" as "junction_"  where "junction_"."post_id" = any(?::uuid[])`,
+				sql:
+					SQL`select "junction_"."tag_id", "junction_"."post_id"  from "public"."post_tags" as "junction_"  where "junction_"."post_id" = any(?::uuid[])`,
 				parameters: [ids],
 				response: {
 					rows: [],
@@ -238,4 +236,3 @@ test.only('large number of posts - use array', async () => {
 		},
 	})
 })
-

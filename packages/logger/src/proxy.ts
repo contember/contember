@@ -40,7 +40,7 @@ class CurrentLoggerProxy implements Logger {
 		getLogger().close()
 	}
 
-	scope<T>(cb: (logger: Logger) => (Promise<T> | T), attributes?: LoggerAttributes, options?: Partial<LoggerOptions>): Promise<T> {
+	scope<T>(cb: (logger: Logger) => Promise<T> | T, attributes?: LoggerAttributes, options?: Partial<LoggerOptions>): Promise<T> {
 		return getLogger().scope(cb, attributes, options)
 	}
 

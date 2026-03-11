@@ -14,22 +14,24 @@ describe('useRichTextBlocksSource', () => {
 	})
 
 	test('decode blocks with references', () => {
-		const { result } = renderHook(() => useRichTextBlocksSource({
-			blocks: [{
-				source: '{"formatVersion":1,"children":[{"type":"reference","children":[{"text":"Foo bar"}],"referenceId":"74bfb183-3adf-4cc1-8e8e-6d5cd700cadd"}]}',
-				references: [
-					{
-						id: '74bfb183-3adf-4cc1-8e8e-6d5cd700cadd',
-						type: 'image',
-						url: 'https://example.com/image.png',
-					},
-				],
-
-			}],
-			sourceField: 'source',
-			referencesField: 'references',
-			referenceDiscriminationField: 'type',
-		}))
+		const { result } = renderHook(() =>
+			useRichTextBlocksSource({
+				blocks: [{
+					source:
+						'{"formatVersion":1,"children":[{"type":"reference","children":[{"text":"Foo bar"}],"referenceId":"74bfb183-3adf-4cc1-8e8e-6d5cd700cadd"}]}',
+					references: [
+						{
+							id: '74bfb183-3adf-4cc1-8e8e-6d5cd700cadd',
+							type: 'image',
+							url: 'https://example.com/image.png',
+						},
+					],
+				}],
+				sourceField: 'source',
+				referencesField: 'references',
+				referenceDiscriminationField: 'type',
+			})
+		)
 		expect(result.current).toStrictEqual([
 			{
 				'content': {
@@ -57,5 +59,4 @@ describe('useRichTextBlocksSource', () => {
 			},
 		])
 	})
-
 })

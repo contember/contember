@@ -94,7 +94,7 @@ export function deepCompare(a: any, b: any, path: Path = [], getCustomComparator
 	if (aType === 'date') {
 		const aTime = a.getTime()
 		const bTime = b.getTime()
-		if (aTime == bTime) {
+		if (aTime === bTime) {
 			return []
 		}
 		return [

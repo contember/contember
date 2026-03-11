@@ -39,7 +39,6 @@ export interface Differ<Data = { [field: string]: any }> {
 	createDiff: (originalSchema: Schema, updatedSchema: Schema) => Migration.Modification<Data>[]
 }
 
-
 export interface ModificationType<Id extends String, Data> {
 	id: Id
 	createModification: (data: Data) => Migration.Modification<Data>

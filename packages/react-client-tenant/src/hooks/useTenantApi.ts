@@ -21,7 +21,6 @@ export const useTenantApi = ({ headers, apiToken }: TenantApiOptions = {}) => {
 			readonly apiToken?: string | typeof LoginToken
 		},
 	): Promise<TData> => {
-
 		const writer = new TextWriter()
 		writer.text(`${fetcher.fetchableType.name.toLowerCase()}`)
 		if (fetcher.variableTypeMap.size !== 0) {

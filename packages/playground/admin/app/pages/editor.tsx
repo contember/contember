@@ -21,7 +21,8 @@ import {
 	ListIcon,
 	ListOrderedIcon,
 	LocateIcon,
-	MinusIcon, PencilIcon,
+	MinusIcon,
+	PencilIcon,
 	PilcrowIcon,
 	QuoteIcon,
 	StrikethroughIcon,
@@ -60,15 +61,7 @@ import { Button } from '~/lib/ui/button'
 import { PopoverClose } from '@radix-ui/react-popover'
 import { uic } from '~/lib/utils'
 import { useSlateStatic } from 'slate-react'
-import {
-	BlockEditorField,
-	EditorBlock,
-	EditorBlockContent,
-	EditorBlockToolbar,
-	EditorInlineToolbar,
-	RichTextField,
-	RichTextView,
-} from '~/lib/editor'
+import { BlockEditorField, EditorBlock, EditorBlockContent, EditorBlockToolbar, EditorInlineToolbar, RichTextField, RichTextView } from '~/lib/editor'
 
 export const Richtext = () => (
 	<Binding>
@@ -85,13 +78,41 @@ export const Richtext = () => (
 				<div className="max-w-md">
 					<RichTextField field="data" label="Rich text field">
 						<EditorInlineToolbar>
-							<EditorMarkTrigger mark={boldMark}><Toggle><BoldIcon className="h-3 w-3" /></Toggle></EditorMarkTrigger>
-							<EditorMarkTrigger mark={italicMark}><Toggle><ItalicIcon className="h-3 w-3" /></Toggle></EditorMarkTrigger>
-							<EditorMarkTrigger mark={underlineMark}><Toggle><UnderlineIcon className="h-3 w-3" /></Toggle></EditorMarkTrigger>
-							<EditorElementTrigger elementType={anchorElementType}><Toggle><LinkIcon className="h-3 w-3" /></Toggle></EditorElementTrigger>
-							<EditorGenericTrigger {...createAlignHandler('start')}><Toggle><AlignLeftIcon className="h-3 w-3" /></Toggle></EditorGenericTrigger>
-							<EditorGenericTrigger {...createAlignHandler('end')}><Toggle><AlignRightIcon className="h-3 w-3" /></Toggle></EditorGenericTrigger>
-							<EditorGenericTrigger {...createAlignHandler('center')}><Toggle><AlignCenterIcon className="h-3 w-3" /></Toggle></EditorGenericTrigger>
+							<EditorMarkTrigger mark={boldMark}>
+								<Toggle>
+									<BoldIcon className="h-3 w-3" />
+								</Toggle>
+							</EditorMarkTrigger>
+							<EditorMarkTrigger mark={italicMark}>
+								<Toggle>
+									<ItalicIcon className="h-3 w-3" />
+								</Toggle>
+							</EditorMarkTrigger>
+							<EditorMarkTrigger mark={underlineMark}>
+								<Toggle>
+									<UnderlineIcon className="h-3 w-3" />
+								</Toggle>
+							</EditorMarkTrigger>
+							<EditorElementTrigger elementType={anchorElementType}>
+								<Toggle>
+									<LinkIcon className="h-3 w-3" />
+								</Toggle>
+							</EditorElementTrigger>
+							<EditorGenericTrigger {...createAlignHandler('start')}>
+								<Toggle>
+									<AlignLeftIcon className="h-3 w-3" />
+								</Toggle>
+							</EditorGenericTrigger>
+							<EditorGenericTrigger {...createAlignHandler('end')}>
+								<Toggle>
+									<AlignRightIcon className="h-3 w-3" />
+								</Toggle>
+							</EditorGenericTrigger>
+							<EditorGenericTrigger {...createAlignHandler('center')}>
+								<Toggle>
+									<AlignCenterIcon className="h-3 w-3" />
+								</Toggle>
+							</EditorGenericTrigger>
 						</EditorInlineToolbar>
 					</RichTextField>
 				</div>
@@ -133,24 +154,74 @@ export const Blocks = () => (
 					]}
 				>
 					<EditorBlockToolbar>
-						<EditorReferenceTrigger referenceType="quote"><BlockButton><QuoteIcon /> Quote</BlockButton></EditorReferenceTrigger>
-						<EditorReferenceTrigger referenceType="image"><BlockButton><ImageIcon /> Image</BlockButton></EditorReferenceTrigger>
-						<EditorElementTrigger elementType={tableElementType}><BlockButton><TableIcon /> Table</BlockButton></EditorElementTrigger>
-						<EditorElementTrigger elementType={scrollTargetElementType}><BlockButton><LocateIcon /> Scroll target</BlockButton></EditorElementTrigger>
-						<EditorElementTrigger elementType={horizontalRuleElementType}><BlockButton><MinusIcon  /> Horizontal rule</BlockButton></EditorElementTrigger>
+						<EditorReferenceTrigger referenceType="quote">
+							<BlockButton>
+								<QuoteIcon /> Quote
+							</BlockButton>
+						</EditorReferenceTrigger>
+						<EditorReferenceTrigger referenceType="image">
+							<BlockButton>
+								<ImageIcon /> Image
+							</BlockButton>
+						</EditorReferenceTrigger>
+						<EditorElementTrigger elementType={tableElementType}>
+							<BlockButton>
+								<TableIcon /> Table
+							</BlockButton>
+						</EditorElementTrigger>
+						<EditorElementTrigger elementType={scrollTargetElementType}>
+							<BlockButton>
+								<LocateIcon /> Scroll target
+							</BlockButton>
+						</EditorElementTrigger>
+						<EditorElementTrigger elementType={horizontalRuleElementType}>
+							<BlockButton>
+								<MinusIcon /> Horizontal rule
+							</BlockButton>
+						</EditorElementTrigger>
 					</EditorBlockToolbar>
 					<EditorInlineToolbar>
 						<div>
-							<EditorMarkTrigger mark={boldMark}><Toggle><BoldIcon className="h-3 w-3" /></Toggle></EditorMarkTrigger>
-							<EditorMarkTrigger mark={italicMark}><Toggle><ItalicIcon className="h-3 w-3" /></Toggle></EditorMarkTrigger>
-							<EditorMarkTrigger mark={underlineMark}><Toggle><UnderlineIcon className="h-3 w-3" /></Toggle></EditorMarkTrigger>
-							<EditorMarkTrigger mark={strikeThroughMark}><Toggle><StrikethroughIcon className="h-3 w-3" /></Toggle></EditorMarkTrigger>
-							<EditorMarkTrigger mark={highlightMark}><Toggle><HighlighterIcon className="h-3 w-3" /></Toggle></EditorMarkTrigger>
-							<EditorMarkTrigger mark={codeMark}><Toggle><CodeIcon className="h-3 w-3" /></Toggle></EditorMarkTrigger>
-							<EditorElementTrigger elementType={anchorElementType}><Toggle><Link2Icon className="h-3 w-3" /></Toggle></EditorElementTrigger>
+							<EditorMarkTrigger mark={boldMark}>
+								<Toggle>
+									<BoldIcon className="h-3 w-3" />
+								</Toggle>
+							</EditorMarkTrigger>
+							<EditorMarkTrigger mark={italicMark}>
+								<Toggle>
+									<ItalicIcon className="h-3 w-3" />
+								</Toggle>
+							</EditorMarkTrigger>
+							<EditorMarkTrigger mark={underlineMark}>
+								<Toggle>
+									<UnderlineIcon className="h-3 w-3" />
+								</Toggle>
+							</EditorMarkTrigger>
+							<EditorMarkTrigger mark={strikeThroughMark}>
+								<Toggle>
+									<StrikethroughIcon className="h-3 w-3" />
+								</Toggle>
+							</EditorMarkTrigger>
+							<EditorMarkTrigger mark={highlightMark}>
+								<Toggle>
+									<HighlighterIcon className="h-3 w-3" />
+								</Toggle>
+							</EditorMarkTrigger>
+							<EditorMarkTrigger mark={codeMark}>
+								<Toggle>
+									<CodeIcon className="h-3 w-3" />
+								</Toggle>
+							</EditorMarkTrigger>
+							<EditorElementTrigger elementType={anchorElementType}>
+								<Toggle>
+									<Link2Icon className="h-3 w-3" />
+								</Toggle>
+							</EditorElementTrigger>
 							<Popover>
 								<PopoverTrigger asChild>
-									<Toggle><LinkIcon className="h-3 w-3" /></Toggle>
+									<Toggle>
+										<LinkIcon className="h-3 w-3" />
+									</Toggle>
 								</PopoverTrigger>
 								<PopoverContent>
 									<EditorInlineReferencePortal referenceType="link">
@@ -161,17 +232,57 @@ export const Blocks = () => (
 							</Popover>
 						</div>
 						<div>
-							<EditorElementTrigger elementType={paragraphElementType} suchThat={{ isNumbered: false }}><Toggle><PilcrowIcon className="h-3 w-3" /></Toggle></EditorElementTrigger>
-							<EditorElementTrigger elementType={headingElementType} suchThat={{ level: 1, isNumbered: false }}><Toggle><Heading1Icon className="h-3 w-3" /></Toggle></EditorElementTrigger>
-							<EditorElementTrigger elementType={headingElementType} suchThat={{ level: 2, isNumbered: false }}><Toggle><Heading2Icon className="h-3 w-3" /></Toggle></EditorElementTrigger>
-							<EditorElementTrigger elementType={headingElementType} suchThat={{ level: 3, isNumbered: false }}><Toggle><Heading3Icon className="h-3 w-3" /></Toggle></EditorElementTrigger>
-							<EditorElementTrigger elementType={unorderedListElementType}><Toggle><ListIcon className="h-3 w-3" /></Toggle></EditorElementTrigger>
-							<EditorElementTrigger elementType={orderedListElementType}><Toggle><ListOrderedIcon className="h-3 w-3" /></Toggle></EditorElementTrigger>
+							<EditorElementTrigger elementType={paragraphElementType} suchThat={{ isNumbered: false }}>
+								<Toggle>
+									<PilcrowIcon className="h-3 w-3" />
+								</Toggle>
+							</EditorElementTrigger>
+							<EditorElementTrigger elementType={headingElementType} suchThat={{ level: 1, isNumbered: false }}>
+								<Toggle>
+									<Heading1Icon className="h-3 w-3" />
+								</Toggle>
+							</EditorElementTrigger>
+							<EditorElementTrigger elementType={headingElementType} suchThat={{ level: 2, isNumbered: false }}>
+								<Toggle>
+									<Heading2Icon className="h-3 w-3" />
+								</Toggle>
+							</EditorElementTrigger>
+							<EditorElementTrigger elementType={headingElementType} suchThat={{ level: 3, isNumbered: false }}>
+								<Toggle>
+									<Heading3Icon className="h-3 w-3" />
+								</Toggle>
+							</EditorElementTrigger>
+							<EditorElementTrigger elementType={unorderedListElementType}>
+								<Toggle>
+									<ListIcon className="h-3 w-3" />
+								</Toggle>
+							</EditorElementTrigger>
+							<EditorElementTrigger elementType={orderedListElementType}>
+								<Toggle>
+									<ListOrderedIcon className="h-3 w-3" />
+								</Toggle>
+							</EditorElementTrigger>
 
-							<EditorGenericTrigger {...createAlignHandler('start')}><Toggle className="ml-4"><AlignLeftIcon className="h-3 w-3" /></Toggle></EditorGenericTrigger>
-							<EditorGenericTrigger {...createAlignHandler('end')}><Toggle><AlignRightIcon className="h-3 w-3" /></Toggle></EditorGenericTrigger>
-							<EditorGenericTrigger {...createAlignHandler('center')}><Toggle><AlignCenterIcon className="h-3 w-3" /></Toggle></EditorGenericTrigger>
-							<EditorGenericTrigger {...createAlignHandler('justify')}><Toggle><AlignJustifyIcon className="h-3 w-3" /></Toggle></EditorGenericTrigger>
+							<EditorGenericTrigger {...createAlignHandler('start')}>
+								<Toggle className="ml-4">
+									<AlignLeftIcon className="h-3 w-3" />
+								</Toggle>
+							</EditorGenericTrigger>
+							<EditorGenericTrigger {...createAlignHandler('end')}>
+								<Toggle>
+									<AlignRightIcon className="h-3 w-3" />
+								</Toggle>
+							</EditorGenericTrigger>
+							<EditorGenericTrigger {...createAlignHandler('center')}>
+								<Toggle>
+									<AlignCenterIcon className="h-3 w-3" />
+								</Toggle>
+							</EditorGenericTrigger>
+							<EditorGenericTrigger {...createAlignHandler('justify')}>
+								<Toggle>
+									<AlignJustifyIcon className="h-3 w-3" />
+								</Toggle>
+							</EditorGenericTrigger>
 						</div>
 					</EditorInlineToolbar>
 
@@ -214,7 +325,6 @@ const ConfirmReferenceButton = () => {
 	)
 }
 
-
 const LinkElement = (props: EditorRenderElementProps) => {
 	const editor = useSlateStatic()
 
@@ -224,17 +334,22 @@ const LinkElement = (props: EditorRenderElementProps) => {
 				{props.children}
 			</span>
 			<span contentEditable={false}>
-				<Popover
-				>
+				<Popover>
 					<PopoverTrigger asChild>
-						<button className="hover:bg-gray-200 p-1.5 border border-gray-200 rounded"><LinkIcon className="w-2 h-2" /></button>
+						<button className="hover:bg-gray-200 p-1.5 border border-gray-200 rounded">
+							<LinkIcon className="w-2 h-2" />
+						</button>
 					</PopoverTrigger>
 					<PopoverContent>
 						<div className="flex gap-2 items-center">
 							<LinkField field="link" />
 
-							<Button variant="destructive" size="sm" onClick={() => EditorTransforms.unwrapNodes(editor, { at: [], match: node => node === props.element })}>
-								<TrashIcon className="w-3 h-3"/>
+							<Button
+								variant="destructive"
+								size="sm"
+								onClick={() => EditorTransforms.unwrapNodes(editor, { at: [], match: node => node === props.element })}
+							>
+								<TrashIcon className="w-3 h-3" />
 							</Button>
 						</div>
 					</PopoverContent>
@@ -243,7 +358,6 @@ const LinkElement = (props: EditorRenderElementProps) => {
 		</span>
 	)
 }
-
 
 export const LinkField = Component<{ field: string }>(({ field }) => (
 	<HasOne field={field}>

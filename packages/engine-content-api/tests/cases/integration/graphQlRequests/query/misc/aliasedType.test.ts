@@ -39,4 +39,3 @@ test('aliased type', async () => {
 		},
 	})
 })
-

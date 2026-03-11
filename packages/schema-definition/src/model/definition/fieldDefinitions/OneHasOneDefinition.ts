@@ -5,7 +5,6 @@ import { CreateFieldContext, FieldDefinition } from './FieldDefinition'
 export class OneHasOneDefinition extends FieldDefinition<OneHasOneDefinitionOptions> {
 	type = 'OneHasOneDefinition' as const
 
-
 	inversedBy(inversedBy: string): OneHasOneDefinition {
 		return this.withOption('inversedBy', inversedBy)
 	}
@@ -63,7 +62,6 @@ export class OneHasOneDefinition extends FieldDefinition<OneHasOneDefinitionOpti
 		return new OneHasOneDefinition({ ...this.options, [key]: value })
 	}
 }
-
 
 export function oneHasOne(target: EntityConstructor, inversedBy?: string): OneHasOneDefinition {
 	return new OneHasOneDefinition({ target, inversedBy })

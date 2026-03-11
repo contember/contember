@@ -32,7 +32,6 @@ class PersonManager {
 		await dbContext.commandBus.execute(new TogglePersonPasswordlessCommand(person.id, value))
 		return new ResponseOk(null)
 	}
-
 }
 
 namespace PersonManager {

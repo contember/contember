@@ -5,7 +5,7 @@
 ```ts
 
 import { Context } from 'react';
-import { JSX as JSX_2 } from 'react/jsx-runtime';
+import { JSX } from 'react/jsx-runtime';
 import * as React_2 from 'react';
 import { ReactNode } from 'react';
 import * as ToastPrimitives from '@radix-ui/react-toast';
@@ -27,12 +27,12 @@ export const ToastAction: React_2.ForwardRefExoticComponent<Omit<ToastPrimitives
 }, "ref"> & React_2.RefAttributes<HTMLButtonElement>>;
 
 // @public (undocumented)
-export const ToastContent: ({ title, children, action, details }: {
+export const ToastContent: (input: {
     title?: ReactNode;
     children?: ReactNode;
     action?: ReactNode;
     details?: ReactNode;
-}) => JSX_2.Element;
+}) => JSX.Element;
 
 // @public (undocumented)
 export interface ToastData {
@@ -52,9 +52,9 @@ export const ToastDescription: React_2.ForwardRefExoticComponent<Omit<ToastPrimi
 }, "ref"> & React_2.RefAttributes<HTMLDivElement>>;
 
 // @public (undocumented)
-export function Toaster({ children }: {
+export function Toaster(input: {
     children: ReactNode;
-}): JSX_2.Element;
+}): JSX.Element;
 
 // @public (undocumented)
 export interface ToasterMethods {
@@ -68,9 +68,9 @@ export interface ToasterMethods {
 export const ToasterMethodsContext: Context<ToasterMethods>;
 
 // @public (undocumented)
-export const ToasterProvider: ({ children }: {
+export const ToasterProvider: (input: {
     children: ReactNode;
-}) => JSX_2.Element;
+}) => JSX.Element;
 
 // @public (undocumented)
 export interface ToasterState {

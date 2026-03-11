@@ -26,7 +26,6 @@ export function DevErrorList({
 	onPrevious,
 	onClear,
 }: DevErrorListProps) {
-
 	useEffect(() => {
 		document.body.classList.add('cui-devError-body')
 		return () => {
@@ -43,21 +42,23 @@ export function DevErrorList({
 						<DevErrorCopy currentError={currentError} currentErrorSource={currentErrorSource} />
 					</div>
 					<div className={className('actions')}>
-						{errorCount > 1 ? (
-							<div className={className('switcher')}>
-								<p className={className('errorCount')}>
-									Error {currentErrorIndex + 1} of {errorCount}
-								</p>
-								<div className={className('switcherButtons')}>
-									<button type="button" className={className('switcherButton')} onClick={onPrevious}>
-										←
-									</button>
-									<button type="button" className={className('switcherButton')} onClick={onNext}>
-										→
-									</button>
+						{errorCount > 1
+							? (
+								<div className={className('switcher')}>
+									<p className={className('errorCount')}>
+										Error {currentErrorIndex + 1} of {errorCount}
+									</p>
+									<div className={className('switcherButtons')}>
+										<button type="button" className={className('switcherButton')} onClick={onPrevious}>
+											←
+										</button>
+										<button type="button" className={className('switcherButton')} onClick={onNext}>
+											→
+										</button>
+									</div>
 								</div>
-							</div>
-						) : null}
+							)
+							: null}
 						<div className={className('close')}>
 							<button type="button" className={className('closeButton')} onClick={onClose}>
 								✕

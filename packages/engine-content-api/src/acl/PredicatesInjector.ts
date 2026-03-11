@@ -69,5 +69,4 @@ export class PredicatesInjector {
 
 		return this.createWhere(entity, fieldsForPredicate, resultWhere, relationContext)
 	}
-
 }

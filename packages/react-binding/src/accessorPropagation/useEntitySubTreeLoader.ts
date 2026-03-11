@@ -28,7 +28,6 @@ export type UseEntitySubTreeLoaderStateRefreshing<State> = {
 	isLoading: true
 }
 
-
 export type UseEntitySubTreeLoaderStateLoaded<State> = {
 	state: 'loaded'
 	entity: SugaredQualifiedSingleEntity
@@ -46,7 +45,6 @@ export type UseEntitySubTreeLoaderStateFailed = {
 	isLoading: false
 }
 
-
 export type UseEntitySubTreeLoaderState<State> =
 	| UseEntitySubTreeLoaderStateInitial
 	| UseEntitySubTreeLoaderStateLoading
@@ -62,7 +60,11 @@ export type UseEntitySubTreeLoaderStateMethods = {
 
 const emptyObject = {} as SugaredQualifiedSingleEntity
 
-export const useEntitySubTreeLoader = <State>(entity: SugaredQualifiedSingleEntity | undefined, children: ReactNode, state?: State): [UseEntitySubTreeLoaderState<State>, UseEntitySubTreeLoaderStateMethods] => {
+export const useEntitySubTreeLoader = <State>(
+	entity: SugaredQualifiedSingleEntity | undefined,
+	children: ReactNode,
+	state?: State,
+): [UseEntitySubTreeLoaderState<State>, UseEntitySubTreeLoaderStateMethods] => {
 	const [displayedState, setDisplayedState] = useState<UseEntitySubTreeLoaderState<State>>({
 		state: 'initial',
 		isLoading: false,
@@ -70,10 +72,12 @@ export const useEntitySubTreeLoader = <State>(entity: SugaredQualifiedSingleEnti
 		treeRootId: undefined,
 		customState: undefined,
 	})
-	const currentlyLoading = useRef<{
-		entity: SugaredQualifiedSingleEntity
-		state?: State
-	}>()
+	const currentlyLoading = useRef<
+		{
+			entity: SugaredQualifiedSingleEntity
+			state?: State
+		} | undefined
+	>(undefined)
 
 	const extendTree = useExtendTree()
 	const [reloadTrigger, setReloadTrigger] = useState<object | null>(null)
@@ -81,7 +85,7 @@ export const useEntitySubTreeLoader = <State>(entity: SugaredQualifiedSingleEnti
 	const resolvedEntity = entity ? memoizedEntity : undefined
 
 	useEffect(() => {
-		(async () => {
+		;(async () => {
 			if (!resolvedEntity) {
 				return
 			}
@@ -130,7 +134,6 @@ export const useEntitySubTreeLoader = <State>(entity: SugaredQualifiedSingleEnti
 					},
 				},
 			)
-
 
 			if (newTreeRootId) {
 				currentlyLoading.current = undefined

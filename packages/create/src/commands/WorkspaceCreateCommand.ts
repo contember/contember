@@ -38,7 +38,6 @@ export class WorkspaceCreateCommand extends Command<Args, Options> {
 			packageManager: packageManager,
 		})
 
-		// eslint-disable-next-line no-console
 		console.log(createDocs(projectDirectory, projectName, packageManager))
 	}
 }

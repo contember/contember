@@ -5,10 +5,9 @@ import { createModificationType, Differ, ModificationHandler } from '../Modifica
 import deepEqual from 'fast-deep-equal'
 
 export class UpdateEntityOrderByModificationHandler implements ModificationHandler<UpdateEntityOrderByModificationData> {
+	constructor(private readonly data: UpdateEntityOrderByModificationData, private readonly schema: Schema) {}
 
-	constructor(private readonly data: UpdateEntityOrderByModificationData, private readonly schema: Schema) { }
-
-	public createSql(builder: MigrationBuilder): void { }
+	public createSql(builder: MigrationBuilder): void {}
 
 	public getSchemaUpdater(): SchemaUpdater {
 		const { entityName, orderBy } = this.data
@@ -63,6 +62,5 @@ export class UpdateEntityOrderByDiffer implements Differ {
 				}
 				return []
 			})
-
 	}
 }

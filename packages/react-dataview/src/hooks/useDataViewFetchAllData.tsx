@@ -6,6 +6,7 @@ import {
 	EntityFieldsWithHoistablesMarker,
 	EntityListSubTree,
 	EntityListSubTreeMarker,
+	EntitySubTreeMarker,
 	MarkerFactory,
 	ReceivedEntityData,
 	useBindingOperations,
@@ -42,7 +43,7 @@ export const useDataViewFetchAllData = ({ children, selection }: { children: Rea
 		const { data, markerTreeRoot } = await bindingOperations.fetchData(node, {
 			environment: env.withExtension(dataViewSelectionEnvironmentExtension, selection ?? {}),
 		})
-		const marker = Array.from(markerTreeRoot.subTrees.values())[0]
+		const marker = Array.from(markerTreeRoot.subTrees.values())[0] as EntityListSubTreeMarker | EntitySubTreeMarker
 		const fieldData = data[marker.placeholderName]
 		if (!(marker instanceof EntityListSubTreeMarker) || !Array.isArray(fieldData)) {
 			throw new Error()
@@ -52,7 +53,6 @@ export const useDataViewFetchAllData = ({ children, selection }: { children: Rea
 			data: fieldData,
 			marker,
 		}
-
 	}, [entityName, filter, children, bindingOperations, env, selection])
 }
 

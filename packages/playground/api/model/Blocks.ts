@@ -7,7 +7,7 @@ export class BlockList {
 }
 
 export const BlockType = c.createEnum(
-	'text',  // title, content
+	'text', // title, content
 	'image', // title, image
 	'textWithImage', // title, content, image, imagePosition
 	'hero', // title, content, color

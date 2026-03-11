@@ -36,12 +36,10 @@ export class ImportApiMiddlewareFactory {
 				await this.importExecutor.import(projectGroup, authResult, commands)
 				response.status = 200
 				response.body = { ok: true }
-
 			} catch (e) {
 				if (e instanceof ImportError) {
 					response.status = 400
 					response.body = { ok: false, error: e.message }
-
 				} else {
 					throw e
 				}

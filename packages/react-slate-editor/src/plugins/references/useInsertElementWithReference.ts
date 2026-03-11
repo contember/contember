@@ -7,7 +7,11 @@ import { ElementWithReference } from './elements'
 import { EditorReferenceBlocks } from '../../internal/helpers/useCreateEditorReferenceBlocks'
 import { BindingError } from '@contember/react-binding'
 
-export type InsertElementWithReference = (element: Partial<Element> & { type: string }, referenceDiscriminant: string, initialize?: EntityAccessor.BatchUpdatesHandler) => void
+export type InsertElementWithReference = (
+	element: Partial<Element> & { type: string },
+	referenceDiscriminant: string,
+	initialize?: EntityAccessor.BatchUpdatesHandler,
+) => void
 
 export const useInsertElementWithReference = ({ createElementReference, blocks, editor }: {
 	createElementReference: CreateElementReferences
@@ -19,7 +23,6 @@ export const useInsertElementWithReference = ({ createElementReference, blocks, 
 		referenceDiscriminant: string,
 		initialize?: EntityAccessor.BatchUpdatesHandler,
 	) => {
-
 		const targetBlock = blocks[element.type]
 
 		if (targetBlock === undefined) {

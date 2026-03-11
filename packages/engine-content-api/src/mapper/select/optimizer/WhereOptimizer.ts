@@ -4,12 +4,11 @@ import { acceptFieldVisitor } from '@contember/schema-utils'
 import { optimizeAnd, optimizeNot, optimizeOr } from './helpers'
 import { replaceWhere } from './WhereReplacer'
 
-type ExtendedRelationContext =
-	& {
-		context: Model.AnyRelationContext
-		canEliminate: boolean
-		isLast: boolean
-	}
+type ExtendedRelationContext = {
+	context: Model.AnyRelationContext
+	canEliminate: boolean
+	isLast: boolean
+}
 
 export interface WhereOptimizationHints {
 	relationPath?: Model.AnyRelationContext[]
@@ -33,7 +32,11 @@ export class WhereOptimizer {
 	) {
 	}
 
-	public optimize(where: Input.OptionalWhere, entity: Model.Entity, { relationPath = [], evaluatedPredicates = [] }: WhereOptimizationHints = {}): Input.OptionalWhere {
+	public optimize(
+		where: Input.OptionalWhere,
+		entity: Model.Entity,
+		{ relationPath = [], evaluatedPredicates = [] }: WhereOptimizationHints = {},
+	): Input.OptionalWhere {
 		if (this.options?.disable) {
 			return where
 		}
@@ -72,7 +75,7 @@ export class WhereOptimizer {
 
 		for (const key in where) {
 			const value = where[key]
-			let operand: OptimizedOperand = undefined
+			let operand: OptimizedOperand
 			if (value === undefined || value === null) {
 				continue
 			} else if (key === 'and') {
@@ -98,17 +101,14 @@ export class WhereOptimizer {
 				if (operand !== true) {
 					operand = this.optimizeOr(innerOperands, entity, relationPath)
 				}
-
 			} else if (key === 'not') {
 				operand = optimizeNot(this.optimizeWhere(value as Input.OptionalWhere, entity, relationPath))
-
 			} else {
 				operand = this.resolveFieldValue(entity, key, value, relationPath)
 			}
 
 			if (operand === false) {
 				return false
-
 			} else if (operand !== undefined) {
 				operands.push(operand)
 			}
@@ -116,7 +116,11 @@ export class WhereOptimizer {
 		return this.optimizeAnd(operands, entity, relationPath)
 	}
 
-	private optimizeOr(operands: readonly OptimizedOperand[], entity: Model.Entity, relationPath: ExtendedRelationContext[]): Input.OptionalWhere | boolean {
+	private optimizeOr(
+		operands: readonly OptimizedOperand[],
+		entity: Model.Entity,
+		relationPath: ExtendedRelationContext[],
+	): Input.OptionalWhere | boolean {
 		const optimized = optimizeOr(operands)
 		if (typeof optimized === 'boolean' || !Array.isArray(optimized.or)) {
 			return optimized
@@ -128,7 +132,11 @@ export class WhereOptimizer {
 		return optimizeOr(result)
 	}
 
-	private optimizeAnd(operands: readonly OptimizedOperand[], entity: Model.Entity, relationPath: ExtendedRelationContext[]): Input.OptionalWhere | boolean {
+	private optimizeAnd(
+		operands: readonly OptimizedOperand[],
+		entity: Model.Entity,
+		relationPath: ExtendedRelationContext[],
+	): Input.OptionalWhere | boolean {
 		const optimized = optimizeAnd(operands)
 		if (typeof optimized === 'boolean' || !Array.isArray(optimized.and)) {
 			return optimized
@@ -140,7 +148,12 @@ export class WhereOptimizer {
 		return optimizeAnd(result)
 	}
 
-	private crossOptimize(operands: Input.OptionalWhere[], entity: Model.Entity, replacement: Input.Condition, relationPath: ExtendedRelationContext[]): (Input.OptionalWhere | boolean)[] {
+	private crossOptimize(
+		operands: Input.OptionalWhere[],
+		entity: Model.Entity,
+		replacement: Input.Condition,
+		relationPath: ExtendedRelationContext[],
+	): (Input.OptionalWhere | boolean)[] {
 		let result: (Input.OptionalWhere | boolean)[] = operands
 		let copied = false
 		const count = Math.min(result.length, this.options?.maxCrossOptimizationInput ?? 50)

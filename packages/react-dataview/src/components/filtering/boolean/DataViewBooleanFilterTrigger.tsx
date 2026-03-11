@@ -11,7 +11,9 @@ export interface DataViewBooleanFilterTriggerAttributes {
 	['data-current']: DataViewBooleanFilterCurrent
 }
 
-const SlotType = Slot as React.ForwardRefExoticComponent<React.ButtonHTMLAttributes<HTMLButtonElement> & React.RefAttributes<HTMLButtonElement> & DataViewBooleanFilterTriggerAttributes>
+const SlotType = Slot as React.ForwardRefExoticComponent<
+	React.ButtonHTMLAttributes<HTMLButtonElement> & React.RefAttributes<HTMLButtonElement> & DataViewBooleanFilterTriggerAttributes
+>
 
 export interface DataViewBooleanFilterTriggerProps {
 	/**
@@ -36,11 +38,9 @@ export interface DataViewBooleanFilterTriggerProps {
 	 * The button element.
 	 */
 	children: ReactElement
-
 }
 
 /**
- *
  * A trigger component for managing boolean filters in a data view.
  *
  * ## Props
@@ -61,25 +61,26 @@ export interface DataViewBooleanFilterTriggerProps {
  * </DataViewBooleanFilterTrigger>
  * ```
  */
-export const DataViewBooleanFilterTrigger = forwardRef<HTMLButtonElement, DataViewBooleanFilterTriggerProps>(({ name, action = 'include', value, ...props }: DataViewBooleanFilterTriggerProps, ref) => {
-	// eslint-disable-next-line react-hooks/rules-of-hooks
-	name ??= useDataViewFilterName()
-	const [current, setFilter] = useDataViewBooleanFilter(name, value)
-	const toggleFilter = useCallback(() => {
-		setFilter(action)
-	}, [action, setFilter])
-	const { onClick, ...otherProps } = props as React.ButtonHTMLAttributes<HTMLButtonElement>
+export const DataViewBooleanFilterTrigger = forwardRef<HTMLButtonElement, DataViewBooleanFilterTriggerProps>(
+	({ name, action = 'include', value, ...props }: DataViewBooleanFilterTriggerProps, ref) => {
+		name ??= useDataViewFilterName()
+		const [current, setFilter] = useDataViewBooleanFilter(name, value)
+		const toggleFilter = useCallback(() => {
+			setFilter(action)
+		}, [action, setFilter])
+		const { onClick, ...otherProps } = props as React.ButtonHTMLAttributes<HTMLButtonElement>
 
-	return (
-		<SlotType
-			ref={ref}
-			onClick={composeEventHandlers(onClick, toggleFilter)}
-			data-active={dataAttribute(current === actionToState[action])}
-			data-current={current}
-			{...otherProps}
-		/>
-	)
-})
+		return (
+			<SlotType
+				ref={ref}
+				onClick={composeEventHandlers(onClick, toggleFilter)}
+				data-active={dataAttribute(current === actionToState[action])}
+				data-current={current}
+				{...otherProps}
+			/>
+		)
+	},
+)
 DataViewBooleanFilterTrigger.displayName = 'DataViewBooleanFilterTrigger'
 
 const actionToState: Record<DataViewSetBooleanFilterAction, DataViewBooleanFilterCurrent> = {

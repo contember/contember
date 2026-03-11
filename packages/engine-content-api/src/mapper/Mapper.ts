@@ -82,7 +82,11 @@ export class Mapper<ConnectionType extends Connection.ConnectionLike = Connectio
 		return await hydrator.hydrateAll(rows, indexByAlias)
 	}
 
-	public async select(entity: Model.Entity, input: ObjectNode<Input.ListQueryInput>, relationPath: Model.AnyRelationContext[]): Promise<SelectResultObject[]> {
+	public async select(
+		entity: Model.Entity,
+		input: ObjectNode<Input.ListQueryInput>,
+		relationPath: Model.AnyRelationContext[],
+	): Promise<SelectResultObject[]> {
 		const hydrator = new SelectHydrator()
 		const qb: SelectBuilder<SelectBuilder.Result> = SelectBuilder.create()
 
@@ -183,9 +187,7 @@ export class Mapper<ConnectionType extends Connection.ConnectionLike = Connectio
 			throw new ImplementationException()
 		}
 		await this.setupSystemVariables()
-		return tryMutation(this.schema, this.schemaDatabaseMetadata, () =>
-			this.insertInternal(entity, data, builderCb),
-		)
+		return tryMutation(this.schema, this.schemaDatabaseMetadata, () => this.insertInternal(entity, data, builderCb))
 	}
 
 	public async update(

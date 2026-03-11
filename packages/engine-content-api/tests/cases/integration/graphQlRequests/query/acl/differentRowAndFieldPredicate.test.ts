@@ -72,8 +72,6 @@ test('different predicate on row and field level', async () => {
 	})
 })
 
-
-
 test('different predicate on row and field level - false', async () => {
 	await execute({
 		schema: schema,
@@ -119,5 +117,3 @@ test('different predicate on row and field level - false', async () => {
 		},
 	})
 })
-
-

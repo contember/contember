@@ -14,20 +14,25 @@ export class ProjectInitializer {
 	) {}
 
 	public async initialize(logger: Logger) {
-		return await logger.scope(async initLogger => {
-			initLogger.debug('Executing system schema migrations')
-			await this.migrationsRunner.run(initLogger)
-			const dbContext = this.databaseContext
-			await retryTransaction(
-				() => dbContext.transaction(async trx => {
-					await this.initStages(trx, logger)
-				}),
-				message => initLogger.warn(message),
-			)
-			if (dbContext.client.connection instanceof Connection) {
-				await dbContext.client.connection.clearPool()
-			}
-		}, {}, { handler: FingerCrossedLoggerHandler.factory() })
+		return await logger.scope(
+			async initLogger => {
+				initLogger.debug('Executing system schema migrations')
+				await this.migrationsRunner.run(initLogger)
+				const dbContext = this.databaseContext
+				await retryTransaction(
+					() =>
+						dbContext.transaction(async trx => {
+							await this.initStages(trx, logger)
+						}),
+					message => initLogger.warn(message),
+				)
+				if (dbContext.client.connection instanceof Connection) {
+					await dbContext.client.connection.clearPool()
+				}
+			},
+			{},
+			{ handler: FingerCrossedLoggerHandler.factory() },
+		)
 	}
 
 	private async initStages(db: DatabaseContext<Connection.TransactionLike>, logger: Logger) {

@@ -1,7 +1,6 @@
 export * from './primitives'
 export * from './helpers'
 
-
 export * from './EventListenersStore'
 export * from './Normalized'
 export * from './TreeParameterMerger'

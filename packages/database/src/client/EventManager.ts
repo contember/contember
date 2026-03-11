@@ -12,13 +12,11 @@ class EventManager {
 	) {}
 
 	on<Event extends keyof EventManager.ListenerTypes>(event: Event, cb: EventManager.ListenerTypes[Event]): void {
-		(this.listeners[event] as EventManager.ListenerTypes[Event][]).push(cb)
+		;(this.listeners[event] as EventManager.ListenerTypes[Event][]).push(cb)
 	}
 
 	fire<Event extends EventManager.Event>(event: Event, ...params: Parameters<EventManager.ListenerTypes[Event]>): void {
-		(this.listeners[event] as EventManager.ListenerTypes[Event][]).forEach((cb: EventManager.ListenerTypes[Event]) =>
-			cb(...(params as [any, any])),
-		)
+		;(this.listeners[event] as EventManager.ListenerTypes[Event][]).forEach((cb: EventManager.ListenerTypes[Event]) => cb(...(params as [any, any])))
 		if (this.parent) {
 			this.parent.fire(event, ...params)
 		}
@@ -31,7 +29,6 @@ class EventManager {
 		this.listeners[event] = (this.listeners[event] as EventManager.ListenerTypes[Event][]).filter(it => it !== cb) as any[]
 	}
 }
-
 
 namespace EventManager {
 	export enum Event {

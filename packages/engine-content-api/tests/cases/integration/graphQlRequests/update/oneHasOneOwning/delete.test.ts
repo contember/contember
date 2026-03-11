@@ -37,7 +37,8 @@ test('delete', async () => {
 					response: { rows: [{ id: testUuid(1), allowed: true }] },
 				},
 				{
-					sql: SQL`select "root_"."id" as "id", "root_"."setting_id" as "ref", true as "allowed" from "public"."site" as "root_" where "root_"."setting_id" in (?)`,
+					sql:
+						SQL`select "root_"."id" as "id", "root_"."setting_id" as "ref", true as "allowed" from "public"."site" as "root_" where "root_"."setting_id" in (?)`,
 					parameters: [testUuid(1)],
 					response: { rows: [{ id: testUuid(2), ref: testUuid(1), allowed: true }] },
 				},
@@ -57,7 +58,6 @@ test('delete', async () => {
 		},
 	})
 })
-
 
 test('delete denied', async () => {
 	await execute({
@@ -93,7 +93,8 @@ test('delete denied', async () => {
 					response: { rows: [{ id: testUuid(1), allowed: true }] },
 				},
 				{
-					sql: SQL`select "root_"."id" as "id", "root_"."setting_id" as "ref", true as "allowed" from "public"."site" as "root_" where "root_"."setting_id" in (?)`,
+					sql:
+						SQL`select "root_"."id" as "id", "root_"."setting_id" as "ref", true as "allowed" from "public"."site" as "root_" where "root_"."setting_id" in (?)`,
 					parameters: [testUuid(1)],
 					response: { rows: [{ id: testUuid(2), ref: testUuid(1), allowed: false }] },
 				},
@@ -104,10 +105,9 @@ test('delete denied', async () => {
 				updateSite: {
 					ok: false,
 					errorMessage: 'Execution has failed:\n'
-					+ 'setting: ForeignKeyConstraintViolation (Cannot delete 123e4567-e89b-12d3-a456-000000000001 row(s) of entity SiteSetting, because it is still referenced from 123e4567-e89b-12d3-a456-000000000002 row(s) of entity Site in relation setting. OnDelete behaviour of this relation is set to "set null". This is possibly caused by ACL denial.)',
+						+ 'setting: ForeignKeyConstraintViolation (Cannot delete 123e4567-e89b-12d3-a456-000000000001 row(s) of entity SiteSetting, because it is still referenced from 123e4567-e89b-12d3-a456-000000000002 row(s) of entity Site in relation setting. OnDelete behaviour of this relation is set to "set null". This is possibly caused by ACL denial.)',
 				},
 			},
 		},
 	})
 })
-

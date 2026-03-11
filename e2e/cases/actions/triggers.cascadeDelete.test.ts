@@ -3,7 +3,6 @@ import { test } from 'bun:test'
 import { createTester, gql } from '../../src/tester'
 
 namespace ActionsModel {
-
 	@actions.watch({
 		name: 'article_watch',
 		watch: `
@@ -31,11 +30,8 @@ namespace ActionsModel {
 }
 
 test('triggers: cascade delete - delete referenced entity', async () => {
-
-
 	const schema = createSchema(ActionsModel)
 	const tester = await createTester(schema)
-
 
 	const res = await tester(gql`
         mutation {
@@ -66,16 +62,19 @@ test('triggers: cascade delete - delete referenced entity', async () => {
 			},
 		})
 
-	await tester(gql`
+	await tester(
+		gql`
         query {
             eventsToProcess {
                 payload
             }
         }
 
-	`, {
-		path: '/actions/' + tester.projectSlug,
-	})
+	`,
+		{
+			path: '/actions/' + tester.projectSlug,
+		},
+	)
 		.expect(200)
 		.expect({
 			data: {
@@ -123,5 +122,3 @@ test('triggers: cascade delete - delete referenced entity', async () => {
 			},
 		})
 })
-
-

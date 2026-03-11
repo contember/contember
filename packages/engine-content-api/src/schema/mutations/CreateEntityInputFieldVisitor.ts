@@ -4,10 +4,9 @@ import { ColumnTypeResolver } from '../ColumnTypeResolver'
 import { CreateEntityRelationInputProvider } from './CreateEntityRelationInputProvider'
 import { Authorizator } from '../../acl'
 
-export class CreateEntityInputFieldVisitor implements
-	Model.ColumnVisitor<GraphQLInputFieldConfig | undefined>,
-	Model.RelationByGenericTypeVisitor<GraphQLInputFieldConfig | undefined> {
-
+export class CreateEntityInputFieldVisitor
+	implements Model.ColumnVisitor<GraphQLInputFieldConfig | undefined>, Model.RelationByGenericTypeVisitor<GraphQLInputFieldConfig | undefined>
+{
 	constructor(
 		private readonly schema: Model.Schema,
 		private readonly authorizator: Authorizator,

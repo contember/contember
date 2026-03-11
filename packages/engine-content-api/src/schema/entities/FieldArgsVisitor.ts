@@ -3,10 +3,11 @@ import { WhereTypeProvider } from '../WhereTypeProvider'
 import { GraphQLFieldConfigArgumentMap, GraphQLInt, GraphQLList, GraphQLNonNull } from 'graphql'
 import { OrderByTypeProvider } from '../OrderByTypeProvider'
 
-export class FieldArgsVisitor implements
-	Model.ColumnVisitor<GraphQLFieldConfigArgumentMap | undefined>,
-	Model.RelationByGenericTypeVisitor<GraphQLFieldConfigArgumentMap | undefined> {
-
+export class FieldArgsVisitor
+	implements
+		Model.ColumnVisitor<GraphQLFieldConfigArgumentMap | undefined>,
+		Model.RelationByGenericTypeVisitor<GraphQLFieldConfigArgumentMap | undefined>
+{
 	constructor(
 		private readonly whereTypeProvider: WhereTypeProvider,
 		private readonly orderByTypeProvider: OrderByTypeProvider,

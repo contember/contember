@@ -1,7 +1,6 @@
 import { queryBuilder } from '../client'
 import { printMutation } from './utils'
 
-
 const data = Array.from({ length: 10 }).map((it, index) => {
 	return queryBuilder.create('ExtendTreeMany', {
 		data: {

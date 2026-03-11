@@ -1,0 +1,121 @@
+{
+	"$schema": "https://biomejs.dev/schemas/2.4.6/schema.json",
+	"assist": {
+		"actions": {
+			"source": {
+				"organizeImports": "on"
+			}
+		}
+	},
+	"files": {
+		"includes": [
+			"packages/**/*.ts",
+			"packages/**/*.tsx",
+			"e2e/**/*.ts",
+			"!**/node_modules",
+			"!**/dist",
+			"!**/temp",
+			"!packages/create/resources",
+			"!packages/playground/api/client",
+			"!packages/client-content/tests/client",
+			"!packages/graphql-client-tenant/src/generated",
+			"!packages/graphql-client-system/src/generated"
+		]
+	},
+	"linter": {
+		"enabled": true,
+		"rules": {
+			"recommended": true,
+			"complexity": {
+				"noUselessFragments": "off",
+				"noStaticOnlyClass": "off",
+				"noBannedTypes": "off",
+				"useDateNow": "off",
+				"useArrowFunction": "off",
+				"noThisInStatic": "off",
+				"useLiteralKeys": "off"
+			},
+		"correctness": {
+				"noUnusedImports": "off",
+				"noChildrenProp": "off",
+				"noUnusedFunctionParameters": "off",
+				"noUnusedPrivateClassMembers": "off",
+				"noUnusedVariables": "off",
+				"noEmptyPattern": "off",
+				"useParseIntRadix": "off",
+				"useExhaustiveDependencies": "error",
+				"useHookAtTopLevel": "off",
+				"noVoidTypeReturn": "off",
+				"noSwitchDeclarations": "off",
+				"noConstantCondition": "off"
+			},
+			"style": {
+				"useImportType": "off",
+				"useTemplate": "off",
+				"useExponentiationOperator": "off",
+				"noNonNullAssertion": "off",
+				"useExportType": "on",
+				"noInferrableTypes": "off",
+				"noNamespace": "off",
+				"useDefaultParameterLast": "off",
+				"useConst": "off",
+				"useNodejsImportProtocol": "off"
+			},
+			"security": {
+				"noDangerouslySetInnerHtml": "error"
+			},
+		"performance": {
+				"noAccumulatingSpread": "off"
+			},
+			"suspicious": {
+				"noTemplateCurlyInString": "off",
+				"noShadowRestrictedNames": "off",
+				"noExplicitAny": "off",
+				"noConfusingVoidType": "off",
+				"noArrayIndexKey": "off",
+				"noAssignInExpressions": "off",
+				"useIterableCallbackReturn": "off",
+				"noEmptyInterface": "off",
+				"noImplicitAnyLet": "off",
+				"noAsyncPromiseExecutor": "off",
+				"noPrototypeBuiltins": "off",
+				"noGlobalIsNan": "off",
+				"noTsIgnore": "off",
+				"noConsole": {
+					"level": "error",
+					"options": { "allow": ["info", "warn", "error", "debug", "log"] }
+				}
+			},
+			"a11y": "off"
+		}
+	},
+	"overrides": [
+		{
+			"includes": [
+				"packages/cli/src/**",
+				"packages/cli-common/src/**"
+			],
+			"linter": {
+				"rules": {
+					"suspicious": {
+						"noConsole": "off"
+					}
+				}
+			}
+		},
+		{
+			"includes": [
+				"packages/engine-content-api/tests/**",
+				"packages/engine-system-api/tests/**",
+				"packages/engine-tenant-api/tests/**"
+			],
+			"linter": {
+				"rules": {
+					"suspicious": {
+						"noConsole": "off"
+					}
+				}
+			}
+		}
+	]
+}

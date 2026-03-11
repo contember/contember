@@ -59,11 +59,11 @@ export class MakeRelationNotNullDiffer implements Differ {
 	createDiff(originalSchema: Schema, updatedSchema: Schema) {
 		return updateRelations(originalSchema, updatedSchema, ({ originalRelation, updatedRelation, updatedEntity }) => {
 			if (
-				originalRelation.type === updatedRelation.type &&
-				isIt<Model.NullableRelation>(updatedRelation, 'nullable') &&
-				isIt<Model.NullableRelation>(originalRelation, 'nullable') &&
-				!updatedRelation.nullable &&
-				originalRelation.nullable
+				originalRelation.type === updatedRelation.type
+				&& isIt<Model.NullableRelation>(updatedRelation, 'nullable')
+				&& isIt<Model.NullableRelation>(originalRelation, 'nullable')
+				&& !updatedRelation.nullable
+				&& originalRelation.nullable
 			) {
 				return makeRelationNotNullModification.createModification({
 					entityName: updatedEntity.name,

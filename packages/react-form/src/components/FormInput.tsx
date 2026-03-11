@@ -21,39 +21,42 @@ export interface FormInputProps {
 	parseValue?: FormInputHandler['parseValue']
 }
 
-export const FormInput = Component<FormInputProps>(({ field, isNonbearing, defaultValue, formatValue: formatValueIn, parseValue: parseValueIn, ...props }) => {
-	const accessor = useField(field)
+export const FormInput = Component<FormInputProps>(
+	({ field, isNonbearing, defaultValue, formatValue: formatValueIn, parseValue: parseValueIn, ...props }) => {
+		const accessor = useField(field)
 
-	const formState = useFormFieldState()
-	const id = formState?.htmlId
-	const hasErrors = (formState?.errors.length ?? accessor.errors?.errors?.length ?? 0) > 0
-	const dirty = formState?.dirty ?? accessor.hasUnpersistedChanges
-	const required = formState?.required ?? !accessor.schema.nullable
+		const formState = useFormFieldState()
+		const id = formState?.htmlId
+		const hasErrors = (formState?.errors.length ?? accessor.errors?.errors?.length ?? 0) > 0
+		const dirty = formState?.dirty ?? accessor.hasUnpersistedChanges
+		const required = formState?.required ?? !accessor.schema.nullable
 
-	const [state, setState] = useState<any>(undefined)
+		const [state, setState] = useState<any>(undefined)
 
-	const { parseValue, formatValue, defaultInputProps } = useFormInputHandler(accessor, { formatValue: formatValueIn, parseValue: parseValueIn })
-	const accessorGetter = accessor.getAccessor
-	const { ref, onFocus, onBlur } = useFormInputValidationHandler(accessor)
+		const { parseValue, formatValue, defaultInputProps } = useFormInputHandler(accessor, { formatValue: formatValueIn, parseValue: parseValueIn })
+		const accessorGetter = accessor.getAccessor
+		const { ref, onFocus, onBlur } = useFormInputValidationHandler(accessor)
 
-	return (
-		<SlotInput
-			ref={ref}
-			value={formatValue(accessor.value, { state, setState })}
-			data-invalid={dataAttribute(hasErrors)}
-			data-dirty={dataAttribute(dirty)}
-			data-required={dataAttribute(required)}
-			onFocus={onFocus}
-			onBlur={onBlur}
-			onChange={useReferentiallyStableCallback<ChangeEventHandler<HTMLInputElement>>(e => {
-				accessorGetter().updateValue(parseValue(e.target.value, { state, setState }))
-			})}
-			{...defaultInputProps}
-			id={id ? `${id}-input` : undefined}
-			required={required}
-			{...props}
-		/>
-	)
-}, ({ field, isNonbearing, defaultValue }) => {
-	return <Field field={field} isNonbearing={isNonbearing} defaultValue={defaultValue} />
-})
+		return (
+			<SlotInput
+				ref={ref}
+				value={formatValue(accessor.value, { state, setState })}
+				data-invalid={dataAttribute(hasErrors)}
+				data-dirty={dataAttribute(dirty)}
+				data-required={dataAttribute(required)}
+				onFocus={onFocus}
+				onBlur={onBlur}
+				onChange={useReferentiallyStableCallback<ChangeEventHandler<HTMLInputElement>>(e => {
+					accessorGetter().updateValue(parseValue(e.target.value, { state, setState }))
+				})}
+				{...defaultInputProps}
+				id={id ? `${id}-input` : undefined}
+				required={required}
+				{...props}
+			/>
+		)
+	},
+	({ field, isNonbearing, defaultValue }) => {
+		return <Field field={field} isNonbearing={isNonbearing} defaultValue={defaultValue} />
+	},
+)

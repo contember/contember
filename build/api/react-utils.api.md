@@ -4,8 +4,8 @@
 
 ```ts
 
+import { ActionDispatch } from 'react';
 import { Context } from 'react';
-import { DispatchWithoutAction } from 'react';
 import { MutableRefObject } from 'react';
 import { NamedExoticComponent } from 'react';
 import type { Provider } from 'react';
@@ -89,7 +89,7 @@ export type PropsWithRequiredChildren<P = unknown> = P & {
 };
 
 // @public (undocumented)
-export type RefObjectOrElement<T> = T | RefObject<T>;
+export type RefObjectOrElement<T> = T | RefObject<T | null>;
 
 // @public (undocumented)
 export type ResultDebuggedMethod = <T>(message: string, value: T) => T;
@@ -180,7 +180,7 @@ export function useDocumentTitle(title: string | null | undefined, formatter?: (
 export function useExpectSameValueReference<T>(next: T, shouldThrow?: boolean): void;
 
 // @public (undocumented)
-export const useForceRender: () => DispatchWithoutAction;
+export const useForceRender: () => ActionDispatch<[]>;
 
 // Warning: (tsdoc-malformed-html-name) Invalid HTML element: A space is not allowed here
 //
@@ -188,7 +188,7 @@ export const useForceRender: () => DispatchWithoutAction;
 export function useId(): string;
 
 // @public (undocumented)
-export const useIsMounted: () => MutableRefObject<boolean>;
+export const useIsMounted: () => RefObject<boolean>;
 
 // @public (undocumented)
 export const useLocalStorageState: <V extends Serializable>(key: StateStorageKey, initializeValue: ValueInitializer<V>) => [V, SetState<V>];
@@ -215,7 +215,7 @@ export const usePreviousValue: <Value>(value: Value) => Value;
 export const useReferentiallyStableCallback: <T extends Function>(callback: NoConstructor<T>) => T;
 
 // @public (undocumented)
-export const useScopedConsoleRef: (prefix: string, override?: boolean) => MutableRefObject<ScopedConsoleContextType>;
+export const useScopedConsoleRef: (prefix: string, override?: boolean) => RefObject<ScopedConsoleContextType>;
 
 // @public (undocumented)
 export const useSessionStorageState: <V extends Serializable>(key: StateStorageKey, initializeValue: ValueInitializer<V>) => [V, SetState<V>];
@@ -224,7 +224,7 @@ export const useSessionStorageState: <V extends Serializable>(key: StateStorageK
 export const useStoredState: <V extends Serializable>(storageOrName: StateStorageOrName | StateStorageOrName[], key: StateStorageKey, initializeValue: ValueInitializer<V>) => [V, SetState<V>];
 
 // @public
-export function useUpdatedRef<T>(value: T): MutableRefObject<T>;
+export function useUpdatedRef<T>(value: T): RefObject<T>;
 
 // @public (undocumented)
 export function useWindowSize(): {

@@ -16,11 +16,16 @@ export class PatchIdentityGlobalRoles implements Command<boolean> {
 				id: this.id,
 			})
 			.values({
-				roles: it => it.raw(`(
+				roles: it =>
+					it.raw(
+						`(
 						SELECT JSONB_AGG(DISTINCT out_role)
 						FROM JSONB_ARRAY_ELEMENTS_TEXT(roles || ?::jsonb) t(out_role)
 						WHERE NOT(out_role = ANY (?::text[]))
-					)`, JSON.stringify(this.add), this.remove),
+					)`,
+						JSON.stringify(this.add),
+						this.remove,
+					),
 			})
 			.execute(db)
 		return result > 0

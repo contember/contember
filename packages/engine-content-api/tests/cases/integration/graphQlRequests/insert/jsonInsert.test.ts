@@ -19,7 +19,8 @@ test('insert json object', async () => {
 		executes: [
 			...sqlTransaction([
 				{
-					sql: SQL`with "root_" as (select ? :: uuid as "id", ? :: jsonb as "data") insert into "public"."foo" ("id", "data") select "root_"."id", "root_"."data" from "root_" returning "id"`,
+					sql:
+						SQL`with "root_" as (select ? :: uuid as "id", ? :: jsonb as "data") insert into "public"."foo" ("id", "data") select "root_"."id", "root_"."data" from "root_" returning "id"`,
 					parameters: [testUuid(1), '{"foo":"value"}'],
 					response: { rows: [{ id: testUuid(1) }] },
 				},
@@ -34,4 +35,3 @@ test('insert json object', async () => {
 		},
 	})
 })
-

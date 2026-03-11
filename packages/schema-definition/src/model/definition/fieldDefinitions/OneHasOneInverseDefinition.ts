@@ -21,16 +21,18 @@ export class OneHasOneInverseDefinition extends FieldDefinition<OneHasOneInverse
 		}
 	}
 
-	protected withOption<K extends keyof OneHasOneInverseDefinitionOptions>(this: any, key: K, value: OneHasOneInverseDefinitionOptions[K]): OneHasOneInverseDefinition {
+	protected withOption<K extends keyof OneHasOneInverseDefinitionOptions>(
+		this: any,
+		key: K,
+		value: OneHasOneInverseDefinitionOptions[K],
+	): OneHasOneInverseDefinition {
 		return new this.constructor({ ...this.options, [key]: value })
 	}
 }
 
-
 export function oneHasOneInverse(target: EntityConstructor, ownedBy: string): OneHasOneInverseDefinition {
 	return new OneHasOneInverseDefinition({ target, ownedBy })
 }
-
 
 export type OneHasOneInverseDefinitionOptions = {
 	target: RelationTarget

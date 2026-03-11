@@ -5,7 +5,6 @@ import OrderDirection = Input.OrderDirection
 import { queryBuilder } from '../../client'
 
 describe('queries', () => {
-
 	const qb = queryBuilder
 	test('list', async () => {
 		const [client, calls] = createClient({
@@ -98,7 +97,6 @@ describe('queries', () => {
 		expect(calls[0].variables).toEqual({})
 	})
 
-
 	test('single query', async () => {
 		const [client, calls] = createClient({
 			value: [
@@ -129,7 +127,6 @@ describe('queries', () => {
 		expect(calls[0].variables).toEqual({})
 	})
 
-
 	test('nested object', async () => {
 		const [client, calls] = createClient()
 		await client.query({
@@ -142,10 +139,11 @@ describe('queries', () => {
 	test('nested object args', async () => {
 		const [client, calls] = createClient()
 		await client.query({
-			authors: qb.list('Author', {}, it => it.$$().$('posts', {
-				limit: 10,
-				filter: { tags: { name: { eq: 'foo' } } },
-			}, it => it.$$())),
+			authors: qb.list('Author', {}, it =>
+				it.$$().$('posts', {
+					limit: 10,
+					filter: { tags: { name: { eq: 'foo' } } },
+				}, it => it.$$())),
 		})
 		expect(calls).toHaveLength(1)
 		expect(calls[0].query).toMatchSnapshot()
@@ -160,7 +158,6 @@ describe('queries', () => {
 			},
 		})
 	})
-
 
 	test('list with args', async () => {
 		const [client, calls] = createClient()
@@ -201,7 +198,6 @@ describe('queries', () => {
 		)
 	})
 
-
 	test('get by id', async () => {
 		const [client, calls] = createClient()
 		const result = await client.query({
@@ -232,13 +228,13 @@ describe('queries', () => {
 			],
 		})
 		const result = await client.query({
-			authors: qb.list('Author', {}, it => it
-				.$$()
-				.transform(it => ({
-					...it,
-					label: `${it.name} (${it.email})`,
-				})),
-			),
+			authors: qb.list('Author', {}, it =>
+				it
+					.$$()
+					.transform(it => ({
+						...it,
+						label: `${it.name} (${it.email})`,
+					}))),
 		})
 		expect(result as any).toStrictEqual({
 			authors: [
@@ -266,13 +262,13 @@ describe('queries', () => {
 			},
 		})
 		const result = await client.query({
-			author: qb.get('Author', { by: { id: '123' } }, it => it
-				.$$()
-				.transform(it => ({
-					...it,
-					label: `${it.name} (${it.email})`,
-				})),
-			),
+			author: qb.get('Author', { by: { id: '123' } }, it =>
+				it
+					.$$()
+					.transform(it => ({
+						...it,
+						label: `${it.name} (${it.email})`,
+					}))),
 		})
 		expect(result as any).toStrictEqual({
 			author: {
@@ -284,7 +280,6 @@ describe('queries', () => {
 		expect(calls).toHaveLength(1)
 		expect(calls).toMatchSnapshot()
 	})
-
 
 	test('nested has-many transform', async () => {
 		const [client, calls] = createClient({
@@ -302,13 +297,14 @@ describe('queries', () => {
 			},
 		})
 		const result = await client.query({
-			author: qb.get('Author', { by: { id: '123' } }, it => it
-				.$$()
-				.$('posts', {}, it => it.$$().transform(it => ({
-					...it,
-					publishYear: it.publishedAt ? new Date(it.publishedAt).getFullYear() : null,
-				}))),
-			),
+			author: qb.get('Author', { by: { id: '123' } }, it =>
+				it
+					.$$()
+					.$('posts', {}, it =>
+						it.$$().transform(it => ({
+							...it,
+							publishYear: it.publishedAt ? new Date(it.publishedAt).getFullYear() : null,
+						})))),
 		})
 		expect(result as any).toStrictEqual({
 			author: {
@@ -330,7 +326,6 @@ describe('queries', () => {
 		expect(calls).toMatchSnapshot()
 	})
 
-
 	test('nested has-one transform', async () => {
 		const [client, calls] = createClient({
 			post: {
@@ -341,19 +336,19 @@ describe('queries', () => {
 				},
 			},
 		})
-		const author = qb.fragment('Author', it => it
-			.$$()
-			.transform(it => ({
-				...it,
-				label: `${it.name} (${it.email})`,
-			})),
-		)
+		const author = qb.fragment('Author', it =>
+			it
+				.$$()
+				.transform(it => ({
+					...it,
+					label: `${it.name} (${it.email})`,
+				})))
 
 		const result = await client.query({
-			post: qb.get('Post', { by: { id: '123' } }, it => it
-				.$$()
-				.$('author', author),
-			),
+			post: qb.get('Post', { by: { id: '123' } }, it =>
+				it
+					.$$()
+					.$('author', author)),
 		})
 		expect(result as any).toStrictEqual({
 			post: {
@@ -368,7 +363,6 @@ describe('queries', () => {
 		expect(calls).toMatchSnapshot()
 	})
 
-
 	test('nested has-many-by transform', async () => {
 		const [client, calls] = createClient({
 			post: {
@@ -379,13 +373,14 @@ describe('queries', () => {
 			},
 		})
 		const result = await client.query({
-			post: qb.get('Post', { by: { id: '123' } }, it => it
-				.$$()
-				.$('localesByLocale', { by: { locale: { code: 'en' } } }, it => it.$$().transform(it => ({
-					...it,
-					label: it.title?.toUpperCase(),
-				}))),
-			),
+			post: qb.get('Post', { by: { id: '123' } }, it =>
+				it
+					.$$()
+					.$('localesByLocale', { by: { locale: { code: 'en' } } }, it =>
+						it.$$().transform(it => ({
+							...it,
+							label: it.title?.toUpperCase(),
+						})))),
 		})
 		expect(result as any).toStrictEqual({
 			post: {
@@ -415,21 +410,22 @@ describe('queries', () => {
 			},
 		})
 		const result = await client.query({
-			author: qb.get('Author', { by: { id: '123' } }, it => it
-				.$$()
-				.transform(it => ({
-					...it,
-					value1: 'foo',
-				}))
-				.$('posts', {}, it => it.$$().transform(it => ({
-					...it,
-					postLabel: 'foo bar',
-				})))
-				.transform(it => ({
-					...it,
-					value2: 'bar',
-				})),
-			),
+			author: qb.get('Author', { by: { id: '123' } }, it =>
+				it
+					.$$()
+					.transform(it => ({
+						...it,
+						value1: 'foo',
+					}))
+					.$('posts', {}, it =>
+						it.$$().transform(it => ({
+							...it,
+							postLabel: 'foo bar',
+						})))
+					.transform(it => ({
+						...it,
+						value2: 'bar',
+					}))),
 		})
 		expect(result as any).toStrictEqual({
 			author: {
@@ -476,5 +472,4 @@ describe('queries', () => {
 		expect(calls[0].query).toMatchSnapshot()
 		expect(calls[0].variables).toStrictEqual({})
 	})
-
 })

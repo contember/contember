@@ -14,7 +14,7 @@ export class BoxedCatchAllJSX {
 	public constructor(public readonly value: ReactNode) {}
 }
 
-//const textFieldLeaf = new Leaf(node => new BoxedTextFieldProps(node.props), TextField)
+// const textFieldLeaf = new Leaf(node => new BoxedTextFieldProps(node.props), TextField)
 const outletLeaf = new Leaf(node => new BoxedContentOutletProps(node.props), ContentOutlet)
 const catchAllJSXLeaf = new Leaf(node => new BoxedCatchAllJSX(node))
 
@@ -22,7 +22,7 @@ export const editorTemplateAnalyzer = new ChildrenAnalyzer<
 	/*BoxedTextFieldProps |*/ BoxedContentOutletProps | BoxedCatchAllJSX,
 	never,
 	Environment
->([/*textFieldLeaf, */outletLeaf, catchAllJSXLeaf], {
+>([/*textFieldLeaf, */ outletLeaf, catchAllJSXLeaf], {
 	staticRenderFactoryName: 'staticRender',
 	staticContextFactoryName: 'generateEnvironment',
 })

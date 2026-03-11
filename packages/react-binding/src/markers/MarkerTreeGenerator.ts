@@ -17,7 +17,6 @@ import { MarkerStaticAnalyzer } from './MarkerStaticAnalyzer'
 type Markers = FieldMarker | HasOneRelationMarker | EntityFieldMarkersContainer | EntityFieldsWithHoistablesMarker | HasManyRelationMarker
 
 export class MarkerTreeGenerator {
-
 	public constructor(private sourceTree: ReactNode, private environment: Environment = Environment.create()) {}
 
 	public generate(): MarkerTreeRoot {
@@ -71,5 +70,4 @@ export class MarkerTreeGenerator {
 
 		return placeholders
 	}
-
 }

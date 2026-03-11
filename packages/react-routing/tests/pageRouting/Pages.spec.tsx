@@ -6,10 +6,13 @@ import { Schema, SchemaLoader } from '@contember/binding'
 import { ContemberClient } from '@contember/react-client'
 
 function expectRequest(pages: ReactNode, request: RequestState) {
-	(SchemaLoader as any).schemaLoadCache.set('apiBaseUrl/content/projectSlug/stage', new Schema({
-		entities: new Map(),
-		enums: new Map(),
-	}))
+	;(SchemaLoader as any).schemaLoadCache.set(
+		'apiBaseUrl/content/projectSlug/stage',
+		new Schema({
+			entities: new Map(),
+			enums: new Map(),
+		}),
+	)
 
 	const el = render(
 		<CurrentRequestContext.Provider value={request}>
@@ -24,7 +27,6 @@ function expectRequest(pages: ReactNode, request: RequestState) {
 			</ContemberClient>
 		</CurrentRequestContext.Provider>,
 	)
-
 
 	return expect(el.container.innerHTML)
 }

@@ -5,7 +5,6 @@ import { useDecoratedPersist } from './useDecoratedPersist'
 import { Component, Field } from '../../coreComponents'
 
 export type PersistOnFieldChangeProps = {
-
 	/**
 	 * The field that should trigger persist when changed.
 	 */

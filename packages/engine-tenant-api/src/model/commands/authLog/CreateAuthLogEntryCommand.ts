@@ -9,7 +9,6 @@ export class CreateAuthLogEntryCommand implements Command<void> {
 	) {
 	}
 
-
 	async execute({ db, providers }: Command.Args): Promise<void> {
 		await InsertBuilder.create()
 			.into('person_auth_log')
@@ -29,7 +28,6 @@ export class CreateAuthLogEntryCommand implements Command<void> {
 				metadata: this.data.metadata ?? {},
 			})
 			.execute(db)
-
 	}
 }
 

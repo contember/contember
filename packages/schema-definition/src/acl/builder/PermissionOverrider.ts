@@ -27,18 +27,20 @@ export default class PermissionOverrider {
 					? {}
 					: {
 						delete: overrides.operations.delete ?? original.operations.delete,
-					  }),
+					}),
 				...(original.operations.customPrimary === undefined && overrides.operations.customPrimary === undefined
 					? {}
 					: {
 						customPrimary: overrides.operations.customPrimary ?? original.operations.customPrimary,
-					  }),
-				...(original.operations.noRoot || overrides.operations.noRoot ? {
-					noRoot: [
-						...(original.operations.noRoot || []),
-						...(overrides.operations.noRoot || []),
-					],
-				} : {}),
+					}),
+				...(original.operations.noRoot || overrides.operations.noRoot
+					? {
+						noRoot: [
+							...(original.operations.noRoot || []),
+							...(overrides.operations.noRoot || []),
+						],
+					}
+					: {}),
 			},
 		}
 	}

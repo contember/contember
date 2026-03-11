@@ -49,4 +49,3 @@ export type SchemaTypeLike = {
 		[entityName: string]: EntityTypeLike
 	}
 }
-

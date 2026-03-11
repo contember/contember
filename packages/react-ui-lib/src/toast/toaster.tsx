@@ -78,7 +78,6 @@ export const ToasterProvider = ({ children }: {
 			setTimeout(dismiss, dismissMs)
 		}
 
-
 		return {
 			dismiss,
 			updateContent: content => {

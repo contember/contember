@@ -24,7 +24,7 @@ export const getVideoFileDataExtractor: (props: VideoFileDataExtractorProps) => 
 			if (!durationField && !heightField && !widthField) {
 				return undefined
 			}
-			const result = await  new Promise<{
+			const result = await new Promise<{
 				videoWidth: number
 				videoHeight: number
 				duration: number

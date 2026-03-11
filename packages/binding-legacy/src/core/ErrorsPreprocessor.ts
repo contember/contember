@@ -48,7 +48,6 @@ class ErrorsPreprocessor {
 			} else {
 				return assertNever(subTreeType)
 			}
-
 		}
 		return treeRoot
 	}
@@ -80,7 +79,7 @@ class ErrorsPreprocessor {
 				const pathNode = path[i]
 
 				if (currentNode.nodeType === 'leaf') {
-					(currentNode as any as ErrorsPreprocessor.ErrorINode).nodeType = 'iNode'
+					;(currentNode as any as ErrorsPreprocessor.ErrorINode).nodeType = 'iNode'
 					;(currentNode as any as ErrorsPreprocessor.ErrorINode).children = new Map()
 				}
 
@@ -92,9 +91,9 @@ class ErrorsPreprocessor {
 							const nextPathNode = path[nextIndex]
 
 							if (
-								'index' in nextPathNode &&
-								typeof nextPathNode.alias === 'string' &&
-								nextPathNode.alias.startsWith(pathNode.field)
+								'index' in nextPathNode
+								&& typeof nextPathNode.alias === 'string'
+								&& nextPathNode.alias.startsWith(pathNode.field)
 							) {
 								// We're dealing with a reduced hasMany relation.
 								i++

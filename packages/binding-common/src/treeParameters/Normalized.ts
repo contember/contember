@@ -24,7 +24,6 @@ export interface ParentEntityParameters {
 	eventListeners: EntityEventListenerStore | undefined
 }
 
-
 export interface QualifiedEntityList {
 	entityName: EntityName
 	hasOneRelationPath: HasOneRelation[]
@@ -162,7 +161,6 @@ export type FieldMeta = ('readable' | 'updatable')[]
 export type EntityListEventListenerStore = EventListenersStore<
 	EntityListAccessor.EntityListEventListenerMap
 >
-
 
 export type FieldEventListenerStore<Value extends FieldValue = FieldValue> = EventListenersStore<
 	FieldAccessor.FieldEventListenerMap<Value>

@@ -1,6 +1,6 @@
 import { SQL } from '../../../../src/tags'
 
-export const createSessionKeySql = function ({ apiKeyId, identityId }: { apiKeyId: string; identityId: string }) {
+export const createSessionKeySql = function({ apiKeyId, identityId }: { apiKeyId: string; identityId: string }) {
 	return {
 		sql: SQL`INSERT INTO "tenant"."api_key" ("id", "token_hash", "type", "identity_id", "disabled_at", "expires_at",
 												 "expiration", "created_at")

@@ -41,7 +41,6 @@ export class ContentSchemaTransferMappingFactory {
 							nullable: column.nullable,
 							values: schema.enums[column.columnType],
 						}
-
 					} else if (column.type === Model.ColumnType.Int) {
 						return {
 							name: column.columnName,
@@ -49,7 +48,6 @@ export class ContentSchemaTransferMappingFactory {
 							nullable: column.nullable,
 							sequence: column.sequence !== undefined,
 						}
-
 					} else {
 						return {
 							name: column.columnName,

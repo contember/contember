@@ -1,0 +1,31 @@
+{
+	"$schema": "https://dprint.dev/schemas/v0.json",
+	"useTabs": true,
+	"typescript": {
+		"semiColons": "asi",
+		"indentWidth": 1,
+		"lineWidth": 150,
+		"quoteStyle": "preferSingle",
+		"jsx.quoteStyle": "preferDouble",
+		"module.sortImportDeclarations": "maintain",
+		"module.sortExportDeclarations": "maintain"
+	},
+	"includes": [
+		"packages/**/*.{ts,tsx}",
+		"e2e/**/*.ts",
+		"scripts/**/*.ts"
+	],
+	"excludes": [
+		"**/node_modules",
+		"**/dist",
+		"**/temp",
+		"packages/create/resources",
+		"packages/playground/api/client",
+		"packages/client-content/tests/client",
+		"packages/graphql-client-tenant/src/generated",
+		"packages/graphql-client-system/src/generated"
+	],
+	"plugins": [
+		"https://plugins.dprint.dev/typescript-0.95.11.wasm"
+	]
+}

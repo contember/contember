@@ -30,11 +30,14 @@ namespace ErrorAccessor {
 
 	export type WellKnownErrorCode = 'fieldRequired'
 
-	export const normalizeError = (error: Error | string): Error => typeof error === 'string' ? {
-		type: 'validation',
-		message: error,
-		code: undefined,
-	} : error
+	export const normalizeError = (error: Error | string): Error =>
+		typeof error === 'string'
+			? {
+				type: 'validation',
+				message: error,
+				code: undefined,
+			}
+			: error
 }
 export { ErrorAccessor }
 

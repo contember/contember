@@ -8,7 +8,6 @@ export interface Project {
 	readonly config: Record<string, unknown>
 }
 
-
 export interface ProjectWithSecrets extends Project {
 	readonly secrets: Record<string, string>
 	readonly updatedAt: Date

@@ -27,11 +27,11 @@
   },
   "devDependencies": {
     "@contember/database-tester": "workspace:*",
-    "@types/node": "^20.17.22",
-    "pg": "^8.12.0"
+    "@types/node": "catalog:",
+    "pg": "catalog:"
   },
   "peerDependencies": {
-    "pg": "^8.9.0"
+    "pg": "catalog:"
   },
   "type": "module"
 }

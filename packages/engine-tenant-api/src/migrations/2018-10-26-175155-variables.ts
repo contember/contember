@@ -16,6 +16,6 @@ CREATE TABLE "project_member_variable" (
   CONSTRAINT project_member_variable_unique UNIQUE ("project_id", "identity_id", "variable")
 );
 `
-export default async function (builder: MigrationBuilder) {
+export default async function(builder: MigrationBuilder) {
 	builder.sql(sql)
 }

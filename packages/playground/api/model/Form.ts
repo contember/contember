@@ -2,7 +2,6 @@ import { c } from '@contember/schema-definition'
 
 export const FormArticleState = c.createEnum('published', 'draft', 'archived')
 
-
 export class FormArticle {
 	state = c.enumColumn(FormArticleState)
 	locked = c.boolColumn().default(false)

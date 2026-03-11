@@ -1,4 +1,11 @@
-import { FileUrlDataExtractorProps, GenericFileMetadataExtractorProps, getFileUrlDataExtractor, getGenericFileMetadataExtractor, getImageFileDataExtractor, ImageFileDataExtractorProps } from '../extractors'
+import {
+	FileUrlDataExtractorProps,
+	GenericFileMetadataExtractorProps,
+	getFileUrlDataExtractor,
+	getGenericFileMetadataExtractor,
+	getImageFileDataExtractor,
+	ImageFileDataExtractorProps,
+} from '../extractors'
 import { FileType, FileWithMeta } from '../types'
 
 export type ImageFileTypeProps =

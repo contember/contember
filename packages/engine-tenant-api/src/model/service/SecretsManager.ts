@@ -17,7 +17,7 @@ export class SecretsManager {
 		return Object.fromEntries(result.map(it => [it.key, it.value.toString()]))
 	}
 
-	private async setSecrets(dbContext: DatabaseContext, projectId: string, secrets: {key: string; value: Buffer}[]): Promise<void> {
+	private async setSecrets(dbContext: DatabaseContext, projectId: string, secrets: { key: string; value: Buffer }[]): Promise<void> {
 		if (secrets.length === 0) {
 			return
 		}

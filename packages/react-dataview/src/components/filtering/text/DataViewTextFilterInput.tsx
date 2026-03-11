@@ -41,7 +41,6 @@ export interface DataViewTextFilterInputProps {
  */
 export const DataViewTextFilterInput = forwardRef<HTMLInputElement, DataViewTextFilterInputProps>(
 	({ name, debounceMs, ...props }: DataViewTextFilterInputProps, ref) => {
-		// eslint-disable-next-line react-hooks/rules-of-hooks
 		name ??= useDataViewFilterName()
 
 		return (

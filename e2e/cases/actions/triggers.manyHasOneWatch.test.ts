@@ -3,7 +3,6 @@ import { test } from 'bun:test'
 import { createTester, gql } from '../../src/tester'
 
 namespace ActionsModel {
-
 	@actions.watch({
 		name: 'article_watch',
 		watch: `
@@ -31,10 +30,8 @@ namespace ActionsModel {
 }
 
 test('triggers: many has one watch - field update', async () => {
-
 	const schema = createSchema(ActionsModel)
 	const tester = await createTester(schema)
-
 
 	const res = await tester(gql`
         mutation {
@@ -56,16 +53,19 @@ test('triggers: many has one watch - field update', async () => {
 			}
 		}
 	`)
-	await tester(gql`
+	await tester(
+		gql`
         query {
             eventsToProcess {
                 payload
             }
         }
 
-	`, {
-		path: '/actions/' + tester.projectSlug,
-	})
+	`,
+		{
+			path: '/actions/' + tester.projectSlug,
+		},
+	)
 		.expect(200)
 		.expect({
 			data: {
@@ -116,11 +116,9 @@ test('triggers: many has one watch - field update', async () => {
 		})
 })
 
-
 test('triggers: many has one watch - field update - noop', async () => {
 	const schema = createSchema(ActionsModel)
 	const tester = await createTester(schema)
-
 
 	const res = await tester(gql`
         mutation {
@@ -142,16 +140,19 @@ test('triggers: many has one watch - field update - noop', async () => {
             }
         }
 	`)
-	await tester(gql`
+	await tester(
+		gql`
         query {
             eventsToProcess {
                 payload
             }
         }
 
-	`, {
-		path: '/actions/' + tester.projectSlug,
-	})
+	`,
+		{
+			path: '/actions/' + tester.projectSlug,
+		},
+	)
 		.expect(200)
 		.expect({
 			data: {
@@ -181,7 +182,6 @@ test('triggers: many has one watch - field update - noop', async () => {
 			},
 		})
 })
-
 
 test('triggers: many has one watch - connect', async () => {
 	const schema = createSchema(ActionsModel)
@@ -219,16 +219,19 @@ test('triggers: many has one watch - connect', async () => {
 				},
 			},
 		})
-	await tester(gql`
+	await tester(
+		gql`
         query {
             eventsToProcess {
                 payload
             }
         }
 
-	`, {
-		path: '/actions/' + tester.projectSlug,
-	})
+	`,
+		{
+			path: '/actions/' + tester.projectSlug,
+		},
+	)
 		.expect(200)
 		.expect({
 			data: {
@@ -278,12 +281,9 @@ test('triggers: many has one watch - connect', async () => {
 		})
 })
 
-
 test('triggers: many has one watch - connect - noop', async () => {
-
 	const schema = createSchema(ActionsModel)
 	const tester = await createTester(schema)
-
 
 	const res = await tester(gql`
         mutation {
@@ -314,16 +314,19 @@ test('triggers: many has one watch - connect - noop', async () => {
 			},
 		})
 
-	await tester(gql`
+	await tester(
+		gql`
         query {
             eventsToProcess {
                 payload
             }
         }
 
-	`, {
-		path: '/actions/' + tester.projectSlug,
-	})
+	`,
+		{
+			path: '/actions/' + tester.projectSlug,
+		},
+	)
 		.expect(200)
 		.expect({
 			data: {
@@ -354,13 +357,9 @@ test('triggers: many has one watch - connect - noop', async () => {
 		})
 })
 
-
 test('triggers: many has one watch - disconnect', async () => {
-
-
 	const schema = createSchema(ActionsModel)
 	const tester = await createTester(schema)
-
 
 	const res = await tester(gql`
         mutation {
@@ -391,16 +390,19 @@ test('triggers: many has one watch - disconnect', async () => {
 			},
 		})
 
-	await tester(gql`
+	await tester(
+		gql`
         query {
             eventsToProcess {
                 payload
             }
         }
 
-	`, {
-		path: '/actions/' + tester.projectSlug,
-	})
+	`,
+		{
+			path: '/actions/' + tester.projectSlug,
+		},
+	)
 		.expect(200)
 		.expect({
 			data: {
@@ -448,17 +450,11 @@ test('triggers: many has one watch - disconnect', async () => {
 				}],
 			},
 		})
-
-
 })
 
-
-
 test('triggers: many has one watch - disconnect - noop', async () => {
-
 	const schema = createSchema(ActionsModel)
 	const tester = await createTester(schema)
-
 
 	const res = await tester(gql`
         mutation {
@@ -488,16 +484,19 @@ test('triggers: many has one watch - disconnect - noop', async () => {
 			},
 		})
 
-	await tester(gql`
+	await tester(
+		gql`
         query {
             eventsToProcess {
                 payload
             }
         }
 
-	`, {
-		path: '/actions/' + tester.projectSlug,
-	})
+	`,
+		{
+			path: '/actions/' + tester.projectSlug,
+		},
+	)
 		.expect(200)
 		.expect({
 			data: {
@@ -526,6 +525,4 @@ test('triggers: many has one watch - disconnect - noop', async () => {
 				}],
 			},
 		})
-
-
 })

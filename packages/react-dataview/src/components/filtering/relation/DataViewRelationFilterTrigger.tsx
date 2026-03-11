@@ -12,7 +12,9 @@ export interface DataViewRelationFilterTriggerAttributes {
 	['data-current']: DataViewRelationFilterCurrent
 }
 
-const SlotType = Slot as React.ForwardRefExoticComponent<React.ButtonHTMLAttributes<HTMLButtonElement> & React.RefAttributes<HTMLButtonElement> & DataViewRelationFilterTriggerAttributes>
+const SlotType = Slot as React.ForwardRefExoticComponent<
+	React.ButtonHTMLAttributes<HTMLButtonElement> & React.RefAttributes<HTMLButtonElement> & DataViewRelationFilterTriggerAttributes
+>
 
 export interface DataViewRelationFilterTriggerProps {
 	/**
@@ -58,7 +60,6 @@ export interface DataViewRelationFilterTriggerProps {
  */
 export const DataViewRelationFilterTrigger = forwardRef<HTMLButtonElement, DataViewRelationFilterTriggerProps>(
 	({ name, action = 'include', ...props }: DataViewRelationFilterTriggerProps, ref) => {
-		// eslint-disable-next-line react-hooks/rules-of-hooks
 		name ??= useDataViewFilterName()
 		const entity = useEntity()
 		const [current, setFilter] = useDataViewRelationFilter(name, entity.id)

@@ -32,45 +32,46 @@ export class MigrateMutationResolver implements MutationResolver<'migrate'> {
 	): Promise<MigrateResponse> {
 		const migrations = this.parseMigrationInput(args)
 
-		return context.db.locked(pg_lock_id, db => db.transaction(async trx => {
-			const stages = await trx.queryHandler.fetch(new StagesQuery())
-			for (const stage of stages) {
-				await context.requireAccess(AuthorizationActions.PROJECT_MIGRATE, stage.slug)
-			}
-			try {
-				await this.projectMigrator.migrate({
-					db: trx,
-					project: context.project,
-					identity: context.identity,
-					stages,
-					migrationsToExecute: migrations,
-					options: {
-						ignoreOrder: force,
-						skipExecuted: true,
-					},
-				})
-			} catch (e) {
-				if (e instanceof MigrationError) {
-					await trx.client.connection.rollback()
-					const error = {
-						code: e.code,
-						migration: e.version,
-						developerMessage: e.message,
-					}
-					return {
-						ok: false,
-						errors: [error],
-						error,
-					}
-				} else {
-					throw e
+		return context.db.locked(pg_lock_id, db =>
+			db.transaction(async trx => {
+				const stages = await trx.queryHandler.fetch(new StagesQuery())
+				for (const stage of stages) {
+					await context.requireAccess(AuthorizationActions.PROJECT_MIGRATE, stage.slug)
 				}
-			}
-			return {
-				ok: true,
-				errors: [],
-			}
-		}))
+				try {
+					await this.projectMigrator.migrate({
+						db: trx,
+						project: context.project,
+						identity: context.identity,
+						stages,
+						migrationsToExecute: migrations,
+						options: {
+							ignoreOrder: force,
+							skipExecuted: true,
+						},
+					})
+				} catch (e) {
+					if (e instanceof MigrationError) {
+						await trx.client.connection.rollback()
+						const error = {
+							code: e.code,
+							migration: e.version,
+							developerMessage: e.message,
+						}
+						return {
+							ok: false,
+							errors: [error],
+							error,
+						}
+					} else {
+						throw e
+					}
+				}
+				return {
+					ok: true,
+					errors: [],
+				}
+			}))
 	}
 
 	private parseMigrationInput(args: MutationMigrateArgs): MigrationInput[] {

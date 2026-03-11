@@ -18,8 +18,5 @@ export const Title = memo<{ children: ReactNode }>(({ children }) => {
 	const titleText = useChildrenAsLabel(children)
 	useDocumentTitle(titleText)
 
-	return (
-		<Slots.Title>{children}</Slots.Title>
-	)
+	return <Slots.Title>{children}</Slots.Title>
 })
-

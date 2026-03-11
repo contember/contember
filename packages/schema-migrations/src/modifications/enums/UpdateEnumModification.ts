@@ -67,10 +67,9 @@ export class UpdateEnumModificationHandler implements ModificationHandler<Update
 	describe() {
 		const currentValues = this.schema.model.enums[this.data.enumName]
 		const missingValues = currentValues.filter(it => !this.data.values.includes(it))
-		const failureWarning =
-			missingValues.length > 0
-				? `Removing values (${missingValues.join(', ')}) from enum, this may fail in runtime`
-				: undefined
+		const failureWarning = missingValues.length > 0
+			? `Removing values (${missingValues.join(', ')}) from enum, this may fail in runtime`
+			: undefined
 		return { message: `Update enum ${this.data.enumName}`, failureWarning }
 	}
 }
@@ -90,8 +89,8 @@ export class UpdateEnumDiffer implements Differ {
 		return Object.entries(updatedSchema.model.enums)
 			.filter(
 				([name]) =>
-					originalSchema.model.enums[name] &&
-					!deepEqual(updatedSchema.model.enums[name], originalSchema.model.enums[name]),
+					originalSchema.model.enums[name]
+					&& !deepEqual(updatedSchema.model.enums[name], originalSchema.model.enums[name]),
 			)
 			.map(([enumName, values]) => updateEnumModification.createModification({ enumName, values }))
 	}

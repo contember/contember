@@ -6,7 +6,6 @@ import { Response, ResponseError, ResponseOk } from '../utils/Response'
 import { DisablePersonErrorCode } from '../../schema'
 
 class PersonAccessManager {
-
 	constructor(private readonly apiKeyManager: ApiKeyManager) {}
 
 	async disablePerson(dbContext: DatabaseContext, person: PersonRow): Promise<PersonDisableAccessResponse> {

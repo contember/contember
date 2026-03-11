@@ -35,8 +35,7 @@ const createDatabaseContext = <ConnectionType extends Connection.ConnectionLike 
 			await client.query(Connection.REPEATABLE_READ)
 			return cb(createDatabaseContext(client, providers))
 		}),
-	scope: cb =>
-		client.scope(client => cb(createDatabaseContext(client, providers))),
+	scope: cb => client.scope(client => cb(createDatabaseContext(client, providers))),
 	commandBus: new CommandBus(client, providers),
 	locked: (lock, cb) => client.locked(lock, client => cb(createDatabaseContext(client, providers))),
 })

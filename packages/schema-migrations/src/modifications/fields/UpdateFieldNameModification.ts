@@ -13,18 +13,9 @@ import {
 	updateModel,
 	updateSchema,
 } from '../utils/schemaUpdateUtils'
-import {
-	createModificationType,
-	ModificationHandler,
-	ModificationHandlerCreateSqlOptions,
-	ModificationHandlerOptions,
-} from '../ModificationHandler'
+import { createModificationType, ModificationHandler, ModificationHandlerCreateSqlOptions, ModificationHandlerOptions } from '../ModificationHandler'
 import { acceptFieldVisitor, PredicateDefinitionProcessor } from '@contember/schema-utils'
-import {
-	VERSION_ACL_PATCH,
-	VERSION_UPDATE_CONSTRAINT_FIELDS,
-	VERSION_UPDATE_INDEX_FIELDS,
-} from '../ModificationVersions'
+import { VERSION_ACL_PATCH, VERSION_UPDATE_CONSTRAINT_FIELDS, VERSION_UPDATE_INDEX_FIELDS } from '../ModificationVersions'
 import { changeValue } from '../utils/valueUtils'
 import { updateColumnNameModification } from '../columns'
 import { NoopModification } from '../NoopModification'
@@ -38,11 +29,15 @@ export class UpdateFieldNameModificationHandler implements ModificationHandler<U
 		private readonly options: ModificationHandlerOptions,
 	) {
 		if (this.data.columnName) {
-			this.renameColumnSubModification = updateColumnNameModification.createHandler({
-				entityName: this.data.entityName,
-				columnName: this.data.columnName,
-				fieldName: this.data.fieldName,
-			}, this.schema, this.options)
+			this.renameColumnSubModification = updateColumnNameModification.createHandler(
+				{
+					entityName: this.data.entityName,
+					columnName: this.data.columnName,
+					fieldName: this.data.fieldName,
+				},
+				this.schema,
+				this.options,
+			)
 		}
 	}
 
@@ -55,30 +50,28 @@ export class UpdateFieldNameModificationHandler implements ModificationHandler<U
 	}
 
 	public getSchemaUpdater(): SchemaUpdater {
-		const updateConstraintFields =
-			this.options.formatVersion >= VERSION_UPDATE_CONSTRAINT_FIELDS
-				? updateEntity(this.data.entityName, ({ entity }) => {
-					return {
-						...entity,
-						unique: entity.unique.map(unique => ({
-							...unique,
-							fields: unique.fields.map(changeValue(this.data.fieldName, this.data.newFieldName)),
-						})),
-					}
-				  })
-				: undefined
-		const updateIndexFields =
-			this.options.formatVersion >= VERSION_UPDATE_INDEX_FIELDS
-				? updateEntity(this.data.entityName, ({ entity }) => {
-					return {
-						...entity,
-						indexes: entity.indexes.map(unique => ({
-							...unique,
-							fields: unique.fields.map(changeValue(this.data.fieldName, this.data.newFieldName)),
-						})),
-					}
-				})
-				: undefined
+		const updateConstraintFields = this.options.formatVersion >= VERSION_UPDATE_CONSTRAINT_FIELDS
+			? updateEntity(this.data.entityName, ({ entity }) => {
+				return {
+					...entity,
+					unique: entity.unique.map(unique => ({
+						...unique,
+						fields: unique.fields.map(changeValue(this.data.fieldName, this.data.newFieldName)),
+					})),
+				}
+			})
+			: undefined
+		const updateIndexFields = this.options.formatVersion >= VERSION_UPDATE_INDEX_FIELDS
+			? updateEntity(this.data.entityName, ({ entity }) => {
+				return {
+					...entity,
+					indexes: entity.indexes.map(unique => ({
+						...unique,
+						fields: unique.fields.map(changeValue(this.data.fieldName, this.data.newFieldName)),
+					})),
+				}
+			})
+			: undefined
 		const updateRelationReferences = updateEveryEntity(
 			updateEveryField(({ field, entity }) => {
 				const isUpdatedRelation = (entity: Model.Entity, relation: Model.AnyRelation | null) => {
@@ -130,46 +123,45 @@ export class UpdateFieldNameModificationHandler implements ModificationHandler<U
 				},
 			}
 		})
-		const updateAclOp =
-			this.options.formatVersion >= VERSION_ACL_PATCH
-				? updateAcl(
-					updateAclEveryRole(
-						updateAclEveryEntity(
-							updateAclFieldPermissions((permissions, entityName) => {
-								if (entityName !== this.data.entityName) {
-									return permissions
-								}
-								if (!permissions[this.data.fieldName]) {
-									return permissions
-								}
-								const { [this.data.fieldName]: field, ...other } = permissions
-								return {
-									[this.data.newFieldName]: field,
-									...other,
-								}
-							}),
-							updateAclEveryPredicate(({ predicate, entityName, schema }) => {
-								const processor = new PredicateDefinitionProcessor(schema.model)
-								const currentEntity = schema.model.entities[entityName]
-								return processor.process<Input.Condition<Value.FieldValue<never>> | string, never>(
-									currentEntity,
-									predicate,
-									{
-										handleColumn: ctx =>
-											ctx.entity.name === this.data.entityName && ctx.column.name === this.data.fieldName
-												? [this.data.newFieldName, ctx.value]
-												: ctx.value,
-										handleRelation: ctx =>
-											ctx.entity.name === this.data.entityName && ctx.relation.name === this.data.fieldName
-												? [this.data.newFieldName, ctx.value]
-												: ctx.value,
-									},
-								)
-							}),
-						),
+		const updateAclOp = this.options.formatVersion >= VERSION_ACL_PATCH
+			? updateAcl(
+				updateAclEveryRole(
+					updateAclEveryEntity(
+						updateAclFieldPermissions((permissions, entityName) => {
+							if (entityName !== this.data.entityName) {
+								return permissions
+							}
+							if (!permissions[this.data.fieldName]) {
+								return permissions
+							}
+							const { [this.data.fieldName]: field, ...other } = permissions
+							return {
+								[this.data.newFieldName]: field,
+								...other,
+							}
+						}),
+						updateAclEveryPredicate(({ predicate, entityName, schema }) => {
+							const processor = new PredicateDefinitionProcessor(schema.model)
+							const currentEntity = schema.model.entities[entityName]
+							return processor.process<Input.Condition<Value.FieldValue<never>> | string, never>(
+								currentEntity,
+								predicate,
+								{
+									handleColumn: ctx =>
+										ctx.entity.name === this.data.entityName && ctx.column.name === this.data.fieldName
+											? [this.data.newFieldName, ctx.value]
+											: ctx.value,
+									handleRelation: ctx =>
+										ctx.entity.name === this.data.entityName && ctx.relation.name === this.data.fieldName
+											? [this.data.newFieldName, ctx.value]
+											: ctx.value,
+								},
+							)
+						}),
 					),
-				  )
-				: undefined
+				),
+			)
+			: undefined
 		return updateSchema(
 			updateAclOp,
 			this.renameColumnSubModification.getSchemaUpdater(),

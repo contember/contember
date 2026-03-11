@@ -3,7 +3,10 @@ import { useCallback } from 'react'
 
 export type BoardColumnKey = string | EntityId | null
 export type UseGroupItemsByColumn = (itemEntities: EntityListAccessor) => Map<BoardColumnKey, EntityAccessor[]>
-export const useGroupItemsByColumn = (getDiscriminatorValue: (entity: EntityAccessor) => BoardColumnKey, sortBy: RelativeSingleField | undefined): UseGroupItemsByColumn => {
+export const useGroupItemsByColumn = (
+	getDiscriminatorValue: (entity: EntityAccessor) => BoardColumnKey,
+	sortBy: RelativeSingleField | undefined,
+): UseGroupItemsByColumn => {
 	return useCallback((itemEntities: EntityListAccessor) => {
 		const itemsByColumn = new Map<BoardColumnKey, EntityAccessor[]>()
 

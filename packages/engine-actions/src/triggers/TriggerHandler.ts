@@ -95,7 +95,6 @@ export class TriggerHandler {
 		}))
 	}
 
-
 	/**
 	 * Collect affected triggers after entity was created or before it was deleted.
 	 * todo: after insert, it should probably check only owning relations, because other relations are connected later, so it would be always empty
@@ -103,9 +102,11 @@ export class TriggerHandler {
 	private async indirectChangesEntityHandler(event: BeforeDeleteEvent | AfterInsertEvent) {
 		//
 		const indirectEntityListeners = this.listenersStore.getIndirectListeners(event.entity.name)
-		const promises = indirectEntityListeners.map(listener => this.collectDeepChanges(event, listener, {
-			[event.entity.primary]: { eq: event.id },
-		}))
+		const promises = indirectEntityListeners.map(listener =>
+			this.collectDeepChanges(event, listener, {
+				[event.entity.primary]: { eq: event.id },
+			})
+		)
 		await Promise.all(promises)
 	}
 
@@ -141,7 +142,6 @@ export class TriggerHandler {
 		})
 		await Promise.all(promises)
 	}
-
 
 	private async collectDeepChanges(
 		cause: EventCause,

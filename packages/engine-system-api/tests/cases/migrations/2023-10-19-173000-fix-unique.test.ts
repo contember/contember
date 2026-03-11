@@ -6,7 +6,6 @@ import { createConnectionMock } from '@contember/database-tester'
 import { createDatabaseMetadata } from '@contember/database'
 
 namespace UniqueModel {
-
 	@c.Unique('colA', 'colB')
 	@c.Unique('manyHasOneBar', 'colB')
 	export class Foo {
@@ -20,7 +19,6 @@ namespace UniqueModel {
 	}
 
 	export class Bar {
-
 	}
 }
 
@@ -32,28 +30,29 @@ test('unique fix test', async () => {
 	}])
 	await migration(builder, {
 		connection: connection,
-		databaseMetadataResolver: () => Promise.resolve(createDatabaseMetadata({
-			foreignKeys: [],
-			indexes: [],
-			uniqueConstraints: [
-				{ constraintName: 'valid1', tableName: 'foo', columnNames: ['col_a', 'col_b'], deferrable: false, deferred: false },
-				{ constraintName: 'valid2', tableName: 'foo', columnNames: ['col_b', 'many_has_one_bar_id'], deferrable: false, deferred: false },
-				{ constraintName: 'valid3', tableName: 'foo', columnNames: ['single_col_unique'], deferrable: false, deferred: false },
-				{ constraintName: 'valid4', tableName: 'foo', columnNames: ['has_one_bar_id'], deferrable: false, deferred: false },
-				{ constraintName: 'invalid1', tableName: 'foo', columnNames: ['col_a', 'col_c'], deferrable: false, deferred: false },
-				{ constraintName: 'invalid2', tableName: 'foo', columnNames: ['col_c', 'many_has_one_bar_id'], deferrable: false, deferred: false },
-
-			],
-		})),
-		schemaResolver: () => Promise.resolve({
-			schema: createSchema(UniqueModel),
-			meta: {
-				id: 1,
-				version: '2024-06-28-153001',
-				checksum: '_checksum_',
-				updatedAt: new Date(),
-			},
-		}),
+		databaseMetadataResolver: () =>
+			Promise.resolve(createDatabaseMetadata({
+				foreignKeys: [],
+				indexes: [],
+				uniqueConstraints: [
+					{ constraintName: 'valid1', tableName: 'foo', columnNames: ['col_a', 'col_b'], deferrable: false, deferred: false },
+					{ constraintName: 'valid2', tableName: 'foo', columnNames: ['col_b', 'many_has_one_bar_id'], deferrable: false, deferred: false },
+					{ constraintName: 'valid3', tableName: 'foo', columnNames: ['single_col_unique'], deferrable: false, deferred: false },
+					{ constraintName: 'valid4', tableName: 'foo', columnNames: ['has_one_bar_id'], deferrable: false, deferred: false },
+					{ constraintName: 'invalid1', tableName: 'foo', columnNames: ['col_a', 'col_c'], deferrable: false, deferred: false },
+					{ constraintName: 'invalid2', tableName: 'foo', columnNames: ['col_c', 'many_has_one_bar_id'], deferrable: false, deferred: false },
+				],
+			})),
+		schemaResolver: () =>
+			Promise.resolve({
+				schema: createSchema(UniqueModel),
+				meta: {
+					id: 1,
+					version: '2024-06-28-153001',
+					checksum: '_checksum_',
+					updatedAt: new Date(),
+				},
+			}),
 		project: {
 			slug: 'test',
 			stages: [
@@ -73,4 +72,3 @@ ALTER TABLE "stage_live"."foo" DROP CONSTRAINT "invalid2";
 `,
 	)
 })
-

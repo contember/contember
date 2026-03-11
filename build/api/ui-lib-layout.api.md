@@ -4,7 +4,7 @@
 
 ```ts
 
-import { JSX as JSX_2 } from 'react/jsx-runtime';
+import { JSX } from 'react/jsx-runtime';
 import { NamedExoticComponent } from 'react';
 import { PropsWithChildren } from 'react';
 import { ReactNode } from 'react';
@@ -13,12 +13,12 @@ import { SlotTargetComponent } from '@contember/react-slots';
 
 // @public (undocumented)
 export const LayoutBoxedComponent: {
-    ({ children, ...rest }: PropsWithChildren<{}>): JSX_2.Element;
+    (input: PropsWithChildren<{}>): JSX.Element;
     displayName: string;
 };
 
 // @public (undocumented)
-export const LayoutComponent: ({ children }: PropsWithChildren) => JSX_2.Element;
+export const LayoutComponent: (input: PropsWithChildren) => JSX.Element;
 
 // @public (undocumented)
 export const Slots: Readonly<{

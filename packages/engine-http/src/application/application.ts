@@ -1,4 +1,4 @@
-import { Key, pathToRegexp } from 'path-to-regexp'
+import { pathToRegexp } from 'path-to-regexp'
 import { KoaContext, KoaMiddleware } from './types'
 import { AuthResult, HttpErrorResponse, HttpResponse } from '../common'
 import Koa from 'koa'
@@ -20,7 +20,6 @@ import { getClientIP } from '../utils/remoteAddress'
 
 type Route<C> = { match: RequestMatcher; controller: C; module: string }
 export class Application {
-
 	private middlewares: KoaMiddleware<any>[] = []
 
 	private routes: Route<HttpController>[] = []
@@ -93,7 +92,7 @@ export class Application {
 
 		const wsRequests: (Promise<void>)[] = []
 		server.on('upgrade', (req, socket, head) => {
-			 wsRequests.push(this.handleWebsocketRequest(wss, abortController.signal, req, socket, head))
+			wsRequests.push(this.handleWebsocketRequest(wss, abortController.signal, req, socket, head))
 		})
 		await new Promise<void>(resolve => {
 			server.listen(this.serverConfig.port, () => resolve())
@@ -140,9 +139,11 @@ export class Application {
 				user: authResult?.identityId,
 			})
 
-			const ws = await new Promise<WebSocket>(resolve => wss.handleUpgrade(req, socket, head, (ws, request) => {
-				resolve(ws)
-			}))
+			const ws = await new Promise<WebSocket>(resolve =>
+				wss.handleUpgrade(req, socket, head, (ws, request) => {
+					resolve(ws)
+				})
+			)
 			const wsEstablished = performance.now()
 			webSocketContext = {
 				ws,
@@ -266,7 +267,6 @@ export class Application {
 		}
 	}
 
-
 	private async handleInternalRequest(matchedRequest: MatchedRequest<InternalHttpController>, ctx: KoaContext<{ module?: string }>) {
 		try {
 			const response = await this.logger.scope(async logger => {
@@ -294,7 +294,6 @@ export class Application {
 		}
 	}
 
-
 	private sendHttpResponse(ctx: KoaContext<{}>, response: HttpResponse) {
 		if (response.contentType) {
 			ctx.set('Content-type', response.contentType)
@@ -315,12 +314,12 @@ export class Application {
 		socket.once('finish', socket.destroy)
 
 		socket.end(
-			`HTTP/1.1 ${response.code} ${http.STATUS_CODES[response.code]}\r\n` +
-			Object.keys(headers)
-				.map(h => `${h}: ${headers[h]}`)
-				.join('\r\n') +
-			'\r\n\r\n' +
-			(response.body ?? ''),
+			`HTTP/1.1 ${response.code} ${http.STATUS_CODES[response.code]}\r\n`
+				+ Object.keys(headers)
+					.map(h => `${h}: ${headers[h]}`)
+					.join('\r\n')
+				+ '\r\n\r\n'
+				+ (response.body ?? ''),
 		)
 	}
 
@@ -349,7 +348,7 @@ export class Application {
 			const res = cb()
 
 			if (res instanceof Promise) {
-				(async () => {
+				;(async () => {
 					try {
 						await res
 					} catch {
@@ -369,7 +368,8 @@ export class Application {
 			const emit = () => {
 				const total = performance.now() - globalStart
 				const timeLabel = total > 500 ? 'TIME_SLOW' : 'TIME_OK'
-				const shouldSuppress = this.suppressAccessLog === true || !ctx.req.url || (this.suppressAccessLog !== false && this.suppressAccessLog.test(ctx.req.url))
+				const shouldSuppress = this.suppressAccessLog === true || !ctx.req.url
+					|| (this.suppressAccessLog !== false && this.suppressAccessLog.test(ctx.req.url))
 
 				const cpuUsageEnd = cpuUsage()
 				const memoryUsageEnd = memoryUsage()
@@ -399,11 +399,9 @@ export class Application {
 				})
 
 				streamTimer.then(emit).catch(emit)
-
 			} else {
 				emit()
 			}
-
 		}
 		return { timer, send }
 	}
@@ -418,7 +416,6 @@ export class Application {
 		return null
 	}
 }
-
 
 type EventTime = { label: string; start: number; duration?: number }
 
@@ -478,10 +475,9 @@ type RequestMatcher = (args: { url: URL }) => Params | null
 const createRequestMatcher = (
 	mask: string,
 ): RequestMatcher => {
-	const keys: Key[] = []
-	const regexp: RegExp = pathToRegexp(mask, keys)
+	const { regexp, keys } = pathToRegexp(mask)
 
-	const match = function (url: string): Params | null {
+	const match = function(url: string): Params | null {
 		const match = regexp.exec(url)
 		if (match) {
 			return match.slice(1).reduce((acc, value, i) => ({ ...acc, [keys[i].name]: value }), {})

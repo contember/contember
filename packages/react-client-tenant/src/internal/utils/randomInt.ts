@@ -20,7 +20,6 @@ export const randomInt = (min: number, max: number) => {
 	return min + (randomInt % range)
 }
 
-
 export const randomString = (length: number, charset: string): string => {
 	let result = ''
 	for (let i = 0; i < length; i++) {

@@ -5,19 +5,18 @@ import { Runnable, RunnableArgs, Running } from '@contember/engine-common'
 import { Listener } from '@contember/database'
 import { NOTIFY_CHANNEL_NAME } from '../utils/notifyChannel'
 
-
 export class ProjectDispatcherFactory {
 	constructor(
 		private readonly dispatcher: EventDispatcher,
 	) {
 	}
 
-	public create({ db, contentSchemaResolver, projectSlug }: { db: DatabaseContext; contentSchemaResolver: ContentSchemaResolver; projectSlug: string}): ProjectDispatcher {
+	public create(
+		{ db, contentSchemaResolver, projectSlug }: { db: DatabaseContext; contentSchemaResolver: ContentSchemaResolver; projectSlug: string },
+	): ProjectDispatcher {
 		return new ProjectDispatcher(this.dispatcher, db, contentSchemaResolver, projectSlug)
 	}
 }
-
-
 
 export class ProjectDispatcher implements Runnable {
 	constructor(
@@ -29,16 +28,14 @@ export class ProjectDispatcher implements Runnable {
 	}
 
 	public async run({ logger, onError, onClose }: RunnableArgs): Promise<Running> {
-
 		return await new Promise<Running>(async (resolve, reject) => {
-
 			let resolvePending = () => {}
 			let rejectPending = (e: any) => {}
 
 			const resolvePendingRef = () => {
 				resolvePending()
 			}
-			let pendingError: any = undefined
+			let pendingError: any
 			const rejectPendingRef = (e: any) => {
 				pendingError = e
 				rejectPending(e)
@@ -112,8 +109,6 @@ export class ProjectDispatcher implements Runnable {
 			} catch (e) {
 				reject(e)
 			}
- 		})
-
-
+		})
 	}
 }

@@ -27,7 +27,6 @@ export interface DataViewElementProps {
 /**
  * Conditionally renders its children based on the current visibility state of a data view element.
  *
- *
  * ## Props
  * - name, fallback, children
  *
@@ -36,7 +35,7 @@ export interface DataViewElementProps {
  * ## Example
  * ```tsx
  * <DataViewElement name={'category'} label="Category">
- *     //  Category content here 
+ *     //  Category content here
  * </DataViewElement>
  * ```
  */

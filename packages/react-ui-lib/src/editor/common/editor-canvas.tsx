@@ -1,7 +1,7 @@
 import { dataAttribute } from '@contember/utilities'
 import { ComponentType, memo, ReactElement, ReactNode, TextareaHTMLAttributes } from 'react'
 
-export interface HTMLTextAreaDivTargetProps extends TextareaHTMLAttributes<HTMLDivElement> { }
+export interface HTMLTextAreaDivTargetProps extends TextareaHTMLAttributes<HTMLDivElement> {}
 
 export interface EditorCanvasProps<P extends HTMLTextAreaDivTargetProps> {
 	underlyingComponent: ComponentType<P>
@@ -16,9 +16,11 @@ export const EditorCanvas = memo(<P extends HTMLTextAreaDivTargetProps>({
 	underlyingComponent: Component,
 	componentProps: props,
 }: EditorCanvasProps<P>) => {
-
 	return (
-		<div data-focus-ring={dataAttribute(focusRing)} className={'relative w-full rounded-md border border-gray-200 border-input bg-transparent px-3 py-2 text-sm shadow-xs placeholder:text-muted-foreground focus-within:outline-hidden focus-within:ring-1 focus-within:ring-ring disabled:cursor-not-allowed disabled:opacity-50'}>
+		<div
+			data-focus-ring={dataAttribute(focusRing)}
+			className={'relative w-full rounded-md border border-gray-200 border-input bg-transparent px-3 py-2 text-sm shadow-xs placeholder:text-muted-foreground focus-within:outline-hidden focus-within:ring-1 focus-within:ring-ring disabled:cursor-not-allowed disabled:opacity-50'}
+		>
 			<Component className="outline-hidden" {...props} />
 			{children}
 		</div>

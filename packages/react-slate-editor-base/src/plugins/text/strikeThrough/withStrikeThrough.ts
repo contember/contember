@@ -3,7 +3,6 @@ import { strikeThroughMark, strikeThroughPlugin } from './strikeThroughMark'
 import { EditorPlugin } from '../../../types'
 import { createMarkHtmlDeserializer } from '../../behaviour'
 
-
 export const withStrikeThrough = (): EditorPlugin => editor => {
 	editor.registerMark(strikeThroughPlugin)
 	editor.htmlDeserializer.registerPlugin(

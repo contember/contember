@@ -58,7 +58,6 @@ export class MigrationAmendCommand extends Command<Args, Options> {
 			throw `Some migrations are not executed. Unable to amend.`
 		}
 
-
 		const schema = await this.schemaLoader.loadSchema()
 		try {
 			const initialSchema = await this.schemaVersionBuilder.buildSchema()
@@ -152,7 +151,8 @@ export class MigrationAmendCommand extends Command<Args, Options> {
 		const { action } = await prompts({
 			type: 'select',
 			name: 'action',
-			message: 'The amendment results in a no-op migration because the changes introduced by the latest migration were reverted.\nYou can choose to remove the latest migration or to modify it so it is empty.',
+			message:
+				'The amendment results in a no-op migration because the changes introduced by the latest migration were reverted.\nYou can choose to remove the latest migration or to modify it so it is empty.',
 			choices: [
 				{ value: 'remove', title: 'Remove latest migration' },
 				{ value: 'keep', title: 'Keep latest migration and make it empty' },

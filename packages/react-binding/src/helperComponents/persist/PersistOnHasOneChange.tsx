@@ -5,7 +5,6 @@ import { useEntity, useEnvironment } from '../../accessorPropagation'
 import { Component, HasOne } from '../../coreComponents'
 
 export type PersistOnHasOneChangeProps = {
-
 	/**
 	 * The relation field that should trigger persist when changed.
 	 */
@@ -56,4 +55,4 @@ export const PersistOnHasOneChange = Component<PersistOnHasOneChangeProps>(({ fi
 	}, [getEntity, doPersist, lastField])
 
 	return null
-}, ({ field }) => <HasOne field={field}/>)
+}, ({ field }) => <HasOne field={field} />)

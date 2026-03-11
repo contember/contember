@@ -7,13 +7,12 @@ export type Narrowable =
 	| bigint
 	| boolean
 
-
 type NarrowRaw<A> =
 	| (A extends [] ? [] : never)
 	| (A extends Narrowable ? A : never)
-	| ({ [K in keyof A]: A[K] extends Function
-		? A[K]
-		: NarrowRaw<A[K]> })
+	| ({
+		[K in keyof A]: A[K] extends Function ? A[K]
+			: NarrowRaw<A[K]>
+	})
 
-// eslint-disable-next-line @typescript-eslint/no-unnecessary-type-constraint
-export type Narrow<A extends any> = A extends [] ? A : NarrowRaw<A>
+export type Narrow<A> = A extends [] ? A : NarrowRaw<A>

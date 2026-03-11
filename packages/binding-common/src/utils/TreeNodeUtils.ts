@@ -4,7 +4,6 @@ import { BindingError } from '../BindingError'
 import levenshtein from 'js-levenshtein'
 
 export class TreeNodeUtils {
-
 	public static resolveEntity(schema: Schema, entityName: string, type: 'entity' | 'entity list'): SchemaEntity {
 		const entity = schema.getEntityOrUndefined(entityName)
 		if (!entity) {
@@ -22,12 +21,16 @@ export class TreeNodeUtils {
 		return this.resolveRelation(environment, field, 'a has-one relation', ['ManyHasOne', 'OneHasOne'])
 	}
 
-
 	public static resolveHasManyRelation(environment: Environment, field: string): SchemaRelation {
 		return this.resolveRelation(environment, field, 'a has-many relation', ['ManyHasMany', 'OneHasMany'])
 	}
 
-	private static resolveRelation(environment: Environment, field: string, relationDescription: string, expectedRelationType: BaseRelation['type'][]): SchemaRelation {
+	private static resolveRelation(
+		environment: Environment,
+		field: string,
+		relationDescription: string,
+		expectedRelationType: BaseRelation['type'][],
+	): SchemaRelation {
 		return this.resolveField(environment, field, (field): field is SchemaRelation => {
 			return field.__typename === '_Relation' && expectedRelationType.includes(field.type)
 		}, relationDescription)
@@ -39,7 +42,12 @@ export class TreeNodeUtils {
 		// TODO run custom validators
 	}
 
-	private static resolveField<T extends SchemaField>(environment: Environment, fieldName: string, matcher: (field: SchemaField) => field is T, expectedDescription: string): T {
+	private static resolveField<T extends SchemaField>(
+		environment: Environment,
+		fieldName: string,
+		matcher: (field: SchemaField) => field is T,
+		expectedDescription: string,
+	): T {
 		const treeLocation = environment.getSubTreeNode()
 		const entity = treeLocation.entity
 		const field = entity.fields.get(fieldName)
@@ -56,8 +64,8 @@ export class TreeNodeUtils {
 		if (!matcher(field)) {
 			const actual = field.__typename === '_Column' ? 'an ordinary field' : `a ${field.type} relation`
 			throw new BindingError(
-				`Invalid field: the name '${field.name}' on ${this.describeLocation(environment)} ` +
-				`refers to ${actual} but is being used as a ${expectedDescription}.`,
+				`Invalid field: the name '${field.name}' on ${this.describeLocation(environment)} `
+					+ `refers to ${actual} but is being used as a ${expectedDescription}.`,
 			)
 		}
 		return field
@@ -66,7 +74,7 @@ export class TreeNodeUtils {
 	public static describeLocation(environment: Environment): string {
 		const path = []
 		const loc = environment.getSubTreeNode()
-		for (let env = environment; ; env = env.getParent()) {
+		for (let env = environment;; env = env.getParent()) {
 			const node = env.getSubTreeNode()
 			if (node.type === 'subtree-entity' || node.type === 'subtree-entity-list') {
 				return `entity '${loc.entity.name}' in path '${[node.entity.name, ...path.reverse()].join('.')}'`
@@ -76,7 +84,7 @@ export class TreeNodeUtils {
 	}
 
 	public static recommendAlternative(original: string, possibleAlternatives: Iterable<string>): string | undefined {
-		let bestAlternative: string | undefined = undefined
+		let bestAlternative: string | undefined
 		let bestAlternativeDistance = Number.MAX_SAFE_INTEGER
 
 		for (const alternative of possibleAlternatives) {

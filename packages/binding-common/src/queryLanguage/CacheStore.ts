@@ -17,7 +17,7 @@ export class CacheStore {
 		let caches = this.cacheStore.get(environment)
 
 		if (caches === undefined) {
-			this.cacheStore.set(environment, (caches = this.createEntryPointCache()))
+			this.cacheStore.set(environment, caches = this.createEntryPointCache())
 		}
 		return caches[entry].get(expression) as Parser.ParserResult[Entry] | undefined
 	}
@@ -31,9 +31,9 @@ export class CacheStore {
 		let caches = this.cacheStore.get(environment)
 
 		if (caches === undefined) {
-			this.cacheStore.set(environment, (caches = this.createEntryPointCache()))
+			this.cacheStore.set(environment, caches = this.createEntryPointCache())
 		}
-		(caches[entry] as LRUCache<string, Parser.ParserResult[Entry]>).set(expression, value)
+		;(caches[entry] as LRUCache<string, Parser.ParserResult[Entry]>).set(expression, value)
 	}
 
 	private createEntryPointCache(): CacheByEntryPoint {

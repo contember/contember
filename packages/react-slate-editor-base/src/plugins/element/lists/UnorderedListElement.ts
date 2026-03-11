@@ -17,7 +17,9 @@ export const isUnorderedListElement = (
 	suchThat?: Partial<UnorderedListElement>,
 ): element is UnorderedListElement => ContemberEditor.isElementType(element, unorderedListElementType, suchThat)
 
-export const unorderedListElementPlugin = ({ render }: { render: ElementRenderer<UnorderedListElement> }): EditorElementPlugin<UnorderedListElement> => ({
+export const unorderedListElementPlugin = (
+	{ render }: { render: ElementRenderer<UnorderedListElement> },
+): EditorElementPlugin<UnorderedListElement> => ({
 	type: unorderedListElementType,
 	render,
 	isActive: ({ editor, suchThat }) => {

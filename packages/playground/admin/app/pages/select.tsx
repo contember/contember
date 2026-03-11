@@ -8,7 +8,6 @@ import { InputField, MultiSelectField, SelectEnumField, SelectField, SortableMul
 import { Slots } from '~/lib/layout'
 import { Divider } from '~/lib/ui/divider'
 
-
 export const HasOne = () => {
 	const required = !!useEnvironment().getParameterOrElse('required', false)
 
@@ -91,10 +90,12 @@ export const CreateNewForm = () => (
 				<SelectField
 					field="hasOne"
 					label="Has one value"
-					createNewForm={<>
-						<InputField field="name" label="Name" />
-						<InputField field="slug" label="Slug" />
-					</>}
+					createNewForm={
+						<>
+							<InputField field="name" label="Name" />
+							<InputField field="slug" label="Slug" />
+						</>
+					}
 				>
 					<Field field="name" />
 				</SelectField>
@@ -120,16 +121,21 @@ export const EnumSelect = () => {
 			<EntitySubTree entity="InputRoot(unique = unique)" setOnCreate="(unique = unique)">
 				<div className="space-y-4">
 					<SelectEnumField field="enumValue" label="Some enum" required={required} />
-					<SelectEnumField field="enumValue" label="Enum with boolean, numbers and null" options={[
-						{ value: 'a', label: 'Option A' },
-						{ value: 'b', label: 'Option B' },
-						{ value: 'c', label: 'Option C' },
-						{ value: true, label: 'True' },
-						{ value: false, label: 'False' },
-						{ value: 1, label: 'One' },
-						{ value: 2, label: 'Two' },
-						{ value: null, label: 'No value' },
-					]} required={required} />
+					<SelectEnumField
+						field="enumValue"
+						label="Enum with boolean, numbers and null"
+						options={[
+							{ value: 'a', label: 'Option A' },
+							{ value: 'b', label: 'Option B' },
+							{ value: 'c', label: 'Option C' },
+							{ value: true, label: 'True' },
+							{ value: false, label: 'False' },
+							{ value: 1, label: 'One' },
+							{ value: 2, label: 'Two' },
+							{ value: null, label: 'No value' },
+						]}
+						required={required}
+					/>
 					<Divider />
 					<InputField field="dummy" label="Dummy to trigger dirty state" />
 				</div>

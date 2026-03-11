@@ -7,7 +7,6 @@ import { UniqueWhereExpander } from '../../inputProcessing'
 import { HasManyToHasOneReducerExtension } from './HasManyToHasOneReducer'
 
 export class HasManyToHasOneReducerExecutionHandler implements SelectExecutionHandler<Input.UniqueQueryInput, HasManyToHasOneReducerExtension> {
-
 	constructor(private readonly schema: Model.Schema, private readonly uniqueWhereExpander: UniqueWhereExpander) {}
 
 	process(context: SelectExecutionHandlerContext<Input.UniqueQueryInput, HasManyToHasOneReducerExtension>): void {
@@ -18,7 +17,6 @@ export class HasManyToHasOneReducerExecutionHandler implements SelectExecutionHa
 		addData({
 			field: entity.primary,
 			dataProvider: async (ids: Input.PrimaryValue[]) => {
-
 				const relationContext = acceptFieldVisitor(this.schema, entity, objectNode.extensions.relationName, {
 					visitRelation: context => context,
 					visitColumn: (): never => {

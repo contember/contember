@@ -1,6 +1,14 @@
 import { useBlockElementCache } from './useBlockElementCache'
 import { Descendant, Editor } from 'slate'
-import { EntityAccessor, EntityId, sortEntities, SugaredFieldProps, SugaredRelativeEntityList, useDesugaredRelativeSingleField, useEntityList } from '@contember/react-binding'
+import {
+	EntityAccessor,
+	EntityId,
+	sortEntities,
+	SugaredFieldProps,
+	SugaredRelativeEntityList,
+	useDesugaredRelativeSingleField,
+	useEntityList,
+} from '@contember/react-binding'
 import { useBlockElementPathRefs } from './useBlockElementPathRefs'
 import { useBlockEditorOnChange } from './useBlockEditorOnChange'
 import { MutableRefObject, useEffect, useMemo, useRef } from 'react'
@@ -25,7 +33,7 @@ export const useBlockEditorState = ({ editor, blockList, sortableBy, contentFiel
 }): useBlockEditorStateResult => {
 	const entityList = useEntityList(blockList)
 	const desugaredSortableByField = useDesugaredRelativeSingleField(sortableBy)
-	const trashFakeBlockId = useRef<EntityId>()
+	const trashFakeBlockId = useRef<EntityId>(undefined)
 	const sortedBlocks = useMemo(() => {
 		return sortEntities(
 			Array.from(entityList).filter(it => it.id !== trashFakeBlockId.current),
@@ -39,9 +47,26 @@ export const useBlockEditorState = ({ editor, blockList, sortableBy, contentFiel
 	const blockElementCache = useBlockElementCache({ editor, blockList, sortableBy, contentField })
 	const blockElementPathRefs = useBlockElementPathRefs({ editor, blockList })
 
-	const refreshBlocks = useRefreshBlocks({ editor, sortableBy, contentField, blockList, blockElementCache, blockElementPathRefs, referencesField, monolithicReferencesMode, sortedBlocksRef, trashFakeBlockId })
+	const refreshBlocks = useRefreshBlocks({
+		editor,
+		sortableBy,
+		contentField,
+		blockList,
+		blockElementCache,
+		blockElementPathRefs,
+		referencesField,
+		monolithicReferencesMode,
+		sortedBlocksRef,
+		trashFakeBlockId,
+	})
 	const onChange = useBlockEditorOnChange({ editor, blockList, contentField, blockElementCache, sortedBlocksRef, refreshBlocks })
-	const nodes = useBlockEditorSlateNodes({ editor, blockElementCache, blockElementPathRefs, blockContentField: contentField, topLevelBlocks: sortedBlocks })
+	const nodes = useBlockEditorSlateNodes({
+		editor,
+		blockElementCache,
+		blockElementPathRefs,
+		blockContentField: contentField,
+		topLevelBlocks: sortedBlocks,
+	})
 
 	return { onChange, nodes, sortedBlocksRef, refreshBlocks, sortedBlocks }
 }

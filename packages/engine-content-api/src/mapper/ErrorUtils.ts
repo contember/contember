@@ -15,7 +15,6 @@ import { acceptFieldVisitor, tryGetColumnName } from '@contember/schema-utils'
 import { logger } from '@contember/logger'
 import { DatabaseMetadata } from '@contember/database'
 
-
 type UniqueConstraintResult = {
 	entity: Model.Entity
 	fields: string[]
@@ -23,7 +22,12 @@ type UniqueConstraintResult = {
 
 const getEntityByTableName = (model: Model.Schema, tableName: string) => Object.values(model.entities).find(it => it.tableName === tableName)
 
-const findUniqueConstraint = (model: Model.Schema, databaseMetadata: DatabaseMetadata, tableName: string, constraintName: string): UniqueConstraintResult | null => {
+const findUniqueConstraint = (
+	model: Model.Schema,
+	databaseMetadata: DatabaseMetadata,
+	tableName: string,
+	constraintName: string,
+): UniqueConstraintResult | null => {
 	const constraint = databaseMetadata.uniqueConstraints.filter({ tableName, constraintName }).first()
 	if (!constraint) {
 		return null
@@ -51,7 +55,12 @@ type RelationInfo = {
 	targetEntity: Model.Entity
 }
 
-const findForeignConstraint = (model: Model.Schema, databaseMetadata: DatabaseMetadata, tableName: string, constraintName: string): RelationInfo | null => {
+const findForeignConstraint = (
+	model: Model.Schema,
+	databaseMetadata: DatabaseMetadata,
+	tableName: string,
+	constraintName: string,
+): RelationInfo | null => {
 	const constraint = databaseMetadata.foreignKeys.filter({ fromTable: tableName, constraintName }).first()
 	if (!constraint) {
 		return null
@@ -92,7 +101,6 @@ export const convertError = (
 	databaseMetadata: DatabaseMetadata,
 	e: any,
 ): MutationResult => {
-
 	if (e instanceof Database.NotNullViolationError) {
 		return new MutationConstraintViolationError([], ConstraintType.notNull, e.originalMessage, [
 			MutationResultHint.sqlError,
@@ -116,8 +124,8 @@ export const convertError = (
 		const matchResult = violationDetail.match(/^Key \(.+\)=\((.+)\) already exists\.$/)
 		const values = matchResult?.[1]
 		const message = constraint
-			? `${values ? `Value (${values})` : 'Unknown value'}` +
-			  ` already exists in unique columns (${constraint.fields.join(', ')}) on entity ${constraint.entity.name}`
+			? `${values ? `Value (${values})` : 'Unknown value'}`
+				+ ` already exists in unique columns (${constraint.fields.join(', ')}) on entity ${constraint.entity.name}`
 			: e.originalMessage
 		const paths = constraint ? constraint.fields.map(it => [{ field: it }]) : []
 		return new MutationConstraintViolationError(paths, ConstraintType.uniqueKey, message, [MutationResultHint.sqlError])
@@ -141,7 +149,11 @@ export const convertError = (
 	throw e
 }
 
-export const tryMutation = async (schema: Model.Schema, databaseMetadata: DatabaseMetadata, cb: () => Promise<MutationResultList>): Promise<MutationResultList> => {
+export const tryMutation = async (
+	schema: Model.Schema,
+	databaseMetadata: DatabaseMetadata,
+	cb: () => Promise<MutationResultList>,
+): Promise<MutationResultList> => {
 	try {
 		return await cb()
 	} catch (e) {

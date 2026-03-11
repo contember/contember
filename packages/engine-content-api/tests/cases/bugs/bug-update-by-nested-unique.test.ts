@@ -6,9 +6,7 @@ import { SchemaBuilder } from '@contember/schema-definition'
 import { test } from 'bun:test'
 
 const schema = new SchemaBuilder()
-	.entity('FrontPage', entity =>
-		entity.column('title', column => column.type(Model.ColumnType.String)).oneHasOne('site', c => c.target('Site')),
-	)
+	.entity('FrontPage', entity => entity.column('title', column => column.type(Model.ColumnType.String)).oneHasOne('site', c => c.target('Site')))
 	.entity('Site', entity => entity.column('slug', column => column.type(Model.ColumnType.String).unique()))
 	.buildSchema()
 
@@ -31,7 +29,8 @@ test('Update by nested unique where', async () => {
 					parameters: ['en'],
 				},
 				{
-					sql: SQL`with "newData_" as (select ? :: text as "title", "root_"."title" as "title_old__", "root_"."id", "root_"."site_id"  from "public"."front_page" as "root_"  where "root_"."id" = ?) 
+					sql:
+						SQL`with "newData_" as (select ? :: text as "title", "root_"."title" as "title_old__", "root_"."id", "root_"."site_id"  from "public"."front_page" as "root_"  where "root_"."id" = ?) 
 							update  "public"."front_page" set  "title" =  "newData_"."title"   from "newData_"  where "front_page"."id" = "newData_"."id"  returning "title_old__"`,
 					response: { rows: [{}] },
 					parameters: ['Hello', testUuid(1)],
@@ -47,5 +46,3 @@ test('Update by nested unique where', async () => {
 		},
 	})
 })
-
-

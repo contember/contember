@@ -1,11 +1,11 @@
 import * as pathToRegexp from 'path-to-regexp'
-import { MatchFunction, PathFunction } from 'path-to-regexp'
+import { Key, MatchFunction, PathFunction, TokenData } from 'path-to-regexp'
 import { Environment } from '@contember/react-binding'
 import { RequestState, RoutingContextValue } from '../../types'
 import { PageNotFound } from '../../PageNotFound'
 
-const matchFunctionsCache: Record<string, MatchFunction> = {}
-const pathFunctionsCache: Record<string, PathFunction> = {}
+const matchFunctionsCache: Record<string, MatchFunction<Record<string, string>>> = {}
+const pathFunctionsCache: Record<string, PathFunction<Record<string, string>>> = {}
 const pathKeysCache: Record<string, string[]> = {}
 
 export const dimensionsIn = (dimensions: string): Environment.SelectedDimensions => {
@@ -17,7 +17,7 @@ export const dimensionsIn = (dimensions: string): Environment.SelectedDimensions
 
 export const dimensionsOut = (dimensions: Environment.SelectedDimensions): string => {
 	return Object.entries(dimensions)
-		.map(([key, value]) => `${key}=${value.join(',')}`)
+		.map(([key, value]) => `${key}=${(value as string[]).join(',')}`)
 		.join('+')
 }
 
@@ -34,8 +34,8 @@ const parseQuery = (query: string): Record<string, string | number> => {
 
 	return Object.fromEntries(Array.from(
 		searchParams,
-		([key, val]) => [key, parseInt(val, 10).toString() === val ? parseInt(val, 10) : val]),
-	)
+		([key, val]) => [key, parseInt(val, 10).toString() === val ? parseInt(val, 10) : val],
+	))
 }
 
 export const pathToRequestState = (routing: RoutingContextValue, path: string, query: string): RequestState => {
@@ -44,7 +44,7 @@ export const pathToRequestState = (routing: RoutingContextValue, path: string, q
 	}
 
 	const pathAfterBase = path.slice(routing.basePath.length)
-	const dimensionsMatch = pathAfterBase.match(/^([^\/]*)/)
+	const dimensionsMatch = pathAfterBase.match(/^([^/]*)/)
 	const dimensionsSegment = dimensionsMatch?.[1] || ''
 	const hasDimensions = dimensionsSegment.includes('=')
 
@@ -75,7 +75,6 @@ export const pathToRequestState = (routing: RoutingContextValue, path: string, q
 	if (routing.pageInQuery) {
 		pageName = typeof parameters.page === 'string' ? parameters.page : 'index'
 		delete parameters.page
-
 	} else {
 		pageName = pageNameIn(pagePathNormalized.slice(1, -1))
 	}
@@ -105,7 +104,6 @@ export const requestStateToPath = (routing: RoutingContextValue, request: Reques
 		if (routing.pageInQuery && request.pageName !== 'index') {
 			query.append('page', request.pageName)
 		}
-
 	} else {
 		const route = routing.routes[request.pageName]
 		const pathParameters = route.objectToParams ? route.objectToParams(request.parameters) : request.parameters
@@ -113,7 +111,7 @@ export const requestStateToPath = (routing: RoutingContextValue, request: Reques
 		pathFunctionsCache[route.path] ??= pathToRegexp.compile(route.path, { encode: encodeURIComponent })
 		pathSegment = pathFunctionsCache[route.path](pathParameters)
 
-		pathKeysCache[route.path] ??= pathToRegexp.parse(route.path).flatMap(it => typeof it !== 'string' && typeof it.name === 'string' ? [it.name] : [])
+		pathKeysCache[route.path] ??= pathToRegexp.parse(route.path).tokens.flatMap(it => it.type === 'param' ? [it.name] : [])
 		pathKeysCache[route.path].forEach(key => query.delete(key))
 	}
 

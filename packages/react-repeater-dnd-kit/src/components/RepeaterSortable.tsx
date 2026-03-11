@@ -1,6 +1,19 @@
 import React, { ReactNode, useCallback, useMemo, useState } from 'react'
 import type { DragStartEvent } from '@dnd-kit/core'
-import { closestCenter, DndContext, DndContextProps, DragCancelEvent, DragEndEvent, KeyboardSensor, MeasuringStrategy, MouseSensor, TouchSensor, UniqueIdentifier, useSensor, useSensors } from '@dnd-kit/core'
+import {
+	closestCenter,
+	DndContext,
+	DndContextProps,
+	DragCancelEvent,
+	DragEndEvent,
+	KeyboardSensor,
+	MeasuringStrategy,
+	MouseSensor,
+	TouchSensor,
+	UniqueIdentifier,
+	useSensor,
+	useSensors,
+} from '@dnd-kit/core'
 import { RepeaterActiveEntityContext } from '../contexts'
 import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable'
 import { useRepeaterMethods, useRepeaterSortedEntities } from '@contember/react-repeater'
@@ -42,7 +55,6 @@ export const RepeaterSortable = ({ children, onDragStart, onDragEnd: onDragEndIn
 	const [activeId, setActiveId] = useState<UniqueIdentifier | null>(null)
 	const { moveItem } = useRepeaterMethods()
 	const entities = useRepeaterSortedEntities()
-
 
 	const activeItem = useMemo(() => {
 		if (!activeId) {

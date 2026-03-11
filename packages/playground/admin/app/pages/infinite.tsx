@@ -48,9 +48,7 @@ export default () => (
 			{/*<DataGridLoader>*/}
 			{/*</DataGridLoader>*/}
 
-
 			<DataGridPagination />
-
 		</DataView>
 	</Binding>
 )

@@ -35,4 +35,3 @@ test('changes a password', async () => {
 		}),
 	})
 })
-

@@ -1,8 +1,7 @@
-import { describe, it, expect } from 'bun:test'
+import { describe, expect, it } from 'bun:test'
 import { CustomTypesProvider } from '../../../src'
 
 describe('uuid graphql type', () => {
-
 	const customTypesProvider = new CustomTypesProvider()
 	it('accepts valid uuid', () => {
 		const validUuid = 'e0818cf9-eee3-4452-9a13-031435218473'

@@ -50,7 +50,6 @@ export const DataGridNumberFilter = Component(({ label, ...props }: DataGridNumb
 	</DataViewNumberFilter>
 ))
 
-
 const DataGridNumberFilterRange = () => {
 	const [artifact] = useDataViewFilter<NumberRangeFilterArtifacts>(useDataViewFilterName())
 	if (!artifact) {
@@ -68,7 +67,6 @@ const DataGridNumberFilterRange = () => {
 	return null
 }
 
-
 const DataGridNumberFilterList = () => (
 	<>
 		<DataViewNumberFilterResetTrigger>
@@ -84,7 +82,6 @@ const DataGridNumberFilterList = () => (
 		</DataViewNullFilterTrigger>
 	</>
 )
-
 
 const DataGridNumberFilterSelect = ({ label }: {
 	label?: ReactNode

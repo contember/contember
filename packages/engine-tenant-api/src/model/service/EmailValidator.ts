@@ -4,7 +4,6 @@ import { ResponseError } from '../utils/Response'
 import { PersonQuery } from '../queries'
 
 export class EmailValidator {
-
 	public async validateEmail(db: DatabaseContext, email: string): Promise<ResponseError<EmailValidatorError> | null> {
 		if (!validateEmail(email.trim())) {
 			return new ResponseError('INVALID_EMAIL_FORMAT', 'E-mail address is not in a valid format')

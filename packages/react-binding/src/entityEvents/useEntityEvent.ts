@@ -27,7 +27,7 @@ export function useEntityEvent(
 ): void
 export function useEntityEvent(
 	type: 'update',
-	listener: EntityAccessor.EntityEventListenerMap['update']
+	listener: EntityAccessor.EntityEventListenerMap['update'],
 ): void
 
 export function useEntityEvent(type: keyof EntityAccessor.RuntimeEntityEventListenerMap, fieldOrListenerIn: unknown, listenerIn?: unknown): void {

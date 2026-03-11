@@ -155,7 +155,7 @@ namespace InsertBuilder {
 	}
 
 	export type ConflictTargetOptions =
-		| ({ columns: IndexColumns} & Where.Options)
+		| ({ columns: IndexColumns } & Where.Options)
 		| { constraint: string }
 
 	type DoNothingConflictAction = {

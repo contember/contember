@@ -1,5 +1,13 @@
 import { memo, useCallback, useMemo, useState } from 'react'
-import { ApiBaseUrlContext, GraphQlClientFactoryContext, LoginTokenContext, ProjectSlugContext, SessionTokenContext, SetSessionTokenContext, StageSlugContext } from '../contexts'
+import {
+	ApiBaseUrlContext,
+	GraphQlClientFactoryContext,
+	LoginTokenContext,
+	ProjectSlugContext,
+	SessionTokenContext,
+	SetSessionTokenContext,
+	StageSlugContext,
+} from '../contexts'
 import { GraphQlClientFactory, SessionTokenContextValue } from '../types'
 
 export interface ContemberClientProps {

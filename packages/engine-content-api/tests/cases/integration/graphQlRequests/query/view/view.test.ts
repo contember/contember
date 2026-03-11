@@ -83,4 +83,3 @@ test('query a view through a relation', async () => {
 		},
 	})
 })
-

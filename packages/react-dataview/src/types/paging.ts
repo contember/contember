@@ -4,7 +4,6 @@ import { StateStorageOrName } from '@contember/react-utils'
  * Methods for paging. Available using {@link useDataViewPagingMethods}.
  */
 export type DataViewPagingMethods = {
-
 	/**
 	 * Refresh the total count of items.
 	 */

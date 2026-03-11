@@ -5,82 +5,82 @@ import { describe } from 'bun:test'
 import { testMigrations } from '../../src/tests'
 import { SchemaDefinition as def } from '@contember/schema-definition'
 
-describe('create a table (no relations, unique on column)', () => testMigrations({
-	original: {  },
-	updated: {
-		model: new SchemaBuilder()
-			.entity('Author', e =>
-				e
-					.column('name', c => c.type(Model.ColumnType.String))
-					.column('email', c => c.type(Model.ColumnType.String).unique())
-					.column('registeredAt', c => c.type(Model.ColumnType.Date)),
-			)
-			.buildSchema(),
-	},
-	diff: [
-		{
-			modification: 'createEntity',
-			entity: {
-				fields: {
-					id: {
-						columnName: 'id',
-						name: 'id',
-						nullable: false,
-						type: Model.ColumnType.Uuid,
-						columnType: 'uuid',
+describe('create a table (no relations, unique on column)', () =>
+	testMigrations({
+		original: {},
+		updated: {
+			model: new SchemaBuilder()
+				.entity('Author', e =>
+					e
+						.column('name', c => c.type(Model.ColumnType.String))
+						.column('email', c => c.type(Model.ColumnType.String).unique())
+						.column('registeredAt', c => c.type(Model.ColumnType.Date)))
+				.buildSchema(),
+		},
+		diff: [
+			{
+				modification: 'createEntity',
+				entity: {
+					fields: {
+						id: {
+							columnName: 'id',
+							name: 'id',
+							nullable: false,
+							type: Model.ColumnType.Uuid,
+							columnType: 'uuid',
+						},
 					},
+					name: 'Author',
+					primary: 'id',
+					primaryColumn: 'id',
+					tableName: 'author',
+					unique: [],
+					eventLog: {
+						enabled: true,
+					},
+					indexes: [],
 				},
-				name: 'Author',
-				primary: 'id',
-				primaryColumn: 'id',
-				tableName: 'author',
-				unique: [],
-				eventLog: {
-					enabled: true,
+			},
+			{
+				modification: 'createColumn',
+				entityName: 'Author',
+				field: {
+					columnName: 'name',
+					name: 'name',
+					nullable: true,
+					type: Model.ColumnType.String,
+					columnType: 'text',
 				},
-				indexes: [],
 			},
-		},
-		{
-			modification: 'createColumn',
-			entityName: 'Author',
-			field: {
-				columnName: 'name',
-				name: 'name',
-				nullable: true,
-				type: Model.ColumnType.String,
-				columnType: 'text',
+			{
+				modification: 'createColumn',
+				entityName: 'Author',
+				field: {
+					columnName: 'email',
+					name: 'email',
+					nullable: true,
+					type: Model.ColumnType.String,
+					columnType: 'text',
+				},
 			},
-		},
-		{
-			modification: 'createColumn',
-			entityName: 'Author',
-			field: {
-				columnName: 'email',
-				name: 'email',
-				nullable: true,
-				type: Model.ColumnType.String,
-				columnType: 'text',
+			{
+				modification: 'createColumn',
+				entityName: 'Author',
+				field: {
+					columnName: 'registered_at',
+					name: 'registeredAt',
+					nullable: true,
+					type: Model.ColumnType.Date,
+					columnType: 'date',
+				},
 			},
-		},
-		{
-			modification: 'createColumn',
-			entityName: 'Author',
-			field: {
-				columnName: 'registered_at',
-				name: 'registeredAt',
-				nullable: true,
-				type: Model.ColumnType.Date,
-				columnType: 'date',
+			{
+				modification: 'createUniqueConstraint',
+				entityName: 'Author',
+				unique: { fields: ['email'] },
 			},
-		},
-		{
-			modification: 'createUniqueConstraint',
-			entityName: 'Author',
-			unique: { fields: ['email'] },
-		},
-	],
-	sql: SQL`CREATE TABLE "author" (
+		],
+		sql: SQL`CREATE TABLE "author" (
 		"id" uuid PRIMARY KEY NOT NULL
 	);
 	CREATE TRIGGER "log_event"
@@ -102,7 +102,7 @@ describe('create a table (no relations, unique on column)', () => testMigrations
 		ADD "registered_at" date;
 	ALTER TABLE "author"
 		ADD UNIQUE ("email");`,
-}))
+	}))
 
 namespace ViewEntityUpdatedSchema {
 	@def.View("SELECT null as id, 'John' AS name")
@@ -110,44 +110,45 @@ namespace ViewEntityUpdatedSchema {
 		name = def.stringColumn()
 	}
 }
-describe('create a view', () => testMigrations({
-	original: {},
-	updated: createSchema(ViewEntityUpdatedSchema),
-	diff: [
-		{
-			modification: 'createView',
-			entity: {
-				fields: {
-					id: {
-						columnName: 'id',
-						name: 'id',
-						nullable: false,
-						type: Model.ColumnType.Uuid,
-						columnType: 'uuid',
+describe('create a view', () =>
+	testMigrations({
+		original: {},
+		updated: createSchema(ViewEntityUpdatedSchema),
+		diff: [
+			{
+				modification: 'createView',
+				entity: {
+					fields: {
+						id: {
+							columnName: 'id',
+							name: 'id',
+							nullable: false,
+							type: Model.ColumnType.Uuid,
+							columnType: 'uuid',
+						},
+						name: {
+							columnName: 'name',
+							name: 'name',
+							nullable: true,
+							type: Model.ColumnType.String,
+							columnType: 'text',
+						},
 					},
-					name: {
-						columnName: 'name',
-						name: 'name',
-						nullable: true,
-						type: Model.ColumnType.String,
-						columnType: 'text',
+					name: 'Author',
+					primary: 'id',
+					primaryColumn: 'id',
+					tableName: 'author',
+					unique: [],
+					view: { sql: "SELECT null as id, 'John' AS name" },
+					eventLog: {
+						enabled: true,
 					},
+					indexes: [],
 				},
-				name: 'Author',
-				primary: 'id',
-				primaryColumn: 'id',
-				tableName: 'author',
-				unique: [],
-				view: { sql: "SELECT null as id, 'John' AS name" },
-				eventLog: {
-					enabled: true,
-				},
-				indexes: [],
 			},
-		},
-	],
-	sql: SQL`CREATE VIEW "author" AS SELECT null as id, 'John' AS name;`,
-}))
+		],
+		sql: SQL`CREATE VIEW "author" AS SELECT null as id, 'John' AS name;`,
+	}))
 
 namespace SchemaWithCustomIdName {
 	export class Author {
@@ -155,50 +156,51 @@ namespace SchemaWithCustomIdName {
 		name = def.stringColumn()
 	}
 }
-describe('custom primary key name', () => testMigrations({
-	original: {},
-	updated: createSchema(SchemaWithCustomIdName),
-	diff: [
-		{
-			modification: 'createEntity',
-			entity: {
-				fields: {
-					id: {
-						columnName: 'author_id',
-						name: 'id',
-						nullable: false,
-						type: Model.ColumnType.Uuid,
-						columnType: 'uuid',
+describe('custom primary key name', () =>
+	testMigrations({
+		original: {},
+		updated: createSchema(SchemaWithCustomIdName),
+		diff: [
+			{
+				modification: 'createEntity',
+				entity: {
+					fields: {
+						id: {
+							columnName: 'author_id',
+							name: 'id',
+							nullable: false,
+							type: Model.ColumnType.Uuid,
+							columnType: 'uuid',
+						},
 					},
+					name: 'Author',
+					primary: 'id',
+					primaryColumn: 'author_id',
+					tableName: 'author',
+					unique: [],
+					eventLog: {
+						enabled: true,
+					},
+					indexes: [],
 				},
-				name: 'Author',
-				primary: 'id',
-				primaryColumn: 'author_id',
-				tableName: 'author',
-				unique: [],
-				eventLog: {
-					enabled: true,
+			},
+			{
+				modification: 'createColumn',
+				entityName: 'Author',
+				field: {
+					columnName: 'name',
+					name: 'name',
+					nullable: true,
+					type: Model.ColumnType.String,
+					columnType: 'text',
 				},
-				indexes: [],
 			},
-		},
-		{
-			modification: 'createColumn',
-			entityName: 'Author',
-			field: {
-				columnName: 'name',
-				name: 'name',
-				nullable: true,
-				type: Model.ColumnType.String,
-				columnType: 'text',
-			},
-		},
-	],
-	sql: SQL`CREATE TABLE "author" ( "author_id" uuid PRIMARY KEY NOT NULL ); 
+		],
+		sql: SQL`CREATE TABLE "author" ( "author_id" uuid PRIMARY KEY NOT NULL ); 
 CREATE TRIGGER "log_event" AFTER INSERT OR UPDATE OR DELETE ON "author" FOR EACH ROW EXECUTE PROCEDURE "system"."trigger_event"($pga$author_id$pga$); 
 CREATE CONSTRAINT TRIGGER "log_event_trx" AFTER INSERT OR UPDATE OR DELETE ON "author" DEFERRABLE INITIALLY DEFERRED FOR EACH ROW EXECUTE PROCEDURE "system"."trigger_event_commit"(); 
 ALTER TABLE "author" ADD "name" text;`,
-}))
+	}))
 
 namespace SchemaWithIndex {
 	@def.Index('name')
@@ -206,51 +208,52 @@ namespace SchemaWithIndex {
 		name = def.stringColumn()
 	}
 }
-describe('entity with index', () => testMigrations({
-	original: {},
-	updated: createSchema(SchemaWithIndex),
-	diff: [
-		{
-			modification: 'createEntity',
-			entity: {
-				fields: {
-					id: {
-						columnName: 'id',
-						name: 'id',
-						nullable: false,
-						type: Model.ColumnType.Uuid,
-						columnType: 'uuid',
+describe('entity with index', () =>
+	testMigrations({
+		original: {},
+		updated: createSchema(SchemaWithIndex),
+		diff: [
+			{
+				modification: 'createEntity',
+				entity: {
+					fields: {
+						id: {
+							columnName: 'id',
+							name: 'id',
+							nullable: false,
+							type: Model.ColumnType.Uuid,
+							columnType: 'uuid',
+						},
 					},
+					name: 'Author',
+					primary: 'id',
+					primaryColumn: 'id',
+					tableName: 'author',
+					unique: [],
+					eventLog: {
+						enabled: true,
+					},
+					indexes: [],
 				},
-				name: 'Author',
-				primary: 'id',
-				primaryColumn: 'id',
-				tableName: 'author',
-				unique: [],
-				eventLog: {
-					enabled: true,
+			},
+			{
+				modification: 'createColumn',
+				entityName: 'Author',
+				field: {
+					columnName: 'name',
+					name: 'name',
+					nullable: true,
+					type: Model.ColumnType.String,
+					columnType: 'text',
 				},
-				indexes: [],
 			},
-		},
-		{
-			modification: 'createColumn',
-			entityName: 'Author',
-			field: {
-				columnName: 'name',
-				name: 'name',
-				nullable: true,
-				type: Model.ColumnType.String,
-				columnType: 'text',
+			{
+				modification: 'createIndex',
+				entityName: 'Author',
+				index: { fields: ['name'] },
 			},
-		},
-		{
-			modification: 'createIndex',
-			entityName: 'Author',
-			index: { fields: ['name'] },
-		},
-	],
-	sql: SQL`CREATE TABLE "author"
+		],
+		sql: SQL`CREATE TABLE "author"
              (
                  "id" uuid PRIMARY KEY NOT NULL
              );
@@ -267,4 +270,4 @@ describe('entity with index', () => testMigrations({
     ALTER TABLE "author"
         ADD "name" text;
 	CREATE INDEX ON "author" ("name");`,
-}))
+	}))

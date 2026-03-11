@@ -6,7 +6,6 @@ ALTER TABLE "person"
 	ADD COLUMN otp_activated_at TIMESTAMP DEFAULT NULL
 `
 
-export default async function (builder: MigrationBuilder) {
+export default async function(builder: MigrationBuilder) {
 	builder.sql(sql)
 }
-

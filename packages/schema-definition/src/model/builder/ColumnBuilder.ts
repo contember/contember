@@ -16,11 +16,13 @@ class ColumnBuilder<O extends PartialColumnOptions<never> = PartialColumnOptions
 		type: Model.ColumnType,
 		typeOptions: ColumnBuilder.TypeOptions = {},
 	): ColumnBuilder<O & PartialColumnOptions<'type'>> {
-		return new ColumnBuilder<O & PartialColumnOptions<'type'>>({
-			...(this.options as object),
-			type: type,
-			...typeOptions,
-		} as O & PartialColumnOptions<'type'>)
+		return new ColumnBuilder<O & PartialColumnOptions<'type'>>(
+			{
+				...(this.options as object),
+				type: type,
+				...typeOptions,
+			} as O & PartialColumnOptions<'type'>,
+		)
 	}
 
 	public nullable(): ColumnBuilder<O> {

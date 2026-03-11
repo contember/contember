@@ -6,7 +6,6 @@ export class Literal {
 export type FormatterPath = ({ type: 'array' } | { type: 'object'; key: string })[]
 export type IndentDecider = (value: any, path: FormatterPath) => boolean
 
-
 export const printJsValue = (value: any, shouldIndentCb: IndentDecider = () => false, path: FormatterPath = []): string => {
 	if (value instanceof Literal) {
 		return value.value
@@ -18,7 +17,7 @@ export const printJsValue = (value: any, shouldIndentCb: IndentDecider = () => f
 		return value.toString(10) + 'n'
 	}
 	if (typeof value === 'string') {
-		return `'${value.replaceAll(/'/g, '\\\'')}'`
+		return `'${value.replaceAll(/'/g, "\\'")}'`
 	}
 	const shouldIndent = shouldIndentCb(value, path)
 	if (!shouldIndent) {
@@ -29,32 +28,31 @@ export const printJsValue = (value: any, shouldIndentCb: IndentDecider = () => f
 	const nl = '\n'
 
 	if (Array.isArray(value)) {
-		return  ''
-				+ '['
-				+ value.map((it, index, arr) =>
-					(shouldIndent ? nl + indent(1) : '')
-					+ printJsValue(it, shouldIndentCb, [...path, { type: 'array' }])
-					+ (shouldIndent ? ',' : ((index + 1) < arr.length ? ', ' : '')),
-				).join('')
-				+ (shouldIndent ? nl + indent(0) : '')
-				+ ']'
+		return ''
+			+ '['
+			+ value.map((it, index, arr) =>
+				(shouldIndent ? nl + indent(1) : '')
+				+ printJsValue(it, shouldIndentCb, [...path, { type: 'array' }])
+				+ (shouldIndent ? ',' : ((index + 1) < arr.length ? ', ' : ''))
+			).join('')
+			+ (shouldIndent ? nl + indent(0) : '')
+			+ ']'
 	}
 
 	return ''
-			+ '{'
-			+ (shouldIndent ? '' : ' ')
-			+ Object.entries(value).map(([key, value], index, arr) => {
-				const formattedKey = isSimpleIdentifier(key) ? key : `[${printJsValue(key)}]`
-				return ''
-					+ (shouldIndent ? nl + indent(1) : '')
-					+ formattedKey
-					+ ': '
-					+ printJsValue(value, shouldIndentCb, [...path, { type: 'object', key }])
-					+ (shouldIndent ? ',' : ((index + 1) < arr.length ? ', ' : ''))
-			}).join('')
-			+ (shouldIndent ? nl + indent(0) : ' ')
-			+ '}'
-
+		+ '{'
+		+ (shouldIndent ? '' : ' ')
+		+ Object.entries(value).map(([key, value], index, arr) => {
+			const formattedKey = isSimpleIdentifier(key) ? key : `[${printJsValue(key)}]`
+			return ''
+				+ (shouldIndent ? nl + indent(1) : '')
+				+ formattedKey
+				+ ': '
+				+ printJsValue(value, shouldIndentCb, [...path, { type: 'object', key }])
+				+ (shouldIndent ? ',' : ((index + 1) < arr.length ? ', ' : ''))
+		}).join('')
+		+ (shouldIndent ? nl + indent(0) : ' ')
+		+ '}'
 }
 
 const isSimpleIdentifier = (identifier: string): boolean => {

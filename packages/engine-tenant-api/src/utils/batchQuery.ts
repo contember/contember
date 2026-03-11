@@ -3,7 +3,10 @@ import { DatabaseContext } from '../model'
 
 export type ItemLoader<Arg, Item> = (args: Arg) => Promise<Item>
 
-export type BatchLoaderArgs<Arg, Result, Item> = [createResult: (args: Arg[], db: DatabaseContext) => Promise<Result>, getItem: (arg: Arg, result: Result) => Item]
+export type BatchLoaderArgs<Arg, Result, Item> = [
+	createResult: (args: Arg[], db: DatabaseContext) => Promise<Result>,
+	getItem: (arg: Arg, result: Result) => Item,
+]
 export const batchLoader = <Arg, Result, Item>(...args: BatchLoaderArgs<Arg, Result, Item>) => args
 
 export const initBatchLoader = <Arg, Result, Item>(

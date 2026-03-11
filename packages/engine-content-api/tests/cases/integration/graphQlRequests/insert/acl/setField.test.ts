@@ -112,5 +112,3 @@ select "root_"."id", "root_"."name" from "root_" where "root_"."name" in (?, ?) 
 		},
 	})
 })
-
-

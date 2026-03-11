@@ -58,7 +58,7 @@ export const PersistOnKey = ({
 // Default hotkey check: ctrl+s or command+s
 const defaultHotkeyCheck = (event: KeyboardEvent) => {
 	return (
-		(event.ctrlKey || event.metaKey) &&
-		event.key.toLowerCase() === 's'
+		(event.ctrlKey || event.metaKey)
+		&& event.key.toLowerCase() === 's'
 	)
 }

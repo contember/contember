@@ -11,14 +11,12 @@ test('Post locale by post and locale (composed unique)', async () => {
 			.entity('Post', entity =>
 				entity
 					.column('title', column => column.type(Model.ColumnType.String))
-					.oneHasMany('locales', relation => relation.target('PostLocale').ownedBy('post')),
-			)
+					.oneHasMany('locales', relation => relation.target('PostLocale').ownedBy('post')))
 			.entity('PostLocale', entity =>
 				entity
 					.unique(['locale', 'post'])
 					.column('locale', column => column.type(Model.ColumnType.String))
-					.column('title', column => column.type(Model.ColumnType.String)),
-			)
+					.column('title', column => column.type(Model.ColumnType.String)))
 			.buildSchema(),
 		query: GQL`
         query {
@@ -44,4 +42,3 @@ test('Post locale by post and locale (composed unique)', async () => {
 		},
 	})
 })
-

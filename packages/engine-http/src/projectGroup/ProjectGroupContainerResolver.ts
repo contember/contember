@@ -1,4 +1,4 @@
-import { PromiseMap, EventEmitter, EventManager } from '@contember/engine-common'
+import { EventEmitter, EventManager, PromiseMap } from '@contember/engine-common'
 import { isDeepStrictEqual } from 'node:util'
 import { ProjectGroupContainer, ProjectGroupContainerFactory } from './ProjectGroupContainer'
 import { TenantConfigResolver } from '../config/tenantConfigResolver'
@@ -9,13 +9,12 @@ interface ContainerWithMeta {
 	inputConfig: any
 }
 export type ProjectGroupContainerResolverEvents = {
-	create: (args: ({ container: ProjectGroupContainer; slug: string | undefined})) => void | (() => void)
+	create: (args: { container: ProjectGroupContainer; slug: string | undefined }) => void | (() => void)
 }
-
 
 export class ProjectGroupContainerResolver implements EventEmitter<ProjectGroupContainerResolverEvents> {
 	private containers = new PromiseMap<string | undefined, ContainerWithMeta>()
-	private eventManager = new EventManager< ProjectGroupContainerResolverEvents>()
+	private eventManager = new EventManager<ProjectGroupContainerResolverEvents>()
 
 	public readonly on = this.eventManager.on.bind(this.eventManager)
 

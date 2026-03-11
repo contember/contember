@@ -58,7 +58,8 @@ export const poolStatsDescription = {
 	connection_recoverable_error_count: 'Number of connections that failed on recoverable error (e.g. 53300) and retry was tried.',
 	connection_error_count: 'Number of non-recoverable errors or recoverable errors reaching max attempts.',
 	connection_disposed_idle_timeout_count: 'Number of idle connection, that was disposed after configured timeout.',
-	connection_disposed_idle_max_count: 'Number of idle connections, that was immediately disposed, because maximum number of idle connection was reached.',
+	connection_disposed_idle_max_count:
+		'Number of idle connections, that was immediately disposed, because maximum number of idle connection was reached.',
 	connection_disposed_old_count: 'Number of connections, that was too old after it was released.',
 	connection_disposed_manual_count: 'Number of manually disposed connection (e.g. due to exception on given connection).',
 	connection_released_count: 'Number of connection returned to the pool.',
@@ -100,7 +101,6 @@ class PendingItem {
 }
 
 class Pool {
-
 	/**
 	 * pool was closed by calling end().
 	 * All connection was disposed, and it is not possible to acquire new one
@@ -203,7 +203,6 @@ class Pool {
 		return pendingItem
 	}
 
-
 	public release(poolConnection: PoolConnection): void {
 		if (this.ended) {
 			return
@@ -214,7 +213,8 @@ class Pool {
 		}
 		if (
 			(this.poolConfig.maxUses && poolConnection.uses >= this.poolConfig.maxUses)
-			|| (this.poolConfig.maxAgeMs && poolConnection.createdAt + this.poolConfig.maxAgeMs < Date.now())) {
+			|| (this.poolConfig.maxAgeMs && poolConnection.createdAt + this.poolConfig.maxAgeMs < Date.now())
+		) {
 			setImmediate(async () => {
 				await this.disposeConnection(poolConnection)
 				this.poolStats.connection_disposed_old_count++
@@ -225,7 +225,6 @@ class Pool {
 		}
 		this.handleAvailableConnection(poolConnection)
 	}
-
 
 	public dispose(poolConnection: PoolConnection): void {
 		if (this.ended) {
@@ -243,7 +242,6 @@ class Pool {
 		this.maybeCreateNew()
 	}
 
-
 	public async end(): Promise<void> {
 		this.ended = true
 		this.queue.forEach(it => it.reject(new PoolClosedError()))
@@ -254,14 +252,12 @@ class Pool {
 		this.active.clear()
 	}
 
-
 	public async closeIdle(): Promise<void> {
 		this.log('Disposing all idle connection on request.')
 		const idle = this.idle
 		this.idle = []
 		await Promise.allSettled(idle.map(it => this.disposeConnection(it)))
 	}
-
 
 	public getPoolStatus(): PoolStatus {
 		return {
@@ -273,7 +269,6 @@ class Pool {
 			stats: this.poolStats,
 		}
 	}
-
 
 	private async maybeCreateNew(): Promise<void> {
 		if (this.ended) {
@@ -335,7 +330,6 @@ class Pool {
 
 			this.handleAvailableConnection(poolConnection)
 			this.maybeCreateNew()
-
 		} catch (e: any) {
 			this.log('Connection error occurred: ' + e.message)
 			this.disposeConnection(poolConnection)
@@ -355,7 +349,6 @@ class Pool {
 					this.log('Retrying')
 					this.maybeCreateNew()
 				}, this.poolConfig.reconnectIntervalMs)
-
 			} else {
 				this.poolStats.connection_error_count++
 				this.connectingCount--
@@ -371,7 +364,6 @@ class Pool {
 					this.poolConfig.logError(clientError)
 				}
 			}
-
 		} finally {
 			setTimeout(() => {
 				if (this.remainingRateLimit === 0) {
@@ -461,7 +453,6 @@ class Pool {
 			this.log('Connection is idle and available.')
 		}
 	}
-
 
 	private removeIdleConnection(poolConnection: PoolConnection) {
 		const index = this.idle.indexOf(poolConnection)

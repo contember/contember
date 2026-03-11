@@ -61,9 +61,10 @@ describe('event manager', () => {
 			},
 		})
 		entity.getAccessor().getField('fooField').updateValue('bar')
-		await expect(() => eventManager.triggerOnBeforePersist()).toThrow('A beforePersist event handler cannot be asynchronous and alter the accessor tree at the same time. To achieve this, prepare your data asynchronously but only touch the tree from a returned callback.')
+		await expect(() => eventManager.triggerOnBeforePersist()).toThrow(
+			'A beforePersist event handler cannot be asynchronous and alter the accessor tree at the same time. To achieve this, prepare your data asynchronously but only touch the tree from a returned callback.',
+		)
 	})
-
 
 	it('fails when triggering async beforePersist, trying to update data #2', async () => {
 		const { entity, eventManager } = prepareBeforePersistTest({
@@ -73,7 +74,9 @@ describe('event manager', () => {
 			},
 		})
 		entity.getAccessor().getField('fooField').updateValue('bar')
-		await expect(eventManager.triggerOnBeforePersist()).rejects.toThrow('A beforePersist event handler cannot be asynchronous and alter the accessor tree at the same time. To achieve this, prepare your data asynchronously but only touch the tree from a returned callback.')
+		await expect(eventManager.triggerOnBeforePersist()).rejects.toThrow(
+			'A beforePersist event handler cannot be asynchronous and alter the accessor tree at the same time. To achieve this, prepare your data asynchronously but only touch the tree from a returned callback.',
+		)
 	})
 
 	it('fails when sync event handler fails', async () => {
@@ -83,9 +86,10 @@ describe('event manager', () => {
 			},
 		})
 		entity.getAccessor().getField('fooField').updateValue('bar')
-		await expect(() => eventManager.triggerOnBeforePersist()).toThrow('A beforePersist handler returned a promise that rejected. This is a no-op that will fail silently in production.')
+		await expect(() => eventManager.triggerOnBeforePersist()).toThrow(
+			'A beforePersist handler returned a promise that rejected. This is a no-op that will fail silently in production.',
+		)
 	})
-
 
 	it('fails when async event handler fails', async () => {
 		const { entity, eventManager } = prepareBeforePersistTest({
@@ -95,7 +99,9 @@ describe('event manager', () => {
 			},
 		})
 		entity.getAccessor().getField('fooField').updateValue('bar')
-		await expect(eventManager.triggerOnBeforePersist()).rejects.toThrow('A beforePersist handler returned a promise that rejected. This is a no-op that will fail silently in production.')
+		await expect(eventManager.triggerOnBeforePersist()).rejects.toThrow(
+			'A beforePersist handler returned a promise that rejected. This is a no-op that will fail silently in production.',
+		)
 	})
 
 	it('fails when async event handler fails #2', async () => {
@@ -106,6 +112,8 @@ describe('event manager', () => {
 		})
 		entity.getAccessor().getField('fooField').updateValue('bar')
 		const result = eventManager.triggerOnBeforePersist()
-		await expect(result).rejects.toThrow('A beforePersist handler returned a promise that rejected. This is a no-op that will fail silently in production.')
+		await expect(result).rejects.toThrow(
+			'A beforePersist handler returned a promise that rejected. This is a no-op that will fail silently in production.',
+		)
 	})
 })

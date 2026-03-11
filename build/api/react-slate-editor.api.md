@@ -12,7 +12,7 @@ import { Element as Element_2 } from 'slate';
 import { EntityAccessor } from '@contember/react-binding';
 import { EntityId } from '@contember/react-binding';
 import type { FunctionComponent } from 'react';
-import { JSX as JSX_2 } from 'react/jsx-runtime';
+import { JSX } from 'react/jsx-runtime';
 import { NamedExoticComponent } from 'react';
 import { Path } from 'slate';
 import { Range as Range_2 } from 'slate';
@@ -48,7 +48,7 @@ export interface BlockProps {
     // (undocumented)
     name: string;
     // (undocumented)
-    render: ({}: BlockRendererProps) => ReactNode;
+    render: (input: BlockRendererProps) => ReactNode;
 }
 
 // @public (undocumented)
@@ -69,7 +69,7 @@ export const EditorBlockElementContext: Context<RenderElementProps>;
 export const EditorGetReferencedEntityContext: Context<GetReferencedEntity>;
 
 // @public (undocumented)
-export const EditorInlineReferencePortal: (props: EditorInlineReferenceTriggerProps) => JSX_2.Element | null;
+export const EditorInlineReferencePortal: (props: EditorInlineReferenceTriggerProps) => JSX.Element | null;
 
 // @public (undocumented)
 export interface EditorInlineReferenceTriggerProps {
@@ -97,7 +97,7 @@ export interface EditorReferenceMethods {
 export const EditorReferenceMethodsContext: Context<EditorReferenceMethods>;
 
 // @public (undocumented)
-export const EditorReferenceTrigger: ({ referenceType, initialize, ...props }: EditorReferenceTriggerProps) => JSX_2.Element;
+export const EditorReferenceTrigger: (input: EditorReferenceTriggerProps) => JSX.Element;
 
 // @public (undocumented)
 export interface EditorReferenceTriggerProps {
@@ -146,7 +146,7 @@ export const useEditorReferenceMethods: () => EditorReferenceMethods;
 export const withReferences: (args: ReferencesPluginArgs) => EditorPlugin;
 
 // @public (undocumented)
-export const withSortable: ({ render: Sortable }: {
+export const withSortable: (input: {
     render: (props: {
         element: EditorElement;
         children: ReactNode;

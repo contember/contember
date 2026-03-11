@@ -36,7 +36,7 @@ export const resolveDefaultValue = (column: Model.AnyColumn, providers: Pick<Pro
 		case Model.ColumnType.Uuid:
 			break
 		default:
-			((x: never) => {})(type)
+			;((x: never) => {})(type)
 	}
 
 	if (column.nullable) {

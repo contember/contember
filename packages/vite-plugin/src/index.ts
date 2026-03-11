@@ -111,8 +111,8 @@ export const contember = (options?: ContemberOptions): Plugin => {
 			server.middlewares.use((req, res, next) => {
 				const [pathname] = req.url?.split('?') ?? []
 
-				const isSpaRoute = pathname === normalizedAppPath ||
-					(pathname.startsWith(`${normalizedAppPath}/`) && !pathname.match(/\.\w+$/))
+				const isSpaRoute = pathname === normalizedAppPath
+					|| (pathname.startsWith(`${normalizedAppPath}/`) && !pathname.match(/\.\w+$/))
 
 				if (isSpaRoute) {
 					req.url = `${normalizedAppPath}/`

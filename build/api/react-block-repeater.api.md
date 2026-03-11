@@ -6,7 +6,7 @@
 
 import { Context } from 'react';
 import { EntityAccessor } from '@contember/react-binding';
-import { JSX as JSX_2 } from 'react/jsx-runtime';
+import { JSX } from 'react/jsx-runtime';
 import { NamedExoticComponent } from 'react';
 import { ReactElement } from 'react';
 import { ReactNode } from 'react';
@@ -29,7 +29,7 @@ export interface BlockProps {
 export const BlockRepeater: NamedExoticComponent<BlockRepeaterProps>;
 
 // @public
-export const BlockRepeaterAddItemTrigger: ({ preprocess, index, type, ...props }: BlockRepeaterAddItemTriggerProps) => JSX_2.Element;
+export const BlockRepeaterAddItemTrigger: (input: BlockRepeaterAddItemTriggerProps) => JSX.Element;
 
 // @public
 export interface BlockRepeaterAddItemTriggerProps {

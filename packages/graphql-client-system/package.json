@@ -28,13 +28,13 @@
   },
   "dependencies": {
     "@contember/schema": "workspace:*",
-    "graphql-ts-client-api": "^3.1.17"
+    "graphql-ts-client-api": "catalog:"
   },
   "devDependencies": {
     "@contember/engine-system-api": "workspace:*",
-    "@graphql-tools/schema": "^10.0.7",
-    "@types/node": "^20.17.22",
-    "graphql": "^16.9.0",
-    "graphql-ts-client-codegen": "^3.1.17"
+    "@graphql-tools/schema": "catalog:",
+    "@types/node": "catalog:",
+    "graphql": "catalog:",
+    "graphql-ts-client-codegen": "catalog:"
   }
 }

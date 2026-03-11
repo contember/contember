@@ -18,9 +18,7 @@ export interface DockerComposeConfig {
 	services?: Record<string, DockerComposeServiceConfig>
 }
 
-
 const MAIN_CONFIGS = ['docker-compose.yaml', 'docker-compose.yml']
-
 
 export class DockerComposeManager {
 	constructor(
@@ -59,5 +57,4 @@ export class DockerComposeManager {
 		}
 		return null
 	}
-
 }

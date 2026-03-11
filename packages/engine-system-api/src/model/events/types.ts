@@ -60,4 +60,3 @@ export class DeleteEvent implements Event {
 	) {
 	}
 }
-

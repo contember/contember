@@ -9,7 +9,7 @@ import { createErrorHandler } from '@contember/react-devbar';
 import { EntityAccessor } from '@contember/react-binding';
 import { Environment } from '@contember/react-binding';
 import { ErrorPersistResult } from '@contember/react-binding';
-import { JSX as JSX_2 } from 'react/jsx-runtime';
+import { JSX } from 'react/jsx-runtime';
 import { NamedExoticComponent } from 'react';
 import { ReactNode } from 'react';
 import { RequestParameters } from '@contember/react-routing';
@@ -20,7 +20,7 @@ import { SugaredRelativeSingleEntity } from '@contember/react-binding';
 import { SugaredRelativeSingleField } from '@contember/react-binding';
 
 // @public (undocumented)
-export const ApplicationEntrypoint: (props: ApplicationEntrypointProps) => JSX_2.Element;
+export const ApplicationEntrypoint: (props: ApplicationEntrypointProps) => JSX.Element;
 
 // @public (undocumented)
 export interface ApplicationEntrypointProps extends ContemberClientProps {
@@ -53,7 +53,7 @@ export interface ClearFieldTriggerProps {
 export { createErrorHandler }
 
 // @public (undocumented)
-export const DisconnectEntityTrigger: ({ immediatePersist, onPersistError, onPersistSuccess, field, ...props }: DisconnectEntityTriggerProps) => JSX_2.Element;
+export const DisconnectEntityTrigger: (input: DisconnectEntityTriggerProps) => JSX.Element;
 
 // @public (undocumented)
 export interface DisconnectEntityTriggerProps {
@@ -70,12 +70,12 @@ export interface DisconnectEntityTriggerProps {
 }
 
 // @public (undocumented)
-export const EntityBeforePersist: ({ listener }: {
+export const EntityBeforePersist: (input: {
     listener: EntityAccessor.EntityEventListenerMap["beforePersist"];
 }) => null;
 
 // @public (undocumented)
-export const RedirectOnPersist: ({ to, parameters }: {
+export const RedirectOnPersist: (input: {
     to: RoutingLinkTarget;
     parameters?: RequestParameters;
 }) => null;
@@ -87,7 +87,7 @@ export const useBlockNavigationOnDirtyState: (handler: () => Promise<BlockNaviga
 }) => void;
 
 // @public (undocumented)
-export const useIsApplicationOutdated: ({ checkIntervalMs }?: {
+export const useIsApplicationOutdated: (input?: {
     checkIntervalMs?: number;
 }) => boolean;
 

@@ -7,7 +7,7 @@ describe('printJsValue', () => {
 	})
 
 	test('string escape', () => {
-		expect(printJsValue('foo\'bar')).toEqual(`'foo\\'bar'`)
+		expect(printJsValue("foo'bar")).toEqual(`'foo\\'bar'`)
 	})
 
 	test('number', () => {
@@ -31,7 +31,8 @@ describe('printJsValue', () => {
 	1,
 	2,
 	3,
-]`)
+]`,
+		)
 	})
 
 	test('inline object', () => {
@@ -43,7 +44,8 @@ describe('printJsValue', () => {
 			`{
 	a: 1,
 	b: 2,
-}`)
+}`,
+		)
 	})
 
 	test('nested block object', () => {
@@ -57,16 +59,17 @@ describe('printJsValue', () => {
 			},
 		},
 	},
-}`)
+}`,
+		)
 	})
-
 
 	test('one level nested block object', () => {
 		expect(printJsValue({ a: 1, b: { c: { d: { e: 1 } } } }, (_, path) => path.length === 0)).toEqual(
 			`{
 	a: 1,
 	b: { c: { d: { e: 1 } } },
-}`)
+}`,
+		)
 	})
 
 	test('nested block object and arr', () => {
@@ -83,6 +86,7 @@ describe('printJsValue', () => {
 			6,
 		],
 	],
-}`)
+}`,
+		)
 	})
 })

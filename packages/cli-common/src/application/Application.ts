@@ -8,7 +8,7 @@ export class Application {
 		private readonly commandManager: CommandManager,
 		private readonly applicationDescription: string,
 		private readonly options: {
-			beforeRun?: (args: {command: Command<any, any>; name: string; args: string[]}) => void
+			beforeRun?: (args: { command: Command<any, any>; name: string; args: string[] }) => void
 		} = {},
 	) {}
 
@@ -29,9 +29,11 @@ export class Application {
 				const configuration = command.getConfiguration()
 				const indent = '    '
 				console.error(
-					`${indent}${chalk.greenBright(
-						commandName.padEnd(maxCommandNameLength),
-					)}${indent}${configuration.getDescription()}`,
+					`${indent}${
+						chalk.greenBright(
+							commandName.padEnd(maxCommandNameLength),
+						)
+					}${indent}${configuration.getDescription()}`,
 				)
 				if (name === '--help') {
 					const helpIndent = `${indent}${' '.repeat(maxCommandNameLength)}${indent}`

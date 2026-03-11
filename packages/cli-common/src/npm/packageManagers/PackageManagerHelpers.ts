@@ -20,7 +20,9 @@ export class PackageManagerHelpers {
 			return [packageJson, it] as const
 		}))
 
-		return packageJson.filter(<T>(it: T | null): it is T => it !== null).map(([packageJson, subDir]) => new Package(join(dir, subDir), false, packageJson))
+		return packageJson.filter(<T>(it: T | null): it is T => it !== null).map(([packageJson, subDir]) =>
+			new Package(join(dir, subDir), false, packageJson)
+		)
 	}
 
 	static getWorkspacesFromPackageJson({ packageJson }: { packageJson: PackageJson }): string[] {

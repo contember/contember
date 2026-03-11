@@ -1,24 +1,13 @@
 import { MigrationBuilder } from '@contember/database-migrations'
 import { Model, Schema } from '@contember/schema'
 import { SchemaUpdater, updateEntity, updateField, updateModel } from '../utils/schemaUpdateUtils'
-import {
-	createModificationType,
-	Differ,
-	ModificationHandler,
-	ModificationHandlerCreateSqlOptions,
-} from '../ModificationHandler'
-import {
-	createEventTrigger,
-	createEventTrxTrigger,
-	dropEventTrigger,
-	dropEventTrxTrigger,
-} from '../utils/sqlUpdateUtils'
+import { createModificationType, Differ, ModificationHandler, ModificationHandlerCreateSqlOptions } from '../ModificationHandler'
+import { createEventTrigger, createEventTrxTrigger, dropEventTrigger, dropEventTrxTrigger } from '../utils/sqlUpdateUtils'
 import { isOwningRelation, isRelation } from '@contember/schema-utils'
 import { updateRelations } from '../utils/diffUtils'
 import { isIt } from '../../utils/isIt'
 
 export class ToggleJunctionEventLogModificationHandler implements ModificationHandler<ToggleJunctionEventLogModificationData> {
-
 	constructor(
 		private readonly data: ToggleJunctionEventLogModificationData,
 		private readonly schema: Schema,
@@ -84,12 +73,12 @@ export const toggleJunctionEventLogModification = createModificationType({
 })
 
 export class ToggleJunctionEventLogDiffer implements Differ {
-	 createDiff(originalSchema: Schema, updatedSchema: Schema) {
+	createDiff(originalSchema: Schema, updatedSchema: Schema) {
 		return updateRelations(originalSchema, updatedSchema, ({ originalRelation, updatedRelation, updatedEntity }) => {
 			if (
-				originalRelation.type === updatedRelation.type &&
-				isIt<Model.JoiningTableRelation>(updatedRelation, 'joiningTable') &&
-				isIt<Model.JoiningTableRelation>(originalRelation, 'joiningTable')
+				originalRelation.type === updatedRelation.type
+				&& isIt<Model.JoiningTableRelation>(updatedRelation, 'joiningTable')
+				&& isIt<Model.JoiningTableRelation>(originalRelation, 'joiningTable')
 			) {
 				const newValue = updatedRelation.joiningTable.eventLog?.enabled ?? false
 				const oldValue = originalRelation.joiningTable.eventLog?.enabled ?? false
@@ -103,6 +92,5 @@ export class ToggleJunctionEventLogDiffer implements Differ {
 			}
 			return undefined
 		})
-
 	}
 }

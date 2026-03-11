@@ -1,10 +1,4 @@
-import {
-	GraphQLBoolean,
-	GraphQLInputFieldConfig,
-	GraphQLInputFieldConfigMap,
-	GraphQLInputObjectType, GraphQLNonNull,
-	GraphQLString,
-} from 'graphql'
+import { GraphQLBoolean, GraphQLInputFieldConfig, GraphQLInputFieldConfigMap, GraphQLInputObjectType, GraphQLNonNull, GraphQLString } from 'graphql'
 import { Acl, Input, Model } from '@contember/schema'
 import { GqlTypeName } from '../utils'
 import { WhereTypeProvider } from '../WhereTypeProvider'
@@ -16,9 +10,9 @@ import { Authorizator } from '../../acl'
 import { ImplementationException } from '../../exception'
 import { ConnectOrCreateRelationInputProvider } from './ConnectOrCreateRelationInputProvider'
 
-export class UpdateEntityRelationInputFieldVisitor implements Model.ColumnVisitor<never>,
-	Model.RelationByGenericTypeVisitor<GraphQLInputObjectType | undefined> {
-
+export class UpdateEntityRelationInputFieldVisitor
+	implements Model.ColumnVisitor<never>, Model.RelationByGenericTypeVisitor<GraphQLInputObjectType | undefined>
+{
 	constructor(
 		private readonly schema: Model.Schema,
 		private readonly authorizator: Authorizator,
@@ -44,7 +38,7 @@ export class UpdateEntityRelationInputFieldVisitor implements Model.ColumnVisito
 		const createInput = createInputType ? { type: createInputType } : undefined
 
 		const updateInputType = this.updateEntityInputProviderAccessor.get().getInput(targetEntity.name, withoutRelation)
-		const updateInput = updateInputType ? {  type: updateInputType } : undefined
+		const updateInput = updateInputType ? { type: updateInputType } : undefined
 
 		const upsertInput = updateInputType && createInputType
 			? {
@@ -164,8 +158,7 @@ export class UpdateEntityRelationInputFieldVisitor implements Model.ColumnVisito
 		)
 		return filterObject(
 			graphQlFields,
-			(key, value): value is GraphQLInputFieldConfig =>
-				allowedOperations.includes(key as Input.UpdateRelationOperation) && value !== undefined,
+			(key, value): value is GraphQLInputFieldConfig => allowedOperations.includes(key as Input.UpdateRelationOperation) && value !== undefined,
 		)
 	}
 

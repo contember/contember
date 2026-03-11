@@ -23,7 +23,7 @@ function useDesugaredRelativeSingleField(
 ): RelativeSingleField | undefined {
 	const environment = useEnvironment()
 
-	let normalizedSugared: SugaredRelativeSingleField | undefined = undefined
+	let normalizedSugared: SugaredRelativeSingleField | undefined
 	let hasField: boolean
 
 	if (sugaredRelativeSingleField === undefined) {
@@ -48,9 +48,8 @@ function useDesugaredRelativeSingleField(
 						isNonbearing: normalizedSugared?.isNonbearing,
 					},
 					environment,
-				  )
+				)
 				: undefined,
-		// eslint-disable-next-line react-hooks/exhaustive-deps
 		[normalizedSugared?.field, normalizedSugared?.defaultValue, normalizedSugared?.isNonbearing, environment, hasField],
 	)
 }

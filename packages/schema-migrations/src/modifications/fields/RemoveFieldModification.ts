@@ -6,7 +6,6 @@ import { createModificationType, Differ, ModificationHandler, ModificationHandle
 import { isDefined } from '../../utils/isDefined'
 
 export class RemoveFieldModificationHandler implements ModificationHandler<RemoveFieldModificationData> {
-
 	constructor(
 		private readonly data: RemoveFieldModificationData,
 		private readonly schema: Schema,
@@ -44,7 +43,6 @@ export class RemoveFieldModificationHandler implements ModificationHandler<Remov
 	describe() {
 		return { message: `Remove field ${this.data.entityName}.${this.data.fieldName}`, isDestructive: true }
 	}
-
 }
 
 export interface RemoveFieldModificationData {

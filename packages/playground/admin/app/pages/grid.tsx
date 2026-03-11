@@ -11,7 +11,8 @@ import {
 	DataGridDateColumn,
 	DataGridDateFilter,
 	DataGridEnumColumn,
-	DataGridEnumFilter, DataGridEnumListColumn,
+	DataGridEnumFilter,
+	DataGridEnumListColumn,
 	DataGridHasManyColumn,
 	DataGridHasManyFilter,
 	DataGridHasManyTooltip,
@@ -48,7 +49,6 @@ export const SimpleGrid = () => {
 			</Slots.Title>
 
 			<Binding>
-
 				<DefaultDataGrid
 					entities="GridArticle"
 					initialSelection={{
@@ -57,7 +57,9 @@ export const SimpleGrid = () => {
 						},
 					}}
 				>
-					<DataGridActionColumn><Button>Show detail</Button></DataGridActionColumn>
+					<DataGridActionColumn>
+						<Button>Show detail</Button>
+					</DataGridActionColumn>
 					<DataGridTextColumn header="Title" field="title" />
 					<DataGridEnumColumn header="State" field="state" options={GridArticleStateLabels} />
 					<DataGridColumn header="test" hidingName="test">
@@ -84,7 +86,6 @@ export default () => {
 			</Slots.Title>
 
 			<Binding>
-
 				<Slots.Actions>
 					<Button>Add article</Button>
 				</Slots.Actions>
@@ -100,7 +101,6 @@ export default () => {
 					</DataGridToolbar>
 
 					<DataGridLoader>
-
 						<DataGridTable>
 							<CustomGridColumn />
 						</DataGridTable>
@@ -109,17 +109,19 @@ export default () => {
 							<CustomGridTile />
 						</DataGridTiles>
 
-						<DataViewLayout name="rows" label={(
-							<>
-								<RowsIcon className="w-3 h-3" />
-								<span>Rows</span>
-							</>
-						)}>
+						<DataViewLayout
+							name="rows"
+							label={
+								<>
+									<RowsIcon className="w-3 h-3" />
+									<span>Rows</span>
+								</>
+							}
+						>
 							<DataViewEachRow>
 								<CustomGridRow />
 							</DataViewEachRow>
 						</DataViewLayout>
-
 					</DataGridLoader>
 
 					<DataGridPagination sticky />
@@ -130,50 +132,54 @@ export default () => {
 }
 
 const CustomGridColumn = Component(() => {
-	return <>
-		<DataGridActionColumn><Button>Show detail</Button></DataGridActionColumn>
+	return (
+		<>
+			<DataGridActionColumn>
+				<Button>Show detail</Button>
+			</DataGridActionColumn>
 
-		<DataGridTextColumn header="Title" field="title" />
+			<DataGridTextColumn header="Title" field="title" />
 
-		<DataGridEnumColumn field="state" />
-		<DataGridEnumListColumn field="target" options={{ a: 'A', b: 'B', c: 'C' }} />
+			<DataGridEnumColumn field="state" />
+			<DataGridEnumListColumn field="target" options={{ a: 'A', b: 'B', c: 'C' }} />
 
-		<DataGridDateColumn header="Published at" field="publishedAt" />
+			<DataGridDateColumn header="Published at" field="publishedAt" />
 
-		<DataGridHasOneColumn header="Author" field="author">
-			<Field field="name" />
-		</DataGridHasOneColumn>
+			<DataGridHasOneColumn header="Author" field="author">
+				<Field field="name" />
+			</DataGridHasOneColumn>
 
-		<DataGridHasOneColumn header="Category" field="category">
-			<Field field="name" />
-		</DataGridHasOneColumn>
+			<DataGridHasOneColumn header="Category" field="category">
+				<Field field="name" />
+			</DataGridHasOneColumn>
 
-		<DataGridHasManyColumn header="Tags" field="tags">
-			<Field field="name" />
-		</DataGridHasManyColumn>
+			<DataGridHasManyColumn header="Tags" field="tags">
+				<Field field="name" />
+			</DataGridHasManyColumn>
 
-		<DataGridColumn header="Comment authors">
-			<div className="flex flex-wrap gap-2">
-				<HasMany field="comments">
-					<HasOne field="author">
-						<DataGridHasManyTooltip field="comments.author">
-							<span className="cursor-pointer border-dashed border-b border-b-gray-400 hover:border-gray-800">
-								<Field field="name" />
-							</span>
-						</DataGridHasManyTooltip>
-					</HasOne>
-				</HasMany>
-			</div>
-		</DataGridColumn>
+			<DataGridColumn header="Comment authors">
+				<div className="flex flex-wrap gap-2">
+					<HasMany field="comments">
+						<HasOne field="author">
+							<DataGridHasManyTooltip field="comments.author">
+								<span className="cursor-pointer border-dashed border-b border-b-gray-400 hover:border-gray-800">
+									<Field field="name" />
+								</span>
+							</DataGridHasManyTooltip>
+						</HasOne>
+					</HasMany>
+				</div>
+			</DataGridColumn>
 
-		<DataGridBooleanColumn header="Locked" field="locked" />
-		<DataGridNumberColumn header="Views" field="views" />
-		<DataGridIsDefinedColumn header="Is published" field="publishedAt" filterName="publishedAt__defined" />
+			<DataGridBooleanColumn header="Locked" field="locked" />
+			<DataGridNumberColumn header="Views" field="views" />
+			<DataGridIsDefinedColumn header="Is published" field="publishedAt" filterName="publishedAt__defined" />
 
-		<DataGridActionColumn>
-			<GridDropdown />
-		</DataGridActionColumn>
-	</>
+			<DataGridActionColumn>
+				<GridDropdown />
+			</DataGridActionColumn>
+		</>
+	)
 })
 
 const CustomGridFilters = Component(() => {
@@ -218,7 +224,6 @@ const CustomGridFilters = Component(() => {
 		</>
 	)
 })
-
 
 const CustomGridTile = Component(() => (
 	<div className="bg-white rounded-md p-4 shadow-md relative flex flex-col gap-2 border border-gray-200 hover:shadow-xl transition-all duration-200">
@@ -293,7 +298,9 @@ const CustomGridRow = Component(() => (
 					</HasOne>
 				</DataViewElement>
 
-				<span className="text-lg font-bold"><Field field="title" /></span>
+				<span className="text-lg font-bold">
+					<Field field="title" />
+				</span>
 
 				<DataViewElement name="tags" label="Tags">
 					<HasMany field="tags">
@@ -306,7 +313,10 @@ const CustomGridRow = Component(() => (
 				</DataViewElement>
 			</div>
 			<div className="flex gap-2 text-sm text-gray-500">
-				published <Field field="publishedAt" format={formatDate} /> by <span className="font-semibold"><Field field="author.name" /></span>
+				published <Field field="publishedAt" format={formatDate} /> by{' '}
+				<span className="font-semibold">
+					<Field field="author.name" />
+				</span>
 			</div>
 		</div>
 
@@ -328,8 +338,12 @@ const GridDropdown = () => (
 		<DropdownMenuItem>Edit</DropdownMenuItem>
 		<DropdownMenuItem>Make a copy</DropdownMenuItem>
 		<DropdownMenuSeparator />
-		<DeleteEntityDialog trigger={<DropdownMenuItem onSelect={e => e.preventDefault()}>
-			Delete
-		</DropdownMenuItem>} />
+		<DeleteEntityDialog
+			trigger={
+				<DropdownMenuItem onSelect={e => e.preventDefault()}>
+					Delete
+				</DropdownMenuItem>
+			}
+		/>
 	</DefaultDropdown>
 )

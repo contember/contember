@@ -35,8 +35,7 @@ export interface BranchMarkerProvider<Props extends {} = any> {
 // This is just to make the typings less confusing and verbose downstream.
 export type StaticRenderProviderProps<Props extends {} = any, NonStaticPropNames extends keyof Props = never> = [
 	NonStaticPropNames,
-] extends [never]
-	? Props
+] extends [never] ? Props
 	: Omit<Props, NonStaticPropNames>
 
 export interface StaticRenderProvider<Props extends {} = any, NonStaticPropNames extends keyof Props = never> {
@@ -49,10 +48,11 @@ export interface StaticRenderProvider<Props extends {} = any, NonStaticPropNames
 export type CompleteMarkerProvider<
 	Props extends {} = any,
 	NonStaticPropNames extends keyof Props = never,
-> = EnvironmentDeltaProvider<Props> &
-LeafMarkerProvider<Props> &
-BranchMarkerProvider<Props> &
-StaticRenderProvider<Props, NonStaticPropNames>
+> =
+	& EnvironmentDeltaProvider<Props>
+	& LeafMarkerProvider<Props>
+	& BranchMarkerProvider<Props>
+	& StaticRenderProvider<Props, NonStaticPropNames>
 
 export type MarkerProvider<Props extends {} = any, NonStaticPropNames extends keyof Props = never> = Partial<
 	CompleteMarkerProvider<Props, NonStaticPropNames>

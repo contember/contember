@@ -21,9 +21,11 @@ export class SignInMutationResolver implements MutationResolvers {
 
 		const nextAllowedSignIn = await context.db.queryHandler.fetch(new NextLoginAttemptQuery(args.email))
 		if (nextAllowedSignIn > new Date()) {
-			return createErrorResponse(new ResponseError('RATE_LIMIT_EXCEEDED', `Too many attempts, please try again later.`, {
-				retryAfter: Math.ceil((nextAllowedSignIn.getTime() - Date.now()) / 1000),
-			}))
+			return createErrorResponse(
+				new ResponseError('RATE_LIMIT_EXCEEDED', `Too many attempts, please try again later.`, {
+					retryAfter: Math.ceil((nextAllowedSignIn.getTime() - Date.now()) / 1000),
+				}),
+			)
 		}
 
 		const response = await this.signInManager.signIn(
@@ -38,10 +40,12 @@ export class SignInMutationResolver implements MutationResolvers {
 			response,
 		})
 
-
 		if (!response.ok) {
 			const configuration = await context.db.queryHandler.fetch(new ConfigurationQuery())
-			if (!configuration.login.revealUserExists && ['NO_PASSWORD_SET', 'NO_PASSWORD_SET', 'PERSON_DISABLED', 'INVALID_PASSWORD', 'UNKNOWN_EMAIL'].includes(response.error)) {
+			if (
+				!configuration.login.revealUserExists
+				&& ['NO_PASSWORD_SET', 'NO_PASSWORD_SET', 'PERSON_DISABLED', 'INVALID_PASSWORD', 'UNKNOWN_EMAIL'].includes(response.error)
+			) {
 				// if the user does not exist, we don't want to reveal that, so we return a generic error
 				return createErrorResponse('INVALID_CREDENTIALS', 'Invalid credentials')
 			}
@@ -73,10 +77,11 @@ export class SignInMutationResolver implements MutationResolvers {
 			context.db,
 			identifier,
 			args.expiration || undefined,
-			async person => await context.requireAccess({
-				action: PermissionActions.PERSON_CREATE_SESSION_KEY(person.roles),
-				message: 'You are not allowed to create a session key for this person.',
-			}),
+			async person =>
+				await context.requireAccess({
+					action: PermissionActions.PERSON_CREATE_SESSION_KEY(person.roles),
+					message: 'You are not allowed to create a session key for this person.',
+				}),
 		)
 		await context.logAuthAction({
 			type: 'create_session_token',

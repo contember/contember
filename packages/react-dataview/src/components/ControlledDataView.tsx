@@ -19,7 +19,6 @@ import { DataViewLoader } from '../internal/components/DataViewLoader'
 import { DataViewInfo, DataViewMethods, DataViewState } from '../types'
 import { dataViewSelectionEnvironmentExtension } from '../env/dataViewSelectionEnvironmentExtension'
 
-
 export interface ControlledDataViewProps {
 	children: ReactNode
 	state: DataViewState

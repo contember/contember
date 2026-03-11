@@ -4,7 +4,6 @@ import { PasswordResetRequestFormFields } from '~/lib/tenant'
 import { AnchorButton } from '~/lib/ui/button'
 import { Link, PasswordResetRequestForm, useRedirect } from '@contember/interface'
 
-
 export default () => {
 	const redirect = useRedirect()
 	return (

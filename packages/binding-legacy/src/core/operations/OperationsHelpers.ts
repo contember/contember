@@ -29,7 +29,7 @@ export class OperationsHelpers {
 			throw new BindingError(`Attempting to connect an entity with key '${entityToConnectKey}' but it doesn't exist.`)
 		}
 		// TODO This is commented out for now in order to at least somewhat mitigate the limitations of dealing with
-		//		inverse relations. However, once that has been addressed systemically, this code needs to be re-enabled.
+		// 		inverse relations. However, once that has been addressed systemically, this code needs to be re-enabled.
 		// if (!stateToConnect.entity.id.existsOnServer) {
 		// 	throw new BindingError(
 		// 		`Attempting to connect an entity with key '${stateToConnect.realmKey}' that ` +
@@ -134,7 +134,7 @@ export class OperationsHelpers {
 		// Version 1.
 		// The listeners subscribed to a particular entity key so we no longer want to call these.
 		// The only positionally associated listeners are in the blueprint so we re-initialize those.
-		//realm.eventListeners = stateInitializer.initializeEntityEventListenerStore(realmBlueprint)
+		// realm.eventListeners = stateInitializer.initializeEntityEventListenerStore(realmBlueprint)
 
 		// Version 2.
 		// This is version two of this terrible hack. We want to preserve e.g. persistSuccess handlers.

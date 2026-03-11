@@ -12,7 +12,6 @@ export interface EntityViewProps {
  * @group Data binding
  */
 export function EntityView(props: EntityViewProps) {
-	// eslint-disable-next-line react-hooks/rules-of-hooks
 	const entity = 'field' in props ? useEntity(props.field)! : useEntity()
 
 	return <>{props.render(entity)}</>

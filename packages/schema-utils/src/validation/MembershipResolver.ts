@@ -3,7 +3,6 @@ import { getRoleVariables } from '../acl'
 import { conditionSchema } from '../type-schema'
 import { assertNever } from '../utils'
 
-
 export class MembershipResolver {
 	public static UnknownIdentity = { identityId: '00000000-0000-0000-0000-000000000000' }
 
@@ -88,7 +87,6 @@ export class MembershipResolver {
 
 			if (variable.type === Acl.VariableType.entity) {
 				parsedVariables.push({ name, condition: { in: inputVariable.values } }) // todo: cast to int where primary is int
-
 			} else if (variable.type === Acl.VariableType.condition) {
 				try {
 					const conditions = inputVariable.values.map(it => conditionSchema()(JSON.parse(it)))
@@ -131,7 +129,6 @@ export enum MembershipValidationErrorType {
 	VARIABLE_EMPTY = 'variableEmpty',
 	VARIABLE_INVALID = 'variableInvalid',
 }
-
 
 export interface ParsedMembershipVariable {
 	readonly name: string

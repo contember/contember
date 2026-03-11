@@ -2,7 +2,6 @@ import { expect, test } from 'bun:test'
 import { createSchema, SchemaDefinition as def } from '@contember/schema-definition'
 import { createTester, gql } from '../../src/tester'
 
-
 namespace TagModel {
 	export class Tag {
 		label = def.stringColumn()

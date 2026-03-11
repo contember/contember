@@ -9,8 +9,9 @@ function filterObject<Input extends {}, Result extends { [Key in keyof Input]: I
 	object: Input,
 	callback: TypeGuard<Input, Result> | Filter<Input>,
 ): Result {
-	return Object.fromEntries(Object.entries(object)
-		.filter(([key, value]) => (callback as any)(key, value, object)),
+	return Object.fromEntries(
+		Object.entries(object)
+			.filter(([key, value]) => (callback as any)(key, value, object)),
 	) as Result
 }
 

@@ -10,7 +10,6 @@ export type RemoveProjectMemberTriggerProps =
 		onError?: (e: unknown) => void
 	}
 
-
 export const RemoveProjectMemberTrigger = ({ identityId, projectSlug, ...props }: RemoveProjectMemberTriggerProps) => {
 	const removeProjectMember = useRemoveProjectMemberMutation()
 	const execute = useCallback(async () => await removeProjectMember({ projectSlug, identityId }), [identityId, projectSlug, removeProjectMember])

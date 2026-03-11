@@ -11,9 +11,13 @@ export class TenantClient {
 	) {
 	}
 
-	async send<TData extends object, TVariables extends object>(fetcher: Fetcher<'Query' | 'Mutation', TData, TVariables>, variables?: TVariables, options?: {
-		authorizationToken?: string
-	}): Promise<{
+	async send<TData extends object, TVariables extends object>(
+		fetcher: Fetcher<'Query' | 'Mutation', TData, TVariables>,
+		variables?: TVariables,
+		options?: {
+			authorizationToken?: string
+		},
+	): Promise<{
 		status: number
 		headers: Headers
 		body?: {
@@ -61,15 +65,19 @@ export class TenantClient {
 	}
 
 	signIn = async (email: string, password = 'HWGA51KKpJ4lSW'): Promise<string> => {
-		const response = await this.send(TenantApi.mutation$
-			.signIn(TenantApi
-				.signInResponse$$
-				.error(TenantApi.signInError$$)
-				.result(TenantApi.signInResult$$),
-			), {
-			email,
-			password,
-		})
+		const response = await this.send(
+			TenantApi.mutation$
+				.signIn(
+					TenantApi
+						.signInResponse$$
+						.error(TenantApi.signInError$$)
+						.result(TenantApi.signInResult$$),
+				),
+			{
+				email,
+				password,
+			},
+		)
 
 		expect(response).toMatchObject({
 			status: 200,
@@ -83,27 +91,27 @@ export class TenantClient {
 			},
 		})
 
-
 		return response.body.data.signIn.result.token
 	}
 
-
 	signUp = async (email: string, password = 'HWGA51KKpJ4lSW') => {
-		const signUpResponse = await this.send(TenantApi.mutation$
-			.signUp(TenantApi
-				.signUpResponse$$
-				.error(TenantApi.signUpError$$)
-				.result(TenantApi
-					.signUpResult$
-					.person(TenantApi
-						.person$$
-						.identity(TenantApi.identity$$),
-					),
+		const signUpResponse = await this.send(
+			TenantApi.mutation$
+				.signUp(
+					TenantApi
+						.signUpResponse$$
+						.error(TenantApi.signUpError$$)
+						.result(TenantApi
+							.signUpResult$
+							.person(TenantApi
+								.person$$
+								.identity(TenantApi.identity$$))),
 				),
-			), {
-			email,
-			password,
-		})
+			{
+				email,
+				password,
+			},
+		)
 
 		expect(signUpResponse).toMatchObject({
 			status: 200,
@@ -120,17 +128,18 @@ export class TenantClient {
 		return signUpResponse.body.data.signUp.result.person.identity.id
 	}
 
-
 	addProjectMember = async (identityId: string, projectSlug: string, membership: Acl.Membership = { role: 'admin', variables: [] }) => {
-		const response = await this.send(TenantApi.mutation$
-			.addProjectMember(TenantApi
-				.addProjectMemberResponse$$
-				.error(TenantApi.addProjectMemberError$$),
-			), {
-			identityId,
-			projectSlug,
-			memberships: [membership],
-		})
+		const response = await this.send(
+			TenantApi.mutation$
+				.addProjectMember(TenantApi
+					.addProjectMemberResponse$$
+					.error(TenantApi.addProjectMemberError$$)),
+			{
+				identityId,
+				projectSlug,
+				memberships: [membership],
+			},
+		)
 		expect(response).toMatchObject({
 			status: 200,
 			body: {
@@ -150,42 +159,49 @@ export class TenantClient {
 		memberships: MembershipInput[]
 		method?: string
 	}, { authorizationToken, expected }: { authorizationToken?: string; expected?: object } = {}) => {
-		const response = await this.send(TenantApi.mutation$
-			.invite(TenantApi
-				.inviteResponse$$
-				.error(TenantApi.inviteError$$)
-				.result(TenantApi
-					.inviteResult$
-					.person(TenantApi
-						.person$$
-						.identity(TenantApi.identity$$),
-					),
-				)), variables, { authorizationToken },
+		const response = await this.send(
+			TenantApi.mutation$
+				.invite(
+					TenantApi
+						.inviteResponse$$
+						.error(TenantApi.inviteError$$)
+						.result(TenantApi
+							.inviteResult$
+							.person(TenantApi
+								.person$$
+								.identity(TenantApi.identity$$))),
+				),
+			variables,
+			{ authorizationToken },
 		)
-		expect(response).toMatchObject(expected ?? {
-			status: 200,
-			body: {
-				data: {
-					invite: {
-						ok: true,
-						error: null,
+		expect(response).toMatchObject(
+			expected ?? {
+				status: 200,
+				body: {
+					data: {
+						invite: {
+							ok: true,
+							error: null,
+						},
 					},
 				},
 			},
-		})
+		)
 
 		return response
 	}
 
 	createProject = async (slug: string) => {
-		const response = await this.send(TenantApi.mutation$
-			.createProject(TenantApi
-				.createProjectResponse$$
-				.error(TenantApi.createProjectResponseError$$),
-			), {
-			projectSlug: slug,
-			config: {},
-		})
+		const response = await this.send(
+			TenantApi.mutation$
+				.createProject(TenantApi
+					.createProjectResponse$$
+					.error(TenantApi.createProjectResponseError$$)),
+			{
+				projectSlug: slug,
+				config: {},
+			},
+		)
 		expect(response).toMatchObject({
 			status: 200,
 			body: {

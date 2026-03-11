@@ -13,8 +13,7 @@ export interface ParentEntityProps extends SugaredParentEntityParameters {
 export const ParentEntity = Component<ParentEntityProps>(
 	props => <>{props.children}</>,
 	{
-		generateBranchMarker: (props, fields, environment) =>
-			MarkerFactory.createParentEntityMarker(props, fields, environment),
+		generateBranchMarker: (props, fields, environment) => MarkerFactory.createParentEntityMarker(props, fields, environment),
 	},
 	'ParentEntity',
 )

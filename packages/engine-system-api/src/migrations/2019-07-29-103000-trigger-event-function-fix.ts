@@ -60,6 +60,6 @@ CREATE OR REPLACE FUNCTION "trigger_event"() RETURNS TRIGGER AS $$
 $$ LANGUAGE plpgsql;
 `
 
-export default async function (builder: MigrationBuilder) {
+export default async function(builder: MigrationBuilder) {
 	builder.sql(sql)
 }

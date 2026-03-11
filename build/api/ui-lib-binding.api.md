@@ -11,7 +11,7 @@ import { ComponentProps } from 'react';
 import { ErrorPersistResult } from '@contember/interface';
 import type { FC } from 'react';
 import { ForwardRefExoticComponent } from 'react';
-import { JSX as JSX_2 } from 'react/jsx-runtime';
+import { JSX } from 'react/jsx-runtime';
 import type { ReactElement } from 'react';
 import { ReactNode } from 'react';
 import { RefAttributes } from 'react';
@@ -19,9 +19,9 @@ import { RoutingLinkTarget } from '@contember/interface';
 import { SuccessfulPersistResult } from '@contember/interface';
 
 // @public (undocumented)
-export const Binding: ({ children }: {
+export const Binding: (input: {
     children: ReactNode;
-}) => JSX_2.Element;
+}) => JSX.Element;
 
 // @public (undocumented)
 export interface BindingStateRendererProps {
@@ -42,12 +42,12 @@ export type DeleteEntityDialogProps = {
 };
 
 // @public (undocumented)
-export const IdentityLoader: ({ children }: {
+export const IdentityLoader: (input: {
     children: React.ReactNode;
-}) => JSX_2.Element;
+}) => JSX.Element;
 
 // @public (undocumented)
-export const PersistButton: ({ label, className, ...buttonProps }: PersistButtonProps) => JSX_2.Element;
+export const PersistButton: (input: PersistButtonProps) => JSX.Element;
 
 // Warning: (ae-forgotten-export) The symbol "Button" needs to be exported by the entry point index.d.ts
 //

@@ -50,11 +50,11 @@ import { DataTransferClient } from './lib/transfer/DataTransferClient'
 import { ExportCommand, ImportCommand, TransferCommand } from './commands/transfer'
 import {
 	Application,
+	Bun,
 	CommandFactoryList,
 	CommandManager,
 	CommandRunner,
 	Npm,
-	Bun,
 	PackageWorkspaceResolver,
 	Pnpm,
 	Yarn,
@@ -91,30 +91,17 @@ export const createContainer = ({ env, version, runtime, workspace }: {
 	runtime: 'node' | 'bun'
 }) => {
 	return new Builder({})
-		.addService('env', () =>
-			env)
-		.addService('version', () =>
-			version)
-		.addService('runtime', () =>
-			runtime)
-		.addService('workspace', () =>
-			workspace)
-		.addService('fs', () =>
-			new FileSystem())
-		.addService('yamlHandler', ({ fs }) =>
-			new YamlHandler(fs))
-		.addService('jsExecutor', () =>
-			new EvalExecutor())
-		.addService('jsBuilder', () =>
-			new EsBuildBuilder())
-		.addService('jsCodeRunner', ({ jsExecutor, jsBuilder }) =>
-			new JsCodeRunner(jsBuilder, jsExecutor))
-
-		.addService('workspaceResolver', ({ yamlHandler }) =>
-			new WorkspaceResolver(yamlHandler))
-
-		.addService('remoteProjectResolver', ({ env }) =>
-			new RemoteProjectResolver(env))
+		.addService('env', () => env)
+		.addService('version', () => version)
+		.addService('runtime', () => runtime)
+		.addService('workspace', () => workspace)
+		.addService('fs', () => new FileSystem())
+		.addService('yamlHandler', ({ fs }) => new YamlHandler(fs))
+		.addService('jsExecutor', () => new EvalExecutor())
+		.addService('jsBuilder', () => new EsBuildBuilder())
+		.addService('jsCodeRunner', ({ jsExecutor, jsBuilder }) => new JsCodeRunner(jsBuilder, jsExecutor))
+		.addService('workspaceResolver', ({ yamlHandler }) => new WorkspaceResolver(yamlHandler))
+		.addService('remoteProjectResolver', ({ env }) => new RemoteProjectResolver(env))
 		.addService('remoteProjectProvider', ({ remoteProjectResolver }) => {
 			const provider = new RemoteProjectProvider()
 			const remoteProject = remoteProjectResolver.resolve()
@@ -123,12 +110,9 @@ export const createContainer = ({ env, version, runtime, workspace }: {
 			}
 			return provider
 		})
-		.addService('systemClientProvider', ({ remoteProjectProvider }) =>
-			new SystemClientProvider(remoteProjectProvider))
-		.addService('tenantClientProvider', ({ remoteProjectProvider }) =>
-			new TenantClientProvider(remoteProjectProvider))
-		.addService('adminClient', ({ remoteProjectProvider }) =>
-			new AdminClient(remoteProjectProvider))
+		.addService('systemClientProvider', ({ remoteProjectProvider }) => new SystemClientProvider(remoteProjectProvider))
+		.addService('tenantClientProvider', ({ remoteProjectProvider }) => new TenantClientProvider(remoteProjectProvider))
+		.addService('adminClient', ({ remoteProjectProvider }) => new AdminClient(remoteProjectProvider))
 		.addService('migrationFilesManager', ({ jsCodeRunner, workspace }) => {
 			const runJs = runtime === 'bun' ? (file: string) => import(file) : jsCodeRunner.run
 			return new MigrationFilesManager(workspace.migrationsDir, {
@@ -147,16 +131,14 @@ export const createContainer = ({ env, version, runtime, workspace }: {
 				new Bun(fs, commandRunner),
 			])
 		})
-		.addService('dockerComposeManager', ({ workspace, env, fs, yamlHandler }) =>
-			new DockerComposeManager(workspace.baseDir, env.dockerComposeFile, fs, yamlHandler))
-		.addService('modificationHandlerFactory', () =>
-			new ModificationHandlerFactory(ModificationHandlerFactory.defaultFactoryMap))
-		.addService('schemaMigrator', ({ modificationHandlerFactory }) =>
-			new SchemaMigrator(modificationHandlerFactory))
-		.addService('migrationsResolver', ({ migrationFilesManager }) =>
-			new MigrationsResolver(migrationFilesManager))
-		.addService('schemaVersionBuilder', ({ migrationsResolver, schemaMigrator }) =>
-			new SchemaVersionBuilder(migrationsResolver, schemaMigrator))
+		.addService(
+			'dockerComposeManager',
+			({ workspace, env, fs, yamlHandler }) => new DockerComposeManager(workspace.baseDir, env.dockerComposeFile, fs, yamlHandler),
+		)
+		.addService('modificationHandlerFactory', () => new ModificationHandlerFactory(ModificationHandlerFactory.defaultFactoryMap))
+		.addService('schemaMigrator', ({ modificationHandlerFactory }) => new SchemaMigrator(modificationHandlerFactory))
+		.addService('migrationsResolver', ({ migrationFilesManager }) => new MigrationsResolver(migrationFilesManager))
+		.addService('schemaVersionBuilder', ({ migrationsResolver, schemaMigrator }) => new SchemaVersionBuilder(migrationsResolver, schemaMigrator))
 		.addService('schemaDiffer', ({ schemaMigrator }) =>
 			new SchemaDiffer(schemaMigrator, {
 				maxPatchSize: env.migrationsOptions?.maxPatchSize,
@@ -167,76 +149,127 @@ export const createContainer = ({ env, version, runtime, workspace }: {
 				ts: jsSample,
 				js: jsSample,
 			}))
-		.addService('migrationDescriber', ({ modificationHandlerFactory }) =>
-			new MigrationDescriber(modificationHandlerFactory))
-		.addService('migrationPrinter', ({ migrationDescriber }) =>
-			new MigrationPrinter(migrationDescriber))
-		.addService('migrationsExecutor', () =>
-			new MigrationExecutor())
-		.addService('migrationsStatusResolver', () =>
-			new MigrationsStatusResolver())
-		.addService('migrationsStatusFacade', ({ systemClientProvider, migrationsResolver, migrationsStatusResolver, migrationPrinter }) =>
-			new MigrationsStatusFacade(systemClientProvider, migrationsResolver, migrationsStatusResolver, migrationPrinter))
-		.addService('migrationExecutionFacade', ({ systemClientProvider, tenantClientProvider, remoteProjectProvider, schemaVersionBuilder, migrationPrinter, migrationsExecutor, migrationsStatusFacade }) =>
-			new MigrationExecutionFacade(systemClientProvider, tenantClientProvider, remoteProjectProvider, schemaVersionBuilder, migrationPrinter, migrationsExecutor, migrationsStatusFacade))
-		.addService('migrationsValidator', ({ migrationDescriber, schemaMigrator }) =>
-			new MigrationsValidator(migrationDescriber, schemaMigrator))
-		.addService('migrationRebaseFacade', ({ schemaVersionBuilder, migrationsValidator, systemClientProvider, migrationFilesManager }) =>
-			new MigrationRebaseFacade(schemaVersionBuilder, migrationsValidator, systemClientProvider, migrationFilesManager))
-		.addService('schemaLoader', ({ workspace, jsCodeRunner, runtime }) =>
-			runtime === 'bun' ? new ImportSchemaLoader(workspace) : new TranspilingSchemaLoader(workspace, jsCodeRunner))
-
-		.addService('adminDeployer', ({ remoteProjectProvider, adminClient, fs }) =>
-			new AdminDeployer(remoteProjectProvider, adminClient, fs))
-		.addService('dataTransferClient', () =>
-			new DataTransferClient())
-
-
-		.addService('deployCommand', ({ adminDeployer, migrationExecutionFacade, fs, remoteProjectProvider, remoteProjectResolver, workspace }) =>
-		 	new DeployCommand(adminDeployer, migrationExecutionFacade, fs, remoteProjectProvider, remoteProjectResolver, workspace))
-		.addService('migrationAmendCommand', ({ migrationsResolver, systemClientProvider, migrationsStatusFacade, schemaLoader, schemaVersionBuilder, migrationCreator, migrationsValidator, migrationPrinter, schemaMigrator }) =>
-			new MigrationAmendCommand(migrationsResolver, systemClientProvider, migrationsStatusFacade, schemaLoader, schemaVersionBuilder, migrationCreator, migrationsValidator, migrationPrinter, schemaMigrator))
-		.addService('migrationBlankCommand', ({ migrationCreator }) =>
-			new MigrationBlankCommand(migrationCreator))
-		.addService('migrationDescribeCommand', ({ migrationPrinter, schemaVersionBuilder, migrationsResolver }) =>
-			new MigrationDescribeCommand(migrationPrinter, schemaVersionBuilder, migrationsResolver))
-		.addService('migrationDiffCommand', ({ schemaLoader, schemaVersionBuilder, migrationCreator, migrationPrinter, migrationExecutionFacade }) =>
-			new MigrationDiffCommand(schemaLoader, schemaVersionBuilder, migrationCreator, migrationPrinter, migrationExecutionFacade))
-		.addService('migrationExecuteCommand', ({ migrationExecutionFacade }) =>
-			new MigrationExecuteCommand(migrationExecutionFacade))
-		.addService('migrationRebaseCommand', ({ migrationsResolver, migrationRebaseFacade }) =>
-			new MigrationRebaseCommand(migrationsResolver, migrationRebaseFacade))
-		.addService('migrationStatusCommand', ({ migrationsStatusFacade, migrationFilesManager, systemClientProvider, migrationPrinter }) =>
-			new MigrationStatusCommand(migrationsStatusFacade, migrationFilesManager, systemClientProvider, migrationPrinter))
-		.addService('versionCommand', ({ version }) =>
-			new VersionCommand(version))
-		.addService('projectGenerateDocumentationCommand', ({ schemaLoader, schemaVersionBuilder }) =>
-			new ProjectGenerateDocumentationCommand(schemaLoader, schemaVersionBuilder))
-		.addService('projectPrintSchemaCommand', ({ schemaLoader, schemaVersionBuilder }) =>
-			new ProjectPrintSchemaCommand(schemaLoader, schemaVersionBuilder))
-		.addService('projectValidateCommand', ({ schemaLoader, migrationsValidator, migrationsResolver, schemaDiffer, schemaVersionBuilder }) =>
-			new ProjectValidateCommand(schemaLoader, migrationsValidator, migrationsResolver, schemaDiffer, schemaVersionBuilder))
-		.addService('exportCommand', ({ dataTransferClient, remoteProjectResolver }) =>
-			new ExportCommand(remoteProjectResolver, dataTransferClient))
-		.addService('importCommand', ({ dataTransferClient, remoteProjectResolver }) =>
-			new ImportCommand(remoteProjectResolver, dataTransferClient))
-		.addService('transferCommand', ({ dataTransferClient, remoteProjectResolver }) =>
-			new TransferCommand(remoteProjectResolver, dataTransferClient))
-		.addService('workspaceUpdateCommand', ({ packageWorkspaceResolver, dockerComposeManager }) =>
-			new WorkspaceUpdateApiCommand(packageWorkspaceResolver, dockerComposeManager))
-		.addService('actionsListVariables', ({ remoteProjectResolver }) =>
-			new ActionsListVariablesCommand(remoteProjectResolver))
-		.addService('actionsSetVariables', ({ remoteProjectResolver }) =>
-			new ActionsSetVariablesCommand(remoteProjectResolver))
-		.addService('actionsListFailedEvents', ({ remoteProjectResolver }) =>
-			new ActionsListFailedEventsCommand(remoteProjectResolver))
-		.addService('actionsRetryEvent', ({ remoteProjectResolver }) =>
-			new ActionsRetryEventCommand(remoteProjectResolver))
-		.addService('actionsGetEvent', ({ remoteProjectResolver }) =>
-			new ActionsGetEventCommand(remoteProjectResolver))
-		.addService('actionsStopEvent', ({ remoteProjectResolver }) =>
-			new ActionsStopEventCommand(remoteProjectResolver))
-
+		.addService('migrationDescriber', ({ modificationHandlerFactory }) => new MigrationDescriber(modificationHandlerFactory))
+		.addService('migrationPrinter', ({ migrationDescriber }) => new MigrationPrinter(migrationDescriber))
+		.addService('migrationsExecutor', () => new MigrationExecutor())
+		.addService('migrationsStatusResolver', () => new MigrationsStatusResolver())
+		.addService(
+			'migrationsStatusFacade',
+			({ systemClientProvider, migrationsResolver, migrationsStatusResolver, migrationPrinter }) =>
+				new MigrationsStatusFacade(systemClientProvider, migrationsResolver, migrationsStatusResolver, migrationPrinter),
+		)
+		.addService(
+			'migrationExecutionFacade',
+			({
+				systemClientProvider,
+				tenantClientProvider,
+				remoteProjectProvider,
+				schemaVersionBuilder,
+				migrationPrinter,
+				migrationsExecutor,
+				migrationsStatusFacade,
+			}) =>
+				new MigrationExecutionFacade(
+					systemClientProvider,
+					tenantClientProvider,
+					remoteProjectProvider,
+					schemaVersionBuilder,
+					migrationPrinter,
+					migrationsExecutor,
+					migrationsStatusFacade,
+				),
+		)
+		.addService('migrationsValidator', ({ migrationDescriber, schemaMigrator }) => new MigrationsValidator(migrationDescriber, schemaMigrator))
+		.addService(
+			'migrationRebaseFacade',
+			({ schemaVersionBuilder, migrationsValidator, systemClientProvider, migrationFilesManager }) =>
+				new MigrationRebaseFacade(schemaVersionBuilder, migrationsValidator, systemClientProvider, migrationFilesManager),
+		)
+		.addService(
+			'schemaLoader',
+			({ workspace, jsCodeRunner, runtime }) =>
+				runtime === 'bun' ? new ImportSchemaLoader(workspace) : new TranspilingSchemaLoader(workspace, jsCodeRunner),
+		)
+		.addService('adminDeployer', ({ remoteProjectProvider, adminClient, fs }) => new AdminDeployer(remoteProjectProvider, adminClient, fs))
+		.addService('dataTransferClient', () => new DataTransferClient())
+		.addService(
+			'deployCommand',
+			({ adminDeployer, migrationExecutionFacade, fs, remoteProjectProvider, remoteProjectResolver, workspace }) =>
+				new DeployCommand(adminDeployer, migrationExecutionFacade, fs, remoteProjectProvider, remoteProjectResolver, workspace),
+		)
+		.addService(
+			'migrationAmendCommand',
+			({
+				migrationsResolver,
+				systemClientProvider,
+				migrationsStatusFacade,
+				schemaLoader,
+				schemaVersionBuilder,
+				migrationCreator,
+				migrationsValidator,
+				migrationPrinter,
+				schemaMigrator,
+			}) =>
+				new MigrationAmendCommand(
+					migrationsResolver,
+					systemClientProvider,
+					migrationsStatusFacade,
+					schemaLoader,
+					schemaVersionBuilder,
+					migrationCreator,
+					migrationsValidator,
+					migrationPrinter,
+					schemaMigrator,
+				),
+		)
+		.addService('migrationBlankCommand', ({ migrationCreator }) => new MigrationBlankCommand(migrationCreator))
+		.addService(
+			'migrationDescribeCommand',
+			({ migrationPrinter, schemaVersionBuilder, migrationsResolver }) =>
+				new MigrationDescribeCommand(migrationPrinter, schemaVersionBuilder, migrationsResolver),
+		)
+		.addService(
+			'migrationDiffCommand',
+			({ schemaLoader, schemaVersionBuilder, migrationCreator, migrationPrinter, migrationExecutionFacade }) =>
+				new MigrationDiffCommand(schemaLoader, schemaVersionBuilder, migrationCreator, migrationPrinter, migrationExecutionFacade),
+		)
+		.addService('migrationExecuteCommand', ({ migrationExecutionFacade }) => new MigrationExecuteCommand(migrationExecutionFacade))
+		.addService(
+			'migrationRebaseCommand',
+			({ migrationsResolver, migrationRebaseFacade }) => new MigrationRebaseCommand(migrationsResolver, migrationRebaseFacade),
+		)
+		.addService(
+			'migrationStatusCommand',
+			({ migrationsStatusFacade, migrationFilesManager, systemClientProvider, migrationPrinter }) =>
+				new MigrationStatusCommand(migrationsStatusFacade, migrationFilesManager, systemClientProvider, migrationPrinter),
+		)
+		.addService('versionCommand', ({ version }) => new VersionCommand(version))
+		.addService(
+			'projectGenerateDocumentationCommand',
+			({ schemaLoader, schemaVersionBuilder }) => new ProjectGenerateDocumentationCommand(schemaLoader, schemaVersionBuilder),
+		)
+		.addService(
+			'projectPrintSchemaCommand',
+			({ schemaLoader, schemaVersionBuilder }) => new ProjectPrintSchemaCommand(schemaLoader, schemaVersionBuilder),
+		)
+		.addService(
+			'projectValidateCommand',
+			({ schemaLoader, migrationsValidator, migrationsResolver, schemaDiffer, schemaVersionBuilder }) =>
+				new ProjectValidateCommand(schemaLoader, migrationsValidator, migrationsResolver, schemaDiffer, schemaVersionBuilder),
+		)
+		.addService('exportCommand', ({ dataTransferClient, remoteProjectResolver }) => new ExportCommand(remoteProjectResolver, dataTransferClient))
+		.addService('importCommand', ({ dataTransferClient, remoteProjectResolver }) => new ImportCommand(remoteProjectResolver, dataTransferClient))
+		.addService('transferCommand', ({ dataTransferClient, remoteProjectResolver }) => new TransferCommand(remoteProjectResolver, dataTransferClient))
+		.addService(
+			'workspaceUpdateCommand',
+			({ packageWorkspaceResolver, dockerComposeManager }) => new WorkspaceUpdateApiCommand(packageWorkspaceResolver, dockerComposeManager),
+		)
+		.addService('actionsListVariables', ({ remoteProjectResolver }) => new ActionsListVariablesCommand(remoteProjectResolver))
+		.addService('actionsSetVariables', ({ remoteProjectResolver }) => new ActionsSetVariablesCommand(remoteProjectResolver))
+		.addService('actionsListFailedEvents', ({ remoteProjectResolver }) => new ActionsListFailedEventsCommand(remoteProjectResolver))
+		.addService('actionsRetryEvent', ({ remoteProjectResolver }) => new ActionsRetryEventCommand(remoteProjectResolver))
+		.addService('actionsGetEvent', ({ remoteProjectResolver }) => new ActionsGetEventCommand(remoteProjectResolver))
+		.addService('actionsStopEvent', ({ remoteProjectResolver }) => new ActionsStopEventCommand(remoteProjectResolver))
 		.addService('commandList', dic => {
 			const commands: CommandFactoryList = {
 				['deploy']: () => dic.deployCommand,
@@ -264,11 +297,12 @@ export const createContainer = ({ env, version, runtime, workspace }: {
 			}
 			return commands
 		})
-		.addService('commandManager', ({ commandList }) =>
-			new CommandManager(commandList))
-
-		.addService('versionChecker', ({ version, workspace, packageWorkspaceResolver, dockerComposeManager }) =>
-			new VersionChecker(version, workspace.baseDir, packageWorkspaceResolver, dockerComposeManager))
+		.addService('commandManager', ({ commandList }) => new CommandManager(commandList))
+		.addService(
+			'versionChecker',
+			({ version, workspace, packageWorkspaceResolver, dockerComposeManager }) =>
+				new VersionChecker(version, workspace.baseDir, packageWorkspaceResolver, dockerComposeManager),
+		)
 		.addService('application', ({ commandManager, versionChecker }) => {
 			const app = new Application(
 				commandManager,

@@ -4,7 +4,6 @@ import { FileWithMeta } from './file'
 import { UploadClient } from './uploadClient'
 
 export interface FileType {
-
 	/**
 	 * @see https://developer.mozilla.org/en-US/docs/Web/API/window/showOpenFilePicker#accept
 	 * null means "any mime type"
@@ -16,7 +15,6 @@ export interface FileType {
 	extractors?: FileDataExtractor[]
 	uploader?: UploadClient<any>
 }
-
 
 export type DiscriminatedFileType =
 	& FileType

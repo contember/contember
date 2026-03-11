@@ -10,7 +10,9 @@ export interface DataViewReloadTriggerAttributes {
 	['data-state']: EntityListSubTreeLoaderState
 }
 
-const SlotType = Slot as React.ForwardRefExoticComponent<React.ButtonHTMLAttributes<HTMLButtonElement> & React.RefAttributes<HTMLButtonElement> & DataViewReloadTriggerAttributes>
+const SlotType = Slot as React.ForwardRefExoticComponent<
+	React.ButtonHTMLAttributes<HTMLButtonElement> & React.RefAttributes<HTMLButtonElement> & DataViewReloadTriggerAttributes
+>
 
 export interface DataViewReloadTriggerProps {
 	/**
@@ -46,10 +48,13 @@ export const DataViewReloadTrigger = forwardRef<HTMLButtonElement, DataViewReloa
 		return (
 			<SlotType
 				ref={ref}
-				onClick={composeEventHandlers(onClick, useCallback(() => {
-					refreshTotalCount()
-					reload()
-				}, [reload, refreshTotalCount]))}
+				onClick={composeEventHandlers(
+					onClick,
+					useCallback(() => {
+						refreshTotalCount()
+						reload()
+					}, [reload, refreshTotalCount]),
+				)}
 				data-state={dataAttribute(state)}
 				{...otherProps}
 			>

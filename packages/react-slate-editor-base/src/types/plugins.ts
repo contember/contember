@@ -11,7 +11,6 @@ export type EditorPlugin = ((editor: Editor) => void) | {
 	staticRender?: (props: { children?: ReactNode }, environment: Environment) => ReactNode
 }
 
-
 export type ElementRenderer<T extends Element> = FunctionComponent<RenderElementProps & { element: T }>
 
 export interface EditorElementPlugin<T extends Element> {
@@ -25,7 +24,6 @@ export interface EditorElementPlugin<T extends Element> {
 	toggleElement?: (args: { editor: Editor; suchThat?: Partial<T> }) => void
 	acceptsAttributes?: (args: { editor: Editor; suchThat: Partial<T> }) => boolean
 }
-
 
 export interface EditorMarkPlugin {
 	type: string

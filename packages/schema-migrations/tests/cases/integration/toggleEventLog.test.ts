@@ -16,32 +16,33 @@ namespace EventLogDisabled {
 	}
 }
 
-
-describe('event log - disable', () => testMigrations({
-	original: createSchema(EventLogNoConfig),
-	updated: createSchema(EventLogDisabled),
-	diff: [
-		{
-			modification: 'toggleEventLog',
-			entityName: 'Author',
-			enabled: false,
-		},
-	],
-	sql: SQL `DROP TRIGGER "log_event" ON "author";
+describe('event log - disable', () =>
+	testMigrations({
+		original: createSchema(EventLogNoConfig),
+		updated: createSchema(EventLogDisabled),
+		diff: [
+			{
+				modification: 'toggleEventLog',
+				entityName: 'Author',
+				enabled: false,
+			},
+		],
+		sql: SQL`DROP TRIGGER "log_event" ON "author";
 	DROP TRIGGER "log_event_trx" ON "author";`,
-}))
+	}))
 
-describe('event log - enable', () => testMigrations({
-	original: createSchema(EventLogDisabled),
-	updated: createSchema(EventLogNoConfig),
-	diff: [
-		{
-			modification: 'toggleEventLog',
-			entityName: 'Author',
-			enabled: true,
-		},
-	],
-	sql: SQL`CREATE TRIGGER "log_event"
+describe('event log - enable', () =>
+	testMigrations({
+		original: createSchema(EventLogDisabled),
+		updated: createSchema(EventLogNoConfig),
+		diff: [
+			{
+				modification: 'toggleEventLog',
+				entityName: 'Author',
+				enabled: true,
+			},
+		],
+		sql: SQL`CREATE TRIGGER "log_event"
 		AFTER INSERT OR UPDATE OR DELETE
 		ON "author"
 		FOR EACH ROW
@@ -52,4 +53,4 @@ describe('event log - enable', () => testMigrations({
 		DEFERRABLE INITIALLY DEFERRED
 		FOR EACH ROW
 	EXECUTE PROCEDURE "system"."trigger_event_commit"();`,
-}))
+	}))

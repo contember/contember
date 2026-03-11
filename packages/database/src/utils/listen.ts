@@ -12,7 +12,6 @@ type ListenArgs<P> = {
 	onClose?: () => void
 }
 
-
 export class Listener<P> {
 	constructor(
 		private readonly client: Client<Connection.AcquiredConnectionLike>,
@@ -23,10 +22,9 @@ export class Listener<P> {
 	}
 
 	async run({ onClose, onError }: {
-				  onError: (e: any) => void
-				  onClose?: () => void
-			  },
-	): Promise<{ end: () => Promise<void> }> {
+		onError: (e: any) => void
+		onClose?: () => void
+	}): Promise<{ end: () => Promise<void> }> {
 		let aborted = false
 		let onAbortInner = async () => {}
 		const onAbort = async () => {
@@ -47,7 +45,6 @@ export class Listener<P> {
 				this.onMessage(payload as P)
 			}))
 			await this.client.query(`LISTEN ${wrapIdentifier(this.channel)}`)
-
 			;(async () => {
 				const stopListening = async () => {
 					try {
@@ -98,7 +95,6 @@ export class Listener<P> {
 	}
 }
 
-
 export class AcquiringListener<P> {
 	constructor(
 		private readonly client: Client,
@@ -108,8 +104,7 @@ export class AcquiringListener<P> {
 	) {
 	}
 
-	async run({ onClose, onError }: { onError: (e: any) => void;onClose?: () => void },
-	): Promise<{ end: () => Promise<void> }> {
+	async run({ onClose, onError }: { onError: (e: any) => void; onClose?: () => void }): Promise<{ end: () => Promise<void> }> {
 		return new Promise(async (resolveRunning, rejectRunning) => {
 			try {
 				await this.client.scope(async db => {

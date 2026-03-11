@@ -30,7 +30,7 @@ export class ExportExecutor {
 	) {
 	}
 
-	async* export(request: ExportRequest, projectContainers: Record<string, ProjectContainer>): AsyncIterable<Command> {
+	async *export(request: ExportRequest, projectContainers: Record<string, ProjectContainer>): AsyncIterable<Command> {
 		for (const project of request.projects) {
 			const projectContainer = projectContainers[project.slug]
 			const systemContext = projectContainer.systemDatabaseContext
@@ -51,7 +51,8 @@ export class ExportExecutor {
 				const contentDatabaseClient = projectContainer.connection.createClient(stage.schema, {})
 
 				yield [
-					'importContentSchemaBegin', {
+					'importContentSchemaBegin',
+					{
 						project: project.targetSlug ?? project.slug,
 						stage: stage.slug,
 						schemaVersion: contentSchema.meta.version ?? '0000-00-00-000000',
@@ -64,10 +65,9 @@ export class ExportExecutor {
 		}
 	}
 
-	private async* exportSchema(db: Client, mapping: TransferMapping): AsyncIterable<Command> {
-		// eslint-disable-next-line @typescript-eslint/no-this-alias
+	private async *exportSchema(db: Client, mapping: TransferMapping): AsyncIterable<Command> {
 		const that = this
-		yield* asyncIterableTransaction(db, async function* (db) {
+		yield* asyncIterableTransaction(db, async function*(db) {
 			await db.query('SET LOCAL statement_timeout = 0')
 			await db.query('SET TRANSACTION ISOLATION LEVEL SERIALIZABLE READ ONLY DEFERRABLE')
 			for (const table of Object.values(mapping.tables)) {
@@ -77,7 +77,7 @@ export class ExportExecutor {
 		})
 	}
 
-	private async* exportSequences(db: Client<Connection.TransactionLike>, table: TransferTableMapping): AsyncIterable<Command> {
+	private async *exportSequences(db: Client<Connection.TransactionLike>, table: TransferTableMapping): AsyncIterable<Command> {
 		for (const column of Object.values(table.columns)) {
 			if (column.type === Model.ColumnType.Int && column.sequence) {
 				const seqNameResult = await db.query<{ name: string }>(
@@ -86,14 +86,14 @@ export class ExportExecutor {
 				)
 
 				const seqNameQuoted = seqNameResult.rows[0].name.split('.').map(it => wrapIdentifier(it)).join('.')
-				const seqValueResult = await db.query<{ last_value: number|string }>(`SELECT last_value FROM ${seqNameQuoted}`)
+				const seqValueResult = await db.query<{ last_value: number | string }>(`SELECT last_value FROM ${seqNameQuoted}`)
 				const seqValue = seqValueResult.rows[0].last_value
 				yield ['importSequence', { table: table.name, column: column.name, value: Number(seqValue) }]
 			}
 		}
 	}
 
-	private async* exportTable(db: Client<Connection.TransactionLike>, table: TransferTableMapping): AsyncIterable<Command> {
+	private async *exportTable(db: Client<Connection.TransactionLike>, table: TransferTableMapping): AsyncIterable<Command> {
 		const DB_FETCH_BATCH_SIZE = 100
 		const query = (table.createSelect ?? this.buildQuery)(db, table)
 		let empty = true
@@ -118,7 +118,6 @@ export class ExportExecutor {
 		for (const column of Object.values(table.columns)) {
 			if (column.type === Model.ColumnType.Json || column.type === Model.ColumnType.Date || column.type === Model.ColumnType.DateTime) {
 				builder = builder.select(expr => expr.raw(`${wrapIdentifier(column.name)}::text`))
-
 			} else {
 				builder = builder.select(column.name)
 			}
@@ -128,7 +127,7 @@ export class ExportExecutor {
 		return builder.createQuery(namespaceContext)
 	}
 
-	private async* cursorQuery(db: Client<Connection.TransactionLike>, batchSize: number, sql: string, parameters: readonly any[] = []) {
+	private async *cursorQuery(db: Client<Connection.TransactionLike>, batchSize: number, sql: string, parameters: readonly any[] = []) {
 		await db.query(`DECLARE contember_cursor NO SCROLL CURSOR FOR ${sql}`, parameters)
 
 		const fetchSql = `FETCH ${Number(batchSize)} FROM contember_cursor`

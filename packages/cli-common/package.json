@@ -23,12 +23,12 @@
     }
   },
   "devDependencies": {
-    "@types/js-yaml": "^4.0.9",
-    "@types/node": "^20.17.22",
-    "@types/npm-package-arg": "^6.1.4"
+    "@types/js-yaml": "catalog:",
+    "@types/node": "catalog:",
+    "@types/npm-package-arg": "catalog:"
   },
   "dependencies": {
-    "chalk": "^5.3.0"
+    "chalk": "catalog:"
   },
   "type": "module"
 }

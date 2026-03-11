@@ -7,7 +7,6 @@ import { useBoardItemsMethods } from './useBoardItemsMethods'
 import { BoardData } from '../types/BoardData'
 import { BoardCommonProps, BoardStaticColumnsBindingProps } from '../components'
 
-
 export type UseStaticBoardBindingProps =
 	& Omit<BoardCommonProps, 'children'>
 	& BoardStaticColumnsBindingProps
@@ -22,7 +21,6 @@ export const useStaticBoard = ({
 	discriminationField,
 	itemEntities,
 }: UseStaticBoardBindingProps): [BoardData<BoardStaticColumnValue>, BoardMethods<BoardStaticColumnValue>] => {
-
 	const desugaredSortableByField = useDesugaredRelativeSingleField(sortableBy)
 	const desugaredDiscriminationField = useDesugaredRelativeSingleField(discriminationField)
 

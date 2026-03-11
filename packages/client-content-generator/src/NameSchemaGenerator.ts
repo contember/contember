@@ -1,4 +1,4 @@
-import { SchemaNames, SchemaEntityNames } from '@contember/client-content'
+import { SchemaEntityNames, SchemaNames } from '@contember/client-content'
 import { Model } from '@contember/schema'
 import { acceptEveryFieldVisitor } from '@contember/schema-utils'
 
@@ -40,5 +40,3 @@ export class NameSchemaGenerator {
 		}
 	}
 }
-
-

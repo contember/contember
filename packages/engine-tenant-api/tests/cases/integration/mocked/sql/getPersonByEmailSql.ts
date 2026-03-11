@@ -5,7 +5,8 @@ export const getPersonByEmailSql = (args: {
 	email: string
 	response: null | { personId: string; password: string; identityId: string; roles: string[]; otpUri?: string }
 }): ExpectedQuery => ({
-	sql: SQL`SELECT "person"."id", "person"."password_hash", "person"."otp_uri", "person"."otp_activated_at", "person"."identity_id", "person"."email", "person"."name", "person"."disabled_at", "person"."passwordless_enabled", "identity"."roles"
+	sql:
+		SQL`SELECT "person"."id", "person"."password_hash", "person"."otp_uri", "person"."otp_activated_at", "person"."identity_id", "person"."email", "person"."name", "person"."disabled_at", "person"."passwordless_enabled", "identity"."roles"
 	         FROM "tenant"."person"
 		              INNER JOIN "tenant"."identity" AS "identity" ON "identity"."id" = "person"."identity_id"
 	         WHERE "person"."email" = ?`,
@@ -24,7 +25,7 @@ export const getPersonByEmailSql = (args: {
 					disabled_at: null,
 					passwordless_enabled: null,
 				},
-			  ]
+			]
 			: [],
 	},
 })

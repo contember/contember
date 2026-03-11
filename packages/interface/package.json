@@ -35,16 +35,16 @@
     "@contember/react-devbar": "workspace:*",
     "@contember/react-identity": "workspace:*",
     "@contember/react-routing": "workspace:*",
-    "@radix-ui/react-slot": "^1.1.0",
-    "stacktracey": "^2.1.8"
+    "@radix-ui/react-slot": "catalog:",
+    "stacktracey": "catalog:"
   },
   "peerDependencies": {
-    "react": "^18 || ^19",
-    "react-dom": "^18 || ^19"
+    "react": "catalog:",
+    "react-dom": "catalog:"
   },
   "devDependencies": {
-    "react": "^18.3.1",
-    "react-dom": "^18.3.1"
+    "react": "catalog:",
+    "react-dom": "catalog:"
   },
   "repository": {
     "type": "git",

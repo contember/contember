@@ -4,7 +4,6 @@ import { collectReferences } from '../../../schema/collectReferences'
 import { EntityLink } from './EntityLink'
 import { EntityInfo } from './EntityInfo'
 
-
 export const ProjectInfo = (props: { schema: Schema; projectName: string }) => {
 	const references = collectReferences(props.schema.model)
 
@@ -37,11 +36,9 @@ export const ProjectInfo = (props: { schema: Schema; projectName: string }) => {
 						</ul>
 					</div>
 				</div>
-
-
 			</div>
 			{Object.values(props.schema.model.entities).map(entity => (
-				<EntityInfo key={entity.name} entity={entity} schema={props.schema} references={references}/>
+				<EntityInfo key={entity.name} entity={entity} schema={props.schema} references={references} />
 			))}
 		</div>
 	)

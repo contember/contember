@@ -3,7 +3,6 @@ import { EditorPlugin } from '../../../types/plugins'
 import { HtmlDeserializer } from './HtmlDeserializer'
 import { HtmlDeserializerPlugin } from '../../../types/htmlDeserializer'
 
-
 export const withPaste = (editor: Editor) => {
 	const { insertData } = editor
 	const htmlDeserializer = new HtmlDeserializer(editor.createDefaultElement, [])

@@ -59,7 +59,7 @@ query {
 						rows: [
 							{
 								role: 'foo',
-								variables: [{ values: ['x', 'y'],  name: 'xyz' }],
+								variables: [{ values: ['x', 'y'], name: 'xyz' }],
 								identityId: testUuid(2),
 							},
 						],

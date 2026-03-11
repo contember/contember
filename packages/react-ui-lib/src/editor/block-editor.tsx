@@ -6,7 +6,17 @@ import { Component, SugaredRelativeEntityList, SugaredRelativeSingleField } from
 import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable'
 import { useSlate, useSlateStatic } from 'slate-react'
 import { blockEditorPlugins } from './plugins'
-import { closestCenter, DndContext, DragEndEvent, KeyboardSensor, MeasuringStrategy, MouseSensor, TouchSensor, useSensor, useSensors } from '@dnd-kit/core'
+import {
+	closestCenter,
+	DndContext,
+	DragEndEvent,
+	KeyboardSensor,
+	MeasuringStrategy,
+	MouseSensor,
+	TouchSensor,
+	useSensor,
+	useSensors,
+} from '@dnd-kit/core'
 import { Transforms } from 'slate'
 
 export type BlockEditorFieldProps =
@@ -19,14 +29,17 @@ export type BlockEditorFieldProps =
 
 export const BlockEditorField = Component<BlockEditorFieldProps>(({ placeholder, children, ...props }) => {
 	return (
-		<BlockEditor {...props} plugins={[
-			...blockEditorPlugins,
-			...props.plugins ?? [],
-			withReferences({
-				field: props.referencesField,
-				discriminationField: props.referenceDiscriminationField,
-			}),
-		]}>
+		<BlockEditor
+			{...props as BlockEditorProps}
+			plugins={[
+				...blockEditorPlugins,
+				...props.plugins ?? [],
+				withReferences({
+					field: props.referencesField,
+					discriminationField: props.referenceDiscriminationField,
+				}),
+			]}
+		>
 			<SortableBlockEditor>
 				<BlockEditorInner placeholder={placeholder}>
 					{children}
@@ -103,7 +116,6 @@ export const BlockEditorInner = ({ children, placeholder }: {
 				}),
 				placeholder: placeholder,
 			}}
-
 		>
 			{children}
 		</EditorCanvas>

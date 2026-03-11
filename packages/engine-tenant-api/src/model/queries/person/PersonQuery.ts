@@ -68,7 +68,6 @@ class PersonByEmailFallbackQuery extends DatabaseQuery<MaybePersonRow> {
 		}
 		return await handler.fetch(PersonQuery.byExactEmail(normalizedEmail))
 	}
-
 }
 
 export { PersonQuery }

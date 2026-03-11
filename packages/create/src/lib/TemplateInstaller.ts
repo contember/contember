@@ -3,9 +3,7 @@ import { FileSystem } from './FileSystem'
 import jsyaml from 'js-yaml'
 import degit from 'degit'
 
-
 export class TemplateInstaller {
-
 	private localTemplates: Record<string, string>
 
 	constructor(
@@ -22,7 +20,7 @@ export class TemplateInstaller {
 		targetDir: string,
 		variables: Record<string, string> = {},
 	) => {
-		let removeTemplate = () => { }
+		let removeTemplate = () => {}
 
 		if (this.localTemplates[template]) {
 			template = this.localTemplates[template]
@@ -98,10 +96,9 @@ export class TemplateInstaller {
 			}
 			await this.replaceFileContent(path, content =>
 				Object.entries(variables).reduce(
-					(content, [key, value]) => content.replace(new RegExp(`\{${key}\}`, 'g'), value),
+					(content, [key, value]) => content.replace(new RegExp(`{${key}}`, 'g'), value),
 					content,
-				),
-			)
+				))
 		}
 	}
 

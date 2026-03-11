@@ -21,7 +21,9 @@ export default () => (
 			<Button>Default size</Button>
 			<Button size="sm">Small size</Button>
 			<Button size="lg">Large size</Button>
-			<Button size="icon"><HomeIcon /></Button>
+			<Button size="icon">
+				<HomeIcon />
+			</Button>
 		</div>
 	</>
 )

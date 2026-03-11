@@ -4,13 +4,7 @@ import { Input, Model } from '@contember/schema'
 import { Path, PathFactory } from './Path'
 import { JoinBuilder } from './JoinBuilder'
 import { ConditionBuilder } from './ConditionBuilder'
-import {
-	ConditionBuilder as SqlConditionBuilder,
-	Literal,
-	Operator,
-	QueryBuilder,
-	SelectBuilder, wrapIdentifier,
-} from '@contember/database'
+import { ConditionBuilder as SqlConditionBuilder, Literal, Operator, QueryBuilder, SelectBuilder, wrapIdentifier } from '@contember/database'
 import { WhereOptimizationHints, WhereOptimizer } from './optimizer/WhereOptimizer'
 
 export class WhereBuilder {
@@ -40,7 +34,6 @@ export class WhereBuilder {
 		})
 	}
 
-
 	public buildAdvanced<R extends SelectBuilder.Result>(
 		entity: Model.Entity,
 		path: Path,
@@ -61,15 +54,22 @@ export class WhereBuilder {
 	private buildInternal<R extends SelectBuilder.Result>({
 		callback,
 		...args
-	}: { entity: Model.Entity; path: Path; where: Input.OptionalWhere; callback: (clauseCb: (clause: SqlConditionBuilder) => SqlConditionBuilder) => SelectBuilder<R>; allowManyJoin: boolean },
-	): SelectBuilder<R> {
+	}: {
+		entity: Model.Entity
+		path: Path
+		where: Input.OptionalWhere
+		callback: (clauseCb: (clause: SqlConditionBuilder) => SqlConditionBuilder) => SelectBuilder<R>
+		allowManyJoin: boolean
+	}): SelectBuilder<R> {
 		const joinList: WhereJoinDefinition[] = []
 
-		const qbWithWhere = callback(clause => this.buildRecursive({
-			conditionBuilder: clause,
-			joinList: joinList,
-			...args,
-		}))
+		const qbWithWhere = callback(clause =>
+			this.buildRecursive({
+				conditionBuilder: clause,
+				joinList: joinList,
+				...args,
+			})
+		)
 		return joinList.reduce<SelectBuilder<R>>(
 			(qb, { path, entity, relationName }) => this.joinBuilder.join<R>(qb, path, entity, relationName),
 			qbWithWhere,
@@ -83,8 +83,14 @@ export class WhereBuilder {
 		where,
 		joinList,
 		allowManyJoin,
-	}: { conditionBuilder: SqlConditionBuilder; entity: Model.Entity; path: Path; where: Input.OptionalWhere; joinList: WhereJoinDefinition[]; allowManyJoin: boolean },
-	): SqlConditionBuilder {
+	}: {
+		conditionBuilder: SqlConditionBuilder
+		entity: Model.Entity
+		path: Path
+		where: Input.OptionalWhere
+		joinList: WhereJoinDefinition[]
+		allowManyJoin: boolean
+	}): SqlConditionBuilder {
 		const tableName = path.alias
 
 		if (where.and !== undefined && where.and !== null && where.and.length > 0) {
@@ -101,7 +107,7 @@ export class WhereBuilder {
 							allowManyJoin,
 						}),
 					clause,
-				),
+				)
 			)
 		}
 		if (where.or !== undefined && where.or !== null && where.or.length > 0) {
@@ -111,16 +117,18 @@ export class WhereBuilder {
 					(clause2, where) =>
 						!where
 							? clause2
-							: clause2.and(clause3 => this.buildRecursive({
-								conditionBuilder: clause3,
-								entity,
-								path,
-								where,
-								joinList,
-								allowManyJoin,
-							})),
+							: clause2.and(clause3 =>
+								this.buildRecursive({
+									conditionBuilder: clause3,
+									entity,
+									path,
+									where,
+									joinList,
+									allowManyJoin,
+								})
+							),
 					clause,
-				),
+				)
 			)
 		}
 		if (where.not !== undefined && where.not !== null) {
@@ -133,7 +141,7 @@ export class WhereBuilder {
 					where: expr,
 					joinList,
 					allowManyJoin,
-				}),
+				})
 			)
 		}
 
@@ -160,7 +168,7 @@ export class WhereBuilder {
 							conditionBuilder,
 							tableName,
 							relation.joiningColumn.columnName,
-							(targetEntity.fields[targetEntity.primary] as Model.AnyColumn),
+							targetEntity.fields[targetEntity.primary] as Model.AnyColumn,
 							primaryCondition,
 						)
 					}
@@ -177,8 +185,6 @@ export class WhereBuilder {
 					allowManyJoin,
 				})
 			}
-
-
 
 			conditionBuilder = acceptFieldVisitor<SqlConditionBuilder>(this.schema, entity, fieldName, {
 				visitColumn: ({ entity, column }) => {
@@ -232,8 +238,10 @@ export class WhereBuilder {
 						? SelectBuilder.create()
 							.select(it => it.raw('1'))
 							.from(new Literal(`(select ${wrapIdentifier(tableName)}.${wrapIdentifier(entity.primaryColumn)})`), targetPath.for('tmp_').alias)
-							.leftJoin(context.targetEntity.tableName, targetPath.alias, it =>
-								it.columnsEq([targetPath.for('tmp_').alias, entity.primaryColumn], [targetPath.alias, context.targetRelation.joiningColumn.columnName]),
+							.leftJoin(
+								context.targetEntity.tableName,
+								targetPath.alias,
+								it => it.columnsEq([targetPath.for('tmp_').alias, entity.primaryColumn], [targetPath.alias, context.targetRelation.joiningColumn.columnName]),
 							)
 						: SelectBuilder.create()
 							.select(it => it.raw('1'))
@@ -255,7 +263,6 @@ export class WhereBuilder {
 		return conditionBuilder
 	}
 
-
 	private createManyHasManySubquery(
 		outerColumn: QueryBuilder.ColumnIdentifier,
 		relationWhere: Input.OptionalWhere,
@@ -274,16 +281,15 @@ export class WhereBuilder {
 
 		const primaryCondition = this.transformWhereToPrimaryCondition(relationWhere, targetEntity.primary)
 		if (primaryCondition !== null) {
+			const columnType = targetEntity.fields[targetEntity.primary] as Model.AnyColumn
 
-			const columnType = (targetEntity.fields[targetEntity.primary] as Model.AnyColumn)
-
-			return qb.where(condition =>
-				this.conditionBuilder.build(condition, junctionPath.alias, toColumn, columnType, primaryCondition),
-			)
+			return qb.where(condition => this.conditionBuilder.build(condition, junctionPath.alias, toColumn, columnType, primaryCondition))
 		}
 
-		const qbJoined = qb.join(targetEntity.tableName, path.alias, clause =>
-			clause.compareColumns([junctionPath.alias, toColumn], Operator.eq, [path.alias, targetEntity.primary]),
+		const qbJoined = qb.join(
+			targetEntity.tableName,
+			path.alias,
+			clause => clause.compareColumns([junctionPath.alias, toColumn], Operator.eq, [path.alias, targetEntity.primary]),
 		)
 		return this.buildInternal({
 			entity: targetEntity,
@@ -359,10 +365,10 @@ export class WhereBuilder {
 		if (cond.isNull !== undefined) {
 			return true
 		}
-		if (cond.and && cond.and.some(it => this.conditionHasIsNull(it))) {
+		if (cond.and?.some(it => this.conditionHasIsNull(it))) {
 			return true
 		}
-		if (cond.or && cond.or.some(it => this.conditionHasIsNull(it))) {
+		if (cond.or?.some(it => this.conditionHasIsNull(it))) {
 			return true
 		}
 		if (cond.not && this.conditionHasIsNull(cond.not)) {

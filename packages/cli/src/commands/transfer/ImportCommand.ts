@@ -51,7 +51,7 @@ export class ImportCommand extends Command<Args, Options> {
 		}
 		const file = input.getArgument('file')
 		const baseInputStream = createReadStream(file)
-		const stream = (file.endsWith('.gz') ? baseInputStream.pipe(createGunzip()) : baseInputStream)
+		const stream = file.endsWith('.gz') ? baseInputStream.pipe(createGunzip()) : baseInputStream
 		stream.on('error', (err: any) => {
 			console.error('Error in import stream:', err)
 		})
@@ -74,4 +74,3 @@ export class ImportCommand extends Command<Args, Options> {
 		}
 	}
 }
-

@@ -1,4 +1,4 @@
-import { expect, it, describe } from 'bun:test'
+import { describe, expect, it } from 'bun:test'
 import type { FunctionComponent, ReactElement, ReactNode } from 'react'
 import * as React from 'react'
 import { BranchNode, ChildrenAnalyzer, Leaf, RawNodeRepresentation } from '../../../src'
@@ -197,10 +197,8 @@ describe('children analyzer', () => {
 			123,
 			{ foo: '123', baz: 123 },
 			'bar',
-			// eslint-disable-next-line react/jsx-key
 			<a href="#baz">baz</a>,
 			{ foo: '456', baz: 456 },
-			// eslint-disable-next-line react/jsx-key
 			<br />,
 			{ foo: '789', baz: 789 },
 		])

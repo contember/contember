@@ -16,6 +16,7 @@ namespace Schema {
 		tags = c.manyHasMany(Tag, 'posts')
 		author = c.manyHasOne(Author, 'posts')
 		locales = c.oneHasMany(PostLocale, 'post')
+		status = c.enumColumn(c.createEnum('draft', 'published', 'archived'))
 	}
 
 	@c.Unique('locale', 'post')

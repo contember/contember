@@ -1,4 +1,4 @@
-// Bun Snapshot v1, https://goo.gl/fbAQLP
+// Bun Snapshot v1, https://bun.sh/docs/test/snapshots
 
 exports[`generate entities generate for scalars 1`] = `
 "
@@ -8,34 +8,34 @@ export type JSONObject = { readonly [K in string]?: JSONValue }
 export type JSONArray = readonly JSONValue[]
 
 export type Foo <OverRelation extends string | never = never> = {
-\tname: 'Foo'
-\tunique:
-\t\t| Omit<{ id: string}, OverRelation>
-\tcolumns: {
-\t\tid: string
-\t\tstringCol: string | null
-\t\tintCol: number | null
-\t\tdoubleCol: number | null
-\t\tdateCol: string | null
-\t\tdatetimeCol: string | null
-\t\tbooleanCol: boolean | null
-\t\tjsonCol: JSONValue | null
-\t\tuuidCol: string | null
-\t}
-\thasOne: {
-\t}
-\thasMany: {
-\t}
-\thasManyBy: {
-\t}
+	name: 'Foo'
+	unique:
+		| Omit<{ id: string}, OverRelation>
+	columns: {
+		id: string
+		stringCol: string | null
+		intCol: number | null
+		doubleCol: number | null
+		dateCol: string | null
+		datetimeCol: string | null
+		booleanCol: boolean | null
+		jsonCol: JSONValue | null
+		uuidCol: string | null
+	}
+	hasOne: {
+	}
+	hasMany: {
+	}
+	hasManyBy: {
+	}
 }
 
 export type ContemberClientEntities = {
-\tFoo: Foo
+	Foo: Foo
 }
 
 export type ContemberClientSchema = {
-\tentities: ContemberClientEntities
+	entities: ContemberClientEntities
 }
 "
 `;
@@ -49,27 +49,27 @@ export type JSONObject = { readonly [K in string]?: JSONValue }
 export type JSONArray = readonly JSONValue[]
 
 export type Foo <OverRelation extends string | never = never> = {
-\tname: 'Foo'
-\tunique:
-\t\t| Omit<{ id: string}, OverRelation>
-\tcolumns: {
-\t\tid: string
-\t\tenumCol: FooEnumCol | null
-\t}
-\thasOne: {
-\t}
-\thasMany: {
-\t}
-\thasManyBy: {
-\t}
+	name: 'Foo'
+	unique:
+		| Omit<{ id: string}, OverRelation>
+	columns: {
+		id: string
+		enumCol: FooEnumCol | null
+	}
+	hasOne: {
+	}
+	hasMany: {
+	}
+	hasManyBy: {
+	}
 }
 
 export type ContemberClientEntities = {
-\tFoo: Foo
+	Foo: Foo
 }
 
 export type ContemberClientSchema = {
-\tentities: ContemberClientEntities
+	entities: ContemberClientEntities
 }
 "
 `;
@@ -82,45 +82,45 @@ export type JSONObject = { readonly [K in string]?: JSONValue }
 export type JSONArray = readonly JSONValue[]
 
 export type Foo <OverRelation extends string | never = never> = {
-\tname: 'Foo'
-\tunique:
-\t\t| Omit<{ id: string}, OverRelation>
-\t\t| Omit<{ oneHasOneInverseRel: Bar['unique']}, OverRelation>
-\tcolumns: {
-\t\tid: string
-\t}
-\thasOne: {
-\t\toneHasOneInverseRel: Bar
-\t}
-\thasMany: {
-\t}
-\thasManyBy: {
-\t}
+	name: 'Foo'
+	unique:
+		| Omit<{ id: string}, OverRelation>
+		| Omit<{ oneHasOneInverseRel: Bar['unique']}, OverRelation>
+	columns: {
+		id: string
+	}
+	hasOne: {
+		oneHasOneInverseRel: Bar
+	}
+	hasMany: {
+	}
+	hasManyBy: {
+	}
 }
 export type Bar <OverRelation extends string | never = never> = {
-\tname: 'Bar'
-\tunique:
-\t\t| Omit<{ id: string}, OverRelation>
-\t\t| Omit<{ oneHasOneOwningRel: Foo['unique']}, OverRelation>
-\tcolumns: {
-\t\tid: string
-\t}
-\thasOne: {
-\t\toneHasOneOwningRel: Foo
-\t}
-\thasMany: {
-\t}
-\thasManyBy: {
-\t}
+	name: 'Bar'
+	unique:
+		| Omit<{ id: string}, OverRelation>
+		| Omit<{ oneHasOneOwningRel: Foo['unique']}, OverRelation>
+	columns: {
+		id: string
+	}
+	hasOne: {
+		oneHasOneOwningRel: Foo
+	}
+	hasMany: {
+	}
+	hasManyBy: {
+	}
 }
 
 export type ContemberClientEntities = {
-\tFoo: Foo
-\tBar: Bar
+	Foo: Foo
+	Bar: Bar
 }
 
 export type ContemberClientSchema = {
-\tentities: ContemberClientEntities
+	entities: ContemberClientEntities
 }
 "
 `;
@@ -133,44 +133,44 @@ export type JSONObject = { readonly [K in string]?: JSONValue }
 export type JSONArray = readonly JSONValue[]
 
 export type Foo <OverRelation extends string | never = never> = {
-\tname: 'Foo'
-\tunique:
-\t\t| Omit<{ id: string}, OverRelation>
-\t\t| Omit<{ oneHasManyRel: Bar['unique']}, OverRelation>
-\tcolumns: {
-\t\tid: string
-\t}
-\thasOne: {
-\t}
-\thasMany: {
-\t\toneHasManyRel: Bar<'manyHasOneRel'>
-\t}
-\thasManyBy: {
-\t}
+	name: 'Foo'
+	unique:
+		| Omit<{ id: string}, OverRelation>
+		| Omit<{ oneHasManyRel: Bar['unique']}, OverRelation>
+	columns: {
+		id: string
+	}
+	hasOne: {
+	}
+	hasMany: {
+		oneHasManyRel: Bar<'manyHasOneRel'>
+	}
+	hasManyBy: {
+	}
 }
 export type Bar <OverRelation extends string | never = never> = {
-\tname: 'Bar'
-\tunique:
-\t\t| Omit<{ id: string}, OverRelation>
-\tcolumns: {
-\t\tid: string
-\t}
-\thasOne: {
-\t\tmanyHasOneRel: Foo
-\t}
-\thasMany: {
-\t}
-\thasManyBy: {
-\t}
+	name: 'Bar'
+	unique:
+		| Omit<{ id: string}, OverRelation>
+	columns: {
+		id: string
+	}
+	hasOne: {
+		manyHasOneRel: Foo
+	}
+	hasMany: {
+	}
+	hasManyBy: {
+	}
 }
 
 export type ContemberClientEntities = {
-\tFoo: Foo
-\tBar: Bar
+	Foo: Foo
+	Bar: Bar
 }
 
 export type ContemberClientSchema = {
-\tentities: ContemberClientEntities
+	entities: ContemberClientEntities
 }
 "
 `;
@@ -183,43 +183,43 @@ export type JSONObject = { readonly [K in string]?: JSONValue }
 export type JSONArray = readonly JSONValue[]
 
 export type Foo <OverRelation extends string | never = never> = {
-\tname: 'Foo'
-\tunique:
-\t\t| Omit<{ id: string}, OverRelation>
-\tcolumns: {
-\t\tid: string
-\t}
-\thasOne: {
-\t}
-\thasMany: {
-\t\tmanyHasManyRel: Bar
-\t}
-\thasManyBy: {
-\t}
+	name: 'Foo'
+	unique:
+		| Omit<{ id: string}, OverRelation>
+	columns: {
+		id: string
+	}
+	hasOne: {
+	}
+	hasMany: {
+		manyHasManyRel: Bar
+	}
+	hasManyBy: {
+	}
 }
 export type Bar <OverRelation extends string | never = never> = {
-\tname: 'Bar'
-\tunique:
-\t\t| Omit<{ id: string}, OverRelation>
-\tcolumns: {
-\t\tid: string
-\t}
-\thasOne: {
-\t}
-\thasMany: {
-\t\tmanyHasManyInverseRel: Foo
-\t}
-\thasManyBy: {
-\t}
+	name: 'Bar'
+	unique:
+		| Omit<{ id: string}, OverRelation>
+	columns: {
+		id: string
+	}
+	hasOne: {
+	}
+	hasMany: {
+		manyHasManyInverseRel: Foo
+	}
+	hasManyBy: {
+	}
 }
 
 export type ContemberClientEntities = {
-\tFoo: Foo
-\tBar: Bar
+	Foo: Foo
+	Bar: Bar
 }
 
 export type ContemberClientSchema = {
-\tentities: ContemberClientEntities
+	entities: ContemberClientEntities
 }
 "
 `;
@@ -232,47 +232,47 @@ export type JSONObject = { readonly [K in string]?: JSONValue }
 export type JSONArray = readonly JSONValue[]
 
 export type Foo <OverRelation extends string | never = never> = {
-\tname: 'Foo'
-\tunique:
-\t\t| Omit<{ id: string}, OverRelation>
-\t\t| Omit<{ locales: FooLocale['unique']}, OverRelation>
-\tcolumns: {
-\t\tid: string
-\t}
-\thasOne: {
-\t}
-\thasMany: {
-\t\tlocales: FooLocale<'foo'>
-\t}
-\thasManyBy: {
-\t\tlocalesByLocale: { entity: FooLocale; by: {locale: string}  }
-\t}
+	name: 'Foo'
+	unique:
+		| Omit<{ id: string}, OverRelation>
+		| Omit<{ locales: FooLocale['unique']}, OverRelation>
+	columns: {
+		id: string
+	}
+	hasOne: {
+	}
+	hasMany: {
+		locales: FooLocale<'foo'>
+	}
+	hasManyBy: {
+		localesByLocale: { entity: FooLocale; by: {locale: string}  }
+	}
 }
 export type FooLocale <OverRelation extends string | never = never> = {
-\tname: 'FooLocale'
-\tunique:
-\t\t| Omit<{ id: string}, OverRelation>
-\t\t| Omit<{ locale: string, foo: Foo['unique']}, OverRelation>
-\tcolumns: {
-\t\tid: string
-\t\tlocale: string
-\t}
-\thasOne: {
-\t\tfoo: Foo
-\t}
-\thasMany: {
-\t}
-\thasManyBy: {
-\t}
+	name: 'FooLocale'
+	unique:
+		| Omit<{ id: string}, OverRelation>
+		| Omit<{ locale: string, foo: Foo['unique']}, OverRelation>
+	columns: {
+		id: string
+		locale: string
+	}
+	hasOne: {
+		foo: Foo
+	}
+	hasMany: {
+	}
+	hasManyBy: {
+	}
 }
 
 export type ContemberClientEntities = {
-\tFoo: Foo
-\tFooLocale: FooLocale
+	Foo: Foo
+	FooLocale: FooLocale
 }
 
 export type ContemberClientSchema = {
-\tentities: ContemberClientEntities
+	entities: ContemberClientEntities
 }
 "
 `;

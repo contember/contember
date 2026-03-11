@@ -16,8 +16,17 @@ export class ContemberClientGenerator {
 		const enumTypeSchema = this.enumTypeSchemaGenerator.generate(model)
 		const entityTypeSchema = this.entityTypeSchemaGenerator.generate(model)
 
-		const namesCode = `import { SchemaNames } from '@contember/client-content'
-export const ContemberClientNames: SchemaNames = ` + JSON.stringify(nameSchema, null, 2)
+		const namesCode = `import type { SchemaNames, SchemaEntityNames } from '@contember/client-content'
+import type { ContemberClientEntities } from './entities'
+import type { ContemberClientEnums } from './enums'
+export const ContemberClientNames = {
+	entities: ${
+			JSON.stringify(nameSchema.entities, null, '\t').replaceAll('\n', '\n\t')
+		} satisfies {[K in keyof ContemberClientEntities]: SchemaEntityNames<K>},
+	enums: ${
+			JSON.stringify(nameSchema.enums, null, '\t').replaceAll('\n', '\n\t')
+		} satisfies {[K in keyof ContemberClientEnums]: readonly ContemberClientEnums[K][]},
+} satisfies SchemaNames`
 
 		const indexCode = `
 import { ContemberClientNames } from './names'

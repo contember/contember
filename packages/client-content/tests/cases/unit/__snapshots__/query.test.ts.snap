@@ -1,130 +1,108 @@
-// Bun Snapshot v1, https://goo.gl/fbAQLP
+// Bun Snapshot v1, https://bun.sh/docs/test/snapshots
 
 exports[`queries list 1`] = `
 "query {
-\tauthors: listAuthor {
-\t\tid
-\t\tname
-\t\temail
-\t}
+	authors: listAuthor {
+		id
+		name
+		email
+	}
 }
 "
 `;
 
 exports[`queries multiple queries 1`] = `
 "query {
-\tauthors: listAuthor {
-\t\tid
-\t\tname
-\t\temail
-\t}
-\tposts: listPost {
-\t\tid
-\t\tpublishedAt
-\t}
+	authors: listAuthor {
+		id
+		name
+		email
+	}
+	posts: listPost {
+		id
+		publishedAt
+		status
+	}
 }
 "
 `;
 
 exports[`queries single query 1`] = `
 "query {
-\tvalue: listPost {
-\t\tid
-\t\tpublishedAt
-\t}
+	value: listPost {
+		id
+		publishedAt
+		status
+	}
 }
 "
 `;
 
 exports[`queries nested object 1`] = `
 "query {
-\tauthors: listAuthor {
-\t\tid
-\t\tname
-\t\temail
-\t\tposts {
-\t\t\tid
-\t\t\tpublishedAt
-\t\t\ttags {
-\t\t\t\tid
-\t\t\t\tname
-\t\t\t}
-\t\t}
-\t}
-}
-"
-`;
-
-exports[`queries nested object args 1`] = `
-"query($PostWhere_0: PostWhere, $Int_1: Int) {
-\tauthors: listAuthor {
-\t\tid
-\t\tname
-\t\temail
-\t\tposts(filter: $PostWhere_0, limit: $Int_1) {
-\t\t\tid
-\t\t\tpublishedAt
-\t\t}
-\t}
-}
-"
-`;
-
-exports[`queries list with args: 
-\t\t\t"query($AuthorWhere_0: AuthorWhere, $AuthorOrderBy_1: [AuthorOrderBy!], $Int_2: Int, $Int_3: Int) {
-\t\t\t\tauthors: listAuthor(filter: $AuthorWhere_0, orderBy: $AuthorOrderBy_1, limit: $Int_2, offset: $Int_3) {
-\t\t\t\t\tid
-\t\t\t\t\tname
-\t\t\t\t\temail
-\t\t\t\t}
-\t\t\t}
-\t\t\t"
-\t\t 1`] = `
-"query($AuthorWhere_0: AuthorWhere, $AuthorOrderBy_1: [AuthorOrderBy!], $Int_2: Int, $Int_3: Int) {
-\tauthors: listAuthor(filter: $AuthorWhere_0, orderBy: $AuthorOrderBy_1, limit: $Int_2, offset: $Int_3) {
-\t\tid
-\t\tname
-\t\temail
-\t}
-}
-"
-`;
-
-exports[`queries get by id 1`] = `
-"query($AuthorUniqueWhere_0: AuthorUniqueWhere!) {
-\tauthors: getAuthor(by: $AuthorUniqueWhere_0) {
-\t\tid
-\t\tname
-\t\temail
-\t}
-}
-"
-`;
-
-exports[`queries nested has-many transform 1`] = `
-[
-  {
-    "query": 
-"query($AuthorUniqueWhere_0: AuthorUniqueWhere!) {
-	author: getAuthor(by: $AuthorUniqueWhere_0) {
+	authors: listAuthor {
 		id
 		name
 		email
 		posts {
 			id
 			publishedAt
+			status
+			tags {
+				id
+				name
+			}
 		}
 	}
 }
 "
-,
-    "variables": {
-      "AuthorUniqueWhere_0": {
-        "id": "123",
-      },
-    },
-  },
-]
+`;
+
+exports[`queries nested object args 1`] = `
+"query($PostWhere_0: PostWhere, $Int_1: Int) {
+	authors: listAuthor {
+		id
+		name
+		email
+		posts(filter: $PostWhere_0, limit: $Int_1) {
+			id
+			publishedAt
+			status
+		}
+	}
+}
+"
+`;
+
+exports[`queries list with args: 
+			"query($AuthorWhere_0: AuthorWhere, $AuthorOrderBy_1: [AuthorOrderBy!], $Int_2: Int, $Int_3: Int) {
+				authors: listAuthor(filter: $AuthorWhere_0, orderBy: $AuthorOrderBy_1, limit: $Int_2, offset: $Int_3) {
+					id
+					name
+					email
+				}
+			}
+			"
+		 1`] = `
+"query($AuthorWhere_0: AuthorWhere, $AuthorOrderBy_1: [AuthorOrderBy!], $Int_2: Int, $Int_3: Int) {
+	authors: listAuthor(filter: $AuthorWhere_0, orderBy: $AuthorOrderBy_1, limit: $Int_2, offset: $Int_3) {
+		id
+		name
+		email
+	}
+}
+"
+`;
+
+exports[`queries get by id 1`] = `
+"query($AuthorUniqueWhere_0: AuthorUniqueWhere!) {
+	authors: getAuthor(by: $AuthorUniqueWhere_0) {
+		id
+		name
+		email
+	}
+}
+"
 `;
 
 exports[`queries top level list transform 1`] = `
@@ -167,6 +145,33 @@ exports[`queries top level get transform 1`] = `
 ]
 `;
 
+exports[`queries nested has-many transform 1`] = `
+[
+  {
+    "query": 
+"query($AuthorUniqueWhere_0: AuthorUniqueWhere!) {
+	author: getAuthor(by: $AuthorUniqueWhere_0) {
+		id
+		name
+		email
+		posts {
+			id
+			publishedAt
+			status
+		}
+	}
+}
+"
+,
+    "variables": {
+      "AuthorUniqueWhere_0": {
+        "id": "123",
+      },
+    },
+  },
+]
+`;
+
 exports[`queries nested has-one transform 1`] = `
 [
   {
@@ -175,6 +180,7 @@ exports[`queries nested has-one transform 1`] = `
 	post: getPost(by: $PostUniqueWhere_0) {
 		id
 		publishedAt
+		status
 		author {
 			id
 			name
@@ -201,6 +207,7 @@ exports[`queries nested has-many-by transform 1`] = `
 	post: getPost(by: $PostUniqueWhere_0) {
 		id
 		publishedAt
+		status
 		localesByLocale(by: $PostLocalesByLocaleUniqueWhere_1) {
 			id
 			title

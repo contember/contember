@@ -1,6 +1,7 @@
+/* eslint-disable @typescript-eslint/ban-ts-comment */
 import { describe, expect, test } from 'bun:test'
 import { ContentClientInput } from '../../../src'
-import { ContemberClientEntities, FragmentOf, FragmentType, queryBuilder } from '../../client'
+import { ContemberClientEntities, FragmentOf, FragmentType, PostStatus, queryBuilder } from '../../client'
 import { expectTypeOf } from 'expect-type'
 
 const qb = queryBuilder
@@ -143,6 +144,6 @@ describe('ts types', () => {
 	test('omit', async () => {
 		const fragment = qb.fragment('Post', it => it.$$().omit('publishedAt'))
 		type fragmentType = FragmentType<typeof fragment>
-		expectTypeOf<fragmentType>().toEqualTypeOf<{ id: string }>()
+		expectTypeOf<fragmentType>().toEqualTypeOf<{ id: string; status: PostStatus | null }>()
 	})
 })

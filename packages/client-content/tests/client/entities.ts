@@ -1,3 +1,4 @@
+import type { PostStatus } from './enums'
 
 export type JSONPrimitive = string | number | boolean | null
 export type JSONValue = JSONPrimitive | JSONObject | JSONArray
@@ -47,6 +48,7 @@ export type Post <OverRelation extends string | never = never> = {
 	columns: {
 		id: string
 		publishedAt: string | null
+		status: PostStatus | null
 	}
 	hasOne: {
 		author: Author

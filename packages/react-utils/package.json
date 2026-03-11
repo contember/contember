@@ -36,5 +36,10 @@
   },
   "dependencies": {
     "fast-deep-equal": "catalog:"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/contember/contember-oss.git",
+    "directory": "packages/react-utils"
   }
 }

@@ -33,5 +33,10 @@
   },
   "peerDependencies": {
     "react": "catalog:"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/contember/contember-oss.git",
+    "directory": "packages/react-multipass-rendering"
   }
 }

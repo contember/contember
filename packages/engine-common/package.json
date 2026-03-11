@@ -28,5 +28,10 @@
   "dependencies": {
     "@contember/logger": "workspace:*"
   },
-  "type": "module"
+  "type": "module",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/contember/contember-oss.git",
+    "directory": "packages/engine-common"
+  }
 }

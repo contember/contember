@@ -33,5 +33,10 @@
     "@contember/client": "workspace:*",
     "@contember/utilities": "workspace:*",
     "uuid": "catalog:"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/contember/contember-oss.git",
+    "directory": "packages/binding-legacy"
   }
 }

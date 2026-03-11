@@ -35,5 +35,10 @@
   "devDependencies": {
     "@types/node": "catalog:"
   },
-  "type": "module"
+  "type": "module",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/contember/contember-oss.git",
+    "directory": "packages/migrations-client"
+  }
 }

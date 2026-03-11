@@ -36,5 +36,10 @@
     "@types/node": "catalog:",
     "graphql": "catalog:",
     "graphql-ts-client-codegen": "catalog:"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/contember/contember-oss.git",
+    "directory": "packages/graphql-client-system"
   }
 }

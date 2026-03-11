@@ -32,5 +32,10 @@
     "@contember/binding-common": "workspace:*",
     "@contember/binding-legacy": "workspace:*",
     "@contember/binding-ng": "workspace:*"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/contember/contember-oss.git",
+    "directory": "packages/binding"
   }
 }

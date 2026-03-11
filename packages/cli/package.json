@@ -10,6 +10,7 @@
     "build": "tailwindcss -i src/lib/project/docs/resources/style.css -o ./dist/resources/out.css"
   },
   "devDependencies": {
+    "@tailwindcss/cli": "catalog:",
     "@types/fs-extra": "catalog:",
     "@types/js-yaml": "catalog:",
     "@types/node": "catalog:",
@@ -46,5 +47,10 @@
   },
   "peerDependencies": {
     "esbuild": "catalog:"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/contember/contember-oss.git",
+    "directory": "packages/cli"
   }
 }

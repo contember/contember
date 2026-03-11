@@ -25,11 +25,11 @@
     },
     "packages/authorization": {
       "name": "@contember/authorization",
-      "version": "2.1.0-alpha.32",
+      "version": "2.1.0-alpha.33",
     },
     "packages/binding": {
       "name": "@contember/binding",
-      "version": "2.1.0-alpha.32",
+      "version": "2.1.0-alpha.33",
       "dependencies": {
         "@contember/binding-common": "workspace:*",
         "@contember/binding-legacy": "workspace:*",
@@ -38,7 +38,7 @@
     },
     "packages/binding-common": {
       "name": "@contember/binding-common",
-      "version": "2.1.0-alpha.32",
+      "version": "2.1.0-alpha.33",
       "dependencies": {
         "@contember/client": "workspace:*",
         "@contember/client-content": "workspace:*",
@@ -60,7 +60,7 @@
     },
     "packages/binding-legacy": {
       "name": "@contember/binding-legacy",
-      "version": "2.1.0-alpha.32",
+      "version": "2.1.0-alpha.33",
       "dependencies": {
         "@contember/binding-common": "workspace:*",
         "@contember/client": "workspace:*",
@@ -70,11 +70,11 @@
     },
     "packages/binding-ng": {
       "name": "@contember/binding-ng",
-      "version": "2.1.0-alpha.32",
+      "version": "2.1.0-alpha.33",
     },
     "packages/cli": {
       "name": "@contember/cli",
-      "version": "2.1.0-alpha.32",
+      "version": "2.1.0-alpha.33",
       "bin": {
         "contember": "./dist/production/run.js",
       },
@@ -120,7 +120,7 @@
     },
     "packages/cli-common": {
       "name": "@contember/cli-common",
-      "version": "2.1.0-alpha.32",
+      "version": "2.1.0-alpha.33",
       "dependencies": {
         "chalk": "catalog:",
       },
@@ -132,7 +132,7 @@
     },
     "packages/client": {
       "name": "@contember/client",
-      "version": "2.1.0-alpha.32",
+      "version": "2.1.0-alpha.33",
       "dependencies": {
         "@contember/client-content": "workspace:*",
         "@contember/graphql-builder": "workspace:*",
@@ -142,7 +142,7 @@
     },
     "packages/client-content": {
       "name": "@contember/client-content",
-      "version": "2.1.0-alpha.32",
+      "version": "2.1.0-alpha.33",
       "dependencies": {
         "@contember/graphql-builder": "workspace:*",
         "@contember/graphql-client": "workspace:*",
@@ -155,7 +155,7 @@
     },
     "packages/client-content-generator": {
       "name": "@contember/client-content-generator",
-      "version": "2.1.0-alpha.32",
+      "version": "2.1.0-alpha.33",
       "bin": {
         "contember-client-generator": "./dist/production/generate.cjs",
       },
@@ -171,7 +171,7 @@
     },
     "packages/config-loader": {
       "name": "@contember/config-loader",
-      "version": "2.1.0-alpha.32",
+      "version": "2.1.0-alpha.33",
       "dependencies": {
         "js-yaml": "catalog:",
       },
@@ -182,7 +182,7 @@
     },
     "packages/create": {
       "name": "@contember/create",
-      "version": "2.1.0-alpha.32",
+      "version": "2.1.0-alpha.33",
       "bin": "dist/production/run.js",
       "dependencies": {
         "@contember/cli-common": "workspace:*",
@@ -197,7 +197,7 @@
     },
     "packages/database": {
       "name": "@contember/database",
-      "version": "2.1.0-alpha.32",
+      "version": "2.1.0-alpha.33",
       "dependencies": {
         "@contember/queryable": "workspace:*",
       },
@@ -212,7 +212,7 @@
     },
     "packages/database-migrations": {
       "name": "@contember/database-migrations",
-      "version": "2.1.0-alpha.32",
+      "version": "2.1.0-alpha.33",
       "dependencies": {
         "@contember/database": "workspace:*",
         "node-pg-migrate": "catalog:",
@@ -226,7 +226,7 @@
     },
     "packages/database-tester": {
       "name": "@contember/database-tester",
-      "version": "2.1.0-alpha.32",
+      "version": "2.1.0-alpha.33",
       "dependencies": {
         "@contember/database": "workspace:*",
       },
@@ -236,11 +236,11 @@
     },
     "packages/dic": {
       "name": "@contember/dic",
-      "version": "2.1.0-alpha.32",
+      "version": "2.1.0-alpha.33",
     },
     "packages/engine-actions": {
       "name": "@contember/engine-actions",
-      "version": "2.1.0-alpha.32",
+      "version": "2.1.0-alpha.33",
       "dependencies": {
         "@contember/authorization": "workspace:*",
         "@contember/database": "workspace:*",
@@ -271,7 +271,7 @@
     },
     "packages/engine-common": {
       "name": "@contember/engine-common",
-      "version": "2.1.0-alpha.32",
+      "version": "2.1.0-alpha.33",
       "dependencies": {
         "@contember/logger": "workspace:*",
       },
@@ -281,7 +281,7 @@
     },
     "packages/engine-content-api": {
       "name": "@contember/engine-content-api",
-      "version": "2.1.0-alpha.32",
+      "version": "2.1.0-alpha.33",
       "dependencies": {
         "@contember/database": "workspace:*",
         "@contember/dic": "workspace:*",
@@ -306,7 +306,7 @@
     },
     "packages/engine-http": {
       "name": "@contember/engine-http",
-      "version": "2.1.0-alpha.32",
+      "version": "2.1.0-alpha.33",
       "dependencies": {
         "@contember/config-loader": "workspace:*",
         "@contember/database": "workspace:*",
@@ -354,7 +354,7 @@
     },
     "packages/engine-plugins": {
       "name": "@contember/engine-plugins",
-      "version": "2.1.0-alpha.32",
+      "version": "2.1.0-alpha.33",
       "dependencies": {
         "@contember/database-migrations": "workspace:*",
         "@contember/engine-http": "workspace:*",
@@ -369,7 +369,7 @@
     },
     "packages/engine-s3-plugin": {
       "name": "@contember/engine-s3-plugin",
-      "version": "2.1.0-alpha.32",
+      "version": "2.1.0-alpha.33",
       "dependencies": {
         "@contember/engine-plugins": "workspace:*",
         "@contember/graphql-utils": "workspace:*",
@@ -391,7 +391,7 @@
     },
     "packages/engine-server": {
       "name": "@contember/engine-server",
-      "version": "2.1.0-alpha.32",
+      "version": "2.1.0-alpha.33",
       "dependencies": {
         "@contember/engine-actions": "workspace:*",
         "@contember/engine-http": "workspace:*",
@@ -409,7 +409,7 @@
     },
     "packages/engine-system-api": {
       "name": "@contember/engine-system-api",
-      "version": "2.1.0-alpha.32",
+      "version": "2.1.0-alpha.33",
       "dependencies": {
         "@contember/authorization": "workspace:*",
         "@contember/database": "workspace:*",
@@ -437,7 +437,7 @@
     },
     "packages/engine-tenant-api": {
       "name": "@contember/engine-tenant-api",
-      "version": "2.1.0-alpha.32",
+      "version": "2.1.0-alpha.33",
       "dependencies": {
         "@contember/authorization": "workspace:*",
         "@contember/config-loader": "workspace:*",
@@ -473,7 +473,7 @@
     },
     "packages/engine-vimeo-plugin": {
       "name": "@contember/engine-vimeo-plugin",
-      "version": "2.1.0-alpha.32",
+      "version": "2.1.0-alpha.33",
       "dependencies": {
         "@contember/engine-plugins": "workspace:*",
         "@contember/typesafe": "workspace:*",
@@ -489,18 +489,18 @@
     },
     "packages/graphql-builder": {
       "name": "@contember/graphql-builder",
-      "version": "2.1.0-alpha.32",
+      "version": "2.1.0-alpha.33",
       "dependencies": {
         "@contember/schema": "workspace:*",
       },
     },
     "packages/graphql-client": {
       "name": "@contember/graphql-client",
-      "version": "2.1.0-alpha.32",
+      "version": "2.1.0-alpha.33",
     },
     "packages/graphql-client-system": {
       "name": "@contember/graphql-client-system",
-      "version": "2.1.0-alpha.32",
+      "version": "2.1.0-alpha.33",
       "dependencies": {
         "@contember/schema": "workspace:*",
         "graphql-ts-client-api": "catalog:",
@@ -515,7 +515,7 @@
     },
     "packages/graphql-client-tenant": {
       "name": "@contember/graphql-client-tenant",
-      "version": "2.1.0-alpha.32",
+      "version": "2.1.0-alpha.33",
       "dependencies": {
         "graphql-ts-client-api": "catalog:",
       },
@@ -529,7 +529,7 @@
     },
     "packages/graphql-utils": {
       "name": "@contember/graphql-utils",
-      "version": "2.1.0-alpha.32",
+      "version": "2.1.0-alpha.33",
       "devDependencies": {
         "@types/node": "catalog:",
         "graphql": "catalog:",
@@ -540,7 +540,7 @@
     },
     "packages/interface": {
       "name": "@contember/interface",
-      "version": "2.1.0-alpha.32",
+      "version": "2.1.0-alpha.33",
       "dependencies": {
         "@contember/react-binding": "workspace:*",
         "@contember/react-client": "workspace:*",
@@ -562,7 +562,7 @@
     },
     "packages/logger": {
       "name": "@contember/logger",
-      "version": "2.1.0-alpha.32",
+      "version": "2.1.0-alpha.33",
       "dependencies": {
         "chalk": "catalog:",
       },
@@ -572,7 +572,7 @@
     },
     "packages/migrations-client": {
       "name": "@contember/migrations-client",
-      "version": "2.1.0-alpha.32",
+      "version": "2.1.0-alpha.33",
       "dependencies": {
         "@contember/engine-common": "workspace:*",
         "@contember/graphql-client": "workspace:*",
@@ -586,7 +586,7 @@
     },
     "packages/playground": {
       "name": "@contember/playground",
-      "version": "2.1.0-alpha.32",
+      "version": "2.1.0-alpha.33",
       "dependencies": {
         "@sindresorhus/slugify": "catalog:",
       },
@@ -622,11 +622,11 @@
     },
     "packages/queryable": {
       "name": "@contember/queryable",
-      "version": "2.1.0-alpha.32",
+      "version": "2.1.0-alpha.33",
     },
     "packages/react-binding": {
       "name": "@contember/react-binding",
-      "version": "2.1.0-alpha.32",
+      "version": "2.1.0-alpha.33",
       "dependencies": {
         "@contember/binding": "workspace:*",
         "@contember/client": "workspace:*",
@@ -649,7 +649,7 @@
     },
     "packages/react-block-repeater": {
       "name": "@contember/react-block-repeater",
-      "version": "2.1.0-alpha.32",
+      "version": "2.1.0-alpha.33",
       "dependencies": {
         "@contember/react-binding": "workspace:*",
         "@contember/react-multipass-rendering": "workspace:*",
@@ -669,7 +669,7 @@
     },
     "packages/react-board": {
       "name": "@contember/react-board",
-      "version": "2.1.0-alpha.32",
+      "version": "2.1.0-alpha.33",
       "dependencies": {
         "@contember/react-binding": "workspace:*",
         "@contember/react-multipass-rendering": "workspace:*",
@@ -686,7 +686,7 @@
     },
     "packages/react-board-dnd-kit": {
       "name": "@contember/react-board-dnd-kit",
-      "version": "2.1.0-alpha.32",
+      "version": "2.1.0-alpha.33",
       "dependencies": {
         "@contember/react-binding": "workspace:*",
         "@contember/react-board": "workspace:*",
@@ -708,7 +708,7 @@
     },
     "packages/react-client": {
       "name": "@contember/react-client",
-      "version": "2.1.0-alpha.32",
+      "version": "2.1.0-alpha.33",
       "dependencies": {
         "@contember/client": "workspace:*",
         "@contember/graphql-client": "workspace:*",
@@ -721,7 +721,7 @@
     },
     "packages/react-client-content": {
       "name": "@contember/react-client-content",
-      "version": "2.1.0-alpha.32",
+      "version": "2.1.0-alpha.33",
       "dependencies": {
         "@contember/client-content": "workspace:*",
         "@contember/react-client": "workspace:*",
@@ -738,7 +738,7 @@
     },
     "packages/react-client-tenant": {
       "name": "@contember/react-client-tenant",
-      "version": "2.1.0-alpha.32",
+      "version": "2.1.0-alpha.33",
       "dependencies": {
         "@contember/graphql-client-tenant": "workspace:*",
         "@contember/react-client": "workspace:*",
@@ -758,7 +758,7 @@
     },
     "packages/react-dataview": {
       "name": "@contember/react-dataview",
-      "version": "2.1.0-alpha.32",
+      "version": "2.1.0-alpha.33",
       "dependencies": {
         "@contember/client": "workspace:*",
         "@contember/react-binding": "workspace:*",
@@ -781,7 +781,7 @@
     },
     "packages/react-devbar": {
       "name": "@contember/react-devbar",
-      "version": "2.1.0-alpha.32",
+      "version": "2.1.0-alpha.33",
       "dependencies": {
         "@contember/react-utils": "workspace:*",
         "@contember/utilities": "workspace:*",
@@ -800,7 +800,7 @@
     },
     "packages/react-form": {
       "name": "@contember/react-form",
-      "version": "2.1.0-alpha.32",
+      "version": "2.1.0-alpha.33",
       "dependencies": {
         "@contember/react-binding": "workspace:*",
         "@contember/react-utils": "workspace:*",
@@ -818,7 +818,7 @@
     },
     "packages/react-identity": {
       "name": "@contember/react-identity",
-      "version": "2.1.0-alpha.32",
+      "version": "2.1.0-alpha.33",
       "dependencies": {
         "@contember/react-binding": "workspace:*",
         "@contember/react-client": "workspace:*",
@@ -835,7 +835,7 @@
     },
     "packages/react-multipass-rendering": {
       "name": "@contember/react-multipass-rendering",
-      "version": "2.1.0-alpha.32",
+      "version": "2.1.0-alpha.33",
       "dependencies": {
         "@contember/utilities": "workspace:*",
       },
@@ -845,7 +845,7 @@
     },
     "packages/react-repeater": {
       "name": "@contember/react-repeater",
-      "version": "2.1.0-alpha.32",
+      "version": "2.1.0-alpha.33",
       "dependencies": {
         "@contember/react-binding": "workspace:*",
         "@contember/react-utils": "workspace:*",
@@ -863,7 +863,7 @@
     },
     "packages/react-repeater-dnd-kit": {
       "name": "@contember/react-repeater-dnd-kit",
-      "version": "2.1.0-alpha.32",
+      "version": "2.1.0-alpha.33",
       "dependencies": {
         "@contember/react-binding": "workspace:*",
         "@contember/react-repeater": "workspace:*",
@@ -884,7 +884,7 @@
     },
     "packages/react-richtext-renderer": {
       "name": "@contember/react-richtext-renderer",
-      "version": "2.1.0-alpha.32",
+      "version": "2.1.0-alpha.33",
       "devDependencies": {
         "@testing-library/dom": "catalog:",
         "@testing-library/react": "catalog:",
@@ -895,7 +895,7 @@
     },
     "packages/react-routing": {
       "name": "@contember/react-routing",
-      "version": "2.1.0-alpha.32",
+      "version": "2.1.0-alpha.33",
       "dependencies": {
         "@contember/react-binding": "workspace:*",
         "@contember/react-utils": "workspace:*",
@@ -914,7 +914,7 @@
     },
     "packages/react-select": {
       "name": "@contember/react-select",
-      "version": "2.1.0-alpha.32",
+      "version": "2.1.0-alpha.33",
       "dependencies": {
         "@contember/react-binding": "workspace:*",
         "@contember/react-dataview": "workspace:*",
@@ -934,7 +934,7 @@
     },
     "packages/react-slate-editor": {
       "name": "@contember/react-slate-editor",
-      "version": "2.1.0-alpha.32",
+      "version": "2.1.0-alpha.33",
       "dependencies": {
         "@contember/react-binding": "workspace:*",
         "@contember/react-multipass-rendering": "workspace:*",
@@ -956,7 +956,7 @@
     },
     "packages/react-slate-editor-base": {
       "name": "@contember/react-slate-editor-base",
-      "version": "2.1.0-alpha.32",
+      "version": "2.1.0-alpha.33",
       "dependencies": {
         "@contember/react-binding": "workspace:*",
         "@contember/utilities": "workspace:*",
@@ -979,7 +979,7 @@
     },
     "packages/react-slate-editor-legacy": {
       "name": "@contember/react-slate-editor-legacy",
-      "version": "2.1.0-alpha.32",
+      "version": "2.1.0-alpha.33",
       "dependencies": {
         "@contember/react-binding": "workspace:*",
         "@contember/react-multipass-rendering": "workspace:*",
@@ -1003,7 +1003,7 @@
     },
     "packages/react-slots": {
       "name": "@contember/react-slots",
-      "version": "2.1.0-alpha.32",
+      "version": "2.1.0-alpha.33",
       "dependencies": {
         "@contember/react-utils": "workspace:*",
         "@contember/utilities": "workspace:*",
@@ -1019,7 +1019,7 @@
     },
     "packages/react-ui-lib": {
       "name": "@contember/react-ui-lib",
-      "version": "2.1.0-alpha.32",
+      "version": "2.1.0-alpha.33",
       "dependencies": {
         "@contember/graphql-client-tenant": "workspace:*",
         "@contember/interface": "workspace:*",
@@ -1075,7 +1075,7 @@
     },
     "packages/react-uploader": {
       "name": "@contember/react-uploader",
-      "version": "2.1.0-alpha.32",
+      "version": "2.1.0-alpha.33",
       "dependencies": {
         "@contember/client": "workspace:*",
         "@contember/graphql-client": "workspace:*",
@@ -1095,7 +1095,7 @@
     },
     "packages/react-uploader-dropzone": {
       "name": "@contember/react-uploader-dropzone",
-      "version": "2.1.0-alpha.32",
+      "version": "2.1.0-alpha.33",
       "dependencies": {
         "@contember/react-binding": "workspace:*",
         "@contember/react-uploader": "workspace:*",
@@ -1115,7 +1115,7 @@
     },
     "packages/react-utils": {
       "name": "@contember/react-utils",
-      "version": "2.1.0-alpha.32",
+      "version": "2.1.0-alpha.33",
       "dependencies": {
         "fast-deep-equal": "catalog:",
       },
@@ -1128,11 +1128,11 @@
     },
     "packages/schema": {
       "name": "@contember/schema",
-      "version": "2.1.0-alpha.32",
+      "version": "2.1.0-alpha.33",
     },
     "packages/schema-definition": {
       "name": "@contember/schema-definition",
-      "version": "2.1.0-alpha.32",
+      "version": "2.1.0-alpha.33",
       "dependencies": {
         "@contember/schema": "workspace:*",
         "@contember/schema-utils": "workspace:*",
@@ -1148,7 +1148,7 @@
     },
     "packages/schema-migrations": {
       "name": "@contember/schema-migrations",
-      "version": "2.1.0-alpha.32",
+      "version": "2.1.0-alpha.33",
       "dependencies": {
         "@contember/database": "workspace:*",
         "@contember/database-migrations": "workspace:*",
@@ -1167,7 +1167,7 @@
     },
     "packages/schema-utils": {
       "name": "@contember/schema-utils",
-      "version": "2.1.0-alpha.32",
+      "version": "2.1.0-alpha.33",
       "dependencies": {
         "@contember/schema": "workspace:*",
         "@contember/typesafe": "workspace:*",
@@ -1179,21 +1179,21 @@
     },
     "packages/typesafe": {
       "name": "@contember/typesafe",
-      "version": "2.1.0-alpha.32",
+      "version": "2.1.0-alpha.33",
       "devDependencies": {
         "@types/node": "catalog:",
       },
     },
     "packages/utilities": {
       "name": "@contember/utilities",
-      "version": "2.1.0-alpha.32",
+      "version": "2.1.0-alpha.33",
       "peerDependencies": {
         "react": "catalog:",
       },
     },
     "packages/vite-plugin": {
       "name": "@contember/vite-plugin",
-      "version": "2.1.0-alpha.32",
+      "version": "2.1.0-alpha.33",
       "peerDependencies": {
         "vite": "catalog:",
       },

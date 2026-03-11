@@ -1,5 +1,21 @@
 const {exec} = require('child_process')
-const core = require('@actions/core')
+const fs = require('fs')
+const os = require('os')
+
+const getInput = (name) => {
+	const val = process.env[`INPUT_${name.toUpperCase()}`] || ''
+	if (!val) {
+		throw new Error(`Input required and not supplied: ${name}`)
+	}
+	return val
+}
+
+const setOutput = (name, value) => {
+	const filePath = process.env['GITHUB_OUTPUT'] || ''
+	if (filePath) {
+		fs.appendFileSync(filePath, `${name}=${value}${os.EOL}`)
+	}
+}
 
 const parseVersion = (version) => {
 	const match = version.match(/^(refs\/tags\/)?v?(?<major>[0-9]+)\.(?<minor>[0-9]+)\.(?<patch>[0-9]+)(-(?<prerelease>[a-z]+)\.(?<prereleaseVersion>[0-9]+))?$/)
@@ -14,8 +30,8 @@ const parseVersion = (version) => {
 		prereleaseVersion: match.groups.prereleaseVersion ? Number(match.groups.prereleaseVersion) : -1,
 	}
 }
-(() => {
-	const inputVersion = core.getInput('version', {required: true})
+;(() => {
+	const inputVersion = getInput('version')
 	const version = parseVersion(inputVersion)
 	if (!version) {
 		return
@@ -56,7 +72,7 @@ const parseVersion = (version) => {
 				}
 			}
 		}
-		core.setOutput('npmTag', npmTag)
-		core.setOutput('versions', latestVersions.join(" "))
+		setOutput('npmTag', npmTag)
+		setOutput('versions', latestVersions.join(" "))
 	})
 })()

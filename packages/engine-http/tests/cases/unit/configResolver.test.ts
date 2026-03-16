@@ -44,6 +44,62 @@ it('resolves tenant config', () => {
 		secrets: {},
 	})
 })
+it('resolves tenant config with group slug env prefix', () => {
+	const envWithGroup = {
+		...env,
+		TENANT_DB_HOST: 'default-db.example.com',
+		TENANT_DB_PORT: '5432',
+		TENANT_DB_USER: 'default_user',
+		TENANT_DB_PASSWORD: 'default_pass',
+		TENANT_DB_NAME: 'default_db',
+		STAGE_TENANT_DB_HOST: 'stage-db.example.com',
+		STAGE_TENANT_DB_NAME: 'stage_db',
+	}
+	const tenantResolver = createTenantConfigResolver(envWithGroup, configTemplate.tenant)
+	const resolvedTenantConfig = tenantResolver('stage', {})
+	assert.deepEqual(resolvedTenantConfig, {
+		db: {
+			host: 'stage-db.example.com',
+			port: 5432,
+			user: 'default_user',
+			password: 'default_pass',
+			database: 'stage_db',
+			connectionTimeoutMs: 5000,
+			pool: { maxConnections: 1000, maxConnecting: 10, idleTimeoutMs: 60000 },
+		},
+		mailer: {},
+		credentials: {},
+		secrets: {},
+	})
+})
+
+it('resolves tenant config with group slug falling back to unprefixed', () => {
+	const envWithGroup = {
+		...env,
+		TENANT_DB_HOST: 'default-db.example.com',
+		TENANT_DB_PORT: '5432',
+		TENANT_DB_USER: 'default_user',
+		TENANT_DB_PASSWORD: 'default_pass',
+		TENANT_DB_NAME: 'default_db',
+	}
+	const tenantResolver = createTenantConfigResolver(envWithGroup, configTemplate.tenant)
+	const resolvedTenantConfig = tenantResolver('prod', {})
+	assert.deepEqual(resolvedTenantConfig, {
+		db: {
+			host: 'default-db.example.com',
+			port: 5432,
+			user: 'default_user',
+			password: 'default_pass',
+			database: 'default_db',
+			connectionTimeoutMs: 5000,
+			pool: { maxConnections: 1000, maxConnecting: 10, idleTimeoutMs: 60000 },
+		},
+		mailer: {},
+		credentials: {},
+		secrets: {},
+	})
+})
+
 it('resolves project config', () => {
 	const tenantResolver = createTenantConfigResolver(env, configTemplate.tenant)
 	const resolvedTenantConfig = tenantResolver('test', tenantConfig)

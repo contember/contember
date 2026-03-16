@@ -1,9 +1,8 @@
-import { Selection } from 'slate'
-import { MouseEventHandler, ReactElement } from 'react'
-import { useSlate } from 'slate-react'
-import { Slot } from '@radix-ui/react-slot'
-import * as React from 'react'
 import { composeEventHandlers } from '@radix-ui/primitive'
+import { Slot } from '@radix-ui/react-slot'
+import { MouseEventHandler, ReactElement } from 'react'
+import { Selection } from 'slate'
+import { useSlate } from 'slate-react'
 import { EditorTransforms } from '../../slate-reexport'
 
 export interface EditorWrapNodeTriggerProps {
@@ -17,19 +16,20 @@ export interface EditorWrapNodeTriggerProps {
 export const EditorWrapNodeTrigger = ({ elementType, suchThat, selection, ...props }: EditorWrapNodeTriggerProps) => {
 	const editor = useSlate()
 	const onClick = () => {
-		if (selection) {
-			EditorTransforms.select(editor, selection)
+		const currentSelection = selection || editor.selection
+
+		if (currentSelection) {
+			EditorTransforms.select(editor, currentSelection)
+			EditorTransforms.wrapNodes(
+				editor,
+				{
+					type: elementType,
+					children: [{ text: '' }],
+					...suchThat,
+				},
+				{ split: true },
+			)
 		}
-		EditorTransforms.wrapNodes(
-			editor,
-			{
-				type: elementType,
-				children: [{ text: '' }],
-				...suchThat,
-			},
-			{ split: true },
-		)
-		EditorTransforms.collapse(editor, { edge: 'end' })
 	}
 
 	return <Slot {...props} onClick={composeEventHandlers(props.onClick, onClick)} />

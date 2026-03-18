@@ -17,6 +17,7 @@ export type EntitySelectionCommonInput<Alias extends string | null = string | nu
 export type EntitySelectionManyArgs<Alias extends string | null = string | null> =
 	& ContentClientInput.AnyListQueryInput
 	& EntitySelectionCommonInput<Alias>
+	& { totalCount?: boolean }
 export type EntitySelectionManyByArgs<Alias extends string | null = string | null> =
 	& { by: Input.UniqueWhere; filter?: Input.Where }
 	& EntitySelectionCommonInput<Alias>
@@ -186,18 +187,43 @@ export class ContentEntitySelection {
 		}
 
 		const entitySelection = typeof fields === 'function' ? fields(new ContentEntitySelection(newContext, [])) : fields
+
+		// Always use paginateRelation API (relay-like Connection format)
+		const paginateFieldName = `paginate${name.charAt(0).toUpperCase()}${name.slice(1)}`
+		const paginateSelectionSet: GraphQlSelectionSet = [
+			...(args.totalCount
+				? [
+					new GraphQlField(null, 'pageInfo', {}, [
+						new GraphQlField(null, 'totalCount'),
+					]),
+				]
+				: []),
+			new GraphQlField(null, 'edges', {}, [
+				new GraphQlField(null, 'node', {}, entitySelection.selectionSet),
+			]),
+		]
 		const newObjectField = new GraphQlField(
 			alias,
-			name,
-			createListArgs(entity, args),
-			entitySelection.selectionSet,
+			paginateFieldName,
+			createListArgs(entity, args, 'paginate'),
+			paginateSelectionSet,
 		)
 		const selectionWithField = this.withField(newObjectField)
+		const includeTotalCount = args.totalCount ?? false
 		const nestedTransform = entitySelection.transformFn
-		if (!nestedTransform) {
-			return selectionWithField
-		}
-		return selectionWithField.withFieldTransform(alias, it => it.map(nestedTransform))
+
+		// Transform: unwrap Connection → flat array, optionally attach totalCount
+		return selectionWithField.withFieldTransform(alias, (connection, ctx) => {
+			const items = connection.edges.map((edge: any) => nestedTransform ? nestedTransform(edge.node, ctx) : edge.node)
+			if (includeTotalCount && connection.pageInfo) {
+				Object.defineProperty(items, 'totalCount', {
+					value: connection.pageInfo.totalCount,
+					enumerable: false,
+					writable: false,
+				})
+			}
+			return items
+		})
 	}
 
 	private _manyBy(

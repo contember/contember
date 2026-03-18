@@ -286,14 +286,12 @@ describe('queries', () => {
 			author: {
 				name: 'John',
 				email: 'foo@localhost',
-				posts: [
-					{
-						publishedAt: '2021-01-01T00:00:00Z',
-					},
-					{
-						publishedAt: '2021-01-02T00:00:00Z',
-					},
-				],
+				posts: {
+					edges: [
+						{ node: { publishedAt: '2021-01-01T00:00:00Z' } },
+						{ node: { publishedAt: '2021-01-02T00:00:00Z' } },
+					],
+				},
 			},
 		})
 		const result = await client.query({
@@ -399,14 +397,12 @@ describe('queries', () => {
 			author: {
 				name: 'John',
 				email: 'foo@localhost',
-				posts: [
-					{
-						publishedAt: '2021-01-01T00:00:00Z',
-					},
-					{
-						publishedAt: '2021-01-02T00:00:00Z',
-					},
-				],
+				posts: {
+					edges: [
+						{ node: { publishedAt: '2021-01-01T00:00:00Z' } },
+						{ node: { publishedAt: '2021-01-02T00:00:00Z' } },
+					],
+				},
 			},
 		})
 		const result = await client.query({

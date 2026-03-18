@@ -359,7 +359,9 @@ export type EntitySelectionCommonInput<Alias extends string | null = string | nu
 };
 
 // @public (undocumented)
-export type EntitySelectionManyArgs<Alias extends string | null = string | null> = ContentClientInput.AnyListQueryInput & EntitySelectionCommonInput<Alias>;
+export type EntitySelectionManyArgs<Alias extends string | null = string | null> = ContentClientInput.AnyListQueryInput & EntitySelectionCommonInput<Alias> & {
+    totalCount?: boolean;
+};
 
 // @public (undocumented)
 export type EntitySelectionManyByArgs<Alias extends string | null = string | null> = {

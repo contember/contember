@@ -62,6 +62,7 @@ export class ContentQueryBuilder {
 		const selection = this.resolveSelection(fields, context)
 
 		return new ContentOperation('query', fieldName, typedArgs, selection.selectionSet, it => {
+			if (!it) return it
 			const transformFn = selection.transformFn
 			if (transformFn) {
 				return it.map((el: any) =>

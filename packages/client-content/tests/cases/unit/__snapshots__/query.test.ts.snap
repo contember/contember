@@ -44,13 +44,21 @@ exports[`queries nested object 1`] = `
 		id
 		name
 		email
-		posts {
-			id
-			publishedAt
-			status
-			tags {
-				id
-				name
+		posts: paginatePosts {
+			edges {
+				node {
+					id
+					publishedAt
+					status
+					tags: paginateTags {
+						edges {
+							node {
+								id
+								name
+							}
+						}
+					}
+				}
 			}
 		}
 	}
@@ -64,10 +72,14 @@ exports[`queries nested object args 1`] = `
 		id
 		name
 		email
-		posts(filter: $PostWhere_0, limit: $Int_1) {
-			id
-			publishedAt
-			status
+		posts: paginatePosts(filter: $PostWhere_0, first: $Int_1) {
+			edges {
+				node {
+					id
+					publishedAt
+					status
+				}
+			}
 		}
 	}
 }
@@ -154,10 +166,14 @@ exports[`queries nested has-many transform 1`] = `
 		id
 		name
 		email
-		posts {
-			id
-			publishedAt
-			status
+		posts: paginatePosts {
+			edges {
+				node {
+					id
+					publishedAt
+					status
+				}
+			}
 		}
 	}
 }

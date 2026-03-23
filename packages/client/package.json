@@ -31,7 +31,9 @@
   "dependencies": {
     "@contember/client-content": "workspace:*",
     "@contember/graphql-builder": "workspace:*",
-    "@contember/graphql-client": "workspace:*",
+    "@contember/graphql-client": "workspace:*"
+  },
+  "devDependencies": {
     "@contember/schema": "workspace:*"
   },
   "repository": {

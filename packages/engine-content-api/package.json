@@ -37,7 +37,6 @@
   },
   "devDependencies": {
     "@contember/database-tester": "workspace:*",
-    "@contember/schema-definition": "workspace:*",
     "@types/node": "catalog:",
     "graphql": "catalog:",
     "pg": "catalog:"

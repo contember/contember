@@ -27,10 +27,10 @@
     }
   },
   "dependencies": {
-    "@contember/schema": "workspace:*",
     "graphql-ts-client-api": "catalog:"
   },
   "devDependencies": {
+    "@contember/schema": "workspace:*",
     "@contember/engine-system-api": "workspace:*",
     "@graphql-tools/schema": "catalog:",
     "@types/node": "catalog:",

@@ -35,8 +35,7 @@
     "@contember/react-devbar": "workspace:*",
     "@contember/react-identity": "workspace:*",
     "@contember/react-routing": "workspace:*",
-    "@radix-ui/react-slot": "catalog:",
-    "stacktracey": "catalog:"
+    "@radix-ui/react-slot": "catalog:"
   },
   "peerDependencies": {
     "react": "catalog:",

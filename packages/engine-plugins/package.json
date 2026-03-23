@@ -22,15 +22,13 @@
       }
     }
   },
-  "dependencies": {
-    "@contember/database-migrations": "workspace:*",
-    "@contember/engine-http": "workspace:*"
-  },
   "peerDependencies": {
     "graphql": "catalog:",
     "pg": "catalog:"
   },
   "devDependencies": {
+    "@contember/database-migrations": "workspace:*",
+    "@contember/engine-http": "workspace:*",
     "graphql": "catalog:"
   },
   "type": "module",

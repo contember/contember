@@ -35,7 +35,7 @@ jobs:
               bun run ae:test
 
           - job_name: lint-imports
-            run_script: ./scripts/lint-module-import/run.sh
+            run_script: bunx deptective
 
           - job_name: test
             run_script: |

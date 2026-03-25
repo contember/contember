@@ -1,7 +1,7 @@
 import type { DepsLintConfig } from 'deptective'
 
 export default {
-	globalModules: ['vitest'],
+	globalModules: [],
 	ignoredPackages: ['@contember/playground'],
 	allowedUnusedDependencies: [
 		'@popperjs/core',

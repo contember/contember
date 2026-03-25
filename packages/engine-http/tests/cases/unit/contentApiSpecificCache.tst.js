@@ -2,7 +2,7 @@ import * as assert from 'node:assert'
 import { ContentApiSpecificCache } from '../../../dist/production/content/ContentApiSpecificCache.js'
 
 /**
- * Probably not possible to pass --expose-gc through vitest (--expose-gc cannot be in NODE_OPTIONS)
+ * Probably not possible to pass --expose-gc through bun test (--expose-gc cannot be in NODE_OPTIONS)
  */
 (async () => {
 	if (!global.gc) {

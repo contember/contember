@@ -11,6 +11,13 @@ interface Test {
 	result: Acl.Permissions
 }
 
+interface ContextualTest {
+	acl: Acl.Schema
+	roles: string[]
+	rootResult: Acl.Permissions
+	allResult: Acl.Permissions
+}
+
 const execute = (test: Test) => {
 	const model: Model.Schema = new SchemaBuilder()
 		.entity('Entity1', e => e.column('lorem').column('bar'))
@@ -25,6 +32,21 @@ const execute = (test: Test) => {
 	}, test.roles)
 	assert.deepStrictEqual(result, test.result)
 	assert.deepStrictEqual(test.acl, initialAcl)
+}
+
+const executeContextual = (test: ContextualTest) => {
+	const model: Model.Schema = new SchemaBuilder()
+		.entity('Entity1', e => e.column('lorem').column('bar'))
+		.entity('Entity2', e => e.oneHasOne('xyz', r => r.target('Entity1')))
+		.buildSchema()
+	const factory = new PermissionFactory()
+	const { root, all } = factory.createContextual({
+		...emptySchema,
+		model,
+		acl: test.acl,
+	}, test.roles)
+	assert.deepStrictEqual(root, test.rootResult)
+	assert.deepStrictEqual(all, test.allResult)
 }
 
 describe('Permission merger', () => {
@@ -838,6 +860,146 @@ describe('Permission merger', () => {
 								{ xyz: { lorem: { eq: 'foo' } } },
 								{ xyz: { lorem: { eq: 'bar' } } },
 							],
+						},
+					},
+				},
+			},
+		})
+	})
+})
+
+describe('Contextual permission merger', () => {
+	it('createContextual: root drops through-only, all includes both', () => {
+		executeContextual({
+			acl: {
+				roles: {
+					throughRole: {
+						variables: {},
+						entities: {
+							Entity2: {
+								predicates: {
+									foo: { xyz: { lorem: { eq: 'through' } } },
+								},
+								operations: {
+									read: {
+										title: 'foo',
+									},
+									noRoot: ['read'],
+								},
+							},
+						},
+					},
+					rootRole: {
+						variables: {},
+						entities: {
+							Entity2: {
+								predicates: {
+									bar: { xyz: { lorem: { eq: 'root' } } },
+								},
+								operations: {
+									read: {
+										title: 'bar',
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+			roles: ['throughRole', 'rootRole'],
+			rootResult: {
+				Entity2: {
+					operations: {
+						read: {
+							title: 'bar',
+							id: 'bar',
+						},
+					},
+					predicates: {
+						bar: {
+							xyz: {
+								lorem: { eq: 'root' },
+							},
+						},
+					},
+				},
+			},
+			allResult: {
+				Entity2: {
+					operations: {
+						read: {
+							title: '__merge__foo__bar',
+							id: '__merge__foo__bar',
+						},
+					},
+					predicates: {
+						__merge__foo__bar: {
+							or: [
+								{ xyz: { lorem: { eq: 'through' } } },
+								{ xyz: { lorem: { eq: 'root' } } },
+							],
+						},
+					},
+				},
+			},
+		})
+	})
+
+	it('createContextual: both roles without noRoot produce same root and all', () => {
+		executeContextual({
+			acl: {
+				roles: {
+					role1: {
+						variables: {},
+						entities: {
+							Entity1: {
+								predicates: {},
+								operations: {
+									read: {
+										id: true,
+										lorem: true,
+									},
+								},
+							},
+						},
+					},
+					role2: {
+						variables: {},
+						entities: {
+							Entity1: {
+								predicates: {},
+								operations: {
+									read: {
+										id: true,
+										bar: true,
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+			roles: ['role1', 'role2'],
+			rootResult: {
+				Entity1: {
+					predicates: {},
+					operations: {
+						read: {
+							id: true,
+							lorem: true,
+							bar: true,
+						},
+					},
+				},
+			},
+			allResult: {
+				Entity1: {
+					predicates: {},
+					operations: {
+						read: {
+							id: true,
+							lorem: true,
+							bar: true,
 						},
 					},
 				},

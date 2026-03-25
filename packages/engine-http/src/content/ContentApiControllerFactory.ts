@@ -80,7 +80,7 @@ export class ContentApiControllerFactory {
 
 			const projectRoles = memberships.map(it => it.role)
 
-			const { schema: graphQlSchema, permissions } = await timer(
+			const { schema: graphQlSchema, permissions, throughPermissions } = await timer(
 				'GraphQLSchemaCreate',
 				() =>
 					this.graphQlSchemaFactory.create(schema, {
@@ -132,6 +132,7 @@ export class ContentApiControllerFactory {
 								schemaMeta: { id: schemaWithMeta.meta.id },
 								schemaDatabaseMetadata,
 								permissions,
+								throughPermissions,
 								systemSchema: projectContainer.systemDatabaseContextFactory.schemaName,
 								stage,
 								project,

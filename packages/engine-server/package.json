@@ -33,7 +33,6 @@
     "uuid": "catalog:"
   },
   "devDependencies": {
-    "@types/koa-compress": "catalog:",
     "@types/node": "catalog:"
   },
   "type": "module",

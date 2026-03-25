@@ -137,6 +137,8 @@
         "@contember/client-content": "workspace:*",
         "@contember/graphql-builder": "workspace:*",
         "@contember/graphql-client": "workspace:*",
+      },
+      "devDependencies": {
         "@contember/schema": "workspace:*",
       },
     },
@@ -294,7 +296,6 @@
       },
       "devDependencies": {
         "@contember/database-tester": "workspace:*",
-        "@contember/schema-definition": "workspace:*",
         "@types/node": "catalog:",
         "graphql": "catalog:",
         "pg": "catalog:",
@@ -338,11 +339,9 @@
         "ws": "catalog:",
       },
       "devDependencies": {
-        "@types/bcryptjs": "catalog:",
         "@types/koa": "catalog:",
         "@types/koa-bodyparser": "catalog:",
         "@types/koa__cors": "catalog:",
-        "@types/lru-cache": "catalog:",
         "@types/node": "catalog:",
         "@types/ws": "catalog:",
         "graphql": "catalog:",
@@ -355,11 +354,9 @@
     "packages/engine-plugins": {
       "name": "@contember/engine-plugins",
       "version": "2.1.0-beta.1",
-      "dependencies": {
+      "devDependencies": {
         "@contember/database-migrations": "workspace:*",
         "@contember/engine-http": "workspace:*",
-      },
-      "devDependencies": {
         "graphql": "catalog:",
       },
       "peerDependencies": {
@@ -403,7 +400,6 @@
         "uuid": "catalog:",
       },
       "devDependencies": {
-        "@types/koa-compress": "catalog:",
         "@types/node": "catalog:",
       },
     },
@@ -502,11 +498,11 @@
       "name": "@contember/graphql-client-system",
       "version": "2.1.0-beta.1",
       "dependencies": {
-        "@contember/schema": "workspace:*",
         "graphql-ts-client-api": "catalog:",
       },
       "devDependencies": {
         "@contember/engine-system-api": "workspace:*",
+        "@contember/schema": "workspace:*",
         "@graphql-tools/schema": "catalog:",
         "@types/node": "catalog:",
         "graphql": "catalog:",
@@ -549,7 +545,6 @@
         "@contember/react-identity": "workspace:*",
         "@contember/react-routing": "workspace:*",
         "@radix-ui/react-slot": "catalog:",
-        "stacktracey": "catalog:",
       },
       "devDependencies": {
         "react": "catalog:",
@@ -786,6 +781,7 @@
         "@contember/react-utils": "workspace:*",
         "@contember/utilities": "workspace:*",
         "buffer": "catalog:",
+        "stacktracey": "catalog:",
       },
       "devDependencies": {
         "@types/react": "catalog:",
@@ -1862,8 +1858,6 @@
 
     "@types/babel__traverse": ["@types/babel__traverse@7.20.6", "", { "dependencies": { "@babel/types": "^7.20.7" } }, "sha512-r1bzfrm0tomOI8g1SzvCaQHo6Lcv6zu0EA+W2kHrt8dyrHQxGzBBL4kdkzIS+jBMV+EYcMAEAqXqYaLJq5rOZg=="],
 
-    "@types/bcryptjs": ["@types/bcryptjs@3.0.0", "", { "dependencies": { "bcryptjs": "*" } }, "sha512-WRZOuCuaz8UcZZE4R5HXTco2goQSI2XxjGY3hbM/xDvwmqFWd4ivooImsMx65OKM6CtNKbnZ5YL+YwAwK7c1dg=="],
-
     "@types/body-parser": ["@types/body-parser@1.19.5", "", { "dependencies": { "@types/connect": "*", "@types/node": "*" } }, "sha512-fB3Zu92ucau0iQ0JMCFQE7b/dv8Ot07NI3KaZIkIUNXq82k4eBAqUaneXfleGY9JWskeS9y+u0nXMyspcuQrCg=="],
 
     "@types/bun": ["@types/bun@1.3.10", "", { "dependencies": { "bun-types": "1.3.10" } }, "sha512-0+rlrUrOrTSskibryHbvQkDOWRJwJZqZlxrUs1u4oOoTln8+WIXBPmAuCF35SWB2z4Zl3E84Nl/D0P7803nigQ=="],
@@ -1904,11 +1898,7 @@
 
     "@types/koa-compose": ["@types/koa-compose@3.2.8", "", { "dependencies": { "@types/koa": "*" } }, "sha512-4Olc63RY+MKvxMwVknCUDhRQX1pFQoBZ/lXcRLP69PQkEpze/0cr8LNqJQe5NFb/b19DWi2a5bTi2VAlQzhJuA=="],
 
-    "@types/koa-compress": ["@types/koa-compress@4.0.7", "", { "dependencies": { "@types/koa": "*", "@types/node": "*" } }, "sha512-NqP9qCBfXCu2+RYkGzEENBkqXWExOPeBEsvj3F0xtVxKDwwdfRRtVdpxJeTRAq2Ml3qlUnDbK8bKHWwe6V1kkg=="],
-
     "@types/koa__cors": ["@types/koa__cors@5.0.1", "", { "dependencies": { "@types/koa": "*" } }, "sha512-xZckuh3B6ycSBAIYnBImG1VDHyBNZsltGAuGb4THuZllccdLgD5DUs4RA7TAUjB58THg00SSZ1e//duQef7WRw=="],
-
-    "@types/lru-cache": ["@types/lru-cache@7.10.10", "", { "dependencies": { "lru-cache": "*" } }, "sha512-nEpVRPWW9EBmx2SCfNn3ClYxPL7IktPX12HhIoSc/H5mMjdeW3+YsXIpseLQ2xF35+OcpwKQbEUw5VtqE4PDNA=="],
 
     "@types/mime": ["@types/mime@1.3.5", "", {}, "sha512-/pyBZWSLD2n0dcHE3hq8s8ZvcETHtEuF+3E7XVt0Ig2nvsVQXdghHVcEkIWjy9A0wKfTn97a/PSDYohKIlnP/w=="],
 
@@ -2701,8 +2691,6 @@
     "@types/express/@types/qs": ["@types/qs@6.9.17", "", {}, "sha512-rX4/bPcfmvxHDv0XjfJELTTr+iB+tn032nPILqHm5wbthUUUuVtNGGqzhya9XUxjTP8Fpr0qYgSZZKxGY++svQ=="],
 
     "@types/express-serve-static-core/@types/qs": ["@types/qs@6.9.17", "", {}, "sha512-rX4/bPcfmvxHDv0XjfJELTTr+iB+tn032nPILqHm5wbthUUUuVtNGGqzhya9XUxjTP8Fpr0qYgSZZKxGY++svQ=="],
-
-    "@types/lru-cache/lru-cache": ["lru-cache@11.0.2", "", {}, "sha512-123qHRfJBmo2jXDbo/a5YOQrJoHF/GNQTLzQ5+IdK5pWpceK17yRc6ozlWd25FxvGKQbIUs91fDFkXmDHTKcyA=="],
 
     "@types/node-fetch/form-data": ["form-data@4.0.1", "", { "dependencies": { "asynckit": "^0.4.0", "combined-stream": "^1.0.8", "mime-types": "^2.1.12" } }, "sha512-tzN8e4TX8+kkxGPK8D5u0FNmjPUjw3lwC9lSLxxoB/+GtsJG91CO8bSWy73APlgAZzZbXEYZJuxjkHH2w+Ezhw=="],
 

@@ -56,11 +56,9 @@
     "ws": "catalog:"
   },
   "devDependencies": {
-    "@types/bcryptjs": "catalog:",
     "@types/koa": "catalog:",
     "@types/koa-bodyparser": "catalog:",
     "@types/koa__cors": "catalog:",
-    "@types/lru-cache": "catalog:",
     "@types/node": "catalog:",
     "@types/ws": "catalog:",
     "graphql": "catalog:"

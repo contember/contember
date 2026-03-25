@@ -21,10 +21,10 @@ bun run build             # Full build (pre-build + ts + vite)
 bun run ts:watch          # Watch mode for TypeScript
 
 # Test
-bun run test              # Run all unit/node tests (vitest)
+bun run test              # Run all unit/node tests (bun)
 bun run test:e2e          # Run e2e tests (no parallelism)
 # Run a single test file:
-bunx vitest run packages/schema-utils/tests/cases/unit/acl.test.ts
+bun test packages/schema-utils/tests/cases/unit/acl.test.ts
 
 # Lint & Format
 bun run lint              # Biome linter
@@ -111,7 +111,7 @@ interface (re-exports) ── react-binding ── binding-common / binding-lega
 
 ## Testing
 
-- **Framework**: Vitest with three workspaces:
+- **Framework**: `bun test` (Bun's built-in test runner):
   - Browser tests (`react-*`): `happy-dom` environment
   - Node tests (non-React packages): `node` environment
   - E2E tests (`e2e/`): integration against live server

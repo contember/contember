@@ -16,7 +16,7 @@ import { ProjectConfig } from '../project/config'
 
 export interface GraphQLSchemaFactoryResult {
 	permissions: Acl.Permissions
-	throughPermissions?: Acl.Permissions
+	allPermissions?: Acl.Permissions
 	schema: GraphQLSchema
 }
 
@@ -84,7 +84,7 @@ export class GraphQlSchemaFactory {
 				types,
 			})
 
-			return { schema: graphQlSchema, permissions, throughPermissions: allPermissions }
+			return { schema: graphQlSchema, permissions, allPermissions }
 		})
 	}
 }

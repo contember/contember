@@ -44,7 +44,7 @@ export type ExecutionContainerArgs = {
 	identityId: string
 	identityVariables: Acl.VariablesMap
 	permissions: Acl.Permissions
-	throughPermissions?: Acl.Permissions
+	allPermissions?: Acl.Permissions
 	systemSchema: string
 	project: { slug: string }
 	stage: { id: string; slug: string }
@@ -78,7 +78,7 @@ export class ExecutionContainerFactory {
 	createBuilderInternal(
 		{
 			permissions,
-			throughPermissions,
+			allPermissions,
 			identityVariables,
 			identityId,
 			db,
@@ -104,7 +104,7 @@ export class ExecutionContainerFactory {
 			.addService('variableInjector', ({ schema }) => new VariableInjector(schema.model, identityVariables))
 			.addService(
 				'predicateFactory',
-				({ variableInjector, schema }) => new PredicateFactory(permissions, schema.model, variableInjector, throughPermissions),
+				({ variableInjector, schema }) => new PredicateFactory(permissions, schema.model, variableInjector, allPermissions),
 			)
 			.addService('predicatesInjector', ({ predicateFactory, schema }) => new PredicatesInjector(schema.model, predicateFactory))
 			.addService('joinBuilder', ({ schema }) => new JoinBuilder(schema.model))

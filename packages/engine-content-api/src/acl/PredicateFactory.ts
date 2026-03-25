@@ -14,12 +14,20 @@ export class PredicateFactory {
 		private readonly permissions: Acl.Permissions,
 		private readonly model: Model.Schema,
 		private readonly variableInjector: VariableInjector,
-		private readonly throughPermissions?: Acl.Permissions,
+		private readonly allPermissions?: Acl.Permissions,
 	) {}
 
+	/**
+	 * Selects the appropriate permission set based on query context:
+	 * - `isRoot === false` (nested/relation context): uses allPermissions (includes through-only permissions)
+	 * - `isRoot === true` or `isRoot === undefined` (root or unknown context): uses root-only permissions
+	 *
+	 * The `undefined` vs `true` distinction matters: `undefined` is the default for callers
+	 * that don't track root context, and must fall through to root permissions for safety.
+	 */
 	private getPermissionsForContext(isRoot?: boolean): Acl.Permissions {
-		if (isRoot === false && this.throughPermissions) {
-			return this.throughPermissions
+		if (isRoot === false && this.allPermissions) {
+			return this.allPermissions
 		}
 		return this.permissions
 	}
@@ -56,6 +64,7 @@ export class PredicateFactory {
 		return permissions?.[fieldName] !== permissions?.[rowLevelField]
 	}
 
+	/** Delete predicates are not context-aware — through-permission support is scoped to read operations only. */
 	public createDeletePredicate(entity: Model.Entity) {
 		const neverCondition: Input.Where = { [entity.primary]: { never: true } }
 		const entityPermissions = this.permissions[entity.name]

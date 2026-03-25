@@ -14,14 +14,24 @@ export class PredicateFactory {
 		private readonly permissions: Acl.Permissions,
 		private readonly model: Model.Schema,
 		private readonly variableInjector: VariableInjector,
+		private readonly throughPermissions?: Acl.Permissions,
 	) {}
+
+	private getPermissionsForContext(isRoot?: boolean): Acl.Permissions {
+		if (isRoot === false && this.throughPermissions) {
+			return this.throughPermissions
+		}
+		return this.permissions
+	}
 
 	public getFieldPredicate(
 		entity: Model.Entity,
 		operation: Acl.Operation.update | Acl.Operation.read | Acl.Operation.create,
 		fieldName: string,
+		isRoot?: boolean,
 	): FieldRequiredPredicate {
-		const permissions = this.permissions[entity.name]?.operations?.[operation]
+		const perms = this.getPermissionsForContext(isRoot)
+		const permissions = perms[entity.name]?.operations?.[operation]
 		const predicate = permissions?.[fieldName] ?? false
 		const rowLevelField = getRowLevelPredicatePseudoField(entity)
 
@@ -38,9 +48,11 @@ export class PredicateFactory {
 		entity: Model.Entity,
 		operation: Acl.Operation.read,
 		fieldName: string,
+		isRoot?: boolean,
 	): boolean {
+		const perms = this.getPermissionsForContext(isRoot)
 		const rowLevelField = getRowLevelPredicatePseudoField(entity)
-		const permissions = this.permissions[entity.name]?.operations?.[operation]
+		const permissions = perms[entity.name]?.operations?.[operation]
 		return permissions?.[fieldName] !== permissions?.[rowLevelField]
 	}
 
@@ -65,8 +77,10 @@ export class PredicateFactory {
 		operation: Acl.Operation.update | Acl.Operation.read | Acl.Operation.create,
 		fieldNames: string[] = [getRowLevelPredicatePseudoField(entity)],
 		relationContext?: Model.AnyRelationContext,
+		isRoot?: boolean,
 	): Input.OptionalWhere {
-		const entityPermissions: Acl.EntityPermissions = this.permissions[entity.name]
+		const perms = this.getPermissionsForContext(isRoot)
+		const entityPermissions: Acl.EntityPermissions = perms[entity.name]
 		const neverCondition: Input.Where = { [entity.primary]: { never: true } }
 
 		if (!entityPermissions) {
@@ -85,11 +99,17 @@ export class PredicateFactory {
 			return neverCondition
 		}
 
-		return this.buildPredicates(entity, operationPredicates, relationContext)
+		return this.buildPredicates(entity, operationPredicates, relationContext, isRoot)
 	}
 
-	public buildPredicates(entity: Model.Entity, predicates: Acl.PredicateReference[], relationContext?: Model.AnyRelationContext): Input.OptionalWhere {
-		const entityPermissions: Acl.EntityPermissions = this.permissions[entity.name] ?? {}
+	public buildPredicates(
+		entity: Model.Entity,
+		predicates: Acl.PredicateReference[],
+		relationContext?: Model.AnyRelationContext,
+		isRoot?: boolean,
+	): Input.OptionalWhere {
+		const perms = this.getPermissionsForContext(isRoot)
+		const entityPermissions: Acl.EntityPermissions = perms[entity.name] ?? {}
 
 		const predicatesWhere: Input.Where[] = predicates.reduce(
 			(result: Input.Where[], name: Acl.PredicateReference): Input.Where[] => {
@@ -105,7 +125,7 @@ export class PredicateFactory {
 			return {}
 		}
 		const where: Input.Where = predicatesWhere.length === 1 ? predicatesWhere[0] : { and: predicatesWhere }
-		return this.optimizePredicates(where, relationContext)
+		return this.optimizePredicates(where, relationContext, isRoot)
 	}
 
 	private getRequiredPredicates(
@@ -128,11 +148,11 @@ export class PredicateFactory {
 		return predicates
 	}
 
-	public optimizePredicates(where: Input.OptionalWhere, relationContext?: Model.AnyRelationContext) {
+	public optimizePredicates(where: Input.OptionalWhere, relationContext?: Model.AnyRelationContext, isRoot?: boolean) {
 		if (!relationContext || !relationContext.targetRelation) {
 			return where
 		}
-		const sourcePredicate = this.create(relationContext.entity, Acl.Operation.read, [relationContext.relation.name])
+		const sourcePredicate = this.create(relationContext.entity, Acl.Operation.read, [relationContext.relation.name], undefined, isRoot)
 		if (Object.keys(sourcePredicate).length === 0) {
 			return where
 		}

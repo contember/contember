@@ -16,6 +16,7 @@ import { ProjectConfig } from '../project/config'
 
 export interface GraphQLSchemaFactoryResult {
 	permissions: Acl.Permissions
+	allPermissions?: Acl.Permissions
 	schema: GraphQLSchema
 }
 
@@ -33,10 +34,10 @@ export class GraphQlSchemaFactory {
 		const cacheKey = `${rolesKey}\xff\xff${contributorsKey}`
 
 		return this.cache.fetch(schema, cacheKey, () => {
-			const permissions = this.permissionFactory.create(schema, identity.projectRoles)
+			const { root: permissions, all: allPermissions } = this.permissionFactory.createContextual(schema, identity.projectRoles)
 
 			const authorizator = new Authorizator(
-				permissions,
+				allPermissions,
 				schema.acl.customPrimary ?? false,
 				Object.values(schema.acl.roles).some(it => it.content?.refreshMaterializedView),
 			)
@@ -83,7 +84,7 @@ export class GraphQlSchemaFactory {
 				types,
 			})
 
-			return { schema: graphQlSchema, permissions }
+			return { schema: graphQlSchema, permissions, allPermissions }
 		})
 	}
 }

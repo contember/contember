@@ -9,7 +9,7 @@ import { MigrateErrorCode } from '../../schema'
 import { calculateSchemaChecksum, SchemaValidator, SchemaValidatorSkippedErrors } from '@contember/schema-utils'
 import { logger } from '@contember/logger'
 import { MigrationsDatabaseMetadataResolverStoreFactory, SchemaDatabaseMetadataResolverStore } from '../metadata'
-import { ContentMigrationQuery, MigrationInput } from './MigrationInput'
+import { ContentMigrationQuery, MigrationInput, SchemaStateInput } from './MigrationInput'
 import { ContentQueryExecutor } from '../dependencies'
 import { SchemaProvider } from './SchemaProvider'
 import { SaveSchemaCommand } from '../commands/schema/SaveSchemaCommand'
@@ -29,18 +29,19 @@ export class ProjectMigrator {
 		private readonly contentQueryExecutor: ContentQueryExecutor,
 	) {}
 
-	public async migrate({ db, project, identity, options: { ignoreOrder = false, skipExecuted = false }, migrationsToExecute, stages }: {
+	public async migrate({ db, project, identity, options: { ignoreOrder = false, skipExecuted = false }, migrationsToExecute, stages, schemaState }: {
 		db: DatabaseContext
 		project: { slug: string; systemSchema: string }
 		identity: { id: string }
 		stages: Stage[]
 		migrationsToExecute: readonly MigrationInput[]
+		schemaState?: SchemaStateInput
 		options: {
 			ignoreOrder?: boolean
 			skipExecuted?: boolean
 		}
 	}) {
-		if (migrationsToExecute.length === 0) {
+		if (migrationsToExecute.length === 0 && !schemaState) {
 			return
 		}
 		const schemaWithMeta = await this.schemaProvider.fetch({ db })
@@ -48,7 +49,8 @@ export class ProjectMigrator {
 		let id = schemaWithMeta.meta.id
 
 		const validated = await this.validateMigrations(db, schema, schemaWithMeta.meta.version ?? null, migrationsToExecute, { ignoreOrder, skipExecuted })
-		if (validated.length === 0) {
+
+		if (validated.length === 0 && !schemaState) {
 			return
 		}
 
@@ -95,7 +97,30 @@ export class ProjectMigrator {
 			}
 			id = await db.commandBus.execute(new SaveMigrationCommand(migration))
 		}
+
+		if (schemaState) {
+			schema = {
+				...schema,
+				acl: schemaState.acl as Schema['acl'],
+				validation: schemaState.validation as Schema['validation'],
+				actions: schemaState.actions as Schema['actions'],
+				settings: schemaState.settings as Schema['settings'],
+			}
+		}
+
 		if (!id) {
+			throw new ImplementationException()
+		}
+
+		const latestVersion = sorted.length > 0
+			? sorted[sorted.length - 1].version
+			: schemaWithMeta.meta.version
+
+		if (!latestVersion) {
+			if (schemaState) {
+				// State-only update on a fresh project with no migrations — nothing to save
+				return
+			}
 			throw new ImplementationException()
 		}
 
@@ -105,7 +130,7 @@ export class ProjectMigrator {
 				meta: {
 					id,
 					updatedAt: new Date(),
-					version: sorted[sorted.length - 1].version,
+					version: latestVersion,
 					checksum: calculateSchemaChecksum(schema),
 				},
 			}),

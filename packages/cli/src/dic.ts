@@ -12,6 +12,7 @@ import {
 	ModificationHandlerFactory,
 	SchemaDiffer,
 	SchemaMigrator,
+	SchemaStateManager,
 	SchemaVersionBuilder,
 	VERSION_LATEST,
 } from '@contember/migrations-client'
@@ -141,7 +142,8 @@ export const createContainer = ({ env, version, runtime, workspace }: {
 		.addService('modificationHandlerFactory', () => new ModificationHandlerFactory(ModificationHandlerFactory.defaultFactoryMap))
 		.addService('schemaMigrator', ({ modificationHandlerFactory }) => new SchemaMigrator(modificationHandlerFactory))
 		.addService('migrationsResolver', ({ migrationFilesManager }) => new MigrationsResolver(migrationFilesManager))
-		.addService('schemaVersionBuilder', ({ migrationsResolver, schemaMigrator }) => new SchemaVersionBuilder(migrationsResolver, schemaMigrator))
+		.addService('schemaStateManager', ({ workspace }) => new SchemaStateManager(workspace.migrationsDir + '/state'))
+		.addService('schemaVersionBuilder', ({ migrationsResolver, schemaMigrator, schemaStateManager }) => new SchemaVersionBuilder(migrationsResolver, schemaMigrator, schemaStateManager))
 		.addService('schemaDiffer', ({ schemaMigrator }) =>
 			new SchemaDiffer(schemaMigrator, {
 				maxPatchSize: env.migrationsOptions?.maxPatchSize,
@@ -171,6 +173,7 @@ export const createContainer = ({ env, version, runtime, workspace }: {
 				migrationPrinter,
 				migrationsExecutor,
 				migrationsStatusFacade,
+				schemaStateManager,
 			}) =>
 				new MigrationExecutionFacade(
 					systemClientProvider,
@@ -180,6 +183,7 @@ export const createContainer = ({ env, version, runtime, workspace }: {
 					migrationPrinter,
 					migrationsExecutor,
 					migrationsStatusFacade,
+					schemaStateManager,
 				),
 		)
 		.addService('migrationsValidator', ({ migrationDescriber, schemaMigrator }) => new MigrationsValidator(migrationDescriber, schemaMigrator))
@@ -212,6 +216,7 @@ export const createContainer = ({ env, version, runtime, workspace }: {
 				migrationsValidator,
 				migrationPrinter,
 				schemaMigrator,
+				schemaStateManager,
 			}) =>
 				new MigrationAmendCommand(
 					migrationsResolver,
@@ -223,6 +228,7 @@ export const createContainer = ({ env, version, runtime, workspace }: {
 					migrationsValidator,
 					migrationPrinter,
 					schemaMigrator,
+					schemaStateManager,
 				),
 		)
 		.addService('migrationBlankCommand', ({ migrationCreator }) => new MigrationBlankCommand(migrationCreator))
@@ -233,8 +239,8 @@ export const createContainer = ({ env, version, runtime, workspace }: {
 		)
 		.addService(
 			'migrationDiffCommand',
-			({ schemaLoader, schemaVersionBuilder, migrationCreator, migrationPrinter, migrationExecutionFacade }) =>
-				new MigrationDiffCommand(schemaLoader, schemaVersionBuilder, migrationCreator, migrationPrinter, migrationExecutionFacade),
+			({ schemaLoader, schemaVersionBuilder, migrationCreator, migrationPrinter, migrationExecutionFacade, schemaStateManager }) =>
+				new MigrationDiffCommand(schemaLoader, schemaVersionBuilder, migrationCreator, migrationPrinter, migrationExecutionFacade, schemaStateManager),
 		)
 		.addService('migrationExecuteCommand', ({ migrationExecutionFacade }) => new MigrationExecuteCommand(migrationExecutionFacade))
 		.addService(

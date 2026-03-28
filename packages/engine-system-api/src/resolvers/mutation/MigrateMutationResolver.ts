@@ -31,6 +31,7 @@ export class MigrateMutationResolver implements MutationResolver<'migrate'> {
 		force = false,
 	): Promise<MigrateResponse> {
 		const migrations = this.parseMigrationInput(args)
+		const schemaState = args.schemaState ?? undefined
 
 		return context.db.locked(pg_lock_id, db =>
 			db.transaction(async trx => {
@@ -45,6 +46,7 @@ export class MigrateMutationResolver implements MutationResolver<'migrate'> {
 						identity: context.identity,
 						stages,
 						migrationsToExecute: migrations,
+						schemaState,
 						options: {
 							ignoreOrder: force,
 							skipExecuted: true,

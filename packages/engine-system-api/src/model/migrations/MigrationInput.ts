@@ -23,3 +23,10 @@ export type ContentMigrationQuery = {
 export type MigrationInput =
 	| SchemaMigrationInput
 	| ContentMigrationInput
+
+export type SchemaStateInput = {
+	readonly acl: unknown
+	readonly validation: unknown
+	readonly actions: unknown
+	readonly settings: unknown
+}

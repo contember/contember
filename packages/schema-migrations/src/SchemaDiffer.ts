@@ -53,7 +53,7 @@ import { UpdateSettingsDiffer } from './modifications/settings'
 import { RemoveIndexNamesDiffer } from './modifications/upgrade/RemoveIndexNamesModification'
 import { ConvertOneHasManyToOneHasOneRelationDiffer } from './modifications/relations/ConvertOneHasManyToOneHasOneRelationModification'
 
-type DiffOptions = { skipRecreateValidation?: boolean; skipInitialSchemaValidation?: boolean }
+export type DiffOptions = { skipRecreateValidation?: boolean; skipInitialSchemaValidation?: boolean; skipNonModelDiffers?: boolean }
 
 export class SchemaDiffer {
 	constructor(
@@ -66,6 +66,7 @@ export class SchemaDiffer {
 	diffSchemas(originalSchema: Schema, updatedSchema: Schema, {
 		skipInitialSchemaValidation = false,
 		skipRecreateValidation = false,
+		skipNonModelDiffers = false,
 	}: DiffOptions = {}): Migration.Modification[] {
 		if (!skipInitialSchemaValidation) {
 			const originalErrors = SchemaValidator.validate(originalSchema)
@@ -80,7 +81,7 @@ export class SchemaDiffer {
 
 		const differs: Differ[] = [
 			new RemoveIndexNamesDiffer(),
-			new UpdateSettingsDiffer(),
+			...skipNonModelDiffers ? [] : [new UpdateSettingsDiffer()],
 			new ConvertOneToManyRelationDiffer(),
 			new ConvertOneHasManyToManyHasManyRelationDiffer(),
 			new ConvertOneHasManyToOneHasOneRelationDiffer(),
@@ -112,15 +113,19 @@ export class SchemaDiffer {
 			new CreateUniqueConstraintDiffer(),
 			new CreateIndexDiffer(),
 			new RemoveEnumDiffer(),
-			new UpdateAclSchemaDiffer(this.options),
-			new UpdateValidationSchemaDiffer(this.options),
+			...skipNonModelDiffers ? [] : [
+				new UpdateAclSchemaDiffer(this.options),
+				new UpdateValidationSchemaDiffer(this.options),
+			],
 			new UpdateEntityOrderByDiffer(),
-			new UpdateTargetDiffer(),
-			new CreateTargetDiffer(),
-			new UpdateTriggerDiffer(this.options),
-			new CreateTriggerDiffer(),
-			new RemoveTriggerDiffer(),
-			new RemoveTargetDiffer(),
+			...skipNonModelDiffers ? [] : [
+				new UpdateTargetDiffer(),
+				new CreateTargetDiffer(),
+				new UpdateTriggerDiffer(this.options),
+				new CreateTriggerDiffer(),
+				new RemoveTriggerDiffer(),
+				new RemoveTargetDiffer(),
+			],
 		]
 
 		const diffs: Migration.Modification[] = []
@@ -132,7 +137,10 @@ export class SchemaDiffer {
 		}
 
 		if (!skipRecreateValidation) {
-			const errors = deepCompare(updatedSchema, appliedDiffsSchema, [], path => {
+			const targetForCompare = skipNonModelDiffers
+				? { ...updatedSchema, acl: appliedDiffsSchema.acl, validation: appliedDiffsSchema.validation, actions: appliedDiffsSchema.actions, settings: appliedDiffsSchema.settings }
+				: updatedSchema
+			const errors = deepCompare(targetForCompare, appliedDiffsSchema, [], path => {
 				if (path[0] === 'model' && path[1] === 'entities' && (path[3] === 'unique' || path[3] === 'index')) {
 					return (a, b) => {
 						return compareArraysIgnoreOrder(a, b, path)

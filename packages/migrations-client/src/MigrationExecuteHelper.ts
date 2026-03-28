@@ -2,6 +2,7 @@ import { MigrationToExecuteOkStatus } from './migrations'
 import { ContentMigrationFactoryArgs, ResolvedMigrationContent } from './MigrationFile'
 import { assertNever } from './utils/assertNever'
 import { SystemClient } from './SystemClient'
+import { SchemaState } from './SchemaStateManager'
 
 export class MigrationExecutor {
 	async executeMigrations({
@@ -9,6 +10,7 @@ export class MigrationExecutor {
 		migrations,
 		contentMigrationFactoryArgs,
 		force,
+		schemaState,
 		log = () => null,
 	}: {
 		client: SystemClient
@@ -16,14 +18,16 @@ export class MigrationExecutor {
 		contentMigrationFactoryArgs: Omit<ContentMigrationFactoryArgs, 'migration'>
 		log: (message: string) => void
 		force?: boolean
+		schemaState?: SchemaState
 	}): Promise<void> {
-		if (migrations.length === 0) {
+		if (migrations.length === 0 && !schemaState) {
 			return
 		}
 		let migrationsToRun: ResolvedMigrationContent[] = []
+		let batchSchemaState: SchemaState | undefined = undefined
 
 		const executeMigrations = async () => {
-			if (migrationsToRun.length === 0) {
+			if (migrationsToRun.length === 0 && !batchSchemaState) {
 				return
 			}
 			await client.migrate(
@@ -51,14 +55,18 @@ export class MigrationExecutor {
 					return assertNever(it)
 				}),
 				force,
+				batchSchemaState,
 			)
 			migrationsToRun.forEach(it => {
 				log(it.name)
 			})
 			migrationsToRun = []
+			batchSchemaState = undefined
 		}
 
-		log('Executing...')
+		if (migrations.length > 0) {
+			log('Executing...')
+		}
 
 		for (const migration of migrations) {
 			const migrationContent = await migration.localMigration.getContent()
@@ -74,7 +82,10 @@ export class MigrationExecutor {
 				migrationsToRun.push(migrationContent)
 			}
 		}
+		batchSchemaState = schemaState
 		await executeMigrations()
-		log('Migration executed')
+		if (migrations.length > 0) {
+			log('Migration executed')
+		}
 	}
 }

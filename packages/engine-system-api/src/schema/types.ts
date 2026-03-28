@@ -228,10 +228,12 @@ export type Mutation = {
 
 export type MutationForceMigrateArgs = {
 	migrations: ReadonlyArray<Migration>
+	schemaState?: InputMaybe<SchemaStateInput>
 }
 
 export type MutationMigrateArgs = {
 	migrations: ReadonlyArray<Migration>
+	schemaState?: InputMaybe<SchemaStateInput>
 }
 
 export type MutationMigrationDeleteArgs = {
@@ -257,6 +259,13 @@ export type QueryEventsArgs = {
 
 export type QueryExecutedMigrationsArgs = {
 	version?: InputMaybe<Scalars['String']['input']>
+}
+
+export type SchemaStateInput = {
+	readonly acl: Scalars['Json']['input']
+	readonly actions: Scalars['Json']['input']
+	readonly settings: Scalars['Json']['input']
+	readonly validation: Scalars['Json']['input']
 }
 
 export type SchemaMigration = {
@@ -399,6 +408,7 @@ export type ResolversTypes = {
 	PrimaryKey: ResolverTypeWrapper<Scalars['PrimaryKey']['output']>
 	Query: ResolverTypeWrapper<{}>
 	Schema: ResolverTypeWrapper<Scalars['Schema']['output']>
+	SchemaStateInput: SchemaStateInput
 	SchemaMigration: SchemaMigration
 	Stage: ResolverTypeWrapper<Stage>
 	String: ResolverTypeWrapper<Scalars['String']['output']>
@@ -435,6 +445,7 @@ export type ResolversParentTypes = {
 	PrimaryKey: Scalars['PrimaryKey']['output']
 	Query: {}
 	Schema: Scalars['Schema']['output']
+	SchemaStateInput: SchemaStateInput
 	SchemaMigration: SchemaMigration
 	Stage: Stage
 	String: Scalars['String']['output']

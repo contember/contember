@@ -2,7 +2,7 @@ import { Command, CommandConfiguration, Input } from '@contember/cli-common'
 import { InvalidSchemaException, SchemaMigrator } from '@contember/schema-migrations'
 import prompts from 'prompts'
 import { emptySchema } from '@contember/schema-utils'
-import { MigrationCreator, MigrationsResolver, SchemaVersionBuilder, SystemClient } from '@contember/migrations-client'
+import { MigrationCreator, MigrationsResolver, SchemaStateManager, SchemaVersionBuilder } from '@contember/migrations-client'
 import { MigrationsStatusFacade } from '../../lib/migrations/MigrationsStatusFacade'
 import { SchemaLoader } from '../../lib/schema/SchemaLoader'
 import { MigrationsValidator } from '../../lib/migrations/MigrationsValidator'
@@ -30,6 +30,7 @@ export class MigrationAmendCommand extends Command<Args, Options> {
 		private readonly migrationsValidator: MigrationsValidator,
 		private readonly migrationPrinter: MigrationPrinter,
 		private readonly schemaMigrator: SchemaMigrator,
+		private readonly schemaStateManager: SchemaStateManager,
 	) {
 		super()
 	}
@@ -59,9 +60,12 @@ export class MigrationAmendCommand extends Command<Args, Options> {
 		}
 
 		const schema = await this.schemaLoader.loadSchema()
+		const stateMode = await this.schemaStateManager.isStateMode()
 		try {
 			const initialSchema = await this.schemaVersionBuilder.buildSchema()
-			const intermediateResult = await this.migrationCreator.prepareMigration(initialSchema, schema, '')
+			const intermediateResult = await this.migrationCreator.prepareMigration(initialSchema, schema, '', {
+				skipNonModelDiffers: stateMode,
+			})
 			if (intermediateResult === null) {
 				console.log('Nothing to do')
 				return 0
@@ -78,7 +82,9 @@ export class MigrationAmendCommand extends Command<Args, Options> {
 				[...amendMigration.modifications, ...intermediateResult.migration.modifications],
 				amendMigration.formatVersion,
 			)
-			const newMigrationResult = await this.migrationCreator.prepareMigration(prevSchema, newSchema, '')
+			const newMigrationResult = await this.migrationCreator.prepareMigration(prevSchema, newSchema, '', {
+				skipNonModelDiffers: stateMode,
+			})
 			const followingMigrations = (await this.migrationsResolver.getSchemaMigrations()).filter(
 				it => it.version > amendMigration.version,
 			)
@@ -119,6 +125,12 @@ export class MigrationAmendCommand extends Command<Args, Options> {
 			}
 			await this.migrationCreator.saveMigration(newMigration)
 			await systemClient.migrationModify(amendMigration.version, newMigration)
+
+			if (stateMode) {
+				await this.schemaStateManager.writeState(
+					SchemaStateManager.schemaStateFromSchema(schema),
+				)
+			}
 
 			return 0
 		} catch (e) {

@@ -138,7 +138,13 @@ export class SchemaDiffer {
 
 		if (!skipRecreateValidation) {
 			const targetForCompare = skipNonModelDiffers
-				? { ...updatedSchema, acl: appliedDiffsSchema.acl, validation: appliedDiffsSchema.validation, actions: appliedDiffsSchema.actions, settings: appliedDiffsSchema.settings }
+				? {
+					...updatedSchema,
+					acl: appliedDiffsSchema.acl,
+					validation: appliedDiffsSchema.validation,
+					actions: appliedDiffsSchema.actions,
+					settings: appliedDiffsSchema.settings,
+				}
 				: updatedSchema
 			const errors = deepCompare(targetForCompare, appliedDiffsSchema, [], path => {
 				if (path[0] === 'model' && path[1] === 'entities' && (path[3] === 'unique' || path[3] === 'index')) {

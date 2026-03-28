@@ -1,6 +1,12 @@
 import prompts from 'prompts'
 import { MigrationPrinter } from './MigrationPrinter'
-import { isSchemaMigration, MigrationExecutor, MigrationToExecuteOkStatus, SchemaStateManager, SchemaVersionBuilder } from '@contember/migrations-client'
+import {
+	isSchemaMigration,
+	MigrationExecutor,
+	MigrationToExecuteOkStatus,
+	SchemaStateManager,
+	SchemaVersionBuilder,
+} from '@contember/migrations-client'
 import { MigrationsStatusFacade } from './MigrationsStatusFacade'
 import { MigrationVersionHelper } from '@contember/engine-common'
 import { SystemClientProvider } from '../SystemClientProvider'

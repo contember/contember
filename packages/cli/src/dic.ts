@@ -140,7 +140,10 @@ export const createContainer = ({ env, version, runtime, workspace }: {
 		.addService('schemaMigrator', ({ modificationHandlerFactory }) => new SchemaMigrator(modificationHandlerFactory))
 		.addService('migrationsResolver', ({ migrationFilesManager }) => new MigrationsResolver(migrationFilesManager))
 		.addService('schemaStateManager', ({ workspace }) => new SchemaStateManager(workspace.migrationsDir + '/state'))
-		.addService('schemaVersionBuilder', ({ migrationsResolver, schemaMigrator, schemaStateManager }) => new SchemaVersionBuilder(migrationsResolver, schemaMigrator, schemaStateManager))
+		.addService(
+			'schemaVersionBuilder',
+			({ migrationsResolver, schemaMigrator, schemaStateManager }) => new SchemaVersionBuilder(migrationsResolver, schemaMigrator, schemaStateManager),
+		)
 		.addService('schemaDiffer', ({ schemaMigrator }) =>
 			new SchemaDiffer(schemaMigrator, {
 				maxPatchSize: env.migrationsOptions?.maxPatchSize,

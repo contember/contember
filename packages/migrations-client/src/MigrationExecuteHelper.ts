@@ -24,7 +24,7 @@ export class MigrationExecutor {
 			return
 		}
 		let migrationsToRun: ResolvedMigrationContent[] = []
-		let batchSchemaState: SchemaState | undefined = undefined
+		let batchSchemaState: SchemaState | undefined
 
 		const executeMigrations = async () => {
 			if (migrationsToRun.length === 0 && !batchSchemaState) {

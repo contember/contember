@@ -4,8 +4,23 @@
 
 ```ts
 
+import { FieldValue } from '@contember/interface';
+import { JSX as JSX_2 } from 'react/jsx-runtime';
 import { NamedExoticComponent } from 'react';
+import { ReactNode } from 'react';
 import { SugaredRelativeSingleField } from '@contember/interface';
+
+// @public (undocumented)
+export const EnumListField: ({ field, decorate, separator, fallback, options }: EnumListFieldProps) => JSX_2.Element;
+
+// @public (undocumented)
+export type EnumListFieldProps = {
+    field: SugaredRelativeSingleField['field'];
+    options?: Record<string, ReactNode>;
+    decorate?: (value: ReactNode) => ReactNode;
+    separator?: ReactNode;
+    fallback?: ReactNode;
+};
 
 // @public (undocumented)
 export const FormattedField: NamedExoticComponent<FormattedFieldProps>;
@@ -15,6 +30,17 @@ export interface FormattedFieldProps {
     // (undocumented)
     field: SugaredRelativeSingleField['field'];
 }
+
+// @public (undocumented)
+export const ListField: <T extends FieldValue = FieldValue>(props: ListFieldProps<T>) => ReactNode;
+
+// @public (undocumented)
+export type ListFieldProps<T> = {
+    field: SugaredRelativeSingleField['field'];
+    render?: (value: T) => ReactNode;
+    separator?: ReactNode;
+    fallback?: ReactNode;
+};
 
 // (No @packageDocumentation comment for this package)
 

@@ -10,7 +10,7 @@ import { SystemSchemaTransferMappingFactory } from './SystemSchemaTransferMappin
 import { AuthResult, HttpErrorResponse } from '../common'
 import { ProjectGroupContainer } from '../projectGroup/ProjectGroupContainer'
 
-type Cell = boolean | number | string | null
+type Cell = boolean | number | string | readonly string[] | null
 type Row = readonly Cell[]
 
 type InsertContext = {
@@ -371,7 +371,7 @@ export class ImportExecutor {
 
 	private async buildRowParser(db: Client, tableMapping: TransferTableMapping, columns: DbColumnSchema[]): Promise<Typesafe.Type<readonly Cell[]>> {
 		const baseType = Typesafe.tuple(...columns.map(it => {
-			const base = this.buildColumnRuntimeType(it.type)
+			const base = this.buildColumnRuntimeType(it)
 			return it.nullable ? Typesafe.nullable(base) : base
 		}))
 
@@ -382,8 +382,8 @@ export class ImportExecutor {
 		return await tableMapping.createRowParser(db, columns.map(it => it.name), baseType)
 	}
 
-	private buildColumnRuntimeType(columnType: Model.ColumnType): Typesafe.Type<Exclude<Cell, null>> {
-		switch (columnType) {
+	private buildColumnRuntimeType(column: DbColumnSchema): Typesafe.Type<Exclude<Cell, null>> {
+		switch (column.type) {
 			case Model.ColumnType.Uuid:
 				return Typesafe.string // TODO
 			case Model.ColumnType.String:
@@ -395,7 +395,7 @@ export class ImportExecutor {
 			case Model.ColumnType.Bool:
 				return Typesafe.boolean
 			case Model.ColumnType.Enum:
-				return Typesafe.string // TODO
+				return column.list ? Typesafe.array(Typesafe.string) : Typesafe.string // TODO
 			case Model.ColumnType.DateTime:
 				return Typesafe.string // TODO
 			case Model.ColumnType.Time:

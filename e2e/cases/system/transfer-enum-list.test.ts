@@ -8,17 +8,19 @@ namespace Model {
 	export class Article {
 		tags = c.enumColumn(ArticleTag).list().notNull()
 		title = c.stringColumn().notNull()
+		labels = c.stringColumn().list().notNull()
+		scores = c.intColumn().list().notNull()
 	}
 }
 
 const schema = createSchema(Model)
 
-test('export and import enum list column', async () => {
+test('export and import list columns (enum, string, int)', async () => {
 	const tester = await createTester(schema)
 
-	// Insert test data with enum list values
+	// Insert test data with list values
 	await tester(gql`mutation {
-		createArticle(data: {title: "first", tags: [foo, bar]}) { ok }
+		createArticle(data: {title: "first", tags: [foo, bar], labels: ["x", "y"], scores: [10, 20]}) { ok }
 	}`)
 		.expect(200)
 		.expect(response => {
@@ -26,7 +28,7 @@ test('export and import enum list column', async () => {
 		})
 
 	await tester(gql`mutation {
-		createArticle(data: {title: "second", tags: [baz]}) { ok }
+		createArticle(data: {title: "second", tags: [baz], labels: ["z"], scores: [5]}) { ok }
 	}`)
 		.expect(200)
 		.expect(response => {
@@ -34,7 +36,7 @@ test('export and import enum list column', async () => {
 		})
 
 	await tester(gql`mutation {
-		createArticle(data: {title: "third", tags: []}) { ok }
+		createArticle(data: {title: "third", tags: [], labels: [], scores: []}) { ok }
 	}`)
 		.expect(200)
 		.expect(response => {
@@ -105,14 +107,16 @@ test('export and import enum list column', async () => {
 		listArticle(orderBy: [{title: asc}]) {
 			title
 			tags
+			labels
+			scores
 		}
 	}`)
 		.expect(200)
 		.expect(response => {
 			expect(response.body.data.listArticle).toEqual([
-				{ title: 'first', tags: ['foo', 'bar'] },
-				{ title: 'second', tags: ['baz'] },
-				{ title: 'third', tags: [] },
+				{ title: 'first', tags: ['foo', 'bar'], labels: ['x', 'y'], scores: [10, 20] },
+				{ title: 'second', tags: ['baz'], labels: ['z'], scores: [5] },
+				{ title: 'third', tags: [], labels: [], scores: [] },
 			])
 		})
 })

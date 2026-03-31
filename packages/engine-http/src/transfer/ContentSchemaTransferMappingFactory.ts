@@ -47,6 +47,7 @@ export class ContentSchemaTransferMappingFactory {
 							name: column.columnName,
 							type: column.type,
 							nullable: column.nullable,
+							list: column.list,
 							sequence: column.sequence !== undefined,
 						}
 					} else {
@@ -54,6 +55,7 @@ export class ContentSchemaTransferMappingFactory {
 							name: column.columnName,
 							type: column.type,
 							nullable: column.nullable,
+							list: column.list,
 						}
 					}
 				},

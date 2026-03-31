@@ -116,7 +116,7 @@ export class ExportExecutor {
 		let builder = db.selectBuilder().from(table.name)
 
 		for (const column of Object.values(table.columns)) {
-			if (column.type === Model.ColumnType.Enum && 'list' in column && column.list) {
+			if (column.list) {
 				builder = builder.select(expr => expr.raw(`${wrapIdentifier(column.name)}::text[]`))
 			} else if (column.type === Model.ColumnType.Json || column.type === Model.ColumnType.Date || column.type === Model.ColumnType.DateTime) {
 				builder = builder.select(expr => expr.raw(`${wrapIdentifier(column.name)}::text`))

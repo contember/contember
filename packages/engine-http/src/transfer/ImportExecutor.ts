@@ -10,7 +10,7 @@ import { SystemSchemaTransferMappingFactory } from './SystemSchemaTransferMappin
 import { AuthResult, HttpErrorResponse } from '../common'
 import { ProjectGroupContainer } from '../projectGroup/ProjectGroupContainer'
 
-type Cell = boolean | number | string | readonly string[] | null
+type Cell = boolean | number | string | readonly string[] | readonly number[] | readonly boolean[] | null
 type Row = readonly Cell[]
 
 type InsertContext = {
@@ -385,25 +385,18 @@ export class ImportExecutor {
 	private buildColumnRuntimeType(column: DbColumnSchema): Typesafe.Type<Exclude<Cell, null>> {
 		switch (column.type) {
 			case Model.ColumnType.Uuid:
-				return Typesafe.string // TODO
 			case Model.ColumnType.String:
-				return Typesafe.string
-			case Model.ColumnType.Int:
-				return Typesafe.number // TODO
-			case Model.ColumnType.Double:
-				return Typesafe.number
-			case Model.ColumnType.Bool:
-				return Typesafe.boolean
 			case Model.ColumnType.Enum:
-				return column.list ? Typesafe.array(Typesafe.string) : Typesafe.string // TODO
 			case Model.ColumnType.DateTime:
-				return Typesafe.string // TODO
 			case Model.ColumnType.Time:
-				return Typesafe.string // TODO
 			case Model.ColumnType.Date:
-				return Typesafe.string // TODO
 			case Model.ColumnType.Json:
-				return Typesafe.string
+				return column.list ? Typesafe.array(Typesafe.string) : Typesafe.string
+			case Model.ColumnType.Int:
+			case Model.ColumnType.Double:
+				return column.list ? Typesafe.array(Typesafe.number) : Typesafe.number
+			case Model.ColumnType.Bool:
+				return column.list ? Typesafe.array(Typesafe.boolean) : Typesafe.boolean
 		}
 	}
 }

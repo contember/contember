@@ -2,7 +2,7 @@ import { Model } from '@contember/schema'
 import * as Typesafe from '@contember/typesafe'
 import { Client, Literal } from '@contember/database'
 
-type Cell = boolean | number | string | null
+type Cell = boolean | number | string | readonly string[] | null
 
 export type TransferMapping = { tables: TransferTableMappingMap }
 
@@ -21,4 +21,4 @@ export type DbColumnSchema =
 	| { name: string; nullable?: boolean; type: Exclude<Model.ColumnType, Model.ColumnType.Enum | Model.ColumnType.Json | Model.ColumnType.Int> }
 	| { name: string; nullable?: boolean; type: Model.ColumnType.Int; sequence?: boolean }
 	| { name: string; nullable?: boolean; type: Model.ColumnType.Json; schema?: Typesafe.Type }
-	| { name: string; nullable?: boolean; type: Model.ColumnType.Enum; values: readonly string[] }
+	| { name: string; nullable?: boolean; type: Model.ColumnType.Enum; values: readonly string[]; list?: boolean }

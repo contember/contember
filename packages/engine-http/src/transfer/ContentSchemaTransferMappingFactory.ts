@@ -40,6 +40,7 @@ export class ContentSchemaTransferMappingFactory {
 							type: column.type,
 							nullable: column.nullable,
 							values: schema.enums[column.columnType],
+							list: column.list,
 						}
 					} else if (column.type === Model.ColumnType.Int) {
 						return {

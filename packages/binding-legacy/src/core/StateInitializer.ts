@@ -188,7 +188,7 @@ export class StateInitializer {
 						// keep in sync two copies of the same data. TS hides the extra info anyway.
 						entityRealm.children,
 						this.treeStore.persistedEntityData.get(entity.id.uniqueValue),
-						entityRealm.unpersistedChangesCount !== 0,
+						entityRealm.unpersistedChangesCount !== 0 || this.hasConnectionChangedFromPersisted(entityRealm),
 						entityRealm.errors,
 						getEntityMarker(entityRealm).environment,
 						entityRealm.getAccessor,
@@ -198,6 +198,29 @@ export class StateInitializer {
 			},
 		}
 		return entityRealm
+	}
+
+	private hasConnectionChangedFromPersisted(entityRealm: EntityRealmState): boolean {
+		if (entityRealm.blueprint.type !== 'hasOne') {
+			return false
+		}
+		const parentState = entityRealm.blueprint.parent
+		const parentPersistedData = this.treeStore.persistedEntityData.get(parentState.entity.id.uniqueValue)
+		if (!parentPersistedData) {
+			return false
+		}
+		const persistedField = parentPersistedData.get(entityRealm.blueprint.marker.placeholderName)
+		if (persistedField === undefined) {
+			return false
+		}
+		const persistedValue = persistedField.value
+		if (persistedValue instanceof ServerId) {
+			return persistedValue.value !== entityRealm.entity.id.value
+		}
+		if (persistedValue === null) {
+			return entityRealm.entity.id.existsOnServer
+		}
+		return false
 	}
 
 	private materializeEntityRealm(state: EntityRealmState | EntityRealmStateStub): EntityRealmState {

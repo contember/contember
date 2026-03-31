@@ -1,5 +1,5 @@
 import { createHash } from 'node:crypto'
-import { Plugin } from 'vite'
+import type { Plugin } from 'vite'
 
 /**
  * Configuration options for the Contember Vite plugin

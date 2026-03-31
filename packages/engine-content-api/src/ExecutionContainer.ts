@@ -44,6 +44,7 @@ export type ExecutionContainerArgs = {
 	identityId: string
 	identityVariables: Acl.VariablesMap
 	permissions: Acl.Permissions
+	allPermissions?: Acl.Permissions
 	systemSchema: string
 	project: { slug: string }
 	stage: { id: string; slug: string }
@@ -75,8 +76,20 @@ export class ExecutionContainerFactory {
 	}
 
 	createBuilderInternal(
-		{ permissions, identityVariables, identityId, db, schema, schemaMeta, systemSchema, stage, project, schemaDatabaseMetadata, userInfo }:
-			ExecutionContainerArgs,
+		{
+			permissions,
+			allPermissions,
+			identityVariables,
+			identityId,
+			db,
+			schema,
+			schemaMeta,
+			systemSchema,
+			stage,
+			project,
+			schemaDatabaseMetadata,
+			userInfo,
+		}: ExecutionContainerArgs,
 	) {
 		return new Builder({})
 			.addService('systemSchema', () => systemSchema)
@@ -89,7 +102,10 @@ export class ExecutionContainerFactory {
 			.addService('userInfo', () => userInfo)
 			.addService('providers', () => this.providers)
 			.addService('variableInjector', ({ schema }) => new VariableInjector(schema.model, identityVariables))
-			.addService('predicateFactory', ({ variableInjector, schema }) => new PredicateFactory(permissions, schema.model, variableInjector))
+			.addService(
+				'predicateFactory',
+				({ variableInjector, schema }) => new PredicateFactory(permissions, schema.model, variableInjector, allPermissions),
+			)
 			.addService('predicatesInjector', ({ predicateFactory, schema }) => new PredicatesInjector(schema.model, predicateFactory))
 			.addService('joinBuilder', ({ schema }) => new JoinBuilder(schema.model))
 			.addService('conditionBuilder', () => new ConditionBuilder())

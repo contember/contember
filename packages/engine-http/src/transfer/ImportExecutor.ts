@@ -25,6 +25,47 @@ type InsertContext = {
 export class ImportError extends Error {
 }
 
+const parsePgTextArray = (value: string): string[] => {
+	if (value === '{}') return []
+	if (!value.startsWith('{') || !value.endsWith('}')) {
+		throw new ParseError([], `invalid PostgreSQL array literal: ${value}`)
+	}
+	const inner = value.slice(1, -1)
+	const result: string[] = []
+	let current = ''
+	let inQuotes = false
+	let escaped = false
+	for (const ch of inner) {
+		if (escaped) {
+			current += ch
+			escaped = false
+		} else if (ch === '\\') {
+			escaped = true
+		} else if (ch === '"') {
+			inQuotes = !inQuotes
+		} else if (ch === ',' && !inQuotes) {
+			result.push(current)
+			current = ''
+		} else {
+			current += ch
+		}
+	}
+	result.push(current)
+	return result
+}
+
+const listType = <T extends Typesafe.Json>(arrayType: Typesafe.Type<T>): Typesafe.Type<T> => {
+	return (input: unknown, path: PropertyKey[] = []) => {
+		if (Array.isArray(input)) {
+			return arrayType(input, path)
+		}
+		if (typeof input === 'string' && input.startsWith('{')) {
+			return arrayType(parsePgTextArray(input), path)
+		}
+		return arrayType(input, path)
+	}
+}
+
 type CommandProcessor<T extends CommandName> = (it: CommandIterator<T>) => Promise<CommandIterator | null>
 type CommandProcessorMap<T extends CommandName> = { [N in CommandName]?: N extends T ? CommandProcessor<N> : undefined }
 
@@ -391,12 +432,12 @@ export class ImportExecutor {
 			case Model.ColumnType.Time:
 			case Model.ColumnType.Date:
 			case Model.ColumnType.Json:
-				return column.list ? Typesafe.array(Typesafe.string) : Typesafe.string
+				return column.list ? listType(Typesafe.array(Typesafe.string)) : Typesafe.string
 			case Model.ColumnType.Int:
 			case Model.ColumnType.Double:
-				return column.list ? Typesafe.array(Typesafe.number) : Typesafe.number
+				return column.list ? listType(Typesafe.array(Typesafe.number)) : Typesafe.number
 			case Model.ColumnType.Bool:
-				return column.list ? Typesafe.array(Typesafe.boolean) : Typesafe.boolean
+				return column.list ? listType(Typesafe.array(Typesafe.boolean)) : Typesafe.boolean
 		}
 	}
 }

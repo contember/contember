@@ -72,6 +72,9 @@ export class ConditionTypeProvider {
 						conditions.containsCI = { type: GraphQLString }
 						conditions.startsWithCI = { type: GraphQLString }
 						conditions.endsWithCI = { type: GraphQLString }
+
+						conditions.similar = { type: GraphQLString }
+						conditions.wordSimilar = { type: GraphQLString }
 					}
 				}
 

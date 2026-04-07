@@ -22,6 +22,8 @@ export enum Operator {
 	'containsCI' = 'containsCI',
 	'startsWithCI' = 'startsWithCI',
 	'endsWithCI' = 'endsWithCI',
+	'similar' = 'similar',
+	'wordSimilar' = 'wordSimilar',
 }
 
 const likeOperators: string[] = [
@@ -170,6 +172,10 @@ export class ConditionBuilder {
 				return `${left} LIKE '%' || ${right}`
 			case Operator.endsWithCI:
 				return `${left} ILIKE '%' || ${right}`
+			case Operator.similar:
+				return `${left} % ${right}`
+			case Operator.wordSimilar:
+				return `${right} <% ${left}`
 		}
 		return `${left} ${operator} ${right}`
 	}

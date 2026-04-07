@@ -29,6 +29,39 @@ export const evaluateCondition = (value: FieldValue | null, condition: Input.Con
 		containsCI: expr => typeof value === 'string' && value.toLowerCase().includes(expr.toLowerCase()),
 		startsWithCI: expr => typeof value === 'string' && value.toLowerCase().startsWith(expr.toLowerCase()),
 		endsWithCI: expr => typeof value === 'string' && value.toLowerCase().endsWith(expr.toLowerCase()),
+		similar: expr => {
+			if (typeof value !== 'string') return false
+			const trigrams = (s: string): Set<string> => {
+				const lower = s.toLowerCase()
+				const padded = `  ${lower} `
+				const set = new Set<string>()
+				for (let i = 0; i < padded.length - 2; i++) set.add(padded.slice(i, i + 3))
+				return set
+			}
+			const a = trigrams(value)
+			const b = trigrams(expr)
+			const intersection = [...a].filter(t => b.has(t)).length
+			const union = new Set([...a, ...b]).size
+			return union > 0 && intersection / union >= 0.3
+		},
+		wordSimilar: expr => {
+			if (typeof value !== 'string') return false
+			const trigrams = (s: string): Set<string> => {
+				const lower = s.toLowerCase()
+				const padded = `  ${lower} `
+				const set = new Set<string>()
+				for (let i = 0; i < padded.length - 2; i++) set.add(padded.slice(i, i + 3))
+				return set
+			}
+			const queryTrigrams = trigrams(expr)
+			const words = value.toLowerCase().split(/\s+/)
+			return words.some(word => {
+				const wordTrigrams = trigrams(word)
+				const intersection = [...queryTrigrams].filter(t => wordTrigrams.has(t)).length
+				const union = new Set([...queryTrigrams, ...wordTrigrams]).size
+				return union > 0 && intersection / union >= 0.6
+			})
+		},
 		never: () => false,
 		always: () => true,
 		// deprecated

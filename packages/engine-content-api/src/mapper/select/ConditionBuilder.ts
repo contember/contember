@@ -71,6 +71,8 @@ export class ConditionBuilder {
 			containsCI: (builder, value) => builder.compare(columnIdentifier, Operator.containsCI, value),
 			startsWithCI: (builder, value) => builder.compare(columnIdentifier, Operator.startsWithCI, value),
 			endsWithCI: (builder, value) => builder.compare(columnIdentifier, Operator.endsWithCI, value),
+			similar: (builder, value) => builder.compare(columnIdentifier, Operator.similar, value),
+			wordSimilar: (builder, value) => builder.compare(columnIdentifier, Operator.wordSimilar, value),
 
 			never: builder => builder.raw('false'),
 			always: builder => builder.raw('true'),

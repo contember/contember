@@ -22,7 +22,8 @@ export class CreateIndexModificationHandler implements ModificationHandler<Creat
 		})
 
 		const tableNameId = wrapIdentifier(entity.tableName)
-		const columnNameIds = columns.map(wrapIdentifier)
+		const opClassSuffix = this.data.index.opClass ? ` public.${this.data.index.opClass}` : ''
+		const columnNameIds = columns.map(c => wrapIdentifier(c) + opClassSuffix)
 		const methodClause = this.data.index.method ? ` USING ${this.data.index.method}` : ''
 
 		builder.sql(`CREATE INDEX ON ${tableNameId}${methodClause} (${columnNameIds.join(', ')})`)

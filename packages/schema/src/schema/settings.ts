@@ -10,9 +10,14 @@ export namespace Settings {
 		readonly uuidVersion?: 4 | 7
 	}
 
+	export type ActionsSettings = {
+		readonly returnTriggeredActions?: boolean
+	}
+
 	export type Schema = {
 		readonly tenant?: TenantSettings
 		readonly content?: ContentSettings
+		readonly actions?: ActionsSettings
 
 		/**
 		 * @deprecated

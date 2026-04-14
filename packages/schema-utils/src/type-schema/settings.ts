@@ -13,6 +13,9 @@ export const settingsSchema = Typesafe.partial({
 		shortDateResponse: Typesafe.boolean,
 		uuidVersion: Typesafe.union(Typesafe.literal(4), Typesafe.literal(7)),
 	}),
+	actions: Typesafe.partial({
+		returnTriggeredActions: Typesafe.boolean,
+	}),
 })
 
 const settingSchemaCheck: Typesafe.Equals<Settings.Schema, ReturnType<typeof settingsSchema>> = true

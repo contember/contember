@@ -36,6 +36,32 @@ import {
 } from './input-validation'
 import { RefreshViewResolver } from './resolvers/RefreshViewResolver'
 
+export interface TriggeredActionEvent {
+	id: string
+	trigger: string
+	target: string
+	transactionId: string
+}
+
+export interface TriggeredActionsCollector {
+	add(events: readonly TriggeredActionEvent[]): void
+	getEvents(): readonly TriggeredActionEvent[]
+}
+
+export class InMemoryTriggeredActionsCollector implements TriggeredActionsCollector {
+	private events: TriggeredActionEvent[] = []
+
+	add(events: readonly TriggeredActionEvent[]): void {
+		for (const event of events) {
+			this.events.push(event)
+		}
+	}
+
+	getEvents(): readonly TriggeredActionEvent[] {
+		return this.events
+	}
+}
+
 export type ExecutionContainerArgs = {
 	schema: Schema
 	schemaMeta: { id?: number }
@@ -56,6 +82,7 @@ export interface ExecutionContainer {
 	mutationResolver: MutationResolver
 	validationResolver: ValidationResolver
 	refreshViewResolver: RefreshViewResolver
+	triggeredActionsCollector: TriggeredActionsCollector | undefined
 }
 
 export type ExecutionContainerBuilder = ReturnType<ExecutionContainerFactory['createBuilderInternal']>
@@ -96,6 +123,10 @@ export class ExecutionContainerFactory {
 			.addService('db', () => db)
 			.addService('project', () => project)
 			.addService('stage', () => stage)
+			.addService('triggeredActionsCollector', (): TriggeredActionsCollector | undefined =>
+				schema.settings.actions?.returnTriggeredActions === true
+					? new InMemoryTriggeredActionsCollector()
+					: undefined)
 			.addService('schema', () => schema)
 			.addService('schemaMeta', () => schemaMeta)
 			.addService('schemaDatabaseMetadata', () => schemaDatabaseMetadata)
@@ -248,6 +279,12 @@ export class ExecutionContainerFactory {
 	}
 
 	public create(args: ExecutionContainerArgs): ExecutionContainer {
-		return this.createBuilder(args).build().pick('validationResolver', 'readResolver', 'mutationResolver', 'refreshViewResolver')
+		return this.createBuilder(args).build().pick(
+			'validationResolver',
+			'readResolver',
+			'mutationResolver',
+			'refreshViewResolver',
+			'triggeredActionsCollector',
+		)
 	}
 }

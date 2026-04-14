@@ -263,3 +263,59 @@ export class Book {
 ```
 
 In this example, the `watch` action 'book_watch' is assigned a priority level of 2. Therefore, events triggered by changes in the 'title' or 'tags' fields of the 'Book' entity will have a processing priority level of 2 in the event queue.
+
+## Returning triggered actions in the GraphQL response
+
+By default, Contember persists triggered Action events to the queue silently — the GraphQL response contains only the mutation result and gives no indication that any Action was fired. If you need to correlate a mutation with the events it produced (for example, to wait for a specific webhook to be processed in tests, or to surface a deterministic event id to a client), you can opt in to returning the triggered events in the response `extensions`.
+
+Enable it via the `actions.returnTriggeredActions` schema setting:
+
+```typescript
+import { createSchema } from '@contember/schema-definition'
+import * as model from './model'
+
+export default {
+  ...createSchema(model),
+  settings: {
+    actions: {
+      returnTriggeredActions: true,
+    },
+  },
+}
+```
+
+When enabled, every Content API response whose execution fired at least one Action will include a `triggeredActions` entry under `extensions`. Responses that did not fire any Action (queries, or mutations that touched no watched fields) leave `extensions.triggeredActions` unset.
+
+#### Example: response with triggered actions
+
+```json
+{
+  "data": {
+    "createBook": {
+      "ok": true,
+      "node": { "id": "f4f0a97d-7850-4add-8946-a1ce016306ce" }
+    }
+  },
+  "extensions": {
+    "triggeredActions": {
+      "events": [
+        {
+          "id": "73bbf733-36a5-4e5c-8798-1ba1b7900b39",
+          "trigger": "book_watch",
+          "target": "book_watch_target",
+          "transactionId": "53e3790d-5485-490c-9420-a1e79b19b5d3"
+        }
+      ]
+    }
+  }
+}
+```
+
+Each entry in `events` corresponds to a row written to the Actions queue and contains:
+
+- `id` — the event id (matches `meta.eventId` in the [webhook payload](./invocation.md#event-metadata))
+- `trigger` — the name of the watch/trigger that produced the event
+- `target` — the name of the resolved target
+- `transactionId` — the id of the database transaction that fired the event; events fired by the same mutation share this value
+
+This setting is opt-in because it adds a small amount of bookkeeping per request and changes the response shape. Leave it disabled if you don't consume the data.

@@ -14,7 +14,10 @@ export class ActionsExecutionContainerHookFactory {
 		return builder => {
 			return builder.setupService(
 				'mapperFactory',
-				(mapperFactory, { whereBuilder, schema, pathFactory, systemSchema, providers, stage, project, schemaMeta, joinBuilder, userInfo }) => {
+				(
+					mapperFactory,
+					{ whereBuilder, schema, pathFactory, systemSchema, providers, stage, project, schemaMeta, joinBuilder, userInfo, triggeredActionsCollector },
+				) => {
 					mapperFactory.hooks.push(mapper => {
 						const triggerPayloadPersister = new TriggerPayloadPersister(
 							mapper,
@@ -25,6 +28,7 @@ export class ActionsExecutionContainerHookFactory {
 							schemaMeta.id,
 							mapper.identityId,
 							userInfo,
+							triggeredActionsCollector,
 						)
 						const triggerPayloadBuilder = new TriggerPayloadBuilder(mapper)
 						const payloadManager = new TriggerPayloadManager(triggerPayloadBuilder, triggerPayloadPersister)

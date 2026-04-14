@@ -1,7 +1,13 @@
-import { c } from '@contember/schema-definition'
+import { ActionsDefinition as actions, c } from '@contember/schema-definition'
 
 export const InputUnique = c.createEnum('unique')
 
+@actions.watch({
+	name: 'input_root_watch',
+	watch: `textValue`,
+	webhook: 'http://localhost:4000/_noop',
+	selection: `textValue`,
+})
 export class InputRoot {
 	unique = c.enumColumn(InputUnique).notNull().unique()
 	dummy = c.stringColumn()

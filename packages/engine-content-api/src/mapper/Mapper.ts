@@ -1,4 +1,4 @@
-import { Input, Model } from '@contember/schema'
+import { Input, Model, Result } from '@contember/schema'
 import { acceptFieldVisitor, getColumnName } from '@contember/schema-utils'
 import {
 	OrderByHelper,
@@ -30,6 +30,7 @@ export class Mapper<ConnectionType extends Connection.ConnectionLike = Connectio
 	public readonly deletedEntities = new DeletedEntitiesStorage()
 	public readonly mutex = new Mutex()
 	public readonly constraintHelper: ConstraintHelper
+	public triggeredActions: Result.TriggeredAction[] = []
 
 	public readonly eventManager: EventManager
 

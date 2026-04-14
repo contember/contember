@@ -49,8 +49,8 @@ export class TriggerHandler {
 				await this.junctionHandler(event)
 			}
 		})
-		evm.listen('BeforeCommitEvent', async event => {
-			await this.payloadManager.persist()
+		evm.listen('BeforeCommitEvent', async (event, mapper) => {
+			mapper.triggeredActions = await this.payloadManager.persist()
 		})
 	}
 

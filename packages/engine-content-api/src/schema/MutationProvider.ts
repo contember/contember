@@ -202,6 +202,9 @@ export class MutationProvider {
 				type: new GraphQLNonNull(this.resultSchemaTypeProvider.validationResultType),
 			}
 		}
+		fields.triggeredActions = {
+			type: this.resultSchemaTypeProvider.triggeredActionListType,
+		}
 		return new GraphQLObjectType({
 			name: GqlTypeName`${entityName}${operation}Result`,
 			fields: fields,

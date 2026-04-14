@@ -88,6 +88,9 @@ export class GraphQlSchemaBuilder {
 					validation: {
 						type: new GraphQLNonNull(this.resultSchemaTypeProvider.validationResultType),
 					},
+					triggeredActions: {
+						type: this.resultSchemaTypeProvider.triggeredActionListType,
+					},
 					...Object.fromEntries(mutations),
 					query: {
 						type: queryObjectType,

@@ -1,0 +1,28 @@
+{
+	"formatVersion": 6,
+	"modifications": [
+		{
+			"modification": "createTarget",
+			"target": {
+				"type": "webhook",
+				"name": "input_root_watch_target",
+				"url": "http://localhost:4000/_noop"
+			}
+		},
+		{
+			"modification": "createTrigger",
+			"trigger": {
+				"type": "watch",
+				"name": "input_root_watch",
+				"entity": "InputRoot",
+				"watch": [
+					"textValue"
+				],
+				"target": "input_root_watch_target",
+				"selection": [
+					"textValue"
+				]
+			}
+		}
+	]
+}

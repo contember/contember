@@ -3,12 +3,19 @@ import { Value } from './value'
 export namespace Result {
 	export type MutationFieldResult = CreateResult | UpdateResult | DeleteResult | UpsertResult
 
+	export interface TriggeredAction {
+		id: string
+		trigger: string
+		target: string
+	}
+
 	export interface CreateResult {
 		ok: boolean
 		errorMessage?: string
 		errors: ExecutionError[]
 		validation: ValidationResult
 		node: Value.Object | null
+		triggeredActions: TriggeredAction[]
 	}
 
 	export interface UpsertResult {
@@ -17,6 +24,7 @@ export namespace Result {
 		errors: ExecutionError[]
 		validation: ValidationResult
 		node: Value.Object | null
+		triggeredActions: TriggeredAction[]
 	}
 
 	export interface UpdateResult {
@@ -25,6 +33,7 @@ export namespace Result {
 		errors: ExecutionError[]
 		validation: ValidationResult
 		node: Value.Object | null
+		triggeredActions: TriggeredAction[]
 	}
 
 	export interface DeleteResult {
@@ -32,6 +41,7 @@ export namespace Result {
 		errorMessage?: string
 		errors: ExecutionError[]
 		node: Value.Object | null
+		triggeredActions: TriggeredAction[]
 	}
 
 	export interface TransactionResult {
@@ -39,6 +49,7 @@ export namespace Result {
 		errorMessage?: string
 		errors: ExecutionError[]
 		validation: ValidationResult
+		triggeredActions: TriggeredAction[]
 	}
 
 	export interface ValidationResult {

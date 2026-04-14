@@ -1,4 +1,4 @@
-import { Actions, Input, Model } from '@contember/schema'
+import { Actions, Input, Model, Result } from '@contember/schema'
 import { AnyListener } from './TriggerListenersStore'
 import { EventCause } from './TriggerHandler'
 import { TriggerPayloadBuilder } from './TriggerPayloadBuilder'
@@ -29,12 +29,15 @@ export class TriggerPayloadManager {
 	}
 
 
-	public async persist(): Promise<void> {
+	public async persist(): Promise<Result.TriggeredAction[]> {
+		const allActions: Result.TriggeredAction[] = []
 		for (const events of Object.values(this.eventsByTrigger)) {
 			const payloads = await this.triggerPayloadBuilder.build(events)
 			const trigger = events[0].listener.trigger
-			await this.triggerPayloadPersister.persist(trigger, payloads)
+			const persisted = await this.triggerPayloadPersister.persist(trigger, payloads)
+			allActions.push(...persisted)
 		}
+		return allActions
 	}
 }
 

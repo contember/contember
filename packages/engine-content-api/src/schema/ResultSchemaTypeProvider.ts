@@ -86,6 +86,19 @@ export class ResultSchemaTypeProvider {
 
 	public errorListResultType = new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(this.errorResultType)))
 
+	private triggeredActionType = new GraphQLObjectType({
+		name: '_TriggeredAction',
+		fields: {
+			id: { type: new GraphQLNonNull(GraphQLString) },
+			trigger: { type: new GraphQLNonNull(GraphQLString) },
+			target: { type: new GraphQLNonNull(GraphQLString) },
+		},
+	})
+
+	public triggeredActionListType = new GraphQLNonNull(
+		new GraphQLList(new GraphQLNonNull(this.triggeredActionType)),
+	)
+
 	public mutationResultType = new GraphQLInterfaceType({
 		name: 'MutationResult',
 		fields: {

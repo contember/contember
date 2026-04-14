@@ -26,6 +26,7 @@ import { executeReadOperations } from './ReadHelpers'
 import { logger } from '@contember/logger'
 
 type WithoutNode<T extends { node: any }> = Pick<T, Exclude<keyof T, 'node'>>
+type InnerResult<T extends { node: any }> = Omit<WithoutNode<T>, 'triggeredActions'>
 
 type TransactionOptions = {
 	deferForeignKeyConstraints?: boolean
@@ -44,7 +45,7 @@ export class MutationResolver {
 	public async resolveTransaction(info: GraphQLResolveInfo, options: TransactionOptions): Promise<Result.TransactionResult> {
 		const queryAst = this.graphqlQueryAstFactory.create(info, (node, path) => {
 			return (
-				(path.length === 1 && !['ok', 'validation', 'errorMessage', 'errors'].includes(node.name.value)) ||
+				(path.length === 1 && !['ok', 'validation', 'errorMessage', 'errors', 'triggeredActions'].includes(node.name.value)) ||
 				(path.length === 2 && node.name.value === 'node') ||
 				path.length > 2 ||
 				path.length === 0 ||
@@ -65,7 +66,7 @@ export class MutationResolver {
 					: undefined,
 			}))
 
-		return this.transaction(async mapper => {
+		const result = await this.transaction(async mapper => {
 			if (options?.deferForeignKeyConstraints) {
 				logger.debug('MutationResolver: deferring foreign constraints')
 				await mapper.constraintHelper.setConstraintsDeferred('foreignKey')
@@ -212,6 +213,22 @@ export class MutationResolver {
 				...trxResult,
 			}
 		})
+
+		// Transaction is atomic — all triggeredActions apply to every mutation within it.
+		// Propagate the transaction-level triggeredActions into each inner mutation result,
+		// so clients can query triggeredActions at either level and get the full picture.
+		const { triggeredActions } = result
+		for (const field of queryAst.fields) {
+			if (field.name === 'query' || field.name === '__typename') {
+				continue
+			}
+			const inner = (result as Record<string, unknown>)[field.alias]
+			if (inner !== null && inner !== undefined && typeof inner === 'object') {
+				;(inner as Record<string, unknown>).triggeredActions = triggeredActions
+			}
+		}
+
+		return result
 	}
 
 	public async resolveUpdate(
@@ -251,7 +268,7 @@ export class MutationResolver {
 		mapper: Mapper,
 		entity: Model.Entity,
 		queryAst: ObjectNode<Input.UpdateInput>,
-	): Promise<WithoutNode<Result.UpdateResult>> {
+	): Promise<InnerResult<Result.UpdateResult>> {
 		const input = queryAst.args
 		const result = await mapper.update(entity, input.by, input.data, input.filter)
 		const errorResponse = this.createErrorResponse(result)
@@ -308,7 +325,7 @@ export class MutationResolver {
 		mapper: Mapper,
 		entity: Model.Entity,
 		queryAst: ObjectNode<Input.CreateInput>,
-	): Promise<WithoutNode<Result.CreateResult>> {
+	): Promise<InnerResult<Result.CreateResult>> {
 		const input = queryAst.args
 		const result = await mapper.insert(entity, input.data)
 		const errorResponse = this.createErrorResponse(result)
@@ -383,7 +400,7 @@ export class MutationResolver {
 		mapper: Mapper,
 		entity: Model.Entity,
 		queryAst: ObjectNode<Input.UpsertInput>,
-	): Promise<WithoutNode<Result.UpsertResult>> {
+	): Promise<InnerResult<Result.UpsertResult>> {
 		const input = queryAst.args
 		const result = await mapper.upsert(entity, input.by, input.update, input.create, input.filter)
 		const errorResponse = this.createErrorResponse(result)
@@ -422,7 +439,7 @@ export class MutationResolver {
 		mapper: Mapper,
 		entity: Model.Entity,
 		queryAst: ObjectNode<Input.DeleteInput>,
-	): Promise<WithoutNode<Result.DeleteResult>> {
+	): Promise<InnerResult<Result.DeleteResult>> {
 		const input = queryAst.args
 
 		const nodes = await this.resolveResultNodes(mapper, entity, input.by, queryAst)
@@ -466,7 +483,7 @@ export class MutationResolver {
 
 	private async transaction<R extends { ok: boolean }>(
 		cb: (mapper: Mapper) => Promise<R>,
-	): Promise<R> {
+	): Promise<R & { triggeredActions: Result.TriggeredAction[] }> {
 		return await retryTransaction(
 			async () => {
 				return await this.mapperFactory.transaction(async mapper => {
@@ -475,6 +492,7 @@ export class MutationResolver {
 					if (!result.ok) {
 						logger.debug('MutationResolver: Transaction failed, rolling back', { result })
 						await mapper.db.connection.rollback()
+						return { ...result, triggeredActions: [] as Result.TriggeredAction[] }
 					} else {
 						try {
 							await mapper.eventManager.fire(new BeforeCommitEvent())
@@ -490,11 +508,11 @@ export class MutationResolver {
 							if (!errorResponse) {
 								throw new ImplementationException()
 							}
-							return { ...result, ...errorResponse }
+							return { ...result, ...errorResponse, triggeredActions: [] as Result.TriggeredAction[] }
 						}
 
 					}
-					return result
+					return { ...result, triggeredActions: mapper.triggeredActions }
 				})
 			},
 			message => logger.warn(message),

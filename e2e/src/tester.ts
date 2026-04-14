@@ -37,7 +37,7 @@ afterEach(() => {
 export const executeGraphql = (
 	path: string,
 	query: string,
-	options: { authorizationToken?: string; variables?: Record<string, any> },
+	options: { authorizationToken?: string; variables?: Record<string, any>; keepExtensions?: boolean },
 ) => {
 	const result = supertest(apiUrl)
 		.post(path)
@@ -50,7 +50,7 @@ export const executeGraphql = (
 		latestError = e
 	})
 	result.on('response', e => {
-		if ('extensions' in e.body) {
+		if (!options.keepExtensions && 'extensions' in e.body) {
 			const { extensions, ...rest } = e.body
 			e.body = rest
 		}
@@ -112,7 +112,7 @@ export const createTester = async (schema: Schema) => {
 
 	const queryCb = (
 		query: string,
-		options: { path?: string; authorizationToken?: string; variables?: Record<string, any> } = {},
+		options: { path?: string; authorizationToken?: string; variables?: Record<string, any>; keepExtensions?: boolean } = {},
 	) => {
 		return executeGraphql(options.path ?? '/content/' + projectSlug + '/live', query, options)
 	}

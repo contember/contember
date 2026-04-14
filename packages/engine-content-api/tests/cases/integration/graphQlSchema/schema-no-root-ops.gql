@@ -242,6 +242,7 @@ type ArticleCreateResult implements MutationResult {
   errors: [_MutationError!]!
   node: Article
   validation: _ValidationResult!
+  triggeredActions: [_TriggeredAction!]!
 }
 
 interface MutationResult {
@@ -267,11 +268,18 @@ enum _MutationErrorType {
   SqlError
 }
 
+type _TriggeredAction {
+  id: String!
+  trigger: String!
+  target: String!
+}
+
 type ArticleDeleteResult implements MutationResult {
   ok: Boolean!
   errorMessage: String
   errors: [_MutationError!]!
   node: Article
+  triggeredActions: [_TriggeredAction!]!
 }
 
 type ArticleUpdateResult implements MutationResult {
@@ -280,6 +288,7 @@ type ArticleUpdateResult implements MutationResult {
   errors: [_MutationError!]!
   node: Article
   validation: _ValidationResult!
+  triggeredActions: [_TriggeredAction!]!
 }
 
 type ArticleUpsertResult implements MutationResult {
@@ -288,6 +297,7 @@ type ArticleUpsertResult implements MutationResult {
   errors: [_MutationError!]!
   node: Article
   validation: _ValidationResult!
+  triggeredActions: [_TriggeredAction!]!
 }
 
 type MutationTransaction {
@@ -295,6 +305,7 @@ type MutationTransaction {
   errorMessage: String
   errors: [_MutationError!]!
   validation: _ValidationResult!
+  triggeredActions: [_TriggeredAction!]!
   createArticle(data: ArticleCreateInput!): ArticleCreateResult!
   deleteArticle(by: ArticleUniqueWhere!, filter: ArticleWhere): ArticleDeleteResult!
   updateArticle(by: ArticleUniqueWhere!, filter: ArticleWhere, data: ArticleUpdateInput!): ArticleUpdateResult!

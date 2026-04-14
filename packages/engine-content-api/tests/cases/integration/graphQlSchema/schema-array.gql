@@ -191,6 +191,7 @@ type FooCreateResult implements MutationResult {
   errors: [_MutationError!]!
   node: Foo
   validation: _ValidationResult!
+  triggeredActions: [_TriggeredAction!]!
 }
 
 interface MutationResult {
@@ -216,11 +217,18 @@ enum _MutationErrorType {
   SqlError
 }
 
+type _TriggeredAction {
+  id: String!
+  trigger: String!
+  target: String!
+}
+
 type FooDeleteResult implements MutationResult {
   ok: Boolean!
   errorMessage: String
   errors: [_MutationError!]!
   node: Foo
+  triggeredActions: [_TriggeredAction!]!
 }
 
 type FooUpdateResult implements MutationResult {
@@ -229,6 +237,7 @@ type FooUpdateResult implements MutationResult {
   errors: [_MutationError!]!
   node: Foo
   validation: _ValidationResult!
+  triggeredActions: [_TriggeredAction!]!
 }
 
 type FooUpsertResult implements MutationResult {
@@ -237,6 +246,7 @@ type FooUpsertResult implements MutationResult {
   errors: [_MutationError!]!
   node: Foo
   validation: _ValidationResult!
+  triggeredActions: [_TriggeredAction!]!
 }
 
 type MutationTransaction {
@@ -244,6 +254,7 @@ type MutationTransaction {
   errorMessage: String
   errors: [_MutationError!]!
   validation: _ValidationResult!
+  triggeredActions: [_TriggeredAction!]!
   createFoo(data: FooCreateInput!): FooCreateResult!
   deleteFoo(by: FooUniqueWhere!, filter: FooWhere): FooDeleteResult!
   updateFoo(by: FooUniqueWhere!, filter: FooWhere, data: FooUpdateInput!): FooUpdateResult!

@@ -447,6 +447,7 @@ type VideoCreateResult implements MutationResult {
   errors: [_MutationError!]!
   node: Video
   validation: _ValidationResult!
+  triggeredActions: [_TriggeredAction!]!
 }
 
 interface MutationResult {
@@ -472,11 +473,18 @@ enum _MutationErrorType {
   SqlError
 }
 
+type _TriggeredAction {
+  id: String!
+  trigger: String!
+  target: String!
+}
+
 type VideoDeleteResult implements MutationResult {
   ok: Boolean!
   errorMessage: String
   errors: [_MutationError!]!
   node: Video
+  triggeredActions: [_TriggeredAction!]!
 }
 
 type VideoUpdateResult implements MutationResult {
@@ -485,6 +493,7 @@ type VideoUpdateResult implements MutationResult {
   errors: [_MutationError!]!
   node: Video
   validation: _ValidationResult!
+  triggeredActions: [_TriggeredAction!]!
 }
 
 type VideoUpsertResult implements MutationResult {
@@ -493,6 +502,7 @@ type VideoUpsertResult implements MutationResult {
   errors: [_MutationError!]!
   node: Video
   validation: _ValidationResult!
+  triggeredActions: [_TriggeredAction!]!
 }
 
 type FrontPageCreateResult implements MutationResult {
@@ -501,6 +511,7 @@ type FrontPageCreateResult implements MutationResult {
   errors: [_MutationError!]!
   node: FrontPage
   validation: _ValidationResult!
+  triggeredActions: [_TriggeredAction!]!
 }
 
 type FrontPageDeleteResult implements MutationResult {
@@ -508,6 +519,7 @@ type FrontPageDeleteResult implements MutationResult {
   errorMessage: String
   errors: [_MutationError!]!
   node: FrontPage
+  triggeredActions: [_TriggeredAction!]!
 }
 
 type FrontPageUpdateResult implements MutationResult {
@@ -516,6 +528,7 @@ type FrontPageUpdateResult implements MutationResult {
   errors: [_MutationError!]!
   node: FrontPage
   validation: _ValidationResult!
+  triggeredActions: [_TriggeredAction!]!
 }
 
 type FrontPageUpsertResult implements MutationResult {
@@ -524,6 +537,7 @@ type FrontPageUpsertResult implements MutationResult {
   errors: [_MutationError!]!
   node: FrontPage
   validation: _ValidationResult!
+  triggeredActions: [_TriggeredAction!]!
 }
 
 type MutationTransaction {
@@ -531,6 +545,7 @@ type MutationTransaction {
   errorMessage: String
   errors: [_MutationError!]!
   validation: _ValidationResult!
+  triggeredActions: [_TriggeredAction!]!
   createVideo(data: VideoCreateInput!): VideoCreateResult!
   deleteVideo(by: VideoUniqueWhere!, filter: VideoWhere): VideoDeleteResult!
   updateVideo(by: VideoUniqueWhere!, filter: VideoWhere, data: VideoUpdateInput!): VideoUpdateResult!

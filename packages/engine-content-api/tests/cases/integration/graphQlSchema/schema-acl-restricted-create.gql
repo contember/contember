@@ -249,6 +249,7 @@ type OneHasManyEntityDeleteResult implements MutationResult {
   errorMessage: String
   errors: [_MutationError!]!
   node: OneHasManyEntity
+  triggeredActions: [_TriggeredAction!]!
 }
 
 interface MutationResult {
@@ -274,12 +275,19 @@ enum _MutationErrorType {
   SqlError
 }
 
+type _TriggeredAction {
+  id: String!
+  trigger: String!
+  target: String!
+}
+
 type OneHasManyEntityUpdateResult implements MutationResult {
   ok: Boolean!
   errorMessage: String
   errors: [_MutationError!]!
   node: OneHasManyEntity
   validation: _ValidationResult!
+  triggeredActions: [_TriggeredAction!]!
 }
 
 type RootDeleteResult implements MutationResult {
@@ -287,6 +295,7 @@ type RootDeleteResult implements MutationResult {
   errorMessage: String
   errors: [_MutationError!]!
   node: Root
+  triggeredActions: [_TriggeredAction!]!
 }
 
 type RootUpdateResult implements MutationResult {
@@ -295,6 +304,7 @@ type RootUpdateResult implements MutationResult {
   errors: [_MutationError!]!
   node: Root
   validation: _ValidationResult!
+  triggeredActions: [_TriggeredAction!]!
 }
 
 type MutationTransaction {
@@ -302,6 +312,7 @@ type MutationTransaction {
   errorMessage: String
   errors: [_MutationError!]!
   validation: _ValidationResult!
+  triggeredActions: [_TriggeredAction!]!
   deleteOneHasManyEntity(by: OneHasManyEntityUniqueWhere!, filter: OneHasManyEntityWhere): OneHasManyEntityDeleteResult!
   updateOneHasManyEntity(by: OneHasManyEntityUniqueWhere!, filter: OneHasManyEntityWhere, data: OneHasManyEntityUpdateInput!): OneHasManyEntityUpdateResult!
   deleteRoot(by: RootUniqueWhere!, filter: RootWhere): RootDeleteResult!

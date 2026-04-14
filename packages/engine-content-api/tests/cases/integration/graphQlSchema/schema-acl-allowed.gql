@@ -326,6 +326,7 @@ type OneHasManyEntityCreateResult implements MutationResult {
   errors: [_MutationError!]!
   node: OneHasManyEntity
   validation: _ValidationResult!
+  triggeredActions: [_TriggeredAction!]!
 }
 
 interface MutationResult {
@@ -351,11 +352,18 @@ enum _MutationErrorType {
   SqlError
 }
 
+type _TriggeredAction {
+  id: String!
+  trigger: String!
+  target: String!
+}
+
 type OneHasManyEntityDeleteResult implements MutationResult {
   ok: Boolean!
   errorMessage: String
   errors: [_MutationError!]!
   node: OneHasManyEntity
+  triggeredActions: [_TriggeredAction!]!
 }
 
 type OneHasManyEntityUpdateResult implements MutationResult {
@@ -364,6 +372,7 @@ type OneHasManyEntityUpdateResult implements MutationResult {
   errors: [_MutationError!]!
   node: OneHasManyEntity
   validation: _ValidationResult!
+  triggeredActions: [_TriggeredAction!]!
 }
 
 type OneHasManyEntityUpsertResult implements MutationResult {
@@ -372,6 +381,7 @@ type OneHasManyEntityUpsertResult implements MutationResult {
   errors: [_MutationError!]!
   node: OneHasManyEntity
   validation: _ValidationResult!
+  triggeredActions: [_TriggeredAction!]!
 }
 
 type RootCreateResult implements MutationResult {
@@ -380,6 +390,7 @@ type RootCreateResult implements MutationResult {
   errors: [_MutationError!]!
   node: Root
   validation: _ValidationResult!
+  triggeredActions: [_TriggeredAction!]!
 }
 
 type RootDeleteResult implements MutationResult {
@@ -387,6 +398,7 @@ type RootDeleteResult implements MutationResult {
   errorMessage: String
   errors: [_MutationError!]!
   node: Root
+  triggeredActions: [_TriggeredAction!]!
 }
 
 type RootUpdateResult implements MutationResult {
@@ -395,6 +407,7 @@ type RootUpdateResult implements MutationResult {
   errors: [_MutationError!]!
   node: Root
   validation: _ValidationResult!
+  triggeredActions: [_TriggeredAction!]!
 }
 
 type RootUpsertResult implements MutationResult {
@@ -403,6 +416,7 @@ type RootUpsertResult implements MutationResult {
   errors: [_MutationError!]!
   node: Root
   validation: _ValidationResult!
+  triggeredActions: [_TriggeredAction!]!
 }
 
 type MutationTransaction {
@@ -410,6 +424,7 @@ type MutationTransaction {
   errorMessage: String
   errors: [_MutationError!]!
   validation: _ValidationResult!
+  triggeredActions: [_TriggeredAction!]!
   createOneHasManyEntity(data: OneHasManyEntityCreateInput!): OneHasManyEntityCreateResult!
   deleteOneHasManyEntity(by: OneHasManyEntityUniqueWhere!, filter: OneHasManyEntityWhere): OneHasManyEntityDeleteResult!
   updateOneHasManyEntity(by: OneHasManyEntityUniqueWhere!, filter: OneHasManyEntityWhere, data: OneHasManyEntityUpdateInput!): OneHasManyEntityUpdateResult!

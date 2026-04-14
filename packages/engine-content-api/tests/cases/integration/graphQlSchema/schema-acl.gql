@@ -164,6 +164,7 @@ type TestCreateResult implements MutationResult {
   errors: [_MutationError!]!
   node: Test
   validation: _ValidationResult!
+  triggeredActions: [_TriggeredAction!]!
 }
 
 interface MutationResult {
@@ -189,12 +190,19 @@ enum _MutationErrorType {
   SqlError
 }
 
+type _TriggeredAction {
+  id: String!
+  trigger: String!
+  target: String!
+}
+
 type TestUpdateResult implements MutationResult {
   ok: Boolean!
   errorMessage: String
   errors: [_MutationError!]!
   node: Test
   validation: _ValidationResult!
+  triggeredActions: [_TriggeredAction!]!
 }
 
 type TestUpsertResult implements MutationResult {
@@ -203,6 +211,7 @@ type TestUpsertResult implements MutationResult {
   errors: [_MutationError!]!
   node: Test
   validation: _ValidationResult!
+  triggeredActions: [_TriggeredAction!]!
 }
 
 type MutationTransaction {
@@ -210,6 +219,7 @@ type MutationTransaction {
   errorMessage: String
   errors: [_MutationError!]!
   validation: _ValidationResult!
+  triggeredActions: [_TriggeredAction!]!
   createTest(data: TestCreateInput!): TestCreateResult!
   updateTest(by: TestUniqueWhere!, filter: TestWhere, data: TestUpdateInput!): TestUpdateResult!
   upsertTest(by: TestUniqueWhere!, filter: TestWhere, update: TestUpdateInput!, create: TestCreateInput!): TestUpsertResult!

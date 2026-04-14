@@ -354,6 +354,7 @@ type ColumnsCreateResult implements MutationResult {
   errors: [_MutationError!]!
   node: Columns
   validation: _ValidationResult!
+  triggeredActions: [_TriggeredAction!]!
 }
 
 interface MutationResult {
@@ -379,11 +380,18 @@ enum _MutationErrorType {
   SqlError
 }
 
+type _TriggeredAction {
+  id: String!
+  trigger: String!
+  target: String!
+}
+
 type ColumnsDeleteResult implements MutationResult {
   ok: Boolean!
   errorMessage: String
   errors: [_MutationError!]!
   node: Columns
+  triggeredActions: [_TriggeredAction!]!
 }
 
 type ColumnsUpdateResult implements MutationResult {
@@ -392,6 +400,7 @@ type ColumnsUpdateResult implements MutationResult {
   errors: [_MutationError!]!
   node: Columns
   validation: _ValidationResult!
+  triggeredActions: [_TriggeredAction!]!
 }
 
 type ColumnsUpsertResult implements MutationResult {
@@ -400,6 +409,7 @@ type ColumnsUpsertResult implements MutationResult {
   errors: [_MutationError!]!
   node: Columns
   validation: _ValidationResult!
+  triggeredActions: [_TriggeredAction!]!
 }
 
 type MutationTransaction {
@@ -407,6 +417,7 @@ type MutationTransaction {
   errorMessage: String
   errors: [_MutationError!]!
   validation: _ValidationResult!
+  triggeredActions: [_TriggeredAction!]!
   createColumns(data: ColumnsCreateInput!): ColumnsCreateResult!
   deleteColumns(by: ColumnsUniqueWhere!, filter: ColumnsWhere): ColumnsDeleteResult!
   updateColumns(by: ColumnsUniqueWhere!, filter: ColumnsWhere, data: ColumnsUpdateInput!): ColumnsUpdateResult!

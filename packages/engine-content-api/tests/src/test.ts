@@ -1,5 +1,5 @@
 import { Acl, Model, Schema, Validation } from '@contember/schema'
-import { Authorizator, GraphQlSchemaBuilderFactory, ExecutionContainerFactory } from '../../src'
+import { Authorizator, GraphQlSchemaBuilderFactory, ExecutionContainerFactory, type ExecutionContainerHook } from '../../src'
 import { AllowAllPermissionFactory, emptySchema } from '@contember/schema-utils'
 import { executeGraphQlTest } from './testGraphql'
 import { Client, emptyDatabaseMetadata } from '@contember/database'
@@ -21,6 +21,7 @@ export interface Test {
 	queryVariables?: Record<string, any>
 	executes: SqlQuery[]
 	return: object
+	executionContainerHooks?: ExecutionContainerHook[]
 }
 
 const SQL_BEGIN = {
@@ -95,6 +96,9 @@ export const execute = async (test: Test) => {
 			})
 		})
 	})
+	for (const hook of test.executionContainerHooks ?? []) {
+		executionContainerFactory.hooks.push(hook)
+	}
 	await executeGraphQlTest({
 		context: {
 			db: db,

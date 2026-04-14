@@ -686,6 +686,7 @@ type AuthorCreateResult implements MutationResult {
   errors: [_MutationError!]!
   node: Author
   validation: _ValidationResult!
+  triggeredActions: [_TriggeredAction!]!
 }
 
 interface MutationResult {
@@ -711,11 +712,18 @@ enum _MutationErrorType {
   SqlError
 }
 
+type _TriggeredAction {
+  id: String!
+  trigger: String!
+  target: String!
+}
+
 type AuthorDeleteResult implements MutationResult {
   ok: Boolean!
   errorMessage: String
   errors: [_MutationError!]!
   node: Author
+  triggeredActions: [_TriggeredAction!]!
 }
 
 type AuthorUpdateResult implements MutationResult {
@@ -724,6 +732,7 @@ type AuthorUpdateResult implements MutationResult {
   errors: [_MutationError!]!
   node: Author
   validation: _ValidationResult!
+  triggeredActions: [_TriggeredAction!]!
 }
 
 type AuthorUpsertResult implements MutationResult {
@@ -732,6 +741,7 @@ type AuthorUpsertResult implements MutationResult {
   errors: [_MutationError!]!
   node: Author
   validation: _ValidationResult!
+  triggeredActions: [_TriggeredAction!]!
 }
 
 type CategoryCreateResult implements MutationResult {
@@ -740,6 +750,7 @@ type CategoryCreateResult implements MutationResult {
   errors: [_MutationError!]!
   node: Category
   validation: _ValidationResult!
+  triggeredActions: [_TriggeredAction!]!
 }
 
 type CategoryDeleteResult implements MutationResult {
@@ -747,6 +758,7 @@ type CategoryDeleteResult implements MutationResult {
   errorMessage: String
   errors: [_MutationError!]!
   node: Category
+  triggeredActions: [_TriggeredAction!]!
 }
 
 type CategoryUpdateResult implements MutationResult {
@@ -755,6 +767,7 @@ type CategoryUpdateResult implements MutationResult {
   errors: [_MutationError!]!
   node: Category
   validation: _ValidationResult!
+  triggeredActions: [_TriggeredAction!]!
 }
 
 type CategoryUpsertResult implements MutationResult {
@@ -763,6 +776,7 @@ type CategoryUpsertResult implements MutationResult {
   errors: [_MutationError!]!
   node: Category
   validation: _ValidationResult!
+  triggeredActions: [_TriggeredAction!]!
 }
 
 type PostLocaleCreateResult implements MutationResult {
@@ -771,6 +785,7 @@ type PostLocaleCreateResult implements MutationResult {
   errors: [_MutationError!]!
   node: PostLocale
   validation: _ValidationResult!
+  triggeredActions: [_TriggeredAction!]!
 }
 
 type PostLocaleDeleteResult implements MutationResult {
@@ -778,6 +793,7 @@ type PostLocaleDeleteResult implements MutationResult {
   errorMessage: String
   errors: [_MutationError!]!
   node: PostLocale
+  triggeredActions: [_TriggeredAction!]!
 }
 
 type PostLocaleUpdateResult implements MutationResult {
@@ -786,6 +802,7 @@ type PostLocaleUpdateResult implements MutationResult {
   errors: [_MutationError!]!
   node: PostLocale
   validation: _ValidationResult!
+  triggeredActions: [_TriggeredAction!]!
 }
 
 type PostLocaleUpsertResult implements MutationResult {
@@ -794,6 +811,7 @@ type PostLocaleUpsertResult implements MutationResult {
   errors: [_MutationError!]!
   node: PostLocale
   validation: _ValidationResult!
+  triggeredActions: [_TriggeredAction!]!
 }
 
 type PostCreateResult implements MutationResult {
@@ -802,6 +820,7 @@ type PostCreateResult implements MutationResult {
   errors: [_MutationError!]!
   node: Post
   validation: _ValidationResult!
+  triggeredActions: [_TriggeredAction!]!
 }
 
 type PostDeleteResult implements MutationResult {
@@ -809,6 +828,7 @@ type PostDeleteResult implements MutationResult {
   errorMessage: String
   errors: [_MutationError!]!
   node: Post
+  triggeredActions: [_TriggeredAction!]!
 }
 
 type PostUpdateResult implements MutationResult {
@@ -817,6 +837,7 @@ type PostUpdateResult implements MutationResult {
   errors: [_MutationError!]!
   node: Post
   validation: _ValidationResult!
+  triggeredActions: [_TriggeredAction!]!
 }
 
 type PostUpsertResult implements MutationResult {
@@ -825,6 +846,7 @@ type PostUpsertResult implements MutationResult {
   errors: [_MutationError!]!
   node: Post
   validation: _ValidationResult!
+  triggeredActions: [_TriggeredAction!]!
 }
 
 type MutationTransaction {
@@ -832,6 +854,7 @@ type MutationTransaction {
   errorMessage: String
   errors: [_MutationError!]!
   validation: _ValidationResult!
+  triggeredActions: [_TriggeredAction!]!
   createAuthor(data: AuthorCreateInput!): AuthorCreateResult!
   deleteAuthor(by: AuthorUniqueWhere!, filter: AuthorWhere): AuthorDeleteResult!
   updateAuthor(by: AuthorUniqueWhere!, filter: AuthorWhere, data: AuthorUpdateInput!): AuthorUpdateResult!

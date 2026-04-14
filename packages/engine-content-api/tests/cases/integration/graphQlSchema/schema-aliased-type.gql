@@ -167,6 +167,7 @@ type AuthorCreateResult implements MutationResult {
   errors: [_MutationError!]!
   node: Author
   validation: _ValidationResult!
+  triggeredActions: [_TriggeredAction!]!
 }
 
 interface MutationResult {
@@ -192,11 +193,18 @@ enum _MutationErrorType {
   SqlError
 }
 
+type _TriggeredAction {
+  id: String!
+  trigger: String!
+  target: String!
+}
+
 type AuthorDeleteResult implements MutationResult {
   ok: Boolean!
   errorMessage: String
   errors: [_MutationError!]!
   node: Author
+  triggeredActions: [_TriggeredAction!]!
 }
 
 type AuthorUpdateResult implements MutationResult {
@@ -205,6 +213,7 @@ type AuthorUpdateResult implements MutationResult {
   errors: [_MutationError!]!
   node: Author
   validation: _ValidationResult!
+  triggeredActions: [_TriggeredAction!]!
 }
 
 type AuthorUpsertResult implements MutationResult {
@@ -213,6 +222,7 @@ type AuthorUpsertResult implements MutationResult {
   errors: [_MutationError!]!
   node: Author
   validation: _ValidationResult!
+  triggeredActions: [_TriggeredAction!]!
 }
 
 type MutationTransaction {
@@ -220,6 +230,7 @@ type MutationTransaction {
   errorMessage: String
   errors: [_MutationError!]!
   validation: _ValidationResult!
+  triggeredActions: [_TriggeredAction!]!
   createAuthor(data: AuthorCreateInput!): AuthorCreateResult!
   deleteAuthor(by: AuthorUniqueWhere!, filter: AuthorWhere): AuthorDeleteResult!
   updateAuthor(by: AuthorUniqueWhere!, filter: AuthorWhere, data: AuthorUpdateInput!): AuthorUpdateResult!

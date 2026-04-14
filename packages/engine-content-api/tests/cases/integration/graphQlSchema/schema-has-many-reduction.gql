@@ -360,6 +360,7 @@ type PostLocaleCreateResult implements MutationResult {
   errors: [_MutationError!]!
   node: PostLocale
   validation: _ValidationResult!
+  triggeredActions: [_TriggeredAction!]!
 }
 
 interface MutationResult {
@@ -385,11 +386,18 @@ enum _MutationErrorType {
   SqlError
 }
 
+type _TriggeredAction {
+  id: String!
+  trigger: String!
+  target: String!
+}
+
 type PostLocaleDeleteResult implements MutationResult {
   ok: Boolean!
   errorMessage: String
   errors: [_MutationError!]!
   node: PostLocale
+  triggeredActions: [_TriggeredAction!]!
 }
 
 type PostLocaleUpdateResult implements MutationResult {
@@ -398,6 +406,7 @@ type PostLocaleUpdateResult implements MutationResult {
   errors: [_MutationError!]!
   node: PostLocale
   validation: _ValidationResult!
+  triggeredActions: [_TriggeredAction!]!
 }
 
 type PostLocaleUpsertResult implements MutationResult {
@@ -406,6 +415,7 @@ type PostLocaleUpsertResult implements MutationResult {
   errors: [_MutationError!]!
   node: PostLocale
   validation: _ValidationResult!
+  triggeredActions: [_TriggeredAction!]!
 }
 
 type PostCreateResult implements MutationResult {
@@ -414,6 +424,7 @@ type PostCreateResult implements MutationResult {
   errors: [_MutationError!]!
   node: Post
   validation: _ValidationResult!
+  triggeredActions: [_TriggeredAction!]!
 }
 
 type PostDeleteResult implements MutationResult {
@@ -421,6 +432,7 @@ type PostDeleteResult implements MutationResult {
   errorMessage: String
   errors: [_MutationError!]!
   node: Post
+  triggeredActions: [_TriggeredAction!]!
 }
 
 type PostUpdateResult implements MutationResult {
@@ -429,6 +441,7 @@ type PostUpdateResult implements MutationResult {
   errors: [_MutationError!]!
   node: Post
   validation: _ValidationResult!
+  triggeredActions: [_TriggeredAction!]!
 }
 
 type PostUpsertResult implements MutationResult {
@@ -437,6 +450,7 @@ type PostUpsertResult implements MutationResult {
   errors: [_MutationError!]!
   node: Post
   validation: _ValidationResult!
+  triggeredActions: [_TriggeredAction!]!
 }
 
 type MutationTransaction {
@@ -444,6 +458,7 @@ type MutationTransaction {
   errorMessage: String
   errors: [_MutationError!]!
   validation: _ValidationResult!
+  triggeredActions: [_TriggeredAction!]!
   createPostLocale(data: PostLocaleCreateInput!): PostLocaleCreateResult!
   deletePostLocale(by: PostLocaleUniqueWhere!, filter: PostLocaleWhere): PostLocaleDeleteResult!
   updatePostLocale(by: PostLocaleUniqueWhere!, filter: PostLocaleWhere, data: PostLocaleUpdateInput!): PostLocaleUpdateResult!

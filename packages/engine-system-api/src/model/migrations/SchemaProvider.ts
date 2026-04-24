@@ -66,7 +66,7 @@ export class SchemaProvider {
 		db: DatabaseContext
 		currentSchema?: SchemaWithMeta | null
 	}): Promise<SchemaWithMeta> {
-		const newSchema = await db.queryHandler.fetch(new SchemaQuery(currentSchema?.meta.checksum))
+		const newSchema = await db.queryHandler.fetch(new SchemaQuery(currentSchema?.meta.checksum, currentSchema?.meta.version))
 		if (!newSchema) {
 			return currentSchema ?? emptyVersionedSchema
 		}

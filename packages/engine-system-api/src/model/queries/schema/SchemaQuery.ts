@@ -28,7 +28,7 @@ export class SchemaQuery extends DatabaseQuery<SchemaWithMeta | null> {
 					return it
 				}
 				if (this.currentVersion) {
-					return it.where(it => it.raw('(checksum != ? OR version != ?)', [this.currentHash, this.currentVersion]))
+					return it.where(it => it.raw('(checksum != ? OR version != ?)', this.currentHash, this.currentVersion))
 				}
 				return it.where(it => it.raw('checksum != ?', this.currentHash))
 			})

@@ -21,6 +21,7 @@ import { WebhookTargetHandler } from './dispatch/WebhookTargetHandler'
 import { ActionsContextResolver } from './graphql/http/ActionsContextResolver'
 import { ActionsWebsocketControllerFactory } from './graphql/http/ActionsWebsocketControllerFactory'
 import { DispatchWorkerSupervisorFactory } from './dispatch/DispatchWorkerSupervisor'
+import { LazyDispatchWorker } from './dispatch/LazyDispatchWorker'
 import { ProjectDispatcherFactory } from './dispatch/ProjectDispatcher'
 import { VariablesQueryResolver } from './graphql/resolvers/query/VariablesQueryResolver'
 import { VariablesManager } from './model/VariablesManager'
@@ -108,11 +109,16 @@ export default class ActionsPlugin implements Plugin {
 						it.addWebsocketRoute('actions', '/actions/_worker', actionsWebsocketMiddlewareFactory.create())
 					},
 				)
-				.setupService('applicationWorkers', (it, { actions_dispatchWorkerSupervisorFactory, projectGroupContainer, serverConfig }) => {
-					if (!(serverConfig as any).projectGroup) {
-						it.registerWorker(this.name, actions_dispatchWorkerSupervisorFactory.create(projectGroupContainer))
-					}
-				}) as unknown as MasterContainerBuilder
+				.setupService(
+					'applicationWorkers',
+					(it, { actions_dispatchWorkerSupervisorFactory, projectGroupContainer, projectGroupContainerResolver, serverConfig }) => {
+						if (!(serverConfig as any).projectGroup) {
+							it.registerWorker(this.name, actions_dispatchWorkerSupervisorFactory.create(projectGroupContainer))
+						} else {
+							it.registerWorker(this.name, new LazyDispatchWorker(projectGroupContainerResolver, actions_dispatchWorkerSupervisorFactory))
+						}
+					},
+				) as unknown as MasterContainerBuilder
 		}
 		return hook
 	}

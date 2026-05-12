@@ -6,6 +6,7 @@ import { DatabaseContext } from '../utils'
 import { Response, ResponseError, ResponseOk } from '../utils/Response'
 import { ImplementationException } from '../../exceptions'
 import { AuthLogService } from './AuthLogService'
+import { ApiKeyRequestInfo } from '../commands'
 
 class SignInManager {
 	constructor(
@@ -14,7 +15,14 @@ class SignInManager {
 		private readonly otpAuthenticator: OtpAuthenticator,
 	) {}
 
-	async signIn(dbContext: DatabaseContext, email: string, password: string, expiration?: number, otpCode?: string): Promise<SignInResponse> {
+	async signIn(
+		dbContext: DatabaseContext,
+		email: string,
+		password: string,
+		expiration?: number,
+		otpCode?: string,
+		requestInfo?: ApiKeyRequestInfo,
+	): Promise<SignInResponse> {
 		const person = await dbContext.queryHandler.fetch(PersonQuery.byEmail(email))
 
 		if (person === null) {
@@ -55,7 +63,7 @@ class SignInManager {
 			}
 		}
 
-		const sessionToken = await this.apiKeyManager.createSessionApiKey(dbContext, person.identity_id, expiration)
+		const sessionToken = await this.apiKeyManager.createSessionApiKey(dbContext, person.identity_id, expiration, requestInfo)
 
 		return new ResponseOk({ person, token: sessionToken, ...authLogData })
 	}
@@ -65,6 +73,7 @@ class SignInManager {
 		personIdentifier: PersonUniqueIdentifier,
 		expiration?: number,
 		verifier?: (person: PersonRow) => Promise<void>,
+		requestInfo?: ApiKeyRequestInfo,
 	): Promise<CreateSessionTokenResponse> {
 		const person = await dbContext.queryHandler.fetch(PersonQuery.byUniqueIdentifier(personIdentifier))
 
@@ -98,7 +107,7 @@ class SignInManager {
 
 		await verifier?.(person)
 
-		const sessionToken = await this.apiKeyManager.createSessionApiKey(dbContext, person.identity_id, expiration)
+		const sessionToken = await this.apiKeyManager.createSessionApiKey(dbContext, person.identity_id, expiration, requestInfo)
 		return new ResponseOk({
 			person,
 			token: sessionToken,

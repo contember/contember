@@ -46,6 +46,7 @@ export class IDPMutationResolver implements MutationResolvers {
 				redirectUrl: args.redirectUrl,
 			},
 			args.expiration ?? undefined,
+			context.httpInfo,
 		)
 		await context.logAuthAction({
 			type: 'idp_login',

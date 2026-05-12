@@ -42,6 +42,9 @@ export type ApiKeyRow = {
 	readonly expiration: number | null
 	readonly roles: string[]
 	readonly person_id: string | null
+	readonly last_ip: string | null
+	readonly last_user_agent: string | null
+	readonly last_used_at: Date | null
 }
 
 const apiKeyBaseQuery = SelectBuilder.create<null | ApiKeyRow>()
@@ -53,6 +56,9 @@ const apiKeyBaseQuery = SelectBuilder.create<null | ApiKeyRow>()
 	.select(['identity', 'roles'])
 	.select(['api_key', 'expiration'])
 	.select(['person', 'id'], 'person_id')
+	.select(['api_key', 'last_ip'])
+	.select(['api_key', 'last_user_agent'])
+	.select(['api_key', 'last_used_at'])
 	.from('api_key')
 	.join('identity', 'identity', joinClause => joinClause.compareColumns(['api_key', 'identity_id'], Operator.eq, ['identity', 'id']))
 	.leftJoin(

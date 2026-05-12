@@ -1,4 +1,5 @@
 import {
+	ApiKeyRequestInfo,
 	CreateApiKeyCommand,
 	DisableApiKeyCommand,
 	DisableIdentityApiKeysCommand,
@@ -26,6 +27,7 @@ export class ApiKeyManager {
 		dbContext: DatabaseContext,
 		readDbContext: DatabaseContext,
 		token: string,
+		requestInfo?: ApiKeyRequestInfo,
 	): Promise<VerifyResponse> {
 		const apiKeyRow = await readDbContext.queryHandler.fetch(new ApiKeyByTokenQuery(token))
 		if (apiKeyRow === null) {
@@ -51,6 +53,12 @@ export class ApiKeyManager {
 					apiKeyRow.type,
 					apiKeyRow.expiration,
 					apiKeyRow.expires_at,
+					requestInfo,
+					{
+						lastIp: apiKeyRow.last_ip,
+						lastUserAgent: apiKeyRow.last_user_agent,
+						lastUsedAt: apiKeyRow.last_used_at,
+					},
 				),
 			)
 		})
@@ -58,13 +66,23 @@ export class ApiKeyManager {
 		return new ResponseOk(new VerifyResult(apiKeyRow.identity_id, apiKeyRow.id, apiKeyRow.roles, apiKeyRow.person_id))
 	}
 
-	async createSessionApiKey(dbContext: DatabaseContext, identityId: string, expiration?: number): Promise<string> {
+	async createSessionApiKey(
+		dbContext: DatabaseContext,
+		identityId: string,
+		expiration?: number,
+		requestInfo?: ApiKeyRequestInfo,
+	): Promise<string> {
 		const config = await dbContext.queryHandler.fetch(new ConfigurationQuery())
 		const expirationResolved = expiration ?? (intervalToSeconds(config.login.defaultTokenExpiration) / 60)
 		const expirationCapped = config.login.maxTokenExpiration
 			? Math.min(expirationResolved, intervalToSeconds(config.login.maxTokenExpiration) / 60)
 			: expirationResolved
-		const command = new CreateApiKeyCommand({ type: ApiKey.Type.SESSION, identityId, expiration: expirationCapped })
+		const command = new CreateApiKeyCommand({
+			type: ApiKey.Type.SESSION,
+			identityId,
+			expiration: expirationCapped,
+			requestInfo,
+		})
 		const token = (await dbContext.commandBus.execute(command)).token
 		assert(token !== undefined)
 		return token

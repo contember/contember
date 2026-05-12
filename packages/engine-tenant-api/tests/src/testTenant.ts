@@ -126,6 +126,7 @@ export const executeTenantTest = async (test: Test) => {
 			test.expectedAuthLog = undefined
 		},
 		db: databaseContext,
+		httpInfo: {},
 	}
 
 	const schema = makeExecutableSchema({

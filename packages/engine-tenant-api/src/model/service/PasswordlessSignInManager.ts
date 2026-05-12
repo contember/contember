@@ -10,7 +10,7 @@ import {
 } from '../../schema'
 import { DatabaseContext, validateToken } from '../utils'
 import { UserMailer } from '../mailing'
-import { ActivateOtpCommand, CreatePersonTokenCommand, IncreaseOtpAttemptCommand, InvalidateTokenCommand } from '../commands'
+import { ActivateOtpCommand, ApiKeyRequestInfo, CreatePersonTokenCommand, IncreaseOtpAttemptCommand, InvalidateTokenCommand } from '../commands'
 import { getPreferredProject } from './helpers/getPreferredProject'
 import { ProjectManager } from './ProjectManager'
 import { PermissionContext } from '../authorization'
@@ -108,13 +108,14 @@ class PasswordlessSignInManager {
 		return urlObj.toString()
 	}
 
-	async signInPasswordless({ db, expiration, token, requestId, mfaOtp, validationType }: {
+	async signInPasswordless({ db, expiration, token, requestId, mfaOtp, validationType, requestInfo }: {
 		db: DatabaseContext
 		validationType: PersonToken.ValidationType
 		requestId: string
 		token: string
 		mfaOtp?: string
 		expiration?: number
+		requestInfo?: ApiKeyRequestInfo
 	}): Promise<PasswordlessSignInManager.SignInPasswordlessResponse> {
 		return db.transaction(async (db): Promise<PasswordlessSignInManager.SignInPasswordlessResponse> => {
 			const tokenResult = await db.queryHandler.fetch(PersonTokenQuery.byId(requestId, 'passwordless'))
@@ -173,7 +174,7 @@ class PasswordlessSignInManager {
 			}
 
 			await db.commandBus.execute(new InvalidateTokenCommand(tokenValidationResult.result.id))
-			const sessionToken = await this.apiKeyManager.createSessionApiKey(db, personRow.identity_id, expiration)
+			const sessionToken = await this.apiKeyManager.createSessionApiKey(db, personRow.identity_id, expiration, requestInfo)
 
 			return new ResponseOk({
 				person: personRow,

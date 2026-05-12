@@ -19,7 +19,9 @@ export class Authenticator {
 	) {
 	}
 
-	public async authenticate({ request, timer }: { request: IncomingMessage; timer: Timer }): Promise<AuthResult | null> {
+	public async authenticate(
+		{ request, timer, clientIp }: { request: IncomingMessage; timer: Timer; clientIp?: string },
+	): Promise<AuthResult | null> {
 		const authHeader = request.headers.authorization
 		if (!authHeader) {
 			return null
@@ -32,7 +34,12 @@ export class Authenticator {
 			throw this.createAuthError(`invalid Authorization header format`)
 		}
 		const [, token] = match
-		const authResult = await timer('Auth', () => this.apiKeyManager.verifyAndProlong(this.tenantDatabase, this.tenantReadDatabase, token))
+		const userAgent = request.headers['user-agent']
+		const authResult = await timer('Auth', () =>
+			this.apiKeyManager.verifyAndProlong(this.tenantDatabase, this.tenantReadDatabase, token, {
+				ip: clientIp,
+				userAgent: typeof userAgent === 'string' ? userAgent : undefined,
+			}))
 		if (!authResult.ok) {
 			throw this.createAuthError(authResult.errorMessage)
 		}

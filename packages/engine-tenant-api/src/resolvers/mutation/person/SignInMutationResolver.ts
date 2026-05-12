@@ -34,6 +34,7 @@ export class SignInMutationResolver implements MutationResolvers {
 			args.password,
 			args.expiration || undefined,
 			args.otpToken || undefined,
+			context.httpInfo,
 		)
 		await context.logAuthAction({
 			type: 'login',
@@ -82,6 +83,7 @@ export class SignInMutationResolver implements MutationResolvers {
 					action: PermissionActions.PERSON_CREATE_SESSION_KEY(person.roles),
 					message: 'You are not allowed to create a session key for this person.',
 				}),
+			context.httpInfo,
 		)
 		await context.logAuthAction({
 			type: 'create_session_token',

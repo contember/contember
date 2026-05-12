@@ -7,7 +7,7 @@ export const getApiKeySql = (args: {
 	response: { identityId: string; personId: string; apiKeyType: ApiKey.Type }
 }): ExpectedQuery => ({
 	sql:
-		SQL`select "api_key"."id", "api_key"."type", "api_key"."identity_id", "api_key"."disabled_at", "api_key"."expires_at", "identity"."roles", "api_key"."expiration", "person"."id" as "person_id"
+		SQL`select "api_key"."id", "api_key"."type", "api_key"."identity_id", "api_key"."disabled_at", "api_key"."expires_at", "identity"."roles", "api_key"."expiration", "person"."id" as "person_id", "api_key"."last_ip", "api_key"."last_user_agent", "api_key"."last_used_at"
 		from "tenant"."api_key"
     	inner join "tenant"."identity" as "identity" on "api_key"."identity_id" = "identity"."id"
     	left join "tenant"."person" as "person" on "person"."identity_id" = "identity"."id"
@@ -26,6 +26,9 @@ export const getApiKeySql = (args: {
 					expiration: null,
 					roles: [],
 					person_id: args.response.personId,
+					last_ip: null,
+					last_user_agent: null,
+					last_used_at: null,
 				},
 			]
 			: [],

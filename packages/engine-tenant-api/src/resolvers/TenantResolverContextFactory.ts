@@ -10,6 +10,7 @@ export const createResolverContext = (permissionContext: PermissionContext, apiK
 		identity: permissionContext.identity,
 		isAllowed: permissionContext.isAllowed.bind(permissionContext),
 		requireAccess: permissionContext.requireAccess.bind(permissionContext),
+		httpInfo: {},
 	}
 }
 
@@ -37,6 +38,10 @@ export class TenantResolverContextFactory {
 					userAgent: httpInfo.userAgent,
 					clientIp: httpInfo.ip,
 				}, data)
+			},
+			httpInfo: {
+				ip: httpInfo.ip,
+				userAgent: httpInfo.userAgent,
 			},
 			db,
 			logger,

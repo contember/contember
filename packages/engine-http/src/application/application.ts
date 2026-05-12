@@ -133,7 +133,7 @@ export class Application {
 				projectGroup: groupContainer.slug,
 			})
 
-			const authResult = await groupContainer.authenticator.authenticate({ request: req, timer })
+			const authResult = await groupContainer.authenticator.authenticate({ request: req, timer, clientIp })
 			requestLogger.debug('User authenticated', { authResult })
 			requestLogger = requestLogger.child({
 				user: authResult?.identityId,
@@ -222,7 +222,7 @@ export class Application {
 			ctx.state.projectGroup = groupContainer.slug
 			ctx.state.project = matchedRequest.params.projectSlug
 
-			const authResult = await groupContainer.authenticator.authenticate({ request: ctx.req, timer })
+			const authResult = await groupContainer.authenticator.authenticate({ request: ctx.req, timer, clientIp })
 			requestLogger.debug('User authenticated', { authResult })
 			requestLogger = requestLogger.child({
 				user: authResult?.identityId,

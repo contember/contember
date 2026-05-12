@@ -67,6 +67,7 @@ export class PasswordlessMutationResolver
 			mfaOtp: args.mfaOtp ?? undefined,
 			validationType: args.validationType,
 			expiration: args.expiration ?? undefined,
+			requestInfo: context.httpInfo,
 		})
 		await context.logAuthAction({
 			type: 'passwordless_login',

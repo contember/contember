@@ -238,6 +238,7 @@ CREATE UNIQUE INDEX "mail_template_identifier" ON "mail_template" USING "btree" 
 CREATE UNIQUE INDEX "mail_template_identifier_global" ON "mail_template" USING "btree" ("mail_type", "variant") WHERE ("project_id" IS NULL);
 CREATE INDEX "mail_template_project_index" ON "mail_template" USING "btree" ("project_id");
 CREATE INDEX "person_auth_log_person_input_identifier_created_at_idx" ON "person_auth_log" USING "btree" ("person_input_identifier", "created_at" DESC);
+CREATE INDEX "person_auth_log_target_person_id_created_at_idx" ON "person_auth_log" USING "btree" ("target_person_id", "created_at" DESC);
 CREATE INDEX "person_identity_id" ON "person" USING "btree" ("identity_id");
 CREATE UNIQUE INDEX "person_identity_provider_identifier" ON "person_identity_provider" USING "btree" ("identity_provider_id", "external_identifier");
 CREATE INDEX "person_identity_provider_person_id" ON "person_identity_provider" USING "btree" ("person_id");

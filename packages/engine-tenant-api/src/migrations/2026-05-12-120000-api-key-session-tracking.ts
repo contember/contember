@@ -13,6 +13,9 @@ ALTER TYPE "auth_log_type" ADD VALUE 'forced_sign_out';
 
 ALTER TABLE "person_auth_log"
 	ADD COLUMN "target_person_id" UUID REFERENCES "person"("id") ON DELETE SET NULL;
+
+CREATE INDEX "person_auth_log_target_person_id_created_at_idx"
+	ON "person_auth_log" ("target_person_id", "created_at" DESC);
 `
 
 export default async function(builder: MigrationBuilder) {

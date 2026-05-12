@@ -17,7 +17,9 @@ CREATE TYPE "auth_log_type" AS ENUM (
     'passwordless_login_init',
     'passwordless_login_exchange',
     'passwordless_login',
-    'person_disable'
+    'person_disable',
+    'session_revoked_by_user',
+    'forced_sign_out'
 );
 CREATE TYPE "config_policy" AS ENUM (
     'always',
@@ -66,7 +68,12 @@ CREATE TABLE "api_key" (
     "expires_at" timestamp with time zone,
     "created_at" timestamp with time zone NOT NULL,
     "expiration" integer,
-    "disabled_at" timestamp with time zone
+    "disabled_at" timestamp with time zone,
+    "last_ip" "inet",
+    "last_user_agent" "text",
+    "last_used_at" timestamp with time zone,
+    "created_ip" "inet",
+    "created_user_agent" "text"
 );
 CREATE TABLE "config" (
     "id" "config_singleton" DEFAULT 'singleton'::"config_singleton" NOT NULL,
@@ -141,7 +148,8 @@ CREATE TABLE "person_auth_log" (
     "ip_address" "inet",
     "user_agent" "text",
     "identity_provider_id" "uuid",
-    "metadata" "jsonb"
+    "metadata" "jsonb",
+    "target_person_id" "uuid"
 );
 CREATE TABLE "person_identity_provider" (
     "id" "uuid" NOT NULL,
@@ -257,6 +265,8 @@ ALTER TABLE ONLY "person_auth_log"
     ADD CONSTRAINT "person_auth_log_person_id_fkey" FOREIGN KEY ("person_id") REFERENCES "person"("id") ON DELETE SET NULL;
 ALTER TABLE ONLY "person_auth_log"
     ADD CONSTRAINT "person_auth_log_person_token_id_fkey" FOREIGN KEY ("person_token_id") REFERENCES "person_token"("id") ON DELETE SET NULL;
+ALTER TABLE ONLY "person_auth_log"
+    ADD CONSTRAINT "person_auth_log_target_person_id_fkey" FOREIGN KEY ("target_person_id") REFERENCES "person"("id") ON DELETE SET NULL;
 ALTER TABLE ONLY "person"
     ADD CONSTRAINT "person_identity_id_fkey" FOREIGN KEY ("identity_id") REFERENCES "identity"("id");
 ALTER TABLE ONLY "person_identity_provider"

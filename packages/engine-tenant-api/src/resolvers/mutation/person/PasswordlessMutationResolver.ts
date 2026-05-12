@@ -68,6 +68,7 @@ export class PasswordlessMutationResolver
 			validationType: args.validationType,
 			expiration: args.expiration ?? undefined,
 			requestInfo: context.httpInfo,
+			trustForwardedInfo: args.options?.trustForwardedClientInfo === true && context.trustForwardedInfo,
 		})
 		await context.logAuthAction({
 			type: 'passwordless_login',

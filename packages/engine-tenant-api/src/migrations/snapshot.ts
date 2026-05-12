@@ -73,7 +73,8 @@ CREATE TABLE "api_key" (
     "last_user_agent" "text",
     "last_used_at" timestamp with time zone,
     "created_ip" "inet",
-    "created_user_agent" "text"
+    "created_user_agent" "text",
+    "trust_forwarded_info" boolean DEFAULT false NOT NULL
 );
 CREATE TABLE "config" (
     "id" "config_singleton" DEFAULT 'singleton'::"config_singleton" NOT NULL,

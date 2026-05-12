@@ -344,6 +344,10 @@ export type CreateApiKeyError = {
 	readonly membershipValidation?: Maybe<ReadonlyArray<MembershipValidationError>>
 }
 
+export type CreateApiKeyOptions = {
+	readonly trustForwardedClientInfo?: InputMaybe<Scalars['Boolean']['input']>
+}
+
 export type CreateApiKeyErrorCode =
 	| 'INVALID_MEMBERSHIP'
 	| 'PROJECT_NOT_FOUND'
@@ -887,12 +891,14 @@ export type MutationConfirmOtpArgs = {
 export type MutationCreateApiKeyArgs = {
 	description: Scalars['String']['input']
 	memberships: ReadonlyArray<MembershipInput>
+	options?: InputMaybe<CreateApiKeyOptions>
 	projectSlug: Scalars['String']['input']
 	tokenHash?: InputMaybe<Scalars['String']['input']>
 }
 
 export type MutationCreateGlobalApiKeyArgs = {
 	description: Scalars['String']['input']
+	options?: InputMaybe<CreateApiKeyOptions>
 	roles?: InputMaybe<ReadonlyArray<Scalars['String']['input']>>
 	tokenHash?: InputMaybe<Scalars['String']['input']>
 }
@@ -914,6 +920,7 @@ export type MutationCreateResetPasswordRequestArgs = {
 export type MutationCreateSessionTokenArgs = {
 	email?: InputMaybe<Scalars['String']['input']>
 	expiration?: InputMaybe<Scalars['Int']['input']>
+	options?: InputMaybe<SignInOptions>
 	personId?: InputMaybe<Scalars['String']['input']>
 }
 
@@ -997,6 +1004,7 @@ export type MutationSetProjectSecretArgs = {
 export type MutationSignInArgs = {
 	email: Scalars['String']['input']
 	expiration?: InputMaybe<Scalars['Int']['input']>
+	options?: InputMaybe<SignInOptions>
 	otpToken?: InputMaybe<Scalars['String']['input']>
 	password: Scalars['String']['input']
 }
@@ -1006,6 +1014,7 @@ export type MutationSignInIdpArgs = {
 	expiration?: InputMaybe<Scalars['Int']['input']>
 	identityProvider: Scalars['String']['input']
 	idpResponse?: InputMaybe<IdpResponseInput>
+	options?: InputMaybe<SignInOptions>
 	redirectUrl?: InputMaybe<Scalars['String']['input']>
 	sessionData?: InputMaybe<Scalars['Json']['input']>
 }
@@ -1013,6 +1022,7 @@ export type MutationSignInIdpArgs = {
 export type MutationSignInPasswordlessArgs = {
 	expiration?: InputMaybe<Scalars['Int']['input']>
 	mfaOtp?: InputMaybe<Scalars['String']['input']>
+	options?: InputMaybe<SignInOptions>
 	requestId: Scalars['String']['input']
 	token: Scalars['String']['input']
 	validationType: PasswordlessValidationType
@@ -1360,6 +1370,10 @@ export type SignInPasswordlessResult = CommonSignInResult & {
 	readonly token: Scalars['String']['output']
 }
 
+export type SignInOptions = {
+	readonly trustForwardedClientInfo?: InputMaybe<Scalars['Boolean']['input']>
+}
+
 export type SignInResponse = {
 	readonly __typename?: 'SignInResponse'
 	readonly error?: Maybe<SignInError>
@@ -1646,6 +1660,7 @@ export type ResolversTypes = {
 	ConfirmOtpResponse: ResolverTypeWrapper<ConfirmOtpResponse>
 	CreateApiKeyError: ResolverTypeWrapper<CreateApiKeyError>
 	CreateApiKeyErrorCode: CreateApiKeyErrorCode
+	CreateApiKeyOptions: CreateApiKeyOptions
 	CreateApiKeyResponse: ResolverTypeWrapper<Omit<CreateApiKeyResponse, 'result'> & { result?: Maybe<ResolversTypes['CreateApiKeyResult']> }>
 	CreateApiKeyResult: ResolverTypeWrapper<Omit<CreateApiKeyResult, 'apiKey'> & { apiKey: ResolversTypes['ApiKeyWithToken'] }>
 	CreatePasswordResetRequestError: ResolverTypeWrapper<CreatePasswordResetRequestError>
@@ -1768,6 +1783,7 @@ export type ResolversTypes = {
 	SignInIDPErrorCode: SignInIdpErrorCode
 	SignInIDPResponse: ResolverTypeWrapper<SignInIdpResponse>
 	SignInIDPResult: ResolverTypeWrapper<SignInIdpResult>
+	SignInOptions: SignInOptions
 	SignInPasswordlessError: ResolverTypeWrapper<SignInPasswordlessError>
 	SignInPasswordlessErrorCode: SignInPasswordlessErrorCode
 	SignInPasswordlessResponse: ResolverTypeWrapper<SignInPasswordlessResponse>
@@ -1841,6 +1857,7 @@ export type ResolversParentTypes = {
 	ConfirmOtpError: ConfirmOtpError
 	ConfirmOtpResponse: ConfirmOtpResponse
 	CreateApiKeyError: CreateApiKeyError
+	CreateApiKeyOptions: CreateApiKeyOptions
 	CreateApiKeyResponse: Omit<CreateApiKeyResponse, 'result'> & { result?: Maybe<ResolversParentTypes['CreateApiKeyResult']> }
 	CreateApiKeyResult: Omit<CreateApiKeyResult, 'apiKey'> & { apiKey: ResolversParentTypes['ApiKeyWithToken'] }
 	CreatePasswordResetRequestError: CreatePasswordResetRequestError
@@ -1934,6 +1951,7 @@ export type ResolversParentTypes = {
 	SignInIDPError: SignInIdpError
 	SignInIDPResponse: SignInIdpResponse
 	SignInIDPResult: SignInIdpResult
+	SignInOptions: SignInOptions
 	SignInPasswordlessError: SignInPasswordlessError
 	SignInPasswordlessResponse: SignInPasswordlessResponse
 	SignInPasswordlessResult: SignInPasswordlessResult

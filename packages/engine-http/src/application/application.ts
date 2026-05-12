@@ -139,6 +139,8 @@ export class Application {
 				user: authResult?.identityId,
 			})
 
+			const effectiveClientIp = authResult?.clientIp ?? clientIp
+
 			const ws = await new Promise<WebSocket>(resolve =>
 				wss.handleUpgrade(req, socket, head, (ws, request) => {
 					resolve(ws)
@@ -152,7 +154,7 @@ export class Application {
 				timer,
 				url,
 				request: req,
-				clientIp,
+				clientIp: effectiveClientIp,
 				authResult,
 				params: matchedRequest.params,
 				projectGroup: groupContainer,
@@ -228,12 +230,14 @@ export class Application {
 				user: authResult?.identityId,
 			})
 
+			const effectiveClientIp = authResult?.clientIp ?? clientIp
+
 			const response = await requestLogger.scope(async logger => {
 				httpContext = {
 					koa: ctx,
 					body: ctx.request.body,
 					url: ctx.request.URL,
-					clientIp,
+					clientIp: effectiveClientIp,
 					logger,
 					timer,
 					request: ctx.req,

@@ -22,6 +22,7 @@ class SignInManager {
 		expiration?: number,
 		otpCode?: string,
 		requestInfo?: ApiKeyRequestInfo,
+		trustForwardedInfo?: boolean,
 	): Promise<SignInResponse> {
 		const person = await dbContext.queryHandler.fetch(PersonQuery.byEmail(email))
 
@@ -63,7 +64,7 @@ class SignInManager {
 			}
 		}
 
-		const sessionToken = await this.apiKeyManager.createSessionApiKey(dbContext, person.identity_id, expiration, requestInfo)
+		const sessionToken = await this.apiKeyManager.createSessionApiKey(dbContext, person.identity_id, expiration, requestInfo, trustForwardedInfo)
 
 		return new ResponseOk({ person, token: sessionToken, ...authLogData })
 	}
@@ -74,6 +75,7 @@ class SignInManager {
 		expiration?: number,
 		verifier?: (person: PersonRow) => Promise<void>,
 		requestInfo?: ApiKeyRequestInfo,
+		trustForwardedInfo?: boolean,
 	): Promise<CreateSessionTokenResponse> {
 		const person = await dbContext.queryHandler.fetch(PersonQuery.byUniqueIdentifier(personIdentifier))
 
@@ -107,7 +109,7 @@ class SignInManager {
 
 		await verifier?.(person)
 
-		const sessionToken = await this.apiKeyManager.createSessionApiKey(dbContext, person.identity_id, expiration, requestInfo)
+		const sessionToken = await this.apiKeyManager.createSessionApiKey(dbContext, person.identity_id, expiration, requestInfo, trustForwardedInfo)
 		return new ResponseOk({
 			person,
 			token: sessionToken,

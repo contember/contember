@@ -9,6 +9,7 @@ export interface TenantResolverHttpInfo {
 
 export interface TenantResolverContext {
 	readonly apiKeyId: string
+	readonly trustForwardedInfo: boolean
 	readonly permissionContext: PermissionContext
 	readonly identity: Identity
 	readonly isAllowed: PermissionContext['isAllowed']

@@ -47,6 +47,7 @@ export class IDPMutationResolver implements MutationResolvers {
 			},
 			args.expiration ?? undefined,
 			context.httpInfo,
+			args.options?.trustForwardedClientInfo === true && context.trustForwardedInfo,
 		)
 		await context.logAuthAction({
 			type: 'idp_login',

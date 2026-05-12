@@ -35,6 +35,7 @@ export class SignInMutationResolver implements MutationResolvers {
 			args.expiration || undefined,
 			args.otpToken || undefined,
 			context.httpInfo,
+			args.options?.trustForwardedClientInfo === true && context.trustForwardedInfo,
 		)
 		await context.logAuthAction({
 			type: 'login',
@@ -84,6 +85,7 @@ export class SignInMutationResolver implements MutationResolvers {
 					message: 'You are not allowed to create a session key for this person.',
 				}),
 			context.httpInfo,
+			args.options?.trustForwardedClientInfo === true && context.trustForwardedInfo,
 		)
 		await context.logAuthAction({
 			type: 'create_session_token',

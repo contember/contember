@@ -108,7 +108,7 @@ class PasswordlessSignInManager {
 		return urlObj.toString()
 	}
 
-	async signInPasswordless({ db, expiration, token, requestId, mfaOtp, validationType, requestInfo }: {
+	async signInPasswordless({ db, expiration, token, requestId, mfaOtp, validationType, requestInfo, trustForwardedInfo }: {
 		db: DatabaseContext
 		validationType: PersonToken.ValidationType
 		requestId: string
@@ -116,6 +116,7 @@ class PasswordlessSignInManager {
 		mfaOtp?: string
 		expiration?: number
 		requestInfo?: ApiKeyRequestInfo
+		trustForwardedInfo?: boolean
 	}): Promise<PasswordlessSignInManager.SignInPasswordlessResponse> {
 		return db.transaction(async (db): Promise<PasswordlessSignInManager.SignInPasswordlessResponse> => {
 			const tokenResult = await db.queryHandler.fetch(PersonTokenQuery.byId(requestId, 'passwordless'))
@@ -174,7 +175,7 @@ class PasswordlessSignInManager {
 			}
 
 			await db.commandBus.execute(new InvalidateTokenCommand(tokenValidationResult.result.id))
-			const sessionToken = await this.apiKeyManager.createSessionApiKey(db, personRow.identity_id, expiration, requestInfo)
+			const sessionToken = await this.apiKeyManager.createSessionApiKey(db, personRow.identity_id, expiration, requestInfo, trustForwardedInfo)
 
 			return new ResponseOk({
 				person: personRow,

@@ -13,9 +13,17 @@ export class ApiKeyService {
 		description: string,
 		roles: readonly string[] = [],
 		tokenHash?: TokenHash,
+		trustForwardedInfo?: boolean,
 	) {
 		const identityId = await db.commandBus.execute(new CreateIdentityCommand(roles, description))
-		const apiKeyResult = await db.commandBus.execute(new CreateApiKeyCommand({ type: ApiKey.Type.PERMANENT, identityId, tokenHash }))
+		const apiKeyResult = await db.commandBus.execute(
+			new CreateApiKeyCommand({
+				type: ApiKey.Type.PERMANENT,
+				identityId,
+				tokenHash,
+				trustForwardedInfo,
+			}),
+		)
 
 		return new ResponseOk(new CreateApiKeyResult({ id: identityId, description }, apiKeyResult))
 	}
@@ -26,8 +34,9 @@ export class ApiKeyService {
 		memberships: readonly Acl.Membership[],
 		description: string,
 		tokenHash?: TokenHash,
+		trustForwardedInfo?: boolean,
 	) {
-		const response = await this.createPermanentApiKey(db, description, [], tokenHash)
+		const response = await this.createPermanentApiKey(db, description, [], tokenHash, trustForwardedInfo)
 
 		const addMemberResult = await db.commandBus.execute(
 			new AddProjectMemberCommand(projectId, response.result.identity.id, createSetMembershipVariables(memberships)),

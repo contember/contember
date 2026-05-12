@@ -31,6 +31,8 @@ export interface Test {
 	return: object
 	sentMails?: ExpectedMessage[]
 	expectedAuthLog?: AuthLogService.LogArgs
+	callerTrustForwardedInfo?: boolean
+	httpInfo?: { ip?: string; userAgent?: string }
 }
 
 export const createUuidGenerator = () => {
@@ -115,6 +117,7 @@ export const executeTenantTest = async (test: Test) => {
 				projectSchemaResolver,
 			),
 			authenticatedApiKeyId,
+			test.callerTrustForwardedInfo ?? false,
 		),
 		logger: createLogger(new JsonStreamLoggerHandler(process.stderr)),
 		logAuthAction: async args => {
@@ -126,7 +129,7 @@ export const executeTenantTest = async (test: Test) => {
 			test.expectedAuthLog = undefined
 		},
 		db: databaseContext,
-		httpInfo: {},
+		httpInfo: test.httpInfo ?? {},
 	}
 
 	const schema = makeExecutableSchema({

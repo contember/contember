@@ -35,9 +35,10 @@ export class ApiKeySessionsByIdentityQuery extends DatabaseQuery<readonly ApiKey
 			.where(it => it.compare(['api_key', 'type'], Operator.eq, ApiKey.Type.SESSION))
 			.where(it => it.isNull(['api_key', 'disabled_at']))
 			.where(it =>
-				it.isNull(['api_key', 'expires_at']).or(
-					or => or.compare(['api_key', 'expires_at'], Operator.gt, this.options.now),
-				),
+				it.or(or =>
+					or.isNull(['api_key', 'expires_at'])
+						.compare(['api_key', 'expires_at'], Operator.gt, this.options.now)
+				)
 			)
 			.orderBy(['api_key', 'created_at'], 'desc')
 			.getResult(db)

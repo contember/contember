@@ -17,8 +17,7 @@ export const listSessionsSql = (args: {
 	now: Date
 	rows: SessionRow[]
 }): ExpectedQuery => ({
-	sql:
-		SQL`select "api_key"."id",
+	sql: SQL`select "api_key"."id",
 			       "api_key"."created_at",
 			       "api_key"."expires_at",
 			       "api_key"."last_used_at",

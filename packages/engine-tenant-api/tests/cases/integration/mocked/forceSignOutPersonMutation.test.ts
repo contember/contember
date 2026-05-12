@@ -70,7 +70,8 @@ test('force sign-out – PERSON_NOT_FOUND', async () => {
 		},
 		executes: [
 			{
-				sql: SQL`SELECT "person"."id", "person"."password_hash", "person"."otp_uri", "person"."otp_activated_at", "person"."identity_id", "person"."email", "person"."name", "person"."disabled_at", "person"."passwordless_enabled", "identity"."roles"
+				sql:
+					SQL`SELECT "person"."id", "person"."password_hash", "person"."otp_uri", "person"."otp_activated_at", "person"."identity_id", "person"."email", "person"."name", "person"."disabled_at", "person"."passwordless_enabled", "identity"."roles"
 					FROM "tenant"."person"
 						INNER JOIN "tenant"."identity" AS "identity" ON "identity"."id" = "person"."identity_id"
 					WHERE "person"."id" = ?`,

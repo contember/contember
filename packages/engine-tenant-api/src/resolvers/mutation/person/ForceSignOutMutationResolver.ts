@@ -21,6 +21,11 @@ export class ForceSignOutMutationResolver implements Pick<MutationResolvers, 'fo
 		const targetPerson = await this.personManager.findPersonById(context.db, args.personId)
 		const reason = args.reason ?? null
 
+		await context.requireAccess({
+			action: PermissionActions.PERSON_FORCE_SIGN_OUT(targetPerson?.roles ?? []),
+			message: 'You are not allowed to force sign out this person',
+		})
+
 		if (targetPerson === null) {
 			const response = new ResponseError('PERSON_NOT_FOUND', `Person <${args.personId}> was not found`)
 			await context.logAuthAction({
@@ -32,18 +37,12 @@ export class ForceSignOutMutationResolver implements Pick<MutationResolvers, 'fo
 			return createErrorResponse(response.error, response.errorMessage)
 		}
 
-		await context.requireAccess({
-			action: PermissionActions.PERSON_FORCE_SIGN_OUT(targetPerson.roles),
-			message: 'You are not allowed to force sign out this person',
-		})
-
 		await this.apiKeyManager.disableIdentityApiKeys(context.db, targetPerson.identity_id)
 
 		const response = new ResponseOk(null)
 		await context.logAuthAction({
 			type: 'forced_sign_out',
 			response,
-			personId: targetPerson.id,
 			targetPersonId: targetPerson.id,
 			metadata: reason !== null ? { reason } : undefined,
 		})

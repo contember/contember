@@ -5,6 +5,7 @@ export enum MailType {
 	newUserInvited = 'newUserInvited',
 	passwordReset = 'passwordReset',
 	passwordlessSignIn = 'passwordlessSignIn',
+	forcedSignOut = 'forcedSignOut',
 }
 
 export const mailTypeFromSchemaToDb = (type: SchemaMailType): MailType => {
@@ -13,6 +14,7 @@ export const mailTypeFromSchemaToDb = (type: SchemaMailType): MailType => {
 		NEW_USER_INVITED: MailType.newUserInvited,
 		RESET_PASSWORD_REQUEST: MailType.passwordReset,
 		PASSWORDLESS_SIGN_IN: MailType.passwordlessSignIn,
+		FORCED_SIGN_OUT: MailType.forcedSignOut,
 	}[type]
 }
 
@@ -22,6 +24,7 @@ export const mailTypeFromDbToSchema = (type: MailType): SchemaMailType => {
 		[MailType.newUserInvited]: 'NEW_USER_INVITED' as const,
 		[MailType.passwordReset]: 'RESET_PASSWORD_REQUEST' as const,
 		[MailType.passwordlessSignIn]: 'PASSWORDLESS_SIGN_IN' as const,
+		[MailType.forcedSignOut]: 'FORCED_SIGN_OUT' as const,
 	}[type]
 }
 

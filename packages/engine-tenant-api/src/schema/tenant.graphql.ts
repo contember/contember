@@ -23,8 +23,10 @@ const schema: DocumentNode = gql`
 
 		identityProviders: [IdentityProvider!]!
 		mailTemplates: [MailTemplateData!]!
-		
+
 		configuration: Config!
+
+		mySessions: [SessionInfo!]!
 	}
 
 	type Mutation {
@@ -70,6 +72,8 @@ const schema: DocumentNode = gql`
 		disableOtp: DisableOtpResponse
 
 		disablePerson(personId: String!): DisablePersonResponse
+		forceSignOutPerson(personId: String!, reason: String): ForceSignOutPersonResponse
+		revokeSession(sessionId: String!): RevokeSessionResponse
 
 		createResetPasswordRequest(email: String!, options: CreateResetPasswordRequestOptions): CreatePasswordResetRequestResponse
 		resetPassword(token: String!, password: String!): ResetPasswordResponse
@@ -1039,6 +1043,51 @@ const schema: DocumentNode = gql`
 		PERSON_NOT_FOUND
 	}
 
+	# === forceSignOutPerson ===
+
+	type ForceSignOutPersonResponse {
+		ok: Boolean!
+		error: ForceSignOutPersonError
+	}
+
+	type ForceSignOutPersonError {
+		code: ForceSignOutPersonErrorCode!
+		developerMessage: String!
+	}
+
+	enum ForceSignOutPersonErrorCode {
+		PERSON_NOT_FOUND
+	}
+
+	# === sessions ===
+
+	type SessionInfo {
+		id: String!
+		createdAt: DateTime!
+		expiresAt: DateTime
+		lastUsedAt: DateTime
+		lastIp: String
+		lastUserAgent: String
+		createdIp: String
+		createdUserAgent: String
+		isCurrent: Boolean!
+	}
+
+	type RevokeSessionResponse {
+		ok: Boolean!
+		error: RevokeSessionError
+	}
+
+	type RevokeSessionError {
+		code: RevokeSessionErrorCode!
+		developerMessage: String!
+	}
+
+	enum RevokeSessionErrorCode {
+		SESSION_NOT_FOUND
+		NOT_A_PERSON
+	}
+
 	# === mails ===
 	
 	type MailTemplateData {
@@ -1067,6 +1116,7 @@ const schema: DocumentNode = gql`
 		NEW_USER_INVITED
 		RESET_PASSWORD_REQUEST
 		PASSWORDLESS_SIGN_IN
+		FORCED_SIGN_OUT
 	}
 
 	input MailTemplateIdentifier {

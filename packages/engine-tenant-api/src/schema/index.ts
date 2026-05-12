@@ -505,6 +505,49 @@ export type DisablePersonResponse = {
 	readonly ok: Scalars['Boolean']['output']
 }
 
+export type ForceSignOutPersonError = {
+	readonly __typename?: 'ForceSignOutPersonError'
+	readonly code: ForceSignOutPersonErrorCode
+	readonly developerMessage: Scalars['String']['output']
+}
+
+export type ForceSignOutPersonErrorCode = 'PERSON_NOT_FOUND'
+
+export type ForceSignOutPersonResponse = {
+	readonly __typename?: 'ForceSignOutPersonResponse'
+	readonly error?: Maybe<ForceSignOutPersonError>
+	readonly ok: Scalars['Boolean']['output']
+}
+
+export type SessionInfo = {
+	readonly __typename?: 'SessionInfo'
+	readonly createdAt: Scalars['DateTime']['output']
+	readonly createdIp?: Maybe<Scalars['String']['output']>
+	readonly createdUserAgent?: Maybe<Scalars['String']['output']>
+	readonly expiresAt?: Maybe<Scalars['DateTime']['output']>
+	readonly id: Scalars['String']['output']
+	readonly isCurrent: Scalars['Boolean']['output']
+	readonly lastIp?: Maybe<Scalars['String']['output']>
+	readonly lastUsedAt?: Maybe<Scalars['DateTime']['output']>
+	readonly lastUserAgent?: Maybe<Scalars['String']['output']>
+}
+
+export type RevokeSessionError = {
+	readonly __typename?: 'RevokeSessionError'
+	readonly code: RevokeSessionErrorCode
+	readonly developerMessage: Scalars['String']['output']
+}
+
+export type RevokeSessionErrorCode =
+	| 'NOT_A_PERSON'
+	| 'SESSION_NOT_FOUND'
+
+export type RevokeSessionResponse = {
+	readonly __typename?: 'RevokeSessionResponse'
+	readonly error?: Maybe<RevokeSessionError>
+	readonly ok: Scalars['Boolean']['output']
+}
+
 export type EnableIdpError = {
 	readonly __typename?: 'EnableIDPError'
 	readonly code: EnableIdpErrorCode
@@ -696,6 +739,7 @@ export type MailTemplateIdentifier = {
 
 export type MailType =
 	| 'EXISTING_USER_INVITED'
+	| 'FORCED_SIGN_OUT'
 	| 'NEW_USER_INVITED'
 	| 'PASSWORDLESS_SIGN_IN'
 	| 'RESET_PASSWORD_REQUEST'
@@ -755,6 +799,7 @@ export type Mutation = {
 	readonly disablePerson?: Maybe<DisablePersonResponse>
 	readonly enableIDP?: Maybe<EnableIdpResponse>
 	readonly enableMyPasswordless?: Maybe<ToggleMyPasswordlessResponse>
+	readonly forceSignOutPerson?: Maybe<ForceSignOutPersonResponse>
 	readonly initSignInIDP?: Maybe<InitSignInIdpResponse>
 	readonly initSignInPasswordless?: Maybe<InitSignInPasswordlessResponse>
 	readonly invite?: Maybe<InviteResponse>
@@ -765,6 +810,7 @@ export type Mutation = {
 	readonly removeProjectMailTemplate?: Maybe<RemoveMailTemplateResponse>
 	readonly removeProjectMember?: Maybe<RemoveProjectMemberResponse>
 	readonly resetPassword?: Maybe<ResetPasswordResponse>
+	readonly revokeSession?: Maybe<RevokeSessionResponse>
 	readonly setProjectSecret?: Maybe<SetProjectSecretResponse>
 	readonly signIn?: Maybe<SignInResponse>
 	readonly signInIDP?: Maybe<SignInIdpResponse>
@@ -933,6 +979,15 @@ export type MutationResetPasswordArgs = {
 	token: Scalars['String']['input']
 }
 
+export type MutationRevokeSessionArgs = {
+	sessionId: Scalars['String']['input']
+}
+
+export type MutationForceSignOutPersonArgs = {
+	personId: Scalars['String']['input']
+	reason?: InputMaybe<Scalars['String']['input']>
+}
+
 export type MutationSetProjectSecretArgs = {
 	key: Scalars['String']['input']
 	projectSlug: Scalars['String']['input']
@@ -1077,6 +1132,7 @@ export type Query = {
 	readonly identityProviders: ReadonlyArray<IdentityProvider>
 	readonly mailTemplates: ReadonlyArray<MailTemplateData>
 	readonly me: Identity
+	readonly mySessions: ReadonlyArray<SessionInfo>
 	readonly personById?: Maybe<Person>
 	readonly projectBySlug?: Maybe<Project>
 	readonly projectMemberships: ReadonlyArray<Membership>
@@ -1618,6 +1674,13 @@ export type ResolversTypes = {
 	DisablePersonError: ResolverTypeWrapper<DisablePersonError>
 	DisablePersonErrorCode: DisablePersonErrorCode
 	DisablePersonResponse: ResolverTypeWrapper<DisablePersonResponse>
+	ForceSignOutPersonError: ResolverTypeWrapper<ForceSignOutPersonError>
+	ForceSignOutPersonErrorCode: ForceSignOutPersonErrorCode
+	ForceSignOutPersonResponse: ResolverTypeWrapper<ForceSignOutPersonResponse>
+	RevokeSessionError: ResolverTypeWrapper<RevokeSessionError>
+	RevokeSessionErrorCode: RevokeSessionErrorCode
+	RevokeSessionResponse: ResolverTypeWrapper<RevokeSessionResponse>
+	SessionInfo: ResolverTypeWrapper<SessionInfo>
 	EnableIDPError: ResolverTypeWrapper<EnableIdpError>
 	EnableIDPErrorCode: EnableIdpErrorCode
 	EnableIDPResponse: ResolverTypeWrapper<EnableIdpResponse>
@@ -1799,6 +1862,11 @@ export type ResolversParentTypes = {
 	DisableOtpResponse: DisableOtpResponse
 	DisablePersonError: DisablePersonError
 	DisablePersonResponse: DisablePersonResponse
+	ForceSignOutPersonError: ForceSignOutPersonError
+	ForceSignOutPersonResponse: ForceSignOutPersonResponse
+	RevokeSessionError: RevokeSessionError
+	RevokeSessionResponse: RevokeSessionResponse
+	SessionInfo: SessionInfo
 	EnableIDPError: EnableIdpError
 	EnableIDPResponse: EnableIdpResponse
 	IDPOptions: IdpOptions
@@ -2364,6 +2432,58 @@ export type DisablePersonResponseResolvers<
 	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
 }
 
+export type ForceSignOutPersonErrorResolvers<
+	ContextType = any,
+	ParentType extends ResolversParentTypes['ForceSignOutPersonError'] = ResolversParentTypes['ForceSignOutPersonError'],
+> = {
+	code?: Resolver<ResolversTypes['ForceSignOutPersonErrorCode'], ParentType, ContextType>
+	developerMessage?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
+}
+
+export type ForceSignOutPersonResponseResolvers<
+	ContextType = any,
+	ParentType extends ResolversParentTypes['ForceSignOutPersonResponse'] = ResolversParentTypes['ForceSignOutPersonResponse'],
+> = {
+	error?: Resolver<Maybe<ResolversTypes['ForceSignOutPersonError']>, ParentType, ContextType>
+	ok?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
+	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
+}
+
+export type RevokeSessionErrorResolvers<
+	ContextType = any,
+	ParentType extends ResolversParentTypes['RevokeSessionError'] = ResolversParentTypes['RevokeSessionError'],
+> = {
+	code?: Resolver<ResolversTypes['RevokeSessionErrorCode'], ParentType, ContextType>
+	developerMessage?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
+}
+
+export type RevokeSessionResponseResolvers<
+	ContextType = any,
+	ParentType extends ResolversParentTypes['RevokeSessionResponse'] = ResolversParentTypes['RevokeSessionResponse'],
+> = {
+	error?: Resolver<Maybe<ResolversTypes['RevokeSessionError']>, ParentType, ContextType>
+	ok?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
+	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
+}
+
+export type SessionInfoResolvers<
+	ContextType = any,
+	ParentType extends ResolversParentTypes['SessionInfo'] = ResolversParentTypes['SessionInfo'],
+> = {
+	createdAt?: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>
+	createdIp?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>
+	createdUserAgent?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>
+	expiresAt?: Resolver<Maybe<ResolversTypes['DateTime']>, ParentType, ContextType>
+	id?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+	isCurrent?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
+	lastIp?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>
+	lastUsedAt?: Resolver<Maybe<ResolversTypes['DateTime']>, ParentType, ContextType>
+	lastUserAgent?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>
+	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
+}
+
 export type EnableIdpErrorResolvers<
 	ContextType = any,
 	ParentType extends ResolversParentTypes['EnableIDPError'] = ResolversParentTypes['EnableIDPError'],
@@ -2656,6 +2776,12 @@ export type MutationResolvers<ContextType = any, ParentType extends ResolversPar
 	>
 	enableIDP?: Resolver<Maybe<ResolversTypes['EnableIDPResponse']>, ParentType, ContextType, RequireFields<MutationEnableIdpArgs, 'identityProvider'>>
 	enableMyPasswordless?: Resolver<Maybe<ResolversTypes['ToggleMyPasswordlessResponse']>, ParentType, ContextType>
+	forceSignOutPerson?: Resolver<
+		Maybe<ResolversTypes['ForceSignOutPersonResponse']>,
+		ParentType,
+		ContextType,
+		RequireFields<MutationForceSignOutPersonArgs, 'personId'>
+	>
 	initSignInIDP?: Resolver<
 		Maybe<ResolversTypes['InitSignInIDPResponse']>,
 		ParentType,
@@ -2704,6 +2830,12 @@ export type MutationResolvers<ContextType = any, ParentType extends ResolversPar
 		ParentType,
 		ContextType,
 		RequireFields<MutationResetPasswordArgs, 'password' | 'token'>
+	>
+	revokeSession?: Resolver<
+		Maybe<ResolversTypes['RevokeSessionResponse']>,
+		ParentType,
+		ContextType,
+		RequireFields<MutationRevokeSessionArgs, 'sessionId'>
 	>
 	setProjectSecret?: Resolver<
 		Maybe<ResolversTypes['SetProjectSecretResponse']>,
@@ -2800,6 +2932,7 @@ export type QueryResolvers<ContextType = any, ParentType extends ResolversParent
 	identityProviders?: Resolver<ReadonlyArray<ResolversTypes['IdentityProvider']>, ParentType, ContextType>
 	mailTemplates?: Resolver<ReadonlyArray<ResolversTypes['MailTemplateData']>, ParentType, ContextType>
 	me?: Resolver<ResolversTypes['Identity'], ParentType, ContextType>
+	mySessions?: Resolver<ReadonlyArray<ResolversTypes['SessionInfo']>, ParentType, ContextType>
 	personById?: Resolver<Maybe<ResolversTypes['Person']>, ParentType, ContextType, RequireFields<QueryPersonByIdArgs, 'id'>>
 	projectBySlug?: Resolver<Maybe<ResolversTypes['Project']>, ParentType, ContextType, RequireFields<QueryProjectBySlugArgs, 'slug'>>
 	projectMemberships?: Resolver<
@@ -3228,6 +3361,11 @@ export type Resolvers<ContextType = any> = {
 	DisableOtpResponse?: DisableOtpResponseResolvers<ContextType>
 	DisablePersonError?: DisablePersonErrorResolvers<ContextType>
 	DisablePersonResponse?: DisablePersonResponseResolvers<ContextType>
+	ForceSignOutPersonError?: ForceSignOutPersonErrorResolvers<ContextType>
+	ForceSignOutPersonResponse?: ForceSignOutPersonResponseResolvers<ContextType>
+	RevokeSessionError?: RevokeSessionErrorResolvers<ContextType>
+	RevokeSessionResponse?: RevokeSessionResponseResolvers<ContextType>
+	SessionInfo?: SessionInfoResolvers<ContextType>
 	EnableIDPError?: EnableIdpErrorResolvers<ContextType>
 	EnableIDPResponse?: EnableIdpResponseResolvers<ContextType>
 	IDPOptionsOutput?: IdpOptionsOutputResolvers<ContextType>

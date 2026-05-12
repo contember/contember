@@ -4,10 +4,10 @@ import { ApiKey } from '../../../../../src'
 
 export const getApiKeySql = (args: {
 	apiKeyId: string
-	response: { identityId: string; personId: string; apiKeyType: ApiKey.Type }
+	response: { identityId: string; personId: string; apiKeyType: ApiKey.Type; trustForwardedInfo?: boolean }
 }): ExpectedQuery => ({
 	sql:
-		SQL`select "api_key"."id", "api_key"."type", "api_key"."identity_id", "api_key"."disabled_at", "api_key"."expires_at", "identity"."roles", "api_key"."expiration", "person"."id" as "person_id", "api_key"."last_ip", "api_key"."last_user_agent", "api_key"."last_used_at"
+		SQL`select "api_key"."id", "api_key"."type", "api_key"."identity_id", "api_key"."disabled_at", "api_key"."expires_at", "identity"."roles", "api_key"."expiration", "person"."id" as "person_id", "api_key"."last_ip", "api_key"."last_user_agent", "api_key"."last_used_at", "api_key"."trust_forwarded_info"
 		from "tenant"."api_key"
     	inner join "tenant"."identity" as "identity" on "api_key"."identity_id" = "identity"."id"
     	left join "tenant"."person" as "person" on "person"."identity_id" = "identity"."id"
@@ -29,6 +29,7 @@ export const getApiKeySql = (args: {
 					last_ip: null,
 					last_user_agent: null,
 					last_used_at: null,
+					trust_forwarded_info: args.response.trustForwardedInfo ?? false,
 				},
 			]
 			: [],

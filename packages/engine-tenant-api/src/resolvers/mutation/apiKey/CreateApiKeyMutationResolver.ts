@@ -21,7 +21,7 @@ export class CreateApiKeyMutationResolver implements MutationResolvers {
 
 	async createApiKey(
 		parent: any,
-		{ projectSlug, memberships, description, tokenHash }: MutationCreateApiKeyArgs,
+		{ projectSlug, memberships, description, tokenHash, options }: MutationCreateApiKeyArgs,
 		context: TenantResolverContext,
 		info: GraphQLResolveInfo,
 	): Promise<CreateApiKeyResponse> {
@@ -47,7 +47,14 @@ export class CreateApiKeyMutationResolver implements MutationResolvers {
 			}
 		}
 
-		const result = await this.apiKeyManager.createProjectPermanentApiKey(context.db, project.id, memberships, description, tokenHash ?? undefined)
+		const result = await this.apiKeyManager.createProjectPermanentApiKey(
+			context.db,
+			project.id,
+			memberships,
+			description,
+			tokenHash ?? undefined,
+			options?.trustForwardedClientInfo === true,
+		)
 
 		return {
 			ok: true,
@@ -60,7 +67,7 @@ export class CreateApiKeyMutationResolver implements MutationResolvers {
 
 	async createGlobalApiKey(
 		parent: any,
-		{ roles, description, tokenHash }: MutationCreateGlobalApiKeyArgs,
+		{ roles, description, tokenHash, options }: MutationCreateGlobalApiKeyArgs,
 		context: TenantResolverContext,
 		info: GraphQLResolveInfo,
 	): Promise<CreateApiKeyResponse> {
@@ -72,7 +79,13 @@ export class CreateApiKeyMutationResolver implements MutationResolvers {
 		if (typeof tokenHash === 'string' && !isTokenHash(tokenHash)) {
 			throw new UserInputError('Invalid format of tokenHash. Must be hex-encoded sha256.')
 		}
-		const result = await this.apiKeyManager.createGlobalPermanentApiKey(context.db, description, roles, tokenHash ?? undefined)
+		const result = await this.apiKeyManager.createGlobalPermanentApiKey(
+			context.db,
+			description,
+			roles,
+			tokenHash ?? undefined,
+			options?.trustForwardedClientInfo === true,
+		)
 		return {
 			ok: true,
 			errors: [],

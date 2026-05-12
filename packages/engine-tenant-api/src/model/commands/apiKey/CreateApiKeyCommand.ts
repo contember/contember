@@ -11,6 +11,7 @@ interface CreateSessionApiKeyArgs {
 	expiration?: number
 	tokenHash?: string
 	requestInfo?: ApiKeyRequestInfo
+	trustForwardedInfo?: boolean
 }
 
 interface CreatePermanentApiKeyArgs {
@@ -19,6 +20,7 @@ interface CreatePermanentApiKeyArgs {
 	tokenHash?: TokenHash
 	expiration?: undefined
 	requestInfo?: ApiKeyRequestInfo
+	trustForwardedInfo?: boolean
 }
 
 export type CreateApiKeyArgs =
@@ -50,6 +52,7 @@ export class CreateApiKeyCommand implements Command<CreateApiKeyCommandResult> {
 				created_at: providers.now(),
 				created_ip: this.args.requestInfo?.ip ?? null,
 				created_user_agent: this.args.requestInfo?.userAgent ?? null,
+				trust_forwarded_info: this.args.trustForwardedInfo ?? false,
 			})
 			.execute(db)
 

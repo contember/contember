@@ -22,6 +22,7 @@ class IDPSignInManager {
 		responseData: unknown,
 		expiration?: number,
 		requestInfo?: ApiKeyRequestInfo,
+		trustForwardedInfo?: boolean,
 	): Promise<IDPSignInManager.SignInIDPResponse> {
 		return dbContext.transaction(async (db): Promise<IDPSignInManager.SignInIDPResponse> => {
 			const provider = await db.queryHandler.fetch(new IdentityProviderBySlugQuery(idpSlug))
@@ -77,7 +78,7 @@ class IDPSignInManager {
 				})
 			}
 
-			const sessionToken = await this.apiKeyManager.createSessionApiKey(db, personRow.identity_id, expiration, requestInfo)
+			const sessionToken = await this.apiKeyManager.createSessionApiKey(db, personRow.identity_id, expiration, requestInfo, trustForwardedInfo)
 			return new ResponseOk({
 				person: personRow,
 				token: sessionToken,

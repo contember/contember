@@ -31,8 +31,8 @@ const schema: DocumentNode = gql`
 
 	type Mutation {
 		signUp(email: String!, password: String, passwordHash: String, roles: [String!], name: String): SignUpResponse
-		signIn(email: String!, password: String!, expiration: Int, otpToken: String): SignInResponse
-		createSessionToken(email: String, personId: String, expiration: Int): CreateSessionTokenResponse
+		signIn(email: String!, password: String!, expiration: Int, otpToken: String, options: SignInOptions): SignInResponse
+		createSessionToken(email: String, personId: String, expiration: Int, options: SignInOptions): CreateSessionTokenResponse
 		signOut(all: Boolean): SignOutResponse
 		changeProfile(personId: String!, email: String, name: String): ChangeProfileResponse
 		changeMyProfile(email: String, name: String): ChangeMyProfileResponse
@@ -48,6 +48,7 @@ const schema: DocumentNode = gql`
 			identityProvider: String!,
 			data: Json,
 			expiration: Int
+			options: SignInOptions
 			idpResponse: IDPResponseInput, @deprecated(reason: "pass idpResponse.url as data.url")
 			redirectUrl: String @deprecated(reason: "use data.redirectUrl"),
 			sessionData: Json @deprecated(reason: "use data.sessionData"),
@@ -55,7 +56,7 @@ const schema: DocumentNode = gql`
 		
 		# passwordless sign in
 		initSignInPasswordless(email: String!, options: InitSignInPasswordlessOptions): InitSignInPasswordlessResponse
-		signInPasswordless(requestId: String!, validationType: PasswordlessValidationType!, token: String!, expiration: Int, mfaOtp: String): SignInPasswordlessResponse
+		signInPasswordless(requestId: String!, validationType: PasswordlessValidationType!, token: String!, expiration: Int, mfaOtp: String, options: SignInOptions): SignInPasswordlessResponse
 		activatePasswordlessOtp(requestId: String!, token: String!, otpHash: String!): ActivatePasswordlessOtpResponse
 
         enableMyPasswordless: ToggleMyPasswordlessResponse
@@ -93,8 +94,8 @@ const schema: DocumentNode = gql`
 
 		updateProjectMember(projectSlug: String!, identityId: String!, memberships: [MembershipInput!]!): UpdateProjectMemberResponse
 
-		createApiKey(projectSlug: String!, memberships: [MembershipInput!]!, description: String!, tokenHash: String): CreateApiKeyResponse
-		createGlobalApiKey(description: String!, roles: [String!], tokenHash: String): CreateApiKeyResponse
+		createApiKey(projectSlug: String!, memberships: [MembershipInput!]!, description: String!, tokenHash: String, options: CreateApiKeyOptions): CreateApiKeyResponse
+		createGlobalApiKey(description: String!, roles: [String!], tokenHash: String, options: CreateApiKeyOptions): CreateApiKeyResponse
 		disableApiKey(id: String!): DisableApiKeyResponse
 		addGlobalIdentityRoles(identityId: String!, roles: [String!]!): AddGlobalIdentityRolesResponse
 		removeGlobalIdentityRoles(identityId: String!, roles: [String!]!): RemoveGlobalIdentityRolesResponse
@@ -241,6 +242,16 @@ const schema: DocumentNode = gql`
 	}
 
 	# === signIn ===
+	input SignInOptions {
+		"""
+		If true, and the calling api_key has trust_forwarded_info=true,
+		the resulting session token will trust X-Contember-Client-IP and
+		X-Contember-Client-User-Agent headers on subsequent requests.
+		Silently ignored when the caller's api_key does not have the flag.
+		"""
+		trustForwardedClientInfo: Boolean
+	}
+
 	type SignInResponse {
 		ok: Boolean!
 		errors: [SignInError!]! @deprecated
@@ -750,6 +761,17 @@ const schema: DocumentNode = gql`
 	}
 
 	# === createApiKey ===
+
+	input CreateApiKeyOptions {
+		"""
+		If true, the created api_key trusts X-Contember-Client-IP and
+		X-Contember-Client-User-Agent headers on subsequent requests.
+		Intended for backend services that proxy user requests; the customer's
+		proxy must strip these headers from incoming traffic and re-inject
+		them with the real user values.
+		"""
+		trustForwardedClientInfo: Boolean
+	}
 
 	type CreateApiKeyResponse {
 		ok: Boolean!

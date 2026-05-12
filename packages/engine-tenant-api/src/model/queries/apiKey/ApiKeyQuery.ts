@@ -45,6 +45,7 @@ export type ApiKeyRow = {
 	readonly last_ip: string | null
 	readonly last_user_agent: string | null
 	readonly last_used_at: Date | null
+	readonly trust_forwarded_info: boolean
 }
 
 const apiKeyBaseQuery = SelectBuilder.create<null | ApiKeyRow>()
@@ -59,6 +60,7 @@ const apiKeyBaseQuery = SelectBuilder.create<null | ApiKeyRow>()
 	.select(['api_key', 'last_ip'])
 	.select(['api_key', 'last_user_agent'])
 	.select(['api_key', 'last_used_at'])
+	.select(['api_key', 'trust_forwarded_info'])
 	.from('api_key')
 	.join('identity', 'identity', joinClause => joinClause.compareColumns(['api_key', 'identity_id'], Operator.eq, ['identity', 'id']))
 	.leftJoin(

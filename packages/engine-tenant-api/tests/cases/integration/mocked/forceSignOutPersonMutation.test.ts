@@ -41,7 +41,6 @@ test('force sign-out – success with reason and mail', async () => {
 		},
 		expectedAuthLog: {
 			type: 'forced_sign_out',
-			personId,
 			targetPersonId: personId,
 			response: expect.objectContaining({ ok: true }),
 			metadata: { reason: 'security incident' },

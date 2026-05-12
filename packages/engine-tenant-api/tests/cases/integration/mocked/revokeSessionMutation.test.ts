@@ -1,4 +1,4 @@
-import { authenticatedApiKeyId, authenticatedIdentityId, executeTenantTest } from '../../../src/testTenant'
+import { authenticatedIdentityId, executeTenantTest } from '../../../src/testTenant'
 import { GQL } from '../../../src/tags'
 import { testUuid } from '../../../src/testUuid'
 import { getPersonByIdentity } from './sql/getPersonByIdentity'

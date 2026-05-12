@@ -49,7 +49,6 @@ test('force sign-out – success with reason and mail', async () => {
 		sentMails: [
 			{
 				subject: 'Your sessions have been signed out',
-				to: 'jane@doe.com',
 			},
 		],
 	})

@@ -29,7 +29,8 @@ class AuthLogService {
 				errorMessage: data.response.ok ? undefined : data.response.errorMessage,
 				ipAddress: ctx.clientIp,
 				userAgent: ctx.userAgent,
-				metadata: {},
+				metadata: data.metadata ?? {},
+				targetPersonId: data.targetPersonId,
 			}),
 		)
 	}
@@ -42,6 +43,8 @@ namespace AuthLogService {
 		personInput?: string // e.g. email
 		tokenId?: string
 		identityProviderId?: string
+		targetPersonId?: string
+		metadata?: Record<string, unknown>
 	}
 
 	export type LogArgs = {

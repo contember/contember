@@ -6,11 +6,12 @@ export const signInMutation = (
 		email: string
 		password: string
 		otpToken?: string
+		options?: { trustForwardedClientInfo?: boolean }
 	},
 	options: { withData?: boolean } = {},
 ): GraphQLTestQuery => ({
-	query: GQL`mutation($email: String!, $password: String!, $otpToken: String) {
-		signIn(email: $email, password: $password, otpToken: $otpToken) {
+	query: GQL`mutation($email: String!, $password: String!, $otpToken: String, $options: SignInOptions) {
+		signIn(email: $email, password: $password, otpToken: $otpToken, options: $options) {
 			ok
 			errors {code}
 			result {

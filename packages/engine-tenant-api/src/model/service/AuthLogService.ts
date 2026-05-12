@@ -2,6 +2,7 @@ import { DatabaseContext } from '../utils'
 import { CreateAuthLogEntryCommand } from '../commands/authLog/CreateAuthLogEntryCommand'
 import { Response } from '../utils/Response'
 import { AuthActionType } from '../type/AuthLog'
+import { JSONValue } from '@contember/schema'
 
 class AuthLogService {
 	async logAuthAction(
@@ -44,7 +45,7 @@ namespace AuthLogService {
 		tokenId?: string
 		identityProviderId?: string
 		targetPersonId?: string
-		metadata?: Record<string, unknown>
+		metadata?: JSONValue
 	}
 
 	export type LogArgs = {

@@ -1,7 +1,7 @@
 import { Command } from '../Command'
 import { ApiKey } from '../../type'
 import { ApiKeyHelper } from './ApiKeyHelper'
-import { UpdateBuilder } from '@contember/database'
+import { QueryBuilder, UpdateBuilder } from '@contember/database'
 
 const PROLONG_THROTTLE_MS = 60_000
 
@@ -44,7 +44,7 @@ export class ProlongApiKeyCommand implements Command<void> {
 			return
 		}
 
-		const values: Record<string, unknown> = {}
+		const values: QueryBuilder.Values = {}
 		if (updateExpiration && newExpiration !== null) {
 			values.expires_at = newExpiration
 		}

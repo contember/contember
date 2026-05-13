@@ -20,6 +20,7 @@ import { OtpAuthenticator } from './OtpAuthenticator'
 import { PersonToken } from '../type'
 import { AuthLogService } from './AuthLogService'
 import { intervalToSeconds } from '../utils/interval'
+import { RateLimiter } from './RateLimiter'
 
 class PasswordlessSignInManager {
 	constructor(
@@ -27,6 +28,7 @@ class PasswordlessSignInManager {
 		private readonly mailer: UserMailer,
 		private readonly projectManager: ProjectManager,
 		private readonly otpAuthenticator: OtpAuthenticator,
+		private readonly rateLimiter: RateLimiter,
 	) {}
 
 	async initSignInPasswordless({ db, permissionContext, mailVariant, mailProject, email }: {
@@ -60,6 +62,20 @@ class PasswordlessSignInManager {
 					}),
 				})
 			}
+
+			// Per-email outbound throttle on passwordless-init mails — same idea
+			// as the password-reset throttle: bound the spam pressure on a real
+			// user even if attackers spray the endpoint.
+			const mailGate = await this.rateLimiter.check(db, 'passwordless_init_mail_per_email', email, configuration)
+			if (!mailGate.ok) {
+				return new ResponseError('RATE_LIMIT_EXCEEDED', `Too many passwordless sign-in requests for this email. Retry after ${mailGate.retryAfterSeconds}s.`, {
+					[AuthLogService.Key]: new AuthLogService.Bag({
+						personInput: email,
+						personId: person.id,
+					}),
+				})
+			}
+			await this.rateLimiter.record(db, 'passwordless_init_mail_per_email', email)
 
 			const createTokenCommand = CreatePersonTokenCommand.createPasswordlessRequest(
 				person.id,

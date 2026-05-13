@@ -11,4 +11,6 @@ export interface TenantResolverContext {
 	readonly db: DatabaseContext
 	readonly logger: Logger
 	readonly logAuthAction: (entry: AuthLogService.LogArgs) => Promise<void>
+	/** Client IP from the HTTP layer; consumed by anti-abuse middleware (captcha + rate-limit). */
+	readonly remoteIp?: string
 }

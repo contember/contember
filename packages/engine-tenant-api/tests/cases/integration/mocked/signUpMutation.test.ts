@@ -19,8 +19,8 @@ test('signs up a new user', async () => {
 	await executeTenantTest({
 		query: signUpMutation({ email, password }),
 		executes: [
-			getPersonByEmailSql({ email, response: null }),
 			getConfigSql(),
+			getPersonByEmailSql({ email, response: null }),
 			...sqlTransaction(
 				createIdentitySql({ identityId, roles: ['person'] }),
 				createPersonSql({ personId, email, password, identityId }),
@@ -52,14 +52,15 @@ test('signs up a new user', async () => {
 	})
 })
 
-test('not sign up user with existing email', async () => {
+test('not sign up user with existing email — returns ALREADY_REGISTERED with recommended action', async () => {
 	const personId = testUuid(1)
 	const email = 'john@doe.com'
 	const password = '123456'
 	await executeTenantTest({
 		query: signUpMutation({ email, password }),
 		executes: [
-			getPersonByEmailSql({ email, response: { personId, password: '', roles: [], identityId: testUuid(1) } }),
+			getConfigSql(),
+			getPersonByEmailSql({ email, response: { personId, password: '$2b$hash', roles: [], identityId: testUuid(1) } }),
 		],
 		return: {
 			data: {
@@ -67,7 +68,7 @@ test('not sign up user with existing email', async () => {
 					ok: false,
 					errors: [
 						{
-							code: 'EMAIL_ALREADY_EXISTS',
+							code: 'ALREADY_REGISTERED',
 						},
 					],
 					result: null,

@@ -1725,6 +1725,7 @@ export type ResolversTypes = {
 	EnableIDPError: ResolverTypeWrapper<EnableIdpError>
 	EnableIDPErrorCode: EnableIdpErrorCode
 	EnableIDPResponse: ResolverTypeWrapper<EnableIdpResponse>
+	Float: ResolverTypeWrapper<Scalars['Float']['output']>
 	IDPOptions: IdpOptions
 	IDPOptionsOutput: ResolverTypeWrapper<IdpOptionsOutput>
 	IDPResponseInput: IdpResponseInput
@@ -1912,6 +1913,7 @@ export type ResolversParentTypes = {
 	DisablePersonResponse: DisablePersonResponse
 	EnableIDPError: EnableIdpError
 	EnableIDPResponse: EnableIdpResponse
+	Float: Scalars['Float']['output']
 	IDPOptions: IdpOptions
 	IDPOptionsOutput: IdpOptionsOutput
 	IDPResponseInput: IdpResponseInput

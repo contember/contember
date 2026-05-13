@@ -11,6 +11,7 @@ import { PasswordStrengthValidator } from './PasswordStrengthValidator'
 import { ResetPasswordErrorCode, WeakPasswordReason } from '../../schema'
 import { PersonTokenQuery } from '../queries/personToken/PersonTokenQuery'
 import { AuthLogService } from './AuthLogService'
+import { RateLimiter } from './RateLimiter'
 
 interface MailOptions {
 	project?: string
@@ -22,6 +23,7 @@ export class PasswordResetManager {
 		private readonly mailer: UserMailer,
 		private readonly projectManager: ProjectManager,
 		private readonly passwordStrengthValidator: PasswordStrengthValidator,
+		private readonly rateLimiter: RateLimiter,
 	) {}
 
 	public async createPasswordResetRequest(
@@ -36,6 +38,15 @@ export class PasswordResetManager {
 		if (!person.email) {
 			throw new ImplementationException()
 		}
+
+		// Per-email outbound throttle: don't spam a real user with reset mails
+		// just because attackers keep poking the endpoint.
+		const config = await dbContext.queryHandler.fetch(new ConfigurationQuery())
+		const mailGate = await this.rateLimiter.check(dbContext, 'password_reset_mail_per_email', person.email, config)
+		if (!mailGate.ok) {
+			return
+		}
+		await this.rateLimiter.record(dbContext, 'password_reset_mail_per_email', person.email)
 
 		await this.mailer.sendPasswordResetEmail(
 			dbContext,

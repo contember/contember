@@ -3,6 +3,7 @@ import NewUserInvited from './templates/NewUserInvited.mustache'
 import ExistingUserInvited from './templates/ExistingUserInvited.mustache'
 import PasswordReset from './templates/PasswordReset.mustache'
 import PasswordlessSignIn from './templates/PasswordlessSignIn.mustache'
+import RegistrationAttemptExistingUser from './templates/RegistrationAttemptExistingUser.mustache'
 import { MailTemplateData, MailTemplateIdentifier, MailType } from './type'
 import { MailTemplateQuery } from '../queries'
 import Layout from './templates/Layout.mustache'
@@ -73,6 +74,26 @@ export class UserMailer {
 		const template = (await this.getCustomTemplate(dbContext, templateId)) || {
 			subject: 'Sign in here',
 			content: PasswordlessSignIn,
+			replyTo: null,
+		}
+		await this.sendMail(templateId, template, mailArguments)
+	}
+
+	/**
+	 * Sent to a legitimate account holder when somebody attempts to sign up
+	 * with their email while revealUserExists is false. Keeps the
+	 * sign-up endpoint from leaking account existence to the attacker without
+	 * leaving the real user in the dark.
+	 */
+	async sendRegistrationAttemptExistingUserEmail(
+		dbContext: DatabaseContext,
+		mailArguments: { email: string },
+		customMailOptions: { projectId: string | null; variant: string },
+	): Promise<void> {
+		const templateId = { type: MailType.registrationAttemptExistingUser, ...customMailOptions }
+		const template = (await this.getCustomTemplate(dbContext, templateId)) || {
+			subject: 'Sign-up attempt with your email',
+			content: RegistrationAttemptExistingUser,
 			replyTo: null,
 		}
 		await this.sendMail(templateId, template, mailArguments)

@@ -4,11 +4,15 @@ import { executeTenantTest } from '../../../src/testTenant'
 import { selectMembershipsSql } from './sql/selectMembershipsSql'
 import { getProjectBySlugSql } from './sql/getProjectBySlugSql'
 import { sqlTransaction } from './sql/sqlTransaction'
+import { getPersonsByIdentitySql } from './sql/getPersonsByIdentitySql'
 import { test } from 'bun:test'
 
 test('removes a project member', async () => {
 	const identityId = testUuid(6)
 	const projectId = testUuid(5)
+	const personId = testUuid(7)
+	const role = 'editor'
+	const beforeMemberships = [{ role, variables: [] }]
 	await executeTenantTest({
 		query: GQL`mutation {
           removeProjectMember(projectSlug: "blog", identityId: "${identityId}") {
@@ -23,7 +27,12 @@ test('removes a project member', async () => {
 			selectMembershipsSql({
 				identityId,
 				projectId,
-				membershipsResponse: [{ role: 'editor', variables: [] }],
+				membershipsResponse: beforeMemberships,
+			}),
+			selectMembershipsSql({
+				identityId,
+				projectId,
+				membershipsResponse: beforeMemberships,
 			}),
 			...sqlTransaction({
 				sql: SQL`DELETE
@@ -34,6 +43,10 @@ test('removes a project member', async () => {
 					rowCount: 1,
 				},
 			}),
+			getPersonsByIdentitySql({
+				identityIds: [identityId],
+				response: [{ personId, identityId, email: 'john@doe.com' }],
+			}),
 		],
 		return: {
 			data: {
@@ -41,6 +54,17 @@ test('removes a project member', async () => {
 					ok: true,
 					errors: [],
 				},
+			},
+		},
+		expectedAuthLog: {
+			type: 'project_membership_remove',
+			response: { ok: true, result: null },
+			targetPersonId: personId,
+			changeDiff: {
+				projectId,
+				identityId,
+				before: beforeMemberships,
+				after: [],
 			},
 		},
 	})

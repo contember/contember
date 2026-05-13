@@ -5,6 +5,8 @@ import { createMembershipValidationErrorResult } from '../../membershipUtils'
 import { createMembershipModification } from '../../../model/service/membershipUtils'
 import { createErrorResponse, createProjectNotFoundResponse } from '../../errorUtils'
 import { Acl } from '@contember/schema'
+import { ProjectMembershipByIdentityQuery } from '../../../model/queries'
+import { logProjectMembershipChange } from './audit'
 
 export class UpdateProjectMemberMutationResolver implements MutationResolvers {
 	constructor(
@@ -62,11 +64,14 @@ export class UpdateProjectMemberMutationResolver implements MutationResolvers {
 			}
 		}
 
+		const before = await context.db.queryHandler.fetch(new ProjectMembershipByIdentityQuery({ id: project.id }, [identityId]))
 		const result = await this.projectMemberManager.updateProjectMember(context.db, project.id, identityId, membershipPatch)
 
 		if (!result.ok) {
 			return createErrorResponse(result.error, result.errorMessage)
 		}
+
+		await logProjectMembershipChange(context, 'project_membership_update', project.id, identityId, before)
 
 		return {
 			ok: true,

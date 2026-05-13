@@ -2,6 +2,7 @@ import { DatabaseContext } from '../utils'
 import { CreateAuthLogEntryCommand } from '../commands/authLog/CreateAuthLogEntryCommand'
 import { Response } from '../utils/Response'
 import { AuthActionType } from '../type/AuthLog'
+import { JSONValue } from '@contember/schema'
 
 class AuthLogService {
 	async logAuthAction(
@@ -30,6 +31,8 @@ class AuthLogService {
 				ipAddress: ctx.clientIp,
 				userAgent: ctx.userAgent,
 				metadata: {},
+				targetPersonId: data.targetPersonId,
+				changeDiff: data.changeDiff,
 			}),
 		)
 	}
@@ -42,6 +45,8 @@ namespace AuthLogService {
 		personInput?: string // e.g. email
 		tokenId?: string
 		identityProviderId?: string
+		targetPersonId?: string
+		changeDiff?: JSONValue
 	}
 
 	export type LogArgs = {

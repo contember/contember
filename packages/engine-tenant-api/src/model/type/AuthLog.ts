@@ -12,3 +12,8 @@ export type AuthActionType =
 	| 'passwordless_login_exchange'
 	| 'passwordless_login'
 	| 'person_disable'
+	| 'global_role_grant'
+	| 'global_role_revoke'
+	| 'project_membership_create'
+	| 'project_membership_update'
+	| 'project_membership_remove'

@@ -28,7 +28,7 @@ const schema: DocumentNode = gql`
 	}
 
 	type Mutation {
-		signUp(email: String!, password: String, passwordHash: String, roles: [String!], name: String): SignUpResponse
+		signUp(email: String!, password: String, passwordHash: String, roles: [String!], name: String, captchaToken: String): SignUpResponse
 		signIn(email: String!, password: String!, expiration: Int, otpToken: String): SignInResponse
 		createSessionToken(email: String, personId: String, expiration: Int): CreateSessionTokenResponse
 		signOut(all: Boolean): SignOutResponse
@@ -52,7 +52,7 @@ const schema: DocumentNode = gql`
 		): SignInIDPResponse
 		
 		# passwordless sign in
-		initSignInPasswordless(email: String!, options: InitSignInPasswordlessOptions): InitSignInPasswordlessResponse
+		initSignInPasswordless(email: String!, options: InitSignInPasswordlessOptions, captchaToken: String): InitSignInPasswordlessResponse
 		signInPasswordless(requestId: String!, validationType: PasswordlessValidationType!, token: String!, expiration: Int, mfaOtp: String): SignInPasswordlessResponse
 		activatePasswordlessOtp(requestId: String!, token: String!, otpHash: String!): ActivatePasswordlessOtpResponse
 
@@ -71,7 +71,7 @@ const schema: DocumentNode = gql`
 
 		disablePerson(personId: String!): DisablePersonResponse
 
-		createResetPasswordRequest(email: String!, options: CreateResetPasswordRequestOptions): CreatePasswordResetRequestResponse
+		createResetPasswordRequest(email: String!, options: CreateResetPasswordRequestOptions, captchaToken: String): CreatePasswordResetRequestResponse
 		resetPassword(token: String!, password: String!): ResetPasswordResponse
 
 		invite(email: String!, name: String, projectSlug: String!, memberships: [MembershipInput!]!, options: InviteOptions): InviteResponse
@@ -125,14 +125,16 @@ const schema: DocumentNode = gql`
 		passwordless: ConfigPasswordless!
 		password: ConfigPassword!
 		login: ConfigLogin!
+		captcha: ConfigCaptcha!
+		rateLimits: ConfigRateLimits!
 	}
-	
+
 	type ConfigPasswordless {
 		enabled: ConfigPolicy!
 		url: String
 		expiration: Interval!
 	}
-	
+
 	type ConfigPassword {
 		minLength: Int!
 		requireUppercase: Int!
@@ -141,8 +143,9 @@ const schema: DocumentNode = gql`
 		requireSpecial: Int!
 		pattern: String
 		checkBlacklist: Boolean!
+		checkHibp: Boolean!
     }
-	
+
 	type ConfigLogin {
 		baseBackoff: Interval!
 		maxBackoff: Interval!
@@ -151,26 +154,61 @@ const schema: DocumentNode = gql`
 		defaultTokenExpiration: Interval!
 		maxTokenExpiration: Interval
     }
-	
+
+	"""
+	Captcha config. The secret is never exposed; only the provider and (where
+	applicable) the threshold are readable.
+	"""
+	type ConfigCaptcha {
+		provider: CaptchaProvider
+		threshold: Float
+	}
+
+	enum CaptchaProvider {
+		turnstile
+		hcaptcha
+		recaptchaV3
+	}
+
+	"""
+	Configurable per-flow rate-limit / throttle windows. Each value bounds the
+	number of attempts allowed from the same IP (or same email for outbound mail
+	throttles) in the configured window.
+	"""
+	type ConfigRateLimits {
+		signUpPerIp: ConfigRateLimitWindow!
+		passwordResetPerIp: ConfigRateLimitWindow!
+		passwordlessInitPerIp: ConfigRateLimitWindow!
+		passwordResetMailPerEmail: ConfigRateLimitWindow!
+		passwordlessInitMailPerEmail: ConfigRateLimitWindow!
+	}
+
+	type ConfigRateLimitWindow {
+		limit: Int!
+		window: Interval!
+	}
+
 	input ConfigInput {
 		passwordless: ConfigPasswordlessInput
 		password: ConfigPasswordInput
 		login: ConfigLoginInput
+		captcha: ConfigCaptchaInput
+		rateLimits: ConfigRateLimitsInput
 	}
-	
+
 	enum ConfigPolicy {
 		always
 		never
 		optIn
 		optOut
 	}
-	
+
 	input ConfigPasswordlessInput {
 		enabled: ConfigPolicy
 		url: String
 		expiration: Interval
 	}
-	
+
 	input ConfigPasswordInput {
 		minLength: Int
 		requireUppercase: Int
@@ -179,8 +217,9 @@ const schema: DocumentNode = gql`
 		requireSpecial: Int
 		pattern: String
 		checkBlacklist: Boolean
+		checkHibp: Boolean
     }
-	
+
 	input ConfigLoginInput {
 		baseBackoff: Interval
 		maxBackoff: Interval
@@ -189,6 +228,29 @@ const schema: DocumentNode = gql`
 		defaultTokenExpiration: Interval
 		maxTokenExpiration: Interval
     }
+
+	"""
+	Provider null disables captcha verification. Secret is write-only.
+	Pass null secret to leave the stored value unchanged; pass empty string to clear.
+	"""
+	input ConfigCaptchaInput {
+		provider: CaptchaProvider
+		secret: String
+		threshold: Float
+	}
+
+	input ConfigRateLimitsInput {
+		signUpPerIp: ConfigRateLimitWindowInput
+		passwordResetPerIp: ConfigRateLimitWindowInput
+		passwordlessInitPerIp: ConfigRateLimitWindowInput
+		passwordResetMailPerEmail: ConfigRateLimitWindowInput
+		passwordlessInitMailPerEmail: ConfigRateLimitWindowInput
+	}
+
+	input ConfigRateLimitWindowInput {
+		limit: Int
+		window: Interval
+	}
 	
 	type ConfigureResponse {
 		ok: Boolean!
@@ -215,14 +277,31 @@ const schema: DocumentNode = gql`
 	type SignUpError {
 		code: SignUpErrorCode!
         weakPasswordReasons: [WeakPasswordReason!]
+		"""
+		For ALREADY_REGISTERED, the recommended next action client UIs should
+		offer to the visitor. Null for unrelated error codes.
+		"""
+		recommendedAction: SignUpRecommendedAction
 		developerMessage: String!
 		endPersonMessage: String @deprecated
 	}
 
 	enum SignUpErrorCode {
-		EMAIL_ALREADY_EXISTS
+		"""
+		Email is already used. Deprecated alias kept for clients that
+		looked at this code; prefer ALREADY_REGISTERED.
+		"""
+		EMAIL_ALREADY_EXISTS @deprecated(reason: "use ALREADY_REGISTERED")
+		ALREADY_REGISTERED
 		INVALID_EMAIL_FORMAT
 		TOO_WEAK
+		INVALID_CAPTCHA
+		RATE_LIMIT_EXCEEDED
+	}
+
+	enum SignUpRecommendedAction {
+		SIGN_IN
+		RESET_PASSWORD
 	}
 
 	type SignUpResult {
@@ -374,6 +453,7 @@ const schema: DocumentNode = gql`
 		MISSING_SPECIAL
 		INVALID_PATTERN
 		BLACKLISTED
+		COMPROMISED
     }
 
 
@@ -550,8 +630,10 @@ const schema: DocumentNode = gql`
 	
 	enum InitSignInPasswordlessErrorCode {
 		PERSON_NOT_FOUND
-		
+
 		PASSWORDLESS_DISABLED
+		INVALID_CAPTCHA
+		RATE_LIMIT_EXCEEDED
 	}
 	
 	type InitSignInPasswordlessResult {
@@ -1067,6 +1149,13 @@ const schema: DocumentNode = gql`
 		NEW_USER_INVITED
 		RESET_PASSWORD_REQUEST
 		PASSWORDLESS_SIGN_IN
+		"""
+		Silent notice sent when somebody attempts to sign up using an email
+		that is already registered while revealUserExists is false. Lets the
+		legitimate owner know an attempt occurred without leaking existence
+		back to the attacker.
+		"""
+		REGISTRATION_ATTEMPT_EXISTING_USER
 	}
 
 	input MailTemplateIdentifier {
@@ -1138,6 +1227,8 @@ const schema: DocumentNode = gql`
 
 	enum CreatePasswordResetRequestErrorCode {
 		PERSON_NOT_FOUND
+		INVALID_CAPTCHA
+		RATE_LIMIT_EXCEEDED
 	}
 
 	type ResetPasswordResponse {

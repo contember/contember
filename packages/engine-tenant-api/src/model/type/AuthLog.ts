@@ -14,3 +14,8 @@ export type AuthActionType =
 	| 'person_disable'
 	| 'session_revoked_by_user'
 	| 'forced_sign_out'
+	| 'global_role_grant'
+	| 'global_role_revoke'
+	| 'project_membership_create'
+	| 'project_membership_update'
+	| 'project_membership_remove'

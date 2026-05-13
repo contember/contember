@@ -43,6 +43,7 @@ class AuthLogService {
 				userAgent: ctx.userAgent,
 				metadata,
 				targetPersonId: data.targetPersonId,
+				eventData: data.eventData,
 			}),
 		)
 	}
@@ -57,6 +58,7 @@ namespace AuthLogService {
 		identityProviderId?: string
 		targetPersonId?: string
 		metadata?: JSONValue
+		eventData?: JSONValue
 	}
 
 	export type LogArgs = {

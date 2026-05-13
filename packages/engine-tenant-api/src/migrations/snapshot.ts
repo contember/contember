@@ -19,7 +19,12 @@ CREATE TYPE "auth_log_type" AS ENUM (
     'passwordless_login',
     'person_disable',
     'session_revoked_by_user',
-    'forced_sign_out'
+    'forced_sign_out',
+    'global_role_grant',
+    'global_role_revoke',
+    'project_membership_create',
+    'project_membership_update',
+    'project_membership_remove'
 );
 CREATE TYPE "config_policy" AS ENUM (
     'always',
@@ -150,7 +155,8 @@ CREATE TABLE "person_auth_log" (
     "user_agent" "text",
     "identity_provider_id" "uuid",
     "metadata" "jsonb",
-    "target_person_id" "uuid"
+    "target_person_id" "uuid",
+    "event_data" "jsonb"
 );
 CREATE TABLE "person_identity_provider" (
     "id" "uuid" NOT NULL,

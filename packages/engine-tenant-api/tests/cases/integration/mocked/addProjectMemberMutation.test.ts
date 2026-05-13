@@ -1,10 +1,12 @@
-import { executeTenantTest } from '../../../src/testTenant'
+import { authenticatedIdentityId, executeTenantTest } from '../../../src/testTenant'
 import { testUuid } from '../../../src/testUuid'
 import { addProjectMemberMutation } from './gql/addProjectMember'
 import { getProjectBySlugSql } from './sql/getProjectBySlugSql'
 import { createMembershipSql } from './sql/createMembershipSql'
 import { createMembershipVariableSql } from './sql/createMembershipVariableSql'
 import { getProjectMembershipSql } from './sql/getProjectMembershipSql'
+import { selectMembershipsSql } from './sql/selectMembershipsSql'
+import { getPersonsByIdentitySql } from './sql/getPersonsByIdentitySql'
 import { sqlTransaction } from './sql/sqlTransaction'
 import { test } from 'bun:test'
 
@@ -14,6 +16,7 @@ test('add project member', async () => {
 	const projectSlug = 'blog'
 	const membershipId = testUuid(1)
 	const projectId = testUuid(5)
+	const personId = testUuid(7)
 	const role = 'editor'
 	const variableId = testUuid(2)
 	const variableName = 'language'
@@ -31,6 +34,15 @@ test('add project member', async () => {
 				createMembershipSql({ membershipId, projectId, identityId, role }),
 				createMembershipVariableSql({ variableId, membershipId, variableName, values }),
 			),
+			selectMembershipsSql({
+				identityId,
+				projectId,
+				membershipsResponse: [{ role, variables: [{ name: variableName, values }] }],
+			}),
+			getPersonsByIdentitySql({
+				identityIds: [identityId],
+				response: [{ personId, identityId, email: 'john@doe.com' }],
+			}),
 		],
 		return: {
 			data: {
@@ -38,6 +50,17 @@ test('add project member', async () => {
 					ok: true,
 					errors: [],
 				},
+			},
+		},
+		expectedAuthLog: {
+			type: 'project_membership_create',
+			response: { ok: true, result: null },
+			targetPersonId: personId,
+			eventData: {
+				projectId,
+				identityId,
+				before: [],
+				after: [{ role, variables: [{ name: variableName, values }] }],
 			},
 		},
 	})

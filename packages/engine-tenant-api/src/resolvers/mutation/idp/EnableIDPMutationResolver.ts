@@ -4,6 +4,7 @@ import { PermissionActions } from '../../../model'
 import { IDPManager } from '../../../model/service/idp/IDPManager'
 import { createErrorResponse } from '../../errorUtils'
 import { TenantResolverContext } from '../../TenantResolverContext'
+import { ResponseOk } from '../../../model/utils/Response'
 
 export class EnableIDPMutationResolver implements MutationResolvers {
 	constructor(private readonly idpManager: IDPManager) {
@@ -18,6 +19,12 @@ export class EnableIDPMutationResolver implements MutationResolvers {
 		if (!result.ok) {
 			return createErrorResponse(result.error, result.errorMessage)
 		}
+
+		await context.logAuthAction({
+			type: 'idp_enable',
+			response: new ResponseOk(null),
+			changeDiff: { slug: args.identityProvider },
+		})
 
 		return { ok: true }
 	}

@@ -41,6 +41,7 @@ import _20240826120000passwordless from './2024-08-26-120000-passwordless'
 import _20250416180000configup from './2025-04-16-180000-config-up'
 import _20250417160000authlog from './2025-04-17-160000-auth-log'
 import _20260513120000authlogtargetdiff from './2026-05-13-120000-auth-log-target-diff'
+import _20260514100000authlogadminactions from './2026-05-14-100000-auth-log-admin-actions'
 import snapshot from './snapshot'
 import { computeTokenHash, Providers } from '../model'
 import { Logger } from '@contember/logger'
@@ -94,6 +95,7 @@ const migrations = {
 	'2025-04-16-180000-config-up': _20250416180000configup,
 	'2025-04-17-160000-auth-log': _20250417160000authlog,
 	'2026-05-13-120000-auth-log-target-diff': _20260513120000authlogtargetdiff,
+	'2026-05-14-100000-auth-log-admin-actions': _20260514100000authlogadminactions,
 }
 
 export class TenantMigrationsRunner {

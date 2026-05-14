@@ -22,7 +22,21 @@ CREATE TYPE "auth_log_type" AS ENUM (
     'global_role_revoke',
     'project_membership_create',
     'project_membership_update',
-    'project_membership_remove'
+    'project_membership_remove',
+    'api_key_create',
+    'api_key_disable',
+    'idp_create',
+    'idp_update',
+    'idp_disable',
+    'idp_enable',
+    'project_create',
+    'project_update',
+    'project_secret_change',
+    'mail_template_change',
+    'tenant_config_change',
+    'person_invite',
+    'person_merge',
+    'person_anonymize'
 );
 CREATE TYPE "config_policy" AS ENUM (
     'always',

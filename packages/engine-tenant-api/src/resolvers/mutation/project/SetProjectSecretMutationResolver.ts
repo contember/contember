@@ -8,6 +8,7 @@ import {
 import { TenantResolverContext } from '../../TenantResolverContext'
 import { PermissionActions, ProjectManager, SecretsManager } from '../../../model'
 import { createProjectNotFoundResponse } from '../../errorUtils'
+import { ResponseOk } from '../../../model/utils/Response'
 
 export class SetProjectSecretMutationResolver implements MutationResolvers {
 	constructor(private readonly projectManager: ProjectManager, private readonly secretManager: SecretsManager) {}
@@ -27,6 +28,16 @@ export class SetProjectSecretMutationResolver implements MutationResolvers {
 			return createProjectNotFoundResponse('PROJECT_NOT_FOUND', args.projectSlug)
 		}
 		await this.secretManager.setSecret(context.db, project.id, args.key, args.value)
+
+		await context.logAuthAction({
+			type: 'project_secret_change',
+			response: new ResponseOk(null),
+			changeDiff: {
+				slug: project.slug,
+				key: args.key,
+			},
+		})
+
 		return { ok: true }
 	}
 }

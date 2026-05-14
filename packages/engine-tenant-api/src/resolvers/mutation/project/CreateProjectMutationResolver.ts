@@ -3,6 +3,7 @@ import { TenantResolverContext } from '../../TenantResolverContext'
 import { isTokenHash, PermissionActions, ProjectManager, TenantRole } from '../../../model'
 import { createErrorResponse } from '../../errorUtils'
 import { UserInputError } from '@contember/graphql-utils'
+import { ResponseOk } from '../../../model/utils/Response'
 
 export class CreateProjectMutationResolver implements MutationResolvers {
 	constructor(private readonly projectManager: ProjectManager) {}
@@ -48,6 +49,17 @@ export class CreateProjectMutationResolver implements MutationResolvers {
 		if (!response.ok) {
 			return createErrorResponse(response.error, response.errorMessage)
 		}
+
+		await context.logAuthAction({
+			type: 'project_create',
+			response: new ResponseOk(null),
+			changeDiff: {
+				slug: projectSlug,
+				name: name || projectSlug,
+				secretKeys: (secrets ?? []).map(it => it.key).sort(),
+			},
+		})
+
 		return {
 			ok: true,
 			error: null,

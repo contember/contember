@@ -3,6 +3,9 @@ import { PermissionActions } from '../../../model'
 import { IDPManager } from '../../../model/service/idp/IDPManager'
 import { createErrorResponse } from '../../errorUtils'
 import { TenantResolverContext } from '../../TenantResolverContext'
+import { ResponseOk } from '../../../model/utils/Response'
+import { IdentityProviderBySlugQuery } from '../../../model/queries'
+import { idpRowToAuditSnapshot } from './audit'
 
 export class AddIDPMutationResolver implements MutationResolvers {
 	constructor(private readonly idpManager: IDPManager) {
@@ -26,6 +29,17 @@ export class AddIDPMutationResolver implements MutationResolvers {
 		if (!result.ok) {
 			return createErrorResponse(result.error, result.errorMessage)
 		}
+
+		const after = await context.db.queryHandler.fetch(new IdentityProviderBySlugQuery(args.identityProvider))
+		await context.logAuthAction({
+			type: 'idp_create',
+			response: new ResponseOk(null),
+			changeDiff: {
+				slug: args.identityProvider,
+				before: null,
+				after: idpRowToAuditSnapshot(after),
+			},
+		})
 
 		return { ok: true }
 	}

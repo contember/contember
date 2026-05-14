@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test'
-import { CaptchaValidator, CaptchaConfig } from '../../../src/model/service/captcha/CaptchaValidator'
+import { CaptchaConfig, CaptchaValidator } from '../../../src/model/service/captcha/CaptchaValidator'
 import { CaptchaProviderHandler, CaptchaVerifyArgs, CaptchaVerifyResult } from '../../../src/model/service/captcha/CaptchaProvider'
 
 class StubProvider implements CaptchaProviderHandler {
@@ -11,11 +11,12 @@ class StubProvider implements CaptchaProviderHandler {
 	}
 }
 
-const buildValidator = (response: CaptchaVerifyResult) => new CaptchaValidator({
-	turnstile: new StubProvider(response),
-	hcaptcha: new StubProvider(response),
-	recaptchaV3: new StubProvider(response),
-})
+const buildValidator = (response: CaptchaVerifyResult) =>
+	new CaptchaValidator({
+		turnstile: new StubProvider(response),
+		hcaptcha: new StubProvider(response),
+		recaptchaV3: new StubProvider(response),
+	})
 
 describe('CaptchaValidator', () => {
 	test('is disabled when provider is null', () => {

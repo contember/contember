@@ -37,17 +37,19 @@ export type ConfigRow = {
 	rate_limit_passwordless_init_mail_per_email_window: IPostgresInterval
 }
 
-export type Config = Omit<
-	{
-		[K in keyof ConfigSchema]: {
-			[K2 in keyof ConfigSchema[K]]: Exclude<ConfigSchema[K][K2], Interval>
-		}
-	},
-	'__typename'
-> & {
-	/**
-	 * Decrypted/plaintext captcha secret. Never exposed through the GraphQL
-	 * schema — only the runtime validator reads it.
-	 */
-	readonly captchaSecret: string | null
-}
+export type Config =
+	& Omit<
+		{
+			[K in keyof ConfigSchema]: {
+				[K2 in keyof ConfigSchema[K]]: Exclude<ConfigSchema[K][K2], Interval>
+			}
+		},
+		'__typename'
+	>
+	& {
+		/**
+		 * Decrypted/plaintext captcha secret. Never exposed through the GraphQL
+		 * schema — only the runtime validator reads it.
+		 */
+		readonly captchaSecret: string | null
+	}

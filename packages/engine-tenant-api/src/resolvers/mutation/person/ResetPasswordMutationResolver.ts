@@ -7,7 +7,15 @@ import {
 } from '../../../schema'
 import { GraphQLResolveInfo } from 'graphql'
 import { TenantResolverContext } from '../../TenantResolverContext'
-import { CaptchaValidator, ConfigurationQuery, PasswordResetManager, PermissionActions, PermissionContextFactory, PersonQuery, RateLimiter } from '../../../model'
+import {
+	CaptchaValidator,
+	ConfigurationQuery,
+	PasswordResetManager,
+	PermissionActions,
+	PermissionContextFactory,
+	PersonQuery,
+	RateLimiter,
+} from '../../../model'
 import { createErrorResponse } from '../../errorUtils'
 import { ResponseError, ResponseOk } from '../../../model/utils/Response'
 

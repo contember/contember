@@ -161,11 +161,12 @@ export class TenantContainerFactory {
 			.addService('hibpChecker', (): HibpChecker => new HttpHibpChecker())
 			.addService('noopHibpChecker', (): HibpChecker => new NoopHibpChecker())
 			.addService('passwordStrengthValidator', ({ hibpChecker }) => new PasswordStrengthValidator(hibpChecker))
-			.addService('captchaValidator', () => new CaptchaValidator({
-				turnstile: new TurnstileProvider(),
-				hcaptcha: new HCaptchaProvider(),
-				recaptchaV3: new RecaptchaV3Provider(),
-			}))
+			.addService('captchaValidator', () =>
+				new CaptchaValidator({
+					turnstile: new TurnstileProvider(),
+					hcaptcha: new HCaptchaProvider(),
+					recaptchaV3: new RecaptchaV3Provider(),
+				}))
 			.addService('rateLimiter', ({ providers }) => new RateLimiter(providers))
 			.addService(
 				'signUpManager',

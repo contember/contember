@@ -68,12 +68,16 @@ class PasswordlessSignInManager {
 			// user even if attackers spray the endpoint.
 			const mailGate = await this.rateLimiter.check(db, 'passwordless_init_mail_per_email', email, configuration)
 			if (!mailGate.ok) {
-				return new ResponseError('RATE_LIMIT_EXCEEDED', `Too many passwordless sign-in requests for this email. Retry after ${mailGate.retryAfterSeconds}s.`, {
-					[AuthLogService.Key]: new AuthLogService.Bag({
-						personInput: email,
-						personId: person.id,
-					}),
-				})
+				return new ResponseError(
+					'RATE_LIMIT_EXCEEDED',
+					`Too many passwordless sign-in requests for this email. Retry after ${mailGate.retryAfterSeconds}s.`,
+					{
+						[AuthLogService.Key]: new AuthLogService.Bag({
+							personInput: email,
+							personId: person.id,
+						}),
+					},
+				)
 			}
 			await this.rateLimiter.record(db, 'passwordless_init_mail_per_email', email)
 

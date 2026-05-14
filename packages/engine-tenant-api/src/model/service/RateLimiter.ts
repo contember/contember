@@ -8,7 +8,7 @@ import { intervalToSeconds } from '../utils/interval'
 
 export interface RateLimitWindow {
 	readonly limit: number
-	readonly window: { /* IPostgresInterval shape */ }
+	readonly window: {/* IPostgresInterval shape */}
 }
 
 export interface RateLimitDecision {

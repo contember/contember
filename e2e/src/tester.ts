@@ -11,6 +11,7 @@ import {
 } from '@contember/schema-migrations'
 import { emptySchema } from '@contember/schema-utils'
 import { afterEach, beforeEach, expect } from 'bun:test'
+import * as TenantApi from '@contember/graphql-client-tenant'
 import { TenantClient } from './TenantClient'
 
 export const rootToken = String(process.env.CONTEMBER_ROOT_TOKEN)
@@ -100,11 +101,43 @@ const executeMigrations = async (projectSlug: string, modifications: Migration.M
 
 export const rand = () => Math.random().toString(36).slice(2)
 
+let tenantBootstrap: Promise<void> | null = null
+const ensureTenantBootstrapped = (tenantClient: TenantClient) => {
+	if (!tenantBootstrap) {
+		tenantBootstrap = relaxTenantLimits(tenantClient)
+	}
+	return tenantBootstrap
+}
+
+const relaxTenantLimits = async (tenantClient: TenantClient) => {
+	const window = '24 hours'
+	const highCeiling = { limit: 100000, window }
+	const result = await tenantClient.send(
+		TenantApi.mutation$.configure(TenantApi.configureResponse$$),
+		{
+			config: {
+				rateLimits: {
+					signUpPerIp: highCeiling,
+					loginPerIp: highCeiling,
+					passwordResetPerIp: highCeiling,
+					passwordlessInitPerIp: highCeiling,
+					passwordResetMailPerEmail: highCeiling,
+					passwordlessInitMailPerEmail: highCeiling,
+				},
+			},
+		},
+	)
+	if (result.status !== 200 || !result.body?.data?.configure?.ok) {
+		throw new Error(`Failed to relax tenant rate limits: ${JSON.stringify(result.body)}`)
+	}
+}
+
 export const createTester = async (schema: Schema) => {
 	const projectSlug = 'test_' + rand()
 	// console.log(`Creating project ${projectSlug}`)
 
 	const tenantClient = new TenantClient(apiUrl, rootToken)
+	await ensureTenantBootstrapped(tenantClient)
 	await tenantClient.createProject(projectSlug)
 
 	const migrations = createMigrations(schema)

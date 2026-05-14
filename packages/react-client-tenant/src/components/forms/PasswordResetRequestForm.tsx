@@ -58,4 +58,6 @@ export const PasswordResetRequestForm = ({ children, onSuccess }: PasswordResetR
 }
 const errorToField: Record<TenantApi.CreatePasswordResetRequestErrorCode, keyof PasswordResetRequestFormValues | undefined> = {
 	PERSON_NOT_FOUND: 'email',
+	RATE_LIMIT_EXCEEDED: undefined,
+	INVALID_CAPTCHA: undefined,
 }

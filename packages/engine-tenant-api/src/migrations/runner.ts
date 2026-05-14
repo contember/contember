@@ -44,6 +44,7 @@ import _20260512120000apikeysessiontracking from './2026-05-12-120000-api-key-se
 import _20260512130000apikeytrustforwardedinfo from './2026-05-12-130000-api-key-trust-forwarded-info'
 import _20260513120000authlogeventdata from './2026-05-13-120000-auth-log-event-data'
 import _20260513130000antiabuse from './2026-05-13-130000-anti-abuse'
+import _20260514100000authlogadminactions from './2026-05-14-100000-auth-log-admin-actions'
 import snapshot from './snapshot'
 import { computeTokenHash, Providers } from '../model'
 import { Logger } from '@contember/logger'
@@ -100,6 +101,7 @@ const migrations = {
 	'2026-05-12-130000-api-key-trust-forwarded-info': _20260512130000apikeytrustforwardedinfo,
 	'2026-05-13-120000-auth-log-event-data': _20260513120000authlogeventdata,
 	'2026-05-13-130000-anti-abuse': _20260513130000antiabuse,
+	'2026-05-14-100000-auth-log-admin-actions': _20260514100000authlogadminactions,
 }
 
 export class TenantMigrationsRunner {

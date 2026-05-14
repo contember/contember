@@ -3,6 +3,8 @@ import { ConfigurationManager } from '../../../model/service/ConfigurationManage
 import { TenantResolverContext } from '../../TenantResolverContext'
 import { PermissionActions } from '../../../model'
 import { createErrorResponse } from '../../errorUtils'
+import { ResponseOk } from '../../../model/utils/Response'
+import { JSONValue } from '@contember/schema'
 
 export class ConfigurationMutationResolver implements Pick<MutationResolvers, 'configure'> {
 	constructor(
@@ -21,6 +23,14 @@ export class ConfigurationMutationResolver implements Pick<MutationResolvers, 'c
 		if (!result.ok) {
 			return createErrorResponse(result.error, result.errorMessage)
 		}
+
+		await context.logAuthAction({
+			type: 'tenant_config_change',
+			response: new ResponseOk(null),
+			eventData: {
+				input: config as unknown as JSONValue,
+			},
+		})
 
 		return {
 			ok: true,

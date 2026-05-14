@@ -317,6 +317,7 @@ export const createResetPasswordRequestMutation: TenantApi.MutationFetcher<{
 }, {
     readonly email: string;
     readonly options?: TenantApi.CreateResetPasswordRequestOptions;
+    readonly captchaToken?: string;
 }>;
 
 // @public (undocumented)
@@ -1443,7 +1444,8 @@ readonly roles?: ReadonlyArray<string>;
 export const useCreateResetPasswordRequestMutation: (input?: TenantApiOptions) => (variables: {
     readonly email: string;
     readonly options?: TenantApi.CreateResetPasswordRequestOptions;
-}) => Promise<TenantMutationResponse<unknown, "PERSON_NOT_FOUND">>;
+    readonly captchaToken?: string;
+}) => Promise<TenantMutationResponse<unknown, TenantApi.CreatePasswordResetRequestErrorCode>>;
 
 // @public (undocumented)
 export const useCreateSessionTokenForm: () => CreateSessionTokenFormContextValue;
@@ -1516,6 +1518,7 @@ readonly idpConfiguration?: unknown;
 export const useInitSignInPasswordlessMutation: (input?: TenantApiOptions) => (variables: {
     readonly email: string;
     readonly options?: TenantApi.InitSignInPasswordlessOptions;
+    readonly captchaToken?: string;
 }) => Promise<TenantMutationResponse<    {
 readonly requestId: string;
 } & {

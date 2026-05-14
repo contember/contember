@@ -40,6 +40,8 @@ export class RateLimiter {
 		switch (scope) {
 			case 'sign_up_per_ip':
 				return { limit: r.signUpPerIp.limit, windowSeconds: intervalToSeconds(r.signUpPerIp.window as any) }
+			case 'login_per_ip':
+				return { limit: r.loginPerIp.limit, windowSeconds: intervalToSeconds(r.loginPerIp.window as any) }
 			case 'password_reset_per_ip':
 				return { limit: r.passwordResetPerIp.limit, windowSeconds: intervalToSeconds(r.passwordResetPerIp.window as any) }
 			case 'passwordless_init_per_ip':

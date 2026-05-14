@@ -177,6 +177,7 @@ const schema: DocumentNode = gql`
 	"""
 	type ConfigRateLimits {
 		signUpPerIp: ConfigRateLimitWindow!
+		loginPerIp: ConfigRateLimitWindow!
 		passwordResetPerIp: ConfigRateLimitWindow!
 		passwordlessInitPerIp: ConfigRateLimitWindow!
 		passwordResetMailPerEmail: ConfigRateLimitWindow!
@@ -241,6 +242,7 @@ const schema: DocumentNode = gql`
 
 	input ConfigRateLimitsInput {
 		signUpPerIp: ConfigRateLimitWindowInput
+		loginPerIp: ConfigRateLimitWindowInput
 		passwordResetPerIp: ConfigRateLimitWindowInput
 		passwordlessInitPerIp: ConfigRateLimitWindowInput
 		passwordResetMailPerEmail: ConfigRateLimitWindowInput

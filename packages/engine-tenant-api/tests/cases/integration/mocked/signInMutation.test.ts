@@ -23,6 +23,7 @@ test('signs in', async () => {
 	await executeTenantTest({
 		query: signInMutation({ email, password }, { withData: true }),
 		executes: [
+			getConfigSql(),
 			getNextLoginAttemptSql(email),
 			getPersonByEmailSql({ email, response: { personId, identityId, password, roles: [] } }),
 			getConfigSql(),
@@ -81,6 +82,7 @@ test('signs in - normalize email', async () => {
 	await executeTenantTest({
 		query: signInMutation({ email, password }),
 		executes: [
+			getConfigSql(),
 			getNextLoginAttemptSql(email),
 			getPersonByEmailSql({ email, response: null }),
 			getPersonByEmailSql({ email: 'john@doe.com', response: { personId, identityId, password, roles: [] } }),
@@ -121,9 +123,9 @@ test('sign in - invalid password', async () => {
 	await executeTenantTest({
 		query: signInMutation({ email, password: 'abcd' }),
 		executes: [
+			getConfigSql(),
 			getNextLoginAttemptSql(email),
 			getPersonByEmailSql({ email, response: { personId, identityId, password, roles: [] } }),
-			getConfigSql(),
 		],
 		return: {
 			data: {
@@ -151,6 +153,7 @@ test('otp token not provided', async () => {
 	await executeTenantTest({
 		query: signInMutation({ email, password }),
 		executes: [
+			getConfigSql(),
 			getNextLoginAttemptSql(email),
 			getPersonByEmailSql({
 				email,
@@ -162,7 +165,6 @@ test('otp token not provided', async () => {
 					otpUri: 'otpauth://totp/contember:john?secret=ABCDEFG&period=30&digits=6&algorithm=SHA1&issuer=contember',
 				},
 			}),
-			getConfigSql(),
 		],
 		return: {
 			data: {
@@ -197,9 +199,9 @@ test('sign in - invalid otp token', async () => {
 	await executeTenantTest({
 		query: signInMutation({ email, password, otpToken: '123456' }),
 		executes: [
+			getConfigSql(),
 			getNextLoginAttemptSql(email),
 			getPersonByEmailSql({ email, response: { personId, identityId, password, roles: [], otpUri: otp.uri } }),
-			getConfigSql(),
 		],
 		return: {
 			data: {
@@ -234,6 +236,7 @@ test('sign in - valid otp token', async () => {
 	await executeTenantTest({
 		query: signInMutation({ email, password, otpToken: otpAuth.generate(otp) }),
 		executes: [
+			getConfigSql(),
 			getNextLoginAttemptSql(email),
 			getPersonByEmailSql({ email, response: { personId, identityId, password, roles: [], otpUri: otp.uri } }),
 			getConfigSql(),

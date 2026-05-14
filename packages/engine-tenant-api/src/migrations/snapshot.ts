@@ -92,6 +92,8 @@ CREATE TABLE "config" (
     "captcha_threshold" double precision,
     "rate_limit_sign_up_per_ip_limit" integer DEFAULT 10 NOT NULL,
     "rate_limit_sign_up_per_ip_window" interval DEFAULT '01:00:00'::interval NOT NULL,
+    "rate_limit_login_per_ip_limit" integer DEFAULT 60 NOT NULL,
+    "rate_limit_login_per_ip_window" interval DEFAULT '01:00:00'::interval NOT NULL,
     "rate_limit_password_reset_per_ip_limit" integer DEFAULT 20 NOT NULL,
     "rate_limit_password_reset_per_ip_window" interval DEFAULT '01:00:00'::interval NOT NULL,
     "rate_limit_passwordless_init_per_ip_limit" integer DEFAULT 20 NOT NULL,

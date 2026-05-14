@@ -41,6 +41,8 @@ export class UpdateConfigurationCommand implements Command<void> {
 					captcha_threshold: captcha?.threshold !== undefined ? captcha.threshold : undefined,
 					rate_limit_sign_up_per_ip_limit: rl?.signUpPerIp?.limit ?? undefined,
 					rate_limit_sign_up_per_ip_window: rl?.signUpPerIp?.window ?? undefined,
+					rate_limit_login_per_ip_limit: rl?.loginPerIp?.limit ?? undefined,
+					rate_limit_login_per_ip_window: rl?.loginPerIp?.window ?? undefined,
 					rate_limit_password_reset_per_ip_limit: rl?.passwordResetPerIp?.limit ?? undefined,
 					rate_limit_password_reset_per_ip_window: rl?.passwordResetPerIp?.window ?? undefined,
 					rate_limit_passwordless_init_per_ip_limit: rl?.passwordlessInitPerIp?.limit ?? undefined,

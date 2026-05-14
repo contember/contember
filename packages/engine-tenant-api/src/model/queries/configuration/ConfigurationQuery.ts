@@ -46,6 +46,10 @@ export class ConfigurationQuery extends DatabaseQuery<Config> {
 					limit: result.rate_limit_sign_up_per_ip_limit,
 					window: result.rate_limit_sign_up_per_ip_window,
 				},
+				loginPerIp: {
+					limit: result.rate_limit_login_per_ip_limit,
+					window: result.rate_limit_login_per_ip_window,
+				},
 				passwordResetPerIp: {
 					limit: result.rate_limit_password_reset_per_ip_limit,
 					window: result.rate_limit_password_reset_per_ip_window,

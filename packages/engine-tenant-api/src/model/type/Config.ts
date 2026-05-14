@@ -25,6 +25,8 @@ export type ConfigRow = {
 	captcha_threshold: number | null
 	rate_limit_sign_up_per_ip_limit: number
 	rate_limit_sign_up_per_ip_window: IPostgresInterval
+	rate_limit_login_per_ip_limit: number
+	rate_limit_login_per_ip_window: IPostgresInterval
 	rate_limit_password_reset_per_ip_limit: number
 	rate_limit_password_reset_per_ip_window: IPostgresInterval
 	rate_limit_passwordless_init_per_ip_limit: number

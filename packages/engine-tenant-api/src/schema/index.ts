@@ -278,6 +278,7 @@ export type ConfigInput = {
  */
 export type ConfigRateLimits = {
 	readonly __typename?: 'ConfigRateLimits'
+	readonly loginPerIp: ConfigRateLimitWindow
 	readonly passwordResetMailPerEmail: ConfigRateLimitWindow
 	readonly passwordResetPerIp: ConfigRateLimitWindow
 	readonly passwordlessInitMailPerEmail: ConfigRateLimitWindow
@@ -286,6 +287,7 @@ export type ConfigRateLimits = {
 }
 
 export type ConfigRateLimitsInput = {
+	readonly loginPerIp?: InputMaybe<ConfigRateLimitWindowInput>
 	readonly passwordResetMailPerEmail?: InputMaybe<ConfigRateLimitWindowInput>
 	readonly passwordResetPerIp?: InputMaybe<ConfigRateLimitWindowInput>
 	readonly passwordlessInitMailPerEmail?: InputMaybe<ConfigRateLimitWindowInput>
@@ -2235,6 +2237,7 @@ export type ConfigRateLimitsResolvers<
 	ContextType = any,
 	ParentType extends ResolversParentTypes['ConfigRateLimits'] = ResolversParentTypes['ConfigRateLimits'],
 > = {
+	loginPerIp?: Resolver<ResolversTypes['ConfigRateLimitWindow'], ParentType, ContextType>
 	passwordResetMailPerEmail?: Resolver<ResolversTypes['ConfigRateLimitWindow'], ParentType, ContextType>
 	passwordResetPerIp?: Resolver<ResolversTypes['ConfigRateLimitWindow'], ParentType, ContextType>
 	passwordlessInitMailPerEmail?: Resolver<ResolversTypes['ConfigRateLimitWindow'], ParentType, ContextType>

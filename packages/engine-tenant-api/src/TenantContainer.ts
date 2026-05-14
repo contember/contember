@@ -237,7 +237,7 @@ export class TenantContainerFactory {
 			.addService('signUpMutationResolver', ({ signUpManager, apiKeyManager }) => new SignUpMutationResolver(signUpManager, apiKeyManager))
 			.addService(
 				'signInMutationResolver',
-				({ signInManager, signInResponseFactory }) => new SignInMutationResolver(signInManager, signInResponseFactory),
+				({ signInManager, signInResponseFactory, rateLimiter }) => new SignInMutationResolver(signInManager, signInResponseFactory, rateLimiter),
 			)
 			.addService('signOutMutationResolver', ({ apiKeyManager }) => new SignOutMutationResolver(apiKeyManager))
 			.addService('changeProfileMutationResolver', ({ personManager }) => new ChangeProfileMutationResolver(personManager))

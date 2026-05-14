@@ -8,6 +8,8 @@ const sql = `
         ADD COLUMN "captcha_threshold"   DOUBLE PRECISION,
         ADD COLUMN "rate_limit_sign_up_per_ip_limit"                     INTEGER  NOT NULL DEFAULT 10,
         ADD COLUMN "rate_limit_sign_up_per_ip_window"                    INTERVAL NOT NULL DEFAULT '1 hour',
+        ADD COLUMN "rate_limit_login_per_ip_limit"                       INTEGER  NOT NULL DEFAULT 60,
+        ADD COLUMN "rate_limit_login_per_ip_window"                      INTERVAL NOT NULL DEFAULT '1 hour',
         ADD COLUMN "rate_limit_password_reset_per_ip_limit"              INTEGER  NOT NULL DEFAULT 20,
         ADD COLUMN "rate_limit_password_reset_per_ip_window"             INTERVAL NOT NULL DEFAULT '1 hour',
         ADD COLUMN "rate_limit_passwordless_init_per_ip_limit"           INTEGER  NOT NULL DEFAULT 20,

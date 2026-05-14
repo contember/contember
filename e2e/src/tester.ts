@@ -110,8 +110,7 @@ const ensureTenantBootstrapped = (tenantClient: TenantClient) => {
 }
 
 const relaxTenantLimits = async (tenantClient: TenantClient) => {
-	const window = '24 hours'
-	const highCeiling = { limit: 100000, window }
+	const highCeiling = { limit: 100000, window: 'PT24H' }
 	const result = await tenantClient.send(
 		TenantApi.mutation$.configure(TenantApi.configureResponse$$),
 		{

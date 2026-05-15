@@ -89,7 +89,7 @@ export class ApiKeyManager {
 		requestInfo?: ApiKeyRequestInfo,
 		trustForwardedInfo?: boolean,
 	): Promise<string> {
-		const config = await dbContext.queryHandler.fetch(new ConfigurationQuery())
+		const config = await dbContext.queryHandler.fetch(new ConfigurationQuery(dbContext.providers))
 		const expirationResolved = expiration ?? (intervalToSeconds(config.login.defaultTokenExpiration) / 60)
 		const expirationCapped = config.login.maxTokenExpiration
 			? Math.min(expirationResolved, intervalToSeconds(config.login.maxTokenExpiration) / 60)

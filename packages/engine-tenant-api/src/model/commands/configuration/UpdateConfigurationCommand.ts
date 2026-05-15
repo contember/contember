@@ -10,9 +10,24 @@ export class UpdateConfigurationCommand implements Command<void> {
 	) {
 	}
 
-	async execute({ db }: Command.Args): Promise<void> {
+	async execute({ db, providers }: Command.Args): Promise<void> {
 		const captcha = this.configuration.captcha
 		const rl = this.configuration.rateLimits
+
+		// Encrypt captcha secret at rest. Empty string clears the value;
+		// non-empty re-encrypts so we always rotate to the latest key version.
+		let captchaSecretCol: Buffer | null | undefined
+		let captchaSecretVersionCol: number | null | undefined
+		if (captcha?.secret !== undefined) {
+			if (captcha.secret === '' || captcha.secret === null) {
+				captchaSecretCol = null
+				captchaSecretVersionCol = null
+			} else {
+				const encrypted = await providers.encrypt(Buffer.from(captcha.secret, 'utf8'))
+				captchaSecretCol = encrypted.value
+				captchaSecretVersionCol = encrypted.version
+			}
+		}
 
 		const result = await UpdateBuilder.create()
 			.table('config')
@@ -37,7 +52,8 @@ export class UpdateConfigurationCommand implements Command<void> {
 					login_default_token_expiration: this.configuration.login?.defaultTokenExpiration ?? undefined,
 					login_max_token_expiration: this.configuration.login?.maxTokenExpiration,
 					captcha_provider: captcha?.provider !== undefined ? captcha.provider : undefined,
-					captcha_secret: captcha?.secret !== undefined ? (captcha.secret === '' ? null : captcha.secret) : undefined,
+					captcha_secret: captchaSecretCol,
+					captcha_secret_version: captchaSecretVersionCol,
 					captcha_threshold: captcha?.threshold !== undefined ? captcha.threshold : undefined,
 					rate_limit_sign_up_per_ip_limit: rl?.signUpPerIp?.limit ?? undefined,
 					rate_limit_sign_up_per_ip_window: rl?.signUpPerIp?.window ?? undefined,

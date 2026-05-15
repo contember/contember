@@ -101,7 +101,8 @@ CREATE TABLE "config" (
     "login_default_token_expiration" interval DEFAULT '00:30:00'::interval NOT NULL,
     "login_max_token_expiration" interval DEFAULT '6 mons'::interval,
     "captcha_provider" "text",
-    "captcha_secret" "text",
+    "captcha_secret" "bytea",
+    "captcha_secret_version" integer,
     "captcha_threshold" double precision,
     "rate_limit_sign_up_per_ip_limit" integer DEFAULT 0 NOT NULL,
     "rate_limit_sign_up_per_ip_window" interval DEFAULT '01:00:00'::interval NOT NULL,
@@ -114,7 +115,7 @@ CREATE TABLE "config" (
     CONSTRAINT "config_captcha_provider_check"
         CHECK ("captcha_provider" IS NULL OR "captcha_provider" IN ('turnstile', 'hcaptcha', 'recaptchaV3')),
     CONSTRAINT "config_captcha_complete"
-        CHECK ("captcha_provider" IS NULL OR "captcha_secret" IS NOT NULL)
+        CHECK ("captcha_provider" IS NULL OR ("captcha_secret" IS NOT NULL AND "captcha_secret_version" IS NOT NULL))
 );
 CREATE TABLE "rate_limit_event" (
     "id" "uuid" NOT NULL,

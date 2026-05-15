@@ -27,7 +27,7 @@ export class SignUpManager {
 
 	async signUp(dbContext: DatabaseContext, args: SignUpUser): Promise<SignUpResponse> {
 		const { email, password, roles = [] } = args
-		const config = await dbContext.queryHandler.fetch(new ConfigurationQuery())
+		const config = await dbContext.queryHandler.fetch(new ConfigurationQuery(dbContext.providers))
 
 		if (!isEmailFormatValid(email.trim())) {
 			return new ResponseError('INVALID_EMAIL_FORMAT', 'E-mail address is not in a valid format')

@@ -38,7 +38,7 @@ class PasswordlessSignInManager {
 		mailProject?: string
 	}): Promise<PasswordlessSignInManager.InitSignInPasswordlessResponse> {
 		return db.transaction(async (db): Promise<PasswordlessSignInManager.InitSignInPasswordlessResponse> => {
-			const configuration = await db.queryHandler.fetch(new ConfigurationQuery())
+			const configuration = await db.queryHandler.fetch(new ConfigurationQuery(db.providers))
 			if (configuration.passwordless.enabled === 'never') {
 				return new ResponseError('PASSWORDLESS_DISABLED', 'Passwordless sign-in is disabled', {
 					[AuthLogService.Key]: new AuthLogService.Bag({}),

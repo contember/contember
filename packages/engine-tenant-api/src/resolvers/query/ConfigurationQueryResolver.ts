@@ -15,6 +15,6 @@ export class ConfigurationQueryResolver implements Pick<QueryResolvers, 'configu
 			message: 'You are not allowed to view configuration',
 		})
 
-		return await context.db.queryHandler.fetch(new ConfigurationQuery())
+		return await context.db.queryHandler.fetch(new ConfigurationQuery(context.db.providers))
 	}
 }

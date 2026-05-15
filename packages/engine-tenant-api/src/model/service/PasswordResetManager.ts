@@ -65,7 +65,7 @@ export class PasswordResetManager {
 	}
 
 	public async resetPassword(dbContext: DatabaseContext, token: string, password: string): Promise<ResetPasswordResponse> {
-		const config = await dbContext.queryHandler.fetch(new ConfigurationQuery())
+		const config = await dbContext.queryHandler.fetch(new ConfigurationQuery(dbContext.providers))
 		const tokenRow = await dbContext.queryHandler.fetch(PersonTokenQuery.byToken(token, 'password_reset'))
 		if (!tokenRow) {
 			return new ResponseError('TOKEN_NOT_FOUND', 'Token not found', {

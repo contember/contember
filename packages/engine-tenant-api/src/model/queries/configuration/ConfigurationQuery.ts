@@ -1,7 +1,12 @@
 import { DatabaseQuery, DatabaseQueryable, Literal, SelectBuilder } from '@contember/database'
 import { Config, ConfigRow } from '../../type/Config'
+import { Providers } from '../../providers'
 
 export class ConfigurationQuery extends DatabaseQuery<Config> {
+	constructor(private readonly providers: Providers) {
+		super()
+	}
+
 	async fetch({ db }: DatabaseQueryable): Promise<Config> {
 		const rows = await SelectBuilder.create<ConfigRow>()
 			.from('config')
@@ -11,6 +16,10 @@ export class ConfigurationQuery extends DatabaseQuery<Config> {
 		if (!result) {
 			throw new Error('Configuration not found')
 		}
+
+		const captchaSecret = result.captcha_secret !== null && result.captcha_secret_version !== null
+			? (await this.providers.decrypt(result.captcha_secret, result.captcha_secret_version)).value.toString('utf8')
+			: null
 
 		return {
 			passwordless: {
@@ -40,7 +49,7 @@ export class ConfigurationQuery extends DatabaseQuery<Config> {
 				provider: result.captcha_provider,
 				threshold: result.captcha_threshold,
 			},
-			captchaSecret: result.captcha_secret,
+			captchaSecret,
 			rateLimits: {
 				signUpPerIp: {
 					limit: result.rate_limit_sign_up_per_ip_limit,

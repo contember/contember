@@ -20,7 +20,7 @@ export class SignInMutationResolver implements MutationResolvers {
 			message: 'You are not allowed to sign in',
 		})
 
-		const configuration = await context.db.queryHandler.fetch(new ConfigurationQuery())
+		const configuration = await context.db.queryHandler.fetch(new ConfigurationQuery(context.db.providers))
 
 		const ipGate = await this.rateLimiter.consume(context.db, 'login_per_ip', context.httpInfo?.ip, configuration)
 		if (!ipGate.ok) {

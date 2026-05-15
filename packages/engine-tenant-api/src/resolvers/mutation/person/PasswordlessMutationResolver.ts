@@ -33,7 +33,7 @@ export class PasswordlessMutationResolver
 			message: 'You are not allowed to request passwordless sign in',
 		})
 
-		const configuration = await context.db.queryHandler.fetch(new ConfigurationQuery())
+		const configuration = await context.db.queryHandler.fetch(new ConfigurationQuery(context.db.providers))
 
 		const rl = await this.rateLimiter.consume(context.db, 'passwordless_init_per_ip', context.httpInfo?.ip, configuration)
 		if (!rl.ok) {

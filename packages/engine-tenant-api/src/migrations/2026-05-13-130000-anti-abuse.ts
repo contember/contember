@@ -3,9 +3,10 @@ import { MigrationBuilder } from '@contember/database-migrations'
 const sql = `
     ALTER TABLE "config"
         ADD COLUMN "password_check_hibp" BOOLEAN NOT NULL DEFAULT FALSE,
-        ADD COLUMN "captcha_provider"    TEXT,
-        ADD COLUMN "captcha_secret"      TEXT,
-        ADD COLUMN "captcha_threshold"   DOUBLE PRECISION,
+        ADD COLUMN "captcha_provider"        TEXT,
+        ADD COLUMN "captcha_secret"          BYTEA,
+        ADD COLUMN "captcha_secret_version"  INTEGER,
+        ADD COLUMN "captcha_threshold"       DOUBLE PRECISION,
         -- limit = 0 disables the throttle (see RateLimiter.check). Tenants opt
         -- in by calling configure() with explicit values; upgrading the engine
         -- alone must not change behavior for existing deployments.
@@ -20,7 +21,7 @@ const sql = `
         ADD CONSTRAINT "config_captcha_provider_check"
             CHECK ("captcha_provider" IS NULL OR "captcha_provider" IN ('turnstile', 'hcaptcha', 'recaptchaV3')),
         ADD CONSTRAINT "config_captcha_complete"
-            CHECK ("captcha_provider" IS NULL OR "captcha_secret" IS NOT NULL);
+            CHECK ("captcha_provider" IS NULL OR ("captcha_secret" IS NOT NULL AND "captcha_secret_version" IS NOT NULL));
 
     CREATE TABLE "rate_limit_event" (
         "id"          UUID PRIMARY KEY,

@@ -21,7 +21,7 @@ export class SignUpMutationResolver implements MutationResolvers {
 			message: 'You are not allowed to sign up',
 		})
 
-		const configuration = await context.db.queryHandler.fetch(new ConfigurationQuery())
+		const configuration = await context.db.queryHandler.fetch(new ConfigurationQuery(context.db.providers))
 
 		const rl = await this.rateLimiter.consume(context.db, 'sign_up_per_ip', context.httpInfo?.ip, configuration)
 		if (!rl.ok) {

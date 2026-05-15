@@ -38,7 +38,7 @@ export class ResetPasswordMutationResolver implements MutationResolvers {
 			message: 'You are not allowed to initialize reset password request',
 		})
 
-		const configuration = await context.db.queryHandler.fetch(new ConfigurationQuery())
+		const configuration = await context.db.queryHandler.fetch(new ConfigurationQuery(context.db.providers))
 
 		const rl = await this.rateLimiter.consume(context.db, 'password_reset_per_ip', context.httpInfo?.ip, configuration)
 		if (!rl.ok) {

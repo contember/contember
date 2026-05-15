@@ -7,8 +7,6 @@ import { DatabaseContext } from '../utils'
 import { MaybePassword } from '../dtos'
 import { EmailValidator } from './EmailValidator'
 import { PasswordStrengthValidator } from './PasswordStrengthValidator'
-import { CaptchaValidator } from './captcha'
-import { RateLimiter } from './RateLimiter'
 import { UserMailer } from '../mailing'
 import { validateEmail as isEmailFormatValid } from '../utils/email'
 
@@ -17,39 +15,19 @@ type SignUpUser = {
 	name?: string
 	password: MaybePassword
 	roles?: readonly string[]
-	captchaToken?: string | null
-	remoteIp?: string
 }
 
 export class SignUpManager {
 	constructor(
 		private readonly emailValidator: EmailValidator,
 		private readonly passwordStrengthValidator: PasswordStrengthValidator,
-		private readonly captchaValidator: CaptchaValidator,
-		private readonly rateLimiter: RateLimiter,
 		private readonly userMailer: UserMailer,
 	) {
 	}
 
 	async signUp(dbContext: DatabaseContext, args: SignUpUser): Promise<SignUpResponse> {
-		const { email, password, roles = [], captchaToken, remoteIp } = args
+		const { email, password, roles = [] } = args
 		const config = await dbContext.queryHandler.fetch(new ConfigurationQuery())
-
-		const rl = await this.rateLimiter.consume(dbContext, 'sign_up_per_ip', remoteIp, config)
-		if (!rl.ok) {
-			return new ResponseError(
-				'RATE_LIMIT_EXCEEDED',
-				`Too many sign-up attempts. Retry after ${rl.retryAfterSeconds}s.`,
-			)
-		}
-
-		const captchaConfig = this.captchaValidator.extractConfig(config)
-		if (this.captchaValidator.isEnabled(captchaConfig)) {
-			const captcha = await this.captchaValidator.verify({ config: captchaConfig, token: captchaToken, remoteIp })
-			if (!captcha.ok) {
-				return new ResponseError('INVALID_CAPTCHA', `Captcha verification failed: ${captcha.reason}`)
-			}
-		}
 
 		if (!isEmailFormatValid(email.trim())) {
 			return new ResponseError('INVALID_EMAIL_FORMAT', 'E-mail address is not in a valid format')

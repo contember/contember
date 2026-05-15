@@ -173,8 +173,8 @@ export class TenantContainerFactory {
 			.addService('rateLimiter', ({ providers }) => new RateLimiter(providers))
 			.addService(
 				'signUpManager',
-				({ emailValidator, passwordStrengthValidator, captchaValidator, rateLimiter, userMailer }) =>
-					new SignUpManager(emailValidator, passwordStrengthValidator, captchaValidator, rateLimiter, userMailer),
+				({ emailValidator, passwordStrengthValidator, userMailer }) =>
+					new SignUpManager(emailValidator, passwordStrengthValidator, userMailer),
 			)
 			.addService('passwordChangeManager', ({ providers, passwordStrengthValidator }) => new PasswordChangeManager(providers, passwordStrengthValidator))
 			.addService('projectMemberManager', () => new ProjectMemberManager())
@@ -237,7 +237,11 @@ export class TenantContainerFactory {
 				({ projectManager, projectMemberManager }) => new ProjectMembersQueryResolver(projectManager, projectMemberManager),
 			)
 			.addService('mailTemplateQueryResolver', () => new MailTemplateQueryResolver())
-			.addService('signUpMutationResolver', ({ signUpManager, apiKeyManager }) => new SignUpMutationResolver(signUpManager, apiKeyManager))
+			.addService(
+				'signUpMutationResolver',
+				({ signUpManager, apiKeyManager, captchaValidator, rateLimiter }) =>
+					new SignUpMutationResolver(signUpManager, apiKeyManager, captchaValidator, rateLimiter),
+			)
 			.addService(
 				'signInMutationResolver',
 				({ signInManager, signInResponseFactory, rateLimiter }) => new SignInMutationResolver(signInManager, signInResponseFactory, rateLimiter),

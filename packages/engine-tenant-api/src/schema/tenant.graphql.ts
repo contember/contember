@@ -248,6 +248,12 @@ const schema: DocumentNode = gql`
 		the resulting session token will trust X-Contember-Client-IP and
 		X-Contember-Client-User-Agent headers on subsequent requests.
 		Silently ignored when the caller's api_key does not have the flag.
+
+		Security: a proxy that sets these headers MUST strip any
+		incoming X-Contember-Client-IP / X-Contember-Client-User-Agent
+		from upstream traffic and re-inject values it trusts. Without
+		that, any client holding a session token minted with this flag
+		could spoof its own IP/User-Agent.
 		"""
 		trustForwardedClientInfo: Boolean
 	}

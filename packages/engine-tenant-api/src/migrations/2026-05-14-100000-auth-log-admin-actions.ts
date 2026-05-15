@@ -13,8 +13,6 @@ ALTER TYPE auth_log_type ADD VALUE IF NOT EXISTS 'project_secret_change';
 ALTER TYPE auth_log_type ADD VALUE IF NOT EXISTS 'mail_template_change';
 ALTER TYPE auth_log_type ADD VALUE IF NOT EXISTS 'tenant_config_change';
 ALTER TYPE auth_log_type ADD VALUE IF NOT EXISTS 'person_invite';
-ALTER TYPE auth_log_type ADD VALUE IF NOT EXISTS 'person_merge';
-ALTER TYPE auth_log_type ADD VALUE IF NOT EXISTS 'person_anonymize';
 `
 
 export default async function(builder: MigrationBuilder) {

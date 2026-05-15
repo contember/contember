@@ -36,9 +36,7 @@ CREATE TYPE "auth_log_type" AS ENUM (
     'project_secret_change',
     'mail_template_change',
     'tenant_config_change',
-    'person_invite',
-    'person_merge',
-    'person_anonymize'
+    'person_invite'
 );
 CREATE TYPE "config_policy" AS ENUM (
     'always',

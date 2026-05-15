@@ -31,5 +31,3 @@ export type AuthActionType =
 	| 'mail_template_change'
 	| 'tenant_config_change'
 	| 'person_invite'
-	| 'person_merge'
-	| 'person_anonymize'

@@ -2,8 +2,13 @@ import { Config } from '../type/Config'
 import { blacklist } from '../utils/blacklist'
 import { WeakPasswordReason } from '../../schema'
 import { Response, ResponseError, ResponseOk } from '../utils/Response'
+import { HibpChecker, NoopHibpChecker } from './HibpChecker'
 
 export class PasswordStrengthValidator {
+	constructor(
+		private readonly hibpChecker: HibpChecker = new NoopHibpChecker(),
+	) {}
+
 	public async verify<const Code extends string>(
 		password: string,
 		passwordConfig: Config['password'],
@@ -56,6 +61,11 @@ export class PasswordStrengthValidator {
 		if (passwordConfig.checkBlacklist && this.isBlacklisted(password.toLowerCase())) {
 			failureReasons.push('BLACKLISTED')
 			developerMessage.push(`Password is blacklisted.`)
+		}
+
+		if (passwordConfig.checkHibp && await this.hibpChecker.isCompromised(password)) {
+			failureReasons.push('COMPROMISED')
+			developerMessage.push(`Password has appeared in a known data breach.`)
 		}
 
 		if (failureReasons.length > 0) {

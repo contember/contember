@@ -11,6 +11,7 @@ import { PasswordStrengthValidator } from './PasswordStrengthValidator'
 import { ResetPasswordErrorCode, WeakPasswordReason } from '../../schema'
 import { PersonTokenQuery } from '../queries/personToken/PersonTokenQuery'
 import { AuthLogService } from './AuthLogService'
+import { NextMailAttemptQuery } from '../queries/authLog/NextMailAttemptQuery'
 
 interface MailOptions {
 	project?: string
@@ -30,12 +31,23 @@ export class PasswordResetManager {
 		person: PersonRow,
 		mailOptions: MailOptions = {},
 	): Promise<void> {
-		const result = await dbContext.commandBus.execute(CreatePersonTokenCommand.createPasswordResetRequest(person.id))
-		const projects = await this.projectManager.getProjectsByIdentity(dbContext, person.identity_id, permissionContext)
-		const project = getPreferredProject(projects, mailOptions.project ?? null)
 		if (!person.email) {
 			throw new ImplementationException()
 		}
+
+		// Per-email exponential backoff on outbound mails — don't spam a real
+		// user with reset mails just because attackers keep poking the
+		// endpoint. Reuses login_* backoff config against person_auth_log.
+		const nextAllowed = await dbContext.queryHandler.fetch(
+			new NextMailAttemptQuery(person.email, 'password_reset_init', 'password_reset'),
+		)
+		if (nextAllowed > new Date()) {
+			return
+		}
+
+		const result = await dbContext.commandBus.execute(CreatePersonTokenCommand.createPasswordResetRequest(person.id))
+		const projects = await this.projectManager.getProjectsByIdentity(dbContext, person.identity_id, permissionContext)
+		const project = getPreferredProject(projects, mailOptions.project ?? null)
 
 		await this.mailer.sendPasswordResetEmail(
 			dbContext,

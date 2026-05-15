@@ -231,15 +231,77 @@ export type CommonSignInResult = {
 
 export type Config = {
 	readonly __typename?: 'Config'
+	readonly captcha: ConfigCaptcha
 	readonly login: ConfigLogin
 	readonly password: ConfigPassword
 	readonly passwordless: ConfigPasswordless
+	readonly rateLimits: ConfigRateLimits
 }
 
+/**
+ * Captcha config. The secret is never exposed; only the provider and (where
+ * applicable) the threshold are readable.
+ */
+export type ConfigCaptcha = {
+	readonly __typename?: 'ConfigCaptcha'
+	readonly provider?: Maybe<CaptchaProvider>
+	readonly threshold?: Maybe<Scalars['Float']['output']>
+}
+
+/**
+ * Provider null disables captcha verification. Secret is write-only.
+ * Pass null secret to leave the stored value unchanged; pass empty string to clear.
+ */
+export type ConfigCaptchaInput = {
+	readonly provider?: InputMaybe<CaptchaProvider>
+	readonly secret?: InputMaybe<Scalars['String']['input']>
+	readonly threshold?: InputMaybe<Scalars['Float']['input']>
+}
+
+export type CaptchaProvider =
+	| 'hcaptcha'
+	| 'recaptchaV3'
+	| 'turnstile'
+
 export type ConfigInput = {
+	readonly captcha?: InputMaybe<ConfigCaptchaInput>
 	readonly login?: InputMaybe<ConfigLoginInput>
 	readonly password?: InputMaybe<ConfigPasswordInput>
 	readonly passwordless?: InputMaybe<ConfigPasswordlessInput>
+	readonly rateLimits?: InputMaybe<ConfigRateLimitsInput>
+}
+
+/**
+ * Configurable per-IP rate-limit windows. Each value bounds the number of
+ * attempts allowed from the same client IP in the configured window. Per-email
+ * throttling for password-reset and passwordless-init flows reuses the
+ * exponential backoff from ConfigLogin (baseBackoff / maxBackoff /
+ * attemptWindow) against person_auth_log entries.
+ */
+export type ConfigRateLimits = {
+	readonly __typename?: 'ConfigRateLimits'
+	readonly loginPerIp: ConfigRateLimitWindow
+	readonly passwordResetPerIp: ConfigRateLimitWindow
+	readonly passwordlessInitPerIp: ConfigRateLimitWindow
+	readonly signUpPerIp: ConfigRateLimitWindow
+}
+
+export type ConfigRateLimitsInput = {
+	readonly loginPerIp?: InputMaybe<ConfigRateLimitWindowInput>
+	readonly passwordResetPerIp?: InputMaybe<ConfigRateLimitWindowInput>
+	readonly passwordlessInitPerIp?: InputMaybe<ConfigRateLimitWindowInput>
+	readonly signUpPerIp?: InputMaybe<ConfigRateLimitWindowInput>
+}
+
+export type ConfigRateLimitWindow = {
+	readonly __typename?: 'ConfigRateLimitWindow'
+	readonly limit: Scalars['Int']['output']
+	readonly window: Scalars['Interval']['output']
+}
+
+export type ConfigRateLimitWindowInput = {
+	readonly limit?: InputMaybe<Scalars['Int']['input']>
+	readonly window?: InputMaybe<Scalars['Interval']['input']>
 }
 
 export type ConfigLogin = {
@@ -264,6 +326,7 @@ export type ConfigLoginInput = {
 export type ConfigPassword = {
 	readonly __typename?: 'ConfigPassword'
 	readonly checkBlacklist: Scalars['Boolean']['output']
+	readonly checkHibp: Scalars['Boolean']['output']
 	readonly minLength: Scalars['Int']['output']
 	readonly pattern?: Maybe<Scalars['String']['output']>
 	readonly requireDigit: Scalars['Int']['output']
@@ -274,6 +337,7 @@ export type ConfigPassword = {
 
 export type ConfigPasswordInput = {
 	readonly checkBlacklist?: InputMaybe<Scalars['Boolean']['input']>
+	readonly checkHibp?: InputMaybe<Scalars['Boolean']['input']>
 	readonly minLength?: InputMaybe<Scalars['Int']['input']>
 	readonly pattern?: InputMaybe<Scalars['String']['input']>
 	readonly requireDigit?: InputMaybe<Scalars['Int']['input']>
@@ -377,7 +441,10 @@ export type CreatePasswordResetRequestError = {
 	readonly endUserMessage?: Maybe<Scalars['String']['output']>
 }
 
-export type CreatePasswordResetRequestErrorCode = 'PERSON_NOT_FOUND'
+export type CreatePasswordResetRequestErrorCode =
+	| 'INVALID_CAPTCHA'
+	| 'PERSON_NOT_FOUND'
+	| 'RATE_LIMIT_EXCEEDED'
 
 export type CreatePasswordResetRequestResponse = {
 	readonly __typename?: 'CreatePasswordResetRequestResponse'
@@ -650,8 +717,10 @@ export type InitSignInPasswordlessError = {
 }
 
 export type InitSignInPasswordlessErrorCode =
+	| 'INVALID_CAPTCHA'
 	| 'PASSWORDLESS_DISABLED'
 	| 'PERSON_NOT_FOUND'
+	| 'RATE_LIMIT_EXCEEDED'
 
 export type InitSignInPasswordlessOptions = {
 	readonly mailProject?: InputMaybe<Scalars['String']['input']>
@@ -746,6 +815,13 @@ export type MailType =
 	| 'FORCED_SIGN_OUT'
 	| 'NEW_USER_INVITED'
 	| 'PASSWORDLESS_SIGN_IN'
+	/**
+	 * Silent notice sent when somebody attempts to sign up using an email
+	 * that is already registered while revealUserExists is false. Lets the
+	 * legitimate owner know an attempt occurred without leaking existence
+	 * back to the attacker.
+	 */
+	| 'REGISTRATION_ATTEMPT_EXISTING_USER'
 	| 'RESET_PASSWORD_REQUEST'
 
 export type MemberType =
@@ -913,6 +989,7 @@ export type MutationCreateProjectArgs = {
 }
 
 export type MutationCreateResetPasswordRequestArgs = {
+	captchaToken?: InputMaybe<Scalars['String']['input']>
 	email: Scalars['String']['input']
 	options?: InputMaybe<CreateResetPasswordRequestOptions>
 }
@@ -947,6 +1024,7 @@ export type MutationInitSignInIdpArgs = {
 }
 
 export type MutationInitSignInPasswordlessArgs = {
+	captchaToken?: InputMaybe<Scalars['String']['input']>
 	email: Scalars['String']['input']
 	options?: InputMaybe<InitSignInPasswordlessOptions>
 }
@@ -1033,6 +1111,7 @@ export type MutationSignOutArgs = {
 }
 
 export type MutationSignUpArgs = {
+	captchaToken?: InputMaybe<Scalars['String']['input']>
 	email: Scalars['String']['input']
 	name?: InputMaybe<Scalars['String']['input']>
 	password?: InputMaybe<Scalars['String']['input']>
@@ -1415,13 +1494,24 @@ export type SignUpError = {
 	readonly developerMessage: Scalars['String']['output']
 	/** @deprecated Field no longer supported */
 	readonly endPersonMessage?: Maybe<Scalars['String']['output']>
+	/**
+	 * For EMAIL_ALREADY_EXISTS, the recommended next action client UIs should
+	 * offer to the visitor. Null for unrelated error codes.
+	 */
+	readonly recommendedAction?: Maybe<SignUpRecommendedAction>
 	readonly weakPasswordReasons?: Maybe<ReadonlyArray<WeakPasswordReason>>
 }
 
 export type SignUpErrorCode =
 	| 'EMAIL_ALREADY_EXISTS'
+	| 'INVALID_CAPTCHA'
 	| 'INVALID_EMAIL_FORMAT'
+	| 'RATE_LIMIT_EXCEEDED'
 	| 'TOO_WEAK'
+
+export type SignUpRecommendedAction =
+	| 'RESET_PASSWORD'
+	| 'SIGN_IN'
 
 export type SignUpResponse = {
 	readonly __typename?: 'SignUpResponse'
@@ -1526,6 +1616,7 @@ export type VariableEntryInput = {
 
 export type WeakPasswordReason =
 	| 'BLACKLISTED'
+	| 'COMPROMISED'
 	| 'INVALID_PATTERN'
 	| 'MISSING_DIGIT'
 	| 'MISSING_LOWERCASE'
@@ -1643,7 +1734,10 @@ export type ResolversTypes = {
 	CheckResetPasswordTokenCode: CheckResetPasswordTokenCode
 	CheckResetPasswordTokenResult: ResolverTypeWrapper<CheckResetPasswordTokenResult>
 	CommonSignInResult: ResolverTypeWrapper<ResolversInterfaceTypes<ResolversTypes>['CommonSignInResult']>
+	CaptchaProvider: CaptchaProvider
 	Config: ResolverTypeWrapper<Config>
+	ConfigCaptcha: ResolverTypeWrapper<ConfigCaptcha>
+	ConfigCaptchaInput: ConfigCaptchaInput
 	ConfigInput: ConfigInput
 	ConfigLogin: ResolverTypeWrapper<ConfigLogin>
 	ConfigLoginInput: ConfigLoginInput
@@ -1652,6 +1746,10 @@ export type ResolversTypes = {
 	ConfigPasswordless: ResolverTypeWrapper<ConfigPasswordless>
 	ConfigPasswordlessInput: ConfigPasswordlessInput
 	ConfigPolicy: ConfigPolicy
+	ConfigRateLimitWindow: ResolverTypeWrapper<ConfigRateLimitWindow>
+	ConfigRateLimitWindowInput: ConfigRateLimitWindowInput
+	ConfigRateLimits: ResolverTypeWrapper<ConfigRateLimits>
+	ConfigRateLimitsInput: ConfigRateLimitsInput
 	ConfigureError: ResolverTypeWrapper<ConfigureError>
 	ConfigureErrorCode: ConfigureErrorCode
 	ConfigureResponse: ResolverTypeWrapper<ConfigureResponse>
@@ -1699,6 +1797,7 @@ export type ResolversTypes = {
 	EnableIDPError: ResolverTypeWrapper<EnableIdpError>
 	EnableIDPErrorCode: EnableIdpErrorCode
 	EnableIDPResponse: ResolverTypeWrapper<EnableIdpResponse>
+	Float: ResolverTypeWrapper<Scalars['Float']['output']>
 	IDPOptions: IdpOptions
 	IDPOptionsOutput: ResolverTypeWrapper<IdpOptionsOutput>
 	IDPResponseInput: IdpResponseInput
@@ -1795,6 +1894,7 @@ export type ResolversTypes = {
 	SignOutResponse: ResolverTypeWrapper<SignOutResponse>
 	SignUpError: ResolverTypeWrapper<SignUpError>
 	SignUpErrorCode: SignUpErrorCode
+	SignUpRecommendedAction: SignUpRecommendedAction
 	SignUpResponse: ResolverTypeWrapper<SignUpResponse>
 	SignUpResult: ResolverTypeWrapper<SignUpResult>
 	String: ResolverTypeWrapper<Scalars['String']['output']>
@@ -1845,6 +1945,8 @@ export type ResolversParentTypes = {
 	CheckResetPasswordTokenResult: CheckResetPasswordTokenResult
 	CommonSignInResult: ResolversInterfaceTypes<ResolversParentTypes>['CommonSignInResult']
 	Config: Config
+	ConfigCaptcha: ConfigCaptcha
+	ConfigCaptchaInput: ConfigCaptchaInput
 	ConfigInput: ConfigInput
 	ConfigLogin: ConfigLogin
 	ConfigLoginInput: ConfigLoginInput
@@ -1852,6 +1954,10 @@ export type ResolversParentTypes = {
 	ConfigPasswordInput: ConfigPasswordInput
 	ConfigPasswordless: ConfigPasswordless
 	ConfigPasswordlessInput: ConfigPasswordlessInput
+	ConfigRateLimitWindow: ConfigRateLimitWindow
+	ConfigRateLimitWindowInput: ConfigRateLimitWindowInput
+	ConfigRateLimits: ConfigRateLimits
+	ConfigRateLimitsInput: ConfigRateLimitsInput
 	ConfigureError: ConfigureError
 	ConfigureResponse: ConfigureResponse
 	ConfirmOtpError: ConfirmOtpError
@@ -1886,6 +1992,7 @@ export type ResolversParentTypes = {
 	SessionInfo: SessionInfo
 	EnableIDPError: EnableIdpError
 	EnableIDPResponse: EnableIdpResponse
+	Float: Scalars['Float']['output']
 	IDPOptions: IdpOptions
 	IDPOptionsOutput: IdpOptionsOutput
 	IDPResponseInput: IdpResponseInput
@@ -2187,9 +2294,40 @@ export type CommonSignInResultResolvers<
 }
 
 export type ConfigResolvers<ContextType = any, ParentType extends ResolversParentTypes['Config'] = ResolversParentTypes['Config']> = {
+	captcha?: Resolver<ResolversTypes['ConfigCaptcha'], ParentType, ContextType>
 	login?: Resolver<ResolversTypes['ConfigLogin'], ParentType, ContextType>
 	password?: Resolver<ResolversTypes['ConfigPassword'], ParentType, ContextType>
 	passwordless?: Resolver<ResolversTypes['ConfigPasswordless'], ParentType, ContextType>
+	rateLimits?: Resolver<ResolversTypes['ConfigRateLimits'], ParentType, ContextType>
+	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
+}
+
+export type ConfigCaptchaResolvers<
+	ContextType = any,
+	ParentType extends ResolversParentTypes['ConfigCaptcha'] = ResolversParentTypes['ConfigCaptcha'],
+> = {
+	provider?: Resolver<Maybe<ResolversTypes['CaptchaProvider']>, ParentType, ContextType>
+	threshold?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>
+	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
+}
+
+export type ConfigRateLimitsResolvers<
+	ContextType = any,
+	ParentType extends ResolversParentTypes['ConfigRateLimits'] = ResolversParentTypes['ConfigRateLimits'],
+> = {
+	loginPerIp?: Resolver<ResolversTypes['ConfigRateLimitWindow'], ParentType, ContextType>
+	passwordResetPerIp?: Resolver<ResolversTypes['ConfigRateLimitWindow'], ParentType, ContextType>
+	passwordlessInitPerIp?: Resolver<ResolversTypes['ConfigRateLimitWindow'], ParentType, ContextType>
+	signUpPerIp?: Resolver<ResolversTypes['ConfigRateLimitWindow'], ParentType, ContextType>
+	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
+}
+
+export type ConfigRateLimitWindowResolvers<
+	ContextType = any,
+	ParentType extends ResolversParentTypes['ConfigRateLimitWindow'] = ResolversParentTypes['ConfigRateLimitWindow'],
+> = {
+	limit?: Resolver<ResolversTypes['Int'], ParentType, ContextType>
+	window?: Resolver<ResolversTypes['Interval'], ParentType, ContextType>
 	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
 }
 
@@ -2208,6 +2346,7 @@ export type ConfigPasswordResolvers<
 	ParentType extends ResolversParentTypes['ConfigPassword'] = ResolversParentTypes['ConfigPassword'],
 > = {
 	checkBlacklist?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
+	checkHibp?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
 	minLength?: Resolver<ResolversTypes['Int'], ParentType, ContextType>
 	pattern?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>
 	requireDigit?: Resolver<ResolversTypes['Int'], ParentType, ContextType>
@@ -3222,6 +3361,7 @@ export type SignUpErrorResolvers<ContextType = any, ParentType extends Resolvers
 	code?: Resolver<ResolversTypes['SignUpErrorCode'], ParentType, ContextType>
 	developerMessage?: Resolver<ResolversTypes['String'], ParentType, ContextType>
 	endPersonMessage?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>
+	recommendedAction?: Resolver<Maybe<ResolversTypes['SignUpRecommendedAction']>, ParentType, ContextType>
 	weakPasswordReasons?: Resolver<Maybe<ReadonlyArray<ResolversTypes['WeakPasswordReason']>>, ParentType, ContextType>
 	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
 }
@@ -3352,9 +3492,12 @@ export type Resolvers<ContextType = any> = {
 	CheckResetPasswordTokenResult?: CheckResetPasswordTokenResultResolvers<ContextType>
 	CommonSignInResult?: CommonSignInResultResolvers<ContextType>
 	Config?: ConfigResolvers<ContextType>
+	ConfigCaptcha?: ConfigCaptchaResolvers<ContextType>
 	ConfigLogin?: ConfigLoginResolvers<ContextType>
 	ConfigPassword?: ConfigPasswordResolvers<ContextType>
 	ConfigPasswordless?: ConfigPasswordlessResolvers<ContextType>
+	ConfigRateLimitWindow?: ConfigRateLimitWindowResolvers<ContextType>
+	ConfigRateLimits?: ConfigRateLimitsResolvers<ContextType>
 	ConfigureError?: ConfigureErrorResolvers<ContextType>
 	ConfigureResponse?: ConfigureResponseResolvers<ContextType>
 	ConfirmOtpError?: ConfirmOtpErrorResolvers<ContextType>

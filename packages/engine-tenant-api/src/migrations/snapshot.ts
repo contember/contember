@@ -93,12 +93,34 @@ CREATE TABLE "config" (
     "password_require_special" integer DEFAULT 0 NOT NULL,
     "password_pattern" "text",
     "password_check_blacklist" boolean DEFAULT true NOT NULL,
+    "password_check_hibp" boolean DEFAULT false NOT NULL,
     "login_base_backoff" interval DEFAULT '00:00:01'::interval NOT NULL,
     "login_max_backoff" interval DEFAULT '00:01:00'::interval NOT NULL,
     "login_attempt_window" interval DEFAULT '00:05:00'::interval NOT NULL,
     "login_reveal_user_exits" boolean DEFAULT true NOT NULL,
     "login_default_token_expiration" interval DEFAULT '00:30:00'::interval NOT NULL,
-    "login_max_token_expiration" interval DEFAULT '6 mons'::interval
+    "login_max_token_expiration" interval DEFAULT '6 mons'::interval,
+    "captcha_provider" "text",
+    "captcha_secret" "text",
+    "captcha_threshold" double precision,
+    "rate_limit_sign_up_per_ip_limit" integer DEFAULT 0 NOT NULL,
+    "rate_limit_sign_up_per_ip_window" interval DEFAULT '01:00:00'::interval NOT NULL,
+    "rate_limit_login_per_ip_limit" integer DEFAULT 0 NOT NULL,
+    "rate_limit_login_per_ip_window" interval DEFAULT '01:00:00'::interval NOT NULL,
+    "rate_limit_password_reset_per_ip_limit" integer DEFAULT 0 NOT NULL,
+    "rate_limit_password_reset_per_ip_window" interval DEFAULT '01:00:00'::interval NOT NULL,
+    "rate_limit_passwordless_init_per_ip_limit" integer DEFAULT 0 NOT NULL,
+    "rate_limit_passwordless_init_per_ip_window" interval DEFAULT '01:00:00'::interval NOT NULL,
+    CONSTRAINT "config_captcha_provider_check"
+        CHECK ("captcha_provider" IS NULL OR "captcha_provider" IN ('turnstile', 'hcaptcha', 'recaptchaV3')),
+    CONSTRAINT "config_captcha_complete"
+        CHECK ("captcha_provider" IS NULL OR "captcha_secret" IS NOT NULL)
+);
+CREATE TABLE "rate_limit_event" (
+    "id" "uuid" NOT NULL,
+    "scope" "text" NOT NULL,
+    "key_hash" bytea NOT NULL,
+    "occurred_at" timestamp with time zone DEFAULT now() NOT NULL
 );
 CREATE TABLE "identity" (
     "id" "uuid" NOT NULL,
@@ -238,6 +260,10 @@ ALTER TABLE ONLY "project_membership_variable"
     ADD CONSTRAINT "project_membership_variable_unique" UNIQUE ("membership_id", "variable");
 ALTER TABLE ONLY "project_secret"
     ADD CONSTRAINT "project_secret_pkey" PRIMARY KEY ("id");
+ALTER TABLE ONLY "rate_limit_event"
+    ADD CONSTRAINT "rate_limit_event_pkey" PRIMARY KEY ("id");
+CREATE INDEX "rate_limit_event_lookup" ON "rate_limit_event" USING "btree" ("scope", "key_hash", "occurred_at" DESC);
+CREATE INDEX "rate_limit_event_occurred_at_brin" ON "rate_limit_event" USING "brin" ("occurred_at");
 CREATE INDEX "api_key_identity_id" ON "api_key" USING "btree" ("identity_id");
 CREATE UNIQUE INDEX "api_key_token_hash" ON "api_key" USING "btree" ("token_hash");
 CREATE INDEX "identity_parent_id" ON "identity" USING "btree" ("parent_id");

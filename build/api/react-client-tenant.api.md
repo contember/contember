@@ -248,6 +248,7 @@ export const createApiKeyMutation: TenantApi.MutationFetcher<{
     readonly memberships: ReadonlyArray<TenantApi.MembershipInput>;
     readonly description: string;
     readonly tokenHash?: string;
+    readonly options?: TenantApi.CreateApiKeyOptions;
 }>;
 
 // Warning: (ae-forgotten-export) The symbol "createApiKeyMutationResult" needs to be exported by the entry point index.d.ts
@@ -291,6 +292,7 @@ export const createGlobalApiKeyMutation: TenantApi.MutationFetcher<{
     readonly description: string;
     readonly roles?: ReadonlyArray<string>;
     readonly tokenHash?: string;
+    readonly options?: TenantApi.CreateApiKeyOptions;
 }>;
 
 // Warning: (ae-forgotten-export) The symbol "createGlobalApiKeyMutationResult" needs to be exported by the entry point index.d.ts
@@ -317,6 +319,7 @@ export const createResetPasswordRequestMutation: TenantApi.MutationFetcher<{
 }, {
     readonly email: string;
     readonly options?: TenantApi.CreateResetPasswordRequestOptions;
+    readonly captchaToken?: string;
 }>;
 
 // @public (undocumented)
@@ -383,6 +386,7 @@ export const createSessionTokenMutation: TenantApi.MutationFetcher<{
     readonly email?: string;
     readonly personId?: string;
     readonly expiration?: number;
+    readonly options?: TenantApi.SignInOptions;
 }>;
 
 // Warning: (ae-forgotten-export) The symbol "createSessionTokenMutationResult" needs to be exported by the entry point index.d.ts
@@ -1144,6 +1148,7 @@ export const signInIDPMutation: TenantApi.MutationFetcher<{
     readonly identityProvider: string;
     readonly data?: unknown;
     readonly expiration?: number;
+    readonly options?: TenantApi.SignInOptions;
     readonly idpResponse?: TenantApi.IDPResponseInput;
     readonly redirectUrl?: string;
     readonly sessionData?: unknown;
@@ -1199,6 +1204,7 @@ export const signInMutation: TenantApi.MutationFetcher<{
     readonly password: string;
     readonly expiration?: number;
     readonly otpToken?: string;
+    readonly options?: TenantApi.SignInOptions;
 }>;
 
 // Warning: (ae-forgotten-export) The symbol "signInResultFragment" needs to be exported by the entry point index.d.ts
@@ -1402,6 +1408,7 @@ export const useCreateApiKeyMutation: (input?: TenantApiOptions) => (variables: 
     readonly memberships: ReadonlyArray<TenantApi.MembershipInput>;
     readonly description: string;
     readonly tokenHash?: string;
+    readonly options?: TenantApi.CreateApiKeyOptions;
 }) => Promise<TenantMutationResponse<    {
 readonly apiKey: {
 readonly id: string;
@@ -1423,6 +1430,7 @@ export const useCreateGlobalApiKeyMutation: (input?: TenantApiOptions) => (varia
     readonly description: string;
     readonly roles?: ReadonlyArray<string>;
     readonly tokenHash?: string;
+    readonly options?: TenantApi.CreateApiKeyOptions;
 }) => Promise<TenantMutationResponse<    {
 readonly apiKey: {
 readonly id: string;
@@ -1443,7 +1451,8 @@ readonly roles?: ReadonlyArray<string>;
 export const useCreateResetPasswordRequestMutation: (input?: TenantApiOptions) => (variables: {
     readonly email: string;
     readonly options?: TenantApi.CreateResetPasswordRequestOptions;
-}) => Promise<TenantMutationResponse<unknown, "PERSON_NOT_FOUND">>;
+    readonly captchaToken?: string;
+}) => Promise<TenantMutationResponse<unknown, TenantApi.CreatePasswordResetRequestErrorCode>>;
 
 // @public (undocumented)
 export const useCreateSessionTokenForm: () => CreateSessionTokenFormContextValue;
@@ -1453,6 +1462,7 @@ export const useCreateSessionTokenMutation: (input?: TenantApiOptions) => (varia
     readonly email?: string;
     readonly personId?: string;
     readonly expiration?: number;
+    readonly options?: TenantApi.SignInOptions;
 }) => Promise<TenantMutationResponse<    {
 readonly token: string;
 } & {
@@ -1516,6 +1526,7 @@ readonly idpConfiguration?: unknown;
 export const useInitSignInPasswordlessMutation: (input?: TenantApiOptions) => (variables: {
     readonly email: string;
     readonly options?: TenantApi.InitSignInPasswordlessOptions;
+    readonly captchaToken?: string;
 }) => Promise<TenantMutationResponse<    {
 readonly requestId: string;
 } & {
@@ -1638,6 +1649,7 @@ export const useSignInMutation: (input?: TenantApiOptions) => (variables: {
     readonly password: string;
     readonly expiration?: number;
     readonly otpToken?: string;
+    readonly options?: TenantApi.SignInOptions;
 }) => Promise<TenantMutationResponse<    {
 readonly token: string;
 } & {
@@ -1657,6 +1669,7 @@ export const useSignInPasswordlessMutation: (input?: TenantApiOptions) => (varia
     readonly token: string;
     readonly expiration?: number;
     readonly mfaOtp?: string;
+    readonly options?: TenantApi.SignInOptions;
 }) => Promise<TenantMutationResponse<    {
 readonly token: string;
 } & {

@@ -48,6 +48,7 @@ export class TenantResolverContextFactory {
 			},
 			db,
 			logger,
+			remoteIp: httpInfo.ip,
 		}
 	}
 }

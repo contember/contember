@@ -11,6 +11,9 @@ export class UpdateConfigurationCommand implements Command<void> {
 	}
 
 	async execute({ db }: Command.Args): Promise<void> {
+		const captcha = this.configuration.captcha
+		const rl = this.configuration.rateLimits
+
 		const result = await UpdateBuilder.create()
 			.table('config')
 			.where({ id: 'singleton' })
@@ -26,12 +29,24 @@ export class UpdateConfigurationCommand implements Command<void> {
 					password_require_special: this.configuration.password?.requireSpecial ?? undefined,
 					password_pattern: this.configuration.password?.pattern,
 					password_check_blacklist: this.configuration.password?.checkBlacklist ?? undefined,
+					password_check_hibp: this.configuration.password?.checkHibp ?? undefined,
 					login_base_backoff: this.configuration.login?.baseBackoff ?? undefined,
 					login_max_backoff: this.configuration.login?.maxBackoff ?? undefined,
 					login_attempt_window: this.configuration.login?.attemptWindow ?? undefined,
 					login_reveal_user_exits: this.configuration.login?.revealUserExists ?? undefined,
 					login_default_token_expiration: this.configuration.login?.defaultTokenExpiration ?? undefined,
 					login_max_token_expiration: this.configuration.login?.maxTokenExpiration,
+					captcha_provider: captcha?.provider !== undefined ? captcha.provider : undefined,
+					captcha_secret: captcha?.secret !== undefined ? (captcha.secret === '' ? null : captcha.secret) : undefined,
+					captcha_threshold: captcha?.threshold !== undefined ? captcha.threshold : undefined,
+					rate_limit_sign_up_per_ip_limit: rl?.signUpPerIp?.limit ?? undefined,
+					rate_limit_sign_up_per_ip_window: rl?.signUpPerIp?.window ?? undefined,
+					rate_limit_login_per_ip_limit: rl?.loginPerIp?.limit ?? undefined,
+					rate_limit_login_per_ip_window: rl?.loginPerIp?.window ?? undefined,
+					rate_limit_password_reset_per_ip_limit: rl?.passwordResetPerIp?.limit ?? undefined,
+					rate_limit_password_reset_per_ip_window: rl?.passwordResetPerIp?.window ?? undefined,
+					rate_limit_passwordless_init_per_ip_limit: rl?.passwordlessInitPerIp?.limit ?? undefined,
+					rate_limit_passwordless_init_per_ip_window: rl?.passwordlessInitPerIp?.window ?? undefined,
 				} satisfies {
 					[K in keyof ConfigRow]: (IPostgresInterval extends ConfigRow[K] ? string : never) | Exclude<ConfigRow[K], IPostgresInterval> | undefined
 				},

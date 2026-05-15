@@ -68,4 +68,6 @@ export const PasswordlessSignInInitForm = ({ children, onSuccess }: Passwordless
 const errorToField: Record<TenantApi.InitSignInPasswordlessErrorCode, keyof PasswordlessSignInInitFormValues | undefined> = {
 	PERSON_NOT_FOUND: 'email',
 	PASSWORDLESS_DISABLED: undefined,
+	RATE_LIMIT_EXCEEDED: undefined,
+	INVALID_CAPTCHA: undefined,
 }

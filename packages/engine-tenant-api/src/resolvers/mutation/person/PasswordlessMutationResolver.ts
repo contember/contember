@@ -8,7 +8,7 @@ import {
 	SignInPasswordlessResponse,
 } from '../../../schema'
 import { TenantResolverContext } from '../../TenantResolverContext'
-import { ConfigurationQuery, PermissionActions } from '../../../model'
+import { CaptchaValidator, ConfigurationQuery, PermissionActions, RateLimiter } from '../../../model'
 import { createErrorResponse } from '../../errorUtils'
 import { SignInResponseFactory } from '../../responseHelpers/SignInResponseFactory'
 import { PasswordlessSignInManager } from '../../../model/service/PasswordlessSignInManager'
@@ -19,6 +19,8 @@ export class PasswordlessMutationResolver
 	constructor(
 		private readonly passwordlessSignInManager: PasswordlessSignInManager,
 		private readonly signInResponseFactory: SignInResponseFactory,
+		private readonly captchaValidator: CaptchaValidator,
+		private readonly rateLimiter: RateLimiter,
 	) {}
 
 	async initSignInPasswordless(
@@ -30,6 +32,26 @@ export class PasswordlessMutationResolver
 			action: PermissionActions.PERSON_REQUEST_PASSWORDLESS_SIGN_IN,
 			message: 'You are not allowed to request passwordless sign in',
 		})
+
+		const configuration = await context.db.queryHandler.fetch(new ConfigurationQuery())
+
+		const rl = await this.rateLimiter.consume(context.db, 'passwordless_init_per_ip', context.remoteIp, configuration)
+		if (!rl.ok) {
+			return createErrorResponse('RATE_LIMIT_EXCEEDED', `Too many passwordless sign-in requests. Retry after ${rl.retryAfterSeconds}s.`)
+		}
+
+		const captchaConfig = this.captchaValidator.extractConfig(configuration)
+		if (this.captchaValidator.isEnabled(captchaConfig)) {
+			const captcha = await this.captchaValidator.verify({
+				config: captchaConfig,
+				token: args.captchaToken ?? undefined,
+				remoteIp: context.remoteIp,
+			})
+			if (!captcha.ok) {
+				return createErrorResponse('INVALID_CAPTCHA', `Captcha verification failed: ${captcha.reason}`)
+			}
+		}
+
 		const result = await this.passwordlessSignInManager.initSignInPasswordless({
 			db: context.db,
 			permissionContext: context.permissionContext,
@@ -42,12 +64,9 @@ export class PasswordlessMutationResolver
 			response: result,
 		})
 		if (!result.ok) {
-			if (result.error === 'PERSON_NOT_FOUND') {
-				const configuration = await context.db.queryHandler.fetch(new ConfigurationQuery())
-				if (!configuration.login.revealUserExists) {
-					// If the user does not exist, we don't want to reveal that
-					return createErrorResponse('PASSWORDLESS_DISABLED', 'Passwordless sign-in is disabled for this person')
-				}
+			if (result.error === 'PERSON_NOT_FOUND' && !configuration.login.revealUserExists) {
+				// If the user does not exist, we don't want to reveal that
+				return createErrorResponse('PASSWORDLESS_DISABLED', 'Passwordless sign-in is disabled for this person')
 			}
 
 			return createErrorResponse(result.error, result.errorMessage)

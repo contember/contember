@@ -6,9 +6,11 @@ import {
 	ApiKeyManager,
 	ApiKeyService,
 	AppleProvider,
+	CaptchaValidator,
 	DatabaseContext,
 	EmailValidator,
 	FacebookProvider,
+	HCaptchaProvider,
 	Identity,
 	IdentityFactory,
 	IDPHandlerRegistry,
@@ -32,12 +34,16 @@ import {
 	ProjectSchemaResolver,
 	ProjectScopeFactory,
 	Providers,
+	RateLimiter,
+	RecaptchaV3Provider,
 	RolesManager,
 	SecretsManager,
 	SignInManager,
 	SignUpManager,
+	TurnstileProvider,
 	UserMailer,
 } from './model'
+import { HibpChecker, HttpHibpChecker, NoopHibpChecker } from './model/service/HibpChecker'
 import {
 	AddIDPMutationResolver,
 	AddProjectMemberMutationResolver,
@@ -155,8 +161,21 @@ export class TenantContainerFactory {
 			.addService('apiKeyService', () => new ApiKeyService())
 			.addService('apiKeyManager', ({ apiKeyService }) => new ApiKeyManager(apiKeyService))
 			.addService('emailValidator', () => new EmailValidator())
-			.addService('passwordStrengthValidator', () => new PasswordStrengthValidator())
-			.addService('signUpManager', ({ emailValidator, passwordStrengthValidator }) => new SignUpManager(emailValidator, passwordStrengthValidator))
+			.addService('hibpChecker', (): HibpChecker => new HttpHibpChecker())
+			.addService('noopHibpChecker', (): HibpChecker => new NoopHibpChecker())
+			.addService('passwordStrengthValidator', ({ hibpChecker }) => new PasswordStrengthValidator(hibpChecker))
+			.addService('captchaValidator', () =>
+				new CaptchaValidator({
+					turnstile: new TurnstileProvider(),
+					hcaptcha: new HCaptchaProvider(),
+					recaptchaV3: new RecaptchaV3Provider(),
+				}))
+			.addService('rateLimiter', ({ providers }) => new RateLimiter(providers))
+			.addService(
+				'signUpManager',
+				({ emailValidator, passwordStrengthValidator, captchaValidator, rateLimiter, userMailer }) =>
+					new SignUpManager(emailValidator, passwordStrengthValidator, captchaValidator, rateLimiter, userMailer),
+			)
 			.addService('passwordChangeManager', ({ providers, passwordStrengthValidator }) => new PasswordChangeManager(providers, passwordStrengthValidator))
 			.addService('projectMemberManager', () => new ProjectMemberManager())
 			.addService('identityFactory', ({ projectMemberManager }) => new IdentityFactory(projectMemberManager))
@@ -221,14 +240,15 @@ export class TenantContainerFactory {
 			.addService('signUpMutationResolver', ({ signUpManager, apiKeyManager }) => new SignUpMutationResolver(signUpManager, apiKeyManager))
 			.addService(
 				'signInMutationResolver',
-				({ signInManager, signInResponseFactory }) => new SignInMutationResolver(signInManager, signInResponseFactory),
+				({ signInManager, signInResponseFactory, rateLimiter }) => new SignInMutationResolver(signInManager, signInResponseFactory, rateLimiter),
 			)
 			.addService('signOutMutationResolver', ({ apiKeyManager }) => new SignOutMutationResolver(apiKeyManager))
 			.addService('changeProfileMutationResolver', ({ personManager }) => new ChangeProfileMutationResolver(personManager))
 			.addService('changePasswordMutationResolver', ({ passwordChangeManager }) => new ChangePasswordMutationResolver(passwordChangeManager))
 			.addService(
 				'resetPasswordMutationResolver',
-				({ passwordResetManager, permissionContextFactory }) => new ResetPasswordMutationResolver(passwordResetManager, permissionContextFactory),
+				({ passwordResetManager, permissionContextFactory, captchaValidator, rateLimiter }) =>
+					new ResetPasswordMutationResolver(passwordResetManager, permissionContextFactory, captchaValidator, rateLimiter),
 			)
 			.addService(
 				'inviteMutationResolver',
@@ -290,7 +310,8 @@ export class TenantContainerFactory {
 			.addService('configurationQueryResolver', ({ configurationManager }) => new ConfigurationQueryResolver(configurationManager))
 			.addService(
 				'passwordlessMutationResolver',
-				({ passwordlessSignInManager, signInResponseFactory }) => new PasswordlessMutationResolver(passwordlessSignInManager, signInResponseFactory),
+				({ passwordlessSignInManager, signInResponseFactory, captchaValidator, rateLimiter }) =>
+					new PasswordlessMutationResolver(passwordlessSignInManager, signInResponseFactory, captchaValidator, rateLimiter),
 			)
 			.addService(
 				'togglePasswordlessMutationResolver',

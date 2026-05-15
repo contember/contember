@@ -77,14 +77,6 @@ export class SignUpMutationResolver implements MutationResolvers {
 			return createErrorResponse(response)
 		}
 		const result = response.result
-
-		if (result.person === null) {
-			// Silent success: a sign-up attempt for an already-registered email
-			// while revealUserExists is false. We must not reveal anything, so
-			// no person, no recommendedAction echoed back to the client.
-			return { ok: true, errors: [], result: null }
-		}
-
 		await this.apiKeyManager.disableOneOffApiKey(context.db, context.apiKeyId)
 
 		return {

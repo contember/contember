@@ -1246,13 +1246,6 @@ const schema: DocumentNode = gql`
 		RESET_PASSWORD_REQUEST
 		PASSWORDLESS_SIGN_IN
 		FORCED_SIGN_OUT
-		"""
-		Silent notice sent when somebody attempts to sign up using an email
-		that is already registered while revealUserExists is false. Lets the
-		legitimate owner know an attempt occurred without leaking existence
-		back to the attacker.
-		"""
-		REGISTRATION_ATTEMPT_EXISTING_USER
 	}
 
 	input MailTemplateIdentifier {

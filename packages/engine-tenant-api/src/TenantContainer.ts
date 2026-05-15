@@ -173,7 +173,7 @@ export class TenantContainerFactory {
 			.addService('rateLimiter', ({ providers }) => new RateLimiter(providers))
 			.addService(
 				'signUpManager',
-				({ emailValidator, passwordStrengthValidator, userMailer }) => new SignUpManager(emailValidator, passwordStrengthValidator, userMailer),
+				({ emailValidator, passwordStrengthValidator }) => new SignUpManager(emailValidator, passwordStrengthValidator),
 			)
 			.addService('passwordChangeManager', ({ providers, passwordStrengthValidator }) => new PasswordChangeManager(providers, passwordStrengthValidator))
 			.addService('projectMemberManager', () => new ProjectMemberManager())

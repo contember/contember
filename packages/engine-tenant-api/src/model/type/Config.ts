@@ -18,6 +18,7 @@ export type ConfigRow = {
 	login_max_backoff: IPostgresInterval
 	login_attempt_window: IPostgresInterval
 	login_reveal_user_exits: boolean
+	login_reveal_login_method: boolean
 	login_default_token_expiration: IPostgresInterval
 	login_max_token_expiration: IPostgresInterval | null
 	captcha_provider: CaptchaProvider | null

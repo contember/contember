@@ -163,6 +163,14 @@ const schema: DocumentNode = gql`
 		maxBackoff: Interval!
 		attemptWindow: Interval!
 		revealUserExists: Boolean!
+		"""
+		If false, signIn collapses NO_PASSWORD_SET / INVALID_PASSWORD into a
+		generic INVALID_CREDENTIALS and signUp omits the recommendedAction
+		hint on EMAIL_ALREADY_EXISTS errors. UNKNOWN_EMAIL and existence-level
+		signals are still controlled by revealUserExists. Defaults to true
+		(no change vs. previous behavior).
+		"""
+		revealLoginMethod: Boolean!
 		defaultTokenExpiration: Interval!
 		maxTokenExpiration: Interval
     }
@@ -238,6 +246,7 @@ const schema: DocumentNode = gql`
 		maxBackoff: Interval
 		attemptWindow: Interval
 		revealUserExists: Boolean
+		revealLoginMethod: Boolean
 		defaultTokenExpiration: Interval
 		maxTokenExpiration: Interval
     }

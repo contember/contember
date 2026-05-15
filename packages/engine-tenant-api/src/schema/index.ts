@@ -383,6 +383,14 @@ export type ConfigLogin = {
 	readonly defaultTokenExpiration: Scalars['Interval']['output']
 	readonly maxBackoff: Scalars['Interval']['output']
 	readonly maxTokenExpiration?: Maybe<Scalars['Interval']['output']>
+	/**
+	 * If false, signIn collapses NO_PASSWORD_SET / INVALID_PASSWORD into a
+	 * generic INVALID_CREDENTIALS and signUp omits the recommendedAction
+	 * hint on EMAIL_ALREADY_EXISTS errors. UNKNOWN_EMAIL and existence-level
+	 * signals are still controlled by revealUserExists. Defaults to true
+	 * (no change vs. previous behavior).
+	 */
+	readonly revealLoginMethod: Scalars['Boolean']['output']
 	readonly revealUserExists: Scalars['Boolean']['output']
 }
 
@@ -392,6 +400,7 @@ export type ConfigLoginInput = {
 	readonly defaultTokenExpiration?: InputMaybe<Scalars['Interval']['input']>
 	readonly maxBackoff?: InputMaybe<Scalars['Interval']['input']>
 	readonly maxTokenExpiration?: InputMaybe<Scalars['Interval']['input']>
+	readonly revealLoginMethod?: InputMaybe<Scalars['Boolean']['input']>
 	readonly revealUserExists?: InputMaybe<Scalars['Boolean']['input']>
 }
 
@@ -2438,6 +2447,7 @@ export type ConfigLoginResolvers<ContextType = any, ParentType extends Resolvers
 	defaultTokenExpiration?: Resolver<ResolversTypes['Interval'], ParentType, ContextType>
 	maxBackoff?: Resolver<ResolversTypes['Interval'], ParentType, ContextType>
 	maxTokenExpiration?: Resolver<Maybe<ResolversTypes['Interval']>, ParentType, ContextType>
+	revealLoginMethod?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
 	revealUserExists?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
 	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
 }

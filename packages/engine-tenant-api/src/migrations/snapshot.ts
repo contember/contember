@@ -110,6 +110,7 @@ CREATE TABLE "config" (
     "login_max_backoff" interval DEFAULT '00:01:00'::interval NOT NULL,
     "login_attempt_window" interval DEFAULT '00:05:00'::interval NOT NULL,
     "login_reveal_user_exits" boolean DEFAULT true NOT NULL,
+    "login_reveal_login_method" boolean DEFAULT true NOT NULL,
     "login_default_token_expiration" interval DEFAULT '00:30:00'::interval NOT NULL,
     "login_max_token_expiration" interval DEFAULT '6 mons'::interval,
     "captcha_provider" "text",

@@ -22,6 +22,7 @@ export const getConfigSql = (): ExpectedQuery => ({
 				login_max_backoff: PostgresInterval('00:01:00'),
 				login_attempt_window: PostgresInterval('00:05:00'),
 				login_reveal_user_exits: true,
+				login_reveal_login_method: true,
 				login_default_token_expiration: PostgresInterval('00:30:00'),
 				login_max_token_expiration: PostgresInterval('12:00:00'),
 				captcha_provider: null,

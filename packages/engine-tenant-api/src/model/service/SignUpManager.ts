@@ -2,11 +2,12 @@ import { CreateIdentityCommand, CreatePersonCommand } from '../commands'
 import { PersonRow } from '../queries'
 import { SignUpErrorCode, SignUpRecommendedAction, WeakPasswordReason } from '../../schema'
 import { TenantRole } from '../authorization'
-import { Response, ResponseOk } from '../utils/Response'
+import { Response, ResponseError, ResponseOk } from '../utils/Response'
 import { DatabaseContext } from '../utils'
 import { MaybePassword } from '../dtos'
 import { EmailValidator } from './EmailValidator'
 import { PasswordStrengthValidator } from './PasswordStrengthValidator'
+import { validateEmail as isEmailFormatValid } from '../utils/email'
 import { Config } from '../type/Config'
 
 type SignUpUser = {
@@ -27,9 +28,21 @@ export class SignUpManager {
 	async signUp(dbContext: DatabaseContext, args: SignUpUser): Promise<SignUpResponse> {
 		const { email, password, roles = [], config } = args
 
-		const validationError = await this.emailValidator.validateEmail(dbContext, email)
-		if (validationError !== null) {
-			return validationError
+		if (!isEmailFormatValid(email.trim())) {
+			return new ResponseError('INVALID_EMAIL_FORMAT', 'E-mail address is not in a valid format')
+		}
+
+		const existingPerson = await this.emailValidator.findExistingPerson(dbContext, email)
+		if (existingPerson !== null) {
+			const exposeMethod = config.login.revealUserExists && config.login.revealLoginMethod
+			const recommendedAction: SignUpRecommendedAction | undefined = exposeMethod
+				? (existingPerson.password_hash ? 'SIGN_IN' : 'RESET_PASSWORD')
+				: undefined
+			return new ResponseError(
+				'EMAIL_ALREADY_EXISTS',
+				`User with email ${email} already exists`,
+				recommendedAction ? { recommendedAction } : undefined,
+			)
 		}
 
 		const plainPassword = password.getPlain()

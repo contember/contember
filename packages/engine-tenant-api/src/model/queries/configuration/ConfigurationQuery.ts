@@ -42,6 +42,7 @@ export class ConfigurationQuery extends DatabaseQuery<Config> {
 				maxBackoff: result.login_max_backoff,
 				attemptWindow: result.login_attempt_window,
 				revealUserExists: result.login_reveal_user_exits,
+				revealLoginMethod: result.login_reveal_login_method,
 				defaultTokenExpiration: result.login_default_token_expiration,
 				maxTokenExpiration: result.login_max_token_expiration,
 			},

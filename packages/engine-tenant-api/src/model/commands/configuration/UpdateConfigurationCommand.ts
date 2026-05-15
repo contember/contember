@@ -49,6 +49,7 @@ export class UpdateConfigurationCommand implements Command<void> {
 					login_max_backoff: this.configuration.login?.maxBackoff ?? undefined,
 					login_attempt_window: this.configuration.login?.attemptWindow ?? undefined,
 					login_reveal_user_exits: this.configuration.login?.revealUserExists ?? undefined,
+					login_reveal_login_method: this.configuration.login?.revealLoginMethod ?? undefined,
 					login_default_token_expiration: this.configuration.login?.defaultTokenExpiration ?? undefined,
 					login_max_token_expiration: this.configuration.login?.maxTokenExpiration,
 					captcha_provider: captcha?.provider !== undefined ? captcha.provider : undefined,

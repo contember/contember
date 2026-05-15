@@ -1,0 +1,53 @@
+---
+title: Disabling a person
+---
+
+`disablePerson` permanently disables a person account. Once disabled, the person can no longer sign in via any flow — password, IDP, or passwordless. Existing sessions are **not** revoked by this mutation; pair it with [`forceSignOutPerson`](./sessions.md#admin-force-sign-out) if you also need to end the person's active sessions.
+
+```graphql
+mutation {
+  disablePerson(personId: "…") {
+    ok
+    error { code developerMessage }
+  }
+}
+```
+
+Errors:
+
+| Code | Cause |
+|---|---|
+| `PERSON_NOT_FOUND` | No person with that id. |
+| `PERSON_ALREADY_DISABLED` | The person is already disabled. |
+
+## Permissions
+
+Gated by `PERSON_DISABLE` against the *target's* roles:
+
+- `SUPER_ADMIN` — can disable any person.
+- `PROJECT_ADMIN` — can disable persons whose roles do not exceed the admin's own (the role-escalation guard).
+- Anyone with the tenant role explicitly granted `PERSON_DISABLE` permission — see [Tenant ACL permissions](/reference/engine/schema/acl.md#tenant-permissions).
+
+`forceSignOutPerson` uses the same role-escalation rule.
+
+## Common usage pattern
+
+To fully cut access for a compromised account:
+
+```graphql
+mutation {
+  disablePerson(personId: "…")           { ok error { code } }
+  forceSignOutPerson(personId: "…",
+                     reason: "Compromised") { ok error { code } }
+}
+```
+
+`disablePerson` blocks future sign-ins; `forceSignOutPerson` invalidates every existing API key (session and permanent) for the person and sends them a `FORCED_SIGN_OUT` mail.
+
+## Re-enabling
+
+There is no `enablePerson` mutation. To restore access, you need direct database access to clear the disabled flag — by design, disabling is meant to be a deliberate, long-term decision rather than a temporary suspension. Persons that need temporary lockouts should be force-signed-out instead.
+
+## Audit
+
+Records `person_disable` in the [audit log](./audit-log.md) with `personId` set to the target.

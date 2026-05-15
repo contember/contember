@@ -35,8 +35,12 @@ Picking the correct token for a given operation can be confusing. The canonical 
 |---|---|
 | Create new users from the public-facing endpoint | [Sign-up](./sign-up.md) |
 | Authenticate existing users (password, IdP, passwordless, admin-impersonation) | [Sign-in](./sign-in.md) · [IdP](./idp.md) · [Passwordless](./passwordless.md) |
+| Run the public password-reset flow | [Password reset](./password-reset.md) |
+| Set up TOTP two-factor authentication | [Two-factor](./two-factor.md) |
+| Change profile or password (self or admin) | [Profile and password changes](./profile.md) |
 | Invite users to projects | [Invites](./invites.md) |
 | Manage project membership | [Memberships](./memberships.md) |
+| Permanently disable an account | [Disabling a person](./disable-person.md) |
 | Create or revoke long-lived API keys for applications | [API keys](./api-keys.md) |
 | List, revoke, or force-end user sessions | [Sessions](./sessions.md) |
 | Have a backend service forward real user IP/UA to Contember | [Proxy trust](./proxy-trust.md) |

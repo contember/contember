@@ -134,12 +134,27 @@ export class IdentityTypeResolver implements IdentityResolvers {
 		}
 	}
 
-	async sessions(parent: { id: string }, args: unknown, context: TenantResolverContext): Promise<SessionInfo[]> {
-		// Sessions are visible to the owner only; for any other identity we
-		// return an empty list rather than throwing so introspection-style
-		// queries (e.g. listing many identities) keep working.
+	async sessions(
+		parent: { id: string; roles?: readonly string[] | undefined | null },
+		args: unknown,
+		context: TenantResolverContext,
+	): Promise<SessionInfo[]> {
+		// Self: always allowed. Other identities: gated by PERSON_VIEW_SESSIONS
+		// against the target's roles, so PROJECT_ADMIN can peek at members but
+		// not at SUPER_ADMIN sessions (projectAdminUseRolesVerifier rule).
+		// Return [] instead of throwing — listing many identities should not
+		// abort just because the viewer lacks visibility for one of them.
 		if (parent.id !== context.identity.id) {
-			return []
+			const targetRoles = await this.roles(parent, {}, context)
+			if (targetRoles === null) {
+				return []
+			}
+			const canView = await context.permissionContext.isAllowed({
+				action: PermissionActions.PERSON_VIEW_SESSIONS(targetRoles),
+			})
+			if (!canView) {
+				return []
+			}
 		}
 		const rows = await context.db.queryHandler.fetch(
 			new ApiKeySessionsByIdentityQuery(parent.id, { now: context.db.providers.now() }),

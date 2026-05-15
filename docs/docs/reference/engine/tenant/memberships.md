@@ -90,3 +90,12 @@ query {
   }
 }
 ```
+
+## Audit
+
+:::note Available since 2.2
+:::
+
+Every successful `addProjectMember`, `updateProjectMember`, and `removeProjectMember` is recorded in the [audit log](./audit-log.md) as `project_membership_create` / `project_membership_update` / `project_membership_remove`, with a `{before, after}` snapshot of the affected memberships and `target_person_id` resolved from the affected identity.
+
+Global role mutations (`addGlobalIdentityRoles`, `removeGlobalIdentityRoles`) are audited the same way as `global_role_grant` / `global_role_revoke`.

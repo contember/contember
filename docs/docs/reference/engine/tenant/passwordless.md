@@ -34,7 +34,11 @@ process.
 
 5. **Rate Limits and Security**:
 
-- There are no rate limits applied at this time, but the system enforces a token validity period (default 5 minutes) and a limit of 3 OTP attempts per magic link.
+- Token validity period (default 5 minutes) and a limit of 3 OTP attempts per magic link.
+- *(since 2.2)* Per-IP rate limit on `initSignInPasswordless` via `rateLimits.passwordlessInitPerIp`. See [anti-abuse](./anti-abuse.md#per-ip-rate-limits).
+- *(since 2.2)* Per-email exponential backoff on `initSignInPasswordless` reusing the `login.baseBackoff` / `login.maxBackoff` / `login.attemptWindow` knobs — a single inbox cannot be flooded with magic-link mails. The mutation still returns `ok: true` but the mail is suppressed until the next allowed attempt.
+- *(since 2.2)* Optional captcha verification on `initSignInPasswordless` when `captcha` is configured. Pass the token via the `captchaToken` argument.
+- *(since 2.2)* When `login.revealUserExists: false`, an `initSignInPasswordless` for an unknown email returns `PASSWORDLESS_DISABLED` rather than `PERSON_NOT_FOUND`.
 
 ### GraphQL API
 
@@ -76,7 +80,10 @@ mutation {
 
 ```graphql
 mutation {
-  initSignInPasswordless(email: "user@example.com") {
+  initSignInPasswordless(
+    email: "user@example.com",
+    captchaToken: "0.aXR…"
+  ) {
     ok
     error {
       code
@@ -89,6 +96,8 @@ mutation {
   }
 }
 ```
+
+Error codes: `PERSON_NOT_FOUND` (or `PASSWORDLESS_DISABLED` when `revealUserExists: false`), `INVALID_CAPTCHA` *(since 2.2)*, `RATE_LIMIT_EXCEEDED` *(since 2.2)*.
 
 #### Signing In with Magic Link or OTP
 

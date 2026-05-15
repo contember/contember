@@ -2,40 +2,52 @@
 title: Overview of Tenant API
 ---
 
-The Contember Tenant API is a specialized GraphQL API designed for the centralized management of **projects**, **tokens**, **users**, and their respective **roles**. Unlike the [Content API](../content/overview.md), the Tenant API is shared across all projects and is accessible via the URL `https://engine-hostname/tenant`. To interact with this API, a `Bearer` token must be supplied in the `Authorization` header.
+The Contember Tenant API is a specialized GraphQL API for managing **projects**, **tokens**, **users**, and **roles**. Unlike the [Content API](../content/overview.md), the Tenant API is shared across all projects and is accessible at `https://engine-hostname/tenant`. Every request needs a `Bearer` token in the `Authorization` header.
 
 ## Key Concepts
 
-- **Identity**: Contains information regarding roles and project memberships.
-- **Person**: Associated with an identity and possesses credentials (email and password) for authentication.
-- **Authorization Key/Token**: Serves as either a permanent (for applications) or session-based (for users) authorization token tied to a specific identity. This token is verified using a Bearer token.
+- **Identity** — Carries roles and project memberships. The unit that authorization is bound to. May or may not have an attached person.
+- **Person** — An identity with credentials (email + optional password) and additional profile fields. Persons can sign in; bare identities cannot.
+- **API Key / Token** — A bearer token. Either *permanent* (created for an application or backend service, no expiry) or *session* (minted at sign-in time, short-lived, tied to a person). See [API keys](./api-keys.md) and [sessions](./sessions.md).
 
-## Authorization Mechanisms
+## Authorization
 
-Much like the Content API, the Tenant API requires an authorization token for every request, including login operations.
+Just like the Content API, every Tenant API request needs a bearer token — including sign-in operations.
 
-The default keys for the `login` and `super_admin` roles are configured via the environment variables `CONTEMBER_LOGIN_TOKEN` and `CONTEMBER_ROOT_TOKEN`. For local development setups, these keys can be found in the `docker-compose.yaml` file.
+The default tokens for the `login` and `super_admin` roles are configured via the `CONTEMBER_LOGIN_TOKEN` and `CONTEMBER_ROOT_TOKEN` environment variables. For local development they are visible in `docker-compose.yaml`.
 
-The login token can be employed for various sign-in methods, including email/password-based and Identity Provider (IdP) authentication, as well as for password reset operations.
+The login token authorizes the public auth flows: `signIn`, `signInIDP`, `signInPasswordless`, `createResetPasswordRequest`, `resetPassword`, `signUp`.
 
-There are primarily two types of authorization tokens:
+## Choosing the right token
 
-- **Permanent API Token**: Generally used in application settings where user authentication is not required. [This token can be generated through Tenant API mutations](api-keys.md).
+Picking the correct token for a given operation can be confusing. The canonical example — generating a permanent API key so an application can read from the Content API:
 
-- **Session Token**: Obtained when a user successfully signs in and is typically used for tracking individual user actions within administrative interfaces.
+1. **Locate the login token** from your environment configuration.
+2. **Sign in** — call `signIn` against the Tenant API using the login token as the bearer.
+3. **Receive the session token** in the response. It's short-lived.
+4. **Create the API key** — call `createApiKey` using the session token as the bearer.
+5. **Read the permanent API token** out of the response. This is what your application stores.
+6. **Use the permanent API token** against the Content API.
 
-## Choosing the Right Token
+## Where to read next
 
-Choosing the appropriate token for specific actions can sometimes be confusing. Here's a step-by-step example to clarify how to generate an API token for an application to read data from the Content API:
+| You need to … | Page |
+|---|---|
+| Create new users from the public-facing endpoint | [Sign-up](./sign-up.md) |
+| Authenticate existing users (password, IdP, passwordless, admin-impersonation) | [Sign-in](./sign-in.md) · [IdP](./idp.md) · [Passwordless](./passwordless.md) |
+| Invite users to projects | [Invites](./invites.md) |
+| Manage project membership | [Memberships](./memberships.md) |
+| Create or revoke long-lived API keys for applications | [API keys](./api-keys.md) |
+| List, revoke, or force-end user sessions | [Sessions](./sessions.md) |
+| Have a backend service forward real user IP/UA to Contember | [Proxy trust](./proxy-trust.md) |
+| Tune password policy, captcha, rate limits | [Password policy](./password-policy.md) · [Anti-abuse](./anti-abuse.md) |
+| Customize transactional mails | [Mail templates](./mail-templates.md) |
+| Inspect what actions were taken against the tenant | [Audit log](./audit-log.md) |
+| See the full configuration surface in one place | [Configuration](./configuration.md) |
 
-1. **Locate the Login Token**: Retrieve your default login token, usually found in your environment configuration.
+## Audit
 
-2. **Sign In**: Use the retrieved login token as a Bearer token and execute the `signIn` mutation against the Tenant API.
+:::note Available since 2.2
+:::
 
-3. **Session Token**: Upon successful sign-in, you'll receive another token—this is your session token, which has a limited validity period.
-
-4. **Create API Key**: Execute the `createApiKey` mutation against the Tenant API, this time using your newly acquired session token.
-
-5. **Retrieve Permanent API Token**: The mutation will return a new, permanent API token configured with the permissions you have set.
-
-6. **Interact with Content API**: You can now use this permanent API token to execute queries against the Content API.
+Every authentication-relevant operation and every administrative tenant mutation is recorded in `person_auth_log`. The [audit log](./audit-log.md) page is the complete reference of event types, `event_data` payloads, and how to query them.

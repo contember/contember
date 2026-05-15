@@ -5,17 +5,17 @@ title: Mail templates
 Mail templates in Contember enable tailored communication for emails dispatched by the Tenant API. Via the `/tenant` path and with either the `SUPER_ADMIN` or `PROJECT_ADMIN` global roles, users can create and manage these templates seamlessly.
 
 ## Mail Types
-Contember provides three primary mail types, each serving specific communication needs:
 
-- **NEW_USER_INVITED**: This mail type welcomes newly invited users. Often, it's the first touchpoint a new user has with the platform, typically containing details for setting up their account or accessing the platform's resources.
+| Type | Sent when | Available since |
+|---|---|---|
+| `NEW_USER_INVITED` | A new person is invited via `invite` with method `CREATE_PASSWORD` or `RESET_PASSWORD`. First touchpoint, typically links to account setup. | 1.x |
+| `EXISTING_USER_INVITED` | A person that already exists is added to a new project via `invite`. Notification only. | 1.x |
+| `RESET_PASSWORD_REQUEST` | `createResetPasswordRequest` is called for an existing person. Carries the reset token / link. | 1.x |
+| `PASSWORDLESS_SIGN_IN` | `initSignInPasswordless` succeeds. Carries the magic link and OTP info. | 1.x |
+| `FORCED_SIGN_OUT` | An admin force-signs-out the person via `forceSignOutPerson`. Informational notice that all sessions were ended. | 2.2 |
+| `REGISTRATION_ATTEMPT_EXISTING_USER` | Somebody tries to `signUp` with an already-registered email while `login.revealUserExists: false`. Sent to the legitimate owner. | 2.2 |
 
-- **EXISTING_USER_INVITED**: Deployed when inviting an already registered user to a new project. It's a notification template, guiding users to the new project or functionalities they've been given access to.
-
-- **RESET_PASSWORD_REQUEST**: For situations when a user forgets their password. This email directs users to reset their password, ensuring they regain access to their account.
-- **PASSWORDLESS_SIGN_IN**: For passwordless authentication, this email contains a magic link for users to sign in securely without a password.
-
-Each of these mail types comes with a straightforward default template. Additionally, in Contember Cloud setups, enhanced custom templates are present, which users can modify or overwrite based on their preferences.
-Of course! I'll include more detailed information about the GraphQL mutations by elaborating on the structure of the input.
+Each type ships with a default template. In Contember Cloud setups, enhanced custom templates are pre-installed and can be modified or overwritten.
 
 ## Managing Templates via GraphQL
 
@@ -109,6 +109,15 @@ Contember uses Mustache for dynamic content in templates. Here are the variables
 - `{{projectSlug}}`: Project identifier (if available).
 - `{{url}}`: URL for passwordless sign-in.
 
+- **FORCED_SIGN_OUT** *(since 2.2)*:
+- `{{email}}`: Recipient's email.
+- `{{reason}}`: Optional reason supplied by the admin to `forceSignOutPerson`. Empty when no reason was provided.
+
+- **REGISTRATION_ATTEMPT_EXISTING_USER** *(since 2.2)*:
+- `{{email}}`: Recipient's email — the legitimate owner of the account that somebody tried to register against.
+
 :::note
 `projectSlug` is available since Engine 1.3+
 :::
+
+Any `addMailTemplate` / `removeMailTemplate` call is recorded as a `mail_template_change` entry in the [audit log](./audit-log.md).

@@ -211,3 +211,19 @@ Here is an example of the response that the signInIDP mutation might return:
 The result field contains the access token in the token field, and information about the authenticated user in the person field.
 
 If the signInIDP mutation was not successful, the ok field would be set to false and the error field would contain details about the error that occurred. Following error codes are possible for this mutation: `INVALID_IDP_RESPONSE`, `IDP_VALIDATION_FAILED`, `PERSON_NOT_FOUND`, `PERSON_ALREADY_EXISTS`
+
+## Audit
+
+:::note Available since 2.2
+:::
+
+Every IdP management call is recorded in the [audit log](./audit-log.md):
+
+| Mutation | Audit type | `event_data` |
+|---|---|---|
+| `addIDP` | `idp_create` | `{identityProvider, type, configurationKeys, options}` — only the *names* of the configuration keys, never the secret values |
+| `updateIDP` | `idp_update` | `{before, after}` with configuration collapsed the same way |
+| `disableIDP` | `idp_disable` | `{identityProvider}` |
+| `enableIDP` | `idp_enable` | `{identityProvider}` |
+
+Sign-in attempts via IdP are recorded as `idp_login`.

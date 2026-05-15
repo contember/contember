@@ -50,8 +50,8 @@ export class CreateApiKeyCommand implements Command<CreateApiKeyCommandResult> {
 				expires_at: ApiKeyHelper.getExpiration(providers, this.args.type, this.args.expiration),
 				expiration: this.args.expiration || null,
 				created_at: providers.now(),
-				created_ip: this.args.requestInfo?.ip ?? null,
-				created_user_agent: this.args.requestInfo?.userAgent ?? null,
+				created_ip: this.args.requestInfo?.ip || null,
+				created_user_agent: this.args.requestInfo?.userAgent || null,
 				trust_forwarded_info: this.args.trustForwardedInfo ?? false,
 			})
 			.execute(db)

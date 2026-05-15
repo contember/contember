@@ -38,7 +38,9 @@ export class ProlongApiKeyCommand implements Command<void> {
 			}
 		}
 
-		const updateTracking = this.shouldUpdateTracking(now)
+		const requestIp = this.requestInfo?.ip || null
+		const requestUserAgent = this.requestInfo?.userAgent || null
+		const updateTracking = this.shouldUpdateTracking(now, requestIp, requestUserAgent)
 
 		if (!updateExpiration && !updateTracking) {
 			return
@@ -49,8 +51,8 @@ export class ProlongApiKeyCommand implements Command<void> {
 			values.expires_at = newExpiration
 		}
 		if (updateTracking) {
-			values.last_ip = this.requestInfo?.ip ?? null
-			values.last_user_agent = this.requestInfo?.userAgent ?? null
+			values.last_ip = requestIp
+			values.last_user_agent = requestUserAgent
 			values.last_used_at = now
 		}
 
@@ -61,7 +63,7 @@ export class ProlongApiKeyCommand implements Command<void> {
 		await qb.execute(db)
 	}
 
-	private shouldUpdateTracking(now: Date): boolean {
+	private shouldUpdateTracking(now: Date, requestIp: string | null, requestUserAgent: string | null): boolean {
 		if (!this.requestInfo) {
 			return false
 		}
@@ -69,9 +71,7 @@ export class ProlongApiKeyCommand implements Command<void> {
 		if (!last || last.lastUsedAt === null) {
 			return true
 		}
-		const ipChanged = (this.requestInfo.ip ?? null) !== last.lastIp
-		const userAgentChanged = (this.requestInfo.userAgent ?? null) !== last.lastUserAgent
-		if (ipChanged || userAgentChanged) {
+		if (requestIp !== last.lastIp || requestUserAgent !== last.lastUserAgent) {
 			return true
 		}
 		return now.getTime() - last.lastUsedAt.getTime() >= PROLONG_THROTTLE_MS

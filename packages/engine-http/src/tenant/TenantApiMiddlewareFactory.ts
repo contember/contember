@@ -22,13 +22,11 @@ export class TenantApiMiddlewareFactory {
 							}
 							const resolverContextFactory = tenantContainer.resolverContextFactory
 							const db = tenantContainer.databaseContext
-							const userAgent = authResult.clientUserAgent
-								?? (typeof koa.request.headers['user-agent'] === 'string' ? koa.request.headers['user-agent'] : undefined)
 							const context = resolverContextFactory.create(
 								authResult,
 								{
 									ip: clientIp,
-									userAgent,
+									userAgent: authResult.clientUserAgent,
 									forwarderIp: authResult.forwarderIp,
 									forwarderUserAgent: authResult.forwarderUserAgent,
 								},

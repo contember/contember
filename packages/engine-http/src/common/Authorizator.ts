@@ -2,6 +2,7 @@ import { ApiKeyManager, DatabaseContext, VerifyResult } from '@contember/engine-
 import { HttpErrorResponse } from './HttpResponse'
 import { Timer } from '../application'
 import { IncomingMessage } from 'node:http'
+import ipaddr from 'ipaddr.js'
 
 export type AuthResult =
 	& VerifyResult
@@ -17,12 +18,33 @@ const assumeIdentityHeader = 'x-contember-assume-identity'
 const forwardedClientIpHeader = 'x-contember-client-ip'
 const forwardedClientUserAgentHeader = 'x-contember-client-user-agent'
 
+const USER_AGENT_MAX_LENGTH = 512
+
 const readHeader = (request: IncomingMessage, name: string): string | undefined => {
 	const value = request.headers[name]
 	if (Array.isArray(value)) {
 		return value[0]
 	}
 	return typeof value === 'string' ? value : undefined
+}
+
+const sanitizeUserAgent = (value: string | undefined): string | undefined => {
+	if (value === undefined) {
+		return undefined
+	}
+	return value.length > USER_AGENT_MAX_LENGTH ? value.slice(0, USER_AGENT_MAX_LENGTH) : value
+}
+
+const sanitizeIp = (value: string | undefined): string | undefined => {
+	if (!value) {
+		return undefined
+	}
+	try {
+		ipaddr.parse(value)
+	} catch {
+		return undefined
+	}
+	return value
 }
 
 export class Authenticator {
@@ -50,10 +72,11 @@ export class Authenticator {
 			throw this.createAuthError(`invalid Authorization header format`)
 		}
 		const [, token] = match
-		const socketUserAgent = readHeader(request, 'user-agent')
-		const forwardedIp = readHeader(request, forwardedClientIpHeader)
-		const forwardedUserAgent = readHeader(request, forwardedClientUserAgentHeader)
-		const socketInfo = { ip: clientIp, userAgent: socketUserAgent }
+		const socketIp = sanitizeIp(clientIp)
+		const socketUserAgent = sanitizeUserAgent(readHeader(request, 'user-agent'))
+		const forwardedIp = sanitizeIp(readHeader(request, forwardedClientIpHeader))
+		const forwardedUserAgent = sanitizeUserAgent(readHeader(request, forwardedClientUserAgentHeader))
+		const socketInfo = { ip: socketIp, userAgent: socketUserAgent }
 		const forwardedInfo = (forwardedIp !== undefined || forwardedUserAgent !== undefined)
 			? { ip: forwardedIp, userAgent: forwardedUserAgent }
 			: undefined
@@ -72,9 +95,9 @@ export class Authenticator {
 		return {
 			...authResult.result,
 			assumedIdentityId,
-			clientIp: trustForwarded ? (forwardedInfo?.ip ?? clientIp) : clientIp,
+			clientIp: trustForwarded ? (forwardedInfo?.ip ?? socketIp) : socketIp,
 			clientUserAgent: trustForwarded ? (forwardedInfo?.userAgent ?? socketUserAgent) : socketUserAgent,
-			forwarderIp: trustForwarded ? clientIp : undefined,
+			forwarderIp: trustForwarded ? socketIp : undefined,
 			forwarderUserAgent: trustForwarded ? socketUserAgent : undefined,
 		}
 	}

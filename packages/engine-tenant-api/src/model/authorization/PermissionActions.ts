@@ -15,6 +15,7 @@ namespace PermissionActions {
 
 	export const CONFIGURE = Authorizator.createAction(Resources.system, 'configure')
 	export const CONFIG_VIEW = Authorizator.createAction(Resources.system, 'viewConfig')
+	export const AUTH_LOG_VIEW = Authorizator.createAction(Resources.system, 'viewAuthLog')
 
 	export const IDENTITY_VIEW_PERMISSIONS = Authorizator.createAction(Resources.identity, 'viewPermissions')
 	export const IDENTITY_ADD_GLOBAL_ROLES = (roles?: readonly string[]) => Authorizator.createAction(Resources.identity, 'addGlobalRoles', { roles })

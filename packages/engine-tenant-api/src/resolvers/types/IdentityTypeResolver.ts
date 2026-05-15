@@ -169,6 +169,7 @@ export class IdentityTypeResolver implements IdentityResolvers {
 			createdIp: row.created_ip,
 			createdUserAgent: row.created_user_agent,
 			isCurrent: row.id === context.apiKeyId,
+			trustForwardedClientInfo: row.trust_forwarded_info,
 		}))
 	}
 }

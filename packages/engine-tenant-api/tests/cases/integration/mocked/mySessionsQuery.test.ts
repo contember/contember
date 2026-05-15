@@ -18,6 +18,7 @@ test('me.sessions returns active sessions and marks the current one', async () =
 					lastUserAgent
 					createdIp
 					createdUserAgent
+					trustForwardedClientInfo
 				}
 			}
 		}`,
@@ -35,6 +36,7 @@ test('me.sessions returns active sessions and marks the current one', async () =
 						last_user_agent: 'cli/1.0',
 						created_ip: '10.0.0.1',
 						created_user_agent: 'cli/1.0',
+						trust_forwarded_info: false,
 					},
 					{
 						id: otherSession,
@@ -45,6 +47,7 @@ test('me.sessions returns active sessions and marks the current one', async () =
 						last_user_agent: 'browser',
 						created_ip: '203.0.113.7',
 						created_user_agent: 'browser',
+						trust_forwarded_info: true,
 					},
 				],
 			}),
@@ -60,6 +63,7 @@ test('me.sessions returns active sessions and marks the current one', async () =
 							lastUserAgent: 'cli/1.0',
 							createdIp: '10.0.0.1',
 							createdUserAgent: 'cli/1.0',
+							trustForwardedClientInfo: false,
 						},
 						{
 							id: otherSession,
@@ -68,6 +72,7 @@ test('me.sessions returns active sessions and marks the current one', async () =
 							lastUserAgent: 'browser',
 							createdIp: '203.0.113.7',
 							createdUserAgent: 'browser',
+							trustForwardedClientInfo: true,
 						},
 					],
 				},

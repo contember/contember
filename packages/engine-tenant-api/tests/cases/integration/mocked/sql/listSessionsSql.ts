@@ -10,6 +10,7 @@ export interface SessionRow {
 	last_user_agent: string | null
 	created_ip: string | null
 	created_user_agent: string | null
+	trust_forwarded_info: boolean
 }
 
 export const listSessionsSql = (args: {
@@ -24,7 +25,8 @@ export const listSessionsSql = (args: {
 			       "api_key"."last_ip",
 			       "api_key"."last_user_agent",
 			       "api_key"."created_ip",
-			       "api_key"."created_user_agent"
+			       "api_key"."created_user_agent",
+			       "api_key"."trust_forwarded_info"
 			from "tenant"."api_key"
 			where "api_key"."identity_id" = ?
 			  and "api_key"."type" = ?

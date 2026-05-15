@@ -25,6 +25,15 @@ const schema: DocumentNode = gql`
 		mailTemplates: [MailTemplateData!]!
 
 		configuration: Config!
+
+		"""
+		Read the tenant audit log (\`person_auth_log\`). Requires the
+		\`system:viewAuthLog\` permission — by default granted only to
+		SUPER_ADMIN via the wildcard ALL-resource/ALL-privilege grant.
+		Ordered by created_at DESC. Page size is capped server-side
+		(default 100, max 500); \`hasMore\` indicates a further page exists.
+		"""
+		authLog(filter: AuthLogFilter, limit: Int, offset: Int): AuthLogPage!
 	}
 
 	type Mutation {
@@ -1015,9 +1024,13 @@ const schema: DocumentNode = gql`
 		permissions: IdentityGlobalPermissions
 		roles: [String!]
 		"""
-		Active SESSION-type api keys for this identity. Returned only when
-		queried for the calling identity (e.g. via \`me { sessions }\`); empty
-		for any other identity.
+		Active SESSION-type api keys for this identity. Always visible for
+		the calling identity (e.g. via \`me { sessions }\`). For other identities,
+		visible to callers holding the \`person:viewSessions\` permission against
+		the target's roles — SUPER_ADMIN sees everyone; PROJECT_ADMIN sees
+		members whose roles fall within their allowed-input-roles. Returns an
+		empty list rather than throwing when the viewer lacks visibility, so
+		batched identity queries do not abort on a single forbidden target.
 		"""
 		sessions: [SessionInfo!]!
 	}
@@ -1180,6 +1193,13 @@ const schema: DocumentNode = gql`
 		createdIp: String
 		createdUserAgent: String
 		isCurrent: Boolean!
+		"""
+		Whether this session honors X-Contember-Client-IP /
+		X-Contember-Client-User-Agent headers on subsequent requests. Set when
+		the session was minted via \`SignInOptions.trustForwardedClientInfo\`
+		from an api_key that was itself created with the flag.
+		"""
+		trustForwardedClientInfo: Boolean!
 	}
 
 	type RevokeSessionResponse {
@@ -1392,6 +1412,91 @@ const schema: DocumentNode = gql`
 
 	enum UpdateProjectErrorCode {
 		PROJECT_NOT_FOUND
+	}
+
+	# === auth log ===
+
+	"""
+	A single \`person_auth_log\` row. Mirrors the columns described in
+	docs/.../audit-log.md.
+	"""
+	type AuthLogEntry {
+		id: String!
+		createdAt: DateTime!
+		"""
+		One of the values listed in \`auth_log_type\` (see audit-log docs).
+		Kept as String rather than a GraphQL enum because a few legacy values
+		(\`2fa_enable\`, \`2fa_disable\`) start with a digit and aren't valid
+		enum names, and the set is expected to keep growing.
+		"""
+		type: String!
+		success: Boolean!
+		"""
+		Identity that performed the action. May be null for entries created
+		before this column was populated, or when the actor's identity was
+		later deleted (FK is ON DELETE SET NULL semantics-wise).
+		"""
+		invokedByIdentityId: String
+		"""
+		The actor's person (if the actor was a person, not a bare api_key).
+		"""
+		personId: String
+		"""
+		The subject of the action when different from the actor (e.g. force
+		sign-out, role grant, membership change). Resolved from the affected
+		identity so the trail points at the right person even when the actor
+		acts on someone else's identity.
+		"""
+		targetPersonId: String
+		"""
+		Free-form input string — typically the email submitted on a failed
+		login, before any person record was looked up.
+		"""
+		personInputIdentifier: String
+		errorCode: String
+		errorMessage: String
+		"""
+		Effective client IP after \`trust-forwarded-info\` is applied. The
+		raw socket peer is preserved in \`metadata.forwarderIp\` when a
+		trusted proxy was involved.
+		"""
+		ipAddress: String
+		userAgent: String
+		identityProviderId: String
+		"""
+		JSONB — forensic context. Common keys: \`forwarderIp\`,
+		\`forwarderUserAgent\`, \`sessionId\`, \`reason\`.
+		"""
+		metadata: Json
+		"""
+		JSONB — domain payload. For change events this is typically
+		\`{before, after}\`; for creation events it's the snapshot.
+		Secret-bearing inputs are redacted before being stored.
+		"""
+		eventData: Json
+	}
+
+	"""
+	All fields are AND-combined. Omitted fields are unconstrained.
+	"""
+	input AuthLogFilter {
+		"OR-combined: any of the listed \`auth_log_type\` values matches."
+		types: [String!]
+		success: Boolean
+		invokedByIdentityId: String
+		personId: String
+		targetPersonId: String
+		personInputIdentifier: String
+		"Inclusive lower bound (\`created_at >= createdAfter\`)."
+		createdAfter: DateTime
+		"Exclusive upper bound (\`created_at < createdBefore\`)."
+		createdBefore: DateTime
+	}
+
+	type AuthLogPage {
+		entries: [AuthLogEntry!]!
+		"True when more rows exist past \`offset + limit\`."
+		hasMore: Boolean!
 	}
 `
 

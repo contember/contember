@@ -83,7 +83,35 @@ Every entry carries:
 
 ## Reading the log
 
-In Contember Cloud the log is exposed in the dashboard. In OSS you query `person_auth_log` directly via the tenant database. Example: every admin action against a single target person in the last 30 days:
+### GraphQL
+
+The tenant API exposes the log via `Query.authLog`. Access requires the `system:viewAuthLog` permission — by default only `SUPER_ADMIN` has it (via the wildcard ALL-resource/ALL-privilege grant). Page size is capped server-side (default 100, max 500); `hasMore` indicates a further page exists.
+
+```graphql
+query AdminActionsAgainstPerson($target: String!, $after: DateTime!) {
+  authLog(
+    limit: 100,
+    filter: { targetPersonId: $target, createdAfter: $after }
+  ) {
+    hasMore
+    entries {
+      id
+      createdAt
+      type
+      success
+      invokedByIdentityId
+      eventData
+      metadata
+    }
+  }
+}
+```
+
+In Contember Cloud the same data drives the dashboard view.
+
+### Direct SQL
+
+You can also query `person_auth_log` directly via the tenant database — useful for ad-hoc analytics that don't map cleanly onto the `AuthLogFilter` input:
 
 ```sql
 SELECT created_at, type, identity_id, success, event_data

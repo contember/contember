@@ -24,7 +24,7 @@ import {
 } from './mutation'
 
 import { Resolvers } from '../schema'
-import { MeQueryResolver, PersonQueryResolver, ProjectMembersQueryResolver, ProjectQueryResolver } from './query'
+import { AuthLogQueryResolver, MeQueryResolver, PersonQueryResolver, ProjectMembersQueryResolver, ProjectQueryResolver } from './query'
 import { IdentityTypeResolver, ProjectTypeResolver } from './types'
 import { DateTimeType, IntervalType, JSONType } from '@contember/graphql-utils'
 import { IDPQueryResolver } from './query/IDPQueryResolver'
@@ -89,6 +89,8 @@ class ResolverFactory {
 			configurationMutationResolver: ConfigurationMutationResolver
 			configurationQueryResolver: ConfigurationQueryResolver
 
+			authLogQueryResolver: AuthLogQueryResolver
+
 			togglePasswordlessMutationResolver: TogglePasswordlessMutationResolver
 		},
 	) {}
@@ -118,6 +120,7 @@ class ResolverFactory {
 				identityProviders: this.resolvers.idpQueryResolver.identityProviders.bind(this.resolvers.idpQueryResolver),
 				mailTemplates: this.resolvers.mailTemplateQueryResolver.mailTemplates.bind(this.resolvers.mailTemplateQueryResolver),
 				configuration: this.resolvers.configurationQueryResolver.configuration.bind(this.resolvers.configurationQueryResolver),
+				authLog: this.resolvers.authLogQueryResolver.authLog.bind(this.resolvers.authLogQueryResolver),
 				checkResetPasswordToken: () => {
 					throw new Error('not implemented')
 				},

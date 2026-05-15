@@ -90,6 +90,7 @@ import { MailTemplateQueryResolver } from './resolvers/query/MailTemplateQueryRe
 import { ConfigurationManager } from './model/service/ConfigurationManager'
 import { ConfigurationMutationResolver } from './resolvers/mutation/configuration/ConfigurationMutationResolver'
 import { ConfigurationQueryResolver } from './resolvers/query/ConfigurationQueryResolver'
+import { AuthLogQueryResolver } from './resolvers/query/AuthLogQueryResolver'
 import { PasswordlessMutationResolver } from './resolvers/mutation/person/PasswordlessMutationResolver'
 import { PasswordlessSignInManager } from './model/service/PasswordlessSignInManager'
 import { TogglePasswordlessMutationResolver } from './resolvers/mutation/person/TogglePasswordlessMutationResolver'
@@ -309,6 +310,7 @@ export class TenantContainerFactory {
 			.addService('identityGlobalRolesMutationResolver', ({ rolesManager }) => new IdentityGlobalRolesMutationResolver(rolesManager))
 			.addService('configurationMutationResolver', ({ configurationManager }) => new ConfigurationMutationResolver(configurationManager))
 			.addService('configurationQueryResolver', ({ configurationManager }) => new ConfigurationQueryResolver(configurationManager))
+			.addService('authLogQueryResolver', () => new AuthLogQueryResolver())
 			.addService(
 				'passwordlessMutationResolver',
 				({ passwordlessSignInManager, signInResponseFactory, captchaValidator, rateLimiter }) =>

@@ -62,6 +62,78 @@ export type AddGlobalIdentityRolesResult = {
 	readonly identity: Identity
 }
 
+/**
+ * A single `person_auth_log` row. Mirrors the columns described in
+ * docs/.../audit-log.md.
+ */
+export type AuthLogEntry = {
+	readonly __typename?: 'AuthLogEntry'
+	readonly createdAt: Scalars['DateTime']['output']
+	/**
+	 * JSONB — domain payload. For change events this is typically
+	 * `{before, after}`; for creation events it's the snapshot.
+	 * Secret-bearing inputs are redacted before being stored.
+	 */
+	readonly eventData?: Maybe<Scalars['Json']['output']>
+	readonly errorCode?: Maybe<Scalars['String']['output']>
+	readonly errorMessage?: Maybe<Scalars['String']['output']>
+	readonly id: Scalars['String']['output']
+	readonly identityProviderId?: Maybe<Scalars['String']['output']>
+	/**
+	 * Effective client IP after `trust-forwarded-info` is applied. The
+	 * raw socket peer is preserved in `metadata.forwarderIp` when a
+	 * trusted proxy was involved.
+	 */
+	readonly ipAddress?: Maybe<Scalars['String']['output']>
+	/** Identity that performed the action. */
+	readonly invokedByIdentityId?: Maybe<Scalars['String']['output']>
+	/**
+	 * JSONB — forensic context. Common keys: `forwarderIp`,
+	 * `forwarderUserAgent`, `sessionId`, `reason`.
+	 */
+	readonly metadata?: Maybe<Scalars['Json']['output']>
+	/** The actor's person (if the actor was a person, not a bare api_key). */
+	readonly personId?: Maybe<Scalars['String']['output']>
+	/**
+	 * Free-form input string — typically the email submitted on a failed
+	 * login, before any person record was looked up.
+	 */
+	readonly personInputIdentifier?: Maybe<Scalars['String']['output']>
+	readonly success: Scalars['Boolean']['output']
+	/** The subject of the action when different from the actor. */
+	readonly targetPersonId?: Maybe<Scalars['String']['output']>
+	/**
+	 * One of the values listed in `auth_log_type` (see audit-log docs).
+	 * Kept as String rather than a GraphQL enum because a few legacy values
+	 * (`2fa_enable`, `2fa_disable`) start with a digit and aren't valid
+	 * enum names, and the set is expected to keep growing.
+	 */
+	readonly type: Scalars['String']['output']
+	readonly userAgent?: Maybe<Scalars['String']['output']>
+}
+
+/** All fields are AND-combined. Omitted fields are unconstrained. */
+export type AuthLogFilter = {
+	/** Inclusive lower bound (`created_at >= createdAfter`). */
+	readonly createdAfter?: InputMaybe<Scalars['DateTime']['input']>
+	/** Exclusive upper bound (`created_at < createdBefore`). */
+	readonly createdBefore?: InputMaybe<Scalars['DateTime']['input']>
+	readonly invokedByIdentityId?: InputMaybe<Scalars['String']['input']>
+	readonly personId?: InputMaybe<Scalars['String']['input']>
+	readonly personInputIdentifier?: InputMaybe<Scalars['String']['input']>
+	readonly success?: InputMaybe<Scalars['Boolean']['input']>
+	readonly targetPersonId?: InputMaybe<Scalars['String']['input']>
+	/** OR-combined: any of the listed `auth_log_type` values matches. */
+	readonly types?: InputMaybe<ReadonlyArray<Scalars['String']['input']>>
+}
+
+export type AuthLogPage = {
+	readonly __typename?: 'AuthLogPage'
+	readonly entries: ReadonlyArray<AuthLogEntry>
+	/** True when more rows exist past `offset + limit`. */
+	readonly hasMore: Scalars['Boolean']['output']
+}
+
 export type AddIdpError = {
 	readonly __typename?: 'AddIDPError'
 	readonly code: AddIdpErrorCode
@@ -601,6 +673,13 @@ export type SessionInfo = {
 	readonly lastIp?: Maybe<Scalars['String']['output']>
 	readonly lastUsedAt?: Maybe<Scalars['DateTime']['output']>
 	readonly lastUserAgent?: Maybe<Scalars['String']['output']>
+	/**
+	 * Whether this session honors X-Contember-Client-IP /
+	 * X-Contember-Client-User-Agent headers on subsequent requests. Set when
+	 * the session was minted via `SignInOptions.trustForwardedClientInfo`
+	 * from an api_key that was itself created with the flag.
+	 */
+	readonly trustForwardedClientInfo: Scalars['Boolean']['output']
 }
 
 export type RevokeSessionError = {
@@ -660,9 +739,13 @@ export type Identity = {
 	readonly projects: ReadonlyArray<IdentityProjectRelation>
 	readonly roles?: Maybe<ReadonlyArray<Scalars['String']['output']>>
 	/**
-	 * Active SESSION-type api keys for this identity. Returned only when
-	 * queried for the calling identity (e.g. via `me { sessions }`); empty
-	 * for any other identity.
+	 * Active SESSION-type api keys for this identity. Always visible for
+	 * the calling identity (e.g. via `me { sessions }`). For other identities,
+	 * visible to callers holding the `person:viewSessions` permission against
+	 * the target's roles — SUPER_ADMIN sees everyone; PROJECT_ADMIN sees
+	 * members whose roles fall within their allowed-input-roles. Returns an
+	 * empty list rather than throwing when the viewer lacks visibility, so
+	 * batched identity queries do not abort on a single forbidden target.
 	 */
 	readonly sessions: ReadonlyArray<SessionInfo>
 }
@@ -1222,6 +1305,14 @@ export type ProjectSecret = {
 
 export type Query = {
 	readonly __typename?: 'Query'
+	/**
+	 * Read the tenant audit log (`person_auth_log`). Requires the
+	 * `system:viewAuthLog` permission — by default granted only to
+	 * SUPER_ADMIN via the wildcard ALL-resource/ALL-privilege grant.
+	 * Ordered by created_at DESC. Page size is capped server-side
+	 * (default 100, max 500); `hasMore` indicates a further page exists.
+	 */
+	readonly authLog: AuthLogPage
 	readonly checkResetPasswordToken: CheckResetPasswordTokenCode
 	readonly configuration: Config
 	readonly identityProviders: ReadonlyArray<IdentityProvider>
@@ -1231,6 +1322,12 @@ export type Query = {
 	readonly projectBySlug?: Maybe<Project>
 	readonly projectMemberships: ReadonlyArray<Membership>
 	readonly projects: ReadonlyArray<Project>
+}
+
+export type QueryAuthLogArgs = {
+	filter?: InputMaybe<AuthLogFilter>
+	limit?: InputMaybe<Scalars['Int']['input']>
+	offset?: InputMaybe<Scalars['Int']['input']>
 }
 
 export type QueryCheckResetPasswordTokenArgs = {
@@ -1723,6 +1820,9 @@ export type ResolversTypes = {
 	AddProjectMemberResponse: ResolverTypeWrapper<AddProjectMemberResponse>
 	ApiKey: ResolverTypeWrapper<Omit<ApiKey, 'identity'> & { identity: ResolversTypes['Identity'] }>
 	ApiKeyWithToken: ResolverTypeWrapper<Omit<ApiKeyWithToken, 'identity'> & { identity: ResolversTypes['Identity'] }>
+	AuthLogEntry: ResolverTypeWrapper<AuthLogEntry>
+	AuthLogFilter: AuthLogFilter
+	AuthLogPage: ResolverTypeWrapper<AuthLogPage>
 	Boolean: ResolverTypeWrapper<Scalars['Boolean']['output']>
 	ChangeMyPasswordError: ResolverTypeWrapper<ChangeMyPasswordError>
 	ChangeMyPasswordErrorCode: ChangeMyPasswordErrorCode
@@ -1938,6 +2038,9 @@ export type ResolversParentTypes = {
 	AddProjectMemberResponse: AddProjectMemberResponse
 	ApiKey: Omit<ApiKey, 'identity'> & { identity: ResolversParentTypes['Identity'] }
 	ApiKeyWithToken: Omit<ApiKeyWithToken, 'identity'> & { identity: ResolversParentTypes['Identity'] }
+	AuthLogEntry: AuthLogEntry
+	AuthLogFilter: AuthLogFilter
+	AuthLogPage: AuthLogPage
 	Boolean: Scalars['Boolean']['output']
 	ChangeMyPasswordError: ChangeMyPasswordError
 	ChangeMyPasswordResponse: ChangeMyPasswordResponse
@@ -2643,6 +2746,7 @@ export type SessionInfoResolvers<
 	lastIp?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>
 	lastUsedAt?: Resolver<Maybe<ResolversTypes['DateTime']>, ParentType, ContextType>
 	lastUserAgent?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>
+	trustForwardedClientInfo?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
 	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
 }
 
@@ -2807,6 +2911,37 @@ export type InviteResultResolvers<ContextType = any, ParentType extends Resolver
 
 export interface JsonScalarConfig extends GraphQLScalarTypeConfig<ResolversTypes['Json'], any> {
 	name: 'Json'
+}
+
+export type AuthLogEntryResolvers<
+	ContextType = any,
+	ParentType extends ResolversParentTypes['AuthLogEntry'] = ResolversParentTypes['AuthLogEntry'],
+> = {
+	createdAt?: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>
+	errorCode?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>
+	errorMessage?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>
+	eventData?: Resolver<Maybe<ResolversTypes['Json']>, ParentType, ContextType>
+	id?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+	identityProviderId?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>
+	invokedByIdentityId?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>
+	ipAddress?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>
+	metadata?: Resolver<Maybe<ResolversTypes['Json']>, ParentType, ContextType>
+	personId?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>
+	personInputIdentifier?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>
+	success?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
+	targetPersonId?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>
+	type?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+	userAgent?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>
+	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
+}
+
+export type AuthLogPageResolvers<
+	ContextType = any,
+	ParentType extends ResolversParentTypes['AuthLogPage'] = ResolversParentTypes['AuthLogPage'],
+> = {
+	entries?: Resolver<ReadonlyArray<ResolversTypes['AuthLogEntry']>, ParentType, ContextType>
+	hasMore?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
+	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
 }
 
 export type MailTemplateDataResolvers<
@@ -3085,6 +3220,7 @@ export type ProjectIdentityRelationResolvers<
 }
 
 export type QueryResolvers<ContextType = any, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = {
+	authLog?: Resolver<ResolversTypes['AuthLogPage'], ParentType, ContextType, Partial<QueryAuthLogArgs>>
 	checkResetPasswordToken?: Resolver<
 		ResolversTypes['CheckResetPasswordTokenCode'],
 		ParentType,
@@ -3486,6 +3622,8 @@ export type Resolvers<ContextType = any> = {
 	AddProjectMemberResponse?: AddProjectMemberResponseResolvers<ContextType>
 	ApiKey?: ApiKeyResolvers<ContextType>
 	ApiKeyWithToken?: ApiKeyWithTokenResolvers<ContextType>
+	AuthLogEntry?: AuthLogEntryResolvers<ContextType>
+	AuthLogPage?: AuthLogPageResolvers<ContextType>
 	ChangeMyPasswordError?: ChangeMyPasswordErrorResolvers<ContextType>
 	ChangeMyPasswordResponse?: ChangeMyPasswordResponseResolvers<ContextType>
 	ChangeMyProfileError?: ChangeMyProfileErrorResolvers<ContextType>

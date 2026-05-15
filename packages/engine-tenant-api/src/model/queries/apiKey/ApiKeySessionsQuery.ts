@@ -10,6 +10,7 @@ export type ApiKeySessionRow = {
 	readonly last_user_agent: string | null
 	readonly created_ip: string | null
 	readonly created_user_agent: string | null
+	readonly trust_forwarded_info: boolean
 }
 
 export class ApiKeySessionsByIdentityQuery extends DatabaseQuery<readonly ApiKeySessionRow[]> {
@@ -30,6 +31,7 @@ export class ApiKeySessionsByIdentityQuery extends DatabaseQuery<readonly ApiKey
 			.select(['api_key', 'last_user_agent'])
 			.select(['api_key', 'created_ip'])
 			.select(['api_key', 'created_user_agent'])
+			.select(['api_key', 'trust_forwarded_info'])
 			.from('api_key')
 			.where(it => it.compare(['api_key', 'identity_id'], Operator.eq, this.identityId))
 			.where(it => it.compare(['api_key', 'type'], Operator.eq, ApiKey.Type.SESSION))

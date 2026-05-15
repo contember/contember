@@ -1,5 +1,5 @@
 import { CreateIdentityCommand, CreatePersonCommand } from '../commands'
-import { ConfigurationQuery, PersonRow } from '../queries'
+import { PersonRow } from '../queries'
 import { SignUpErrorCode, SignUpRecommendedAction, WeakPasswordReason } from '../../schema'
 import { TenantRole } from '../authorization'
 import { Response, ResponseError, ResponseOk } from '../utils/Response'
@@ -9,12 +9,14 @@ import { EmailValidator } from './EmailValidator'
 import { PasswordStrengthValidator } from './PasswordStrengthValidator'
 import { UserMailer } from '../mailing'
 import { validateEmail as isEmailFormatValid } from '../utils/email'
+import { Config } from '../type/Config'
 
 type SignUpUser = {
 	email: string
 	name?: string
 	password: MaybePassword
 	roles?: readonly string[]
+	config: Config
 }
 
 export class SignUpManager {
@@ -26,8 +28,7 @@ export class SignUpManager {
 	}
 
 	async signUp(dbContext: DatabaseContext, args: SignUpUser): Promise<SignUpResponse> {
-		const { email, password, roles = [] } = args
-		const config = await dbContext.queryHandler.fetch(new ConfigurationQuery(dbContext.providers))
+		const { email, password, roles = [], config } = args
 
 		if (!isEmailFormatValid(email.trim())) {
 			return new ResponseError('INVALID_EMAIL_FORMAT', 'E-mail address is not in a valid format')

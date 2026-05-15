@@ -24,6 +24,7 @@ test('signIn: trustForwardedClientInfo=true is propagated when caller has the fl
 		callerTrustForwardedInfo: true,
 		query: signInMutation({ email, password, options: { trustForwardedClientInfo: true } }),
 		executes: [
+			getConfigSql(),
 			getNextLoginAttemptSql(email),
 			getPersonByEmailSql({ email, response: { personId, identityId, password, roles: [] } }),
 			getConfigSql(),
@@ -59,6 +60,7 @@ test('signIn: trustForwardedClientInfo=true is silently dropped when caller has 
 		callerTrustForwardedInfo: false,
 		query: signInMutation({ email, password, options: { trustForwardedClientInfo: true } }),
 		executes: [
+			getConfigSql(),
 			getNextLoginAttemptSql(email),
 			getPersonByEmailSql({ email, response: { personId, identityId, password, roles: [] } }),
 			getConfigSql(),
@@ -113,5 +115,6 @@ test('createGlobalApiKey: trustForwardedClientInfo=true creates permanent key wi
 				},
 			},
 		},
+		expectedAuthLog: expect.objectContaining({ type: 'api_key_create' }),
 	})
 })

@@ -70,6 +70,7 @@ export class SignUpMutationResolver implements MutationResolvers {
 			name: args.name ?? undefined,
 			password,
 			roles,
+			config: configuration,
 		})
 
 		if (!response.ok) {

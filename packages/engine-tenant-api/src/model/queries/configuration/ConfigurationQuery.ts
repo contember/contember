@@ -17,7 +17,7 @@ export class ConfigurationQuery extends DatabaseQuery<Config> {
 			throw new Error('Configuration not found')
 		}
 
-		const captchaSecret = result.captcha_secret !== null && result.captcha_secret_version !== null
+		const captchaSecret = result.captcha_secret && typeof result.captcha_secret_version === 'number'
 			? (await this.providers.decrypt(result.captcha_secret, result.captcha_secret_version)).value.toString('utf8')
 			: null
 

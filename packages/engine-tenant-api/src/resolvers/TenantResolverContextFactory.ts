@@ -11,7 +11,7 @@ export const createResolverContext = (permissionContext: PermissionContext, apiK
 		identity: permissionContext.identity,
 		isAllowed: permissionContext.isAllowed.bind(permissionContext),
 		requireAccess: permissionContext.requireAccess.bind(permissionContext),
-		httpInfo: {},
+		httpInfo: { ip: '' },
 	}
 }
 

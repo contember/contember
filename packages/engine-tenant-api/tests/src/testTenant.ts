@@ -129,7 +129,7 @@ export const executeTenantTest = async (test: Test) => {
 			test.expectedAuthLog = undefined
 		},
 		db: databaseContext,
-		httpInfo: test.httpInfo ?? {},
+		httpInfo: { ip: test.httpInfo?.ip ?? '', userAgent: test.httpInfo?.userAgent },
 	}
 
 	const schema = makeExecutableSchema({

@@ -22,7 +22,7 @@ export class SignInMutationResolver implements MutationResolvers {
 
 		const configuration = await context.db.queryHandler.fetch(new ConfigurationQuery(context.db.providers))
 
-		const ipGate = await this.rateLimiter.consume(context.db, 'login_per_ip', context.httpInfo?.ip, configuration)
+		const ipGate = await this.rateLimiter.consume(context.db, 'login_per_ip', context.httpInfo.ip, configuration)
 		if (!ipGate.ok) {
 			return createErrorResponse(
 				new ResponseError('RATE_LIMIT_EXCEEDED', `Too many sign-in attempts from this IP. Retry after ${ipGate.retryAfterSeconds}s.`, {

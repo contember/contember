@@ -3,7 +3,7 @@ import { Logger } from '@contember/logger'
 import { AuthLogService } from '../model/service/AuthLogService'
 
 export interface TenantResolverHttpInfo {
-	readonly ip?: string
+	readonly ip: string
 	readonly userAgent?: string
 }
 

@@ -40,7 +40,7 @@ export class ResetPasswordMutationResolver implements MutationResolvers {
 
 		const configuration = await context.db.queryHandler.fetch(new ConfigurationQuery(context.db.providers))
 
-		const rl = await this.rateLimiter.consume(context.db, 'password_reset_per_ip', context.httpInfo?.ip, configuration)
+		const rl = await this.rateLimiter.consume(context.db, 'password_reset_per_ip', context.httpInfo.ip, configuration)
 		if (!rl.ok) {
 			return createErrorResponse('RATE_LIMIT_EXCEEDED', `Too many password-reset requests. Retry after ${rl.retryAfterSeconds}s.`)
 		}
@@ -50,7 +50,7 @@ export class ResetPasswordMutationResolver implements MutationResolvers {
 			const captcha = await this.captchaValidator.verify({
 				config: captchaConfig,
 				token: args.captchaToken ?? undefined,
-				remoteIp: context.httpInfo?.ip,
+				remoteIp: context.httpInfo.ip,
 			})
 			if (!captcha.ok) {
 				return createErrorResponse('INVALID_CAPTCHA', `Captcha verification failed: ${captcha.reason}`)

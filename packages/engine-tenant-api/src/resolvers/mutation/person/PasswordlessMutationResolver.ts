@@ -35,7 +35,7 @@ export class PasswordlessMutationResolver
 
 		const configuration = await context.db.queryHandler.fetch(new ConfigurationQuery())
 
-		const rl = await this.rateLimiter.consume(context.db, 'passwordless_init_per_ip', context.remoteIp, configuration)
+		const rl = await this.rateLimiter.consume(context.db, 'passwordless_init_per_ip', context.httpInfo?.ip, configuration)
 		if (!rl.ok) {
 			return createErrorResponse('RATE_LIMIT_EXCEEDED', `Too many passwordless sign-in requests. Retry after ${rl.retryAfterSeconds}s.`)
 		}
@@ -45,7 +45,7 @@ export class PasswordlessMutationResolver
 			const captcha = await this.captchaValidator.verify({
 				config: captchaConfig,
 				token: args.captchaToken ?? undefined,
-				remoteIp: context.remoteIp,
+				remoteIp: context.httpInfo?.ip,
 			})
 			if (!captcha.ok) {
 				return createErrorResponse('INVALID_CAPTCHA', `Captcha verification failed: ${captcha.reason}`)

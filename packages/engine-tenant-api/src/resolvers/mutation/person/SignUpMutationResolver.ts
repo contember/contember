@@ -23,7 +23,7 @@ export class SignUpMutationResolver implements MutationResolvers {
 
 		const configuration = await context.db.queryHandler.fetch(new ConfigurationQuery())
 
-		const rl = await this.rateLimiter.consume(context.db, 'sign_up_per_ip', context.remoteIp, configuration)
+		const rl = await this.rateLimiter.consume(context.db, 'sign_up_per_ip', context.httpInfo?.ip, configuration)
 		if (!rl.ok) {
 			return createErrorResponse(
 				new ResponseError('RATE_LIMIT_EXCEEDED', `Too many sign-up attempts. Retry after ${rl.retryAfterSeconds}s.`),
@@ -35,7 +35,7 @@ export class SignUpMutationResolver implements MutationResolvers {
 			const captcha = await this.captchaValidator.verify({
 				config: captchaConfig,
 				token: args.captchaToken ?? undefined,
-				remoteIp: context.remoteIp,
+				remoteIp: context.httpInfo?.ip,
 			})
 			if (!captcha.ok) {
 				return createErrorResponse('INVALID_CAPTCHA', `Captcha verification failed: ${captcha.reason}`)

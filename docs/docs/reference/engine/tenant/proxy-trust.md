@@ -13,6 +13,15 @@ For the cases where you need the real user's IP and User-Agent to flow all the w
 A proxy that uses this feature **must** strip any incoming `X-Contember-Client-IP` / `X-Contember-Client-User-Agent` headers from upstream traffic and re-inject them with values it trusts. Without that, any client holding a session token minted with this flag can spoof their own IP and User-Agent in Contember's audit log.
 :::
 
+:::danger Backend-only key
+An api_key with `trustForwardedClientInfo: true` (and any session token minted from one) must **never** reach the end client — no shipping it to the browser, no embedding it in a public app, no handing it to untrusted code. The flag tells Contember to take the IP/User-Agent that arrives in two HTTP headers as ground truth. A holder of such a key who can craft their own requests can:
+
+- **Bypass per-IP rate limits** on `signIn`, `signUp`, `createResetPasswordRequest`, and `initSignInPasswordless` by rotating `X-Contember-Client-IP` per attempt.
+- **Forge `client_ip` / `user_agent`** in the audit log, in session-tracking columns, and in Content API `userInfo`.
+
+Use the flag only on api_keys that live entirely server-side behind a proxy you operate (the proxy strips and re-injects the headers as described below). For anything that touches the browser, mint plain api_keys without the flag.
+:::
+
 ## How it works
 
 1. You create an api_key with `trustForwardedClientInfo: true`.

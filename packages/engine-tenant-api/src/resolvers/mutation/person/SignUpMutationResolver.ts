@@ -1,6 +1,16 @@
 import { MutationResolvers, MutationSignUpArgs, SignUpResponse } from '../../../schema'
 import { TenantResolverContext } from '../../TenantResolverContext'
-import { ApiKeyManager, CaptchaValidator, ConfigurationQuery, NoPassword, PasswordHash, PasswordPlain, PermissionActions, RateLimiter, SignUpManager } from '../../../model'
+import {
+	ApiKeyManager,
+	CaptchaValidator,
+	ConfigurationQuery,
+	NoPassword,
+	PasswordHash,
+	PasswordPlain,
+	PermissionActions,
+	RateLimiter,
+	SignUpManager,
+} from '../../../model'
 import { createErrorResponse } from '../../errorUtils'
 import { UserInputError } from '@contember/graphql-utils'
 import { PersonResponseFactory } from '../../responseHelpers/PersonResponseFactory'

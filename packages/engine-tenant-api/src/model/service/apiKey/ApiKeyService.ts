@@ -61,6 +61,7 @@ export class CreateApiKeyResult {
 			identity: {
 				...this.identity,
 				projects: [],
+				sessions: [],
 			},
 		}
 	}

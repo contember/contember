@@ -4,19 +4,21 @@ import { testUuid } from '../../../src/testUuid'
 import { listSessionsSql } from './sql/listSessionsSql'
 import { test } from 'bun:test'
 
-test('mySessions returns active sessions and marks the current one', async () => {
+test('me.sessions returns active sessions and marks the current one', async () => {
 	const currentSession = authenticatedApiKeyId
 	const otherSession = testUuid(101)
 
 	await executeTenantTest({
 		query: GQL`query {
-			mySessions {
-				id
-				isCurrent
-				lastIp
-				lastUserAgent
-				createdIp
-				createdUserAgent
+			me {
+				sessions {
+					id
+					isCurrent
+					lastIp
+					lastUserAgent
+					createdIp
+					createdUserAgent
+				}
 			}
 		}`,
 		executes: [
@@ -49,24 +51,26 @@ test('mySessions returns active sessions and marks the current one', async () =>
 		],
 		return: {
 			data: {
-				mySessions: [
-					{
-						id: currentSession,
-						isCurrent: true,
-						lastIp: '10.0.0.1',
-						lastUserAgent: 'cli/1.0',
-						createdIp: '10.0.0.1',
-						createdUserAgent: 'cli/1.0',
-					},
-					{
-						id: otherSession,
-						isCurrent: false,
-						lastIp: '203.0.113.7',
-						lastUserAgent: 'browser',
-						createdIp: '203.0.113.7',
-						createdUserAgent: 'browser',
-					},
-				],
+				me: {
+					sessions: [
+						{
+							id: currentSession,
+							isCurrent: true,
+							lastIp: '10.0.0.1',
+							lastUserAgent: 'cli/1.0',
+							createdIp: '10.0.0.1',
+							createdUserAgent: 'cli/1.0',
+						},
+						{
+							id: otherSession,
+							isCurrent: false,
+							lastIp: '203.0.113.7',
+							lastUserAgent: 'browser',
+							createdIp: '203.0.113.7',
+							createdUserAgent: 'browser',
+						},
+					],
+				},
 			},
 		},
 	})

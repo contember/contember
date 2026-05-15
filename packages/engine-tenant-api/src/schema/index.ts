@@ -659,6 +659,12 @@ export type Identity = {
 	readonly person?: Maybe<Person>
 	readonly projects: ReadonlyArray<IdentityProjectRelation>
 	readonly roles?: Maybe<ReadonlyArray<Scalars['String']['output']>>
+	/**
+	 * Active SESSION-type api keys for this identity. Returned only when
+	 * queried for the calling identity (e.g. via `me { sessions }`); empty
+	 * for any other identity.
+	 */
+	readonly sessions: ReadonlyArray<SessionInfo>
 }
 
 export type IdentityGlobalPermissions = {
@@ -1221,7 +1227,6 @@ export type Query = {
 	readonly identityProviders: ReadonlyArray<IdentityProvider>
 	readonly mailTemplates: ReadonlyArray<MailTemplateData>
 	readonly me: Identity
-	readonly mySessions: ReadonlyArray<SessionInfo>
 	readonly personById?: Maybe<Person>
 	readonly projectBySlug?: Maybe<Project>
 	readonly projectMemberships: ReadonlyArray<Membership>
@@ -2677,6 +2682,7 @@ export type IdentityResolvers<ContextType = any, ParentType extends ResolversPar
 	person?: Resolver<Maybe<ResolversTypes['Person']>, ParentType, ContextType>
 	projects?: Resolver<ReadonlyArray<ResolversTypes['IdentityProjectRelation']>, ParentType, ContextType>
 	roles?: Resolver<Maybe<ReadonlyArray<ResolversTypes['String']>>, ParentType, ContextType>
+	sessions?: Resolver<ReadonlyArray<ResolversTypes['SessionInfo']>, ParentType, ContextType>
 	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
 }
 
@@ -3089,7 +3095,6 @@ export type QueryResolvers<ContextType = any, ParentType extends ResolversParent
 	identityProviders?: Resolver<ReadonlyArray<ResolversTypes['IdentityProvider']>, ParentType, ContextType>
 	mailTemplates?: Resolver<ReadonlyArray<ResolversTypes['MailTemplateData']>, ParentType, ContextType>
 	me?: Resolver<ResolversTypes['Identity'], ParentType, ContextType>
-	mySessions?: Resolver<ReadonlyArray<ResolversTypes['SessionInfo']>, ParentType, ContextType>
 	personById?: Resolver<Maybe<ResolversTypes['Person']>, ParentType, ContextType, RequireFields<QueryPersonByIdArgs, 'id'>>
 	projectBySlug?: Resolver<Maybe<ResolversTypes['Project']>, ParentType, ContextType, RequireFields<QueryProjectBySlugArgs, 'slug'>>
 	projectMemberships?: Resolver<

@@ -25,8 +25,6 @@ const schema: DocumentNode = gql`
 		mailTemplates: [MailTemplateData!]!
 
 		configuration: Config!
-
-		mySessions: [SessionInfo!]!
 	}
 
 	type Mutation {
@@ -1016,6 +1014,12 @@ const schema: DocumentNode = gql`
 		projects: [IdentityProjectRelation!]!
 		permissions: IdentityGlobalPermissions
 		roles: [String!]
+		"""
+		Active SESSION-type api keys for this identity. Returned only when
+		queried for the calling identity (e.g. via \`me { sessions }\`); empty
+		for any other identity.
+		"""
+		sessions: [SessionInfo!]!
 	}
 
 	type IdentityGlobalPermissions {

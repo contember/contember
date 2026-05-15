@@ -1,4 +1,4 @@
-import { Identity, IdentityGlobalPermissions, IdentityProjectRelation, IdentityResolvers, Maybe, Person } from '../../schema'
+import { Identity, IdentityGlobalPermissions, IdentityProjectRelation, IdentityResolvers, Maybe, Person, SessionInfo } from '../../schema'
 import {
 	IdentityQuery,
 	PermissionActions,
@@ -8,6 +8,7 @@ import {
 	ProjectManager,
 	ProjectMemberManager,
 } from '../../model'
+import { ApiKeySessionsByIdentityQuery } from '../../model/queries/apiKey'
 import { TenantResolverContext } from '../TenantResolverContext'
 import { notEmpty } from '../../utils/array'
 import { batchLoader } from '../../utils/batchQuery'
@@ -131,5 +132,28 @@ export class IdentityTypeResolver implements IdentityResolvers {
 			canCreateProject: await permissionsContext.isAllowed({ action: PermissionActions.PROJECT_CREATE }),
 			canDeployEntrypoint: await permissionsContext.isAllowed({ action: PermissionActions.ENTRYPOINT_DEPLOY }),
 		}
+	}
+
+	async sessions(parent: { id: string }, args: unknown, context: TenantResolverContext): Promise<SessionInfo[]> {
+		// Sessions are visible to the owner only; for any other identity we
+		// return an empty list rather than throwing so introspection-style
+		// queries (e.g. listing many identities) keep working.
+		if (parent.id !== context.identity.id) {
+			return []
+		}
+		const rows = await context.db.queryHandler.fetch(
+			new ApiKeySessionsByIdentityQuery(parent.id, { now: context.db.providers.now() }),
+		)
+		return rows.map(row => ({
+			id: row.id,
+			createdAt: row.created_at,
+			expiresAt: row.expires_at,
+			lastUsedAt: row.last_used_at,
+			lastIp: row.last_ip,
+			lastUserAgent: row.last_user_agent,
+			createdIp: row.created_ip,
+			createdUserAgent: row.created_user_agent,
+			isCurrent: row.id === context.apiKeyId,
+		}))
 	}
 }

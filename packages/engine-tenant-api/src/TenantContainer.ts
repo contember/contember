@@ -86,7 +86,6 @@ import { TenantCredentials, TenantMigrationsRunner } from './migrations'
 import { DisablePersonMutationResolver } from './resolvers/mutation/person/DisablePersonMutationResolver'
 import { ForceSignOutMutationResolver } from './resolvers/mutation/person/ForceSignOutMutationResolver'
 import { RevokeSessionMutationResolver } from './resolvers/mutation/person/RevokeSessionMutationResolver'
-import { SessionsQueryResolver } from './resolvers/query/SessionsQueryResolver'
 import { MailTemplateQueryResolver } from './resolvers/query/MailTemplateQueryResolver'
 import { ConfigurationManager } from './model/service/ConfigurationManager'
 import { ConfigurationMutationResolver } from './resolvers/mutation/configuration/ConfigurationMutationResolver'
@@ -302,7 +301,6 @@ export class TenantContainerFactory {
 				'revokeSessionMutationResolver',
 				({ apiKeyManager }) => new RevokeSessionMutationResolver(apiKeyManager),
 			)
-			.addService('sessionsQueryResolver', () => new SessionsQueryResolver())
 			.addService('updateProjectMutationResolver', ({ projectManager }) => new UpdateProjectMutationResolver(projectManager))
 			.addService(
 				'setProjectSecretMutationResolver',

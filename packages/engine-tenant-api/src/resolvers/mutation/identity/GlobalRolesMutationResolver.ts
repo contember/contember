@@ -42,7 +42,7 @@ export class IdentityGlobalRolesMutationResolver implements MutationResolvers {
 		return {
 			ok: true,
 			result: {
-				identity: { id: identityId, projects: [] },
+				identity: { id: identityId, projects: [], sessions: [] },
 			},
 		}
 	}
@@ -70,7 +70,7 @@ export class IdentityGlobalRolesMutationResolver implements MutationResolvers {
 		return {
 			ok: true,
 			result: {
-				identity: { id: identityId, projects: [] },
+				identity: { id: identityId, projects: [], sessions: [] },
 			},
 		}
 	}

@@ -39,7 +39,7 @@ export class ProjectTypeResolver implements ProjectResolvers {
 		)
 		return members.map(it => ({
 			...it,
-			identity: { ...it.identity, projects: [] },
+			identity: { ...it.identity, projects: [], sessions: [] },
 		}))
 	}
 

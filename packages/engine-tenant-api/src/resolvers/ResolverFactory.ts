@@ -24,7 +24,7 @@ import {
 } from './mutation'
 
 import { Resolvers } from '../schema'
-import { MeQueryResolver, PersonQueryResolver, ProjectMembersQueryResolver, ProjectQueryResolver, SessionsQueryResolver } from './query'
+import { MeQueryResolver, PersonQueryResolver, ProjectMembersQueryResolver, ProjectQueryResolver } from './query'
 import { IdentityTypeResolver, ProjectTypeResolver } from './types'
 import { DateTimeType, IntervalType, JSONType } from '@contember/graphql-utils'
 import { IDPQueryResolver } from './query/IDPQueryResolver'
@@ -64,7 +64,6 @@ class ResolverFactory {
 			disablePersonMutationResolver: DisablePersonMutationResolver
 			forceSignOutMutationResolver: ForceSignOutMutationResolver
 			revokeSessionMutationResolver: RevokeSessionMutationResolver
-			sessionsQueryResolver: SessionsQueryResolver
 
 			inviteMutationResolver: InviteMutationResolver
 			addProjectMemberMutationResolver: AddProjectMemberMutationResolver
@@ -104,6 +103,7 @@ class ResolverFactory {
 				person: this.resolvers.identityTypeResolver.person.bind(this.resolvers.identityTypeResolver),
 				roles: this.resolvers.identityTypeResolver.roles.bind(this.resolvers.identityTypeResolver),
 				permissions: this.resolvers.identityTypeResolver.permissions.bind(this.resolvers.identityTypeResolver),
+				sessions: this.resolvers.identityTypeResolver.sessions.bind(this.resolvers.identityTypeResolver),
 			},
 			Project: {
 				members: this.resolvers.projectTypeResolver.members.bind(this.resolvers.projectTypeResolver),
@@ -118,7 +118,6 @@ class ResolverFactory {
 				identityProviders: this.resolvers.idpQueryResolver.identityProviders.bind(this.resolvers.idpQueryResolver),
 				mailTemplates: this.resolvers.mailTemplateQueryResolver.mailTemplates.bind(this.resolvers.mailTemplateQueryResolver),
 				configuration: this.resolvers.configurationQueryResolver.configuration.bind(this.resolvers.configurationQueryResolver),
-				mySessions: this.resolvers.sessionsQueryResolver.mySessions.bind(this.resolvers.sessionsQueryResolver),
 				checkResetPasswordToken: () => {
 					throw new Error('not implemented')
 				},

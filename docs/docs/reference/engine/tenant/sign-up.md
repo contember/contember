@@ -43,7 +43,7 @@ mutation {
 | Code | Cause |
 |---|---|
 | `INVALID_EMAIL_FORMAT` | Email failed format validation. |
-| `EMAIL_ALREADY_EXISTS` | An account with that email already exists. Only returned when `login.revealUserExists: true`. |
+| `EMAIL_ALREADY_EXISTS` | An account with that email already exists. Always returned, regardless of `login.revealUserExists` — see [Enumeration behavior](#enumeration-behavior). |
 | `TOO_WEAK` | Password failed strength checks. See `weakPasswordReasons[]`. |
 | `INVALID_CAPTCHA` | Captcha is configured and the token was missing or rejected. *(since 2.2)* |
 | `RATE_LIMIT_EXCEEDED` | Per-IP sign-up rate limit hit. *(since 2.2)* |
@@ -70,19 +70,13 @@ The hint is purely advisory; clients that don't recognize it should fall back to
 }
 ```
 
-## Silent-leak protection *(since 2.2)*
+## Enumeration behavior
 
-When `login.revealUserExists` is `false` and somebody tries to sign up with an already-registered email, the endpoint returns:
+`signUp` always returns `EMAIL_ALREADY_EXISTS` when the address is taken — `revealUserExists: false` does **not** suppress it. An earlier silent-success branch (return `ok: true, result: null` and mail the legitimate owner) was tried and removed: `result === null` vs `result !== null` is trivially distinguishable, so the branch did not actually close the enumeration oracle while degrading UX.
 
-```graphql
-{ ok: true, result: null, errors: [] }
-```
+For tenants that genuinely cannot tolerate sign-up enumeration the recommended pattern is to gate sign-up behind an invite-only flow (don't expose `signUp` to the public login token) and run the public flow through [`createResetPasswordRequest`](./password-reset.md), which is the only auth-flow endpoint that *can* mask existence without lying about it.
 
-— the same shape as a successful sign-up, without any person data. Concurrently a `REGISTRATION_ATTEMPT_EXISTING_USER` mail is sent to the legitimate owner so they know an attempt occurred. The `recommendedAction` hint is **not** included in this branch (it would leak the original error).
-
-Clients that need to detect a successful sign-up should check for `result.person != null`, not just `ok: true`.
-
-See [anti-abuse → enumeration protection](./anti-abuse.md#enumeration-protection) for the full enumeration matrix across all auth flows.
+See [anti-abuse → enumeration protection](./anti-abuse.md#enumeration-protection) for the matrix across all auth flows.
 
 ## Audit
 

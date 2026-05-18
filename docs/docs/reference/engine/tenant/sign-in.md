@@ -35,10 +35,10 @@ Errors:
 | Code | Cause |
 |---|---|
 | `UNKNOWN_EMAIL` | No person with that email. Only returned when `login.revealUserExists: true`. |
-| `INVALID_PASSWORD` | Wrong password. Only returned when `login.revealUserExists: true`. |
-| `INVALID_CREDENTIALS` | Wrong email *or* password. Returned when `login.revealUserExists: false`. |
+| `INVALID_PASSWORD` | Wrong password. Only returned when `login.revealLoginMethod: true` *(since 2.2)*. |
+| `INVALID_CREDENTIALS` | Wrong email *or* password. Returned when `login.revealUserExists: false` (masks the email branch) and/or `login.revealLoginMethod: false` (masks the password/no-password branch). |
 | `PERSON_DISABLED` | The person has been disabled. |
-| `NO_PASSWORD_SET` | The person has no password (IDP-only / passwordless-only). |
+| `NO_PASSWORD_SET` | The person has no password (IDP-only / passwordless-only). Only returned when `login.revealLoginMethod: true` *(since 2.2)*; otherwise collapsed into `INVALID_CREDENTIALS`. |
 | `OTP_REQUIRED` | The person has 2FA enabled and `otpToken` was missing. |
 | `INVALID_OTP_TOKEN` | 2FA token rejected. |
 | `RATE_LIMIT_EXCEEDED` | Per-IP login rate limit *(since 2.2)* or per-email exponential backoff hit. `retryAfter` carries the wait in seconds. |
@@ -76,6 +76,7 @@ All login behavior is controlled by the `login` section of the tenant [configura
 | Field | Effect |
 |---|---|
 | `revealUserExists` | See [anti-abuse — enumeration protection](./anti-abuse.md#enumeration-protection). |
+| `revealLoginMethod` | *(since 2.2)* When `false`, `NO_PASSWORD_SET` / `INVALID_PASSWORD` are collapsed into `INVALID_CREDENTIALS` and `signUp` omits the `recommendedAction` hint on `EMAIL_ALREADY_EXISTS`. Orthogonal to `revealUserExists`. |
 | `baseBackoff`, `maxBackoff`, `attemptWindow` | Per-email exponential backoff. Also drives the mail-init throttle for password reset and passwordless init. |
 | `defaultTokenExpiration` | Lifetime applied when the client omits `expiration`. |
 | `maxTokenExpiration` | Cap on client-requested `expiration`. |

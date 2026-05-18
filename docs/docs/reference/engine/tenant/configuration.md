@@ -23,6 +23,7 @@ query {
     }
     login {
       revealUserExists
+      revealLoginMethod
       baseBackoff
       maxBackoff
       attemptWindow
@@ -93,7 +94,8 @@ See [password policy](./password-policy.md) for individual fields and the `WeakP
 
 | Field | Default | Notes |
 |---|---|---|
-| `revealUserExists` | `true` | When `false`, all sign-in / sign-up / reset / passwordless-init failures look identical to the caller. See [anti-abuse — enumeration protection](./anti-abuse.md#enumeration-protection). |
+| `revealUserExists` | `true` | When `false`, unknown-email failures on sign-in / reset / passwordless-init are masked. See [anti-abuse — enumeration protection](./anti-abuse.md#enumeration-protection). |
+| `revealLoginMethod` | `true` | *(since 2.2)* When `false`, `signIn` collapses `NO_PASSWORD_SET` / `INVALID_PASSWORD` into a generic `INVALID_CREDENTIALS` and `signUp` omits the `recommendedAction` hint on `EMAIL_ALREADY_EXISTS`. Orthogonal to `revealUserExists` — `UNKNOWN_EMAIL` is still controlled by that flag. |
 | `baseBackoff` | `PT1S` | Starting backoff between per-email login attempts. Also drives the per-email mail-init throttle for password reset and passwordless init. |
 | `maxBackoff` | `PT1M` | Upper bound for the exponential backoff. |
 | `attemptWindow` | `PT5M` | How long failed attempts are remembered. |
@@ -133,7 +135,7 @@ Sliding-window per-IP limits. `limit: 0` (the default) disables that scope. See 
 mutation {
   configure(config: {
     password: { minLength: 12, checkBlacklist: true, checkHibp: true },
-    login:    { revealUserExists: false },
+    login:    { revealUserExists: false, revealLoginMethod: false },
     captcha:  { provider: turnstile, secret: "…" },
     rateLimits: {
       signUpPerIp:           { limit: 5,   window: "PT1H" },

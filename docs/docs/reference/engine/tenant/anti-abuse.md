@@ -5,7 +5,7 @@ title: Anti-abuse protections
 The Tenant API has five layered defenses against credential stuffing, account enumeration, password spraying, and resource abuse. They are independent — each can be enabled and tuned separately — and all live behind the [`configure`](./configuration.md) mutation.
 
 :::note Available since 2.2
-Captcha, per-IP rate limits, HIBP check, and the sign-up silent-leak branch ship in engine **2.2**. The per-email login backoff and `revealUserExists` flag have been around since 1.x.
+Captcha, per-IP rate limits, and the HIBP check ship in engine **2.2**. The per-email login backoff and `revealUserExists` flag have been around since 1.x.
 :::
 
 ## Where each protection applies
@@ -110,35 +110,36 @@ mutation {
 
 ## Enumeration protection
 
-`login.revealUserExists` controls whether the API tells callers that an email is or isn't registered.
+Two orthogonal flags control how much the API leaks about an account on auth failure:
 
-When `revealUserExists: true` (the default — preserved for backwards compatibility):
+- **`login.revealUserExists`** — does the response distinguish "no such email" from "wrong password"?
+- **`login.revealLoginMethod`** *(since 2.2)* — when an email exists, does the response distinguish "wrong password" from "this person has no password set" (i.e. they sign in via IDP or passwordless)? Also gates the `recommendedAction` hint on `signUp`'s `EMAIL_ALREADY_EXISTS`.
 
-| Flow | Unknown email | Wrong password / state |
-|---|---|---|
-| `signIn` | `UNKNOWN_EMAIL` | `INVALID_PASSWORD` |
-| `signUp` | (proceeds) | `EMAIL_ALREADY_EXISTS` |
-| `createResetPasswordRequest` | `PERSON_NOT_FOUND` | (proceeds) |
-| `initSignInPasswordless` | `PERSON_NOT_FOUND` | (proceeds) |
+Both default to `true` (preserved for backwards compatibility). Privacy-conscious tenants typically set both to `false`.
 
-When `revealUserExists: false`:
+When `revealUserExists: true` and `revealLoginMethod: true` (defaults):
 
-| Flow | Unknown email | Wrong password / state |
-|---|---|---|
-| `signIn` | `INVALID_CREDENTIALS` | `INVALID_CREDENTIALS` |
-| `signUp` | (proceeds) | `ok: true, result: null` + silent notice mail to the real owner *(since 2.2)* |
-| `createResetPasswordRequest` | `ok: true` | (proceeds) |
-| `initSignInPasswordless` | `PASSWORDLESS_DISABLED` | (proceeds) |
+| Flow | Unknown email | Wrong password | No password set (IDP/passwordless-only) |
+|---|---|---|---|
+| `signIn` | `UNKNOWN_EMAIL` | `INVALID_PASSWORD` | `NO_PASSWORD_SET` |
+| `signUp` | (proceeds) | `EMAIL_ALREADY_EXISTS` + `recommendedAction` | — |
+| `createResetPasswordRequest` | `PERSON_NOT_FOUND` | (proceeds) | — |
+| `initSignInPasswordless` | `PERSON_NOT_FOUND` | (proceeds) | — |
 
-### Sign-up silent-leak protection *(since 2.2)*
+When `revealUserExists: false` and `revealLoginMethod: false` (recommended for public tenants):
 
-Pre-2.2, a `signUp` with `revealUserExists: false` still leaked existence via `EMAIL_ALREADY_EXISTS`. From 2.2 the sign-up endpoint:
+| Flow | Unknown email | Wrong password | No password set |
+|---|---|---|---|
+| `signIn` | `INVALID_CREDENTIALS` | `INVALID_CREDENTIALS` | `INVALID_CREDENTIALS` |
+| `signUp` | (proceeds) | `EMAIL_ALREADY_EXISTS` (no `recommendedAction`; see below) | — |
+| `createResetPasswordRequest` | `ok: true` | (proceeds) | — |
+| `initSignInPasswordless` | `PASSWORDLESS_DISABLED` | (proceeds) | — |
 
-1. Returns `ok: true, result: null` — the attacker sees the same response shape as a successful sign-up.
-2. Sends a `REGISTRATION_ATTEMPT_EXISTING_USER` mail to the legitimate account holder so they know somebody tried to register with their email.
-3. The `recommendedAction` hint (`SIGN_IN` / `RESET_PASSWORD`) on `SignUpError` is **not** echoed in the silent branch.
+The two flags can be mixed independently. `revealUserExists: false` alone still distinguishes `INVALID_PASSWORD` vs `NO_PASSWORD_SET`; `revealLoginMethod: false` alone still distinguishes `UNKNOWN_EMAIL` vs `INVALID_CREDENTIALS`.
 
-See [sign-up](./sign-up.md) for the full mutation reference.
+### Sign-up enumeration
+
+`signUp` is the one flow where `revealUserExists` does **not** mask existence — `EMAIL_ALREADY_EXISTS` is returned regardless. An earlier silent-success branch was tried and removed because `result === null` vs `result !== null` is trivially distinguishable, so it didn't actually close the oracle. For tenants that need to fully suppress sign-up enumeration the recommendation is to take `signUp` off the public login token and run the public flow through [invites](./invites.md) or [password reset](./password-reset.md). See [sign-up](./sign-up.md) for details.
 
 ## Recommended baseline
 
@@ -146,7 +147,7 @@ For any tenant exposed to the public internet:
 
 - `password.checkBlacklist: true`, `password.checkHibp: true`
 - `password.minLength: 12` or higher
-- `login.revealUserExists: false`
+- `login.revealUserExists: false`, `login.revealLoginMethod: false`
 - Captcha provider configured
 - Rate limits set for all four scopes
 

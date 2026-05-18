@@ -84,7 +84,7 @@ test('force sign-out – PERSON_NOT_FOUND', async () => {
 		},
 		expectedAuthLog: {
 			type: 'forced_sign_out',
-			targetPersonId: personId,
+			metadata: { requestedPersonId: personId },
 			response: expect.objectContaining({ ok: false }),
 		},
 	})

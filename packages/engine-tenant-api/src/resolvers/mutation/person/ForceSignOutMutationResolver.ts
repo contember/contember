@@ -31,8 +31,10 @@ export class ForceSignOutMutationResolver implements Pick<MutationResolvers, 'fo
 			await context.logAuthAction({
 				type: 'forced_sign_out',
 				response,
-				targetPersonId: args.personId,
-				metadata: reason !== null ? { reason } : undefined,
+				metadata: {
+					requestedPersonId: args.personId,
+					...(reason !== null ? { reason } : {}),
+				},
 			})
 			return createErrorResponse(response.error, response.errorMessage)
 		}

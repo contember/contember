@@ -42,6 +42,7 @@ Picking the correct token for a given operation can be confusing. The canonical 
 | Manage project membership | [Memberships](./memberships.md) |
 | Permanently disable an account | [Disabling a person](./disable-person.md) |
 | Create or revoke long-lived API keys for applications | [API keys](./api-keys.md) |
+| Create or update projects, set project secrets | [Project management](./projects.md) |
 | List, revoke, or force-end user sessions | [Sessions](./sessions.md) |
 | Have a backend service forward real user IP/UA to Contember | [Proxy trust](./proxy-trust.md) |
 | Tune password policy, captcha, rate limits | [Password policy](./password-policy.md) · [Anti-abuse](./anti-abuse.md) |

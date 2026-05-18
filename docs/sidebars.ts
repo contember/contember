@@ -189,6 +189,7 @@ const sidebars: SidebarsConfig = {
 						'reference/engine/tenant/memberships',
 						'reference/engine/tenant/disable-person',
 						'reference/engine/tenant/api-keys',
+						'reference/engine/tenant/projects',
 						'reference/engine/tenant/proxy-trust',
 						'reference/engine/tenant/password-policy',
 						'reference/engine/tenant/anti-abuse',

@@ -33,7 +33,7 @@ query {
 }
 ```
 
-`Identity.sessions` is also reachable through `personById(id) { identity { sessions } }` and `projectBySlug { members { identity { sessions } } }`, subject to permission — by default only the owning identity and tenants with explicit grants can read someone else's sessions.
+`Identity.sessions` is also reachable through `personById(id) { identity { sessions } }` and `projectBySlug { members { identity { sessions } } }`. The owning identity always sees its own sessions; reading someone else's requires the `person:viewSessions` permission against the target's roles — `SUPER_ADMIN` sees everyone, `PROJECT_ADMIN` sees members whose roles fall within their allowed-input-roles, anyone else with an explicit ACL grant for `person:viewSessions` sees within the configured scope. When the caller lacks visibility on a particular identity the field returns an empty list rather than throwing, so batched queries don't abort on a single forbidden target.
 
 ### `SessionInfo` fields
 

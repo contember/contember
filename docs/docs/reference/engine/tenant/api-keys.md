@@ -98,40 +98,6 @@ The flag cannot be flipped on an existing api_key. To remove it, disable the key
 
 *(since 2.2)* Every `createApiKey` / `createGlobalApiKey` is recorded as `api_key_create` in the [audit log](./audit-log.md) with the api_key id, identity, and memberships/roles — never the token or its hash. `disableApiKey` is recorded as `api_key_disable`.
 
-## Add Global Roles to an Identity
-
-```graphql
-mutation {
-  addGlobalIdentityRoles(
-    identityId: "some-identity-id",
-    roles: ["super_admin", "monitor"]
-  ) {
-    ok
-    error {
-      code
-    }
-  }
-}
-```
-
-## Remove Global Roles from an Identity
-
-```graphql
-mutation {
-  removeGlobalIdentityRoles(
-    identityId: "some-identity-id",
-    roles: ["monitor"]
-  ) {
-    ok
-    error {
-      code
-    }
-  }
-}
-```
-
-
-
 ## Session keys vs permanent keys
 
 API keys come in two flavors:

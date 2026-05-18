@@ -109,6 +109,21 @@ query AdminActionsAgainstPerson($target: String!, $after: DateTime!) {
 
 In Contember Cloud the same data drives the dashboard view.
 
+#### `AuthLogFilter` fields
+
+All fields are AND-combined; omitted fields are unconstrained.
+
+| Field | Notes |
+|---|---|
+| `types` | OR-combined list of `auth_log_type` values. |
+| `success` | Filter to successful or failed events only. |
+| `invokedByIdentityId` | Actor identity. |
+| `personId` | Actor's person. |
+| `targetPersonId` | Subject of the action — for force sign-out, role grant, membership change, etc. |
+| `personInputIdentifier` | The free-form identifier submitted by the caller (usually the email on a failed `signIn` / `signUp`). Useful for tracking probe attempts against a specific email that does not exist in `person`. |
+| `createdAfter` | Inclusive lower bound (`created_at >= createdAfter`). |
+| `createdBefore` | Exclusive upper bound (`created_at < createdBefore`). |
+
 ### Direct SQL
 
 You can also query `person_auth_log` directly via the tenant database — useful for ad-hoc analytics that don't map cleanly onto the `AuthLogFilter` input:

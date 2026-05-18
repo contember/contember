@@ -91,6 +91,45 @@ query {
 }
 ```
 
+## Global identity roles
+
+Project memberships scope a person's access to a single project. **Global roles** (`super_admin`, `project_admin`, custom global roles defined in the tenant ACL — see [Tenant ACL permissions](/reference/engine/schema/acl.md#tenant-permissions)) are attached directly to an identity and are not project-scoped. Two mutations grant and revoke them:
+
+```graphql
+mutation {
+  addGlobalIdentityRoles(
+    identityId: "2f673a53-af33-42b1-9e17-e1305fa26d9d",
+    roles: ["super_admin", "monitor"]
+  ) {
+    ok
+    error { code developerMessage }
+    result { identity { id roles } }
+  }
+}
+```
+
+```graphql
+mutation {
+  removeGlobalIdentityRoles(
+    identityId: "2f673a53-af33-42b1-9e17-e1305fa26d9d",
+    roles: ["monitor"]
+  ) {
+    ok
+    error { code }
+    result { identity { id roles } }
+  }
+}
+```
+
+Errors:
+
+| Code | Cause |
+|---|---|
+| `IDENTITY_NOT_FOUND` | No such identity. |
+| `INVALID_ROLE` | A role in the list is not defined in the tenant ACL or the caller is not allowed to grant it. |
+
+Both are gated by `identity:addGlobalRoles` / `identity:removeGlobalRoles` against the role list — `SUPER_ADMIN` can grant any role, `PROJECT_ADMIN` is restricted to the project-admin allowed-input-roles set, and any other identity needs an explicit ACL grant scoping which roles it may assign. `result.identity.roles` echoes the new role set after the mutation.
+
 ## Audit
 
 :::note Available since 2.2

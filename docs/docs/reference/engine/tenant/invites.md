@@ -14,12 +14,12 @@ mutation {
     memberships: [
       {
         role: "editor",
-        variables: [{name: "language", values: ["en}]
+        variables: [{name: "language", values: ["en"]}]
       }
     ],
     options: {
-        mailVariant: "en_us",  # Optional
-        method: RESET_PASSWORD  # Recommended
+      mailVariant: "en_us",   # Optional
+      method: RESET_PASSWORD  # Recommended
     }
   ) {
     ok

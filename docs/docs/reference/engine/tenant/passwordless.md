@@ -145,3 +145,40 @@ mutation {
   }
 }
 ```
+
+#### Completing sign-in with MFA
+
+If 2FA is enabled for the person, `signInPasswordless` requires the current TOTP code via the `mfaOtp` argument. A missing or wrong code is reported the same way as on `signIn`:
+
+```graphql
+mutation {
+  signInPasswordless(
+    requestId: "abcd1234",
+    validationType: token,
+    token: "xyz789",
+    mfaOtp: "123456"
+  ) {
+    ok
+    error { code }
+    result { token person { id email } }
+  }
+}
+```
+
+Error codes added in this case: `OTP_REQUIRED` (no `mfaOtp` supplied), `INVALID_OTP_TOKEN` (wrong code). React to `OTP_REQUIRED` by prompting the user and retrying with `mfaOtp` populated. See [two-factor](./two-factor.md) for the broader 2FA reference.
+
+### Per-person opt-in / opt-out
+
+When `passwordless.enabled` is `optIn` or `optOut` (see [configuration](./configuration.md)), each person can flip their own preference with two self-service mutations:
+
+```graphql
+mutation { enableMyPasswordless  { ok error { code } } }
+mutation { disableMyPasswordless { ok error { code } } }
+```
+
+| Code | Cause |
+|---|---|
+| `NOT_A_PERSON` | Caller is authenticated via a permanent API key, not a person. |
+| `CANNOT_TOGGLE` | `passwordless.enabled` is `always` or `never` — the tenant has forced the setting globally and individual persons cannot override it. |
+
+The mutations are gated by the `PERSON_TOGGLE_PASSWORDLESS` permission, which is held by `PERSON` (any authenticated person) by default. The current state is observable through `me { person { passwordlessEnabled } }`.

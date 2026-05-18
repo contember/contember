@@ -13,7 +13,6 @@ Mail templates in Contember enable tailored communication for emails dispatched 
 | `RESET_PASSWORD_REQUEST` | `createResetPasswordRequest` is called for an existing person. Carries the reset token / link. | 1.x |
 | `PASSWORDLESS_SIGN_IN` | `initSignInPasswordless` succeeds. Carries the magic link and OTP info. | 1.x |
 | `FORCED_SIGN_OUT` | An admin force-signs-out the person via `forceSignOutPerson`. Informational notice that all sessions were ended. | 2.2 |
-| `REGISTRATION_ATTEMPT_EXISTING_USER` | Somebody tries to `signUp` with an already-registered email while `login.revealUserExists: false`. Sent to the legitimate owner. | 2.2 |
 
 Each type ships with a default template. In Contember Cloud setups, enhanced custom templates are pre-installed and can be modified or overwritten.
 
@@ -29,8 +28,9 @@ Each type ships with a default template. In Contember Cloud setups, enhanced cus
            subject: "Welcome to Our Platform",
            content: "Hello {{email}}, get started with our platform!",
            projectSlug: "YourProjectSlug",     # Optional: for project-specific templates
-           variant: "en-US",                  # Optional: for different variants like locales
-           useLayout: true                    # Optional: set to false for custom designs
+           variant: "en-US",                   # Optional: for different variants like locales
+           useLayout: true,                    # Optional: set to false for custom designs
+           replyTo: "support@example.com"      # Optional: Reply-To header
        }) {
            ok,
            error {
@@ -41,12 +41,13 @@ Each type ships with a default template. In Contember Cloud setups, enhanced cus
    }
    ```
   Input breakdown:
-- `type`: The type of the mail, i.e., `NEW_USER_INVITED`, `EXISTING_USER_INVITED`, or `RESET_PASSWORD_REQUEST`.
+- `type`: The mail type — one of the values from the table above (`NEW_USER_INVITED`, `EXISTING_USER_INVITED`, `RESET_PASSWORD_REQUEST`, `PASSWORDLESS_SIGN_IN`, `FORCED_SIGN_OUT`).
 - `subject`: The email's subject.
 - `content`: The email's main content, with Mustache variables for dynamic information.
 - `projectSlug`: To specify a particular project.
 - `variant`: For different template variants, such as language or design.
 - `useLayout`: A flag to determine whether to use the default layout.
+- `replyTo`: Optional. Sets the `Reply-To` header on the outgoing mail. Omit (or pass `null`) to leave the default.
 
 - **Removing a Mail Template**:  
 To delete a custom template, use the `removeMailTemplate` mutation. When removed, the system defaults back to the original template.
@@ -112,9 +113,6 @@ Contember uses Mustache for dynamic content in templates. Here are the variables
 - **FORCED_SIGN_OUT** *(since 2.2)*:
 - `{{email}}`: Recipient's email.
 - `{{reason}}`: Optional reason supplied by the admin to `forceSignOutPerson`. Empty when no reason was provided.
-
-- **REGISTRATION_ATTEMPT_EXISTING_USER** *(since 2.2)*:
-- `{{email}}`: Recipient's email — the legitimate owner of the account that somebody tried to register against.
 
 :::note
 `projectSlug` is available since Engine 1.3+

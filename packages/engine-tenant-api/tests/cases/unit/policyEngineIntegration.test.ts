@@ -2,7 +2,6 @@ import { describe, expect, test } from 'bun:test'
 import { PolicyEngine, StaticPolicySource } from '@contember/policy'
 import { Acl } from '@contember/schema'
 import { BUILTIN_POLICIES, ProjectSchemaPolicyProvider, TenantActions, TenantResources } from '../../../src/model/policy'
-import { MembershipMatcher } from '../../../src/model/authorization/MembershipMatcher'
 
 const decision = async (sources: { name: string; statements: any[] }[], action: string, resource: string, ctx: any) => {
 	const engine = new PolicyEngine(sources.map(s => new StaticPolicySource(s.name, s.statements)))
@@ -255,11 +254,11 @@ describe('ProjectSchemaPolicyProvider — translation', () => {
 })
 
 /**
- * These tests pin the translation to MembershipMatcher's behavior. For every
- * (invoker, subject) pair, both paths must agree — otherwise the policy engine
- * rollout silently changes who can manage what.
+ * Semantic edge cases for the manage-rule translation. These pin down behavior
+ * the rule grammar inherits from the legacy membership matcher (e.g. variable
+ * subset constraints, vacuous matches, extra-variable rejection).
  */
-describe('ProjectSchemaPolicyProvider — MembershipMatcher parity', () => {
+describe('ProjectSchemaPolicyProvider — membership rule semantics', () => {
 	const aclWithVariables: Acl.Schema = {
 		roles: {
 			editor: {
@@ -281,18 +280,6 @@ describe('ProjectSchemaPolicyProvider — MembershipMatcher parity', () => {
 			},
 		},
 	} as any
-
-	const runMatcher = (
-		acl: Acl.Schema,
-		invoker: Acl.Membership,
-		subject: Acl.Membership,
-		ruleKey: 'manage' | 'view' | 'invite' | 'unmanagedInvite' = 'manage',
-	): boolean => {
-		const tenant = acl.roles[invoker.role]?.tenant
-		const rule = tenant?.[ruleKey]
-		const matcher = new MembershipMatcher([{ ...invoker, matchRule: rule ?? {} }])
-		return matcher.matches(subject)
-	}
 
 	const runPolicy = async (
 		acl: Acl.Schema,
@@ -316,18 +303,14 @@ describe('ProjectSchemaPolicyProvider — MembershipMatcher parity', () => {
 		return result.decision === 'allow'
 	}
 
-	test('subject with no variables — matches invoker who has variables (vacuous)', async () => {
+	test('subject with no variables — vacuously matches invoker with variables', async () => {
 		const invoker: Acl.Membership = { role: 'editor', variables: [{ name: 'team', values: ['eng'] }] }
 		const subject: Acl.Membership = { role: 'editor', variables: [] }
 
-		const matcherAllows = runMatcher(aclWithVariables, invoker, subject)
-		const policyAllows = await runPolicy(aclWithVariables, invoker, subject)
-
-		expect(matcherAllows).toBe(true)
-		expect(policyAllows).toBe(matcherAllows)
+		expect(await runPolicy(aclWithVariables, invoker, subject)).toBe(true)
 	})
 
-	test('subject with extra variable not in rule — both deny', async () => {
+	test('subject with extra variable not in rule — deny', async () => {
 		const invoker: Acl.Membership = { role: 'editor', variables: [{ name: 'team', values: ['eng'] }] }
 		const subject: Acl.Membership = {
 			role: 'editor',
@@ -337,46 +320,37 @@ describe('ProjectSchemaPolicyProvider — MembershipMatcher parity', () => {
 			],
 		}
 
-		const matcherAllows = runMatcher(aclWithVariables, invoker, subject)
-		const policyAllows = await runPolicy(aclWithVariables, invoker, subject)
-
-		expect(matcherAllows).toBe(false)
-		expect(policyAllows).toBe(matcherAllows)
-	})
-
-	test('subject values subset of invoker — both allow', async () => {
-		const invoker: Acl.Membership = { role: 'editor', variables: [{ name: 'team', values: ['eng', 'platform'] }] }
-		const subject: Acl.Membership = { role: 'editor', variables: [{ name: 'team', values: ['eng'] }] }
-
-		expect(runMatcher(aclWithVariables, invoker, subject)).toBe(true)
-		expect(await runPolicy(aclWithVariables, invoker, subject)).toBe(true)
-	})
-
-	test('subject values not subset of invoker — both deny', async () => {
-		const invoker: Acl.Membership = { role: 'editor', variables: [{ name: 'team', values: ['eng'] }] }
-		const subject: Acl.Membership = { role: 'editor', variables: [{ name: 'team', values: ['ops'] }] }
-
-		expect(runMatcher(aclWithVariables, invoker, subject)).toBe(false)
 		expect(await runPolicy(aclWithVariables, invoker, subject)).toBe(false)
 	})
 
-	test('rule has no variables — even an empty-variables subject is rejected', async () => {
-		// MembershipRoleMatchRule = `{}` (no `variables` key) — MembershipMatcher
-		// rejects any subject because `variables?.[name]` is undefined for any name,
-		// but empty subject vars vacuously pass. Let's verify both:
+	test('subject values subset of invoker — allow', async () => {
+		const invoker: Acl.Membership = { role: 'editor', variables: [{ name: 'team', values: ['eng', 'platform'] }] }
+		const subject: Acl.Membership = { role: 'editor', variables: [{ name: 'team', values: ['eng'] }] }
+
+		expect(await runPolicy(aclWithVariables, invoker, subject)).toBe(true)
+	})
+
+	test('subject values not subset of invoker — deny', async () => {
+		const invoker: Acl.Membership = { role: 'editor', variables: [{ name: 'team', values: ['eng'] }] }
+		const subject: Acl.Membership = { role: 'editor', variables: [{ name: 'team', values: ['ops'] }] }
+
+		expect(await runPolicy(aclWithVariables, invoker, subject)).toBe(false)
+	})
+
+	test('rule = `{}` (no variables key) — empty-variables subject passes vacuously', async () => {
+		// `MembershipRoleMatchRule` = `{}` (no `variables` key) — a subject with
+		// no variables passes vacuously (the forAllKeys check sees an empty
+		// subject), but any non-empty subject variable set is rejected by the
+		// shape constraint.
 		const invoker: Acl.Membership = { role: 'noVarRule', variables: [] }
 
-		// subject with no variables: original passes (every of [] is true), translation also passes
 		const subjectEmpty: Acl.Membership = { role: 'viewer', variables: [] }
-		expect(runMatcher(aclWithVariables, invoker, subjectEmpty)).toBe(true)
 		expect(await runPolicy(aclWithVariables, invoker, subjectEmpty)).toBe(true)
 
-		// subject with any variable: original rejects, translation must reject too
 		const subjectWithVar: Acl.Membership = {
 			role: 'viewer',
 			variables: [{ name: 'anything', values: ['x'] }],
 		}
-		expect(runMatcher(aclWithVariables, invoker, subjectWithVar)).toBe(false)
 		expect(await runPolicy(aclWithVariables, invoker, subjectWithVar)).toBe(false)
 	})
 
@@ -395,40 +369,20 @@ describe('ProjectSchemaPolicyProvider — MembershipMatcher parity', () => {
 			variables: [{ name: 'whatever', values: ['x', 'y'] }],
 		}
 
-		expect(runMatcher(acl, invoker, subject)).toBe(true)
 		expect(await runPolicy(acl, invoker, subject)).toBe(true)
 	})
 })
 
 /**
- * Regression tests for parity bugs found in second-round review:
+ * Regression tests for the invite/manage fallback semantics:
  *
- * 1. `invite: true, manage: undefined` must deny (legacy maps to `{}` which
+ * 1. `invite: true, manage: undefined` must deny (the fallback rule `{}`
  *    matches nothing) — NOT emit an unconditional allow.
  * 2. When the outer "some role has invite" gate passes, all invoker memberships
  *    must contribute (their `manage` rule acting as the invite rule), even if
- *    their own role doesn't set invite. Legacy union across memberships.
+ *    their own role doesn't set invite. Decisions union across memberships.
  */
-describe('ProjectSchemaPolicyProvider — invite/manage fallback parity', () => {
-	const runMatcherInvite = (
-		acl: Acl.Schema,
-		invoker: readonly Acl.Membership[],
-		subject: Acl.Membership,
-	): boolean => {
-		// Mirror legacy AclSchemaAccessNodeFactory invite verifier construction.
-		const membershipRoles = invoker.map(it => acl.roles[it.role]).filter((it): it is Acl.RolePermissions => !!it)
-		if (!membershipRoles.some(it => it.tenant?.invite)) return false
-		const matcher = new MembershipMatcher(invoker.map(it => ({
-			...it,
-			matchRule: (() => {
-				const tenant = acl.roles[it.role]?.tenant
-				const inv = tenant?.invite
-				return inv && inv !== true ? inv : tenant?.manage ?? {}
-			})(),
-		})))
-		return matcher.matches(subject)
-	}
-
+describe('ProjectSchemaPolicyProvider — invite/manage fallback semantics', () => {
 	const runPolicyInvite = async (
 		acl: Acl.Schema,
 		invoker: readonly Acl.Membership[],
@@ -451,7 +405,7 @@ describe('ProjectSchemaPolicyProvider — invite/manage fallback parity', () => 
 		return result.decision === 'allow'
 	}
 
-	test('invite=true, manage=undefined → deny (legacy "{}" rule matches nothing)', async () => {
+	test('invite=true, manage=undefined → deny (fallback "{}" rule matches nothing)', async () => {
 		const acl: Acl.Schema = {
 			roles: {
 				editor: { entities: {}, tenant: { invite: true } },
@@ -460,11 +414,10 @@ describe('ProjectSchemaPolicyProvider — invite/manage fallback parity', () => 
 		const invoker: Acl.Membership[] = [{ role: 'editor', variables: [] }]
 		const subject: Acl.Membership = { role: 'viewer', variables: [] }
 
-		expect(runMatcherInvite(acl, invoker, subject)).toBe(false)
 		expect(await runPolicyInvite(acl, invoker, subject)).toBe(false)
 	})
 
-	test('invite=true, manage=true → allow (legacy "true" rule matches anything)', async () => {
+	test('invite=true, manage=true → allow (fallback "true" rule matches anything)', async () => {
 		const acl: Acl.Schema = {
 			roles: {
 				editor: { entities: {}, tenant: { invite: true, manage: true } },
@@ -473,7 +426,6 @@ describe('ProjectSchemaPolicyProvider — invite/manage fallback parity', () => 
 		const invoker: Acl.Membership[] = [{ role: 'editor', variables: [] }]
 		const subject: Acl.Membership = { role: 'anyone', variables: [] }
 
-		expect(runMatcherInvite(acl, invoker, subject)).toBe(true)
 		expect(await runPolicyInvite(acl, invoker, subject)).toBe(true)
 	})
 
@@ -487,10 +439,7 @@ describe('ProjectSchemaPolicyProvider — invite/manage fallback parity', () => 
 		const admin: Acl.Membership = { role: 'admin', variables: [] }
 		const other: Acl.Membership = { role: 'viewer', variables: [] }
 
-		expect(runMatcherInvite(acl, invoker, admin)).toBe(true)
 		expect(await runPolicyInvite(acl, invoker, admin)).toBe(true)
-
-		expect(runMatcherInvite(acl, invoker, other)).toBe(false)
 		expect(await runPolicyInvite(acl, invoker, other)).toBe(false)
 	})
 
@@ -504,10 +453,7 @@ describe('ProjectSchemaPolicyProvider — invite/manage fallback parity', () => 
 		const admin: Acl.Membership = { role: 'admin', variables: [] }
 		const other: Acl.Membership = { role: 'viewer', variables: [] }
 
-		expect(runMatcherInvite(acl, invoker, admin)).toBe(true)
 		expect(await runPolicyInvite(acl, invoker, admin)).toBe(true)
-
-		expect(runMatcherInvite(acl, invoker, other)).toBe(false)
 		expect(await runPolicyInvite(acl, invoker, other)).toBe(false)
 	})
 
@@ -518,17 +464,16 @@ describe('ProjectSchemaPolicyProvider — invite/manage fallback parity', () => 
 				roleY: { entities: {}, tenant: { manage: { admin: true } } },
 			},
 		} as any
-		// Invoker holds BOTH memberships. Legacy's verifier is created because
-		// roleX has truthy invite; then every membership's matchRule contributes
-		// via `.some(...)` — roleY's matchRule = manage ?? {} = {admin: true},
-		// which matches the admin subject.
+		// Invoker holds BOTH memberships. The invite outer gate is opened by
+		// roleX's truthy invite; then every membership's effective rule
+		// contributes — roleY's rule (manage ?? {} = {admin: true}) matches the
+		// admin subject.
 		const invoker: Acl.Membership[] = [
 			{ role: 'roleX', variables: [] },
 			{ role: 'roleY', variables: [] },
 		]
 		const admin: Acl.Membership = { role: 'admin', variables: [] }
 
-		expect(runMatcherInvite(acl, invoker, admin)).toBe(true)
 		expect(await runPolicyInvite(acl, invoker, admin)).toBe(true)
 	})
 
@@ -541,7 +486,6 @@ describe('ProjectSchemaPolicyProvider — invite/manage fallback parity', () => 
 		const invoker: Acl.Membership[] = [{ role: 'roleX', variables: [] }]
 		const admin: Acl.Membership = { role: 'admin', variables: [] }
 
-		expect(runMatcherInvite(acl, invoker, admin)).toBe(false)
 		expect(await runPolicyInvite(acl, invoker, admin)).toBe(false)
 	})
 
@@ -554,9 +498,7 @@ describe('ProjectSchemaPolicyProvider — invite/manage fallback parity', () => 
 		const invoker: Acl.Membership[] = [{ role: 'editor', variables: [] }]
 		const admin: Acl.Membership = { role: 'admin', variables: [] }
 
-		// Legacy: outer guard fails (no role has invite truthy)
-		expect(runMatcherInvite(acl, invoker, admin)).toBe(false)
-		// New: inviteEnabled is false → no invite statements emitted
+		// inviteEnabled is false → no invite statements emitted
 		expect(await runPolicyInvite(acl, invoker, admin)).toBe(false)
 	})
 })

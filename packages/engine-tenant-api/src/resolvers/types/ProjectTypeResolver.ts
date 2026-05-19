@@ -16,8 +16,7 @@ export class ProjectTypeResolver implements ProjectResolvers {
 		args: ProjectMembersArgs,
 		context: TenantResolverContext,
 	): Promise<readonly ProjectIdentityRelation[]> {
-		const projectScope = await context.permissionContext.createProjectScope(parent)
-		const verifier = context.permissionContext.createAccessVerifier(projectScope)
+		const verifier = context.permissionContext.createAccessVerifier(parent)
 		if (!(await verifier(PermissionActions.PROJECT_VIEW_MEMBER([])))) {
 			return []
 		}

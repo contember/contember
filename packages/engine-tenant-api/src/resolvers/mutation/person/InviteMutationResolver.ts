@@ -22,7 +22,7 @@ export class InviteMutationResolver implements MutationResolvers {
 	): Promise<InviteResponse> {
 		const project = await this.projectManager.getProjectBySlug(context.db, projectSlug)
 		await context.requireAccess({
-			scope: await context.permissionContext.createProjectScope(project),
+			project,
 			action: PermissionActions.PERSON_INVITE(memberships),
 			message: 'You are not allowed to invite a person',
 		})
@@ -46,7 +46,7 @@ export class InviteMutationResolver implements MutationResolvers {
 	): Promise<InviteResponse> {
 		const project = await this.projectManager.getProjectBySlug(context.db, projectSlug)
 		await context.requireAccess({
-			scope: await context.permissionContext.createProjectScope(project),
+			project,
 			action: PermissionActions.PERSON_INVITE_UNMANAGED(memberships),
 			message: 'You are not allowed to unmanaged person invite',
 		})

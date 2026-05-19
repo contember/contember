@@ -15,7 +15,7 @@ export class UpdateProjectMutationResolver implements MutationResolvers {
 	): Promise<UpdateProjectResponse> {
 		const project = await this.projectManager.getProjectBySlug(context.db, args.projectSlug)
 		await context.requireAccess({
-			scope: await context.permissionContext.createProjectScope(project),
+			project,
 			action: PermissionActions.PROJECT_UPDATE,
 			message: 'You are not allowed to update a project',
 		})

@@ -37,34 +37,34 @@ class StubService extends PolicyService {
 	) {
 		super()
 	}
-	async list(): Promise<PolicyDto[]> {
+	override async list(): Promise<PolicyDto[]> {
 		this.lastCall = { method: 'list', args: [] }
 		return this.impl.list ? this.impl.list() : []
 	}
-	async getBySlug(_db: any, slug: string): Promise<PolicyDto | null> {
+	override async getBySlug(_db: any, slug: string): Promise<PolicyDto | null> {
 		this.lastCall = { method: 'getBySlug', args: [slug] }
 		return this.impl.getBySlug ? this.impl.getBySlug(slug) : null
 	}
-	async create(_db: any, input: any): Promise<{ id: string }> {
+	override async create(_db: any, input: any): Promise<{ id: string }> {
 		this.lastCall = { method: 'create', args: [input] }
 		return this.impl.create ? this.impl.create() : { id: 'new-id' }
 	}
-	async update(_db: any, slug: string, input: any): Promise<{ updated: boolean }> {
+	override async update(_db: any, slug: string, input: any): Promise<{ updated: boolean }> {
 		this.lastCall = { method: 'update', args: [slug, input] }
 		if (!this.impl.update) throw new PolicyNotFoundError(slug)
 		return this.impl.update()
 	}
-	async delete(_db: any, slug: string): Promise<{ deleted: boolean }> {
+	override async delete(_db: any, slug: string): Promise<{ deleted: boolean }> {
 		this.lastCall = { method: 'delete', args: [slug] }
 		return this.impl.delete ? this.impl.delete() : { deleted: false }
 	}
-	async assign(_db: any, identityId: string, policySlug: string, tags: Record<string, unknown>): Promise<void> {
+	override async assign(_db: any, identityId: string, policySlug: string, tags: Record<string, unknown>): Promise<void> {
 		this.lastCall = { method: 'assign', args: [identityId, policySlug, tags] }
 		if (this.impl.assign) {
 			await this.impl.assign()
 		}
 	}
-	async revoke(_db: any, identityId: string, policySlug: string): Promise<{ revoked: boolean }> {
+	override async revoke(_db: any, identityId: string, policySlug: string): Promise<{ revoked: boolean }> {
 		this.lastCall = { method: 'revoke', args: [identityId, policySlug] }
 		return this.impl.revoke ? this.impl.revoke() : { revoked: false }
 	}
@@ -104,14 +104,11 @@ const makeContext = (overrides: {
 describe('CreatePolicyMutationResolver', () => {
 	test('happy path returns ok + created policy', async () => {
 		const svc = new StubService({
-			getBySlug: async slug => (svc.lastCall?.method === 'getBySlug' && (svc.lastCall.args[0] === 'auditor' && (svc.lastCall.args as any[]).length === 1)
-				? samplePolicy
-				: null),
 			create: async () => ({ id: 'policy-1' }),
 		})
 		// First getBySlug returns null (no existing), second returns samplePolicy. Simulate via call count.
 		let calls = 0
-		svc.getBySlug = async (_db, slug) => {
+		svc.getBySlug = async (_db, _slug) => {
 			calls += 1
 			return calls === 1 ? null : samplePolicy
 		}
@@ -125,7 +122,6 @@ describe('CreatePolicyMutationResolver', () => {
 				},
 			},
 			makeContext(),
-			{} as any,
 		)
 		expect(res.ok).toBe(true)
 		expect(res.result?.policy.slug).toBe('auditor')
@@ -141,7 +137,6 @@ describe('CreatePolicyMutationResolver', () => {
 				input: { slug: 'auditor', document: { statements: [] } },
 			},
 			makeContext(),
-			{} as any,
 		)
 		expect(res.ok).toBe(false)
 		expect(res.error?.code).toBe('SLUG_ALREADY_EXISTS')
@@ -160,7 +155,6 @@ describe('CreatePolicyMutationResolver', () => {
 				input: { slug: 'auditor', document: { statements: [] } },
 			},
 			makeContext(),
-			{} as any,
 		)
 		expect(res.ok).toBe(false)
 		expect(res.error?.code).toBe('INVALID_DOCUMENT')
@@ -179,7 +173,6 @@ describe('CreatePolicyMutationResolver', () => {
 				input: { slug: 'builtin:foo', document: { statements: [] } },
 			},
 			makeContext(),
-			{} as any,
 		)
 		expect(res.ok).toBe(false)
 		expect(res.error?.code).toBe('SLUG_RESERVED')
@@ -195,7 +188,6 @@ describe('CreatePolicyMutationResolver', () => {
 					input: { slug: 'auditor', document: { statements: [] } },
 				},
 				makeContext({ allowed: false }),
-				{} as any,
 			),
 		).rejects.toThrow()
 	})
@@ -206,7 +198,7 @@ describe('UpdatePolicyMutationResolver', () => {
 		const svc = new StubService({ update: async () => ({ updated: true }) })
 		svc.getBySlug = async () => samplePolicy
 		const resolver = new UpdatePolicyMutationResolver(svc)
-		const res = await resolver.updatePolicy({}, { slug: 'auditor', input: { label: 'New label' } }, makeContext(), {} as any)
+		const res = await resolver.updatePolicy({}, { slug: 'auditor', input: { label: 'New label' } }, makeContext())
 		expect(res.ok).toBe(true)
 		expect(res.result?.policy.slug).toBe('auditor')
 	})
@@ -217,7 +209,7 @@ describe('UpdatePolicyMutationResolver', () => {
 			throw new PolicyNotFoundError('missing')
 		}
 		const resolver = new UpdatePolicyMutationResolver(svc)
-		const res = await resolver.updatePolicy({}, { slug: 'missing', input: {} }, makeContext(), {} as any)
+		const res = await resolver.updatePolicy({}, { slug: 'missing', input: {} }, makeContext())
 		expect(res.ok).toBe(false)
 		expect(res.error?.code).toBe('POLICY_NOT_FOUND')
 	})
@@ -235,7 +227,6 @@ describe('UpdatePolicyMutationResolver', () => {
 				input: { document: { statements: [] } },
 			},
 			makeContext(),
-			{} as any,
 		)
 		expect(res.ok).toBe(false)
 		expect(res.error?.code).toBe('INVALID_DOCUMENT')
@@ -246,14 +237,14 @@ describe('DeletePolicyMutationResolver', () => {
 	test('happy path', async () => {
 		const svc = new StubService({ delete: async () => ({ deleted: true }) })
 		const resolver = new DeletePolicyMutationResolver(svc)
-		const res = await resolver.deletePolicy({}, { slug: 'auditor' }, makeContext(), {} as any)
+		const res = await resolver.deletePolicy({}, { slug: 'auditor' }, makeContext())
 		expect(res.ok).toBe(true)
 	})
 
 	test('not-found', async () => {
 		const svc = new StubService({ delete: async () => ({ deleted: false }) })
 		const resolver = new DeletePolicyMutationResolver(svc)
-		const res = await resolver.deletePolicy({}, { slug: 'missing' }, makeContext(), {} as any)
+		const res = await resolver.deletePolicy({}, { slug: 'missing' }, makeContext())
 		expect(res.ok).toBe(false)
 		expect(res.error?.code).toBe('POLICY_NOT_FOUND')
 	})
@@ -272,7 +263,6 @@ describe('AssignPolicyMutationResolver', () => {
 				tags: { team: 'eng' },
 			},
 			makeContext(),
-			{} as any,
 		)
 		expect(res.ok).toBe(true)
 		expect(svc.lastCall?.method).toBe('assign')
@@ -294,7 +284,6 @@ describe('AssignPolicyMutationResolver', () => {
 				tags: {},
 			},
 			makeContext({ identities: [] }),
-			{} as any,
 		)
 		expect(res.ok).toBe(false)
 		expect(res.error?.code).toBe('IDENTITY_NOT_FOUND')
@@ -315,7 +304,6 @@ describe('AssignPolicyMutationResolver', () => {
 				tags: {},
 			},
 			makeContext(),
-			{} as any,
 		)
 		expect(res.ok).toBe(false)
 		expect(res.error?.code).toBe('POLICY_NOT_FOUND')
@@ -335,7 +323,6 @@ describe('AssignPolicyMutationResolver', () => {
 				tags: { team: '${identity.id}' },
 			},
 			makeContext(),
-			{} as any,
 		)
 		expect(res.ok).toBe(false)
 		expect(res.error?.code).toBe('INVALID_TAGS')
@@ -354,7 +341,6 @@ describe('RevokePolicyMutationResolver', () => {
 				policySlug: 'auditor',
 			},
 			makeContext(),
-			{} as any,
 		)
 		expect(res.ok).toBe(true)
 	})
@@ -370,7 +356,6 @@ describe('RevokePolicyMutationResolver', () => {
 				policySlug: 'missing',
 			},
 			makeContext(),
-			{} as any,
 		)
 		expect(res.ok).toBe(false)
 		expect(res.error?.code).toBe('POLICY_NOT_FOUND')
@@ -387,7 +372,6 @@ describe('RevokePolicyMutationResolver', () => {
 				policySlug: 'auditor',
 			},
 			makeContext(),
-			{} as any,
 		)
 		expect(res.ok).toBe(false)
 		expect(res.error?.code).toBe('NOT_ASSIGNED')
@@ -398,7 +382,7 @@ describe('PolicyQueryResolver', () => {
 	test('list returns mapped policies', async () => {
 		const svc = new StubService({ list: async () => [samplePolicy] })
 		const resolver = new PolicyQueryResolver(svc)
-		const res = await resolver.policies({}, {}, makeContext(), {} as any)
+		const res = await resolver.policies({}, {}, makeContext())
 		expect(res).toHaveLength(1)
 		expect(res[0].slug).toBe('auditor')
 	})
@@ -407,7 +391,7 @@ describe('PolicyQueryResolver', () => {
 		const svc = new StubService({})
 		svc.getBySlug = async () => null
 		const resolver = new PolicyQueryResolver(svc)
-		const res = await resolver.policy({}, { slug: 'missing' }, makeContext(), {} as any)
+		const res = await resolver.policy({}, { slug: 'missing' }, makeContext())
 		expect(res).toBeNull()
 	})
 })
@@ -415,7 +399,7 @@ describe('PolicyQueryResolver', () => {
 describe('BuiltinPolicyQueryResolver', () => {
 	test('returns BUILTIN_POLICIES list mapped to GraphQL shape', async () => {
 		const resolver = new BuiltinPolicyQueryResolver()
-		const res = await resolver.builtinPolicies({}, {}, makeContext(), {} as any)
+		const res = await resolver.builtinPolicies({}, {}, makeContext())
 		expect(res).toHaveLength(BUILTIN_POLICIES.length)
 		expect(res[0]).toHaveProperty('role')
 		expect(res[0].slug.startsWith('builtin:')).toBe(true)

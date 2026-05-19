@@ -1,143 +1,162 @@
 import { describe, expect, test } from 'bun:test'
-import { PolicySource, Statement } from '@contember/policy'
-import { Authorizator } from '@contember/authorization'
+import { Acl, ProjectRole, Schema } from '@contember/schema'
+import { Statement } from '@contember/policy'
+import { emptySchema } from '@contember/schema-utils'
 import { PermissionContext } from '../../../src/model/authorization/PermissionContext'
-import { Identity } from '../../../src/model/authorization/Identity'
+import { StaticIdentity } from '../../../src/model/authorization/Identity'
+import { TenantRole } from '../../../src/model/authorization/Roles'
+import { PermissionActions } from '../../../src/model/authorization/PermissionActions'
+import { ProjectSchemaResolver } from '../../../src/model/type'
+import { IdentityPolicyAssignmentsQuery } from '../../../src/model/policy/queries'
+
+// No custom-policy assignments — authorization is driven purely by built-in
+// role policies, so we can assert pure project-aware role synthesis.
+const stubDb = { queryHandler: { fetch: async () => [] } } as any
+
+// DatabaseContext stub that reports a single `identity_policy` assignment of a
+// custom policy whose document carries `statements`. Lets us exercise the
+// `TenantDbPolicyProvider` DB path through `PermissionContext`.
+const dbWithCustomPolicy = (statements: Statement[]) => ({
+	queryHandler: {
+		fetch: async (query: unknown) =>
+			query instanceof IdentityPolicyAssignmentsQuery
+				? [{ identityId: 'identity-1', policyId: 'p1', tags: {}, grantedBy: null, grantedAt: new Date() }]
+				: [{ id: 'p1', slug: 'custom', label: '', description: null, document: { version: '1', statements }, version: 1, createdAt: new Date(), updatedAt: new Date() }],
+	},
+}) as any
+
+const schemaResolver = (schemas: Record<string, Schema | undefined>): ProjectSchemaResolver => ({
+	getSchema: async (slug: string) => schemas[slug],
+})
+
+const membership = (role: string, variables: Acl.Membership['variables'] = []): Acl.Membership => ({ role, variables })
+
+const makeContext = (
+	roles: string[],
+	memberships: Record<string, readonly Acl.Membership[]> = {},
+	schemas: Record<string, Schema | undefined> = { foo: emptySchema },
+	db: any = stubDb,
+) => new PermissionContext(
+	new StaticIdentity('identity-1', roles, memberships),
+	db,
+	schemaResolver(schemas),
+)
 
 /**
- * `buildContext` must not let the caller shadow server-supplied identity —
- * resolvers that pass `{ subject, ...spreadFromInput }` would otherwise be
- * able to (accidentally or otherwise) substitute another principal.
+ * Project-aware role synthesis: an identity that is a member/admin of the
+ * target project gains PROJECT_MEMBER/PROJECT_ADMIN — but only for that
+ * project's resource. This guards the regression where a project-admin via
+ * membership lost tenant admin powers on their own project.
  */
-describe('PermissionContext.buildContext', () => {
-	const makeContext = (capturedContext: { value: any }, identityArgs: { id: string; roles: readonly string[] }) => {
-		const identity: any = {
-			id: identityArgs.id,
-			roles: identityArgs.roles,
-			async getProjectMemberships() {
-				return []
-			},
-		} as Identity
+describe('PermissionContext — project-aware role synthesis', () => {
+	const project = { slug: 'foo' }
 
-		const captureSource: PolicySource = {
-			name: 'capture',
-			getStatements(context) {
-				capturedContext.value = context
-				return [] as Statement[]
-			},
-		}
-
-		return new PermissionContext(
-			identity,
-			{} as Authorizator,
-			{} as any,
-			{} as any,
-			[captureSource],
-		)
-	}
-
-	test('caller cannot overwrite identity via context spread', async () => {
-		const captured = { value: null as any }
-		const ctx = makeContext(captured, { id: 'real-id', roles: ['login'] })
-
-		await ctx.isAllowedAction('tenant:project.view', 'project:any', {
-			identity: { id: 'spoofed', roles: ['super_admin'] } as any,
-		})
-
-		expect(captured.value.identity).toEqual({ id: 'real-id', roles: ['login'] })
+	test('admin membership grants project-scoped admin actions', async () => {
+		const ctx = makeContext([TenantRole.PERSON], { foo: [membership(ProjectRole.ADMIN)] })
+		expect(await ctx.isAllowed({ project, action: PermissionActions.PROJECT_VIEW })).toBe(true)
+		expect(await ctx.isAllowed({ project, action: PermissionActions.PROJECT_ADD_MEMBER([]) })).toBe(true)
+		expect(await ctx.isAllowed({ project, action: PermissionActions.API_KEY_CREATE })).toBe(true)
 	})
 
-	test('caller-supplied non-identity fields are preserved', async () => {
-		const captured = { value: null as any }
-		const ctx = makeContext(captured, { id: 'real-id', roles: ['login'] })
-
-		await ctx.isAllowedAction('x', 'y', {
-			subject: { roles: ['admin'] },
-			something: 'else',
-		})
-
-		expect(captured.value.subject).toEqual({ roles: ['admin'] })
-		expect(captured.value.something).toBe('else')
+	test('synthesized PROJECT_ADMIN does NOT leak to the global resource', async () => {
+		const ctx = makeContext([TenantRole.PERSON], { foo: [membership(ProjectRole.ADMIN)] })
+		// Same identity, no project scope (resource '*') — must NOT be admin.
+		expect(await ctx.isAllowed({ action: PermissionActions.PROJECT_ADD_MEMBER([]) })).toBe(false)
+		expect(await ctx.isAllowed({ action: PermissionActions.API_KEY_CREATE })).toBe(false)
 	})
 
-	test('identity is always present even without caller context', async () => {
-		const captured = { value: null as any }
-		const ctx = makeContext(captured, { id: 'real-id', roles: ['login', 'person'] })
+	test('plain membership grants PROJECT_MEMBER (view) but not admin', async () => {
+		const ctx = makeContext([TenantRole.PERSON], { foo: [membership('editor')] })
+		expect(await ctx.isAllowed({ project, action: PermissionActions.PROJECT_VIEW })).toBe(true)
+		expect(await ctx.isAllowed({ project, action: PermissionActions.PROJECT_ADD_MEMBER([]) })).toBe(false)
+	})
 
-		await ctx.isAllowedAction('x', 'y')
+	test('no membership → project actions denied', async () => {
+		const ctx = makeContext([TenantRole.PERSON], { foo: [] })
+		expect(await ctx.isAllowed({ project, action: PermissionActions.PROJECT_VIEW })).toBe(false)
+	})
 
-		expect(captured.value.identity).toEqual({ id: 'real-id', roles: ['login', 'person'] })
+	test('super_admin is allowed everything regardless of membership', async () => {
+		const ctx = makeContext([TenantRole.SUPER_ADMIN])
+		expect(await ctx.isAllowed({ project, action: PermissionActions.PROJECT_ADD_MEMBER([]) })).toBe(true)
+		expect(await ctx.isAllowed({ action: PermissionActions.PROJECT_CREATE })).toBe(true)
 	})
 })
 
 /**
- * Engine treats deny conditions fail-closed when a referenced context path is
- * missing — built-in role-escalation guards stay effective even if a resolver
- * forgets to populate `subject.*`. The opposite (allow with missing context)
- * is still fail-closed: the statement does not apply, default deny stands.
+ * `deniedScope` invariant: a project supplied to `isAllowed` that does not
+ * exist (null) or whose schema cannot be resolved must deny — never fall
+ * through to a global evaluation.
  */
-describe('PermissionContext.isAllowedAction — missing-context deny is fail-closed', () => {
-	const buildCtx = (sources: PolicySource[]) => {
-		const identity: any = {
-			id: 'id',
-			roles: ['login'],
-			async getProjectMemberships() {
-				return []
-			},
-		} as Identity
-		return new PermissionContext(
-			identity,
-			{} as Authorizator,
-			{} as any,
-			{} as any,
-			sources,
-		)
-	}
-
-	test('deny fires when condition path is missing (guard cannot be bypassed)', async () => {
-		const allowAndConditionalDeny: PolicySource = {
-			name: 'mixed',
-			getStatements() {
-				return [
-					{ effect: 'allow' as const, actions: ['x'], resources: ['*'] },
-					{
-						effect: 'deny' as const,
-						actions: ['x'],
-						resources: ['*'],
-						conditions: {
-							'forAnyValue:stringEquals': { 'subject.roles': ['danger'] },
-						},
-					},
-				]
-			},
-		}
-		const ctx = buildCtx([allowAndConditionalDeny])
-
-		// subject.roles is missing — deny still fires (fail-closed).
-		expect(await ctx.isAllowedAction('x', '*')).toBe(false)
-		// Present but doesn't trigger the deny — allow wins.
-		expect(await ctx.isAllowedAction('x', '*', { subject: { roles: ['safe'] } })).toBe(true)
-		// Present and triggers the deny.
-		expect(await ctx.isAllowedAction('x', '*', { subject: { roles: ['danger'] } })).toBe(false)
+describe('PermissionContext — denied project scope', () => {
+	test('null project denies', async () => {
+		const ctx = makeContext([TenantRole.SUPER_ADMIN])
+		expect(await ctx.isAllowed({ project: null, action: PermissionActions.PROJECT_VIEW })).toBe(false)
 	})
 
-	test('allow with missing condition path falls through to default deny', async () => {
-		const conditionalAllow: PolicySource = {
-			name: 'allow',
-			getStatements() {
-				return [{
-					effect: 'allow' as const,
-					actions: ['x'],
-					resources: ['*'],
-					conditions: { stringEquals: { 'subject.role': 'admin' } },
-				}]
-			},
-		}
-		const ctx = buildCtx([conditionalAllow])
+	test('unresolvable schema denies', async () => {
+		const ctx = makeContext([TenantRole.SUPER_ADMIN], {}, { foo: undefined })
+		expect(await ctx.isAllowed({ project: { slug: 'foo' }, action: PermissionActions.PROJECT_VIEW })).toBe(false)
+	})
+})
 
-		// subject.role missing — allow doesn't apply → default deny.
-		expect(await ctx.isAllowedAction('x', '*')).toBe(false)
-		// Present and matches — allow.
-		expect(await ctx.isAllowedAction('x', '*', { subject: { role: 'admin' } })).toBe(true)
+/**
+ * Membership-aware actions (add/update/remove member, invite) are authorized
+ * only if EVERY targeted membership is individually allowed — the AND-reduce
+ * mirrors the legacy MembershipMatcher. Here the only grant for `addMember`
+ * comes from the project schema's `manage` rule, gated on the subject
+ * membership's `team` variable being a subset of the invoker's.
+ */
+describe('PermissionContext — membership AND-loop via schema manage rule', () => {
+	const manageSchema = {
+		...emptySchema,
+		acl: {
+			roles: {
+				editor: {
+					entities: {},
+					tenant: { manage: { editor: { variables: { team: 'team' } } } },
+				},
+			},
+		},
+	} as unknown as Schema
+
+	const project = { slug: 'webmaster' }
+	const invoker = membership('editor', [{ name: 'team', values: ['eng'] }])
+	const targetEng = membership('editor', [{ name: 'team', values: ['eng'] }])
+	const targetOps = membership('editor', [{ name: 'team', values: ['ops'] }])
+
+	const ctx = () => makeContext([TenantRole.PERSON], { webmaster: [invoker] }, { webmaster: manageSchema })
+
+	test('allows when every target membership is within invoker values', async () => {
+		expect(await ctx().isAllowed({ project, action: PermissionActions.PROJECT_ADD_MEMBER([targetEng]) })).toBe(true)
+	})
+
+	test('denies when any target membership is outside invoker values', async () => {
+		expect(await ctx().isAllowed({ project, action: PermissionActions.PROJECT_ADD_MEMBER([targetEng, targetOps]) })).toBe(false)
+	})
+})
+
+/**
+ * Custom policies stored in `identity_policy` / `tenant_policy` must actually
+ * authorize through `PermissionContext` (the whole point of the engine), and
+ * an explicit `deny` must win over a built-in allow.
+ */
+describe('PermissionContext — custom policy assignments', () => {
+	test('custom allow policy grants an action the role lacks', async () => {
+		const granted = makeContext([TenantRole.LOGIN], {}, { foo: emptySchema },
+			dbWithCustomPolicy([{ effect: 'allow', actions: ['tenant:project.view'], resources: ['*'] }]))
+		expect(await granted.isAllowed({ action: PermissionActions.PROJECT_VIEW })).toBe(true)
+
+		// Control: same role without the assignment is denied.
+		expect(await makeContext([TenantRole.LOGIN]).isAllowed({ action: PermissionActions.PROJECT_VIEW })).toBe(false)
+	})
+
+	test('custom deny policy overrides a built-in allow (deny wins)', async () => {
+		const denied = makeContext([TenantRole.SUPER_ADMIN], {}, { foo: emptySchema },
+			dbWithCustomPolicy([{ effect: 'deny', actions: ['tenant:project.view'], resources: ['*'] }]))
+		expect(await denied.isAllowed({ action: PermissionActions.PROJECT_VIEW })).toBe(false)
+
+		// Control: super_admin without the deny is allowed.
+		expect(await makeContext([TenantRole.SUPER_ADMIN]).isAllowed({ action: PermissionActions.PROJECT_VIEW })).toBe(true)
 	})
 })

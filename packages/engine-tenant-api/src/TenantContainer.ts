@@ -1,8 +1,6 @@
-import { AccessEvaluator, Authorizator } from '@contember/authorization'
 import { Connection, DatabaseConfig } from '@contember/database'
 import { Builder } from '@contember/dic'
 import {
-	AclSchemaAccessNodeFactory,
 	ApiKeyManager,
 	ApiKeyService,
 	AppleProvider,
@@ -11,7 +9,6 @@ import {
 	EmailValidator,
 	FacebookProvider,
 	HCaptchaProvider,
-	Identity,
 	IdentityFactory,
 	IDPHandlerRegistry,
 	IDPManager,
@@ -25,7 +22,6 @@ import {
 	PasswordChangeManager,
 	PasswordResetManager,
 	PermissionContextFactory,
-	PermissionsFactory,
 	PersonAccessManager,
 	PersonManager,
 	PolicyService,
@@ -33,7 +29,6 @@ import {
 	ProjectManager,
 	ProjectMemberManager,
 	ProjectSchemaResolver,
-	ProjectScopeFactory,
 	Providers,
 	RateLimiter,
 	RecaptchaV3Provider,
@@ -112,7 +107,6 @@ export interface TenantContainer {
 	projectManager: ProjectManager
 	resolvers: Schema.Resolvers
 	resolverContextFactory: TenantResolverContextFactory
-	authorizator: Authorizator<Identity>
 	identityFetcher: IdentityFetcher
 	databaseContext: DatabaseContext
 	readDatabaseContext: DatabaseContext
@@ -146,7 +140,6 @@ export class TenantContainerFactory {
 				'projectManager',
 				'signUpManager',
 				'resolvers',
-				'authorizator',
 				'resolverContextFactory',
 				'identityFetcher',
 				'databaseContext',
@@ -162,9 +155,17 @@ export class TenantContainerFactory {
 			.addService('providers', () => ({ ...this.providers, ...args.cryptoProviders }))
 			.addService('mailer', () => createMailer(args.mailOptions))
 			.addService('projectSchemaResolver', () => args.projectSchemaResolver)
+			.addService('connection', () => args.connection)
+			.addService('readConnection', () => args.readConnection)
+			.addService(
+				'databaseContext',
+				({ connection, providers }) => new DatabaseContext(connection.createClient('tenant', { module: 'tenant' }), providers),
+			)
+			.addService(
+				'readDatabaseContext',
+				({ readConnection, providers }) => new DatabaseContext(readConnection.createClient('tenant', { module: 'tenant' }), providers),
+			)
 			.addService('templateRenderer', () => new TemplateRenderer())
-			.addService('accessEvaluator', ({}) => new AccessEvaluator.PermissionEvaluator(new PermissionsFactory().create()))
-			.addService('authorizator', ({ accessEvaluator }) => new Authorizator.Default(accessEvaluator))
 			.addService('userMailer', ({ mailer, templateRenderer }) => new UserMailer(mailer, templateRenderer))
 			.addService('apiKeyService', () => new ApiKeyService())
 			.addService('apiKeyManager', ({ apiKeyService }) => new ApiKeyManager(apiKeyService))
@@ -186,11 +187,10 @@ export class TenantContainerFactory {
 			.addService('passwordChangeManager', ({ providers, passwordStrengthValidator }) => new PasswordChangeManager(providers, passwordStrengthValidator))
 			.addService('projectMemberManager', () => new ProjectMemberManager())
 			.addService('identityFactory', ({ projectMemberManager }) => new IdentityFactory(projectMemberManager))
-			.addService('projectScopeFactory', () => new ProjectScopeFactory(new AclSchemaAccessNodeFactory()))
 			.addService(
 				'permissionContextFactory',
-				({ authorizator, identityFactory, projectScopeFactory, projectSchemaResolver }) =>
-					new PermissionContextFactory(authorizator, identityFactory, projectScopeFactory, projectSchemaResolver),
+				({ identityFactory, projectSchemaResolver, databaseContext }) =>
+					new PermissionContextFactory(identityFactory, projectSchemaResolver, databaseContext),
 			)
 			.addService('secretManager', ({ providers }) => new SecretsManager(providers))
 			.addService('projectManager', ({ secretManager, apiKeyService }) => new ProjectManager(secretManager, args.projectInitializer, apiKeyService))
@@ -342,16 +342,6 @@ export class TenantContainerFactory {
 				({ permissionContextFactory, authLogService }) => new TenantResolverContextFactory(permissionContextFactory, authLogService),
 			)
 			.addService('resolvers', container => new ResolverFactory(container).create())
-			.addService('connection', () => args.connection)
-			.addService('readConnection', () => args.readConnection)
-			.addService(
-				'databaseContext',
-				({ connection, providers }) => new DatabaseContext(connection.createClient('tenant', { module: 'tenant' }), providers),
-			)
-			.addService(
-				'readDatabaseContext',
-				({ readConnection, providers }) => new DatabaseContext(readConnection.createClient('tenant', { module: 'tenant' }), providers),
-			)
 			.addService('identityFetcher', ({ databaseContext }) => new IdentityFetcher(databaseContext.client))
 			.addService('migrationsRunner', ({ providers }) => new TenantMigrationsRunner(args.dbCredentials, 'tenant', args.tenantCredentials, providers))
 	}

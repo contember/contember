@@ -14,17 +14,16 @@ export class ProjectMembersQueryResolver implements QueryResolvers {
 		context: TenantResolverContext,
 	): Promise<readonly Membership[]> {
 		const project = await this.projectManager.getProjectBySlug(context.db, args.projectSlug)
-		const projectScope = await context.permissionContext.createProjectScope(project)
 		if (
 			!project
 			|| !(await context.isAllowed({
-				scope: projectScope,
+				project,
 				action: PermissionActions.PROJECT_VIEW_MEMBER([]),
 			}))
 		) {
 			return []
 		}
-		const verifier = context.permissionContext.createAccessVerifier(projectScope)
+		const verifier = context.permissionContext.createAccessVerifier(project)
 
 		return await this.projectMemberManager.getAllProjectMemberships(context.db, { id: project.id }, { id: args.identityId }, verifier)
 	}

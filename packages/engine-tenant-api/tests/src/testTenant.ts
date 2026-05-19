@@ -1,15 +1,15 @@
 import { GraphQLTestQuery } from '../cases/integration/mocked/gql/types'
 import { testUuid } from './testUuid'
 import {
-	AclSchemaAccessNodeFactory,
 	createResolverContext,
 	PermissionContext,
+	PermissionContextFactory,
 	ProjectSchemaResolver,
-	ProjectScopeFactory,
 	Providers,
 	StaticIdentity,
 	TenantContainerFactory,
 	TenantResolverContext,
+	TenantRole,
 	typeDefs,
 } from '../../src'
 import { Buffer } from 'buffer'
@@ -68,6 +68,16 @@ const projectSchemaResolver: ProjectSchemaResolver = {
 export const authenticatedIdentityId = testUuid(999)
 export const authenticatedApiKeyId = testUuid(998)
 
+// Minimal stand-in for `DatabaseContext` used only by the `PermissionContext`
+// authorization path. Only `queryHandler.fetch` is reached — and only for the
+// `IdentityPolicyAssignmentsQuery`, for which empty rows mean "no custom-policy
+// assignments for this identity".
+const stubDatabaseContextForAuth = {
+	queryHandler: {
+		fetch: async () => [],
+	},
+} as any
+
 export const executeTenantTest = async (test: Test) => {
 	const mailer = createMockedMailer()
 	const providers: Providers = {
@@ -103,6 +113,15 @@ export const executeTenantTest = async (test: Test) => {
 			cryptoProviders: providers,
 		})
 		.replaceService('mailer', () => mailer)
+		.replaceService(
+			// Integration tests assert a strict SQL queue. Custom-policy lookups
+			// (`identity_policy`) would otherwise fire at every authorization site —
+			// swap in a stub policy DB context that reports "no assignments"; the
+			// built-in role policies on the test identity then authorize as expected.
+			'permissionContextFactory',
+			({ identityFactory, projectSchemaResolver }) =>
+				new PermissionContextFactory(identityFactory, projectSchemaResolver, stubDatabaseContextForAuth),
+		)
 		.setupService('idpRegistry', reg => {
 			reg.registerHandler('mock', new IdPMock())
 		})
@@ -112,11 +131,10 @@ export const executeTenantTest = async (test: Test) => {
 	const context: TenantResolverContext = {
 		...createResolverContext(
 			new PermissionContext(
-				new StaticIdentity(authenticatedIdentityId, []),
-				{
-					isAllowed: () => Promise.resolve(true),
-				},
-				new ProjectScopeFactory(new AclSchemaAccessNodeFactory()),
+				// Tests assume the authenticated identity has unrestricted tenant
+				// access — granted via the built-in `super_admin` policy.
+				new StaticIdentity(authenticatedIdentityId, [TenantRole.SUPER_ADMIN]),
+				stubDatabaseContextForAuth,
 				projectSchemaResolver,
 			),
 			authenticatedApiKeyId,

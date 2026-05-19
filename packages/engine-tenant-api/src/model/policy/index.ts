@@ -1,5 +1,7 @@
 export * from './actions'
+export * from './AssumeMembershipPolicySource'
 export * from './builtinPolicies'
+export * from './membershipRuleStatements'
 export * from './PolicyDto'
 export * from './TenantDbPolicyProvider'
 export * from './ProjectSchemaPolicyProvider'

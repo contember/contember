@@ -12,6 +12,7 @@
 		{ "path": "../../dic/src" },
 		{ "path": "../../logger/src" },
 		{ "path": "../../graphql-utils/src" },
+		{ "path": "../../policy/src" },
 		{ "path": "../../schema/src" },
 		{ "path": "../../schema-utils/src" },
 		{ "path": "../../typesafe/src" }

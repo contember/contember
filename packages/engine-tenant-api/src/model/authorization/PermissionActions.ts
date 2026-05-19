@@ -11,6 +11,7 @@ namespace PermissionActions {
 		apiKey = 'apiKey',
 		mailTemplate = 'mailTemplate',
 		idp = 'idp',
+		policy = 'policy',
 	}
 
 	export const CONFIGURE = Authorizator.createAction(Resources.system, 'configure')
@@ -77,6 +78,13 @@ namespace PermissionActions {
 	export const IDP_DISABLE = Authorizator.createAction(Resources.idp, 'disable')
 	export const IDP_ENABLE = Authorizator.createAction(Resources.idp, 'enable')
 	export const IDP_LIST = Authorizator.createAction(Resources.idp, 'list')
+
+	export const POLICY_VIEW = Authorizator.createAction(Resources.policy, 'view')
+	export const POLICY_CREATE = Authorizator.createAction(Resources.policy, 'create')
+	export const POLICY_UPDATE = Authorizator.createAction(Resources.policy, 'update')
+	export const POLICY_DELETE = Authorizator.createAction(Resources.policy, 'delete')
+	export const POLICY_ASSIGN = Authorizator.createAction(Resources.policy, 'assign')
+	export const POLICY_REVOKE = Authorizator.createAction(Resources.policy, 'revoke')
 }
 
 export { PermissionActions }

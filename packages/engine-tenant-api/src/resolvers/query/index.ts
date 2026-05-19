@@ -1,5 +1,7 @@
 export * from './AuthLogQueryResolver'
+export * from './BuiltinPolicyQueryResolver'
 export * from './MeQueryResolver'
+export * from './PolicyQueryResolver'
 export * from './ProjectMembersQueryResolver'
 export * from './ProjectQueryResolver'
 export * from './PersonQueryResolver'

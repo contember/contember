@@ -196,6 +196,7 @@ const sidebars: SidebarsConfig = {
 						'reference/engine/tenant/audit-log',
 						'reference/engine/tenant/configuration',
 						'reference/engine/tenant/mail-templates',
+						'reference/engine/tenant/policies',
 					],
 				},
 				{

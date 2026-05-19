@@ -34,6 +34,10 @@ const schema: DocumentNode = gql`
 		(default 100, max 500); \`hasMore\` indicates a further page exists.
 		"""
 		authLog(filter: AuthLogFilter, limit: Int, offset: Int): AuthLogPage!
+
+		policies: [Policy!]!
+		policy(slug: String!): Policy
+		builtinPolicies: [BuiltinPolicy!]!
 	}
 
 	type Mutation {
@@ -129,6 +133,11 @@ const schema: DocumentNode = gql`
 		removeProjectMailTemplate(templateIdentifier: MailTemplateIdentifier!): RemoveMailTemplateResponse
 		@deprecated(reason: "use removeMailTemplate")
 
+		createPolicy(input: CreatePolicyInput!): CreatePolicyResponse
+		updatePolicy(slug: String!, input: UpdatePolicyInput!): UpdatePolicyResponse
+		deletePolicy(slug: String!): DeletePolicyResponse
+		assignPolicy(identityId: String!, policySlug: String!, tags: Json): AssignPolicyResponse
+		revokePolicy(identityId: String!, policySlug: String!): RevokePolicyResponse
 	}
 	
 	# === configure ===
@@ -1042,6 +1051,7 @@ const schema: DocumentNode = gql`
 		batched identity queries do not abort on a single forbidden target.
 		"""
 		sessions: [SessionInfo!]!
+		policies: [PolicyAssignment!]
 	}
 
 	type IdentityGlobalPermissions {
@@ -1499,6 +1509,175 @@ const schema: DocumentNode = gql`
 		entries: [AuthLogEntry!]!
 		"True when more rows exist past \`offset + limit\`."
 		hasMore: Boolean!
+	}
+
+	# === policies ===
+
+	enum PolicyEffect {
+		allow
+		deny
+	}
+
+	type PolicyStatement {
+		effect: PolicyEffect!
+		actions: [String!]!
+		resources: [String!]
+		""" Free-form { [operator]: { [contextPath]: primitive | [primitive] } } map. See policies.md. """
+		conditions: Json
+	}
+
+	input PolicyStatementInput {
+		effect: PolicyEffect!
+		actions: [String!]!
+		resources: [String!]
+		conditions: Json
+	}
+
+	type PolicyDocument {
+		version: String
+		statements: [PolicyStatement!]!
+	}
+
+	input PolicyDocumentInput {
+		version: String
+		statements: [PolicyStatementInput!]!
+	}
+
+	type Policy {
+		id: String!
+		slug: String!
+		label: String!
+		description: String
+		document: PolicyDocument!
+		version: Int!
+		createdAt: DateTime!
+		updatedAt: DateTime!
+	}
+
+	type PolicyAssignment {
+		policy: Policy!
+		identityId: String!
+		tags: Json!
+		grantedBy: String
+		grantedAt: DateTime!
+	}
+
+	type BuiltinPolicy {
+		role: String!
+		slug: String!
+		label: String!
+		description: String!
+		document: PolicyDocument!
+	}
+
+	# === createPolicy ===
+
+	input CreatePolicyInput {
+		slug: String!
+		label: String
+		description: String
+		document: PolicyDocumentInput!
+	}
+
+	type CreatePolicyResponse {
+		ok: Boolean!
+		error: CreatePolicyError
+		result: CreatePolicyResult
+	}
+
+	type CreatePolicyError {
+		code: CreatePolicyErrorCode!
+		developerMessage: String!
+	}
+
+	enum CreatePolicyErrorCode {
+		INVALID_SLUG
+		SLUG_RESERVED
+		SLUG_ALREADY_EXISTS
+		INVALID_DOCUMENT
+	}
+
+	type CreatePolicyResult {
+		policy: Policy!
+	}
+
+	# === updatePolicy ===
+
+	input UpdatePolicyInput {
+		label: String
+		description: String
+		document: PolicyDocumentInput
+	}
+
+	type UpdatePolicyResponse {
+		ok: Boolean!
+		error: UpdatePolicyError
+		result: UpdatePolicyResult
+	}
+
+	type UpdatePolicyError {
+		code: UpdatePolicyErrorCode!
+		developerMessage: String!
+	}
+
+	enum UpdatePolicyErrorCode {
+		POLICY_NOT_FOUND
+		INVALID_DOCUMENT
+	}
+
+	type UpdatePolicyResult {
+		policy: Policy!
+	}
+
+	# === deletePolicy ===
+
+	type DeletePolicyResponse {
+		ok: Boolean!
+		error: DeletePolicyError
+	}
+
+	type DeletePolicyError {
+		code: DeletePolicyErrorCode!
+		developerMessage: String!
+	}
+
+	enum DeletePolicyErrorCode {
+		POLICY_NOT_FOUND
+	}
+
+	# === assignPolicy ===
+
+	type AssignPolicyResponse {
+		ok: Boolean!
+		error: AssignPolicyError
+	}
+
+	type AssignPolicyError {
+		code: AssignPolicyErrorCode!
+		developerMessage: String!
+	}
+
+	enum AssignPolicyErrorCode {
+		POLICY_NOT_FOUND
+		IDENTITY_NOT_FOUND
+		INVALID_TAGS
+	}
+
+	# === revokePolicy ===
+
+	type RevokePolicyResponse {
+		ok: Boolean!
+		error: RevokePolicyError
+	}
+
+	type RevokePolicyError {
+		code: RevokePolicyErrorCode!
+		developerMessage: String!
+	}
+
+	enum RevokePolicyErrorCode {
+		POLICY_NOT_FOUND
+		NOT_ASSIGNED
 	}
 `
 

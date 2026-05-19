@@ -28,6 +28,7 @@ import {
 	PermissionsFactory,
 	PersonAccessManager,
 	PersonManager,
+	PolicyService,
 	ProjectInitializer,
 	ProjectManager,
 	ProjectMemberManager,
@@ -47,10 +48,14 @@ import { HibpChecker, HttpHibpChecker, NoopHibpChecker } from './model/service/H
 import {
 	AddIDPMutationResolver,
 	AddProjectMemberMutationResolver,
+	AssignPolicyMutationResolver,
+	BuiltinPolicyQueryResolver,
 	ChangePasswordMutationResolver,
 	ChangeProfileMutationResolver,
 	CreateApiKeyMutationResolver,
+	CreatePolicyMutationResolver,
 	CreateProjectMutationResolver,
+	DeletePolicyMutationResolver,
 	DisableApiKeyMutationResolver,
 	DisableIDPMutationResolver,
 	EnableIDPMutationResolver,
@@ -62,17 +67,20 @@ import {
 	MeQueryResolver,
 	OtpMutationResolver,
 	PersonQueryResolver,
+	PolicyQueryResolver,
 	ProjectMembersQueryResolver,
 	ProjectQueryResolver,
 	ProjectTypeResolver,
 	RemoveProjectMemberMutationResolver,
 	ResetPasswordMutationResolver,
 	ResolverFactory,
+	RevokePolicyMutationResolver,
 	SetProjectSecretMutationResolver,
 	SignInMutationResolver,
 	SignOutMutationResolver,
 	SignUpMutationResolver,
 	TenantResolverContextFactory,
+	UpdatePolicyMutationResolver,
 	UpdateProjectMemberMutationResolver,
 	UpdateProjectMutationResolver,
 } from './resolvers'
@@ -207,6 +215,7 @@ export class TenantContainerFactory {
 			.addService('inviteManager', ({ providers, userMailer, projectSchemaResolver }) => new InviteManager(providers, userMailer, projectSchemaResolver))
 			.addService('otpManager', ({ otpAuthenticator }) => new OtpManager(otpAuthenticator))
 			.addService('mailTemplateManager', () => new MailTemplateManager())
+			.addService('policyService', () => new PolicyService())
 			.addService('rolesManager', () => new RolesManager())
 			.addService('configurationManager', () => new ConfigurationManager())
 			.addService(
@@ -216,8 +225,8 @@ export class TenantContainerFactory {
 			)
 			.addService(
 				'identityTypeResolver',
-				({ projectMemberManager, projectManager, permissionContextFactory }) =>
-					new IdentityTypeResolver(projectMemberManager, projectManager, permissionContextFactory),
+				({ projectMemberManager, projectManager, permissionContextFactory, policyService }) =>
+					new IdentityTypeResolver(projectMemberManager, projectManager, permissionContextFactory, policyService),
 			)
 			.addService(
 				'projectTypeResolver',
@@ -236,6 +245,8 @@ export class TenantContainerFactory {
 				({ projectManager, projectMemberManager }) => new ProjectMembersQueryResolver(projectManager, projectMemberManager),
 			)
 			.addService('mailTemplateQueryResolver', () => new MailTemplateQueryResolver())
+			.addService('policyQueryResolver', ({ policyService }) => new PolicyQueryResolver(policyService))
+			.addService('builtinPolicyQueryResolver', () => new BuiltinPolicyQueryResolver())
 			.addService(
 				'signUpMutationResolver',
 				({ signUpManager, apiKeyManager, captchaValidator, rateLimiter }) =>
@@ -320,6 +331,11 @@ export class TenantContainerFactory {
 				'togglePasswordlessMutationResolver',
 				({ configurationManager, personManager }) => new TogglePasswordlessMutationResolver(configurationManager, personManager),
 			)
+			.addService('createPolicyMutationResolver', ({ policyService }) => new CreatePolicyMutationResolver(policyService))
+			.addService('updatePolicyMutationResolver', ({ policyService }) => new UpdatePolicyMutationResolver(policyService))
+			.addService('deletePolicyMutationResolver', ({ policyService }) => new DeletePolicyMutationResolver(policyService))
+			.addService('assignPolicyMutationResolver', ({ policyService }) => new AssignPolicyMutationResolver(policyService))
+			.addService('revokePolicyMutationResolver', ({ policyService }) => new RevokePolicyMutationResolver(policyService))
 			.addService('authLogService', () => new AuthLogService())
 			.addService(
 				'resolverContextFactory',

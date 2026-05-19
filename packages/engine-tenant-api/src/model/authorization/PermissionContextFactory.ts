@@ -4,6 +4,7 @@ import { PermissionContext } from './PermissionContext'
 import { ProjectScopeFactory } from './ProjectScopeFactory'
 import { ProjectSchemaResolver } from '../type'
 import { DatabaseContext } from '../utils'
+import { TenantDbPolicyProvider } from '../policy/TenantDbPolicyProvider'
 
 export class PermissionContextFactory {
 	constructor(
@@ -15,6 +16,13 @@ export class PermissionContextFactory {
 
 	public create(db: DatabaseContext, args: { id: string; roles: readonly string[] }): PermissionContext {
 		const identity = this.identityFactory.create(db, args)
-		return new PermissionContext(identity, this.authorizator, this.projectScopeFactory, this.schemaResolver)
+		const tenantPolicies = new TenantDbPolicyProvider(db, { id: args.id, roles: args.roles })
+		return new PermissionContext(
+			identity,
+			this.authorizator,
+			this.projectScopeFactory,
+			this.schemaResolver,
+			[tenantPolicies],
+		)
 	}
 }

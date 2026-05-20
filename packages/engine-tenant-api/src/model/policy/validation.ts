@@ -1,4 +1,4 @@
-import { ConditionBlock, Policy } from '@contember/policy'
+import { ConditionBlock, defaultOperators, Policy } from '@contember/policy'
 
 export class PolicyValidationError extends Error {
 }
@@ -54,6 +54,9 @@ function validateConditionBlock(block: ConditionBlock, statementIndex: number): 
 	for (const [operator, paths] of Object.entries(block)) {
 		if (typeof operator !== 'string' || operator.length === 0) {
 			throw new PolicyValidationError(`statement[${statementIndex}].conditions: operator names must be non-empty strings`)
+		}
+		if (!(operator in defaultOperators)) {
+			throw new PolicyValidationError(`statement[${statementIndex}].conditions: unknown operator "${operator}"`)
 		}
 		if (paths === null || typeof paths !== 'object' || Array.isArray(paths)) {
 			throw new PolicyValidationError(

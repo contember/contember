@@ -269,6 +269,44 @@ test('Tenant API: grant boundary — a delegated manager can only grant within i
 	)
 	expect(deletePowerful.body.data.deletePolicy).toMatchObject({ ok: false, error: { code: 'EXCEEDS_PERMISSIONS' } })
 
+	// --- update: both the old and the new document must stay within the surface ---
+	const updateMutation = gql`
+		mutation($slug: String!, $input: UpdatePolicyInput!) {
+			updatePolicy(slug: $slug, input: $input) { ok error { code } }
+		}
+	`
+	// delegate authors an in-surface policy it owns
+	const editableSlug = `editable-${rand()}`
+	const editable = await asDelegate({
+		slug: editableSlug,
+		document: { statements: [{ effect: 'allow', actions: ['tenant:idp.add'], resources: ['*'] }] },
+	})
+	expect(editable.body.data.createPolicy.ok).toBe(true)
+
+	// ALLOWED: narrowing/keeping within surface
+	const updWithin = await sendTenant(updateMutation, {
+		variables: {
+			slug: editableSlug,
+			input: { document: { statements: [{ effect: 'allow', actions: ['tenant:idp.add', 'tenant:idp.list'], resources: ['*'] }] } },
+		},
+		authorizationToken: delegateToken,
+	})
+	expect(updWithin.body.data.updatePolicy).toMatchObject({ ok: true, error: null })
+
+	// REJECTED: new document adds an out-of-surface action
+	const updBeyond = await sendTenant(updateMutation, {
+		variables: { slug: editableSlug, input: { document: { statements: [{ effect: 'allow', actions: ['tenant:project.create'], resources: ['*'] }] } } },
+		authorizationToken: delegateToken,
+	})
+	expect(updBeyond.body.data.updatePolicy).toMatchObject({ ok: false, error: { code: 'EXCEEDS_PERMISSIONS' } })
+
+	// REJECTED (old-document arm): cannot touch a powerful policy even to weaken it
+	const updPowerful = await sendTenant(updateMutation, {
+		variables: { slug: powerfulSlug, input: { document: { statements: [{ effect: 'allow', actions: ['tenant:idp.add'], resources: ['*'] }] } } },
+		authorizationToken: delegateToken,
+	})
+	expect(updPowerful.body.data.updatePolicy).toMatchObject({ ok: false, error: { code: 'EXCEEDS_PERMISSIONS' } })
+
 	// super_admin remains unrestricted: it can delete the powerful policy
 	const superDelete = await sendTenant(gql`mutation($slug: String!) { deletePolicy(slug: $slug) { ok } }`, { variables: { slug: powerfulSlug } })
 	expect(superDelete.body.data.deletePolicy.ok).toBe(true)

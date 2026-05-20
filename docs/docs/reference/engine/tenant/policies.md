@@ -12,7 +12,8 @@ three sources:
   `project_admin`). These define the baseline permission surface for the
   legacy role system.
 - **Project schema policies** — derived from the project's tenant ACL
-  (`acl.roles[*].tenant`) at request time.
+  (`acl.roles[*].tenant`) at request time. Contributed only when the
+  authorization check is scoped to a specific project.
 - **User-defined policies** — JSON documents managed via the tenant GraphQL
   API and attached to individual identities.
 
@@ -24,16 +25,21 @@ API. Built-in policies are read-only and can be inspected via the
 
 - **Action** — a verb on a tenant resource, namespaced as `tenant:<resource>.<verb>`,
   e.g. `tenant:project.addMember`.
-- **Resource** — an ARN-like identifier of the object the action targets:
-  `project:<slug>`, `person:<id>`, `identity:<id>`, `idp:<slug>`,
-  `policy:<slug>`, or `*` for any.
+- **Resource** — the scope an action is evaluated against. The tenant API only
+  ever evaluates two resource values: `*` for tenant-global operations, and
+  `project:<slug>` when the operation targets a specific project. A statement's
+  `resources` patterns are globbed against that value, so the only patterns that
+  can ever match are `*`, `project:*`, or `project:<slug>` (optionally templated,
+  e.g. `project:${assignment.tags.project}`). There is **no** per-object resource
+  such as `person:<id>` — finer-grained targeting is expressed through
+  conditions, not resources.
 - **Statement** — one rule: an `effect` (`allow`/`deny`), a list of
   `actions`, an optional list of `resources` (defaults to `*`), and an
   optional condition block.
 - **Policy** — a versioned bundle of statements (`{ version, statements }`).
 - **Assignment** — a row linking an identity to a policy, optionally
   parameterized with a `tags` object whose values are substituted into the
-  policy's statements at evaluation time.
+  policy's statements at load time (before evaluation).
 
 ## Decision algorithm
 
@@ -45,7 +51,8 @@ The engine walks every source, collects matches, and decides:
 
 A statement matches when (1) one of its `actions` patterns globs the
 requested action, (2) one of its `resources` patterns globs the requested
-resource, and (3) all conditions evaluate to true against the request
+resource (always `*` or `project:<slug>`; see [Concepts](#concepts)), and
+(3) all conditions evaluate to true against the request
 context. Glob patterns use `*` (any sequence) and `?` (one char) and are
 anchored.
 
@@ -76,15 +83,14 @@ permission check (self-view); reading it for another identity requires
 {
   "effect": "allow",
   "actions": ["tenant:person.viewSessions", "tenant:person.forceSignOut"],
-  "resources": ["person:*"],
-  "conditions": {
-    "stringEquals": { "subject.person.team": "${assignment.tags.team}" }
-  }
+  "resources": ["*"]
 }
 ```
 
 A statement with no `conditions` and `resources: ["*"]` is the simplest
-form: unconditional permission for the listed actions on any resource.
+form: unconditional permission for the listed actions tenant-wide. Person
+actions like the two above are not project-scoped, so `*` is the only
+resource that matches them.
 
 ### Conditions
 
@@ -103,6 +109,22 @@ operators).
 | Object shape | `forAllKeys:stringEquals` |
 | Presence | `exists` |
 
+For example, a `deny` that protects privileged identities from being disabled:
+
+```json
+{
+  "effect": "deny",
+  "actions": ["tenant:person.disable"],
+  "conditions": {
+    "forAnyValue:stringEquals": { "subject.targetRoles": ["super_admin", "project_creator"] }
+  }
+}
+```
+
+`subject.targetRoles` here is populated only for the person actions listed in
+the [evaluation context](#evaluation-context) — referencing a path the current
+action doesn't populate falls under the missing-context rules below.
+
 **Missing-context handling.** When a condition references a context path
 the tenant API didn't populate, the engine resolves it per statement
 effect: `allow` skips the statement; `deny` fires fail-closed. The
@@ -110,11 +132,37 @@ effect: `allow` skips the statement; `deny` fires fail-closed. The
 treat a missing path as vacuously true (parallel to `.every()` over an
 empty array).
 
+### Evaluation context
+
+Conditions and `${...}` placeholders resolve against the request context the
+tenant API builds per check. The set of available paths is deliberately small:
+
+| Path | When present | Meaning |
+| --- | --- | --- |
+| `identity.id` | always | UUID of the calling identity |
+| `identity.roles` | always | the caller's tenant roles |
+| `subject.roles` | role-granting actions: `addGlobalRoles`, `removeGlobalRoles`, `apiKey.createGlobal`, `person.signUp` | the roles the caller is trying to grant/use |
+| `subject.targetRoles` | person actions on another identity: `person.disable`, `person.changeProfile`, `person.changePassword`, `person.createSessionToken` | the roles already held by the target |
+| `subject.membership.role`, `subject.membership.variables.<var>` | membership actions: `person.invite`, `person.inviteUnmanaged`, `project.viewMember`, `project.addMember`, `project.updateMember`, `project.removeMember` | the membership being granted/operated on (evaluated once per membership, AND-reduced) |
+
+`assignment.tags.*` is **not** an evaluation-time context path — assignment tags
+are baked into the statement's `actions`, `resources`, and condition values at
+load time (see below), not read during evaluation.
+
+A condition or placeholder that references a path not populated for the current
+action resolves per the missing-context rules above: `allow` skips the
+statement, `deny` fires fail-closed.
+
 ### Placeholder substitution
 
-Strings in `actions`, `resources`, and condition values can contain
-`${path}` placeholders that resolve against the request context at
-evaluation time:
+Strings in `actions`, `resources`, and condition values can contain `${path}`
+placeholders, resolved in two passes:
+
+- **At assignment load** — `${assignment.tags.<key>}` is replaced with the value
+  from the assignment row. This is why tag values may not themselves contain
+  `${...}` (see [assign / revoke](#assign--revoke)).
+- **At evaluation** — remaining placeholders resolve against the request context
+  (`identity.*`, `subject.*`).
 
 ```json
 {
@@ -124,12 +172,8 @@ evaluation time:
 }
 ```
 
-The tenant API populates `identity.id` and `identity.roles` automatically;
-`assignment.tags.*` is baked in from the assignment row before evaluation.
-Other namespaces (`subject.*`) are populated by the resolver per action.
-
-If a placeholder cannot be resolved at evaluation time, the engine treats
-it fail-closed — see the conditions section above.
+If a placeholder cannot be resolved, the engine treats it fail-closed — see the
+conditions section above.
 
 ## Managing policies via the tenant API
 
@@ -138,18 +182,15 @@ it fail-closed — see the conditions section above.
 ```graphql
 mutation {
   createPolicy(input: {
-    slug: "team-lead"
-    label: "Team Lead"
-    description: "View and force sign-out for own team"
+    slug: "project-viewer"
+    label: "Project Viewer"
+    description: "Read-only access to a single project, chosen per assignment"
     document: {
       version: "1"
       statements: [{
         effect: allow
-        actions: ["tenant:person.viewSessions", "tenant:person.forceSignOut"]
-        resources: ["person:*"]
-        conditions: {
-          stringEquals: { "subject.person.team": "${assignment.tags.team}" }
-        }
+        actions: ["tenant:project.view", "tenant:project.viewMember"]
+        resources: ["project:${assignment.tags.project}"]
       }]
     }
   }) {
@@ -178,8 +219,8 @@ must not start with the reserved `builtin:` prefix.
 
 ```graphql
 mutation {
-  updatePolicy(slug: "team-lead", input: {
-    label: "Team Lead (revised)"
+  updatePolicy(slug: "project-viewer", input: {
+    label: "Project Viewer (revised)"
     document: { version: "1", statements: [...] }
   }) {
     ok
@@ -203,7 +244,7 @@ enum UpdatePolicyErrorCode {
 
 ```graphql
 mutation {
-  deletePolicy(slug: "team-lead") {
+  deletePolicy(slug: "project-viewer") {
     ok
     error { code }
   }
@@ -223,8 +264,8 @@ enum DeletePolicyErrorCode { POLICY_NOT_FOUND }
 mutation {
   assignPolicy(
     identityId: "2f673a53-af33-42b1-9e17-e1305fa26d9d"
-    policySlug: "team-lead"
-    tags: { team: "eng" }
+    policySlug: "project-viewer"
+    tags: { project: "acme" }
   ) {
     ok
     error { code }
@@ -254,7 +295,7 @@ enum AssignPolicyErrorCode {
 mutation {
   revokePolicy(
     identityId: "2f673a53-af33-42b1-9e17-e1305fa26d9d"
-    policySlug: "team-lead"
+    policySlug: "project-viewer"
   ) {
     ok
     error { code }
@@ -278,7 +319,7 @@ query {
     document { version statements { effect actions resources conditions } }
   }
 
-  policy(slug: "team-lead") {
+  policy(slug: "project-viewer") {
     id slug document { statements { effect actions } }
   }
 
@@ -365,4 +406,4 @@ the policy CRUD API.
 The tenant DB policy source is instantiated per request and caches its
 statement list on first call. Repeated authorization checks within one
 request hit the database at most once, regardless of how many resolvers
-call `requireAction`.
+call `requireAccess` / `isAllowed`.

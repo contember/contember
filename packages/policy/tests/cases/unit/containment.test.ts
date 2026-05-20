@@ -225,6 +225,54 @@ describe('findUngrantableCells — KNOWN LIMITATION (sound but stricter than nec
 	})
 })
 
+describe('findUngrantableCells — soundness corner cases', () => {
+	test('coverage cannot be stitched across two surface cells', () => {
+		// action from one allow + resource from another must NOT combine: the
+		// actor can do idp.add on project:a and idp.list on project:b, but NOT
+		// idp.add on project:b.
+		const s = computeGrantableSurface([
+			allow(['tenant:idp.add'], ['project:a']),
+			allow(['tenant:idp.list'], ['project:b']),
+		])
+		expect(findUngrantableCells(s, doc(allow(['tenant:idp.add'], ['project:a'])))).toEqual([])
+		expect(findUngrantableCells(s, doc(allow(['tenant:idp.add'], ['project:b'])))).toEqual([
+			{ action: 'tenant:idp.add', resource: 'project:b' },
+		])
+	})
+
+	test('a resource-scoped deny subtracts only overlapping resources', () => {
+		const s = computeGrantableSurface([allow(['tenant:idp.add'], ['*']), deny(['tenant:idp.add'], ['idp:secret-*'])])
+		// disjoint resource is fine
+		expect(findUngrantableCells(s, doc(allow(['tenant:idp.add'], ['idp:public-1'])))).toEqual([])
+		// resource overlapping the deny is blocked
+		expect(findUngrantableCells(s, doc(allow(['tenant:idp.add'], ['idp:secret-1'])))).toEqual([
+			{ action: 'tenant:idp.add', resource: 'idp:secret-1' },
+		])
+		// a wildcard resource intersects the deny -> blocked
+		expect(findUngrantableCells(s, doc(allow(['tenant:idp.add'], ['*'])))).toEqual([
+			{ action: 'tenant:idp.add', resource: '*' },
+		])
+	})
+
+	test('an unconditional allow survives alongside a conditional one for the same action', () => {
+		const s = computeGrantableSurface([
+			allow(['tenant:project.addMember'], ['*']),
+			allow(['tenant:project.addMember'], ['*'], { stringEquals: { 'subject.membership.role': 'editor' } }),
+		])
+		expect(s.allow).toEqual([{ action: 'tenant:project.addMember', resource: '*' }])
+		expect(findUngrantableCells(s, doc(allow(['tenant:project.addMember'], ['*'])))).toEqual([])
+	})
+
+	test('a broad deny in the actor’s own policy collapses its surface', () => {
+		// A single wildcard deny (even conditional) wipes the grantable surface —
+		// conservative, and worth pinning so it is a known consequence.
+		const s = computeGrantableSurface([allow(['tenant:idp.add'], ['*']), deny(['tenant:*'], ['*'], { bool: { x: true } })])
+		expect(findUngrantableCells(s, doc(allow(['tenant:idp.add'], ['*'])))).toEqual([
+			{ action: 'tenant:idp.add', resource: '*' },
+		])
+	})
+})
+
 describe('isCellGrantable', () => {
 	test('deny intersection blocks an otherwise-allowed cell', () => {
 		const surface = computeGrantableSurface([allow(['tenant:identity.*'], ['*']), deny(['tenant:identity.addGlobalRoles'], ['*'])])

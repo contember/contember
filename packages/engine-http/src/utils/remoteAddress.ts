@@ -11,10 +11,12 @@ function isPrivate(ip: string): boolean {
 
 	const r = addr.range()
 	if (r === 'ipv4Mapped') {
-		return (addr as ipaddr.IPv6).toIPv4Address().range() === 'private'
+		const mapped = (addr as ipaddr.IPv6).toIPv4Address().range()
+		return mapped === 'private' || mapped === 'loopback'
 	}
 
 	return r === 'private' // IPv4 RFC1918
+		|| r === 'loopback' // 127.0.0.0/8, ::1
 		|| r === 'uniqueLocal' // IPv6 fc00::/7
 		|| r === 'linkLocal' // IPv6 fe80::/10
 }

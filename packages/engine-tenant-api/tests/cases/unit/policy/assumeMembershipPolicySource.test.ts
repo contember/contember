@@ -77,6 +77,75 @@ describe('AssumeMembershipPolicySource', () => {
 		).toBe(false)
 	})
 
+	test('invoker lacks the mapped variable — deny subject carrying it, even with empty values', async () => {
+		const acl: Acl.Schema = {
+			roles: {
+				admin: {
+					entities: {},
+					content: {
+						assumeMembership: {
+							editor: { variables: { team: 'team' } },
+						},
+					},
+				},
+			},
+		} as any
+		// invoker has the role but NOT the mapped `team` variable
+		const invoker: Acl.Membership[] = [{ role: 'admin', variables: [] }]
+
+		// subject carries `team` with non-empty values → deny
+		expect(
+			await decide(acl, invoker, {
+				role: 'editor',
+				variables: [{ name: 'team', values: ['eng'] }],
+			}),
+		).toBe(false)
+
+		// subject carries `team` with an EMPTY value list → still deny (matches legacy matcher)
+		expect(
+			await decide(acl, invoker, {
+				role: 'editor',
+				variables: [{ name: 'team', values: [] }],
+			}),
+		).toBe(false)
+
+		// subject does not carry `team` at all → allow
+		expect(await decide(acl, invoker, { role: 'editor', variables: [] })).toBe(true)
+	})
+
+	test('invoker has the mapped variable with empty values — allow only empty subject', async () => {
+		const acl: Acl.Schema = {
+			roles: {
+				admin: {
+					entities: {},
+					content: {
+						assumeMembership: {
+							editor: { variables: { team: 'team' } },
+						},
+					},
+				},
+			},
+		} as any
+		// invoker DOES carry `team`, but with no allowed values
+		const invoker: Acl.Membership[] = [{ role: 'admin', variables: [{ name: 'team', values: [] }] }]
+
+		// subject with empty values → subset of empty → allow
+		expect(
+			await decide(acl, invoker, {
+				role: 'editor',
+				variables: [{ name: 'team', values: [] }],
+			}),
+		).toBe(true)
+
+		// subject with any value → not a subset of empty → deny
+		expect(
+			await decide(acl, invoker, {
+				role: 'editor',
+				variables: [{ name: 'team', values: ['eng'] }],
+			}),
+		).toBe(false)
+	})
+
 	test('subject carries a variable not in the rule — deny (shape constraint)', async () => {
 		const acl: Acl.Schema = {
 			roles: {

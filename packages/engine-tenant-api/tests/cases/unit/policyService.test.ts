@@ -89,6 +89,14 @@ describe('document validation', () => {
 		).not.toThrow()
 	})
 
+	test('rejects unknown operator', () => {
+		expect(() =>
+			validatePolicyDocument({
+				statements: [{ effect: 'allow', actions: ['x'], conditions: { stringEqual: { 'subject.team': 'eng' } } as any }],
+			})
+		).toThrow(/unknown operator/)
+	})
+
 	test('rejects non-object conditions', () => {
 		expect(() =>
 			validatePolicyDocument({

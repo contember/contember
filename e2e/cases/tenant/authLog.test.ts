@@ -69,9 +69,7 @@ test('authLog records login attempts and role grants, and filters by type + targ
 	expect(allResp.status).toBe(200)
 	const allEntries = allResp.body.data.authLog.entries as Entry[]
 
-	const eventsForOurUser = allEntries.filter(e =>
-		e.personId === personId || e.targetPersonId === personId || e.personInputIdentifier === email
-	)
+	const eventsForOurUser = allEntries.filter(e => e.personId === personId || e.targetPersonId === personId || e.personInputIdentifier === email)
 	const failedLogin = eventsForOurUser.find(e => e.type === 'login' && !e.success)
 	const successfulLogin = eventsForOurUser.find(e => e.type === 'login' && e.success)
 	const roleGrant = eventsForOurUser.find(e => e.type === 'global_role_grant')

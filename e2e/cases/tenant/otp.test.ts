@@ -14,8 +14,7 @@ const signInMutation = `mutation($email: String!, $password: String!, $otp: Stri
 	}
 }`
 
-const generateToken = (secret: string): string =>
-	new TOTP({ secret: Secret.fromBase32(secret), digits: 6 }).generate()
+const generateToken = (secret: string): string => new TOTP({ secret: Secret.fromBase32(secret), digits: 6 }).generate()
 
 const enableOtp = async (token: string): Promise<string> => {
 	const prep = await executeGraphql('/tenant', prepareOtpMutation, { authorizationToken: token })

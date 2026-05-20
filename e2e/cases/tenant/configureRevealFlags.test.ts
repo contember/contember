@@ -1,4 +1,4 @@
-import { expect, test, afterAll } from 'bun:test'
+import { afterAll, expect, test } from 'bun:test'
 import { createTester, executeGraphql, loginToken, rand } from '../../src/tester'
 import { emptySchema } from '@contember/schema-utils'
 

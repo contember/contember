@@ -16,14 +16,24 @@ const stubDb = { queryHandler: { fetch: async () => [] } } as any
 // DatabaseContext stub that reports a single `identity_policy` assignment of a
 // custom policy whose document carries `statements`. Lets us exercise the
 // `TenantDbPolicyProvider` DB path through `PermissionContext`.
-const dbWithCustomPolicy = (statements: Statement[]) => ({
-	queryHandler: {
-		fetch: async (query: unknown) =>
-			query instanceof IdentityPolicyAssignmentsQuery
-				? [{ identityId: 'identity-1', policyId: 'p1', tags: {}, grantedBy: null, grantedAt: new Date() }]
-				: [{ id: 'p1', slug: 'custom', label: '', description: null, document: { version: '1', statements }, version: 1, createdAt: new Date(), updatedAt: new Date() }],
-	},
-}) as any
+const dbWithCustomPolicy = (statements: Statement[]) =>
+	({
+		queryHandler: {
+			fetch: async (query: unknown) =>
+				query instanceof IdentityPolicyAssignmentsQuery
+					? [{ identityId: 'identity-1', policyId: 'p1', tags: {}, grantedBy: null, grantedAt: new Date() }]
+					: [{
+						id: 'p1',
+						slug: 'custom',
+						label: '',
+						description: null,
+						document: { version: '1', statements },
+						version: 1,
+						createdAt: new Date(),
+						updatedAt: new Date(),
+					}],
+		},
+	}) as any
 
 const schemaResolver = (schemas: Record<string, Schema | undefined>): ProjectSchemaResolver => ({
 	getSchema: async (slug: string) => schemas[slug],
@@ -36,11 +46,12 @@ const makeContext = (
 	memberships: Record<string, readonly Acl.Membership[]> = {},
 	schemas: Record<string, Schema | undefined> = { foo: emptySchema },
 	db: any = stubDb,
-) => new PermissionContext(
-	new StaticIdentity('identity-1', roles, memberships),
-	db,
-	schemaResolver(schemas),
-)
+) =>
+	new PermissionContext(
+		new StaticIdentity('identity-1', roles, memberships),
+		db,
+		schemaResolver(schemas),
+	)
 
 /**
  * Project-aware role synthesis: an identity that is a member/admin of the
@@ -143,8 +154,12 @@ describe('PermissionContext — membership AND-loop via schema manage rule', () 
  */
 describe('PermissionContext — custom policy assignments', () => {
 	test('custom allow policy grants an action the role lacks', async () => {
-		const granted = makeContext([TenantRole.LOGIN], {}, { foo: emptySchema },
-			dbWithCustomPolicy([{ effect: 'allow', actions: ['tenant:project.view'], resources: ['*'] }]))
+		const granted = makeContext(
+			[TenantRole.LOGIN],
+			{},
+			{ foo: emptySchema },
+			dbWithCustomPolicy([{ effect: 'allow', actions: ['tenant:project.view'], resources: ['*'] }]),
+		)
 		expect(await granted.isAllowed({ action: PermissionActions.PROJECT_VIEW })).toBe(true)
 
 		// Control: same role without the assignment is denied.
@@ -152,8 +167,12 @@ describe('PermissionContext — custom policy assignments', () => {
 	})
 
 	test('custom deny policy overrides a built-in allow (deny wins)', async () => {
-		const denied = makeContext([TenantRole.SUPER_ADMIN], {}, { foo: emptySchema },
-			dbWithCustomPolicy([{ effect: 'deny', actions: ['tenant:project.view'], resources: ['*'] }]))
+		const denied = makeContext(
+			[TenantRole.SUPER_ADMIN],
+			{},
+			{ foo: emptySchema },
+			dbWithCustomPolicy([{ effect: 'deny', actions: ['tenant:project.view'], resources: ['*'] }]),
+		)
 		expect(await denied.isAllowed({ action: PermissionActions.PROJECT_VIEW })).toBe(false)
 
 		// Control: super_admin without the deny is allowed.

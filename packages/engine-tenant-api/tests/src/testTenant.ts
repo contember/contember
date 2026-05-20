@@ -121,8 +121,7 @@ export const executeTenantTest = async (test: Test) => {
 			// swap in a stub policy DB context that reports "no assignments"; the
 			// built-in role policies on the test identity then authorize as expected.
 			'permissionContextFactory',
-			({ identityFactory, projectSchemaResolver }) =>
-				new PermissionContextFactory(identityFactory, projectSchemaResolver, stubDatabaseContextForAuth),
+			({ identityFactory, projectSchemaResolver }) => new PermissionContextFactory(identityFactory, projectSchemaResolver, stubDatabaseContextForAuth),
 		)
 		.setupService('idpRegistry', reg => {
 			reg.registerHandler('mock', new IdPMock())

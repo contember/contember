@@ -49,28 +49,37 @@ export function statementsForMembershipRule(
 		if (perRole !== true) {
 			const variables = perRole.variables
 			if (variables !== true) {
-				const allowedKeys = variables ? Object.keys(variables) : []
-				conditions['forAllKeys:stringEquals'] = {
-					'subject.membership.variables': allowedKeys,
-				}
+				// Keys the subject is allowed to carry, and the per-key value constraints.
+				// A mapped variable whose invoker counterpart is absent is intentionally
+				// excluded from `allowedKeys`: the legacy matcher iterates the subject side
+				// and bails (`return false`) on a missing invoker variable, so it denies any
+				// subject that carries such a variable at all — even with an empty value list.
+				// Excluding the key makes `forAllKeys:stringEquals` reject exactly those
+				// subjects, while a subject that doesn't carry the key still passes.
+				const allowedKeys: string[] = []
+				const forAllValues: Record<string, readonly string[]> = {}
 				if (variables) {
 					for (const [subjectVar, mapping] of Object.entries(variables)) {
 						if (mapping === true) {
-							// any value of this variable passes — no condition added
+							// any value of this variable passes — only the key is allowed
+							allowedKeys.push(subjectVar)
 							continue
 						}
-						// mapping is the invoker variable name — values from the invoker
-						// membership become the allowed set on the subject side. The
-						// engine's `forAllValues:stringEquals` is vacuous on an absent
-						// path, so a subject that doesn't carry this variable passes —
-						// matching the legacy semantics that iterate the SUBJECT side
-						// and skip variables the subject doesn't carry.
 						const invokerVariable = invoker.variables.find(v => v.name === mapping)
-						const allowedValues = invokerVariable?.values ?? []
-						const forAll = conditions['forAllValues:stringEquals'] ?? {}
-						forAll[`subject.membership.variables.${subjectVar}`] = allowedValues
-						conditions['forAllValues:stringEquals'] = forAll
+						if (!invokerVariable) {
+							// invoker lacks the mapped variable → subject must not carry this key
+							continue
+						}
+						// the subject's values must be a subset of the invoker's values
+						allowedKeys.push(subjectVar)
+						forAllValues[`subject.membership.variables.${subjectVar}`] = invokerVariable.values
 					}
+				}
+				conditions['forAllKeys:stringEquals'] = {
+					'subject.membership.variables': allowedKeys,
+				}
+				if (Object.keys(forAllValues).length > 0) {
+					conditions['forAllValues:stringEquals'] = forAllValues
 				}
 			}
 		}

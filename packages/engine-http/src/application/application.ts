@@ -27,6 +27,7 @@ export class Application {
 	private websocketRoutes: Route<WebSocketController>[] = []
 
 	private suppressAccessLog: boolean | RegExp
+	private trustedProxies: string[]
 
 	constructor(
 		private readonly projectGroupResolver: ProjectGroupResolver,
@@ -37,6 +38,7 @@ export class Application {
 	) {
 		const suppressAccessLogRaw = serverConfig.http?.suppressAccessLog
 		this.suppressAccessLog = suppressAccessLogRaw === true ? true : suppressAccessLogRaw ? new RegExp(suppressAccessLogRaw) : false
+		this.trustedProxies = serverConfig.http?.trustedProxies ?? []
 	}
 
 	addMiddleware(middleware: KoaMiddleware<any>) {
@@ -118,7 +120,7 @@ export class Application {
 		let webSocketContext: WebSocketContext | null = null
 		let requestLogger = this.logger
 		const { timer, send: sendTimer } = this.createTimer()
-		const clientIp = getClientIP(req)
+		const clientIp = getClientIP(req, this.trustedProxies)
 		try {
 			const url = new URL(req.url ?? '/', `http://${req.headers.host}`)
 			const matchedRequest = this.matchRequest(this.websocketRoutes, url)
@@ -201,7 +203,7 @@ export class Application {
 			}
 		}
 		let httpContext: HttpContext | null = null
-		const clientIp = getClientIP(ctx.req)
+		const clientIp = getClientIP(ctx.req, this.trustedProxies)
 		let requestLogger = this.createRequestLogger(ctx.req, ctx.request.body, matchedRequest?.module, clientIp)
 		const { timer, send: sendTimer } = this.createTimer()
 
@@ -276,7 +278,7 @@ export class Application {
 			const response = await this.logger.scope(async logger => {
 				return await matchedRequest.controller({
 					koa: ctx,
-					clientIp: getClientIP(ctx.req),
+					clientIp: getClientIP(ctx.req, this.trustedProxies),
 					body: ctx.request.body,
 					url: ctx.request.URL,
 					logger,

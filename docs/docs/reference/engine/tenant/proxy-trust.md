@@ -36,6 +36,28 @@ Use the flag only on api_keys that live entirely server-side behind a proxy you 
 
 When the api_key does **not** have the flag, or the headers are absent, Contember uses the socket IP/UA as before.
 
+## Socket IP resolution and `X-Forwarded-For`
+
+Everything above is the *application-level* mechanism (`X-Contember-Client-IP`, gated by an api_key flag). Below it sits a *network-level* step that determines the **socket IP** in the first place — the value used as the client IP when the trust flag is off, and preserved as `forwarderIp` when it is on.
+
+Contember resolves the socket IP from the TCP peer address and, when appropriate, the `X-Forwarded-For` (XFF) header:
+
+- If the connection arrives from a **trusted network** — loopback (`127.0.0.0/8`, `::1`), private (RFC1918), IPv6 unique-local (`fc00::/7`), link-local (`fe80::/10`), or any range in `CONTEMBER_HTTP_TRUSTED_PROXIES` — Contember reads `X-Forwarded-For` and takes the **rightmost** address that is itself not trusted. This is the real client in front of your proxy chain.
+- Otherwise (the connection comes straight from a public peer), `X-Forwarded-For` is **ignored** and the raw peer IP is used. A client connecting directly therefore cannot spoof its IP via XFF.
+
+This anti-spoofing only holds if your proxy *appends* the peer it saw to `X-Forwarded-For` (e.g. nginx `$proxy_add_x_forwarded_for`) rather than passing through a client-supplied one.
+
+### `CONTEMBER_HTTP_TRUSTED_PROXIES`
+
+By default only loopback/private/link-local peers are trusted to set `X-Forwarded-For`. If Contember sits behind a load balancer that connects from a **public** IP (or a non-private network), list its address(es) here so XFF is honored:
+
+```bash
+# comma-separated; CIDR notation or bare addresses (bare → /32 or /128)
+CONTEMBER_HTTP_TRUSTED_PROXIES="203.0.113.0/24, 198.51.100.7, 2001:db8::/32"
+```
+
+An invalid entry fails server startup rather than being silently dropped. Without this set, a public-facing load balancer's own IP would be recorded as the client IP, because XFF from an untrusted peer is ignored.
+
 ## Enabling on a permanent api_key
 
 Set the flag at creation time via the `options` field:

@@ -1,6 +1,7 @@
 import * as Typesafe from '@contember/typesafe'
 import { MailerOptions } from '@contember/engine-tenant-api'
 import { upperCaseFirst } from '../utils/strings'
+import ipaddr from 'ipaddr.js'
 
 const dbConfigRequired = {
 	host: Typesafe.string,
@@ -115,6 +116,33 @@ export const serverConfigSchema = Typesafe.partial({
 				return val
 			}
 			Typesafe.fail([])
+		},
+		trustedProxies: (val: unknown, path: PropertyKey[] = []): string[] | undefined => {
+			if (val === undefined || val === null || val === '') {
+				return undefined
+			}
+			const raw = Array.isArray(val) ? val : String(val).split(',')
+			const cidrs = raw
+				.map(it => String(it).trim())
+				.filter(Boolean)
+				.map(entry => {
+					// Accept both CIDR notation (10.0.0.0/8) and bare addresses (10.0.0.1 → /32, ::1 → /128).
+					if (entry.includes('/')) {
+						try {
+							ipaddr.parseCIDR(entry)
+							return entry
+						} catch {
+							return Typesafe.fail([...path, entry])
+						}
+					}
+					try {
+						const addr = ipaddr.parse(entry)
+						return `${entry}/${addr.kind() === 'ipv6' ? 128 : 32}`
+					} catch {
+						return Typesafe.fail([...path, entry])
+					}
+				})
+			return cidrs.length > 0 ? cidrs : undefined
 		},
 	}),
 	contentApi: Typesafe.partial({

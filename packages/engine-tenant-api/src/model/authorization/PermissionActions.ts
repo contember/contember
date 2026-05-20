@@ -2,6 +2,16 @@ import { Authorizator } from '@contember/authorization'
 import { Acl } from '@contember/schema'
 
 namespace PermissionActions {
+	/** Meta carried by actions whose authorization depends on a set of roles being granted/used/targeted. */
+	export interface RolesMeta {
+		roles?: readonly string[]
+	}
+
+	/** Meta carried by membership-aware actions — the project memberships the invoker wants to grant or operate on. */
+	export interface MembershipsMeta {
+		memberships: readonly Acl.Membership[]
+	}
+
 	export enum Resources {
 		system = 'system',
 		entrypoint = 'entrypoint',
@@ -19,36 +29,44 @@ namespace PermissionActions {
 	export const AUTH_LOG_VIEW = Authorizator.createAction(Resources.system, 'viewAuthLog')
 
 	export const IDENTITY_VIEW_PERMISSIONS = Authorizator.createAction(Resources.identity, 'viewPermissions')
-	export const IDENTITY_ADD_GLOBAL_ROLES = (roles?: readonly string[]) => Authorizator.createAction(Resources.identity, 'addGlobalRoles', { roles })
+	export const IDENTITY_ADD_GLOBAL_ROLES = (roles?: readonly string[]) =>
+		Authorizator.createAction(Resources.identity, 'addGlobalRoles', { roles } satisfies RolesMeta)
 	export const IDENTITY_REMOVE_GLOBAL_ROLES = (roles?: readonly string[]) =>
-		Authorizator.createAction(Resources.identity, 'removeGlobalRoles', { roles })
+		Authorizator.createAction(Resources.identity, 'removeGlobalRoles', { roles } satisfies RolesMeta)
 
-	export const PERSON_DISABLE = (roles?: readonly string[]) => Authorizator.createAction(Resources.person, 'disable', { roles })
-	export const PERSON_FORCE_SIGN_OUT = (roles?: readonly string[]) => Authorizator.createAction(Resources.person, 'forceSignOut', { roles })
-	export const PERSON_RESET_MFA = (roles?: readonly string[]) => Authorizator.createAction(Resources.person, 'resetMfa', { roles })
+	export const PERSON_DISABLE = (roles?: readonly string[]) => Authorizator.createAction(Resources.person, 'disable', { roles } satisfies RolesMeta)
+	export const PERSON_FORCE_SIGN_OUT = (roles?: readonly string[]) =>
+		Authorizator.createAction(Resources.person, 'forceSignOut', { roles } satisfies RolesMeta)
+	export const PERSON_RESET_MFA = (roles?: readonly string[]) =>
+		Authorizator.createAction(Resources.person, 'resetMfa', { roles } satisfies RolesMeta)
 	export const PERSON_REVOKE_SESSION = Authorizator.createAction(Resources.person, 'revokeSession')
-	export const PERSON_VIEW_SESSIONS = (roles?: readonly string[]) => Authorizator.createAction(Resources.person, 'viewSessions', { roles })
+	export const PERSON_VIEW_SESSIONS = (roles?: readonly string[]) =>
+		Authorizator.createAction(Resources.person, 'viewSessions', { roles } satisfies RolesMeta)
 
 	export const PERSON_VIEW = Authorizator.createAction(Resources.person, 'view')
 	export const PERSON_SIGN_IN = Authorizator.createAction(Resources.person, 'signIn')
-	export const PERSON_SIGN_UP = (roles?: readonly string[]) => Authorizator.createAction(Resources.person, 'signUp', { roles })
+	export const PERSON_SIGN_UP = (roles?: readonly string[]) => Authorizator.createAction(Resources.person, 'signUp', { roles } satisfies RolesMeta)
 	export const PERSON_SIGN_OUT = Authorizator.createAction(Resources.person, 'signOut')
 	export const PERSON_SETUP_OTP = Authorizator.createAction(Resources.person, 'setupOtp')
-	export const PERSON_CHANGE_PROFILE = (roles?: readonly string[]) => Authorizator.createAction(Resources.person, 'changeProfile', { roles })
+	export const PERSON_CHANGE_PROFILE = (roles?: readonly string[]) =>
+		Authorizator.createAction(Resources.person, 'changeProfile', { roles } satisfies RolesMeta)
 	export const PERSON_CHANGE_MY_PROFILE = Authorizator.createAction(Resources.person, 'changeMyProfile')
 	export const PERSON_TOGGLE_PASSWORDLESS = Authorizator.createAction(Resources.person, 'togglePasswordless')
-	export const PERSON_CHANGE_PASSWORD = (roles?: readonly string[]) => Authorizator.createAction(Resources.person, 'changePassword', { roles })
+	export const PERSON_CHANGE_PASSWORD = (roles?: readonly string[]) =>
+		Authorizator.createAction(Resources.person, 'changePassword', { roles } satisfies RolesMeta)
 	export const PERSON_CHANGE_MY_PASSWORD = Authorizator.createAction(Resources.person, 'changeMyPassword')
 	export const PERSON_RESET_PASSWORD = Authorizator.createAction(Resources.person, 'resetPassword')
 	export const PERSON_CREATE_IDP_URL = Authorizator.createAction(Resources.person, 'createIdPUrl')
 	export const PERSON_SIGN_IN_IDP = Authorizator.createAction(Resources.person, 'signInIdp')
 	export const PERSON_REQUEST_PASSWORDLESS_SIGN_IN = Authorizator.createAction(Resources.person, 'requestPasswordlessSignIn')
 	export const PERSON_PASSWORDLESS_SIGN_IN = Authorizator.createAction(Resources.person, 'passwordlessSignIn')
-	export const PERSON_CREATE_SESSION_KEY = (roles?: readonly string[]) => Authorizator.createAction(Resources.person, 'createSessionToken', { roles })
+	export const PERSON_CREATE_SESSION_KEY = (roles?: readonly string[]) =>
+		Authorizator.createAction(Resources.person, 'createSessionToken', { roles } satisfies RolesMeta)
 
-	export const PERSON_INVITE = (memberships: readonly Acl.Membership[]) => Authorizator.createAction(Resources.person, 'invite', { memberships })
+	export const PERSON_INVITE = (memberships: readonly Acl.Membership[]) =>
+		Authorizator.createAction(Resources.person, 'invite', { memberships } satisfies MembershipsMeta)
 	export const PERSON_INVITE_UNMANAGED = (memberships: readonly Acl.Membership[]) =>
-		Authorizator.createAction(Resources.person, 'invite_unmanaged', { memberships })
+		Authorizator.createAction(Resources.person, 'invite_unmanaged', { memberships } satisfies MembershipsMeta)
 
 	export const PROJECT_VIEW = Authorizator.createAction(Resources.project, 'view')
 	export const PROJECT_SET_SECRET = Authorizator.createAction(Resources.project, 'setSecret')
@@ -58,16 +76,17 @@ namespace PermissionActions {
 	export const ENTRYPOINT_DEPLOY = Authorizator.createAction(Resources.entrypoint, 'deployEntrypoint')
 
 	export const PROJECT_VIEW_MEMBER = (memberships: readonly Acl.Membership[]) =>
-		Authorizator.createAction(Resources.project, 'viewMembers', { memberships })
+		Authorizator.createAction(Resources.project, 'viewMembers', { memberships } satisfies MembershipsMeta)
 	export const PROJECT_ADD_MEMBER = (memberships: readonly Acl.Membership[]) =>
-		Authorizator.createAction(Resources.project, 'addMember', { memberships })
+		Authorizator.createAction(Resources.project, 'addMember', { memberships } satisfies MembershipsMeta)
 	export const PROJECT_REMOVE_MEMBER = (memberships: readonly Acl.Membership[]) =>
-		Authorizator.createAction(Resources.project, 'removeMember', { memberships })
+		Authorizator.createAction(Resources.project, 'removeMember', { memberships } satisfies MembershipsMeta)
 	export const PROJECT_UPDATE_MEMBER = (memberships: readonly Acl.Membership[]) =>
-		Authorizator.createAction(Resources.project, 'updateMember', { memberships })
+		Authorizator.createAction(Resources.project, 'updateMember', { memberships } satisfies MembershipsMeta)
 
 	export const API_KEY_CREATE = Authorizator.createAction(Resources.apiKey, 'create')
-	export const API_KEY_CREATE_GLOBAL = (roles?: readonly string[]) => Authorizator.createAction(Resources.apiKey, 'createGlobal', { roles })
+	export const API_KEY_CREATE_GLOBAL = (roles?: readonly string[]) =>
+		Authorizator.createAction(Resources.apiKey, 'createGlobal', { roles } satisfies RolesMeta)
 	export const API_KEY_DISABLE = Authorizator.createAction(Resources.apiKey, 'disable')
 
 	export const MAIL_TEMPLATE_ADD = Authorizator.createAction(Resources.mailTemplate, 'add')

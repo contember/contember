@@ -12,8 +12,9 @@ export interface PolicyActor {
  * Thrown when a policy mutation would let the actor grant — or lift a deny on —
  * a permission outside its own grantable surface. The single rule: every
  * `(action, resource)` cell of every statement of the touched policy must be
- * covered by the actor's surface, regardless of effect or operation. See
- * `@contember/policy`'s `findUngrantableCells` and the package CLAUDE.md.
+ * covered by the actor's surface, regardless of effect or operation. The
+ * surface/containment math lives in `@contember/policy` (`containment.ts`:
+ * `computeGrantableSurface`, `findUngrantableCells`).
  */
 export class PolicyBoundaryError extends Error {
 	constructor(public readonly violations: readonly Cell[]) {

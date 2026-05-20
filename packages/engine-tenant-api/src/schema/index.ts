@@ -146,6 +146,7 @@ export type AssignPolicyError = {
 };
 
 export type AssignPolicyErrorCode =
+  | 'EXCEEDS_PERMISSIONS'
   | 'IDENTITY_NOT_FOUND'
   | 'INVALID_TAGS'
   | 'POLICY_NOT_FOUND';
@@ -586,6 +587,7 @@ export type CreatePolicyError = {
 };
 
 export type CreatePolicyErrorCode =
+  | 'EXCEEDS_PERMISSIONS'
   | 'INVALID_DOCUMENT'
   | 'INVALID_SLUG'
   | 'SLUG_ALREADY_EXISTS'
@@ -673,6 +675,7 @@ export type DeletePolicyError = {
 };
 
 export type DeletePolicyErrorCode =
+  | 'EXCEEDS_PERMISSIONS'
   | 'POLICY_NOT_FOUND';
 
 export type DeletePolicyResponse = {
@@ -1643,6 +1646,7 @@ export type RevokePolicyError = {
 };
 
 export type RevokePolicyErrorCode =
+  | 'EXCEEDS_PERMISSIONS'
   | 'NOT_ASSIGNED'
   | 'POLICY_NOT_FOUND';
 
@@ -1942,6 +1946,7 @@ export type UpdatePolicyError = {
 };
 
 export type UpdatePolicyErrorCode =
+  | 'EXCEEDS_PERMISSIONS'
   | 'INVALID_DOCUMENT'
   | 'POLICY_NOT_FOUND';
 

@@ -1,6 +1,6 @@
 import { CreatePolicyResponse, MutationCreatePolicyArgs, MutationResolvers } from '../../../schema'
 import { TenantResolverContext } from '../../TenantResolverContext'
-import { PermissionActions, PolicyService, PolicyValidationError } from '../../../model'
+import { PermissionActions, PolicyBoundaryError, PolicyService, PolicyValidationError } from '../../../model'
 import { createErrorResponse } from '../../errorUtils'
 import { policyDocumentFromInput, PolicyResponseFactory } from '../../responseHelpers/PolicyResponseFactory'
 
@@ -21,7 +21,7 @@ export class CreatePolicyMutationResolver implements MutationResolvers {
 			return createErrorResponse('SLUG_ALREADY_EXISTS', `Policy with slug "${input.slug}" already exists`)
 		}
 		try {
-			const { id } = await this.policyService.create(context.db, {
+			const { id } = await this.policyService.create(context.db, context.identity, {
 				slug: input.slug,
 				label: input.label ?? undefined,
 				description: input.description ?? undefined,
@@ -36,6 +36,9 @@ export class CreatePolicyMutationResolver implements MutationResolvers {
 				result: { policy: PolicyResponseFactory.toGraphQL(created) },
 			}
 		} catch (e) {
+			if (e instanceof PolicyBoundaryError) {
+				return createErrorResponse('EXCEEDS_PERMISSIONS', e.message)
+			}
 			if (e instanceof PolicyValidationError) {
 				const code = e.message.startsWith('Invalid policy slug') || e.message.includes('reserved')
 					? (e.message.includes('reserved') ? 'SLUG_RESERVED' : 'INVALID_SLUG')

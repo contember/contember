@@ -1963,6 +1963,7 @@ const schema: DocumentNode = gql`
 		SLUG_RESERVED
 		SLUG_ALREADY_EXISTS
 		INVALID_DOCUMENT
+		EXCEEDS_PERMISSIONS
 	}
 
 	type CreatePolicyResult {
@@ -1991,6 +1992,7 @@ const schema: DocumentNode = gql`
 	enum UpdatePolicyErrorCode {
 		POLICY_NOT_FOUND
 		INVALID_DOCUMENT
+		EXCEEDS_PERMISSIONS
 	}
 
 	type UpdatePolicyResult {
@@ -2011,6 +2013,7 @@ const schema: DocumentNode = gql`
 
 	enum DeletePolicyErrorCode {
 		POLICY_NOT_FOUND
+		EXCEEDS_PERMISSIONS
 	}
 
 	# === assignPolicy ===
@@ -2029,6 +2032,7 @@ const schema: DocumentNode = gql`
 		POLICY_NOT_FOUND
 		IDENTITY_NOT_FOUND
 		INVALID_TAGS
+		EXCEEDS_PERMISSIONS
 	}
 
 	# === revokePolicy ===
@@ -2046,6 +2050,7 @@ const schema: DocumentNode = gql`
 	enum RevokePolicyErrorCode {
 		POLICY_NOT_FOUND
 		NOT_ASSIGNED
+		EXCEEDS_PERMISSIONS
 	}
 `
 

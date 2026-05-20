@@ -1,6 +1,6 @@
 import { MutationResolvers, MutationUpdatePolicyArgs, UpdatePolicyResponse } from '../../../schema'
 import { TenantResolverContext } from '../../TenantResolverContext'
-import { PermissionActions, PolicyNotFoundError, PolicyService, PolicyValidationError } from '../../../model'
+import { PermissionActions, PolicyBoundaryError, PolicyNotFoundError, PolicyService, PolicyValidationError } from '../../../model'
 import { createErrorResponse } from '../../errorUtils'
 import { policyDocumentFromInput, PolicyResponseFactory } from '../../responseHelpers/PolicyResponseFactory'
 
@@ -17,7 +17,7 @@ export class UpdatePolicyMutationResolver implements MutationResolvers {
 			message: 'You are not allowed to update a policy',
 		})
 		try {
-			await this.policyService.update(context.db, slug, {
+			await this.policyService.update(context.db, context.identity, slug, {
 				label: input.label ?? undefined,
 				description: input.description,
 				document: input.document ? policyDocumentFromInput(input.document) : undefined,
@@ -31,6 +31,9 @@ export class UpdatePolicyMutationResolver implements MutationResolvers {
 				result: { policy: PolicyResponseFactory.toGraphQL(updated) },
 			}
 		} catch (e) {
+			if (e instanceof PolicyBoundaryError) {
+				return createErrorResponse('EXCEEDS_PERMISSIONS', e.message)
+			}
 			if (e instanceof PolicyNotFoundError) {
 				return createErrorResponse('POLICY_NOT_FOUND', e.message)
 			}

@@ -1,6 +1,6 @@
 import { AssignPolicyResponse, MutationAssignPolicyArgs, MutationResolvers } from '../../../schema'
 import { TenantResolverContext } from '../../TenantResolverContext'
-import { IdentityQuery, PermissionActions, PolicyNotFoundError, PolicyService, PolicyValidationError } from '../../../model'
+import { IdentityQuery, PermissionActions, PolicyBoundaryError, PolicyNotFoundError, PolicyService, PolicyValidationError } from '../../../model'
 import { createErrorResponse } from '../../errorUtils'
 
 export class AssignPolicyMutationResolver implements MutationResolvers {
@@ -22,13 +22,16 @@ export class AssignPolicyMutationResolver implements MutationResolvers {
 		try {
 			await this.policyService.assign(
 				context.db,
+				context.identity,
 				identityId,
 				policySlug,
 				(tags ?? {}) as Record<string, unknown>,
-				context.identity.id,
 			)
 			return { ok: true }
 		} catch (e) {
+			if (e instanceof PolicyBoundaryError) {
+				return createErrorResponse('EXCEEDS_PERMISSIONS', e.message)
+			}
 			if (e instanceof PolicyNotFoundError) {
 				return createErrorResponse('POLICY_NOT_FOUND', e.message)
 			}

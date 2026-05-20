@@ -1,6 +1,6 @@
 import { MutationResolvers, MutationRevokePolicyArgs, RevokePolicyResponse } from '../../../schema'
 import { TenantResolverContext } from '../../TenantResolverContext'
-import { PermissionActions, PolicyService } from '../../../model'
+import { PermissionActions, PolicyBoundaryError, PolicyService } from '../../../model'
 import { createErrorResponse } from '../../errorUtils'
 
 export class RevokePolicyMutationResolver implements MutationResolvers {
@@ -19,10 +19,17 @@ export class RevokePolicyMutationResolver implements MutationResolvers {
 		if (!policy) {
 			return createErrorResponse('POLICY_NOT_FOUND', `Policy ${policySlug} not found`)
 		}
-		const { revoked } = await this.policyService.revoke(context.db, identityId, policySlug)
-		if (!revoked) {
-			return createErrorResponse('NOT_ASSIGNED', `Policy ${policySlug} is not assigned to identity ${identityId}`)
+		try {
+			const { revoked } = await this.policyService.revoke(context.db, context.identity, identityId, policySlug)
+			if (!revoked) {
+				return createErrorResponse('NOT_ASSIGNED', `Policy ${policySlug} is not assigned to identity ${identityId}`)
+			}
+			return { ok: true }
+		} catch (e) {
+			if (e instanceof PolicyBoundaryError) {
+				return createErrorResponse('EXCEEDS_PERMISSIONS', e.message)
+			}
+			throw e
 		}
-		return { ok: true }
 	}
 }

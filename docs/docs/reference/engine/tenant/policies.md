@@ -62,7 +62,8 @@ All policy-management operations require the corresponding tenant action.
 By default only **super admins** can manage policies; the project_admin
 role does not include policy management. Granting these permissions to
 other roles is intentional and requires extending the built-in policies
-or assigning a custom policy.
+or assigning a custom policy — but a delegated manager is then confined to
+its own permissions by the [grant boundary](#grant-boundary).
 
 | Operation | Required action |
 | --- | --- |
@@ -76,6 +77,44 @@ or assigning a custom policy.
 `Identity.policies` is readable by the identity itself without any
 permission check (self-view); reading it for another identity requires
 `tenant:policy.view`.
+
+## Grant boundary
+
+Holding `tenant:policy.create` / `assign` / … only lets you *call* the
+mutation. What you may put into — or remove from — a policy is additionally
+bounded by your **own** permissions, so delegating policy management can never
+escalate privilege beyond the delegator.
+
+The rule is a single check applied to `createPolicy`, `updatePolicy`,
+`assignPolicy`, `deletePolicy`, and `revokePolicy`: **every `(action, resource)`
+cell of every statement of the touched policy — regardless of `effect` — must
+lie within the caller's grantable surface.** Granting an `allow X` and removing
+a `deny X` both let the target end up with `X`, so the caller must hold `X`
+either way. The invariant is simply: *you may only touch a policy you could
+author from scratch yourself.*
+
+The **grantable surface** is the caller's own *global, unconditional* `allow`
+cells, minus any cell covered by one of its `deny` statements. Consequences:
+
+- **Conditional allows are excluded** — including the membership-derived
+  permissions synthesized from project schema. Scoped member management is
+  delegated through the [tenant ACL](#tenant-acl-derived-policies), not by
+  granting it via a custom policy.
+- **Deny-guarded actions are excluded entirely.** A `project_admin` granted
+  policy management therefore cannot delegate `addGlobalRoles` and the other
+  guarded actions (see [Project-admin guards](#project-admin-guards)), even
+  though it can perform them itself under the guard conditions.
+- **`update` checks both the old and the new document** — you cannot strip a
+  `deny` you do not hold, nor weaken a powerful policy you could not have
+  authored.
+- **For `assign`, the document is checked with the assignment's `tags` baked
+  in**, so a tag-scoped grant is bounded by its concrete scope. For
+  create/update/delete/revoke, unresolved `${...}` placeholders widen to `*`
+  (the worst case the cell could expand to).
+- **`super_admin`** has `*` on `*`, so its surface is unbounded.
+
+Violations return the `EXCEEDS_PERMISSIONS` error code (present on all five
+mutation error enums below).
 
 ## Statement shape
 
@@ -209,6 +248,7 @@ enum CreatePolicyErrorCode {
   SLUG_RESERVED       # "builtin:" prefix is reserved
   SLUG_ALREADY_EXISTS
   INVALID_DOCUMENT
+  EXCEEDS_PERMISSIONS # document grants beyond your own surface (see Grant boundary)
 }
 ```
 
@@ -237,6 +277,7 @@ to clear the description.
 enum UpdatePolicyErrorCode {
   POLICY_NOT_FOUND
   INVALID_DOCUMENT
+  EXCEEDS_PERMISSIONS # new or existing document is outside your surface (see Grant boundary)
 }
 ```
 
@@ -255,7 +296,10 @@ Deleting a policy cascades to its assignments — all identities lose the
 policy immediately.
 
 ```graphql
-enum DeletePolicyErrorCode { POLICY_NOT_FOUND }
+enum DeletePolicyErrorCode {
+  POLICY_NOT_FOUND
+  EXCEEDS_PERMISSIONS # the policy mentions actions outside your surface (see Grant boundary)
+}
 ```
 
 ### Assign / revoke
@@ -288,6 +332,7 @@ enum AssignPolicyErrorCode {
   POLICY_NOT_FOUND
   IDENTITY_NOT_FOUND
   INVALID_TAGS
+  EXCEEDS_PERMISSIONS # baked document grants beyond your own surface (see Grant boundary)
 }
 ```
 
@@ -307,6 +352,7 @@ mutation {
 enum RevokePolicyErrorCode {
   POLICY_NOT_FOUND
   NOT_ASSIGNED
+  EXCEEDS_PERMISSIONS # the policy mentions actions outside your surface (see Grant boundary)
 }
 ```
 

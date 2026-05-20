@@ -2,6 +2,14 @@ import { Authorizator } from '@contember/authorization'
 import { Acl } from '@contember/schema'
 import { EvaluationContext } from '@contember/policy'
 import { Identity } from './Identity'
+import { PermissionActions } from './PermissionActions'
+
+/**
+ * Shape of `action.meta` after the authorizator erases its generic. The fields
+ * mirror the meta types declared on the action creators in `PermissionActions`,
+ * so renaming a field there breaks both the creation and the read below.
+ */
+type ActionMeta = Partial<PermissionActions.RolesMeta & PermissionActions.MembershipsMeta>
 
 /**
  * Result of translating a legacy `Authorizator.Action` into a policy engine
@@ -88,16 +96,17 @@ export function translateAction(action: Authorizator.Action, identity: Identity)
 	// paths — under deny that fires fail-closed. Defaulting to [] makes the
 	// operator return false instead of 'missing', so the deny doesn't fire and
 	// the underlying allow applies — matching legacy.
+	const meta = action.meta as ActionMeta | undefined
 	if (ALLOWLIST_ROLE_ACTIONS.has(key)) {
-		const roles = ((action.meta as any)?.roles ?? []) as readonly string[]
+		const roles = meta?.roles ?? []
 		return { engineAction, baseContext: { ...baseContext, subject: { roles } } }
 	}
 	if (DENYLIST_TARGET_ROLE_ACTIONS.has(key)) {
-		const roles = ((action.meta as any)?.roles ?? []) as readonly string[]
+		const roles = meta?.roles ?? []
 		return { engineAction, baseContext: { ...baseContext, subject: { targetRoles: roles } } }
 	}
 	if (MEMBERSHIP_ACTIONS.has(key)) {
-		const memberships = ((action.meta as any)?.memberships ?? []) as readonly Acl.Membership[]
+		const memberships = meta?.memberships ?? []
 		return { engineAction, baseContext, subjectMemberships: memberships }
 	}
 	return { engineAction, baseContext }

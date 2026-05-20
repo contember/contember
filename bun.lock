@@ -314,6 +314,7 @@
         "@contember/engine-tenant-api": "workspace:*",
         "@contember/graphql-utils": "workspace:*",
         "@contember/logger": "workspace:*",
+        "@contember/policy": "workspace:*",
         "@contember/schema": "workspace:*",
         "@contember/schema-migrations": "workspace:*",
         "@contember/schema-utils": "workspace:*",

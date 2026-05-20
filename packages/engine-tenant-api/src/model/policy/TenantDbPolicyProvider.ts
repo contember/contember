@@ -85,7 +85,7 @@ export class TenantDbPolicyProvider implements PolicySource {
  * and condition values using the assignment's tag bag. Remaining placeholders
  * are left intact for engine-time resolution.
  */
-function bakeAssignmentTags(stmt: Statement, tagContext: EvaluationContext): Statement {
+export function bakeAssignmentTags(stmt: Statement, tagContext: EvaluationContext): Statement {
 	const actions = stmt.actions.map(a => substituteValue(a, tagContext) as string)
 	const resources = stmt.resources?.map(r => substituteValue(r, tagContext) as string)
 	let conditions: ConditionBlock | undefined = stmt.conditions

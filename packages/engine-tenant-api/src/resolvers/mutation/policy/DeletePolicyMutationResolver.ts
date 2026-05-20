@@ -1,6 +1,6 @@
 import { DeletePolicyResponse, MutationDeletePolicyArgs, MutationResolvers } from '../../../schema'
 import { TenantResolverContext } from '../../TenantResolverContext'
-import { PermissionActions, PolicyService } from '../../../model'
+import { PermissionActions, PolicyBoundaryError, PolicyService } from '../../../model'
 import { createErrorResponse } from '../../errorUtils'
 
 export class DeletePolicyMutationResolver implements MutationResolvers {
@@ -15,10 +15,17 @@ export class DeletePolicyMutationResolver implements MutationResolvers {
 			action: PermissionActions.POLICY_DELETE,
 			message: 'You are not allowed to delete a policy',
 		})
-		const result = await this.policyService.delete(context.db, slug)
-		if (!result.deleted) {
-			return createErrorResponse('POLICY_NOT_FOUND', `Policy ${slug} not found`)
+		try {
+			const result = await this.policyService.delete(context.db, context.identity, slug)
+			if (!result.deleted) {
+				return createErrorResponse('POLICY_NOT_FOUND', `Policy ${slug} not found`)
+			}
+			return { ok: true }
+		} catch (e) {
+			if (e instanceof PolicyBoundaryError) {
+				return createErrorResponse('EXCEEDS_PERMISSIONS', e.message)
+			}
+			throw e
 		}
-		return { ok: true }
 	}
 }

@@ -167,6 +167,113 @@ test('Tenant API: assigned policy grants permission end-to-end, revoke removes i
 	await sendTenant(gql`mutation($slug: String!) { deletePolicy(slug: $slug) { ok } }`, { variables: { slug } })
 })
 
+test('Tenant API: grant boundary — a delegated manager can only grant within its own surface', async () => {
+	const tester = await createTester(emptySchema)
+	const email = `delegate+${rand()}@example.com`
+	const delegateId = await tester.tenant.signUp(email)
+	const delegateToken = await tester.tenant.signIn(email)
+
+	// As super_admin: grant the delegate policy management + a *limited* surface
+	// (idp.* only). This becomes the delegate's grantable surface.
+	const managerSlug = `manager-${rand()}`
+	const createManager = await sendTenant(createPolicyMutation, {
+		variables: {
+			input: {
+				slug: managerSlug,
+				document: {
+					statements: [
+						{
+							effect: 'allow',
+							actions: [
+								'tenant:policy.view',
+								'tenant:policy.create',
+								'tenant:policy.update',
+								'tenant:policy.delete',
+								'tenant:policy.assign',
+								'tenant:policy.revoke',
+								'tenant:idp.add',
+								'tenant:idp.update',
+								'tenant:idp.list',
+							],
+							resources: ['*'],
+						},
+					],
+				},
+			},
+		},
+	})
+	expect(createManager.body.data.createPolicy.ok).toBe(true)
+
+	const assignManager = await sendTenant(
+		gql`mutation($identityId: String!, $slug: String!) { assignPolicy(identityId: $identityId, policySlug: $slug) { ok error { code } } }`,
+		{ variables: { identityId: delegateId, slug: managerSlug } },
+	)
+	expect(assignManager.body.data.assignPolicy).toMatchObject({ ok: true, error: null })
+
+	const asDelegate = (input: any) => sendTenant(createPolicyMutation, { variables: { input }, authorizationToken: delegateToken })
+
+	// ALLOWED: granting a subset of the delegate's own surface
+	const withinSurface = await asDelegate({
+		slug: `ok-${rand()}`,
+		document: { statements: [{ effect: 'allow', actions: ['tenant:idp.add'], resources: ['*'] }] },
+	})
+	expect(withinSurface.body.data.createPolicy).toMatchObject({ ok: true, error: null })
+
+	// ALLOWED: sub-delegating policy.assign (it is in the surface) stays bounded
+	const subDelegate = await asDelegate({
+		slug: `ok-sub-${rand()}`,
+		document: { statements: [{ effect: 'allow', actions: ['tenant:policy.assign', 'tenant:idp.list'], resources: ['*'] }] },
+	})
+	expect(subDelegate.body.data.createPolicy).toMatchObject({ ok: true, error: null })
+
+	// REJECTED: an action outside the surface
+	const outside = await asDelegate({
+		slug: `bad-${rand()}`,
+		document: { statements: [{ effect: 'allow', actions: ['tenant:project.create'], resources: ['*'] }] },
+	})
+	expect(outside.body.data.createPolicy).toMatchObject({ ok: false, error: { code: 'EXCEEDS_PERMISSIONS' } })
+
+	// REJECTED: a wildcard grant the enumerated surface cannot cover
+	const wildcard = await asDelegate({
+		slug: `bad-wild-${rand()}`,
+		document: { statements: [{ effect: 'allow', actions: ['*'], resources: ['*'] }] },
+	})
+	expect(wildcard.body.data.createPolicy).toMatchObject({ ok: false, error: { code: 'EXCEEDS_PERMISSIONS' } })
+
+	// REJECTED: a deny on an out-of-surface action (removing it later would escalate)
+	const denyOutside = await asDelegate({
+		slug: `bad-deny-${rand()}`,
+		document: { statements: [{ effect: 'deny', actions: ['tenant:project.create'], resources: ['*'] }] },
+	})
+	expect(denyOutside.body.data.createPolicy).toMatchObject({ ok: false, error: { code: 'EXCEEDS_PERMISSIONS' } })
+
+	// REJECTED: assigning a powerful policy authored by super_admin
+	const powerfulSlug = `powerful-${rand()}`
+	const powerful = await sendTenant(createPolicyMutation, {
+		variables: { input: { slug: powerfulSlug, document: { statements: [{ effect: 'allow', actions: ['tenant:project.create'], resources: ['*'] }] } } },
+	})
+	expect(powerful.body.data.createPolicy.ok).toBe(true)
+
+	const victimEmail = `victim+${rand()}@example.com`
+	const victimId = await tester.tenant.signUp(victimEmail)
+	const assignPowerful = await sendTenant(
+		gql`mutation($identityId: String!, $slug: String!) { assignPolicy(identityId: $identityId, policySlug: $slug) { ok error { code } } }`,
+		{ variables: { identityId: victimId, slug: powerfulSlug }, authorizationToken: delegateToken },
+	)
+	expect(assignPowerful.body.data.assignPolicy).toMatchObject({ ok: false, error: { code: 'EXCEEDS_PERMISSIONS' } })
+
+	// REJECTED: even deleting that powerful policy (it mentions out-of-surface actions)
+	const deletePowerful = await sendTenant(
+		gql`mutation($slug: String!) { deletePolicy(slug: $slug) { ok error { code } } }`,
+		{ variables: { slug: powerfulSlug }, authorizationToken: delegateToken },
+	)
+	expect(deletePowerful.body.data.deletePolicy).toMatchObject({ ok: false, error: { code: 'EXCEEDS_PERMISSIONS' } })
+
+	// super_admin remains unrestricted: it can delete the powerful policy
+	const superDelete = await sendTenant(gql`mutation($slug: String!) { deletePolicy(slug: $slug) { ok } }`, { variables: { slug: powerfulSlug } })
+	expect(superDelete.body.data.deletePolicy.ok).toBe(true)
+})
+
 test('Tenant API: builtinPolicies are exposed', async () => {
 	await createTester(emptySchema)
 	const res = await sendTenant(gql`query { builtinPolicies { role slug document { statements { effect actions } } } }`)

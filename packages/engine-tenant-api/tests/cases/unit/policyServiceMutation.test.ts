@@ -1,23 +1,26 @@
 import { describe, expect, test } from 'bun:test'
 import { PolicyNotFoundError, PolicyService, PolicyValidationError } from '../../../src/model/policy'
+import { IdentityPolicyAssignmentsQuery } from '../../../src/model/policy/queries/IdentityPolicyAssignmentsQuery'
 import type { DatabaseContext } from '../../../src/model/utils'
-import type { PolicyDto } from '../../../src/model/policy'
+import type { PolicyActor, PolicyDto } from '../../../src/model/policy'
+
+const actor: PolicyActor = { id: 'actor-id', roles: [] }
 
 const makeDb = (overrides: {
 	fetch?: (query: any) => any
 	execute?: (command: any) => any
 }): DatabaseContext => {
-	const calls: any[] = []
 	const db = {
 		queryHandler: {
-			fetch: overrides.fetch ?? (() => undefined),
+			// The grant-boundary surface load runs `IdentityPolicyAssignmentsQuery`;
+			// the actor here holds no policies, so return an empty assignment list.
+			fetch: (query: any) => query instanceof IdentityPolicyAssignmentsQuery ? [] : (overrides.fetch ?? (() => undefined))(query),
 		},
 		commandBus: {
 			execute: overrides.execute ?? (() => {
 				throw new Error('commandBus.execute should not be called in this test')
 			}),
 		},
-		_calls: calls,
 	}
 	return db as any
 }
@@ -38,7 +41,7 @@ describe('PolicyService.create — slug protection', () => {
 		const db = makeDb({})
 		const service = new PolicyService()
 		await expect(
-			service.create(db, { slug: 'builtin:foo', document: { statements: [] } }),
+			service.create(db, actor, { slug: 'builtin:foo', document: { statements: [] } }),
 		).rejects.toBeInstanceOf(PolicyValidationError)
 	})
 })
@@ -48,7 +51,7 @@ describe('PolicyService.update', () => {
 		const db = makeDb({ fetch: () => null })
 		const service = new PolicyService()
 		await expect(
-			service.update(db, 'missing', { label: 'x' }),
+			service.update(db, actor, 'missing', { label: 'x' }),
 		).rejects.toBeInstanceOf(PolicyNotFoundError)
 	})
 
@@ -62,7 +65,7 @@ describe('PolicyService.update', () => {
 			},
 		})
 		const service = new PolicyService()
-		const result = await service.update(db, 'auditor', { label: 'new label' })
+		const result = await service.update(db, actor, 'auditor', { label: 'new label' })
 		expect(executed).toBe(true)
 		expect(result).toEqual({ updated: true })
 	})
@@ -71,7 +74,7 @@ describe('PolicyService.update', () => {
 		const db = makeDb({ fetch: () => customPolicy })
 		const service = new PolicyService()
 		await expect(
-			service.update(db, 'auditor', { document: { statements: 'oops' as any } }),
+			service.update(db, actor, 'auditor', { document: { statements: 'oops' as any } }),
 		).rejects.toBeInstanceOf(PolicyValidationError)
 	})
 })
@@ -80,14 +83,21 @@ describe('PolicyService.delete', () => {
 	test('forwards to the command and returns its result', async () => {
 		let executed = false
 		const db = makeDb({
+			fetch: () => customPolicy,
 			execute: () => {
 				executed = true
 				return { deleted: true }
 			},
 		})
 		const service = new PolicyService()
-		expect(await service.delete(db, 'auditor')).toEqual({ deleted: true })
+		expect(await service.delete(db, actor, 'auditor')).toEqual({ deleted: true })
 		expect(executed).toBe(true)
+	})
+
+	test('returns deleted:false when the policy does not exist', async () => {
+		const db = makeDb({ fetch: () => null })
+		const service = new PolicyService()
+		expect(await service.delete(db, actor, 'missing')).toEqual({ deleted: false })
 	})
 })
 
@@ -102,7 +112,7 @@ describe('PolicyService.assign — tag validation', () => {
 		})
 		const service = new PolicyService()
 		await expect(
-			service.assign(db, 'identity-x', 'auditor', { team: '${identity.id}' }),
+			service.assign(db, actor, 'identity-x', 'auditor', { team: '${identity.id}' }),
 		).rejects.toBeInstanceOf(PolicyValidationError)
 		expect(dbTouched).toBe(false)
 	})
@@ -116,7 +126,7 @@ describe('PolicyService.assign — tag validation', () => {
 			},
 		})
 		const service = new PolicyService()
-		await service.assign(db, 'identity-x', 'auditor', { team: 'eng', level: 3 })
+		await service.assign(db, actor, 'identity-x', 'auditor', { team: 'eng', level: 3 })
 		expect(executed).toBe(true)
 	})
 })

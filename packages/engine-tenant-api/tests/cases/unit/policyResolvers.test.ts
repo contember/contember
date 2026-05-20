@@ -45,26 +45,26 @@ class StubService extends PolicyService {
 		this.lastCall = { method: 'getBySlug', args: [slug] }
 		return this.impl.getBySlug ? this.impl.getBySlug(slug) : null
 	}
-	override async create(_db: any, input: any): Promise<{ id: string }> {
+	override async create(_db: any, _actor: any, input: any): Promise<{ id: string }> {
 		this.lastCall = { method: 'create', args: [input] }
 		return this.impl.create ? this.impl.create() : { id: 'new-id' }
 	}
-	override async update(_db: any, slug: string, input: any): Promise<{ updated: boolean }> {
+	override async update(_db: any, _actor: any, slug: string, input: any): Promise<{ updated: boolean }> {
 		this.lastCall = { method: 'update', args: [slug, input] }
 		if (!this.impl.update) throw new PolicyNotFoundError(slug)
 		return this.impl.update()
 	}
-	override async delete(_db: any, slug: string): Promise<{ deleted: boolean }> {
+	override async delete(_db: any, _actor: any, slug: string): Promise<{ deleted: boolean }> {
 		this.lastCall = { method: 'delete', args: [slug] }
 		return this.impl.delete ? this.impl.delete() : { deleted: false }
 	}
-	override async assign(_db: any, identityId: string, policySlug: string, tags: Record<string, unknown>): Promise<void> {
+	override async assign(_db: any, _actor: any, identityId: string, policySlug: string, tags: Record<string, unknown>): Promise<void> {
 		this.lastCall = { method: 'assign', args: [identityId, policySlug, tags] }
 		if (this.impl.assign) {
 			await this.impl.assign()
 		}
 	}
-	override async revoke(_db: any, identityId: string, policySlug: string): Promise<{ revoked: boolean }> {
+	override async revoke(_db: any, _actor: any, identityId: string, policySlug: string): Promise<{ revoked: boolean }> {
 		this.lastCall = { method: 'revoke', args: [identityId, policySlug] }
 		return this.impl.revoke ? this.impl.revoke() : { revoked: false }
 	}

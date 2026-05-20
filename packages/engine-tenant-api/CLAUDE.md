@@ -35,3 +35,17 @@ CQRS pattern with Command/Query separation via `CommandBus` and `DatabaseQuery`.
 ## Database
 
 Core tables: `identity`, `person`, `api_key`, `person_token`, `project`, `project_membership`, `project_membership_variable`, `project_secret`, `identity_provider`, `person_identity_provider`, `mail_template`, `person_auth_log`, `config`
+
+## Migrations & snapshot
+
+Migrations live in `src/migrations/` (one `YYYY-MM-DD-HHMMSS-name.ts` per change, registered in `runner.ts`). `snapshot.ts` is a `pg_dump` of the schema that running ALL migrations produces — the runner uses it (`SnapshotMigrationResolver`) to bootstrap a fresh DB in one step instead of replaying every migration. **It is generated, not hand-edited, and must be regenerated whenever you add or change a migration**, otherwise a fresh DB drifts from an upgraded one (e.g. a missing index or a non-partial index).
+
+Regenerate (works from any worktree; needs `docker compose up -d postgres` + local `bun install`):
+
+```bash
+./scripts/create-migrations-snapshot/run.sh tenant   # or: system
+```
+
+The script runs the migrations with local `bun` against the current checkout (so it picks up THIS branch's migrations, not whatever the engine container has mounted), auto-discovers the running postgres container, dumps the schema, and formats the result. Do NOT run migrations inside the `engine` container for this — it mounts the main repo, not your worktree.
+
+Verify the snapshot matches the migrations by bootstrapping two fresh DBs — one with `CONTEMBER_MIGRATIONS_NO_SNAPSHOT=1` (replays migrations), one without (uses the snapshot) — and diffing `pg_dump` of both; they must be schema-identical.

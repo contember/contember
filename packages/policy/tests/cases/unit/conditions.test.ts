@@ -422,6 +422,16 @@ describe('errors', () => {
 			)
 		).toThrow(UnknownConditionOperatorError)
 	})
+
+	test('inherited Object members are NOT treated as operators', () => {
+		// `ctx.operators[name]` would resolve `toString`/`constructor`/`__proto__`
+		// to functions on Object.prototype and invoke them as operators (returning
+		// truthy → silently passing the condition). They must throw instead.
+		for (const name of ['toString', 'constructor', 'hasOwnProperty', 'valueOf', '__proto__']) {
+			expect(() => evaluateConditions({ [name]: { x: 'y' } }, ctx({ x: 'y' }), 'deny'))
+				.toThrow(UnknownConditionOperatorError)
+		}
+	})
 })
 
 describe('no conditions', () => {

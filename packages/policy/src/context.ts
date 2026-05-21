@@ -22,6 +22,15 @@ export function readPath(context: EvaluationContext, path: string): unknown {
 		if (typeof current !== 'object') {
 			return undefined
 		}
+		// Never step into prototype machinery — a path like `__proto__.x` or
+		// `constructor` must resolve to undefined, not the prototype/constructor
+		// object. Only own enumerable-or-not properties are addressable.
+		if (segment === '__proto__' || segment === 'constructor' || segment === 'prototype') {
+			return undefined
+		}
+		if (!Object.prototype.hasOwnProperty.call(current, segment)) {
+			return undefined
+		}
 		current = (current as Record<string, unknown>)[segment]
 	}
 	return current

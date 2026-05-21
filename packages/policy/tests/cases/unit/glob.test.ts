@@ -74,3 +74,25 @@ describe('glob cache LRU', () => {
 		expect(globMatch('unique-pattern-0:*', 'mismatch')).toBe(false)
 	})
 })
+
+describe('glob consecutive-star collapse (catastrophic backtracking guard)', () => {
+	test('collapses runs of * into a single .*', () => {
+		// Each * must NOT emit its own `.*` (which produces `^.*.*.*a$` and
+		// backtracks exponentially on long non-matching input).
+		expect(globToRegExp('***a').source).toBe('^.*a$')
+		expect(globToRegExp('a***b').source).toBe('^a.*b$')
+		expect(globToRegExp('****').source).toBe('^.*$')
+	})
+
+	test('still matches correctly after collapse', () => {
+		expect(globMatch('***a', 'xyza')).toBe(true)
+		expect(globMatch('a***b', 'a-anything-b')).toBe(true)
+		expect(globMatch('a***b', 'a-anything')).toBe(false)
+	})
+
+	test('many stars against long non-matching input resolves promptly', () => {
+		const start = Date.now()
+		expect(globMatch('*'.repeat(30) + 'x', 'y'.repeat(64))).toBe(false)
+		expect(Date.now() - start).toBeLessThan(100)
+	})
+})

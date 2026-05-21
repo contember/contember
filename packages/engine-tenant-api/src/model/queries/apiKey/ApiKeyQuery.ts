@@ -1,6 +1,7 @@
 import { DatabaseQuery, DatabaseQueryable, Operator, SelectBuilder } from '@contember/database'
 import { ApiKey } from '../../type/index.js'
 import { computeTokenHash } from '../../utils/index.js'
+import { IPostgresInterval } from 'postgres-interval'
 
 export class ApiKeyByIdQuery extends DatabaseQuery<null | ApiKeyRow> {
 	constructor(private readonly apiKeyId: string) {
@@ -46,6 +47,9 @@ export type ApiKeyRow = {
 	readonly last_user_agent: string | null
 	readonly last_used_at: Date | null
 	readonly trust_forwarded_info: boolean
+	readonly issued_at: Date | null
+	readonly idle_timeout: IPostgresInterval | null
+	readonly max_expires_at: Date | null
 }
 
 const apiKeyBaseQuery = SelectBuilder.create<null | ApiKeyRow>()
@@ -61,6 +65,9 @@ const apiKeyBaseQuery = SelectBuilder.create<null | ApiKeyRow>()
 	.select(['api_key', 'last_user_agent'])
 	.select(['api_key', 'last_used_at'])
 	.select(['api_key', 'trust_forwarded_info'])
+	.select(['api_key', 'issued_at'])
+	.select(['api_key', 'idle_timeout'])
+	.select(['api_key', 'max_expires_at'])
 	.from('api_key')
 	.join('identity', 'identity', joinClause => joinClause.compareColumns(['api_key', 'identity_id'], Operator.eq, ['identity', 'id']))
 	.leftJoin(

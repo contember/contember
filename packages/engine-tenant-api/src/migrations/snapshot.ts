@@ -102,7 +102,9 @@ CREATE TABLE "api_key" (
     "created_ip" "inet",
     "created_user_agent" "text",
     "trust_forwarded_info" boolean DEFAULT false NOT NULL,
-    "issued_at" timestamp with time zone
+    "issued_at" timestamp with time zone,
+    "idle_timeout" interval,
+    "max_expires_at" timestamp with time zone
 );
 CREATE TABLE "auth_policy" (
     "id" "uuid" NOT NULL,

@@ -13,14 +13,16 @@ import { DatabaseContext, TokenHash } from '../../utils/index.js'
 import { ApiKeyService, CreateApiKeyResponse } from './ApiKeyService.js'
 import assert from 'node:assert'
 import { Acl } from '@contember/schema'
-import { ApiKeyByIdQuery, ApiKeyByTokenQuery, ApiKeyRow, ConfigurationQuery } from '../../queries/index.js'
+import { ApiKeyByIdQuery, ApiKeyByTokenQuery, ApiKeyRow, ConfigurationQuery, IdentityQuery } from '../../queries/index.js'
 import PostgresInterval from 'postgres-interval'
 import { Config } from '../../type/Config.js'
-import { intervalToSeconds } from '../../utils/interval.js'
+import { intervalToPostgres, intervalToSeconds } from '../../utils/interval.js'
+import { AuthPolicyResolver } from '../AuthPolicyResolver.js'
 
 export class ApiKeyManager {
 	constructor(
 		private readonly apiKeyService: ApiKeyService,
+		private readonly authPolicyResolver: AuthPolicyResolver,
 	) {}
 
 	async verifyAndProlong(
@@ -47,6 +49,30 @@ export class ApiKeyManager {
 			return new ResponseError(VerifyErrorCode.DISABLED, `API key expired at ${apiKeyRow.expires_at.toISOString()}`)
 		}
 
+		// A19: absolute hard cap (defensive — the prolong clamp should already keep
+		// expires_at <= max_expires_at, but enforce it here regardless).
+		if (apiKeyRow.max_expires_at !== null && apiKeyRow.max_expires_at <= now) {
+			await dbContext.commandBus.execute(new DisableApiKeyCommand(apiKeyRow.id))
+			return new ResponseError(
+				VerifyErrorCode.DISABLED,
+				`API key reached its maximum lifetime at ${apiKeyRow.max_expires_at.toISOString()}`,
+			)
+		}
+
+		// A19: idle timeout. Reject + disable when the session has been idle longer
+		// than the policy's idle_timeout. A null idle_timeout (today's default) or a
+		// never-used key (last_used_at null) are never idle-expired.
+		if (apiKeyRow.idle_timeout !== null && apiKeyRow.last_used_at !== null) {
+			const idleMs = intervalToSeconds(apiKeyRow.idle_timeout) * 1000
+			if (now.getTime() - apiKeyRow.last_used_at.getTime() > idleMs) {
+				await dbContext.commandBus.execute(new DisableApiKeyCommand(apiKeyRow.id))
+				return new ResponseError(
+					VerifyErrorCode.DISABLED,
+					`API key was idle since ${apiKeyRow.last_used_at.toISOString()} and exceeded the idle timeout`,
+				)
+			}
+		}
+
 		const effectiveInfo: ApiKeyRequestInfo | undefined = apiKeyRow.trust_forwarded_info && forwardedInfo
 			? {
 				ip: forwardedInfo.ip ?? requestInfo?.ip,
@@ -67,6 +93,7 @@ export class ApiKeyManager {
 						lastUserAgent: apiKeyRow.last_user_agent,
 						lastUsedAt: apiKeyRow.last_used_at,
 					},
+					apiKeyRow.max_expires_at,
 				),
 			)
 		})
@@ -90,16 +117,45 @@ export class ApiKeyManager {
 		trustForwardedInfo?: boolean,
 	): Promise<string> {
 		const config = await dbContext.queryHandler.fetch(new ConfigurationQuery(dbContext.providers))
-		const expirationResolved = expiration ?? (intervalToSeconds(config.login.defaultTokenExpiration) / 60)
-		const expirationCapped = config.login.maxTokenExpiration
-			? Math.min(expirationResolved, intervalToSeconds(config.login.maxTokenExpiration) / 60)
-			: expirationResolved
+
+		// A19: snapshot the effective session policy onto the api_key at sign-in.
+		// With no matching policy, every field is null/baseline and the result is
+		// byte-for-byte today's behavior.
+		const [identityRow] = await dbContext.queryHandler.fetch(new IdentityQuery([identityId]))
+		const globalRoles = identityRow?.roles ?? []
+		const policy = await this.authPolicyResolver.resolveForIdentity(dbContext, identityId, globalRoles)
+
+		const defaultExpirationMinutes = intervalToSeconds(config.login.defaultTokenExpiration) / 60
+		// remember_me_allowed === false: ignore a client-supplied longer lifetime and
+		// force the default. (true/null leave the requested expiration untouched.)
+		const requestedMinutes = policy.rememberMeAllowed === false
+			? defaultExpirationMinutes
+			: (expiration ?? defaultExpirationMinutes)
+
+		// Cap by maxTokenExpiration (existing behavior) AND by the policy's
+		// tokenExpiration (A19) — strictest wins.
+		let expirationCapped = config.login.maxTokenExpiration
+			? Math.min(requestedMinutes, intervalToSeconds(config.login.maxTokenExpiration) / 60)
+			: requestedMinutes
+		if (policy.tokenExpiration) {
+			expirationCapped = Math.min(expirationCapped, intervalToSeconds(policy.tokenExpiration) / 60)
+		}
+
+		// Absolute hard cap: issued_at + policy.tokenExpiration. NULL = uncapped
+		// sliding window (today's behavior).
+		const issuedAt = dbContext.providers.now()
+		const maxExpiresAt = policy.tokenExpiration
+			? new Date(issuedAt.getTime() + intervalToSeconds(policy.tokenExpiration) * 1000)
+			: null
+
 		const command = new CreateApiKeyCommand({
 			type: ApiKey.Type.SESSION,
 			identityId,
 			expiration: expirationCapped,
 			requestInfo,
 			trustForwardedInfo,
+			idleTimeout: policy.idleTimeout ? intervalToPostgres(policy.idleTimeout) : null,
+			maxExpiresAt,
 		})
 		const token = (await dbContext.commandBus.execute(command)).token
 		assert(token !== undefined)

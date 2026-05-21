@@ -1,5 +1,17 @@
 import { IPostgresInterval } from 'postgres-interval'
 
+/**
+ * Serializes an interval into a Postgres-acceptable string literal for use as a
+ * query parameter (e.g. writing into an INTERVAL column). `postgres-interval`
+ * instances expose `toPostgres()`; we fall back to a seconds literal otherwise.
+ */
+export const intervalToPostgres = (interval: IPostgresInterval): string => {
+	if (typeof interval.toPostgres === 'function') {
+		return interval.toPostgres()
+	}
+	return `${intervalToSeconds(interval)} seconds`
+}
+
 export const intervalToSeconds = (interval: IPostgresInterval): number => {
 	const { months, years, days, hours, minutes, seconds, milliseconds } = interval
 	return (

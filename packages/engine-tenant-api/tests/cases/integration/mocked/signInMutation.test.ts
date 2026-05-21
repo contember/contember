@@ -16,6 +16,7 @@ import { consumeBackupCodeSql } from './sql/consumeBackupCodeSql.js'
 import { consumeEmailOtpTokenSql, EMAIL_OTP_CODE, getLatestEmailOtpTokenSql, sendEmailOtpSql } from './sql/emailOtpSql.js'
 import { getMailTemplateSql } from './sql/getMailTemplateSql.js'
 import { getAuthPoliciesSql } from './sql/authPolicySql.js'
+import { getIdentityByIdSql } from './sql/getIdentityByIdSql.js'
 
 test('signs in', async () => {
 	const email = 'john@doe.com'
@@ -32,6 +33,8 @@ test('signs in', async () => {
 			getPersonByEmailSql({ email, response: { personId, identityId, password, roles: [] } }),
 			getAuthPoliciesSql(),
 			getConfigSql(),
+			getIdentityByIdSql({ identityId }),
+			getAuthPoliciesSql(),
 			createSessionKeySql({ apiKeyId: apiKeyId, identityId: identityId }),
 			getIdentityProjectsSql({ identityId: identityId, projectId: projectId }),
 			selectMembershipsSql({
@@ -93,6 +96,8 @@ test('signs in - normalize email', async () => {
 			getPersonByEmailSql({ email: 'john@doe.com', response: { personId, identityId, password, roles: [] } }),
 			getAuthPoliciesSql(),
 			getConfigSql(),
+			getIdentityByIdSql({ identityId }),
+			getAuthPoliciesSql(),
 			createSessionKeySql({ apiKeyId: apiKeyId, identityId: identityId }),
 			getIdentityProjectsSql({ identityId: identityId, projectId: projectId }),
 			selectMembershipsSql({
@@ -246,6 +251,8 @@ test('sign in - valid otp token', async () => {
 			getNextLoginAttemptSql(email),
 			getPersonByEmailSql({ email, response: { personId, identityId, password, roles: [], otpUri: otp.uri } }),
 			getConfigSql(),
+			getIdentityByIdSql({ identityId }),
+			getAuthPoliciesSql(),
 			createSessionKeySql({ apiKeyId, identityId }),
 			getIdentityProjectsSql({ identityId, projectId }),
 			selectMembershipsSql({
@@ -298,6 +305,8 @@ test('sign in - valid backup code (when OTP is required)', async () => {
 			getPersonByEmailSql({ email, response: { personId, identityId, password, roles: [], otpUri: otp.uri } }),
 			consumeBackupCodeSql({ personId, codeHash: BACKUP_CODE_HASH, consumed: true }),
 			getConfigSql(),
+			getIdentityByIdSql({ identityId }),
+			getAuthPoliciesSql(),
 			createSessionKeySql({ apiKeyId, identityId }),
 			getIdentityProjectsSql({ identityId, projectId }),
 			selectMembershipsSql({
@@ -389,6 +398,8 @@ test('sign in - email OTP enabled, valid code: signs in', async () => {
 			getLatestEmailOtpTokenSql({ personId, tokenId }),
 			consumeEmailOtpTokenSql({ tokenId }),
 			getConfigSql(),
+			getIdentityByIdSql({ identityId }),
+			getAuthPoliciesSql(),
 			createSessionKeySql({ apiKeyId, identityId }),
 			getIdentityProjectsSql({ identityId, projectId }),
 			selectMembershipsSql({ identityId, projectId, membershipsResponse: [] }),

@@ -29,6 +29,9 @@ const makeDb = (overrides: {
 				throw new Error('commandBus.execute should not be called in this test')
 			}),
 		},
+		// Mutating methods now wrap their read-check-write in a transaction; the
+		// fake just runs the callback against the same db.
+		transaction: (cb: any) => cb(db),
 	}
 	return db as any
 }
@@ -140,8 +143,8 @@ describe('PolicyService.assign — tag validation', () => {
 })
 
 describe('PolicyService — target identity protection', () => {
-	const protectedTargetDb = (overrides: { execute?: (c: any) => any } = {}): DatabaseContext =>
-		({
+	const protectedTargetDb = (overrides: { execute?: (c: any) => any } = {}): DatabaseContext => {
+		const db: any = {
 			queryHandler: {
 				fetch: (query: any) =>
 					query instanceof IdentityPolicyAssignmentsQuery
@@ -155,7 +158,10 @@ describe('PolicyService — target identity protection', () => {
 					throw new Error('commandBus.execute should not run when target is protected')
 				}),
 			},
-		}) as any
+			transaction: (cb: any) => cb(db),
+		}
+		return db
+	}
 
 	test('non-super-admin actor cannot assign a policy to a super_admin identity', async () => {
 		const service = new PolicyService()

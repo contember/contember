@@ -17,6 +17,7 @@ import { PermissionContext } from '../authorization'
 import { PersonTokenQuery } from '../queries/personToken/PersonTokenQuery'
 import { ImplementationException } from '../../exceptions'
 import { OtpManager } from './OtpManager'
+import { BackupCodeManager } from './BackupCodeManager'
 import { PersonToken } from '../type'
 import { AuthLogService } from './AuthLogService'
 import { intervalToSeconds } from '../utils/interval'
@@ -28,6 +29,7 @@ class PasswordlessSignInManager {
 		private readonly mailer: UserMailer,
 		private readonly projectManager: ProjectManager,
 		private readonly otpManager: OtpManager,
+		private readonly backupCodeManager: BackupCodeManager,
 	) {}
 
 	async initSignInPasswordless({ db, permissionContext, mailVariant, mailProject, email }: {
@@ -129,12 +131,13 @@ class PasswordlessSignInManager {
 		return urlObj.toString()
 	}
 
-	async signInPasswordless({ db, expiration, token, requestId, mfaOtp, validationType, requestInfo, trustForwardedInfo }: {
+	async signInPasswordless({ db, expiration, token, requestId, mfaOtp, backupCode, validationType, requestInfo, trustForwardedInfo }: {
 		db: DatabaseContext
 		validationType: PersonToken.ValidationType
 		requestId: string
 		token: string
 		mfaOtp?: string
+		backupCode?: string
 		expiration?: number
 		requestInfo?: ApiKeyRequestInfo
 		trustForwardedInfo?: boolean
@@ -175,18 +178,29 @@ class PasswordlessSignInManager {
 				})
 			}
 
+			let usedBackupCode = false
 			if (personRow.otp_secret && personRow.otp_activated_at) {
-				if (!mfaOtp) {
+				if (mfaOtp) {
+					if (!await this.otpManager.verifyOtp(personRow, mfaOtp)) {
+						return new ResponseError('INVALID_OTP_TOKEN', 'OTP token validation has failed', {
+							[AuthLogService.Key]: new AuthLogService.Bag({
+								personId: personRow.id,
+								tokenId: tokenResult?.id,
+							}),
+						})
+					}
+				} else if (backupCode) {
+					if (!await this.backupCodeManager.verifyAndConsume(db, personRow.id, backupCode)) {
+						return new ResponseError('INVALID_OTP_TOKEN', 'OTP token validation has failed', {
+							[AuthLogService.Key]: new AuthLogService.Bag({
+								personId: personRow.id,
+								tokenId: tokenResult?.id,
+							}),
+						})
+					}
+					usedBackupCode = true
+				} else {
 					return new ResponseError('OTP_REQUIRED', `2FA is enabled. OTP token is required`, {
-						[AuthLogService.Key]: new AuthLogService.Bag({
-							personId: personRow.id,
-							tokenId: tokenResult?.id,
-						}),
-					})
-				}
-
-				if (!await this.otpManager.verifyOtp(personRow, mfaOtp)) {
-					return new ResponseError('INVALID_OTP_TOKEN', 'OTP token validation has failed', {
 						[AuthLogService.Key]: new AuthLogService.Bag({
 							personId: personRow.id,
 							tokenId: tokenResult?.id,
@@ -201,6 +215,7 @@ class PasswordlessSignInManager {
 			return new ResponseOk({
 				person: personRow,
 				token: sessionToken,
+				usedBackupCode,
 				[AuthLogService.Key]: new AuthLogService.Bag({
 					personId: personRow.id,
 					tokenId: tokenResult?.id,
@@ -273,6 +288,8 @@ namespace PasswordlessSignInManager {
 	interface SignInPasswordlessResult {
 		readonly person: PersonRow
 		readonly token: string
+		/** True when MFA was satisfied by consuming a backup code (instead of a TOTP token). */
+		readonly usedBackupCode?: boolean
 		[AuthLogService.Key]: AuthLogService.Bag
 	}
 	export type SignInPasswordlessResponse = Response<SignInPasswordlessResult, SignInPasswordlessErrorCode, {

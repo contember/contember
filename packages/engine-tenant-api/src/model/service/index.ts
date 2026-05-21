@@ -2,6 +2,7 @@ export * from './apiKey'
 export * from './captcha'
 export * from './idp'
 
+export * from './BackupCodeManager'
 export * from './EmailValidator'
 export * from './IDPSignInManager'
 export * from './InviteManager'

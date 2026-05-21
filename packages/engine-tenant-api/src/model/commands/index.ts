@@ -1,4 +1,5 @@
 export * from './apiKey'
+export * from './backupCode'
 export * from './configuration'
 export * from './person'
 export * from './rateLimit'

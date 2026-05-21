@@ -13,6 +13,7 @@ import {
 	InviteMutationResolver,
 	MailTemplateMutationResolver,
 	OtpMutationResolver,
+	RegenerateBackupCodesMutationResolver,
 	RemoveProjectMemberMutationResolver,
 	ResetPasswordMutationResolver,
 	SetProjectSecretMutationResolver,
@@ -74,6 +75,7 @@ class ResolverFactory {
 			disableApiKeyMutationResolver: DisableApiKeyMutationResolver
 
 			otpMutationResolver: OtpMutationResolver
+			regenerateBackupCodesMutationResolver: RegenerateBackupCodesMutationResolver
 
 			mailTemplateMutationResolver: MailTemplateMutationResolver
 
@@ -178,6 +180,9 @@ class ResolverFactory {
 				prepareOtp: this.resolvers.otpMutationResolver.prepareOtp.bind(this.resolvers.otpMutationResolver),
 				confirmOtp: this.resolvers.otpMutationResolver.confirmOtp.bind(this.resolvers.otpMutationResolver),
 				disableOtp: this.resolvers.otpMutationResolver.disableOtp.bind(this.resolvers.otpMutationResolver),
+				regenerateBackupCodes: this.resolvers.regenerateBackupCodesMutationResolver.regenerateBackupCodes.bind(
+					this.resolvers.regenerateBackupCodesMutationResolver,
+				),
 
 				addMailTemplate: this.resolvers.mailTemplateMutationResolver.addMailTemplate.bind(this.resolvers.mailTemplateMutationResolver),
 				removeMailTemplate: this.resolvers.mailTemplateMutationResolver.removeMailTemplate.bind(this.resolvers.mailTemplateMutationResolver),

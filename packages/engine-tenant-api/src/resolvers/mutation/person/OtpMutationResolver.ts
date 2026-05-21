@@ -7,13 +7,16 @@ import {
 	PrepareOtpResponse,
 } from '../../../schema'
 import { TenantResolverContext } from '../../TenantResolverContext'
-import { OtpManager, PermissionActions, PersonQuery, PersonRow } from '../../../model'
+import { BackupCodeManager, OtpManager, PermissionActions, PersonQuery, PersonRow } from '../../../model'
 import { ImplementationException } from '../../../exceptions'
 import { createErrorResponse } from '../../errorUtils'
 import { ResponseError, ResponseOk } from '../../../model/utils/Response'
 
 export class OtpMutationResolver implements MutationResolvers {
-	constructor(private readonly otpManager: OtpManager) {}
+	constructor(
+		private readonly otpManager: OtpManager,
+		private readonly backupCodeManager: BackupCodeManager,
+	) {}
 
 	async prepareOtp(parent: any, args: MutationPrepareOtpArgs, context: TenantResolverContext): Promise<PrepareOtpResponse> {
 		const person = await this.getPersonFromContext(context)
@@ -50,9 +53,19 @@ export class OtpMutationResolver implements MutationResolvers {
 			response: new ResponseOk(null),
 			personId: person.id,
 		})
+		// Promoting pending->active enrolls (or rotates) TOTP; (re)issue the backup-code set.
+		const backupCodes = await this.backupCodeManager.generate(context.db, person.id)
+		await context.logAuthAction({
+			type: 'backup_code_generated',
+			response: new ResponseOk(null),
+			personId: person.id,
+		})
 		return {
 			ok: true,
 			errors: [],
+			result: {
+				backupCodes,
+			},
 		}
 	}
 
@@ -62,6 +75,7 @@ export class OtpMutationResolver implements MutationResolvers {
 			return createErrorResponse('OTP_NOT_ACTIVE', 'OTP is not active, you cannot disable it.')
 		}
 		await this.otpManager.disableOtp(context.db, person)
+		await this.backupCodeManager.deleteForPerson(context.db, person.id)
 		await context.logAuthAction({
 			type: '2fa_disable',
 			response: new ResponseOk(null),

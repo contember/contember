@@ -48,11 +48,19 @@ export class SignInMutationResolver implements MutationResolvers {
 			args.otpToken || undefined,
 			context.httpInfo,
 			args.options?.trustForwardedClientInfo === true && context.trustForwardedInfo,
+			args.backupCode || undefined,
 		)
 		await context.logAuthAction({
 			type: 'login',
 			response,
 		})
+		if (response.ok && response.result.usedBackupCode) {
+			await context.logAuthAction({
+				type: 'backup_code_used',
+				response,
+				personId: response.result.person.id,
+			})
+		}
 
 		if (!response.ok) {
 			const { revealUserExists, revealLoginMethod } = configuration.login

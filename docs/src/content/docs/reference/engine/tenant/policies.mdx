@@ -41,6 +41,32 @@ API. Built-in policies are read-only and can be inspected via the
   parameterized with a `tags` object whose values are substituted into the
   policy's statements at load time (before evaluation).
 
+## Action reference
+
+The complete set of actions a statement can name. Each is `tenant:<resource>.<verb>`;
+patterns may use globs (e.g. `tenant:project.*` for every project action, or `tenant:*`
+for everything). There is no API to enumerate these at runtime — this table is the
+authoritative catalog. The built-in role policies (`builtinPolicies` query) show how
+they are grouped per role.
+
+| Resource | Actions |
+| --- | --- |
+| `system` | `configure`, `viewConfig`, `viewAuthLog` |
+| `identity` | `viewPermissions`, `addGlobalRoles`, `removeGlobalRoles` |
+| `person` | `view`, `signIn`, `signUp`, `signOut`, `disable`, `setupOtp`, `changeProfile`, `changeMyProfile`, `changePassword`, `changeMyPassword`, `resetPassword`, `togglePasswordless`, `createIdPUrl`, `signInIdp`, `requestPasswordlessSignIn`, `passwordlessSignIn`, `createSessionToken`, `invite`, `inviteUnmanaged`, `forceSignOut`, `revokeSession`, `viewSessions` |
+| `project` | `view`, `create`, `update`, `setSecret`, `viewMember`, `addMember`, `updateMember`, `removeMember` |
+| `apiKey` | `create`, `createGlobal`, `disable` |
+| `mailTemplate` | `add`, `remove`, `list` |
+| `idp` | `add`, `update`, `disable`, `enable`, `list` |
+| `entrypoint` | `deploy` |
+| `policy` | `view`, `create`, `update`, `delete`, `assign`, `revoke` |
+
+The resource an action is evaluated against is `project:<slug>` whenever the
+operation targets a specific project (member management, invites, per-project API
+keys and mail templates, …) and `*` otherwise — it is not tied to the action's
+resource namespace (see [Concepts](#concepts)). The condition operators usable
+inside a statement are listed under [Conditions](#conditions).
+
 ## Decision algorithm
 
 The engine walks every source, collects matches, and decides:
@@ -54,7 +80,15 @@ requested action, (2) one of its `resources` patterns globs the requested
 resource (always `*` or `project:<slug>`; see [Concepts](#concepts)), and
 (3) all conditions evaluate to true against the request
 context. Glob patterns use `*` (any sequence) and `?` (one char) and are
-anchored.
+anchored (the whole value must match).
+
+:::note Glob limitations
+There is **no escape syntax**: a literal `*` or `?` in the matched value cannot
+be required — both characters are always wildcards. Consecutive wildcards
+collapse, so `**` behaves identically to `*` (there is no recursive-glob
+meaning). The same matcher backs the `stringLike` / `stringNotLike` condition
+operators, so the same limitations apply there.
+:::
 
 ## Authorization
 
@@ -252,8 +286,9 @@ enum CreatePolicyErrorCode {
 }
 ```
 
-Slug requirements: 1–128 characters, alphanumeric / `_` / `-` / `.` / `:`,
-must not start with the reserved `builtin:` prefix.
+Slug requirements: 1–128 characters; the **first** character must be a letter,
+digit, or `_`; the remaining characters may also include `-`, `.`, and `:`.
+Must not start with the reserved `builtin:` prefix.
 
 ### Update
 

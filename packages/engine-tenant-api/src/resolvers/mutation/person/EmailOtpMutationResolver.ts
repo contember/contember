@@ -6,7 +6,7 @@ import {
 	MutationResolvers,
 } from '../../../schema'
 import { TenantResolverContext } from '../../TenantResolverContext'
-import { BackupCodeManager, EmailOtpManager, PermissionActions, PersonQuery, PersonRow } from '../../../model'
+import { AuthPolicyResolver, BackupCodeManager, EmailOtpManager, PermissionActions, PersonQuery, PersonRow } from '../../../model'
 import { ImplementationException } from '../../../exceptions'
 import { createErrorResponse } from '../../errorUtils'
 import { ResponseOk } from '../../../model/utils/Response'
@@ -16,6 +16,7 @@ export class EmailOtpMutationResolver implements Pick<MutationResolvers, 'initEm
 	constructor(
 		private readonly emailOtpManager: EmailOtpManager,
 		private readonly backupCodeManager: BackupCodeManager,
+		private readonly authPolicyResolver: AuthPolicyResolver,
 	) {}
 
 	async initEmailOtp(parent: any, args: {}, context: TenantResolverContext): Promise<InitEmailOtpResponse> {
@@ -61,9 +62,16 @@ export class EmailOtpMutationResolver implements Pick<MutationResolvers, 'initEm
 		if (!person.email_otp_enabled) {
 			return createErrorResponse('EMAIL_OTP_NOT_ACTIVE', 'Email OTP is not active, you cannot disable it.')
 		}
+		const hasActiveTotp = Boolean(person.otp_secret && person.otp_activated_at)
+		// Block removal of the last factor when an effective policy mandates MFA.
+		if (!hasActiveTotp) {
+			const policy = await this.authPolicyResolver.resolveForIdentity(context.db, person.identity_id, person.roles)
+			if (policy.mfaRequired) {
+				return createErrorResponse('MFA_REQUIRED', 'MFA is required for your role; you cannot disable your only factor.')
+			}
+		}
 		await context.db.commandBus.execute(new SetEmailOtpEnabledCommand(person.id, false))
 		// If no MFA factor remains (no active TOTP, email OTP now off), drop backup codes.
-		const hasActiveTotp = Boolean(person.otp_secret && person.otp_activated_at)
 		if (!hasActiveTotp) {
 			await this.backupCodeManager.deleteForPerson(context.db, person.id)
 		}

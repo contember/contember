@@ -526,7 +526,7 @@ export type DisableEmailOtpError = {
 	readonly developerMessage: Scalars['String']['output']
 }
 
-export type DisableEmailOtpErrorCode = 'EMAIL_OTP_NOT_ACTIVE'
+export type DisableEmailOtpErrorCode = 'EMAIL_OTP_NOT_ACTIVE' | 'MFA_REQUIRED'
 
 export type DisableEmailOtpResponse = {
 	readonly __typename?: 'DisableEmailOtpResponse'
@@ -685,7 +685,7 @@ export type DisableOtpError = {
 	readonly endUserMessage?: Maybe<Scalars['String']['output']>
 }
 
-export type DisableOtpErrorCode = 'OTP_NOT_ACTIVE'
+export type DisableOtpErrorCode = 'MFA_REQUIRED' | 'OTP_NOT_ACTIVE'
 
 export type DisableOtpResponse = {
 	readonly __typename?: 'DisableOtpResponse'
@@ -742,6 +742,98 @@ export type ForceSignOutPersonErrorCode = 'PERSON_NOT_FOUND'
 export type ForceSignOutPersonResponse = {
 	readonly __typename?: 'ForceSignOutPersonResponse'
 	readonly error?: Maybe<ForceSignOutPersonError>
+	readonly ok: Scalars['Boolean']['output']
+}
+
+export type ResetPersonMfaError = {
+	readonly __typename?: 'ResetPersonMfaError'
+	readonly code: ResetPersonMfaErrorCode
+	readonly developerMessage: Scalars['String']['output']
+}
+
+export type ResetPersonMfaErrorCode = 'PERSON_NOT_FOUND'
+
+export type ResetPersonMfaResponse = {
+	readonly __typename?: 'ResetPersonMfaResponse'
+	readonly error?: Maybe<ResetPersonMfaError>
+	readonly ok: Scalars['Boolean']['output']
+}
+
+export type MfaEnrollment = {
+	readonly __typename?: 'MfaEnrollment'
+	readonly otpUri: Scalars['String']['output']
+	readonly otpSecret: Scalars['String']['output']
+}
+
+export type AuthPolicyScope = 'global' | 'project'
+
+export type AuthPolicy = {
+	readonly __typename?: 'AuthPolicy'
+	readonly id: Scalars['String']['output']
+	readonly scope: AuthPolicyScope
+	readonly project?: Maybe<Scalars['String']['output']>
+	readonly roles: ReadonlyArray<Scalars['String']['output']>
+	readonly mfaRequired?: Maybe<Scalars['Boolean']['output']>
+	readonly tokenExpiration?: Maybe<Scalars['Interval']['output']>
+	readonly idleTimeout?: Maybe<Scalars['Interval']['output']>
+	readonly rememberMeAllowed?: Maybe<Scalars['Boolean']['output']>
+}
+
+export type AuthPolicyInput = {
+	readonly scope: AuthPolicyScope
+	readonly project?: InputMaybe<Scalars['String']['input']>
+	readonly roles: ReadonlyArray<Scalars['String']['input']>
+	readonly mfaRequired?: InputMaybe<Scalars['Boolean']['input']>
+	readonly tokenExpiration?: InputMaybe<Scalars['Interval']['input']>
+	readonly idleTimeout?: InputMaybe<Scalars['Interval']['input']>
+	readonly rememberMeAllowed?: InputMaybe<Scalars['Boolean']['input']>
+}
+
+export type CreateAuthPolicyError = {
+	readonly __typename?: 'CreateAuthPolicyError'
+	readonly code: CreateAuthPolicyErrorCode
+	readonly developerMessage: Scalars['String']['output']
+}
+
+export type CreateAuthPolicyErrorCode = 'PROJECT_NOT_ALLOWED' | 'PROJECT_NOT_FOUND' | 'PROJECT_REQUIRED'
+
+export type CreateAuthPolicyResult = {
+	readonly __typename?: 'CreateAuthPolicyResult'
+	readonly id: Scalars['String']['output']
+}
+
+export type CreateAuthPolicyResponse = {
+	readonly __typename?: 'CreateAuthPolicyResponse'
+	readonly error?: Maybe<CreateAuthPolicyError>
+	readonly ok: Scalars['Boolean']['output']
+	readonly result?: Maybe<CreateAuthPolicyResult>
+}
+
+export type UpdateAuthPolicyError = {
+	readonly __typename?: 'UpdateAuthPolicyError'
+	readonly code: UpdateAuthPolicyErrorCode
+	readonly developerMessage: Scalars['String']['output']
+}
+
+export type UpdateAuthPolicyErrorCode = 'NOT_FOUND' | 'PROJECT_NOT_ALLOWED' | 'PROJECT_NOT_FOUND' | 'PROJECT_REQUIRED'
+
+export type UpdateAuthPolicyResponse = {
+	readonly __typename?: 'UpdateAuthPolicyResponse'
+	readonly error?: Maybe<UpdateAuthPolicyError>
+	readonly ok: Scalars['Boolean']['output']
+}
+
+export type DeleteAuthPolicyError = {
+	readonly __typename?: 'DeleteAuthPolicyError'
+	readonly code: DeleteAuthPolicyErrorCode
+	readonly developerMessage: Scalars['String']['output']
+}
+
+export type DeleteAuthPolicyErrorCode = 'NOT_FOUND'
+
+export type DeleteAuthPolicyResponse = {
+	readonly __typename?: 'DeleteAuthPolicyResponse'
+	readonly error?: Maybe<DeleteAuthPolicyError>
 	readonly ok: Scalars['Boolean']['output']
 }
 
@@ -1032,6 +1124,10 @@ export type Mutation = {
 	readonly changePassword?: Maybe<ChangePasswordResponse>
 	readonly changeProfile?: Maybe<ChangeProfileResponse>
 	readonly configure?: Maybe<ConfigureResponse>
+	readonly createAuthPolicy?: Maybe<CreateAuthPolicyResponse>
+	readonly updateAuthPolicy?: Maybe<UpdateAuthPolicyResponse>
+	readonly deleteAuthPolicy?: Maybe<DeleteAuthPolicyResponse>
+	readonly resetPersonMfa?: Maybe<ResetPersonMfaResponse>
 	readonly confirmEmailOtp?: Maybe<ConfirmEmailOtpResponse>
 	readonly confirmOtp?: Maybe<ConfirmOtpResponse>
 	readonly createApiKey?: Maybe<CreateApiKeyResponse>
@@ -1128,6 +1224,23 @@ export type MutationChangeProfileArgs = {
 
 export type MutationConfigureArgs = {
 	config: ConfigInput
+}
+
+export type MutationCreateAuthPolicyArgs = {
+	policy: AuthPolicyInput
+}
+
+export type MutationUpdateAuthPolicyArgs = {
+	id: Scalars['String']['input']
+	policy: AuthPolicyInput
+}
+
+export type MutationDeleteAuthPolicyArgs = {
+	id: Scalars['String']['input']
+}
+
+export type MutationResetPersonMfaArgs = {
+	personId: Scalars['String']['input']
 }
 
 export type MutationConfirmOtpArgs = {
@@ -1400,6 +1513,7 @@ export type Query = {
 	 * (default 100, max 500); `hasMore` indicates a further page exists.
 	 */
 	readonly authLog: AuthLogPage
+	readonly authPolicies: ReadonlyArray<AuthPolicy>
 	readonly checkResetPasswordToken: CheckResetPasswordTokenCode
 	readonly configuration: Config
 	readonly identityProviders: ReadonlyArray<IdentityProvider>
@@ -1567,12 +1681,14 @@ export type SignInError = {
 	/** @deprecated Field no longer supported */
 	readonly endUserMessage?: Maybe<Scalars['String']['output']>
 	readonly retryAfter?: Maybe<Scalars['Int']['output']>
+	readonly mfaEnrollment?: Maybe<MfaEnrollment>
 }
 
 export type SignInErrorCode =
 	| 'INVALID_CREDENTIALS'
 	| 'INVALID_OTP_TOKEN'
 	| 'INVALID_PASSWORD'
+	| 'MFA_ENROLLMENT_REQUIRED'
 	| 'NO_PASSWORD_SET'
 	| 'OTP_REQUIRED'
 	| 'PERSON_DISABLED'
@@ -1618,6 +1734,7 @@ export type SignInPasswordlessError = {
 
 export type SignInPasswordlessErrorCode =
 	| 'INVALID_OTP_TOKEN'
+	| 'MFA_ENROLLMENT_REQUIRED'
 	| 'OTP_REQUIRED'
 	| 'PERSON_DISABLED'
 	| 'TOKEN_EXPIRED'
@@ -1655,6 +1772,7 @@ export type SignInResult = CommonSignInResult & {
 	readonly __typename?: 'SignInResult'
 	readonly person: Person
 	readonly token: Scalars['String']['output']
+	readonly backupCodes?: Maybe<ReadonlyArray<Scalars['String']['output']>>
 }
 
 export type SignOutError = {
@@ -1993,6 +2111,23 @@ export type ResolversTypes = {
 	ForceSignOutPersonError: ResolverTypeWrapper<ForceSignOutPersonError>
 	ForceSignOutPersonErrorCode: ForceSignOutPersonErrorCode
 	ForceSignOutPersonResponse: ResolverTypeWrapper<ForceSignOutPersonResponse>
+	ResetPersonMfaError: ResolverTypeWrapper<ResetPersonMfaError>
+	ResetPersonMfaErrorCode: ResetPersonMfaErrorCode
+	ResetPersonMfaResponse: ResolverTypeWrapper<ResetPersonMfaResponse>
+	MfaEnrollment: ResolverTypeWrapper<MfaEnrollment>
+	AuthPolicy: ResolverTypeWrapper<AuthPolicy>
+	AuthPolicyScope: AuthPolicyScope
+	AuthPolicyInput: AuthPolicyInput
+	CreateAuthPolicyError: ResolverTypeWrapper<CreateAuthPolicyError>
+	CreateAuthPolicyErrorCode: CreateAuthPolicyErrorCode
+	CreateAuthPolicyResult: ResolverTypeWrapper<CreateAuthPolicyResult>
+	CreateAuthPolicyResponse: ResolverTypeWrapper<CreateAuthPolicyResponse>
+	UpdateAuthPolicyError: ResolverTypeWrapper<UpdateAuthPolicyError>
+	UpdateAuthPolicyErrorCode: UpdateAuthPolicyErrorCode
+	UpdateAuthPolicyResponse: ResolverTypeWrapper<UpdateAuthPolicyResponse>
+	DeleteAuthPolicyError: ResolverTypeWrapper<DeleteAuthPolicyError>
+	DeleteAuthPolicyErrorCode: DeleteAuthPolicyErrorCode
+	DeleteAuthPolicyResponse: ResolverTypeWrapper<DeleteAuthPolicyResponse>
 	RevokeSessionError: ResolverTypeWrapper<RevokeSessionError>
 	RevokeSessionErrorCode: RevokeSessionErrorCode
 	RevokeSessionResponse: ResolverTypeWrapper<RevokeSessionResponse>
@@ -2205,6 +2340,18 @@ export type ResolversParentTypes = {
 	DisablePersonResponse: DisablePersonResponse
 	ForceSignOutPersonError: ForceSignOutPersonError
 	ForceSignOutPersonResponse: ForceSignOutPersonResponse
+	ResetPersonMfaError: ResetPersonMfaError
+	ResetPersonMfaResponse: ResetPersonMfaResponse
+	MfaEnrollment: MfaEnrollment
+	AuthPolicy: AuthPolicy
+	AuthPolicyInput: AuthPolicyInput
+	CreateAuthPolicyError: CreateAuthPolicyError
+	CreateAuthPolicyResult: CreateAuthPolicyResult
+	CreateAuthPolicyResponse: CreateAuthPolicyResponse
+	UpdateAuthPolicyError: UpdateAuthPolicyError
+	UpdateAuthPolicyResponse: UpdateAuthPolicyResponse
+	DeleteAuthPolicyError: DeleteAuthPolicyError
+	DeleteAuthPolicyResponse: DeleteAuthPolicyResponse
 	RevokeSessionError: RevokeSessionError
 	RevokeSessionResponse: RevokeSessionResponse
 	SessionInfo: SessionInfo
@@ -2901,6 +3048,111 @@ export type ForceSignOutPersonResponseResolvers<
 	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
 }
 
+export type ResetPersonMfaErrorResolvers<
+	ContextType = any,
+	ParentType extends ResolversParentTypes['ResetPersonMfaError'] = ResolversParentTypes['ResetPersonMfaError'],
+> = {
+	code?: Resolver<ResolversTypes['ResetPersonMfaErrorCode'], ParentType, ContextType>
+	developerMessage?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
+}
+
+export type ResetPersonMfaResponseResolvers<
+	ContextType = any,
+	ParentType extends ResolversParentTypes['ResetPersonMfaResponse'] = ResolversParentTypes['ResetPersonMfaResponse'],
+> = {
+	error?: Resolver<Maybe<ResolversTypes['ResetPersonMfaError']>, ParentType, ContextType>
+	ok?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
+	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
+}
+
+export type MfaEnrollmentResolvers<
+	ContextType = any,
+	ParentType extends ResolversParentTypes['MfaEnrollment'] = ResolversParentTypes['MfaEnrollment'],
+> = {
+	otpUri?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+	otpSecret?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
+}
+
+export type AuthPolicyResolvers<
+	ContextType = any,
+	ParentType extends ResolversParentTypes['AuthPolicy'] = ResolversParentTypes['AuthPolicy'],
+> = {
+	id?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+	scope?: Resolver<ResolversTypes['AuthPolicyScope'], ParentType, ContextType>
+	project?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>
+	roles?: Resolver<ReadonlyArray<ResolversTypes['String']>, ParentType, ContextType>
+	mfaRequired?: Resolver<Maybe<ResolversTypes['Boolean']>, ParentType, ContextType>
+	tokenExpiration?: Resolver<Maybe<ResolversTypes['Interval']>, ParentType, ContextType>
+	idleTimeout?: Resolver<Maybe<ResolversTypes['Interval']>, ParentType, ContextType>
+	rememberMeAllowed?: Resolver<Maybe<ResolversTypes['Boolean']>, ParentType, ContextType>
+	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
+}
+
+export type CreateAuthPolicyErrorResolvers<
+	ContextType = any,
+	ParentType extends ResolversParentTypes['CreateAuthPolicyError'] = ResolversParentTypes['CreateAuthPolicyError'],
+> = {
+	code?: Resolver<ResolversTypes['CreateAuthPolicyErrorCode'], ParentType, ContextType>
+	developerMessage?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
+}
+
+export type CreateAuthPolicyResultResolvers<
+	ContextType = any,
+	ParentType extends ResolversParentTypes['CreateAuthPolicyResult'] = ResolversParentTypes['CreateAuthPolicyResult'],
+> = {
+	id?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
+}
+
+export type CreateAuthPolicyResponseResolvers<
+	ContextType = any,
+	ParentType extends ResolversParentTypes['CreateAuthPolicyResponse'] = ResolversParentTypes['CreateAuthPolicyResponse'],
+> = {
+	error?: Resolver<Maybe<ResolversTypes['CreateAuthPolicyError']>, ParentType, ContextType>
+	ok?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
+	result?: Resolver<Maybe<ResolversTypes['CreateAuthPolicyResult']>, ParentType, ContextType>
+	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
+}
+
+export type UpdateAuthPolicyErrorResolvers<
+	ContextType = any,
+	ParentType extends ResolversParentTypes['UpdateAuthPolicyError'] = ResolversParentTypes['UpdateAuthPolicyError'],
+> = {
+	code?: Resolver<ResolversTypes['UpdateAuthPolicyErrorCode'], ParentType, ContextType>
+	developerMessage?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
+}
+
+export type UpdateAuthPolicyResponseResolvers<
+	ContextType = any,
+	ParentType extends ResolversParentTypes['UpdateAuthPolicyResponse'] = ResolversParentTypes['UpdateAuthPolicyResponse'],
+> = {
+	error?: Resolver<Maybe<ResolversTypes['UpdateAuthPolicyError']>, ParentType, ContextType>
+	ok?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
+	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
+}
+
+export type DeleteAuthPolicyErrorResolvers<
+	ContextType = any,
+	ParentType extends ResolversParentTypes['DeleteAuthPolicyError'] = ResolversParentTypes['DeleteAuthPolicyError'],
+> = {
+	code?: Resolver<ResolversTypes['DeleteAuthPolicyErrorCode'], ParentType, ContextType>
+	developerMessage?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
+}
+
+export type DeleteAuthPolicyResponseResolvers<
+	ContextType = any,
+	ParentType extends ResolversParentTypes['DeleteAuthPolicyResponse'] = ResolversParentTypes['DeleteAuthPolicyResponse'],
+> = {
+	error?: Resolver<Maybe<ResolversTypes['DeleteAuthPolicyError']>, ParentType, ContextType>
+	ok?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
+	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
+}
+
 export type RevokeSessionErrorResolvers<
 	ContextType = any,
 	ParentType extends ResolversParentTypes['RevokeSessionError'] = ResolversParentTypes['RevokeSessionError'],
@@ -3217,6 +3469,30 @@ export type MutationResolvers<ContextType = any, ParentType extends ResolversPar
 		RequireFields<MutationChangeProfileArgs, 'personId'>
 	>
 	configure?: Resolver<Maybe<ResolversTypes['ConfigureResponse']>, ParentType, ContextType, RequireFields<MutationConfigureArgs, 'config'>>
+	createAuthPolicy?: Resolver<
+		Maybe<ResolversTypes['CreateAuthPolicyResponse']>,
+		ParentType,
+		ContextType,
+		RequireFields<MutationCreateAuthPolicyArgs, 'policy'>
+	>
+	updateAuthPolicy?: Resolver<
+		Maybe<ResolversTypes['UpdateAuthPolicyResponse']>,
+		ParentType,
+		ContextType,
+		RequireFields<MutationUpdateAuthPolicyArgs, 'id' | 'policy'>
+	>
+	deleteAuthPolicy?: Resolver<
+		Maybe<ResolversTypes['DeleteAuthPolicyResponse']>,
+		ParentType,
+		ContextType,
+		RequireFields<MutationDeleteAuthPolicyArgs, 'id'>
+	>
+	resetPersonMfa?: Resolver<
+		Maybe<ResolversTypes['ResetPersonMfaResponse']>,
+		ParentType,
+		ContextType,
+		RequireFields<MutationResetPersonMfaArgs, 'personId'>
+	>
 	confirmOtp?: Resolver<Maybe<ResolversTypes['ConfirmOtpResponse']>, ParentType, ContextType, RequireFields<MutationConfirmOtpArgs, 'otpToken'>>
 	confirmEmailOtp?: Resolver<
 		Maybe<ResolversTypes['ConfirmEmailOtpResponse']>,
@@ -3416,6 +3692,7 @@ export type ProjectIdentityRelationResolvers<
 
 export type QueryResolvers<ContextType = any, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = {
 	authLog?: Resolver<ResolversTypes['AuthLogPage'], ParentType, ContextType, Partial<QueryAuthLogArgs>>
+	authPolicies?: Resolver<ReadonlyArray<ResolversTypes['AuthPolicy']>, ParentType, ContextType>
 	checkResetPasswordToken?: Resolver<
 		ResolversTypes['CheckResetPasswordTokenCode'],
 		ParentType,
@@ -3622,6 +3899,7 @@ export type SignInErrorResolvers<ContextType = any, ParentType extends Resolvers
 	developerMessage?: Resolver<ResolversTypes['String'], ParentType, ContextType>
 	endUserMessage?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>
 	retryAfter?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>
+	mfaEnrollment?: Resolver<Maybe<ResolversTypes['MfaEnrollment']>, ParentType, ContextType>
 	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
 }
 
@@ -3699,6 +3977,7 @@ export type SignInResultResolvers<ContextType = any, ParentType extends Resolver
 	{
 		person?: Resolver<ResolversTypes['Person'], ParentType, ContextType>
 		token?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+		backupCodes?: Resolver<Maybe<ReadonlyArray<ResolversTypes['String']>>, ParentType, ContextType>
 		__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
 	}
 
@@ -3897,6 +4176,17 @@ export type Resolvers<ContextType = any> = {
 	DisablePersonResponse?: DisablePersonResponseResolvers<ContextType>
 	ForceSignOutPersonError?: ForceSignOutPersonErrorResolvers<ContextType>
 	ForceSignOutPersonResponse?: ForceSignOutPersonResponseResolvers<ContextType>
+	ResetPersonMfaError?: ResetPersonMfaErrorResolvers<ContextType>
+	ResetPersonMfaResponse?: ResetPersonMfaResponseResolvers<ContextType>
+	MfaEnrollment?: MfaEnrollmentResolvers<ContextType>
+	AuthPolicy?: AuthPolicyResolvers<ContextType>
+	CreateAuthPolicyError?: CreateAuthPolicyErrorResolvers<ContextType>
+	CreateAuthPolicyResult?: CreateAuthPolicyResultResolvers<ContextType>
+	CreateAuthPolicyResponse?: CreateAuthPolicyResponseResolvers<ContextType>
+	UpdateAuthPolicyError?: UpdateAuthPolicyErrorResolvers<ContextType>
+	UpdateAuthPolicyResponse?: UpdateAuthPolicyResponseResolvers<ContextType>
+	DeleteAuthPolicyError?: DeleteAuthPolicyErrorResolvers<ContextType>
+	DeleteAuthPolicyResponse?: DeleteAuthPolicyResponseResolvers<ContextType>
 	RevokeSessionError?: RevokeSessionErrorResolvers<ContextType>
 	RevokeSessionResponse?: RevokeSessionResponseResolvers<ContextType>
 	SessionInfo?: SessionInfoResolvers<ContextType>

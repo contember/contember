@@ -73,6 +73,12 @@ export class SignInMutationResolver implements MutationResolvers {
 				response,
 			})
 		}
+		if (!response.ok && response.metadata?.mfaEnrollmentRequired) {
+			await context.logAuthAction({
+				type: 'mfa_enrollment_required',
+				response,
+			})
+		}
 
 		if (!response.ok) {
 			const { revealUserExists, revealLoginMethod } = configuration.login
@@ -83,6 +89,15 @@ export class SignInMutationResolver implements MutationResolvers {
 				&& ['NO_PASSWORD_SET', 'INVALID_PASSWORD'].includes(response.error)
 			if (collapseAll || collapseMethodOnly) {
 				return createErrorResponse('INVALID_CREDENTIALS', 'Invalid credentials')
+			}
+			// Preserve the additive mfaEnrollment payload on MFA_ENROLLMENT_REQUIRED (A06).
+			if (response.error === 'MFA_ENROLLMENT_REQUIRED' && response.metadata?.mfaEnrollment) {
+				const error = {
+					code: response.error,
+					developerMessage: response.errorMessage,
+					mfaEnrollment: response.metadata.mfaEnrollment,
+				}
+				return { ok: false, error, errors: [error] }
 			}
 			return createErrorResponse(response.error, response.errorMessage)
 		}

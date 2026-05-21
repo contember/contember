@@ -7,7 +7,7 @@ import {
 	PrepareOtpResponse,
 } from '../../../schema'
 import { TenantResolverContext } from '../../TenantResolverContext'
-import { BackupCodeManager, OtpManager, PermissionActions, PersonQuery, PersonRow } from '../../../model'
+import { AuthPolicyResolver, BackupCodeManager, OtpManager, PermissionActions, PersonQuery, PersonRow } from '../../../model'
 import { ImplementationException } from '../../../exceptions'
 import { createErrorResponse } from '../../errorUtils'
 import { ResponseError, ResponseOk } from '../../../model/utils/Response'
@@ -16,6 +16,7 @@ export class OtpMutationResolver implements MutationResolvers {
 	constructor(
 		private readonly otpManager: OtpManager,
 		private readonly backupCodeManager: BackupCodeManager,
+		private readonly authPolicyResolver: AuthPolicyResolver,
 	) {}
 
 	async prepareOtp(parent: any, args: MutationPrepareOtpArgs, context: TenantResolverContext): Promise<PrepareOtpResponse> {
@@ -73,6 +74,15 @@ export class OtpMutationResolver implements MutationResolvers {
 		const person = await this.getPersonFromContext(context)
 		if (!person.otp_secret) {
 			return createErrorResponse('OTP_NOT_ACTIVE', 'OTP is not active, you cannot disable it.')
+		}
+		// Block removal of the last factor when an effective policy mandates MFA.
+		// Rotation (prepareOtp + confirmOtp) stays open — only removal is blocked.
+		const wouldHaveNoFactor = !person.email_otp_enabled
+		if (wouldHaveNoFactor) {
+			const policy = await this.authPolicyResolver.resolveForIdentity(context.db, person.identity_id, person.roles)
+			if (policy.mfaRequired) {
+				return createErrorResponse('MFA_REQUIRED', 'MFA is required for your role; you cannot disable your only factor.')
+			}
 		}
 		await this.otpManager.disableOtp(context.db, person)
 		await this.backupCodeManager.deleteForPerson(context.db, person.id)

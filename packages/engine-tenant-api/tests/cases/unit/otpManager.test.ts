@@ -37,6 +37,7 @@ const basePerson: PersonRow = {
 	roles: [],
 	disabled_at: null,
 	passwordless_enabled: null,
+	mfa_grace_until: null,
 }
 
 describe('OtpManager.verifyOtp', () => {

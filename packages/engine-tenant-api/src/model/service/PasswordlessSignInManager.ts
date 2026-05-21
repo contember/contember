@@ -18,6 +18,7 @@ import { PersonTokenQuery } from '../queries/personToken/PersonTokenQuery'
 import { ImplementationException } from '../../exceptions'
 import { OtpManager } from './OtpManager'
 import { BackupCodeManager } from './BackupCodeManager'
+import { AuthPolicyResolver } from './AuthPolicyResolver'
 import { PersonToken } from '../type'
 import { AuthLogService } from './AuthLogService'
 import { intervalToSeconds } from '../utils/interval'
@@ -30,6 +31,7 @@ class PasswordlessSignInManager {
 		private readonly projectManager: ProjectManager,
 		private readonly otpManager: OtpManager,
 		private readonly backupCodeManager: BackupCodeManager,
+		private readonly authPolicyResolver: AuthPolicyResolver,
 	) {}
 
 	async initSignInPasswordless({ db, permissionContext, mailVariant, mailProject, email }: {
@@ -201,6 +203,19 @@ class PasswordlessSignInManager {
 					usedBackupCode = true
 				} else {
 					return new ResponseError('OTP_REQUIRED', `2FA is enabled. OTP token is required`, {
+						[AuthLogService.Key]: new AuthLogService.Bag({
+							personId: personRow.id,
+							tokenId: tokenResult?.id,
+						}),
+					})
+				}
+			} else if (!personRow.email_otp_enabled) {
+				// No active factor. A06: if a role mandates MFA, block (do NOT
+				// self-provision — enroll-via-signIn is password-only). The user
+				// must enroll a factor through the password flow first.
+				const policy = await this.authPolicyResolver.resolveForIdentity(db, personRow.identity_id, personRow.roles)
+				if (policy.mfaRequired) {
+					return new ResponseError('MFA_ENROLLMENT_REQUIRED', 'MFA enrollment is required; enroll a factor via password sign-in first.', {
 						[AuthLogService.Key]: new AuthLogService.Bag({
 							personId: personRow.id,
 							tokenId: tokenResult?.id,

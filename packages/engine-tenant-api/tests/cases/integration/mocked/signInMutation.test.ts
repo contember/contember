@@ -15,6 +15,7 @@ import { getConfigSql } from './sql/getConfigSql'
 import { consumeBackupCodeSql } from './sql/consumeBackupCodeSql'
 import { consumeEmailOtpTokenSql, EMAIL_OTP_CODE, getLatestEmailOtpTokenSql, sendEmailOtpSql } from './sql/emailOtpSql'
 import { getMailTemplateSql } from './sql/getMailTemplateSql'
+import { getAuthPoliciesSql } from './sql/authPolicySql'
 
 test('signs in', async () => {
 	const email = 'john@doe.com'
@@ -29,6 +30,7 @@ test('signs in', async () => {
 			getConfigSql(),
 			getNextLoginAttemptSql(email),
 			getPersonByEmailSql({ email, response: { personId, identityId, password, roles: [] } }),
+			getAuthPoliciesSql(),
 			getConfigSql(),
 			createSessionKeySql({ apiKeyId: apiKeyId, identityId: identityId }),
 			getIdentityProjectsSql({ identityId: identityId, projectId: projectId }),
@@ -89,6 +91,7 @@ test('signs in - normalize email', async () => {
 			getNextLoginAttemptSql(email),
 			getPersonByEmailSql({ email, response: null }),
 			getPersonByEmailSql({ email: 'john@doe.com', response: { personId, identityId, password, roles: [] } }),
+			getAuthPoliciesSql(),
 			getConfigSql(),
 			createSessionKeySql({ apiKeyId: apiKeyId, identityId: identityId }),
 			getIdentityProjectsSql({ identityId: identityId, projectId: projectId }),

@@ -48,6 +48,7 @@ export class CreatePersonCommand implements Command<Omit<PersonRow, 'roles'>> {
 			email_otp_enabled: false,
 			disabled_at: null,
 			passwordless_enabled: null,
+			mfa_grace_until: null,
 		}
 	}
 }

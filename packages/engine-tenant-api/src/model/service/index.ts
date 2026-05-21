@@ -2,6 +2,8 @@ export * from './apiKey'
 export * from './captcha'
 export * from './idp'
 
+export * from './AuthPolicyManager'
+export * from './AuthPolicyResolver'
 export * from './BackupCodeManager'
 export * from './EmailOtpManager'
 export * from './EmailValidator'

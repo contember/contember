@@ -27,6 +27,14 @@ const schema: DocumentNode = gql`
 		configuration: Config!
 
 		"""
+		List configured auth policies (per-role MFA / session policy). Requires the
+		\`system:configure\` permission — by default granted only to SUPER_ADMIN
+		(and PROJECT_ADMIN, like \`configure\`). With no rows configured, MFA
+		enforcement is inert and sign-in behaves exactly as today.
+		"""
+		authPolicies: [AuthPolicy!]!
+
+		"""
 		Read the tenant audit log (\`person_auth_log\`). Requires the
 		\`system:viewAuthLog\` permission — by default granted only to
 		SUPER_ADMIN via the wildcard ALL-resource/ALL-privilege grant.
@@ -86,6 +94,7 @@ const schema: DocumentNode = gql`
 
 		disablePerson(personId: String!): DisablePersonResponse
 		forceSignOutPerson(personId: String!, reason: String): ForceSignOutPersonResponse
+		resetPersonMfa(personId: String!): ResetPersonMfaResponse
 		revokeSession(sessionId: String!): RevokeSessionResponse
 
 		createResetPasswordRequest(email: String!, options: CreateResetPasswordRequestOptions, captchaToken: String): CreatePasswordResetRequestResponse
@@ -127,6 +136,11 @@ const schema: DocumentNode = gql`
 		updateProject(projectSlug: String!, name: String, config: Json, mergeConfig: Boolean): UpdateProjectResponse
 		
 		configure(config: ConfigInput!): ConfigureResponse
+
+		# === auth policy (per-role MFA / session policy) ===
+		createAuthPolicy(policy: AuthPolicyInput!): CreateAuthPolicyResponse
+		updateAuthPolicy(id: String!, policy: AuthPolicyInput!): UpdateAuthPolicyResponse
+		deleteAuthPolicy(id: String!): DeleteAuthPolicyResponse
 
 		addProjectMailTemplate(template: MailTemplate!): AddMailTemplateResponse
 		@deprecated(reason: "use addMailTemplate")
@@ -365,6 +379,18 @@ const schema: DocumentNode = gql`
 		developerMessage: String!
 		endUserMessage: String @deprecated
 		retryAfter: Int
+		"""
+		Set only on a MFA_ENROLLMENT_REQUIRED error: the freshly provisioned
+		pending TOTP secret the client must enroll (show the QR / secret, then
+		retry signIn with otpToken). Additive — clients that don't read it are
+		unaffected.
+		"""
+		mfaEnrollment: MfaEnrollment
+	}
+
+	type MfaEnrollment {
+		otpUri: String!
+		otpSecret: String!
 	}
 
 	enum SignInErrorCode {
@@ -375,12 +401,18 @@ const schema: DocumentNode = gql`
 		NO_PASSWORD_SET
 		OTP_REQUIRED
 		INVALID_OTP_TOKEN
+		MFA_ENROLLMENT_REQUIRED
 		RATE_LIMIT_EXCEEDED
 	}
 
 	type SignInResult implements CommonSignInResult {
 		token: String!
 		person: Person!
+		"""
+		Set only when this sign-in completed an MFA enrollment (A06): the freshly
+		generated backup codes, shown exactly once. Null on a normal sign-in.
+		"""
+		backupCodes: [String!]
 	}
 
 	# == createSessionToken ==
@@ -707,8 +739,9 @@ const schema: DocumentNode = gql`
 		PERSON_DISABLED
 		OTP_REQUIRED
 		INVALID_OTP_TOKEN
+		MFA_ENROLLMENT_REQUIRED
 	}
-	
+
 	type SignInPasswordlessResult implements CommonSignInResult {
 		token: String!
 		person: Person!
@@ -1167,6 +1200,7 @@ const schema: DocumentNode = gql`
 
 	enum DisableOtpErrorCode {
 		OTP_NOT_ACTIVE
+		MFA_REQUIRED
 	}
 
 	type RegenerateBackupCodesResponse {
@@ -1235,6 +1269,7 @@ const schema: DocumentNode = gql`
 
 	enum DisableEmailOtpErrorCode {
 		EMAIL_OTP_NOT_ACTIVE
+		MFA_REQUIRED
 	}
 
 	type DisablePersonResponse {
@@ -1266,6 +1301,104 @@ const schema: DocumentNode = gql`
 
 	enum ForceSignOutPersonErrorCode {
 		PERSON_NOT_FOUND
+	}
+
+	# === resetPersonMfa ===
+
+	type ResetPersonMfaResponse {
+		ok: Boolean!
+		error: ResetPersonMfaError
+	}
+
+	type ResetPersonMfaError {
+		code: ResetPersonMfaErrorCode!
+		developerMessage: String!
+	}
+
+	enum ResetPersonMfaErrorCode {
+		PERSON_NOT_FOUND
+	}
+
+	# === auth policy (per-role MFA / session policy) ===
+
+	type AuthPolicy {
+		id: String!
+		scope: AuthPolicyScope!
+		"""Project slug, present only for project-scoped policies."""
+		project: String
+		roles: [String!]!
+		mfaRequired: Boolean
+		tokenExpiration: Interval
+		idleTimeout: Interval
+		rememberMeAllowed: Boolean
+	}
+
+	enum AuthPolicyScope {
+		global
+		project
+	}
+
+	input AuthPolicyInput {
+		scope: AuthPolicyScope!
+		"""Project slug. Required for scope=project, forbidden for scope=global."""
+		project: String
+		roles: [String!]!
+		mfaRequired: Boolean
+		tokenExpiration: Interval
+		idleTimeout: Interval
+		rememberMeAllowed: Boolean
+	}
+
+	type CreateAuthPolicyResponse {
+		ok: Boolean!
+		error: CreateAuthPolicyError
+		result: CreateAuthPolicyResult
+	}
+
+	type CreateAuthPolicyResult {
+		id: String!
+	}
+
+	type CreateAuthPolicyError {
+		code: CreateAuthPolicyErrorCode!
+		developerMessage: String!
+	}
+
+	enum CreateAuthPolicyErrorCode {
+		PROJECT_REQUIRED
+		PROJECT_NOT_ALLOWED
+		PROJECT_NOT_FOUND
+	}
+
+	type UpdateAuthPolicyResponse {
+		ok: Boolean!
+		error: UpdateAuthPolicyError
+	}
+
+	type UpdateAuthPolicyError {
+		code: UpdateAuthPolicyErrorCode!
+		developerMessage: String!
+	}
+
+	enum UpdateAuthPolicyErrorCode {
+		NOT_FOUND
+		PROJECT_REQUIRED
+		PROJECT_NOT_ALLOWED
+		PROJECT_NOT_FOUND
+	}
+
+	type DeleteAuthPolicyResponse {
+		ok: Boolean!
+		error: DeleteAuthPolicyError
+	}
+
+	type DeleteAuthPolicyError {
+		code: DeleteAuthPolicyErrorCode!
+		developerMessage: String!
+	}
+
+	enum DeleteAuthPolicyErrorCode {
+		NOT_FOUND
 	}
 
 	# === sessions ===

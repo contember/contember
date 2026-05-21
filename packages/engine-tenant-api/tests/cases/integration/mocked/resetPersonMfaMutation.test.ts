@@ -2,67 +2,60 @@ import { executeTenantTest } from '../../../src/testTenant'
 import { GQL, SQL } from '../../../src/tags'
 import { testUuid } from '../../../src/testUuid'
 import { getPersonByIdSql } from './sql/getPersonByIdSql'
-import { getMailTemplateSql } from './sql/getMailTemplateSql'
 import { expect, test } from 'bun:test'
 
-const disableIdentityApiKeysSql = (identityId: string) => ({
-	sql: SQL`update "tenant"."api_key" set "disabled_at" = ? where "identity_id" = ?`,
-	parameters: [(val: any) => val instanceof Date, identityId],
-	response: { rowCount: 1 },
-})
-
-test('force sign-out – success with reason and mail', async () => {
+test('resetPersonMfa clears factors + backup codes and audits mfa_reset', async () => {
 	const personId = testUuid(1)
 	const identityId = testUuid(2)
-
 	await executeTenantTest({
 		query: {
-			query: GQL`mutation($id: String!, $reason: String) {
-				forceSignOutPerson(personId: $id, reason: $reason) {
-					ok
-					error { code }
-				}
+			query: GQL`mutation($id: String!) {
+				resetPersonMfa(personId: $id) { ok error { code } }
 			}`,
-			variables: { id: personId, reason: 'security incident' },
+			variables: { id: personId },
 		},
 		executes: [
 			getPersonByIdSql({
 				personId,
 				response: { personId, identityId, password: '123', roles: [], email: 'jane@doe.com' },
 			}),
-			disableIdentityApiKeysSql(identityId),
-			getMailTemplateSql({ type: 'forcedSignOut', projectId: null }),
-			getMailTemplateSql({ type: 'forcedSignOut', projectId: null }),
+			{
+				sql: SQL`update "tenant"."person_mfa"
+					set "totp_secret" = ?, "totp_secret_version" = ?, "totp_activated_at" = ?, "totp_pending_secret" = ?, "totp_pending_version" = ?, "totp_pending_created_at" = ?, "email_otp_enabled" = ?
+					where "person_id" = ?`,
+				parameters: [null, null, null, null, null, null, false, personId],
+				response: { rowCount: 1 },
+			},
+			{
+				sql: SQL`update "tenant"."person" set "mfa_grace_until" = ? where "id" = ?`,
+				parameters: [null, personId],
+				response: { rowCount: 1 },
+			},
+			{
+				sql: SQL`delete from "tenant"."person_backup_code" where "person_id" = ?`,
+				parameters: [personId],
+				response: { rowCount: 2 },
+			},
 		],
 		return: {
 			data: {
-				forceSignOutPerson: { ok: true, error: null },
+				resetPersonMfa: { ok: true, error: null },
 			},
 		},
 		expectedAuthLog: {
-			type: 'forced_sign_out',
+			type: 'mfa_reset',
 			targetPersonId: personId,
 			response: expect.objectContaining({ ok: true }),
-			metadata: { reason: 'security incident' },
 		},
-		sentMails: [
-			{
-				subject: 'Your sessions have been signed out',
-			},
-		],
 	})
 })
 
-test('force sign-out – PERSON_NOT_FOUND', async () => {
+test('resetPersonMfa returns PERSON_NOT_FOUND', async () => {
 	const personId = testUuid(1)
-
 	await executeTenantTest({
 		query: {
 			query: GQL`mutation($id: String!) {
-				forceSignOutPerson(personId: $id) {
-					ok
-					error { code }
-				}
+				resetPersonMfa(personId: $id) { ok error { code } }
 			}`,
 			variables: { id: personId },
 		},
@@ -80,11 +73,11 @@ test('force sign-out – PERSON_NOT_FOUND', async () => {
 		],
 		return: {
 			data: {
-				forceSignOutPerson: { ok: false, error: { code: 'PERSON_NOT_FOUND' } },
+				resetPersonMfa: { ok: false, error: { code: 'PERSON_NOT_FOUND' } },
 			},
 		},
 		expectedAuthLog: {
-			type: 'forced_sign_out',
+			type: 'mfa_reset',
 			metadata: { requestedPersonId: personId },
 			response: expect.objectContaining({ ok: false }),
 		},

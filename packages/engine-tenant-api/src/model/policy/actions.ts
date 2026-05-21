@@ -6,8 +6,11 @@
  *   system, identity, person, project, apiKey, mailTemplate, idp, entrypoint, policy
  *
  * Resources (the object an action targets) are referenced as ARN-like strings
- * in policy statements: `project:<slug>`, `person:<id>`, `idp:<slug>`,
- * `policy:<slug>`, `*` for any.
+ * in policy statements. NOTE: the tenant authorization layer
+ * (`PermissionContext`) only ever evaluates against two resource values today:
+ * `*` (the global scope) and `project:<slug>` (a project scope). There is no
+ * per-object resource such as `person:<id>` — finer targeting must be expressed
+ * with conditions, not the resource string.
  */
 
 export const TenantActions = {
@@ -88,14 +91,13 @@ export type TenantAction = typeof TenantActions[keyof typeof TenantActions]
 
 /**
  * Build canonical resource strings.
+ *
+ * Only `project` and `any` are emitted/evaluated by the current tenant
+ * authorization layer (see the note at the top of this file). Per-object
+ * builders were removed to avoid suggesting a resource granularity the engine
+ * does not actually evaluate.
  */
 export const TenantResources = {
 	project: (slug: string) => `project:${slug}`,
-	person: (id: string) => `person:${id}`,
-	identity: (id: string) => `identity:${id}`,
-	idp: (slug: string) => `idp:${slug}`,
-	apiKey: (id: string) => `apiKey:${id}`,
-	mailTemplate: (id: string) => `mailTemplate:${id}`,
-	policy: (slug: string) => `policy:${slug}`,
 	any: '*',
 }

@@ -139,10 +139,11 @@ export const BUILTIN_POLICIES: readonly BuiltinPolicyDefinition[] = [
 				// PermissionsFactory: project_admin may grant/use only roles from
 				// {LOGIN, PROJECT_ADMIN, ENTRYPOINT_DEPLOYER}. Anything else
 				// (including SUPER_ADMIN, PROJECT_CREATOR, and arbitrary unknown
-				// roles) is denied. Missing `subject.roles` fail-closes via the
-				// engine's deny-on-missing-context semantics — stricter than the
-				// original verifier (which treated `roles === undefined` as pass)
-				// but consistent with the rest of the policy guards in this file.
+				// roles) is denied. `actionMapping.ts` defaults a missing
+				// `meta.roles` to `[]` (NOT undefined) before evaluation, so the
+				// `forAnyValue:stringNotEquals` deny returns `false` (no element
+				// outside the allowlist) rather than firing on missing context —
+				// reproducing the legacy verifier's "roles === undefined ⇒ pass".
 				{
 					effect: 'deny',
 					actions: [

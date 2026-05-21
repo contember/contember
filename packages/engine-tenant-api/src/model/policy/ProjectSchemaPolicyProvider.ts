@@ -75,6 +75,42 @@ export class ProjectSchemaPolicyProvider implements PolicySource {
 		const manageEnabled = tenantByMembership.some(({ tenant }) => !!tenant?.manage)
 		const viewEnabled = tenantByMembership.some(({ tenant }) => !!tenant?.view)
 
+		// Coarse-gate statements. Resolvers do a two-step check: first a "can you
+		// manage members here at all?" probe with an EMPTY subject-membership list
+		// (no `subject.membership` in context), then a per-membership check. The
+		// legacy verifier was `memberships.every(matcher.matches)`, so the empty
+		// probe returned `true` for any invoker whose role merely *had* the
+		// capability — even a non-admin delegated manager. The per-membership
+		// statements below all carry a `subject.membership.role` condition, which
+		// is missing during the probe and fail-closes to deny, silently stripping
+		// delegated managers/viewers of member access. These gate statements
+		// restore the legacy probe: `exists:{subject.membership:false}` makes them
+		// apply ONLY when no membership is in context (the probe), and be skipped
+		// during the real per-membership evaluation.
+		const probeOnly = { exists: { 'subject.membership': false } } as const
+		if (inviteEnabled) {
+			out.push({ effect: 'allow', actions: [TenantActions.personInvite], resources: [resource], conditions: probeOnly })
+		}
+		if (unmanagedInviteEnabled) {
+			out.push({ effect: 'allow', actions: [TenantActions.personInviteUnmanaged], resources: [resource], conditions: probeOnly })
+		}
+		if (manageEnabled) {
+			out.push({
+				effect: 'allow',
+				actions: [
+					TenantActions.projectViewMember,
+					TenantActions.projectAddMember,
+					TenantActions.projectUpdateMember,
+					TenantActions.projectRemoveMember,
+				],
+				resources: [resource],
+				conditions: probeOnly,
+			})
+		}
+		if (viewEnabled) {
+			out.push({ effect: 'allow', actions: [TenantActions.projectViewMember], resources: [resource], conditions: probeOnly })
+		}
+
 		for (const { invoker, tenant } of tenantByMembership) {
 			if (!tenant) continue
 

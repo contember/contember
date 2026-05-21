@@ -1,6 +1,7 @@
 import { describe, expect, test } from 'bun:test'
 import { PolicyNotFoundError, PolicyService, PolicyValidationError } from '../../../src/model/policy'
 import { IdentityPolicyAssignmentsQuery } from '../../../src/model/policy/queries/IdentityPolicyAssignmentsQuery'
+import { IdentityQuery } from '../../../src/model/queries/identity/IdentityQuery'
 import type { DatabaseContext } from '../../../src/model/utils'
 import type { PolicyActor, PolicyDto } from '../../../src/model/policy'
 
@@ -14,7 +15,14 @@ const makeDb = (overrides: {
 		queryHandler: {
 			// The grant-boundary surface load runs `IdentityPolicyAssignmentsQuery`;
 			// the actor here holds no policies, so return an empty assignment list.
-			fetch: (query: any) => query instanceof IdentityPolicyAssignmentsQuery ? [] : (overrides.fetch ?? (() => undefined))(query),
+			// `assertCanTargetIdentity` (assign/revoke) runs `IdentityQuery`; return a
+			// non-protected target so the target guard passes.
+			fetch: (query: any) =>
+				query instanceof IdentityPolicyAssignmentsQuery
+					? []
+					: query instanceof IdentityQuery
+					? [{ id: 'identity-x', description: '', roles: [] }]
+					: (overrides.fetch ?? (() => undefined))(query),
 		},
 		commandBus: {
 			execute: overrides.execute ?? (() => {
@@ -127,6 +135,52 @@ describe('PolicyService.assign — tag validation', () => {
 		})
 		const service = new PolicyService()
 		await service.assign(db, actor, 'identity-x', 'auditor', { team: 'eng', level: 3 })
+		expect(executed).toBe(true)
+	})
+})
+
+describe('PolicyService — target identity protection', () => {
+	const protectedTargetDb = (overrides: { execute?: (c: any) => any } = {}): DatabaseContext =>
+		({
+			queryHandler: {
+				fetch: (query: any) =>
+					query instanceof IdentityPolicyAssignmentsQuery
+						? []
+						: query instanceof IdentityQuery
+						? [{ id: 'su-id', description: '', roles: ['super_admin'] }]
+						: customPolicy,
+			},
+			commandBus: {
+				execute: overrides.execute ?? (() => {
+					throw new Error('commandBus.execute should not run when target is protected')
+				}),
+			},
+		}) as any
+
+	test('non-super-admin actor cannot assign a policy to a super_admin identity', async () => {
+		const service = new PolicyService()
+		await expect(service.assign(protectedTargetDb(), actor, 'su-id', 'auditor')).rejects.toThrow(/not allowed/i)
+	})
+
+	test('non-super-admin actor cannot revoke a policy from a super_admin identity', async () => {
+		const service = new PolicyService()
+		await expect(service.revoke(protectedTargetDb(), actor, 'su-id', 'auditor')).rejects.toThrow(/not allowed/i)
+	})
+
+	test('super-admin actor may target a super_admin identity', async () => {
+		let executed = false
+		const superActor: PolicyActor = { id: 'actor-id', roles: ['super_admin'] }
+		const service = new PolicyService()
+		await service.assign(
+			protectedTargetDb({
+				execute: () => {
+					executed = true
+				},
+			}),
+			superActor,
+			'su-id',
+			'auditor',
+		)
 		expect(executed).toBe(true)
 	})
 })

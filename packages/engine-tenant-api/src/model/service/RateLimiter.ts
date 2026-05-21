@@ -23,8 +23,10 @@ export interface RateLimitDecision {
  * recorded only when the call passes — denied calls do not extend the window,
  * matching the spec's "max N successful attempts per window".
  *
- * The raw key (IP, email, ...) is hashed with the configured provider to avoid
- * storing PII at rest.
+ * The raw key (IP, email, ...) is hashed with the configured provider so the
+ * raw value is not stored at rest. Note this is pseudonymization, not strong
+ * anonymization: an unsalted SHA-256 of a low-entropy input (e.g. an IPv4
+ * address) is recoverable by brute force, so treat key_hash as sensitive.
  */
 export class RateLimiter {
 	constructor(
@@ -71,7 +73,12 @@ export class RateLimiter {
 	}
 
 	/**
-	 * Atomic check + record. Returns the decision; only records on success.
+	 * Combined check + record. Returns the decision; only records on success.
+	 *
+	 * Not atomic: the COUNT and the INSERT are separate statements, so under
+	 * concurrent requests for the same key a few attempts beyond the limit can
+	 * slip through (the window is a soft ceiling). That is acceptable for abuse
+	 * mitigation — do not rely on it as a hard quota.
 	 */
 	async consume(db: DatabaseContext, scope: RateLimitScope, key: string | null | undefined, config: Config): Promise<RateLimitDecision> {
 		if (!key) {

@@ -334,8 +334,15 @@ export function evaluateConditions(block: ConditionBlock | undefined, ctx: Condi
 		return true
 	}
 	for (const [operatorName, paths] of Object.entries(block)) {
-		const operator = ctx.operators[operatorName]
-		if (!operator) {
+		// Guard against inherited members (`toString`, `constructor`, `__proto__`,
+		// …): a plain `ctx.operators[operatorName]` walks the prototype chain, so
+		// `toString` would resolve to `Object.prototype.toString` and be invoked as
+		// an operator — returning a truthy value and silently passing the
+		// condition. Only own, function-valued operators are accepted.
+		const operator = Object.prototype.hasOwnProperty.call(ctx.operators, operatorName)
+			? ctx.operators[operatorName]
+			: undefined
+		if (typeof operator !== 'function') {
 			throw new UnknownConditionOperatorError(operatorName)
 		}
 		for (const [path, rawExpected] of Object.entries(paths)) {

@@ -56,3 +56,17 @@ describe('substituteValue', () => {
 		expect(substituteValue(null, {})).toBeNull()
 	})
 })
+
+describe('readPath prototype safety', () => {
+	test('does not traverse __proto__ / constructor / prototype', () => {
+		expect(readPath({}, '__proto__')).toBeUndefined()
+		expect(readPath({}, 'constructor')).toBeUndefined()
+		expect(readPath({}, '__proto__.polluted')).toBeUndefined()
+		expect(readPath({ a: {} }, 'a.constructor.name')).toBeUndefined()
+	})
+
+	test('only reads own properties', () => {
+		expect(readPath({ hasOwnProperty: 'shadowed' }, 'hasOwnProperty')).toBe('shadowed')
+		expect(readPath({}, 'hasOwnProperty')).toBeUndefined()
+	})
+})

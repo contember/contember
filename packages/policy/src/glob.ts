@@ -37,6 +37,14 @@ export function globToRegExp(pattern: string): RegExp {
 	for (let i = 0; i < pattern.length; i++) {
 		const c = pattern[i]
 		if (c === '*') {
+			// Collapse a run of consecutive `*` into a single `.*`. Emitting one
+			// `.*` per star (`.*.*.*…`) makes the regex catastrophically backtrack
+			// on long non-matching inputs — and patterns can come from
+			// user-authored policies, so an actor could stall authorization with
+			// `actions: ['**********x']`. Collapsing keeps the pattern linear.
+			if (pattern[i - 1] === '*') {
+				continue
+			}
 			out += '.*'
 		} else if (c === '?') {
 			out += '.'

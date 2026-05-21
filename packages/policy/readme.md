@@ -25,3 +25,9 @@ const result = await engine.evaluate(
 ```
 
 See `tests/cases/unit/*.test.ts` for the full operator surface and matching rules.
+
+> The example above uses an arbitrary resource pattern (`person:*`) to show the
+> engine's generality. Individual consumers choose their own resource scheme —
+> e.g. the Contember tenant API only ever evaluates against `*` and
+> `project:<slug>`, expressing finer targeting with conditions rather than the
+> resource string.

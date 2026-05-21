@@ -16,7 +16,7 @@ import { ProjectManager } from './ProjectManager'
 import { PermissionContext } from '../authorization'
 import { PersonTokenQuery } from '../queries/personToken/PersonTokenQuery'
 import { ImplementationException } from '../../exceptions'
-import { OtpAuthenticator } from './OtpAuthenticator'
+import { OtpManager } from './OtpManager'
 import { PersonToken } from '../type'
 import { AuthLogService } from './AuthLogService'
 import { intervalToSeconds } from '../utils/interval'
@@ -27,7 +27,7 @@ class PasswordlessSignInManager {
 		private readonly apiKeyManager: ApiKeyManager,
 		private readonly mailer: UserMailer,
 		private readonly projectManager: ProjectManager,
-		private readonly otpAuthenticator: OtpAuthenticator,
+		private readonly otpManager: OtpManager,
 	) {}
 
 	async initSignInPasswordless({ db, permissionContext, mailVariant, mailProject, email }: {
@@ -175,7 +175,7 @@ class PasswordlessSignInManager {
 				})
 			}
 
-			if (personRow.otp_uri && personRow.otp_activated_at) {
+			if (personRow.otp_secret && personRow.otp_activated_at) {
 				if (!mfaOtp) {
 					return new ResponseError('OTP_REQUIRED', `2FA is enabled. OTP token is required`, {
 						[AuthLogService.Key]: new AuthLogService.Bag({
@@ -185,7 +185,7 @@ class PasswordlessSignInManager {
 					})
 				}
 
-				if (!this.otpAuthenticator.validate({ uri: personRow.otp_uri }, mfaOtp)) {
+				if (!await this.otpManager.verifyOtp(personRow, mfaOtp)) {
 					return new ResponseError('INVALID_OTP_TOKEN', 'OTP token validation has failed', {
 						[AuthLogService.Key]: new AuthLogService.Bag({
 							personId: personRow.id,

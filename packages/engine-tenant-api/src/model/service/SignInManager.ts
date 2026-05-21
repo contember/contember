@@ -1,5 +1,5 @@
 import { CreateSessionTokenErrorCode, SignInErrorCode } from '../../schema'
-import { ApiKeyManager, OtpAuthenticator } from '../service'
+import { ApiKeyManager, OtpManager } from '../service'
 import { PersonQuery, PersonRow, PersonUniqueIdentifier } from '../queries'
 import { Providers } from '../providers'
 import { DatabaseContext } from '../utils'
@@ -12,7 +12,7 @@ class SignInManager {
 	constructor(
 		private readonly apiKeyManager: ApiKeyManager,
 		private readonly providers: Providers,
-		private readonly otpAuthenticator: OtpAuthenticator,
+		private readonly otpManager: OtpManager,
 	) {}
 
 	async signIn(
@@ -54,12 +54,12 @@ class SignInManager {
 			return new ResponseError('INVALID_PASSWORD', `Password does not match`, authLogData)
 		}
 
-		if (person.otp_uri && person.otp_activated_at) {
+		if (person.otp_secret && person.otp_activated_at) {
 			if (!otpCode) {
 				return new ResponseError('OTP_REQUIRED', `2FA is enabled. OTP token is required`, authLogData)
 			}
 
-			if (!this.otpAuthenticator.validate({ uri: person.otp_uri }, otpCode)) {
+			if (!await this.otpManager.verifyOtp(person, otpCode)) {
 				return new ResponseError('INVALID_OTP_TOKEN', 'OTP token validation has failed', authLogData)
 			}
 		}

@@ -18,13 +18,6 @@ export class OtpMutationResolver implements MutationResolvers {
 	async prepareOtp(parent: any, args: MutationPrepareOtpArgs, context: TenantResolverContext): Promise<PrepareOtpResponse> {
 		const person = await this.getPersonFromContext(context)
 		const otp = await this.otpManager.prepareOtp(context.db, person, args.label || 'Contember')
-		if (person.otp_activated_at) {
-			await context.logAuthAction({
-				type: '2fa_disable',
-				response: new ResponseOk(null),
-				personId: person.id,
-			})
-		}
 		return {
 			ok: true,
 			result: {
@@ -36,13 +29,13 @@ export class OtpMutationResolver implements MutationResolvers {
 
 	async confirmOtp(parent: any, args: MutationConfirmOtpArgs, context: TenantResolverContext): Promise<ConfirmOtpResponse> {
 		const person = await this.getPersonFromContext(context)
-		if (!person.otp_uri) {
+		if (!person.otp_pending_secret) {
 			return createErrorResponse(
 				'NOT_PREPARED',
 				`OTP setup was not initialized. Call prepareOtp first.`,
 			)
 		}
-		if (!this.otpManager.verifyOtp(person, args.otpToken)) {
+		if (!await this.otpManager.verifyPendingOtp(person, args.otpToken)) {
 			const responseError = new ResponseError('INVALID_OTP_TOKEN', 'Provided token is not correct.')
 			await context.logAuthAction({
 				type: '2fa_enable',
@@ -65,7 +58,7 @@ export class OtpMutationResolver implements MutationResolvers {
 
 	async disableOtp(parent: any, args: {}, context: TenantResolverContext): Promise<DisableOtpResponse> {
 		const person = await this.getPersonFromContext(context)
-		if (!person.otp_uri) {
+		if (!person.otp_secret) {
 			return createErrorResponse('OTP_NOT_ACTIVE', 'OTP is not active, you cannot disable it.')
 		}
 		await this.otpManager.disableOtp(context.db, person)

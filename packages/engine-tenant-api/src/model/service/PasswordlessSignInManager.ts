@@ -22,7 +22,7 @@ import { ProjectManager } from './ProjectManager.js'
 import { PermissionContext } from '../authorization/index.js'
 import { PersonTokenQuery } from '../queries/personToken/PersonTokenQuery.js'
 import { ImplementationException } from '../../exceptions.js'
-import { OtpAuthenticator } from './OtpAuthenticator.js'
+import { OtpManager } from './OtpManager.js'
 import { PersonToken } from '../type/index.js'
 import { AuthLogService } from './AuthLogService.js'
 import { intervalToSeconds } from '../utils/interval.js'
@@ -33,7 +33,7 @@ class PasswordlessSignInManager {
 		private readonly apiKeyManager: ApiKeyManager,
 		private readonly mailer: UserMailer,
 		private readonly projectManager: ProjectManager,
-		private readonly otpAuthenticator: OtpAuthenticator,
+		private readonly otpManager: OtpManager,
 	) {}
 
 	async initSignInPasswordless({ db, permissionContext, mailVariant, mailProject, email }: {
@@ -181,7 +181,7 @@ class PasswordlessSignInManager {
 				})
 			}
 
-			if (personRow.otp_uri && personRow.otp_activated_at) {
+			if (personRow.otp_secret && personRow.otp_activated_at) {
 				if (!mfaOtp) {
 					return new ResponseError('OTP_REQUIRED', `2FA is enabled. OTP token is required`, {
 						[AuthLogService.Key]: new AuthLogService.Bag({
@@ -191,7 +191,7 @@ class PasswordlessSignInManager {
 					})
 				}
 
-				if (!this.otpAuthenticator.validate({ uri: personRow.otp_uri }, mfaOtp)) {
+				if (!await this.otpManager.verifyOtp(personRow, mfaOtp)) {
 					return new ResponseError('INVALID_OTP_TOKEN', 'OTP token validation has failed', {
 						[AuthLogService.Key]: new AuthLogService.Bag({
 							personId: personRow.id,

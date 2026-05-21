@@ -202,17 +202,17 @@ export class TenantContainerFactory {
 			.addService('idpSignInManager', ({ apiKeyManager, idpRegistry }) => new IDPSignInManager(apiKeyManager, idpRegistry))
 			.addService('idpManager', ({ idpRegistry }) => new IDPManager(idpRegistry))
 			.addService('otpAuthenticator', ({ providers }) => new OtpAuthenticator(providers))
-			.addService('signInManager', ({ apiKeyManager, providers, otpAuthenticator }) => new SignInManager(apiKeyManager, providers, otpAuthenticator))
+			.addService('otpManager', ({ otpAuthenticator, providers }) => new OtpManager(otpAuthenticator, providers))
+			.addService('signInManager', ({ apiKeyManager, providers, otpManager }) => new SignInManager(apiKeyManager, providers, otpManager))
 			.addService('membershipValidator', ({ projectSchemaResolver }) => new MembershipValidator(projectSchemaResolver))
 			.addService('inviteManager', ({ providers, userMailer, projectSchemaResolver }) => new InviteManager(providers, userMailer, projectSchemaResolver))
-			.addService('otpManager', ({ otpAuthenticator }) => new OtpManager(otpAuthenticator))
 			.addService('mailTemplateManager', () => new MailTemplateManager())
 			.addService('rolesManager', () => new RolesManager())
 			.addService('configurationManager', () => new ConfigurationManager())
 			.addService(
 				'passwordlessSignInManager',
-				({ apiKeyManager, userMailer, projectManager, otpAuthenticator }) =>
-					new PasswordlessSignInManager(apiKeyManager, userMailer, projectManager, otpAuthenticator),
+				({ apiKeyManager, userMailer, projectManager, otpManager }) =>
+					new PasswordlessSignInManager(apiKeyManager, userMailer, projectManager, otpManager),
 			)
 			.addService(
 				'identityTypeResolver',

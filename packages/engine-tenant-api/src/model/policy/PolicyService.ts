@@ -52,15 +52,21 @@ export class PolicyService {
 	): Promise<{ id: string }> {
 		validatePolicySlug(input.slug)
 		validatePolicyDocument(input.document)
-		await assertWithinGrantableSurface(db, actor, [input.document])
-		return db.commandBus.execute(
-			new CreatePolicyCommand({
-				slug: input.slug,
-				label: input.label,
-				description: input.description,
-				document: input.document,
-			}),
-		)
+		// The grant-boundary check reads the actor's own surface; doing it and the
+		// write in one REPEATABLE READ transaction closes the window where a
+		// concurrent change to the actor's policies could let an out-of-surface
+		// document slip in between the check and the insert.
+		return db.transaction(async db => {
+			await assertWithinGrantableSurface(db, actor, [input.document])
+			return db.commandBus.execute(
+				new CreatePolicyCommand({
+					slug: input.slug,
+					label: input.label,
+					description: input.description,
+					document: input.document,
+				}),
+			)
+		})
 	}
 
 	async update(
@@ -69,27 +75,33 @@ export class PolicyService {
 		slug: string,
 		input: { label?: string; description?: string | null; document?: Policy },
 	): Promise<{ updated: boolean }> {
-		const existing = await this.getBySlug(db, slug)
-		if (!existing) {
-			throw new PolicyNotFoundError(slug)
-		}
 		if (input.document !== undefined) {
 			validatePolicyDocument(input.document)
 		}
-		// Both states must be within the actor's surface: the new document so it
-		// cannot grant beyond the actor, the old one so the actor cannot strip a
-		// deny it does not itself hold (which would escalate the assignees).
-		await assertWithinGrantableSurface(db, actor, [existing.document, input.document ?? existing.document])
-		return db.commandBus.execute(new UpdatePolicyCommand({ slug, ...input }))
+		// Read-check-write in one transaction: the existing document, the boundary
+		// check against both states, and the update must see a consistent snapshot.
+		return db.transaction(async db => {
+			const existing = await this.getBySlug(db, slug)
+			if (!existing) {
+				throw new PolicyNotFoundError(slug)
+			}
+			// Both states must be within the actor's surface: the new document so it
+			// cannot grant beyond the actor, the old one so the actor cannot strip a
+			// deny it does not itself hold (which would escalate the assignees).
+			await assertWithinGrantableSurface(db, actor, [existing.document, input.document ?? existing.document])
+			return db.commandBus.execute(new UpdatePolicyCommand({ slug, ...input }))
+		})
 	}
 
 	async delete(db: DatabaseContext, actor: PolicyActor, slug: string): Promise<{ deleted: boolean }> {
-		const existing = await this.getBySlug(db, slug)
-		if (!existing) {
-			return { deleted: false }
-		}
-		await assertWithinGrantableSurface(db, actor, [existing.document])
-		return db.commandBus.execute(new DeletePolicyCommand(slug))
+		return db.transaction(async db => {
+			const existing = await this.getBySlug(db, slug)
+			if (!existing) {
+				return { deleted: false }
+			}
+			await assertWithinGrantableSurface(db, actor, [existing.document])
+			return db.commandBus.execute(new DeletePolicyCommand(slug))
+		})
 	}
 
 	async assign(
@@ -100,40 +112,44 @@ export class PolicyService {
 		tags: Record<string, unknown> = {},
 	): Promise<void> {
 		validateAssignmentTags(tags)
-		await this.assertCanTargetIdentity(db, actor, identityId)
-		const policy = await this.getBySlug(db, policySlug)
-		if (!policy) {
-			throw new PolicyNotFoundError(policySlug)
-		}
-		// Check the document as it will actually be baked for this assignment —
-		// per-assignment tags narrow `${assignment.tags.*}` placeholders, so a
-		// tag-scoped policy is checked against its concrete scope, not `*`.
-		const baked: Policy = {
-			version: policy.document.version,
-			statements: policy.document.statements.map(stmt => bakeAssignmentTags(stmt, { assignment: { tags, policySlug } })),
-		}
-		await assertWithinGrantableSurface(db, actor, [baked])
-		await db.commandBus.execute(
-			new AssignPolicyCommand({
-				identityId,
-				policyId: policy.id,
-				tags,
-				grantedBy: actor.id,
-			}),
-		)
+		await db.transaction(async db => {
+			await this.assertCanTargetIdentity(db, actor, identityId)
+			const policy = await this.getBySlug(db, policySlug)
+			if (!policy) {
+				throw new PolicyNotFoundError(policySlug)
+			}
+			// Check the document as it will actually be baked for this assignment —
+			// per-assignment tags narrow `${assignment.tags.*}` placeholders, so a
+			// tag-scoped policy is checked against its concrete scope, not `*`.
+			const baked: Policy = {
+				version: policy.document.version,
+				statements: policy.document.statements.map(stmt => bakeAssignmentTags(stmt, { assignment: { tags, policySlug } })),
+			}
+			await assertWithinGrantableSurface(db, actor, [baked])
+			await db.commandBus.execute(
+				new AssignPolicyCommand({
+					identityId,
+					policyId: policy.id,
+					tags,
+					grantedBy: actor.id,
+				}),
+			)
+		})
 	}
 
 	async revoke(db: DatabaseContext, actor: PolicyActor, identityId: string, policySlug: string): Promise<{ revoked: boolean }> {
-		await this.assertCanTargetIdentity(db, actor, identityId)
-		const policy = await this.getBySlug(db, policySlug)
-		if (!policy) {
-			return { revoked: false }
-		}
-		// Revoking removes the policy's (possibly deny-bearing) statements from the
-		// target; the actor must hold every action involved. Placeholders widen to
-		// `*` here — conservative across whatever tags the assignment carried.
-		await assertWithinGrantableSurface(db, actor, [policy.document])
-		return db.commandBus.execute(new RevokePolicyCommand(identityId, policy.id))
+		return db.transaction(async db => {
+			await this.assertCanTargetIdentity(db, actor, identityId)
+			const policy = await this.getBySlug(db, policySlug)
+			if (!policy) {
+				return { revoked: false }
+			}
+			// Revoking removes the policy's (possibly deny-bearing) statements from the
+			// target; the actor must hold every action involved. Placeholders widen to
+			// `*` here — conservative across whatever tags the assignment carried.
+			await assertWithinGrantableSurface(db, actor, [policy.document])
+			return db.commandBus.execute(new RevokePolicyCommand(identityId, policy.id))
+		})
 	}
 
 	/**

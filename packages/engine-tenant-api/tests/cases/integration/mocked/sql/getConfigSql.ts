@@ -1,6 +1,6 @@
 import { ExpectedQuery } from '@contember/database-tester'
 import PostgresInterval from 'postgres-interval'
-export const getConfigSql = (): ExpectedQuery => ({
+export const getConfigSql = (overrides: Record<string, unknown> = {}): ExpectedQuery => ({
 	sql: `select *  from "tenant"."config"`,
 	parameters: [],
 	response: {
@@ -37,6 +37,7 @@ export const getConfigSql = (): ExpectedQuery => ({
 				rate_limit_password_reset_per_ip_window: PostgresInterval('01:00:00'),
 				rate_limit_passwordless_init_per_ip_limit: 0,
 				rate_limit_passwordless_init_per_ip_window: PostgresInterval('01:00:00'),
+				...overrides,
 			},
 		],
 	},

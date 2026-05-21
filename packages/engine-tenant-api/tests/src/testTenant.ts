@@ -33,6 +33,8 @@ export interface Test {
 	expectedAuthLog?: AuthLogService.LogArgs
 	callerTrustForwardedInfo?: boolean
 	httpInfo?: { ip?: string; userAgent?: string }
+	/** Override individual providers (e.g. a working `decrypt` to enable captcha). */
+	providers?: Partial<Providers>
 }
 
 export const createUuidGenerator = () => {
@@ -81,6 +83,7 @@ export const executeTenantTest = async (test: Test) => {
 			throw new Error('not supported')
 		},
 		hash: value => Buffer.from(value.toString()),
+		...test.providers,
 	}
 	const projectInitializer = {
 		initializeProject: () => {

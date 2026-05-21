@@ -70,39 +70,40 @@ This also returns three identifiers similar to creating a project-specific API k
 
 Both `createApiKey` and `createGlobalApiKey` support the optional `tokenHash` parameter. If you provide a SHA-256 hash of the token you wish to use, the API will not generate a new token, and the `token` field in the response will be empty. This allows you more control over token management but requires you to securely generate and store the original token yourself.
 
-## Add Global Roles to an Identity
+### Trusted-proxy API keys
+
+:::note Available since 2.2
+:::
+
+Both `createApiKey` and `createGlobalApiKey` accept `options.trustForwardedClientInfo: true`. An api_key with that flag honors the `X-Contember-Client-IP` and `X-Contember-Client-User-Agent` headers from the request, so session tracking, audit logs and Content API `userInfo` see the real end-user IP/UA rather than the proxy's socket.
+
+This is intended for backend services that proxy user requests. The flag carries a strict security contract on the proxy side — see [proxy trust](./proxy-trust.md) before enabling.
 
 ```graphql
 mutation {
-  addGlobalIdentityRoles(
-    identityId: "some-identity-id",
-    roles: ["super_admin", "monitor"]
+  createGlobalApiKey(
+    description: "Backend → Contember (per-user)",
+    roles: ["login"],
+    options: { trustForwardedClientInfo: true }
   ) {
     ok
-    error {
-      code
-    }
+    result { apiKey { id token } }
   }
 }
 ```
 
-## Remove Global Roles from an Identity
+The flag cannot be flipped on an existing api_key. To remove it, disable the key and create a new one.
 
-```graphql
-mutation {
-  removeGlobalIdentityRoles(
-    identityId: "some-identity-id",
-    roles: ["monitor"]
-  ) {
-    ok
-    error {
-      code
-    }
-  }
-}
-```
+### Audit
 
+*(since 2.2)* Every `createApiKey` / `createGlobalApiKey` is recorded as `api_key_create` in the [audit log](./audit-log.md) with the api_key id, identity, and memberships/roles — never the token or its hash. `disableApiKey` is recorded as `api_key_disable`.
 
+## Session keys vs permanent keys
+
+API keys come in two flavors:
+
+- **Permanent** — created by `createApiKey` / `createGlobalApiKey`, no expiry, intended for applications and integrations.
+- **Session** — minted by `signIn` / `signInIDP` / `signInPasswordless` / `createSessionToken`, short-lived, tied to a person. Documented in [sessions](./sessions.md) — there you'll also find how to list and revoke active sessions.
 
 ## Disable API Key
 
@@ -115,3 +116,5 @@ mutation {
 ```
 
 Use the API Key ID to disable the API key. Do not confuse this with the Identity ID.
+
+To invalidate every API key (session and permanent) for a target person at once, use [`forceSignOutPerson`](./sessions.md#admin-force-sign-out).

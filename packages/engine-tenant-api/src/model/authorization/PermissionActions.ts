@@ -15,6 +15,7 @@ namespace PermissionActions {
 
 	export const CONFIGURE = Authorizator.createAction(Resources.system, 'configure')
 	export const CONFIG_VIEW = Authorizator.createAction(Resources.system, 'viewConfig')
+	export const AUTH_LOG_VIEW = Authorizator.createAction(Resources.system, 'viewAuthLog')
 
 	export const IDENTITY_VIEW_PERMISSIONS = Authorizator.createAction(Resources.identity, 'viewPermissions')
 	export const IDENTITY_ADD_GLOBAL_ROLES = (roles?: readonly string[]) => Authorizator.createAction(Resources.identity, 'addGlobalRoles', { roles })
@@ -22,6 +23,9 @@ namespace PermissionActions {
 		Authorizator.createAction(Resources.identity, 'removeGlobalRoles', { roles })
 
 	export const PERSON_DISABLE = (roles?: readonly string[]) => Authorizator.createAction(Resources.person, 'disable', { roles })
+	export const PERSON_FORCE_SIGN_OUT = (roles?: readonly string[]) => Authorizator.createAction(Resources.person, 'forceSignOut', { roles })
+	export const PERSON_REVOKE_SESSION = Authorizator.createAction(Resources.person, 'revokeSession')
+	export const PERSON_VIEW_SESSIONS = (roles?: readonly string[]) => Authorizator.createAction(Resources.person, 'viewSessions', { roles })
 
 	export const PERSON_VIEW = Authorizator.createAction(Resources.person, 'view')
 	export const PERSON_SIGN_IN = Authorizator.createAction(Resources.person, 'signIn')

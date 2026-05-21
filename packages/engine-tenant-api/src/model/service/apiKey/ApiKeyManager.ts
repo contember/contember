@@ -1,4 +1,5 @@
 import {
+	ApiKeyRequestInfo,
 	CreateApiKeyCommand,
 	DisableApiKeyCommand,
 	DisableIdentityApiKeysCommand,
@@ -26,6 +27,8 @@ export class ApiKeyManager {
 		dbContext: DatabaseContext,
 		readDbContext: DatabaseContext,
 		token: string,
+		requestInfo?: ApiKeyRequestInfo,
+		forwardedInfo?: ApiKeyRequestInfo,
 	): Promise<VerifyResponse> {
 		const apiKeyRow = await readDbContext.queryHandler.fetch(new ApiKeyByTokenQuery(token))
 		if (apiKeyRow === null) {
@@ -44,6 +47,13 @@ export class ApiKeyManager {
 			return new ResponseError(VerifyErrorCode.DISABLED, `API key expired at ${apiKeyRow.expires_at.toISOString()}`)
 		}
 
+		const effectiveInfo: ApiKeyRequestInfo | undefined = apiKeyRow.trust_forwarded_info && forwardedInfo
+			? {
+				ip: forwardedInfo.ip ?? requestInfo?.ip,
+				userAgent: forwardedInfo.userAgent ?? requestInfo?.userAgent,
+			}
+			: requestInfo
+
 		setImmediate(async () => {
 			await dbContext.commandBus.execute(
 				new ProlongApiKeyCommand(
@@ -51,20 +61,46 @@ export class ApiKeyManager {
 					apiKeyRow.type,
 					apiKeyRow.expiration,
 					apiKeyRow.expires_at,
+					effectiveInfo,
+					{
+						lastIp: apiKeyRow.last_ip,
+						lastUserAgent: apiKeyRow.last_user_agent,
+						lastUsedAt: apiKeyRow.last_used_at,
+					},
 				),
 			)
 		})
 
-		return new ResponseOk(new VerifyResult(apiKeyRow.identity_id, apiKeyRow.id, apiKeyRow.roles, apiKeyRow.person_id))
+		return new ResponseOk(
+			new VerifyResult(
+				apiKeyRow.identity_id,
+				apiKeyRow.id,
+				apiKeyRow.roles,
+				apiKeyRow.person_id,
+				apiKeyRow.trust_forwarded_info,
+			),
+		)
 	}
 
-	async createSessionApiKey(dbContext: DatabaseContext, identityId: string, expiration?: number): Promise<string> {
-		const config = await dbContext.queryHandler.fetch(new ConfigurationQuery())
+	async createSessionApiKey(
+		dbContext: DatabaseContext,
+		identityId: string,
+		expiration?: number,
+		requestInfo?: ApiKeyRequestInfo,
+		trustForwardedInfo?: boolean,
+	): Promise<string> {
+		const config = await dbContext.queryHandler.fetch(new ConfigurationQuery(dbContext.providers))
 		const expirationResolved = expiration ?? (intervalToSeconds(config.login.defaultTokenExpiration) / 60)
 		const expirationCapped = config.login.maxTokenExpiration
 			? Math.min(expirationResolved, intervalToSeconds(config.login.maxTokenExpiration) / 60)
 			: expirationResolved
-		const command = new CreateApiKeyCommand({ type: ApiKey.Type.SESSION, identityId, expiration: expirationCapped })
+		const command = new CreateApiKeyCommand({
+			type: ApiKey.Type.SESSION,
+			identityId,
+			expiration: expirationCapped,
+			requestInfo,
+			trustForwardedInfo,
+		})
 		const token = (await dbContext.commandBus.execute(command)).token
 		assert(token !== undefined)
 		return token
@@ -93,9 +129,10 @@ export class ApiKeyManager {
 		description: string,
 		roles: readonly string[],
 		tokenHash?: TokenHash,
+		trustForwardedInfo?: boolean,
 	): Promise<CreateApiKeyResponse> {
 		return await dbContext.transaction(async db => {
-			return await this.apiKeyService.createPermanentApiKey(db, description, roles, tokenHash)
+			return await this.apiKeyService.createPermanentApiKey(db, description, roles, tokenHash, trustForwardedInfo)
 		})
 	}
 
@@ -105,9 +142,10 @@ export class ApiKeyManager {
 		memberships: readonly Acl.Membership[],
 		description: string,
 		tokenHash?: TokenHash,
+		trustForwardedInfo?: boolean,
 	): Promise<CreateApiKeyResponse> {
 		return await dbContext.transaction(async db => {
-			return await this.apiKeyService.createProjectPermanentApiKey(db, projectId, memberships, description, tokenHash)
+			return await this.apiKeyService.createProjectPermanentApiKey(db, projectId, memberships, description, tokenHash, trustForwardedInfo)
 		})
 	}
 }
@@ -122,6 +160,7 @@ export class VerifyResult {
 		public readonly apiKeyId: string,
 		public readonly roles: string[],
 		public readonly personId: string | null,
+		public readonly trustForwardedInfo: boolean = false,
 	) {}
 }
 

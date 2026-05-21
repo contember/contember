@@ -3,12 +3,15 @@ import { ApiKey } from '../../type'
 import { ApiKeyHelper } from './ApiKeyHelper'
 import { InsertBuilder } from '@contember/database'
 import { computeTokenHash, generateToken, TokenHash } from '../../utils'
+import { ApiKeyRequestInfo } from './ProlongApiKeyCommand'
 
 interface CreateSessionApiKeyArgs {
 	type: ApiKey.Type.SESSION
 	identityId: string
 	expiration?: number
 	tokenHash?: string
+	requestInfo?: ApiKeyRequestInfo
+	trustForwardedInfo?: boolean
 }
 
 interface CreatePermanentApiKeyArgs {
@@ -16,6 +19,8 @@ interface CreatePermanentApiKeyArgs {
 	identityId: string
 	tokenHash?: TokenHash
 	expiration?: undefined
+	requestInfo?: ApiKeyRequestInfo
+	trustForwardedInfo?: boolean
 }
 
 export type CreateApiKeyArgs =
@@ -45,6 +50,9 @@ export class CreateApiKeyCommand implements Command<CreateApiKeyCommandResult> {
 				expires_at: ApiKeyHelper.getExpiration(providers, this.args.type, this.args.expiration),
 				expiration: this.args.expiration || null,
 				created_at: providers.now(),
+				created_ip: this.args.requestInfo?.ip || null,
+				created_user_agent: this.args.requestInfo?.userAgent || null,
+				trust_forwarded_info: this.args.trustForwardedInfo ?? false,
 			})
 			.execute(db)
 

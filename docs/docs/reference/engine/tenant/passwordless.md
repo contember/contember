@@ -34,7 +34,11 @@ process.
 
 5. **Rate Limits and Security**:
 
-- There are no rate limits applied at this time, but the system enforces a token validity period (default 5 minutes) and a limit of 3 OTP attempts per magic link.
+- Token validity period (default 5 minutes) and a limit of 3 OTP attempts per magic link.
+- *(since 2.2)* Per-IP rate limit on `initSignInPasswordless` via `rateLimits.passwordlessInitPerIp`. See [anti-abuse](./anti-abuse.md#per-ip-rate-limits).
+- *(since 2.2)* Per-email exponential backoff on `initSignInPasswordless` reusing the `login.baseBackoff` / `login.maxBackoff` / `login.attemptWindow` knobs — a single inbox cannot be flooded with magic-link mails. The mutation still returns `ok: true` but the mail is suppressed until the next allowed attempt.
+- *(since 2.2)* Optional captcha verification on `initSignInPasswordless` when `captcha` is configured. Pass the token via the `captchaToken` argument.
+- *(since 2.2)* When `login.revealUserExists: false`, an `initSignInPasswordless` for an unknown email returns `PASSWORDLESS_DISABLED` rather than `PERSON_NOT_FOUND`.
 
 ### GraphQL API
 
@@ -76,7 +80,10 @@ mutation {
 
 ```graphql
 mutation {
-  initSignInPasswordless(email: "user@example.com") {
+  initSignInPasswordless(
+    email: "user@example.com",
+    captchaToken: "0.aXR…"
+  ) {
     ok
     error {
       code
@@ -89,6 +96,8 @@ mutation {
   }
 }
 ```
+
+Error codes: `PERSON_NOT_FOUND` (or `PASSWORDLESS_DISABLED` when `revealUserExists: false`), `INVALID_CAPTCHA` *(since 2.2)*, `RATE_LIMIT_EXCEEDED` *(since 2.2)*.
 
 #### Signing In with Magic Link or OTP
 
@@ -136,3 +145,40 @@ mutation {
   }
 }
 ```
+
+#### Completing sign-in with MFA
+
+If 2FA is enabled for the person, `signInPasswordless` requires the current TOTP code via the `mfaOtp` argument. A missing or wrong code is reported the same way as on `signIn`:
+
+```graphql
+mutation {
+  signInPasswordless(
+    requestId: "abcd1234",
+    validationType: token,
+    token: "xyz789",
+    mfaOtp: "123456"
+  ) {
+    ok
+    error { code }
+    result { token person { id email } }
+  }
+}
+```
+
+Error codes added in this case: `OTP_REQUIRED` (no `mfaOtp` supplied), `INVALID_OTP_TOKEN` (wrong code). React to `OTP_REQUIRED` by prompting the user and retrying with `mfaOtp` populated. See [two-factor](./two-factor.md) for the broader 2FA reference.
+
+### Per-person opt-in / opt-out
+
+When `passwordless.enabled` is `optIn` or `optOut` (see [configuration](./configuration.md)), each person can flip their own preference with two self-service mutations:
+
+```graphql
+mutation { enableMyPasswordless  { ok error { code } } }
+mutation { disableMyPasswordless { ok error { code } } }
+```
+
+| Code | Cause |
+|---|---|
+| `NOT_A_PERSON` | Caller is authenticated via a permanent API key, not a person. |
+| `CANNOT_TOGGLE` | `passwordless.enabled` is `always` or `never` — the tenant has forced the setting globally and individual persons cannot override it. |
+
+The mutations are gated by the `PERSON_TOGGLE_PASSWORDLESS` permission, which is held by `PERSON` (any authenticated person) by default. The current state is observable through `me { person { passwordlessEnabled } }`.

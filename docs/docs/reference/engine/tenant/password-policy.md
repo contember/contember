@@ -38,6 +38,7 @@ mutation {
 - **requireDigit** – Minimum digits required (e.g., `1`)
 - **requireSpecial** – Minimum special characters required (e.g., `1`)
 - **checkBlacklist** – Whether to block commonly used or leaked passwords (`true` or `false`)
+- **checkHibp** – Whether to check the password against the Have I Been Pwned corpus *(since 2.2)*. See [HIBP check](#hibp-check) below.
 - **pattern** – Optional regex pattern that passwords must match (e.g., enforce structure)
 
 ## Blacklist: Preventing Common Passwords
@@ -59,6 +60,23 @@ To ensure better coverage, basic normalization is applied before blacklist compa
   - `!` → `i`
 
 For example, `P@ssw0rd` would be flagged as `password` after normalization and leetspeak decoding.
+
+## HIBP check
+
+:::note Available since 2.2
+:::
+
+When `checkHibp` is enabled, every password-setting flow (`signUp`, `changePassword`, `changeMyPassword`, `resetPassword`) is checked against the [Have I Been Pwned](https://haveibeenpwned.com/Passwords) corpus using its k-anonymity API: only the first 5 hex chars of the password's SHA-1 hash are sent to HIBP, never the password itself.
+
+```graphql
+mutation {
+  configure(config: { password: { checkHibp: true } }) { ok }
+}
+```
+
+Compromised passwords are rejected with `TOO_WEAK` and a `COMPROMISED` entry in `weakPasswordReasons`.
+
+The check is **fail-open**: if HIBP is unreachable or times out (1.5 s), the check is skipped — a network outage cannot lock users out of password changes. `checkHibp` and `checkBlacklist` are independent; you typically want both on.
 
 ## Weak Password Feedback
 
@@ -86,10 +104,14 @@ mutation {
 - `MISSING_SPECIAL`
 - `INVALID_PATTERN`
 - `BLACKLISTED`
+- `COMPROMISED` *(since 2.2)* — password found in the HIBP corpus
 
 ## Best Practices
 
 - Enforce a mix of character types for better entropy.
 - Enable `checkBlacklist` to avoid trivial passwords.
+- Enable `checkHibp` to also block passwords known from public breaches.
 - Use `pattern` if you require a specific password structure.
+
+See [anti-abuse](./anti-abuse.md) for the broader picture of how password policy interacts with rate limits, captcha, and enumeration protection.
 

@@ -1,0 +1,144 @@
+---
+title: Audit log
+---
+
+Every authentication-relevant action and — since 2.2 — every administrative tenant mutation is recorded in the `person_auth_log` table. The log is a tamper-evident, append-only trail of who did what, when, from which client, and (where applicable) what they changed.
+
+:::note Available since 2.2
+`target_person_id` and `event_data` columns and most admin-side event types were introduced in **engine 2.2**. The login/password/IDP events have been recorded since 1.x.
+:::
+
+## What ends up in the log
+
+Every entry carries:
+
+| Column | Meaning |
+|---|---|
+| `type` | One of the `auth_log_type` enum values (see table below) |
+| `success` | Whether the action succeeded; failures are recorded too |
+| `created_at` | Timestamp |
+| `person_id` | The actor's person (if the actor was a person, not a system token) |
+| `identity_id` | The actor's identity |
+| `target_person_id` | The subject of the action when different from the actor (e.g. force sign-out, role grant, membership change) |
+| `client_ip` | The effective client IP (after [trust-forwarded-info](./proxy-trust.md) is applied) |
+| `user_agent` | The effective client User-Agent |
+| `person_input_identifier` | Free-form input string (the email submitted on a failed login, etc.) |
+| `error_code` | The `code` returned to the caller on failure |
+| `metadata` | JSONB — forensic context (forwarder IP/UA, `sessionId`, `reason`, …) |
+| `event_data` | JSONB — domain payload: `{before, after}` snapshots, creation snapshots, redacted inputs |
+
+## Event types
+
+### Authentication events
+
+| Type | When |
+|---|---|
+| `login` | `signIn` (password) |
+| `create_session_token` | `createSessionToken` (admin impersonation) |
+| `idp_login` | `signInIDP` |
+| `passwordless_login_init` | `initSignInPasswordless` |
+| `passwordless_login_exchange` | `activatePasswordlessOtp` |
+| `passwordless_login` | `signInPasswordless` |
+| `password_reset_init` | `createResetPasswordRequest` |
+| `password_reset` | `resetPassword` |
+| `password_change` | `changePassword`, `changeMyPassword` |
+| `email_change` | `changeProfile`, `changeMyProfile` (email field) |
+| `2fa_enable`, `2fa_disable` | `confirmOtp`, `disableOtp` |
+
+### Session events (since 2.2)
+
+| Type | When | `target_person_id` | `event_data` / `metadata` |
+|---|---|---|---|
+| `session_revoked_by_user` | `revokeSession` | — | `metadata.sessionId` |
+| `forced_sign_out` | `forceSignOutPerson` | target person | `metadata.reason` (if supplied) |
+| `person_disable` | `disablePerson` | target person | — |
+
+### Authorization changes (since 2.2)
+
+| Type | When | `event_data` |
+|---|---|---|
+| `global_role_grant` | `addGlobalIdentityRoles` (success) | `{before: {roles}, after: {roles}}` |
+| `global_role_revoke` | `removeGlobalIdentityRoles` (success) | `{before: {roles}, after: {roles}}` |
+| `project_membership_create` | `addProjectMember` (success) | `{projectId, identityId, before: [], after: [{role, variables}]}` |
+| `project_membership_update` | `updateProjectMember` (success) | `{projectId, identityId, before, after}` |
+| `project_membership_remove` | `removeProjectMember` (success) | `{projectId, identityId, before, after: []}` |
+
+`target_person_id` is resolved from the affected identity, so even when the actor is acting on someone else's identity the trail points at the right person.
+
+### Administrative events (since 2.2)
+
+| Type | When | `event_data` |
+|---|---|---|
+| `api_key_create` | `createApiKey`, `createGlobalApiKey` | `{apiKeyId, identityId, description, memberships?, roles?}` — never the token or hash |
+| `api_key_disable` | `disableApiKey` | `{apiKeyId}` |
+| `idp_create` | `addIDP` | `{identityProvider, type, configurationKeys, options}` — only the *key names* of the configuration are stored; values (client secrets, OIDC URLs) are never persisted |
+| `idp_update` | `updateIDP` | `{before, after}` with configuration collapsed the same way |
+| `idp_disable`, `idp_enable` | `disableIDP`, `enableIDP` | `{identityProvider}` |
+| `project_create` | `createProject` | `{projectSlug, name}` |
+| `project_update` | `updateProject` | `{before, after}` |
+| `project_secret_change` | `setProjectSecret` | `{projectSlug, key}` — only the secret name, never the value |
+| `mail_template_change` | `addMailTemplate`, `removeMailTemplate` | `{action: 'add' \| 'remove', type, projectSlug?, variant?}` |
+| `tenant_config_change` | `configure` | `{input}` — full ConfigInput with `captcha.secret` redacted to `***` |
+| `person_invite` | `invite`, `unmanagedInvite` | `{projectSlug, email, isNew, memberships}` |
+
+## Reading the log
+
+### GraphQL
+
+The tenant API exposes the log via `Query.authLog`. Access requires the `system:viewAuthLog` permission — by default only `SUPER_ADMIN` has it (via the wildcard ALL-resource/ALL-privilege grant). Page size is capped server-side (default 100, max 500); `hasMore` indicates a further page exists.
+
+```graphql
+query AdminActionsAgainstPerson($target: String!, $after: DateTime!) {
+  authLog(
+    limit: 100,
+    filter: { targetPersonId: $target, createdAfter: $after }
+  ) {
+    hasMore
+    entries {
+      id
+      createdAt
+      type
+      success
+      invokedByIdentityId
+      eventData
+      metadata
+    }
+  }
+}
+```
+
+In Contember Cloud the same data drives the dashboard view.
+
+#### `AuthLogFilter` fields
+
+All fields are AND-combined; omitted fields are unconstrained.
+
+| Field | Notes |
+|---|---|
+| `types` | OR-combined list of `auth_log_type` values. |
+| `success` | Filter to successful or failed events only. |
+| `invokedByIdentityId` | Actor identity. |
+| `personId` | Actor's person. |
+| `targetPersonId` | Subject of the action — for force sign-out, role grant, membership change, etc. |
+| `personInputIdentifier` | The free-form identifier submitted by the caller (usually the email on a failed `signIn` / `signUp`). Useful for tracking probe attempts against a specific email that does not exist in `person`. |
+| `createdAfter` | Inclusive lower bound (`created_at >= createdAfter`). |
+| `createdBefore` | Exclusive upper bound (`created_at < createdBefore`). |
+
+### Direct SQL
+
+You can also query `person_auth_log` directly via the tenant database — useful for ad-hoc analytics that don't map cleanly onto the `AuthLogFilter` input:
+
+```sql
+SELECT created_at, type, identity_id, success, event_data
+FROM person_auth_log
+WHERE target_person_id = $1
+  AND created_at > now() - interval '30 days'
+ORDER BY created_at DESC;
+```
+
+## Logging conventions
+
+- Both success and failure are recorded for authentication events. The success flag distinguishes them.
+- Admin events are recorded only on success — a denied permission check throws before the action runs, so there is nothing to audit at the resolver level (the permission failure is observable from the HTTP error response itself).
+- Secret-bearing inputs are redacted before they hit the log: captcha secret becomes `***`, IDP configuration is collapsed to a sorted list of keys, project secrets log only their key name, API keys log only their id and identity.
+- The forwarder's socket IP/UA are preserved in `metadata.forwarderIp` / `metadata.forwarderUserAgent` when [trust-forwarded-info](./proxy-trust.md) is in effect, so the trail still has a path back to the proxy.

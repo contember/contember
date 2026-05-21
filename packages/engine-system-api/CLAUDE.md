@@ -17,6 +17,16 @@ Mutations: `migrate` (+ dev-only: `truncate`, `forceMigrate`, `migrationModify`,
 
 Migration error codes: `MUST_FOLLOW_LATEST`, `ALREADY_EXECUTED`, `INVALID_FORMAT`, `INVALID_SCHEMA`, `MIGRATION_FAILED`, `CONTENT_MIGRATION_FAILED`, `CONTENT_MIGRATION_NOT_SUCCESSFUL`
 
+## Migrations snapshot
+
+`src/migrations/snapshot.ts` is a generated `pg_dump` of the full-migration schema, used to bootstrap fresh DBs. Regenerate it whenever you add/change a migration — never hand-edit:
+
+```bash
+./scripts/create-migrations-snapshot/run.sh system
+```
+
+The system snapshot templates uuid generation via `${randomUuidFn}` (built-in `gen_random_uuid` on modern PG), and the script drops the migration-provided `uuid_generate_v4` fallback function from the dump. See `engine-tenant-api/CLAUDE.md` → "Migrations & snapshot" for the full workflow and verification steps.
+
 ## Database Tables (system schema)
 
 - `schema_migration` — executed migrations registry

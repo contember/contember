@@ -31,6 +31,10 @@ export interface Test {
 	return: object
 	sentMails?: ExpectedMessage[]
 	expectedAuthLog?: AuthLogService.LogArgs
+	callerTrustForwardedInfo?: boolean
+	httpInfo?: { ip?: string; userAgent?: string }
+	/** Override individual providers (e.g. a working `decrypt` to enable captcha). */
+	providers?: Partial<Providers>
 }
 
 export const createUuidGenerator = () => {
@@ -79,6 +83,7 @@ export const executeTenantTest = async (test: Test) => {
 			throw new Error('not supported')
 		},
 		hash: value => Buffer.from(value.toString()),
+		...test.providers,
 	}
 	const projectInitializer = {
 		initializeProject: () => {
@@ -115,6 +120,7 @@ export const executeTenantTest = async (test: Test) => {
 				projectSchemaResolver,
 			),
 			authenticatedApiKeyId,
+			test.callerTrustForwardedInfo ?? false,
 		),
 		logger: createLogger(new JsonStreamLoggerHandler(process.stderr)),
 		logAuthAction: async args => {
@@ -126,6 +132,7 @@ export const executeTenantTest = async (test: Test) => {
 			test.expectedAuthLog = undefined
 		},
 		db: databaseContext,
+		httpInfo: { ip: test.httpInfo?.ip ?? '', userAgent: test.httpInfo?.userAgent },
 	}
 
 	const schema = makeExecutableSchema({

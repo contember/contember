@@ -1,6 +1,7 @@
 export * from './apiKey'
 export * from './configuration'
 export * from './person'
+export * from './rateLimit'
 export * from './Command'
 export * from './CommandBus'
 export * from './identity'

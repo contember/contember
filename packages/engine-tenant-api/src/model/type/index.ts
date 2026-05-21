@@ -1,4 +1,5 @@
 export * from './ApiKey'
+export * from './Config'
 export * from './IdentityProvider'
 export * from './Project'
 export * from './Variables'

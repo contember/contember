@@ -7,7 +7,15 @@ import {
 } from '../../../schema'
 import { GraphQLResolveInfo } from 'graphql'
 import { TenantResolverContext } from '../../TenantResolverContext'
-import { ConfigurationQuery, PasswordResetManager, PermissionActions, PermissionContextFactory, PersonQuery } from '../../../model'
+import {
+	CaptchaValidator,
+	ConfigurationQuery,
+	PasswordResetManager,
+	PermissionActions,
+	PermissionContextFactory,
+	PersonQuery,
+	RateLimiter,
+} from '../../../model'
 import { createErrorResponse } from '../../errorUtils'
 import { ResponseError, ResponseOk } from '../../../model/utils/Response'
 
@@ -15,6 +23,8 @@ export class ResetPasswordMutationResolver implements MutationResolvers {
 	constructor(
 		private readonly passwordResetManager: PasswordResetManager,
 		private readonly permissionContextFactory: PermissionContextFactory,
+		private readonly captchaValidator: CaptchaValidator,
+		private readonly rateLimiter: RateLimiter,
 	) {}
 
 	async createResetPasswordRequest(
@@ -27,6 +37,26 @@ export class ResetPasswordMutationResolver implements MutationResolvers {
 			action: PermissionActions.PERSON_RESET_PASSWORD,
 			message: 'You are not allowed to initialize reset password request',
 		})
+
+		const configuration = await context.db.queryHandler.fetch(new ConfigurationQuery(context.db.providers))
+
+		const rl = await this.rateLimiter.consume(context.db, 'password_reset_per_ip', context.httpInfo.ip, configuration)
+		if (!rl.ok) {
+			return createErrorResponse('RATE_LIMIT_EXCEEDED', `Too many password-reset requests. Retry after ${rl.retryAfterSeconds}s.`)
+		}
+
+		const captchaConfig = this.captchaValidator.extractConfig(configuration)
+		if (this.captchaValidator.isEnabled(captchaConfig)) {
+			const captcha = await this.captchaValidator.verify({
+				config: captchaConfig,
+				token: args.captchaToken ?? undefined,
+				remoteIp: context.httpInfo.ip,
+			})
+			if (!captcha.ok) {
+				return createErrorResponse('INVALID_CAPTCHA', `Captcha verification failed: ${captcha.reason}`)
+			}
+		}
+
 		const person = await context.db.queryHandler.fetch(PersonQuery.byEmail(args.email))
 		if (!person) {
 			const responseError = new ResponseError('PERSON_NOT_FOUND', `Person with email ${args.email} was not found.`)
@@ -36,7 +66,6 @@ export class ResetPasswordMutationResolver implements MutationResolvers {
 				personInput: args.email,
 			})
 
-			const configuration = await context.db.queryHandler.fetch(new ConfigurationQuery())
 			if (!configuration.login.revealUserExists) {
 				// If the user does not exist, we do not want to leak this information
 				return { ok: true, errors: [] }

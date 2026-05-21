@@ -3,13 +3,15 @@ import { DatabaseContext, PermissionContext, PermissionContextFactory } from '..
 import { Logger } from '@contember/logger'
 import { AuthLogService } from '../model/service/AuthLogService'
 
-export const createResolverContext = (permissionContext: PermissionContext, apiKeyId: string) => {
+export const createResolverContext = (permissionContext: PermissionContext, apiKeyId: string, trustForwardedInfo = false) => {
 	return {
 		apiKeyId: apiKeyId,
+		trustForwardedInfo,
 		permissionContext,
 		identity: permissionContext.identity,
 		isAllowed: permissionContext.isAllowed.bind(permissionContext),
 		requireAccess: permissionContext.requireAccess.bind(permissionContext),
+		httpInfo: { ip: '' },
 	}
 }
 
@@ -20,8 +22,8 @@ export class TenantResolverContextFactory {
 	) {}
 
 	public create(
-		authContext: { apiKeyId: string; identityId: string; roles: string[] },
-		httpInfo: { ip: string; userAgent?: string },
+		authContext: { apiKeyId: string; identityId: string; roles: string[]; trustForwardedInfo?: boolean },
+		httpInfo: { ip: string; userAgent?: string; forwarderIp?: string; forwarderUserAgent?: string },
 		db: DatabaseContext,
 		logger: Logger,
 	): TenantResolverContext {
@@ -30,13 +32,19 @@ export class TenantResolverContextFactory {
 			roles: authContext.roles,
 		})
 		return {
-			...createResolverContext(permissionContext, authContext.apiKeyId),
+			...createResolverContext(permissionContext, authContext.apiKeyId, authContext.trustForwardedInfo ?? false),
 			logAuthAction: async data => {
 				await this.authLogService.logAuthAction(db, {
 					identityId: authContext.identityId,
 					userAgent: httpInfo.userAgent,
 					clientIp: httpInfo.ip,
+					forwarderIp: httpInfo.forwarderIp,
+					forwarderUserAgent: httpInfo.forwarderUserAgent,
 				}, data)
+			},
+			httpInfo: {
+				ip: httpInfo.ip,
+				userAgent: httpInfo.userAgent,
 			},
 			db,
 			logger,

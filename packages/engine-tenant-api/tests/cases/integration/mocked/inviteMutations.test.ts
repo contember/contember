@@ -76,6 +76,23 @@ test('invite a new person', async () => {
 				},
 			},
 		},
+		expectedAuthLog: {
+			type: 'person_invite',
+			response: { ok: true, result: null },
+			targetPersonId: personId,
+			personInput: email,
+			eventData: {
+				projectSlug,
+				isNew: true,
+				unmanaged: false,
+				memberships: [
+					{
+						role: 'editor',
+						variables: [{ name: 'language', values: [languageId] }],
+					},
+				],
+			},
+		},
 	})
 })
 
@@ -147,6 +164,23 @@ test('invite a new person with password reset', async () => {
 						},
 					},
 				},
+			},
+		},
+		expectedAuthLog: {
+			type: 'person_invite',
+			response: { ok: true, result: null },
+			targetPersonId: personId,
+			personInput: email,
+			eventData: {
+				projectSlug,
+				isNew: true,
+				unmanaged: false,
+				memberships: [
+					{
+						role: 'editor',
+						variables: [{ name: 'language', values: [languageId] }],
+					},
+				],
 			},
 		},
 	})

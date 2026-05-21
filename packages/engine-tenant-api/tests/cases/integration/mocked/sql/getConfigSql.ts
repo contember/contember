@@ -1,6 +1,6 @@
 import { ExpectedQuery } from '@contember/database-tester'
 import PostgresInterval from 'postgres-interval'
-export const getConfigSql = (): ExpectedQuery => ({
+export const getConfigSql = (overrides: Record<string, unknown> = {}): ExpectedQuery => ({
 	sql: `select *  from "tenant"."config"`,
 	parameters: [],
 	response: {
@@ -17,12 +17,27 @@ export const getConfigSql = (): ExpectedQuery => ({
 				password_require_special: 0,
 				password_pattern: null,
 				password_check_blacklist: true,
+				password_check_hibp: false,
 				login_base_backoff: PostgresInterval('00:00:01'),
 				login_max_backoff: PostgresInterval('00:01:00'),
 				login_attempt_window: PostgresInterval('00:05:00'),
 				login_reveal_user_exits: true,
+				login_reveal_login_method: true,
 				login_default_token_expiration: PostgresInterval('00:30:00'),
 				login_max_token_expiration: PostgresInterval('12:00:00'),
+				captcha_provider: null,
+				captcha_secret: null,
+				captcha_secret_version: null,
+				captcha_threshold: null,
+				rate_limit_sign_up_per_ip_limit: 0,
+				rate_limit_sign_up_per_ip_window: PostgresInterval('01:00:00'),
+				rate_limit_login_per_ip_limit: 0,
+				rate_limit_login_per_ip_window: PostgresInterval('01:00:00'),
+				rate_limit_password_reset_per_ip_limit: 0,
+				rate_limit_password_reset_per_ip_window: PostgresInterval('01:00:00'),
+				rate_limit_passwordless_init_per_ip_limit: 0,
+				rate_limit_passwordless_init_per_ip_window: PostgresInterval('01:00:00'),
+				...overrides,
 			},
 		],
 	},

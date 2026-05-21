@@ -4,7 +4,7 @@ import { IDPHandlerRegistry, IDPResponse, IDPResponseError, IDPValidationError }
 import { Response, ResponseError, ResponseOk } from '../utils/Response'
 import { InitSignInIdpErrorCode, InitSignInIdpResult, SignInIdpErrorCode } from '../../schema'
 import { DatabaseContext } from '../utils'
-import { CreateIdentityCommand, CreatePersonCommand, CreatePersonIdentityProviderIdentifierCommand } from '../commands'
+import { ApiKeyRequestInfo, CreateIdentityCommand, CreatePersonCommand, CreatePersonIdentityProviderIdentifierCommand } from '../commands'
 import { TenantRole } from '../authorization'
 import { NoPassword } from '../dtos'
 import { IdentityProviderRow } from '../queries/idp/types'
@@ -21,6 +21,8 @@ class IDPSignInManager {
 		idpSlug: string,
 		responseData: unknown,
 		expiration?: number,
+		requestInfo?: ApiKeyRequestInfo,
+		trustForwardedInfo?: boolean,
 	): Promise<IDPSignInManager.SignInIDPResponse> {
 		return dbContext.transaction(async (db): Promise<IDPSignInManager.SignInIDPResponse> => {
 			const provider = await db.queryHandler.fetch(new IdentityProviderBySlugQuery(idpSlug))
@@ -76,7 +78,7 @@ class IDPSignInManager {
 				})
 			}
 
-			const sessionToken = await this.apiKeyManager.createSessionApiKey(db, personRow.identity_id, expiration)
+			const sessionToken = await this.apiKeyManager.createSessionApiKey(db, personRow.identity_id, expiration, requestInfo, trustForwardedInfo)
 			return new ResponseOk({
 				person: personRow,
 				token: sessionToken,

@@ -11,6 +11,8 @@ import { ApiKeyManager, isTokenHash, MembershipValidator, PermissionActions, Pro
 import { createMembershipValidationErrorResult } from '../../membershipUtils'
 import { createProjectNotFoundResponse } from '../../errorUtils'
 import { UserInputError } from '@contember/graphql-utils'
+import { ResponseOk } from '../../../model/utils/Response'
+import { Acl, JSONValue } from '@contember/schema'
 
 export class CreateApiKeyMutationResolver implements MutationResolvers {
 	constructor(
@@ -21,7 +23,7 @@ export class CreateApiKeyMutationResolver implements MutationResolvers {
 
 	async createApiKey(
 		parent: any,
-		{ projectSlug, memberships, description, tokenHash }: MutationCreateApiKeyArgs,
+		{ projectSlug, memberships, description, tokenHash, options }: MutationCreateApiKeyArgs,
 		context: TenantResolverContext,
 		info: GraphQLResolveInfo,
 	): Promise<CreateApiKeyResponse> {
@@ -47,7 +49,27 @@ export class CreateApiKeyMutationResolver implements MutationResolvers {
 			}
 		}
 
-		const result = await this.apiKeyManager.createProjectPermanentApiKey(context.db, project.id, memberships, description, tokenHash ?? undefined)
+		const result = await this.apiKeyManager.createProjectPermanentApiKey(
+			context.db,
+			project.id,
+			memberships,
+			description,
+			tokenHash ?? undefined,
+			options?.trustForwardedClientInfo === true,
+		)
+
+		await context.logAuthAction({
+			type: 'api_key_create',
+			response: new ResponseOk(null),
+			eventData: {
+				scope: 'project',
+				projectSlug: project.slug,
+				apiKeyId: result.result.apiKey.id,
+				identityId: result.result.identity.id,
+				description,
+				memberships: memberships.map(membershipToJson),
+			},
+		})
 
 		return {
 			ok: true,
@@ -60,7 +82,7 @@ export class CreateApiKeyMutationResolver implements MutationResolvers {
 
 	async createGlobalApiKey(
 		parent: any,
-		{ roles, description, tokenHash }: MutationCreateGlobalApiKeyArgs,
+		{ roles, description, tokenHash, options }: MutationCreateGlobalApiKeyArgs,
 		context: TenantResolverContext,
 		info: GraphQLResolveInfo,
 	): Promise<CreateApiKeyResponse> {
@@ -72,7 +94,26 @@ export class CreateApiKeyMutationResolver implements MutationResolvers {
 		if (typeof tokenHash === 'string' && !isTokenHash(tokenHash)) {
 			throw new UserInputError('Invalid format of tokenHash. Must be hex-encoded sha256.')
 		}
-		const result = await this.apiKeyManager.createGlobalPermanentApiKey(context.db, description, roles, tokenHash ?? undefined)
+		const result = await this.apiKeyManager.createGlobalPermanentApiKey(
+			context.db,
+			description,
+			roles,
+			tokenHash ?? undefined,
+			options?.trustForwardedClientInfo === true,
+		)
+
+		await context.logAuthAction({
+			type: 'api_key_create',
+			response: new ResponseOk(null),
+			eventData: {
+				scope: 'global',
+				apiKeyId: result.result.apiKey.id,
+				identityId: result.result.identity.id,
+				description,
+				roles: [...roles],
+			},
+		})
+
 		return {
 			ok: true,
 			errors: [],
@@ -82,3 +123,8 @@ export class CreateApiKeyMutationResolver implements MutationResolvers {
 		}
 	}
 }
+
+const membershipToJson = ({ role, variables }: Acl.Membership): JSONValue => ({
+	role,
+	variables: variables.map(({ name, values }) => ({ name, values: [...values] })),
+})

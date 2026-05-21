@@ -14,12 +14,12 @@ mutation {
     memberships: [
       {
         role: "editor",
-        variables: [{name: "language", values: ["en}]
+        variables: [{name: "language", values: ["en"]}]
       }
     ],
     options: {
-        mailVariant: "en_us",  # Optional
-        method: RESET_PASSWORD  # Recommended
+      mailVariant: "en_us",   # Optional
+      method: RESET_PASSWORD  # Recommended
     }
   ) {
     ok
@@ -45,3 +45,7 @@ By default, the invitation process auto-generates a password and sends it via em
 ### Customizing Email Templates
 
 You can specify a preferred email template variant by setting the `mailVariant` option, as outlined in the [mail templates](./mail-templates.md) section.
+
+### Audit
+
+*(since 2.2)* Every `invite` / `unmanagedInvite` call is recorded in the [audit log](./audit-log.md) as `person_invite` with `event_data` carrying `{projectSlug, email, isNew, memberships}`.

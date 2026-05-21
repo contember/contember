@@ -6,9 +6,11 @@ import {
 	ApiKeyManager,
 	ApiKeyService,
 	AppleProvider,
+	CaptchaValidator,
 	DatabaseContext,
 	EmailValidator,
 	FacebookProvider,
+	HCaptchaProvider,
 	Identity,
 	IdentityFactory,
 	IDPHandlerRegistry,
@@ -32,12 +34,16 @@ import {
 	ProjectSchemaResolver,
 	ProjectScopeFactory,
 	Providers,
+	RateLimiter,
+	RecaptchaV3Provider,
 	RolesManager,
 	SecretsManager,
 	SignInManager,
 	SignUpManager,
+	TurnstileProvider,
 	UserMailer,
 } from './model'
+import { HibpChecker, HttpHibpChecker, NoopHibpChecker } from './model/service/HibpChecker'
 import {
 	AddIDPMutationResolver,
 	AddProjectMemberMutationResolver,
@@ -78,10 +84,13 @@ import { IDPQueryResolver } from './resolvers/query/IDPQueryResolver'
 import { UpdateIDPMutationResolver } from './resolvers/mutation/idp/UpdateIDPMutationResolver'
 import { TenantCredentials, TenantMigrationsRunner } from './migrations'
 import { DisablePersonMutationResolver } from './resolvers/mutation/person/DisablePersonMutationResolver'
+import { ForceSignOutMutationResolver } from './resolvers/mutation/person/ForceSignOutMutationResolver'
+import { RevokeSessionMutationResolver } from './resolvers/mutation/person/RevokeSessionMutationResolver'
 import { MailTemplateQueryResolver } from './resolvers/query/MailTemplateQueryResolver'
 import { ConfigurationManager } from './model/service/ConfigurationManager'
 import { ConfigurationMutationResolver } from './resolvers/mutation/configuration/ConfigurationMutationResolver'
 import { ConfigurationQueryResolver } from './resolvers/query/ConfigurationQueryResolver'
+import { AuthLogQueryResolver } from './resolvers/query/AuthLogQueryResolver'
 import { PasswordlessMutationResolver } from './resolvers/mutation/person/PasswordlessMutationResolver'
 import { PasswordlessSignInManager } from './model/service/PasswordlessSignInManager'
 import { TogglePasswordlessMutationResolver } from './resolvers/mutation/person/TogglePasswordlessMutationResolver'
@@ -152,8 +161,20 @@ export class TenantContainerFactory {
 			.addService('apiKeyService', () => new ApiKeyService())
 			.addService('apiKeyManager', ({ apiKeyService }) => new ApiKeyManager(apiKeyService))
 			.addService('emailValidator', () => new EmailValidator())
-			.addService('passwordStrengthValidator', () => new PasswordStrengthValidator())
-			.addService('signUpManager', ({ emailValidator, passwordStrengthValidator }) => new SignUpManager(emailValidator, passwordStrengthValidator))
+			.addService('hibpChecker', (): HibpChecker => new HttpHibpChecker())
+			.addService('noopHibpChecker', (): HibpChecker => new NoopHibpChecker())
+			.addService('passwordStrengthValidator', ({ hibpChecker }) => new PasswordStrengthValidator(hibpChecker))
+			.addService('captchaValidator', () =>
+				new CaptchaValidator({
+					turnstile: new TurnstileProvider(),
+					hcaptcha: new HCaptchaProvider(),
+					recaptchaV3: new RecaptchaV3Provider(),
+				}))
+			.addService('rateLimiter', ({ providers }) => new RateLimiter(providers))
+			.addService(
+				'signUpManager',
+				({ emailValidator, passwordStrengthValidator }) => new SignUpManager(emailValidator, passwordStrengthValidator),
+			)
 			.addService('passwordChangeManager', ({ providers, passwordStrengthValidator }) => new PasswordChangeManager(providers, passwordStrengthValidator))
 			.addService('projectMemberManager', () => new ProjectMemberManager())
 			.addService('identityFactory', ({ projectMemberManager }) => new IdentityFactory(projectMemberManager))
@@ -215,17 +236,22 @@ export class TenantContainerFactory {
 				({ projectManager, projectMemberManager }) => new ProjectMembersQueryResolver(projectManager, projectMemberManager),
 			)
 			.addService('mailTemplateQueryResolver', () => new MailTemplateQueryResolver())
-			.addService('signUpMutationResolver', ({ signUpManager, apiKeyManager }) => new SignUpMutationResolver(signUpManager, apiKeyManager))
+			.addService(
+				'signUpMutationResolver',
+				({ signUpManager, apiKeyManager, captchaValidator, rateLimiter }) =>
+					new SignUpMutationResolver(signUpManager, apiKeyManager, captchaValidator, rateLimiter),
+			)
 			.addService(
 				'signInMutationResolver',
-				({ signInManager, signInResponseFactory }) => new SignInMutationResolver(signInManager, signInResponseFactory),
+				({ signInManager, signInResponseFactory, rateLimiter }) => new SignInMutationResolver(signInManager, signInResponseFactory, rateLimiter),
 			)
 			.addService('signOutMutationResolver', ({ apiKeyManager }) => new SignOutMutationResolver(apiKeyManager))
 			.addService('changeProfileMutationResolver', ({ personManager }) => new ChangeProfileMutationResolver(personManager))
 			.addService('changePasswordMutationResolver', ({ passwordChangeManager }) => new ChangePasswordMutationResolver(passwordChangeManager))
 			.addService(
 				'resetPasswordMutationResolver',
-				({ passwordResetManager, permissionContextFactory }) => new ResetPasswordMutationResolver(passwordResetManager, permissionContextFactory),
+				({ passwordResetManager, permissionContextFactory, captchaValidator, rateLimiter }) =>
+					new ResetPasswordMutationResolver(passwordResetManager, permissionContextFactory, captchaValidator, rateLimiter),
 			)
 			.addService(
 				'inviteMutationResolver',
@@ -268,6 +294,14 @@ export class TenantContainerFactory {
 				'disablePersonMutationResolver',
 				({ personAccessManager, personManager }) => new DisablePersonMutationResolver(personAccessManager, personManager),
 			)
+			.addService(
+				'forceSignOutMutationResolver',
+				({ apiKeyManager, personManager, userMailer }) => new ForceSignOutMutationResolver(apiKeyManager, personManager, userMailer),
+			)
+			.addService(
+				'revokeSessionMutationResolver',
+				({ apiKeyManager }) => new RevokeSessionMutationResolver(apiKeyManager),
+			)
 			.addService('updateProjectMutationResolver', ({ projectManager }) => new UpdateProjectMutationResolver(projectManager))
 			.addService(
 				'setProjectSecretMutationResolver',
@@ -276,9 +310,11 @@ export class TenantContainerFactory {
 			.addService('identityGlobalRolesMutationResolver', ({ rolesManager }) => new IdentityGlobalRolesMutationResolver(rolesManager))
 			.addService('configurationMutationResolver', ({ configurationManager }) => new ConfigurationMutationResolver(configurationManager))
 			.addService('configurationQueryResolver', ({ configurationManager }) => new ConfigurationQueryResolver(configurationManager))
+			.addService('authLogQueryResolver', () => new AuthLogQueryResolver())
 			.addService(
 				'passwordlessMutationResolver',
-				({ passwordlessSignInManager, signInResponseFactory }) => new PasswordlessMutationResolver(passwordlessSignInManager, signInResponseFactory),
+				({ passwordlessSignInManager, signInResponseFactory, captchaValidator, rateLimiter }) =>
+					new PasswordlessMutationResolver(passwordlessSignInManager, signInResponseFactory, captchaValidator, rateLimiter),
 			)
 			.addService(
 				'togglePasswordlessMutationResolver',

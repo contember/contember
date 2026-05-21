@@ -6,6 +6,7 @@ import { getProjectBySlugSql } from './sql/getProjectBySlugSql'
 import { sqlTransaction } from './sql/sqlTransaction'
 import { getProjectMembershipSql } from './sql/getProjectMembershipSql'
 import { createMembershipSql } from './sql/createMembershipSql'
+import { getPersonsByIdentitySql } from './sql/getPersonsByIdentitySql'
 import { updateProjectMemberMutation } from './gql/updateProjectMember'
 import { test } from 'bun:test'
 
@@ -17,6 +18,7 @@ test('update project member', async () => {
 	const variableId = testUuid(2)
 	const languageId1 = testUuid(600)
 	const languageId2 = testUuid(500)
+	const personId = testUuid(7)
 	const role = 'editor'
 	const variableName = 'language'
 	await executeTenantTest({
@@ -35,6 +37,11 @@ test('update project member', async () => {
 				projectId: projectId,
 				membershipsResponse: [{ role, variables: [{ name: variableName, values: [languageId2] }] }],
 			}),
+			selectMembershipsSql({
+				identityId: identityId,
+				projectId: projectId,
+				membershipsResponse: [{ role, variables: [{ name: variableName, values: [languageId2] }] }],
+			}),
 			...sqlTransaction(
 				getProjectMembershipSql({ projectId, identityId }, true),
 				createMembershipSql({ identityId, projectId, membershipId, role }),
@@ -46,6 +53,15 @@ test('update project member', async () => {
 					id: variableId,
 				}),
 			),
+			selectMembershipsSql({
+				identityId,
+				projectId,
+				membershipsResponse: [{ role, variables: [{ name: variableName, values: [languageId1] }] }],
+			}),
+			getPersonsByIdentitySql({
+				identityIds: [identityId],
+				response: [{ personId, identityId, email: 'john@doe.com' }],
+			}),
 		],
 		return: {
 			data: {
@@ -53,6 +69,17 @@ test('update project member', async () => {
 					ok: true,
 					errors: [],
 				},
+			},
+		},
+		expectedAuthLog: {
+			type: 'project_membership_update',
+			response: { ok: true, result: null },
+			targetPersonId: personId,
+			eventData: {
+				projectId,
+				identityId,
+				before: [{ role, variables: [{ name: variableName, values: [languageId2] }] }],
+				after: [{ role, variables: [{ name: variableName, values: [languageId1] }] }],
 			},
 		},
 	})

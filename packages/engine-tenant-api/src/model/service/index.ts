@@ -1,4 +1,5 @@
 export * from './apiKey'
+export * from './captcha'
 export * from './idp'
 
 export * from './EmailValidator'
@@ -13,6 +14,7 @@ export * from './PasswordResetManager'
 export * from './PersonAccessManager'
 export * from './PersonManager'
 export * from './ProjectManager'
+export * from './RateLimiter'
 export * from './ProjectMemberManager'
 export * from './RolesManager'
 export * from './SecretsManager'

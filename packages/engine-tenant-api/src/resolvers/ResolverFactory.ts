@@ -24,12 +24,14 @@ import {
 } from './mutation'
 
 import { Resolvers } from '../schema'
-import { MeQueryResolver, PersonQueryResolver, ProjectMembersQueryResolver, ProjectQueryResolver } from './query'
+import { AuthLogQueryResolver, MeQueryResolver, PersonQueryResolver, ProjectMembersQueryResolver, ProjectQueryResolver } from './query'
 import { IdentityTypeResolver, ProjectTypeResolver } from './types'
 import { DateTimeType, IntervalType, JSONType } from '@contember/graphql-utils'
 import { IDPQueryResolver } from './query/IDPQueryResolver'
 import { UpdateIDPMutationResolver } from './mutation/idp/UpdateIDPMutationResolver'
 import { DisablePersonMutationResolver } from './mutation/person/DisablePersonMutationResolver'
+import { ForceSignOutMutationResolver } from './mutation/person/ForceSignOutMutationResolver'
+import { RevokeSessionMutationResolver } from './mutation/person/RevokeSessionMutationResolver'
 import { MailTemplateQueryResolver } from './query/MailTemplateQueryResolver'
 import { ConfigurationMutationResolver } from './mutation/configuration/ConfigurationMutationResolver'
 import { ConfigurationQueryResolver } from './query/ConfigurationQueryResolver'
@@ -60,6 +62,8 @@ class ResolverFactory {
 			passwordlessMutationResolver: PasswordlessMutationResolver
 
 			disablePersonMutationResolver: DisablePersonMutationResolver
+			forceSignOutMutationResolver: ForceSignOutMutationResolver
+			revokeSessionMutationResolver: RevokeSessionMutationResolver
 
 			inviteMutationResolver: InviteMutationResolver
 			addProjectMemberMutationResolver: AddProjectMemberMutationResolver
@@ -85,6 +89,8 @@ class ResolverFactory {
 			configurationMutationResolver: ConfigurationMutationResolver
 			configurationQueryResolver: ConfigurationQueryResolver
 
+			authLogQueryResolver: AuthLogQueryResolver
+
 			togglePasswordlessMutationResolver: TogglePasswordlessMutationResolver
 		},
 	) {}
@@ -99,6 +105,7 @@ class ResolverFactory {
 				person: this.resolvers.identityTypeResolver.person.bind(this.resolvers.identityTypeResolver),
 				roles: this.resolvers.identityTypeResolver.roles.bind(this.resolvers.identityTypeResolver),
 				permissions: this.resolvers.identityTypeResolver.permissions.bind(this.resolvers.identityTypeResolver),
+				sessions: this.resolvers.identityTypeResolver.sessions.bind(this.resolvers.identityTypeResolver),
 			},
 			Project: {
 				members: this.resolvers.projectTypeResolver.members.bind(this.resolvers.projectTypeResolver),
@@ -113,6 +120,7 @@ class ResolverFactory {
 				identityProviders: this.resolvers.idpQueryResolver.identityProviders.bind(this.resolvers.idpQueryResolver),
 				mailTemplates: this.resolvers.mailTemplateQueryResolver.mailTemplates.bind(this.resolvers.mailTemplateQueryResolver),
 				configuration: this.resolvers.configurationQueryResolver.configuration.bind(this.resolvers.configurationQueryResolver),
+				authLog: this.resolvers.authLogQueryResolver.authLog.bind(this.resolvers.authLogQueryResolver),
 				checkResetPasswordToken: () => {
 					throw new Error('not implemented')
 				},
@@ -139,6 +147,8 @@ class ResolverFactory {
 				enableIDP: this.resolvers.enableIdpMutationResolver.enableIDP.bind(this.resolvers.enableIdpMutationResolver),
 				updateIDP: this.resolvers.updateIdpMutationResolver.updateIDP.bind(this.resolvers.updateIdpMutationResolver),
 				disablePerson: this.resolvers.disablePersonMutationResolver.disablePerson.bind(this.resolvers.disablePersonMutationResolver),
+				forceSignOutPerson: this.resolvers.forceSignOutMutationResolver.forceSignOutPerson.bind(this.resolvers.forceSignOutMutationResolver),
+				revokeSession: this.resolvers.revokeSessionMutationResolver.revokeSession.bind(this.resolvers.revokeSessionMutationResolver),
 
 				signInPasswordless: this.resolvers.passwordlessMutationResolver.signInPasswordless.bind(this.resolvers.passwordlessMutationResolver),
 				initSignInPasswordless: this.resolvers.passwordlessMutationResolver.initSignInPasswordless.bind(this.resolvers.passwordlessMutationResolver),

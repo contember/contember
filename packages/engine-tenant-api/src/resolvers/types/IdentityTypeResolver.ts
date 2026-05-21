@@ -1,4 +1,4 @@
-import { Identity, IdentityGlobalPermissions, IdentityProjectRelation, IdentityResolvers, Maybe, Person } from '../../schema'
+import { Identity, IdentityGlobalPermissions, IdentityProjectRelation, IdentityResolvers, Maybe, Person, SessionInfo } from '../../schema'
 import {
 	IdentityQuery,
 	PermissionActions,
@@ -8,6 +8,7 @@ import {
 	ProjectManager,
 	ProjectMemberManager,
 } from '../../model'
+import { ApiKeySessionsByIdentityQuery } from '../../model/queries/apiKey'
 import { TenantResolverContext } from '../TenantResolverContext'
 import { notEmpty } from '../../utils/array'
 import { batchLoader } from '../../utils/batchQuery'
@@ -131,5 +132,44 @@ export class IdentityTypeResolver implements IdentityResolvers {
 			canCreateProject: await permissionsContext.isAllowed({ action: PermissionActions.PROJECT_CREATE }),
 			canDeployEntrypoint: await permissionsContext.isAllowed({ action: PermissionActions.ENTRYPOINT_DEPLOY }),
 		}
+	}
+
+	async sessions(
+		parent: { id: string; roles?: readonly string[] | undefined | null },
+		args: unknown,
+		context: TenantResolverContext,
+	): Promise<SessionInfo[]> {
+		// Self: always allowed. Other identities: gated by PERSON_VIEW_SESSIONS
+		// against the target's roles, so PROJECT_ADMIN can peek at members but
+		// not at SUPER_ADMIN sessions (projectAdminUseRolesVerifier rule).
+		// Return [] instead of throwing — listing many identities should not
+		// abort just because the viewer lacks visibility for one of them.
+		if (parent.id !== context.identity.id) {
+			const targetRoles = await this.roles(parent, {}, context)
+			if (targetRoles === null) {
+				return []
+			}
+			const canView = await context.permissionContext.isAllowed({
+				action: PermissionActions.PERSON_VIEW_SESSIONS(targetRoles),
+			})
+			if (!canView) {
+				return []
+			}
+		}
+		const rows = await context.db.queryHandler.fetch(
+			new ApiKeySessionsByIdentityQuery(parent.id, { now: context.db.providers.now() }),
+		)
+		return rows.map(row => ({
+			id: row.id,
+			createdAt: row.created_at,
+			expiresAt: row.expires_at,
+			lastUsedAt: row.last_used_at,
+			lastIp: row.last_ip,
+			lastUserAgent: row.last_user_agent,
+			createdIp: row.created_ip,
+			createdUserAgent: row.created_user_agent,
+			isCurrent: row.id === context.apiKeyId,
+			trustForwardedClientInfo: row.trust_forwarded_info,
+		}))
 	}
 }

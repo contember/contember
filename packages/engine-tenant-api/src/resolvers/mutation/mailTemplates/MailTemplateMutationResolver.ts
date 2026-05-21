@@ -9,6 +9,7 @@ import { TenantResolverContext } from '../../TenantResolverContext'
 import { MailTemplateManager, mailTypeFromSchemaToDb, PermissionActions, ProjectManager } from '../../../model'
 import { createErrorResponse, createProjectNotFoundResponse } from '../../errorUtils'
 import { validateEmail } from '../../../model/utils/email'
+import { ResponseOk } from '../../../model/utils/Response'
 
 export class MailTemplateMutationResolver implements MutationResolvers {
 	constructor(
@@ -44,6 +45,17 @@ export class MailTemplateMutationResolver implements MutationResolvers {
 			replyTo: replyTo?.trim() || null,
 		})
 
+		await context.logAuthAction({
+			type: 'mail_template_change',
+			response: new ResponseOk(null),
+			eventData: {
+				action: 'add',
+				projectSlug: project?.slug ?? null,
+				mailType: type,
+				variant: variant || '',
+			},
+		})
+
 		return {
 			ok: true,
 			errors: [],
@@ -73,6 +85,17 @@ export class MailTemplateMutationResolver implements MutationResolvers {
 		if (!removed) {
 			return createErrorResponse('PROJECT_NOT_FOUND', 'Mail template not found')
 		}
+
+		await context.logAuthAction({
+			type: 'mail_template_change',
+			response: new ResponseOk(null),
+			eventData: {
+				action: 'remove',
+				projectSlug: project?.slug ?? null,
+				mailType: type,
+				variant: variant || '',
+			},
+		})
 
 		return {
 			ok: true,

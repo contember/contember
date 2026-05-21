@@ -3,6 +3,7 @@ import { TenantResolverContext } from '../../TenantResolverContext'
 import { MembershipValidator, PermissionActions, ProjectManager, ProjectMemberManager } from '../../../model'
 import { createMembershipValidationErrorResult } from '../../membershipUtils'
 import { createErrorResponse, createProjectNotFoundResponse } from '../../errorUtils'
+import { logProjectMembershipChange } from './audit'
 
 export class AddProjectMemberMutationResolver implements MutationResolvers {
 	constructor(
@@ -40,6 +41,8 @@ export class AddProjectMemberMutationResolver implements MutationResolvers {
 		if (!result.ok) {
 			return createErrorResponse(result.error, result.errorMessage)
 		}
+
+		await logProjectMembershipChange(context, 'project_membership_create', project.id, identityId, [])
 
 		return {
 			ok: true,

@@ -71,5 +71,22 @@ test('create api key', async () => {
 				},
 			},
 		},
+		expectedAuthLog: {
+			type: 'api_key_create',
+			response: { ok: true, result: null },
+			eventData: {
+				scope: 'project',
+				projectSlug,
+				apiKeyId,
+				identityId,
+				description: 'test key',
+				memberships: [
+					{
+						role,
+						variables: [{ name: 'language', values: [languageId] }],
+					},
+				],
+			},
+		},
 	})
 })

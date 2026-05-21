@@ -5,17 +5,16 @@ title: Mail templates
 Mail templates in Contember enable tailored communication for emails dispatched by the Tenant API. Via the `/tenant` path and with either the `SUPER_ADMIN` or `PROJECT_ADMIN` global roles, users can create and manage these templates seamlessly.
 
 ## Mail Types
-Contember provides three primary mail types, each serving specific communication needs:
 
-- **NEW_USER_INVITED**: This mail type welcomes newly invited users. Often, it's the first touchpoint a new user has with the platform, typically containing details for setting up their account or accessing the platform's resources.
+| Type | Sent when | Available since |
+|---|---|---|
+| `NEW_USER_INVITED` | A new person is invited via `invite` with method `CREATE_PASSWORD` or `RESET_PASSWORD`. First touchpoint, typically links to account setup. | 1.x |
+| `EXISTING_USER_INVITED` | A person that already exists is added to a new project via `invite`. Notification only. | 1.x |
+| `RESET_PASSWORD_REQUEST` | `createResetPasswordRequest` is called for an existing person. Carries the reset token / link. | 1.x |
+| `PASSWORDLESS_SIGN_IN` | `initSignInPasswordless` succeeds. Carries the magic link and OTP info. | 1.x |
+| `FORCED_SIGN_OUT` | An admin force-signs-out the person via `forceSignOutPerson`. Informational notice that all sessions were ended. | 2.2 |
 
-- **EXISTING_USER_INVITED**: Deployed when inviting an already registered user to a new project. It's a notification template, guiding users to the new project or functionalities they've been given access to.
-
-- **RESET_PASSWORD_REQUEST**: For situations when a user forgets their password. This email directs users to reset their password, ensuring they regain access to their account.
-- **PASSWORDLESS_SIGN_IN**: For passwordless authentication, this email contains a magic link for users to sign in securely without a password.
-
-Each of these mail types comes with a straightforward default template. Additionally, in Contember Cloud setups, enhanced custom templates are present, which users can modify or overwrite based on their preferences.
-Of course! I'll include more detailed information about the GraphQL mutations by elaborating on the structure of the input.
+Each type ships with a default template. In Contember Cloud setups, enhanced custom templates are pre-installed and can be modified or overwritten.
 
 ## Managing Templates via GraphQL
 
@@ -29,8 +28,9 @@ Of course! I'll include more detailed information about the GraphQL mutations by
            subject: "Welcome to Our Platform",
            content: "Hello {{email}}, get started with our platform!",
            projectSlug: "YourProjectSlug",     # Optional: for project-specific templates
-           variant: "en-US",                  # Optional: for different variants like locales
-           useLayout: true                    # Optional: set to false for custom designs
+           variant: "en-US",                   # Optional: for different variants like locales
+           useLayout: true,                    # Optional: set to false for custom designs
+           replyTo: "support@example.com"      # Optional: Reply-To header
        }) {
            ok,
            error {
@@ -41,12 +41,13 @@ Of course! I'll include more detailed information about the GraphQL mutations by
    }
    ```
   Input breakdown:
-- `type`: The type of the mail, i.e., `NEW_USER_INVITED`, `EXISTING_USER_INVITED`, or `RESET_PASSWORD_REQUEST`.
+- `type`: The mail type — one of the values from the table above (`NEW_USER_INVITED`, `EXISTING_USER_INVITED`, `RESET_PASSWORD_REQUEST`, `PASSWORDLESS_SIGN_IN`, `FORCED_SIGN_OUT`).
 - `subject`: The email's subject.
 - `content`: The email's main content, with Mustache variables for dynamic information.
 - `projectSlug`: To specify a particular project.
 - `variant`: For different template variants, such as language or design.
 - `useLayout`: A flag to determine whether to use the default layout.
+- `replyTo`: Optional. Sets the `Reply-To` header on the outgoing mail. Omit (or pass `null`) to leave the default.
 
 - **Removing a Mail Template**:  
 To delete a custom template, use the `removeMailTemplate` mutation. When removed, the system defaults back to the original template.
@@ -109,6 +110,12 @@ Contember uses Mustache for dynamic content in templates. Here are the variables
 - `{{projectSlug}}`: Project identifier (if available).
 - `{{url}}`: URL for passwordless sign-in.
 
+- **FORCED_SIGN_OUT** *(since 2.2)*:
+- `{{email}}`: Recipient's email.
+- `{{reason}}`: Optional reason supplied by the admin to `forceSignOutPerson`. Empty when no reason was provided.
+
 :::note
 `projectSlug` is available since Engine 1.3+
 :::
+
+Any `addMailTemplate` / `removeMailTemplate` call is recorded as a `mail_template_change` entry in the [audit log](./audit-log.md).

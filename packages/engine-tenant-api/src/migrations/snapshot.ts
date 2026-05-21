@@ -17,7 +17,26 @@ CREATE TYPE "auth_log_type" AS ENUM (
     'passwordless_login_init',
     'passwordless_login_exchange',
     'passwordless_login',
-    'person_disable'
+    'person_disable',
+    'session_revoked_by_user',
+    'forced_sign_out',
+    'global_role_grant',
+    'global_role_revoke',
+    'project_membership_create',
+    'project_membership_update',
+    'project_membership_remove',
+    'api_key_create',
+    'api_key_disable',
+    'idp_create',
+    'idp_update',
+    'idp_disable',
+    'idp_enable',
+    'project_create',
+    'project_update',
+    'project_secret_change',
+    'mail_template_change',
+    'tenant_config_change',
+    'person_invite'
 );
 CREATE TYPE "config_policy" AS ENUM (
     'always',
@@ -66,7 +85,13 @@ CREATE TABLE "api_key" (
     "expires_at" timestamp with time zone,
     "created_at" timestamp with time zone NOT NULL,
     "expiration" integer,
-    "disabled_at" timestamp with time zone
+    "disabled_at" timestamp with time zone,
+    "last_ip" "inet",
+    "last_user_agent" "text",
+    "last_used_at" timestamp with time zone,
+    "created_ip" "inet",
+    "created_user_agent" "text",
+    "trust_forwarded_info" boolean DEFAULT false NOT NULL
 );
 CREATE TABLE "config" (
     "id" "config_singleton" DEFAULT 'singleton'::"config_singleton" NOT NULL,
@@ -85,7 +110,23 @@ CREATE TABLE "config" (
     "login_attempt_window" interval DEFAULT '00:05:00'::interval NOT NULL,
     "login_reveal_user_exits" boolean DEFAULT true NOT NULL,
     "login_default_token_expiration" interval DEFAULT '00:30:00'::interval NOT NULL,
-    "login_max_token_expiration" interval DEFAULT '6 mons'::interval
+    "login_max_token_expiration" interval DEFAULT '6 mons'::interval,
+    "password_check_hibp" boolean DEFAULT false NOT NULL,
+    "captcha_provider" "text",
+    "captcha_secret" "bytea",
+    "captcha_secret_version" integer,
+    "captcha_threshold" double precision,
+    "rate_limit_sign_up_per_ip_limit" integer DEFAULT 0 NOT NULL,
+    "rate_limit_sign_up_per_ip_window" interval DEFAULT '01:00:00'::interval NOT NULL,
+    "rate_limit_login_per_ip_limit" integer DEFAULT 0 NOT NULL,
+    "rate_limit_login_per_ip_window" interval DEFAULT '01:00:00'::interval NOT NULL,
+    "rate_limit_password_reset_per_ip_limit" integer DEFAULT 0 NOT NULL,
+    "rate_limit_password_reset_per_ip_window" interval DEFAULT '01:00:00'::interval NOT NULL,
+    "rate_limit_passwordless_init_per_ip_limit" integer DEFAULT 0 NOT NULL,
+    "rate_limit_passwordless_init_per_ip_window" interval DEFAULT '01:00:00'::interval NOT NULL,
+    "login_reveal_login_method" boolean DEFAULT true NOT NULL,
+    CONSTRAINT "config_captcha_complete" CHECK ((("captcha_provider" IS NULL) OR (("captcha_secret" IS NOT NULL) AND ("captcha_secret_version" IS NOT NULL)))),
+    CONSTRAINT "config_captcha_provider_check" CHECK ((("captcha_provider" IS NULL) OR ("captcha_provider" = ANY (ARRAY['turnstile'::"text", 'hcaptcha'::"text", 'recaptchaV3'::"text"]))))
 );
 CREATE TABLE "identity" (
     "id" "uuid" NOT NULL,
@@ -141,7 +182,9 @@ CREATE TABLE "person_auth_log" (
     "ip_address" "inet",
     "user_agent" "text",
     "identity_provider_id" "uuid",
-    "metadata" "jsonb"
+    "metadata" "jsonb",
+    "target_person_id" "uuid",
+    "event_data" "jsonb"
 );
 CREATE TABLE "person_identity_provider" (
     "id" "uuid" NOT NULL,
@@ -189,6 +232,12 @@ CREATE TABLE "project_secret" (
     "value" "bytea" NOT NULL,
     "version" smallint NOT NULL
 );
+CREATE TABLE "rate_limit_event" (
+    "id" "uuid" NOT NULL,
+    "scope" "text" NOT NULL,
+    "key_hash" "bytea" NOT NULL,
+    "occurred_at" timestamp with time zone DEFAULT "now"() NOT NULL
+);
 ALTER TABLE ONLY "api_key"
     ADD CONSTRAINT "api_key_id" PRIMARY KEY ("id");
 ALTER TABLE ONLY "config"
@@ -223,13 +272,17 @@ ALTER TABLE ONLY "project_membership_variable"
     ADD CONSTRAINT "project_membership_variable_unique" UNIQUE ("membership_id", "variable");
 ALTER TABLE ONLY "project_secret"
     ADD CONSTRAINT "project_secret_pkey" PRIMARY KEY ("id");
+ALTER TABLE ONLY "rate_limit_event"
+    ADD CONSTRAINT "rate_limit_event_pkey" PRIMARY KEY ("id");
 CREATE INDEX "api_key_identity_id" ON "api_key" USING "btree" ("identity_id");
 CREATE UNIQUE INDEX "api_key_token_hash" ON "api_key" USING "btree" ("token_hash");
 CREATE INDEX "identity_parent_id" ON "identity" USING "btree" ("parent_id");
 CREATE UNIQUE INDEX "mail_template_identifier" ON "mail_template" USING "btree" ("project_id", "mail_type", "variant") WHERE ("project_id" IS NOT NULL);
 CREATE UNIQUE INDEX "mail_template_identifier_global" ON "mail_template" USING "btree" ("mail_type", "variant") WHERE ("project_id" IS NULL);
 CREATE INDEX "mail_template_project_index" ON "mail_template" USING "btree" ("project_id");
-CREATE INDEX "person_auth_log_person_input_identifier_created_at_idx" ON "person_auth_log" USING "btree" ("person_input_identifier", "created_at" DESC);
+CREATE INDEX "person_auth_log_person_id_created_at_idx" ON "person_auth_log" USING "btree" ("person_id", "created_at" DESC);
+CREATE INDEX "person_auth_log_person_input_identifier_created_at_idx" ON "person_auth_log" USING "btree" ("person_input_identifier", "created_at" DESC) WHERE (("type" = 'login'::"auth_log_type") AND ("success" = false));
+CREATE INDEX "person_auth_log_target_person_id_created_at_idx" ON "person_auth_log" USING "btree" ("target_person_id", "created_at" DESC);
 CREATE INDEX "person_identity_id" ON "person" USING "btree" ("identity_id");
 CREATE UNIQUE INDEX "person_identity_provider_identifier" ON "person_identity_provider" USING "btree" ("identity_provider_id", "external_identifier");
 CREATE INDEX "person_identity_provider_person_id" ON "person_identity_provider" USING "btree" ("person_id");
@@ -240,6 +293,8 @@ CREATE UNIQUE INDEX "project_membership_unique" ON "project_membership" USING "b
 CREATE INDEX "project_secret_project_index" ON "project_secret" USING "btree" ("project_id");
 CREATE UNIQUE INDEX "project_secret_unique" ON "project_secret" USING "btree" ("project_id", "key");
 CREATE UNIQUE INDEX "project_slug" ON "project" USING "btree" ("slug");
+CREATE INDEX "rate_limit_event_lookup" ON "rate_limit_event" USING "btree" ("scope", "key_hash", "occurred_at" DESC);
+CREATE INDEX "rate_limit_event_occurred_at_brin" ON "rate_limit_event" USING "brin" ("occurred_at");
 CREATE TRIGGER "project_deleted" AFTER DELETE ON "project" FOR EACH ROW EXECUTE FUNCTION "project_deleted"();
 CREATE TRIGGER "project_secret_updated" AFTER INSERT OR DELETE OR UPDATE ON "project_secret" FOR EACH ROW EXECUTE FUNCTION "project_secret_updated"();
 CREATE TRIGGER "project_updated" BEFORE INSERT OR UPDATE OF "name", "slug", "config" ON "project" FOR EACH ROW EXECUTE FUNCTION "project_updated"();
@@ -257,6 +312,8 @@ ALTER TABLE ONLY "person_auth_log"
     ADD CONSTRAINT "person_auth_log_person_id_fkey" FOREIGN KEY ("person_id") REFERENCES "person"("id") ON DELETE SET NULL;
 ALTER TABLE ONLY "person_auth_log"
     ADD CONSTRAINT "person_auth_log_person_token_id_fkey" FOREIGN KEY ("person_token_id") REFERENCES "person_token"("id") ON DELETE SET NULL;
+ALTER TABLE ONLY "person_auth_log"
+    ADD CONSTRAINT "person_auth_log_target_person_id_fkey" FOREIGN KEY ("target_person_id") REFERENCES "person"("id") ON DELETE SET NULL;
 ALTER TABLE ONLY "person"
     ADD CONSTRAINT "person_identity_id_fkey" FOREIGN KEY ("identity_id") REFERENCES "identity"("id");
 ALTER TABLE ONLY "person_identity_provider"

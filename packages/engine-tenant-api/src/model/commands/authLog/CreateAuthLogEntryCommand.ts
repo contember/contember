@@ -26,6 +26,8 @@ export class CreateAuthLogEntryCommand implements Command<void> {
 				user_agent: this.data.userAgent,
 				identity_provider_id: this.data.identityProviderId,
 				metadata: this.data.metadata ?? {},
+				target_person_id: this.data.targetPersonId,
+				event_data: this.data.eventData,
 			})
 			.execute(db)
 	}
@@ -45,5 +47,7 @@ namespace CreateAuthLogEntryCommand {
 		userAgent?: string
 		identityProviderId?: string
 		metadata?: JSONValue
+		targetPersonId?: string
+		eventData?: JSONValue
 	}
 }

@@ -3,6 +3,7 @@ import NewUserInvited from './templates/NewUserInvited.mustache'
 import ExistingUserInvited from './templates/ExistingUserInvited.mustache'
 import PasswordReset from './templates/PasswordReset.mustache'
 import PasswordlessSignIn from './templates/PasswordlessSignIn.mustache'
+import ForcedSignOut from './templates/ForcedSignOut.mustache'
 import { MailTemplateData, MailTemplateIdentifier, MailType } from './type'
 import { MailTemplateQuery } from '../queries'
 import Layout from './templates/Layout.mustache'
@@ -59,6 +60,20 @@ export class UserMailer {
 		const template = (await this.getCustomTemplate(dbContext, templateId)) || {
 			subject: 'Password reset',
 			content: PasswordReset,
+			replyTo: null,
+		}
+		await this.sendMail(templateId, template, mailArguments)
+	}
+
+	async sendForcedSignOutEmail(
+		dbContext: DatabaseContext,
+		mailArguments: { email: string; reason: string | null },
+		customMailOptions: { projectId: string | null; variant: string },
+	): Promise<void> {
+		const templateId = { type: MailType.forcedSignOut, ...customMailOptions }
+		const template = (await this.getCustomTemplate(dbContext, templateId)) || {
+			subject: 'Your sessions have been signed out',
+			content: ForcedSignOut,
 			replyTo: null,
 		}
 		await this.sendMail(templateId, template, mailArguments)

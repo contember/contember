@@ -33,6 +33,7 @@ class PermissionsFactory {
 		permissions.allow(TenantRole.PERSON, PermissionActions.PERSON_TOGGLE_PASSWORDLESS)
 		permissions.allow(TenantRole.PERSON, PermissionActions.PERSON_SIGN_OUT)
 		permissions.allow(TenantRole.PERSON, PermissionActions.PERSON_SETUP_OTP)
+		permissions.allow(TenantRole.PERSON, PermissionActions.PERSON_REVOKE_SESSION)
 
 		permissions.allow(TenantRole.PROJECT_MEMBER, PermissionActions.PROJECT_VIEW)
 
@@ -48,6 +49,8 @@ class PermissionsFactory {
 		permissions.allow(TenantRole.PROJECT_ADMIN, PermissionActions.IDENTITY_REMOVE_GLOBAL_ROLES(), projectAdminAllowedInputRoles)
 		permissions.allow(TenantRole.PROJECT_ADMIN, PermissionActions.PERSON_CREATE_SESSION_KEY(), projectAdminUseRolesVerifier)
 		permissions.allow(TenantRole.PROJECT_ADMIN, PermissionActions.PERSON_DISABLE(), projectAdminUseRolesVerifier)
+		permissions.allow(TenantRole.PROJECT_ADMIN, PermissionActions.PERSON_FORCE_SIGN_OUT(), projectAdminUseRolesVerifier)
+		permissions.allow(TenantRole.PROJECT_ADMIN, PermissionActions.PERSON_VIEW_SESSIONS(), projectAdminUseRolesVerifier)
 		permissions.allow(TenantRole.PROJECT_ADMIN, PermissionActions.PERSON_CHANGE_PROFILE(), projectAdminUseRolesVerifier)
 		permissions.allow(TenantRole.PROJECT_ADMIN, PermissionActions.PERSON_CHANGE_PASSWORD(), projectAdminUseRolesVerifier)
 

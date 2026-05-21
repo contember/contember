@@ -1,3 +1,4 @@
+export * from './AuthLogQueryResolver'
 export * from './MeQueryResolver'
 export * from './ProjectMembersQueryResolver'
 export * from './ProjectQueryResolver'

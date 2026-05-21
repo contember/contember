@@ -6,6 +6,7 @@ export class MeQueryResolver implements QueryResolvers {
 		return {
 			id: context.identity.id,
 			projects: [],
+			sessions: [],
 			person: null,
 		}
 	}

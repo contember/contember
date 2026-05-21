@@ -10,7 +10,7 @@ import {
 } from '../../schema'
 import { DatabaseContext, validateToken } from '../utils'
 import { UserMailer } from '../mailing'
-import { ActivateOtpCommand, CreatePersonTokenCommand, IncreaseOtpAttemptCommand, InvalidateTokenCommand } from '../commands'
+import { ActivateOtpCommand, ApiKeyRequestInfo, CreatePersonTokenCommand, IncreaseOtpAttemptCommand, InvalidateTokenCommand } from '../commands'
 import { getPreferredProject } from './helpers/getPreferredProject'
 import { ProjectManager } from './ProjectManager'
 import { PermissionContext } from '../authorization'
@@ -20,6 +20,7 @@ import { OtpAuthenticator } from './OtpAuthenticator'
 import { PersonToken } from '../type'
 import { AuthLogService } from './AuthLogService'
 import { intervalToSeconds } from '../utils/interval'
+import { NextMailAttemptQuery } from '../queries/authLog/NextMailAttemptQuery'
 
 class PasswordlessSignInManager {
 	constructor(
@@ -37,7 +38,7 @@ class PasswordlessSignInManager {
 		mailProject?: string
 	}): Promise<PasswordlessSignInManager.InitSignInPasswordlessResponse> {
 		return db.transaction(async (db): Promise<PasswordlessSignInManager.InitSignInPasswordlessResponse> => {
-			const configuration = await db.queryHandler.fetch(new ConfigurationQuery())
+			const configuration = await db.queryHandler.fetch(new ConfigurationQuery(db.providers))
 			if (configuration.passwordless.enabled === 'never') {
 				return new ResponseError('PASSWORDLESS_DISABLED', 'Passwordless sign-in is disabled', {
 					[AuthLogService.Key]: new AuthLogService.Bag({}),
@@ -59,6 +60,26 @@ class PasswordlessSignInManager {
 						personId: person.id,
 					}),
 				})
+			}
+
+			// Per-email exponential backoff on outbound mails — bound the spam
+			// pressure on a real user even if attackers spray the endpoint.
+			// Reuses login_* backoff config against person_auth_log.
+			const nextAllowed = await db.queryHandler.fetch(
+				new NextMailAttemptQuery(email, 'passwordless_login_init', 'passwordless_login'),
+			)
+			if (nextAllowed > new Date()) {
+				const retryAfterSeconds = Math.max(1, Math.ceil((nextAllowed.getTime() - Date.now()) / 1000))
+				return new ResponseError(
+					'RATE_LIMIT_EXCEEDED',
+					`Too many passwordless sign-in requests for this email. Retry after ${retryAfterSeconds}s.`,
+					{
+						[AuthLogService.Key]: new AuthLogService.Bag({
+							personInput: email,
+							personId: person.id,
+						}),
+					},
+				)
 			}
 
 			const createTokenCommand = CreatePersonTokenCommand.createPasswordlessRequest(
@@ -108,13 +129,15 @@ class PasswordlessSignInManager {
 		return urlObj.toString()
 	}
 
-	async signInPasswordless({ db, expiration, token, requestId, mfaOtp, validationType }: {
+	async signInPasswordless({ db, expiration, token, requestId, mfaOtp, validationType, requestInfo, trustForwardedInfo }: {
 		db: DatabaseContext
 		validationType: PersonToken.ValidationType
 		requestId: string
 		token: string
 		mfaOtp?: string
 		expiration?: number
+		requestInfo?: ApiKeyRequestInfo
+		trustForwardedInfo?: boolean
 	}): Promise<PasswordlessSignInManager.SignInPasswordlessResponse> {
 		return db.transaction(async (db): Promise<PasswordlessSignInManager.SignInPasswordlessResponse> => {
 			const tokenResult = await db.queryHandler.fetch(PersonTokenQuery.byId(requestId, 'passwordless'))
@@ -173,7 +196,7 @@ class PasswordlessSignInManager {
 			}
 
 			await db.commandBus.execute(new InvalidateTokenCommand(tokenValidationResult.result.id))
-			const sessionToken = await this.apiKeyManager.createSessionApiKey(db, personRow.identity_id, expiration)
+			const sessionToken = await this.apiKeyManager.createSessionApiKey(db, personRow.identity_id, expiration, requestInfo, trustForwardedInfo)
 
 			return new ResponseOk({
 				person: personRow,

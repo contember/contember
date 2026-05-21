@@ -12,6 +12,7 @@ export class PersonResponseFactory {
 			identity: {
 				id: personRow.identity_id,
 				projects,
+				sessions: [],
 			},
 		}
 	}

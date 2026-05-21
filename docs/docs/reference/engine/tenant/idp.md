@@ -132,82 +132,95 @@ When you execute the disableIDP mutation, it will return a response indicating w
 
 ## IdP authentication
 
-You can use the `initSignInIDP` and `signInIDP` mutations to authenticate users using an external identity provider (IdP). The initSignInIDP mutation allows you to initiate the authentication process, while the signInIDP mutation allows you to complete the authentication process and obtain an access token that can be used to authenticate subsequent requests.
+A two-step exchange: `initSignInIDP` produces the redirect URL and any state your client must remember, the user authenticates at the provider, and `signInIDP` consumes the callback URL to mint a session.
 
-To initiate the authentication process, you can use the `initSignInIDP` mutation like this:
+Both mutations carry their provider-specific arguments inside a `data: Json` field. Older `redirectUrl`, `idpResponse`, and `sessionData` top-level arguments still work but are deprecated and should not be used in new integrations.
 
-```graphql
-mutation {
-	initSignInIDP(identityProvider: "oidc-provider", redirectUrl: "https://my-app.dev/finish-auth") {
-		ok
-		error {
-			code
-			developerMessage
-		}
-		result {
-			authUrl
-			sessionData
-		}
-	}
-}
-```
-In this example, the identityProvider field is set to "oidc-provider", which is the custom slug that you used to identify the OIDC identity provider when you added it to Contember. The redirectUrl field specifies the URL that the user should be redirected to after they have authenticated with the identity provider.
-
-
-The initSignInIDP mutation will return a response indicating whether the operation was successful. If the "ok" in response is `false`, you will find details in `error`, possible error code is: `PROVIDER_NOT_FOUND`
-
-The result field will contain the authUrl and sessionData that you will need to complete the authentication process, you must store sessionData according to OIDC state and nonce handling recommendation.
-
-To complete the authentication process, you will need to redirect the user to the authUrl provided by the initSignInIDP mutation. The user will be prompted to authenticate with the identity provider, and once they have done so, they will be redirected back to the redirectUrl specified in the initSignInIDP mutation.
-
-Once the user has been redirected back to the redirectUrl, you can use the signInIDP mutation to complete the authentication process and obtain an access token:
+### Step 1 — initiate
 
 ```graphql
 mutation {
-	signInIDP(
-		identityProvider: "oidc-provider",
-		idpResponse: {
-			url: "https://my-app.dev/finish-auth?code=ABC123&state=XYZ789"
-		},
-		redirectUrl: "https://my-app.dev/finish-auth",
-		sessionData: {nonce: "123456",state: "XYZ789"},
-		expiration: 60
-	) {
-		ok
-		error {
-			code
-			developerMessage
-		}
-		result {
-			token
-			person {
-				id
-				email
-			}
-		}
-	}
+  initSignInIDP(
+    identityProvider: "oidc-provider",
+    data: { redirectUrl: "https://my-app.dev/finish-auth" }
+  ) {
+    ok
+    error { code developerMessage }
+    result {
+      authUrl
+      sessionData
+      idpConfiguration
+    }
+  }
 }
 ```
-In this example, the identityProvider field is set to "oidc-provider" again, and the idpResponse field includes the URL that the user was redirected to after authenticating with the identity provider. The redirectUrl field must match the redirectUrl specified in the initSignInIDP mutation, and the sessionData field should include the sessionData returned by the initSignInIDP mutation. The expiration field specifies the number of seconds that the access token should be valid for.
 
-The signInIDP mutation returns a response that indicates whether the authentication operation was successful, and if successful, provides an access token that can be used to authenticate subsequent requests.
+The `identityProvider` field is the slug used when the IdP was added. `data.redirectUrl` is where the provider should send the user after authentication. The exact `data` shape is provider-specific — for OIDC the supported key is `redirectUrl`.
 
-Here is an example of the response that the signInIDP mutation might return:
+The response carries:
+
+- `authUrl` — redirect the browser here.
+- `sessionData` — opaque blob you must keep alongside the browser session (carries state, nonce, code verifier, …). Pass it back into `signInIDP` verbatim.
+- `idpConfiguration` — only set when the IDP was created with `initReturnsConfig: true`; useful for clients that need to drive the auth flow themselves.
+
+Error codes: `PROVIDER_NOT_FOUND`, `IDP_VALIDATION_FAILED`.
+
+### Step 2 — complete
+
+Once the IDP redirects back to your `redirectUrl`, take the full callback URL (with `?code=…&state=…`) and submit it together with the `sessionData` from step 1:
+
+```graphql
+mutation {
+  signInIDP(
+    identityProvider: "oidc-provider",
+    data: {
+      url: "https://my-app.dev/finish-auth?code=ABC123&state=XYZ789",
+      sessionData: { nonce: "123456", state: "XYZ789" },
+      redirectUrl: "https://my-app.dev/finish-auth"
+    },
+    expiration: 60,
+    options: { trustForwardedClientInfo: true }  # optional, see proxy-trust.md
+  ) {
+    ok
+    error { code developerMessage }
+    result {
+      token
+      person { id email }
+      idpResponse
+    }
+  }
+}
+```
+
+`data.url` is the full callback URL the IDP sent the user to. `data.sessionData` is the blob returned by `initSignInIDP`. `data.redirectUrl` must match what was passed to `initSignInIDP`.
+
+The response `result.token` is the session API key — store it client-side and use it as the Bearer token for subsequent requests. `idpResponse` exposes the provider's raw token-exchange response when you need access tokens / userinfo claims.
 
 ```json
 {
-	"ok": true,
-	"error": null,
-	"result": {
-		"token": "XXX",
-		"person": {
-			"id": "user-uuid",
-			"email": "john.doe@example.com"
-		}
-	}
+  "ok": true,
+  "error": null,
+  "result": {
+    "token": "XXX",
+    "person": { "id": "user-uuid", "email": "john.doe@example.com" }
+  }
 }
 ```
 
-The result field contains the access token in the token field, and information about the authenticated user in the person field.
+Error codes: `INVALID_IDP_RESPONSE`, `IDP_VALIDATION_FAILED`, `PERSON_NOT_FOUND`, `PERSON_DISABLED`, `PERSON_ALREADY_EXISTS`.
 
-If the signInIDP mutation was not successful, the ok field would be set to false and the error field would contain details about the error that occurred. Following error codes are possible for this mutation: `INVALID_IDP_RESPONSE`, `IDP_VALIDATION_FAILED`, `PERSON_NOT_FOUND`, `PERSON_ALREADY_EXISTS`
+## Audit
+
+:::note Available since 2.2
+:::
+
+Every IdP management call is recorded in the [audit log](./audit-log.md):
+
+| Mutation | Audit type | `event_data` |
+|---|---|---|
+| `addIDP` | `idp_create` | `{identityProvider, type, configurationKeys, options}` — only the *names* of the configuration keys, never the secret values |
+| `updateIDP` | `idp_update` | `{before, after}` with configuration collapsed the same way |
+| `disableIDP` | `idp_disable` | `{identityProvider}` |
+| `enableIDP` | `idp_enable` | `{identityProvider}` |
+
+Sign-in attempts via IdP are recorded as `idp_login`.

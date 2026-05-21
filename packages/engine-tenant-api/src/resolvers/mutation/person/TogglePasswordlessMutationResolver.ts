@@ -31,7 +31,7 @@ export class TogglePasswordlessMutationResolver implements Pick<MutationResolver
 			action: PermissionActions.PERSON_TOGGLE_PASSWORDLESS,
 			message: 'You are not allowed to enable passwordless',
 		})
-		const config = await await context.db.queryHandler.fetch(new ConfigurationQuery())
+		const config = await await context.db.queryHandler.fetch(new ConfigurationQuery(context.db.providers))
 		if (config.passwordless?.enabled === 'always' || config.passwordless?.enabled === 'never') {
 			return createErrorResponse('CANNOT_TOGGLE', 'Passwordless is configured globally and cannot be toggled')
 		}

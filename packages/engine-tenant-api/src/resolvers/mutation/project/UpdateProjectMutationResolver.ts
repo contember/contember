@@ -3,6 +3,7 @@ import { TenantResolverContext } from '../../TenantResolverContext'
 import { PermissionActions, ProjectManager } from '../../../model'
 import { createProjectNotFoundResponse } from '../../errorUtils'
 import { Merger } from '@contember/config-loader'
+import { ResponseOk } from '../../../model/utils/Response'
 
 export class UpdateProjectMutationResolver implements MutationResolvers {
 	constructor(private readonly projectManager: ProjectManager) {}
@@ -21,10 +22,23 @@ export class UpdateProjectMutationResolver implements MutationResolvers {
 		if (!project) {
 			return createProjectNotFoundResponse('PROJECT_NOT_FOUND', args.projectSlug)
 		}
+		const nameChange = args.name && args.name !== project.name ? { before: project.name, after: args.name } : undefined
+		const configChanged = args.config !== undefined
 		await this.projectManager.updateProject(context.db, project.id, {
 			name: args.name || undefined,
 			config: args.config !== undefined ? Merger.merge(args.mergeConfig ? project.config : {}, args.config as any) : undefined,
 		})
+
+		await context.logAuthAction({
+			type: 'project_update',
+			response: new ResponseOk(null),
+			eventData: {
+				slug: project.slug,
+				...(nameChange ? { name: nameChange } : {}),
+				...(configChanged ? { configChanged: true, mergeConfig: args.mergeConfig ?? false } : {}),
+			},
+		})
+
 		return { ok: true }
 	}
 }

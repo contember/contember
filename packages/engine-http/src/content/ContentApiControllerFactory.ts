@@ -138,7 +138,7 @@ export class ContentApiControllerFactory {
 								project,
 								userInfo: {
 									ipAddress: clientIp,
-									userAgent: koa.request.headers['user-agent'] ?? null,
+									userAgent: authResult.clientUserAgent ?? null,
 								},
 							})
 

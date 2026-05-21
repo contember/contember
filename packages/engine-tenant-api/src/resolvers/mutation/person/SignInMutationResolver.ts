@@ -1,6 +1,6 @@
 import { CreateSessionTokenResponse, MutationCreateSessionTokenArgs, MutationResolvers, MutationSignInArgs, SignInResponse } from '../../../schema'
 import { TenantResolverContext } from '../../TenantResolverContext'
-import { ConfigurationQuery, PermissionActions, PersonUniqueIdentifier, SignInManager } from '../../../model'
+import { ConfigurationQuery, PermissionActions, PersonUniqueIdentifier, RateLimiter, SignInManager } from '../../../model'
 import { createErrorResponse } from '../../errorUtils'
 import { SignInResponseFactory } from '../../responseHelpers/SignInResponseFactory'
 import { UserInputError } from '@contember/graphql-utils'
@@ -11,6 +11,7 @@ export class SignInMutationResolver implements MutationResolvers {
 	constructor(
 		private readonly signInManager: SignInManager,
 		private readonly signInResponseFactory: SignInResponseFactory,
+		private readonly rateLimiter: RateLimiter,
 	) {}
 
 	async signIn(parent: any, args: MutationSignInArgs, context: TenantResolverContext): Promise<SignInResponse> {
@@ -18,6 +19,17 @@ export class SignInMutationResolver implements MutationResolvers {
 			action: PermissionActions.PERSON_SIGN_IN,
 			message: 'You are not allowed to sign in',
 		})
+
+		const configuration = await context.db.queryHandler.fetch(new ConfigurationQuery(context.db.providers))
+
+		const ipGate = await this.rateLimiter.consume(context.db, 'login_per_ip', context.httpInfo.ip, configuration)
+		if (!ipGate.ok) {
+			return createErrorResponse(
+				new ResponseError('RATE_LIMIT_EXCEEDED', `Too many sign-in attempts from this IP. Retry after ${ipGate.retryAfterSeconds}s.`, {
+					retryAfter: ipGate.retryAfterSeconds,
+				}),
+			)
+		}
 
 		const nextAllowedSignIn = await context.db.queryHandler.fetch(new NextLoginAttemptQuery(args.email))
 		if (nextAllowedSignIn > new Date()) {
@@ -34,6 +46,8 @@ export class SignInMutationResolver implements MutationResolvers {
 			args.password,
 			args.expiration || undefined,
 			args.otpToken || undefined,
+			context.httpInfo,
+			args.options?.trustForwardedClientInfo === true && context.trustForwardedInfo,
 		)
 		await context.logAuthAction({
 			type: 'login',
@@ -41,12 +55,13 @@ export class SignInMutationResolver implements MutationResolvers {
 		})
 
 		if (!response.ok) {
-			const configuration = await context.db.queryHandler.fetch(new ConfigurationQuery())
-			if (
-				!configuration.login.revealUserExists
-				&& ['NO_PASSWORD_SET', 'NO_PASSWORD_SET', 'PERSON_DISABLED', 'INVALID_PASSWORD', 'UNKNOWN_EMAIL'].includes(response.error)
-			) {
-				// if the user does not exist, we don't want to reveal that, so we return a generic error
+			const { revealUserExists, revealLoginMethod } = configuration.login
+			const collapseAll = !revealUserExists
+				&& ['NO_PASSWORD_SET', 'PERSON_DISABLED', 'INVALID_PASSWORD', 'UNKNOWN_EMAIL'].includes(response.error)
+			const collapseMethodOnly = revealUserExists
+				&& !revealLoginMethod
+				&& ['NO_PASSWORD_SET', 'INVALID_PASSWORD'].includes(response.error)
+			if (collapseAll || collapseMethodOnly) {
 				return createErrorResponse('INVALID_CREDENTIALS', 'Invalid credentials')
 			}
 			return createErrorResponse(response.error, response.errorMessage)
@@ -82,6 +97,8 @@ export class SignInMutationResolver implements MutationResolvers {
 					action: PermissionActions.PERSON_CREATE_SESSION_KEY(person.roles),
 					message: 'You are not allowed to create a session key for this person.',
 				}),
+			context.httpInfo,
+			args.options?.trustForwardedClientInfo === true && context.trustForwardedInfo,
 		)
 		await context.logAuthAction({
 			type: 'create_session_token',

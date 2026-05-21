@@ -2,6 +2,8 @@ import { MutationRemoveProjectMemberArgs, MutationResolvers, RemoveProjectMember
 import { TenantResolverContext } from '../../TenantResolverContext'
 import { PermissionActions, ProjectManager, ProjectMemberManager } from '../../../model'
 import { createErrorResponse, createProjectNotFoundResponse } from '../../errorUtils'
+import { ProjectMembershipByIdentityQuery } from '../../../model/queries'
+import { logProjectMembershipChange } from './audit'
 
 export class RemoveProjectMemberMutationResolver implements MutationResolvers {
 	constructor(
@@ -36,11 +38,14 @@ export class RemoveProjectMemberMutationResolver implements MutationResolvers {
 			message: 'You are not allowed to remove a project member',
 		})
 
+		const before = await context.db.queryHandler.fetch(new ProjectMembershipByIdentityQuery({ id: project.id }, [identityId]))
 		const result = await this.projectMemberManager.removeProjectMember(context.db, project.id, identityId)
 
 		if (!result.ok) {
 			return createErrorResponse(result.error, result.errorMessage)
 		}
+
+		await logProjectMembershipChange(context, 'project_membership_remove', project.id, identityId, before)
 
 		return {
 			ok: true,

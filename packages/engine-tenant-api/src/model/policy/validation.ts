@@ -55,7 +55,11 @@ function validateConditionBlock(block: ConditionBlock, statementIndex: number): 
 		if (typeof operator !== 'string' || operator.length === 0) {
 			throw new PolicyValidationError(`statement[${statementIndex}].conditions: operator names must be non-empty strings`)
 		}
-		if (!(operator in defaultOperators)) {
+		// `hasOwnProperty`, not `in`: `in` walks the prototype chain, so inherited
+		// members (`toString`, `constructor`, `__proto__`, …) would pass validation
+		// and then be invoked as operators at evaluation time. Mirror the engine's
+		// own-property guard in `evaluateConditions`.
+		if (!Object.prototype.hasOwnProperty.call(defaultOperators, operator)) {
 			throw new PolicyValidationError(`statement[${statementIndex}].conditions: unknown operator "${operator}"`)
 		}
 		if (paths === null || typeof paths !== 'object' || Array.isArray(paths)) {

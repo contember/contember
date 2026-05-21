@@ -97,6 +97,18 @@ describe('document validation', () => {
 		).toThrow(/unknown operator/)
 	})
 
+	test('rejects inherited Object members as operators (prototype-chain guard)', () => {
+		// `operator in defaultOperators` would accept `toString`/`constructor`/etc.,
+		// which then evaluate as truthy operators at runtime. They must be rejected.
+		for (const name of ['toString', 'constructor', 'hasOwnProperty', '__proto__']) {
+			expect(() =>
+				validatePolicyDocument({
+					statements: [{ effect: 'allow', actions: ['x'], conditions: { [name]: { 'subject.team': 'eng' } } as any }],
+				})
+			).toThrow(/unknown operator/)
+		}
+	})
+
 	test('rejects non-object conditions', () => {
 		expect(() =>
 			validatePolicyDocument({

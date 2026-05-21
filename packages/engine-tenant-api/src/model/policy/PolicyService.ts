@@ -1,12 +1,26 @@
 import { Policy } from '@contember/policy'
+import { ForbiddenError } from '@contember/graphql-utils'
 import { DatabaseContext } from '../utils'
 import { AssignPolicyCommand, CreatePolicyCommand, DeletePolicyCommand, RevokePolicyCommand, UpdatePolicyCommand } from './commands'
 import { ListPoliciesQuery, PoliciesByIdsQuery, PolicyBySlugQuery } from './queries'
 import { IdentityPolicyAssignmentsQuery } from './queries/IdentityPolicyAssignmentsQuery'
+import { IdentityQuery } from '../queries/identity/IdentityQuery'
 import { IdentityPolicyAssignment, PolicyDto } from './PolicyDto'
 import { validateAssignmentTags, validatePolicyDocument, validatePolicySlug } from './validation'
 import { assertWithinGrantableSurface, PolicyActor } from './grantBoundary'
 import { bakeAssignmentTags } from './TenantDbPolicyProvider'
+import { TenantRole } from '../authorization/Roles'
+
+/**
+ * Roles a policy mutation must never touch on a target identity unless the
+ * actor is a super admin — mirrors the legacy `projectAdminUseRolesVerifier`,
+ * which forbade operating on identities holding these roles. Without this, a
+ * delegate granted `tenant:policy.assign` could assign (or revoke) within-surface
+ * policies — including deny statements — on a super admin / project creator,
+ * which the grant boundary alone does not prevent (it bounds *what* is granted,
+ * not *who* it is granted to).
+ */
+const PROTECTED_TARGET_ROLES: readonly string[] = [TenantRole.SUPER_ADMIN, TenantRole.PROJECT_CREATOR]
 
 /**
  * Service-layer facade over user-defined policy CRUD.
@@ -86,6 +100,7 @@ export class PolicyService {
 		tags: Record<string, unknown> = {},
 	): Promise<void> {
 		validateAssignmentTags(tags)
+		await this.assertCanTargetIdentity(db, actor, identityId)
 		const policy = await this.getBySlug(db, policySlug)
 		if (!policy) {
 			throw new PolicyNotFoundError(policySlug)
@@ -109,6 +124,7 @@ export class PolicyService {
 	}
 
 	async revoke(db: DatabaseContext, actor: PolicyActor, identityId: string, policySlug: string): Promise<{ revoked: boolean }> {
+		await this.assertCanTargetIdentity(db, actor, identityId)
 		const policy = await this.getBySlug(db, policySlug)
 		if (!policy) {
 			return { revoked: false }
@@ -118,6 +134,27 @@ export class PolicyService {
 		// `*` here — conservative across whatever tags the assignment carried.
 		await assertWithinGrantableSurface(db, actor, [policy.document])
 		return db.commandBus.execute(new RevokePolicyCommand(identityId, policy.id))
+	}
+
+	/**
+	 * Forbid assigning/revoking policies on a more-privileged identity. A super
+	 * admin actor may target anyone; everyone else (e.g. a delegate granted
+	 * `tenant:policy.assign`) cannot target an identity holding a protected role.
+	 * Throws `ForbiddenError`, surfaced the same way as the resolver's
+	 * action-level `requireAccess` failure.
+	 */
+	private async assertCanTargetIdentity(db: DatabaseContext, actor: PolicyActor, targetIdentityId: string): Promise<void> {
+		if (actor.roles.includes(TenantRole.SUPER_ADMIN)) {
+			return
+		}
+		const [target] = await db.queryHandler.fetch(new IdentityQuery([targetIdentityId]))
+		if (!target) {
+			// Existence is reported by the resolver's own check; nothing to guard.
+			return
+		}
+		if (target.roles.some(role => PROTECTED_TARGET_ROLES.includes(role))) {
+			throw new ForbiddenError('You are not allowed to manage policies of this identity')
+		}
 	}
 
 	async listAssignedPolicies(db: DatabaseContext, identityId: string): Promise<PolicyDto[]> {

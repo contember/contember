@@ -251,6 +251,97 @@ describe('ProjectSchemaPolicyProvider — translation', () => {
 			})).decision,
 		).toBe('deny')
 	})
+
+	// Resolvers do a coarse "can you manage members here at all?" probe with an
+	// EMPTY subject-membership list — i.e. no `subject.membership` in context —
+	// before the per-membership check. The legacy `[].every(matcher.matches)`
+	// returned true for any invoker whose role merely had the capability. The
+	// gate statement must reproduce that for delegated (non-admin) managers.
+	test('coarse probe (no subject.membership) passes for manage/view-capable invoker', async () => {
+		const provider = new ProjectSchemaPolicyProvider({
+			slug: 'webmaster',
+			acl: aclWithManage,
+			memberships: [{ role: 'editor', variables: [{ name: 'team', values: ['eng'] }] }],
+		})
+		const engine = new PolicyEngine([provider])
+		const resource = TenantResources.project('webmaster')
+
+		// manage-capable → probe for member mutations passes
+		expect((await engine.evaluate(TenantActions.projectRemoveMember, resource, {})).decision).toBe('allow')
+		expect((await engine.evaluate(TenantActions.projectUpdateMember, resource, {})).decision).toBe('allow')
+		expect((await engine.evaluate(TenantActions.projectViewMember, resource, {})).decision).toBe('allow')
+		// invite-capable → probe for invite passes
+		expect((await engine.evaluate(TenantActions.personInvite, resource, {})).decision).toBe('allow')
+	})
+
+	test('coarse probe denies when the invoker role lacks the capability', async () => {
+		const provider = new ProjectSchemaPolicyProvider({
+			slug: 'webmaster',
+			acl: { roles: { plain: { entities: {} } } } as any,
+			memberships: [{ role: 'plain', variables: [] }],
+		})
+		const engine = new PolicyEngine([provider])
+		const resource = TenantResources.project('webmaster')
+		expect((await engine.evaluate(TenantActions.projectRemoveMember, resource, {})).decision).toBe('deny')
+	})
+
+	test('gate statement does NOT leak into the per-membership check', async () => {
+		// With an actual subject.membership present, the probe gate must be skipped
+		// so the real role/variable conditions decide — otherwise every membership
+		// would be unconditionally allowed.
+		const provider = new ProjectSchemaPolicyProvider({
+			slug: 'webmaster',
+			acl: aclWithManage,
+			memberships: [{ role: 'editor', variables: [{ name: 'team', values: ['eng'] }] }],
+		})
+		const engine = new PolicyEngine([provider])
+		const resource = TenantResources.project('webmaster')
+		// editor → admin is NOT in the manage rule → must still deny
+		expect(
+			(await engine.evaluate(TenantActions.projectAddMember, resource, {
+				subject: { membership: { role: 'admin', variables: {} } },
+			})).decision,
+		).toBe('deny')
+	})
+
+	// A subject variable whose name contains '.' cannot be safely encoded as the
+	// `subject.membership.variables.<name>` dot-path (readPath would mis-split it
+	// and drop the value-subset constraint → escalation). Such subjects must be
+	// denied (fail-safe), not allowed with an arbitrary value set.
+	test('dotted variable name does not silently drop the value-subset constraint', async () => {
+		const aclDotted: Acl.Schema = {
+			roles: {
+				editor: {
+					entities: {},
+					tenant: {
+						manage: { editor: { variables: { 'team.x': 'team.x' } } },
+					},
+				},
+			} as any,
+		}
+		const provider = new ProjectSchemaPolicyProvider({
+			slug: 'webmaster',
+			acl: aclDotted,
+			memberships: [{ role: 'editor', variables: [{ name: 'team.x', values: ['eng'] }] }],
+		})
+		const engine = new PolicyEngine([provider])
+		const resource = TenantResources.project('webmaster')
+
+		// Subject carrying the dotted variable with a SUPERSET of values would, via
+		// the bug, be allowed (constraint silently dropped). It must be denied.
+		expect(
+			(await engine.evaluate(TenantActions.projectAddMember, resource, {
+				subject: { membership: { role: 'editor', variables: { 'team.x': ['eng', 'secret'] } } },
+			})).decision,
+		).toBe('deny')
+		// Even an exact-subset subject is denied — we cannot express the constraint
+		// for a dotted name, so we fail safe rather than risk escalation.
+		expect(
+			(await engine.evaluate(TenantActions.projectAddMember, resource, {
+				subject: { membership: { role: 'editor', variables: { 'team.x': ['eng'] } } },
+			})).decision,
+		).toBe('deny')
+	})
 })
 
 /**

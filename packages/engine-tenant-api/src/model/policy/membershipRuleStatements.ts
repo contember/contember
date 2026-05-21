@@ -70,6 +70,18 @@ export function statementsForMembershipRule(
 							// invoker lacks the mapped variable → subject must not carry this key
 							continue
 						}
+						if (subjectVar.includes('.')) {
+							// The value-subset constraint is encoded as the dot-path
+							// `subject.membership.variables.<name>`; a name containing '.'
+							// would be mis-split by `readPath` (treated as nested keys),
+							// resolve to undefined, and make `forAllValues:stringEquals`
+							// vacuously pass — silently dropping the subset check and
+							// letting the subject carry arbitrary values (escalation).
+							// We cannot express the subset for such a name, so deny any
+							// subject carrying it (exclude from allowedKeys) — fail-safe,
+							// matching the absent-invoker-variable case above.
+							continue
+						}
 						// the subject's values must be a subset of the invoker's values
 						allowedKeys.push(subjectVar)
 						forAllValues[`subject.membership.variables.${subjectVar}`] = invokerVariable.values

@@ -49,6 +49,7 @@ import _20260515120000configreveallogmethod from './2026-05-15-120000-config-rev
 import _20260521100000personmfa from './2026-05-21-100000-person-mfa'
 import _20260521110000mfafoundation from './2026-05-21-110000-mfa-foundation'
 import _20260521120000emailotp from './2026-05-21-120000-email-otp'
+import _20260521130000apikeysessionpolicy from './2026-05-21-130000-api-key-session-policy'
 import snapshot from './snapshot'
 import { computeTokenHash, Providers } from '../model'
 import { Logger } from '@contember/logger'
@@ -110,6 +111,7 @@ const migrations = {
 	'2026-05-21-100000-person-mfa': _20260521100000personmfa,
 	'2026-05-21-110000-mfa-foundation': _20260521110000mfafoundation,
 	'2026-05-21-120000-email-otp': _20260521120000emailotp,
+	'2026-05-21-130000-api-key-session-policy': _20260521130000apikeysessionpolicy,
 }
 
 export class TenantMigrationsRunner {

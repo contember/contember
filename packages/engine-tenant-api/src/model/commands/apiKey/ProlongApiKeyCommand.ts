@@ -24,10 +24,16 @@ export class ProlongApiKeyCommand implements Command<void> {
 		private readonly currentExpiration: Date | null,
 		private readonly requestInfo?: ApiKeyRequestInfo,
 		private readonly tracking?: ApiKeyTrackingState,
+		private readonly maxExpiresAt?: Date | null,
 	) {}
 
 	async execute({ db, providers }: Command.Args): Promise<void> {
-		const newExpiration = ApiKeyHelper.getExpiration(providers, this.type, this.expiration)
+		let newExpiration = ApiKeyHelper.getExpiration(providers, this.type, this.expiration)
+		// A19: clamp the sliding window at the absolute cap snapshotted at sign-in.
+		// NULL maxExpiresAt = today's uncapped sliding window.
+		if (newExpiration !== null && this.maxExpiresAt && newExpiration.getTime() > this.maxExpiresAt.getTime()) {
+			newExpiration = this.maxExpiresAt
+		}
 		const now = providers.now()
 
 		let updateExpiration = newExpiration !== null

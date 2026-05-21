@@ -168,7 +168,8 @@ export class TenantContainerFactory {
 			.addService('authorizator', ({ accessEvaluator }) => new Authorizator.Default(accessEvaluator))
 			.addService('userMailer', ({ mailer, templateRenderer }) => new UserMailer(mailer, templateRenderer))
 			.addService('apiKeyService', () => new ApiKeyService())
-			.addService('apiKeyManager', ({ apiKeyService }) => new ApiKeyManager(apiKeyService))
+			.addService('authPolicyResolver', () => new AuthPolicyResolver())
+			.addService('apiKeyManager', ({ apiKeyService, authPolicyResolver }) => new ApiKeyManager(apiKeyService, authPolicyResolver))
 			.addService('emailValidator', () => new EmailValidator())
 			.addService('hibpChecker', (): HibpChecker => new HttpHibpChecker())
 			.addService('noopHibpChecker', (): HibpChecker => new NoopHibpChecker())
@@ -214,7 +215,6 @@ export class TenantContainerFactory {
 			.addService('otpManager', ({ otpAuthenticator, providers }) => new OtpManager(otpAuthenticator, providers))
 			.addService('backupCodeManager', ({ providers }) => new BackupCodeManager(providers))
 			.addService('emailOtpManager', ({ userMailer, providers }) => new EmailOtpManager(userMailer, providers))
-			.addService('authPolicyResolver', () => new AuthPolicyResolver())
 			.addService('authPolicyManager', ({ projectManager }) => new AuthPolicyManager(projectManager))
 			.addService(
 				'signInManager',

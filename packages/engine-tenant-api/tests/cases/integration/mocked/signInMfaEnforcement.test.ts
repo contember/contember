@@ -9,6 +9,7 @@ import { createSessionKeySql } from './sql/createSessionKeySql'
 import { getIdentityProjectsSql } from './sql/getIdentityProjectsSql'
 import { selectMembershipsSql } from './sql/selectMembershipsSql'
 import { getAllProjectRolesByIdentitySql, getAuthPoliciesSql } from './sql/authPolicySql'
+import { getIdentityByIdSql } from './sql/getIdentityByIdSql'
 import { generateBackupCodesSql } from './sql/generateBackupCodesSql'
 import { expect, test } from 'bun:test'
 import { Buffer } from 'buffer'
@@ -119,6 +120,9 @@ test('MFA required + valid pending code → enrolls (pending→active), returns 
 			},
 			...generateBackupCodesSql({ personId, firstUuidIndex: 1 }),
 			getConfigSql(),
+			getIdentityByIdSql({ identityId, roles: ['editor'] }),
+			requiringPolicy(),
+			getAllProjectRolesByIdentitySql({ identityId }),
 			createSessionKeySql({ apiKeyId, identityId }),
 			getIdentityProjectsSql({ identityId, projectId }),
 			selectMembershipsSql({ identityId, projectId, membershipsResponse: [] }),

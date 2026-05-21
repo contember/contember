@@ -11,6 +11,8 @@ import { selectMembershipsSql } from './sql/selectMembershipsSql'
 import { createIdentitySql } from './sql/createIdentitySql'
 import { createPersonSql } from './sql/createPersonSql'
 import { getConfigSql } from './sql/getConfigSql'
+import { getIdentityByIdSql } from './sql/getIdentityByIdSql'
+import { getAuthPoliciesSql } from './sql/authPolicySql'
 
 test('signs in idp with existing identity', async () => {
 	const externalIdentifier = 'abcd'
@@ -59,6 +61,8 @@ test('signs in idp with existing identity', async () => {
 					},
 				}),
 				getConfigSql(),
+				getIdentityByIdSql({ identityId }),
+				getAuthPoliciesSql(),
 				createSessionKeySql({
 					apiKeyId,
 					identityId,
@@ -139,6 +143,8 @@ test('signs in exclusive idp', async () => {
 					response: { rowCount: 1 },
 				},
 				getConfigSql(),
+				getIdentityByIdSql({ identityId }),
+				getAuthPoliciesSql(),
 				createSessionKeySql({
 					apiKeyId,
 					identityId,

@@ -67,6 +67,12 @@ export class SignInMutationResolver implements MutationResolvers {
 				personId: response.result.person.id,
 			})
 		}
+		if (!response.ok && response.metadata?.emailOtpSent) {
+			await context.logAuthAction({
+				type: 'email_otp_sent',
+				response,
+			})
+		}
 
 		if (!response.ok) {
 			const { revealUserExists, revealLoginMethod } = configuration.login

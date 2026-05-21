@@ -9,6 +9,7 @@ import {
 	BackupCodeManager,
 	CaptchaValidator,
 	DatabaseContext,
+	EmailOtpManager,
 	EmailValidator,
 	FacebookProvider,
 	HCaptchaProvider,
@@ -54,6 +55,7 @@ import {
 	CreateProjectMutationResolver,
 	DisableApiKeyMutationResolver,
 	DisableIDPMutationResolver,
+	EmailOtpMutationResolver,
 	EnableIDPMutationResolver,
 	IdentityGlobalRolesMutationResolver,
 	IdentityTypeResolver,
@@ -206,9 +208,11 @@ export class TenantContainerFactory {
 			.addService('otpAuthenticator', ({ providers }) => new OtpAuthenticator(providers))
 			.addService('otpManager', ({ otpAuthenticator, providers }) => new OtpManager(otpAuthenticator, providers))
 			.addService('backupCodeManager', ({ providers }) => new BackupCodeManager(providers))
+			.addService('emailOtpManager', ({ userMailer, providers }) => new EmailOtpManager(userMailer, providers))
 			.addService(
 				'signInManager',
-				({ apiKeyManager, providers, otpManager, backupCodeManager }) => new SignInManager(apiKeyManager, providers, otpManager, backupCodeManager),
+				({ apiKeyManager, providers, otpManager, backupCodeManager, emailOtpManager }) =>
+					new SignInManager(apiKeyManager, providers, otpManager, backupCodeManager, emailOtpManager),
 			)
 			.addService('membershipValidator', ({ projectSchemaResolver }) => new MembershipValidator(projectSchemaResolver))
 			.addService('inviteManager', ({ providers, userMailer, projectSchemaResolver }) => new InviteManager(providers, userMailer, projectSchemaResolver))
@@ -283,6 +287,10 @@ export class TenantContainerFactory {
 			)
 			.addService('disableApiKeyMutationResolver', ({ apiKeyManager }) => new DisableApiKeyMutationResolver(apiKeyManager))
 			.addService('otpMutationResolver', ({ otpManager, backupCodeManager }) => new OtpMutationResolver(otpManager, backupCodeManager))
+			.addService(
+				'emailOtpMutationResolver',
+				({ emailOtpManager, backupCodeManager }) => new EmailOtpMutationResolver(emailOtpManager, backupCodeManager),
+			)
 			.addService(
 				'regenerateBackupCodesMutationResolver',
 				({ backupCodeManager }) => new RegenerateBackupCodesMutationResolver(backupCodeManager),

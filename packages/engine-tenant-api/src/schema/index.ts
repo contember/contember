@@ -486,6 +486,54 @@ export type ConfirmOtpResult = {
 	readonly backupCodes: ReadonlyArray<Scalars['String']['output']>
 }
 
+export type ConfirmEmailOtpError = {
+	readonly __typename?: 'ConfirmEmailOtpError'
+	readonly code: ConfirmEmailOtpErrorCode
+	readonly developerMessage: Scalars['String']['output']
+}
+
+export type ConfirmEmailOtpErrorCode = 'INVALID_OTP_TOKEN'
+
+export type ConfirmEmailOtpResponse = {
+	readonly __typename?: 'ConfirmEmailOtpResponse'
+	readonly error?: Maybe<ConfirmEmailOtpError>
+	readonly ok: Scalars['Boolean']['output']
+	readonly result?: Maybe<ConfirmEmailOtpResult>
+}
+
+export type ConfirmEmailOtpResult = {
+	readonly __typename?: 'ConfirmEmailOtpResult'
+	readonly backupCodes: ReadonlyArray<Scalars['String']['output']>
+}
+
+export type InitEmailOtpError = {
+	readonly __typename?: 'InitEmailOtpError'
+	readonly code: InitEmailOtpErrorCode
+	readonly developerMessage: Scalars['String']['output']
+}
+
+export type InitEmailOtpErrorCode = 'NO_EMAIL'
+
+export type InitEmailOtpResponse = {
+	readonly __typename?: 'InitEmailOtpResponse'
+	readonly error?: Maybe<InitEmailOtpError>
+	readonly ok: Scalars['Boolean']['output']
+}
+
+export type DisableEmailOtpError = {
+	readonly __typename?: 'DisableEmailOtpError'
+	readonly code: DisableEmailOtpErrorCode
+	readonly developerMessage: Scalars['String']['output']
+}
+
+export type DisableEmailOtpErrorCode = 'EMAIL_OTP_NOT_ACTIVE'
+
+export type DisableEmailOtpResponse = {
+	readonly __typename?: 'DisableEmailOtpResponse'
+	readonly error?: Maybe<DisableEmailOtpError>
+	readonly ok: Scalars['Boolean']['output']
+}
+
 export type CreateApiKeyError = {
 	readonly __typename?: 'CreateApiKeyError'
 	readonly code: CreateApiKeyErrorCode
@@ -935,6 +983,7 @@ export type MailTemplateIdentifier = {
 }
 
 export type MailType =
+	| 'EMAIL_OTP'
 	| 'EXISTING_USER_INVITED'
 	| 'FORCED_SIGN_OUT'
 	| 'NEW_USER_INVITED'
@@ -983,6 +1032,7 @@ export type Mutation = {
 	readonly changePassword?: Maybe<ChangePasswordResponse>
 	readonly changeProfile?: Maybe<ChangeProfileResponse>
 	readonly configure?: Maybe<ConfigureResponse>
+	readonly confirmEmailOtp?: Maybe<ConfirmEmailOtpResponse>
 	readonly confirmOtp?: Maybe<ConfirmOtpResponse>
 	readonly createApiKey?: Maybe<CreateApiKeyResponse>
 	readonly createGlobalApiKey?: Maybe<CreateApiKeyResponse>
@@ -991,12 +1041,14 @@ export type Mutation = {
 	readonly createSessionToken?: Maybe<CreateSessionTokenResponse>
 	readonly disableApiKey?: Maybe<DisableApiKeyResponse>
 	readonly disableIDP?: Maybe<DisableIdpResponse>
+	readonly disableEmailOtp?: Maybe<DisableEmailOtpResponse>
 	readonly disableMyPasswordless?: Maybe<ToggleMyPasswordlessResponse>
 	readonly disableOtp?: Maybe<DisableOtpResponse>
 	readonly disablePerson?: Maybe<DisablePersonResponse>
 	readonly enableIDP?: Maybe<EnableIdpResponse>
 	readonly enableMyPasswordless?: Maybe<ToggleMyPasswordlessResponse>
 	readonly forceSignOutPerson?: Maybe<ForceSignOutPersonResponse>
+	readonly initEmailOtp?: Maybe<InitEmailOtpResponse>
 	readonly initSignInIDP?: Maybe<InitSignInIdpResponse>
 	readonly initSignInPasswordless?: Maybe<InitSignInPasswordlessResponse>
 	readonly invite?: Maybe<InviteResponse>
@@ -1079,6 +1131,10 @@ export type MutationConfigureArgs = {
 }
 
 export type MutationConfirmOtpArgs = {
+	otpToken: Scalars['String']['input']
+}
+
+export type MutationConfirmEmailOtpArgs = {
 	otpToken: Scalars['String']['input']
 }
 
@@ -1893,6 +1949,16 @@ export type ResolversTypes = {
 	ConfirmOtpErrorCode: ConfirmOtpErrorCode
 	ConfirmOtpResponse: ResolverTypeWrapper<ConfirmOtpResponse>
 	ConfirmOtpResult: ResolverTypeWrapper<ConfirmOtpResult>
+	ConfirmEmailOtpError: ResolverTypeWrapper<ConfirmEmailOtpError>
+	ConfirmEmailOtpErrorCode: ConfirmEmailOtpErrorCode
+	ConfirmEmailOtpResponse: ResolverTypeWrapper<ConfirmEmailOtpResponse>
+	ConfirmEmailOtpResult: ResolverTypeWrapper<ConfirmEmailOtpResult>
+	InitEmailOtpError: ResolverTypeWrapper<InitEmailOtpError>
+	InitEmailOtpErrorCode: InitEmailOtpErrorCode
+	InitEmailOtpResponse: ResolverTypeWrapper<InitEmailOtpResponse>
+	DisableEmailOtpError: ResolverTypeWrapper<DisableEmailOtpError>
+	DisableEmailOtpErrorCode: DisableEmailOtpErrorCode
+	DisableEmailOtpResponse: ResolverTypeWrapper<DisableEmailOtpResponse>
 	CreateApiKeyError: ResolverTypeWrapper<CreateApiKeyError>
 	CreateApiKeyErrorCode: CreateApiKeyErrorCode
 	CreateApiKeyOptions: CreateApiKeyOptions
@@ -2107,6 +2173,13 @@ export type ResolversParentTypes = {
 	ConfirmOtpError: ConfirmOtpError
 	ConfirmOtpResponse: ConfirmOtpResponse
 	ConfirmOtpResult: ConfirmOtpResult
+	ConfirmEmailOtpError: ConfirmEmailOtpError
+	ConfirmEmailOtpResponse: ConfirmEmailOtpResponse
+	ConfirmEmailOtpResult: ConfirmEmailOtpResult
+	InitEmailOtpError: InitEmailOtpError
+	InitEmailOtpResponse: InitEmailOtpResponse
+	DisableEmailOtpError: DisableEmailOtpError
+	DisableEmailOtpResponse: DisableEmailOtpResponse
 	CreateApiKeyError: CreateApiKeyError
 	CreateApiKeyOptions: CreateApiKeyOptions
 	CreateApiKeyResponse: Omit<CreateApiKeyResponse, 'result'> & { result?: Maybe<ResolversParentTypes['CreateApiKeyResult']> }
@@ -2559,6 +2632,69 @@ export type ConfirmOtpResultResolvers<
 	ParentType extends ResolversParentTypes['ConfirmOtpResult'] = ResolversParentTypes['ConfirmOtpResult'],
 > = {
 	backupCodes?: Resolver<ReadonlyArray<ResolversTypes['String']>, ParentType, ContextType>
+	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
+}
+
+export type ConfirmEmailOtpErrorResolvers<
+	ContextType = any,
+	ParentType extends ResolversParentTypes['ConfirmEmailOtpError'] = ResolversParentTypes['ConfirmEmailOtpError'],
+> = {
+	code?: Resolver<ResolversTypes['ConfirmEmailOtpErrorCode'], ParentType, ContextType>
+	developerMessage?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
+}
+
+export type ConfirmEmailOtpResponseResolvers<
+	ContextType = any,
+	ParentType extends ResolversParentTypes['ConfirmEmailOtpResponse'] = ResolversParentTypes['ConfirmEmailOtpResponse'],
+> = {
+	error?: Resolver<Maybe<ResolversTypes['ConfirmEmailOtpError']>, ParentType, ContextType>
+	ok?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
+	result?: Resolver<Maybe<ResolversTypes['ConfirmEmailOtpResult']>, ParentType, ContextType>
+	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
+}
+
+export type ConfirmEmailOtpResultResolvers<
+	ContextType = any,
+	ParentType extends ResolversParentTypes['ConfirmEmailOtpResult'] = ResolversParentTypes['ConfirmEmailOtpResult'],
+> = {
+	backupCodes?: Resolver<ReadonlyArray<ResolversTypes['String']>, ParentType, ContextType>
+	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
+}
+
+export type InitEmailOtpErrorResolvers<
+	ContextType = any,
+	ParentType extends ResolversParentTypes['InitEmailOtpError'] = ResolversParentTypes['InitEmailOtpError'],
+> = {
+	code?: Resolver<ResolversTypes['InitEmailOtpErrorCode'], ParentType, ContextType>
+	developerMessage?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
+}
+
+export type InitEmailOtpResponseResolvers<
+	ContextType = any,
+	ParentType extends ResolversParentTypes['InitEmailOtpResponse'] = ResolversParentTypes['InitEmailOtpResponse'],
+> = {
+	error?: Resolver<Maybe<ResolversTypes['InitEmailOtpError']>, ParentType, ContextType>
+	ok?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
+	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
+}
+
+export type DisableEmailOtpErrorResolvers<
+	ContextType = any,
+	ParentType extends ResolversParentTypes['DisableEmailOtpError'] = ResolversParentTypes['DisableEmailOtpError'],
+> = {
+	code?: Resolver<ResolversTypes['DisableEmailOtpErrorCode'], ParentType, ContextType>
+	developerMessage?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
+}
+
+export type DisableEmailOtpResponseResolvers<
+	ContextType = any,
+	ParentType extends ResolversParentTypes['DisableEmailOtpResponse'] = ResolversParentTypes['DisableEmailOtpResponse'],
+> = {
+	error?: Resolver<Maybe<ResolversTypes['DisableEmailOtpError']>, ParentType, ContextType>
+	ok?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
 	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
 }
 
@@ -3082,6 +3218,14 @@ export type MutationResolvers<ContextType = any, ParentType extends ResolversPar
 	>
 	configure?: Resolver<Maybe<ResolversTypes['ConfigureResponse']>, ParentType, ContextType, RequireFields<MutationConfigureArgs, 'config'>>
 	confirmOtp?: Resolver<Maybe<ResolversTypes['ConfirmOtpResponse']>, ParentType, ContextType, RequireFields<MutationConfirmOtpArgs, 'otpToken'>>
+	confirmEmailOtp?: Resolver<
+		Maybe<ResolversTypes['ConfirmEmailOtpResponse']>,
+		ParentType,
+		ContextType,
+		RequireFields<MutationConfirmEmailOtpArgs, 'otpToken'>
+	>
+	initEmailOtp?: Resolver<Maybe<ResolversTypes['InitEmailOtpResponse']>, ParentType, ContextType>
+	disableEmailOtp?: Resolver<Maybe<ResolversTypes['DisableEmailOtpResponse']>, ParentType, ContextType>
 	createApiKey?: Resolver<
 		Maybe<ResolversTypes['CreateApiKeyResponse']>,
 		ParentType,
@@ -3723,6 +3867,13 @@ export type Resolvers<ContextType = any> = {
 	ConfigureResponse?: ConfigureResponseResolvers<ContextType>
 	ConfirmOtpError?: ConfirmOtpErrorResolvers<ContextType>
 	ConfirmOtpResponse?: ConfirmOtpResponseResolvers<ContextType>
+	ConfirmEmailOtpError?: ConfirmEmailOtpErrorResolvers<ContextType>
+	ConfirmEmailOtpResponse?: ConfirmEmailOtpResponseResolvers<ContextType>
+	ConfirmEmailOtpResult?: ConfirmEmailOtpResultResolvers<ContextType>
+	InitEmailOtpError?: InitEmailOtpErrorResolvers<ContextType>
+	InitEmailOtpResponse?: InitEmailOtpResponseResolvers<ContextType>
+	DisableEmailOtpError?: DisableEmailOtpErrorResolvers<ContextType>
+	DisableEmailOtpResponse?: DisableEmailOtpResponseResolvers<ContextType>
 	ConfirmOtpResult?: ConfirmOtpResultResolvers<ContextType>
 	CreateApiKeyError?: CreateApiKeyErrorResolvers<ContextType>
 	CreateApiKeyResponse?: CreateApiKeyResponseResolvers<ContextType>

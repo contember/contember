@@ -13,6 +13,8 @@ import { getIdentityProjectsSql } from './sql/getIdentityProjectsSql.js'
 import { getNextLoginAttemptSql } from './sql/getNextLoginAttemptSql.js'
 import { getConfigSql } from './sql/getConfigSql.js'
 import { consumeBackupCodeSql } from './sql/consumeBackupCodeSql.js'
+import { consumeEmailOtpTokenSql, EMAIL_OTP_CODE, getLatestEmailOtpTokenSql, sendEmailOtpSql } from './sql/emailOtpSql.js'
+import { getMailTemplateSql } from './sql/getMailTemplateSql.js'
 
 test('signs in', async () => {
 	const email = 'john@doe.com'
@@ -326,6 +328,118 @@ test('sign in - valid backup code (when OTP is required)', async () => {
 				}),
 			}),
 		],
+	})
+})
+
+test('sign in - email OTP enabled, no code provided: dispatches a code and returns OTP_REQUIRED', async () => {
+	const email = 'john@doe.com'
+	const password = '123'
+	const identityId = testUuid(2)
+	const personId = testUuid(7)
+	await executeTenantTest({
+		query: signInMutation({ email, password }),
+		executes: [
+			getConfigSql(),
+			getNextLoginAttemptSql(email),
+			getPersonByEmailSql({ email, response: { personId, identityId, password, roles: [], emailOtpEnabled: true } }),
+			...sendEmailOtpSql({ personId, tokenId: testUuid(1) }),
+			getMailTemplateSql({ type: 'emailOtp', projectId: null }),
+			getMailTemplateSql({ type: 'emailOtp', projectId: null }),
+		],
+		return: {
+			data: {
+				signIn: {
+					ok: false,
+					errors: [{ code: 'OTP_REQUIRED' }],
+					result: null,
+				},
+			},
+		},
+		sentMails: [{ subject: 'Your verification code' }],
+		expectedAuthLog: [
+			{
+				type: 'login',
+				response: expect.objectContaining({ ok: false }),
+			},
+			expect.objectContaining({
+				type: 'email_otp_sent',
+				response: expect.objectContaining({ ok: false }),
+			}),
+		],
+	})
+})
+
+test('sign in - email OTP enabled, valid code: signs in', async () => {
+	const email = 'john@doe.com'
+	const password = '123'
+	const identityId = testUuid(2)
+	const personId = testUuid(7)
+	const tokenId = testUuid(50)
+	const apiKeyId = testUuid(1)
+	const projectId = testUuid(10)
+	await executeTenantTest({
+		query: signInMutation({ email, password, otpToken: EMAIL_OTP_CODE }),
+		executes: [
+			getConfigSql(),
+			getNextLoginAttemptSql(email),
+			getPersonByEmailSql({ email, response: { personId, identityId, password, roles: [], emailOtpEnabled: true } }),
+			getLatestEmailOtpTokenSql({ personId, tokenId }),
+			consumeEmailOtpTokenSql({ tokenId }),
+			getConfigSql(),
+			createSessionKeySql({ apiKeyId, identityId }),
+			getIdentityProjectsSql({ identityId, projectId }),
+			selectMembershipsSql({ identityId, projectId, membershipsResponse: [] }),
+		],
+		return: {
+			data: {
+				signIn: {
+					ok: true,
+					errors: [],
+					result: {
+						token: '0000000000000000000000000000000000000000',
+					},
+				},
+			},
+		},
+		expectedAuthLog: {
+			type: 'login',
+			response: expect.objectContaining({ ok: true }),
+		},
+	})
+})
+
+test('sign in - email OTP enabled, invalid code: INVALID_OTP_TOKEN', async () => {
+	const email = 'john@doe.com'
+	const password = '123'
+	const identityId = testUuid(2)
+	const personId = testUuid(7)
+	const tokenId = testUuid(50)
+	await executeTenantTest({
+		query: signInMutation({ email, password, otpToken: '111111' }),
+		executes: [
+			getConfigSql(),
+			getNextLoginAttemptSql(email),
+			getPersonByEmailSql({ email, response: { personId, identityId, password, roles: [], emailOtpEnabled: true } }),
+			getLatestEmailOtpTokenSql({ personId, tokenId }),
+			{
+				sql: SQL`update "tenant"."person_token" set "otp_attempts" = otp_attempts + 1 where "id" = ?`,
+				parameters: [tokenId],
+				response: { rowCount: 1 },
+			},
+		],
+		return: {
+			data: {
+				signIn: {
+					ok: false,
+					errors: [{ code: 'INVALID_OTP_TOKEN' }],
+					result: null,
+				},
+			},
+		},
+		expectedAuthLog: {
+			type: 'login',
+			response: expect.objectContaining({ ok: false }),
+		},
 	})
 })
 

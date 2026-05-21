@@ -3,6 +3,7 @@ export * from './captcha/index.js'
 export * from './idp/index.js'
 
 export * from './BackupCodeManager.js'
+export * from './EmailOtpManager.js'
 export * from './EmailValidator.js'
 export * from './IDPSignInManager.js'
 export * from './InviteManager.js'

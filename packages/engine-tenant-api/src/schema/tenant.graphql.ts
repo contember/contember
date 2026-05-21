@@ -80,6 +80,10 @@ const schema: DocumentNode = gql`
 		disableOtp: DisableOtpResponse
 		regenerateBackupCodes: RegenerateBackupCodesResponse
 
+		initEmailOtp: InitEmailOtpResponse
+		confirmEmailOtp(otpToken: String!): ConfirmEmailOtpResponse
+		disableEmailOtp: DisableEmailOtpResponse
+
 		disablePerson(personId: String!): DisablePersonResponse
 		forceSignOutPerson(personId: String!, reason: String): ForceSignOutPersonResponse
 		revokeSession(sessionId: String!): RevokeSessionResponse
@@ -1184,6 +1188,55 @@ const schema: DocumentNode = gql`
 		backupCodes: [String!]!
 	}
 
+	# ==== email otp (A05) ====
+
+	type InitEmailOtpResponse {
+		ok: Boolean!
+		error: InitEmailOtpError
+	}
+
+	type InitEmailOtpError {
+		code: InitEmailOtpErrorCode!
+		developerMessage: String!
+	}
+
+	enum InitEmailOtpErrorCode {
+		NO_EMAIL
+	}
+
+	type ConfirmEmailOtpResponse {
+		ok: Boolean!
+		error: ConfirmEmailOtpError
+		result: ConfirmEmailOtpResult
+	}
+
+	type ConfirmEmailOtpResult {
+		backupCodes: [String!]!
+	}
+
+	type ConfirmEmailOtpError {
+		code: ConfirmEmailOtpErrorCode!
+		developerMessage: String!
+	}
+
+	enum ConfirmEmailOtpErrorCode {
+		INVALID_OTP_TOKEN
+	}
+
+	type DisableEmailOtpResponse {
+		ok: Boolean!
+		error: DisableEmailOtpError
+	}
+
+	type DisableEmailOtpError {
+		code: DisableEmailOtpErrorCode!
+		developerMessage: String!
+	}
+
+	enum DisableEmailOtpErrorCode {
+		EMAIL_OTP_NOT_ACTIVE
+	}
+
 	type DisablePersonResponse {
 		ok: Boolean!
 		error: DisablePersonError
@@ -1280,6 +1333,7 @@ const schema: DocumentNode = gql`
 		RESET_PASSWORD_REQUEST
 		PASSWORDLESS_SIGN_IN
 		FORCED_SIGN_OUT
+		EMAIL_OTP
 	}
 
 	input MailTemplateIdentifier {

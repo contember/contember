@@ -58,7 +58,8 @@ CREATE TYPE "config_singleton" AS ENUM (
 );
 CREATE TYPE "person_token_type" AS ENUM (
     'password_reset',
-    'passwordless'
+    'passwordless',
+    'mfa_email_otp'
 );
 CREATE FUNCTION "project_deleted"() RETURNS "trigger"
     LANGUAGE "plpgsql"

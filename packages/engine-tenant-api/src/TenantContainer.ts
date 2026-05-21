@@ -6,6 +6,7 @@ import {
 	ApiKeyManager,
 	ApiKeyService,
 	AppleProvider,
+	BackupCodeManager,
 	CaptchaValidator,
 	DatabaseContext,
 	EmailValidator,
@@ -65,6 +66,7 @@ import {
 	ProjectMembersQueryResolver,
 	ProjectQueryResolver,
 	ProjectTypeResolver,
+	RegenerateBackupCodesMutationResolver,
 	RemoveProjectMemberMutationResolver,
 	ResetPasswordMutationResolver,
 	ResolverFactory,
@@ -203,7 +205,11 @@ export class TenantContainerFactory {
 			.addService('idpManager', ({ idpRegistry }) => new IDPManager(idpRegistry))
 			.addService('otpAuthenticator', ({ providers }) => new OtpAuthenticator(providers))
 			.addService('otpManager', ({ otpAuthenticator, providers }) => new OtpManager(otpAuthenticator, providers))
-			.addService('signInManager', ({ apiKeyManager, providers, otpManager }) => new SignInManager(apiKeyManager, providers, otpManager))
+			.addService('backupCodeManager', ({ providers }) => new BackupCodeManager(providers))
+			.addService(
+				'signInManager',
+				({ apiKeyManager, providers, otpManager, backupCodeManager }) => new SignInManager(apiKeyManager, providers, otpManager, backupCodeManager),
+			)
 			.addService('membershipValidator', ({ projectSchemaResolver }) => new MembershipValidator(projectSchemaResolver))
 			.addService('inviteManager', ({ providers, userMailer, projectSchemaResolver }) => new InviteManager(providers, userMailer, projectSchemaResolver))
 			.addService('mailTemplateManager', () => new MailTemplateManager())
@@ -211,8 +217,8 @@ export class TenantContainerFactory {
 			.addService('configurationManager', () => new ConfigurationManager())
 			.addService(
 				'passwordlessSignInManager',
-				({ apiKeyManager, userMailer, projectManager, otpManager }) =>
-					new PasswordlessSignInManager(apiKeyManager, userMailer, projectManager, otpManager),
+				({ apiKeyManager, userMailer, projectManager, otpManager, backupCodeManager }) =>
+					new PasswordlessSignInManager(apiKeyManager, userMailer, projectManager, otpManager, backupCodeManager),
 			)
 			.addService(
 				'identityTypeResolver',
@@ -276,7 +282,11 @@ export class TenantContainerFactory {
 				({ apiKeyManager, projectManager, membershipValidator }) => new CreateApiKeyMutationResolver(apiKeyManager, projectManager, membershipValidator),
 			)
 			.addService('disableApiKeyMutationResolver', ({ apiKeyManager }) => new DisableApiKeyMutationResolver(apiKeyManager))
-			.addService('otpMutationResolver', ({ otpManager }) => new OtpMutationResolver(otpManager))
+			.addService('otpMutationResolver', ({ otpManager, backupCodeManager }) => new OtpMutationResolver(otpManager, backupCodeManager))
+			.addService(
+				'regenerateBackupCodesMutationResolver',
+				({ backupCodeManager }) => new RegenerateBackupCodesMutationResolver(backupCodeManager),
+			)
 			.addService(
 				'mailTemplateMutationResolver',
 				({ projectManager, mailTemplateManager }) => new MailTemplateMutationResolver(projectManager, mailTemplateManager),

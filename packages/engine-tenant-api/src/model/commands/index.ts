@@ -1,4 +1,5 @@
 export * from './apiKey/index.js'
+export * from './backupCode/index.js'
 export * from './configuration/index.js'
 export * from './person/index.js'
 export * from './rateLimit/index.js'

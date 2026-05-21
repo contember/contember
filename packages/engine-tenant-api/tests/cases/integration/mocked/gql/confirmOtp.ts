@@ -9,6 +9,9 @@ export const confirmOtpMutation = (variables: { token: string }): GraphQLTestQue
 			errors {
 				code
 			}
+			result {
+				backupCodes
+			}
 		}
 	}`,
 	variables,

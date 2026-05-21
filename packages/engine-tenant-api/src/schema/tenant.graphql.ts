@@ -38,7 +38,7 @@ const schema: DocumentNode = gql`
 
 	type Mutation {
 		signUp(email: String!, password: String, passwordHash: String, roles: [String!], name: String, captchaToken: String): SignUpResponse
-		signIn(email: String!, password: String!, expiration: Int, otpToken: String, options: SignInOptions): SignInResponse
+		signIn(email: String!, password: String!, expiration: Int, otpToken: String, backupCode: String, options: SignInOptions): SignInResponse
 		createSessionToken(email: String, personId: String, expiration: Int, options: SignInOptions): CreateSessionTokenResponse
 		signOut(all: Boolean): SignOutResponse
 		changeProfile(personId: String!, email: String, name: String): ChangeProfileResponse
@@ -63,7 +63,7 @@ const schema: DocumentNode = gql`
 		
 		# passwordless sign in
 		initSignInPasswordless(email: String!, options: InitSignInPasswordlessOptions, captchaToken: String): InitSignInPasswordlessResponse
-		signInPasswordless(requestId: String!, validationType: PasswordlessValidationType!, token: String!, expiration: Int, mfaOtp: String, options: SignInOptions): SignInPasswordlessResponse
+		signInPasswordless(requestId: String!, validationType: PasswordlessValidationType!, token: String!, expiration: Int, mfaOtp: String, backupCode: String, options: SignInOptions): SignInPasswordlessResponse
 		activatePasswordlessOtp(requestId: String!, token: String!, otpHash: String!): ActivatePasswordlessOtpResponse
 
         enableMyPasswordless: ToggleMyPasswordlessResponse
@@ -78,6 +78,7 @@ const schema: DocumentNode = gql`
 		prepareOtp(label: String): PrepareOtpResponse
 		confirmOtp(otpToken: String!): ConfirmOtpResponse
 		disableOtp: DisableOtpResponse
+		regenerateBackupCodes: RegenerateBackupCodesResponse
 
 		disablePerson(personId: String!): DisablePersonResponse
 		forceSignOutPerson(personId: String!, reason: String): ForceSignOutPersonResponse
@@ -1130,6 +1131,11 @@ const schema: DocumentNode = gql`
 		ok: Boolean!
 		errors: [ConfirmOtpError!]! @deprecated
 		error: ConfirmOtpError
+		result: ConfirmOtpResult
+	}
+
+	type ConfirmOtpResult {
+		backupCodes: [String!]!
 	}
 
 	type ConfirmOtpError {
@@ -1157,6 +1163,25 @@ const schema: DocumentNode = gql`
 
 	enum DisableOtpErrorCode {
 		OTP_NOT_ACTIVE
+	}
+
+	type RegenerateBackupCodesResponse {
+		ok: Boolean!
+		error: RegenerateBackupCodesError
+		result: RegenerateBackupCodesResult
+	}
+
+	type RegenerateBackupCodesError {
+		code: RegenerateBackupCodesErrorCode!
+		developerMessage: String!
+	}
+
+	enum RegenerateBackupCodesErrorCode {
+		OTP_NOT_ACTIVE
+	}
+
+	type RegenerateBackupCodesResult {
+		backupCodes: [String!]!
 	}
 
 	type DisablePersonResponse {

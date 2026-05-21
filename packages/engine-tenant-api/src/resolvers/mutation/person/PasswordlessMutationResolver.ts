@@ -84,6 +84,7 @@ export class PasswordlessMutationResolver
 			requestId: args.requestId,
 			token: args.token,
 			mfaOtp: args.mfaOtp ?? undefined,
+			backupCode: args.backupCode ?? undefined,
 			validationType: args.validationType,
 			expiration: args.expiration ?? undefined,
 			requestInfo: context.httpInfo,
@@ -93,6 +94,13 @@ export class PasswordlessMutationResolver
 			type: 'passwordless_login',
 			response: signIn,
 		})
+		if (signIn.ok && signIn.result.usedBackupCode) {
+			await context.logAuthAction({
+				type: 'backup_code_used',
+				response: signIn,
+				personId: signIn.result.person.id,
+			})
+		}
 		if (!signIn.ok) {
 			return createErrorResponse(signIn.error, signIn.errorMessage)
 		}

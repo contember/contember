@@ -478,6 +478,12 @@ export type ConfirmOtpResponse = {
 	/** @deprecated Field no longer supported */
 	readonly errors: ReadonlyArray<ConfirmOtpError>
 	readonly ok: Scalars['Boolean']['output']
+	readonly result?: Maybe<ConfirmOtpResult>
+}
+
+export type ConfirmOtpResult = {
+	readonly __typename?: 'ConfirmOtpResult'
+	readonly backupCodes: ReadonlyArray<Scalars['String']['output']>
 }
 
 export type CreateApiKeyError = {
@@ -639,6 +645,26 @@ export type DisableOtpResponse = {
 	/** @deprecated Field no longer supported */
 	readonly errors: ReadonlyArray<DisableOtpError>
 	readonly ok: Scalars['Boolean']['output']
+}
+
+export type RegenerateBackupCodesError = {
+	readonly __typename?: 'RegenerateBackupCodesError'
+	readonly code: RegenerateBackupCodesErrorCode
+	readonly developerMessage: Scalars['String']['output']
+}
+
+export type RegenerateBackupCodesErrorCode = 'OTP_NOT_ACTIVE'
+
+export type RegenerateBackupCodesResponse = {
+	readonly __typename?: 'RegenerateBackupCodesResponse'
+	readonly error?: Maybe<RegenerateBackupCodesError>
+	readonly ok: Scalars['Boolean']['output']
+	readonly result?: Maybe<RegenerateBackupCodesResult>
+}
+
+export type RegenerateBackupCodesResult = {
+	readonly __typename?: 'RegenerateBackupCodesResult'
+	readonly backupCodes: ReadonlyArray<Scalars['String']['output']>
 }
 
 export type DisablePersonError = {
@@ -975,6 +1001,7 @@ export type Mutation = {
 	readonly initSignInPasswordless?: Maybe<InitSignInPasswordlessResponse>
 	readonly invite?: Maybe<InviteResponse>
 	readonly prepareOtp?: Maybe<PrepareOtpResponse>
+	readonly regenerateBackupCodes?: Maybe<RegenerateBackupCodesResponse>
 	readonly removeGlobalIdentityRoles?: Maybe<RemoveGlobalIdentityRolesResponse>
 	readonly removeMailTemplate?: Maybe<RemoveMailTemplateResponse>
 	/** @deprecated use removeMailTemplate */
@@ -1171,6 +1198,7 @@ export type MutationSetProjectSecretArgs = {
 }
 
 export type MutationSignInArgs = {
+	backupCode?: InputMaybe<Scalars['String']['input']>
 	email: Scalars['String']['input']
 	expiration?: InputMaybe<Scalars['Int']['input']>
 	options?: InputMaybe<SignInOptions>
@@ -1189,6 +1217,7 @@ export type MutationSignInIdpArgs = {
 }
 
 export type MutationSignInPasswordlessArgs = {
+	backupCode?: InputMaybe<Scalars['String']['input']>
 	expiration?: InputMaybe<Scalars['Int']['input']>
 	mfaOtp?: InputMaybe<Scalars['String']['input']>
 	options?: InputMaybe<SignInOptions>
@@ -1863,6 +1892,7 @@ export type ResolversTypes = {
 	ConfirmOtpError: ResolverTypeWrapper<ConfirmOtpError>
 	ConfirmOtpErrorCode: ConfirmOtpErrorCode
 	ConfirmOtpResponse: ResolverTypeWrapper<ConfirmOtpResponse>
+	ConfirmOtpResult: ResolverTypeWrapper<ConfirmOtpResult>
 	CreateApiKeyError: ResolverTypeWrapper<CreateApiKeyError>
 	CreateApiKeyErrorCode: CreateApiKeyErrorCode
 	CreateApiKeyOptions: CreateApiKeyOptions
@@ -1960,6 +1990,10 @@ export type ResolversTypes = {
 	ProjectMembersInput: ProjectMembersInput
 	ProjectSecret: ProjectSecret
 	Query: ResolverTypeWrapper<{}>
+	RegenerateBackupCodesError: ResolverTypeWrapper<RegenerateBackupCodesError>
+	RegenerateBackupCodesErrorCode: RegenerateBackupCodesErrorCode
+	RegenerateBackupCodesResponse: ResolverTypeWrapper<RegenerateBackupCodesResponse>
+	RegenerateBackupCodesResult: ResolverTypeWrapper<RegenerateBackupCodesResult>
 	RemoveGlobalIdentityRolesError: ResolverTypeWrapper<RemoveGlobalIdentityRolesError>
 	RemoveGlobalIdentityRolesErrorCode: RemoveGlobalIdentityRolesErrorCode
 	RemoveGlobalIdentityRolesResponse: ResolverTypeWrapper<
@@ -2072,6 +2106,7 @@ export type ResolversParentTypes = {
 	ConfigureResponse: ConfigureResponse
 	ConfirmOtpError: ConfirmOtpError
 	ConfirmOtpResponse: ConfirmOtpResponse
+	ConfirmOtpResult: ConfirmOtpResult
 	CreateApiKeyError: CreateApiKeyError
 	CreateApiKeyOptions: CreateApiKeyOptions
 	CreateApiKeyResponse: Omit<CreateApiKeyResponse, 'result'> & { result?: Maybe<ResolversParentTypes['CreateApiKeyResult']> }
@@ -2146,6 +2181,9 @@ export type ResolversParentTypes = {
 	ProjectMembersInput: ProjectMembersInput
 	ProjectSecret: ProjectSecret
 	Query: {}
+	RegenerateBackupCodesError: RegenerateBackupCodesError
+	RegenerateBackupCodesResponse: RegenerateBackupCodesResponse
+	RegenerateBackupCodesResult: RegenerateBackupCodesResult
 	RemoveGlobalIdentityRolesError: RemoveGlobalIdentityRolesError
 	RemoveGlobalIdentityRolesResponse: Omit<RemoveGlobalIdentityRolesResponse, 'result'> & {
 		result?: Maybe<ResolversParentTypes['RemoveGlobalIdentityRolesResult']>
@@ -2512,6 +2550,15 @@ export type ConfirmOtpResponseResolvers<
 	error?: Resolver<Maybe<ResolversTypes['ConfirmOtpError']>, ParentType, ContextType>
 	errors?: Resolver<ReadonlyArray<ResolversTypes['ConfirmOtpError']>, ParentType, ContextType>
 	ok?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
+	result?: Resolver<Maybe<ResolversTypes['ConfirmOtpResult']>, ParentType, ContextType>
+	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
+}
+
+export type ConfirmOtpResultResolvers<
+	ContextType = any,
+	ParentType extends ResolversParentTypes['ConfirmOtpResult'] = ResolversParentTypes['ConfirmOtpResult'],
+> = {
+	backupCodes?: Resolver<ReadonlyArray<ResolversTypes['String']>, ParentType, ContextType>
 	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
 }
 
@@ -3102,6 +3149,7 @@ export type MutationResolvers<ContextType = any, ParentType extends ResolversPar
 		RequireFields<MutationInviteArgs, 'email' | 'memberships' | 'projectSlug'>
 	>
 	prepareOtp?: Resolver<Maybe<ResolversTypes['PrepareOtpResponse']>, ParentType, ContextType, Partial<MutationPrepareOtpArgs>>
+	regenerateBackupCodes?: Resolver<Maybe<ResolversTypes['RegenerateBackupCodesResponse']>, ParentType, ContextType>
 	removeGlobalIdentityRoles?: Resolver<
 		Maybe<ResolversTypes['RemoveGlobalIdentityRolesResponse']>,
 		ParentType,
@@ -3243,6 +3291,33 @@ export type QueryResolvers<ContextType = any, ParentType extends ResolversParent
 		RequireFields<QueryProjectMembershipsArgs, 'identityId' | 'projectSlug'>
 	>
 	projects?: Resolver<ReadonlyArray<ResolversTypes['Project']>, ParentType, ContextType>
+}
+
+export type RegenerateBackupCodesErrorResolvers<
+	ContextType = any,
+	ParentType extends ResolversParentTypes['RegenerateBackupCodesError'] = ResolversParentTypes['RegenerateBackupCodesError'],
+> = {
+	code?: Resolver<ResolversTypes['RegenerateBackupCodesErrorCode'], ParentType, ContextType>
+	developerMessage?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
+}
+
+export type RegenerateBackupCodesResponseResolvers<
+	ContextType = any,
+	ParentType extends ResolversParentTypes['RegenerateBackupCodesResponse'] = ResolversParentTypes['RegenerateBackupCodesResponse'],
+> = {
+	error?: Resolver<Maybe<ResolversTypes['RegenerateBackupCodesError']>, ParentType, ContextType>
+	ok?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
+	result?: Resolver<Maybe<ResolversTypes['RegenerateBackupCodesResult']>, ParentType, ContextType>
+	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
+}
+
+export type RegenerateBackupCodesResultResolvers<
+	ContextType = any,
+	ParentType extends ResolversParentTypes['RegenerateBackupCodesResult'] = ResolversParentTypes['RegenerateBackupCodesResult'],
+> = {
+	backupCodes?: Resolver<ReadonlyArray<ResolversTypes['String']>, ParentType, ContextType>
+	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
 }
 
 export type RemoveGlobalIdentityRolesErrorResolvers<
@@ -3648,6 +3723,7 @@ export type Resolvers<ContextType = any> = {
 	ConfigureResponse?: ConfigureResponseResolvers<ContextType>
 	ConfirmOtpError?: ConfirmOtpErrorResolvers<ContextType>
 	ConfirmOtpResponse?: ConfirmOtpResponseResolvers<ContextType>
+	ConfirmOtpResult?: ConfirmOtpResultResolvers<ContextType>
 	CreateApiKeyError?: CreateApiKeyErrorResolvers<ContextType>
 	CreateApiKeyResponse?: CreateApiKeyResponseResolvers<ContextType>
 	CreateApiKeyResult?: CreateApiKeyResultResolvers<ContextType>
@@ -3701,6 +3777,9 @@ export type Resolvers<ContextType = any> = {
 	Project?: ProjectResolvers<ContextType>
 	ProjectIdentityRelation?: ProjectIdentityRelationResolvers<ContextType>
 	Query?: QueryResolvers<ContextType>
+	RegenerateBackupCodesError?: RegenerateBackupCodesErrorResolvers<ContextType>
+	RegenerateBackupCodesResponse?: RegenerateBackupCodesResponseResolvers<ContextType>
+	RegenerateBackupCodesResult?: RegenerateBackupCodesResultResolvers<ContextType>
 	RemoveGlobalIdentityRolesError?: RemoveGlobalIdentityRolesErrorResolvers<ContextType>
 	RemoveGlobalIdentityRolesResponse?: RemoveGlobalIdentityRolesResponseResolvers<ContextType>
 	RemoveGlobalIdentityRolesResult?: RemoveGlobalIdentityRolesResultResolvers<ContextType>

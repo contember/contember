@@ -1,6 +1,7 @@
 import { authenticatedIdentityId, executeTenantTest, now } from '../../../src/testTenant.js'
 import { testUuid } from '../../../src/testUuid.js'
 import { getPersonByIdentity } from './sql/getPersonByIdentity.js'
+import { generateBackupCodesSql } from './sql/generateBackupCodesSql.js'
 import { confirmOtpMutation } from './gql/confirmOtp.js'
 import { expect, test } from 'bun:test'
 import { OtpAuthenticator } from '../../../../src/index.js'
@@ -35,21 +36,44 @@ test('confirm otp mutation with valid code', async () => {
 					rowCount: 1,
 				},
 			},
+			...generateBackupCodesSql({ personId, firstUuidIndex: 1 }),
 		],
 		return: {
 			data: {
 				confirmOtp: {
 					ok: true,
 					errors: [],
+					result: {
+						backupCodes: [
+							'aaaaa-aaaaa',
+							'aaaaa-aaaaa',
+							'aaaaa-aaaaa',
+							'aaaaa-aaaaa',
+							'aaaaa-aaaaa',
+							'aaaaa-aaaaa',
+							'aaaaa-aaaaa',
+							'aaaaa-aaaaa',
+							'aaaaa-aaaaa',
+							'aaaaa-aaaaa',
+						],
+					},
 				},
 			},
 		},
-		expectedAuthLog: expect.objectContaining({
-			type: '2fa_enable',
-			response: expect.objectContaining({
-				ok: true,
+		expectedAuthLog: [
+			expect.objectContaining({
+				type: '2fa_enable',
+				response: expect.objectContaining({
+					ok: true,
+				}),
 			}),
-		}),
+			expect.objectContaining({
+				type: 'backup_code_generated',
+				response: expect.objectContaining({
+					ok: true,
+				}),
+			}),
+		],
 	})
 })
 
@@ -74,6 +98,7 @@ test('confirm otp mutation with invalid code', async () => {
 				confirmOtp: {
 					ok: false,
 					errors: [{ code: 'INVALID_OTP_TOKEN' }],
+					result: null,
 				},
 			},
 		},

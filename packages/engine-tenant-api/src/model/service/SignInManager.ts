@@ -1,5 +1,5 @@
 import { CreateSessionTokenErrorCode, SignInErrorCode } from '../../schema/index.js'
-import { ApiKeyManager, OtpManager } from '../service/index.js'
+import { ApiKeyManager, BackupCodeManager, OtpManager } from '../service/index.js'
 import { PersonQuery, PersonRow, PersonUniqueIdentifier } from '../queries/index.js'
 import { Providers } from '../providers.js'
 import { DatabaseContext } from '../utils/index.js'
@@ -13,6 +13,7 @@ class SignInManager {
 		private readonly apiKeyManager: ApiKeyManager,
 		private readonly providers: Providers,
 		private readonly otpManager: OtpManager,
+		private readonly backupCodeManager: BackupCodeManager,
 	) {}
 
 	async signIn(
@@ -23,6 +24,7 @@ class SignInManager {
 		otpCode?: string,
 		requestInfo?: ApiKeyRequestInfo,
 		trustForwardedInfo?: boolean,
+		backupCode?: string,
 	): Promise<SignInResponse> {
 		const person = await dbContext.queryHandler.fetch(PersonQuery.byEmail(email))
 
@@ -54,19 +56,25 @@ class SignInManager {
 			return new ResponseError('INVALID_PASSWORD', `Password does not match`, authLogData)
 		}
 
+		let usedBackupCode = false
 		if (person.otp_secret && person.otp_activated_at) {
-			if (!otpCode) {
+			if (otpCode) {
+				if (!await this.otpManager.verifyOtp(person, otpCode)) {
+					return new ResponseError('INVALID_OTP_TOKEN', 'OTP token validation has failed', authLogData)
+				}
+			} else if (backupCode) {
+				if (!await this.backupCodeManager.verifyAndConsume(dbContext, person.id, backupCode)) {
+					return new ResponseError('INVALID_OTP_TOKEN', 'OTP token validation has failed', authLogData)
+				}
+				usedBackupCode = true
+			} else {
 				return new ResponseError('OTP_REQUIRED', `2FA is enabled. OTP token is required`, authLogData)
-			}
-
-			if (!await this.otpManager.verifyOtp(person, otpCode)) {
-				return new ResponseError('INVALID_OTP_TOKEN', 'OTP token validation has failed', authLogData)
 			}
 		}
 
 		const sessionToken = await this.apiKeyManager.createSessionApiKey(dbContext, person.identity_id, expiration, requestInfo, trustForwardedInfo)
 
-		return new ResponseOk({ person, token: sessionToken, ...authLogData })
+		return new ResponseOk({ person, token: sessionToken, usedBackupCode, ...authLogData })
 	}
 
 	async createSessionToken(
@@ -124,6 +132,8 @@ class SignInManager {
 export interface SignInResult {
 	readonly person: PersonRow
 	readonly token: string
+	/** True when MFA was satisfied by consuming a backup code (instead of a TOTP token). */
+	readonly usedBackupCode?: boolean
 	[AuthLogService.Key]: AuthLogService.Bag
 }
 

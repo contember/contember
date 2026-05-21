@@ -1,5 +1,5 @@
 import { CreateSessionTokenErrorCode, SignInErrorCode } from '../../schema'
-import { ApiKeyManager, BackupCodeManager, OtpManager } from '../service'
+import { ApiKeyManager, BackupCodeManager, EmailOtpManager, OtpManager } from '../service'
 import { PersonQuery, PersonRow, PersonUniqueIdentifier } from '../queries'
 import { Providers } from '../providers'
 import { DatabaseContext } from '../utils'
@@ -14,6 +14,7 @@ class SignInManager {
 		private readonly providers: Providers,
 		private readonly otpManager: OtpManager,
 		private readonly backupCodeManager: BackupCodeManager,
+		private readonly emailOtpManager: EmailOtpManager,
 	) {}
 
 	async signIn(
@@ -58,6 +59,7 @@ class SignInManager {
 
 		let usedBackupCode = false
 		if (person.otp_secret && person.otp_activated_at) {
+			// Active TOTP takes precedence (A07 path, unchanged).
 			if (otpCode) {
 				if (!await this.otpManager.verifyOtp(person, otpCode)) {
 					return new ResponseError('INVALID_OTP_TOKEN', 'OTP token validation has failed', authLogData)
@@ -69,6 +71,26 @@ class SignInManager {
 				usedBackupCode = true
 			} else {
 				return new ResponseError('OTP_REQUIRED', `2FA is enabled. OTP token is required`, authLogData)
+			}
+		} else if (person.email_otp_enabled) {
+			// No active TOTP, but email OTP is enabled (A05).
+			if (otpCode) {
+				if (!await this.emailOtpManager.verifyAndConsume(dbContext, person, otpCode)) {
+					return new ResponseError('INVALID_OTP_TOKEN', 'OTP token validation has failed', authLogData)
+				}
+			} else if (backupCode) {
+				if (!await this.backupCodeManager.verifyAndConsume(dbContext, person.id, backupCode)) {
+					return new ResponseError('INVALID_OTP_TOKEN', 'OTP token validation has failed', authLogData)
+				}
+				usedBackupCode = true
+			} else {
+				// Dispatch a fresh code and ask the client to retry with otpToken. Reuses
+				// the existing OTP_REQUIRED contract so clients that already handle it work.
+				await this.emailOtpManager.sendCode(dbContext, person)
+				return new ResponseError('OTP_REQUIRED', `2FA is enabled. OTP token is required`, {
+					emailOtpSent: true,
+					...authLogData,
+				})
 			}
 		}
 
@@ -138,6 +160,8 @@ export interface SignInResult {
 }
 
 export type SignInResponse = Response<SignInResult, SignInErrorCode, {
+	/** Set on an OTP_REQUIRED error when an email-OTP code was just dispatched (A05). */
+	emailOtpSent?: boolean
 	[AuthLogService.Key]: AuthLogService.Bag
 }>
 export type CreateSessionTokenResponse = Response<SignInResult, CreateSessionTokenErrorCode, {

@@ -3,6 +3,7 @@ import NewUserInvited from './templates/NewUserInvited.mustache'
 import ExistingUserInvited from './templates/ExistingUserInvited.mustache'
 import PasswordReset from './templates/PasswordReset.mustache'
 import PasswordlessSignIn from './templates/PasswordlessSignIn.mustache'
+import EmailOtp from './templates/EmailOtp.mustache'
 import ForcedSignOut from './templates/ForcedSignOut.mustache'
 import { MailTemplateData, MailTemplateIdentifier, MailType } from './type'
 import { MailTemplateQuery } from '../queries'
@@ -88,6 +89,20 @@ export class UserMailer {
 		const template = (await this.getCustomTemplate(dbContext, templateId)) || {
 			subject: 'Sign in here',
 			content: PasswordlessSignIn,
+			replyTo: null,
+		}
+		await this.sendMail(templateId, template, mailArguments)
+	}
+
+	async sendEmailOtpEmail(
+		dbContext: DatabaseContext,
+		mailArguments: { email: string; code: string; project?: string; projectSlug?: string },
+		customMailOptions: { projectId: string | null; variant: string },
+	): Promise<void> {
+		const templateId = { type: MailType.emailOtp, ...customMailOptions }
+		const template = (await this.getCustomTemplate(dbContext, templateId)) || {
+			subject: 'Your verification code',
+			content: EmailOtp,
 			replyTo: null,
 		}
 		await this.sendMail(templateId, template, mailArguments)

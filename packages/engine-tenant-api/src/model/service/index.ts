@@ -3,6 +3,7 @@ export * from './captcha'
 export * from './idp'
 
 export * from './BackupCodeManager'
+export * from './EmailOtpManager'
 export * from './EmailValidator'
 export * from './IDPSignInManager'
 export * from './InviteManager'

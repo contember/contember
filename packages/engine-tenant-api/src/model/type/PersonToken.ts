@@ -1,5 +1,5 @@
 export namespace PersonToken {
-	export type Type = 'password_reset' | 'passwordless'
+	export type Type = 'password_reset' | 'passwordless' | 'mfa_email_otp'
 	export type ValidationType = 'token' | 'otp'
 
 	export interface Row {

@@ -7,6 +7,7 @@ import {
 	CreateProjectMutationResolver,
 	DisableApiKeyMutationResolver,
 	DisableIDPMutationResolver,
+	EmailOtpMutationResolver,
 	EnableIDPMutationResolver,
 	IdentityGlobalRolesMutationResolver,
 	IDPMutationResolver,
@@ -75,6 +76,7 @@ class ResolverFactory {
 			disableApiKeyMutationResolver: DisableApiKeyMutationResolver
 
 			otpMutationResolver: OtpMutationResolver
+			emailOtpMutationResolver: EmailOtpMutationResolver
 			regenerateBackupCodesMutationResolver: RegenerateBackupCodesMutationResolver
 
 			mailTemplateMutationResolver: MailTemplateMutationResolver
@@ -183,6 +185,10 @@ class ResolverFactory {
 				regenerateBackupCodes: this.resolvers.regenerateBackupCodesMutationResolver.regenerateBackupCodes.bind(
 					this.resolvers.regenerateBackupCodesMutationResolver,
 				),
+
+				initEmailOtp: this.resolvers.emailOtpMutationResolver.initEmailOtp.bind(this.resolvers.emailOtpMutationResolver),
+				confirmEmailOtp: this.resolvers.emailOtpMutationResolver.confirmEmailOtp.bind(this.resolvers.emailOtpMutationResolver),
+				disableEmailOtp: this.resolvers.emailOtpMutationResolver.disableEmailOtp.bind(this.resolvers.emailOtpMutationResolver),
 
 				addMailTemplate: this.resolvers.mailTemplateMutationResolver.addMailTemplate.bind(this.resolvers.mailTemplateMutationResolver),
 				removeMailTemplate: this.resolvers.mailTemplateMutationResolver.removeMailTemplate.bind(this.resolvers.mailTemplateMutationResolver),

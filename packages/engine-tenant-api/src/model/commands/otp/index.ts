@@ -1,3 +1,4 @@
 export * from './ConfirmOtpCommand'
 export * from './DisableOtpCommand'
 export * from './PrepareOtpCommand'
+export * from './SetEmailOtpEnabledCommand'

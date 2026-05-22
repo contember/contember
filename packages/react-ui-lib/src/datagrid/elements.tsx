@@ -1,8 +1,8 @@
 import { EyeIcon, EyeOffIcon } from 'lucide-react'
-import { dict } from '../dict'
+import { dict } from '@contember/react-ui-lib-base'
 import * as React from 'react'
 import { DataViewElementData, DataViewVisibilityTrigger, useDataViewElements } from '@contember/react-dataview'
-import { ScrollArea } from '../ui/scroll-area'
+import { ScrollArea } from '@contember/react-ui-lib-base'
 import { Fragment } from 'react'
 
 /**

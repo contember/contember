@@ -1,10 +1,10 @@
-import { uic } from '../utils'
-import { Button } from '../ui/button'
+import { uic } from '@contember/react-ui-lib-base'
+import { Button } from '@contember/react-ui-lib-base'
 import * as React from 'react'
 import { forwardRef } from 'react'
 import { CheckIcon, PlusIcon, XIcon } from 'lucide-react'
-import { PopoverContent } from '../ui/popover'
-import { dict } from '../dict'
+import { PopoverContent } from '@contember/react-ui-lib-base'
+import { dict } from '@contember/react-ui-lib-base'
 
 export const SelectInputWrapperUI = uic('div', {
 	baseClass: 'w-full max-w-md relative',

@@ -2,7 +2,7 @@ import { Link } from '@contember/interface'
 import { useHasActiveSlotsFactory } from '@contember/react-slots'
 import { dataAttribute } from '@contember/utilities'
 import { PropsWithChildren } from 'react'
-import { Separator } from '../ui/separator'
+import { Separator } from '@contember/react-ui-lib-base'
 import {
 	Sidebar,
 	SidebarContent,
@@ -19,7 +19,7 @@ import {
 	SidebarProvider,
 	SidebarRail,
 	SidebarTrigger,
-} from '../ui/sidebar'
+} from '@contember/react-ui-lib-base'
 import { SlotTargets } from './slots'
 
 export const LayoutComponent = ({ children }: PropsWithChildren) => {

@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { ReactNode, useCallback } from 'react'
-import { Popover, PopoverTrigger } from '../ui/popover'
+import { Popover, PopoverTrigger } from '@contember/react-ui-lib-base'
 import {
 	Component,
 	RecursionTerminatorPortal,
@@ -9,7 +9,7 @@ import {
 	useEntity,
 	useEntityBeforePersist,
 } from '@contember/interface'
-import { Button } from '../ui/button'
+import { Button } from '@contember/react-ui-lib-base'
 import { ChevronDownIcon, XIcon } from 'lucide-react'
 import {
 	SelectCreateNewTrigger,
@@ -24,7 +24,7 @@ import { Select, SelectEachValue, SelectItemTrigger, SelectPlaceholder } from '@
 import { CreateEntityDialog } from './create-new'
 import { DataViewSortingDirections, DataViewUnionFilterFields } from '@contember/react-dataview'
 import { useFormFieldId } from '@contember/react-form'
-import { dict } from '../dict'
+import { dict } from '@contember/react-ui-lib-base'
 
 export type SelectInputProps = {
 	field: SugaredRelativeSingleEntity['field']

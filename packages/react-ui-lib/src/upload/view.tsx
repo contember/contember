@@ -10,9 +10,9 @@ import {
 	VideoFileDataExtractorProps,
 } from '@contember/react-uploader'
 import { formatBytes, formatDate, formatDuration } from '../formatting'
-import { Button } from '../ui/button'
+import { Button } from '@contember/react-ui-lib-base'
 import { EditIcon, FileIcon, InfoIcon, TrashIcon } from 'lucide-react'
-import { Popover, PopoverContent, PopoverTrigger } from '../ui/popover'
+import { Popover, PopoverContent, PopoverTrigger } from '@contember/react-ui-lib-base'
 import { formatImageResizeUrl } from '../images'
 
 export type BaseFileViewProps = {

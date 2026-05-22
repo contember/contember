@@ -1,10 +1,10 @@
 import { PersistTrigger } from '@contember/interface'
 import { ComponentProps, ReactNode } from 'react'
-import { dict } from '../dict'
-import { Button } from '../ui/button'
-import { Loader } from '../ui/loader'
+import { dict } from '@contember/react-ui-lib-base'
+import { Button } from '@contember/react-ui-lib-base'
+import { Loader } from '@contember/react-ui-lib-base'
 import { usePersistSuccessHandler } from './hooks'
-import { cn } from '../utils'
+import { cn } from '@contember/react-ui-lib-base'
 
 export interface PersistButtonProps extends ComponentProps<typeof Button> {
 	label?: ReactNode

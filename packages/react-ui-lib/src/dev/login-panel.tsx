@@ -1,8 +1,8 @@
-import { Button } from '../ui/button'
+import { Button } from '@contember/react-ui-lib-base'
 import { useSessionTokenWithMeta, useSetSessionToken } from '@contember/react-client'
 import { CreateSessionTokenForm, useCreateSessionTokenForm } from '@contember/react-client-tenant'
-import { Loader } from '../ui/loader'
-import { TenantFormError, TenantFormField } from '../tenant/forms/common'
+import { Loader } from '@contember/react-ui-lib-base'
+import { TenantFormError, TenantFormField } from '@contember/react-ui-lib-tenant'
 
 export const LoginWithEmail = () => {
 	const sessionToken = useSessionTokenWithMeta()

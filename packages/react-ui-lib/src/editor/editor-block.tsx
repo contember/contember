@@ -1,6 +1,6 @@
-import { Button } from '../ui/button'
+import { Button } from '@contember/react-ui-lib-base'
 import { PencilIcon, TrashIcon } from 'lucide-react'
-import { Popover, PopoverContent, PopoverTrigger } from '../ui/popover'
+import { Popover, PopoverContent, PopoverTrigger } from '@contember/react-ui-lib-base'
 import { Component } from '@contember/interface'
 import { ReactNode, useCallback } from 'react'
 import { Block, BlockContent, BlockRendererProps, useEditorBlockElement } from '@contember/react-slate-editor'

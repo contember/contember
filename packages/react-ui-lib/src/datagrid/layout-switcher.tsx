@@ -1,8 +1,8 @@
 import { DataViewLayoutTrigger, useDataViewSelectionState } from '@contember/react-dataview'
-import { Button } from '../ui/button'
+import { Button } from '@contember/react-ui-lib-base'
 import * as React from 'react'
-import { dict } from '../dict'
-import { uic } from '../utils/uic'
+import { dict } from '@contember/react-ui-lib-base'
+import { uic } from '@contember/react-ui-lib-base'
 
 const LayoutSwitchButton = uic(Button, {
 	baseClass: 'data-[active]:text-blue-600 data-[active]:bg-gray-50 data-[active]:shadow-inner gap-2 flex-1',

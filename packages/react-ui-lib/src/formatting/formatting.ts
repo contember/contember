@@ -1,5 +1,5 @@
 import { SchemaColumn } from '@contember/interface'
-import { dict } from '../dict'
+import { dict } from '@contember/react-ui-lib-base'
 
 export const formatDate = (date: string | null) => {
 	if (date === null) {

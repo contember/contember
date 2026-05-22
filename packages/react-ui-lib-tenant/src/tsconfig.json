@@ -1,0 +1,19 @@
+{
+	"extends": "../../../tsconfig.settings.json",
+	"compilerOptions": {
+		"outDir": "../dist/types",
+		"types": [
+			"vite/client"
+		]
+	},
+	"references": [
+		{ "path": "../../graphql-client-tenant/src" },
+		{ "path": "../../interface/src" },
+		{ "path": "../../react-client/src" },
+		{ "path": "../../react-client-tenant/src" },
+		{ "path": "../../react-identity/src" },
+		{ "path": "../../react-ui-lib-base/src" },
+		{ "path": "../../react-utils/src" },
+		{ "path": "../../utilities/src" }
+	]
+}

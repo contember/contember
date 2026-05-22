@@ -14,8 +14,8 @@ import { Board, BoardColumn, BoardEachColumn, BoardEachItem, BoardItem, BoardNul
 import { GripHorizontal, GripIcon } from 'lucide-react'
 import { Component } from '@contember/interface'
 import { ReactNode } from 'react'
-import { uic } from '../utils'
-import { DropIndicator } from '../ui/sortable'
+import { uic } from '@contember/react-ui-lib-base'
+import { DropIndicator } from '@contember/react-ui-lib-base'
 
 export const BoardWrapperUI = uic('div', {
 	baseClass: 'flex gap-4 max-w-full overflow-x-auto -mx-2 px-2 pb-4',

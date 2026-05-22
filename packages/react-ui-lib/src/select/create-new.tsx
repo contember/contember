@@ -1,9 +1,9 @@
 import * as React from 'react'
 import { ReactElement, ReactNode } from 'react'
-import { Button } from '../ui/button'
+import { Button } from '@contember/react-ui-lib-base'
 import { SelectItemTrigger, SelectNewItem } from '@contember/react-select'
-import { dict } from '../dict'
-import { Dialog, DialogClose, DialogContent, DialogFooter, DialogTrigger } from '../ui/dialog'
+import { dict } from '@contember/react-ui-lib-base'
+import { Dialog, DialogClose, DialogContent, DialogFooter, DialogTrigger } from '@contember/react-ui-lib-base'
 
 export const CreateEntityDialog = ({ trigger, children }: { trigger: ReactElement; children: ReactNode }) => {
 	return (

@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { ReactNode } from 'react'
-import { Loader } from '../ui/loader'
+import { Loader } from '@contember/react-ui-lib-base'
 import { DataViewLoaderState } from '@contember/react-dataview'
 
 /**

@@ -1,5 +1,5 @@
 import { ReactNode, useCallback } from 'react'
-import { dict } from '../dict'
+import { dict } from '@contember/react-ui-lib-base'
 import { ErrorAccessor } from '@contember/interface'
 
 export const useErrorFormatter = () => {

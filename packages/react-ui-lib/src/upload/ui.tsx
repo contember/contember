@@ -1,7 +1,7 @@
 import * as React from 'react'
-import { Loader } from '../ui/loader'
+import { Loader } from '@contember/react-ui-lib-base'
 import { GripIcon } from 'lucide-react'
-import { uic } from '../utils/uic'
+import { uic } from '@contember/react-ui-lib-base'
 
 export const UploaderDropzoneWrapperUI = uic('div', { baseClass: 'rounded-sm border border-gray-200 p-1 shadow-sm' })
 export const UploaderDropzoneAreaUI = uic('div', {

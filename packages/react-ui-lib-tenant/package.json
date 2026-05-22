@@ -1,0 +1,51 @@
+{
+  "name": "@contember/react-ui-lib-tenant",
+  "license": "Apache-2.0",
+  "version": "2.1.0-beta.2",
+  "type": "module",
+  "sideEffects": false,
+  "private": true,
+  "main": "./dist/production/index.js",
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/types/index.d.ts",
+        "development": "./dist/development/index.js",
+        "production": "./dist/production/index.js",
+        "typescript": "./src/index.ts",
+        "default": "./dist/production/index.js"
+      },
+      "require": {
+        "types": "./dist/types/index.d.ts",
+        "development": "./dist/development/index.cjs",
+        "production": "./dist/production/index.cjs",
+        "typescript": "./src/index.ts",
+        "default": "./dist/production/index.cjs"
+      }
+    }
+  },
+  "typings": "./dist/types/index.d.ts",
+  "scripts": {
+    "ae:build": "api-extractor run --local",
+    "ae:test": "api-extractor run"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/contember/interface.git",
+    "directory": "packages/react-ui-lib-tenant"
+  },
+  "dependencies": {
+    "@contember/graphql-client-tenant": "workspace:*",
+    "@contember/interface": "workspace:*",
+    "@contember/react-client": "workspace:*",
+    "@contember/react-client-tenant": "workspace:*",
+    "@contember/react-identity": "workspace:*",
+    "@contember/react-ui-lib-base": "workspace:*",
+    "@contember/react-utils": "workspace:*",
+    "@contember/utilities": "workspace:*",
+    "lucide-react": "catalog:",
+    "qrcode-generator": "catalog:",
+    "react": "catalog:",
+    "react-dom": "catalog:"
+  }
+}

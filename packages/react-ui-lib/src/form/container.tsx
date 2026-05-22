@@ -1,5 +1,5 @@
 import { ReactNode } from 'react'
-import { FormContainerUI, FormDescriptionUI, FormErrorUI, FormLabelUI, FormLabelWrapperUI } from './ui'
+import { FormContainerUI, FormDescriptionUI, FormErrorUI, FormLabelUI, FormLabelWrapperUI } from '@contember/react-ui-lib-base'
 import { useErrorFormatter } from '../errors'
 import { Component, ErrorAccessor, useLabelMiddleware } from '@contember/interface'
 import { FormError, FormFieldStateProvider, FormLabel, useFormFieldState } from '@contember/react-form'

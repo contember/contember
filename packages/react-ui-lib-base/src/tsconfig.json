@@ -1,0 +1,16 @@
+{
+	"extends": "../../../tsconfig.settings.json",
+	"compilerOptions": {
+		"outDir": "../dist/types",
+		"types": [
+			"vite/client"
+		]
+	},
+	"references": [
+		{ "path": "../../interface/src" },
+		{ "path": "../../react-dataview/src" },
+		{ "path": "../../react-uploader/src" },
+		{ "path": "../../react-utils/src" },
+		{ "path": "../../utilities/src" }
+	]
+}

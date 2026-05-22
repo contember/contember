@@ -17,10 +17,10 @@ import {
 import { DataView, DataViewEachRow, DataViewLoaderState, DataViewSortingDirections, useDataViewEntityListAccessor } from '@contember/react-dataview'
 import { ReactNode, useMemo } from 'react'
 import { CheckIcon } from 'lucide-react'
-import { Loader } from '../ui/loader'
-import { Popover, PopoverContent, PopoverTrigger } from '../ui/popover'
-import { Button } from '../ui/button'
-import { DimensionLabelUI, DimensionLabelWrapperUI } from '../ui/dimension'
+import { Loader } from '@contember/react-ui-lib-base'
+import { Popover, PopoverContent, PopoverTrigger } from '@contember/react-ui-lib-base'
+import { Button } from '@contember/react-ui-lib-base'
+import { DimensionLabelUI, DimensionLabelWrapperUI } from '@contember/react-ui-lib-base'
 
 export type DimensionsSwitcherProps = {
 	options: SugaredQualifiedEntityList['entities']

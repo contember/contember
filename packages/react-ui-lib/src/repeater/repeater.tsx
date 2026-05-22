@@ -17,10 +17,10 @@ import {
 	RepeaterSortableItemNode,
 } from '@contember/react-repeater-dnd-kit'
 import { GripVerticalIcon, PlusCircleIcon, Trash2Icon } from 'lucide-react'
-import { Button } from '../ui/button'
-import { uic } from '../utils'
-import { DropIndicator } from '../ui/sortable'
-import { dict } from '../dict'
+import { Button } from '@contember/react-ui-lib-base'
+import { uic } from '@contember/react-ui-lib-base'
+import { DropIndicator } from '@contember/react-ui-lib-base'
+import { dict } from '@contember/react-ui-lib-base'
 import { ReactNode } from 'react'
 
 const RepeaterWrapperUI = uic('div', {

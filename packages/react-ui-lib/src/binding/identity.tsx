@@ -1,8 +1,8 @@
 import { IdentityState, LogoutTrigger } from '@contember/react-identity'
-import { Loader } from '../ui/loader'
-import { dict } from '../dict'
-import { Button } from '../ui/button'
-import { Card, CardContent } from '../ui/card'
+import { Loader } from '@contember/react-ui-lib-base'
+import { dict } from '@contember/react-ui-lib-base'
+import { Button } from '@contember/react-ui-lib-base'
+import { Card, CardContent } from '@contember/react-ui-lib-base'
 import { CircleAlert } from 'lucide-react'
 import { useEffect } from 'react'
 

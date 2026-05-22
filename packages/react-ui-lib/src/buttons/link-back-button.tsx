@@ -1,5 +1,5 @@
 import { ReactNode } from 'react'
-import { AnchorButton } from '../ui/button'
+import { AnchorButton } from '@contember/react-ui-lib-base'
 import { ArrowLeftIcon } from 'lucide-react'
 import { Link, type RoutingLinkTarget } from '@contember/interface'
 import { Slots } from '../layout'

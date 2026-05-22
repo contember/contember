@@ -1,9 +1,9 @@
 import React, { ReactNode, useEffect } from 'react'
 import { Element } from 'slate'
 import { useSortable } from '@dnd-kit/sortable'
-import { uic } from '../utils'
+import { uic } from '@contember/react-ui-lib-base'
 import { GripVerticalIcon } from 'lucide-react'
-import { DropIndicator } from '../ui/sortable'
+import { DropIndicator } from '@contember/react-ui-lib-base'
 import { Portal } from '@radix-ui/react-portal'
 import { DragOverlay } from '@dnd-kit/core'
 

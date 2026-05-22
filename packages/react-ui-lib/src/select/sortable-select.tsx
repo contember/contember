@@ -19,9 +19,9 @@ import {
 import { SelectItemTrigger, SelectPlaceholder, SortableMultiSelect } from '@contember/react-select'
 import { ChevronDownIcon } from 'lucide-react'
 import { ReactNode } from 'react'
-import { Popover, PopoverTrigger } from '../ui/popover'
-import { DropIndicator } from '../ui/sortable'
-import { cn } from '../utils'
+import { Popover, PopoverTrigger } from '@contember/react-ui-lib-base'
+import { DropIndicator } from '@contember/react-ui-lib-base'
+import { cn } from '@contember/react-ui-lib-base'
 import { CreateEntityDialog } from './create-new'
 import { DefaultSelectDataView } from './list'
 import {

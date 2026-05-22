@@ -11,7 +11,6 @@
   },
   "devDependencies": {
     "@tailwindcss/cli": "catalog:",
-    "@types/fs-extra": "catalog:",
     "@types/js-yaml": "catalog:",
     "@types/node": "catalog:",
     "@types/prompts": "catalog:",
@@ -37,7 +36,6 @@
     "fast-glob": "catalog:",
     "graphql": "catalog:",
     "js-yaml": "catalog:",
-    "lodash-es": "catalog:",
     "pg": "catalog:",
     "preact": "catalog:",
     "preact-render-to-string": "catalog:",

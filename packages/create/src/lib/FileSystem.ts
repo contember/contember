@@ -1,6 +1,5 @@
 import * as fs from 'node:fs/promises'
 import { access } from 'node:fs/promises'
-import { copy } from 'fs-extra'
 import { tmpdir } from 'node:os'
 
 export class FileSystem {
@@ -8,7 +7,8 @@ export class FileSystem {
 	writeFile = fs.writeFile
 	rename = fs.rename
 	readDir = fs.readdir
-	copy = copy
+	copy = (source: string, destination: string, options?: { filter?: (source: string, destination: string) => boolean }) =>
+		fs.cp(source, destination, { recursive: true, ...options })
 	unlink = fs.unlink
 	remove = fs.rm
 	pathExists = async (path: string) => {

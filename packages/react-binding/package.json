@@ -43,7 +43,6 @@
     "react-dom": "catalog:"
   },
   "devDependencies": {
-    "@types/js-levenshtein": "catalog:",
     "react": "catalog:",
     "react-dom": "catalog:"
   },

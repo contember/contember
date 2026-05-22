@@ -1,4 +1,13 @@
-import { Identity, IdentityGlobalPermissions, IdentityProjectRelation, IdentityResolvers, Maybe, Person, PolicyAssignment, SessionInfo } from '../../schema/index.js'
+import {
+	Identity,
+	IdentityGlobalPermissions,
+	IdentityProjectRelation,
+	IdentityResolvers,
+	Maybe,
+	Person,
+	PolicyAssignment,
+	SessionInfo,
+} from '../../schema/index.js'
 import {
 	IdentityQuery,
 	PermissionActions,

@@ -14,6 +14,7 @@ const baseProviders: Providers = {
 	encrypt: () => {
 		throw new Error('not supported')
 	},
+	encryptionEnabled: false,
 	hash: () => Buffer.alloc(0),
 }
 
@@ -22,6 +23,7 @@ const exec = async (args: {
 	currentExpiration: Date | null
 	requestInfo?: ApiKeyRequestInfo
 	tracking?: ApiKeyTrackingState
+	maxExpiresAt?: Date | null
 	expectedQueries: ExpectedQuery[]
 }) => {
 	const cmd = new ProlongApiKeyCommand(
@@ -31,6 +33,7 @@ const exec = async (args: {
 		args.currentExpiration,
 		args.requestInfo,
 		args.tracking,
+		args.maxExpiresAt,
 	)
 	const connection = createConnectionMock(args.expectedQueries)
 	const client = connection.createClient('tenant', { module: 'tenant' })
@@ -112,6 +115,42 @@ test('bypasses throttle when IP changes', async () => {
 			{
 				sql: `update "tenant"."api_key" set "last_ip" = ?, "last_user_agent" = ?, "last_used_at" = ? where "id" = ?`,
 				parameters: ['198.51.100.7', 'curl', now, 'api-key-id'],
+				response: { rowCount: 1 },
+			},
+		],
+	})
+})
+
+test('A19: clamps expires_at at max_expires_at when the sliding window would exceed it', async () => {
+	const now = new Date('2026-05-12T12:00:00Z')
+	// 30-minute window would push expires_at to 12:30, but the absolute cap is 12:10.
+	const currentExpiration = new Date('2026-05-12T12:05:00Z')
+	const maxExpiresAt = new Date('2026-05-12T12:10:00Z')
+	await exec({
+		now,
+		currentExpiration,
+		maxExpiresAt,
+		expectedQueries: [
+			{
+				sql: `update "tenant"."api_key" set "expires_at" = ? where "id" = ?`,
+				parameters: [maxExpiresAt, 'api-key-id'],
+				response: { rowCount: 1 },
+			},
+		],
+	})
+})
+
+test('A19: unaffected when max_expires_at is null (today behavior)', async () => {
+	const now = new Date('2026-05-12T12:00:00Z')
+	const currentExpiration = new Date('2026-05-12T12:25:00Z')
+	await exec({
+		now,
+		currentExpiration,
+		maxExpiresAt: null,
+		expectedQueries: [
+			{
+				sql: `update "tenant"."api_key" set "expires_at" = ? where "id" = ?`,
+				parameters: [new Date('2026-05-12T12:30:00Z'), 'api-key-id'],
 				response: { rowCount: 1 },
 			},
 		],

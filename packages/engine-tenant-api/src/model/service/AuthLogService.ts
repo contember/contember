@@ -47,6 +47,36 @@ class AuthLogService {
 			}),
 		)
 	}
+
+	/**
+	 * Focused, response-agnostic emit for internal auth-path events (A19) that
+	 * originate outside the resolver layer (e.g. `ApiKeyManager` on the HTTP auth
+	 * hot path). Unlike `logAuthAction`, it does not require a GraphQL `Response`.
+	 */
+	async logSessionEvent(
+		db: DatabaseContext,
+		entry: {
+			type: AuthActionType
+			identityId: string
+			personId?: string | null
+			ipAddress?: string
+			userAgent?: string
+			success: boolean
+			eventData?: JSONValue
+		},
+	): Promise<void> {
+		await db.commandBus.execute(
+			new CreateAuthLogEntryCommand({
+				type: entry.type,
+				invokedById: entry.identityId,
+				personId: entry.personId ?? undefined,
+				success: entry.success,
+				ipAddress: entry.ipAddress,
+				userAgent: entry.userAgent,
+				eventData: entry.eventData,
+			}),
+		)
+	}
 }
 
 namespace AuthLogService {

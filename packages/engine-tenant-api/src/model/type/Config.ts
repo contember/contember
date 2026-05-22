@@ -21,6 +21,7 @@ export type ConfigRow = {
 	login_reveal_login_method: boolean
 	login_default_token_expiration: IPostgresInterval
 	login_max_token_expiration: IPostgresInterval | null
+	login_mfa_grace_duration: IPostgresInterval
 	captcha_provider: CaptchaProvider | null
 	captcha_secret: Buffer | null
 	captcha_secret_version: number | null
@@ -33,6 +34,8 @@ export type ConfigRow = {
 	rate_limit_password_reset_per_ip_window: IPostgresInterval
 	rate_limit_passwordless_init_per_ip_limit: number
 	rate_limit_passwordless_init_per_ip_window: IPostgresInterval
+	rate_limit_email_otp_per_person_limit: number
+	rate_limit_email_otp_per_person_window: IPostgresInterval
 }
 
 export type Config =

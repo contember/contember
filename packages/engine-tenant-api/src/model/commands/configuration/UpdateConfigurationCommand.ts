@@ -52,6 +52,7 @@ export class UpdateConfigurationCommand implements Command<void> {
 					login_reveal_login_method: this.configuration.login?.revealLoginMethod ?? undefined,
 					login_default_token_expiration: this.configuration.login?.defaultTokenExpiration ?? undefined,
 					login_max_token_expiration: this.configuration.login?.maxTokenExpiration,
+					login_mfa_grace_duration: this.configuration.login?.mfaGraceDuration ?? undefined,
 					captcha_provider: captcha?.provider !== undefined ? captcha.provider : undefined,
 					captcha_secret: captchaSecretCol,
 					captcha_secret_version: captchaSecretVersionCol,
@@ -64,6 +65,8 @@ export class UpdateConfigurationCommand implements Command<void> {
 					rate_limit_password_reset_per_ip_window: rl?.passwordResetPerIp?.window ?? undefined,
 					rate_limit_passwordless_init_per_ip_limit: rl?.passwordlessInitPerIp?.limit ?? undefined,
 					rate_limit_passwordless_init_per_ip_window: rl?.passwordlessInitPerIp?.window ?? undefined,
+					rate_limit_email_otp_per_person_limit: rl?.emailOtpPerPerson?.limit ?? undefined,
+					rate_limit_email_otp_per_person_window: rl?.emailOtpPerPerson?.window ?? undefined,
 				} satisfies {
 					[K in keyof ConfigRow]: (IPostgresInterval extends ConfigRow[K] ? string : never) | Exclude<ConfigRow[K], IPostgresInterval> | undefined
 				},

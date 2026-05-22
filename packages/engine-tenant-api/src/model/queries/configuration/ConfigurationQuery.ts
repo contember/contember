@@ -45,6 +45,7 @@ export class ConfigurationQuery extends DatabaseQuery<Config> {
 				revealLoginMethod: result.login_reveal_login_method,
 				defaultTokenExpiration: result.login_default_token_expiration,
 				maxTokenExpiration: result.login_max_token_expiration,
+				mfaGraceDuration: result.login_mfa_grace_duration,
 			},
 			captcha: {
 				provider: result.captcha_provider,
@@ -67,6 +68,10 @@ export class ConfigurationQuery extends DatabaseQuery<Config> {
 				passwordlessInitPerIp: {
 					limit: result.rate_limit_passwordless_init_per_ip_limit,
 					window: result.rate_limit_passwordless_init_per_ip_window,
+				},
+				emailOtpPerPerson: {
+					limit: result.rate_limit_email_otp_per_person_limit,
+					window: result.rate_limit_email_otp_per_person_window,
 				},
 			},
 		}

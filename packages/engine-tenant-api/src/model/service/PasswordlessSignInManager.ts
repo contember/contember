@@ -16,7 +16,8 @@ import { ProjectManager } from './ProjectManager'
 import { PermissionContext } from '../authorization'
 import { PersonTokenQuery } from '../queries/personToken/PersonTokenQuery'
 import { ImplementationException } from '../../exceptions'
-import { OtpAuthenticator } from './OtpAuthenticator'
+import { OtpManager } from './OtpManager'
+import { BackupCodeManager } from './BackupCodeManager'
 import { PersonToken } from '../type'
 import { AuthLogService } from './AuthLogService'
 import { intervalToSeconds } from '../utils/interval'
@@ -27,7 +28,8 @@ class PasswordlessSignInManager {
 		private readonly apiKeyManager: ApiKeyManager,
 		private readonly mailer: UserMailer,
 		private readonly projectManager: ProjectManager,
-		private readonly otpAuthenticator: OtpAuthenticator,
+		private readonly otpManager: OtpManager,
+		private readonly backupCodeManager: BackupCodeManager,
 	) {}
 
 	async initSignInPasswordless({ db, permissionContext, mailVariant, mailProject, email }: {
@@ -129,12 +131,13 @@ class PasswordlessSignInManager {
 		return urlObj.toString()
 	}
 
-	async signInPasswordless({ db, expiration, token, requestId, mfaOtp, validationType, requestInfo, trustForwardedInfo }: {
+	async signInPasswordless({ db, expiration, token, requestId, mfaOtp, backupCode, validationType, requestInfo, trustForwardedInfo }: {
 		db: DatabaseContext
 		validationType: PersonToken.ValidationType
 		requestId: string
 		token: string
 		mfaOtp?: string
+		backupCode?: string
 		expiration?: number
 		requestInfo?: ApiKeyRequestInfo
 		trustForwardedInfo?: boolean
@@ -175,8 +178,28 @@ class PasswordlessSignInManager {
 				})
 			}
 
-			if (personRow.otp_uri && personRow.otp_activated_at) {
-				if (!mfaOtp) {
+			let usedBackupCode = false
+			if (personRow.otp_secret && personRow.otp_activated_at) {
+				if (mfaOtp) {
+					if (!await this.otpManager.verifyOtp(db, personRow, mfaOtp)) {
+						return new ResponseError('INVALID_OTP_TOKEN', 'OTP token validation has failed', {
+							[AuthLogService.Key]: new AuthLogService.Bag({
+								personId: personRow.id,
+								tokenId: tokenResult?.id,
+							}),
+						})
+					}
+				} else if (backupCode) {
+					if (!await this.backupCodeManager.verifyAndConsume(db, personRow, backupCode)) {
+						return new ResponseError('INVALID_OTP_TOKEN', 'OTP token validation has failed', {
+							[AuthLogService.Key]: new AuthLogService.Bag({
+								personId: personRow.id,
+								tokenId: tokenResult?.id,
+							}),
+						})
+					}
+					usedBackupCode = true
+				} else {
 					return new ResponseError('OTP_REQUIRED', `2FA is enabled. OTP token is required`, {
 						[AuthLogService.Key]: new AuthLogService.Bag({
 							personId: personRow.id,
@@ -184,16 +207,12 @@ class PasswordlessSignInManager {
 						}),
 					})
 				}
-
-				if (!this.otpAuthenticator.validate({ uri: personRow.otp_uri }, mfaOtp)) {
-					return new ResponseError('INVALID_OTP_TOKEN', 'OTP token validation has failed', {
-						[AuthLogService.Key]: new AuthLogService.Bag({
-							personId: personRow.id,
-							tokenId: tokenResult?.id,
-						}),
-					})
-				}
 			}
+			// NOTE: passwordless sign-in does NOT enforce mandatory-MFA enrollment.
+			// A person with no MFA factor is let through even when an auth_policy would
+			// require MFA — enroll-via-sign-in is password-only, and passwordless email
+			// access is itself a possession factor. An existing factor (TOTP/backup
+			// code, handled above) is still verified. Documented limitation (A06).
 
 			await db.commandBus.execute(new InvalidateTokenCommand(tokenValidationResult.result.id))
 			const sessionToken = await this.apiKeyManager.createSessionApiKey(db, personRow.identity_id, expiration, requestInfo, trustForwardedInfo)
@@ -201,6 +220,7 @@ class PasswordlessSignInManager {
 			return new ResponseOk({
 				person: personRow,
 				token: sessionToken,
+				usedBackupCode,
 				[AuthLogService.Key]: new AuthLogService.Bag({
 					personId: personRow.id,
 					tokenId: tokenResult?.id,
@@ -273,6 +293,8 @@ namespace PasswordlessSignInManager {
 	interface SignInPasswordlessResult {
 		readonly person: PersonRow
 		readonly token: string
+		/** True when MFA was satisfied by consuming a backup code (instead of a TOTP token). */
+		readonly usedBackupCode?: boolean
 		[AuthLogService.Key]: AuthLogService.Bag
 	}
 	export type SignInPasswordlessResponse = Response<SignInPasswordlessResult, SignInPasswordlessErrorCode, {

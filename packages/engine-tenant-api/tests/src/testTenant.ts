@@ -30,7 +30,8 @@ export interface Test {
 	executes: ExpectedQuery[]
 	return: object
 	sentMails?: ExpectedMessage[]
-	expectedAuthLog?: AuthLogService.LogArgs
+	/** A single expected auth log, or a sequence of them when the mutation emits more than one. */
+	expectedAuthLog?: AuthLogService.LogArgs | AuthLogService.LogArgs[]
 	callerTrustForwardedInfo?: boolean
 	httpInfo?: { ip?: string; userAgent?: string }
 	/** Override individual providers (e.g. a working `decrypt` to enable captcha). */
@@ -82,6 +83,7 @@ export const executeTenantTest = async (test: Test) => {
 		encrypt: () => {
 			throw new Error('not supported')
 		},
+		encryptionEnabled: false,
 		hash: value => Buffer.from(value.toString()),
 		...test.providers,
 	}
@@ -108,6 +110,12 @@ export const executeTenantTest = async (test: Test) => {
 		})
 		.build()
 
+	const expectedAuthLogs = test.expectedAuthLog === undefined
+		? undefined
+		: Array.isArray(test.expectedAuthLog)
+		? [...test.expectedAuthLog]
+		: [test.expectedAuthLog]
+
 	const databaseContext = tenantContainer.databaseContext
 	const context: TenantResolverContext = {
 		...createResolverContext(
@@ -124,12 +132,11 @@ export const executeTenantTest = async (test: Test) => {
 		),
 		logger: createLogger(new JsonStreamLoggerHandler(process.stderr)),
 		logAuthAction: async args => {
-			if (!test.expectedAuthLog) {
+			if (!expectedAuthLogs || expectedAuthLogs.length === 0) {
 				console.log(JSON.stringify(args))
 				throw new Error('No expected auth log')
 			}
-			expect(args).toEqual(test.expectedAuthLog)
-			test.expectedAuthLog = undefined
+			expect(args).toEqual(expectedAuthLogs.shift()!)
 		},
 		db: databaseContext,
 		httpInfo: { ip: test.httpInfo?.ip ?? '', userAgent: test.httpInfo?.userAgent },
@@ -154,5 +161,7 @@ export const executeTenantTest = async (test: Test) => {
 	}
 	mailer.expectEmpty()
 	expect(test.executes).toHaveLength(0)
-	expect(test.expectedAuthLog).toBeUndefined()
+	if (expectedAuthLogs) {
+		expect(expectedAuthLogs).toHaveLength(0)
+	}
 }

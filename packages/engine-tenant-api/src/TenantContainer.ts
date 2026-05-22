@@ -6,8 +6,12 @@ import {
 	ApiKeyManager,
 	ApiKeyService,
 	AppleProvider,
+	AuthPolicyManager,
+	AuthPolicyResolver,
+	BackupCodeManager,
 	CaptchaValidator,
 	DatabaseContext,
+	EmailOtpManager,
 	EmailValidator,
 	FacebookProvider,
 	HCaptchaProvider,
@@ -53,6 +57,7 @@ import {
 	CreateProjectMutationResolver,
 	DisableApiKeyMutationResolver,
 	DisableIDPMutationResolver,
+	EmailOtpMutationResolver,
 	EnableIDPMutationResolver,
 	IdentityGlobalRolesMutationResolver,
 	IdentityTypeResolver,
@@ -65,6 +70,7 @@ import {
 	ProjectMembersQueryResolver,
 	ProjectQueryResolver,
 	ProjectTypeResolver,
+	RegenerateBackupCodesMutationResolver,
 	RemoveProjectMemberMutationResolver,
 	ResetPasswordMutationResolver,
 	ResolverFactory,
@@ -90,6 +96,9 @@ import { MailTemplateQueryResolver } from './resolvers/query/MailTemplateQueryRe
 import { ConfigurationManager } from './model/service/ConfigurationManager'
 import { ConfigurationMutationResolver } from './resolvers/mutation/configuration/ConfigurationMutationResolver'
 import { ConfigurationQueryResolver } from './resolvers/query/ConfigurationQueryResolver'
+import { AuthPolicyMutationResolver } from './resolvers/mutation/configuration/AuthPolicyMutationResolver'
+import { AuthPolicyQueryResolver } from './resolvers/query/AuthPolicyQueryResolver'
+import { ResetPersonMfaMutationResolver } from './resolvers/mutation/person/ResetPersonMfaMutationResolver'
 import { AuthLogQueryResolver } from './resolvers/query/AuthLogQueryResolver'
 import { PasswordlessMutationResolver } from './resolvers/mutation/person/PasswordlessMutationResolver'
 import { PasswordlessSignInManager } from './model/service/PasswordlessSignInManager'
@@ -121,12 +130,12 @@ export interface TenantContainerArgs {
 	projectSchemaResolver: ProjectSchemaResolver
 	projectInitializer: ProjectInitializer
 	tenantCredentials: TenantCredentials
-	cryptoProviders: Pick<Providers, 'encrypt' | 'decrypt'>
+	cryptoProviders: Pick<Providers, 'encrypt' | 'decrypt' | 'encryptionEnabled'>
 }
 
 export class TenantContainerFactory {
 	constructor(
-		private readonly providers: Omit<Providers, 'encrypt' | 'decrypt'>,
+		private readonly providers: Omit<Providers, 'encrypt' | 'decrypt' | 'encryptionEnabled'>,
 	) {}
 
 	create(args: TenantContainerArgs): TenantContainer {
@@ -159,7 +168,12 @@ export class TenantContainerFactory {
 			.addService('authorizator', ({ accessEvaluator }) => new Authorizator.Default(accessEvaluator))
 			.addService('userMailer', ({ mailer, templateRenderer }) => new UserMailer(mailer, templateRenderer))
 			.addService('apiKeyService', () => new ApiKeyService())
-			.addService('apiKeyManager', ({ apiKeyService }) => new ApiKeyManager(apiKeyService))
+			.addService('authPolicyResolver', () => new AuthPolicyResolver())
+			.addService('authLogService', () => new AuthLogService())
+			.addService(
+				'apiKeyManager',
+				({ apiKeyService, authPolicyResolver, authLogService }) => new ApiKeyManager(apiKeyService, authPolicyResolver, authLogService),
+			)
 			.addService('emailValidator', () => new EmailValidator())
 			.addService('hibpChecker', (): HibpChecker => new HttpHibpChecker())
 			.addService('noopHibpChecker', (): HibpChecker => new NoopHibpChecker())
@@ -202,17 +216,24 @@ export class TenantContainerFactory {
 			.addService('idpSignInManager', ({ apiKeyManager, idpRegistry }) => new IDPSignInManager(apiKeyManager, idpRegistry))
 			.addService('idpManager', ({ idpRegistry }) => new IDPManager(idpRegistry))
 			.addService('otpAuthenticator', ({ providers }) => new OtpAuthenticator(providers))
-			.addService('signInManager', ({ apiKeyManager, providers, otpAuthenticator }) => new SignInManager(apiKeyManager, providers, otpAuthenticator))
+			.addService('otpManager', ({ otpAuthenticator, providers }) => new OtpManager(otpAuthenticator, providers))
+			.addService('backupCodeManager', ({ providers, userMailer }) => new BackupCodeManager(userMailer, providers))
+			.addService('emailOtpManager', ({ userMailer, providers, rateLimiter }) => new EmailOtpManager(userMailer, providers, rateLimiter))
+			.addService('authPolicyManager', ({ projectManager }) => new AuthPolicyManager(projectManager))
+			.addService(
+				'signInManager',
+				({ apiKeyManager, providers, otpManager, backupCodeManager, emailOtpManager, authPolicyResolver }) =>
+					new SignInManager(apiKeyManager, providers, otpManager, backupCodeManager, emailOtpManager, authPolicyResolver),
+			)
 			.addService('membershipValidator', ({ projectSchemaResolver }) => new MembershipValidator(projectSchemaResolver))
 			.addService('inviteManager', ({ providers, userMailer, projectSchemaResolver }) => new InviteManager(providers, userMailer, projectSchemaResolver))
-			.addService('otpManager', ({ otpAuthenticator }) => new OtpManager(otpAuthenticator))
 			.addService('mailTemplateManager', () => new MailTemplateManager())
 			.addService('rolesManager', () => new RolesManager())
 			.addService('configurationManager', () => new ConfigurationManager())
 			.addService(
 				'passwordlessSignInManager',
-				({ apiKeyManager, userMailer, projectManager, otpAuthenticator }) =>
-					new PasswordlessSignInManager(apiKeyManager, userMailer, projectManager, otpAuthenticator),
+				({ apiKeyManager, userMailer, projectManager, otpManager, backupCodeManager }) =>
+					new PasswordlessSignInManager(apiKeyManager, userMailer, projectManager, otpManager, backupCodeManager),
 			)
 			.addService(
 				'identityTypeResolver',
@@ -276,7 +297,19 @@ export class TenantContainerFactory {
 				({ apiKeyManager, projectManager, membershipValidator }) => new CreateApiKeyMutationResolver(apiKeyManager, projectManager, membershipValidator),
 			)
 			.addService('disableApiKeyMutationResolver', ({ apiKeyManager }) => new DisableApiKeyMutationResolver(apiKeyManager))
-			.addService('otpMutationResolver', ({ otpManager }) => new OtpMutationResolver(otpManager))
+			.addService(
+				'otpMutationResolver',
+				({ otpManager, backupCodeManager, authPolicyResolver }) => new OtpMutationResolver(otpManager, backupCodeManager, authPolicyResolver),
+			)
+			.addService(
+				'emailOtpMutationResolver',
+				({ emailOtpManager, backupCodeManager, authPolicyResolver }) =>
+					new EmailOtpMutationResolver(emailOtpManager, backupCodeManager, authPolicyResolver),
+			)
+			.addService(
+				'regenerateBackupCodesMutationResolver',
+				({ backupCodeManager }) => new RegenerateBackupCodesMutationResolver(backupCodeManager),
+			)
 			.addService(
 				'mailTemplateMutationResolver',
 				({ projectManager, mailTemplateManager }) => new MailTemplateMutationResolver(projectManager, mailTemplateManager),
@@ -299,6 +332,10 @@ export class TenantContainerFactory {
 				({ apiKeyManager, personManager, userMailer }) => new ForceSignOutMutationResolver(apiKeyManager, personManager, userMailer),
 			)
 			.addService(
+				'resetPersonMfaMutationResolver',
+				({ personManager, backupCodeManager }) => new ResetPersonMfaMutationResolver(personManager, backupCodeManager),
+			)
+			.addService(
 				'revokeSessionMutationResolver',
 				({ apiKeyManager }) => new RevokeSessionMutationResolver(apiKeyManager),
 			)
@@ -310,6 +347,8 @@ export class TenantContainerFactory {
 			.addService('identityGlobalRolesMutationResolver', ({ rolesManager }) => new IdentityGlobalRolesMutationResolver(rolesManager))
 			.addService('configurationMutationResolver', ({ configurationManager }) => new ConfigurationMutationResolver(configurationManager))
 			.addService('configurationQueryResolver', ({ configurationManager }) => new ConfigurationQueryResolver(configurationManager))
+			.addService('authPolicyMutationResolver', ({ authPolicyManager }) => new AuthPolicyMutationResolver(authPolicyManager))
+			.addService('authPolicyQueryResolver', ({ authPolicyManager }) => new AuthPolicyQueryResolver(authPolicyManager))
 			.addService('authLogQueryResolver', () => new AuthLogQueryResolver())
 			.addService(
 				'passwordlessMutationResolver',
@@ -320,7 +359,6 @@ export class TenantContainerFactory {
 				'togglePasswordlessMutationResolver',
 				({ configurationManager, personManager }) => new TogglePasswordlessMutationResolver(configurationManager, personManager),
 			)
-			.addService('authLogService', () => new AuthLogService())
 			.addService(
 				'resolverContextFactory',
 				({ permissionContextFactory, authLogService }) => new TenantResolverContextFactory(permissionContextFactory, authLogService),

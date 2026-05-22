@@ -48,11 +48,31 @@ export class SignInMutationResolver implements MutationResolvers {
 			args.otpToken || undefined,
 			context.httpInfo,
 			args.options?.trustForwardedClientInfo === true && context.trustForwardedInfo,
+			args.backupCode || undefined,
 		)
 		await context.logAuthAction({
 			type: 'login',
 			response,
 		})
+		if (response.ok && response.result.usedBackupCode) {
+			await context.logAuthAction({
+				type: 'backup_code_used',
+				response,
+				personId: response.result.person.id,
+			})
+		}
+		if (!response.ok && response.metadata?.emailOtpSent) {
+			await context.logAuthAction({
+				type: 'email_otp_sent',
+				response,
+			})
+		}
+		if (!response.ok && response.metadata?.mfaEnrollmentRequired) {
+			await context.logAuthAction({
+				type: 'mfa_enrollment_required',
+				response,
+			})
+		}
 
 		if (!response.ok) {
 			const { revealUserExists, revealLoginMethod } = configuration.login
@@ -63,6 +83,15 @@ export class SignInMutationResolver implements MutationResolvers {
 				&& ['NO_PASSWORD_SET', 'INVALID_PASSWORD'].includes(response.error)
 			if (collapseAll || collapseMethodOnly) {
 				return createErrorResponse('INVALID_CREDENTIALS', 'Invalid credentials')
+			}
+			// Preserve the additive mfaEnrollment payload on MFA_ENROLLMENT_REQUIRED (A06).
+			if (response.error === 'MFA_ENROLLMENT_REQUIRED' && response.metadata?.mfaEnrollment) {
+				const error = {
+					code: response.error,
+					developerMessage: response.errorMessage,
+					mfaEnrollment: response.metadata.mfaEnrollment,
+				}
+				return { ok: false, error, errors: [error] }
 			}
 			return createErrorResponse(response.error, response.errorMessage)
 		}

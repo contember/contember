@@ -27,6 +27,14 @@ const schema: DocumentNode = gql`
 		configuration: Config!
 
 		"""
+		List configured auth policies (per-role MFA / session policy). Requires the
+		\`system:configure\` permission — by default granted only to SUPER_ADMIN
+		(and PROJECT_ADMIN, like \`configure\`). With no rows configured, MFA
+		enforcement is inert and sign-in behaves exactly as today.
+		"""
+		authPolicies: [AuthPolicy!]!
+
+		"""
 		Read the tenant audit log (\`person_auth_log\`). Requires the
 		\`system:viewAuthLog\` permission — by default granted only to
 		SUPER_ADMIN via the wildcard ALL-resource/ALL-privilege grant.
@@ -38,7 +46,7 @@ const schema: DocumentNode = gql`
 
 	type Mutation {
 		signUp(email: String!, password: String, passwordHash: String, roles: [String!], name: String, captchaToken: String): SignUpResponse
-		signIn(email: String!, password: String!, expiration: Int, otpToken: String, options: SignInOptions): SignInResponse
+		signIn(email: String!, password: String!, expiration: Int, otpToken: String, backupCode: String, options: SignInOptions): SignInResponse
 		createSessionToken(email: String, personId: String, expiration: Int, options: SignInOptions): CreateSessionTokenResponse
 		signOut(all: Boolean): SignOutResponse
 		changeProfile(personId: String!, email: String, name: String): ChangeProfileResponse
@@ -63,7 +71,7 @@ const schema: DocumentNode = gql`
 		
 		# passwordless sign in
 		initSignInPasswordless(email: String!, options: InitSignInPasswordlessOptions, captchaToken: String): InitSignInPasswordlessResponse
-		signInPasswordless(requestId: String!, validationType: PasswordlessValidationType!, token: String!, expiration: Int, mfaOtp: String, options: SignInOptions): SignInPasswordlessResponse
+		signInPasswordless(requestId: String!, validationType: PasswordlessValidationType!, token: String!, expiration: Int, mfaOtp: String, backupCode: String, options: SignInOptions): SignInPasswordlessResponse
 		activatePasswordlessOtp(requestId: String!, token: String!, otpHash: String!): ActivatePasswordlessOtpResponse
 
         enableMyPasswordless: ToggleMyPasswordlessResponse
@@ -78,9 +86,15 @@ const schema: DocumentNode = gql`
 		prepareOtp(label: String): PrepareOtpResponse
 		confirmOtp(otpToken: String!): ConfirmOtpResponse
 		disableOtp: DisableOtpResponse
+		regenerateBackupCodes: RegenerateBackupCodesResponse
+
+		initEmailOtp: InitEmailOtpResponse
+		confirmEmailOtp(otpToken: String!): ConfirmEmailOtpResponse
+		disableEmailOtp: DisableEmailOtpResponse
 
 		disablePerson(personId: String!): DisablePersonResponse
 		forceSignOutPerson(personId: String!, reason: String): ForceSignOutPersonResponse
+		resetPersonMfa(personId: String!): ResetPersonMfaResponse
 		revokeSession(sessionId: String!): RevokeSessionResponse
 
 		createResetPasswordRequest(email: String!, options: CreateResetPasswordRequestOptions, captchaToken: String): CreatePasswordResetRequestResponse
@@ -122,6 +136,11 @@ const schema: DocumentNode = gql`
 		updateProject(projectSlug: String!, name: String, config: Json, mergeConfig: Boolean): UpdateProjectResponse
 		
 		configure(config: ConfigInput!): ConfigureResponse
+
+		# === auth policy (per-role MFA / session policy) ===
+		createAuthPolicy(policy: AuthPolicyInput!): CreateAuthPolicyResponse
+		updateAuthPolicy(id: String!, policy: AuthPolicyInput!): UpdateAuthPolicyResponse
+		deleteAuthPolicy(id: String!): DeleteAuthPolicyResponse
 
 		addProjectMailTemplate(template: MailTemplate!): AddMailTemplateResponse
 		@deprecated(reason: "use addMailTemplate")
@@ -173,6 +192,7 @@ const schema: DocumentNode = gql`
 		revealLoginMethod: Boolean!
 		defaultTokenExpiration: Interval!
 		maxTokenExpiration: Interval
+		mfaGraceDuration: Interval!
     }
 
 	"""
@@ -202,6 +222,12 @@ const schema: DocumentNode = gql`
 		loginPerIp: ConfigRateLimitWindow!
 		passwordResetPerIp: ConfigRateLimitWindow!
 		passwordlessInitPerIp: ConfigRateLimitWindow!
+		"""
+		Caps how many email-OTP codes may be dispatched per person within the
+		window (a brute-force / email-bomb backstop). Unlike the per-IP limits it
+		ships enabled by default. Set limit to 0 to disable.
+		"""
+		emailOtpPerPerson: ConfigRateLimitWindow!
 	}
 
 	type ConfigRateLimitWindow {
@@ -249,6 +275,7 @@ const schema: DocumentNode = gql`
 		revealLoginMethod: Boolean
 		defaultTokenExpiration: Interval
 		maxTokenExpiration: Interval
+		mfaGraceDuration: Interval
     }
 
 	"""
@@ -266,6 +293,7 @@ const schema: DocumentNode = gql`
 		loginPerIp: ConfigRateLimitWindowInput
 		passwordResetPerIp: ConfigRateLimitWindowInput
 		passwordlessInitPerIp: ConfigRateLimitWindowInput
+		emailOtpPerPerson: ConfigRateLimitWindowInput
 	}
 
 	input ConfigRateLimitWindowInput {
@@ -360,6 +388,18 @@ const schema: DocumentNode = gql`
 		developerMessage: String!
 		endUserMessage: String @deprecated
 		retryAfter: Int
+		"""
+		Set only on a MFA_ENROLLMENT_REQUIRED error: the freshly provisioned
+		pending TOTP secret the client must enroll (show the QR / secret, then
+		retry signIn with otpToken). Additive — clients that don't read it are
+		unaffected.
+		"""
+		mfaEnrollment: MfaEnrollment
+	}
+
+	type MfaEnrollment {
+		otpUri: String!
+		otpSecret: String!
 	}
 
 	enum SignInErrorCode {
@@ -370,12 +410,18 @@ const schema: DocumentNode = gql`
 		NO_PASSWORD_SET
 		OTP_REQUIRED
 		INVALID_OTP_TOKEN
+		MFA_ENROLLMENT_REQUIRED
 		RATE_LIMIT_EXCEEDED
 	}
 
 	type SignInResult implements CommonSignInResult {
 		token: String!
 		person: Person!
+		"""
+		Set only when this sign-in completed an MFA enrollment (A06): the freshly
+		generated backup codes, shown exactly once. Null on a normal sign-in.
+		"""
+		backupCodes: [String!]
 	}
 
 	# == createSessionToken ==
@@ -702,8 +748,9 @@ const schema: DocumentNode = gql`
 		PERSON_DISABLED
 		OTP_REQUIRED
 		INVALID_OTP_TOKEN
+		MFA_ENROLLMENT_REQUIRED
 	}
-	
+
 	type SignInPasswordlessResult implements CommonSignInResult {
 		token: String!
 		person: Person!
@@ -1130,6 +1177,11 @@ const schema: DocumentNode = gql`
 		ok: Boolean!
 		errors: [ConfirmOtpError!]! @deprecated
 		error: ConfirmOtpError
+		result: ConfirmOtpResult
+	}
+
+	type ConfirmOtpResult {
+		backupCodes: [String!]!
 	}
 
 	type ConfirmOtpError {
@@ -1157,6 +1209,77 @@ const schema: DocumentNode = gql`
 
 	enum DisableOtpErrorCode {
 		OTP_NOT_ACTIVE
+		MFA_REQUIRED
+	}
+
+	type RegenerateBackupCodesResponse {
+		ok: Boolean!
+		error: RegenerateBackupCodesError
+		result: RegenerateBackupCodesResult
+	}
+
+	type RegenerateBackupCodesError {
+		code: RegenerateBackupCodesErrorCode!
+		developerMessage: String!
+	}
+
+	enum RegenerateBackupCodesErrorCode {
+		OTP_NOT_ACTIVE
+	}
+
+	type RegenerateBackupCodesResult {
+		backupCodes: [String!]!
+	}
+
+	# ==== email otp (A05) ====
+
+	type InitEmailOtpResponse {
+		ok: Boolean!
+		error: InitEmailOtpError
+	}
+
+	type InitEmailOtpError {
+		code: InitEmailOtpErrorCode!
+		developerMessage: String!
+	}
+
+	enum InitEmailOtpErrorCode {
+		NO_EMAIL
+		RATE_LIMITED
+	}
+
+	type ConfirmEmailOtpResponse {
+		ok: Boolean!
+		error: ConfirmEmailOtpError
+		result: ConfirmEmailOtpResult
+	}
+
+	type ConfirmEmailOtpResult {
+		backupCodes: [String!]!
+	}
+
+	type ConfirmEmailOtpError {
+		code: ConfirmEmailOtpErrorCode!
+		developerMessage: String!
+	}
+
+	enum ConfirmEmailOtpErrorCode {
+		INVALID_OTP_TOKEN
+	}
+
+	type DisableEmailOtpResponse {
+		ok: Boolean!
+		error: DisableEmailOtpError
+	}
+
+	type DisableEmailOtpError {
+		code: DisableEmailOtpErrorCode!
+		developerMessage: String!
+	}
+
+	enum DisableEmailOtpErrorCode {
+		EMAIL_OTP_NOT_ACTIVE
+		MFA_REQUIRED
 	}
 
 	type DisablePersonResponse {
@@ -1188,6 +1311,106 @@ const schema: DocumentNode = gql`
 
 	enum ForceSignOutPersonErrorCode {
 		PERSON_NOT_FOUND
+	}
+
+	# === resetPersonMfa ===
+
+	type ResetPersonMfaResponse {
+		ok: Boolean!
+		error: ResetPersonMfaError
+	}
+
+	type ResetPersonMfaError {
+		code: ResetPersonMfaErrorCode!
+		developerMessage: String!
+	}
+
+	enum ResetPersonMfaErrorCode {
+		PERSON_NOT_FOUND
+	}
+
+	# === auth policy (per-role MFA / session policy) ===
+
+	type AuthPolicy {
+		id: String!
+		scope: AuthPolicyScope!
+		"""Project slug, present only for project-scoped policies."""
+		project: String
+		roles: [String!]!
+		mfaRequired: Boolean
+		tokenExpiration: Interval
+		idleTimeout: Interval
+		mfaGraceDuration: Interval
+		rememberMeAllowed: Boolean
+	}
+
+	enum AuthPolicyScope {
+		global
+		project
+	}
+
+	input AuthPolicyInput {
+		scope: AuthPolicyScope!
+		"""Project slug. Required for scope=project, forbidden for scope=global."""
+		project: String
+		roles: [String!]!
+		mfaRequired: Boolean
+		tokenExpiration: Interval
+		idleTimeout: Interval
+		mfaGraceDuration: Interval
+		rememberMeAllowed: Boolean
+	}
+
+	type CreateAuthPolicyResponse {
+		ok: Boolean!
+		error: CreateAuthPolicyError
+		result: CreateAuthPolicyResult
+	}
+
+	type CreateAuthPolicyResult {
+		id: String!
+	}
+
+	type CreateAuthPolicyError {
+		code: CreateAuthPolicyErrorCode!
+		developerMessage: String!
+	}
+
+	enum CreateAuthPolicyErrorCode {
+		PROJECT_REQUIRED
+		PROJECT_NOT_ALLOWED
+		PROJECT_NOT_FOUND
+	}
+
+	type UpdateAuthPolicyResponse {
+		ok: Boolean!
+		error: UpdateAuthPolicyError
+	}
+
+	type UpdateAuthPolicyError {
+		code: UpdateAuthPolicyErrorCode!
+		developerMessage: String!
+	}
+
+	enum UpdateAuthPolicyErrorCode {
+		NOT_FOUND
+		PROJECT_REQUIRED
+		PROJECT_NOT_ALLOWED
+		PROJECT_NOT_FOUND
+	}
+
+	type DeleteAuthPolicyResponse {
+		ok: Boolean!
+		error: DeleteAuthPolicyError
+	}
+
+	type DeleteAuthPolicyError {
+		code: DeleteAuthPolicyErrorCode!
+		developerMessage: String!
+	}
+
+	enum DeleteAuthPolicyErrorCode {
+		NOT_FOUND
 	}
 
 	# === sessions ===
@@ -1255,6 +1478,8 @@ const schema: DocumentNode = gql`
 		RESET_PASSWORD_REQUEST
 		PASSWORDLESS_SIGN_IN
 		FORCED_SIGN_OUT
+		EMAIL_OTP
+		BACKUP_CODES_EXHAUSTED
 	}
 
 	input MailTemplateIdentifier {

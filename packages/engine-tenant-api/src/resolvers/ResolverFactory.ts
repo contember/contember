@@ -7,12 +7,14 @@ import {
 	CreateProjectMutationResolver,
 	DisableApiKeyMutationResolver,
 	DisableIDPMutationResolver,
+	EmailOtpMutationResolver,
 	EnableIDPMutationResolver,
 	IdentityGlobalRolesMutationResolver,
 	IDPMutationResolver,
 	InviteMutationResolver,
 	MailTemplateMutationResolver,
 	OtpMutationResolver,
+	RegenerateBackupCodesMutationResolver,
 	RemoveProjectMemberMutationResolver,
 	ResetPasswordMutationResolver,
 	SetProjectSecretMutationResolver,
@@ -35,6 +37,9 @@ import { RevokeSessionMutationResolver } from './mutation/person/RevokeSessionMu
 import { MailTemplateQueryResolver } from './query/MailTemplateQueryResolver'
 import { ConfigurationMutationResolver } from './mutation/configuration/ConfigurationMutationResolver'
 import { ConfigurationQueryResolver } from './query/ConfigurationQueryResolver'
+import { AuthPolicyMutationResolver } from './mutation/configuration/AuthPolicyMutationResolver'
+import { AuthPolicyQueryResolver } from './query/AuthPolicyQueryResolver'
+import { ResetPersonMfaMutationResolver } from './mutation/person/ResetPersonMfaMutationResolver'
 import { PasswordlessMutationResolver } from './mutation/person/PasswordlessMutationResolver'
 import { TogglePasswordlessMutationResolver } from './mutation/person/TogglePasswordlessMutationResolver'
 
@@ -63,6 +68,7 @@ class ResolverFactory {
 
 			disablePersonMutationResolver: DisablePersonMutationResolver
 			forceSignOutMutationResolver: ForceSignOutMutationResolver
+			resetPersonMfaMutationResolver: ResetPersonMfaMutationResolver
 			revokeSessionMutationResolver: RevokeSessionMutationResolver
 
 			inviteMutationResolver: InviteMutationResolver
@@ -74,6 +80,8 @@ class ResolverFactory {
 			disableApiKeyMutationResolver: DisableApiKeyMutationResolver
 
 			otpMutationResolver: OtpMutationResolver
+			emailOtpMutationResolver: EmailOtpMutationResolver
+			regenerateBackupCodesMutationResolver: RegenerateBackupCodesMutationResolver
 
 			mailTemplateMutationResolver: MailTemplateMutationResolver
 
@@ -88,6 +96,9 @@ class ResolverFactory {
 
 			configurationMutationResolver: ConfigurationMutationResolver
 			configurationQueryResolver: ConfigurationQueryResolver
+
+			authPolicyMutationResolver: AuthPolicyMutationResolver
+			authPolicyQueryResolver: AuthPolicyQueryResolver
 
 			authLogQueryResolver: AuthLogQueryResolver
 
@@ -120,6 +131,7 @@ class ResolverFactory {
 				identityProviders: this.resolvers.idpQueryResolver.identityProviders.bind(this.resolvers.idpQueryResolver),
 				mailTemplates: this.resolvers.mailTemplateQueryResolver.mailTemplates.bind(this.resolvers.mailTemplateQueryResolver),
 				configuration: this.resolvers.configurationQueryResolver.configuration.bind(this.resolvers.configurationQueryResolver),
+				authPolicies: this.resolvers.authPolicyQueryResolver.authPolicies.bind(this.resolvers.authPolicyQueryResolver),
 				authLog: this.resolvers.authLogQueryResolver.authLog.bind(this.resolvers.authLogQueryResolver),
 				checkResetPasswordToken: () => {
 					throw new Error('not implemented')
@@ -148,6 +160,7 @@ class ResolverFactory {
 				updateIDP: this.resolvers.updateIdpMutationResolver.updateIDP.bind(this.resolvers.updateIdpMutationResolver),
 				disablePerson: this.resolvers.disablePersonMutationResolver.disablePerson.bind(this.resolvers.disablePersonMutationResolver),
 				forceSignOutPerson: this.resolvers.forceSignOutMutationResolver.forceSignOutPerson.bind(this.resolvers.forceSignOutMutationResolver),
+				resetPersonMfa: this.resolvers.resetPersonMfaMutationResolver.resetPersonMfa.bind(this.resolvers.resetPersonMfaMutationResolver),
 				revokeSession: this.resolvers.revokeSessionMutationResolver.revokeSession.bind(this.resolvers.revokeSessionMutationResolver),
 
 				signInPasswordless: this.resolvers.passwordlessMutationResolver.signInPasswordless.bind(this.resolvers.passwordlessMutationResolver),
@@ -178,6 +191,13 @@ class ResolverFactory {
 				prepareOtp: this.resolvers.otpMutationResolver.prepareOtp.bind(this.resolvers.otpMutationResolver),
 				confirmOtp: this.resolvers.otpMutationResolver.confirmOtp.bind(this.resolvers.otpMutationResolver),
 				disableOtp: this.resolvers.otpMutationResolver.disableOtp.bind(this.resolvers.otpMutationResolver),
+				regenerateBackupCodes: this.resolvers.regenerateBackupCodesMutationResolver.regenerateBackupCodes.bind(
+					this.resolvers.regenerateBackupCodesMutationResolver,
+				),
+
+				initEmailOtp: this.resolvers.emailOtpMutationResolver.initEmailOtp.bind(this.resolvers.emailOtpMutationResolver),
+				confirmEmailOtp: this.resolvers.emailOtpMutationResolver.confirmEmailOtp.bind(this.resolvers.emailOtpMutationResolver),
+				disableEmailOtp: this.resolvers.emailOtpMutationResolver.disableEmailOtp.bind(this.resolvers.emailOtpMutationResolver),
 
 				addMailTemplate: this.resolvers.mailTemplateMutationResolver.addMailTemplate.bind(this.resolvers.mailTemplateMutationResolver),
 				removeMailTemplate: this.resolvers.mailTemplateMutationResolver.removeMailTemplate.bind(this.resolvers.mailTemplateMutationResolver),
@@ -197,6 +217,10 @@ class ResolverFactory {
 				),
 
 				configure: this.resolvers.configurationMutationResolver.configure.bind(this.resolvers.configurationMutationResolver),
+
+				createAuthPolicy: this.resolvers.authPolicyMutationResolver.createAuthPolicy.bind(this.resolvers.authPolicyMutationResolver),
+				updateAuthPolicy: this.resolvers.authPolicyMutationResolver.updateAuthPolicy.bind(this.resolvers.authPolicyMutationResolver),
+				deleteAuthPolicy: this.resolvers.authPolicyMutationResolver.deleteAuthPolicy.bind(this.resolvers.authPolicyMutationResolver),
 			},
 		}
 	}

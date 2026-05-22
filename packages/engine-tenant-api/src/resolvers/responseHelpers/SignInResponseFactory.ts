@@ -10,7 +10,10 @@ export class SignInResponseFactory {
 	) {
 	}
 
-	public async createResponse(signInResult: SignInResult, context: TenantResolverContext): Promise<CommonSignInResult> {
+	public async createResponse(
+		signInResult: SignInResult,
+		context: TenantResolverContext,
+	): Promise<CommonSignInResult & { backupCodes?: readonly string[] }> {
 		const identityId = signInResult.person.identity_id
 		const permissionContext = this.permissionContextFactory.create(context.db, {
 			id: identityId,
@@ -27,6 +30,8 @@ export class SignInResponseFactory {
 		return {
 			token: signInResult.token,
 			person: PersonResponseFactory.createPersonResponse(signInResult.person, projects),
+			// Present only when this sign-in completed an MFA enrollment (A06).
+			...(signInResult.backupCodes ? { backupCodes: signInResult.backupCodes } : {}),
 		}
 	}
 }

@@ -58,6 +58,40 @@ jobs:
         run: ${{ matrix.run_script }}
 
 
+  snapshot:
+    # Guards that engine-{tenant,system}-api/src/migrations/snapshot.ts is in sync
+    # with the migrations: bootstraps two fresh DBs (full replay vs snapshot
+    # fast-path) and diffs their schemas. Fails if snapshot.ts drifted —
+    # regenerate with ./scripts/create-migrations-snapshot/run.sh <tenant|system>.
+    needs: [ ]
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: postgres
+        ports:
+          - 5432:5432
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.3.10
+      - name: Install deps
+        run: |
+          bun --version
+          bun install --frozen-lockfile
+          sudo apt-get update && sudo apt-get install -y postgresql-client
+      - name: Verify migrations snapshots
+        run: ./scripts/create-migrations-snapshot/verify.sh
+        env:
+          PGHOST: 127.0.0.1
+          PGPORT: 5432
+          PGUSER: postgres
+          PGPASSWORD: postgres
+
   test-db:
     needs: [ ]
     runs-on: ubuntu-latest

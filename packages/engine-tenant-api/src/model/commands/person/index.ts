@@ -1,4 +1,6 @@
 export * from './ChangePasswordCommand'
 export * from './CreatePersonCommand'
+export * from './ResetPersonMfaCommand'
+export * from './SetMfaGraceUntilCommand'
 export * from './CreatePersonIdentityProviderIdentifierCommand'
 export * from './TogglePersonPasswordlessCommand'

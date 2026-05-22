@@ -50,6 +50,7 @@ class PermissionsFactory {
 		permissions.allow(TenantRole.PROJECT_ADMIN, PermissionActions.PERSON_CREATE_SESSION_KEY(), projectAdminUseRolesVerifier)
 		permissions.allow(TenantRole.PROJECT_ADMIN, PermissionActions.PERSON_DISABLE(), projectAdminUseRolesVerifier)
 		permissions.allow(TenantRole.PROJECT_ADMIN, PermissionActions.PERSON_FORCE_SIGN_OUT(), projectAdminUseRolesVerifier)
+		permissions.allow(TenantRole.PROJECT_ADMIN, PermissionActions.PERSON_RESET_MFA(), projectAdminUseRolesVerifier)
 		permissions.allow(TenantRole.PROJECT_ADMIN, PermissionActions.PERSON_VIEW_SESSIONS(), projectAdminUseRolesVerifier)
 		permissions.allow(TenantRole.PROJECT_ADMIN, PermissionActions.PERSON_CHANGE_PROFILE(), projectAdminUseRolesVerifier)
 		permissions.allow(TenantRole.PROJECT_ADMIN, PermissionActions.PERSON_CHANGE_PASSWORD(), projectAdminUseRolesVerifier)

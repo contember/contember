@@ -93,9 +93,13 @@ const DELETE_SQL = `delete from "tenant"."person_backup_code" where "person_id" 
 const INSERT_SQL = `insert into "tenant"."person_backup_code" ("id", "person_id", "code_hash", "created_at") values (?, ?, ?, ?)`
 
 describe('BackupCodeManager', () => {
-	test('generate deletes the old set and produces 10 codes (stored as normalized hashes)', async () => {
+	test('generate replaces the whole set atomically (delete + 10 inserts in one transaction)', async () => {
 		const providers = baseProviders()
+		// The DELETE + inserts run inside a single REPEATABLE READ transaction so a
+		// mid-flow failure can't leave a partial set mismatched with the returned codes.
 		const queries: ExpectedQuery[] = [
+			{ sql: `BEGIN;`, response: { rowCount: 1 } },
+			{ sql: `SET TRANSACTION ISOLATION LEVEL REPEATABLE READ`, response: { rowCount: 1 } },
 			{ sql: DELETE_SQL, parameters: [PERSON_ID], response: { rowCount: 3 } },
 		]
 		for (let i = 0; i < 10; i++) {
@@ -105,6 +109,7 @@ describe('BackupCodeManager', () => {
 				response: { rowCount: 1 },
 			})
 		}
+		queries.push({ sql: `COMMIT;`, response: { rowCount: 1 } })
 		const db = makeDb(queries, providers)
 		const codes = await new BackupCodeManager(makeMailer().mailer, providers).generate(db, PERSON_ID)
 

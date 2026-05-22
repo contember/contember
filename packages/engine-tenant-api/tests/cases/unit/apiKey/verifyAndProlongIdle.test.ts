@@ -14,12 +14,11 @@ import PostgresInterval from 'postgres-interval'
 
 const TOKEN = '0000000000000000000000000000000000000000'
 const TOKEN_HASH = computeTokenHash(TOKEN)
-// verifyAndProlong reads the wall clock (`new Date()`), not providers.now(), so
-// fixtures are anchored relative to the real current time.
-const REAL_NOW = Date.now()
-const minutesAgo = (m: number) => new Date(REAL_NOW - m * 60_000)
-const minutesAhead = (m: number) => new Date(REAL_NOW + m * 60_000)
+// verifyAndProlong now reads providers.now() (single injectable clock), so fixtures
+// are anchored relative to that fixed clock rather than the real wall clock.
 const NOW = new Date('2026-05-21T12:00:00Z')
+const minutesAgo = (m: number) => new Date(NOW.getTime() - m * 60_000)
+const minutesAhead = (m: number) => new Date(NOW.getTime() + m * 60_000)
 
 const baseProviders: Providers = {
 	bcrypt: () => Promise.resolve('x'),
@@ -138,6 +137,27 @@ test('A19: idle-expired key (last_used_at older than idle_timeout) is rejected a
 	expect(response.ok).toBe(false)
 	// A19: idle rejection emits a session_expired_idle audit entry.
 	expect(authLog.type).toBe('session_expired_idle')
+})
+
+test('A19: idle within the prolong-throttle slack is NOT expired (small idle_timeout)', async () => {
+	// last_used_at is written at most once per 60s, so a continuously-active session
+	// can legitimately lag by up to that window. With idle_timeout=1min, a key last
+	// seen 90s ago (< 1min + 60s slack) must stay alive rather than be disabled.
+	const row = defaultRow({
+		idle_timeout: PostgresInterval('00:01:00'),
+		last_used_at: new Date(NOW.getTime() - 90_000),
+	})
+	const response = await run(row, [], true)
+	expect(response.ok).toBe(true)
+})
+
+test('A19: idle beyond idle_timeout + slack is still expired (small idle_timeout)', async () => {
+	const row = defaultRow({
+		idle_timeout: PostgresInterval('00:01:00'),
+		last_used_at: new Date(NOW.getTime() - 150_000), // 150s > 60s + 60s slack
+	})
+	const response = await run(row, [disableUpdate, authLogInsert({})])
+	expect(response.ok).toBe(false)
 })
 
 test('A19: fresh key within idle_timeout is allowed', async () => {

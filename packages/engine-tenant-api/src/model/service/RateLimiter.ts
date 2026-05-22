@@ -48,6 +48,8 @@ export class RateLimiter {
 				return { limit: r.passwordResetPerIp.limit, windowSeconds: intervalToSeconds(r.passwordResetPerIp.window as any) }
 			case 'passwordless_init_per_ip':
 				return { limit: r.passwordlessInitPerIp.limit, windowSeconds: intervalToSeconds(r.passwordlessInitPerIp.window as any) }
+			case 'email_otp_per_person':
+				return { limit: r.emailOtpPerPerson.limit, windowSeconds: intervalToSeconds(r.emailOtpPerPerson.window as any) }
 		}
 	}
 

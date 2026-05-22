@@ -1,7 +1,8 @@
 import { describe, expect, test } from 'bun:test'
 import crypto from 'node:crypto'
+import PostgresInterval from 'postgres-interval'
 import { createConnectionMock, ExpectedQuery } from '@contember/database-tester'
-import { DatabaseContext, EmailOtpManager, PersonRow, Providers, TemplateRenderer, UserMailer } from '../../../src'
+import { Config, DatabaseContext, EmailOtpManager, PersonRow, Providers, RateLimiter, TemplateRenderer, UserMailer } from '../../../src'
 import { createMockedMailer } from '../../src/mailer'
 
 const NOW = new Date('2026-05-20T12:00:00.000Z')
@@ -84,16 +85,48 @@ const tokenRow = (overrides: Record<string, any> = {}) => ({
 	...overrides,
 })
 
+// Rate-limit gate that fronts sendCode (email_otp_per_person). The mocked `hash`
+// provider stores the key verbatim, so the hashed key is just Buffer.from(PERSON_ID).
+const RL_COUNT_SQL = `select count(*)::text as count from "tenant"."rate_limit_event"
+	where "scope" = ? and "key_hash" = ? and "occurred_at" >= ?`
+const RL_INSERT_SQL = `insert into "tenant"."rate_limit_event" ("id", "scope", "key_hash", "occurred_at") values (?, ?, ?, ?)`
+const RL_KEY_HASH = Buffer.from(PERSON_ID)
+
+// limit 10 / 10 minutes — the shipped default.
+const config = ({
+	rateLimits: {
+		emailOtpPerPerson: { limit: 10, window: PostgresInterval('00:10:00') },
+	},
+}) as unknown as Config
+
+const makeManager = (providers: Providers, mailer = makeMailer()) => new EmailOtpManager(mailer, providers, new RateLimiter(providers))
+
 const INVALIDATE_PRIOR_SQL = `update "tenant"."person_token" set "used_at" = ? where "person_id" = ? and "type" = ? and "used_at" is null`
 const INSERT_TOKEN_SQL =
 	`insert into "tenant"."person_token" ("id", "token_hash", "person_id", "expires_at", "created_at", "used_at", "type", "otp_hash") values (?, ?, ?, ?, ?, ?, ?, ?)`
 const SELECT_LATEST_SQL =
 	`select * from "tenant"."person_token" where "person_id" = ? and "type" = ? and "used_at" is null order by "created_at" desc limit 1`
+// Atomic per-code attempt reservation (ClaimOtpAttemptCommand): increments only while
+// still unused and below the cap. params = [tokenId, maxAttempts].
+const CLAIM_ATTEMPT_SQL =
+	`update "tenant"."person_token" set "otp_attempts" = otp_attempts + 1 where "id" = ? and "used_at" is null and "otp_attempts" < ?`
+const INVALIDATE_TOKEN_SQL = `update "tenant"."person_token" set "used_at" = ? where "id" = ? and "used_at" is null`
 
 describe('EmailOtpManager', () => {
 	test('sendCode generates a 6-digit code, invalidates prior tokens, stores the hashed code and emails it', async () => {
 		const providers = baseProviders()
 		const queries: ExpectedQuery[] = [
+			// rate-limit gate: COUNT under limit, then record the event (uuid-0).
+			{
+				sql: RL_COUNT_SQL,
+				parameters: ['email_otp_per_person', RL_KEY_HASH, new Date(NOW.getTime() - 10 * 60 * 1000)],
+				response: { rows: [{ count: '0' }] },
+			},
+			{
+				sql: RL_INSERT_SQL,
+				parameters: ['uuid-0', 'email_otp_per_person', RL_KEY_HASH, NOW],
+				response: { rowCount: 1 },
+			},
 			{
 				sql: INVALIDATE_PRIOR_SQL,
 				parameters: [NOW, PERSON_ID, 'mfa_email_otp'],
@@ -102,7 +135,7 @@ describe('EmailOtpManager', () => {
 			{
 				sql: INSERT_TOKEN_SQL,
 				parameters: [
-					'uuid-0',
+					'uuid-1',
 					RANDOM_TOKEN_HASH,
 					PERSON_ID,
 					(v: any) => v instanceof Date,
@@ -130,9 +163,29 @@ describe('EmailOtpManager', () => {
 		]
 		const db = makeDb(queries, providers)
 		const mailer = createMockedMailer()
-		await new EmailOtpManager(new UserMailer(mailer, new TemplateRenderer()), providers).sendCode(db, person())
+		const decision = await makeManager(providers, new UserMailer(mailer, new TemplateRenderer())).sendCode(db, person(), config)
+		expect(decision.ok).toBe(true)
 		const sent = mailer.expectMessage({ subject: 'Your verification code' })
 		expect(sent.html).toContain(EXPECTED_CODE)
+		mailer.expectEmpty()
+		expect(queries).toHaveLength(0)
+	})
+
+	test('sendCode is rate-limited: returns not-ok, issues no token and sends no mail once the per-person limit is reached', async () => {
+		const providers = baseProviders()
+		const queries: ExpectedQuery[] = [
+			// COUNT already at the limit (10) → deny; no INSERT, no token, no mail.
+			{
+				sql: RL_COUNT_SQL,
+				parameters: ['email_otp_per_person', RL_KEY_HASH, new Date(NOW.getTime() - 10 * 60 * 1000)],
+				response: { rows: [{ count: '10' }] },
+			},
+		]
+		const db = makeDb(queries, providers)
+		const mailer = createMockedMailer()
+		const decision = await makeManager(providers, new UserMailer(mailer, new TemplateRenderer())).sendCode(db, person(), config)
+		expect(decision.ok).toBe(false)
+		expect(decision.retryAfterSeconds).toBe(600)
 		mailer.expectEmpty()
 		expect(queries).toHaveLength(0)
 	})
@@ -145,19 +198,25 @@ describe('EmailOtpManager', () => {
 				parameters: [PERSON_ID, 'mfa_email_otp'],
 				response: { rows: [tokenRow()] },
 			},
+			// Reserve an attempt slot atomically before comparing the code.
 			{
-				sql: `update "tenant"."person_token" set "used_at" = ? where "id" = ? and "used_at" is null`,
+				sql: CLAIM_ATTEMPT_SQL,
+				parameters: ['token-1', 3],
+				response: { rowCount: 1 },
+			},
+			{
+				sql: INVALIDATE_TOKEN_SQL,
 				parameters: [NOW, 'token-1'],
 				response: { rowCount: 1 },
 			},
 		]
 		const db = makeDb(queries, providers)
-		const ok = await new EmailOtpManager(makeMailer(), providers).verifyAndConsume(db, person(), EXPECTED_CODE)
+		const ok = await makeManager(providers).verifyAndConsume(db, person(), EXPECTED_CODE)
 		expect(ok).toBe(true)
 		expect(queries).toHaveLength(0)
 	})
 
-	test('verifyAndConsume rejects a wrong code and bumps the attempt counter', async () => {
+	test('verifyAndConsume rejects a wrong code after reserving an attempt slot', async () => {
 		const providers = baseProviders()
 		const queries: ExpectedQuery[] = [
 			{
@@ -165,30 +224,36 @@ describe('EmailOtpManager', () => {
 				parameters: [PERSON_ID, 'mfa_email_otp'],
 				response: { rows: [tokenRow()] },
 			},
+			// The slot is reserved up front; a wrong code then fails validation (no token consumed).
 			{
-				sql: `update "tenant"."person_token" set "otp_attempts" = otp_attempts + 1 where "id" = ?`,
-				parameters: ['token-1'],
+				sql: CLAIM_ATTEMPT_SQL,
+				parameters: ['token-1', 3],
 				response: { rowCount: 1 },
 			},
 		]
 		const db = makeDb(queries, providers)
-		const ok = await new EmailOtpManager(makeMailer(), providers).verifyAndConsume(db, person(), '999999')
+		const ok = await makeManager(providers).verifyAndConsume(db, person(), '999999')
 		expect(ok).toBe(false)
 		expect(queries).toHaveLength(0)
 	})
 
-	test('verifyAndConsume rejects once the attempt cap is exceeded (no counter bump)', async () => {
+	test('verifyAndConsume rejects once the attempt cap is exceeded (claim reserves no slot)', async () => {
 		const providers = baseProviders()
 		const queries: ExpectedQuery[] = [
 			{
 				sql: SELECT_LATEST_SQL,
 				parameters: [PERSON_ID, 'mfa_email_otp'],
-				// 3 attempts already used => validateToken returns TOKEN_EXPIRED before checking the code.
 				response: { rows: [tokenRow({ otp_attempts: 3 })] },
+			},
+			// otp_attempts already at the cap => the conditional UPDATE matches no row.
+			{
+				sql: CLAIM_ATTEMPT_SQL,
+				parameters: ['token-1', 3],
+				response: { rowCount: 0 },
 			},
 		]
 		const db = makeDb(queries, providers)
-		const ok = await new EmailOtpManager(makeMailer(), providers).verifyAndConsume(db, person(), EXPECTED_CODE)
+		const ok = await makeManager(providers).verifyAndConsume(db, person(), EXPECTED_CODE)
 		expect(ok).toBe(false)
 		expect(queries).toHaveLength(0)
 	})
@@ -203,7 +268,7 @@ describe('EmailOtpManager', () => {
 			},
 		]
 		const db = makeDb(queries, providers)
-		const ok = await new EmailOtpManager(makeMailer(), providers).verifyAndConsume(db, person(), EXPECTED_CODE)
+		const ok = await makeManager(providers).verifyAndConsume(db, person(), EXPECTED_CODE)
 		expect(ok).toBe(false)
 		expect(queries).toHaveLength(0)
 	})

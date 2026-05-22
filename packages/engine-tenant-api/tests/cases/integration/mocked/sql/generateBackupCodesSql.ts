@@ -2,6 +2,7 @@ import { ExpectedQuery } from '@contember/database-tester'
 import { SQL } from '../../../../src/tags'
 import { testUuid } from '../../../../src/testUuid'
 import { now } from '../../../../src/testTenant'
+import { sqlTransaction } from './sqlTransaction'
 
 /**
  * Mocks the SQL emitted by BackupCodeManager.generate: delete the old set, then
@@ -15,7 +16,8 @@ export const generateBackupCodesSql = (args: {
 	/** First uuid the manager will consume for the inserts (sequential from here). */
 	firstUuidIndex: number
 }): ExpectedQuery[] => {
-	const queries: ExpectedQuery[] = [
+	// generate() replaces the whole set inside a single REPEATABLE READ transaction.
+	const inner: ExpectedQuery[] = [
 		{
 			sql: SQL`DELETE FROM "tenant"."person_backup_code" WHERE "person_id" = ?`,
 			parameters: [args.personId],
@@ -23,11 +25,11 @@ export const generateBackupCodesSql = (args: {
 		},
 	]
 	for (let i = 0; i < 10; i++) {
-		queries.push({
+		inner.push({
 			sql: SQL`INSERT INTO "tenant"."person_backup_code" ("id", "person_id", "code_hash", "created_at") VALUES (?, ?, ?, ?)`,
 			parameters: [testUuid(args.firstUuidIndex + i), args.personId, CODE_HASH, now],
 			response: { rowCount: 1 },
 		})
 	}
-	return queries
+	return sqlTransaction(...inner)
 }

@@ -89,9 +89,12 @@ class SignInManager {
 			} else {
 				// Dispatch a fresh code and ask the client to retry with otpToken. Reuses
 				// the existing OTP_REQUIRED contract so clients that already handle it work.
-				await this.emailOtpManager.sendCode(dbContext, person)
+				// The send is rate-limited per person; when throttled nothing is emailed
+				// (emailOtpSent: false) but a previously emailed code stays valid.
+				const config = await dbContext.queryHandler.fetch(new ConfigurationQuery(dbContext.providers))
+				const decision = await this.emailOtpManager.sendCode(dbContext, person, config)
 				return new ResponseError('OTP_REQUIRED', `2FA is enabled. OTP token is required`, {
-					emailOtpSent: true,
+					emailOtpSent: decision.ok,
 					...authLogData,
 				})
 			}
@@ -185,7 +188,14 @@ class SignInManager {
 			if (!await this.otpManager.verifyPendingOtp(person, otpCode)) {
 				return new ResponseError('INVALID_OTP_TOKEN', 'OTP token validation has failed', authLogData)
 			}
-			await this.otpManager.confirmOtp(dbContext, person)
+			const promoted = await this.otpManager.confirmOtp(dbContext, person)
+			if (!promoted) {
+				// Lost a concurrent enrollment-completion race: the pending secret was
+				// already promoted by the other request (which issued the backup codes).
+				// Don't regenerate here — that would invalidate the codes already
+				// returned. TOTP is now active, so a retry signs in via the normal path.
+				return new ResponseError('INVALID_OTP_TOKEN', 'OTP token validation has failed', authLogData)
+			}
 			const backupCodes = await this.backupCodeManager.generate(dbContext, person.id)
 			return { backupCodes }
 		}

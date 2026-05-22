@@ -3,7 +3,12 @@ import { ApiKey } from '../../type/index.js'
 import { ApiKeyHelper } from './ApiKeyHelper.js'
 import { QueryBuilder, UpdateBuilder } from '@contember/database'
 
-const PROLONG_THROTTLE_MS = 60_000
+/**
+ * Tracking writes (`last_used_at`) are throttled to at most once per this window, so
+ * an idle check must add this slack to avoid prematurely expiring an active session
+ * whose `last_used_at` is intentionally stale (see {@link ApiKeyManager.verifyAndProlong}).
+ */
+export const PROLONG_THROTTLE_MS = 60_000
 
 export interface ApiKeyRequestInfo {
 	ip?: string

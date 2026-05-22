@@ -34,6 +34,8 @@ export type ConfigRow = {
 	rate_limit_password_reset_per_ip_window: IPostgresInterval
 	rate_limit_passwordless_init_per_ip_limit: number
 	rate_limit_passwordless_init_per_ip_window: IPostgresInterval
+	rate_limit_email_otp_per_person_limit: number
+	rate_limit_email_otp_per_person_window: IPostgresInterval
 }
 
 export type Config =

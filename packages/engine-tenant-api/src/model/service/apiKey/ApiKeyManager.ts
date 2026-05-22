@@ -4,6 +4,7 @@ import {
 	DisableApiKeyCommand,
 	DisableIdentityApiKeysCommand,
 	DisableOneOffApiKeyCommand,
+	PROLONG_THROTTLE_MS,
 	ProlongApiKeyCommand,
 } from '../../commands/index.js'
 import { ApiKey } from '../../type/index.js'
@@ -46,7 +47,9 @@ export class ApiKeyManager {
 			)
 		}
 
-		const now = new Date()
+		// Single injectable clock for all session-policy time math (matches issuance,
+		// which uses providers.now()), so the A19 idle/max logic is deterministically testable.
+		const now = dbContext.providers.now()
 		if (apiKeyRow.expires_at !== null && apiKeyRow.expires_at <= now) {
 			return new ResponseError(VerifyErrorCode.DISABLED, `API key expired at ${apiKeyRow.expires_at.toISOString()}`)
 		}
@@ -66,7 +69,11 @@ export class ApiKeyManager {
 		// never-used key (last_used_at null) are never idle-expired.
 		if (apiKeyRow.idle_timeout !== null && apiKeyRow.last_used_at !== null) {
 			const idleMs = intervalToSeconds(apiKeyRow.idle_timeout) * 1000
-			if (now.getTime() - apiKeyRow.last_used_at.getTime() > idleMs) {
+			// last_used_at is written at most once per PROLONG_THROTTLE_MS (tracking is
+			// throttled), so it can legitimately lag a continuously-active session by up
+			// to that window. Add the throttle as slack so a small idle_timeout can't
+			// idle-expire a session that is actually in use.
+			if (now.getTime() - apiKeyRow.last_used_at.getTime() > idleMs + PROLONG_THROTTLE_MS) {
 				await dbContext.commandBus.execute(new DisableApiKeyCommand(apiKeyRow.id))
 				try {
 					await this.authLogService.logSessionEvent(dbContext, {

@@ -13,7 +13,7 @@ import { getIdentityProjectsSql } from './sql/getIdentityProjectsSql.js'
 import { getNextLoginAttemptSql } from './sql/getNextLoginAttemptSql.js'
 import { getConfigSql } from './sql/getConfigSql.js'
 import { consumeBackupCodeSql, countUnusedBackupCodesSql } from './sql/consumeBackupCodeSql.js'
-import { consumeEmailOtpTokenSql, EMAIL_OTP_CODE, getLatestEmailOtpTokenSql, sendEmailOtpSql } from './sql/emailOtpSql.js'
+import { claimEmailOtpAttemptSql, consumeEmailOtpTokenSql, EMAIL_OTP_CODE, getLatestEmailOtpTokenSql, sendEmailOtpSql } from './sql/emailOtpSql.js'
 import { getMailTemplateSql } from './sql/getMailTemplateSql.js'
 import { getAuthPoliciesSql } from './sql/authPolicySql.js'
 import { getIdentityByIdSql } from './sql/getIdentityByIdSql.js'
@@ -355,7 +355,9 @@ test('sign in - email OTP enabled, no code provided: dispatches a code and retur
 			getConfigSql(),
 			getNextLoginAttemptSql(email),
 			getPersonByEmailSql({ email, response: { personId, identityId, password, roles: [], emailOtpEnabled: true } }),
-			...sendEmailOtpSql({ personId, tokenId: testUuid(1) }),
+			// signIn lazily re-fetches the config to resolve the email-OTP send rate limit.
+			getConfigSql(),
+			...sendEmailOtpSql({ personId, rateLimitEventId: testUuid(1), tokenId: testUuid(2) }),
 			getMailTemplateSql({ type: 'emailOtp', projectId: null }),
 			getMailTemplateSql({ type: 'emailOtp', projectId: null }),
 		],
@@ -397,6 +399,7 @@ test('sign in - email OTP enabled, valid code: signs in', async () => {
 			getNextLoginAttemptSql(email),
 			getPersonByEmailSql({ email, response: { personId, identityId, password, roles: [], emailOtpEnabled: true } }),
 			getLatestEmailOtpTokenSql({ personId, tokenId }),
+			claimEmailOtpAttemptSql({ tokenId }),
 			consumeEmailOtpTokenSql({ tokenId }),
 			getConfigSql(),
 			getIdentityByIdSql({ identityId }),
@@ -436,11 +439,7 @@ test('sign in - email OTP enabled, invalid code: INVALID_OTP_TOKEN', async () =>
 			getNextLoginAttemptSql(email),
 			getPersonByEmailSql({ email, response: { personId, identityId, password, roles: [], emailOtpEnabled: true } }),
 			getLatestEmailOtpTokenSql({ personId, tokenId }),
-			{
-				sql: SQL`update "tenant"."person_token" set "otp_attempts" = otp_attempts + 1 where "id" = ?`,
-				parameters: [tokenId],
-				response: { rowCount: 1 },
-			},
+			claimEmailOtpAttemptSql({ tokenId }),
 		],
 		return: {
 			data: {

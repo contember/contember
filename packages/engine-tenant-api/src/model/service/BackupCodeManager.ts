@@ -35,15 +35,20 @@ export class BackupCodeManager {
 	 * formatted plaintext codes (to be shown once).
 	 */
 	async generate(dbContext: DatabaseContext, personId: string): Promise<string[]> {
-		await dbContext.commandBus.execute(new DeleteBackupCodesCommand(personId))
-
 		const codes: string[] = []
 		for (let i = 0; i < BACKUP_CODE_COUNT; i++) {
-			const code = await this.generateCode()
-			codes.push(code)
-			// Hash the normalized form so verification (which normalizes its input) matches.
-			await dbContext.commandBus.execute(new CreateBackupCodeCommand(personId, this.hash(this.normalize(code))))
+			codes.push(await this.generateCode())
 		}
+		// Replace the whole set atomically: a mid-flow failure must never leave the
+		// person with a partial set that doesn't match the plaintext codes returned
+		// to (and shown once to) the caller.
+		await dbContext.transaction(async tx => {
+			await tx.commandBus.execute(new DeleteBackupCodesCommand(personId))
+			for (const code of codes) {
+				// Hash the normalized form so verification (which normalizes its input) matches.
+				await tx.commandBus.execute(new CreateBackupCodeCommand(personId, this.hash(this.normalize(code))))
+			}
+		})
 		return codes
 	}
 

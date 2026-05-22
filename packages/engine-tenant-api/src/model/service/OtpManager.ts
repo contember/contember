@@ -39,8 +39,9 @@ export class OtpManager {
 		return otp
 	}
 
-	async confirmOtp(dbContext: DatabaseContext, person: PersonRow): Promise<void> {
-		await dbContext.commandBus.execute(new ConfirmOtpCommand(person.id))
+	/** Promotes the pending TOTP secret to active. Returns false if there was no pending secret to promote (e.g. a lost concurrent confirm). */
+	async confirmOtp(dbContext: DatabaseContext, person: PersonRow): Promise<boolean> {
+		return await dbContext.commandBus.execute(new ConfirmOtpCommand(person.id))
 	}
 
 	async disableOtp(dbContext: DatabaseContext, person: PersonRow): Promise<void> {

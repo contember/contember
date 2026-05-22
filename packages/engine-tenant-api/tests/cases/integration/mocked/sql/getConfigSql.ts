@@ -38,6 +38,8 @@ export const getConfigSql = (overrides: Record<string, unknown> = {}): ExpectedQ
 				rate_limit_password_reset_per_ip_window: PostgresInterval('01:00:00'),
 				rate_limit_passwordless_init_per_ip_limit: 0,
 				rate_limit_passwordless_init_per_ip_window: PostgresInterval('01:00:00'),
+				rate_limit_email_otp_per_person_limit: 10,
+				rate_limit_email_otp_per_person_window: PostgresInterval('00:10:00'),
 				...overrides,
 			},
 		],

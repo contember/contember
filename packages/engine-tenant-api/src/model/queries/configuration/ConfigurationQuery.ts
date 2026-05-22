@@ -69,6 +69,10 @@ export class ConfigurationQuery extends DatabaseQuery<Config> {
 					limit: result.rate_limit_passwordless_init_per_ip_limit,
 					window: result.rate_limit_passwordless_init_per_ip_window,
 				},
+				emailOtpPerPerson: {
+					limit: result.rate_limit_email_otp_per_person_limit,
+					window: result.rate_limit_email_otp_per_person_window,
+				},
 			},
 		}
 	}

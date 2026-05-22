@@ -222,6 +222,12 @@ const schema: DocumentNode = gql`
 		loginPerIp: ConfigRateLimitWindow!
 		passwordResetPerIp: ConfigRateLimitWindow!
 		passwordlessInitPerIp: ConfigRateLimitWindow!
+		"""
+		Caps how many email-OTP codes may be dispatched per person within the
+		window (a brute-force / email-bomb backstop). Unlike the per-IP limits it
+		ships enabled by default. Set limit to 0 to disable.
+		"""
+		emailOtpPerPerson: ConfigRateLimitWindow!
 	}
 
 	type ConfigRateLimitWindow {
@@ -287,6 +293,7 @@ const schema: DocumentNode = gql`
 		loginPerIp: ConfigRateLimitWindowInput
 		passwordResetPerIp: ConfigRateLimitWindowInput
 		passwordlessInitPerIp: ConfigRateLimitWindowInput
+		emailOtpPerPerson: ConfigRateLimitWindowInput
 	}
 
 	input ConfigRateLimitWindowInput {
@@ -1238,6 +1245,7 @@ const schema: DocumentNode = gql`
 
 	enum InitEmailOtpErrorCode {
 		NO_EMAIL
+		RATE_LIMITED
 	}
 
 	type ConfirmEmailOtpResponse {

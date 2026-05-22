@@ -51,6 +51,7 @@ import _20260521110000mfafoundation from './2026-05-21-110000-mfa-foundation.js'
 import _20260521120000emailotp from './2026-05-21-120000-email-otp.js'
 import _20260521130000apikeysessionpolicy from './2026-05-21-130000-api-key-session-policy.js'
 import _20260521140000mfagraceduration from './2026-05-21-140000-mfa-grace-duration.js'
+import _20260521150000emailotpratelimit from './2026-05-21-150000-email-otp-rate-limit.js'
 import snapshot from './snapshot.js'
 import { computeTokenHash, Providers } from '../model/index.js'
 import { Logger } from '@contember/logger'
@@ -114,6 +115,7 @@ const migrations = {
 	'2026-05-21-120000-email-otp': _20260521120000emailotp,
 	'2026-05-21-130000-api-key-session-policy': _20260521130000apikeysessionpolicy,
 	'2026-05-21-140000-mfa-grace-duration': _20260521140000mfagraceduration,
+	'2026-05-21-150000-email-otp-rate-limit': _20260521150000emailotpratelimit,
 }
 
 export class TenantMigrationsRunner {

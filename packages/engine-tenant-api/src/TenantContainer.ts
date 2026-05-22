@@ -218,7 +218,7 @@ export class TenantContainerFactory {
 			.addService('otpAuthenticator', ({ providers }) => new OtpAuthenticator(providers))
 			.addService('otpManager', ({ otpAuthenticator, providers }) => new OtpManager(otpAuthenticator, providers))
 			.addService('backupCodeManager', ({ providers, userMailer }) => new BackupCodeManager(userMailer, providers))
-			.addService('emailOtpManager', ({ userMailer, providers }) => new EmailOtpManager(userMailer, providers))
+			.addService('emailOtpManager', ({ userMailer, providers, rateLimiter }) => new EmailOtpManager(userMailer, providers, rateLimiter))
 			.addService('authPolicyManager', ({ projectManager }) => new AuthPolicyManager(projectManager))
 			.addService(
 				'signInManager',

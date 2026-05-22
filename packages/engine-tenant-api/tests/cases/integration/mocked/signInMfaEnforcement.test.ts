@@ -118,10 +118,10 @@ test('MFA required + valid pending code → enrolls (pending→active), returns 
 			// Enforcement resolves the grace duration from the global config default.
 			getConfigSql(),
 			{
-				// confirmOtp promotes pending → active.
+				// confirmOtp promotes pending → active (only while a pending secret is present).
 				sql: `update "tenant"."person_mfa"
 					set "totp_secret" = "totp_pending_secret", "totp_secret_version" = "totp_pending_version", "totp_activated_at" = ?, "totp_pending_secret" = ?, "totp_pending_version" = ?, "totp_pending_created_at" = ?
-					where "person_id" = ?`,
+					where "person_id" = ? and "totp_pending_secret" is not null`,
 				parameters: [now, null, null, null, personId],
 				response: { rowCount: 1 },
 			},

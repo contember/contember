@@ -352,6 +352,7 @@ export type ConfigInput = {
  */
 export type ConfigRateLimits = {
 	readonly __typename?: 'ConfigRateLimits'
+	readonly emailOtpPerPerson: ConfigRateLimitWindow
 	readonly loginPerIp: ConfigRateLimitWindow
 	readonly passwordResetPerIp: ConfigRateLimitWindow
 	readonly passwordlessInitPerIp: ConfigRateLimitWindow
@@ -359,6 +360,7 @@ export type ConfigRateLimits = {
 }
 
 export type ConfigRateLimitsInput = {
+	readonly emailOtpPerPerson?: InputMaybe<ConfigRateLimitWindowInput>
 	readonly loginPerIp?: InputMaybe<ConfigRateLimitWindowInput>
 	readonly passwordResetPerIp?: InputMaybe<ConfigRateLimitWindowInput>
 	readonly passwordlessInitPerIp?: InputMaybe<ConfigRateLimitWindowInput>
@@ -514,7 +516,7 @@ export type InitEmailOtpError = {
 	readonly developerMessage: Scalars['String']['output']
 }
 
-export type InitEmailOtpErrorCode = 'NO_EMAIL'
+export type InitEmailOtpErrorCode = 'NO_EMAIL' | 'RATE_LIMITED'
 
 export type InitEmailOtpResponse = {
 	readonly __typename?: 'InitEmailOtpResponse'
@@ -2688,6 +2690,7 @@ export type ConfigRateLimitsResolvers<
 	ContextType = any,
 	ParentType extends ResolversParentTypes['ConfigRateLimits'] = ResolversParentTypes['ConfigRateLimits'],
 > = {
+	emailOtpPerPerson?: Resolver<ResolversTypes['ConfigRateLimitWindow'], ParentType, ContextType>
 	loginPerIp?: Resolver<ResolversTypes['ConfigRateLimitWindow'], ParentType, ContextType>
 	passwordResetPerIp?: Resolver<ResolversTypes['ConfigRateLimitWindow'], ParentType, ContextType>
 	passwordlessInitPerIp?: Resolver<ResolversTypes['ConfigRateLimitWindow'], ParentType, ContextType>

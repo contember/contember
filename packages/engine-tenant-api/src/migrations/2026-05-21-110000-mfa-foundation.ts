@@ -27,15 +27,15 @@ CREATE INDEX ON auth_policy (project_id);
 ALTER TABLE api_key ADD COLUMN issued_at TIMESTAMPTZ;
 ALTER TABLE person ADD COLUMN mfa_grace_until TIMESTAMPTZ;
 
-ALTER TYPE "auth_log_type" ADD VALUE 'backup_code_generated';
-ALTER TYPE "auth_log_type" ADD VALUE 'backup_code_used';
-ALTER TYPE "auth_log_type" ADD VALUE 'backup_code_regenerated';
-ALTER TYPE "auth_log_type" ADD VALUE 'email_otp_sent';
-ALTER TYPE "auth_log_type" ADD VALUE 'mfa_enrollment_required';
-ALTER TYPE "auth_log_type" ADD VALUE 'mfa_reset';
-ALTER TYPE "auth_log_type" ADD VALUE 'session_expired_idle';
-ALTER TYPE "auth_log_type" ADD VALUE 'session_policy_applied';
-ALTER TYPE "auth_log_type" ADD VALUE 'auth_policy_change';
+ALTER TYPE "auth_log_type" ADD VALUE IF NOT EXISTS 'backup_code_generated';
+ALTER TYPE "auth_log_type" ADD VALUE IF NOT EXISTS 'backup_code_used';
+ALTER TYPE "auth_log_type" ADD VALUE IF NOT EXISTS 'backup_code_regenerated';
+ALTER TYPE "auth_log_type" ADD VALUE IF NOT EXISTS 'email_otp_sent';
+ALTER TYPE "auth_log_type" ADD VALUE IF NOT EXISTS 'mfa_enrollment_required';
+ALTER TYPE "auth_log_type" ADD VALUE IF NOT EXISTS 'mfa_reset';
+ALTER TYPE "auth_log_type" ADD VALUE IF NOT EXISTS 'session_expired_idle';
+ALTER TYPE "auth_log_type" ADD VALUE IF NOT EXISTS 'session_policy_applied';
+ALTER TYPE "auth_log_type" ADD VALUE IF NOT EXISTS 'auth_policy_change';
 `
 
 export default async function(builder: MigrationBuilder) {

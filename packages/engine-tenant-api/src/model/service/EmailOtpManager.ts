@@ -4,6 +4,9 @@ import { Providers } from '../providers'
 import { UserMailer } from '../mailing'
 import { IncreaseOtpAttemptCommand, InvalidateEmailOtpTokensCommand, InvalidateTokenCommand, SaveEmailOtpTokenCommand } from '../commands'
 import { PersonTokenQuery } from '../queries/personToken/PersonTokenQuery'
+import { RateLimitDecision, RateLimiter } from './RateLimiter'
+import { RateLimitScopes } from '../type/RateLimit'
+import { Config } from '../type/Config'
 
 /** Email-OTP codes are short-lived numeric codes delivered by email. */
 const EMAIL_OTP_EXPIRATION_MINUTES = 10
@@ -20,14 +23,25 @@ export class EmailOtpManager {
 	constructor(
 		private readonly mailer: UserMailer,
 		private readonly providers: Pick<Providers, 'randomBytes' | 'now' | 'uuid'>,
+		private readonly rateLimiter: RateLimiter,
 	) {}
 
 	/**
 	 * Generates a fresh code, invalidates any prior unused email-OTP tokens for the
 	 * person, persists the new one and emails the code. Must run inside the request's
 	 * db context (it issues commands + sends mail).
+	 *
+	 * Gated by the per-person `email_otp_per_person` rate limit so an attacker who
+	 * knows the password cannot re-issue codes to reset the per-code 3-attempt
+	 * counter, nor email-bomb a person. When the limit is hit nothing is sent and
+	 * the returned decision is `ok: false` (the caller decides how to surface it);
+	 * a previously emailed, still-valid code remains usable.
 	 */
-	async sendCode(dbContext: DatabaseContext, person: PersonRow): Promise<void> {
+	async sendCode(dbContext: DatabaseContext, person: PersonRow, config: Config): Promise<RateLimitDecision> {
+		const decision = await this.rateLimiter.consume(dbContext, RateLimitScopes.emailOtpPerPerson, person.id, config)
+		if (!decision.ok) {
+			return decision
+		}
 		const code = await this.generateCode()
 		// Only the latest emailed code may ever verify.
 		await dbContext.commandBus.execute(new InvalidateEmailOtpTokensCommand(person.id))
@@ -39,6 +53,7 @@ export class EmailOtpManager {
 			variant: '',
 			projectId: null,
 		})
+		return decision
 	}
 
 	/**

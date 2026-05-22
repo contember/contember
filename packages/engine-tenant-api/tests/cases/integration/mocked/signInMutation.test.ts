@@ -355,7 +355,9 @@ test('sign in - email OTP enabled, no code provided: dispatches a code and retur
 			getConfigSql(),
 			getNextLoginAttemptSql(email),
 			getPersonByEmailSql({ email, response: { personId, identityId, password, roles: [], emailOtpEnabled: true } }),
-			...sendEmailOtpSql({ personId, tokenId: testUuid(1) }),
+			// signIn lazily re-fetches the config to resolve the email-OTP send rate limit.
+			getConfigSql(),
+			...sendEmailOtpSql({ personId, rateLimitEventId: testUuid(1), tokenId: testUuid(2) }),
 			getMailTemplateSql({ type: 'emailOtp', projectId: null }),
 			getMailTemplateSql({ type: 'emailOtp', projectId: null }),
 		],

@@ -152,6 +152,8 @@ CREATE TABLE "config" (
     "rate_limit_passwordless_init_per_ip_window" interval DEFAULT '01:00:00'::interval NOT NULL,
     "login_reveal_login_method" boolean DEFAULT true NOT NULL,
     "login_mfa_grace_duration" interval DEFAULT '00:00:00'::interval NOT NULL,
+    "rate_limit_email_otp_per_person_limit" integer DEFAULT 10 NOT NULL,
+    "rate_limit_email_otp_per_person_window" interval DEFAULT '00:10:00'::interval NOT NULL,
     CONSTRAINT "config_captcha_complete" CHECK ((("captcha_provider" IS NULL) OR (("captcha_secret" IS NOT NULL) AND ("captcha_secret_version" IS NOT NULL)))),
     CONSTRAINT "config_captcha_provider_check" CHECK ((("captcha_provider" IS NULL) OR ("captcha_provider" = ANY (ARRAY['turnstile'::"text", 'hcaptcha'::"text", 'recaptchaV3'::"text"]))))
 );

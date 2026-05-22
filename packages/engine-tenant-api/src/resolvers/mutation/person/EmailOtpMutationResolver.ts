@@ -6,7 +6,7 @@ import {
 	MutationResolvers,
 } from '../../../schema'
 import { TenantResolverContext } from '../../TenantResolverContext'
-import { AuthPolicyResolver, BackupCodeManager, EmailOtpManager, PermissionActions, PersonQuery, PersonRow } from '../../../model'
+import { AuthPolicyResolver, BackupCodeManager, ConfigurationQuery, EmailOtpManager, PermissionActions, PersonQuery, PersonRow } from '../../../model'
 import { ImplementationException } from '../../../exceptions'
 import { createErrorResponse } from '../../errorUtils'
 import { ResponseOk } from '../../../model/utils/Response'
@@ -25,7 +25,11 @@ export class EmailOtpMutationResolver implements Pick<MutationResolvers, 'initEm
 			return createErrorResponse('NO_EMAIL', 'Person has no email address to send the code to.')
 		}
 		// Send a confirmation code; enabling happens only after confirmEmailOtp.
-		await this.emailOtpManager.sendCode(context.db, person)
+		const config = await context.db.queryHandler.fetch(new ConfigurationQuery(context.db.providers))
+		const decision = await this.emailOtpManager.sendCode(context.db, person, config)
+		if (!decision.ok) {
+			return createErrorResponse('RATE_LIMITED', `Too many codes requested. Retry after ${decision.retryAfterSeconds}s.`)
+		}
 		return {
 			ok: true,
 		}

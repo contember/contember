@@ -12,8 +12,25 @@ export const EMAIL_OTP_CODE = '000000'
 export const EMAIL_OTP_CODE_HASH = sha256(EMAIL_OTP_CODE)
 const RANDOM_TOKEN_HASH = sha256('0'.repeat(40))
 
-/** Mocks EmailOtpManager.sendCode: invalidate prior unused email-OTP tokens, then insert a new one. */
-export const sendEmailOtpSql = (args: { personId: string; tokenId: string }): ExpectedQuery[] => [
+/**
+ * Mocks EmailOtpManager.sendCode: consume the per-person email_otp rate limit
+ * (COUNT under the default limit of 10, then record the event), invalidate prior
+ * unused email-OTP tokens, then insert a new one. The caller must fetch the config
+ * (getConfigSql) before this, since sendCode is rate-limited by the effective config.
+ */
+export const sendEmailOtpSql = (args: { personId: string; rateLimitEventId: string; tokenId: string }): ExpectedQuery[] => [
+	{
+		sql: SQL`select count(*)::text as count from "tenant"."rate_limit_event"
+		where "scope" = ? and "key_hash" = ? and "occurred_at" >= ?`,
+		// mocked hash provider stores the key verbatim; window 10min → now - 600s.
+		parameters: ['email_otp_per_person', Buffer.from(args.personId), new Date(now.getTime() - 10 * 60 * 1000)],
+		response: { rows: [{ count: '0' }] },
+	},
+	{
+		sql: SQL`insert into "tenant"."rate_limit_event" ("id", "scope", "key_hash", "occurred_at") values (?, ?, ?, ?)`,
+		parameters: [args.rateLimitEventId, 'email_otp_per_person', Buffer.from(args.personId), now],
+		response: { rowCount: 1 },
+	},
 	{
 		sql: SQL`update "tenant"."person_token" set "used_at" = ? where "person_id" = ? and "type" = ? and "used_at" is null`,
 		parameters: [now, args.personId, 'mfa_email_otp'],

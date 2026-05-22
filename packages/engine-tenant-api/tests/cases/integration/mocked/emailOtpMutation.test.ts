@@ -5,6 +5,7 @@ import { generateBackupCodesSql } from './sql/generateBackupCodesSql'
 import { confirmEmailOtpMutation, initEmailOtpMutation } from './gql/emailOtp'
 import { consumeEmailOtpTokenSql, EMAIL_OTP_CODE, getLatestEmailOtpTokenSql, sendEmailOtpSql } from './sql/emailOtpSql'
 import { setEmailOtpEnabledSql } from './sql/setEmailOtpEnabledSql'
+import { getConfigSql } from './sql/getConfigSql'
 import { expect, test } from 'bun:test'
 
 test('initEmailOtp sends a code', async () => {
@@ -16,7 +17,8 @@ test('initEmailOtp sends a code', async () => {
 				identityId: authenticatedIdentityId,
 				response: { personId, password: '123', roles: [], email: 'john@doe.com' },
 			}),
-			...sendEmailOtpSql({ personId, tokenId: testUuid(1) }),
+			getConfigSql(),
+			...sendEmailOtpSql({ personId, rateLimitEventId: testUuid(1), tokenId: testUuid(2) }),
 			{
 				sql:
 					`select "mail_template"."id", "subject", "content", "use_layout" as "useLayout", "reply_to" as "replyTo", "project_id" as "projectId", "mail_type" as "type", "variant" FROM "tenant"."mail_template" WHERE "project_id" IS NULL AND "mail_type" = ? AND "variant" = ?`,

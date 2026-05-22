@@ -232,8 +232,8 @@ export class TenantContainerFactory {
 			.addService('configurationManager', () => new ConfigurationManager())
 			.addService(
 				'passwordlessSignInManager',
-				({ apiKeyManager, userMailer, projectManager, otpManager, backupCodeManager, authPolicyResolver }) =>
-					new PasswordlessSignInManager(apiKeyManager, userMailer, projectManager, otpManager, backupCodeManager, authPolicyResolver),
+				({ apiKeyManager, userMailer, projectManager, otpManager, backupCodeManager }) =>
+					new PasswordlessSignInManager(apiKeyManager, userMailer, projectManager, otpManager, backupCodeManager),
 			)
 			.addService(
 				'identityTypeResolver',

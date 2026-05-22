@@ -1,6 +1,6 @@
 import { useCallback } from 'react'
-import { dict } from '../dict'
-import { ToastContent, useShowToast } from '../toast'
+import { dict } from '@contember/react-ui-lib-base'
+import { ToastContent, useShowToast } from '@contember/react-ui-lib-base'
 import { ErrorPersistResult, SuccessfulPersistResult, usePersist } from '@contember/interface'
 import { useErrorFormatter } from '../errors'
 

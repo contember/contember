@@ -6,30 +6,31 @@
 
 import { AnyFileTypeProps } from '@contember/react-uploader';
 import { AudioFileTypeProps } from '@contember/react-uploader';
-import { ClassAttributes } from 'react';
 import { ComponentProps } from 'react';
 import { DataViewSortingDirections } from '@contember/react-dataview';
 import { DataViewUnionFilterFields } from '@contember/react-dataview';
 import { ErrorAccessor } from '@contember/interface';
 import { FormCheckboxProps } from '@contember/react-form';
+import { FormContainerUI } from '@contember/react-ui-lib-base';
+import { FormDescriptionUI } from '@contember/react-ui-lib-base';
+import { FormErrorUI } from '@contember/react-ui-lib-base';
 import { FormInputProps } from '@contember/react-form';
+import { FormLabelUI } from '@contember/react-ui-lib-base';
+import { FormLabelWrapperUI } from '@contember/react-ui-lib-base';
+import { FormLayout } from '@contember/react-ui-lib-base';
 import { FormRadioItemProps } from '@contember/react-form';
-import { ForwardRefExoticComponent } from 'react';
-import { HTMLAttributes } from 'react';
 import { ImageFileTypeProps } from '@contember/react-uploader';
-import { InputHTMLAttributes } from 'react';
-import { LabelProps } from '@radix-ui/react-label';
+import { Input } from '@contember/react-ui-lib-base';
 import { NamedExoticComponent } from 'react';
 import * as React_2 from 'react';
 import { ReactNode } from 'react';
-import { RefAttributes } from 'react';
 import { RepeaterProps } from '@contember/react-repeater';
 import { S3FileOptions } from '@contember/react-uploader';
 import { SugaredQualifiedEntityList } from '@contember/interface';
 import { SugaredRelativeEntityList } from '@contember/interface';
 import { SugaredRelativeSingleEntity } from '@contember/interface';
 import { SugaredRelativeSingleField } from '@contember/interface';
-import { TextareaHTMLAttributes } from 'react';
+import { TextareaAutosize } from '@contember/react-ui-lib-base';
 import { UploaderBaseFieldProps } from '@contember/react-uploader';
 import { VideoFileTypeProps } from '@contember/react-uploader';
 
@@ -99,53 +100,17 @@ export type FormContainerProps = {
     required?: boolean;
 };
 
-// @public (undocumented)
-export const FormContainerUI: ForwardRefExoticComponent<Omit<ClassAttributes<HTMLDivElement> & HTMLAttributes<HTMLDivElement> & {
-asChild?: boolean;
-children?: ReactNode;
-className?: string;
-}, "ref"> & RefAttributes<HTMLDivElement>>;
+export { FormContainerUI }
 
-// @public (undocumented)
-export const FormDescriptionUI: ForwardRefExoticComponent<Omit<ClassAttributes<HTMLParagraphElement> & HTMLAttributes<HTMLParagraphElement> & {
-asChild?: boolean;
-children?: ReactNode;
-className?: string;
-}, "ref"> & RefAttributes<HTMLParagraphElement>>;
+export { FormDescriptionUI }
 
-// @public (undocumented)
-export const FormErrorUI: ForwardRefExoticComponent<Omit<ClassAttributes<HTMLParagraphElement> & HTMLAttributes<HTMLParagraphElement> & {
-asChild?: boolean;
-children?: ReactNode;
-className?: string;
-}, "ref"> & RefAttributes<HTMLParagraphElement>>;
+export { FormErrorUI }
 
-// @public (undocumented)
-export const FormLabelUI: ForwardRefExoticComponent<Omit<Omit<LabelProps & RefAttributes<HTMLLabelElement> & {
-asChild?: boolean;
-children?: ReactNode;
-className?: string;
-}, "ref"> & RefAttributes<HTMLLabelElement> & {
-asChild?: boolean;
-children?: ReactNode;
-className?: string;
-} & {
-required?: boolean | null | undefined;
-}, "ref"> & RefAttributes<HTMLLabelElement>>;
+export { FormLabelUI }
 
-// @public (undocumented)
-export const FormLabelWrapperUI: ForwardRefExoticComponent<Omit<ClassAttributes<HTMLDivElement> & HTMLAttributes<HTMLDivElement> & {
-asChild?: boolean;
-children?: ReactNode;
-className?: string;
-}, "ref"> & RefAttributes<HTMLDivElement>>;
+export { FormLabelWrapperUI }
 
-// @public (undocumented)
-export const FormLayout: ForwardRefExoticComponent<Omit<ClassAttributes<HTMLDivElement> & HTMLAttributes<HTMLDivElement> & {
-asChild?: boolean;
-children?: ReactNode;
-className?: string;
-}, "ref"> & RefAttributes<HTMLDivElement>>;
+export { FormLayout }
 
 // @public (undocumented)
 export const ImageField: React_2.NamedExoticComponent<ImageFieldProps>;
@@ -250,11 +215,6 @@ export const VideoRepeaterField: React_2.NamedExoticComponent<VideoRepeaterField
 
 // @public (undocumented)
 export type VideoRepeaterFieldProps = BaseFileRepeaterFieldProps & VideoFileTypeProps;
-
-// Warnings were encountered during analysis:
-//
-// src/form/inputs.tsx:26:3 - (ae-forgotten-export) The symbol "Input" needs to be exported by the entry point index.d.ts
-// src/form/inputs.tsx:46:3 - (ae-forgotten-export) The symbol "TextareaAutosize" needs to be exported by the entry point index.d.ts
 
 // (No @packageDocumentation comment for this package)
 

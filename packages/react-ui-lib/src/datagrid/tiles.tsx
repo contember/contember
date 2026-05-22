@@ -1,9 +1,9 @@
 import { Component } from '@contember/interface'
 import { DataViewEachRow, DataViewLayout } from '@contember/react-dataview'
 import * as React from 'react'
-import { dict } from '../dict'
+import { dict } from '@contember/react-ui-lib-base'
 import { LayoutGridIcon } from 'lucide-react'
-import { cn } from '../utils'
+import { cn } from '@contember/react-ui-lib-base'
 
 /**
  * Props for the {@link DataGridTiles} component.

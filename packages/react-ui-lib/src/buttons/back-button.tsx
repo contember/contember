@@ -1,6 +1,6 @@
-import { Button } from '../ui/button'
+import { Button } from '@contember/react-ui-lib-base'
 import { ArrowLeftIcon } from 'lucide-react'
-import { dict } from '../dict'
+import { dict } from '@contember/react-ui-lib-base'
 
 export type BackButtonProps = {
 	label?: string

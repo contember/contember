@@ -1,7 +1,7 @@
 import { Component, Field, SugaredRelativeEntityList, SugaredRelativeSingleEntity } from '@contember/interface'
 import * as React from 'react'
 import { ReactNode } from 'react'
-import { TableCell, TableHead } from '../ui/table'
+import { TableCell, TableHead } from '@contember/react-ui-lib-base'
 import { DataGridColumnHeader } from './column-header'
 import {
 	DataViewBooleanFilter,
@@ -17,7 +17,7 @@ import {
 } from '@contember/react-dataview'
 import { formatBoolean, formatDate, formatDateTime, formatNumber } from '../formatting'
 import { DataGridEnumCell, DataGridEnumListCell, DataGridHasManyCell, DataGridHasOneCell } from './cells'
-import { cn } from '../utils'
+import { cn } from '@contember/react-ui-lib-base'
 import {
 	DataGridBooleanFilterControls,
 	DataGridDateFilterControls,

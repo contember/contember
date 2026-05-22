@@ -12,7 +12,7 @@
   },
   "type": "module",
   "scripts": {
-    "pre-build": "rm -rf rm ./resources/templates/default/admin/lib && cp -r ../react-ui-lib/src ./resources/templates/default/admin/lib && rm ./resources/templates/default/admin/lib/index.ts ./resources/templates/default/admin/lib/tsconfig.json"
+    "pre-build": "node ./resources/templates/default/scripts/assemble-ui-lib.mjs --packages-dir .. --target ./resources/templates/default/admin/lib"
   },
   "devDependencies": {
     "@types/degit": "catalog:"

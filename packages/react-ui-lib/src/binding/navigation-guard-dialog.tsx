@@ -1,8 +1,8 @@
 import { useCallback, useState } from 'react'
-import { AlertDialog, AlertDialogCancel, AlertDialogContent, AlertDialogTitle } from '../ui/alert-dialog'
+import { AlertDialog, AlertDialogCancel, AlertDialogContent, AlertDialogTitle } from '@contember/react-ui-lib-base'
 import { BlockNavigationOnDirtyStateResult, useBlockNavigationOnDirtyState } from '@contember/interface'
 import { usePersistFeedbackHandlers } from './hooks'
-import { Button } from '../ui/button'
+import { Button } from '@contember/react-ui-lib-base'
 import { SaveIcon } from 'lucide-react'
 
 export const NavigationGuardDialog = () => {

@@ -7,10 +7,10 @@ import {
 	AlertDialogDescription,
 	AlertDialogFooter,
 	AlertDialogHeader,
-} from '../ui/alert-dialog'
+} from '@contember/react-ui-lib-base'
 import { useIsApplicationOutdated } from '@contember/interface'
 import { ClockIcon, RefreshCwIcon } from 'lucide-react'
-import { dict } from '../dict'
+import { dict } from '@contember/react-ui-lib-base'
 
 const postponeTimeoutMs = 60_000 * 5
 const checkIntervalMs = 30_000

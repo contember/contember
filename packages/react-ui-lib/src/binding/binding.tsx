@@ -1,6 +1,6 @@
 import { ReactNode, useEffect } from 'react'
 import { AccessorTreeState, DataBindingProvider, useDataBindingEvent } from '@contember/interface'
-import { Loader } from '../ui/loader'
+import { Loader } from '@contember/react-ui-lib-base'
 import { NavigationGuardDialog } from './navigation-guard-dialog'
 import { usePersistErrorHandler } from './hooks'
 import { ErrorBoundary } from '../errors/error-boundary'

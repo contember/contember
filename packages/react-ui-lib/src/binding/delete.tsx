@@ -1,7 +1,7 @@
 import { DeleteEntityTrigger, type RoutingLinkTarget, useRedirect } from '@contember/interface'
 import type { FC, ReactElement } from 'react'
 import * as React from 'react'
-import { dict } from '../dict'
+import { dict } from '@contember/react-ui-lib-base'
 import {
 	AlertDialog,
 	AlertDialogAction,
@@ -12,8 +12,8 @@ import {
 	AlertDialogHeader,
 	AlertDialogTitle,
 	AlertDialogTrigger,
-} from '../ui/alert-dialog'
-import { Button } from '../ui/button'
+} from '@contember/react-ui-lib-base'
+import { Button } from '@contember/react-ui-lib-base'
 
 export type DeleteEntityDialogProps = {
 	trigger: ReactElement

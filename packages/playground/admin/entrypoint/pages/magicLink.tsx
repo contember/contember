@@ -1,5 +1,5 @@
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '~/lib/ui/card'
-import { dict } from '~/lib/dict'
+import { dict } from '~/lib/tenant/dict'
 import { Loader } from '~/lib/ui/loader'
 import { PasswordlessSignInFormFields } from '~/lib/tenant/forms/passwordless-signin'
 import { AnchorButton } from '~/lib/ui/button'

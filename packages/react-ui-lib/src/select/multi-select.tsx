@@ -5,7 +5,7 @@ import { MultiSelect, SelectEachValue, SelectItemTrigger, SelectPlaceholder } fr
 import { ChevronDownIcon } from 'lucide-react'
 import * as React from 'react'
 import { ReactNode } from 'react'
-import { Popover, PopoverTrigger } from '../ui/popover'
+import { Popover, PopoverTrigger } from '@contember/react-ui-lib-base'
 import { CreateEntityDialog } from './create-new'
 import { DefaultSelectDataView } from './list'
 import {

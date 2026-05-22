@@ -13,10 +13,10 @@ import {
 	PanelRightOpenIcon,
 } from 'lucide-react'
 import { PropsWithChildren, useEffect, useState } from 'react'
-import { dict } from '../dict'
-import { Button } from '../ui/button'
-import { SidebarProvider } from '../ui/sidebar'
-import { uic } from '../utils'
+import { dict } from '@contember/react-ui-lib-base'
+import { Button } from '@contember/react-ui-lib-base'
+import { SidebarProvider } from '@contember/react-ui-lib-base'
+import { uic } from '@contember/react-ui-lib-base'
 import { SlotTargets } from './slots'
 
 const LayoutBodyUI = uic('div', { baseClass: 'bg-gray-50 h-full min-h-screen relative py-4 pl-[calc(100vw-100%)]' })

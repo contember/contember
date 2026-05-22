@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { ReactNode } from 'react'
-import { ScrollArea } from '../ui/scroll-area'
-import { Loader } from '../ui/loader'
+import { ScrollArea } from '@contember/react-ui-lib-base'
+import { Loader } from '@contember/react-ui-lib-base'
 import {
 	DataViewHighlightRow,
 	DataViewInfiniteLoadEachRow,
@@ -15,7 +15,7 @@ import {
 } from '@contember/react-dataview'
 import { useOnHighlight } from './highlight'
 import { Component } from '@contember/interface'
-import { Button } from '../ui/button'
+import { Button } from '@contember/react-ui-lib-base'
 import { ArrowBigDownDash } from 'lucide-react'
 import { SelectDefaultFilter } from './filter'
 import { SelectListItemUI } from './ui'

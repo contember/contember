@@ -177,6 +177,12 @@
 			"path": "./packages/react-ui-lib"
 		},
 		{
+			"path": "./packages/react-ui-lib-base"
+		},
+		{
+			"path": "./packages/react-ui-lib-tenant"
+		},
+		{
 			"path": "./packages/react-uploader"
 		},
 		{

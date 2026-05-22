@@ -1,5 +1,5 @@
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '~/lib/ui/card'
-import { dict } from '~/lib/dict'
+import { dict } from '~/lib/tenant/dict'
 import { MailIcon } from 'lucide-react'
 import { AnchorButton } from '~/lib/ui/button'
 import { Link } from '@contember/interface'

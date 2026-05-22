@@ -23,10 +23,11 @@
 		{ "path": "../../react-slots/src" },
 		{ "path": "../../react-slate-editor-base/src" },
 		{ "path": "../../react-slate-editor/src" },
+		{ "path": "../../react-ui-lib-base/src" },
+		{ "path": "../../react-ui-lib-tenant/src" },
 		{ "path": "../../react-uploader/src" },
 		{ "path": "../../react-uploader-dropzone/src" },
 		{ "path": "../../react-utils/src" },
-		{ "path": "../../utilities/src" },
-		{ "path": "../../graphql-client-tenant/src" }
+		{ "path": "../../utilities/src" }
 	]
 }

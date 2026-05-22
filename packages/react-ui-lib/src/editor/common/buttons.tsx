@@ -20,7 +20,7 @@ import {
 } from '@contember/react-slate-editor-base'
 import * as React from 'react'
 import { ReactNode } from 'react'
-import { Toggle } from '../../ui/toggle'
+import { Toggle } from '@contember/react-ui-lib-base'
 import {
 	AlignCenterIcon,
 	AlignJustifyIcon,

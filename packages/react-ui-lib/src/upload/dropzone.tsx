@@ -4,8 +4,8 @@ import { useUploaderStateFiles } from '@contember/react-uploader'
 import { UploaderDropzoneAreaUI, UploaderDropzoneWrapperUI, UploaderInactiveDropzoneUI } from './ui'
 import { ReactNode } from 'react'
 import { UploadIcon } from 'lucide-react'
-import { dict } from '../dict'
-import { Button } from '../ui/button'
+import { dict } from '@contember/react-ui-lib-base'
+import { Button } from '@contember/react-ui-lib-base'
 
 export const UploaderDropzone = ({ inactiveOnUpload, dropzonePlaceholder }: { inactiveOnUpload?: boolean; dropzonePlaceholder?: ReactNode }) => {
 	const filesInProgress = useUploaderStateFiles({ state: ['uploading', 'initial', 'finalizing'] })

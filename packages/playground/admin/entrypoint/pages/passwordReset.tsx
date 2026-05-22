@@ -1,6 +1,6 @@
 import { ToastContent, useShowToast } from '~/lib/toast'
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '~/lib/ui/card'
-import { dict } from '~/lib/dict'
+import { dict } from '~/lib/tenant/dict'
 import { PasswordResetFormFields } from '~/lib/tenant'
 import { AnchorButton } from '~/lib/ui/button'
 import { Link, PasswordResetForm, useCurrentRequest, useRedirect } from '@contember/interface'

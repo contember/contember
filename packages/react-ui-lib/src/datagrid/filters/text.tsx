@@ -1,6 +1,6 @@
-import { InputBare, InputLike } from '../../ui/input'
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '../../ui/dropdown'
-import { Button } from '../../ui/button'
+import { InputBare, InputLike } from '@contember/react-ui-lib-base'
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@contember/react-ui-lib-base'
+import { Button } from '@contember/react-ui-lib-base'
 import { MoreHorizontalIcon, XIcon } from 'lucide-react'
 import * as React from 'react'
 import {
@@ -18,10 +18,10 @@ import {
 	DataViewUnionTextFilterProps,
 	TextFilterArtifactsMatchMode,
 } from '@contember/react-dataview'
-import { Popover, PopoverContent, PopoverTrigger } from '../../ui/popover'
+import { Popover, PopoverContent, PopoverTrigger } from '@contember/react-ui-lib-base'
 import { DataGridActiveFilterUI } from '../ui'
 import { DataGridNullFilter } from './common'
-import { dict } from '../../dict'
+import { dict } from '@contember/react-ui-lib-base'
 import { Component } from '@contember/interface'
 import { DataGridFilterMobileHiding } from './mobile'
 import { DataViewFieldLabel } from '../labels'

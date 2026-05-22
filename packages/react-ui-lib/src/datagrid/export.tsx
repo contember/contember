@@ -1,9 +1,9 @@
-import { Button } from '../ui/button'
+import { Button } from '@contember/react-ui-lib-base'
 import { DownloadIcon } from 'lucide-react'
 import { DataViewExportTrigger } from '@contember/react-dataview'
 import * as React from 'react'
 import { ReactNode, useMemo } from 'react'
-import { dict } from '../dict'
+import { dict } from '@contember/react-ui-lib-base'
 
 /**
  * Button for exporting data grid to CSV.

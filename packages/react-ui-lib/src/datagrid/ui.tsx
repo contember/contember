@@ -1,8 +1,8 @@
 import { CheckSquareIcon, FilterIcon, FilterXIcon, PlusIcon, SquareIcon, XIcon } from 'lucide-react'
 import { forwardRef, ReactEventHandler, ReactNode, useCallback } from 'react'
-import { dict } from '../dict'
-import { Button } from '../ui/button'
-import { cn, uic } from '../utils'
+import { dict } from '@contember/react-ui-lib-base'
+import { Button } from '@contember/react-ui-lib-base'
+import { cn, uic } from '@contember/react-ui-lib-base'
 
 export const DataGridTooltipLabel = uic('span', {
 	baseClass: 'cursor-pointer border-dashed border-b border-b-gray-400 hover:border-gray-800',

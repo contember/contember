@@ -1,6 +1,6 @@
 import { memo, ReactNode } from 'react'
 import { useSlateSelection } from 'slate-react'
-import { cn } from '../../utils'
+import { cn } from '@contember/react-ui-lib-base'
 
 export interface EditorBlockToolbarProps {
 	children: ReactNode

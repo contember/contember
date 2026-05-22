@@ -1,10 +1,10 @@
 import { CheckIcon, FileIcon, Loader2Icon, StopCircleIcon, XIcon } from 'lucide-react'
-import { Button } from '../ui/button'
-import { Progress } from '../ui/progress'
+import { Button } from '@contember/react-ui-lib-base'
+import { Progress } from '@contember/react-ui-lib-base'
 import * as React from 'react'
 import { ReactNode, useEffect } from 'react'
-import { Toast } from '../toast'
-import { dict } from '../dict'
+import { Toast } from '@contember/react-ui-lib-base'
+import { dict } from '@contember/react-ui-lib-base'
 import {
 	UploaderEachFile,
 	UploaderError,
@@ -15,7 +15,7 @@ import {
 	UploaderFileStateUploading,
 } from '@contember/react-uploader'
 import { formatBytes } from '../formatting/formatting'
-import { Loader } from '../ui/loader'
+import { Loader } from '@contember/react-ui-lib-base'
 
 const formatError = (error: unknown) => {
 	if (error instanceof UploaderError) {

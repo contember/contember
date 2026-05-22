@@ -1,11 +1,11 @@
-import { cn } from '../utils'
-import { Button } from '../ui/button'
+import { cn } from '@contember/react-ui-lib-base'
+import { Button } from '@contember/react-ui-lib-base'
 import { ReactNode } from 'react'
 import { ArrowDownAZIcon, ArrowUpDownIcon, ArrowUpZaIcon, EyeOffIcon, FilterIcon } from 'lucide-react'
 import { DataViewSortingSwitch, DataViewSortingTrigger, DataViewVisibilityTrigger, useDataViewFilter } from '@contember/react-dataview'
-import { dict } from '../dict'
+import { dict } from '@contember/react-ui-lib-base'
 import { Component } from '@contember/interface'
-import { Popover, PopoverContent, PopoverTrigger } from '../ui/popover'
+import { Popover, PopoverContent, PopoverTrigger } from '@contember/react-ui-lib-base'
 
 /**
  * Props for {@link DataGridColumnHeader}.

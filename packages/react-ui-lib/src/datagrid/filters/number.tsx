@@ -10,12 +10,12 @@ import {
 	useDataViewFilter,
 	useDataViewFilterName,
 } from '@contember/react-dataview'
-import { Popover, PopoverContent, PopoverTrigger } from '../../ui/popover'
+import { Popover, PopoverContent, PopoverTrigger } from '@contember/react-ui-lib-base'
 import { DataGridActiveFilterUI, DataGridFilterSelectTriggerUI, DataGridSingleFilterUI } from '../ui'
 import { DataGridNullFilter } from './common'
-import { Input } from '../../ui/input'
+import { Input } from '@contember/react-ui-lib-base'
 import { formatNumber } from '../../formatting'
-import { dict } from '../../dict'
+import { dict } from '@contember/react-ui-lib-base'
 import { Component } from '@contember/interface'
 import { DataGridFilterMobileHiding } from './mobile'
 import { DataViewFieldLabel } from '../labels'

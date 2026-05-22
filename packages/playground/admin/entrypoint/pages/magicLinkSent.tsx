@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '~/lib/ui/card'
-import { dict } from '~/lib/dict'
+import { dict } from '~/lib/tenant/dict'
 import { PasswordlessSignInFormFields } from '~/lib/tenant/forms/passwordless-signin'
 import { MailIcon } from 'lucide-react'
 import { AnchorButton } from '~/lib/ui/button'

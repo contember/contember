@@ -5,6 +5,27 @@
 		"emitDeclarationOnly": false,
 		"paths": {
 			"~/*": ["./*"],
+			"~/lib/ui/*": [
+				"../../react-ui-lib-base/src/ui/*"
+			],
+			"~/lib/utils": [
+				"../../react-ui-lib-base/src/utils"
+			],
+			"~/lib/utils/*": [
+				"../../react-ui-lib-base/src/utils/*"
+			],
+			"~/lib/dict": [
+				"../../react-ui-lib-base/src/dict"
+			],
+			"~/lib/toast": [
+				"../../react-ui-lib-base/src/toast"
+			],
+			"~/lib/tenant": [
+				"../../react-ui-lib-tenant/src"
+			],
+			"~/lib/tenant/*": [
+				"../../react-ui-lib-tenant/src/*"
+			],
 			"~/lib/*": [
 				"../../react-ui-lib/src/*"
 			]
@@ -14,6 +35,8 @@
 		{ "path": "../api" },
 		{ "path": "../../interface/src" },
 		{ "path": "../../react-ui-lib/src" },
+		{ "path": "../../react-ui-lib-base/src" },
+		{ "path": "../../react-ui-lib-tenant/src" },
 		{ "path": "../../react-slate-editor-legacy/src" },
 		{ "path": "../../vite-plugin/src" }
 	]

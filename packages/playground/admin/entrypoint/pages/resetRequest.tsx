@@ -1,5 +1,5 @@
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '~/lib/ui/card'
-import { dict } from '~/lib/dict'
+import { dict } from '~/lib/tenant/dict'
 import { PasswordResetRequestFormFields } from '~/lib/tenant'
 import { AnchorButton } from '~/lib/ui/button'
 import { Link, PasswordResetRequestForm, useRedirect } from '@contember/interface'

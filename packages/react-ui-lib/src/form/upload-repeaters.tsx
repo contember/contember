@@ -42,7 +42,7 @@ import {
 	RepeaterSortableItemNode,
 } from '@contember/react-repeater-dnd-kit'
 import { UploaderRepeaterDropIndicator } from '../upload/repeater'
-import { Loader } from '../ui/loader'
+import { Loader } from '@contember/react-ui-lib-base'
 
 export type BaseFileRepeaterFieldProps =
 	& Omit<FormContainerProps, 'children'>

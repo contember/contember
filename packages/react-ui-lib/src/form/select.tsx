@@ -17,9 +17,9 @@ import { useCallback, useMemo } from 'react'
 import { FormContainer, FormContainerProps } from './container'
 import { FormFieldScope, FormHasManyRelationScope, FormHasOneRelationScope, useFormFieldState } from '@contember/react-form'
 import { Component, Field, RecursionTerminator, SugaredRelativeSingleField, useEntityBeforePersist, useField } from '@contember/interface'
-import { Popover, PopoverTrigger } from '../ui/popover'
+import { Popover, PopoverTrigger } from '@contember/react-ui-lib-base'
 import { ChevronDownIcon, ChevronUpIcon } from 'lucide-react'
-import { dict } from '../dict'
+import { dict } from '@contember/react-ui-lib-base'
 import { useEnumOptionsFormatter } from '../labels'
 
 export type SelectFieldProps =

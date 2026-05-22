@@ -1,4 +1,4 @@
-import { DropIndicator } from '../ui/sortable'
+import { DropIndicator } from '@contember/react-ui-lib-base'
 import * as React from 'react'
 import { RepeaterSortableDropIndicator } from '@contember/react-repeater-dnd-kit'
 

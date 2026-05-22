@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { ReactNode, useCallback } from 'react'
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../../ui/tooltip'
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@contember/react-ui-lib-base'
 import {
 	DataViewEnumFilter,
 	DataViewEnumFilterProps,
@@ -13,7 +13,7 @@ import {
 	useDataViewFilterName,
 } from '@contember/react-dataview'
 import { Component } from '@contember/interface'
-import { Popover, PopoverContent, PopoverTrigger } from '../../ui/popover'
+import { Popover, PopoverContent, PopoverTrigger } from '@contember/react-ui-lib-base'
 import {
 	DataGridActiveFilterUI,
 	DataGridExcludeActionButtonUI,
@@ -23,7 +23,7 @@ import {
 	DataGridSingleFilterUI,
 } from '../ui'
 import { DataGridNullFilter } from './common'
-import { dict } from '../../dict'
+import { dict } from '@contember/react-ui-lib-base'
 import { DataGridFilterMobileHiding } from './mobile'
 import { useEnumOptionsFormatter } from '../../labels'
 import { DataViewFieldLabel } from '../labels'

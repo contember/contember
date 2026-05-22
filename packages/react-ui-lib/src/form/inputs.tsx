@@ -1,7 +1,7 @@
 import { ComponentProps, ReactNode, useMemo } from 'react'
-import { CheckboxInput, Input, RadioInput } from '../ui/input'
-import { TextareaAutosize } from '../ui/textarea'
-import { FormLabelUI } from './ui'
+import { CheckboxInput, Input, RadioInput } from '@contember/react-ui-lib-base'
+import { TextareaAutosize } from '@contember/react-ui-lib-base'
+import { FormLabelUI } from '@contember/react-ui-lib-base'
 import {
 	FormCheckbox,
 	FormCheckboxProps,

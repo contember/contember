@@ -4,8 +4,8 @@ import { ChildrenAnalyzer, Leaf } from '@contember/react-multipass-rendering'
 import { SheetIcon } from 'lucide-react'
 import * as React from 'react'
 import { Fragment, ReactNode, useMemo } from 'react'
-import { dict } from '../dict'
-import { Table, TableBody, TableHeader, TableRow } from '../ui/table'
+import { dict } from '@contember/react-ui-lib-base'
+import { Table, TableBody, TableHeader, TableRow } from '@contember/react-ui-lib-base'
 
 import { DataGridColumnLeaf, DataGridColumnLeafProps } from './column-leaf'
 

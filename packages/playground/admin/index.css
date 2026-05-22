@@ -2,6 +2,8 @@
 @import 'tailwindcss';
 
 @source "../../react-ui-lib/src";
+@source "../../react-ui-lib-base/src";
+@source "../../react-ui-lib-tenant/src";
 
 @layer base {
 	:root {

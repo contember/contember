@@ -2,10 +2,10 @@ import { DataViewChangePageTrigger, DataViewPagingStateView, DataViewSetItemsPer
 import { DropdownMenu } from '@radix-ui/react-dropdown-menu'
 import { ChevronDownIcon, ChevronLeftIcon, ChevronRightIcon, ChevronsLeftIcon, ChevronsRightIcon, Loader2Icon } from 'lucide-react'
 import { FC } from 'react'
-import { dict, dictFormat } from '../dict'
-import { Button } from '../ui/button'
-import { DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '../ui/dropdown'
-import { uic } from '../utils'
+import { dict, dictFormat } from '@contember/react-ui-lib-base'
+import { Button } from '@contember/react-ui-lib-base'
+import { DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@contember/react-ui-lib-base'
+import { uic } from '@contember/react-ui-lib-base'
 
 const PaginationWrapper = uic('div', {
 	baseClass: 'flex gap-6 lg:gap-8 items-center justify-between mt-4 pb-4',

@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { forwardRef, ReactNode, useCallback, useMemo } from 'react'
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../../ui/tooltip'
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@contember/react-ui-lib-base'
 import {
 	DataViewHasManyFilter,
 	DataViewHasManyFilterProps,
@@ -16,7 +16,7 @@ import {
 	UseDataViewRelationFilterResult,
 } from '@contember/react-dataview'
 import { Component, EntityId, StaticRender, useEntity } from '@contember/interface'
-import { Popover, PopoverTrigger } from '../../ui/popover'
+import { Popover, PopoverTrigger } from '@contember/react-ui-lib-base'
 import {
 	DataGridActiveFilterUI,
 	DataGridExcludeActionButtonUI,
@@ -27,7 +27,7 @@ import {
 } from '../ui'
 import { DataGridNullFilter } from './common'
 import { SelectDefaultFilter, SelectListInner, SelectPopoverContent } from '../../select'
-import { dict } from '../../dict'
+import { dict } from '@contember/react-ui-lib-base'
 import { DataGridFilterMobileHiding } from './mobile'
 import { DataViewHasManyLabel, DataViewHasOneLabel } from '../labels'
 import { createRequiredContext } from '@contember/react-utils'

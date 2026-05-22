@@ -35,7 +35,6 @@
     "directory": "packages/react-ui-lib"
   },
   "dependencies": {
-    "@contember/graphql-client-tenant": "workspace:*",
     "@contember/interface": "workspace:*",
     "@contember/react-block-repeater": "workspace:*",
     "@contember/react-board": "workspace:*",

@@ -5,16 +5,13 @@
 ```ts
 
 import { AccessorTreeState } from '@contember/interface';
-import { ButtonHTMLAttributes } from 'react';
-import { ClassAttributes } from 'react';
+import { Button } from '@contember/react-ui-lib-base';
 import { ComponentProps } from 'react';
 import { ErrorPersistResult } from '@contember/interface';
 import type { FC } from 'react';
-import { ForwardRefExoticComponent } from 'react';
 import { JSX } from 'react/jsx-runtime';
 import type { ReactElement } from 'react';
 import { ReactNode } from 'react';
-import { RefAttributes } from 'react';
 import { RoutingLinkTarget } from '@contember/interface';
 import { SuccessfulPersistResult } from '@contember/interface';
 
@@ -49,8 +46,6 @@ export const IdentityLoader: (input: {
 // @public (undocumented)
 export const PersistButton: (input: PersistButtonProps) => JSX.Element;
 
-// Warning: (ae-forgotten-export) The symbol "Button" needs to be exported by the entry point index.d.ts
-//
 // @public (undocumented)
 export interface PersistButtonProps extends ComponentProps<typeof Button> {
     // (undocumented)

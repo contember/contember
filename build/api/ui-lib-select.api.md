@@ -136,11 +136,11 @@ export const SelectListInner: React_2.NamedExoticComponent<SelectListProps>;
 // @public (undocumented)
 export const SelectListItemUI: React_2.ForwardRefExoticComponent<Omit<Omit<React_2.ClassAttributes<HTMLButtonElement> & React_2.ButtonHTMLAttributes<HTMLButtonElement> & {
     asChild?: boolean;
-    children?: React_2.ReactNode;
+    children?: ReactNode;
     className?: string;
 } & {
-    variant?: "link" | "default" | "destructive" | "outline" | "secondary" | "ghost" | null | undefined;
-    size?: "default" | "icon" | "sm" | "lg" | "xs" | null | undefined;
+    variant?: "default" | "outline" | "link" | "destructive" | "secondary" | "ghost" | null | undefined;
+    size?: "default" | "sm" | "lg" | "icon" | "xs" | null | undefined;
 }, "ref"> & React_2.RefAttributes<HTMLButtonElement> & {
     asChild?: boolean;
     children?: React_2.ReactNode;

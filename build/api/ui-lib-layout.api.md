@@ -22,12 +22,12 @@ export const LayoutComponent: (input: PropsWithChildren) => JSX.Element;
 
 // @public (undocumented)
 export const Slots: Readonly<{
-    readonly Back: SlotSourceComponent<"Back">;
     readonly Sidebar: SlotSourceComponent<"Sidebar">;
     readonly Title: SlotSourceComponent<"Title">;
     readonly Logo: SlotSourceComponent<"Logo">;
     readonly Navigation: SlotSourceComponent<"Navigation">;
     readonly Footer: SlotSourceComponent<"Footer">;
+    readonly Back: SlotSourceComponent<"Back">;
     readonly Content: SlotSourceComponent<"Content">;
     readonly ContentHeader: SlotSourceComponent<"ContentHeader">;
     readonly Actions: SlotSourceComponent<"Actions">;
@@ -36,12 +36,12 @@ export const Slots: Readonly<{
 
 // @public (undocumented)
 export const SlotTargets: Readonly<{
-    readonly Back: SlotTargetComponent<"Back">;
     readonly Sidebar: SlotTargetComponent<"Sidebar">;
     readonly Title: SlotTargetComponent<"Title">;
     readonly Logo: SlotTargetComponent<"Logo">;
     readonly Navigation: SlotTargetComponent<"Navigation">;
     readonly Footer: SlotTargetComponent<"Footer">;
+    readonly Back: SlotTargetComponent<"Back">;
     readonly Content: SlotTargetComponent<"Content">;
     readonly ContentHeader: SlotTargetComponent<"ContentHeader">;
     readonly Actions: SlotTargetComponent<"Actions">;

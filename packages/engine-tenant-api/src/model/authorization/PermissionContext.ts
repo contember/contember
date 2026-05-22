@@ -16,17 +16,11 @@ export type AccessVerifier = (action: Authorizator.Action) => Promise<boolean>
  * Pre-resolved authorization target for one scope key. Holds the canonical
  * engine `resource` plus a ready `PolicyEngine` whose `TenantDbPolicyProvider`
  * was built with the scope's effective roles (incl. project-aware synthesis).
- *
- * `denied` short-circuits evaluation: the project was supplied but does not
- * exist / has no resolvable schema (the old `deniedScope` behavior).
  */
 interface ScopeResolution {
-	denied: boolean
 	resource: string
 	engine: PolicyEngine
 }
-
-const DENIED: ScopeResolution = { denied: true, resource: '', engine: new PolicyEngine([]) }
 
 /**
  * The single authorization surface for the tenant API. Resolvers call
@@ -57,11 +51,7 @@ export class PermissionContext {
 		project?: Pick<Project, 'slug'> | null
 		action: Authorizator.Action<Meta>
 	}): Promise<boolean> {
-		const resolution = await this.resolve(project)
-		if (resolution.denied) {
-			return false
-		}
-		const { engine, resource } = resolution
+		const { engine, resource } = await this.resolve(project)
 		const translated = translateAction(action, this.identity)
 
 		if (translated.subjectMemberships !== undefined) {
@@ -106,7 +96,7 @@ export class PermissionContext {
 	}
 
 	private resolve(project?: Pick<Project, 'slug'> | null): Promise<ScopeResolution> {
-		const key = project === undefined ? 'global' : project === null ? 'denied' : `project:${project.slug}`
+		const key = project === undefined || project === null ? 'global' : `project:${project.slug}`
 		let cached = this.resolutionCache.get(key)
 		if (!cached) {
 			cached = this.doResolve(project)
@@ -116,15 +106,19 @@ export class PermissionContext {
 	}
 
 	private async doResolve(project?: Pick<Project, 'slug'> | null): Promise<ScopeResolution> {
-		if (project === undefined) {
-			return { denied: false, resource: '*', engine: this.buildEngine(this.identity.roles, null) }
-		}
-		if (project === null) {
-			return DENIED
+		// A missing project (null) or one without a resolvable schema falls back to the
+		// global scope: only the identity's own (project-less) roles are evaluated against
+		// `*`, with no project-membership synthesis. This mirrors the legacy authorizator,
+		// where both `Global` and `deniedScope` resolved to `AccessNode.Fixed.denied()` and
+		// access was granted solely by the union with the identity's global roles — so a
+		// super_admin still passes (and reaches e.g. PROJECT_NOT_FOUND), while an unprivileged
+		// caller is denied regardless of whether the project exists.
+		if (project === undefined || project === null) {
+			return this.globalScope()
 		}
 		const schema = await this.schemaResolver.getSchema(project.slug)
 		if (!schema) {
-			return DENIED
+			return this.globalScope()
 		}
 		const memberships = await this.identity.getProjectMemberships(project.slug)
 		const roles = [...this.identity.roles]
@@ -140,10 +134,13 @@ export class PermissionContext {
 			memberships,
 		})
 		return {
-			denied: false,
 			resource: `project:${project.slug}`,
 			engine: this.buildEngine(roles, projectProvider),
 		}
+	}
+
+	private globalScope(): ScopeResolution {
+		return { resource: '*', engine: this.buildEngine(this.identity.roles, null) }
 	}
 
 	private buildEngine(roles: readonly string[], projectProvider: PolicySource | null): PolicyEngine {

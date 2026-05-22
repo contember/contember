@@ -95,19 +95,35 @@ describe('PermissionContext — project-aware role synthesis', () => {
 })
 
 /**
- * `deniedScope` invariant: a project supplied to `isAllowed` that does not
- * exist (null) or whose schema cannot be resolved must deny — never fall
- * through to a global evaluation.
+ * Missing-project fallback: a project supplied to `isAllowed` that does not
+ * exist (null) or whose schema cannot be resolved falls back to the GLOBAL
+ * scope — only the identity's own (project-less) roles are evaluated against
+ * `*`, with no project-membership synthesis. This mirrors the legacy
+ * authorizator, where `deniedScope` and `Global` were the same denied node and
+ * access came solely from the union with the identity's global roles. The
+ * global pass is what lets a super_admin's resolver reach PROJECT_NOT_FOUND
+ * instead of being short-circuited with a Forbidden error.
  */
-describe('PermissionContext — denied project scope', () => {
-	test('null project denies', async () => {
+describe('PermissionContext — missing project falls back to global scope', () => {
+	test('super_admin is still allowed for a null project', async () => {
 		const ctx = makeContext([TenantRole.SUPER_ADMIN])
+		expect(await ctx.isAllowed({ project: null, action: PermissionActions.PROJECT_VIEW })).toBe(true)
+	})
+
+	test('super_admin is still allowed when the schema cannot be resolved', async () => {
+		const ctx = makeContext([TenantRole.SUPER_ADMIN], {}, { foo: undefined })
+		expect(await ctx.isAllowed({ project: { slug: 'foo' }, action: PermissionActions.PROJECT_VIEW })).toBe(true)
+	})
+
+	test('an unprivileged identity is denied for a null project', async () => {
+		const ctx = makeContext([TenantRole.PERSON])
 		expect(await ctx.isAllowed({ project: null, action: PermissionActions.PROJECT_VIEW })).toBe(false)
 	})
 
-	test('unresolvable schema denies', async () => {
-		const ctx = makeContext([TenantRole.SUPER_ADMIN], {}, { foo: undefined })
-		expect(await ctx.isAllowed({ project: { slug: 'foo' }, action: PermissionActions.PROJECT_VIEW })).toBe(false)
+	test('project-membership powers do NOT apply when the project is missing', async () => {
+		// Admin of `foo` by membership, but the lookup yielded null → no synthesis.
+		const ctx = makeContext([TenantRole.PERSON], { foo: [membership(ProjectRole.ADMIN)] })
+		expect(await ctx.isAllowed({ project: null, action: PermissionActions.PROJECT_ADD_MEMBER([]) })).toBe(false)
 	})
 })
 

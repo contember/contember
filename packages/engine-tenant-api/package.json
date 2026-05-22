@@ -33,6 +33,7 @@
     "@contember/dic": "workspace:*",
     "@contember/graphql-utils": "workspace:*",
     "@contember/logger": "workspace:*",
+    "@contember/policy": "workspace:*",
     "@contember/schema": "workspace:*",
     "@contember/schema-utils": "workspace:*",
     "@contember/typesafe": "workspace:*",
@@ -47,6 +48,10 @@
   },
   "devDependencies": {
     "@contember/database-tester": "workspace:*",
+    "@graphql-codegen/cli": "^7.0.0",
+    "@graphql-codegen/typescript": "^6.0.1",
+    "@graphql-codegen/typescript-operations": "^6.0.2",
+    "@graphql-codegen/typescript-resolvers": "^6.0.1",
     "@graphql-tools/schema": "catalog:",
     "@types/mustache": "catalog:",
     "@types/node": "catalog:",

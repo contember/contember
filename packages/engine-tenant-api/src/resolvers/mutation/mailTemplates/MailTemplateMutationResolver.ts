@@ -24,7 +24,7 @@ export class MailTemplateMutationResolver implements MutationResolvers {
 	): Promise<AddMailTemplateResponse> {
 		const project = projectSlug ? await this.projectManager.getProjectBySlug(context.db, projectSlug) : null
 		await context.requireAccess({
-			scope: project ? await context.permissionContext.createProjectScope(project) : undefined,
+			project: project ?? undefined,
 			action: PermissionActions.MAIL_TEMPLATE_ADD,
 			message: 'You are not allowed to add a mail template',
 		})
@@ -69,7 +69,7 @@ export class MailTemplateMutationResolver implements MutationResolvers {
 	): Promise<RemoveMailTemplateResponse> {
 		const project = projectSlug ? await this.projectManager.getProjectBySlug(context.db, projectSlug) : null
 		await context.requireAccess({
-			scope: project ? await context.permissionContext.createProjectScope(project) : undefined,
+			project: project ?? undefined,
 			action: PermissionActions.MAIL_TEMPLATE_REMOVE,
 			message: 'You are not allowed to remove a mail template',
 		})

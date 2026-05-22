@@ -1,10 +1,20 @@
-import { Identity, IdentityGlobalPermissions, IdentityProjectRelation, IdentityResolvers, Maybe, Person, SessionInfo } from '../../schema'
+import {
+	Identity,
+	IdentityGlobalPermissions,
+	IdentityProjectRelation,
+	IdentityResolvers,
+	Maybe,
+	Person,
+	PolicyAssignment,
+	SessionInfo,
+} from '../../schema'
 import {
 	IdentityQuery,
 	PermissionActions,
 	PermissionContextFactory,
 	PersonByIdentityBatchQuery,
 	PersonRow,
+	PolicyService,
 	ProjectManager,
 	ProjectMemberManager,
 } from '../../model'
@@ -13,6 +23,7 @@ import { TenantResolverContext } from '../TenantResolverContext'
 import { notEmpty } from '../../utils/array'
 import { batchLoader } from '../../utils/batchQuery'
 import { PersonResponseFactory } from '../responseHelpers/PersonResponseFactory'
+import { PolicyResponseFactory } from '../responseHelpers/PolicyResponseFactory'
 
 export class IdentityTypeResolver implements IdentityResolvers {
 	private personLoader = batchLoader<string, Record<string, PersonRow>, PersonRow>(
@@ -34,6 +45,7 @@ export class IdentityTypeResolver implements IdentityResolvers {
 		private readonly projectMemberManager: ProjectMemberManager,
 		private readonly projectManager: ProjectManager,
 		private readonly permissionContextFactory: PermissionContextFactory,
+		private readonly policyService: PolicyService,
 	) {
 	}
 
@@ -64,7 +76,7 @@ export class IdentityTypeResolver implements IdentityResolvers {
 				projects.map(async (it): Promise<IdentityProjectRelation | null> => {
 					const verifier = isSelf
 						? undefined
-						: context.permissionContext.createAccessVerifier(await context.permissionContext.createProjectScope(it))
+						: context.permissionContext.createAccessVerifier(it)
 					const memberships = await this.projectMemberManager.getAllProjectMemberships(
 						context.db,
 						{ id: it.id },
@@ -171,5 +183,29 @@ export class IdentityTypeResolver implements IdentityResolvers {
 			isCurrent: row.id === context.apiKeyId,
 			trustForwardedClientInfo: row.trust_forwarded_info,
 		}))
+	}
+
+	async policies(
+		parent: { id: string },
+		{}: any,
+		context: TenantResolverContext,
+	): Promise<readonly PolicyAssignment[] | null> {
+		const isSelf = parent.id === context.identity.id
+		if (!isSelf) {
+			const canView = await context.permissionContext.isAllowed({ action: PermissionActions.POLICY_VIEW })
+			if (!canView) {
+				return null
+			}
+		}
+		const assignments = await this.policyService.listAssignments(context.db, parent.id)
+		if (assignments.length === 0) {
+			return []
+		}
+		const policies = await this.policyService.listAssignedPolicies(context.db, parent.id)
+		const byId = new Map(policies.map(p => [p.id, p]))
+		return assignments.flatMap(a => {
+			const policy = byId.get(a.policyId)
+			return policy ? [PolicyResponseFactory.assignmentToGraphQL(a, policy)] : []
+		})
 	}
 }

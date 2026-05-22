@@ -7,7 +7,7 @@ import {
 } from '../../../schema'
 import { GraphQLResolveInfo } from 'graphql'
 import { TenantResolverContext } from '../../TenantResolverContext'
-import { IdentityScope, PermissionActions, PersonManager, PersonQuery } from '../../../model'
+import { PermissionActions, PersonManager, PersonQuery } from '../../../model'
 import { createErrorResponse } from '../../errorUtils'
 
 export class ChangeProfileMutationResolver implements Pick<MutationResolvers, 'changeMyProfile' | 'changeProfile'> {
@@ -30,7 +30,6 @@ export class ChangeProfileMutationResolver implements Pick<MutationResolvers, 'c
 		}
 
 		await context.requireAccess({
-			scope: new IdentityScope(person.identity_id),
 			action: PermissionActions.PERSON_CHANGE_PROFILE(person.roles),
 			message: 'You are not allowed to change a profile',
 		})

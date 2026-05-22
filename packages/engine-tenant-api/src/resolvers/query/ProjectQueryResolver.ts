@@ -20,7 +20,7 @@ export class ProjectQueryResolver implements QueryResolvers {
 		if (
 			!project
 			|| !(await context.isAllowed({
-				scope: await context.permissionContext.createProjectScope(project),
+				project,
 				action: PermissionActions.PROJECT_VIEW,
 			}))
 		) {

@@ -1,10 +1,13 @@
 import {
 	AddIDPMutationResolver,
 	AddProjectMemberMutationResolver,
+	AssignPolicyMutationResolver,
 	ChangePasswordMutationResolver,
 	ChangeProfileMutationResolver,
 	CreateApiKeyMutationResolver,
+	CreatePolicyMutationResolver,
 	CreateProjectMutationResolver,
+	DeletePolicyMutationResolver,
 	DisableApiKeyMutationResolver,
 	DisableIDPMutationResolver,
 	EnableIDPMutationResolver,
@@ -15,16 +18,26 @@ import {
 	OtpMutationResolver,
 	RemoveProjectMemberMutationResolver,
 	ResetPasswordMutationResolver,
+	RevokePolicyMutationResolver,
 	SetProjectSecretMutationResolver,
 	SignInMutationResolver,
 	SignOutMutationResolver,
 	SignUpMutationResolver,
+	UpdatePolicyMutationResolver,
 	UpdateProjectMemberMutationResolver,
 	UpdateProjectMutationResolver,
 } from './mutation'
 
 import { Resolvers } from '../schema'
-import { AuthLogQueryResolver, MeQueryResolver, PersonQueryResolver, ProjectMembersQueryResolver, ProjectQueryResolver } from './query'
+import {
+	AuthLogQueryResolver,
+	BuiltinPolicyQueryResolver,
+	MeQueryResolver,
+	PersonQueryResolver,
+	PolicyQueryResolver,
+	ProjectMembersQueryResolver,
+	ProjectQueryResolver,
+} from './query'
 import { IdentityTypeResolver, ProjectTypeResolver } from './types'
 import { DateTimeType, IntervalType, JSONType } from '@contember/graphql-utils'
 import { IDPQueryResolver } from './query/IDPQueryResolver'
@@ -47,6 +60,8 @@ class ResolverFactory {
 			projectMembersQueryResolver: ProjectMembersQueryResolver
 			idpQueryResolver: IDPQueryResolver
 			mailTemplateQueryResolver: MailTemplateQueryResolver
+			policyQueryResolver: PolicyQueryResolver
+			builtinPolicyQueryResolver: BuiltinPolicyQueryResolver
 
 			signUpMutationResolver: SignUpMutationResolver
 			signInMutationResolver: SignInMutationResolver
@@ -92,6 +107,12 @@ class ResolverFactory {
 			authLogQueryResolver: AuthLogQueryResolver
 
 			togglePasswordlessMutationResolver: TogglePasswordlessMutationResolver
+
+			createPolicyMutationResolver: CreatePolicyMutationResolver
+			updatePolicyMutationResolver: UpdatePolicyMutationResolver
+			deletePolicyMutationResolver: DeletePolicyMutationResolver
+			assignPolicyMutationResolver: AssignPolicyMutationResolver
+			revokePolicyMutationResolver: RevokePolicyMutationResolver
 		},
 	) {}
 
@@ -106,6 +127,7 @@ class ResolverFactory {
 				roles: this.resolvers.identityTypeResolver.roles.bind(this.resolvers.identityTypeResolver),
 				permissions: this.resolvers.identityTypeResolver.permissions.bind(this.resolvers.identityTypeResolver),
 				sessions: this.resolvers.identityTypeResolver.sessions.bind(this.resolvers.identityTypeResolver),
+				policies: this.resolvers.identityTypeResolver.policies.bind(this.resolvers.identityTypeResolver),
 			},
 			Project: {
 				members: this.resolvers.projectTypeResolver.members.bind(this.resolvers.projectTypeResolver),
@@ -121,6 +143,9 @@ class ResolverFactory {
 				mailTemplates: this.resolvers.mailTemplateQueryResolver.mailTemplates.bind(this.resolvers.mailTemplateQueryResolver),
 				configuration: this.resolvers.configurationQueryResolver.configuration.bind(this.resolvers.configurationQueryResolver),
 				authLog: this.resolvers.authLogQueryResolver.authLog.bind(this.resolvers.authLogQueryResolver),
+				policies: this.resolvers.policyQueryResolver.policies.bind(this.resolvers.policyQueryResolver),
+				policy: this.resolvers.policyQueryResolver.policy.bind(this.resolvers.policyQueryResolver),
+				builtinPolicies: this.resolvers.builtinPolicyQueryResolver.builtinPolicies.bind(this.resolvers.builtinPolicyQueryResolver),
 				checkResetPasswordToken: () => {
 					throw new Error('not implemented')
 				},
@@ -197,6 +222,12 @@ class ResolverFactory {
 				),
 
 				configure: this.resolvers.configurationMutationResolver.configure.bind(this.resolvers.configurationMutationResolver),
+
+				createPolicy: this.resolvers.createPolicyMutationResolver.createPolicy.bind(this.resolvers.createPolicyMutationResolver),
+				updatePolicy: this.resolvers.updatePolicyMutationResolver.updatePolicy.bind(this.resolvers.updatePolicyMutationResolver),
+				deletePolicy: this.resolvers.deletePolicyMutationResolver.deletePolicy.bind(this.resolvers.deletePolicyMutationResolver),
+				assignPolicy: this.resolvers.assignPolicyMutationResolver.assignPolicy.bind(this.resolvers.assignPolicyMutationResolver),
+				revokePolicy: this.resolvers.revokePolicyMutationResolver.revokePolicy.bind(this.resolvers.revokePolicyMutationResolver),
 			},
 		}
 	}

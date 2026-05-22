@@ -135,6 +135,13 @@ CREATE TABLE "identity" (
     "description" "text",
     "created_at" timestamp with time zone NOT NULL
 );
+CREATE TABLE "identity_policy" (
+    "identity_id" "uuid" NOT NULL,
+    "policy_id" "uuid" NOT NULL,
+    "tags" "jsonb" DEFAULT '{}'::"jsonb" NOT NULL,
+    "granted_by" "uuid",
+    "granted_at" timestamp with time zone DEFAULT "now"() NOT NULL
+);
 CREATE TABLE "identity_provider" (
     "id" "uuid" NOT NULL,
     "slug" "text" NOT NULL,
@@ -238,6 +245,16 @@ CREATE TABLE "rate_limit_event" (
     "key_hash" "bytea" NOT NULL,
     "occurred_at" timestamp with time zone DEFAULT "now"() NOT NULL
 );
+CREATE TABLE "tenant_policy" (
+    "id" "uuid" NOT NULL,
+    "slug" "text" NOT NULL,
+    "label" "text" DEFAULT ''::"text" NOT NULL,
+    "description" "text",
+    "document" "jsonb" NOT NULL,
+    "version" integer DEFAULT 1 NOT NULL,
+    "created_at" timestamp with time zone DEFAULT "now"() NOT NULL,
+    "updated_at" timestamp with time zone DEFAULT "now"() NOT NULL
+);
 ALTER TABLE ONLY "api_key"
     ADD CONSTRAINT "api_key_id" PRIMARY KEY ("id");
 ALTER TABLE ONLY "config"
@@ -246,6 +263,8 @@ ALTER TABLE ONLY "person"
     ADD CONSTRAINT "email_unique" UNIQUE ("email");
 ALTER TABLE ONLY "identity"
     ADD CONSTRAINT "identity_id" PRIMARY KEY ("id");
+ALTER TABLE ONLY "identity_policy"
+    ADD CONSTRAINT "identity_policy_pkey" PRIMARY KEY ("identity_id", "policy_id");
 ALTER TABLE ONLY "identity_provider"
     ADD CONSTRAINT "identity_provider_id" PRIMARY KEY ("id");
 ALTER TABLE ONLY "identity_provider"
@@ -274,9 +293,14 @@ ALTER TABLE ONLY "project_secret"
     ADD CONSTRAINT "project_secret_pkey" PRIMARY KEY ("id");
 ALTER TABLE ONLY "rate_limit_event"
     ADD CONSTRAINT "rate_limit_event_pkey" PRIMARY KEY ("id");
+ALTER TABLE ONLY "tenant_policy"
+    ADD CONSTRAINT "tenant_policy_pkey" PRIMARY KEY ("id");
+ALTER TABLE ONLY "tenant_policy"
+    ADD CONSTRAINT "tenant_policy_slug_key" UNIQUE ("slug");
 CREATE INDEX "api_key_identity_id" ON "api_key" USING "btree" ("identity_id");
 CREATE UNIQUE INDEX "api_key_token_hash" ON "api_key" USING "btree" ("token_hash");
 CREATE INDEX "identity_parent_id" ON "identity" USING "btree" ("parent_id");
+CREATE INDEX "identity_policy_policy_id_idx" ON "identity_policy" USING "btree" ("policy_id");
 CREATE UNIQUE INDEX "mail_template_identifier" ON "mail_template" USING "btree" ("project_id", "mail_type", "variant") WHERE ("project_id" IS NOT NULL);
 CREATE UNIQUE INDEX "mail_template_identifier_global" ON "mail_template" USING "btree" ("mail_type", "variant") WHERE ("project_id" IS NULL);
 CREATE INDEX "mail_template_project_index" ON "mail_template" USING "btree" ("project_id");
@@ -302,6 +326,12 @@ ALTER TABLE ONLY "api_key"
     ADD CONSTRAINT "api_key_identity_id_fkey" FOREIGN KEY ("identity_id") REFERENCES "identity"("id");
 ALTER TABLE ONLY "identity"
     ADD CONSTRAINT "identity_parent_id_fkey" FOREIGN KEY ("parent_id") REFERENCES "identity"("id");
+ALTER TABLE ONLY "identity_policy"
+    ADD CONSTRAINT "identity_policy_granted_by_fkey" FOREIGN KEY ("granted_by") REFERENCES "identity"("id") ON DELETE SET NULL;
+ALTER TABLE ONLY "identity_policy"
+    ADD CONSTRAINT "identity_policy_identity_id_fkey" FOREIGN KEY ("identity_id") REFERENCES "identity"("id") ON DELETE CASCADE;
+ALTER TABLE ONLY "identity_policy"
+    ADD CONSTRAINT "identity_policy_policy_id_fkey" FOREIGN KEY ("policy_id") REFERENCES "tenant_policy"("id") ON DELETE CASCADE;
 ALTER TABLE ONLY "mail_template"
     ADD CONSTRAINT "mail_template_project" FOREIGN KEY ("project_id") REFERENCES "project"("id") ON DELETE CASCADE;
 ALTER TABLE ONLY "person_auth_log"

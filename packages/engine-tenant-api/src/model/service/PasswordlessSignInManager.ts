@@ -183,7 +183,7 @@ class PasswordlessSignInManager {
 			let usedBackupCode = false
 			if (personRow.otp_secret && personRow.otp_activated_at) {
 				if (mfaOtp) {
-					if (!await this.otpManager.verifyOtp(personRow, mfaOtp)) {
+					if (!await this.otpManager.verifyOtp(db, personRow, mfaOtp)) {
 						return new ResponseError('INVALID_OTP_TOKEN', 'OTP token validation has failed', {
 							[AuthLogService.Key]: new AuthLogService.Bag({
 								personId: personRow.id,

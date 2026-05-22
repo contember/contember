@@ -71,7 +71,7 @@ class SignInManager {
 		if (hasActiveTotp) {
 			// Active TOTP takes precedence (A07 path, unchanged).
 			if (otpCode) {
-				if (!await this.otpManager.verifyOtp(person, otpCode)) {
+				if (!await this.otpManager.verifyOtp(dbContext, person, otpCode)) {
 					return new ResponseError('INVALID_OTP_TOKEN', 'OTP token validation has failed', authLogData)
 				}
 			} else if (backupCode) {

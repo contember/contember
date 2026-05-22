@@ -18,6 +18,7 @@ const providers: Providers = {
 	encrypt: () => {
 		throw new Error('not supported')
 	},
+	encryptionEnabled: false,
 	hash: () => Buffer.alloc(0),
 }
 

@@ -21,12 +21,21 @@ type ResolvedSecret = {
 export class OtpManager {
 	constructor(
 		private readonly otpAuthenticator: OtpAuthenticator,
-		private readonly providers: Pick<Providers, 'decrypt' | 'encrypt'>,
+		private readonly providers: Pick<Providers, 'decrypt' | 'encrypt' | 'encryptionEnabled'>,
 	) {}
 
 	async prepareOtp(dbContext: DatabaseContext, person: PersonRow, label: string): Promise<OtpData> {
 		const otp = await this.otpAuthenticator.create(person.email ?? person.name ?? 'unnamed', label)
-		await dbContext.commandBus.execute(new PrepareOtpCommand(person.id, otp.secret))
+		if (this.providers.encryptionEnabled) {
+			// A key is configured: store the base32 secret encrypted (version >= 1).
+			const encrypted = await this.providers.encrypt(Buffer.from(otp.secret, 'utf8'))
+			await dbContext.commandBus.execute(new PrepareOtpCommand(person.id, encrypted.value, encrypted.version))
+		} else {
+			// No key: store the plaintext otpauth URI as version 0, exactly like legacy
+			// (pre-encryption) secrets. Opportunistic re-encryption upgrades it once a key
+			// becomes available.
+			await dbContext.commandBus.execute(new PrepareOtpCommand(person.id, Buffer.from(otp.uri, 'utf8'), 0))
+		}
 		return otp
 	}
 

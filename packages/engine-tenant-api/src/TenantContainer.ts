@@ -130,12 +130,12 @@ export interface TenantContainerArgs {
 	projectSchemaResolver: ProjectSchemaResolver
 	projectInitializer: ProjectInitializer
 	tenantCredentials: TenantCredentials
-	cryptoProviders: Pick<Providers, 'encrypt' | 'decrypt'>
+	cryptoProviders: Pick<Providers, 'encrypt' | 'decrypt' | 'encryptionEnabled'>
 }
 
 export class TenantContainerFactory {
 	constructor(
-		private readonly providers: Omit<Providers, 'encrypt' | 'decrypt'>,
+		private readonly providers: Omit<Providers, 'encrypt' | 'decrypt' | 'encryptionEnabled'>,
 	) {}
 
 	create(args: TenantContainerArgs): TenantContainer {

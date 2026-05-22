@@ -19,6 +19,7 @@ import { GQL } from '../../../src/tags'
 
 const encryptProvider = {
 	encrypt: (value: Buffer) => Promise.resolve({ value: Buffer.concat([Buffer.from('ENC:'), value]), version: 1 }),
+	encryptionEnabled: true,
 }
 
 // signIn query that also reads the additive mfaEnrollment payload + backupCodes.

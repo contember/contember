@@ -19,6 +19,7 @@ const providers: Providers = {
 	encrypt: () => {
 		throw new Error('not supported')
 	},
+	encryptionEnabled: false,
 	hash: value => Buffer.from(value.toString()),
 }
 

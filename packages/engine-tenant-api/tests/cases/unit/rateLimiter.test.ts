@@ -17,6 +17,7 @@ const baseProviders: Providers = {
 	encrypt: () => {
 		throw new Error('not supported')
 	},
+	encryptionEnabled: false,
 	// Mirrors the real sha256 contract closely enough to assert the key is hashed
 	// (and never stored raw) without pulling in node:crypto.
 	hash: (value, algo) => Buffer.from(`${String(algo)}:${value.toString()}`),

@@ -35,6 +35,7 @@ const baseProviders = (overrides: Partial<Providers> = {}): Providers => ({
 	encrypt: () => {
 		throw new Error('not supported')
 	},
+	encryptionEnabled: false,
 	hash: value => Buffer.from(value.toString()),
 	...overrides,
 })

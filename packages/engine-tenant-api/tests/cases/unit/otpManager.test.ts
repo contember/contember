@@ -34,6 +34,7 @@ const baseProviders = (overrides: Partial<Providers> = {}): Providers => ({
 	uuid: () => 'uuid',
 	decrypt,
 	encrypt,
+	encryptionEnabled: true,
 	hash: value => Buffer.from(value.toString()),
 	...overrides,
 })

@@ -1,4 +1,13 @@
-import { Identity, IdentityGlobalPermissions, IdentityProjectRelation, IdentityResolvers, Maybe, Person, PolicyAssignment, SessionInfo } from '../../schema'
+import {
+	Identity,
+	IdentityGlobalPermissions,
+	IdentityProjectRelation,
+	IdentityResolvers,
+	Maybe,
+	Person,
+	PolicyAssignment,
+	SessionInfo,
+} from '../../schema'
 import {
 	IdentityQuery,
 	PermissionActions,

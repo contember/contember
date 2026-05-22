@@ -1190,6 +1190,8 @@ export const signInMutation: TenantApi.MutationFetcher<{
         readonly result?: ({
             readonly token: string;
         } & {
+            readonly backupCodes?: ReadonlyArray<string>;
+        } & {
             readonly person: {
                 readonly id: string;
             } & {
@@ -1204,6 +1206,7 @@ export const signInMutation: TenantApi.MutationFetcher<{
     readonly password: string;
     readonly expiration?: number;
     readonly otpToken?: string;
+    readonly backupCode?: string;
     readonly options?: TenantApi.SignInOptions;
 }>;
 
@@ -1484,7 +1487,7 @@ export const useDisableApiKeyMutation: (input?: TenantApiOptions) => (variables:
 export const useDisableMyPasswordlessMutation: (input?: TenantApiOptions) => (variables: {}) => Promise<TenantMutationResponse<unknown, TenantApi.ToggleMyPasswordlessErrorCode>>;
 
 // @public (undocumented)
-export const useDisableOtpMutation: (input?: TenantApiOptions) => (variables: {}) => Promise<TenantMutationResponse<unknown, "OTP_NOT_ACTIVE">>;
+export const useDisableOtpMutation: (input?: TenantApiOptions) => (variables: {}) => Promise<TenantMutationResponse<unknown, TenantApi.DisableOtpErrorCode>>;
 
 // @public (undocumented)
 export const useEnableMyPasswordlessMutation: (input?: TenantApiOptions) => (variables: {}) => Promise<TenantMutationResponse<unknown, TenantApi.ToggleMyPasswordlessErrorCode>>;
@@ -1649,9 +1652,12 @@ export const useSignInMutation: (input?: TenantApiOptions) => (variables: {
     readonly password: string;
     readonly expiration?: number;
     readonly otpToken?: string;
+    readonly backupCode?: string;
     readonly options?: TenantApi.SignInOptions;
 }) => Promise<TenantMutationResponse<    {
 readonly token: string;
+} & {
+readonly backupCodes?: ReadonlyArray<string>;
 } & {
 readonly person: {
 readonly id: string;
@@ -1669,6 +1675,7 @@ export const useSignInPasswordlessMutation: (input?: TenantApiOptions) => (varia
     readonly token: string;
     readonly expiration?: number;
     readonly mfaOtp?: string;
+    readonly backupCode?: string;
     readonly options?: TenantApi.SignInOptions;
 }) => Promise<TenantMutationResponse<    {
 readonly token: string;

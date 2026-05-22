@@ -37,7 +37,6 @@
     "fast-glob": "catalog:",
     "graphql": "catalog:",
     "js-yaml": "catalog:",
-    "lodash-es": "catalog:",
     "pg": "catalog:",
     "preact": "catalog:",
     "preact-render-to-string": "catalog:",

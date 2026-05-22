@@ -34,7 +34,6 @@
     "@contember/utilities": "workspace:*",
     "chevrotain": "catalog:",
     "fast-deep-equal": "catalog:",
-    "js-levenshtein": "catalog:",
     "uuid": "catalog:"
   },
   "peerDependencies": {
@@ -42,7 +41,6 @@
     "react-dom": "catalog:"
   },
   "devDependencies": {
-    "@types/js-levenshtein": "catalog:",
     "react": "catalog:",
     "react-dom": "catalog:"
   },

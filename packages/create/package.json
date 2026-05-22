@@ -7,7 +7,6 @@
     "@contember/cli-common": "workspace:*",
     "chalk": "catalog:",
     "degit": "catalog:",
-    "fs-extra": "catalog:",
     "js-yaml": "catalog:"
   },
   "type": "module",

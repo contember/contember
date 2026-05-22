@@ -1467,6 +1467,7 @@ const schema: DocumentNode = gql`
 		PASSWORDLESS_SIGN_IN
 		FORCED_SIGN_OUT
 		EMAIL_OTP
+		BACKUP_CODES_EXHAUSTED
 	}
 
 	input MailTemplateIdentifier {

@@ -192,7 +192,7 @@ class PasswordlessSignInManager {
 						})
 					}
 				} else if (backupCode) {
-					if (!await this.backupCodeManager.verifyAndConsume(db, personRow.id, backupCode)) {
+					if (!await this.backupCodeManager.verifyAndConsume(db, personRow, backupCode)) {
 						return new ResponseError('INVALID_OTP_TOKEN', 'OTP token validation has failed', {
 							[AuthLogService.Key]: new AuthLogService.Bag({
 								personId: personRow.id,

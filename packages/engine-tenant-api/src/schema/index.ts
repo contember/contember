@@ -1075,6 +1075,7 @@ export type MailTemplateIdentifier = {
 }
 
 export type MailType =
+	| 'BACKUP_CODES_EXHAUSTED'
 	| 'EMAIL_OTP'
 	| 'EXISTING_USER_INVITED'
 	| 'FORCED_SIGN_OUT'

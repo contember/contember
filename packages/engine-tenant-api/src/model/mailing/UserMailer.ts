@@ -5,6 +5,7 @@ import PasswordReset from './templates/PasswordReset.mustache'
 import PasswordlessSignIn from './templates/PasswordlessSignIn.mustache'
 import EmailOtp from './templates/EmailOtp.mustache'
 import ForcedSignOut from './templates/ForcedSignOut.mustache'
+import BackupCodesExhausted from './templates/BackupCodesExhausted.mustache'
 import { MailTemplateData, MailTemplateIdentifier, MailType } from './type'
 import { MailTemplateQuery } from '../queries'
 import Layout from './templates/Layout.mustache'
@@ -103,6 +104,20 @@ export class UserMailer {
 		const template = (await this.getCustomTemplate(dbContext, templateId)) || {
 			subject: 'Your verification code',
 			content: EmailOtp,
+			replyTo: null,
+		}
+		await this.sendMail(templateId, template, mailArguments)
+	}
+
+	async sendBackupCodesExhaustedEmail(
+		dbContext: DatabaseContext,
+		mailArguments: { email: string },
+		customMailOptions: { projectId: string | null; variant: string },
+	): Promise<void> {
+		const templateId = { type: MailType.backupCodesExhausted, ...customMailOptions }
+		const template = (await this.getCustomTemplate(dbContext, templateId)) || {
+			subject: 'You have no MFA backup codes left',
+			content: BackupCodesExhausted,
 			replyTo: null,
 		}
 		await this.sendMail(templateId, template, mailArguments)

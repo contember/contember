@@ -3,6 +3,8 @@ import { DatabaseContext } from '../utils'
 import { Providers } from '../providers'
 import { ConsumeBackupCodeCommand, CreateBackupCodeCommand, DeleteBackupCodesCommand } from '../commands'
 import { computeTokenHash } from '../utils/token'
+import { UserMailer } from '../mailing'
+import { PersonRow } from '../queries'
 
 /** Number of backup codes issued per generation. */
 const BACKUP_CODE_COUNT = 10
@@ -23,6 +25,7 @@ const ALPHABET = 'abcdefghijkmnpqrstuvwxyz23456789'
  */
 export class BackupCodeManager {
 	constructor(
+		private readonly mailer: UserMailer,
 		private readonly providers: Pick<Providers, 'uuid' | 'now' | 'randomBytes'>,
 	) {}
 
@@ -49,15 +52,22 @@ export class BackupCodeManager {
 	 * matching code. Returns whether a code was actually consumed. Safe against
 	 * double-spend (see {@link ConsumeBackupCodeCommand}).
 	 */
-	async verifyAndConsume(dbContext: DatabaseContext, personId: string, code: string): Promise<boolean> {
+	async verifyAndConsume(dbContext: DatabaseContext, person: PersonRow, code: string): Promise<boolean> {
 		const normalized = this.normalize(code)
 		if (normalized.length === 0) {
 			return false
 		}
-		// TODO(A07-followup): when this consumes the *last* unused code, send an
-		// email notification ("you have no backup codes left"). Needs a new mail
-		// template + a default-template migration, so it is intentionally deferred.
-		return dbContext.commandBus.execute(new ConsumeBackupCodeCommand(personId, this.hash(normalized)))
+		const consumed = await dbContext.commandBus.execute(new ConsumeBackupCodeCommand(person.id, this.hash(normalized)))
+		if (consumed && (await this.countUnused(dbContext, person.id)) === 0) {
+			// Best-effort: notify the person they have no backup codes left. A failed
+			// email must never block or fail sign-in, so swallow any error.
+			try {
+				await this.mailer.sendBackupCodesExhaustedEmail(dbContext, { email: person.email ?? '' }, { projectId: null, variant: '' })
+			} catch {
+				// ignore
+			}
+		}
+		return consumed
 	}
 
 	async deleteForPerson(dbContext: DatabaseContext, personId: string): Promise<void> {

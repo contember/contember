@@ -75,7 +75,7 @@ class SignInManager {
 					return new ResponseError('INVALID_OTP_TOKEN', 'OTP token validation has failed', authLogData)
 				}
 			} else if (backupCode) {
-				if (!await this.backupCodeManager.verifyAndConsume(dbContext, person.id, backupCode)) {
+				if (!await this.backupCodeManager.verifyAndConsume(dbContext, person, backupCode)) {
 					return new ResponseError('INVALID_OTP_TOKEN', 'OTP token validation has failed', authLogData)
 				}
 				usedBackupCode = true
@@ -89,7 +89,7 @@ class SignInManager {
 					return new ResponseError('INVALID_OTP_TOKEN', 'OTP token validation has failed', authLogData)
 				}
 			} else if (backupCode) {
-				if (!await this.backupCodeManager.verifyAndConsume(dbContext, person.id, backupCode)) {
+				if (!await this.backupCodeManager.verifyAndConsume(dbContext, person, backupCode)) {
 					return new ResponseError('INVALID_OTP_TOKEN', 'OTP token validation has failed', authLogData)
 				}
 				usedBackupCode = true

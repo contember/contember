@@ -1,7 +1,7 @@
-import { describe, expect, test } from 'bun:test'
+import { describe, expect, mock, test } from 'bun:test'
 import crypto from 'node:crypto'
 import { createConnectionMock, ExpectedQuery } from '@contember/database-tester'
-import { BackupCodeManager, DatabaseContext, Providers } from '../../../src'
+import { BackupCodeManager, DatabaseContext, PersonRow, Providers, UserMailer } from '../../../src'
 
 const NOW = new Date('2026-05-20T12:00:00.000Z')
 const PERSON_ID = '123e4567-e89b-12d3-a456-000000000001'
@@ -45,6 +45,43 @@ const makeDb = (queries: ExpectedQuery[], providers: Providers) => {
 	return new DatabaseContext(client, providers)
 }
 
+const PERSON_EMAIL = 'person@example.com'
+
+const person = (overrides: Partial<PersonRow> = {}): PersonRow => ({
+	id: PERSON_ID,
+	password_hash: 'x',
+	identity_id: 'identity-1',
+	otp_secret: null,
+	otp_secret_version: null,
+	otp_activated_at: null,
+	otp_pending_secret: null,
+	otp_pending_version: null,
+	otp_pending_created_at: null,
+	email_otp_enabled: false,
+	email: PERSON_EMAIL,
+	name: null,
+	roles: [],
+	disabled_at: null,
+	passwordless_enabled: null,
+	mfa_grace_until: null,
+	...overrides,
+})
+
+/** A UserMailer test double exposing only the method BackupCodeManager calls. */
+const makeMailer = (impl?: UserMailer['sendBackupCodesExhaustedEmail']) => {
+	const sendBackupCodesExhaustedEmail = mock<UserMailer['sendBackupCodesExhaustedEmail']>(impl ?? (() => Promise.resolve()))
+	const mailer = { sendBackupCodesExhaustedEmail } as unknown as UserMailer
+	return { mailer, sendBackupCodesExhaustedEmail }
+}
+
+// SELECT issued by countUnused after a successful consume.
+const COUNT_UNUSED_SQL = `select count(*)::text as count from "tenant"."person_backup_code" where "person_id" = ? and "used_at" is null`
+const countUnusedSql = (count: number): ExpectedQuery => ({
+	sql: COUNT_UNUSED_SQL,
+	parameters: [PERSON_ID],
+	response: { rows: [{ count: String(count) }] },
+})
+
 const ALPHABET = 'abcdefghijkmnpqrstuvwxyz23456789'
 // With sequentialBytes, byte i = i, so char i = ALPHABET[i % 32].
 const expectedRaw = Array.from({ length: 10 }, (_, i) => ALPHABET[i % ALPHABET.length]).join('')
@@ -68,7 +105,7 @@ describe('BackupCodeManager', () => {
 			})
 		}
 		const db = makeDb(queries, providers)
-		const codes = await new BackupCodeManager(providers).generate(db, PERSON_ID)
+		const codes = await new BackupCodeManager(makeMailer().mailer, providers).generate(db, PERSON_ID)
 
 		expect(codes).toHaveLength(10)
 		expect(codes.every(c => c === expectedFormatted)).toBe(true)
@@ -77,7 +114,7 @@ describe('BackupCodeManager', () => {
 		expect(queries).toHaveLength(0)
 	})
 
-	test('verifyAndConsume returns true when an unused code is consumed', async () => {
+	test('verifyAndConsume returns true when an unused code is consumed (codes remain → no email)', async () => {
 		const providers = baseProviders()
 		const queries: ExpectedQuery[] = [
 			{
@@ -85,14 +122,54 @@ describe('BackupCodeManager', () => {
 				parameters: [NOW, PERSON_ID, expectedHash],
 				response: { rowCount: 1 },
 			},
+			countUnusedSql(3),
 		]
 		const db = makeDb(queries, providers)
-		const ok = await new BackupCodeManager(providers).verifyAndConsume(db, PERSON_ID, expectedFormatted)
+		const { mailer, sendBackupCodesExhaustedEmail } = makeMailer()
+		const ok = await new BackupCodeManager(mailer, providers).verifyAndConsume(db, person(), expectedFormatted)
 		expect(ok).toBe(true)
 		expect(queries).toHaveLength(0)
+		expect(sendBackupCodesExhaustedEmail).toHaveBeenCalledTimes(0)
 	})
 
-	test('verifyAndConsume returns false on a second use of the same code (no row updated)', async () => {
+	test('verifyAndConsume sends the exhausted email exactly once when the last code is used', async () => {
+		const providers = baseProviders()
+		const queries: ExpectedQuery[] = [
+			{
+				sql: `update "tenant"."person_backup_code" set "used_at" = ? where "person_id" = ? and "code_hash" = ? and "used_at" is null`,
+				parameters: [NOW, PERSON_ID, expectedHash],
+				response: { rowCount: 1 },
+			},
+			countUnusedSql(0),
+		]
+		const db = makeDb(queries, providers)
+		const { mailer, sendBackupCodesExhaustedEmail } = makeMailer()
+		const ok = await new BackupCodeManager(mailer, providers).verifyAndConsume(db, person(), expectedFormatted)
+		expect(ok).toBe(true)
+		expect(queries).toHaveLength(0)
+		expect(sendBackupCodesExhaustedEmail).toHaveBeenCalledTimes(1)
+		expect(sendBackupCodesExhaustedEmail.mock.calls[0][1]).toEqual({ email: PERSON_EMAIL })
+		expect(sendBackupCodesExhaustedEmail.mock.calls[0][2]).toEqual({ projectId: null, variant: '' })
+	})
+
+	test('verifyAndConsume still returns true if sending the exhausted email throws (best-effort)', async () => {
+		const providers = baseProviders()
+		const queries: ExpectedQuery[] = [
+			{
+				sql: `update "tenant"."person_backup_code" set "used_at" = ? where "person_id" = ? and "code_hash" = ? and "used_at" is null`,
+				parameters: [NOW, PERSON_ID, expectedHash],
+				response: { rowCount: 1 },
+			},
+			countUnusedSql(0),
+		]
+		const db = makeDb(queries, providers)
+		const { mailer, sendBackupCodesExhaustedEmail } = makeMailer(() => Promise.reject(new Error('smtp down')))
+		const ok = await new BackupCodeManager(mailer, providers).verifyAndConsume(db, person(), expectedFormatted)
+		expect(ok).toBe(true)
+		expect(sendBackupCodesExhaustedEmail).toHaveBeenCalledTimes(1)
+	})
+
+	test('verifyAndConsume returns false on a second use of the same code (no row updated, no email)', async () => {
 		const providers = baseProviders()
 		const queries: ExpectedQuery[] = [
 			{
@@ -102,9 +179,11 @@ describe('BackupCodeManager', () => {
 			},
 		]
 		const db = makeDb(queries, providers)
-		const ok = await new BackupCodeManager(providers).verifyAndConsume(db, PERSON_ID, expectedFormatted)
+		const { mailer, sendBackupCodesExhaustedEmail } = makeMailer()
+		const ok = await new BackupCodeManager(mailer, providers).verifyAndConsume(db, person(), expectedFormatted)
 		expect(ok).toBe(false)
 		expect(queries).toHaveLength(0)
+		expect(sendBackupCodesExhaustedEmail).toHaveBeenCalledTimes(0)
 	})
 
 	test('verifyAndConsume normalizes formatting and case before hashing', async () => {
@@ -118,17 +197,20 @@ describe('BackupCodeManager', () => {
 				parameters: [NOW, PERSON_ID, expectedHash],
 				response: { rowCount: 1 },
 			},
+			countUnusedSql(2),
 		]
 		const db = makeDb(queries, providers)
-		const ok = await new BackupCodeManager(providers).verifyAndConsume(db, PERSON_ID, messyInput)
+		const ok = await new BackupCodeManager(makeMailer().mailer, providers).verifyAndConsume(db, person(), messyInput)
 		expect(ok).toBe(true)
 		expect(queries).toHaveLength(0)
 	})
 
-	test('verifyAndConsume returns false for empty input without hitting the DB', async () => {
+	test('verifyAndConsume returns false for empty input without hitting the DB (no email)', async () => {
 		const providers = baseProviders()
 		const db = makeDb([], providers)
-		const ok = await new BackupCodeManager(providers).verifyAndConsume(db, PERSON_ID, '   ')
+		const { mailer, sendBackupCodesExhaustedEmail } = makeMailer()
+		const ok = await new BackupCodeManager(mailer, providers).verifyAndConsume(db, person(), '   ')
 		expect(ok).toBe(false)
+		expect(sendBackupCodesExhaustedEmail).toHaveBeenCalledTimes(0)
 	})
 })

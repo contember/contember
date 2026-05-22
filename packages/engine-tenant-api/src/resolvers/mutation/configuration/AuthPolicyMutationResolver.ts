@@ -107,6 +107,7 @@ export class AuthPolicyMutationResolver implements Pick<MutationResolvers, 'crea
 			mfaRequired: policy.mfaRequired ?? null,
 			tokenExpiration: policy.tokenExpiration ?? null,
 			idleTimeout: policy.idleTimeout ?? null,
+			graceDuration: policy.mfaGraceDuration ?? null,
 			rememberMeAllowed: policy.rememberMeAllowed ?? null,
 		}
 	}
@@ -119,5 +120,6 @@ const snapshotInput = (policy: AuthPolicyInput): JSONValue => ({
 	mfaRequired: policy.mfaRequired ?? null,
 	tokenExpiration: policy.tokenExpiration ?? null,
 	idleTimeout: policy.idleTimeout ?? null,
+	mfaGraceDuration: policy.mfaGraceDuration ?? null,
 	rememberMeAllowed: policy.rememberMeAllowed ?? null,
 })

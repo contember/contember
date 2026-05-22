@@ -130,12 +130,12 @@ export interface TenantContainerArgs {
 	projectSchemaResolver: ProjectSchemaResolver
 	projectInitializer: ProjectInitializer
 	tenantCredentials: TenantCredentials
-	cryptoProviders: Pick<Providers, 'encrypt' | 'decrypt'>
+	cryptoProviders: Pick<Providers, 'encrypt' | 'decrypt' | 'encryptionEnabled'>
 }
 
 export class TenantContainerFactory {
 	constructor(
-		private readonly providers: Omit<Providers, 'encrypt' | 'decrypt'>,
+		private readonly providers: Omit<Providers, 'encrypt' | 'decrypt' | 'encryptionEnabled'>,
 	) {}
 
 	create(args: TenantContainerArgs): TenantContainer {
@@ -169,7 +169,11 @@ export class TenantContainerFactory {
 			.addService('userMailer', ({ mailer, templateRenderer }) => new UserMailer(mailer, templateRenderer))
 			.addService('apiKeyService', () => new ApiKeyService())
 			.addService('authPolicyResolver', () => new AuthPolicyResolver())
-			.addService('apiKeyManager', ({ apiKeyService, authPolicyResolver }) => new ApiKeyManager(apiKeyService, authPolicyResolver))
+			.addService('authLogService', () => new AuthLogService())
+			.addService(
+				'apiKeyManager',
+				({ apiKeyService, authPolicyResolver, authLogService }) => new ApiKeyManager(apiKeyService, authPolicyResolver, authLogService),
+			)
 			.addService('emailValidator', () => new EmailValidator())
 			.addService('hibpChecker', (): HibpChecker => new HttpHibpChecker())
 			.addService('noopHibpChecker', (): HibpChecker => new NoopHibpChecker())
@@ -213,7 +217,7 @@ export class TenantContainerFactory {
 			.addService('idpManager', ({ idpRegistry }) => new IDPManager(idpRegistry))
 			.addService('otpAuthenticator', ({ providers }) => new OtpAuthenticator(providers))
 			.addService('otpManager', ({ otpAuthenticator, providers }) => new OtpManager(otpAuthenticator, providers))
-			.addService('backupCodeManager', ({ providers }) => new BackupCodeManager(providers))
+			.addService('backupCodeManager', ({ providers, userMailer }) => new BackupCodeManager(userMailer, providers))
 			.addService('emailOtpManager', ({ userMailer, providers }) => new EmailOtpManager(userMailer, providers))
 			.addService('authPolicyManager', ({ projectManager }) => new AuthPolicyManager(projectManager))
 			.addService(
@@ -228,8 +232,8 @@ export class TenantContainerFactory {
 			.addService('configurationManager', () => new ConfigurationManager())
 			.addService(
 				'passwordlessSignInManager',
-				({ apiKeyManager, userMailer, projectManager, otpManager, backupCodeManager, authPolicyResolver }) =>
-					new PasswordlessSignInManager(apiKeyManager, userMailer, projectManager, otpManager, backupCodeManager, authPolicyResolver),
+				({ apiKeyManager, userMailer, projectManager, otpManager, backupCodeManager }) =>
+					new PasswordlessSignInManager(apiKeyManager, userMailer, projectManager, otpManager, backupCodeManager),
 			)
 			.addService(
 				'identityTypeResolver',
@@ -355,7 +359,6 @@ export class TenantContainerFactory {
 				'togglePasswordlessMutationResolver',
 				({ configurationManager, personManager }) => new TogglePasswordlessMutationResolver(configurationManager, personManager),
 			)
-			.addService('authLogService', () => new AuthLogService())
 			.addService(
 				'resolverContextFactory',
 				({ permissionContextFactory, authLogService }) => new TenantResolverContextFactory(permissionContextFactory, authLogService),

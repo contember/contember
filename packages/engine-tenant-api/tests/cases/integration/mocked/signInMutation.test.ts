@@ -12,7 +12,7 @@ import { createSessionKeySql } from './sql/createSessionKeySql.js'
 import { getIdentityProjectsSql } from './sql/getIdentityProjectsSql.js'
 import { getNextLoginAttemptSql } from './sql/getNextLoginAttemptSql.js'
 import { getConfigSql } from './sql/getConfigSql.js'
-import { consumeBackupCodeSql } from './sql/consumeBackupCodeSql.js'
+import { consumeBackupCodeSql, countUnusedBackupCodesSql } from './sql/consumeBackupCodeSql.js'
 import { consumeEmailOtpTokenSql, EMAIL_OTP_CODE, getLatestEmailOtpTokenSql, sendEmailOtpSql } from './sql/emailOtpSql.js'
 import { getMailTemplateSql } from './sql/getMailTemplateSql.js'
 import { getAuthPoliciesSql } from './sql/authPolicySql.js'
@@ -304,6 +304,7 @@ test('sign in - valid backup code (when OTP is required)', async () => {
 			getNextLoginAttemptSql(email),
 			getPersonByEmailSql({ email, response: { personId, identityId, password, roles: [], otpUri: otp.uri } }),
 			consumeBackupCodeSql({ personId, codeHash: BACKUP_CODE_HASH, consumed: true }),
+			countUnusedBackupCodesSql({ personId, count: 4 }),
 			getConfigSql(),
 			getIdentityByIdSql({ identityId }),
 			getAuthPoliciesSql(),

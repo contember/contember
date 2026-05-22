@@ -2,6 +2,7 @@ export * from './apiKey/index.js'
 export * from './captcha/index.js'
 export * from './idp/index.js'
 
+export * from './AuthLogService.js'
 export * from './AuthPolicyManager.js'
 export * from './AuthPolicyResolver.js'
 export * from './BackupCodeManager.js'

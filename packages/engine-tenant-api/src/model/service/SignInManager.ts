@@ -1,20 +1,13 @@
 import { CreateSessionTokenErrorCode, MfaEnrollment, SignInErrorCode } from '../../schema/index.js'
 import { ApiKeyManager, AuthPolicyResolver, BackupCodeManager, EmailOtpManager, OtpManager } from '../service/index.js'
-import { PersonQuery, PersonRow, PersonUniqueIdentifier } from '../queries/index.js'
+import { ConfigurationQuery, PersonQuery, PersonRow, PersonUniqueIdentifier } from '../queries/index.js'
 import { Providers } from '../providers.js'
 import { DatabaseContext } from '../utils/index.js'
 import { Response, ResponseError, ResponseOk } from '../utils/Response.js'
 import { ImplementationException } from '../../exceptions.js'
 import { AuthLogService } from './AuthLogService.js'
 import { ApiKeyRequestInfo, SetMfaGraceUntilCommand } from '../commands/index.js'
-
-/**
- * MFA grace duration (seconds) granted on first sign-in against a requiring role
- * with no factor. Per the design, the default is 0 (immediate enforcement); the
- * value is sourced from this single constant so a config knob can replace it
- * later without touching the enforcement logic. Keep it 0 to preserve behavior.
- */
-const MFA_GRACE_DURATION_SECONDS = 0
+import { intervalToSeconds } from '../utils/interval.js'
 
 class SignInManager {
 	constructor(
@@ -71,11 +64,11 @@ class SignInManager {
 		if (hasActiveTotp) {
 			// Active TOTP takes precedence (A07 path, unchanged).
 			if (otpCode) {
-				if (!await this.otpManager.verifyOtp(person, otpCode)) {
+				if (!await this.otpManager.verifyOtp(dbContext, person, otpCode)) {
 					return new ResponseError('INVALID_OTP_TOKEN', 'OTP token validation has failed', authLogData)
 				}
 			} else if (backupCode) {
-				if (!await this.backupCodeManager.verifyAndConsume(dbContext, person.id, backupCode)) {
+				if (!await this.backupCodeManager.verifyAndConsume(dbContext, person, backupCode)) {
 					return new ResponseError('INVALID_OTP_TOKEN', 'OTP token validation has failed', authLogData)
 				}
 				usedBackupCode = true
@@ -89,7 +82,7 @@ class SignInManager {
 					return new ResponseError('INVALID_OTP_TOKEN', 'OTP token validation has failed', authLogData)
 				}
 			} else if (backupCode) {
-				if (!await this.backupCodeManager.verifyAndConsume(dbContext, person.id, backupCode)) {
+				if (!await this.backupCodeManager.verifyAndConsume(dbContext, person, backupCode)) {
 					return new ResponseError('INVALID_OTP_TOKEN', 'OTP token validation has failed', authLogData)
 				}
 				usedBackupCode = true
@@ -160,6 +153,17 @@ class SignInManager {
 
 		const now = this.providers.now()
 
+		// Resolve the effective grace duration (seconds). A per-policy override
+		// wins; otherwise we fall back to the global config default. Only fetch the
+		// config when the override is absent, to keep query shapes minimal.
+		let graceSeconds: number
+		if (policy.graceDuration !== null) {
+			graceSeconds = intervalToSeconds(policy.graceDuration)
+		} else {
+			const config = await dbContext.queryHandler.fetch(new ConfigurationQuery(dbContext.providers))
+			graceSeconds = intervalToSeconds(config.login.mfaGraceDuration)
+		}
+
 		// Grace handling. Default grace duration is 0 (immediate enforcement), so
 		// by default neither branch below opens a window.
 		if (person.mfa_grace_until !== null) {
@@ -168,9 +172,9 @@ class SignInManager {
 				return null
 			}
 			// Grace expired → fall through to enforcement.
-		} else if (MFA_GRACE_DURATION_SECONDS > 0) {
+		} else if (graceSeconds > 0) {
 			// Open the grace window now and allow this sign-in.
-			const graceUntil = new Date(now.getTime() + MFA_GRACE_DURATION_SECONDS * 1000)
+			const graceUntil = new Date(now.getTime() + graceSeconds * 1000)
 			await dbContext.commandBus.execute(new SetMfaGraceUntilCommand(person.id, graceUntil))
 			return null
 		}

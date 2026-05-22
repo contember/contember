@@ -16,9 +16,9 @@ test('createAuthPolicy (global) inserts a row and audits auth_policy_change', as
 		executes: [
 			{
 				sql:
-					SQL`insert into "tenant"."auth_policy" ("id", "scope", "project_id", "roles", "mfa_required", "token_expiration", "idle_timeout", "remember_me_allowed", "created_at", "updated_at")
-					values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-				parameters: [policyId, 'global', null, ['admin'], true, null, null, null, now, now],
+					SQL`insert into "tenant"."auth_policy" ("id", "scope", "project_id", "roles", "mfa_required", "token_expiration", "idle_timeout", "grace_duration", "remember_me_allowed", "created_at", "updated_at")
+					values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+				parameters: [policyId, 'global', null, ['admin'], true, null, null, null, null, now, now],
 				response: { rowCount: 1 },
 			},
 		],

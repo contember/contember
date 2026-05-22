@@ -9,6 +9,7 @@ export type AuthPolicyWriteValues = {
 	mfaRequired: boolean | null
 	tokenExpiration: string | null
 	idleTimeout: string | null
+	graceDuration: string | null
 	rememberMeAllowed: boolean | null
 }
 
@@ -29,6 +30,7 @@ export class CreateAuthPolicyCommand implements Command<string> {
 				mfa_required: this.values.mfaRequired,
 				token_expiration: this.values.tokenExpiration,
 				idle_timeout: this.values.idleTimeout,
+				grace_duration: this.values.graceDuration,
 				remember_me_allowed: this.values.rememberMeAllowed,
 				created_at: now,
 				updated_at: now,

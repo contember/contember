@@ -25,6 +25,7 @@ export const getConfigSql = (overrides: Record<string, unknown> = {}): ExpectedQ
 				login_reveal_login_method: true,
 				login_default_token_expiration: PostgresInterval('00:30:00'),
 				login_max_token_expiration: PostgresInterval('12:00:00'),
+				login_mfa_grace_duration: PostgresInterval('00:00:00'),
 				captcha_provider: null,
 				captcha_secret: null,
 				captcha_secret_version: null,

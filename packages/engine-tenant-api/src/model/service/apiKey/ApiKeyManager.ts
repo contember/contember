@@ -18,11 +18,13 @@ import PostgresInterval from 'postgres-interval'
 import { Config } from '../../type/Config.js'
 import { intervalToPostgres, intervalToSeconds } from '../../utils/interval.js'
 import { AuthPolicyResolver } from '../AuthPolicyResolver.js'
+import { AuthLogService } from '../AuthLogService.js'
 
 export class ApiKeyManager {
 	constructor(
 		private readonly apiKeyService: ApiKeyService,
 		private readonly authPolicyResolver: AuthPolicyResolver,
+		private readonly authLogService: AuthLogService,
 	) {}
 
 	async verifyAndProlong(
@@ -66,6 +68,22 @@ export class ApiKeyManager {
 			const idleMs = intervalToSeconds(apiKeyRow.idle_timeout) * 1000
 			if (now.getTime() - apiKeyRow.last_used_at.getTime() > idleMs) {
 				await dbContext.commandBus.execute(new DisableApiKeyCommand(apiKeyRow.id))
+				try {
+					await this.authLogService.logSessionEvent(dbContext, {
+						type: 'session_expired_idle',
+						identityId: apiKeyRow.identity_id,
+						personId: apiKeyRow.person_id,
+						ipAddress: requestInfo?.ip,
+						userAgent: requestInfo?.userAgent,
+						success: false,
+						eventData: {
+							lastUsedAt: apiKeyRow.last_used_at?.toISOString() ?? null,
+							idleTimeout: String(apiKeyRow.idle_timeout),
+						},
+					})
+				} catch {
+					/* best-effort: auth path must stay resilient */
+				}
 				return new ResponseError(
 					VerifyErrorCode.DISABLED,
 					`API key was idle since ${apiKeyRow.last_used_at.toISOString()} and exceeded the idle timeout`,
@@ -159,6 +177,33 @@ export class ApiKeyManager {
 		})
 		const token = (await dbContext.commandBus.execute(command)).token
 		assert(token !== undefined)
+
+		// A19: audit only when a policy is actually in effect. With zero auth_policy
+		// rows the resolved policy is inert and no extra insert happens.
+		const policyApplied = policy.mfaRequired === true
+			|| policy.tokenExpiration !== null
+			|| policy.idleTimeout !== null
+			|| policy.rememberMeAllowed !== null
+		if (policyApplied) {
+			try {
+				await this.authLogService.logSessionEvent(dbContext, {
+					type: 'session_policy_applied',
+					identityId,
+					ipAddress: requestInfo?.ip,
+					userAgent: requestInfo?.userAgent,
+					success: true,
+					eventData: {
+						tokenExpiration: policy.tokenExpiration ? intervalToPostgres(policy.tokenExpiration) : null,
+						idleTimeout: policy.idleTimeout ? intervalToPostgres(policy.idleTimeout) : null,
+						rememberMeAllowed: policy.rememberMeAllowed,
+						mfaRequired: policy.mfaRequired,
+					},
+				})
+			} catch {
+				/* best-effort: sign-in must not break on an audit failure */
+			}
+		}
+
 		return token
 	}
 

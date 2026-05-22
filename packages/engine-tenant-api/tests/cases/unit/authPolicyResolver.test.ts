@@ -19,6 +19,7 @@ const providers: Providers = {
 	encrypt: () => {
 		throw new Error('not supported')
 	},
+	encryptionEnabled: false,
 	hash: value => Buffer.from(value.toString()),
 }
 
@@ -38,6 +39,7 @@ const policyRow = (overrides: Record<string, unknown>) => ({
 	mfa_required: null,
 	token_expiration: null,
 	idle_timeout: null,
+	grace_duration: null,
 	remember_me_allowed: null,
 	created_at: NOW,
 	updated_at: NOW,
@@ -51,7 +53,7 @@ describe('AuthPolicyResolver', () => {
 		]
 		const db = makeDb(queries)
 		const result = await new AuthPolicyResolver().resolveForIdentity(db, IDENTITY_ID, ['someRole'])
-		expect(result).toEqual({ mfaRequired: false, tokenExpiration: null, idleTimeout: null, rememberMeAllowed: null })
+		expect(result).toEqual({ mfaRequired: false, tokenExpiration: null, idleTimeout: null, graceDuration: null, rememberMeAllowed: null })
 		expect(queries).toHaveLength(0)
 	})
 

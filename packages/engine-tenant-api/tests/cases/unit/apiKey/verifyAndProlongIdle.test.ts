@@ -1,5 +1,14 @@
 import { expect, test } from 'bun:test'
-import { ApiKey, ApiKeyManager, ApiKeyService, AuthPolicyResolver, computeTokenHash, DatabaseContext, Providers } from '../../../../src'
+import {
+	ApiKey,
+	ApiKeyManager,
+	ApiKeyService,
+	AuthLogService,
+	AuthPolicyResolver,
+	computeTokenHash,
+	DatabaseContext,
+	Providers,
+} from '../../../../src'
 import { createConnectionMock, ExpectedQuery } from '@contember/database-tester'
 import PostgresInterval from 'postgres-interval'
 
@@ -24,6 +33,7 @@ const baseProviders: Providers = {
 	encrypt: () => {
 		throw new Error('not supported')
 	},
+	encryptionEnabled: false,
 	hash: () => Buffer.alloc(0),
 }
 
@@ -85,8 +95,29 @@ const prolongUpdate: ExpectedQuery = {
 	response: { rowCount: 1 },
 }
 
+// Captures the `type` of the session_expired_idle person_auth_log insert.
+// The idle key carries a person_id, so the InsertBuilder emits it → columns are
+// id, invoked_by_id, person_id, type, success, metadata, event_data.
+const authLogInsert = (capture: { type?: string }): ExpectedQuery => ({
+	sql:
+		`insert into  "tenant"."person_auth_log" ("id", "invoked_by_id", "person_id", "type", "success", "metadata", "event_data") values  (?, ?, ?, ?, ?, ?, ?)`,
+	parameters: [
+		() => true,
+		() => true,
+		() => true,
+		(value: any) => {
+			capture.type = value
+			return true
+		},
+		() => true,
+		() => true,
+		() => true,
+	],
+	response: { rowCount: 1 },
+})
+
 const run = async (row: Row | null, expectedQueries: ExpectedQuery[], allowProlong = false) => {
-	const manager = new ApiKeyManager(new ApiKeyService(), new AuthPolicyResolver())
+	const manager = new ApiKeyManager(new ApiKeyService(), new AuthPolicyResolver(), new AuthLogService())
 	const queries = [selectByToken(row), ...expectedQueries, ...(allowProlong ? [prolongUpdate] : [])]
 	const connection = createConnectionMock(queries)
 	const client = connection.createClient('tenant', { module: 'tenant' })
@@ -102,8 +133,11 @@ test('A19: idle-expired key (last_used_at older than idle_timeout) is rejected a
 		idle_timeout: PostgresInterval('00:15:00'),
 		last_used_at: minutesAgo(20), // 20 min ago > 15 min idle timeout
 	})
-	const response = await run(row, [disableUpdate])
+	const authLog: { type?: string } = {}
+	const response = await run(row, [disableUpdate, authLogInsert(authLog)])
 	expect(response.ok).toBe(false)
+	// A19: idle rejection emits a session_expired_idle audit entry.
+	expect(authLog.type).toBe('session_expired_idle')
 })
 
 test('A19: fresh key within idle_timeout is allowed', async () => {

@@ -21,6 +21,7 @@ export type ConfigRow = {
 	login_reveal_login_method: boolean
 	login_default_token_expiration: IPostgresInterval
 	login_max_token_expiration: IPostgresInterval | null
+	login_mfa_grace_duration: IPostgresInterval
 	captcha_provider: CaptchaProvider | null
 	captcha_secret: Buffer | null
 	captcha_secret_version: number | null

@@ -10,4 +10,10 @@ export interface Providers {
 
 	encrypt: (value: Buffer) => Promise<{ value: Buffer; version: number }>
 	decrypt: (value: Buffer, version: number) => Promise<{ value: Buffer; needsReEncrypt: boolean }>
+	/**
+	 * Whether an encryption key is configured. When false, `encrypt` throws, so
+	 * secrets that can fall back to plaintext-at-rest (TOTP) must do so (version 0),
+	 * preserving pre-encryption behavior on deployments without a key.
+	 */
+	encryptionEnabled: boolean
 }

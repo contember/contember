@@ -34,6 +34,7 @@ export class AuthPolicyQueryResolver implements Pick<QueryResolvers, 'authPolici
 			// IPostgresInterval; the Interval scalar serializes it to an ISO 8601 string.
 			tokenExpiration: row.token_expiration as unknown as AuthPolicy['tokenExpiration'],
 			idleTimeout: row.idle_timeout as unknown as AuthPolicy['idleTimeout'],
+			mfaGraceDuration: row.grace_duration as unknown as AuthPolicy['mfaGraceDuration'],
 			rememberMeAllowed: row.remember_me_allowed,
 		}))
 	}

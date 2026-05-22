@@ -9,7 +9,6 @@ export default {
 		'pg',
 		'uuid',
 		'graphql',
-		'lodash-es',
 		'graphql-ts-client-api',
 		'react-dom',
 	],

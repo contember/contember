@@ -169,7 +169,11 @@ export class TenantContainerFactory {
 			.addService('userMailer', ({ mailer, templateRenderer }) => new UserMailer(mailer, templateRenderer))
 			.addService('apiKeyService', () => new ApiKeyService())
 			.addService('authPolicyResolver', () => new AuthPolicyResolver())
-			.addService('apiKeyManager', ({ apiKeyService, authPolicyResolver }) => new ApiKeyManager(apiKeyService, authPolicyResolver))
+			.addService('authLogService', () => new AuthLogService())
+			.addService(
+				'apiKeyManager',
+				({ apiKeyService, authPolicyResolver, authLogService }) => new ApiKeyManager(apiKeyService, authPolicyResolver, authLogService),
+			)
 			.addService('emailValidator', () => new EmailValidator())
 			.addService('hibpChecker', (): HibpChecker => new HttpHibpChecker())
 			.addService('noopHibpChecker', (): HibpChecker => new NoopHibpChecker())
@@ -355,7 +359,6 @@ export class TenantContainerFactory {
 				'togglePasswordlessMutationResolver',
 				({ configurationManager, personManager }) => new TogglePasswordlessMutationResolver(configurationManager, personManager),
 			)
-			.addService('authLogService', () => new AuthLogService())
 			.addService(
 				'resolverContextFactory',
 				({ permissionContextFactory, authLogService }) => new TenantResolverContextFactory(permissionContextFactory, authLogService),

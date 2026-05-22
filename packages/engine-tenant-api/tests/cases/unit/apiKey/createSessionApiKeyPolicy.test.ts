@@ -1,5 +1,5 @@
 import { expect, test } from 'bun:test'
-import { ApiKeyManager, ApiKeyService, AuthPolicyResolver, DatabaseContext, Providers } from '../../../../src'
+import { ApiKeyManager, ApiKeyService, AuthLogService, AuthPolicyResolver, DatabaseContext, Providers } from '../../../../src'
 import { createConnectionMock, ExpectedQuery } from '@contember/database-tester'
 import PostgresInterval from 'postgres-interval'
 
@@ -107,12 +107,40 @@ const policy = (overrides: Partial<PolicyRow>): PolicyRow => ({
 	...overrides,
 })
 
+// Captures the `type` of the session_policy_applied person_auth_log insert.
+// logSessionEvent passes no personId here, so the InsertBuilder omits the
+// person_id column → columns are id, invoked_by_id, type, success, metadata, event_data.
+const authLogInsert = (capture: { type?: string }): ExpectedQuery => ({
+	sql: `insert into  "tenant"."person_auth_log" ("id", "invoked_by_id", "type", "success", "metadata", "event_data") values  (?, ?, ?, ?, ?, ?)`,
+	parameters: [
+		() => true,
+		() => true,
+		(value: any) => {
+			capture.type = value
+			return true
+		},
+		() => true,
+		() => true,
+		() => true,
+	],
+	response: { rowCount: 1 },
+})
+
+// "non-inert" mirrors ApiKeyManager's guard: any policy field actually set.
+const isPolicyApplied = (policies: PolicyRow[]): boolean =>
+	policies.some(p =>
+		p.mfa_required === true
+		|| p.token_expiration !== null
+		|| p.idle_timeout !== null
+		|| p.remember_me_allowed !== null
+	)
+
 const run = async (args: {
 	expiration?: number
 	policies?: PolicyRow[]
 	roles?: string[]
-}): Promise<any[]> => {
-	const manager = new ApiKeyManager(new ApiKeyService(), new AuthPolicyResolver())
+}): Promise<{ insertParams: any[]; authLog: { type?: string } }> => {
+	const manager = new ApiKeyManager(new ApiKeyService(), new AuthPolicyResolver(), new AuthLogService())
 	const policies = args.policies ?? []
 	const queries: ExpectedQuery[] = [
 		configQuery(),
@@ -133,11 +161,15 @@ const run = async (args: {
 		}),
 		response: { rowCount: 1 },
 	})
+	const authLog: { type?: string } = {}
+	if (isPolicyApplied(policies)) {
+		queries.push(authLogInsert(authLog))
+	}
 	const connection = createConnectionMock(queries)
 	const client = connection.createClient('tenant', { module: 'tenant' })
 	const db = new DatabaseContext(client, providers)
 	await manager.createSessionApiKey(db, IDENTITY_ID, args.expiration)
-	return insertParams
+	return { insertParams, authLog }
 }
 
 // INSERT column order:
@@ -151,41 +183,47 @@ const IDLE_TIMEOUT = 12
 const MAX_EXPIRES_AT = 13
 
 test('A19: no policy → identical to today (no idle_timeout / max_expires_at, default 30m window)', async () => {
-	const params = await run({})
+	const { insertParams: params, authLog } = await run({})
 	expect(params[EXPIRATION]).toBe(30)
 	expect(params[EXPIRES_AT]).toEqual(new Date('2026-05-21T12:30:00Z'))
 	expect(params[IDLE_TIMEOUT]).toBeNull()
 	expect(params[MAX_EXPIRES_AT]).toBeNull()
 	// issued_at is always set for session keys.
 	expect(params[ISSUED_AT]).toEqual(NOW)
+	// No policy in effect → no session_policy_applied audit (no extra insert).
+	expect(authLog.type).toBeUndefined()
 })
 
 test('A19: tokenExpiration policy → max_expires_at set and initial expiry capped to the policy', async () => {
 	// Client asks for 600 min, but policy caps token lifetime to 10 minutes.
-	const params = await run({
+	const { insertParams: params, authLog } = await run({
 		expiration: 600,
 		policies: [policy({ token_expiration: PostgresInterval('00:10:00') })],
 	})
 	expect(params[EXPIRATION]).toBe(10)
 	expect(params[EXPIRES_AT]).toEqual(new Date('2026-05-21T12:10:00Z'))
 	expect(params[MAX_EXPIRES_AT]).toEqual(new Date('2026-05-21T12:10:00Z'))
+	// Non-inert policy applied → session_policy_applied audit fires.
+	expect(authLog.type).toBe('session_policy_applied')
 })
 
 test('A19: idleTimeout policy → idle_timeout snapshotted onto the key', async () => {
-	const params = await run({
+	const { insertParams: params, authLog } = await run({
 		policies: [policy({ idle_timeout: PostgresInterval('00:15:00') })],
 	})
 	// Serialized via postgres-interval's toPostgres().
 	expect(params[IDLE_TIMEOUT]).toBe('15 minutes')
 	expect(params[MAX_EXPIRES_AT]).toBeNull()
+	expect(authLog.type).toBe('session_policy_applied')
 })
 
 test('A19: rememberMeAllowed=false → client longer expiration is ignored, forced to default', async () => {
 	// Client asks for 600 min, but remember-me is denied → default 30m.
-	const params = await run({
+	const { insertParams: params, authLog } = await run({
 		expiration: 600,
 		policies: [policy({ remember_me_allowed: false })],
 	})
 	expect(params[EXPIRATION]).toBe(30)
 	expect(params[EXPIRES_AT]).toEqual(new Date('2026-05-21T12:30:00Z'))
+	expect(authLog.type).toBe('session_policy_applied')
 })

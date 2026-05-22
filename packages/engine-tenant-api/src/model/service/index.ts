@@ -2,6 +2,7 @@ export * from './apiKey'
 export * from './captcha'
 export * from './idp'
 
+export * from './AuthLogService'
 export * from './AuthPolicyManager'
 export * from './AuthPolicyResolver'
 export * from './BackupCodeManager'

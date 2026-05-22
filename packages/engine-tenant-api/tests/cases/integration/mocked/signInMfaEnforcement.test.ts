@@ -124,6 +124,21 @@ test('MFA required + valid pending code → enrolls (pending→active), returns 
 			requiringPolicy(),
 			getAllProjectRolesByIdentitySql({ identityId }),
 			createSessionKeySql({ apiKeyId, identityId }),
+			{
+				// A19: the requiring (mfaRequired) policy is non-inert, so
+				// createSessionApiKey emits a session_policy_applied audit entry.
+				// No personId is passed → the person_id column is omitted by the InsertBuilder.
+				sql: `insert into  "tenant"."person_auth_log" ("id", "invoked_by_id", "type", "success", "metadata", "event_data") values  (?, ?, ?, ?, ?, ?)`,
+				parameters: [
+					() => true,
+					identityId,
+					'session_policy_applied',
+					true,
+					() => true,
+					() => true,
+				],
+				response: { rowCount: 1 },
+			},
 			getIdentityProjectsSql({ identityId, projectId }),
 			selectMembershipsSql({ identityId, projectId, membershipsResponse: [] }),
 		],

@@ -14,6 +14,7 @@ export type AuthPolicyInputValues = {
 	mfaRequired?: boolean | null
 	tokenExpiration?: string | null
 	idleTimeout?: string | null
+	graceDuration?: string | null
 	rememberMeAllowed?: boolean | null
 }
 
@@ -43,6 +44,7 @@ export class AuthPolicyManager {
 				mfaRequired: input.mfaRequired ?? null,
 				tokenExpiration: input.tokenExpiration ?? null,
 				idleTimeout: input.idleTimeout ?? null,
+				graceDuration: input.graceDuration ?? null,
 				rememberMeAllowed: input.rememberMeAllowed ?? null,
 			}),
 		)
@@ -62,6 +64,7 @@ export class AuthPolicyManager {
 				mfaRequired: input.mfaRequired ?? null,
 				tokenExpiration: input.tokenExpiration ?? null,
 				idleTimeout: input.idleTimeout ?? null,
+				graceDuration: input.graceDuration ?? null,
 				rememberMeAllowed: input.rememberMeAllowed ?? null,
 			}),
 		)

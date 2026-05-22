@@ -192,6 +192,7 @@ const schema: DocumentNode = gql`
 		revealLoginMethod: Boolean!
 		defaultTokenExpiration: Interval!
 		maxTokenExpiration: Interval
+		mfaGraceDuration: Interval!
     }
 
 	"""
@@ -268,6 +269,7 @@ const schema: DocumentNode = gql`
 		revealLoginMethod: Boolean
 		defaultTokenExpiration: Interval
 		maxTokenExpiration: Interval
+		mfaGraceDuration: Interval
     }
 
 	"""
@@ -1330,6 +1332,7 @@ const schema: DocumentNode = gql`
 		mfaRequired: Boolean
 		tokenExpiration: Interval
 		idleTimeout: Interval
+		mfaGraceDuration: Interval
 		rememberMeAllowed: Boolean
 	}
 
@@ -1346,6 +1349,7 @@ const schema: DocumentNode = gql`
 		mfaRequired: Boolean
 		tokenExpiration: Interval
 		idleTimeout: Interval
+		mfaGraceDuration: Interval
 		rememberMeAllowed: Boolean
 	}
 

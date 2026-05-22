@@ -11,6 +11,7 @@ export type AuthPolicyRow = {
 	readonly mfa_required: boolean | null
 	readonly token_expiration: IPostgresInterval | null
 	readonly idle_timeout: IPostgresInterval | null
+	readonly grace_duration: IPostgresInterval | null
 	readonly remember_me_allowed: boolean | null
 	readonly created_at: Date
 	readonly updated_at: Date
@@ -26,5 +27,6 @@ export type EffectivePolicy = {
 	readonly mfaRequired: boolean
 	readonly tokenExpiration: IPostgresInterval | null
 	readonly idleTimeout: IPostgresInterval | null
+	readonly graceDuration: IPostgresInterval | null
 	readonly rememberMeAllowed: boolean | null
 }

@@ -13,6 +13,7 @@ import { getIdentityByIdSql } from './sql/getIdentityByIdSql'
 import { generateBackupCodesSql } from './sql/generateBackupCodesSql'
 import { expect, test } from 'bun:test'
 import { Buffer } from 'buffer'
+import PostgresInterval from 'postgres-interval'
 import { OtpAuthenticator } from '../../../../src'
 import { GQL } from '../../../src/tags'
 
@@ -48,6 +49,9 @@ test('MFA required + no factor + no code → MFA_ENROLLMENT_REQUIRED with pendin
 			getPersonByEmailSql({ email, response: { personId, identityId, password, roles: ['editor'] } }),
 			requiringPolicy(),
 			getAllProjectRolesByIdentitySql({ identityId }),
+			// Enforcement resolves the grace duration: the matched policy has no
+			// grace override, so the global config default (0 = immediate) is read.
+			getConfigSql(),
 			{
 				// prepareOtp writes the pending slot.
 				sql: `insert into "tenant"."person_mfa" ("person_id", "totp_pending_secret", "totp_pending_version", "totp_pending_created_at")
@@ -110,6 +114,8 @@ test('MFA required + valid pending code → enrolls (pending→active), returns 
 			getPersonByEmailSql({ email, response: { personId, identityId, password, roles: ['editor'], otpPendingUri: otp.uri } }),
 			requiringPolicy(),
 			getAllProjectRolesByIdentitySql({ identityId }),
+			// Enforcement resolves the grace duration from the global config default.
+			getConfigSql(),
 			{
 				// confirmOtp promotes pending → active.
 				sql: `update "tenant"."person_mfa"
@@ -168,6 +174,8 @@ test('MFA required + invalid pending code → INVALID_OTP_TOKEN', async () => {
 			getPersonByEmailSql({ email, response: { personId, identityId, password, roles: ['editor'], otpPendingUri: pendingUri } }),
 			requiringPolicy(),
 			getAllProjectRolesByIdentitySql({ identityId }),
+			// Enforcement resolves the grace duration from the global config default.
+			getConfigSql(),
 		],
 		return: {
 			data: {
@@ -210,6 +218,105 @@ test('active TOTP + requiring policy → existing OTP_REQUIRED path (policy not 
 		expectedAuthLog: {
 			type: 'login',
 			response: expect.objectContaining({ ok: false }),
+		},
+	})
+})
+
+// A policy whose grace_duration is set opens a grace window: the person is let in
+// on the first hit, `mfa_grace_until` is anchored, and no enrollment is forced.
+const gracePolicy = () =>
+	getAuthPoliciesSql([{ id: testUuid(900), scope: 'global', roles: ['editor'], mfaRequired: true, graceDuration: '01:00:00' }])
+
+test('MFA required + per-policy grace → opens grace window, sets mfa_grace_until, signs in', async () => {
+	const email = 'john@doe.com'
+	const password = '123'
+	const identityId = testUuid(2)
+	const personId = testUuid(7)
+	const apiKeyId = testUuid(1)
+	const projectId = testUuid(20)
+	await executeTenantTest({
+		query: signInWithMfa({ email, password }),
+		executes: [
+			getConfigSql(),
+			getNextLoginAttemptSql(email),
+			getPersonByEmailSql({ email, response: { personId, identityId, password, roles: ['editor'] } }),
+			gracePolicy(),
+			getAllProjectRolesByIdentitySql({ identityId }),
+			// Per-policy grace override is present → the global config is NOT read here.
+			{
+				// Grace window opened: now (12:00) + 1h.
+				sql: SQL`update "tenant"."person" set "mfa_grace_until" = ? where "id" = ?`,
+				parameters: [new Date('2019-09-04 13:00'), personId],
+				response: { rowCount: 1 },
+			},
+			getConfigSql(),
+			getIdentityByIdSql({ identityId, roles: ['editor'] }),
+			gracePolicy(),
+			getAllProjectRolesByIdentitySql({ identityId }),
+			createSessionKeySql({ apiKeyId, identityId }),
+			{
+				// A19: the requiring policy is non-inert → session_policy_applied audit.
+				sql: `insert into  "tenant"."person_auth_log" ("id", "invoked_by_id", "type", "success", "metadata", "event_data") values  (?, ?, ?, ?, ?, ?)`,
+				parameters: [() => true, identityId, 'session_policy_applied', true, () => true, () => true],
+				response: { rowCount: 1 },
+			},
+			getIdentityProjectsSql({ identityId, projectId }),
+			selectMembershipsSql({ identityId, projectId, membershipsResponse: [] }),
+		],
+		return: (response: any) => {
+			expect(response.data.signIn.ok).toBe(true)
+			expect(response.data.signIn.result.token).toBe('0000000000000000000000000000000000000000')
+		},
+		expectedAuthLog: {
+			type: 'login',
+			response: expect.objectContaining({ ok: true }),
+		},
+	})
+})
+
+test('MFA required + no policy grace override → global config default opens the grace window', async () => {
+	const email = 'john@doe.com'
+	const password = '123'
+	const identityId = testUuid(2)
+	const personId = testUuid(7)
+	const apiKeyId = testUuid(1)
+	const projectId = testUuid(20)
+	await executeTenantTest({
+		query: signInWithMfa({ email, password }),
+		executes: [
+			getConfigSql(),
+			getNextLoginAttemptSql(email),
+			getPersonByEmailSql({ email, response: { personId, identityId, password, roles: ['editor'] } }),
+			requiringPolicy(),
+			getAllProjectRolesByIdentitySql({ identityId }),
+			// No per-policy override → the global config default is read; here it is
+			// non-zero (2h), so a grace window opens instead of forcing enrollment.
+			getConfigSql({ login_mfa_grace_duration: PostgresInterval('02:00:00') }),
+			{
+				sql: SQL`update "tenant"."person" set "mfa_grace_until" = ? where "id" = ?`,
+				parameters: [new Date('2019-09-04 14:00'), personId],
+				response: { rowCount: 1 },
+			},
+			getConfigSql(),
+			getIdentityByIdSql({ identityId, roles: ['editor'] }),
+			requiringPolicy(),
+			getAllProjectRolesByIdentitySql({ identityId }),
+			createSessionKeySql({ apiKeyId, identityId }),
+			{
+				sql: `insert into  "tenant"."person_auth_log" ("id", "invoked_by_id", "type", "success", "metadata", "event_data") values  (?, ?, ?, ?, ?, ?)`,
+				parameters: [() => true, identityId, 'session_policy_applied', true, () => true, () => true],
+				response: { rowCount: 1 },
+			},
+			getIdentityProjectsSql({ identityId, projectId }),
+			selectMembershipsSql({ identityId, projectId, membershipsResponse: [] }),
+		],
+		return: (response: any) => {
+			expect(response.data.signIn.ok).toBe(true)
+			expect(response.data.signIn.result.token).toBe('0000000000000000000000000000000000000000')
+		},
+		expectedAuthLog: {
+			type: 'login',
+			response: expect.objectContaining({ ok: true }),
 		},
 	})
 })

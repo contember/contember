@@ -10,6 +10,7 @@ export type AuthPolicyRowResponse = {
 	mfaRequired?: boolean | null
 	tokenExpiration?: string | null
 	idleTimeout?: string | null
+	graceDuration?: string | null
 	rememberMeAllowed?: boolean | null
 }
 
@@ -26,6 +27,7 @@ export const getAuthPoliciesSql = (rows: AuthPolicyRowResponse[] = []): Expected
 			mfa_required: row.mfaRequired ?? null,
 			token_expiration: row.tokenExpiration ? PostgresInterval(row.tokenExpiration) : null,
 			idle_timeout: row.idleTimeout ? PostgresInterval(row.idleTimeout) : null,
+			grace_duration: row.graceDuration ? PostgresInterval(row.graceDuration) : null,
 			remember_me_allowed: row.rememberMeAllowed ?? null,
 			created_at: new Date('2026-05-21T00:00:00.000Z'),
 			updated_at: new Date('2026-05-21T00:00:00.000Z'),

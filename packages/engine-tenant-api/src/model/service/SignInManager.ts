@@ -1,20 +1,13 @@
 import { CreateSessionTokenErrorCode, MfaEnrollment, SignInErrorCode } from '../../schema'
 import { ApiKeyManager, AuthPolicyResolver, BackupCodeManager, EmailOtpManager, OtpManager } from '../service'
-import { PersonQuery, PersonRow, PersonUniqueIdentifier } from '../queries'
+import { ConfigurationQuery, PersonQuery, PersonRow, PersonUniqueIdentifier } from '../queries'
 import { Providers } from '../providers'
 import { DatabaseContext } from '../utils'
 import { Response, ResponseError, ResponseOk } from '../utils/Response'
 import { ImplementationException } from '../../exceptions'
 import { AuthLogService } from './AuthLogService'
 import { ApiKeyRequestInfo, SetMfaGraceUntilCommand } from '../commands'
-
-/**
- * MFA grace duration (seconds) granted on first sign-in against a requiring role
- * with no factor. Per the design, the default is 0 (immediate enforcement); the
- * value is sourced from this single constant so a config knob can replace it
- * later without touching the enforcement logic. Keep it 0 to preserve behavior.
- */
-const MFA_GRACE_DURATION_SECONDS = 0
+import { intervalToSeconds } from '../utils/interval'
 
 class SignInManager {
 	constructor(
@@ -160,6 +153,17 @@ class SignInManager {
 
 		const now = this.providers.now()
 
+		// Resolve the effective grace duration (seconds). A per-policy override
+		// wins; otherwise we fall back to the global config default. Only fetch the
+		// config when the override is absent, to keep query shapes minimal.
+		let graceSeconds: number
+		if (policy.graceDuration !== null) {
+			graceSeconds = intervalToSeconds(policy.graceDuration)
+		} else {
+			const config = await dbContext.queryHandler.fetch(new ConfigurationQuery(dbContext.providers))
+			graceSeconds = intervalToSeconds(config.login.mfaGraceDuration)
+		}
+
 		// Grace handling. Default grace duration is 0 (immediate enforcement), so
 		// by default neither branch below opens a window.
 		if (person.mfa_grace_until !== null) {
@@ -168,9 +172,9 @@ class SignInManager {
 				return null
 			}
 			// Grace expired → fall through to enforcement.
-		} else if (MFA_GRACE_DURATION_SECONDS > 0) {
+		} else if (graceSeconds > 0) {
 			// Open the grace window now and allow this sign-in.
-			const graceUntil = new Date(now.getTime() + MFA_GRACE_DURATION_SECONDS * 1000)
+			const graceUntil = new Date(now.getTime() + graceSeconds * 1000)
 			await dbContext.commandBus.execute(new SetMfaGraceUntilCommand(person.id, graceUntil))
 			return null
 		}

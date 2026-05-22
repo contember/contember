@@ -383,6 +383,7 @@ export type ConfigLogin = {
 	readonly defaultTokenExpiration: Scalars['Interval']['output']
 	readonly maxBackoff: Scalars['Interval']['output']
 	readonly maxTokenExpiration?: Maybe<Scalars['Interval']['output']>
+	readonly mfaGraceDuration: Scalars['Interval']['output']
 	/**
 	 * If false, signIn collapses NO_PASSWORD_SET / INVALID_PASSWORD into a
 	 * generic INVALID_CREDENTIALS and signUp omits the recommendedAction
@@ -400,6 +401,7 @@ export type ConfigLoginInput = {
 	readonly defaultTokenExpiration?: InputMaybe<Scalars['Interval']['input']>
 	readonly maxBackoff?: InputMaybe<Scalars['Interval']['input']>
 	readonly maxTokenExpiration?: InputMaybe<Scalars['Interval']['input']>
+	readonly mfaGraceDuration?: InputMaybe<Scalars['Interval']['input']>
 	readonly revealLoginMethod?: InputMaybe<Scalars['Boolean']['input']>
 	readonly revealUserExists?: InputMaybe<Scalars['Boolean']['input']>
 }
@@ -776,6 +778,7 @@ export type AuthPolicy = {
 	readonly mfaRequired?: Maybe<Scalars['Boolean']['output']>
 	readonly tokenExpiration?: Maybe<Scalars['Interval']['output']>
 	readonly idleTimeout?: Maybe<Scalars['Interval']['output']>
+	readonly mfaGraceDuration?: Maybe<Scalars['Interval']['output']>
 	readonly rememberMeAllowed?: Maybe<Scalars['Boolean']['output']>
 }
 
@@ -786,6 +789,7 @@ export type AuthPolicyInput = {
 	readonly mfaRequired?: InputMaybe<Scalars['Boolean']['input']>
 	readonly tokenExpiration?: InputMaybe<Scalars['Interval']['input']>
 	readonly idleTimeout?: InputMaybe<Scalars['Interval']['input']>
+	readonly mfaGraceDuration?: InputMaybe<Scalars['Interval']['input']>
 	readonly rememberMeAllowed?: InputMaybe<Scalars['Boolean']['input']>
 }
 
@@ -2706,6 +2710,7 @@ export type ConfigLoginResolvers<ContextType = any, ParentType extends Resolvers
 	defaultTokenExpiration?: Resolver<ResolversTypes['Interval'], ParentType, ContextType>
 	maxBackoff?: Resolver<ResolversTypes['Interval'], ParentType, ContextType>
 	maxTokenExpiration?: Resolver<Maybe<ResolversTypes['Interval']>, ParentType, ContextType>
+	mfaGraceDuration?: Resolver<ResolversTypes['Interval'], ParentType, ContextType>
 	revealLoginMethod?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
 	revealUserExists?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
 	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
@@ -3087,6 +3092,7 @@ export type AuthPolicyResolvers<
 	mfaRequired?: Resolver<Maybe<ResolversTypes['Boolean']>, ParentType, ContextType>
 	tokenExpiration?: Resolver<Maybe<ResolversTypes['Interval']>, ParentType, ContextType>
 	idleTimeout?: Resolver<Maybe<ResolversTypes['Interval']>, ParentType, ContextType>
+	mfaGraceDuration?: Resolver<Maybe<ResolversTypes['Interval']>, ParentType, ContextType>
 	rememberMeAllowed?: Resolver<Maybe<ResolversTypes['Boolean']>, ParentType, ContextType>
 	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
 }

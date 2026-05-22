@@ -25,7 +25,7 @@ export class AuthPolicyResolver {
 		// Fast path: with no policies configured, enforcement is inert and we skip
 		// the cross-project role query entirely (preserves today's query shape).
 		if (policies.length === 0) {
-			return { mfaRequired: false, tokenExpiration: null, idleTimeout: null, rememberMeAllowed: null }
+			return { mfaRequired: false, tokenExpiration: null, idleTimeout: null, graceDuration: null, rememberMeAllowed: null }
 		}
 		const projectRoles = await db.queryHandler.fetch(new AllProjectRolesByIdentityQuery(identityId))
 
@@ -68,6 +68,7 @@ export class AuthPolicyResolver {
 		let mfaRequired = false
 		let tokenExpiration: IPostgresInterval | null = null
 		let idleTimeout: IPostgresInterval | null = null
+		let graceDuration: IPostgresInterval | null = null
 		let rememberMeAllowed: boolean | null = null
 
 		for (const policy of policies) {
@@ -76,6 +77,7 @@ export class AuthPolicyResolver {
 			}
 			tokenExpiration = this.shortest(tokenExpiration, policy.token_expiration)
 			idleTimeout = this.shortest(idleTimeout, policy.idle_timeout)
+			graceDuration = this.shortest(graceDuration, policy.grace_duration)
 			if (policy.remember_me_allowed === false) {
 				rememberMeAllowed = false
 			} else if (policy.remember_me_allowed === true && rememberMeAllowed === null) {
@@ -83,7 +85,7 @@ export class AuthPolicyResolver {
 			}
 		}
 
-		return { mfaRequired, tokenExpiration, idleTimeout, rememberMeAllowed }
+		return { mfaRequired, tokenExpiration, idleTimeout, graceDuration, rememberMeAllowed }
 	}
 
 	/** Strictest wins: returns the shorter of two intervals (NULL = unconstrained). */

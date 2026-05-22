@@ -116,7 +116,8 @@ CREATE TABLE "auth_policy" (
     "idle_timeout" interval,
     "remember_me_allowed" boolean,
     "created_at" timestamp with time zone DEFAULT "now"() NOT NULL,
-    "updated_at" timestamp with time zone DEFAULT "now"() NOT NULL
+    "updated_at" timestamp with time zone DEFAULT "now"() NOT NULL,
+    "grace_duration" interval
 );
 CREATE TABLE "config" (
     "id" "config_singleton" DEFAULT 'singleton'::"config_singleton" NOT NULL,
@@ -150,6 +151,7 @@ CREATE TABLE "config" (
     "rate_limit_passwordless_init_per_ip_limit" integer DEFAULT 0 NOT NULL,
     "rate_limit_passwordless_init_per_ip_window" interval DEFAULT '01:00:00'::interval NOT NULL,
     "login_reveal_login_method" boolean DEFAULT true NOT NULL,
+    "login_mfa_grace_duration" interval DEFAULT '00:00:00'::interval NOT NULL,
     CONSTRAINT "config_captcha_complete" CHECK ((("captcha_provider" IS NULL) OR (("captcha_secret" IS NOT NULL) AND ("captcha_secret_version" IS NOT NULL)))),
     CONSTRAINT "config_captcha_provider_check" CHECK ((("captcha_provider" IS NULL) OR ("captcha_provider" = ANY (ARRAY['turnstile'::"text", 'hcaptcha'::"text", 'recaptchaV3'::"text"]))))
 );

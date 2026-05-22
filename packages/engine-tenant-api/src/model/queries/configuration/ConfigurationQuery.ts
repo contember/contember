@@ -45,6 +45,7 @@ export class ConfigurationQuery extends DatabaseQuery<Config> {
 				revealLoginMethod: result.login_reveal_login_method,
 				defaultTokenExpiration: result.login_default_token_expiration,
 				maxTokenExpiration: result.login_max_token_expiration,
+				mfaGraceDuration: result.login_mfa_grace_duration,
 			},
 			captcha: {
 				provider: result.captcha_provider,

@@ -1,5 +1,6 @@
 import { createAclVariables, ExecutionContainerFactory } from '@contember/engine-content-api'
 import { StageBySlugQuery } from '@contember/engine-system-api'
+import { Client } from '@contember/database'
 import { GraphQLSchema } from 'graphql'
 import { HttpController } from '../application'
 import { HttpErrorResponse, HttpResponse } from '../common'
@@ -8,8 +9,10 @@ import { ProjectContextResolver } from '../project-common'
 import { ContentQueryHandler, ContentQueryHandlerFactory } from './ContentQueryHandlerFactory'
 import { GraphQlSchemaFactory } from './GraphQlSchemaFactory'
 import { NotModifiedChecker } from './NotModifiedChecker'
+import { TestTransactionService } from '../testing'
 
 const debugHeader = 'x-contember-debug'
+const testSessionHeader = 'x-contember-test-session'
 
 export class ContentApiControllerFactory {
 	constructor(
@@ -18,6 +21,7 @@ export class ContentApiControllerFactory {
 		private readonly handlerFactory: ContentQueryHandlerFactory,
 		private readonly projectContextResolver: ProjectContextResolver,
 		private readonly graphQlSchemaFactory: GraphQlSchemaFactory,
+		private readonly testTransactionService: TestTransactionService,
 	) {
 	}
 
@@ -90,6 +94,27 @@ export class ContentApiControllerFactory {
 
 			const schemaDatabaseMetadata = await projectContainer.projectDatabaseMetadataResolver.resolveDatabaseMetadata(systemDatabase, schema, stage.schema)
 
+			// Test-transaction mode: if the request carries a session header, bind its content DB
+			// client to the session's pinned (rolled-back-later) transaction. Decided here, from the
+			// request itself — no async-context routing.
+			let testContentDatabase: Client | undefined
+			if (this.testTransactionService.isEnabled()) {
+				const headerValue = request.headers[testSessionHeader]
+				if (headerValue !== undefined) {
+					const token = Array.isArray(headerValue) ? headerValue[0] : headerValue
+					testContentDatabase = await this.testTransactionService.resolveContentClient(
+						token,
+						project.slug,
+						projectContainer.connection,
+						stage.schema,
+						{ module: 'content' },
+					)
+					if (!testContentDatabase) {
+						return new HttpErrorResponse(400, 'Unknown or expired test transaction session')
+					}
+				}
+			}
+
 			const handler = await (async () => {
 				const existingHandler = handlerCache.get(graphQlSchema)
 				if (existingHandler) {
@@ -113,7 +138,7 @@ export class ContentApiControllerFactory {
 							}
 
 							const connection = operation === 'query' ? projectContainer.readConnection : projectContainer.connection
-							const contentDatabase = connection.createClient(stage.schema, { module: 'content' })
+							const contentDatabase = testContentDatabase ?? connection.createClient(stage.schema, { module: 'content' })
 
 							const identityVariables = createAclVariables(schema.acl, memberships)
 							let identityId = authResult.identityId

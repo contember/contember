@@ -23,6 +23,7 @@ export * from './projectGroup/ProjectGroupContainer'
 export * from './projectGroup/ProjectGroupResolver'
 export type { ProjectGroupContainerResolver } from './projectGroup/ProjectGroupContainerResolver'
 
+export * from './testing'
 export * from './utils/serverStartup'
 export * from './utils/serverTermination'
 export * from './utils/sentry'

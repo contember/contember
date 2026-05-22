@@ -48,6 +48,7 @@ import {
 } from './transfer'
 import { CryptoWrapper } from './utils/CryptoWrapper'
 import { ApplicationWorkerManager } from './workers'
+import { TestTransactionService } from './testing'
 
 export type ProcessType =
 	| 'singleNode'
@@ -201,18 +202,33 @@ export class MasterContainerFactory {
 					projectGroupContainerResolver,
 				)
 			})
+			.addService('testTransactionService', ({ serverConfig }) =>
+				new TestTransactionService(
+					serverConfig.test?.transactions ?? false,
+					(serverConfig.test?.transactionTtlSeconds ?? 60) * 1000,
+				))
 			.addService('notModifiedChecker', () => new NotModifiedChecker())
 			.addService('contentQueryHandlerFactory', ({ debugMode }) => new ContentQueryHandlerFactory(debugMode))
 			.addService('projectContextResolver', () => new ProjectContextResolver())
 			.addService(
 				'contentApiMiddlewareFactory',
-				({ projectContextResolver, notModifiedChecker, executionContainerFactory, contentQueryHandlerFactory, graphQlSchemaFactory }) =>
+				(
+					{
+						projectContextResolver,
+						notModifiedChecker,
+						executionContainerFactory,
+						contentQueryHandlerFactory,
+						graphQlSchemaFactory,
+						testTransactionService,
+					},
+				) =>
 					new ContentApiControllerFactory(
 						notModifiedChecker,
 						executionContainerFactory,
 						contentQueryHandlerFactory,
 						projectContextResolver,
 						graphQlSchemaFactory,
+						testTransactionService,
 					),
 			)
 			.addService('tenantApiMiddlewareFactory', () => new TenantApiMiddlewareFactory())
@@ -258,7 +274,14 @@ export class MasterContainerFactory {
 				'application',
 				(
 					it,
-					{ contentApiMiddlewareFactory, tenantApiMiddlewareFactory, systemApiMiddlewareFactory, importApiMiddlewareFactory, exportApiMiddlewareFactory },
+					{
+						contentApiMiddlewareFactory,
+						tenantApiMiddlewareFactory,
+						systemApiMiddlewareFactory,
+						importApiMiddlewareFactory,
+						exportApiMiddlewareFactory,
+						testTransactionService,
+					},
 				) => {
 					it.addRoute('content', '/content/:projectSlug/:stageSlug', contentApiMiddlewareFactory.create())
 					it.addRoute('tenant', '/tenant', tenantApiMiddlewareFactory.create())
@@ -270,6 +293,21 @@ export class MasterContainerFactory {
 					it.addInternalRoute('internal', '/health', () => {
 						return new HttpResponse(200, 'OK')
 					})
+
+					if (testTransactionService.isEnabled()) {
+						it.addInternalRoute('test', '/test/transaction', async ({ koa }) => {
+							const method = koa.request.method
+							if (method === 'POST') {
+								return new HttpResponse(200, JSON.stringify({ token: testTransactionService.begin() }), 'application/json')
+							}
+							if (method === 'DELETE') {
+								const token = koa.get('x-contember-test-session')
+								const ok = token ? await testTransactionService.rollback(token) : false
+								return new HttpResponse(ok ? 200 : 404, JSON.stringify({ ok }), 'application/json')
+							}
+							return new HttpResponse(405, JSON.stringify({ error: 'Method not allowed' }), 'application/json')
+						})
+					}
 				},
 			)
 			.addService('initializer', ({ projectGroupContainer }) => new Initializer(projectGroupContainer))

@@ -103,5 +103,9 @@ export const configTemplate: any = {
 				dsn: '%?env.SENTRY_DSN%',
 			},
 		},
+		test: {
+			transactions: '%?env.CONTEMBER_TEST_TRANSACTIONS::bool%',
+			transactionTtlSeconds: '%?env.CONTEMBER_TEST_TRANSACTION_TTL_SECONDS::number%',
+		},
 	},
 }

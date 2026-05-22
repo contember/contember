@@ -1,19 +1,38 @@
+# Host ports are env-overridable so multiple checkouts (e.g. git worktrees) can run
+# their own engine side by side. Defaults below match the canonical single-checkout setup.
+#
+# Running the engine from a git worktree:
+#   1. Copy this file to docker-compose.override.yaml (gitignored) in the worktree.
+#   2. Set a unique project name AND a non-clashing port range, e.g. in a `.env` file:
+#        COMPOSE_PROJECT_NAME=contember-oss-myworktree
+#        CONTEMBER_ENGINE_PORT=3101
+#        CONTEMBER_ADMINER_PORT=3102
+#        CONTEMBER_MINIO_PORT=3103
+#        CONTEMBER_POSTGRES_PORT=3105
+#        CONTEMBER_MAILHOG_PORT=3106
+#      (COMPOSE_PROJECT_NAME is required — otherwise two worktrees both default to their
+#       directory name and collide on container/volume names.)
+#   3. `docker compose up engine mailhog --detach`
+# e2e against it: CONTEMBER_API_URL=http://localhost:$CONTEMBER_ENGINE_PORT, MAILHOG_URL=http://localhost:$CONTEMBER_MAILHOG_PORT
 services:
   playground:
     user: '1000:1000'
-    ports: [ '3000:3000' ]
+    ports: [ '${CONTEMBER_PLAYGROUND_PORT:-3000}:3000' ]
 
   engine:
-    ports: [ '3001:4000' ]
+    ports: [ '${CONTEMBER_ENGINE_PORT:-3001}:4000' ]
 
   adminer:
-    ports: [ '3002:8080' ]
+    ports: [ '${CONTEMBER_ADMINER_PORT:-3002}:8080' ]
 
   minio:
-    ports: [ '3003:9000' ]
+    ports: [ '${CONTEMBER_MINIO_PORT:-3003}:9000' ]
 
   postgres:
-    ports: [ '3005:5432' ]
+    ports: [ '${CONTEMBER_POSTGRES_PORT:-3005}:5432' ]
+
+  mailhog:
+    ports: [ '${CONTEMBER_MAILHOG_PORT:-3006}:8025' ]
 
 #---- project groups
 #services:

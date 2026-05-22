@@ -80,6 +80,8 @@ const makeContext = (overrides: {
 		identity: { id: overrides.identityId ?? 'caller-id', roles: ['super_admin'] } as any,
 		permissionContext: {} as any,
 		apiKeyId: 'api-key-id',
+		trustForwardedInfo: false,
+		httpInfo: { ip: '127.0.0.1' },
 		isAllowed: async () => overrides.allowed !== false,
 		requireAccess: async () => {
 			if (overrides.allowed === false) {

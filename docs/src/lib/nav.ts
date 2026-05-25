@@ -217,6 +217,7 @@ export const nav: NavItem[] = [
 		items: [
 			doc('guides/deploy-contember'),
 			doc('cloud/permissions'),
+			doc('cloud/api'),
 		],
 	},
 	{

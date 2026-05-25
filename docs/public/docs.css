@@ -315,6 +315,30 @@ a:hover {
 	margin-top: 1.4rem;
 }
 
+/* A standalone top-level page (e.g. Contember CLI) reads as a peer of the
+   section headers, not a stray nested link. */
+.sidebar > .sidebar__list > .sidebar__item {
+	margin-top: 1.4rem;
+}
+
+.sidebar > .sidebar__list > .sidebar__item > .sidebar__link {
+	font-weight: 650;
+	font-size: 0.7rem;
+	letter-spacing: 0.06em;
+	text-transform: uppercase;
+	color: var(--text-faint);
+}
+
+.sidebar > .sidebar__list > .sidebar__item > .sidebar__link:hover {
+	color: var(--text);
+	background: transparent;
+}
+
+.sidebar > .sidebar__list > .sidebar__item > .sidebar__link--active {
+	color: var(--accent-strong);
+	background: transparent;
+}
+
 /* ── Table of contents ── */
 .toc__title {
 	font-size: 0.7rem;

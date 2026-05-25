@@ -1,0 +1,114 @@
+---
+title: Profile and password changes
+---
+
+Two pairs of mutations let persons (and administrators) update profile and credentials:
+
+| Self-service | Admin |
+|---|---|
+| `changeMyProfile(email, name)` | `changeProfile(personId, email, name)` |
+| `changeMyPassword(currentPassword, newPassword)` | `changePassword(personId, password)` |
+
+The self-service variants require the caller to be authenticated as the person being changed; the admin variants take a `personId` and are gated by per-target permission checks.
+
+## Self-service
+
+### Change my profile
+
+```graphql
+mutation {
+  changeMyProfile(email: "new@example.com", name: "Alice Example") {
+    ok
+    error { code developerMessage }
+  }
+}
+```
+
+Pass either field individually — omitted fields are left unchanged. Setting `name: ""` clears the name.
+
+Errors:
+
+| Code | Cause |
+|---|---|
+| `NOT_A_PERSON` | Caller is authenticated via a permanent API key, not a person. |
+| `INVALID_EMAIL_FORMAT` | Email failed format validation. |
+| `EMAIL_ALREADY_EXISTS` | Email is already used by another person. |
+
+A successful email change records `email_change` in the [audit log](/reference/engine/tenant/audit-log).
+
+### Change my password
+
+```graphql
+mutation {
+  changeMyPassword(currentPassword: "…", newPassword: "…") {
+    ok
+    error {
+      code
+      weakPasswordReasons
+      developerMessage
+    }
+  }
+}
+```
+
+The caller must supply their current password — this protects against session hijack where an attacker holding a session token tries to lock out the user.
+
+Errors:
+
+| Code | Cause |
+|---|---|
+| `NOT_A_PERSON` | Caller is authenticated via a permanent API key. |
+| `NO_PASSWORD_SET` | The person has no password (IDP-only / passwordless-only). Use [password reset](/reference/engine/tenant/password-reset) to *set* the first password. |
+| `INVALID_PASSWORD` | `currentPassword` is wrong. |
+| `TOO_WEAK` | `newPassword` failed [password policy](/reference/engine/tenant/password-policy). `weakPasswordReasons[]` carries reasons including `COMPROMISED` *(since 2.2)*. |
+
+A successful change records `password_change` in the audit log.
+
+## Admin
+
+### Change someone's profile
+
+```graphql
+mutation {
+  changeProfile(personId: "…", email: "new@example.com", name: "Alice") {
+    ok
+    error { code developerMessage }
+  }
+}
+```
+
+Gated by `PERSON_CHANGE_PROFILE` against the *target's* roles — a `PROJECT_ADMIN` can change profiles of persons whose roles do not exceed their own; `SUPER_ADMIN` is unrestricted.
+
+Errors: `PERSON_NOT_FOUND`, `INVALID_EMAIL_FORMAT`, `EMAIL_ALREADY_EXISTS`.
+
+### Set someone's password
+
+```graphql
+mutation {
+  changePassword(personId: "…", password: "…") {
+    ok
+    error {
+      code
+      weakPasswordReasons
+      developerMessage
+    }
+  }
+}
+```
+
+Gated by `PERSON_CHANGE_PASSWORD` against the target's roles. No current-password check — the admin is trusted by policy.
+
+Use cases:
+
+- Forced credential rotation after a known compromise.
+- Setting a temporary password before invoking [`forceSignOutPerson`](/reference/engine/tenant/sessions#admin-force-sign-out) to lock the person out of their existing sessions.
+- Bulk migration scripts.
+
+The new password is validated against the active [password policy](/reference/engine/tenant/password-policy) just like the self-service path. Records `password_change` in the audit log.
+
+## When the person has no password
+
+`changeMyPassword` returns `NO_PASSWORD_SET` for persons created via IDP or passwordless-only flows. To set an initial password, either:
+
+- Trigger the public [password reset](/reference/engine/tenant/password-reset) flow.
+- Have an admin call `changePassword` directly.

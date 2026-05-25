@@ -1,0 +1,126 @@
+---
+title: Slots
+---
+
+# <span className="version">Interface 1.2+</span> Slots
+
+**Use Slots to render contents of your page the other areas of the layout.**
+
+Every Contember component can [access data binding context](/reference/interface/data-binding/overview/)
+and render it to the page but this composition is limited to how the content might be rendered as is.
+
+For example you can't render a persist button to save the form in the header from the page because
+it is nested within the descendants of the page that is rendered in the layout.
+
+To overcome this limitation slots provide a way to *escape*  and render to other parts of the layout easily, even
+the parts that are not directly descendants of the page, e.g. header or footer of the layout.
+
+## What are slots?
+
+**Layout slots** are React components that can be used to render content in predefined
+places of the layout. Each `SlotSource` can render (append) its children to the target as
+[createPortal()](https://react.dev/reference/react-dom/createPortal) would do.
+
+This is useful when you want to render a button in the footer, header, sidebar or any
+other place of the layout that is not directly accessible from within inside of the rendered page.
+
+## Defining your slots
+
+Slots are made of two pair components. One component is used to render content to the portal (source)
+and the other component is used to render the content from the portal (target).
+
+To create your slot you need to create two components:
+
+- **SlotSource** – React component that will be used to [render content from pages](#1-rendering-content-to-slot-from-the-page)
+- **SlotTarget** – React component that will be used in place where you want to render content
+
+**`admin/lib/components/slots.tsx`**
+
+```tsx
+import { createSlotComponents } from '@contember/react-slots'
+import { useChildrenAsLabel, useDocumentTitle } from '@contember/react-utils'
+import { memo, ReactNode } from 'react'
+
+export const [, Slots, SlotTargets] = createSlotComponents([
+	'Title',
+	'Logo',
+	'Navigation',
+	'Footer',
+	'Back',
+	'Content',
+	'ContentHeader',
+	'Sidebar',
+	'Actions',
+])
+export const Title = memo<{ children: ReactNode }>(({ children }) => {
+	const titleText = useChildrenAsLabel(children)
+	useDocumentTitle(titleText)
+
+	return (
+		<Slots.Title>{children}</Slots.Title>
+	)
+})
+```
+
+## Rendering page content to a slot source
+
+By wrapping the content in the slot source component, instead of rendering it as an immediate
+descendants of the page, you will create a *portal* that will render the content to the
+target component.
+
+**`admin/pages/my-page.tsx`**
+
+```tsx
+import { Slots } from '@app/libs/components/slots'
+
+export default () => (
+	<Slots.Actions>
+		<a href="#">Some action</a>
+	</Slots.Actions>
+)
+```
+
+## Placing slot targets in the layout
+
+- **useHasActiveSlotsFactory()** – Hook that returns a function that returns `true` if there is any content
+to render, otherwise it returns `false` which gives you even more control to compose layout.
+
+**`admin/libs/components/layout.tsx`**
+
+```tsx
+import { useHasActiveSlotsFactory } from '@contember/react-slots'
+import { SlotTargets } from './slots'
+
+export const Layout = ({ children }: React.PropsWithChildren) => {
+	const isActive = useHasActiveSlotsFactory()
+
+	return (
+		<div className="layout">
+			{isActive('Back', 'Title') && (
+				<>
+					<SlotTargets.Back />
+					<SlotTargets.Title as="h1" />
+				</>
+			)}
+
+
+			{isActive('Actions') && (
+				<div className="layout__actions">
+					<SlotTargets.Actions />
+				</div>
+			)}
+
+			{children}
+		</div>
+	)
+}
+```
+
+:::note
+Slots use `React.createPortal` under the hood. But  Slots gives you extra tools to control how your layout behaves, when there is no content to render.
+:::
+
+## Context Providers
+
+Using slots is optional. Their respective providers are included in our project templates in the application entry point.
+Once you decide to go your own way just remove the `<Slots.Provider>` from the `index.tsx` file.

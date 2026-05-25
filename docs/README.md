@@ -1,41 +1,48 @@
-# Website
+# Contember Documentation
 
-This website is built using [Docusaurus](https://docusaurus.io/), a modern static website generator.
+A lightweight, Bun-powered docs site built with [Pletivo](https://github.com/contember/pletivo).
+Content is plain Markdown/MDX; the theme (navbar, sidebar, table of contents,
+admonitions, code highlighting, search) is a small set of JSX components — no
+framework config beyond `pletivo.config.ts`.
 
-### Installation
+## Develop
 
-```
-$ yarn
-```
-
-### Local Development
-
-```
-$ yarn start
+```bash
+bun install
+bun run dev      # dev server with HMR on http://localhost:3010
 ```
 
-This command starts a local development server and opens up a browser window. Most changes are reflected live without having to restart the server.
+## Build
 
-### Build
-
-```
-$ yarn build
-```
-
-This command generates static content into the `build` directory and can be served using any static contents hosting service.
-
-### Deployment
-
-Using SSH:
-
-```
-$ USE_SSH=true yarn deploy
+```bash
+bun run build    # static output → build/
+bun run serve    # preview the built site
 ```
 
-Not using SSH:
+## Structure
 
 ```
-$ GIT_USER=<Your GitHub username> yarn deploy
+src/
+  content/docs/        Markdown/MDX pages (the docs themselves)
+  components/          Theme components (DocLayout, Sidebar, Toc, Navbar, …)
+  lib/                 nav tree, doc lookups, TOC extraction, remark plugins
+  pages/
+    index.tsx          Homepage (renders the doc with `slug: /`)
+    [...slug].tsx      Every other doc, by its content path
+public/                Static assets (img/, assets/) and docs.css
+pletivo.config.ts      MDX pipeline: admonitions, heading slugs, Shiki
 ```
 
-If you are using GitHub pages for hosting, this command is a convenient way to build the website and push to the `gh-pages` branch.
+### Authoring
+
+- Add a `.mdx` file under `src/content/docs/` and reference it in `src/lib/nav.ts`
+  to place it in the sidebar.
+- Admonitions use the familiar `:::note`, `:::tip[Title]`, `:::caution`,
+  `:::danger`, `:::important` syntax.
+- Internal links are absolute and extensionless, e.g. `[ACL](/reference/engine/schema/acl)`.
+
+### Search
+
+Search uses Algolia DocSearch (`@docsearch/js` from the CDN) pointed at the
+existing `docs-contember` index. The Algolia crawler is configured outside this
+repo; it indexes the deployed HTML.

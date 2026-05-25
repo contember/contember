@@ -33,6 +33,7 @@ import {
 	MigrationDescribeCommand,
 	MigrationDiffCommand,
 	MigrationExecuteCommand,
+	MigrationInitStateCommand,
 	MigrationRebaseCommand,
 	MigrationStatusCommand,
 	ProjectGenerateDocumentationCommand,
@@ -239,10 +240,22 @@ export const createContainer = ({ env, version, runtime, workspace }: {
 		)
 		.addService(
 			'migrationDiffCommand',
-			({ schemaLoader, schemaVersionBuilder, migrationCreator, migrationPrinter, migrationExecutionFacade, schemaStateManager }) =>
-				new MigrationDiffCommand(schemaLoader, schemaVersionBuilder, migrationCreator, migrationPrinter, migrationExecutionFacade, schemaStateManager),
+			({ schemaLoader, schemaVersionBuilder, migrationCreator, migrationPrinter, migrationExecutionFacade, schemaStateManager, migrationsResolver }) =>
+				new MigrationDiffCommand(
+					schemaLoader,
+					schemaVersionBuilder,
+					migrationCreator,
+					migrationPrinter,
+					migrationExecutionFacade,
+					schemaStateManager,
+					migrationsResolver,
+				),
 		)
 		.addService('migrationExecuteCommand', ({ migrationExecutionFacade }) => new MigrationExecuteCommand(migrationExecutionFacade))
+		.addService(
+			'migrationInitStateCommand',
+			({ schemaLoader, schemaStateManager }) => new MigrationInitStateCommand(schemaLoader, schemaStateManager),
+		)
 		.addService(
 			'migrationRebaseCommand',
 			({ migrationsResolver, migrationRebaseFacade }) => new MigrationRebaseCommand(migrationsResolver, migrationRebaseFacade),
@@ -289,6 +302,7 @@ export const createContainer = ({ env, version, runtime, workspace }: {
 				['migrations:diff']: () => dic.migrationDiffCommand,
 				['migrations:amend']: () => dic.migrationAmendCommand,
 				['migrations:blank']: () => dic.migrationBlankCommand,
+				['migrations:init-state']: () => dic.migrationInitStateCommand,
 				['migrations:describe']: () => dic.migrationDescribeCommand,
 				['migrations:execute']: () => dic.migrationExecuteCommand,
 				['migrations:rebase']: () => dic.migrationRebaseCommand,

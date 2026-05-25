@@ -1,7 +1,7 @@
 import { Command, CommandConfiguration, Input } from '@contember/cli-common'
 import { InvalidSchemaException } from '@contember/schema-migrations'
 import prompts from 'prompts'
-import { MigrationCreator, SchemaStateManager, SchemaVersionBuilder } from '@contember/migrations-client'
+import { MigrationCreator, MigrationsResolver, SchemaStateManager, SchemaVersionBuilder } from '@contember/migrations-client'
 import { SchemaLoader } from '../../lib/schema/SchemaLoader'
 import { MigrationPrinter } from '../../lib/migrations/MigrationPrinter'
 import { MigrationExecutionFacade } from '../../lib/migrations/MigrationExecutionFacade'
@@ -25,6 +25,7 @@ export class MigrationDiffCommand extends Command<Args, Options> {
 		private readonly migrationPrinter: MigrationPrinter,
 		private readonly migrationExecutorFacade: MigrationExecutionFacade,
 		private readonly schemaStateManager: SchemaStateManager,
+		private readonly migrationsResolver: MigrationsResolver,
 	) {
 		super()
 	}
@@ -48,7 +49,15 @@ export class MigrationDiffCommand extends Command<Args, Options> {
 		const skipInitialSchemaValidation = input.getOption('skip-initial-schema-validation') === true
 
 		const schema = await this.schemaLoader.loadSchema()
-		const stateMode = await this.schemaStateManager.isStateMode()
+		let stateMode = await this.schemaStateManager.isStateMode()
+
+		// New project (no migrations yet) defaults to schema state mode. To opt out, create a migration first (e.g. `migrations:blank`).
+		if (!stateMode && (await this.migrationsResolver.getSchemaMigrations()).length === 0) {
+			console.log('No migrations found — enabling schema state mode for this project.')
+			console.log('ACL, validation, actions and settings will be managed in the state/ directory instead of migrations.')
+			await this.schemaStateManager.extractState(schema)
+			stateMode = true
+		}
 
 		try {
 			const initialSchema = await this.schemaVersionBuilder.buildSchema()

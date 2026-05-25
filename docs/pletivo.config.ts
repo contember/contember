@@ -19,7 +19,22 @@ export default defineConfig({
 		],
 		rehypePlugins: [
 			rehypeSlug,
-			[rehypeShiki, { theme: 'night-owl' }],
+			[
+				rehypeShiki,
+				{
+					themes: { light: 'github-light', dark: 'night-owl' },
+					defaultColor: false,
+					// Expose the language on <pre> so the code-block chrome can label it.
+					transformers: [
+						{
+							name: 'data-lang',
+							pre(node: any) {
+								node.properties['data-lang'] = this.options.lang
+							},
+						},
+					],
+				},
+			],
 		],
 	},
 })

@@ -1,4 +1,5 @@
 import Search from './Search'
+import ThemeToggle from './ThemeToggle'
 
 export default function Navbar() {
 	return (
@@ -16,6 +17,7 @@ export default function Navbar() {
 					<Search />
 					<a className="navbar__icon" href="https://github.com/contember">GitHub</a>
 					<a className="navbar__icon" href="https://www.youtube.com/@cntmbr">YouTube</a>
+					<ThemeToggle />
 				</div>
 			</div>
 		</header>

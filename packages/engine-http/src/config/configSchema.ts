@@ -175,6 +175,10 @@ export const serverConfigSchema = Typesafe.partial({
 	monitoringPort: Typesafe.number,
 	workerCount: Typesafe.union(Typesafe.number, Typesafe.string),
 	applicationWorker: Typesafe.string,
+	test: Typesafe.partial({
+		transactions: Typesafe.boolean,
+		transactionTtlSeconds: Typesafe.number,
+	}),
 })
 
 export const stageConfig = Typesafe.record(

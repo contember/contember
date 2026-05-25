@@ -168,6 +168,7 @@ const sidebars: SidebarsConfig = {
 								'reference/engine/content/advanced/assume-membership',
 								'reference/engine/content/advanced/request-debugging',
 								'reference/engine/content/advanced/caching',
+								'reference/engine/content/advanced/test-transactions',
 							],
 						},
 					],

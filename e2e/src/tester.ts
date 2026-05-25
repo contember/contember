@@ -34,14 +34,22 @@ afterEach(() => {
 	// }
 })
 
+// PoC: when set, every GraphQL request carries the test-session header, so the engine
+// (with CONTEMBER_TEST_TRANSACTIONS=true) routes it through a rolled-back transaction.
+let testSessionToken: string | undefined
+
 export const executeGraphql = (
 	path: string,
 	query: string,
 	options: { authorizationToken?: string; variables?: Record<string, any>; keepExtensions?: boolean },
 ) => {
-	const result = supertest(apiUrl)
+	const request = supertest(apiUrl)
 		.post(path)
 		.set('Authorization', 'Bearer ' + (options.authorizationToken || rootToken))
+	if (testSessionToken) {
+		request.set('X-Contember-Test-Session', testSessionToken)
+	}
+	const result = request
 		.send({
 			query,
 			variables: options.variables || {},
@@ -99,6 +107,28 @@ const executeMigrations = async (projectSlug: string, modifications: Migration.M
 }
 
 export const rand = () => Math.random().toString(36).slice(2)
+
+/**
+ * PoC: run `fn` with all GraphQL requests bound to a fresh server-side transaction that is
+ * rolled back afterwards. Requires the engine to run with `CONTEMBER_TEST_TRANSACTIONS=true`.
+ */
+export const withTestTransaction = async <T>(fn: () => Promise<T>): Promise<T> => {
+	const beginRes = await fetch(apiUrl + '/test/transaction', { method: 'POST' })
+	if (!beginRes.ok) {
+		throw new Error(`Failed to begin test transaction (HTTP ${beginRes.status}). Is CONTEMBER_TEST_TRANSACTIONS=true?`)
+	}
+	const { token } = await beginRes.json() as { token: string }
+	testSessionToken = token
+	try {
+		return await fn()
+	} finally {
+		testSessionToken = undefined
+		await fetch(apiUrl + '/test/transaction', {
+			method: 'DELETE',
+			headers: { 'X-Contember-Test-Session': token },
+		})
+	}
+}
 
 export const createTester = async (schema: Schema) => {
 	const projectSlug = 'test_' + rand()

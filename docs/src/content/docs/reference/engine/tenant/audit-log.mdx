@@ -42,7 +42,11 @@ Every entry carries:
 | `password_reset_init` | `createResetPasswordRequest` |
 | `password_reset` | `resetPassword` |
 | `password_change` | `changePassword`, `changeMyPassword` |
-| `email_change` | `changeProfile`, `changeMyProfile` (email field) |
+| `email_change` | `changeProfile`, `changeMyProfile` (email field, immediate change) |
+| `email_verify_init` | *(since 2.2)* A verification mail is sent — `signUp` (when required) or `requestEmailVerification` |
+| `email_verify_complete` | *(since 2.2)* `verifyEmail` |
+| `email_change_init` | *(since 2.2)* `changeMyProfile` initiates a verified e-mail change |
+| `email_change_complete` | *(since 2.2)* `confirmEmailChange` |
 | `2fa_enable`, `2fa_disable` | `confirmOtp`, `disableOtp` |
 
 ### Session events (since 2.2)

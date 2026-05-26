@@ -13,6 +13,9 @@ Mail templates in Contember enable tailored communication for emails dispatched 
 | `RESET_PASSWORD_REQUEST` | `createResetPasswordRequest` is called for an existing person. Carries the reset token / link. | 1.x |
 | `PASSWORDLESS_SIGN_IN` | `initSignInPasswordless` succeeds. Carries the magic link and OTP info. | 1.x |
 | `FORCED_SIGN_OUT` | An admin force-signs-out the person via `forceSignOutPerson`. Informational notice that all sessions were ended. | 2.2 |
+| `EMAIL_VERIFICATION` | `signUp` (when `signup.requireEmailVerification` is on) or `requestEmailVerification`. Carries the verification token. See [e-mail verification](/reference/engine/tenant/email-verification). | 2.2 |
+| `EMAIL_CHANGE_VERIFY` | A self-service e-mail change is initiated via `changeMyProfile` with `emailChange.requireVerification` on. Sent to the **new** address; carries the confirmation token. | 2.2 |
+| `EMAIL_CHANGE_NOTIFY` | `confirmEmailChange` succeeds. Sent to the **old** address as a security notice. | 2.2 |
 
 Each type ships with a default template. In Contember Cloud setups, enhanced custom templates are pre-installed and can be modified or overwritten.
 
@@ -41,7 +44,7 @@ Each type ships with a default template. In Contember Cloud setups, enhanced cus
    }
    ```
   Input breakdown:
-- `type`: The mail type — one of the values from the table above (`NEW_USER_INVITED`, `EXISTING_USER_INVITED`, `RESET_PASSWORD_REQUEST`, `PASSWORDLESS_SIGN_IN`, `FORCED_SIGN_OUT`).
+- `type`: The mail type — one of the values from the table above (`NEW_USER_INVITED`, `EXISTING_USER_INVITED`, `RESET_PASSWORD_REQUEST`, `PASSWORDLESS_SIGN_IN`, `FORCED_SIGN_OUT`, `EMAIL_VERIFICATION`, `EMAIL_CHANGE_VERIFY`, `EMAIL_CHANGE_NOTIFY`).
 - `subject`: The email's subject.
 - `content`: The email's main content, with Mustache variables for dynamic information.
 - `projectSlug`: To specify a particular project.
@@ -113,6 +116,22 @@ Contember uses Mustache for dynamic content in templates. Here are the variables
 - **FORCED_SIGN_OUT** *(since 2.2)*:
 - `{{email}}`: Recipient's email.
 - `{{reason}}`: Optional reason supplied by the admin to `forceSignOutPerson`. Empty when no reason was provided.
+
+- **EMAIL_VERIFICATION** *(since 2.2)*:
+- `{{email}}`: Address being verified.
+- `{{token}}`: Verification token.
+- `{{project}}`: Project name (if available).
+- `{{projectSlug}}`: Project identifier (if available).
+
+- **EMAIL_CHANGE_VERIFY** *(since 2.2)* — sent to the **new** address:
+- `{{email}}`: The new address being confirmed.
+- `{{token}}`: Confirmation token.
+- `{{project}}`: Project name (if available).
+- `{{projectSlug}}`: Project identifier (if available).
+
+- **EMAIL_CHANGE_NOTIFY** *(since 2.2)* — sent to the **old** address:
+- `{{email}}`: The old (previous) address.
+- `{{newEmail}}`: The address the account was changed to.
 
 :::note
 `projectSlug` is available since Engine 1.3+

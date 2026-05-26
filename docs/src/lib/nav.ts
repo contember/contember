@@ -171,6 +171,7 @@ export const nav: NavItem[] = [
 					doc('reference/engine/tenant/idp'),
 					doc('reference/engine/tenant/password-reset'),
 					doc('reference/engine/tenant/two-factor'),
+					doc('reference/engine/tenant/email-verification'),
 					doc('reference/engine/tenant/profile'),
 					doc('reference/engine/tenant/invites'),
 					doc('reference/engine/tenant/memberships'),

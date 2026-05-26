@@ -6,6 +6,7 @@
 
 import { ActivatePasswordlessOtpErrorCode } from '@contember/graphql-client-tenant';
 import { ChangeMyPasswordErrorCode } from '@contember/graphql-client-tenant';
+import { ConfirmEmailChangeErrorCode } from '@contember/graphql-client-tenant';
 import { ConfirmOtpErrorCode } from '@contember/graphql-client-tenant';
 import { Context } from 'react';
 import { CreateApiKeyErrorCode } from '@contember/graphql-client-tenant';
@@ -21,12 +22,14 @@ import { ModelType } from 'graphql-ts-client-api';
 import { MutationFetcher } from '@contember/graphql-client-tenant';
 import { ReactElement } from 'react';
 import { ReactNode } from 'react';
+import { RequestEmailVerificationErrorCode } from '@contember/graphql-client-tenant';
 import { ResetPasswordErrorCode } from '@contember/graphql-client-tenant';
 import { SetStateAction } from 'react';
 import { SignInErrorCode } from '@contember/graphql-client-tenant';
 import { SignInIDPErrorCode } from '@contember/graphql-client-tenant';
 import * as TenantApi from '@contember/graphql-client-tenant';
 import { UpdateProjectMemberErrorCode } from '@contember/graphql-client-tenant';
+import { VerifyEmailErrorCode } from '@contember/graphql-client-tenant';
 
 // @public (undocumented)
 export type ActivatePasswordlessOtpMutationVariables = Parameters<ReturnType<typeof useActivatePasswordlessOtpMutation>>[0];
@@ -150,6 +153,54 @@ export const changeProfile: TenantApi.MutationFetcher<{
 
 // @public (undocumented)
 export type ChangeProfileMutationVariables = Parameters<ReturnType<typeof useChangeProfileMutation>>[0];
+
+// @public (undocumented)
+export const ConfirmEmailChangeForm: (input: ConfirmEmailChangeFormProps) => JSX.Element;
+
+// @public (undocumented)
+export type ConfirmEmailChangeFormContextValue = FormContextValue<ConfirmEmailChangeFormValues, ConfirmEmailChangeFormErrorCode>;
+
+// @public (undocumented)
+export type ConfirmEmailChangeFormError = FormError<ConfirmEmailChangeFormValues, ConfirmEmailChangeFormErrorCode>;
+
+// @public (undocumented)
+export type ConfirmEmailChangeFormErrorCode = ConfirmEmailChangeErrorCode | 'FIELD_REQUIRED' | 'INVALID_VALUE' | 'UNKNOWN_ERROR';
+
+// @public (undocumented)
+export interface ConfirmEmailChangeFormProps {
+    // (undocumented)
+    children: ReactElement;
+    // (undocumented)
+    onSuccess?: () => void;
+    // (undocumented)
+    token?: string;
+}
+
+// @public (undocumented)
+export type ConfirmEmailChangeFormState = FormState;
+
+// @public (undocumented)
+export type ConfirmEmailChangeFormValues = {
+    token: string;
+};
+
+// @public (undocumented)
+export const confirmEmailChangeMutation: TenantApi.MutationFetcher<{
+    readonly mutation?: ({
+        readonly ok: boolean;
+    } & {
+        readonly error?: ({
+            readonly code: TenantApi.ConfirmEmailChangeErrorCode;
+        } & {
+            readonly developerMessage: string;
+        }) | undefined;
+    }) | undefined;
+}, {
+    readonly token: string;
+}>;
+
+// @public (undocumented)
+export type ConfirmEmailChangeMutationVariables = Parameters<ReturnType<typeof useConfirmEmailChangeMutation>>[0];
 
 // @public (undocumented)
 export const confirmOtpMutation: TenantApi.MutationFetcher<{
@@ -1095,6 +1146,53 @@ export type RemoveProjectMemberTriggerProps = RemoveProjectMemberMutationVariabl
 };
 
 // @public (undocumented)
+export const RequestEmailVerificationForm: (input: RequestEmailVerificationFormProps) => JSX.Element;
+
+// @public (undocumented)
+export type RequestEmailVerificationFormContextValue = FormContextValue<RequestEmailVerificationFormValues, RequestEmailVerificationFormErrorCode>;
+
+// @public (undocumented)
+export type RequestEmailVerificationFormError = FormError<RequestEmailVerificationFormValues, RequestEmailVerificationFormErrorCode>;
+
+// @public (undocumented)
+export type RequestEmailVerificationFormErrorCode = RequestEmailVerificationErrorCode | 'FIELD_REQUIRED' | 'INVALID_VALUE' | 'UNKNOWN_ERROR';
+
+// @public (undocumented)
+export interface RequestEmailVerificationFormProps {
+    // (undocumented)
+    children: ReactElement;
+    // (undocumented)
+    onSuccess?: () => void;
+}
+
+// @public (undocumented)
+export type RequestEmailVerificationFormState = FormState;
+
+// @public (undocumented)
+export type RequestEmailVerificationFormValues = {
+    email: string;
+};
+
+// @public (undocumented)
+export const requestEmailVerificationMutation: TenantApi.MutationFetcher<{
+    readonly mutation?: ({
+        readonly ok: boolean;
+    } & {
+        readonly error?: ({
+            readonly code: TenantApi.RequestEmailVerificationErrorCode;
+        } & {
+            readonly developerMessage: string;
+        }) | undefined;
+    }) | undefined;
+}, {
+    readonly email: string;
+    readonly options?: TenantApi.EmailVerificationOptions;
+}>;
+
+// @public (undocumented)
+export type RequestEmailVerificationMutationVariables = Parameters<ReturnType<typeof useRequestEmailVerificationMutation>>[0];
+
+// @public (undocumented)
 export const resetPasswordMutation: TenantApi.MutationFetcher<{
     readonly mutation?: ({
         readonly ok: boolean;
@@ -1398,6 +1496,14 @@ export const useChangeProfileMutation: (input?: TenantApiOptions) => (variables:
 }) => Promise<TenantMutationResponse<unknown, TenantApi.ChangeProfileErrorCode>>;
 
 // @public (undocumented)
+export const useConfirmEmailChangeForm: () => ConfirmEmailChangeFormContextValue;
+
+// @public (undocumented)
+export const useConfirmEmailChangeMutation: (input?: TenantApiOptions) => (variables: {
+    readonly token: string;
+}) => Promise<TenantMutationResponse<unknown, TenantApi.ConfirmEmailChangeErrorCode>>;
+
+// @public (undocumented)
 export const useConfirmOtpMutation: (input?: TenantApiOptions) => (variables: {
     readonly otpToken: string;
 }) => Promise<TenantMutationResponse<unknown, TenantApi.ConfirmOtpErrorCode>>;
@@ -1626,6 +1732,15 @@ export const useRemoveProjectMemberMutation: (input?: TenantApiOptions) => (vari
 }) => Promise<TenantMutationResponse<unknown, TenantApi.RemoveProjectMemberErrorCode>>;
 
 // @public (undocumented)
+export const useRequestEmailVerificationForm: () => RequestEmailVerificationFormContextValue;
+
+// @public (undocumented)
+export const useRequestEmailVerificationMutation: (input?: TenantApiOptions) => (variables: {
+    readonly email: string;
+    readonly options?: TenantApi.EmailVerificationOptions;
+}) => Promise<TenantMutationResponse<unknown, "RATE_LIMIT_EXCEEDED">>;
+
+// @public (undocumented)
 export const useResetPasswordMutation: (input?: TenantApiOptions) => (variables: {
     readonly token: string;
     readonly password: string;
@@ -1716,6 +1831,62 @@ export const useUpdateProjectMemberMutation: (input?: TenantApiOptions) => (vari
     readonly identityId: string;
     readonly memberships: ReadonlyArray<TenantApi.MembershipInput>;
 }) => Promise<TenantMutationResponse<unknown, TenantApi.UpdateProjectMemberErrorCode>>;
+
+// @public (undocumented)
+export const useVerifyEmailForm: () => VerifyEmailFormContextValue;
+
+// @public (undocumented)
+export const useVerifyEmailMutation: (input?: TenantApiOptions) => (variables: {
+    readonly token: string;
+}) => Promise<TenantMutationResponse<unknown, TenantApi.VerifyEmailErrorCode>>;
+
+// @public (undocumented)
+export const VerifyEmailForm: (input: VerifyEmailFormProps) => JSX.Element;
+
+// @public (undocumented)
+export type VerifyEmailFormContextValue = FormContextValue<VerifyEmailFormValues, VerifyEmailFormErrorCode>;
+
+// @public (undocumented)
+export type VerifyEmailFormError = FormError<VerifyEmailFormValues, VerifyEmailFormErrorCode>;
+
+// @public (undocumented)
+export type VerifyEmailFormErrorCode = VerifyEmailErrorCode | 'FIELD_REQUIRED' | 'INVALID_VALUE' | 'UNKNOWN_ERROR';
+
+// @public (undocumented)
+export interface VerifyEmailFormProps {
+    // (undocumented)
+    children: ReactElement;
+    // (undocumented)
+    onSuccess?: () => void;
+    // (undocumented)
+    token?: string;
+}
+
+// @public (undocumented)
+export type VerifyEmailFormState = FormState;
+
+// @public (undocumented)
+export type VerifyEmailFormValues = {
+    token: string;
+};
+
+// @public (undocumented)
+export const verifyEmailMutation: TenantApi.MutationFetcher<{
+    readonly mutation?: ({
+        readonly ok: boolean;
+    } & {
+        readonly error?: ({
+            readonly code: TenantApi.VerifyEmailErrorCode;
+        } & {
+            readonly developerMessage: string;
+        }) | undefined;
+    }) | undefined;
+}, {
+    readonly token: string;
+}>;
+
+// @public (undocumented)
+export type VerifyEmailMutationVariables = Parameters<ReturnType<typeof useVerifyEmailMutation>>[0];
 
 // (No @packageDocumentation comment for this package)
 

@@ -72,6 +72,9 @@ import { ActionsListFailedEventsCommand } from './commands/actions/ActionsListFa
 import { ActionsRetryEventCommand } from './commands/actions/ActionsRetryEventCommand'
 import { ActionsGetEventCommand } from './commands/actions/ActionsGetEventCommand'
 import { ActionsStopEventCommand } from './commands/actions/ActionsStopEventCommand'
+import { TenantApplyCommand } from './commands/tenant'
+import { ImportTenantConfigLoader, TranspilingTenantConfigLoader } from './lib/tenant/TenantConfigLoader'
+import { TenantConfigApplier } from './lib/tenant/TenantConfigApplier'
 
 const jsSample = `
 export const query = \`\`
@@ -270,6 +273,16 @@ export const createContainer = ({ env, version, runtime, workspace }: {
 		.addService('actionsRetryEvent', ({ remoteProjectResolver }) => new ActionsRetryEventCommand(remoteProjectResolver))
 		.addService('actionsGetEvent', ({ remoteProjectResolver }) => new ActionsGetEventCommand(remoteProjectResolver))
 		.addService('actionsStopEvent', ({ remoteProjectResolver }) => new ActionsStopEventCommand(remoteProjectResolver))
+		.addService(
+			'tenantConfigLoader',
+			({ jsCodeRunner }) => runtime === 'bun' ? new ImportTenantConfigLoader() : new TranspilingTenantConfigLoader(jsCodeRunner),
+		)
+		.addService('tenantConfigApplier', () => new TenantConfigApplier())
+		.addService(
+			'tenantApplyCommand',
+			({ remoteProjectResolver, tenantConfigLoader, tenantConfigApplier }) =>
+				new TenantApplyCommand(remoteProjectResolver, tenantConfigLoader, tenantConfigApplier),
+		)
 		.addService('commandList', dic => {
 			const commands: CommandFactoryList = {
 				['deploy']: () => dic.deployCommand,
@@ -294,6 +307,7 @@ export const createContainer = ({ env, version, runtime, workspace }: {
 				['actions:retry-event']: () => dic.actionsRetryEvent,
 				['actions:get-event']: () => dic.actionsGetEvent,
 				['actions:stop-event']: () => dic.actionsStopEvent,
+				['tenant:apply']: () => dic.tenantApplyCommand,
 			}
 			return commands
 		})
@@ -309,7 +323,10 @@ export const createContainer = ({ env, version, runtime, workspace }: {
 				`Contember CLI version ${version}`,
 				{
 					beforeRun: async ({ name }) => {
-						if (!process.env.CONTEMBER_SKIP_VERSION_CHECK && !['deploy', 'version', 'data:export', 'data:import', 'data:transfer'].includes(name)) {
+						if (
+							!process.env.CONTEMBER_SKIP_VERSION_CHECK
+							&& !['deploy', 'version', 'data:export', 'data:import', 'data:transfer', 'tenant:apply'].includes(name)
+						) {
 							await versionChecker.checkVersions()
 						}
 					},

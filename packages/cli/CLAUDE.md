@@ -14,7 +14,18 @@ Command-line interface for Contember project management. 22 commands for deploym
 
 **Actions** (6): `actions:list-variables`, `actions:set-variables`, `actions:failed-events`, `actions:get-event`, `actions:retry-event`, `actions:stop-event`
 
+**Tenant**: `tenant:apply [config] [--dsn] [--dry-run]` — apply declarative tenant configuration
+
 **Other**: `workspace:update:api`, `version`
+
+## Tenant configuration
+
+`tenant:apply` reads a typed `tenant.config.ts` (path overridable via the first arg, default `tenant.config.ts`) and applies it idempotently to the tenant API:
+- `config` → `configure` mutation (partial merge of password/login/passwordless/captcha/rateLimits)
+- `identityProviders` (keyed by slug) → `addIDP`/`updateIDP` chosen from current state, then `enableIDP`/`disableIDP` to match `disabled`
+- `mailTemplates` → `addMailTemplate` (server-side upsert)
+
+Nothing is ever removed (no pruning). Authored with `defineTenantConfig` from the library export of `@contember/cli` (`src/index.ts`). Secrets come from `process.env` in the config file. Requires a token with **PROJECT_ADMIN/SUPER_ADMIN** privileges — a deploy-only (ENTRYPOINT_DEPLOYER) token is rejected by the API. Orchestration lives in `lib/tenant/` (`TenantClient`, `TenantConfigLoader`, `TenantConfigApplier`); no new server-side API was needed.
 
 ## Connection
 

@@ -191,4 +191,79 @@ describe('IdpSessionRevalidator — lifetime-driven phases', () => {
 		expect(out).toBe('valid')
 		expect(h.executed.some(c => c instanceof DisableApiKeyCommand)).toBe(false)
 	})
+
+	test('corrupt stored config (validateConfiguration throws) → valid (fail open, no revoke)', async () => {
+		const h = createHarness(baseRow({ session: { tokens: { refresh_token: 'r' }, expiresAt: t('11:30:00') } }))
+		const registry = new IDPHandlerRegistry()
+		registry.registerHandler('oidc', {
+			initAuth: async () => ({ authUrl: '', sessionData: {} }),
+			processResponse: async () => ({ externalIdentifier: 'x' }),
+			validateConfiguration: () => {
+				throw new Error('corrupt configuration')
+			},
+			revalidate: async () => ({ status: 'revoked', reason: 'invalid_grant' }),
+		})
+		const out = await new IdpSessionRevalidator(registry).revalidate(h.dbContext, h.readDbContext, apiKeyRow)
+		expect(out).toBe('valid')
+		expect(h.executed.some(c => c instanceof DisableApiKeyCommand)).toBe(false)
+	})
+})
+
+describe('IdpSessionRevalidator — audit logging', () => {
+	test('token rotation is audited as idp_session_revalidated', async () => {
+		const h = createHarness(baseRow({ session: { tokens: { refresh_token: 'r' }, expiresAt: t('11:30:00') } }))
+		await new IdpSessionRevalidator(
+			registryWith(async () => ({ status: 'valid', idpSession: { tokens: { refresh_token: 'new' }, expiresAt: t('13:30:00') } })),
+		).revalidate(h.dbContext, h.readDbContext, apiKeyRow)
+		const log = h.executed.find(c => c instanceof CreateAuthLogEntryCommand) as CreateAuthLogEntryCommand | undefined
+		expect(log).toBeDefined()
+		expect((log as any).data.type).toBe('idp_session_revalidated')
+		expect((log as any).data.success).toBe(true)
+	})
+
+	test('a no-op probe (valid, no rotated session) is NOT logged', async () => {
+		// userinfo / introspection return valid without an idpSession; logging every such tick
+		// (every minInterval) would flood the audit log, so it must stay silent.
+		const h = createHarness(baseRow({ session: { tokens: { access_token: 'a' }, expiresAt: t('11:30:00') } }))
+		const out = await new IdpSessionRevalidator(registryWith(async () => ({ status: 'valid' })))
+			.revalidate(h.dbContext, h.readDbContext, apiKeyRow)
+		expect(out).toBe('valid')
+		expect(h.executed.some(c => c instanceof CreateAuthLogEntryCommand)).toBe(false)
+		expect(h.executed.some(c => c instanceof UpdateIdpSessionCommand)).toBe(false)
+	})
+
+	test('a DB-write failure in the background (SWR) path is swallowed — no unhandled rejection', async () => {
+		const rejections: unknown[] = []
+		const onRejection = (e: unknown) => rejections.push(e)
+		process.on('unhandledRejection', onRejection)
+		try {
+			const executed: any[] = []
+			const commandBus = {
+				execute: async (command: any) => {
+					executed.push(command)
+					if (command instanceof ClaimIdpRevalidationCommand) {
+						return true
+					}
+					if (command instanceof DisableApiKeyCommand) {
+						throw new Error('db down') // the deferred revoke write fails after the response
+					}
+					return undefined
+				},
+			}
+			const ctx = {
+				providers: { now: () => NOW },
+				commandBus,
+				queryHandler: { fetch: async () => baseRow() }, // soft phase → background (SWR)
+			} as unknown as DatabaseContext
+
+			const out = await new IdpSessionRevalidator(registryWith(async () => ({ status: 'revoked', reason: 'invalid_grant' })))
+				.revalidate(ctx, ctx, apiKeyRow)
+			expect(out).toBe('valid') // served from the still-valid token
+			await tick()
+			await new Promise(resolve => setTimeout(resolve, 0)) // flush the rejected-promise microtasks
+			expect(rejections).toHaveLength(0)
+		} finally {
+			process.off('unhandledRejection', onRejection)
+		}
+	})
 })

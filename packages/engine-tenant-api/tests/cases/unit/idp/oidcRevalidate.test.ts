@@ -75,6 +75,27 @@ describe('revalidateOIDC — userinfo', () => {
 		const result = await revalidateOIDC({} as any, 'userinfo', session({}))
 		expect(result).toEqual({ status: 'revoked', reason: 'no_access_token' })
 	})
+
+	test('revoked: bare 401 with no parseable error code', async () => {
+		// RFC 6750 allows a 401 without a `WWW-Authenticate` error param; openid-client then
+		// surfaces a non-standard `error` string. A 401 is still definitive → revoked.
+		const client = {
+			userinfo: async () => {
+				throw new errors.OPError({ error: 'expected 200 OK, got: 401 Unauthorized' }, { statusCode: 401 } as any)
+			},
+		} as any
+		const result = await revalidateOIDC(client, 'userinfo', session({ access_token: 'a' }))
+		expect(result).toEqual({ status: 'revoked', reason: 'userinfo_unauthorized' })
+	})
+
+	test('transient: a 503 from userinfo propagates (does NOT revoke)', async () => {
+		const client = {
+			userinfo: async () => {
+				throw new errors.OPError({ error: 'expected 200 OK, got: 503 Service Unavailable' }, { statusCode: 503 } as any)
+			},
+		} as any
+		await expect(revalidateOIDC(client, 'userinfo', session({ access_token: 'a' }))).rejects.toThrow()
+	})
 })
 
 describe('revalidateOIDC — introspection', () => {
@@ -88,6 +109,17 @@ describe('revalidateOIDC — introspection', () => {
 		const client = { introspect: async () => ({ active: false }) } as any
 		const result = await revalidateOIDC(client, 'introspection', session({ access_token: 'a' }))
 		expect(result).toEqual({ status: 'revoked', reason: 'inactive' })
+	})
+
+	test('a 401 from introspection is transient (client-auth/config), NOT a revoked token', async () => {
+		// Introspection reports revoked tokens with 200 `{active:false}`; a 401 means the
+		// client failed to authenticate to the introspection endpoint → must not log users out.
+		const client = {
+			introspect: async () => {
+				throw new errors.OPError({ error: 'expected 200 OK, got: 401 Unauthorized' }, { statusCode: 401 } as any)
+			},
+		} as any
+		await expect(revalidateOIDC(client, 'introspection', session({ access_token: 'a' }))).rejects.toThrow()
 	})
 })
 

@@ -82,6 +82,7 @@ export const executeTenantTest = async (test: Test) => {
 		encrypt: () => {
 			throw new Error('not supported')
 		},
+		encryptionEnabled: false,
 		hash: value => Buffer.from(value.toString()),
 		...test.providers,
 	}

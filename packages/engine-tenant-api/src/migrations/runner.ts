@@ -46,6 +46,10 @@ import _20260513120000authlogeventdata from './2026-05-13-120000-auth-log-event-
 import _20260513130000antiabuse from './2026-05-13-130000-anti-abuse'
 import _20260514100000authlogadminactions from './2026-05-14-100000-auth-log-admin-actions'
 import _20260515120000configreveallogmethod from './2026-05-15-120000-config-reveal-login-method'
+import _20260526120000emailverificationtypes from './2026-05-26-120000-email-verification-types'
+import _20260526120010emailverification from './2026-05-26-120010-email-verification'
+import _20260526130000emailchangeverificationconfig from './2026-05-26-130000-email-change-verification-config'
+import _20260526130010idprequireverifiedemail from './2026-05-26-130010-idp-require-verified-email'
 import snapshot from './snapshot'
 import { computeTokenHash, Providers } from '../model'
 import { Logger } from '@contember/logger'
@@ -104,6 +108,10 @@ const migrations = {
 	'2026-05-13-130000-anti-abuse': _20260513130000antiabuse,
 	'2026-05-14-100000-auth-log-admin-actions': _20260514100000authlogadminactions,
 	'2026-05-15-120000-config-reveal-login-method': _20260515120000configreveallogmethod,
+	'2026-05-26-120000-email-verification-types': _20260526120000emailverificationtypes,
+	'2026-05-26-120010-email-verification': _20260526120010emailverification,
+	'2026-05-26-130000-email-change-verification-config': _20260526130000emailchangeverificationconfig,
+	'2026-05-26-130010-idp-require-verified-email': _20260526130010idprequireverifiedemail,
 }
 
 export class TenantMigrationsRunner {

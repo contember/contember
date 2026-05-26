@@ -1,4 +1,5 @@
 export * from './ChangePasswordCommand'
 export * from './CreatePersonCommand'
 export * from './CreatePersonIdentityProviderIdentifierCommand'
+export * from './MarkEmailVerifiedCommand'
 export * from './TogglePersonPasswordlessCommand'

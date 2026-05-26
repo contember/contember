@@ -3,10 +3,20 @@ import { SQL } from '../../../../src/tags'
 
 export const getPersonByEmailSql = (args: {
 	email: string
-	response: null | { personId: string; password: string; identityId: string; roles: string[]; otpUri?: string }
+	response:
+		| null
+		| {
+			personId: string
+			password: string
+			identityId: string
+			roles: string[]
+			otpUri?: string
+			emailVerifiedAt?: Date | null
+			emailVerificationRequired?: boolean
+		}
 }): ExpectedQuery => ({
 	sql:
-		SQL`SELECT "person"."id", "person"."password_hash", "person"."otp_uri", "person"."otp_activated_at", "person"."identity_id", "person"."email", "person"."name", "person"."disabled_at", "person"."passwordless_enabled", "identity"."roles"
+		SQL`SELECT "person"."id", "person"."password_hash", "person"."otp_uri", "person"."otp_activated_at", "person"."identity_id", "person"."email", "person"."name", "person"."disabled_at", "person"."passwordless_enabled", "person"."email_verified_at", "person"."email_verification_required", "identity"."roles"
 	         FROM "tenant"."person"
 		              INNER JOIN "tenant"."identity" AS "identity" ON "identity"."id" = "person"."identity_id"
 	         WHERE "person"."email" = ?`,
@@ -24,6 +34,8 @@ export const getPersonByEmailSql = (args: {
 					otp_activated_at: args.response.otpUri ? new Date() : null,
 					disabled_at: null,
 					passwordless_enabled: null,
+					email_verified_at: args.response.emailVerifiedAt ?? null,
+					email_verification_required: args.response.emailVerificationRequired ?? false,
 				},
 			]
 			: [],

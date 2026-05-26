@@ -51,6 +51,15 @@ The configuration field should include the URL of the provider's OpenID Connect 
 
 The options field allows you to specify additional options for the identity provider, such as whether to automatically sign up users who don't already have an account and whether to allow only this identity provider for authentication.
 
+#### Options
+
+| Option | Default | Notes |
+|---|---|---|
+| `autoSignUp` | `false` | Create a new account for an unknown e-mail instead of failing. |
+| `exclusive` | `false` | Only this IdP may authenticate the matched accounts; disables linking by e-mail. |
+| `initReturnsConfig` | `false` | `initSignInIDP` returns the raw provider config to the client. |
+| `requireVerifiedEmail` | `false` | *(since 2.2)* For a non-`exclusive` provider, only auto-link to / sign in an existing local account by e-mail when the provider asserts the e-mail is **verified**. Guards against account takeover via an unverified provider claim. See [e-mail verification](/reference/engine/tenant/email-verification#idp-verified-email-gate). |
+
 If the "ok" in response is `false`, you will find details in `error`, possible error codes are following: `ALREADY_EXISTS`, `UNKNOWN_TYPE`, `INVALID_CONFIGURATION`
 
 ### Updating existing IdP

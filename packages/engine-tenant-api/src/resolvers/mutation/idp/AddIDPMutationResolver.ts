@@ -24,6 +24,7 @@ export class AddIDPMutationResolver implements MutationResolvers {
 				autoSignUp: args.options?.autoSignUp ?? false,
 				exclusive: args.options?.exclusive ?? false,
 				initReturnsConfig: args.options?.initReturnsConfig ?? false,
+				requireVerifiedEmail: args.options?.requireVerifiedEmail ?? false,
 			},
 		})
 		if (!result.ok) {

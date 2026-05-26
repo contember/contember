@@ -10,7 +10,14 @@ import {
 } from '../../schema'
 import { DatabaseContext, validateToken } from '../utils'
 import { UserMailer } from '../mailing'
-import { ActivateOtpCommand, ApiKeyRequestInfo, CreatePersonTokenCommand, IncreaseOtpAttemptCommand, InvalidateTokenCommand } from '../commands'
+import {
+	ActivateOtpCommand,
+	ApiKeyRequestInfo,
+	CreatePersonTokenCommand,
+	IncreaseOtpAttemptCommand,
+	InvalidateTokenCommand,
+	MarkEmailVerifiedCommand,
+} from '../commands'
 import { getPreferredProject } from './helpers/getPreferredProject'
 import { ProjectManager } from './ProjectManager'
 import { PermissionContext } from '../authorization'
@@ -196,6 +203,14 @@ class PasswordlessSignInManager {
 			}
 
 			await db.commandBus.execute(new InvalidateTokenCommand(tokenValidationResult.result.id))
+			// Receiving and clicking the magic link proves ownership of the address,
+			// so a successful passwordless sign-in also satisfies the e-mail
+			// verification requirement. Without this, a required-but-unverified
+			// account could obtain a session here while being blocked from password
+			// sign-in (SignInManager) — an inconsistent, exploitable gap.
+			if (personRow.email_verified_at === null) {
+				await db.commandBus.execute(new MarkEmailVerifiedCommand(personRow.id))
+			}
 			const sessionToken = await this.apiKeyManager.createSessionApiKey(db, personRow.identity_id, expiration, requestInfo, trustForwardedInfo)
 
 			return new ResponseOk({

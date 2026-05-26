@@ -54,16 +54,24 @@ export class SignUpManager {
 			}
 		}
 
+		// Freeze the requirement onto the person at sign-up time. Flipping the
+		// tenant-wide flag later must not retroactively lock out accounts that
+		// were created while verification was optional.
+		const emailVerificationRequired = config.signup.requireEmailVerification
+
 		const person = await dbContext.transaction(async db => {
 			const identityId = await db.commandBus.execute(new CreateIdentityCommand([...roles, TenantRole.PERSON]))
-			return await db.commandBus.execute(new CreatePersonCommand({ identityId, email, password }))
+			return await db.commandBus.execute(new CreatePersonCommand({ identityId, email, password, emailVerificationRequired }))
 		})
-		return new ResponseOk(new SignUpResult(person))
+		return new ResponseOk(new SignUpResult(person, emailVerificationRequired))
 	}
 }
 
 export class SignUpResult {
-	constructor(public readonly person: Omit<PersonRow, 'roles'>) {}
+	constructor(
+		public readonly person: Omit<PersonRow, 'roles'>,
+		public readonly emailVerificationRequired: boolean = false,
+	) {}
 }
 
 export type SignUpResponse = Response<SignUpResult, SignUpErrorCode, {

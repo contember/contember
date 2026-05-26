@@ -8,7 +8,9 @@ import {
 	AppleProvider,
 	CaptchaValidator,
 	DatabaseContext,
+	EmailChangeManager,
 	EmailValidator,
+	EmailVerificationManager,
 	FacebookProvider,
 	HCaptchaProvider,
 	Identity,
@@ -53,6 +55,7 @@ import {
 	CreateProjectMutationResolver,
 	DisableApiKeyMutationResolver,
 	DisableIDPMutationResolver,
+	EmailVerificationMutationResolver,
 	EnableIDPMutationResolver,
 	IdentityGlobalRolesMutationResolver,
 	IdentityTypeResolver,
@@ -192,6 +195,15 @@ export class TenantContainerFactory {
 				'passwordResetManager',
 				({ userMailer, projectManager, passwordStrengthValidator }) => new PasswordResetManager(userMailer, projectManager, passwordStrengthValidator),
 			)
+			.addService(
+				'emailVerificationManager',
+				({ userMailer, projectManager }) => new EmailVerificationManager(userMailer, projectManager),
+			)
+			.addService(
+				'emailChangeManager',
+				({ userMailer, projectManager, emailValidator, apiKeyManager }) =>
+					new EmailChangeManager(userMailer, projectManager, emailValidator, apiKeyManager),
+			)
 			.addService('idpRegistry', () => {
 				const idpRegistry = new IDPHandlerRegistry()
 				idpRegistry.registerHandler('oidc', new OIDCProvider())
@@ -238,15 +250,24 @@ export class TenantContainerFactory {
 			.addService('mailTemplateQueryResolver', () => new MailTemplateQueryResolver())
 			.addService(
 				'signUpMutationResolver',
-				({ signUpManager, apiKeyManager, captchaValidator, rateLimiter }) =>
-					new SignUpMutationResolver(signUpManager, apiKeyManager, captchaValidator, rateLimiter),
+				({ signUpManager, apiKeyManager, captchaValidator, rateLimiter, emailVerificationManager, permissionContextFactory }) =>
+					new SignUpMutationResolver(signUpManager, apiKeyManager, captchaValidator, rateLimiter, emailVerificationManager, permissionContextFactory),
 			)
 			.addService(
 				'signInMutationResolver',
 				({ signInManager, signInResponseFactory, rateLimiter }) => new SignInMutationResolver(signInManager, signInResponseFactory, rateLimiter),
 			)
 			.addService('signOutMutationResolver', ({ apiKeyManager }) => new SignOutMutationResolver(apiKeyManager))
-			.addService('changeProfileMutationResolver', ({ personManager }) => new ChangeProfileMutationResolver(personManager))
+			.addService(
+				'changeProfileMutationResolver',
+				({ personManager, emailChangeManager, permissionContextFactory }) =>
+					new ChangeProfileMutationResolver(personManager, emailChangeManager, permissionContextFactory),
+			)
+			.addService(
+				'emailVerificationMutationResolver',
+				({ emailVerificationManager, permissionContextFactory }) =>
+					new EmailVerificationMutationResolver(emailVerificationManager, permissionContextFactory),
+			)
 			.addService('changePasswordMutationResolver', ({ passwordChangeManager }) => new ChangePasswordMutationResolver(passwordChangeManager))
 			.addService(
 				'resetPasswordMutationResolver',

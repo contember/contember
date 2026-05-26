@@ -9,4 +9,5 @@ export interface IdentityProviderOptions {
 	autoSignUp: boolean
 	exclusive: boolean
 	initReturnsConfig: boolean
+	requireVerifiedEmail: boolean
 }

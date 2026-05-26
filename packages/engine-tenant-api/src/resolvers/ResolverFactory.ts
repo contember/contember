@@ -37,6 +37,7 @@ import { ConfigurationMutationResolver } from './mutation/configuration/Configur
 import { ConfigurationQueryResolver } from './query/ConfigurationQueryResolver'
 import { PasswordlessMutationResolver } from './mutation/person/PasswordlessMutationResolver'
 import { TogglePasswordlessMutationResolver } from './mutation/person/TogglePasswordlessMutationResolver'
+import { EmailVerificationMutationResolver } from './mutation/person/EmailVerificationMutationResolver'
 
 class ResolverFactory {
 	public constructor(
@@ -54,6 +55,7 @@ class ResolverFactory {
 			changeProfileMutationResolver: ChangeProfileMutationResolver
 			changePasswordMutationResolver: ChangePasswordMutationResolver
 			resetPasswordMutationResolver: ResetPasswordMutationResolver
+			emailVerificationMutationResolver: EmailVerificationMutationResolver
 			idpMutationResolver: IDPMutationResolver
 			registerIdpMutationResolver: AddIDPMutationResolver
 			disableIdpMutationResolver: DisableIDPMutationResolver
@@ -139,6 +141,12 @@ class ResolverFactory {
 					this.resolvers.resetPasswordMutationResolver,
 				),
 				resetPassword: this.resolvers.resetPasswordMutationResolver.resetPassword.bind(this.resolvers.resetPasswordMutationResolver),
+
+				requestEmailVerification: this.resolvers.emailVerificationMutationResolver.requestEmailVerification.bind(
+					this.resolvers.emailVerificationMutationResolver,
+				),
+				verifyEmail: this.resolvers.emailVerificationMutationResolver.verifyEmail.bind(this.resolvers.emailVerificationMutationResolver),
+				confirmEmailChange: this.resolvers.changeProfileMutationResolver.confirmEmailChange.bind(this.resolvers.changeProfileMutationResolver),
 
 				initSignInIDP: this.resolvers.idpMutationResolver.initSignInIDP.bind(this.resolvers.idpMutationResolver),
 				signInIDP: this.resolvers.idpMutationResolver.signInIDP.bind(this.resolvers.idpMutationResolver),

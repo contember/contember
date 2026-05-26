@@ -107,4 +107,5 @@ const errorToField: Record<TenantApi.SignInErrorCode, keyof LoginFormValues | un
 	'INVALID_CREDENTIALS': 'password',
 	'RATE_LIMIT_EXCEEDED': 'password',
 	'OTP_REQUIRED': undefined,
+	'EMAIL_NOT_VERIFIED': 'email',
 }

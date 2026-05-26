@@ -1,5 +1,6 @@
 import { Command } from '../Command'
 import { UpdateBuilder } from '@contember/database'
+import { normalizeEmail } from '../../utils/email'
 
 export type ChangeProfileData = {
 	readonly email?: string
@@ -10,9 +11,14 @@ export class ChangeProfileCommand implements Command<void> {
 	constructor(private readonly personId: string, private readonly data: ChangeProfileData) {}
 
 	async execute({ db }: Command.Args): Promise<void> {
+		// Always store the normalized form so the value matches the email_unique
+		// index and lookups (PersonQuery.byEmail) regardless of how it was typed.
+		const values = this.data.email !== undefined
+			? { ...this.data, email: normalizeEmail(this.data.email) }
+			: this.data
 		await UpdateBuilder.create()
 			.table('person')
-			.values(this.data)
+			.values(values)
 			.where({
 				id: this.personId,
 			})

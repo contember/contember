@@ -128,6 +128,14 @@ class IDPSignInManager {
 		if (!provider.exclusive) {
 			const personByEmail = claim.email ? await db.queryHandler.fetch(PersonQuery.byEmail(claim.email)) : null
 			if (personByEmail) {
+				// Auto-linking an IdP identity to a pre-existing local account by
+				// e-mail is takeover-grade: if the provider returns an unverified
+				// (or attacker-controlled) e-mail, it could hijack the account. When
+				// the provider requires a verified e-mail, refuse to link — and to
+				// sign in — unless the provider asserts the address is verified.
+				if (provider.requireVerifiedEmail && claim.emailVerified !== true) {
+					return null
+				}
 				await this.saveIdpIdentifier(db, provider, claim, personByEmail)
 				return personByEmail
 			}

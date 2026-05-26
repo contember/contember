@@ -7,6 +7,7 @@ export class PersonResponseFactory {
 			id: personRow.id,
 			otpEnabled: !!personRow.otp_activated_at,
 			email: personRow.email,
+			emailVerified: !!personRow.email_verified_at,
 			name: personRow.name,
 			passwordlessEnabled: personRow.passwordless_enabled,
 			identity: {

@@ -36,7 +36,11 @@ CREATE TYPE "auth_log_type" AS ENUM (
     'project_secret_change',
     'mail_template_change',
     'tenant_config_change',
-    'person_invite'
+    'person_invite',
+    'email_verify_init',
+    'email_verify_complete',
+    'email_change_init',
+    'email_change_complete'
 );
 CREATE TYPE "config_policy" AS ENUM (
     'always',
@@ -49,7 +53,9 @@ CREATE TYPE "config_singleton" AS ENUM (
 );
 CREATE TYPE "person_token_type" AS ENUM (
     'password_reset',
-    'passwordless'
+    'passwordless',
+    'email_verification',
+    'email_change'
 );
 CREATE FUNCTION "project_deleted"() RETURNS "trigger"
     LANGUAGE "plpgsql"
@@ -125,6 +131,8 @@ CREATE TABLE "config" (
     "rate_limit_passwordless_init_per_ip_limit" integer DEFAULT 0 NOT NULL,
     "rate_limit_passwordless_init_per_ip_window" interval DEFAULT '01:00:00'::interval NOT NULL,
     "login_reveal_login_method" boolean DEFAULT true NOT NULL,
+    "signup_require_email_verification" boolean DEFAULT false NOT NULL,
+    "require_email_change_verification" boolean DEFAULT true NOT NULL,
     CONSTRAINT "config_captcha_complete" CHECK ((("captcha_provider" IS NULL) OR (("captcha_secret" IS NOT NULL) AND ("captcha_secret_version" IS NOT NULL)))),
     CONSTRAINT "config_captcha_provider_check" CHECK ((("captcha_provider" IS NULL) OR ("captcha_provider" = ANY (ARRAY['turnstile'::"text", 'hcaptcha'::"text", 'recaptchaV3'::"text"]))))
 );
@@ -143,7 +151,8 @@ CREATE TABLE "identity_provider" (
     "disabled_at" timestamp with time zone,
     "auto_sign_up" boolean DEFAULT false NOT NULL,
     "exclusive" boolean DEFAULT false,
-    "init_returns_config" boolean DEFAULT false NOT NULL
+    "init_returns_config" boolean DEFAULT false NOT NULL,
+    "require_verified_email" boolean DEFAULT false NOT NULL
 );
 CREATE TABLE "mail_template" (
     "id" "uuid" NOT NULL,
@@ -166,6 +175,8 @@ CREATE TABLE "person" (
     "idp_only" boolean DEFAULT false NOT NULL,
     "disabled_at" timestamp with time zone,
     "passwordless_enabled" boolean,
+    "email_verified_at" timestamp with time zone,
+    "email_verification_required" boolean DEFAULT false NOT NULL,
     CONSTRAINT "idp_only_no_email" CHECK ((("idp_only" = false) OR (("idp_only" = true) AND ("email" IS NULL))))
 );
 CREATE TABLE "person_auth_log" (
@@ -202,7 +213,8 @@ CREATE TABLE "person_token" (
     "used_at" timestamp with time zone,
     "type" "person_token_type" DEFAULT 'password_reset'::"person_token_type" NOT NULL,
     "otp_hash" "text",
-    "otp_attempts" integer DEFAULT 0 NOT NULL
+    "otp_attempts" integer DEFAULT 0 NOT NULL,
+    "meta" "jsonb"
 );
 CREATE TABLE "project" (
     "id" "uuid" NOT NULL,

@@ -38,6 +38,7 @@ Errors:
 | `INVALID_PASSWORD` | Wrong password. Only returned when `login.revealLoginMethod: true` *(since 2.2)*. |
 | `INVALID_CREDENTIALS` | Wrong email *or* password. Returned when `login.revealUserExists: false` (masks the email branch) and/or `login.revealLoginMethod: false` (masks the password/no-password branch). |
 | `PERSON_DISABLED` | The person has been disabled. |
+| `EMAIL_NOT_VERIFIED` | *(since 2.2)* The account was created while `signup.requireEmailVerification` was on and has not yet verified its e-mail. Prompt the user to verify, or resend via `requestEmailVerification`. See [e-mail verification](/reference/engine/tenant/email-verification). |
 | `NO_PASSWORD_SET` | The person has no password (IDP-only / passwordless-only). Only returned when `login.revealLoginMethod: true` *(since 2.2)*; otherwise collapsed into `INVALID_CREDENTIALS`. |
 | `OTP_REQUIRED` | The person has 2FA enabled and `otpToken` was missing. |
 | `INVALID_OTP_TOKEN` | 2FA token rejected. |

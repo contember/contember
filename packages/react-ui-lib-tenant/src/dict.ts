@@ -1,6 +1,7 @@
 import { InviteErrorCodes } from './hooks/useInvite'
 import { ChangeMyPasswordFormErrorCode, CreateApiKeyFormErrorCode } from '@contember/interface'
 import {
+	ConfirmEmailChangeFormErrorCode,
 	InviteFormErrorCode,
 	LoginFormErrorCode,
 	OtpConfirmFormErrorCode,
@@ -9,7 +10,9 @@ import {
 	PasswordlessSignInInitFormErrorCode,
 	PasswordResetFormErrorCode,
 	PasswordResetRequestFormErrorCode,
+	RequestEmailVerificationFormErrorCode,
 	UpdateProjectMemberFormErrorCode,
+	VerifyEmailFormErrorCode,
 } from '@contember/react-identity'
 import { ActivatePasswordlessOtpErrorCode } from '@contember/graphql-client-tenant'
 
@@ -111,6 +114,7 @@ export const dict = {
 				'INVALID_CREDENTIALS': 'Invalid credentials',
 				'RATE_LIMIT_EXCEEDED': 'Too many failed attempts, please try again later',
 				'OTP_REQUIRED': undefined,
+				'EMAIL_NOT_VERIFIED': 'Your e-mail address has not been verified',
 			} satisfies Record<LoginFormErrorCode, string | undefined>,
 			idpInitError: 'Failed to initialize IdP login:',
 			idpResponseError: 'Failed to process IdP response:',
@@ -202,6 +206,55 @@ export const dict = {
 			success: 'Password reset link has been sent',
 			checkMail: 'Please check your mailbox for instructions on how to reset your password.',
 			entryCode: 'Or enter the reset code directly.',
+		},
+		verifyEmail: {
+			token: 'Verification code',
+			submit: 'Verify e-mail',
+			errorMessages: {
+				'FIELD_REQUIRED': 'This field is required',
+				'INVALID_VALUE': 'Invalid value',
+				'UNKNOWN_ERROR': 'Something went wrong. Please try again later',
+				'TOKEN_EXPIRED': 'Token expired',
+				'TOKEN_NOT_FOUND': 'Token not found',
+				'TOKEN_USED': 'Token already used',
+				'TOKEN_INVALID': 'Invalid token',
+			} satisfies Record<VerifyEmailFormErrorCode, string>,
+			title: 'Verify e-mail',
+			description: 'Enter the verification code to confirm your e-mail address',
+			success: 'Your e-mail address has been verified',
+		},
+		confirmEmailChange: {
+			token: 'Confirmation code',
+			submit: 'Confirm e-mail change',
+			errorMessages: {
+				'FIELD_REQUIRED': 'This field is required',
+				'INVALID_VALUE': 'Invalid value',
+				'UNKNOWN_ERROR': 'Something went wrong. Please try again later',
+				'TOKEN_EXPIRED': 'Token expired',
+				'TOKEN_NOT_FOUND': 'Token not found',
+				'TOKEN_USED': 'Token already used',
+				'TOKEN_INVALID': 'Invalid token',
+				'EMAIL_ALREADY_EXISTS': 'This e-mail address is already in use',
+				'INVALID_EMAIL_FORMAT': 'Invalid email format',
+			} satisfies Record<ConfirmEmailChangeFormErrorCode, string>,
+			title: 'Confirm e-mail change',
+			description: 'Enter the confirmation code to change your e-mail address',
+			success: 'Your e-mail address has been changed',
+		},
+		requestEmailVerification: {
+			email: 'E-mail',
+			submit: 'Send verification link',
+			errorMessages: {
+				'FIELD_REQUIRED': 'This field is required',
+				'INVALID_VALUE': 'Invalid value',
+				'UNKNOWN_ERROR': 'Something went wrong. Please try again later',
+				'RATE_LIMIT_EXCEEDED': 'Too many requests, please try again later',
+			} satisfies Record<RequestEmailVerificationFormErrorCode, string>,
+			title: 'Verify e-mail',
+			description: 'Enter your e-mail below to receive a verification link',
+			success: 'Verification link has been sent',
+			checkMail: 'Please check your mailbox for instructions on how to verify your e-mail address.',
+			entryCode: 'Or enter the verification code directly.',
 		},
 		passwordlessSignInInit: {
 			email: 'E-mail',

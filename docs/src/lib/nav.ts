@@ -130,6 +130,7 @@ export const nav: NavItem[] = [
 						label: 'Advanced',
 						items: [
 							doc('reference/engine/migrations/advanced/development-commands'),
+							doc('reference/engine/migrations/advanced/schema-state-mode'),
 							doc('reference/engine/migrations/advanced/skipping-validations'),
 							doc('reference/engine/migrations/advanced/writing-schema-migrations'),
 						],

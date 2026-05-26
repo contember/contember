@@ -15,6 +15,7 @@ import {
 	IdentityFactory,
 	IDPHandlerRegistry,
 	IDPManager,
+	IdpSessionRevalidator,
 	IDPSignInManager,
 	InviteManager,
 	MailTemplateManager,
@@ -121,12 +122,12 @@ export interface TenantContainerArgs {
 	projectSchemaResolver: ProjectSchemaResolver
 	projectInitializer: ProjectInitializer
 	tenantCredentials: TenantCredentials
-	cryptoProviders: Pick<Providers, 'encrypt' | 'decrypt'>
+	cryptoProviders: Pick<Providers, 'encrypt' | 'decrypt' | 'encryptionEnabled'>
 }
 
 export class TenantContainerFactory {
 	constructor(
-		private readonly providers: Omit<Providers, 'encrypt' | 'decrypt'>,
+		private readonly providers: Omit<Providers, 'encrypt' | 'decrypt' | 'encryptionEnabled'>,
 	) {}
 
 	create(args: TenantContainerArgs): TenantContainer {
@@ -159,7 +160,15 @@ export class TenantContainerFactory {
 			.addService('authorizator', ({ accessEvaluator }) => new Authorizator.Default(accessEvaluator))
 			.addService('userMailer', ({ mailer, templateRenderer }) => new UserMailer(mailer, templateRenderer))
 			.addService('apiKeyService', () => new ApiKeyService())
-			.addService('apiKeyManager', ({ apiKeyService }) => new ApiKeyManager(apiKeyService))
+			.addService('idpRegistry', () => {
+				const idpRegistry = new IDPHandlerRegistry()
+				idpRegistry.registerHandler('oidc', new OIDCProvider())
+				idpRegistry.registerHandler('facebook', new FacebookProvider())
+				idpRegistry.registerHandler('apple', new AppleProvider())
+				return idpRegistry
+			})
+			.addService('idpSessionRevalidator', ({ idpRegistry }) => new IdpSessionRevalidator(idpRegistry))
+			.addService('apiKeyManager', ({ apiKeyService, idpSessionRevalidator }) => new ApiKeyManager(apiKeyService, idpSessionRevalidator))
 			.addService('emailValidator', () => new EmailValidator())
 			.addService('hibpChecker', (): HibpChecker => new HttpHibpChecker())
 			.addService('noopHibpChecker', (): HibpChecker => new NoopHibpChecker())
@@ -192,13 +201,6 @@ export class TenantContainerFactory {
 				'passwordResetManager',
 				({ userMailer, projectManager, passwordStrengthValidator }) => new PasswordResetManager(userMailer, projectManager, passwordStrengthValidator),
 			)
-			.addService('idpRegistry', () => {
-				const idpRegistry = new IDPHandlerRegistry()
-				idpRegistry.registerHandler('oidc', new OIDCProvider())
-				idpRegistry.registerHandler('facebook', new FacebookProvider())
-				idpRegistry.registerHandler('apple', new AppleProvider())
-				return idpRegistry
-			})
 			.addService('idpSignInManager', ({ apiKeyManager, idpRegistry }) => new IDPSignInManager(apiKeyManager, idpRegistry))
 			.addService('idpManager', ({ idpRegistry }) => new IDPManager(idpRegistry))
 			.addService('otpAuthenticator', ({ providers }) => new OtpAuthenticator(providers))

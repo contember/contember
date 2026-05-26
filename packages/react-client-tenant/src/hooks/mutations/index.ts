@@ -1,5 +1,6 @@
 export * from './apiKey'
 export * from './auth'
+export * from './emailVerification'
 export * from './invite'
 export * from './idp'
 export * from './memberships'

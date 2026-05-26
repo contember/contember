@@ -156,6 +156,80 @@ test('sign in - invalid password', async () => {
 	})
 })
 
+test('sign in - email not verified', async () => {
+	const email = 'john@doe.com'
+	const password = '123'
+	const identityId = testUuid(2)
+	const personId = testUuid(7)
+	await executeTenantTest({
+		query: signInMutation({ email, password }),
+		executes: [
+			getConfigSql(),
+			getNextLoginAttemptSql(email),
+			getPersonByEmailSql({
+				email,
+				response: { personId, identityId, password, roles: [], emailVerificationRequired: true, emailVerifiedAt: null },
+			}),
+		],
+		return: {
+			data: {
+				signIn: {
+					ok: false,
+					errors: [{ code: 'EMAIL_NOT_VERIFIED' }],
+					result: null,
+				},
+			},
+		},
+		expectedAuthLog: {
+			type: 'login',
+			response: expect.objectContaining({
+				ok: false,
+			}),
+		},
+	})
+})
+
+test('sign in - email verification required but already verified', async () => {
+	const email = 'john@doe.com'
+	const password = '123'
+	const identityId = testUuid(2)
+	const personId = testUuid(7)
+	const projectId = testUuid(10)
+	const apiKeyId = testUuid(1)
+	await executeTenantTest({
+		query: signInMutation({ email, password }),
+		executes: [
+			getConfigSql(),
+			getNextLoginAttemptSql(email),
+			getPersonByEmailSql({
+				email,
+				response: { personId, identityId, password, roles: [], emailVerificationRequired: true, emailVerifiedAt: now },
+			}),
+			getConfigSql(),
+			createSessionKeySql({ apiKeyId, identityId }),
+			getIdentityProjectsSql({ identityId, projectId }),
+			selectMembershipsSql({ identityId, projectId, membershipsResponse: [] }),
+		],
+		return: {
+			data: {
+				signIn: {
+					ok: true,
+					errors: [],
+					result: {
+						token: '0000000000000000000000000000000000000000',
+					},
+				},
+			},
+		},
+		expectedAuthLog: {
+			type: 'login',
+			response: expect.objectContaining({
+				ok: true,
+			}),
+		},
+	})
+})
+
 test('otp token not provided', async () => {
 	const email = 'john@doe.com'
 	const password = '123'

@@ -1,5 +1,6 @@
 export * from './ChangeProfileMutationResolver.js'
 export * from './ChangePasswordMutationResolver.js'
+export * from './EmailVerificationMutationResolver.js'
 export * from './IDPMutationResolver.js'
 export * from './InviteMutationResolver.js'
 export * from './OtpMutationResolver.js'

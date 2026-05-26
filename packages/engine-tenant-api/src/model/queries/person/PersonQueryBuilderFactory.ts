@@ -19,6 +19,8 @@ export class PersonQueryBuilderFactory {
 			.select(['person', 'disabled_at'])
 			.select(['person', 'passwordless_enabled'])
 			.select(['person', 'mfa_grace_until'])
+			.select(['person', 'email_verified_at'])
+			.select(['person', 'email_verification_required'])
 			.select(['identity', 'roles'])
 			.from('person')
 			.join('identity', 'identity', expr => expr.columnsEq(['identity', 'id'], ['person', 'identity_id']))

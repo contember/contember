@@ -22,6 +22,9 @@ export class ConfigurationQuery extends DatabaseQuery<Config> {
 			: null
 
 		return {
+			signup: {
+				requireEmailVerification: result.signup_require_email_verification,
+			},
 			passwordless: {
 				enabled: result.passwordless_enabled,
 				url: result.passwordless_url,

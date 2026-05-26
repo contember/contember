@@ -6,6 +6,9 @@ import PasswordlessSignIn from './templates/PasswordlessSignIn.mustache.js'
 import EmailOtp from './templates/EmailOtp.mustache.js'
 import ForcedSignOut from './templates/ForcedSignOut.mustache.js'
 import BackupCodesExhausted from './templates/BackupCodesExhausted.mustache.js'
+import EmailVerification from './templates/EmailVerification.mustache.js'
+import EmailChangeVerify from './templates/EmailChangeVerify.mustache.js'
+import EmailChangeNotify from './templates/EmailChangeNotify.mustache.js'
 import { MailTemplateData, MailTemplateIdentifier, MailType } from './type.js'
 import { MailTemplateQuery } from '../queries/index.js'
 import Layout from './templates/Layout.mustache.js'
@@ -76,6 +79,48 @@ export class UserMailer {
 		const template = (await this.getCustomTemplate(dbContext, templateId)) || {
 			subject: 'Your sessions have been signed out',
 			content: ForcedSignOut,
+			replyTo: null,
+		}
+		await this.sendMail(templateId, template, mailArguments)
+	}
+
+	async sendEmailVerificationEmail(
+		dbContext: DatabaseContext,
+		mailArguments: { email: string; token: string; project?: string; projectSlug?: string },
+		customMailOptions: { projectId: string | null; variant: string },
+	): Promise<void> {
+		const templateId = { type: MailType.emailVerification, ...customMailOptions }
+		const template = (await this.getCustomTemplate(dbContext, templateId)) || {
+			subject: 'Verify your e-mail address',
+			content: EmailVerification,
+			replyTo: null,
+		}
+		await this.sendMail(templateId, template, mailArguments)
+	}
+
+	async sendEmailChangeVerifyEmail(
+		dbContext: DatabaseContext,
+		mailArguments: { email: string; token: string; project?: string; projectSlug?: string },
+		customMailOptions: { projectId: string | null; variant: string },
+	): Promise<void> {
+		const templateId = { type: MailType.emailChangeVerify, ...customMailOptions }
+		const template = (await this.getCustomTemplate(dbContext, templateId)) || {
+			subject: 'Confirm your new e-mail address',
+			content: EmailChangeVerify,
+			replyTo: null,
+		}
+		await this.sendMail(templateId, template, mailArguments)
+	}
+
+	async sendEmailChangeNotifyEmail(
+		dbContext: DatabaseContext,
+		mailArguments: { email: string; newEmail: string; project?: string; projectSlug?: string },
+		customMailOptions: { projectId: string | null; variant: string },
+	): Promise<void> {
+		const templateId = { type: MailType.emailChangeNotify, ...customMailOptions }
+		const template = (await this.getCustomTemplate(dbContext, templateId)) || {
+			subject: 'Your e-mail address was changed',
+			content: EmailChangeNotify,
 			replyTo: null,
 		}
 		await this.sendMail(templateId, template, mailArguments)

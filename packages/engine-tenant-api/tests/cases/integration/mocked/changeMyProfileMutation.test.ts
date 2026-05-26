@@ -6,6 +6,7 @@ import { changeMyProfileMutation } from './gql/changeMyProfile.js'
 import { getPersonByIdentity } from './sql/getPersonByIdentity.js'
 import { authenticatedIdentityId } from '../../../src/testTenant.js'
 import { getPersonByEmailSql } from './sql/getPersonByEmailSql.js'
+import { getConfigSql } from './sql/getConfigSql.js'
 
 test('changes my name', async () => {
 	const personId = testUuid(1)
@@ -18,6 +19,7 @@ test('changes my name', async () => {
 				identityId,
 				response: { personId, email: 'john.doe@example.com', name: 'John Doe', roles: [], password: '123456' },
 			}),
+			getConfigSql(),
 			updatePersonProfileNameSql({ personId, name }),
 		],
 		return: {
@@ -42,6 +44,7 @@ test('unset my name', async () => {
 				identityId,
 				response: { personId, email: 'john.doe@example.com', name: 'John Doe', roles: [], password: '123456' },
 			}),
+			getConfigSql(),
 			updatePersonProfileNameSql({ personId, name }),
 		],
 		return: {
@@ -66,6 +69,7 @@ test('changes my email', async () => {
 				identityId,
 				response: { personId, email: 'john.doe@example.com', name: 'John Doe', roles: [], password: '123456' },
 			}),
+			getConfigSql(),
 			getPersonByEmailSql({ email, response: null }),
 			updatePersonProfileEmailSql({ personId, email }),
 		],
@@ -122,6 +126,7 @@ test('changes my email - invalid #2', async () => {
 				identityId,
 				response: { personId, email: 'john.doe@example.com', name: 'John Doe', roles: [], password: '123456' },
 			}),
+			getConfigSql(),
 		],
 		return: {
 			data: {
@@ -153,6 +158,7 @@ test('changes my email - exists', async () => {
 				identityId,
 				response: { personId, email: 'john.doe@example.com', name: 'John Doe', roles: [], password: '123456' },
 			}),
+			getConfigSql(),
 			getPersonByEmailSql({ email, response: { personId: testUuid(4), identityId: testUuid(5), roles: [], password: '' } }),
 		],
 		return: {
@@ -186,6 +192,7 @@ test('changes my name and email', async () => {
 				identityId,
 				response: { personId, email: 'john.doe@example.com', name: 'John Doe', roles: [], password: '123456' },
 			}),
+			getConfigSql(),
 			getPersonByEmailSql({ email, response: null }),
 			updatePersonProfileNameAndEmailSql({ personId, email, name }),
 		],

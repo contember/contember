@@ -6,7 +6,7 @@ import { resolveConfig } from './resolveConfig.js'
 
 const extraEntrypoints = {
 	'engine-server': ['start'],
-	'cli': ['run'],
+	'cli': ['run', 'index'],
 	'create': ['run'],
 	'client-content-generator': ['generate', 'index'],
 	playground: [],

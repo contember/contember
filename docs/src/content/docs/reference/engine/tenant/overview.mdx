@@ -1,0 +1,58 @@
+---
+title: Overview of Tenant API
+---
+
+The Contember Tenant API is a specialized GraphQL API for managing **projects**, **tokens**, **users**, and **roles**. Unlike the [Content API](/reference/engine/content/overview), the Tenant API is shared across all projects and is accessible at `https://engine-hostname/tenant`. Every request needs a `Bearer` token in the `Authorization` header.
+
+## Key Concepts
+
+- **Identity** — Carries roles and project memberships. The unit that authorization is bound to. May or may not have an attached person.
+- **Person** — An identity with credentials (email + optional password) and additional profile fields. Persons can sign in; bare identities cannot.
+- **API Key / Token** — A bearer token. Either *permanent* (created for an application or backend service, no expiry) or *session* (minted at sign-in time, short-lived, tied to a person). See [API keys](/reference/engine/tenant/api-keys) and [sessions](/reference/engine/tenant/sessions).
+
+## Authorization
+
+Just like the Content API, every Tenant API request needs a bearer token — including sign-in operations.
+
+The default tokens for the `login` and `super_admin` roles are configured via the `CONTEMBER_LOGIN_TOKEN` and `CONTEMBER_ROOT_TOKEN` environment variables. For local development they are visible in `docker-compose.yaml`.
+
+The login token authorizes the public auth flows: `signIn`, `signInIDP`, `signInPasswordless`, `createResetPasswordRequest`, `resetPassword`, `signUp`.
+
+## Choosing the right token
+
+Picking the correct token for a given operation can be confusing. The canonical example — generating a permanent API key so an application can read from the Content API:
+
+1. **Locate the login token** from your environment configuration.
+2. **Sign in** — call `signIn` against the Tenant API using the login token as the bearer.
+3. **Receive the session token** in the response. It's short-lived.
+4. **Create the API key** — call `createApiKey` using the session token as the bearer.
+5. **Read the permanent API token** out of the response. This is what your application stores.
+6. **Use the permanent API token** against the Content API.
+
+## Where to read next
+
+| You need to … | Page |
+|---|---|
+| Create new users from the public-facing endpoint | [Sign-up](/reference/engine/tenant/sign-up) |
+| Authenticate existing users (password, IdP, passwordless, admin-impersonation) | [Sign-in](/reference/engine/tenant/sign-in) · [IdP](/reference/engine/tenant/idp) · [Passwordless](/reference/engine/tenant/passwordless) |
+| Run the public password-reset flow | [Password reset](/reference/engine/tenant/password-reset) |
+| Set up TOTP two-factor authentication | [Two-factor](/reference/engine/tenant/two-factor) |
+| Change profile or password (self or admin) | [Profile and password changes](/reference/engine/tenant/profile) |
+| Invite users to projects | [Invites](/reference/engine/tenant/invites) |
+| Manage project membership | [Memberships](/reference/engine/tenant/memberships) |
+| Permanently disable an account | [Disabling a person](/reference/engine/tenant/disable-person) |
+| Create or revoke long-lived API keys for applications | [API keys](/reference/engine/tenant/api-keys) |
+| Create or update projects, set project secrets | [Project management](/reference/engine/tenant/projects) |
+| List, revoke, or force-end user sessions | [Sessions](/reference/engine/tenant/sessions) |
+| Have a backend service forward real user IP/UA to Contember | [Proxy trust](/reference/engine/tenant/proxy-trust) |
+| Tune password policy, captcha, rate limits | [Password policy](/reference/engine/tenant/password-policy) · [Anti-abuse](/reference/engine/tenant/anti-abuse) |
+| Customize transactional mails | [Mail templates](/reference/engine/tenant/mail-templates) |
+| Inspect what actions were taken against the tenant | [Audit log](/reference/engine/tenant/audit-log) |
+| See the full configuration surface in one place | [Configuration](/reference/engine/tenant/configuration) |
+
+## Audit
+
+:::note[Available since 2.2]
+:::
+
+Every authentication-relevant operation and every administrative tenant mutation is recorded in `person_auth_log`. The [audit log](/reference/engine/tenant/audit-log) page is the complete reference of event types, `event_data` payloads, and how to query them.

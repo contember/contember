@@ -183,6 +183,7 @@ export const nav: NavItem[] = [
 					doc('reference/engine/tenant/audit-log'),
 					doc('reference/engine/tenant/configuration'),
 					doc('reference/engine/tenant/mail-templates'),
+					doc('reference/engine/tenant/declarative-config'),
 				],
 			},
 			{

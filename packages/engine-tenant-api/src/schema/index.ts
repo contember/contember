@@ -305,6 +305,7 @@ export type CommonSignInResult = {
 export type Config = {
 	readonly __typename?: 'Config'
 	readonly captcha: ConfigCaptcha
+	readonly emailChange: ConfigEmailChange
 	readonly login: ConfigLogin
 	readonly password: ConfigPassword
 	readonly passwordless: ConfigPasswordless
@@ -337,8 +338,18 @@ export type CaptchaProvider =
 	| 'recaptchaV3'
 	| 'turnstile'
 
+export type ConfigEmailChange = {
+	readonly __typename?: 'ConfigEmailChange'
+	readonly requireVerification: Scalars['Boolean']['output']
+}
+
+export type ConfigEmailChangeInput = {
+	readonly requireVerification?: InputMaybe<Scalars['Boolean']['input']>
+}
+
 export type ConfigInput = {
 	readonly captcha?: InputMaybe<ConfigCaptchaInput>
+	readonly emailChange?: InputMaybe<ConfigEmailChangeInput>
 	readonly login?: InputMaybe<ConfigLoginInput>
 	readonly password?: InputMaybe<ConfigPasswordInput>
 	readonly passwordless?: InputMaybe<ConfigPasswordlessInput>
@@ -794,6 +805,7 @@ export type IdpOptions = {
 	readonly autoSignUp?: InputMaybe<Scalars['Boolean']['input']>
 	readonly exclusive?: InputMaybe<Scalars['Boolean']['input']>
 	readonly initReturnsConfig?: InputMaybe<Scalars['Boolean']['input']>
+	readonly requireVerifiedEmail?: InputMaybe<Scalars['Boolean']['input']>
 }
 
 export type IdpOptionsOutput = {
@@ -801,6 +813,7 @@ export type IdpOptionsOutput = {
 	readonly autoSignUp: Scalars['Boolean']['output']
 	readonly exclusive: Scalars['Boolean']['output']
 	readonly initReturnsConfig: Scalars['Boolean']['output']
+	readonly requireVerifiedEmail: Scalars['Boolean']['output']
 }
 
 export type IdpResponseInput = {
@@ -1935,6 +1948,8 @@ export type ResolversTypes = {
 	Config: ResolverTypeWrapper<Config>
 	ConfigCaptcha: ResolverTypeWrapper<ConfigCaptcha>
 	ConfigCaptchaInput: ConfigCaptchaInput
+	ConfigEmailChange: ResolverTypeWrapper<ConfigEmailChange>
+	ConfigEmailChangeInput: ConfigEmailChangeInput
 	ConfigInput: ConfigInput
 	ConfigSignup: ResolverTypeWrapper<ConfigSignup>
 	ConfigSignupInput: ConfigSignupInput
@@ -2159,6 +2174,8 @@ export type ResolversParentTypes = {
 	Config: Config
 	ConfigCaptcha: ConfigCaptcha
 	ConfigCaptchaInput: ConfigCaptchaInput
+	ConfigEmailChange: ConfigEmailChange
+	ConfigEmailChangeInput: ConfigEmailChangeInput
 	ConfigInput: ConfigInput
 	ConfigSignup: ConfigSignup
 	ConfigSignupInput: ConfigSignupInput
@@ -2516,6 +2533,7 @@ export type CommonSignInResultResolvers<
 
 export type ConfigResolvers<ContextType = any, ParentType extends ResolversParentTypes['Config'] = ResolversParentTypes['Config']> = {
 	captcha?: Resolver<ResolversTypes['ConfigCaptcha'], ParentType, ContextType>
+	emailChange?: Resolver<ResolversTypes['ConfigEmailChange'], ParentType, ContextType>
 	login?: Resolver<ResolversTypes['ConfigLogin'], ParentType, ContextType>
 	password?: Resolver<ResolversTypes['ConfigPassword'], ParentType, ContextType>
 	passwordless?: Resolver<ResolversTypes['ConfigPasswordless'], ParentType, ContextType>
@@ -2889,6 +2907,7 @@ export type IdpOptionsOutputResolvers<
 	autoSignUp?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
 	exclusive?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
 	initReturnsConfig?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
+	requireVerifiedEmail?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
 	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
 }
 

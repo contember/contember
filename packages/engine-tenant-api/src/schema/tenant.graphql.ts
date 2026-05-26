@@ -150,6 +150,7 @@ const schema: DocumentNode = gql`
 	
 	type Config {
 		signup: ConfigSignup!
+		emailChange: ConfigEmailChange!
 		passwordless: ConfigPasswordless!
 		password: ConfigPassword!
 		login: ConfigLogin!
@@ -160,13 +161,23 @@ const schema: DocumentNode = gql`
 	type ConfigSignup {
 		"""
 		When true, new accounts must verify their e-mail address before they can
-		sign in, and changeMyProfile e-mail changes go through a confirmation
-		flow (confirmEmailChange) instead of swapping the address immediately.
-		The requirement is captured per account at sign-up, so toggling this only
-		affects accounts created afterwards. Defaults to false (no change vs.
-		previous behavior).
+		sign in. The requirement is captured per account at sign-up, so toggling
+		this only affects accounts created afterwards. Defaults to false (no
+		change vs. previous behavior). E-mail changes are governed separately by
+		ConfigEmailChange.requireVerification.
 		"""
 		requireEmailVerification: Boolean!
+	}
+
+	type ConfigEmailChange {
+		"""
+		When true, a user-initiated changeMyProfile e-mail change does not swap
+		the address immediately: it goes through a confirmation flow
+		(confirmEmailChange) against a token mailed to the new address, and the
+		old address stays active until the new one is confirmed. Independent of
+		ConfigSignup.requireEmailVerification. Defaults to true.
+		"""
+		requireVerification: Boolean!
 	}
 
 	type ConfigPasswordless {
@@ -239,6 +250,7 @@ const schema: DocumentNode = gql`
 
 	input ConfigInput {
 		signup: ConfigSignupInput
+		emailChange: ConfigEmailChangeInput
 		passwordless: ConfigPasswordlessInput
 		password: ConfigPasswordInput
 		login: ConfigLoginInput
@@ -248,6 +260,10 @@ const schema: DocumentNode = gql`
 
 	input ConfigSignupInput {
 		requireEmailVerification: Boolean
+	}
+
+	input ConfigEmailChangeInput {
+		requireVerification: Boolean
 	}
 
 	enum ConfigPolicy {
@@ -674,12 +690,19 @@ const schema: DocumentNode = gql`
 		autoSignUp: Boolean!
 		exclusive: Boolean!
 		initReturnsConfig: Boolean!
+		"""
+		When true, a non-exclusive provider may only auto-link to / sign in an
+		existing account by e-mail if the provider asserts the e-mail is verified.
+		Defaults to false.
+		"""
+		requireVerifiedEmail: Boolean!
 	}
 
 	input IDPOptions {
 		autoSignUp: Boolean
 		exclusive: Boolean
 		initReturnsConfig: Boolean
+		requireVerifiedEmail: Boolean
 	}
 
 	# === passwordless sign in ===

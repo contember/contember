@@ -91,12 +91,14 @@ export class ChangeProfileMutationResolver implements Pick<MutationResolvers, 'c
 		const normalizedNewEmail = args.email ? normalizeEmail(args.email) : null
 		const emailChanging = normalizedNewEmail !== null && normalizedNewEmail !== person.email
 
-		// When verification is required, an e-mail change is not applied
-		// immediately: it goes through confirmEmailChange against a token mailed
-		// to the new address. The name change (if any) is applied atomically with
-		// the token — validation/rate-limiting run first, so a rejected e-mail
-		// never leaves a half-applied profile.
-		if (emailChanging && config.signup.requireEmailVerification) {
+		// When e-mail-change verification is required, an e-mail change is not
+		// applied immediately: it goes through confirmEmailChange against a token
+		// mailed to the new address (the old address stays active until then). The
+		// name change (if any) is applied atomically with the token —
+		// validation/rate-limiting run first, so a rejected e-mail never leaves a
+		// half-applied profile. This is governed by its own config flag,
+		// independent of signup verification.
+		if (emailChanging && config.emailChange.requireVerification) {
 			const permissionContext = await this.permissionContextFactory.create(context.db, {
 				id: person.identity_id,
 				roles: person.roles,

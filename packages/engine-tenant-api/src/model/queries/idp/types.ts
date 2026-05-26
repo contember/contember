@@ -9,6 +9,7 @@ export type IdentityProviderRow = {
 	autoSignUp: boolean
 	exclusive: boolean
 	initReturnsConfig: boolean
+	requireVerifiedEmail: boolean
 }
 
 export type IdentityProviderDto =

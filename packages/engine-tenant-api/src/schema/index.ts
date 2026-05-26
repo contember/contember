@@ -347,6 +347,7 @@ export type CommonSignInResult = {
 export type Config = {
 	readonly __typename?: 'Config'
 	readonly captcha: ConfigCaptcha
+	readonly emailChange: ConfigEmailChange
 	readonly login: ConfigLogin
 	readonly password: ConfigPassword
 	readonly passwordless: ConfigPasswordless
@@ -374,8 +375,25 @@ export type ConfigCaptchaInput = {
 	readonly threshold?: InputMaybe<Scalars['Float']['input']>
 }
 
+export type ConfigEmailChange = {
+	readonly __typename?: 'ConfigEmailChange'
+	/**
+	 * When true, a user-initiated changeMyProfile e-mail change does not swap
+	 * the address immediately: it goes through a confirmation flow
+	 * (confirmEmailChange) against a token mailed to the new address, and the
+	 * old address stays active until the new one is confirmed. Independent of
+	 * ConfigSignup.requireEmailVerification. Defaults to true.
+	 */
+	readonly requireVerification: Scalars['Boolean']['output']
+}
+
+export type ConfigEmailChangeInput = {
+	readonly requireVerification?: InputMaybe<Scalars['Boolean']['input']>
+}
+
 export type ConfigInput = {
 	readonly captcha?: InputMaybe<ConfigCaptchaInput>
+	readonly emailChange?: InputMaybe<ConfigEmailChangeInput>
 	readonly login?: InputMaybe<ConfigLoginInput>
 	readonly password?: InputMaybe<ConfigPasswordInput>
 	readonly passwordless?: InputMaybe<ConfigPasswordlessInput>
@@ -499,11 +517,10 @@ export type ConfigSignup = {
 	readonly __typename?: 'ConfigSignup'
 	/**
 	 * When true, new accounts must verify their e-mail address before they can
-	 * sign in, and changeMyProfile e-mail changes go through a confirmation
-	 * flow (confirmEmailChange) instead of swapping the address immediately.
-	 * The requirement is captured per account at sign-up, so toggling this only
-	 * affects accounts created afterwards. Defaults to false (no change vs.
-	 * previous behavior).
+	 * sign in. The requirement is captured per account at sign-up, so toggling
+	 * this only affects accounts created afterwards. Defaults to false (no
+	 * change vs. previous behavior). E-mail changes are governed separately by
+	 * ConfigEmailChange.requireVerification.
 	 */
 	readonly requireEmailVerification: Scalars['Boolean']['output']
 }
@@ -868,6 +885,7 @@ export type IdpOptions = {
 	readonly autoSignUp?: InputMaybe<Scalars['Boolean']['input']>
 	readonly exclusive?: InputMaybe<Scalars['Boolean']['input']>
 	readonly initReturnsConfig?: InputMaybe<Scalars['Boolean']['input']>
+	readonly requireVerifiedEmail?: InputMaybe<Scalars['Boolean']['input']>
 }
 
 export type IdpOptionsOutput = {
@@ -875,6 +893,12 @@ export type IdpOptionsOutput = {
 	readonly autoSignUp: Scalars['Boolean']['output']
 	readonly exclusive: Scalars['Boolean']['output']
 	readonly initReturnsConfig: Scalars['Boolean']['output']
+	/**
+	 * When true, a non-exclusive provider may only auto-link to / sign in an
+	 * existing account by e-mail if the provider asserts the e-mail is verified.
+	 * Defaults to false.
+	 */
+	readonly requireVerifiedEmail: Scalars['Boolean']['output']
 }
 
 export type IdpResponseInput = {
@@ -2253,6 +2277,8 @@ export type ResolversTypes = {
 	Config: ResolverTypeWrapper<Config>
 	ConfigCaptcha: ResolverTypeWrapper<ConfigCaptcha>
 	ConfigCaptchaInput: ConfigCaptchaInput
+	ConfigEmailChange: ResolverTypeWrapper<ConfigEmailChange>
+	ConfigEmailChangeInput: ConfigEmailChangeInput
 	ConfigInput: ConfigInput
 	ConfigLogin: ResolverTypeWrapper<ConfigLogin>
 	ConfigLoginInput: ConfigLoginInput
@@ -2508,6 +2534,8 @@ export type ResolversParentTypes = {
 	Config: Config
 	ConfigCaptcha: ConfigCaptcha
 	ConfigCaptchaInput: ConfigCaptchaInput
+	ConfigEmailChange: ConfigEmailChange
+	ConfigEmailChangeInput: ConfigEmailChangeInput
 	ConfigInput: ConfigInput
 	ConfigLogin: ConfigLogin
 	ConfigLoginInput: ConfigLoginInput
@@ -2898,6 +2926,7 @@ export type CommonSignInResultResolvers<
 
 export type ConfigResolvers<ContextType = any, ParentType extends ResolversParentTypes['Config'] = ResolversParentTypes['Config']> = {
 	captcha?: Resolver<ResolversTypes['ConfigCaptcha'], ParentType, ContextType>
+	emailChange?: Resolver<ResolversTypes['ConfigEmailChange'], ParentType, ContextType>
 	login?: Resolver<ResolversTypes['ConfigLogin'], ParentType, ContextType>
 	password?: Resolver<ResolversTypes['ConfigPassword'], ParentType, ContextType>
 	passwordless?: Resolver<ResolversTypes['ConfigPasswordless'], ParentType, ContextType>
@@ -2911,6 +2940,13 @@ export type ConfigCaptchaResolvers<
 > = {
 	provider?: Resolver<Maybe<ResolversTypes['CaptchaProvider']>, ParentType, ContextType>
 	threshold?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>
+}
+
+export type ConfigEmailChangeResolvers<
+	ContextType = any,
+	ParentType extends ResolversParentTypes['ConfigEmailChange'] = ResolversParentTypes['ConfigEmailChange'],
+> = {
+	requireVerification?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
 }
 
 export type ConfigLoginResolvers<ContextType = any, ParentType extends ResolversParentTypes['ConfigLogin'] = ResolversParentTypes['ConfigLogin']> = {
@@ -3315,6 +3351,7 @@ export type IdpOptionsOutputResolvers<
 	autoSignUp?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
 	exclusive?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
 	initReturnsConfig?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
+	requireVerifiedEmail?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
 }
 
 export type IdentityResolvers<ContextType = any, ParentType extends ResolversParentTypes['Identity'] = ResolversParentTypes['Identity']> = {
@@ -4282,6 +4319,7 @@ export type Resolvers<ContextType = any> = {
 	CommonSignInResult?: CommonSignInResultResolvers<ContextType>
 	Config?: ConfigResolvers<ContextType>
 	ConfigCaptcha?: ConfigCaptchaResolvers<ContextType>
+	ConfigEmailChange?: ConfigEmailChangeResolvers<ContextType>
 	ConfigLogin?: ConfigLoginResolvers<ContextType>
 	ConfigPassword?: ConfigPasswordResolvers<ContextType>
 	ConfigPasswordless?: ConfigPasswordlessResolvers<ContextType>

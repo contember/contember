@@ -41,11 +41,17 @@ export const handleOIDCResponse = async (
 		const userInfo = result.access_token && fetchUserInfo ? await client.userinfo(result) : {}
 		const oidcResult = returnOIDCResult ? result : {}
 
+		// The OIDC `email_verified` claim is a boolean per spec, but some providers
+		// send the string "true"; userInfo takes precedence over the ID token.
+		const rawEmailVerified = (userInfo as Record<string, unknown>).email_verified ?? claimsWithoutHashes.email_verified
+		const emailVerified = rawEmailVerified === true || rawEmailVerified === 'true'
+
 		return {
 			externalIdentifier: claims.sub,
 			...oidcResult,
 			...claimsWithoutHashes,
 			...userInfo,
+			emailVerified,
 		}
 	} catch (e: any) {
 		if (e instanceof errors.RPError) {

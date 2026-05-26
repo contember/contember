@@ -11,6 +11,12 @@ Every successful `configure` call is recorded in the [audit log](/reference/engi
 ```graphql
 query {
   configuration {
+    signup {
+      requireEmailVerification
+    }
+    emailChange {
+      requireVerification
+    }
     password {
       minLength
       requireUppercase
@@ -81,6 +87,18 @@ Prefer keeping configuration in version control? Describe it in a typed `tenant.
 :::
 
 ## Sections
+
+### `signup` *(since 2.2)*
+
+| Field | Default | Notes |
+|---|---|---|
+| `requireEmailVerification` | `false` | New accounts must verify their e-mail before they can sign in. Captured per account at sign-up; toggling affects only accounts created afterwards. See [e-mail verification](/reference/engine/tenant/email-verification). |
+
+### `emailChange` *(since 2.2)*
+
+| Field | Default | Notes |
+|---|---|---|
+| `requireVerification` | `true` | Self-service `changeMyProfile` e-mail changes go through `confirmEmailChange` against a token mailed to the new address, instead of swapping immediately. Independent of `signup.requireEmailVerification`. See [e-mail verification](/reference/engine/tenant/email-verification#e-mail-change-verification). |
 
 ### `password`
 

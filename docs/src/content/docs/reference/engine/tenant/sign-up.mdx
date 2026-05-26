@@ -38,6 +38,10 @@ mutation {
 
 `password` and `passwordHash` are mutually exclusive; pass neither to create a person with no password (intended for passwordless-only or IDP-only accounts).
 
+## E-mail verification *(since 2.2)*
+
+When `signup.requireEmailVerification` is enabled, `signUp` still succeeds but Contember mails a verification token to the address and the account cannot sign in (`signIn` returns `EMAIL_NOT_VERIFIED`) until it is verified. The requirement is frozen onto the account at sign-up time, so toggling the flag never affects existing accounts. See [e-mail verification](/reference/engine/tenant/email-verification).
+
 ## Errors
 
 | Code | Cause |

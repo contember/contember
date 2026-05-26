@@ -489,7 +489,8 @@ const schema: DocumentNode = gql`
 		NOT_A_PERSON
 		INVALID_EMAIL_FORMAT
 		EMAIL_ALREADY_EXISTS
-	}	
+		RATE_LIMIT_EXCEEDED
+	}
 
 	# === changePassword ===
 

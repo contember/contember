@@ -36,16 +36,18 @@ export class EmailVerificationMutationResolver implements Pick<MutationResolvers
 				id: person.identity_id,
 				roles: person.roles,
 			})
-			await this.emailVerificationManager.sendVerificationEmail(context.db, permissionContext, person, {
+			const sent = await this.emailVerificationManager.sendVerificationEmail(context.db, permissionContext, person, {
 				mailVariant: args.options?.mailVariant || undefined,
 				project: args.options?.mailProject || undefined,
 			})
-			await context.logAuthAction({
-				type: 'email_verify_init',
-				response: new ResponseOk(null),
-				personId: person.id,
-				personInput: args.email,
-			})
+			if (sent) {
+				await context.logAuthAction({
+					type: 'email_verify_init',
+					response: new ResponseOk(null),
+					personId: person.id,
+					personInput: args.email,
+				})
+			}
 		}
 		return { ok: true }
 	}

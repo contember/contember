@@ -20,6 +20,7 @@ import {
 } from '../../../model'
 import { createErrorResponse } from '../../errorUtils'
 import { ResponseOk } from '../../../model/utils/Response'
+import { normalizeEmail } from '../../../model/utils/email'
 
 export class ChangeProfileMutationResolver implements Pick<MutationResolvers, 'changeMyProfile' | 'changeProfile' | 'confirmEmailChange'> {
 	constructor(
@@ -85,30 +86,39 @@ export class ChangeProfileMutationResolver implements Pick<MutationResolvers, 'c
 		})
 
 		const config = await context.db.queryHandler.fetch(new ConfigurationQuery(context.db.providers))
-		const emailChanging = !!args.email && args.email !== person.email
+		// Compare normalized: a resubmit that only differs in casing/whitespace is
+		// not a real change and must not trigger a confirmation mail.
+		const normalizedNewEmail = args.email ? normalizeEmail(args.email) : null
+		const emailChanging = normalizedNewEmail !== null && normalizedNewEmail !== person.email
 
 		// When verification is required, an e-mail change is not applied
 		// immediately: it goes through confirmEmailChange against a token mailed
-		// to the new address. The name change (if any) still applies right away.
+		// to the new address. The name change (if any) is applied atomically with
+		// the token — validation/rate-limiting run first, so a rejected e-mail
+		// never leaves a half-applied profile.
 		if (emailChanging && config.signup.requireEmailVerification) {
-			if (args.name !== undefined) {
-				const nameResult = await this.personManager.changeProfile(context.db, person, {
-					name: args.name === '' ? null : args.name,
-				})
-				if (!nameResult.ok) {
-					return createErrorResponse(nameResult.error, nameResult.errorMessage)
-				}
-			}
 			const permissionContext = await this.permissionContextFactory.create(context.db, {
 				id: person.identity_id,
 				roles: person.roles,
 			})
-			const result = await this.emailChangeManager.requestEmailChange(context.db, permissionContext, person, args.email!)
+			const result = await this.emailChangeManager.requestEmailChange(
+				context.db,
+				permissionContext,
+				person,
+				normalizedNewEmail,
+				{},
+				args.name !== undefined
+					? async db => {
+						await this.personManager.changeProfile(db, person, { name: args.name === '' ? null : args.name })
+					}
+					: undefined,
+			)
 			await context.logAuthAction({
 				type: 'email_change_init',
 				response: result,
 				personId: person.id,
-				personInput: args.email!,
+				// Log the normalized address so it matches the per-recipient backoff key.
+				personInput: normalizedNewEmail,
 			})
 			if (!result.ok) {
 				return createErrorResponse(result.error, result.errorMessage)

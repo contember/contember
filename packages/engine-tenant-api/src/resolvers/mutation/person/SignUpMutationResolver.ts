@@ -93,13 +93,15 @@ export class SignUpMutationResolver implements MutationResolvers {
 					id: personRow.identity_id,
 					roles: personRow.roles,
 				})
-				await this.emailVerificationManager.sendVerificationEmail(context.db, permissionContext, personRow)
-				await context.logAuthAction({
-					type: 'email_verify_init',
-					response: new ResponseOk(null),
-					personId: personRow.id,
-					personInput: personRow.email,
-				})
+				const sent = await this.emailVerificationManager.sendVerificationEmail(context.db, permissionContext, personRow)
+				if (sent) {
+					await context.logAuthAction({
+						type: 'email_verify_init',
+						response: new ResponseOk(null),
+						personId: personRow.id,
+						personInput: personRow.email,
+					})
+				}
 			}
 		}
 

@@ -239,6 +239,7 @@ export type ChangeMyProfileErrorCode =
 	| 'EMAIL_ALREADY_EXISTS'
 	| 'INVALID_EMAIL_FORMAT'
 	| 'NOT_A_PERSON'
+	| 'RATE_LIMIT_EXCEEDED'
 
 export type ChangeMyProfileResponse = {
 	readonly __typename?: 'ChangeMyProfileResponse'

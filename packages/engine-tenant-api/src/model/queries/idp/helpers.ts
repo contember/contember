@@ -14,7 +14,9 @@ export const createBaseIdpQuery = () =>
 		.select('require_verified_email', 'requireVerifiedEmail')
 		.from('identity_provider')
 
-export const createIdpDto = ({ exclusive, autoSignUp, initReturnsConfig, requireVerifiedEmail, ...row }: IdentityProviderRow): IdentityProviderDto => {
+export const createIdpDto = (
+	{ exclusive, autoSignUp, initReturnsConfig, requireVerifiedEmail, ...row }: IdentityProviderRow,
+): IdentityProviderDto => {
 	return {
 		...row,
 		options: { autoSignUp, exclusive, initReturnsConfig, requireVerifiedEmail },

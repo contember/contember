@@ -112,6 +112,7 @@ export const dict = {
 				'RATE_LIMIT_EXCEEDED': 'Too many failed attempts, please try again later',
 				'OTP_REQUIRED': undefined,
 				'MFA_ENROLLMENT_REQUIRED': 'Multi-factor authentication enrollment is required',
+				'EMAIL_NOT_VERIFIED': 'Your e-mail address has not been verified',
 			} satisfies Record<LoginFormErrorCode, string | undefined>,
 			idpInitError: 'Failed to initialize IdP login:',
 			idpResponseError: 'Failed to process IdP response:',

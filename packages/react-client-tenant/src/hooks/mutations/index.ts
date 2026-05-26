@@ -1,5 +1,6 @@
 export * from './apiKey/index.js'
 export * from './auth/index.js'
+export * from './emailVerification/index.js'
 export * from './invite/index.js'
 export * from './idp/index.js'
 export * from './memberships/index.js'

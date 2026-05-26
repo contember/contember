@@ -20,7 +20,7 @@ Example File Name: `2023-10-26-150000-add-english-locale.js`
 You can use the Contember CLI to create blank migration files. Simply run the following command and provide a label for your migration.
 
 ```bash
-yarn contember migration:blank <label>
+npm run contember migrations:blank <label>
 ```
 
 Depending on the complexity of your migration, you can choose to use a JSON, JavaScript (JS), or TypeScript (TS) file. By default, the CLI will create a TypeScript file.
@@ -130,10 +130,10 @@ It's crucial to fetch the "ok" and "errorMessage" fields for top-level mutations
 
 ## Applying Migrations
 
-To run your content migrations, use the Contember CLI’s `migration:execute` command.
+To run your content migrations, use the Contember CLI’s `migrations:execute` command.
 
 ```bash
-npx contember migration:execute
+npm run contember migrations:execute
 ```
 
 ### Execution Model for Function Migrations

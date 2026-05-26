@@ -7,7 +7,7 @@ import { UpdateIdpSessionCommand } from '../../commands/idp/UpdateIdpSessionComm
 import { DisableApiKeyCommand } from '../../commands'
 import { CreateAuthLogEntryCommand } from '../../commands/authLog/CreateAuthLogEntryCommand'
 import { REVALIDATION_DEFAULT_FALLBACK_INTERVAL, REVALIDATION_DEFAULT_MIN_INTERVAL, REVALIDATION_DEFAULT_SOFT_THRESHOLD } from './IDPRevalidation'
-import { IdentityProviderHandler } from './IdentityProviderHandler'
+import { IdentityProviderHandler, RevalidationResult } from './IdentityProviderHandler'
 
 export type RevalidationOutcome = 'valid' | 'revoked'
 
@@ -91,8 +91,12 @@ export class IdpSessionRevalidator {
 		}
 
 		// SWR: serve this request from the (still valid) token, refresh after the response.
+		// The work runs detached (after the response is sent), so any rejection — a transient
+		// DB error in the revoke / persist writes, a corrupt-config throw — must be swallowed
+		// here; otherwise it becomes an unhandledRejection and can take the worker down. The
+		// session is simply kept and re-tried on a later request (the claim floor throttles).
 		setImmediate(() => {
-			void this.runRevalidation(dbContext, handler, row, apiKeyRow)
+			this.runRevalidation(dbContext, handler, row, apiKeyRow).catch(() => {})
 		})
 		return 'valid'
 	}
@@ -128,13 +132,14 @@ export class IdpSessionRevalidator {
 		row: IdpSessionRow,
 		apiKeyRow: ApiKeyRow,
 	): Promise<RevalidationOutcome> {
-		let result
+		let result: RevalidationResult
 		try {
 			const config = handler.validateConfiguration(row.providerConfiguration)
 			result = await handler.revalidate!(config, row.session)
 		} catch {
-			// transient failure (network / IdP down) — must NOT revoke; keep the session and
-			// retry on a later request (the claim floor prevents hammering the IdP).
+			// transient failure (network / IdP down) or a corrupt stored config — must NOT
+			// revoke; keep the session and retry on a later request (the claim floor prevents
+			// hammering the IdP).
 			return 'valid'
 		}
 
@@ -143,11 +148,28 @@ export class IdpSessionRevalidator {
 			return 'revoked'
 		}
 
-		// Still valid — persist the rotated token (resets the lifetime reference) / refreshed expiry.
+		// Still valid — persist the rotated token (resets the lifetime reference) / refreshed
+		// expiry. A rotation is a real, low-frequency event (token-lifetime cadence), so we
+		// audit it as `idp_session_revalidated`; the no-op userinfo/introspection probes
+		// (no rotated session) are intentionally NOT logged to keep the audit log usable.
 		if (result.idpSession) {
 			await dbContext.commandBus.execute(new UpdateIdpSessionCommand(row.id, result.idpSession))
+			await this.logRevalidated(dbContext, apiKeyRow, row)
 		}
 		return 'valid'
+	}
+
+	private async logRevalidated(dbContext: DatabaseContext, apiKeyRow: ApiKeyRow, row: IdpSessionRow): Promise<void> {
+		await dbContext.commandBus.execute(
+			new CreateAuthLogEntryCommand({
+				type: 'idp_session_revalidated',
+				invokedById: apiKeyRow.identity_id,
+				personId: apiKeyRow.person_id ?? undefined,
+				identityProviderId: row.identityProviderId,
+				personTokenId: apiKeyRow.id,
+				success: true,
+			}),
+		)
 	}
 
 	private async revoke(dbContext: DatabaseContext, apiKeyRow: ApiKeyRow, row: IdpSessionRow, reason: string): Promise<void> {

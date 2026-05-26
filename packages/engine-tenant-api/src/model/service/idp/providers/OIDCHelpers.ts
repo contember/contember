@@ -133,8 +133,19 @@ export const revalidateOIDC = async (
 		}
 		return { status: 'valid' }
 	} catch (e: any) {
-		if (e instanceof errors.OPError && typeof e.error === 'string' && REVOKED_OIDC_ERRORS.has(e.error)) {
-			return { status: 'revoked', reason: e.error }
+		if (e instanceof errors.OPError) {
+			if (typeof e.error === 'string' && REVOKED_OIDC_ERRORS.has(e.error)) {
+				return { status: 'revoked', reason: e.error }
+			}
+			// The userinfo endpoint signals a rejected access token with a bare HTTP 401 — per
+			// RFC 6750 the `WWW-Authenticate` error code is optional, so openid-client may not
+			// surface a parseable `error` here. A 401 is still definitive: the token is no
+			// longer accepted → revoked. (Introspection is NOT treated this way: it returns 200
+			// `{active:false}` for revoked tokens, so a 401/400 there means client-auth/config
+			// failure — transient, must not log users out.)
+			if (method === 'userinfo' && e.response?.statusCode === 401) {
+				return { status: 'revoked', reason: 'userinfo_unauthorized' }
+			}
 		}
 		// transient (network / IdP unavailable) — propagate, do not revoke
 		throw e

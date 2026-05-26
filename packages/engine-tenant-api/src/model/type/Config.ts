@@ -3,6 +3,7 @@ import { IPostgresInterval } from 'postgres-interval'
 import { type Config as ConfigSchema } from '../../schema'
 import { Interval } from '../../schema/types'
 export type ConfigRow = {
+	signup_require_email_verification: boolean
 	passwordless_enabled: ConfigPolicy
 	passwordless_url: string | null
 	passwordless_expiration: IPostgresInterval

@@ -308,6 +308,7 @@ export type Config = {
 	readonly password: ConfigPassword
 	readonly passwordless: ConfigPasswordless
 	readonly rateLimits: ConfigRateLimits
+	readonly signup: ConfigSignup
 }
 
 /**
@@ -341,7 +342,74 @@ export type ConfigInput = {
 	readonly password?: InputMaybe<ConfigPasswordInput>
 	readonly passwordless?: InputMaybe<ConfigPasswordlessInput>
 	readonly rateLimits?: InputMaybe<ConfigRateLimitsInput>
+	readonly signup?: InputMaybe<ConfigSignupInput>
 }
+
+export type ConfigSignup = {
+	readonly __typename?: 'ConfigSignup'
+	readonly requireEmailVerification: Scalars['Boolean']['output']
+}
+
+export type ConfigSignupInput = {
+	readonly requireEmailVerification?: InputMaybe<Scalars['Boolean']['input']>
+}
+
+export type EmailVerificationOptions = {
+	readonly mailProject?: InputMaybe<Scalars['String']['input']>
+	readonly mailVariant?: InputMaybe<Scalars['String']['input']>
+}
+
+export type RequestEmailVerificationResponse = {
+	readonly __typename?: 'RequestEmailVerificationResponse'
+	readonly error?: Maybe<RequestEmailVerificationError>
+	readonly ok: Scalars['Boolean']['output']
+}
+
+export type RequestEmailVerificationError = {
+	readonly __typename?: 'RequestEmailVerificationError'
+	readonly code: RequestEmailVerificationErrorCode
+	readonly developerMessage: Scalars['String']['output']
+}
+
+export type RequestEmailVerificationErrorCode = 'RATE_LIMIT_EXCEEDED'
+
+export type VerifyEmailResponse = {
+	readonly __typename?: 'VerifyEmailResponse'
+	readonly error?: Maybe<VerifyEmailError>
+	readonly ok: Scalars['Boolean']['output']
+}
+
+export type VerifyEmailError = {
+	readonly __typename?: 'VerifyEmailError'
+	readonly code: VerifyEmailErrorCode
+	readonly developerMessage: Scalars['String']['output']
+}
+
+export type VerifyEmailErrorCode =
+	| 'TOKEN_EXPIRED'
+	| 'TOKEN_INVALID'
+	| 'TOKEN_NOT_FOUND'
+	| 'TOKEN_USED'
+
+export type ConfirmEmailChangeResponse = {
+	readonly __typename?: 'ConfirmEmailChangeResponse'
+	readonly error?: Maybe<ConfirmEmailChangeError>
+	readonly ok: Scalars['Boolean']['output']
+}
+
+export type ConfirmEmailChangeError = {
+	readonly __typename?: 'ConfirmEmailChangeError'
+	readonly code: ConfirmEmailChangeErrorCode
+	readonly developerMessage: Scalars['String']['output']
+}
+
+export type ConfirmEmailChangeErrorCode =
+	| 'EMAIL_ALREADY_EXISTS'
+	| 'INVALID_EMAIL_FORMAT'
+	| 'TOKEN_EXPIRED'
+	| 'TOKEN_INVALID'
+	| 'TOKEN_NOT_FOUND'
+	| 'TOKEN_USED'
 
 /**
  * Configurable per-IP rate-limit windows. Each value bounds the number of
@@ -909,6 +977,9 @@ export type MailTemplateIdentifier = {
 }
 
 export type MailType =
+	| 'EMAIL_CHANGE_NOTIFY'
+	| 'EMAIL_CHANGE_VERIFY'
+	| 'EMAIL_VERIFICATION'
 	| 'EXISTING_USER_INVITED'
 	| 'FORCED_SIGN_OUT'
 	| 'NEW_USER_INVITED'
@@ -957,6 +1028,7 @@ export type Mutation = {
 	readonly changePassword?: Maybe<ChangePasswordResponse>
 	readonly changeProfile?: Maybe<ChangeProfileResponse>
 	readonly configure?: Maybe<ConfigureResponse>
+	readonly confirmEmailChange?: Maybe<ConfirmEmailChangeResponse>
 	readonly confirmOtp?: Maybe<ConfirmOtpResponse>
 	readonly createApiKey?: Maybe<CreateApiKeyResponse>
 	readonly createGlobalApiKey?: Maybe<CreateApiKeyResponse>
@@ -980,6 +1052,7 @@ export type Mutation = {
 	/** @deprecated use removeMailTemplate */
 	readonly removeProjectMailTemplate?: Maybe<RemoveMailTemplateResponse>
 	readonly removeProjectMember?: Maybe<RemoveProjectMemberResponse>
+	readonly requestEmailVerification?: Maybe<RequestEmailVerificationResponse>
 	readonly resetPassword?: Maybe<ResetPasswordResponse>
 	readonly revokeSession?: Maybe<RevokeSessionResponse>
 	readonly setProjectSecret?: Maybe<SetProjectSecretResponse>
@@ -992,6 +1065,7 @@ export type Mutation = {
 	readonly updateIDP?: Maybe<UpdateIdpResponse>
 	readonly updateProject?: Maybe<UpdateProjectResponse>
 	readonly updateProjectMember?: Maybe<UpdateProjectMemberResponse>
+	readonly verifyEmail?: Maybe<VerifyEmailResponse>
 }
 
 export type MutationActivatePasswordlessOtpArgs = {
@@ -1049,6 +1123,10 @@ export type MutationChangeProfileArgs = {
 
 export type MutationConfigureArgs = {
 	config: ConfigInput
+}
+
+export type MutationConfirmEmailChangeArgs = {
+	token: Scalars['String']['input']
 }
 
 export type MutationConfirmOtpArgs = {
@@ -1150,6 +1228,11 @@ export type MutationRemoveProjectMemberArgs = {
 	projectSlug: Scalars['String']['input']
 }
 
+export type MutationRequestEmailVerificationArgs = {
+	email: Scalars['String']['input']
+	options?: InputMaybe<EmailVerificationOptions>
+}
+
 export type MutationResetPasswordArgs = {
 	password: Scalars['String']['input']
 	token: Scalars['String']['input']
@@ -1240,6 +1323,10 @@ export type MutationUpdateProjectMemberArgs = {
 	projectSlug: Scalars['String']['input']
 }
 
+export type MutationVerifyEmailArgs = {
+	token: Scalars['String']['input']
+}
+
 export type PasswordlessValidationType =
 	| 'otp'
 	| 'token'
@@ -1247,6 +1334,7 @@ export type PasswordlessValidationType =
 export type Person = {
 	readonly __typename?: 'Person'
 	readonly email?: Maybe<Scalars['String']['output']>
+	readonly emailVerified: Scalars['Boolean']['output']
 	readonly id: Scalars['String']['output']
 	readonly identity: Identity
 	readonly name?: Maybe<Scalars['String']['output']>
@@ -1485,6 +1573,7 @@ export type SignInError = {
 }
 
 export type SignInErrorCode =
+	| 'EMAIL_NOT_VERIFIED'
 	| 'INVALID_CREDENTIALS'
 	| 'INVALID_OTP_TOKEN'
 	| 'INVALID_PASSWORD'
@@ -1846,6 +1935,18 @@ export type ResolversTypes = {
 	ConfigCaptcha: ResolverTypeWrapper<ConfigCaptcha>
 	ConfigCaptchaInput: ConfigCaptchaInput
 	ConfigInput: ConfigInput
+	ConfigSignup: ResolverTypeWrapper<ConfigSignup>
+	ConfigSignupInput: ConfigSignupInput
+	ConfirmEmailChangeError: ResolverTypeWrapper<ConfirmEmailChangeError>
+	ConfirmEmailChangeErrorCode: ConfirmEmailChangeErrorCode
+	ConfirmEmailChangeResponse: ResolverTypeWrapper<ConfirmEmailChangeResponse>
+	EmailVerificationOptions: EmailVerificationOptions
+	RequestEmailVerificationError: ResolverTypeWrapper<RequestEmailVerificationError>
+	RequestEmailVerificationErrorCode: RequestEmailVerificationErrorCode
+	RequestEmailVerificationResponse: ResolverTypeWrapper<RequestEmailVerificationResponse>
+	VerifyEmailError: ResolverTypeWrapper<VerifyEmailError>
+	VerifyEmailErrorCode: VerifyEmailErrorCode
+	VerifyEmailResponse: ResolverTypeWrapper<VerifyEmailResponse>
 	ConfigLogin: ResolverTypeWrapper<ConfigLogin>
 	ConfigLoginInput: ConfigLoginInput
 	ConfigPassword: ResolverTypeWrapper<ConfigPassword>
@@ -2058,6 +2159,15 @@ export type ResolversParentTypes = {
 	ConfigCaptcha: ConfigCaptcha
 	ConfigCaptchaInput: ConfigCaptchaInput
 	ConfigInput: ConfigInput
+	ConfigSignup: ConfigSignup
+	ConfigSignupInput: ConfigSignupInput
+	ConfirmEmailChangeError: ConfirmEmailChangeError
+	ConfirmEmailChangeResponse: ConfirmEmailChangeResponse
+	EmailVerificationOptions: EmailVerificationOptions
+	RequestEmailVerificationError: RequestEmailVerificationError
+	RequestEmailVerificationResponse: RequestEmailVerificationResponse
+	VerifyEmailError: VerifyEmailError
+	VerifyEmailResponse: VerifyEmailResponse
 	ConfigLogin: ConfigLogin
 	ConfigLoginInput: ConfigLoginInput
 	ConfigPassword: ConfigPassword
@@ -3034,6 +3144,12 @@ export type MutationResolvers<ContextType = any, ParentType extends ResolversPar
 		RequireFields<MutationChangeProfileArgs, 'personId'>
 	>
 	configure?: Resolver<Maybe<ResolversTypes['ConfigureResponse']>, ParentType, ContextType, RequireFields<MutationConfigureArgs, 'config'>>
+	confirmEmailChange?: Resolver<
+		Maybe<ResolversTypes['ConfirmEmailChangeResponse']>,
+		ParentType,
+		ContextType,
+		RequireFields<MutationConfirmEmailChangeArgs, 'token'>
+	>
 	confirmOtp?: Resolver<Maybe<ResolversTypes['ConfirmOtpResponse']>, ParentType, ContextType, RequireFields<MutationConfirmOtpArgs, 'otpToken'>>
 	createApiKey?: Resolver<
 		Maybe<ResolversTypes['CreateApiKeyResponse']>,
@@ -3126,6 +3242,12 @@ export type MutationResolvers<ContextType = any, ParentType extends ResolversPar
 		ContextType,
 		RequireFields<MutationRemoveProjectMemberArgs, 'identityId' | 'projectSlug'>
 	>
+	requestEmailVerification?: Resolver<
+		Maybe<ResolversTypes['RequestEmailVerificationResponse']>,
+		ParentType,
+		ContextType,
+		RequireFields<MutationRequestEmailVerificationArgs, 'email'>
+	>
 	resetPassword?: Resolver<
 		Maybe<ResolversTypes['ResetPasswordResponse']>,
 		ParentType,
@@ -3173,6 +3295,7 @@ export type MutationResolvers<ContextType = any, ParentType extends ResolversPar
 		ContextType,
 		RequireFields<MutationUpdateProjectMemberArgs, 'identityId' | 'memberships' | 'projectSlug'>
 	>
+	verifyEmail?: Resolver<Maybe<ResolversTypes['VerifyEmailResponse']>, ParentType, ContextType, RequireFields<MutationVerifyEmailArgs, 'token'>>
 }
 
 export type PersonResolvers<ContextType = any, ParentType extends ResolversParentTypes['Person'] = ResolversParentTypes['Person']> = {

@@ -35,6 +35,7 @@ export class UpdateConfigurationCommand implements Command<void> {
 			.values(
 				{
 					passwordless_enabled: this.configuration.passwordless?.enabled ?? undefined,
+					signup_require_email_verification: this.configuration.signup?.requireEmailVerification ?? undefined,
 					passwordless_url: this.configuration.passwordless?.url,
 					passwordless_expiration: this.configuration.passwordless?.expiration ?? undefined,
 					password_min_length: this.configuration.password?.minLength ?? undefined,

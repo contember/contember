@@ -12,6 +12,7 @@ export class CreatePersonCommand implements Command<Omit<PersonRow, 'roles'>> {
 			name?: string
 			password: MaybePassword
 			idpOnly?: boolean
+			emailVerificationRequired?: boolean
 		},
 	) {}
 
@@ -21,6 +22,7 @@ export class CreatePersonCommand implements Command<Omit<PersonRow, 'roles'>> {
 		const password_hash = await this.data.password.getHash(providers)
 		const email = this.data.email ? normalizeEmail(this.data.email) : null
 		const name = this.data.name ?? this.data.email?.split('@')[0] ?? null
+		const emailVerificationRequired = this.data.emailVerificationRequired ?? false
 		await InsertBuilder.create()
 			.into('person')
 			.values({
@@ -30,6 +32,7 @@ export class CreatePersonCommand implements Command<Omit<PersonRow, 'roles'>> {
 				password_hash,
 				identity_id: this.data.identityId,
 				idp_only: this.data.idpOnly ?? false,
+				email_verification_required: emailVerificationRequired,
 			})
 			.execute(db)
 
@@ -43,6 +46,8 @@ export class CreatePersonCommand implements Command<Omit<PersonRow, 'roles'>> {
 			otp_activated_at: null,
 			disabled_at: null,
 			passwordless_enabled: null,
+			email_verified_at: null,
+			email_verification_required: emailVerificationRequired,
 		}
 	}
 }

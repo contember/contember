@@ -86,6 +86,21 @@ const schema: DocumentNode = gql`
 		createResetPasswordRequest(email: String!, options: CreateResetPasswordRequestOptions, captchaToken: String): CreatePasswordResetRequestResponse
 		resetPassword(token: String!, password: String!): ResetPasswordResponse
 
+		"""
+		(Re)send the e-mail verification link for the given address. Always
+		reports ok regardless of whether the address exists or is already
+		verified, to avoid leaking account existence.
+		"""
+		requestEmailVerification(email: String!, options: EmailVerificationOptions): RequestEmailVerificationResponse
+		verifyEmail(token: String!): VerifyEmailResponse
+		"""
+		Confirm a pending e-mail change (see changeMyProfile when
+		config.signup.requireEmailVerification is enabled). Consumes the token
+		that was mailed to the new address, swaps the address, and signs out all
+		existing sessions.
+		"""
+		confirmEmailChange(token: String!): ConfirmEmailChangeResponse
+
 		invite(email: String!, name: String, projectSlug: String!, memberships: [MembershipInput!]!, options: InviteOptions): InviteResponse
 		unmanagedInvite(
 			email: String!,
@@ -134,11 +149,24 @@ const schema: DocumentNode = gql`
 	# === configure ===
 	
 	type Config {
+		signup: ConfigSignup!
 		passwordless: ConfigPasswordless!
 		password: ConfigPassword!
 		login: ConfigLogin!
 		captcha: ConfigCaptcha!
 		rateLimits: ConfigRateLimits!
+	}
+
+	type ConfigSignup {
+		"""
+		When true, new accounts must verify their e-mail address before they can
+		sign in, and changeMyProfile e-mail changes go through a confirmation
+		flow (confirmEmailChange) instead of swapping the address immediately.
+		The requirement is captured per account at sign-up, so toggling this only
+		affects accounts created afterwards. Defaults to false (no change vs.
+		previous behavior).
+		"""
+		requireEmailVerification: Boolean!
 	}
 
 	type ConfigPasswordless {
@@ -210,11 +238,16 @@ const schema: DocumentNode = gql`
 	}
 
 	input ConfigInput {
+		signup: ConfigSignupInput
 		passwordless: ConfigPasswordlessInput
 		password: ConfigPasswordInput
 		login: ConfigLoginInput
 		captcha: ConfigCaptchaInput
 		rateLimits: ConfigRateLimitsInput
+	}
+
+	input ConfigSignupInput {
+		requireEmailVerification: Boolean
 	}
 
 	enum ConfigPolicy {
@@ -370,6 +403,7 @@ const schema: DocumentNode = gql`
 		NO_PASSWORD_SET
 		OTP_REQUIRED
 		INVALID_OTP_TOKEN
+		EMAIL_NOT_VERIFIED
 		RATE_LIMIT_EXCEEDED
 	}
 
@@ -1006,6 +1040,7 @@ const schema: DocumentNode = gql`
 		name: String
 		otpEnabled: Boolean!
 		passwordlessEnabled: Boolean
+		emailVerified: Boolean!
 		identity: Identity!
 	}
 
@@ -1255,6 +1290,9 @@ const schema: DocumentNode = gql`
 		RESET_PASSWORD_REQUEST
 		PASSWORDLESS_SIGN_IN
 		FORCED_SIGN_OUT
+		EMAIL_VERIFICATION
+		EMAIL_CHANGE_VERIFY
+		EMAIL_CHANGE_NOTIFY
 	}
 
 	input MailTemplateIdentifier {
@@ -1354,6 +1392,63 @@ const schema: DocumentNode = gql`
 	input CreateResetPasswordRequestOptions {
 		mailProject: String
 		mailVariant: String
+	}
+
+	# === email verification ===
+
+	input EmailVerificationOptions {
+		mailProject: String
+		mailVariant: String
+	}
+
+	type RequestEmailVerificationResponse {
+		ok: Boolean!
+		error: RequestEmailVerificationError
+	}
+
+	type RequestEmailVerificationError {
+		code: RequestEmailVerificationErrorCode!
+		developerMessage: String!
+	}
+
+	enum RequestEmailVerificationErrorCode {
+		RATE_LIMIT_EXCEEDED
+	}
+
+	type VerifyEmailResponse {
+		ok: Boolean!
+		error: VerifyEmailError
+	}
+
+	type VerifyEmailError {
+		code: VerifyEmailErrorCode!
+		developerMessage: String!
+	}
+
+	enum VerifyEmailErrorCode {
+		TOKEN_NOT_FOUND
+		TOKEN_INVALID
+		TOKEN_USED
+		TOKEN_EXPIRED
+	}
+
+	type ConfirmEmailChangeResponse {
+		ok: Boolean!
+		error: ConfirmEmailChangeError
+	}
+
+	type ConfirmEmailChangeError {
+		code: ConfirmEmailChangeErrorCode!
+		developerMessage: String!
+	}
+
+	enum ConfirmEmailChangeErrorCode {
+		TOKEN_NOT_FOUND
+		TOKEN_INVALID
+		TOKEN_USED
+		TOKEN_EXPIRED
+		EMAIL_ALREADY_EXISTS
+		INVALID_EMAIL_FORMAT
 	}
 
 	# === project ===

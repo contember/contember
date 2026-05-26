@@ -1,6 +1,11 @@
 export namespace PersonToken {
-	export type Type = 'password_reset' | 'passwordless'
+	export type Type = 'password_reset' | 'passwordless' | 'email_verification' | 'email_change'
 	export type ValidationType = 'token' | 'otp'
+
+	/** Payload carried by an email_change token: the pending new address. */
+	export interface EmailChangeMeta {
+		email: string
+	}
 
 	export interface Row {
 		id: string
@@ -11,6 +16,7 @@ export namespace PersonToken {
 		person_id: string
 		otp_hash: string | null
 		otp_attempts: number
+		meta: EmailChangeMeta | null
 	}
 
 	export type TokenValidationError =

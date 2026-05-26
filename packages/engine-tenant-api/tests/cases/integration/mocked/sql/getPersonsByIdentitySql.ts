@@ -6,7 +6,7 @@ export const getPersonsByIdentitySql = (args: {
 	response: readonly { personId: string; identityId: string; email: string; password?: string; roles?: readonly string[] }[]
 }): ExpectedQuery => ({
 	sql:
-		SQL`SELECT "person"."id", "person"."password_hash", "person"."otp_uri", "person"."otp_activated_at", "person"."identity_id", "person"."email", "person"."name", "person"."disabled_at", "person"."passwordless_enabled", "identity"."roles"
+		SQL`SELECT "person"."id", "person"."password_hash", "person"."otp_uri", "person"."otp_activated_at", "person"."identity_id", "person"."email", "person"."name", "person"."disabled_at", "person"."passwordless_enabled", "person"."email_verified_at", "person"."email_verification_required", "identity"."roles"
 	         FROM "tenant"."person"
 		              INNER JOIN "tenant"."identity" AS "identity" ON "identity"."id" = "person"."identity_id"
 	         WHERE "person"."identity_id" IN (${args.identityIds.map(() => '?').join(', ')})`,

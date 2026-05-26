@@ -54,6 +54,13 @@ class SignInManager {
 			return new ResponseError('INVALID_PASSWORD', `Password does not match`, authLogData)
 		}
 
+		// Block sign-in for accounts that were created while email verification
+		// was required but never proved ownership. Accounts predating the
+		// requirement carry email_verification_required = false and pass through.
+		if (person.email_verification_required && person.email_verified_at === null) {
+			return new ResponseError('EMAIL_NOT_VERIFIED', `E-mail address has not been verified`, authLogData)
+		}
+
 		if (person.otp_uri && person.otp_activated_at) {
 			if (!otpCode) {
 				return new ResponseError('OTP_REQUIRED', `2FA is enabled. OTP token is required`, authLogData)

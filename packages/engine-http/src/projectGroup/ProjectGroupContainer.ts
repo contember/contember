@@ -104,6 +104,7 @@ export class ProjectGroupContainerFactory {
 					cryptoProviders: {
 						decrypt: cryptoWrapper.decrypt.bind(cryptoWrapper),
 						encrypt: cryptoWrapper.encrypt.bind(cryptoWrapper),
+						encryptionEnabled: cryptoWrapper.enabled,
 					},
 				})
 			})

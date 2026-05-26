@@ -17,10 +17,12 @@ import { ApiKeyByIdQuery, ApiKeyByTokenQuery, ApiKeyRow, ConfigurationQuery } fr
 import PostgresInterval from 'postgres-interval'
 import { Config } from '../../type/Config'
 import { intervalToSeconds } from '../../utils/interval'
+import { IdpSessionRevalidator } from '../idp/IdpSessionRevalidator'
 
 export class ApiKeyManager {
 	constructor(
 		private readonly apiKeyService: ApiKeyService,
+		private readonly idpSessionRevalidator?: IdpSessionRevalidator,
 	) {}
 
 	async verifyAndProlong(
@@ -45,6 +47,17 @@ export class ApiKeyManager {
 		const now = new Date()
 		if (apiKeyRow.expires_at !== null && apiKeyRow.expires_at <= now) {
 			return new ResponseError(VerifyErrorCode.DISABLED, `API key expired at ${apiKeyRow.expires_at.toISOString()}`)
+		}
+
+		// Re-validate IdP-backed sessions against their identity provider (A24). In the
+		// default `background` mode this returns immediately and revalidates after the
+		// response (revocation lands on the next request); in `blocking` mode it can revoke
+		// the current request. No-op for password sessions and IdPs without revalidation.
+		if (this.idpSessionRevalidator) {
+			const outcome = await this.idpSessionRevalidator.revalidate(dbContext, readDbContext, apiKeyRow)
+			if (outcome === 'revoked') {
+				return new ResponseError(VerifyErrorCode.DISABLED, 'IdP session was revoked')
+			}
 		}
 
 		const effectiveInfo: ApiKeyRequestInfo | undefined = apiKeyRow.trust_forwarded_info && forwardedInfo
@@ -89,6 +102,22 @@ export class ApiKeyManager {
 		requestInfo?: ApiKeyRequestInfo,
 		trustForwardedInfo?: boolean,
 	): Promise<string> {
+		const { token } = await this.createSessionApiKeyWithId(dbContext, identityId, expiration, requestInfo, trustForwardedInfo)
+		return token
+	}
+
+	/**
+	 * Like {@link createSessionApiKey} but also returns the api_key id — needed when the
+	 * caller has to bind another row to the session (e.g. an `idp_session` for IdP
+	 * re-validation).
+	 */
+	async createSessionApiKeyWithId(
+		dbContext: DatabaseContext,
+		identityId: string,
+		expiration?: number,
+		requestInfo?: ApiKeyRequestInfo,
+		trustForwardedInfo?: boolean,
+	): Promise<{ id: string; token: string }> {
 		const config = await dbContext.queryHandler.fetch(new ConfigurationQuery(dbContext.providers))
 		const expirationResolved = expiration ?? (intervalToSeconds(config.login.defaultTokenExpiration) / 60)
 		const expirationCapped = config.login.maxTokenExpiration
@@ -101,9 +130,9 @@ export class ApiKeyManager {
 			requestInfo,
 			trustForwardedInfo,
 		})
-		const token = (await dbContext.commandBus.execute(command)).token
+		const { id, token } = await dbContext.commandBus.execute(command)
 		assert(token !== undefined)
-		return token
+		return { id, token }
 	}
 
 	async findApiKey(dbContext: DatabaseContext, apiKeyId: string): Promise<ApiKeyRow | null> {

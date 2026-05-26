@@ -10,4 +10,10 @@ export interface Providers {
 
 	encrypt: (value: Buffer) => Promise<{ value: Buffer; version: number }>
 	decrypt: (value: Buffer, version: number) => Promise<{ value: Buffer; needsReEncrypt: boolean }>
+	/**
+	 * Whether an encryption key is configured, so callers can avoid storing secrets in plaintext.
+	 * Optional for backward compatibility with external embedders that construct `Providers`
+	 * directly; an absent value is treated as "no key" (token-bearing IdP sessions are skipped).
+	 */
+	encryptionEnabled?: boolean
 }

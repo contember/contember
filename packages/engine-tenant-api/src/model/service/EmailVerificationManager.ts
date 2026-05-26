@@ -23,12 +23,19 @@ export class EmailVerificationManager {
 		private readonly projectManager: ProjectManager,
 	) {}
 
+	/**
+	 * Sends a verification mail unless the per-email backoff says to hold off.
+	 * Returns whether a mail was actually sent, so the caller only records an
+	 * `email_verify_init` audit entry for mails that really went out — otherwise
+	 * a throttled attempt would both tell the user to check their inbox and log
+	 * a phantom init that pushes the backoff out further.
+	 */
 	public async sendVerificationEmail(
 		dbContext: DatabaseContext,
 		permissionContext: PermissionContext,
 		person: PersonRow,
 		mailOptions: MailOptions = {},
-	): Promise<void> {
+	): Promise<boolean> {
 		if (!person.email) {
 			throw new ImplementationException()
 		}
@@ -40,7 +47,7 @@ export class EmailVerificationManager {
 			new NextMailAttemptQuery(person.email, 'email_verify_init', 'email_verify_complete'),
 		)
 		if (nextAllowed > dbContext.providers.now()) {
-			return
+			return false
 		}
 
 		const result = await dbContext.commandBus.execute(CreatePersonTokenCommand.createEmailVerificationRequest(person.id))
@@ -60,6 +67,7 @@ export class EmailVerificationManager {
 				projectId: project?.id ?? null,
 			},
 		)
+		return true
 	}
 
 	public async verifyEmail(dbContext: DatabaseContext, token: string): Promise<VerifyEmailResponse> {

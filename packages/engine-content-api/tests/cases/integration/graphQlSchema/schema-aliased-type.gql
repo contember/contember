@@ -76,6 +76,8 @@ input AuthorNameCondition {
   containsCI: String
   startsWithCI: String
   endsWithCI: String
+  similar: String
+  wordSimilar: String
 }
 
 input AuthorOrderBy {

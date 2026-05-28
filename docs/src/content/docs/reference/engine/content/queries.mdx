@@ -196,6 +196,8 @@ To filter the results of a query in Contember's GraphQL API, you can use the fil
 | startsWithCI | starts with a string (case insensitive)  | `{startsWithCI: "contember"}`         | String only
 | endsWith     | ends with a string (case sensitive)      | `{endsWith: "contember"}`             | String only
 | endsWithCI   | ends with a string (case insensitive)    | `{endsWithCI: "contember"}`           | String only
+| similar      | fuzzy match by overall trigram similarity | `{similar: "contember"}`             | String only (requires `pg_trgm`)
+| wordSimilar  | fuzzy match against any word in the text  | `{wordSimilar: "contmbr"}`           | String only (requires `pg_trgm`)
 | includes     | checks if array includes value or JSON contains value | `{includes: "value"}`     | Array/List columns and JSON columns
 | minLength    | minimum array length                     | `{minLength: 1}`                      | Array/List columns
 | maxLength    | maximum array length                     | `{maxLength: 5}`                      | Array/List columns
@@ -223,10 +225,44 @@ input StringCondition {
   containsCI: String
   startsWithCI: String
   endsWithCI: String
+  similar: String
+  wordSimilar: String
   always: Boolean
   never: Boolean
 }
 ```
+
+### Fuzzy text search (trigram similarity)
+
+The `similar` and `wordSimilar` operators perform fuzzy text matching based on trigram similarity, which is useful for search-as-you-type and for tolerating typos. They are backed by PostgreSQL's [`pg_trgm`](https://www.postgresql.org/docs/current/pgtrgm.html) extension:
+
+- `similar` compares the **overall** trigram similarity between the column and the value (PostgreSQL `column % value`). A row matches when the similarity is above `pg_trgm.similarity_threshold` (default `0.3`).
+- `wordSimilar` checks whether the value is similar to **any word** within the column text (PostgreSQL `value <% column`). A row matches when the word similarity is above `pg_trgm.word_similarity_threshold` (default `0.6`). This is well suited for matching a short query against longer texts.
+
+#### Example: fuzzy search by title
+
+```graphql
+query {
+  listPost(filter: { title: { wordSimilar: "contmbr" } }) {
+    id
+    title
+  }
+}
+```
+
+:::caution[Requires the `pg_trgm` extension]
+These operators rely on the PostgreSQL `pg_trgm` extension. It must be enabled in your database before the operators can be used, otherwise queries fail with `operator does not exist: text % text`. Enable it once per database with:
+
+```sql
+CREATE EXTENSION IF NOT EXISTS pg_trgm;
+```
+
+For good performance on larger tables, also add a GIN trigram index on the searched column — see [Trigram indexes](/reference/engine/schema/columns#trigram-indexes-for-fuzzy-search).
+:::
+
+:::note
+The match thresholds are controlled by PostgreSQL settings (`pg_trgm.similarity_threshold` and `pg_trgm.word_similarity_threshold`), not by Contember. Adjust them at the database/session level if the defaults are too strict or too loose.
+:::
 
 ### Logical operators
 

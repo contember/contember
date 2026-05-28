@@ -43,6 +43,8 @@ test('query builder: constructs condition', async () => {
 						.compare('j', Operator.containsCI, 'X')
 						.compare('k', Operator.startsWithCI, 'Y')
 						.compare('l', Operator.endsWithCI, 'Z')
+						.compare('m2', Operator.similar, 'hello')
+						.compare('m3', Operator.wordSimilar, 'world')
 						.compareColumns('z', Operator.eq, ['foo', 'x'])
 						.in('o', [1, 2, 3])
 						.in('x', values, 'int')
@@ -59,8 +61,10 @@ test('query builder: constructs condition', async () => {
                where "a" = ? and "b" != ? and "c" < ? and "d" <= ? and "e" > ? and "f" >= ?
                      and "g" like '%' || ? || '%' and "h" like ? || '%' and "i" like '%' || ?
                      and "j" ilike '%' || ? || '%' and "k" ilike ? || '%' and "l" ilike '%' || ?
+                     and "m2" % ?
+                     and ? <% "m3"
                      and "z" = "foo"."x" and "o" in (?, ?, ?) and "x" = any(?::int[]) and "m" in (select ?) and exists (select ?::int) and "n" is null and false`,
-		parameters: [1, 2, 3, 4, 5, 6, 'foo\\\\\\%bar', 'lorem\\_ipsum', 'dolor\\%sit', 'X', 'Y', 'Z', 1, 2, 3, values, 1, 1],
+		parameters: [1, 2, 3, 4, 5, 6, 'foo\\\\\\%bar', 'lorem\\_ipsum', 'dolor\\%sit', 'X', 'Y', 'Z', 'hello', 'world', 1, 2, 3, values, 1, 1],
 	})
 })
 

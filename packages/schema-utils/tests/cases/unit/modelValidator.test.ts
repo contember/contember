@@ -92,6 +92,63 @@ test('column name collision', () => {
 	])
 })
 
+namespace CoveringIndexKeyOverlap {
+	@c.Index({ fields: ['title'], include: ['title'] })
+	export class Article {
+		title = c.stringColumn()
+	}
+}
+
+test('covering index include column overlaps key column', () => {
+	const schema = createSchema(CoveringIndexKeyOverlap)
+	const validator = new ModelValidator(schema.model)
+	expect(validator.validate()).toStrictEqual([
+		{
+			code: 'MODEL_INVALID_INDEX',
+			message: 'Field title cannot be both an index key and an included (covering) column',
+			path: ['entities', 'Article', 'indexes'],
+		},
+	])
+})
+
+namespace PartialIndexEmptyPredicate {
+	@c.Index({ fields: ['title'], where: '   ' })
+	export class Article {
+		title = c.stringColumn()
+	}
+}
+
+test('partial index with empty predicate', () => {
+	const schema = createSchema(PartialIndexEmptyPredicate)
+	const validator = new ModelValidator(schema.model)
+	expect(validator.validate()).toStrictEqual([
+		{
+			code: 'MODEL_INVALID_INDEX',
+			message: 'Index predicate (where) must not be empty.',
+			path: ['entities', 'Article', 'indexes'],
+		},
+	])
+})
+
+namespace PartialIndexSemicolonPredicate {
+	@c.Index({ fields: ['title'], where: 'title IS NOT NULL); DROP TABLE article; --' })
+	export class Article {
+		title = c.stringColumn()
+	}
+}
+
+test('partial index predicate with a statement terminator', () => {
+	const schema = createSchema(PartialIndexSemicolonPredicate)
+	const validator = new ModelValidator(schema.model)
+	expect(validator.validate()).toStrictEqual([
+		{
+			code: 'MODEL_INVALID_INDEX',
+			message: 'Index predicate (where) must not contain ";".',
+			path: ['entities', 'Article', 'indexes'],
+		},
+	])
+})
+
 namespace ViewRelations {
 	@c.View('SELECT 1')
 	export class Foo {

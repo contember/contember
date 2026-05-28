@@ -14,19 +14,28 @@ export class CreateIndexModificationHandler implements ModificationHandler<Creat
 		if (entity.view && !entity.view.materialized) {
 			return
 		}
-		const fields = this.data.index.fields
+		const index = this.data.index
 		const columns = getIndexColumns({
-			fields,
+			fields: index.fields,
 			entity,
 			model: this.schema.model,
 		})
 
 		const tableNameId = wrapIdentifier(entity.tableName)
-		const opClassSuffix = this.data.index.opClass ? ` public.${this.data.index.opClass}` : ''
+		const opClassSuffix = index.opClass ? ` public.${index.opClass}` : ''
 		const columnNameIds = columns.map(c => wrapIdentifier(c) + opClassSuffix)
-		const methodClause = this.data.index.method ? ` USING ${this.data.index.method}` : ''
+		const methodClause = index.method ? ` USING ${index.method}` : ''
 
-		builder.sql(`CREATE INDEX ON ${tableNameId}${methodClause} (${columnNameIds.join(', ')})`)
+		const includeClause = index.include?.length
+			? ` INCLUDE (${getIndexColumns({ fields: index.include, entity, model: this.schema.model }).map(wrapIdentifier).join(', ')})`
+			: ''
+		// `where` is a raw, developer-authored SQL predicate. Its trust boundary is identical to
+		// @c.View's raw body — committed to a migration and gated by code review, not end-user input.
+		// Its shape is validated in ModelValidator (non-empty, no statement terminator); here we only
+		// wrap it in parentheses so it stays a self-contained boolean expression.
+		const whereClause = index.where ? ` WHERE (${index.where})` : ''
+
+		builder.sql(`CREATE INDEX ON ${tableNameId}${methodClause} (${columnNameIds.join(', ')})${includeClause}${whereClause}`)
 
 		invalidateDatabaseMetadata()
 	}
@@ -44,9 +53,12 @@ export class CreateIndexModificationHandler implements ModificationHandler<Creat
 	}
 
 	describe() {
-		const methodText = this.data.index.method ? ` using ${this.data.index.method}` : ''
+		const index = this.data.index
+		const methodText = index.method ? ` using ${index.method}` : ''
+		const includeText = index.include?.length ? ` include (${index.include.join(', ')})` : ''
+		const whereText = index.where ? ` where ${index.where}` : ''
 		return {
-			message: `Create index(${this.data.index.fields.join(', ')})${methodText} on entity ${this.data.entityName}`,
+			message: `Create index(${index.fields.join(', ')})${methodText}${includeText}${whereText} on entity ${this.data.entityName}`,
 		}
 	}
 }

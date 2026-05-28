@@ -323,6 +323,10 @@ export namespace Model {
 		readonly name?: string
 		readonly method?: IndexMethod
 		readonly opClass?: string
+		// raw SQL boolean predicate for a PARTIAL index (CREATE INDEX ... WHERE <where>)
+		readonly where?: string
+		// entity field names for a COVERING index (CREATE INDEX ... INCLUDE (<include>))
+		readonly include?: readonly string[]
 	}
 
 	export interface ColumnContext {

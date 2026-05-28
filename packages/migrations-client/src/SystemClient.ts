@@ -14,6 +14,13 @@ export enum MigrateErrorCode {
 	InvalidFormat = 'INVALID_FORMAT',
 	InvalidSchema = 'INVALID_SCHEMA',
 	MigrationFailed = 'MIGRATION_FAILED',
+	ProjectNotEmpty = 'PROJECT_NOT_EMPTY',
+}
+
+export type SnapshotInput = {
+	formatVersion: number
+	modifications: unknown[]
+	covers: unknown[]
 }
 
 export type MigrateResponse = {
@@ -52,6 +59,34 @@ mutation($migrations: [Migration!]!, $schemaState: SchemaStateInput) {
 				},
 			})
 		).migrate
+		if (!result.ok) {
+			throw result.errors
+		}
+	}
+
+	public async migrateFromSnapshot(snapshot: SnapshotInput, schemaState?: SchemaState): Promise<void> {
+		const query = `
+mutation($snapshot: SnapshotInput!, $schemaState: SchemaStateInput) {
+	migrateFromSnapshot(snapshot: $snapshot, schemaState: $schemaState) {
+		ok
+		errors {
+			code
+			migration
+			message: developerMessage
+		}
+	}
+}
+`
+		const result = (
+			await this.apiClient.execute<{
+				migrateFromSnapshot: { ok: boolean; errors: { code: MigrateErrorCode; migration: string; message: string }[] }
+			}>(query, {
+				variables: {
+					snapshot,
+					schemaState: schemaState ?? null,
+				},
+			})
+		).migrateFromSnapshot
 		if (!result.ok) {
 			throw result.errors
 		}

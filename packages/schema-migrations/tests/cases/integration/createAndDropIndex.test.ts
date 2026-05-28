@@ -1,5 +1,5 @@
-import { describe } from 'bun:test'
-import { testMigrations } from '../../src/tests.js'
+import { describe, it } from 'bun:test'
+import { testApplyDiff, testMigrations } from '../../src/tests.js'
 import { SQL } from '../../src/tags.js'
 import { createSchema, SchemaDefinition as def } from '@contember/schema-definition'
 import { createDatabaseMetadata } from '@contember/database'
@@ -7,6 +7,63 @@ import { createDatabaseMetadata } from '@contember/database'
 namespace SchemaWithoutIndex {
 	export class Article {
 		title = def.stringColumn()
+	}
+}
+
+// base with an extra column used as the INCLUDE / predicate target in covering & partial tests
+namespace SchemaArticleBase {
+	export class Article {
+		title = def.stringColumn()
+		content = def.stringColumn()
+	}
+}
+
+namespace SchemaWithPartialIndex {
+	@def.Index({ fields: ['title'], where: 'title IS NOT NULL' })
+	export class Article {
+		title = def.stringColumn()
+		content = def.stringColumn()
+	}
+}
+
+namespace SchemaWithCoveringIndex {
+	@def.Index({ fields: ['title'], include: ['content'] })
+	export class Article {
+		title = def.stringColumn()
+		content = def.stringColumn()
+	}
+}
+
+namespace SchemaWithPartialCoveringIndex {
+	@def.Index({ fields: ['title'], include: ['content'], where: 'title IS NOT NULL' })
+	export class Article {
+		title = def.stringColumn()
+		content = def.stringColumn()
+	}
+}
+
+namespace SchemaWithPartialIndexA {
+	@def.Index({ fields: ['title'], where: 'content = \'a\'' })
+	export class Article {
+		title = def.stringColumn()
+		content = def.stringColumn()
+	}
+}
+
+namespace SchemaWithPartialIndexB {
+	@def.Index({ fields: ['title'], where: 'content = \'b\'' })
+	export class Article {
+		title = def.stringColumn()
+		content = def.stringColumn()
+	}
+}
+
+namespace SchemaWithTwoPartialIndexes {
+	@def.Index({ fields: ['title'], where: 'content = \'a\'' })
+	@def.Index({ fields: ['title'], where: 'content = \'b\'' })
+	export class Article {
+		title = def.stringColumn()
+		content = def.stringColumn()
 	}
 }
 
@@ -155,4 +212,149 @@ CREATE INDEX ON "article" USING hash ("title");`,
 			}],
 			uniqueConstraints: [],
 		}),
+	}))
+
+describe('create partial index', () =>
+	testMigrations({
+		original: createSchema(SchemaArticleBase),
+		updated: createSchema(SchemaWithPartialIndex),
+		diff: [
+			{
+				modification: 'createIndex',
+				entityName: 'Article',
+				index: { fields: ['title'], where: 'title IS NOT NULL' },
+			},
+		],
+		sql: SQL`CREATE INDEX ON "article" ("title") WHERE (title IS NOT NULL);`,
+	}))
+
+describe('create covering index', () =>
+	testMigrations({
+		original: createSchema(SchemaArticleBase),
+		updated: createSchema(SchemaWithCoveringIndex),
+		diff: [
+			{
+				modification: 'createIndex',
+				entityName: 'Article',
+				index: { fields: ['title'], include: ['content'] },
+			},
+		],
+		sql: SQL`CREATE INDEX ON "article" ("title") INCLUDE ("content");`,
+	}))
+
+describe('create partial covering index', () =>
+	testMigrations({
+		original: createSchema(SchemaArticleBase),
+		updated: createSchema(SchemaWithPartialCoveringIndex),
+		diff: [
+			{
+				modification: 'createIndex',
+				entityName: 'Article',
+				index: { fields: ['title'], include: ['content'], where: 'title IS NOT NULL' },
+			},
+		],
+		sql: SQL`CREATE INDEX ON "article" ("title") INCLUDE ("content") WHERE (title IS NOT NULL);`,
+	}))
+
+describe('drop partial index', () =>
+	testMigrations({
+		original: createSchema(SchemaWithPartialIndex),
+		updated: createSchema(SchemaArticleBase),
+		diff: [
+			{
+				modification: 'removeIndex',
+				entityName: 'Article',
+				fields: ['title'],
+				where: 'title IS NOT NULL',
+			},
+		],
+		sql: SQL`DROP INDEX "idx_article_title";`,
+		databaseMetadata: createDatabaseMetadata({
+			foreignKeys: [],
+			indexes: [{
+				tableName: 'article',
+				columnNames: ['title'],
+				indexName: 'idx_article_title',
+				unique: false,
+			}],
+			uniqueConstraints: [],
+		}),
+	}))
+
+describe('drop covering index', () =>
+	// metadata reports both key and INCLUDE columns (pg_index.indkey lists both), so the DROP
+	// matching must include the covering column too.
+	testMigrations({
+		original: createSchema(SchemaWithCoveringIndex),
+		updated: createSchema(SchemaArticleBase),
+		diff: [
+			{
+				modification: 'removeIndex',
+				entityName: 'Article',
+				fields: ['title'],
+				include: ['content'],
+			},
+		],
+		sql: SQL`DROP INDEX "idx_article_title_content";`,
+		databaseMetadata: createDatabaseMetadata({
+			foreignKeys: [],
+			indexes: [{
+				tableName: 'article',
+				columnNames: ['title', 'content'],
+				indexName: 'idx_article_title_content',
+				unique: false,
+			}],
+			uniqueConstraints: [],
+		}),
+	}))
+
+// Two partial indexes on the same columns differing only by WHERE must NOT be treated as the same
+// index: changing the predicate produces a remove + create, never a no-op.
+describe('change partial index predicate', () =>
+	testMigrations({
+		original: createSchema(SchemaWithPartialIndexA),
+		updated: createSchema(SchemaWithPartialIndexB),
+		diff: [
+			{
+				modification: 'removeIndex',
+				entityName: 'Article',
+				fields: ['title'],
+				where: 'content = \'a\'',
+			},
+			{
+				modification: 'createIndex',
+				entityName: 'Article',
+				index: { fields: ['title'], where: 'content = \'b\'' },
+			},
+		],
+		sql: SQL`DROP INDEX "idx_article_title";
+CREATE INDEX ON "article" ("title") WHERE (content = 'b');`,
+		databaseMetadata: createDatabaseMetadata({
+			foreignKeys: [],
+			indexes: [{
+				tableName: 'article',
+				columnNames: ['title'],
+				indexName: 'idx_article_title',
+				unique: false,
+			}],
+			uniqueConstraints: [],
+		}),
+	}))
+
+// Schema-level identity is predicate-aware: removing one of two partial indexes on identical columns
+// must leave the other intact (the old columns-only matching removed both).
+describe('remove one of two partial indexes on the same columns', () =>
+	it('keeps the sibling index', () => {
+		testApplyDiff(
+			createSchema(SchemaWithTwoPartialIndexes),
+			createSchema(SchemaWithPartialIndexA),
+			[
+				{
+					modification: 'removeIndex',
+					entityName: 'Article',
+					fields: ['title'],
+					where: 'content = \'b\'',
+				},
+			],
+		)
 	}))

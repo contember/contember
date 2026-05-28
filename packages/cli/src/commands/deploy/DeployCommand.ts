@@ -19,6 +19,7 @@ type Options = {
 	['no-migrations']?: boolean
 	root?: boolean
 	yes?: boolean
+	snapshot?: boolean
 }
 
 export class DeployCommand extends Command<Args, Options> {
@@ -41,6 +42,9 @@ export class DeployCommand extends Command<Args, Options> {
 		configuration.option('root').valueNone()
 		configuration.option('no-admin').valueNone()
 		configuration.option('no-migrations').valueNone()
+		configuration.option('snapshot')
+			.valueNone()
+			.description('Bootstrap an empty target database from snapshot.json instead of replaying every migration')
 		configuration //
 			.option('yes')
 			.valueNone()
@@ -79,6 +83,7 @@ export class DeployCommand extends Command<Args, Options> {
 				force: false,
 				requireConfirmation: !yes,
 				additionalMessage: deployAdmin ? 'Admin will be deployed.' : 'Admin will NOT be deployed.',
+				useSnapshot: input.getOption('snapshot') === true,
 			})
 			if (!result) {
 				return

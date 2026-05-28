@@ -1,7 +1,7 @@
 import { GraphQLResolveInfo } from 'graphql'
 import { SystemResolverContext } from '../SystemResolverContext'
 import { MutationResolver } from '../Resolver'
-import { MigrateResponse, MigrationType, MutationMigrateArgs } from '../../schema'
+import { MigrateResponse, MigrationType, MutationMigrateArgs, MutationMigrateFromSnapshotArgs } from '../../schema'
 import { Migration } from '@contember/schema-migrations'
 import { AuthorizationActions, MigrationError, ProjectMigrator, StagesQuery } from '../../model'
 import { MigrationInput } from '../../model/migrations/MigrationInput'
@@ -76,8 +76,63 @@ export class MigrateMutationResolver implements MutationResolver<'migrate'> {
 			}))
 	}
 
+	async migrateFromSnapshot(
+		parent: any,
+		args: MutationMigrateFromSnapshotArgs,
+		context: SystemResolverContext,
+		info: GraphQLResolveInfo,
+	): Promise<MigrateResponse> {
+		const covers = this.parseMigrations(args.snapshot.covers)
+		const schemaState = args.schemaState ?? undefined
+
+		return context.db.locked(pg_lock_id, db =>
+			db.transaction(async trx => {
+				const stages = await trx.queryHandler.fetch(new StagesQuery())
+				for (const stage of stages) {
+					await context.requireAccess(AuthorizationActions.PROJECT_MIGRATE, stage.slug)
+				}
+				try {
+					await this.projectMigrator.migrateFromSnapshot({
+						db: trx,
+						project: context.project,
+						stages,
+						snapshot: {
+							formatVersion: args.snapshot.formatVersion,
+							modifications: args.snapshot.modifications as Migration.Modification[],
+						},
+						covers,
+						schemaState,
+					})
+				} catch (e) {
+					if (e instanceof MigrationError) {
+						await trx.client.connection.rollback()
+						const error = {
+							code: e.code,
+							migration: e.version,
+							developerMessage: e.message,
+						}
+						return {
+							ok: false,
+							errors: [error],
+							error,
+						}
+					} else {
+						throw e
+					}
+				}
+				return {
+					ok: true,
+					errors: [],
+				}
+			}))
+	}
+
 	private parseMigrationInput(args: MutationMigrateArgs): MigrationInput[] {
-		return args.migrations.map((it): MigrationInput => {
+		return this.parseMigrations(args.migrations)
+	}
+
+	private parseMigrations(migrations: MutationMigrateArgs['migrations']): MigrationInput[] {
+		return migrations.map((it): MigrationInput => {
 			if (!it.type) {
 				if (!it.modifications || !it.formatVersion) {
 					throw new UserInputError('invalid migration format')

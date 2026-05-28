@@ -21,6 +21,12 @@ const schema: DocumentNode = gql`
 
 	type Mutation {
 		migrate(migrations: [Migration!]!, schemaState: SchemaStateInput): MigrateResponse!
+		"""
+		Bootstraps an empty project from a snapshot: applies the collapsed schema in a
+		single step and records the covered migrations as executed without replaying them.
+		Refused (PROJECT_NOT_EMPTY) when any migration has already been executed.
+		"""
+		migrateFromSnapshot(snapshot: SnapshotInput!, schemaState: SchemaStateInput): MigrateResponse!
 	}
 
 	input SchemaStateInput {
@@ -28,6 +34,14 @@ const schema: DocumentNode = gql`
 		validation: Json!
 		actions: Json!
 		settings: Json!
+	}
+
+	input SnapshotInput {
+		"Collapsed schema (empty -> target) applied once to every stage."
+		formatVersion: Int!
+		modifications: [Json!]!
+		"Migrations subsumed by the snapshot, recorded as executed without running their SQL."
+		covers: [Migration!]!
 	}
 
 	# === events ===
@@ -188,6 +202,7 @@ const schema: DocumentNode = gql`
 		MIGRATION_FAILED
 		CONTENT_MIGRATION_FAILED
 		CONTENT_MIGRATION_NOT_SUCCESSFUL
+		PROJECT_NOT_EMPTY
 	}
 
 	type MigrateError {

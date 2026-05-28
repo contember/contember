@@ -175,6 +175,7 @@ export class Article {
 Available options for indexes:
 - `fields`: Array of field names to include in the index
 - `method`: Index method (`"btree"`, `"gin"`, `"gist"`, `"hash"`, `"brin"`, `"spgist"`)
+- `opClass`: Operator class applied to the indexed columns (e.g. `"gin_trgm_ops"` for trigram search). Requires the corresponding PostgreSQL extension to be installed.
 
 :::tip
 Use `gin` method for JSON columns and array/list columns as it provides efficient indexing for these data types:
@@ -184,6 +185,27 @@ Use `gin` method for JSON columns and array/list columns as it provides efficien
 export class Article {
 	metadata = c.jsonColumn()
 }
+```
+:::
+
+#### Trigram indexes for fuzzy search
+
+To make the [`similar` and `wordSimilar` filter operators](/reference/engine/content/queries#fuzzy-text-search-trigram-similarity) perform well, add a GIN index with the `gin_trgm_ops` operator class on the searched column:
+
+```typescript
+@c.Index({ fields: ['title'], method: 'gin', opClass: 'gin_trgm_ops' })
+export class Article {
+	title = c.stringColumn()
+}
+```
+
+This generates `CREATE INDEX ... USING gin ("title" gin_trgm_ops)`.
+
+:::caution[Requires the `pg_trgm` extension]
+The `gin_trgm_ops` operator class is provided by the PostgreSQL `pg_trgm` extension. It must be enabled in your database before the migration that creates the index runs, otherwise the migration fails with `operator class "gin_trgm_ops" does not exist`. Enable it once per database with:
+
+```sql
+CREATE EXTENSION IF NOT EXISTS pg_trgm;
 ```
 :::
 

@@ -1,4 +1,4 @@
-import { calculateSchemaChecksum, emptySchema } from '@contember/schema-utils'
+import { compareArraysIgnoreOrder, deepCompare, emptySchema } from '@contember/schema-utils'
 import {
 	calculateMigrationChecksum,
 	CoveredMigration,
@@ -131,7 +131,18 @@ export class MigrationSnapshotFacade {
 			snapshotSchema = { ...snapshotSchema, ...await this.schemaStateManager.readState() }
 		}
 
-		if (calculateSchemaChecksum(replaySchema) === calculateSchemaChecksum(snapshotSchema)) {
+		// Compare with the same order-insensitive equality that SchemaDiffer uses for its own
+		// round-trip check. The collapsed differ emits fields/constraints in a fixed order that may
+		// differ from a replay of an interleaved history (e.g. a column added to an entity that
+		// already has a relation), so a raw checksum (JSON.stringify) would report false mismatches
+		// on schemas that are in fact deeply equal.
+		const differences = deepCompare(replaySchema, snapshotSchema, [], path => {
+			if (path[0] === 'model' && path[1] === 'entities' && (path[3] === 'unique' || path[3] === 'index')) {
+				return (a, b) => compareArraysIgnoreOrder(a, b, path)
+			}
+			return null
+		})
+		if (differences.length === 0) {
 			return {
 				ok: true,
 				message: `Snapshot is up to date (covers ${snapshot.covers.length} migrations up to ${snapshot.version}).`,
@@ -157,6 +168,17 @@ export class MigrationSnapshotFacade {
 				if (checksum !== covered.checksum) {
 					return `covered migration ${covered.name} has changed`
 				}
+			}
+		}
+		// Detect a migration added within the covered range (version <= snapshot.version) that the
+		// snapshot does not know about — e.g. a teammate's migration with an earlier timestamp merged
+		// after the snapshot was generated. Without this, bootstrapping would record the covers up to
+		// snapshot.version and the subsequent normal replay would fail with MUST_FOLLOW_LATEST on the
+		// in-range migration, leaving the database half-bootstrapped. Treat it as stale and fall back.
+		const coveredVersions = new Set(snapshot.covers.map(it => it.version))
+		for (const file of files) {
+			if (file.version <= snapshot.version && !coveredVersions.has(file.version)) {
+				return `migration ${file.name} is within the covered range but not part of the snapshot`
 			}
 		}
 		return null

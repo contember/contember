@@ -35,6 +35,33 @@ namespace ModelB {
 	}
 }
 
+namespace WithRelation {
+	export class Author {
+		name = c.stringColumn()
+		posts = c.oneHasMany(Post, 'author')
+	}
+
+	export class Post {
+		title = c.stringColumn()
+		author = c.manyHasOne(Author, 'posts').notNull()
+	}
+}
+
+namespace WithRelationAndColumn {
+	export class Author {
+		name = c.stringColumn()
+		// added after `posts` already exists — a replay orders Author.fields as [..., posts, nickname]
+		// while the collapsed differ emits columns before relations: [..., nickname, posts].
+		nickname = c.stringColumn()
+		posts = c.oneHasMany(Post, 'author')
+	}
+
+	export class Post {
+		title = c.stringColumn()
+		author = c.manyHasOne(Author, 'posts').notNull()
+	}
+}
+
 const setup = async (migrationsDir: string) => {
 	const filesManager = new MigrationFilesManager(migrationsDir, { json: new JsonLoader(new MigrationParser()) })
 	const migrationsResolver = new MigrationsResolver(filesManager)
@@ -95,6 +122,28 @@ describe('MigrationSnapshotFacade', () => {
 		expect(result.ok).toBe(true)
 	})
 
+	test('verify tolerates schema key-order differences between a replay and the collapsed snapshot', async () => {
+		// History adds a column to an entity that already has a relation. A replay orders the entity's
+		// fields as [..., relation, column]; the collapsed differ orders them [..., column, relation].
+		// The two schemas are deeply equal but their JSON checksums differ — verify must not report a
+		// false mismatch (it compares order-insensitively, like SchemaDiffer's own round-trip check).
+		const dir = await fs.mkdtemp(path.join(os.tmpdir(), 'contember-snapshot-rel-'))
+		try {
+			const { schemaDiffer } = await setup(dir)
+			const a = createSchema(WithRelation)
+			const b = createSchema(WithRelationAndColumn)
+			const write = (name: string, content: unknown) => fs.writeFile(path.join(dir, name), JSON.stringify(content, null, '\t'))
+			await write('2024-01-01-120000-a.json', { formatVersion: VERSION_LATEST, modifications: schemaDiffer.diffSchemas(emptySchema, a) })
+			await write('2024-01-02-120000-b.json', { formatVersion: VERSION_LATEST, modifications: schemaDiffer.diffSchemas(a, b) })
+
+			await (await setup(dir)).facade.create()
+			const result = await (await setup(dir)).facade.verify()
+			expect(result.ok).toBe(true)
+		} finally {
+			await fs.rm(dir, { recursive: true, force: true })
+		}
+	})
+
 	test('verify fails when a covered migration changed after the snapshot', async () => {
 		await (await freshFacade()).create()
 		// tamper with a covered schema migration, then re-read from a fresh process
@@ -129,6 +178,21 @@ describe('MigrationSnapshotFacade', () => {
 		await (await freshFacade()).create()
 		await fs.rm(path.join(migrationsDir, '2024-01-01-120000-a.json'))
 		expect(await (await freshFacade()).getUsableSnapshot([])).toBeNull()
+	})
+
+	test('getUsableSnapshot ignores the snapshot when a migration was added within the covered range', async () => {
+		await (await freshFacade()).create()
+		// a migration whose version falls between two covered migrations, added without regenerating the
+		// snapshot. Bootstrapping would then fail with MUST_FOLLOW_LATEST, so it must fall back to replay.
+		await fs.writeFile(
+			path.join(migrationsDir, '2024-01-01-130000-inrange.json'),
+			JSON.stringify({ formatVersion: VERSION_LATEST, modifications: [] }, null, '\t'),
+		)
+		expect(await (await freshFacade()).getUsableSnapshot([])).toBeNull()
+
+		const result = await (await freshFacade()).verify()
+		expect(result.ok).toBe(false)
+		expect(result.message).toMatch(/within the covered range/)
 	})
 
 	test('buildSnapshotInput maps covered migrations to GraphQL inputs', async () => {

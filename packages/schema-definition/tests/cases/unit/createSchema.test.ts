@@ -96,6 +96,29 @@ test('basic createSchema test', () => {
 	})
 })
 
+namespace IndexModel {
+	@c.Index('title')
+	@c.Index({ fields: ['title'], where: 'title IS NOT NULL' })
+	@c.Index({ fields: ['title'], include: ['content'] })
+	@c.Index({ fields: ['title'], include: ['content'], where: 'published', method: 'btree' })
+	export class Article {
+		title = c.stringColumn()
+		content = c.stringColumn()
+	}
+}
+
+test('index DSL with where and include', () => {
+	const schema = createSchema(IndexModel)
+	const indexes = schema.model.entities.Article.indexes
+	expect(indexes).toHaveLength(4)
+	expect(indexes).toEqual(expect.arrayContaining([
+		{ fields: ['title'] },
+		{ fields: ['title'], where: 'title IS NOT NULL' },
+		{ fields: ['title'], include: ['content'] },
+		{ fields: ['title'], include: ['content'], where: 'published', method: 'btree' },
+	]))
+})
+
 namespace StrictModel {
 	export class Genre {
 		name = c.stringColumn()

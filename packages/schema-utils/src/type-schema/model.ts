@@ -173,6 +173,8 @@ const indexSchemaBase = Typesafe.intersection(
 	Typesafe.partial({
 		name: Typesafe.string,
 		method: Typesafe.enumeration('btree', 'gin', 'gist', 'hash', 'brin', 'spgist'),
+		where: Typesafe.string,
+		include: Typesafe.array(Typesafe.string),
 	}),
 )
 const indexCheck: Typesafe.Equals<Model.Index, ReturnType<typeof indexSchemaBase>> = true

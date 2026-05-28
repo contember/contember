@@ -54,7 +54,34 @@ export class ModelValidator {
 			entity,
 			errors.for('unique'),
 		)
+		this.validateIndexes(
+			entity,
+			errors.for('indexes'),
+		)
 		this.validateColumnNamesCollision(entity, errors)
+	}
+
+	private validateIndexes(entity: Model.Entity, errors: ErrorBuilder): void {
+		for (const index of entity.indexes) {
+			for (const field of [...index.fields, ...index.include ?? []]) {
+				if (!entity.fields[field]) {
+					errors.add('MODEL_UNDEFINED_FIELD', `Referenced field ${field} in an index does not exists`)
+				}
+			}
+			// Postgres rejects an INCLUDE column that is already a key column.
+			for (const field of index.include ?? []) {
+				if (index.fields.includes(field)) {
+					errors.add('MODEL_INVALID_INDEX', `Field ${field} cannot be both an index key and an included (covering) column`)
+				}
+			}
+			// `where` is a raw SQL predicate embedded verbatim into CREATE INDEX. We don't parse SQL,
+			// but a couple of basic checks catch the common footguns early with a clear message:
+			if (index.where !== undefined && index.where.trim() === '') {
+				errors.add('MODEL_INVALID_INDEX', 'Index predicate (where) must not be empty.')
+			} else if (index.where?.includes(';')) {
+				errors.add('MODEL_INVALID_INDEX', 'Index predicate (where) must not contain ";".')
+			}
+		}
 	}
 
 	private validateUniqueConstraints(entity: Model.Entity, errors: ErrorBuilder): void {

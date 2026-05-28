@@ -2,6 +2,7 @@ import prompts from 'prompts'
 import { MigrationPrinter } from './MigrationPrinter'
 import {
 	isSchemaMigration,
+	MigrateErrorCode,
 	MigrationExecutor,
 	MigrationToExecuteOkStatus,
 	SchemaState,
@@ -147,7 +148,21 @@ export class MigrationExecutionFacade {
 			)
 		}
 		const input = await this.migrationSnapshotFacade.buildSnapshotInput(snapshot)
-		await this.systemClientProvider.get().migrateFromSnapshot(input, schemaState)
+		try {
+			await this.systemClientProvider.get().migrateFromSnapshot(input, schemaState)
+		} catch (e) {
+			if (isProjectNotEmptyError(e)) {
+				// The project was migrated between our emptiness check and the server call (e.g. a
+				// concurrent execute on a fresh database). Fall back to a normal replay rather than
+				// crashing — the subsequent status resolution will pick up whatever is left to run.
+				console.warn('Snapshot skipped: the project is no longer empty. Falling back to a full replay.')
+				return
+			}
+			throw e
+		}
 		console.log('Snapshot applied')
 	}
 }
+
+const isProjectNotEmptyError = (e: unknown): boolean =>
+	Array.isArray(e) && e.some(it => it !== null && typeof it === 'object' && (it as { code?: unknown }).code === MigrateErrorCode.ProjectNotEmpty)

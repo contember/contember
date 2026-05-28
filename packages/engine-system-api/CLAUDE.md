@@ -13,11 +13,15 @@ System management API handling schema migrations, stage management, and content 
 
 Queries: `stages`, `executedMigrations`, `events`, `schema`
 
-Mutations: `migrate` (+ dev-only: `truncate`, `forceMigrate`, `migrationModify`, `migrationDelete`)
+Mutations: `migrate`, `migrateFromSnapshot` (+ dev-only: `truncate`, `forceMigrate`, `migrationModify`, `migrationDelete`)
 
-Migration error codes: `MUST_FOLLOW_LATEST`, `ALREADY_EXECUTED`, `INVALID_FORMAT`, `INVALID_SCHEMA`, `MIGRATION_FAILED`, `CONTENT_MIGRATION_FAILED`, `CONTENT_MIGRATION_NOT_SUCCESSFUL`
+`migrateFromSnapshot` bootstraps an **empty** project: it applies a collapsed schema (`SnapshotInput.modifications`) to every stage once and records the `covers` migrations as executed without replaying their SQL, so the registry ends up identical to a full replay. It is refused (`PROJECT_NOT_EMPTY`) if any migration has already run. Handled by `ProjectMigrator.migrateFromSnapshot`; the CLI side lives in `cli` `MigrationSnapshotFacade`.
 
-## Migrations snapshot
+Migration error codes: `MUST_FOLLOW_LATEST`, `ALREADY_EXECUTED`, `INVALID_FORMAT`, `INVALID_SCHEMA`, `MIGRATION_FAILED`, `CONTENT_MIGRATION_FAILED`, `CONTENT_MIGRATION_NOT_SUCCESSFUL`, `PROJECT_NOT_EMPTY`
+
+## Migrations snapshot (engine-internal)
+
+> Not to be confused with project **`migrateFromSnapshot`** above. This section is the engine's *own* `system`/`tenant` schema bootstrap (a `pg_dump`), unrelated to user project migrations.
 
 `src/migrations/snapshot.ts` is a generated `pg_dump` of the full-migration schema, used to bootstrap fresh DBs. Regenerate it whenever you add/change a migration — never hand-edit:
 

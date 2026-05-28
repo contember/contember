@@ -6,7 +6,7 @@ import { Stage } from '../dtos'
 import { DatabaseContext } from '../database'
 import { ExecutedMigrationsResolver } from './ExecutedMigrationsResolver'
 import { MigrateErrorCode } from '../../schema'
-import { calculateSchemaChecksum, SchemaValidator, SchemaValidatorSkippedErrors } from '@contember/schema-utils'
+import { calculateSchemaChecksum, emptySchema, SchemaValidator, SchemaValidatorSkippedErrors } from '@contember/schema-utils'
 import { logger } from '@contember/logger'
 import { MigrationsDatabaseMetadataResolverStoreFactory, SchemaDatabaseMetadataResolverStore } from '../metadata'
 import { ContentMigrationQuery, MigrationInput, SchemaStateInput } from './MigrationInput'
@@ -122,6 +122,83 @@ export class ProjectMigrator {
 				return
 			}
 			throw new ImplementationException()
+		}
+
+		await db.commandBus.execute(
+			new SaveSchemaCommand({
+				schema,
+				meta: {
+					id,
+					updatedAt: new Date(),
+					version: latestVersion,
+					checksum: calculateSchemaChecksum(schema),
+				},
+			}),
+		)
+	}
+
+	public async migrateFromSnapshot({ db, project, stages, snapshot, covers, schemaState }: {
+		db: DatabaseContext
+		project: { slug: string; systemSchema: string }
+		stages: Stage[]
+		snapshot: { formatVersion: number; modifications: Migration.Modification[] }
+		covers: readonly MigrationInput[]
+		schemaState?: SchemaStateInput
+	}) {
+		const sortedCovers = [...covers].sort((a, b) => a.version.localeCompare(b.version))
+		const latestVersion = sortedCovers.length > 0 ? sortedCovers[sortedCovers.length - 1].version : null
+		if (!latestVersion) {
+			throw new ImplementationException('Snapshot must cover at least one migration')
+		}
+
+		// Hard safety gate: a snapshot may only bootstrap a project that has executed nothing yet.
+		const executedMigrations = await this.executedMigrationsResolver.getMigrations(db)
+		if (executedMigrations.length > 0) {
+			throw new ProjectNotEmptyError(latestVersion, 'Cannot apply snapshot: project already has executed migrations')
+		}
+
+		const metadataStore = this.migrationsDatabaseMetadataResolverStoreFactory.create(db)
+		let schema = emptySchema
+		for (const modification of snapshot.modifications) {
+			;[schema] = await this.applyModification(
+				db.client,
+				stages,
+				schema,
+				modification,
+				snapshot.formatVersion,
+				latestVersion,
+				project,
+				metadataStore,
+			)
+		}
+
+		const errors = SchemaValidator.validate(schema)
+		if (errors.length > 0) {
+			throw new InvalidSchemaError(
+				latestVersion,
+				'Snapshot generates invalid schema: \n'
+					+ errors.map(it => `${it.path.join('.')}: [${it.code}] ${it.message}`).join('\n'),
+			)
+		}
+
+		// Record covered migrations as executed without replaying their SQL, so the registry
+		// ends up identical to a full replay (status, checksums and schema rebuild stay correct).
+		let id: number | undefined
+		for (const migration of sortedCovers) {
+			id = await db.commandBus.execute(new SaveMigrationCommand(migration))
+		}
+		if (!id) {
+			throw new ImplementationException()
+		}
+
+		if (schemaState) {
+			schema = {
+				...schema,
+				acl: schemaState.acl as Schema['acl'],
+				validation: schemaState.validation as Schema['validation'],
+				actions: schemaState.actions as Schema['actions'],
+				settings: schemaState.settings as Schema['settings'],
+			}
 		}
 
 		await db.commandBus.execute(
@@ -311,4 +388,8 @@ export class FailedContentMigrationError extends MigrationError {
 
 export class NotSuccessfulContentMigrationError extends MigrationError {
 	code = MigrateErrorCode.ContentMigrationNotSuccessful
+}
+
+export class ProjectNotEmptyError extends MigrationError {
+	code = MigrateErrorCode.ProjectNotEmpty
 }

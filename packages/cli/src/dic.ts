@@ -14,6 +14,7 @@ import {
 	SchemaMigrator,
 	SchemaStateManager,
 	SchemaVersionBuilder,
+	SnapshotManager,
 	VERSION_LATEST,
 } from '@contember/migrations-client'
 import { JsCodeRunner } from './lib/js/JsCodeRunner'
@@ -35,7 +36,9 @@ import {
 	MigrationExecuteCommand,
 	MigrationInitStateCommand,
 	MigrationRebaseCommand,
+	MigrationSnapshotCommand,
 	MigrationStatusCommand,
+	MigrationVerifySnapshotCommand,
 	ProjectGenerateDocumentationCommand,
 	ProjectPrintSchemaCommand,
 	ProjectValidateCommand,
@@ -44,6 +47,7 @@ import {
 } from './commands'
 import { MigrationExecutionFacade } from './lib/migrations/MigrationExecutionFacade'
 import { MigrationPrinter } from './lib/migrations/MigrationPrinter'
+import { MigrationSnapshotFacade } from './lib/migrations/MigrationSnapshotFacade'
 import { MigrationsStatusFacade } from './lib/migrations/MigrationsStatusFacade'
 import { ImportSchemaLoader, SchemaLoader, TranspilingSchemaLoader } from './lib/schema/SchemaLoader'
 import { MigrationsValidator } from './lib/migrations/MigrationsValidator'
@@ -141,6 +145,7 @@ export const createContainer = ({ env, version, runtime, workspace }: {
 		.addService('schemaMigrator', ({ modificationHandlerFactory }) => new SchemaMigrator(modificationHandlerFactory))
 		.addService('migrationsResolver', ({ migrationFilesManager }) => new MigrationsResolver(migrationFilesManager))
 		.addService('schemaStateManager', ({ workspace }) => new SchemaStateManager(workspace.migrationsDir + '/state'))
+		.addService('snapshotManager', ({ workspace }) => new SnapshotManager(workspace.migrationsDir + '/snapshot.json'))
 		.addService(
 			'schemaVersionBuilder',
 			({ migrationsResolver, schemaMigrator, schemaStateManager }) => new SchemaVersionBuilder(migrationsResolver, schemaMigrator, schemaStateManager),
@@ -160,6 +165,18 @@ export const createContainer = ({ env, version, runtime, workspace }: {
 		.addService('migrationsExecutor', () => new MigrationExecutor())
 		.addService('migrationsStatusResolver', () => new MigrationsStatusResolver())
 		.addService(
+			'migrationSnapshotFacade',
+			({ migrationsResolver, schemaVersionBuilder, schemaDiffer, schemaMigrator, schemaStateManager, snapshotManager }) =>
+				new MigrationSnapshotFacade(
+					migrationsResolver,
+					schemaVersionBuilder,
+					schemaDiffer,
+					schemaMigrator,
+					schemaStateManager,
+					snapshotManager,
+				),
+		)
+		.addService(
 			'migrationsStatusFacade',
 			({ systemClientProvider, migrationsResolver, migrationsStatusResolver, migrationPrinter }) =>
 				new MigrationsStatusFacade(systemClientProvider, migrationsResolver, migrationsStatusResolver, migrationPrinter),
@@ -175,6 +192,7 @@ export const createContainer = ({ env, version, runtime, workspace }: {
 				migrationsExecutor,
 				migrationsStatusFacade,
 				schemaStateManager,
+				migrationSnapshotFacade,
 			}) =>
 				new MigrationExecutionFacade(
 					systemClientProvider,
@@ -185,6 +203,7 @@ export const createContainer = ({ env, version, runtime, workspace }: {
 					migrationsExecutor,
 					migrationsStatusFacade,
 					schemaStateManager,
+					migrationSnapshotFacade,
 				),
 		)
 		.addService('migrationsValidator', ({ migrationDescriber, schemaMigrator }) => new MigrationsValidator(migrationDescriber, schemaMigrator))
@@ -260,6 +279,11 @@ export const createContainer = ({ env, version, runtime, workspace }: {
 			'migrationRebaseCommand',
 			({ migrationsResolver, migrationRebaseFacade }) => new MigrationRebaseCommand(migrationsResolver, migrationRebaseFacade),
 		)
+		.addService('migrationSnapshotCommand', ({ migrationSnapshotFacade }) => new MigrationSnapshotCommand(migrationSnapshotFacade))
+		.addService(
+			'migrationVerifySnapshotCommand',
+			({ migrationSnapshotFacade }) => new MigrationVerifySnapshotCommand(migrationSnapshotFacade),
+		)
 		.addService(
 			'migrationStatusCommand',
 			({ migrationsStatusFacade, migrationFilesManager, systemClientProvider, migrationPrinter }) =>
@@ -306,6 +330,8 @@ export const createContainer = ({ env, version, runtime, workspace }: {
 				['migrations:describe']: () => dic.migrationDescribeCommand,
 				['migrations:execute']: () => dic.migrationExecuteCommand,
 				['migrations:rebase']: () => dic.migrationRebaseCommand,
+				['migrations:snapshot']: () => dic.migrationSnapshotCommand,
+				['migrations:verify-snapshot']: () => dic.migrationVerifySnapshotCommand,
 				['migrations:status']: () => dic.migrationStatusCommand,
 				['workspace:update:api']: () => dic.workspaceUpdateCommand,
 				['project:validate']: () => dic.projectValidateCommand,

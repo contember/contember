@@ -9,7 +9,7 @@ export interface RedirectOnPersistProps {
 /**
  * Redirects to the given target after a successful persist. Exposes a static
  * render so the fields referenced by the routing target are registered during
- * the static analysis pass, just like {@link Link}.
+ * the static analysis pass, just like `Link`.
  */
 export const RedirectOnPersist = Component<RedirectOnPersistProps>(
 	({ to, parameters }) => {

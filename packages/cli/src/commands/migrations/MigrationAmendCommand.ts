@@ -66,8 +66,17 @@ export class MigrationAmendCommand extends Command<Args, Options> {
 			const intermediateResult = await this.migrationCreator.prepareMigration(initialSchema, schema, '', {
 				skipNonModelDiffers: stateMode,
 			})
+
+			const schemaState = stateMode ? SchemaStateManager.schemaStateFromSchema(schema) : undefined
+			const stateChanged = schemaState ? await this.schemaStateManager.writeState(schemaState, { dryRun: true }) : false
+
 			if (intermediateResult === null) {
-				console.log('Nothing to do')
+				if (stateChanged) {
+					await this.schemaStateManager.writeState(schemaState!)
+					console.log('Schema state updated (no model changes)')
+				} else {
+					console.log('Nothing to do')
+				}
 				return 0
 			}
 			if (amendMigration.formatVersion !== intermediateResult.migration.formatVersion) {
@@ -114,6 +123,9 @@ export class MigrationAmendCommand extends Command<Args, Options> {
 			if (!newMigrationResult && await this.shouldRemove()) {
 				await this.migrationCreator.removeMigration(amendMigration.name)
 				await systemClient.migrationDelete(amendMigration.version)
+				if (schemaState) {
+					await this.schemaStateManager.writeState(schemaState)
+				}
 				console.log('Latest migration was removed')
 				return 0
 			}
@@ -126,10 +138,8 @@ export class MigrationAmendCommand extends Command<Args, Options> {
 			await this.migrationCreator.saveMigration(newMigration)
 			await systemClient.migrationModify(amendMigration.version, newMigration)
 
-			if (stateMode) {
-				await this.schemaStateManager.writeState(
-					SchemaStateManager.schemaStateFromSchema(schema),
-				)
+			if (schemaState) {
+				await this.schemaStateManager.writeState(schemaState)
 			}
 
 			return 0

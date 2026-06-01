@@ -23,6 +23,7 @@ CREATE INDEX "idp_session_sid" ON "idp_session" ("identity_provider_id", "idp_se
 
 ALTER TYPE "auth_log_type" ADD VALUE IF NOT EXISTS 'idp_session_revalidated';
 ALTER TYPE "auth_log_type" ADD VALUE IF NOT EXISTS 'idp_session_revoked';
+ALTER TYPE "auth_log_type" ADD VALUE IF NOT EXISTS 'idp_session_revalidation_failed';
 `
 
 export default async function(builder: MigrationBuilder) {

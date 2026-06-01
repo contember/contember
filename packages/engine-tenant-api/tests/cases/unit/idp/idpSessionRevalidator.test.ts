@@ -277,6 +277,68 @@ describe('IdpSessionRevalidator — audit logging', () => {
 		expect(rotateLog.data.userAgent).toBe('Mozilla/5.0 test')
 	})
 
+	test('transient IdP failure (fail open) is audited as idp_session_revalidation_failed / revalidation_error', async () => {
+		// expired → blocking, so the failure audit runs synchronously
+		const h = createHarness(baseRow({ session: { tokens: { refresh_token: 'r' }, expiresAt: t('11:30:00') } }))
+		const out = await new IdpSessionRevalidator(registryWith(async () => {
+			throw new Error('ECONNREFUSED')
+		})).revalidate(h.dbContext, h.readDbContext, apiKeyRow, { ip: '203.0.113.7', userAgent: 'UA' })
+		expect(out).toBe('valid')
+		expect(h.executed.some(c => c instanceof DisableApiKeyCommand)).toBe(false)
+		const log = h.executed.find(c => c instanceof CreateAuthLogEntryCommand) as any
+		expect(log).toBeDefined()
+		expect(log.data.type).toBe('idp_session_revalidation_failed')
+		expect(log.data.errorCode).toBe('revalidation_error')
+		expect(log.data.success).toBe(true) // fail-open marker, not a security failure
+		expect(log.data.ipAddress).toBe('203.0.113.7')
+	})
+
+	test('corrupt stored config (fail open) is audited as idp_session_revalidation_failed / config_invalid', async () => {
+		const h = createHarness(baseRow({ session: { tokens: { refresh_token: 'r' }, expiresAt: t('11:30:00') } }))
+		const registry = new IDPHandlerRegistry()
+		registry.registerHandler('oidc', {
+			initAuth: async () => ({ authUrl: '', sessionData: {} }),
+			processResponse: async () => ({ externalIdentifier: 'x' }),
+			validateConfiguration: () => {
+				throw new Error('corrupt configuration')
+			},
+			revalidate: async () => ({ status: 'revoked', reason: 'invalid_grant' }),
+		})
+		const out = await new IdpSessionRevalidator(registry).revalidate(h.dbContext, h.readDbContext, apiKeyRow)
+		expect(out).toBe('valid')
+		expect(h.executed.some(c => c instanceof DisableApiKeyCommand)).toBe(false)
+		const log = h.executed.find(c => c instanceof CreateAuthLogEntryCommand) as any
+		expect(log).toBeDefined()
+		expect(log.data.type).toBe('idp_session_revalidation_failed')
+		expect(log.data.errorCode).toBe('config_invalid')
+	})
+
+	test('a failing audit write on fail-open does not crash a blocking request', async () => {
+		// expired → blocking; the failure-audit insert itself throws and must be swallowed
+		const executed: any[] = []
+		const commandBus = {
+			execute: async (command: any) => {
+				executed.push(command)
+				if (command instanceof ClaimIdpRevalidationCommand) {
+					return true
+				}
+				if (command instanceof CreateAuthLogEntryCommand) {
+					throw new Error('audit db down')
+				}
+				return undefined
+			},
+		}
+		const ctx = {
+			providers: { now: () => NOW },
+			commandBus,
+			queryHandler: { fetch: async () => baseRow({ session: { tokens: { refresh_token: 'r' }, expiresAt: t('11:30:00') } }) },
+		} as unknown as DatabaseContext
+		const out = await new IdpSessionRevalidator(registryWith(async () => {
+			throw new Error('ECONNREFUSED')
+		})).revalidate(ctx, ctx, apiKeyRow)
+		expect(out).toBe('valid')
+	})
+
 	test('a no-op probe (valid, no rotated session) is NOT logged', async () => {
 		// userinfo / introspection return valid without an idpSession; logging every such tick
 		// (every minInterval) would flood the audit log, so it must stay silent.

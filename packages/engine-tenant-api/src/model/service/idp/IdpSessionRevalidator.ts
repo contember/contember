@@ -139,14 +139,26 @@ export class IdpSessionRevalidator {
 		apiKeyRow: ApiKeyRow,
 		requestInfo?: ApiKeyRequestInfo,
 	): Promise<RevalidationOutcome> {
+		let config: {}
+		try {
+			config = handler.validateConfiguration(row.providerConfiguration)
+		} catch {
+			// corrupt stored config — must NOT revoke; keep the session and retry later. Audit
+			// it so the operator can tell "vouched for" apart from "silently broken" (without an
+			// entry, a config typo disables re-validation invisibly for the life of every session).
+			await this.logRevalidationFailed(dbContext, apiKeyRow, row, 'config_invalid', requestInfo)
+			return 'valid'
+		}
+
 		let result: RevalidationResult
 		try {
-			const config = handler.validateConfiguration(row.providerConfiguration)
 			result = await handler.revalidate!(config, row.session)
 		} catch {
-			// transient failure (network / IdP down) or a corrupt stored config — must NOT
-			// revoke; keep the session and retry on a later request (the claim floor prevents
-			// hammering the IdP).
+			// transient failure (network / IdP down) — must NOT revoke; keep the session and retry
+			// on a later request (the claim floor prevents hammering the IdP). Audited (throttled
+			// to one entry per claim window) so a prolonged IdP outage is visible rather than a
+			// silent fail-open.
+			await this.logRevalidationFailed(dbContext, apiKeyRow, row, 'revalidation_error', requestInfo)
 			return 'valid'
 		}
 
@@ -189,6 +201,41 @@ export class IdpSessionRevalidator {
 				userAgent: requestInfo?.userAgent,
 			}),
 		)
+	}
+
+	/**
+	 * Audit a fail-open: the IdP couldn't be consulted (transient outage) or the stored config is
+	 * corrupt, so we kept the session rather than revoking it. Naturally throttled to one entry
+	 * per claim window (we only reach here after a successful claim, which bumps
+	 * `last_validated_at`). The write is best-effort and self-contained — a failure to audit must
+	 * never propagate and fail a blocking verify request (the whole point of failing open).
+	 */
+	private async logRevalidationFailed(
+		dbContext: DatabaseContext,
+		apiKeyRow: ApiKeyRow,
+		row: IdpSessionRow,
+		errorCode: 'config_invalid' | 'revalidation_error',
+		requestInfo?: ApiKeyRequestInfo,
+	): Promise<void> {
+		try {
+			await dbContext.commandBus.execute(
+				new CreateAuthLogEntryCommand({
+					type: 'idp_session_revalidation_failed',
+					invokedById: apiKeyRow.identity_id,
+					personId: apiKeyRow.person_id ?? undefined,
+					identityProviderId: row.identityProviderId,
+					personTokenId: apiKeyRow.id,
+					// not a security failure (the session is kept) — a fail-open marker the operator
+					// can alert on. `success: true` keeps it out of the failed-login funnels.
+					success: true,
+					errorCode,
+					ipAddress: requestInfo?.ip,
+					userAgent: requestInfo?.userAgent,
+				}),
+			)
+		} catch {
+			// best-effort observability — never fail the request because the audit write failed
+		}
 	}
 
 	private async revoke(

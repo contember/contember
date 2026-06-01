@@ -31,6 +31,7 @@ export type AuthActionType =
 	| 'idp_enable'
 	| 'idp_session_revalidated'
 	| 'idp_session_revoked'
+	| 'idp_session_revalidation_failed'
 	| 'project_create'
 	| 'project_update'
 	| 'project_secret_change'

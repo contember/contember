@@ -6,6 +6,7 @@ import { InitSignInIdpErrorCode, InitSignInIdpResult, SignInIdpErrorCode } from 
 import { DatabaseContext } from '../utils/index.js'
 import { ApiKeyRequestInfo, CreateIdentityCommand, CreatePersonCommand, CreatePersonIdentityProviderIdentifierCommand } from '../commands/index.js'
 import { CreateIdpSessionCommand } from '../commands/idp/CreateIdpSessionCommand.js'
+import { CreateAuthLogEntryCommand } from '../commands/authLog/CreateAuthLogEntryCommand.js'
 import { TenantRole } from '../authorization/index.js'
 import { NoPassword } from '../dtos/index.js'
 import { IdentityProviderRow } from '../queries/idp/types.js'
@@ -102,6 +103,25 @@ class IDPSignInManager {
 				const hasTokens = !!claim.idpSession.tokens && Object.keys(claim.idpSession.tokens).length > 0
 				if (!hasTokens || db.providers.encryptionEnabled) {
 					await db.commandBus.execute(new CreateIdpSessionCommand(apiKeyId, provider.id, claim.idpSession))
+				} else {
+					// Re-validation is enabled on this IdP but no encryption key is configured, so we
+					// won't store the token-bearing session — it silently degrades to a plain,
+					// non-revalidated session. Audit the downgrade (errorCode `encryption_disabled`)
+					// so the operator can see that a session they expected to be continuously
+					// re-validated is in fact not protected, instead of failing closed at sign-in.
+					await db.commandBus.execute(
+						new CreateAuthLogEntryCommand({
+							type: 'idp_session_revalidation_failed',
+							invokedById: personRow.identity_id,
+							personId: personRow.id,
+							identityProviderId: provider.id,
+							personTokenId: apiKeyId,
+							success: true,
+							errorCode: 'encryption_disabled',
+							ipAddress: requestInfo?.ip,
+							userAgent: requestInfo?.userAgent,
+						}),
+					)
 				}
 			}
 

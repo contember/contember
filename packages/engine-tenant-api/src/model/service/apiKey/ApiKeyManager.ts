@@ -21,12 +21,14 @@ import { intervalToPostgres, intervalToSeconds } from '../../utils/interval.js'
 import { AuthPolicyResolver } from '../AuthPolicyResolver.js'
 import { AuthLogService } from '../AuthLogService.js'
 import { IdpSessionRevalidator } from '../idp/IdpSessionRevalidator.js'
+import { UnpersistedApiKeyManager } from './UnpersistedApiKeyManager.js'
 
 export class ApiKeyManager {
 	constructor(
 		private readonly apiKeyService: ApiKeyService,
 		private readonly authPolicyResolver: AuthPolicyResolver,
 		private readonly authLogService: AuthLogService,
+		private readonly unpersistedApiKeyManager: UnpersistedApiKeyManager = new UnpersistedApiKeyManager(),
 		private readonly idpSessionRevalidator?: IdpSessionRevalidator,
 	) {}
 
@@ -37,6 +39,12 @@ export class ApiKeyManager {
 		requestInfo?: ApiKeyRequestInfo,
 		forwardedInfo?: ApiKeyRequestInfo,
 	): Promise<VerifyResponse> {
+		const unpersistedResult = this.unpersistedApiKeyManager.verify(token)
+		if (unpersistedResult !== null) {
+			// Configured (unpersisted) root token: no DB row to prolong/track.
+			return new ResponseOk(unpersistedResult)
+		}
+
 		const apiKeyRow = await readDbContext.queryHandler.fetch(new ApiKeyByTokenQuery(token))
 		if (apiKeyRow === null) {
 			return new ResponseError(VerifyErrorCode.NOT_FOUND, 'API key was not found')

@@ -23,6 +23,20 @@ export const isTokenHash = (token: string): token is TokenHash => isFixedLengthH
 
 export const MAX_OTP_ATTEMPTS = 3
 
+/**
+ * Constant-time comparison of two token hashes. Both inputs are expected to be
+ * 64-character hex strings (sha256). Returns false on any length mismatch
+ * without leaking timing information about the matching prefix.
+ */
+export const timingSafeCompareHash = (a: TokenHash, b: TokenHash): boolean => {
+	const bufferA = Buffer.from(a, 'hex')
+	const bufferB = Buffer.from(b, 'hex')
+	if (bufferA.length !== bufferB.length) {
+		return false
+	}
+	return crypto.timingSafeEqual(bufferA, bufferB)
+}
+
 export const validateToken = ({ entry, validationType, token, now }: {
 	entry: PersonToken.Row | null
 	validationType: PersonToken.ValidationType

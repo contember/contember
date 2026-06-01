@@ -113,7 +113,56 @@ test('strict test', () => {
 			settings: settingsPresets['v1.3'],
 		}), { strict: true })
 
-	expect(cb).toThrow(`Strict schema validation failed: 
+	expect(cb).toThrow(`Strict schema validation failed:
 - Book.genre: inverse side of the relation is not defined.
 - Book.genre: onDelete behaviour is not set. Use one of cascadeOnDelete(), setNullOnDelete() or restrictOnDelete().`)
+})
+
+namespace StrictViewModel {
+	export class Author {
+		name = c.stringColumn()
+		stats = c.oneHasOneInverse(AuthorStats, 'author')
+	}
+
+	@c.View('SELECT 1')
+	export class AuthorStats {
+		author = c.oneHasOne(Author, 'stats')
+		postCount = c.intColumn().notNull()
+	}
+}
+
+test('strict test: onDelete is not required on a view entity relation', () => {
+	const cb = () =>
+		createSchema(StrictViewModel, schema => ({
+			...schema,
+			settings: settingsPresets['v1.3'],
+		}), { strict: true })
+
+	// AuthorStats.author has an inverse side defined and is a view relation, so neither the
+	// inverse-side nor the onDelete strict checks should fire.
+	expect(cb).not.toThrow()
+})
+
+namespace StrictViewWithOnDeleteModel {
+	export class Author {
+		name = c.stringColumn()
+		stats = c.oneHasOneInverse(AuthorStats, 'author')
+	}
+
+	@c.View('SELECT 1')
+	export class AuthorStats {
+		author = c.oneHasOne(Author, 'stats').cascadeOnDelete()
+		postCount = c.intColumn().notNull()
+	}
+}
+
+test('strict test: onDelete must not be set on a view entity relation', () => {
+	const cb = () =>
+		createSchema(StrictViewWithOnDeleteModel, schema => ({
+			...schema,
+			settings: settingsPresets['v1.3'],
+		}), { strict: true })
+
+	expect(cb).toThrow(`Strict schema validation failed:
+- AuthorStats.author: onDelete behaviour must not be set on a relation of a view entity. Views are read-only and have no delete semantics.`)
 })

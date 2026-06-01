@@ -17,13 +17,14 @@ export const createSchema = (definitions: Record<string, any>, modifyCallback?: 
 		strictDefinitionValidator: strictDefinitionValidator,
 		defaultCollation: options?.defaultCollation,
 	})
+	strictDefinitionValidator.validateModel(model)
 	const validation = InputValidation.parseDefinition(definitions)
 	const acl = AclDefinition.createAcl(definitions, model)
 	const actions = ActionsDefinition.createActions(definitions)
 	const schema = { ...emptySchema, model, validation, acl, actions }
 
 	if (strictDefinitionValidator.warnings.length > 0) {
-		throw `Strict schema validation failed: \n${strictDefinitionValidator.warnings.map(it => `- ${it.message}`).join('\n')}`
+		throw `Strict schema validation failed:\n${strictDefinitionValidator.warnings.map(it => `- ${it.message}`).join('\n')}`
 	}
 
 	return modifyCallback ? modifyCallback(schema) : schema

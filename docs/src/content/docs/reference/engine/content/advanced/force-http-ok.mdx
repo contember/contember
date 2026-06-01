@@ -1,0 +1,50 @@
+---
+title: Forcing HTTP 200 responses
+---
+
+Some GraphQL clients cannot properly handle non-200 HTTP status codes — for example, on an authentication failure Contember returns `401`, which such a client may treat as a hard transport error instead of reading the GraphQL error payload from the body.
+
+To work around this, Contember exposes an **opt-in** request header that forces the HTTP status of a GraphQL API response to `200`, while keeping all error information in the JSON body.
+
+## Usage
+
+Send the `X-Contember-Force-Ok` header with a truthy value (`1`, `true`, `on`, or `yes`) on any request to the Content (`/content/...`), Tenant (`/tenant`), or System (`/system/...`) API:
+
+```http
+POST /tenant HTTP/1.1
+Authorization: Bearer <token>
+X-Contember-Force-Ok: true
+Content-Type: application/json
+
+{ "query": "{ me { id } }" }
+```
+
+If the request would normally fail with a non-200 status (e.g. `401` on auth failure, `400` on a validation error), the response status is coerced to `200`. The original status is preserved in the `X-Contember-Original-Status` response header so clients and proxies can still observe it.
+
+```http
+HTTP/1.1 200 OK
+X-Contember-Original-Status: 401
+Content-Type: application/json
+
+{ "errors": [{ "code": 401, "message": "Authentication required" }] }
+```
+
+When the header is absent (the default), Contember returns the real status code unchanged. The coercion is scoped to the GraphQL API endpoints with a JSON body, so non-JSON or transport-level responses are never mislabeled.
+
+## Disabling the header
+
+The capability is enabled by default. To forbid it entirely (so the header is ignored and real status codes are always returned), set the config flag:
+
+```bash
+CONTEMBER_HTTP_RESPONSE_STATUS_HEADER=false
+```
+
+or in the server config:
+
+```yaml
+server:
+  http:
+    responseStatusHeader: false
+```
+
+Accepted values are boolean-ish strings: `true`/`1`/`on` to enable, `false`/`0`/`off` to disable.

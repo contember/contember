@@ -38,6 +38,7 @@ Two resolution modes:
 ## Key Files
 
 - `application/application.ts` — Koa app, route registration, request lifecycle
+- `application/forceHttpOk.ts` — opt-in `X-Contember-Force-Ok` header that coerces GraphQL API responses to HTTP 200 (errors stay in the JSON body); gated by `http.responseStatusHeader` config
 - `MasterContainer.ts` — DI container factory with all service definitions
 - `content/ContentApiControllerFactory.ts` — Content API: schema resolution, membership check, GraphQL execution
 - `projectGroup/ProjectGroupResolver.ts` — Tenant resolution

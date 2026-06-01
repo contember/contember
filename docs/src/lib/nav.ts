@@ -162,6 +162,7 @@ export const nav: NavItem[] = [
 							doc('reference/engine/content/advanced/assume-identity'),
 							doc('reference/engine/content/advanced/assume-membership'),
 							doc('reference/engine/content/advanced/request-debugging'),
+							doc('reference/engine/content/advanced/force-http-ok'),
 							doc('reference/engine/content/advanced/caching'),
 							doc('reference/engine/content/advanced/test-transactions'),
 						],

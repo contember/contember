@@ -23,6 +23,17 @@ namespace AuthorCategoryModel {
 	}
 }
 
+// the second migration, amended to introduce Tag instead of Category — a different, valid schema
+namespace AuthorTagModel {
+	export class Author {
+		name = def.stringColumn()
+	}
+
+	export class Tag {
+		label = def.stringColumn()
+	}
+}
+
 const repoRoot = resolve(import.meta.dir, '../../..')
 const cliEntry = join(repoRoot, 'packages/cli/src/run.ts')
 const differ = new SchemaDiffer(new SchemaMigrator(new ModificationHandlerFactory(ModificationHandlerFactory.defaultFactoryMap)))
@@ -113,4 +124,75 @@ test('CLI: migrations:snapshot + migrations:execute bootstraps a fresh project f
 	expect(rerun.exitCode).toBe(0)
 	expect(rerun.stdout).not.toContain('Bootstrapping from snapshot')
 	expect(rerun.stdout).toContain('No migrations to execute')
+}, 60000)
+
+test('CLI: a snapshot left stale by an amend is ignored, and a full replay bootstraps the amended schema', async () => {
+	expect((await runCli(['migrations:snapshot'])).exitCode).toBe(0)
+
+	// amend the covered migration (as `migrations:amend` rewrites the file): same version/filename, new
+	// modifications — Tag instead of Category. The snapshot's checksum no longer matches.
+	await fs.writeFile(
+		join(migrationsDir, '2024-07-02-120000-b.json'),
+		JSON.stringify(
+			{ formatVersion: VERSION_LATEST, modifications: differ.diffSchemas(createSchema(AuthorModel), createSchema(AuthorTagModel)) },
+			null,
+			'\t',
+		),
+	)
+
+	const project = `test_${rand()}`
+	const env = {
+		CONTEMBER_API_URL: apiUrl,
+		CONTEMBER_API_TOKEN: rootToken,
+		CONTEMBER_PROJECT_NAME: project,
+	}
+
+	const executeResult = await runCli(['migrations:execute', '--yes'], env)
+	expect(executeResult.exitCode).toBe(0)
+	// the snapshot is detected as stale and skipped — a full replay runs instead
+	expect(executeResult.stderr).toContain('Ignoring snapshot')
+	expect(executeResult.stdout).not.toContain('Bootstrapping from snapshot')
+	expect(executeResult.stdout).toContain('Will execute following migrations')
+
+	// the registry matches a full replay of the (amended) files
+	const data = await systemData(project, `query { executedMigrations { version } }`)
+	expect(data.executedMigrations).toStrictEqual([{ version: '2024-07-01-120000' }, { version: '2024-07-02-120000' }])
+
+	// the live schema is the amended one: Author + Tag exist, the original Category does not
+	const ok = await fetch(`${apiUrl}/content/${project}/live`, {
+		method: 'POST',
+		headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${rootToken}` },
+		body: JSON.stringify({ query: `query { listAuthor { id } listTag { id } }` }),
+	})
+	expect((await ok.json() as { errors?: unknown }).errors).toBeUndefined()
+
+	const gone = await fetch(`${apiUrl}/content/${project}/live`, {
+		method: 'POST',
+		headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${rootToken}` },
+		body: JSON.stringify({ query: `query { listCategory { id } }` }),
+	})
+	expect((await gone.json() as { errors?: unknown }).errors).toBeDefined()
+}, 60000)
+
+test('CLI: migrations:verify-snapshot passes for a fresh snapshot and fails (exit 1) once it goes stale', async () => {
+	expect((await runCli(['migrations:snapshot'])).exitCode).toBe(0)
+
+	// offline check — no project/connection needed
+	const fresh = await runCli(['migrations:verify-snapshot'])
+	expect(fresh.exitCode).toBe(0)
+	expect(fresh.stdout).toContain('up to date')
+
+	// amend a covered migration; the committed snapshot no longer matches a replay
+	await fs.writeFile(
+		join(migrationsDir, '2024-07-02-120000-b.json'),
+		JSON.stringify(
+			{ formatVersion: VERSION_LATEST, modifications: differ.diffSchemas(createSchema(AuthorModel), createSchema(AuthorTagModel)) },
+			null,
+			'\t',
+		),
+	)
+
+	const stale = await runCli(['migrations:verify-snapshot'])
+	expect(stale.exitCode).toBe(1)
+	expect(stale.stderr).toContain('stale')
 }, 60000)

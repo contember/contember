@@ -155,6 +155,13 @@ export class MigrationSnapshotFacade {
 	}
 
 	private async findStaleness(snapshot: SnapshotFile): Promise<string | null> {
+		// The collapsed snapshot is built differently per mode (state mode omits the non-model parts,
+		// see create()), and on bootstrap the non-model overlay is driven by the *current* mode. A mode
+		// switch since the snapshot was created (e.g. migrations:init-state) leaves the covers untouched
+		// and would otherwise pass unnoticed, so treat it as stale and fall back to a full replay.
+		if (snapshot.stateMode !== await this.schemaStateManager.isStateMode()) {
+			return `schema state mode changed since the snapshot was created`
+		}
 		const files = await this.migrationsResolver.getMigrationFiles()
 		const byVersion = new Map(files.map(it => [it.version, it]))
 		for (const covered of snapshot.covers) {
@@ -162,8 +169,16 @@ export class MigrationSnapshotFacade {
 			if (!file) {
 				return `covered migration ${covered.name} is missing`
 			}
+			const content = await file.getContent()
+			const currentType = isSchemaMigration(content) ? 'schema' : 'content'
+			// A covered migration that flipped type (e.g. a content migration manually rewritten into a
+			// schema one) is not reflected in the collapsed modifications, so the snapshot no longer
+			// equals a replay. Schema covers also verify the checksum; content covers carry none (their
+			// data is never reproduced), so the type check is the only identity they get.
+			if (currentType !== covered.type) {
+				return `covered migration ${covered.name} changed type`
+			}
 			if (covered.type === 'schema') {
-				const content = await file.getContent()
 				const checksum = isSchemaMigration(content) ? calculateMigrationChecksum(content) : null
 				if (checksum !== covered.checksum) {
 					return `covered migration ${covered.name} has changed`

@@ -195,6 +195,38 @@ describe('MigrationSnapshotFacade', () => {
 		expect(result.message).toMatch(/within the covered range/)
 	})
 
+	test('verify fails when a covered migration changed type', async () => {
+		const { schemaDiffer } = await setup(migrationsDir)
+		await (await freshFacade()).create()
+		// the seed migration was recorded as a content cover; rewrite it into a schema migration. Its
+		// modifications are absent from the collapsed snapshot, so it no longer equals a full replay.
+		await fs.writeFile(
+			path.join(migrationsDir, '2024-01-03-120000-seed.json'),
+			JSON.stringify(
+				{ formatVersion: VERSION_LATEST, modifications: schemaDiffer.diffSchemas(createSchema(ModelB), createSchema(ModelA)) },
+				null,
+				'\t',
+			),
+		)
+
+		expect(await (await freshFacade()).getUsableSnapshot([])).toBeNull()
+		const result = await (await freshFacade()).verify()
+		expect(result.ok).toBe(false)
+		expect(result.message).toMatch(/changed type/)
+	})
+
+	test('verify fails when schema state mode was toggled after the snapshot', async () => {
+		await (await freshFacade()).create()
+		// enabling state mode (migrations:init-state) only creates the state/ dir — it leaves the covered
+		// migration files untouched, so without an explicit guard the snapshot would pass unnoticed.
+		await fs.mkdir(path.join(migrationsDir, 'state'), { recursive: true })
+
+		expect(await (await freshFacade()).getUsableSnapshot([])).toBeNull()
+		const result = await (await freshFacade()).verify()
+		expect(result.ok).toBe(false)
+		expect(result.message).toMatch(/state mode changed/)
+	})
+
 	test('buildSnapshotInput maps covered migrations to GraphQL inputs', async () => {
 		const facade = await freshFacade()
 		const snapshot = await facade.create()

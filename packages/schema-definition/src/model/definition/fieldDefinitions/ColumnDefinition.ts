@@ -1,4 +1,4 @@
-import { Model } from '@contember/schema'
+import { JSONValue, Model } from '@contember/schema'
 import { CreateFieldContext, FieldDefinition } from './FieldDefinition.js'
 import { EnumDefinition } from '../EnumDefinition.js'
 import { resolveDefaultColumnType } from '@contember/schema-utils'
@@ -59,6 +59,14 @@ export class ColumnDefinition extends FieldDefinition<ColumnDefinitionOptions> {
 		return this.withOption('collation', collation)
 	}
 
+	/**
+	 * Attaches a JSON Schema to a JSON column. Input values are validated against it on create/update.
+	 * The schema is stored as metadata and does not affect the database schema.
+	 */
+	public schema(schema: JSONValue): ColumnDefinition {
+		return this.withOption('schema', schema)
+	}
+
 	createField({ name, conventions, enumRegistry, entityName, options }: CreateFieldContext): Model.AnyField {
 		const {
 			type,
@@ -71,6 +79,7 @@ export class ColumnDefinition extends FieldDefinition<ColumnDefinitionOptions> {
 			sequence,
 			list,
 			collation = options.defaultCollation,
+			schema,
 		} = this.options
 		const common = {
 			name: name,
@@ -80,6 +89,7 @@ export class ColumnDefinition extends FieldDefinition<ColumnDefinitionOptions> {
 			...(defaultValue !== undefined ? { default: defaultValue } : {}),
 			...(sequence !== undefined ? { sequence } : {}),
 			...(type === Model.ColumnType.String && collation !== undefined ? { collation } : {}),
+			...(type === Model.ColumnType.Json && schema !== undefined ? { schema } : {}),
 		}
 		if (type === Model.ColumnType.Enum) {
 			if (typeAlias) {
@@ -188,4 +198,5 @@ export type ColumnDefinitionOptions = {
 	default?: Model.ColumnTypeDefinition['default']
 	sequence?: Model.ColumnTypeDefinition['sequence']
 	collation?: Model.Collation
+	schema?: JSONValue
 } & ColumnTypeOptions

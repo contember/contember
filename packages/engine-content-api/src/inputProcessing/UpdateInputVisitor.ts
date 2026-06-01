@@ -111,9 +111,18 @@ export class UpdateInputVisitor<Result> implements Model.ColumnVisitor<Promise<R
 		if (input === undefined || input === null) {
 			return Promise.resolve([])
 		}
+		// GraphQL coerces a single object into a single-element list, so a bare `{ set: ... }` arrives here as `[{ set: ... }]`.
+		const elements = Array.isArray(input) ? input : [input]
+		const hasSet = elements.some(it => it && 'set' in it && (it as MapperInput.SetManyRelationInput).set !== undefined)
+		if (hasSet) {
+			if (elements.length !== 1) {
+				throw new UserError('A "set" operation must be the only item of a has-many relation input.')
+			}
+			return this.processSetRelationInput(processor, context, elements[0] as MapperInput.SetManyRelationInput)
+		}
 		const results: Array<Result> = []
 		let i = 0
-		for (let element of input) {
+		for (let element of elements as MapperInput.UpdateManyRelationInputItem[]) {
 			const alias = element.alias
 			element = filterObject(element, (k, v) => v !== null && v !== undefined)
 			this.verifyOperations(element)
@@ -157,6 +166,36 @@ export class UpdateInputVisitor<Result> implements Model.ColumnVisitor<Promise<R
 		return results
 	}
 
+	private async processSetRelationInput<Context>(
+		processor: UpdateInputProcessor.HasManyRelationInputProcessor<Context, Result>,
+		context: Context,
+		input: MapperInput.SetManyRelationInput,
+	): Promise<Result[]> {
+		const keys = Object.keys(filterObject(input, (k, v) => v !== null && v !== undefined))
+		const allowedKeys = ['set', 'orphanStrategy']
+		const unexpected = keys.filter(it => !allowedKeys.includes(it))
+		if (unexpected.length > 0) {
+			throw new UserError(
+				`Unexpected key(s) ${unexpected.join(', ')} alongside "set". Only "orphanStrategy" is allowed.`,
+			)
+		}
+		const orphanStrategy = input.orphanStrategy ?? Input.OrphanRemovalStrategy.disconnect
+		if (!Object.values(Input.OrphanRemovalStrategy).includes(orphanStrategy)) {
+			throw new UserError(
+				`Invalid orphanStrategy "${orphanStrategy}". Expected one of: ${Object.values(Input.OrphanRemovalStrategy).join(', ')}.`,
+			)
+		}
+		for (const item of input.set) {
+			this.verifySetItemOperations(item)
+		}
+		return [
+			await processor.set({
+				...context,
+				input: { items: input.set, orphanStrategy },
+			}),
+		]
+	}
+
 	private verifyOperations(input: object) {
 		const keys = Object.keys(input).filter(it => it !== 'alias')
 		const ops = Object.values(Input.UpdateRelationOperation) as string[]
@@ -164,6 +203,23 @@ export class UpdateInputVisitor<Result> implements Model.ColumnVisitor<Promise<R
 			const found = keys.length === 0 ? 'none' : keys.join(', ')
 			throw new UserError(
 				`Expected exactly one of: ${ops.join(', ')}. ${found} found.`,
+			)
+		}
+	}
+
+	private verifySetItemOperations(input: object) {
+		const keys = Object.keys(filterObject(input, (k, v) => v !== null && v !== undefined)).filter(it => it !== 'alias')
+		const ops: string[] = [
+			Input.UpdateRelationOperation.create,
+			Input.UpdateRelationOperation.connect,
+			Input.UpdateRelationOperation.connectOrCreate,
+			Input.UpdateRelationOperation.update,
+			Input.UpdateRelationOperation.upsert,
+		]
+		if (keys.length !== 1 || !ops.includes(keys[0])) {
+			const found = keys.length === 0 ? 'none' : keys.join(', ')
+			throw new UserError(
+				`Expected exactly one of: ${ops.join(', ')} in a "set" item. ${found} found.`,
 			)
 		}
 	}

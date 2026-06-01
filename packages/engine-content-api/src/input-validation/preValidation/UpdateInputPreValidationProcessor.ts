@@ -27,6 +27,7 @@ export class UpdateInputPreValidationProcessor implements UpdateInputProcessor<R
 		connect: NoResult,
 		disconnect: NoResult,
 		['delete']: NoResult,
+		set: ctx => this.processSet(ctx),
 	}
 	manyHasManyOwning: UpdateInputProcessor.HasManyRelationInputProcessor<Model.ManyHasManyOwningContext, Result> = {
 		create: ctx => this.processCreate(ctx),
@@ -36,6 +37,7 @@ export class UpdateInputPreValidationProcessor implements UpdateInputProcessor<R
 		connect: NoResult,
 		disconnect: NoResult,
 		['delete']: NoResult,
+		set: ctx => this.processSet(ctx),
 	}
 	manyHasOne: UpdateInputProcessor.HasOneRelationInputProcessor<Model.ManyHasOneContext, Result> = {
 		create: ctx => this.processCreate(ctx),
@@ -54,6 +56,7 @@ export class UpdateInputPreValidationProcessor implements UpdateInputProcessor<R
 		connect: NoResult,
 		disconnect: NoResult,
 		['delete']: NoResult,
+		set: ctx => this.processSet(ctx),
 	}
 	oneHasOneInverse: UpdateInputProcessor.HasOneRelationInputProcessor<Model.OneHasOneInverseContext, Result> = {
 		create: ctx => this.processCreate(ctx),
@@ -119,6 +122,27 @@ export class UpdateInputPreValidationProcessor implements UpdateInputProcessor<R
 				overRelation: context.targetRelation,
 			})),
 		]
+	}
+
+	async processSet(context: {
+		targetEntity: Model.Entity
+		relation: Model.AnyRelation
+		targetRelation: Model.AnyRelation | null
+		input: UpdateInputProcessor.SetManyInput
+	}) {
+		const results: Result[] = []
+		for (const item of context.input.items) {
+			if ('create' in item) {
+				results.push(...(await this.processCreate({ ...context, input: item.create })))
+			} else if ('connectOrCreate' in item) {
+				results.push(...(await this.processCreate({ ...context, input: item.connectOrCreate.create })))
+			} else if ('update' in item) {
+				results.push(...(await this.processUpdate({ ...context, input: item.update.data })))
+			} else if ('upsert' in item) {
+				results.push(...(await this.processUpsert({ ...context, input: { update: item.upsert.update, create: item.upsert.create } })))
+			}
+		}
+		return results
 	}
 
 	async processUpdate(context: {

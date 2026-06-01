@@ -306,6 +306,8 @@ input PostUpdateLocalesEntityRelationInput {
   connectOrCreate: PostConnectOrCreateLocalesRelationInput
   disconnect: PostLocaleUniqueWhere
   delete: PostLocaleUniqueWhere
+  set: [PostSetLocalesItemRelationInput!]
+  orphanStrategy: OrphanRemovalStrategy
   alias: String
 }
 
@@ -324,6 +326,20 @@ input PostUpsertLocalesRelationInput {
   by: PostLocaleUniqueWhere!
   update: PostLocaleWithoutPostUpdateInput!
   create: PostLocaleWithoutPostCreateInput!
+}
+
+input PostSetLocalesItemRelationInput {
+  create: PostLocaleWithoutPostCreateInput
+  connect: PostLocaleUniqueWhere
+  connectOrCreate: PostConnectOrCreateLocalesRelationInput
+  update: PostUpdateLocalesRelationInput
+  upsert: PostUpsertLocalesRelationInput
+  alias: String
+}
+
+enum OrphanRemovalStrategy {
+  disconnect
+  delete
 }
 
 type QueryTransaction {

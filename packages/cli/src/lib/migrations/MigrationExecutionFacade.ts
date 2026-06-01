@@ -41,7 +41,17 @@ export class MigrationExecutionFacade {
 		await this.tenantClientProvider.get().createProject(project.name, true)
 
 		const stateMode = await this.schemaStateManager.isStateMode()
-		const schemaState = stateMode ? await this.schemaStateManager.readState() : undefined
+		let schemaState = stateMode ? await this.schemaStateManager.readState() : undefined
+
+		// The state files always reflect the latest schema. When migrating to an older version, that
+		// state may reference parts of the model that don't exist yet, so skip it rather than push an
+		// inconsistent overlay. Run `migrations:execute` without `--until` to sync the schema state.
+		if (until && schemaState) {
+			console.log(
+				'Warning: schema state was not applied because --until targets a specific migration; the state files reflect the latest schema. Run migrations:execute without --until to sync it.',
+			)
+			schemaState = undefined
+		}
 
 		const status = await this.migrationStatusFacade.resolveMigrationsStatus({ force })
 		const migrations = until

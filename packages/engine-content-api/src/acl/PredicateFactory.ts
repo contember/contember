@@ -146,6 +146,7 @@ export class PredicateFactory {
 		scope: AclScope,
 		fieldNames: readonly string[] = [getRowLevelPredicatePseudoField(entity)],
 		relationContext?: Model.AnyRelationContext,
+		predicateState?: Acl.PredicateState,
 	): Input.OptionalWhere {
 		const cacheKey = JSON.stringify([
 			entity.name,
@@ -153,12 +154,13 @@ export class PredicateFactory {
 			fieldNames,
 			this.relationContextKey(relationContext),
 			this.permissionSetKey(scope),
+			predicateState ?? null,
 		])
 		const cached = this.createCache.get(cacheKey)
 		if (cached !== undefined) {
 			return cached
 		}
-		const result = this.createInternal(entity, operation, scope, fieldNames, relationContext)
+		const result = this.createInternal(entity, operation, scope, fieldNames, relationContext, predicateState)
 		this.createCache.set(cacheKey, result)
 		return result
 	}
@@ -169,6 +171,7 @@ export class PredicateFactory {
 		scope: AclScope,
 		fieldNames: readonly string[] = [getRowLevelPredicatePseudoField(entity)],
 		relationContext?: Model.AnyRelationContext,
+		predicateState?: Acl.PredicateState,
 	): Input.OptionalWhere {
 		const perms = this.permissionsFor(scope)
 		const entityPermissions: Acl.EntityPermissions = perms[entity.name]
@@ -190,7 +193,7 @@ export class PredicateFactory {
 			return neverCondition
 		}
 
-		return this.buildPredicates(entity, operationPredicates, scope, relationContext)
+		return this.buildPredicates(entity, operationPredicates, scope, relationContext, predicateState)
 	}
 
 	public buildPredicates(
@@ -198,18 +201,20 @@ export class PredicateFactory {
 		predicates: readonly Acl.PredicateReference[],
 		scope: AclScope,
 		relationContext?: Model.AnyRelationContext,
+		predicateState?: Acl.PredicateState,
 	): Input.OptionalWhere {
 		const cacheKey = JSON.stringify([
 			entity.name,
 			predicates,
 			this.relationContextKey(relationContext),
 			this.permissionSetKey(scope),
+			predicateState ?? null,
 		])
 		const cached = this.buildCache.get(cacheKey)
 		if (cached !== undefined) {
 			return cached
 		}
-		const result = this.buildPredicatesInternal(entity, predicates, scope, relationContext)
+		const result = this.buildPredicatesInternal(entity, predicates, scope, relationContext, predicateState)
 		this.buildCache.set(cacheKey, result)
 		return result
 	}
@@ -219,6 +224,7 @@ export class PredicateFactory {
 		predicates: readonly Acl.PredicateReference[],
 		scope: AclScope,
 		relationContext?: Model.AnyRelationContext,
+		predicateState?: Acl.PredicateState,
 	): Input.OptionalWhere {
 		const perms = this.permissionsFor(scope)
 		const entityPermissions: Acl.EntityPermissions = perms[entity.name] ?? {}
@@ -228,7 +234,7 @@ export class PredicateFactory {
 				if (!entityPermissions.predicates[name]) {
 					throw new Error(`${entity.name}: Undefined predicate ${name}`)
 				}
-				const predicateWhere: Input.Where = this.variableInjector.inject(entity, entityPermissions.predicates[name])
+				const predicateWhere: Input.Where = this.variableInjector.inject(entity, entityPermissions.predicates[name], predicateState)
 				return [...result, predicateWhere]
 			},
 			[],

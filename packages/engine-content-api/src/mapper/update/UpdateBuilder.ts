@@ -54,10 +54,14 @@ export class UpdateBuilder {
 	}
 
 	public addPredicates(fields: string[]): void {
-		const predicate = this.predicateFactory.create(this.entity, Acl.Operation.update, this.scope, fields)
+		// The update predicate is enforced against both the stored ("old") row and the proposed
+		// ("new") row. `_old`/`_new` markers let it constrain each state differently, e.g. allow a
+		// transition A -> B but not B -> A. Without markers both calls produce the same where.
+		const oldPredicate = this.predicateFactory.create(this.entity, Acl.Operation.update, this.scope, fields, undefined, 'old')
+		const newPredicate = this.predicateFactory.create(this.entity, Acl.Operation.update, this.scope, fields, undefined, 'new')
 		this.predicateFields.push(...fields)
-		this.addNewWhere(predicate)
-		this.addOldWhere(predicate)
+		this.addOldWhere(oldPredicate)
+		this.addNewWhere(newPredicate)
 	}
 
 	/**

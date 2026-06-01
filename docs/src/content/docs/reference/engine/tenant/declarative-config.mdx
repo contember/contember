@@ -1,0 +1,134 @@
+---
+title: Declarative configuration (CLI)
+---
+
+Instead of calling the [`configure`](/reference/engine/tenant/configuration), [`addIDP`](/reference/engine/tenant/idp), and [`addMailTemplate`](/reference/engine/tenant/mail-templates) mutations by hand, you can describe the whole tenant setup in a typed `tenant.config.ts` file and apply it with a single command:
+
+```bash
+contember tenant:apply
+```
+
+This keeps tenant configuration in version control next to the rest of your project and makes it reproducible across environments. Applying is **idempotent** — running it repeatedly converges to the same state.
+
+:::note[Available since 2.2]
+:::
+
+## The config file
+
+Author the file with the typed `defineTenantConfig` helper from `@contember/cli` for full editor autocompletion:
+
+```ts title="tenant.config.ts"
+import { defineTenantConfig } from '@contember/cli'
+
+export default defineTenantConfig({
+  // → configure mutation (partial merge)
+  config: {
+    password: {
+      minLength: 12,
+      checkBlacklist: true,
+      checkHibp: true,
+    },
+    login: {
+      revealUserExists: false,
+      defaultTokenExpiration: 'PT30M',
+    },
+    passwordless: {
+      enabled: 'optIn',
+      expiration: 'PT5M',
+    },
+    captcha: {
+      provider: 'turnstile',
+      secret: process.env.TURNSTILE_SECRET,
+      threshold: 0.5,
+    },
+    rateLimits: {
+      loginPerIp: { limit: 20, window: 'PT1H' },
+    },
+  },
+
+  // → addIDP / updateIDP, keyed by provider slug
+  identityProviders: {
+    google: {
+      type: 'oidc',
+      configuration: {
+        url: 'https://accounts.google.com/.well-known/openid-configuration',
+        clientId: process.env.GOOGLE_CLIENT_ID,
+        clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+      },
+      options: { autoSignUp: true, exclusive: false },
+      disabled: false,
+    },
+  },
+
+  // → addMailTemplate (server-side upsert)
+  mailTemplates: [
+    {
+      type: 'RESET_PASSWORD_REQUEST',
+      variant: 'en',
+      subject: 'Reset your password',
+      content: 'Click the link to reset your password: {{link}}',
+    },
+  ],
+})
+```
+
+The file is plain TypeScript executed by the CLI, so **secrets come straight from `process.env`** — never hardcode credentials.
+
+## Running it
+
+```bash
+# Connect via DSN
+contember tenant:apply --dsn "contember://my-app:TOKEN@api.example.com"
+
+# Or rely on CONTEMBER_* environment variables
+contember tenant:apply
+
+# Use a non-default config path
+contember tenant:apply config/tenant.ts
+
+# Preview the actions without making any changes
+contember tenant:apply --dry-run
+```
+
+| Argument / option | Description |
+|---|---|
+| `[config]` | Path to the config file. Defaults to `tenant.config.ts`. |
+| `--dsn` | Project DSN. Falls back to the `CONTEMBER_*` environment variables. |
+| `--dry-run` | Print the actions that would be performed without executing them. |
+
+## How each section is applied
+
+| Field | Mutation(s) | Semantics |
+|---|---|---|
+| `config` | `configure` | Always sent. All fields are optional and merged — unset fields preserve the current value. |
+| `identityProviders` | `addIDP` / `updateIDP`, then `enableIDP` / `disableIDP` | The CLI reads the current providers and chooses add vs. update per slug. `disabled: true` disables the provider; omitting it (or `false`) keeps/makes it enabled. |
+| `mailTemplates` | `addMailTemplate` | A server-side upsert keyed by `type` + `variant` (+ `projectSlug`). |
+
+:::tip[Nothing is removed]
+`tenant:apply` only adds and updates. Identity providers or mail templates that exist on the tenant but are **not** present in the config are left untouched. To remove one, do it explicitly via the corresponding mutation.
+:::
+
+## Permissions
+
+The underlying mutations require the `CONFIGURE`, `IDP_*`, and `MAIL_TEMPLATE_*` tenant permissions, held by `SUPER_ADMIN` and `PROJECT_ADMIN`.
+
+:::caution[A deploy-only token is not enough]
+An `ENTRYPOINT_DEPLOYER` (deploy) token can run `deploy` but **cannot** configure the tenant. Use a token with `PROJECT_ADMIN` or `SUPER_ADMIN` privileges for `tenant:apply` — for example a dedicated CI API key.
+:::
+
+## In CI
+
+Run it after deploying migrations, with an admin-scoped token:
+
+```yaml title=".github/workflows/deploy.yml"
+- run: npm run contember deploy
+  env:
+    CONTEMBER_DSN: ${{ secrets.CONTEMBER_DEPLOY_DSN }}
+
+- run: npm run contember tenant:apply
+  env:
+    CONTEMBER_DSN: ${{ secrets.CONTEMBER_ADMIN_DSN }}
+    GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
+    GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
+    TURNSTILE_SECRET: ${{ secrets.TURNSTILE_SECRET }}
+```

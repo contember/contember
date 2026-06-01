@@ -6,6 +6,24 @@
     "contember": "./dist/production/run.js"
   },
   "type": "module",
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/types/index.d.ts",
+        "development": "./dist/development/index.js",
+        "production": "./dist/production/index.js",
+        "typescript": "./src/index.ts",
+        "default": "./dist/production/index.js"
+      },
+      "require": {
+        "types": "./dist/types/index.d.ts",
+        "development": "./dist/development/index.cjs",
+        "production": "./dist/production/index.cjs",
+        "typescript": "./src/index.ts",
+        "default": "./dist/production/index.cjs"
+      }
+    }
+  },
   "scripts": {
     "build": "tailwindcss -i src/lib/project/docs/resources/style.css -o ./dist/resources/out.css"
   },
@@ -25,6 +43,7 @@
     "@contember/engine-common": "workspace:*",
     "@contember/engine-content-api": "workspace:*",
     "@contember/graphql-client": "workspace:*",
+    "@contember/graphql-client-tenant": "workspace:*",
     "@contember/migrations-client": "workspace:*",
     "@contember/schema": "workspace:*",
     "@contember/schema-migrations": "workspace:*",
@@ -35,6 +54,7 @@
     "chalk-table": "catalog:",
     "fast-glob": "catalog:",
     "graphql": "catalog:",
+    "graphql-ts-client-api": "catalog:",
     "js-yaml": "catalog:",
     "pg": "catalog:",
     "preact": "catalog:",

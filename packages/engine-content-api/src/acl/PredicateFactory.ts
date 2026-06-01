@@ -87,6 +87,7 @@ export class PredicateFactory {
 		fieldNames: string[] = [getRowLevelPredicatePseudoField(entity)],
 		relationContext?: Model.AnyRelationContext,
 		isRoot?: boolean,
+		predicateState?: Acl.PredicateState,
 	): Input.OptionalWhere {
 		const perms = this.getPermissionsForContext(isRoot)
 		const entityPermissions: Acl.EntityPermissions = perms[entity.name]
@@ -108,7 +109,7 @@ export class PredicateFactory {
 			return neverCondition
 		}
 
-		return this.buildPredicates(entity, operationPredicates, relationContext, isRoot)
+		return this.buildPredicates(entity, operationPredicates, relationContext, isRoot, predicateState)
 	}
 
 	public buildPredicates(
@@ -116,6 +117,7 @@ export class PredicateFactory {
 		predicates: Acl.PredicateReference[],
 		relationContext?: Model.AnyRelationContext,
 		isRoot?: boolean,
+		predicateState?: Acl.PredicateState,
 	): Input.OptionalWhere {
 		const perms = this.getPermissionsForContext(isRoot)
 		const entityPermissions: Acl.EntityPermissions = perms[entity.name] ?? {}
@@ -125,7 +127,7 @@ export class PredicateFactory {
 				if (!entityPermissions.predicates[name]) {
 					throw new Error(`${entity.name}: Undefined predicate ${name}`)
 				}
-				const predicateWhere: Input.Where = this.variableInjector.inject(entity, entityPermissions.predicates[name])
+				const predicateWhere: Input.Where = this.variableInjector.inject(entity, entityPermissions.predicates[name], predicateState)
 				return [...result, predicateWhere]
 			},
 			[],

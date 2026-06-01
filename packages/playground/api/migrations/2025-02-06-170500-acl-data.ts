@@ -1,6 +1,6 @@
 import { ContentMutation } from '@contember/client-content'
-import { queryBuilder } from '../client'
-import { printMutation } from './utils'
+import { queryBuilder } from '../client/index.js'
+import { printMutation } from './utils.js'
 import { faker } from '@faker-js/faker'
 
 faker.seed(123)

@@ -9,7 +9,7 @@ import {
 } from '@contember/react-binding'
 import { FormInputHandler } from '@contember/react-form'
 import { useCallback, useEffect, useMemo, useRef } from 'react'
-import { SlugInputOwnProps } from './FormSlugInput'
+import { SlugInputOwnProps } from './FormSlugInput.js'
 
 export type SlugPrefix = string | ((environment: Environment) => string)
 

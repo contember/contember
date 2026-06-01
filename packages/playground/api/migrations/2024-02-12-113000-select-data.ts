@@ -1,5 +1,5 @@
-import { printMutation, uniqGenerator } from './utils'
-import { queryBuilder } from '../client'
+import { printMutation, uniqGenerator } from './utils.js'
+import { queryBuilder } from '../client/index.js'
 import { faker } from '@faker-js/faker'
 
 faker.seed(123)

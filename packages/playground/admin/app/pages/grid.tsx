@@ -35,7 +35,7 @@ import {
 import * as React from 'react'
 import { DefaultDropdown, DropdownMenuItem, DropdownMenuSeparator } from '~/lib/ui/dropdown'
 import { Binding, DeleteEntityDialog } from '~/lib/binding'
-import { GridArticleStateLabels } from '../labels'
+import { GridArticleStateLabels } from '../labels.js'
 import { formatDate } from '~/lib/formatting'
 import { Button } from '~/lib/ui/button'
 import { EyeIcon, LockIcon, MessageSquareIcon, RowsIcon } from 'lucide-react'

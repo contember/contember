@@ -1,5 +1,5 @@
-import { printMutation } from './utils'
-import { queryBuilder } from '../client'
+import { printMutation } from './utils.js'
+import { queryBuilder } from '../client/index.js'
 
 export default printMutation([
 	queryBuilder.create('AclBranch', {

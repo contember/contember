@@ -43,7 +43,7 @@ const runExecute = async (opts: { until?: string }) => {
 	}
 
 	const facade = new MigrationExecutionFacade(
-		{ get: () => ({}) } as any, // systemClientProvider
+		{ get: () => ({ listExecutedMigrations: async () => [] }) } as any, // systemClientProvider
 		{ get: () => ({ createProject: async () => {} }) } as any, // tenantClientProvider
 		{ get: () => ({ name: 'p', token: 't', endpoint: 'e' }) } as any, // projectProvider
 		{} as any, // schemaVersionBuilder (only used in the describe prompt path)
@@ -51,6 +51,7 @@ const runExecute = async (opts: { until?: string }) => {
 		migrationExecutor as any,
 		{ resolveMigrationsStatus: async () => status } as any,
 		schemaStateManager,
+		{ getUsableSnapshot: async () => null } as any, // migrationSnapshotFacade — these tests exercise the no-snapshot path
 	)
 
 	const logs: string[] = []

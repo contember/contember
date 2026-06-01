@@ -21,7 +21,7 @@ import { EntityAccessor, Field } from '@contember/interface'
 import { FileUrlDataExtractorProps, GenericFileMetadataExtractorProps, ImageFileDataExtractorProps } from '@contember/react-uploader'
 import { UploadIcon } from 'lucide-react'
 import { dict } from '~/lib/dict'
-import { Title } from '../components/title'
+import { Title } from '../components/title.js'
 
 const imageFields: FileUrlDataExtractorProps & GenericFileMetadataExtractorProps & ImageFileDataExtractorProps = {
 	urlField: 'url',

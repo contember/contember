@@ -1,5 +1,5 @@
 import { createSchema, settingsPresets } from '@contember/schema-definition'
-import * as model from './model'
+import * as model from './model/index.js'
 import { AllowAllPermissionFactory } from '@contember/schema-utils'
 
 export default createSchema(model, schema => ({

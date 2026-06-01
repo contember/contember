@@ -3,7 +3,7 @@ import { Component, Environment, Field, FieldAccessor, SugaredRelativeSingleFiel
 import * as React from 'react'
 import { ComponentType } from 'react'
 import { Slot } from '@radix-ui/react-slot'
-import { useSlugInput } from './useSlugInput'
+import { useSlugInput } from './useSlugInput.js'
 
 export type FormSlugInputProps =
 	& FormInputProps

@@ -3,7 +3,7 @@ import { PlugIcon } from 'lucide-react'
 import { Title } from '~/app/components/title'
 import { Slots } from '~/lib/layout'
 import { Button } from '~/lib/ui/button'
-import { queryBuilder } from '../../../api/client'
+import { queryBuilder } from '../../../api/client/index.js'
 
 const listHooksValue = queryBuilder.list('HooksValue', {
 	orderBy: [{ createdAt: 'asc' }],

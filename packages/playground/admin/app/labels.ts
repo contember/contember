@@ -1,4 +1,4 @@
-import { BoardTaskStatus, ContemberClientEntities, ContemberClientEnums, ContemberClientNames, GridArticleState } from '../../api/client'
+import { BoardTaskStatus, ContemberClientEntities, ContemberClientEnums, ContemberClientNames, GridArticleState } from '../../api/client/index.js'
 import { createEnumFormatter } from '~/lib/formatting'
 import { ReactNode } from 'react'
 import { EnumOptionsFormatter, FieldLabelFormatter } from '~/lib/labels'

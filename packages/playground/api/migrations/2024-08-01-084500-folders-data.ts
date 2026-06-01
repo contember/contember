@@ -1,5 +1,5 @@
-import { printMutation } from './utils'
-import { ContemberClientEntities, queryBuilder } from '../client'
+import { printMutation } from './utils.js'
+import { ContemberClientEntities, queryBuilder } from '../client/index.js'
 import { ContentClientInput } from '@contember/client-content'
 import { faker } from '@faker-js/faker'
 

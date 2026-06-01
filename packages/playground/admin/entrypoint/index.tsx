@@ -1,7 +1,7 @@
 import '../index.css'
 import { createErrorHandler } from '@contember/react-devbar'
 import { createRoot } from 'react-dom/client'
-import { Entrypoint } from './entrypoint'
+import { Entrypoint } from './entrypoint.js'
 
 const errorHandler = createErrorHandler((dom, react, onRecoverableError) => createRoot(dom, { onRecoverableError }).render(react))
 

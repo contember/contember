@@ -4,8 +4,8 @@ import { IdentityLoader } from '~/lib/binding'
 import { Slots } from '~/lib/layout'
 import { LayoutComponent } from '~/lib/layout/layout'
 import { SidebarContent, SidebarFooter, SidebarGroup, SidebarGroupContent, SidebarHeader } from '~/lib/ui/sidebar'
-import { Logo } from './logo'
-import { Navigation, UserNavigation } from './navigation'
+import { Logo } from './logo.js'
+import { Navigation, UserNavigation } from './navigation.js'
 
 export const Layout = memo(({ children }: PropsWithChildren) => (
 	<IdentityLoader>

@@ -124,6 +124,8 @@ export class AclValidator {
 		variables: Acl.Variables,
 		errorBuilder: ErrorBuilder,
 	): void {
+		this.validateStateMarkers(predicate, errorBuilder, false, false)
+
 		const processor = new PredicateDefinitionProcessor(this.model)
 		processor.process(entity, predicate, {
 			handleColumn: ctx => {
@@ -151,6 +153,45 @@ export class AclValidator {
 				return ctx.value
 			},
 		})
+	}
+
+	/**
+	 * The `_old`/`_new` update-state markers are only supported at the top level and inside `and`
+	 * chains. Inside `or`/`not` their meaning would depend on the evaluated state and is rejected.
+	 * Nesting a marker inside another marker is likewise meaningless.
+	 */
+	private validateStateMarkers(
+		predicate: Acl.PredicateDefinition,
+		errorBuilder: ErrorBuilder,
+		insideBranching: boolean,
+		insideMarker: boolean,
+	): void {
+		for (const [key, value] of Object.entries(predicate)) {
+			if (value === undefined) {
+				continue
+			}
+			if (key === Acl.PredicateOldStateMarker || key === Acl.PredicateNewStateMarker) {
+				if (insideBranching) {
+					errorBuilder.for(key).add(
+						'ACL_INVALID_STATE_MARKER',
+						`Update-state marker "${key}" cannot be used inside "or"/"not"; use it at the top level or within "and".`,
+					)
+				}
+				if (insideMarker) {
+					errorBuilder.for(key).add(
+						'ACL_INVALID_STATE_MARKER',
+						`Update-state marker "${key}" cannot be nested inside another "_old"/"_new" marker.`,
+					)
+				}
+				this.validateStateMarkers(value as Acl.PredicateDefinition, errorBuilder.for(key), insideBranching, true)
+			} else if (key === 'and') {
+				;(value as Acl.PredicateDefinition[]).forEach(it => this.validateStateMarkers(it, errorBuilder.for(key), insideBranching, insideMarker))
+			} else if (key === 'or') {
+				;(value as Acl.PredicateDefinition[]).forEach(it => this.validateStateMarkers(it, errorBuilder.for(key), true, insideMarker))
+			} else if (key === 'not') {
+				this.validateStateMarkers(value as Acl.PredicateDefinition, errorBuilder.for(key), true, insideMarker)
+			}
+		}
 	}
 
 	private validateOperations(

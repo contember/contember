@@ -433,6 +433,8 @@ export class ImportExecutor {
 			case Model.ColumnType.Time:
 			case Model.ColumnType.Date:
 			case Model.ColumnType.Json:
+			// Numeric is transferred as a string to avoid JS float precision loss.
+			case Model.ColumnType.Numeric:
 				return column.list ? listType(Typesafe.array(Typesafe.string)) : Typesafe.string
 			case Model.ColumnType.Int:
 			case Model.ColumnType.Double:

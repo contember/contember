@@ -62,6 +62,7 @@ export const c = {
 	boolColumn: SchemaDefinition.boolColumn,
 	intColumn: SchemaDefinition.intColumn,
 	doubleColumn: SchemaDefinition.doubleColumn,
+	numericColumn: SchemaDefinition.numericColumn,
 	dateColumn: SchemaDefinition.dateColumn,
 	timeColumn: SchemaDefinition.timeColumn,
 	dateTimeColumn: SchemaDefinition.dateTimeColumn,

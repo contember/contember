@@ -131,6 +131,21 @@ export function doubleColumn(): ColumnDefinition {
 	return column(Model.ColumnType.Double)
 }
 
+/**
+ * Creates a `numeric(precision, scale)` (a.k.a. `decimal`) column.
+ *
+ * Values are transported over GraphQL as strings (e.g. `'-123456789123.456'`) to avoid
+ * JavaScript floating-point precision loss. The value returned by the API is the exact
+ * Postgres `numeric` text representation, which includes trailing zeros up to the column
+ * scale (e.g. `123.450000000` for `numeric(20, 9)`).
+ *
+ * @param precision total number of significant digits
+ * @param scale number of digits after the decimal point
+ */
+export function numericColumn(precision: number, scale: number): ColumnDefinition {
+	return column(Model.ColumnType.Numeric).columnType(`${resolveDefaultColumnType(Model.ColumnType.Numeric)}(${precision}, ${scale})`)
+}
+
 export function dateColumn(): ColumnDefinition {
 	return column(Model.ColumnType.Date)
 }

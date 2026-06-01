@@ -39,6 +39,7 @@ export namespace Model {
 		String = 'String',
 		Int = 'Integer',
 		Double = 'Double',
+		Numeric = 'Numeric',
 		Bool = 'Bool',
 		Enum = 'Enum',
 		DateTime = 'DateTime',

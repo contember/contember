@@ -17,6 +17,7 @@ export const resolveDefaultValue = (column: Model.AnyColumn, providers: Pick<Pro
 		case Model.ColumnType.Int:
 		case Model.ColumnType.Enum:
 		case Model.ColumnType.Double:
+		case Model.ColumnType.Numeric:
 		case Model.ColumnType.Bool:
 		case Model.ColumnType.Json:
 			if (typeof column.default !== 'undefined') {

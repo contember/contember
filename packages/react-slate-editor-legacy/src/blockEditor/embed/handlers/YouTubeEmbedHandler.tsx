@@ -76,7 +76,7 @@ namespace YouTubeEmbedHandler {
 				width="560"
 				height="315"
 				src={`https://www.youtube-nocookie.com/embed/${youTubeId}`}
-				referrerPolicy="no-referrer"
+				referrerPolicy="strict-origin-when-cross-origin"
 				allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
 				loading="lazy"
 				frameBorder="0"

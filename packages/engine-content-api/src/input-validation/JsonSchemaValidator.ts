@@ -156,7 +156,12 @@ const validateNumber = (schema: Exclude<JsonSchema, boolean>, value: number, pat
 	}
 }
 
-const validateArray = (schema: Exclude<JsonSchema, boolean>, value: readonly JSONValue[], path: string, errors: JsonSchemaValidationError[]): void => {
+const validateArray = (
+	schema: Exclude<JsonSchema, boolean>,
+	value: readonly JSONValue[],
+	path: string,
+	errors: JsonSchemaValidationError[],
+): void => {
 	if (typeof schema.minItems === 'number' && value.length < schema.minItems) {
 		errors.push({ path, message: `Array has fewer than ${schema.minItems} items` })
 	}

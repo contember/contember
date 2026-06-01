@@ -279,3 +279,86 @@ describe('change string to array string not null', () =>
 		sql: SQL`ALTER TABLE "author"
         ALTER "email" SET DATA TYPE text[] USING CASE WHEN "email" IS NULL THEN ARRAY[]::text[] ELSE ARRAY["email"]::text[] END;`,
 	}))
+
+// https://github.com/contember/contember/issues/828
+// Altering a column type used by a view requires dropping & recreating the view, even when the view
+// does not declare explicit `dependencies` - the dependency is inferred from the view SQL referencing the table.
+namespace ViewDependsOnColumnOrig {
+	export class Something {
+		value = def.intColumn()
+	}
+
+	@def.View('SELECT something.id, something.value::text AS value FROM something')
+	export class SomethingView {
+		value = def.stringColumn()
+	}
+}
+
+namespace ViewDependsOnColumnUpdated {
+	export class Something {
+		value = def.stringColumn()
+	}
+
+	@def.View('SELECT something.id, something.value::text AS value FROM something')
+	export class SomethingView {
+		value = def.stringColumn()
+	}
+}
+
+describe('change column type used by a view without declared dependencies', () =>
+	testMigrations({
+		original: createSchema(ViewDependsOnColumnOrig),
+		updated: createSchema(ViewDependsOnColumnUpdated),
+		diff: [
+			{
+				modification: 'removeEntity',
+				entityName: 'SomethingView',
+			},
+			updateColumnDefinitionModification.createModification({
+				entityName: 'Something',
+				fieldName: 'value',
+				definition: {
+					type: Model.ColumnType.String,
+					columnType: 'text',
+					nullable: true,
+				},
+			}),
+			{
+				modification: 'createView',
+				entity: {
+					name: 'SomethingView',
+					primary: 'id',
+					primaryColumn: 'id',
+					unique: [],
+					indexes: [],
+					fields: {
+						id: {
+							name: 'id',
+							columnName: 'id',
+							nullable: false,
+							type: 'Uuid',
+							columnType: 'uuid',
+						},
+						value: {
+							name: 'value',
+							columnName: 'value',
+							nullable: true,
+							type: 'String',
+							columnType: 'text',
+						},
+					},
+					tableName: 'something_view',
+					eventLog: {
+						enabled: true,
+					},
+					view: {
+						sql: 'SELECT something.id, something.value::text AS value FROM something',
+					},
+				},
+			},
+		],
+		sql: SQL`DROP VIEW "something_view";
+ALTER TABLE "something"
+	ALTER "value" SET DATA TYPE text USING "value"::text;
+CREATE VIEW "something_view" AS SELECT something.id, something.value::text AS value FROM something;`,
+	}))

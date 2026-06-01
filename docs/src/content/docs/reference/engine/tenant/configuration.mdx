@@ -94,7 +94,7 @@ Requires the `CONFIGURE` tenant permission. By default this is held by `SUPER_AD
 
 | Field | Default | Notes |
 |---|---|---|
-| `requireVerification` | `true` | Self-service `changeMyProfile` e-mail changes go through `confirmEmailChange` against a token mailed to the new address, instead of swapping immediately. Independent of `signup.requireEmailVerification`. See [e-mail verification](/reference/engine/tenant/email-verification#e-mail-change-verification). |
+| `requireVerification` | `false` | Self-service `changeMyProfile` e-mail changes go through `confirmEmailChange` against a token mailed to the new address, instead of swapping immediately. Independent of `signup.requireEmailVerification`. See [e-mail verification](/reference/engine/tenant/email-verification#e-mail-change-verification). |
 
 ### `password`
 

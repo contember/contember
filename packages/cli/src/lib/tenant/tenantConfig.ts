@@ -1,78 +1,67 @@
+import type {
+	ConfigCaptchaInput,
+	ConfigInput,
+	ConfigLoginInput,
+	ConfigPasswordInput,
+	ConfigPasswordlessInput,
+	ConfigRateLimitsInput,
+	ConfigRateLimitWindowInput,
+	IDPOptions,
+	MailTemplate,
+} from '@contember/graphql-client-tenant'
+
+// Enums and leaf input shapes are re-derived from the generated tenant client
+// (`@contember/graphql-client-tenant`, generated from `tenant.graphql`), so they
+// stay in sync with the schema. The only thing layered on top is `| null` on the
+// fields where the API treats an explicit `null`/`''` as "clear/disable" — the
+// codegen renders nullable inputs as optional only and drops the `| null`.
+export type { CaptchaProvider, ConfigPolicy, MailType } from '@contember/graphql-client-tenant'
+
 /**
  * ISO 8601 duration string, e.g. `"P1D"` (1 day) or `"PT5M"` (5 minutes).
  */
 export type Interval = string
 
-export type ConfigPolicy = 'always' | 'never' | 'optIn' | 'optOut'
+/** Adds `| null` to the given keys of an otherwise non-nullable generated input. */
+type WithNullable<T, K extends keyof T> = Omit<T, K> & { readonly [P in K]?: T[P] | null }
 
-export type CaptchaProvider = 'turnstile' | 'hcaptcha' | 'recaptchaV3'
+export type TenantPasswordConfig = WithNullable<ConfigPasswordInput, 'pattern'>
 
-export interface TenantPasswordConfig {
-	minLength?: number
-	requireUppercase?: number
-	requireLowercase?: number
-	requireDigit?: number
-	requireSpecial?: number
-	pattern?: string | null
-	checkBlacklist?: boolean
-	checkHibp?: boolean
+export type TenantLoginConfig = WithNullable<ConfigLoginInput, 'maxTokenExpiration'>
+
+export type TenantPasswordlessConfig = WithNullable<ConfigPasswordlessInput, 'url'>
+
+/**
+ * `provider: null` disables captcha verification.
+ * `secret` is write-only: `null`/omitted leaves the stored value unchanged, `''` clears it.
+ */
+export type TenantCaptchaConfig = WithNullable<ConfigCaptchaInput, 'provider' | 'secret' | 'threshold'>
+
+export type TenantRateLimitWindow = ConfigRateLimitWindowInput
+
+export type TenantRateLimitsConfig = ConfigRateLimitsInput
+
+/**
+ * Maps to the tenant `configure(config: ConfigInput!)` mutation. New config
+ * groups added to the schema flow through automatically; only the groups that
+ * need `| null` overrides are pinned.
+ */
+export type TenantGlobalConfig = Omit<ConfigInput, 'password' | 'login' | 'passwordless' | 'captcha'> & {
+	readonly password?: TenantPasswordConfig
+	readonly login?: TenantLoginConfig
+	readonly passwordless?: TenantPasswordlessConfig
+	readonly captcha?: TenantCaptchaConfig
 }
 
-export interface TenantLoginConfig {
-	baseBackoff?: Interval
-	maxBackoff?: Interval
-	attemptWindow?: Interval
-	revealUserExists?: boolean
-	revealLoginMethod?: boolean
-	defaultTokenExpiration?: Interval
-	maxTokenExpiration?: Interval | null
-}
-
-export interface TenantPasswordlessConfig {
-	enabled?: ConfigPolicy
-	url?: string | null
-	expiration?: Interval
-}
-
-export interface TenantCaptchaConfig {
-	/** `null` disables captcha verification. */
-	provider?: CaptchaProvider | null
-	/** Write-only. `null`/omitted leaves the stored value unchanged; `''` clears it. */
-	secret?: string | null
-	threshold?: number | null
-}
-
-export interface TenantRateLimitWindow {
-	limit?: number
-	window?: Interval
-}
-
-export interface TenantRateLimitsConfig {
-	signUpPerIp?: TenantRateLimitWindow
-	loginPerIp?: TenantRateLimitWindow
-	passwordResetPerIp?: TenantRateLimitWindow
-	passwordlessInitPerIp?: TenantRateLimitWindow
-}
-
-/** Maps to the tenant `configure(config: ConfigInput!)` mutation. */
-export interface TenantGlobalConfig {
-	password?: TenantPasswordConfig
-	login?: TenantLoginConfig
-	passwordless?: TenantPasswordlessConfig
-	captcha?: TenantCaptchaConfig
-	rateLimits?: TenantRateLimitsConfig
-}
-
-export interface TenantIdpOptions {
-	autoSignUp?: boolean
-	exclusive?: boolean
-	initReturnsConfig?: boolean
-}
+export type TenantIdpOptions = IDPOptions
 
 /**
  * A single identity provider. The record key is used as the provider slug.
  * `type` is the handler key registered on the server (built-in: `oidc`,
  * `facebook`, `apple`).
+ *
+ * This is a CLI-specific composite — the `addIDP`/`updateIDP` mutations take
+ * `type`/`configuration`/`options` as separate arguments, not a single input.
  */
 export interface TenantIdpConfig {
 	type: string
@@ -82,23 +71,8 @@ export interface TenantIdpConfig {
 	disabled?: boolean
 }
 
-export type MailType =
-	| 'EXISTING_USER_INVITED'
-	| 'NEW_USER_INVITED'
-	| 'RESET_PASSWORD_REQUEST'
-	| 'PASSWORDLESS_SIGN_IN'
-	| 'FORCED_SIGN_OUT'
-
-export interface TenantMailTemplate {
-	projectSlug?: string | null
-	type: MailType
-	/** Custom variant identifier, e.g. a locale. */
-	variant?: string
-	subject: string
-	content: string
-	useLayout?: boolean
-	replyTo?: string | null
-}
+/** Maps to the `addMailTemplate(template: MailTemplate!)` mutation. */
+export type TenantMailTemplate = WithNullable<MailTemplate, 'projectSlug' | 'replyTo'>
 
 /**
  * Declarative tenant configuration. Applied idempotently by

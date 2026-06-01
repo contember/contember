@@ -161,7 +161,7 @@ CREATE TABLE "config" (
     "rate_limit_email_otp_per_person_limit" integer DEFAULT 10 NOT NULL,
     "rate_limit_email_otp_per_person_window" interval DEFAULT '00:10:00'::interval NOT NULL,
     "signup_require_email_verification" boolean DEFAULT false NOT NULL,
-    "require_email_change_verification" boolean DEFAULT true NOT NULL,
+    "require_email_change_verification" boolean DEFAULT false NOT NULL,
     CONSTRAINT "config_captcha_complete" CHECK ((("captcha_provider" IS NULL) OR (("captcha_secret" IS NOT NULL) AND ("captcha_secret_version" IS NOT NULL)))),
     CONSTRAINT "config_captcha_provider_check" CHECK ((("captcha_provider" IS NULL) OR ("captcha_provider" = ANY (ARRAY['turnstile'::"text", 'hcaptcha'::"text", 'recaptchaV3'::"text"]))))
 );

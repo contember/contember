@@ -194,7 +194,7 @@ const schema: DocumentNode = gql`
 		the address immediately: it goes through a confirmation flow
 		(confirmEmailChange) against a token mailed to the new address, and the
 		old address stays active until the new one is confirmed. Independent of
-		ConfigSignup.requireEmailVerification. Defaults to true.
+		ConfigSignup.requireEmailVerification. Defaults to false.
 		"""
 		requireVerification: Boolean!
 	}

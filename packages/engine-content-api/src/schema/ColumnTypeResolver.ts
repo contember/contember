@@ -82,6 +82,8 @@ export class ColumnTypeResolver {
 				return this.customTypeProvider.uuidType
 			case Model.ColumnType.Double:
 				return GraphQLFloat
+			case Model.ColumnType.Numeric:
+				return this.customTypeProvider.decimalType
 			case Model.ColumnType.Bool:
 				return GraphQLBoolean
 			case Model.ColumnType.DateTime:

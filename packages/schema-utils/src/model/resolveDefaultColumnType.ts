@@ -7,6 +7,8 @@ export const resolveDefaultColumnType = (type: Exclude<Model.ColumnType, Model.C
 			return 'integer'
 		case Model.ColumnType.Double:
 			return 'double precision'
+		case Model.ColumnType.Numeric:
+			return 'numeric'
 		case Model.ColumnType.String:
 			return 'text'
 		case Model.ColumnType.Uuid:

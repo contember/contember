@@ -123,9 +123,14 @@ export class ExportExecutor {
 					|| column.type === Model.ColumnType.DateTime)
 			) {
 				builder = builder.select(expr => expr.raw(`${wrapIdentifier(column.name)}::text[]`))
+			} else if (column.list && column.type === Model.ColumnType.Numeric) {
+				builder = builder.select(expr => expr.raw(`${wrapIdentifier(column.name)}::text[]`))
 			} else if (column.list) {
 				builder = builder.select(column.name)
-			} else if (column.type === Model.ColumnType.Json || column.type === Model.ColumnType.Date || column.type === Model.ColumnType.DateTime) {
+			} else if (
+				column.type === Model.ColumnType.Json || column.type === Model.ColumnType.Date || column.type === Model.ColumnType.DateTime
+				|| column.type === Model.ColumnType.Numeric
+			) {
 				builder = builder.select(expr => expr.raw(`${wrapIdentifier(column.name)}::text`))
 			} else {
 				builder = builder.select(column.name)

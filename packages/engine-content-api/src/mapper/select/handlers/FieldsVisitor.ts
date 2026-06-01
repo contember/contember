@@ -28,6 +28,10 @@ export class FieldsVisitor implements Model.RelationByTypeVisitor<void>, Model.C
 		const columnAlias = columnPath.alias
 
 		let selectFrom = wrapIdentifier(tableAlias) + '.' + wrapIdentifier(column.columnName)
+		if (column.type === Model.ColumnType.Numeric) {
+			// Numeric is transported as a string to avoid JS float precision loss.
+			selectFrom += column.list ? '::text[]' : '::text'
+		}
 		if (column.type === Model.ColumnType.Date && this.settings.shortDateResponse) {
 			selectFrom += '::text'
 		}

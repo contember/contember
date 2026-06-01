@@ -190,6 +190,17 @@ ${Object.values(entity.fields).map(field => this.generateField({ field, entity, 
 		let parts: string[] = []
 		if (column.type === Model.ColumnType.Enum) {
 			parts.push(`enumColumn(${column.columnType})`)
+		} else if (column.type === Model.ColumnType.Numeric) {
+			// numericColumn requires precision and scale, parsed from e.g. "numeric(10, 2)"
+			const match = /numeric\s*\(\s*(\d+)\s*,\s*(\d+)\s*\)/i.exec(column.columnType)
+			if (match) {
+				parts.push(`numericColumn(${match[1]}, ${match[2]})`)
+			} else {
+				parts.push('numericColumn(30, 10)')
+				if (resolveDefaultColumnType(column.type) !== column.columnType) {
+					parts.push(`columnType(${printJsValue(column.columnType)})`)
+				}
+			}
 		} else {
 			parts.push(`${ColumnToMethodMapping[column.type]}()`)
 			const defaultColumnType = resolveDefaultColumnType(column.type)
@@ -231,6 +242,7 @@ const ColumnToMethodMapping: {
 	[Model.ColumnType.Time]: 'timeColumn',
 	[Model.ColumnType.Json]: 'jsonColumn',
 	[Model.ColumnType.Double]: 'doubleColumn',
+	[Model.ColumnType.Numeric]: 'numericColumn',
 	[Model.ColumnType.Uuid]: 'uuidColumn',
 	[Model.ColumnType.Int]: 'intColumn',
 	[Model.ColumnType.String]: 'stringColumn',

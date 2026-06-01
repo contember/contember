@@ -202,3 +202,30 @@ describe('create list column', () =>
 		],
 		sql: SQL`ALTER TABLE "author" ADD "emails" text[];`,
 	}))
+
+describe('create numeric column', () =>
+	testMigrations({
+		original: createSchema({
+			Author: class Author {
+			},
+		}),
+		updated: createSchema({
+			Author: class Author {
+				balance = def.numericColumn(20, 9)
+			},
+		}),
+		diff: [
+			{
+				modification: 'createColumn',
+				entityName: 'Author',
+				field: {
+					columnName: 'balance',
+					name: 'balance',
+					nullable: true,
+					type: Model.ColumnType.Numeric,
+					columnType: 'numeric(20, 9)',
+				},
+			},
+		],
+		sql: SQL`ALTER TABLE "author" ADD "balance" numeric(20, 9);`,
+	}))

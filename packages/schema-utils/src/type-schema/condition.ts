@@ -79,6 +79,9 @@ const resolveColumnTypeSchema = (type: Model.ColumnType) => {
 		case Model.ColumnType.Enum:
 		case Model.ColumnType.String:
 			return Typesafe.string
+		// Numeric is transported as a string to avoid JS float precision loss.
+		case Model.ColumnType.Numeric:
+			return Typesafe.string
 		case Model.ColumnType.Double:
 			return Typesafe.number
 		case Model.ColumnType.Int:

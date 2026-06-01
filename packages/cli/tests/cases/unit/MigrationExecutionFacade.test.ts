@@ -5,7 +5,7 @@ import * as path from 'node:path'
 import { createSchema, SchemaDefinition as def } from '@contember/schema-definition'
 import { Schema } from '@contember/schema'
 import { SchemaStateManager } from '@contember/migrations-client'
-import { MigrationExecutionFacade } from '../../../src/lib/migrations/MigrationExecutionFacade'
+import { MigrationExecutionFacade } from '../../../src/lib/migrations/MigrationExecutionFacade.js'
 
 namespace BlogModel {
 	export class Author {

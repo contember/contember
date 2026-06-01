@@ -1,9 +1,9 @@
 import { EntityAccessor, isEntityAccessor } from '@contember/react-binding'
 import { Entity } from '@contember/react-binding'
-import { BoardCurrentColumnContext, useBoardColumns } from '../contexts'
+import { BoardCurrentColumnContext, useBoardColumns } from '../contexts.js'
 import { ReactNode } from 'react'
-import { BoardColumn } from './BoardColumn'
-import { BoardNullColumnPlaceholder } from '../const'
+import { BoardColumn } from './BoardColumn.js'
+import { BoardNullColumnPlaceholder } from '../const.js'
 
 export const BoardEachColumn = ({ children }: {
 	children: ReactNode

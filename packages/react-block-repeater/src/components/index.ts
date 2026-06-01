@@ -1,3 +1,3 @@
-export * from './Block'
-export * from './BlockRepeater'
-export * from './BlockRepeaterAddItemTrigger'
+export * from './Block.js'
+export * from './BlockRepeater.js'
+export * from './BlockRepeaterAddItemTrigger.js'

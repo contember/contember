@@ -1,3 +1,3 @@
-export * from './CreateEnumModification'
-export * from './RemoveEnumModification'
-export * from './UpdateEnumModification'
+export * from './CreateEnumModification.js'
+export * from './RemoveEnumModification.js'
+export * from './UpdateEnumModification.js'

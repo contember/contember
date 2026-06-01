@@ -1,7 +1,7 @@
 import { test } from 'bun:test'
-import { executeTenantTest } from '../../../src/testTenant'
-import { signUpMutation } from './gql/signUp'
-import { getConfigSql } from './sql/getConfigSql'
+import { executeTenantTest } from '../../../src/testTenant.js'
+import { signUpMutation } from './gql/signUp.js'
+import { getConfigSql } from './sql/getConfigSql.js'
 import { ExpectedQuery } from '@contember/database-tester'
 
 const email = 'john@doe.com'

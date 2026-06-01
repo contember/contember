@@ -1,2 +1,2 @@
-export * from './useIsApplicationOutdated'
-export * from './useBlockNavigationOnDirtyState'
+export * from './useIsApplicationOutdated.js'
+export * from './useBlockNavigationOnDirtyState.js'

@@ -1,3 +1,3 @@
-export * from './AnchorElement'
-export * from './AnchorHtmlDeserializer'
-export * from './withAnchors'
+export * from './AnchorElement.js'
+export * from './AnchorHtmlDeserializer.js'
+export * from './withAnchors.js'

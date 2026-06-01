@@ -1,8 +1,8 @@
 import { ReactNode, useMemo } from 'react'
-import { BoardCurrentItemContext, useBoardCurrentColumn } from '../contexts'
+import { BoardCurrentItemContext, useBoardCurrentColumn } from '../contexts.js'
 import { Entity } from '@contember/react-binding'
-import { BoardItem } from './BoardItem'
-import { BoardColumnNode, BoardItemNode } from '../types'
+import { BoardItem } from './BoardItem.js'
+import { BoardColumnNode, BoardItemNode } from '../types/index.js'
 
 export const BoardEachItem = ({ children }: {
 	children: ReactNode

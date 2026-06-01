@@ -1,7 +1,7 @@
-import type { FieldValue, OptionallyVariableFieldValue } from '../treeParameters'
-import { VariableFieldValue } from './VariableFieldValue'
-import { Environment } from './Environment'
-import { BindingError } from '../BindingError'
+import type { FieldValue, OptionallyVariableFieldValue } from '../treeParameters/index.js'
+import { VariableFieldValue } from './VariableFieldValue.js'
+import { Environment } from './Environment.js'
+import { BindingError } from '../BindingError.js'
 
 export class VariableInputTransformer {
 	public static transformValue(value: OptionallyVariableFieldValue, environment: Environment): FieldValue {

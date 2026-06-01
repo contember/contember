@@ -1,4 +1,4 @@
-import { Mailer, MailMessage, SentInfo } from '../../src/utils'
+import { Mailer, MailMessage, SentInfo } from '../../src/utils/index.js'
 import { expect } from 'bun:test'
 
 export type ExpectedMessage = { subject: string }

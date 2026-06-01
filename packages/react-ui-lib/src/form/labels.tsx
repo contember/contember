@@ -1,5 +1,5 @@
 import { useFormFieldState } from '@contember/react-form'
-import { useFieldLabelFormatter } from '../labels'
+import { useFieldLabelFormatter } from '../labels/index.js'
 
 export const FormFieldLabel = () => {
 	const state = useFormFieldState()

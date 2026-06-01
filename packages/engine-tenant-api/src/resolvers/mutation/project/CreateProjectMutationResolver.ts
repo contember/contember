@@ -1,9 +1,9 @@
-import { CreateProjectResponse, MutationCreateProjectArgs, MutationResolvers } from '../../../schema'
-import { TenantResolverContext } from '../../TenantResolverContext'
-import { isTokenHash, PermissionActions, ProjectManager, TenantRole } from '../../../model'
-import { createErrorResponse } from '../../errorUtils'
+import { CreateProjectResponse, MutationCreateProjectArgs, MutationResolvers } from '../../../schema/index.js'
+import { TenantResolverContext } from '../../TenantResolverContext.js'
+import { isTokenHash, PermissionActions, ProjectManager, TenantRole } from '../../../model/index.js'
+import { createErrorResponse } from '../../errorUtils.js'
 import { UserInputError } from '@contember/graphql-utils'
-import { ResponseOk } from '../../../model/utils/Response'
+import { ResponseOk } from '../../../model/utils/Response.js'
 
 export class CreateProjectMutationResolver implements MutationResolvers {
 	constructor(private readonly projectManager: ProjectManager) {}

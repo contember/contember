@@ -1,9 +1,9 @@
 import { useCallback, useMemo } from 'react'
 import { useStoredState } from '@contember/react-utils'
-import { DataViewFilteringMethods, DataViewFilteringProps, DataViewFilteringState } from '../../types'
-import { useDataViewResolvedFilters } from './useDataViewResolvedFilters'
+import { DataViewFilteringMethods, DataViewFilteringProps, DataViewFilteringState } from '../../types/index.js'
+import { useDataViewResolvedFilters } from './useDataViewResolvedFilters.js'
 import { QualifiedEntityList } from '@contember/react-binding'
-import { DataViewFilteringStoredState, getDataViewFilteringStorageArgs } from '../stateStorage'
+import { DataViewFilteringStoredState, getDataViewFilteringStorageArgs } from '../stateStorage.js'
 
 export type UseDataViewFilteringArgs =
 	& {

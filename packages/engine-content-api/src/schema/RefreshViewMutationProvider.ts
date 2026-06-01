@@ -1,7 +1,7 @@
 import { Model } from '@contember/schema'
 import { GraphQLBoolean, GraphQLEnumType, GraphQLFieldConfig, GraphQLInputObjectType, GraphQLObjectType } from 'graphql'
-import { Context } from '../types'
-import { Authorizator } from '../acl'
+import { Context } from '../types.js'
+import { Authorizator } from '../acl/index.js'
 
 export class RefreshViewMutationProvider {
 	constructor(

@@ -1,8 +1,8 @@
 import { Editor, Editor as SlateEditor, Element as SlateElement, Point, Range as SlateRange, Transforms } from 'slate'
-import { ContemberEditor } from '../../../editor'
-import { ejectHeadingElement, HeadingElement, headingElementPlugin, headingElementType, isHeadingElement } from './HeadingElement'
-import { headingHtmlDeserializer } from './HeadingHtmlDeserializer'
-import { ElementRenderer } from '../../../types'
+import { ContemberEditor } from '../../../editor/index.js'
+import { ejectHeadingElement, HeadingElement, headingElementPlugin, headingElementType, isHeadingElement } from './HeadingElement.js'
+import { headingHtmlDeserializer } from './HeadingHtmlDeserializer.js'
+import { ElementRenderer } from '../../../types/index.js'
 
 export const withHeadings = ({ render }: { render: ElementRenderer<HeadingElement> }) => <E extends Editor>(editor: E): E => {
 	const {

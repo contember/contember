@@ -1,7 +1,7 @@
-import { Config, QueryResolvers } from '../../schema'
-import { ConfigurationQuery, PermissionActions } from '../../model'
-import { TenantResolverContext } from '../TenantResolverContext'
-import { ConfigurationManager } from '../../model/service/ConfigurationManager'
+import { Config, QueryResolvers } from '../../schema/index.js'
+import { ConfigurationQuery, PermissionActions } from '../../model/index.js'
+import { TenantResolverContext } from '../TenantResolverContext.js'
+import { ConfigurationManager } from '../../model/service/ConfigurationManager.js'
 
 export class ConfigurationQueryResolver implements Pick<QueryResolvers, 'configuration'> {
 	constructor(

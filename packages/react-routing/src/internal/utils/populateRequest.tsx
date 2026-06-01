@@ -1,5 +1,5 @@
-import { RequestState, RoutingContextValue } from '../../types'
-import { pathToRequestState, requestStateToPath } from './urlMapper'
+import { RequestState, RoutingContextValue } from '../../types/index.js'
+import { pathToRequestState, requestStateToPath } from './urlMapper.js'
 
 export const populateRequest = (routing: RoutingContextValue, location: Location): RequestState => {
 	const request = pathToRequestState(routing, location.pathname, location.search)

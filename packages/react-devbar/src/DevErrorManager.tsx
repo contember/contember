@@ -1,6 +1,6 @@
-import { DevErrorBadge, DevErrorList, ErrorType } from './ui/DevError'
+import { DevErrorBadge, DevErrorList, ErrorType } from './ui/DevError/index.js'
 import { useEffect, useState } from 'react'
-import { useProcessedError } from './hooks/useParsedStacktrace'
+import { useProcessedError } from './hooks/useParsedStacktrace.js'
 
 export class ErrorBus {
 	private queue: { error: ErrorType; source: string }[] = []

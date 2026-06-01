@@ -1,6 +1,6 @@
 import { Component } from '@contember/react-binding'
 import type { FunctionComponent, ReactNode } from 'react'
-import type { SugaredDiscriminateBy } from '../discrimination'
+import type { SugaredDiscriminateBy } from '../discrimination/index.js'
 
 export interface BlockProps {
 	/**

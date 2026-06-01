@@ -7,7 +7,7 @@ import { Fragment, ReactNode, useMemo } from 'react'
 import { dict } from '@contember/react-ui-lib-base'
 import { Table, TableBody, TableHeader, TableRow } from '@contember/react-ui-lib-base'
 
-import { DataGridColumnLeaf, DataGridColumnLeafProps } from './column-leaf'
+import { DataGridColumnLeaf, DataGridColumnLeafProps } from './column-leaf.js'
 
 /**
  * Props for the {@link DataGridTable} component.

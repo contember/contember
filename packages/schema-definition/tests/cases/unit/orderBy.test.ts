@@ -1,6 +1,6 @@
 import { Model } from '@contember/schema'
 import { describe, expect, test } from 'bun:test'
-import { c, createSchema } from '../../../src'
+import { c, createSchema } from '../../../src/index.js'
 
 const assert = {
 	deepEqual: (a: any, b: any) => expect(a).toStrictEqual(b),

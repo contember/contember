@@ -1,5 +1,5 @@
 import { Input, Model, Writable } from '@contember/schema'
-import { replaceWhere } from '../mapper/select/optimizer/WhereReplacer'
+import { replaceWhere } from '../mapper/select/optimizer/WhereReplacer.js'
 
 export class EvaluatedPredicateReplacer {
 	constructor(

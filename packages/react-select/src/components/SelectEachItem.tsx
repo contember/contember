@@ -1,5 +1,5 @@
 import React, { ReactNode } from 'react'
-import { useSelectCurrentEntities } from '../contexts'
+import { useSelectCurrentEntities } from '../contexts.js'
 import { Entity } from '@contember/react-binding'
 
 export const SelectEachValue = ({ children }: { children: ReactNode }) => {

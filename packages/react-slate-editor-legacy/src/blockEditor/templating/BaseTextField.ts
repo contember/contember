@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react'
-import type { EditorWithBlocks } from '../editor'
+import type { EditorWithBlocks } from '../editor/index.js'
 
 export interface BaseTextField {
 	placeholder: ReactNode

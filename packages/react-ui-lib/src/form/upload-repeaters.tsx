@@ -18,7 +18,7 @@ import {
 } from '@contember/react-uploader'
 import * as React from 'react'
 import { ReactNode, useMemo, useState } from 'react'
-import { FormContainer, FormContainerProps } from './container'
+import { FormContainer, FormContainerProps } from './container.js'
 import { Component, useEntity } from '@contember/interface'
 import { FormFieldStateProvider } from '@contember/react-form'
 import {
@@ -31,8 +31,8 @@ import {
 	UploaderRepeaterHandleUI,
 	UploaderRepeaterItemsWrapperUI,
 	UploaderRepeaterItemUI,
-} from '../upload'
-import { UploaderProgress } from '../upload/upload-progress'
+} from '../upload/index.js'
+import { UploaderProgress } from '../upload/upload-progress.js'
 import { Repeater, RepeaterProps, RepeaterRemoveItemTrigger } from '@contember/react-repeater'
 import {
 	RepeaterSortable,
@@ -41,7 +41,7 @@ import {
 	RepeaterSortableItemActivator,
 	RepeaterSortableItemNode,
 } from '@contember/react-repeater-dnd-kit'
-import { UploaderRepeaterDropIndicator } from '../upload/repeater'
+import { UploaderRepeaterDropIndicator } from '../upload/repeater.js'
 import { Loader } from '@contember/react-ui-lib-base'
 
 export type BaseFileRepeaterFieldProps =

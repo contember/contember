@@ -1,5 +1,5 @@
 import { expect, test } from 'bun:test'
-import { createTester, executeGraphql, loginToken, rand } from '../../src/tester'
+import { createTester, executeGraphql, loginToken, rand } from '../../src/tester.js'
 import { emptySchema } from '@contember/schema-utils'
 
 const changeMyPasswordMutation = `mutation($cur: String!, $next: String!) {

@@ -1,11 +1,11 @@
 import { describe, expect, test } from 'bun:test'
-import { WebhookTargetHandler } from '../../../src/dispatch/WebhookTargetHandler'
-import { FetcherResponse } from '../../../src/dispatch/WebhookFetcher'
+import { WebhookTargetHandler } from '../../../src/dispatch/WebhookTargetHandler.js'
+import { FetcherResponse } from '../../../src/dispatch/WebhookFetcher.js'
 import { createLogger, Logger, TestLoggerHandler } from '@contember/logger'
-import { EventRow } from '../../../src/model/types'
+import { EventRow } from '../../../src/model/types.js'
 import { Actions, ActionsPayload } from '@contember/schema'
-import { HandledEvent } from '../../../src/dispatch/types'
-import { testUuid } from '../../src/uuid'
+import { HandledEvent } from '../../../src/dispatch/types.js'
+import { testUuid } from '../../src/uuid.js'
 
 const assert = {
 	equal: (a: any, b: any) => expect(a).toEqual(b),

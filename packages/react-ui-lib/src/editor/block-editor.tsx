@@ -1,11 +1,11 @@
 import { ReactNode, useCallback, useMemo } from 'react'
-import { EditorCanvas } from './common/editor-canvas'
-import { EditorEditableCanvas } from './common/editor-editable-canvas'
+import { EditorCanvas } from './common/editor-canvas.js'
+import { EditorEditableCanvas } from './common/editor-editable-canvas.js'
 import { BlockEditor, BlockEditorProps, withReferences } from '@contember/react-slate-editor'
 import { Component, SugaredRelativeEntityList, SugaredRelativeSingleField } from '@contember/interface'
 import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable'
 import { useSlate, useSlateStatic } from 'slate-react'
-import { blockEditorPlugins } from './plugins'
+import { blockEditorPlugins } from './plugins.js'
 import {
 	closestCenter,
 	DndContext,

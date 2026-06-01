@@ -1,13 +1,13 @@
 import { GraphQLResolveInfo } from 'graphql'
-import { SystemResolverContext } from '../SystemResolverContext'
-import { MutationResolver } from '../Resolver'
-import { MigrateResponse, MigrationType, MutationMigrateArgs, MutationMigrateFromSnapshotArgs } from '../../schema'
+import { SystemResolverContext } from '../SystemResolverContext.js'
+import { MutationResolver } from '../Resolver.js'
+import { MigrateResponse, MigrationType, MutationMigrateArgs, MutationMigrateFromSnapshotArgs } from '../../schema/index.js'
 import { Migration } from '@contember/schema-migrations'
-import { AuthorizationActions, MigrationError, ProjectMigrator, StagesQuery } from '../../model'
-import { MigrationInput } from '../../model/migrations/MigrationInput'
+import { AuthorizationActions, MigrationError, ProjectMigrator, StagesQuery } from '../../model/index.js'
+import { MigrationInput } from '../../model/migrations/MigrationInput.js'
 import { UserInputError } from '@contember/graphql-utils'
 import { SchemaValidatorSkippedErrors } from '@contember/schema-utils'
-import { assertNever } from '../../utils'
+import { assertNever } from '../../utils/index.js'
 
 const pg_lock_id = 1597474138739147
 

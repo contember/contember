@@ -1,6 +1,6 @@
 import { v4 as uuidV4 } from 'uuid'
 import type { FieldAccessor } from '@contember/binding-common'
-import { FieldHelper } from './FieldHelper'
+import { FieldHelper } from './FieldHelper.js'
 
 class UuidFieldHelper extends FieldHelper<string> {
 	public setToUuid(options?: FieldAccessor.UpdateOptions) {

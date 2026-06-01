@@ -1,5 +1,5 @@
 import { Editor as SlateEditor, Element as SlateElement, Text as SlateText } from 'slate'
-import { SerializableEditorNode } from '../../types/editor'
+import { SerializableEditorNode } from '../../types/editor.js'
 
 export const serializeNodes = <E extends SlateEditor>(
 	editor: E,

@@ -1,7 +1,7 @@
 import { describe, expect, test } from 'bun:test'
-import { BuiltinElements } from '../src'
+import { BuiltinElements } from '../src/index.js'
 import { renderHook } from '@testing-library/react'
-import { useRichTextBlocksSource } from '../src/hooks/useRichTextBlocksSource'
+import { useRichTextBlocksSource } from '../src/hooks/useRichTextBlocksSource.js'
 
 describe('useRichTextBlocksSource', () => {
 	const createBlock = (el: BuiltinElements) => ({

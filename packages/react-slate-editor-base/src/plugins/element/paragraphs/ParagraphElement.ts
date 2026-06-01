@@ -1,7 +1,7 @@
 import { Editor, Editor as SlateEditor, Element as SlateElement, Node as SlateNode, Transforms } from 'slate'
-import { ContemberEditor } from '../../../editor'
-import { AlignDirection } from '../../attributes'
-import { EditorElementPlugin, ElementRenderer } from '../../../types'
+import { ContemberEditor } from '../../../editor/index.js'
+import { AlignDirection } from '../../attributes/index.js'
+import { EditorElementPlugin, ElementRenderer } from '../../../types/index.js'
 
 export const paragraphElementType = 'paragraph' as const
 

@@ -1,4 +1,4 @@
-import { HtmlDeserializerPlugin } from '../../../types'
+import { HtmlDeserializerPlugin } from '../../../types/index.js'
 
 export const anchorHtmlDeserializer: HtmlDeserializerPlugin = {
 	processInlinePaste: ({ element, next, cumulativeTextAttrs }) => {

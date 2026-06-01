@@ -1,8 +1,8 @@
 import prom from 'prom-client'
-import { ProjectInfoMiddlewareState } from '../project-common'
-import { KoaMiddleware } from '../application'
-import { ModuleInfoMiddlewareState } from '../common'
-import { GraphQLKoaState } from '../graphql'
+import { ProjectInfoMiddlewareState } from '../project-common/index.js'
+import { KoaMiddleware } from '../application/index.js'
+import { ModuleInfoMiddlewareState } from '../common/index.js'
+import { GraphQLKoaState } from '../graphql/index.js'
 
 export const createColllectHttpMetricsMiddleware = (
 	registry: prom.Registry,

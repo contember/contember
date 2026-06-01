@@ -1,7 +1,7 @@
 import { Client, Connection } from '@contember/database'
-import { Providers } from '../providers'
-import { CommandBus } from '../commands'
-import { BatchLoaderArgs, initBatchLoader, ItemLoader } from '../../utils/batchQuery'
+import { Providers } from '../providers.js'
+import { CommandBus } from '../commands/index.js'
+import { BatchLoaderArgs, initBatchLoader, ItemLoader } from '../../utils/batchQuery.js'
 
 export class DatabaseContext<Conn extends Connection.ConnectionLike = Connection.ConnectionLike> {
 	private loaders = new Map<BatchLoaderArgs<any, any, any>, ItemLoader<any, any>>()

@@ -1,2 +1,2 @@
-export * from './ApiKeyQuery'
-export * from './ApiKeySessionsQuery'
+export * from './ApiKeyQuery.js'
+export * from './ApiKeySessionsQuery.js'

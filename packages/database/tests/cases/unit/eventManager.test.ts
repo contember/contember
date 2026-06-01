@@ -1,6 +1,6 @@
-import { EventManager } from '../../../src'
+import { EventManager } from '../../../src/index.js'
 import { expect, test } from 'bun:test'
-import { createConnectionMockAlt } from './createConnectionMockAlt'
+import { createConnectionMockAlt } from './createConnectionMockAlt.js'
 
 test('event manager: connection and client', async () => {
 	const [connection, end] = createConnectionMockAlt([

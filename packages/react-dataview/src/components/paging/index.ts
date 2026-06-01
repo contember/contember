@@ -1,3 +1,3 @@
-export * from './DataViewPagingStateView'
-export * from './DataViewChangePageTrigger'
-export * from './DataViewSetItemsPerPageTrigger'
+export * from './DataViewPagingStateView.js'
+export * from './DataViewChangePageTrigger.js'
+export * from './DataViewSetItemsPerPageTrigger.js'

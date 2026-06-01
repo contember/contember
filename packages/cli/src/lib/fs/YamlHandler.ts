@@ -1,8 +1,8 @@
 import { readFile, writeFile } from 'node:fs/promises'
 import jsyaml from 'js-yaml'
-import { FileSystem } from './FileSystem'
+import { FileSystem } from './FileSystem.js'
 import YAWN from 'yawn-yaml'
-import { JSONObject, JSONPrimitive } from '../json'
+import { JSONObject, JSONPrimitive } from '../json.js'
 import { Merger } from '@contember/config-loader'
 
 export type JsonUpdateCallback<Value = JSONObject> = (

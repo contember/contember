@@ -1,5 +1,5 @@
 import { cloneElement, ReactElement, ReactNode, useMemo } from 'react'
-import { useFormFieldState } from '../contexts'
+import { useFormFieldState } from '../contexts.js'
 import { BindingError, ErrorAccessor } from '@contember/react-binding'
 
 export const FormError = ({ children, formatter }: {

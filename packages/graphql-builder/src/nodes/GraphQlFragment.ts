@@ -1,4 +1,4 @@
-import { GraphQlSelectionSet } from './GraphQlField'
+import { GraphQlSelectionSet } from './GraphQlField.js'
 
 export class GraphQlFragment {
 	constructor(

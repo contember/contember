@@ -1,4 +1,4 @@
-import { UpdateInputProcessor } from '../../../inputProcessing'
+import { UpdateInputProcessor } from '../../../inputProcessing/index.js'
 import { Input, Model } from '@contember/schema'
 import {
 	ConstraintType,
@@ -7,12 +7,12 @@ import {
 	MutationEntryNotFoundError,
 	MutationNothingToDo,
 	NothingToDoReason,
-} from '../../Result'
-import { Mapper } from '../../Mapper'
-import { SqlUpdateInputProcessorResult } from '../SqlUpdateInputProcessor'
-import { UpdateBuilder } from '../UpdateBuilder'
-import { CheckedPrimary } from '../../CheckedPrimary'
-import { MapperInput } from '../../types'
+} from '../../Result.js'
+import { Mapper } from '../../Mapper.js'
+import { SqlUpdateInputProcessorResult } from '../SqlUpdateInputProcessor.js'
+import { UpdateBuilder } from '../UpdateBuilder.js'
+import { CheckedPrimary } from '../../CheckedPrimary.js'
+import { MapperInput } from '../../types.js'
 
 type Context = Model.ManyHasOneContext
 

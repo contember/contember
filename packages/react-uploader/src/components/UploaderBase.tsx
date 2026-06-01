@@ -1,5 +1,5 @@
 import { Component, HasOne } from '@contember/react-binding'
-import { UploaderBaseFieldProps } from '../types'
+import { UploaderBaseFieldProps } from '../types/index.js'
 import { ReactNode } from 'react'
 
 export type UploaderBaseProps =

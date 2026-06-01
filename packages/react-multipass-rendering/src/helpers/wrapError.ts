@@ -1,5 +1,5 @@
 import React, { ReactElement } from 'react'
-import { ChildrenAnalyzerError } from '../ChildrenAnalyzerError'
+import { ChildrenAnalyzerError } from '../ChildrenAnalyzerError.js'
 
 export const wrapError = (e: unknown, currentComponentName: string, methodName: string, path: ReactElement[]): never => {
 	if (!(e instanceof Error)) {

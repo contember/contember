@@ -1,7 +1,7 @@
 import { Descendant, Editor, Element, Element as SlateElement, Node as SlateNode, Path as SlatePath, Text, Transforms } from 'slate'
-import { isInReferenceElement, prepareElementForInsertion } from './utils'
+import { isInReferenceElement, prepareElementForInsertion } from './utils/index.js'
 import { ContemberEditor, EditorTransforms } from '@contember/react-slate-editor-base'
-import { isElementWithReference } from './elements'
+import { isElementWithReference } from './elements/index.js'
 
 export const referenceOverrides = (editor: Editor) => {
 	let { insertData, insertFragment, insertBreak, insertNode } = editor

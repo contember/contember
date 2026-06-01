@@ -1,7 +1,7 @@
-import { BindingError } from '../BindingError'
-import type { Filter } from '../treeParameters'
+import { BindingError } from '../BindingError.js'
+import type { Filter } from '../treeParameters/index.js'
 import equal from 'fast-deep-equal/es6/index.js'
-import { Schema, SchemaColumn, SchemaEntity, SchemaRelation } from '../schema'
+import { Schema, SchemaColumn, SchemaEntity, SchemaRelation } from '../schema/index.js'
 
 class Environment<Node extends Environment.AnyNode | undefined = Environment.AnyNode | undefined> {
 	private constructor(

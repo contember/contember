@@ -1,6 +1,6 @@
 import { QueryBuilder, UpdateBuilder } from '@contember/database'
-import { Command } from '../Command'
-import { Project } from '../../type'
+import { Command } from '../Command.js'
+import { Project } from '../../type/index.js'
 
 export class UpdateProjectCommand implements Command<void> {
 	constructor(private projectId: string, private readonly data: Partial<Pick<Project, 'name' | 'config'>>) {}

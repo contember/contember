@@ -1,6 +1,6 @@
-import { DataViewPagingInfo, DataViewPagingState } from '../../types'
+import { DataViewPagingInfo, DataViewPagingState } from '../../types/index.js'
 import { ReactNode } from 'react'
-import { useDataViewPagingInfo, useDataViewPagingState } from '../../contexts'
+import { useDataViewPagingInfo, useDataViewPagingState } from '../../contexts.js'
 
 export interface DataViewPagingStateViewProps {
 	/**

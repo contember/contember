@@ -1,14 +1,14 @@
-import { MutationCreateOk, MutationNoResultError, MutationResultList } from '../Result'
-import { CreateInputVisitor } from '../../inputProcessing'
-import { SqlCreateInputProcessor, SqlCreateInputProcessorResult } from './SqlCreateInputProcessor'
-import { Mapper } from '../Mapper'
+import { MutationCreateOk, MutationNoResultError, MutationResultList } from '../Result.js'
+import { CreateInputVisitor } from '../../inputProcessing/index.js'
+import { SqlCreateInputProcessor, SqlCreateInputProcessorResult } from './SqlCreateInputProcessor.js'
+import { Mapper } from '../Mapper.js'
 import { Model } from '@contember/schema'
 import { acceptFieldVisitor, Providers } from '@contember/schema-utils'
-import { InsertBuilderFactory } from './InsertBuilderFactory'
-import { InsertBuilder } from './InsertBuilder'
-import { rowDataToFieldValues } from '../ColumnValue'
+import { InsertBuilderFactory } from './InsertBuilderFactory.js'
+import { InsertBuilder } from './InsertBuilder.js'
+import { rowDataToFieldValues } from '../ColumnValue.js'
 import { DatabaseMetadata } from '@contember/database'
-import { MapperInput } from '../types'
+import { MapperInput } from '../types.js'
 
 export class Inserter {
 	constructor(

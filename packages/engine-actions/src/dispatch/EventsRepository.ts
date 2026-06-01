@@ -1,8 +1,8 @@
 import { Client, Connection, Literal, LockModifier, LockType, Operator, SelectBuilder, UpdateBuilder } from '@contember/database'
-import { EventRow, HandledEvent } from './types'
+import { EventRow, HandledEvent } from './types.js'
 import { Actions } from '@contember/schema'
-import { eventsToProcessSpecification, eventsToProcessStateSpecification } from '../model/EventsToProcessSpecification'
-import { notify } from '../utils/notifyChannel'
+import { eventsToProcessSpecification, eventsToProcessStateSpecification } from '../model/EventsToProcessSpecification.js'
+import { notify } from '../utils/notifyChannel.js'
 
 const ACK_TIMEOUT_MS = 1_000 * 60 * 10 // 10 minutes
 const DEFAULT_REPEAT_INTERVAL_MS = 5_000 // 5 seconds

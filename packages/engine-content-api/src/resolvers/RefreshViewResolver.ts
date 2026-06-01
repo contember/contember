@@ -1,5 +1,5 @@
 import { Schema } from '@contember/schema'
-import { MapperFactory } from '../mapper'
+import { MapperFactory } from '../mapper/index.js'
 import { wrapIdentifier } from '@contember/database'
 
 export class RefreshViewResolver {

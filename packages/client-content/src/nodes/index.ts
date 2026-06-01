@@ -1,3 +1,3 @@
-export * from './ContentEntitySelection'
-export * from './ContentOperation'
-export * from './TypedEntitySelection'
+export * from './ContentEntitySelection.js'
+export * from './ContentOperation.js'
+export * from './TypedEntitySelection.js'

@@ -1,6 +1,6 @@
 import * as TooltipPrimitive from '@radix-ui/react-tooltip'
-import { uic } from '../utils'
-import { createComponentOpenHooks } from '../utils/createComponentOpenHooks'
+import { uic } from '../utils/index.js'
+import { createComponentOpenHooks } from '../utils/createComponentOpenHooks.js'
 
 export const TooltipProvider = TooltipPrimitive.Provider
 

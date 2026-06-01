@@ -1,5 +1,5 @@
-import { GraphQLTestQuery } from './types'
-import { GQL } from '../../../../src/tags'
+import { GraphQLTestQuery } from './types.js'
+import { GQL } from '../../../../src/tags.js'
 
 export const resetPasswordMutation = (variables: { token: string; password: string }): GraphQLTestQuery => ({
 	query: GQL`mutation($token: String!, $password: String!) {

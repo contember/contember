@@ -1,4 +1,4 @@
-import { EntityConstructor } from '../../../utils'
+import { EntityConstructor } from '../../../utils/index.js'
 
 export class EntityRegistry {
 	public readonly entities: Record<string, EntityConstructor> = {}

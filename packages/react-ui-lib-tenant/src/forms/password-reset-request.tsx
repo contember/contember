@@ -1,8 +1,8 @@
 import { usePasswordResetRequestForm } from '@contember/react-identity'
 import { Button } from '@contember/react-ui-lib-base'
 import { Loader } from '@contember/react-ui-lib-base'
-import { TenantFormError, TenantFormField } from './common'
-import { dict } from '../dict'
+import { TenantFormError, TenantFormField } from './common.js'
+import { dict } from '../dict.js'
 
 export const PasswordResetRequestFormFields = () => {
 	const form = usePasswordResetRequestForm()

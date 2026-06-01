@@ -1,1 +1,1 @@
-export * from './EventsQueryResolver'
+export * from './EventsQueryResolver.js'

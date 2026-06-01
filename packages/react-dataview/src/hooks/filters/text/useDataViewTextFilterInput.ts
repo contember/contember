@@ -1,6 +1,6 @@
 import { ChangeEvent, useCallback, useEffect, useRef, useState } from 'react'
-import { useDataViewFilter } from '../../useDataViewFilter'
-import { TextFilterArtifacts } from '../../../filterTypes'
+import { useDataViewFilter } from '../../useDataViewFilter.js'
+import { TextFilterArtifacts } from '../../../filterTypes/index.js'
 
 export interface UseDataViewTextFilterInputResult {
 	value: string

@@ -1,2 +1,2 @@
-export * from './DependencyCollector'
-export * from './DependencyMerger'
+export * from './DependencyCollector.js'
+export * from './DependencyMerger.js'

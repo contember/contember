@@ -1,5 +1,5 @@
 import { ApplicationContext, HttpErrorResponse, ProjectConfig, ProjectContainer, ProjectContextResolver } from '@contember/engine-http'
-import { Identity } from '../../authorization'
+import { Identity } from '../../authorization/index.js'
 
 export interface ActionsContext {
 	projectContainer: ProjectContainer

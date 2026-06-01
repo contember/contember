@@ -1,6 +1,6 @@
-import { BoardCurrentColumnContext, useBoardColumns } from '../contexts'
+import { BoardCurrentColumnContext, useBoardColumns } from '../contexts.js'
 import { ReactNode } from 'react'
-import { BoardNullColumnPlaceholder } from '../const'
+import { BoardNullColumnPlaceholder } from '../const.js'
 
 export type BoardNullColumnProps = {
 	children: ReactNode

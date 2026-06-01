@@ -1,5 +1,5 @@
 import { ExpectedQuery } from '@contember/database-tester'
-import { SQL } from '../../../../src/tags'
+import { SQL } from '../../../../src/tags.js'
 
 export const updatePersonProfileNameSql = (args: { personId: string; name: string | null }): ExpectedQuery => ({
 	sql: SQL`UPDATE "tenant"."person"

@@ -1,13 +1,13 @@
 import { ReactNode, useCallback, useEffect, useState } from 'react'
-import { TreeRootIdProvider, useBindingOperations, useEnvironment, useHasEntity } from '../accessorPropagation'
-import { Component } from '../coreComponents'
-import { useEntityBeforePersist } from '../entityEvents'
+import { TreeRootIdProvider, useBindingOperations, useEnvironment, useHasEntity } from '../accessorPropagation/index.js'
+import { Component } from '../coreComponents/index.js'
+import { useEntityBeforePersist } from '../entityEvents/index.js'
 import { EntityFieldMarkersContainer, EntityFieldsWithHoistablesMarker } from '@contember/binding'
 import { MarkerFactory } from '@contember/binding'
 import type { TreeRootId } from '@contember/binding'
 import { useConstantValueInvariant } from '@contember/react-utils'
 import { EntityAccessor } from '@contember/binding'
-import { useMutationState } from '../accessorTree'
+import { useMutationState } from '../accessorTree/index.js'
 
 export interface DeferredSubTreesProps {
 	fallback: ReactNode

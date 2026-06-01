@@ -1,1 +1,1 @@
-export * from './ApplicationWorkerManager'
+export * from './ApplicationWorkerManager.js'

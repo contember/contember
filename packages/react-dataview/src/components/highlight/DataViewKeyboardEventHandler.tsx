@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { forwardRef, ReactNode } from 'react'
 import { Slot } from '@radix-ui/react-slot'
-import { useDataViewKeyboardEventHandler } from '../../contexts'
+import { useDataViewKeyboardEventHandler } from '../../contexts.js'
 
 /**
  * A component that listens for keyboard events and dispatches them to the data view.

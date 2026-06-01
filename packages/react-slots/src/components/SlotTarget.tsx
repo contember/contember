@@ -1,7 +1,7 @@
 import { dataAttribute } from '@contember/utilities'
 import { ElementType, memo, ReactNode, useMemo } from 'react'
-import { useTargetElementRegistrar } from '../hooks'
-import { useHasActiveSlotsFactory } from '../hooks'
+import { useTargetElementRegistrar } from '../hooks/index.js'
+import { useHasActiveSlotsFactory } from '../hooks/index.js'
 
 export type OwnTargetContainerProps = {
 	className: string

@@ -1,18 +1,18 @@
 import { MigrationBuilder } from '@contember/database-migrations'
 import { Model, Schema } from '@contember/schema'
-import { SchemaUpdater, updateEntity, updateField, updateModel, updateSchema } from '../utils/schemaUpdateUtils'
+import { SchemaUpdater, updateEntity, updateField, updateModel, updateSchema } from '../utils/schemaUpdateUtils.js'
 import {
 	createModificationType,
 	Differ,
 	ModificationHandler,
 	ModificationHandlerCreateSqlOptions,
 	ModificationHandlerOptions,
-} from '../ModificationHandler'
+} from '../ModificationHandler.js'
 import { isOwningRelation } from '@contember/schema-utils'
-import { updateRelations } from '../utils/diffUtils'
-import { NoopModification } from '../NoopModification'
-import { updateFieldNameModification } from '../fields'
-import { wrapIdentifier } from '../../utils/dbHelpers'
+import { updateRelations } from '../utils/diffUtils.js'
+import { NoopModification } from '../NoopModification.js'
+import { updateFieldNameModification } from '../fields/index.js'
+import { wrapIdentifier } from '../../utils/dbHelpers.js'
 
 export class ConvertOneHasManyToOneHasOneRelationModificationHandler
 	implements ModificationHandler<ConvertOneHasManyToOneHasOneRelationModificationData>

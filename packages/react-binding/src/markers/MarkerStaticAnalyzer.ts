@@ -1,5 +1,5 @@
 import React, { ReactElement, ReactNode } from 'react'
-import { BranchMarkerProvider, EnvironmentDeltaProvider, LeafMarkerProvider, StaticRenderProvider } from './MarkerProvider'
+import { BranchMarkerProvider, EnvironmentDeltaProvider, LeafMarkerProvider, StaticRenderProvider } from './MarkerProvider.js'
 import {
 	EntityFieldMarkersContainer,
 	EntityFieldsWithHoistablesMarker,
@@ -8,7 +8,7 @@ import {
 	HasManyRelationMarker,
 	HasOneRelationMarker,
 } from '@contember/binding'
-import { IncrementalMarkerBuilder } from './IncrementalMarkerBuilder'
+import { IncrementalMarkerBuilder } from './IncrementalMarkerBuilder.js'
 
 type Markers = FieldMarker | HasOneRelationMarker | EntityFieldMarkersContainer | EntityFieldsWithHoistablesMarker | HasManyRelationMarker
 

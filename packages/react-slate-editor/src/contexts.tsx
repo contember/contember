@@ -1,6 +1,6 @@
 import { createRequiredContext } from '@contember/react-utils'
-import { GetReferencedEntity } from './plugins/references/useGetReferencedEntity'
-import { EditorReferenceMethods } from './types'
+import { GetReferencedEntity } from './plugins/references/useGetReferencedEntity.js'
+import { EditorReferenceMethods } from './types/index.js'
 import { RenderElementProps } from 'slate-react'
 
 const EditorGetReferencedEntityContext_ = createRequiredContext<GetReferencedEntity>('EditorGetReferenceEntityContext')

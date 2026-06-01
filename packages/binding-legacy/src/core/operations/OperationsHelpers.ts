@@ -2,11 +2,11 @@ import type { EntityAccessor } from '@contember/binding-common'
 import type { RuntimeId } from '@contember/binding-common'
 import { BindingError } from '@contember/binding-common'
 import { PRIMARY_KEY_NAME } from '@contember/binding-common'
-import { EventManager } from '../EventManager'
-import { RealmKeyGenerator } from '../RealmKeyGenerator'
-import type { EntityRealmState, EntityRealmStateStub, EntityState } from '../state'
-import type { StateInitializer } from '../StateInitializer'
-import type { TreeStore } from '../TreeStore'
+import { EventManager } from '../EventManager.js'
+import { RealmKeyGenerator } from '../RealmKeyGenerator.js'
+import type { EntityRealmState, EntityRealmStateStub, EntityState } from '../state/index.js'
+import type { StateInitializer } from '../StateInitializer.js'
+import type { TreeStore } from '../TreeStore.js'
 
 export class OperationsHelpers {
 	public static rejectInvalidAccessorTree(): never {

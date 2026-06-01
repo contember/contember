@@ -1,13 +1,13 @@
-export * from './acl'
-export * from './resolvers'
-export * from './introspection'
-export * from './schema'
-export * from './inputProcessing'
-export { EntityRulesResolver } from './input-validation'
-export * from './types'
-export * from './ExecutionContainer'
+export * from './acl/index.js'
+export * from './resolvers/index.js'
+export * from './introspection/index.js'
+export * from './schema/index.js'
+export * from './inputProcessing/index.js'
+export { EntityRulesResolver } from './input-validation/index.js'
+export * from './types.js'
+export * from './ExecutionContainer.js'
 export { graphql } from 'graphql'
-export { UserError } from './exception'
+export { UserError } from './exception.js'
 export {
 	AfterCommitEvent,
 	AfterInsertEvent,
@@ -31,5 +31,5 @@ export {
 	Path,
 	PathFactory,
 	type WhereBuilder,
-} from './mapper'
-export * from './utils/uniqueWhereFields'
+} from './mapper/index.js'
+export * from './utils/uniqueWhereFields.js'

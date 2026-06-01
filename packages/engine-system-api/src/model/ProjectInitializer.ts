@@ -1,9 +1,9 @@
-import { ProjectConfig } from '../types'
-import { StageCreator } from './stages'
-import { DatabaseContext } from './database'
+import { ProjectConfig } from '../types.js'
+import { StageCreator } from './stages/index.js'
+import { DatabaseContext } from './database/index.js'
 import { Connection, retryTransaction } from '@contember/database'
 import { FingerCrossedLoggerHandler, Logger } from '@contember/logger'
-import { SystemMigrationsRunner } from '../migrations'
+import { SystemMigrationsRunner } from '../migrations/index.js'
 
 export class ProjectInitializer {
 	constructor(

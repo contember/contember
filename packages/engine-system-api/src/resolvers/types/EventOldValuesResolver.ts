@@ -1,6 +1,6 @@
-import { DeleteEvent, DeleteEventResolvers, UpdateEvent, UpdateEventResolvers } from '../../schema'
-import { SystemResolverContext } from '../SystemResolverContext'
-import { oldValuesLoaderFactory } from './OldValuesHelpers'
+import { DeleteEvent, DeleteEventResolvers, UpdateEvent, UpdateEventResolvers } from '../../schema/index.js'
+import { SystemResolverContext } from '../SystemResolverContext.js'
+import { oldValuesLoaderFactory } from './OldValuesHelpers.js'
 
 export class EventOldValuesResolver implements UpdateEventResolvers<SystemResolverContext>, DeleteEventResolvers<SystemResolverContext> {
 	async oldValues(

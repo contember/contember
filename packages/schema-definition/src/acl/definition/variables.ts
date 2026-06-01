@@ -1,4 +1,4 @@
-import { Role } from './roles'
+import { Role } from './roles.js'
 import { Acl, Input } from '@contember/schema'
 
 export class VariableDefinition<

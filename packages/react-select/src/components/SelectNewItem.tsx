@@ -11,7 +11,7 @@ import {
 } from '@contember/react-binding'
 import * as React from 'react'
 import { ReactNode, useEffect, useMemo, useState } from 'react'
-import { useSelectOptions } from '../contexts'
+import { useSelectOptions } from '../contexts.js'
 
 export const SelectNewItem = ({ children }: { children: ReactNode }) => {
 	const options = useSelectOptions()

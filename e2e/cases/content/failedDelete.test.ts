@@ -1,6 +1,6 @@
 import { test } from 'bun:test'
 import { c, createSchema } from '@contember/schema-definition'
-import { createTester, gql } from '../../src/tester'
+import { createTester, gql } from '../../src/tester.js'
 
 namespace CascadeFailModel {
 	export class Post {

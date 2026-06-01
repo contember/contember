@@ -1,6 +1,6 @@
 import { DatabaseQuery, DatabaseQueryable, SelectBuilder } from '@contember/database'
-import { EventRow } from './types'
-import { EventArgs } from '../graphql/schema'
+import { EventRow } from './types.js'
+import { EventArgs } from '../graphql/schema/index.js'
 
 export class FailedEventsQuery extends DatabaseQuery<EventRow[]> {
 	constructor(

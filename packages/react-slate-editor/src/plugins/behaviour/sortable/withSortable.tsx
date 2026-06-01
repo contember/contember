@@ -2,7 +2,7 @@ import { EditorElement, EditorPlugin } from '@contember/react-slate-editor-base'
 import { ReactEditor } from 'slate-react'
 import { ReactNode } from 'react'
 import { Element, Transforms } from 'slate'
-import { createElementKey } from '../../../internal/helpers/createElementKey'
+import { createElementKey } from '../../../internal/helpers/createElementKey.js'
 
 export const withSortable = ({ render: Sortable }: {
 	render: (props: { element: EditorElement; children: ReactNode }) => ReactNode

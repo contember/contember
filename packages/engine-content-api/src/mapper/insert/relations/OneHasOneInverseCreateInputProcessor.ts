@@ -1,10 +1,10 @@
-import { Mapper } from '../../Mapper'
-import { ConstraintType, MutationConstraintViolationError, MutationEntryNotFoundError, MutationResultList } from '../../Result'
-import { CheckedPrimary } from '../../CheckedPrimary'
+import { Mapper } from '../../Mapper.js'
+import { ConstraintType, MutationConstraintViolationError, MutationEntryNotFoundError, MutationResultList } from '../../Result.js'
+import { CheckedPrimary } from '../../CheckedPrimary.js'
 import { Input, Model } from '@contember/schema'
-import { CreateInputProcessor } from '../../../inputProcessing'
-import { SqlCreateInputProcessorResult } from '../SqlCreateInputProcessor'
-import { MapperInput } from '../../types'
+import { CreateInputProcessor } from '../../../inputProcessing/index.js'
+import { SqlCreateInputProcessorResult } from '../SqlCreateInputProcessor.js'
+import { MapperInput } from '../../types.js'
 
 type Context = Model.OneHasOneInverseContext
 

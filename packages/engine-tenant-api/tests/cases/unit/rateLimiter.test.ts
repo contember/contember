@@ -1,7 +1,7 @@
 import { describe, expect, test } from 'bun:test'
 import PostgresInterval from 'postgres-interval'
 import { createConnectionMock, ExpectedQuery } from '@contember/database-tester'
-import { Config, DatabaseContext, Providers, RateLimiter } from '../../../src'
+import { Config, DatabaseContext, Providers, RateLimiter } from '../../../src/index.js'
 
 const NOW = new Date('2026-05-20T12:00:00.000Z')
 

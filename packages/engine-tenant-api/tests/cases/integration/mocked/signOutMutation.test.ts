@@ -1,11 +1,11 @@
-import { authenticatedApiKeyId, authenticatedIdentityId, executeTenantTest } from '../../../src/testTenant'
-import { testUuid } from '../../../src/testUuid'
-import { GQL, SQL } from '../../../src/tags'
-import { disableApiKey } from './sql/disableApiKeySql'
-import { getPersonByIdentity } from './sql/getPersonByIdentity'
+import { authenticatedApiKeyId, authenticatedIdentityId, executeTenantTest } from '../../../src/testTenant.js'
+import { testUuid } from '../../../src/testUuid.js'
+import { GQL, SQL } from '../../../src/tags.js'
+import { disableApiKey } from './sql/disableApiKeySql.js'
+import { getPersonByIdentity } from './sql/getPersonByIdentity.js'
 import { test } from 'bun:test'
-import { getApiKeySql } from './sql/getApiKeySql'
-import { ApiKey } from '../../../../src'
+import { getApiKeySql } from './sql/getApiKeySql.js'
+import { ApiKey } from '../../../../src/index.js'
 
 test('sign out', async () => {
 	const personId = testUuid(1)

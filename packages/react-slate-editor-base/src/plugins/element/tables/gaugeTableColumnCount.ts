@@ -1,5 +1,5 @@
-import type { TableElement } from './TableElement'
-import type { TableRowElement } from './TableRowElement'
+import type { TableElement } from './TableElement.js'
+import type { TableRowElement } from './TableRowElement.js'
 
 export const gaugeTableColumnCount = (table: TableElement): number => {
 	// This whole function is obviously very heuristic. It's intended to be called during normalizations (i.e. often),

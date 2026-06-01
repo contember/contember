@@ -9,7 +9,7 @@ import type {
 	SugaredUnconstrainedQualifiedSingleEntity,
 	TreeRootId,
 } from '@contember/binding-common'
-import type { TreeStore } from '../TreeStore'
+import type { TreeStore } from '../TreeStore.js'
 
 export const createBatchUpdatesOptions = (rootEnvironment: Environment, treeStore: TreeStore): BatchUpdatesOptions =>
 	Object.freeze({

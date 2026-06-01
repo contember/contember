@@ -1,7 +1,7 @@
-import { HtmlDeserializerPlugin } from '../../../types'
-import { tableCellElementType } from './TableCellElement'
-import { tableElementType } from './TableElement'
-import { tableRowElementType } from './TableRowElement'
+import { HtmlDeserializerPlugin } from '../../../types/index.js'
+import { tableCellElementType } from './TableCellElement.js'
+import { tableElementType } from './TableElement.js'
+import { tableRowElementType } from './TableRowElement.js'
 
 export const tableHTMLDeserializer: HtmlDeserializerPlugin = {
 	processBlockPaste: ({ element, next, cumulativeTextAttrs }) => {

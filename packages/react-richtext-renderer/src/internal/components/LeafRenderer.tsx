@@ -1,10 +1,10 @@
 import { createElement } from 'react'
-import type { BuiltinLeaves } from '../../types/builtin/BuiltinLeaves'
-import { RenderLeafFallback } from './RenderLeafFallback'
-import type { RichTextLeaf } from '../../types/structure/RichTextLeaf'
-import { RichTextElement } from '../../types/structure/RichTextElement'
-import { RichTextRenderingOptions } from '../../types/RichTextRenderingOptions'
-import { RichTextBlock } from '../../types/RichTextBlock'
+import type { BuiltinLeaves } from '../../types/builtin/BuiltinLeaves.js'
+import { RenderLeafFallback } from './RenderLeafFallback.js'
+import type { RichTextLeaf } from '../../types/structure/RichTextLeaf.js'
+import { RichTextElement } from '../../types/structure/RichTextElement.js'
+import { RichTextRenderingOptions } from '../../types/RichTextRenderingOptions.js'
+import { RichTextBlock } from '../../types/RichTextBlock.js'
 
 export interface LeafRendererProps<CustomElements extends RichTextElement = never, CustomLeaves extends RichTextLeaf = RichTextLeaf> {
 	options: RichTextRenderingOptions<CustomElements, CustomLeaves>

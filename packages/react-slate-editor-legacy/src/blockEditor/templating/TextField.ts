@@ -1,6 +1,6 @@
 import { BindingError, Component, SugaredRelativeSingleField } from '@contember/react-binding'
 import type { FunctionComponent } from 'react'
-import type { BaseTextField } from './BaseTextField'
+import type { BaseTextField } from './BaseTextField.js'
 
 export interface TextFieldProps extends SugaredRelativeSingleField, BaseTextField {}
 

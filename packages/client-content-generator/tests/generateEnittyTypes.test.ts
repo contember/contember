@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'bun:test'
-import { EntityTypeSchemaGenerator } from '../src'
-import { schemas } from './schemas'
+import { EntityTypeSchemaGenerator } from '../src/index.js'
+import { schemas } from './schemas.js'
 
 describe('generate entities', () => {
 	const entityGenerator = new EntityTypeSchemaGenerator()

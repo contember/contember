@@ -1,2 +1,2 @@
-export * from './MarkerTreeGenerator'
-export * from './MarkerProvider'
+export * from './MarkerTreeGenerator.js'
+export * from './MarkerProvider.js'

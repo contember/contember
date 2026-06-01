@@ -1,7 +1,7 @@
-import { useHasActiveSlotsFactory } from './useHasActiveSlotsFactory'
+import { useHasActiveSlotsFactory } from './useHasActiveSlotsFactory.js'
 import { createElement, Fragment, useCallback } from 'react'
-import { createSlotTargetComponent } from '../factories'
-import { SlotTargetComponentsRecord } from '../factories'
+import { createSlotTargetComponent } from '../factories/index.js'
+import { SlotTargetComponentsRecord } from '../factories/index.js'
 
 /**
  * Creates a function that returns a list of slot targets if any of them are active.

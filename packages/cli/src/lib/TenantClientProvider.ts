@@ -1,5 +1,5 @@
-import { TenantClient } from './tenant/TenantClient'
-import { RemoteProjectProvider } from './project/RemoteProjectProvider'
+import { TenantClient } from './tenant/TenantClient.js'
+import { RemoteProjectProvider } from './project/RemoteProjectProvider.js'
 
 export class TenantClientProvider {
 	constructor(

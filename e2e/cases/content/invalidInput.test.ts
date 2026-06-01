@@ -1,6 +1,6 @@
 import { createSchema, SchemaDefinition as def } from '@contember/schema-definition'
 import { test } from 'bun:test'
-import { createTester, gql } from '../../src/tester'
+import { createTester, gql } from '../../src/tester.js'
 namespace PostModel {
 	export class Post {
 		slug = def.stringColumn().unique()

@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { useCallback } from 'react'
 import { useDataViewFilterName, useDataViewNullFilter } from '@contember/react-dataview'
-import { DataGridFilterSelectItemUI } from '../ui'
+import { DataGridFilterSelectItemUI } from '../ui.js'
 import { dict } from '@contember/react-ui-lib-base'
 
 /**

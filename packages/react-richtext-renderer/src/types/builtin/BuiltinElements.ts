@@ -1,4 +1,4 @@
-import type { RichTextElement, RichTextLeaf } from '../structure'
+import type { RichTextElement, RichTextLeaf } from '../structure/index.js'
 
 export type BuiltinElements<
 	CustomElements extends RichTextElement = never,

@@ -3,7 +3,7 @@ import { Input } from '@contember/client'
 import { EntityAccessor } from '@contember/binding'
 import { Filter } from '@contember/binding'
 import { BindingError } from '@contember/binding'
-import { evaluateCondition } from './evaluateCondition'
+import { evaluateCondition } from './evaluateCondition.js'
 
 export class FilterEvaluator {
 	constructor(

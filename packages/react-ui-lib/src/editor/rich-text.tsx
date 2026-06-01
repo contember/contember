@@ -1,12 +1,12 @@
 import { Editable, useSlateStatic } from 'slate-react'
-import { EditorCanvas } from './common/editor-canvas'
+import { EditorCanvas } from './common/editor-canvas.js'
 import { RichTextEditor } from '@contember/react-slate-editor'
 import { Component, SugaredRelativeSingleField, useMutationState } from '@contember/interface'
 import * as React from 'react'
 import { ReactNode } from 'react'
-import { FormContainer, FormContainerProps } from '../form'
+import { FormContainer, FormContainerProps } from '../form/index.js'
 import { FormFieldScope } from '@contember/react-form'
-import { richTextFieldPlugins } from './plugins'
+import { richTextFieldPlugins } from './plugins.js'
 
 export type RichTextFieldProps =
 	& {

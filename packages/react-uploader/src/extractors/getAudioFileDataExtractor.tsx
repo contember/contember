@@ -1,5 +1,5 @@
 import { Field, SugaredRelativeSingleField } from '@contember/react-binding'
-import { FileDataExtractor } from '../types'
+import { FileDataExtractor } from '../types/index.js'
 
 export interface AudioFileDataExtractorProps {
 	durationField?: SugaredRelativeSingleField['field']

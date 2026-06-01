@@ -1,9 +1,9 @@
-import { ConfigInput, ConfigureResponse, MutationConfigureArgs, MutationResolvers } from '../../../schema'
-import { ConfigurationManager } from '../../../model/service/ConfigurationManager'
-import { TenantResolverContext } from '../../TenantResolverContext'
-import { PermissionActions } from '../../../model'
-import { createErrorResponse } from '../../errorUtils'
-import { ResponseOk } from '../../../model/utils/Response'
+import { ConfigInput, ConfigureResponse, MutationConfigureArgs, MutationResolvers } from '../../../schema/index.js'
+import { ConfigurationManager } from '../../../model/service/ConfigurationManager.js'
+import { TenantResolverContext } from '../../TenantResolverContext.js'
+import { PermissionActions } from '../../../model/index.js'
+import { createErrorResponse } from '../../errorUtils.js'
+import { ResponseOk } from '../../../model/utils/Response.js'
 import { JSONValue } from '@contember/schema'
 
 export class ConfigurationMutationResolver implements Pick<MutationResolvers, 'configure'> {

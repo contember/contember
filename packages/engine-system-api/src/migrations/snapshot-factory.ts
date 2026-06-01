@@ -1,5 +1,5 @@
 import { MigrationArgs, MigrationBuilder } from '@contember/database-migrations'
-import { SystemMigrationArgs } from './types'
+import { SystemMigrationArgs } from './types.js'
 
 export const snapshotMigration = (sqlFactory: (args: { randomUuidFn: string }) => string) => {
 	return async (builder: MigrationBuilder, args: MigrationArgs<SystemMigrationArgs>) => {

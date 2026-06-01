@@ -1,9 +1,9 @@
 import { HttpController } from '@contember/engine-http'
-import { ActionsGraphQLHandler } from './ActionsGraphQLHandlerFactory'
-import { ActionsContext } from '../resolvers/ActionsContext'
-import { ActionsContextResolver } from './ActionsContextResolver'
+import { ActionsGraphQLHandler } from './ActionsGraphQLHandlerFactory.js'
+import { ActionsContext } from '../resolvers/ActionsContext.js'
+import { ActionsContextResolver } from './ActionsContextResolver.js'
 import { AuthorizationScope, Authorizator } from '@contember/authorization'
-import { Identity } from '../../authorization'
+import { Identity } from '../../authorization/index.js'
 import { ForbiddenError } from '@contember/graphql-utils'
 
 export class ActionsApiMiddlewareFactory {

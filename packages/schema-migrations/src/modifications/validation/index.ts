@@ -1,2 +1,2 @@
-export * from './PatchValidationSchemaModification'
-export * from './UpdateValidationSchemaModification'
+export * from './PatchValidationSchemaModification.js'
+export * from './UpdateValidationSchemaModification.js'

@@ -1,5 +1,5 @@
-import { DynamicRequestParameters, RequestParameters, RoutingParameterResolver } from '../../types'
-import { RoutingParameter } from '../../dto/RoutingParameter'
+import { DynamicRequestParameters, RequestParameters, RoutingParameterResolver } from '../../types/index.js'
+import { RoutingParameter } from '../../dto/RoutingParameter.js'
 
 export const resolveParameters = (parameters: DynamicRequestParameters, resolveParameter: RoutingParameterResolver): RequestParameters => {
 	return Object.fromEntries(

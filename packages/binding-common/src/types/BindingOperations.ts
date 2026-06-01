@@ -1,11 +1,11 @@
-import type { AsyncBatchUpdatesOptions } from './AsyncBatchUpdatesOptions'
-import type { BatchUpdatesOptions } from './BatchUpdatesOptions'
-import type { ExtendTree } from './ExtendTree'
-import type { Persist } from './Persist'
-import type { Environment } from '../environment'
-import { ReceivedDataTree } from './QueryRequestResponse'
-import { MarkerTreeRoot } from '../markers'
-import { DataBindingEventListenerMap } from './DataBindingEvents'
+import type { AsyncBatchUpdatesOptions } from './AsyncBatchUpdatesOptions.js'
+import type { BatchUpdatesOptions } from './BatchUpdatesOptions.js'
+import type { ExtendTree } from './ExtendTree.js'
+import type { Persist } from './Persist.js'
+import type { Environment } from '../environment/index.js'
+import { ReceivedDataTree } from './QueryRequestResponse.js'
+import { MarkerTreeRoot } from '../markers/index.js'
+import { DataBindingEventListenerMap } from './DataBindingEvents.js'
 
 export type FetchData<Node> = (fragment: Node, options?: { signal?: AbortSignal; environment?: Environment }) => Promise<{
 	data: ReceivedDataTree

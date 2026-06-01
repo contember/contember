@@ -1,10 +1,10 @@
-import { SchemaDefinition } from './model'
-import * as InputValidation from './validation'
-import * as AclDefinition from './acl/definition'
-import * as ActionsDefinition from './actions/definition'
+import { SchemaDefinition } from './model/index.js'
+import * as InputValidation from './validation/index.js'
+import * as AclDefinition from './acl/definition/index.js'
+import * as ActionsDefinition from './actions/definition/index.js'
 import { Model, Schema } from '@contember/schema'
 import { emptySchema } from '@contember/schema-utils'
-import { allStrict, StrictDefinitionValidator, StrictOptions } from './strict'
+import { allStrict, StrictDefinitionValidator, StrictOptions } from './strict.js'
 
 export const createSchema = (definitions: Record<string, any>, modifyCallback?: (schema: Schema) => Schema, options?: {
 	strict?: boolean | StrictOptions

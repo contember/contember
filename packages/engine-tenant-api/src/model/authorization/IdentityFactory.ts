@@ -1,6 +1,6 @@
-import { ProjectMemberManager } from '../service'
-import { Identity, ProjectAwareIdentity } from './Identity'
-import { DatabaseContext } from '../utils'
+import { ProjectMemberManager } from '../service/index.js'
+import { Identity, ProjectAwareIdentity } from './Identity.js'
+import { DatabaseContext } from '../utils/index.js'
 
 export class IdentityFactory {
 	constructor(private readonly projectMemberManager: ProjectMemberManager) {}

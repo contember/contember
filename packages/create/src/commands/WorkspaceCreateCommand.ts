@@ -1,9 +1,9 @@
 import { Command, CommandConfiguration, Input } from '@contember/cli-common'
 import { join } from 'node:path'
 import chalk from 'chalk'
-import { TemplateInstaller } from '../lib/TemplateInstaller'
-import { getPackageVersion } from '../lib/version'
-import { detectPackageManager } from '../lib/packageManagerDetector'
+import { TemplateInstaller } from '../lib/TemplateInstaller.js'
+import { getPackageVersion } from '../lib/version.js'
+import { detectPackageManager } from '../lib/packageManagerDetector.js'
 
 type Args = {
 	projectName: string

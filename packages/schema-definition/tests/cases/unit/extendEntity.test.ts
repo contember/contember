@@ -1,8 +1,8 @@
 import { Model } from '@contember/schema'
 import { expect, test } from 'bun:test'
-import { c, createSchema } from '../../../src'
-import { extendEntity, FieldDefinition } from '../../../src/model/definition'
-import { DecoratorFunction } from '../../../src/utils'
+import { c, createSchema } from '../../../src/index.js'
+import { extendEntity, FieldDefinition } from '../../../src/model/definition/index.js'
+import { DecoratorFunction } from '../../../src/utils/index.js'
 
 namespace ExtendedModel {
 	export class Article {

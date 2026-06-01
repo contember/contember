@@ -1,6 +1,6 @@
-import type { SuccessfulPersistResult } from './PersistResult'
-import type { PersistErrorOptions } from './PersistErrorOptions'
-import type { PersistSuccessOptions } from './PersistSuccessOptions'
+import type { SuccessfulPersistResult } from './PersistResult.js'
+import type { PersistErrorOptions } from './PersistErrorOptions.js'
+import type { PersistSuccessOptions } from './PersistSuccessOptions.js'
 
 export interface PersistOptions {
 	signal?: AbortSignal

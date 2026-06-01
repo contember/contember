@@ -1,6 +1,6 @@
-import { QueryAstFactory } from './QueryAstFactory'
-import { Mapper } from '../mapper'
-import { Dependencies } from './dependencies'
+import { QueryAstFactory } from './QueryAstFactory.js'
+import { Mapper } from '../mapper/index.js'
+import { Dependencies } from './dependencies/index.js'
 import { Input, Model, Value } from '@contember/schema'
 
 export class ValidationDataSelector {

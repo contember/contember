@@ -1,5 +1,5 @@
 import { DatabaseQuery, DatabaseQueryable, SelectBuilder } from '@contember/database'
-import { byProjectSlug } from './ProjectSlugSpecification'
+import { byProjectSlug } from './ProjectSlugSpecification.js'
 
 class ProjectRolesByIdentityQuery extends DatabaseQuery<ProjectRolesByIdentityQuery.Result> {
 	constructor(private readonly project: { id: string } | { slug: string }, private readonly identityId: string) {

@@ -1,7 +1,7 @@
-import { PersonRow } from '../queries'
-import { ConfirmOtpCommand, DisableOtpCommand, PrepareOtpCommand } from '../commands'
-import { DatabaseContext } from '../utils'
-import { OtpAuthenticator, OtpData } from './OtpAuthenticator'
+import { PersonRow } from '../queries/index.js'
+import { ConfirmOtpCommand, DisableOtpCommand, PrepareOtpCommand } from '../commands/index.js'
+import { DatabaseContext } from '../utils/index.js'
+import { OtpAuthenticator, OtpData } from './OtpAuthenticator.js'
 
 export class OtpManager {
 	constructor(

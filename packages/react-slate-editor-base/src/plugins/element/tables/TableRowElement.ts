@@ -1,8 +1,8 @@
 import { Editor as SlateEditor, Element, Element as SlateElement, Node, Node as SlateNode, Transforms } from 'slate'
-import { createEmptyTableCellElement, isTableCellElement, tableCellElementType } from './TableCellElement'
-import { ContemberEditor } from '../../../editor'
-import { tableElementType } from './TableElement'
-import { EditorElementPlugin, ElementRenderer } from '../../../types'
+import { createEmptyTableCellElement, isTableCellElement, tableCellElementType } from './TableCellElement.js'
+import { ContemberEditor } from '../../../editor/index.js'
+import { tableElementType } from './TableElement.js'
+import { EditorElementPlugin, ElementRenderer } from '../../../types/index.js'
 
 export const tableRowElementType = 'tableRow' as const
 

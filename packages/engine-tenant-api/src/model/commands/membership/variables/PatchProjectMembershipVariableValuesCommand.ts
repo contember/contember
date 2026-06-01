@@ -1,4 +1,4 @@
-import { Command } from '../../Command'
+import { Command } from '../../Command.js'
 import { ConflictActionType, InsertBuilder, Literal } from '@contember/database'
 
 export class PatchProjectMembershipVariableValuesCommand implements Command<string[]> {

@@ -1,2 +1,2 @@
-export * from './CollectHttpMetricsMiddelware'
-export * from './ShowMetricsMiddleware'
+export * from './CollectHttpMetricsMiddelware.js'
+export * from './ShowMetricsMiddleware.js'

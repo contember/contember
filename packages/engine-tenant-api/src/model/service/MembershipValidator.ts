@@ -1,4 +1,4 @@
-import { ProjectSchemaResolver } from '../type'
+import { ProjectSchemaResolver } from '../type/index.js'
 import { MembershipResolver, MembershipValidationError, MembershipValidationErrorType } from '@contember/schema-utils'
 import { Acl } from '@contember/schema'
 

@@ -1,5 +1,5 @@
 import React, { ReactElement } from 'react'
-import { useRepeaterSortableItem } from '../contexts'
+import { useRepeaterSortableItem } from '../contexts.js'
 import { Slot } from '@radix-ui/react-slot'
 
 /**

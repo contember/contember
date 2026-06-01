@@ -1,5 +1,5 @@
-import FieldProcessor from './FieldProcessor'
-import ColumnBuilder from '../ColumnBuilder'
+import FieldProcessor from './FieldProcessor.js'
+import ColumnBuilder from '../ColumnBuilder.js'
 import { Model } from '@contember/schema'
 import { NamingConventions, resolveDefaultColumnType } from '@contember/schema-utils'
 

@@ -1,9 +1,9 @@
-import { HttpController } from '../application'
-import { HttpErrorResponse } from '../common'
-import { fromBuffer } from './CommandStream'
-import { ImportError, ImportExecutor } from './ImportExecutor'
+import { HttpController } from '../application/index.js'
+import { HttpErrorResponse } from '../common/index.js'
+import { fromBuffer } from './CommandStream.js'
+import { ImportError, ImportExecutor } from './ImportExecutor.js'
 import { createGunzip } from 'node:zlib'
-import { ProjectGroupResolver } from '../projectGroup/ProjectGroupResolver'
+import { ProjectGroupResolver } from '../projectGroup/ProjectGroupResolver.js'
 
 export class ImportApiMiddlewareFactory {
 	constructor(

@@ -13,12 +13,12 @@ import {
 	DataViewSortingDirections,
 	DataViewUnionFilterFields,
 } from '@contember/react-dataview'
-import { useOnHighlight } from './highlight'
+import { useOnHighlight } from './highlight.js'
 import { Component } from '@contember/interface'
 import { Button } from '@contember/react-ui-lib-base'
 import { ArrowBigDownDash } from 'lucide-react'
-import { SelectDefaultFilter } from './filter'
-import { SelectListItemUI } from './ui'
+import { SelectDefaultFilter } from './filter.js'
+import { SelectListItemUI } from './ui.js'
 import { SelectDataView, SelectItemTrigger, SelectOption } from '@contember/react-select'
 
 export interface DefaultSelectDataViewProps {

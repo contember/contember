@@ -1,6 +1,6 @@
-import { GraphQLTestQuery } from './types'
-import { GQL } from '../../../../src/tags'
-import { testUuid } from '../../../../src/testUuid'
+import { GraphQLTestQuery } from './types.js'
+import { GQL } from '../../../../src/tags.js'
+import { testUuid } from '../../../../src/testUuid.js'
 
 export const prepareOtpMutation = (variables: {}): GraphQLTestQuery => ({
 	query: GQL`mutation {

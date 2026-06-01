@@ -1,4 +1,4 @@
-import type { RichTextLeaf } from '../structure'
+import type { RichTextLeaf } from '../structure/index.js'
 
 export type BuiltinLeaves =
 	& RichTextBoldLeaf

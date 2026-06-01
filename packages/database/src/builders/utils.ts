@@ -1,7 +1,7 @@
-import { Literal } from '../Literal'
-import { QueryBuilder } from './QueryBuilder'
-import { ColumnExpressionFactory } from './ColumnExpressionFactory'
-import { formatColumnIdentifier } from '../utils'
+import { Literal } from '../Literal.js'
+import { QueryBuilder } from './QueryBuilder.js'
+import { ColumnExpressionFactory } from './ColumnExpressionFactory.js'
+import { formatColumnIdentifier } from '../utils/index.js'
 
 export function resolveValues(values: QueryBuilder.Values): QueryBuilder.ResolvedValues {
 	return Object.entries(values)

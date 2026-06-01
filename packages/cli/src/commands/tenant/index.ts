@@ -1,1 +1,1 @@
-export * from './TenantApplyCommand'
+export * from './TenantApplyCommand.js'

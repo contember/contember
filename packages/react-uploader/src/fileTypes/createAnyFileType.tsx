@@ -1,5 +1,5 @@
-import { FileUrlDataExtractorProps, GenericFileMetadataExtractorProps, getFileUrlDataExtractor, getGenericFileMetadataExtractor } from '../extractors'
-import { FileType } from '../types'
+import { FileUrlDataExtractorProps, GenericFileMetadataExtractorProps, getFileUrlDataExtractor, getGenericFileMetadataExtractor } from '../extractors/index.js'
+import { FileType } from '../types/index.js'
 
 export type AnyFileTypeProps =
 	& FileType

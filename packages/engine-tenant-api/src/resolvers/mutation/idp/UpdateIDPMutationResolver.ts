@@ -1,11 +1,11 @@
-import { MutationResolvers, MutationUpdateIdpArgs, UpdateIdpResponse } from '../../../schema'
-import { PermissionActions } from '../../../model'
-import { IDPManager } from '../../../model/service/idp/IDPManager'
-import { createErrorResponse } from '../../errorUtils'
-import { TenantResolverContext } from '../../TenantResolverContext'
-import { ResponseOk } from '../../../model/utils/Response'
-import { IdentityProviderBySlugQuery } from '../../../model/queries'
-import { idpRowToAuditSnapshot } from './audit'
+import { MutationResolvers, MutationUpdateIdpArgs, UpdateIdpResponse } from '../../../schema/index.js'
+import { PermissionActions } from '../../../model/index.js'
+import { IDPManager } from '../../../model/service/idp/IDPManager.js'
+import { createErrorResponse } from '../../errorUtils.js'
+import { TenantResolverContext } from '../../TenantResolverContext.js'
+import { ResponseOk } from '../../../model/utils/Response.js'
+import { IdentityProviderBySlugQuery } from '../../../model/queries/index.js'
+import { idpRowToAuditSnapshot } from './audit.js'
 
 export class UpdateIDPMutationResolver implements MutationResolvers {
 	constructor(private readonly idpManager: IDPManager) {

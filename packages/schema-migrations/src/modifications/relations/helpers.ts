@@ -1,6 +1,6 @@
 import { MigrationBuilder } from '@contember/database-migrations'
 import { Model } from '@contember/schema'
-import { wrapIdentifier } from '../../utils/dbHelpers'
+import { wrapIdentifier } from '../../utils/dbHelpers.js'
 import { DatabaseMetadata } from '@contember/database'
 
 export const addForeignKeyConstraint = ({ builder, entity, relation, targetEntity, recreate = false, databaseMetadata, invalidateDatabaseMetadata }: {

@@ -2,7 +2,7 @@ import { afterEach, beforeEach, describe, expect, test } from 'bun:test'
 import * as fs from 'node:fs/promises'
 import * as os from 'node:os'
 import * as path from 'node:path'
-import { SchemaStateManager } from '../../../src'
+import { SchemaStateManager } from '../../../src/index.js'
 import { emptySchema } from '@contember/schema-utils'
 import { Schema } from '@contember/schema'
 

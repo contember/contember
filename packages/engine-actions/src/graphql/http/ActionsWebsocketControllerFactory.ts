@@ -1,6 +1,6 @@
 import { HttpErrorResponse, WebSocketController } from '@contember/engine-http'
-import { ActionsContextResolver } from './ActionsContextResolver'
-import { DispatchWorkerSupervisorFactory } from '../../dispatch/DispatchWorkerSupervisor'
+import { ActionsContextResolver } from './ActionsContextResolver.js'
+import { DispatchWorkerSupervisorFactory } from '../../dispatch/DispatchWorkerSupervisor.js'
 import * as Typesafe from '@contember/typesafe'
 import { TenantRole } from '@contember/engine-tenant-api'
 import { Running } from '@contember/engine-common'

@@ -1,5 +1,5 @@
 import { Descendant, Element as SlateElement } from 'slate'
-import { HtmlDeserializer } from '../plugins/behaviour/paste/HtmlDeserializer'
+import { HtmlDeserializer } from '../plugins/behaviour/paste/HtmlDeserializer.js'
 
 export type HtmlDeserializerNextCallback = (children: NodeList | Node[], cumulativeTextAttrs: HtmlDeserializerTextAttrs) => Descendant[]
 

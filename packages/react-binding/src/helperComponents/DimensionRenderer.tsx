@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { ReactNode } from 'react'
-import { EnvironmentMiddleware } from '../accessorPropagation'
-import { Component } from '../coreComponents'
+import { EnvironmentMiddleware } from '../accessorPropagation/index.js'
+import { Component } from '../coreComponents/index.js'
 
 export type DimensionRendererProps = {
 	dimension: string

@@ -1,4 +1,4 @@
-import { uic } from '../utils'
+import { uic } from '../utils/index.js'
 
 export const Card = uic('div', {
 	baseClass: 'rounded-xl border border-gray-200 bg-card text-card-foreground shadow-sm',

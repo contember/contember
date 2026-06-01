@@ -1,9 +1,9 @@
 import { Acl, Model } from '@contember/schema'
-import { PermissionFactory } from '../../../src/acl'
+import { PermissionFactory } from '../../../src/acl/index.js'
 import { SchemaBuilder } from '@contember/schema-definition'
 import { describe, it } from 'bun:test'
 import { emptySchema } from '@contember/schema-utils'
-import { assert } from '../../src/assert'
+import { assert } from '../../src/assert.js'
 
 interface Test {
 	acl: Acl.Schema

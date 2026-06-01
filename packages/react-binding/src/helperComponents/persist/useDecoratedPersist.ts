@@ -1,5 +1,5 @@
 import { useCallback } from 'react'
-import { usePersist } from '../../accessorPropagation'
+import { usePersist } from '../../accessorPropagation/index.js'
 import { ErrorPersistResult, isErrorPersistResult, SuccessfulPersistResult } from '@contember/binding'
 import { useReferentiallyStableCallback } from '@contember/react-utils'
 

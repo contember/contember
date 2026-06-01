@@ -9,10 +9,10 @@ import { ProjectMembersQueryResult, useProjectMembersQuery, useTenantQueryLoader
 import { useProjectSlug } from '@contember/react-client'
 import { UpdateProjectMemberForm } from '@contember/interface'
 import { ToastContent, useShowToast } from '@contember/react-ui-lib-base'
-import { dict } from '../dict'
-import { MemberDeleteDialog } from './member-delete-dialog'
+import { dict } from '../dict.js'
+import { MemberDeleteDialog } from './member-delete-dialog.js'
 import { Dialog, DialogContent, DialogTrigger } from '@contember/react-ui-lib-base'
-import { RolesConfig, UpdateProjectMemberFormFields } from '../forms'
+import { RolesConfig, UpdateProjectMemberFormFields } from '../forms/index.js'
 
 const perPage = 20
 

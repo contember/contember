@@ -1,9 +1,9 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useSessionStorageState, useStoredState } from '@contember/react-utils'
-import { DataViewPagingInfo, DataViewPagingMethods, DataViewPagingProps, DataViewPagingState } from '../../types'
-import { useDataViewTotalCount } from './useDataViewTotalCount'
+import { DataViewPagingInfo, DataViewPagingMethods, DataViewPagingProps, DataViewPagingState } from '../../types/index.js'
+import { useDataViewTotalCount } from './useDataViewTotalCount.js'
 import { Filter, QualifiedEntityList } from '@contember/react-binding'
-import { DataViewCurrentPageStoredState, getDataViewCurrentPageStorageArgs, getDataViewPagingSettingStorageArgs } from '../stateStorage'
+import { DataViewCurrentPageStoredState, getDataViewCurrentPageStorageArgs, getDataViewPagingSettingStorageArgs } from '../stateStorage.js'
 
 type UseDataViewPagingArgs =
 	& {

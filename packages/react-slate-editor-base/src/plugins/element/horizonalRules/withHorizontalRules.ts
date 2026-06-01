@@ -1,6 +1,6 @@
 import { Editor, Element as SlateElement, Node as SlateNode, NodeEntry, Range as SlateRange, Text, Transforms } from 'slate'
-import { HorizontalRuleElement, horizontalRuleElementPlugin, horizontalRuleElementType } from './HorizontalRuleElement'
-import { ElementRenderer } from '../../../types'
+import { HorizontalRuleElement, horizontalRuleElementPlugin, horizontalRuleElementType } from './HorizontalRuleElement.js'
+import { ElementRenderer } from '../../../types/index.js'
 
 export const withHorizontalRules = ({ render }: { render: ElementRenderer<HorizontalRuleElement> }) => <E extends Editor>(editor: E): E => {
 	const { insertText } = editor

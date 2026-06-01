@@ -1,8 +1,8 @@
 import { createContext, createRequiredContext } from '@contember/react-utils'
-import { UploaderFileState, UploaderState } from './types'
+import { UploaderFileState, UploaderState } from './types/index.js'
 import { ErrorAccessor } from '@contember/react-binding'
-import { UploadClient } from './types/uploadClient'
-import { UploaderOptions } from './types/options'
+import { UploadClient } from './types/uploadClient.js'
+import { UploaderOptions } from './types/options.js'
 
 export const [UploaderUploadFilesContext, useUploaderUploadFiles] = createRequiredContext<(files: File[]) => void>('UploaderUploadFiles')
 export const [UploaderStateContext, useUploaderState] = createRequiredContext<UploaderState>('UploaderState')

@@ -1,7 +1,7 @@
 import { ComponentType, createContext, ReactNode, useCallback, useMemo } from 'react'
 import { Environment } from '@contember/binding'
-import { useEnvironment } from './useEnvironment'
-import { Component } from '../coreComponents'
+import { useEnvironment } from './useEnvironment.js'
+import { Component } from '../coreComponents/index.js'
 
 export const EnvironmentContext = createContext<Environment>(Environment.create())
 EnvironmentContext.displayName = 'EnvironmentContext'

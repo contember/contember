@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'bun:test'
-import { TenantConfigApplier } from '../src/lib/tenant/TenantConfigApplier'
-import type { RemoteIdentityProvider, TenantClient } from '../src/lib/tenant/TenantClient'
+import { TenantConfigApplier } from '../src/lib/tenant/TenantConfigApplier.js'
+import type { RemoteIdentityProvider, TenantClient } from '../src/lib/tenant/TenantClient.js'
 
 const createClientMock = (existingIdps: RemoteIdentityProvider[] = []) => {
 	const calls: string[] = []

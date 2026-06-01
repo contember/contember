@@ -1,6 +1,6 @@
 import { getEntity } from '@contember/schema-utils'
-import { PathFactory, WhereBuilder } from './select'
-import { PredicateFactory } from '../acl'
+import { PathFactory, WhereBuilder } from './select/index.js'
+import { PredicateFactory } from '../acl/index.js'
 import { Client, ConflictActionType, DeleteBuilder, InsertBuilder, Literal, Operator, SelectBuilder } from '@contember/database'
 import { Acl, Input, Model } from '@contember/schema'
 import {
@@ -10,10 +10,10 @@ import {
 	MutationResultList,
 	MutationResultType,
 	NothingToDoReason,
-} from './Result'
-import { ImplementationException } from '../exception'
-import { AfterJunctionUpdateEvent, BeforeJunctionUpdateEvent } from './EventManager'
-import { Mapper } from './Mapper'
+} from './Result.js'
+import { ImplementationException } from '../exception.js'
+import { AfterJunctionUpdateEvent, BeforeJunctionUpdateEvent } from './EventManager.js'
+import { Mapper } from './Mapper.js'
 
 type OkResultFactory = () => MutationJunctionUpdateOk
 

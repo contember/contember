@@ -1,5 +1,5 @@
 import { DatabaseQuery, DatabaseQueryable, SelectBuilder } from '@contember/database'
-import { Providers } from '../../providers'
+import { Providers } from '../../providers.js'
 
 type ProjectSecretsQueryResult = { key: string; value: Buffer; needsReEncrypt: boolean }[]
 

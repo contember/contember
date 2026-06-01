@@ -1,6 +1,6 @@
 import { MigrationArgs, MigrationBuilder } from '@contember/database-migrations'
-import { TenantMigrationArgs } from './types'
-import { createCredentials } from './tenantCredentials'
+import { TenantMigrationArgs } from './types.js'
+import { createCredentials } from './tenantCredentials.js'
 
 export default async (sqlFactory: () => string) => {
 	return async (builder: MigrationBuilder, args: MigrationArgs<TenantMigrationArgs>) => {

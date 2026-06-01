@@ -1,9 +1,9 @@
 import type { EntityAccessor, ErrorAccessor } from '@contember/binding-common'
 import type { EntitySubTreeMarker, HasOneRelationMarker } from '@contember/binding-common'
 import type { EntityEventListenerStore, EntityRealmKey, FieldName, PlaceholderName } from '@contember/binding-common'
-import type { EntityListState } from './EntityListState'
-import type { EntityState } from './EntityState'
-import type { StateNode } from './StateNode'
+import type { EntityListState } from './EntityListState.js'
+import type { EntityState } from './EntityState.js'
+import type { StateNode } from './StateNode.js'
 
 export interface HasOneEntityRealmBlueprint {
 	readonly type: 'hasOne'

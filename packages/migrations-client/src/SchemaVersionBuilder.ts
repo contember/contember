@@ -1,8 +1,8 @@
 import { Schema } from '@contember/schema'
 import { emptySchema } from '@contember/schema-utils'
 import { SchemaMigrator } from '@contember/schema-migrations'
-import { MigrationsResolver } from './MigrationsResolver'
-import { SchemaStateManager } from './SchemaStateManager'
+import { MigrationsResolver } from './MigrationsResolver.js'
+import { SchemaStateManager } from './SchemaStateManager.js'
 
 export class SchemaVersionBuilder {
 	constructor(

@@ -1,6 +1,6 @@
 import { createElement } from 'react'
 import { isHotkey } from 'is-hotkey'
-import { EditorMarkPlugin } from '../../../types'
+import { EditorMarkPlugin } from '../../../types/index.js'
 
 export const strikeThroughMark = 'isStruckThrough'
 export const strikeThroughPlugin: EditorMarkPlugin = {

@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'bun:test'
-import { createClient } from '../../lib'
-import { queryBuilder } from '../../client'
+import { createClient } from '../../lib.js'
+import { queryBuilder } from '../../client/index.js'
 import { expectTypeOf } from 'expect-type'
 
 const qb = queryBuilder

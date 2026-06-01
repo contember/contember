@@ -1,9 +1,9 @@
 import { InviteFormErrorCode, useInviteForm } from '@contember/react-identity'
 import { Button } from '@contember/react-ui-lib-base'
 import { Loader } from '@contember/react-ui-lib-base'
-import { TenantFormError, TenantFormField, TenantFormLabel } from './common'
-import { MembershipsControl, RolesConfig, useIntrospectionRolesConfig } from './memberships-control'
-import { dict } from '../dict'
+import { TenantFormError, TenantFormField, TenantFormLabel } from './common.js'
+import { MembershipsControl, RolesConfig, useIntrospectionRolesConfig } from './memberships-control.js'
+import { dict } from '../dict.js'
 
 export const InviteFormFields = ({ projectSlug, roles }: { projectSlug: string; roles?: RolesConfig }) => {
 	const form = useInviteForm()

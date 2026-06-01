@@ -1,5 +1,5 @@
 import { ReactNode } from 'react'
-import { useDataViewSortingState } from '../../contexts'
+import { useDataViewSortingState } from '../../contexts.js'
 
 export interface DataViewSortingSwitchProps {
 	field: string

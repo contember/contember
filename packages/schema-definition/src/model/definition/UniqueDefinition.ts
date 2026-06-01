@@ -1,5 +1,5 @@
-import { extendEntity } from './extensions'
-import { DecoratorFunction } from '../../utils'
+import { extendEntity } from './extensions.js'
+import { DecoratorFunction } from '../../utils/index.js'
 import { Model } from '@contember/schema'
 
 export type UniqueOptions<T> =

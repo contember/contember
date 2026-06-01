@@ -1,7 +1,7 @@
 import { GraphQlClient, GraphQlClientOptions } from '@contember/graphql-client'
 import { useMemo } from 'react'
-import { useGraphQlClientFactory, useSessionToken } from '../contexts'
-import { useApiBaseUrl } from '../contexts'
+import { useGraphQlClientFactory, useSessionToken } from '../contexts.js'
+import { useApiBaseUrl } from '../contexts.js'
 
 const defaultFactory = (options: GraphQlClientOptions): GraphQlClient => new GraphQlClient(options)
 

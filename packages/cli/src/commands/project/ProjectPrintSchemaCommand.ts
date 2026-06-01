@@ -10,9 +10,9 @@ import {
 import { printSchema } from 'graphql'
 import { mergeSchemas } from '@graphql-tools/schema'
 import { emptySchema, normalizeSchema } from '@contember/schema-utils'
-import { SchemaLoader } from '../../lib/schema/SchemaLoader'
+import { SchemaLoader } from '../../lib/schema/SchemaLoader.js'
 import { SchemaVersionBuilder } from '@contember/migrations-client'
-import { validateSchemaAndPrintErrors } from '../../lib/schema/SchemaValidationHelper'
+import { validateSchemaAndPrintErrors } from '../../lib/schema/SchemaValidationHelper.js'
 
 type Args = {}
 

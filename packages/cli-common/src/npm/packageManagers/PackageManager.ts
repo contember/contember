@@ -1,6 +1,6 @@
-import { PackageJson } from '../PackageJson'
+import { PackageJson } from '../PackageJson.js'
 
-import { Package } from '../Package'
+import { Package } from '../Package.js'
 
 export interface PackageManager {
 	isActive(args: { dir: string; packageJson: PackageJson }): Promise<boolean>

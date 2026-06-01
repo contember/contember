@@ -1,2 +1,2 @@
-export * from './useChangeProfile'
-export * from './useChangeMyProfile'
+export * from './useChangeProfile.js'
+export * from './useChangeMyProfile.js'

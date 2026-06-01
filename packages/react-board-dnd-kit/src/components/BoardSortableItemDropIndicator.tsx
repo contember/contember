@@ -1,5 +1,5 @@
 import React, { ReactNode } from 'react'
-import { useBoardSortableNode } from '../contexts'
+import { useBoardSortableNode } from '../contexts.js'
 
 export const BoardSortableItemDropIndicator = ({ children, position }: {
 	children: ReactNode

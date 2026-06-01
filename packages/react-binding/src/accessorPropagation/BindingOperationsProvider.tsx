@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react'
 import type { BindingOperations } from '@contember/binding'
-import { BindingOperationsContext, defaultBindingOperations } from './BindingOperationsContext'
+import { BindingOperationsContext, defaultBindingOperations } from './BindingOperationsContext.js'
 
 export interface BindingOperationsProviderProps {
 	bindingOperations: BindingOperations<ReactNode> | undefined

@@ -1,4 +1,4 @@
-import { createFieldFilterHandler } from './createFilterHandler'
+import { createFieldFilterHandler } from './createFilterHandler.js'
 
 export type IsDefinedFilterArtifacts = {
 	nullCondition?: boolean

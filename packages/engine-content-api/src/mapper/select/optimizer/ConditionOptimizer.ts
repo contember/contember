@@ -1,5 +1,5 @@
 import { Input } from '@contember/schema'
-import { optimizeAnd, optimizeNot, optimizeOr } from './helpers'
+import { optimizeAnd, optimizeNot, optimizeOr } from './helpers.js'
 
 type ObjectEntry<T> = { [K in keyof Required<T>]: [K, T[K]] }[keyof T]
 

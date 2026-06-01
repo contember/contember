@@ -8,8 +8,8 @@ import {
 import { logger } from '@contember/logger'
 import { AllowAllPermissionFactory } from '@contember/schema-utils'
 import { graphql, GraphQLError } from 'graphql'
-import { ContentGraphqlContext } from '../content/ContentGraphqlContext'
-import { extractOriginalError } from '../graphql'
+import { ContentGraphqlContext } from '../content/ContentGraphqlContext.js'
+import { extractOriginalError } from '../graphql/index.js'
 
 export class ContentQueryExecutorImpl implements ContentQueryExecutor {
 	constructor(

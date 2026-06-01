@@ -1,12 +1,12 @@
-import { tuple } from '../../utils'
+import { tuple } from '../../utils/index.js'
 import { Acl, Input, Model, Value } from '@contember/schema'
 import { acceptEveryFieldVisitor, getColumnName, getColumnType } from '@contember/schema-utils'
 import { Operator, QueryBuilder, UpdateBuilder as DbUpdateBuilder, Value as DbValue } from '@contember/database'
-import { PathFactory, WhereBuilder } from '../select'
-import { ColumnValue, normalizeDbValue } from '../ColumnValue'
-import { PredicateFactory } from '../../acl'
-import { AfterUpdateEvent, BeforeUpdateEvent } from '../EventManager'
-import { Mapper } from '../Mapper'
+import { PathFactory, WhereBuilder } from '../select/index.js'
+import { ColumnValue, normalizeDbValue } from '../ColumnValue.js'
+import { PredicateFactory } from '../../acl/index.js'
+import { AfterUpdateEvent, BeforeUpdateEvent } from '../EventManager.js'
+import { Mapper } from '../Mapper.js'
 
 export interface UpdateResult {
 	values: ColumnValue[]

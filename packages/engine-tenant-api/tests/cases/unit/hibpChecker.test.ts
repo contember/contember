@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test'
-import { HttpHibpChecker, NoopHibpChecker } from '../../../src/model/service/HibpChecker'
+import { HttpHibpChecker, NoopHibpChecker } from '../../../src/model/service/HibpChecker.js'
 
 const makeFetch = (body: string, ok = true): typeof fetch => {
 	return (async () => {

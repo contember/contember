@@ -1,6 +1,6 @@
 import type { EntityAccessor } from '@contember/binding'
 import type { FieldName } from '@contember/binding'
-import { useEntityEvent } from './useEntityEvent'
+import { useEntityEvent } from './useEntityEvent.js'
 
 export const useOnConnectionUpdate = (
 	fieldName: FieldName,

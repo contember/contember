@@ -1,13 +1,13 @@
-import { Event, QueryEventsInProcessingArgs, QueryEventsToProcessArgs, QueryFailedEventsArgs, QueryResolvers } from '../../schema'
-import { ActionsContext } from '../ActionsContext'
-import { EventsToProcessQuery } from '../../../model/EventsToProcessQuery'
-import { EventRow } from '../../../model/types'
+import { Event, QueryEventsInProcessingArgs, QueryEventsToProcessArgs, QueryFailedEventsArgs, QueryResolvers } from '../../schema/index.js'
+import { ActionsContext } from '../ActionsContext.js'
+import { EventsToProcessQuery } from '../../../model/EventsToProcessQuery.js'
+import { EventRow } from '../../../model/types.js'
 import { DatabaseContext, StagesQuery } from '@contember/engine-system-api'
 import { Client, DatabaseQuery } from '@contember/database'
-import { EventsInProcessingQuery } from '../../../model/EventsInProcessingQuery'
-import { FailedEventsQuery } from '../../../model/FailedEventsQuery'
-import { ActionsAuthorizationActions } from '../../../authorization'
-import { EventByIdQuery } from '../../../model/EventByIdQuery'
+import { EventsInProcessingQuery } from '../../../model/EventsInProcessingQuery.js'
+import { FailedEventsQuery } from '../../../model/FailedEventsQuery.js'
+import { ActionsAuthorizationActions } from '../../../authorization/index.js'
+import { EventByIdQuery } from '../../../model/EventByIdQuery.js'
 
 export class EventsQueryResolver implements QueryResolvers<ActionsContext> {
 	async eventsInProcessing(parent: unknown, { args }: QueryEventsInProcessingArgs, ctx: ActionsContext) {

@@ -1,10 +1,10 @@
 import { MigrationBuilder } from '@contember/database-migrations'
 import { Model, Schema } from '@contember/schema'
-import { SchemaUpdater, updateModel } from '../utils/schemaUpdateUtils'
-import { createModificationType, Differ, ModificationHandler } from '../ModificationHandler'
+import { SchemaUpdater, updateModel } from '../utils/schemaUpdateUtils.js'
+import { createModificationType, Differ, ModificationHandler } from '../ModificationHandler.js'
 import deepEqual from 'fast-deep-equal'
-import { createCheck, getConstraintName } from './enumUtils'
-import { getColumnSqlType } from '../utils/columnUtils'
+import { createCheck, getConstraintName } from './enumUtils.js'
+import { getColumnSqlType } from '../utils/columnUtils.js'
 
 export class UpdateEnumModificationHandler implements ModificationHandler<UpdateEnumModificationData> {
 	constructor(private readonly data: UpdateEnumModificationData, private readonly schema: Schema) {}

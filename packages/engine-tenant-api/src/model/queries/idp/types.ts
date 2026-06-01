@@ -1,4 +1,4 @@
-import { IdentityProviderData } from '../../type'
+import { IdentityProviderData } from '../../type/index.js'
 
 export type IdentityProviderRow = {
 	id: string

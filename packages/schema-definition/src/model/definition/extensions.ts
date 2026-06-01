@@ -1,8 +1,8 @@
 import { Model } from '@contember/schema'
-import { EntityConstructor, FieldsDefinition } from './types'
-import { EntityRegistry } from './internal'
-import { createMetadataStore, DecoratorFunction } from '../../utils'
-import { CommonContext } from './context'
+import { EntityConstructor, FieldsDefinition } from './types.js'
+import { EntityRegistry } from './internal/index.js'
+import { createMetadataStore, DecoratorFunction } from '../../utils/index.js'
+import { CommonContext } from './context.js'
 
 export type EntityExtensionArgs =
 	& {

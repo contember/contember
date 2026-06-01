@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test'
-import { RichText } from '../src'
+import { RichText } from '../src/index.js'
 import { render } from '@testing-library/react'
 
 describe('reference render', () => {

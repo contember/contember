@@ -1,7 +1,7 @@
 import { expect, it } from 'bun:test'
-import { createTenantConfigResolver } from '../../../src/config/tenantConfigResolver'
-import { configTemplate } from '../../../src/config/configTemplate'
-import { createProjectConfigResolver } from '../../../src/config/projectConfigResolver'
+import { createTenantConfigResolver } from '../../../src/config/tenantConfigResolver.js'
+import { configTemplate } from '../../../src/config/configTemplate.js'
+import { createProjectConfigResolver } from '../../../src/config/projectConfigResolver.js'
 
 const assert = {
 	deepEqual: (a: any, b: any) => expect(a).toStrictEqual(b),

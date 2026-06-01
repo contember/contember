@@ -1,7 +1,7 @@
 import { Editor, Transforms } from 'slate'
-import { EditorPlugin } from '../../../types/plugins'
-import { HtmlDeserializer } from './HtmlDeserializer'
-import { HtmlDeserializerPlugin } from '../../../types/htmlDeserializer'
+import { EditorPlugin } from '../../../types/plugins.js'
+import { HtmlDeserializer } from './HtmlDeserializer.js'
+import { HtmlDeserializerPlugin } from '../../../types/htmlDeserializer.js'
 
 export const withPaste = (editor: Editor) => {
 	const { insertData } = editor

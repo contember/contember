@@ -1,5 +1,5 @@
 import { JSONValue } from '@contember/schema'
-import { GraphQlField, GraphQlFragment, GraphQlFragmentSpread, GraphQlInlineFragment, GraphQlSelectionSet } from './nodes'
+import { GraphQlField, GraphQlFragment, GraphQlFragmentSpread, GraphQlInlineFragment, GraphQlSelectionSet } from './nodes/index.js'
 
 export type GraphQlPrintResult = { query: string; variables: Record<string, JSONValue> }
 

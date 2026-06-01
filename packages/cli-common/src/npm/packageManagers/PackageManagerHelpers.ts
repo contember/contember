@@ -1,7 +1,7 @@
-import { Package } from '../Package'
-import { PackageJson } from '../PackageJson'
+import { Package } from '../Package.js'
+import { PackageJson } from '../PackageJson.js'
 import { join } from 'node:path'
-import { FileSystem } from '../FileSystem'
+import { FileSystem } from '../FileSystem.js'
 
 export class PackageManagerHelpers {
 	static async readWorkspacePackages({ fs, dir, workspaces }: {

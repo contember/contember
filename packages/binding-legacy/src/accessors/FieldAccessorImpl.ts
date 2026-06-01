@@ -1,6 +1,6 @@
-import type { FieldState } from '../core/state'
-import type { FieldOperations } from '../core/operations'
-import { TemporalFieldHelper, UuidFieldHelper } from '../fieldHelpers'
+import type { FieldState } from '../core/state/index.js'
+import type { FieldOperations } from '../core/operations/index.js'
+import { TemporalFieldHelper, UuidFieldHelper } from '../fieldHelpers/index.js'
 import { EntityAccessor, ErrorAccessor, FieldAccessor, FieldName, FieldValue, SchemaColumn } from '@contember/binding-common'
 
 export class FieldAccessorImpl<Value extends FieldValue = FieldValue> implements FieldAccessor {

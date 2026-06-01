@@ -1,6 +1,6 @@
 import * as SwitchPrimitives from '@radix-ui/react-switch'
 import * as React from 'react'
-import { uic } from '../utils'
+import { uic } from '../utils/index.js'
 
 export const Switch = uic(SwitchPrimitives.Root, {
 	baseClass:

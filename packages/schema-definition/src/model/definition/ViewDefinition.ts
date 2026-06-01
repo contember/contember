@@ -1,6 +1,6 @@
-import { extendEntity } from './extensions'
-import { EntityConstructor } from './types'
-import { DecoratorFunction } from '../../utils'
+import { extendEntity } from './extensions.js'
+import { EntityConstructor } from './types.js'
+import { DecoratorFunction } from '../../utils/index.js'
 
 export type ViewOptions<T> = {
 	dependencies?: (() => EntityConstructor[]) | EntityConstructor[]

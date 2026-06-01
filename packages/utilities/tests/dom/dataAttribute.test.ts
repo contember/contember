@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test'
-import { dataAttribute } from '../../src'
+import { dataAttribute } from '../../src/index.js'
 
 describe('@contember/utilities', function() {
 	test('@contember/utilities.dataAttribute', function() {

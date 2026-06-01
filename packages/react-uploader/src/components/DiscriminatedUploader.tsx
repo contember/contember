@@ -1,14 +1,14 @@
-import { useUploadState } from '../internal/hooks/useUploadState'
-import { useUploaderDoUpload } from '../internal/hooks/useUploaderDoUpload'
-import { UploaderOptionsContext, UploaderStateContext, UploaderUploadFilesContext } from '../contexts'
+import { useUploadState } from '../internal/hooks/useUploadState.js'
+import { useUploaderDoUpload } from '../internal/hooks/useUploaderDoUpload.js'
+import { UploaderOptionsContext, UploaderStateContext, UploaderUploadFilesContext } from '../contexts.js'
 import { Fragment, ReactNode, useMemo } from 'react'
 import { Component, Field, SugaredRelativeSingleEntity } from '@contember/react-binding'
-import { DiscriminatedFileTypeMap } from '../types'
+import { DiscriminatedFileTypeMap } from '../types/index.js'
 import { SugaredRelativeSingleField } from '@contember/react-binding'
-import { useFillDiscriminatedEntity } from '../internal/hooks/useFillDiscriminatedEntity'
-import { uploaderErrorHandler } from '../internal/utils/uploaderErrorHandler'
-import { resolveAllAcceptedMimes } from '../internal/utils/resolveAllAcceptedMimes'
-import { UploaderBase } from './UploaderBase'
+import { useFillDiscriminatedEntity } from '../internal/hooks/useFillDiscriminatedEntity.js'
+import { uploaderErrorHandler } from '../internal/utils/uploaderErrorHandler.js'
+import { resolveAllAcceptedMimes } from '../internal/utils/resolveAllAcceptedMimes.js'
+import { UploaderBase } from './UploaderBase.js'
 
 export type DiscriminatedUploaderProps = {
 	baseField?: SugaredRelativeSingleEntity['field']

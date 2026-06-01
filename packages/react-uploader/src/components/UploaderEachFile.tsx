@@ -1,7 +1,7 @@
-import { UploaderFileStateContext } from '../contexts'
+import { UploaderFileStateContext } from '../contexts.js'
 import { ReactNode } from 'react'
-import { UploaderFileState } from '../types/state'
-import { useUploaderStateFiles } from '../hooks'
+import { UploaderFileState } from '../types/state.js'
+import { useUploaderStateFiles } from '../hooks/index.js'
 
 export const UploaderEachFile = ({ children, state, fallback }: {
 	children: ReactNode

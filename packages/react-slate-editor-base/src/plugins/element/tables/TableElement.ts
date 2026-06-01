@@ -10,11 +10,11 @@ import {
 	Range as SlateRange,
 	Transforms,
 } from 'slate'
-import { createEmptyTableRowElement, isTableRowElement, TableRowElement, tableRowElementType } from './TableRowElement'
-import { ContemberEditor } from '../../../editor'
-import { gaugeTableColumnCount } from './gaugeTableColumnCount'
-import { createEmptyTableCellElement } from './TableCellElement'
-import { EditorElementPlugin, ElementRenderer } from '../../../types'
+import { createEmptyTableRowElement, isTableRowElement, TableRowElement, tableRowElementType } from './TableRowElement.js'
+import { ContemberEditor } from '../../../editor/index.js'
+import { gaugeTableColumnCount } from './gaugeTableColumnCount.js'
+import { createEmptyTableCellElement } from './TableCellElement.js'
+import { EditorElementPlugin, ElementRenderer } from '../../../types/index.js'
 
 export const tableElementType = 'table' as const
 

@@ -1,4 +1,4 @@
-import { useUploaderDropzoneState } from '../internal/contexts'
+import { useUploaderDropzoneState } from '../internal/contexts.js'
 import * as React from 'react'
 
 export const UploaderDropzoneInput = () => {

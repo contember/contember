@@ -1,6 +1,6 @@
-import { SQL } from '../../../../src/tags'
+import { SQL } from '../../../../src/tags.js'
 import { ExpectedQuery } from '@contember/database-tester'
-import { now } from '../../../../src/testTenant'
+import { now } from '../../../../src/testTenant.js'
 
 export const createIdentitySql = (args: {
 	identityId: string

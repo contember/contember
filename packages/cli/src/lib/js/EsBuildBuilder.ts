@@ -1,4 +1,4 @@
-import { JsBuilder } from './JsBuilder'
+import { JsBuilder } from './JsBuilder.js'
 
 export class EsBuildBuilder implements JsBuilder {
 	async build(path: string): Promise<string> {

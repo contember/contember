@@ -1,11 +1,11 @@
 #!/usr/bin/env node
 import { join, resolve } from 'node:path'
-import { packageRoot } from './consts'
-import { createContainer } from './dic'
-import { readCliEnv } from './lib/env'
-import { WorkspaceResolver } from './lib/workspace/WorkspaceResolver'
-import { YamlHandler } from './lib/fs/YamlHandler'
-import { FileSystem } from './lib/fs/FileSystem'
+import { packageRoot } from './consts.js'
+import { createContainer } from './dic.js'
+import { readCliEnv } from './lib/env.js'
+import { WorkspaceResolver } from './lib/workspace/WorkspaceResolver.js'
+import { YamlHandler } from './lib/fs/YamlHandler.js'
+import { FileSystem } from './lib/fs/FileSystem.js'
 ;(async () => {
 	const version = require(join(packageRoot, 'package.json')).version
 	const nodeVersion = process.version.match(/^v?(\d+)\..+$/)

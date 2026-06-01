@@ -1,9 +1,9 @@
 import { Authorizator } from '@contember/authorization'
-import { IdentityFactory } from './IdentityFactory'
-import { PermissionContext } from './PermissionContext'
-import { ProjectScopeFactory } from './ProjectScopeFactory'
-import { ProjectSchemaResolver } from '../type'
-import { DatabaseContext } from '../utils'
+import { IdentityFactory } from './IdentityFactory.js'
+import { PermissionContext } from './PermissionContext.js'
+import { ProjectScopeFactory } from './ProjectScopeFactory.js'
+import { ProjectSchemaResolver } from '../type/index.js'
+import { DatabaseContext } from '../utils/index.js'
 
 export class PermissionContextFactory {
 	constructor(

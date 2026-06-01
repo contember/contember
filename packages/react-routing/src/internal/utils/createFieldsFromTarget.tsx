@@ -1,8 +1,8 @@
-import { LinkTarget } from './parseLinkTarget'
-import { targetToRequest } from './targetToRequest'
-import { ROUTING_BINDING_PARAMETER_PREFIX } from '../hooks/useBindingLinkParametersResolver'
-import { DynamicRequestParameters } from '../../types'
-import { RoutingParameter } from '../../dto'
+import { LinkTarget } from './parseLinkTarget.js'
+import { targetToRequest } from './targetToRequest.js'
+import { ROUTING_BINDING_PARAMETER_PREFIX } from '../hooks/useBindingLinkParametersResolver.js'
+import { DynamicRequestParameters } from '../../types/index.js'
+import { RoutingParameter } from '../../dto/index.js'
 
 export const createFieldsFromTarget = (to: LinkTarget) => {
 	const dummyRequest = {

@@ -1,11 +1,11 @@
-import { authenticatedIdentityId, executeTenantTest } from '../../../src/testTenant'
-import { GQL } from '../../../src/tags'
-import { testUuid } from '../../../src/testUuid'
-import { getPersonByIdentity } from './sql/getPersonByIdentity'
-import { getApiKeySql } from './sql/getApiKeySql'
-import { disableApiKey } from './sql/disableApiKeySql'
+import { authenticatedIdentityId, executeTenantTest } from '../../../src/testTenant.js'
+import { GQL } from '../../../src/tags.js'
+import { testUuid } from '../../../src/testUuid.js'
+import { getPersonByIdentity } from './sql/getPersonByIdentity.js'
+import { getApiKeySql } from './sql/getApiKeySql.js'
+import { disableApiKey } from './sql/disableApiKeySql.js'
 import { expect, test } from 'bun:test'
-import { ApiKey } from '../../../../src'
+import { ApiKey } from '../../../../src/index.js'
 
 test('revoke own session', async () => {
 	const personId = testUuid(1)

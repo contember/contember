@@ -1,6 +1,6 @@
 import { Environment } from '@contember/react-binding'
-import { DataViewProps } from '../../components'
-import { dataViewKeyEnvironmentExtension } from '../../env/dataViewKeyEnvironmentExtension'
+import { DataViewProps } from '../../components/index.js'
+import { dataViewKeyEnvironmentExtension } from '../../env/dataViewKeyEnvironmentExtension.js'
 
 export const getDataViewKey = (env: Environment, props: Pick<DataViewProps, 'entities' | 'dataViewKey'>) => {
 	const pageName = env.getExtension(dataViewKeyEnvironmentExtension)

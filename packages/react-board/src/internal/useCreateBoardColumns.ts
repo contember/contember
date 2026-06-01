@@ -1,8 +1,8 @@
 import { useMemo } from 'react'
-import { UseGroupItemsByColumn } from './useGroupItemsByColumn'
+import { UseGroupItemsByColumn } from './useGroupItemsByColumn.js'
 import { EntityListAccessor } from '@contember/react-binding'
-import { BoardNullColumnPlaceholder } from '../const'
-import { BoardColumnNode, BoardColumnValue } from '../types'
+import { BoardNullColumnPlaceholder } from '../const.js'
+import { BoardColumnNode, BoardColumnValue } from '../types/index.js'
 
 export const useCreateBoardColumns = <ColumnValue extends BoardColumnValue>({ groupItemsByColumn, items, columns, columnIdGetter }: {
 	items: EntityListAccessor

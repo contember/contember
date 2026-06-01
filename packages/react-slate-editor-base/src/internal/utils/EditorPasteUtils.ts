@@ -1,6 +1,6 @@
 import { Element } from 'slate'
-import { NodesWithType } from '../../plugins/behaviour/paste/HtmlDeserializer'
-import { EditorDefaultElementFactory } from '../../types/editor'
+import { NodesWithType } from '../../plugins/behaviour/paste/HtmlDeserializer.js'
+import { EditorDefaultElementFactory } from '../../types/editor.js'
 
 export class EditorPasteUtils {
 	public static wordPasteListItemContent(allNodes: Iterable<Node> | ArrayLike<Node>): Node[] {

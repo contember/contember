@@ -1,5 +1,5 @@
-import type { RichTextElement, RichTextLeaf, RootEditorNode } from './structure'
-import type { RichTextReference } from './RichTextReference'
+import type { RichTextElement, RichTextLeaf, RootEditorNode } from './structure/index.js'
+import type { RichTextReference } from './RichTextReference.js'
 
 export interface RichTextBlock<
 	CustomElements extends RichTextElement = never,

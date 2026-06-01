@@ -1,17 +1,17 @@
-import * as AclDefinition from './acl/definition'
-import { Role } from './acl/definition'
-import * as ActionsDefinition from './actions/definition'
-import * as InputValidation from './validation'
-import { SchemaDefinition } from './model'
-import { createSchema } from './createSchema'
+import * as AclDefinition from './acl/definition/index.js'
+import { Role } from './acl/definition/index.js'
+import * as ActionsDefinition from './actions/definition/index.js'
+import * as InputValidation from './validation/index.js'
+import { SchemaDefinition } from './model/index.js'
+import { createSchema } from './createSchema.js'
 
 export { AllowAllPermissionFactory } from '@contember/schema-utils'
-export { PermissionsBuilder } from './acl/builder/PermissionsBuilder'
-export * from './model'
-export * from './presets'
+export { PermissionsBuilder } from './acl/builder/PermissionsBuilder.js'
+export * from './model/index.js'
+export * from './presets.js'
 
 export type { Role }
-export type { VariableDefinition } from './acl/definition'
+export type { VariableDefinition } from './acl/definition/index.js'
 export type {
 	ColumnDefinition,
 	EnumDefinition,
@@ -22,7 +22,7 @@ export type {
 	OneHasManyDefinition,
 	OneHasOneDefinition,
 	OneHasOneInverseDefinition,
-} from './model/definition'
+} from './model/definition/index.js'
 
 export { AclDefinition, ActionsDefinition, createSchema, InputValidation, SchemaDefinition }
 

@@ -1,7 +1,7 @@
-import { DecoratorFunction, EntityConstructor } from '../../utils'
+import { DecoratorFunction, EntityConstructor } from '../../utils/index.js'
 import { Actions } from '@contember/schema'
-import { triggersStore } from './internal/store'
-import { ActionsTarget } from './targets'
+import { triggersStore } from './internal/store.js'
+import { ActionsTarget } from './targets.js'
 
 export type TriggerWebhookDefinition = {
 	webhook:

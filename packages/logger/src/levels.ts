@@ -1,4 +1,4 @@
-import { LogLevelName } from './types'
+import { LogLevelName } from './types.js'
 
 export const LogLevels: { [K in LogLevelName]: { name: K; value: number } } = {
 	debug: { name: 'debug', value: 10 },

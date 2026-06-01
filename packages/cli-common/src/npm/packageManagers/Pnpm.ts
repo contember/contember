@@ -1,11 +1,11 @@
-import { FileSystem } from '../FileSystem'
+import { FileSystem } from '../FileSystem.js'
 import { join } from 'node:path'
 
-import { PackageJson } from '../PackageJson'
-import { PackageManager } from './PackageManager'
-import { Package } from '../Package'
-import { PackageManagerHelpers } from './PackageManagerHelpers'
-import { CommandRunner } from '../CommandRunner'
+import { PackageJson } from '../PackageJson.js'
+import { PackageManager } from './PackageManager.js'
+import { Package } from '../Package.js'
+import { PackageManagerHelpers } from './PackageManagerHelpers.js'
+import { CommandRunner } from '../CommandRunner.js'
 
 export class Pnpm implements PackageManager {
 	constructor(

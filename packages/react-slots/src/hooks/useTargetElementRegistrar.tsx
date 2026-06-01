@@ -1,5 +1,5 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react'
-import { useTargetsRegistryContext } from '../internal/contexts'
+import { useTargetsRegistryContext } from '../internal/contexts.js'
 import { useId } from '@contember/react-utils'
 
 /**

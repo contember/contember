@@ -1,2 +1,2 @@
-export * from './IdentityEnvironmentExtension'
-export * from './ProjectEnvironmentExtension'
+export * from './IdentityEnvironmentExtension.js'
+export * from './ProjectEnvironmentExtension.js'

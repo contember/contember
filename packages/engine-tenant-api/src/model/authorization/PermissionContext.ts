@@ -1,8 +1,8 @@
 import { AccessNode, AuthorizationScope, Authorizator } from '@contember/authorization'
 import { ForbiddenError } from '@contember/graphql-utils'
-import { ProjectScopeFactory } from './ProjectScopeFactory'
-import { Project, ProjectSchemaResolver } from '../type'
-import { Identity } from './Identity'
+import { ProjectScopeFactory } from './ProjectScopeFactory.js'
+import { Project, ProjectSchemaResolver } from '../type/index.js'
+import { Identity } from './Identity.js'
 
 export type AccessVerifier = (action: Authorizator.Action) => Promise<boolean>
 

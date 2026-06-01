@@ -12,9 +12,9 @@ import type {
 	SugaredOrderBy,
 	SugaredSetOnCreate,
 	SugaredUniqueWhere,
-} from './primitives'
-import type { EntityAccessor, EntityListAccessor, FieldAccessor } from '../types'
-import { FieldMeta } from './Normalized'
+} from './primitives/index.js'
+import type { EntityAccessor, EntityListAccessor, FieldAccessor } from '../types/index.js'
+import { FieldMeta } from './Normalized.js'
 
 export interface SugaredParentEntityParameters extends UnsugarableSingleEntityEventListeners {
 }

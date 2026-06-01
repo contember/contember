@@ -1,4 +1,4 @@
-import { LogEntry, LoggerHandler } from '../types'
+import { LogEntry, LoggerHandler } from '../types.js'
 
 export class TestLoggerHandler implements LoggerHandler {
 	public readonly messages: LogEntry[] = []

@@ -1,4 +1,4 @@
-import { JSONValue } from './json'
+import { JSONValue } from './json.js'
 import { GraphQLScalarType, Kind, ValueNode } from 'graphql'
 
 type Maybe<T> = null | undefined | T

@@ -13,11 +13,11 @@ import {
 import * as Slate from 'slate'
 import { withHistory } from 'slate-history'
 import { ReactEditor, withReact } from 'slate-react'
-import { EditorElementPlugin, EditorMarkPlugin } from '../types/plugins'
-import { TextSpecifics } from '../types/editor'
-import { DefaultElement } from '../internal/components/DefaultElement'
-import { withPaste } from '../plugins/behaviour'
-import { ContemberEditor } from './index'
+import { EditorElementPlugin, EditorMarkPlugin } from '../types/plugins.js'
+import { TextSpecifics } from '../types/editor.js'
+import { DefaultElement } from '../internal/components/DefaultElement.js'
+import { withPaste } from '../plugins/behaviour/index.js'
+import { ContemberEditor } from './index.js'
 
 export const createEditorWithEssentials = ({ defaultElementType }: { defaultElementType: string }): Editor => {
 	const underlyingEditor = withHistory(withReact(createEditor() as ReactEditor))

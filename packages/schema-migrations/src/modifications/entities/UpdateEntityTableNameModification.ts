@@ -1,7 +1,7 @@
 import { MigrationBuilder } from '@contember/database-migrations'
 import { Schema } from '@contember/schema'
-import { SchemaUpdater, updateEntity, updateModel } from '../utils/schemaUpdateUtils'
-import { createModificationType, Differ, ModificationHandler } from '../ModificationHandler'
+import { SchemaUpdater, updateEntity, updateModel } from '../utils/schemaUpdateUtils.js'
+import { createModificationType, Differ, ModificationHandler } from '../ModificationHandler.js'
 
 export class UpdateEntityTableNameModificationHandler implements ModificationHandler<UpdateEntityTableNameModificationData> {
 	constructor(private readonly data: UpdateEntityTableNameModificationData, private readonly schema: Schema) {}

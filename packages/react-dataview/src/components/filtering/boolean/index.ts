@@ -1,2 +1,2 @@
-export * from './DataViewBooleanFilterTrigger'
-export * from './DataViewBooleanFilter'
+export * from './DataViewBooleanFilterTrigger.js'
+export * from './DataViewBooleanFilter.js'

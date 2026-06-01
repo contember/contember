@@ -1,7 +1,7 @@
 import { Acl, Input } from '@contember/schema'
-import { getRoleVariables } from '../acl'
-import { conditionSchema } from '../type-schema'
-import { assertNever } from '../utils'
+import { getRoleVariables } from '../acl/index.js'
+import { conditionSchema } from '../type-schema/index.js'
+import { assertNever } from '../utils/index.js'
 
 export class MembershipResolver {
 	public static UnknownIdentity = { identityId: '00000000-0000-0000-0000-000000000000' }

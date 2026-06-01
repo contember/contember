@@ -1,4 +1,4 @@
-import { useBoardCurrentColumn } from '../contexts'
+import { useBoardCurrentColumn } from '../contexts.js'
 
 export const BoardColumnLabel = () => {
 	const value = useBoardCurrentColumn().value

@@ -2,7 +2,7 @@ import React, { ReactNode } from 'react'
 import { Portal } from '@radix-ui/react-portal'
 import { DragOverlay } from '@dnd-kit/core'
 import { AccessorTree, Entity, EntityAccessor, isEntityAccessor, useAccessorTreeState } from '@contember/react-binding'
-import { useBoardActiveColumn } from '../contexts'
+import { useBoardActiveColumn } from '../contexts.js'
 import { BoardCurrentColumnContext } from '@contember/react-board'
 
 export const BoardSortableColumnDragOverlay = ({ children }: {

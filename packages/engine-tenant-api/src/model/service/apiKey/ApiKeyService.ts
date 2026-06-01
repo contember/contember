@@ -1,10 +1,10 @@
-import { DatabaseContext, TokenHash } from '../../utils'
-import { AddProjectMemberCommand, CreateApiKeyCommand, CreateIdentityCommand } from '../../commands'
-import { ApiKey } from '../../type'
-import { createSetMembershipVariables } from '../membershipUtils'
-import { ImplementationException } from '../../../exceptions'
-import { Response, ResponseOk } from '../../utils/Response'
-import { ApiKeyWithToken } from '../../../schema'
+import { DatabaseContext, TokenHash } from '../../utils/index.js'
+import { AddProjectMemberCommand, CreateApiKeyCommand, CreateIdentityCommand } from '../../commands/index.js'
+import { ApiKey } from '../../type/index.js'
+import { createSetMembershipVariables } from '../membershipUtils.js'
+import { ImplementationException } from '../../../exceptions.js'
+import { Response, ResponseOk } from '../../utils/Response.js'
+import { ApiKeyWithToken } from '../../../schema/index.js'
 import { Acl } from '@contember/schema'
 
 export class ApiKeyService {

@@ -1,1 +1,1 @@
-export * from './ConfigurationQuery'
+export * from './ConfigurationQuery.js'

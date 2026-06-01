@@ -1,10 +1,10 @@
-import { unorderedListElementType } from './UnorderedListElement'
-import { orderedListElementType } from './OrderedListElement'
-import { listItemElementType } from './ListItemElement'
+import { unorderedListElementType } from './UnorderedListElement.js'
+import { orderedListElementType } from './OrderedListElement.js'
+import { listItemElementType } from './ListItemElement.js'
 import { Element as SlateElement } from 'slate'
-import { HtmlDeserializerPlugin } from '../../../types'
-import { NodesWithType } from '../../behaviour/paste/HtmlDeserializer'
-import { EditorPasteUtils } from '../../../internal/utils/EditorPasteUtils'
+import { HtmlDeserializerPlugin } from '../../../types/index.js'
+import { NodesWithType } from '../../behaviour/paste/HtmlDeserializer.js'
+import { EditorPasteUtils } from '../../../internal/utils/EditorPasteUtils.js'
 
 export interface ListElementProperties {
 	ordered: boolean

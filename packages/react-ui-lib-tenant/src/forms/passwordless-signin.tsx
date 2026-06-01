@@ -1,8 +1,8 @@
 import { usePasswordlessSignInForm } from '@contember/react-identity'
 import { Button } from '@contember/react-ui-lib-base'
 import { Loader } from '@contember/react-ui-lib-base'
-import { TenantFormError, TenantFormField } from './common'
-import { dict } from '../dict'
+import { TenantFormError, TenantFormField } from './common.js'
+import { dict } from '../dict.js'
 import { useEffect, useRef, useState } from 'react'
 
 export const PasswordlessSignInFormFields = ({ type, email }: { type: 'token' | 'otp'; email?: string }) => {

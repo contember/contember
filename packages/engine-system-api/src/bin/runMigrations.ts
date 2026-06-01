@@ -1,5 +1,5 @@
-import { SystemMigrationsRunner } from '../migrations'
-import { DatabaseContextFactory, emptyVersionedSchema, SchemaProvider } from '../model'
+import { SystemMigrationsRunner } from '../migrations/index.js'
+import { DatabaseContextFactory, emptyVersionedSchema, SchemaProvider } from '../model/index.js'
 import { DatabaseMetadataResolver, emptyDatabaseMetadata } from '@contember/database'
 import { createLogger, PrettyPrintLoggerHandler } from '@contember/logger'
 ;(async () => {

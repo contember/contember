@@ -1,7 +1,7 @@
 import * as React from 'react'
-import { useDataViewFilterName, useDataViewRelationFilterArgs } from '../../../contexts'
-import { useDataViewRelationFilterFactory } from '../../../hooks'
-import { DataView, DataViewProps } from '../../DataView'
+import { useDataViewFilterName, useDataViewRelationFilterArgs } from '../../../contexts.js'
+import { useDataViewRelationFilterFactory } from '../../../hooks/index.js'
+import { DataView, DataViewProps } from '../../DataView.js'
 import { EntityAccessor } from '@contember/react-binding'
 import { useCallback } from 'react'
 

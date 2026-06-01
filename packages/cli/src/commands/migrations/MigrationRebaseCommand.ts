@@ -1,6 +1,6 @@
 import { Command, CommandConfiguration, Input } from '@contember/cli-common'
 import { Migration, MigrationsResolver } from '@contember/migrations-client'
-import { MigrationRebaseFacade } from '../../lib/migrations/MigrationRebaseFacade'
+import { MigrationRebaseFacade } from '../../lib/migrations/MigrationRebaseFacade.js'
 
 type Args = {
 	migration: string[]

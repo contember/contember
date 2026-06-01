@@ -1,6 +1,6 @@
 import { Slot } from '@radix-ui/react-slot'
 import { ComponentType, ReactElement } from 'react'
-import { useIDPMethods } from '../../contexts'
+import { useIDPMethods } from '../../contexts.js'
 
 const SlotButton = Slot as ComponentType<React.ButtonHTMLAttributes<HTMLButtonElement>>
 

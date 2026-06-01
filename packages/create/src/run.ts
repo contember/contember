@@ -1,9 +1,9 @@
 #!/usr/bin/env node
 import { Application, CommandManager } from '@contember/cli-common'
-import { WorkspaceCreateCommand } from './commands'
-import { TemplateInstaller } from './lib/TemplateInstaller'
-import { resourcesDir } from './paths'
-import { FileSystem } from './lib/FileSystem'
+import { WorkspaceCreateCommand } from './commands/index.js'
+import { TemplateInstaller } from './lib/TemplateInstaller.js'
+import { resourcesDir } from './paths.js'
+import { FileSystem } from './lib/FileSystem.js'
 ;(async () => {
 	const commandManager = new CommandManager({
 		['workspace']: () =>

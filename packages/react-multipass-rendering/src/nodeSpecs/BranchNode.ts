@@ -1,7 +1,7 @@
 import type { ElementType } from 'react'
-import { ChildrenAnalyzerError } from '../ChildrenAnalyzerError'
-import type { BranchNodeOptions } from './BranchNodeOptions'
-import type { ChildrenRepresentationReducer, UseSiteBranchNodeRepresentationFactory, ValidFactoryName } from './types'
+import { ChildrenAnalyzerError } from '../ChildrenAnalyzerError.js'
+import type { BranchNodeOptions } from './BranchNodeOptions.js'
+import type { ChildrenRepresentationReducer, UseSiteBranchNodeRepresentationFactory, ValidFactoryName } from './types/index.js'
 
 class BranchNode<
 	Props extends {} = {},

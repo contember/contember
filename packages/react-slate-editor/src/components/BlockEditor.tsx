@@ -4,7 +4,7 @@ import { Fragment, ReactNode, useEffect, useState } from 'react'
 import { Slate, useSlate } from 'slate-react'
 import { createEditor, EditorPlugin, paragraphElementType } from '@contember/react-slate-editor-base'
 import { Descendant, insertNodes, Node, removeNodes, withoutNormalizing } from 'slate'
-import { createElementKey } from '../internal/helpers/createElementKey'
+import { createElementKey } from '../internal/helpers/createElementKey.js'
 
 export interface BlockEditorProps {
 	field: SugaredRelativeSingleField['field']

@@ -1,4 +1,4 @@
-export * from './BindingConfig'
-export { EntityAccessorImpl } from './EntityAccessorImpl'
-export { EntityListAccessorImpl } from './EntityListAccessorImpl'
-export { FieldAccessorImpl } from './FieldAccessorImpl'
+export * from './BindingConfig.js'
+export { EntityAccessorImpl } from './EntityAccessorImpl.js'
+export { EntityListAccessorImpl } from './EntityListAccessorImpl.js'
+export { FieldAccessorImpl } from './FieldAccessorImpl.js'

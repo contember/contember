@@ -1,7 +1,7 @@
 import { Editor, Editor as SlateEditor, Element as SlateElement, Node as SlateNode, Transforms } from 'slate'
-import { ContemberEditor } from '../../../editor'
-import { isListElement } from './ListElement'
-import { EditorElementPlugin, ElementRenderer } from '../../../types'
+import { ContemberEditor } from '../../../editor/index.js'
+import { isListElement } from './ListElement.js'
+import { EditorElementPlugin, ElementRenderer } from '../../../types/index.js'
 
 export const listItemElementType = 'listItem' as const
 

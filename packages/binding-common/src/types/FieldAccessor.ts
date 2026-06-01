@@ -1,9 +1,9 @@
-import type { FieldName, FieldValue } from '../treeParameters'
-import type { BatchUpdatesOptions } from './BatchUpdatesOptions'
-import type { Errorable } from './Errorable'
-import { ErrorAccessor } from './ErrorAccessor'
-import type { SchemaColumn } from '../schema'
-import { EntityAccessor } from './EntityAccessor'
+import type { FieldName, FieldValue } from '../treeParameters/index.js'
+import type { BatchUpdatesOptions } from './BatchUpdatesOptions.js'
+import type { Errorable } from './Errorable.js'
+import { ErrorAccessor } from './ErrorAccessor.js'
+import type { SchemaColumn } from '../schema/index.js'
+import { EntityAccessor } from './EntityAccessor.js'
 
 export const isFieldAccessor = (accessor: unknown): accessor is FieldAccessor =>
 	accessor !== null && typeof accessor === 'object' && '__type' in accessor && accessor.__type === 'FieldAccessor'

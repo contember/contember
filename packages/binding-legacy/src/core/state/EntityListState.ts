@@ -2,7 +2,7 @@ import type { EntityListAccessor, ErrorAccessor } from '@contember/binding-commo
 import type { EntityListSubTreeMarker, HasManyRelationMarker } from '@contember/binding-common'
 import type { EntityEventListenerStore, EntityId, EntityListEventListenerStore, EntityName, RemovalType } from '@contember/binding-common'
 import type { BijectiveIndexedMap } from '@contember/utilities'
-import type { EntityRealmState, EntityRealmStateStub } from './EntityRealmState'
+import type { EntityRealmState, EntityRealmStateStub } from './EntityRealmState.js'
 
 export type EntityListBlueprint =
 	| {

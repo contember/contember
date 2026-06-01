@@ -1,13 +1,13 @@
 import { Command, CommandConfiguration, Input } from '@contember/cli-common'
 import prompts from 'prompts'
-import { maskToken } from '../../lib/maskToken'
-import { MigrationExecutionFacade } from '../../lib/migrations/MigrationExecutionFacade'
-import { AdminDeployer } from '../../lib/admin/AdminDeployer'
-import { FileSystem } from '../../lib/fs/FileSystem'
-import { RemoteProject } from '../../lib/project/RemoteProject'
-import { Workspace } from '../../lib/workspace/Workspace'
-import { RemoteProjectProvider } from '../../lib/project/RemoteProjectProvider'
-import { RemoteProjectResolver } from '../../lib/project/RemoteProjectResolver'
+import { maskToken } from '../../lib/maskToken.js'
+import { MigrationExecutionFacade } from '../../lib/migrations/MigrationExecutionFacade.js'
+import { AdminDeployer } from '../../lib/admin/AdminDeployer.js'
+import { FileSystem } from '../../lib/fs/FileSystem.js'
+import { RemoteProject } from '../../lib/project/RemoteProject.js'
+import { Workspace } from '../../lib/workspace/Workspace.js'
+import { RemoteProjectProvider } from '../../lib/project/RemoteProjectProvider.js'
+import { RemoteProjectResolver } from '../../lib/project/RemoteProjectResolver.js'
 
 type Args = {
 	dsn?: string

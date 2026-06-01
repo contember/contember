@@ -1,2 +1,2 @@
-export * from './dataAttribute'
-export * from './svgSizeProps'
+export * from './dataAttribute.js'
+export * from './svgSizeProps.js'

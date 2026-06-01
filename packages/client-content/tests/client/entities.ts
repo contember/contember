@@ -1,4 +1,4 @@
-import type { PostStatus } from './enums'
+import type { PostStatus } from './enums.js'
 
 export type JSONPrimitive = string | number | boolean | null
 export type JSONValue = JSONPrimitive | JSONObject | JSONArray

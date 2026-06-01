@@ -1,6 +1,6 @@
-import { HttpController } from '../application'
-import { HttpErrorResponse } from '../common'
-import { GraphQLKoaState } from '../graphql'
+import { HttpController } from '../application/index.js'
+import { HttpErrorResponse } from '../common/index.js'
+import { GraphQLKoaState } from '../graphql/index.js'
 
 export class TenantApiMiddlewareFactory {
 	create(): HttpController {

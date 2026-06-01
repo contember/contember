@@ -12,16 +12,16 @@ import {
 } from '@contember/react-dataview'
 import { Component } from '@contember/interface'
 import { Popover, PopoverContent, PopoverTrigger } from '@contember/react-ui-lib-base'
-import { DataGridActiveFilterUI, DataGridFilterSelectTriggerUI, DataGridSingleFilterUI } from '../ui'
+import { DataGridActiveFilterUI, DataGridFilterSelectTriggerUI, DataGridSingleFilterUI } from '../ui.js'
 import { Input } from '@contember/react-ui-lib-base'
-import { formatDate } from '../../formatting/formatting'
+import { formatDate } from '../../formatting/formatting.js'
 import { dict } from '@contember/react-ui-lib-base'
-import { DataGridNullFilter } from './common'
-import { DataGridFilterMobileHiding } from './mobile'
+import { DataGridNullFilter } from './common.js'
+import { DataGridFilterMobileHiding } from './mobile.js'
 import { Button } from '@contember/react-ui-lib-base'
 import { Label } from '@contember/react-ui-lib-base'
 import { XIcon } from 'lucide-react'
-import { DataViewFieldLabel } from '../labels'
+import { DataViewFieldLabel } from '../labels.js'
 
 export type DataGridPredefinedDateRange = { start: string; end: string; label: ReactNode }
 

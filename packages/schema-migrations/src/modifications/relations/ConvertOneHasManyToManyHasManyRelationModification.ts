@@ -1,19 +1,19 @@
 import { MigrationBuilder } from '@contember/database-migrations'
 import { Model, Schema } from '@contember/schema'
-import { addField, SchemaUpdater, updateEntity, updateModel, updateSchema } from '../utils/schemaUpdateUtils'
+import { addField, SchemaUpdater, updateEntity, updateModel, updateSchema } from '../utils/schemaUpdateUtils.js'
 import {
 	createModificationType,
 	Differ,
 	ModificationHandler,
 	ModificationHandlerCreateSqlOptions,
 	ModificationHandlerOptions,
-} from '../ModificationHandler'
+} from '../ModificationHandler.js'
 import { isInverseRelation, isOwningRelation } from '@contember/schema-utils'
-import { updateRelations } from '../utils/diffUtils'
-import { createJunctionTableSql } from '../utils/createJunctionTable'
-import { wrapIdentifier } from '../../utils/dbHelpers'
-import { normalizeManyHasManyRelation, PartialManyHasManyRelation } from './normalization'
-import { updateFieldNameModification } from '../fields'
+import { updateRelations } from '../utils/diffUtils.js'
+import { createJunctionTableSql } from '../utils/createJunctionTable.js'
+import { wrapIdentifier } from '../../utils/dbHelpers.js'
+import { normalizeManyHasManyRelation, PartialManyHasManyRelation } from './normalization.js'
+import { updateFieldNameModification } from '../fields/index.js'
 
 export class ConvertOneHasManyToManyHasManyRelationModificationHandler
 	implements ModificationHandler<ConvertOneHasManyToManyHasManyRelationModificationData>

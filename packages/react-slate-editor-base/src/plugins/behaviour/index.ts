@@ -1,1 +1,1 @@
-export * from './paste'
+export * from './paste/index.js'

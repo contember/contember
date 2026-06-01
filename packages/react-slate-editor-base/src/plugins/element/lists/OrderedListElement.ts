@@ -1,9 +1,9 @@
 import { Editor as SlateEditor, Element as SlateElement, Node as SlateNode } from 'slate'
-import { ContemberEditor } from '../../../editor'
-import { getParentListElement } from './ListElement'
-import { unorderedListElementType } from './UnorderedListElement'
-import { normalizeListElement, toggleListElement } from './transforms'
-import { EditorElementPlugin, ElementRenderer } from '../../../types'
+import { ContemberEditor } from '../../../editor/index.js'
+import { getParentListElement } from './ListElement.js'
+import { unorderedListElementType } from './UnorderedListElement.js'
+import { normalizeListElement, toggleListElement } from './transforms/index.js'
+import { EditorElementPlugin, ElementRenderer } from '../../../types/index.js'
 
 export const orderedListElementType = 'orderedList' as const
 

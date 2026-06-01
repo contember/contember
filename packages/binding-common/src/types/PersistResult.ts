@@ -1,6 +1,6 @@
-import { ErrorAccessor } from './ErrorAccessor'
-import { EntityId } from '../treeParameters'
-import { DataBindingTransactionResult } from './DataBindingTransactionResult'
+import { ErrorAccessor } from './ErrorAccessor.js'
+import { EntityId } from '../treeParameters/index.js'
+import { DataBindingTransactionResult } from './DataBindingTransactionResult.js'
 
 export interface NothingToPersistPersistResult {
 	type: 'nothingToPersist'

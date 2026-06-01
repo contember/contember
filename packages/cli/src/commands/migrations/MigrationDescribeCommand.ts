@@ -1,5 +1,5 @@
 import { Command, CommandConfiguration, Input } from '@contember/cli-common'
-import { MigrationPrinter } from '../../lib/migrations/MigrationPrinter'
+import { MigrationPrinter } from '../../lib/migrations/MigrationPrinter.js'
 import { MigrationsResolver, SchemaVersionBuilder } from '@contember/migrations-client'
 
 type Args = {

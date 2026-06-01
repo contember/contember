@@ -1,5 +1,5 @@
 import { forwardRef, ReactElement, useCallback } from 'react'
-import { useDataViewSelectionMethods, useDataViewSelectionState } from '../../contexts'
+import { useDataViewSelectionMethods, useDataViewSelectionState } from '../../contexts.js'
 import { Slot } from '@radix-ui/react-slot'
 import { dataAttribute } from '@contember/utilities'
 import { composeEventHandlers } from '@radix-ui/primitive'

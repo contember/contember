@@ -1,7 +1,7 @@
 import { Ancestor, BaseEditor, Descendant, Path, Point, Range, Selection } from 'slate'
 import { ReactEditor, RenderElementProps } from 'slate-react'
 import { HistoryEditor } from 'slate-history'
-import { EditorWithEssentials } from './types/editor'
+import { EditorWithEssentials } from './types/editor.js'
 
 export type Editor = EditorWithEssentials<ReactEditor & HistoryEditor & BaseEditor>
 export type EditorElement =

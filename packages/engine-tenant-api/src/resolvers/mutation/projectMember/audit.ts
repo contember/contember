@@ -1,9 +1,9 @@
 import { Acl, JSONValue } from '@contember/schema'
-import { TenantResolverContext } from '../../TenantResolverContext'
-import { ProjectMembershipByIdentityQuery } from '../../../model/queries'
-import { PersonByIdentityBatchQuery } from '../../../model/queries/person/PersonByIdentityBatchQuery'
-import { ResponseOk } from '../../../model/utils/Response'
-import { AuthActionType } from '../../../model/type/AuthLog'
+import { TenantResolverContext } from '../../TenantResolverContext.js'
+import { ProjectMembershipByIdentityQuery } from '../../../model/queries/index.js'
+import { PersonByIdentityBatchQuery } from '../../../model/queries/person/PersonByIdentityBatchQuery.js'
+import { ResponseOk } from '../../../model/utils/Response.js'
+import { AuthActionType } from '../../../model/type/AuthLog.js'
 
 export const logProjectMembershipChange = async (
 	context: TenantResolverContext,

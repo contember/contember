@@ -1,4 +1,4 @@
-import { MigrationFilesManager } from './MigrationFilesManager'
+import { MigrationFilesManager } from './MigrationFilesManager.js'
 import { Schema } from '@contember/schema'
 import { Migration, SchemaDiffer, VERSION_LATEST } from '@contember/schema-migrations'
 import { MigrationVersionHelper } from '@contember/engine-common'

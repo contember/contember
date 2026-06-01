@@ -1,4 +1,4 @@
-import migration from '../../../src/migrations/2023-09-11-174000-fix-on-delete'
+import migration from '../../../src/migrations/2023-09-11-174000-fix-on-delete.js'
 import { createMigrationBuilder } from '@contember/database-migrations'
 import { expect, test } from 'bun:test'
 import { SchemaBuilder } from '@contember/schema-definition'

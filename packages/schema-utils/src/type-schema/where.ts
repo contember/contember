@@ -1,6 +1,6 @@
 import { Input, Model } from '@contember/schema'
-import { acceptFieldVisitor } from '../model'
-import { conditionSchema } from './condition'
+import { acceptFieldVisitor } from '../model/index.js'
+import { conditionSchema } from './condition.js'
 import * as Typesafe from '@contember/typesafe'
 
 export const whereSchema = ({ schema, entity }: {

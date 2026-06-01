@@ -1,7 +1,7 @@
-import { LineTransform } from '../stream'
+import { LineTransform } from '../stream.js'
 import { Readable } from 'node:stream'
 import { createGzip } from 'node:zlib'
-import { RemoteProject } from '../project/RemoteProject'
+import { RemoteProject } from '../project/RemoteProject.js'
 
 export class DataTransferClient {
 	dataImport = async ({ printProgress, stream, project, gzip }: {

@@ -1,7 +1,7 @@
 import { InsertBuilder, Literal, QueryBuilder, SelectBuilder } from '@contember/database'
 import { calculateMigrationChecksum } from '@contember/schema-migrations'
-import { Command } from '../Command'
-import { MigrationInput } from '../../migrations/MigrationInput'
+import { Command } from '../Command.js'
+import { MigrationInput } from '../../migrations/MigrationInput.js'
 
 export class SaveMigrationCommand implements Command<number> {
 	constructor(private readonly migration: MigrationInput) {}

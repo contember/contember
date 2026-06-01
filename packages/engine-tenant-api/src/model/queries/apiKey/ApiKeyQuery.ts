@@ -1,6 +1,6 @@
 import { DatabaseQuery, DatabaseQueryable, Operator, SelectBuilder } from '@contember/database'
-import { ApiKey } from '../../type'
-import { computeTokenHash } from '../../utils'
+import { ApiKey } from '../../type/index.js'
+import { computeTokenHash } from '../../utils/index.js'
 
 export class ApiKeyByIdQuery extends DatabaseQuery<null | ApiKeyRow> {
 	constructor(private readonly apiKeyId: string) {

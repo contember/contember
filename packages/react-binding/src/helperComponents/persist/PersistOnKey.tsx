@@ -1,6 +1,6 @@
 import { ErrorPersistResult, SuccessfulPersistResult } from '@contember/binding'
 import { useEffect } from 'react'
-import { useDecoratedPersist } from './useDecoratedPersist'
+import { useDecoratedPersist } from './useDecoratedPersist.js'
 
 export type PersistOnKeyProps = {
 	/**

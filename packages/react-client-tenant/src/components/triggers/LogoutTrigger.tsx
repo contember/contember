@@ -1,6 +1,6 @@
 import { ReactNode, useCallback } from 'react'
 import { Slot } from '@radix-ui/react-slot'
-import { useLogout } from '../../hooks/useLogout'
+import { useLogout } from '../../hooks/useLogout.js'
 
 export const LogoutTrigger = ({ children }: {
 	children: ReactNode

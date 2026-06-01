@@ -1,6 +1,6 @@
-import { RichText } from './RichText'
-import { RichTextElement, RichTextFieldSource, RichTextLeaf, RichTextRenderingOptions } from '../types'
-import { useRichTextFieldSource } from '../hooks'
+import { RichText } from './RichText.js'
+import { RichTextElement, RichTextFieldSource, RichTextLeaf, RichTextRenderingOptions } from '../types/index.js'
+import { useRichTextFieldSource } from '../hooks/index.js'
 
 export type { RichTextFieldSource }
 

@@ -24,12 +24,12 @@ import {
 	DataGridFilterSelectItemUI,
 	DataGridFilterSelectTriggerUI,
 	DataGridSingleFilterUI,
-} from '../ui'
-import { DataGridNullFilter } from './common'
-import { SelectDefaultFilter, SelectListInner, SelectPopoverContent } from '../../select'
+} from '../ui.js'
+import { DataGridNullFilter } from './common.js'
+import { SelectDefaultFilter, SelectListInner, SelectPopoverContent } from '../../select/index.js'
 import { dict } from '@contember/react-ui-lib-base'
-import { DataGridFilterMobileHiding } from './mobile'
-import { DataViewHasManyLabel, DataViewHasOneLabel } from '../labels'
+import { DataGridFilterMobileHiding } from './mobile.js'
+import { DataViewHasManyLabel, DataViewHasOneLabel } from '../labels.js'
 import { createRequiredContext } from '@contember/react-utils'
 
 /**

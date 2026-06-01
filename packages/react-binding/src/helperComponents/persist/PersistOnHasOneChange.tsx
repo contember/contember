@@ -1,8 +1,8 @@
 import { ErrorPersistResult, QueryLanguage, SuccessfulPersistResult, SugaredRelativeSingleEntity } from '@contember/binding'
 import { useEffect, useMemo } from 'react'
-import { useDecoratedPersist } from './useDecoratedPersist'
-import { useEntity, useEnvironment } from '../../accessorPropagation'
-import { Component, HasOne } from '../../coreComponents'
+import { useDecoratedPersist } from './useDecoratedPersist.js'
+import { useEntity, useEnvironment } from '../../accessorPropagation/index.js'
+import { Component, HasOne } from '../../coreComponents/index.js'
 
 export type PersistOnHasOneChangeProps = {
 	/**

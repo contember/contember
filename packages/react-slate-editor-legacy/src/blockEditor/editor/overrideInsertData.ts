@@ -1,11 +1,11 @@
 import type { FieldValue, RelativeSingleField } from '@contember/react-binding'
 import { Descendant, Element as SlateElement, Node as SlateNode, Text, Transforms } from 'slate'
-import type { ResolvedDiscriminatedDatum } from '../../discrimination'
-import { ReferenceElement, referenceElementType } from '../elements'
-import type { EmbedHandler, NormalizedEmbedHandlers } from '../embed'
-import type { EditorWithBlocks } from './EditorWithBlocks'
-import { parseUrl } from '../../utils'
-import { isInReferenceElement } from '../utils'
+import type { ResolvedDiscriminatedDatum } from '../../discrimination/index.js'
+import { ReferenceElement, referenceElementType } from '../elements/index.js'
+import type { EmbedHandler, NormalizedEmbedHandlers } from '../embed/index.js'
+import type { EditorWithBlocks } from './EditorWithBlocks.js'
+import { parseUrl } from '../../utils/index.js'
+import { isInReferenceElement } from '../utils/index.js'
 
 export interface OverrideInsertDataOptions {
 	embedHandlers: NormalizedEmbedHandlers | undefined

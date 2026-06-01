@@ -4,7 +4,7 @@ import * as SMTPPool from 'nodemailer/lib/smtp-pool'
 import * as SendmailTransport from 'nodemailer/lib/sendmail-transport'
 import * as SESTransport from 'nodemailer/lib/ses-transport'
 import { logger } from '@contember/logger'
-import { MailTemplateIdentifier } from '../model'
+import { MailTemplateIdentifier } from '../model/index.js'
 
 export interface MailMessage {
 	to: string

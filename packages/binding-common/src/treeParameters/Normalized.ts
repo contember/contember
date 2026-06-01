@@ -11,9 +11,9 @@ import type {
 	OrderBy,
 	SetOnCreate,
 	UniqueWhere,
-} from './primitives'
-import type { EventListenersStore } from './EventListenersStore'
-import type { EntityAccessor, EntityListAccessor, FieldAccessor } from '../types'
+} from './primitives/index.js'
+import type { EventListenersStore } from './EventListenersStore.js'
+import type { EntityAccessor, EntityListAccessor, FieldAccessor } from '../types/index.js'
 
 export interface RelativeEntityList {
 	hasOneRelationPath: HasOneRelation[]

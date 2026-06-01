@@ -1,4 +1,4 @@
-import { MembershipInput, MembershipUpdateInput, VariableUpdateInput } from '../commands'
+import { MembershipInput, MembershipUpdateInput, VariableUpdateInput } from '../commands/index.js'
 import { Acl } from '@contember/schema'
 
 export const createSetMembershipVariables = (memberships: readonly Acl.Membership[]): MembershipInput[] => {

@@ -1,5 +1,5 @@
-import { attrAccept } from './attrAccept'
-import { FileType, FileWithMeta } from '../../types'
+import { attrAccept } from './attrAccept.js'
+import { FileType, FileWithMeta } from '../../types/index.js'
 
 export const resolveAcceptingSingleType = async (
 	file: FileWithMeta,

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'bun:test'
-import { evaluateCondition } from '../../../../src/helperComponents/helpers/evaluateCondition'
+import { evaluateCondition } from '../../../../src/helperComponents/helpers/evaluateCondition.js'
 
 describe('evaluate condition', () => {
 	it('always', () => {

@@ -1,4 +1,4 @@
-import { usePreviousValue } from './usePreviousValue'
+import { usePreviousValue } from './usePreviousValue.js'
 
 // This entire hook should get optimized away for prod
 export const useConstantValueInvariant = <Value>(value: Value, message?: string) => {

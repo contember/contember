@@ -1,5 +1,5 @@
 import { useMemo } from 'react'
-import { useConstantLengthInvariant } from './useConstantLengthInvariant'
+import { useConstantLengthInvariant } from './useConstantLengthInvariant.js'
 
 /**
  * ⚠️ ONLY USE THIS IF YOU *REALLY* KNOW WHAT YOU'RE DOING! ⚠️

@@ -1,8 +1,8 @@
 import { Input, Model, Writable } from '@contember/schema'
 import { getTargetEntity } from '@contember/schema-utils'
-import { UserError } from '../exception'
-import { getFieldsForUniqueWhere } from '../utils'
-import { CheckedPrimary } from '../mapper/CheckedPrimary'
+import { UserError } from '../exception.js'
+import { getFieldsForUniqueWhere } from '../utils/index.js'
+import { CheckedPrimary } from '../mapper/CheckedPrimary.js'
 
 type ExtendedUniqueWhere = Input.UniqueWhere<Input.PrimaryValue[]>
 

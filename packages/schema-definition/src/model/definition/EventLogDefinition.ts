@@ -1,4 +1,4 @@
-import { extendEntity } from './extensions'
+import { extendEntity } from './extensions.js'
 
 export const DisableEventLog = () =>
 	extendEntity(({ entity }) => ({

@@ -1,4 +1,4 @@
-export * as ContentSchemaTypes from './content-schema.types'
-export { IntrospectionSchemaDefinitionFactory } from './IntrospectionSchemaDefinitionFactory'
-export { default as ContentSchema } from './introspection.schema'
-export * from './IntrospectionSchemaFactory'
+export * as ContentSchemaTypes from './content-schema.types.js'
+export { IntrospectionSchemaDefinitionFactory } from './IntrospectionSchemaDefinitionFactory.js'
+export { default as ContentSchema } from './introspection.schema.js'
+export * from './IntrospectionSchemaFactory.js'

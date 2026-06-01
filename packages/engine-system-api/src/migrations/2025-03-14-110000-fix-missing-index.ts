@@ -1,6 +1,6 @@
 import { MigrationArgs, MigrationBuilder } from '@contember/database-migrations'
 import { DatabaseMetadata } from '@contember/database'
-import { SystemMigrationArgs } from './types'
+import { SystemMigrationArgs } from './types.js'
 import { wrapIdentifier } from '@contember/database'
 import { Model } from '@contember/schema'
 import { acceptFieldVisitor } from '@contember/schema-utils'

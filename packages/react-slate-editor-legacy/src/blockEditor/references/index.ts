@@ -1,2 +1,2 @@
-export * from './useCreateElementReference'
-export * from './useInsertElementWithReference'
+export * from './useCreateElementReference.js'
+export * from './useInsertElementWithReference.js'

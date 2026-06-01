@@ -1,4 +1,4 @@
-import { BindingError } from '../BindingError'
+import { BindingError } from '../BindingError.js'
 
 export function assertNever(_: never): never {
 	throw new BindingError(

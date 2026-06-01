@@ -1,5 +1,5 @@
-export * from './components'
-export * from './hooks'
-export * from './types'
+export * from './components/index.js'
+export * from './hooks/index.js'
+export * from './types/index.js'
 
-export * from './RichTextRendererError'
+export * from './RichTextRendererError.js'

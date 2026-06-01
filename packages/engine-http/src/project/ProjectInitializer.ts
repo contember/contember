@@ -1,5 +1,5 @@
 import { ProjectInitializer as ProjectInitializerInterface, ProjectWithSecrets } from '@contember/engine-tenant-api'
-import { ProjectContainerResolver } from './ProjectContainerResolver'
+import { ProjectContainerResolver } from './ProjectContainerResolver.js'
 import { Logger } from '@contember/logger'
 
 export class ProjectInitializer implements ProjectInitializerInterface {

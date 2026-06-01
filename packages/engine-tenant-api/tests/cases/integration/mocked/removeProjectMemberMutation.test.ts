@@ -1,10 +1,10 @@
-import { GQL, SQL } from '../../../src/tags'
-import { testUuid } from '../../../src/testUuid'
-import { executeTenantTest } from '../../../src/testTenant'
-import { selectMembershipsSql } from './sql/selectMembershipsSql'
-import { getProjectBySlugSql } from './sql/getProjectBySlugSql'
-import { sqlTransaction } from './sql/sqlTransaction'
-import { getPersonsByIdentitySql } from './sql/getPersonsByIdentitySql'
+import { GQL, SQL } from '../../../src/tags.js'
+import { testUuid } from '../../../src/testUuid.js'
+import { executeTenantTest } from '../../../src/testTenant.js'
+import { selectMembershipsSql } from './sql/selectMembershipsSql.js'
+import { getProjectBySlugSql } from './sql/getProjectBySlugSql.js'
+import { sqlTransaction } from './sql/sqlTransaction.js'
+import { getPersonsByIdentitySql } from './sql/getPersonsByIdentitySql.js'
 import { test } from 'bun:test'
 
 test('removes a project member', async () => {

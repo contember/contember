@@ -1,6 +1,6 @@
 import { DatabaseQuery, DatabaseQueryable, Literal, SelectBuilder } from '@contember/database'
-import { Config, ConfigRow } from '../../type/Config'
-import { Providers } from '../../providers'
+import { Config, ConfigRow } from '../../type/Config.js'
+import { Providers } from '../../providers.js'
 
 export class ConfigurationQuery extends DatabaseQuery<Config> {
 	constructor(private readonly providers: Providers) {

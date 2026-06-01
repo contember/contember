@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'bun:test'
-import { FilterEvaluator } from '../../../../src/helperComponents/helpers/FilterEvaluator'
-import { schema } from './schema'
-import { EntityAccessor } from '../../../../src'
+import { FilterEvaluator } from '../../../../src/helperComponents/helpers/FilterEvaluator.js'
+import { schema } from './schema.js'
+import { EntityAccessor } from '../../../../src/index.js'
 
 const entityAccessorMock = {
 	name: 'Article',

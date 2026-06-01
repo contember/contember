@@ -1,7 +1,7 @@
 import { ReactNode } from 'react'
 import { BoardNullColumn, BoardNullColumnProps, useBoardCurrentColumn } from '@contember/react-board'
 import { useSortable } from '@dnd-kit/sortable'
-import { BoardSortableNodeContext } from '../contexts'
+import { BoardSortableNodeContext } from '../contexts.js'
 
 export const BoardSortableNullColumn = ({ children }: BoardNullColumnProps) => {
 	return (

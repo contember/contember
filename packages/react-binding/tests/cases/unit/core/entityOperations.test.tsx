@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'bun:test'
-import { EntitySubTree, Field, HasOne } from '../../../../src'
-import { createBinding } from '../../../lib/bindingFactory'
+import { EntitySubTree, Field, HasOne } from '../../../../src/index.js'
+import { createBinding } from '../../../lib/bindingFactory.js'
 import { c, createSchema } from '@contember/schema-definition'
-import { convertModelToAdminSchema } from '../../../lib/convertModelToAdminSchema'
+import { convertModelToAdminSchema } from '../../../lib/convertModelToAdminSchema.js'
 import assert from 'assert'
 
 namespace TrackChangesModel {

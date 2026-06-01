@@ -1,7 +1,7 @@
-import { SchemaUpdater } from '../utils/schemaUpdateUtils'
-import { createModificationType, ModificationHandler } from '../ModificationHandler'
+import { SchemaUpdater } from '../utils/schemaUpdateUtils.js'
+import { createModificationType, ModificationHandler } from '../ModificationHandler.js'
 import { applyPatch, Operation } from 'rfc6902'
-import deepCopy from '../../utils/deepCopy'
+import deepCopy from '../../utils/deepCopy.js'
 
 export class PatchValidationSchemaModificationHandler implements ModificationHandler<PatchValidationSchemaModificationData> {
 	constructor(private readonly data: PatchValidationSchemaModificationData) {}

@@ -1,8 +1,8 @@
 import { BindingError, EntityAccessor, useEntity, useHasEntity } from '@contember/react-binding'
 import { useMemo } from 'react'
-import { RoutingParameterResolver } from '../../types'
+import { RoutingParameterResolver } from '../../types/index.js'
 
-import { PageNotFound } from '../../PageNotFound'
+import { PageNotFound } from '../../PageNotFound.js'
 
 export const ROUTING_BINDING_PARAMETER_PREFIX = 'entity.'
 

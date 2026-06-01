@@ -1,8 +1,8 @@
-import { executeTenantTest } from '../../../src/testTenant'
-import { GQL } from '../../../src/tags'
-import { testUuid } from '../../../src/testUuid'
+import { executeTenantTest } from '../../../src/testTenant.js'
+import { GQL } from '../../../src/tags.js'
+import { testUuid } from '../../../src/testUuid.js'
 import { test } from 'bun:test'
-import { sqlTransaction } from './sql/sqlTransaction'
+import { sqlTransaction } from './sql/sqlTransaction.js'
 
 test('list project members by email query', async () => {
 	await executeTenantTest({

@@ -1,9 +1,9 @@
-import { ImplementationException } from '../exceptions'
-import { ClientErrorCodes } from './errorCodes'
+import { ImplementationException } from '../exceptions.js'
+import { ClientErrorCodes } from './errorCodes.js'
 import { EventEmitter } from 'node:events'
-import { ClientError, DatabaseError } from './errors'
-import { PgClientFactory } from '../utils'
-import { PgClient } from './PgClient'
+import { ClientError, DatabaseError } from './errors.js'
+import { PgClientFactory } from '../utils/index.js'
+import { PgClient } from './PgClient.js'
 
 export type PoolLogger = (message: string, status: PoolStatus) => void
 

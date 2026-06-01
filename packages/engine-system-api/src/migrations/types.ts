@@ -1,6 +1,6 @@
-import { ProjectConfig } from '../types'
+import { ProjectConfig } from '../types.js'
 import { Connection, DatabaseMetadata } from '@contember/database'
-import { SchemaWithMeta } from '../model'
+import { SchemaWithMeta } from '../model/index.js'
 
 export interface SystemMigrationArgs {
 	schemaResolver: (connection: Connection.ConnectionLike) => Promise<SchemaWithMeta>

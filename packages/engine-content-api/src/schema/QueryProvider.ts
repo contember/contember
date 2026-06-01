@@ -1,13 +1,13 @@
 import { GraphQLFieldConfig, GraphQLInt, GraphQLList, GraphQLNonNull } from 'graphql'
 import { Acl, Input, Model } from '@contember/schema'
-import { Context } from '../types'
-import { EntityTypeProvider } from './EntityTypeProvider'
-import { WhereTypeProvider } from './WhereTypeProvider'
-import { Authorizator } from '../acl'
-import { OrderByTypeProvider } from './OrderByTypeProvider'
-import { ExtensionKey, Operation, OperationMeta } from './OperationExtension'
-import { ImplementationException } from '../exception'
-import { PaginatedFieldConfigFactory } from './PaginatedFieldConfigFactory'
+import { Context } from '../types.js'
+import { EntityTypeProvider } from './EntityTypeProvider.js'
+import { WhereTypeProvider } from './WhereTypeProvider.js'
+import { Authorizator } from '../acl/index.js'
+import { OrderByTypeProvider } from './OrderByTypeProvider.js'
+import { ExtensionKey, Operation, OperationMeta } from './OperationExtension.js'
+import { ImplementationException } from '../exception.js'
+import { PaginatedFieldConfigFactory } from './PaginatedFieldConfigFactory.js'
 
 export class QueryProvider {
 	constructor(

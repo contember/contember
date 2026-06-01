@@ -1,1 +1,1 @@
-export * from './ApplicationEntrypoint'
+export * from './ApplicationEntrypoint.js'

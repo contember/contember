@@ -1,10 +1,10 @@
-import { Command } from '../Command'
-import { UpdateProjectMemberErrorCode } from '../../../schema'
-import { CreateOrUpdateProjectMembershipCommand } from './CreateOrUpdateProjectMembershipCommand'
+import { Command } from '../Command.js'
+import { UpdateProjectMemberErrorCode } from '../../../schema/index.js'
+import { CreateOrUpdateProjectMembershipCommand } from './CreateOrUpdateProjectMembershipCommand.js'
 import { SelectBuilder } from '@contember/database'
-import { MembershipUpdateInput } from './types'
-import { RemoveProjectMembershipCommand } from './RemoveProjectMembershipsCommand'
-import { Response, ResponseError, ResponseOk } from '../../utils/Response'
+import { MembershipUpdateInput } from './types.js'
+import { RemoveProjectMembershipCommand } from './RemoveProjectMembershipsCommand.js'
+import { Response, ResponseError, ResponseOk } from '../../utils/Response.js'
 
 export class UpdateProjectMemberCommand implements Command<UpdateProjectMemberResponse> {
 	constructor(

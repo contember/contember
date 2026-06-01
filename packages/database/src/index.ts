@@ -1,17 +1,17 @@
-import { With } from './builders/internal/With'
-import { Where } from './builders/internal/Where'
-import { Returning } from './builders/internal/Returning'
+import { With } from './builders/internal/With.js'
+import { Where } from './builders/internal/Where.js'
+import { Returning } from './builders/internal/Returning.js'
 
 export type WithAware = With.Aware
 export type WhereAware = Where.Aware
 export type ReturningAware = Returning.Aware
 
-export * from './client'
-export * from './builders'
-export * from './metadata'
-export * from './queryable'
-export * from './Literal'
-export * from './types'
+export * from './client/index.js'
+export * from './builders/index.js'
+export * from './metadata/index.js'
+export * from './queryable/index.js'
+export * from './Literal.js'
+export * from './types.js'
 export {
 	AcquiringListener,
 	asyncIterableTransaction,
@@ -23,4 +23,4 @@ export {
 	retryTransaction,
 	withDatabaseAdvisoryLock,
 	wrapIdentifier,
-} from './utils'
+} from './utils/index.js'

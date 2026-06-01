@@ -1,6 +1,6 @@
-import { Migration, MigrationExecutor, RunMigration } from './Migration'
-import { MigrationsResolver, MigrationsResolverContext } from './MigrationsResolver'
-import { checkOrder, timePrefixLength } from './helpers'
+import { Migration, MigrationExecutor, RunMigration } from './Migration.js'
+import { MigrationsResolver, MigrationsResolverContext } from './MigrationsResolver.js'
+import { checkOrder, timePrefixLength } from './helpers.js'
 
 export class SnapshotMigrationResolver<Args> implements MigrationsResolver<Args> {
 	constructor(

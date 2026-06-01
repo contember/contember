@@ -1,2 +1,2 @@
-export * from './RemoveChangedFieldDiffer'
-export * from './RemoveViewDiffer'
+export * from './RemoveChangedFieldDiffer.js'
+export * from './RemoveViewDiffer.js'

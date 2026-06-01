@@ -1,3 +1,3 @@
-export * from './Identity'
-export * from './AuthorizationActions'
-export * from './PermissionsFactory'
+export * from './Identity.js'
+export * from './AuthorizationActions.js'
+export * from './PermissionsFactory.js'

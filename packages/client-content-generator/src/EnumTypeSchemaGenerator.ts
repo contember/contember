@@ -1,5 +1,5 @@
 import { Model } from '@contember/schema'
-import { getEnumTypeName } from './utils'
+import { getEnumTypeName } from './utils.js'
 
 export class EnumTypeSchemaGenerator {
 	generate(model: Model.Schema): string {

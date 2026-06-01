@@ -1,5 +1,5 @@
 import { Validation, Value } from '@contember/schema'
-import { assertNever } from '../utils'
+import { assertNever } from '../utils/index.js'
 
 namespace ValidationContext {
 	export type AnyContext = NodeContext | ValueContext | NodeListContext | UndefinedNodeContext

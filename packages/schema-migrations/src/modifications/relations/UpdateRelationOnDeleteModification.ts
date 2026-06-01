@@ -1,11 +1,11 @@
 import { MigrationBuilder } from '@contember/database-migrations'
 import { Model, Schema } from '@contember/schema'
-import { SchemaUpdater, updateEntity, updateField, updateModel } from '../utils/schemaUpdateUtils'
-import { createModificationType, Differ, ModificationHandler, ModificationHandlerCreateSqlOptions } from '../ModificationHandler'
-import { isIt } from '../../utils/isIt'
-import { updateRelations } from '../utils/diffUtils'
+import { SchemaUpdater, updateEntity, updateField, updateModel } from '../utils/schemaUpdateUtils.js'
+import { createModificationType, Differ, ModificationHandler, ModificationHandlerCreateSqlOptions } from '../ModificationHandler.js'
+import { isIt } from '../../utils/isIt.js'
+import { updateRelations } from '../utils/diffUtils.js'
 import { acceptRelationTypeVisitor } from '@contember/schema-utils'
-import { addForeignKeyConstraint } from './helpers'
+import { addForeignKeyConstraint } from './helpers.js'
 
 export class UpdateRelationOnDeleteModificationHandler implements ModificationHandler<UpdateRelationOnDeleteModificationData> {
 	constructor(

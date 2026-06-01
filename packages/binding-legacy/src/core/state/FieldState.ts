@@ -1,7 +1,7 @@
 import type { ErrorAccessor, FieldAccessor } from '@contember/binding-common'
 import type { FieldMarker } from '@contember/binding-common'
 import type { FieldEventListenerStore, FieldName, FieldValue } from '@contember/binding-common'
-import type { EntityRealmState } from './EntityRealmState'
+import type { EntityRealmState } from './EntityRealmState.js'
 
 export interface FieldState<Value extends FieldValue = FieldValue> {
 	type: 'field'

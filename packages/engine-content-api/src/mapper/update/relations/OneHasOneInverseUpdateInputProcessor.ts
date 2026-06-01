@@ -5,13 +5,13 @@ import {
 	MutationResultList,
 	MutationResultType,
 	NothingToDoReason,
-} from '../../Result'
-import { UpdateInputProcessor } from '../../../inputProcessing'
+} from '../../Result.js'
+import { UpdateInputProcessor } from '../../../inputProcessing/index.js'
 import { Input, Model } from '@contember/schema'
-import { Mapper } from '../../Mapper'
-import { SqlUpdateInputProcessorResult } from '../SqlUpdateInputProcessor'
-import { CheckedPrimary } from '../../CheckedPrimary'
-import { MapperInput } from '../../types'
+import { Mapper } from '../../Mapper.js'
+import { SqlUpdateInputProcessorResult } from '../SqlUpdateInputProcessor.js'
+import { CheckedPrimary } from '../../CheckedPrimary.js'
+import { MapperInput } from '../../types.js'
 
 type Context = Model.OneHasOneInverseContext
 

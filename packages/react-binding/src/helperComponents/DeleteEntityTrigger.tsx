@@ -1,9 +1,9 @@
 import { ReactElement, useCallback, useEffect } from 'react'
 import { Slot } from '@radix-ui/react-slot'
-import { useDecoratedPersist } from './persist/useDecoratedPersist'
+import { useDecoratedPersist } from './persist/useDecoratedPersist.js'
 import { ErrorPersistResult, SuccessfulPersistResult } from '@contember/binding'
-import { useEntity } from '../accessorPropagation'
-import { useMutationState } from '../accessorTree'
+import { useEntity } from '../accessorPropagation/index.js'
+import { useMutationState } from '../accessorTree/index.js'
 import { composeEventHandlers } from '@radix-ui/primitive'
 
 const SlotType = Slot as React.ForwardRefExoticComponent<React.ButtonHTMLAttributes<HTMLButtonElement> & React.RefAttributes<HTMLButtonElement>>

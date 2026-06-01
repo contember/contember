@@ -1,1 +1,1 @@
-export * from './EmbedHandler'
+export * from './EmbedHandler.js'

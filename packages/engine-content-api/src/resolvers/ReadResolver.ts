@@ -1,9 +1,9 @@
 import { Input, Model } from '@contember/schema'
-import { MapperFactory } from '../mapper'
+import { MapperFactory } from '../mapper/index.js'
 import { GraphQLResolveInfo } from 'graphql'
-import { GraphQlQueryAstFactory } from './GraphQlQueryAstFactory'
-import { ObjectNode } from '../inputProcessing'
-import { executeReadOperations, paginate } from './ReadHelpers'
+import { GraphQlQueryAstFactory } from './GraphQlQueryAstFactory.js'
+import { ObjectNode } from '../inputProcessing/index.js'
+import { executeReadOperations, paginate } from './ReadHelpers.js'
 
 export class ReadResolver {
 	constructor(

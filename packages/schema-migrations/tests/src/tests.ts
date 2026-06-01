@@ -1,4 +1,4 @@
-import { Migration, ModificationHandlerFactory, SchemaDiffer, SchemaMigrator, VERSION_LATEST } from '../../src'
+import { Migration, ModificationHandlerFactory, SchemaDiffer, SchemaMigrator, VERSION_LATEST } from '../../src/index.js'
 import { Schema } from '@contember/schema'
 import { createMigrationBuilder } from '@contember/database-migrations'
 import { describe, expect, it, test } from 'bun:test'

@@ -1,5 +1,5 @@
 import React, { forwardRef, ReactNode } from 'react'
-import { useSelectIsSelected } from '../contexts'
+import { useSelectIsSelected } from '../contexts.js'
 import { Slot } from '@radix-ui/react-slot'
 import { useEntity } from '@contember/react-binding'
 import { dataAttribute } from '@contember/utilities'

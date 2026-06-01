@@ -1,8 +1,8 @@
-import { MigrationToExecuteOkStatus } from './migrations'
-import { ContentMigrationFactoryArgs, ResolvedMigrationContent } from './MigrationFile'
-import { assertNever } from './utils/assertNever'
-import { SystemClient } from './SystemClient'
-import { SchemaState } from './SchemaStateManager'
+import { MigrationToExecuteOkStatus } from './migrations.js'
+import { ContentMigrationFactoryArgs, ResolvedMigrationContent } from './MigrationFile.js'
+import { assertNever } from './utils/assertNever.js'
+import { SystemClient } from './SystemClient.js'
+import { SchemaState } from './SchemaStateManager.js'
 
 export class MigrationExecutor {
 	async executeMigrations({

@@ -1,8 +1,8 @@
-import { executeTenantTest } from '../../../src/testTenant'
-import { GQL, SQL } from '../../../src/tags'
-import { testUuid } from '../../../src/testUuid'
-import { getPersonByIdSql } from './sql/getPersonByIdSql'
-import { getMailTemplateSql } from './sql/getMailTemplateSql'
+import { executeTenantTest } from '../../../src/testTenant.js'
+import { GQL, SQL } from '../../../src/tags.js'
+import { testUuid } from '../../../src/testUuid.js'
+import { getPersonByIdSql } from './sql/getPersonByIdSql.js'
+import { getMailTemplateSql } from './sql/getMailTemplateSql.js'
 import { expect, test } from 'bun:test'
 
 const disableIdentityApiKeysSql = (identityId: string) => ({

@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { ReactNode } from 'react'
-import { UploaderDropzoneStateContext } from '../internal/contexts'
+import { UploaderDropzoneStateContext } from '../internal/contexts.js'
 import { useDropzone } from 'react-dropzone'
 import { useMutationState } from '@contember/react-binding'
 import { useUploaderOptions, useUploaderUploadFiles } from '@contember/react-uploader'

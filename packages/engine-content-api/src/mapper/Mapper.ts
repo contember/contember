@@ -9,21 +9,21 @@ import {
 	SelectIndexedResultObjects,
 	SelectResultObject,
 	WhereBuilder,
-} from './select'
+} from './select/index.js'
 import { Client, Connection, ConstraintHelper, DatabaseMetadata, SelectBuilder } from '@contember/database'
-import { PredicatesInjector } from '../acl'
-import { JunctionTableManager } from './JunctionTableManager'
-import { DeletedEntitiesStorage, DeleteExecutor } from './delete'
-import { MutationEntryNotFoundError, MutationResultList } from './Result'
-import { UpdateBuilder, Updater } from './update'
-import { InsertBuilder, Inserter } from './insert'
-import { tryMutation } from './ErrorUtils'
-import { ObjectNode, UniqueWhereExpander } from '../inputProcessing'
-import { Mutex } from '../utils'
-import { CheckedPrimary } from './CheckedPrimary'
-import { ImplementationException } from '../exception'
-import { EventManager } from './EventManager'
-import { MapperInput } from './types'
+import { PredicatesInjector } from '../acl/index.js'
+import { JunctionTableManager } from './JunctionTableManager.js'
+import { DeletedEntitiesStorage, DeleteExecutor } from './delete/index.js'
+import { MutationEntryNotFoundError, MutationResultList } from './Result.js'
+import { UpdateBuilder, Updater } from './update/index.js'
+import { InsertBuilder, Inserter } from './insert/index.js'
+import { tryMutation } from './ErrorUtils.js'
+import { ObjectNode, UniqueWhereExpander } from '../inputProcessing/index.js'
+import { Mutex } from '../utils/index.js'
+import { CheckedPrimary } from './CheckedPrimary.js'
+import { ImplementationException } from '../exception.js'
+import { EventManager } from './EventManager.js'
+import { MapperInput } from './types.js'
 
 export class Mapper<ConnectionType extends Connection.ConnectionLike = Connection.ConnectionLike> {
 	private systemVariablesSetupDone: Promise<void> | undefined

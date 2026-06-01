@@ -1,7 +1,7 @@
 import type { EntityAccessor, Environment, ErrorAccessorHolder } from '@contember/react-binding'
 import type { ReactNode } from 'react'
-import { FileWithMeta } from './file'
-import { FileUploadResult } from './uploadClient'
+import { FileWithMeta } from './file.js'
+import { FileUploadResult } from './uploadClient.js'
 
 export interface FileDataExtractorStaticRenderOptions {
 	environment: Environment

@@ -1,7 +1,7 @@
 import { useSessionToken } from '@contember/react-client'
 import { ReactNode, useEffect } from 'react'
-import { useFetchIdentity } from '../hooks'
-import { IdentityContext, IdentityMethodsContext, IdentityStateContext } from '../contexts'
+import { useFetchIdentity } from '../hooks/index.js'
+import { IdentityContext, IdentityMethodsContext, IdentityStateContext } from '../contexts.js'
 
 export interface IdentityProviderProps {
 	children: ReactNode

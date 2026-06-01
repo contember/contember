@@ -1,9 +1,9 @@
-import { OrderedListElement, orderedListElementType } from '../OrderedListElement'
-import { UnorderedListElement, unorderedListElementType } from '../UnorderedListElement'
+import { OrderedListElement, orderedListElementType } from '../OrderedListElement.js'
+import { UnorderedListElement, unorderedListElementType } from '../UnorderedListElement.js'
 import { Editor, Element as SlateElement, NodeEntry, Text, Transforms } from 'slate'
-import { ContemberEditor } from '../../../../editor'
-import { listItemElementType } from '../ListItemElement'
-import { isListElement } from '../ListElement'
+import { ContemberEditor } from '../../../../editor/index.js'
+import { listItemElementType } from '../ListItemElement.js'
+import { isListElement } from '../ListElement.js'
 
 export const toggleListElement = <T extends OrderedListElement | UnorderedListElement>(
 	editor: Editor,

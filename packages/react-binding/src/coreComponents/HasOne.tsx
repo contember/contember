@@ -1,12 +1,12 @@
 import type { ReactElement, ReactNode } from 'react'
-import { useEntity } from '../accessorPropagation'
+import { useEntity } from '../accessorPropagation/index.js'
 import { PRIMARY_KEY_NAME } from '@contember/binding'
 import { Environment } from '@contember/binding'
 import { MarkerFactory } from '@contember/binding'
 import type { SugaredRelativeSingleEntity } from '@contember/binding'
-import { Component } from './Component'
-import { Entity } from './Entity'
-import { Field } from './Field'
+import { Component } from './Component.js'
+import { Entity } from './Entity.js'
+import { Field } from './Field.js'
 import { TreeNodeEnvironmentFactory } from '@contember/binding'
 
 export type HasOneProps<EntityProps = never> = SugaredRelativeSingleEntity & {

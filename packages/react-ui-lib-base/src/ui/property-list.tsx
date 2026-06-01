@@ -1,5 +1,5 @@
 import { ReactNode } from 'react'
-import { uic } from '../utils'
+import { uic } from '../utils/index.js'
 
 export const PropertyList = uic('div', {
 	baseClass: 'relative overflow-auto bg-gray-50/50 max-w-lg border border-gray-200 rounded-md grid grid-cols-[max-content_1fr]',

@@ -1,1 +1,1 @@
-export * from './outdated-application-dialog'
+export * from './outdated-application-dialog.js'

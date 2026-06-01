@@ -1,9 +1,9 @@
 import { Component, useEnvironment } from '@contember/react-binding'
 import { useMemo } from 'react'
-import { RoutingLink, RoutingLinkProps } from './RoutingLink'
-import { useBindingLinkParametersResolver } from '../internal/hooks/useBindingLinkParametersResolver'
-import { parseLinkTarget } from '../internal/utils/parseLinkTarget'
-import { RoutingLinkFields } from './RoutingLinkFields'
+import { RoutingLink, RoutingLinkProps } from './RoutingLink.js'
+import { useBindingLinkParametersResolver } from '../internal/hooks/useBindingLinkParametersResolver.js'
+import { parseLinkTarget } from '../internal/utils/parseLinkTarget.js'
+import { RoutingLinkFields } from './RoutingLinkFields.js'
 
 export type LinkProps = Omit<RoutingLinkProps, 'parametersResolver'>
 

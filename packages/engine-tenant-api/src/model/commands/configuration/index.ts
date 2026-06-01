@@ -1,1 +1,1 @@
-export * from './UpdateConfigurationCommand'
+export * from './UpdateConfigurationCommand.js'

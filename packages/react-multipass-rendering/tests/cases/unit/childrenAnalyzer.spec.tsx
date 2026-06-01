@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'bun:test'
 import type { FunctionComponent, ReactElement, ReactNode } from 'react'
 import * as React from 'react'
-import { BranchNode, ChildrenAnalyzer, Leaf, RawNodeRepresentation } from '../../../src'
+import { BranchNode, ChildrenAnalyzer, Leaf, RawNodeRepresentation } from '../../../src/index.js'
 
 interface FooComponentProps {
 	foo: string

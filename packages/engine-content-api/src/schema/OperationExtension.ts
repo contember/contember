@@ -1,5 +1,5 @@
 import { Model } from '@contember/schema'
-import { ImplementationException } from '../exception'
+import { ImplementationException } from '../exception.js'
 
 export class OperationMeta {
 	constructor(public readonly operation: Operation, public readonly entity: Model.Entity) {}

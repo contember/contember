@@ -1,7 +1,7 @@
-import type { PlaceholderName } from '../treeParameters'
-import type { FieldMarker } from './FieldMarker'
-import type { HasManyRelationMarker } from './HasManyRelationMarker'
-import type { HasOneRelationMarker } from './HasOneRelationMarker'
+import type { PlaceholderName } from '../treeParameters/index.js'
+import type { FieldMarker } from './FieldMarker.js'
+import type { HasManyRelationMarker } from './HasManyRelationMarker.js'
+import type { HasOneRelationMarker } from './HasOneRelationMarker.js'
 
 export type EntityFieldMarker = FieldMarker | HasOneRelationMarker | HasManyRelationMarker
 export type EntityFieldMarkers = ReadonlyMap<PlaceholderName, EntityFieldMarker>

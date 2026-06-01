@@ -1,2 +1,2 @@
-export * from './Runnable'
-export * from './Supervisor'
+export * from './Runnable.js'
+export * from './Supervisor.js'

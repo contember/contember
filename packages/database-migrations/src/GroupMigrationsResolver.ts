@@ -1,6 +1,6 @@
-import { MigrationsResolver, MigrationsResolverContext } from './MigrationsResolver'
-import { Migration } from './Migration'
-import { timePrefixLength } from './helpers'
+import { MigrationsResolver, MigrationsResolverContext } from './MigrationsResolver.js'
+import { Migration } from './Migration.js'
+import { timePrefixLength } from './helpers.js'
 
 export class GroupMigrationsResolver<Args> implements MigrationsResolver<Args> {
 	constructor(

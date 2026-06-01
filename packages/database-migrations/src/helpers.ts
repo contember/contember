@@ -1,5 +1,5 @@
 import { MigrationBuilder } from 'node-pg-migrate'
-import { Migration, RunMigration } from './Migration'
+import { Migration, RunMigration } from './Migration.js'
 import MigrationBuilderImpl from 'node-pg-migrate/dist/migration-builder.js'
 import { escapeValue as pgEscape } from 'node-pg-migrate/dist/utils.js'
 

@@ -1,6 +1,6 @@
 import { useSetSessionToken } from '@contember/react-client'
 import { useCallback } from 'react'
-import { useSignOutMutation } from '../../hooks'
+import { useSignOutMutation } from '../../hooks/index.js'
 
 export const useLogoutInternal = (clearIdentity?: () => void) => {
 	const tenantLogout = useSignOutMutation()

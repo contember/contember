@@ -1,5 +1,5 @@
 import { DatabaseQuery, DatabaseQueryable, SelectBuilder } from '@contember/database'
-import { EventRow } from './types'
+import { EventRow } from './types.js'
 
 export class EventByIdQuery extends DatabaseQuery<EventRow | null> {
 	constructor(

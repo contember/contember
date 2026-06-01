@@ -1,8 +1,8 @@
 import { DatabaseContext } from '@contember/engine-system-api'
-import { VariablesQuery } from './VariablesQuery'
-import { SetVariablesArgs } from '../graphql/schema'
+import { VariablesQuery } from './VariablesQuery.js'
+import { SetVariablesArgs } from '../graphql/schema/index.js'
 import { DeleteBuilder } from '@contember/database'
-import { SetVariableCommand } from './SetVariableCommand'
+import { SetVariableCommand } from './SetVariableCommand.js'
 
 export type VariablesMap = Record<string, string>
 

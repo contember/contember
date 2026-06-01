@@ -1,5 +1,5 @@
 import * as SeparatorPrimitive from '@radix-ui/react-separator'
-import { uic } from '../utils'
+import { uic } from '../utils/index.js'
 
 export const Separator = uic(SeparatorPrimitive.Root, {
 	baseClass: 'shrink-0 bg-border',

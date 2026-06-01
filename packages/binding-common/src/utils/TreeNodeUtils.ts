@@ -1,6 +1,6 @@
-import { Environment } from '../environment'
-import { BaseRelation, Schema, SchemaColumn, SchemaEntity, SchemaField, SchemaRelation } from '../schema'
-import { BindingError } from '../BindingError'
+import { Environment } from '../environment/index.js'
+import { BaseRelation, Schema, SchemaColumn, SchemaEntity, SchemaField, SchemaRelation } from '../schema/index.js'
+import { BindingError } from '../BindingError.js'
 
 const levenshtein = (a: string, b: string): number => {
 	if (a === b) {

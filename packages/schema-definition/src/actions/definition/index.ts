@@ -1,8 +1,8 @@
 import { Actions } from '@contember/schema'
-import { ActionsFactory } from './internal/ActionsFactory'
+import { ActionsFactory } from './internal/ActionsFactory.js'
 
-export * from './triggers'
-export * from './targets'
+export * from './triggers.js'
+export * from './targets.js'
 
 export const createActions = (
 	exportedDefinitions: Record<string, any>,

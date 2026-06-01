@@ -1,7 +1,7 @@
-import { IdentityProvider, QueryResolvers } from '../../schema'
-import { PermissionActions } from '../../model'
-import { TenantResolverContext } from '../TenantResolverContext'
-import { IDPManager } from '../../model/service/idp/IDPManager'
+import { IdentityProvider, QueryResolvers } from '../../schema/index.js'
+import { PermissionActions } from '../../model/index.js'
+import { TenantResolverContext } from '../TenantResolverContext.js'
+import { IDPManager } from '../../model/service/idp/IDPManager.js'
 
 export class IDPQueryResolver implements QueryResolvers {
 	constructor(

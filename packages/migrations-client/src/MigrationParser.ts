@@ -1,6 +1,6 @@
 import { Migration, VERSION_INITIAL } from '@contember/schema-migrations'
-import { ContentMigrationQuery, MigrationFile, ResolvedMigrationContent } from './MigrationFile'
-import { JSONValue } from './utils/json'
+import { ContentMigrationQuery, MigrationFile, ResolvedMigrationContent } from './MigrationFile.js'
+import { JSONValue } from './utils/json.js'
 
 export class MigrationParser {
 	public parse(migrationFile: MigrationFile, content: JSONValue): ResolvedMigrationContent {

@@ -1,4 +1,4 @@
-import { Environment } from './Environment'
+import { Environment } from './Environment.js'
 import {
 	HasOneRelation,
 	SugaredQualifiedEntityList,
@@ -8,10 +8,10 @@ import {
 	SugaredRelativeSingleField,
 	SugaredUnconstrainedQualifiedEntityList,
 	SugaredUnconstrainedQualifiedSingleEntity,
-} from '../treeParameters'
-import { QueryLanguage } from '../queryLanguage'
-import { TreeNodeUtils } from '../utils/TreeNodeUtils'
-import { whereToFilter } from '../utils/whereToFilter'
+} from '../treeParameters/index.js'
+import { QueryLanguage } from '../queryLanguage/index.js'
+import { TreeNodeUtils } from '../utils/TreeNodeUtils.js'
+import { whereToFilter } from '../utils/whereToFilter.js'
 
 export class TreeNodeEnvironmentFactory {
 	public static createEnvironmentForEntityListSubtree(

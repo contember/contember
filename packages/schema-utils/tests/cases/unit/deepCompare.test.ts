@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test'
-import { compareArraysIgnoreOrder } from '../../../src'
+import { compareArraysIgnoreOrder } from '../../../src/index.js'
 
 describe('deep compare', () => {
 	test('compare array ignore order - success', () => {

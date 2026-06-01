@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { UploaderDropzoneArea, UploaderDropzoneRoot } from '@contember/react-uploader-dropzone'
 import { useUploaderStateFiles } from '@contember/react-uploader'
-import { UploaderDropzoneAreaUI, UploaderDropzoneWrapperUI, UploaderInactiveDropzoneUI } from './ui'
+import { UploaderDropzoneAreaUI, UploaderDropzoneWrapperUI, UploaderInactiveDropzoneUI } from './ui.js'
 import { ReactNode } from 'react'
 import { UploadIcon } from 'lucide-react'
 import { dict } from '@contember/react-ui-lib-base'

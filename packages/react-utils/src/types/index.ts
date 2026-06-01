@@ -1,2 +1,2 @@
-export * from './PropsWithRequiredChildren'
-export * from './Serializable'
+export * from './PropsWithRequiredChildren.js'
+export * from './Serializable.js'

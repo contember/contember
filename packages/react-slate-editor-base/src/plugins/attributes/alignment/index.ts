@@ -1,1 +1,1 @@
-export * from './alignButton'
+export * from './alignButton.js'

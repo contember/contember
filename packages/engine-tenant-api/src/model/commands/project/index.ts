@@ -1,3 +1,3 @@
-export * from './CreateProjectCommand'
-export * from './SetProjectSecretCommand'
-export * from './UpdateProjectCommand'
+export * from './CreateProjectCommand.js'
+export * from './SetProjectSecretCommand.js'
+export * from './UpdateProjectCommand.js'

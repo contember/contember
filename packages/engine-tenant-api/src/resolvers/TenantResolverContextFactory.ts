@@ -1,7 +1,7 @@
-import { TenantResolverContext } from './TenantResolverContext'
-import { DatabaseContext, PermissionContext, PermissionContextFactory } from '../model'
+import { TenantResolverContext } from './TenantResolverContext.js'
+import { DatabaseContext, PermissionContext, PermissionContextFactory } from '../model/index.js'
 import { Logger } from '@contember/logger'
-import { AuthLogService } from '../model/service/AuthLogService'
+import { AuthLogService } from '../model/service/AuthLogService.js'
 
 export const createResolverContext = (permissionContext: PermissionContext, apiKeyId: string, trustForwardedInfo = false) => {
 	return {

@@ -1,5 +1,5 @@
 import { Editor, Element as SlateElement, Node as SlateNode, Path } from 'slate'
-import { isElementWithReference } from '../elements'
+import { isElementWithReference } from '../elements/index.js'
 
 const isPathInReferenceElement = (editor: Editor, path: Path) => {
 	for (const [node] of SlateNode.levels(editor, path, { reverse: true })) {

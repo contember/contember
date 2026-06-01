@@ -15,17 +15,17 @@ import {
 	withTables,
 	withUnderline,
 } from '@contember/react-slate-editor-base'
-import { AnchorRenderer } from './elements/AnchorRenderer'
-import { ParagraphRenderer } from './elements/ParagraphRenderer'
-import { HeadingRenderer } from './elements/HeadingRenderer'
-import { ListItemRenderer } from './elements/ListItemRenderer'
-import { OrderedListRenderer } from './elements/OrderedListRenderer'
-import { UnorderedListRenderer } from './elements/UnorderedListRenderer'
-import { HorizontalRuleRenderer } from './elements/HorizontalRuleRenderer'
-import { ScrollTargetRenderer } from './elements/ScrollTargetRenderer'
-import { TableElementRenderer } from './elements/TableElementRenderer'
-import { TableCellElementRenderer } from './elements/TableCellElementRenderer'
-import { TableRowElementRenderer } from './elements/TableRowElementRenderer'
+import { AnchorRenderer } from './elements/AnchorRenderer.js'
+import { ParagraphRenderer } from './elements/ParagraphRenderer.js'
+import { HeadingRenderer } from './elements/HeadingRenderer.js'
+import { ListItemRenderer } from './elements/ListItemRenderer.js'
+import { OrderedListRenderer } from './elements/OrderedListRenderer.js'
+import { UnorderedListRenderer } from './elements/UnorderedListRenderer.js'
+import { HorizontalRuleRenderer } from './elements/HorizontalRuleRenderer.js'
+import { ScrollTargetRenderer } from './elements/ScrollTargetRenderer.js'
+import { TableElementRenderer } from './elements/TableElementRenderer.js'
+import { TableCellElementRenderer } from './elements/TableCellElementRenderer.js'
+import { TableRowElementRenderer } from './elements/TableRowElementRenderer.js'
 
 export const baseEditorPlugins = {
 	anchor: withAnchors({

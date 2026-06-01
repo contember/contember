@@ -1,5 +1,5 @@
 import { DatabaseQuery, DatabaseQueryable, SelectBuilder } from '@contember/database'
-import { Project } from '../../type'
+import { Project } from '../../type/index.js'
 
 export class ProjectsQuery extends DatabaseQuery<Project[]> {
 	async fetch({ db }: DatabaseQueryable): Promise<Project[]> {

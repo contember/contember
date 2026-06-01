@@ -1,7 +1,7 @@
-import { DatabaseContext } from '../utils'
-import { PatchIdentityGlobalRoles } from '../commands'
-import { Response, ResponseError, ResponseOk } from '../utils/Response'
-import { TenantRole } from '../authorization'
+import { DatabaseContext } from '../utils/index.js'
+import { PatchIdentityGlobalRoles } from '../commands/index.js'
+import { Response, ResponseError, ResponseOk } from '../utils/Response.js'
+import { TenantRole } from '../authorization/index.js'
 
 export class RolesManager {
 	async addGlobalRoles(dbContext: DatabaseContext, identityId: string, roles: readonly string[]): Promise<Response<null, GlobalRolesErrorCode>> {

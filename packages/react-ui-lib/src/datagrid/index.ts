@@ -27,16 +27,16 @@ export {
 	type DataGridTextFilterProps,
 	DataGridUnionTextFilter,
 	type DataGridUnionTextFilterProps,
-} from './filters'
+} from './filters/index.js'
 
-export * from './cells'
-export * from './columns'
-export * from './empty'
-export * from './export'
-export * from './grid'
-export * from './layout-switcher'
-export * from './loader'
-export * from './pagination'
-export * from './tiles'
-export * from './toolbar'
-export * from './table'
+export * from './cells.js'
+export * from './columns.js'
+export * from './empty.js'
+export * from './export.js'
+export * from './grid.js'
+export * from './layout-switcher.js'
+export * from './loader.js'
+export * from './pagination.js'
+export * from './tiles.js'
+export * from './toolbar.js'
+export * from './table.js'

@@ -1,6 +1,6 @@
 import { ExpectedQuery } from '@contember/database-tester'
-import { SQL } from '../../../../src/tags'
-import { IdentityProviderRow } from '../../../../../src/model/queries/idp/types'
+import { SQL } from '../../../../src/tags.js'
+import { IdentityProviderRow } from '../../../../../src/model/queries/idp/types.js'
 
 export const getIdpBySlugSql = (args: {
 	slug: string

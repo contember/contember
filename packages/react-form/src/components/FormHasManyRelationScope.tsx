@@ -1,6 +1,6 @@
 import { HasManyRelationMarker, SugaredRelativeEntityList, useEntityList } from '@contember/react-binding'
 import * as React from 'react'
-import { FormFieldStateProvider } from './FormFieldStateProvider'
+import { FormFieldStateProvider } from './FormFieldStateProvider.js'
 import { useMemo } from 'react'
 
 export type FormHasManyRelationScopeProps = {

@@ -1,6 +1,6 @@
 import { MigrationsResolver, MigrationsStatusResolver } from '@contember/migrations-client'
-import { SystemClientProvider } from '../SystemClientProvider'
-import { MigrationPrinter } from './MigrationPrinter'
+import { SystemClientProvider } from '../SystemClientProvider.js'
+import { MigrationPrinter } from './MigrationPrinter.js'
 
 export class MigrationsStatusFacade {
 	constructor(

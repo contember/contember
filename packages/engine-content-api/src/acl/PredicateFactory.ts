@@ -1,6 +1,6 @@
 import { Acl, Input, Model } from '@contember/schema'
-import { VariableInjector } from './VariableInjector'
-import { EvaluatedPredicateReplacer } from './EvaluatedPredicateReplacer'
+import { VariableInjector } from './VariableInjector.js'
+import { EvaluatedPredicateReplacer } from './EvaluatedPredicateReplacer.js'
 
 const getRowLevelPredicatePseudoField = (entity: Model.Entity) => entity.primary
 

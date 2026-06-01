@@ -2,9 +2,9 @@ import * as React from 'react'
 import { ReactNode } from 'react'
 import * as ToastPrimitives from '@radix-ui/react-toast'
 import { X } from 'lucide-react'
-import { uic } from '../utils'
-import { ToasterProvider, useToasts } from './toaster'
-import { dict } from '../dict'
+import { uic } from '../utils/index.js'
+import { ToasterProvider, useToasts } from './toaster.js'
+import { dict } from '../dict.js'
 
 export const ToastContent = ({ title, children, action, details }: {
 	title?: ReactNode

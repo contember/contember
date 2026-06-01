@@ -1,5 +1,5 @@
-import { createMetadataStore } from '../../../utils'
-import { BasicTriggerDefinition, WatchTriggerDefinition } from '../triggers'
+import { createMetadataStore } from '../../../utils/index.js'
+import { BasicTriggerDefinition, WatchTriggerDefinition } from '../triggers.js'
 
 type StoredTrigger =
 	| { type: 'basic'; definition: BasicTriggerDefinition }

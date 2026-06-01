@@ -1,12 +1,12 @@
 import { Editor, Element, Node as SlateNode, NodeEntry, Path as SlatePath, Point, Range as SlateRange, Text, Transforms } from 'slate'
-import { ContemberEditor } from '../../../editor'
-import { isTableCellElement, TableCellElement, tableCellElementPlugin } from './TableCellElement'
-import { getTableElementColumnCount, getTableElementRowCount, isTableElement, TableElement, tableElementPlugin } from './TableElement'
-import { getTableCellCoordinates, selectTableCellContents } from './TableElementSelection'
-import { tableHTMLDeserializer } from './TableHtmlDeserializer'
-import { TableModifications } from './TableModifications'
-import { isTableRowElement, TableRowElement, tableRowElementPlugin } from './TableRowElement'
-import { ElementRenderer } from '../../../types'
+import { ContemberEditor } from '../../../editor/index.js'
+import { isTableCellElement, TableCellElement, tableCellElementPlugin } from './TableCellElement.js'
+import { getTableElementColumnCount, getTableElementRowCount, isTableElement, TableElement, tableElementPlugin } from './TableElement.js'
+import { getTableCellCoordinates, selectTableCellContents } from './TableElementSelection.js'
+import { tableHTMLDeserializer } from './TableHtmlDeserializer.js'
+import { TableModifications } from './TableModifications.js'
+import { isTableRowElement, TableRowElement, tableRowElementPlugin } from './TableRowElement.js'
+import { ElementRenderer } from '../../../types/index.js'
 
 export const withTables = ({ renderTable, renderTableCell, renderTableRow }: {
 	renderTable: ElementRenderer<TableElement>

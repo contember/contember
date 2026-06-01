@@ -1,5 +1,5 @@
 import { Command, CommandConfiguration, Input } from '@contember/cli-common'
-import { MigrationSnapshotFacade } from '../../lib/migrations/MigrationSnapshotFacade'
+import { MigrationSnapshotFacade } from '../../lib/migrations/MigrationSnapshotFacade.js'
 
 type Args = {}
 

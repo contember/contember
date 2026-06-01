@@ -1,8 +1,8 @@
 import * as React from 'react'
 import * as SheetPrimitive from '@radix-ui/react-dialog'
-import { uic } from '../utils/uic'
+import { uic } from '../utils/uic.js'
 import { XIcon } from 'lucide-react'
-import { createComponentOpenHooks } from '../utils/createComponentOpenHooks'
+import { createComponentOpenHooks } from '../utils/createComponentOpenHooks.js'
 
 export const { Component: Sheet, useOpen: useSheetOpenState } = createComponentOpenHooks(SheetPrimitive.Root)
 

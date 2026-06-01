@@ -1,3 +1,3 @@
-export * from './FieldsVisitor'
-export * from './FieldsVisitorFactory'
-export * from './MetaHandler'
+export * from './FieldsVisitor.js'
+export * from './FieldsVisitorFactory.js'
+export * from './MetaHandler.js'

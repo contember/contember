@@ -1,5 +1,5 @@
 import React, { ReactNode } from 'react'
-import { useDataViewEntityListAccessor } from '../contexts'
+import { useDataViewEntityListAccessor } from '../contexts.js'
 
 /**
  * Renders children when the DataView is not empty.

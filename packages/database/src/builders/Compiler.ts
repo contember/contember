@@ -1,12 +1,12 @@
-import { aliasLiteral, assertNever, prependSchema, wrapIdentifier } from '../utils'
-import { SelectBuilder } from './SelectBuilder'
-import { Literal } from '../Literal'
-import { DeleteBuilder } from './DeleteBuilder'
-import { InsertBuilder } from './InsertBuilder'
-import { UpdateBuilder } from './UpdateBuilder'
-import { QueryBuilder } from './QueryBuilder'
-import { LockType } from './LockType'
-import { ConflictActionType } from './ConflictActionType'
+import { aliasLiteral, assertNever, prependSchema, wrapIdentifier } from '../utils/index.js'
+import { SelectBuilder } from './SelectBuilder.js'
+import { Literal } from '../Literal.js'
+import { DeleteBuilder } from './DeleteBuilder.js'
+import { InsertBuilder } from './InsertBuilder.js'
+import { UpdateBuilder } from './UpdateBuilder.js'
+import { QueryBuilder } from './QueryBuilder.js'
+import { LockType } from './LockType.js'
+import { ConflictActionType } from './ConflictActionType.js'
 
 class Compiler {
 	compileSelect(options: SelectBuilder.Options, namespaceContext: Compiler.Context): Literal {

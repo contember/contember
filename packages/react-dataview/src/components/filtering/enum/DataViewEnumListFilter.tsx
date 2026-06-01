@@ -1,10 +1,10 @@
 import { Component, SugaredRelativeSingleField } from '@contember/react-binding'
 import * as React from 'react'
-import { getFilterName } from '../../../internal/helpers/getFilterName'
-import { createEnumListFilter } from '../../../filterTypes'
-import { DataViewFilter } from '../DataViewFilter'
-import { DataViewEnumFilterArgsContext, DataViewFilterNameContext } from '../../../contexts'
-import { useDataViewTargetFieldSchema } from '../../../hooks'
+import { getFilterName } from '../../../internal/helpers/getFilterName.js'
+import { createEnumListFilter } from '../../../filterTypes/index.js'
+import { DataViewFilter } from '../DataViewFilter.js'
+import { DataViewEnumFilterArgsContext, DataViewFilterNameContext } from '../../../contexts.js'
+import { useDataViewTargetFieldSchema } from '../../../hooks/index.js'
 
 export interface DataViewEnumListFilterProps {
 	/**

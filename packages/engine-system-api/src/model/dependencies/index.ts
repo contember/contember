@@ -1,2 +1,2 @@
-export * from './tenant'
-export * from './content/ContentQueryExecutor'
+export * from './tenant/index.js'
+export * from './content/ContentQueryExecutor.js'

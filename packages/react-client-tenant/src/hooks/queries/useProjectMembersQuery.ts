@@ -1,6 +1,6 @@
 import * as TenantApi from '@contember/graphql-client-tenant'
 import { ModelType, ParameterRef } from 'graphql-ts-client-api'
-import { TenantApiOptions, useTenantApi } from '../useTenantApi'
+import { TenantApiOptions, useTenantApi } from '../useTenantApi.js'
 import { useCallback } from 'react'
 
 const projectIdentityRelationFragment = TenantApi

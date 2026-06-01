@@ -1,5 +1,5 @@
 import { expect, test } from 'bun:test'
-import { S3ObjectAuthorizator, S3Service } from '../../src'
+import { S3ObjectAuthorizator, S3Service } from '../../src/index.js'
 
 const mocked = new Date('2021-07-02T17:22Z')
 const constantUuid = '9fce3907-ff2b-45bb-b4ce-eff5527dd315'

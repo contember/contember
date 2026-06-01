@@ -1,6 +1,6 @@
-import { parseDsn } from '../dsn'
-import { RemoteProject } from './RemoteProject'
-import { CliEnv } from '../env'
+import { parseDsn } from '../dsn.js'
+import { RemoteProject } from './RemoteProject.js'
+import { CliEnv } from '../env.js'
 
 export class RemoteProjectResolver {
 	constructor(

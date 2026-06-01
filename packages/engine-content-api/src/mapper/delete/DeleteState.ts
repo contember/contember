@@ -1,7 +1,7 @@
-import { DeletedEntitiesStorage } from './DeletedEntitiesStorage'
+import { DeletedEntitiesStorage } from './DeletedEntitiesStorage.js'
 import { Input } from '@contember/schema'
-import { ImplementationException } from '../../exception'
-import { MutationResult, MutationResultList } from '../Result'
+import { ImplementationException } from '../../exception.js'
+import { MutationResult, MutationResultList } from '../Result.js'
 
 export class DeleteState {
 	private plannedDelete = new DeletedEntitiesStorage()

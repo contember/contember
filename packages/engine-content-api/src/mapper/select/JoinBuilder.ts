@@ -1,7 +1,7 @@
-import { Path } from './Path'
+import { Path } from './Path.js'
 import { acceptRelationTypeVisitor, getTargetEntity } from '@contember/schema-utils'
 import { Model } from '@contember/schema'
-import { JoinVisitor } from './JoinVisitor'
+import { JoinVisitor } from './JoinVisitor.js'
 import { Operator } from '@contember/database'
 import { SelectBuilder } from '@contember/database'
 

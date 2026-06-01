@@ -1,6 +1,6 @@
-import type { GetEntityByKey } from './GetEntityByKey'
-import type { GetEntityListSubTree } from './GetEntityListSubTree'
-import type { GetEntitySubTree } from './GetEntitySubTree'
+import type { GetEntityByKey } from './GetEntityByKey.js'
+import type { GetEntityListSubTree } from './GetEntityListSubTree.js'
+import type { GetEntitySubTree } from './GetEntitySubTree.js'
 
 export interface BatchUpdatesOptions {
 	getEntityByKey: GetEntityByKey

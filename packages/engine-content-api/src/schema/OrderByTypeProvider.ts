@@ -9,10 +9,10 @@ import {
 } from 'graphql'
 import { Acl, Model } from '@contember/schema'
 import { acceptFieldVisitor } from '@contember/schema-utils'
-import { singletonFactory } from '../utils'
-import { GqlTypeName } from './utils'
-import { Authorizator } from '../acl'
-import { FieldAccessVisitor } from './FieldAccessVisitor'
+import { singletonFactory } from '../utils/index.js'
+import { GqlTypeName } from './utils.js'
+import { Authorizator } from '../acl/index.js'
+import { FieldAccessVisitor } from './FieldAccessVisitor.js'
 
 export class OrderByTypeProvider {
 	private orderBySingleton = singletonFactory(name => this.createEntityOrderByType(name))

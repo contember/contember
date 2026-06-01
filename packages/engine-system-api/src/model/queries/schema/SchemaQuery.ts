@@ -1,6 +1,6 @@
 import { DatabaseQuery, DatabaseQueryable, Literal, SelectBuilder } from '@contember/database'
 import { Schema } from '@contember/schema'
-import { SchemaWithMeta } from '../../migrations'
+import { SchemaWithMeta } from '../../migrations/index.js'
 
 export class SchemaQuery extends DatabaseQuery<SchemaWithMeta | null> {
 	constructor(

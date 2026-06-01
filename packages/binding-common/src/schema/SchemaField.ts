@@ -1,4 +1,4 @@
-import type { SchemaColumn } from './SchemaColumn'
-import type { SchemaRelation } from './SchemaRelation'
+import type { SchemaColumn } from './SchemaColumn.js'
+import type { SchemaRelation } from './SchemaRelation.js'
 
 export type SchemaField = SchemaRelation | SchemaColumn

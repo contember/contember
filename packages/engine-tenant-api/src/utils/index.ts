@@ -1,2 +1,2 @@
-export * from './Mailer'
-export * from './TemplateRenderer'
+export * from './Mailer.js'
+export * from './TemplateRenderer.js'

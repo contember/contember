@@ -1,11 +1,11 @@
-import { mutationFragments } from './utils/mutationFragments'
+import { mutationFragments } from './utils/mutationFragments.js'
 import { GraphQlClient, GraphQlClientRequestOptions } from '@contember/graphql-client'
 import { GraphQlQueryPrinter } from '@contember/graphql-builder'
-import { ContentMutation, ContentQuery } from './nodes'
-import { createMutationOperationSet } from './utils/createMutationOperationSet'
-import { createQueryOperationSet } from './utils/createQueryOperationSet'
-import { MutationError, ValidationResult } from './types'
-import { MutationFailedError } from './MutationFailedError'
+import { ContentMutation, ContentQuery } from './nodes/index.js'
+import { createMutationOperationSet } from './utils/createMutationOperationSet.js'
+import { createQueryOperationSet } from './utils/createQueryOperationSet.js'
+import { MutationError, ValidationResult } from './types/index.js'
+import { MutationFailedError } from './MutationFailedError.js'
 
 export type QueryExecutorOptions = GraphQlClientRequestOptions
 

@@ -1,5 +1,5 @@
-import { PersonRow } from '../../model'
-import { IdentityProjectRelation, Person } from '../../schema'
+import { PersonRow } from '../../model/index.js'
+import { IdentityProjectRelation, Person } from '../../schema/index.js'
 
 export class PersonResponseFactory {
 	public static createPersonResponse(personRow: Omit<PersonRow, 'roles'>, projects: ReadonlyArray<IdentityProjectRelation> = []): Person {

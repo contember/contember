@@ -1,4 +1,4 @@
-import { CreateListener, DeleteListener, IndirectListener, JunctionListener, UpdateListener } from './TriggerListenersStore'
+import { CreateListener, DeleteListener, IndirectListener, JunctionListener, UpdateListener } from './TriggerListenersStore.js'
 
 export interface TriggerListeners {
 	readonly deleteListeners: Map<string, DeleteListener[]>

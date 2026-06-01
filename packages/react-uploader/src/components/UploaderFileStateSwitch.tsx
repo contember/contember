@@ -1,12 +1,12 @@
 import { ComponentType, createElement, isValidElement, ReactElement } from 'react'
-import { useUploaderFileState } from '../contexts'
+import { useUploaderFileState } from '../contexts.js'
 import {
 	UploaderFileStateError,
 	UploaderFileStateFinalizing,
 	UploaderFileStateInitial,
 	UploaderFileStateSuccess,
 	UploaderFileStateUploading,
-} from '../types'
+} from '../types/index.js'
 
 export interface UploaderFileStateSwitchProps {
 	initial?: ReactElement | ComponentType<UploaderFileStateInitial>

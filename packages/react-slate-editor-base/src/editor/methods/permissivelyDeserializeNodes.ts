@@ -1,6 +1,6 @@
-import { toLatestFormat } from './toLatestFormat'
+import { toLatestFormat } from './toLatestFormat.js'
 import { Editor as SlateEditor, Element as SlateElement, Text as SlateText } from 'slate'
-import { SerializableEditorNode } from '../../types/editor'
+import { SerializableEditorNode } from '../../types/editor.js'
 
 export const permissivelyDeserializeNodes = <E extends SlateEditor>(
 	editor: E,

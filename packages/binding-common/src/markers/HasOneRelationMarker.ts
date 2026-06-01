@@ -1,7 +1,7 @@
-import type { Environment } from '../environment'
-import type { HasOneRelation } from '../treeParameters'
-import type { EntityFieldMarkersContainer } from './EntityFieldMarkersContainer'
-import { PlaceholderGenerator } from './PlaceholderGenerator'
+import type { Environment } from '../environment/index.js'
+import type { HasOneRelation } from '../treeParameters/index.js'
+import type { EntityFieldMarkersContainer } from './EntityFieldMarkersContainer.js'
+import { PlaceholderGenerator } from './PlaceholderGenerator.js'
 
 // This may also represent a reduced has many relation.
 export class HasOneRelationMarker {

@@ -5,8 +5,8 @@ import {
 	QualifiedSingleEntity,
 	UnconstrainedQualifiedEntityList,
 	UnconstrainedQualifiedSingleEntity,
-} from '../treeParameters'
-import { Environment } from '../environment'
+} from '../treeParameters/index.js'
+import { Environment } from '../environment/index.js'
 
 export class PlaceholderParametersGenerator {
 	public static createHasOneRelationParameters(relation: HasOneRelation): any {

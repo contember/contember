@@ -1,2 +1,2 @@
-export * from './DataViewSortingSwitch'
-export * from './DataViewSortingTrigger'
+export * from './DataViewSortingSwitch.js'
+export * from './DataViewSortingTrigger.js'

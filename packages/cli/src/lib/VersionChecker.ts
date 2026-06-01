@@ -1,8 +1,8 @@
 import { join, relative } from 'node:path'
 import * as semver from 'semver'
 import { PackageWorkspaceResolver } from '@contember/cli-common'
-import { DockerComposeManager } from './fs/DockerComposeManager'
-import { contemberDockerImages } from '../consts'
+import { DockerComposeManager } from './fs/DockerComposeManager.js'
+import { contemberDockerImages } from '../consts.js'
 
 export class VersionChecker {
 	constructor(

@@ -1,5 +1,5 @@
-import { GraphQlClientError, GraphQlErrorType } from './GraphQlClientError'
-import { GraphQlClientOptions, GraphQlClientRequestOptions } from './GraphQlClientRequestOptions'
+import { GraphQlClientError, GraphQlErrorType } from './GraphQlClientError.js'
+import { GraphQlClientOptions, GraphQlClientRequestOptions } from './GraphQlClientRequestOptions.js'
 
 export class GraphQlClient {
 	constructor(

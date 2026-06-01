@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react'
 import type { TreeRootId } from '@contember/binding'
-import { TreeRootIdContext } from './TreeRootIdContext'
+import { TreeRootIdContext } from './TreeRootIdContext.js'
 
 export interface TreeRootIdProviderProps {
 	treeRootId: TreeRootId | undefined

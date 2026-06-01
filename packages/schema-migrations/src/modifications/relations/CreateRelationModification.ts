@@ -1,21 +1,21 @@
 import { Model, Schema } from '@contember/schema'
 import { acceptRelationTypeVisitor, isInverseRelation, isOwningRelation, isRelation } from '@contember/schema-utils'
 import { MigrationBuilder } from '@contember/database-migrations'
-import { addField, SchemaUpdater, updateEntity, updateModel, updateSchema } from '../utils/schemaUpdateUtils'
+import { addField, SchemaUpdater, updateEntity, updateModel, updateSchema } from '../utils/schemaUpdateUtils.js'
 import {
 	createModificationType,
 	Differ,
 	ModificationHandler,
 	ModificationHandlerCreateSqlOptions,
 	ModificationHandlerOptions,
-} from '../ModificationHandler'
-import { isIt } from '../../utils/isIt'
-import { createFields } from '../utils/diffUtils'
-import { getPrimaryColumnType } from '../utils/getPrimaryColumnType'
-import { createJunctionTableSql } from '../utils/createJunctionTable'
-import { normalizeManyHasManyRelation, PartialManyHasManyRelation } from './normalization'
-import { addForeignKeyConstraint } from './helpers'
-import { wrapIdentifier } from '../../utils/dbHelpers'
+} from '../ModificationHandler.js'
+import { isIt } from '../../utils/isIt.js'
+import { createFields } from '../utils/diffUtils.js'
+import { getPrimaryColumnType } from '../utils/getPrimaryColumnType.js'
+import { createJunctionTableSql } from '../utils/createJunctionTable.js'
+import { normalizeManyHasManyRelation, PartialManyHasManyRelation } from './normalization.js'
+import { addForeignKeyConstraint } from './helpers.js'
+import { wrapIdentifier } from '../../utils/dbHelpers.js'
 
 export class CreateRelationModificationHandler implements ModificationHandler<CreateRelationModificationData> {
 	constructor(

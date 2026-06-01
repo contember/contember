@@ -1,8 +1,8 @@
 import { AccessNode } from '@contember/authorization'
-import { PermissionActions } from './PermissionActions'
+import { PermissionActions } from './PermissionActions.js'
 import { Acl } from '@contember/schema'
-import { MembershipMatcher } from './MembershipMatcher'
-import { DirectPermissionsAccessNode } from './DirectPermissionsAccessNode'
+import { MembershipMatcher } from './MembershipMatcher.js'
+import { DirectPermissionsAccessNode } from './DirectPermissionsAccessNode.js'
 
 export class AclSchemaAccessNodeFactory {
 	create(schema: Acl.Schema, memberships: readonly Acl.Membership[]): AccessNode {

@@ -1,4 +1,4 @@
-import { CaptchaProviderHandler, CaptchaVerifyArgs, CaptchaVerifyResult } from './CaptchaProvider'
+import { CaptchaProviderHandler, CaptchaVerifyArgs, CaptchaVerifyResult } from './CaptchaProvider.js'
 
 const DEFAULT_THRESHOLD = 0.5
 

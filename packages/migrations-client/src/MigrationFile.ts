@@ -1,6 +1,6 @@
 import { Migration } from '@contember/schema-migrations'
-import { JSONObject } from './utils/json'
-import { SchemaVersionBuilder } from './SchemaVersionBuilder'
+import { JSONObject } from './utils/json.js'
+import { SchemaVersionBuilder } from './SchemaVersionBuilder.js'
 
 export interface MigrationFile {
 	path: string

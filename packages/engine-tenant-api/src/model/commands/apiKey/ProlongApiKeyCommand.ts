@@ -1,6 +1,6 @@
-import { Command } from '../Command'
-import { ApiKey } from '../../type'
-import { ApiKeyHelper } from './ApiKeyHelper'
+import { Command } from '../Command.js'
+import { ApiKey } from '../../type/index.js'
+import { ApiKeyHelper } from './ApiKeyHelper.js'
 import { QueryBuilder, UpdateBuilder } from '@contember/database'
 
 const PROLONG_THROTTLE_MS = 60_000

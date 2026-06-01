@@ -1,7 +1,7 @@
 import { describe, expect, test } from 'bun:test'
-import { HCaptchaProvider } from '../../../src/model/service/captcha/HCaptchaProvider'
-import { RecaptchaV3Provider } from '../../../src/model/service/captcha/RecaptchaV3Provider'
-import { TurnstileProvider } from '../../../src/model/service/captcha/TurnstileProvider'
+import { HCaptchaProvider } from '../../../src/model/service/captcha/HCaptchaProvider.js'
+import { RecaptchaV3Provider } from '../../../src/model/service/captcha/RecaptchaV3Provider.js'
+import { TurnstileProvider } from '../../../src/model/service/captcha/TurnstileProvider.js'
 
 /** Builds a fetch stub returning the given JSON payload, capturing the request. */
 const stubFetch = (payload: unknown) => {

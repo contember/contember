@@ -1,4 +1,4 @@
-import { ResponseError } from '../model/utils/Response'
+import { ResponseError } from '../model/utils/Response.js'
 
 type Error<T> = { code: T; developerMessage: string }
 type ErrorResponse<T, Meta = {}> = { ok: false; error: Error<T> & Meta; errors: [Error<T> & Meta] }

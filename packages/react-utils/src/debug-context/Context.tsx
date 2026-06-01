@@ -1,6 +1,6 @@
 import { createContext, memo, ReactNode, useContext, useMemo, useRef } from 'react'
-import { isNoopScopedConsole, noopScopedConsole } from './Constants'
-import { ScopedConsoleContextType } from './Types'
+import { isNoopScopedConsole, noopScopedConsole } from './Constants.js'
+import { ScopedConsoleContextType } from './Types.js'
 
 function createPrefixedConsole(message: string, prefixedConsole?: ScopedConsoleContextType): ScopedConsoleContextType {
 	return {

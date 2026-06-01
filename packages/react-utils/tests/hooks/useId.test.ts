@@ -1,6 +1,6 @@
 import { renderHook } from '@testing-library/react'
 import { describe, expect, test } from 'bun:test'
-import { useId } from '../../src'
+import { useId } from '../../src/index.js'
 
 describe('@contember/utilities', () => {
 	test('useClassName', () => {

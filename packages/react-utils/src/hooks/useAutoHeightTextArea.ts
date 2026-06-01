@@ -1,6 +1,6 @@
 import { useCallback, useLayoutEffect } from 'react'
-import { RefObjectOrElement, unwrapRefValue } from './unwrapRefValue'
-import { useOnElementResize } from './useOnElementResize'
+import { RefObjectOrElement, unwrapRefValue } from './unwrapRefValue.js'
+import { useOnElementResize } from './useOnElementResize.js'
 
 function px<V extends number | false | null | undefined>(value?: V): string {
 	return typeof value === 'number' && !(isNaN(value) || value === Infinity || value === -Infinity) ? value + 'px' : ''

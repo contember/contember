@@ -1,5 +1,5 @@
 import { expect, test } from 'bun:test'
-import { apiUrl, createTester, gql, rootToken } from '../../src/tester'
+import { apiUrl, createTester, gql, rootToken } from '../../src/tester.js'
 
 import { c, createSchema } from '@contember/schema-definition'
 

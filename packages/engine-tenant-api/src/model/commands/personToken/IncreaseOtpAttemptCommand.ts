@@ -1,6 +1,6 @@
-import { Command } from '../Command'
+import { Command } from '../Command.js'
 import { Literal, UpdateBuilder } from '@contember/database'
-import { ImplementationException } from '../../../exceptions'
+import { ImplementationException } from '../../../exceptions.js'
 
 export class IncreaseOtpAttemptCommand implements Command<void> {
 	constructor(

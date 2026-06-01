@@ -1,11 +1,11 @@
 import { describe } from 'bun:test'
-import { testMigrations } from '../../src/tests'
+import { testMigrations } from '../../src/tests.js'
 import { createSchema, SchemaBuilder } from '@contember/schema-definition'
 import { Model } from '@contember/schema'
-import { SQL } from '../../src/tags'
+import { SQL } from '../../src/tags.js'
 import { SchemaDefinition as def } from '@contember/schema-definition'
 import { createDatabaseMetadata } from '@contember/database'
-import { removeUniqueConstraintModification } from '../../../src'
+import { removeUniqueConstraintModification } from '../../../src/index.js'
 
 describe('remove relation (many has one)', () =>
 	testMigrations({

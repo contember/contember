@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 import { describe, expect, test } from 'bun:test'
-import { ContentClientInput } from '../../../src'
-import { ContemberClientEntities, FragmentOf, FragmentType, PostStatus, queryBuilder } from '../../client'
+import { ContentClientInput } from '../../../src/index.js'
+import { ContemberClientEntities, FragmentOf, FragmentType, PostStatus, queryBuilder } from '../../client/index.js'
 import { expectTypeOf } from 'expect-type'
 
 const qb = queryBuilder

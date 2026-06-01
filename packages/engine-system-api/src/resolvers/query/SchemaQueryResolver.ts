@@ -1,7 +1,7 @@
 import { GraphQLResolveInfo } from 'graphql'
-import { SystemResolverContext } from '../SystemResolverContext'
-import { QueryResolver } from '../Resolver'
-import { AuthorizationActions, StagesQuery } from '../../model'
+import { SystemResolverContext } from '../SystemResolverContext.js'
+import { QueryResolver } from '../Resolver.js'
+import { AuthorizationActions, StagesQuery } from '../../model/index.js'
 
 export class SchemaQueryResolver implements QueryResolver<'schema'> {
 	async schema(

@@ -1,6 +1,6 @@
-import type { Environment } from '../environment'
+import type { Environment } from '../environment/index.js'
 import { LRUCache } from '@contember/utilities'
-import type { Parser } from './Parser'
+import type { Parser } from './Parser.js'
 
 type CacheByEntryPoint = {
 	[Entry in Parser.EntryPoint]: LRUCache<string, Parser.ParserResult[Entry]>

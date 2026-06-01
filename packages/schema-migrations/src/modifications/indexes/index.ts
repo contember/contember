@@ -1,2 +1,2 @@
-export * from './CreateIndexModification'
-export * from './RemoveIndexModification'
+export * from './CreateIndexModification.js'
+export * from './RemoveIndexModification.js'

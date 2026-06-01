@@ -1,5 +1,5 @@
 import { Input } from '@contember/client'
-import { createFieldFilterHandler } from './createFilterHandler'
+import { createFieldFilterHandler } from './createFilterHandler.js'
 
 export type EnumFilterArtifacts = {
 	values?: string[]

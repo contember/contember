@@ -1,5 +1,5 @@
-import type { EntityListState } from '../core/state'
-import type { ListOperations } from '../core/operations'
+import type { EntityListState } from '../core/state/index.js'
+import type { ListOperations } from '../core/operations/index.js'
 import {
 	EntityAccessor,
 	EntityId,

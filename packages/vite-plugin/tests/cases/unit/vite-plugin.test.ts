@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, mock, spyOn } from 'bun:test'
-import contember from '../../../src'
+import contember from '../../../src/index.js'
 import { ConfigEnv, Plugin, UserConfig } from 'vite'
 
 const invokePluginHook = (plugin: Plugin, hookName: string, ...args: any[]) => {

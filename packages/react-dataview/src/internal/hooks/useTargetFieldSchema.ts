@@ -1,5 +1,5 @@
 import { useEnvironment } from '@contember/react-binding'
-import { useDataViewEntityListProps } from '../../contexts'
+import { useDataViewEntityListProps } from '../../contexts.js'
 import { useMemo } from 'react'
 
 export const useDataViewTargetFieldSchemaInternal = (fields: string[]) => {

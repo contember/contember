@@ -1,1 +1,1 @@
-export * from './assertNever'
+export * from './assertNever.js'

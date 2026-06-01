@@ -1,6 +1,6 @@
 import { isAbsolute, resolve } from 'node:path'
-import { JsCodeRunner } from '../js/JsCodeRunner'
-import { TenantConfig } from './tenantConfig'
+import { JsCodeRunner } from '../js/JsCodeRunner.js'
+import { TenantConfig } from './tenantConfig.js'
 
 const resolvePath = (path: string): string => isAbsolute(path) ? path : resolve(process.cwd(), path)
 

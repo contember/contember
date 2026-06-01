@@ -8,9 +8,9 @@ import {
 	TreeNodeEnvironmentFactory,
 	useField,
 } from '@contember/react-binding'
-import { useFormFieldState } from '../contexts'
+import { useFormFieldState } from '../contexts.js'
 import { dataAttribute } from '@contember/utilities'
-import { useFormInputValidationHandler } from '../hooks'
+import { useFormInputValidationHandler } from '../hooks/index.js'
 import { Slot } from '@radix-ui/react-slot'
 
 const SlotInput = Slot as React.ForwardRefExoticComponent<React.RefAttributes<HTMLInputElement> & React.InputHTMLAttributes<HTMLInputElement>>

@@ -1,6 +1,6 @@
-import { boldMark, boldMarkPlugin } from './boldMark'
-import { EditorPlugin } from '../../../types'
-import { createMarkHtmlDeserializer } from '../../behaviour'
+import { boldMark, boldMarkPlugin } from './boldMark.js'
+import { EditorPlugin } from '../../../types/index.js'
+import { createMarkHtmlDeserializer } from '../../behaviour/index.js'
 
 export const withBold = (): EditorPlugin => editor => {
 	editor.registerMark(boldMarkPlugin)

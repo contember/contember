@@ -1,1 +1,1 @@
-export * from './ContemberClient'
+export * from './ContemberClient.js'

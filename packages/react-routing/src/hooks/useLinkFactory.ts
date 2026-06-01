@@ -1,9 +1,9 @@
 import { useCallback } from 'react'
 import { EntityAccessor, useEnvironment } from '@contember/react-binding'
-import { RequestParameters, RoutingLinkTarget } from '../types'
-import { createBindingLinkParametersResolver, useBindingLinkParametersResolver } from '../internal/hooks/useBindingLinkParametersResolver'
-import { useRoutingLinkFactory } from './useRoutingLinkFactory'
-import { parseLinkTarget } from '../internal/utils/parseLinkTarget'
+import { RequestParameters, RoutingLinkTarget } from '../types/index.js'
+import { createBindingLinkParametersResolver, useBindingLinkParametersResolver } from '../internal/hooks/useBindingLinkParametersResolver.js'
+import { useRoutingLinkFactory } from './useRoutingLinkFactory.js'
+import { parseLinkTarget } from '../internal/utils/parseLinkTarget.js'
 
 export const useLinkFactory = () => {
 	const parametersResolver = useBindingLinkParametersResolver()

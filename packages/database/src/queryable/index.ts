@@ -1,2 +1,2 @@
-export * from './DatabaseQuery'
-export * from './DatabaseQueryable'
+export * from './DatabaseQuery.js'
+export * from './DatabaseQueryable.js'

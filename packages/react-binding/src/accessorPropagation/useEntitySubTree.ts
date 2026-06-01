@@ -1,9 +1,9 @@
 import { useCallback } from 'react'
 import type { Alias, EntityAccessor, SugaredQualifiedSingleEntity, SugaredUnconstrainedQualifiedSingleEntity } from '@contember/binding'
 import { TreeRootId } from '@contember/binding'
-import { useAccessorUpdateSubscription } from './useAccessorUpdateSubscription'
-import { useEntitySubTreeParameters } from './useEntitySubTreeParameters'
-import { useGetEntitySubTree } from './useGetEntitySubTree'
+import { useAccessorUpdateSubscription } from './useAccessorUpdateSubscription.js'
+import { useEntitySubTreeParameters } from './useEntitySubTreeParameters.js'
+import { useGetEntitySubTree } from './useGetEntitySubTree.js'
 
 export const useEntitySubTree = (
 	qualifiedSingleEntity: Alias | SugaredQualifiedSingleEntity | SugaredUnconstrainedQualifiedSingleEntity,

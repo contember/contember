@@ -1,1 +1,1 @@
-export * from './SchemaDatabaseMetadataResolverStore'
+export * from './SchemaDatabaseMetadataResolverStore.js'

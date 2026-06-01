@@ -1,10 +1,10 @@
-import { DatabaseContext } from '../database'
-import { DeleteMigrationCommand } from '../commands'
-import { Response, ResponseError, ResponseOk } from '../../utils'
+import { DatabaseContext } from '../database/index.js'
+import { DeleteMigrationCommand } from '../commands/index.js'
+import { Response, ResponseError, ResponseOk } from '../../utils/index.js'
 import { Migration } from '@contember/schema-migrations'
-import { ModifyMigrationCommand } from '../commands/migrations/ModifyMigrationCommand'
-import { SchemaProvider } from './SchemaProvider'
-import { SaveSchemaCommand } from '../commands/schema/SaveSchemaCommand'
+import { ModifyMigrationCommand } from '../commands/migrations/ModifyMigrationCommand.js'
+import { SchemaProvider } from './SchemaProvider.js'
+import { SaveSchemaCommand } from '../commands/schema/SaveSchemaCommand.js'
 
 export class MigrationAlterer {
 	constructor(

@@ -10,10 +10,10 @@ import {
 	GraphQLScalarType,
 	GraphQLString,
 } from 'graphql'
-import { singletonFactory } from '../utils'
-import { ColumnTypeResolver } from './ColumnTypeResolver'
-import { GqlTypeName } from './utils'
-import { ImplementationException } from '../exception'
+import { singletonFactory } from '../utils/index.js'
+import { ColumnTypeResolver } from './ColumnTypeResolver.js'
+import { GqlTypeName } from './utils.js'
+import { ImplementationException } from '../exception.js'
 
 export class ConditionTypeProvider {
 	private conditions = singletonFactory<GraphQLInputObjectType, string, [GraphQLScalarType | GraphQLEnumType, Model.AnyColumn]>(

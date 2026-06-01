@@ -1,8 +1,8 @@
 import { test } from 'bun:test'
-import { execute } from '../../../../../src/test'
+import { execute } from '../../../../../src/test.js'
 import { SchemaBuilder } from '@contember/schema-definition'
-import { GQL, SQL } from '../../../../../src/tags'
-import { testUuid } from '../../../../../src/testUuid'
+import { GQL, SQL } from '../../../../../src/tags.js'
+import { testUuid } from '../../../../../src/testUuid.js'
 
 test('Posts with filtered tags', async () => {
 	await execute({

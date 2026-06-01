@@ -1,2 +1,2 @@
-export * from './schema'
-export { LaxSchemaConverter } from './LaxSchemaConverter'
+export * from './schema.js'
+export { LaxSchemaConverter } from './LaxSchemaConverter.js'

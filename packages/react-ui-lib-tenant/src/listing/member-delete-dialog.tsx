@@ -10,7 +10,7 @@ import {
 } from '@contember/react-ui-lib-base'
 import { Button } from '@contember/react-ui-lib-base'
 import { TrashIcon } from 'lucide-react'
-import { dict } from '../dict'
+import { dict } from '../dict.js'
 import * as React from 'react'
 import { ReactNode } from 'react'
 import { RemoveProjectMemberTrigger } from '@contember/interface'

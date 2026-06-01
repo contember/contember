@@ -1,5 +1,5 @@
 import { Transforms } from 'slate'
-import { EditorPlugin } from '../../../types'
+import { EditorPlugin } from '../../../types/index.js'
 
 export const withNewline = (): EditorPlugin => editor => {
 	const { onKeyDown } = editor

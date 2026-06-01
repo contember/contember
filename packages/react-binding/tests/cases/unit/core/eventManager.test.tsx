@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'bun:test'
-import { EntityAccessor, EntitySubTree, Field } from '../../../../src'
-import { createBinding } from '../../../lib/bindingFactory'
+import { EntityAccessor, EntitySubTree, Field } from '../../../../src/index.js'
+import { createBinding } from '../../../lib/bindingFactory.js'
 import { c, createSchema } from '@contember/schema-definition'
-import { convertModelToAdminSchema } from '../../../lib/convertModelToAdminSchema'
+import { convertModelToAdminSchema } from '../../../lib/convertModelToAdminSchema.js'
 import assert from 'assert'
 
 import.meta.env.DEV = 'true'

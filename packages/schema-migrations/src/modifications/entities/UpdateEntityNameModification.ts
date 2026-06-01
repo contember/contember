@@ -9,13 +9,13 @@ import {
 	updateEveryField,
 	updateModel,
 	updateSchema,
-} from '../utils/schemaUpdateUtils'
-import { createModificationType, ModificationHandler, ModificationHandlerCreateSqlOptions, ModificationHandlerOptions } from '../ModificationHandler'
-import { isIt } from '../../utils/isIt'
-import { VERSION_ACL_PATCH } from '../ModificationVersions'
-import { NoopModification } from '../NoopModification'
-import { changeValue } from '../utils/valueUtils'
-import { updateEntityTableNameModification } from './UpdateEntityTableNameModification'
+} from '../utils/schemaUpdateUtils.js'
+import { createModificationType, ModificationHandler, ModificationHandlerCreateSqlOptions, ModificationHandlerOptions } from '../ModificationHandler.js'
+import { isIt } from '../../utils/isIt.js'
+import { VERSION_ACL_PATCH } from '../ModificationVersions.js'
+import { NoopModification } from '../NoopModification.js'
+import { changeValue } from '../utils/valueUtils.js'
+import { updateEntityTableNameModification } from './UpdateEntityTableNameModification.js'
 
 export class UpdateEntityNameModificationHandler implements ModificationHandler<UpdateEntityNameModificationData> {
 	private subModification: ModificationHandler<any>

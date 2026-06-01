@@ -1,6 +1,6 @@
 import type { Location as SlateLocation, NodeEntry } from 'slate'
 import { Editor as SlateEditor, Element as SlateElement } from 'slate'
-import { closest } from './closest'
+import { closest } from './closest.js'
 
 export const closestViableBlockContainerEntry = <E extends SlateEditor>(
 	editor: E,

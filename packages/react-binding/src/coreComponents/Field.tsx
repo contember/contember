@@ -1,8 +1,8 @@
 import type { ReactElement, ReactNode } from 'react'
-import { useField } from '../accessorPropagation'
+import { useField } from '../accessorPropagation/index.js'
 import { MarkerFactory } from '@contember/binding'
 import type { FieldValue, SugaredRelativeSingleField } from '@contember/binding'
-import { Component } from './Component'
+import { Component } from './Component.js'
 import { TreeNodeEnvironmentFactory } from '@contember/binding'
 
 export interface FieldBasicProps extends SugaredRelativeSingleField {}

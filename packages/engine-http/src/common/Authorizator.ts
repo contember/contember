@@ -1,6 +1,6 @@
 import { ApiKeyManager, DatabaseContext, VerifyResult } from '@contember/engine-tenant-api'
-import { HttpErrorResponse } from './HttpResponse'
-import { Timer } from '../application'
+import { HttpErrorResponse } from './HttpResponse.js'
+import { Timer } from '../application/index.js'
 import { IncomingMessage } from 'node:http'
 import ipaddr from 'ipaddr.js'
 

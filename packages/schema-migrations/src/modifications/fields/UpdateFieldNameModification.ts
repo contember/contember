@@ -12,13 +12,13 @@ import {
 	updateEveryField,
 	updateModel,
 	updateSchema,
-} from '../utils/schemaUpdateUtils'
-import { createModificationType, ModificationHandler, ModificationHandlerCreateSqlOptions, ModificationHandlerOptions } from '../ModificationHandler'
+} from '../utils/schemaUpdateUtils.js'
+import { createModificationType, ModificationHandler, ModificationHandlerCreateSqlOptions, ModificationHandlerOptions } from '../ModificationHandler.js'
 import { acceptFieldVisitor, PredicateDefinitionProcessor } from '@contember/schema-utils'
-import { VERSION_ACL_PATCH, VERSION_UPDATE_CONSTRAINT_FIELDS, VERSION_UPDATE_INDEX_FIELDS } from '../ModificationVersions'
-import { changeValue } from '../utils/valueUtils'
-import { updateColumnNameModification } from '../columns'
-import { NoopModification } from '../NoopModification'
+import { VERSION_ACL_PATCH, VERSION_UPDATE_CONSTRAINT_FIELDS, VERSION_UPDATE_INDEX_FIELDS } from '../ModificationVersions.js'
+import { changeValue } from '../utils/valueUtils.js'
+import { updateColumnNameModification } from '../columns/index.js'
+import { NoopModification } from '../NoopModification.js'
 
 export class UpdateFieldNameModificationHandler implements ModificationHandler<UpdateFieldNameModificationData> {
 	private renameColumnSubModification: ModificationHandler<any> = new NoopModification()

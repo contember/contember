@@ -1,8 +1,8 @@
 import { MembershipMatcher } from '@contember/engine-tenant-api'
 import * as Typesafe from '@contember/typesafe'
 import { Acl } from '@contember/schema'
-import { HttpErrorResponse } from '../common'
-import { ProjectMembershipFetcher } from './ProjectMembershipFetcher'
+import { HttpErrorResponse } from '../common/index.js'
+import { ProjectMembershipFetcher } from './ProjectMembershipFetcher.js'
 import { MembershipResolver, ParsedMembership } from '@contember/schema-utils'
 
 const assumeMembershipHeader = 'x-contember-assume-membership'

@@ -1,3 +1,3 @@
-export * from './HeadingElement'
-export * from './HeadingHtmlDeserializer'
-export * from './withHeadings'
+export * from './HeadingElement.js'
+export * from './HeadingHtmlDeserializer.js'
+export * from './withHeadings.js'

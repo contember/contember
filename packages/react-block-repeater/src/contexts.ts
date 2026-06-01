@@ -1,6 +1,6 @@
 import { SugaredRelativeSingleField } from '@contember/react-binding'
 import { createRequiredContext } from '@contember/react-utils'
-import { BlocksMap } from './types'
+import { BlocksMap } from './types/index.js'
 
 const BlockRepeaterConfigContext_ = createRequiredContext<{
 	discriminatedBy: SugaredRelativeSingleField['field']

@@ -1,4 +1,4 @@
-import { UpdateInputProcessor } from '../../../inputProcessing'
+import { UpdateInputProcessor } from '../../../inputProcessing/index.js'
 import { Input, Model } from '@contember/schema'
 import {
 	ConstraintType,
@@ -9,12 +9,12 @@ import {
 	MutationResultList,
 	MutationResultType,
 	NothingToDoReason,
-} from '../../Result'
-import { Mapper } from '../../Mapper'
-import { UpdateBuilder } from '../../update/UpdateBuilder'
-import { CheckedPrimary } from '../../CheckedPrimary'
-import { SqlUpdateInputProcessorResult } from '../SqlUpdateInputProcessor'
-import { MapperInput } from '../../types'
+} from '../../Result.js'
+import { Mapper } from '../../Mapper.js'
+import { UpdateBuilder } from '../../update/UpdateBuilder.js'
+import { CheckedPrimary } from '../../CheckedPrimary.js'
+import { SqlUpdateInputProcessorResult } from '../SqlUpdateInputProcessor.js'
+import { MapperInput } from '../../types.js'
 
 type Context = Model.OneHasOneOwningContext
 

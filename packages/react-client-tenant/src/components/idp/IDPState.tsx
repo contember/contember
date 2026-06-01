@@ -1,6 +1,6 @@
 import React, { ReactNode } from 'react'
-import { IDPStateType } from '../../types'
-import { useIDPState } from '../../contexts'
+import { IDPStateType } from '../../types/index.js'
+import { useIDPState } from '../../contexts.js'
 
 export interface IDPStateProps {
 	state: IDPStateType | IDPStateType[]

@@ -1,9 +1,9 @@
 import { Editor, Element as SlateElement, Node as SlateNode, Path as SlatePath, Transforms } from 'slate'
-import { ContemberEditor } from '../../../../editor'
-import type { ListItemElement } from '../ListItemElement'
-import { indentListItem } from './indentListItem'
-import { isListElement } from '../ListElement'
-import { isListItemElement } from '../ListItemElement'
+import { ContemberEditor } from '../../../../editor/index.js'
+import type { ListItemElement } from '../ListItemElement.js'
+import { indentListItem } from './indentListItem.js'
+import { isListElement } from '../ListElement.js'
+import { isListItemElement } from '../ListItemElement.js'
 
 export const dedentListItem = (
 	editor: Editor,

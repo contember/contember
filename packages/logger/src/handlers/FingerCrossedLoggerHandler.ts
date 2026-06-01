@@ -1,5 +1,5 @@
-import { LogEntry, LoggerHandler, LoggerHandlerFactory, LogLevel } from '../types'
-import { LogLevels } from '../levels'
+import { LogEntry, LoggerHandler, LoggerHandlerFactory, LogLevel } from '../types.js'
+import { LogLevels } from '../levels.js'
 
 export interface FingerCrossedLoggerHandlerOptions {
 	logAlwaysLevel: LogLevel

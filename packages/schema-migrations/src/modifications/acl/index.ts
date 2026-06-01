@@ -1,2 +1,2 @@
-export * from './PatchAclSchemaModification'
-export * from './UpdateAclSchemaModification'
+export * from './PatchAclSchemaModification.js'
+export * from './UpdateAclSchemaModification.js'

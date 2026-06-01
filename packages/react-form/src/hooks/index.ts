@@ -1,1 +1,1 @@
-export * from './useFormInputValidationHandler'
+export * from './useFormInputValidationHandler.js'

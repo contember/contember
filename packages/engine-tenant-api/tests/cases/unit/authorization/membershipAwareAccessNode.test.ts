@@ -1,6 +1,6 @@
 import { expect, test } from 'bun:test'
-import { testUuid } from '../../../src/testUuid'
-import { AclSchemaAccessNodeFactory, PermissionActions } from '../../../../src'
+import { testUuid } from '../../../src/testUuid.js'
+import { AclSchemaAccessNodeFactory, PermissionActions } from '../../../../src/index.js'
 import { Acl } from '@contember/schema'
 
 const siteIdA = testUuid(666)

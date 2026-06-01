@@ -1,6 +1,6 @@
 import { QueryLanguage, SugaredRelativeSingleEntity, wrapFilterInHasOnes } from '@contember/react-binding'
-import { DataViewFilterHandler } from '../types'
-import { RelationFilterArtifacts } from './common'
+import { DataViewFilterHandler } from '../types/index.js'
+import { RelationFilterArtifacts } from './common.js'
 
 const id = Symbol('hasOne')
 

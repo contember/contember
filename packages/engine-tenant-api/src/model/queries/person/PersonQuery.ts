@@ -1,7 +1,7 @@
 import { DatabaseQuery, DatabaseQueryable, Literal, Operator, SelectBuilderSpecification } from '@contember/database'
-import { MaybePersonRow } from './types'
-import { PersonQueryBuilderFactory } from './PersonQueryBuilderFactory'
-import { normalizeEmail } from '../../utils/email'
+import { MaybePersonRow } from './types.js'
+import { PersonQueryBuilderFactory } from './PersonQueryBuilderFactory.js'
+import { normalizeEmail } from '../../utils/email.js'
 
 export type PersonUniqueIdentifier =
 	| { type: 'id'; id: string }

@@ -1,9 +1,9 @@
 import { GraphQLList, GraphQLNonNull, GraphQLOutputType } from 'graphql'
 import { Acl, Model } from '@contember/schema'
-import { ColumnTypeResolver } from '../ColumnTypeResolver'
-import { EntityTypeProvider } from '../EntityTypeProvider'
-import { Authorizator } from '../../acl'
-import { ImplementationException } from '../../exception'
+import { ColumnTypeResolver } from '../ColumnTypeResolver.js'
+import { EntityTypeProvider } from '../EntityTypeProvider.js'
+import { Authorizator } from '../../acl/index.js'
+import { ImplementationException } from '../../exception.js'
 
 export class FieldTypeVisitor implements Model.ColumnVisitor<GraphQLOutputType>, Model.RelationByGenericTypeVisitor<GraphQLOutputType> {
 	constructor(

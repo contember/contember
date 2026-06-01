@@ -1,5 +1,5 @@
 import React, { ReactNode, useMemo } from 'react'
-import { useSelectHandleSelect, useSelectOptions } from '../contexts'
+import { useSelectHandleSelect, useSelectOptions } from '../contexts.js'
 import { DataView, DataViewFilterHandlerRegistry, DataViewProps } from '@contember/react-dataview'
 
 export type SelectDataViewProps =

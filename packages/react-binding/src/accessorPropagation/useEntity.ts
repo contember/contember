@@ -1,11 +1,11 @@
 import { useConstantLengthInvariant, useConstantValueInvariant } from '@contember/react-utils'
 import { useCallback } from 'react'
-import { useEntityKey, useGetEntityByKey } from './index'
+import { useEntityKey, useGetEntityByKey } from './index.js'
 import type { EntityAccessor } from '@contember/binding'
-import { useOnConnectionUpdate } from '../entityEvents'
+import { useOnConnectionUpdate } from '../entityEvents/index.js'
 import type { SugaredRelativeSingleEntity } from '@contember/binding'
-import { useAccessorUpdateSubscription } from './useAccessorUpdateSubscription'
-import { useDesugaredRelativeSingleEntity } from './useDesugaredRelativeSingleEntity'
+import { useAccessorUpdateSubscription } from './useAccessorUpdateSubscription.js'
+import { useDesugaredRelativeSingleEntity } from './useDesugaredRelativeSingleEntity.js'
 
 function useEntity(): EntityAccessor
 function useEntity(sugaredRelativeSingleEntity: string | SugaredRelativeSingleEntity): EntityAccessor

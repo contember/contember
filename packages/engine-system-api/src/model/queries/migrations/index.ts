@@ -1,3 +1,3 @@
-export * from './ExecutedMigrationByVersionQuery'
-export * from './ExecutedMigrationByVersionQuery'
-export * from './ExecutedMigrationsQuery'
+export * from './ExecutedMigrationByVersionQuery.js'
+export * from './ExecutedMigrationByVersionQuery.js'
+export * from './ExecutedMigrationsQuery.js'

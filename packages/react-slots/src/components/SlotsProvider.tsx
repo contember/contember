@@ -5,7 +5,7 @@ import {
 	RenderToSlotPortalContextType,
 	SlotTargetsRegistryContextType,
 	TargetsRegistryContext,
-} from '../internal/contexts'
+} from '../internal/contexts.js'
 
 /**
  * @group Layout

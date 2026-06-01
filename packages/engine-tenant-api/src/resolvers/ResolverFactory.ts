@@ -21,22 +21,22 @@ import {
 	SignUpMutationResolver,
 	UpdateProjectMemberMutationResolver,
 	UpdateProjectMutationResolver,
-} from './mutation'
+} from './mutation/index.js'
 
-import { Resolvers } from '../schema'
-import { AuthLogQueryResolver, MeQueryResolver, PersonQueryResolver, ProjectMembersQueryResolver, ProjectQueryResolver } from './query'
-import { IdentityTypeResolver, ProjectTypeResolver } from './types'
+import { Resolvers } from '../schema/index.js'
+import { AuthLogQueryResolver, MeQueryResolver, PersonQueryResolver, ProjectMembersQueryResolver, ProjectQueryResolver } from './query/index.js'
+import { IdentityTypeResolver, ProjectTypeResolver } from './types/index.js'
 import { DateTimeType, IntervalType, JSONType } from '@contember/graphql-utils'
-import { IDPQueryResolver } from './query/IDPQueryResolver'
-import { UpdateIDPMutationResolver } from './mutation/idp/UpdateIDPMutationResolver'
-import { DisablePersonMutationResolver } from './mutation/person/DisablePersonMutationResolver'
-import { ForceSignOutMutationResolver } from './mutation/person/ForceSignOutMutationResolver'
-import { RevokeSessionMutationResolver } from './mutation/person/RevokeSessionMutationResolver'
-import { MailTemplateQueryResolver } from './query/MailTemplateQueryResolver'
-import { ConfigurationMutationResolver } from './mutation/configuration/ConfigurationMutationResolver'
-import { ConfigurationQueryResolver } from './query/ConfigurationQueryResolver'
-import { PasswordlessMutationResolver } from './mutation/person/PasswordlessMutationResolver'
-import { TogglePasswordlessMutationResolver } from './mutation/person/TogglePasswordlessMutationResolver'
+import { IDPQueryResolver } from './query/IDPQueryResolver.js'
+import { UpdateIDPMutationResolver } from './mutation/idp/UpdateIDPMutationResolver.js'
+import { DisablePersonMutationResolver } from './mutation/person/DisablePersonMutationResolver.js'
+import { ForceSignOutMutationResolver } from './mutation/person/ForceSignOutMutationResolver.js'
+import { RevokeSessionMutationResolver } from './mutation/person/RevokeSessionMutationResolver.js'
+import { MailTemplateQueryResolver } from './query/MailTemplateQueryResolver.js'
+import { ConfigurationMutationResolver } from './mutation/configuration/ConfigurationMutationResolver.js'
+import { ConfigurationQueryResolver } from './query/ConfigurationQueryResolver.js'
+import { PasswordlessMutationResolver } from './mutation/person/PasswordlessMutationResolver.js'
+import { TogglePasswordlessMutationResolver } from './mutation/person/TogglePasswordlessMutationResolver.js'
 
 class ResolverFactory {
 	public constructor(

@@ -1,1 +1,1 @@
-export * from './formatImageResizeUrl'
+export * from './formatImageResizeUrl.js'

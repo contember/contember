@@ -7,8 +7,8 @@ import {
 	SessionTokenContext,
 	SetSessionTokenContext,
 	StageSlugContext,
-} from '../contexts'
-import { GraphQlClientFactory, SessionTokenContextValue } from '../types'
+} from '../contexts.js'
+import { GraphQlClientFactory, SessionTokenContextValue } from '../types/index.js'
 
 export interface ContemberClientProps {
 	apiBaseUrl: string

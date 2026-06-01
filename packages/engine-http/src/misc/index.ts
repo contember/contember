@@ -1,1 +1,1 @@
-export * from './HomepageMiddlewareFactory'
+export * from './HomepageMiddlewareFactory.js'

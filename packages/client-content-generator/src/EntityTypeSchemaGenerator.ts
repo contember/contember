@@ -1,7 +1,7 @@
 import { Model } from '@contember/schema'
 import { acceptEveryFieldVisitor, acceptFieldVisitor } from '@contember/schema-utils'
 
-import { getEnumTypeName } from './utils'
+import { getEnumTypeName } from './utils.js'
 
 export class EntityTypeSchemaGenerator {
 	generate(model: Model.Schema): string {

@@ -9,11 +9,11 @@ import {
 	UploaderBase,
 	VideoFileDataExtractorProps,
 } from '@contember/react-uploader'
-import { formatBytes, formatDate, formatDuration } from '../formatting'
+import { formatBytes, formatDate, formatDuration } from '../formatting/index.js'
 import { Button } from '@contember/react-ui-lib-base'
 import { EditIcon, FileIcon, InfoIcon, TrashIcon } from 'lucide-react'
 import { Popover, PopoverContent, PopoverTrigger } from '@contember/react-ui-lib-base'
-import { formatImageResizeUrl } from '../images'
+import { formatImageResizeUrl } from '../images/index.js'
 
 export type BaseFileViewProps = {
 	baseField?: SugaredRelativeSingleEntity['field']

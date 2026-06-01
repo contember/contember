@@ -1,6 +1,6 @@
-import { ExecutedMigration } from '../dtos'
-import { ExecutedMigrationByVersionQuery, ExecutedMigrationsQuery } from '../queries'
-import { DatabaseContext } from '../database'
+import { ExecutedMigration } from '../dtos/index.js'
+import { ExecutedMigrationByVersionQuery, ExecutedMigrationsQuery } from '../queries/index.js'
+import { DatabaseContext } from '../database/index.js'
 
 export class ExecutedMigrationsResolver {
 	async getMigrations(db: DatabaseContext, afterVersion?: string): Promise<ExecutedMigration[]> {

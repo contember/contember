@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { HasOneRelationMarker, SugaredRelativeSingleEntity, useEntity } from '@contember/react-binding'
-import { FormFieldStateProvider } from './FormFieldStateProvider'
+import { FormFieldStateProvider } from './FormFieldStateProvider.js'
 import { useMemo } from 'react'
 
 export type FormHasOneRelationScopeProps = {

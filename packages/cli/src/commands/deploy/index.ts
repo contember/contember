@@ -1,1 +1,1 @@
-export * from './DeployCommand'
+export * from './DeployCommand.js'

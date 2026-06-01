@@ -1,7 +1,7 @@
 import { ReactNode } from 'react'
 import { BoardEachColumn, useBoardColumns, useBoardCurrentColumn } from '@contember/react-board'
 import { horizontalListSortingStrategy, SortableContext, useSortable } from '@dnd-kit/sortable'
-import { BoardSortableNodeContext } from '../contexts'
+import { BoardSortableNodeContext } from '../contexts.js'
 
 export const BoardSortableEachColumn = ({ children }: {
 	children: ReactNode

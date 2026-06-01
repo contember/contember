@@ -1,5 +1,5 @@
-import type { EditorWithBlocks } from './EditorWithBlocks'
-import { InsertElementWithReference } from '../references/useInsertElementWithReference'
+import type { EditorWithBlocks } from './EditorWithBlocks.js'
+import { InsertElementWithReference } from '../references/useInsertElementWithReference.js'
 
 export interface OverrideInsertElementWithReferenceOptions {
 	insertElementWithReference: InsertElementWithReference

@@ -1,6 +1,6 @@
 import { expect, test } from 'bun:test'
 import { IncomingMessage } from 'node:http'
-import { getClientIP } from '../../../src/utils/remoteAddress'
+import { getClientIP } from '../../../src/utils/remoteAddress.js'
 
 const req = (remoteAddress: string | undefined, xff?: string | string[]): IncomingMessage => ({
 	socket: { remoteAddress },

@@ -1,6 +1,6 @@
 import { Model, Validation } from '@contember/schema'
-import { ErrorBuilder, ValidationError } from './errors'
-import { acceptFieldVisitor } from '../model'
+import { ErrorBuilder, ValidationError } from './errors.js'
+import { acceptFieldVisitor } from '../model/index.js'
 
 export class ValidationValidator {
 	constructor(private readonly model: Model.Schema) {}

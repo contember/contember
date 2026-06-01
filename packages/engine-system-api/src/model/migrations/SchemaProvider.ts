@@ -1,7 +1,7 @@
-import { SchemaQuery } from '../queries'
-import { DatabaseContext } from '../database'
+import { SchemaQuery } from '../queries/index.js'
+import { DatabaseContext } from '../database/index.js'
 import { calculateSchemaChecksum, emptySchema, normalizeSchema } from '@contember/schema-utils'
-import { ExecutedMigrationsResolver } from './ExecutedMigrationsResolver'
+import { ExecutedMigrationsResolver } from './ExecutedMigrationsResolver.js'
 import { SchemaMigrator } from '@contember/schema-migrations'
 import { Schema } from '@contember/schema'
 

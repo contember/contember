@@ -1,4 +1,4 @@
-import { useEditorBlockElement } from '../contexts'
+import { useEditorBlockElement } from '../contexts.js'
 
 export interface ContentOutletProps {
 }

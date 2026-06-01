@@ -1,4 +1,4 @@
-import { ContentClient } from '../src'
+import { ContentClient } from '../src/index.js'
 
 export const createClient = (result?: any) => {
 	const calls: { query: string; variables: Record<string, unknown> }[] = []

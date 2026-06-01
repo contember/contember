@@ -1,2 +1,2 @@
-export * from './application'
-export * from './types'
+export * from './application.js'
+export * from './types.js'

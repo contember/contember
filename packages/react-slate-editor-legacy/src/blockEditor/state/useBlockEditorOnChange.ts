@@ -10,8 +10,8 @@ import {
 import { assertNever } from '@contember/utilities'
 import { MutableRefObject, useCallback } from 'react'
 import { Editor, Element, Operation } from 'slate'
-import { useGetParentEntityRef } from '../useGetParentEntityRef'
-import { BlockElementCache } from './useBlockElementCache'
+import { useGetParentEntityRef } from '../useGetParentEntityRef.js'
+import { BlockElementCache } from './useBlockElementCache.js'
 
 export const useBlockEditorOnChange = ({ refreshBlocks, editor, sortedBlocksRef, contentField, blockList, blockElementCache }: {
 	editor: Editor

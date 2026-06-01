@@ -1,9 +1,9 @@
 import { SetStateAction, useCallback } from 'react'
-import { useIDPStateStore } from './useIDPStateStore'
-import { getBaseHref } from '../utils/getBaseHref'
-import { IDPInitError, IDPStateValue } from '../../types/idp'
-import { useInitSignInIDPMutation } from '../../hooks'
-import { useSaveBacklink } from './useRedirectToBacklink'
+import { useIDPStateStore } from './useIDPStateStore.js'
+import { getBaseHref } from '../utils/getBaseHref.js'
+import { IDPInitError, IDPStateValue } from '../../types/idp.js'
+import { useInitSignInIDPMutation } from '../../hooks/index.js'
+import { useSaveBacklink } from './useRedirectToBacklink.js'
 
 export interface UseInitIDPRedirectProps {
 	onRedirect?: (url: string) => void

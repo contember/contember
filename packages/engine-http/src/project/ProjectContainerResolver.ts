@@ -1,8 +1,8 @@
-import { ProjectContainer, ProjectContainerFactory } from './ProjectContainer'
+import { ProjectContainer, ProjectContainerFactory } from './ProjectContainer.js'
 import { DatabaseContext, ProjectManager, ProjectWithSecrets } from '@contember/engine-tenant-api'
-import { ProjectContainerStore } from './ProjectContainerStore'
-import { ProjectConfigResolver } from '../config/projectConfigResolver'
-import { TenantConfig } from '../config/config'
+import { ProjectContainerStore } from './ProjectContainerStore.js'
+import { ProjectConfigResolver } from '../config/projectConfigResolver.js'
+import { TenantConfig } from '../config/config.js'
 import { Logger } from '@contember/logger'
 import { EventEmitter, EventManager } from '@contember/engine-common'
 

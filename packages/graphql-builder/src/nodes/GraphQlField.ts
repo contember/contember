@@ -1,5 +1,5 @@
-import { GraphQlFragmentSpread } from './GraphQlFragmentSpread'
-import { GraphQlInlineFragment } from './GraphQlInlineFragment'
+import { GraphQlFragmentSpread } from './GraphQlFragmentSpread.js'
+import { GraphQlInlineFragment } from './GraphQlInlineFragment.js'
 import { JSONValue } from '@contember/schema'
 
 export class GraphQlField {

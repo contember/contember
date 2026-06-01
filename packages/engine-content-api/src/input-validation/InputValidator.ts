@@ -1,4 +1,4 @@
-import { ValidationPath } from './ValidationPath'
+import { ValidationPath } from './ValidationPath.js'
 import { Validation } from '@contember/schema'
 
 export interface FieldValidationResult {

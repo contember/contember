@@ -1,5 +1,5 @@
-import { TriggerListenersStore } from './TriggerListenersStore'
-import { TriggerListenerBuilder } from './TriggerListenersBuilder'
+import { TriggerListenersStore } from './TriggerListenersStore.js'
+import { TriggerListenerBuilder } from './TriggerListenersBuilder.js'
 import { Schema } from '@contember/schema'
 
 export class TriggerListenersFactory {

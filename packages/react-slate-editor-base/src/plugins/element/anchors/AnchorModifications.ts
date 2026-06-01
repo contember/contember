@@ -1,5 +1,5 @@
 import { Editor, Range, Transforms } from 'slate'
-import { AnchorElement, isAnchorElement, isAnchorElementActive } from './AnchorElement'
+import { AnchorElement, isAnchorElement, isAnchorElementActive } from './AnchorElement.js'
 
 export class AnchorModifications {
 	public static unwrapAnchor(editor: Editor) {

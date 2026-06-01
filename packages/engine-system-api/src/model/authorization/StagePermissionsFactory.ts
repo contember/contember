@@ -1,7 +1,7 @@
 import { Acl } from '@contember/schema'
 import { Permissions } from '@contember/authorization'
-import { AuthorizationActions } from './AuthorizationActions'
-import { SchemaGetter } from '../SchemaGetter'
+import { AuthorizationActions } from './AuthorizationActions.js'
+import { SchemaGetter } from '../SchemaGetter.js'
 
 export class StagePermissionsFactory {
 	constructor(private readonly getSchema: SchemaGetter) {}

@@ -1,5 +1,5 @@
 import { DatabaseQuery, DatabaseQueryable, Literal, SelectBuilder } from '@contember/database'
-import { RateLimitScope } from '../../type/RateLimit'
+import { RateLimitScope } from '../../type/RateLimit.js'
 
 export class RateLimitCountQuery extends DatabaseQuery<number> {
 	constructor(

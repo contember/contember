@@ -1,3 +1,3 @@
-export * from './BijectiveIndexedMap'
-export * from './LRUCache'
-export * from './WeakIdCache'
+export * from './BijectiveIndexedMap.js'
+export * from './LRUCache.js'
+export * from './WeakIdCache.js'

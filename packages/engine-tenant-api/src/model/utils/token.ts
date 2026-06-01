@@ -1,8 +1,8 @@
 import crypto from 'node:crypto'
-import { FixedLengthHexString, isFixedLengthHexString } from './hex'
-import { PersonToken } from '../type'
-import { ImplementationException } from '../../exceptions'
-import { Response, ResponseError, ResponseOk } from './Response'
+import { FixedLengthHexString, isFixedLengthHexString } from './hex.js'
+import { PersonToken } from '../type/index.js'
+import { ImplementationException } from '../../exceptions.js'
+import { Response, ResponseError, ResponseOk } from './Response.js'
 
 export const generateToken = async (generator: {
 	randomBytes: (bytes: number) => Promise<Buffer>

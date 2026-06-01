@@ -18,11 +18,11 @@ import {
 	textToSpecifics,
 	toLatestFormat,
 	topLevelNodes,
-} from './methods'
+} from './methods/index.js'
 
-export type { ElementDataAttributes } from './methods'
+export type { ElementDataAttributes } from './methods/index.js'
 
-// TODO use export * as ContemberEditor from './methods' once the tooling is ready.
+// TODO use export * as ContemberEditor from './methods/index.js' once the tooling is ready.
 export const ContemberEditor = {
 	addMarks,
 	canToggleMark,
@@ -45,4 +45,4 @@ export const ContemberEditor = {
 	topLevelNodes,
 }
 
-export * from './createEditor'
+export * from './createEditor.js'

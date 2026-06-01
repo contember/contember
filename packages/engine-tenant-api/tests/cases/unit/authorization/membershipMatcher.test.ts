@@ -1,6 +1,6 @@
 import { expect, test } from 'bun:test'
-import { testUuid } from '../../../src/testUuid'
-import { MembershipMatcher } from '../../../../src'
+import { testUuid } from '../../../src/testUuid.js'
+import { MembershipMatcher } from '../../../../src/index.js'
 
 const siteIdA = testUuid(666)
 const siteIdB = testUuid(667)

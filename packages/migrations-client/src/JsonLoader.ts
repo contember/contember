@@ -1,7 +1,7 @@
-import { MigrationFileLoader } from './MigrationFileLoader'
+import { MigrationFileLoader } from './MigrationFileLoader.js'
 import * as fs from 'node:fs/promises'
-import { MigrationParser } from './MigrationParser'
-import { MigrationFile } from './MigrationFile'
+import { MigrationParser } from './MigrationParser.js'
+import { MigrationFile } from './MigrationFile.js'
 
 export class JsonLoader implements MigrationFileLoader {
 	constructor(

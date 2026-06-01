@@ -1,6 +1,6 @@
-import { RichTextLeaf } from '../structure'
+import { RichTextLeaf } from '../structure/index.js'
 import { ComponentType, ReactElement } from 'react'
-import { BuiltinLeaves } from '../builtin'
+import { BuiltinLeaves } from '../builtin/index.js'
 
 export type RenderLeafProps<CustomLeaves extends RichTextLeaf = RichTextLeaf> = {
 	formatVersion: number

@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { ReactElement, useCallback } from 'react'
 import { Slot } from '@radix-ui/react-slot'
-import { useEditorReferenceMethods } from '../contexts'
+import { useEditorReferenceMethods } from '../contexts.js'
 import { EntityAccessor } from '@contember/react-binding'
 
 export interface EditorReferenceTriggerProps {

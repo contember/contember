@@ -1,5 +1,5 @@
-import { MutationError, ValidationResult } from './types'
-import { ContentMutation } from './nodes'
+import { MutationError, ValidationResult } from './types/index.js'
+import { ContentMutation } from './nodes/index.js'
 
 export class MutationFailedError<
 	Value extends {

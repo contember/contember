@@ -1,6 +1,6 @@
-export * from './types'
+export * from './types/index.js'
 
-export * from './BranchNode'
-export * from './BranchNodeOptions'
-export * from './Leaf'
-export * from './RawNodeRepresentation'
+export * from './BranchNode.js'
+export * from './BranchNodeOptions.js'
+export * from './Leaf.js'
+export * from './RawNodeRepresentation.js'

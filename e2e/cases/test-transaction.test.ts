@@ -1,5 +1,5 @@
 import { expect, test } from 'bun:test'
-import { apiUrl, createTester, gql, withTestTransaction } from '../src/tester'
+import { apiUrl, createTester, gql, withTestTransaction } from '../src/tester.js'
 import { createSchema, SchemaDefinition as def } from '@contember/schema-definition'
 
 namespace AuthorModel {

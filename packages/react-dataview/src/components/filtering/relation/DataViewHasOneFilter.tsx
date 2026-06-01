@@ -1,12 +1,12 @@
 import { Component, QueryLanguage, SugaredQualifiedEntityList, useEnvironment } from '@contember/react-binding'
 import * as React from 'react'
 import { useMemo } from 'react'
-import { DataViewFilterNameContext, DataViewRelationFilterArgsContext } from '../../../contexts'
-import { DataViewFilter } from '../DataViewFilter'
-import { getFilterName } from '../../../internal/helpers/getFilterName'
-import { createHasOneFilter } from '../../../filterTypes'
+import { DataViewFilterNameContext, DataViewRelationFilterArgsContext } from '../../../contexts.js'
+import { DataViewFilter } from '../DataViewFilter.js'
+import { getFilterName } from '../../../internal/helpers/getFilterName.js'
+import { createHasOneFilter } from '../../../filterTypes/index.js'
 import { SugaredRelativeSingleEntity } from '@contember/react-binding'
-import { useFieldEntityName } from '../../../internal/hooks/useFieldEntityName'
+import { useFieldEntityName } from '../../../internal/hooks/useFieldEntityName.js'
 
 export interface DataViewHasOneFilterProps {
 	/**

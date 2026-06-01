@@ -1,5 +1,5 @@
-import { DataViewFilterHandler } from '../../types'
-import { DataViewFilterNameContext } from '../../contexts'
+import { DataViewFilterHandler } from '../../types/index.js'
+import { DataViewFilterNameContext } from '../../contexts.js'
 import { Component } from '@contember/react-binding'
 
 export interface DataViewFilterProps {

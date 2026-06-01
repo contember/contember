@@ -10,8 +10,8 @@ import {
 	useBindingOperations,
 } from '@contember/react-binding'
 import { MutableRefObject, useCallback } from 'react'
-import { useGetReferenceEntityList } from './useGetReferenceEntityList'
-import { RefreshBlocks } from '../state/useRefreshBlocks'
+import { useGetReferenceEntityList } from './useGetReferenceEntityList.js'
+import { RefreshBlocks } from '../state/useRefreshBlocks.js'
 
 export type CreateElementReferences = (
 	editor: Editor,

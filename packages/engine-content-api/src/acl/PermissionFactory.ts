@@ -1,7 +1,7 @@
 import { Acl, Model, Schema, Writable } from '@contember/schema'
 import { getEntity, PredicateDefinitionProcessor } from '@contember/schema-utils'
-import { mapObject } from '../utils'
-import { prefixVariable } from './VariableUtils'
+import { mapObject } from '../utils/index.js'
+import { prefixVariable } from './VariableUtils.js'
 
 export interface Identity {
 	projectRoles: readonly string[]

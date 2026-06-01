@@ -1,7 +1,7 @@
 import { Environment } from '@contember/react-binding'
 import { ReactNode } from 'react'
-import { blockAnalyzer } from './blockAnalyzer'
-import { BlockContent, BlockProps, ContentOutletProps } from '../../components'
+import { blockAnalyzer } from './blockAnalyzer.js'
+import { BlockContent, BlockProps, ContentOutletProps } from '../../components/index.js'
 import { ChildrenAnalyzer, Leaf } from '@contember/react-multipass-rendering'
 
 export interface EditorReferenceBlock extends BlockProps {

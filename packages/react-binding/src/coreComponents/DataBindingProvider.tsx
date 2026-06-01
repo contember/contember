@@ -1,5 +1,5 @@
 import { ComponentType, createElement, memo, ReactElement, ReactNode } from 'react'
-import { AccessorTree, AccessorTreeState, useDataBinding } from '../accessorTree'
+import { AccessorTree, AccessorTreeState, useDataBinding } from '../accessorTree/index.js'
 
 export type DataBindingProviderStateComponent<StateProps> = {
 	stateComponent: ComponentType<StateProps & DataBindingStateComponentProps>

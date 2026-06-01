@@ -1,5 +1,5 @@
 import { expect, test } from 'bun:test'
-import { c, createSchema, settingsPresets } from '../../../src'
+import { c, createSchema, settingsPresets } from '../../../src/index.js'
 
 namespace SimpleModel {
 	export const publicRole = c.createRole('public')

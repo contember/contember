@@ -1,6 +1,6 @@
 import { Schema } from '@contember/schema'
-import { SchemaUpdater } from '../utils/schemaUpdateUtils'
-import { createModificationType, Differ, ModificationHandler } from '../ModificationHandler'
+import { SchemaUpdater } from '../utils/schemaUpdateUtils.js'
+import { createModificationType, Differ, ModificationHandler } from '../ModificationHandler.js'
 
 export class RemoveTriggerModificationHandler implements ModificationHandler<RemoveTriggerModificationData> {
 	constructor(private readonly data: RemoveTriggerModificationData) {

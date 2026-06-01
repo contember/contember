@@ -2,9 +2,9 @@ import * as React from 'react'
 import { forwardRef, ReactElement, useCallback } from 'react'
 import { Slot } from '@radix-ui/react-slot'
 import { composeEventHandlers } from '@radix-ui/primitive'
-import { useDataViewFilter } from '../../../hooks'
-import { NumberRangeFilterArtifacts } from '../../../filterTypes'
-import { useDataViewFilterName } from '../../../contexts'
+import { useDataViewFilter } from '../../../hooks/index.js'
+import { NumberRangeFilterArtifacts } from '../../../filterTypes/index.js'
+import { useDataViewFilterName } from '../../../contexts.js'
 
 export interface DataViewNumberFilterResetTriggerProps {
 	/**

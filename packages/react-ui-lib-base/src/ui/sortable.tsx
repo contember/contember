@@ -1,4 +1,4 @@
-import { uic } from '../utils'
+import { uic } from '../utils/index.js'
 
 export const DropIndicator = uic('div', {
 	baseClass: 'bg-blue-300 rounded-sm shadow-lg shadow-blue-700 absolute',

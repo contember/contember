@@ -1,7 +1,7 @@
-export * from './addEntityAtIndex'
+export * from './addEntityAtIndex.js'
 // Deliberately not exporting errors
-export * from './repairEntitiesOrder'
-export * from './SetOrderFieldOnCreate'
-export * from './sortEntities'
+export * from './repairEntitiesOrder.js'
+export * from './SetOrderFieldOnCreate.js'
+export * from './sortEntities.js'
 
-export type { SortedEntities } from './SortedEntities'
+export type { SortedEntities } from './SortedEntities.js'

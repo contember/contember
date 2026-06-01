@@ -1,3 +1,3 @@
-export * from './StageBySlugQuery'
-export * from './StageQueryFactory'
-export * from './StagesQuery'
+export * from './StageBySlugQuery.js'
+export * from './StageQueryFactory.js'
+export * from './StagesQuery.js'

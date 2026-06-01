@@ -1,10 +1,10 @@
-import { ForceSignOutPersonResponse, MutationForceSignOutPersonArgs, MutationResolvers } from '../../../schema'
-import { TenantResolverContext } from '../../TenantResolverContext'
-import { ApiKeyManager, PermissionActions } from '../../../model'
-import { PersonManager } from '../../../model/service/PersonManager'
-import { createErrorResponse } from '../../errorUtils'
-import { ResponseError, ResponseOk } from '../../../model/utils/Response'
-import { UserMailer } from '../../../model/mailing'
+import { ForceSignOutPersonResponse, MutationForceSignOutPersonArgs, MutationResolvers } from '../../../schema/index.js'
+import { TenantResolverContext } from '../../TenantResolverContext.js'
+import { ApiKeyManager, PermissionActions } from '../../../model/index.js'
+import { PersonManager } from '../../../model/service/PersonManager.js'
+import { createErrorResponse } from '../../errorUtils.js'
+import { ResponseError, ResponseOk } from '../../../model/utils/Response.js'
+import { UserMailer } from '../../../model/mailing/index.js'
 
 export class ForceSignOutMutationResolver implements Pick<MutationResolvers, 'forceSignOutPerson'> {
 	constructor(

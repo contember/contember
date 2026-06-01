@@ -13,10 +13,10 @@ import {
 	FormRadioItemProps,
 	useFormFieldState,
 } from '@contember/react-form'
-import { FormContainer, FormContainerProps } from './container'
+import { FormContainer, FormContainerProps } from './container.js'
 import { Component, Field } from '@contember/interface'
-import { useEnumOptionsFormatter } from '../labels'
-import { FormFieldLabel } from './labels'
+import { useEnumOptionsFormatter } from '../labels/index.js'
+import { FormFieldLabel } from './labels.js'
 
 export type InputFieldProps =
 	& Omit<FormInputProps, 'children'>

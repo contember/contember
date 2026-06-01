@@ -1,4 +1,4 @@
-import { RemoteProjectProvider } from './project/RemoteProjectProvider'
+import { RemoteProjectProvider } from './project/RemoteProjectProvider.js'
 import { SystemClient } from '@contember/migrations-client'
 
 export class SystemClientProvider {

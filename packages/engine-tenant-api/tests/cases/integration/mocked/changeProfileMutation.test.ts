@@ -1,12 +1,12 @@
-import { executeTenantTest } from '../../../src/testTenant'
-import { testUuid } from '../../../src/testUuid'
+import { executeTenantTest } from '../../../src/testTenant.js'
+import { testUuid } from '../../../src/testUuid.js'
 import { expect, test } from 'bun:test'
-import { changeProfileMutation } from './gql/changeProfile'
-import { updatePersonProfileNameAndEmailSql } from './sql/updatePesonNameSql'
-import { authenticatedIdentityId } from '../../../src/testTenant'
-import { getPersonByIdentity } from './sql/getPersonByIdentity'
-import { getPersonByEmailSql } from './sql/getPersonByEmailSql'
-import { getPersonByIdSql } from './sql/getPersonByIdSql'
+import { changeProfileMutation } from './gql/changeProfile.js'
+import { updatePersonProfileNameAndEmailSql } from './sql/updatePesonNameSql.js'
+import { authenticatedIdentityId } from '../../../src/testTenant.js'
+import { getPersonByIdentity } from './sql/getPersonByIdentity.js'
+import { getPersonByEmailSql } from './sql/getPersonByEmailSql.js'
+import { getPersonByIdSql } from './sql/getPersonByIdSql.js'
 
 test('changes my name and email', async () => {
 	const personId = testUuid(1)

@@ -1,5 +1,5 @@
 import { ContentQueryBuilder, SchemaEntityNames, SchemaNames } from '@contember/client-content'
-import { Schema, SchemaRelation } from '../schema'
+import { Schema, SchemaRelation } from '../schema/index.js'
 
 export const createQueryBuilder = (schema: Schema) => {
 	const schemaNames: SchemaNames = {

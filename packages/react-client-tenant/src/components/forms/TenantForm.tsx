@@ -1,7 +1,7 @@
 import { ComponentType, ReactElement, useCallback, useEffect, useState } from 'react'
 import { Slot } from '@radix-ui/react-slot'
-import { FormContextValue } from '../../types/forms'
-import { FormContext } from '../../contexts'
+import { FormContextValue } from '../../types/forms.js'
+import { FormContext } from '../../contexts.js'
 import { useReferentiallyStableCallback } from '@contember/react-utils'
 
 const SlotForm = Slot as ComponentType<React.FormHTMLAttributes<HTMLFormElement>>

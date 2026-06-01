@@ -1,1 +1,1 @@
-export * from './withSortable'
+export * from './withSortable.js'

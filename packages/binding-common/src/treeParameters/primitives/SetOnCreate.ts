@@ -1,4 +1,4 @@
-import type { SugaredUniqueWhere, UniqueWhere } from './UniqueWhere'
+import type { SugaredUniqueWhere, UniqueWhere } from './UniqueWhere.js'
 
 export type SetOnCreate = UniqueWhere | undefined
 

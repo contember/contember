@@ -1,7 +1,7 @@
 import { MigrationBuilder } from '@contember/database-migrations'
 import { Schema } from '@contember/schema'
-import { SchemaUpdater, updateModel } from '../utils/schemaUpdateUtils'
-import { createModificationType, Differ, ModificationHandler } from '../ModificationHandler'
+import { SchemaUpdater, updateModel } from '../utils/schemaUpdateUtils.js'
+import { createModificationType, Differ, ModificationHandler } from '../ModificationHandler.js'
 
 export class RemoveEnumModificationHandler implements ModificationHandler<RemoveEnumModificationData> {
 	constructor(private readonly data: RemoveEnumModificationData, private readonly schema: Schema) {}

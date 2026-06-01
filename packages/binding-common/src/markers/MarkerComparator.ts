@@ -1,4 +1,4 @@
-import { PRIMARY_KEY_NAME, TYPENAME_KEY_NAME } from '../consts'
+import { PRIMARY_KEY_NAME, TYPENAME_KEY_NAME } from '../consts.js'
 import {
 	EntityFieldMarkersContainer,
 	EntityListSubTreeMarker,
@@ -6,9 +6,9 @@ import {
 	FieldMarker,
 	HasManyRelationMarker,
 	HasOneRelationMarker,
-} from '../markers'
-import { assertNever } from '../utils/assertNever'
-import { LocalizedBindingError } from '../LocalizedBindingError'
+} from '../markers/index.js'
+import { assertNever } from '../utils/assertNever.js'
+import { LocalizedBindingError } from '../LocalizedBindingError.js'
 
 export class MarkerComparator {
 	public static isSubTreeSubsetOf(

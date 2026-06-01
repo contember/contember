@@ -1,4 +1,4 @@
-import { JSONObject } from './json'
+import { JSONObject } from './json.js'
 
 export namespace Actions {
 	export type SelectionNodeSub = readonly [name: string, args: JSONObject, fields: SelectionNode]

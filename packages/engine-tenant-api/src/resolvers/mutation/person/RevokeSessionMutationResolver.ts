@@ -1,8 +1,8 @@
-import { MutationResolvers, MutationRevokeSessionArgs, RevokeSessionResponse } from '../../../schema'
-import { TenantResolverContext } from '../../TenantResolverContext'
-import { ApiKey, ApiKeyManager, PermissionActions, PersonQuery } from '../../../model'
-import { createErrorResponse } from '../../errorUtils'
-import { ResponseError, ResponseOk } from '../../../model/utils/Response'
+import { MutationResolvers, MutationRevokeSessionArgs, RevokeSessionResponse } from '../../../schema/index.js'
+import { TenantResolverContext } from '../../TenantResolverContext.js'
+import { ApiKey, ApiKeyManager, PermissionActions, PersonQuery } from '../../../model/index.js'
+import { createErrorResponse } from '../../errorUtils.js'
+import { ResponseError, ResponseOk } from '../../../model/utils/Response.js'
 
 export class RevokeSessionMutationResolver implements Pick<MutationResolvers, 'revokeSession'> {
 	constructor(private readonly apiKeyManager: ApiKeyManager) {}

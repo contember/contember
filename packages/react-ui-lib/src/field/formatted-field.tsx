@@ -1,5 +1,5 @@
 import { Component, FieldView, SugaredRelativeSingleField } from '@contember/interface'
-import { getFormatter } from '../formatting'
+import { getFormatter } from '../formatting/index.js'
 
 export interface FormattedFieldProps {
 	field: SugaredRelativeSingleField['field']

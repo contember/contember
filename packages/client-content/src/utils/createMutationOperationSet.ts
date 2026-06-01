@@ -1,6 +1,6 @@
-import { ContentMutation, ContentOperation, ContentQuery } from '../nodes'
+import { ContentMutation, ContentOperation, ContentQuery } from '../nodes/index.js'
 import { GraphQlField } from '@contember/graphql-builder'
-import { ContentOperationSet } from './ContentOperationSet'
+import { ContentOperationSet } from './ContentOperationSet.js'
 
 export const createMutationOperationSet = (
 	input:

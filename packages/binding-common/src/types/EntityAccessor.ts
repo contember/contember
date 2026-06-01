@@ -1,5 +1,5 @@
-import { Environment } from '../environment'
-import { EntityListSubTreeMarker, EntitySubTreeMarker, HasManyRelationMarker, HasOneRelationMarker } from '../markers'
+import { Environment } from '../environment/index.js'
+import { EntityListSubTreeMarker, EntitySubTreeMarker, HasManyRelationMarker, HasOneRelationMarker } from '../markers/index.js'
 import type {
 	EntityId,
 	EntityName,
@@ -12,15 +12,15 @@ import type {
 	SugaredRelativeEntityList,
 	SugaredRelativeSingleEntity,
 	SugaredRelativeSingleField,
-} from '../treeParameters'
-import type { AsyncBatchUpdatesOptions } from './AsyncBatchUpdatesOptions'
-import type { BatchUpdatesOptions } from './BatchUpdatesOptions'
-import { EntityListAccessor } from './EntityListAccessor'
-import type { Errorable } from './Errorable'
-import { ErrorAccessor } from './ErrorAccessor'
-import type { FieldAccessor } from './FieldAccessor'
-import type { PersistErrorOptions } from './PersistErrorOptions'
-import type { PersistSuccessOptions } from './PersistSuccessOptions'
+} from '../treeParameters/index.js'
+import type { AsyncBatchUpdatesOptions } from './AsyncBatchUpdatesOptions.js'
+import type { BatchUpdatesOptions } from './BatchUpdatesOptions.js'
+import { EntityListAccessor } from './EntityListAccessor.js'
+import type { Errorable } from './Errorable.js'
+import { ErrorAccessor } from './ErrorAccessor.js'
+import type { FieldAccessor } from './FieldAccessor.js'
+import type { PersistErrorOptions } from './PersistErrorOptions.js'
+import type { PersistSuccessOptions } from './PersistSuccessOptions.js'
 
 export const isEntityAccessor = (accessor: unknown): accessor is EntityAccessor =>
 	accessor !== null && typeof accessor === 'object' && '__type' in accessor && accessor.__type === 'EntityAccessor'

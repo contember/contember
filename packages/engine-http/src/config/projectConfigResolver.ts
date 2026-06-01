@@ -1,9 +1,9 @@
 import { Merger, ParametersResolver, resolveParameters, UndefinedParameterError } from '@contember/config-loader'
 import * as Typesafe from '@contember/typesafe'
-import { projectConfigSchema } from './configSchema'
-import { TenantConfig } from './config'
-import { ProjectConfig, ProjectSecrets } from '../project/config'
-import { ConfigProcessor } from './ConfigProcessor'
+import { projectConfigSchema } from './configSchema.js'
+import { TenantConfig } from './config.js'
+import { ProjectConfig, ProjectSecrets } from '../project/config.js'
+import { ConfigProcessor } from './ConfigProcessor.js'
 
 export type ProjectConfigResolver = (
 	slug: string,

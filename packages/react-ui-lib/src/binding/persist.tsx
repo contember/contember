@@ -3,7 +3,7 @@ import { ComponentProps, ReactNode } from 'react'
 import { dict } from '@contember/react-ui-lib-base'
 import { Button } from '@contember/react-ui-lib-base'
 import { Loader } from '@contember/react-ui-lib-base'
-import { usePersistSuccessHandler } from './hooks'
+import { usePersistSuccessHandler } from './hooks.js'
 import { cn } from '@contember/react-ui-lib-base'
 
 export interface PersistButtonProps extends ComponentProps<typeof Button> {

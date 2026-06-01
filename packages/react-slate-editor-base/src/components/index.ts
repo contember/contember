@@ -1,3 +1,3 @@
-export * from './triggers'
+export * from './triggers/index.js'
 
-export * from './RichTextEditor'
+export * from './RichTextEditor.js'

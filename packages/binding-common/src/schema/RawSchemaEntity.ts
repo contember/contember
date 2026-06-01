@@ -1,6 +1,6 @@
-import type { EntityName } from '../treeParameters'
-import type { SchemaColumn } from './SchemaColumn'
-import type { SchemaRelation } from './SchemaRelation'
+import type { EntityName } from '../treeParameters/index.js'
+import type { SchemaColumn } from './SchemaColumn.js'
+import type { SchemaRelation } from './SchemaRelation.js'
 
 export type RawSchemaFields = Array<SchemaRelation | SchemaColumn>
 

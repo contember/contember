@@ -1,8 +1,8 @@
 import { Input, Model } from '@contember/schema'
-import { OrderByHelper } from '../../../src/mapper'
-import { ObjectNode } from '../../../src/inputProcessing'
+import { OrderByHelper } from '../../../src/mapper/index.js'
+import { ObjectNode } from '../../../src/inputProcessing/index.js'
 import { describe, it } from 'bun:test'
-import { assert } from '../../src/assert'
+import { assert } from '../../src/assert.js'
 
 const entity: Model.Entity = {
 	name: 'Foo',

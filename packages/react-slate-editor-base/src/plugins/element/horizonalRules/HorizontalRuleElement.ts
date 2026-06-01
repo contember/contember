@@ -1,5 +1,5 @@
 import { Editor, Editor as SlateEditor, Element as SlateElement, Node as SlateNode, Range as SlateRange, Transforms } from 'slate'
-import { EditorElementPlugin, ElementRenderer } from '../../../types'
+import { EditorElementPlugin, ElementRenderer } from '../../../types/index.js'
 
 export const horizontalRuleElementType = 'horizontalRule' as const
 

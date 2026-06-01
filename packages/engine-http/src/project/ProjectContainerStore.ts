@@ -1,5 +1,5 @@
 import { PromiseMap } from '@contember/engine-common'
-import { ProjectContainer } from './ProjectContainer'
+import { ProjectContainer } from './ProjectContainer.js'
 
 type ContainerWithMeta = { container: ProjectContainer; cleanups: (() => void)[]; timestamp: Date }
 

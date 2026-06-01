@@ -1,6 +1,6 @@
 import { Command, CommandConfiguration, Input, PackageWorkspaceResolver } from '@contember/cli-common'
-import { DockerComposeManager } from '../../lib/fs/DockerComposeManager'
-import { contemberDockerImages } from '../../consts'
+import { DockerComposeManager } from '../../lib/fs/DockerComposeManager.js'
+import { contemberDockerImages } from '../../consts.js'
 
 type Args = {
 	version: string

@@ -1,13 +1,13 @@
 import * as Typesafe from '@contember/typesafe'
 import { Client, Issuer } from 'openid-client'
-import { IdentityProviderHandler, IDPResponse, InitIDPAuthResult } from '../IdentityProviderHandler'
-import { IDPValidationError } from '../IDPValidationError'
-import { InvalidIDPConfigurationError } from '../InvalidIDPConfigurationError'
-import { catchTypesafe } from './helpers'
-import { BaseOIDCConfiguration, OIDCConfiguration, OIDCInitData, OIDCResponseData } from './OIDCTypes'
-import { handleOIDCResponse, initOIDCAuth } from './OIDCHelpers'
+import { IdentityProviderHandler, IDPResponse, InitIDPAuthResult } from '../IdentityProviderHandler.js'
+import { IDPValidationError } from '../IDPValidationError.js'
+import { InvalidIDPConfigurationError } from '../InvalidIDPConfigurationError.js'
+import { catchTypesafe } from './helpers.js'
+import { BaseOIDCConfiguration, OIDCConfiguration, OIDCInitData, OIDCResponseData } from './OIDCTypes.js'
+import { handleOIDCResponse, initOIDCAuth } from './OIDCHelpers.js'
 import { createHmac } from 'node:crypto'
-import { IDPResponseError } from '../IDPResponseError'
+import { IDPResponseError } from '../IDPResponseError.js'
 
 const FacebookConfiguration = BaseOIDCConfiguration
 type FacebookConfiguration = ReturnType<typeof FacebookConfiguration>

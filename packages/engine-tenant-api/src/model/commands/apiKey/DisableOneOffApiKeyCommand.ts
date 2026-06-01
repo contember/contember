@@ -1,5 +1,5 @@
-import { Command } from '../Command'
-import { ApiKey } from '../../type'
+import { Command } from '../Command.js'
+import { ApiKey } from '../../type/index.js'
 import { UpdateBuilder } from '@contember/database'
 
 export class DisableOneOffApiKeyCommand implements Command<void> {

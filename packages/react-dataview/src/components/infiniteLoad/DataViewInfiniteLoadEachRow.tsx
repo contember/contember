@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { Fragment, ReactNode } from 'react'
 import { Component, Entity, EntityAccessor } from '@contember/react-binding'
-import { useDataViewInfiniteLoadAccessors } from '../../contexts'
+import { useDataViewInfiniteLoadAccessors } from '../../contexts.js'
 
 export const DataViewInfiniteLoadEachRow = Component(({ children }: {
 	children: ReactNode

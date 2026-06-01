@@ -1,7 +1,7 @@
-import { Maybe, Person, QueryPersonByIdArgs, QueryResolvers } from '../../schema'
-import { TenantResolverContext } from '../TenantResolverContext'
-import { PermissionActions, PersonManager } from '../../model'
-import { PersonResponseFactory } from '../responseHelpers/PersonResponseFactory'
+import { Maybe, Person, QueryPersonByIdArgs, QueryResolvers } from '../../schema/index.js'
+import { TenantResolverContext } from '../TenantResolverContext.js'
+import { PermissionActions, PersonManager } from '../../model/index.js'
+import { PersonResponseFactory } from '../responseHelpers/PersonResponseFactory.js'
 
 export class PersonQueryResolver implements QueryResolvers {
 	constructor(private readonly personManager: PersonManager) {}

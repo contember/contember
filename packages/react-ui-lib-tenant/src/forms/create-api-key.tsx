@@ -1,9 +1,9 @@
 import { CreateApiKeyFormErrorCode, useCreateApiKeyForm } from '@contember/react-identity'
 import { Button } from '@contember/react-ui-lib-base'
 import { Loader } from '@contember/react-ui-lib-base'
-import { TenantFormError, TenantFormField, TenantFormLabel } from './common'
-import { MembershipsControl, useIntrospectionRolesConfig } from './memberships-control'
-import { dict } from '../dict'
+import { TenantFormError, TenantFormField, TenantFormLabel } from './common.js'
+import { MembershipsControl, useIntrospectionRolesConfig } from './memberships-control.js'
+import { dict } from '../dict.js'
 
 export const CreateApiKeyFormFields = ({ projectSlug }: { projectSlug: string }) => {
 	const form = useCreateApiKeyForm()

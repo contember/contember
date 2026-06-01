@@ -1,5 +1,5 @@
-import { EntityRegistry, EnumRegistry } from './internal'
-import { StrictDefinitionValidator } from '../../strict'
+import { EntityRegistry, EnumRegistry } from './internal/index.js'
+import { StrictDefinitionValidator } from '../../strict.js'
 import { NamingConventions } from '@contember/schema-utils'
 
 export type CommonContext = {

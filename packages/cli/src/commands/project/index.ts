@@ -1,3 +1,3 @@
-export * from './ProjectGenerateDocumentationCommand'
-export * from './ProjectPrintSchemaCommand'
-export * from './ProjectValidateCommand'
+export * from './ProjectGenerateDocumentationCommand.js'
+export * from './ProjectPrintSchemaCommand.js'
+export * from './ProjectValidateCommand.js'

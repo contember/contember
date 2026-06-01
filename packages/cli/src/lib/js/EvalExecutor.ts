@@ -1,4 +1,4 @@
-import { JsExecutor } from './JsExecutor'
+import { JsExecutor } from './JsExecutor.js'
 
 export class EvalExecutor implements JsExecutor {
 	public async execute(code: string): Promise<unknown> {

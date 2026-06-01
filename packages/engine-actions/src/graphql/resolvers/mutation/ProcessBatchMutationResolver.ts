@@ -1,7 +1,7 @@
-import { MutationResolvers } from '../../schema'
-import { ActionsContext } from '../ActionsContext'
-import { EventDispatcher } from '../../../dispatch/EventDispatcher'
-import { ActionsAuthorizationActions } from '../../../authorization'
+import { MutationResolvers } from '../../schema/index.js'
+import { ActionsContext } from '../ActionsContext.js'
+import { EventDispatcher } from '../../../dispatch/EventDispatcher.js'
+import { ActionsAuthorizationActions } from '../../../authorization/index.js'
 
 export class ProcessBatchMutationResolver implements MutationResolvers<ActionsContext> {
 	constructor(

@@ -1,11 +1,11 @@
 import type { FieldValue, PlaceholderName } from '@contember/binding-common'
 import { assertNever } from '@contember/binding-common'
-import type { TreeStore } from '../TreeStore'
-import type { EntityListState } from './EntityListState'
-import type { EntityRealmState } from './EntityRealmState'
-import type { FieldState } from './FieldState'
-import { getEntityMarker } from './getEntityMarker'
-import type { RootStateNode, StateINode, StateNode } from './StateNode'
+import type { TreeStore } from '../TreeStore.js'
+import type { EntityListState } from './EntityListState.js'
+import type { EntityRealmState } from './EntityRealmState.js'
+import type { FieldState } from './FieldState.js'
+import { getEntityMarker } from './getEntityMarker.js'
+import type { RootStateNode, StateINode, StateNode } from './StateNode.js'
 
 export class StateIterator {
 	public static *eachSiblingRealm(

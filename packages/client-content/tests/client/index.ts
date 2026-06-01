@@ -1,10 +1,10 @@
 
-import { ContemberClientNames } from './names'
-import type { ContemberClientSchema } from './entities'
+import { ContemberClientNames } from './names.js'
+import type { ContemberClientSchema } from './entities.js'
 import { ContentQueryBuilder, TypedContentQueryBuilder, TypedEntitySelection } from '@contember/client-content'
-export * from './names'
-export * from './enums'
-export * from './entities'
+export * from './names.js'
+export * from './enums.js'
+export * from './entities.js'
 
 export const queryBuilder = new ContentQueryBuilder(ContemberClientNames) as unknown as TypedContentQueryBuilder<ContemberClientSchema>
 

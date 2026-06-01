@@ -1,4 +1,4 @@
-import { Providers } from '../model'
+import { Providers } from '../model/index.js'
 
 export interface TenantMigrationArgs {
 	getCredentials: () => Promise<{

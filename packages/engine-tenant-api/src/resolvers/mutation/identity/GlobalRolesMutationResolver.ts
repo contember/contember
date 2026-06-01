@@ -4,14 +4,14 @@ import {
 	MutationRemoveGlobalIdentityRolesArgs,
 	MutationResolvers,
 	RemoveGlobalIdentityRolesResponse,
-} from '../../../schema'
+} from '../../../schema/index.js'
 import { GraphQLResolveInfo } from 'graphql'
-import { TenantResolverContext } from '../../TenantResolverContext'
-import { PermissionActions, RolesManager } from '../../../model'
-import { createErrorResponse } from '../../errorUtils'
-import { IdentityQuery } from '../../../model/queries/identity/IdentityQuery'
-import { PersonByIdentityBatchQuery } from '../../../model/queries/person/PersonByIdentityBatchQuery'
-import { ResponseOk } from '../../../model/utils/Response'
+import { TenantResolverContext } from '../../TenantResolverContext.js'
+import { PermissionActions, RolesManager } from '../../../model/index.js'
+import { createErrorResponse } from '../../errorUtils.js'
+import { IdentityQuery } from '../../../model/queries/identity/IdentityQuery.js'
+import { PersonByIdentityBatchQuery } from '../../../model/queries/person/PersonByIdentityBatchQuery.js'
+import { ResponseOk } from '../../../model/utils/Response.js'
 
 export class IdentityGlobalRolesMutationResolver implements MutationResolvers {
 	constructor(

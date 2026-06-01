@@ -1,6 +1,6 @@
 import { Environment, SugarableHasOneRelation, SugaredRelativeEntityList, SugaredRelativeSingleEntity, TokenRegExps } from '@contember/binding'
 import { ReactNode, useMemo } from 'react'
-import { Component } from '../coreComponents'
+import { Component } from '../coreComponents/index.js'
 
 export interface RecursionTerminatorOptions {
 	shouldTerminate?: (args: { node: Environment.AnyNode; field: string; environment: Environment }) => boolean | undefined

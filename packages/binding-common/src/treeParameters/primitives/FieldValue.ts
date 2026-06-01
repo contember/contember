@@ -1,5 +1,5 @@
-import type { VariableFieldValue } from '../../environment'
-import { JsonValue } from './Json'
+import type { VariableFieldValue } from '../../environment/index.js'
+import { JsonValue } from './Json.js'
 
 export type FieldValue = JsonValue
 

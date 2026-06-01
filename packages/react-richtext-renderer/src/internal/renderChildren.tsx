@@ -1,11 +1,11 @@
 import type { ReactElement } from 'react'
-import { ElementRenderer } from './components/ElementRenderer'
-import { LeafRenderer } from './components/LeafRenderer'
-import type { RichTextElement } from '../types/structure/RichTextElement'
-import type { RichTextLeaf } from '../types/structure/RichTextLeaf'
-import { RichTextRenderingOptions } from '../types/RichTextRenderingOptions'
-import { RichTextBlock } from '../types/RichTextBlock'
-import { RichTextChild } from '../types/structure/RichTextChild'
+import { ElementRenderer } from './components/ElementRenderer.js'
+import { LeafRenderer } from './components/LeafRenderer.js'
+import type { RichTextElement } from '../types/structure/RichTextElement.js'
+import type { RichTextLeaf } from '../types/structure/RichTextLeaf.js'
+import { RichTextRenderingOptions } from '../types/RichTextRenderingOptions.js'
+import { RichTextBlock } from '../types/RichTextBlock.js'
+import { RichTextChild } from '../types/structure/RichTextChild.js'
 
 export const renderChildren = <
 	CustomElements extends RichTextElement = never,

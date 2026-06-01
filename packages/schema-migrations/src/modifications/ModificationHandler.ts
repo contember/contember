@@ -1,7 +1,7 @@
 import { MigrationBuilder } from '@contember/database-migrations'
-import { SchemaUpdater } from './utils/schemaUpdateUtils'
+import { SchemaUpdater } from './utils/schemaUpdateUtils.js'
 import { Schema } from '@contember/schema'
-import { Migration } from '../Migration'
+import { Migration } from '../Migration.js'
 import { DatabaseMetadata } from '@contember/database'
 
 export interface ModificationDescription {

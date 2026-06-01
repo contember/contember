@@ -1,1 +1,1 @@
-export * from './EventOldValuesResolver'
+export * from './EventOldValuesResolver.js'

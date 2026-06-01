@@ -1,6 +1,6 @@
 import { Acl, Model } from '@contember/schema'
-import { createMetadataStore, DecoratorFunction, EntityConstructor } from '../../utils'
-import { Role } from './roles'
+import { createMetadataStore, DecoratorFunction, EntityConstructor } from '../../utils/index.js'
+import { Role } from './roles.js'
 
 export type EntityAclExtensionArgs = {
 	entity: Model.Entity

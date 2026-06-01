@@ -1,14 +1,14 @@
 import { BindingError } from '@contember/react-binding'
 import * as Slate from 'slate'
 import { Descendant, Editor, Element as SlateElement, Node as SlateNode } from 'slate'
-import { createReferenceElementPlugin, ReferenceElementOptions } from '../elements'
-import type { EditorWithBlocks } from './EditorWithBlocks'
-import { overrideCreateElementReference, OverrideCreateElementReferenceOptions } from './overrideCreateElementReference'
-import { overrideInsertBreak } from './overrideInsertBreak'
-import { overrideInsertData, OverrideInsertDataOptions } from './overrideInsertData'
-import { overrideInsertElementWithReference, OverrideInsertElementWithReferenceOptions } from './overrideInsertElementWithReference'
-import { overrideInsertNode } from './overrideInsertNode'
-import { overrideRenderElement, OverrideRenderElementOptions } from './overrideRenderElement'
+import { createReferenceElementPlugin, ReferenceElementOptions } from '../elements/index.js'
+import type { EditorWithBlocks } from './EditorWithBlocks.js'
+import { overrideCreateElementReference, OverrideCreateElementReferenceOptions } from './overrideCreateElementReference.js'
+import { overrideInsertBreak } from './overrideInsertBreak.js'
+import { overrideInsertData, OverrideInsertDataOptions } from './overrideInsertData.js'
+import { overrideInsertElementWithReference, OverrideInsertElementWithReferenceOptions } from './overrideInsertElementWithReference.js'
+import { overrideInsertNode } from './overrideInsertNode.js'
+import { overrideRenderElement, OverrideRenderElementOptions } from './overrideRenderElement.js'
 
 export interface InitEditorOptions
 	extends

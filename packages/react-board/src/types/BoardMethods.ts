@@ -1,5 +1,5 @@
 import { EntityAccessor } from '@contember/react-binding'
-import { BoardColumnValue } from './BoardColumnNode'
+import { BoardColumnValue } from './BoardColumnNode.js'
 
 export type BoardAddColumnMethod = (index: number | undefined, preprocess?: EntityAccessor.BatchUpdatesHandler) => void
 export type BoardMoveColumnMethod = (entity: EntityAccessor, index: number) => void

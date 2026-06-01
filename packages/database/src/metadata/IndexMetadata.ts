@@ -1,4 +1,4 @@
-import { stringArrayEquals } from './stringArrayEquals'
+import { stringArrayEquals } from './stringArrayEquals.js'
 
 export interface IndexMetadata {
 	indexName: string

@@ -1,3 +1,3 @@
-export * from './DisableOtpTrigger'
-export * from './LogoutTrigger'
-export * from './RemoveProjectMemberTrigger'
+export * from './DisableOtpTrigger.js'
+export * from './LogoutTrigger.js'
+export * from './RemoveProjectMemberTrigger.js'

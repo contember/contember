@@ -1,6 +1,6 @@
-import { SQL } from '../../../../src/tags'
+import { SQL } from '../../../../src/tags.js'
 import { ExpectedQuery } from '@contember/database-tester'
-import { ApiKey } from '../../../../../src'
+import { ApiKey } from '../../../../../src/index.js'
 
 export const getApiKeySql = (args: {
 	apiKeyId: string

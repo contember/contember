@@ -1,11 +1,11 @@
 import { ReactElement, useCallback, useMemo } from 'react'
 import * as TenantApi from '@contember/graphql-client-tenant'
-import { TenantForm } from './TenantForm'
-import { FormContextValue, FormError, FormState } from '../../types/forms'
-import { useForm } from '../../contexts'
-import { InitSignInPasswordlessMutationResult, useInitSignInPasswordlessMutation } from '../../hooks'
-import { PASSWORDLESS_REQUEST_STORAGE_KEY } from '../../consts'
-import { useSaveBacklink } from '../../internal/hooks/useRedirectToBacklink'
+import { TenantForm } from './TenantForm.js'
+import { FormContextValue, FormError, FormState } from '../../types/forms.js'
+import { useForm } from '../../contexts.js'
+import { InitSignInPasswordlessMutationResult, useInitSignInPasswordlessMutation } from '../../hooks/index.js'
+import { PASSWORDLESS_REQUEST_STORAGE_KEY } from '../../consts.js'
+import { useSaveBacklink } from '../../internal/hooks/useRedirectToBacklink.js'
 
 export type PasswordlessSignInInitFormValues = {
 	email: string

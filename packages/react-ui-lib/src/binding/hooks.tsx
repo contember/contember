@@ -2,7 +2,7 @@ import { useCallback } from 'react'
 import { dict } from '@contember/react-ui-lib-base'
 import { ToastContent, useShowToast } from '@contember/react-ui-lib-base'
 import { ErrorPersistResult, SuccessfulPersistResult, usePersist } from '@contember/interface'
-import { useErrorFormatter } from '../errors'
+import { useErrorFormatter } from '../errors/index.js'
 
 export const usePersistWithFeedback = () => {
 	const triggerPersist = usePersist()

@@ -1,5 +1,5 @@
-import { useDataViewFilter } from '../../index'
-import { BooleanFilterArtifacts } from '../../../filterTypes'
+import { useDataViewFilter } from '../../index.js'
+import { BooleanFilterArtifacts } from '../../../filterTypes/index.js'
 import { useCallback, useMemo } from 'react'
 
 export type DataViewSetBooleanFilterAction = 'include' | 'unset' | 'toggle'

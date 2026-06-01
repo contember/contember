@@ -1,6 +1,6 @@
-import { FileUploadProgress, FileUploadResult } from '../uploadClient'
-import { FileWithMeta } from './file'
-import { FileType } from './type'
+import { FileUploadProgress, FileUploadResult } from '../uploadClient/index.js'
+import { FileWithMeta } from './file.js'
+import { FileType } from './type.js'
 
 export type BeforeUploadEvent = {
 	file: FileWithMeta

@@ -1,5 +1,5 @@
 import type { FieldAccessor } from '@contember/binding-common'
-import { FieldHelper } from './FieldHelper'
+import { FieldHelper } from './FieldHelper.js'
 
 class TemporalFieldHelper extends FieldHelper<string> {
 	public setToNow(options?: FieldAccessor.UpdateOptions) {

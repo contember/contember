@@ -1,1 +1,1 @@
-export * from './use-error-formatter'
+export * from './use-error-formatter.js'

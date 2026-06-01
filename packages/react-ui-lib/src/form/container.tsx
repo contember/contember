@@ -1,9 +1,9 @@
 import { ReactNode } from 'react'
 import { FormContainerUI, FormDescriptionUI, FormErrorUI, FormLabelUI, FormLabelWrapperUI } from '@contember/react-ui-lib-base'
-import { useErrorFormatter } from '../errors'
+import { useErrorFormatter } from '../errors/index.js'
 import { Component, ErrorAccessor, useLabelMiddleware } from '@contember/interface'
 import { FormError, FormFieldStateProvider, FormLabel, useFormFieldState } from '@contember/react-form'
-import { FormFieldLabel } from './labels'
+import { FormFieldLabel } from './labels.js'
 
 export type FormContainerProps = {
 	label?: ReactNode

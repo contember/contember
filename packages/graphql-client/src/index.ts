@@ -1,3 +1,3 @@
-export * from './GraphQlClient'
-export * from './GraphQlClientRequestOptions'
-export * from './GraphQlClientError'
+export * from './GraphQlClient.js'
+export * from './GraphQlClientRequestOptions.js'
+export * from './GraphQlClientError.js'

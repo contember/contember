@@ -1,7 +1,7 @@
 import { ReactNode } from 'react'
-import { RoutingContext } from '../contexts'
-import { RequestProvider } from '../internal/components/RequestProvider'
-import { RoutingContextValue } from '../types'
+import { RoutingContext } from '../contexts.js'
+import { RequestProvider } from '../internal/components/RequestProvider.js'
+import { RoutingContextValue } from '../types/index.js'
 
 export type RoutingProviderProps =
 	& Partial<RoutingContextValue>

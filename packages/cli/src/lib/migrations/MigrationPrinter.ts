@@ -5,7 +5,7 @@ import chalk from 'chalk'
 import { AnyMigrationStatus, Migration, MigrationDescriber, MigrationState } from '@contember/migrations-client'
 import { emptyDatabaseMetadata } from '@contember/database'
 import chalkTable from 'chalk-table'
-import { assertNever } from '../assertNever'
+import { assertNever } from '../assertNever.js'
 
 export class MigrationPrinter {
 	constructor(

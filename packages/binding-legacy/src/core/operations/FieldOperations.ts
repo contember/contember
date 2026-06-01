@@ -9,12 +9,12 @@ import {
 	PRIMARY_KEY_NAME,
 	ServerId,
 } from '@contember/binding-common'
-import type { AccessorErrorManager } from '../AccessorErrorManager'
-import { EventManager } from '../EventManager'
-import { FieldState, getEntityMarker, StateIterator } from '../state'
-import type { StateInitializer } from '../StateInitializer'
-import type { TreeStore } from '../TreeStore'
-import { OperationsHelpers } from './OperationsHelpers'
+import type { AccessorErrorManager } from '../AccessorErrorManager.js'
+import { EventManager } from '../EventManager.js'
+import { FieldState, getEntityMarker, StateIterator } from '../state/index.js'
+import type { StateInitializer } from '../StateInitializer.js'
+import type { TreeStore } from '../TreeStore.js'
+import { OperationsHelpers } from './OperationsHelpers.js'
 
 export class FieldOperations {
 	public constructor(

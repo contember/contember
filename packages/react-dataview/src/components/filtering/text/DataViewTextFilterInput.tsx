@@ -1,8 +1,8 @@
 import * as React from 'react'
 import { forwardRef, ReactElement } from 'react'
 import { Slot } from '@radix-ui/react-slot'
-import { useDataViewTextFilterInput } from '../../../hooks'
-import { useDataViewFilterName } from '../../../contexts'
+import { useDataViewTextFilterInput } from '../../../hooks/index.js'
+import { useDataViewFilterName } from '../../../contexts.js'
 
 const SlotInput = Slot as React.ForwardRefExoticComponent<
 	React.InputHTMLAttributes<HTMLInputElement> & React.RefAttributes<HTMLInputElement>

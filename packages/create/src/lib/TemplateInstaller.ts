@@ -1,5 +1,5 @@
 import { join } from 'node:path'
-import { FileSystem } from './FileSystem'
+import { FileSystem } from './FileSystem.js'
 import jsyaml from 'js-yaml'
 import degit from 'degit'
 

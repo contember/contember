@@ -1,1 +1,1 @@
-export * from './urlSigner'
+export * from './urlSigner.js'

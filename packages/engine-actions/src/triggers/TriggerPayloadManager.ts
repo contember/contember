@@ -1,8 +1,8 @@
 import { Actions, ActionsPayload, Input, Model } from '@contember/schema'
-import { AnyListener } from './TriggerListenersStore'
-import { EventCause } from './TriggerHandler'
-import { TriggerPayloadBuilder } from './TriggerPayloadBuilder'
-import { TriggerPayloadPersister } from './TriggerPayloadPersister'
+import { AnyListener } from './TriggerListenersStore.js'
+import { EventCause } from './TriggerHandler.js'
+import { TriggerPayloadBuilder } from './TriggerPayloadBuilder.js'
+import { TriggerPayloadPersister } from './TriggerPayloadPersister.js'
 
 export interface FiredEvent {
 	listener: AnyListener

@@ -2,10 +2,10 @@ import { Command, CommandConfiguration, Input } from '@contember/cli-common'
 import { InvalidSchemaException } from '@contember/schema-migrations'
 import prompts from 'prompts'
 import { MigrationCreator, MigrationsResolver, SchemaStateManager, SchemaVersionBuilder } from '@contember/migrations-client'
-import { SchemaLoader } from '../../lib/schema/SchemaLoader'
-import { MigrationPrinter } from '../../lib/migrations/MigrationPrinter'
-import { MigrationExecutionFacade } from '../../lib/migrations/MigrationExecutionFacade'
-import { printValidationErrors } from '../../lib/schema/SchemaValidationPrinter'
+import { SchemaLoader } from '../../lib/schema/SchemaLoader.js'
+import { MigrationPrinter } from '../../lib/migrations/MigrationPrinter.js'
+import { MigrationExecutionFacade } from '../../lib/migrations/MigrationExecutionFacade.js'
+import { printValidationErrors } from '../../lib/schema/SchemaValidationPrinter.js'
 
 type Args = {
 	migrationName: string

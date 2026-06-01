@@ -1,4 +1,4 @@
-import type { Environment } from '../environment'
+import type { Environment } from '../environment/index.js'
 import {
 	EntityFieldMarker,
 	EntityFieldMarkersContainer,
@@ -8,8 +8,8 @@ import {
 	FieldMarker,
 	HasManyRelationMarker,
 	HasOneRelationMarker,
-} from '../markers'
-import { MarkerMerger } from '../markers/MarkerMerger'
+} from '../markers/index.js'
+import { MarkerMerger } from '../markers/MarkerMerger.js'
 import type {
 	EntityEventListenerStore,
 	HasManyRelation,
@@ -24,10 +24,10 @@ import type {
 	SugaredRelativeSingleField,
 	SugaredUnconstrainedQualifiedEntityList,
 	SugaredUnconstrainedQualifiedSingleEntity,
-} from '../treeParameters'
-import { TreeParameterMerger } from '../treeParameters/TreeParameterMerger'
-import { assertNever } from '../utils/assertNever'
-import { QueryLanguage } from './QueryLanguage'
+} from '../treeParameters/index.js'
+import { TreeParameterMerger } from '../treeParameters/TreeParameterMerger.js'
+import { assertNever } from '../utils/assertNever.js'
+import { QueryLanguage } from './QueryLanguage.js'
 
 export class MarkerFactory {
 	public static createEntitySubTreeMarker(

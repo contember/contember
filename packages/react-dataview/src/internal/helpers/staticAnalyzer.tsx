@@ -1,10 +1,10 @@
-import { dataViewSelectionEnvironmentExtension } from '../../env/dataViewSelectionEnvironmentExtension'
-import { createUnionTextFilter } from '../../filterTypes'
-import { DataViewFilter, DataViewFilterProps, DataViewLayout, DataViewLayoutProps, DataViewProps, DataViewQueryFilterName } from '../../components'
+import { dataViewSelectionEnvironmentExtension } from '../../env/dataViewSelectionEnvironmentExtension.js'
+import { createUnionTextFilter } from '../../filterTypes/index.js'
+import { DataViewFilter, DataViewFilterProps, DataViewLayout, DataViewLayoutProps, DataViewProps, DataViewQueryFilterName } from '../../components/index.js'
 import { EntityFieldMarkersContainer, EntityListSubTreeMarker, Environment, FieldMarker, HasOneRelationMarker } from '@contember/react-binding'
 import { EntityListSubTree, MarkerTreeGenerator } from '@contember/react-binding'
 import { ChildrenAnalyzer, Leaf } from '@contember/react-multipass-rendering'
-import { DataViewFilterHandler, DataViewSelectionLayout } from '../../types'
+import { DataViewFilterHandler, DataViewSelectionLayout } from '../../types/index.js'
 import deepEqual from 'fast-deep-equal'
 
 export interface DataViewStaticInfo {

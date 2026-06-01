@@ -18,11 +18,11 @@ import {
 } from '@contember/react-uploader'
 import * as React from 'react'
 import { ReactNode, useMemo, useState } from 'react'
-import { FormContainer, FormContainerProps } from './container'
+import { FormContainer, FormContainerProps } from './container.js'
 import { Component, DisconnectEntityTrigger, EntityView, useEntity } from '@contember/interface'
 import { FormFieldStateProvider } from '@contember/react-form'
-import { UploadedAnyView, UploadedAudioView, UploadedImageView, UploadedVideoView, UploaderDropzone, UploaderItemUI } from '../upload'
-import { UploaderProgress } from '../upload/upload-progress'
+import { UploadedAnyView, UploadedAudioView, UploadedImageView, UploadedVideoView, UploaderDropzone, UploaderItemUI } from '../upload/index.js'
+import { UploaderProgress } from '../upload/upload-progress.js'
 
 export type BaseUploadFieldProps =
 	& Omit<FormContainerProps, 'children'>

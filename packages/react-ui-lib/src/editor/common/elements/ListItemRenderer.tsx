@@ -1,7 +1,7 @@
 import { RenderElementProps } from 'slate-react'
 import { FunctionComponent } from 'react'
 import { ListItemElement } from '@contember/react-slate-editor-base'
-import { BlockElement } from './BlockElement'
+import { BlockElement } from './BlockElement.js'
 
 export interface ListItemRendererProps extends Omit<RenderElementProps, 'element'> {
 	element: ListItemElement

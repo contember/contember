@@ -1,9 +1,9 @@
-import { ContentEvent, EventType } from './types'
-import { CreateEvent, DeleteEvent, EventType as ApiEventType, UpdateEvent } from '../../schema'
-import { assertNever } from '../../utils'
-import { IdentityFetcher } from '../dependencies'
-import { formatIdentity } from './identityUtils'
-import { appendCreateSpecificData, appendDeleteSpecificData, appendUpdateSpecificData } from './EventResponseHelper'
+import { ContentEvent, EventType } from './types.js'
+import { CreateEvent, DeleteEvent, EventType as ApiEventType, UpdateEvent } from '../../schema/index.js'
+import { assertNever } from '../../utils/index.js'
+import { IdentityFetcher } from '../dependencies/index.js'
+import { formatIdentity } from './identityUtils.js'
+import { appendCreateSpecificData, appendDeleteSpecificData, appendUpdateSpecificData } from './EventResponseHelper.js'
 
 export class EventResponseBuilder {
 	constructor(private readonly identityFetcher: IdentityFetcher) {}

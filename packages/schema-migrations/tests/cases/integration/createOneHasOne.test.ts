@@ -1,8 +1,8 @@
 import { describe } from 'bun:test'
-import { testMigrations } from '../../src/tests'
+import { testMigrations } from '../../src/tests.js'
 import { SchemaBuilder } from '@contember/schema-definition'
 import { Model } from '@contember/schema'
-import { SQL } from '../../src/tags'
+import { SQL } from '../../src/tags.js'
 
 describe('create one has one relation (site with settings)', () =>
 	testMigrations({

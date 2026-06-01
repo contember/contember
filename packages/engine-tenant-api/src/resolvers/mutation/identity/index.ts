@@ -1,1 +1,1 @@
-export * from './GlobalRolesMutationResolver'
+export * from './GlobalRolesMutationResolver.js'

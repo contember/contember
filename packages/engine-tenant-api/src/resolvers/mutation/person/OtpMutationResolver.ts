@@ -5,12 +5,12 @@ import {
 	MutationPrepareOtpArgs,
 	MutationResolvers,
 	PrepareOtpResponse,
-} from '../../../schema'
-import { TenantResolverContext } from '../../TenantResolverContext'
-import { OtpManager, PermissionActions, PersonQuery, PersonRow } from '../../../model'
-import { ImplementationException } from '../../../exceptions'
-import { createErrorResponse } from '../../errorUtils'
-import { ResponseError, ResponseOk } from '../../../model/utils/Response'
+} from '../../../schema/index.js'
+import { TenantResolverContext } from '../../TenantResolverContext.js'
+import { OtpManager, PermissionActions, PersonQuery, PersonRow } from '../../../model/index.js'
+import { ImplementationException } from '../../../exceptions.js'
+import { createErrorResponse } from '../../errorUtils.js'
+import { ResponseError, ResponseOk } from '../../../model/utils/Response.js'
 
 export class OtpMutationResolver implements MutationResolvers {
 	constructor(private readonly otpManager: OtpManager) {}

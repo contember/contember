@@ -1,8 +1,8 @@
 import * as React from 'react'
 import { ReactNode } from 'react'
 import { Component, EntityListSubTree } from '@contember/react-binding'
-import { useDataViewRelationFilterData } from '../../../hooks'
-import { useDataViewFilterName, useDataViewRelationFilterArgs } from '../../../contexts'
+import { useDataViewRelationFilterData } from '../../../hooks/index.js'
+import { useDataViewFilterName, useDataViewRelationFilterArgs } from '../../../contexts.js'
 
 export interface DataViewRelationFilterListProps {
 	/**

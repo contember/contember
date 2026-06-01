@@ -11,7 +11,7 @@ import {
 } from '@contember/schema-migrations'
 import { emptySchema } from '@contember/schema-utils'
 import { afterEach, beforeEach, expect } from 'bun:test'
-import { TenantClient } from './TenantClient'
+import { TenantClient } from './TenantClient.js'
 
 export const rootToken = String(process.env.CONTEMBER_ROOT_TOKEN)
 export const loginToken = String(process.env.CONTEMBER_LOGIN_TOKEN)

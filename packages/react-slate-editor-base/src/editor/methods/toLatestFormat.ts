@@ -1,6 +1,6 @@
 import { BindingError } from '@contember/react-binding'
 import { Editor as SlateEditor, Element as SlateElement } from 'slate'
-import { SerializableEditorNode } from '../../types/editor'
+import { SerializableEditorNode } from '../../types/editor.js'
 
 export const toLatestFormat = <E extends SlateEditor>(
 	editor: E,

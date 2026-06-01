@@ -1,8 +1,8 @@
 import { assertNever } from '@contember/binding-common'
-import type { StateNode } from '../state'
+import type { StateNode } from '../state/index.js'
 import type { MeaningfulMarker } from '@contember/binding-common'
-import { MarkerSugarer } from './MarkerSugarer'
-import { TreeParameterSugarer } from './TreeParameterSugarer'
+import { MarkerSugarer } from './MarkerSugarer.js'
+import { TreeParameterSugarer } from './TreeParameterSugarer.js'
 
 export class ErrorLocator {
 	private static readonly GLUE = '.'

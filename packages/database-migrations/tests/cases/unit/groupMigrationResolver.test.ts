@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test'
-import { GroupMigrationsResolver, Migration } from '../../../src'
+import { GroupMigrationsResolver, Migration } from '../../../src/index.js'
 
 describe('group migration resolver', () => {
 	test('merges migrations', () => {

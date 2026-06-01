@@ -1,5 +1,5 @@
-import { BindingError } from '../BindingError'
-import { PRIMARY_KEY_NAME } from '../consts'
+import { BindingError } from '../BindingError.js'
+import { PRIMARY_KEY_NAME } from '../consts.js'
 import {
 	EntityFieldMarkers,
 	EntityFieldMarkersContainer,
@@ -12,11 +12,11 @@ import {
 	MarkerTreeRoot,
 	MeaningfulMarker,
 	SubTreeMarkers,
-} from '../markers'
-import type { Alias, FieldName, PlaceholderName } from '../treeParameters'
-import { assertNever } from '../utils/assertNever'
-import { TreeParameterMerger } from '../treeParameters/TreeParameterMerger'
-import { Environment } from '../environment'
+} from '../markers/index.js'
+import type { Alias, FieldName, PlaceholderName } from '../treeParameters/index.js'
+import { assertNever } from '../utils/assertNever.js'
+import { TreeParameterMerger } from '../treeParameters/TreeParameterMerger.js'
+import { Environment } from '../environment/index.js'
 
 export class MarkerMerger {
 	// This method assumes their placeholder names are the same

@@ -13,11 +13,11 @@ import {
 	DataViewSelectionStateContext,
 	DataViewSortingMethodsContext,
 	DataViewSortingStateContext,
-} from '../contexts'
+} from '../contexts.js'
 import { Component, EntityAccessor, Environment, EnvironmentMiddleware } from '@contember/react-binding'
-import { DataViewLoader } from '../internal/components/DataViewLoader'
-import { DataViewInfo, DataViewMethods, DataViewState } from '../types'
-import { dataViewSelectionEnvironmentExtension } from '../env/dataViewSelectionEnvironmentExtension'
+import { DataViewLoader } from '../internal/components/DataViewLoader.js'
+import { DataViewInfo, DataViewMethods, DataViewState } from '../types/index.js'
+import { dataViewSelectionEnvironmentExtension } from '../env/dataViewSelectionEnvironmentExtension.js'
 
 export interface ControlledDataViewProps {
 	children: ReactNode

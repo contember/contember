@@ -1,5 +1,5 @@
-import { createGenericTextCellFilterCondition } from './common'
-import { createFieldFilterHandler } from './createFilterHandler'
+import { createGenericTextCellFilterCondition } from './common.js'
+import { createFieldFilterHandler } from './createFilterHandler.js'
 
 export type TextFilterArtifactsMatchMode = 'matches' | 'matchesExactly' | 'startsWith' | 'endsWith' | 'doesNotMatch'
 

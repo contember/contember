@@ -1,6 +1,6 @@
 import { ReactNode, useMemo } from 'react'
-import { useDataViewFilter } from '../../index'
-import { RelationFilterArtifacts } from '../../../filterTypes'
+import { useDataViewFilter } from '../../index.js'
+import { RelationFilterArtifacts } from '../../../filterTypes/index.js'
 import { QueryLanguage, SugaredQualifiedEntityList } from '@contember/react-binding'
 import { useEntityListSubTreeLoader, useEnvironment } from '@contember/react-binding'
 

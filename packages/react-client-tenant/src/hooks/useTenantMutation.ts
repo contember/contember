@@ -1,4 +1,4 @@
-import { TenantApiOptions, useTenantApi } from './useTenantApi'
+import { TenantApiOptions, useTenantApi } from './useTenantApi.js'
 import { useCallback, useMemo } from 'react'
 import { MutationFetcher } from '@contember/graphql-client-tenant'
 

@@ -1,6 +1,6 @@
-import type { EditorWithBlocks } from './EditorWithBlocks'
-import { isInReferenceElement } from '../utils'
-import { isElementWithReference } from '../elements'
+import type { EditorWithBlocks } from './EditorWithBlocks.js'
+import { isInReferenceElement } from '../utils/index.js'
+import { isElementWithReference } from '../elements/index.js'
 import { Editor, Element, Path as SlatePath, Text, Transforms } from 'slate'
 import { ContemberEditor } from '@contember/react-slate-editor-base'
 

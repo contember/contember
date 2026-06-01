@@ -1,8 +1,8 @@
 import { Client, InsertBuilder } from '@contember/database'
 import { Mapper, TriggeredActionEvent, TriggeredActionsCollector } from '@contember/engine-content-api'
 import { Actions, ActionsPayload } from '@contember/schema'
-import { EventRow } from '../model/types'
-import { notify } from '../utils/notifyChannel'
+import { EventRow } from '../model/types.js'
+import { notify } from '../utils/notifyChannel.js'
 
 type EventRowToInsert = Omit<EventRow, 'created_at' | 'visible_at' | 'last_state_change' | 'log'> & {
 	created_at: string | Date

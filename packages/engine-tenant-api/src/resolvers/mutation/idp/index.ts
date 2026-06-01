@@ -1,3 +1,3 @@
-export * from './DisableIDPMutationResolver'
-export * from './EnableIDPMutationResolver'
-export * from './AddIDPMutationResolver'
+export * from './DisableIDPMutationResolver.js'
+export * from './EnableIDPMutationResolver.js'
+export * from './AddIDPMutationResolver.js'

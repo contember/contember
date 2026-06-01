@@ -1,4 +1,4 @@
-import { snapshotMigration } from './snapshot-factory'
+import { snapshotMigration } from './snapshot-factory.js'
 export default snapshotMigration(({ randomUuidFn }) => `
 CREATE DOMAIN "event_data_type" AS "text"
 	CONSTRAINT "event_data_type_check" CHECK ((VALUE = ANY (ARRAY['create'::"text", 'update'::"text", 'delete'::"text"])));

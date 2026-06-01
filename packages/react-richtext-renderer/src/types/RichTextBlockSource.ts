@@ -1,4 +1,4 @@
-import { RichTextElement, RichTextLeaf, RootEditorNode } from './structure'
+import { RichTextElement, RichTextLeaf, RootEditorNode } from './structure/index.js'
 
 export type RichTextBlockSource<CustomElements extends RichTextElement = never, CustomLeaves extends RichTextLeaf = RichTextLeaf> = {
 	blocks: readonly Readonly<Record<string, unknown>>[]

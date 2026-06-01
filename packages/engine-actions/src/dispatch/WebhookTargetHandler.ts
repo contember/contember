@@ -1,8 +1,8 @@
 import { Actions, ActionsPayload } from '@contember/schema'
-import { EventRow, HandledEvent, InvokeHandler, InvokeHandlerArgs } from './types'
-import { VariablesMap } from '../model/VariablesManager'
+import { EventRow, HandledEvent, InvokeHandler, InvokeHandlerArgs } from './types.js'
+import { VariablesMap } from '../model/VariablesManager.js'
 import * as Typesafe from '@contember/typesafe'
-import { FetcherResponse, WebhookFetcher } from './WebhookFetcher'
+import { FetcherResponse, WebhookFetcher } from './WebhookFetcher.js'
 
 const DEFAULT_TIMEOUT_MS = 30_000 // 30 seconds
 

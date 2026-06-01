@@ -1,7 +1,7 @@
-import { QueryResolvers } from '../../schema'
-import { ActionsContext } from '../ActionsContext'
-import { VariablesManager } from '../../../model/VariablesManager'
-import { ActionsAuthorizationActions } from '../../../authorization'
+import { QueryResolvers } from '../../schema/index.js'
+import { ActionsContext } from '../ActionsContext.js'
+import { VariablesManager } from '../../../model/VariablesManager.js'
+import { ActionsAuthorizationActions } from '../../../authorization/index.js'
 
 export class VariablesQueryResolver implements QueryResolvers<ActionsContext> {
 	constructor(

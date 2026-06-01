@@ -1,7 +1,7 @@
 import { useCallback, useState } from 'react'
 import { AlertDialog, AlertDialogCancel, AlertDialogContent, AlertDialogTitle } from '@contember/react-ui-lib-base'
 import { BlockNavigationOnDirtyStateResult, useBlockNavigationOnDirtyState } from '@contember/interface'
-import { usePersistFeedbackHandlers } from './hooks'
+import { usePersistFeedbackHandlers } from './hooks.js'
 import { Button } from '@contember/react-ui-lib-base'
 import { SaveIcon } from 'lucide-react'
 

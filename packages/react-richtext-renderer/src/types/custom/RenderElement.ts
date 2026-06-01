@@ -1,12 +1,12 @@
-import { RichTextElement } from '../structure/RichTextElement'
-import { RichTextLeaf } from '../structure/RichTextLeaf'
-import { RichTextReference } from '../RichTextReference'
-import { BuiltinElements } from '../builtin/BuiltinElements'
+import { RichTextElement } from '../structure/RichTextElement.js'
+import { RichTextLeaf } from '../structure/RichTextLeaf.js'
+import { RichTextReference } from '../RichTextReference.js'
+import { BuiltinElements } from '../builtin/BuiltinElements.js'
 import { ComponentType, ReactElement } from 'react'
-import { RichTextReferenceMetadata } from '../RichTextReferenceMetadata'
-import { RichTextRenderingOptions } from '../RichTextRenderingOptions'
-import { RichTextBlock } from '../RichTextBlock'
-import { RenderChildren } from '../RenderChildren'
+import { RichTextReferenceMetadata } from '../RichTextReferenceMetadata.js'
+import { RichTextRenderingOptions } from '../RichTextRenderingOptions.js'
+import { RichTextBlock } from '../RichTextBlock.js'
+import { RenderChildren } from '../RenderChildren.js'
 
 export type RenderElementProps<
 	CustomElements extends RichTextElement = never,

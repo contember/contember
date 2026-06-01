@@ -1,4 +1,4 @@
-import { ParsedStackFrame, ParsedStackTrace } from './types'
+import { ParsedStackFrame, ParsedStackTrace } from './types.js'
 
 const className = (cls?: string | null) => cls ? `cui-devError-${cls}` : 'cui-devError'
 export const StackTrace = ({ stackTrace }: { stackTrace: ParsedStackTrace }) => {

@@ -1,6 +1,6 @@
 import { withSortable } from '@contember/react-slate-editor'
-import { SortableBlock } from './sortable-block'
-import { baseEditorPlugins } from './common/baseEditorPlugins'
+import { SortableBlock } from './sortable-block.js'
+import { baseEditorPlugins } from './common/baseEditorPlugins.js'
 
 const plugins = baseEditorPlugins
 

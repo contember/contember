@@ -1,10 +1,10 @@
-import { QueryBuilder } from './QueryBuilder'
-import { Literal } from '../Literal'
-import { Value } from '../types'
-import { ConditionBuilder, ConditionExpression } from './ConditionBuilder'
-import { WindowFunction } from './WindowFunction'
-import { CaseStatement } from './CaseStatement'
-import { formatColumnIdentifier } from '../utils'
+import { QueryBuilder } from './QueryBuilder.js'
+import { Literal } from '../Literal.js'
+import { Value } from '../types.js'
+import { ConditionBuilder, ConditionExpression } from './ConditionBuilder.js'
+import { WindowFunction } from './WindowFunction.js'
+import { CaseStatement } from './CaseStatement.js'
+import { formatColumnIdentifier } from '../utils/index.js'
 
 export class ColumnExpressionFactory {
 	public select(columnName: QueryBuilder.ColumnIdentifier): Literal {

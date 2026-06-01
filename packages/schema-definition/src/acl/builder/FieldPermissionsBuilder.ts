@@ -1,8 +1,8 @@
-import FieldSelector from './FieldSelector'
-import EntityPermissionsBuilder from './EntityPermissionsBuilder'
+import FieldSelector from './FieldSelector.js'
+import EntityPermissionsBuilder from './EntityPermissionsBuilder.js'
 import { Acl, Model, Writable } from '@contember/schema'
-import EntitySelector from './EntitySelector'
-import { PermissionsBuilder } from './PermissionsBuilder'
+import EntitySelector from './EntitySelector.js'
+import { PermissionsBuilder } from './PermissionsBuilder.js'
 
 export default class FieldPermissionsBuilder {
 	public constructor(

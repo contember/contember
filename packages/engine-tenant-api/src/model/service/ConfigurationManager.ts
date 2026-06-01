@@ -1,7 +1,7 @@
-import { ConfigInput, ConfigureErrorCode } from '../../schema'
-import { Response, ResponseOk } from '../utils/Response'
-import { DatabaseContext } from '../utils'
-import { UpdateConfigurationCommand } from '../commands'
+import { ConfigInput, ConfigureErrorCode } from '../../schema/index.js'
+import { Response, ResponseOk } from '../utils/Response.js'
+import { DatabaseContext } from '../utils/index.js'
+import { UpdateConfigurationCommand } from '../commands/index.js'
 
 export class ConfigurationManager {
 	public async updateConfiguration(db: DatabaseContext, configuration: ConfigInput): Promise<Response<null, ConfigureErrorCode>> {

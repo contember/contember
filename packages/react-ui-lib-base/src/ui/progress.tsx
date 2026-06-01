@@ -1,6 +1,6 @@
 import * as ProgressPrimitive from '@radix-ui/react-progress'
 import * as React from 'react'
-import { uic } from '../utils'
+import { uic } from '../utils/index.js'
 
 const ProgressRoot = uic(ProgressPrimitive.Root, {
 	baseClass: 'relative h-1.5 w-full overflow-hidden rounded-full bg-primary/20',

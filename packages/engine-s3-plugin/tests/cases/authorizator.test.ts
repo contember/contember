@@ -1,5 +1,5 @@
 import { expect, test } from 'bun:test'
-import { S3ObjectAuthorizator } from '../../src'
+import { S3ObjectAuthorizator } from '../../src/index.js'
 
 test('required read pattern', () => {
 	const authorizator = new S3ObjectAuthorizator([], [{ pattern: 'foo/**' }])

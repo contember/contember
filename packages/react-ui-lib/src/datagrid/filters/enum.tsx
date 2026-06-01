@@ -21,12 +21,12 @@ import {
 	DataGridFilterSelectItemUI,
 	DataGridFilterSelectTriggerUI,
 	DataGridSingleFilterUI,
-} from '../ui'
-import { DataGridNullFilter } from './common'
+} from '../ui.js'
+import { DataGridNullFilter } from './common.js'
 import { dict } from '@contember/react-ui-lib-base'
-import { DataGridFilterMobileHiding } from './mobile'
-import { useEnumOptionsFormatter } from '../../labels'
-import { DataViewFieldLabel } from '../labels'
+import { DataGridFilterMobileHiding } from './mobile.js'
+import { useEnumOptionsFormatter } from '../../labels/index.js'
+import { DataViewFieldLabel } from '../labels.js'
 
 /**
  * Props for {@link DataGridEnumFilter}.

@@ -1,6 +1,6 @@
-import { DataViewGlobalKeyContext } from '../contexts'
+import { DataViewGlobalKeyContext } from '../contexts.js'
 import { EnvironmentMiddleware } from '@contember/react-binding'
-import { dataViewKeyEnvironmentExtension } from '../env/dataViewKeyEnvironmentExtension'
+import { dataViewKeyEnvironmentExtension } from '../env/dataViewKeyEnvironmentExtension.js'
 
 /**
  * The `DataViewKeyProvider` component is responsible for providing a global key for the DataView.

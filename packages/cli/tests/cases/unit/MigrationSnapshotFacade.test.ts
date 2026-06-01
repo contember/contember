@@ -17,7 +17,7 @@ import {
 	SnapshotManager,
 	VERSION_LATEST,
 } from '@contember/migrations-client'
-import { MigrationSnapshotFacade } from '../../../src/lib/migrations/MigrationSnapshotFacade'
+import { MigrationSnapshotFacade } from '../../../src/lib/migrations/MigrationSnapshotFacade.js'
 
 namespace ModelA {
 	export class Author {

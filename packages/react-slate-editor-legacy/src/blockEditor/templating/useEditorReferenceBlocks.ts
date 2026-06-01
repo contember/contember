@@ -1,9 +1,9 @@
 import { Environment, useEnvironment } from '@contember/react-binding'
 import { useConstantValueInvariant } from '@contember/react-utils'
 import { ReactNode, useMemo } from 'react'
-import { BlockProps, useBlockProps } from '../../blocks'
-import { NormalizedDiscriminatedData, useDiscriminatedData } from '../../discrimination'
-import { EditorTemplate, getEditorTemplate } from './getEditorTemplate'
+import { BlockProps, useBlockProps } from '../../blocks/index.js'
+import { NormalizedDiscriminatedData, useDiscriminatedData } from '../../discrimination/index.js'
+import { EditorTemplate, getEditorTemplate } from './getEditorTemplate.js'
 
 export interface EditorReferenceBlock extends BlockProps {
 	template: EditorTemplate

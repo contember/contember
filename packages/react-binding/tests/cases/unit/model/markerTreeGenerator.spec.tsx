@@ -20,7 +20,7 @@ import {
 	PlaceholderName,
 	PRIMARY_KEY_NAME,
 	SubTreeMarkers,
-} from '../../../../src'
+} from '../../../../src/index.js'
 import { Schema, SchemaRelation } from '@contember/binding'
 import { SchemaPreprocessor } from '@contember/binding'
 

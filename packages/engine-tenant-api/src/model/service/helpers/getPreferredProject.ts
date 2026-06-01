@@ -1,4 +1,4 @@
-import { Project } from '../../type'
+import { Project } from '../../type/index.js'
 
 export const getPreferredProject = (projects: Project[], preferredProjectSlug: string | null): Project | null => {
 	if (projects.length === 1) {

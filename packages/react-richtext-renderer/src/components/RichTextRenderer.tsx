@@ -1,8 +1,8 @@
 import { memo, ReactElement } from 'react'
-import type { RichTextElement } from '../types/structure/RichTextElement'
-import type { RichTextLeaf } from '../types/structure/RichTextLeaf'
-import { RichTextFieldRenderer, RichTextFieldRendererProps } from './RichTextFieldRenderer'
-import { RichTextBlocksRenderer, RichTextBlocksRendererProps } from './RichTextBlocksRenderer'
+import type { RichTextElement } from '../types/structure/RichTextElement.js'
+import type { RichTextLeaf } from '../types/structure/RichTextLeaf.js'
+import { RichTextFieldRenderer, RichTextFieldRendererProps } from './RichTextFieldRenderer.js'
+import { RichTextBlocksRenderer, RichTextBlocksRendererProps } from './RichTextBlocksRenderer.js'
 
 export type RichTextRendererProps<
 	CustomElements extends RichTextElement = never,

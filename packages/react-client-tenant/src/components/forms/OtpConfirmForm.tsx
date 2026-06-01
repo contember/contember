@@ -1,9 +1,9 @@
 import { ReactElement } from 'react'
-import { TenantForm } from './TenantForm'
-import { FormContextValue, FormError, FormState } from '../../types'
-import { useForm, useIdentityMethods } from '../../contexts'
+import { TenantForm } from './TenantForm.js'
+import { FormContextValue, FormError, FormState } from '../../types/index.js'
+import { useForm, useIdentityMethods } from '../../contexts.js'
 import { ConfirmOtpErrorCode } from '@contember/graphql-client-tenant'
-import { useConfirmOtpMutation } from '../../hooks'
+import { useConfirmOtpMutation } from '../../hooks/index.js'
 
 export type OtpConfirmFormValues = {
 	otpToken: string

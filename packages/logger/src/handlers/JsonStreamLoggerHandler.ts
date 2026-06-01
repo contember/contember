@@ -1,5 +1,5 @@
-import { LogEntry, LoggerHandler, LogLevel } from '../types'
-import { LogLevels } from '../levels'
+import { LogEntry, LoggerHandler, LogLevel } from '../types.js'
+import { LogLevels } from '../levels.js'
 
 export interface JsonStreamLoggerHandlerOptions {
 	logLevel: LogLevel

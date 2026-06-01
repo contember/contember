@@ -3,11 +3,11 @@ import deepEqual from 'fast-deep-equal'
 import { Acl, Input, Model, Writable } from '@contember/schema'
 import { PredicateDefinitionProcessor } from '@contember/schema-utils'
 
-import { PermissionsByEntity } from './AclFactory'
-import { createPredicateName } from './createPredicateName'
-import { AllowDefinition, PredicateExtra, WhenDefinition } from '../permissions'
-import { PredicateEvaluationReference } from '../references'
-import { VariableDefinition } from '../variables'
+import { PermissionsByEntity } from './AclFactory.js'
+import { createPredicateName } from './createPredicateName.js'
+import { AllowDefinition, PredicateExtra, WhenDefinition } from '../permissions.js'
+import { PredicateEvaluationReference } from '../references.js'
+import { VariableDefinition } from '../variables.js'
 
 export class EntityPredicatesResolver {
 	private usedPredicates: string[] = []

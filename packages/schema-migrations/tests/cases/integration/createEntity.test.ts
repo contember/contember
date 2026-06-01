@@ -1,8 +1,8 @@
 import { createSchema, SchemaBuilder } from '@contember/schema-definition'
 import { Model } from '@contember/schema'
-import { SQL } from '../../src/tags'
+import { SQL } from '../../src/tags.js'
 import { describe } from 'bun:test'
-import { testMigrations } from '../../src/tests'
+import { testMigrations } from '../../src/tests.js'
 import { SchemaDefinition as def } from '@contember/schema-definition'
 
 describe('create a table (no relations, unique on column)', () =>

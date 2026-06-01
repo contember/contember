@@ -1,2 +1,2 @@
-export * from './MailTemplateQuery'
-export * from './MailTemplateListQuery'
+export * from './MailTemplateQuery.js'
+export * from './MailTemplateListQuery.js'

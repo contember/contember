@@ -1,13 +1,13 @@
 import { QueryLanguage, SugaredQualifiedEntityList } from '@contember/react-binding'
-import { DataViewInfo, DataViewMethods, DataViewState } from '../types/dataview'
+import { DataViewInfo, DataViewMethods, DataViewState } from '../types/dataview.js'
 import { useCallback, useMemo, useRef } from 'react'
 import { useEnvironment } from '@contember/react-binding'
-import { useDataViewFiltering } from '../internal/hooks/useDataViewFiltering'
-import { DataViewFilteringProps, DataViewPagingProps, DataViewSelectionProps, DataViewSortingProps } from '../types'
-import { useDataViewSorting } from '../internal/hooks/useDataViewSorting'
-import { useDataViewPaging } from '../internal/hooks/useDataViewPaging'
-import { useDataViewSelection } from '../internal/hooks/useDataViewSelection'
-import { getDataViewKey } from '../internal/helpers/getDataViewKey'
+import { useDataViewFiltering } from '../internal/hooks/useDataViewFiltering.js'
+import { DataViewFilteringProps, DataViewPagingProps, DataViewSelectionProps, DataViewSortingProps } from '../types/index.js'
+import { useDataViewSorting } from '../internal/hooks/useDataViewSorting.js'
+import { useDataViewPaging } from '../internal/hooks/useDataViewPaging.js'
+import { useDataViewSelection } from '../internal/hooks/useDataViewSelection.js'
+import { getDataViewKey } from '../internal/helpers/getDataViewKey.js'
 
 export type UseDataViewArgs =
 	& {

@@ -1,4 +1,4 @@
-import { SlotSource, SlotSourceProps } from '../components/SlotSource'
+import { SlotSource, SlotSourceProps } from '../components/SlotSource.js'
 import { ComponentType } from 'react'
 
 export type SlotSourceComponentProps = Omit<SlotSourceProps, 'name'>

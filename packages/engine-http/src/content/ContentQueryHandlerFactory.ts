@@ -1,7 +1,7 @@
 import { GraphQLSchema } from 'graphql'
-import { createDbQueriesListener, createGraphQLQueryHandler, GraphQLListener, GraphQLQueryHandler } from '../graphql'
-import { ContentGraphqlContext } from './ContentGraphqlContext'
-import { createTriggeredActionsListener } from './triggeredActionsListener'
+import { createDbQueriesListener, createGraphQLQueryHandler, GraphQLListener, GraphQLQueryHandler } from '../graphql/index.js'
+import { ContentGraphqlContext } from './ContentGraphqlContext.js'
+import { createTriggeredActionsListener } from './triggeredActionsListener.js'
 
 export type ContentQueryHandler = GraphQLQueryHandler<ContentGraphqlContext>
 

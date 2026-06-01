@@ -1,8 +1,8 @@
-import { DisablePersonResponse, MutationDisablePersonArgs, MutationResolvers } from '../../../schema'
-import { TenantResolverContext } from '../../TenantResolverContext'
-import { PermissionActions, PersonAccessManager } from '../../../model'
-import { PersonManager } from '../../../model/service/PersonManager'
-import { createErrorResponse } from '../../errorUtils'
+import { DisablePersonResponse, MutationDisablePersonArgs, MutationResolvers } from '../../../schema/index.js'
+import { TenantResolverContext } from '../../TenantResolverContext.js'
+import { PermissionActions, PersonAccessManager } from '../../../model/index.js'
+import { PersonManager } from '../../../model/service/PersonManager.js'
+import { createErrorResponse } from '../../errorUtils.js'
 
 export class DisablePersonMutationResolver implements MutationResolvers {
 	constructor(

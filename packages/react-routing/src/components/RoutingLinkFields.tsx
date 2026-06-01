@@ -1,7 +1,7 @@
 import { Component, Field } from '@contember/react-binding'
-import { RoutingLinkTarget } from '../types'
-import { parseLinkTarget } from '../internal/utils/parseLinkTarget'
-import { createFieldsFromTarget } from '../internal/utils/createFieldsFromTarget'
+import { RoutingLinkTarget } from '../types/index.js'
+import { parseLinkTarget } from '../internal/utils/parseLinkTarget.js'
+import { createFieldsFromTarget } from '../internal/utils/createFieldsFromTarget.js'
 
 export interface RoutingLinkFieldsProps {
 	to: RoutingLinkTarget

@@ -1,2 +1,2 @@
-export * from './IdentityProviderBySlugQuery'
-export * from './IdentityProvidersQuery'
+export * from './IdentityProviderBySlugQuery.js'
+export * from './IdentityProvidersQuery.js'

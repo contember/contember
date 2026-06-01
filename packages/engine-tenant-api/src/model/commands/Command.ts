@@ -1,6 +1,6 @@
 import { Client } from '@contember/database'
-import { Providers } from '../providers'
-import { CommandBus } from './CommandBus'
+import { Providers } from '../providers.js'
+import { CommandBus } from './CommandBus.js'
 
 interface Command<Result> {
 	execute(args: Command.Args): Promise<Result>

@@ -1,9 +1,9 @@
 import { Actions, Model } from '@contember/schema'
-import { acceptFieldVisitor } from '../model'
-import { ErrorBuilder, ValidationError } from './errors'
-import { assertNever } from '../utils'
+import { acceptFieldVisitor } from '../model/index.js'
+import { ErrorBuilder, ValidationError } from './errors.js'
+import { assertNever } from '../utils/index.js'
 import * as Typesafe from '@contember/typesafe'
-import { whereSchema } from '../type-schema/where'
+import { whereSchema } from '../type-schema/where.js'
 
 const manyArgsSchema = (args: { schema: Model.Schema; entity: Model.Entity }) =>
 	Typesafe.partial({

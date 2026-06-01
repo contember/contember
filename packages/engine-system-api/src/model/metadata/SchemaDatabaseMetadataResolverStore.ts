@@ -1,4 +1,4 @@
-import { DatabaseContext } from '../database'
+import { DatabaseContext } from '../database/index.js'
 import { DatabaseMetadata, DatabaseMetadataResolver } from '@contember/database'
 
 export class SchemaDatabaseMetadataResolverStore {

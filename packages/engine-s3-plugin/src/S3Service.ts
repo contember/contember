@@ -1,10 +1,10 @@
 import { extension as resolveExtension } from 'mime-types'
-import { resolveS3PublicBaseUrl, S3Config } from './Config'
+import { resolveS3PublicBaseUrl, S3Config } from './Config.js'
 import { ForbiddenError, UserInputError } from '@contember/graphql-utils'
 import { Providers } from '@contember/engine-plugins'
-import { S3Signer } from './S3Signer'
-import { S3GenerateSignedUploadInput } from './S3SchemaTypes'
-import { S3ObjectAuthorizator } from './S3ObjectAuthorizator'
+import { S3Signer } from './S3Signer.js'
+import { S3GenerateSignedUploadInput } from './S3SchemaTypes.js'
+import { S3ObjectAuthorizator } from './S3ObjectAuthorizator.js'
 
 type SignedReadUrl = {
 	url: string

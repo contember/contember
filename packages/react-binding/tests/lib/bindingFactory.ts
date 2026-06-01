@@ -10,7 +10,7 @@ import {
 	TreeAugmenter,
 	TreeStore,
 } from '@contember/binding-legacy'
-import { MarkerTreeGenerator } from '../../src'
+import { MarkerTreeGenerator } from '../../src/index.js'
 
 export const createBinding = ({ node, schema }: { node: ReactNode; schema: SchemaStore }) => {
 	const finalSchema = new Schema(schema)

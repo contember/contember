@@ -1,6 +1,6 @@
-import type { FieldName } from '../treeParameters'
-import type { SchemaColumnType } from './SchemaColumnType'
-import type { SchemaEnumName } from './SchemaEnums'
+import type { FieldName } from '../treeParameters/index.js'
+import type { SchemaColumnType } from './SchemaColumnType.js'
+import type { SchemaEnumName } from './SchemaEnums.js'
 
 export interface SchemaColumn {
 	__typename: '_Column'

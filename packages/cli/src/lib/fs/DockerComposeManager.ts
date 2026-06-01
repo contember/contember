@@ -1,7 +1,7 @@
 import { dirname, join } from 'node:path'
 import jsyaml from 'js-yaml'
-import { FileSystem } from './FileSystem'
-import { JsonUpdateCallback, YamlHandler } from './YamlHandler'
+import { FileSystem } from './FileSystem.js'
+import { JsonUpdateCallback, YamlHandler } from './YamlHandler.js'
 
 export interface DockerComposeServiceConfig {
 	image?: string

@@ -1,7 +1,7 @@
 import { useEffect } from 'react'
-import { DevErrorInner } from './DevErrorInner'
-import type { ProcessedError } from './types'
-import { DevErrorCopy } from './DevErrorCopy'
+import { DevErrorInner } from './DevErrorInner.js'
+import type { ProcessedError } from './types.js'
+import { DevErrorCopy } from './DevErrorCopy.js'
 
 export interface DevErrorListProps {
 	currentError: ProcessedError

@@ -1,4 +1,4 @@
-import type { EntityId, FieldValue } from '../treeParameters'
+import type { EntityId, FieldValue } from '../treeParameters/index.js'
 
 export type ReceivedFieldData = FieldValue | ReceivedEntityData | Array<ReceivedEntityData>
 

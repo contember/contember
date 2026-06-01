@@ -1,5 +1,5 @@
-import { DataViewFilterArtifact } from '../types'
-import { useDataViewFilteringMethods, useDataViewFilteringState } from '../contexts'
+import { DataViewFilterArtifact } from '../types/index.js'
+import { useDataViewFilteringMethods, useDataViewFilteringState } from '../contexts.js'
 import { SetStateAction, useCallback } from 'react'
 
 export type UseDataViewFilterResult<T extends DataViewFilterArtifact> = [

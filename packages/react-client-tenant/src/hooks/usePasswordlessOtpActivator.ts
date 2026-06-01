@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react'
-import { PASSWORDLESS_REQUEST_STORAGE_KEY } from '../consts'
-import { useActivatePasswordlessOtpMutation } from './mutations'
-import { randomString } from '../internal/utils/randomInt'
-import { calculateHash } from '../internal/utils/hashing'
+import { PASSWORDLESS_REQUEST_STORAGE_KEY } from '../consts.js'
+import { useActivatePasswordlessOtpMutation } from './mutations/index.js'
+import { randomString } from '../internal/utils/randomInt.js'
+import { calculateHash } from '../internal/utils/hashing.js'
 import { ActivatePasswordlessOtpErrorCode } from '@contember/graphql-client-tenant'
 
 const usePasswordlessParams = (): { localStorageRequestId: string | null; urlRequestId: string | null; urlToken: string | null } => {

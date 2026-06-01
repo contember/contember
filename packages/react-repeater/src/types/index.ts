@@ -1,1 +1,1 @@
-export * from './RepeaterMethods'
+export * from './RepeaterMethods.js'

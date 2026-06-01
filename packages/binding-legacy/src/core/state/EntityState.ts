@@ -1,5 +1,5 @@
 import type { EntityName, EntityRealmKey, RuntimeId, UnpersistedEntityDummyId } from '@contember/binding-common'
-import type { EntityRealmState, EntityRealmStateStub } from './EntityRealmState'
+import type { EntityRealmState, EntityRealmStateStub } from './EntityRealmState.js'
 
 export interface EntityState {
 	entityName: EntityName

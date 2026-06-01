@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test'
-import { Migration, SnapshotMigrationResolver } from '../../../src'
+import { Migration, SnapshotMigrationResolver } from '../../../src/index.js'
 
 describe('snapshot migration resolver', () => {
 	test('use snapshot with latest migration timestamp', () => {

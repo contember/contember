@@ -7,7 +7,7 @@ import {
 	SugaredRelativeSingleField,
 	useBindingOperations,
 } from '@contember/react-binding'
-import { useGetReferenceEntityList } from './useGetReferenceEntityList'
+import { useGetReferenceEntityList } from './useGetReferenceEntityList.js'
 import { useReferentiallyStableCallback } from '@contember/react-utils'
 
 export type CreateElementReferences = (

@@ -1,9 +1,9 @@
-import { EventManager } from './EventManager'
-import { Client } from './Client'
-import { Pool, PoolConfig, PoolStatus } from './Pool'
-import { createPgClientFactory } from '../utils'
-import { DatabaseConfig } from '../types'
-import { AcquiredConnection } from './AcquiredConnection'
+import { EventManager } from './EventManager.js'
+import { Client } from './Client.js'
+import { Pool, PoolConfig, PoolStatus } from './Pool.js'
+import { createPgClientFactory } from '../utils/index.js'
+import { DatabaseConfig } from '../types.js'
+import { AcquiredConnection } from './AcquiredConnection.js'
 import { Notification } from 'pg'
 
 class Connection implements Connection.ConnectionLike, Connection.ClientFactory, Connection.PoolStatusProvider {

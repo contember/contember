@@ -1,13 +1,13 @@
 import { Acl, Input, Model, Settings } from '@contember/schema'
-import { Mapper } from '../../Mapper'
-import { RelationFetcher } from '../RelationFetcher'
-import { SelectExecutionHandlerContext } from '../SelectExecutionHandler'
-import { PredicateFactory } from '../../../acl'
+import { Mapper } from '../../Mapper.js'
+import { RelationFetcher } from '../RelationFetcher.js'
+import { SelectExecutionHandlerContext } from '../SelectExecutionHandler.js'
+import { PredicateFactory } from '../../../acl/index.js'
 import { Literal, wrapIdentifier } from '@contember/database'
-import { ColumnValueGetter } from '../SelectHydrator'
+import { ColumnValueGetter } from '../SelectHydrator.js'
 import { Providers } from '@contember/schema-utils'
 import { getColumnName } from '@contember/schema-utils'
-import { viewComputedId } from '../../../utils/viewComputedId'
+import { viewComputedId } from '../../../utils/viewComputedId.js'
 
 export class FieldsVisitor implements Model.RelationByTypeVisitor<void>, Model.ColumnVisitor<void> {
 	constructor(

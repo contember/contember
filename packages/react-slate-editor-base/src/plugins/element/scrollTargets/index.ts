@@ -1,2 +1,2 @@
-export * from './ScrollTargetElement'
-export * from './withScrollTargets'
+export * from './ScrollTargetElement.js'
+export * from './withScrollTargets.js'

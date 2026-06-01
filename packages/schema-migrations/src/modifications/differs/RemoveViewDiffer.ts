@@ -1,8 +1,8 @@
-import { Differ } from '../ModificationHandler'
+import { Differ } from '../ModificationHandler.js'
 import { Schema } from '@contember/schema'
 import deepEqual from 'fast-deep-equal'
-import { cascadeRemoveDependantViews } from '../utils/viewDependencies'
-import { UpdateColumnDefinitionDiffer } from '../columns'
+import { cascadeRemoveDependantViews } from '../utils/viewDependencies.js'
+import { UpdateColumnDefinitionDiffer } from '../columns/index.js'
 
 /**
  * Remove changed or removed view.

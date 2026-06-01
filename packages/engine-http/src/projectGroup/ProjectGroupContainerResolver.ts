@@ -1,7 +1,7 @@
 import { EventEmitter, EventManager, PromiseMap } from '@contember/engine-common'
 import { isDeepStrictEqual } from 'node:util'
-import { ProjectGroupContainer, ProjectGroupContainerFactory } from './ProjectGroupContainer'
-import { TenantConfigResolver } from '../config/tenantConfigResolver'
+import { ProjectGroupContainer, ProjectGroupContainerFactory } from './ProjectGroupContainer.js'
+import { TenantConfigResolver } from '../config/tenantConfigResolver.js'
 
 interface ContainerWithMeta {
 	container: ProjectGroupContainer

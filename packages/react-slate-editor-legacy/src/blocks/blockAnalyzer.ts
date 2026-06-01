@@ -1,6 +1,6 @@
 import type { Environment } from '@contember/react-binding'
 import { ChildrenAnalyzer, Leaf } from '@contember/react-multipass-rendering'
-import { Block, BlockProps } from './Block'
+import { Block, BlockProps } from './Block.js'
 
 const blockLeaf = new Leaf<BlockProps>(node => node.props, Block)
 

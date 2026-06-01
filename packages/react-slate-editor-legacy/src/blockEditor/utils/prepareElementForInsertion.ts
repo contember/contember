@@ -9,7 +9,7 @@ import {
 	Range as SlateRange,
 	Transforms,
 } from 'slate'
-import { isReferenceElement } from '../elements'
+import { isReferenceElement } from '../elements/index.js'
 import { ContemberEditor } from '@contember/react-slate-editor-base'
 
 export const prepareElementForInsertion = (editor: Editor, node: SlateNode) => {

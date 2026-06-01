@@ -1,10 +1,10 @@
 import { GraphQLInputObjectType, GraphQLNonNull } from 'graphql'
 import { Acl, Model } from '@contember/schema'
-import { aliasAwareResolver, EntityTypeProvider, FieldAccessVisitor, GqlTypeName, WhereTypeProvider } from '../../schema'
+import { aliasAwareResolver, EntityTypeProvider, FieldAccessVisitor, GqlTypeName, WhereTypeProvider } from '../../schema/index.js'
 import { acceptFieldVisitor } from '@contember/schema-utils'
-import { Authorizator } from '../../acl'
-import { getFieldsForUniqueWhere } from '../../utils'
-import { HasManyToHasOneReducer, HasManyToHasOneReducerExtension } from './HasManyToHasOneReducer'
+import { Authorizator } from '../../acl/index.js'
+import { getFieldsForUniqueWhere } from '../../utils/index.js'
+import { HasManyToHasOneReducer, HasManyToHasOneReducerExtension } from './HasManyToHasOneReducer.js'
 import { GraphQLFieldConfig } from 'graphql'
 
 type Result = [

@@ -1,2 +1,2 @@
-export * from './parseUrl'
-export * from './parseIframeSrc'
+export * from './parseUrl.js'
+export * from './parseIframeSrc.js'

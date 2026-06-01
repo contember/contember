@@ -1,8 +1,8 @@
-import { BindingError } from '../BindingError'
-import type { Environment } from '../environment'
-import type { HasManyRelation } from '../treeParameters'
-import type { EntityFieldMarkersContainer } from './EntityFieldMarkersContainer'
-import { PlaceholderGenerator } from './PlaceholderGenerator'
+import { BindingError } from '../BindingError.js'
+import type { Environment } from '../environment/index.js'
+import type { HasManyRelation } from '../treeParameters/index.js'
+import type { EntityFieldMarkersContainer } from './EntityFieldMarkersContainer.js'
+import { PlaceholderGenerator } from './PlaceholderGenerator.js'
 
 // This doesn't represent reduced has many relations.
 export class HasManyRelationMarker {

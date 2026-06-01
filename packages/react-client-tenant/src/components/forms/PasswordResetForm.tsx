@@ -1,10 +1,10 @@
 import { ReactElement } from 'react'
 import * as TenantApi from '@contember/graphql-client-tenant'
 import { ResetPasswordErrorCode } from '@contember/graphql-client-tenant'
-import { TenantForm } from './TenantForm'
-import { FormContextValue, FormError, FormState } from '../../types'
-import { useForm } from '../../contexts'
-import { useResetPasswordMutation } from '../../hooks'
+import { TenantForm } from './TenantForm.js'
+import { FormContextValue, FormError, FormState } from '../../types/index.js'
+import { useForm } from '../../contexts.js'
+import { useResetPasswordMutation } from '../../hooks/index.js'
 
 export type PasswordResetFormValues = {
 	token: string

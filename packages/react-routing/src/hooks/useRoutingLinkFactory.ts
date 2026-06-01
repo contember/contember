@@ -1,10 +1,10 @@
 import { BaseSyntheticEvent, useCallback } from 'react'
-import { useCurrentRequest, usePushRequest, useRouting } from '../contexts'
-import { RequestParameters, RoutingLinkTarget, RoutingParameterResolver } from '../types'
-import { targetToRequest } from '../internal/utils/targetToRequest'
-import { resolveParameters } from '../internal/utils/resolveParameters'
-import { requestStateToPath } from '../internal/utils/urlMapper'
-import { PageNotFound } from '../PageNotFound'
+import { useCurrentRequest, usePushRequest, useRouting } from '../contexts.js'
+import { RequestParameters, RoutingLinkTarget, RoutingParameterResolver } from '../types/index.js'
+import { targetToRequest } from '../internal/utils/targetToRequest.js'
+import { resolveParameters } from '../internal/utils/resolveParameters.js'
+import { requestStateToPath } from '../internal/utils/urlMapper.js'
+import { PageNotFound } from '../PageNotFound.js'
 
 export interface RoutingLinkParams {
 	href: string

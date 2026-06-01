@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'bun:test'
-import { Environment } from '../../../../src/environment'
-import { Parser } from '../../../../src/queryLanguage'
+import { Environment } from '../../../../src/environment/index.js'
+import { Parser } from '../../../../src/queryLanguage/index.js'
 
 const parse = (input: string, environment: Environment = Environment.create()) => {
 	return Parser.parseQueryLanguageExpression(input, 'filter', environment)

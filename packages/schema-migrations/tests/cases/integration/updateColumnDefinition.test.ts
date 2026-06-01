@@ -1,9 +1,9 @@
 import { describe } from 'bun:test'
-import { testMigrations } from '../../src/tests'
+import { testMigrations } from '../../src/tests.js'
 import { createSchema, SchemaBuilder, SchemaDefinition as def } from '@contember/schema-definition'
 import { Model } from '@contember/schema'
-import { SQL } from '../../src/tags'
-import { updateColumnDefinitionModification } from '../../../src'
+import { SQL } from '../../src/tags.js'
+import { updateColumnDefinitionModification } from '../../../src/index.js'
 
 describe('update column definition', () =>
 	testMigrations({

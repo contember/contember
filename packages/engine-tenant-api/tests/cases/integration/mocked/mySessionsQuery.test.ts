@@ -1,7 +1,7 @@
-import { authenticatedApiKeyId, authenticatedIdentityId, executeTenantTest, now } from '../../../src/testTenant'
-import { GQL } from '../../../src/tags'
-import { testUuid } from '../../../src/testUuid'
-import { listSessionsSql } from './sql/listSessionsSql'
+import { authenticatedApiKeyId, authenticatedIdentityId, executeTenantTest, now } from '../../../src/testTenant.js'
+import { GQL } from '../../../src/tags.js'
+import { testUuid } from '../../../src/testUuid.js'
+import { listSessionsSql } from './sql/listSessionsSql.js'
 import { test } from 'bun:test'
 
 test('me.sessions returns active sessions and marks the current one', async () => {

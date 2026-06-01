@@ -1,5 +1,5 @@
 import React, { ReactNode, useCallback, useMemo } from 'react'
-import { SelectCurrentEntitiesContext, SelectHandler, SelectHandleSelectContext, SelectIsSelectedContext, SelectOptionsContext } from '../contexts'
+import { SelectCurrentEntitiesContext, SelectHandler, SelectHandleSelectContext, SelectIsSelectedContext, SelectOptionsContext } from '../contexts.js'
 import {
 	Component,
 	EntityAccessor,
@@ -19,7 +19,7 @@ import {
 } from '@contember/react-binding'
 import { useReferentiallyStableCallback } from '@contember/react-utils'
 import { Repeater } from '@contember/react-repeater'
-import { SelectEvents } from '../types'
+import { SelectEvents } from '../types/index.js'
 
 export type SortableMultiSelectProps =
 	& {

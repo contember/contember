@@ -4,11 +4,11 @@ import {
 	MutationChangeMyProfileArgs,
 	MutationChangeProfileArgs,
 	MutationResolvers,
-} from '../../../schema'
+} from '../../../schema/index.js'
 import { GraphQLResolveInfo } from 'graphql'
-import { TenantResolverContext } from '../../TenantResolverContext'
-import { IdentityScope, PermissionActions, PersonManager, PersonQuery } from '../../../model'
-import { createErrorResponse } from '../../errorUtils'
+import { TenantResolverContext } from '../../TenantResolverContext.js'
+import { IdentityScope, PermissionActions, PersonManager, PersonQuery } from '../../../model/index.js'
+import { createErrorResponse } from '../../errorUtils.js'
 
 export class ChangeProfileMutationResolver implements Pick<MutationResolvers, 'changeMyProfile' | 'changeProfile'> {
 	constructor(

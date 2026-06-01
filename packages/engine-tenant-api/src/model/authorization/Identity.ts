@@ -1,5 +1,5 @@
-import { ProjectMemberManager } from '../service'
-import { DatabaseContext } from '../utils'
+import { ProjectMemberManager } from '../service/index.js'
+import { DatabaseContext } from '../utils/index.js'
 import { Acl } from '@contember/schema'
 
 export interface Identity {

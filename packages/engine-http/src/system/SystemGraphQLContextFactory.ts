@@ -1,8 +1,8 @@
 import { Identity, SystemContainer } from '@contember/engine-system-api'
-import { SystemGraphQLContext } from './SystemGraphQLHandlerFactory'
-import { AuthResult } from '../common'
+import { SystemGraphQLContext } from './SystemGraphQLHandlerFactory.js'
+import { AuthResult } from '../common/index.js'
 import { Acl } from '@contember/schema'
-import { ProjectContainer } from '../project'
+import { ProjectContainer } from '../project/index.js'
 
 export class SystemGraphQLContextFactory {
 	public async create({ authResult, memberships, projectContainer, systemContainer, onClearCache }: {

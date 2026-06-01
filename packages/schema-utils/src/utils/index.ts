@@ -1,3 +1,3 @@
-export * from './assertNever'
-export * from './isIt'
-export * from './deepCompare'
+export * from './assertNever.js'
+export * from './isIt.js'
+export * from './deepCompare.js'

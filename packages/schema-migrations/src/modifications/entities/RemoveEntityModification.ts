@@ -10,17 +10,17 @@ import {
 	updateAclEveryRole,
 	updateModel,
 	updateSchema,
-} from '../utils/schemaUpdateUtils'
+} from '../utils/schemaUpdateUtils.js'
 import {
 	createModificationType,
 	Differ,
 	ModificationHandler,
 	ModificationHandlerCreateSqlOptions,
 	ModificationHandlerOptions,
-} from '../ModificationHandler'
-import { VERSION_ACL_PATCH, VERSION_REMOVE_REFERENCING_RELATIONS } from '../ModificationVersions'
+} from '../ModificationHandler.js'
+import { VERSION_ACL_PATCH, VERSION_REMOVE_REFERENCING_RELATIONS } from '../ModificationVersions.js'
 import { acceptEveryFieldVisitor, isInverseRelation, isRelation, PredicateDefinitionProcessor } from '@contember/schema-utils'
-import { removeFieldModification } from '../fields'
+import { removeFieldModification } from '../fields/index.js'
 
 export class RemoveEntityModificationHandler implements ModificationHandler<RemoveEntityModificationData> {
 	constructor(

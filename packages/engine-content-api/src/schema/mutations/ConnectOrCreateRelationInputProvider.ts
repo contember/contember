@@ -1,11 +1,11 @@
-import { Accessor, Interface, singletonFactory } from '../../utils'
+import { Accessor, Interface, singletonFactory } from '../../utils/index.js'
 import { GraphQLInputObjectType, GraphQLNonNull } from 'graphql'
-import { GqlTypeName } from '../utils'
-import { WhereTypeProvider } from '../WhereTypeProvider'
-import { EntityInputProvider, EntityInputType } from './EntityInputProvider'
+import { GqlTypeName } from '../utils.js'
+import { WhereTypeProvider } from '../WhereTypeProvider.js'
+import { EntityInputProvider, EntityInputType } from './EntityInputProvider.js'
 import { Model } from '@contember/schema'
 import { acceptFieldVisitor } from '@contember/schema-utils'
-import { ImplementationException } from '../../exception'
+import { ImplementationException } from '../../exception.js'
 
 type Args = {
 	entityName: string

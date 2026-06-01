@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { useMemo } from 'react'
 import { SugaredRelativeSingleField, useField } from '@contember/react-binding'
-import { FormFieldStateProvider } from './FormFieldStateProvider'
+import { FormFieldStateProvider } from './FormFieldStateProvider.js'
 
 export type FormFieldScopeProps = {
 	field: SugaredRelativeSingleField['field']

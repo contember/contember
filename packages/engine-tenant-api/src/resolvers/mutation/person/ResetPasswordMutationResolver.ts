@@ -4,9 +4,9 @@ import {
 	MutationResetPasswordArgs,
 	MutationResolvers,
 	ResetPasswordResponse,
-} from '../../../schema'
+} from '../../../schema/index.js'
 import { GraphQLResolveInfo } from 'graphql'
-import { TenantResolverContext } from '../../TenantResolverContext'
+import { TenantResolverContext } from '../../TenantResolverContext.js'
 import {
 	CaptchaValidator,
 	ConfigurationQuery,
@@ -15,9 +15,9 @@ import {
 	PermissionContextFactory,
 	PersonQuery,
 	RateLimiter,
-} from '../../../model'
-import { createErrorResponse } from '../../errorUtils'
-import { ResponseError, ResponseOk } from '../../../model/utils/Response'
+} from '../../../model/index.js'
+import { createErrorResponse } from '../../errorUtils.js'
+import { ResponseError, ResponseOk } from '../../../model/utils/Response.js'
 
 export class ResetPasswordMutationResolver implements MutationResolvers {
 	constructor(

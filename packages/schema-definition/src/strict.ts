@@ -12,8 +12,16 @@ export const allStrict: StrictOptions = {
 
 export type Warning = { message: string }
 
+type OnDeleteValidation = {
+	entityName: string
+	field: string
+	hasOnDelete: boolean
+}
+
 export class StrictDefinitionValidator {
 	public readonly warnings: Warning[] = []
+
+	private readonly onDeleteValidations: OnDeleteValidation[] = []
 
 	constructor(
 		private readonly options: StrictOptions,
@@ -27,10 +35,27 @@ export class StrictDefinitionValidator {
 	}
 
 	public validateOnCascade(entityName: string, field: string, definition: { onDelete?: Model.OnDelete }): void {
-		if (!definition.onDelete && this.options.requireOnDelete) {
-			this.registerWarning(
-				`${entityName}.${field}: onDelete behaviour is not set. Use one of cascadeOnDelete(), setNullOnDelete() or restrictOnDelete().`,
-			)
+		// View entities are read-only and have no real delete semantics, so onDelete validation is
+		// deferred to validateModel() where we know which entities are views.
+		this.onDeleteValidations.push({ entityName, field, hasOnDelete: definition.onDelete !== undefined })
+	}
+
+	public validateModel(model: Model.Schema): void {
+		for (const { entityName, field, hasOnDelete } of this.onDeleteValidations) {
+			const isView = model.entities[entityName]?.view !== undefined
+			if (isView) {
+				if (hasOnDelete) {
+					this.registerWarning(
+						`${entityName}.${field}: onDelete behaviour must not be set on a relation of a view entity. Views are read-only and have no delete semantics.`,
+					)
+				}
+				continue
+			}
+			if (!hasOnDelete && this.options.requireOnDelete) {
+				this.registerWarning(
+					`${entityName}.${field}: onDelete behaviour is not set. Use one of cascadeOnDelete(), setNullOnDelete() or restrictOnDelete().`,
+				)
+			}
 		}
 	}
 

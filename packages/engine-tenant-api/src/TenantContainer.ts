@@ -21,6 +21,7 @@ import {
 	IdentityFactory,
 	IDPHandlerRegistry,
 	IDPManager,
+	IdpSessionRevalidator,
 	IDPSignInManager,
 	InviteManager,
 	MailTemplateManager,
@@ -173,9 +174,18 @@ export class TenantContainerFactory {
 			.addService('apiKeyService', () => new ApiKeyService())
 			.addService('authPolicyResolver', () => new AuthPolicyResolver())
 			.addService('authLogService', () => new AuthLogService())
+			.addService('idpRegistry', () => {
+				const idpRegistry = new IDPHandlerRegistry()
+				idpRegistry.registerHandler('oidc', new OIDCProvider())
+				idpRegistry.registerHandler('facebook', new FacebookProvider())
+				idpRegistry.registerHandler('apple', new AppleProvider())
+				return idpRegistry
+			})
+			.addService('idpSessionRevalidator', ({ idpRegistry }) => new IdpSessionRevalidator(idpRegistry))
 			.addService(
 				'apiKeyManager',
-				({ apiKeyService, authPolicyResolver, authLogService }) => new ApiKeyManager(apiKeyService, authPolicyResolver, authLogService),
+				({ apiKeyService, authPolicyResolver, authLogService, idpSessionRevalidator }) =>
+					new ApiKeyManager(apiKeyService, authPolicyResolver, authLogService, idpSessionRevalidator),
 			)
 			.addService('emailValidator', () => new EmailValidator())
 			.addService('hibpChecker', (): HibpChecker => new HttpHibpChecker())
@@ -218,13 +228,6 @@ export class TenantContainerFactory {
 				({ userMailer, projectManager, emailValidator, apiKeyManager, permissionContextFactory }) =>
 					new EmailChangeManager(userMailer, projectManager, emailValidator, apiKeyManager, permissionContextFactory),
 			)
-			.addService('idpRegistry', () => {
-				const idpRegistry = new IDPHandlerRegistry()
-				idpRegistry.registerHandler('oidc', new OIDCProvider())
-				idpRegistry.registerHandler('facebook', new FacebookProvider())
-				idpRegistry.registerHandler('apple', new AppleProvider())
-				return idpRegistry
-			})
 			.addService('idpSignInManager', ({ apiKeyManager, idpRegistry }) => new IDPSignInManager(apiKeyManager, idpRegistry))
 			.addService('idpManager', ({ idpRegistry }) => new IDPManager(idpRegistry))
 			.addService('otpAuthenticator', ({ providers }) => new OtpAuthenticator(providers))

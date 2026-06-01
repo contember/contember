@@ -20,12 +20,14 @@ import { Config } from '../../type/Config.js'
 import { intervalToPostgres, intervalToSeconds } from '../../utils/interval.js'
 import { AuthPolicyResolver } from '../AuthPolicyResolver.js'
 import { AuthLogService } from '../AuthLogService.js'
+import { IdpSessionRevalidator } from '../idp/IdpSessionRevalidator.js'
 
 export class ApiKeyManager {
 	constructor(
 		private readonly apiKeyService: ApiKeyService,
 		private readonly authPolicyResolver: AuthPolicyResolver,
 		private readonly authLogService: AuthLogService,
+		private readonly idpSessionRevalidator?: IdpSessionRevalidator,
 	) {}
 
 	async verifyAndProlong(
@@ -105,6 +107,18 @@ export class ApiKeyManager {
 			}
 			: requestInfo
 
+		// Re-validate IdP-backed sessions against their identity provider (A24). In the
+		// default `background` mode this returns immediately and revalidates after the
+		// response (revocation lands on the next request); in `blocking` mode it can revoke
+		// the current request. No-op for password sessions and IdPs without revalidation.
+		// `effectiveInfo` is passed so the audit entries record the originating request's IP/UA.
+		if (this.idpSessionRevalidator) {
+			const outcome = await this.idpSessionRevalidator.revalidate(dbContext, readDbContext, apiKeyRow, effectiveInfo)
+			if (outcome === 'revoked') {
+				return new ResponseError(VerifyErrorCode.DISABLED, 'IdP session was revoked')
+			}
+		}
+
 		setImmediate(async () => {
 			await dbContext.commandBus.execute(
 				new ProlongApiKeyCommand(
@@ -141,6 +155,22 @@ export class ApiKeyManager {
 		requestInfo?: ApiKeyRequestInfo,
 		trustForwardedInfo?: boolean,
 	): Promise<string> {
+		const { token } = await this.createSessionApiKeyWithId(dbContext, identityId, expiration, requestInfo, trustForwardedInfo)
+		return token
+	}
+
+	/**
+	 * Like {@link createSessionApiKey} but also returns the api_key id — needed when the
+	 * caller has to bind another row to the session (e.g. an `idp_session` for IdP
+	 * re-validation).
+	 */
+	async createSessionApiKeyWithId(
+		dbContext: DatabaseContext,
+		identityId: string,
+		expiration?: number,
+		requestInfo?: ApiKeyRequestInfo,
+		trustForwardedInfo?: boolean,
+	): Promise<{ id: string; token: string }> {
 		const config = await dbContext.queryHandler.fetch(new ConfigurationQuery(dbContext.providers))
 
 		// A19: snapshot the effective session policy onto the api_key at sign-in.
@@ -182,7 +212,7 @@ export class ApiKeyManager {
 			idleTimeout: policy.idleTimeout ? intervalToPostgres(policy.idleTimeout) : null,
 			maxExpiresAt,
 		})
-		const token = (await dbContext.commandBus.execute(command)).token
+		const { id, token } = await dbContext.commandBus.execute(command)
 		assert(token !== undefined)
 
 		// A19: audit only when a policy is actually in effect. With zero auth_policy
@@ -211,7 +241,7 @@ export class ApiKeyManager {
 			}
 		}
 
-		return token
+		return { id, token }
 	}
 
 	async findApiKey(dbContext: DatabaseContext, apiKeyId: string): Promise<ApiKeyRow | null> {

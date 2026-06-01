@@ -1,8 +1,32 @@
-import { Client, custom, errors, generators } from 'openid-client'
+import { Client, custom, errors, generators, TokenSet } from 'openid-client'
 import { OIDCResponseData } from './OIDCTypes.js'
 import { IDPValidationError } from '../IDPValidationError.js'
 import { IDPResponseError } from '../IDPResponseError.js'
-import { IDPResponse, InitIDPAuthResult } from '../IdentityProviderHandler.js'
+import { IDPResponse, IDPSessionState, InitIDPAuthResult, RevalidationResult } from '../IdentityProviderHandler.js'
+
+/**
+ * Build the persisted session state from an OIDC token set. Stores the tokens needed for
+ * later re-validation (refresh/access) and SLO (id_token); the whole `tokens` blob is
+ * encrypted at rest by the command layer.
+ *
+ * `prevTokens` carries the previously stored tokens forward: a refresh-grant response MAY omit
+ * the refresh token (RFC 6749 §6 — IdPs that don't rotate just don't re-send it), in which case
+ * the client must keep using the old one. Without this fallback a non-rotating IdP would persist
+ * a session with no refresh token and be revoked (`no_refresh_token`) on the very next tick.
+ */
+export const tokenSetToSessionState = (tokenSet: TokenSet, sessionId?: string, prevTokens?: Record<string, unknown>): IDPSessionState => {
+	const refreshToken = tokenSet.refresh_token ?? (typeof prevTokens?.refresh_token === 'string' ? prevTokens.refresh_token : undefined)
+	const idToken = tokenSet.id_token ?? (typeof prevTokens?.id_token === 'string' ? prevTokens.id_token : undefined)
+	return {
+		sessionId,
+		tokens: {
+			...(refreshToken ? { refresh_token: refreshToken } : {}),
+			...(tokenSet.access_token ? { access_token: tokenSet.access_token } : {}),
+			...(idToken ? { id_token: idToken } : {}),
+		},
+		expiresAt: tokenSet.expires_at ? new Date(tokenSet.expires_at * 1000) : undefined,
+	}
+}
 
 export const initOIDCAuth = async (
 	client: Client,
@@ -29,6 +53,7 @@ export const handleOIDCResponse = async (
 	{ sessionData, redirectUrl, ...otherData }: OIDCResponseData,
 	fetchUserInfo?: boolean,
 	returnOIDCResult?: boolean,
+	captureSession?: boolean,
 ): Promise<IDPResponse> => {
 	const params = 'parameters' in otherData ? otherData.parameters : client.callbackParams(otherData.url)
 	if (params.state && !sessionData?.state) {
@@ -40,6 +65,7 @@ export const handleOIDCResponse = async (
 		const { at_hash, c_hash, nonce, ...claimsWithoutHashes } = claims
 		const userInfo = result.access_token && fetchUserInfo ? await client.userinfo(result) : {}
 		const oidcResult = returnOIDCResult ? result : {}
+		const idpSession = captureSession ? tokenSetToSessionState(result, typeof claims.sid === 'string' ? claims.sid : undefined) : undefined
 
 		// The OIDC `email_verified` claim is a boolean per spec, but some providers
 		// send the string "true"; userInfo takes precedence over the ID token.
@@ -52,6 +78,7 @@ export const handleOIDCResponse = async (
 			...claimsWithoutHashes,
 			...userInfo,
 			emailVerified,
+			...(idpSession ? { idpSession } : {}),
 		}
 	} catch (e: any) {
 		if (e instanceof errors.RPError) {
@@ -64,6 +91,79 @@ export const handleOIDCResponse = async (
 			}
 			throw new IDPResponseError(e.message)
 		}
+		throw e
+	}
+}
+
+/** OIDC errors that definitively mean "this session is no longer valid at the IdP". */
+const REVOKED_OIDC_ERRORS = new Set(['invalid_grant', 'invalid_token', 'expired_token'])
+
+/**
+ * Re-validate a stored OIDC session against the IdP. Returns `revoked` only for definitive
+ * IdP responses (invalid/expired grant or inactive introspection). Transient failures
+ * (network, IdP down) re-throw so the caller can fail-open and keep the session — IdP
+ * downtime must not log everyone out.
+ */
+export const revalidateOIDC = async (
+	client: Client,
+	method: 'refresh' | 'userinfo' | 'introspection',
+	session: IDPSessionState,
+): Promise<RevalidationResult> => {
+	const tokens = session.tokens ?? {}
+	const refreshToken = typeof tokens.refresh_token === 'string' ? tokens.refresh_token : undefined
+	const accessToken = typeof tokens.access_token === 'string' ? tokens.access_token : undefined
+	try {
+		if (method === 'refresh') {
+			if (!refreshToken) {
+				return { status: 'revoked', reason: 'no_refresh_token' }
+			}
+			const tokenSet = await client.refresh(refreshToken)
+			let claims: Record<string, unknown> | undefined
+			try {
+				claims = tokenSet.id_token ? tokenSet.claims() : undefined
+			} catch {
+				claims = undefined
+			}
+			return {
+				status: 'valid',
+				claims,
+				// carry the stored tokens forward: a non-rotating IdP omits the refresh token here
+				idpSession: tokenSetToSessionState(tokenSet, session.sessionId, tokens),
+			}
+		}
+		if (method === 'userinfo') {
+			if (!accessToken) {
+				return { status: 'revoked', reason: 'no_access_token' }
+			}
+			const userInfo = await client.userinfo(accessToken)
+			return { status: 'valid', claims: userInfo }
+		}
+		// introspection
+		const token = accessToken ?? refreshToken
+		if (!token) {
+			return { status: 'revoked', reason: 'no_token' }
+		}
+		const result = await client.introspect(token, accessToken ? 'access_token' : 'refresh_token')
+		if (!result.active) {
+			return { status: 'revoked', reason: 'inactive' }
+		}
+		return { status: 'valid' }
+	} catch (e: any) {
+		if (e instanceof errors.OPError) {
+			if (typeof e.error === 'string' && REVOKED_OIDC_ERRORS.has(e.error)) {
+				return { status: 'revoked', reason: e.error }
+			}
+			// The userinfo endpoint signals a rejected access token with a bare HTTP 401 — per
+			// RFC 6750 the `WWW-Authenticate` error code is optional, so openid-client may not
+			// surface a parseable `error` here. A 401 is still definitive: the token is no
+			// longer accepted → revoked. (Introspection is NOT treated this way: it returns 200
+			// `{active:false}` for revoked tokens, so a 401/400 there means client-auth/config
+			// failure — transient, must not log users out.)
+			if (method === 'userinfo' && e.response?.statusCode === 401) {
+				return { status: 'revoked', reason: 'userinfo_unauthorized' }
+			}
+		}
+		// transient (network / IdP unavailable) — propagate, do not revoke
 		throw e
 	}
 }

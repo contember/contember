@@ -1,10 +1,22 @@
 import * as Typesafe from '@contember/typesafe'
 import { ResponseType } from 'openid-client'
+import { IDPRevalidationConfig } from '../IDPRevalidation.js'
 
 export interface OIDCSessionData {
 	nonce: string
 	state: string
 }
+
+/** OIDC re-validation config: the generic settings plus the OIDC-specific probe method. */
+export const OIDCRevalidationConfig = Typesafe.intersection(
+	IDPRevalidationConfig,
+	Typesafe.partial({
+		/** How to probe the IdP. `refresh` needs `offline_access`; default `refresh`. */
+		method: Typesafe.enumeration('refresh', 'userinfo', 'introspection'),
+	}),
+)
+
+export type OIDCRevalidationConfig = ReturnType<typeof OIDCRevalidationConfig>
 
 export const OIDCConfigurationOptions = Typesafe.partial({
 	responseType: Typesafe.enumeration<ResponseType>('code', 'code id_token', 'code id_token token', 'code token', 'id_token', 'id_token token', 'none'),
@@ -15,6 +27,7 @@ export const OIDCConfigurationOptions = Typesafe.partial({
 	fetchUserInfo: Typesafe.boolean,
 	returnOIDCResult: Typesafe.boolean,
 	timeout: Typesafe.number,
+	revalidation: OIDCRevalidationConfig,
 })
 export const BaseOIDCConfiguration = Typesafe.intersection(
 	Typesafe.object({

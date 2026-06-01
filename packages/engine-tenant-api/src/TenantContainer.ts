@@ -42,8 +42,8 @@ import {
 	SignUpManager,
 	TurnstileProvider,
 	UserMailer,
-} from './model'
-import { HibpChecker, HttpHibpChecker, NoopHibpChecker } from './model/service/HibpChecker'
+} from './model/index.js'
+import { HibpChecker, HttpHibpChecker, NoopHibpChecker } from './model/service/HibpChecker.js'
 import {
 	AddIDPMutationResolver,
 	AddProjectMemberMutationResolver,
@@ -75,27 +75,27 @@ import {
 	TenantResolverContextFactory,
 	UpdateProjectMemberMutationResolver,
 	UpdateProjectMutationResolver,
-} from './resolvers'
-import * as Schema from './schema'
-import { createMailer, MailerOptions, TemplateRenderer } from './utils'
-import { IdentityFetcher } from './bridges/system/IdentityFetcher'
-import { SignInResponseFactory } from './resolvers/responseHelpers/SignInResponseFactory'
-import { IDPQueryResolver } from './resolvers/query/IDPQueryResolver'
-import { UpdateIDPMutationResolver } from './resolvers/mutation/idp/UpdateIDPMutationResolver'
-import { TenantCredentials, TenantMigrationsRunner } from './migrations'
-import { DisablePersonMutationResolver } from './resolvers/mutation/person/DisablePersonMutationResolver'
-import { ForceSignOutMutationResolver } from './resolvers/mutation/person/ForceSignOutMutationResolver'
-import { RevokeSessionMutationResolver } from './resolvers/mutation/person/RevokeSessionMutationResolver'
-import { MailTemplateQueryResolver } from './resolvers/query/MailTemplateQueryResolver'
-import { ConfigurationManager } from './model/service/ConfigurationManager'
-import { ConfigurationMutationResolver } from './resolvers/mutation/configuration/ConfigurationMutationResolver'
-import { ConfigurationQueryResolver } from './resolvers/query/ConfigurationQueryResolver'
-import { AuthLogQueryResolver } from './resolvers/query/AuthLogQueryResolver'
-import { PasswordlessMutationResolver } from './resolvers/mutation/person/PasswordlessMutationResolver'
-import { PasswordlessSignInManager } from './model/service/PasswordlessSignInManager'
-import { TogglePasswordlessMutationResolver } from './resolvers/mutation/person/TogglePasswordlessMutationResolver'
-import { PasswordStrengthValidator } from './model/service/PasswordStrengthValidator'
-import { AuthLogService } from './model/service/AuthLogService'
+} from './resolvers/index.js'
+import * as Schema from './schema/index.js'
+import { createMailer, MailerOptions, TemplateRenderer } from './utils/index.js'
+import { IdentityFetcher } from './bridges/system/IdentityFetcher.js'
+import { SignInResponseFactory } from './resolvers/responseHelpers/SignInResponseFactory.js'
+import { IDPQueryResolver } from './resolvers/query/IDPQueryResolver.js'
+import { UpdateIDPMutationResolver } from './resolvers/mutation/idp/UpdateIDPMutationResolver.js'
+import { TenantCredentials, TenantMigrationsRunner } from './migrations/index.js'
+import { DisablePersonMutationResolver } from './resolvers/mutation/person/DisablePersonMutationResolver.js'
+import { ForceSignOutMutationResolver } from './resolvers/mutation/person/ForceSignOutMutationResolver.js'
+import { RevokeSessionMutationResolver } from './resolvers/mutation/person/RevokeSessionMutationResolver.js'
+import { MailTemplateQueryResolver } from './resolvers/query/MailTemplateQueryResolver.js'
+import { ConfigurationManager } from './model/service/ConfigurationManager.js'
+import { ConfigurationMutationResolver } from './resolvers/mutation/configuration/ConfigurationMutationResolver.js'
+import { ConfigurationQueryResolver } from './resolvers/query/ConfigurationQueryResolver.js'
+import { AuthLogQueryResolver } from './resolvers/query/AuthLogQueryResolver.js'
+import { PasswordlessMutationResolver } from './resolvers/mutation/person/PasswordlessMutationResolver.js'
+import { PasswordlessSignInManager } from './model/service/PasswordlessSignInManager.js'
+import { TogglePasswordlessMutationResolver } from './resolvers/mutation/person/TogglePasswordlessMutationResolver.js'
+import { PasswordStrengthValidator } from './model/service/PasswordStrengthValidator.js'
+import { AuthLogService } from './model/service/AuthLogService.js'
 
 export interface TenantContainer {
 	projectMemberManager: ProjectMemberManager

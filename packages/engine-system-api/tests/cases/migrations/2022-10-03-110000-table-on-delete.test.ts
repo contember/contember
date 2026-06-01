@@ -1,4 +1,4 @@
-import migration from '../../../src/migrations/2022-10-03-110000-table-on-delete'
+import migration from '../../../src/migrations/2022-10-03-110000-table-on-delete.js'
 import { createMigrationBuilder } from '@contember/database-migrations'
 import { expect, test } from 'bun:test'
 import { SchemaBuilder } from '@contember/schema-definition'

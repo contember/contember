@@ -1,17 +1,17 @@
 import { MigrationBuilder } from '@contember/database-migrations'
 import { Model, Schema } from '@contember/schema'
-import { SchemaUpdater, updateModel } from '../utils/schemaUpdateUtils'
+import { SchemaUpdater, updateModel } from '../utils/schemaUpdateUtils.js'
 import {
 	createModificationType,
 	Differ,
 	ModificationHandler,
 	ModificationHandlerCreateSqlOptions,
 	ModificationHandlerOptions,
-} from '../ModificationHandler'
-import { createEventTrigger, createEventTrxTrigger } from '../utils/sqlUpdateUtils'
+} from '../ModificationHandler.js'
+import { createEventTrigger, createEventTrxTrigger } from '../utils/sqlUpdateUtils.js'
 import { PossibleEntityShapeInMigrations } from '../../utils/PartialEntity.js'
-import { getColumnSqlType } from '../utils/columnUtils'
-import { VERSION_CORRECT_PRIMARY_COLUMN_NAME } from '../ModificationVersions'
+import { getColumnSqlType } from '../utils/columnUtils.js'
+import { VERSION_CORRECT_PRIMARY_COLUMN_NAME } from '../ModificationVersions.js'
 
 export class CreateEntityModificationHandler implements ModificationHandler<CreateEntityModificationData> {
 	constructor(

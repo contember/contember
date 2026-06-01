@@ -1,7 +1,7 @@
 import { ReactElement, useCallback } from 'react'
-import { useDisableOtpMutation } from '../../hooks'
-import { TenantActionTrigger } from './TenantActionTrigger'
-import { useIdentityMethods } from '../../contexts'
+import { useDisableOtpMutation } from '../../hooks/index.js'
+import { TenantActionTrigger } from './TenantActionTrigger.js'
+import { useIdentityMethods } from '../../contexts.js'
 
 export interface DisableOtpTriggerProps {
 	children: ReactElement

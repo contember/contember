@@ -1,5 +1,5 @@
 import { ContemberClientGenerator } from '@contember/client-content-generator'
-import { schema } from './schema'
+import { schema } from './schema.js'
 import fs from 'node:fs/promises'
 import { join } from 'node:path'
 

@@ -1,5 +1,5 @@
-import { uic } from '../utils/uic'
-import { Label } from '../ui/label'
+import { uic } from '../utils/uic.js'
+import { Label } from '../ui/label.js'
 
 export const FormLayout = uic('div', {
 	baseClass: 'flex flex-col gap-2 mx-4 max-w-lg',

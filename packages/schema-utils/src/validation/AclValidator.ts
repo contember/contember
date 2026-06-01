@@ -1,8 +1,8 @@
 import { Acl, Model } from '@contember/schema'
-import { PredicateDefinitionProcessor } from '../acl'
-import { getEntity } from '../model'
-import { ErrorBuilder, ValidationError } from './errors'
-import { conditionSchema } from '../type-schema'
+import { PredicateDefinitionProcessor } from '../acl/index.js'
+import { getEntity } from '../model/index.js'
+import { ErrorBuilder, ValidationError } from './errors.js'
+import { conditionSchema } from '../type-schema/index.js'
 
 export class AclValidator {
 	constructor(private readonly model: Model.Schema) {}

@@ -1,4 +1,4 @@
-import { uic } from '../utils'
+import { uic } from '../utils/index.js'
 
 export const TableWrapper = uic('div', {
 	baseClass: 'relative w-full overflow-auto',

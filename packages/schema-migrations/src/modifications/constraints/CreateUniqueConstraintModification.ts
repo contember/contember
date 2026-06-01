@@ -1,9 +1,9 @@
 import { MigrationBuilder } from '@contember/database-migrations'
 import { Model, Schema } from '@contember/schema'
-import { SchemaUpdater, updateEntity, updateModel } from '../utils/schemaUpdateUtils'
-import { createModificationType, Differ, ModificationHandler, ModificationHandlerCreateSqlOptions } from '../ModificationHandler'
-import { wrapIdentifier } from '../../utils/dbHelpers'
-import { getUniqueConstraintColumns } from './utils'
+import { SchemaUpdater, updateEntity, updateModel } from '../utils/schemaUpdateUtils.js'
+import { createModificationType, Differ, ModificationHandler, ModificationHandlerCreateSqlOptions } from '../ModificationHandler.js'
+import { wrapIdentifier } from '../../utils/dbHelpers.js'
+import { getUniqueConstraintColumns } from './utils.js'
 import deepEqual from 'fast-deep-equal'
 
 export class CreateUniqueConstraintModificationHandler implements ModificationHandler<CreateUniqueConstraintModificationData> {

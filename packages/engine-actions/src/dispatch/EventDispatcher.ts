@@ -1,10 +1,10 @@
-import { EventsRepository } from './EventsRepository'
-import { TargetHandlerResolver } from './TargetHandlerResolver'
-import { HandledEvent } from './types'
+import { EventsRepository } from './EventsRepository.js'
+import { TargetHandlerResolver } from './TargetHandlerResolver.js'
+import { HandledEvent } from './types.js'
 import { Logger } from '@contember/logger'
 import { ContentSchemaResolver } from '@contember/engine-http'
 import { DatabaseContext } from '@contember/engine-system-api'
-import { VariablesManager } from '../model/VariablesManager'
+import { VariablesManager } from '../model/VariablesManager.js'
 
 type ProcessBatchArgs = {
 	db: DatabaseContext

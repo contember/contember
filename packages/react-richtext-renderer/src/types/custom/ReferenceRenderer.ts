@@ -1,10 +1,10 @@
 import type { ComponentType, ReactElement } from 'react'
-import type { BuiltinElements } from '../builtin'
-import type { RichTextElement, RichTextLeaf } from '../structure'
-import { RichTextReferenceFilledMetadata } from '../RichTextReferenceMetadata'
-import type { RichTextReference } from '../RichTextReference'
-import { RichTextBlock } from '../RichTextBlock'
-import { RichTextRenderingOptions } from '../RichTextRenderingOptions'
+import type { BuiltinElements } from '../builtin/index.js'
+import type { RichTextElement, RichTextLeaf } from '../structure/index.js'
+import { RichTextReferenceFilledMetadata } from '../RichTextReferenceMetadata.js'
+import type { RichTextReference } from '../RichTextReference.js'
+import { RichTextBlock } from '../RichTextBlock.js'
+import { RichTextRenderingOptions } from '../RichTextRenderingOptions.js'
 
 export type ReferenceRendererProps<
 	Reference extends RichTextReference = RichTextReference,

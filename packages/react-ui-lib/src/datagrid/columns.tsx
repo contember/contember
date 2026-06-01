@@ -2,7 +2,7 @@ import { Component, Field, SugaredRelativeEntityList, SugaredRelativeSingleEntit
 import * as React from 'react'
 import { ReactNode } from 'react'
 import { TableCell, TableHead } from '@contember/react-ui-lib-base'
-import { DataGridColumnHeader } from './column-header'
+import { DataGridColumnHeader } from './column-header.js'
 import {
 	DataViewBooleanFilter,
 	DataViewDateFilter,
@@ -15,8 +15,8 @@ import {
 	DataViewNumberFilter,
 	DataViewTextFilter,
 } from '@contember/react-dataview'
-import { formatBoolean, formatDate, formatDateTime, formatNumber } from '../formatting'
-import { DataGridEnumCell, DataGridEnumListCell, DataGridHasManyCell, DataGridHasOneCell } from './cells'
+import { formatBoolean, formatDate, formatDateTime, formatNumber } from '../formatting/index.js'
+import { DataGridEnumCell, DataGridEnumListCell, DataGridHasManyCell, DataGridHasOneCell } from './cells.js'
 import { cn } from '@contember/react-ui-lib-base'
 import {
 	DataGridBooleanFilterControls,
@@ -27,10 +27,10 @@ import {
 	DataGridRelationFilterControls,
 	DataGridRelationFilteredItemsList,
 	DataGridTextFilterInner,
-} from './filters'
+} from './filters/index.js'
 import { CheckIcon, XIcon } from 'lucide-react'
-import { DataViewFieldLabel, DataViewHasManyLabel, DataViewHasOneLabel } from './labels'
-import { DataGridColumnLeaf } from './column-leaf'
+import { DataViewFieldLabel, DataViewHasManyLabel, DataViewHasOneLabel } from './labels.js'
+import { DataGridColumnLeaf } from './column-leaf.js'
 
 /**
  * Renders a column with action buttons. Should be used in a {@link DataGridTable}.

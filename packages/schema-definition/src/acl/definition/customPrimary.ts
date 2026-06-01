@@ -1,6 +1,6 @@
-import { Role } from './roles'
-import { DecoratorFunction } from '../../utils'
-import { extendEntityAcl } from './aclExtensions'
+import { Role } from './roles.js'
+import { DecoratorFunction } from '../../utils/index.js'
+import { extendEntityAcl } from './aclExtensions.js'
 
 export const allowCustomPrimary = (role?: Role | Role[]): DecoratorFunction<any> => {
 	return extendEntityAcl(({ permissions, role: currentRole }) => {

@@ -1,3 +1,3 @@
-export * from './Narrow'
-export * from './Partial'
-export * from './NonOptional'
+export * from './Narrow.js'
+export * from './Partial.js'
+export * from './NonOptional.js'

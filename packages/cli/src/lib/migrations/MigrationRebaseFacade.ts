@@ -1,8 +1,8 @@
 import { Migration, MigrationFilesManager, SchemaStateManager, SchemaVersionBuilder, SystemClient } from '@contember/migrations-client'
-import { MigrationsValidator } from './MigrationsValidator'
+import { MigrationsValidator } from './MigrationsValidator.js'
 import { emptySchema } from '@contember/schema-utils'
 import { MigrationVersionHelper } from '@contember/engine-common'
-import { SystemClientProvider } from '../SystemClientProvider'
+import { SystemClientProvider } from '../SystemClientProvider.js'
 
 export class MigrationRebaseFacade {
 	constructor(

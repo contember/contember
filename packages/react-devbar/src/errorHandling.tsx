@@ -1,5 +1,5 @@
 import { Buffer } from 'buffer'
-import { DevErrorManager, ErrorBus } from './DevErrorManager'
+import { DevErrorManager, ErrorBus } from './DevErrorManager.js'
 import { ReactElement } from 'react'
 
 export type ErrorReactRenderer = (domElement: Element, reactElement: ReactElement, onRecoverableError: (e: any) => void) => void

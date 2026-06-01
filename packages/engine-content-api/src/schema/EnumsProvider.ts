@@ -1,6 +1,6 @@
 import { GraphQLEnumType, GraphQLEnumValueConfigMap } from 'graphql'
 import { Model } from '@contember/schema'
-import { capitalizeFirstLetter, singletonFactory } from '../utils'
+import { capitalizeFirstLetter, singletonFactory } from '../utils/index.js'
 
 export class EnumsProvider {
 	private schema: Model.Schema

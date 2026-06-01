@@ -1,6 +1,6 @@
-import type { EntityListState } from './EntityListState'
-import type { EntityRealmState } from './EntityRealmState'
-import type { FieldState } from './FieldState'
+import type { EntityListState } from './EntityListState.js'
+import type { EntityRealmState } from './EntityRealmState.js'
+import type { FieldState } from './FieldState.js'
 import type { FieldValue } from '@contember/binding-common'
 
 export type RootStateNode = EntityRealmState | EntityListState

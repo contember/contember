@@ -1,5 +1,5 @@
-import { useCopyErrorMarkdown } from '../../hooks/useCopyErrorMarkdown'
-import { ProcessedError } from './types'
+import { useCopyErrorMarkdown } from '../../hooks/useCopyErrorMarkdown.js'
+import { ProcessedError } from './types.js'
 
 export const DevErrorCopy = ({ currentError, currentErrorSource }: {
 	currentError: ProcessedError

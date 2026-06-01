@@ -1,1 +1,1 @@
-export * from './block-repeater'
+export * from './block-repeater.js'

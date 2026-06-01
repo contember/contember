@@ -1,5 +1,5 @@
-import type { EditorWithBlocks } from './EditorWithBlocks'
-import { CreateElementReferences } from '../references'
+import type { EditorWithBlocks } from './EditorWithBlocks.js'
+import { CreateElementReferences } from '../references/index.js'
 
 export interface OverrideCreateElementReferenceOptions {
 	createElementReferences: CreateElementReferences

@@ -1,6 +1,6 @@
 import { expect, test } from 'bun:test'
 import supertest from 'supertest'
-import { apiUrl, createTester, executeGraphql, rand, rootToken } from '../../src/tester'
+import { apiUrl, createTester, executeGraphql, rand, rootToken } from '../../src/tester.js'
 import { emptySchema } from '@contember/schema-utils'
 
 const SOCKET_IP = '203.0.113.10' // pretend "proxy/socket" IP, seen via X-Forwarded-For

@@ -1,9 +1,9 @@
 import { SugaredRelativeSingleEntity, SugaredRelativeSingleField, useEntity } from '@contember/react-binding'
-import { DiscriminatedFileType, DiscriminatedFileTypeMap, FileWithMeta, StartUploadEvent, UploaderEvents } from '../../types'
+import { DiscriminatedFileType, DiscriminatedFileTypeMap, FileWithMeta, StartUploadEvent, UploaderEvents } from '../../types/index.js'
 import { useReferentiallyStableCallback } from '@contember/react-utils'
-import { disconnectAtBase } from '../utils/disconnectAtBase'
-import { resolveAcceptingSingleType } from '../utils/resolveAccept'
-import { executeExtractors } from '../utils/fillEntityFields'
+import { disconnectAtBase } from '../utils/disconnectAtBase.js'
+import { resolveAcceptingSingleType } from '../utils/resolveAccept.js'
+import { executeExtractors } from '../utils/fillEntityFields.js'
 
 export type UseFillEntityArgs =
 	& UploaderEvents

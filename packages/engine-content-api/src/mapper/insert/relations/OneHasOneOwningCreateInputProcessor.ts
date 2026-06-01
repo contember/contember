@@ -1,11 +1,11 @@
-import { ConstraintType, getInsertPrimary, MutationConstraintViolationError, MutationEntryNotFoundError, MutationResultList } from '../../Result'
-import { InsertBuilder } from '../../insert'
-import { Mapper } from '../../Mapper'
+import { ConstraintType, getInsertPrimary, MutationConstraintViolationError, MutationEntryNotFoundError, MutationResultList } from '../../Result.js'
+import { InsertBuilder } from '../../insert/index.js'
+import { Mapper } from '../../Mapper.js'
 import { Input, Model } from '@contember/schema'
-import { CreateInputProcessor } from '../../../inputProcessing'
-import { SqlCreateInputProcessorResult } from '../SqlCreateInputProcessor'
-import { CheckedPrimary } from '../../CheckedPrimary'
-import { MapperInput } from '../../types'
+import { CreateInputProcessor } from '../../../inputProcessing/index.js'
+import { SqlCreateInputProcessorResult } from '../SqlCreateInputProcessor.js'
+import { CheckedPrimary } from '../../CheckedPrimary.js'
+import { MapperInput } from '../../types.js'
 
 type Context = Model.OneHasOneOwningContext
 

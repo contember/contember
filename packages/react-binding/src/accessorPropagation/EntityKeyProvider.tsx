@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react'
-import { EntityKeyContext } from './EntityKeyContext'
+import { EntityKeyContext } from './EntityKeyContext.js'
 import { EntityAccessor } from '@contember/binding'
 
 export interface EntityKeyProviderProps {

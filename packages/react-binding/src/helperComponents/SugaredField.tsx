@@ -1,4 +1,4 @@
-import { Component, Field, FieldProps } from '../coreComponents'
+import { Component, Field, FieldProps } from '../coreComponents/index.js'
 import type { SugaredRelativeSingleField } from '@contember/binding'
 import { FieldValue } from '@contember/binding'
 import { ReactElement } from 'react'

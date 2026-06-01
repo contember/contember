@@ -1,1 +1,1 @@
-export * from './TruncateEventsCommand'
+export * from './TruncateEventsCommand.js'

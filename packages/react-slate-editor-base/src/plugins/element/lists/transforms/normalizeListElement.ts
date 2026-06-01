@@ -1,6 +1,6 @@
 import { Editor, Element as SlateElement, Node as SlateNode, Path as SlatePath, Transforms } from 'slate'
-import { listItemElementType } from '../ListItemElement'
-import { ContemberEditor } from '../../../../editor'
+import { listItemElementType } from '../ListItemElement.js'
+import { ContemberEditor } from '../../../../editor/index.js'
 
 export const normalizeListElement = ({ editor, path, preventDefault }: { editor: Editor; path: SlatePath; preventDefault: () => void }) => {
 	for (const [child, childPath] of SlateNode.children(editor, path)) {

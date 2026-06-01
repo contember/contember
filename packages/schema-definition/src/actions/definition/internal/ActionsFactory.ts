@@ -1,8 +1,8 @@
-import { assertNever, filterEntityDefinition } from '../../../utils'
+import { assertNever, filterEntityDefinition } from '../../../utils/index.js'
 import { Actions } from '@contember/schema'
-import { triggersStore } from './store'
-import { BasicTriggerDefinition, TargetDefinition, WatchTriggerDefinition } from '../triggers'
-import { ActionsTarget } from '../targets'
+import { triggersStore } from './store.js'
+import { BasicTriggerDefinition, TargetDefinition, WatchTriggerDefinition } from '../triggers.js'
+import { ActionsTarget } from '../targets.js'
 import { Kind, parse, SelectionNode, ValueNode } from 'graphql'
 
 export class ActionsFactory {

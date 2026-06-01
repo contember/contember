@@ -1,7 +1,7 @@
 import { dataAttribute } from '@contember/utilities'
 import { memo, MouseEvent as ReactMouseEvent, ReactElement, useCallback } from 'react'
-import { RequestParameters, RoutingLinkTarget, RoutingParameterResolver } from '../types'
-import { useRoutingLink } from '../hooks'
+import { RequestParameters, RoutingLinkTarget, RoutingParameterResolver } from '../types/index.js'
+import { useRoutingLink } from '../hooks/index.js'
 import { Slot } from '@radix-ui/react-slot'
 
 export interface RoutingLinkProps {

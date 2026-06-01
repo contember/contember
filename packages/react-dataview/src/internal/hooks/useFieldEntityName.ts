@@ -1,4 +1,4 @@
-import { useDataViewTargetFieldSchemaInternal } from './useTargetFieldSchema'
+import { useDataViewTargetFieldSchemaInternal } from './useTargetFieldSchema.js'
 
 export const useFieldEntityName = (fields: string[]) => {
 	const { field: targetField } = useDataViewTargetFieldSchemaInternal(fields)

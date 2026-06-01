@@ -1,4 +1,4 @@
-import { useBlockElementCache } from './useBlockElementCache'
+import { useBlockElementCache } from './useBlockElementCache.js'
 import { Descendant, Editor } from 'slate'
 import {
 	EntityAccessor,
@@ -9,11 +9,11 @@ import {
 	useDesugaredRelativeSingleField,
 	useEntityList,
 } from '@contember/react-binding'
-import { useBlockElementPathRefs } from './useBlockElementPathRefs'
-import { useBlockEditorOnChange } from './useBlockEditorOnChange'
+import { useBlockElementPathRefs } from './useBlockElementPathRefs.js'
+import { useBlockEditorOnChange } from './useBlockEditorOnChange.js'
 import { MutableRefObject, useEffect, useMemo, useRef } from 'react'
-import { useBlockEditorSlateNodes } from '../useBlockEditorSlateNodes'
-import { useRefreshBlocks } from './useRefreshBlocks'
+import { useBlockEditorSlateNodes } from '../useBlockEditorSlateNodes.js'
+import { useRefreshBlocks } from './useRefreshBlocks.js'
 
 export interface useBlockEditorStateResult {
 	onChange: () => void

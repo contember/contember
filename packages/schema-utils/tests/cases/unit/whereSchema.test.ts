@@ -1,8 +1,8 @@
 import { describe, expect, test } from 'bun:test'
-import { conditionSchema } from '../../../src/type-schema'
+import { conditionSchema } from '../../../src/type-schema/index.js'
 import { Model } from '@contember/schema'
 import { createSchema, SchemaDefinition as def } from '@contember/schema-definition'
-import { whereSchema } from '../../../src/type-schema/where'
+import { whereSchema } from '../../../src/type-schema/where.js'
 
 namespace MyModel {
 	export class Article {

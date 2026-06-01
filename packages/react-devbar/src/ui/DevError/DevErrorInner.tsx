@@ -1,5 +1,5 @@
-import { StackTrace } from './StackTrace'
-import type { ProcessedError } from './types'
+import { StackTrace } from './StackTrace.js'
+import type { ProcessedError } from './types.js'
 
 export interface DevErrorInnerProps {
 	error: ProcessedError

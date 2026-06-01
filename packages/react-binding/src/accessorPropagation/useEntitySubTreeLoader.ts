@@ -1,7 +1,7 @@
 import { createElement, ReactNode, useCallback, useEffect, useRef, useState } from 'react'
 import { SugaredQualifiedSingleEntity, TreeRootId } from '@contember/binding'
-import { useExtendTree } from './useExtendTree'
-import { EntitySubTree } from '../coreComponents'
+import { useExtendTree } from './useExtendTree.js'
+import { EntitySubTree } from '../coreComponents/index.js'
 import { useObjectMemo } from '@contember/react-utils'
 
 export type UseEntitySubTreeLoaderStateInitial = {

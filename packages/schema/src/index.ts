@@ -1,6 +1,6 @@
-import { Acl, Actions, Model, Settings, Validation } from './schema'
+import { Acl, Actions, Model, Settings, Validation } from './schema/index.js'
 
-export * from './ProjectRole'
+export * from './ProjectRole.js'
 
 export type Schema = {
 	readonly model: Model.Schema
@@ -12,4 +12,4 @@ export type Schema = {
 
 export type Writable<V> = { -readonly [K in keyof V]: V[K] }
 
-export * from './schema'
+export * from './schema/index.js'

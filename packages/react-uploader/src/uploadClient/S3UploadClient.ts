@@ -1,6 +1,6 @@
-import { UploadClient, UploadClientUploadArgs } from '../types'
+import { UploadClient, UploadClientUploadArgs } from '../types/index.js'
 import { GenerateUploadUrlMutationBuilder } from '@contember/client'
-import { UploaderError } from '../UploaderError'
+import { UploaderError } from '../UploaderError.js'
 
 export interface S3UploadClientOptions {
 	signUrl: S3UrlSigner

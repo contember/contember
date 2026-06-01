@@ -1,4 +1,4 @@
-import { SerializationFailureError } from '../client'
+import { SerializationFailureError } from '../client/index.js'
 
 export interface RetryOptions {
 	maxAttempts: number

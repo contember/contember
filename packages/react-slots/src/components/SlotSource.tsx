@@ -1,6 +1,6 @@
 import { memo, ReactNode } from 'react'
 import { createPortal } from 'react-dom'
-import { useSlotTargetElement } from '../hooks'
+import { useSlotTargetElement } from '../hooks/index.js'
 
 export type SlotSourceProps = {
 	children: ReactNode

@@ -1,7 +1,7 @@
 import { EntityAccessor } from '@contember/react-binding'
 import { ReactNode, useEffect } from 'react'
 import * as React from 'react'
-import { DataViewHighlightIndexContext, DataViewKeyboardEventHandlerContext, useDataViewEntityListAccessor } from '../../contexts'
+import { DataViewHighlightIndexContext, DataViewKeyboardEventHandlerContext, useDataViewEntityListAccessor } from '../../contexts.js'
 import { useReferentiallyStableCallback } from '@contember/react-utils'
 
 export const DataViewInteractionProvider = ({ children, onSelectHighlighted }: {

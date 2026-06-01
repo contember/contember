@@ -7,7 +7,7 @@ import {
 	useDataViewEntityListAccessor,
 	useDataViewPagingInfo,
 	useDataViewPagingMethods,
-} from '../../contexts'
+} from '../../contexts.js'
 import { Component, EntityListAccessor, EntityListSubTreeMarker, QualifiedEntityList } from '@contember/react-binding'
 import deepEqual from 'fast-deep-equal'
 

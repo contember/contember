@@ -1,2 +1,2 @@
-export * from './clientFactory'
-export * from './sessionToken'
+export * from './clientFactory.js'
+export * from './sessionToken.js'

@@ -1,1 +1,1 @@
-export * from './otp-setup'
+export * from './otp-setup.js'

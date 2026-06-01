@@ -1,6 +1,6 @@
 import { expect, test } from 'bun:test'
 import { Model } from '@contember/schema'
-import { ModelValidator } from '../../../src'
+import { ModelValidator } from '../../../src/index.js'
 import { c, createSchema } from '@contember/schema-definition'
 
 test('"meta" collision', () => {

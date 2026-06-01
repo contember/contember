@@ -1,6 +1,6 @@
 import * as Sentry from '@sentry/node'
 import { LogEntry, LoggerHandler, LogLevel, LogLevelName, LogLevels } from '@contember/logger'
-import { LoggerRequestBody } from '../application'
+import { LoggerRequestBody } from '../application/index.js'
 
 const logLevelMapping: Record<LogLevelName, Sentry.SeverityLevel> = {
 	crit: 'fatal',

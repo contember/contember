@@ -14,7 +14,7 @@ import {
 	useSensor,
 	useSensors,
 } from '@dnd-kit/core'
-import { RepeaterActiveEntityContext } from '../contexts'
+import { RepeaterActiveEntityContext } from '../contexts.js'
 import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable'
 import { useRepeaterMethods, useRepeaterSortedEntities } from '@contember/react-repeater'
 

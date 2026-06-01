@@ -1,6 +1,6 @@
-import { Client } from '../client'
-import { wrapIdentifier } from './sql'
-import { DatabaseMetadata } from '../metadata'
+import { Client } from '../client/index.js'
+import { wrapIdentifier } from './sql.js'
+import { DatabaseMetadata } from '../metadata/index.js'
 
 export type ConstraintType = 'foreignKey' | 'unique'
 

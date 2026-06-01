@@ -1,5 +1,5 @@
-import { createListArgs } from '../utils/createListArgs'
-import { ContentClientInput, SchemaEntityNames, SchemaNames } from '../types'
+import { createListArgs } from '../utils/createListArgs.js'
+import { ContentClientInput, SchemaEntityNames, SchemaNames } from '../types/index.js'
 import { Input } from '@contember/schema'
 import { GraphQlField, GraphQlFieldTypedArgs, GraphQlSelectionSet } from '@contember/graphql-builder'
 

@@ -1,6 +1,6 @@
-import { useAddRequestChangeListener } from '../contexts'
+import { useAddRequestChangeListener } from '../contexts.js'
 import { useEffect } from 'react'
-import { RequestChangeHandler } from '../types'
+import { RequestChangeHandler } from '../types/index.js'
 
 export const useRegisterRequestChangeListener = (listener: RequestChangeHandler) => {
 	const add = useAddRequestChangeListener()

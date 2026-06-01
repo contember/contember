@@ -1,4 +1,4 @@
-import { ImplementationException } from '../exception'
+import { ImplementationException } from '../exception.js'
 
 export const singletonFactory = <T, Id = string, Args = undefined>(cb: (id: Id, args: Args) => T) => {
 	const created = new Map<string, T>()

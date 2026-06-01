@@ -1,2 +1,2 @@
-export * from './HasRole'
-export * from './IdentityEnvironmentProvider'
+export * from './HasRole.js'
+export * from './IdentityEnvironmentProvider.js'

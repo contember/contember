@@ -1,5 +1,5 @@
 import { Actions, Model } from '@contember/schema'
-import { TriggerListeners } from './TriggerListeners'
+import { TriggerListeners } from './TriggerListeners.js'
 
 export interface IndirectListener {
 	type: 'indirect'

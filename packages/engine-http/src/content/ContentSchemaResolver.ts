@@ -1,8 +1,8 @@
 import { DatabaseContext, SchemaProvider, SchemaWithMeta } from '@contember/engine-system-api'
 import { calculateSchemaChecksum, filterSchemaByStage, normalizeSchema } from '@contember/schema-utils'
 import { Schema } from '@contember/schema'
-import { ContentApiSpecificCache } from './ContentApiSpecificCache'
-import { createMemoizer } from '../utils/memoizeObject'
+import { ContentApiSpecificCache } from './ContentApiSpecificCache.js'
+import { createMemoizer } from '../utils/memoizeObject.js'
 
 const memoizedSchema = createMemoizer(calculateSchemaChecksum)
 

@@ -1,5 +1,5 @@
 import React, { ReactNode } from 'react'
-import { useDataViewLoaderState } from '../contexts'
+import { useDataViewLoaderState } from '../contexts.js'
 
 export interface DataViewLoaderStateProps {
 	children: ReactNode

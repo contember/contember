@@ -10,12 +10,12 @@ import {
 } from '@contember/engine-system-api'
 import { GraphQlSchemaBuilderFactory, PermissionFactory } from '@contember/engine-content-api'
 import { Logger } from '@contember/logger'
-import { ProjectConfig } from './config'
-import { ContentSchemaResolver } from '../content'
-import { Providers } from '../providers'
-import { Plugin } from '../plugin/Plugin'
-import { ServerConfig } from '../config/config'
-import { ProjectDatabaseMetadataResolver } from './ProjectDatabaseMetadataResolver'
+import { ProjectConfig } from './config.js'
+import { ContentSchemaResolver } from '../content/index.js'
+import { Providers } from '../providers.js'
+import { Plugin } from '../plugin/Plugin.js'
+import { ServerConfig } from '../config/config.js'
+import { ProjectDatabaseMetadataResolver } from './ProjectDatabaseMetadataResolver.js'
 
 export interface ProjectContainer {
 	systemDatabaseContextFactory: DatabaseContextFactory

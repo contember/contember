@@ -4,7 +4,7 @@ import { useSlate } from 'slate-react'
 import { Slot } from '@radix-ui/react-slot'
 import * as React from 'react'
 import { composeEventHandlers } from '@radix-ui/primitive'
-import { EditorTransforms } from '../../slate-reexport'
+import { EditorTransforms } from '../../slate-reexport.js'
 
 export interface EditorWrapNodeTriggerProps {
 	elementType: string

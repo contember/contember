@@ -2,7 +2,7 @@ import { Environment, EnvironmentContext, EnvironmentExtensionProvider } from '@
 import { ContemberClient, ContemberClientProps } from '@contember/react-client'
 import { ReactNode } from 'react'
 import { RouteMap, RoutingContextValue, RoutingProvider } from '@contember/react-routing'
-import { DataViewPageNameKeyProvider } from './DataViewPageNameKeyProvider'
+import { DataViewPageNameKeyProvider } from './DataViewPageNameKeyProvider.js'
 import { IdentityEnvironmentProvider, IdentityProvider, projectEnvironmentExtension } from '@contember/react-identity'
 
 export interface ApplicationEntrypointProps extends ContemberClientProps {

@@ -1,3 +1,3 @@
-export * from './Input'
-export * from './Result'
-export * from './Schema'
+export * from './Input.js'
+export * from './Result.js'
+export * from './Schema.js'

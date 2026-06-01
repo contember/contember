@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react'
 import { MarkerFactory } from '@contember/binding'
 import type { SugaredParentEntityParameters } from '@contember/binding'
-import { Component } from './Component'
+import { Component } from './Component.js'
 
 export interface ParentEntityProps extends SugaredParentEntityParameters {
 	children?: ReactNode

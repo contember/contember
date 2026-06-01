@@ -1,2 +1,2 @@
-export * from './TenantApiMiddlewareFactory'
-export * from './TenantGraphQLHandlerFactory'
+export * from './TenantApiMiddlewareFactory.js'
+export * from './TenantGraphQLHandlerFactory.js'

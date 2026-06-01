@@ -1,6 +1,6 @@
-import { RichTextBlockSource, RichTextElement, RichTextLeaf, RichTextRenderingOptions } from '../types'
-import { RichText } from './RichText'
-import { useRichTextBlocksSource } from '../hooks'
+import { RichTextBlockSource, RichTextElement, RichTextLeaf, RichTextRenderingOptions } from '../types/index.js'
+import { RichText } from './RichText.js'
+import { useRichTextBlocksSource } from '../hooks/index.js'
 
 export type { RichTextBlockSource }
 

@@ -1,8 +1,8 @@
 import { MigrationBuilder } from '@contember/database-migrations'
 import { Schema } from '@contember/schema'
-import { SchemaUpdater, updateModel } from '../utils/schemaUpdateUtils'
-import { createModificationType, Differ, ModificationHandler } from '../ModificationHandler'
-import { createCheck, getConstraintName } from './enumUtils'
+import { SchemaUpdater, updateModel } from '../utils/schemaUpdateUtils.js'
+import { createModificationType, Differ, ModificationHandler } from '../ModificationHandler.js'
+import { createCheck, getConstraintName } from './enumUtils.js'
 
 export class CreateEnumModificationHandler implements ModificationHandler<CreateEnumModificationData> {
 	constructor(private readonly data: CreateEnumModificationData, private readonly schema: Schema) {}

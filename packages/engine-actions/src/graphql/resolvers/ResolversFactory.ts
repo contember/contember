@@ -1,9 +1,9 @@
 import { DateTimeType, JSONType, UuidType } from '@contember/graphql-utils'
-import { Resolvers } from '../schema'
-import { EventsQueryResolver } from './query'
-import { ProcessBatchMutationResolver, RetryEventMutationResolver, SetVariablesMutationResolver, StopEventMutationResolver } from './mutation'
-import { ActionsContext } from './ActionsContext'
-import { VariablesQueryResolver } from './query/VariablesQueryResolver'
+import { Resolvers } from '../schema/index.js'
+import { EventsQueryResolver } from './query/index.js'
+import { ProcessBatchMutationResolver, RetryEventMutationResolver, SetVariablesMutationResolver, StopEventMutationResolver } from './mutation/index.js'
+import { ActionsContext } from './ActionsContext.js'
+import { VariablesQueryResolver } from './query/VariablesQueryResolver.js'
 
 export class ResolversFactory {
 	constructor(

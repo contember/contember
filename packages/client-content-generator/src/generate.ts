@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 import * as fs from 'node:fs/promises'
 import { join, resolve } from 'node:path'
-import { ContemberClientGenerator } from './ContemberClientGenerator'
+import { ContemberClientGenerator } from './ContemberClientGenerator.js'
 ;(async () => {
 	const schemaPath = process.argv[2]
 	const outDir = process.argv[3]

@@ -1,5 +1,5 @@
-import { MutationResolvers, MutationSignUpArgs, SignUpResponse } from '../../../schema'
-import { TenantResolverContext } from '../../TenantResolverContext'
+import { MutationResolvers, MutationSignUpArgs, SignUpResponse } from '../../../schema/index.js'
+import { TenantResolverContext } from '../../TenantResolverContext.js'
 import {
 	ApiKeyManager,
 	CaptchaValidator,
@@ -10,11 +10,11 @@ import {
 	PermissionActions,
 	RateLimiter,
 	SignUpManager,
-} from '../../../model'
-import { createErrorResponse } from '../../errorUtils'
+} from '../../../model/index.js'
+import { createErrorResponse } from '../../errorUtils.js'
 import { UserInputError } from '@contember/graphql-utils'
-import { PersonResponseFactory } from '../../responseHelpers/PersonResponseFactory'
-import { ResponseError } from '../../../model/utils/Response'
+import { PersonResponseFactory } from '../../responseHelpers/PersonResponseFactory.js'
+import { ResponseError } from '../../../model/utils/Response.js'
 
 export class SignUpMutationResolver implements MutationResolvers {
 	constructor(

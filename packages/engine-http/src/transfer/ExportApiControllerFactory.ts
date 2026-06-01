@@ -1,11 +1,11 @@
-import { HttpController } from '../application'
-import { HttpErrorResponse } from '../common'
+import { HttpController } from '../application/index.js'
+import { HttpErrorResponse } from '../common/index.js'
 import { Readable } from 'node:stream'
-import { toBuffer } from './CommandStream'
-import { ExportExecutor, ExportRequest } from './ExportExecutor'
+import { toBuffer } from './CommandStream.js'
+import { ExportExecutor, ExportRequest } from './ExportExecutor.js'
 import { ParseError } from '@contember/typesafe'
-import { ProjectGroupResolver } from '../projectGroup/ProjectGroupResolver'
-import { ProjectContainer } from '../project'
+import { ProjectGroupResolver } from '../projectGroup/ProjectGroupResolver.js'
+import { ProjectContainer } from '../project/index.js'
 import { emptySchema } from '@contember/schema-utils'
 
 export class ExportApiControllerFactory {

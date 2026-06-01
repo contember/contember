@@ -1,8 +1,8 @@
 import * as React from 'react'
 import { isValidElement, ReactNode } from 'react'
 import { Slot } from '@radix-ui/react-slot'
-import { DataViewEnumFilterCurrent, useDataViewEnumFilter } from '../../../hooks'
-import { useDataViewFilterName } from '../../../contexts'
+import { DataViewEnumFilterCurrent, useDataViewEnumFilter } from '../../../hooks/index.js'
+import { useDataViewFilterName } from '../../../contexts.js'
 
 export const DataViewEnumFilterState = ({ name, children, state, value }: {
 	name?: string

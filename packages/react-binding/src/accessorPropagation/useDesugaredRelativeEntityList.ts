@@ -1,7 +1,7 @@
 import { useMemo } from 'react'
 import { QueryLanguage } from '@contember/binding'
 import type { RelativeEntityList, SugaredRelativeEntityList } from '@contember/binding'
-import { useEnvironment } from './useEnvironment'
+import { useEnvironment } from './useEnvironment.js'
 
 /**
  * @deprecated Use useEntityList instead.

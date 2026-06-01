@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { ReactNode, useCallback } from 'react'
-import { useDataViewEntityListProps, useDataViewFilteringState } from '../contexts'
+import { useDataViewEntityListProps, useDataViewFilteringState } from '../contexts.js'
 import {
 	Component,
 	EntityFieldsWithHoistablesMarker,
@@ -12,8 +12,8 @@ import {
 	useBindingOperations,
 	useEnvironment,
 } from '@contember/react-binding'
-import { dataViewSelectionEnvironmentExtension } from '../env/dataViewSelectionEnvironmentExtension'
-import { DataViewSelectionValues } from '../types'
+import { dataViewSelectionEnvironmentExtension } from '../env/dataViewSelectionEnvironmentExtension.js'
+import { DataViewSelectionValues } from '../types/index.js'
 
 /**
  * Hook for fetching all data matching the current filter. Used for exporting data.

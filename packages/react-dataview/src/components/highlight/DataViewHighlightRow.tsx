@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { forwardRef, ReactNode, useEffect, useRef } from 'react'
 import { Slot } from '@radix-ui/react-slot'
-import { useDataViewEntityListAccessor, useDataViewHighlightIndex } from '../../contexts'
+import { useDataViewEntityListAccessor, useDataViewHighlightIndex } from '../../contexts.js'
 import { EntityAccessor, useEntity } from '@contember/react-binding'
 import { dataAttribute } from '@contember/utilities'
 import { useComposeRef } from '@contember/react-utils'

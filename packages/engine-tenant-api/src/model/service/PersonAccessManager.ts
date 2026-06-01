@@ -1,9 +1,9 @@
-import { PersonQuery, PersonRow } from '../queries'
-import { DatabaseContext } from '../utils'
-import { DisablePersonCommand } from '../commands/person/DisablePersonCommand'
-import { ApiKeyManager } from './apiKey'
-import { Response, ResponseError, ResponseOk } from '../utils/Response'
-import { DisablePersonErrorCode } from '../../schema'
+import { PersonQuery, PersonRow } from '../queries/index.js'
+import { DatabaseContext } from '../utils/index.js'
+import { DisablePersonCommand } from '../commands/person/DisablePersonCommand.js'
+import { ApiKeyManager } from './apiKey/index.js'
+import { Response, ResponseError, ResponseOk } from '../utils/Response.js'
+import { DisablePersonErrorCode } from '../../schema/index.js'
 
 class PersonAccessManager {
 	constructor(private readonly apiKeyManager: ApiKeyManager) {}

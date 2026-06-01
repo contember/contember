@@ -1,6 +1,6 @@
 import { describe } from 'bun:test'
-import { testMigrations } from '../../src/tests'
-import { SQL } from '../../src/tags'
+import { testMigrations } from '../../src/tests.js'
+import { SQL } from '../../src/tags.js'
 import { createSchema, SchemaDefinition as def } from '@contember/schema-definition'
 
 namespace ConvertOHMToMHMSchemaOrig {

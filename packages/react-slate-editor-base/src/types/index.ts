@@ -1,3 +1,3 @@
-export * from './editor'
-export * from './htmlDeserializer'
-export * from './plugins'
+export * from './editor.js'
+export * from './htmlDeserializer.js'
+export * from './plugins.js'

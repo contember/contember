@@ -1,6 +1,6 @@
 import { useMemo } from 'react'
-import { RequestParameters, RoutingLinkTarget, RoutingParameterResolver } from '../types'
-import { useRoutingLinkFactory } from './useRoutingLinkFactory'
+import { RequestParameters, RoutingLinkTarget, RoutingParameterResolver } from '../types/index.js'
+import { useRoutingLinkFactory } from './useRoutingLinkFactory.js'
 
 export const useRoutingLink = (target: RoutingLinkTarget, parametersResolver?: RoutingParameterResolver, parameters?: RequestParameters) => {
 	const linkFactory = useRoutingLinkFactory()

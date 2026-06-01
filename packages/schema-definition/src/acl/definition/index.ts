@@ -1,11 +1,11 @@
 import { Acl, Model } from '@contember/schema'
-import { AclFactory } from './internal/AclFactory'
+import { AclFactory } from './internal/AclFactory.js'
 
-export * from './customPrimary'
-export * from './permissions'
-export * from './references'
-export * from './roles'
-export * from './variables'
+export * from './customPrimary.js'
+export * from './permissions.js'
+export * from './references.js'
+export * from './roles.js'
+export * from './variables.js'
 
 export const createAcl = (
 	exportedDefinitions: Record<string, any>,

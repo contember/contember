@@ -1,3 +1,3 @@
-export * from './UploaderDropzoneRoot'
-export * from './UploaderDropzoneInput'
-export * from './UploaderDropzoneArea'
+export * from './UploaderDropzoneRoot.js'
+export * from './UploaderDropzoneInput.js'
+export * from './UploaderDropzoneArea.js'

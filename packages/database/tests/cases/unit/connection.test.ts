@@ -1,6 +1,6 @@
 import { expect, it } from 'bun:test'
-import { MutexDeadlockError } from '../../../src/utils'
-import { createConnectionMockAlt } from './createConnectionMockAlt'
+import { MutexDeadlockError } from '../../../src/utils/index.js'
+import { createConnectionMockAlt } from './createConnectionMockAlt.js'
 
 it('support nested scope', async () => {
 	const [connection, end] = createConnectionMockAlt(

@@ -1,6 +1,6 @@
 import { Runnable, RunnableArgs, Running, Supervisor, SupervisorOptions } from '@contember/engine-common'
 import { ProjectGroupContainerResolver } from '@contember/engine-http'
-import { DispatchWorkerSupervisorFactory } from './DispatchWorkerSupervisor'
+import { DispatchWorkerSupervisorFactory } from './DispatchWorkerSupervisor.js'
 
 export class LazyDispatchWorker implements Runnable {
 	constructor(

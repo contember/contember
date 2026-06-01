@@ -1,8 +1,8 @@
 import { Model, Schema, Writable } from '@contember/schema'
-import { acceptFieldVisitor, DefaultNamingConventions, isInverseRelation, NamingConventions, resolveDefaultColumnType } from '../model'
-import { printJsValue } from '../utils/printJsValue'
-import { DefinitionNamingConventions } from './DefinitionNamingConventions'
-import { AclDefinitionCodeGenerator } from './AclDefinitionCodeGenerator'
+import { acceptFieldVisitor, DefaultNamingConventions, isInverseRelation, NamingConventions, resolveDefaultColumnType } from '../model/index.js'
+import { printJsValue } from '../utils/printJsValue.js'
+import { DefinitionNamingConventions } from './DefinitionNamingConventions.js'
+import { AclDefinitionCodeGenerator } from './AclDefinitionCodeGenerator.js'
 
 export class DefinitionCodeGenerator {
 	constructor(

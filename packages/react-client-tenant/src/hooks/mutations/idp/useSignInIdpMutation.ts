@@ -1,6 +1,6 @@
 import * as TenantApi from '@contember/graphql-client-tenant'
-import { LoginToken } from '../../useTenantApi'
-import { createTenantMutation } from '../../useTenantMutation'
+import { LoginToken } from '../../useTenantApi.js'
+import { createTenantMutation } from '../../useTenantMutation.js'
 import { ModelType } from 'graphql-ts-client-api'
 
 const signInIdpFragment = TenantApi.signInIDPResult$$.person(TenantApi.person$.id.email.name)

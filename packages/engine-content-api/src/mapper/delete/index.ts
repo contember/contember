@@ -1,2 +1,2 @@
-export * from './DeletedEntitiesStorage'
-export * from './DeleteExecutor'
+export * from './DeletedEntitiesStorage.js'
+export * from './DeleteExecutor.js'

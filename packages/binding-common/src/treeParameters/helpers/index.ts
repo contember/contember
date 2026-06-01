@@ -1,1 +1,1 @@
-export * from './wrapFilterInHasOnes'
+export * from './wrapFilterInHasOnes.js'

@@ -1,12 +1,12 @@
 import { useConstantValueInvariant } from '@contember/react-utils'
 import { ReactElement, ReactNode } from 'react'
-import { useEntitySubTree } from '../accessorPropagation'
+import { useEntitySubTree } from '../accessorPropagation/index.js'
 import type { SugaredQualifiedSingleEntity, SugaredUnconstrainedQualifiedSingleEntity, TreeRootId } from '@contember/binding'
 import { Environment, MarkerFactory, PRIMARY_KEY_NAME, TreeNodeEnvironmentFactory } from '@contember/binding'
-import { Component } from './Component'
-import { Entity } from './Entity'
-import { Field } from './Field'
-import { SetOrderFieldOnCreate, SetOrderFieldOnCreateOwnProps } from '../accessorSorting'
+import { Component } from './Component.js'
+import { Entity } from './Entity.js'
+import { Field } from './Field.js'
+import { SetOrderFieldOnCreate, SetOrderFieldOnCreateOwnProps } from '../accessorSorting/index.js'
 
 export interface EntitySubTreeAdditionalProps {
 	variables?: Environment.ValuesMapWithFactory

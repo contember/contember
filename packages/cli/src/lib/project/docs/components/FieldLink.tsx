@@ -1,6 +1,6 @@
 import { Fragment, h } from 'preact'
-import { EntityLink } from './EntityLink'
-import { formatFieldAnchor } from './utils'
+import { EntityLink } from './EntityLink.js'
+import { formatFieldAnchor } from './utils.js'
 
 export const FieldLink = ({ entity, field, noEntityLabel }: { entity: string; field: string; noEntityLabel?: boolean }) => (
 	<Fragment>

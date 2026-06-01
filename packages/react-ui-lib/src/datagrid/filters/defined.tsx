@@ -2,13 +2,13 @@ import * as React from 'react'
 import { ReactNode } from 'react'
 import { DataViewBooleanFilterProps, DataViewIsDefinedFilter, DataViewNullFilterTrigger } from '@contember/react-dataview'
 import { Popover, PopoverContent, PopoverTrigger } from '@contember/react-ui-lib-base'
-import { DataGridFilterSelectTriggerUI, DataGridSingleFilterUI } from '../ui'
+import { DataGridFilterSelectTriggerUI, DataGridSingleFilterUI } from '../ui.js'
 import { dict } from '@contember/react-ui-lib-base'
 import { Component } from '@contember/interface'
-import { DataGridFilterMobileHiding } from './mobile'
+import { DataGridFilterMobileHiding } from './mobile.js'
 import { CheckIcon, XIcon } from 'lucide-react'
 import { Button } from '@contember/react-ui-lib-base'
-import { DataViewFieldLabel } from '../labels'
+import { DataViewFieldLabel } from '../labels.js'
 
 /**
  * Props for {@link DataGridIsDefinedFilter}.

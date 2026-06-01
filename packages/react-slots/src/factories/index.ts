@@ -1,3 +1,3 @@
-export * from './createSlotComponents'
-export * from './createSlotTargetComponent'
-export * from './createSlotSourceComponent'
+export * from './createSlotComponents.js'
+export * from './createSlotTargetComponent.js'
+export * from './createSlotSourceComponent.js'

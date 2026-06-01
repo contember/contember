@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'bun:test'
-import { GenerateUploadUrlMutationBuilder } from '../../../src'
+import { GenerateUploadUrlMutationBuilder } from '../../../src/index.js'
 
 describe('generate upload url mutation builder', () => {
 	it('correctly creates a simple mutation', () => {

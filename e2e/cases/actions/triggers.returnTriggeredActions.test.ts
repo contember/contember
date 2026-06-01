@@ -1,6 +1,6 @@
 import { ActionsDefinition as actions, createSchema, SchemaDefinition as def } from '@contember/schema-definition'
 import { expect, test } from 'bun:test'
-import { createTester, gql } from '../../src/tester'
+import { createTester, gql } from '../../src/tester.js'
 
 namespace ActionsModel {
 	@actions.watch({

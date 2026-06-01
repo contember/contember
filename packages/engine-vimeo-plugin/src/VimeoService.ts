@@ -1,4 +1,4 @@
-import { VimeoConfig } from './Config'
+import { VimeoConfig } from './Config.js'
 
 export class VimeoService {
 	constructor(public readonly config: VimeoConfig) {}

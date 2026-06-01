@@ -1,6 +1,6 @@
 import { ReactNode } from 'react'
-import { UploaderFileState } from '../types'
-import { useUploaderStateFiles } from '../hooks'
+import { UploaderFileState } from '../types/index.js'
+import { useUploaderStateFiles } from '../hooks/index.js'
 
 export const UploaderHasFile = ({ children, state, fallback }: {
 	children: ReactNode

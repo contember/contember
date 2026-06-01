@@ -1,4 +1,4 @@
-import { LogEntry, LoggerAttributes } from './types'
+import { LogEntry, LoggerAttributes } from './types.js'
 import { inspect } from 'node:util'
 
 export type FormattedAttributes = {

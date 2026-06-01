@@ -1,5 +1,5 @@
-import { RichTextChild, RichTextElement, RichTextLeaf } from './structure'
-import { RichTextRenderingOptions } from './RichTextRenderingOptions'
+import { RichTextChild, RichTextElement, RichTextLeaf } from './structure/index.js'
+import { RichTextRenderingOptions } from './RichTextRenderingOptions.js'
 import { ReactElement } from 'react'
 
 export type RenderChildren<

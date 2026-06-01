@@ -1,4 +1,4 @@
-import { CreateEvent, DeleteEvent, UpdateEvent } from './types'
+import { CreateEvent, DeleteEvent, UpdateEvent } from './types.js'
 
 export const appendUpdateSpecificData = <T>(commonData: T, event: UpdateEvent) => ({
 	...commonData,

@@ -1,8 +1,8 @@
 import { describe, expect, test } from 'bun:test'
-import { createClient } from '../../lib'
+import { createClient } from '../../lib.js'
 import { Input } from '@contember/schema'
 import OrderDirection = Input.OrderDirection
-import { queryBuilder } from '../../client'
+import { queryBuilder } from '../../client/index.js'
 
 describe('queries', () => {
 	const qb = queryBuilder

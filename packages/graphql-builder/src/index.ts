@@ -1,2 +1,2 @@
-export * from './nodes'
-export * from './GraphQlQueryPrinter'
+export * from './nodes/index.js'
+export * from './GraphQlQueryPrinter.js'

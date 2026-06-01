@@ -1,10 +1,10 @@
-import { ChangeMyPasswordErrorCode, ChangePasswordErrorCode, WeakPasswordReason } from '../../schema'
-import { ChangePasswordCommand } from '../commands'
-import { Response, ResponseError, ResponseOk } from '../utils/Response'
-import { ConfigurationQuery, PersonRow } from '../queries'
-import { Providers } from '../providers'
-import { DatabaseContext } from '../utils'
-import { PasswordStrengthValidator } from './PasswordStrengthValidator'
+import { ChangeMyPasswordErrorCode, ChangePasswordErrorCode, WeakPasswordReason } from '../../schema/index.js'
+import { ChangePasswordCommand } from '../commands/index.js'
+import { Response, ResponseError, ResponseOk } from '../utils/Response.js'
+import { ConfigurationQuery, PersonRow } from '../queries/index.js'
+import { Providers } from '../providers.js'
+import { DatabaseContext } from '../utils/index.js'
+import { PasswordStrengthValidator } from './PasswordStrengthValidator.js'
 
 class PasswordChangeManager {
 	constructor(

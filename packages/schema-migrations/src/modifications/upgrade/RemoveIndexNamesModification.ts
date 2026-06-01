@@ -1,6 +1,6 @@
 import { Schema } from '@contember/schema'
-import { SchemaUpdater, updateEveryEntity, updateModel } from '../utils/schemaUpdateUtils'
-import { createModificationType, Differ, ModificationHandler } from '../ModificationHandler'
+import { SchemaUpdater, updateEveryEntity, updateModel } from '../utils/schemaUpdateUtils.js'
+import { createModificationType, Differ, ModificationHandler } from '../ModificationHandler.js'
 
 export class RemoveIndexNamesModificationHandler implements ModificationHandler<RemoveIndexNamesModificationData> {
 	public createSql(): void {

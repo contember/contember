@@ -1,6 +1,6 @@
-import { GetReferencedEntity } from './useGetReferencedEntity'
+import { GetReferencedEntity } from './useGetReferencedEntity.js'
 import { useContext } from 'react'
-import { ReferencesContext } from './ReferencesProvider'
+import { ReferencesContext } from './ReferencesProvider.js'
 
 export const useReferencedEntity: GetReferencedEntity = (path, el) => {
 	const ctx = useContext(ReferencesContext)

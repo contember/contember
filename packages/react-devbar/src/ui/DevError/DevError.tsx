@@ -1,4 +1,4 @@
-import { DevErrorInner, DevErrorInnerProps } from './DevErrorInner'
+import { DevErrorInner, DevErrorInnerProps } from './DevErrorInner.js'
 
 export interface DevErrorProps extends DevErrorInnerProps {
 	source: string

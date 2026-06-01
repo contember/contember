@@ -1,7 +1,7 @@
 import type { GraphQlClient, GraphQlClientRequestOptions } from '@contember/client'
-import type { RawSchema } from './RawSchema'
-import { Schema } from './Schema'
-import { SchemaPreprocessor } from './SchemaPreprocessor'
+import type { RawSchema } from './RawSchema.js'
+import { Schema } from './Schema.js'
+import { SchemaPreprocessor } from './SchemaPreprocessor.js'
 
 export class SchemaLoader {
 	private static readonly schemaLoadCache: Map<string, Promise<Schema>> = new Map()

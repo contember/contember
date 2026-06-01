@@ -3,8 +3,8 @@ import { forwardRef, ReactElement, useCallback } from 'react'
 import { Slot } from '@radix-ui/react-slot'
 import { composeEventHandlers } from '@radix-ui/primitive'
 import { dataAttribute } from '@contember/utilities'
-import { DataViewBooleanFilterCurrent, DataViewSetBooleanFilterAction, useDataViewBooleanFilter } from '../../../hooks'
-import { useDataViewFilterName } from '../../../contexts'
+import { DataViewBooleanFilterCurrent, DataViewSetBooleanFilterAction, useDataViewBooleanFilter } from '../../../hooks/index.js'
+import { useDataViewFilterName } from '../../../contexts.js'
 
 export interface DataViewBooleanFilterTriggerAttributes {
 	['data-active']?: ''

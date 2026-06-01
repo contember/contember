@@ -10,7 +10,7 @@ import {
 	Transforms,
 } from 'slate'
 import { ContemberEditor } from '@contember/react-slate-editor-base'
-import { isElementWithReference } from '../elements'
+import { isElementWithReference } from '../elements/index.js'
 
 export const prepareElementForInsertion = (editor: Editor, isReference: boolean) => {
 	const selection = editor.selection

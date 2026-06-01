@@ -1,4 +1,4 @@
-import type { BindingOperations } from './BindingOperations'
+import type { BindingOperations } from './BindingOperations.js'
 
 // This allows us to have several parallel sub-trees without one having to be the main tree
 // and all the other ones subordinate.

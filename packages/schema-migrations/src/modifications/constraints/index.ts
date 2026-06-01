@@ -1,3 +1,3 @@
-export * from './CreateUniqueConstraintModification'
-export * from './RemoveUniqueConstraintModification'
-export * from './utils'
+export * from './CreateUniqueConstraintModification.js'
+export * from './RemoveUniqueConstraintModification.js'
+export * from './utils.js'

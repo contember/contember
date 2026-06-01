@@ -7,7 +7,7 @@ import {
 	MeaningfulMarker,
 } from '@contember/binding-common'
 import { assertNever } from '@contember/binding-common'
-import { TreeParameterSugarer } from './TreeParameterSugarer'
+import { TreeParameterSugarer } from './TreeParameterSugarer.js'
 
 export class MarkerSugarer {
 	public static sugarMarker(marker: MeaningfulMarker): string {

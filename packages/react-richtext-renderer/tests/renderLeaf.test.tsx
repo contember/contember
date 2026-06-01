@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test'
-import { BuiltinLeaves, RichText } from '../src'
+import { BuiltinLeaves, RichText } from '../src/index.js'
 import { render } from '@testing-library/react'
 
 describe('leaf rendering', () => {

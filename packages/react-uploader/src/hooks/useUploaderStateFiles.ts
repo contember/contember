@@ -1,5 +1,5 @@
-import { UploaderFileState } from '../types'
-import { useUploaderState } from '../contexts'
+import { UploaderFileState } from '../types/index.js'
+import { useUploaderState } from '../contexts.js'
 import { useMemo } from 'react'
 
 export type UseUploaderStateFilesArgs = {

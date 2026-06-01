@@ -1,10 +1,10 @@
-import { UpdateInputProcessor } from '../../../inputProcessing'
+import { UpdateInputProcessor } from '../../../inputProcessing/index.js'
 import { Input, Model } from '@contember/schema'
-import { getInsertPrimary, MutationEntryNotFoundError } from '../../Result'
-import { Mapper } from '../../Mapper'
-import { SqlUpdateInputProcessorResult } from '../../update'
-import { CheckedPrimary } from '../../CheckedPrimary'
-import { MapperInput } from '../../types'
+import { getInsertPrimary, MutationEntryNotFoundError } from '../../Result.js'
+import { Mapper } from '../../Mapper.js'
+import { SqlUpdateInputProcessorResult } from '../../update/index.js'
+import { CheckedPrimary } from '../../CheckedPrimary.js'
+import { MapperInput } from '../../types.js'
 
 type Context = Model.ManyHasManyOwningContext | Model.ManyHasManyInverseContext
 

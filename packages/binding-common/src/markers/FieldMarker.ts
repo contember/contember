@@ -1,5 +1,5 @@
-import type { FieldName, FieldValue, RelativeSingleField } from '../treeParameters'
-import { PlaceholderGenerator } from './PlaceholderGenerator'
+import type { FieldName, FieldValue, RelativeSingleField } from '../treeParameters/index.js'
+import { PlaceholderGenerator } from './PlaceholderGenerator.js'
 
 /**
  * A nonbearing field is only defined in context of create mutations. An entity will be created if and only if some

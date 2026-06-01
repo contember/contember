@@ -1,2 +1,2 @@
-export * from './deprecate'
-export * from './types'
+export * from './deprecate.js'
+export * from './types.js'

@@ -1,6 +1,6 @@
-import { UniqueConstraintMetadata, UniqueConstraintMetadataSet } from './UniqueConstraintMetadata'
-import { ForeignKeyConstraintMetadata, ForeignKeyConstraintMetadataSet } from './ForeignKeyConstraintMetadata'
-import { IndexMetadata, IndexMetadataSet } from './IndexMetadata'
+import { UniqueConstraintMetadata, UniqueConstraintMetadataSet } from './UniqueConstraintMetadata.js'
+import { ForeignKeyConstraintMetadata, ForeignKeyConstraintMetadataSet } from './ForeignKeyConstraintMetadata.js'
+import { IndexMetadata, IndexMetadataSet } from './IndexMetadata.js'
 
 export interface DatabaseMetadata {
 	uniqueConstraints: UniqueConstraintMetadataSet

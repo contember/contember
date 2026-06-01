@@ -1,3 +1,3 @@
-export * from './ParagraphElement'
-export * from './ParagraphHtmlDeserializer'
-export * from './withParagraphs'
+export * from './ParagraphElement.js'
+export * from './ParagraphHtmlDeserializer.js'
+export * from './withParagraphs.js'

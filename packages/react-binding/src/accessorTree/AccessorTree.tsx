@@ -1,10 +1,10 @@
 import type { ReactNode } from 'react'
-import { BindingOperationsProvider, EnvironmentContext, TreeRootIdProvider } from '../accessorPropagation'
-import type { AccessorTreeState } from './AccessorTreeState'
-import { AccessorTreeStateContext } from './AccessorTreeStateContext'
-import { DirtinessContext } from './DirtinessContext'
-import { MutationStateContext } from './MutationStateContext'
-import { EntityKeyContext } from '../accessorPropagation/EntityKeyContext'
+import { BindingOperationsProvider, EnvironmentContext, TreeRootIdProvider } from '../accessorPropagation/index.js'
+import type { AccessorTreeState } from './AccessorTreeState.js'
+import { AccessorTreeStateContext } from './AccessorTreeStateContext.js'
+import { DirtinessContext } from './DirtinessContext.js'
+import { MutationStateContext } from './MutationStateContext.js'
+import { EntityKeyContext } from '../accessorPropagation/EntityKeyContext.js'
 
 export interface AccessorTreeProps {
 	state: AccessorTreeState

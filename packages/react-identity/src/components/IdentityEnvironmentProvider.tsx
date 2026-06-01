@@ -1,6 +1,6 @@
 import { ReactNode } from 'react'
 import { EnvironmentExtensionProvider } from '@contember/react-binding'
-import { identityEnvironmentExtension } from '../environment'
+import { identityEnvironmentExtension } from '../environment/index.js'
 import { useIdentity } from '@contember/react-client-tenant'
 
 export interface IdentityEnvironmentProviderProps {

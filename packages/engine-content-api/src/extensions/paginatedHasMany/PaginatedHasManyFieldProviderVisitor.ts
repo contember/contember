@@ -1,8 +1,8 @@
 import { Model } from '@contember/schema'
-import { PaginatedHasManyFieldProvider, PaginatedHasManyFieldProviderExtension } from './PaginatedHasManyFieldProvider'
-import { capitalizeFirstLetter } from '../../utils'
-import { PaginatedFieldConfigFactory } from '../../schema/PaginatedFieldConfigFactory'
-import { aliasAwareResolver } from '../../schema'
+import { PaginatedHasManyFieldProvider, PaginatedHasManyFieldProviderExtension } from './PaginatedHasManyFieldProvider.js'
+import { capitalizeFirstLetter } from '../../utils/index.js'
+import { PaginatedFieldConfigFactory } from '../../schema/PaginatedFieldConfigFactory.js'
+import { aliasAwareResolver } from '../../schema/index.js'
 import { GraphQLFieldConfig } from 'graphql'
 
 type Result = [

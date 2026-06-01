@@ -1,7 +1,7 @@
 import { ErrorAccessor } from '@contember/react-binding'
 import { useEffect, useId, useMemo } from 'react'
-import { FormFieldStateContext, useFormFieldState } from '../contexts'
-import { FormFieldState } from '../types'
+import { FormFieldStateContext, useFormFieldState } from '../contexts.js'
+import { FormFieldState } from '../types/index.js'
 
 const emptyArr: [] = []
 

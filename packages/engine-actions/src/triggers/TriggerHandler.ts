@@ -7,9 +7,9 @@ import {
 	EventManager,
 } from '@contember/engine-content-api'
 import { Input } from '@contember/schema'
-import { IndirectListener, JunctionListener, TriggerListenersStore } from './TriggerListenersStore'
-import { TriggerPayloadManager } from './TriggerPayloadManager'
-import { TriggerIndirectChangesFetcher } from './TriggerIndirectChangesFetcher'
+import { IndirectListener, JunctionListener, TriggerListenersStore } from './TriggerListenersStore.js'
+import { TriggerPayloadManager } from './TriggerPayloadManager.js'
+import { TriggerIndirectChangesFetcher } from './TriggerIndirectChangesFetcher.js'
 
 export type EventCause =
 	| BeforeUpdateEvent

@@ -17,7 +17,7 @@ import {
 	SchemaVersionBuilder,
 	VERSION_LATEST,
 } from '@contember/migrations-client'
-import { MigrationRebaseFacade } from '../../../src/lib/migrations/MigrationRebaseFacade'
+import { MigrationRebaseFacade } from '../../../src/lib/migrations/MigrationRebaseFacade.js'
 
 namespace BlogModel {
 	export class Author {

@@ -5,8 +5,8 @@ import {
 	getAudioFileDataExtractor,
 	getFileUrlDataExtractor,
 	getGenericFileMetadataExtractor,
-} from '../extractors'
-import { FileType } from '../types'
+} from '../extractors/index.js'
+import { FileType } from '../types/index.js'
 
 export type AudioFileTypeProps =
 	& FileType

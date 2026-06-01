@@ -1,6 +1,6 @@
-import { EntityTypeLike, SchemaTypeLike } from '../types'
-import { ContentClientInput } from '../types'
-import { ContentEntitySelectionContext } from './ContentEntitySelection'
+import { EntityTypeLike, SchemaTypeLike } from '../types/index.js'
+import { ContentClientInput } from '../types/index.js'
+import { ContentEntitySelectionContext } from './ContentEntitySelection.js'
 
 export interface TypedEntitySelection<TSchema extends SchemaTypeLike, TEntityName extends string, TEntity extends EntityTypeLike, TValue> {
 	/** @internal */

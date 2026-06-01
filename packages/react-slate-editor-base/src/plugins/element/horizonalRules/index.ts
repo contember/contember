@@ -1,2 +1,2 @@
-export * from './HorizontalRuleElement'
-export * from './withHorizontalRules'
+export * from './HorizontalRuleElement.js'
+export * from './withHorizontalRules.js'

@@ -1,5 +1,5 @@
-import { Runnable, RunnableArgs, Running } from './Runnable'
-import { abortableTimeout } from './utils'
+import { Runnable, RunnableArgs, Running } from './Runnable.js'
+import { abortableTimeout } from './utils.js'
 
 export type SupervisorOptions = {
 	max?: number

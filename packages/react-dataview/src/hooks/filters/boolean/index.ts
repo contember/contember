@@ -1,1 +1,1 @@
-export * from './useDataViewBooleanFilter'
+export * from './useDataViewBooleanFilter.js'

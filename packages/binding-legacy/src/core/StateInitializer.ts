@@ -14,10 +14,10 @@ import type {
 } from '@contember/binding-common'
 import { EventListenersStore } from '@contember/binding-common'
 import { assertNever } from '@contember/binding-common'
-import type { AccessorErrorManager } from './AccessorErrorManager'
-import type { EventManager } from './EventManager'
-import { EntityOperations, FieldOperations, ListOperations } from './operations'
-import { RealmKeyGenerator } from './RealmKeyGenerator'
+import type { AccessorErrorManager } from './AccessorErrorManager.js'
+import type { EventManager } from './EventManager.js'
+import { EntityOperations, FieldOperations, ListOperations } from './operations/index.js'
+import { RealmKeyGenerator } from './RealmKeyGenerator.js'
 import {
 	EntityListBlueprint,
 	EntityListState,
@@ -28,11 +28,11 @@ import {
 	FieldState,
 	getEntityMarker,
 	RootStateNode,
-} from './state'
+} from './state/index.js'
 import { TreeParameterMerger } from '@contember/binding-common'
-import type { TreeStore } from './TreeStore'
-import { EntityAccessorImpl, EntityListAccessorImpl, FieldAccessorImpl } from '../accessors'
-import { EntityFieldPersistedData, EntityFieldPersistedValue } from '../accessorTree'
+import type { TreeStore } from './TreeStore.js'
+import { EntityAccessorImpl, EntityListAccessorImpl, FieldAccessorImpl } from '../accessors/index.js'
+import { EntityFieldPersistedData, EntityFieldPersistedValue } from '../accessorTree/index.js'
 
 export class StateInitializer {
 	private readonly fieldOperations: FieldOperations

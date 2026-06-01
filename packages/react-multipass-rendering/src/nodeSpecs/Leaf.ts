@@ -1,5 +1,5 @@
 import type { ElementType } from 'react'
-import type { ConstrainedLeafRepresentationFactory, UnconstrainedLeafRepresentationFactory, ValidFactoryName } from './types'
+import type { ConstrainedLeafRepresentationFactory, UnconstrainedLeafRepresentationFactory, ValidFactoryName } from './types/index.js'
 
 class Leaf<
 	Props extends {} = {},

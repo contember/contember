@@ -1,5 +1,5 @@
 import { createContext, createRequiredContext } from '@contember/react-utils'
-import { FormContextValue, Identity, IdentityMethods, IdentityStateValue, IDPMethods, IDPStateValue } from './types'
+import { FormContextValue, Identity, IdentityMethods, IdentityStateValue, IDPMethods, IDPStateValue } from './types/index.js'
 
 const IdentityContext_ = createContext<Identity | undefined>('IdentityContext', undefined)
 /** @internal */

@@ -1,8 +1,8 @@
 import { Command, CommandConfiguration, Input } from '@contember/cli-common'
-import { RemoteProjectResolver } from '../../lib/project/RemoteProjectResolver'
-import { TenantClient } from '../../lib/tenant/TenantClient'
-import { TenantConfigLoader } from '../../lib/tenant/TenantConfigLoader'
-import { TenantConfigApplier } from '../../lib/tenant/TenantConfigApplier'
+import { RemoteProjectResolver } from '../../lib/project/RemoteProjectResolver.js'
+import { TenantClient } from '../../lib/tenant/TenantClient.js'
+import { TenantConfigLoader } from '../../lib/tenant/TenantConfigLoader.js'
+import { TenantConfigApplier } from '../../lib/tenant/TenantConfigApplier.js'
 
 type Args = {
 	config?: string

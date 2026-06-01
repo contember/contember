@@ -1,7 +1,7 @@
-import { Command } from '../Command'
-import { ConfigInput } from '../../../schema'
+import { Command } from '../Command.js'
+import { ConfigInput } from '../../../schema/index.js'
 import { UpdateBuilder } from '@contember/database'
-import { ConfigRow } from '../../type/Config'
+import { ConfigRow } from '../../type/Config.js'
 import { IPostgresInterval } from 'postgres-interval'
 
 export class UpdateConfigurationCommand implements Command<void> {

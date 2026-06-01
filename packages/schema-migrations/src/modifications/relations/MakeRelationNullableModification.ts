@@ -1,10 +1,10 @@
 import { MigrationBuilder } from '@contember/database-migrations'
 import { Model, Schema } from '@contember/schema'
-import { SchemaUpdater, updateEntity, updateField, updateModel } from '../utils/schemaUpdateUtils'
-import { createModificationType, Differ, ModificationHandler } from '../ModificationHandler'
+import { SchemaUpdater, updateEntity, updateField, updateModel } from '../utils/schemaUpdateUtils.js'
+import { createModificationType, Differ, ModificationHandler } from '../ModificationHandler.js'
 import { getEntity, tryGetColumnName } from '@contember/schema-utils'
-import { isIt } from '../../utils/isIt'
-import { updateRelations } from '../utils/diffUtils'
+import { isIt } from '../../utils/isIt.js'
+import { updateRelations } from '../utils/diffUtils.js'
 
 export class MakeRelationNullableModificationHandler implements ModificationHandler<MakeRelationNullableModificationData> {
 	constructor(private readonly data: MakeRelationNullableModificationData, private readonly schema: Schema) {}

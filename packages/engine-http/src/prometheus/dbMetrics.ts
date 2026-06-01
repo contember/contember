@@ -1,7 +1,7 @@
 /// <reference path="../../types/prom-client/index.d.ts" />
 import prom from 'prom-client'
 import { Connection, EventManager, PoolStats, poolStatsDescription } from '@contember/database'
-import { CustomMetric } from './CustomMetric'
+import { CustomMetric } from './CustomMetric.js'
 
 const labelNames = ['contember_project' as const, 'contember_module' as const, 'contember_project_group' as const, 'database_instance']
 type LabelNames = typeof labelNames[number]

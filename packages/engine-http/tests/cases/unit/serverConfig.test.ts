@@ -1,5 +1,5 @@
 import { expect, test } from 'bun:test'
-import { serverConfigSchema } from '../../../src/config/configSchema'
+import { serverConfigSchema } from '../../../src/config/configSchema.js'
 
 const trustedProxies = (val: unknown): unknown => serverConfigSchema({ http: { trustedProxies: val } }).http?.trustedProxies
 

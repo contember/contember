@@ -1,5 +1,5 @@
-import { paragraphElementType } from './ParagraphElement'
-import { HtmlDeserializerPlugin } from '../../../types'
+import { paragraphElementType } from './ParagraphElement.js'
+import { HtmlDeserializerPlugin } from '../../../types/index.js'
 
 export const paragraphHtmlDeserializer: HtmlDeserializerPlugin = {
 	processBlockPaste: ({ element, next, cumulativeTextAttrs }) =>

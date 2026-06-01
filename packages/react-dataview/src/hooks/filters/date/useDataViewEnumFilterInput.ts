@@ -1,6 +1,6 @@
 import { ChangeEvent, useCallback } from 'react'
-import { useDataViewFilter } from '../../useDataViewFilter'
-import { DateRangeFilterArtifacts } from '../../../filterTypes'
+import { useDataViewFilter } from '../../useDataViewFilter.js'
+import { DateRangeFilterArtifacts } from '../../../filterTypes/index.js'
 
 export interface UseDataViewDateFilterInputResult {
 	value: string

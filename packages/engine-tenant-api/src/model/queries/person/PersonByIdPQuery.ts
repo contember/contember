@@ -1,6 +1,6 @@
 import { DatabaseQuery, DatabaseQueryable } from '@contember/database'
-import { MaybePersonRow } from './types'
-import { PersonQueryBuilderFactory } from './PersonQueryBuilderFactory'
+import { MaybePersonRow } from './types.js'
+import { PersonQueryBuilderFactory } from './PersonQueryBuilderFactory.js'
 
 class PersonByIdPQuery extends DatabaseQuery<MaybePersonRow> {
 	constructor(

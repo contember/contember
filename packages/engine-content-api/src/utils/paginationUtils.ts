@@ -1,4 +1,4 @@
-import { ObjectNode } from '../inputProcessing'
+import { ObjectNode } from '../inputProcessing/index.js'
 import { Input } from '@contember/schema'
 
 export class PaginationHelper {

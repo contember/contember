@@ -9,14 +9,14 @@ import {
 	RuntimeId,
 	UnpersistedEntityDummyId,
 } from '@contember/binding-common'
-import type { AccessorErrorManager } from '../AccessorErrorManager'
-import { EventManager } from '../EventManager'
-import { RealmKeyGenerator } from '../RealmKeyGenerator'
-import { EntityListState, getEntityMarker, StateIterator } from '../state'
-import type { StateInitializer } from '../StateInitializer'
-import type { TreeStore } from '../TreeStore'
-import { OperationsHelpers } from './OperationsHelpers'
-import { ErrorLocator } from '../exceptions/ErrorLocator'
+import type { AccessorErrorManager } from '../AccessorErrorManager.js'
+import { EventManager } from '../EventManager.js'
+import { RealmKeyGenerator } from '../RealmKeyGenerator.js'
+import { EntityListState, getEntityMarker, StateIterator } from '../state/index.js'
+import type { StateInitializer } from '../StateInitializer.js'
+import type { TreeStore } from '../TreeStore.js'
+import { OperationsHelpers } from './OperationsHelpers.js'
+import { ErrorLocator } from '../exceptions/ErrorLocator.js'
 
 export class ListOperations {
 	public constructor(

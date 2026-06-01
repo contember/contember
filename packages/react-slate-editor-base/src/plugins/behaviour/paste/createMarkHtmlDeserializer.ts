@@ -1,4 +1,4 @@
-import { HtmlDeserializerPlugin } from '../../../types/htmlDeserializer'
+import { HtmlDeserializerPlugin } from '../../../types/htmlDeserializer.js'
 
 export const createMarkHtmlDeserializer = (
 	markType: string,

@@ -1,7 +1,7 @@
-import { DatabaseContext } from '../utils'
-import { validateEmail } from '../utils/email'
-import { ResponseError } from '../utils/Response'
-import { PersonQuery, PersonRow } from '../queries'
+import { DatabaseContext } from '../utils/index.js'
+import { validateEmail } from '../utils/email.js'
+import { ResponseError } from '../utils/Response.js'
+import { PersonQuery, PersonRow } from '../queries/index.js'
 
 export class EmailValidator {
 	public async validateEmail(db: DatabaseContext, email: string): Promise<ResponseError<EmailValidatorError> | null> {

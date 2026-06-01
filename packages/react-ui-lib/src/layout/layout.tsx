@@ -20,7 +20,7 @@ import {
 	SidebarRail,
 	SidebarTrigger,
 } from '@contember/react-ui-lib-base'
-import { SlotTargets } from './slots'
+import { SlotTargets } from './slots.js'
 
 export const LayoutComponent = ({ children }: PropsWithChildren) => {
 	const isActive = useHasActiveSlotsFactory()

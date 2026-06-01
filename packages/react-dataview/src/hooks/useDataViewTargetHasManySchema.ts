@@ -1,5 +1,5 @@
 import { useMemo } from 'react'
-import { useDataViewTargetFieldSchemaInternal } from '../internal/hooks/useTargetFieldSchema'
+import { useDataViewTargetFieldSchemaInternal } from '../internal/hooks/useTargetFieldSchema.js'
 import { QueryLanguage, SugaredRelativeEntityList, useEnvironment } from '@contember/react-binding'
 
 /**

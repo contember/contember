@@ -1,5 +1,5 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
-import { printJsValue } from '../../../src/utils/printJsValue'
+import { printJsValue } from '../../../src/utils/printJsValue.js'
 
 describe('printJsValue', () => {
 	test('string', () => {

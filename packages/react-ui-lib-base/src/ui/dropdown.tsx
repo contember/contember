@@ -2,9 +2,9 @@ import * as DropdownMenuPrimitive from '@radix-ui/react-dropdown-menu'
 import { Check, ChevronRight, Circle, MoreHorizontalIcon } from 'lucide-react'
 import * as React from 'react'
 import { ReactNode } from 'react'
-import { uic } from '../utils'
-import { createComponentOpenHooks } from '../utils/createComponentOpenHooks'
-import { buttonConfig } from './button'
+import { uic } from '../utils/index.js'
+import { createComponentOpenHooks } from '../utils/createComponentOpenHooks.js'
+import { buttonConfig } from './button.js'
 
 export const {
 	Component: DropdownMenu,

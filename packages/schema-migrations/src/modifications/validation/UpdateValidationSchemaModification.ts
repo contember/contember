@@ -1,9 +1,9 @@
 import { Schema, Validation } from '@contember/schema'
-import { SchemaUpdater } from '../utils/schemaUpdateUtils'
-import { createModificationType, Differ, ModificationHandler } from '../ModificationHandler'
+import { SchemaUpdater } from '../utils/schemaUpdateUtils.js'
+import { createModificationType, Differ, ModificationHandler } from '../ModificationHandler.js'
 import deepEqual from 'fast-deep-equal'
 import { createPatch } from 'rfc6902'
-import { patchValidationSchemaModification } from './PatchValidationSchemaModification'
+import { patchValidationSchemaModification } from './PatchValidationSchemaModification.js'
 
 export class UpdateValidationSchemaModificationHandler implements ModificationHandler<UpdateValidationSchemaModificationData> {
 	constructor(private readonly data: UpdateValidationSchemaModificationData) {}

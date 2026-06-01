@@ -1,9 +1,9 @@
-import { ChangeProfileCommand, ChangeProfileData } from '../commands/person/ChangeProfileCommand'
-import { Response, ResponseError, ResponseOk } from '../utils/Response'
-import { PersonQuery, PersonRow } from '../queries'
-import { DatabaseContext } from '../utils'
-import { EmailValidator, EmailValidatorError } from './EmailValidator'
-import { TogglePersonPasswordlessCommand } from '../commands'
+import { ChangeProfileCommand, ChangeProfileData } from '../commands/person/ChangeProfileCommand.js'
+import { Response, ResponseError, ResponseOk } from '../utils/Response.js'
+import { PersonQuery, PersonRow } from '../queries/index.js'
+import { DatabaseContext } from '../utils/index.js'
+import { EmailValidator, EmailValidatorError } from './EmailValidator.js'
+import { TogglePersonPasswordlessCommand } from '../commands/index.js'
 
 class PersonManager {
 	constructor(

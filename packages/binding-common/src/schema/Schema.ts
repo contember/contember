@@ -1,11 +1,11 @@
-import type { EntityName, FieldName } from '../treeParameters'
-import type { SchemaField } from './SchemaField'
-import type { SchemaStore } from './SchemaStore'
-import { SchemaEntity } from './SchemaEntity'
-import { SchemaColumn } from './SchemaColumn'
-import { SchemaRelation } from './SchemaRelation'
-import { SchemaEnumName } from './SchemaEnums'
-import { throwBindingError } from '../BindingError'
+import type { EntityName, FieldName } from '../treeParameters/index.js'
+import type { SchemaField } from './SchemaField.js'
+import type { SchemaStore } from './SchemaStore.js'
+import { SchemaEntity } from './SchemaEntity.js'
+import { SchemaColumn } from './SchemaColumn.js'
+import { SchemaRelation } from './SchemaRelation.js'
+import { SchemaEnumName } from './SchemaEnums.js'
+import { throwBindingError } from '../BindingError.js'
 
 export class Schema {
 	public constructor(private readonly store: SchemaStore) {}

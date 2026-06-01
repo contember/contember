@@ -1,7 +1,7 @@
 import { ReactEditor } from 'slate-react'
 import { Editor, Path as SlatePath, Transforms } from 'slate'
-import { TableCellElement } from './TableCellElement'
-import { TableElement } from './TableElement'
+import { TableCellElement } from './TableCellElement.js'
+import { TableElement } from './TableElement.js'
 
 export const selectTableCellContents = (editor: Editor, table: TableElement | SlatePath, rowIndex: number, columnIndex: number) => {
 	if (!Array.isArray(table)) {

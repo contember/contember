@@ -1,5 +1,5 @@
 import React, { ReactNode } from 'react'
-import { useBoardSortableNode } from '../contexts'
+import { useBoardSortableNode } from '../contexts.js'
 import { Slot } from '@radix-ui/react-slot'
 import { dataAttribute } from '@contember/utilities'
 

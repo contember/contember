@@ -1,8 +1,8 @@
 import { Component, Field, SugaredRelativeSingleField } from '@contember/react-binding'
 import { Repeater, RepeaterProps } from '@contember/react-repeater'
 import { useState } from 'react'
-import { extractBlocks } from '../internal/helpers/staticAnalyzer'
-import { BlockRepeaterConfigContext } from '../contexts'
+import { extractBlocks } from '../internal/helpers/staticAnalyzer.js'
+import { BlockRepeaterConfigContext } from '../contexts.js'
 
 /**
  * Props for the {@link BlockRepeater} component.

@@ -1,7 +1,7 @@
-import { PredicateDefinitionProcessor } from '../acl'
-import { IndentDecider, Literal, printJsValue } from '../utils/printJsValue'
+import { PredicateDefinitionProcessor } from '../acl/index.js'
+import { IndentDecider, Literal, printJsValue } from '../utils/printJsValue.js'
 import { Acl, Model, Schema } from '@contember/schema'
-import { DefinitionNamingConventions } from './DefinitionNamingConventions'
+import { DefinitionNamingConventions } from './DefinitionNamingConventions.js'
 
 const indentFirstLevel: IndentDecider = (val, path) => path.length === 0
 

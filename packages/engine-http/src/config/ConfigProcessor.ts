@@ -1,6 +1,6 @@
 import * as Typesafe from '@contember/typesafe'
 
-import { Env } from './config'
+import { Env } from './config.js'
 
 export type ConfigTemplate = any // fixme
 

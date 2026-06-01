@@ -1,1 +1,1 @@
-export * from './dimensions'
+export * from './dimensions.js'

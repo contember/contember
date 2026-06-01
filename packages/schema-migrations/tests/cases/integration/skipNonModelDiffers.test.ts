@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test'
-import { ModificationHandlerFactory, SchemaDiffer, SchemaMigrator } from '../../../src'
+import { ModificationHandlerFactory, SchemaDiffer, SchemaMigrator } from '../../../src/index.js'
 import { SchemaBuilder } from '@contember/schema-definition'
 import { Acl, Model, Schema } from '@contember/schema'
 import { emptySchema } from '@contember/schema-utils'

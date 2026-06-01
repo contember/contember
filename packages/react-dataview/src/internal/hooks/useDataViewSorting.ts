@@ -1,9 +1,9 @@
 import { useCallback, useMemo } from 'react'
 import { useStoredState } from '@contember/react-utils'
-import { DataViewSortingMethods, DataViewSortingProps, DataViewSortingState } from '../../types'
-import { cycleOrderDirection } from '../helpers/cycleOrderDirection'
+import { DataViewSortingMethods, DataViewSortingProps, DataViewSortingState } from '../../types/index.js'
+import { cycleOrderDirection } from '../helpers/cycleOrderDirection.js'
 import { OrderBy, QueryLanguage, useEnvironment } from '@contember/react-binding'
-import { DataViewSortingStoredState, getDataViewSortingStorageArgs } from '../stateStorage'
+import { DataViewSortingStoredState, getDataViewSortingStorageArgs } from '../stateStorage.js'
 
 export type UseDataViewSortingArgs =
 	& {

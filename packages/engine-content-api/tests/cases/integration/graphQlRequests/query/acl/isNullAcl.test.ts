@@ -1,9 +1,9 @@
 import { AclDefinition as acl, createSchema, SchemaDefinition as def } from '@contember/schema-definition'
 import { test } from 'bun:test'
-import { execute } from '../../../../../src/test'
-import { GQL, SQL } from '../../../../../src/tags'
-import { PermissionFactory } from '../../../../../../src'
-import { testUuid } from '../../../../../src/testUuid'
+import { execute } from '../../../../../src/test.js'
+import { GQL, SQL } from '../../../../../src/tags.js'
+import { PermissionFactory } from '../../../../../../src/index.js'
+import { testUuid } from '../../../../../src/testUuid.js'
 
 namespace RowPredicateSubset {
 	export const ownerRole = acl.createRole('owner')

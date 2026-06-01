@@ -1,1 +1,1 @@
-export * from './RecordRateLimitEventCommand'
+export * from './RecordRateLimitEventCommand.js'

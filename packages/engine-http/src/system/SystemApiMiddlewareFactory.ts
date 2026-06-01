@@ -1,8 +1,8 @@
-import { HttpController } from '../application'
-import { ProjectContextResolver } from '../project-common'
-import { HttpErrorResponse } from '../common'
-import { SystemGraphQLContextFactory } from './SystemGraphQLContextFactory'
-import { GraphQLKoaState } from '../graphql'
+import { HttpController } from '../application/index.js'
+import { ProjectContextResolver } from '../project-common/index.js'
+import { HttpErrorResponse } from '../common/index.js'
+import { SystemGraphQLContextFactory } from './SystemGraphQLContextFactory.js'
+import { GraphQLKoaState } from '../graphql/index.js'
 
 export class SystemApiMiddlewareFactory {
 	constructor(

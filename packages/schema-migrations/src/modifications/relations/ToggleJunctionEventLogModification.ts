@@ -1,11 +1,11 @@
 import { MigrationBuilder } from '@contember/database-migrations'
 import { Model, Schema } from '@contember/schema'
-import { SchemaUpdater, updateEntity, updateField, updateModel } from '../utils/schemaUpdateUtils'
-import { createModificationType, Differ, ModificationHandler, ModificationHandlerCreateSqlOptions } from '../ModificationHandler'
-import { createEventTrigger, createEventTrxTrigger, dropEventTrigger, dropEventTrxTrigger } from '../utils/sqlUpdateUtils'
+import { SchemaUpdater, updateEntity, updateField, updateModel } from '../utils/schemaUpdateUtils.js'
+import { createModificationType, Differ, ModificationHandler, ModificationHandlerCreateSqlOptions } from '../ModificationHandler.js'
+import { createEventTrigger, createEventTrxTrigger, dropEventTrigger, dropEventTrxTrigger } from '../utils/sqlUpdateUtils.js'
 import { isOwningRelation, isRelation } from '@contember/schema-utils'
-import { updateRelations } from '../utils/diffUtils'
-import { isIt } from '../../utils/isIt'
+import { updateRelations } from '../utils/diffUtils.js'
+import { isIt } from '../../utils/isIt.js'
 
 export class ToggleJunctionEventLogModificationHandler implements ModificationHandler<ToggleJunctionEventLogModificationData> {
 	constructor(

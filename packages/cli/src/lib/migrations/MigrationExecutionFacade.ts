@@ -1,5 +1,5 @@
 import prompts from 'prompts'
-import { MigrationPrinter } from './MigrationPrinter'
+import { MigrationPrinter } from './MigrationPrinter.js'
 import {
 	isSchemaMigration,
 	MigrateErrorCode,
@@ -9,12 +9,12 @@ import {
 	SchemaStateManager,
 	SchemaVersionBuilder,
 } from '@contember/migrations-client'
-import { MigrationsStatusFacade } from './MigrationsStatusFacade'
-import { MigrationSnapshotFacade } from './MigrationSnapshotFacade'
+import { MigrationsStatusFacade } from './MigrationsStatusFacade.js'
+import { MigrationSnapshotFacade } from './MigrationSnapshotFacade.js'
 import { MigrationVersionHelper } from '@contember/engine-common'
-import { SystemClientProvider } from '../SystemClientProvider'
-import { TenantClientProvider } from '../TenantClientProvider'
-import { RemoteProjectProvider } from '../project/RemoteProjectProvider'
+import { SystemClientProvider } from '../SystemClientProvider.js'
+import { TenantClientProvider } from '../TenantClientProvider.js'
+import { RemoteProjectProvider } from '../project/RemoteProjectProvider.js'
 
 export class MigrationExecutionFacade {
 	constructor(

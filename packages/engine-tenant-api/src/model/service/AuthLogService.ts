@@ -1,7 +1,7 @@
-import { DatabaseContext } from '../utils'
-import { CreateAuthLogEntryCommand } from '../commands/authLog/CreateAuthLogEntryCommand'
-import { Response } from '../utils/Response'
-import { AuthActionType } from '../type/AuthLog'
+import { DatabaseContext } from '../utils/index.js'
+import { CreateAuthLogEntryCommand } from '../commands/authLog/CreateAuthLogEntryCommand.js'
+import { Response } from '../utils/Response.js'
+import { AuthActionType } from '../type/AuthLog.js'
 import { JSONValue } from '@contember/schema'
 
 class AuthLogService {

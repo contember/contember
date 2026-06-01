@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test'
-import { EnumTypeSchemaGenerator } from '../src'
+import { EnumTypeSchemaGenerator } from '../src/index.js'
 
 test('generate enums', () => {
 	const enumGenerator = new EnumTypeSchemaGenerator()

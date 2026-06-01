@@ -1,4 +1,4 @@
-import type { BranchNode, RawNodeRepresentation, ValidFactoryName } from './nodeSpecs'
+import type { BranchNode, RawNodeRepresentation, ValidFactoryName } from './nodeSpecs/index.js'
 
 export type BranchNodeList<LeavesRepresentationUnion, BranchNodesRepresentationUnion, StaticContext> = BranchNode<
 	any,

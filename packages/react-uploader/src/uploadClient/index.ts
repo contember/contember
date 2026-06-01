@@ -1,2 +1,2 @@
-export * from './S3UploadClient'
-export * from '../types/uploadClient'
+export * from './S3UploadClient.js'
+export * from '../types/uploadClient.js'

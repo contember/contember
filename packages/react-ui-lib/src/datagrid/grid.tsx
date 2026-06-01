@@ -1,10 +1,10 @@
 import { Component } from '@contember/interface'
 import { DataView, DataViewProps } from '@contember/react-dataview'
 import { ReactNode } from 'react'
-import { DataGridLoader } from './loader'
-import { DataGridPagination } from './pagination'
-import { DataGridTable } from './table'
-import { DataGridToolbar } from './toolbar'
+import { DataGridLoader } from './loader.js'
+import { DataGridPagination } from './pagination.js'
+import { DataGridTable } from './table.js'
+import { DataGridToolbar } from './toolbar.js'
 
 /**
  * Props for {@link DataGrid}.

@@ -1,7 +1,7 @@
-import { FileDataExtractor } from './extractor'
+import { FileDataExtractor } from './extractor.js'
 import { SugaredRelativeSingleEntity } from '@contember/react-binding'
-import { FileWithMeta } from './file'
-import { UploadClient } from './uploadClient'
+import { FileWithMeta } from './file.js'
+import { UploadClient } from './uploadClient.js'
 
 export interface FileType {
 	/**

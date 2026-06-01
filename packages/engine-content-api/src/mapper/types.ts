@@ -1,5 +1,5 @@
 import { Input, Model, Value } from '@contember/schema'
-import { CheckedPrimary } from './CheckedPrimary'
+import { CheckedPrimary } from './CheckedPrimary.js'
 
 export type JoiningColumns = { sourceColumn: Model.JoiningColumn; targetColumn: Model.JoiningColumn }
 

@@ -1,7 +1,7 @@
 import { Schema } from '@contember/schema'
 import { GraphQLSchema, GraphQLSchemaConfig } from 'graphql'
-import { Identity } from './Identity'
-import { ProjectConfig } from '../project/config'
+import { Identity } from './Identity.js'
+import { ProjectConfig } from '../project/config.js'
 
 export type GraphQLSchemaContributorContext = {
 	schema: Schema

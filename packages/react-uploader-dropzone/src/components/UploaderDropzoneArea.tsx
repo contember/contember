@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { ReactNode, useMemo } from 'react'
-import { useUploaderDropzoneState } from '../internal/contexts'
+import { useUploaderDropzoneState } from '../internal/contexts.js'
 import { Slot } from '@radix-ui/react-slot'
 import { dataAttribute } from '@contember/utilities'
 import { useUploaderState } from '@contember/react-uploader'

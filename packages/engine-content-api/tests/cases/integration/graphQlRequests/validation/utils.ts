@@ -1,5 +1,5 @@
-import { execute, SqlQuery } from '../../../../src/test'
-import { GQL } from '../../../../src/tags'
+import { execute, SqlQuery } from '../../../../src/test.js'
+import { GQL } from '../../../../src/tags.js'
 import { Input, Result, Schema } from '@contember/schema'
 import { InputValidation, SchemaDefinition } from '@contember/schema-definition'
 import { emptySchema } from '@contember/schema-utils'

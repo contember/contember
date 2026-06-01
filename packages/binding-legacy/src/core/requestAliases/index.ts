@@ -1,1 +1,1 @@
-export * from './MutationAlias'
+export * from './MutationAlias.js'

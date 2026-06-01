@@ -1,13 +1,13 @@
-import { useUploadState } from '../internal/hooks/useUploadState'
-import { useUploaderDoUpload } from '../internal/hooks/useUploaderDoUpload'
-import { UploaderOptionsContext, UploaderStateContext, UploaderUploadFilesContext } from '../contexts'
+import { useUploadState } from '../internal/hooks/useUploadState.js'
+import { useUploaderDoUpload } from '../internal/hooks/useUploaderDoUpload.js'
+import { UploaderOptionsContext, UploaderStateContext, UploaderUploadFilesContext } from '../contexts.js'
 import { Fragment, ReactNode, useMemo } from 'react'
 import { Component } from '@contember/react-binding'
-import { FileType, UploaderBaseFieldProps } from '../types'
-import { UploaderBase } from './UploaderBase'
-import { uploaderErrorHandler } from '../internal/utils/uploaderErrorHandler'
-import { useCreateRepeaterEntity } from '../internal/hooks/useCreateRepeaterEntity'
-import { MultiUploaderEntityToFileStateMapContext } from '../internal/contexts'
+import { FileType, UploaderBaseFieldProps } from '../types/index.js'
+import { UploaderBase } from './UploaderBase.js'
+import { uploaderErrorHandler } from '../internal/utils/uploaderErrorHandler.js'
+import { useCreateRepeaterEntity } from '../internal/hooks/useCreateRepeaterEntity.js'
+import { MultiUploaderEntityToFileStateMapContext } from '../internal/contexts.js'
 
 export type MultiUploaderProps =
 	& UploaderBaseFieldProps

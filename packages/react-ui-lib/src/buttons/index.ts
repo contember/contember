@@ -1,2 +1,2 @@
-export * from './back-button'
-export * from './link-back-button'
+export * from './back-button.js'
+export * from './link-back-button.js'

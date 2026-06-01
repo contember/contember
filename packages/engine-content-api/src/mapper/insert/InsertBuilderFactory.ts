@@ -1,7 +1,7 @@
-import { PathFactory, WhereBuilder } from '../select'
+import { PathFactory, WhereBuilder } from '../select/index.js'
 import { Model } from '@contember/schema'
-import { InsertBuilder } from './InsertBuilder'
-import { PredicateFactory } from '../../acl'
+import { InsertBuilder } from './InsertBuilder.js'
+import { PredicateFactory } from '../../acl/index.js'
 
 export class InsertBuilderFactory {
 	constructor(

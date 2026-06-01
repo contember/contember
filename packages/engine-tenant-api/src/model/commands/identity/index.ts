@@ -1,2 +1,2 @@
-export * from './CreateIdentityCommand'
-export * from './PatchIdentityGlobalRoles'
+export * from './CreateIdentityCommand.js'
+export * from './PatchIdentityGlobalRoles.js'

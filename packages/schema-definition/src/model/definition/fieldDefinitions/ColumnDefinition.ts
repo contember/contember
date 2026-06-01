@@ -1,6 +1,6 @@
 import { Model } from '@contember/schema'
-import { CreateFieldContext, FieldDefinition } from './FieldDefinition'
-import { EnumDefinition } from '../EnumDefinition'
+import { CreateFieldContext, FieldDefinition } from './FieldDefinition.js'
+import { EnumDefinition } from '../EnumDefinition.js'
 import { resolveDefaultColumnType } from '@contember/schema-utils'
 
 export class ColumnDefinition extends FieldDefinition<ColumnDefinitionOptions> {

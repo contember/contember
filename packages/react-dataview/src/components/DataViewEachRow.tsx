@@ -1,6 +1,6 @@
 import { ReactNode } from 'react'
 import { Entity, EntityAccessor } from '@contember/react-binding'
-import { useDataViewEntityListAccessor } from '../contexts'
+import { useDataViewEntityListAccessor } from '../contexts.js'
 
 /**
  * Renders children for each row in the DataView.

@@ -1,10 +1,10 @@
-import { Command } from '../Command'
-import { ChangePasswordCommand } from '../person/ChangePasswordCommand'
-import { Response, ResponseOk } from '../../utils/Response'
-import { PersonTokenQuery } from '../../queries/personToken/PersonTokenQuery'
-import { InvalidateTokenCommand } from './InvalidateTokenCommand'
-import { validateToken } from '../../utils'
-import { PersonToken } from '../../type'
+import { Command } from '../Command.js'
+import { ChangePasswordCommand } from '../person/ChangePasswordCommand.js'
+import { Response, ResponseOk } from '../../utils/Response.js'
+import { PersonTokenQuery } from '../../queries/personToken/PersonTokenQuery.js'
+import { InvalidateTokenCommand } from './InvalidateTokenCommand.js'
+import { validateToken } from '../../utils/index.js'
+import { PersonToken } from '../../type/index.js'
 
 export class ResetPasswordCommand implements Command<ResetPasswordCommandResponse> {
 	constructor(private readonly token: string, private readonly password: string) {}

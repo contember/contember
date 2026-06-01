@@ -1,9 +1,9 @@
 import { ReactElement } from 'react'
 import { Slot } from '@radix-ui/react-slot'
 import { dataAttribute } from '@contember/utilities'
-import { useDecoratedPersist } from './useDecoratedPersist'
+import { useDecoratedPersist } from './useDecoratedPersist.js'
 import { ErrorPersistResult, SuccessfulPersistResult } from '@contember/binding'
-import { useDirtinessState, useMutationState } from '../../accessorTree'
+import { useDirtinessState, useMutationState } from '../../accessorTree/index.js'
 import { composeEventHandlers } from '@radix-ui/primitive'
 
 export interface PersistTriggerAttributes {

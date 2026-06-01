@@ -1,4 +1,4 @@
-import { TriggerListenerBuilder, TriggerListeners } from '../../../src/triggers'
+import { TriggerListenerBuilder, TriggerListeners } from '../../../src/triggers/index.js'
 import { SchemaDefinition as def } from '@contember/schema-definition'
 import { Actions, Model } from '@contember/schema'
 import { expect, test } from 'bun:test'

@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test'
-import { modelSchema } from '../../../src/type-schema'
+import { modelSchema } from '../../../src/type-schema/index.js'
 import { Model } from '@contember/schema'
 
 describe('model schema', () => {

@@ -1,7 +1,7 @@
 import { Actions } from '@contember/schema'
-import { WebhookTargetHandler } from './WebhookTargetHandler'
-import { ImplementationException } from '../ImplementationException'
-import { InvokeHandler } from './types'
+import { WebhookTargetHandler } from './WebhookTargetHandler.js'
+import { ImplementationException } from '../ImplementationException.js'
+import { InvokeHandler } from './types.js'
 
 export class TargetHandlerResolver {
 	constructor(

@@ -1,4 +1,4 @@
-import { usePortalsRegistryContext } from '../internal/contexts'
+import { usePortalsRegistryContext } from '../internal/contexts.js'
 import { useEffect, useLayoutEffect, useMemo } from 'react'
 import { useId } from '@contember/react-utils'
 

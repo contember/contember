@@ -1,12 +1,12 @@
 import type { ComponentType, ReactElement, ReactNode } from 'react'
-import { useEntityList } from '../accessorPropagation'
+import { useEntityList } from '../accessorPropagation/index.js'
 import { PRIMARY_KEY_NAME } from '@contember/binding'
 import { Environment } from '@contember/binding'
 import { MarkerFactory } from '@contember/binding'
 import type { SugaredRelativeEntityList } from '@contember/binding'
-import { Component } from './Component'
-import { EntityList, EntityListBaseProps } from './EntityList'
-import { Field } from './Field'
+import { Component } from './Component.js'
+import { EntityList, EntityListBaseProps } from './EntityList.js'
+import { Field } from './Field.js'
 import { TreeNodeEnvironmentFactory } from '@contember/binding'
 
 export type HasManyProps<ListProps = never, EntityProps = never> =

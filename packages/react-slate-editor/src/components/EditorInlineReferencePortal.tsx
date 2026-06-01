@@ -3,7 +3,7 @@ import { Editor, Element as SlateElement, type Range as SlateRange } from 'slate
 import { ReactNode, useEffect, useState } from 'react'
 import { EntityAccessor, EntityId } from '@contember/react-binding'
 import { useSlate } from 'slate-react'
-import { useEditorReferenceMethods } from '../contexts'
+import { useEditorReferenceMethods } from '../contexts.js'
 
 export interface InitializeReferenceContentProps {
 	referenceId: EntityId

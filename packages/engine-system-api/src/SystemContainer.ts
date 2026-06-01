@@ -11,8 +11,8 @@ import {
 	PermissionsFactory,
 	ProjectMigrator,
 	ProjectTruncateExecutor,
-} from './model'
-import { UuidProvider } from './utils'
+} from './model/index.js'
+import { UuidProvider } from './utils/index.js'
 import {
 	EventsQueryResolver,
 	ExecutedMigrationsQueryResolver,
@@ -22,11 +22,11 @@ import {
 	StagesQueryResolver,
 	SystemResolverContextFactory,
 	TruncateMutationResolver,
-} from './resolvers'
-import { EventOldValuesResolver } from './resolvers/types'
+} from './resolvers/index.js'
+import { EventOldValuesResolver } from './resolvers/types/index.js'
 import { DatabaseMetadataResolver } from '@contember/database'
-import { SchemaProvider } from './model'
-import { SchemaQueryResolver } from './resolvers/query/SchemaQueryResolver'
+import { SchemaProvider } from './model/index.js'
+import { SchemaQueryResolver } from './resolvers/query/SchemaQueryResolver.js'
 
 export interface SystemContainer {
 	systemResolversFactory: ResolverFactory

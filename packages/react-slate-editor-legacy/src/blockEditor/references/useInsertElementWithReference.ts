@@ -1,9 +1,9 @@
 import { useCallback } from 'react'
 import { Editor, Element as SlateElement, Transforms } from 'slate'
 import { EntityAccessor, FieldValue } from '@contember/react-binding'
-import { prepareElementForInsertion } from '../utils'
-import { ElementWithReference } from '../elements'
-import { CreateElementReferences } from './useCreateElementReference'
+import { prepareElementForInsertion } from '../utils/index.js'
+import { ElementWithReference } from '../elements/index.js'
+import { CreateElementReferences } from './useCreateElementReference.js'
 
 export type InsertElementWithReference = (
 	element: Omit<SlateElement, 'referenceId'>,

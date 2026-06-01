@@ -1,8 +1,8 @@
 import { Environment } from '@contember/react-binding'
 import { ChildrenAnalyzer, Leaf } from '@contember/react-multipass-rendering'
-import { BoardItem } from '../components/BoardItem'
+import { BoardItem } from '../components/BoardItem.js'
 import { ReactNode } from 'react'
-import { BoardColumn } from '../components/BoardColumn'
+import { BoardColumn } from '../components/BoardColumn.js'
 
 const itemLeaf = new Leaf(node => ({ type: 'item' as const, children: node.props.children }), BoardItem)
 const columnLeaf = new Leaf(node => ({ type: 'column' as const, children: node.props.children }), BoardColumn)

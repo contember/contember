@@ -1,8 +1,8 @@
 import { Component, SugaredRelativeSingleField } from '@contember/react-binding'
 import * as React from 'react'
-import { createUnionTextFilter } from '../../../filterTypes'
-import { DataViewFilter } from '../DataViewFilter'
-import { DataViewFilterNameContext } from '../../../contexts'
+import { createUnionTextFilter } from '../../../filterTypes/index.js'
+import { DataViewFilter } from '../DataViewFilter.js'
+import { DataViewFilterNameContext } from '../../../contexts.js'
 
 export interface DataViewUnionTextFilterProps {
 	/**

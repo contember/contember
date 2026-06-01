@@ -1,3 +1,3 @@
-export * from './assertNever'
-export * from './generateEnumerabilityPreventingEntropy'
-export * from './isEmptyObject'
+export * from './assertNever.js'
+export * from './generateEnumerabilityPreventingEntropy.js'
+export * from './isEmptyObject.js'

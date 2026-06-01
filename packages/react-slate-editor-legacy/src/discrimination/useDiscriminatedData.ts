@@ -1,7 +1,7 @@
 import { useEnvironment, VariableInputTransformer } from '@contember/react-binding'
 import { useMemo } from 'react'
-import type { DiscriminatedDatum } from './DiscriminatedDatum'
-import type { NormalizedDiscriminatedData } from './NormalizedDiscriminatedData'
+import type { DiscriminatedDatum } from './DiscriminatedDatum.js'
+import type { NormalizedDiscriminatedData } from './NormalizedDiscriminatedData.js'
 
 export const useDiscriminatedData = <Datum extends DiscriminatedDatum = DiscriminatedDatum>(
 	source: Iterable<Datum>,

@@ -1,6 +1,6 @@
 import { EntityAccessor } from '@contember/react-binding'
-import { useMultiUploaderEntityToFileStateMap } from '../internal/contexts'
-import { useUploaderState } from '../contexts'
+import { useMultiUploaderEntityToFileStateMap } from '../internal/contexts.js'
+import { useUploaderState } from '../contexts.js'
 
 export const useMultiUploaderFileState = (entity: EntityAccessor) => {
 	const entityToFileIdMap = useMultiUploaderEntityToFileStateMap()

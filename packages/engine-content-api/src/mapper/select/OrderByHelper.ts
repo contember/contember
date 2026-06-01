@@ -1,5 +1,5 @@
 import { Input, Model } from '@contember/schema'
-import { ObjectNode } from '../../inputProcessing'
+import { ObjectNode } from '../../inputProcessing/index.js'
 
 export class OrderByHelper {
 	public static appendDefaultOrderBy(

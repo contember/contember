@@ -1,9 +1,9 @@
 import { test } from 'bun:test'
-import { execute, failedTransaction, sqlTransaction } from '../../../../src/test'
+import { execute, failedTransaction, sqlTransaction } from '../../../../src/test.js'
 import { createSchema, SchemaBuilder, SchemaDefinition as def } from '@contember/schema-definition'
 import { Model } from '@contember/schema'
-import { GQL, SQL } from '../../../../src/tags'
-import { testUuid } from '../../../../src/testUuid'
+import { GQL, SQL } from '../../../../src/tags.js'
+import { testUuid } from '../../../../src/testUuid.js'
 
 test('delete author and with restrict on posts', async () => {
 	await execute({

@@ -1,5 +1,5 @@
 import { expect, test } from 'bun:test'
-import { MembershipResolver, MembershipValidationErrorType } from '../../../src'
+import { MembershipResolver, MembershipValidationErrorType } from '../../../src/index.js'
 import { Acl } from '@contember/schema'
 
 const id1 = 'bff057b3-11f7-4bc7-abe3-1f2ef266824d'

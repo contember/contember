@@ -1,2 +1,2 @@
-export * from './ProjectContextResolver'
-export * from './ProjectInfoMiddlewareState'
+export * from './ProjectContextResolver.js'
+export * from './ProjectInfoMiddlewareState.js'

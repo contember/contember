@@ -1,5 +1,5 @@
-import { JsBuilder } from './JsBuilder'
-import { JsExecutor } from './JsExecutor'
+import { JsBuilder } from './JsBuilder.js'
+import { JsExecutor } from './JsExecutor.js'
 
 export class JsCodeRunner {
 	constructor(

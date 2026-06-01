@@ -1,6 +1,6 @@
 import { Input, Model } from '@contember/schema'
-import { Mapper, RelationFetcher, SelectGroupedObjects } from '../../mapper'
-import { ObjectNode } from '../../inputProcessing'
+import { Mapper, RelationFetcher, SelectGroupedObjects } from '../../mapper/index.js'
+import { ObjectNode } from '../../inputProcessing/index.js'
 
 export class PaginatedHasManyNodesVisitor
 	implements Model.ColumnVisitor<Promise<SelectGroupedObjects>>, Model.RelationByTypeVisitor<Promise<SelectGroupedObjects>>

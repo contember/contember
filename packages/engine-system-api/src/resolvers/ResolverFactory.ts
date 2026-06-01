@@ -1,11 +1,11 @@
-import { EventsQueryResolver, ExecutedMigrationsQueryResolver, StagesQueryResolver } from './query'
-import { Event, EventType, Resolvers } from '../schema'
-import { assertNever } from '../utils'
-import { MigrateMutationResolver, MigrationAlterMutationResolver, TruncateMutationResolver } from './mutation'
+import { EventsQueryResolver, ExecutedMigrationsQueryResolver, StagesQueryResolver } from './query/index.js'
+import { Event, EventType, Resolvers } from '../schema/index.js'
+import { assertNever } from '../utils/index.js'
+import { MigrateMutationResolver, MigrationAlterMutationResolver, TruncateMutationResolver } from './mutation/index.js'
 import { createJsonLikeType, DateTimeType, JSONType } from '@contember/graphql-utils'
-import { EventOldValuesResolver } from './types'
+import { EventOldValuesResolver } from './types/index.js'
 import { GraphQLError, GraphQLScalarType, Kind } from 'graphql'
-import { SchemaQueryResolver } from './query/SchemaQueryResolver'
+import { SchemaQueryResolver } from './query/SchemaQueryResolver.js'
 
 export class ResolverFactory {
 	public constructor(

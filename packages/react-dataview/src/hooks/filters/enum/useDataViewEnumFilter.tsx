@@ -1,5 +1,5 @@
-import { useDataViewFilter } from '../../index'
-import { EnumFilterArtifacts } from '../../../filterTypes'
+import { useDataViewFilter } from '../../index.js'
+import { EnumFilterArtifacts } from '../../../filterTypes/index.js'
 import { useCallback, useMemo } from 'react'
 
 export type DataViewSetEnumFilterAction = 'include' | 'exclude' | 'unset' | 'toggleInclude' | 'toggleExclude'

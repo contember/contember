@@ -2,12 +2,12 @@ import { GraphQlClientError, useCurrentContentGraphQlClient, useCurrentSystemGra
 import { ReactNode, useCallback, useEffect, useRef, useState } from 'react'
 import type { TreeRootAccessor } from '@contember/binding'
 import { DataBinding, Environment, TreeStore } from '@contember/binding'
-import type { AccessorTreeState } from './AccessorTreeState'
+import type { AccessorTreeState } from './AccessorTreeState.js'
 import { useIsMounted } from '@contember/react-utils'
-import { MarkerTreeGenerator } from '../markers'
+import { MarkerTreeGenerator } from '../markers/index.js'
 import ReactDOM from 'react-dom'
-import { useEnvironmentWithSchema } from './useEnvironmentWithSchema'
-import { useEnvironment } from '../accessorPropagation'
+import { useEnvironmentWithSchema } from './useEnvironmentWithSchema.js'
+import { useEnvironment } from '../accessorPropagation/index.js'
 
 export const useDataBinding = ({
 	children,

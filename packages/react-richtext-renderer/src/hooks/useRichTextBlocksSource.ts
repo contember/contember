@@ -1,7 +1,7 @@
-import { RichTextBlock, RichTextBlockSource, RichTextElement, RichTextLeaf, RichTextReference, RootEditorNode } from '../types'
-import { defaultDeserialize } from '../internal/defaultDeserialize'
+import { RichTextBlock, RichTextBlockSource, RichTextElement, RichTextLeaf, RichTextReference, RootEditorNode } from '../types/index.js'
+import { defaultDeserialize } from '../internal/defaultDeserialize.js'
 import { useMemo } from 'react'
-import { RichTextRendererError } from '../RichTextRendererError'
+import { RichTextRendererError } from '../RichTextRendererError.js'
 
 export const useRichTextBlocksSource = <CustomElements extends RichTextElement, CustomLeaves extends RichTextLeaf>({
 	deserialize = defaultDeserialize,

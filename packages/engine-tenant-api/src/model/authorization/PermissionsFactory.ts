@@ -1,6 +1,6 @@
 import { Permissions } from '@contember/authorization'
-import { PermissionActions } from './PermissionActions'
-import { TenantRole } from './Roles'
+import { PermissionActions } from './PermissionActions.js'
+import { TenantRole } from './Roles.js'
 
 const allowedRoles = new Set<string>([TenantRole.LOGIN, TenantRole.PROJECT_ADMIN, TenantRole.ENTRYPOINT_DEPLOYER])
 

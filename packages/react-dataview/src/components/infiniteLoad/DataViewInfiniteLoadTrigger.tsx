@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { forwardRef, ReactElement, useCallback } from 'react'
-import { useDataViewInfiniteLoadTrigger } from '../../contexts'
+import { useDataViewInfiniteLoadTrigger } from '../../contexts.js'
 import { Slot } from '@radix-ui/react-slot'
 import { composeEventHandlers } from '@radix-ui/primitive'
 

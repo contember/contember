@@ -1,4 +1,4 @@
-import { InviteErrorCodes } from './hooks/useInvite'
+import { InviteErrorCodes } from './hooks/useInvite.js'
 import { ChangeMyPasswordFormErrorCode, CreateApiKeyFormErrorCode } from '@contember/interface'
 import {
 	InviteFormErrorCode,

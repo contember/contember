@@ -1,8 +1,8 @@
 import { dirname, extname, join } from 'node:path'
 import * as fs from 'node:fs/promises'
-import { YamlAdapter } from './adapters/YamlAdapter'
-import { JsonAdapter } from './adapters/JsonAdapter'
-import Merger from './Merger'
+import { YamlAdapter } from './adapters/YamlAdapter.js'
+import { JsonAdapter } from './adapters/JsonAdapter.js'
+import Merger from './Merger.js'
 
 class Loader {
 	constructor(

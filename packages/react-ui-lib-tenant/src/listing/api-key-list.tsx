@@ -1,8 +1,8 @@
 import { ProjectMembersFilter } from '@contember/graphql-client-tenant'
 import * as React from 'react'
 import { TableCell } from '@contember/react-ui-lib-base'
-import { dict } from '../dict'
-import { MemberList, MemberListController } from './member-list'
+import { dict } from '../dict.js'
+import { MemberList, MemberListController } from './member-list.js'
 
 const filter: ProjectMembersFilter = {
 	memberType: 'API_KEY',

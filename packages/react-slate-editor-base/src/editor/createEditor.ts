@@ -1,6 +1,6 @@
-import { createEditorWithEssentials } from './createEditorWithEssentials'
+import { createEditorWithEssentials } from './createEditorWithEssentials.js'
 import { Editor } from 'slate'
-import { EditorPlugin, EditorPluginWrapperProps } from '../types'
+import { EditorPlugin, EditorPluginWrapperProps } from '../types/index.js'
 import { createElement, FunctionComponent, ReactNode } from 'react'
 import { EntityAccessor } from '@contember/react-binding'
 import { Environment } from '@contember/react-binding'

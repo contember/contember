@@ -1,11 +1,11 @@
 import { useConstantValueInvariant } from '@contember/react-utils'
 import { ComponentType, ReactElement, ReactNode } from 'react'
-import { useEntityListSubTree } from '../accessorPropagation'
+import { useEntityListSubTree } from '../accessorPropagation/index.js'
 import type { SugaredQualifiedEntityList, SugaredUnconstrainedQualifiedEntityList, TreeRootId } from '@contember/binding'
 import { Environment, MarkerFactory, PRIMARY_KEY_NAME, TreeNodeEnvironmentFactory } from '@contember/binding'
-import { Component } from './Component'
-import { EntityList, EntityListBaseProps } from './EntityList'
-import { Field } from './Field'
+import { Component } from './Component.js'
+import { EntityList, EntityListBaseProps } from './EntityList.js'
+import { Field } from './Field.js'
 
 export interface EntityListSubTreeAdditionalProps {
 	variables?: Environment.ValuesMapWithFactory

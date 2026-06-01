@@ -1,5 +1,5 @@
 import { DeleteBuilder } from '@contember/database'
-import { Command } from '../Command'
+import { Command } from '../Command.js'
 
 export class TruncateEventsCommand implements Command<number> {
 	public async execute({ db }: Command.Args): Promise<number> {

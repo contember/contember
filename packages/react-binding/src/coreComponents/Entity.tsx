@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react'
-import { AccessorProvider } from '../accessorPropagation'
+import { AccessorProvider } from '../accessorPropagation/index.js'
 import type { EntityAccessor } from '@contember/binding'
-import { Component } from './Component'
+import { Component } from './Component.js'
 
 export interface EntityBaseProps {
 	accessor: EntityAccessor

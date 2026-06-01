@@ -1,8 +1,8 @@
-import { Project, ProjectSchemaResolver } from '../type'
-import { AclSchemaAccessNodeFactory } from './AclSchemaAccessNodeFactory'
+import { Project, ProjectSchemaResolver } from '../type/index.js'
+import { AclSchemaAccessNodeFactory } from './AclSchemaAccessNodeFactory.js'
 import { AuthorizationScope } from '@contember/authorization'
-import { ProjectScope } from './ProjectScope'
-import { Identity } from './Identity'
+import { ProjectScope } from './ProjectScope.js'
+import { Identity } from './Identity.js'
 
 export class ProjectScopeFactory {
 	constructor(

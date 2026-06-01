@@ -1,6 +1,6 @@
-import { EntityRealmState, getEntityMarker } from '../core/state'
-import type { EntityOperations } from '../core/operations'
-import { SingleEntityPersistedData } from '../accessorTree'
+import { EntityRealmState, getEntityMarker } from '../core/state/index.js'
+import type { EntityOperations } from '../core/operations/index.js'
+import { SingleEntityPersistedData } from '../accessorTree/index.js'
 import {
 	EntityFieldMarkers,
 	EntityListAccessor,

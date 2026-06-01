@@ -1,3 +1,3 @@
-export * from './DataViewNumberFilter'
-export * from './DataViewNumberFilterInput'
-export * from './DataViewNumberFilterResetTrigger'
+export * from './DataViewNumberFilter.js'
+export * from './DataViewNumberFilterInput.js'
+export * from './DataViewNumberFilterResetTrigger.js'

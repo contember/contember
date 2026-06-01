@@ -1,7 +1,7 @@
 import { Input, Writable } from '@contember/client'
 import { EmbeddedActionsParser, Lexer } from 'chevrotain'
-import { Environment } from '../environment'
-import type { EntityName, FieldName, Filter, OrderBy, UniqueWhere } from '../treeParameters'
+import { Environment } from '../environment/index.js'
+import type { EntityName, FieldName, Filter, OrderBy, UniqueWhere } from '../treeParameters/index.js'
 import type {
 	ParsedHasManyRelation,
 	ParsedHasOneRelation,
@@ -17,11 +17,11 @@ import type {
 	ParsedTaggedMapVariableValue,
 	ParsedUnconstrainedQualifiedEntityList,
 	ParsedUnconstrainedQualifiedSingleEntity,
-} from './ParserResults'
-import { CacheStore } from './CacheStore'
-import { QueryLanguageError } from './QueryLanguageError'
-import { tokenList, TokenRegExps, tokens } from './tokenList'
-import { BindingError } from '../BindingError'
+} from './ParserResults.js'
+import { CacheStore } from './CacheStore.js'
+import { QueryLanguageError } from './QueryLanguageError.js'
+import { tokenList, TokenRegExps, tokens } from './tokenList.js'
+import { BindingError } from '../BindingError.js'
 
 /**
  * TODO:

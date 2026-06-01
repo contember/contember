@@ -1,5 +1,5 @@
 import { SelectBuilder } from '@contember/database'
-import { MailTemplateData, MailTemplateIdentifier } from '../../mailing'
+import { MailTemplateData, MailTemplateIdentifier } from '../../mailing/index.js'
 
 export type MailTemplateRow =
 	& {

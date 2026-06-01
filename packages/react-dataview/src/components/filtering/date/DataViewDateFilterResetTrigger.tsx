@@ -2,9 +2,9 @@ import * as React from 'react'
 import { forwardRef, ReactElement, useCallback } from 'react'
 import { Slot } from '@radix-ui/react-slot'
 import { composeEventHandlers } from '@radix-ui/primitive'
-import { useDataViewFilter } from '../../../hooks'
-import { DateRangeFilterArtifacts } from '../../../filterTypes'
-import { useDataViewFilterName } from '../../../contexts'
+import { useDataViewFilter } from '../../../hooks/index.js'
+import { DateRangeFilterArtifacts } from '../../../filterTypes/index.js'
+import { useDataViewFilterName } from '../../../contexts.js'
 
 const SlotType = Slot as React.ForwardRefExoticComponent<React.ButtonHTMLAttributes<HTMLButtonElement> & React.RefAttributes<HTMLButtonElement>>
 

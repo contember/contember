@@ -1,5 +1,5 @@
-import { createSlotSourceComponent, SlotSourceComponent } from './createSlotSourceComponent'
-import { createSlotTargetComponent, SlotTargetComponent } from './createSlotTargetComponent'
+import { createSlotSourceComponent, SlotSourceComponent } from './createSlotSourceComponent.js'
+import { createSlotTargetComponent, SlotTargetComponent } from './createSlotTargetComponent.js'
 
 const pascalCaseRegex = /^[A-Z][a-zA-Z0-9]*$/
 

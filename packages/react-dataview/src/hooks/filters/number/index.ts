@@ -1,1 +1,1 @@
-export * from './useDataViewNumberFilterInput'
+export * from './useDataViewNumberFilterInput.js'

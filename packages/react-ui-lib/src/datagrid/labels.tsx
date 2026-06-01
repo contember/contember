@@ -1,6 +1,6 @@
 import { SugaredRelativeEntityList, SugaredRelativeSingleEntity, SugaredRelativeSingleField } from '@contember/interface'
 import { useDataViewTargetFieldSchema, useDataViewTargetHasManySchema, useDataViewTargetHasOneSchema } from '@contember/react-dataview'
-import { useFieldLabelFormatter } from '../labels'
+import { useFieldLabelFormatter } from '../labels/index.js'
 
 /**
  * Utility component that renders a label for a field.

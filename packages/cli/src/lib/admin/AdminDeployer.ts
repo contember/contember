@@ -1,6 +1,6 @@
-import { AdminClient, AdminFiles } from './AdminClient'
-import { FileSystem } from '../fs/FileSystem'
-import { RemoteProjectProvider } from '../project/RemoteProjectProvider'
+import { AdminClient, AdminFiles } from './AdminClient.js'
+import { FileSystem } from '../fs/FileSystem.js'
+import { RemoteProjectProvider } from '../project/RemoteProjectProvider.js'
 
 export class AdminDeployer {
 	constructor(

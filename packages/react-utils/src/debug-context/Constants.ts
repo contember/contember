@@ -1,4 +1,4 @@
-import type { ScopedConsoleContextType } from './Types'
+import type { ScopedConsoleContextType } from './Types.js'
 
 export function noopLog(...parameters: any[]) {}
 

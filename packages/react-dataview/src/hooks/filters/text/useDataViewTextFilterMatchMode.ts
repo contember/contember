@@ -1,6 +1,6 @@
 import { useCallback } from 'react'
-import { TextFilterArtifacts, TextFilterArtifactsMatchMode } from '../../../filterTypes'
-import { useDataViewFilter } from '../../useDataViewFilter'
+import { TextFilterArtifacts, TextFilterArtifactsMatchMode } from '../../../filterTypes/index.js'
+import { useDataViewFilter } from '../../useDataViewFilter.js'
 
 export type UseDataViewTextFilterMatchModeResult = [isCurrent: boolean, set: () => void]
 

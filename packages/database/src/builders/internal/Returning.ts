@@ -1,7 +1,7 @@
-import { QueryBuilder } from '../'
-import { Literal } from '../../Literal'
-import { Connection } from '../../client'
-import { formatColumnIdentifier } from '../../utils'
+import { QueryBuilder } from '../index.js'
+import { Literal } from '../../Literal.js'
+import { Connection } from '../../client/index.js'
+import { formatColumnIdentifier } from '../../utils/index.js'
 
 class Returning {
 	constructor(private readonly columns: (QueryBuilder.ColumnIdentifier | Literal)[] = []) {}

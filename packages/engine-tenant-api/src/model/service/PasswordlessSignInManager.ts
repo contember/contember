@@ -1,26 +1,26 @@
-import { ApiKeyManager } from './apiKey'
-import { ConfigurationQuery, PersonQuery, PersonRow } from '../queries'
-import { Response, ResponseError, ResponseOk } from '../utils/Response'
+import { ApiKeyManager } from './apiKey/index.js'
+import { ConfigurationQuery, PersonQuery, PersonRow } from '../queries/index.js'
+import { Response, ResponseError, ResponseOk } from '../utils/Response.js'
 import {
 	ActivatePasswordlessOtpErrorCode,
 	ConfigPolicy,
 	InitSignInPasswordlessErrorCode,
 	InitSignInPasswordlessResult,
 	SignInPasswordlessErrorCode,
-} from '../../schema'
-import { DatabaseContext, validateToken } from '../utils'
-import { UserMailer } from '../mailing'
-import { ActivateOtpCommand, ApiKeyRequestInfo, CreatePersonTokenCommand, IncreaseOtpAttemptCommand, InvalidateTokenCommand } from '../commands'
-import { getPreferredProject } from './helpers/getPreferredProject'
-import { ProjectManager } from './ProjectManager'
-import { PermissionContext } from '../authorization'
-import { PersonTokenQuery } from '../queries/personToken/PersonTokenQuery'
-import { ImplementationException } from '../../exceptions'
-import { OtpAuthenticator } from './OtpAuthenticator'
-import { PersonToken } from '../type'
-import { AuthLogService } from './AuthLogService'
-import { intervalToSeconds } from '../utils/interval'
-import { NextMailAttemptQuery } from '../queries/authLog/NextMailAttemptQuery'
+} from '../../schema/index.js'
+import { DatabaseContext, validateToken } from '../utils/index.js'
+import { UserMailer } from '../mailing/index.js'
+import { ActivateOtpCommand, ApiKeyRequestInfo, CreatePersonTokenCommand, IncreaseOtpAttemptCommand, InvalidateTokenCommand } from '../commands/index.js'
+import { getPreferredProject } from './helpers/getPreferredProject.js'
+import { ProjectManager } from './ProjectManager.js'
+import { PermissionContext } from '../authorization/index.js'
+import { PersonTokenQuery } from '../queries/personToken/PersonTokenQuery.js'
+import { ImplementationException } from '../../exceptions.js'
+import { OtpAuthenticator } from './OtpAuthenticator.js'
+import { PersonToken } from '../type/index.js'
+import { AuthLogService } from './AuthLogService.js'
+import { intervalToSeconds } from '../utils/interval.js'
+import { NextMailAttemptQuery } from '../queries/authLog/NextMailAttemptQuery.js'
 
 class PasswordlessSignInManager {
 	constructor(

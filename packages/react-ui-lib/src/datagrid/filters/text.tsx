@@ -19,12 +19,12 @@ import {
 	TextFilterArtifactsMatchMode,
 } from '@contember/react-dataview'
 import { Popover, PopoverContent, PopoverTrigger } from '@contember/react-ui-lib-base'
-import { DataGridActiveFilterUI } from '../ui'
-import { DataGridNullFilter } from './common'
+import { DataGridActiveFilterUI } from '../ui.js'
+import { DataGridNullFilter } from './common.js'
 import { dict } from '@contember/react-ui-lib-base'
 import { Component } from '@contember/interface'
-import { DataGridFilterMobileHiding } from './mobile'
-import { DataViewFieldLabel } from '../labels'
+import { DataGridFilterMobileHiding } from './mobile.js'
+import { DataViewFieldLabel } from '../labels.js'
 
 /**
  * Props for {@link DataGridTextFilter}.

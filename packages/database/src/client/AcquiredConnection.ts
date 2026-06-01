@@ -1,8 +1,8 @@
-import { Connection } from './Connection'
-import { EventManager } from './EventManager'
-import { Mutex } from '../utils'
-import { executeTransaction, Transaction } from './Transaction'
-import { ClientErrorCodes } from './errorCodes'
+import { Connection } from './Connection.js'
+import { EventManager } from './EventManager.js'
+import { Mutex } from '../utils/index.js'
+import { executeTransaction, Transaction } from './Transaction.js'
+import { ClientErrorCodes } from './errorCodes.js'
 import {
 	ForeignKeyViolationError,
 	InvalidDataError,
@@ -11,8 +11,8 @@ import {
 	SerializationFailureError,
 	TransactionAbortedError,
 	UniqueViolationError,
-} from './errors'
-import { PgClient } from './PgClient'
+} from './errors.js'
+import { PgClient } from './PgClient.js'
 import { Notification } from 'pg'
 
 export class AcquiredConnection implements Connection.AcquiredConnectionLike {

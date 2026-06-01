@@ -1,3 +1,3 @@
-export * from './modelUtils'
-export * from './resolveDefaultColumnType'
-export * from './NamingConventions'
+export * from './modelUtils.js'
+export * from './resolveDefaultColumnType.js'
+export * from './NamingConventions.js'

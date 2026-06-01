@@ -1,5 +1,5 @@
 import { useEffect } from 'react'
-import { useEntityKey, useGetEntityByKey } from '../accessorPropagation'
+import { useEntityKey, useGetEntityByKey } from '../accessorPropagation/index.js'
 import type { EntityAccessor } from '@contember/binding'
 import type { FieldName } from '@contember/binding'
 import { useReferentiallyStableCallback } from '@contember/react-utils'

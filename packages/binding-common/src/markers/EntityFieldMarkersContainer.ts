@@ -1,5 +1,5 @@
-import type { EntityFieldMarkers } from './EntityFieldMarkers'
-import type { EntityFieldPlaceholders } from './EntityFieldPlaceholders'
+import type { EntityFieldMarkers } from './EntityFieldMarkers.js'
+import type { EntityFieldPlaceholders } from './EntityFieldPlaceholders.js'
 
 export class EntityFieldMarkersContainer {
 	public constructor(

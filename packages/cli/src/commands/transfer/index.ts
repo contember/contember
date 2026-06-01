@@ -1,3 +1,3 @@
-export * from './ExportCommand'
-export * from './ImportCommand'
-export * from './TransferCommand'
+export * from './ExportCommand.js'
+export * from './ImportCommand.js'
+export * from './TransferCommand.js'

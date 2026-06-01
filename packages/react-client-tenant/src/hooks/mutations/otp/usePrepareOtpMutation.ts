@@ -1,6 +1,6 @@
 import * as TenantApi from '@contember/graphql-client-tenant'
 import { ModelType } from 'graphql-ts-client-api'
-import { createTenantMutation } from '../../useTenantMutation'
+import { createTenantMutation } from '../../useTenantMutation.js'
 
 const prepareOtmMutationResult = TenantApi.prepareOtpResponse$$.result(TenantApi.prepareOtpResult$$)
 

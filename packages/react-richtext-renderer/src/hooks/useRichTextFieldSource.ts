@@ -1,6 +1,6 @@
-import { RichTextBlock, RichTextElement, RichTextFieldSource, RichTextLeaf } from '../types'
+import { RichTextBlock, RichTextElement, RichTextFieldSource, RichTextLeaf } from '../types/index.js'
 import { useMemo } from 'react'
-import { defaultDeserialize } from '../internal/defaultDeserialize'
+import { defaultDeserialize } from '../internal/defaultDeserialize.js'
 
 export const useRichTextFieldSource = <CustomElements extends RichTextElement, CustomLeaves extends RichTextLeaf>({
 	source,

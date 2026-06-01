@@ -10,13 +10,13 @@ import {
 	useDesugaredRelativeSingleEntity,
 	useDesugaredRelativeSingleField,
 } from '@contember/react-binding'
-import { BoardAddColumnMethod, BoardMethods, BoardMoveColumnMethod, BoardRemoveColumnMethod } from '../types'
-import { useGroupItemsByColumn } from './useGroupItemsByColumn'
-import { useCreateBoardColumns } from './useCreateBoardColumns'
-import { arrayMove } from '../utils/arrayMove'
-import { useBoardItemsMethods } from './useBoardItemsMethods'
-import { BoardData } from '../types/BoardData'
-import { BoardCommonProps, BoardDynamicColumnsBindingProps } from '../components'
+import { BoardAddColumnMethod, BoardMethods, BoardMoveColumnMethod, BoardRemoveColumnMethod } from '../types/index.js'
+import { useGroupItemsByColumn } from './useGroupItemsByColumn.js'
+import { useCreateBoardColumns } from './useCreateBoardColumns.js'
+import { arrayMove } from '../utils/arrayMove.js'
+import { useBoardItemsMethods } from './useBoardItemsMethods.js'
+import { BoardData } from '../types/BoardData.js'
+import { BoardCommonProps, BoardDynamicColumnsBindingProps } from '../components/index.js'
 
 export type UseDynamicBoardBindingProps =
 	& Omit<BoardCommonProps, 'children'>

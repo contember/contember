@@ -1,10 +1,10 @@
 import { ReactNode, useCallback } from 'react'
 import { useAbortController, useIsMounted } from '@contember/react-utils'
-import { useBindingOperations } from './useBindingOperations'
+import { useBindingOperations } from './useBindingOperations.js'
 import { TreeRootId } from '@contember/binding'
 import { ExtendTreeOptions } from '@contember/binding'
 import { DataBindingExtendAborted } from '@contember/binding'
-import { useEnvironment } from './useEnvironment'
+import { useEnvironment } from './useEnvironment.js'
 
 export const useExtendTree = () => {
 	const abort = useAbortController()

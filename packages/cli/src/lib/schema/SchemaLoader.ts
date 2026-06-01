@@ -1,9 +1,9 @@
 import { join } from 'node:path'
 import { Schema } from '@contember/schema'
 import { schemaType } from '@contember/schema-utils'
-import { JsCodeRunner } from '../js/JsCodeRunner'
+import { JsCodeRunner } from '../js/JsCodeRunner.js'
 import * as Typesafe from '@contember/typesafe'
-import { Workspace } from '../workspace/Workspace'
+import { Workspace } from '../workspace/Workspace.js'
 
 export class ImportSchemaLoader {
 	constructor(

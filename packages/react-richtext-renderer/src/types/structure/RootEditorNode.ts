@@ -1,6 +1,6 @@
-import type { RichTextElement } from './RichTextElement'
-import type { RichTextLeaf } from './RichTextLeaf'
-import { RichTextChild } from './RichTextChild'
+import type { RichTextElement } from './RichTextElement.js'
+import type { RichTextLeaf } from './RichTextLeaf.js'
+import { RichTextChild } from './RichTextChild.js'
 
 export interface RootEditorNode<
 	CustomElements extends RichTextElement = never,

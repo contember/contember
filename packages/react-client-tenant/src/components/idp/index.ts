@@ -1,3 +1,3 @@
-export * from './IDPState'
-export * from './IDP'
-export * from './IDPInitTrigger'
+export * from './IDPState.js'
+export * from './IDP.js'
+export * from './IDPInitTrigger.js'

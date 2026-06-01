@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react'
-import { Component } from '../coreComponents'
+import { Component } from '../coreComponents/index.js'
 
 export interface StaticRenderProps {
 	children?: ReactNode

@@ -1,6 +1,6 @@
 import { EntityListSubTreeMarker, FieldMarker, HasManyRelationMarker, HasOneRelationMarker, PRIMARY_KEY_NAME } from '@contember/react-binding'
-import { ExportFactory, ExportFormatterCreateOutputArgs, ExportResult } from './ExportFactory'
-import { DataViewDataForExport } from '../types'
+import { ExportFactory, ExportFormatterCreateOutputArgs, ExportResult } from './ExportFactory.js'
+import { DataViewDataForExport } from '../types/index.js'
 
 export class CsvExportFactory implements ExportFactory {
 	create(args: ExportFormatterCreateOutputArgs): ExportResult {

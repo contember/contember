@@ -1,6 +1,6 @@
-import { createMetadataStore } from '../../../utils/MetadataStore'
-import { AllowDefinitionFactory } from '../permissions'
-import { Role } from '../roles'
+import { createMetadataStore } from '../../../utils/MetadataStore.js'
+import { AllowDefinitionFactory } from '../permissions.js'
+import { Role } from '../roles.js'
 
 export type EntityPermissionsDefinition = {
 	factory: AllowDefinitionFactory<any>

@@ -1,11 +1,11 @@
-import { CreateSessionTokenResponse, MutationCreateSessionTokenArgs, MutationResolvers, MutationSignInArgs, SignInResponse } from '../../../schema'
-import { TenantResolverContext } from '../../TenantResolverContext'
-import { ConfigurationQuery, PermissionActions, PersonUniqueIdentifier, RateLimiter, SignInManager } from '../../../model'
-import { createErrorResponse } from '../../errorUtils'
-import { SignInResponseFactory } from '../../responseHelpers/SignInResponseFactory'
+import { CreateSessionTokenResponse, MutationCreateSessionTokenArgs, MutationResolvers, MutationSignInArgs, SignInResponse } from '../../../schema/index.js'
+import { TenantResolverContext } from '../../TenantResolverContext.js'
+import { ConfigurationQuery, PermissionActions, PersonUniqueIdentifier, RateLimiter, SignInManager } from '../../../model/index.js'
+import { createErrorResponse } from '../../errorUtils.js'
+import { SignInResponseFactory } from '../../responseHelpers/SignInResponseFactory.js'
 import { UserInputError } from '@contember/graphql-utils'
-import { NextLoginAttemptQuery } from '../../../model/queries/authLog/NextLoginAttemptQuery'
-import { ResponseError } from '../../../model/utils/Response'
+import { NextLoginAttemptQuery } from '../../../model/queries/authLog/NextLoginAttemptQuery.js'
+import { ResponseError } from '../../../model/utils/Response.js'
 
 export class SignInMutationResolver implements MutationResolvers {
 	constructor(

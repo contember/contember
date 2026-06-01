@@ -1,5 +1,5 @@
-import { Stage } from '../../dtos'
-import { DatabaseContext } from '../../database'
+import { Stage } from '../../dtos/index.js'
+import { DatabaseContext } from '../../database/index.js'
 import { ExecutionResult } from 'graphql'
 import { DatabaseMetadata } from '@contember/database'
 import { Schema } from '@contember/schema'

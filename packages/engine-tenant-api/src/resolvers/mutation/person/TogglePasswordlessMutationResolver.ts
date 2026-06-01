@@ -1,8 +1,8 @@
-import { MutationResolvers, ToggleMyPasswordlessResponse } from '../../../schema'
-import { ConfigurationManager } from '../../../model/service/ConfigurationManager'
-import { TenantResolverContext } from '../../TenantResolverContext'
-import { ConfigurationQuery, PermissionActions, PersonManager, PersonQuery } from '../../../model'
-import { createErrorResponse } from '../../errorUtils'
+import { MutationResolvers, ToggleMyPasswordlessResponse } from '../../../schema/index.js'
+import { ConfigurationManager } from '../../../model/service/ConfigurationManager.js'
+import { TenantResolverContext } from '../../TenantResolverContext.js'
+import { ConfigurationQuery, PermissionActions, PersonManager, PersonQuery } from '../../../model/index.js'
+import { createErrorResponse } from '../../errorUtils.js'
 
 export class TogglePasswordlessMutationResolver implements Pick<MutationResolvers, 'enableMyPasswordless' | 'disableMyPasswordless'> {
 	constructor(

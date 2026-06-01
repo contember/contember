@@ -1,7 +1,7 @@
-import { authenticatedIdentityId, executeTenantTest, now } from '../../../src/testTenant'
-import { GQL } from '../../../src/tags'
-import { testUuid } from '../../../src/testUuid'
-import { authLogFilteredSql, authLogPlainSql } from './sql/authLogSql'
+import { authenticatedIdentityId, executeTenantTest, now } from '../../../src/testTenant.js'
+import { GQL } from '../../../src/tags.js'
+import { testUuid } from '../../../src/testUuid.js'
+import { authLogFilteredSql, authLogPlainSql } from './sql/authLogSql.js'
 import { test } from 'bun:test'
 
 test('authLog returns paginated audit entries with default limit', async () => {

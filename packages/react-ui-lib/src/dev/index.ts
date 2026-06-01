@@ -1,2 +1,2 @@
-export * from './login-panel'
-export * from './todo'
+export * from './login-panel.js'
+export * from './todo.js'

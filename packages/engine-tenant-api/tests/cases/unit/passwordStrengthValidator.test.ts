@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'bun:test'
-import { PasswordStrengthValidator } from '../../../src/model/service/PasswordStrengthValidator'
-import { HibpChecker } from '../../../src/model/service/HibpChecker'
+import { PasswordStrengthValidator } from '../../../src/model/service/PasswordStrengthValidator.js'
+import { HibpChecker } from '../../../src/model/service/HibpChecker.js'
 
 const passwordConfig = {
 	minLength: 6,

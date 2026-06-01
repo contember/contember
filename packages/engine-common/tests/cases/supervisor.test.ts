@@ -1,6 +1,6 @@
 import { createLogger, TestLoggerHandler } from '@contember/logger'
 import { expect, test } from 'bun:test'
-import { Runnable, RunnableArgs, Running, Supervisor } from '../../src'
+import { Runnable, RunnableArgs, Running, Supervisor } from '../../src/index.js'
 
 const shouldNotHappenCallback = () => {
 	throw new Error('should not happen')

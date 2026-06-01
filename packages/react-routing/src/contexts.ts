@@ -1,5 +1,5 @@
 import { createContext, createRequiredContext } from '@contember/react-utils'
-import { RequestChangeHandler, RequestState, RoutingContextValue } from './types'
+import { RequestChangeHandler, RequestState, RoutingContextValue } from './types/index.js'
 
 const CurrentRequestContext_ = createRequiredContext<RequestState>('CurrentRequestContext')
 /**

@@ -1,4 +1,4 @@
-import { SemverString } from './types'
+import { SemverString } from './types.js'
 
 /**
  * Logs a deprecation warning if the assertion is `false`.

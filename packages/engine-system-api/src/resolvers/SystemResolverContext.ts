@@ -1,11 +1,11 @@
 import { Authorizator } from '@contember/authorization'
 import { ForbiddenError } from '@contember/graphql-utils'
-import { DatabaseContext, Identity } from '../model'
-import { ProjectConfig } from '../types'
-import { StagePermissionsFactory } from '../model/authorization/StagePermissionsFactory'
-import { StageScope } from '../model/authorization/StageScope'
-import { ItemLoader } from '../utils/batchQuery'
-import { SchemaGetter } from '../model/SchemaGetter'
+import { DatabaseContext, Identity } from '../model/index.js'
+import { ProjectConfig } from '../types.js'
+import { StagePermissionsFactory } from '../model/authorization/StagePermissionsFactory.js'
+import { StageScope } from '../model/authorization/StageScope.js'
+import { ItemLoader } from '../utils/batchQuery.js'
+import { SchemaGetter } from '../model/SchemaGetter.js'
 
 export class SystemResolverContextFactory {
 	constructor(

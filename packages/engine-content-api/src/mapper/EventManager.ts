@@ -1,6 +1,6 @@
 import { Input, Model, Value } from '@contember/schema'
-import { Mapper } from './Mapper'
-import { ColumnValue } from './ColumnValue'
+import { Mapper } from './Mapper.js'
+import { ColumnValue } from './ColumnValue.js'
 
 export class BeforeInsertEvent {
 	public type = 'BeforeInsertEvent' as const

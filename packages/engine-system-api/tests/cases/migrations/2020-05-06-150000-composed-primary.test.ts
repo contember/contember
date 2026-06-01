@@ -1,5 +1,5 @@
 import { emptyDatabaseMetadata } from '@contember/database'
-import migration from '../../../src/migrations/2020-05-06-150000-composed-primary'
+import migration from '../../../src/migrations/2020-05-06-150000-composed-primary.js'
 import { createMigrationBuilder } from '@contember/database-migrations'
 import { expect, test } from 'bun:test'
 import { c, createSchema } from '@contember/schema-definition'

@@ -1,7 +1,7 @@
 import { EnvironmentContext, useEnvironment } from '@contember/react-binding'
 import { ComponentType, Fragment, isValidElement, lazy, ReactElement, ReactNode, Suspense, useMemo, useRef } from 'react'
-import { useCurrentRequest } from '../contexts'
-import { pageNameIn } from '../internal/utils/urlMapper'
+import { useCurrentRequest } from '../contexts.js'
+import { pageNameIn } from '../internal/utils/urlMapper.js'
 
 export interface PageProvider<P> {
 	getPageName(props: P, fallback?: string): string

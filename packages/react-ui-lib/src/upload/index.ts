@@ -1,3 +1,3 @@
-export * from './dropzone'
-export * from './ui'
-export * from './view'
+export * from './dropzone.js'
+export * from './ui.js'
+export * from './view.js'

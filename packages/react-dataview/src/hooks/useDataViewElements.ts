@@ -1,10 +1,10 @@
 import { BranchNode, ChildrenAnalyzer } from '@contember/react-multipass-rendering'
-import { useDataViewChildren } from '../contexts'
-import { DataViewElement } from '../components'
+import { useDataViewChildren } from '../contexts.js'
+import { DataViewElement } from '../components/index.js'
 import { Environment, useEnvironment } from '@contember/react-binding'
 import { ReactNode, useMemo, useState } from 'react'
-import { DataViewSelectionValues } from '../types'
-import { dataViewSelectionEnvironmentExtension } from '../env/dataViewSelectionEnvironmentExtension'
+import { DataViewSelectionValues } from '../types/index.js'
+import { dataViewSelectionEnvironmentExtension } from '../env/dataViewSelectionEnvironmentExtension.js'
 
 /**
  * Hook for getting all DataView elements from the children.

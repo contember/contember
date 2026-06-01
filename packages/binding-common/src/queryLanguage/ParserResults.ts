@@ -1,4 +1,4 @@
-import { EntityName, FieldName, Filter, UniqueWhere } from '../treeParameters'
+import { EntityName, FieldName, Filter, UniqueWhere } from '../treeParameters/index.js'
 
 export interface ParsedQualifiedSingleEntity {
 	where: UniqueWhere

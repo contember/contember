@@ -1,5 +1,5 @@
 import { Input, JSONObject } from '@contember/schema'
-import { EntityTypeLike } from './Schema'
+import { EntityTypeLike } from './Schema.js'
 
 export namespace ContentClientInput {
 	export type ConnectRelationInput<TEntity extends EntityTypeLike> = {

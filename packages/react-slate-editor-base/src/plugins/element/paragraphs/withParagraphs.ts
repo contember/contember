@@ -1,8 +1,8 @@
 import { Editor, Element as SlateElement, Point, Range as SlateRange, Transforms } from 'slate'
-import { ContemberEditor } from '../../../editor'
-import { isParagraphElement, ParagraphElement, paragraphElementPlugin, paragraphElementType } from './ParagraphElement'
-import { paragraphHtmlDeserializer } from './ParagraphHtmlDeserializer'
-import { ElementRenderer } from '../../../types'
+import { ContemberEditor } from '../../../editor/index.js'
+import { isParagraphElement, ParagraphElement, paragraphElementPlugin, paragraphElementType } from './ParagraphElement.js'
+import { paragraphHtmlDeserializer } from './ParagraphHtmlDeserializer.js'
+import { ElementRenderer } from '../../../types/index.js'
 
 export const withParagraphs = ({ render }: { render: ElementRenderer<ParagraphElement> }) => <E extends Editor>(editor: E): E => {
 	const {

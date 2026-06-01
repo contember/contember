@@ -1,6 +1,6 @@
 import { ReactNode } from 'react'
 import { describe, expect, it } from 'bun:test'
-import { CurrentRequestContext, Page, Pages, RequestState } from '../../src'
+import { CurrentRequestContext, Page, Pages, RequestState } from '../../src/index.js'
 import { render } from '@testing-library/react'
 import { Schema, SchemaLoader } from '@contember/binding'
 import { ContemberClient } from '@contember/react-client'

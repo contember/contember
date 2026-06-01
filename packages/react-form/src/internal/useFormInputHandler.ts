@@ -1,6 +1,6 @@
 import { FieldAccessor, SchemaColumn, SchemaKnownColumnType } from '@contember/react-binding'
 import { useMemo } from 'react'
-import { FormInputHandler } from '../types'
+import { FormInputHandler } from '../types/index.js'
 
 export const useFormInputHandler = (field: FieldAccessor, { formatValue, parseValue }: Partial<FormInputHandler>): FormInputHandler => {
 	return useMemo(() => {

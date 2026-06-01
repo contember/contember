@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { Slot } from '@radix-ui/react-slot'
 import { dataAttribute } from '@contember/utilities'
-import { useFormFieldState } from '../contexts'
+import { useFormFieldState } from '../contexts.js'
 import { BindingError } from '@contember/react-binding'
 
 export const FormLabel = (props: {

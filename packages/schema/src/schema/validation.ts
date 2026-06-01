@@ -1,4 +1,4 @@
-import { JSONValue } from './json'
+import { JSONValue } from './json.js'
 
 export namespace Validation {
 	export type ContextPath = readonly string[]

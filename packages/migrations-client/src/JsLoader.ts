@@ -1,6 +1,6 @@
-import { MigrationFileLoader } from './MigrationFileLoader'
-import { MigrationParser } from './MigrationParser'
-import { ContentMigration, ContentMigrationFactoryArgs, MigrationContent, MigrationFile } from './MigrationFile'
+import { MigrationFileLoader } from './MigrationFileLoader.js'
+import { MigrationParser } from './MigrationParser.js'
+import { ContentMigration, ContentMigrationFactoryArgs, MigrationContent, MigrationFile } from './MigrationFile.js'
 
 export class JsLoader implements MigrationFileLoader {
 	constructor(

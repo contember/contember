@@ -6,12 +6,12 @@ import {
 	MutationResolvers,
 	MutationSignInPasswordlessArgs,
 	SignInPasswordlessResponse,
-} from '../../../schema'
-import { TenantResolverContext } from '../../TenantResolverContext'
-import { CaptchaValidator, ConfigurationQuery, PermissionActions, RateLimiter } from '../../../model'
-import { createErrorResponse } from '../../errorUtils'
-import { SignInResponseFactory } from '../../responseHelpers/SignInResponseFactory'
-import { PasswordlessSignInManager } from '../../../model/service/PasswordlessSignInManager'
+} from '../../../schema/index.js'
+import { TenantResolverContext } from '../../TenantResolverContext.js'
+import { CaptchaValidator, ConfigurationQuery, PermissionActions, RateLimiter } from '../../../model/index.js'
+import { createErrorResponse } from '../../errorUtils.js'
+import { SignInResponseFactory } from '../../responseHelpers/SignInResponseFactory.js'
+import { PasswordlessSignInManager } from '../../../model/service/PasswordlessSignInManager.js'
 
 export class PasswordlessMutationResolver
 	implements Pick<MutationResolvers, 'initSignInPasswordless' | 'signInPasswordless' | 'activatePasswordlessOtp'>

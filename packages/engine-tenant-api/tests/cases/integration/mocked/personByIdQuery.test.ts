@@ -1,8 +1,8 @@
-import { executeTenantTest } from '../../../src/testTenant'
-import { GQL } from '../../../src/tags'
-import { testUuid } from '../../../src/testUuid'
+import { executeTenantTest } from '../../../src/testTenant.js'
+import { GQL } from '../../../src/tags.js'
+import { testUuid } from '../../../src/testUuid.js'
 import { test } from 'bun:test'
-import { getPersonByIdSql } from './sql/getPersonByIdSql'
+import { getPersonByIdSql } from './sql/getPersonByIdSql.js'
 
 test('get person by id query', async () => {
 	const name = 'John Doe'

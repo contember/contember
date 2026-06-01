@@ -1,5 +1,5 @@
-import { ContentOperation, ContentQuery } from '../nodes'
-import { ContentOperationSet } from './ContentOperationSet'
+import { ContentOperation, ContentQuery } from '../nodes/index.js'
+import { ContentOperationSet } from './ContentOperationSet.js'
 import { GraphQlField } from '@contember/graphql-builder'
 
 export const createQueryOperationSet = (

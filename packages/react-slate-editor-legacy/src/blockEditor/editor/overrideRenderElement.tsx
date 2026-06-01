@@ -1,6 +1,6 @@
 import { Editor, Element } from 'slate'
-import { ReferenceElementWrapper } from '../references/ReferenceElementWrapper'
-import { isElementWithReference } from '../elements'
+import { ReferenceElementWrapper } from '../references/ReferenceElementWrapper.js'
+import { isElementWithReference } from '../elements/index.js'
 import { ErrorBoundary } from 'react-error-boundary'
 import { ReactEditor } from 'slate-react'
 import { ComponentType, ReactNode } from 'react'

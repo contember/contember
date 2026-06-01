@@ -1,8 +1,8 @@
-import { PackageManager } from './packageManagers/PackageManager'
-import { Package } from './Package'
+import { PackageManager } from './packageManagers/PackageManager.js'
+import { Package } from './Package.js'
 import { dirname, join } from 'node:path'
-import { PackageJson } from './PackageJson'
-import { FileSystem } from './FileSystem'
+import { PackageJson } from './PackageJson.js'
+import { FileSystem } from './FileSystem.js'
 
 export type Dependency = {
 	pckg: Package

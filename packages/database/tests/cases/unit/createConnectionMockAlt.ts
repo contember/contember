@@ -1,5 +1,5 @@
-import { Connection, Pool } from '../../../src'
-import { PgClient } from '../../../src/client/PgClient'
+import { Connection, Pool } from '../../../src/index.js'
+import { PgClient } from '../../../src/client/PgClient.js'
 import EventEmitter from 'node:events'
 import { expect } from 'bun:test'
 

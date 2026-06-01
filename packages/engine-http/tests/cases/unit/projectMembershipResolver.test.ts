@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'bun:test'
-import { ProjectMembershipFetcher, ProjectMembershipResolver } from '../../../src'
-import { createMock } from '../../utils'
+import { ProjectMembershipFetcher, ProjectMembershipResolver } from '../../../src/index.js'
+import { createMock } from '../../utils.js'
 import { Acl } from '@contember/schema'
 
 describe('membership resolver', () => {

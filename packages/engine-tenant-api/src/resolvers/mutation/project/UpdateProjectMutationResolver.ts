@@ -1,9 +1,9 @@
-import { MutationResolvers, MutationUpdateProjectArgs, UpdateProjectResponse } from '../../../schema'
-import { TenantResolverContext } from '../../TenantResolverContext'
-import { PermissionActions, ProjectManager } from '../../../model'
-import { createProjectNotFoundResponse } from '../../errorUtils'
+import { MutationResolvers, MutationUpdateProjectArgs, UpdateProjectResponse } from '../../../schema/index.js'
+import { TenantResolverContext } from '../../TenantResolverContext.js'
+import { PermissionActions, ProjectManager } from '../../../model/index.js'
+import { createProjectNotFoundResponse } from '../../errorUtils.js'
 import { Merger } from '@contember/config-loader'
-import { ResponseOk } from '../../../model/utils/Response'
+import { ResponseOk } from '../../../model/utils/Response.js'
 
 export class UpdateProjectMutationResolver implements MutationResolvers {
 	constructor(private readonly projectManager: ProjectManager) {}

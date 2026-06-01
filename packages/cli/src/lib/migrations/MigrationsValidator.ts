@@ -2,7 +2,7 @@ import { Migration } from '@contember/migrations-client'
 import { Schema } from '@contember/schema'
 import { SchemaValidatorSkippedErrors } from '@contember/schema-utils'
 import { MigrationDescriber, MigrationVersionHelper, SchemaMigrator, SchemaUpdateError } from '@contember/schema-migrations'
-import { validateSchemaAndPrintErrors } from '../schema/SchemaValidationHelper'
+import { validateSchemaAndPrintErrors } from '../schema/SchemaValidationHelper.js'
 
 export class MigrationsValidator {
 	constructor(

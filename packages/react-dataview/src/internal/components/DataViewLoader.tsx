@@ -9,10 +9,10 @@ import {
 	useEntityListSubTree,
 	useEntityListSubTreeLoader,
 } from '@contember/react-binding'
-import { DataViewDisplayedStateContext, DataViewEntityListAccessorContext, DataViewLoaderStateContext, DataViewReloadContext } from '../../contexts'
-import { DataViewState } from '../../types'
-import { dataViewSelectionEnvironmentExtension } from '../../env/dataViewSelectionEnvironmentExtension'
-import { DataViewInteractionProvider } from './DataViewInteractionProvider'
+import { DataViewDisplayedStateContext, DataViewEntityListAccessorContext, DataViewLoaderStateContext, DataViewReloadContext } from '../../contexts.js'
+import { DataViewState } from '../../types/index.js'
+import { dataViewSelectionEnvironmentExtension } from '../../env/dataViewSelectionEnvironmentExtension.js'
+import { DataViewInteractionProvider } from './DataViewInteractionProvider.js'
 
 export interface DataViewLoaderProps {
 	children: ReactNode

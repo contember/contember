@@ -1,10 +1,10 @@
 import { SetStateAction, useEffect, useRef } from 'react'
 import { useSetSessionToken } from '@contember/react-client'
-import { useIDPStateStore } from './useIDPStateStore'
-import { getBaseHref } from '../utils/getBaseHref'
-import { IDPStateValue } from '../../types/idp'
-import { useSignInIDPMutation } from '../../hooks'
-import { useRedirectToBacklinkCallback } from './useRedirectToBacklink'
+import { useIDPStateStore } from './useIDPStateStore.js'
+import { getBaseHref } from '../utils/getBaseHref.js'
+import { IDPStateValue } from '../../types/idp.js'
+import { useSignInIDPMutation } from '../../hooks/index.js'
+import { useRedirectToBacklinkCallback } from './useRedirectToBacklink.js'
 
 export interface UseHandleIDPResponseProps {
 	onLogin?: () => void

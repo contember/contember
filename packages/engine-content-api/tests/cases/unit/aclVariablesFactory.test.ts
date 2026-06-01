@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'bun:test'
-import { createAclVariables } from '../../../src'
+import { createAclVariables } from '../../../src/index.js'
 import { Acl } from '@contember/schema'
-import { testUuid } from '../../src/testUuid'
+import { testUuid } from '../../src/testUuid.js'
 
 describe('create acl variables', () => {
 	const definition: Acl.EntityVariable = { type: Acl.VariableType.entity, entityName: 'Author' }

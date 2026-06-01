@@ -1,8 +1,8 @@
 import { Model, Schema } from '@contember/schema'
-import { SchemaUpdater, updateEntity, updateField, updateModel } from '../utils/schemaUpdateUtils'
-import { createModificationType, Differ, ModificationHandler } from '../ModificationHandler'
+import { SchemaUpdater, updateEntity, updateField, updateModel } from '../utils/schemaUpdateUtils.js'
+import { createModificationType, Differ, ModificationHandler } from '../ModificationHandler.js'
 import { isOwningRelation } from '@contember/schema-utils'
-import { updateRelations } from '../utils/diffUtils'
+import { updateRelations } from '../utils/diffUtils.js'
 
 export class DisableOrphanRemovalModificationHandler implements ModificationHandler<DisableOrphanRemovalModificationData> {
 	constructor(private readonly data: DisableOrphanRemovalModificationData, private readonly schema: Schema) {}

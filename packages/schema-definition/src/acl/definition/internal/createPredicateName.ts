@@ -1,4 +1,4 @@
-import { WhenDefinition } from '../permissions'
+import { WhenDefinition } from '../permissions.js'
 
 export const createPredicateName = (when: WhenDefinition) => {
 	const json = JSON.stringify(when)

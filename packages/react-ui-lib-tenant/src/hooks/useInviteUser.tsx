@@ -1,12 +1,12 @@
 import * as React from 'react'
 
-import { useInvite } from './useInvite'
+import { useInvite } from './useInvite.js'
 import { ToastContent, useShowToast } from '@contember/react-ui-lib-base'
 import { useProjectSlug } from '@contember/react-client'
 import { EntityAccessor } from '@contember/interface'
 import * as TenantApi from '@contember/graphql-client-tenant'
 import { useReferentiallyStableCallback } from '@contember/react-utils'
-import { dict } from '../dict'
+import { dict } from '../dict.js'
 
 export const useInviteUser = ({ emailField, personIdField, memberships }: {
 	personIdField: string

@@ -1,8 +1,8 @@
-import { Connection } from './Connection'
-import { EventManager } from './EventManager'
-import { wrapIdentifier } from '../utils'
+import { Connection } from './Connection.js'
+import { EventManager } from './EventManager.js'
+import { wrapIdentifier } from '../utils/index.js'
 import { Notification } from 'pg'
-import { CannotCommitError, DatabaseError } from './errors'
+import { CannotCommitError, DatabaseError } from './errors.js'
 
 export class Transaction implements Connection.TransactionLike {
 	public get isClosed(): boolean {

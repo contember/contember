@@ -3,8 +3,8 @@ import { createContext } from '@contember/react-utils'
 import { VariantProps } from 'class-variance-authority'
 import { ChevronRight } from 'lucide-react'
 import { Children, isValidElement, ReactNode, useMemo } from 'react'
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from './collapsible'
-import { SidebarMenu, SidebarMenuButton, sidebarMenuButtonVariants, SidebarMenuItem, SidebarMenuSub } from './sidebar'
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from './collapsible.js'
+import { SidebarMenu, SidebarMenuButton, sidebarMenuButtonVariants, SidebarMenuItem, SidebarMenuSub } from './sidebar.js'
 
 export type MenuItemProps = {
 	icon?: ReactNode

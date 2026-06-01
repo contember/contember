@@ -1,9 +1,9 @@
 import { Actions, Model } from '@contember/schema'
-import { TriggerListeners } from './TriggerListeners'
-import { JunctionListener, TriggerListenersStore } from './TriggerListenersStore'
+import { TriggerListeners } from './TriggerListeners.js'
+import { JunctionListener, TriggerListenersStore } from './TriggerListenersStore.js'
 import { acceptFieldVisitor, getEntity } from '@contember/schema-utils'
-import { mapGetOrPut } from '../utils/map'
-import { ImplementationException } from '../ImplementationException'
+import { mapGetOrPut } from '../utils/map.js'
+import { ImplementationException } from '../ImplementationException.js'
 
 export class TriggerListenerBuilder {
 	private readonly data: TriggerListeners = {

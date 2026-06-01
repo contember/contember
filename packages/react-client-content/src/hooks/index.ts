@@ -1,3 +1,3 @@
-export * from './useContentQuery'
-export * from './useContentClient'
-export * from './useContentMutation'
+export * from './useContentQuery.js'
+export * from './useContentClient.js'
+export * from './useContentMutation.js'

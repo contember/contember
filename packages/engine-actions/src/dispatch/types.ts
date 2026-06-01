@@ -1,7 +1,7 @@
 import { Logger } from '@contember/logger'
 import { Actions } from '@contember/schema'
-import { EventRow } from '../model/types'
-import { VariablesMap } from '../model/VariablesManager'
+import { EventRow } from '../model/types.js'
+import { VariablesMap } from '../model/VariablesManager.js'
 
 export type { EventRow }
 

@@ -2,13 +2,13 @@ import { Client, Connection, ConstraintHelper, DatabaseMetadataResolver, wrapIde
 import { Model, Schema } from '@contember/schema'
 import * as Typesafe from '@contember/typesafe'
 import { ParseError } from '@contember/typesafe'
-import { Command, CommandArgsMap, CommandName } from './Command'
+import { Command, CommandArgsMap, CommandName } from './Command.js'
 import { DatabaseContext, StageBySlugQuery } from '@contember/engine-system-api'
-import { DbColumnSchema, TransferMapping, TransferTableMapping } from './TransferMapping'
-import { ContentSchemaTransferMappingFactory } from './ContentSchemaTransferMappingFactory'
-import { SystemSchemaTransferMappingFactory } from './SystemSchemaTransferMappingFactory'
-import { AuthResult, HttpErrorResponse } from '../common'
-import { ProjectGroupContainer } from '../projectGroup/ProjectGroupContainer'
+import { DbColumnSchema, TransferMapping, TransferTableMapping } from './TransferMapping.js'
+import { ContentSchemaTransferMappingFactory } from './ContentSchemaTransferMappingFactory.js'
+import { SystemSchemaTransferMappingFactory } from './SystemSchemaTransferMappingFactory.js'
+import { AuthResult, HttpErrorResponse } from '../common/index.js'
+import { ProjectGroupContainer } from '../projectGroup/ProjectGroupContainer.js'
 
 type Cell = boolean | number | string | readonly string[] | readonly number[] | readonly boolean[] | null
 type Row = readonly Cell[]

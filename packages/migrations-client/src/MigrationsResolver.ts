@@ -1,6 +1,6 @@
-import { MigrationFilesManager } from './MigrationFilesManager'
+import { MigrationFilesManager } from './MigrationFilesManager.js'
 import { Migration } from '@contember/schema-migrations'
-import { isSchemaMigration, MigrationFile } from './MigrationFile'
+import { isSchemaMigration, MigrationFile } from './MigrationFile.js'
 import { MigrationVersionHelper } from '@contember/engine-common'
 
 export class MigrationsResolver {

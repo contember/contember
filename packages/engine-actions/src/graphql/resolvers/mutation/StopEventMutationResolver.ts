@@ -1,7 +1,7 @@
-import { MutationResolvers, MutationRetryEventArgs } from '../../schema'
-import { ActionsContext } from '../ActionsContext'
-import { ActionsAuthorizationActions } from '../../../authorization'
-import { EventsRepository } from '../../../dispatch/EventsRepository'
+import { MutationResolvers, MutationRetryEventArgs } from '../../schema/index.js'
+import { ActionsContext } from '../ActionsContext.js'
+import { ActionsAuthorizationActions } from '../../../authorization/index.js'
+import { EventsRepository } from '../../../dispatch/EventsRepository.js'
 
 export class StopEventMutationResolver implements MutationResolvers<ActionsContext> {
 	constructor(

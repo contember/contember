@@ -1,10 +1,10 @@
-import { DatabaseContext } from '../utils'
-import { Providers } from '../providers'
-import { Config } from '../type/Config'
-import { RateLimitCountQuery } from '../queries/rateLimit/RateLimitCountQuery'
-import { RecordRateLimitEventCommand } from '../commands/rateLimit/RecordRateLimitEventCommand'
-import { RateLimitScope } from '../type/RateLimit'
-import { intervalToSeconds } from '../utils/interval'
+import { DatabaseContext } from '../utils/index.js'
+import { Providers } from '../providers.js'
+import { Config } from '../type/Config.js'
+import { RateLimitCountQuery } from '../queries/rateLimit/RateLimitCountQuery.js'
+import { RecordRateLimitEventCommand } from '../commands/rateLimit/RecordRateLimitEventCommand.js'
+import { RateLimitScope } from '../type/RateLimit.js'
+import { intervalToSeconds } from '../utils/interval.js'
 
 export interface RateLimitWindow {
 	readonly limit: number

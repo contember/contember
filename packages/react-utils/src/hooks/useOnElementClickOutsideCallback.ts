@@ -1,5 +1,5 @@
 import { useEffect } from 'react'
-import { RefObjectOrElement, unwrapRefValue } from './unwrapRefValue'
+import { RefObjectOrElement, unwrapRefValue } from './unwrapRefValue.js'
 
 export function useOnElementClickOutsideCallback(
 	refOrElement: RefObjectOrElement<HTMLElement>,

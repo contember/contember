@@ -1,9 +1,9 @@
 import { ReactNode, useEffect } from 'react'
 import { AccessorTreeState, DataBindingProvider, useDataBindingEvent } from '@contember/interface'
 import { Loader } from '@contember/react-ui-lib-base'
-import { NavigationGuardDialog } from './navigation-guard-dialog'
-import { usePersistErrorHandler } from './hooks'
-import { ErrorBoundary } from '../errors/error-boundary'
+import { NavigationGuardDialog } from './navigation-guard-dialog.js'
+import { usePersistErrorHandler } from './hooks.js'
+import { ErrorBoundary } from '../errors/error-boundary.js'
 
 export const Binding = ({ children }: {
 	children: ReactNode

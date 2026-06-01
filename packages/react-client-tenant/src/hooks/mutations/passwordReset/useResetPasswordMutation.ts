@@ -1,6 +1,6 @@
 import * as TenantApi from '@contember/graphql-client-tenant'
-import { LoginToken } from '../../useTenantApi'
-import { createTenantMutation } from '../../useTenantMutation'
+import { LoginToken } from '../../useTenantApi.js'
+import { createTenantMutation } from '../../useTenantMutation.js'
 
 export const resetPasswordMutation = TenantApi
 	.mutation$

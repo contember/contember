@@ -1,4 +1,4 @@
-import { RemoteProject } from './RemoteProject'
+import { RemoteProject } from './RemoteProject.js'
 
 export class RemoteProjectProvider {
 	private _remoteProject: RemoteProject | undefined = undefined

@@ -8,12 +8,12 @@ import {
 	GraphQLSchemaConfig,
 	GraphQLString,
 } from 'graphql'
-import { S3Service, S3ServiceFactory } from './S3Service'
-import { Project3Config, resolveS3Config, S3Config } from './Config'
+import { S3Service, S3ServiceFactory } from './S3Service.js'
+import { Project3Config, resolveS3Config, S3Config } from './Config.js'
 import { GraphQLSchemaContributor, GraphQLSchemaContributorContext, Providers } from '@contember/engine-plugins'
-import * as types from './S3SchemaTypes'
-import { S3Acl, S3GenerateSignedUploadInput, S3SignedRead, S3SignedUpload } from './S3SchemaTypes'
-import { S3ObjectAuthorizator } from './S3ObjectAuthorizator'
+import * as types from './S3SchemaTypes.js'
+import { S3Acl, S3GenerateSignedUploadInput, S3SignedRead, S3SignedUpload } from './S3SchemaTypes.js'
+import { S3ObjectAuthorizator } from './S3ObjectAuthorizator.js'
 
 interface Identity {
 	projectRoles: string[]

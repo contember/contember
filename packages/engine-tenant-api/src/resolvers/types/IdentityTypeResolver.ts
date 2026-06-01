@@ -1,4 +1,4 @@
-import { Identity, IdentityGlobalPermissions, IdentityProjectRelation, IdentityResolvers, Maybe, Person, SessionInfo } from '../../schema'
+import { Identity, IdentityGlobalPermissions, IdentityProjectRelation, IdentityResolvers, Maybe, Person, SessionInfo } from '../../schema/index.js'
 import {
 	IdentityQuery,
 	PermissionActions,
@@ -7,12 +7,12 @@ import {
 	PersonRow,
 	ProjectManager,
 	ProjectMemberManager,
-} from '../../model'
-import { ApiKeySessionsByIdentityQuery } from '../../model/queries/apiKey'
-import { TenantResolverContext } from '../TenantResolverContext'
-import { notEmpty } from '../../utils/array'
-import { batchLoader } from '../../utils/batchQuery'
-import { PersonResponseFactory } from '../responseHelpers/PersonResponseFactory'
+} from '../../model/index.js'
+import { ApiKeySessionsByIdentityQuery } from '../../model/queries/apiKey/index.js'
+import { TenantResolverContext } from '../TenantResolverContext.js'
+import { notEmpty } from '../../utils/array.js'
+import { batchLoader } from '../../utils/batchQuery.js'
+import { PersonResponseFactory } from '../responseHelpers/PersonResponseFactory.js'
 
 export class IdentityTypeResolver implements IdentityResolvers {
 	private personLoader = batchLoader<string, Record<string, PersonRow>, PersonRow>(

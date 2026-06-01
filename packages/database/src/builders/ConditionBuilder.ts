@@ -1,10 +1,10 @@
-import { Value } from '../types'
-import { Literal } from '../Literal'
-import { QueryBuilder } from './QueryBuilder'
-import { SelectBuilder } from './SelectBuilder'
-import { Compiler } from './Compiler'
-import { createSubQueryLiteralFactory, SubQueryExpression } from './internal/Subqueries'
-import { formatColumnIdentifier } from '../utils'
+import { Value } from '../types.js'
+import { Literal } from '../Literal.js'
+import { QueryBuilder } from './QueryBuilder.js'
+import { SelectBuilder } from './SelectBuilder.js'
+import { Compiler } from './Compiler.js'
+import { createSubQueryLiteralFactory, SubQueryExpression } from './internal/Subqueries.js'
+import { formatColumnIdentifier } from '../utils/index.js'
 
 export type ConditionCallback = (builder: ConditionBuilder) => ConditionBuilder
 export type ConditionExpression = ConditionBuilder | ConditionCallback

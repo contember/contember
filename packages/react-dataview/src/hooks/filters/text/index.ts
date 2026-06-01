@@ -1,2 +1,2 @@
-export * from './useDataViewTextFilterInput'
-export * from './useDataViewTextFilterMatchMode'
+export * from './useDataViewTextFilterInput.js'
+export * from './useDataViewTextFilterMatchMode.js'

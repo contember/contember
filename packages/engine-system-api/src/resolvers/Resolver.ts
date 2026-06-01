@@ -1,4 +1,4 @@
-import * as Schema from '../schema'
+import * as Schema from '../schema/index.js'
 import { IResolvers } from '@graphql-tools/utils'
 
 export interface IgnoreIndex {

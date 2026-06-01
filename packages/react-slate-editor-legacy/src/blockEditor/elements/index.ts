@@ -1,2 +1,2 @@
-export * from './ElementWithReference'
-export * from './ReferenceElement'
+export * from './ElementWithReference.js'
+export * from './ReferenceElement.js'

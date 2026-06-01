@@ -11,11 +11,11 @@ import {
 	useEntityList,
 	useEntityListSubTree,
 } from '@contember/react-binding'
-import { boardAnalyzer } from '../internal/boardAnalyzer'
+import { boardAnalyzer } from '../internal/boardAnalyzer.js'
 import { Fragment, ReactNode } from 'react'
-import { useDynamicBoard } from '../internal/useDynamicBoard'
-import { useStaticBoard } from '../internal/useStaticBoard'
-import { BoardColumnsContext, BoardMethodsContext } from '../contexts'
+import { useDynamicBoard } from '../internal/useDynamicBoard.js'
+import { useStaticBoard } from '../internal/useStaticBoard.js'
+import { BoardColumnsContext, BoardMethodsContext } from '../contexts.js'
 
 export type BoardProps =
 	| BoardQualifiedDynamicProps

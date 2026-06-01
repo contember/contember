@@ -1,4 +1,4 @@
-import { MailType as SchemaMailType } from '../../schema'
+import { MailType as SchemaMailType } from '../../schema/index.js'
 
 export enum MailType {
 	existingUserInvited = 'existingUserInvited',

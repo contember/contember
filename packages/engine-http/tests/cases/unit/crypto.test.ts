@@ -1,5 +1,5 @@
 import { expect, test } from 'bun:test'
-import { CryptoWrapper } from '../../../src'
+import { CryptoWrapper } from '../../../src/index.js'
 import * as crypto from 'node:crypto'
 
 const encryptionKey = crypto.createSecretKey(Buffer.from('0000000000000000000000000000000000000000000000000000000000000000', 'hex'))

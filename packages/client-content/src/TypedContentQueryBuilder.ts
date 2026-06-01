@@ -1,6 +1,6 @@
-import { ContentClientInput, MutationResult, SchemaTypeLike, TransactionResult } from './types'
-import { ContentMutation, ContentQuery, TypedEntitySelection, TypedEntitySelectionCallback } from './nodes'
-import { MutationTransactionOptions } from './ContentQueryBuilder'
+import { ContentClientInput, MutationResult, SchemaTypeLike, TransactionResult } from './types/index.js'
+import { ContentMutation, ContentQuery, TypedEntitySelection, TypedEntitySelectionCallback } from './nodes/index.js'
+import { MutationTransactionOptions } from './ContentQueryBuilder.js'
 
 export type TypedContentEntitySelectionOrCallback<TSchema extends SchemaTypeLike, TEntityName extends keyof TSchema['entities'] & string, TValue> =
 	| TypedEntitySelection<TSchema, TEntityName, TSchema['entities'][TEntityName], TValue>

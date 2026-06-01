@@ -1,5 +1,5 @@
 import React, { forwardRef, ReactElement, useCallback } from 'react'
-import { useSelectHandleSelect } from '../contexts'
+import { useSelectHandleSelect } from '../contexts.js'
 import { Slot } from '@radix-ui/react-slot'
 import { useEntity } from '@contember/react-binding'
 

@@ -1,9 +1,9 @@
-import { DisableApiKeyErrorCode, DisableApiKeyResponse, MutationDisableApiKeyArgs, MutationResolvers } from '../../../schema'
+import { DisableApiKeyErrorCode, DisableApiKeyResponse, MutationDisableApiKeyArgs, MutationResolvers } from '../../../schema/index.js'
 import { GraphQLResolveInfo } from 'graphql'
-import { TenantResolverContext } from '../../TenantResolverContext'
-import { ApiKeyManager, PermissionActions } from '../../../model'
-import { createErrorResponse } from '../../errorUtils'
-import { ResponseOk } from '../../../model/utils/Response'
+import { TenantResolverContext } from '../../TenantResolverContext.js'
+import { ApiKeyManager, PermissionActions } from '../../../model/index.js'
+import { createErrorResponse } from '../../errorUtils.js'
+import { ResponseOk } from '../../../model/utils/Response.js'
 
 export class DisableApiKeyMutationResolver implements MutationResolvers {
 	constructor(private readonly apiKeyManager: ApiKeyManager) {}

@@ -1,6 +1,6 @@
-import type { RichTextElement, RichTextLeaf } from './structure'
-import type { RichTextReference } from './RichTextReference'
-import { ReferenceRenderer } from './custom'
+import type { RichTextElement, RichTextLeaf } from './structure/index.js'
+import type { RichTextReference } from './RichTextReference.js'
+import { ReferenceRenderer } from './custom/index.js'
 
 export type RichTextReferenceMetadata<
 	CustomElements extends RichTextElement = never,

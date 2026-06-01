@@ -1,6 +1,6 @@
 import { Permissions } from '@contember/authorization'
 import { ProjectRole } from '@contember/schema'
-import { ActionsAuthorizationActions } from './ActionsAuthorizationActions'
+import { ActionsAuthorizationActions } from './ActionsAuthorizationActions.js'
 
 export class ActionsPermissionsFactory {
 	public create(): Permissions {

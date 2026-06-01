@@ -26,10 +26,10 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
  */
 
-import { createMigrationBuilder } from './helpers'
+import { createMigrationBuilder } from './helpers.js'
 import { Connection, withDatabaseAdvisoryLock, wrapIdentifier } from '@contember/database'
-import { Migration, RunMigration } from './Migration'
-import { MigrationsResolver } from './MigrationsResolver'
+import { Migration, RunMigration } from './Migration.js'
+import { MigrationsResolver } from './MigrationsResolver.js'
 
 export type RunnerOption<Args = unknown> = {
 	migrationsTable: string

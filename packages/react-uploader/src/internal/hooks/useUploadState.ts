@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react'
-import { AfterUploadEvent, BeforeUploadEvent, ErrorEvent, ProgressEvent, StartUploadEvent, SuccessEvent, UploaderEvents } from '../../types/events'
-import { UploaderFileState, UploaderState } from '../../types/state'
+import { AfterUploadEvent, BeforeUploadEvent, ErrorEvent, ProgressEvent, StartUploadEvent, SuccessEvent, UploaderEvents } from '../../types/events.js'
+import { UploaderFileState, UploaderState } from '../../types/state.js'
 import { useReferentiallyStableCallback } from '@contember/react-utils'
 
 export const useUploadState = ({ onBeforeUpload, onStartUpload, onSuccess, onError, onProgress, onAfterUpload }: UploaderEvents): UploaderEvents & {

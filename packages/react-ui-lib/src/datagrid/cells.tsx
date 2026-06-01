@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { ReactNode } from 'react'
-import { DataGridEnumFieldTooltip, DataGridHasManyTooltip, DataGridHasOneTooltip } from './filters'
-import { DataGridTooltipLabel } from './ui'
+import { DataGridEnumFieldTooltip, DataGridHasManyTooltip, DataGridHasOneTooltip } from './filters/index.js'
+import { DataGridTooltipLabel } from './ui.js'
 import {
 	Component,
 	Field,
@@ -12,7 +12,7 @@ import {
 	SugaredRelativeSingleEntity,
 	SugaredRelativeSingleField,
 } from '@contember/interface'
-import { useEnumOptionsFormatter } from '../labels'
+import { useEnumOptionsFormatter } from '../labels/index.js'
 
 /**
  * Props for {@link DataGridHasOneCell}.

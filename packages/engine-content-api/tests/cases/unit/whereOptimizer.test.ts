@@ -1,9 +1,9 @@
 import { describe, it } from 'bun:test'
-import { ConditionOptimizer } from '../../../src/mapper/select/optimizer/ConditionOptimizer'
+import { ConditionOptimizer } from '../../../src/mapper/select/optimizer/ConditionOptimizer.js'
 import { SchemaDefinition as def } from '@contember/schema-definition'
-import { WhereOptimizer } from '../../../src/mapper/select/optimizer/WhereOptimizer'
+import { WhereOptimizer } from '../../../src/mapper/select/optimizer/WhereOptimizer.js'
 import { acceptFieldVisitor } from '@contember/schema-utils'
-import { assert } from '../../src/assert'
+import { assert } from '../../src/assert.js'
 
 namespace TestModel {
 	export class Author {

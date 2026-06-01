@@ -1,7 +1,7 @@
 import { ComponentType, createElement, ReactElement, ReactNode } from 'react'
 import type { EntityListAccessor } from '@contember/binding'
-import { Component } from './Component'
-import { Entity } from './Entity'
+import { Component } from './Component.js'
+import { Entity } from './Entity.js'
 
 export interface EntityListBaseProps {
 	accessor: EntityListAccessor

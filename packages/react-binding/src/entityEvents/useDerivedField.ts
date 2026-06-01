@@ -1,5 +1,5 @@
 import { useCallback, useEffect } from 'react'
-import { useDesugaredRelativeSingleField, useEntityKey, useGetEntityByKey } from '../accessorPropagation'
+import { useDesugaredRelativeSingleField, useEntityKey, useGetEntityByKey } from '../accessorPropagation/index.js'
 import type { FieldAccessor } from '@contember/binding'
 import type { FieldValue, SugaredRelativeSingleField } from '@contember/binding'
 

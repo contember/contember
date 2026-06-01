@@ -1,1 +1,1 @@
-export * from './useInviteMutation'
+export * from './useInviteMutation.js'

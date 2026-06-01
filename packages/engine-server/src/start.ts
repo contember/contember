@@ -12,11 +12,11 @@ import {
 	serverConfigSchema,
 	TerminationJob,
 } from '@contember/engine-http'
-import loadPlugins from './loadPlugins'
+import loadPlugins from './loadPlugins.js'
 import cluster from 'node:cluster'
 import * as os from 'node:os'
-import { timeout } from './utils'
-import { getClusterProcessType, notifyWorkerStarted, WorkerManager } from './cluster'
+import { timeout } from './utils.js'
+import { getClusterProcessType, notifyWorkerStarted, WorkerManager } from './cluster.js'
 
 const logger = createDefaultLogger()
 process.on('warning', message => {

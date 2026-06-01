@@ -1,6 +1,6 @@
-export * from './accessors'
-export * from './accessorTree'
-export * from './core'
+export * from './accessors/index.js'
+export * from './accessorTree/index.js'
+export * from './core/index.js'
 
 export * from '@contember/binding-common'
 

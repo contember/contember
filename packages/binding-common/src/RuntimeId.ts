@@ -1,5 +1,5 @@
-import { generateEnumerabilityPreventingEntropy } from './utils/generateEnumerabilityPreventingEntropy'
-import { EntityId } from './treeParameters'
+import { generateEnumerabilityPreventingEntropy } from './utils/generateEnumerabilityPreventingEntropy.js'
+import { EntityId } from './treeParameters/index.js'
 
 export type UniqueEntityId = string & { __type: 'UniqueEntityId' }
 

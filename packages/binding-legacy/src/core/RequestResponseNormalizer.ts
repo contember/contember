@@ -11,9 +11,9 @@ import {
 	HasOneRelationMarker,
 	MarkerTreeRoot,
 } from '@contember/binding-common'
-import { SubMutationOperation } from './MutationGenerator'
+import { SubMutationOperation } from './MutationGenerator.js'
 import { assertNever } from '@contember/binding-common'
-import { NormalizedPersistedData, PersistedEntityDataStore, SingleEntityPersistedData } from '../accessorTree'
+import { NormalizedPersistedData, PersistedEntityDataStore, SingleEntityPersistedData } from '../accessorTree/index.js'
 
 export class RequestResponseNormalizer {
 	public static mergeInQueryResponse(

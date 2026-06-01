@@ -1,6 +1,6 @@
 import { DataBindingEventListenerMap } from '@contember/binding'
 import { useEffect } from 'react'
-import { useBindingOperations } from '../accessorPropagation'
+import { useBindingOperations } from '../accessorPropagation/index.js'
 import { useReferentiallyStableCallback } from '@contember/react-utils'
 
 export const useDataBindingEvent = <Type extends keyof DataBindingEventListenerMap>(

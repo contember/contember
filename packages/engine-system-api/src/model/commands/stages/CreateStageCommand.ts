@@ -1,7 +1,7 @@
 import { InsertBuilder, wrapIdentifier } from '@contember/database'
-import { StageConfig } from '../../../types'
-import { Command } from '../Command'
-import { formatSchemaName } from '../../helpers'
+import { StageConfig } from '../../../types.js'
+import { Command } from '../Command.js'
+import { formatSchemaName } from '../../helpers/index.js'
 
 export class CreateStageCommand implements Command<void> {
 	constructor(private readonly stage: StageConfig) {}

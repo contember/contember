@@ -1,5 +1,5 @@
 import { Client } from '@contember/database'
-import { IdentityQuery, PersonByIdentityBatchQuery } from '../../model'
+import { IdentityQuery, PersonByIdentityBatchQuery } from '../../model/index.js'
 
 export class IdentityFetcher {
 	constructor(

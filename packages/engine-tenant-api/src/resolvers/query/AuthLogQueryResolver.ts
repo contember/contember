@@ -1,8 +1,8 @@
-import { AuthLogPage, QueryAuthLogArgs, QueryResolvers } from '../../schema'
-import { TenantResolverContext } from '../TenantResolverContext'
-import { PermissionActions } from '../../model'
-import { AuthLogQuery } from '../../model/queries/authLog/AuthLogQuery'
-import { AuthActionType } from '../../model/type/AuthLog'
+import { AuthLogPage, QueryAuthLogArgs, QueryResolvers } from '../../schema/index.js'
+import { TenantResolverContext } from '../TenantResolverContext.js'
+import { PermissionActions } from '../../model/index.js'
+import { AuthLogQuery } from '../../model/queries/authLog/AuthLogQuery.js'
+import { AuthActionType } from '../../model/type/AuthLog.js'
 
 export class AuthLogQueryResolver implements Pick<QueryResolvers, 'authLog'> {
 	async authLog(

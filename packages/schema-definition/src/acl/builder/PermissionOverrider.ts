@@ -1,5 +1,5 @@
 import { Acl } from '@contember/schema'
-import { tuple } from '../../utils'
+import { tuple } from '../../utils/index.js'
 
 export default class PermissionOverrider {
 	public override(original: Acl.Permissions, overrides: Acl.Permissions): Acl.Permissions {

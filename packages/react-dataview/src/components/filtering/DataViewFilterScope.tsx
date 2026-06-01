@@ -1,4 +1,4 @@
-import { DataViewFilterNameContext } from '../../contexts'
+import { DataViewFilterNameContext } from '../../contexts.js'
 
 export interface DataViewFilterScopeProps {
 	/**

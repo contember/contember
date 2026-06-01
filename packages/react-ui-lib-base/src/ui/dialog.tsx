@@ -1,8 +1,8 @@
 import * as React from 'react'
 import * as DialogPrimitive from '@radix-ui/react-dialog'
-import { uic } from '../utils/uic'
+import { uic } from '../utils/uic.js'
 import { XIcon } from 'lucide-react'
-import { createComponentOpenHooks } from '../utils/createComponentOpenHooks'
+import { createComponentOpenHooks } from '../utils/createComponentOpenHooks.js'
 
 export const { Component: Dialog, useOpen: useDialogOpenState } = createComponentOpenHooks(DialogPrimitive.Root)
 

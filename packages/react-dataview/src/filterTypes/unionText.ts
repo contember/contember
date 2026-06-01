@@ -1,6 +1,6 @@
 import { Filter, SugaredRelativeSingleField } from '@contember/react-binding'
-import { DataViewFilterHandler } from '../types'
-import { createTextFilter, TextFilterArtifacts } from './text'
+import { DataViewFilterHandler } from '../types/index.js'
+import { createTextFilter, TextFilterArtifacts } from './text.js'
 
 export type DataViewUnionFilterFields = SugaredRelativeSingleField['field'] | SugaredRelativeSingleField['field'][]
 

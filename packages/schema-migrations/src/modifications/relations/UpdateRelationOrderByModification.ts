@@ -1,8 +1,8 @@
 import { Model, Schema } from '@contember/schema'
-import { SchemaUpdater, updateEntity, updateField, updateModel } from '../utils/schemaUpdateUtils'
-import { createModificationType, Differ, ModificationHandler } from '../ModificationHandler'
+import { SchemaUpdater, updateEntity, updateField, updateModel } from '../utils/schemaUpdateUtils.js'
+import { createModificationType, Differ, ModificationHandler } from '../ModificationHandler.js'
 import deepEqual from 'fast-deep-equal'
-import { updateRelations } from '../utils/diffUtils'
+import { updateRelations } from '../utils/diffUtils.js'
 
 export class UpdateRelationOrderByModificationHandler implements ModificationHandler<UpdateRelationOrderByModificationData> {
 	constructor(private readonly data: UpdateRelationOrderByModificationData, private readonly schema: Schema) {}

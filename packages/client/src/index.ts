@@ -1,4 +1,4 @@
-export * from './GenerateUploadUrlMutationBuilder'
+export * from './GenerateUploadUrlMutationBuilder.js'
 
 export * from '@contember/client-content'
 export * from '@contember/graphql-client'

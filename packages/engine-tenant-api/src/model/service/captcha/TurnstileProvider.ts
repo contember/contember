@@ -1,4 +1,4 @@
-import { CaptchaProviderHandler, CaptchaVerifyArgs, CaptchaVerifyResult } from './CaptchaProvider'
+import { CaptchaProviderHandler, CaptchaVerifyArgs, CaptchaVerifyResult } from './CaptchaProvider.js'
 
 /**
  * Cloudflare Turnstile. Binary success/failure — `threshold` is ignored.

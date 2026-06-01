@@ -1,5 +1,5 @@
-import { RoutingParameter } from '../dto/RoutingParameter'
-import { SelectedDimension } from './dimensions'
+import { RoutingParameter } from '../dto/RoutingParameter.js'
+import { SelectedDimension } from './dimensions.js'
 
 export type RequestParameterValue = number | string
 

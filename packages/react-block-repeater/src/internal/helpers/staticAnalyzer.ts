@@ -1,5 +1,5 @@
 import { ReactNode } from 'react'
-import { Block, BlockProps } from '../../components'
+import { Block, BlockProps } from '../../components/index.js'
 import { Environment } from '@contember/react-binding'
 import { ChildrenAnalyzer, Leaf } from '@contember/react-multipass-rendering'
 

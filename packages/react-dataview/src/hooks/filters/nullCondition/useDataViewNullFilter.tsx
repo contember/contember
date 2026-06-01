@@ -1,4 +1,4 @@
-import { useDataViewFilter } from '../../index'
+import { useDataViewFilter } from '../../index.js'
 import { useCallback } from 'react'
 
 export type DataViewSetNullFilterAction = 'include' | 'exclude' | 'unset' | 'toggleInclude' | 'toggleExclude'

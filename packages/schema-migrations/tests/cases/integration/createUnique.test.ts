@@ -1,8 +1,8 @@
 import { c, createSchema } from '@contember/schema-definition'
-import { SQL } from '../../src/tags'
+import { SQL } from '../../src/tags.js'
 import { describe } from 'bun:test'
-import { testMigrations } from '../../src/tests'
-import { createUniqueConstraintModification, removeUniqueConstraintModification } from '../../../src'
+import { testMigrations } from '../../src/tests.js'
+import { createUniqueConstraintModification, removeUniqueConstraintModification } from '../../../src/index.js'
 import { createDatabaseMetadata } from '@contember/database'
 
 describe('create unique (immediate)', () =>

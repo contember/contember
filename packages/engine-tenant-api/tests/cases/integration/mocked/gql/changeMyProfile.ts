@@ -1,5 +1,5 @@
-import { GraphQLTestQuery } from './types'
-import { GQL } from '../../../../src/tags'
+import { GraphQLTestQuery } from './types.js'
+import { GQL } from '../../../../src/tags.js'
 
 export const changeMyProfileMutation = (variables: { email?: string | null; name?: string | null }): GraphQLTestQuery => ({
 	query: GQL`mutation($email: String, $name: String) {

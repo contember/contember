@@ -1,7 +1,7 @@
 import { Children, isValidElement, ReactNode } from 'react'
 import { describe, expect, it } from 'bun:test'
 import { Environment } from '@contember/react-binding'
-import { Link, RoutingLinkFields } from '../../src'
+import { Link, RoutingLinkFields } from '../../src/index.js'
 
 interface StaticRenderProvider {
 	staticRender?: (props: any, environment: Environment) => ReactNode

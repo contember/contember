@@ -1,2 +1,2 @@
-export * from './EditorReferenceTrigger'
-export * from './EditorInlineReferencePortal'
+export * from './EditorReferenceTrigger.js'
+export * from './EditorInlineReferencePortal.js'

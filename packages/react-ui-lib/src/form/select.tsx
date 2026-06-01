@@ -11,16 +11,16 @@ import {
 	SelectPopoverContent,
 	SortableMultiSelectInput,
 	SortableMultiSelectInputProps,
-} from '../select'
+} from '../select/index.js'
 import * as React from 'react'
 import { useCallback, useMemo } from 'react'
-import { FormContainer, FormContainerProps } from './container'
+import { FormContainer, FormContainerProps } from './container.js'
 import { FormFieldScope, FormHasManyRelationScope, FormHasOneRelationScope, useFormFieldState } from '@contember/react-form'
 import { Component, Field, RecursionTerminator, SugaredRelativeSingleField, useEntityBeforePersist, useField } from '@contember/interface'
 import { Popover, PopoverTrigger } from '@contember/react-ui-lib-base'
 import { ChevronDownIcon, ChevronUpIcon } from 'lucide-react'
 import { dict } from '@contember/react-ui-lib-base'
-import { useEnumOptionsFormatter } from '../labels'
+import { useEnumOptionsFormatter } from '../labels/index.js'
 
 export type SelectFieldProps =
 	& SelectInputProps

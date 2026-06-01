@@ -19,8 +19,8 @@ import {
 	VERSION_LATEST,
 } from '@contember/migrations-client'
 import { Input } from '@contember/cli-common'
-import { MigrationAmendCommand } from '../../../src/commands/migrations/MigrationAmendCommand'
-import { SchemaLoader } from '../../../src/lib/schema/SchemaLoader'
+import { MigrationAmendCommand } from '../../../src/commands/migrations/MigrationAmendCommand.js'
+import { SchemaLoader } from '../../../src/lib/schema/SchemaLoader.js'
 
 namespace BlogModel {
 	export class Author {

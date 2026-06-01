@@ -1,8 +1,8 @@
 import { BindingError, Environment } from '@contember/react-binding'
 import { assertNever } from '@contember/utilities'
 import type { ReactNode } from 'react'
-import type { ContentOutletProps } from './ContentOutlet'
-import { BoxedCatchAllJSX, BoxedContentOutletProps, editorTemplateAnalyzer } from './editorTemplateAnalyzer'
+import type { ContentOutletProps } from './ContentOutlet.js'
+import { BoxedCatchAllJSX, BoxedContentOutletProps, editorTemplateAnalyzer } from './editorTemplateAnalyzer.js'
 
 export interface EditorTemplateAtom<Value> {
 	nodeBefore: ReactNode

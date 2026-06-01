@@ -1,5 +1,5 @@
-import type { RichTextLeaf } from './RichTextLeaf'
-import { RichTextChild } from './RichTextChild'
+import type { RichTextLeaf } from './RichTextLeaf.js'
+import { RichTextChild } from './RichTextChild.js'
 
 export interface RichTextElement<
 	CustomElements extends RichTextElement = never,

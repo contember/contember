@@ -1,6 +1,6 @@
 import pg from 'pg'
-import { DatabaseConfig } from '../types'
-import { PgClient } from '../client/PgClient'
+import { DatabaseConfig } from '../types.js'
+import { PgClient } from '../client/PgClient.js'
 
 export type PgClientFactory = () => PgClient
 export const createPgClientFactory =

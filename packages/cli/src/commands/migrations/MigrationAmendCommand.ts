@@ -3,12 +3,12 @@ import { InvalidSchemaException, SchemaMigrator } from '@contember/schema-migrat
 import prompts from 'prompts'
 import { emptySchema } from '@contember/schema-utils'
 import { MigrationCreator, MigrationsResolver, SchemaStateManager, SchemaVersionBuilder } from '@contember/migrations-client'
-import { MigrationsStatusFacade } from '../../lib/migrations/MigrationsStatusFacade'
-import { SchemaLoader } from '../../lib/schema/SchemaLoader'
-import { MigrationsValidator } from '../../lib/migrations/MigrationsValidator'
-import { MigrationPrinter } from '../../lib/migrations/MigrationPrinter'
-import { printValidationErrors } from '../../lib/schema/SchemaValidationPrinter'
-import { SystemClientProvider } from '../../lib/SystemClientProvider'
+import { MigrationsStatusFacade } from '../../lib/migrations/MigrationsStatusFacade.js'
+import { SchemaLoader } from '../../lib/schema/SchemaLoader.js'
+import { MigrationsValidator } from '../../lib/migrations/MigrationsValidator.js'
+import { MigrationPrinter } from '../../lib/migrations/MigrationPrinter.js'
+import { printValidationErrors } from '../../lib/schema/SchemaValidationPrinter.js'
+import { SystemClientProvider } from '../../lib/SystemClientProvider.js'
 
 type Args = {
 	migration?: string

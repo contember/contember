@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'bun:test'
-import { CaptchaConfig, CaptchaValidator } from '../../../src/model/service/captcha/CaptchaValidator'
-import { CaptchaProviderHandler, CaptchaVerifyArgs, CaptchaVerifyResult } from '../../../src/model/service/captcha/CaptchaProvider'
+import { CaptchaConfig, CaptchaValidator } from '../../../src/model/service/captcha/CaptchaValidator.js'
+import { CaptchaProviderHandler, CaptchaVerifyArgs, CaptchaVerifyResult } from '../../../src/model/service/captcha/CaptchaProvider.js'
 
 class StubProvider implements CaptchaProviderHandler {
 	public lastArgs: CaptchaVerifyArgs | null = null

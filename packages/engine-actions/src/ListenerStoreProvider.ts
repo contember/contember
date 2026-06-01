@@ -1,4 +1,4 @@
-import { TriggerListenersFactory, TriggerListenersStore } from './triggers'
+import { TriggerListenersFactory, TriggerListenersStore } from './triggers/index.js'
 import { Schema } from '@contember/schema'
 
 export class ListenerStoreProvider {

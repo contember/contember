@@ -1,9 +1,9 @@
 import * as React from 'react'
 import { forwardRef, ReactElement, ReactNode, useCallback } from 'react'
 import { Slot } from '@radix-ui/react-slot'
-import { useDataViewFetchAllData } from '../hooks'
-import { CsvExportFactory, ExportFactory } from '../export'
-import { useDataViewChildren, useDataViewEntityListProps, useDataViewSelectionState } from '../contexts'
+import { useDataViewFetchAllData } from '../hooks/index.js'
+import { CsvExportFactory, ExportFactory } from '../export/index.js'
+import { useDataViewChildren, useDataViewEntityListProps, useDataViewSelectionState } from '../contexts.js'
 import { composeEventHandlers } from '@radix-ui/primitive'
 
 export interface DataViewExportTriggerProps {

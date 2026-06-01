@@ -1,7 +1,7 @@
-import { wrapIdentifier } from '../../utils'
-import { Literal } from '../../Literal'
-import { Compiler } from '../Compiler'
-import { SubQueryExpression, SubQueryLiteralFactory } from './Subqueries'
+import { wrapIdentifier } from '../../utils/index.js'
+import { Literal } from '../../Literal.js'
+import { Compiler } from '../Compiler.js'
+import { SubQueryExpression, SubQueryLiteralFactory } from './Subqueries.js'
 
 namespace With {
 	type CteOptions = {

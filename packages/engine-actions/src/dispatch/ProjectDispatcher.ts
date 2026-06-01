@@ -1,9 +1,9 @@
 import { DatabaseContext } from '@contember/engine-system-api'
-import { EventDispatcher } from './EventDispatcher'
+import { EventDispatcher } from './EventDispatcher.js'
 import { ContentSchemaResolver } from '@contember/engine-http'
 import { Runnable, RunnableArgs, Running } from '@contember/engine-common'
 import { Listener } from '@contember/database'
-import { NOTIFY_CHANNEL_NAME } from '../utils/notifyChannel'
+import { NOTIFY_CHANNEL_NAME } from '../utils/notifyChannel.js'
 
 export class ProjectDispatcherFactory {
 	constructor(

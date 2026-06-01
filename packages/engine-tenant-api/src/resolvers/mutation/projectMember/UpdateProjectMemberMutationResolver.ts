@@ -1,12 +1,12 @@
-import { MutationResolvers, MutationUpdateProjectMemberArgs, UpdateProjectMemberErrorCode, UpdateProjectMemberResponse } from '../../../schema'
-import { TenantResolverContext } from '../../TenantResolverContext'
-import { MembershipValidationErrorType, MembershipValidator, PermissionActions, ProjectManager, ProjectMemberManager } from '../../../model'
-import { createMembershipValidationErrorResult } from '../../membershipUtils'
-import { createMembershipModification } from '../../../model/service/membershipUtils'
-import { createErrorResponse, createProjectNotFoundResponse } from '../../errorUtils'
+import { MutationResolvers, MutationUpdateProjectMemberArgs, UpdateProjectMemberErrorCode, UpdateProjectMemberResponse } from '../../../schema/index.js'
+import { TenantResolverContext } from '../../TenantResolverContext.js'
+import { MembershipValidationErrorType, MembershipValidator, PermissionActions, ProjectManager, ProjectMemberManager } from '../../../model/index.js'
+import { createMembershipValidationErrorResult } from '../../membershipUtils.js'
+import { createMembershipModification } from '../../../model/service/membershipUtils.js'
+import { createErrorResponse, createProjectNotFoundResponse } from '../../errorUtils.js'
 import { Acl } from '@contember/schema'
-import { ProjectMembershipByIdentityQuery } from '../../../model/queries'
-import { logProjectMembershipChange } from './audit'
+import { ProjectMembershipByIdentityQuery } from '../../../model/queries/index.js'
+import { logProjectMembershipChange } from './audit.js'
 
 export class UpdateProjectMemberMutationResolver implements MutationResolvers {
 	constructor(

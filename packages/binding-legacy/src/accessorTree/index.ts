@@ -1,1 +1,1 @@
-export * from './NormalizedPersistedData'
+export * from './NormalizedPersistedData.js'

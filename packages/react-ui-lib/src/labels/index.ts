@@ -1,2 +1,2 @@
-export * from './field-labels'
-export * from './enum-labels'
+export * from './field-labels.js'
+export * from './enum-labels.js'

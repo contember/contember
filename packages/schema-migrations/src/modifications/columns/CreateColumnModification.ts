@@ -1,11 +1,11 @@
 import { MigrationBuilder } from '@contember/database-migrations'
 import { JSONValue, Model, Schema } from '@contember/schema'
-import { addField, SchemaUpdater, updateEntity, updateModel } from '../utils/schemaUpdateUtils'
-import { createModificationType, Differ, ModificationHandler } from '../ModificationHandler'
+import { addField, SchemaUpdater, updateEntity, updateModel } from '../utils/schemaUpdateUtils.js'
+import { createModificationType, Differ, ModificationHandler } from '../ModificationHandler.js'
 import { isColumn } from '@contember/schema-utils'
-import { createFields } from '../utils/diffUtils'
-import { getColumnSqlType } from '../utils/columnUtils'
-import { fillSeed, formatSeedExpression } from './columnUtils'
+import { createFields } from '../utils/diffUtils.js'
+import { getColumnSqlType } from '../utils/columnUtils.js'
+import { fillSeed, formatSeedExpression } from './columnUtils.js'
 
 export class CreateColumnModificationHandler implements ModificationHandler<CreateColumnModificationData> {
 	constructor(private readonly data: CreateColumnModificationData, private readonly schema: Schema) {}

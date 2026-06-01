@@ -1,6 +1,6 @@
-import { Workspace } from './Workspace'
+import { Workspace } from './Workspace.js'
 import { join, resolve } from 'node:path'
-import { YamlHandler } from '../fs/YamlHandler'
+import { YamlHandler } from '../fs/YamlHandler.js'
 
 export interface LocalProjectConfig {
 	apiDir?: string

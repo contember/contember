@@ -1,6 +1,6 @@
 import { ConfigProcessor, ConfigTemplate, ConfigTemplateContext } from '@contember/engine-plugins'
 import * as Typesafe from '@contember/typesafe'
-import { ProjectVimeoConfig, vimeoConfigSchema } from './Config'
+import { ProjectVimeoConfig, vimeoConfigSchema } from './Config.js'
 
 export class VimeoConfigProcessor implements ConfigProcessor<ProjectVimeoConfig> {
 	getProjectConfigSchema?(slug: string): Typesafe.Type<ProjectVimeoConfig> {

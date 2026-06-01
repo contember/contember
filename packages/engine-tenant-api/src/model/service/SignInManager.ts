@@ -1,12 +1,12 @@
-import { CreateSessionTokenErrorCode, SignInErrorCode } from '../../schema'
-import { ApiKeyManager, OtpAuthenticator } from '../service'
-import { PersonQuery, PersonRow, PersonUniqueIdentifier } from '../queries'
-import { Providers } from '../providers'
-import { DatabaseContext } from '../utils'
-import { Response, ResponseError, ResponseOk } from '../utils/Response'
-import { ImplementationException } from '../../exceptions'
-import { AuthLogService } from './AuthLogService'
-import { ApiKeyRequestInfo } from '../commands'
+import { CreateSessionTokenErrorCode, SignInErrorCode } from '../../schema/index.js'
+import { ApiKeyManager, OtpAuthenticator } from '../service/index.js'
+import { PersonQuery, PersonRow, PersonUniqueIdentifier } from '../queries/index.js'
+import { Providers } from '../providers.js'
+import { DatabaseContext } from '../utils/index.js'
+import { Response, ResponseError, ResponseOk } from '../utils/Response.js'
+import { ImplementationException } from '../../exceptions.js'
+import { AuthLogService } from './AuthLogService.js'
+import { ApiKeyRequestInfo } from '../commands/index.js'
 
 class SignInManager {
 	constructor(

@@ -1,6 +1,6 @@
 import { InsertBuilder } from '@contember/database'
-import { Command } from '../Command'
-import { RateLimitScope } from '../../type/RateLimit'
+import { Command } from '../Command.js'
+import { RateLimitScope } from '../../type/RateLimit.js'
 
 export class RecordRateLimitEventCommand implements Command<void> {
 	constructor(

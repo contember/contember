@@ -2,9 +2,9 @@ import { Component, Field, FieldAccessor, FieldBasicProps, QueryLanguage, useEnt
 import { FunctionComponent, useCallback, useMemo, useState } from 'react'
 import { Descendant, Editor, Element as SlateElement, Node as SlateNode, NodeEntry, Transforms } from 'slate'
 import { Slate } from 'slate-react'
-import { createEditor, CreateEditorPublicOptions } from '../editor'
-import { paragraphElementType } from '../plugins'
-import { useRichTextFieldNodes } from '../internal/hooks/useRichTextFieldNodes'
+import { createEditor, CreateEditorPublicOptions } from '../editor/index.js'
+import { paragraphElementType } from '../plugins/index.js'
+import { useRichTextFieldNodes } from '../internal/hooks/useRichTextFieldNodes.js'
 
 export type RichTextEditorProps =
 	& FieldBasicProps

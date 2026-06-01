@@ -1,5 +1,5 @@
 import { MembershipInput } from '@contember/graphql-client-tenant'
-import { dict } from '../dict'
+import { dict } from '../dict.js'
 import { Button } from '@contember/react-ui-lib-base'
 import { PlusIcon, XIcon } from 'lucide-react'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@contember/react-ui-lib-base'

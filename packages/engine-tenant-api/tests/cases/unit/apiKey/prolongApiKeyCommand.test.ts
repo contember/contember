@@ -1,5 +1,5 @@
 import { expect, test } from 'bun:test'
-import { ApiKey, ApiKeyRequestInfo, ApiKeyTrackingState, DatabaseContext, ProlongApiKeyCommand, Providers } from '../../../../src'
+import { ApiKey, ApiKeyRequestInfo, ApiKeyTrackingState, DatabaseContext, ProlongApiKeyCommand, Providers } from '../../../../src/index.js'
 import { createConnectionMock, ExpectedQuery } from '@contember/database-tester'
 
 const baseProviders: Providers = {

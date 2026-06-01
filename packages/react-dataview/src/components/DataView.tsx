@@ -1,9 +1,9 @@
 import { ReactNode, useState } from 'react'
 import { Component, EntityAccessor, Environment, QueryLanguage } from '@contember/react-binding'
-import { useDataView, UseDataViewArgs } from '../hooks'
-import { ControlledDataView } from './ControlledDataView'
-import { DataViewLoader } from '../internal/components/DataViewLoader'
-import { DataViewUnionFilterFields } from '../filterTypes'
+import { useDataView, UseDataViewArgs } from '../hooks/index.js'
+import { ControlledDataView } from './ControlledDataView.js'
+import { DataViewLoader } from '../internal/components/DataViewLoader.js'
+import { DataViewUnionFilterFields } from '../filterTypes/index.js'
 import { getStateStorage, StateStorageOrName } from '@contember/react-utils'
 import {
 	DataViewStoredStateArgs,
@@ -12,11 +12,11 @@ import {
 	getDataViewPagingSettingStorageArgs,
 	getDataViewSelectionStorageArgs,
 	getDataViewSortingStorageArgs,
-} from '../internal/stateStorage'
-import { resolveFilters } from '../internal/hooks/useDataViewResolvedFilters'
-import { resolveOrderBy } from '../internal/hooks/useDataViewSorting'
-import { collectStaticInfo } from '../internal/helpers/staticAnalyzer'
-import { getDataViewKey } from '../internal/helpers/getDataViewKey'
+} from '../internal/stateStorage.js'
+import { resolveFilters } from '../internal/hooks/useDataViewResolvedFilters.js'
+import { resolveOrderBy } from '../internal/hooks/useDataViewSorting.js'
+import { collectStaticInfo } from '../internal/helpers/staticAnalyzer.js'
+import { getDataViewKey } from '../internal/helpers/getDataViewKey.js'
 
 export type DataViewProps =
 	& {

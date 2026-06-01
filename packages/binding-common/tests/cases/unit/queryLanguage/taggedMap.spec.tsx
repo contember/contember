@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'bun:test'
-import { Environment } from '../../../../src/environment'
-import { Parser } from '../../../../src/queryLanguage'
-import type { ParsedTaggedMap } from '../../../../src/queryLanguage/ParserResults'
+import { Environment } from '../../../../src/environment/index.js'
+import { Parser } from '../../../../src/queryLanguage/index.js'
+import type { ParsedTaggedMap } from '../../../../src/queryLanguage/ParserResults.js'
 
 const parse = (input: string): ParsedTaggedMap => {
 	return Parser.parseQueryLanguageExpression(input, 'taggedMap', Environment.create())

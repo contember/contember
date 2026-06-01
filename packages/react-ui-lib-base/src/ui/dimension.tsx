@@ -1,4 +1,4 @@
-import { uic } from '../utils'
+import { uic } from '../utils/index.js'
 
 export const DimensionLabelWrapperUI = uic('div', {
 	baseClass: 'flex justify-between items-center',

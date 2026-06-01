@@ -1,9 +1,9 @@
 import { FC, ReactNode, useCallback, useEffect, useRef, useState } from 'react'
-import { RequestState } from '../../types'
-import { requestStateToPath } from '../utils/urlMapper'
-import { AddRequestListenerContext, CurrentRequestContext, PushRequestContext, useRouting } from '../../contexts'
-import { populateRequest } from '../utils/populateRequest'
-import { useRequestChangeListeners } from '../hooks/useRequestChangeListeners'
+import { RequestState } from '../../types/index.js'
+import { requestStateToPath } from '../utils/urlMapper.js'
+import { AddRequestListenerContext, CurrentRequestContext, PushRequestContext, useRouting } from '../../contexts.js'
+import { populateRequest } from '../utils/populateRequest.js'
+import { useRequestChangeListeners } from '../hooks/useRequestChangeListeners.js'
 
 export const RequestProvider: FC<{ children: ReactNode }> = ({ children }) => {
 	const routing = useRouting()

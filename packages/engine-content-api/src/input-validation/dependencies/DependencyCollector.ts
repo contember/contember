@@ -1,5 +1,5 @@
 import { Validation } from '@contember/schema'
-import { assertNever } from '../../utils'
+import { assertNever } from '../../utils/index.js'
 import { InputValidation } from '@contember/schema-definition'
 
 export class DependencyCollector {

@@ -1,6 +1,6 @@
 import { Schema, Settings } from '@contember/schema'
-import { SchemaUpdater } from '../utils/schemaUpdateUtils'
-import { createModificationType, Differ, ModificationHandler } from '../ModificationHandler'
+import { SchemaUpdater } from '../utils/schemaUpdateUtils.js'
+import { createModificationType, Differ, ModificationHandler } from '../ModificationHandler.js'
 import deepEqual from 'fast-deep-equal'
 
 export class UpdateSettingsModificationHandler implements ModificationHandler<UpdateSettingsModificationData> {

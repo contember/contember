@@ -1,5 +1,5 @@
-import { Interval } from './types'
-import { OutputInterval } from './types'
+import { Interval } from './types.js'
+import { OutputInterval } from './types.js'
 import { GraphQLResolveInfo, GraphQLScalarType, GraphQLScalarTypeConfig } from 'graphql'
 export type Maybe<T> = T | null
 export type InputMaybe<T> = Maybe<T>

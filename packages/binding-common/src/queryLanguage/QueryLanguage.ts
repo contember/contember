@@ -1,4 +1,4 @@
-import type { Environment } from '../environment'
+import type { Environment } from '../environment/index.js'
 import {
 	Alias,
 	EntityCreationParametersDefaults,
@@ -41,12 +41,12 @@ import {
 	UnsugarableEntityListEventListeners,
 	UnsugarableFieldEventListeners,
 	UnsugarableSingleEntityEventListeners,
-} from '../treeParameters'
-import { Parser } from './Parser'
-import { ParsedHasManyRelation, ParsedHasOneRelation } from './ParserResults'
-import { TokenRegExps } from './tokenList'
-import { TreeParameterMerger } from '../treeParameters/TreeParameterMerger'
-import { VariableInputTransformer } from '../environment/VariableInputTransformer'
+} from '../treeParameters/index.js'
+import { Parser } from './Parser.js'
+import { ParsedHasManyRelation, ParsedHasOneRelation } from './ParserResults.js'
+import { TokenRegExps } from './tokenList.js'
+import { TreeParameterMerger } from '../treeParameters/TreeParameterMerger.js'
+import { VariableInputTransformer } from '../environment/VariableInputTransformer.js'
 
 const emptyObject = Object.freeze({})
 

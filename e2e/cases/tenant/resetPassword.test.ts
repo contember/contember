@@ -1,5 +1,5 @@
 import { expect, test } from 'bun:test'
-import { consumeMails, createTester, loginToken, rand } from '../../src/tester'
+import { consumeMails, createTester, loginToken, rand } from '../../src/tester.js'
 import { emptySchema } from '@contember/schema-utils'
 import * as TenantApi from '@contember/graphql-client-tenant'
 

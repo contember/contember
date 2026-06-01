@@ -1,6 +1,6 @@
 import { useCallback } from 'react'
-import { RequestParameters, RoutingLinkTarget } from '../types'
-import { useLinkFactory } from './useLinkFactory'
+import { RequestParameters, RoutingLinkTarget } from '../types/index.js'
+import { useLinkFactory } from './useLinkFactory.js'
 
 export const useRedirect = () => {
 	const linkFactory = useLinkFactory()

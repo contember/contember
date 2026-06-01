@@ -1,7 +1,7 @@
 import { Actions } from '@contember/schema'
 import { emptySchema } from '@contember/schema-utils'
 import { describe } from 'bun:test'
-import { testMigrations } from '../../src/tests'
+import { testMigrations } from '../../src/tests.js'
 import { c, createSchema } from '@contember/schema-definition'
 namespace Schema {
 	export class Post {

@@ -1,6 +1,6 @@
 import { Input, Model } from '@contember/schema'
 import { Compiler, ConditionBuilder as SqlConditionBuilder, formatColumnIdentifier, Literal, Operator, QueryBuilder } from '@contember/database'
-import { UserError } from '../../exception'
+import { UserError } from '../../exception.js'
 
 export class ConditionBuilder {
 	public build(

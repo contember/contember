@@ -1,8 +1,8 @@
-import { Config } from '../type/Config'
-import { blacklist } from '../utils/blacklist'
-import { WeakPasswordReason } from '../../schema'
-import { Response, ResponseError, ResponseOk } from '../utils/Response'
-import { HibpChecker, NoopHibpChecker } from './HibpChecker'
+import { Config } from '../type/Config.js'
+import { blacklist } from '../utils/blacklist.js'
+import { WeakPasswordReason } from '../../schema/index.js'
+import { Response, ResponseError, ResponseOk } from '../utils/Response.js'
+import { HibpChecker, NoopHibpChecker } from './HibpChecker.js'
 
 export class PasswordStrengthValidator {
 	constructor(

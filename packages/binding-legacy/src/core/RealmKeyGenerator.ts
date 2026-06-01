@@ -1,6 +1,6 @@
 import { ClientGeneratedUuid, EntityFieldMarkersContainer, EntityId, EntityRealmKey, PlaceholderName, RuntimeId } from '@contember/binding-common'
 import { assertNever } from '@contember/binding-common'
-import type { EntityListState, EntityRealmBlueprint, EntityRealmState } from './state'
+import type { EntityListState, EntityRealmBlueprint, EntityRealmState } from './state/index.js'
 import { WeakIdCache } from '@contember/utilities'
 
 const GLUE = '--'

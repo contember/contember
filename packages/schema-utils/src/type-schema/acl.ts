@@ -1,6 +1,6 @@
 import { Acl, Model } from '@contember/schema'
 import * as Typesafe from '@contember/typesafe'
-import { conditionSchema } from './condition'
+import { conditionSchema } from './condition.js'
 
 const membershipMatchRuleSchema = Typesafe.union(
 	Typesafe.boolean,

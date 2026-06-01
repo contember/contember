@@ -1,7 +1,7 @@
 import { Children, isValidElement, ReactNode } from 'react'
 import { describe, expect, it } from 'bun:test'
 import { Environment } from '@contember/react-binding'
-import { RedirectOnPersist } from '../../src/components/binding/RedirectOnPersist'
+import { RedirectOnPersist } from '../../src/components/binding/RedirectOnPersist.js'
 
 interface StaticRenderProvider {
 	staticRender?: (props: any, environment: Environment) => ReactNode

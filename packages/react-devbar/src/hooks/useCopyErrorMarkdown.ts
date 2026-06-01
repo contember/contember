@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import type { ParsedStackTrace, ProcessedError } from '../ui/DevError/types'
+import type { ParsedStackTrace, ProcessedError } from '../ui/DevError/types.js'
 
 const convertStackTraceToMarkdown = (stackTrace: ParsedStackTrace, lines: string[]) => {
 	stackTrace.forEach((frame, index) => {

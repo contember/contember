@@ -1,7 +1,7 @@
 import { Environment, Filter, QualifiedEntityList } from '@contember/react-binding'
 import { useMemo } from 'react'
 import { useEnvironment } from '@contember/react-binding'
-import { DataViewFilterHandlerRegistry, DataViewFilteringArtifacts } from '../../types'
+import { DataViewFilterHandlerRegistry, DataViewFilteringArtifacts } from '../../types/index.js'
 
 export type UseDataViewResolvedFiltersArgs = {
 	filters: DataViewFilteringArtifacts

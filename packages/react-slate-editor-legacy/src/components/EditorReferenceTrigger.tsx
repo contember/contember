@@ -4,9 +4,9 @@ import { useEnvironment } from '@contember/react-binding'
 import { useSlate } from 'slate-react'
 import { Slot } from '@radix-ui/react-slot'
 import * as React from 'react'
-import { EditorWithBlocks, ReferenceElement, referenceElementType } from '../blockEditor'
-import { useEditorReferenceBlocks } from '../contexts'
-import { getDiscriminatedDatum } from '../discrimination'
+import { EditorWithBlocks, ReferenceElement, referenceElementType } from '../blockEditor/index.js'
+import { useEditorReferenceBlocks } from '../contexts.js'
+import { getDiscriminatedDatum } from '../discrimination/index.js'
 
 export interface EditorReferenceTriggerProps {
 	referenceType: OptionallyVariableFieldValue

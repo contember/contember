@@ -1,4 +1,4 @@
-import { Logger, LoggerAttributes, LoggerHandler, LoggerOptions } from './types'
+import { Logger, LoggerAttributes, LoggerHandler, LoggerOptions } from './types.js'
 import { AsyncLocalStorage } from 'node:async_hooks'
 
 const loggerStore = new AsyncLocalStorage<Logger>()

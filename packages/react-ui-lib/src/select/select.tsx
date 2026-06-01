@@ -18,10 +18,10 @@ import {
 	SelectInputUI,
 	SelectInputWrapperUI,
 	SelectPopoverContent,
-} from './ui'
-import { DefaultSelectDataView } from './list'
+} from './ui.js'
+import { DefaultSelectDataView } from './list.js'
 import { Select, SelectEachValue, SelectItemTrigger, SelectPlaceholder } from '@contember/react-select'
-import { CreateEntityDialog } from './create-new'
+import { CreateEntityDialog } from './create-new.js'
 import { DataViewSortingDirections, DataViewUnionFilterFields } from '@contember/react-dataview'
 import { useFormFieldId } from '@contember/react-form'
 import { dict } from '@contember/react-ui-lib-base'

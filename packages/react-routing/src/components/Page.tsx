@@ -1,5 +1,5 @@
 import { FunctionComponent, ReactNode } from 'react'
-import { useCurrentRequest } from '../contexts'
+import { useCurrentRequest } from '../contexts.js'
 
 export interface PageProps<P> {
 	name: string

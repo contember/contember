@@ -1,9 +1,9 @@
 import { join } from 'node:path'
-import { ConfigSource, readConfig, ServerConfig } from '../config/config'
+import { ConfigSource, readConfig, ServerConfig } from '../config/config.js'
 import { Type } from '@contember/typesafe'
 import { createLogger, JsonStreamLoggerHandler, Logger, LogLevels, PrettyPrintLoggerHandler } from '@contember/logger'
-import { ConfigProcessor } from '../config/ConfigProcessor'
-import { Plugin } from '../plugin/Plugin'
+import { ConfigProcessor } from '../config/ConfigProcessor.js'
+import { Plugin } from '../plugin/Plugin.js'
 import { readFile } from 'node:fs/promises'
 
 export const getServerVersion = async (): Promise<string> => {

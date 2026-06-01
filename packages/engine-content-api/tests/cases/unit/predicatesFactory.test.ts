@@ -1,8 +1,8 @@
-import { PredicateFactory, VariableInjector } from '../../../src/acl'
+import { PredicateFactory, VariableInjector } from '../../../src/acl/index.js'
 import { SchemaDefinition as def } from '@contember/schema-definition'
 import { Acl, Model } from '@contember/schema'
 import { describe, it } from 'bun:test'
-import { assert } from '../../src/assert'
+import { assert } from '../../src/assert.js'
 
 namespace TestModel {
 	export class Author {

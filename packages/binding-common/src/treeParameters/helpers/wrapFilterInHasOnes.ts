@@ -1,5 +1,5 @@
-import type { Filter, HasOneRelation } from '../../treeParameters'
-import { whereToFilter } from '../../utils/whereToFilter'
+import type { Filter, HasOneRelation } from '../../treeParameters/index.js'
+import { whereToFilter } from '../../utils/whereToFilter.js'
 
 export const wrapFilterInHasOnes = (path: HasOneRelation[], filter: Filter): Filter => {
 	for (let i = path.length - 1; i >= 0; i--) {

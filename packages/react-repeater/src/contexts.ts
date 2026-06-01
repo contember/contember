@@ -1,7 +1,7 @@
 import { EntityAccessor, EntityListAccessor } from '@contember/react-binding'
 import { createRequiredContext } from '@contember/react-utils'
 
-import { RepeaterMethods } from './types'
+import { RepeaterMethods } from './types/index.js'
 
 const RepeaterEntityListAccessorContext_ = createRequiredContext<EntityListAccessor>('RepeaterEntityListAccessorContext')
 /** @internal */

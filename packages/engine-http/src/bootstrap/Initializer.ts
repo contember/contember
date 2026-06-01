@@ -1,4 +1,4 @@
-import { ProjectGroupContainer } from '../projectGroup/ProjectGroupContainer'
+import { ProjectGroupContainer } from '../projectGroup/ProjectGroupContainer.js'
 
 export class Initializer {
 	constructor(

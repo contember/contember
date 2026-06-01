@@ -1,12 +1,12 @@
 import { ReactElement, useCallback, useMemo } from 'react'
 import * as TenantApi from '@contember/graphql-client-tenant'
-import { TenantForm } from './TenantForm'
+import { TenantForm } from './TenantForm.js'
 import { SignInErrorCode } from '@contember/graphql-client-tenant'
-import { FormContextValue, FormError, FormState } from '../../types'
-import { useForm } from '../../contexts'
+import { FormContextValue, FormError, FormState } from '../../types/index.js'
+import { useForm } from '../../contexts.js'
 import { useSetSessionToken } from '@contember/react-client'
-import { SignInMutationResult, useSignInMutation } from '../../hooks'
-import { useRedirectToBacklinkCallback } from '../../internal/hooks/useRedirectToBacklink'
+import { SignInMutationResult, useSignInMutation } from '../../hooks/index.js'
+import { useRedirectToBacklinkCallback } from '../../internal/hooks/useRedirectToBacklink.js'
 
 export type LoginFormValues = {
 	email: string

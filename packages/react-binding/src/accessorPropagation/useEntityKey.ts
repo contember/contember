@@ -1,6 +1,6 @@
 import { useContext } from 'react'
 import { BindingError, EntityAccessor } from '@contember/binding'
-import { EntityKeyContext } from './EntityKeyContext'
+import { EntityKeyContext } from './EntityKeyContext.js'
 
 export const useEntityKey = (): string | (() => EntityAccessor) => {
 	const entityKey = useContext(EntityKeyContext)

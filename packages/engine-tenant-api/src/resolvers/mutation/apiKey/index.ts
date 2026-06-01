@@ -1,2 +1,2 @@
-export * from './CreateApiKeyMutationResolver'
-export * from './DisableApiKeyMutationResolver'
+export * from './CreateApiKeyMutationResolver.js'
+export * from './DisableApiKeyMutationResolver.js'

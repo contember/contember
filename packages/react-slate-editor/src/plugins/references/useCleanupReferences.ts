@@ -2,7 +2,7 @@ import { EntityId, SugaredRelativeEntityList } from '@contember/react-binding'
 import { useEntityBeforePersist, useEntityList } from '@contember/react-binding'
 import { useReferentiallyStableCallback } from '@contember/react-utils'
 import { Descendant, Editor, Element } from 'slate'
-import { isElementWithReference } from './elements'
+import { isElementWithReference } from './elements/index.js'
 
 export const useCleanupReferences = ({ field, editor }: {
 	field: SugaredRelativeEntityList['field']

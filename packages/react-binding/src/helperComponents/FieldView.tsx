@@ -1,10 +1,10 @@
 import { useArrayMapMemo, useConstantLengthInvariant } from '@contember/react-utils'
 import { ReactElement, ReactNode, useCallback, useMemo } from 'react'
-import { useEntity } from '../accessorPropagation'
+import { useEntity } from '../accessorPropagation/index.js'
 import type { FieldAccessor, FieldValue, RelativeSingleField, SugaredRelativeSingleField } from '@contember/binding'
 import { QueryLanguage, throwBindingError } from '@contember/binding'
-import { Component } from '../coreComponents'
-import { SugaredField } from './SugaredField'
+import { Component } from '../coreComponents/index.js'
+import { SugaredField } from './SugaredField.js'
 
 export interface FieldViewCommonProps {
 	fallbackIfUnpersisted?: ReactNode

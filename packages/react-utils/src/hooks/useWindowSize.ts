@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react'
-import { useOnWindowResize } from './useOnWindowResize'
+import { useOnWindowResize } from './useOnWindowResize.js'
 
 export function useWindowSize() {
 	const [width, setWidth] = useState(window.innerWidth)

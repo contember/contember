@@ -1,6 +1,6 @@
 import { RenderElementProps } from 'slate-react'
 import { FunctionComponent } from 'react'
-import { BlockElement } from './BlockElement'
+import { BlockElement } from './BlockElement.js'
 import { OrderedListElement } from '@contember/react-slate-editor-base'
 
 export interface OrderedListRendererProps extends Omit<RenderElementProps, 'element'> {

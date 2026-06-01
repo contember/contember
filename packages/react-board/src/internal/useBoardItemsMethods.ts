@@ -8,9 +8,9 @@ import {
 	repairEntitiesOrder,
 	sortEntities,
 } from '@contember/react-binding'
-import { BoardColumnKey, UseGroupItemsByColumn } from './useGroupItemsByColumn'
-import { arrayMove } from '../utils/arrayMove'
-import { BoardAddItemMethod, BoardColumnValue, BoardMethods, BoardMoveItemMethod, BoardRemoveItemMethod } from '../types'
+import { BoardColumnKey, UseGroupItemsByColumn } from './useGroupItemsByColumn.js'
+import { arrayMove } from '../utils/arrayMove.js'
+import { BoardAddItemMethod, BoardColumnValue, BoardMethods, BoardMoveItemMethod, BoardRemoveItemMethod } from '../types/index.js'
 
 export type UseBoardItemsMethodsProps<ColumnValue extends BoardColumnValue> = {
 	itemEntities: EntityListAccessor

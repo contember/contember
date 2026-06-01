@@ -1,4 +1,4 @@
-import Loader from '../Loader'
+import Loader from '../Loader.js'
 import * as yaml from 'js-yaml'
 
 export class YamlAdapter implements Loader.Adapter {

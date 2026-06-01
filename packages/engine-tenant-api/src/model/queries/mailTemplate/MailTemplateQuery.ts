@@ -1,6 +1,6 @@
 import { DatabaseQuery, DatabaseQueryable } from '@contember/database'
-import { MailTemplateIdentifier } from '../../mailing'
-import { createMailTemplateQuery, MailTemplateRow } from './helpers'
+import { MailTemplateIdentifier } from '../../mailing/index.js'
+import { createMailTemplateQuery, MailTemplateRow } from './helpers.js'
 
 export class MailTemplateQuery extends DatabaseQuery<MailTemplateRow | null> {
 	constructor(

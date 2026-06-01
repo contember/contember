@@ -1,4 +1,4 @@
-import { Migration, RunMigration } from './Migration'
+import { Migration, RunMigration } from './Migration.js'
 
 export interface MigrationsResolverContext {
 	runMigrations: RunMigration[]

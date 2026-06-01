@@ -1,5 +1,5 @@
-import { Client, Connection } from '../client'
-import { wrapIdentifier } from './sql'
+import { Client, Connection } from '../client/index.js'
+import { wrapIdentifier } from './sql.js'
 import { clearInterval } from 'node:timers'
 
 type ListenArgs<P> = {

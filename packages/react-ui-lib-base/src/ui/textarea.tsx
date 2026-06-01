@@ -1,5 +1,5 @@
 import { useAutoHeightTextArea, useComposeRef } from '@contember/react-utils'
-import { uic } from '../utils'
+import { uic } from '../utils/index.js'
 import { ComponentProps, forwardRef, useRef } from 'react'
 
 export const Textarea = uic('textarea', {

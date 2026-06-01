@@ -1,6 +1,6 @@
 import { DatabaseQuery, DatabaseQueryable } from '@contember/database'
-import { PersonRow } from './types'
-import { PersonQueryBuilderFactory } from './PersonQueryBuilderFactory'
+import { PersonRow } from './types.js'
+import { PersonQueryBuilderFactory } from './PersonQueryBuilderFactory.js'
 
 export class PersonByIdentityBatchQuery extends DatabaseQuery<PersonRow[]> {
 	constructor(private identityIds: string[]) {

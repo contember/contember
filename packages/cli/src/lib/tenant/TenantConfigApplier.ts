@@ -1,5 +1,5 @@
-import { TenantClient } from './TenantClient'
-import { TenantConfig } from './tenantConfig'
+import { TenantClient } from './TenantClient.js'
+import { TenantConfig } from './tenantConfig.js'
 
 export interface TenantConfigApplyOptions {
 	dryRun?: boolean

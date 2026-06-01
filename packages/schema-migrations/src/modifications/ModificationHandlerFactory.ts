@@ -1,8 +1,8 @@
 import { Schema } from '@contember/schema'
-import { ModificationHandler, ModificationHandlerOptions, ModificationType } from './ModificationHandler'
-import { patchAclSchemaModification, updateAclSchemaModification } from './acl'
-import { createColumnModification, updateColumnDefinitionModification, updateColumnNameModification } from './columns'
-import { createUniqueConstraintModification, removeUniqueConstraintModification } from './constraints'
+import { ModificationHandler, ModificationHandlerOptions, ModificationType } from './ModificationHandler.js'
+import { patchAclSchemaModification, updateAclSchemaModification } from './acl/index.js'
+import { createColumnModification, updateColumnDefinitionModification, updateColumnNameModification } from './columns/index.js'
+import { createUniqueConstraintModification, removeUniqueConstraintModification } from './constraints/index.js'
 import {
 	createEntityModification,
 	createViewModification,
@@ -10,10 +10,10 @@ import {
 	toggleEventLogModification,
 	updateEntityNameModification,
 	updateEntityTableNameModification,
-} from './entities'
-import { updateViewModification } from './entities/UpdateViewModification'
-import { createEnumModification, removeEnumModification, updateEnumModification } from './enums'
-import { removeFieldModification, updateFieldNameModification } from './fields'
+} from './entities/index.js'
+import { updateViewModification } from './entities/UpdateViewModification.js'
+import { createEnumModification, removeEnumModification, updateEnumModification } from './enums/index.js'
+import { removeFieldModification, updateFieldNameModification } from './fields/index.js'
 import {
 	convertOneHasManyToManyHasManyRelationModification,
 	convertOneToManyRelationModification,
@@ -26,17 +26,17 @@ import {
 	toggleJunctionEventLogModification,
 	updateRelationOnDeleteModification,
 	updateRelationOrderByModification,
-} from './relations'
-import { patchValidationSchemaModification, updateValidationSchemaModification } from './validation'
-import { createIndexModification, removeIndexModification } from './indexes'
-import { updateSettingsModification } from './settings'
-import { createTriggerModification, patchTriggerModification, removeTriggerModification, updateTriggerModification } from './actions'
-import { createTargetModification } from './actions/CreateTargetModification'
-import { removeTargetModification } from './actions/RemoveTargetModification'
-import { updateTargetModification } from './actions/UpdateTargetModification'
-import { updateEntityOrderByModification } from './entities/UpdateEntityOrderByModification'
-import { removeIndexNamesModification } from './upgrade/RemoveIndexNamesModification'
-import { convertOneHasManyToOneHasOneRelationModification } from './relations/ConvertOneHasManyToOneHasOneRelationModification'
+} from './relations/index.js'
+import { patchValidationSchemaModification, updateValidationSchemaModification } from './validation/index.js'
+import { createIndexModification, removeIndexModification } from './indexes/index.js'
+import { updateSettingsModification } from './settings/index.js'
+import { createTriggerModification, patchTriggerModification, removeTriggerModification, updateTriggerModification } from './actions/index.js'
+import { createTargetModification } from './actions/CreateTargetModification.js'
+import { removeTargetModification } from './actions/RemoveTargetModification.js'
+import { updateTargetModification } from './actions/UpdateTargetModification.js'
+import { updateEntityOrderByModification } from './entities/UpdateEntityOrderByModification.js'
+import { removeIndexNamesModification } from './upgrade/RemoveIndexNamesModification.js'
+import { convertOneHasManyToOneHasOneRelationModification } from './relations/ConvertOneHasManyToOneHasOneRelationModification.js'
 
 class ModificationHandlerFactory {
 	constructor(private readonly map: Record<string, ModificationType<string, any>>) {}

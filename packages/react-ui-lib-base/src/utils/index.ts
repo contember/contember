@@ -1,2 +1,2 @@
-export * from './cn'
-export * from './uic'
+export * from './cn.js'
+export * from './uic.js'

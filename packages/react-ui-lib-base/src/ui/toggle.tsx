@@ -1,5 +1,5 @@
 import * as TogglePrimitive from '@radix-ui/react-toggle'
-import { ConfigVariants, uic, uiconfig } from '../utils'
+import { ConfigVariants, uic, uiconfig } from '../utils/index.js'
 
 export const toggleConfig = uiconfig({
 	baseClass:

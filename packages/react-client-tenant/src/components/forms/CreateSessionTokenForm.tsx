@@ -1,9 +1,9 @@
 import { ReactElement } from 'react'
-import { TenantForm } from './TenantForm'
-import { FormContextValue, FormError, FormState } from '../../types'
-import { useForm } from '../../contexts'
+import { TenantForm } from './TenantForm.js'
+import { FormContextValue, FormError, FormState } from '../../types/index.js'
+import { useForm } from '../../contexts.js'
 import { CreateSessionTokenErrorCode } from '@contember/graphql-client-tenant'
-import { CreateSessionTokenMutationResult, useCreateSessionTokenMutation } from '../../hooks'
+import { CreateSessionTokenMutationResult, useCreateSessionTokenMutation } from '../../hooks/index.js'
 
 export type CreateSessionTokenFormValues = {
 	email: string

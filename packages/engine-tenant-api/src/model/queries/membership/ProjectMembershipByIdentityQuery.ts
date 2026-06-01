@@ -1,5 +1,5 @@
 import { DatabaseQuery, DatabaseQueryable, SelectBuilder } from '@contember/database'
-import { byProjectSlug } from './ProjectSlugSpecification'
+import { byProjectSlug } from './ProjectSlugSpecification.js'
 import { Acl } from '@contember/schema'
 
 class ProjectMembershipByIdentityQuery extends DatabaseQuery<ProjectMembershipByIdentityQuery.Result> {

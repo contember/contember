@@ -12,7 +12,7 @@ import {
 	HasOneRelationMarker,
 	MarkerTreeRoot,
 } from '@contember/binding'
-import { MarkerStaticAnalyzer } from './MarkerStaticAnalyzer'
+import { MarkerStaticAnalyzer } from './MarkerStaticAnalyzer.js'
 
 type Markers = FieldMarker | HasOneRelationMarker | EntityFieldMarkersContainer | EntityFieldsWithHoistablesMarker | HasManyRelationMarker
 

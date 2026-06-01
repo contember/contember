@@ -1,12 +1,12 @@
-import { PermissionFactory, PredicateFactory, PredicatesInjector, VariableInjector } from '../../../src/acl'
+import { PermissionFactory, PredicateFactory, PredicatesInjector, VariableInjector } from '../../../src/acl/index.js'
 import { AclDefinition as acl, createSchema, PermissionsBuilder, SchemaBuilder, SchemaDefinition as def } from '@contember/schema-definition'
 import { Acl, Model } from '@contember/schema'
 import { describe, it } from 'bun:test'
-import { WhereOptimizer } from '../../../src/mapper/select/optimizer/WhereOptimizer'
-import { ConditionOptimizer } from '../../../src/mapper/select/optimizer/ConditionOptimizer'
+import { WhereOptimizer } from '../../../src/mapper/select/optimizer/WhereOptimizer.js'
+import { ConditionOptimizer } from '../../../src/mapper/select/optimizer/ConditionOptimizer.js'
 import { acceptFieldVisitor, AllowAllPermissionFactory } from '@contember/schema-utils'
-import { testUuid } from '../../src/testUuid'
-import { assert } from '../../src/assert'
+import { testUuid } from '../../src/testUuid.js'
+import { assert } from '../../src/assert.js'
 
 const schema = new SchemaBuilder()
 	.enum('locale', ['cs', 'en'])

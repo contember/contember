@@ -1,1 +1,1 @@
-export * from './references'
+export * from './references.js'

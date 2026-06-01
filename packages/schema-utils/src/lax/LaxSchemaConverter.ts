@@ -1,7 +1,7 @@
 import { Model, Schema, Writable } from '@contember/schema'
-import { LaxSchema, LaxSchemaColumn, LaxSchemaEnum, LaxSchemaField, LaxSchemaRelation } from './schema'
-import { DefaultNamingConventions, NamingConventions, resolveDefaultColumnType } from '../model'
-import { emptySchema } from '../index'
+import { LaxSchema, LaxSchemaColumn, LaxSchemaEnum, LaxSchemaField, LaxSchemaRelation } from './schema.js'
+import { DefaultNamingConventions, NamingConventions, resolveDefaultColumnType } from '../model/index.js'
+import { emptySchema } from '../index.js'
 
 const simpleColumnTypes: { [K in LaxSchemaColumn['type']]: { type: Model.ColumnType; columnType: string } } = {
 	boolean: { type: Model.ColumnType.Bool, columnType: 'boolean' },

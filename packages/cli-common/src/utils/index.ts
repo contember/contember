@@ -1,1 +1,1 @@
-export * from './findPackageRoot'
+export * from './findPackageRoot.js'

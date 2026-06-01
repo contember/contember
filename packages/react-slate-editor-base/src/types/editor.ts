@@ -1,9 +1,9 @@
 import type { FocusEvent as ReactFocusEvent, KeyboardEvent as ReactKeyboardEvent, ReactElement } from 'react'
 import type { BaseEditor, Descendant, Editor, Element as SlateElement, Node as SlateNode, NodeEntry, Text as SlateText } from 'slate'
 import type { RenderElementProps, RenderLeafProps } from 'slate-react'
-import { EditorElementPlugin, EditorMarkPlugin } from './plugins'
+import { EditorElementPlugin, EditorMarkPlugin } from './plugins.js'
 import type * as Slate from 'slate'
-import { HtmlDeserializer } from '../plugins/behaviour/paste/HtmlDeserializer'
+import { HtmlDeserializer } from '../plugins/behaviour/paste/HtmlDeserializer.js'
 
 export type EditorDefaultElementFactory = (children: Descendant[]) => SlateElement
 

@@ -1,4 +1,4 @@
-import { EntityConstructor } from './decorators'
+import { EntityConstructor } from './decorators.js'
 
 export const filterEntityDefinition = (definitions: Record<string, unknown>): [string, EntityConstructor][] =>
 	Object.entries(definitions)

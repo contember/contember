@@ -1,8 +1,8 @@
 import { Input, Model } from '@contember/schema'
-import { ConditionOptimizer } from './ConditionOptimizer'
+import { ConditionOptimizer } from './ConditionOptimizer.js'
 import { acceptFieldVisitor } from '@contember/schema-utils'
-import { optimizeAnd, optimizeNot, optimizeOr } from './helpers'
-import { replaceWhere } from './WhereReplacer'
+import { optimizeAnd, optimizeNot, optimizeOr } from './helpers.js'
+import { replaceWhere } from './WhereReplacer.js'
 
 type ExtendedRelationContext = {
 	context: Model.AnyRelationContext

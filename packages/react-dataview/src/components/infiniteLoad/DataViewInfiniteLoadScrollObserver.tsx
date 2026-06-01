@@ -1,4 +1,4 @@
-import { useDataViewInfiniteLoadTrigger } from '../../contexts'
+import { useDataViewInfiniteLoadTrigger } from '../../contexts.js'
 import * as React from 'react'
 import { useEffect, useRef, useState } from 'react'
 

@@ -1,4 +1,4 @@
-import { uic } from '../utils'
+import { uic } from '../utils/index.js'
 
 export const Divider = uic('hr', {
 	baseClass: 'border-t border-divider',

@@ -1,6 +1,6 @@
-import { DatabaseContext, Identity, PermissionContext } from '../model'
+import { DatabaseContext, Identity, PermissionContext } from '../model/index.js'
 import { Logger } from '@contember/logger'
-import { AuthLogService } from '../model/service/AuthLogService'
+import { AuthLogService } from '../model/service/AuthLogService.js'
 
 export interface TenantResolverHttpInfo {
 	readonly ip: string

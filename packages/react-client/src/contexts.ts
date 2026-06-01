@@ -1,5 +1,5 @@
 import { createContext, createRequiredContext } from '@contember/react-utils'
-import { GraphQlClientFactory, SessionTokenContextValue } from './types'
+import { GraphQlClientFactory, SessionTokenContextValue } from './types/index.js'
 
 const SessionTokenContext_ = createContext<SessionTokenContextValue>('SessionTokenContext', {
 	propsToken: undefined,

@@ -1,2 +1,2 @@
-export * from './useCreateResetPasswordRequestMutation'
-export * from './useResetPasswordMutation'
+export * from './useCreateResetPasswordRequestMutation.js'
+export * from './useResetPasswordMutation.js'

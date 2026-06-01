@@ -1,10 +1,10 @@
 import { useEntity } from '@contember/react-binding'
-import { FileType, StartUploadEvent, UploaderEvents } from '../../types'
+import { FileType, StartUploadEvent, UploaderEvents } from '../../types/index.js'
 import { useReferentiallyStableCallback } from '@contember/react-utils'
-import { disconnectAtBase } from '../utils/disconnectAtBase'
-import { resolveAcceptingSingleType } from '../utils/resolveAccept'
-import { UploaderBaseFieldProps } from '../../types/base'
-import { executeExtractors } from '../utils/fillEntityFields'
+import { disconnectAtBase } from '../utils/disconnectAtBase.js'
+import { resolveAcceptingSingleType } from '../utils/resolveAccept.js'
+import { UploaderBaseFieldProps } from '../../types/base.js'
+import { executeExtractors } from '../utils/fillEntityFields.js'
 
 export type UseFillEntityArgs =
 	& UploaderEvents

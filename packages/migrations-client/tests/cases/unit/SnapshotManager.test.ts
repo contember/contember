@@ -2,7 +2,7 @@ import { afterEach, beforeEach, describe, expect, test } from 'bun:test'
 import * as fs from 'node:fs/promises'
 import * as os from 'node:os'
 import * as path from 'node:path'
-import { SnapshotFile, SnapshotManager } from '../../../src'
+import { SnapshotFile, SnapshotManager } from '../../../src/index.js'
 
 const sampleSnapshot: SnapshotFile = {
 	version: '2024-01-02-120000',

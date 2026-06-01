@@ -1,9 +1,9 @@
 import { ProjectContainer, ProjectGroupContainer } from '@contember/engine-http'
 import { AcquiringListener } from '@contember/database'
 import { Runnable, RunnableArgs, Running, Supervisor } from '@contember/engine-common'
-import { ProjectDispatcherFactory } from './ProjectDispatcher'
+import { ProjectDispatcherFactory } from './ProjectDispatcher.js'
 import { Logger } from '@contember/logger'
-import { ImplementationException } from '../ImplementationException'
+import { ImplementationException } from '../ImplementationException.js'
 
 export class DispatchWorkerSupervisorFactory {
 	constructor(

@@ -1,5 +1,5 @@
 import { DatabaseQuery, DatabaseQueryable } from '@contember/database'
-import { createMailTemplateQuery, MailTemplateRow } from './helpers'
+import { createMailTemplateQuery, MailTemplateRow } from './helpers.js'
 
 export type MailTemplateListRow =
 	& MailTemplateRow

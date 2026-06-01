@@ -1,8 +1,8 @@
-import { Command } from '../Command'
+import { Command } from '../Command.js'
 import { InsertBuilder } from '@contember/database'
-import { plusMinutes } from '../../utils/time'
-import { TokenHash } from '../../utils'
-import { PersonToken } from '../../type'
+import { plusMinutes } from '../../utils/time.js'
+import { TokenHash } from '../../utils/index.js'
+import { PersonToken } from '../../type/index.js'
 
 class SavePersonTokenCommand implements Command<SavePersonTokenCommand.Result> {
 	constructor(

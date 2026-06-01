@@ -1,10 +1,10 @@
 import { MigrationGroup } from '@contember/database-migrations'
 import { ExecutionContainerHook } from '@contember/engine-content-api'
-import { ConfigProcessor } from '../config/ConfigProcessor'
+import { ConfigProcessor } from '../config/ConfigProcessor.js'
 import * as Typesafe from '@contember/typesafe'
-import { GraphQLSchemaContributor } from '../content'
-import { Providers } from '../providers'
-import { MasterContainerHook } from '../MasterContainer'
+import { GraphQLSchemaContributor } from '../content/index.js'
+import { Providers } from '../providers.js'
+import { MasterContainerHook } from '../MasterContainer.js'
 
 export interface SchemaContributorArgs {
 	providers: Providers

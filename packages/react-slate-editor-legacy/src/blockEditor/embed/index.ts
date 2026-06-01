@@ -1,7 +1,7 @@
-export * from './core'
-import { GoogleForm, SoundCloud, Spotify, Vimeo, YouTube } from './handlers'
+export * from './core/index.js'
+import { GoogleForm, SoundCloud, Spotify, Vimeo, YouTube } from './handlers/index.js'
 
-// TODO use export * as EmbedHandlers from './handlers' once the tooling is ready.
+// TODO use export * as EmbedHandlers from './handlers/index.js' once the tooling is ready.
 export const EmbedHandlers = {
 	GoogleForm,
 	YouTube,

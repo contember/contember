@@ -17,8 +17,8 @@ import type {
 	UnconstrainedQualifiedEntityList,
 	UnconstrainedQualifiedSingleEntity,
 	UniqueWhere,
-} from '../treeParameters'
-import { BindingError } from '../BindingError'
+} from '../treeParameters/index.js'
+import { BindingError } from '../BindingError.js'
 
 export class TreeParameterMerger {
 	public static mergeHasOneRelationsWithSamePlaceholders(

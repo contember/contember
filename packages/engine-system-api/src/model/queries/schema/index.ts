@@ -1,1 +1,1 @@
-export * from './SchemaQuery'
+export * from './SchemaQuery.js'

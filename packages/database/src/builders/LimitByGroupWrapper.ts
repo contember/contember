@@ -1,8 +1,8 @@
-import { QueryBuilder } from './QueryBuilder'
-import { SelectBuilder } from './SelectBuilder'
-import { Operator } from './ConditionBuilder'
-import { Client } from '../client'
-import { WindowFunction } from './WindowFunction'
+import { QueryBuilder } from './QueryBuilder.js'
+import { SelectBuilder } from './SelectBuilder.js'
+import { Operator } from './ConditionBuilder.js'
+import { Client } from '../client/index.js'
+import { WindowFunction } from './WindowFunction.js'
 
 type OrderByCallback = <Orderable extends QueryBuilder.Orderable<any> | null>(
 	orderable: Orderable,

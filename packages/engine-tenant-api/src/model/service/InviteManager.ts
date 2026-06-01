@@ -4,20 +4,20 @@ import {
 	CreatePersonCommand,
 	CreatePersonTokenCommand,
 	SavePersonTokenCommand,
-} from '../commands'
-import { Providers } from '../providers'
-import { PersonQuery, PersonRow } from '../queries'
-import { Project, ProjectSchemaResolver } from '../type'
-import { InviteErrorCode, InviteMethod } from '../../schema'
-import { TenantRole } from '../authorization'
-import { UserMailer } from '../mailing'
-import { createAppendMembershipVariables } from './membershipUtils'
-import { Response, ResponseError, ResponseOk } from '../utils/Response'
-import { DatabaseContext, TokenHash } from '../utils'
-import { NoPassword, PasswordPlain } from '../dtos'
+} from '../commands/index.js'
+import { Providers } from '../providers.js'
+import { PersonQuery, PersonRow } from '../queries/index.js'
+import { Project, ProjectSchemaResolver } from '../type/index.js'
+import { InviteErrorCode, InviteMethod } from '../../schema/index.js'
+import { TenantRole } from '../authorization/index.js'
+import { UserMailer } from '../mailing/index.js'
+import { createAppendMembershipVariables } from './membershipUtils.js'
+import { Response, ResponseError, ResponseOk } from '../utils/Response.js'
+import { DatabaseContext, TokenHash } from '../utils/index.js'
+import { NoPassword, PasswordPlain } from '../dtos/index.js'
 import { Acl } from '@contember/schema'
-import { validateEmail } from '../utils/email'
-import { INVITATION_RESET_TOKEN_EXPIRATION_MINUTES } from '../consts/expirations'
+import { validateEmail } from '../utils/email.js'
+import { INVITATION_RESET_TOKEN_EXPIRATION_MINUTES } from '../consts/expirations.js'
 
 export interface InviteData {
 	email: string

@@ -1,10 +1,10 @@
-import { EnableIdpResponse, MutationEnableIdpArgs, MutationResolvers } from '../../../schema'
+import { EnableIdpResponse, MutationEnableIdpArgs, MutationResolvers } from '../../../schema/index.js'
 import { GraphQLResolveInfo } from 'graphql'
-import { PermissionActions } from '../../../model'
-import { IDPManager } from '../../../model/service/idp/IDPManager'
-import { createErrorResponse } from '../../errorUtils'
-import { TenantResolverContext } from '../../TenantResolverContext'
-import { ResponseOk } from '../../../model/utils/Response'
+import { PermissionActions } from '../../../model/index.js'
+import { IDPManager } from '../../../model/service/idp/IDPManager.js'
+import { createErrorResponse } from '../../errorUtils.js'
+import { TenantResolverContext } from '../../TenantResolverContext.js'
+import { ResponseOk } from '../../../model/utils/Response.js'
 
 export class EnableIDPMutationResolver implements MutationResolvers {
 	constructor(private readonly idpManager: IDPManager) {

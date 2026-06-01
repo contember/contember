@@ -1,10 +1,10 @@
 import { c, createSchema, SchemaDefinition as def } from '@contember/schema-definition'
 import { Acl } from '@contember/schema'
 import { test } from 'bun:test'
-import { execute } from '../../../../../src/test'
-import { GQL, SQL } from '../../../../../src/tags'
-import { testUuid } from '../../../../../src/testUuid'
-import { PermissionFactory } from '../../../../../../src'
+import { execute } from '../../../../../src/test.js'
+import { GQL, SQL } from '../../../../../src/tags.js'
+import { testUuid } from '../../../../../src/testUuid.js'
+import { PermissionFactory } from '../../../../../../src/index.js'
 
 namespace TestModel {
 	export class Author {

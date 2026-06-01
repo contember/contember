@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'bun:test'
-import { ConditionOptimizer } from '../../../src/mapper/select/optimizer/ConditionOptimizer'
+import { ConditionOptimizer } from '../../../src/mapper/select/optimizer/ConditionOptimizer.js'
 
 const assert = {
 	deepStrictEqual: (a: any, b: any) => {

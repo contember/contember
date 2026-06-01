@@ -1,1 +1,1 @@
-export * from './lib/tenant/tenantConfig'
+export * from './lib/tenant/tenantConfig.js'

@@ -1,8 +1,8 @@
-import { SqlUpdateInputProcessor, SqlUpdateInputProcessorResult } from './SqlUpdateInputProcessor'
-import { UpdateInputVisitor } from '../../inputProcessing'
+import { SqlUpdateInputProcessor, SqlUpdateInputProcessorResult } from './SqlUpdateInputProcessor.js'
+import { UpdateInputVisitor } from '../../inputProcessing/index.js'
 import { Input, Model } from '@contember/schema'
-import { UpdateBuilderFactory } from './UpdateBuilderFactory'
-import { Mapper } from '../Mapper'
+import { UpdateBuilderFactory } from './UpdateBuilderFactory.js'
+import { Mapper } from '../Mapper.js'
 import { acceptFieldVisitor } from '@contember/schema-utils'
 import {
 	MutationEntryNotFoundError,
@@ -11,10 +11,10 @@ import {
 	MutationResultList,
 	MutationUpdateOk,
 	NothingToDoReason,
-} from '../Result'
-import { UpdateBuilder } from './UpdateBuilder'
-import { rowDataToFieldValues } from '../ColumnValue'
-import { MapperInput } from '../types'
+} from '../Result.js'
+import { UpdateBuilder } from './UpdateBuilder.js'
+import { rowDataToFieldValues } from '../ColumnValue.js'
+import { MapperInput } from '../types.js'
 
 export class Updater {
 	constructor(

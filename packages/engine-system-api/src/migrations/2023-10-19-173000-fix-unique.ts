@@ -1,6 +1,6 @@
 import { MigrationArgs, MigrationBuilder } from '@contember/database-migrations'
 import { DatabaseMetadata, wrapIdentifier } from '@contember/database'
-import { SystemMigrationArgs } from './types'
+import { SystemMigrationArgs } from './types.js'
 import { getUniqueConstraintColumns } from '@contember/schema-migrations'
 
 export default async function(builder: MigrationBuilder, args: MigrationArgs<SystemMigrationArgs>) {

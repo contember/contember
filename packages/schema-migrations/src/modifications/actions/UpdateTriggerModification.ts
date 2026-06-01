@@ -1,9 +1,9 @@
 import { Actions, Schema } from '@contember/schema'
-import { SchemaUpdater } from '../utils/schemaUpdateUtils'
-import { createModificationType, Differ, ModificationHandler } from '../ModificationHandler'
+import { SchemaUpdater } from '../utils/schemaUpdateUtils.js'
+import { createModificationType, Differ, ModificationHandler } from '../ModificationHandler.js'
 import deepEqual from 'fast-deep-equal'
 import { createPatch } from 'rfc6902'
-import { patchTriggerModification } from './PatchTriggerModification'
+import { patchTriggerModification } from './PatchTriggerModification.js'
 
 export class UpdateTriggerModificationHandler implements ModificationHandler<UpdateTriggerModificationData> {
 	constructor(private readonly data: UpdateTriggerModificationData) {

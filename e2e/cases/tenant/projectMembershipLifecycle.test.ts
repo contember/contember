@@ -1,7 +1,7 @@
 import { expect, test } from 'bun:test'
 import { createSchema, SchemaDefinition as def } from '@contember/schema-definition'
 import { AllowAllPermissionFactory } from '@contember/schema-utils'
-import { createTester, executeGraphql, gql, rand } from '../../src/tester'
+import { createTester, executeGraphql, gql, rand } from '../../src/tester.js'
 
 namespace TagModel {
 	export class Tag {

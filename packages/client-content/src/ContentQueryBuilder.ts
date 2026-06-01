@@ -1,4 +1,4 @@
-import { ContentClientInput, MutationResult, SchemaNames, TransactionResult } from './types'
+import { ContentClientInput, MutationResult, SchemaNames, TransactionResult } from './types/index.js'
 import {
 	ContentEntitySelection,
 	ContentEntitySelectionCallback,
@@ -6,12 +6,12 @@ import {
 	ContentMutation,
 	ContentOperation,
 	ContentQuery,
-} from './nodes'
-import { createListArgs } from './utils/createListArgs'
-import { createTypedArgs } from './utils/createTypedArgs'
+} from './nodes/index.js'
+import { createListArgs } from './utils/createListArgs.js'
+import { createTypedArgs } from './utils/createTypedArgs.js'
 import { Input } from '@contember/schema'
 import { GraphQlField, GraphQlFieldTypedArgs, GraphQlFragmentSpread, GraphQlSelectionSet } from '@contember/graphql-builder'
-import { createMutationOperationSet } from './utils/createMutationOperationSet'
+import { createMutationOperationSet } from './utils/createMutationOperationSet.js'
 
 export type EntitySelectionOrCallback =
 	| ContentEntitySelection

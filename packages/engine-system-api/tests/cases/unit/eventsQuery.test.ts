@@ -1,7 +1,7 @@
 import { expect, test } from 'bun:test'
-import { EventsQuery } from '../../../src/model'
-import { testUuid } from '../../src/uuid'
-import { EventsOrder } from '../../../src/schema'
+import { EventsQuery } from '../../../src/model/index.js'
+import { testUuid } from '../../src/uuid.js'
+import { EventsOrder } from '../../../src/schema/index.js'
 
 test('events query', async () => {
 	const query = new EventsQuery(

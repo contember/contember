@@ -1,8 +1,8 @@
 import { describe, expect, test } from 'bun:test'
 import { Runnable, RunnableArgs, Running } from '@contember/engine-common'
 import { createLogger, TestLoggerHandler } from '@contember/logger'
-import { LazyDispatchWorker } from '../../../src/dispatch/LazyDispatchWorker'
-import { DispatchWorkerSupervisorFactory } from '../../../src/dispatch/DispatchWorkerSupervisor'
+import { LazyDispatchWorker } from '../../../src/dispatch/LazyDispatchWorker.js'
+import { DispatchWorkerSupervisorFactory } from '../../../src/dispatch/DispatchWorkerSupervisor.js'
 import { ProjectGroupContainerResolver } from '@contember/engine-http'
 import { ProjectGroupContainer } from '@contember/engine-http'
 

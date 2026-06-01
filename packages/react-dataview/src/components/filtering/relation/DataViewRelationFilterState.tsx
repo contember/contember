@@ -1,9 +1,9 @@
 import * as React from 'react'
 import { isValidElement, ReactNode } from 'react'
 import { Slot } from '@radix-ui/react-slot'
-import { DataViewRelationFilterCurrent, useDataViewRelationFilter } from '../../../hooks'
+import { DataViewRelationFilterCurrent, useDataViewRelationFilter } from '../../../hooks/index.js'
 import { useEntity } from '@contember/react-binding'
-import { useDataViewFilterName } from '../../../contexts'
+import { useDataViewFilterName } from '../../../contexts.js'
 
 /**
  * Conditionally renders its children based on the current relation filter state.

@@ -1,9 +1,9 @@
 import { ReactElement, useEffect, useState } from 'react'
-import { TenantForm } from './TenantForm'
-import { FormContextValue, FormError, FormState } from '../../types'
-import { useForm } from '../../contexts'
+import { TenantForm } from './TenantForm.js'
+import { FormContextValue, FormError, FormState } from '../../types/index.js'
+import { useForm } from '../../contexts.js'
 import { MembershipInput, UpdateProjectMemberErrorCode } from '@contember/graphql-client-tenant'
-import { useProjectMembershipsQuery, useTenantQueryLoader, useUpdateProjectMemberMutation } from '../../hooks'
+import { useProjectMembershipsQuery, useTenantQueryLoader, useUpdateProjectMemberMutation } from '../../hooks/index.js'
 
 export type UpdateProjectMemberFormValues = {
 	memberships: readonly MembershipInput[]

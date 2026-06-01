@@ -1,10 +1,10 @@
-import { PackageManager } from './PackageManager'
-import { FileSystem } from '../FileSystem'
-import { Package } from '../Package'
-import { PackageJson } from '../PackageJson'
+import { PackageManager } from './PackageManager.js'
+import { FileSystem } from '../FileSystem.js'
+import { Package } from '../Package.js'
+import { PackageJson } from '../PackageJson.js'
 import { join } from 'node:path'
-import { PackageManagerHelpers } from './PackageManagerHelpers'
-import { CommandRunner } from '../CommandRunner'
+import { PackageManagerHelpers } from './PackageManagerHelpers.js'
+import { CommandRunner } from '../CommandRunner.js'
 
 export class Npm implements PackageManager {
 	constructor(

@@ -1,7 +1,7 @@
 import chalk from 'chalk'
 import { inspect } from 'node:util'
-import { LogEntry, LoggerAttributes, LoggerHandler, LogLevel } from '../types'
-import { LogLevels } from '../levels'
+import { LogEntry, LoggerAttributes, LoggerHandler, LogLevel } from '../types.js'
+import { LogLevels } from '../levels.js'
 
 export interface PrettyPrintLoggerHandlerOptions {
 	logLevel: LogLevel

@@ -9,9 +9,9 @@ import {
 	ModificationHandlerFactory,
 	ModificationHandlerOptions,
 	SchemaUpdateError,
-} from './modifications'
+} from './modifications/index.js'
 import { createMigrationBuilder } from '@contember/database-migrations'
-import { Migration } from './Migration'
+import { Migration } from './Migration.js'
 import { Schema } from '@contember/schema'
 
 export interface ModificationDescriptionResult {

@@ -1,6 +1,6 @@
 export { SchemaMigrator } from '@contember/schema-migrations'
 
-export { devTypeDefs, Schema, typeDefs } from './schema'
+export { devTypeDefs, Schema, typeDefs } from './schema/index.js'
 
 export {
 	type Command,
@@ -23,9 +23,9 @@ export {
 	StageBySlugQuery,
 	StageCreator,
 	StagesQuery,
-} from './model'
-export * from './SystemContainer'
-export * from './resolvers'
-export * from './types'
-export * from './utils'
-export * from './migrations'
+} from './model/index.js'
+export * from './SystemContainer.js'
+export * from './resolvers/index.js'
+export * from './types.js'
+export * from './utils/index.js'
+export * from './migrations/index.js'

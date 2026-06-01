@@ -5,8 +5,8 @@ import {
 	getGenericFileMetadataExtractor,
 	getImageFileDataExtractor,
 	ImageFileDataExtractorProps,
-} from '../extractors'
-import { FileType, FileWithMeta } from '../types'
+} from '../extractors/index.js'
+import { FileType, FileWithMeta } from '../types/index.js'
 
 export type ImageFileTypeProps =
 	& FileType

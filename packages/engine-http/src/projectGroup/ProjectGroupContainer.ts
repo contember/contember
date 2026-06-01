@@ -6,7 +6,7 @@ import {
 	TenantContainer,
 	TenantContainerFactory,
 } from '@contember/engine-tenant-api'
-import { TenantConfig } from '../config/config'
+import { TenantConfig } from '../config/config.js'
 import {
 	ProjectContainerFactoryFactory,
 	ProjectContainerResolver,
@@ -14,17 +14,17 @@ import {
 	ProjectInitializerProxy,
 	ProjectSchemaResolver,
 	ProjectSchemaResolverProxy,
-} from '../project'
+} from '../project/index.js'
 import { SystemContainer, SystemContainerFactory } from '@contember/engine-system-api'
-import { ProjectConfigResolver } from '../config/projectConfigResolver'
+import { ProjectConfigResolver } from '../config/projectConfigResolver.js'
 import { createSecretKey } from 'node:crypto'
 import { Logger } from '@contember/logger'
-import { TenantGraphQLHandler, TenantGraphQLHandlerFactory } from '../tenant'
-import { SystemGraphQLHandler, SystemGraphQLHandlerFactory } from '../system'
-import { Authenticator } from '../common'
-import { ProjectMembershipFetcher, ProjectMembershipResolver } from '../content'
-import { Providers } from '../providers'
-import { CryptoWrapper } from '../utils/CryptoWrapper'
+import { TenantGraphQLHandler, TenantGraphQLHandlerFactory } from '../tenant/index.js'
+import { SystemGraphQLHandler, SystemGraphQLHandlerFactory } from '../system/index.js'
+import { Authenticator } from '../common/index.js'
+import { ProjectMembershipFetcher, ProjectMembershipResolver } from '../content/index.js'
+import { Providers } from '../providers.js'
+import { CryptoWrapper } from '../utils/CryptoWrapper.js'
 
 export interface ProjectGroupContainer {
 	slug: string | undefined

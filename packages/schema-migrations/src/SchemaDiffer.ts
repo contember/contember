@@ -8,9 +8,9 @@ import {
 	SchemaValidator,
 	ValidationError,
 } from '@contember/schema-utils'
-import { SchemaMigrator } from './SchemaMigrator'
-import { Migration } from './Migration'
-import { ImplementationException } from './exceptions'
+import { SchemaMigrator } from './SchemaMigrator.js'
+import { Migration } from './Migration.js'
+import { ImplementationException } from './exceptions.js'
 import {
 	ConvertOneHasManyToManyHasManyRelationDiffer,
 	ConvertOneToManyRelationDiffer,
@@ -42,16 +42,16 @@ import {
 	UpdateRelationOrderByDiffer,
 	UpdateValidationSchemaDiffer,
 	VERSION_LATEST,
-} from './modifications'
-import { RemoveChangedFieldDiffer, RemoveViewDiffer } from './modifications/differs'
-import { CreateIndexDiffer, RemoveIndexDiffer } from './modifications/indexes'
-import { CreateTriggerDiffer, RemoveTriggerDiffer, UpdateTriggerDiffer } from './modifications/actions'
-import { UpdateTargetDiffer } from './modifications/actions/UpdateTargetModification'
-import { CreateTargetDiffer } from './modifications/actions/CreateTargetModification'
-import { RemoveTargetDiffer } from './modifications/actions/RemoveTargetModification'
-import { UpdateSettingsDiffer } from './modifications/settings'
-import { RemoveIndexNamesDiffer } from './modifications/upgrade/RemoveIndexNamesModification'
-import { ConvertOneHasManyToOneHasOneRelationDiffer } from './modifications/relations/ConvertOneHasManyToOneHasOneRelationModification'
+} from './modifications/index.js'
+import { RemoveChangedFieldDiffer, RemoveViewDiffer } from './modifications/differs/index.js'
+import { CreateIndexDiffer, RemoveIndexDiffer } from './modifications/indexes/index.js'
+import { CreateTriggerDiffer, RemoveTriggerDiffer, UpdateTriggerDiffer } from './modifications/actions/index.js'
+import { UpdateTargetDiffer } from './modifications/actions/UpdateTargetModification.js'
+import { CreateTargetDiffer } from './modifications/actions/CreateTargetModification.js'
+import { RemoveTargetDiffer } from './modifications/actions/RemoveTargetModification.js'
+import { UpdateSettingsDiffer } from './modifications/settings/index.js'
+import { RemoveIndexNamesDiffer } from './modifications/upgrade/RemoveIndexNamesModification.js'
+import { ConvertOneHasManyToOneHasOneRelationDiffer } from './modifications/relations/ConvertOneHasManyToOneHasOneRelationModification.js'
 
 export type DiffOptions = { skipRecreateValidation?: boolean; skipInitialSchemaValidation?: boolean; skipNonModelDiffers?: boolean }
 

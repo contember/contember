@@ -1,5 +1,5 @@
 import { Literal, SelectBuilder } from '@contember/database'
-import { ExecutedMigration } from '../../dtos'
+import { ExecutedMigration } from '../../dtos/index.js'
 import { VERSION_INITIAL } from '@contember/schema-migrations'
 
 type ExecutedMigrationRow = { id: number; name: string; migration: any; checksum: string | null; executed_at: Date; type: 'content' | 'schema' }

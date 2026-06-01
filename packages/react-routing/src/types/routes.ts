@@ -1,4 +1,4 @@
-import { SelectedDimension } from './dimensions'
+import { SelectedDimension } from './dimensions.js'
 
 export type RouteParams = any
 export type RouteName = string

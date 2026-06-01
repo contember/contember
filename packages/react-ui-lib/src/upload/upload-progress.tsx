@@ -14,7 +14,7 @@ import {
 	UploaderFileStateSwitch,
 	UploaderFileStateUploading,
 } from '@contember/react-uploader'
-import { formatBytes } from '../formatting/formatting'
+import { formatBytes } from '../formatting/formatting.js'
 import { Loader } from '@contember/react-ui-lib-base'
 
 const formatError = (error: unknown) => {

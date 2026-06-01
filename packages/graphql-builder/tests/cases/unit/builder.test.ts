@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test'
-import { GraphQlField, GraphQlQueryPrinter } from '../../../src'
+import { GraphQlField, GraphQlQueryPrinter } from '../../../src/index.js'
 
 describe('builder', () => {
 	test('fetch field', async () => {

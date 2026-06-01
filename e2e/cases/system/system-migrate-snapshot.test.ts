@@ -1,5 +1,5 @@
 import { expect, test } from 'bun:test'
-import { createTester, gql } from '../../src/tester'
+import { createTester, gql } from '../../src/tester.js'
 import { createSchema, SchemaDefinition as def } from '@contember/schema-definition'
 import { emptySchema } from '@contember/schema-utils'
 import { ModificationHandlerFactory, SchemaDiffer, SchemaMigrator, VERSION_LATEST } from '@contember/schema-migrations'

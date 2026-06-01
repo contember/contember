@@ -1,7 +1,7 @@
 import { Model } from '@contember/schema'
-import { EnumTypeSchemaGenerator } from './EnumTypeSchemaGenerator'
-import { EntityTypeSchemaGenerator } from './EntityTypeSchemaGenerator'
-import { NameSchemaGenerator } from './NameSchemaGenerator'
+import { EnumTypeSchemaGenerator } from './EnumTypeSchemaGenerator.js'
+import { EntityTypeSchemaGenerator } from './EntityTypeSchemaGenerator.js'
+import { NameSchemaGenerator } from './NameSchemaGenerator.js'
 
 export class ContemberClientGenerator {
 	constructor(

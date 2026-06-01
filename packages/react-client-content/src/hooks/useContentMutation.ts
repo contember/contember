@@ -1,6 +1,6 @@
 import { ContentMutation, ContentQuery, QueryExecutorOptions } from '@contember/client-content'
 import { useRef, useState } from 'react'
-import { useContentClient } from './useContentClient'
+import { useContentClient } from './useContentClient.js'
 import { useReferentiallyStableCallback } from '@contember/react-utils'
 
 export type ContentMutationState<Result> =

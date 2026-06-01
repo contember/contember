@@ -1,1 +1,1 @@
-export * from './useBlockRepeaterCurrentBlock'
+export * from './useBlockRepeaterCurrentBlock.js'

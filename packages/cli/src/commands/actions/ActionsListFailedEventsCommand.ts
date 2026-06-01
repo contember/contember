@@ -1,6 +1,6 @@
 import { Command, CommandConfiguration, Input } from '@contember/cli-common'
-import { RemoteProjectResolver } from '../../lib/project/RemoteProjectResolver'
-import { ActionsClient } from '../../lib/actions/ActionsClient'
+import { RemoteProjectResolver } from '../../lib/project/RemoteProjectResolver.js'
+import { ActionsClient } from '../../lib/actions/ActionsClient.js'
 import chalkTable from 'chalk-table'
 type Args = {}
 

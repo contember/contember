@@ -1,9 +1,9 @@
 import { Acl, Input, Model } from '@contember/schema'
-import { assertNever } from '../../utils'
+import { assertNever } from '../../utils/index.js'
 import { Client, DeleteBuilder, Literal, SelectBuilder } from '@contember/database'
-import { PathFactory, WhereBuilder } from '../select'
-import { PredicateFactory } from '../../acl'
-import { UpdateBuilderFactory } from '../update'
+import { PathFactory, WhereBuilder } from '../select/index.js'
+import { PredicateFactory } from '../../acl/index.js'
+import { UpdateBuilderFactory } from '../update/index.js'
 import {
 	ConstraintType,
 	MutationConstraintViolationError,
@@ -14,20 +14,20 @@ import {
 	MutationResultList,
 	MutationUpdateOk,
 	NothingToDoReason,
-} from '../Result'
-import { Mapper } from '../Mapper'
-import { CheckedPrimary } from '../CheckedPrimary'
-import { DeleteState } from './DeleteState'
+} from '../Result.js'
+import { Mapper } from '../Mapper.js'
+import { CheckedPrimary } from '../CheckedPrimary.js'
+import { DeleteState } from './DeleteState.js'
 import {
 	EntityReferenceRow,
 	findOwningRelations,
 	findRelationsWithOrphanRemoval,
 	formatConstraintViolationMessage,
 	OneHasOneOwningRelationTuple,
-} from './helpers'
+} from './helpers.js'
 import { getEntity } from '@contember/schema-utils'
-import { AfterUpdateEvent, BeforeDeleteEvent, BeforeUpdateEvent, EventManager } from '../EventManager'
-import { ImplementationException } from '../../exception'
+import { AfterUpdateEvent, BeforeDeleteEvent, BeforeUpdateEvent, EventManager } from '../EventManager.js'
+import { ImplementationException } from '../../exception.js'
 
 type DeleteQueue = [entity: Model.Entity, ids: Input.PrimaryValue[]][]
 

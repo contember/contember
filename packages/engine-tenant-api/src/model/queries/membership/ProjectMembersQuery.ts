@@ -1,6 +1,6 @@
 import { DatabaseQuery, DatabaseQueryable, SelectBuilder } from '@contember/database'
-import { MemberType, ProjectMembersInput } from '../../../schema'
-import { ImplementationException } from '../../../exceptions'
+import { MemberType, ProjectMembersInput } from '../../../schema/index.js'
+import { ImplementationException } from '../../../exceptions.js'
 
 export class ProjectMembersQuery extends DatabaseQuery<ProjectMembersQueryResult> {
 	constructor(

@@ -1,4 +1,4 @@
-import { PackageJson } from './PackageJson'
+import { PackageJson } from './PackageJson.js'
 
 export class Package {
 	constructor(

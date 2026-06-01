@@ -1,5 +1,5 @@
-import { ContentEvent, CreateEvent, DeleteEvent, EventType, UpdateEvent } from '../../events'
-import { assertNever } from '../../../utils'
+import { ContentEvent, CreateEvent, DeleteEvent, EventType, UpdateEvent } from '../../events/index.js'
+import { assertNever } from '../../../utils/index.js'
 
 export type EventRow = {
 	id: string

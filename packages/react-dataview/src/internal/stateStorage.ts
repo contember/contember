@@ -6,7 +6,7 @@ import {
 	DataViewSelectionProps,
 	DataViewSelectionValues,
 	DataViewSortingState,
-} from '../types'
+} from '../types/index.js'
 
 export const dataViewKeyFallback = 'dataview'
 

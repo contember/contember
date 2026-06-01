@@ -1,9 +1,9 @@
 import { Editor } from 'slate'
-import { AnchorModifications } from './AnchorModifications'
-import { AnchorElement, anchorElementPlugin } from './AnchorElement'
-import { anchorHtmlDeserializer } from './AnchorHtmlDeserializer'
-import { ElementRenderer } from '../../../types'
-import { parseUrl } from '../../../internal/utils'
+import { AnchorModifications } from './AnchorModifications.js'
+import { AnchorElement, anchorElementPlugin } from './AnchorElement.js'
+import { anchorHtmlDeserializer } from './AnchorHtmlDeserializer.js'
+import { ElementRenderer } from '../../../types/index.js'
+import { parseUrl } from '../../../internal/utils/index.js'
 
 export const withAnchors = ({ render }: { render: ElementRenderer<AnchorElement> }) => <E extends Editor>(editor: E): E => {
 	const { insertText } = editor

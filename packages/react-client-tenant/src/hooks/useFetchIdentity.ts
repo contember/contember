@@ -1,8 +1,8 @@
 import { useCallback, useMemo, useState } from 'react'
-import { Identity, IdentityMethods, IdentityStateValue } from '../types'
+import { Identity, IdentityMethods, IdentityStateValue } from '../types/index.js'
 import { GraphQlClientError, useSessionToken } from '@contember/react-client'
-import { useLogoutInternal } from '../internal/hooks/useLogoutInternal'
-import { useMeQuery } from './queries'
+import { useLogoutInternal } from '../internal/hooks/useLogoutInternal.js'
+import { useMeQuery } from './queries/index.js'
 
 export const useFetchIdentity = (): [{ state: IdentityStateValue; identity: Identity | undefined }, IdentityMethods] => {
 	const sessionToken = useSessionToken()

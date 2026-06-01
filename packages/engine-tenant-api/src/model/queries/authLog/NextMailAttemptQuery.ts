@@ -1,5 +1,5 @@
 import { DatabaseQuery, DatabaseQueryable, Literal, SelectBuilder } from '@contember/database'
-import { AuthActionType } from '../../type/AuthLog'
+import { AuthActionType } from '../../type/AuthLog.js'
 
 /**
  * Per-email exponential backoff for mail-sending init flows (password reset,

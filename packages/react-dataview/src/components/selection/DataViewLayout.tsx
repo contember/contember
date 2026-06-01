@@ -1,6 +1,6 @@
 import { Component } from '@contember/react-binding'
-import { dataViewSelectionEnvironmentExtension } from '../../env/dataViewSelectionEnvironmentExtension'
-import { useDataViewDisplayedState } from '../../contexts'
+import { dataViewSelectionEnvironmentExtension } from '../../env/dataViewSelectionEnvironmentExtension.js'
+import { useDataViewDisplayedState } from '../../contexts.js'
 import { ReactNode } from 'react'
 
 export interface DataViewLayoutProps {

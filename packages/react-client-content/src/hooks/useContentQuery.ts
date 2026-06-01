@@ -1,6 +1,6 @@
 import { ContentOperation, ContentQuery, QueryExecutorOptions } from '@contember/client-content'
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { useContentClient } from './useContentClient'
+import { useContentClient } from './useContentClient.js'
 import { useConstantValueInvariant, useObjectMemo } from '@contember/react-utils'
 
 export type ContentQueryOptions = QueryExecutorOptions

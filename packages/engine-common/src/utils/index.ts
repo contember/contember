@@ -1,1 +1,1 @@
-export * from './PromiseMap'
+export * from './PromiseMap.js'

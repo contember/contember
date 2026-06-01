@@ -1,2 +1,2 @@
-export * from './useRichTextFieldSource'
-export * from './useRichTextBlocksSource'
+export * from './useRichTextFieldSource.js'
+export * from './useRichTextBlocksSource.js'

@@ -1,9 +1,9 @@
-import { Command } from '../Command'
-import { ApiKey } from '../../type'
-import { ApiKeyHelper } from './ApiKeyHelper'
+import { Command } from '../Command.js'
+import { ApiKey } from '../../type/index.js'
+import { ApiKeyHelper } from './ApiKeyHelper.js'
 import { InsertBuilder } from '@contember/database'
-import { computeTokenHash, generateToken, TokenHash } from '../../utils'
-import { ApiKeyRequestInfo } from './ProlongApiKeyCommand'
+import { computeTokenHash, generateToken, TokenHash } from '../../utils/index.js'
+import { ApiKeyRequestInfo } from './ProlongApiKeyCommand.js'
 
 interface CreateSessionApiKeyArgs {
 	type: ApiKey.Type.SESSION

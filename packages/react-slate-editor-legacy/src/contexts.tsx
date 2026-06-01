@@ -1,5 +1,5 @@
 import { createRequiredContext } from '@contember/react-utils'
-import { EditorReferenceBlocks } from './blockEditor'
+import { EditorReferenceBlocks } from './blockEditor/index.js'
 
 const EditorReferenceBlocksContext_ = createRequiredContext<EditorReferenceBlocks>('EditorReferenceBlocksContext')
 /** @internal */

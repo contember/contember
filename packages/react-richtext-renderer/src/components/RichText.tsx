@@ -1,7 +1,7 @@
 import { createElement } from 'react'
-import { renderChildren } from '../internal/renderChildren'
-import type { RichTextBlock } from '../types'
-import { RichTextElement, RichTextLeaf, RichTextRenderingOptions } from '../types'
+import { renderChildren } from '../internal/renderChildren.js'
+import type { RichTextBlock } from '../types/index.js'
+import { RichTextElement, RichTextLeaf, RichTextRenderingOptions } from '../types/index.js'
 
 export type RichTextProps<
 	CustomElements extends RichTextElement = never,

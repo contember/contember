@@ -1,6 +1,6 @@
 import { Schema } from '@contember/schema'
-import { DefaultNamingConventions, NamingConventions } from '../model'
-import { DefinitionCodeGenerator } from './DefinitionCodeGenerator'
+import { DefaultNamingConventions, NamingConventions } from '../model/index.js'
+import { DefinitionCodeGenerator } from './DefinitionCodeGenerator.js'
 
 /**
  * @deprecated use {@link DefinitionCodeGenerator}

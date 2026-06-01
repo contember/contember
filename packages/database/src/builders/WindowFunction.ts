@@ -1,7 +1,7 @@
-import { QueryBuilder } from './QueryBuilder'
-import { Literal } from '../Literal'
-import { columnExpressionToLiteral } from './utils'
-import { formatColumnIdentifier } from '../utils'
+import { QueryBuilder } from './QueryBuilder.js'
+import { Literal } from '../Literal.js'
+import { columnExpressionToLiteral } from './utils.js'
+import { formatColumnIdentifier } from '../utils/index.js'
 
 class WindowFunction<HasFunction extends boolean> implements QueryBuilder.Orderable<WindowFunction<HasFunction>> {
 	private constructor(

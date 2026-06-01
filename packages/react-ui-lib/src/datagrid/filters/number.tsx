@@ -11,14 +11,14 @@ import {
 	useDataViewFilterName,
 } from '@contember/react-dataview'
 import { Popover, PopoverContent, PopoverTrigger } from '@contember/react-ui-lib-base'
-import { DataGridActiveFilterUI, DataGridFilterSelectTriggerUI, DataGridSingleFilterUI } from '../ui'
-import { DataGridNullFilter } from './common'
+import { DataGridActiveFilterUI, DataGridFilterSelectTriggerUI, DataGridSingleFilterUI } from '../ui.js'
+import { DataGridNullFilter } from './common.js'
 import { Input } from '@contember/react-ui-lib-base'
-import { formatNumber } from '../../formatting'
+import { formatNumber } from '../../formatting/index.js'
 import { dict } from '@contember/react-ui-lib-base'
 import { Component } from '@contember/interface'
-import { DataGridFilterMobileHiding } from './mobile'
-import { DataViewFieldLabel } from '../labels'
+import { DataGridFilterMobileHiding } from './mobile.js'
+import { DataViewFieldLabel } from '../labels.js'
 
 /**
  * Props for {@link DataGridNumberFilter}.

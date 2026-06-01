@@ -1,6 +1,6 @@
 import { Editor, Element as SlateElement, Transforms } from 'slate'
-import type { EditorWithBlocks } from './EditorWithBlocks'
-import { prepareElementForInsertion } from '../utils'
+import type { EditorWithBlocks } from './EditorWithBlocks.js'
+import { prepareElementForInsertion } from '../utils/index.js'
 
 export const overrideInsertNode = <E extends EditorWithBlocks>(editor: E) => {
 	const { insertNode } = editor

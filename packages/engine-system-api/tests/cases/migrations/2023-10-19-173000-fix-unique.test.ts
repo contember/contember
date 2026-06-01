@@ -1,4 +1,4 @@
-import migration from '../../../src/migrations/2023-10-19-173000-fix-unique'
+import migration from '../../../src/migrations/2023-10-19-173000-fix-unique.js'
 import { createMigrationBuilder } from '@contember/database-migrations'
 import { expect, test } from 'bun:test'
 import { c, createSchema } from '@contember/schema-definition'

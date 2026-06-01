@@ -4,14 +4,14 @@ import {
 	MutationCreateApiKeyArgs,
 	MutationCreateGlobalApiKeyArgs,
 	MutationResolvers,
-} from '../../../schema'
+} from '../../../schema/index.js'
 import { GraphQLResolveInfo } from 'graphql'
-import { TenantResolverContext } from '../../TenantResolverContext'
-import { ApiKeyManager, isTokenHash, MembershipValidator, PermissionActions, ProjectManager } from '../../../model'
-import { createMembershipValidationErrorResult } from '../../membershipUtils'
-import { createProjectNotFoundResponse } from '../../errorUtils'
+import { TenantResolverContext } from '../../TenantResolverContext.js'
+import { ApiKeyManager, isTokenHash, MembershipValidator, PermissionActions, ProjectManager } from '../../../model/index.js'
+import { createMembershipValidationErrorResult } from '../../membershipUtils.js'
+import { createProjectNotFoundResponse } from '../../errorUtils.js'
 import { UserInputError } from '@contember/graphql-utils'
-import { ResponseOk } from '../../../model/utils/Response'
+import { ResponseOk } from '../../../model/utils/Response.js'
 import { Acl, JSONValue } from '@contember/schema'
 
 export class CreateApiKeyMutationResolver implements MutationResolvers {

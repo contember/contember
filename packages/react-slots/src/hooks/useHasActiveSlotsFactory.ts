@@ -1,6 +1,6 @@
 import { useCallback } from 'react'
-import { useActiveSlotPortalsContext } from '../internal/contexts'
-import { SlotTargetComponentsRecord } from '../factories'
+import { useActiveSlotPortalsContext } from '../internal/contexts.js'
+import { SlotTargetComponentsRecord } from '../factories/index.js'
 
 /**
  * Creates a function which returns true if any of the slots passed to it are active.

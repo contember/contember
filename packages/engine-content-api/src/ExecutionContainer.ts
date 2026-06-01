@@ -1,7 +1,7 @@
-import { PredicateFactory, PredicatesInjector, VariableInjector } from './acl'
-import { ConditionBuilder, FieldsVisitorFactory, JoinBuilder, MetaHandler, OrderByBuilder, RelationFetcher, WhereBuilder } from './mapper/select'
-import { UniqueWhereExpander } from './inputProcessing'
-import { HasManyToHasOneReducer, HasManyToHasOneReducerExecutionHandler } from './extensions'
+import { PredicateFactory, PredicatesInjector, VariableInjector } from './acl/index.js'
+import { ConditionBuilder, FieldsVisitorFactory, JoinBuilder, MetaHandler, OrderByBuilder, RelationFetcher, WhereBuilder } from './mapper/select/index.js'
+import { UniqueWhereExpander } from './inputProcessing/index.js'
+import { HasManyToHasOneReducer, HasManyToHasOneReducerExecutionHandler } from './extensions/index.js'
 import {
 	DeleteExecutor,
 	InsertBuilderFactory,
@@ -16,16 +16,16 @@ import {
 	SelectHydrator,
 	UpdateBuilderFactory,
 	Updater,
-} from './mapper'
+} from './mapper/index.js'
 import { Builder } from '@contember/dic'
 import { Acl, Model, Schema } from '@contember/schema'
 import { Client, DatabaseMetadata, SelectBuilder as DbSelectBuilder } from '@contember/database'
 import { ParsedMembership, Providers } from '@contember/schema-utils'
-import { PaginatedHasManyExecutionHandler } from './extensions/paginatedHasMany/PaginatedHasManyExecutionHandler'
-import { PaginatedHasManyFieldProvider } from './extensions/paginatedHasMany/PaginatedHasManyFieldProvider'
-import { WhereOptimizer, WhereOptimizerOptions } from './mapper/select/optimizer/WhereOptimizer'
-import { ConditionOptimizer } from './mapper/select/optimizer/ConditionOptimizer'
-import { GraphQlQueryAstFactory, MutationResolver, ReadResolver, ValidationResolver } from './resolvers'
+import { PaginatedHasManyExecutionHandler } from './extensions/paginatedHasMany/PaginatedHasManyExecutionHandler.js'
+import { PaginatedHasManyFieldProvider } from './extensions/paginatedHasMany/PaginatedHasManyFieldProvider.js'
+import { WhereOptimizer, WhereOptimizerOptions } from './mapper/select/optimizer/WhereOptimizer.js'
+import { ConditionOptimizer } from './mapper/select/optimizer/ConditionOptimizer.js'
+import { GraphQlQueryAstFactory, MutationResolver, ReadResolver, ValidationResolver } from './resolvers/index.js'
 import {
 	ColumnValueResolver,
 	DependencyCollector,
@@ -33,8 +33,8 @@ import {
 	InputPreValidator,
 	QueryAstFactory,
 	ValidationDataSelector,
-} from './input-validation'
-import { RefreshViewResolver } from './resolvers/RefreshViewResolver'
+} from './input-validation/index.js'
+import { RefreshViewResolver } from './resolvers/RefreshViewResolver.js'
 
 export interface TriggeredActionEvent {
 	id: string

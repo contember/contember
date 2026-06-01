@@ -1,3 +1,3 @@
-export * from './Authorizator'
-export * from './HttpResponse'
-export * from './ModuleInfoMiddleware'
+export * from './Authorizator.js'
+export * from './HttpResponse.js'
+export * from './ModuleInfoMiddleware.js'

@@ -1,5 +1,5 @@
 import { Filter, QueryLanguage, SugaredRelativeSingleField, wrapFilterInHasOnes } from '@contember/react-binding'
-import { DataViewFilterArtifact, DataViewFilterHandler, DataViewFilterHandlerOptions } from '../types'
+import { DataViewFilterArtifact, DataViewFilterHandler, DataViewFilterHandlerOptions } from '../types/index.js'
 import { Input } from '@contember/client'
 
 export const createFilterHandler = <FA extends DataViewFilterArtifact = DataViewFilterArtifact>({ createFilter, isEmpty, identifier }: {

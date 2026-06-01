@@ -1,5 +1,5 @@
 import { JSONValue } from '@contember/schema'
-import { IdentityProviderRow } from '../../../model/queries/idp/types'
+import { IdentityProviderRow } from '../../../model/queries/idp/types.js'
 
 export const idpRowToAuditSnapshot = (row: IdentityProviderRow | null): JSONValue => {
 	if (!row) {

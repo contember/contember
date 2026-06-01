@@ -1,6 +1,6 @@
-import { c } from '../../../src'
+import { c } from '../../../src/index.js'
 import { expect, test } from 'bun:test'
-import { createActions } from '../../../src/actions/definition'
+import { createActions } from '../../../src/actions/definition/index.js'
 
 namespace SimpleActions {
 	@c.Watch({

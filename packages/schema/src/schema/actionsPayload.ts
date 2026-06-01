@@ -1,5 +1,5 @@
-import { Input } from './input'
-import { JSONObject } from './json'
+import { Input } from './input.js'
+import { JSONObject } from './json.js'
 
 export namespace ActionsPayload {
 	export type EntityEventPathNode = {

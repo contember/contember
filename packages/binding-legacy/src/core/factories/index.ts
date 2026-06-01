@@ -1,1 +1,1 @@
-export * from './createBatchUpdatesOptions'
+export * from './createBatchUpdatesOptions.js'

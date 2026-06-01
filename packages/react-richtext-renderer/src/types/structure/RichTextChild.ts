@@ -1,6 +1,6 @@
-import { RichTextLeaf } from './RichTextLeaf'
-import { RichTextElement } from './RichTextElement'
-import { BuiltinElements, BuiltinLeaves } from '../builtin'
+import { RichTextLeaf } from './RichTextLeaf.js'
+import { RichTextElement } from './RichTextElement.js'
+import { BuiltinElements, BuiltinLeaves } from '../builtin/index.js'
 
 export type RichTextChild<
 	CustomElements extends RichTextElement = never,

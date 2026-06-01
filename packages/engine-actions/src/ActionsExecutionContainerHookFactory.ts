@@ -1,7 +1,7 @@
-import { TriggerHandler, TriggerIndirectChangesFetcher, TriggerPayloadManager } from './triggers'
-import { ListenerStoreProvider } from './ListenerStoreProvider'
-import { TriggerPayloadBuilder } from './triggers/TriggerPayloadBuilder'
-import { TriggerPayloadPersister } from './triggers/TriggerPayloadPersister'
+import { TriggerHandler, TriggerIndirectChangesFetcher, TriggerPayloadManager } from './triggers/index.js'
+import { ListenerStoreProvider } from './ListenerStoreProvider.js'
+import { TriggerPayloadBuilder } from './triggers/TriggerPayloadBuilder.js'
+import { TriggerPayloadPersister } from './triggers/TriggerPayloadPersister.js'
 import { ExecutionContainerHook } from '@contember/engine-content-api'
 
 export class ActionsExecutionContainerHookFactory {

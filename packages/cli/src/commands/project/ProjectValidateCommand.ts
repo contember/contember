@@ -1,8 +1,8 @@
 import { Command, CommandConfiguration } from '@contember/cli-common'
 import { emptySchema } from '@contember/schema-utils'
-import { SchemaLoader } from '../../lib/schema/SchemaLoader'
-import { validateSchemaAndPrintErrors } from '../../lib/schema/SchemaValidationHelper'
-import { MigrationsValidator } from '../../lib/migrations/MigrationsValidator'
+import { SchemaLoader } from '../../lib/schema/SchemaLoader.js'
+import { validateSchemaAndPrintErrors } from '../../lib/schema/SchemaValidationHelper.js'
+import { MigrationsValidator } from '../../lib/migrations/MigrationsValidator.js'
 import { MigrationsResolver, SchemaVersionBuilder } from '@contember/migrations-client'
 import { SchemaDiffer } from '@contember/schema-migrations'
 

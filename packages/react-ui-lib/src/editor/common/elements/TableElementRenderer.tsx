@@ -3,7 +3,7 @@ import { assertNever } from '@contember/utilities'
 import { memo, useCallback } from 'react'
 import { Transforms } from 'slate'
 import { ReactEditor, RenderElementProps, useSelected, useSlateStatic } from 'slate-react'
-import { BlockElement } from './BlockElement'
+import { BlockElement } from './BlockElement.js'
 
 export interface TableElementRendererProps extends Omit<RenderElementProps, 'element'> {
 	element: TableElement

@@ -1,8 +1,8 @@
 import { SugaredField, SugaredFieldProps, useField } from '@contember/react-binding'
 import { memo, ReactNode } from 'react'
-import type { SugaredDiscriminateBy } from '../../../discrimination'
-import type { EmbedHandler, PopulateEmbedDataOptions } from '../core'
-import { parseUrl } from '../../../utils'
+import type { SugaredDiscriminateBy } from '../../../discrimination/index.js'
+import type { EmbedHandler, PopulateEmbedDataOptions } from '../core/index.js'
+import { parseUrl } from '../../../utils/index.js'
 
 class VimeoEmbedHandler implements EmbedHandler<string> {
 	public readonly debugName = 'Vimeo'

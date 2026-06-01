@@ -1,6 +1,6 @@
-import { ImplementationException } from '../ImplementationException'
-import { assertNever } from '../utils/assertNever'
-import { FiredEvent } from './TriggerPayloadManager'
+import { ImplementationException } from '../ImplementationException.js'
+import { assertNever } from '../utils/assertNever.js'
+import { FiredEvent } from './TriggerPayloadManager.js'
 import { Actions, ActionsPayload, Input } from '@contember/schema'
 import { FieldNode, Mapper, ObjectNode } from '@contember/engine-content-api'
 

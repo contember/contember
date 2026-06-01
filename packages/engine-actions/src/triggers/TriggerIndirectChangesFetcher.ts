@@ -1,5 +1,5 @@
 import { Mapper, PathFactory, WhereBuilder } from '@contember/engine-content-api'
-import { IndirectListener, JunctionListener } from './TriggerListenersStore'
+import { IndirectListener, JunctionListener } from './TriggerListenersStore.js'
 import { SelectBuilder } from '@contember/database'
 import { ActionsPayload, Input, Model, Schema } from '@contember/schema'
 import { JoinBuilder } from '@contember/engine-content-api'

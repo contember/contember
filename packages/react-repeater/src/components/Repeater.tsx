@@ -1,6 +1,6 @@
 import { ReactNode, useEffect, useMemo } from 'react'
-import { useCreateRepeaterMethods } from '../internal/useCreateRepeaterMethods'
-import { RepeaterEntityListAccessorContext, RepeaterMethodsContext, RepeaterSortedEntitiesContext } from '../contexts'
+import { useCreateRepeaterMethods } from '../internal/useCreateRepeaterMethods.js'
+import { RepeaterEntityListAccessorContext, RepeaterMethodsContext, RepeaterSortedEntitiesContext } from '../contexts.js'
 import {
 	Component,
 	EntityListSubTree,

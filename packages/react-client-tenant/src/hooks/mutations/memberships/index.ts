@@ -1,3 +1,3 @@
-export * from './useRemoveProjectMemberMutation'
-export * from './useAddProjectMemberMutation'
-export * from './useUpdateProjectMemberMutation'
+export * from './useRemoveProjectMemberMutation.js'
+export * from './useAddProjectMemberMutation.js'
+export * from './useUpdateProjectMemberMutation.js'

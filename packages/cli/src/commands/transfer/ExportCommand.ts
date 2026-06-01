@@ -1,11 +1,11 @@
 import { Command, CommandConfiguration, Input } from '@contember/cli-common'
 import { createWriteStream } from 'node:fs'
-import { maskToken } from '../../lib/maskToken'
+import { maskToken } from '../../lib/maskToken.js'
 import { pipeline } from 'node:stream/promises'
-import { printProgressLine } from '../../lib/transfer/stdio'
+import { printProgressLine } from '../../lib/transfer/stdio.js'
 import { createGunzip, createGzip } from 'node:zlib'
-import { RemoteProjectResolver } from '../../lib/project/RemoteProjectResolver'
-import { DataTransferClient } from '../../lib/transfer/DataTransferClient'
+import { RemoteProjectResolver } from '../../lib/project/RemoteProjectResolver.js'
+import { DataTransferClient } from '../../lib/transfer/DataTransferClient.js'
 import { Readable } from 'node:stream'
 
 type Args = {

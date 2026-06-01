@@ -1,2 +1,2 @@
-export * from './prepareElementForInsertion'
-export * from './isInReferenceElement'
+export * from './prepareElementForInsertion.js'
+export * from './isInReferenceElement.js'

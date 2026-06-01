@@ -1,5 +1,5 @@
 import React, { ReactNode } from 'react'
-import { RepeaterCurrentEntityContext, useRepeaterSortedEntities } from '../contexts'
+import { RepeaterCurrentEntityContext, useRepeaterSortedEntities } from '../contexts.js'
 import { Entity } from '@contember/react-binding'
 
 /**

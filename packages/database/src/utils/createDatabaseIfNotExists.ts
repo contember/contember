@@ -1,6 +1,6 @@
-import { DatabaseConfig } from '../types'
-import { ClientError, ClientErrorCodes, Connection } from '../client'
-import { wrapIdentifier } from './sql'
+import { DatabaseConfig } from '../types.js'
+import { ClientError, ClientErrorCodes, Connection } from '../client/index.js'
+import { wrapIdentifier } from './sql.js'
 
 export const createDatabaseIfNotExists = async (db: DatabaseConfig, log: (message: string | Error) => void) => {
 	try {

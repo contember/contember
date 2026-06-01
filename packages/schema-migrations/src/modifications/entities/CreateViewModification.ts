@@ -1,8 +1,8 @@
 import { MigrationBuilder } from '@contember/database-migrations'
 import { Model, Schema } from '@contember/schema'
-import { SchemaUpdater, updateModel } from '../utils/schemaUpdateUtils'
-import { createModificationType, Differ, ModificationHandler } from '../ModificationHandler'
-import { Migration } from '../../Migration'
+import { SchemaUpdater, updateModel } from '../utils/schemaUpdateUtils.js'
+import { createModificationType, Differ, ModificationHandler } from '../ModificationHandler.js'
+import { Migration } from '../../Migration.js'
 import { PossibleEntityShapeInMigrations } from '../../utils/PartialEntity.js'
 
 export class CreateViewModificationHandler implements ModificationHandler<CreateViewModificationData> {

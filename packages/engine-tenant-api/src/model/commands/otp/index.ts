@@ -1,3 +1,3 @@
-export * from './ConfirmOtpCommand'
-export * from './DisableOtpCommand'
-export * from './PrepareOtpCommand'
+export * from './ConfirmOtpCommand.js'
+export * from './DisableOtpCommand.js'
+export * from './PrepareOtpCommand.js'

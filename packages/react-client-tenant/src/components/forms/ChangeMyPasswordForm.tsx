@@ -1,9 +1,9 @@
 import { ReactElement } from 'react'
 import { ChangeMyPasswordErrorCode } from '@contember/graphql-client-tenant'
-import { TenantForm } from './TenantForm'
-import { FormContextValue, FormError, FormState } from '../../types'
-import { useForm } from '../../contexts'
-import { useChangeMyPasswordMutation } from '../../hooks'
+import { TenantForm } from './TenantForm.js'
+import { FormContextValue, FormError, FormState } from '../../types/index.js'
+import { useForm } from '../../contexts.js'
+import { useChangeMyPasswordMutation } from '../../hooks/index.js'
 
 export type ChangeMyPasswordFormValues = {
 	currentPassword: string

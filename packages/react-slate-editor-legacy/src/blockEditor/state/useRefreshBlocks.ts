@@ -10,12 +10,12 @@ import {
 	useEntityBeforePersist,
 } from '@contember/react-binding'
 import { Descendant, Editor, Element, Element as SlateElement } from 'slate'
-import { isElementWithReference } from '../elements'
-import { useGetParentEntityRef } from '../useGetParentEntityRef'
+import { isElementWithReference } from '../elements/index.js'
+import { useGetParentEntityRef } from '../useGetParentEntityRef.js'
 import { MutableRefObject, useCallback } from 'react'
-import { BlockElementCache } from './useBlockElementCache'
-import { BlockElementPathRefs } from './useBlockElementPathRefs'
-import { isInitialSlateState } from '../utils/isInitialSlateState'
+import { BlockElementCache } from './useBlockElementCache.js'
+import { BlockElementPathRefs } from './useBlockElementPathRefs.js'
+import { isInitialSlateState } from '../utils/isInitialSlateState.js'
 
 export type RefreshBlocks = (args?: { forceInitialBlock?: boolean }) => void
 

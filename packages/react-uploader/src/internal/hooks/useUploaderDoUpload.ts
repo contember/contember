@@ -1,8 +1,8 @@
 import { useCallback } from 'react'
-import { UploaderError } from '../../UploaderError'
-import { FileWithMeta, UploaderEvents } from '../../types'
-import { useGetPreviewUrls } from './useGetPreviewUrls'
-import { useUploaderClient } from '../../contexts'
+import { UploaderError } from '../../UploaderError.js'
+import { FileWithMeta, UploaderEvents } from '../../types/index.js'
+import { useGetPreviewUrls } from './useGetPreviewUrls.js'
+import { useUploaderClient } from '../../contexts.js'
 
 export const useUploaderDoUpload = ({ onBeforeUpload, onError, onProgress, onSuccess, onStartUpload, onAfterUpload }: UploaderEvents) => {
 	const getPreviewUrl = useGetPreviewUrls()

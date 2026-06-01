@@ -1,5 +1,5 @@
 import { ExpectedQuery } from '@contember/database-tester'
-import { SQL } from '../../../../src/tags'
+import { SQL } from '../../../../src/tags.js'
 export const sqlTransaction = (...queries: ExpectedQuery[]): ExpectedQuery[] => [
 	{
 		sql: SQL`BEGIN;`,

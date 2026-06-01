@@ -1,6 +1,6 @@
 import { test } from 'bun:test'
 import { createSchema, SchemaDefinition as def } from '@contember/schema-definition'
-import { createTester, gql } from '../../src/tester'
+import { createTester, gql } from '../../src/tester.js'
 
 namespace Model {
 	@def.Unique('url')

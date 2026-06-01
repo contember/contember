@@ -1,1 +1,1 @@
-export * from './repeater'
+export * from './repeater.js'

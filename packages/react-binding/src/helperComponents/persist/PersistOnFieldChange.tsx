@@ -1,8 +1,8 @@
 import { ErrorPersistResult, SuccessfulPersistResult, SugaredRelativeSingleField } from '@contember/binding'
 import { useEffect } from 'react'
-import { useField } from '../../accessorPropagation'
-import { useDecoratedPersist } from './useDecoratedPersist'
-import { Component, Field } from '../../coreComponents'
+import { useField } from '../../accessorPropagation/index.js'
+import { useDecoratedPersist } from './useDecoratedPersist.js'
+import { Component, Field } from '../../coreComponents/index.js'
 
 export type PersistOnFieldChangeProps = {
 	/**

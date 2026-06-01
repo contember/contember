@@ -1,5 +1,5 @@
 import { createRequiredContext } from '@contember/react-utils'
-import { BoardColumnNode, BoardColumnValue, BoardItemNode, BoardMethods } from './types'
+import { BoardColumnNode, BoardColumnValue, BoardItemNode, BoardMethods } from './types/index.js'
 
 const _BoardMethodsContext = createRequiredContext<BoardMethods<any>>('BoardMethodsContext')
 /** @internal */

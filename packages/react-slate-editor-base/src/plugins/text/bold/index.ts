@@ -1,2 +1,2 @@
-export * from './withBold'
-export * from './boldMark'
+export * from './withBold.js'
+export * from './boldMark.js'

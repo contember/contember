@@ -1,4 +1,4 @@
-import { SchemaEntityNames } from '../types'
+import { SchemaEntityNames } from '../types/index.js'
 import { GraphQlFieldTypedArgs } from '@contember/graphql-builder'
 
 export const createListArgs = (

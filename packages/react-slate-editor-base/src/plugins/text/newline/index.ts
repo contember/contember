@@ -1,1 +1,1 @@
-export * from './withNewline'
+export * from './withNewline.js'

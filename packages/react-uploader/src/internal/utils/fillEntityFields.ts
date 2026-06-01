@@ -1,6 +1,6 @@
-import { FileType, FileWithMeta } from '../../types'
+import { FileType, FileWithMeta } from '../../types/index.js'
 import { EntityAccessor } from '@contember/react-binding'
-import { FileUploadResult } from '../../types/uploadClient'
+import { FileUploadResult } from '../../types/uploadClient.js'
 
 export const executeExtractors = async ({ fileType, file, result }: { fileType: FileType; file: FileWithMeta; result: FileUploadResult }) => {
 	const extractorsResult = fileType.extractors?.map(it => {

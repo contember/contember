@@ -1,6 +1,6 @@
-import { Path } from './Path'
+import { Path } from './Path.js'
 import { Value } from '@contember/schema'
-import { getFulfilledValues, getRejections } from '../../utils'
+import { getFulfilledValues, getRejections } from '../../utils/index.js'
 import { logger } from '@contember/logger'
 
 type DataPromises = {

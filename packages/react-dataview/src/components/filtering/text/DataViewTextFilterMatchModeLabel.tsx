@@ -1,7 +1,7 @@
 import { ReactNode } from 'react'
-import { TextFilterArtifacts, TextFilterArtifactsMatchMode } from '../../../filterTypes'
-import { useDataViewFilter } from '../../../hooks'
-import { useDataViewFilterName } from '../../../contexts'
+import { TextFilterArtifacts, TextFilterArtifactsMatchMode } from '../../../filterTypes/index.js'
+import { useDataViewFilter } from '../../../hooks/index.js'
+import { useDataViewFilterName } from '../../../contexts.js'
 
 export interface DataViewTextFilterMatchModeLabelProps {
 	/**

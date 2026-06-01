@@ -1,8 +1,8 @@
-import { Connection } from '../client'
-import { createDatabaseMetadata, DatabaseMetadata } from './DatabaseMetadata'
-import { ForeignKeyConstraintMetadata, ForeignKeyDeleteAction } from './ForeignKeyConstraintMetadata'
-import { UniqueConstraintMetadata } from './UniqueConstraintMetadata'
-import { IndexMetadata } from './IndexMetadata'
+import { Connection } from '../client/index.js'
+import { createDatabaseMetadata, DatabaseMetadata } from './DatabaseMetadata.js'
+import { ForeignKeyConstraintMetadata, ForeignKeyDeleteAction } from './ForeignKeyConstraintMetadata.js'
+import { UniqueConstraintMetadata } from './UniqueConstraintMetadata.js'
+import { IndexMetadata } from './IndexMetadata.js'
 
 export class DatabaseMetadataResolver {
 	async resolveMetadata(db: Connection.Queryable, contentSchema: string): Promise<DatabaseMetadata> {

@@ -1,7 +1,7 @@
 import { BindingError, Environment, TreeNodeEnvironmentFactory } from '@contember/binding'
-import { Component } from '../coreComponents'
-import { recursionTerminatorEnvironmentExtension, RecursionTerminatorProps } from './RecursionTerminator'
-import { EnvironmentMiddleware } from '../accessorPropagation'
+import { Component } from '../coreComponents/index.js'
+import { recursionTerminatorEnvironmentExtension, RecursionTerminatorProps } from './RecursionTerminator.js'
+import { EnvironmentMiddleware } from '../accessorPropagation/index.js'
 
 export const RecursionTerminatorPortal = Component<RecursionTerminatorProps>(({ field, children }) => {
 	return <EnvironmentMiddleware args={[field]} create={createEnvWithExtension}>{children}</EnvironmentMiddleware>

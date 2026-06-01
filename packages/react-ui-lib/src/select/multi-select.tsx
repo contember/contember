@@ -6,8 +6,8 @@ import { ChevronDownIcon } from 'lucide-react'
 import * as React from 'react'
 import { ReactNode } from 'react'
 import { Popover, PopoverTrigger } from '@contember/react-ui-lib-base'
-import { CreateEntityDialog } from './create-new'
-import { DefaultSelectDataView } from './list'
+import { CreateEntityDialog } from './create-new.js'
+import { DefaultSelectDataView } from './list.js'
 import {
 	MultiSelectItemContentUI,
 	MultiSelectItemRemoveButtonUI,
@@ -19,7 +19,7 @@ import {
 	SelectInputUI,
 	SelectInputWrapperUI,
 	SelectPopoverContent,
-} from './ui'
+} from './ui.js'
 
 export type MultiSelectInputProps = {
 	field: SugaredRelativeEntityList['field']

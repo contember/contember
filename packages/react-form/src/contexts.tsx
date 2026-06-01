@@ -1,5 +1,5 @@
 import { createContext } from '@contember/react-utils'
-import { FormFieldState } from './types'
+import { FormFieldState } from './types/index.js'
 
 const FormFieldStateContext_ = createContext<FormFieldState | undefined>('FormFieldStateContext', undefined)
 export const FormFieldStateContext = FormFieldStateContext_[0]

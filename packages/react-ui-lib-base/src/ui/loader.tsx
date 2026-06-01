@@ -1,7 +1,7 @@
 import * as React from 'react'
-import { uic } from '../utils'
+import { uic } from '../utils/index.js'
 import { Loader2Icon } from 'lucide-react'
-import { Overlay, OverlayProps } from './overlay'
+import { Overlay, OverlayProps } from './overlay.js'
 
 export interface LoaderProps extends Omit<OverlayProps, 'children'> {
 	size?: 'sm' | 'md' | 'lg'

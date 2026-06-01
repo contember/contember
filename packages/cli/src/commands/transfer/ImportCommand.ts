@@ -1,12 +1,12 @@
 import { Command, CommandConfiguration, Input } from '@contember/cli-common'
 import { createReadStream } from 'node:fs'
 import { createGunzip } from 'node:zlib'
-import { confirmImport } from './utils'
-import { maskToken } from '../../lib/maskToken'
-import { printProgressLine } from '../../lib/transfer/stdio'
-import { readStream } from '../../lib/stream'
-import { RemoteProjectResolver } from '../../lib/project/RemoteProjectResolver'
-import { DataTransferClient } from '../../lib/transfer/DataTransferClient'
+import { confirmImport } from './utils.js'
+import { maskToken } from '../../lib/maskToken.js'
+import { printProgressLine } from '../../lib/transfer/stdio.js'
+import { readStream } from '../../lib/stream.js'
+import { RemoteProjectResolver } from '../../lib/project/RemoteProjectResolver.js'
+import { DataTransferClient } from '../../lib/transfer/DataTransferClient.js'
 
 type Args = {
 	file: string

@@ -1,1 +1,1 @@
-export * from './UpdateSettingsModification'
+export * from './UpdateSettingsModification.js'

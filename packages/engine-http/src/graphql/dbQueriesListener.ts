@@ -1,5 +1,5 @@
 import { Client, EventManager } from '@contember/database'
-import { GraphQLListener } from './execution'
+import { GraphQLListener } from './execution.js'
 
 type Query = { sql: string; bindings: any; elapsed?: number; error?: string; meta?: any; rowCount?: number }
 

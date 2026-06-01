@@ -1,5 +1,5 @@
 import { expect, test } from 'bun:test'
-import { LaxSchemaConverter } from '../../../src'
+import { LaxSchemaConverter } from '../../../src/index.js'
 
 test('lax schema converter basic', () => {
 	const converter = new LaxSchemaConverter(

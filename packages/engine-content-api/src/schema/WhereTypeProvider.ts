@@ -1,13 +1,13 @@
 import { Acl, Model } from '@contember/schema'
 import { acceptFieldVisitor, getEntity } from '@contember/schema-utils'
 import { GraphQLInputFieldConfig, GraphQLInputFieldConfigMap, GraphQLInputObjectType, GraphQLList } from 'graphql'
-import { capitalizeFirstLetter, getFieldsForUniqueWhere, singletonFactory } from '../utils'
-import { ColumnTypeResolver } from './ColumnTypeResolver'
-import { ConditionTypeProvider } from './ConditionTypeProvider'
-import { GqlTypeName } from './utils'
-import { Authorizator } from '../acl'
-import { FieldAccessVisitor } from './FieldAccessVisitor'
-import { ImplementationException } from '../exception'
+import { capitalizeFirstLetter, getFieldsForUniqueWhere, singletonFactory } from '../utils/index.js'
+import { ColumnTypeResolver } from './ColumnTypeResolver.js'
+import { ConditionTypeProvider } from './ConditionTypeProvider.js'
+import { GqlTypeName } from './utils.js'
+import { Authorizator } from '../acl/index.js'
+import { FieldAccessVisitor } from './FieldAccessVisitor.js'
+import { ImplementationException } from '../exception.js'
 
 export class WhereTypeProvider {
 	private whereSingleton = singletonFactory(name => this.createEntityWhereType(name))

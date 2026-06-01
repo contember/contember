@@ -1,5 +1,5 @@
 import { useCallback, useMemo, useState } from 'react'
-import { Serializable } from '../types'
+import { Serializable } from '../types/index.js'
 
 export type SetState<V extends Serializable> = (value: V | ((current: V) => V)) => void
 export type StateStorageKey = [uniquePrefix: string, key: string]

@@ -9,8 +9,8 @@ import {
 	GraphQLSchemaConfig,
 	GraphQLString,
 } from 'graphql'
-import { VimeoServiceFactory } from './VimeoService'
-import { ProjectVimeoConfig } from './Config'
+import { VimeoServiceFactory } from './VimeoService.js'
+import { ProjectVimeoConfig } from './Config.js'
 import { GraphQLSchemaContributor, GraphQLSchemaContributorContext } from '@contember/engine-plugins'
 
 interface VimeoAcl {

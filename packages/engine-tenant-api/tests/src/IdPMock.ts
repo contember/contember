@@ -1,4 +1,4 @@
-import { IdentityProviderHandler, IDPResponse, InitIDPAuthResult } from '../../src'
+import { IdentityProviderHandler, IDPResponse, InitIDPAuthResult } from '../../src/index.js'
 
 export class IdPMock implements IdentityProviderHandler<any> {
 	initAuth(configuration: any, data: unknown): Promise<InitIDPAuthResult> {

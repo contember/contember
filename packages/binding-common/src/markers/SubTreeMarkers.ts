@@ -1,5 +1,5 @@
-import type { PlaceholderName } from '../treeParameters'
-import type { EntityListSubTreeMarker } from './EntityListSubTreeMarker'
-import type { EntitySubTreeMarker } from './EntitySubTreeMarker'
+import type { PlaceholderName } from '../treeParameters/index.js'
+import type { EntityListSubTreeMarker } from './EntityListSubTreeMarker.js'
+import type { EntitySubTreeMarker } from './EntitySubTreeMarker.js'
 
 export type SubTreeMarkers = ReadonlyMap<PlaceholderName, EntitySubTreeMarker | EntityListSubTreeMarker>

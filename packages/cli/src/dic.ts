@@ -17,16 +17,16 @@ import {
 	SnapshotManager,
 	VERSION_LATEST,
 } from '@contember/migrations-client'
-import { JsCodeRunner } from './lib/js/JsCodeRunner'
-import { EsBuildBuilder } from './lib/js/EsBuildBuilder'
-import { EvalExecutor } from './lib/js/EvalExecutor'
-import { AdminDeployer } from './lib/admin/AdminDeployer'
-import { RemoteProjectResolver } from './lib/project/RemoteProjectResolver'
-import { CliEnv } from './lib/env'
-import { AdminClient } from './lib/admin/AdminClient'
-import { FileSystem } from './lib/fs/FileSystem'
-import { WorkspaceResolver } from './lib/workspace/WorkspaceResolver'
-import { YamlHandler } from './lib/fs/YamlHandler'
+import { JsCodeRunner } from './lib/js/JsCodeRunner.js'
+import { EsBuildBuilder } from './lib/js/EsBuildBuilder.js'
+import { EvalExecutor } from './lib/js/EvalExecutor.js'
+import { AdminDeployer } from './lib/admin/AdminDeployer.js'
+import { RemoteProjectResolver } from './lib/project/RemoteProjectResolver.js'
+import { CliEnv } from './lib/env.js'
+import { AdminClient } from './lib/admin/AdminClient.js'
+import { FileSystem } from './lib/fs/FileSystem.js'
+import { WorkspaceResolver } from './lib/workspace/WorkspaceResolver.js'
+import { YamlHandler } from './lib/fs/YamlHandler.js'
 import {
 	DeployCommand,
 	MigrationAmendCommand,
@@ -44,16 +44,16 @@ import {
 	ProjectValidateCommand,
 	VersionCommand,
 	WorkspaceUpdateApiCommand,
-} from './commands'
-import { MigrationExecutionFacade } from './lib/migrations/MigrationExecutionFacade'
-import { MigrationPrinter } from './lib/migrations/MigrationPrinter'
-import { MigrationSnapshotFacade } from './lib/migrations/MigrationSnapshotFacade'
-import { MigrationsStatusFacade } from './lib/migrations/MigrationsStatusFacade'
-import { ImportSchemaLoader, SchemaLoader, TranspilingSchemaLoader } from './lib/schema/SchemaLoader'
-import { MigrationsValidator } from './lib/migrations/MigrationsValidator'
-import { MigrationRebaseFacade } from './lib/migrations/MigrationRebaseFacade'
-import { DataTransferClient } from './lib/transfer/DataTransferClient'
-import { ExportCommand, ImportCommand, TransferCommand } from './commands/transfer'
+} from './commands/index.js'
+import { MigrationExecutionFacade } from './lib/migrations/MigrationExecutionFacade.js'
+import { MigrationPrinter } from './lib/migrations/MigrationPrinter.js'
+import { MigrationSnapshotFacade } from './lib/migrations/MigrationSnapshotFacade.js'
+import { MigrationsStatusFacade } from './lib/migrations/MigrationsStatusFacade.js'
+import { ImportSchemaLoader, SchemaLoader, TranspilingSchemaLoader } from './lib/schema/SchemaLoader.js'
+import { MigrationsValidator } from './lib/migrations/MigrationsValidator.js'
+import { MigrationRebaseFacade } from './lib/migrations/MigrationRebaseFacade.js'
+import { DataTransferClient } from './lib/transfer/DataTransferClient.js'
+import { ExportCommand, ImportCommand, TransferCommand } from './commands/transfer/index.js'
 import {
 	Application,
 	Bun,
@@ -66,21 +66,21 @@ import {
 	Yarn,
 	YarnClassic,
 } from '@contember/cli-common'
-import { VersionChecker } from './lib/VersionChecker'
-import { DockerComposeManager } from './lib/fs/DockerComposeManager'
-import { RemoteProjectProvider } from './lib/project/RemoteProjectProvider'
-import { SystemClientProvider } from './lib/SystemClientProvider'
-import { TenantClientProvider } from './lib/TenantClientProvider'
-import { Workspace } from './lib/workspace/Workspace'
-import { ActionsListVariablesCommand } from './commands/actions/ActionsListVariablesCommand'
-import { ActionsSetVariablesCommand } from './commands/actions/ActionsSetVariablesCommand'
-import { ActionsListFailedEventsCommand } from './commands/actions/ActionsListFailedEventsCommand'
-import { ActionsRetryEventCommand } from './commands/actions/ActionsRetryEventCommand'
-import { ActionsGetEventCommand } from './commands/actions/ActionsGetEventCommand'
-import { ActionsStopEventCommand } from './commands/actions/ActionsStopEventCommand'
-import { TenantApplyCommand } from './commands/tenant'
-import { ImportTenantConfigLoader, TranspilingTenantConfigLoader } from './lib/tenant/TenantConfigLoader'
-import { TenantConfigApplier } from './lib/tenant/TenantConfigApplier'
+import { VersionChecker } from './lib/VersionChecker.js'
+import { DockerComposeManager } from './lib/fs/DockerComposeManager.js'
+import { RemoteProjectProvider } from './lib/project/RemoteProjectProvider.js'
+import { SystemClientProvider } from './lib/SystemClientProvider.js'
+import { TenantClientProvider } from './lib/TenantClientProvider.js'
+import { Workspace } from './lib/workspace/Workspace.js'
+import { ActionsListVariablesCommand } from './commands/actions/ActionsListVariablesCommand.js'
+import { ActionsSetVariablesCommand } from './commands/actions/ActionsSetVariablesCommand.js'
+import { ActionsListFailedEventsCommand } from './commands/actions/ActionsListFailedEventsCommand.js'
+import { ActionsRetryEventCommand } from './commands/actions/ActionsRetryEventCommand.js'
+import { ActionsGetEventCommand } from './commands/actions/ActionsGetEventCommand.js'
+import { ActionsStopEventCommand } from './commands/actions/ActionsStopEventCommand.js'
+import { TenantApplyCommand } from './commands/tenant/index.js'
+import { ImportTenantConfigLoader, TranspilingTenantConfigLoader } from './lib/tenant/TenantConfigLoader.js'
+import { TenantConfigApplier } from './lib/tenant/TenantConfigApplier.js'
 
 const jsSample = `
 export const query = \`\`

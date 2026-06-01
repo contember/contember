@@ -1,5 +1,5 @@
 import { useEffect } from 'react'
-import { RefObjectOrElement, unwrapRefValue } from './unwrapRefValue'
+import { RefObjectOrElement, unwrapRefValue } from './unwrapRefValue.js'
 
 /**
  * Calls the callback when the mouse enters the element, but only after a timeout, e.g. for tooltips or dropdown menus.

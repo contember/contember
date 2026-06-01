@@ -1,6 +1,6 @@
 import { makeExecutableSchema } from '@graphql-tools/schema'
 import { Schema, TenantResolverContext, typeDefs } from '@contember/engine-tenant-api'
-import { createGraphQLQueryHandler, GraphQLQueryHandler } from '../graphql'
+import { createGraphQLQueryHandler, GraphQLQueryHandler } from '../graphql/index.js'
 
 export type TenantGraphQLContext = TenantResolverContext & { identityId: string }
 

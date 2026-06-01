@@ -1,6 +1,6 @@
-import { MailTemplateData, QueryResolvers } from '../../schema'
-import { MailTemplateListQuery, mailTypeFromDbToSchema, PermissionActions } from '../../model'
-import { TenantResolverContext } from '../TenantResolverContext'
+import { MailTemplateData, QueryResolvers } from '../../schema/index.js'
+import { MailTemplateListQuery, mailTypeFromDbToSchema, PermissionActions } from '../../model/index.js'
+import { TenantResolverContext } from '../TenantResolverContext.js'
 
 export class MailTemplateQueryResolver implements QueryResolvers {
 	async mailTemplates(parent: unknown, args: unknown, context: TenantResolverContext): Promise<MailTemplateData[]> {

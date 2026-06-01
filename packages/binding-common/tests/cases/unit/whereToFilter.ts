@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'bun:test'
-import { whereToFilter } from '../../../src'
+import { whereToFilter } from '../../../src/index.js'
 
 describe('whereToFilter', () => {
 	it('complex by', () => {

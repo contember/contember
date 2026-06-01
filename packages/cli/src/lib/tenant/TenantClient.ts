@@ -21,7 +21,7 @@ import {
 	updateIDPResponse$$,
 } from '@contember/graphql-client-tenant'
 import { Fetcher, TextWriter, util } from 'graphql-ts-client-api'
-import { TenantGlobalConfig, TenantIdpOptions, TenantMailTemplate } from './tenantConfig'
+import { TenantGlobalConfig, TenantIdpOptions, TenantMailTemplate } from './tenantConfig.js'
 
 export const createTenantApiUrl = (url: string) => {
 	if (url.endsWith('/')) {

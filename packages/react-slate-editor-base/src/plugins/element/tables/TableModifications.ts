@@ -1,9 +1,9 @@
 import { Editor, NodeEntry, Transforms } from 'slate'
 import { ReactEditor } from 'slate-react'
-import { getTableElementColumnCount, getTableElementRowCount, TableElement } from './TableElement'
-import { createEmptyTableRowElement, isTableRowElement, TableRowElement, tableRowElementType } from './TableRowElement'
-import { ContemberEditor } from '../../../editor'
-import { createEmptyTableCellElement, isTableCellElement, TableCellElement, tableCellElementType } from './TableCellElement'
+import { getTableElementColumnCount, getTableElementRowCount, TableElement } from './TableElement.js'
+import { createEmptyTableRowElement, isTableRowElement, TableRowElement, tableRowElementType } from './TableRowElement.js'
+import { ContemberEditor } from '../../../editor/index.js'
+import { createEmptyTableCellElement, isTableCellElement, TableCellElement, tableCellElementType } from './TableCellElement.js'
 
 export class TableModifications {
 	public static deleteTableColumn(editor: Editor, element: TableElement, index: number) {

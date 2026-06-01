@@ -1,12 +1,12 @@
 import type { ReactNode } from 'react'
 import { useMemo } from 'react'
-import { Component, Field } from '../coreComponents'
+import { Component, Field } from '../coreComponents/index.js'
 import { EntityAccessor } from '@contember/binding'
 import { QueryLanguage } from '@contember/binding'
-import { useEntity, useEnvironment } from '../accessorPropagation'
+import { useEntity, useEnvironment } from '../accessorPropagation/index.js'
 import { Filter } from '@contember/binding'
-import { FilterFieldsCollector } from './helpers/FilterFieldsCollector'
-import { FilterEvaluator } from './helpers/FilterEvaluator'
+import { FilterFieldsCollector } from './helpers/FilterFieldsCollector.js'
+import { FilterEvaluator } from './helpers/FilterEvaluator.js'
 
 export type IfProps =
 	| IfFilterProps

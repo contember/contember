@@ -1,6 +1,6 @@
 import { expect, test } from 'bun:test'
-import { InvalidSchemaError, MigrationError, ProjectMigrator } from '../../../src/model'
-import { SchemaStateInput } from '../../../src/model/migrations/MigrationInput'
+import { InvalidSchemaError, MigrationError, ProjectMigrator } from '../../../src/model/index.js'
+import { SchemaStateInput } from '../../../src/model/migrations/MigrationInput.js'
 import { emptySchema } from '@contember/schema-utils'
 
 // The state-only path never touches the database (no migrations to apply, no schema row to save on a

@@ -1,10 +1,10 @@
 import { GraphQLFieldConfig, GraphQLNonNull } from 'graphql'
-import { Context } from '../types'
-import { WhereTypeProvider } from './WhereTypeProvider'
-import { EntityInputProvider, EntityInputType } from './mutations'
+import { Context } from '../types.js'
+import { WhereTypeProvider } from './WhereTypeProvider.js'
+import { EntityInputProvider, EntityInputType } from './mutations/index.js'
 import { Input, Model } from '@contember/schema'
-import { filterObject } from '../utils'
-import { ResultSchemaTypeProvider } from './ResultSchemaTypeProvider'
+import { filterObject } from '../utils/index.js'
+import { ResultSchemaTypeProvider } from './ResultSchemaTypeProvider.js'
 
 type FieldConfig<TArgs> = GraphQLFieldConfig<Context, any, TArgs>
 

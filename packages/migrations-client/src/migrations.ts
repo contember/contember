@@ -1,5 +1,5 @@
 import { calculateMigrationChecksum, Migration, MigrationInfo } from '@contember/schema-migrations'
-import { isSchemaMigration, MigrationFile } from './MigrationFile'
+import { isSchemaMigration, MigrationFile } from './MigrationFile.js'
 
 export interface ExecutedMigrationInfo extends MigrationInfo {
 	readonly executedAt: Date

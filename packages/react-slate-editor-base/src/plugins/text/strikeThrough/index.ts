@@ -1,2 +1,2 @@
-export * from './withStrikeThrough'
-export * from './strikeThroughMark'
+export * from './withStrikeThrough.js'
+export * from './strikeThroughMark.js'

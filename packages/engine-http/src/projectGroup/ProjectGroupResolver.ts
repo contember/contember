@@ -1,8 +1,8 @@
-import { CryptoWrapper } from '../utils/CryptoWrapper'
-import { ProjectGroupContainer } from './ProjectGroupContainer'
+import { CryptoWrapper } from '../utils/CryptoWrapper.js'
+import { ProjectGroupContainer } from './ProjectGroupContainer.js'
 import { IncomingMessage } from 'node:http'
-import { ProjectGroupContainerResolver } from './ProjectGroupContainerResolver'
-import { HttpErrorResponse } from '../common'
+import { ProjectGroupContainerResolver } from './ProjectGroupContainerResolver.js'
+import { HttpErrorResponse } from '../common/index.js'
 
 export class ProjectGroupResolver {
 	private groupRegex

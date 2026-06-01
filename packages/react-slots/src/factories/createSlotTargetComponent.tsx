@@ -1,4 +1,4 @@
-import { SlotTarget, SlotTargetProps } from '../components/SlotTarget'
+import { SlotTarget, SlotTargetProps } from '../components/SlotTarget.js'
 import { ComponentType } from 'react'
 
 export type SlotTargetComponentProps = Omit<SlotTargetProps, 'name'>

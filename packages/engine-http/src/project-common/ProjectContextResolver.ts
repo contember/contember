@@ -1,5 +1,5 @@
-import { HttpErrorResponse } from '../common'
-import { ApplicationContext } from '../application'
+import { HttpErrorResponse } from '../common/index.js'
+import { ApplicationContext } from '../application/index.js'
 
 export class ProjectContextResolver {
 	async resolve(context: ApplicationContext) {

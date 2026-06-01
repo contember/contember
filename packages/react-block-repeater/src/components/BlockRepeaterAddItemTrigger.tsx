@@ -1,5 +1,5 @@
 import { Slot } from '@radix-ui/react-slot'
-import { useBlockRepeaterConfig } from '../contexts'
+import { useBlockRepeaterConfig } from '../contexts.js'
 import React, { ReactElement, useCallback, useMemo } from 'react'
 import { EntityAccessor } from '@contember/react-binding'
 import { RepeaterAddItemIndex, useRepeaterMethods } from '@contember/react-repeater'

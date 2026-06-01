@@ -1,5 +1,5 @@
 import React, { ReactNode } from 'react'
-import { useRepeaterSortedEntities } from '../contexts'
+import { useRepeaterSortedEntities } from '../contexts.js'
 
 /**
  * Renders the children only if the repeater is empty.

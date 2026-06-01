@@ -1,12 +1,12 @@
-import { useUploadState } from '../internal/hooks/useUploadState'
-import { useUploaderDoUpload } from '../internal/hooks/useUploaderDoUpload'
-import { UploaderOptionsContext, UploaderStateContext, UploaderUploadFilesContext } from '../contexts'
+import { useUploadState } from '../internal/hooks/useUploadState.js'
+import { useUploaderDoUpload } from '../internal/hooks/useUploaderDoUpload.js'
+import { UploaderOptionsContext, UploaderStateContext, UploaderUploadFilesContext } from '../contexts.js'
 import { Fragment, ReactNode, useMemo } from 'react'
 import { Component } from '@contember/react-binding'
-import { FileType, UploaderBaseFieldProps } from '../types'
-import { useFillEntity } from '../internal/hooks/useFillEntity'
-import { UploaderBase } from './UploaderBase'
-import { uploaderErrorHandler } from '../internal/utils/uploaderErrorHandler'
+import { FileType, UploaderBaseFieldProps } from '../types/index.js'
+import { useFillEntity } from '../internal/hooks/useFillEntity.js'
+import { UploaderBase } from './UploaderBase.js'
+import { uploaderErrorHandler } from '../internal/utils/uploaderErrorHandler.js'
 
 export type UploaderProps =
 	& UploaderBaseFieldProps

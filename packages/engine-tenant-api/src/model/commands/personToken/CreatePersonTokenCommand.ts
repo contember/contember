@@ -1,8 +1,8 @@
-import { Command } from '../Command'
-import { computeTokenHash, generateToken } from '../../utils'
-import { SavePersonTokenCommand } from './SavePersonTokenCommand'
-import { PersonToken } from '../../type'
-import { PASSWORD_RESET_EXPIRATION_MINUTES } from '../../consts/expirations'
+import { Command } from '../Command.js'
+import { computeTokenHash, generateToken } from '../../utils/index.js'
+import { SavePersonTokenCommand } from './SavePersonTokenCommand.js'
+import { PersonToken } from '../../type/index.js'
+import { PASSWORD_RESET_EXPIRATION_MINUTES } from '../../consts/expirations.js'
 
 export class CreatePersonTokenCommand implements Command<CreatePersonTokenCommand.Result> {
 	private constructor(

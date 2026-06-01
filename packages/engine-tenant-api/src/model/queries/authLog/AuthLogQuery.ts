@@ -1,6 +1,6 @@
 import { DatabaseQuery, DatabaseQueryable, Operator, SelectBuilder } from '@contember/database'
 import { JSONValue } from '@contember/schema'
-import { AuthActionType } from '../../type/AuthLog'
+import { AuthActionType } from '../../type/AuthLog.js'
 
 export type AuthLogEntryRow = {
 	readonly id: string

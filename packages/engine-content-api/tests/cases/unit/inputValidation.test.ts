@@ -8,10 +8,10 @@ import {
 	evaluateValidation,
 	QueryAstFactory,
 	ValidationContext,
-} from '../../../src/input-validation'
-import { FieldNode, ObjectNode } from '../../../src/inputProcessing'
+} from '../../../src/input-validation/index.js'
+import { FieldNode, ObjectNode } from '../../../src/inputProcessing/index.js'
 import { describe, expect, it } from 'bun:test'
-import { assert } from '../../src/assert'
+import { assert } from '../../src/assert.js'
 
 describe('input validation tests', () => {
 	it('evaluates rule', () => {

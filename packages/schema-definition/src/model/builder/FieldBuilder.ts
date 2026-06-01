@@ -1,8 +1,8 @@
-import OneHasOneBuilder from './OneHasOneBuilder'
-import ManyHasOneBuilder from './ManyHasOneBuilder'
-import ManyHasManyBuilder from './ManyHasManyBuilder'
-import OneHasManyBuilder from './OneHasManyBuilder'
-import ColumnBuilder from './ColumnBuilder'
+import OneHasOneBuilder from './OneHasOneBuilder.js'
+import ManyHasOneBuilder from './ManyHasOneBuilder.js'
+import ManyHasManyBuilder from './ManyHasManyBuilder.js'
+import OneHasManyBuilder from './OneHasManyBuilder.js'
+import ColumnBuilder from './ColumnBuilder.js'
 
 interface FieldBuilder<O> {
 	getOption(): O

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'bun:test'
-import { FilterFieldsCollector } from '../../../../src/helperComponents/helpers/FilterFieldsCollector'
-import { schema } from './schema'
+import { FilterFieldsCollector } from '../../../../src/helperComponents/helpers/FilterFieldsCollector.js'
+import { schema } from './schema.js'
 
 describe('Filter fields collector', () => {
 	it('collects simple column', () => {

@@ -1,5 +1,5 @@
 import { Input, Model, Value } from '@contember/schema'
-import { MapperInput } from './types'
+import { MapperInput } from './types.js'
 
 export enum MutationResultType {
 	ok = 'ok',

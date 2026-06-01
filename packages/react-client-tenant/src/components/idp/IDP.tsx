@@ -1,9 +1,9 @@
 import { ReactNode, useEffect, useMemo, useRef, useState } from 'react'
-import { IDPMethodsContextProvider, IDPStateContextProvider } from '../../contexts'
-import { IDPInitError, IDPResponseError, IDPStateValue } from '../../types/idp'
-import { useHandleIDPResponse } from '../../internal/hooks/useHandleIDPResponse'
-import { useIDPAutoInitProvider } from '../../internal/hooks/useIDPAutoInit'
-import { useInitIDPRedirect } from '../../internal/hooks/useInitIDPRedirect'
+import { IDPMethodsContextProvider, IDPStateContextProvider } from '../../contexts.js'
+import { IDPInitError, IDPResponseError, IDPStateValue } from '../../types/idp.js'
+import { useHandleIDPResponse } from '../../internal/hooks/useHandleIDPResponse.js'
+import { useIDPAutoInitProvider } from '../../internal/hooks/useIDPAutoInit.js'
+import { useInitIDPRedirect } from '../../internal/hooks/useInitIDPRedirect.js'
 
 export interface IDPProps {
 	children: ReactNode

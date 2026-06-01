@@ -1,1 +1,1 @@
-export * from './getCombinedSignal'
+export * from './getCombinedSignal.js'

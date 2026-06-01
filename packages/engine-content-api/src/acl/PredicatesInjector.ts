@@ -1,6 +1,6 @@
 import { Acl, Input, Model, Writable } from '@contember/schema'
 import { acceptFieldVisitor } from '@contember/schema-utils'
-import { PredicateFactory } from './PredicateFactory'
+import { PredicateFactory } from './PredicateFactory.js'
 
 export class PredicatesInjector {
 	constructor(private readonly schema: Model.Schema, private readonly predicateFactory: PredicateFactory) {}

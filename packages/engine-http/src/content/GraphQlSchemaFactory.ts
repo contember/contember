@@ -9,10 +9,10 @@ import {
 } from '@contember/engine-content-api'
 import { Acl, Schema } from '@contember/schema'
 import { GraphQLFieldConfig, GraphQLNamedType, GraphQLSchema } from 'graphql'
-import { GraphQLSchemaContributor } from './GraphQLSchemaContributor'
-import { Identity } from './Identity'
-import { ContentApiSpecificCache } from './ContentApiSpecificCache'
-import { ProjectConfig } from '../project/config'
+import { GraphQLSchemaContributor } from './GraphQLSchemaContributor.js'
+import { Identity } from './Identity.js'
+import { ContentApiSpecificCache } from './ContentApiSpecificCache.js'
+import { ProjectConfig } from '../project/config.js'
 
 export interface GraphQLSchemaFactoryResult {
 	permissions: Acl.Permissions

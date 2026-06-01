@@ -1,7 +1,7 @@
-import { createResolverContext, IdentityTypeResolver, TenantResolverContext } from '../index'
-import { PermissionContextFactory, SignInResult } from '../../model'
-import { CommonSignInResult } from '../../schema'
-import { PersonResponseFactory } from './PersonResponseFactory'
+import { createResolverContext, IdentityTypeResolver, TenantResolverContext } from '../index.js'
+import { PermissionContextFactory, SignInResult } from '../../model/index.js'
+import { CommonSignInResult } from '../../schema/index.js'
+import { PersonResponseFactory } from './PersonResponseFactory.js'
 
 export class SignInResponseFactory {
 	constructor(

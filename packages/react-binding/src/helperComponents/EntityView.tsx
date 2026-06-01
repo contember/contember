@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react'
-import { useEntity } from '../accessorPropagation'
+import { useEntity } from '../accessorPropagation/index.js'
 import type { EntityAccessor } from '@contember/binding'
 import type { SugaredRelativeSingleEntity } from '@contember/binding'
 

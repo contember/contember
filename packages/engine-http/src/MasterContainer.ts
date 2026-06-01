@@ -2,8 +2,8 @@ import { Builder } from '@contember/dic'
 import { SystemContainerFactory } from '@contember/engine-system-api'
 import { TenantContainerFactory } from '@contember/engine-tenant-api'
 import { ModificationHandlerFactory } from '@contember/schema-migrations'
-import { Initializer } from './bootstrap'
-import { ServerConfig } from './config/config'
+import { Initializer } from './bootstrap/index.js'
+import { ServerConfig } from './config/config.js'
 
 import { DatabaseMetadataResolver } from '@contember/database'
 import { ExecutionContainerFactory, GraphQlSchemaBuilderFactory, PermissionFactory } from '@contember/engine-content-api'
@@ -11,10 +11,10 @@ import { Logger } from '@contember/logger'
 import { Schema } from '@contember/schema'
 import Koa from 'koa'
 import { createSecretKey } from 'node:crypto'
-import { Application } from './application'
-import { HttpResponse } from './common'
-import { ProjectConfigResolver } from './config/projectConfigResolver'
-import { TenantConfigResolver } from './config/tenantConfigResolver'
+import { Application } from './application/index.js'
+import { HttpResponse } from './common/index.js'
+import { ProjectConfigResolver } from './config/projectConfigResolver.js'
+import { TenantConfigResolver } from './config/tenantConfigResolver.js'
 import {
 	ContentApiControllerFactory,
 	ContentQueryHandlerFactory,
@@ -22,22 +22,22 @@ import {
 	GraphQlSchemaFactory,
 	GraphQLSchemaFactoryResult,
 	NotModifiedChecker,
-} from './content'
-import { ContentApiSpecificCache } from './content/ContentApiSpecificCache'
-import { homepageController } from './misc'
-import { Plugin } from './plugin/Plugin'
-import { ProjectContainerFactoryFactory } from './project'
-import { ProjectContextResolver } from './project-common'
-import { ProjectGroupContainerFactory } from './projectGroup/ProjectGroupContainer'
-import { ProjectGroupContainerResolver } from './projectGroup/ProjectGroupContainerResolver'
-import { ProjectGroupResolver } from './projectGroup/ProjectGroupResolver'
-import { createColllectHttpMetricsMiddleware, createShowMetricsMiddleware } from './prometheus'
-import { ProjectGroupContainerMetricsHook } from './prometheus/ProjectGroupContainerMetricsHook'
-import { PrometheusRegistryFactory } from './prometheus/PrometheusRegistryFactory'
-import { createProviders, Providers } from './providers'
-import { SystemApiMiddlewareFactory, SystemGraphQLContextFactory, SystemGraphQLHandlerFactory } from './system'
-import { ContentQueryExecutorImpl } from './system/ContentQueryExecutor'
-import { TenantApiMiddlewareFactory, TenantGraphQLHandlerFactory } from './tenant'
+} from './content/index.js'
+import { ContentApiSpecificCache } from './content/ContentApiSpecificCache.js'
+import { homepageController } from './misc/index.js'
+import { Plugin } from './plugin/Plugin.js'
+import { ProjectContainerFactoryFactory } from './project/index.js'
+import { ProjectContextResolver } from './project-common/index.js'
+import { ProjectGroupContainerFactory } from './projectGroup/ProjectGroupContainer.js'
+import { ProjectGroupContainerResolver } from './projectGroup/ProjectGroupContainerResolver.js'
+import { ProjectGroupResolver } from './projectGroup/ProjectGroupResolver.js'
+import { createColllectHttpMetricsMiddleware, createShowMetricsMiddleware } from './prometheus/index.js'
+import { ProjectGroupContainerMetricsHook } from './prometheus/ProjectGroupContainerMetricsHook.js'
+import { PrometheusRegistryFactory } from './prometheus/PrometheusRegistryFactory.js'
+import { createProviders, Providers } from './providers.js'
+import { SystemApiMiddlewareFactory, SystemGraphQLContextFactory, SystemGraphQLHandlerFactory } from './system/index.js'
+import { ContentQueryExecutorImpl } from './system/ContentQueryExecutor.js'
+import { TenantApiMiddlewareFactory, TenantGraphQLHandlerFactory } from './tenant/index.js'
 import {
 	ContentSchemaTransferMappingFactory,
 	ExportApiControllerFactory,
@@ -45,10 +45,10 @@ import {
 	ImportApiMiddlewareFactory,
 	ImportExecutor,
 	SystemSchemaTransferMappingFactory,
-} from './transfer'
-import { CryptoWrapper } from './utils/CryptoWrapper'
-import { ApplicationWorkerManager } from './workers'
-import { TestTransactionService } from './testing'
+} from './transfer/index.js'
+import { CryptoWrapper } from './utils/CryptoWrapper.js'
+import { ApplicationWorkerManager } from './workers/index.js'
+import { TestTransactionService } from './testing/index.js'
 
 export type ProcessType =
 	| 'singleNode'

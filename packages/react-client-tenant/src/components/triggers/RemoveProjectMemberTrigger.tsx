@@ -1,6 +1,6 @@
 import { ReactElement, useCallback } from 'react'
-import { TenantActionTrigger } from './TenantActionTrigger'
-import { RemoveProjectMemberMutationVariables, useRemoveProjectMemberMutation } from '../../hooks'
+import { TenantActionTrigger } from './TenantActionTrigger.js'
+import { RemoveProjectMemberMutationVariables, useRemoveProjectMemberMutation } from '../../hooks/index.js'
 
 export type RemoveProjectMemberTriggerProps =
 	& RemoveProjectMemberMutationVariables

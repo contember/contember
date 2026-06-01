@@ -1,7 +1,7 @@
-import { DataViewSelectionMethods, DataViewSelectionProps, DataViewSelectionState } from '../../types'
+import { DataViewSelectionMethods, DataViewSelectionProps, DataViewSelectionState } from '../../types/index.js'
 import { useCallback, useMemo } from 'react'
 import { useStoredState } from '@contember/react-utils'
-import { DataViewSelectionStoredState, getDataViewSelectionStorageArgs } from '../stateStorage'
+import { DataViewSelectionStoredState, getDataViewSelectionStorageArgs } from '../stateStorage.js'
 
 export type UseDataViewSelectionArgs =
 	& {

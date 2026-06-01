@@ -1,9 +1,9 @@
 import { Command, CommandConfiguration, Input } from '@contember/cli-common'
-import { renderProjectInfoHtml } from '../../lib/project/docs/projectDescribe'
+import { renderProjectInfoHtml } from '../../lib/project/docs/projectDescribe.js'
 import { writeFile } from 'node:fs/promises'
 import { join } from 'node:path'
-import { SchemaLoader } from '../../lib/schema/SchemaLoader'
-import { validateSchemaAndPrintErrors } from '../../lib/schema/SchemaValidationHelper'
+import { SchemaLoader } from '../../lib/schema/SchemaLoader.js'
+import { validateSchemaAndPrintErrors } from '../../lib/schema/SchemaValidationHelper.js'
 import { SchemaVersionBuilder } from '@contember/migrations-client'
 
 type Args = {}

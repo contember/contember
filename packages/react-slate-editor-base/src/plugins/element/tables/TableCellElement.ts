@@ -1,7 +1,7 @@
 import { Editor as SlateEditor, Element, Element as SlateElement, Node, Transforms } from 'slate'
-import { ContemberEditor } from '../../../editor'
-import { tableRowElementType } from './TableRowElement'
-import { EditorElementPlugin, ElementRenderer } from '../../../types'
+import { ContemberEditor } from '../../../editor/index.js'
+import { tableRowElementType } from './TableRowElement.js'
+import { EditorElementPlugin, ElementRenderer } from '../../../types/index.js'
 
 export const tableCellElementType = 'tableCell' as const
 

@@ -1,8 +1,8 @@
 import { forwardRef, MouseEvent, ReactElement, useCallback } from 'react'
-import { useDataViewSortingMethods, useDataViewSortingState } from '../../contexts'
+import { useDataViewSortingMethods, useDataViewSortingState } from '../../contexts.js'
 import { Slot } from '@radix-ui/react-slot'
 import { dataAttribute } from '@contember/utilities'
-import { DataViewSortingDirection, DataViewSortingDirectionAction } from '../../types'
+import { DataViewSortingDirection, DataViewSortingDirectionAction } from '../../types/index.js'
 import { composeEventHandlers } from '@radix-ui/primitive'
 
 export interface DataViewSortingTriggerAttributes {

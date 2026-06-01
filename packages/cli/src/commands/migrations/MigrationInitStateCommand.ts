@@ -1,6 +1,6 @@
 import { Command, CommandConfiguration, Input } from '@contember/cli-common'
 import { SchemaStateManager } from '@contember/migrations-client'
-import { SchemaLoader } from '../../lib/schema/SchemaLoader'
+import { SchemaLoader } from '../../lib/schema/SchemaLoader.js'
 
 type Args = {}
 

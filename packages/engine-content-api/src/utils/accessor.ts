@@ -1,5 +1,5 @@
-import { ImplementationException } from '../exception'
-import { Interface } from './Interface'
+import { ImplementationException } from '../exception.js'
+import { Interface } from './Interface.js'
 
 export class Accessor<T> {
 	private val: T | undefined

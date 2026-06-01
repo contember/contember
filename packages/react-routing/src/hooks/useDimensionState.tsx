@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
-import { useCurrentRequest } from '../contexts'
-import { useRedirect } from './useRedirect'
+import { useCurrentRequest } from '../contexts.js'
+import { useRedirect } from './useRedirect.js'
 import { StateStorageOrName, useStoredState } from '@contember/react-utils'
 
 const emptyDim = [] as string[]

@@ -1,4 +1,4 @@
-import { LoggerHandler } from '../types'
+import { LoggerHandler } from '../types.js'
 
 export class NullLoggerHandler implements LoggerHandler {
 	close(): void {

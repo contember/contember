@@ -1,6 +1,6 @@
-import { headingElementType } from './HeadingElement'
-import { HtmlDeserializerPlugin } from '../../../types'
-import { EditorPasteUtils } from '../../../internal/utils/EditorPasteUtils'
+import { headingElementType } from './HeadingElement.js'
+import { HtmlDeserializerPlugin } from '../../../types/index.js'
+import { EditorPasteUtils } from '../../../internal/utils/EditorPasteUtils.js'
 
 export const headingHtmlDeserializer: HtmlDeserializerPlugin = {
 	processBlockPaste: ({ element, next, cumulativeTextAttrs }) => {

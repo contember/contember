@@ -1,5 +1,5 @@
-import { EntityConstructor } from '../../utils'
-import { FieldDefinition } from './fieldDefinitions'
+import { EntityConstructor } from '../../utils/index.js'
+import { FieldDefinition } from './fieldDefinitions/index.js'
 
 export type RelationTarget = EntityConstructor
 export type FieldsDefinition = Record<string, FieldDefinition<any>>

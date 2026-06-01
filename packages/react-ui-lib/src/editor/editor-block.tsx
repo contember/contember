@@ -4,7 +4,7 @@ import { Popover, PopoverContent, PopoverTrigger } from '@contember/react-ui-lib
 import { Component } from '@contember/interface'
 import { ReactNode, useCallback } from 'react'
 import { Block, BlockContent, BlockRendererProps, useEditorBlockElement } from '@contember/react-slate-editor'
-import { BlockElement } from './common/elements/BlockElement'
+import { BlockElement } from './common/elements/BlockElement.js'
 import { ReactEditor, useSlateStatic } from 'slate-react'
 import { Node, Transforms } from 'slate'
 

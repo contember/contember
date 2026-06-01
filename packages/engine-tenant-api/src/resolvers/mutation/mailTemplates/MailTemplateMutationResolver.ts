@@ -4,12 +4,12 @@ import {
 	MutationRemoveProjectMailTemplateArgs,
 	MutationResolvers,
 	RemoveMailTemplateResponse,
-} from '../../../schema'
-import { TenantResolverContext } from '../../TenantResolverContext'
-import { MailTemplateManager, mailTypeFromSchemaToDb, PermissionActions, ProjectManager } from '../../../model'
-import { createErrorResponse, createProjectNotFoundResponse } from '../../errorUtils'
-import { validateEmail } from '../../../model/utils/email'
-import { ResponseOk } from '../../../model/utils/Response'
+} from '../../../schema/index.js'
+import { TenantResolverContext } from '../../TenantResolverContext.js'
+import { MailTemplateManager, mailTypeFromSchemaToDb, PermissionActions, ProjectManager } from '../../../model/index.js'
+import { createErrorResponse, createProjectNotFoundResponse } from '../../errorUtils.js'
+import { validateEmail } from '../../../model/utils/email.js'
+import { ResponseOk } from '../../../model/utils/Response.js'
 
 export class MailTemplateMutationResolver implements MutationResolvers {
 	constructor(

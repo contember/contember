@@ -1,8 +1,8 @@
 import { Editor, Element, Element as SlateElement, Node, Path as SlatePath } from 'slate'
-import { isUnorderedListElement, UnorderedListElement } from './UnorderedListElement'
-import { isOrderedListElement, OrderedListElement } from './OrderedListElement'
-import { ContemberEditor } from '../../../editor'
-import { isListItemElement } from './ListItemElement'
+import { isUnorderedListElement, UnorderedListElement } from './UnorderedListElement.js'
+import { isOrderedListElement, OrderedListElement } from './OrderedListElement.js'
+import { ContemberEditor } from '../../../editor/index.js'
+import { isListItemElement } from './ListItemElement.js'
 
 export const isListElement = <T extends UnorderedListElement | OrderedListElement>(
 	element: Node,

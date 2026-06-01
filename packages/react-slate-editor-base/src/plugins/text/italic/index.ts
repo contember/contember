@@ -1,2 +1,2 @@
-export * from './withItalic'
-export * from './italicMark'
+export * from './withItalic.js'
+export * from './italicMark.js'

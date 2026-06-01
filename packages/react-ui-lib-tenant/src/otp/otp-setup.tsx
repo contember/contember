@@ -14,9 +14,9 @@ import {
 	AlertDialogTitle,
 	AlertDialogTrigger,
 } from '@contember/react-ui-lib-base'
-import { TenantFormError, TenantFormField } from '../forms/common'
+import { TenantFormError, TenantFormField } from '../forms/common.js'
 import { ToastContent, useShowToast } from '@contember/react-ui-lib-base'
-import { dict } from '../dict'
+import { dict } from '../dict.js'
 
 export const OtpSetup = () => {
 	const identity = useIdentity()

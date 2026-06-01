@@ -1,6 +1,6 @@
-import { Config } from '../../type/Config'
-import { CaptchaProvider as CaptchaProviderKey } from '../../../schema'
-import { CaptchaProviderHandler, CaptchaVerifyResult } from './CaptchaProvider'
+import { Config } from '../../type/Config.js'
+import { CaptchaProvider as CaptchaProviderKey } from '../../../schema/index.js'
+import { CaptchaProviderHandler, CaptchaVerifyResult } from './CaptchaProvider.js'
 
 export interface CaptchaConfig {
 	readonly provider: CaptchaProviderKey | null

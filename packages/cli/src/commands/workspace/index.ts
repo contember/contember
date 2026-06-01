@@ -1,1 +1,1 @@
-export * from './WorkspaceUpdateApiCommand'
+export * from './WorkspaceUpdateApiCommand.js'

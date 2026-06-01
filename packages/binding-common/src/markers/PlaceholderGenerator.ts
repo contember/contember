@@ -6,10 +6,10 @@ import type {
 	QualifiedSingleEntity,
 	UnconstrainedQualifiedEntityList,
 	UnconstrainedQualifiedSingleEntity,
-} from '../treeParameters'
-import { Hashing } from '../utils/Hashing'
-import { Environment } from '../environment'
-import { PlaceholderParametersGenerator } from './PlaceholderParametersGenerator'
+} from '../treeParameters/index.js'
+import { Hashing } from '../utils/Hashing.js'
+import { Environment } from '../environment/index.js'
+import { PlaceholderParametersGenerator } from './PlaceholderParametersGenerator.js'
 
 export class PlaceholderGenerator {
 	public static getFieldPlaceholder(fieldName: FieldName): string {

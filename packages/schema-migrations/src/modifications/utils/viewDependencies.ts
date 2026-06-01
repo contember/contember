@@ -1,6 +1,6 @@
 import { Model } from '@contember/schema'
-import { Migration } from '../../Migration'
-import { removeEntityModification } from '../entities'
+import { Migration } from '../../Migration.js'
+import { removeEntityModification } from '../entities/index.js'
 
 type EntityDependantViews = Map<string, Set<Model.Entity>>
 export const getEntityDependantViews = (model: Model.Schema): EntityDependantViews => {

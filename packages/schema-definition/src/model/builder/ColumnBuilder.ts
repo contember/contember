@@ -1,4 +1,4 @@
-import FieldBuilder from './FieldBuilder'
+import FieldBuilder from './FieldBuilder.js'
 import { Model } from '@contember/schema'
 
 type PartialColumnOptions<K extends keyof ColumnBuilder.Options> =

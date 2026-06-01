@@ -1,4 +1,4 @@
-import { uic, uiconfig } from '../utils'
+import { uic, uiconfig } from '../utils/index.js'
 
 export const inputConfig = uiconfig({
 	baseClass: [

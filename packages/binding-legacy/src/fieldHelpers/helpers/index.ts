@@ -1,2 +1,2 @@
-export * from './TemporalFieldHelper'
-export * from './UuidFieldHelper'
+export * from './TemporalFieldHelper.js'
+export * from './UuidFieldHelper.js'

@@ -1,5 +1,5 @@
-export * from './nodeSpecs'
+export * from './nodeSpecs/index.js'
 
-export * from './ChildrenAnalyzer'
-export * from './ChildrenAnalyzerError'
-export * from './ChildrenAnalyzerOptions'
+export * from './ChildrenAnalyzer.js'
+export * from './ChildrenAnalyzerError.js'
+export * from './ChildrenAnalyzerOptions.js'

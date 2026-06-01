@@ -1,5 +1,5 @@
 import * as CollapsiblePrimitive from '@radix-ui/react-collapsible'
-import { createComponentOpenHooks } from '../utils/createComponentOpenHooks'
+import { createComponentOpenHooks } from '../utils/createComponentOpenHooks.js'
 
 export const {
 	Component: Collapsible,

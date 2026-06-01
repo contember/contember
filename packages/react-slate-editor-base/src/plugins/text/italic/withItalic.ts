@@ -1,6 +1,6 @@
-import { italicMark, italicMarkPlugin } from './italicMark'
-import { EditorPlugin } from '../../../types'
-import { createMarkHtmlDeserializer } from '../../behaviour'
+import { italicMark, italicMarkPlugin } from './italicMark.js'
+import { EditorPlugin } from '../../../types/index.js'
+import { createMarkHtmlDeserializer } from '../../behaviour/index.js'
 
 export const withItalic = (): EditorPlugin => editor => {
 	editor.registerMark(italicMarkPlugin)

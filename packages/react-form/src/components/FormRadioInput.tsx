@@ -3,8 +3,8 @@ import { dataAttribute } from '@contember/utilities'
 import { Slot } from '@radix-ui/react-slot'
 import * as React from 'react'
 import { ChangeEventHandler, useCallback } from 'react'
-import { useFormFieldState } from '../contexts'
-import { useFormInputValidationHandler } from '../hooks'
+import { useFormFieldState } from '../contexts.js'
+import { useFormInputValidationHandler } from '../hooks/index.js'
 
 const SlotInput = Slot as React.ForwardRefExoticComponent<React.RefAttributes<HTMLInputElement> & React.InputHTMLAttributes<HTMLInputElement>>
 

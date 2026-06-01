@@ -1,5 +1,5 @@
-import { useIdentityMethods } from '../contexts'
-import { useLogoutInternal } from '../internal/hooks/useLogoutInternal'
+import { useIdentityMethods } from '../contexts.js'
+import { useLogoutInternal } from '../internal/hooks/useLogoutInternal.js'
 
 export const useLogout = () => {
 	const { clearIdentity } = useIdentityMethods()

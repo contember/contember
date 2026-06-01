@@ -1,4 +1,4 @@
-import { NormalizedPersistedData, PersistedEntityDataStore, SubTreeDataStore } from '../accessorTree'
+import { NormalizedPersistedData, PersistedEntityDataStore, SubTreeDataStore } from '../accessorTree/index.js'
 import type {
 	Alias,
 	EntityId,
@@ -18,9 +18,9 @@ import type {
 } from '@contember/binding-common'
 import { BindingError, MarkerComparator, MarkerTreeRoot, PlaceholderGenerator, QueryLanguage } from '@contember/binding-common'
 import { assertNever } from '@contember/binding-common'
-import { RequestResponseNormalizer } from './RequestResponseNormalizer'
-import type { EntityListState, EntityRealmState, EntityRealmStateStub, EntityState, RootStateNode } from './state'
-import { SubMutationOperation } from './MutationGenerator'
+import { RequestResponseNormalizer } from './RequestResponseNormalizer.js'
+import type { EntityListState, EntityRealmState, EntityRealmStateStub, EntityState, RootStateNode } from './state/index.js'
+import { SubMutationOperation } from './MutationGenerator.js'
 
 const emptyEntityIdSet: ReadonlySet<EntityId> = new Set()
 

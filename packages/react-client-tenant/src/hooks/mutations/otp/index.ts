@@ -1,3 +1,3 @@
-export * from './useConfirmOtpMutation'
-export * from './useDisableOtpMutation'
-export * from './usePrepareOtpMutation'
+export * from './useConfirmOtpMutation.js'
+export * from './useDisableOtpMutation.js'
+export * from './usePrepareOtpMutation.js'

@@ -1,8 +1,8 @@
 import { Client, custom, errors, generators } from 'openid-client'
-import { OIDCResponseData } from './OIDCTypes'
-import { IDPValidationError } from '../IDPValidationError'
-import { IDPResponseError } from '../IDPResponseError'
-import { IDPResponse, InitIDPAuthResult } from '../IdentityProviderHandler'
+import { OIDCResponseData } from './OIDCTypes.js'
+import { IDPValidationError } from '../IDPValidationError.js'
+import { IDPResponseError } from '../IDPResponseError.js'
+import { IDPResponse, InitIDPAuthResult } from '../IdentityProviderHandler.js'
 
 export const initOIDCAuth = async (
 	client: Client,

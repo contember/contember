@@ -1,12 +1,12 @@
 import { escapeValue, MigrationBuilder } from '@contember/database-migrations'
 import { JSONValue, Model, Schema } from '@contember/schema'
-import { SchemaUpdater, updateEntity, updateField, updateModel } from '../utils/schemaUpdateUtils'
-import { createModificationType, Differ, ModificationHandler } from '../ModificationHandler'
+import { SchemaUpdater, updateEntity, updateField, updateModel } from '../utils/schemaUpdateUtils.js'
+import { createModificationType, Differ, ModificationHandler } from '../ModificationHandler.js'
 import deepEqual from 'fast-deep-equal'
-import { updateColumns } from '../utils/diffUtils'
-import { wrapIdentifier } from '../../utils/dbHelpers'
-import { getColumnSqlType } from '../utils/columnUtils'
-import { fillSeed, formatSeedExpression } from './columnUtils'
+import { updateColumns } from '../utils/diffUtils.js'
+import { wrapIdentifier } from '../../utils/dbHelpers.js'
+import { getColumnSqlType } from '../utils/columnUtils.js'
+import { fillSeed, formatSeedExpression } from './columnUtils.js'
 
 export class UpdateColumnDefinitionModificationHandler implements ModificationHandler<UpdateColumnDefinitionModificationData> {
 	constructor(private readonly data: UpdateColumnDefinitionModificationData, private readonly schema: Schema) {}

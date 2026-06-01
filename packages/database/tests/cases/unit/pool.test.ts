@@ -1,5 +1,5 @@
 import { beforeAll, expect, it } from 'bun:test'
-import { ClientErrorCodes, Pool, PoolLogger } from '../../../src'
+import { ClientErrorCodes, Pool, PoolLogger } from '../../../src/index.js'
 import { Client as PgClient } from 'pg'
 import EventEmitter from 'node:events'
 

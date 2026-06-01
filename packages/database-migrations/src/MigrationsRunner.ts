@@ -1,5 +1,5 @@
 import { Connection } from '@contember/database'
-import { MigrationsResolver } from './MigrationsResolver'
+import { MigrationsResolver } from './MigrationsResolver.js'
 
 export class MigrationsRunner<MigrationArgs> {
 	constructor(
@@ -12,7 +12,7 @@ export class MigrationsRunner<MigrationArgs> {
 		log: (msg: string) => void,
 		migrationArgs: MigrationArgs,
 	): Promise<{ name: string }[]> {
-		const migrate = (await import('./runner')).default
+		const migrate = (await import('./runner.js')).default
 		return await migrate(this.migrationsResolver, this.connection, {
 			schema: this.schema,
 			migrationsTable: 'migrations',

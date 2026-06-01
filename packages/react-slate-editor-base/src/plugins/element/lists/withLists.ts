@@ -1,12 +1,12 @@
 import { Editor, Element as SlateElement, Node as SlateNode, Path as SlatePath, Range as SlateRange, Text, Transforms } from 'slate'
-import { ContemberEditor } from '../../../editor'
-import { isListItemElement, ListItemElement, listItemElementPlugin } from './ListItemElement'
-import { OrderedListElement, orderedListElementPlugin } from './OrderedListElement'
-import { dedentListItem, indentListItem } from './transforms'
-import { UnorderedListElement, unorderedListElementPlugin } from './UnorderedListElement'
-import { isListElement } from './ListElement'
-import { listHtmlDeserializerFactory } from './ListHtmlDeserializer'
-import { ElementRenderer } from '../../../types'
+import { ContemberEditor } from '../../../editor/index.js'
+import { isListItemElement, ListItemElement, listItemElementPlugin } from './ListItemElement.js'
+import { OrderedListElement, orderedListElementPlugin } from './OrderedListElement.js'
+import { dedentListItem, indentListItem } from './transforms/index.js'
+import { UnorderedListElement, unorderedListElementPlugin } from './UnorderedListElement.js'
+import { isListElement } from './ListElement.js'
+import { listHtmlDeserializerFactory } from './ListHtmlDeserializer.js'
+import { ElementRenderer } from '../../../types/index.js'
 
 export const withLists = ({ renderListItem, renderUnorderedList, renderOrderedList }: {
 	renderListItem: ElementRenderer<ListItemElement>

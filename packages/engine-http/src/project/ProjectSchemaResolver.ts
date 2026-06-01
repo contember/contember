@@ -1,6 +1,6 @@
 import { ProjectSchemaResolver as ProjectSchemaResolverInterface } from '@contember/engine-tenant-api'
 import { Schema } from '@contember/schema'
-import { ProjectContainerResolver } from './ProjectContainerResolver'
+import { ProjectContainerResolver } from './ProjectContainerResolver.js'
 
 export class ProjectSchemaResolver implements ProjectSchemaResolverInterface {
 	constructor(

@@ -1,6 +1,6 @@
 import { InsertBuilder } from '@contember/database'
-import { Command } from '../Command'
-import { Project } from '../../type'
+import { Command } from '../Command.js'
+import { Project } from '../../type/index.js'
 import { ConflictActionType } from '@contember/database'
 
 export class CreateProjectCommand implements Command<string | null> {

@@ -1,6 +1,6 @@
 import { Registry } from 'prom-client'
-import { ProjectGroupContainerResolver } from '../projectGroup/ProjectGroupContainerResolver'
-import { createDbMetricsRegistrar } from './dbMetrics'
+import { ProjectGroupContainerResolver } from '../projectGroup/ProjectGroupContainerResolver.js'
+import { createDbMetricsRegistrar } from './dbMetrics.js'
 
 export class ProjectGroupContainerMetricsHook {
 	constructor(

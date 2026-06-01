@@ -1,6 +1,6 @@
 import { ConflictActionType, InsertBuilder } from '@contember/database'
-import { Command } from '../Command'
-import { SchemaWithMeta } from '../../migrations'
+import { Command } from '../Command.js'
+import { SchemaWithMeta } from '../../migrations/index.js'
 
 export class SaveSchemaCommand implements Command<void> {
 	constructor(private readonly input: SchemaWithMeta) {}

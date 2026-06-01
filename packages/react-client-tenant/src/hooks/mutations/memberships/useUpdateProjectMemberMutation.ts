@@ -1,5 +1,5 @@
 import * as TenantApi from '@contember/graphql-client-tenant'
-import { createTenantMutation } from '../../useTenantMutation'
+import { createTenantMutation } from '../../useTenantMutation.js'
 
 export const updateProjectMemberMutation = TenantApi.mutation$
 	.updateProjectMember(

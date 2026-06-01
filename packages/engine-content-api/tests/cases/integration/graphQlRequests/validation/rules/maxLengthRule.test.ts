@@ -1,7 +1,7 @@
 import { describe, it } from 'bun:test'
 import { InputValidation as v } from '@contember/schema-definition'
 import { SchemaDefinition as d } from '@contember/schema-definition'
-import { createSchema, testCreate } from '../utils'
+import { createSchema, testCreate } from '../utils.js'
 
 class Item {
 	@v.assert(v.rules.maxLength(5), 'failure')

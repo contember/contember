@@ -1,6 +1,6 @@
 import { isHotkey } from 'is-hotkey'
 import { createElement } from 'react'
-import { EditorMarkPlugin } from '../../../types'
+import { EditorMarkPlugin } from '../../../types/index.js'
 
 export const italicMark = 'isItalic'
 

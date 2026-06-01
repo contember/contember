@@ -1,5 +1,5 @@
-import OneHasOneBuilder from '../OneHasOneBuilder'
-import FieldProcessor from './FieldProcessor'
+import OneHasOneBuilder from '../OneHasOneBuilder.js'
+import FieldProcessor from './FieldProcessor.js'
 import { Model } from '@contember/schema'
 import { NamingConventions } from '@contember/schema-utils'
 

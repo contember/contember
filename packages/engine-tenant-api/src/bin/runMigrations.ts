@@ -1,4 +1,4 @@
-import { TenantMigrationsRunner } from '../migrations'
+import { TenantMigrationsRunner } from '../migrations/index.js'
 import { createLogger, PrettyPrintLoggerHandler } from '@contember/logger'
 
 let uuidNum = 0

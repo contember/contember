@@ -1,5 +1,5 @@
-import { Identity, QueryResolvers } from '../../schema'
-import { TenantResolverContext } from '../TenantResolverContext'
+import { Identity, QueryResolvers } from '../../schema/index.js'
+import { TenantResolverContext } from '../TenantResolverContext.js'
 
 export class MeQueryResolver implements QueryResolvers {
 	me(parent: unknown, args: unknown, context: TenantResolverContext): Identity {

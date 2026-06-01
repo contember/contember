@@ -1,8 +1,8 @@
-import { filterObject } from '../utils'
+import { filterObject } from '../utils/index.js'
 import { Input, Model } from '@contember/schema'
-import { CreateInputProcessor } from './CreateInputProcessor'
-import { ImplementationException, UserError } from '../exception'
-import { MapperInput } from '../mapper'
+import { CreateInputProcessor } from './CreateInputProcessor.js'
+import { ImplementationException, UserError } from '../exception.js'
+import { MapperInput } from '../mapper/index.js'
 
 export class CreateInputVisitor<Result> implements Model.ColumnVisitor<Promise<Result[]>>, Model.RelationByTypeVisitor<Promise<Result[]>> {
 	constructor(

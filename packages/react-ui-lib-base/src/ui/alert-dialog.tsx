@@ -1,8 +1,8 @@
 import * as AlertDialogPrimitive from '@radix-ui/react-alert-dialog'
 import * as React from 'react'
-import { uic } from '../utils'
-import { createComponentOpenHooks } from '../utils/createComponentOpenHooks'
-import { buttonConfig } from './button'
+import { uic } from '../utils/index.js'
+import { createComponentOpenHooks } from '../utils/createComponentOpenHooks.js'
+import { buttonConfig } from './button.js'
 
 export const {
 	Component: AlertDialog,

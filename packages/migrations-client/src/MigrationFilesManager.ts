@@ -1,7 +1,7 @@
 import { MigrationVersionHelper } from '@contember/engine-common'
 import * as fs from 'node:fs/promises'
-import { MigrationFileLoader } from './MigrationFileLoader'
-import { MigrationContent, MigrationFile } from './MigrationFile'
+import { MigrationFileLoader } from './MigrationFileLoader.js'
+import { MigrationContent, MigrationFile } from './MigrationFile.js'
 import { join } from 'node:path'
 import { Dirent } from 'node:fs'
 

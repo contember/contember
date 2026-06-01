@@ -1,5 +1,5 @@
 import React, { ReactNode } from 'react'
-import { RepeaterSortableItemContext, useRepeaterActiveEntity } from '../contexts'
+import { RepeaterSortableItemContext, useRepeaterActiveEntity } from '../contexts.js'
 import { Portal } from '@radix-ui/react-portal'
 import { DragOverlay } from '@dnd-kit/core'
 import { useSortable } from '@dnd-kit/sortable'

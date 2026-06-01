@@ -1,5 +1,5 @@
 import { useCallback, useRef, useState } from 'react'
-import { RequestChangeEvent, RequestChangeHandler, RequestState } from '../../types'
+import { RequestChangeEvent, RequestChangeHandler, RequestState } from '../../types/index.js'
 
 export const useRequestChangeListeners = (): {
 	addListener: (handler: RequestChangeHandler) => () => void

@@ -1,2 +1,2 @@
-export * from './DataViewHighlightRow'
-export * from './DataViewKeyboardEventHandler'
+export * from './DataViewHighlightRow.js'
+export * from './DataViewKeyboardEventHandler.js'

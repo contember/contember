@@ -1,5 +1,5 @@
 import { Model } from '@contember/schema'
-import { CommonContext } from '../context'
+import { CommonContext } from '../context.js'
 
 export abstract class FieldDefinition<O> {
 	constructor(public readonly options: O) {

@@ -1,6 +1,6 @@
-import { Argument } from './Argument'
-import { Option, OptionMode } from './Option'
-import { Arguments, Input, Options } from './Input'
+import { Argument } from './Argument.js'
+import { Option, OptionMode } from './Option.js'
+import { Arguments, Input, Options } from './Input.js'
 
 export class InputParser {
 	constructor(private _arguments: Argument[], private options: Option[]) {}

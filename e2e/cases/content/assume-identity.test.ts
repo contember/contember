@@ -1,5 +1,5 @@
 import { test } from 'bun:test'
-import { createTester, gql } from '../../src/tester'
+import { createTester, gql } from '../../src/tester.js'
 import { createSchema, SchemaDefinition as def } from '@contember/schema-definition'
 import { AllowAllPermissionFactory } from '@contember/schema-utils'
 

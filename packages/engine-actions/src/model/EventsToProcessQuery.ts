@@ -1,7 +1,7 @@
 import { DatabaseQuery, DatabaseQueryable, SelectBuilder } from '@contember/database'
-import { EventRow } from './types'
-import { EventArgs } from '../graphql/schema'
-import { eventsToProcessSpecification } from './EventsToProcessSpecification'
+import { EventRow } from './types.js'
+import { EventArgs } from '../graphql/schema/index.js'
+import { eventsToProcessSpecification } from './EventsToProcessSpecification.js'
 
 export class EventsToProcessQuery extends DatabaseQuery<EventRow[]> {
 	constructor(

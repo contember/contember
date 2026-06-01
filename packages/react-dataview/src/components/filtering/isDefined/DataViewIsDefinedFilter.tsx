@@ -1,7 +1,7 @@
 import { Component, SugaredRelativeSingleField } from '@contember/react-binding'
-import { getFilterName } from '../../../internal/helpers/getFilterName'
-import { DataViewFilter } from '../DataViewFilter'
-import { createIsDefinedFilter } from '../../../filterTypes'
+import { getFilterName } from '../../../internal/helpers/getFilterName.js'
+import { DataViewFilter } from '../DataViewFilter.js'
+import { createIsDefinedFilter } from '../../../filterTypes/index.js'
 
 export interface DataViewIsDefinedFilterProps {
 	/**

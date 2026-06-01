@@ -1,10 +1,10 @@
 import { Client, custom, Issuer } from 'openid-client'
-import { IdentityProviderHandler, IDPResponse, InitIDPAuthResult } from '../IdentityProviderHandler'
-import { InvalidIDPConfigurationError } from '../InvalidIDPConfigurationError'
-import { catchTypesafe } from './helpers'
-import { OIDCConfiguration, OIDCInitData, OIDCResponseData } from './OIDCTypes'
-import { handleOIDCResponse, initOIDCAuth } from './OIDCHelpers'
-import { IDPValidationError } from '../IDPValidationError'
+import { IdentityProviderHandler, IDPResponse, InitIDPAuthResult } from '../IdentityProviderHandler.js'
+import { InvalidIDPConfigurationError } from '../InvalidIDPConfigurationError.js'
+import { catchTypesafe } from './helpers.js'
+import { OIDCConfiguration, OIDCInitData, OIDCResponseData } from './OIDCTypes.js'
+import { handleOIDCResponse, initOIDCAuth } from './OIDCHelpers.js'
+import { IDPValidationError } from '../IDPValidationError.js'
 
 const DEFAULT_OIDC_TIMEOUT = 5000
 

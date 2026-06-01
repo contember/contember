@@ -1,5 +1,5 @@
-import { Command } from '../Command'
-import { AuthActionType } from '../../type/AuthLog'
+import { Command } from '../Command.js'
+import { AuthActionType } from '../../type/AuthLog.js'
 import { InsertBuilder } from '@contember/database'
 import { JSONValue } from '@contember/schema'
 

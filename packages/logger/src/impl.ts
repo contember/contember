@@ -8,11 +8,11 @@ import {
 	LoggerOptions,
 	LogLevel,
 	LogLevelName,
-} from './types'
-import { LogLevels } from './levels'
-import { formatLogEntryAttributes, formatLoggerAttributes, FormattedAttributes, stringify } from './formatting'
-import { LoggerHandlerList } from './handlers/LoggerHandlerList'
-import { withLogger } from './proxy'
+} from './types.js'
+import { LogLevels } from './levels.js'
+import { formatLogEntryAttributes, formatLoggerAttributes, FormattedAttributes, stringify } from './formatting.js'
+import { LoggerHandlerList } from './handlers/LoggerHandlerList.js'
+import { withLogger } from './proxy.js'
 
 export const createLogger = (
 	handler: LoggerHandler,

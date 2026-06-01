@@ -5,18 +5,18 @@ import {
 	DisableIdentityApiKeysCommand,
 	DisableOneOffApiKeyCommand,
 	ProlongApiKeyCommand,
-} from '../../commands'
-import { ApiKey } from '../../type'
+} from '../../commands/index.js'
+import { ApiKey } from '../../type/index.js'
 
-import { Response, ResponseError, ResponseOk } from '../../utils/Response'
-import { DatabaseContext, TokenHash } from '../../utils'
-import { ApiKeyService, CreateApiKeyResponse } from './ApiKeyService'
+import { Response, ResponseError, ResponseOk } from '../../utils/Response.js'
+import { DatabaseContext, TokenHash } from '../../utils/index.js'
+import { ApiKeyService, CreateApiKeyResponse } from './ApiKeyService.js'
 import assert from 'node:assert'
 import { Acl } from '@contember/schema'
-import { ApiKeyByIdQuery, ApiKeyByTokenQuery, ApiKeyRow, ConfigurationQuery } from '../../queries'
+import { ApiKeyByIdQuery, ApiKeyByTokenQuery, ApiKeyRow, ConfigurationQuery } from '../../queries/index.js'
 import PostgresInterval from 'postgres-interval'
-import { Config } from '../../type/Config'
-import { intervalToSeconds } from '../../utils/interval'
+import { Config } from '../../type/Config.js'
+import { intervalToSeconds } from '../../utils/interval.js'
 
 export class ApiKeyManager {
 	constructor(

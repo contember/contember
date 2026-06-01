@@ -1,4 +1,4 @@
-import { IncompleteRequestState, RequestState, RoutingLinkTarget } from '../../types'
+import { IncompleteRequestState, RequestState, RoutingLinkTarget } from '../../types/index.js'
 
 export const targetToRequest = (target: RoutingLinkTarget, currentRequest: RequestState): IncompleteRequestState | null => {
 	if (typeof target === 'function') {

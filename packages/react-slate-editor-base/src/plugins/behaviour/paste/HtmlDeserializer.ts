@@ -1,6 +1,6 @@
 import { Descendant, Element as SlateElement, Text as SlateText } from 'slate'
-import { HtmlDeserializerNextCallback, HtmlDeserializerPlugin } from '../../../types/htmlDeserializer'
-import { EditorDefaultElementFactory } from '../../../types/editor'
+import { HtmlDeserializerNextCallback, HtmlDeserializerPlugin } from '../../../types/htmlDeserializer.js'
+import { EditorDefaultElementFactory } from '../../../types/editor.js'
 
 const ignoredElements = ['SCRIPT', 'STYLE', 'TEMPLATE']
 

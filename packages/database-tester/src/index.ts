@@ -1,1 +1,1 @@
-export * from './mocking'
+export * from './mocking.js'

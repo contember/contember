@@ -1,7 +1,7 @@
 import * as React from 'react'
 import * as PopoverPrimitive from '@radix-ui/react-popover'
-import { cn, uic } from '../utils'
-import { createComponentOpenHooks } from '../utils/createComponentOpenHooks'
+import { cn, uic } from '../utils/index.js'
+import { createComponentOpenHooks } from '../utils/createComponentOpenHooks.js'
 
 const { Component: Popover, useOpen: usePopoverOpenState } = createComponentOpenHooks(PopoverPrimitive.Root)
 

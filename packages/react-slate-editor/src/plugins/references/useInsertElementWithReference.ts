@@ -1,10 +1,10 @@
 import { Descendant, Editor, Element, Transforms } from 'slate'
 import { EntityAccessor, FieldValue } from '@contember/react-binding'
-import { CreateElementReferences } from './useCreateElementReference'
+import { CreateElementReferences } from './useCreateElementReference.js'
 import { useReferentiallyStableCallback } from '@contember/react-utils'
-import { prepareElementForInsertion } from './utils'
-import { ElementWithReference } from './elements'
-import { EditorReferenceBlocks } from '../../internal/helpers/useCreateEditorReferenceBlocks'
+import { prepareElementForInsertion } from './utils/index.js'
+import { ElementWithReference } from './elements/index.js'
+import { EditorReferenceBlocks } from '../../internal/helpers/useCreateEditorReferenceBlocks.js'
 import { BindingError } from '@contember/react-binding'
 
 export type InsertElementWithReference = (

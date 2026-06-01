@@ -6,9 +6,9 @@ import type {
 	SugaredUnconstrainedQualifiedSingleEntity,
 } from '@contember/binding'
 import { QueryLanguage } from '@contember/binding'
-import { Component, EntityListSubTree, EntitySubTree, Field } from '../coreComponents'
-import { SugaredField } from '../helperComponents'
-import { addEntityAtIndex } from './addEntityAtIndex'
+import { Component, EntityListSubTree, EntitySubTree, Field } from '../coreComponents/index.js'
+import { SugaredField } from '../helperComponents/index.js'
+import { addEntityAtIndex } from './addEntityAtIndex.js'
 
 export interface SetOrderFieldOnCreateOwnProps {
 	orderField: SugaredRelativeSingleField | string

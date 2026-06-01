@@ -1,6 +1,6 @@
-import { AddMailTemplateCommand, RemoveMailTemplateCommand } from '../commands'
-import { MailTemplate, MailTemplateIdentifier } from '../mailing'
-import { DatabaseContext } from '../utils'
+import { AddMailTemplateCommand, RemoveMailTemplateCommand } from '../commands/index.js'
+import { MailTemplate, MailTemplateIdentifier } from '../mailing/index.js'
+import { DatabaseContext } from '../utils/index.js'
 
 export class MailTemplateManager {
 	public async addMailTemplate(dbContext: DatabaseContext, mailTemplate: MailTemplate): Promise<void> {

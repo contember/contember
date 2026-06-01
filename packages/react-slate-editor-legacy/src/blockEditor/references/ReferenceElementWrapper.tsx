@@ -1,7 +1,7 @@
 import { FC, ReactNode } from 'react'
-import { ElementWithReference } from '../elements'
+import { ElementWithReference } from '../elements/index.js'
 import { AccessorProvider } from '@contember/react-binding'
-import { useReferencedEntity } from './useReferencedEntity'
+import { useReferencedEntity } from './useReferencedEntity.js'
 import { ReactEditor, useSlateStatic } from 'slate-react'
 
 export type ReferenceElementWrapperProps = {

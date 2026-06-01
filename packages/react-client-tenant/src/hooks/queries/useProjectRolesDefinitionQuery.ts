@@ -1,6 +1,6 @@
 import * as TenantApi from '@contember/graphql-client-tenant'
 import { ModelType } from 'graphql-ts-client-api'
-import { TenantApiOptions, useTenantApi } from '../useTenantApi'
+import { TenantApiOptions, useTenantApi } from '../useTenantApi.js'
 import { useCallback } from 'react'
 
 const projectRolesDefinitionFragment = TenantApi.roleDefinition$$

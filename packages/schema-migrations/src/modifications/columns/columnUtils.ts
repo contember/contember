@@ -1,4 +1,4 @@
-import { wrapIdentifier } from '../../utils/dbHelpers'
+import { wrapIdentifier } from '../../utils/dbHelpers.js'
 import { JSONValue, Model } from '@contember/schema'
 import { escapeValue, MigrationBuilder } from '@contember/database-migrations'
 import { getColumnName } from '@contember/schema-utils'

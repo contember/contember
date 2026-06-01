@@ -1,2 +1,2 @@
-export * from './createMarkHtmlDeserializer'
-export * from './withPaste'
+export * from './createMarkHtmlDeserializer.js'
+export * from './withPaste.js'

@@ -1,1 +1,1 @@
-import { PageRequest, RequestParameters, RequestState } from '../../types'
+import { PageRequest, RequestParameters, RequestState } from '../../types/index.js'

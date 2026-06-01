@@ -1,11 +1,11 @@
-import { InviteErrorCode, InviteResponse, MutationInviteArgs, MutationResolvers, MutationUnmanagedInviteArgs } from '../../../schema'
-import { TenantResolverContext } from '../../TenantResolverContext'
-import { InviteData, InviteManager, isTokenHash, MembershipValidator, PermissionActions, ProjectManager } from '../../../model'
-import { createMembershipValidationErrorResult } from '../../membershipUtils'
-import { createErrorResponse, createProjectNotFoundResponse } from '../../errorUtils'
+import { InviteErrorCode, InviteResponse, MutationInviteArgs, MutationResolvers, MutationUnmanagedInviteArgs } from '../../../schema/index.js'
+import { TenantResolverContext } from '../../TenantResolverContext.js'
+import { InviteData, InviteManager, isTokenHash, MembershipValidator, PermissionActions, ProjectManager } from '../../../model/index.js'
+import { createMembershipValidationErrorResult } from '../../membershipUtils.js'
+import { createErrorResponse, createProjectNotFoundResponse } from '../../errorUtils.js'
 import { UserInputError } from '@contember/graphql-utils'
-import { PersonResponseFactory } from '../../responseHelpers/PersonResponseFactory'
-import { ResponseOk } from '../../../model/utils/Response'
+import { PersonResponseFactory } from '../../responseHelpers/PersonResponseFactory.js'
+import { ResponseOk } from '../../../model/utils/Response.js'
 import { Acl, JSONValue } from '@contember/schema'
 
 export class InviteMutationResolver implements MutationResolvers {

@@ -1,5 +1,5 @@
 import { DatabaseQuery, DatabaseQueryable, Operator, SelectBuilder } from '@contember/database'
-import { ApiKey } from '../../type'
+import { ApiKey } from '../../type/index.js'
 
 export type ApiKeySessionRow = {
 	readonly id: string

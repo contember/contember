@@ -1,6 +1,6 @@
 import { useEntity } from '@contember/react-binding'
-import { useBlockRepeaterConfig } from '../contexts'
-import { BlockProps } from '../components'
+import { useBlockRepeaterConfig } from '../contexts.js'
+import { BlockProps } from '../components/index.js'
 
 /**
  * Returns the current block props (see {@link BlockProps}).

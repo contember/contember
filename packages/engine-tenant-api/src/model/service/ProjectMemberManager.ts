@@ -5,15 +5,15 @@ import {
 	RemoveProjectMemberResponse,
 	UpdateProjectMemberCommand,
 	UpdateProjectMemberResponse,
-} from '../commands'
-import { ProjectMembershipByIdentityQuery, ProjectMembersQuery } from '../queries'
-import { AddProjectMemberErrorCode, ProjectMembersInput } from '../../schema'
-import { AccessVerifier, PermissionActions, TenantRole } from '../authorization'
-import { indexListBy, notEmpty } from '../../utils/array'
-import { createSetMembershipVariables } from './membershipUtils'
+} from '../commands/index.js'
+import { ProjectMembershipByIdentityQuery, ProjectMembersQuery } from '../queries/index.js'
+import { AddProjectMemberErrorCode, ProjectMembersInput } from '../../schema/index.js'
+import { AccessVerifier, PermissionActions, TenantRole } from '../authorization/index.js'
+import { indexListBy, notEmpty } from '../../utils/array.js'
+import { createSetMembershipVariables } from './membershipUtils.js'
 import { Acl, ProjectRole } from '@contember/schema'
-import { Response } from '../utils/Response'
-import { DatabaseContext } from '../utils'
+import { Response } from '../utils/Response.js'
+import { DatabaseContext } from '../utils/index.js'
 
 export class ProjectMemberManager {
 	async addProjectMember(

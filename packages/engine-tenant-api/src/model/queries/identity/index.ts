@@ -1,1 +1,1 @@
-export * from './IdentityQuery'
+export * from './IdentityQuery.js'

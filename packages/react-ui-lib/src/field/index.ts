@@ -1,1 +1,1 @@
-export * from './formatted-field'
+export * from './formatted-field.js'

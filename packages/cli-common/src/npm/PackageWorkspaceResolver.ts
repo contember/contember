@@ -1,13 +1,13 @@
-import { PackageManager } from './packageManagers/PackageManager'
-import { Yarn } from './packageManagers/Yarn'
-import { YarnClassic } from './packageManagers/YarnClassic'
-import { Pnpm } from './packageManagers/Pnpm'
-import { Npm } from './packageManagers/Npm'
-import { PackageJson } from './PackageJson'
+import { PackageManager } from './packageManagers/PackageManager.js'
+import { Yarn } from './packageManagers/Yarn.js'
+import { YarnClassic } from './packageManagers/YarnClassic.js'
+import { Pnpm } from './packageManagers/Pnpm.js'
+import { Npm } from './packageManagers/Npm.js'
+import { PackageJson } from './PackageJson.js'
 import { dirname, join } from 'node:path'
-import { Package } from './Package'
-import { PackageWorkspace } from './PackageWorkspace'
-import { FileSystem } from './FileSystem'
+import { Package } from './Package.js'
+import { PackageWorkspace } from './PackageWorkspace.js'
+import { FileSystem } from './FileSystem.js'
 
 export class PackageWorkspaceResolver {
 	constructor(

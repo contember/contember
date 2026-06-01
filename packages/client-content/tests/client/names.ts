@@ -1,6 +1,6 @@
 import type { SchemaNames, SchemaEntityNames } from '@contember/client-content'
-import type { ContemberClientEntities } from './entities'
-import type { ContemberClientEnums } from './enums'
+import type { ContemberClientEntities } from './entities.js'
+import type { ContemberClientEnums } from './enums.js'
 export const ContemberClientNames = {
 	entities: {
 		"Locale": {

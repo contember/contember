@@ -1,6 +1,6 @@
 import { Acl } from '@contember/schema'
 import { Client } from '@contember/database'
-import { ExecutionContainer } from './ExecutionContainer'
+import { ExecutionContainer } from './ExecutionContainer.js'
 
 export interface Context {
 	db: Client

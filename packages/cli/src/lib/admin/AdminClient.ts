@@ -1,5 +1,5 @@
-import { maskToken } from '../maskToken'
-import { RemoteProjectProvider } from '../project/RemoteProjectProvider'
+import { maskToken } from '../maskToken.js'
+import { RemoteProjectProvider } from '../project/RemoteProjectProvider.js'
 
 export type AdminFiles = Array<{ path: string; data: string }>
 export class AdminClient {

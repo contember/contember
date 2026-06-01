@@ -1,11 +1,11 @@
 import { Acl, Input, Model, Value } from '@contember/schema'
 import { InsertBuilder as DbInsertBuilder, QueryBuilder, Value as DbValue } from '@contember/database'
-import { PathFactory, WhereBuilder } from '../select'
+import { PathFactory, WhereBuilder } from '../select/index.js'
 import { getColumnName, getColumnType } from '@contember/schema-utils'
-import { ColumnValue, normalizeDbValue } from '../ColumnValue'
-import { PredicateFactory } from '../../acl'
-import { AfterInsertEvent, BeforeInsertEvent } from '../EventManager'
-import { Mapper } from '../Mapper'
+import { ColumnValue, normalizeDbValue } from '../ColumnValue.js'
+import { PredicateFactory } from '../../acl/index.js'
+import { AfterInsertEvent, BeforeInsertEvent } from '../EventManager.js'
+import { Mapper } from '../Mapper.js'
 
 export interface InsertResult {
 	values: ColumnValue[]

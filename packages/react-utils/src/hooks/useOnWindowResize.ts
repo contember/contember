@@ -1,5 +1,5 @@
 import { useLayoutEffect, useRef } from 'react'
-import { useScopedConsoleRef } from '../debug-context'
+import { useScopedConsoleRef } from '../debug-context/index.js'
 
 export function useOnWindowResize(
 	callback: (event: Event) => void,

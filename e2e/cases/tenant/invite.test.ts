@@ -1,6 +1,6 @@
 import { expect, test } from 'bun:test'
 import { Acl } from '@contember/schema'
-import { consumeMails, createTester, rand } from '../../src/tester'
+import { consumeMails, createTester, rand } from '../../src/tester.js'
 import { c, createSchema } from '@contember/schema-definition'
 import * as TenantApi from '@contember/graphql-client-tenant'
 

@@ -1,5 +1,5 @@
 import { Acl, Model } from '@contember/schema'
-import { Authorizator } from '../acl'
+import { Authorizator } from '../acl/index.js'
 
 export class FieldAccessVisitor implements Model.ColumnVisitor<boolean>, Model.RelationVisitor<boolean> {
 	constructor(

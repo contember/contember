@@ -1,6 +1,6 @@
 import React, { ReactElement, useCallback, useMemo } from 'react'
-import { RepeaterAddItemIndex } from '../../types/RepeaterMethods'
-import { useRepeaterMethods } from '../../contexts'
+import { RepeaterAddItemIndex } from '../../types/RepeaterMethods.js'
+import { useRepeaterMethods } from '../../contexts.js'
 import { Slot } from '@radix-ui/react-slot'
 import { EntityAccessor } from '@contember/react-binding'
 import { composeEventHandlers } from '@radix-ui/primitive'

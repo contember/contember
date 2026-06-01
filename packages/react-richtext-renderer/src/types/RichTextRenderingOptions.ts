@@ -1,7 +1,7 @@
-import { RichTextElement, RichTextLeaf } from './structure'
-import { ReferenceRendererMap, RenderBlock, RenderElement, RenderLeaf } from './custom'
-import { RichTextReference } from './RichTextReference'
-import { RichTextReferenceMetadata } from './RichTextReferenceMetadata'
+import { RichTextElement, RichTextLeaf } from './structure/index.js'
+import { ReferenceRendererMap, RenderBlock, RenderElement, RenderLeaf } from './custom/index.js'
+import { RichTextReference } from './RichTextReference.js'
+import { RichTextReferenceMetadata } from './RichTextReferenceMetadata.js'
 
 export type UndefinedReferenceHandler<
 	CustomElements extends RichTextElement = never,

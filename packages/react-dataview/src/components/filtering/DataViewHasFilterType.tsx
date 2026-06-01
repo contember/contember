@@ -1,4 +1,4 @@
-import { useDataViewFilterHandlerRegistry } from '../../contexts'
+import { useDataViewFilterHandlerRegistry } from '../../contexts.js'
 
 export interface DataViewHasFilterTypeProps {
 	/**

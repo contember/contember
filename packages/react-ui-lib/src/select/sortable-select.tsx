@@ -22,8 +22,8 @@ import { ReactNode } from 'react'
 import { Popover, PopoverTrigger } from '@contember/react-ui-lib-base'
 import { DropIndicator } from '@contember/react-ui-lib-base'
 import { cn } from '@contember/react-ui-lib-base'
-import { CreateEntityDialog } from './create-new'
-import { DefaultSelectDataView } from './list'
+import { CreateEntityDialog } from './create-new.js'
+import { DefaultSelectDataView } from './list.js'
 import {
 	MultiSelectItemDragOverlayUI,
 	MultiSelectItemRemoveButtonUI,
@@ -36,7 +36,7 @@ import {
 	SelectInputUI,
 	SelectInputWrapperUI,
 	SelectPopoverContent,
-} from './ui'
+} from './ui.js'
 
 const MultiSortableSelectDropIndicator = ({ position }: { position: 'before' | 'after' }) => (
 	<div className={cn('relative', position === 'before' ? '-translate-x-0.5' : 'translate-x-1.5')}>

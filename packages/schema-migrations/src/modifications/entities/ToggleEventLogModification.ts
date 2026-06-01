@@ -1,14 +1,14 @@
 import { MigrationBuilder } from '@contember/database-migrations'
 import { Schema } from '@contember/schema'
-import { SchemaUpdater, updateEntity, updateModel } from '../utils/schemaUpdateUtils'
+import { SchemaUpdater, updateEntity, updateModel } from '../utils/schemaUpdateUtils.js'
 import {
 	createModificationType,
 	Differ,
 	ModificationHandler,
 	ModificationHandlerCreateSqlOptions,
 	ModificationHandlerOptions,
-} from '../ModificationHandler'
-import { createEventTrigger, createEventTrxTrigger, dropEventTrigger, dropEventTrxTrigger } from '../utils/sqlUpdateUtils'
+} from '../ModificationHandler.js'
+import { createEventTrigger, createEventTrxTrigger, dropEventTrigger, dropEventTrxTrigger } from '../utils/sqlUpdateUtils.js'
 
 export class ToggleEventLogModificationHandler implements ModificationHandler<ToggleEventLogModificationData> {
 	constructor(

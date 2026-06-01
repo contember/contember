@@ -5,7 +5,7 @@ import { join, resolve } from 'node:path'
 import { createSchema, SchemaDefinition as def } from '@contember/schema-definition'
 import { emptySchema } from '@contember/schema-utils'
 import { ModificationHandlerFactory, SchemaDiffer, SchemaMigrator, VERSION_LATEST } from '@contember/schema-migrations'
-import { apiUrl, rand, rootToken } from '../../src/tester'
+import { apiUrl, rand, rootToken } from '../../src/tester.js'
 
 namespace AuthorModel {
 	export class Author {

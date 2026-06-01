@@ -1,10 +1,10 @@
 import { MigrationBuilder } from '@contember/database-migrations'
 import { Schema } from '@contember/schema'
-import { SchemaUpdater, updateEntity, updateModel } from '../utils/schemaUpdateUtils'
-import { createModificationType, Differ, ModificationHandler, ModificationHandlerCreateSqlOptions } from '../ModificationHandler'
+import { SchemaUpdater, updateEntity, updateModel } from '../utils/schemaUpdateUtils.js'
+import { createModificationType, Differ, ModificationHandler, ModificationHandlerCreateSqlOptions } from '../ModificationHandler.js'
 import deepEqual from 'fast-deep-equal'
-import { getIndexColumns } from './utils'
-import { wrapIdentifier } from '../../utils/dbHelpers'
+import { getIndexColumns } from './utils.js'
+import { wrapIdentifier } from '../../utils/dbHelpers.js'
 
 export class RemoveIndexModificationHandler implements ModificationHandler<RemoveIndexModificationData> {
 	constructor(private readonly data: RemoveIndexModificationData, private readonly schema: Schema) {}

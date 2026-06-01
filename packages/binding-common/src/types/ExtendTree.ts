@@ -1,5 +1,5 @@
-import type { Environment } from '../environment'
-import type { TreeRootId } from '../treeParameters'
+import type { Environment } from '../environment/index.js'
+import type { TreeRootId } from '../treeParameters/index.js'
 
 export interface ExtendTreeOptions {
 	signal?: AbortSignal

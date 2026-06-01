@@ -1,5 +1,5 @@
-import FieldProcessor from './FieldProcessor'
-import ManyHasManyBuilder from '../ManyHasManyBuilder'
+import FieldProcessor from './FieldProcessor.js'
+import ManyHasManyBuilder from '../ManyHasManyBuilder.js'
 import { Model } from '@contember/schema'
 import { NamingConventions } from '@contember/schema-utils'
 

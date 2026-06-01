@@ -1,5 +1,5 @@
 import { useCallback, useEffect } from 'react'
-import { useIdentity } from '../../contexts'
+import { useIdentity } from '../../contexts.js'
 
 const getBacklinkFromUrl = () => {
 	return new URLSearchParams(window.location.search).get('backlink')

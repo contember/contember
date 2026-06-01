@@ -1,7 +1,7 @@
 import { GraphQLSchema, GraphQLSchemaConfig } from 'graphql'
-import * as ContentSchema from './content-schema.types'
-import { IntrospectionSchemaFactory } from './IntrospectionSchemaFactory'
-import { createSchemaConfig } from './introspection.schema'
+import * as ContentSchema from './content-schema.types.js'
+import { IntrospectionSchemaFactory } from './IntrospectionSchemaFactory.js'
+import { createSchemaConfig } from './introspection.schema.js'
 
 export class IntrospectionSchemaDefinitionFactory {
 	constructor(private readonly introspectionSchemaFactory: IntrospectionSchemaFactory) {}

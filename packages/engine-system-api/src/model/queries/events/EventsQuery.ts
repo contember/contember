@@ -8,9 +8,9 @@ import {
 	SelectBuilderSpecification,
 	Value,
 } from '@contember/database'
-import { ContentEvent } from '../../events'
-import { EventsFilter, EventsFilterDate, EventsOrder } from '../../../schema'
-import { createEventsFromRows, EventRow } from './EventQueryHelpers'
+import { ContentEvent } from '../../events/index.js'
+import { EventsFilter, EventsFilterDate, EventsOrder } from '../../../schema/index.js'
+import { createEventsFromRows, EventRow } from './EventQueryHelpers.js'
 
 export class EventsQuery extends DatabaseQuery<ContentEvent[]> {
 	constructor(

@@ -1,5 +1,5 @@
-import { repairEntitiesOrder } from './repairEntitiesOrder'
-import { sortEntities } from './sortEntities'
+import { repairEntitiesOrder } from './repairEntitiesOrder.js'
+import { sortEntities } from './sortEntities.js'
 import { EntityAccessor, EntityListAccessor, RelativeSingleField } from '@contember/binding'
 
 export const addEntityAtIndex = (

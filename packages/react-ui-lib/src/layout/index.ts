@@ -1,3 +1,3 @@
-export * from './layout-boxed'
-export * from './layout'
-export * from './slots'
+export * from './layout-boxed.js'
+export * from './layout.js'
+export * from './slots.js'

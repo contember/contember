@@ -1,7 +1,7 @@
-import type { Environment } from '../environment'
-import type { QualifiedEntityList, UnconstrainedQualifiedEntityList } from '../treeParameters'
-import type { EntityFieldMarkersContainer } from './EntityFieldMarkersContainer'
-import { PlaceholderGenerator } from './PlaceholderGenerator'
+import type { Environment } from '../environment/index.js'
+import type { QualifiedEntityList, UnconstrainedQualifiedEntityList } from '../treeParameters/index.js'
+import type { EntityFieldMarkersContainer } from './EntityFieldMarkersContainer.js'
+import { PlaceholderGenerator } from './PlaceholderGenerator.js'
 
 export class EntityListSubTreeMarker {
 	public readonly placeholderName: string

@@ -1,4 +1,4 @@
-import migration from '../../../src/migrations/2025-03-14-110000-fix-missing-index'
+import migration from '../../../src/migrations/2025-03-14-110000-fix-missing-index.js'
 import { createMigrationBuilder } from '@contember/database-migrations'
 import { expect, test } from 'bun:test'
 import { c, createSchema } from '@contember/schema-definition'

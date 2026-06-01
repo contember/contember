@@ -1,2 +1,2 @@
-export * from './references'
-export * from './behaviour'
+export * from './references/index.js'
+export * from './behaviour/index.js'

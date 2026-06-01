@@ -1,6 +1,6 @@
 import { DatabaseQuery, DatabaseQueryable, Literal, SelectBuilder } from '@contember/database'
-import { PersonToken } from '../../type'
-import { computeTokenHash } from '../../utils'
+import { PersonToken } from '../../type/index.js'
+import { computeTokenHash } from '../../utils/index.js'
 
 export class PersonTokenQuery extends DatabaseQuery<PersonToken.Row | null> {
 	private constructor(

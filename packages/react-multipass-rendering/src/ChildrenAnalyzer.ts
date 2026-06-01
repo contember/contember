@@ -1,11 +1,11 @@
 import { assertNever } from '@contember/utilities'
 import type { ElementType, ReactElement, ReactNode } from 'react'
-import type { BranchNodeList } from './BranchNodeList'
-import { ChildrenAnalyzerError } from './ChildrenAnalyzerError'
-import type { ChildrenAnalyzerOptions } from './ChildrenAnalyzerOptions'
-import type { LeafList } from './LeafList'
-import { getErrorMessage } from './helpers'
-import { wrapError } from './helpers/wrapError'
+import type { BranchNodeList } from './BranchNodeList.js'
+import { ChildrenAnalyzerError } from './ChildrenAnalyzerError.js'
+import type { ChildrenAnalyzerOptions } from './ChildrenAnalyzerOptions.js'
+import type { LeafList } from './LeafList.js'
+import { getErrorMessage } from './helpers/index.js'
+import { wrapError } from './helpers/wrapError.js'
 import type {
 	DeclarationSiteNodeRepresentationFactory,
 	RawNodeRepresentation,
@@ -13,7 +13,7 @@ import type {
 	SyntheticChildrenFactory,
 	UnconstrainedLeafRepresentationFactory,
 	ValidFactoryName,
-} from './nodeSpecs'
+} from './nodeSpecs/index.js'
 
 export class ChildrenAnalyzer<
 	AllLeavesRepresentation = any,

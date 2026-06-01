@@ -1,9 +1,9 @@
 import { Command, CommandConfiguration, Input } from '@contember/cli-common'
 import { MigrationFilesManager, MigrationState, sortMigrations, SystemClient } from '@contember/migrations-client'
 import chalk from 'chalk'
-import { MigrationsStatusFacade } from '../../lib/migrations/MigrationsStatusFacade'
-import { MigrationPrinter } from '../../lib/migrations/MigrationPrinter'
-import { SystemClientProvider } from '../../lib/SystemClientProvider'
+import { MigrationsStatusFacade } from '../../lib/migrations/MigrationsStatusFacade.js'
+import { MigrationPrinter } from '../../lib/migrations/MigrationPrinter.js'
+import { SystemClientProvider } from '../../lib/SystemClientProvider.js'
 
 type Args = {}
 

@@ -1,4 +1,4 @@
-import { FingerCrossedLoggerHandlerOptions } from './handlers/FingerCrossedLoggerHandler'
+import { FingerCrossedLoggerHandlerOptions } from './handlers/FingerCrossedLoggerHandler.js'
 
 export type LogFn = (errorOrMessage: unknown, attributes?: LoggerAttributes) => void
 

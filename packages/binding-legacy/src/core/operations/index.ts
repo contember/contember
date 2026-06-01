@@ -1,3 +1,3 @@
-export * from './EntityOperations'
-export * from './FieldOperations'
-export * from './ListOperations'
+export * from './EntityOperations.js'
+export * from './FieldOperations.js'
+export * from './ListOperations.js'

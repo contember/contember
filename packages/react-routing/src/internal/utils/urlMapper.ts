@@ -1,8 +1,8 @@
 import * as pathToRegexp from 'path-to-regexp'
 import { Key, MatchFunction, PathFunction, TokenData } from 'path-to-regexp'
 import { Environment } from '@contember/react-binding'
-import { RequestState, RoutingContextValue } from '../../types'
-import { PageNotFound } from '../../PageNotFound'
+import { RequestState, RoutingContextValue } from '../../types/index.js'
+import { PageNotFound } from '../../PageNotFound.js'
 
 const matchFunctionsCache: Record<string, MatchFunction<Record<string, string>>> = {}
 const pathFunctionsCache: Record<string, PathFunction<Record<string, string>>> = {}

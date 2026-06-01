@@ -1,9 +1,9 @@
 import { AccessNode, AuthorizationScope } from '@contember/authorization'
-import { Project } from '../type'
-import { TenantRole } from './Roles'
+import { Project } from '../type/index.js'
+import { TenantRole } from './Roles.js'
 import { Acl, ProjectRole } from '@contember/schema'
-import { AclSchemaAccessNodeFactory } from './AclSchemaAccessNodeFactory'
-import { Identity } from './Identity'
+import { AclSchemaAccessNodeFactory } from './AclSchemaAccessNodeFactory.js'
+import { Identity } from './Identity.js'
 
 export class ProjectScope implements AuthorizationScope<Identity> {
 	constructor(

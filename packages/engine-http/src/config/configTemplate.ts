@@ -86,6 +86,7 @@ export const configTemplate: any = {
 			requestBodySize: '%?env.CONTEMBER_HTTP_REQUEST_BODY_SIZE::string%',
 			suppressAccessLog: '%?env.CONTEMBER_HTTP_SUPPRESS_ACCESS_LOG::string%',
 			trustedProxies: '%?env.CONTEMBER_HTTP_TRUSTED_PROXIES::string%',
+			responseStatusHeader: '%?env.CONTEMBER_HTTP_RESPONSE_STATUS_HEADER::string%',
 		},
 		contentApi: {
 			schemaCacheTtlSeconds: '%?env.CONTEMBER_CONTENT_API_SCHEMA_CACHE_TTL_SECONDS::number%',

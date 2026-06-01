@@ -29,6 +29,13 @@ class PredicateDefinitionProcessor {
 				])
 			} else if (key === 'and' || key === 'or') {
 				result[key] = (value as Acl.PredicateDefinition[]).map(it => this.processInternal(entity, it, handler, [...path, key]))
+			} else if (key === Acl.PredicateOldStateMarker || key === Acl.PredicateNewStateMarker) {
+				result[key] = this.processInternal(
+					entity,
+					value as Acl.PredicateDefinition<PredicateExtension>,
+					handler,
+					[...path, key],
+				) as (typeof result)[keyof typeof result]
 			} else if (!entity.fields[key] && handler.handleUndefinedField) {
 				const undefinedResult = handler.handleUndefinedField({ entity, name: key, value, path })
 				if (undefinedResult !== undefined) {

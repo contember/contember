@@ -17,6 +17,7 @@ import { URL } from 'node:url'
 import { cpuUsage, memoryUsage } from 'node:process'
 import { performance } from 'node:perf_hooks'
 import { getClientIP } from '../utils/remoteAddress.js'
+import { isForceHttpOkRequested, isGraphqlModule } from './forceHttpOk.js'
 
 type Route<C> = { match: RequestMatcher; controller: C; module: string }
 export class Application {
@@ -28,6 +29,7 @@ export class Application {
 
 	private suppressAccessLog: boolean | RegExp
 	private trustedProxies: string[]
+	private forceHttpOkEnabled: boolean
 
 	constructor(
 		private readonly projectGroupResolver: ProjectGroupResolver,
@@ -39,6 +41,7 @@ export class Application {
 		const suppressAccessLogRaw = serverConfig.http?.suppressAccessLog
 		this.suppressAccessLog = suppressAccessLogRaw === true ? true : suppressAccessLogRaw ? new RegExp(suppressAccessLogRaw) : false
 		this.trustedProxies = serverConfig.http?.trustedProxies ?? []
+		this.forceHttpOkEnabled = serverConfig.http?.responseStatusHeader ?? true
 	}
 
 	addMiddleware(middleware: KoaMiddleware<any>) {
@@ -262,6 +265,7 @@ export class Application {
 				requestLogger.error(e)
 			}
 		} finally {
+			this.maybeForceHttpOk(ctx, matchedRequest?.module)
 			sendTimer({
 				req: ctx.req,
 				response: ctx.res,
@@ -298,6 +302,32 @@ export class Application {
 				this.logger.error(e)
 			}
 		}
+	}
+
+	/**
+	 * When the X-Contember-Force-Ok header is present (and the capability is enabled in config),
+	 * coerce the HTTP status of a GraphQL API response (content/tenant/system) to 200, keeping the
+	 * error information in the JSON body. Scoped to those modules so non-JSON / non-GraphQL responses
+	 * are not mislabeled. Default behavior (real status codes) is preserved when the header is absent.
+	 */
+	private maybeForceHttpOk(ctx: KoaContext<{}>, module: string | undefined) {
+		if (!this.forceHttpOkEnabled) {
+			return
+		}
+		if (ctx.status === 200) {
+			return
+		}
+		if (!isGraphqlModule(module)) {
+			return
+		}
+		if (ctx.body === undefined || ctx.body === null) {
+			return
+		}
+		if (!isForceHttpOkRequested(ctx.req)) {
+			return
+		}
+		ctx.set('X-Contember-Original-Status', String(ctx.status))
+		ctx.status = 200
 	}
 
 	private sendHttpResponse(ctx: KoaContext<{}>, response: HttpResponse) {

@@ -103,6 +103,21 @@ export const serverConfigSchema = Typesafe.partial({
 	port: Typesafe.number,
 	http: Typesafe.partial({
 		requestBodySize: Typesafe.string,
+		// Allows clients to opt in (via the X-Contember-Force-Ok request header) to receiving HTTP 200
+		// for GraphQL API responses, keeping error info in the JSON body. Defaults to enabled; set to
+		// false to forbid the header entirely. Accepts boolean-ish strings ('true'/'1'/'on'/...).
+		responseStatusHeader: (val: unknown) => {
+			if (val === undefined || val === null || val === '') {
+				return undefined
+			}
+			if (val === true || val === 'true' || val === '1' || val === 'on') {
+				return true
+			}
+			if (val === false || val === 'false' || val === '0' || val === 'off') {
+				return false
+			}
+			return Typesafe.fail([])
+		},
 		suppressAccessLog: (val: unknown) => {
 			if (!val) {
 				return undefined

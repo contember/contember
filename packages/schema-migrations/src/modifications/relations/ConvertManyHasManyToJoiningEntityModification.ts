@@ -11,6 +11,7 @@ import { createEventTrigger, createEventTrxTrigger, dropEventTrigger } from '../
 import { getColumnSqlType } from '../utils/columnUtils.js'
 import { wrapIdentifier } from '../../utils/dbHelpers.js'
 import { VERSION_LATEST } from '../ModificationVersions.js'
+import { PossibleEntityShapeInMigrations } from '../../utils/PartialEntity.js'
 
 /**
  * Promotes an implicit many-has-many relation (backed by a junction table with a composite primary key)
@@ -136,7 +137,7 @@ export const convertManyHasManyToJoiningEntityModification = createModificationT
 export interface ConvertManyHasManyToJoiningEntityModificationData {
 	entityName: string
 	fieldName: string
-	joiningEntity: Model.Entity
+	joiningEntity: PossibleEntityShapeInMigrations
 	sourceInverseSide?: Model.OneHasManyRelation
 	targetInverseSide?: Model.OneHasManyRelation
 }

@@ -5,6 +5,7 @@ import { Mapper } from '../../Mapper.js'
 import { SqlUpdateInputProcessorResult } from '../../update/index.js'
 import { CheckedPrimary } from '../../CheckedPrimary.js'
 import { MapperInput } from '../../types.js'
+import { processSetManyRelationInput } from './SetManyRelationHelper.js'
 
 type Context = Model.ManyHasManyOwningContext | Model.ManyHasManyInverseContext
 
@@ -12,6 +13,14 @@ export class ManyHasManyUpdateInputProcessor implements UpdateInputProcessor.Has
 	constructor(
 		private readonly mapper: Mapper,
 	) {
+	}
+
+	public async set(
+		context: Context & { input: UpdateInputProcessor.SetManyInput },
+	) {
+		return async ({ primary }: { primary: Input.PrimaryValue }) => {
+			return await processSetManyRelationInput(this.mapper, context, primary, this, context.input)
+		}
 	}
 
 	public async connect(

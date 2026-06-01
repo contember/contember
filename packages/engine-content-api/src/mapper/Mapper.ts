@@ -10,7 +10,7 @@ import {
 	SelectResultObject,
 	WhereBuilder,
 } from './select/index.js'
-import { Client, Connection, ConstraintHelper, DatabaseMetadata, SelectBuilder } from '@contember/database'
+import { Client, Connection, ConstraintHelper, DatabaseMetadata, Operator, SelectBuilder } from '@contember/database'
 import { PredicatesInjector } from '../acl/index.js'
 import { JunctionTableManager } from './JunctionTableManager.js'
 import { DeletedEntitiesStorage, DeleteExecutor } from './delete/index.js'
@@ -316,6 +316,44 @@ export class Mapper<ConnectionType extends Connection.ConnectionLike = Connectio
 			visitOneHasOneOwning: err,
 			visitManyHasOne: err,
 		})
+	}
+
+	/**
+	 * Fetches the primary values of entities currently in a has-many relation of the given owner.
+	 * Used by the declarative `set` operation to compute orphans. Respects ACL read predicates on the target entity.
+	 */
+	public async fetchHasManyPrimaries(
+		context: Model.OneHasManyContext | Model.ManyHasManyOwningContext | Model.ManyHasManyInverseContext,
+		ownerPrimary: Input.PrimaryValue,
+	): Promise<Input.PrimaryValue[]> {
+		if (context.type === 'oneHasMany') {
+			const { targetEntity, targetRelation } = context
+			const where: Input.OptionalWhere = {
+				[targetRelation.name]: { [context.entity.primary]: { eq: ownerPrimary } },
+			}
+			const withPredicates = this.predicatesInjector.inject(targetEntity, where)
+			const path = this.pathFactory.create([])
+			const qb = SelectBuilder.create()
+				.from(targetEntity.tableName, path.alias)
+				.select([path.alias, targetEntity.primaryColumn], 'primary_')
+			const built = this.whereBuilder.build(qb, targetEntity, path, withPredicates)
+			const rows = await built.getResult(this.db)
+			return rows.map(it => it.primary_ as Input.PrimaryValue)
+		}
+
+		// many-has-many: read from the junction table via the owning side
+		const owningContext = context.type === 'manyHasManyOwning'
+			? { entity: context.entity, relation: context.relation, ownerIsJoining: true }
+			: { entity: context.targetEntity, relation: context.targetRelation, ownerIsJoining: false }
+		const joiningTable = owningContext.relation.joiningTable
+		const ownerColumn = owningContext.ownerIsJoining ? joiningTable.joiningColumn.columnName : joiningTable.inverseJoiningColumn.columnName
+		const targetColumn = owningContext.ownerIsJoining ? joiningTable.inverseJoiningColumn.columnName : joiningTable.joiningColumn.columnName
+		const qb = SelectBuilder.create()
+			.from(joiningTable.tableName, 'junction_')
+			.select(['junction_', targetColumn], 'primary_')
+			.where(cond => cond.compare(['junction_', ownerColumn], Operator.eq, ownerPrimary))
+		const rows = await qb.getResult(this.db)
+		return rows.map(it => it.primary_ as Input.PrimaryValue)
 	}
 
 	public async getPrimaryValue(

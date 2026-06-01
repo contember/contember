@@ -46,7 +46,31 @@ export namespace Acl {
 	// }
 
 	export type PredicateVariable = string // { name: string }
+
+	/**
+	 * Marker keys usable inside an update predicate to constrain the stored ("old")
+	 * vs the incoming ("new") value of the row being updated. The wrapped sub-predicate
+	 * is evaluated only against the respective state. Outside of an update operation
+	 * (read/create/delete) both markers collapse to the single available state.
+	 *
+	 * Example - allow moving a record from state A to state B, but not back:
+	 * ```
+	 * {
+	 *   _old: { state: { eq: 'A' } },
+	 *   _new: { state: { eq: 'B' } },
+	 * }
+	 * ```
+	 */
+	export const PredicateOldStateMarker = '_old'
+	export const PredicateNewStateMarker = '_new'
+
+	export type PredicateState = 'old' | 'new'
+
 	export type PredicateDefinition<E = never> = Input.Where<PredicateVariable | Input.Condition | E>
+		& {
+			readonly [PredicateOldStateMarker]?: PredicateDefinition<E>
+			readonly [PredicateNewStateMarker]?: PredicateDefinition<E>
+		}
 
 	export type PredicateMap = { readonly [name: string]: PredicateDefinition }
 

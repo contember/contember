@@ -44,6 +44,36 @@ it('resolves tenant config', () => {
 		secrets: {},
 	})
 })
+it('resolves tenant config with statement and lock timeouts', () => {
+	const envWithTimeouts = {
+		...env,
+		TENANT_DB_STATEMENT_TIMEOUT_MS: '30000',
+		TENANT_DB_LOCK_TIMEOUT_MS: '5000',
+	}
+	const tenantResolver = createTenantConfigResolver(envWithTimeouts, configTemplate.tenant)
+	const resolvedTenantConfig = tenantResolver('test', tenantConfig)
+	assert.deepEqual(resolvedTenantConfig, {
+		db: {
+			host: 'c0.cluster-abc.eu-west-1.rds.amazonaws.com',
+			port: 5432,
+			user: 'u_test_e',
+			password: 'PASSWD',
+			database: 'p_test_e',
+			connectionTimeoutMs: 5000,
+			statementTimeoutMs: 30000,
+			lockTimeoutMs: 5000,
+			pool: { maxConnections: 1000, maxConnecting: 10, idleTimeoutMs: 60000 },
+			read: {
+				host: 'c0.cluster-ro-abc.eu-west-1.rds.amazonaws.com',
+				pool: {},
+			},
+		},
+		mailer: {},
+		credentials: {},
+		secrets: {},
+	})
+})
+
 it('resolves tenant config with group slug env prefix', () => {
 	const envWithGroup = {
 		...env,

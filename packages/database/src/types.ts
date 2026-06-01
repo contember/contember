@@ -23,5 +23,6 @@ export interface DatabaseConfig {
 	readonly ssl?: boolean
 	readonly queryTimeoutMs?: number
 	readonly statementTimeoutMs?: number
+	readonly lockTimeoutMs?: number
 	readonly connectionTimeoutMs?: number
 }

@@ -63,6 +63,66 @@ test('update name', async () => {
 	})
 })
 
+test('update with old/new transition predicate', async () => {
+	await execute({
+		schema: new SchemaBuilder()
+			.entity('Article', e => e.column('state', c => c.type(Model.ColumnType.String)))
+			.buildSchema(),
+		query: GQL`mutation {
+        updateArticle(
+            by: {id: "${testUuid(1)}"},
+            data: {state: "published"}
+          ) {
+          ok
+        }
+      }`,
+		permissions: {
+			Article: {
+				predicates: {
+					// allow moving draft -> published, but the predicate also constrains the old state
+					transition_predicate: {
+						_old: { state: { eq: 'draft' } },
+						_new: { state: { eq: 'published' } },
+					} as any,
+				},
+				operations: {
+					update: {
+						id: true,
+						state: 'transition_predicate',
+					},
+					read: {
+						id: true,
+					},
+				},
+			},
+		},
+		variables: {},
+		executes: [
+			...sqlTransaction([
+				{
+					sql: SQL`select "root_"."id" from "public"."article" as "root_" where "root_"."id" = ?`,
+					parameters: [testUuid(1)],
+					response: { rows: [{ id: testUuid(1) }] },
+				},
+				{
+					sql:
+						SQL`with "newData_" as (select ? :: text as "state", "root_"."state" as "state_old__", "root_"."id"  from "public"."article" as "root_"  where "root_"."id" = ? and "root_"."state" = ?)
+						update  "public"."article" set  "state" =  "newData_"."state"   from "newData_"  where "article"."id" = "newData_"."id" and "newData_"."state" = ?  returning "state_old__"`,
+					parameters: ['published', testUuid(1), 'draft', 'published'],
+					response: { rows: [{ state_old__: 'draft' }] },
+				},
+			]),
+		],
+		return: {
+			data: {
+				updateArticle: {
+					ok: true,
+				},
+			},
+		},
+	})
+})
+
 test('update name - denied', async () => {
 	await execute({
 		schema: new SchemaBuilder()

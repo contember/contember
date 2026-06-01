@@ -36,6 +36,7 @@ import {
 	PermissionContextFactory,
 	PermissionsFactory,
 	PersonAccessManager,
+	PersonIdentityProviderManager,
 	PersonManager,
 	ProjectInitializer,
 	ProjectManager,
@@ -64,6 +65,7 @@ import {
 	CreateProjectMutationResolver,
 	DisableApiKeyMutationResolver,
 	DisableIDPMutationResolver,
+	DisconnectMyIdentityProviderMutationResolver,
 	EmailOtpMutationResolver,
 	EmailVerificationMutationResolver,
 	EnableIDPMutationResolver,
@@ -74,6 +76,7 @@ import {
 	MailTemplateMutationResolver,
 	MeQueryResolver,
 	OtpMutationResolver,
+	PersonIdentityProvidersQueryResolver,
 	PersonQueryResolver,
 	ProjectMembersQueryResolver,
 	ProjectQueryResolver,
@@ -245,6 +248,7 @@ export class TenantContainerFactory {
 			)
 			.addService('idpSignInManager', ({ apiKeyManager, idpRegistry }) => new IDPSignInManager(apiKeyManager, idpRegistry))
 			.addService('idpManager', ({ idpRegistry }) => new IDPManager(idpRegistry))
+			.addService('personIdentityProviderManager', () => new PersonIdentityProviderManager())
 			.addService('otpAuthenticator', ({ providers }) => new OtpAuthenticator(providers))
 			.addService('otpManager', ({ otpAuthenticator, providers }) => new OtpManager(otpAuthenticator, providers))
 			.addService('backupCodeManager', ({ providers, userMailer }) => new BackupCodeManager(userMailer, providers))
@@ -294,6 +298,10 @@ export class TenantContainerFactory {
 				({ personManager, projectManager, projectMemberManager }) => new PersonQueryResolver(personManager, projectManager, projectMemberManager),
 			)
 			.addService('idpQueryResolver', ({ idpManager }) => new IDPQueryResolver(idpManager))
+			.addService(
+				'personIdentityProvidersQueryResolver',
+				({ personIdentityProviderManager }) => new PersonIdentityProvidersQueryResolver(personIdentityProviderManager),
+			)
 			.addService('projectQueryResolver', ({ projectManager }) => new ProjectQueryResolver(projectManager))
 			.addService(
 				'projectMembersQueryResolver',
@@ -374,6 +382,10 @@ export class TenantContainerFactory {
 			.addService('updateIdpMutationResolver', ({ idpManager }) => new UpdateIDPMutationResolver(idpManager))
 			.addService('disableIdpMutationResolver', ({ idpManager }) => new DisableIDPMutationResolver(idpManager))
 			.addService('enableIdpMutationResolver', ({ idpManager }) => new EnableIDPMutationResolver(idpManager))
+			.addService(
+				'disconnectMyIdentityProviderMutationResolver',
+				({ personIdentityProviderManager }) => new DisconnectMyIdentityProviderMutationResolver(personIdentityProviderManager),
+			)
 			.addService('createProjectMutationResolver', ({ projectManager }) => new CreateProjectMutationResolver(projectManager))
 			.addService(
 				'disablePersonMutationResolver',

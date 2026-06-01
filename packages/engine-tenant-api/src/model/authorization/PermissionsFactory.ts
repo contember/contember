@@ -34,6 +34,8 @@ class PermissionsFactory {
 		permissions.allow(TenantRole.PERSON, PermissionActions.PERSON_SIGN_OUT)
 		permissions.allow(TenantRole.PERSON, PermissionActions.PERSON_SETUP_OTP)
 		permissions.allow(TenantRole.PERSON, PermissionActions.PERSON_REVOKE_SESSION)
+		permissions.allow(TenantRole.PERSON, PermissionActions.PERSON_LIST_MY_IDP)
+		permissions.allow(TenantRole.PERSON, PermissionActions.PERSON_DISCONNECT_MY_IDP)
 
 		permissions.allow(TenantRole.PROJECT_MEMBER, PermissionActions.PROJECT_VIEW)
 

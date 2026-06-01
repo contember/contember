@@ -40,6 +40,10 @@ const schema: DocumentNode = gql`
 		checkResetPasswordToken(requestId: String!, token: String!): CheckResetPasswordTokenCode!
 
 		identityProviders: [IdentityProvider!]!
+
+		""" External IdP connections of the currently authenticated person. """
+		myIdentityProviders: [PersonIdentityProvider!]!
+
 		mailTemplates: [MailTemplateData!]!
 
 		configuration: Config!
@@ -100,6 +104,9 @@ const schema: DocumentNode = gql`
 		updateIDP(identityProvider: String!, type: String, configuration: Json, options: IDPOptions, mergeConfiguration: Boolean): UpdateIDPResponse
 		disableIDP(identityProvider: String!): DisableIDPResponse
 		enableIDP(identityProvider: String!): EnableIDPResponse
+
+		""" Disconnect one of the authenticated person's own external IdP connections. """
+		disconnectMyIdentityProvider(identityProvider: String!): DisconnectIDPResponse
 
 		prepareOtp(label: String): PrepareOtpResponse
 		confirmOtp(otpToken: String!): ConfirmOtpResponse
@@ -798,6 +805,38 @@ const schema: DocumentNode = gql`
 
 	enum EnableIDPErrorCode {
 		NOT_FOUND
+	}
+
+	""" A single external IdP connection of the currently authenticated person. """
+	type PersonIdentityProvider {
+		id: String!
+		createdAt: DateTime!
+		externalIdentifier: String!
+		identityProvider: IdentityProviderListItem!
+	}
+
+	""" Public view of an identity provider, exposed in personal IdP connection listings. """
+	type IdentityProviderListItem {
+		slug: String!
+		type: String!
+		disabledAt: DateTime
+	}
+
+	type DisconnectIDPResponse {
+		error: DisconnectIDPError
+		ok: Boolean!
+	}
+
+	type DisconnectIDPError {
+		code: DisconnectIDPErrorCode!
+		developerMessage: String!
+	}
+
+	enum DisconnectIDPErrorCode {
+		""" The person has no connection to the given identity provider. """
+		NOT_FOUND
+		""" The person is not allowed to disconnect their last remaining sign-in method. """
+		LAST_AUTH_METHOD
 	}
 
 	type IdentityProvider {

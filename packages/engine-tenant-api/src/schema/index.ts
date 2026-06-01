@@ -947,6 +947,22 @@ export type ForceSignOutPersonResponse = {
 	readonly ok: Scalars['Boolean']['output']
 }
 
+export type DisconnectIdpError = {
+	readonly __typename?: 'DisconnectIDPError'
+	readonly code: DisconnectIdpErrorCode
+	readonly developerMessage: Scalars['String']['output']
+}
+
+export type DisconnectIdpErrorCode =
+	| 'LAST_AUTH_METHOD'
+	| 'NOT_FOUND'
+
+export type DisconnectIdpResponse = {
+	readonly __typename?: 'DisconnectIDPResponse'
+	readonly error?: Maybe<DisconnectIdpError>
+	readonly ok: Scalars['Boolean']['output']
+}
+
 export type IdpOptions = {
 	readonly assumeEmailVerified?: InputMaybe<Scalars['Boolean']['input']>
 	readonly autoSignUp?: InputMaybe<Scalars['Boolean']['input']>
@@ -1034,6 +1050,23 @@ export type InitEmailOtpResponse = {
 	readonly __typename?: 'InitEmailOtpResponse'
 	readonly error?: Maybe<InitEmailOtpError>
 	readonly ok: Scalars['Boolean']['output']
+}
+
+/** Public view of an identity provider, exposed in personal IdP connection listings. */
+export type IdentityProviderListItem = {
+	readonly __typename?: 'IdentityProviderListItem'
+	readonly disabledAt?: Maybe<Scalars['DateTime']['output']>
+	readonly slug: Scalars['String']['output']
+	readonly type: Scalars['String']['output']
+}
+
+/** A single external IdP connection of the currently authenticated person. */
+export type PersonIdentityProvider = {
+	readonly __typename?: 'PersonIdentityProvider'
+	readonly createdAt: Scalars['DateTime']['output']
+	readonly externalIdentifier: Scalars['String']['output']
+	readonly id: Scalars['String']['output']
+	readonly identityProvider: IdentityProviderListItem
 }
 
 export type InitSignInIdpError = {
@@ -1247,6 +1280,7 @@ export type Mutation = {
 	readonly disableMyPasswordless?: Maybe<ToggleMyPasswordlessResponse>
 	readonly disableOtp?: Maybe<DisableOtpResponse>
 	readonly disablePerson?: Maybe<DisablePersonResponse>
+	readonly disconnectMyIdentityProvider?: Maybe<DisconnectIdpResponse>
 	readonly enableIDP?: Maybe<EnableIdpResponse>
 	readonly enableMyPasswordless?: Maybe<ToggleMyPasswordlessResponse>
 	readonly forceSignOutPerson?: Maybe<ForceSignOutPersonResponse>
@@ -1408,6 +1442,10 @@ export type MutationDisableIdpArgs = {
 
 export type MutationDisablePersonArgs = {
 	personId: Scalars['String']['input']
+}
+
+export type MutationDisconnectMyIdentityProviderArgs = {
+	identityProvider: Scalars['String']['input']
 }
 
 export type MutationEnableIdpArgs = {
@@ -1701,6 +1739,8 @@ export type Query = {
 	readonly identityProviders: ReadonlyArray<IdentityProvider>
 	readonly mailTemplates: ReadonlyArray<MailTemplateData>
 	readonly me: Identity
+	/** External IdP connections of the currently authenticated person. */
+	readonly myIdentityProviders: ReadonlyArray<PersonIdentityProvider>
 	readonly personById?: Maybe<Person>
 	/**
 	 * List persons across the tenant. SUPER_ADMIN sees every person; otherwise
@@ -2502,6 +2542,11 @@ export type ResolversTypes = {
 	EnableIDPError: ResolverTypeWrapper<EnableIdpError>
 	EnableIDPErrorCode: EnableIdpErrorCode
 	EnableIDPResponse: ResolverTypeWrapper<EnableIdpResponse>
+	DisconnectIDPError: ResolverTypeWrapper<DisconnectIdpError>
+	DisconnectIDPErrorCode: DisconnectIdpErrorCode
+	DisconnectIDPResponse: ResolverTypeWrapper<DisconnectIdpResponse>
+	PersonIdentityProvider: ResolverTypeWrapper<PersonIdentityProvider>
+	IdentityProviderListItem: ResolverTypeWrapper<IdentityProviderListItem>
 	Float: ResolverTypeWrapper<Scalars['Float']['output']>
 	ForceSignOutPersonError: ResolverTypeWrapper<ForceSignOutPersonError>
 	ForceSignOutPersonErrorCode: ForceSignOutPersonErrorCode
@@ -2749,6 +2794,10 @@ export type ResolversParentTypes = {
 	EmailVerificationOptions: EmailVerificationOptions
 	EnableIDPError: EnableIdpError
 	EnableIDPResponse: EnableIdpResponse
+	DisconnectIDPError: DisconnectIdpError
+	DisconnectIDPResponse: DisconnectIdpResponse
+	PersonIdentityProvider: PersonIdentityProvider
+	IdentityProviderListItem: IdentityProviderListItem
 	Float: Scalars['Float']['output']
 	ForceSignOutPersonError: ForceSignOutPersonError
 	ForceSignOutPersonResponse: ForceSignOutPersonResponse
@@ -3533,6 +3582,45 @@ export type ForceSignOutPersonResponseResolvers<
 	ok?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
 }
 
+export type DisconnectIdpErrorResolvers<
+	ContextType = any,
+	ParentType extends ResolversParentTypes['DisconnectIDPError'] = ResolversParentTypes['DisconnectIDPError'],
+> = {
+	code?: Resolver<ResolversTypes['DisconnectIDPErrorCode'], ParentType, ContextType>
+	developerMessage?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
+}
+
+export type DisconnectIdpResponseResolvers<
+	ContextType = any,
+	ParentType extends ResolversParentTypes['DisconnectIDPResponse'] = ResolversParentTypes['DisconnectIDPResponse'],
+> = {
+	error?: Resolver<Maybe<ResolversTypes['DisconnectIDPError']>, ParentType, ContextType>
+	ok?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
+	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
+}
+
+export type PersonIdentityProviderResolvers<
+	ContextType = any,
+	ParentType extends ResolversParentTypes['PersonIdentityProvider'] = ResolversParentTypes['PersonIdentityProvider'],
+> = {
+	createdAt?: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>
+	externalIdentifier?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+	id?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+	identityProvider?: Resolver<ResolversTypes['IdentityProviderListItem'], ParentType, ContextType>
+	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
+}
+
+export type IdentityProviderListItemResolvers<
+	ContextType = any,
+	ParentType extends ResolversParentTypes['IdentityProviderListItem'] = ResolversParentTypes['IdentityProviderListItem'],
+> = {
+	disabledAt?: Resolver<Maybe<ResolversTypes['DateTime']>, ParentType, ContextType>
+	slug?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+	type?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
+}
+
 export type IdpOptionsOutputResolvers<
 	ContextType = any,
 	ParentType extends ResolversParentTypes['IDPOptionsOutput'] = ResolversParentTypes['IDPOptionsOutput'],
@@ -3840,6 +3928,12 @@ export type MutationResolvers<ContextType = any, ParentType extends ResolversPar
 		ContextType,
 		RequireFields<MutationDisablePersonArgs, 'personId'>
 	>
+	disconnectMyIdentityProvider?: Resolver<
+		Maybe<ResolversTypes['DisconnectIDPResponse']>,
+		ParentType,
+		ContextType,
+		RequireFields<MutationDisconnectMyIdentityProviderArgs, 'identityProvider'>
+	>
 	enableIDP?: Resolver<Maybe<ResolversTypes['EnableIDPResponse']>, ParentType, ContextType, RequireFields<MutationEnableIdpArgs, 'identityProvider'>>
 	enableMyPasswordless?: Resolver<Maybe<ResolversTypes['ToggleMyPasswordlessResponse']>, ParentType, ContextType>
 	forceSignOutPerson?: Resolver<
@@ -4030,6 +4124,7 @@ export type QueryResolvers<ContextType = any, ParentType extends ResolversParent
 	identityProviders?: Resolver<ReadonlyArray<ResolversTypes['IdentityProvider']>, ParentType, ContextType>
 	mailTemplates?: Resolver<ReadonlyArray<ResolversTypes['MailTemplateData']>, ParentType, ContextType>
 	me?: Resolver<ResolversTypes['Identity'], ParentType, ContextType>
+	myIdentityProviders?: Resolver<ReadonlyArray<ResolversTypes['PersonIdentityProvider']>, ParentType, ContextType>
 	personById?: Resolver<Maybe<ResolversTypes['Person']>, ParentType, ContextType, RequireFields<QueryPersonByIdArgs, 'id'>>
 	persons?: Resolver<ReadonlyArray<ResolversTypes['Person']>, ParentType, ContextType, Partial<QueryPersonsArgs>>
 	projectBySlug?: Resolver<Maybe<ResolversTypes['Project']>, ParentType, ContextType, RequireFields<QueryProjectBySlugArgs, 'slug'>>
@@ -4574,6 +4669,10 @@ export type Resolvers<ContextType = any> = {
 	EnableIDPResponse?: EnableIdpResponseResolvers<ContextType>
 	ForceSignOutPersonError?: ForceSignOutPersonErrorResolvers<ContextType>
 	ForceSignOutPersonResponse?: ForceSignOutPersonResponseResolvers<ContextType>
+	DisconnectIDPError?: DisconnectIdpErrorResolvers<ContextType>
+	DisconnectIDPResponse?: DisconnectIdpResponseResolvers<ContextType>
+	PersonIdentityProvider?: PersonIdentityProviderResolvers<ContextType>
+	IdentityProviderListItem?: IdentityProviderListItemResolvers<ContextType>
 	IDPOptionsOutput?: IdpOptionsOutputResolvers<ContextType>
 	Identity?: IdentityResolvers<ContextType>
 	IdentityGlobalPermissions?: IdentityGlobalPermissionsResolvers<ContextType>

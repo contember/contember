@@ -42,6 +42,8 @@ namespace PermissionActions {
 	export const PERSON_RESET_PASSWORD = Authorizator.createAction(Resources.person, 'resetPassword')
 	export const PERSON_CREATE_IDP_URL = Authorizator.createAction(Resources.person, 'createIdPUrl')
 	export const PERSON_SIGN_IN_IDP = Authorizator.createAction(Resources.person, 'signInIdp')
+	export const PERSON_LIST_MY_IDP = Authorizator.createAction(Resources.person, 'listMyIdp')
+	export const PERSON_DISCONNECT_MY_IDP = Authorizator.createAction(Resources.person, 'disconnectMyIdp')
 	export const PERSON_REQUEST_PASSWORDLESS_SIGN_IN = Authorizator.createAction(Resources.person, 'requestPasswordlessSignIn')
 	export const PERSON_PASSWORDLESS_SIGN_IN = Authorizator.createAction(Resources.person, 'passwordlessSignIn')
 	export const PERSON_CREATE_SESSION_KEY = (roles?: readonly string[]) => Authorizator.createAction(Resources.person, 'createSessionToken', { roles })

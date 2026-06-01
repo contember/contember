@@ -111,6 +111,8 @@ input StringCondition {
   containsCI: String
   startsWithCI: String
   endsWithCI: String
+  similar: String
+  wordSimilar: String
 }
 
 input PostWhere {

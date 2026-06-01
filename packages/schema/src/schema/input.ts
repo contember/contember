@@ -204,6 +204,8 @@ export namespace Input {
 		readonly containsCI?: string
 		readonly startsWithCI?: string
 		readonly endsWithCI?: string
+		readonly similar?: string
+		readonly wordSimilar?: string
 
 		// special
 		readonly never?: true

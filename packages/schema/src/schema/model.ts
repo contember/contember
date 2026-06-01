@@ -322,6 +322,7 @@ export namespace Model {
 		readonly fields: readonly string[]
 		readonly name?: string
 		readonly method?: IndexMethod
+		readonly opClass?: string
 	}
 
 	export interface ColumnContext {

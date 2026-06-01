@@ -48,6 +48,8 @@ const conditionSchemaInner = <T extends Json>(metadata: ResolvedColumnMetadata<T
 					containsCI: Typesafe.string,
 					startsWithCI: Typesafe.string,
 					endsWithCI: Typesafe.string,
+					similar: Typesafe.string,
+					wordSimilar: Typesafe.string,
 				}
 				: {}),
 		}))

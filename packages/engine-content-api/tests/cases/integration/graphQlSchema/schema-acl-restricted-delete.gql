@@ -264,6 +264,8 @@ input RootUpdateREntityRelationInput {
   connect: OneHasManyEntityUniqueWhere
   connectOrCreate: RootConnectOrCreateRRelationInput
   disconnect: OneHasManyEntityUniqueWhere
+  set: [RootSetRItemRelationInput!]
+  orphanStrategy: OrphanRemovalStrategy
   alias: String
 }
 
@@ -281,6 +283,20 @@ input RootUpsertRRelationInput {
   by: OneHasManyEntityUniqueWhere!
   update: OneHasManyEntityWithoutR2UpdateInput!
   create: OneHasManyEntityWithoutR2CreateInput!
+}
+
+input RootSetRItemRelationInput {
+  create: OneHasManyEntityWithoutR2CreateInput
+  connect: OneHasManyEntityUniqueWhere
+  connectOrCreate: RootConnectOrCreateRRelationInput
+  update: RootUpdateRRelationInput
+  upsert: RootUpsertRRelationInput
+  alias: String
+}
+
+enum OrphanRemovalStrategy {
+  disconnect
+  delete
 }
 
 type QueryTransaction {

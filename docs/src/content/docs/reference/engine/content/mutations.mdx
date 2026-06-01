@@ -111,6 +111,44 @@ mutation {
 }
 ```   
 
+### Declaratively setting a collection with `set`
+
+For "has many" relations (both *one has many* and *many has many*) you can declaratively set
+the whole collection so that it ends up containing exactly the records you describe, without
+having to fetch and `disconnect`/`delete` the existing ones yourself.
+
+Each `set` item is one of the positive operations `connect`, `create`, `connectOrCreate`,
+`update` or `upsert` (no `delete`/`disconnect`). Any record that is currently related but is
+not part of the provided list is an *orphan* and is removed according to `orphanStrategy`:
+
+- `disconnect` (default) - the orphan stays in the database, only the relation is removed. This
+  is the safest option and is used when `orphanStrategy` is omitted.
+- `delete` - the orphan record is deleted entirely.
+
+The desired records are connected/created first and orphan removal runs afterwards, so records
+that are present both before and after the operation are never transiently removed.
+
+```graphql
+mutation {
+  updatePost(by: {id: "af86a9a3-349a-412f-b95b-725c4b9061b8"}, data: {
+    tags: {
+      orphanStrategy: delete
+      set: [
+        {connect: {id: "..."}}
+        {create: {name: "graphql"}}
+      ]
+    }
+  }) {
+    ok
+  }
+}
+```
+
+:::note
+`set` must be the only operation provided for that relation - it cannot be combined with other
+per-item operations in the same list. It is currently supported on "has many" relations only.
+:::
+
 ## Transactions
 
 Each mutation (with its nested mutations) is wrapped into individual transaction, meaning that for query:

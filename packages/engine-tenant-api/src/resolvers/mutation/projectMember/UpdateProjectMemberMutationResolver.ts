@@ -1,4 +1,9 @@
-import { MutationResolvers, MutationUpdateProjectMemberArgs, UpdateProjectMemberErrorCode, UpdateProjectMemberResponse } from '../../../schema/index.js'
+import {
+	MutationResolvers,
+	MutationUpdateProjectMemberArgs,
+	UpdateProjectMemberErrorCode,
+	UpdateProjectMemberResponse,
+} from '../../../schema/index.js'
 import { TenantResolverContext } from '../../TenantResolverContext.js'
 import { MembershipValidationErrorType, MembershipValidator, PermissionActions, ProjectManager, ProjectMemberManager } from '../../../model/index.js'
 import { createMembershipValidationErrorResult } from '../../membershipUtils.js'

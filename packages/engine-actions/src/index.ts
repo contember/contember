@@ -29,7 +29,13 @@ import { AccessEvaluator, Authorizator } from '@contember/authorization'
 import { ActionsPermissionsFactory } from './authorization/index.js'
 import { WebhookFetcherNative } from './dispatch/WebhookFetcher.js'
 
-export { TriggerHandler, TriggerIndirectChangesFetcher, TriggerListenersFactory, TriggerListenersStore, TriggerPayloadManager } from './triggers/index.js'
+export {
+	TriggerHandler,
+	TriggerIndirectChangesFetcher,
+	TriggerListenersFactory,
+	TriggerListenersStore,
+	TriggerPayloadManager,
+} from './triggers/index.js'
 export { ActionsExecutionContainerHookFactory } from './ActionsExecutionContainerHookFactory.js'
 export { ListenerStoreProvider } from './ListenerStoreProvider.js'
 

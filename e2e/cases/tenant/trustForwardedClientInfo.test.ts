@@ -72,27 +72,43 @@ test('signIn options.trustForwardedClientInfo: honored when caller api_key has t
 	// Path B: caller (root token) has trust=false → option is silently dropped → resulting session trust=false.
 	const untrustedToken = await signInWith(rootToken, email, password, { trustForwardedClientInfo: true })
 
-	// Warm-up: ensure last_* is populated for both keys by making one authenticated request with the headers.
 	const forwardedHeaders = {
 		'X-Contember-Client-IP': FORWARDED_IP,
 		'X-Contember-Client-User-Agent': FORWARDED_UA,
 	}
-	expect((await tenantWithHeaders(trustedToken, { query: `{ me { id } }` }, forwardedHeaders)).status).toBe(200)
-	expect((await tenantWithHeaders(untrustedToken, { query: `{ me { id } }` }, forwardedHeaders)).status).toBe(200)
 
-	const sessionsResp = await tenantWithHeaders(
-		trustedToken,
-		{ query: `{ me { sessions { id isCurrent trustForwardedClientInfo lastIp lastUserAgent } } }` },
-		forwardedHeaders,
-	)
-	expect(sessionsResp.status).toBe(200)
-	const sessions = sessionsResp.body.data.me.sessions as {
+	type Session = {
 		id: string
 		isCurrent: boolean
 		trustForwardedClientInfo: boolean
 		lastIp: string | null
 		lastUserAgent: string | null
-	}[]
+	}
+
+	// Session tracking (last_ip/last_user_agent/last_used_at) is written fire-and-forget via
+	// setImmediate after the auth response returns (see ApiKeyManager.verifyAndProlong), so it is
+	// eventually consistent. Re-trigger both sessions and poll until their lastIp lands, instead of
+	// reading once and racing the async write.
+	const readSessions = async (): Promise<Session[]> => {
+		expect((await tenantWithHeaders(trustedToken, { query: `{ me { id } }` }, forwardedHeaders)).status).toBe(200)
+		expect((await tenantWithHeaders(untrustedToken, { query: `{ me { id } }` }, forwardedHeaders)).status).toBe(200)
+		const resp = await tenantWithHeaders(
+			trustedToken,
+			{ query: `{ me { sessions { id isCurrent trustForwardedClientInfo lastIp lastUserAgent } } }` },
+			forwardedHeaders,
+		)
+		expect(resp.status).toBe(200)
+		return resp.body.data.me.sessions as Session[]
+	}
+
+	let sessions: Session[] = []
+	for (let attempt = 0; attempt < 20; attempt++) {
+		sessions = await readSessions()
+		if (sessions.length === 2 && sessions.every(s => s.lastIp !== null)) {
+			break
+		}
+		await Bun.sleep(50)
+	}
 	expect(sessions).toHaveLength(2)
 
 	const trusted = sessions.find(s => s.isCurrent)!

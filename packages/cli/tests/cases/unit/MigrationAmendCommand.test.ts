@@ -28,15 +28,37 @@ namespace BlogModel {
 	}
 }
 
+namespace BlogModelExtended {
+	export class Author {
+		name = c.stringColumn()
+		nickname = c.stringColumn()
+	}
+}
+
 const aclWith = (role: string): Schema['acl'] => ({
 	roles: {
 		[role]: { variables: {}, stages: '*', entities: {} },
 	},
 })
 
+type SystemClientCall = { method: 'migrate' | 'migrationDelete' | 'migrationModify'; args: any[] }
+
+// A system client that records calls instead of hitting the network. `get()` throws by default so a
+// state-only amend (which must not touch the server) fails loudly if it ever reaches out.
+const recordingSystemClient = (calls?: SystemClientCall[]) => ({
+	get: () => {
+		if (!calls) {
+			throw new Error('systemClient must not be used for a state-only amend')
+		}
+		const record = (method: SystemClientCall['method']) => async (...args: any[]) => {
+			calls.push({ method, args })
+		}
+		return { migrate: record('migrate'), migrationDelete: record('migrationDelete'), migrationModify: record('migrationModify') }
+	},
+})
+
 // Builds an amend command wired with real migrations-client services backed by `migrationsDir`.
-// The network-bound collaborators are stubbed: a state-only amend must return before any of them is used.
-const buildCommand = (migrationsDir: string, loadedSchema: Schema) => {
+const buildCommand = (migrationsDir: string, loadedSchema: Schema, calls?: SystemClientCall[]) => {
 	const filesManager = new MigrationFilesManager(migrationsDir, { json: new JsonLoader(new MigrationParser()) })
 	const migrationsResolver = new MigrationsResolver(filesManager)
 	const schemaMigrator = new SchemaMigrator(new ModificationHandlerFactory(ModificationHandlerFactory.defaultFactoryMap))
@@ -46,17 +68,12 @@ const buildCommand = (migrationsDir: string, loadedSchema: Schema) => {
 
 	const schemaLoader: SchemaLoader = { loadSchema: async () => loadedSchema }
 	const statusFacade = { resolveMigrationsStatus: async () => ({ migrationsToExecute: [] }) }
-	const systemClientProvider = {
-		get: () => {
-			throw new Error('systemClient must not be used for a state-only amend')
-		},
-	}
 	const migrationsValidator = { validate: async () => true }
 	const migrationPrinter = { printMigrationDescription: () => {} }
 
 	const command = new MigrationAmendCommand(
 		migrationsResolver,
-		systemClientProvider as any,
+		recordingSystemClient(calls) as any,
 		statusFacade as any,
 		schemaLoader,
 		schemaVersionBuilder,
@@ -117,5 +134,23 @@ describe('MigrationAmendCommand (schema state mode)', () => {
 		expect(code).toBe(0)
 		const state = await schemaStateManager.readState()
 		expect(Object.keys(state.acl.roles)).toStrictEqual(['admin'])
+	})
+
+	test('re-pushes schema state to the server after amending model changes', async () => {
+		// model changed (a column added) — migrationModify rebuilds the server schema from migrations
+		// and drops the non-model state, so amend must re-apply the state via a follow-up migrate call.
+		const loaded: Schema = { ...createSchema(BlogModelExtended), acl: aclWith('admin') }
+		const calls: SystemClientCall[] = []
+		const { command } = buildCommand(migrationsDir, loaded, calls)
+
+		const code = await run(command)
+
+		expect(code).toBe(0)
+		const modifyIndex = calls.findIndex(it => it.method === 'migrationModify')
+		expect(modifyIndex).toBeGreaterThanOrEqual(0)
+		// the state re-push is a migrate call carrying schemaState, after the migrationModify
+		const restate = calls.slice(modifyIndex + 1).find(it => it.method === 'migrate' && it.args[2])
+		expect(restate).toBeDefined()
+		expect(Object.keys(restate!.args[2].acl.roles)).toStrictEqual(['admin'])
 	})
 })

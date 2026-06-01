@@ -193,8 +193,8 @@ export const createContainer = ({ env, version, runtime, workspace }: {
 		.addService('migrationsValidator', ({ migrationDescriber, schemaMigrator }) => new MigrationsValidator(migrationDescriber, schemaMigrator))
 		.addService(
 			'migrationRebaseFacade',
-			({ schemaVersionBuilder, migrationsValidator, systemClientProvider, migrationFilesManager }) =>
-				new MigrationRebaseFacade(schemaVersionBuilder, migrationsValidator, systemClientProvider, migrationFilesManager),
+			({ schemaVersionBuilder, migrationsValidator, systemClientProvider, migrationFilesManager, schemaStateManager }) =>
+				new MigrationRebaseFacade(schemaVersionBuilder, migrationsValidator, systemClientProvider, migrationFilesManager, schemaStateManager),
 		)
 		.addService(
 			'schemaLoader',

@@ -125,6 +125,9 @@ export class MigrationAmendCommand extends Command<Args, Options> {
 				await systemClient.migrationDelete(amendMigration.version)
 				if (schemaState) {
 					await this.schemaStateManager.writeState(schemaState)
+					// migrationDelete rebuilds the server schema from migrations, dropping the
+					// non-model state; re-apply it so the server stays in sync with the state files.
+					await systemClient.migrate([], force, schemaState)
 				}
 				console.log('Latest migration was removed')
 				return 0
@@ -140,6 +143,9 @@ export class MigrationAmendCommand extends Command<Args, Options> {
 
 			if (schemaState) {
 				await this.schemaStateManager.writeState(schemaState)
+				// migrationModify rebuilds the server schema from migrations, dropping the
+				// non-model state; re-apply it so the server stays in sync with the state files.
+				await systemClient.migrate([], force, schemaState)
 			}
 
 			return 0

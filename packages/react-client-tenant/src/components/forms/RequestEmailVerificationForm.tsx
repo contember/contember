@@ -58,4 +58,5 @@ export const RequestEmailVerificationForm = ({ children, onSuccess }: RequestEma
 }
 const errorToField: Record<TenantApi.RequestEmailVerificationErrorCode, keyof RequestEmailVerificationFormValues | undefined> = {
 	RATE_LIMIT_EXCEEDED: undefined,
+	INVALID_CAPTCHA: undefined,
 }

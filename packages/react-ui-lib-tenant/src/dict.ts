@@ -250,6 +250,7 @@ export const dict = {
 				'INVALID_VALUE': 'Invalid value',
 				'UNKNOWN_ERROR': 'Something went wrong. Please try again later',
 				'RATE_LIMIT_EXCEEDED': 'Too many requests, please try again later',
+				'INVALID_CAPTCHA': 'Captcha verification failed',
 			} satisfies Record<RequestEmailVerificationFormErrorCode, string>,
 			title: 'Verify e-mail',
 			description: 'Enter your e-mail below to receive a verification link',

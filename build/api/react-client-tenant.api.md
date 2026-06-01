@@ -1187,6 +1187,7 @@ export const requestEmailVerificationMutation: TenantApi.MutationFetcher<{
 }, {
     readonly email: string;
     readonly options?: TenantApi.EmailVerificationOptions;
+    readonly captchaToken?: string;
 }>;
 
 // @public (undocumented)
@@ -1738,7 +1739,8 @@ export const useRequestEmailVerificationForm: () => RequestEmailVerificationForm
 export const useRequestEmailVerificationMutation: (input?: TenantApiOptions) => (variables: {
     readonly email: string;
     readonly options?: TenantApi.EmailVerificationOptions;
-}) => Promise<TenantMutationResponse<unknown, "RATE_LIMIT_EXCEEDED">>;
+    readonly captchaToken?: string;
+}) => Promise<TenantMutationResponse<unknown, TenantApi.RequestEmailVerificationErrorCode>>;
 
 // @public (undocumented)
 export const useResetPasswordMutation: (input?: TenantApiOptions) => (variables: {

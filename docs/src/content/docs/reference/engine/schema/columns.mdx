@@ -291,6 +291,31 @@ config = c.jsonColumn().columnType('json')
 ```
 In this example, the config property is a JSON column that is defined with the column type json in the database. This means that the config column will be of type json in the database, rather than the default jsonb type.
 
+### Validating JSON columns with a JSON Schema
+
+The `schema` method (available only on `jsonColumn()`) lets you attach a [JSON Schema](https://json-schema.org/) to a JSON column. The schema is stored as metadata in the Contember schema and the value provided on every `create` / `update` mutation is validated against it. Validation errors are reported the same way as the built-in field validation rules.
+
+#### Example how to attach a JSON Schema to a JSON column:
+
+```typescript
+address = c.jsonColumn().schema({
+	type: 'object',
+	properties: {
+		street: { type: 'string' },
+		zip: { type: 'string', pattern: '^[0-9]{5}$' },
+		country: { type: 'string', enum: ['CZ', 'SK'] },
+	},
+	required: ['street', 'zip'],
+	additionalProperties: false,
+})
+```
+
+Notes and limitations:
+
+- The schema is **metadata only** — it does not change the database column type and adds no database-level `CHECK` constraint. Changing the attached schema produces a metadata-only migration with no DDL.
+- `null` values are not validated (use `notNull()` to forbid them) and a column is only validated when it is present in the mutation input.
+- The validator implements a pragmatic subset of JSON Schema (2020-12 compatible) with no extra runtime dependency. Supported keywords: `type` (including `integer` and type arrays), `enum`, `const`, object (`properties`, `required`, `additionalProperties`, `minProperties`, `maxProperties`), array (`items`, `minItems`, `maxItems`, `uniqueItems`), string (`minLength`, `maxLength`, `pattern`), number (`minimum`, `maximum`, `exclusiveMinimum`, `exclusiveMaximum`, `multipleOf`), and the combinators `allOf`, `anyOf`, `oneOf`, `not`. Unknown keywords (such as `$ref`, `format`, `$defs`) are ignored.
+
 ### Default value
 
 The `default` method allows you to specify a default value for a column in your entity schema. When a default value is specified, it will be used as the value of the column when a new record is created if no value is explicitly provided.

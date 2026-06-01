@@ -440,4 +440,99 @@ describe('Input pre-validator', () => {
 		})
 		assert.deepStrictEqual(result, [])
 	})
+
+	describe('JSON schema on JSON column', () => {
+		const model = SchemaDefinition.createModel(JsonSchemaModelDefinition)
+
+		it('accepts a valid JSON value on create', async () => {
+			const validator = createValidator({ model, validation: {} })
+			const result = await validator.validateCreate({
+				entity: getEntity(model, 'Product'),
+				data: {
+					meta: { color: 'red', size: 42 },
+				},
+				overRelation: null,
+				path: [],
+				mapper,
+			})
+			assert.deepStrictEqual(result, [])
+		})
+
+		it('rejects an invalid JSON value on create', async () => {
+			const validator = createValidator({ model, validation: {} })
+			const result = await validator.validateCreate({
+				entity: getEntity(model, 'Product'),
+				data: {
+					meta: { size: 'not-a-number' },
+				},
+				overRelation: null,
+				path: [],
+				mapper,
+			})
+			assert.deepStrictEqual(result, [
+				{
+					path: [{ field: 'meta' }],
+					message: { text: '/color: Required property is missing' },
+				},
+				{
+					path: [{ field: 'meta' }],
+					message: { text: '/size: Expected type number, got string' },
+				},
+			])
+		})
+
+		it('rejects an invalid JSON value on update', async () => {
+			const validator = createValidator({ model, validation: {} })
+			const result = await validator.validateUpdate({
+				entity: getEntity(model, 'Product'),
+				data: {
+					meta: { color: 123 },
+				},
+				where: { id: testUuid(1) },
+				path: [],
+				mapper,
+			})
+			assert.deepStrictEqual(result, [
+				{
+					path: [{ field: 'meta' }],
+					message: { text: '/color: Expected type string, got number' },
+				},
+			])
+		})
+
+		it('skips null and absent values', async () => {
+			const validator = createValidator({ model, validation: {} })
+			const resultNull = await validator.validateUpdate({
+				entity: getEntity(model, 'Product'),
+				data: { meta: null },
+				where: { id: testUuid(1) },
+				path: [],
+				mapper,
+			})
+			assert.deepStrictEqual(resultNull, [])
+
+			const resultAbsent = await validator.validateUpdate({
+				entity: getEntity(model, 'Product'),
+				data: {},
+				where: { id: testUuid(1) },
+				path: [],
+				mapper,
+			})
+			assert.deepStrictEqual(resultAbsent, [])
+		})
+	})
 })
+
+namespace JsonSchemaModelDefinition {
+	export class Product {
+		name = def.stringColumn()
+		meta = def.jsonColumn().schema({
+			type: 'object',
+			properties: {
+				color: { type: 'string' },
+				size: { type: 'number' },
+			},
+			required: ['color'],
+		})
+	}
+}

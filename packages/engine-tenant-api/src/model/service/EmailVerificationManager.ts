@@ -11,6 +11,7 @@ import { PersonTokenQuery } from '../queries/personToken/PersonTokenQuery.js'
 import { NextMailAttemptQuery } from '../queries/authLog/NextMailAttemptQuery.js'
 import { validateToken } from '../utils/index.js'
 import { PersonToken } from '../type/index.js'
+import { AuthLogService } from './AuthLogService.js'
 
 interface MailOptions {
 	project?: string
@@ -74,14 +75,29 @@ export class EmailVerificationManager {
 		const tokenRow = await dbContext.queryHandler.fetch(PersonTokenQuery.byToken(token, 'email_verification'))
 		const validation = validateToken({ entry: tokenRow, token, now: dbContext.providers.now(), validationType: 'token' })
 		if (!validation.ok) {
-			return new ResponseError(validation.error, validation.errorMessage)
+			// Carry whatever we know about the subject so the audit log can tie the
+			// failure to a person/token even on an invalid/expired token (matches
+			// PasswordResetManager — see email_verify_complete audit entry).
+			return new ResponseError(validation.error, validation.errorMessage, {
+				[AuthLogService.Key]: new AuthLogService.Bag(
+					tokenRow ? { personId: tokenRow.person_id, tokenId: tokenRow.id } : {},
+				),
+			})
 		}
+		const authLogData = new AuthLogService.Bag({
+			personId: validation.result.person_id,
+			tokenId: validation.result.id,
+		})
 		return await dbContext.transaction(async db => {
 			await db.commandBus.execute(new InvalidateTokenCommand(validation.result.id))
 			await db.commandBus.execute(new MarkEmailVerifiedCommand(validation.result.person_id))
-			return new ResponseOk(null)
+			return new ResponseOk({ [AuthLogService.Key]: authLogData })
 		})
 	}
 }
 
-export type VerifyEmailResponse = Response<null, PersonToken.TokenValidationError>
+export type VerifyEmailResponse = Response<
+	{ [AuthLogService.Key]: AuthLogService.Bag },
+	PersonToken.TokenValidationError,
+	{ [AuthLogService.Key]: AuthLogService.Bag }
+>

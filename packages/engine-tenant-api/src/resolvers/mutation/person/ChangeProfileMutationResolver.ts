@@ -19,7 +19,6 @@ import {
 	PersonQuery,
 } from '../../../model/index.js'
 import { createErrorResponse } from '../../errorUtils.js'
-import { ResponseOk } from '../../../model/utils/Response.js'
 import { normalizeEmail } from '../../../model/utils/email.js'
 
 export class ChangeProfileMutationResolver implements Pick<MutationResolvers, 'changeMyProfile' | 'changeProfile' | 'confirmEmailChange'> {
@@ -161,10 +160,9 @@ export class ChangeProfileMutationResolver implements Pick<MutationResolvers, 'c
 		const result = await this.emailChangeManager.confirmEmailChange(context.db, args.token)
 		await context.logAuthAction({
 			type: 'email_change_complete',
-			// confirmEmailChange's success payload carries domain data, not an
-			// AuthLog bag; collapse to a bare ok/error for the audit entry.
-			response: result.ok ? new ResponseOk(null) : result,
-			personId: result.ok ? result.result.personId : undefined,
+			// personId/tokenId ride along in the AuthLog bag on both success and
+			// the uniqueness/validation failure paths (see EmailChangeManager).
+			response: result,
 		})
 		if (!result.ok) {
 			return createErrorResponse(result.error, result.errorMessage)

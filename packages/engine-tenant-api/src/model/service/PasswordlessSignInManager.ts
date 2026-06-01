@@ -227,7 +227,8 @@ class PasswordlessSignInManager {
 			// verification requirement. Without this, a required-but-unverified
 			// account could obtain a session here while being blocked from password
 			// sign-in (SignInManager) — an inconsistent, exploitable gap.
-			if (personRow.email_verified_at === null) {
+			const emailVerifiedNow = personRow.email_verified_at === null
+			if (emailVerifiedNow) {
 				await db.commandBus.execute(new MarkEmailVerifiedCommand(personRow.id))
 			}
 			const sessionToken = await this.apiKeyManager.createSessionApiKey(db, personRow.identity_id, expiration, requestInfo, trustForwardedInfo)
@@ -239,6 +240,9 @@ class PasswordlessSignInManager {
 				[AuthLogService.Key]: new AuthLogService.Bag({
 					personId: personRow.id,
 					tokenId: tokenResult?.id,
+					// Record that this sign-in also satisfied e-mail verification, so
+					// the audit trail shows when/how the address became verified.
+					eventData: emailVerifiedNow ? { emailVerified: true } : undefined,
 				}),
 			})
 		})

@@ -14,6 +14,7 @@ import { getConfigSql } from './sql/getConfigSql.js'
 import { getIdentityByIdSql } from './sql/getIdentityByIdSql.js'
 import { getAuthPoliciesSql } from './sql/authPolicySql.js'
 import { getPersonByEmailSql } from './sql/getPersonByEmailSql.js'
+import { AuthLogService } from '../../../../src/model/service/AuthLogService.js'
 
 test('signs in idp with existing identity', async () => {
 	const externalIdentifier = 'abcd'
@@ -154,10 +155,21 @@ test('does NOT link by e-mail when provider requires a verified e-mail and the c
 				},
 			},
 		},
+		// The gate block is takeover-grade, so the audit entry must stay
+		// distinguishable from an ordinary not-found: it records the blocked
+		// account's id and a reason, even though the external error is generic.
 		expectedAuthLog: {
 			type: 'idp_login',
 			response: expect.objectContaining({
 				ok: false,
+				metadata: expect.objectContaining({
+					[AuthLogService.Key]: expect.objectContaining({
+						data: expect.objectContaining({
+							personId,
+							eventData: { reason: 'idp_email_unverified' },
+						}),
+					}),
+				}),
 			}),
 		},
 	})

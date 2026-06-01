@@ -15,6 +15,7 @@ import { validateToken } from '../utils/index.js'
 import { normalizeEmail } from '../utils/email.js'
 import { PersonToken } from '../type/index.js'
 import { UniqueViolationError } from '@contember/database'
+import { AuthLogService } from './AuthLogService.js'
 
 interface MailOptions {
 	project?: string
@@ -95,8 +96,18 @@ export class EmailChangeManager {
 		const tokenRow = await dbContext.queryHandler.fetch(PersonTokenQuery.byToken(token, 'email_change'))
 		const validation = validateToken({ entry: tokenRow, token, now: dbContext.providers.now(), validationType: 'token' })
 		if (!validation.ok) {
-			return new ResponseError(validation.error, validation.errorMessage)
+			// Tie the failure to a person/token in the audit log when we can, even
+			// for an invalid/expired token (matches verifyEmail / password reset).
+			return new ResponseError(validation.error, validation.errorMessage, {
+				[AuthLogService.Key]: new AuthLogService.Bag(
+					tokenRow ? { personId: tokenRow.person_id, tokenId: tokenRow.id } : {},
+				),
+			})
 		}
+		const authLogData = new AuthLogService.Bag({
+			personId: validation.result.person_id,
+			tokenId: validation.result.id,
+		})
 		const newEmail = validation.result.meta?.email
 		if (!newEmail) {
 			throw new ImplementationException('email_change token is missing its email payload')
@@ -111,7 +122,9 @@ export class EmailChangeManager {
 		// claimed the address between request and confirmation.
 		const validationError = await this.emailValidator.validateEmail(dbContext, newEmail)
 		if (validationError !== null) {
-			return new ResponseError(validationError.error, validationError.errorMessage)
+			return new ResponseError(validationError.error, validationError.errorMessage, {
+				[AuthLogService.Key]: authLogData,
+			})
 		}
 
 		const oldEmail = person.email
@@ -129,7 +142,9 @@ export class EmailChangeManager {
 			// this UPDATE. The unique index is the real guard — translate its
 			// violation into a clean error instead of leaking a 500.
 			if (e instanceof UniqueViolationError) {
-				return new ResponseError('EMAIL_ALREADY_EXISTS', `User with email ${newEmail} already exists`)
+				return new ResponseError('EMAIL_ALREADY_EXISTS', `User with email ${newEmail} already exists`, {
+					[AuthLogService.Key]: authLogData,
+				})
 			}
 			throw e
 		}
@@ -142,13 +157,14 @@ export class EmailChangeManager {
 			)
 		}
 
-		return new ResponseOk({ personId: person.id, newEmail })
+		return new ResponseOk({ personId: person.id, newEmail, [AuthLogService.Key]: authLogData })
 	}
 }
 
 export type RequestEmailChangeResponse = Response<null, EmailValidatorError | 'RATE_LIMIT_EXCEEDED'>
 
 export type ConfirmEmailChangeResponse = Response<
-	{ personId: string; newEmail: string },
-	PersonToken.TokenValidationError | EmailValidatorError
+	{ personId: string; newEmail: string; [AuthLogService.Key]: AuthLogService.Bag },
+	PersonToken.TokenValidationError | EmailValidatorError,
+	{ [AuthLogService.Key]: AuthLogService.Bag }
 >

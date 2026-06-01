@@ -8,6 +8,7 @@ import { sqlTransaction } from './sql/sqlTransaction.js'
 import { getPersonByIdSql } from './sql/getPersonByIdSql.js'
 import { getPersonByEmailSql } from './sql/getPersonByEmailSql.js'
 import { getMailTemplateSql } from './sql/getMailTemplateSql.js'
+import { AuthLogService } from '../../../../src/model/service/AuthLogService.js'
 
 const anyString = (val: unknown) => typeof val === 'string'
 const isDate = (val: unknown) => val instanceof Date
@@ -71,10 +72,19 @@ test('confirmEmailChange - swaps the email, verifies it and signs out sessions',
 				},
 			},
 		},
+		// personId/tokenId now ride in the response's AuthLog bag (so the audit
+		// entry stays attributable on the failure paths too), not as a top-level
+		// logAuthAction arg.
 		expectedAuthLog: expect.objectContaining({
 			type: 'email_change_complete',
-			personId,
-			response: expect.objectContaining({ ok: true }),
+			response: expect.objectContaining({
+				ok: true,
+				result: expect.objectContaining({
+					[AuthLogService.Key]: expect.objectContaining({
+						data: expect.objectContaining({ personId, tokenId }),
+					}),
+				}),
+			}),
 		}),
 		sentMails: [
 			{
@@ -123,9 +133,18 @@ test('confirmEmailChange - new email taken in the meantime', async () => {
 				},
 			},
 		},
+		// Even on the uniqueness failure the audit entry stays attributable to the
+		// person/token via the bag carried in the error response's metadata.
 		expectedAuthLog: expect.objectContaining({
 			type: 'email_change_complete',
-			response: expect.objectContaining({ ok: false }),
+			response: expect.objectContaining({
+				ok: false,
+				metadata: expect.objectContaining({
+					[AuthLogService.Key]: expect.objectContaining({
+						data: expect.objectContaining({ personId, tokenId }),
+					}),
+				}),
+			}),
 		}),
 	})
 })

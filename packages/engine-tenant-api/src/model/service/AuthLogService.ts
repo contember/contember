@@ -42,8 +42,8 @@ class AuthLogService {
 				ipAddress: ctx.clientIp,
 				userAgent: ctx.userAgent,
 				metadata,
-				targetPersonId: data.targetPersonId,
-				eventData: data.eventData,
+				targetPersonId: data.targetPersonId ?? authData?.data?.targetPersonId,
+				eventData: data.eventData ?? authData?.data?.eventData,
 			}),
 		)
 	}

@@ -56,14 +56,19 @@ class IDPSignInManager {
 				}
 				throw e
 			}
-			const personRow = await this.resolvePerson(db, claim, provider)
+			const resolved = await this.resolvePerson(db, claim, provider)
+			const personRow = resolved.person
 
 			if (!personRow) {
+				// Keep the external error generic (no account-existence leak), but
+				// record the email-verification gate block distinctly in the audit
+				// log — it is a takeover-grade event, not an ordinary "not found".
 				return new ResponseError('PERSON_NOT_FOUND', `Person ${claim.email} not found`, {
 					[AuthLogService.Key]: new AuthLogService.Bag({
 						identityProviderId: provider.id,
 						personInput: claim.email,
-						personId: undefined,
+						personId: resolved.blockedPersonId,
+						eventData: resolved.blockedReason ? { reason: resolved.blockedReason } : undefined,
 					}),
 				})
 			}
@@ -118,11 +123,11 @@ class IDPSignInManager {
 		}
 	}
 
-	private async resolvePerson(db: DatabaseContext, claim: IDPResponse, provider: IdentityProviderRow): Promise<PersonRow | null> {
+	private async resolvePerson(db: DatabaseContext, claim: IDPResponse, provider: IdentityProviderRow): Promise<IDPSignInManager.ResolvePersonResult> {
 		const personByIdPQuery = new PersonByIdPQuery(provider.id, claim.externalIdentifier)
 		const personByIdp = await db.queryHandler.fetch(personByIdPQuery)
 		if (personByIdp) {
-			return personByIdp
+			return { person: personByIdp }
 		}
 
 		if (!provider.exclusive) {
@@ -134,20 +139,20 @@ class IDPSignInManager {
 				// the provider requires a verified e-mail, refuse to link — and to
 				// sign in — unless the provider asserts the address is verified.
 				if (provider.requireVerifiedEmail && claim.emailVerified !== true) {
-					return null
+					return { person: null, blockedReason: 'idp_email_unverified', blockedPersonId: personByEmail.id }
 				}
 				await this.saveIdpIdentifier(db, provider, claim, personByEmail)
-				return personByEmail
+				return { person: personByEmail }
 			}
 		}
 
 		if (provider.autoSignUp) {
 			const signedUpPerson = await this.signUp(db, claim, provider)
 			await this.saveIdpIdentifier(db, provider, claim, signedUpPerson)
-			return signedUpPerson
+			return { person: signedUpPerson }
 		}
 
-		return null
+		return { person: null }
 	}
 
 	private async signUp(db: DatabaseContext, { email, name, externalIdentifier }: IDPResponse, provider: IdentityProviderRow): Promise<PersonRow> {
@@ -175,6 +180,12 @@ class IDPSignInManager {
 }
 
 namespace IDPSignInManager {
+	export type ResolvePersonResult = {
+		readonly person: PersonRow | null
+		readonly blockedReason?: 'idp_email_unverified'
+		readonly blockedPersonId?: string
+	}
+
 	export type InitSignInIDPResponse = Response<InitSignInIdpResult, InitSignInIdpErrorCode>
 
 	interface SignInIDPResult {

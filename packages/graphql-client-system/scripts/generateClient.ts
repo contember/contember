@@ -1,5 +1,6 @@
 import { AsyncGenerator } from 'graphql-ts-client-codegen'
 import { makeExecutableSchema } from '@graphql-tools/schema'
+// biome-ignore lint/correctness/useImportExtensions: .graphql files are resolved by the bundler loader, not as JS modules
 import { default as typeDefs } from '../../engine-system-api/src/schema/system.graphql'
 import * as path from 'path'
 import { dirname } from 'node:path'

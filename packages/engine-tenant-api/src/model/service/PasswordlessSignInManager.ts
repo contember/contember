@@ -10,7 +10,13 @@ import {
 } from '../../schema/index.js'
 import { DatabaseContext, validateToken } from '../utils/index.js'
 import { UserMailer } from '../mailing/index.js'
-import { ActivateOtpCommand, ApiKeyRequestInfo, CreatePersonTokenCommand, IncreaseOtpAttemptCommand, InvalidateTokenCommand } from '../commands/index.js'
+import {
+	ActivateOtpCommand,
+	ApiKeyRequestInfo,
+	CreatePersonTokenCommand,
+	IncreaseOtpAttemptCommand,
+	InvalidateTokenCommand,
+} from '../commands/index.js'
 import { getPreferredProject } from './helpers/getPreferredProject.js'
 import { ProjectManager } from './ProjectManager.js'
 import { PermissionContext } from '../authorization/index.js'

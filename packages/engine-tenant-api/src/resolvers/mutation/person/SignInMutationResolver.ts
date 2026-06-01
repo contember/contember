@@ -1,4 +1,10 @@
-import { CreateSessionTokenResponse, MutationCreateSessionTokenArgs, MutationResolvers, MutationSignInArgs, SignInResponse } from '../../../schema/index.js'
+import {
+	CreateSessionTokenResponse,
+	MutationCreateSessionTokenArgs,
+	MutationResolvers,
+	MutationSignInArgs,
+	SignInResponse,
+} from '../../../schema/index.js'
 import { TenantResolverContext } from '../../TenantResolverContext.js'
 import { ConfigurationQuery, PermissionActions, PersonUniqueIdentifier, RateLimiter, SignInManager } from '../../../model/index.js'
 import { createErrorResponse } from '../../errorUtils.js'

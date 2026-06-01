@@ -10,7 +10,12 @@ import {
 	updateModel,
 	updateSchema,
 } from '../utils/schemaUpdateUtils.js'
-import { createModificationType, ModificationHandler, ModificationHandlerCreateSqlOptions, ModificationHandlerOptions } from '../ModificationHandler.js'
+import {
+	createModificationType,
+	ModificationHandler,
+	ModificationHandlerCreateSqlOptions,
+	ModificationHandlerOptions,
+} from '../ModificationHandler.js'
 import { isIt } from '../../utils/isIt.js'
 import { VERSION_ACL_PATCH } from '../ModificationVersions.js'
 import { NoopModification } from '../NoopModification.js'

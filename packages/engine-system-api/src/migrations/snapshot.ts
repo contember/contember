@@ -1,7 +1,6 @@
 import { snapshotMigration } from './snapshot-factory.js'
 export default snapshotMigration(({ randomUuidFn }) => `
-CREATE DOMAIN "event_data_type" AS "text"
-	CONSTRAINT "event_data_type_check" CHECK ((VALUE = ANY (ARRAY['create'::"text", 'update'::"text", 'delete'::"text"])));
+CREATE DOMAIN "event_data_type" AS "text";
 CREATE DOMAIN "event_type" AS "text"
 	CONSTRAINT "event_type_check" CHECK ((VALUE = ANY (ARRAY['init'::"text", 'create'::"text", 'update'::"text", 'delete'::"text", 'run_migration'::"text"])));
 CREATE TYPE "schema_migration_type" AS ENUM (
@@ -110,8 +109,8 @@ $$;
 CREATE TABLE "event_data" (
     "id" "uuid" NOT NULL,
     "type" "event_data_type" NOT NULL,
-    "table_name" "text" NOT NULL,
-    "row_ids" "jsonb" NOT NULL,
+    "table_name" "text",
+    "row_ids" "jsonb",
     "values" "jsonb",
     "created_at" timestamp with time zone DEFAULT "clock_timestamp"() NOT NULL,
     "schema_id" integer NOT NULL,
@@ -148,6 +147,8 @@ CREATE TABLE "stage_transaction" (
 );
 ALTER TABLE ONLY "event_data"
     ADD CONSTRAINT "event_data_pkey" PRIMARY KEY ("id");
+ALTER DOMAIN "event_data_type"
+    ADD CONSTRAINT "event_data_type_check" CHECK ((VALUE = ANY (ARRAY['create'::"text", 'update'::"text", 'delete'::"text", 'truncate'::"text"]))) NOT VALID;
 ALTER TABLE ONLY "schema_migration"
     ADD CONSTRAINT "schema_migration_name_key" UNIQUE ("name");
 ALTER TABLE ONLY "schema_migration"

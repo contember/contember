@@ -34,6 +34,8 @@ export class ResolverFactory {
 							return 'UpdateEvent'
 						case EventType.Delete:
 							return 'DeleteEvent'
+						case EventType.Truncate:
+							return 'TruncateEvent'
 						case null:
 						case undefined:
 							return null

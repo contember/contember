@@ -37,6 +37,15 @@
 			},
 		"correctness": {
 				"noUnusedImports": "off",
+				"useImportExtensions": {
+					"level": "error",
+					"options": {
+						"extensionMappings": {
+							"ts": "js",
+							"tsx": "js"
+						}
+					}
+				},
 				"noChildrenProp": "off",
 				"noUnusedFunctionParameters": "off",
 				"noUnusedPrivateClassMembers": "off",

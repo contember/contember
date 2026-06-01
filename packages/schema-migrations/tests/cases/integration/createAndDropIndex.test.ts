@@ -43,7 +43,7 @@ namespace SchemaWithPartialCoveringIndex {
 }
 
 namespace SchemaWithPartialIndexA {
-	@def.Index({ fields: ['title'], where: 'content = \'a\'' })
+	@def.Index({ fields: ['title'], where: "content = 'a'" })
 	export class Article {
 		title = def.stringColumn()
 		content = def.stringColumn()
@@ -51,7 +51,7 @@ namespace SchemaWithPartialIndexA {
 }
 
 namespace SchemaWithPartialIndexB {
-	@def.Index({ fields: ['title'], where: 'content = \'b\'' })
+	@def.Index({ fields: ['title'], where: "content = 'b'" })
 	export class Article {
 		title = def.stringColumn()
 		content = def.stringColumn()
@@ -59,8 +59,8 @@ namespace SchemaWithPartialIndexB {
 }
 
 namespace SchemaWithTwoPartialIndexes {
-	@def.Index({ fields: ['title'], where: 'content = \'a\'' })
-	@def.Index({ fields: ['title'], where: 'content = \'b\'' })
+	@def.Index({ fields: ['title'], where: "content = 'a'" })
+	@def.Index({ fields: ['title'], where: "content = 'b'" })
 	export class Article {
 		title = def.stringColumn()
 		content = def.stringColumn()
@@ -319,12 +319,12 @@ describe('change partial index predicate', () =>
 				modification: 'removeIndex',
 				entityName: 'Article',
 				fields: ['title'],
-				where: 'content = \'a\'',
+				where: "content = 'a'",
 			},
 			{
 				modification: 'createIndex',
 				entityName: 'Article',
-				index: { fields: ['title'], where: 'content = \'b\'' },
+				index: { fields: ['title'], where: "content = 'b'" },
 			},
 		],
 		sql: SQL`DROP INDEX "idx_article_title";
@@ -353,7 +353,7 @@ describe('remove one of two partial indexes on the same columns', () =>
 					modification: 'removeIndex',
 					entityName: 'Article',
 					fields: ['title'],
-					where: 'content = \'b\'',
+					where: "content = 'b'",
 				},
 			],
 		)

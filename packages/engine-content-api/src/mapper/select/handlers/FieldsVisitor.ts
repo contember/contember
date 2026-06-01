@@ -36,7 +36,12 @@ export class FieldsVisitor implements Model.RelationByTypeVisitor<void>, Model.C
 			selectFrom += '::text'
 		}
 		if (column.type === Model.ColumnType.DateTime && this.settings.fullDateTimeResponse) {
-			selectFrom += '::text'
+			// Format SQL-side to a valid ISO 8601 string (with "T" separator and "Z" suffix)
+			// instead of relying on JS Date, which would lose sub-second precision.
+			const format = `'YYYY-MM-DD"T"HH24:MI:SS.US"Z"'`
+			selectFrom = column.list
+				? `(select array_agg(to_char(elem AT TIME ZONE 'UTC', ${format}) order by ord) from unnest(${selectFrom}) with ordinality as t(elem, ord))`
+				: `to_char(${selectFrom} AT TIME ZONE 'UTC', ${format})`
 		}
 		if (column.type === Model.ColumnType.Enum && column.list) {
 			selectFrom += '::text[]'

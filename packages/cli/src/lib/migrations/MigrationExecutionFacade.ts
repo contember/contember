@@ -1,9 +1,14 @@
 import prompts from 'prompts'
 import { MigrationPrinter } from './MigrationPrinter'
-import { isSchemaMigration, MigrationExecutor, MigrationToExecuteOkStatus, SchemaVersionBuilder } from '@contember/migrations-client'
+import {
+	isSchemaMigration,
+	MigrationExecutor,
+	MigrationToExecuteOkStatus,
+	SchemaStateManager,
+	SchemaVersionBuilder,
+} from '@contember/migrations-client'
 import { MigrationsStatusFacade } from './MigrationsStatusFacade'
 import { MigrationVersionHelper } from '@contember/engine-common'
-import { RemoteProject } from '../project/RemoteProject'
 import { SystemClientProvider } from '../SystemClientProvider'
 import { TenantClientProvider } from '../TenantClientProvider'
 import { RemoteProjectProvider } from '../project/RemoteProjectProvider'
@@ -17,6 +22,7 @@ export class MigrationExecutionFacade {
 		private readonly migrationPrinter: MigrationPrinter,
 		private readonly migrationExecutor: MigrationExecutor,
 		private readonly migrationStatusFacade: MigrationsStatusFacade,
+		private readonly schemaStateManager: SchemaStateManager,
 	) {
 	}
 
@@ -34,19 +40,37 @@ export class MigrationExecutionFacade {
 		const project = this.projectProvider.get()
 		await this.tenantClientProvider.get().createProject(project.name, true)
 
+		const stateMode = await this.schemaStateManager.isStateMode()
+		let schemaState = stateMode ? await this.schemaStateManager.readState() : undefined
+
+		// The state files always reflect the latest schema. When migrating to an older version, that
+		// state may reference parts of the model that don't exist yet, so skip it rather than push an
+		// inconsistent overlay. Run `migrations:execute` without `--until` to sync the schema state.
+		if (until && schemaState) {
+			console.log(
+				'Warning: schema state was not applied because --until targets a specific migration; the state files reflect the latest schema. Run migrations:execute without --until to sync it.',
+			)
+			schemaState = undefined
+		}
+
 		const status = await this.migrationStatusFacade.resolveMigrationsStatus({ force })
 		const migrations = until
 			? status.migrationsToExecute.filter(it => it.version <= MigrationVersionHelper.extractVersion(until))
 			: status.migrationsToExecute
-		if (migrations.length === 0) {
+		if (migrations.length === 0 && !schemaState) {
 			console.log('No migrations to execute')
 			return true
 		}
-		console.log('Will execute following migrations:')
-		migrations.forEach(it => console.log(it.name))
+		if (migrations.length > 0) {
+			console.log('Will execute following migrations:')
+			migrations.forEach(it => console.log(it.name))
+		}
+		if (schemaState && migrations.length === 0) {
+			console.log('Updating schema state')
+		}
 		additionalMessage && console.log(additionalMessage)
 
-		if (typeof requireConfirmation === 'function' ? requireConfirmation(migrations) : requireConfirmation) {
+		if (migrations.length > 0 && (typeof requireConfirmation === 'function' ? requireConfirmation(migrations) : requireConfirmation)) {
 			if (!process.stdin.isTTY) {
 				throw 'TTY not available. Pass --yes option to confirm execution.'
 			}
@@ -84,6 +108,7 @@ export class MigrationExecutionFacade {
 		await this.migrationExecutor.executeMigrations({
 			client: this.systemClientProvider.get(),
 			migrations,
+			schemaState,
 			contentMigrationFactoryArgs: {
 				apiToken: project.token,
 				apiBaseUrl: project.endpoint,

@@ -20,7 +20,14 @@ const schema: DocumentNode = gql`
 	}
 
 	type Mutation {
-		migrate(migrations: [Migration!]!): MigrateResponse!
+		migrate(migrations: [Migration!]!, schemaState: SchemaStateInput): MigrateResponse!
+	}
+
+	input SchemaStateInput {
+		acl: Json!
+		validation: Json!
+		actions: Json!
+		settings: Json!
 	}
 
 	# === events ===

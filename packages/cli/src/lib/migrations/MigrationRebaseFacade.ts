@@ -1,4 +1,4 @@
-import { Migration, MigrationFilesManager, SchemaVersionBuilder, SystemClient } from '@contember/migrations-client'
+import { Migration, MigrationFilesManager, SchemaStateManager, SchemaVersionBuilder, SystemClient } from '@contember/migrations-client'
 import { MigrationsValidator } from './MigrationsValidator'
 import { emptySchema } from '@contember/schema-utils'
 import { MigrationVersionHelper } from '@contember/engine-common'
@@ -10,6 +10,7 @@ export class MigrationRebaseFacade {
 		private readonly migrationsValidator: MigrationsValidator,
 		private readonly systemClientProvider: SystemClientProvider,
 		private readonly migrationFilesManager: MigrationFilesManager,
+		private readonly schemaStateManager: SchemaStateManager,
 	) {
 	}
 
@@ -36,6 +37,12 @@ export class MigrationRebaseFacade {
 			}
 			await this.systemClientProvider.get().migrationModify(migration.version, newMigration)
 			await this.migrationFilesManager.moveFile(migration.name, newMigration.name)
+		}
+
+		// migrationModify rebuilds the server schema from migrations, dropping the non-model
+		// state; re-apply it from the state files so the server stays consistent.
+		if (await this.schemaStateManager.isStateMode()) {
+			await this.systemClientProvider.get().migrate([], false, await this.schemaStateManager.readState())
 		}
 	}
 }

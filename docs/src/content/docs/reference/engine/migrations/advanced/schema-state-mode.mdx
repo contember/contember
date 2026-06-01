@@ -1,0 +1,109 @@
+---
+title: Schema state mode
+---
+
+## <span className="version">Engine 2.1+</span> Schema state mode
+
+By default, **every** change to your schema produces a migration — including changes to ACL, validation rules, actions and settings. While this keeps a complete, ordered history of the model, it tends to be noisy for the non-model parts of the schema: a small tweak to an ACL predicate or a validation message generates a full migration file, and reviewing those diffs in a migration is awkward.
+
+**Schema state mode** changes how these non-model parts are tracked. Instead of being written into migrations, the following parts of the schema are stored as plain JSON files in a `state/` directory next to your migrations:
+
+- **ACL** → `state/acl.json`
+- **Validation** → `state/validation.json`
+- **Actions** → `state/actions.json`
+- **Settings** → `state/settings.json`
+
+The database model (entities, columns, relations, indexes, …) continues to be tracked through migrations exactly as before. Only the parts above move into the state files.
+
+### Why use it
+
+- **Readable diffs.** ACL, validation and actions are kept as their current, full state — a pull request shows the actual before/after of `acl.json`, not a list of modification operations.
+- **No migration churn.** Tweaking a predicate or a validation message updates a JSON file instead of adding a migration that has to be ordered, rebased and never touched again.
+- **Simpler conflict resolution.** Merging two branches that both touched ACL means merging one JSON file, not reconciling competing migrations.
+
+:::note
+Schema state mode does **not** change the runtime behaviour of ACL, validation, actions or settings — it only changes where their definition is stored and how it is delivered to the server. The resulting schema on the server is identical either way.
+:::
+
+### Directory layout
+
+With schema state mode enabled, your migrations directory looks like this:
+
+```
+api/migrations/
+├── state/
+│   ├── acl.json
+│   ├── validation.json
+│   ├── actions.json
+│   └── settings.json
+├── 2024-01-10-120000-init.json
+└── 2024-02-03-090000-add-categories.json
+```
+
+The presence of the `state/` directory is what enables the mode — there is no separate config flag.
+
+### Enabling schema state mode
+
+**New projects** are switched to schema state mode automatically. The first time you run `migrations:diff` on a project that has no migrations yet, Contember extracts the current ACL, validation, actions and settings into the `state/` directory and continues in state mode from there.
+
+```bash
+npm run contember migrations:diff init
+# No migrations found — enabling schema state mode for this project.
+# ACL, validation, actions and settings will be managed in the state/ directory instead of migrations.
+```
+
+**Existing projects** can opt in explicitly with the `migrations:init-state` command. It reads your current schema and writes the non-model parts into the `state/` directory:
+
+```bash
+npm run contember migrations:init-state
+# Schema state mode enabled. ACL, validation, actions and settings are now managed in the state/ directory.
+# These parts of the schema will no longer be written into migrations.
+```
+
+:::note
+Enabling state mode on an existing project does not rewrite or remove your historical migrations. ACL/validation/actions/settings already captured in past migrations stay there as a baseline; from now on, further changes to those parts are reflected in the `state/` files instead of new migrations.
+:::
+
+#### Opting out for a new project
+
+If you prefer the classic behaviour where everything goes through migrations, create a migration **before** your first `migrations:diff` — for example a blank one:
+
+```bash
+npm run contember migrations:blank init
+```
+
+Because the project now has a migration, `migrations:diff` will not auto-enable state mode.
+
+### Working with state mode
+
+Once enabled, the everyday commands take the `state/` directory into account automatically.
+
+#### `migrations:diff`
+
+`migrations:diff` no longer emits modifications for ACL, validation, actions or settings. Instead it updates the corresponding `state/*.json` files:
+
+- If only the non-model parts changed, no migration is created — you'll see `Schema state updated (no model changes)` and the state files are rewritten.
+- If both the model and the non-model parts changed, a migration is created for the model changes **and** the state files are updated alongside it.
+- If you pass the execute confirmation, the updated state is synced to the server together with any pending migrations.
+
+#### `migrations:execute`
+
+`migrations:execute` sends the current contents of the `state/` directory to the server along with the migrations it runs. This means the server's ACL, validation, actions and settings are brought in line with your state files — even when there are no new migrations to execute, running `migrations:execute` will push state-only changes.
+
+#### `migrations:amend`
+
+`migrations:amend` works as before for model changes. With state mode enabled, it also refreshes the `state/` files from your current schema, so amending a migration keeps the non-model state in sync.
+
+### How it works under the hood
+
+When state mode is active, the CLI:
+
+1. Builds the baseline schema from migrations as usual, then **overlays** the contents of the `state/` files on top of it (`acl`, `validation`, `actions`, `settings`). This overlaid schema is what diffs are computed against.
+2. Skips the ACL, validation, actions and settings *differs* when generating migrations (via `skipNonModelDiffers`), so those parts never end up as migration modifications.
+3. On execute, passes the state as a `schemaState` argument to the system API's `migrate` mutation. The server applies any migrations, then overrides the non-model parts of the resulting schema with the provided state before saving.
+
+Because the server accepts the state as part of the same `migrate` call, model migrations and non-model state are always applied together and stay consistent.
+
+:::tip
+The `state/*.json` files are regular schema fragments and are meant to be committed to version control. Review them in pull requests just like any other source file.
+:::

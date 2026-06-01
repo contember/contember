@@ -2,15 +2,22 @@ import { Schema } from '@contember/schema'
 import { emptySchema } from '@contember/schema-utils'
 import { SchemaMigrator } from '@contember/schema-migrations'
 import { MigrationsResolver } from './MigrationsResolver'
+import { SchemaStateManager } from './SchemaStateManager'
 
 export class SchemaVersionBuilder {
 	constructor(
 		private readonly migrationsResolver: MigrationsResolver,
 		private readonly schemaMigrator: SchemaMigrator,
+		private readonly schemaStateManager: SchemaStateManager,
 	) {}
 
 	async buildSchema(targetVersion?: string): Promise<Schema> {
-		return this.buildSchemaAdvanced(emptySchema, version => !targetVersion || version <= targetVersion)
+		let schema = await this.buildSchemaAdvanced(emptySchema, version => !targetVersion || version <= targetVersion)
+		if (!targetVersion && await this.schemaStateManager.isStateMode()) {
+			const state = await this.schemaStateManager.readState()
+			schema = { ...schema, ...state }
+		}
+		return schema
 	}
 
 	async buildSchemaUntil(targetVersion: string): Promise<Schema> {

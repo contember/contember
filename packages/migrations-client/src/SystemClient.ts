@@ -1,5 +1,6 @@
 import { GraphQlClient } from '@contember/graphql-client'
 import { ExecutedMigration, ExecutedMigrationInfo } from './migrations'
+import { SchemaState } from './SchemaStateManager'
 
 export type MigrateError = {
 	readonly code: MigrateErrorCode
@@ -28,10 +29,10 @@ export class SystemClient {
 		return new SystemClient(graphqlClient)
 	}
 
-	public async migrate(migrations: any[], force = false): Promise<void> {
+	public async migrate(migrations: any[], force = false, schemaState?: SchemaState): Promise<void> {
 		const query = `
-mutation($migrations: [Migration!]!) {
-	migrate: ${force ? 'forceMigrate' : 'migrate'}(migrations: $migrations) {
+mutation($migrations: [Migration!]!, $schemaState: SchemaStateInput) {
+	migrate: ${force ? 'forceMigrate' : 'migrate'}(migrations: $migrations, schemaState: $schemaState) {
 		ok
 		errors {
 			code
@@ -47,6 +48,7 @@ mutation($migrations: [Migration!]!) {
 			}>(query, {
 				variables: {
 					migrations,
+					schemaState: schemaState ?? null,
 				},
 			})
 		).migrate

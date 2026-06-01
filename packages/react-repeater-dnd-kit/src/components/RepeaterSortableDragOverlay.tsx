@@ -1,8 +1,9 @@
 import React, { ReactNode } from 'react'
-import { useRepeaterActiveEntity } from '../contexts'
+import { RepeaterSortableItemContext, useRepeaterActiveEntity } from '../contexts'
 import { Portal } from '@radix-ui/react-portal'
 import { DragOverlay } from '@dnd-kit/core'
-import { AccessorTree, Entity, useAccessorTreeState } from '@contember/react-binding'
+import { useSortable } from '@dnd-kit/sortable'
+import { AccessorTree, EntityAccessor, Entity, useAccessorTreeState } from '@contember/react-binding'
 import { RepeaterCurrentEntityContext } from '@contember/react-repeater'
 
 /**
@@ -22,11 +23,27 @@ export const RepeaterSortableDragOverlay = ({ children }: {
 				<AccessorTree state={accessorTreeState}>
 					<Entity accessor={activeItem}>
 						<RepeaterCurrentEntityContext.Provider value={activeItem}>
-							{children}
+							<RepeaterSortableDragOverlayItemContext activeItem={activeItem}>
+								{children}
+							</RepeaterSortableDragOverlayItemContext>
 						</RepeaterCurrentEntityContext.Provider>
 					</Entity>
 				</AccessorTree>
 			</DragOverlay>
 		</Portal>
+	)
+}
+
+const RepeaterSortableDragOverlayItemContext = ({ activeItem, children }: {
+	activeItem: EntityAccessor
+	children: ReactNode
+}) => {
+	const sortable = useSortable({
+		id: activeItem.id,
+	})
+	return (
+		<RepeaterSortableItemContext.Provider value={sortable}>
+			{children}
+		</RepeaterSortableItemContext.Provider>
 	)
 }

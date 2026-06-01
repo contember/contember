@@ -66,7 +66,8 @@ export namespace Acl {
 
 	export type PredicateState = 'old' | 'new'
 
-	export type PredicateDefinition<E = never> = Input.Where<PredicateVariable | Input.Condition | E>
+	export type PredicateDefinition<E = never> =
+		& Input.Where<PredicateVariable | Input.Condition | E>
 		& {
 			readonly [PredicateOldStateMarker]?: PredicateDefinition<E>
 			readonly [PredicateNewStateMarker]?: PredicateDefinition<E>

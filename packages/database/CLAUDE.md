@@ -21,6 +21,7 @@ Builders compile to `Literal` objects (SQL string + parameters array). The `Comp
 - `Connection.create(config)` — pool-based (default 10 connections)
 - `Connection.createSingle(config)` — single connection
 - `connection.createClient(schema, queryMeta)` — creates `Client` with schema context
+- `connection.withMaxConnections(n)` — returns a `ScopeLimitedConnection` view that caps how many pool connections may be acquired concurrently through it (one per top-level `scope`; nested scopes reuse the held connection and are not counted). Used per HTTP request so a single request cannot starve the shared pool.
 - `client.transaction(callback)` — REPEATABLE_READ isolation, nested via SAVEPOINTs
 - `client.locked(lockNumber, callback)` — PostgreSQL advisory locks
 
@@ -39,5 +40,7 @@ PostgreSQL error codes are mapped to typed errors: `NotNullViolationError`, `For
 - `client/Pool.ts` — connection pool with rate limiting and lifecycle management
 - `client/Transaction.ts` — transaction + savepoint handling
 - `client/AcquiredConnection.ts` — mutex-serialized query execution with timing
+- `client/ScopeLimitedConnection.ts` — semaphore-limited connection view (per-request connection cap)
+- `utils/Semaphore.ts` — counting semaphore with FIFO queue (backs `ScopeLimitedConnection`)
 - `builders/` — SelectBuilder, InsertBuilder, UpdateBuilder, DeleteBuilder, ConditionBuilder, Compiler
 - `Literal.ts` — SQL + parameters encapsulation

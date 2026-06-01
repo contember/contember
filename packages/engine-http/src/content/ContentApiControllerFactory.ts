@@ -137,7 +137,15 @@ export class ContentApiControllerFactory {
 								operationName: operation,
 							}
 
-							const connection = operation === 'query' ? projectContainer.readConnection : projectContainer.connection
+							const baseConnection = operation === 'query' ? projectContainer.readConnection : projectContainer.connection
+							const maxConnectionsPerRequest = 'maxConnectionsPerRequest' in project.db
+								? project.db.maxConnectionsPerRequest
+								: undefined
+							// Optionally cap how many pool connections this single request may hold concurrently,
+							// so one request cannot starve the shared pool under high concurrency. Defaults to unlimited.
+							const connection = maxConnectionsPerRequest !== undefined
+								? baseConnection.withMaxConnections(maxConnectionsPerRequest)
+								: baseConnection
 							const contentDatabase = testContentDatabase ?? connection.createClient(stage.schema, { module: 'content' })
 
 							const identityVariables = createAclVariables(schema.acl, memberships)

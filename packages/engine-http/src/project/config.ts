@@ -10,6 +10,12 @@ export type ProjectConfig = {
 		& {
 			pool?: Omit<PoolConfig, 'logError'>
 			systemSchema?: string
+			/**
+			 * Maximum number of database connections a single HTTP request may hold
+			 * concurrently. Prevents one request from starving the shared pool. Defaults
+			 * to unlimited (no per-request cap). Must be at least 1.
+			 */
+			maxConnectionsPerRequest?: number
 			read?:
 				& Partial<DatabaseConfig>
 				& {

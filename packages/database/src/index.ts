@@ -21,6 +21,7 @@ export {
 	formatColumnIdentifier,
 	Listener,
 	retryTransaction,
+	Semaphore,
 	withDatabaseAdvisoryLock,
 	wrapIdentifier,
 } from './utils/index.js'

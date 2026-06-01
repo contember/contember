@@ -286,8 +286,8 @@ export class TenantContainerFactory {
 			)
 			.addService(
 				'emailVerificationMutationResolver',
-				({ emailVerificationManager, permissionContextFactory }) =>
-					new EmailVerificationMutationResolver(emailVerificationManager, permissionContextFactory),
+				({ emailVerificationManager, permissionContextFactory, captchaValidator, rateLimiter }) =>
+					new EmailVerificationMutationResolver(emailVerificationManager, permissionContextFactory, captchaValidator, rateLimiter),
 			)
 			.addService('changePasswordMutationResolver', ({ passwordChangeManager }) => new ChangePasswordMutationResolver(passwordChangeManager))
 			.addService(

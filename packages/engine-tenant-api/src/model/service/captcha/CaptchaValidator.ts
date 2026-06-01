@@ -2,10 +2,14 @@ import { Config } from '../../type/Config.js'
 import { CaptchaProvider as CaptchaProviderKey } from '../../../schema/index.js'
 import { CaptchaProviderHandler, CaptchaVerifyResult } from './CaptchaProvider.js'
 
+/** Mutations that can be individually gated by captcha (config.captcha.protect). */
+export type CaptchaProtectedFlow = 'signUp' | 'passwordReset' | 'passwordlessInit' | 'emailVerification'
+
 export interface CaptchaConfig {
 	readonly provider: CaptchaProviderKey | null
 	readonly secret: string | null
 	readonly threshold: number | null
+	readonly protect: Record<CaptchaProtectedFlow, boolean>
 }
 
 export class CaptchaValidator {
@@ -19,6 +23,15 @@ export class CaptchaValidator {
 	}
 
 	/**
+	 * True when captcha is configured AND enforced for the given flow. A single
+	 * provider/secret is shared; `config.captcha.protect` decides per-flow which
+	 * mutations actually require a token.
+	 */
+	public isEnabledFor(config: CaptchaConfig, flow: CaptchaProtectedFlow): boolean {
+		return this.isEnabled(config) && config.protect[flow]
+	}
+
+	/**
 	 * Extract just the captcha-relevant fields from a loaded tenant Config so
 	 * services only pass what they need.
 	 */
@@ -27,6 +40,12 @@ export class CaptchaValidator {
 			provider: config.captcha.provider ?? null,
 			secret: config.captchaSecret,
 			threshold: config.captcha.threshold ?? null,
+			protect: {
+				signUp: config.captcha.protect.signUp,
+				passwordReset: config.captcha.protect.passwordReset,
+				passwordlessInit: config.captcha.protect.passwordlessInit,
+				emailVerification: config.captcha.protect.emailVerification,
+			},
 		}
 	}
 

@@ -44,12 +44,14 @@ query {
     captcha {
       provider
       threshold
+      protect { signUp passwordReset passwordlessInit emailVerification }
     }
     rateLimits {
       signUpPerIp        { limit window }
       loginPerIp         { limit window }
       passwordResetPerIp { limit window }
       passwordlessInitPerIp { limit window }
+      emailVerificationPerIp { limit window }
     }
   }
 }
@@ -69,7 +71,8 @@ mutation {
       signUpPerIp:           { limit: 5,  window: "PT1H" },
       loginPerIp:            { limit: 20, window: "PT1H" },
       passwordResetPerIp:    { limit: 5,  window: "PT1H" },
-      passwordlessInitPerIp: { limit: 5,  window: "PT1H" }
+      passwordlessInitPerIp: { limit: 5,  window: "PT1H" },
+      emailVerificationPerIp: { limit: 5, window: "PT1H" }
     }
   }) {
     ok
@@ -139,6 +142,7 @@ See [anti-abuse — captcha](/reference/engine/tenant/anti-abuse#captcha).
 | `provider` | `turnstile`, `hcaptcha`, or `recaptchaV3`. `null` disables captcha. |
 | `secret` | **Write-only.** The provider's server-side secret. Encrypted at rest with the tenant's `Providers` keychain. Passing `null` leaves the stored value unchanged; passing `""` clears it. |
 | `threshold` | reCAPTCHA v3 score threshold (0.0–1.0). Ignored for hCaptcha / Turnstile. |
+| `protect` | Per-flow enforcement. The provider/secret is shared; these flags pick **which** mutations require a token. `signUp` / `passwordReset` / `passwordlessInit` default `true`; `emailVerification` defaults `false` (opt in if `requestEmailVerification` is publicly exposed). Has no effect while `provider` is `null`. |
 
 ### `rateLimits` *(since 2.2)*
 
@@ -150,6 +154,7 @@ Sliding-window per-IP limits. `limit: 0` (the default) disables that scope. See 
 | `loginPerIp` | `signIn`, `signInIDP`, `signInPasswordless` |
 | `passwordResetPerIp` | `createResetPasswordRequest` |
 | `passwordlessInitPerIp` | `initSignInPasswordless` |
+| `emailVerificationPerIp` | `requestEmailVerification` |
 
 ## Recommended hardening baseline
 
@@ -163,7 +168,8 @@ mutation {
       signUpPerIp:           { limit: 5,   window: "PT1H" },
       loginPerIp:            { limit: 20,  window: "PT1H" },
       passwordResetPerIp:    { limit: 5,   window: "PT1H" },
-      passwordlessInitPerIp: { limit: 5,   window: "PT1H" }
+      passwordlessInitPerIp: { limit: 5,   window: "PT1H" },
+      emailVerificationPerIp: { limit: 5,  window: "PT1H" }
     }
   }) { ok error { code developerMessage } }
 }

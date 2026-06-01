@@ -7,7 +7,15 @@ import {
 } from '../../../schema/index.js'
 import { GraphQLResolveInfo } from 'graphql'
 import { TenantResolverContext } from '../../TenantResolverContext.js'
-import { EmailVerificationManager, PermissionActions, PermissionContextFactory, PersonQuery } from '../../../model/index.js'
+import {
+	CaptchaValidator,
+	ConfigurationQuery,
+	EmailVerificationManager,
+	PermissionActions,
+	PermissionContextFactory,
+	PersonQuery,
+	RateLimiter,
+} from '../../../model/index.js'
 import { createErrorResponse } from '../../errorUtils.js'
 import { ResponseOk } from '../../../model/utils/Response.js'
 
@@ -15,6 +23,8 @@ export class EmailVerificationMutationResolver implements Pick<MutationResolvers
 	constructor(
 		private readonly emailVerificationManager: EmailVerificationManager,
 		private readonly permissionContextFactory: PermissionContextFactory,
+		private readonly captchaValidator: CaptchaValidator,
+		private readonly rateLimiter: RateLimiter,
 	) {}
 
 	async requestEmailVerification(
@@ -27,6 +37,28 @@ export class EmailVerificationMutationResolver implements Pick<MutationResolvers
 			action: PermissionActions.PERSON_RESET_PASSWORD,
 			message: 'You are not allowed to request e-mail verification',
 		})
+
+		const configuration = await context.db.queryHandler.fetch(new ConfigurationQuery(context.db.providers))
+
+		// Per-IP rate limit + captcha mirror createResetPasswordRequest: this is
+		// an unauthenticated email-sending endpoint, so gate abuse before the
+		// (always-ok) anti-enumeration response below can be used as a mail bomb.
+		const rl = await this.rateLimiter.consume(context.db, 'email_verification_per_ip', context.httpInfo.ip, configuration)
+		if (!rl.ok) {
+			return createErrorResponse('RATE_LIMIT_EXCEEDED', `Too many e-mail verification requests. Retry after ${rl.retryAfterSeconds}s.`)
+		}
+
+		const captchaConfig = this.captchaValidator.extractConfig(configuration)
+		if (this.captchaValidator.isEnabledFor(captchaConfig, 'emailVerification')) {
+			const captcha = await this.captchaValidator.verify({
+				config: captchaConfig,
+				token: args.captchaToken ?? undefined,
+				remoteIp: context.httpInfo.ip,
+			})
+			if (!captcha.ok) {
+				return createErrorResponse('INVALID_CAPTCHA', `Captcha verification failed: ${captcha.reason}`)
+			}
+		}
 
 		const person = await context.db.queryHandler.fetch(PersonQuery.byEmail(args.email))
 		// Always report ok regardless of whether the address exists or is

@@ -46,7 +46,7 @@ export class ResetPasswordMutationResolver implements MutationResolvers {
 		}
 
 		const captchaConfig = this.captchaValidator.extractConfig(configuration)
-		if (this.captchaValidator.isEnabled(captchaConfig)) {
+		if (this.captchaValidator.isEnabledFor(captchaConfig, 'passwordReset')) {
 			const captcha = await this.captchaValidator.verify({
 				config: captchaConfig,
 				token: args.captchaToken ?? undefined,

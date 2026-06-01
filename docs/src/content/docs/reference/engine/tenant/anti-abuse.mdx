@@ -10,13 +10,13 @@ Captcha, per-IP rate limits, and the HIBP check ship in engine **2.2**. The per-
 
 ## Where each protection applies
 
-| Layer | `signUp` | `signIn` | `createResetPasswordRequest` | `initSignInPasswordless` |
-|---|---|---|---|---|
-| Captcha | ✅ | — | ✅ | ✅ |
-| Per-IP rate limit | ✅ `signUpPerIp` | ✅ `loginPerIp` | ✅ `passwordResetPerIp` | ✅ `passwordlessInitPerIp` |
-| Per-email backoff | — | ✅ (login backoff) | ✅ (mail-init backoff) | ✅ (mail-init backoff) |
-| HIBP password check | ✅ | — | — (applied on `resetPassword`) | — |
-| Silent leak protection | ✅ | ✅ | ✅ | ✅ |
+| Layer | `signUp` | `signIn` | `createResetPasswordRequest` | `initSignInPasswordless` | `requestEmailVerification` |
+|---|---|---|---|---|---|
+| Captcha | ✅ | — | ✅ | ✅ | ⚙️ opt-in |
+| Per-IP rate limit | ✅ `signUpPerIp` | ✅ `loginPerIp` | ✅ `passwordResetPerIp` | ✅ `passwordlessInitPerIp` | ✅ `emailVerificationPerIp` |
+| Per-email backoff | — | ✅ (login backoff) | ✅ (mail-init backoff) | ✅ (mail-init backoff) | ✅ (mail-init backoff) |
+| HIBP password check | ✅ | — | — (applied on `resetPassword`) | — | — |
+| Silent leak protection | ✅ | ✅ | ✅ | ✅ | ✅ |
 
 The HIBP check also applies to `changePassword`, `changeMyPassword`, and `resetPassword` — anywhere a password is being set.
 
@@ -31,6 +31,23 @@ mutation {
   }) { ok error { code developerMessage } }
 }
 ```
+
+### Which flows enforce captcha
+
+The provider/secret is shared, but enforcement is **per flow** via `captcha.protect` — so you protect exactly the mutations you expose publicly. `signUp`, `passwordReset` (`createResetPasswordRequest`), and `passwordlessInit` (`initSignInPasswordless`) default to **on**; `emailVerification` (`requestEmailVerification`) defaults to **off** — opt in only if you expose that resend endpoint to anonymous clients.
+
+```graphql
+mutation {
+  configure(config: {
+    captcha: {
+      provider: turnstile, secret: "0x4AAA…"
+      protect: { signUp: true, passwordReset: true, passwordlessInit: true, emailVerification: false }
+    }
+  }) { ok }
+}
+```
+
+`signIn` never takes a captcha — it neither creates a resource nor sends mail, so credential abuse is handled by the per-email login backoff and `loginPerIp` instead. The flags have no effect while `provider` is `null`.
 
 Clients then attach the captcha token from the widget to the mutation:
 
@@ -62,7 +79,8 @@ mutation {
       signUpPerIp:           { limit: 5,  window: "PT1H" },
       loginPerIp:            { limit: 20, window: "PT1H" },
       passwordResetPerIp:    { limit: 5,  window: "PT1H" },
-      passwordlessInitPerIp: { limit: 5,  window: "PT1H" }
+      passwordlessInitPerIp: { limit: 5,  window: "PT1H" },
+      emailVerificationPerIp: { limit: 5, window: "PT1H" }
     }
   }) { ok }
 }

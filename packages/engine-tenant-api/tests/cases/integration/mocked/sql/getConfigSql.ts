@@ -45,6 +45,14 @@ export const getConfigSql = (overrides: Record<string, unknown> = {}): ExpectedQ
 				rate_limit_passwordless_init_per_ip_window: PostgresInterval('01:00:00'),
 				rate_limit_email_otp_per_person_limit: 10,
 				rate_limit_email_otp_per_person_window: PostgresInterval('00:10:00'),
+				rate_limit_email_verification_per_ip_limit: 0,
+				rate_limit_email_verification_per_ip_window: PostgresInterval('01:00:00'),
+				// Per-flow captcha enforcement. The historically-protected flows
+				// default ON; email verification is opt-in (matches column defaults).
+				captcha_protect_sign_up: true,
+				captcha_protect_password_reset: true,
+				captcha_protect_passwordless_init: true,
+				captcha_protect_email_verification: false,
 				...overrides,
 			},
 		],

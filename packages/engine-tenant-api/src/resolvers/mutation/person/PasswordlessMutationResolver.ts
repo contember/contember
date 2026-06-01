@@ -41,7 +41,7 @@ export class PasswordlessMutationResolver
 		}
 
 		const captchaConfig = this.captchaValidator.extractConfig(configuration)
-		if (this.captchaValidator.isEnabled(captchaConfig)) {
+		if (this.captchaValidator.isEnabledFor(captchaConfig, 'passwordlessInit')) {
 			const captcha = await this.captchaValidator.verify({
 				config: captchaConfig,
 				token: args.captchaToken ?? undefined,

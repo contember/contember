@@ -361,6 +361,7 @@ export type Config = {
  */
 export type ConfigCaptcha = {
 	readonly __typename?: 'ConfigCaptcha'
+	readonly protect: ConfigCaptchaProtect
 	readonly provider?: Maybe<CaptchaProvider>
 	readonly threshold?: Maybe<Scalars['Float']['output']>
 }
@@ -370,9 +371,30 @@ export type ConfigCaptcha = {
  * Pass null secret to leave the stored value unchanged; pass empty string to clear.
  */
 export type ConfigCaptchaInput = {
+	readonly protect?: InputMaybe<ConfigCaptchaProtectInput>
 	readonly provider?: InputMaybe<CaptchaProvider>
 	readonly secret?: InputMaybe<Scalars['String']['input']>
 	readonly threshold?: InputMaybe<Scalars['Float']['input']>
+}
+
+/**
+ * Per-flow captcha enforcement. The captcha provider/secret is shared; these
+ * flags decide which mutations actually require a captcha token when a provider
+ * is configured.
+ */
+export type ConfigCaptchaProtect = {
+	readonly __typename?: 'ConfigCaptchaProtect'
+	readonly emailVerification: Scalars['Boolean']['output']
+	readonly passwordReset: Scalars['Boolean']['output']
+	readonly passwordlessInit: Scalars['Boolean']['output']
+	readonly signUp: Scalars['Boolean']['output']
+}
+
+export type ConfigCaptchaProtectInput = {
+	readonly emailVerification?: InputMaybe<Scalars['Boolean']['input']>
+	readonly passwordReset?: InputMaybe<Scalars['Boolean']['input']>
+	readonly passwordlessInit?: InputMaybe<Scalars['Boolean']['input']>
+	readonly signUp?: InputMaybe<Scalars['Boolean']['input']>
 }
 
 export type ConfigEmailChange = {
@@ -382,7 +404,7 @@ export type ConfigEmailChange = {
 	 * the address immediately: it goes through a confirmation flow
 	 * (confirmEmailChange) against a token mailed to the new address, and the
 	 * old address stays active until the new one is confirmed. Independent of
-	 * ConfigSignup.requireEmailVerification. Defaults to true.
+	 * ConfigSignup.requireEmailVerification. Defaults to false.
 	 */
 	readonly requireVerification: Scalars['Boolean']['output']
 }
@@ -499,6 +521,7 @@ export type ConfigRateLimits = {
 	 * ships enabled by default. Set limit to 0 to disable.
 	 */
 	readonly emailOtpPerPerson: ConfigRateLimitWindow
+	readonly emailVerificationPerIp: ConfigRateLimitWindow
 	readonly loginPerIp: ConfigRateLimitWindow
 	readonly passwordResetPerIp: ConfigRateLimitWindow
 	readonly passwordlessInitPerIp: ConfigRateLimitWindow
@@ -507,6 +530,7 @@ export type ConfigRateLimits = {
 
 export type ConfigRateLimitsInput = {
 	readonly emailOtpPerPerson?: InputMaybe<ConfigRateLimitWindowInput>
+	readonly emailVerificationPerIp?: InputMaybe<ConfigRateLimitWindowInput>
 	readonly loginPerIp?: InputMaybe<ConfigRateLimitWindowInput>
 	readonly passwordResetPerIp?: InputMaybe<ConfigRateLimitWindowInput>
 	readonly passwordlessInitPerIp?: InputMaybe<ConfigRateLimitWindowInput>
@@ -1388,6 +1412,7 @@ export type MutationRemoveProjectMemberArgs = {
 }
 
 export type MutationRequestEmailVerificationArgs = {
+	captchaToken?: InputMaybe<Scalars['String']['input']>
 	email: Scalars['String']['input']
 	options?: InputMaybe<EmailVerificationOptions>
 }
@@ -1696,7 +1721,9 @@ export type RequestEmailVerificationError = {
 	readonly developerMessage: Scalars['String']['output']
 }
 
-export type RequestEmailVerificationErrorCode = 'RATE_LIMIT_EXCEEDED'
+export type RequestEmailVerificationErrorCode =
+	| 'INVALID_CAPTCHA'
+	| 'RATE_LIMIT_EXCEEDED'
 
 export type RequestEmailVerificationResponse = {
 	readonly __typename?: 'RequestEmailVerificationResponse'
@@ -2277,6 +2304,8 @@ export type ResolversTypes = {
 	Config: ResolverTypeWrapper<Config>
 	ConfigCaptcha: ResolverTypeWrapper<ConfigCaptcha>
 	ConfigCaptchaInput: ConfigCaptchaInput
+	ConfigCaptchaProtect: ResolverTypeWrapper<ConfigCaptchaProtect>
+	ConfigCaptchaProtectInput: ConfigCaptchaProtectInput
 	ConfigEmailChange: ResolverTypeWrapper<ConfigEmailChange>
 	ConfigEmailChangeInput: ConfigEmailChangeInput
 	ConfigInput: ConfigInput
@@ -2534,6 +2563,8 @@ export type ResolversParentTypes = {
 	Config: Config
 	ConfigCaptcha: ConfigCaptcha
 	ConfigCaptchaInput: ConfigCaptchaInput
+	ConfigCaptchaProtect: ConfigCaptchaProtect
+	ConfigCaptchaProtectInput: ConfigCaptchaProtectInput
 	ConfigEmailChange: ConfigEmailChange
 	ConfigEmailChangeInput: ConfigEmailChangeInput
 	ConfigInput: ConfigInput
@@ -2938,8 +2969,19 @@ export type ConfigCaptchaResolvers<
 	ContextType = any,
 	ParentType extends ResolversParentTypes['ConfigCaptcha'] = ResolversParentTypes['ConfigCaptcha'],
 > = {
+	protect?: Resolver<ResolversTypes['ConfigCaptchaProtect'], ParentType, ContextType>
 	provider?: Resolver<Maybe<ResolversTypes['CaptchaProvider']>, ParentType, ContextType>
 	threshold?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>
+}
+
+export type ConfigCaptchaProtectResolvers<
+	ContextType = any,
+	ParentType extends ResolversParentTypes['ConfigCaptchaProtect'] = ResolversParentTypes['ConfigCaptchaProtect'],
+> = {
+	emailVerification?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
+	passwordReset?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
+	passwordlessInit?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
+	signUp?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
 }
 
 export type ConfigEmailChangeResolvers<
@@ -2996,6 +3038,7 @@ export type ConfigRateLimitsResolvers<
 	ParentType extends ResolversParentTypes['ConfigRateLimits'] = ResolversParentTypes['ConfigRateLimits'],
 > = {
 	emailOtpPerPerson?: Resolver<ResolversTypes['ConfigRateLimitWindow'], ParentType, ContextType>
+	emailVerificationPerIp?: Resolver<ResolversTypes['ConfigRateLimitWindow'], ParentType, ContextType>
 	loginPerIp?: Resolver<ResolversTypes['ConfigRateLimitWindow'], ParentType, ContextType>
 	passwordResetPerIp?: Resolver<ResolversTypes['ConfigRateLimitWindow'], ParentType, ContextType>
 	passwordlessInitPerIp?: Resolver<ResolversTypes['ConfigRateLimitWindow'], ParentType, ContextType>
@@ -4319,6 +4362,7 @@ export type Resolvers<ContextType = any> = {
 	CommonSignInResult?: CommonSignInResultResolvers<ContextType>
 	Config?: ConfigResolvers<ContextType>
 	ConfigCaptcha?: ConfigCaptchaResolvers<ContextType>
+	ConfigCaptchaProtect?: ConfigCaptchaProtectResolvers<ContextType>
 	ConfigEmailChange?: ConfigEmailChangeResolvers<ContextType>
 	ConfigLogin?: ConfigLoginResolvers<ContextType>
 	ConfigPassword?: ConfigPasswordResolvers<ContextType>

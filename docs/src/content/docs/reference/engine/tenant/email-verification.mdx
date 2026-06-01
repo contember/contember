@@ -46,7 +46,8 @@ Error codes: `TOKEN_NOT_FOUND`, `TOKEN_INVALID`, `TOKEN_USED`, `TOKEN_EXPIRED`.
 mutation {
   requestEmailVerification(
     email: "alice@example.com",
-    options: { mailProject: "my-project", mailVariant: "en-US" }
+    options: { mailProject: "my-project", mailVariant: "en-US" },
+    captchaToken: "0.aXR…"
   ) {
     ok
     error { code developerMessage }
@@ -56,12 +57,17 @@ mutation {
 
 Always returns `ok: true` regardless of whether the address exists or is already verified — the same anti-enumeration stance as [password reset](/reference/engine/tenant/password-reset). A mail is only actually sent when the address belongs to an unverified account **and** the per-recipient backoff allows it.
 
+Like `createResetPasswordRequest`, this is an unauthenticated, mail-sending endpoint, so it can additionally be guarded by a [per-IP rate limit](/reference/engine/tenant/anti-abuse#per-ip-rate-limits) (`emailVerificationPerIp`) and [captcha](/reference/engine/tenant/anti-abuse#which-flows-enforce-captcha) (`captcha.protect.emailVerification`). **Both are opt-in for this flow** (default off) — turn them on if you expose the resend endpoint to anonymous clients. When enabled, those gates run **before** the anti-enumeration response, so — unlike the silent backoff — they surface an explicit error.
+
 | Option | Notes |
 |---|---|
 | `mailProject` | Slug of the project whose mail template / branding to use. Defaults to the recipient's preferred project. |
 | `mailVariant` | [Template variant](/reference/engine/tenant/mail-templates) (e.g. locale). |
+| `captchaToken` | Captcha token from the widget. Required only when `captcha.protect.emailVerification` is enabled. |
 
-Error code: `RATE_LIMIT_EXCEEDED` — surfaced only on the rare path where it is observable; the throttle normally just suppresses the mail while still reporting `ok: true`.
+Error codes:
+- `RATE_LIMIT_EXCEEDED` — the per-IP window is full (or, on the rare observable path, the per-recipient backoff); the backoff normally just suppresses the mail while still reporting `ok: true`.
+- `INVALID_CAPTCHA` — captcha is configured but the token is missing or rejected.
 
 ### Sign-in behavior
 

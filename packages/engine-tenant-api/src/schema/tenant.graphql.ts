@@ -105,7 +105,7 @@ const schema: DocumentNode = gql`
 		reports ok regardless of whether the address exists or is already
 		verified, to avoid leaking account existence.
 		"""
-		requestEmailVerification(email: String!, options: EmailVerificationOptions): RequestEmailVerificationResponse
+		requestEmailVerification(email: String!, options: EmailVerificationOptions, captchaToken: String): RequestEmailVerificationResponse
 		verifyEmail(token: String!): VerifyEmailResponse
 		"""
 		Confirm a pending e-mail change (see changeMyProfile when
@@ -241,6 +241,19 @@ const schema: DocumentNode = gql`
 	type ConfigCaptcha {
 		provider: CaptchaProvider
 		threshold: Float
+		protect: ConfigCaptchaProtect!
+	}
+
+	"""
+	Per-flow captcha enforcement. The captcha provider/secret is shared; these
+	flags decide which mutations actually require a captcha token when a provider
+	is configured.
+	"""
+	type ConfigCaptchaProtect {
+		signUp: Boolean!
+		passwordReset: Boolean!
+		passwordlessInit: Boolean!
+		emailVerification: Boolean!
 	}
 
 	enum CaptchaProvider {
@@ -267,6 +280,7 @@ const schema: DocumentNode = gql`
 		ships enabled by default. Set limit to 0 to disable.
 		"""
 		emailOtpPerPerson: ConfigRateLimitWindow!
+		emailVerificationPerIp: ConfigRateLimitWindow!
 	}
 
 	type ConfigRateLimitWindow {
@@ -335,6 +349,14 @@ const schema: DocumentNode = gql`
 		provider: CaptchaProvider
 		secret: String
 		threshold: Float
+		protect: ConfigCaptchaProtectInput
+	}
+
+	input ConfigCaptchaProtectInput {
+		signUp: Boolean
+		passwordReset: Boolean
+		passwordlessInit: Boolean
+		emailVerification: Boolean
 	}
 
 	input ConfigRateLimitsInput {
@@ -343,6 +365,7 @@ const schema: DocumentNode = gql`
 		passwordResetPerIp: ConfigRateLimitWindowInput
 		passwordlessInitPerIp: ConfigRateLimitWindowInput
 		emailOtpPerPerson: ConfigRateLimitWindowInput
+		emailVerificationPerIp: ConfigRateLimitWindowInput
 	}
 
 	input ConfigRateLimitWindowInput {
@@ -1662,6 +1685,7 @@ const schema: DocumentNode = gql`
 
 	enum RequestEmailVerificationErrorCode {
 		RATE_LIMIT_EXCEEDED
+		INVALID_CAPTCHA
 	}
 
 	type VerifyEmailResponse {

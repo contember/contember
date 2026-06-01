@@ -74,11 +74,16 @@ export const EntityBeforePersist: (input: {
     listener: EntityAccessor.EntityEventListenerMap["beforePersist"];
 }) => null;
 
+// @public
+export const RedirectOnPersist: NamedExoticComponent<RedirectOnPersistProps>;
+
 // @public (undocumented)
-export const RedirectOnPersist: (input: {
-    to: RoutingLinkTarget;
+export interface RedirectOnPersistProps {
+    // (undocumented)
     parameters?: RequestParameters;
-}) => null;
+    // (undocumented)
+    to: RoutingLinkTarget;
+}
 
 // @public (undocumented)
 export const useBlockNavigationOnDirtyState: (handler: () => Promise<BlockNavigationOnDirtyStateResult>, options?: {

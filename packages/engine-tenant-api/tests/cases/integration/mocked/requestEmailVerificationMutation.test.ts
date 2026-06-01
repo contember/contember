@@ -63,7 +63,7 @@ test('requestEmailVerification - sends a verification mail for an unverified per
 			{
 				sql: SQL`INSERT INTO "tenant"."person_token" ("id", "token_hash", "person_id", "expires_at", "created_at", "used_at", "type", "meta")
 				         VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
-				parameters: [anyString, anyString, personId, isDate, isDate, null, 'email_verification', null],
+				parameters: [anyString, anyString, personId, isDate, isDate, null, 'email_verification', (val: any) => !!val && val.email === email],
 				response: { rowCount: 1 },
 			},
 			getIdentityProjectsSql({ identityId, projectId }),

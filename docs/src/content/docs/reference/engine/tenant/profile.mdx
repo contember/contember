@@ -27,7 +27,7 @@ mutation {
 Pass either field individually — omitted fields are left unchanged. Setting `name: ""` clears the name.
 
 :::note[E-mail-change verification — opt-in *(since 2.2)*]
-When `emailChange.requireVerification` is enabled (it is **off** by default), changing the e-mail does **not** apply immediately: `changeMyProfile` returns `ok: true`, mails a confirmation token to the *new* address, and keeps the old address active until the user confirms via [`confirmEmailChange`](/reference/engine/tenant/email-verification#e-mail-change-verification). A `name` change passed in the same call is still applied right away. By default the flag is off and addresses swap immediately as before.
+When `emailChange.requireVerification` is enabled (it is **off** by default) — or the account was created under sign-up verification, which implies it — changing the e-mail does **not** apply immediately: `changeMyProfile` returns `ok: true`, mails a confirmation token to the *new* address, and keeps the old address active until the user confirms via [`confirmEmailChange`](/reference/engine/tenant/email-verification#e-mail-change-verification). A `name` change passed in the same call is still applied right away. When neither applies (a deployment with no verification at all), addresses swap immediately as before. In that direct case the change also clears the verified status of the address, since the new one is unproven.
 :::
 
 Errors:

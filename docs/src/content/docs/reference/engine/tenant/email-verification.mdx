@@ -10,7 +10,7 @@ Contember can require users to prove ownership of their e-mail address by clicki
 - **Sign-up verification** — a newly created account cannot sign in until its e-mail is verified. Controlled by `signup.requireEmailVerification` (default **off**).
 - **E-mail-change verification** — a user-initiated e-mail change is not applied immediately; the new address must be confirmed before it becomes active. Controlled by `emailChange.requireVerification` (default **off**).
 
-Both are governed by separate [configuration](/reference/engine/tenant/configuration) flags and can be enabled independently. A related, third knob — [IdP `requireVerifiedEmail`](#idp-verified-email-gate) — gates auto-linking an external identity to a local account.
+Each has its own [configuration](/reference/engine/tenant/configuration) flag. They can be enabled independently, with one coupling: enabling sign-up verification automatically subjects those accounts to change verification too (you cannot require a proven address and then allow it to be swapped for an unproven one). A related, third knob — [IdP `requireVerifiedEmail`](#idp-verified-email-gate) — gates auto-linking an external identity to a local account.
 
 All three verification mutations (`requestEmailVerification`, `verifyEmail`, `confirmEmailChange`) are part of the public auth surface: they are gated by the same `PERSON_RESET_PASSWORD` permission as [password reset](/reference/engine/tenant/password-reset), so the public login token can call them.
 
@@ -85,7 +85,7 @@ When the account was created under the requirement and is still unverified, `sig
 
 ## E-mail-change verification
 
-When `emailChange.requireVerification` is **on** (it is **off** by default), a user changing their own address via [`changeMyProfile`](/reference/engine/tenant/profile) does **not** swap the address immediately. Instead:
+An e-mail change goes through verification when **either** `emailChange.requireVerification` is **on** (it is **off** by default), **or** the account is already subject to sign-up verification (`email_verification_required`, frozen on at sign-up). In other words **sign-up verification implies change verification**: an account whose address had to be proven cannot silently swap it for an unproven one. In that case, a user changing their own address via [`changeMyProfile`](/reference/engine/tenant/profile) does **not** swap the address immediately. Instead:
 
 1. `changeMyProfile(email: "new@…")` validates and rate-limits the request, then mails an `EMAIL_CHANGE_VERIFY` token **to the new address**. The mutation returns `ok: true` but the address is unchanged. The old address stays active until confirmation. Any `name` change passed in the same call is applied atomically with the token (validation runs first, so a rejected change never leaves a half-applied profile).
 2. The user clicks through and submits the token via `confirmEmailChange`.
@@ -93,7 +93,9 @@ When `emailChange.requireVerification` is **on** (it is **off** by default), a u
 
 Because the link goes to the *new* address, clicking it proves the user controls the address being switched to.
 
-When the flag is **off** (the default), `changeMyProfile` swaps the address immediately as before, so an engine upgrade does not change existing behavior. The admin [`changeProfile`](/reference/engine/tenant/profile#admin) mutation is **never** routed through verification — admins are trusted by policy and the change is applied directly.
+When neither condition applies — the flag is off **and** the account is not verification-required (always the case on a deployment that never enabled any verification) — `changeMyProfile` swaps the address immediately as before, so an engine upgrade does not change existing behavior.
+
+The admin [`changeProfile`](/reference/engine/tenant/profile#admin) mutation is **never** routed through verification — admins are trusted by policy and the change is applied directly. It does, however, clear the verified status when it changes the address: the new address is unproven, so `email_verified_at` is reset (which, for a verification-required account, makes the user re-verify before their next sign-in).
 
 ### `confirmEmailChange`
 
@@ -152,9 +154,9 @@ query {
 | Flag | Default | Effect |
 |---|---|---|
 | `signup.requireEmailVerification` | `false` | New accounts must verify before they can sign in. Captured per account at sign-up; toggling affects only accounts created afterwards. |
-| `emailChange.requireVerification` | `false` | Self-service e-mail changes go through `confirmEmailChange` instead of swapping immediately. |
+| `emailChange.requireVerification` | `false` | Self-service e-mail changes go through `confirmEmailChange` instead of swapping immediately. Sign-up-verified accounts are subject to this regardless of the flag. |
 
-The two are independent of each other and of the [IdP gate](#idp-verified-email-gate). Requires the `CONFIGURE` permission (`SUPER_ADMIN` by default). See [configuration](/reference/engine/tenant/configuration).
+The two can be set independently of each other and of the [IdP gate](#idp-verified-email-gate), with the one coupling noted above (sign-up verification implies change verification). Requires the `CONFIGURE` permission (`SUPER_ADMIN` by default). See [configuration](/reference/engine/tenant/configuration).
 
 ## Mail templates
 

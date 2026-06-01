@@ -1,6 +1,6 @@
 import { Response, ResponseError, ResponseOk } from '../utils/Response.js'
 import { UserMailer } from '../mailing/index.js'
-import { PersonRow } from '../queries/index.js'
+import { PersonQuery, PersonRow } from '../queries/index.js'
 import { PermissionContext } from '../authorization/index.js'
 import { ProjectManager } from './ProjectManager.js'
 import { DatabaseContext } from '../utils/index.js'
@@ -51,7 +51,7 @@ export class EmailVerificationManager {
 			return false
 		}
 
-		const result = await dbContext.commandBus.execute(CreatePersonTokenCommand.createEmailVerificationRequest(person.id))
+		const result = await dbContext.commandBus.execute(CreatePersonTokenCommand.createEmailVerificationRequest(person.id, person.email))
 		const projects = await this.projectManager.getProjectsByIdentity(dbContext, person.identity_id, permissionContext)
 		const project = getPreferredProject(projects, mailOptions.project ?? null)
 
@@ -88,6 +88,21 @@ export class EmailVerificationManager {
 			personId: validation.result.person_id,
 			tokenId: validation.result.id,
 		})
+		const person = await dbContext.queryHandler.fetch(PersonQuery.byId(validation.result.person_id))
+		if (!person) {
+			throw new ImplementationException()
+		}
+		// Bind the token to the address it was issued for: if the person's e-mail
+		// changed after the token was minted (an admin profile edit, or a separate
+		// email-change flow), a stale verification link must not stamp the new,
+		// unproven address as verified. Tokens issued before this binding carry no
+		// email payload — fall back to the legacy behaviour for those.
+		const issuedFor = validation.result.meta?.email
+		if (issuedFor != null && issuedFor !== person.email) {
+			return new ResponseError('TOKEN_INVALID', 'Verification token was issued for a different e-mail address', {
+				[AuthLogService.Key]: authLogData,
+			})
+		}
 		return await dbContext.transaction(async db => {
 			await db.commandBus.execute(new InvalidateTokenCommand(validation.result.id))
 			await db.commandBus.execute(new MarkEmailVerifiedCommand(validation.result.person_id))

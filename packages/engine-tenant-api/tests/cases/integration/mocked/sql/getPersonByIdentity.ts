@@ -15,6 +15,8 @@ export const getPersonByIdentity = (args: {
 			otpUri?: string
 			otpPendingUri?: string
 			emailOtpEnabled?: boolean
+			emailVerifiedAt?: Date | null
+			emailVerificationRequired?: boolean
 		}
 }): ExpectedQuery => ({
 	sql:
@@ -40,6 +42,8 @@ export const getPersonByIdentity = (args: {
 					otp_pending_secret: args.response.otpPendingUri ? Buffer.from(args.response.otpPendingUri, 'utf8') : null,
 					otp_pending_version: args.response.otpPendingUri ? 0 : null,
 					email_otp_enabled: args.response.emailOtpEnabled ?? false,
+					email_verified_at: args.response.emailVerifiedAt ?? null,
+					email_verification_required: args.response.emailVerificationRequired ?? false,
 				},
 			]
 			: [],

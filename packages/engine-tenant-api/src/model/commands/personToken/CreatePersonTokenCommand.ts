@@ -23,9 +23,13 @@ export class CreatePersonTokenCommand implements Command<CreatePersonTokenComman
 
 	static createEmailVerificationRequest(
 		personId: string,
+		email: string,
 		expirationMinutes: number = EMAIL_VERIFICATION_EXPIRATION_MINUTES,
 	): CreatePersonTokenCommand {
-		return new CreatePersonTokenCommand(personId, 'email_verification', expirationMinutes)
+		// Bind the token to the address it was issued for, so it can only verify
+		// that exact e-mail — not whatever the person's current address happens to
+		// be when the link is finally clicked (see EmailVerificationManager.verifyEmail).
+		return new CreatePersonTokenCommand(personId, 'email_verification', expirationMinutes, { email })
 	}
 
 	static createEmailChangeRequest(

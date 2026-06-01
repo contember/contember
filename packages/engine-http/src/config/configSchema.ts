@@ -14,6 +14,7 @@ const dbConfigOptional = {
 	ssl: Typesafe.boolean,
 	queryTimeoutMs: Typesafe.number,
 	statementTimeoutMs: Typesafe.number,
+	lockTimeoutMs: Typesafe.number,
 	connectionTimeoutMs: Typesafe.number,
 	pool: Typesafe.partial({
 		maxConnections: Typesafe.number,

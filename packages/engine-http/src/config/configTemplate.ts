@@ -3,6 +3,7 @@ const createDbConfigTemplate = (prefix: string) => {
 		ssl: `%?${prefix}_SSL::bool%`,
 		queryTimeoutMs: `%?${prefix}_QUERY_TIMEOUT_MS::number%`,
 		statementTimeoutMs: `%?${prefix}_STATEMENT_TIMEOUT_MS::number%`,
+		lockTimeoutMs: `%?${prefix}_LOCK_TIMEOUT_MS::number%`,
 		connectionTimeoutMs: `%?${prefix}_CONNECTION_TIMEOUT_MS::number%`,
 		pool: {
 			maxConnections: `%?${prefix}_POOL_MAX_CONNECTIONS::number%`,

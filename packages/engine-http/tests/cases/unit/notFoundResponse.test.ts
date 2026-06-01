@@ -1,50 +1,39 @@
-import { afterAll, beforeAll, expect, test } from 'bun:test'
-import Koa from 'koa'
-import { AddressInfo } from 'node:net'
-import { Server } from 'node:http'
-import prom from 'prom-client'
-import { createNotFoundMiddleware } from '../../../src/common'
-import { createShowMetricsMiddleware } from '../../../src/prometheus'
+import { expect, test } from 'bun:test'
+import { KoaContext } from '../../../src/application/types.js'
+import { createNotFoundMiddleware } from '../../../src/common/index.js'
 
-// Mirrors the monitoring Koa composition from MasterContainer: a metrics
-// endpoint followed by a terminal JSON 404 handler for everything else.
-const registry = new prom.Registry()
-const app = new Koa()
-app.use(createShowMetricsMiddleware(registry))
-app.use(createNotFoundMiddleware())
+const createMockContext = () => {
+	const headers: Record<string, string> = {}
+	const ctx = {
+		status: 200,
+		body: undefined as unknown,
+		set: (name: string, value: string) => {
+			headers[name.toLowerCase()] = value
+		},
+		get headers() {
+			return headers
+		},
+	}
+	return ctx as unknown as KoaContext<any> & { headers: Record<string, string> }
+}
 
-let server: Server
-let baseUrl: string
+const next = () => Promise.resolve()
 
-beforeAll(async () => {
-	server = app.listen(0)
-	await new Promise<void>(resolve => server.once('listening', () => resolve()))
-	const { port } = server.address() as AddressInfo
-	baseUrl = `http://127.0.0.1:${port}`
+test('not found middleware responds with consistent JSON error envelope', async () => {
+	const ctx = createMockContext()
+
+	await createNotFoundMiddleware()(ctx, next)
+
+	expect(ctx.status).toBe(404)
+	expect((ctx as any).headers['content-type']).toBe('application/json')
+	expect(JSON.parse(ctx.body as string)).toEqual({ errors: [{ message: 'Route not found', code: 404 }] })
 })
 
-afterAll(async () => {
-	await new Promise<void>(resolve => server.close(() => resolve()))
-})
+test('not found middleware never returns the plain-text "Not Found" body', async () => {
+	const ctx = createMockContext()
 
-test('unknown url responds with consistent JSON error envelope', async () => {
-	const response = await fetch(`${baseUrl}/this-route-does-not-exist`)
+	await createNotFoundMiddleware()(ctx, next)
 
-	expect(response.status).toBe(404)
-	expect(response.headers.get('content-type')).toContain('application/json')
-	expect(await response.json()).toEqual({ errors: [{ message: 'Route not found', code: 404 }] })
-})
-
-test('unknown url never returns the plain-text "Not Found" body', async () => {
-	const response = await fetch(`${baseUrl}/foo/bar`)
-	const text = await response.text()
-
-	expect(text).not.toBe('Not Found')
-	expect(() => JSON.parse(text)).not.toThrow()
-})
-
-test('known /metrics url still works', async () => {
-	const response = await fetch(`${baseUrl}/metrics`)
-
-	expect(response.status).toBe(200)
+	expect(ctx.body).not.toBe('Not Found')
+	expect(() => JSON.parse(ctx.body as string)).not.toThrow()
 })

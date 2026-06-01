@@ -50,6 +50,7 @@ export class ResolverFactory {
 			},
 			Mutation: {
 				migrate: this.migrateMutationResolver.migrate.bind(this.migrateMutationResolver),
+				migrateFromSnapshot: this.migrateMutationResolver.migrateFromSnapshot.bind(this.migrateMutationResolver),
 			},
 			DeleteEvent: {
 				oldValues: this.eventOldValuesResolver.oldValues.bind(this.eventOldValuesResolver),

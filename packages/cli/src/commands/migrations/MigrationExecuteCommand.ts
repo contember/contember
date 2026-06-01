@@ -7,6 +7,7 @@ type Options = {
 	until?: string
 	force: boolean
 	yes?: boolean
+	['no-snapshot']?: boolean
 }
 
 export class MigrationExecuteCommand extends Command<Args, Options> {
@@ -23,6 +24,9 @@ export class MigrationExecuteCommand extends Command<Args, Options> {
 		configuration.option('until')
 			.valueRequired()
 			.description('Execute all migrations leading up to, and inclusive of, a specified migration')
+		configuration.option('no-snapshot')
+			.valueNone()
+			.description('Do not bootstrap a fresh database from snapshot.json; replay every migration instead')
 		configuration //
 			.option('yes')
 			.valueNone()
@@ -37,6 +41,7 @@ export class MigrationExecuteCommand extends Command<Args, Options> {
 			force,
 			until,
 			requireConfirmation: !input.getOption('yes'),
+			useSnapshot: input.getOption('no-snapshot') !== true,
 		})
 	}
 }

@@ -1,0 +1,112 @@
+---
+title: Migration snapshots
+---
+
+## <span className="version">Engine 2.1+</span> Migration snapshots
+
+On a fresh database, `migrations:execute` replays **every** migration one by one. On a large, long-lived project that can take minutes — most of the time is spent on *churn* (a table is created, altered, renamed and dropped again across the history) rather than on the schema you actually end up with.
+
+A **migration snapshot** collapses the whole migration history into a single schema that bootstraps an empty database in one step, then runs only the migrations created after the snapshot. The migration files are left untouched — the snapshot is an accelerator, not a rewrite of history.
+
+:::note
+A snapshot only ever applies to a database that has executed **no** migrations yet (a clean local DB or a CI database). It never touches an already-migrated database, so production is unaffected. The server enforces this and refuses a snapshot on a non-empty project (`PROJECT_NOT_EMPTY`).
+:::
+
+### Creating a snapshot
+
+```bash
+npm run contember migrations:snapshot
+# Snapshot created: 412 migrations collapsed up to 2025-03-14-110000.
+```
+
+This writes `snapshot.json` next to your migrations:
+
+```
+api/migrations/
+├── state/                       # if you use schema state mode
+├── snapshot.json                # ← generated, commit it
+├── 2024-01-10-120000-init.json
+└── … (all your migrations)
+```
+
+`snapshot.json` is meant to be **committed** so the whole team and CI benefit. Regenerate it whenever you want the fast path to cover newly added migrations — a stale snapshot is detected and safely ignored (see below), it just means a slower replay until you regenerate.
+
+### Using a snapshot
+
+`migrations:execute` uses the snapshot automatically when all of these hold:
+
+- a `snapshot.json` is present,
+- the target project has no executed migrations, and
+- none of the covered migration files have changed since the snapshot was created.
+
+```bash
+npm run contember migrations:execute
+# Bootstrapping from snapshot (collapses 412 migrations up to 2025-03-14-110000)
+# Snapshot applied
+# Will execute following migrations:
+# 2025-04-02-101500-add-tags
+```
+
+Pass `--no-snapshot` to force a full replay.
+
+`deploy` does **not** use the snapshot by default (it is opt-in there via `--snapshot`), so a normal deployment always goes through the regular migration path.
+
+### Schema state mode
+
+Snapshots and [schema state mode](./schema-state-mode) fit together. When state mode is on, the snapshot collapses only the **model** (entities, columns, relations, …); ACL, validation, actions and settings come from the `state/` files exactly as during a normal execute. When state mode is off, those non-model parts are part of the migration history and are included in the snapshot.
+
+### Data and content migrations
+
+A snapshot captures **schema only**. [Content (data) migrations](../content-migrations) within the covered range are recorded as executed but their data effects are **not** reproduced — the snapshot bootstraps an empty database. `migrations:snapshot` warns you about every content migration it subsumes:
+
+```bash
+npm run contember migrations:snapshot
+# Snapshot created: 412 migrations collapsed up to 2025-03-14-110000.
+#
+# Warning: 2 content (data) migration(s) are covered by this snapshot:
+#   - 2024-06-01-090000
+#   - 2024-09-12-140000
+# Their data effects are NOT reproduced when bootstrapping from the snapshot.
+# Seed any required data manually for local development.
+```
+
+If your local workflow depends on data produced by those migrations, seed it yourself (the data is not part of the snapshot). Content migrations created *after* the snapshot run normally.
+
+### Verifying a snapshot
+
+A collapsed snapshot must produce exactly the same schema as replaying every migration. `migrations:verify-snapshot` checks this offline — it is a good CI guard:
+
+```bash
+npm run contember migrations:verify-snapshot
+# Snapshot is up to date (covers 412 migrations up to 2025-03-14-110000).
+```
+
+It fails (non-zero exit) if `snapshot.json` is stale — i.e. a covered migration was added, removed or changed — telling you to regenerate it with `migrations:snapshot`.
+
+The check is fully **offline**: it replays your migration files and compares them against `snapshot.json` locally, so it needs **no database and no running engine** — just your repository.
+
+#### In CI
+
+Because a stale snapshot is silently ignored (you just fall back to a slow replay), it is easy to forget to regenerate `snapshot.json` after adding, amending or rebasing a migration. Treat it like a lockfile: add a CI step that fails the build when the committed snapshot no longer matches the migrations, so a forgotten regenerate is caught in review rather than quietly slowing everyone down.
+
+```yaml
+# .github/workflows/ci.yml
+- name: Verify migration snapshot
+  run: npm run contember migrations:verify-snapshot
+```
+
+A full replay by the current engine also catches a snapshot left behind by an **older engine version** — something the lightweight staleness check during `migrations:execute` (which only compares migration checksums) cannot see. Running `verify-snapshot` in CI is therefore worth it even when nobody touched the migrations.
+
+:::tip
+If the step fails, the fix is always the same: run `migrations:snapshot` and commit the regenerated `snapshot.json`.
+:::
+
+### How it works under the hood
+
+1. `migrations:snapshot` replays all schema migrations into one schema and diffs it from an empty schema to get a single collapsed set of modifications. It records the version and checksum of every migration it covers.
+2. On a clean database, `migrations:execute` calls the system API's `migrateFromSnapshot` mutation. The server applies the collapsed schema to every stage **once**, then records the covered migrations as executed **without** replaying their SQL — so the migrations registry ends up identical to a full replay. Migration status, checksums and on-demand schema rebuilds all keep working unchanged.
+3. Migrations created after the snapshot are then executed normally.
+
+:::tip
+Because the registry ends up identical to a full replay, you can freely mix snapshot bootstrapping (locally / in CI) and normal replay (in production) — both converge on the same schema and the same executed-migration history.
+:::

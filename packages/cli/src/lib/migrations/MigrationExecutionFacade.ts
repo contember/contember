@@ -2,12 +2,15 @@ import prompts from 'prompts'
 import { MigrationPrinter } from './MigrationPrinter'
 import {
 	isSchemaMigration,
+	MigrateErrorCode,
 	MigrationExecutor,
 	MigrationToExecuteOkStatus,
+	SchemaState,
 	SchemaStateManager,
 	SchemaVersionBuilder,
 } from '@contember/migrations-client'
 import { MigrationsStatusFacade } from './MigrationsStatusFacade'
+import { MigrationSnapshotFacade } from './MigrationSnapshotFacade'
 import { MigrationVersionHelper } from '@contember/engine-common'
 import { SystemClientProvider } from '../SystemClientProvider'
 import { TenantClientProvider } from '../TenantClientProvider'
@@ -23,6 +26,7 @@ export class MigrationExecutionFacade {
 		private readonly migrationExecutor: MigrationExecutor,
 		private readonly migrationStatusFacade: MigrationsStatusFacade,
 		private readonly schemaStateManager: SchemaStateManager,
+		private readonly migrationSnapshotFacade: MigrationSnapshotFacade,
 	) {
 	}
 
@@ -31,11 +35,13 @@ export class MigrationExecutionFacade {
 		force,
 		until,
 		additionalMessage,
+		useSnapshot = true,
 	}: {
 		requireConfirmation: boolean | ((migrations: MigrationToExecuteOkStatus[]) => boolean)
 		force?: boolean
 		until?: string
 		additionalMessage?: string
+		useSnapshot?: boolean
 	}): Promise<boolean> => {
 		const project = this.projectProvider.get()
 		await this.tenantClientProvider.get().createProject(project.name, true)
@@ -51,6 +57,10 @@ export class MigrationExecutionFacade {
 				'Warning: schema state was not applied because --until targets a specific migration; the state files reflect the latest schema. Run migrations:execute without --until to sync it.',
 			)
 			schemaState = undefined
+		}
+
+		if (useSnapshot) {
+			await this.tryApplySnapshot({ until, schemaState })
 		}
 
 		const status = await this.migrationStatusFacade.resolveMigrationsStatus({ force })
@@ -120,4 +130,39 @@ export class MigrationExecutionFacade {
 		})
 		return true
 	}
+
+	private async tryApplySnapshot({ until, schemaState }: { until?: string; schemaState?: SchemaState }): Promise<void> {
+		const executed = await this.systemClientProvider.get().listExecutedMigrations()
+		const snapshot = await this.migrationSnapshotFacade.getUsableSnapshot(executed)
+		if (!snapshot) {
+			return
+		}
+		if (until && snapshot.version > MigrationVersionHelper.extractVersion(until)) {
+			// snapshot reaches past the requested target — fall back to a normal replay
+			return
+		}
+		console.log(`Bootstrapping from snapshot (collapses ${snapshot.covers.length} migrations up to ${snapshot.version})`)
+		if (snapshot.contentMigrations.length > 0) {
+			console.warn(
+				`Note: ${snapshot.contentMigrations.length} content migration(s) are covered by the snapshot; their data is NOT reproduced.`,
+			)
+		}
+		const input = await this.migrationSnapshotFacade.buildSnapshotInput(snapshot)
+		try {
+			await this.systemClientProvider.get().migrateFromSnapshot(input, schemaState)
+		} catch (e) {
+			if (isProjectNotEmptyError(e)) {
+				// The project was migrated between our emptiness check and the server call (e.g. a
+				// concurrent execute on a fresh database). Fall back to a normal replay rather than
+				// crashing — the subsequent status resolution will pick up whatever is left to run.
+				console.warn('Snapshot skipped: the project is no longer empty. Falling back to a full replay.')
+				return
+			}
+			throw e
+		}
+		console.log('Snapshot applied')
+	}
 }
+
+const isProjectNotEmptyError = (e: unknown): boolean =>
+	Array.isArray(e) && e.some(it => it !== null && typeof it === 'object' && (it as { code?: unknown }).code === MigrateErrorCode.ProjectNotEmpty)

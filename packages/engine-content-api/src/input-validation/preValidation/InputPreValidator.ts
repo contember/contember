@@ -16,6 +16,7 @@ import { Dependencies, DependencyCollector } from '../dependencies/index.js'
 import { DependencyMerger } from '../dependencies/index.js'
 import { NotSupportedError } from '../exceptions.js'
 import { ValidationDataSelector } from '../ValidationDataSelector.js'
+import { validateJsonSchema } from '../JsonSchemaValidator.js'
 
 export interface CreateValidationArgs {
 	mapper: Mapper
@@ -54,11 +55,13 @@ export class InputPreValidator {
 
 		const fieldsResult = this.validateFields(rules, context, path)
 
+		const jsonSchemaResult = this.validateJsonSchemaColumns(entity, data, path)
+
 		const processor = new CreateInputPreValidationProcessor(this, path, mapper)
 		const visitor = new CreateInputVisitor(processor, this.model, data)
 		const relationResult = await this.validateRelations(entity, visitor)
 
-		return [...fieldsResult, ...relationResult]
+		return [...fieldsResult, ...jsonSchemaResult, ...relationResult]
 	}
 
 	async validateUpdate({ entity, data, path, mapper, where }: UpdateValidationArgs): Promise<ValidationResult> {
@@ -69,11 +72,51 @@ export class InputPreValidator {
 		const context = await this.createContextForUpdate(mapper, entity, where, data, dependencies)
 		const fieldsResult: ValidationResult = this.validateFields(rules, context, path)
 
+		const jsonSchemaResult = this.validateJsonSchemaColumns(entity, data, path)
+
 		const processor = new UpdateInputPreValidationProcessor(this, path, mapper)
 		const visitor = new UpdateInputVisitor(processor, this.model, data)
 		const relationResult = await this.validateRelations(entity, visitor)
 
-		return [...fieldsResult, ...relationResult]
+		return [...fieldsResult, ...jsonSchemaResult, ...relationResult]
+	}
+
+	/**
+	 * Validates JSON columns that have a JSON Schema attached. Only fields present in the input
+	 * are validated; `null` values are skipped (use `notNull()` to forbid them).
+	 */
+	private validateJsonSchemaColumns(
+		entity: Model.Entity,
+		data: MapperInput.CreateDataInput | MapperInput.UpdateDataInput,
+		path: ValidationPath,
+	): ValidationResult {
+		const result: ValidationResult = []
+		for (const field of Object.values(entity.fields)) {
+			if (field.type !== Model.ColumnType.Json) {
+				continue
+			}
+			const schema = (field as Model.AnyColumn).schema
+			if (schema === undefined) {
+				continue
+			}
+			if (!(field.name in data)) {
+				continue
+			}
+			const value = data[field.name] as Input.ColumnValue
+			if (value === null || value === undefined) {
+				continue
+			}
+			const errors = validateJsonSchema(schema, value)
+			for (const error of errors) {
+				result.push({
+					path: [...path, { field: field.name }],
+					message: {
+						text: error.path ? `${error.path}: ${error.message}` : error.message,
+					},
+				})
+			}
+		}
+		return result
 	}
 
 	private createContextForCreate(entity: Model.Entity, data: MapperInput.CreateDataInput): ValidationContext.NodeContext {

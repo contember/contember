@@ -1,4 +1,4 @@
-import { Acl, Model, Schema, Validation } from '@contember/schema'
+import { Acl, Model, Schema, Settings, Validation } from '@contember/schema'
 import { Authorizator, ExecutionContainerFactory, GraphQlSchemaBuilderFactory } from '../../src/index.js'
 import { AllowAllPermissionFactory, emptySchema } from '@contember/schema-utils'
 import { executeGraphQlTest } from './testGraphql.js'
@@ -14,6 +14,7 @@ export interface SqlQuery {
 
 export interface Test {
 	schema: Model.Schema
+	settings?: Settings.Schema
 	validation?: Validation.Schema
 	permissions?: Acl.Permissions
 	variables?: Acl.VariablesMap
@@ -82,7 +83,7 @@ export const execute = async (test: Test) => {
 	const connection = createConnectionMock(test.executes)
 
 	const db = new Client(connection, 'public', {})
-	const schema: Schema = { ...emptySchema, model: test.schema, validation: test.validation || {} }
+	const schema: Schema = { ...emptySchema, model: test.schema, validation: test.validation || {}, settings: test.settings || emptySchema.settings }
 	const providers = {
 		uuid: createUuidGenerator('a456', 0),
 		now: () => new Date('2019-09-04 12:00'),

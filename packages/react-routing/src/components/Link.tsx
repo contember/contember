@@ -1,9 +1,9 @@
-import { Component, Field, useEnvironment } from '@contember/react-binding'
+import { Component, useEnvironment } from '@contember/react-binding'
 import { useMemo } from 'react'
 import { RoutingLink, RoutingLinkProps } from './RoutingLink'
 import { useBindingLinkParametersResolver } from '../internal/hooks/useBindingLinkParametersResolver'
 import { parseLinkTarget } from '../internal/utils/parseLinkTarget'
-import { createFieldsFromTarget } from '../internal/utils/createFieldsFromTarget'
+import { RoutingLinkFields } from './RoutingLinkFields'
 
 export type LinkProps = Omit<RoutingLinkProps, 'parametersResolver'>
 
@@ -18,12 +18,10 @@ export const Link = Component(({ to, ...props }: LinkProps) => {
 	}, [to, env])
 
 	return <RoutingLink parametersResolver={parametersResolver} to={desugaredTo} {...props} />
-}, (props, env) => {
-	const to = parseLinkTarget(props.to, env)
-
+}, props => {
 	return (
 		<>
-			{createFieldsFromTarget(to).map((it, index) => <Field key={`${index}-${it}`} field={it} />)}
+			<RoutingLinkFields to={props.to} />
 			{props.children}
 		</>
 	)

@@ -83,6 +83,24 @@ npm run contember migrations:verify-snapshot
 
 It fails (non-zero exit) if `snapshot.json` is stale — i.e. a covered migration was added, removed or changed — telling you to regenerate it with `migrations:snapshot`.
 
+The check is fully **offline**: it replays your migration files and compares them against `snapshot.json` locally, so it needs **no database and no running engine** — just your repository.
+
+#### In CI
+
+Because a stale snapshot is silently ignored (you just fall back to a slow replay), it is easy to forget to regenerate `snapshot.json` after adding, amending or rebasing a migration. Treat it like a lockfile: add a CI step that fails the build when the committed snapshot no longer matches the migrations, so a forgotten regenerate is caught in review rather than quietly slowing everyone down.
+
+```yaml
+# .github/workflows/ci.yml
+- name: Verify migration snapshot
+  run: npm run contember migrations:verify-snapshot
+```
+
+A full replay by the current engine also catches a snapshot left behind by an **older engine version** — something the lightweight staleness check during `migrations:execute` (which only compares migration checksums) cannot see. Running `verify-snapshot` in CI is therefore worth it even when nobody touched the migrations.
+
+:::tip
+If the step fails, the fix is always the same: run `migrations:snapshot` and commit the regenerated `snapshot.json`.
+:::
+
 ### How it works under the hood
 
 1. `migrations:snapshot` replays all schema migrations into one schema and diffs it from an empty schema to get a single collapsed set of modifications. It records the version and checksum of every migration it covers.

@@ -12,7 +12,7 @@ import { Schema } from '@contember/schema'
 import Koa from 'koa'
 import { createSecretKey } from 'node:crypto'
 import { Application } from './application/index.js'
-import { HttpResponse } from './common/index.js'
+import { createNotFoundMiddleware, HttpResponse } from './common/index.js'
 import { ProjectConfigResolver } from './config/projectConfigResolver.js'
 import { TenantConfigResolver } from './config/tenantConfigResolver.js'
 import {
@@ -322,6 +322,7 @@ export class MasterContainerFactory {
 			.addService('monitoringKoa', ({ promRegistry }) => {
 				const app = new Koa()
 				app.use(createShowMetricsMiddleware(promRegistry))
+				app.use(createNotFoundMiddleware())
 
 				return app
 			})

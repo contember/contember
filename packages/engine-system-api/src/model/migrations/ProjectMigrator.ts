@@ -98,6 +98,10 @@ export class ProjectMigrator {
 			id = await db.commandBus.execute(new SaveMigrationCommand(migration))
 		}
 
+		const latestVersion = sorted.length > 0
+			? sorted[sorted.length - 1].version
+			: schemaWithMeta.meta.version
+
 		if (schemaState) {
 			schema = {
 				...schema,
@@ -106,15 +110,20 @@ export class ProjectMigrator {
 				actions: schemaState.actions as Schema['actions'],
 				settings: schemaState.settings as Schema['settings'],
 			}
+			// Client-supplied state is otherwise saved blindly; validate it as the normal migration flow would.
+			const errors = SchemaValidator.validate(schema)
+			if (errors.length > 0) {
+				throw new InvalidSchemaError(
+					latestVersion ?? '(schema state)',
+					'Schema state is invalid: \n'
+						+ errors.map(it => `${it.path.join('.')}: [${it.code}] ${it.message}`).join('\n'),
+				)
+			}
 		}
 
 		if (!id) {
 			throw new ImplementationException()
 		}
-
-		const latestVersion = sorted.length > 0
-			? sorted[sorted.length - 1].version
-			: schemaWithMeta.meta.version
 
 		if (!latestVersion) {
 			if (schemaState) {

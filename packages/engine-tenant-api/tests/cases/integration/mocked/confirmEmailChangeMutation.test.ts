@@ -8,6 +8,7 @@ import { sqlTransaction } from './sql/sqlTransaction.js'
 import { getPersonByIdSql } from './sql/getPersonByIdSql.js'
 import { getPersonByEmailSql } from './sql/getPersonByEmailSql.js'
 import { getMailTemplateSql } from './sql/getMailTemplateSql.js'
+import { getIdentityProjectsSql } from './sql/getIdentityProjectsSql.js'
 import { AuthLogService } from '../../../../src/model/service/AuthLogService.js'
 
 const anyString = (val: unknown) => typeof val === 'string'
@@ -18,6 +19,7 @@ test('confirmEmailChange - swaps the email, verifies it and signs out sessions',
 	const tokenId = testUuid(1)
 	const personId = testUuid(2)
 	const identityId = testUuid(3)
+	const projectId = testUuid(10)
 	const oldEmail = 'john.doe@example.com'
 	const newEmail = 'jane@doe.com'
 	await executeTenantTest({
@@ -61,7 +63,10 @@ test('confirmEmailChange - swaps the email, verifies it and signs out sessions',
 					response: { rowCount: 1 },
 				},
 			),
-			getMailTemplateSql({ type: 'emailChangeNotify', projectId: null }),
+			// The notify mail to the OLD address now resolves the person's preferred
+			// project, so a per-project EMAIL_CHANGE_NOTIFY template is honoured.
+			getIdentityProjectsSql({ identityId, projectId }),
+			getMailTemplateSql({ type: 'emailChangeNotify', projectId }),
 			getMailTemplateSql({ type: 'emailChangeNotify', projectId: null }),
 		],
 		return: {

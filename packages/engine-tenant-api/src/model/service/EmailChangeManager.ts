@@ -1,7 +1,7 @@
 import { Response, ResponseError, ResponseOk } from '../utils/Response.js'
 import { UserMailer } from '../mailing/index.js'
 import { PersonQuery, PersonRow } from '../queries/index.js'
-import { PermissionContext } from '../authorization/index.js'
+import { PermissionContext, PermissionContextFactory } from '../authorization/index.js'
 import { ProjectManager } from './ProjectManager.js'
 import { ApiKeyManager } from './apiKey/index.js'
 import { EmailValidator, EmailValidatorError } from './EmailValidator.js'
@@ -28,6 +28,7 @@ export class EmailChangeManager {
 		private readonly projectManager: ProjectManager,
 		private readonly emailValidator: EmailValidator,
 		private readonly apiKeyManager: ApiKeyManager,
+		private readonly permissionContextFactory: PermissionContextFactory,
 	) {}
 
 	/**
@@ -150,10 +151,20 @@ export class EmailChangeManager {
 		}
 
 		if (oldEmail) {
+			// Resolve the person's preferred project so a per-project
+			// EMAIL_CHANGE_NOTIFY template (and branding) is honoured, mirroring
+			// requestEmailChange. The token carries no project, so derive it from the
+			// person's own identity.
+			const permissionContext = this.permissionContextFactory.create(dbContext, {
+				id: person.identity_id,
+				roles: person.roles,
+			})
+			const projects = await this.projectManager.getProjectsByIdentity(dbContext, person.identity_id, permissionContext)
+			const project = getPreferredProject(projects, null)
 			await this.mailer.sendEmailChangeNotifyEmail(
 				dbContext,
-				{ email: oldEmail, newEmail },
-				{ projectId: null, variant: '' },
+				{ email: oldEmail, newEmail, project: project?.name, projectSlug: project?.slug },
+				{ projectId: project?.id ?? null, variant: '' },
 			)
 		}
 

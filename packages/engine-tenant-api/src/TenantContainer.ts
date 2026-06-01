@@ -215,8 +215,8 @@ export class TenantContainerFactory {
 			)
 			.addService(
 				'emailChangeManager',
-				({ userMailer, projectManager, emailValidator, apiKeyManager }) =>
-					new EmailChangeManager(userMailer, projectManager, emailValidator, apiKeyManager),
+				({ userMailer, projectManager, emailValidator, apiKeyManager, permissionContextFactory }) =>
+					new EmailChangeManager(userMailer, projectManager, emailValidator, apiKeyManager, permissionContextFactory),
 			)
 			.addService('idpRegistry', () => {
 				const idpRegistry = new IDPHandlerRegistry()

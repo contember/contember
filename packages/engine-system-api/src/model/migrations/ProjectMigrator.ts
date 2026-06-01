@@ -121,15 +121,16 @@ export class ProjectMigrator {
 			}
 		}
 
-		if (!id) {
+		if (!latestVersion) {
+			if (schemaState) {
+				// State-only update on a fresh project with no migrations — there is no schema
+				// row to attach the state to yet, so there is nothing to save.
+				return
+			}
 			throw new ImplementationException()
 		}
 
-		if (!latestVersion) {
-			if (schemaState) {
-				// State-only update on a fresh project with no migrations — nothing to save
-				return
-			}
+		if (!id) {
 			throw new ImplementationException()
 		}
 
@@ -231,7 +232,7 @@ export class ProjectMigrator {
 		const errors = SchemaValidator.validate(schema)
 		if (errors.length > 0) {
 			throw new InvalidSchemaError(
-				toExecute[toExecute.length - 1].version,
+				toExecute[toExecute.length - 1]?.version ?? version ?? '(schema)',
 				'Migration generates invalid schema: \n'
 					+ errors.map(it => it.path.join('.') + ': ' + it.message).join('\n'),
 			)

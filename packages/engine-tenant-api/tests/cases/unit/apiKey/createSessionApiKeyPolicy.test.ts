@@ -1,5 +1,5 @@
 import { expect, test } from 'bun:test'
-import { ApiKeyManager, ApiKeyService, AuthLogService, AuthPolicyResolver, DatabaseContext, Providers } from '../../../../src'
+import { ApiKeyManager, ApiKeyService, AuthLogService, AuthPolicyResolver, DatabaseContext, Providers } from "../../../../src/index.js"
 import { createConnectionMock, ExpectedQuery } from '@contember/database-tester'
 import PostgresInterval from 'postgres-interval'
 

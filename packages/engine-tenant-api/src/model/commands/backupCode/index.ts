@@ -1,3 +1,3 @@
-export * from './ConsumeBackupCodeCommand'
-export * from './CreateBackupCodeCommand'
-export * from './DeleteBackupCodesCommand'
+export * from "./ConsumeBackupCodeCommand.js"
+export * from "./CreateBackupCodeCommand.js"
+export * from "./DeleteBackupCodesCommand.js"

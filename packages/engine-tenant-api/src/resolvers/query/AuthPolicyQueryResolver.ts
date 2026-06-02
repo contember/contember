@@ -1,7 +1,7 @@
-import { AuthPolicy, QueryResolvers } from '../../schema'
-import { AuthPolicyManager, PermissionActions } from '../../model'
-import { TenantResolverContext } from '../TenantResolverContext'
-import { ProjectsQuery } from '../../model/queries'
+import { AuthPolicy, QueryResolvers } from "../../schema/index.js"
+import { AuthPolicyManager, PermissionActions } from "../../model/index.js"
+import { TenantResolverContext } from "../TenantResolverContext.js"
+import { ProjectsQuery } from "../../model/queries/index.js"
 
 /**
  * Lists configured auth policies. Gated like `configure`. Maps each row's

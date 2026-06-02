@@ -1,6 +1,6 @@
-import { Command } from '../Command'
+import { Command } from "../Command.js"
 import { InsertBuilder } from '@contember/database'
-import { AuthPolicyScope } from '../../type'
+import { AuthPolicyScope } from "../../type/index.js"
 
 export type AuthPolicyWriteValues = {
 	scope: AuthPolicyScope

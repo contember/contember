@@ -1,5 +1,5 @@
 import { DatabaseQuery, DatabaseQueryable, Literal, SelectBuilder } from '@contember/database'
-import { AuthPolicyRow } from '../../type'
+import { AuthPolicyRow } from "../../type/index.js"
 
 /**
  * Lists `auth_policy` rows. Optionally filters to a single project (or to the

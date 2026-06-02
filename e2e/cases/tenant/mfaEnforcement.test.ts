@@ -2,7 +2,7 @@ import { expect, test } from 'bun:test'
 import { Secret, TOTP } from 'otpauth'
 import { createSchema, SchemaDefinition as def } from '@contember/schema-definition'
 import { AllowAllPermissionFactory } from '@contember/schema-utils'
-import { createTester, executeGraphql, loginToken, rand, rootToken } from '../../src/tester'
+import { createTester, executeGraphql, loginToken, rand, rootToken } from "../../src/tester.js"
 
 // Project-scoped policy isolation:
 // Global identity roles are restricted to the fixed TenantRole enum, so a *global*

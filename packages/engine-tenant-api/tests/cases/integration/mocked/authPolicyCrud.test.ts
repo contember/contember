@@ -1,7 +1,7 @@
-import { executeTenantTest, now } from '../../../src/testTenant'
-import { GQL, SQL } from '../../../src/tags'
-import { testUuid } from '../../../src/testUuid'
-import { getAuthPoliciesSql } from './sql/authPolicySql'
+import { executeTenantTest, now } from "../../../src/testTenant.js"
+import { GQL, SQL } from "../../../src/tags.js"
+import { testUuid } from "../../../src/testUuid.js"
+import { getAuthPoliciesSql } from "./sql/authPolicySql.js"
 import { expect, test } from 'bun:test'
 
 test('createAuthPolicy (global) inserts a row and audits auth_policy_change', async () => {

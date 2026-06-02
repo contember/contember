@@ -1,7 +1,7 @@
 import { describe, expect, mock, test } from 'bun:test'
 import crypto from 'node:crypto'
 import { createConnectionMock, ExpectedQuery } from '@contember/database-tester'
-import { BackupCodeManager, DatabaseContext, PersonRow, Providers, UserMailer } from '../../../src'
+import { BackupCodeManager, DatabaseContext, PersonRow, Providers, UserMailer } from "../../../src/index.js"
 
 const NOW = new Date('2026-05-20T12:00:00.000Z')
 const PERSON_ID = '123e4567-e89b-12d3-a456-000000000001'

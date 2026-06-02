@@ -1,6 +1,6 @@
-import { Command } from '../Command'
+import { Command } from "../Command.js"
 import { UpdateBuilder } from '@contember/database'
-import { AuthPolicyScope } from '../../type'
+import { AuthPolicyScope } from "../../type/index.js"
 
 /**
  * Updates an existing `auth_policy` row. Only the supplied fields are written

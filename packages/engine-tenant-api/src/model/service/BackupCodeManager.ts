@@ -1,10 +1,10 @@
 import { Literal, SelectBuilder } from '@contember/database'
-import { DatabaseContext } from '../utils'
-import { Providers } from '../providers'
-import { ConsumeBackupCodeCommand, CreateBackupCodeCommand, DeleteBackupCodesCommand } from '../commands'
-import { computeTokenHash } from '../utils/token'
-import { UserMailer } from '../mailing'
-import { PersonRow } from '../queries'
+import { DatabaseContext } from "../utils/index.js"
+import { Providers } from "../providers.js"
+import { ConsumeBackupCodeCommand, CreateBackupCodeCommand, DeleteBackupCodesCommand } from "../commands/index.js"
+import { computeTokenHash } from "../utils/token.js"
+import { UserMailer } from "../mailing/index.js"
+import { PersonRow } from "../queries/index.js"
 
 /** Number of backup codes issued per generation. */
 const BACKUP_CODE_COUNT = 10

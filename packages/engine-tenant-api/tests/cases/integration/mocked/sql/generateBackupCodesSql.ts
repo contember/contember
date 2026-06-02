@@ -1,8 +1,8 @@
 import { ExpectedQuery } from '@contember/database-tester'
-import { SQL } from '../../../../src/tags'
-import { testUuid } from '../../../../src/testUuid'
-import { now } from '../../../../src/testTenant'
-import { sqlTransaction } from './sqlTransaction'
+import { SQL } from "../../../../src/tags.js"
+import { testUuid } from "../../../../src/testUuid.js"
+import { now } from "../../../../src/testTenant.js"
+import { sqlTransaction } from "./sqlTransaction.js"
 
 /**
  * Mocks the SQL emitted by BackupCodeManager.generate: delete the old set, then

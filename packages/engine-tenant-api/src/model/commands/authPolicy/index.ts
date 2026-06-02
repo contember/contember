@@ -1,3 +1,3 @@
-export * from './CreateAuthPolicyCommand'
-export * from './UpdateAuthPolicyCommand'
-export * from './DeleteAuthPolicyCommand'
+export * from "./CreateAuthPolicyCommand.js"
+export * from "./UpdateAuthPolicyCommand.js"
+export * from "./DeleteAuthPolicyCommand.js"

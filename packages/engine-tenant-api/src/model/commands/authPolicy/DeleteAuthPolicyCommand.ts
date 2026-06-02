@@ -1,4 +1,4 @@
-import { Command } from '../Command'
+import { Command } from "../Command.js"
 import { DeleteBuilder } from '@contember/database'
 
 /** Deletes an `auth_policy` row by id. Returns whether a row was removed. */

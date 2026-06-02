@@ -1,9 +1,9 @@
-import { authenticatedIdentityId, executeTenantTest } from '../../../src/testTenant'
-import { testUuid } from '../../../src/testUuid'
-import { getPersonByIdentity } from './sql/getPersonByIdentity'
-import { getAllProjectRolesByIdentitySql, getAuthPoliciesSql } from './sql/authPolicySql'
+import { authenticatedIdentityId, executeTenantTest } from "../../../src/testTenant.js"
+import { testUuid } from "../../../src/testUuid.js"
+import { getPersonByIdentity } from "./sql/getPersonByIdentity.js"
+import { getAllProjectRolesByIdentitySql, getAuthPoliciesSql } from "./sql/authPolicySql.js"
 import { expect, test } from 'bun:test'
-import { GQL } from '../../../src/tags'
+import { GQL } from "../../../src/tags.js"
 
 const disableOtpMutation = () => ({
 	query: GQL`mutation { disableOtp { ok error { code } } }`,

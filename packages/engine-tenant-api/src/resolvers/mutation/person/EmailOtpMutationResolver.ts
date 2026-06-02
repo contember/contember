@@ -4,13 +4,13 @@ import {
 	InitEmailOtpResponse,
 	MutationConfirmEmailOtpArgs,
 	MutationResolvers,
-} from '../../../schema'
-import { TenantResolverContext } from '../../TenantResolverContext'
-import { AuthPolicyResolver, BackupCodeManager, ConfigurationQuery, EmailOtpManager, PermissionActions, PersonQuery, PersonRow } from '../../../model'
-import { ImplementationException } from '../../../exceptions'
-import { createErrorResponse } from '../../errorUtils'
-import { ResponseOk } from '../../../model/utils/Response'
-import { SetEmailOtpEnabledCommand } from '../../../model/commands'
+} from "../../../schema/index.js"
+import { TenantResolverContext } from "../../TenantResolverContext.js"
+import { AuthPolicyResolver, BackupCodeManager, ConfigurationQuery, EmailOtpManager, PermissionActions, PersonQuery, PersonRow } from "../../../model/index.js"
+import { ImplementationException } from "../../../exceptions.js"
+import { createErrorResponse } from "../../errorUtils.js"
+import { ResponseOk } from "../../../model/utils/Response.js"
+import { SetEmailOtpEnabledCommand } from "../../../model/commands/index.js"
 
 export class EmailOtpMutationResolver implements Pick<MutationResolvers, 'initEmailOtp' | 'confirmEmailOtp' | 'disableEmailOtp'> {
 	constructor(

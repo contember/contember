@@ -1,10 +1,10 @@
-import { DatabaseContext } from '../utils'
-import { Response, ResponseError, ResponseOk } from '../utils/Response'
-import { ProjectManager } from './ProjectManager'
-import { AuthPoliciesQuery } from '../queries'
-import { CreateAuthPolicyCommand, DeleteAuthPolicyCommand, UpdateAuthPolicyCommand } from '../commands'
-import { AuthPolicyRow, AuthPolicyScope } from '../type'
-import { CreateAuthPolicyErrorCode, DeleteAuthPolicyErrorCode, UpdateAuthPolicyErrorCode } from '../../schema'
+import { DatabaseContext } from "../utils/index.js"
+import { Response, ResponseError, ResponseOk } from "../utils/Response.js"
+import { ProjectManager } from "./ProjectManager.js"
+import { AuthPoliciesQuery } from "../queries/index.js"
+import { CreateAuthPolicyCommand, DeleteAuthPolicyCommand, UpdateAuthPolicyCommand } from "../commands/index.js"
+import { AuthPolicyRow, AuthPolicyScope } from "../type/index.js"
+import { CreateAuthPolicyErrorCode, DeleteAuthPolicyErrorCode, UpdateAuthPolicyErrorCode } from "../../schema/index.js"
 
 export type AuthPolicyInputValues = {
 	scope: AuthPolicyScope

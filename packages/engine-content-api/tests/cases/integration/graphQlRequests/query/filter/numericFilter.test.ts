@@ -1,6 +1,6 @@
 import { test } from 'bun:test'
 import { execute } from '../../../../../src/test'
-import { SchemaDefinition as def, createSchema } from '@contember/schema-definition'
+import { createSchema, SchemaDefinition as def } from '@contember/schema-definition'
 import { GQL, SQL } from '../../../../../src/tags'
 import { testUuid } from '../../../../../src/testUuid'
 

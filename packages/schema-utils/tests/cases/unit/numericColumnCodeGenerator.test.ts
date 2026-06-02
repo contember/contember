@@ -1,5 +1,4 @@
-import { createSchema } from '@contember/schema-definition'
-import { c } from '@contember/schema-definition'
+import { c, createSchema } from '@contember/schema-definition'
 import { expect, test } from 'bun:test'
 import { Model } from '@contember/schema'
 import { DefinitionCodeGenerator } from '../../../src/definition-generator/DefinitionCodeGenerator'

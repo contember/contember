@@ -19,6 +19,25 @@ const stringColumn = (name: string): Model.AnyColumn => ({
 	nullable: true,
 })
 
+// Shared expected SQL for both the bidirectional and unidirectional cases (the SQL is identical:
+// it depends only on the junction table/columns, not on the inverse relations).
+const convertSql = SQL`
+	DROP TRIGGER "log_event" ON "post_categories";
+	DROP TRIGGER "log_event_trx" ON "post_categories";
+	ALTER TABLE "post_categories" ADD COLUMN "id" uuid;
+	UPDATE "post_categories" SET "id" = "system"."uuid_generate_v4"();
+	ALTER TABLE "post_categories" ALTER COLUMN "id" SET NOT NULL;
+	ALTER TABLE "post_categories" DROP CONSTRAINT "post_categories_pkey";
+	ALTER TABLE "post_categories" ADD PRIMARY KEY ("id");
+	ALTER TABLE "post_categories" ADD UNIQUE ("post_id", "category_id");
+	CREATE TRIGGER "log_event" AFTER INSERT OR UPDATE OR DELETE
+		ON "post_categories" FOR EACH ROW
+		EXECUTE PROCEDURE "system"."trigger_event"($pga$id$pga$);
+	CREATE CONSTRAINT TRIGGER "log_event_trx" AFTER INSERT OR UPDATE OR DELETE
+		ON "post_categories" DEFERRABLE INITIALLY DEFERRED FOR EACH ROW
+		EXECUTE PROCEDURE "system"."trigger_event_commit"();
+`
+
 namespace ConvertMHMToEntityOriginal {
 	export const model: Model.Schema = {
 		enums: {},
@@ -164,20 +183,10 @@ describe('convert many has many to joining entity', () => {
 				targetInverseSide: ConvertMHMToEntityUpdated.model.entities.Category.fields.postCategories,
 			},
 		],
-		// Note: `log_event_trx` is NOT dropped or re-created — it takes no column params and stays
-		// valid across the primary-key change. Re-creating it would fail with "trigger already exists".
-		sql: SQL`
-		DROP TRIGGER "log_event" ON "post_categories";
-		ALTER TABLE "post_categories" ADD COLUMN "id" uuid;
-		UPDATE "post_categories" SET "id" = "system"."uuid_generate_v4"();
-		ALTER TABLE "post_categories" ALTER COLUMN "id" SET NOT NULL;
-		ALTER TABLE "post_categories" DROP CONSTRAINT "post_categories_pkey";
-		ALTER TABLE "post_categories" ADD PRIMARY KEY ("id");
-		ALTER TABLE "post_categories" ADD UNIQUE ("post_id", "category_id");
-		CREATE TRIGGER "log_event" AFTER INSERT OR UPDATE OR DELETE
-			ON "post_categories" FOR EACH ROW
-			EXECUTE PROCEDURE "system"."trigger_event"($pga$id$pga$);
-		`,
+		// Both event-log triggers are dropped up-front: keeping the deferred `log_event_trx` would
+		// queue pending trigger events on the back-fill UPDATE and break the following ALTER TABLE.
+		// They are re-created at the end (`log_event` re-pointed onto the new surrogate id).
+		sql: convertSql,
 	})
 })
 
@@ -309,17 +318,6 @@ describe('convert unidirectional many has many to joining entity', () => {
 				sourceInverseSide: ConvertUnidirectionalMHMUpdated.model.entities.Post.fields.postCategories,
 			},
 		],
-		sql: SQL`
-		DROP TRIGGER "log_event" ON "post_categories";
-		ALTER TABLE "post_categories" ADD COLUMN "id" uuid;
-		UPDATE "post_categories" SET "id" = "system"."uuid_generate_v4"();
-		ALTER TABLE "post_categories" ALTER COLUMN "id" SET NOT NULL;
-		ALTER TABLE "post_categories" DROP CONSTRAINT "post_categories_pkey";
-		ALTER TABLE "post_categories" ADD PRIMARY KEY ("id");
-		ALTER TABLE "post_categories" ADD UNIQUE ("post_id", "category_id");
-		CREATE TRIGGER "log_event" AFTER INSERT OR UPDATE OR DELETE
-			ON "post_categories" FOR EACH ROW
-			EXECUTE PROCEDURE "system"."trigger_event"($pga$id$pga$);
-		`,
+		sql: convertSql,
 	})
 })

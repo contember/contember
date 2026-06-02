@@ -7,7 +7,7 @@ import {
 	ModificationHandlerCreateSqlOptions,
 	ModificationHandlerOptions,
 } from '../ModificationHandler.js'
-import { createEventTrigger, dropEventTrigger } from '../utils/sqlUpdateUtils.js'
+import { createEventTrigger, createEventTrxTrigger, dropEventTrigger, dropEventTrxTrigger } from '../utils/sqlUpdateUtils.js'
 import { getColumnSqlType } from '../utils/columnUtils.js'
 import { wrapIdentifier } from '../../utils/dbHelpers.js'
 import { VERSION_LATEST } from '../ModificationVersions.js'
@@ -21,7 +21,8 @@ import { PossibleEntityShapeInMigrations } from '../../utils/PartialEntity.js'
  *  - a surrogate `id` (uuid) primary key column is added and back-filled (see {@link uuidGenerator}),
  *  - the original composite primary key is dropped and the new `id` becomes the primary key,
  *  - both foreign-key columns are kept and become two many-has-one relations of the new entity,
- *  - the event-log trigger is re-pointed from the two foreign-key columns onto the new `id` column.
+ *  - the `log_event` trigger is re-pointed from the two foreign-key columns onto the new `id` column
+ *    (both event-log triggers are dropped up-front and re-created afterwards).
  *
  * The original many-has-many owning relation (and its inverse side, if any) is removed from the schema.
  *
@@ -49,9 +50,14 @@ export class ConvertManyHasManyToJoiningEntityModificationHandler implements Mod
 		const primaryColumnNameId = wrapIdentifier(primaryColumnName)
 		const primaryColumnType = getColumnSqlType(primaryColumn)
 
-		// Re-point the event-log trigger (logs on the composite key) before changing the primary key.
+		// Drop BOTH event-log triggers before touching the table.
+		// The deferred `log_event_trx` constraint trigger must go too: otherwise the back-fill UPDATE
+		// below queues pending deferred trigger events, and PostgreSQL then rejects the subsequent
+		// `ALTER TABLE` with "cannot ALTER TABLE because it has pending trigger events". Both are
+		// re-created at the end, so there is no duplicate-trigger conflict either.
 		if (joiningTable.eventLog.enabled) {
 			dropEventTrigger(builder, tableName)
+			dropEventTrxTrigger(builder, tableName)
 		}
 
 		// Add the surrogate primary key and back-fill it for existing rows.
@@ -70,11 +76,11 @@ export class ConvertManyHasManyToJoiningEntityModificationHandler implements Mod
 			})`,
 		)
 
-		// Only the row-level `log_event` trigger is re-pointed onto the new surrogate primary key.
-		// The deferred `log_event_trx` constraint trigger takes no column params, so it is left
-		// untouched — dropping and re-creating it would fail with "trigger already exists".
+		// Re-create both triggers: `log_event` is now re-pointed onto the surrogate primary key,
+		// `log_event_trx` is restored unchanged (it takes no column params).
 		if (joiningEntity.eventLog?.enabled !== false) {
 			createEventTrigger(builder, systemSchema, tableName, [primaryColumnName])
+			createEventTrxTrigger(builder, systemSchema, tableName)
 		}
 	}
 

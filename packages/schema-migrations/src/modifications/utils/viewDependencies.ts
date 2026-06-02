@@ -64,6 +64,22 @@ export const getEntityDependantViews = (model: Model.Schema): EntityDependantVie
 	return dependants
 }
 
+/**
+ * Inverse of {@link getEntityDependantViews}: for each view entity, the set of entity names it depends on
+ * (i.e. the entities/views that must exist before it can be created). Uses the same explicit-or-inferred
+ * dependency logic, so view recreation ordering matches view removal ordering.
+ */
+export const getEntityViewDependencies = (model: Model.Schema): Map<string, Set<string>> => {
+	const dependencies: Map<string, Set<string>> = new Map(Object.values(model.entities).map(it => [it.name, new Set()]))
+	const dependants = getEntityDependantViews(model)
+	for (const [dependency, dependantEntities] of dependants) {
+		for (const dependant of dependantEntities) {
+			dependencies.get(dependant.name)!.add(dependency)
+		}
+	}
+	return dependencies
+}
+
 export const cascadeRemoveDependantViews = (model: Model.Schema, entities: Model.Entity[]): Migration.Modification[] => {
 	const visited = new Set<string>()
 	const dependants = getEntityDependantViews(model)

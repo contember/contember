@@ -4,6 +4,7 @@ import { SchemaUpdater, updateModel } from '../utils/schemaUpdateUtils'
 import { createModificationType, Differ, ModificationHandler } from '../ModificationHandler'
 import { Migration } from '../../Migration'
 import { PossibleEntityShapeInMigrations } from '../../utils/PartialEntity.js'
+import { getEntityViewDependencies } from '../utils/viewDependencies'
 
 export class CreateViewModificationHandler implements ModificationHandler<CreateViewModificationData> {
 	constructor(private readonly data: CreateViewModificationData, private readonly schema: Schema) {}
@@ -54,12 +55,15 @@ export class CreateViewDiffer implements Differ {
 			.filter(it => !!it.view)
 		const created = new Set<string>()
 		const modifications: Migration.Modification[] = []
+		// dependencies derived using the same explicit-or-inferred logic as view removal, so that a view is
+		// always created after the views/tables it references (see issue #828)
+		const viewDependencies = getEntityViewDependencies(updatedSchema.model)
 		const cascadeCreate = (entity: Model.Entity) => {
 			if (originalSchema.model.entities[entity.name] || created.has(entity.name)) {
 				return
 			}
 			created.add(entity.name)
-			for (const dependency of entity.view?.dependencies ?? []) {
+			for (const dependency of viewDependencies.get(entity.name) ?? []) {
 				cascadeCreate(updatedSchema.model.entities[dependency])
 			}
 			modifications.push(createViewModification.createModification({

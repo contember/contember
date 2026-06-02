@@ -362,3 +362,271 @@ ALTER TABLE "something"
 	ALTER "value" SET DATA TYPE text USING "value"::text;
 CREATE VIEW "something_view" AS SELECT something.id, something.value::text AS value FROM something;`,
 	}))
+
+// https://github.com/contember/contember/issues/828
+// Nested case: view B (SomethingViewView) references view A's table (something_view), and view A references
+// the altered column's table. Neither view declares explicit `dependencies`. Both views must be dropped and
+// recreated, and recreation must emit A (something_view) BEFORE B (something_view_view).
+// NOTE: the dependent view (SomethingViewView) is declared BEFORE the view it references (SomethingView).
+// With the old recreation ordering (explicit `dependencies` only), CreateViewDiffer would emit them in
+// declaration order and produce `CREATE VIEW something_view_view` before `something_view`, which fails at
+// runtime. The fix reorders recreation using the same inferred dependencies as removal.
+namespace NestedViewDependsOnColumnOrig {
+	export class Something {
+		value = def.intColumn()
+	}
+
+	@def.View('SELECT something_view.id, something_view.value AS value FROM something_view')
+	export class SomethingViewView {
+		value = def.stringColumn()
+	}
+
+	@def.View('SELECT something.id, something.value::text AS value FROM something')
+	export class SomethingView {
+		value = def.stringColumn()
+	}
+}
+
+namespace NestedViewDependsOnColumnUpdated {
+	export class Something {
+		value = def.stringColumn()
+	}
+
+	@def.View('SELECT something_view.id, something_view.value AS value FROM something_view')
+	export class SomethingViewView {
+		value = def.stringColumn()
+	}
+
+	@def.View('SELECT something.id, something.value::text AS value FROM something')
+	export class SomethingView {
+		value = def.stringColumn()
+	}
+}
+
+describe('change column type used by nested views without declared dependencies', () =>
+	testMigrations({
+		original: createSchema(NestedViewDependsOnColumnOrig),
+		updated: createSchema(NestedViewDependsOnColumnUpdated),
+		diff: [
+			{
+				modification: 'removeEntity',
+				entityName: 'SomethingViewView',
+			},
+			{
+				modification: 'removeEntity',
+				entityName: 'SomethingView',
+			},
+			updateColumnDefinitionModification.createModification({
+				entityName: 'Something',
+				fieldName: 'value',
+				definition: {
+					type: Model.ColumnType.String,
+					columnType: 'text',
+					nullable: true,
+				},
+			}),
+			{
+				modification: 'createView',
+				entity: {
+					name: 'SomethingView',
+					primary: 'id',
+					primaryColumn: 'id',
+					unique: [],
+					indexes: [],
+					fields: {
+						id: {
+							name: 'id',
+							columnName: 'id',
+							nullable: false,
+							type: 'Uuid',
+							columnType: 'uuid',
+						},
+						value: {
+							name: 'value',
+							columnName: 'value',
+							nullable: true,
+							type: 'String',
+							columnType: 'text',
+						},
+					},
+					tableName: 'something_view',
+					eventLog: {
+						enabled: true,
+					},
+					view: {
+						sql: 'SELECT something.id, something.value::text AS value FROM something',
+					},
+				},
+			},
+			{
+				modification: 'createView',
+				entity: {
+					name: 'SomethingViewView',
+					primary: 'id',
+					primaryColumn: 'id',
+					unique: [],
+					indexes: [],
+					fields: {
+						id: {
+							name: 'id',
+							columnName: 'id',
+							nullable: false,
+							type: 'Uuid',
+							columnType: 'uuid',
+						},
+						value: {
+							name: 'value',
+							columnName: 'value',
+							nullable: true,
+							type: 'String',
+							columnType: 'text',
+						},
+					},
+					tableName: 'something_view_view',
+					eventLog: {
+						enabled: true,
+					},
+					view: {
+						sql: 'SELECT something_view.id, something_view.value AS value FROM something_view',
+					},
+				},
+			},
+		],
+		sql: SQL`DROP VIEW "something_view_view";
+DROP VIEW "something_view";
+ALTER TABLE "something"
+	ALTER "value" SET DATA TYPE text USING "value"::text;
+CREATE VIEW "something_view" AS SELECT something.id, something.value::text AS value FROM something;
+CREATE VIEW "something_view_view" AS SELECT something_view.id, something_view.value AS value FROM something_view;`,
+	}))
+
+// Multiple independent views over the same altered table - both are dropped & recreated; relative order of the
+// two independent views is irrelevant, but each must come after the table.
+namespace MultipleIndependentViewsOrig {
+	export class Something {
+		value = def.intColumn()
+	}
+
+	@def.View('SELECT something.id, something.value::text AS value FROM something')
+	export class ViewA {
+		value = def.stringColumn()
+	}
+
+	@def.View('SELECT something.id, something.value::text AS value FROM something')
+	export class ViewB {
+		value = def.stringColumn()
+	}
+}
+
+namespace MultipleIndependentViewsUpdated {
+	export class Something {
+		value = def.stringColumn()
+	}
+
+	@def.View('SELECT something.id, something.value::text AS value FROM something')
+	export class ViewA {
+		value = def.stringColumn()
+	}
+
+	@def.View('SELECT something.id, something.value::text AS value FROM something')
+	export class ViewB {
+		value = def.stringColumn()
+	}
+}
+
+describe('change column type used by multiple independent views without declared dependencies', () =>
+	testMigrations({
+		original: createSchema(MultipleIndependentViewsOrig),
+		updated: createSchema(MultipleIndependentViewsUpdated),
+		diff: [
+			{
+				modification: 'removeEntity',
+				entityName: 'ViewA',
+			},
+			{
+				modification: 'removeEntity',
+				entityName: 'ViewB',
+			},
+			updateColumnDefinitionModification.createModification({
+				entityName: 'Something',
+				fieldName: 'value',
+				definition: {
+					type: Model.ColumnType.String,
+					columnType: 'text',
+					nullable: true,
+				},
+			}),
+			{
+				modification: 'createView',
+				entity: {
+					name: 'ViewA',
+					primary: 'id',
+					primaryColumn: 'id',
+					unique: [],
+					indexes: [],
+					fields: {
+						id: {
+							name: 'id',
+							columnName: 'id',
+							nullable: false,
+							type: 'Uuid',
+							columnType: 'uuid',
+						},
+						value: {
+							name: 'value',
+							columnName: 'value',
+							nullable: true,
+							type: 'String',
+							columnType: 'text',
+						},
+					},
+					tableName: 'view_a',
+					eventLog: {
+						enabled: true,
+					},
+					view: {
+						sql: 'SELECT something.id, something.value::text AS value FROM something',
+					},
+				},
+			},
+			{
+				modification: 'createView',
+				entity: {
+					name: 'ViewB',
+					primary: 'id',
+					primaryColumn: 'id',
+					unique: [],
+					indexes: [],
+					fields: {
+						id: {
+							name: 'id',
+							columnName: 'id',
+							nullable: false,
+							type: 'Uuid',
+							columnType: 'uuid',
+						},
+						value: {
+							name: 'value',
+							columnName: 'value',
+							nullable: true,
+							type: 'String',
+							columnType: 'text',
+						},
+					},
+					tableName: 'view_b',
+					eventLog: {
+						enabled: true,
+					},
+					view: {
+						sql: 'SELECT something.id, something.value::text AS value FROM something',
+					},
+				},
+			},
+		],
+		sql: SQL`DROP VIEW "view_a";
+DROP VIEW "view_b";
+ALTER TABLE "something"
+	ALTER "value" SET DATA TYPE text USING "value"::text;
+CREATE VIEW "view_a" AS SELECT something.id, something.value::text AS value FROM something;
+CREATE VIEW "view_b" AS SELECT something.id, something.value::text AS value FROM something;`,
+	}))

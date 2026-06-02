@@ -1,5 +1,5 @@
 import { ExpectedQuery } from '@contember/database-tester'
-import { SQL } from "../../../../src/tags.js"
+import { SQL } from '../../../../src/tags.js'
 
 /** Mocks SetEmailOtpEnabledCommand: upsert person_mfa.email_otp_enabled. */
 export const setEmailOtpEnabledSql = (args: { personId: string; enabled: boolean }): ExpectedQuery => ({

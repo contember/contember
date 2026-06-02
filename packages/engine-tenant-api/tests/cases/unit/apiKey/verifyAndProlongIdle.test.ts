@@ -8,7 +8,7 @@ import {
 	computeTokenHash,
 	DatabaseContext,
 	Providers,
-} from "../../../../src/index.js"
+} from '../../../../src/index.js'
 import { createConnectionMock, ExpectedQuery } from '@contember/database-tester'
 import PostgresInterval from 'postgres-interval'
 

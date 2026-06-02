@@ -7,11 +7,11 @@ import {
 	MutationResolvers,
 	MutationUpdateAuthPolicyArgs,
 	UpdateAuthPolicyResponse,
-} from "../../../schema/index.js"
-import { TenantResolverContext } from "../../TenantResolverContext.js"
-import { AuthPolicyManager, PermissionActions } from "../../../model/index.js"
-import { createErrorResponse } from "../../errorUtils.js"
-import { ResponseOk } from "../../../model/utils/Response.js"
+} from '../../../schema/index.js'
+import { TenantResolverContext } from '../../TenantResolverContext.js'
+import { AuthPolicyManager, PermissionActions } from '../../../model/index.js'
+import { createErrorResponse } from '../../errorUtils.js'
+import { ResponseOk } from '../../../model/utils/Response.js'
 import { JSONValue } from '@contember/schema'
 
 /**

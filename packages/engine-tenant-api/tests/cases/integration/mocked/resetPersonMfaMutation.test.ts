@@ -1,7 +1,7 @@
-import { executeTenantTest } from "../../../src/testTenant.js"
-import { GQL, SQL } from "../../../src/tags.js"
-import { testUuid } from "../../../src/testUuid.js"
-import { getPersonByIdSql } from "./sql/getPersonByIdSql.js"
+import { executeTenantTest } from '../../../src/testTenant.js'
+import { GQL, SQL } from '../../../src/tags.js'
+import { testUuid } from '../../../src/testUuid.js'
+import { getPersonByIdSql } from './sql/getPersonByIdSql.js'
 import { expect, test } from 'bun:test'
 
 test('resetPersonMfa clears factors + backup codes and audits mfa_reset', async () => {

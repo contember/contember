@@ -1,5 +1,5 @@
 import { ExpectedQuery } from '@contember/database-tester'
-import { SQL } from "../../../../src/tags.js"
+import { SQL } from '../../../../src/tags.js'
 import PostgresInterval from 'postgres-interval'
 
 export type AuthPolicyRowResponse = {

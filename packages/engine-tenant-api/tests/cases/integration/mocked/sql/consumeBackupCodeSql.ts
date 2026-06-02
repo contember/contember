@@ -1,6 +1,6 @@
 import { ExpectedQuery } from '@contember/database-tester'
-import { SQL } from "../../../../src/tags.js"
-import { now } from "../../../../src/testTenant.js"
+import { SQL } from '../../../../src/tags.js'
+import { now } from '../../../../src/testTenant.js'
 
 /**
  * Mocks BackupCodeManager.verifyAndConsume: an atomic UPDATE that only touches an

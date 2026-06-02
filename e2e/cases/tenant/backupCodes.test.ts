@@ -1,6 +1,6 @@
 import { expect, test } from 'bun:test'
 import { Secret, TOTP } from 'otpauth'
-import { createTester, executeGraphql, loginToken, rand } from "../../src/tester.js"
+import { createTester, executeGraphql, loginToken, rand } from '../../src/tester.js'
 import { emptySchema } from '@contember/schema-utils'
 
 const prepareOtpMutation = `mutation { prepareOtp { ok result { otpSecret otpUri } } }`

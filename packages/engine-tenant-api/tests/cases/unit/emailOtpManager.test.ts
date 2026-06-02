@@ -2,8 +2,8 @@ import { describe, expect, test } from 'bun:test'
 import crypto from 'node:crypto'
 import PostgresInterval from 'postgres-interval'
 import { createConnectionMock, ExpectedQuery } from '@contember/database-tester'
-import { Config, DatabaseContext, EmailOtpManager, PersonRow, Providers, RateLimiter, TemplateRenderer, UserMailer } from "../../../src/index.js"
-import { createMockedMailer } from "../../src/mailer.js"
+import { Config, DatabaseContext, EmailOtpManager, PersonRow, Providers, RateLimiter, TemplateRenderer, UserMailer } from '../../../src/index.js'
+import { createMockedMailer } from '../../src/mailer.js'
 
 const NOW = new Date('2026-05-20T12:00:00.000Z')
 const PERSON_ID = '123e4567-e89b-12d3-a456-000000000001'

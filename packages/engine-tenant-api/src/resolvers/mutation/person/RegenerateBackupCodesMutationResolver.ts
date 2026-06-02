@@ -1,9 +1,9 @@
-import { MutationResolvers, RegenerateBackupCodesResponse } from "../../../schema/index.js"
-import { TenantResolverContext } from "../../TenantResolverContext.js"
-import { BackupCodeManager, PermissionActions, PersonQuery, PersonRow } from "../../../model/index.js"
-import { ImplementationException } from "../../../exceptions.js"
-import { createErrorResponse } from "../../errorUtils.js"
-import { ResponseOk } from "../../../model/utils/Response.js"
+import { MutationResolvers, RegenerateBackupCodesResponse } from '../../../schema/index.js'
+import { TenantResolverContext } from '../../TenantResolverContext.js'
+import { BackupCodeManager, PermissionActions, PersonQuery, PersonRow } from '../../../model/index.js'
+import { ImplementationException } from '../../../exceptions.js'
+import { createErrorResponse } from '../../errorUtils.js'
+import { ResponseOk } from '../../../model/utils/Response.js'
 
 export class RegenerateBackupCodesMutationResolver implements Pick<MutationResolvers, 'regenerateBackupCodes'> {
 	constructor(private readonly backupCodeManager: BackupCodeManager) {}

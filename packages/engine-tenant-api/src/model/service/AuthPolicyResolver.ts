@@ -1,8 +1,8 @@
-import { DatabaseContext } from "../utils/index.js"
-import { AllProjectRolesByIdentityQuery, AuthPoliciesQuery } from "../queries/index.js"
-import { AuthPolicyRow, EffectivePolicy } from "../type/index.js"
+import { DatabaseContext } from '../utils/index.js'
+import { AllProjectRolesByIdentityQuery, AuthPoliciesQuery } from '../queries/index.js'
+import { AuthPolicyRow, EffectivePolicy } from '../type/index.js'
 import { IPostgresInterval } from 'postgres-interval'
-import { intervalToSeconds } from "../utils/interval.js"
+import { intervalToSeconds } from '../utils/interval.js'
 
 /**
  * Resolves the effective auth policy for an identity by aggregating all matching

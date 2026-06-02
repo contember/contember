@@ -1,4 +1,4 @@
-import { Command } from "../Command.js"
+import { Command } from '../Command.js'
 import { UpdateBuilder } from '@contember/database'
 
 /** Sets `person.mfa_grace_until` (the anchor for the MFA enrollment grace window). */

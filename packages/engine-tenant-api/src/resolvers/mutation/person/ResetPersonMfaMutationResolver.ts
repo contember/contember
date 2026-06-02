@@ -1,10 +1,10 @@
-import { MutationResetPersonMfaArgs, MutationResolvers, ResetPersonMfaResponse } from "../../../schema/index.js"
-import { TenantResolverContext } from "../../TenantResolverContext.js"
-import { BackupCodeManager, PermissionActions } from "../../../model/index.js"
-import { PersonManager } from "../../../model/service/PersonManager.js"
-import { ResetPersonMfaCommand } from "../../../model/commands/index.js"
-import { createErrorResponse } from "../../errorUtils.js"
-import { ResponseError, ResponseOk } from "../../../model/utils/Response.js"
+import { MutationResetPersonMfaArgs, MutationResolvers, ResetPersonMfaResponse } from '../../../schema/index.js'
+import { TenantResolverContext } from '../../TenantResolverContext.js'
+import { BackupCodeManager, PermissionActions } from '../../../model/index.js'
+import { PersonManager } from '../../../model/service/PersonManager.js'
+import { ResetPersonMfaCommand } from '../../../model/commands/index.js'
+import { createErrorResponse } from '../../errorUtils.js'
+import { ResponseError, ResponseOk } from '../../../model/utils/Response.js'
 
 /**
  * Admin recovery for a locked-out user: clears the target person's MFA factors

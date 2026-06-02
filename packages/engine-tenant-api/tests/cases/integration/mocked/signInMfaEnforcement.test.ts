@@ -1,21 +1,21 @@
-import { executeTenantTest, now } from "../../../src/testTenant.js"
-import { SQL } from "../../../src/tags.js"
-import { testUuid } from "../../../src/testUuid.js"
-import { signInMutation } from "./gql/signIn.js"
-import { getPersonByEmailSql } from "./sql/getPersonByEmailSql.js"
-import { getConfigSql } from "./sql/getConfigSql.js"
-import { getNextLoginAttemptSql } from "./sql/getNextLoginAttemptSql.js"
-import { createSessionKeySql } from "./sql/createSessionKeySql.js"
-import { getIdentityProjectsSql } from "./sql/getIdentityProjectsSql.js"
-import { selectMembershipsSql } from "./sql/selectMembershipsSql.js"
-import { getAllProjectRolesByIdentitySql, getAuthPoliciesSql } from "./sql/authPolicySql.js"
-import { getIdentityByIdSql } from "./sql/getIdentityByIdSql.js"
-import { generateBackupCodesSql } from "./sql/generateBackupCodesSql.js"
+import { executeTenantTest, now } from '../../../src/testTenant.js'
+import { SQL } from '../../../src/tags.js'
+import { testUuid } from '../../../src/testUuid.js'
+import { signInMutation } from './gql/signIn.js'
+import { getPersonByEmailSql } from './sql/getPersonByEmailSql.js'
+import { getConfigSql } from './sql/getConfigSql.js'
+import { getNextLoginAttemptSql } from './sql/getNextLoginAttemptSql.js'
+import { createSessionKeySql } from './sql/createSessionKeySql.js'
+import { getIdentityProjectsSql } from './sql/getIdentityProjectsSql.js'
+import { selectMembershipsSql } from './sql/selectMembershipsSql.js'
+import { getAllProjectRolesByIdentitySql, getAuthPoliciesSql } from './sql/authPolicySql.js'
+import { getIdentityByIdSql } from './sql/getIdentityByIdSql.js'
+import { generateBackupCodesSql } from './sql/generateBackupCodesSql.js'
 import { expect, test } from 'bun:test'
 import { Buffer } from 'buffer'
 import PostgresInterval from 'postgres-interval'
-import { OtpAuthenticator } from "../../../../src/index.js"
-import { GQL } from "../../../src/tags.js"
+import { OtpAuthenticator } from '../../../../src/index.js'
+import { GQL } from '../../../src/tags.js'
 
 const encryptProvider = {
 	encrypt: (value: Buffer) => Promise.resolve({ value: Buffer.concat([Buffer.from('ENC:'), value]), version: 1 }),

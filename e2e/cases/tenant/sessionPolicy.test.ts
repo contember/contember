@@ -1,7 +1,7 @@
 import { expect, test } from 'bun:test'
 import { createSchema, SchemaDefinition as def } from '@contember/schema-definition'
 import { AllowAllPermissionFactory } from '@contember/schema-utils'
-import { createTester, executeGraphql, loginToken, rand, rootToken } from "../../src/tester.js"
+import { createTester, executeGraphql, loginToken, rand, rootToken } from '../../src/tester.js'
 
 // Project-scoped policy isolation (see mfaEnforcement.test.ts): a project-scoped
 // auth_policy matches project-membership roles keyed by project_id, so a unique

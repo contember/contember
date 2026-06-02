@@ -1,11 +1,11 @@
-import { authenticatedIdentityId, executeTenantTest, now } from "../../../src/testTenant.js"
-import { testUuid } from "../../../src/testUuid.js"
-import { getPersonByIdentity } from "./sql/getPersonByIdentity.js"
-import { generateBackupCodesSql } from "./sql/generateBackupCodesSql.js"
-import { confirmEmailOtpMutation, initEmailOtpMutation } from "./gql/emailOtp.js"
-import { claimEmailOtpAttemptSql, consumeEmailOtpTokenSql, EMAIL_OTP_CODE, getLatestEmailOtpTokenSql, sendEmailOtpSql } from "./sql/emailOtpSql.js"
-import { setEmailOtpEnabledSql } from "./sql/setEmailOtpEnabledSql.js"
-import { getConfigSql } from "./sql/getConfigSql.js"
+import { authenticatedIdentityId, executeTenantTest, now } from '../../../src/testTenant.js'
+import { testUuid } from '../../../src/testUuid.js'
+import { getPersonByIdentity } from './sql/getPersonByIdentity.js'
+import { generateBackupCodesSql } from './sql/generateBackupCodesSql.js'
+import { confirmEmailOtpMutation, initEmailOtpMutation } from './gql/emailOtp.js'
+import { claimEmailOtpAttemptSql, consumeEmailOtpTokenSql, EMAIL_OTP_CODE, getLatestEmailOtpTokenSql, sendEmailOtpSql } from './sql/emailOtpSql.js'
+import { setEmailOtpEnabledSql } from './sql/setEmailOtpEnabledSql.js'
+import { getConfigSql } from './sql/getConfigSql.js'
 import { expect, test } from 'bun:test'
 
 test('initEmailOtp sends a code', async () => {

@@ -1,5 +1,5 @@
 import { expect, test } from 'bun:test'
-import { consumeMails, createTester, executeGraphql, loginToken, rand } from "../../src/tester.js"
+import { consumeMails, createTester, executeGraphql, loginToken, rand } from '../../src/tester.js'
 import { emptySchema } from '@contember/schema-utils'
 
 const initEmailOtpMutation = `mutation { initEmailOtp { ok error { code } } }`

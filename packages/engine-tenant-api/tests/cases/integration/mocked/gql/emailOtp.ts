@@ -1,5 +1,5 @@
-import { GraphQLTestQuery } from "./types.js"
-import { GQL } from "../../../../src/tags.js"
+import { GraphQLTestQuery } from './types.js'
+import { GQL } from '../../../../src/tags.js'
 
 export const confirmEmailOtpMutation = (variables: { token: string }): GraphQLTestQuery => ({
 	query: GQL`mutation($token: String!) {

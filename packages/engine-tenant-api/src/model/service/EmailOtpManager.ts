@@ -1,12 +1,12 @@
-import { PersonRow } from "../queries/index.js"
-import { DatabaseContext, MAX_OTP_ATTEMPTS, validateToken } from "../utils/index.js"
-import { Providers } from "../providers.js"
-import { UserMailer } from "../mailing/index.js"
-import { ClaimOtpAttemptCommand, InvalidateEmailOtpTokensCommand, InvalidateTokenCommand, SaveEmailOtpTokenCommand } from "../commands/index.js"
-import { PersonTokenQuery } from "../queries/personToken/PersonTokenQuery.js"
-import { RateLimitDecision, RateLimiter } from "./RateLimiter.js"
-import { RateLimitScopes } from "../type/RateLimit.js"
-import { Config } from "../type/Config.js"
+import { PersonRow } from '../queries/index.js'
+import { DatabaseContext, MAX_OTP_ATTEMPTS, validateToken } from '../utils/index.js'
+import { Providers } from '../providers.js'
+import { UserMailer } from '../mailing/index.js'
+import { ClaimOtpAttemptCommand, InvalidateEmailOtpTokensCommand, InvalidateTokenCommand, SaveEmailOtpTokenCommand } from '../commands/index.js'
+import { PersonTokenQuery } from '../queries/personToken/PersonTokenQuery.js'
+import { RateLimitDecision, RateLimiter } from './RateLimiter.js'
+import { RateLimitScopes } from '../type/RateLimit.js'
+import { Config } from '../type/Config.js'
 
 /** Email-OTP codes are short-lived numeric codes delivered by email. */
 const EMAIL_OTP_EXPIRATION_MINUTES = 10

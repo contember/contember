@@ -1,4 +1,4 @@
-import Layout from "./Layout.mustache.js"
+import Layout from './Layout.mustache.js'
 // language=Mustache
 export default Layout(`
 	<p>Hello,</p>

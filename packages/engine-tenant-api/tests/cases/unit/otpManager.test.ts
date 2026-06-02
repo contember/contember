@@ -1,7 +1,7 @@
 import { describe, expect, test } from 'bun:test'
 import { Buffer } from 'buffer'
 import { createConnectionMock, ExpectedQuery } from '@contember/database-tester'
-import { DatabaseContext, OtpAuthenticator, OtpError, OtpManager, PersonRow, Providers } from "../../../src/index.js"
+import { DatabaseContext, OtpAuthenticator, OtpError, OtpManager, PersonRow, Providers } from '../../../src/index.js'
 
 const now = new Date('2019-09-04 12:00')
 

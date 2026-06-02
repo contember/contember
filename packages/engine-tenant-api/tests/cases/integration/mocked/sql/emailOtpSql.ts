@@ -1,6 +1,6 @@
 import { ExpectedQuery } from '@contember/database-tester'
-import { SQL } from "../../../../src/tags.js"
-import { now } from "../../../../src/testTenant.js"
+import { SQL } from '../../../../src/tags.js'
+import { now } from '../../../../src/testTenant.js'
 import crypto from 'node:crypto'
 
 const sha256 = (value: string) => crypto.createHash('sha256').update(value, 'ascii').digest('hex')

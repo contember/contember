@@ -1,1 +1,1 @@
-export * from "./AuthPoliciesQuery.js"
+export * from './AuthPoliciesQuery.js'

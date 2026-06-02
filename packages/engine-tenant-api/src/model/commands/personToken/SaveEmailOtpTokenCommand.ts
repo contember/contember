@@ -1,7 +1,7 @@
-import { Command } from "../Command.js"
+import { Command } from '../Command.js'
 import { InsertBuilder } from '@contember/database'
-import { plusMinutes } from "../../utils/time.js"
-import { computeTokenHash, generateToken, TokenHash } from "../../utils/index.js"
+import { plusMinutes } from '../../utils/time.js'
+import { computeTokenHash, generateToken, TokenHash } from '../../utils/index.js'
 
 /**
  * Creates an `mfa_email_otp` person_token carrying a 6-digit code in `otp_hash`.

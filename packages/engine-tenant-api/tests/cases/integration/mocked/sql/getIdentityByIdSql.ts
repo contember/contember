@@ -1,4 +1,4 @@
-import { SQL } from "../../../../src/tags.js"
+import { SQL } from '../../../../src/tags.js'
 import { ExpectedQuery } from '@contember/database-tester'
 
 /**

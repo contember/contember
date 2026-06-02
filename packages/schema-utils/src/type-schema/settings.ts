@@ -10,6 +10,7 @@ export const settingsSchema = Typesafe.partial({
 	content: Typesafe.partial({
 		useExistsInHasManyFilter: Typesafe.boolean,
 		fullDateTimeResponse: Typesafe.boolean,
+		dateTimeResponseFormat: Typesafe.union(Typesafe.literal('legacy'), Typesafe.literal('iso8601')),
 		shortDateResponse: Typesafe.boolean,
 		uuidVersion: Typesafe.union(Typesafe.literal(4), Typesafe.literal(7)),
 	}),

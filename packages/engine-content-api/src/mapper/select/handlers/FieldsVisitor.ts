@@ -36,12 +36,18 @@ export class FieldsVisitor implements Model.RelationByTypeVisitor<void>, Model.C
 			selectFrom += '::text'
 		}
 		if (column.type === Model.ColumnType.DateTime && this.settings.fullDateTimeResponse) {
-			// Format SQL-side to a valid ISO 8601 string (with "T" separator and "Z" suffix)
-			// instead of relying on JS Date, which would lose sub-second precision.
-			const format = `'YYYY-MM-DD"T"HH24:MI:SS.US"Z"'`
-			selectFrom = column.list
-				? `(select array_agg(to_char(elem AT TIME ZONE 'UTC', ${format}) order by ord) from unnest(${selectFrom}) with ordinality as t(elem, ord))`
-				: `to_char(${selectFrom} AT TIME ZONE 'UTC', ${format})`
+			if (this.settings.dateTimeResponseFormat === 'iso8601') {
+				// Format SQL-side to a valid ISO 8601 string (with "T" separator and "Z" suffix)
+				// instead of relying on JS Date, which would lose sub-second precision.
+				const format = `'YYYY-MM-DD"T"HH24:MI:SS.US"Z"'`
+				selectFrom = column.list
+					? `(select array_agg(to_char(elem AT TIME ZONE 'UTC', ${format}) order by ord) from unnest(${selectFrom}) with ordinality as t(elem, ord))`
+					: `to_char(${selectFrom} AT TIME ZONE 'UTC', ${format})`
+			} else {
+				// Legacy (backward-compatible) format: emit the raw PostgreSQL text
+				// representation, e.g. "2024-01-01 11:22:33.444444+00".
+				selectFrom += '::text'
+			}
 		}
 		if (column.type === Model.ColumnType.Enum && column.list) {
 			selectFrom += '::text[]'

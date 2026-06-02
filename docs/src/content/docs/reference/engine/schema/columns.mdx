@@ -17,13 +17,14 @@ In this example, the Post entity has two columns: title and publishedAt. The tit
 
 ## Supported data types
 
-Contember supports several different data types for columns, including string, int, double, bool, dateTime, date, json, and uuid. You can use the following methods to define columns of different types:
+Contember supports several different data types for columns, including string, int, double, numeric, bool, dateTime, date, json, and uuid. You can use the following methods to define columns of different types:
 
 | Contember Type | Definition method | PostgreSQL type  | Description
 | -------------- | ------------------| ---------------- | -----------
 | String         | stringColumn      | text             | Generic text field with arbitrary length.
 | Int            | intColumn         | integer          | Stores whole signed numbers (32b default)
 | Double         | doubleColumn      | double precision | Floating point numbers according to IEEE 64-bit float.
+| Numeric        | numericColumn     | numeric(p, s)    | Exact decimal numbers with a fixed precision and scale (e.g. money). Transferred as a string. [See more in a section below.](#numeric-exact-decimals)
 | Bool           | boolColumn        | boolean          | Binary true/false value.
 | DateTime       | dateTimeColumn    | timestamptz      | For storing date and time, converted to UTC by default and transferred in ISO 8601 format (e.g. `2032-01-18T13:36:45Z`).
 | Date           | dateColumn        | date             | Date field without a time part. It's transferred in `YYYY-MM-DD` format (e.g. `2032-01-18`).
@@ -39,6 +40,58 @@ export class Post {
 	config = c.jsonColumn().columnType('json')
 }
 ```
+:::
+
+
+## Numeric (exact decimals)
+
+The `numericColumn` method defines an exact decimal column backed by the PostgreSQL `numeric(precision, scale)` type. Unlike `doubleColumn`, which uses IEEE 64-bit floating point and is subject to rounding errors, `numeric` stores the value exactly. Use it whenever you need precise arithmetic — most importantly for money, but also for quantities, rates, measurements, and any value where a rounding error is unacceptable.
+
+`numericColumn` takes two required arguments:
+
+- `precision` — the total number of significant digits.
+- `scale` — the number of digits after the decimal point.
+
+#### Example how to define a price column:
+
+```typescript
+export class Product {
+	price = c.numericColumn(20, 9).notNull()
+}
+```
+
+This maps to a `numeric(20, 9)` column in PostgreSQL, allowing up to 20 significant digits with 9 of them after the decimal point.
+
+### Transferred as a string
+
+Numeric values are transported over GraphQL as **strings** rather than numbers. This is intentional: JavaScript numbers are IEEE 64-bit floats and cannot represent every decimal value exactly (for example, `0.1 + 0.2 !== 0.3`), so passing them through a GraphQL `Float` would silently corrupt the very precision a `numeric` column exists to protect. The column is therefore exposed through a custom `Decimal` GraphQL scalar, and the generated TypeScript SDK types it as `string`.
+
+**On input**, the `Decimal` scalar accepts either a string (e.g. `"123.45"`, including scientific notation like `"1.5e10"`) or a plain JSON number, which is normalized to a string. Values that are not valid decimals — as well as `NaN` and `Infinity` — are rejected.
+
+**On output**, the API returns the exact PostgreSQL `numeric` text representation. This preserves trailing zeros up to the column scale, so a value of `123.45` stored in a `numeric(20, 9)` column is returned as `"123.450000000"`.
+
+```graphql
+mutation {
+  createProduct(data: { price: "123.45" }) {
+    node {
+      price # => "123.450000000"
+    }
+  }
+}
+```
+
+Filtering and ordering work the same way as for other numeric types — operators such as `eq`, `gt`, `lt`, `in`, and `notIn` are available, and comparison happens in the database as exact `numeric` arithmetic. Filter values are also passed as strings:
+
+```graphql
+query {
+  listProduct(filter: { price: { gt: "100.5" } }, orderBy: [{ price: asc }]) {
+    price
+  }
+}
+```
+
+:::tip
+If you don't need exact precision and prefer working with plain JavaScript numbers, use `doubleColumn` instead.
 :::
 
 

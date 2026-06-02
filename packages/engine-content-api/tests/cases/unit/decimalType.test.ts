@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'bun:test'
 import { Kind } from 'graphql'
-import { CustomTypesProvider } from '../../../src'
+import { CustomTypesProvider } from '../../../src/index.js'
 
 describe('decimal graphql type', () => {
 	const decimalType = new CustomTypesProvider().decimalType

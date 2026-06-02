@@ -169,7 +169,7 @@ describe('convert many has many to joining entity', () => {
 		sql: SQL`
 		DROP TRIGGER "log_event" ON "post_categories";
 		ALTER TABLE "post_categories" ADD COLUMN "id" uuid;
-		UPDATE "post_categories" SET "id" = public."uuid_generate_v4"();
+		UPDATE "post_categories" SET "id" = "system"."uuid_generate_v4"();
 		ALTER TABLE "post_categories" ALTER COLUMN "id" SET NOT NULL;
 		ALTER TABLE "post_categories" DROP CONSTRAINT "post_categories_pkey";
 		ALTER TABLE "post_categories" ADD PRIMARY KEY ("id");
@@ -312,7 +312,7 @@ describe('convert unidirectional many has many to joining entity', () => {
 		sql: SQL`
 		DROP TRIGGER "log_event" ON "post_categories";
 		ALTER TABLE "post_categories" ADD COLUMN "id" uuid;
-		UPDATE "post_categories" SET "id" = public."uuid_generate_v4"();
+		UPDATE "post_categories" SET "id" = "system"."uuid_generate_v4"();
 		ALTER TABLE "post_categories" ALTER COLUMN "id" SET NOT NULL;
 		ALTER TABLE "post_categories" DROP CONSTRAINT "post_categories_pkey";
 		ALTER TABLE "post_categories" ADD PRIMARY KEY ("id");

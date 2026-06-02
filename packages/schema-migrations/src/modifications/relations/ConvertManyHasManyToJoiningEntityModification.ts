@@ -18,7 +18,7 @@ import { PossibleEntityShapeInMigrations } from '../../utils/PartialEntity.js'
  * into an explicit joining entity, while preserving all existing rows in the junction table.
  *
  * The junction table is reused in place — no data is copied:
- *  - a surrogate `id` (uuid) primary key column is added and back-filled (see {@link UUID_GENERATOR}),
+ *  - a surrogate `id` (uuid) primary key column is added and back-filled (see {@link uuidGenerator}),
  *  - the original composite primary key is dropped and the new `id` becomes the primary key,
  *  - both foreign-key columns are kept and become two many-has-one relations of the new entity,
  *  - the event-log trigger is re-pointed from the two foreign-key columns onto the new `id` column.
@@ -27,8 +27,8 @@ import { PossibleEntityShapeInMigrations } from '../../utils/PartialEntity.js'
  *
  * Limitations / requirements:
  *  - The junction table is assumed to use the standard composite primary key produced by Contember.
- *  - UUID back-filling relies on the `public.uuid_generate_v4()` SQL function that Contember installs
- *    during tenant setup. No PostgreSQL extension is created by this migration.
+ *  - UUID back-filling relies on the `uuid_generate_v4()` SQL function that Contember installs in the
+ *    project's system schema. No PostgreSQL extension is created by this migration.
  */
 export class ConvertManyHasManyToJoiningEntityModificationHandler implements ModificationHandler<ConvertManyHasManyToJoiningEntityModificationData> {
 	constructor(
@@ -56,7 +56,7 @@ export class ConvertManyHasManyToJoiningEntityModificationHandler implements Mod
 
 		// Add the surrogate primary key and back-fill it for existing rows.
 		builder.sql(`ALTER TABLE ${tableNameId} ADD COLUMN ${primaryColumnNameId} ${primaryColumnType}`)
-		builder.sql(`UPDATE ${tableNameId} SET ${primaryColumnNameId} = ${UUID_GENERATOR}`)
+		builder.sql(`UPDATE ${tableNameId} SET ${primaryColumnNameId} = ${uuidGenerator(systemSchema)}`)
 		builder.sql(`ALTER TABLE ${tableNameId} ALTER COLUMN ${primaryColumnNameId} SET NOT NULL`)
 
 		// Replace the composite primary key with the surrogate one.
@@ -159,10 +159,11 @@ export class ConvertManyHasManyToJoiningEntityModificationHandler implements Mod
 }
 
 /**
- * Contember installs a pure-SQL `public.uuid_generate_v4()` function during tenant setup,
- * so UUIDs can be generated without enabling any PostgreSQL extension.
+ * Contember installs a pure-SQL `uuid_generate_v4()` function in the project's system schema
+ * (see the `trigger-event-function` system migration), so UUIDs can be generated without enabling
+ * any PostgreSQL extension. It must be referenced through the system schema — it is not in `public`.
  */
-const UUID_GENERATOR = 'public."uuid_generate_v4"()'
+const uuidGenerator = (systemSchema: string) => `${wrapIdentifier(systemSchema)}."uuid_generate_v4"()`
 
 export const convertManyHasManyToJoiningEntityModification = createModificationType({
 	id: 'convertManyHasManyToJoiningEntity',

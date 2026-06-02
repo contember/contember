@@ -105,6 +105,14 @@ export const nav: NavItem[] = [
 		items: [
 			{
 				type: 'category',
+				label: 'Configuration',
+				collapsed: true,
+				items: [
+					doc('reference/engine/configuration/database'),
+				],
+			},
+			{
+				type: 'category',
 				label: 'Schema',
 				collapsed: true,
 				items: [

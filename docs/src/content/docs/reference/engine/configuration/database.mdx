@@ -1,0 +1,200 @@
+---
+title: Database configuration
+description: Connection, SSL, timeouts, connection pool, and read replicas for the tenant and project databases — via config files or environment variables.
+---
+
+Contember connects to PostgreSQL for two kinds of databases:
+
+- the **tenant** database (users, projects, memberships, API keys), and
+- a **content** database for each deployed project.
+
+Every database has the same set of options: connection parameters, SSL, statement/lock timeouts, a connection pool, and an optional read replica. All of them can be set either in the [config file](#config-file) (JSON or YAML) or via [environment variables](#environment-variables) — env vars are the most common way to configure a self-hosted deployment.
+
+:::tip
+If you just want to get an instance running, the [Self-host Contember](/guides/self-hosted-contember) guide shows the minimal set of `DEFAULT_DB_*` / `TENANT_DB_*` variables you need. This page is the full reference for everything else.
+:::
+
+## Connection parameters
+
+| Option | Required | Description |
+|---|---|---|
+| `host` | yes | PostgreSQL host name. |
+| `port` | yes | PostgreSQL port. Defaults to `5432` when unset. |
+| `user` | yes | Database user. |
+| `password` | yes | Database password. |
+| `database` | yes | Database name. For projects this defaults to the project slug. |
+| `ssl` | no | Connect over TLS. Boolean; off by default. |
+
+The configured user needs permission to create databases if you let Contember create per-project content databases on its own — see the [self-hosting guide](/guides/self-hosted-contember#1-setup-postgressql-database).
+
+## Timeouts
+
+These map directly onto PostgreSQL / `node-postgres` settings and are applied to every connection in the pool. All values are in **milliseconds**. They are optional, and when omitted Contember does not set them — so the PostgreSQL server default applies.
+
+| Option | Maps to | Description | Default |
+|---|---|---|---|
+| `connectionTimeoutMs` | `connectionTimeoutMillis` | How long to wait when establishing a new connection before failing. | no timeout |
+| `queryTimeoutMs` | `query_timeout` | Client-side timeout — aborts the query from the driver if no result arrives in time. | no timeout |
+| `statementTimeoutMs` | [`statement_timeout`](https://www.postgresql.org/docs/current/runtime-config-client.html#GUC-STATEMENT-TIMEOUT) | Server-side cap on how long a single statement may run before PostgreSQL cancels it. | `0` (disabled) in PostgreSQL |
+| `lockTimeoutMs` | [`lock_timeout`](https://www.postgresql.org/docs/current/runtime-config-client.html#GUC-LOCK-TIMEOUT) | Server-side cap on how long a statement waits to acquire a lock before erroring out. Useful to stop a long-running migration or write from blocking indefinitely behind another transaction. | `0` (disabled) in PostgreSQL |
+
+:::note
+`statement_timeout` and `lock_timeout` are **disabled by default in PostgreSQL** (a value of `0` means "no limit"). Setting `statementTimeoutMs` / `lockTimeoutMs` is a good way to bound worst-case query and lock-wait time. Contember explicitly disables both (`SET LOCAL statement_timeout = 0`, `lock_timeout = 0`) for long-running data [export/import](/reference/engine/content/transfer) operations, so those are never killed by your configured limits.
+:::
+
+## Connection pool
+
+Contember manages its own connection pool. All pool options are optional and live under `pool`.
+
+| Option | Description | Default |
+|---|---|---|
+| `maxConnections` | Maximum number of connections in the pool. | `10` |
+| `maxConnecting` | Maximum number of connections being established concurrently. | `ceil(maxConnections / 2)` |
+| `maxIdle` | Maximum number of idle connections kept around; extras are disposed immediately. | `maxConnections` |
+| `idleTimeoutMs` | How long an idle connection is kept before it is disposed. | `10000` |
+| `acquireTimeoutMs` | How long a request waits for a free connection before failing with an acquire-timeout error. | `10000` |
+| `reconnectIntervalMs` | Delay between retries after a recoverable connection error. | `100` |
+| `rateLimitCount` | Maximum number of connection attempts within `rateLimitPeriodMs`. | `maxConnecting * 5` |
+| `rateLimitPeriodMs` | Window for the connection-attempt rate limit. | `1000` |
+| `maxUses` | Dispose a connection after it has been acquired this many times. | unlimited |
+| `maxAgeMs` | Dispose a connection once it reaches this age (after it is returned to the pool). | unlimited |
+
+## Read replica
+
+If you run a PostgreSQL read replica, point read-only traffic at it with a `read` sub-config. It accepts the **same options** as the primary connection (`host`, `port`, `user`, `password`, `database`, `ssl`, the timeouts, and `pool`). Any option you omit is inherited from the primary connection; the replica is only used when at least a `host` is provided.
+
+```yaml
+tenant:
+  db:
+    host: primary.db.example.com
+    port: 5432
+    user: contember
+    password: secret
+    database: tenant
+    read:
+      host: replica.db.example.com
+```
+
+## Config file
+
+Database options can be set declaratively in the config file. The tenant database lives under `tenant.db`, and per-project databases under `projects.<slug>.db` (or `projectDefaults.db` for defaults shared by all projects). A project may also set `useTenantDb: true` to share the tenant connection instead of using its own.
+
+```yaml
+tenant:
+  db:
+    host: db.example.com
+    port: 5432
+    user: contember
+    password: secret
+    database: tenant
+    ssl: true
+    statementTimeoutMs: 30000
+    lockTimeoutMs: 5000
+    pool:
+      maxConnections: 20
+      idleTimeoutMs: 10000
+
+projects:
+  blog:
+    db:
+      host: db.example.com
+      port: 5432
+      user: contember
+      password: secret
+      database: blog
+      pool:
+        maxConnections: 10
+```
+
+The same structure works in JSON. Config files and environment variables are merged, so you can set common values in a file and override per-environment values through env vars.
+
+## Environment variables
+
+Every database option is also exposed as an environment variable. The variable name is built from a **prefix** plus the option name (upper-snake-cased), e.g. `lockTimeoutMs` → `…_DB_LOCK_TIMEOUT_MS`, `pool.maxConnections` → `…_DB_POOL_MAX_CONNECTIONS`.
+
+The prefix selects which database the variable applies to:
+
+| Prefix | Applies to | Resolution order |
+|---|---|---|
+| `TENANT_DB_…` | tenant database | `TENANT_DB_*`, then falls back to `DEFAULT_DB_*` |
+| `DEFAULT_DB_…` | tenant **and** every project (shared fallback) | used when no more specific variable is set |
+| `<PROJECT>_DB_…` | a single project (slug upper-cased, `-` → `_`, e.g. `blog` → `BLOG_DB_…`) | `<PROJECT>_DB_*`, then falls back to `DEFAULT_DB_*` |
+
+So the common case — one PostgreSQL server for everything — is just the `DEFAULT_DB_*` set; use `TENANT_DB_*` / `<PROJECT>_DB_*` only to override a specific database.
+
+:::note
+`DEFAULT_DB_PORT` defaults to `5432` if you don't set it. When running multiple project groups, a group-scoped `<GROUP>_TENANT_DB_*` variable takes precedence over the plain `TENANT_DB_*` form (`<GROUP>` is the project-group slug, upper-cased with `-` → `_`).
+:::
+
+### Variable names
+
+Replace `<PREFIX>` below with `DEFAULT`, `TENANT`, or a project slug (`<PROJECT>`). The read-replica variants insert `READ_` after `DB_` (e.g. `DEFAULT_DB_READ_HOST`).
+
+| Option | Primary variable | Cast |
+|---|---|---|
+| `host` | `<PREFIX>_DB_HOST` | string |
+| `port` | `<PREFIX>_DB_PORT` | number |
+| `user` | `<PREFIX>_DB_USER` | string |
+| `password` | `<PREFIX>_DB_PASSWORD` | string |
+| `database` | `<PREFIX>_DB_NAME` | string |
+| `ssl` | `<PREFIX>_DB_SSL` | bool |
+| `connectionTimeoutMs` | `<PREFIX>_DB_CONNECTION_TIMEOUT_MS` | number |
+| `queryTimeoutMs` | `<PREFIX>_DB_QUERY_TIMEOUT_MS` | number |
+| `statementTimeoutMs` | `<PREFIX>_DB_STATEMENT_TIMEOUT_MS` | number |
+| `lockTimeoutMs` | `<PREFIX>_DB_LOCK_TIMEOUT_MS` | number |
+| `pool.maxConnections` | `<PREFIX>_DB_POOL_MAX_CONNECTIONS` | number |
+| `pool.maxConnecting` | `<PREFIX>_DB_POOL_MAX_CONNECTING` | number |
+| `pool.maxIdle` | `<PREFIX>_DB_POOL_MAX_IDLE` | number |
+| `pool.idleTimeoutMs` | `<PREFIX>_DB_POOL_IDLE_TIMEOUT_MS` | number |
+| `pool.acquireTimeoutMs` | `<PREFIX>_DB_POOL_ACQUIRE_TIMEOUT_MS` | number |
+| `pool.reconnectIntervalMs` | `<PREFIX>_DB_POOL_RECONNECT_INTERVAL_MS` | number |
+| `pool.rateLimitCount` | `<PREFIX>_DB_POOL_RATE_LIMIT_COUNT` | number |
+| `pool.rateLimitPeriodMs` | `<PREFIX>_DB_POOL_RATE_LIMIT_PERIOD_MS` | number |
+| `pool.maxUses` | `<PREFIX>_DB_POOL_MAX_USES` | number |
+| `pool.maxAgeMs` | `<PREFIX>_DB_POOL_MAX_AGE_MS` | number |
+
+The read replica uses the same names with a `READ_` segment, for both the connection and the pool:
+
+| Option | Read-replica variable |
+|---|---|
+| `read.host` | `<PREFIX>_DB_READ_HOST` |
+| `read.port` | `<PREFIX>_DB_READ_PORT` |
+| `read.user` | `<PREFIX>_DB_READ_USER` |
+| `read.password` | `<PREFIX>_DB_READ_PASSWORD` |
+| `read.database` | `<PREFIX>_DB_READ_NAME` |
+| `read.ssl` | `<PREFIX>_DB_READ_SSL` |
+| `read.statementTimeoutMs` | `<PREFIX>_DB_READ_STATEMENT_TIMEOUT_MS` |
+| `read.lockTimeoutMs` | `<PREFIX>_DB_READ_LOCK_TIMEOUT_MS` |
+| `read.pool.maxConnections` | `<PREFIX>_DB_READ_POOL_MAX_CONNECTIONS` |
+| … | … and the rest, following the same pattern |
+
+### Example
+
+```bash
+# Shared server for the tenant DB and all projects
+DEFAULT_DB_HOST=db.example.com
+DEFAULT_DB_PORT=5432
+DEFAULT_DB_USER=contember
+DEFAULT_DB_PASSWORD=secret
+DEFAULT_DB_SSL=true
+
+# Tenant database name (the tenant DB has no slug to default from)
+TENANT_DB_NAME=tenant
+
+# Bound lock waits and statement runtime everywhere
+DEFAULT_DB_LOCK_TIMEOUT_MS=5000
+DEFAULT_DB_STATEMENT_TIMEOUT_MS=30000
+
+# Bigger pool just for the "blog" project
+BLOG_DB_POOL_MAX_CONNECTIONS=20
+
+# Route the "blog" project's reads to a replica
+BLOG_DB_READ_HOST=replica.db.example.com
+```
+
+Boolean variables (`*_SSL`) accept `true`, `on`, or `1` as truthy; anything else is falsy.
+
+## See also
+
+- [Self-host Contember](/guides/self-hosted-contember) — end-to-end deployment, including the minimal database variables.
+- [Data transfer](/reference/engine/content/transfer) — export/import, which bypass the configured statement/lock timeouts.

@@ -26,7 +26,7 @@ Contember supports several different data types for columns, including string, i
 | Double         | doubleColumn      | double precision | Floating point numbers according to IEEE 64-bit float.
 | Numeric        | numericColumn     | numeric(p, s)    | Exact decimal numbers with a fixed precision and scale (e.g. money). Transferred as a string. [See more in a section below.](#numeric-exact-decimals)
 | Bool           | boolColumn        | boolean          | Binary true/false value.
-| DateTime       | dateTimeColumn    | timestamptz      | For storing date and time, converted to UTC by default and transferred in ISO 8601 format (e.g. `2032-01-18T13:36:45Z`).
+| DateTime       | dateTimeColumn    | timestamptz      | For storing date and time, converted to UTC by default and transferred in ISO 8601 format (e.g. `2032-01-18T13:36:45Z`). The precision and exact format of the serialized value can be tuned — see [DateTime serialization](/reference/engine/content/queries#datetime-serialization).
 | Date           | dateColumn        | date             | Date field without a time part. It's transferred in `YYYY-MM-DD` format (e.g. `2032-01-18`).
 | Json           | jsonColumn        | jsonb            | Stores arbitrary JSON.
 | UUID           | uuidColumn        | uuid             | Universally unique identifier, used for all primary keys by default.

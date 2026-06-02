@@ -3,7 +3,11 @@ import { computeTokenHash, generateToken } from '../../utils/index.js'
 import { SavePersonTokenCommand } from './SavePersonTokenCommand.js'
 import { PersonToken } from '../../type/index.js'
 import { JSONValue } from '@contember/schema'
-import { EMAIL_CHANGE_EXPIRATION_MINUTES, EMAIL_VERIFICATION_EXPIRATION_MINUTES, PASSWORD_RESET_EXPIRATION_MINUTES } from '../../consts/expirations.js'
+import {
+	EMAIL_CHANGE_EXPIRATION_MINUTES,
+	EMAIL_VERIFICATION_EXPIRATION_MINUTES,
+	PASSWORD_RESET_EXPIRATION_MINUTES,
+} from '../../consts/expirations.js'
 
 export class CreatePersonTokenCommand implements Command<CreatePersonTokenCommand.Result> {
 	private constructor(

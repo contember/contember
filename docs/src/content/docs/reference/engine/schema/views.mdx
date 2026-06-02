@@ -69,7 +69,7 @@ export class PendingActionEvents {
   state = c.stringColumn().notNull()
   visibleAt = c.dateTimeColumn().notNull()
 }
-````
+```
 
 This view surfaces pending action events queued in the system.
 
@@ -152,13 +152,25 @@ query {
 
 ### Handling Dependencies in View Entities
 
-If a view depends on other views, declare them using the `dependencies` option to ensure the correct migration order.
+Declare **every project entity the view's SQL reads from** — regular tables *and* other views — using the `dependencies` option:
 
 ```ts
-@c.View(`SELECT ...`, {
-  dependencies: () => [OtherViewEntity],
+@c.View(`SELECT * FROM author JOIN survey_answer_stats ...`, {
+  dependencies: () => [Author, SurveyAnswerStats],
 })
+export class AuthorReport {}
 ```
+
+Contember uses these declarations to:
+
+- **Order migrations correctly** — a view is always created after the entities (tables or views) it reads from.
+- **Recreate the view when a referenced column changes type** — PostgreSQL forbids altering the type of a column that is used by a view, so Contember has to `DROP` the dependent view, run the `ALTER`, and re-`CREATE` it. It can only do this for entities you list in `dependencies`.
+
+:::caution
+Declaring dependencies only on other **views** is a common mistake. If your view reads from a regular **table** and you omit it here, a later migration that changes a column's type on that table will **fail** with `cannot alter type of a column used by a view`. Always list the tables your view reads from, too.
+:::
+
+Use the arrow-function form (`() => [...]`) to avoid problems with circular imports between entity definitions.
 
 ---
 

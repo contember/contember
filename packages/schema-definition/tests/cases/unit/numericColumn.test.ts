@@ -1,5 +1,5 @@
 import { expect, test } from 'bun:test'
-import { c, createSchema } from '../../../src'
+import { c, createSchema } from '../../../src/index.js'
 import { Model } from '@contember/schema'
 
 namespace NumericModel {

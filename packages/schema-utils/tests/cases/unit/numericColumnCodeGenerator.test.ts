@@ -1,7 +1,7 @@
 import { c, createSchema } from '@contember/schema-definition'
 import { expect, test } from 'bun:test'
 import { Model, Schema } from '@contember/schema'
-import { DefinitionCodeGenerator } from '../../../src/definition-generator/DefinitionCodeGenerator'
+import { DefinitionCodeGenerator } from '../../../src/definition-generator/DefinitionCodeGenerator.js'
 
 namespace NumericModel {
 	export class Product {

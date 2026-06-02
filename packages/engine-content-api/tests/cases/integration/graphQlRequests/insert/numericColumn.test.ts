@@ -1,8 +1,8 @@
 import { test } from 'bun:test'
-import { execute, sqlTransaction } from '../../../../src/test'
+import { execute, sqlTransaction } from '../../../../src/test.js'
 import { createSchema, SchemaDefinition as def } from '@contember/schema-definition'
-import { GQL, SQL } from '../../../../src/tags'
-import { testUuid } from '../../../../src/testUuid'
+import { GQL, SQL } from '../../../../src/tags.js'
+import { testUuid } from '../../../../src/testUuid.js'
 
 namespace NumericModel {
 	export class Product {

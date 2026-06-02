@@ -57,6 +57,60 @@ type PostEdge {
 
 ```
 
+## DateTime serialization
+
+By default, `DateTime` columns are serialized through the GraphQL `DateTime` scalar, which formats the value with a JavaScript `Date`. This produces a valid ISO 8601 string but truncates the time to millisecond precision (e.g. `2024-01-01T11:22:33.444Z`), dropping any sub-millisecond digits stored in PostgreSQL.
+
+Two schema settings under `content` change this behavior.
+
+### `fullDateTimeResponse`
+
+When enabled, the Content API serializes `DateTime` values directly from PostgreSQL instead of going through the JavaScript `Date`. This preserves the full microsecond precision of the underlying `timestamptz` column.
+
+This setting is enabled by the `v2.0` settings preset and above, so new projects have it on by default.
+
+```typescript
+import { createSchema } from '@contember/schema-definition'
+import * as model from './model'
+
+export default {
+  ...createSchema(model),
+  settings: {
+    content: {
+      fullDateTimeResponse: true,
+    },
+  },
+}
+```
+
+### `dateTimeResponseFormat`
+
+When `fullDateTimeResponse` is enabled, `dateTimeResponseFormat` controls the exact textual representation of the serialized value. It accepts two values:
+
+| Value | Example output | Notes
+| ----------- | --------------------------------- | -----
+| `legacy` (default) | `2024-01-01 11:22:33.444444+00` | Raw PostgreSQL text representation — a space separator and a numeric UTC offset, **not** a valid ISO 8601 string.
+| `iso8601` | `2024-01-01T11:22:33.444444Z` | Valid ISO 8601 string with a `T` separator and a `Z` suffix, formatted on the database side so microsecond precision is preserved.
+
+The default is `legacy` for backward compatibility, because the raw PostgreSQL text format is what `fullDateTimeResponse` has always produced. To get standards-compliant ISO 8601 output, opt in to `iso8601`:
+
+```typescript
+import { createSchema } from '@contember/schema-definition'
+import * as model from './model'
+
+export default {
+  ...createSchema(model),
+  settings: {
+    content: {
+      fullDateTimeResponse: true,
+      dateTimeResponseFormat: 'iso8601',
+    },
+  },
+}
+```
+
+`dateTimeResponseFormat` has no effect unless `fullDateTimeResponse` is also enabled. Both the scalar (single value) and list (`dateTimeColumn().list()`) variants of `DateTime` columns are formatted consistently, and `null` values are preserved as `null`.
+
 ## Fetching a single record
 
 To fetch a single record using the "get" query in Contember. For example, if you have an entity called "Post", there will be a field called "getPost" with a parameter called "by". To fetch a record, you need to know the unique field that identifies the record.

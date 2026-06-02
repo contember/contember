@@ -17,7 +17,7 @@ import { URL } from 'node:url'
 import { cpuUsage, memoryUsage } from 'node:process'
 import { performance } from 'node:perf_hooks'
 import { getClientIP } from '../utils/remoteAddress.js'
-import { isForceHttpOkRequested, isGraphqlModule } from './forceHttpOk.js'
+import { isForceHttpOkRequested, shouldForceHttpOk } from './forceHttpOk.js'
 
 type Route<C> = { match: RequestMatcher; controller: C; module: string }
 export class Application {
@@ -311,19 +311,14 @@ export class Application {
 	 * are not mislabeled. Default behavior (real status codes) is preserved when the header is absent.
 	 */
 	private maybeForceHttpOk(ctx: KoaContext<{}>, module: string | undefined) {
-		if (!this.forceHttpOkEnabled) {
-			return
-		}
-		if (ctx.status === 200) {
-			return
-		}
-		if (!isGraphqlModule(module)) {
-			return
-		}
-		if (ctx.body === undefined || ctx.body === null) {
-			return
-		}
-		if (!isForceHttpOkRequested(ctx.req)) {
+		const coerce = shouldForceHttpOk({
+			enabled: this.forceHttpOkEnabled,
+			status: ctx.status,
+			module,
+			hasBody: ctx.body !== undefined && ctx.body !== null,
+			headerRequested: isForceHttpOkRequested(ctx.req),
+		})
+		if (!coerce) {
 			return
 		}
 		ctx.set('X-Contember-Original-Status', String(ctx.status))

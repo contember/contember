@@ -7,7 +7,7 @@ import {
 	ModificationHandlerCreateSqlOptions,
 	ModificationHandlerOptions,
 } from '../ModificationHandler.js'
-import { createEventTrigger, createEventTrxTrigger, dropEventTrigger } from '../utils/sqlUpdateUtils.js'
+import { createEventTrigger, dropEventTrigger } from '../utils/sqlUpdateUtils.js'
 import { getColumnSqlType } from '../utils/columnUtils.js'
 import { wrapIdentifier } from '../../utils/dbHelpers.js'
 import { VERSION_LATEST } from '../ModificationVersions.js'
@@ -70,9 +70,11 @@ export class ConvertManyHasManyToJoiningEntityModificationHandler implements Mod
 			})`,
 		)
 
+		// Only the row-level `log_event` trigger is re-pointed onto the new surrogate primary key.
+		// The deferred `log_event_trx` constraint trigger takes no column params, so it is left
+		// untouched — dropping and re-creating it would fail with "trigger already exists".
 		if (joiningEntity.eventLog?.enabled !== false) {
 			createEventTrigger(builder, systemSchema, tableName, [primaryColumnName])
-			createEventTrxTrigger(builder, systemSchema, tableName)
 		}
 	}
 
@@ -80,6 +82,7 @@ export class ConvertManyHasManyToJoiningEntityModificationHandler implements Mod
 		const { entity, relation } = this.getRelation()
 		const version = this.options.formatVersion ?? VERSION_LATEST
 		const joiningEntity = this.data.joiningEntity
+		const joinUniqueConstraint = this.getJoinUniqueConstraint()
 
 		return updateSchema(
 			// remove the original many-has-many (owning side + inverse side)
@@ -92,7 +95,8 @@ export class ConvertManyHasManyToJoiningEntityModificationHandler implements Mod
 					[joiningEntity.name]: {
 						eventLog: { enabled: true },
 						...joiningEntity,
-						unique: Object.values(joiningEntity.unique ?? []),
+						// Keep the schema in sync with the join-uniqueness constraint emitted by createSql.
+						unique: [...Object.values(joiningEntity.unique ?? []), joinUniqueConstraint],
 						indexes: Object.values(joiningEntity.indexes ?? []),
 					},
 				},
@@ -110,6 +114,37 @@ export class ConvertManyHasManyToJoiningEntityModificationHandler implements Mod
 	describe() {
 		return {
 			message: `Converts ManyHasMany relation ${this.data.entityName}.${this.data.fieldName} to a joining entity ${this.data.joiningEntity.name}`,
+		}
+	}
+
+	/**
+	 * The join-uniqueness constraint (relationA, relationB) that replaces the dropped composite
+	 * primary key. The field names are resolved from the joining entity's two many-has-one relations
+	 * by matching their joining columns against the original junction columns, so the constraint
+	 * references schema field names (not raw column names).
+	 */
+	private getJoinUniqueConstraint(): Model.UniqueConstraint {
+		const { relation } = this.getRelation()
+		const joiningTable = relation.joiningTable
+		const joiningEntity = this.data.joiningEntity
+
+		const findRelationField = (columnName: string): string => {
+			const field = Object.values(joiningEntity.fields).find((it): it is Model.AnyRelation & Model.JoiningColumnRelation =>
+				'joiningColumn' in it && (it as Model.JoiningColumnRelation).joiningColumn.columnName === columnName
+			)
+			if (!field) {
+				throw new Error(
+					`Joining entity ${joiningEntity.name} has no many-has-one relation mapped to column ${columnName}`,
+				)
+			}
+			return field.name
+		}
+
+		return {
+			fields: [
+				findRelationField(joiningTable.joiningColumn.columnName),
+				findRelationField(joiningTable.inverseJoiningColumn.columnName),
+			],
 		}
 	}
 

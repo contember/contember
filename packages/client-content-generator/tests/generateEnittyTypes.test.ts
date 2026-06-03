@@ -26,4 +26,12 @@ describe('generate entities', () => {
 	test('generate reduced has by', () => {
 		expect(entityGenerator.generate(schemas.reducedHasManySchema.model)).toMatchSnapshot()
 	})
+
+	test('json column without schema stays JSONValue, with schema is derived', () => {
+		const output = entityGenerator.generate(schemas.jsonSchemaSchema.model)
+		// schema-less json column keeps JSONValue
+		expect(output).toContain('plain: JSONValue | null')
+		// json column with a schema gets the derived object type
+		expect(output).toContain('structured: { name: string; age?: number; tags?: readonly (string)[] } | null')
+	})
 })

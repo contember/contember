@@ -1,5 +1,5 @@
 import { Model } from '@contember/schema'
-import { acceptEveryFieldVisitor, acceptFieldVisitor } from '@contember/schema-utils'
+import { acceptEveryFieldVisitor, acceptFieldVisitor, jsonSchemaToTsType } from '@contember/schema-utils'
 
 import { getEnumTypeName } from './utils.js'
 
@@ -160,7 +160,9 @@ const columnToTsType = (column: Model.AnyColumn): string => {
 			case Model.ColumnType.Date:
 				return 'string'
 			case Model.ColumnType.Json:
-				return 'JSONValue'
+				// A jsonColumn with an attached JSON Schema gets a derived TypeScript type; without a
+				// schema (or for any construct the schema cannot faithfully express) it stays `JSONValue`.
+				return column.schema !== undefined ? jsonSchemaToTsType(column.schema) : 'JSONValue'
 			case Model.ColumnType.Uuid:
 				return 'string'
 			default:

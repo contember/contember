@@ -70,12 +70,10 @@ export type AllowedJsonSchemaAnnotationKeyword = (typeof ALLOWED_JSON_SCHEMA_ANN
 const supportedKeywordSet: ReadonlySet<string> = new Set<string>(SUPPORTED_JSON_SCHEMA_KEYWORDS)
 const annotationKeywordSet: ReadonlySet<string> = new Set<string>(ALLOWED_JSON_SCHEMA_ANNOTATION_KEYWORDS)
 
-export const isSupportedJsonSchemaKeyword = (keyword: string): keyword is SupportedJsonSchemaKeyword =>
-	supportedKeywordSet.has(keyword)
+export const isSupportedJsonSchemaKeyword = (keyword: string): keyword is SupportedJsonSchemaKeyword => supportedKeywordSet.has(keyword)
 
 export const isAllowedJsonSchemaAnnotationKeyword = (keyword: string): keyword is AllowedJsonSchemaAnnotationKeyword =>
 	annotationKeywordSet.has(keyword)
 
 /** A keyword is recognized if it is either a supported validation keyword or an allowed annotation. */
-export const isRecognizedJsonSchemaKeyword = (keyword: string): boolean =>
-	supportedKeywordSet.has(keyword) || annotationKeywordSet.has(keyword)
+export const isRecognizedJsonSchemaKeyword = (keyword: string): boolean => supportedKeywordSet.has(keyword) || annotationKeywordSet.has(keyword)

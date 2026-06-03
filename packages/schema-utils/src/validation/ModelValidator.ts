@@ -1,4 +1,4 @@
-import { Model } from '@contember/schema'
+import { Acl, Model } from '@contember/schema'
 import { ErrorBuilder, ValidationError } from './errors.js'
 import { acceptEveryFieldVisitor, getTargetEntity, isColumn, isInverseRelation, isOwningRelation } from '../model/index.js'
 import { collectUnsupportedJsonSchemaKeywords, SUPPORTED_JSON_SCHEMA_KEYWORDS } from '../json-schema/index.js'
@@ -6,7 +6,10 @@ import { collectUnsupportedJsonSchemaKeywords, SUPPORTED_JSON_SCHEMA_KEYWORDS } 
 const IDENTIFIER_PATTERN = /^[_a-zA-Z][_a-zA-Z0-9]*$/
 // An index operator class is an identifier, optionally schema-qualified (e.g. "public.gin_trgm_ops").
 const INDEX_OPCLASS_PATTERN = /^[_a-zA-Z][_a-zA-Z0-9$]*(\.[_a-zA-Z][_a-zA-Z0-9$]*)?$/
-const RESERVED_WORDS = ['and', 'or', 'not']
+// `and`/`or`/`not` are operators in `Input.Where`; `_old`/`_new` are update-state markers in ACL
+// predicates (also a `Where`). A field sharing any of these names would be shadowed by the operator
+// when the field is referenced inside a predicate, so they are forbidden as identifiers.
+const RESERVED_WORDS = ['and', 'or', 'not', Acl.PredicateOldStateMarker, Acl.PredicateNewStateMarker]
 
 export class ModelValidator {
 	constructor(private readonly model: Model.Schema) {}

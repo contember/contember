@@ -28,8 +28,9 @@ import { PossibleEntityShapeInMigrations } from '../../utils/PartialEntity.js'
  *
  * Limitations / requirements:
  *  - The junction table is assumed to use the standard composite primary key produced by Contember.
- *  - UUID back-filling relies on the `uuid_generate_v4()` SQL function that Contember installs in the
- *    project's system schema. No PostgreSQL extension is created by this migration.
+ *  - UUID back-filling uses a pure-SQL `uuid_generate_v4()` function in the project's system schema,
+ *    which the migration creates on the fly if missing (see {@link ensureUuidGenerator}). No
+ *    PostgreSQL extension is created by this migration.
  */
 export class ConvertManyHasManyToJoiningEntityModificationHandler implements ModificationHandler<ConvertManyHasManyToJoiningEntityModificationData> {
 	constructor(
@@ -62,6 +63,7 @@ export class ConvertManyHasManyToJoiningEntityModificationHandler implements Mod
 
 		// Add the surrogate primary key and back-fill it for existing rows.
 		builder.sql(`ALTER TABLE ${tableNameId} ADD COLUMN ${primaryColumnNameId} ${primaryColumnType}`)
+		builder.sql(ensureUuidGenerator(systemSchema))
 		builder.sql(`UPDATE ${tableNameId} SET ${primaryColumnNameId} = ${uuidGenerator(systemSchema)}`)
 		builder.sql(`ALTER TABLE ${tableNameId} ALTER COLUMN ${primaryColumnNameId} SET NOT NULL`)
 
@@ -165,11 +167,42 @@ export class ConvertManyHasManyToJoiningEntityModificationHandler implements Mod
 }
 
 /**
- * Contember installs a pure-SQL `uuid_generate_v4()` function in the project's system schema
- * (see the `trigger-event-function` system migration), so UUIDs can be generated without enabling
- * any PostgreSQL extension. It must be referenced through the system schema — it is not in `public`.
+ * UUIDs are back-filled with a pure-SQL `uuid_generate_v4()` function kept in the project's system
+ * schema, so no PostgreSQL extension is ever created. The function cannot be assumed to exist:
+ * Contember's system migrations only materialize it on databases where `pg_catalog.gen_random_uuid`
+ * is unavailable (i.e. PostgreSQL < 13), so on modern servers `system.uuid_generate_v4()` is absent.
+ * {@link ensureUuidGenerator} therefore (idempotently) creates it in the system schema up-front. It
+ * must be referenced through the system schema — it is not in `public` nor on the stage search_path.
  */
 const uuidGenerator = (systemSchema: string) => `${wrapIdentifier(systemSchema)}."uuid_generate_v4"()`
+
+/**
+ * Idempotently materialize the pure-SQL `uuid_generate_v4()` function in the system schema. The body
+ * matches the one Contember's `trigger-event-function` system migration installs, so the same
+ * extension-free UUID generator is reused everywhere. Wrapped in a guard so re-running (or running on
+ * a database where it already exists) is a no-op.
+ */
+const ensureUuidGenerator = (systemSchema: string) => {
+	const systemSchemaId = wrapIdentifier(systemSchema)
+	return `DO $ensure_uuid$
+BEGIN
+	IF NOT EXISTS(
+		SELECT FROM pg_proc
+		JOIN pg_namespace ON pg_proc.pronamespace = pg_namespace.oid
+		WHERE pg_namespace.nspname = ${quoteLiteral(systemSchema)} AND pg_proc.proname = 'uuid_generate_v4'
+	) THEN
+		CREATE FUNCTION ${systemSchemaId}."uuid_generate_v4"() RETURNS "uuid"
+		LANGUAGE "sql"
+		AS $ensure_uuid_body$
+			SELECT OVERLAY(OVERLAY(md5(random()::TEXT || ':' || clock_timestamp()::TEXT) PLACING '4' FROM 13) PLACING
+				to_hex(floor(random() * (11 - 8 + 1) + 8)::INT)::TEXT FROM 17)::UUID;
+		$ensure_uuid_body$;
+	END IF;
+END
+$ensure_uuid$;`
+}
+
+const quoteLiteral = (value: string) => `'${value.replace(/'/g, "''")}'`
 
 export const convertManyHasManyToJoiningEntityModification = createModificationType({
 	id: 'convertManyHasManyToJoiningEntity',

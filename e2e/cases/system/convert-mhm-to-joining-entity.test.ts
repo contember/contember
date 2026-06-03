@@ -133,34 +133,45 @@ test('System API: convert bidirectional many-has-many to a joining entity (prese
 	await tester.migrate(modifications, '2024-08-01-120000-convert-mhm')
 
 	// existing rows are preserved and now queryable through the new joining entity
-	const afterPost = await tester(gql`
-		query {
-			getPost(by: { id: "${postId}" }) {
-				postCategories { id category { title } }
+	const afterPost = await tester(
+		gql`
+			query($id: UUID!) {
+				getPost(by: { id: $id }) {
+					postCategories { id category { title } }
+				}
 			}
-		}
-	`).expect(200)
+		`,
+		{ variables: { id: postId } },
+	).expect(200)
 	const links = afterPost.body.data.getPost.postCategories
 	expect(links).toHaveLength(2)
 	expect(links.map((it: any) => it.category.title).sort()).toEqual(['A', 'B'])
 
 	// the join-uniqueness constraint is enforced (schema/DB stay in sync): re-linking
 	// the same (post, category) pair must be rejected.
-	const firstCategory = await tester(gql`
-		query { getPost(by: { id: "${postId}" }) { postCategories { category { id } } } }
-	`).expect(200)
-	const existingCategoryId = firstCategory.body.data.getPost.postCategories[0].category.id
-	const dup = await tester(gql`
-		mutation {
-			createPostCategory(data: {
-				post: { connect: { id: "${postId}" } }
-				category: { connect: { id: "${existingCategoryId}" } }
-			}) {
-				ok
-				errors { type }
+	const firstCategory = await tester(
+		gql`
+			query($id: UUID!) {
+				getPost(by: { id: $id }) { postCategories { category { id } } }
 			}
-		}
-	`).expect(200)
+		`,
+		{ variables: { id: postId } },
+	).expect(200)
+	const existingCategoryId = firstCategory.body.data.getPost.postCategories[0].category.id
+	const dup = await tester(
+		gql`
+			mutation($postId: UUID!, $categoryId: UUID!) {
+				createPostCategory(data: {
+					post: { connect: { id: $postId } }
+					category: { connect: { id: $categoryId } }
+				}) {
+					ok
+					errors { type }
+				}
+			}
+		`,
+		{ variables: { postId, categoryId: existingCategoryId } },
+	).expect(200)
 	expect(dup.body.data.createPostCategory.ok).toBe(false)
 })
 
@@ -192,13 +203,16 @@ test('System API: convert unidirectional many-has-many to a joining entity', asy
 
 	await tester.migrate(modifications, '2024-08-01-130000-convert-mhm-uni')
 
-	const afterPost = await tester(gql`
-		query {
-			getPost(by: { id: "${postId}" }) {
-				postCategories { category { title } }
+	const afterPost = await tester(
+		gql`
+			query($id: UUID!) {
+				getPost(by: { id: $id }) {
+					postCategories { category { title } }
+				}
 			}
-		}
-	`).expect(200)
+		`,
+		{ variables: { id: postId } },
+	).expect(200)
 	expect(afterPost.body.data.getPost.postCategories).toHaveLength(1)
 	expect(afterPost.body.data.getPost.postCategories[0].category.title).toBe('X')
 })

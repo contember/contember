@@ -25,6 +25,22 @@ const convertSql = SQL`
 	DROP TRIGGER "log_event" ON "post_categories";
 	DROP TRIGGER "log_event_trx" ON "post_categories";
 	ALTER TABLE "post_categories" ADD COLUMN "id" uuid;
+	DO $ensure_uuid$
+	BEGIN
+		IF NOT EXISTS(
+			SELECT FROM pg_proc
+			JOIN pg_namespace ON pg_proc.pronamespace = pg_namespace.oid
+			WHERE pg_namespace.nspname = 'system' AND pg_proc.proname = 'uuid_generate_v4'
+		) THEN
+			CREATE FUNCTION "system"."uuid_generate_v4"() RETURNS "uuid"
+			LANGUAGE "sql"
+			AS $ensure_uuid_body$
+				SELECT OVERLAY(OVERLAY(md5(random()::TEXT || ':' || clock_timestamp()::TEXT) PLACING '4' FROM 13) PLACING
+					to_hex(floor(random() * (11 - 8 + 1) + 8)::INT)::TEXT FROM 17)::UUID;
+			$ensure_uuid_body$;
+		END IF;
+	END
+	$ensure_uuid$;
 	UPDATE "post_categories" SET "id" = "system"."uuid_generate_v4"();
 	ALTER TABLE "post_categories" ALTER COLUMN "id" SET NOT NULL;
 	ALTER TABLE "post_categories" DROP CONSTRAINT "post_categories_pkey";

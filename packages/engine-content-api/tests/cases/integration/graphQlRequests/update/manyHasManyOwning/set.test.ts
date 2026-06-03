@@ -1,9 +1,9 @@
 import { test } from 'bun:test'
 import { Acl } from '@contember/schema'
-import { execute, failedTransaction, sqlTransaction } from '../../../../../src/test'
-import { GQL, SQL } from '../../../../../src/tags'
-import { testUuid } from '../../../../../src/testUuid'
-import { postWithCategories } from './schema'
+import { execute, failedTransaction, sqlTransaction } from '../../../../../src/test.js'
+import { GQL, SQL } from '../../../../../src/tags.js'
+import { testUuid } from '../../../../../src/testUuid.js'
+import { postWithCategories } from './schema.js'
 
 test('set with default orphanStrategy (disconnect) - junction', async () => {
 	await execute({

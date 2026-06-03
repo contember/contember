@@ -25,6 +25,30 @@ const createConnection = (): Connection => {
 	return new Connection(pool)
 }
 
+// A connection whose query() can be told to throw, used to verify the slot is released on error/rollback.
+const createFailingConnection = (shouldThrow: (sql: string) => boolean): Connection => {
+	const pool = new Pool(() => {
+		return new class extends EventEmitter {
+			connect() {
+				return Promise.resolve()
+			}
+
+			end() {
+				return Promise.resolve()
+			}
+
+			async query(sql: string) {
+				await timeout(1)
+				if (shouldThrow(sql)) {
+					throw new Error('boom')
+				}
+				return { rows: [], rowCount: 0, command: sql === 'COMMIT' ? 'COMMIT' : undefined }
+			}
+		}() as unknown as PgClient
+	}, { maxConnections: 10, logError: () => null })
+	return new Connection(pool)
+}
+
 it('limits concurrent connections per scope', async () => {
 	const connection = createConnection()
 	const limited = connection.withMaxConnections(2)
@@ -97,5 +121,84 @@ it('queues work beyond the limit and eventually completes all', async () => {
 	await Promise.all(Array.from({ length: 6 }, () => work()))
 
 	expect(completed).toBe(6)
+	await connection.end()
+})
+
+it('the (limit+1)th acquisition waits until a slot is released', async () => {
+	const connection = createConnection()
+	const limited = connection.withMaxConnections(1)
+
+	let firstReleased = false
+	let secondStartedBeforeFirstReleased = false
+
+	// hold the only slot open until we explicitly let go
+	let releaseFirst!: () => void
+	const firstGate = new Promise<void>(resolve => {
+		releaseFirst = resolve
+	})
+
+	const first = limited.scope(async () => {
+		await firstGate
+		firstReleased = true
+	})
+
+	const second = limited.scope(async () => {
+		// if the cap worked, the first slot was already released by the time we get here
+		if (!firstReleased) {
+			secondStartedBeforeFirstReleased = true
+		}
+	})
+
+	// give the event loop a chance to (incorrectly) start the second scope
+	await timeout(5)
+	expect(firstReleased).toBe(false)
+
+	releaseFirst()
+	await Promise.all([first, second])
+
+	expect(secondStartedBeforeFirstReleased).toBe(false)
+	await connection.end()
+})
+
+it('releases the slot when the scope callback throws', async () => {
+	const connection = createConnection()
+	const limited = connection.withMaxConnections(1)
+
+	await expect(limited.scope(async () => {
+		throw new Error('boom')
+	})).rejects.toThrow('boom')
+
+	// if the slot had leaked, this would hang until the test times out
+	const result = await limited.scope(async () => 'ok')
+	expect(result).toBe('ok')
+	await connection.end()
+})
+
+it('releases the slot when a query inside the scope throws', async () => {
+	const connection = createFailingConnection(sql => sql === 'FAIL')
+	const limited = connection.withMaxConnections(1)
+
+	await expect(limited.query('FAIL')).rejects.toThrow('boom')
+
+	const result = await limited.query('SELECT 1')
+	expect(result.rowCount).toBe(0)
+	await connection.end()
+})
+
+it('releases the slot when a transaction rolls back', async () => {
+	// fail the statement inside the transaction so executeTransaction issues a ROLLBACK and rethrows
+	const connection = createFailingConnection(sql => sql === 'FAIL')
+	const limited = connection.withMaxConnections(1)
+
+	await expect(limited.transaction(async trx => {
+		await trx.query('FAIL')
+	})).rejects.toThrow('boom')
+
+	// the slot (and the only allowed connection) must be free again for the next request
+	const result = await limited.transaction(async trx => {
+		await trx.query('SELECT 1')
+		return 'ok'
+	})
+	expect(result).toBe('ok')
 	await connection.end()
 })

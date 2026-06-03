@@ -193,3 +193,28 @@ test('json schema reports unsupported keyword inside a combinator', () => {
 	expect(errors[0].message).toContain('unsupported keyword "patternProperties"')
 	expect(errors[0].message).toContain('at "/anyOf/1"')
 })
+
+test('rejects fields named after the _old/_new state markers', () => {
+	const model: Model.Schema = {
+		enums: {},
+		entities: {
+			Foo: {
+				fields: {
+					id: { columnName: 'id', name: 'id', nullable: false, type: Model.ColumnType.Uuid, columnType: 'uuid' },
+					_old: { columnName: '_old', name: '_old', nullable: true, type: Model.ColumnType.String, columnType: 'text' },
+					_new: { columnName: '_new', name: '_new', nullable: true, type: Model.ColumnType.String, columnType: 'text' },
+				},
+				name: 'Foo',
+				primary: 'id',
+				primaryColumn: 'id',
+				tableName: 'foo',
+				unique: [],
+				eventLog: { enabled: true },
+				indexes: [],
+			},
+		},
+	}
+	const errors = new ModelValidator(model).validate()
+	expect(errors.map(it => it.message)).toContain('_old is reserved word')
+	expect(errors.map(it => it.message)).toContain('_new is reserved word')
+})

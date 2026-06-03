@@ -188,8 +188,7 @@ test('set applies the target read predicate when computing orphans - inverse jun
 				// orphan-candidate fetch joins the target entity and applies its read predicate, so members
 				// the role cannot read are excluded from the diff and left untouched.
 				{
-					sql:
-						SQL`select "junction_"."post_id" as "primary_" from "public"."post_categories" as "junction_"
+					sql: SQL`select "junction_"."post_id" as "primary_" from "public"."post_categories" as "junction_"
 						inner join "public"."post" as "root_" on "junction_"."post_id" = "root_"."id"
 						where "junction_"."category_id" = ? and "root_"."title" = ?`,
 					parameters: [testUuid(2), 'visible'],

@@ -345,13 +345,33 @@ export class Mapper<ConnectionType extends Connection.ConnectionLike = Connectio
 		const owningContext = context.type === 'manyHasManyOwning'
 			? { entity: context.entity, relation: context.relation, ownerIsJoining: true }
 			: { entity: context.targetEntity, relation: context.targetRelation, ownerIsJoining: false }
+		const targetEntity = context.targetEntity
 		const joiningTable = owningContext.relation.joiningTable
 		const ownerColumn = owningContext.ownerIsJoining ? joiningTable.joiningColumn.columnName : joiningTable.inverseJoiningColumn.columnName
 		const targetColumn = owningContext.ownerIsJoining ? joiningTable.inverseJoiningColumn.columnName : joiningTable.joiningColumn.columnName
-		const qb = SelectBuilder.create()
+
+		// Apply the target entity's ACL read predicate so that members the current role cannot read
+		// are excluded from the orphan computation (left untouched), matching the oneHasMany behavior.
+		// `inject` returns an empty where when there is no read predicate, in which case the junction
+		// is read directly with no join, preserving the permissive/no-ACL query unchanged.
+		const readPredicate = this.predicatesInjector.inject(targetEntity, {})
+		const hasReadPredicate = Object.keys(readPredicate).length > 0
+
+		let qb = SelectBuilder.create()
 			.from(joiningTable.tableName, 'junction_')
 			.select(['junction_', targetColumn], 'primary_')
 			.where(cond => cond.compare(['junction_', ownerColumn], Operator.eq, ownerPrimary))
+
+		if (hasReadPredicate) {
+			const path = this.pathFactory.create([])
+			qb = qb.join(
+				targetEntity.tableName,
+				path.alias,
+				clause => clause.compareColumns(['junction_', targetColumn], Operator.eq, [path.alias, targetEntity.primaryColumn]),
+			)
+			qb = this.whereBuilder.build(qb, targetEntity, path, readPredicate)
+		}
+
 		const rows = await qb.getResult(this.db)
 		return rows.map(it => it.primary_ as Input.PrimaryValue)
 	}

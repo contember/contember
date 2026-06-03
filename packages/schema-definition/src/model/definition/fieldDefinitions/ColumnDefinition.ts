@@ -62,6 +62,11 @@ export class ColumnDefinition extends FieldDefinition<ColumnDefinitionOptions> {
 	/**
 	 * Attaches a JSON Schema to a JSON column. Input values are validated against it on create/update.
 	 * The schema is stored as metadata and does not affect the database schema.
+	 *
+	 * Only honored for JSON columns ({@link jsonColumn}); it is silently ignored on other column types.
+	 * Validation runs on mutation input only — stored rows are not re-validated when the schema changes,
+	 * and the data-transfer/import path bypasses it. Only a subset of JSON Schema keywords is supported;
+	 * see {@link validateJsonSchema} for the exact list.
 	 */
 	public schema(schema: JSONValue): ColumnDefinition {
 		return this.withOption('schema', schema)

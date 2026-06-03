@@ -9,18 +9,21 @@ export interface JsonSchemaValidationError {
 type JsonSchema = { readonly [key: string]: JSONValue } | boolean
 
 /**
- * A pragmatic, dependency-free validator for a subset of JSON Schema (draft 2020-12 compatible).
+ * A pragmatic, dependency-free validator for a *subset* of JSON Schema. It is intentionally not a
+ * full draft 2020-12 implementation — it only understands the keywords listed below.
  *
  * Supported keywords:
  * - `type` (string or array of strings: object, array, string, number, integer, boolean, null)
  * - `enum`, `const`
  * - object: `properties`, `required`, `additionalProperties`, `minProperties`, `maxProperties`
- * - array: `items`, `minItems`, `maxItems`, `uniqueItems`
+ * - array: `items` (applied to ALL elements, draft-07 style), `minItems`, `maxItems`, `uniqueItems`
  * - string: `minLength`, `maxLength`, `pattern`
  * - number: `minimum`, `maximum`, `exclusiveMinimum`, `exclusiveMaximum`, `multipleOf`
  * - combinators: `allOf`, `anyOf`, `oneOf`, `not`
  *
- * Unknown keywords are ignored (treated as valid), matching the lenient JSON Schema philosophy.
+ * Any other keyword is SILENTLY IGNORED (treated as valid) — including `$ref`, `$defs`, `format`,
+ * `patternProperties`, `propertyNames`, `dependentRequired`, `dependentSchemas`, `if`/`then`/`else`,
+ * `contains`, and the 2020-12 tuple keyword `prefixItems`. Such keywords look validated but are not.
  */
 export const validateJsonSchema = (schema: JSONValue, value: JSONValue | undefined): JsonSchemaValidationError[] => {
 	const errors: JsonSchemaValidationError[] = []

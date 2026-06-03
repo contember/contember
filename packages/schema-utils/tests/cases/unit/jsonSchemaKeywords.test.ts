@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test'
-import { collectUnsupportedJsonSchemaKeywords } from '../../../src'
+import { collectUnsupportedJsonSchemaKeywords } from '../../../src/index.js'
 
 describe('collectUnsupportedJsonSchemaKeywords', () => {
 	test('accepts a fully supported schema', () => {

@@ -1,6 +1,6 @@
 import { describe, it } from 'bun:test'
-import { assert } from '../../src/assert'
-import { validateJsonSchema } from '../../../src/input-validation/JsonSchemaValidator'
+import { assert } from '../../src/assert.js'
+import { validateJsonSchema } from '../../../src/input-validation/JsonSchemaValidator.js'
 
 describe('JSON schema validator', () => {
 	it('validates type', () => {

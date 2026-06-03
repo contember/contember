@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test'
-import { jsonSchemaToTsType } from '../../../src'
+import { jsonSchemaToTsType } from '../../../src/index.js'
 
 describe('jsonSchemaToTsType', () => {
 	test('scalars', () => {

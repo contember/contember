@@ -1,8 +1,8 @@
 import { test } from 'bun:test'
-import { execute, failedTransaction, sqlTransaction } from '../../../../../src/test'
-import { GQL, SQL } from '../../../../../src/tags'
-import { testUuid } from '../../../../../src/testUuid'
-import { postWithNullableLocale } from './schema'
+import { execute, failedTransaction, sqlTransaction } from '../../../../../src/test.js'
+import { GQL, SQL } from '../../../../../src/tags.js'
+import { testUuid } from '../../../../../src/testUuid.js'
+import { postWithNullableLocale } from './schema.js'
 
 test('set with default orphanStrategy (disconnect)', async () => {
 	await execute({

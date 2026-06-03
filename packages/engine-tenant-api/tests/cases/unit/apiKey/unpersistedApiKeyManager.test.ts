@@ -67,6 +67,24 @@ test('verify returns null for a non-matching token', () => {
 	expect(manager.verify('wrong')).toBeNull()
 })
 
+test('verify resolves every configured token, regardless of position', () => {
+	// Mix of plain tokens and a pre-computed hash; every one must resolve.
+	// This also guards the constant-time loop, which intentionally does not
+	// early-return on the first match.
+	const manager = UnpersistedApiKeyManager.createForRootTokens({
+		tokens: ['first-token', 'second-token'],
+		tokenHashes: [computeTokenHash('third-token')],
+	})
+
+	for (const token of ['first-token', 'second-token', 'third-token']) {
+		const result = manager.verify(token)
+		expect(result).not.toBeNull()
+		expect(result!.identityId).toBe(UNPERSISTED_ROOT_IDENTITY_ID)
+		expect(result!.roles).toEqual([TenantRole.SUPER_ADMIN])
+	}
+	expect(manager.verify('unknown-token')).toBeNull()
+})
+
 test('createForRootTokens rejects malformed token hashes', () => {
 	expect(() => UnpersistedApiKeyManager.createForRootTokens({ tokenHashes: ['not-a-valid-hash'] })).toThrow()
 })

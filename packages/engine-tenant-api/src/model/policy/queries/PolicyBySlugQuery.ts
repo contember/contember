@@ -1,6 +1,6 @@
 import { DatabaseQuery, DatabaseQueryable, SelectBuilder } from '@contember/database'
-import { PolicyDto } from '../PolicyDto'
-import { PolicyRow, rowToPolicy } from './rowMapping'
+import { PolicyDto } from '../PolicyDto.js'
+import { PolicyRow, rowToPolicy } from './rowMapping.js'
 
 export class PolicyBySlugQuery extends DatabaseQuery<PolicyDto | null> {
 	constructor(private readonly slug: string) {

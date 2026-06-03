@@ -1,5 +1,5 @@
 import { DatabaseQuery, DatabaseQueryable, SelectBuilder } from '@contember/database'
-import { IdentityPolicyAssignment } from '../PolicyDto'
+import { IdentityPolicyAssignment } from '../PolicyDto.js'
 
 export class IdentityPolicyAssignmentsQuery extends DatabaseQuery<IdentityPolicyAssignment[]> {
 	constructor(private readonly identityId: string) {

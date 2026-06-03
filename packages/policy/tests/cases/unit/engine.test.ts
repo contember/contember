@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test'
-import { PolicyEngine, Statement, StaticPolicySource } from '../../../src'
+import { PolicyEngine, Statement, StaticPolicySource } from '../../../src/index.js'
 
 const engine = (statements: Statement[]) => new PolicyEngine([new StaticPolicySource('test', statements)])
 

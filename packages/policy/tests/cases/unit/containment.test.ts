@@ -8,7 +8,7 @@ import {
 	maxExpand,
 	Policy,
 	Statement,
-} from '../../../src'
+} from '../../../src/index.js'
 
 describe('globSubsumes', () => {
 	test('wildcard subsumes anything', () => {

@@ -1,7 +1,7 @@
 import { describe, expect, test } from 'bun:test'
 import { PolicyEngine } from '@contember/policy'
 import { Acl } from '@contember/schema'
-import { ASSUME_MEMBERSHIP_ACTION, AssumeMembershipPolicySource, buildMembershipSubject } from '../../../../src/model/policy'
+import { ASSUME_MEMBERSHIP_ACTION, AssumeMembershipPolicySource, buildMembershipSubject } from '../../../../src/model/policy/index.js'
 
 const projectSlug = 'webmaster'
 const resource = `project:${projectSlug}`

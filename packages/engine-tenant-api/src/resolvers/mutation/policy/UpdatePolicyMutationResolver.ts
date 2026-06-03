@@ -1,8 +1,8 @@
-import { MutationResolvers, MutationUpdatePolicyArgs, UpdatePolicyResponse } from '../../../schema'
-import { TenantResolverContext } from '../../TenantResolverContext'
-import { PermissionActions, PolicyBoundaryError, PolicyNotFoundError, PolicyService, PolicyValidationError } from '../../../model'
-import { createErrorResponse } from '../../errorUtils'
-import { policyDocumentFromInput, PolicyResponseFactory } from '../../responseHelpers/PolicyResponseFactory'
+import { MutationResolvers, MutationUpdatePolicyArgs, UpdatePolicyResponse } from '../../../schema/index.js'
+import { TenantResolverContext } from '../../TenantResolverContext.js'
+import { PermissionActions, PolicyBoundaryError, PolicyNotFoundError, PolicyService, PolicyValidationError } from '../../../model/index.js'
+import { createErrorResponse } from '../../errorUtils.js'
+import { policyDocumentFromInput, PolicyResponseFactory } from '../../responseHelpers/PolicyResponseFactory.js'
 
 export class UpdatePolicyMutationResolver implements MutationResolvers {
 	constructor(private readonly policyService: PolicyService) {}

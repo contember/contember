@@ -1,4 +1,4 @@
-import { EvaluationContext } from './types'
+import { EvaluationContext } from './types.js'
 
 /**
  * Read a dot-path from the evaluation context. Returns undefined when any

@@ -1,6 +1,6 @@
 import { Cell, computeGrantableSurface, findUngrantableCells, Policy } from '@contember/policy'
-import { DatabaseContext } from '../utils'
-import { TenantDbPolicyProvider } from './TenantDbPolicyProvider'
+import { DatabaseContext } from '../utils/index.js'
+import { TenantDbPolicyProvider } from './TenantDbPolicyProvider.js'
 
 /** The identity performing a policy mutation — its own (global) roles bound the grant. */
 export interface PolicyActor {

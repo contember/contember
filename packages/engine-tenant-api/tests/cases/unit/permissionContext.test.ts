@@ -2,12 +2,12 @@ import { describe, expect, test } from 'bun:test'
 import { Acl, ProjectRole, Schema } from '@contember/schema'
 import { Statement } from '@contember/policy'
 import { emptySchema } from '@contember/schema-utils'
-import { PermissionContext } from '../../../src/model/authorization/PermissionContext'
-import { StaticIdentity } from '../../../src/model/authorization/Identity'
-import { TenantRole } from '../../../src/model/authorization/Roles'
-import { PermissionActions } from '../../../src/model/authorization/PermissionActions'
-import { ProjectSchemaResolver } from '../../../src/model/type'
-import { IdentityPolicyAssignmentsQuery } from '../../../src/model/policy/queries'
+import { PermissionContext } from '../../../src/model/authorization/PermissionContext.js'
+import { StaticIdentity } from '../../../src/model/authorization/Identity.js'
+import { TenantRole } from '../../../src/model/authorization/Roles.js'
+import { PermissionActions } from '../../../src/model/authorization/PermissionActions.js'
+import { ProjectSchemaResolver } from '../../../src/model/type/index.js'
+import { IdentityPolicyAssignmentsQuery } from '../../../src/model/policy/queries/index.js'
 
 // No custom-policy assignments — authorization is driven purely by built-in
 // role policies, so we can assert pure project-aware role synthesis.

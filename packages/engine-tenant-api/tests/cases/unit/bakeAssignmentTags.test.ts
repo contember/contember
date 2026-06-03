@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test'
-import { bakeAssignmentTags } from '../../../src/model/policy'
+import { bakeAssignmentTags } from '../../../src/model/policy/index.js'
 import type { Statement } from '@contember/policy'
 
 /**

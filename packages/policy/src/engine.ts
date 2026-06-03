@@ -1,7 +1,7 @@
-import { EvaluationContext, EvaluationResult, MatchTrace, PolicySource, Statement } from './types'
-import { globMatchAny } from './glob'
-import { hasUnresolvedPlaceholder, substituteString } from './context'
-import { ConditionOperator, defaultOperators, evaluateConditions } from './conditions'
+import { EvaluationContext, EvaluationResult, MatchTrace, PolicySource, Statement } from './types.js'
+import { globMatchAny } from './glob.js'
+import { hasUnresolvedPlaceholder, substituteString } from './context.js'
+import { ConditionOperator, defaultOperators, evaluateConditions } from './conditions.js'
 
 export interface PolicyEngineOptions {
 	operators?: Record<string, ConditionOperator>

@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test'
-import { defaultOperators, evaluateConditions, UnknownConditionOperatorError } from '../../../src'
+import { defaultOperators, evaluateConditions, UnknownConditionOperatorError } from '../../../src/index.js'
 
 const ctx = (context: Record<string, unknown>) => ({ context, operators: defaultOperators })
 

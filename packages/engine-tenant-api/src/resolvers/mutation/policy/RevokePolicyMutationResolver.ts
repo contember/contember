@@ -1,7 +1,7 @@
-import { MutationResolvers, MutationRevokePolicyArgs, RevokePolicyResponse } from '../../../schema'
-import { TenantResolverContext } from '../../TenantResolverContext'
-import { PermissionActions, PolicyBoundaryError, PolicyService } from '../../../model'
-import { createErrorResponse } from '../../errorUtils'
+import { MutationResolvers, MutationRevokePolicyArgs, RevokePolicyResponse } from '../../../schema/index.js'
+import { TenantResolverContext } from '../../TenantResolverContext.js'
+import { PermissionActions, PolicyBoundaryError, PolicyService } from '../../../model/index.js'
+import { createErrorResponse } from '../../errorUtils.js'
 
 export class RevokePolicyMutationResolver implements MutationResolvers {
 	constructor(private readonly policyService: PolicyService) {}

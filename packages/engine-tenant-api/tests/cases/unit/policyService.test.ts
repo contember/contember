@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test'
-import { PolicyValidationError, validateAssignmentTags, validatePolicyDocument, validatePolicySlug } from '../../../src/model/policy'
+import { PolicyValidationError, validateAssignmentTags, validatePolicyDocument, validatePolicySlug } from '../../../src/model/policy/index.js'
 
 describe('slug validation', () => {
 	test('accepts simple slugs', () => {

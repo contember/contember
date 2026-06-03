@@ -1,6 +1,6 @@
 import { Acl } from '@contember/schema'
 import { EvaluationContext, PolicySource, Statement } from '@contember/policy'
-import { statementsForMembershipRule } from './membershipRuleStatements'
+import { statementsForMembershipRule } from './membershipRuleStatements.js'
 
 /**
  * Action emitted/queried by {@link AssumeMembershipPolicySource}.

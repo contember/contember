@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test'
-import { readPath, substituteString, substituteValue } from '../../../src'
+import { readPath, substituteString, substituteValue } from '../../../src/index.js'
 
 describe('readPath', () => {
 	test('reads simple paths', () => {

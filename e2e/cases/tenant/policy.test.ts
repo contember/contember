@@ -1,5 +1,5 @@
 import { expect, test } from 'bun:test'
-import { createTester, executeGraphql, gql, rand } from '../../src/tester'
+import { createTester, executeGraphql, gql, rand } from '../../src/tester.js'
 import { emptySchema } from '@contember/schema-utils'
 
 const sendTenant = (

@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test'
-import { globMatch, globToRegExp } from '../../../src'
+import { globMatch, globToRegExp } from '../../../src/index.js'
 
 describe('glob matching', () => {
 	test('exact match', () => {

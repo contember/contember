@@ -1,7 +1,7 @@
-import { BuiltinPolicy, QueryResolvers } from '../../schema'
-import { TenantResolverContext } from '../TenantResolverContext'
-import { BUILTIN_POLICIES, PermissionActions } from '../../model'
-import { PolicyResponseFactory } from '../responseHelpers/PolicyResponseFactory'
+import { BuiltinPolicy, QueryResolvers } from '../../schema/index.js'
+import { TenantResolverContext } from '../TenantResolverContext.js'
+import { BUILTIN_POLICIES, PermissionActions } from '../../model/index.js'
+import { PolicyResponseFactory } from '../responseHelpers/PolicyResponseFactory.js'
 
 export class BuiltinPolicyQueryResolver implements QueryResolvers {
 	async builtinPolicies(_: unknown, __: unknown, context: TenantResolverContext): Promise<BuiltinPolicy[]> {

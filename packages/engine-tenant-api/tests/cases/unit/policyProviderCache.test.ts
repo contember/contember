@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'bun:test'
-import { TenantDbPolicyProvider } from '../../../src/model/policy'
-import type { DatabaseContext } from '../../../src/model/utils'
+import { TenantDbPolicyProvider } from '../../../src/model/policy/index.js'
+import type { DatabaseContext } from '../../../src/model/utils/index.js'
 
 /**
  * Verifies that the per-request provider hits the DB once per instance even if

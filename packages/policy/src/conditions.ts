@@ -1,6 +1,6 @@
-import { ConditionBlock, ConditionValue, Effect, EvaluationContext } from './types'
-import { hasUnresolvedPlaceholder, readPath, substituteValue } from './context'
-import { globMatch } from './glob'
+import { ConditionBlock, ConditionValue, Effect, EvaluationContext } from './types.js'
+import { hasUnresolvedPlaceholder, readPath, substituteValue } from './context.js'
+import { globMatch } from './glob.js'
 
 /**
  * Tri-state operator result.

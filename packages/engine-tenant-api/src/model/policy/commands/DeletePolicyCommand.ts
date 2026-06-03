@@ -1,4 +1,4 @@
-import { Command } from '../../commands/Command'
+import { Command } from '../../commands/Command.js'
 import { DeleteBuilder } from '@contember/database'
 
 export class DeletePolicyCommand implements Command<{ deleted: boolean }> {

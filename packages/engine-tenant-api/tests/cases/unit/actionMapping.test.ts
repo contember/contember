@@ -1,7 +1,7 @@
 import { describe, expect, test } from 'bun:test'
-import { translateAction } from '../../../src/model/authorization/actionMapping'
-import { PermissionActions } from '../../../src/model/authorization/PermissionActions'
-import { StaticIdentity } from '../../../src/model/authorization/Identity'
+import { translateAction } from '../../../src/model/authorization/actionMapping.js'
+import { PermissionActions } from '../../../src/model/authorization/PermissionActions.js'
+import { StaticIdentity } from '../../../src/model/authorization/Identity.js'
 import { Acl } from '@contember/schema'
 
 /**

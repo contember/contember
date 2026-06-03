@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test'
-import { AssignPolicyCommand, PolicyValidationError } from '../../../src/model/policy'
+import { AssignPolicyCommand, PolicyValidationError } from '../../../src/model/policy/index.js'
 
 const fakeArgs = (): any => ({
 	db: {

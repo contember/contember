@@ -1,9 +1,9 @@
 import { describe, expect, test } from 'bun:test'
-import { PolicyNotFoundError, PolicyService, PolicyValidationError } from '../../../src/model/policy'
-import { IdentityPolicyAssignmentsQuery } from '../../../src/model/policy/queries/IdentityPolicyAssignmentsQuery'
-import { IdentityQuery } from '../../../src/model/queries/identity/IdentityQuery'
-import type { DatabaseContext } from '../../../src/model/utils'
-import type { PolicyActor, PolicyDto } from '../../../src/model/policy'
+import { PolicyNotFoundError, PolicyService, PolicyValidationError } from '../../../src/model/policy/index.js'
+import { IdentityPolicyAssignmentsQuery } from '../../../src/model/policy/queries/IdentityPolicyAssignmentsQuery.js'
+import { IdentityQuery } from '../../../src/model/queries/identity/IdentityQuery.js'
+import type { DatabaseContext } from '../../../src/model/utils/index.js'
+import type { PolicyActor, PolicyDto } from '../../../src/model/policy/index.js'
 
 const actor: PolicyActor = { id: 'actor-id', roles: [] }
 

@@ -1,4 +1,4 @@
-import { Command } from '../../commands/Command'
+import { Command } from '../../commands/Command.js'
 import { InsertBuilder } from '@contember/database'
 import { Policy } from '@contember/policy'
 

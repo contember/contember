@@ -1,8 +1,8 @@
 import { Authorizator } from '@contember/authorization'
 import { Acl } from '@contember/schema'
 import { EvaluationContext } from '@contember/policy'
-import { Identity } from './Identity'
-import { PermissionActions } from './PermissionActions'
+import { Identity } from './Identity.js'
+import { PermissionActions } from './PermissionActions.js'
 
 /**
  * Shape of `action.meta` after the authorizator erases its generic. The fields

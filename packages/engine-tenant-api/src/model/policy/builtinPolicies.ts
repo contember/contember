@@ -1,6 +1,6 @@
 import { Policy } from '@contember/policy'
-import { TenantRole } from '../authorization/Roles'
-import { TenantActions } from './actions'
+import { TenantRole } from '../authorization/Roles.js'
+import { TenantActions } from './actions.js'
 
 /**
  * Built-in policies that mirror the hardcoded TenantRole permissions in

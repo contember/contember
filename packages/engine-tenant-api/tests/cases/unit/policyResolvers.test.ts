@@ -7,9 +7,9 @@ import {
 	PolicyQueryResolver,
 	RevokePolicyMutationResolver,
 	UpdatePolicyMutationResolver,
-} from '../../../src/resolvers'
-import { BUILTIN_POLICIES, PolicyDto, PolicyNotFoundError, PolicyService, PolicyValidationError } from '../../../src/model/policy'
-import { TenantResolverContext } from '../../../src/resolvers/TenantResolverContext'
+} from '../../../src/resolvers/index.js'
+import { BUILTIN_POLICIES, PolicyDto, PolicyNotFoundError, PolicyService, PolicyValidationError } from '../../../src/model/policy/index.js'
+import { TenantResolverContext } from '../../../src/resolvers/TenantResolverContext.js'
 
 const samplePolicy: PolicyDto = {
 	id: 'policy-1',

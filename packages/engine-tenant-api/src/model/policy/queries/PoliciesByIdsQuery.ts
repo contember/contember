@@ -1,6 +1,6 @@
 import { DatabaseQuery, DatabaseQueryable, SelectBuilder } from '@contember/database'
-import { PolicyDto } from '../PolicyDto'
-import { PolicyRow, rowToPolicy } from './rowMapping'
+import { PolicyDto } from '../PolicyDto.js'
+import { PolicyRow, rowToPolicy } from './rowMapping.js'
 
 export class PoliciesByIdsQuery extends DatabaseQuery<PolicyDto[]> {
 	constructor(private readonly ids: readonly string[]) {

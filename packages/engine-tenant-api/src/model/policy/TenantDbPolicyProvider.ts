@@ -1,7 +1,7 @@
 import { ConditionBlock, EvaluationContext, PolicySource, Statement, substituteValue } from '@contember/policy'
-import { DatabaseContext } from '../utils'
-import { IdentityPolicyAssignmentsQuery, PoliciesByIdsQuery } from './queries'
-import { BUILTIN_POLICIES } from './builtinPolicies'
+import { DatabaseContext } from '../utils/index.js'
+import { IdentityPolicyAssignmentsQuery, PoliciesByIdsQuery } from './queries/index.js'
+import { BUILTIN_POLICIES } from './builtinPolicies.js'
 
 interface IdentityInput {
 	id: string

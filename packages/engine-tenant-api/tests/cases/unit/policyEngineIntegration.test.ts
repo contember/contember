@@ -1,7 +1,7 @@
 import { describe, expect, test } from 'bun:test'
 import { PolicyEngine, StaticPolicySource } from '@contember/policy'
 import { Acl } from '@contember/schema'
-import { BUILTIN_POLICIES, ProjectSchemaPolicyProvider, TenantActions, TenantResources } from '../../../src/model/policy'
+import { BUILTIN_POLICIES, ProjectSchemaPolicyProvider, TenantActions, TenantResources } from '../../../src/model/policy/index.js'
 
 const decision = async (sources: { name: string; statements: any[] }[], action: string, resource: string, ctx: any) => {
 	const engine = new PolicyEngine(sources.map(s => new StaticPolicySource(s.name, s.statements)))

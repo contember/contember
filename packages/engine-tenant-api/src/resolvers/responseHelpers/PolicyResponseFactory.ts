@@ -3,10 +3,10 @@ import {
 	PolicyAssignment as GraphQLPolicyAssignment,
 	PolicyDocument as GraphQLPolicyDocument,
 	PolicyDocumentInput,
-} from '../../schema'
+} from '../../schema/index.js'
 import { Policy as PolicyDocumentModel } from '@contember/policy'
-import { IdentityPolicyAssignment, PolicyDto } from '../../model/policy'
-import { BuiltinPolicyDefinition } from '../../model/policy/builtinPolicies'
+import { IdentityPolicyAssignment, PolicyDto } from '../../model/policy/index.js'
+import { BuiltinPolicyDefinition } from '../../model/policy/builtinPolicies.js'
 
 export class PolicyResponseFactory {
 	static toGraphQL(policy: PolicyDto): GraphQLPolicy {

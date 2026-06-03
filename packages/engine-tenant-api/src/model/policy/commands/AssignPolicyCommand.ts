@@ -1,6 +1,6 @@
-import { Command } from '../../commands/Command'
+import { Command } from '../../commands/Command.js'
 import { ConflictActionType, InsertBuilder } from '@contember/database'
-import { validateAssignmentTags } from '../validation'
+import { validateAssignmentTags } from '../validation.js'
 
 export interface AssignPolicyInput {
 	identityId: string

@@ -1,5 +1,5 @@
 import { Policy } from '@contember/policy'
-import { PolicyDto } from '../PolicyDto'
+import { PolicyDto } from '../PolicyDto.js'
 
 export interface PolicyRow {
 	id: string

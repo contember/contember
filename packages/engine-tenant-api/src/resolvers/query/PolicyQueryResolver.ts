@@ -1,7 +1,7 @@
-import { Policy as GraphQLPolicy, QueryPolicyArgs, QueryResolvers } from '../../schema'
-import { TenantResolverContext } from '../TenantResolverContext'
-import { PermissionActions, PolicyService } from '../../model'
-import { PolicyResponseFactory } from '../responseHelpers/PolicyResponseFactory'
+import { Policy as GraphQLPolicy, QueryPolicyArgs, QueryResolvers } from '../../schema/index.js'
+import { TenantResolverContext } from '../TenantResolverContext.js'
+import { PermissionActions, PolicyService } from '../../model/index.js'
+import { PolicyResponseFactory } from '../responseHelpers/PolicyResponseFactory.js'
 
 export class PolicyQueryResolver implements QueryResolvers {
 	constructor(private readonly policyService: PolicyService) {}

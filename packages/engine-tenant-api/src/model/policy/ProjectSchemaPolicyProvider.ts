@@ -1,7 +1,7 @@
 import { Acl } from '@contember/schema'
 import { EvaluationContext, PolicySource, Statement } from '@contember/policy'
-import { TenantActions, TenantResources } from './actions'
-import { statementsForMembershipRule } from './membershipRuleStatements'
+import { TenantActions, TenantResources } from './actions.js'
+import { statementsForMembershipRule } from './membershipRuleStatements.js'
 
 /**
  * Translate `Acl.Membership` (array-of-`{name, values}`) into the engine

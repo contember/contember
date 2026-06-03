@@ -1,7 +1,7 @@
 import { describe, expect, test } from 'bun:test'
 import type { Acl } from '@contember/schema'
 import { PolicyEngine } from '@contember/policy'
-import { buildMembershipSubject, ProjectSchemaPolicyProvider, TenantActions, TenantResources } from '../../../src/model/policy'
+import { buildMembershipSubject, ProjectSchemaPolicyProvider, TenantActions, TenantResources } from '../../../src/model/policy/index.js'
 
 describe('buildMembershipSubject', () => {
 	test('translates array-of-{name,values} into a flat object', () => {

@@ -1,3 +1,4 @@
+export * from './ConvertManyHasManyToJoiningEntityModification.js'
 export * from './ConvertOneHasManyToManyHasManyRelationModification.js'
 export * from './ConvertOneToManyRelationModification.js'
 export * from './CreateRelationInverseSideModification.js'

@@ -15,6 +15,7 @@ import { updateViewModification } from './entities/UpdateViewModification.js'
 import { createEnumModification, removeEnumModification, updateEnumModification } from './enums/index.js'
 import { removeFieldModification, updateFieldNameModification } from './fields/index.js'
 import {
+	convertManyHasManyToJoiningEntityModification,
 	convertOneHasManyToManyHasManyRelationModification,
 	convertOneToManyRelationModification,
 	createRelationInverseSideModification,
@@ -90,6 +91,7 @@ namespace ModificationHandlerFactory {
 		toggleEventLogModification,
 		toggleJunctionEventLogModification,
 		convertOneHasManyToManyHasManyRelationModification,
+		convertManyHasManyToJoiningEntityModification,
 		updateEntityOrderByModification,
 		createTriggerModification,
 		updateTriggerModification,

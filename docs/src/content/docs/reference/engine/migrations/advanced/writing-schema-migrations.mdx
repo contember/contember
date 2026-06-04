@@ -110,3 +110,96 @@ Similar to the `updateEntityName` modification, the `updateFieldName` modificati
 ```
 
 In this example, the field named "OldField" within the entity "Entity" will be renamed to "NewField" using the `updateFieldName` modification.
+
+### <span className="version">Engine 2.1+</span> Converting a many-has-many relation to a joining entity
+
+Contember stores a many-has-many relation in an implicit junction table that you cannot query or extend directly. When you later need to attach data to the relation itself (e.g. a position, a timestamp, or any extra column), you have to promote that junction table into an explicit **joining entity** with its own two many-has-one relations.
+
+The `convertManyHasManyToJoiningEntity` modification performs this promotion **in place**, reusing the existing junction table so that all current links are preserved — no rows are copied and no data is lost.
+
+This modification is **manual-only**: the schema differ never generates it. A naive diff between the old and new schema would drop the junction table (losing data) and create a new entity, so you must write this modification by hand. Generate a migration with the new schema, then replace the auto-generated modifications for this relation with a single `convertManyHasManyToJoiningEntity`.
+
+**What it does to the junction table:**
+
+- Adds a surrogate `id` (uuid) primary-key column and back-fills it for every existing row (using the `uuid_generate_v4()` function Contember installs in the project's system schema — no PostgreSQL extension is created).
+- Drops the original composite primary key and makes the new `id` the primary key.
+- Keeps both foreign-key columns and exposes them as two many-has-one relations of the new entity.
+- Adds a `UNIQUE (joiningColumn, inverseJoiningColumn)` constraint so the original join-uniqueness (one link per pair) is still enforced after the composite primary key is gone.
+- Re-points the `log_event` event-log trigger onto the new `id` column (both event-log triggers are dropped up-front and re-created afterwards).
+- Removes the original many-has-many owning relation (and its inverse side, if any) from the schema.
+
+**Arguments:**
+
+- **entityName**: The entity that owns the many-has-many relation.
+- **fieldName**: The owning many-has-many field on that entity to convert.
+- **joiningEntity**: The full definition of the new joining entity. Its `tableName` must be the junction table's real (generated) table name, and its two many-has-one relations must reuse the junction table's `joiningColumn` and `inverseJoiningColumn` column names. Do not include the join-uniqueness constraint in `unique` — the modification adds it for you.
+- **sourceInverseSide**: The one-has-many relation added to the owning entity, pointing at the new joining entity.
+- **targetInverseSide** _(optional)_: The one-has-many relation added to the target entity. Provide it for bidirectional relations; omit it for unidirectional ones (the target entity then stays untouched).
+
+**Example:**
+
+```json5
+{
+	"modification": "convertManyHasManyToJoiningEntity",
+	"entityName": "Post",
+	"fieldName": "categories",
+	/* highlight-start */
+	"joiningEntity": {
+		"name": "PostCategory",
+		"primary": "id",
+		"primaryColumn": "id",
+		// must match the existing junction table
+		"tableName": "post_categories",
+		"eventLog": { "enabled": true },
+		// leave empty — the join-uniqueness constraint is added by the modification
+		"unique": [],
+		"indexes": [],
+		"fields": {
+			"id": {
+				"name": "id",
+				"columnName": "id",
+				"type": "Uuid",
+				"columnType": "uuid",
+				"nullable": false
+			},
+			"post": {
+				"name": "post",
+				"type": "ManyHasOne",
+				"target": "Post",
+				"inversedBy": "postCategories",
+				"nullable": false,
+				// reuse the junction's joining column
+				"joiningColumn": { "columnName": "post_id", "onDelete": "cascade" }
+			},
+			"category": {
+				"name": "category",
+				"type": "ManyHasOne",
+				"target": "Category",
+				"inversedBy": "postCategories",
+				"nullable": false,
+				// reuse the junction's inverse joining column
+				"joiningColumn": { "columnName": "category_id", "onDelete": "cascade" }
+			}
+		}
+	},
+	"sourceInverseSide": {
+		"name": "postCategories",
+		"type": "OneHasMany",
+		"target": "PostCategory",
+		"ownedBy": "post"
+	},
+	"targetInverseSide": {
+		"name": "postCategories",
+		"type": "OneHasMany",
+		"target": "PostCategory",
+		"ownedBy": "category"
+	}
+	/* highlight-end */
+}
+```
+
+In this example the implicit `Post.categories` many-has-many is promoted into a `PostCategory` joining entity backed by the existing `post_categories` table. Every existing link is preserved and becomes a `PostCategory` row, queryable through `Post.postCategories` and `Category.postCategories`.
+
+:::caution
+This modification is intended to run against the implicit junction table of the relation it targets, using the standard composite primary key and column layout that Contember generates. After running it, re-run `migrations:diff` to confirm the schema and database are in sync.
+:::

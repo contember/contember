@@ -9,6 +9,11 @@ export class CryptoWrapper {
 	) {
 	}
 
+	/** Whether an encryption key is configured (i.e. `encrypt`/`decrypt` will work). */
+	get enabled(): boolean {
+		return this.encryptionKey !== undefined
+	}
+
 	async encrypt(value: Buffer): Promise<{ value: Buffer; version: number }> {
 		if (!this.encryptionKey) {
 			throw new Error('encryption key not provided')

@@ -3,7 +3,9 @@ import NewUserInvited from './templates/NewUserInvited.mustache.js'
 import ExistingUserInvited from './templates/ExistingUserInvited.mustache.js'
 import PasswordReset from './templates/PasswordReset.mustache.js'
 import PasswordlessSignIn from './templates/PasswordlessSignIn.mustache.js'
+import EmailOtp from './templates/EmailOtp.mustache.js'
 import ForcedSignOut from './templates/ForcedSignOut.mustache.js'
+import BackupCodesExhausted from './templates/BackupCodesExhausted.mustache.js'
 import { MailTemplateData, MailTemplateIdentifier, MailType } from './type.js'
 import { MailTemplateQuery } from '../queries/index.js'
 import Layout from './templates/Layout.mustache.js'
@@ -88,6 +90,34 @@ export class UserMailer {
 		const template = (await this.getCustomTemplate(dbContext, templateId)) || {
 			subject: 'Sign in here',
 			content: PasswordlessSignIn,
+			replyTo: null,
+		}
+		await this.sendMail(templateId, template, mailArguments)
+	}
+
+	async sendEmailOtpEmail(
+		dbContext: DatabaseContext,
+		mailArguments: { email: string; code: string; project?: string; projectSlug?: string },
+		customMailOptions: { projectId: string | null; variant: string },
+	): Promise<void> {
+		const templateId = { type: MailType.emailOtp, ...customMailOptions }
+		const template = (await this.getCustomTemplate(dbContext, templateId)) || {
+			subject: 'Your verification code',
+			content: EmailOtp,
+			replyTo: null,
+		}
+		await this.sendMail(templateId, template, mailArguments)
+	}
+
+	async sendBackupCodesExhaustedEmail(
+		dbContext: DatabaseContext,
+		mailArguments: { email: string },
+		customMailOptions: { projectId: string | null; variant: string },
+	): Promise<void> {
+		const templateId = { type: MailType.backupCodesExhausted, ...customMailOptions }
+		const template = (await this.getCustomTemplate(dbContext, templateId)) || {
+			subject: 'You have no MFA backup codes left',
+			content: BackupCodesExhausted,
 			replyTo: null,
 		}
 		await this.sendMail(templateId, template, mailArguments)

@@ -8,6 +8,8 @@ import { getIdentityProjectsSql } from './sql/getIdentityProjectsSql.js'
 import { createSessionTokenMutation } from './gql/createSessionToken.js'
 import { createSessionKeySql } from './sql/createSessionKeySql.js'
 import { getConfigSql } from './sql/getConfigSql.js'
+import { getIdentityByIdSql } from './sql/getIdentityByIdSql.js'
+import { getAuthPoliciesSql } from './sql/authPolicySql.js'
 
 test('create session key', async () => {
 	const email = 'john@doe.com'
@@ -20,6 +22,8 @@ test('create session key', async () => {
 		executes: [
 			getPersonByEmailSql({ email, response: { personId, identityId, password: 'aaa', roles: [] } }),
 			getConfigSql(),
+			getIdentityByIdSql({ identityId }),
+			getAuthPoliciesSql(),
 			createSessionKeySql({ apiKeyId: apiKeyId, identityId: identityId }),
 			getIdentityProjectsSql({ identityId: identityId, projectId: projectId }),
 			selectMembershipsSql({

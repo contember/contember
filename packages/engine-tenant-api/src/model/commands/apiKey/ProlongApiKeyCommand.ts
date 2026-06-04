@@ -3,7 +3,12 @@ import { ApiKey } from '../../type/index.js'
 import { ApiKeyHelper } from './ApiKeyHelper.js'
 import { QueryBuilder, UpdateBuilder } from '@contember/database'
 
-const PROLONG_THROTTLE_MS = 60_000
+/**
+ * Tracking writes (`last_used_at`) are throttled to at most once per this window, so
+ * an idle check must add this slack to avoid prematurely expiring an active session
+ * whose `last_used_at` is intentionally stale (see {@link ApiKeyManager.verifyAndProlong}).
+ */
+export const PROLONG_THROTTLE_MS = 60_000
 
 export interface ApiKeyRequestInfo {
 	ip?: string
@@ -24,10 +29,16 @@ export class ProlongApiKeyCommand implements Command<void> {
 		private readonly currentExpiration: Date | null,
 		private readonly requestInfo?: ApiKeyRequestInfo,
 		private readonly tracking?: ApiKeyTrackingState,
+		private readonly maxExpiresAt?: Date | null,
 	) {}
 
 	async execute({ db, providers }: Command.Args): Promise<void> {
-		const newExpiration = ApiKeyHelper.getExpiration(providers, this.type, this.expiration)
+		let newExpiration = ApiKeyHelper.getExpiration(providers, this.type, this.expiration)
+		// A19: clamp the sliding window at the absolute cap snapshotted at sign-in.
+		// NULL maxExpiresAt = today's uncapped sliding window.
+		if (newExpiration !== null && this.maxExpiresAt && newExpiration.getTime() > this.maxExpiresAt.getTime()) {
+			newExpiration = this.maxExpiresAt
+		}
 		const now = providers.now()
 
 		let updateExpiration = newExpiration !== null

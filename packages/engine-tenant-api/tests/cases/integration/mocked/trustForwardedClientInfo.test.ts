@@ -8,6 +8,8 @@ import { createSessionKeySql } from './sql/createSessionKeySql.js'
 import { getIdentityProjectsSql } from './sql/getIdentityProjectsSql.js'
 import { getNextLoginAttemptSql } from './sql/getNextLoginAttemptSql.js'
 import { getConfigSql } from './sql/getConfigSql.js'
+import { getAuthPoliciesSql } from './sql/authPolicySql.js'
+import { getIdentityByIdSql } from './sql/getIdentityByIdSql.js'
 import { GQL } from '../../../src/tags.js'
 import { sqlTransaction } from './sql/sqlTransaction.js'
 import { createIdentitySql } from './sql/createIdentitySql.js'
@@ -27,7 +29,10 @@ test('signIn: trustForwardedClientInfo=true is propagated when caller has the fl
 			getConfigSql(),
 			getNextLoginAttemptSql(email),
 			getPersonByEmailSql({ email, response: { personId, identityId, password, roles: [] } }),
+			getAuthPoliciesSql(),
 			getConfigSql(),
+			getIdentityByIdSql({ identityId }),
+			getAuthPoliciesSql(),
 			createSessionKeySql({ apiKeyId, identityId, trustForwardedInfo: true }),
 			getIdentityProjectsSql({ identityId, projectId }),
 			selectMembershipsSql({
@@ -63,7 +68,10 @@ test('signIn: trustForwardedClientInfo=true is silently dropped when caller has 
 			getConfigSql(),
 			getNextLoginAttemptSql(email),
 			getPersonByEmailSql({ email, response: { personId, identityId, password, roles: [] } }),
+			getAuthPoliciesSql(),
 			getConfigSql(),
+			getIdentityByIdSql({ identityId }),
+			getAuthPoliciesSql(),
 			createSessionKeySql({ apiKeyId, identityId, trustForwardedInfo: false }),
 			getIdentityProjectsSql({ identityId, projectId }),
 			selectMembershipsSql({

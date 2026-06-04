@@ -36,7 +36,16 @@ CREATE TYPE "auth_log_type" AS ENUM (
     'project_secret_change',
     'mail_template_change',
     'tenant_config_change',
-    'person_invite'
+    'person_invite',
+    'backup_code_generated',
+    'backup_code_used',
+    'backup_code_regenerated',
+    'email_otp_sent',
+    'mfa_enrollment_required',
+    'mfa_reset',
+    'session_expired_idle',
+    'session_policy_applied',
+    'auth_policy_change'
 );
 CREATE TYPE "config_policy" AS ENUM (
     'always',
@@ -49,7 +58,8 @@ CREATE TYPE "config_singleton" AS ENUM (
 );
 CREATE TYPE "person_token_type" AS ENUM (
     'password_reset',
-    'passwordless'
+    'passwordless',
+    'mfa_email_otp'
 );
 CREATE FUNCTION "project_deleted"() RETURNS "trigger"
     LANGUAGE "plpgsql"
@@ -91,7 +101,23 @@ CREATE TABLE "api_key" (
     "last_used_at" timestamp with time zone,
     "created_ip" "inet",
     "created_user_agent" "text",
-    "trust_forwarded_info" boolean DEFAULT false NOT NULL
+    "trust_forwarded_info" boolean DEFAULT false NOT NULL,
+    "issued_at" timestamp with time zone,
+    "idle_timeout" interval,
+    "max_expires_at" timestamp with time zone
+);
+CREATE TABLE "auth_policy" (
+    "id" "uuid" NOT NULL,
+    "scope" "text" NOT NULL,
+    "project_id" "uuid",
+    "roles" "text"[] NOT NULL,
+    "mfa_required" boolean,
+    "token_expiration" interval,
+    "idle_timeout" interval,
+    "remember_me_allowed" boolean,
+    "created_at" timestamp with time zone DEFAULT "now"() NOT NULL,
+    "updated_at" timestamp with time zone DEFAULT "now"() NOT NULL,
+    "grace_duration" interval
 );
 CREATE TABLE "config" (
     "id" "config_singleton" DEFAULT 'singleton'::"config_singleton" NOT NULL,
@@ -125,6 +151,9 @@ CREATE TABLE "config" (
     "rate_limit_passwordless_init_per_ip_limit" integer DEFAULT 0 NOT NULL,
     "rate_limit_passwordless_init_per_ip_window" interval DEFAULT '01:00:00'::interval NOT NULL,
     "login_reveal_login_method" boolean DEFAULT true NOT NULL,
+    "login_mfa_grace_duration" interval DEFAULT '00:00:00'::interval NOT NULL,
+    "rate_limit_email_otp_per_person_limit" integer DEFAULT 10 NOT NULL,
+    "rate_limit_email_otp_per_person_window" interval DEFAULT '00:10:00'::interval NOT NULL,
     CONSTRAINT "config_captcha_complete" CHECK ((("captcha_provider" IS NULL) OR (("captcha_secret" IS NOT NULL) AND ("captcha_secret_version" IS NOT NULL)))),
     CONSTRAINT "config_captcha_provider_check" CHECK ((("captcha_provider" IS NULL) OR ("captcha_provider" = ANY (ARRAY['turnstile'::"text", 'hcaptcha'::"text", 'recaptchaV3'::"text"]))))
 );
@@ -160,12 +189,11 @@ CREATE TABLE "person" (
     "email" "text",
     "password_hash" "text",
     "identity_id" "uuid" NOT NULL,
-    "otp_uri" "text",
-    "otp_activated_at" timestamp with time zone,
     "name" "text",
     "idp_only" boolean DEFAULT false NOT NULL,
     "disabled_at" timestamp with time zone,
     "passwordless_enabled" boolean,
+    "mfa_grace_until" timestamp with time zone,
     CONSTRAINT "idp_only_no_email" CHECK ((("idp_only" = false) OR (("idp_only" = true) AND ("email" IS NULL))))
 );
 CREATE TABLE "person_auth_log" (
@@ -186,12 +214,29 @@ CREATE TABLE "person_auth_log" (
     "target_person_id" "uuid",
     "event_data" "jsonb"
 );
+CREATE TABLE "person_backup_code" (
+    "id" "uuid" NOT NULL,
+    "person_id" "uuid" NOT NULL,
+    "code_hash" "text" NOT NULL,
+    "used_at" timestamp with time zone,
+    "created_at" timestamp with time zone DEFAULT "now"() NOT NULL
+);
 CREATE TABLE "person_identity_provider" (
     "id" "uuid" NOT NULL,
     "person_id" "uuid" NOT NULL,
     "identity_provider_id" "uuid" NOT NULL,
     "created_at" timestamp with time zone DEFAULT "now"() NOT NULL,
     "external_identifier" "text" NOT NULL
+);
+CREATE TABLE "person_mfa" (
+    "person_id" "uuid" NOT NULL,
+    "totp_secret" "bytea",
+    "totp_secret_version" integer,
+    "totp_activated_at" timestamp with time zone,
+    "totp_pending_secret" "bytea",
+    "totp_pending_version" integer,
+    "totp_pending_created_at" timestamp with time zone,
+    "email_otp_enabled" boolean DEFAULT false NOT NULL
 );
 CREATE TABLE "person_token" (
     "id" "uuid" NOT NULL,
@@ -240,6 +285,8 @@ CREATE TABLE "rate_limit_event" (
 );
 ALTER TABLE ONLY "api_key"
     ADD CONSTRAINT "api_key_id" PRIMARY KEY ("id");
+ALTER TABLE ONLY "auth_policy"
+    ADD CONSTRAINT "auth_policy_pkey" PRIMARY KEY ("id");
 ALTER TABLE ONLY "config"
     ADD CONSTRAINT "config_pkey" PRIMARY KEY ("id");
 ALTER TABLE ONLY "person"
@@ -254,12 +301,16 @@ ALTER TABLE ONLY "mail_template"
     ADD CONSTRAINT "mail_template_pkey" PRIMARY KEY ("id");
 ALTER TABLE ONLY "person_auth_log"
     ADD CONSTRAINT "person_auth_log_pkey" PRIMARY KEY ("id");
+ALTER TABLE ONLY "person_backup_code"
+    ADD CONSTRAINT "person_backup_code_pkey" PRIMARY KEY ("id");
 ALTER TABLE ONLY "person"
     ADD CONSTRAINT "person_id" PRIMARY KEY ("id");
 ALTER TABLE ONLY "person"
     ADD CONSTRAINT "person_identity_id_key" UNIQUE ("identity_id");
 ALTER TABLE ONLY "person_identity_provider"
     ADD CONSTRAINT "person_identity_provider_pkey" PRIMARY KEY ("id");
+ALTER TABLE ONLY "person_mfa"
+    ADD CONSTRAINT "person_mfa_pkey" PRIMARY KEY ("person_id");
 ALTER TABLE ONLY "person_token"
     ADD CONSTRAINT "person_password_reset_id" PRIMARY KEY ("id");
 ALTER TABLE ONLY "project"
@@ -276,6 +327,7 @@ ALTER TABLE ONLY "rate_limit_event"
     ADD CONSTRAINT "rate_limit_event_pkey" PRIMARY KEY ("id");
 CREATE INDEX "api_key_identity_id" ON "api_key" USING "btree" ("identity_id");
 CREATE UNIQUE INDEX "api_key_token_hash" ON "api_key" USING "btree" ("token_hash");
+CREATE INDEX "auth_policy_project_id_idx" ON "auth_policy" USING "btree" ("project_id");
 CREATE INDEX "identity_parent_id" ON "identity" USING "btree" ("parent_id");
 CREATE UNIQUE INDEX "mail_template_identifier" ON "mail_template" USING "btree" ("project_id", "mail_type", "variant") WHERE ("project_id" IS NOT NULL);
 CREATE UNIQUE INDEX "mail_template_identifier_global" ON "mail_template" USING "btree" ("mail_type", "variant") WHERE ("project_id" IS NULL);
@@ -283,6 +335,7 @@ CREATE INDEX "mail_template_project_index" ON "mail_template" USING "btree" ("pr
 CREATE INDEX "person_auth_log_person_id_created_at_idx" ON "person_auth_log" USING "btree" ("person_id", "created_at" DESC);
 CREATE INDEX "person_auth_log_person_input_identifier_created_at_idx" ON "person_auth_log" USING "btree" ("person_input_identifier", "created_at" DESC) WHERE (("type" = 'login'::"auth_log_type") AND ("success" = false));
 CREATE INDEX "person_auth_log_target_person_id_created_at_idx" ON "person_auth_log" USING "btree" ("target_person_id", "created_at" DESC);
+CREATE INDEX "person_backup_code_person_id_idx" ON "person_backup_code" USING "btree" ("person_id");
 CREATE INDEX "person_identity_id" ON "person" USING "btree" ("identity_id");
 CREATE UNIQUE INDEX "person_identity_provider_identifier" ON "person_identity_provider" USING "btree" ("identity_provider_id", "external_identifier");
 CREATE INDEX "person_identity_provider_person_id" ON "person_identity_provider" USING "btree" ("person_id");
@@ -300,6 +353,8 @@ CREATE TRIGGER "project_secret_updated" AFTER INSERT OR DELETE OR UPDATE ON "pro
 CREATE TRIGGER "project_updated" BEFORE INSERT OR UPDATE OF "name", "slug", "config" ON "project" FOR EACH ROW EXECUTE FUNCTION "project_updated"();
 ALTER TABLE ONLY "api_key"
     ADD CONSTRAINT "api_key_identity_id_fkey" FOREIGN KEY ("identity_id") REFERENCES "identity"("id");
+ALTER TABLE ONLY "auth_policy"
+    ADD CONSTRAINT "auth_policy_project_id_fkey" FOREIGN KEY ("project_id") REFERENCES "project"("id") ON DELETE CASCADE;
 ALTER TABLE ONLY "identity"
     ADD CONSTRAINT "identity_parent_id_fkey" FOREIGN KEY ("parent_id") REFERENCES "identity"("id");
 ALTER TABLE ONLY "mail_template"
@@ -314,12 +369,16 @@ ALTER TABLE ONLY "person_auth_log"
     ADD CONSTRAINT "person_auth_log_person_token_id_fkey" FOREIGN KEY ("person_token_id") REFERENCES "person_token"("id") ON DELETE SET NULL;
 ALTER TABLE ONLY "person_auth_log"
     ADD CONSTRAINT "person_auth_log_target_person_id_fkey" FOREIGN KEY ("target_person_id") REFERENCES "person"("id") ON DELETE SET NULL;
+ALTER TABLE ONLY "person_backup_code"
+    ADD CONSTRAINT "person_backup_code_person_id_fkey" FOREIGN KEY ("person_id") REFERENCES "person"("id") ON DELETE CASCADE;
 ALTER TABLE ONLY "person"
     ADD CONSTRAINT "person_identity_id_fkey" FOREIGN KEY ("identity_id") REFERENCES "identity"("id");
 ALTER TABLE ONLY "person_identity_provider"
     ADD CONSTRAINT "person_identity_provider_idp" FOREIGN KEY ("identity_provider_id") REFERENCES "identity_provider"("id") ON DELETE CASCADE;
 ALTER TABLE ONLY "person_identity_provider"
     ADD CONSTRAINT "person_identity_provider_person" FOREIGN KEY ("person_id") REFERENCES "person"("id") ON DELETE CASCADE;
+ALTER TABLE ONLY "person_mfa"
+    ADD CONSTRAINT "person_mfa_person_id_fkey" FOREIGN KEY ("person_id") REFERENCES "person"("id") ON DELETE CASCADE;
 ALTER TABLE ONLY "person_token"
     ADD CONSTRAINT "person_password_reset_person" FOREIGN KEY ("person_id") REFERENCES "person"("id") ON DELETE CASCADE;
 ALTER TABLE ONLY "project_membership"

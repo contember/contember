@@ -6,6 +6,8 @@ export enum MailType {
 	passwordReset = 'passwordReset',
 	passwordlessSignIn = 'passwordlessSignIn',
 	forcedSignOut = 'forcedSignOut',
+	emailOtp = 'emailOtp',
+	backupCodesExhausted = 'backupCodesExhausted',
 }
 
 export const mailTypeFromSchemaToDb = (type: SchemaMailType): MailType => {
@@ -15,6 +17,8 @@ export const mailTypeFromSchemaToDb = (type: SchemaMailType): MailType => {
 		RESET_PASSWORD_REQUEST: MailType.passwordReset,
 		PASSWORDLESS_SIGN_IN: MailType.passwordlessSignIn,
 		FORCED_SIGN_OUT: MailType.forcedSignOut,
+		EMAIL_OTP: MailType.emailOtp,
+		BACKUP_CODES_EXHAUSTED: MailType.backupCodesExhausted,
 	}[type]
 }
 
@@ -25,6 +29,8 @@ export const mailTypeFromDbToSchema = (type: MailType): SchemaMailType => {
 		[MailType.passwordReset]: 'RESET_PASSWORD_REQUEST' as const,
 		[MailType.passwordlessSignIn]: 'PASSWORDLESS_SIGN_IN' as const,
 		[MailType.forcedSignOut]: 'FORCED_SIGN_OUT' as const,
+		[MailType.emailOtp]: 'EMAIL_OTP' as const,
+		[MailType.backupCodesExhausted]: 'BACKUP_CODES_EXHAUSTED' as const,
 	}[type]
 }
 

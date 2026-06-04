@@ -1,8 +1,8 @@
 import { authenticatedIdentityId, executeTenantTest, now } from '../../../src/testTenant.js'
 import { testUuid } from '../../../src/testUuid.js'
 import { getPersonByIdentity } from './sql/getPersonByIdentity.js'
+import { generateBackupCodesSql } from './sql/generateBackupCodesSql.js'
 import { confirmOtpMutation } from './gql/confirmOtp.js'
-import { ConfirmOtpErrorCode } from '../../../../src/schema/index.js'
 import { expect, test } from 'bun:test'
 import { OtpAuthenticator } from '../../../../src/index.js'
 import { Buffer } from 'buffer'
@@ -22,33 +22,58 @@ test('confirm otp mutation with valid code', async () => {
 				response: {
 					personId,
 					password: '123',
-					otpUri: otp.uri,
+					otpPendingUri: otp.uri,
 					roles: [],
 					email: 'john@doe.com',
 				},
 			}),
 			{
-				sql: `update "tenant"."person" set "otp_activated_at" = ? where "id" = ?`,
-				parameters: [now, personId],
+				sql: `update "tenant"."person_mfa"
+					set "totp_secret" = "totp_pending_secret", "totp_secret_version" = "totp_pending_version", "totp_activated_at" = ?, "totp_pending_secret" = ?, "totp_pending_version" = ?, "totp_pending_created_at" = ?
+					where "person_id" = ? and "totp_pending_secret" is not null`,
+				parameters: [now, null, null, null, personId],
 				response: {
 					rowCount: 1,
 				},
 			},
+			...generateBackupCodesSql({ personId, firstUuidIndex: 1 }),
 		],
 		return: {
 			data: {
 				confirmOtp: {
 					ok: true,
 					errors: [],
+					result: {
+						backupCodes: [
+							'aaaaa-aaaaa',
+							'aaaaa-aaaaa',
+							'aaaaa-aaaaa',
+							'aaaaa-aaaaa',
+							'aaaaa-aaaaa',
+							'aaaaa-aaaaa',
+							'aaaaa-aaaaa',
+							'aaaaa-aaaaa',
+							'aaaaa-aaaaa',
+							'aaaaa-aaaaa',
+						],
+					},
 				},
 			},
 		},
-		expectedAuthLog: expect.objectContaining({
-			type: '2fa_enable',
-			response: expect.objectContaining({
-				ok: true,
+		expectedAuthLog: [
+			expect.objectContaining({
+				type: '2fa_enable',
+				response: expect.objectContaining({
+					ok: true,
+				}),
 			}),
-		}),
+			expect.objectContaining({
+				type: 'backup_code_generated',
+				response: expect.objectContaining({
+					ok: true,
+				}),
+			}),
+		],
 	})
 })
 
@@ -62,7 +87,7 @@ test('confirm otp mutation with invalid code', async () => {
 				response: {
 					personId,
 					password: '123',
-					otpUri: 'otpauth://totp/contember:john?secret=ABDEF&period=30&digits=6&algorithm=SHA1&issuer=contember',
+					otpPendingUri: 'otpauth://totp/contember:john?secret=ABDEF&period=30&digits=6&algorithm=SHA1&issuer=contember',
 					roles: [],
 					email: 'john@doe.com',
 				},
@@ -73,6 +98,7 @@ test('confirm otp mutation with invalid code', async () => {
 				confirmOtp: {
 					ok: false,
 					errors: [{ code: 'INVALID_OTP_TOKEN' }],
+					result: null,
 				},
 			},
 		},

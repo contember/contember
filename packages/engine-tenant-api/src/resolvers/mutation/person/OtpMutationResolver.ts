@@ -7,24 +7,21 @@ import {
 	PrepareOtpResponse,
 } from '../../../schema/index.js'
 import { TenantResolverContext } from '../../TenantResolverContext.js'
-import { OtpManager, PermissionActions, PersonQuery, PersonRow } from '../../../model/index.js'
+import { AuthPolicyResolver, BackupCodeManager, OtpManager, PermissionActions, PersonQuery, PersonRow } from '../../../model/index.js'
 import { ImplementationException } from '../../../exceptions.js'
 import { createErrorResponse } from '../../errorUtils.js'
 import { ResponseError, ResponseOk } from '../../../model/utils/Response.js'
 
 export class OtpMutationResolver implements MutationResolvers {
-	constructor(private readonly otpManager: OtpManager) {}
+	constructor(
+		private readonly otpManager: OtpManager,
+		private readonly backupCodeManager: BackupCodeManager,
+		private readonly authPolicyResolver: AuthPolicyResolver,
+	) {}
 
 	async prepareOtp(parent: any, args: MutationPrepareOtpArgs, context: TenantResolverContext): Promise<PrepareOtpResponse> {
 		const person = await this.getPersonFromContext(context)
 		const otp = await this.otpManager.prepareOtp(context.db, person, args.label || 'Contember')
-		if (person.otp_activated_at) {
-			await context.logAuthAction({
-				type: '2fa_disable',
-				response: new ResponseOk(null),
-				personId: person.id,
-			})
-		}
 		return {
 			ok: true,
 			result: {
@@ -36,13 +33,13 @@ export class OtpMutationResolver implements MutationResolvers {
 
 	async confirmOtp(parent: any, args: MutationConfirmOtpArgs, context: TenantResolverContext): Promise<ConfirmOtpResponse> {
 		const person = await this.getPersonFromContext(context)
-		if (!person.otp_uri) {
+		if (!person.otp_pending_secret) {
 			return createErrorResponse(
 				'NOT_PREPARED',
 				`OTP setup was not initialized. Call prepareOtp first.`,
 			)
 		}
-		if (!this.otpManager.verifyOtp(person, args.otpToken)) {
+		if (!await this.otpManager.verifyPendingOtp(person, args.otpToken)) {
 			const responseError = new ResponseError('INVALID_OTP_TOKEN', 'Provided token is not correct.')
 			await context.logAuthAction({
 				type: '2fa_enable',
@@ -57,18 +54,38 @@ export class OtpMutationResolver implements MutationResolvers {
 			response: new ResponseOk(null),
 			personId: person.id,
 		})
+		// Promoting pending->active enrolls (or rotates) TOTP; (re)issue the backup-code set.
+		const backupCodes = await this.backupCodeManager.generate(context.db, person.id)
+		await context.logAuthAction({
+			type: 'backup_code_generated',
+			response: new ResponseOk(null),
+			personId: person.id,
+		})
 		return {
 			ok: true,
 			errors: [],
+			result: {
+				backupCodes,
+			},
 		}
 	}
 
 	async disableOtp(parent: any, args: {}, context: TenantResolverContext): Promise<DisableOtpResponse> {
 		const person = await this.getPersonFromContext(context)
-		if (!person.otp_uri) {
+		if (!person.otp_secret) {
 			return createErrorResponse('OTP_NOT_ACTIVE', 'OTP is not active, you cannot disable it.')
 		}
+		// Block removal of the last factor when an effective policy mandates MFA.
+		// Rotation (prepareOtp + confirmOtp) stays open — only removal is blocked.
+		const wouldHaveNoFactor = !person.email_otp_enabled
+		if (wouldHaveNoFactor) {
+			const policy = await this.authPolicyResolver.resolveForIdentity(context.db, person.identity_id, person.roles)
+			if (policy.mfaRequired) {
+				return createErrorResponse('MFA_REQUIRED', 'MFA is required for your role; you cannot disable your only factor.')
+			}
+		}
 		await this.otpManager.disableOtp(context.db, person)
+		await this.backupCodeManager.deleteForPerson(context.db, person.id)
 		await context.logAuthAction({
 			type: '2fa_disable',
 			response: new ResponseOk(null),

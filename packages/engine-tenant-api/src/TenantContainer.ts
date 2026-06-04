@@ -48,6 +48,7 @@ import {
 	SignInManager,
 	SignUpManager,
 	TurnstileProvider,
+	UnpersistedApiKeyManager,
 	UserMailer,
 } from './model/index.js'
 import { HibpChecker, HttpHibpChecker, NoopHibpChecker } from './model/service/HibpChecker.js'
@@ -182,10 +183,15 @@ export class TenantContainerFactory {
 				return idpRegistry
 			})
 			.addService('idpSessionRevalidator', ({ idpRegistry }) => new IdpSessionRevalidator(idpRegistry))
+			.addService('unpersistedApiKeyManager', () =>
+				UnpersistedApiKeyManager.createForRootTokens({
+					tokens: args.tenantCredentials.rootTokens,
+					tokenHashes: args.tenantCredentials.rootTokenHashes,
+				}))
 			.addService(
 				'apiKeyManager',
-				({ apiKeyService, authPolicyResolver, authLogService, idpSessionRevalidator }) =>
-					new ApiKeyManager(apiKeyService, authPolicyResolver, authLogService, idpSessionRevalidator),
+				({ apiKeyService, authPolicyResolver, authLogService, unpersistedApiKeyManager, idpSessionRevalidator }) =>
+					new ApiKeyManager(apiKeyService, authPolicyResolver, authLogService, unpersistedApiKeyManager, idpSessionRevalidator),
 			)
 			.addService('emailValidator', () => new EmailValidator())
 			.addService('hibpChecker', (): HibpChecker => new HttpHibpChecker())

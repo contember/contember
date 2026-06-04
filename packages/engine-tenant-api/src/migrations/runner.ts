@@ -69,6 +69,17 @@ export interface TenantCredentials {
 	rootToken?: string
 	rootTokenHash?: string
 	rootPassword?: string
+	/**
+	 * Unpersisted root tokens (plain values). When set, these tokens are
+	 * verified at runtime and resolve to a super-admin identity without being
+	 * stored in the database. Useful for easy rotation.
+	 */
+	rootTokens?: readonly string[]
+	/**
+	 * Unpersisted root token hashes (sha256 hex). Same as {@link rootTokens} but
+	 * the plain token never needs to be passed to the engine.
+	 */
+	rootTokenHashes?: readonly string[]
 }
 
 const migrations = {

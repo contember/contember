@@ -18,6 +18,19 @@ The default tokens for the `login` and `super_admin` roles are configured via th
 
 The login token authorizes the public auth flows: `signIn`, `signInIDP`, `signInPasswordless`, `createResetPasswordRequest`, `resetPassword`, `signUp`.
 
+### Unpersisted root tokens
+
+`CONTEMBER_ROOT_TOKEN` is seeded into the tenant database during setup — its hash is stored in the `api_key` table. As an alternative (or in addition), you can configure **unpersisted** root tokens that are verified at runtime and resolve to a `super_admin` identity **without being stored in the database**:
+
+- `CONTEMBER_ROOT_TOKENS` — a comma- or whitespace-separated list of plain root tokens.
+- `CONTEMBER_ROOT_TOKEN_HASHES` — a comma- or whitespace-separated list of sha256 hashes (lower- or upper-case hex) of root tokens, so the plain secret never has to be handed to the engine.
+
+In the JSON/YAML config these map to `tenant.credentials.rootTokens` and `tenant.credentials.rootTokenHashes`, which may also be supplied as arrays.
+
+Because these tokens are never written to the database, rotation is trivial — just change the environment variable (or config) and restart; no migration or database write is involved, and revoking a token is as simple as removing it from the list. Incoming tokens are matched against the configured hashes using a constant-time comparison.
+
+A request authenticated by an unpersisted root token is granted the `super_admin` role (full access) and is attributed to a fixed virtual identity id that has no row in the `identity` table.
+
 ## Choosing the right token
 
 Picking the correct token for a given operation can be confusing. The canonical example — generating a permanent API key so an application can read from the Content API:

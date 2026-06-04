@@ -26,6 +26,21 @@ import { ProjectMembershipFetcher, ProjectMembershipResolver } from '../content/
 import { Providers } from '../providers.js'
 import { CryptoWrapper } from '../utils/CryptoWrapper.js'
 
+/**
+ * Normalizes a token list that may be provided either as an array (JSON config)
+ * or as a comma/whitespace-separated string (env-based config) into an array of
+ * non-empty tokens.
+ */
+const normalizeTokenList = (value: string | readonly string[] | undefined): readonly string[] | undefined => {
+	if (value === undefined) {
+		return undefined
+	}
+	const items = (Array.isArray(value) ? value : (value as string).split(/[\s,]+/))
+		.map(it => it.trim())
+		.filter(it => it.length > 0)
+	return items.length > 0 ? items : undefined
+}
+
 export interface ProjectGroupContainer {
 	slug: string | undefined
 
@@ -98,7 +113,11 @@ export class ProjectGroupContainerFactory {
 					readConnection: tenantReadConnection,
 					dbCredentials: tenantDbCredentials,
 					mailOptions: config.mailer,
-					tenantCredentials: config.credentials,
+					tenantCredentials: {
+						...config.credentials,
+						rootTokens: normalizeTokenList(config.credentials.rootTokens),
+						rootTokenHashes: normalizeTokenList(config.credentials.rootTokenHashes),
+					},
 					projectInitializer,
 					projectSchemaResolver,
 					cryptoProviders: {

@@ -54,6 +54,8 @@ export const configTemplate: any = {
 			rootTokenHash: '%?env.CONTEMBER_ROOT_TOKEN_HASH%',
 			rootPassword: '%?env.CONTEMBER_ROOT_PASSWORD%',
 			loginToken: '%?env.CONTEMBER_LOGIN_TOKEN%',
+			rootTokens: '%?env.CONTEMBER_ROOT_TOKENS%',
+			rootTokenHashes: '%?env.CONTEMBER_ROOT_TOKEN_HASHES%',
 		},
 		secrets: {
 			encryptionKey: '%?env.CONTEMBER_ENCRYPTION_KEY%',

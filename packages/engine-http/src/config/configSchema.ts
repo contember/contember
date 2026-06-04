@@ -91,6 +91,9 @@ export const tenantConfigSchema = Typesafe.intersection(
 			rootPassword: Typesafe.string,
 			rootEmail: Typesafe.string,
 			loginToken: Typesafe.string,
+			// Either a JSON array of tokens, or a comma-separated string (for env-based config).
+			rootTokens: Typesafe.union(Typesafe.array(Typesafe.string), Typesafe.string),
+			rootTokenHashes: Typesafe.union(Typesafe.array(Typesafe.string), Typesafe.string),
 		}),
 	}),
 	Typesafe.object({

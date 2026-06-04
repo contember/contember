@@ -26,7 +26,8 @@ CQRS pattern with Command/Query separation via `CommandBus` and `DatabaseQuery`.
 
 ## Key Services
 
-- `ApiKeyManager` — token creation, verification, prolongation
+- `ApiKeyManager` — token creation, verification, prolongation. `verifyAndProlong` first consults `UnpersistedApiKeyManager` (configured root tokens, constant-time hash match, no DB row) and only then falls back to the `api_key` table lookup.
+- `UnpersistedApiKeyManager` — verifies configured root tokens that are NOT stored in the DB (enables zero-write rotation); built from `tenantCredentials.rootTokens` / `rootTokenHashes`, resolves to a fixed virtual `super_admin` identity (`UNPERSISTED_ROOT_IDENTITY_ID`).
 - `OtpManager` — TOTP 2FA setup/confirm/disable
 - `SecretsManager` — encrypted project secrets
 - `ConfigurationManager` — tenant-wide config (password policies, login settings, passwordless)

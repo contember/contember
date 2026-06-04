@@ -18,23 +18,42 @@ const buildValidator = (response: CaptchaVerifyResult) =>
 		recaptchaV3: new StubProvider(response),
 	})
 
+const protectAll: CaptchaConfig['protect'] = { signUp: true, passwordReset: true, passwordlessInit: true, emailVerification: true }
+
 describe('CaptchaValidator', () => {
 	test('is disabled when provider is null', () => {
 		const validator = buildValidator({ ok: true })
-		const config: CaptchaConfig = { provider: null, secret: 'whatever', threshold: null }
+		const config: CaptchaConfig = { provider: null, secret: 'whatever', threshold: null, protect: protectAll }
 		expect(validator.isEnabled(config)).toBe(false)
 	})
 
 	test('is disabled when secret is missing', () => {
 		const validator = buildValidator({ ok: true })
-		const config: CaptchaConfig = { provider: 'turnstile', secret: null, threshold: null }
+		const config: CaptchaConfig = { provider: 'turnstile', secret: null, threshold: null, protect: protectAll }
 		expect(validator.isEnabled(config)).toBe(false)
+	})
+
+	test('isEnabledFor requires both a configured provider and the per-flow flag', () => {
+		const validator = buildValidator({ ok: true })
+		const enabled: CaptchaConfig = {
+			provider: 'turnstile',
+			secret: 'secret',
+			threshold: null,
+			protect: { signUp: true, passwordReset: false, passwordlessInit: true, emailVerification: false },
+		}
+		expect(validator.isEnabledFor(enabled, 'signUp')).toBe(true)
+		expect(validator.isEnabledFor(enabled, 'passwordReset')).toBe(false)
+		expect(validator.isEnabledFor(enabled, 'emailVerification')).toBe(false)
+
+		// No provider → never enforced regardless of the flags.
+		const noProvider: CaptchaConfig = { provider: null, secret: null, threshold: null, protect: protectAll }
+		expect(validator.isEnabledFor(noProvider, 'signUp')).toBe(false)
 	})
 
 	test('verify skips when disabled', async () => {
 		const validator = buildValidator({ ok: true })
 		const result = await validator.verify({
-			config: { provider: null, secret: null, threshold: null },
+			config: { provider: null, secret: null, threshold: null, protect: protectAll },
 			token: 'irrelevant',
 		})
 		expect(result).toEqual({ ok: true, skipped: true })
@@ -43,7 +62,7 @@ describe('CaptchaValidator', () => {
 	test('verify rejects when token is missing while enabled', async () => {
 		const validator = buildValidator({ ok: true })
 		const result = await validator.verify({
-			config: { provider: 'turnstile', secret: 'secret', threshold: null },
+			config: { provider: 'turnstile', secret: 'secret', threshold: null, protect: protectAll },
 			token: undefined,
 		})
 		expect(result.ok).toBe(false)
@@ -55,7 +74,7 @@ describe('CaptchaValidator', () => {
 	test('verify delegates to the configured provider', async () => {
 		const validator = buildValidator({ ok: true, score: 0.9 })
 		const result = await validator.verify({
-			config: { provider: 'recaptchaV3', secret: 'secret', threshold: 0.5 },
+			config: { provider: 'recaptchaV3', secret: 'secret', threshold: 0.5, protect: protectAll },
 			token: 'abc',
 			remoteIp: '1.2.3.4',
 		})

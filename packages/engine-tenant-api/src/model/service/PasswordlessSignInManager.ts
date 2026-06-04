@@ -16,6 +16,7 @@ import {
 	CreatePersonTokenCommand,
 	IncreaseOtpAttemptCommand,
 	InvalidateTokenCommand,
+	MarkEmailVerifiedCommand,
 } from '../commands/index.js'
 import { getPreferredProject } from './helpers/getPreferredProject.js'
 import { ProjectManager } from './ProjectManager.js'
@@ -221,6 +222,15 @@ class PasswordlessSignInManager {
 			// code, handled above) is still verified. Documented limitation (A06).
 
 			await db.commandBus.execute(new InvalidateTokenCommand(tokenValidationResult.result.id))
+			// Receiving and clicking the magic link proves ownership of the address,
+			// so a successful passwordless sign-in also satisfies the e-mail
+			// verification requirement. Without this, a required-but-unverified
+			// account could obtain a session here while being blocked from password
+			// sign-in (SignInManager) — an inconsistent, exploitable gap.
+			const emailVerifiedNow = personRow.email_verified_at === null
+			if (emailVerifiedNow) {
+				await db.commandBus.execute(new MarkEmailVerifiedCommand(personRow.id))
+			}
 			const sessionToken = await this.apiKeyManager.createSessionApiKey(db, personRow.identity_id, expiration, requestInfo, trustForwardedInfo)
 
 			return new ResponseOk({
@@ -230,6 +240,9 @@ class PasswordlessSignInManager {
 				[AuthLogService.Key]: new AuthLogService.Bag({
 					personId: personRow.id,
 					tokenId: tokenResult?.id,
+					// Record that this sign-in also satisfied e-mail verification, so
+					// the audit trail shows when/how the address became verified.
+					eventData: emailVerifiedNow ? { emailVerified: true } : undefined,
 				}),
 			})
 		})

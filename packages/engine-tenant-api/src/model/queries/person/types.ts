@@ -15,6 +15,8 @@ export interface PersonRow {
 	readonly disabled_at: Date | null
 	readonly passwordless_enabled: boolean | null
 	readonly mfa_grace_until: Date | null
+	readonly email_verified_at: Date | null
+	readonly email_verification_required: boolean
 }
 
 export type MaybePersonRow = PersonRow | null

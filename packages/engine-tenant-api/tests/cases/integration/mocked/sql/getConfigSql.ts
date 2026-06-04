@@ -7,6 +7,11 @@ export const getConfigSql = (overrides: Record<string, unknown> = {}): ExpectedQ
 		rows: [
 			{
 				id: 'b65949a6-b481-40b5-a0ed-0acdb5a24cb6',
+				signup_require_email_verification: false,
+				// Both verification flags default to the feature-off state, matching
+				// the real DB column defaults (DEFAULT FALSE). Tests that exercise a
+				// verification flow opt in explicitly via an override.
+				require_email_change_verification: false,
 				passwordless_enabled: 'never',
 				passwordless_url: null,
 				passwordless_expiration: PostgresInterval('00:10:00'),
@@ -40,6 +45,14 @@ export const getConfigSql = (overrides: Record<string, unknown> = {}): ExpectedQ
 				rate_limit_passwordless_init_per_ip_window: PostgresInterval('01:00:00'),
 				rate_limit_email_otp_per_person_limit: 10,
 				rate_limit_email_otp_per_person_window: PostgresInterval('00:10:00'),
+				rate_limit_email_verification_per_ip_limit: 0,
+				rate_limit_email_verification_per_ip_window: PostgresInterval('01:00:00'),
+				// Per-flow captcha enforcement. The historically-protected flows
+				// default ON; email verification is opt-in (matches column defaults).
+				captcha_protect_sign_up: true,
+				captcha_protect_password_reset: true,
+				captcha_protect_passwordless_init: true,
+				captcha_protect_email_verification: false,
 				...overrides,
 			},
 		],

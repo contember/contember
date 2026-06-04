@@ -7,6 +7,8 @@ export type IDPResponse = {
 	externalIdentifier: string
 	email?: string
 	name?: string
+	/** Whether the provider asserts the e-mail address is verified (OIDC `email_verified`). */
+	emailVerified?: boolean
 } & Record<string, unknown>
 
 export interface IdentityProviderHandler<Configuration extends {}> {

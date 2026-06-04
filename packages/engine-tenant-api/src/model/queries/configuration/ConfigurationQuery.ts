@@ -22,6 +22,12 @@ export class ConfigurationQuery extends DatabaseQuery<Config> {
 			: null
 
 		return {
+			signup: {
+				requireEmailVerification: result.signup_require_email_verification,
+			},
+			emailChange: {
+				requireVerification: result.require_email_change_verification,
+			},
 			passwordless: {
 				enabled: result.passwordless_enabled,
 				url: result.passwordless_url,
@@ -50,6 +56,12 @@ export class ConfigurationQuery extends DatabaseQuery<Config> {
 			captcha: {
 				provider: result.captcha_provider,
 				threshold: result.captcha_threshold,
+				protect: {
+					signUp: result.captcha_protect_sign_up,
+					passwordReset: result.captcha_protect_password_reset,
+					passwordlessInit: result.captcha_protect_passwordless_init,
+					emailVerification: result.captcha_protect_email_verification,
+				},
 			},
 			captchaSecret,
 			rateLimits: {
@@ -72,6 +84,10 @@ export class ConfigurationQuery extends DatabaseQuery<Config> {
 				emailOtpPerPerson: {
 					limit: result.rate_limit_email_otp_per_person_limit,
 					window: result.rate_limit_email_otp_per_person_window,
+				},
+				emailVerificationPerIp: {
+					limit: result.rate_limit_email_verification_per_ip_limit,
+					window: result.rate_limit_email_verification_per_ip_window,
 				},
 			},
 		}

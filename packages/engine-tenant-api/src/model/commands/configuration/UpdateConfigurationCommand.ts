@@ -35,6 +35,8 @@ export class UpdateConfigurationCommand implements Command<void> {
 			.values(
 				{
 					passwordless_enabled: this.configuration.passwordless?.enabled ?? undefined,
+					signup_require_email_verification: this.configuration.signup?.requireEmailVerification ?? undefined,
+					require_email_change_verification: this.configuration.emailChange?.requireVerification ?? undefined,
 					passwordless_url: this.configuration.passwordless?.url,
 					passwordless_expiration: this.configuration.passwordless?.expiration ?? undefined,
 					password_min_length: this.configuration.password?.minLength ?? undefined,
@@ -57,6 +59,10 @@ export class UpdateConfigurationCommand implements Command<void> {
 					captcha_secret: captchaSecretCol,
 					captcha_secret_version: captchaSecretVersionCol,
 					captcha_threshold: captcha?.threshold !== undefined ? captcha.threshold : undefined,
+					captcha_protect_sign_up: captcha?.protect?.signUp ?? undefined,
+					captcha_protect_password_reset: captcha?.protect?.passwordReset ?? undefined,
+					captcha_protect_passwordless_init: captcha?.protect?.passwordlessInit ?? undefined,
+					captcha_protect_email_verification: captcha?.protect?.emailVerification ?? undefined,
 					rate_limit_sign_up_per_ip_limit: rl?.signUpPerIp?.limit ?? undefined,
 					rate_limit_sign_up_per_ip_window: rl?.signUpPerIp?.window ?? undefined,
 					rate_limit_login_per_ip_limit: rl?.loginPerIp?.limit ?? undefined,
@@ -67,6 +73,8 @@ export class UpdateConfigurationCommand implements Command<void> {
 					rate_limit_passwordless_init_per_ip_window: rl?.passwordlessInitPerIp?.window ?? undefined,
 					rate_limit_email_otp_per_person_limit: rl?.emailOtpPerPerson?.limit ?? undefined,
 					rate_limit_email_otp_per_person_window: rl?.emailOtpPerPerson?.window ?? undefined,
+					rate_limit_email_verification_per_ip_limit: rl?.emailVerificationPerIp?.limit ?? undefined,
+					rate_limit_email_verification_per_ip_window: rl?.emailVerificationPerIp?.window ?? undefined,
 				} satisfies {
 					[K in keyof ConfigRow]: (IPostgresInterval extends ConfigRow[K] ? string : never) | Exclude<ConfigRow[K], IPostgresInterval> | undefined
 				},

@@ -8,6 +8,9 @@ export enum MailType {
 	forcedSignOut = 'forcedSignOut',
 	emailOtp = 'emailOtp',
 	backupCodesExhausted = 'backupCodesExhausted',
+	emailVerification = 'emailVerification',
+	emailChangeVerify = 'emailChangeVerify',
+	emailChangeNotify = 'emailChangeNotify',
 }
 
 export const mailTypeFromSchemaToDb = (type: SchemaMailType): MailType => {
@@ -19,6 +22,9 @@ export const mailTypeFromSchemaToDb = (type: SchemaMailType): MailType => {
 		FORCED_SIGN_OUT: MailType.forcedSignOut,
 		EMAIL_OTP: MailType.emailOtp,
 		BACKUP_CODES_EXHAUSTED: MailType.backupCodesExhausted,
+		EMAIL_VERIFICATION: MailType.emailVerification,
+		EMAIL_CHANGE_VERIFY: MailType.emailChangeVerify,
+		EMAIL_CHANGE_NOTIFY: MailType.emailChangeNotify,
 	}[type]
 }
 
@@ -31,6 +37,9 @@ export const mailTypeFromDbToSchema = (type: MailType): SchemaMailType => {
 		[MailType.forcedSignOut]: 'FORCED_SIGN_OUT' as const,
 		[MailType.emailOtp]: 'EMAIL_OTP' as const,
 		[MailType.backupCodesExhausted]: 'BACKUP_CODES_EXHAUSTED' as const,
+		[MailType.emailVerification]: 'EMAIL_VERIFICATION' as const,
+		[MailType.emailChangeVerify]: 'EMAIL_CHANGE_VERIFY' as const,
+		[MailType.emailChangeNotify]: 'EMAIL_CHANGE_NOTIFY' as const,
 	}[type]
 }
 

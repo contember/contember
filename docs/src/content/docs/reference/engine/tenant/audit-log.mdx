@@ -42,8 +42,18 @@ Every entry carries:
 | `password_reset_init` | `createResetPasswordRequest` |
 | `password_reset` | `resetPassword` |
 | `password_change` | `changePassword`, `changeMyPassword` |
-| `email_change` | `changeProfile`, `changeMyProfile` (email field) |
+| `email_change` | `changeProfile`, `changeMyProfile` (email field, immediate change) |
+| `email_verify_init` | *(since 2.2)* A verification mail is sent — `signUp` (when required) or `requestEmailVerification` |
+| `email_verify_complete` | *(since 2.2)* `verifyEmail` |
+| `email_change_init` | *(since 2.2)* `changeMyProfile` initiates a verified e-mail change |
+| `email_change_complete` | *(since 2.2)* `confirmEmailChange` |
 | `2fa_enable`, `2fa_disable` | `confirmOtp`, `disableOtp` |
+
+A few auth events carry extra context so security-relevant outcomes stay distinguishable:
+
+- `idp_login` failures where a verified-email-required provider [refused to auto-link](/reference/engine/tenant/idp) an unverified claim to an existing account record `event_data.reason = "idp_email_unverified"` and the blocked account's `person_id`, even though the client-facing error stays a generic `PERSON_NOT_FOUND` (no account-existence leak).
+- `passwordless_login` that also satisfies a pending e-mail-verification requirement (clicking the magic link proves ownership) records `event_data.emailVerified = true`, so the trail shows when/how the address became verified.
+- `email_verify_complete` and `email_change_complete` carry the `person_id` and `person_token_id` on both success and failure paths.
 
 ### Session events (since 2.2)
 

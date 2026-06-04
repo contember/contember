@@ -3,6 +3,8 @@ import { IPostgresInterval } from 'postgres-interval'
 import { type Config as ConfigSchema } from '../../schema/index.js'
 import { Interval } from '../../schema/types.js'
 export type ConfigRow = {
+	signup_require_email_verification: boolean
+	require_email_change_verification: boolean
 	passwordless_enabled: ConfigPolicy
 	passwordless_url: string | null
 	passwordless_expiration: IPostgresInterval
@@ -26,6 +28,10 @@ export type ConfigRow = {
 	captcha_secret: Buffer | null
 	captcha_secret_version: number | null
 	captcha_threshold: number | null
+	captcha_protect_sign_up: boolean
+	captcha_protect_password_reset: boolean
+	captcha_protect_passwordless_init: boolean
+	captcha_protect_email_verification: boolean
 	rate_limit_sign_up_per_ip_limit: number
 	rate_limit_sign_up_per_ip_window: IPostgresInterval
 	rate_limit_login_per_ip_limit: number
@@ -36,6 +42,8 @@ export type ConfigRow = {
 	rate_limit_passwordless_init_per_ip_window: IPostgresInterval
 	rate_limit_email_otp_per_person_limit: number
 	rate_limit_email_otp_per_person_window: IPostgresInterval
+	rate_limit_email_verification_per_ip_limit: number
+	rate_limit_email_verification_per_ip_window: IPostgresInterval
 }
 
 export type Config =

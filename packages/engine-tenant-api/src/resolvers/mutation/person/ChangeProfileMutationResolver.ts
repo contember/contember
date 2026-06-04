@@ -1,18 +1,31 @@
 import {
 	ChangeMyProfileResponse,
 	ChangeProfileResponse,
+	ConfirmEmailChangeResponse,
 	MutationChangeMyProfileArgs,
 	MutationChangeProfileArgs,
+	MutationConfirmEmailChangeArgs,
 	MutationResolvers,
 } from '../../../schema/index.js'
 import { GraphQLResolveInfo } from 'graphql'
 import { TenantResolverContext } from '../../TenantResolverContext.js'
-import { IdentityScope, PermissionActions, PersonManager, PersonQuery } from '../../../model/index.js'
+import {
+	ConfigurationQuery,
+	EmailChangeManager,
+	IdentityScope,
+	PermissionActions,
+	PermissionContextFactory,
+	PersonManager,
+	PersonQuery,
+} from '../../../model/index.js'
 import { createErrorResponse } from '../../errorUtils.js'
+import { normalizeEmail } from '../../../model/utils/email.js'
 
-export class ChangeProfileMutationResolver implements Pick<MutationResolvers, 'changeMyProfile' | 'changeProfile'> {
+export class ChangeProfileMutationResolver implements Pick<MutationResolvers, 'changeMyProfile' | 'changeProfile' | 'confirmEmailChange'> {
 	constructor(
 		private readonly personManager: PersonManager,
+		private readonly emailChangeManager: EmailChangeManager,
+		private readonly permissionContextFactory: PermissionContextFactory,
 	) {}
 
 	async changeProfile(
@@ -71,6 +84,56 @@ export class ChangeProfileMutationResolver implements Pick<MutationResolvers, 'c
 			message: 'You are not allowed to change profile',
 		})
 
+		const config = await context.db.queryHandler.fetch(new ConfigurationQuery(context.db.providers))
+		// Compare normalized: a resubmit that only differs in casing/whitespace is
+		// not a real change and must not trigger a confirmation mail.
+		const normalizedNewEmail = args.email ? normalizeEmail(args.email) : null
+		const emailChanging = normalizedNewEmail !== null && normalizedNewEmail !== person.email
+
+		// When e-mail-change verification applies, an e-mail change is not
+		// applied immediately: it goes through confirmEmailChange against a token
+		// mailed to the new address (the old address stays active until then). The
+		// name change (if any) is applied atomically with the token —
+		// validation/rate-limiting run first, so a rejected e-mail never leaves a
+		// half-applied profile.
+		//
+		// This fires when EITHER the tenant opts in via require_email_change_verification,
+		// OR this account is already subject to verification (email_verification_required,
+		// set when it signed up while signup verification was on). The latter is what
+		// keeps the "email_verified_at implies THIS address was proven" invariant intact:
+		// without it, a verification-required account could swap to an arbitrary address
+		// via the direct path and inherit the old verified status, defeating the sign-in
+		// gate. signup verification ⇒ change verification, regardless of the change flag.
+		if (emailChanging && (config.emailChange.requireVerification || person.email_verification_required)) {
+			const permissionContext = await this.permissionContextFactory.create(context.db, {
+				id: person.identity_id,
+				roles: person.roles,
+			})
+			const result = await this.emailChangeManager.requestEmailChange(
+				context.db,
+				permissionContext,
+				person,
+				normalizedNewEmail,
+				{},
+				args.name !== undefined
+					? async db => {
+						await this.personManager.changeProfile(db, person, { name: args.name === '' ? null : args.name })
+					}
+					: undefined,
+			)
+			await context.logAuthAction({
+				type: 'email_change_init',
+				response: result,
+				personId: person.id,
+				// Log the normalized address so it matches the per-recipient backoff key.
+				personInput: normalizedNewEmail,
+			})
+			if (!result.ok) {
+				return createErrorResponse(result.error, result.errorMessage)
+			}
+			return { ok: true }
+		}
+
 		const result = await this.personManager.changeProfile(context.db, person, {
 			email: args.email,
 			name: args.name === '' ? null : args.name,
@@ -87,6 +150,30 @@ export class ChangeProfileMutationResolver implements Pick<MutationResolvers, 'c
 			return createErrorResponse(result.error, result.errorMessage)
 		}
 
+		return { ok: true }
+	}
+
+	async confirmEmailChange(
+		parent: unknown,
+		args: MutationConfirmEmailChangeArgs,
+		context: TenantResolverContext,
+		info: GraphQLResolveInfo,
+	): Promise<ConfirmEmailChangeResponse> {
+		await context.requireAccess({
+			action: PermissionActions.PERSON_RESET_PASSWORD,
+			message: 'You are not allowed to confirm an e-mail change',
+		})
+
+		const result = await this.emailChangeManager.confirmEmailChange(context.db, args.token)
+		await context.logAuthAction({
+			type: 'email_change_complete',
+			// personId/tokenId ride along in the AuthLog bag on both success and
+			// the uniqueness/validation failure paths (see EmailChangeManager).
+			response: result,
+		})
+		if (!result.ok) {
+			return createErrorResponse(result.error, result.errorMessage)
+		}
 		return { ok: true }
 	}
 }

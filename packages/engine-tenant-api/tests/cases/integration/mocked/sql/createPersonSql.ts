@@ -8,9 +8,10 @@ export const createPersonSql = (args: {
 	password?: string
 	identityId: string
 	idpOnly?: boolean
+	emailVerificationRequired?: boolean
 }): ExpectedQuery => ({
-	sql: SQL`INSERT INTO "tenant"."person" ("id", "email", "name", "password_hash", "identity_id", "idp_only")
-	         VALUES (?, ?, ?, ?, ?, ?)`,
+	sql: SQL`INSERT INTO "tenant"."person" ("id", "email", "name", "password_hash", "identity_id", "idp_only", "email_verification_required")
+	         VALUES (?, ?, ?, ?, ?, ?, ?)`,
 	parameters: [
 		args.personId,
 		args.email ?? null,
@@ -18,6 +19,7 @@ export const createPersonSql = (args: {
 		args.password ? `BCRYPTED-${args.password}` : null,
 		args.identityId,
 		args.idpOnly ?? false,
+		args.emailVerificationRequired ?? false,
 	],
 	response: { rowCount: 1 },
 })

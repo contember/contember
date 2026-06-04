@@ -12,6 +12,7 @@ export class IdPMock implements IdentityProviderHandler<any> {
 		return Promise.resolve({
 			externalIdentifier: configuration.externalIdentifier,
 			email: configuration.email,
+			emailVerified: configuration.emailVerified,
 		})
 	}
 

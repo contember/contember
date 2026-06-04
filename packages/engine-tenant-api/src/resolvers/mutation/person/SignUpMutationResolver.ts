@@ -4,17 +4,20 @@ import {
 	ApiKeyManager,
 	CaptchaValidator,
 	ConfigurationQuery,
+	EmailVerificationManager,
 	NoPassword,
 	PasswordHash,
 	PasswordPlain,
 	PermissionActions,
+	PermissionContextFactory,
+	PersonQuery,
 	RateLimiter,
 	SignUpManager,
 } from '../../../model/index.js'
 import { createErrorResponse } from '../../errorUtils.js'
 import { UserInputError } from '@contember/graphql-utils'
 import { PersonResponseFactory } from '../../responseHelpers/PersonResponseFactory.js'
-import { ResponseError } from '../../../model/utils/Response.js'
+import { ResponseError, ResponseOk } from '../../../model/utils/Response.js'
 
 export class SignUpMutationResolver implements MutationResolvers {
 	constructor(
@@ -22,6 +25,8 @@ export class SignUpMutationResolver implements MutationResolvers {
 		private readonly apiKeyManager: ApiKeyManager,
 		private readonly captchaValidator: CaptchaValidator,
 		private readonly rateLimiter: RateLimiter,
+		private readonly emailVerificationManager: EmailVerificationManager,
+		private readonly permissionContextFactory: PermissionContextFactory,
 	) {}
 
 	async signUp(parent: any, args: MutationSignUpArgs, context: TenantResolverContext): Promise<SignUpResponse> {
@@ -41,7 +46,7 @@ export class SignUpMutationResolver implements MutationResolvers {
 		}
 
 		const captchaConfig = this.captchaValidator.extractConfig(configuration)
-		if (this.captchaValidator.isEnabled(captchaConfig)) {
+		if (this.captchaValidator.isEnabledFor(captchaConfig, 'signUp')) {
 			const captcha = await this.captchaValidator.verify({
 				config: captchaConfig,
 				token: args.captchaToken ?? undefined,
@@ -78,6 +83,27 @@ export class SignUpMutationResolver implements MutationResolvers {
 		}
 		const result = response.result
 		await this.apiKeyManager.disableOneOffApiKey(context.db, context.apiKeyId)
+
+		if (result.emailVerificationRequired) {
+			// Re-fetch to get the identity roles needed for the project lookup
+			// the verification mail is scoped to.
+			const personRow = await context.db.queryHandler.fetch(PersonQuery.byId(result.person.id))
+			if (personRow?.email) {
+				const permissionContext = await this.permissionContextFactory.create(context.db, {
+					id: personRow.identity_id,
+					roles: personRow.roles,
+				})
+				const sent = await this.emailVerificationManager.sendVerificationEmail(context.db, permissionContext, personRow)
+				if (sent) {
+					await context.logAuthAction({
+						type: 'email_verify_init',
+						response: new ResponseOk(null),
+						personId: personRow.id,
+						personInput: personRow.email,
+					})
+				}
+			}
+		}
 
 		return {
 			ok: true,

@@ -26,6 +26,10 @@ mutation {
 
 Pass either field individually — omitted fields are left unchanged. Setting `name: ""` clears the name.
 
+:::note[E-mail-change verification — opt-in *(since 2.2)*]
+When `emailChange.requireVerification` is enabled (it is **off** by default) — or the account was created under sign-up verification, which implies it — changing the e-mail does **not** apply immediately: `changeMyProfile` returns `ok: true`, mails a confirmation token to the *new* address, and keeps the old address active until the user confirms via [`confirmEmailChange`](/reference/engine/tenant/email-verification#e-mail-change-verification). A `name` change passed in the same call is still applied right away. When neither applies (a deployment with no verification at all), addresses swap immediately as before. In that direct case the change also clears the verified status of the address, since the new one is unproven.
+:::
+
 Errors:
 
 | Code | Cause |
@@ -33,8 +37,9 @@ Errors:
 | `NOT_A_PERSON` | Caller is authenticated via a permanent API key, not a person. |
 | `INVALID_EMAIL_FORMAT` | Email failed format validation. |
 | `EMAIL_ALREADY_EXISTS` | Email is already used by another person. |
+| `RATE_LIMIT_EXCEEDED` | *(since 2.2)* Per-recipient backoff on confirmation mails for a verified e-mail change. |
 
-A successful email change records `email_change` in the [audit log](/reference/engine/tenant/audit-log).
+An immediate (unverified) email change records `email_change` in the [audit log](/reference/engine/tenant/audit-log); a verified change records `email_change_init` / `email_change_complete` instead.
 
 ### Change my password
 
@@ -80,6 +85,8 @@ mutation {
 Gated by `PERSON_CHANGE_PROFILE` against the *target's* roles — a `PROJECT_ADMIN` can change profiles of persons whose roles do not exceed their own; `SUPER_ADMIN` is unrestricted.
 
 Errors: `PERSON_NOT_FOUND`, `INVALID_EMAIL_FORMAT`, `EMAIL_ALREADY_EXISTS`.
+
+The admin `changeProfile` is **never** routed through [e-mail-change verification](/reference/engine/tenant/email-verification#e-mail-change-verification) — the new address is applied immediately regardless of `emailChange.requireVerification`. Only the self-service `changeMyProfile` goes through confirmation.
 
 ### Set someone's password
 

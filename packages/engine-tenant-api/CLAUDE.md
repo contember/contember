@@ -36,6 +36,16 @@ CQRS pattern with Command/Query separation via `CommandBus` and `DatabaseQuery`.
 
 Core tables: `identity`, `person`, `api_key`, `person_token`, `project`, `project_membership`, `project_membership_variable`, `project_secret`, `identity_provider`, `person_identity_provider`, `mail_template`, `person_auth_log`, `config`
 
+## GraphQL schema (generated)
+
+`src/schema/index.ts` is **generated** from the SDL in `src/schema/tenant.graphql.ts` via graphql-codegen — **do not hand-edit it**. Change the SDL (types, inputs, mutations, enums) and regenerate:
+
+```bash
+./scripts/graphql-codegen/run.sh engine-tenant-api
+```
+
+The script runs codegen in Docker and writes `src/schema/index.ts`. Its raw output uses semicolons / 2-space indent; the repo style is tabs / no semicolons, so run `bun run format` (dprint) afterwards to normalize the file. When adding a new SDL **type**, codegen also emits its `ResolversTypes` / `ResolversParentTypes` / `*Resolvers` entries — regenerating gets these right; hand-editing tends to miss them.
+
 ## Migrations & snapshot
 
 Migrations live in `src/migrations/` (one `YYYY-MM-DD-HHMMSS-name.ts` per change, registered in `runner.ts`). `snapshot.ts` is a `pg_dump` of the schema that running ALL migrations produces — the runner uses it (`SnapshotMigrationResolver`) to bootstrap a fresh DB in one step instead of replaying every migration. **It is generated, not hand-edited, and must be regenerated whenever you add or change a migration**, otherwise a fresh DB drifts from an upgraded one (e.g. a missing index or a non-partial index).

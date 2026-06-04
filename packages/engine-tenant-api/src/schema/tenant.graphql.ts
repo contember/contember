@@ -100,6 +100,21 @@ const schema: DocumentNode = gql`
 		createResetPasswordRequest(email: String!, options: CreateResetPasswordRequestOptions, captchaToken: String): CreatePasswordResetRequestResponse
 		resetPassword(token: String!, password: String!): ResetPasswordResponse
 
+		"""
+		(Re)send the e-mail verification link for the given address. Always
+		reports ok regardless of whether the address exists or is already
+		verified, to avoid leaking account existence.
+		"""
+		requestEmailVerification(email: String!, options: EmailVerificationOptions, captchaToken: String): RequestEmailVerificationResponse
+		verifyEmail(token: String!): VerifyEmailResponse
+		"""
+		Confirm a pending e-mail change (see changeMyProfile when
+		config.signup.requireEmailVerification is enabled). Consumes the token
+		that was mailed to the new address, swaps the address, and signs out all
+		existing sessions.
+		"""
+		confirmEmailChange(token: String!): ConfirmEmailChangeResponse
+
 		invite(email: String!, name: String, projectSlug: String!, memberships: [MembershipInput!]!, options: InviteOptions): InviteResponse
 		unmanagedInvite(
 			email: String!,
@@ -153,11 +168,35 @@ const schema: DocumentNode = gql`
 	# === configure ===
 	
 	type Config {
+		signup: ConfigSignup!
+		emailChange: ConfigEmailChange!
 		passwordless: ConfigPasswordless!
 		password: ConfigPassword!
 		login: ConfigLogin!
 		captcha: ConfigCaptcha!
 		rateLimits: ConfigRateLimits!
+	}
+
+	type ConfigSignup {
+		"""
+		When true, new accounts must verify their e-mail address before they can
+		sign in. The requirement is captured per account at sign-up, so toggling
+		this only affects accounts created afterwards. Defaults to false (no
+		change vs. previous behavior). E-mail changes are governed separately by
+		ConfigEmailChange.requireVerification.
+		"""
+		requireEmailVerification: Boolean!
+	}
+
+	type ConfigEmailChange {
+		"""
+		When true, a user-initiated changeMyProfile e-mail change does not swap
+		the address immediately: it goes through a confirmation flow
+		(confirmEmailChange) against a token mailed to the new address, and the
+		old address stays active until the new one is confirmed. Independent of
+		ConfigSignup.requireEmailVerification. Defaults to false.
+		"""
+		requireVerification: Boolean!
 	}
 
 	type ConfigPasswordless {
@@ -202,6 +241,19 @@ const schema: DocumentNode = gql`
 	type ConfigCaptcha {
 		provider: CaptchaProvider
 		threshold: Float
+		protect: ConfigCaptchaProtect!
+	}
+
+	"""
+	Per-flow captcha enforcement. The captcha provider/secret is shared; these
+	flags decide which mutations actually require a captcha token when a provider
+	is configured.
+	"""
+	type ConfigCaptchaProtect {
+		signUp: Boolean!
+		passwordReset: Boolean!
+		passwordlessInit: Boolean!
+		emailVerification: Boolean!
 	}
 
 	enum CaptchaProvider {
@@ -228,6 +280,7 @@ const schema: DocumentNode = gql`
 		ships enabled by default. Set limit to 0 to disable.
 		"""
 		emailOtpPerPerson: ConfigRateLimitWindow!
+		emailVerificationPerIp: ConfigRateLimitWindow!
 	}
 
 	type ConfigRateLimitWindow {
@@ -236,11 +289,21 @@ const schema: DocumentNode = gql`
 	}
 
 	input ConfigInput {
+		signup: ConfigSignupInput
+		emailChange: ConfigEmailChangeInput
 		passwordless: ConfigPasswordlessInput
 		password: ConfigPasswordInput
 		login: ConfigLoginInput
 		captcha: ConfigCaptchaInput
 		rateLimits: ConfigRateLimitsInput
+	}
+
+	input ConfigSignupInput {
+		requireEmailVerification: Boolean
+	}
+
+	input ConfigEmailChangeInput {
+		requireVerification: Boolean
 	}
 
 	enum ConfigPolicy {
@@ -286,6 +349,14 @@ const schema: DocumentNode = gql`
 		provider: CaptchaProvider
 		secret: String
 		threshold: Float
+		protect: ConfigCaptchaProtectInput
+	}
+
+	input ConfigCaptchaProtectInput {
+		signUp: Boolean
+		passwordReset: Boolean
+		passwordlessInit: Boolean
+		emailVerification: Boolean
 	}
 
 	input ConfigRateLimitsInput {
@@ -294,6 +365,7 @@ const schema: DocumentNode = gql`
 		passwordResetPerIp: ConfigRateLimitWindowInput
 		passwordlessInitPerIp: ConfigRateLimitWindowInput
 		emailOtpPerPerson: ConfigRateLimitWindowInput
+		emailVerificationPerIp: ConfigRateLimitWindowInput
 	}
 
 	input ConfigRateLimitWindowInput {
@@ -411,6 +483,7 @@ const schema: DocumentNode = gql`
 		OTP_REQUIRED
 		INVALID_OTP_TOKEN
 		MFA_ENROLLMENT_REQUIRED
+		EMAIL_NOT_VERIFIED
 		RATE_LIMIT_EXCEEDED
 	}
 
@@ -501,7 +574,8 @@ const schema: DocumentNode = gql`
 		NOT_A_PERSON
 		INVALID_EMAIL_FORMAT
 		EMAIL_ALREADY_EXISTS
-	}	
+		RATE_LIMIT_EXCEEDED
+	}
 
 	# === changePassword ===
 
@@ -685,12 +759,19 @@ const schema: DocumentNode = gql`
 		autoSignUp: Boolean!
 		exclusive: Boolean!
 		initReturnsConfig: Boolean!
+		"""
+		When true, a non-exclusive provider may only auto-link to / sign in an
+		existing account by e-mail if the provider asserts the e-mail is verified.
+		Defaults to false.
+		"""
+		requireVerifiedEmail: Boolean!
 	}
 
 	input IDPOptions {
 		autoSignUp: Boolean
 		exclusive: Boolean
 		initReturnsConfig: Boolean
+		requireVerifiedEmail: Boolean
 	}
 
 	# === passwordless sign in ===
@@ -1053,6 +1134,7 @@ const schema: DocumentNode = gql`
 		name: String
 		otpEnabled: Boolean!
 		passwordlessEnabled: Boolean
+		emailVerified: Boolean!
 		identity: Identity!
 	}
 
@@ -1480,6 +1562,9 @@ const schema: DocumentNode = gql`
 		FORCED_SIGN_OUT
 		EMAIL_OTP
 		BACKUP_CODES_EXHAUSTED
+		EMAIL_VERIFICATION
+		EMAIL_CHANGE_VERIFY
+		EMAIL_CHANGE_NOTIFY
 	}
 
 	input MailTemplateIdentifier {
@@ -1579,6 +1664,64 @@ const schema: DocumentNode = gql`
 	input CreateResetPasswordRequestOptions {
 		mailProject: String
 		mailVariant: String
+	}
+
+	# === email verification ===
+
+	input EmailVerificationOptions {
+		mailProject: String
+		mailVariant: String
+	}
+
+	type RequestEmailVerificationResponse {
+		ok: Boolean!
+		error: RequestEmailVerificationError
+	}
+
+	type RequestEmailVerificationError {
+		code: RequestEmailVerificationErrorCode!
+		developerMessage: String!
+	}
+
+	enum RequestEmailVerificationErrorCode {
+		RATE_LIMIT_EXCEEDED
+		INVALID_CAPTCHA
+	}
+
+	type VerifyEmailResponse {
+		ok: Boolean!
+		error: VerifyEmailError
+	}
+
+	type VerifyEmailError {
+		code: VerifyEmailErrorCode!
+		developerMessage: String!
+	}
+
+	enum VerifyEmailErrorCode {
+		TOKEN_NOT_FOUND
+		TOKEN_INVALID
+		TOKEN_USED
+		TOKEN_EXPIRED
+	}
+
+	type ConfirmEmailChangeResponse {
+		ok: Boolean!
+		error: ConfirmEmailChangeError
+	}
+
+	type ConfirmEmailChangeError {
+		code: ConfirmEmailChangeErrorCode!
+		developerMessage: String!
+	}
+
+	enum ConfirmEmailChangeErrorCode {
+		TOKEN_NOT_FOUND
+		TOKEN_INVALID
+		TOKEN_USED
+		TOKEN_EXPIRED
+		EMAIL_ALREADY_EXISTS
+		INVALID_EMAIL_FORMAT
 	}
 
 	# === project ===

@@ -1,13 +1,10 @@
+/** Internal type. DO NOT USE DIRECTLY. */
+export type Incremental<T> = T | { [P in keyof T]?: P extends ' $fragmentName' | '__typename' ? T[P] : never }
 import { Interval } from './types.js'
 import { OutputInterval } from './types.js'
 import { GraphQLResolveInfo, GraphQLScalarType, GraphQLScalarTypeConfig } from 'graphql'
 export type Maybe<T> = T | null
 export type InputMaybe<T> = Maybe<T>
-export type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] }
-export type MakeOptional<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]?: Maybe<T[SubKey]> }
-export type MakeMaybe<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]: Maybe<T[SubKey]> }
-export type MakeEmpty<T extends { [key: string]: unknown }, K extends keyof T> = { [_ in K]?: never }
-export type Incremental<T> = T | { [P in keyof T]?: P extends ' $fragmentName' | '__typename' ? T[P] : never }
 export type Omit<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>
 export type RequireFields<T, K extends keyof T> = Omit<T, K> & { [P in K]-?: NonNullable<T[P]> }
 /** All built-in and custom scalars, mapped to their actual values */
@@ -18,6 +15,7 @@ export type Scalars = {
 	Int: { input: number; output: number }
 	Float: { input: number; output: number }
 	DateTime: { input: Date; output: Date }
+	/**  Interval is a string in the format ISO 8601, e.g. "PT1H" for 1 hour  */
 	Interval: { input: Interval; output: OutputInterval }
 	Json: { input: unknown; output: unknown }
 }
@@ -60,78 +58,6 @@ export type AddGlobalIdentityRolesResponse = {
 export type AddGlobalIdentityRolesResult = {
 	readonly __typename?: 'AddGlobalIdentityRolesResult'
 	readonly identity: Identity
-}
-
-/**
- * A single `person_auth_log` row. Mirrors the columns described in
- * docs/.../audit-log.md.
- */
-export type AuthLogEntry = {
-	readonly __typename?: 'AuthLogEntry'
-	readonly createdAt: Scalars['DateTime']['output']
-	/**
-	 * JSONB — domain payload. For change events this is typically
-	 * `{before, after}`; for creation events it's the snapshot.
-	 * Secret-bearing inputs are redacted before being stored.
-	 */
-	readonly eventData?: Maybe<Scalars['Json']['output']>
-	readonly errorCode?: Maybe<Scalars['String']['output']>
-	readonly errorMessage?: Maybe<Scalars['String']['output']>
-	readonly id: Scalars['String']['output']
-	readonly identityProviderId?: Maybe<Scalars['String']['output']>
-	/**
-	 * Effective client IP after `trust-forwarded-info` is applied. The
-	 * raw socket peer is preserved in `metadata.forwarderIp` when a
-	 * trusted proxy was involved.
-	 */
-	readonly ipAddress?: Maybe<Scalars['String']['output']>
-	/** Identity that performed the action. */
-	readonly invokedByIdentityId?: Maybe<Scalars['String']['output']>
-	/**
-	 * JSONB — forensic context. Common keys: `forwarderIp`,
-	 * `forwarderUserAgent`, `sessionId`, `reason`.
-	 */
-	readonly metadata?: Maybe<Scalars['Json']['output']>
-	/** The actor's person (if the actor was a person, not a bare api_key). */
-	readonly personId?: Maybe<Scalars['String']['output']>
-	/**
-	 * Free-form input string — typically the email submitted on a failed
-	 * login, before any person record was looked up.
-	 */
-	readonly personInputIdentifier?: Maybe<Scalars['String']['output']>
-	readonly success: Scalars['Boolean']['output']
-	/** The subject of the action when different from the actor. */
-	readonly targetPersonId?: Maybe<Scalars['String']['output']>
-	/**
-	 * One of the values listed in `auth_log_type` (see audit-log docs).
-	 * Kept as String rather than a GraphQL enum because a few legacy values
-	 * (`2fa_enable`, `2fa_disable`) start with a digit and aren't valid
-	 * enum names, and the set is expected to keep growing.
-	 */
-	readonly type: Scalars['String']['output']
-	readonly userAgent?: Maybe<Scalars['String']['output']>
-}
-
-/** All fields are AND-combined. Omitted fields are unconstrained. */
-export type AuthLogFilter = {
-	/** Inclusive lower bound (`created_at >= createdAfter`). */
-	readonly createdAfter?: InputMaybe<Scalars['DateTime']['input']>
-	/** Exclusive upper bound (`created_at < createdBefore`). */
-	readonly createdBefore?: InputMaybe<Scalars['DateTime']['input']>
-	readonly invokedByIdentityId?: InputMaybe<Scalars['String']['input']>
-	readonly personId?: InputMaybe<Scalars['String']['input']>
-	readonly personInputIdentifier?: InputMaybe<Scalars['String']['input']>
-	readonly success?: InputMaybe<Scalars['Boolean']['input']>
-	readonly targetPersonId?: InputMaybe<Scalars['String']['input']>
-	/** OR-combined: any of the listed `auth_log_type` values matches. */
-	readonly types?: InputMaybe<ReadonlyArray<Scalars['String']['input']>>
-}
-
-export type AuthLogPage = {
-	readonly __typename?: 'AuthLogPage'
-	readonly entries: ReadonlyArray<AuthLogEntry>
-	/** True when more rows exist past `offset + limit`. */
-	readonly hasMore: Scalars['Boolean']['output']
 }
 
 export type AddIdpError = {
@@ -210,6 +136,122 @@ export type ApiKeyWithToken = {
 	readonly token?: Maybe<Scalars['String']['output']>
 }
 
+/**
+ * A single `person_auth_log` row. Mirrors the columns described in
+ * docs/.../audit-log.md.
+ */
+export type AuthLogEntry = {
+	readonly __typename?: 'AuthLogEntry'
+	readonly createdAt: Scalars['DateTime']['output']
+	readonly errorCode?: Maybe<Scalars['String']['output']>
+	readonly errorMessage?: Maybe<Scalars['String']['output']>
+	/**
+	 * JSONB — domain payload. For change events this is typically
+	 * `{before, after}`; for creation events it's the snapshot.
+	 * Secret-bearing inputs are redacted before being stored.
+	 */
+	readonly eventData?: Maybe<Scalars['Json']['output']>
+	readonly id: Scalars['String']['output']
+	readonly identityProviderId?: Maybe<Scalars['String']['output']>
+	/**
+	 * Identity that performed the action. May be null for entries created
+	 * before this column was populated, or when the actor's identity was
+	 * later deleted (FK is ON DELETE SET NULL semantics-wise).
+	 */
+	readonly invokedByIdentityId?: Maybe<Scalars['String']['output']>
+	/**
+	 * Effective client IP after `trust-forwarded-info` is applied. The
+	 * raw socket peer is preserved in `metadata.forwarderIp` when a
+	 * trusted proxy was involved.
+	 */
+	readonly ipAddress?: Maybe<Scalars['String']['output']>
+	/**
+	 * JSONB — forensic context. Common keys: `forwarderIp`,
+	 * `forwarderUserAgent`, `sessionId`, `reason`.
+	 */
+	readonly metadata?: Maybe<Scalars['Json']['output']>
+	/** The actor's person (if the actor was a person, not a bare api_key). */
+	readonly personId?: Maybe<Scalars['String']['output']>
+	/**
+	 * Free-form input string — typically the email submitted on a failed
+	 * login, before any person record was looked up.
+	 */
+	readonly personInputIdentifier?: Maybe<Scalars['String']['output']>
+	readonly success: Scalars['Boolean']['output']
+	/**
+	 * The subject of the action when different from the actor (e.g. force
+	 * sign-out, role grant, membership change). Resolved from the affected
+	 * identity so the trail points at the right person even when the actor
+	 * acts on someone else's identity.
+	 */
+	readonly targetPersonId?: Maybe<Scalars['String']['output']>
+	/**
+	 * One of the values listed in `auth_log_type` (see audit-log docs).
+	 * Kept as String rather than a GraphQL enum because a few legacy values
+	 * (`2fa_enable`, `2fa_disable`) start with a digit and aren't valid
+	 * enum names, and the set is expected to keep growing.
+	 */
+	readonly type: Scalars['String']['output']
+	readonly userAgent?: Maybe<Scalars['String']['output']>
+}
+
+/** All fields are AND-combined. Omitted fields are unconstrained. */
+export type AuthLogFilter = {
+	/** Inclusive lower bound (`created_at >= createdAfter`). */
+	readonly createdAfter?: InputMaybe<Scalars['DateTime']['input']>
+	/** Exclusive upper bound (`created_at < createdBefore`). */
+	readonly createdBefore?: InputMaybe<Scalars['DateTime']['input']>
+	readonly invokedByIdentityId?: InputMaybe<Scalars['String']['input']>
+	readonly personId?: InputMaybe<Scalars['String']['input']>
+	readonly personInputIdentifier?: InputMaybe<Scalars['String']['input']>
+	readonly success?: InputMaybe<Scalars['Boolean']['input']>
+	readonly targetPersonId?: InputMaybe<Scalars['String']['input']>
+	/** OR-combined: any of the listed `auth_log_type` values matches. */
+	readonly types?: InputMaybe<ReadonlyArray<Scalars['String']['input']>>
+}
+
+export type AuthLogPage = {
+	readonly __typename?: 'AuthLogPage'
+	readonly entries: ReadonlyArray<AuthLogEntry>
+	/** True when more rows exist past `offset + limit`. */
+	readonly hasMore: Scalars['Boolean']['output']
+}
+
+export type AuthPolicy = {
+	readonly __typename?: 'AuthPolicy'
+	readonly id: Scalars['String']['output']
+	readonly idleTimeout?: Maybe<Scalars['Interval']['output']>
+	readonly mfaGraceDuration?: Maybe<Scalars['Interval']['output']>
+	readonly mfaRequired?: Maybe<Scalars['Boolean']['output']>
+	/** Project slug, present only for project-scoped policies. */
+	readonly project?: Maybe<Scalars['String']['output']>
+	readonly rememberMeAllowed?: Maybe<Scalars['Boolean']['output']>
+	readonly roles: ReadonlyArray<Scalars['String']['output']>
+	readonly scope: AuthPolicyScope
+	readonly tokenExpiration?: Maybe<Scalars['Interval']['output']>
+}
+
+export type AuthPolicyInput = {
+	readonly idleTimeout?: InputMaybe<Scalars['Interval']['input']>
+	readonly mfaGraceDuration?: InputMaybe<Scalars['Interval']['input']>
+	readonly mfaRequired?: InputMaybe<Scalars['Boolean']['input']>
+	/** Project slug. Required for scope=project, forbidden for scope=global. */
+	readonly project?: InputMaybe<Scalars['String']['input']>
+	readonly rememberMeAllowed?: InputMaybe<Scalars['Boolean']['input']>
+	readonly roles: ReadonlyArray<Scalars['String']['input']>
+	readonly scope: AuthPolicyScope
+	readonly tokenExpiration?: InputMaybe<Scalars['Interval']['input']>
+}
+
+export type AuthPolicyScope =
+	| 'global'
+	| 'project'
+
+export type CaptchaProvider =
+	| 'hcaptcha'
+	| 'recaptchaV3'
+	| 'turnstile'
+
 export type ChangeMyPasswordError = {
 	readonly __typename?: 'ChangeMyPasswordError'
 	readonly code: ChangeMyPasswordErrorCode
@@ -239,6 +281,7 @@ export type ChangeMyProfileErrorCode =
 	| 'EMAIL_ALREADY_EXISTS'
 	| 'INVALID_EMAIL_FORMAT'
 	| 'NOT_A_PERSON'
+	| 'RATE_LIMIT_EXCEEDED'
 
 export type ChangeMyProfileResponse = {
 	readonly __typename?: 'ChangeMyProfileResponse'
@@ -304,10 +347,12 @@ export type CommonSignInResult = {
 export type Config = {
 	readonly __typename?: 'Config'
 	readonly captcha: ConfigCaptcha
+	readonly emailChange: ConfigEmailChange
 	readonly login: ConfigLogin
 	readonly password: ConfigPassword
 	readonly passwordless: ConfigPasswordless
 	readonly rateLimits: ConfigRateLimits
+	readonly signup: ConfigSignup
 }
 
 /**
@@ -316,6 +361,7 @@ export type Config = {
  */
 export type ConfigCaptcha = {
 	readonly __typename?: 'ConfigCaptcha'
+	readonly protect: ConfigCaptchaProtect
 	readonly provider?: Maybe<CaptchaProvider>
 	readonly threshold?: Maybe<Scalars['Float']['output']>
 }
@@ -325,57 +371,56 @@ export type ConfigCaptcha = {
  * Pass null secret to leave the stored value unchanged; pass empty string to clear.
  */
 export type ConfigCaptchaInput = {
+	readonly protect?: InputMaybe<ConfigCaptchaProtectInput>
 	readonly provider?: InputMaybe<CaptchaProvider>
 	readonly secret?: InputMaybe<Scalars['String']['input']>
 	readonly threshold?: InputMaybe<Scalars['Float']['input']>
 }
 
-export type CaptchaProvider =
-	| 'hcaptcha'
-	| 'recaptchaV3'
-	| 'turnstile'
+/**
+ * Per-flow captcha enforcement. The captcha provider/secret is shared; these
+ * flags decide which mutations actually require a captcha token when a provider
+ * is configured.
+ */
+export type ConfigCaptchaProtect = {
+	readonly __typename?: 'ConfigCaptchaProtect'
+	readonly emailVerification: Scalars['Boolean']['output']
+	readonly passwordReset: Scalars['Boolean']['output']
+	readonly passwordlessInit: Scalars['Boolean']['output']
+	readonly signUp: Scalars['Boolean']['output']
+}
+
+export type ConfigCaptchaProtectInput = {
+	readonly emailVerification?: InputMaybe<Scalars['Boolean']['input']>
+	readonly passwordReset?: InputMaybe<Scalars['Boolean']['input']>
+	readonly passwordlessInit?: InputMaybe<Scalars['Boolean']['input']>
+	readonly signUp?: InputMaybe<Scalars['Boolean']['input']>
+}
+
+export type ConfigEmailChange = {
+	readonly __typename?: 'ConfigEmailChange'
+	/**
+	 * When true, a user-initiated changeMyProfile e-mail change does not swap
+	 * the address immediately: it goes through a confirmation flow
+	 * (confirmEmailChange) against a token mailed to the new address, and the
+	 * old address stays active until the new one is confirmed. Independent of
+	 * ConfigSignup.requireEmailVerification. Defaults to false.
+	 */
+	readonly requireVerification: Scalars['Boolean']['output']
+}
+
+export type ConfigEmailChangeInput = {
+	readonly requireVerification?: InputMaybe<Scalars['Boolean']['input']>
+}
 
 export type ConfigInput = {
 	readonly captcha?: InputMaybe<ConfigCaptchaInput>
+	readonly emailChange?: InputMaybe<ConfigEmailChangeInput>
 	readonly login?: InputMaybe<ConfigLoginInput>
 	readonly password?: InputMaybe<ConfigPasswordInput>
 	readonly passwordless?: InputMaybe<ConfigPasswordlessInput>
 	readonly rateLimits?: InputMaybe<ConfigRateLimitsInput>
-}
-
-/**
- * Configurable per-IP rate-limit windows. Each value bounds the number of
- * attempts allowed from the same client IP in the configured window. Per-email
- * throttling for password-reset and passwordless-init flows reuses the
- * exponential backoff from ConfigLogin (baseBackoff / maxBackoff /
- * attemptWindow) against person_auth_log entries.
- */
-export type ConfigRateLimits = {
-	readonly __typename?: 'ConfigRateLimits'
-	readonly emailOtpPerPerson: ConfigRateLimitWindow
-	readonly loginPerIp: ConfigRateLimitWindow
-	readonly passwordResetPerIp: ConfigRateLimitWindow
-	readonly passwordlessInitPerIp: ConfigRateLimitWindow
-	readonly signUpPerIp: ConfigRateLimitWindow
-}
-
-export type ConfigRateLimitsInput = {
-	readonly emailOtpPerPerson?: InputMaybe<ConfigRateLimitWindowInput>
-	readonly loginPerIp?: InputMaybe<ConfigRateLimitWindowInput>
-	readonly passwordResetPerIp?: InputMaybe<ConfigRateLimitWindowInput>
-	readonly passwordlessInitPerIp?: InputMaybe<ConfigRateLimitWindowInput>
-	readonly signUpPerIp?: InputMaybe<ConfigRateLimitWindowInput>
-}
-
-export type ConfigRateLimitWindow = {
-	readonly __typename?: 'ConfigRateLimitWindow'
-	readonly limit: Scalars['Int']['output']
-	readonly window: Scalars['Interval']['output']
-}
-
-export type ConfigRateLimitWindowInput = {
-	readonly limit?: InputMaybe<Scalars['Int']['input']>
-	readonly window?: InputMaybe<Scalars['Interval']['input']>
+	readonly signup?: InputMaybe<ConfigSignupInput>
 }
 
 export type ConfigLogin = {
@@ -450,6 +495,64 @@ export type ConfigPolicy =
 	| 'optIn'
 	| 'optOut'
 
+export type ConfigRateLimitWindow = {
+	readonly __typename?: 'ConfigRateLimitWindow'
+	readonly limit: Scalars['Int']['output']
+	readonly window: Scalars['Interval']['output']
+}
+
+export type ConfigRateLimitWindowInput = {
+	readonly limit?: InputMaybe<Scalars['Int']['input']>
+	readonly window?: InputMaybe<Scalars['Interval']['input']>
+}
+
+/**
+ * Configurable per-IP rate-limit windows. Each value bounds the number of
+ * attempts allowed from the same client IP in the configured window. Per-email
+ * throttling for password-reset and passwordless-init flows reuses the
+ * exponential backoff from ConfigLogin (baseBackoff / maxBackoff /
+ * attemptWindow) against person_auth_log entries.
+ */
+export type ConfigRateLimits = {
+	readonly __typename?: 'ConfigRateLimits'
+	/**
+	 * Caps how many email-OTP codes may be dispatched per person within the
+	 * window (a brute-force / email-bomb backstop). Unlike the per-IP limits it
+	 * ships enabled by default. Set limit to 0 to disable.
+	 */
+	readonly emailOtpPerPerson: ConfigRateLimitWindow
+	readonly emailVerificationPerIp: ConfigRateLimitWindow
+	readonly loginPerIp: ConfigRateLimitWindow
+	readonly passwordResetPerIp: ConfigRateLimitWindow
+	readonly passwordlessInitPerIp: ConfigRateLimitWindow
+	readonly signUpPerIp: ConfigRateLimitWindow
+}
+
+export type ConfigRateLimitsInput = {
+	readonly emailOtpPerPerson?: InputMaybe<ConfigRateLimitWindowInput>
+	readonly emailVerificationPerIp?: InputMaybe<ConfigRateLimitWindowInput>
+	readonly loginPerIp?: InputMaybe<ConfigRateLimitWindowInput>
+	readonly passwordResetPerIp?: InputMaybe<ConfigRateLimitWindowInput>
+	readonly passwordlessInitPerIp?: InputMaybe<ConfigRateLimitWindowInput>
+	readonly signUpPerIp?: InputMaybe<ConfigRateLimitWindowInput>
+}
+
+export type ConfigSignup = {
+	readonly __typename?: 'ConfigSignup'
+	/**
+	 * When true, new accounts must verify their e-mail address before they can
+	 * sign in. The requirement is captured per account at sign-up, so toggling
+	 * this only affects accounts created afterwards. Defaults to false (no
+	 * change vs. previous behavior). E-mail changes are governed separately by
+	 * ConfigEmailChange.requireVerification.
+	 */
+	readonly requireEmailVerification: Scalars['Boolean']['output']
+}
+
+export type ConfigSignupInput = {
+	readonly requireEmailVerification?: InputMaybe<Scalars['Boolean']['input']>
+}
+
 export type ConfigureError = {
 	readonly __typename?: 'ConfigureError'
 	readonly code: ConfigureErrorCode
@@ -462,6 +565,46 @@ export type ConfigureResponse = {
 	readonly __typename?: 'ConfigureResponse'
 	readonly error?: Maybe<ConfigureError>
 	readonly ok: Scalars['Boolean']['output']
+}
+
+export type ConfirmEmailChangeError = {
+	readonly __typename?: 'ConfirmEmailChangeError'
+	readonly code: ConfirmEmailChangeErrorCode
+	readonly developerMessage: Scalars['String']['output']
+}
+
+export type ConfirmEmailChangeErrorCode =
+	| 'EMAIL_ALREADY_EXISTS'
+	| 'INVALID_EMAIL_FORMAT'
+	| 'TOKEN_EXPIRED'
+	| 'TOKEN_INVALID'
+	| 'TOKEN_NOT_FOUND'
+	| 'TOKEN_USED'
+
+export type ConfirmEmailChangeResponse = {
+	readonly __typename?: 'ConfirmEmailChangeResponse'
+	readonly error?: Maybe<ConfirmEmailChangeError>
+	readonly ok: Scalars['Boolean']['output']
+}
+
+export type ConfirmEmailOtpError = {
+	readonly __typename?: 'ConfirmEmailOtpError'
+	readonly code: ConfirmEmailOtpErrorCode
+	readonly developerMessage: Scalars['String']['output']
+}
+
+export type ConfirmEmailOtpErrorCode = 'INVALID_OTP_TOKEN'
+
+export type ConfirmEmailOtpResponse = {
+	readonly __typename?: 'ConfirmEmailOtpResponse'
+	readonly error?: Maybe<ConfirmEmailOtpError>
+	readonly ok: Scalars['Boolean']['output']
+	readonly result?: Maybe<ConfirmEmailOtpResult>
+}
+
+export type ConfirmEmailOtpResult = {
+	readonly __typename?: 'ConfirmEmailOtpResult'
+	readonly backupCodes: ReadonlyArray<Scalars['String']['output']>
 }
 
 export type ConfirmOtpError = {
@@ -490,54 +633,6 @@ export type ConfirmOtpResult = {
 	readonly backupCodes: ReadonlyArray<Scalars['String']['output']>
 }
 
-export type ConfirmEmailOtpError = {
-	readonly __typename?: 'ConfirmEmailOtpError'
-	readonly code: ConfirmEmailOtpErrorCode
-	readonly developerMessage: Scalars['String']['output']
-}
-
-export type ConfirmEmailOtpErrorCode = 'INVALID_OTP_TOKEN'
-
-export type ConfirmEmailOtpResponse = {
-	readonly __typename?: 'ConfirmEmailOtpResponse'
-	readonly error?: Maybe<ConfirmEmailOtpError>
-	readonly ok: Scalars['Boolean']['output']
-	readonly result?: Maybe<ConfirmEmailOtpResult>
-}
-
-export type ConfirmEmailOtpResult = {
-	readonly __typename?: 'ConfirmEmailOtpResult'
-	readonly backupCodes: ReadonlyArray<Scalars['String']['output']>
-}
-
-export type InitEmailOtpError = {
-	readonly __typename?: 'InitEmailOtpError'
-	readonly code: InitEmailOtpErrorCode
-	readonly developerMessage: Scalars['String']['output']
-}
-
-export type InitEmailOtpErrorCode = 'NO_EMAIL' | 'RATE_LIMITED'
-
-export type InitEmailOtpResponse = {
-	readonly __typename?: 'InitEmailOtpResponse'
-	readonly error?: Maybe<InitEmailOtpError>
-	readonly ok: Scalars['Boolean']['output']
-}
-
-export type DisableEmailOtpError = {
-	readonly __typename?: 'DisableEmailOtpError'
-	readonly code: DisableEmailOtpErrorCode
-	readonly developerMessage: Scalars['String']['output']
-}
-
-export type DisableEmailOtpErrorCode = 'EMAIL_OTP_NOT_ACTIVE' | 'MFA_REQUIRED'
-
-export type DisableEmailOtpResponse = {
-	readonly __typename?: 'DisableEmailOtpResponse'
-	readonly error?: Maybe<DisableEmailOtpError>
-	readonly ok: Scalars['Boolean']['output']
-}
-
 export type CreateApiKeyError = {
 	readonly __typename?: 'CreateApiKeyError'
 	readonly code: CreateApiKeyErrorCode
@@ -547,16 +642,23 @@ export type CreateApiKeyError = {
 	readonly membershipValidation?: Maybe<ReadonlyArray<MembershipValidationError>>
 }
 
-export type CreateApiKeyOptions = {
-	readonly trustForwardedClientInfo?: InputMaybe<Scalars['Boolean']['input']>
-}
-
 export type CreateApiKeyErrorCode =
 	| 'INVALID_MEMBERSHIP'
 	| 'PROJECT_NOT_FOUND'
 	| 'ROLE_NOT_FOUND'
 	| 'VARIABLE_EMPTY'
 	| 'VARIABLE_NOT_FOUND'
+
+export type CreateApiKeyOptions = {
+	/**
+	 * If true, the created api_key trusts X-Contember-Client-IP and
+	 * X-Contember-Client-User-Agent headers on subsequent requests.
+	 * Intended for backend services that proxy user requests; the customer's
+	 * proxy must strip these headers from incoming traffic and re-inject
+	 * them with the real user values.
+	 */
+	readonly trustForwardedClientInfo?: InputMaybe<Scalars['Boolean']['input']>
+}
 
 export type CreateApiKeyResponse = {
 	readonly __typename?: 'CreateApiKeyResponse'
@@ -570,6 +672,29 @@ export type CreateApiKeyResponse = {
 export type CreateApiKeyResult = {
 	readonly __typename?: 'CreateApiKeyResult'
 	readonly apiKey: ApiKeyWithToken
+}
+
+export type CreateAuthPolicyError = {
+	readonly __typename?: 'CreateAuthPolicyError'
+	readonly code: CreateAuthPolicyErrorCode
+	readonly developerMessage: Scalars['String']['output']
+}
+
+export type CreateAuthPolicyErrorCode =
+	| 'PROJECT_NOT_ALLOWED'
+	| 'PROJECT_NOT_FOUND'
+	| 'PROJECT_REQUIRED'
+
+export type CreateAuthPolicyResponse = {
+	readonly __typename?: 'CreateAuthPolicyResponse'
+	readonly error?: Maybe<CreateAuthPolicyError>
+	readonly ok: Scalars['Boolean']['output']
+	readonly result?: Maybe<CreateAuthPolicyResult>
+}
+
+export type CreateAuthPolicyResult = {
+	readonly __typename?: 'CreateAuthPolicyResult'
+	readonly id: Scalars['String']['output']
 }
 
 export type CreatePasswordResetRequestError = {
@@ -649,6 +774,20 @@ export type CreateSessionTokenResult = CommonSignInResult & {
 	readonly token: Scalars['String']['output']
 }
 
+export type DeleteAuthPolicyError = {
+	readonly __typename?: 'DeleteAuthPolicyError'
+	readonly code: DeleteAuthPolicyErrorCode
+	readonly developerMessage: Scalars['String']['output']
+}
+
+export type DeleteAuthPolicyErrorCode = 'NOT_FOUND'
+
+export type DeleteAuthPolicyResponse = {
+	readonly __typename?: 'DeleteAuthPolicyResponse'
+	readonly error?: Maybe<DeleteAuthPolicyError>
+	readonly ok: Scalars['Boolean']['output']
+}
+
 export type DisableApiKeyError = {
 	readonly __typename?: 'DisableApiKeyError'
 	readonly code: DisableApiKeyErrorCode
@@ -664,6 +803,22 @@ export type DisableApiKeyResponse = {
 	readonly error?: Maybe<DisableApiKeyError>
 	/** @deprecated Field no longer supported */
 	readonly errors: ReadonlyArray<DisableApiKeyError>
+	readonly ok: Scalars['Boolean']['output']
+}
+
+export type DisableEmailOtpError = {
+	readonly __typename?: 'DisableEmailOtpError'
+	readonly code: DisableEmailOtpErrorCode
+	readonly developerMessage: Scalars['String']['output']
+}
+
+export type DisableEmailOtpErrorCode =
+	| 'EMAIL_OTP_NOT_ACTIVE'
+	| 'MFA_REQUIRED'
+
+export type DisableEmailOtpResponse = {
+	readonly __typename?: 'DisableEmailOtpResponse'
+	readonly error?: Maybe<DisableEmailOtpError>
 	readonly ok: Scalars['Boolean']['output']
 }
 
@@ -689,7 +844,9 @@ export type DisableOtpError = {
 	readonly endUserMessage?: Maybe<Scalars['String']['output']>
 }
 
-export type DisableOtpErrorCode = 'MFA_REQUIRED' | 'OTP_NOT_ACTIVE'
+export type DisableOtpErrorCode =
+	| 'MFA_REQUIRED'
+	| 'OTP_NOT_ACTIVE'
 
 export type DisableOtpResponse = {
 	readonly __typename?: 'DisableOtpResponse'
@@ -697,26 +854,6 @@ export type DisableOtpResponse = {
 	/** @deprecated Field no longer supported */
 	readonly errors: ReadonlyArray<DisableOtpError>
 	readonly ok: Scalars['Boolean']['output']
-}
-
-export type RegenerateBackupCodesError = {
-	readonly __typename?: 'RegenerateBackupCodesError'
-	readonly code: RegenerateBackupCodesErrorCode
-	readonly developerMessage: Scalars['String']['output']
-}
-
-export type RegenerateBackupCodesErrorCode = 'OTP_NOT_ACTIVE'
-
-export type RegenerateBackupCodesResponse = {
-	readonly __typename?: 'RegenerateBackupCodesResponse'
-	readonly error?: Maybe<RegenerateBackupCodesError>
-	readonly ok: Scalars['Boolean']['output']
-	readonly result?: Maybe<RegenerateBackupCodesResult>
-}
-
-export type RegenerateBackupCodesResult = {
-	readonly __typename?: 'RegenerateBackupCodesResult'
-	readonly backupCodes: ReadonlyArray<Scalars['String']['output']>
 }
 
 export type DisablePersonError = {
@@ -735,148 +872,9 @@ export type DisablePersonResponse = {
 	readonly ok: Scalars['Boolean']['output']
 }
 
-export type ForceSignOutPersonError = {
-	readonly __typename?: 'ForceSignOutPersonError'
-	readonly code: ForceSignOutPersonErrorCode
-	readonly developerMessage: Scalars['String']['output']
-}
-
-export type ForceSignOutPersonErrorCode = 'PERSON_NOT_FOUND'
-
-export type ForceSignOutPersonResponse = {
-	readonly __typename?: 'ForceSignOutPersonResponse'
-	readonly error?: Maybe<ForceSignOutPersonError>
-	readonly ok: Scalars['Boolean']['output']
-}
-
-export type ResetPersonMfaError = {
-	readonly __typename?: 'ResetPersonMfaError'
-	readonly code: ResetPersonMfaErrorCode
-	readonly developerMessage: Scalars['String']['output']
-}
-
-export type ResetPersonMfaErrorCode = 'PERSON_NOT_FOUND'
-
-export type ResetPersonMfaResponse = {
-	readonly __typename?: 'ResetPersonMfaResponse'
-	readonly error?: Maybe<ResetPersonMfaError>
-	readonly ok: Scalars['Boolean']['output']
-}
-
-export type MfaEnrollment = {
-	readonly __typename?: 'MfaEnrollment'
-	readonly otpUri: Scalars['String']['output']
-	readonly otpSecret: Scalars['String']['output']
-}
-
-export type AuthPolicyScope = 'global' | 'project'
-
-export type AuthPolicy = {
-	readonly __typename?: 'AuthPolicy'
-	readonly id: Scalars['String']['output']
-	readonly scope: AuthPolicyScope
-	readonly project?: Maybe<Scalars['String']['output']>
-	readonly roles: ReadonlyArray<Scalars['String']['output']>
-	readonly mfaRequired?: Maybe<Scalars['Boolean']['output']>
-	readonly tokenExpiration?: Maybe<Scalars['Interval']['output']>
-	readonly idleTimeout?: Maybe<Scalars['Interval']['output']>
-	readonly mfaGraceDuration?: Maybe<Scalars['Interval']['output']>
-	readonly rememberMeAllowed?: Maybe<Scalars['Boolean']['output']>
-}
-
-export type AuthPolicyInput = {
-	readonly scope: AuthPolicyScope
-	readonly project?: InputMaybe<Scalars['String']['input']>
-	readonly roles: ReadonlyArray<Scalars['String']['input']>
-	readonly mfaRequired?: InputMaybe<Scalars['Boolean']['input']>
-	readonly tokenExpiration?: InputMaybe<Scalars['Interval']['input']>
-	readonly idleTimeout?: InputMaybe<Scalars['Interval']['input']>
-	readonly mfaGraceDuration?: InputMaybe<Scalars['Interval']['input']>
-	readonly rememberMeAllowed?: InputMaybe<Scalars['Boolean']['input']>
-}
-
-export type CreateAuthPolicyError = {
-	readonly __typename?: 'CreateAuthPolicyError'
-	readonly code: CreateAuthPolicyErrorCode
-	readonly developerMessage: Scalars['String']['output']
-}
-
-export type CreateAuthPolicyErrorCode = 'PROJECT_NOT_ALLOWED' | 'PROJECT_NOT_FOUND' | 'PROJECT_REQUIRED'
-
-export type CreateAuthPolicyResult = {
-	readonly __typename?: 'CreateAuthPolicyResult'
-	readonly id: Scalars['String']['output']
-}
-
-export type CreateAuthPolicyResponse = {
-	readonly __typename?: 'CreateAuthPolicyResponse'
-	readonly error?: Maybe<CreateAuthPolicyError>
-	readonly ok: Scalars['Boolean']['output']
-	readonly result?: Maybe<CreateAuthPolicyResult>
-}
-
-export type UpdateAuthPolicyError = {
-	readonly __typename?: 'UpdateAuthPolicyError'
-	readonly code: UpdateAuthPolicyErrorCode
-	readonly developerMessage: Scalars['String']['output']
-}
-
-export type UpdateAuthPolicyErrorCode = 'NOT_FOUND' | 'PROJECT_NOT_ALLOWED' | 'PROJECT_NOT_FOUND' | 'PROJECT_REQUIRED'
-
-export type UpdateAuthPolicyResponse = {
-	readonly __typename?: 'UpdateAuthPolicyResponse'
-	readonly error?: Maybe<UpdateAuthPolicyError>
-	readonly ok: Scalars['Boolean']['output']
-}
-
-export type DeleteAuthPolicyError = {
-	readonly __typename?: 'DeleteAuthPolicyError'
-	readonly code: DeleteAuthPolicyErrorCode
-	readonly developerMessage: Scalars['String']['output']
-}
-
-export type DeleteAuthPolicyErrorCode = 'NOT_FOUND'
-
-export type DeleteAuthPolicyResponse = {
-	readonly __typename?: 'DeleteAuthPolicyResponse'
-	readonly error?: Maybe<DeleteAuthPolicyError>
-	readonly ok: Scalars['Boolean']['output']
-}
-
-export type SessionInfo = {
-	readonly __typename?: 'SessionInfo'
-	readonly createdAt: Scalars['DateTime']['output']
-	readonly createdIp?: Maybe<Scalars['String']['output']>
-	readonly createdUserAgent?: Maybe<Scalars['String']['output']>
-	readonly expiresAt?: Maybe<Scalars['DateTime']['output']>
-	readonly id: Scalars['String']['output']
-	readonly isCurrent: Scalars['Boolean']['output']
-	readonly lastIp?: Maybe<Scalars['String']['output']>
-	readonly lastUsedAt?: Maybe<Scalars['DateTime']['output']>
-	readonly lastUserAgent?: Maybe<Scalars['String']['output']>
-	/**
-	 * Whether this session honors X-Contember-Client-IP /
-	 * X-Contember-Client-User-Agent headers on subsequent requests. Set when
-	 * the session was minted via `SignInOptions.trustForwardedClientInfo`
-	 * from an api_key that was itself created with the flag.
-	 */
-	readonly trustForwardedClientInfo: Scalars['Boolean']['output']
-}
-
-export type RevokeSessionError = {
-	readonly __typename?: 'RevokeSessionError'
-	readonly code: RevokeSessionErrorCode
-	readonly developerMessage: Scalars['String']['output']
-}
-
-export type RevokeSessionErrorCode =
-	| 'NOT_A_PERSON'
-	| 'SESSION_NOT_FOUND'
-
-export type RevokeSessionResponse = {
-	readonly __typename?: 'RevokeSessionResponse'
-	readonly error?: Maybe<RevokeSessionError>
-	readonly ok: Scalars['Boolean']['output']
+export type EmailVerificationOptions = {
+	readonly mailProject?: InputMaybe<Scalars['String']['input']>
+	readonly mailVariant?: InputMaybe<Scalars['String']['input']>
 }
 
 export type EnableIdpError = {
@@ -893,10 +891,25 @@ export type EnableIdpResponse = {
 	readonly ok: Scalars['Boolean']['output']
 }
 
+export type ForceSignOutPersonError = {
+	readonly __typename?: 'ForceSignOutPersonError'
+	readonly code: ForceSignOutPersonErrorCode
+	readonly developerMessage: Scalars['String']['output']
+}
+
+export type ForceSignOutPersonErrorCode = 'PERSON_NOT_FOUND'
+
+export type ForceSignOutPersonResponse = {
+	readonly __typename?: 'ForceSignOutPersonResponse'
+	readonly error?: Maybe<ForceSignOutPersonError>
+	readonly ok: Scalars['Boolean']['output']
+}
+
 export type IdpOptions = {
 	readonly autoSignUp?: InputMaybe<Scalars['Boolean']['input']>
 	readonly exclusive?: InputMaybe<Scalars['Boolean']['input']>
 	readonly initReturnsConfig?: InputMaybe<Scalars['Boolean']['input']>
+	readonly requireVerifiedEmail?: InputMaybe<Scalars['Boolean']['input']>
 }
 
 export type IdpOptionsOutput = {
@@ -904,6 +917,12 @@ export type IdpOptionsOutput = {
 	readonly autoSignUp: Scalars['Boolean']['output']
 	readonly exclusive: Scalars['Boolean']['output']
 	readonly initReturnsConfig: Scalars['Boolean']['output']
+	/**
+	 * When true, a non-exclusive provider may only auto-link to / sign in an
+	 * existing account by e-mail if the provider asserts the e-mail is verified.
+	 * Defaults to false.
+	 */
+	readonly requireVerifiedEmail: Scalars['Boolean']['output']
 }
 
 export type IdpResponseInput = {
@@ -950,6 +969,22 @@ export type IdentityProvider = {
 	readonly options: IdpOptionsOutput
 	readonly slug: Scalars['String']['output']
 	readonly type: Scalars['String']['output']
+}
+
+export type InitEmailOtpError = {
+	readonly __typename?: 'InitEmailOtpError'
+	readonly code: InitEmailOtpErrorCode
+	readonly developerMessage: Scalars['String']['output']
+}
+
+export type InitEmailOtpErrorCode =
+	| 'NO_EMAIL'
+	| 'RATE_LIMITED'
+
+export type InitEmailOtpResponse = {
+	readonly __typename?: 'InitEmailOtpResponse'
+	readonly error?: Maybe<InitEmailOtpError>
+	readonly ok: Scalars['Boolean']['output']
 }
 
 export type InitSignInIdpError = {
@@ -1082,7 +1117,10 @@ export type MailTemplateIdentifier = {
 
 export type MailType =
 	| 'BACKUP_CODES_EXHAUSTED'
+	| 'EMAIL_CHANGE_NOTIFY'
+	| 'EMAIL_CHANGE_VERIFY'
 	| 'EMAIL_OTP'
+	| 'EMAIL_VERIFICATION'
 	| 'EXISTING_USER_INVITED'
 	| 'FORCED_SIGN_OUT'
 	| 'NEW_USER_INVITED'
@@ -1117,6 +1155,12 @@ export type MembershipValidationErrorCode =
 	| 'VARIABLE_INVALID'
 	| 'VARIABLE_NOT_FOUND'
 
+export type MfaEnrollment = {
+	readonly __typename?: 'MfaEnrollment'
+	readonly otpSecret: Scalars['String']['output']
+	readonly otpUri: Scalars['String']['output']
+}
+
 export type Mutation = {
 	readonly __typename?: 'Mutation'
 	readonly activatePasswordlessOtp?: Maybe<ActivatePasswordlessOtpResponse>
@@ -1131,20 +1175,25 @@ export type Mutation = {
 	readonly changePassword?: Maybe<ChangePasswordResponse>
 	readonly changeProfile?: Maybe<ChangeProfileResponse>
 	readonly configure?: Maybe<ConfigureResponse>
-	readonly createAuthPolicy?: Maybe<CreateAuthPolicyResponse>
-	readonly updateAuthPolicy?: Maybe<UpdateAuthPolicyResponse>
-	readonly deleteAuthPolicy?: Maybe<DeleteAuthPolicyResponse>
-	readonly resetPersonMfa?: Maybe<ResetPersonMfaResponse>
+	/**
+	 * Confirm a pending e-mail change (see changeMyProfile when
+	 * config.signup.requireEmailVerification is enabled). Consumes the token
+	 * that was mailed to the new address, swaps the address, and signs out all
+	 * existing sessions.
+	 */
+	readonly confirmEmailChange?: Maybe<ConfirmEmailChangeResponse>
 	readonly confirmEmailOtp?: Maybe<ConfirmEmailOtpResponse>
 	readonly confirmOtp?: Maybe<ConfirmOtpResponse>
 	readonly createApiKey?: Maybe<CreateApiKeyResponse>
+	readonly createAuthPolicy?: Maybe<CreateAuthPolicyResponse>
 	readonly createGlobalApiKey?: Maybe<CreateApiKeyResponse>
 	readonly createProject?: Maybe<CreateProjectResponse>
 	readonly createResetPasswordRequest?: Maybe<CreatePasswordResetRequestResponse>
 	readonly createSessionToken?: Maybe<CreateSessionTokenResponse>
+	readonly deleteAuthPolicy?: Maybe<DeleteAuthPolicyResponse>
 	readonly disableApiKey?: Maybe<DisableApiKeyResponse>
-	readonly disableIDP?: Maybe<DisableIdpResponse>
 	readonly disableEmailOtp?: Maybe<DisableEmailOtpResponse>
+	readonly disableIDP?: Maybe<DisableIdpResponse>
 	readonly disableMyPasswordless?: Maybe<ToggleMyPasswordlessResponse>
 	readonly disableOtp?: Maybe<DisableOtpResponse>
 	readonly disablePerson?: Maybe<DisablePersonResponse>
@@ -1162,7 +1211,14 @@ export type Mutation = {
 	/** @deprecated use removeMailTemplate */
 	readonly removeProjectMailTemplate?: Maybe<RemoveMailTemplateResponse>
 	readonly removeProjectMember?: Maybe<RemoveProjectMemberResponse>
+	/**
+	 * (Re)send the e-mail verification link for the given address. Always
+	 * reports ok regardless of whether the address exists or is already
+	 * verified, to avoid leaking account existence.
+	 */
+	readonly requestEmailVerification?: Maybe<RequestEmailVerificationResponse>
 	readonly resetPassword?: Maybe<ResetPasswordResponse>
+	readonly resetPersonMfa?: Maybe<ResetPersonMfaResponse>
 	readonly revokeSession?: Maybe<RevokeSessionResponse>
 	readonly setProjectSecret?: Maybe<SetProjectSecretResponse>
 	readonly signIn?: Maybe<SignInResponse>
@@ -1171,9 +1227,11 @@ export type Mutation = {
 	readonly signOut?: Maybe<SignOutResponse>
 	readonly signUp?: Maybe<SignUpResponse>
 	readonly unmanagedInvite?: Maybe<InviteResponse>
+	readonly updateAuthPolicy?: Maybe<UpdateAuthPolicyResponse>
 	readonly updateIDP?: Maybe<UpdateIdpResponse>
 	readonly updateProject?: Maybe<UpdateProjectResponse>
 	readonly updateProjectMember?: Maybe<UpdateProjectMemberResponse>
+	readonly verifyEmail?: Maybe<VerifyEmailResponse>
 }
 
 export type MutationActivatePasswordlessOtpArgs = {
@@ -1233,28 +1291,15 @@ export type MutationConfigureArgs = {
 	config: ConfigInput
 }
 
-export type MutationCreateAuthPolicyArgs = {
-	policy: AuthPolicyInput
-}
-
-export type MutationUpdateAuthPolicyArgs = {
-	id: Scalars['String']['input']
-	policy: AuthPolicyInput
-}
-
-export type MutationDeleteAuthPolicyArgs = {
-	id: Scalars['String']['input']
-}
-
-export type MutationResetPersonMfaArgs = {
-	personId: Scalars['String']['input']
-}
-
-export type MutationConfirmOtpArgs = {
-	otpToken: Scalars['String']['input']
+export type MutationConfirmEmailChangeArgs = {
+	token: Scalars['String']['input']
 }
 
 export type MutationConfirmEmailOtpArgs = {
+	otpToken: Scalars['String']['input']
+}
+
+export type MutationConfirmOtpArgs = {
 	otpToken: Scalars['String']['input']
 }
 
@@ -1264,6 +1309,10 @@ export type MutationCreateApiKeyArgs = {
 	options?: InputMaybe<CreateApiKeyOptions>
 	projectSlug: Scalars['String']['input']
 	tokenHash?: InputMaybe<Scalars['String']['input']>
+}
+
+export type MutationCreateAuthPolicyArgs = {
+	policy: AuthPolicyInput
 }
 
 export type MutationCreateGlobalApiKeyArgs = {
@@ -1295,6 +1344,10 @@ export type MutationCreateSessionTokenArgs = {
 	personId?: InputMaybe<Scalars['String']['input']>
 }
 
+export type MutationDeleteAuthPolicyArgs = {
+	id: Scalars['String']['input']
+}
+
 export type MutationDisableApiKeyArgs = {
 	id: Scalars['String']['input']
 }
@@ -1309,6 +1362,11 @@ export type MutationDisablePersonArgs = {
 
 export type MutationEnableIdpArgs = {
 	identityProvider: Scalars['String']['input']
+}
+
+export type MutationForceSignOutPersonArgs = {
+	personId: Scalars['String']['input']
+	reason?: InputMaybe<Scalars['String']['input']>
 }
 
 export type MutationInitSignInIdpArgs = {
@@ -1353,18 +1411,23 @@ export type MutationRemoveProjectMemberArgs = {
 	projectSlug: Scalars['String']['input']
 }
 
+export type MutationRequestEmailVerificationArgs = {
+	captchaToken?: InputMaybe<Scalars['String']['input']>
+	email: Scalars['String']['input']
+	options?: InputMaybe<EmailVerificationOptions>
+}
+
 export type MutationResetPasswordArgs = {
 	password: Scalars['String']['input']
 	token: Scalars['String']['input']
 }
 
-export type MutationRevokeSessionArgs = {
-	sessionId: Scalars['String']['input']
+export type MutationResetPersonMfaArgs = {
+	personId: Scalars['String']['input']
 }
 
-export type MutationForceSignOutPersonArgs = {
-	personId: Scalars['String']['input']
-	reason?: InputMaybe<Scalars['String']['input']>
+export type MutationRevokeSessionArgs = {
+	sessionId: Scalars['String']['input']
 }
 
 export type MutationSetProjectSecretArgs = {
@@ -1424,6 +1487,11 @@ export type MutationUnmanagedInviteArgs = {
 	projectSlug: Scalars['String']['input']
 }
 
+export type MutationUpdateAuthPolicyArgs = {
+	id: Scalars['String']['input']
+	policy: AuthPolicyInput
+}
+
 export type MutationUpdateIdpArgs = {
 	configuration?: InputMaybe<Scalars['Json']['input']>
 	identityProvider: Scalars['String']['input']
@@ -1445,6 +1513,10 @@ export type MutationUpdateProjectMemberArgs = {
 	projectSlug: Scalars['String']['input']
 }
 
+export type MutationVerifyEmailArgs = {
+	token: Scalars['String']['input']
+}
+
 export type PasswordlessValidationType =
 	| 'otp'
 	| 'token'
@@ -1452,6 +1524,7 @@ export type PasswordlessValidationType =
 export type Person = {
 	readonly __typename?: 'Person'
 	readonly email?: Maybe<Scalars['String']['output']>
+	readonly emailVerified: Scalars['Boolean']['output']
 	readonly id: Scalars['String']['output']
 	readonly identity: Identity
 	readonly name?: Maybe<Scalars['String']['output']>
@@ -1520,6 +1593,12 @@ export type Query = {
 	 * (default 100, max 500); `hasMore` indicates a further page exists.
 	 */
 	readonly authLog: AuthLogPage
+	/**
+	 * List configured auth policies (per-role MFA / session policy). Requires the
+	 * `system:configure` permission — by default granted only to SUPER_ADMIN
+	 * (and PROJECT_ADMIN, like `configure`). With no rows configured, MFA
+	 * enforcement is inert and sign-in behaves exactly as today.
+	 */
 	readonly authPolicies: ReadonlyArray<AuthPolicy>
 	readonly checkResetPasswordToken: CheckResetPasswordTokenCode
 	readonly configuration: Config
@@ -1554,6 +1633,26 @@ export type QueryProjectBySlugArgs = {
 export type QueryProjectMembershipsArgs = {
 	identityId: Scalars['String']['input']
 	projectSlug: Scalars['String']['input']
+}
+
+export type RegenerateBackupCodesError = {
+	readonly __typename?: 'RegenerateBackupCodesError'
+	readonly code: RegenerateBackupCodesErrorCode
+	readonly developerMessage: Scalars['String']['output']
+}
+
+export type RegenerateBackupCodesErrorCode = 'OTP_NOT_ACTIVE'
+
+export type RegenerateBackupCodesResponse = {
+	readonly __typename?: 'RegenerateBackupCodesResponse'
+	readonly error?: Maybe<RegenerateBackupCodesError>
+	readonly ok: Scalars['Boolean']['output']
+	readonly result?: Maybe<RegenerateBackupCodesResult>
+}
+
+export type RegenerateBackupCodesResult = {
+	readonly __typename?: 'RegenerateBackupCodesResult'
+	readonly backupCodes: ReadonlyArray<Scalars['String']['output']>
 }
 
 export type RemoveGlobalIdentityRolesError = {
@@ -1616,6 +1715,22 @@ export type RemoveProjectMemberResponse = {
 	readonly ok: Scalars['Boolean']['output']
 }
 
+export type RequestEmailVerificationError = {
+	readonly __typename?: 'RequestEmailVerificationError'
+	readonly code: RequestEmailVerificationErrorCode
+	readonly developerMessage: Scalars['String']['output']
+}
+
+export type RequestEmailVerificationErrorCode =
+	| 'INVALID_CAPTCHA'
+	| 'RATE_LIMIT_EXCEEDED'
+
+export type RequestEmailVerificationResponse = {
+	readonly __typename?: 'RequestEmailVerificationResponse'
+	readonly error?: Maybe<RequestEmailVerificationError>
+	readonly ok: Scalars['Boolean']['output']
+}
+
 export type ResetPasswordError = {
 	readonly __typename?: 'ResetPasswordError'
 	readonly code: ResetPasswordErrorCode
@@ -1637,6 +1752,36 @@ export type ResetPasswordResponse = {
 	readonly error?: Maybe<ResetPasswordError>
 	/** @deprecated Field no longer supported */
 	readonly errors: ReadonlyArray<ResetPasswordError>
+	readonly ok: Scalars['Boolean']['output']
+}
+
+export type ResetPersonMfaError = {
+	readonly __typename?: 'ResetPersonMfaError'
+	readonly code: ResetPersonMfaErrorCode
+	readonly developerMessage: Scalars['String']['output']
+}
+
+export type ResetPersonMfaErrorCode = 'PERSON_NOT_FOUND'
+
+export type ResetPersonMfaResponse = {
+	readonly __typename?: 'ResetPersonMfaResponse'
+	readonly error?: Maybe<ResetPersonMfaError>
+	readonly ok: Scalars['Boolean']['output']
+}
+
+export type RevokeSessionError = {
+	readonly __typename?: 'RevokeSessionError'
+	readonly code: RevokeSessionErrorCode
+	readonly developerMessage: Scalars['String']['output']
+}
+
+export type RevokeSessionErrorCode =
+	| 'NOT_A_PERSON'
+	| 'SESSION_NOT_FOUND'
+
+export type RevokeSessionResponse = {
+	readonly __typename?: 'RevokeSessionResponse'
+	readonly error?: Maybe<RevokeSessionError>
 	readonly ok: Scalars['Boolean']['output']
 }
 
@@ -1667,6 +1812,26 @@ export type RoleVariableDefinition = {
 	readonly name: Scalars['String']['output']
 }
 
+export type SessionInfo = {
+	readonly __typename?: 'SessionInfo'
+	readonly createdAt: Scalars['DateTime']['output']
+	readonly createdIp?: Maybe<Scalars['String']['output']>
+	readonly createdUserAgent?: Maybe<Scalars['String']['output']>
+	readonly expiresAt?: Maybe<Scalars['DateTime']['output']>
+	readonly id: Scalars['String']['output']
+	readonly isCurrent: Scalars['Boolean']['output']
+	readonly lastIp?: Maybe<Scalars['String']['output']>
+	readonly lastUsedAt?: Maybe<Scalars['DateTime']['output']>
+	readonly lastUserAgent?: Maybe<Scalars['String']['output']>
+	/**
+	 * Whether this session honors X-Contember-Client-IP /
+	 * X-Contember-Client-User-Agent headers on subsequent requests. Set when
+	 * the session was minted via `SignInOptions.trustForwardedClientInfo`
+	 * from an api_key that was itself created with the flag.
+	 */
+	readonly trustForwardedClientInfo: Scalars['Boolean']['output']
+}
+
 export type SetProjectSecretError = {
 	readonly __typename?: 'SetProjectSecretError'
 	readonly code: SetProjectSecretErrorCode
@@ -1687,11 +1852,18 @@ export type SignInError = {
 	readonly developerMessage: Scalars['String']['output']
 	/** @deprecated Field no longer supported */
 	readonly endUserMessage?: Maybe<Scalars['String']['output']>
-	readonly retryAfter?: Maybe<Scalars['Int']['output']>
+	/**
+	 * Set only on a MFA_ENROLLMENT_REQUIRED error: the freshly provisioned
+	 * pending TOTP secret the client must enroll (show the QR / secret, then
+	 * retry signIn with otpToken). Additive — clients that don't read it are
+	 * unaffected.
+	 */
 	readonly mfaEnrollment?: Maybe<MfaEnrollment>
+	readonly retryAfter?: Maybe<Scalars['Int']['output']>
 }
 
 export type SignInErrorCode =
+	| 'EMAIL_NOT_VERIFIED'
 	| 'INVALID_CREDENTIALS'
 	| 'INVALID_OTP_TOKEN'
 	| 'INVALID_PASSWORD'
@@ -1733,6 +1905,22 @@ export type SignInIdpResult = CommonSignInResult & {
 	readonly token: Scalars['String']['output']
 }
 
+export type SignInOptions = {
+	/**
+	 * If true, and the calling api_key has trust_forwarded_info=true,
+	 * the resulting session token will trust X-Contember-Client-IP and
+	 * X-Contember-Client-User-Agent headers on subsequent requests.
+	 * Silently ignored when the caller's api_key does not have the flag.
+	 *
+	 * Security: a proxy that sets these headers MUST strip any
+	 * incoming X-Contember-Client-IP / X-Contember-Client-User-Agent
+	 * from upstream traffic and re-inject values it trusts. Without
+	 * that, any client holding a session token minted with this flag
+	 * could spoof its own IP/User-Agent.
+	 */
+	readonly trustForwardedClientInfo?: InputMaybe<Scalars['Boolean']['input']>
+}
+
 export type SignInPasswordlessError = {
 	readonly __typename?: 'SignInPasswordlessError'
 	readonly code: SignInPasswordlessErrorCode
@@ -1762,10 +1950,6 @@ export type SignInPasswordlessResult = CommonSignInResult & {
 	readonly token: Scalars['String']['output']
 }
 
-export type SignInOptions = {
-	readonly trustForwardedClientInfo?: InputMaybe<Scalars['Boolean']['input']>
-}
-
 export type SignInResponse = {
 	readonly __typename?: 'SignInResponse'
 	readonly error?: Maybe<SignInError>
@@ -1777,9 +1961,13 @@ export type SignInResponse = {
 
 export type SignInResult = CommonSignInResult & {
 	readonly __typename?: 'SignInResult'
+	/**
+	 * Set only when this sign-in completed an MFA enrollment (A06): the freshly
+	 * generated backup codes, shown exactly once. Null on a normal sign-in.
+	 */
+	readonly backupCodes?: Maybe<ReadonlyArray<Scalars['String']['output']>>
 	readonly person: Person
 	readonly token: Scalars['String']['output']
-	readonly backupCodes?: Maybe<ReadonlyArray<Scalars['String']['output']>>
 }
 
 export type SignOutError = {
@@ -1862,6 +2050,24 @@ export type UnmanagedInviteOptions = {
 	readonly resetTokenHash?: InputMaybe<Scalars['String']['input']>
 }
 
+export type UpdateAuthPolicyError = {
+	readonly __typename?: 'UpdateAuthPolicyError'
+	readonly code: UpdateAuthPolicyErrorCode
+	readonly developerMessage: Scalars['String']['output']
+}
+
+export type UpdateAuthPolicyErrorCode =
+	| 'NOT_FOUND'
+	| 'PROJECT_NOT_ALLOWED'
+	| 'PROJECT_NOT_FOUND'
+	| 'PROJECT_REQUIRED'
+
+export type UpdateAuthPolicyResponse = {
+	readonly __typename?: 'UpdateAuthPolicyResponse'
+	readonly error?: Maybe<UpdateAuthPolicyError>
+	readonly ok: Scalars['Boolean']['output']
+}
+
 export type UpdateIdpError = {
 	readonly __typename?: 'UpdateIDPError'
 	readonly code: UpdateIdpErrorCode
@@ -1928,6 +2134,24 @@ export type VariableEntryInput = {
 	readonly values: ReadonlyArray<Scalars['String']['input']>
 }
 
+export type VerifyEmailError = {
+	readonly __typename?: 'VerifyEmailError'
+	readonly code: VerifyEmailErrorCode
+	readonly developerMessage: Scalars['String']['output']
+}
+
+export type VerifyEmailErrorCode =
+	| 'TOKEN_EXPIRED'
+	| 'TOKEN_INVALID'
+	| 'TOKEN_NOT_FOUND'
+	| 'TOKEN_USED'
+
+export type VerifyEmailResponse = {
+	readonly __typename?: 'VerifyEmailResponse'
+	readonly error?: Maybe<VerifyEmailError>
+	readonly ok: Scalars['Boolean']['output']
+}
+
 export type WeakPasswordReason =
 	| 'BLACKLISTED'
 	| 'COMPROMISED'
@@ -1943,7 +2167,7 @@ export type ResolverTypeWrapper<T> = Promise<T> | T
 export type ResolverWithResolve<TResult, TParent, TContext, TArgs> = {
 	resolve: ResolverFn<TResult, TParent, TContext, TArgs>
 }
-export type Resolver<TResult, TParent = {}, TContext = {}, TArgs = {}> =
+export type Resolver<TResult, TParent = Record<PropertyKey, never>, TContext = Record<PropertyKey, never>, TArgs = Record<PropertyKey, never>> =
 	| ResolverFn<TResult, TParent, TContext, TArgs>
 	| ResolverWithResolve<TResult, TParent, TContext, TArgs>
 
@@ -1982,21 +2206,36 @@ export type SubscriptionObject<TResult, TKey extends string, TParent, TContext, 
 	| SubscriptionSubscriberObject<TResult, TKey, TParent, TContext, TArgs>
 	| SubscriptionResolverObject<TResult, TParent, TContext, TArgs>
 
-export type SubscriptionResolver<TResult, TKey extends string, TParent = {}, TContext = {}, TArgs = {}> =
+export type SubscriptionResolver<
+	TResult,
+	TKey extends string,
+	TParent = Record<PropertyKey, never>,
+	TContext = Record<PropertyKey, never>,
+	TArgs = Record<PropertyKey, never>,
+> =
 	| ((...args: any[]) => SubscriptionObject<TResult, TKey, TParent, TContext, TArgs>)
 	| SubscriptionObject<TResult, TKey, TParent, TContext, TArgs>
 
-export type TypeResolveFn<TTypes, TParent = {}, TContext = {}> = (
+export type TypeResolveFn<TTypes, TParent = Record<PropertyKey, never>, TContext = Record<PropertyKey, never>> = (
 	parent: TParent,
 	context: TContext,
 	info: GraphQLResolveInfo,
 ) => Maybe<TTypes> | Promise<Maybe<TTypes>>
 
-export type IsTypeOfResolverFn<T = {}, TContext = {}> = (obj: T, context: TContext, info: GraphQLResolveInfo) => boolean | Promise<boolean>
+export type IsTypeOfResolverFn<T = Record<PropertyKey, never>, TContext = Record<PropertyKey, never>> = (
+	obj: T,
+	context: TContext,
+	info: GraphQLResolveInfo,
+) => boolean | Promise<boolean>
 
 export type NextResolverFn<T> = () => Promise<T>
 
-export type DirectiveResolverFn<TResult = {}, TParent = {}, TContext = {}, TArgs = {}> = (
+export type DirectiveResolverFn<
+	TResult = Record<PropertyKey, never>,
+	TParent = Record<PropertyKey, never>,
+	TContext = Record<PropertyKey, never>,
+	TArgs = Record<PropertyKey, never>,
+> = (
 	next: NextResolverFn<TResult>,
 	parent: TParent,
 	args: TArgs,
@@ -2006,8 +2245,15 @@ export type DirectiveResolverFn<TResult = {}, TParent = {}, TContext = {}, TArgs
 
 /** Mapping of interface types */
 export type ResolversInterfaceTypes<_RefType extends Record<string, unknown>> = {
-	CommonSignInResult: (CreateSessionTokenResult) | (SignInIdpResult) | (SignInPasswordlessResult) | (SignInResult)
-	RoleVariableDefinition: (RoleConditionVariableDefinition) | (RoleEntityVariableDefinition) | (RolePredefinedVariableDefinition)
+	CommonSignInResult:
+		| (CreateSessionTokenResult)
+		| (SignInIdpResult)
+		| (SignInPasswordlessResult)
+		| (SignInResult)
+	RoleVariableDefinition:
+		| (RoleConditionVariableDefinition)
+		| (RoleEntityVariableDefinition)
+		| (RolePredefinedVariableDefinition)
 }
 
 /** Mapping between all available schema types and the resolvers types */
@@ -2035,7 +2281,11 @@ export type ResolversTypes = {
 	AuthLogEntry: ResolverTypeWrapper<AuthLogEntry>
 	AuthLogFilter: AuthLogFilter
 	AuthLogPage: ResolverTypeWrapper<AuthLogPage>
+	AuthPolicy: ResolverTypeWrapper<AuthPolicy>
+	AuthPolicyInput: AuthPolicyInput
+	AuthPolicyScope: AuthPolicyScope
 	Boolean: ResolverTypeWrapper<Scalars['Boolean']['output']>
+	CaptchaProvider: CaptchaProvider
 	ChangeMyPasswordError: ResolverTypeWrapper<ChangeMyPasswordError>
 	ChangeMyPasswordErrorCode: ChangeMyPasswordErrorCode
 	ChangeMyPasswordResponse: ResolverTypeWrapper<ChangeMyPasswordResponse>
@@ -2051,10 +2301,13 @@ export type ResolversTypes = {
 	CheckResetPasswordTokenCode: CheckResetPasswordTokenCode
 	CheckResetPasswordTokenResult: ResolverTypeWrapper<CheckResetPasswordTokenResult>
 	CommonSignInResult: ResolverTypeWrapper<ResolversInterfaceTypes<ResolversTypes>['CommonSignInResult']>
-	CaptchaProvider: CaptchaProvider
 	Config: ResolverTypeWrapper<Config>
 	ConfigCaptcha: ResolverTypeWrapper<ConfigCaptcha>
 	ConfigCaptchaInput: ConfigCaptchaInput
+	ConfigCaptchaProtect: ResolverTypeWrapper<ConfigCaptchaProtect>
+	ConfigCaptchaProtectInput: ConfigCaptchaProtectInput
+	ConfigEmailChange: ResolverTypeWrapper<ConfigEmailChange>
+	ConfigEmailChangeInput: ConfigEmailChangeInput
 	ConfigInput: ConfigInput
 	ConfigLogin: ResolverTypeWrapper<ConfigLogin>
 	ConfigLoginInput: ConfigLoginInput
@@ -2067,28 +2320,31 @@ export type ResolversTypes = {
 	ConfigRateLimitWindowInput: ConfigRateLimitWindowInput
 	ConfigRateLimits: ResolverTypeWrapper<ConfigRateLimits>
 	ConfigRateLimitsInput: ConfigRateLimitsInput
+	ConfigSignup: ResolverTypeWrapper<ConfigSignup>
+	ConfigSignupInput: ConfigSignupInput
 	ConfigureError: ResolverTypeWrapper<ConfigureError>
 	ConfigureErrorCode: ConfigureErrorCode
 	ConfigureResponse: ResolverTypeWrapper<ConfigureResponse>
-	ConfirmOtpError: ResolverTypeWrapper<ConfirmOtpError>
-	ConfirmOtpErrorCode: ConfirmOtpErrorCode
-	ConfirmOtpResponse: ResolverTypeWrapper<ConfirmOtpResponse>
-	ConfirmOtpResult: ResolverTypeWrapper<ConfirmOtpResult>
+	ConfirmEmailChangeError: ResolverTypeWrapper<ConfirmEmailChangeError>
+	ConfirmEmailChangeErrorCode: ConfirmEmailChangeErrorCode
+	ConfirmEmailChangeResponse: ResolverTypeWrapper<ConfirmEmailChangeResponse>
 	ConfirmEmailOtpError: ResolverTypeWrapper<ConfirmEmailOtpError>
 	ConfirmEmailOtpErrorCode: ConfirmEmailOtpErrorCode
 	ConfirmEmailOtpResponse: ResolverTypeWrapper<ConfirmEmailOtpResponse>
 	ConfirmEmailOtpResult: ResolverTypeWrapper<ConfirmEmailOtpResult>
-	InitEmailOtpError: ResolverTypeWrapper<InitEmailOtpError>
-	InitEmailOtpErrorCode: InitEmailOtpErrorCode
-	InitEmailOtpResponse: ResolverTypeWrapper<InitEmailOtpResponse>
-	DisableEmailOtpError: ResolverTypeWrapper<DisableEmailOtpError>
-	DisableEmailOtpErrorCode: DisableEmailOtpErrorCode
-	DisableEmailOtpResponse: ResolverTypeWrapper<DisableEmailOtpResponse>
+	ConfirmOtpError: ResolverTypeWrapper<ConfirmOtpError>
+	ConfirmOtpErrorCode: ConfirmOtpErrorCode
+	ConfirmOtpResponse: ResolverTypeWrapper<ConfirmOtpResponse>
+	ConfirmOtpResult: ResolverTypeWrapper<ConfirmOtpResult>
 	CreateApiKeyError: ResolverTypeWrapper<CreateApiKeyError>
 	CreateApiKeyErrorCode: CreateApiKeyErrorCode
 	CreateApiKeyOptions: CreateApiKeyOptions
 	CreateApiKeyResponse: ResolverTypeWrapper<Omit<CreateApiKeyResponse, 'result'> & { result?: Maybe<ResolversTypes['CreateApiKeyResult']> }>
 	CreateApiKeyResult: ResolverTypeWrapper<Omit<CreateApiKeyResult, 'apiKey'> & { apiKey: ResolversTypes['ApiKeyWithToken'] }>
+	CreateAuthPolicyError: ResolverTypeWrapper<CreateAuthPolicyError>
+	CreateAuthPolicyErrorCode: CreateAuthPolicyErrorCode
+	CreateAuthPolicyResponse: ResolverTypeWrapper<CreateAuthPolicyResponse>
+	CreateAuthPolicyResult: ResolverTypeWrapper<CreateAuthPolicyResult>
 	CreatePasswordResetRequestError: ResolverTypeWrapper<CreatePasswordResetRequestError>
 	CreatePasswordResetRequestErrorCode: CreatePasswordResetRequestErrorCode
 	CreatePasswordResetRequestResponse: ResolverTypeWrapper<CreatePasswordResetRequestResponse>
@@ -2103,9 +2359,15 @@ export type ResolversTypes = {
 	CreateSessionTokenResponse: ResolverTypeWrapper<CreateSessionTokenResponse>
 	CreateSessionTokenResult: ResolverTypeWrapper<CreateSessionTokenResult>
 	DateTime: ResolverTypeWrapper<Scalars['DateTime']['output']>
+	DeleteAuthPolicyError: ResolverTypeWrapper<DeleteAuthPolicyError>
+	DeleteAuthPolicyErrorCode: DeleteAuthPolicyErrorCode
+	DeleteAuthPolicyResponse: ResolverTypeWrapper<DeleteAuthPolicyResponse>
 	DisableApiKeyError: ResolverTypeWrapper<DisableApiKeyError>
 	DisableApiKeyErrorCode: DisableApiKeyErrorCode
 	DisableApiKeyResponse: ResolverTypeWrapper<DisableApiKeyResponse>
+	DisableEmailOtpError: ResolverTypeWrapper<DisableEmailOtpError>
+	DisableEmailOtpErrorCode: DisableEmailOtpErrorCode
+	DisableEmailOtpResponse: ResolverTypeWrapper<DisableEmailOtpResponse>
 	DisableIDPError: ResolverTypeWrapper<DisableIdpError>
 	DisableIDPErrorCode: DisableIdpErrorCode
 	DisableIDPResponse: ResolverTypeWrapper<DisableIdpResponse>
@@ -2115,34 +2377,14 @@ export type ResolversTypes = {
 	DisablePersonError: ResolverTypeWrapper<DisablePersonError>
 	DisablePersonErrorCode: DisablePersonErrorCode
 	DisablePersonResponse: ResolverTypeWrapper<DisablePersonResponse>
-	ForceSignOutPersonError: ResolverTypeWrapper<ForceSignOutPersonError>
-	ForceSignOutPersonErrorCode: ForceSignOutPersonErrorCode
-	ForceSignOutPersonResponse: ResolverTypeWrapper<ForceSignOutPersonResponse>
-	ResetPersonMfaError: ResolverTypeWrapper<ResetPersonMfaError>
-	ResetPersonMfaErrorCode: ResetPersonMfaErrorCode
-	ResetPersonMfaResponse: ResolverTypeWrapper<ResetPersonMfaResponse>
-	MfaEnrollment: ResolverTypeWrapper<MfaEnrollment>
-	AuthPolicy: ResolverTypeWrapper<AuthPolicy>
-	AuthPolicyScope: AuthPolicyScope
-	AuthPolicyInput: AuthPolicyInput
-	CreateAuthPolicyError: ResolverTypeWrapper<CreateAuthPolicyError>
-	CreateAuthPolicyErrorCode: CreateAuthPolicyErrorCode
-	CreateAuthPolicyResult: ResolverTypeWrapper<CreateAuthPolicyResult>
-	CreateAuthPolicyResponse: ResolverTypeWrapper<CreateAuthPolicyResponse>
-	UpdateAuthPolicyError: ResolverTypeWrapper<UpdateAuthPolicyError>
-	UpdateAuthPolicyErrorCode: UpdateAuthPolicyErrorCode
-	UpdateAuthPolicyResponse: ResolverTypeWrapper<UpdateAuthPolicyResponse>
-	DeleteAuthPolicyError: ResolverTypeWrapper<DeleteAuthPolicyError>
-	DeleteAuthPolicyErrorCode: DeleteAuthPolicyErrorCode
-	DeleteAuthPolicyResponse: ResolverTypeWrapper<DeleteAuthPolicyResponse>
-	RevokeSessionError: ResolverTypeWrapper<RevokeSessionError>
-	RevokeSessionErrorCode: RevokeSessionErrorCode
-	RevokeSessionResponse: ResolverTypeWrapper<RevokeSessionResponse>
-	SessionInfo: ResolverTypeWrapper<SessionInfo>
+	EmailVerificationOptions: EmailVerificationOptions
 	EnableIDPError: ResolverTypeWrapper<EnableIdpError>
 	EnableIDPErrorCode: EnableIdpErrorCode
 	EnableIDPResponse: ResolverTypeWrapper<EnableIdpResponse>
 	Float: ResolverTypeWrapper<Scalars['Float']['output']>
+	ForceSignOutPersonError: ResolverTypeWrapper<ForceSignOutPersonError>
+	ForceSignOutPersonErrorCode: ForceSignOutPersonErrorCode
+	ForceSignOutPersonResponse: ResolverTypeWrapper<ForceSignOutPersonResponse>
 	IDPOptions: IdpOptions
 	IDPOptionsOutput: ResolverTypeWrapper<IdpOptionsOutput>
 	IDPResponseInput: IdpResponseInput
@@ -2155,6 +2397,9 @@ export type ResolversTypes = {
 	IdentityGlobalPermissions: ResolverTypeWrapper<IdentityGlobalPermissions>
 	IdentityProjectRelation: ResolverTypeWrapper<Omit<IdentityProjectRelation, 'project'> & { project: ResolversTypes['Project'] }>
 	IdentityProvider: ResolverTypeWrapper<IdentityProvider>
+	InitEmailOtpError: ResolverTypeWrapper<InitEmailOtpError>
+	InitEmailOtpErrorCode: InitEmailOtpErrorCode
+	InitEmailOtpResponse: ResolverTypeWrapper<InitEmailOtpResponse>
 	InitSignInIDPError: ResolverTypeWrapper<InitSignInIdpError>
 	InitSignInIDPErrorCode: InitSignInIdpErrorCode
 	InitSignInIDPResponse: ResolverTypeWrapper<InitSignInIdpResponse>
@@ -2182,7 +2427,8 @@ export type ResolversTypes = {
 	MembershipInput: MembershipInput
 	MembershipValidationError: ResolverTypeWrapper<MembershipValidationError>
 	MembershipValidationErrorCode: MembershipValidationErrorCode
-	Mutation: ResolverTypeWrapper<{}>
+	MfaEnrollment: ResolverTypeWrapper<MfaEnrollment>
+	Mutation: ResolverTypeWrapper<Record<PropertyKey, never>>
 	PasswordlessValidationType: PasswordlessValidationType
 	Person: ResolverTypeWrapper<Omit<Person, 'identity'> & { identity: ResolversTypes['Identity'] }>
 	PrepareOtpResponse: ResolverTypeWrapper<PrepareOtpResponse>
@@ -2197,7 +2443,7 @@ export type ResolversTypes = {
 	ProjectMembersFilter: ProjectMembersFilter
 	ProjectMembersInput: ProjectMembersInput
 	ProjectSecret: ProjectSecret
-	Query: ResolverTypeWrapper<{}>
+	Query: ResolverTypeWrapper<Record<PropertyKey, never>>
 	RegenerateBackupCodesError: ResolverTypeWrapper<RegenerateBackupCodesError>
 	RegenerateBackupCodesErrorCode: RegenerateBackupCodesErrorCode
 	RegenerateBackupCodesResponse: ResolverTypeWrapper<RegenerateBackupCodesResponse>
@@ -2214,14 +2460,24 @@ export type ResolversTypes = {
 	RemoveProjectMemberError: ResolverTypeWrapper<RemoveProjectMemberError>
 	RemoveProjectMemberErrorCode: RemoveProjectMemberErrorCode
 	RemoveProjectMemberResponse: ResolverTypeWrapper<RemoveProjectMemberResponse>
+	RequestEmailVerificationError: ResolverTypeWrapper<RequestEmailVerificationError>
+	RequestEmailVerificationErrorCode: RequestEmailVerificationErrorCode
+	RequestEmailVerificationResponse: ResolverTypeWrapper<RequestEmailVerificationResponse>
 	ResetPasswordError: ResolverTypeWrapper<ResetPasswordError>
 	ResetPasswordErrorCode: ResetPasswordErrorCode
 	ResetPasswordResponse: ResolverTypeWrapper<ResetPasswordResponse>
+	ResetPersonMfaError: ResolverTypeWrapper<ResetPersonMfaError>
+	ResetPersonMfaErrorCode: ResetPersonMfaErrorCode
+	ResetPersonMfaResponse: ResolverTypeWrapper<ResetPersonMfaResponse>
+	RevokeSessionError: ResolverTypeWrapper<RevokeSessionError>
+	RevokeSessionErrorCode: RevokeSessionErrorCode
+	RevokeSessionResponse: ResolverTypeWrapper<RevokeSessionResponse>
 	RoleConditionVariableDefinition: ResolverTypeWrapper<RoleConditionVariableDefinition>
 	RoleDefinition: ResolverTypeWrapper<Omit<RoleDefinition, 'variables'> & { variables: ReadonlyArray<ResolversTypes['RoleVariableDefinition']> }>
 	RoleEntityVariableDefinition: ResolverTypeWrapper<RoleEntityVariableDefinition>
 	RolePredefinedVariableDefinition: ResolverTypeWrapper<RolePredefinedVariableDefinition>
 	RoleVariableDefinition: ResolverTypeWrapper<ResolversInterfaceTypes<ResolversTypes>['RoleVariableDefinition']>
+	SessionInfo: ResolverTypeWrapper<SessionInfo>
 	SetProjectSecretError: ResolverTypeWrapper<SetProjectSecretError>
 	SetProjectSecretErrorCode: SetProjectSecretErrorCode
 	SetProjectSecretResponse: ResolverTypeWrapper<SetProjectSecretResponse>
@@ -2251,6 +2507,9 @@ export type ResolversTypes = {
 	ToggleMyPasswordlessErrorCode: ToggleMyPasswordlessErrorCode
 	ToggleMyPasswordlessResponse: ResolverTypeWrapper<ToggleMyPasswordlessResponse>
 	UnmanagedInviteOptions: UnmanagedInviteOptions
+	UpdateAuthPolicyError: ResolverTypeWrapper<UpdateAuthPolicyError>
+	UpdateAuthPolicyErrorCode: UpdateAuthPolicyErrorCode
+	UpdateAuthPolicyResponse: ResolverTypeWrapper<UpdateAuthPolicyResponse>
 	UpdateIDPError: ResolverTypeWrapper<UpdateIdpError>
 	UpdateIDPErrorCode: UpdateIdpErrorCode
 	UpdateIDPResponse: ResolverTypeWrapper<UpdateIdpResponse>
@@ -2262,6 +2521,9 @@ export type ResolversTypes = {
 	UpdateProjectResponse: ResolverTypeWrapper<UpdateProjectResponse>
 	VariableEntry: ResolverTypeWrapper<VariableEntry>
 	VariableEntryInput: VariableEntryInput
+	VerifyEmailError: ResolverTypeWrapper<VerifyEmailError>
+	VerifyEmailErrorCode: VerifyEmailErrorCode
+	VerifyEmailResponse: ResolverTypeWrapper<VerifyEmailResponse>
 	WeakPasswordReason: WeakPasswordReason
 }
 
@@ -2285,6 +2547,8 @@ export type ResolversParentTypes = {
 	AuthLogEntry: AuthLogEntry
 	AuthLogFilter: AuthLogFilter
 	AuthLogPage: AuthLogPage
+	AuthPolicy: AuthPolicy
+	AuthPolicyInput: AuthPolicyInput
 	Boolean: Scalars['Boolean']['output']
 	ChangeMyPasswordError: ChangeMyPasswordError
 	ChangeMyPasswordResponse: ChangeMyPasswordResponse
@@ -2299,6 +2563,10 @@ export type ResolversParentTypes = {
 	Config: Config
 	ConfigCaptcha: ConfigCaptcha
 	ConfigCaptchaInput: ConfigCaptchaInput
+	ConfigCaptchaProtect: ConfigCaptchaProtect
+	ConfigCaptchaProtectInput: ConfigCaptchaProtectInput
+	ConfigEmailChange: ConfigEmailChange
+	ConfigEmailChangeInput: ConfigEmailChangeInput
 	ConfigInput: ConfigInput
 	ConfigLogin: ConfigLogin
 	ConfigLoginInput: ConfigLoginInput
@@ -2310,22 +2578,25 @@ export type ResolversParentTypes = {
 	ConfigRateLimitWindowInput: ConfigRateLimitWindowInput
 	ConfigRateLimits: ConfigRateLimits
 	ConfigRateLimitsInput: ConfigRateLimitsInput
+	ConfigSignup: ConfigSignup
+	ConfigSignupInput: ConfigSignupInput
 	ConfigureError: ConfigureError
 	ConfigureResponse: ConfigureResponse
-	ConfirmOtpError: ConfirmOtpError
-	ConfirmOtpResponse: ConfirmOtpResponse
-	ConfirmOtpResult: ConfirmOtpResult
+	ConfirmEmailChangeError: ConfirmEmailChangeError
+	ConfirmEmailChangeResponse: ConfirmEmailChangeResponse
 	ConfirmEmailOtpError: ConfirmEmailOtpError
 	ConfirmEmailOtpResponse: ConfirmEmailOtpResponse
 	ConfirmEmailOtpResult: ConfirmEmailOtpResult
-	InitEmailOtpError: InitEmailOtpError
-	InitEmailOtpResponse: InitEmailOtpResponse
-	DisableEmailOtpError: DisableEmailOtpError
-	DisableEmailOtpResponse: DisableEmailOtpResponse
+	ConfirmOtpError: ConfirmOtpError
+	ConfirmOtpResponse: ConfirmOtpResponse
+	ConfirmOtpResult: ConfirmOtpResult
 	CreateApiKeyError: CreateApiKeyError
 	CreateApiKeyOptions: CreateApiKeyOptions
 	CreateApiKeyResponse: Omit<CreateApiKeyResponse, 'result'> & { result?: Maybe<ResolversParentTypes['CreateApiKeyResult']> }
 	CreateApiKeyResult: Omit<CreateApiKeyResult, 'apiKey'> & { apiKey: ResolversParentTypes['ApiKeyWithToken'] }
+	CreateAuthPolicyError: CreateAuthPolicyError
+	CreateAuthPolicyResponse: CreateAuthPolicyResponse
+	CreateAuthPolicyResult: CreateAuthPolicyResult
 	CreatePasswordResetRequestError: CreatePasswordResetRequestError
 	CreatePasswordResetRequestResponse: CreatePasswordResetRequestResponse
 	CreateProjectOptions: CreateProjectOptions
@@ -2337,34 +2608,24 @@ export type ResolversParentTypes = {
 	CreateSessionTokenResponse: CreateSessionTokenResponse
 	CreateSessionTokenResult: CreateSessionTokenResult
 	DateTime: Scalars['DateTime']['output']
+	DeleteAuthPolicyError: DeleteAuthPolicyError
+	DeleteAuthPolicyResponse: DeleteAuthPolicyResponse
 	DisableApiKeyError: DisableApiKeyError
 	DisableApiKeyResponse: DisableApiKeyResponse
+	DisableEmailOtpError: DisableEmailOtpError
+	DisableEmailOtpResponse: DisableEmailOtpResponse
 	DisableIDPError: DisableIdpError
 	DisableIDPResponse: DisableIdpResponse
 	DisableOtpError: DisableOtpError
 	DisableOtpResponse: DisableOtpResponse
 	DisablePersonError: DisablePersonError
 	DisablePersonResponse: DisablePersonResponse
-	ForceSignOutPersonError: ForceSignOutPersonError
-	ForceSignOutPersonResponse: ForceSignOutPersonResponse
-	ResetPersonMfaError: ResetPersonMfaError
-	ResetPersonMfaResponse: ResetPersonMfaResponse
-	MfaEnrollment: MfaEnrollment
-	AuthPolicy: AuthPolicy
-	AuthPolicyInput: AuthPolicyInput
-	CreateAuthPolicyError: CreateAuthPolicyError
-	CreateAuthPolicyResult: CreateAuthPolicyResult
-	CreateAuthPolicyResponse: CreateAuthPolicyResponse
-	UpdateAuthPolicyError: UpdateAuthPolicyError
-	UpdateAuthPolicyResponse: UpdateAuthPolicyResponse
-	DeleteAuthPolicyError: DeleteAuthPolicyError
-	DeleteAuthPolicyResponse: DeleteAuthPolicyResponse
-	RevokeSessionError: RevokeSessionError
-	RevokeSessionResponse: RevokeSessionResponse
-	SessionInfo: SessionInfo
+	EmailVerificationOptions: EmailVerificationOptions
 	EnableIDPError: EnableIdpError
 	EnableIDPResponse: EnableIdpResponse
 	Float: Scalars['Float']['output']
+	ForceSignOutPersonError: ForceSignOutPersonError
+	ForceSignOutPersonResponse: ForceSignOutPersonResponse
 	IDPOptions: IdpOptions
 	IDPOptionsOutput: IdpOptionsOutput
 	IDPResponseInput: IdpResponseInput
@@ -2375,6 +2636,8 @@ export type ResolversParentTypes = {
 	IdentityGlobalPermissions: IdentityGlobalPermissions
 	IdentityProjectRelation: Omit<IdentityProjectRelation, 'project'> & { project: ResolversParentTypes['Project'] }
 	IdentityProvider: IdentityProvider
+	InitEmailOtpError: InitEmailOtpError
+	InitEmailOtpResponse: InitEmailOtpResponse
 	InitSignInIDPError: InitSignInIdpError
 	InitSignInIDPResponse: InitSignInIdpResponse
 	InitSignInIDPResult: InitSignInIdpResult
@@ -2395,7 +2658,8 @@ export type ResolversParentTypes = {
 	Membership: Membership
 	MembershipInput: MembershipInput
 	MembershipValidationError: MembershipValidationError
-	Mutation: {}
+	MfaEnrollment: MfaEnrollment
+	Mutation: Record<PropertyKey, never>
 	Person: Omit<Person, 'identity'> & { identity: ResolversParentTypes['Identity'] }
 	PrepareOtpResponse: PrepareOtpResponse
 	PrepareOtpResult: PrepareOtpResult
@@ -2407,7 +2671,7 @@ export type ResolversParentTypes = {
 	ProjectMembersFilter: ProjectMembersFilter
 	ProjectMembersInput: ProjectMembersInput
 	ProjectSecret: ProjectSecret
-	Query: {}
+	Query: Record<PropertyKey, never>
 	RegenerateBackupCodesError: RegenerateBackupCodesError
 	RegenerateBackupCodesResponse: RegenerateBackupCodesResponse
 	RegenerateBackupCodesResult: RegenerateBackupCodesResult
@@ -2420,13 +2684,20 @@ export type ResolversParentTypes = {
 	RemoveMailTemplateResponse: RemoveMailTemplateResponse
 	RemoveProjectMemberError: RemoveProjectMemberError
 	RemoveProjectMemberResponse: RemoveProjectMemberResponse
+	RequestEmailVerificationError: RequestEmailVerificationError
+	RequestEmailVerificationResponse: RequestEmailVerificationResponse
 	ResetPasswordError: ResetPasswordError
 	ResetPasswordResponse: ResetPasswordResponse
+	ResetPersonMfaError: ResetPersonMfaError
+	ResetPersonMfaResponse: ResetPersonMfaResponse
+	RevokeSessionError: RevokeSessionError
+	RevokeSessionResponse: RevokeSessionResponse
 	RoleConditionVariableDefinition: RoleConditionVariableDefinition
 	RoleDefinition: Omit<RoleDefinition, 'variables'> & { variables: ReadonlyArray<ResolversParentTypes['RoleVariableDefinition']> }
 	RoleEntityVariableDefinition: RoleEntityVariableDefinition
 	RolePredefinedVariableDefinition: RolePredefinedVariableDefinition
 	RoleVariableDefinition: ResolversInterfaceTypes<ResolversParentTypes>['RoleVariableDefinition']
+	SessionInfo: SessionInfo
 	SetProjectSecretError: SetProjectSecretError
 	SetProjectSecretResponse: SetProjectSecretResponse
 	SignInError: SignInError
@@ -2448,6 +2719,8 @@ export type ResolversParentTypes = {
 	ToggleMyPasswordlessError: ToggleMyPasswordlessError
 	ToggleMyPasswordlessResponse: ToggleMyPasswordlessResponse
 	UnmanagedInviteOptions: UnmanagedInviteOptions
+	UpdateAuthPolicyError: UpdateAuthPolicyError
+	UpdateAuthPolicyResponse: UpdateAuthPolicyResponse
 	UpdateIDPError: UpdateIdpError
 	UpdateIDPResponse: UpdateIdpResponse
 	UpdateProjectError: UpdateProjectError
@@ -2456,6 +2729,8 @@ export type ResolversParentTypes = {
 	UpdateProjectResponse: UpdateProjectResponse
 	VariableEntry: VariableEntry
 	VariableEntryInput: VariableEntryInput
+	VerifyEmailError: VerifyEmailError
+	VerifyEmailResponse: VerifyEmailResponse
 }
 
 export type ActivatePasswordlessOtpErrorResolvers<
@@ -2464,7 +2739,6 @@ export type ActivatePasswordlessOtpErrorResolvers<
 > = {
 	code?: Resolver<ResolversTypes['ActivatePasswordlessOtpErrorCode'], ParentType, ContextType>
 	developerMessage?: Resolver<ResolversTypes['String'], ParentType, ContextType>
-	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
 }
 
 export type ActivatePasswordlessOtpResponseResolvers<
@@ -2473,7 +2747,6 @@ export type ActivatePasswordlessOtpResponseResolvers<
 > = {
 	error?: Resolver<Maybe<ResolversTypes['ActivatePasswordlessOtpError']>, ParentType, ContextType>
 	ok?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
-	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
 }
 
 export type AddGlobalIdentityRolesErrorResolvers<
@@ -2482,7 +2755,6 @@ export type AddGlobalIdentityRolesErrorResolvers<
 > = {
 	code?: Resolver<ResolversTypes['AddGlobalIdentityRolesErrorCode'], ParentType, ContextType>
 	developerMessage?: Resolver<ResolversTypes['String'], ParentType, ContextType>
-	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
 }
 
 export type AddGlobalIdentityRolesResponseResolvers<
@@ -2492,7 +2764,6 @@ export type AddGlobalIdentityRolesResponseResolvers<
 	error?: Resolver<Maybe<ResolversTypes['AddGlobalIdentityRolesError']>, ParentType, ContextType>
 	ok?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
 	result?: Resolver<Maybe<ResolversTypes['AddGlobalIdentityRolesResult']>, ParentType, ContextType>
-	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
 }
 
 export type AddGlobalIdentityRolesResultResolvers<
@@ -2500,13 +2771,11 @@ export type AddGlobalIdentityRolesResultResolvers<
 	ParentType extends ResolversParentTypes['AddGlobalIdentityRolesResult'] = ResolversParentTypes['AddGlobalIdentityRolesResult'],
 > = {
 	identity?: Resolver<ResolversTypes['Identity'], ParentType, ContextType>
-	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
 }
 
 export type AddIdpErrorResolvers<ContextType = any, ParentType extends ResolversParentTypes['AddIDPError'] = ResolversParentTypes['AddIDPError']> = {
 	code?: Resolver<ResolversTypes['AddIDPErrorCode'], ParentType, ContextType>
 	developerMessage?: Resolver<ResolversTypes['String'], ParentType, ContextType>
-	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
 }
 
 export type AddIdpResponseResolvers<
@@ -2515,7 +2784,6 @@ export type AddIdpResponseResolvers<
 > = {
 	error?: Resolver<Maybe<ResolversTypes['AddIDPError']>, ParentType, ContextType>
 	ok?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
-	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
 }
 
 export type AddMailTemplateErrorResolvers<
@@ -2525,7 +2793,6 @@ export type AddMailTemplateErrorResolvers<
 	code?: Resolver<ResolversTypes['AddMailTemplateErrorCode'], ParentType, ContextType>
 	developerMessage?: Resolver<ResolversTypes['String'], ParentType, ContextType>
 	endUserMessage?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>
-	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
 }
 
 export type AddMailTemplateResponseResolvers<
@@ -2535,7 +2802,6 @@ export type AddMailTemplateResponseResolvers<
 	error?: Resolver<Maybe<ResolversTypes['AddMailTemplateError']>, ParentType, ContextType>
 	errors?: Resolver<ReadonlyArray<ResolversTypes['AddMailTemplateError']>, ParentType, ContextType>
 	ok?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
-	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
 }
 
 export type AddProjectMemberErrorResolvers<
@@ -2546,7 +2812,6 @@ export type AddProjectMemberErrorResolvers<
 	developerMessage?: Resolver<ResolversTypes['String'], ParentType, ContextType>
 	endUserMessage?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>
 	membershipValidation?: Resolver<Maybe<ReadonlyArray<ResolversTypes['MembershipValidationError']>>, ParentType, ContextType>
-	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
 }
 
 export type AddProjectMemberResponseResolvers<
@@ -2556,13 +2821,11 @@ export type AddProjectMemberResponseResolvers<
 	error?: Resolver<Maybe<ResolversTypes['AddProjectMemberError']>, ParentType, ContextType>
 	errors?: Resolver<ReadonlyArray<ResolversTypes['AddProjectMemberError']>, ParentType, ContextType>
 	ok?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
-	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
 }
 
 export type ApiKeyResolvers<ContextType = any, ParentType extends ResolversParentTypes['ApiKey'] = ResolversParentTypes['ApiKey']> = {
 	id?: Resolver<ResolversTypes['String'], ParentType, ContextType>
 	identity?: Resolver<ResolversTypes['Identity'], ParentType, ContextType>
-	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
 }
 
 export type ApiKeyWithTokenResolvers<
@@ -2572,7 +2835,42 @@ export type ApiKeyWithTokenResolvers<
 	id?: Resolver<ResolversTypes['String'], ParentType, ContextType>
 	identity?: Resolver<ResolversTypes['Identity'], ParentType, ContextType>
 	token?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>
-	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
+}
+
+export type AuthLogEntryResolvers<ContextType = any, ParentType extends ResolversParentTypes['AuthLogEntry'] = ResolversParentTypes['AuthLogEntry']> =
+	{
+		createdAt?: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>
+		errorCode?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>
+		errorMessage?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>
+		eventData?: Resolver<Maybe<ResolversTypes['Json']>, ParentType, ContextType>
+		id?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+		identityProviderId?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>
+		invokedByIdentityId?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>
+		ipAddress?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>
+		metadata?: Resolver<Maybe<ResolversTypes['Json']>, ParentType, ContextType>
+		personId?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>
+		personInputIdentifier?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>
+		success?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
+		targetPersonId?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>
+		type?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+		userAgent?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>
+	}
+
+export type AuthLogPageResolvers<ContextType = any, ParentType extends ResolversParentTypes['AuthLogPage'] = ResolversParentTypes['AuthLogPage']> = {
+	entries?: Resolver<ReadonlyArray<ResolversTypes['AuthLogEntry']>, ParentType, ContextType>
+	hasMore?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
+}
+
+export type AuthPolicyResolvers<ContextType = any, ParentType extends ResolversParentTypes['AuthPolicy'] = ResolversParentTypes['AuthPolicy']> = {
+	id?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+	idleTimeout?: Resolver<Maybe<ResolversTypes['Interval']>, ParentType, ContextType>
+	mfaGraceDuration?: Resolver<Maybe<ResolversTypes['Interval']>, ParentType, ContextType>
+	mfaRequired?: Resolver<Maybe<ResolversTypes['Boolean']>, ParentType, ContextType>
+	project?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>
+	rememberMeAllowed?: Resolver<Maybe<ResolversTypes['Boolean']>, ParentType, ContextType>
+	roles?: Resolver<ReadonlyArray<ResolversTypes['String']>, ParentType, ContextType>
+	scope?: Resolver<ResolversTypes['AuthPolicyScope'], ParentType, ContextType>
+	tokenExpiration?: Resolver<Maybe<ResolversTypes['Interval']>, ParentType, ContextType>
 }
 
 export type ChangeMyPasswordErrorResolvers<
@@ -2582,7 +2880,6 @@ export type ChangeMyPasswordErrorResolvers<
 	code?: Resolver<ResolversTypes['ChangeMyPasswordErrorCode'], ParentType, ContextType>
 	developerMessage?: Resolver<ResolversTypes['String'], ParentType, ContextType>
 	weakPasswordReasons?: Resolver<Maybe<ReadonlyArray<ResolversTypes['WeakPasswordReason']>>, ParentType, ContextType>
-	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
 }
 
 export type ChangeMyPasswordResponseResolvers<
@@ -2591,7 +2888,6 @@ export type ChangeMyPasswordResponseResolvers<
 > = {
 	error?: Resolver<Maybe<ResolversTypes['ChangeMyPasswordError']>, ParentType, ContextType>
 	ok?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
-	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
 }
 
 export type ChangeMyProfileErrorResolvers<
@@ -2600,7 +2896,6 @@ export type ChangeMyProfileErrorResolvers<
 > = {
 	code?: Resolver<ResolversTypes['ChangeMyProfileErrorCode'], ParentType, ContextType>
 	developerMessage?: Resolver<ResolversTypes['String'], ParentType, ContextType>
-	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
 }
 
 export type ChangeMyProfileResponseResolvers<
@@ -2609,7 +2904,6 @@ export type ChangeMyProfileResponseResolvers<
 > = {
 	error?: Resolver<Maybe<ResolversTypes['ChangeMyProfileError']>, ParentType, ContextType>
 	ok?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
-	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
 }
 
 export type ChangePasswordErrorResolvers<
@@ -2620,7 +2914,6 @@ export type ChangePasswordErrorResolvers<
 	developerMessage?: Resolver<ResolversTypes['String'], ParentType, ContextType>
 	endUserMessage?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>
 	weakPasswordReasons?: Resolver<Maybe<ReadonlyArray<ResolversTypes['WeakPasswordReason']>>, ParentType, ContextType>
-	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
 }
 
 export type ChangePasswordResponseResolvers<
@@ -2630,7 +2923,6 @@ export type ChangePasswordResponseResolvers<
 	error?: Resolver<Maybe<ResolversTypes['ChangePasswordError']>, ParentType, ContextType>
 	errors?: Resolver<ReadonlyArray<ResolversTypes['ChangePasswordError']>, ParentType, ContextType>
 	ok?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
-	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
 }
 
 export type ChangeProfileErrorResolvers<
@@ -2639,7 +2931,6 @@ export type ChangeProfileErrorResolvers<
 > = {
 	code?: Resolver<ResolversTypes['ChangeProfileErrorCode'], ParentType, ContextType>
 	developerMessage?: Resolver<ResolversTypes['String'], ParentType, ContextType>
-	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
 }
 
 export type ChangeProfileResponseResolvers<
@@ -2648,7 +2939,6 @@ export type ChangeProfileResponseResolvers<
 > = {
 	error?: Resolver<Maybe<ResolversTypes['ChangeProfileError']>, ParentType, ContextType>
 	ok?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
-	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
 }
 
 export type CheckResetPasswordTokenResultResolvers<
@@ -2656,7 +2946,6 @@ export type CheckResetPasswordTokenResultResolvers<
 	ParentType extends ResolversParentTypes['CheckResetPasswordTokenResult'] = ResolversParentTypes['CheckResetPasswordTokenResult'],
 > = {
 	code?: Resolver<ResolversTypes['CheckResetPasswordTokenCode'], ParentType, ContextType>
-	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
 }
 
 export type CommonSignInResultResolvers<
@@ -2664,47 +2953,42 @@ export type CommonSignInResultResolvers<
 	ParentType extends ResolversParentTypes['CommonSignInResult'] = ResolversParentTypes['CommonSignInResult'],
 > = {
 	__resolveType: TypeResolveFn<'CreateSessionTokenResult' | 'SignInIDPResult' | 'SignInPasswordlessResult' | 'SignInResult', ParentType, ContextType>
-	person?: Resolver<ResolversTypes['Person'], ParentType, ContextType>
-	token?: Resolver<ResolversTypes['String'], ParentType, ContextType>
 }
 
 export type ConfigResolvers<ContextType = any, ParentType extends ResolversParentTypes['Config'] = ResolversParentTypes['Config']> = {
 	captcha?: Resolver<ResolversTypes['ConfigCaptcha'], ParentType, ContextType>
+	emailChange?: Resolver<ResolversTypes['ConfigEmailChange'], ParentType, ContextType>
 	login?: Resolver<ResolversTypes['ConfigLogin'], ParentType, ContextType>
 	password?: Resolver<ResolversTypes['ConfigPassword'], ParentType, ContextType>
 	passwordless?: Resolver<ResolversTypes['ConfigPasswordless'], ParentType, ContextType>
 	rateLimits?: Resolver<ResolversTypes['ConfigRateLimits'], ParentType, ContextType>
-	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
+	signup?: Resolver<ResolversTypes['ConfigSignup'], ParentType, ContextType>
 }
 
 export type ConfigCaptchaResolvers<
 	ContextType = any,
 	ParentType extends ResolversParentTypes['ConfigCaptcha'] = ResolversParentTypes['ConfigCaptcha'],
 > = {
+	protect?: Resolver<ResolversTypes['ConfigCaptchaProtect'], ParentType, ContextType>
 	provider?: Resolver<Maybe<ResolversTypes['CaptchaProvider']>, ParentType, ContextType>
 	threshold?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>
-	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
 }
 
-export type ConfigRateLimitsResolvers<
+export type ConfigCaptchaProtectResolvers<
 	ContextType = any,
-	ParentType extends ResolversParentTypes['ConfigRateLimits'] = ResolversParentTypes['ConfigRateLimits'],
+	ParentType extends ResolversParentTypes['ConfigCaptchaProtect'] = ResolversParentTypes['ConfigCaptchaProtect'],
 > = {
-	emailOtpPerPerson?: Resolver<ResolversTypes['ConfigRateLimitWindow'], ParentType, ContextType>
-	loginPerIp?: Resolver<ResolversTypes['ConfigRateLimitWindow'], ParentType, ContextType>
-	passwordResetPerIp?: Resolver<ResolversTypes['ConfigRateLimitWindow'], ParentType, ContextType>
-	passwordlessInitPerIp?: Resolver<ResolversTypes['ConfigRateLimitWindow'], ParentType, ContextType>
-	signUpPerIp?: Resolver<ResolversTypes['ConfigRateLimitWindow'], ParentType, ContextType>
-	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
+	emailVerification?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
+	passwordReset?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
+	passwordlessInit?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
+	signUp?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
 }
 
-export type ConfigRateLimitWindowResolvers<
+export type ConfigEmailChangeResolvers<
 	ContextType = any,
-	ParentType extends ResolversParentTypes['ConfigRateLimitWindow'] = ResolversParentTypes['ConfigRateLimitWindow'],
+	ParentType extends ResolversParentTypes['ConfigEmailChange'] = ResolversParentTypes['ConfigEmailChange'],
 > = {
-	limit?: Resolver<ResolversTypes['Int'], ParentType, ContextType>
-	window?: Resolver<ResolversTypes['Interval'], ParentType, ContextType>
-	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
+	requireVerification?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
 }
 
 export type ConfigLoginResolvers<ContextType = any, ParentType extends ResolversParentTypes['ConfigLogin'] = ResolversParentTypes['ConfigLogin']> = {
@@ -2716,7 +3000,6 @@ export type ConfigLoginResolvers<ContextType = any, ParentType extends Resolvers
 	mfaGraceDuration?: Resolver<ResolversTypes['Interval'], ParentType, ContextType>
 	revealLoginMethod?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
 	revealUserExists?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
-	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
 }
 
 export type ConfigPasswordResolvers<
@@ -2731,7 +3014,6 @@ export type ConfigPasswordResolvers<
 	requireLowercase?: Resolver<ResolversTypes['Int'], ParentType, ContextType>
 	requireSpecial?: Resolver<ResolversTypes['Int'], ParentType, ContextType>
 	requireUppercase?: Resolver<ResolversTypes['Int'], ParentType, ContextType>
-	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
 }
 
 export type ConfigPasswordlessResolvers<
@@ -2741,8 +3023,32 @@ export type ConfigPasswordlessResolvers<
 	enabled?: Resolver<ResolversTypes['ConfigPolicy'], ParentType, ContextType>
 	expiration?: Resolver<ResolversTypes['Interval'], ParentType, ContextType>
 	url?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>
-	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
 }
+
+export type ConfigRateLimitWindowResolvers<
+	ContextType = any,
+	ParentType extends ResolversParentTypes['ConfigRateLimitWindow'] = ResolversParentTypes['ConfigRateLimitWindow'],
+> = {
+	limit?: Resolver<ResolversTypes['Int'], ParentType, ContextType>
+	window?: Resolver<ResolversTypes['Interval'], ParentType, ContextType>
+}
+
+export type ConfigRateLimitsResolvers<
+	ContextType = any,
+	ParentType extends ResolversParentTypes['ConfigRateLimits'] = ResolversParentTypes['ConfigRateLimits'],
+> = {
+	emailOtpPerPerson?: Resolver<ResolversTypes['ConfigRateLimitWindow'], ParentType, ContextType>
+	emailVerificationPerIp?: Resolver<ResolversTypes['ConfigRateLimitWindow'], ParentType, ContextType>
+	loginPerIp?: Resolver<ResolversTypes['ConfigRateLimitWindow'], ParentType, ContextType>
+	passwordResetPerIp?: Resolver<ResolversTypes['ConfigRateLimitWindow'], ParentType, ContextType>
+	passwordlessInitPerIp?: Resolver<ResolversTypes['ConfigRateLimitWindow'], ParentType, ContextType>
+	signUpPerIp?: Resolver<ResolversTypes['ConfigRateLimitWindow'], ParentType, ContextType>
+}
+
+export type ConfigSignupResolvers<ContextType = any, ParentType extends ResolversParentTypes['ConfigSignup'] = ResolversParentTypes['ConfigSignup']> =
+	{
+		requireEmailVerification?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
+	}
 
 export type ConfigureErrorResolvers<
 	ContextType = any,
@@ -2750,7 +3056,6 @@ export type ConfigureErrorResolvers<
 > = {
 	code?: Resolver<ResolversTypes['ConfigureErrorCode'], ParentType, ContextType>
 	developerMessage?: Resolver<ResolversTypes['String'], ParentType, ContextType>
-	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
 }
 
 export type ConfigureResponseResolvers<
@@ -2759,7 +3064,46 @@ export type ConfigureResponseResolvers<
 > = {
 	error?: Resolver<Maybe<ResolversTypes['ConfigureError']>, ParentType, ContextType>
 	ok?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
-	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
+}
+
+export type ConfirmEmailChangeErrorResolvers<
+	ContextType = any,
+	ParentType extends ResolversParentTypes['ConfirmEmailChangeError'] = ResolversParentTypes['ConfirmEmailChangeError'],
+> = {
+	code?: Resolver<ResolversTypes['ConfirmEmailChangeErrorCode'], ParentType, ContextType>
+	developerMessage?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+}
+
+export type ConfirmEmailChangeResponseResolvers<
+	ContextType = any,
+	ParentType extends ResolversParentTypes['ConfirmEmailChangeResponse'] = ResolversParentTypes['ConfirmEmailChangeResponse'],
+> = {
+	error?: Resolver<Maybe<ResolversTypes['ConfirmEmailChangeError']>, ParentType, ContextType>
+	ok?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
+}
+
+export type ConfirmEmailOtpErrorResolvers<
+	ContextType = any,
+	ParentType extends ResolversParentTypes['ConfirmEmailOtpError'] = ResolversParentTypes['ConfirmEmailOtpError'],
+> = {
+	code?: Resolver<ResolversTypes['ConfirmEmailOtpErrorCode'], ParentType, ContextType>
+	developerMessage?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+}
+
+export type ConfirmEmailOtpResponseResolvers<
+	ContextType = any,
+	ParentType extends ResolversParentTypes['ConfirmEmailOtpResponse'] = ResolversParentTypes['ConfirmEmailOtpResponse'],
+> = {
+	error?: Resolver<Maybe<ResolversTypes['ConfirmEmailOtpError']>, ParentType, ContextType>
+	ok?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
+	result?: Resolver<Maybe<ResolversTypes['ConfirmEmailOtpResult']>, ParentType, ContextType>
+}
+
+export type ConfirmEmailOtpResultResolvers<
+	ContextType = any,
+	ParentType extends ResolversParentTypes['ConfirmEmailOtpResult'] = ResolversParentTypes['ConfirmEmailOtpResult'],
+> = {
+	backupCodes?: Resolver<ReadonlyArray<ResolversTypes['String']>, ParentType, ContextType>
 }
 
 export type ConfirmOtpErrorResolvers<
@@ -2769,7 +3113,6 @@ export type ConfirmOtpErrorResolvers<
 	code?: Resolver<ResolversTypes['ConfirmOtpErrorCode'], ParentType, ContextType>
 	developerMessage?: Resolver<ResolversTypes['String'], ParentType, ContextType>
 	endUserMessage?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>
-	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
 }
 
 export type ConfirmOtpResponseResolvers<
@@ -2780,7 +3123,6 @@ export type ConfirmOtpResponseResolvers<
 	errors?: Resolver<ReadonlyArray<ResolversTypes['ConfirmOtpError']>, ParentType, ContextType>
 	ok?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
 	result?: Resolver<Maybe<ResolversTypes['ConfirmOtpResult']>, ParentType, ContextType>
-	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
 }
 
 export type ConfirmOtpResultResolvers<
@@ -2788,70 +3130,6 @@ export type ConfirmOtpResultResolvers<
 	ParentType extends ResolversParentTypes['ConfirmOtpResult'] = ResolversParentTypes['ConfirmOtpResult'],
 > = {
 	backupCodes?: Resolver<ReadonlyArray<ResolversTypes['String']>, ParentType, ContextType>
-	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
-}
-
-export type ConfirmEmailOtpErrorResolvers<
-	ContextType = any,
-	ParentType extends ResolversParentTypes['ConfirmEmailOtpError'] = ResolversParentTypes['ConfirmEmailOtpError'],
-> = {
-	code?: Resolver<ResolversTypes['ConfirmEmailOtpErrorCode'], ParentType, ContextType>
-	developerMessage?: Resolver<ResolversTypes['String'], ParentType, ContextType>
-	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
-}
-
-export type ConfirmEmailOtpResponseResolvers<
-	ContextType = any,
-	ParentType extends ResolversParentTypes['ConfirmEmailOtpResponse'] = ResolversParentTypes['ConfirmEmailOtpResponse'],
-> = {
-	error?: Resolver<Maybe<ResolversTypes['ConfirmEmailOtpError']>, ParentType, ContextType>
-	ok?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
-	result?: Resolver<Maybe<ResolversTypes['ConfirmEmailOtpResult']>, ParentType, ContextType>
-	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
-}
-
-export type ConfirmEmailOtpResultResolvers<
-	ContextType = any,
-	ParentType extends ResolversParentTypes['ConfirmEmailOtpResult'] = ResolversParentTypes['ConfirmEmailOtpResult'],
-> = {
-	backupCodes?: Resolver<ReadonlyArray<ResolversTypes['String']>, ParentType, ContextType>
-	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
-}
-
-export type InitEmailOtpErrorResolvers<
-	ContextType = any,
-	ParentType extends ResolversParentTypes['InitEmailOtpError'] = ResolversParentTypes['InitEmailOtpError'],
-> = {
-	code?: Resolver<ResolversTypes['InitEmailOtpErrorCode'], ParentType, ContextType>
-	developerMessage?: Resolver<ResolversTypes['String'], ParentType, ContextType>
-	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
-}
-
-export type InitEmailOtpResponseResolvers<
-	ContextType = any,
-	ParentType extends ResolversParentTypes['InitEmailOtpResponse'] = ResolversParentTypes['InitEmailOtpResponse'],
-> = {
-	error?: Resolver<Maybe<ResolversTypes['InitEmailOtpError']>, ParentType, ContextType>
-	ok?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
-	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
-}
-
-export type DisableEmailOtpErrorResolvers<
-	ContextType = any,
-	ParentType extends ResolversParentTypes['DisableEmailOtpError'] = ResolversParentTypes['DisableEmailOtpError'],
-> = {
-	code?: Resolver<ResolversTypes['DisableEmailOtpErrorCode'], ParentType, ContextType>
-	developerMessage?: Resolver<ResolversTypes['String'], ParentType, ContextType>
-	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
-}
-
-export type DisableEmailOtpResponseResolvers<
-	ContextType = any,
-	ParentType extends ResolversParentTypes['DisableEmailOtpResponse'] = ResolversParentTypes['DisableEmailOtpResponse'],
-> = {
-	error?: Resolver<Maybe<ResolversTypes['DisableEmailOtpError']>, ParentType, ContextType>
-	ok?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
-	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
 }
 
 export type CreateApiKeyErrorResolvers<
@@ -2862,7 +3140,6 @@ export type CreateApiKeyErrorResolvers<
 	developerMessage?: Resolver<ResolversTypes['String'], ParentType, ContextType>
 	endUserMessage?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>
 	membershipValidation?: Resolver<Maybe<ReadonlyArray<ResolversTypes['MembershipValidationError']>>, ParentType, ContextType>
-	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
 }
 
 export type CreateApiKeyResponseResolvers<
@@ -2873,7 +3150,6 @@ export type CreateApiKeyResponseResolvers<
 	errors?: Resolver<ReadonlyArray<ResolversTypes['CreateApiKeyError']>, ParentType, ContextType>
 	ok?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
 	result?: Resolver<Maybe<ResolversTypes['CreateApiKeyResult']>, ParentType, ContextType>
-	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
 }
 
 export type CreateApiKeyResultResolvers<
@@ -2881,7 +3157,30 @@ export type CreateApiKeyResultResolvers<
 	ParentType extends ResolversParentTypes['CreateApiKeyResult'] = ResolversParentTypes['CreateApiKeyResult'],
 > = {
 	apiKey?: Resolver<ResolversTypes['ApiKeyWithToken'], ParentType, ContextType>
-	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
+}
+
+export type CreateAuthPolicyErrorResolvers<
+	ContextType = any,
+	ParentType extends ResolversParentTypes['CreateAuthPolicyError'] = ResolversParentTypes['CreateAuthPolicyError'],
+> = {
+	code?: Resolver<ResolversTypes['CreateAuthPolicyErrorCode'], ParentType, ContextType>
+	developerMessage?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+}
+
+export type CreateAuthPolicyResponseResolvers<
+	ContextType = any,
+	ParentType extends ResolversParentTypes['CreateAuthPolicyResponse'] = ResolversParentTypes['CreateAuthPolicyResponse'],
+> = {
+	error?: Resolver<Maybe<ResolversTypes['CreateAuthPolicyError']>, ParentType, ContextType>
+	ok?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
+	result?: Resolver<Maybe<ResolversTypes['CreateAuthPolicyResult']>, ParentType, ContextType>
+}
+
+export type CreateAuthPolicyResultResolvers<
+	ContextType = any,
+	ParentType extends ResolversParentTypes['CreateAuthPolicyResult'] = ResolversParentTypes['CreateAuthPolicyResult'],
+> = {
+	id?: Resolver<ResolversTypes['String'], ParentType, ContextType>
 }
 
 export type CreatePasswordResetRequestErrorResolvers<
@@ -2891,7 +3190,6 @@ export type CreatePasswordResetRequestErrorResolvers<
 	code?: Resolver<ResolversTypes['CreatePasswordResetRequestErrorCode'], ParentType, ContextType>
 	developerMessage?: Resolver<ResolversTypes['String'], ParentType, ContextType>
 	endUserMessage?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>
-	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
 }
 
 export type CreatePasswordResetRequestResponseResolvers<
@@ -2901,7 +3199,6 @@ export type CreatePasswordResetRequestResponseResolvers<
 	error?: Resolver<Maybe<ResolversTypes['CreatePasswordResetRequestError']>, ParentType, ContextType>
 	errors?: Resolver<ReadonlyArray<ResolversTypes['CreatePasswordResetRequestError']>, ParentType, ContextType>
 	ok?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
-	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
 }
 
 export type CreateProjectResponseResolvers<
@@ -2911,7 +3208,6 @@ export type CreateProjectResponseResolvers<
 	error?: Resolver<Maybe<ResolversTypes['CreateProjectResponseError']>, ParentType, ContextType>
 	ok?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
 	result?: Resolver<Maybe<ResolversTypes['CreateProjectResult']>, ParentType, ContextType>
-	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
 }
 
 export type CreateProjectResponseErrorResolvers<
@@ -2920,7 +3216,6 @@ export type CreateProjectResponseErrorResolvers<
 > = {
 	code?: Resolver<ResolversTypes['CreateProjectResponseErrorCode'], ParentType, ContextType>
 	developerMessage?: Resolver<ResolversTypes['String'], ParentType, ContextType>
-	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
 }
 
 export type CreateProjectResultResolvers<
@@ -2928,7 +3223,6 @@ export type CreateProjectResultResolvers<
 	ParentType extends ResolversParentTypes['CreateProjectResult'] = ResolversParentTypes['CreateProjectResult'],
 > = {
 	deployerApiKey?: Resolver<Maybe<ResolversTypes['ApiKeyWithToken']>, ParentType, ContextType>
-	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
 }
 
 export type CreateSessionTokenErrorResolvers<
@@ -2937,7 +3231,6 @@ export type CreateSessionTokenErrorResolvers<
 > = {
 	code?: Resolver<ResolversTypes['CreateSessionTokenErrorCode'], ParentType, ContextType>
 	developerMessage?: Resolver<ResolversTypes['String'], ParentType, ContextType>
-	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
 }
 
 export type CreateSessionTokenResponseResolvers<
@@ -2947,7 +3240,6 @@ export type CreateSessionTokenResponseResolvers<
 	error?: Resolver<Maybe<ResolversTypes['CreateSessionTokenError']>, ParentType, ContextType>
 	ok?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
 	result?: Resolver<Maybe<ResolversTypes['CreateSessionTokenResult']>, ParentType, ContextType>
-	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
 }
 
 export type CreateSessionTokenResultResolvers<
@@ -2963,6 +3255,22 @@ export interface DateTimeScalarConfig extends GraphQLScalarTypeConfig<ResolversT
 	name: 'DateTime'
 }
 
+export type DeleteAuthPolicyErrorResolvers<
+	ContextType = any,
+	ParentType extends ResolversParentTypes['DeleteAuthPolicyError'] = ResolversParentTypes['DeleteAuthPolicyError'],
+> = {
+	code?: Resolver<ResolversTypes['DeleteAuthPolicyErrorCode'], ParentType, ContextType>
+	developerMessage?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+}
+
+export type DeleteAuthPolicyResponseResolvers<
+	ContextType = any,
+	ParentType extends ResolversParentTypes['DeleteAuthPolicyResponse'] = ResolversParentTypes['DeleteAuthPolicyResponse'],
+> = {
+	error?: Resolver<Maybe<ResolversTypes['DeleteAuthPolicyError']>, ParentType, ContextType>
+	ok?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
+}
+
 export type DisableApiKeyErrorResolvers<
 	ContextType = any,
 	ParentType extends ResolversParentTypes['DisableApiKeyError'] = ResolversParentTypes['DisableApiKeyError'],
@@ -2970,7 +3278,6 @@ export type DisableApiKeyErrorResolvers<
 	code?: Resolver<ResolversTypes['DisableApiKeyErrorCode'], ParentType, ContextType>
 	developerMessage?: Resolver<ResolversTypes['String'], ParentType, ContextType>
 	endUserMessage?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>
-	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
 }
 
 export type DisableApiKeyResponseResolvers<
@@ -2980,7 +3287,22 @@ export type DisableApiKeyResponseResolvers<
 	error?: Resolver<Maybe<ResolversTypes['DisableApiKeyError']>, ParentType, ContextType>
 	errors?: Resolver<ReadonlyArray<ResolversTypes['DisableApiKeyError']>, ParentType, ContextType>
 	ok?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
-	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
+}
+
+export type DisableEmailOtpErrorResolvers<
+	ContextType = any,
+	ParentType extends ResolversParentTypes['DisableEmailOtpError'] = ResolversParentTypes['DisableEmailOtpError'],
+> = {
+	code?: Resolver<ResolversTypes['DisableEmailOtpErrorCode'], ParentType, ContextType>
+	developerMessage?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+}
+
+export type DisableEmailOtpResponseResolvers<
+	ContextType = any,
+	ParentType extends ResolversParentTypes['DisableEmailOtpResponse'] = ResolversParentTypes['DisableEmailOtpResponse'],
+> = {
+	error?: Resolver<Maybe<ResolversTypes['DisableEmailOtpError']>, ParentType, ContextType>
+	ok?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
 }
 
 export type DisableIdpErrorResolvers<
@@ -2989,7 +3311,6 @@ export type DisableIdpErrorResolvers<
 > = {
 	code?: Resolver<ResolversTypes['DisableIDPErrorCode'], ParentType, ContextType>
 	developerMessage?: Resolver<ResolversTypes['String'], ParentType, ContextType>
-	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
 }
 
 export type DisableIdpResponseResolvers<
@@ -2998,7 +3319,6 @@ export type DisableIdpResponseResolvers<
 > = {
 	error?: Resolver<Maybe<ResolversTypes['DisableIDPError']>, ParentType, ContextType>
 	ok?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
-	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
 }
 
 export type DisableOtpErrorResolvers<
@@ -3008,7 +3328,6 @@ export type DisableOtpErrorResolvers<
 	code?: Resolver<ResolversTypes['DisableOtpErrorCode'], ParentType, ContextType>
 	developerMessage?: Resolver<ResolversTypes['String'], ParentType, ContextType>
 	endUserMessage?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>
-	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
 }
 
 export type DisableOtpResponseResolvers<
@@ -3018,7 +3337,6 @@ export type DisableOtpResponseResolvers<
 	error?: Resolver<Maybe<ResolversTypes['DisableOtpError']>, ParentType, ContextType>
 	errors?: Resolver<ReadonlyArray<ResolversTypes['DisableOtpError']>, ParentType, ContextType>
 	ok?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
-	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
 }
 
 export type DisablePersonErrorResolvers<
@@ -3027,7 +3345,6 @@ export type DisablePersonErrorResolvers<
 > = {
 	code?: Resolver<ResolversTypes['DisablePersonErrorCode'], ParentType, ContextType>
 	developerMessage?: Resolver<ResolversTypes['String'], ParentType, ContextType>
-	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
 }
 
 export type DisablePersonResponseResolvers<
@@ -3036,166 +3353,6 @@ export type DisablePersonResponseResolvers<
 > = {
 	error?: Resolver<Maybe<ResolversTypes['DisablePersonError']>, ParentType, ContextType>
 	ok?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
-	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
-}
-
-export type ForceSignOutPersonErrorResolvers<
-	ContextType = any,
-	ParentType extends ResolversParentTypes['ForceSignOutPersonError'] = ResolversParentTypes['ForceSignOutPersonError'],
-> = {
-	code?: Resolver<ResolversTypes['ForceSignOutPersonErrorCode'], ParentType, ContextType>
-	developerMessage?: Resolver<ResolversTypes['String'], ParentType, ContextType>
-	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
-}
-
-export type ForceSignOutPersonResponseResolvers<
-	ContextType = any,
-	ParentType extends ResolversParentTypes['ForceSignOutPersonResponse'] = ResolversParentTypes['ForceSignOutPersonResponse'],
-> = {
-	error?: Resolver<Maybe<ResolversTypes['ForceSignOutPersonError']>, ParentType, ContextType>
-	ok?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
-	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
-}
-
-export type ResetPersonMfaErrorResolvers<
-	ContextType = any,
-	ParentType extends ResolversParentTypes['ResetPersonMfaError'] = ResolversParentTypes['ResetPersonMfaError'],
-> = {
-	code?: Resolver<ResolversTypes['ResetPersonMfaErrorCode'], ParentType, ContextType>
-	developerMessage?: Resolver<ResolversTypes['String'], ParentType, ContextType>
-	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
-}
-
-export type ResetPersonMfaResponseResolvers<
-	ContextType = any,
-	ParentType extends ResolversParentTypes['ResetPersonMfaResponse'] = ResolversParentTypes['ResetPersonMfaResponse'],
-> = {
-	error?: Resolver<Maybe<ResolversTypes['ResetPersonMfaError']>, ParentType, ContextType>
-	ok?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
-	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
-}
-
-export type MfaEnrollmentResolvers<
-	ContextType = any,
-	ParentType extends ResolversParentTypes['MfaEnrollment'] = ResolversParentTypes['MfaEnrollment'],
-> = {
-	otpUri?: Resolver<ResolversTypes['String'], ParentType, ContextType>
-	otpSecret?: Resolver<ResolversTypes['String'], ParentType, ContextType>
-	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
-}
-
-export type AuthPolicyResolvers<
-	ContextType = any,
-	ParentType extends ResolversParentTypes['AuthPolicy'] = ResolversParentTypes['AuthPolicy'],
-> = {
-	id?: Resolver<ResolversTypes['String'], ParentType, ContextType>
-	scope?: Resolver<ResolversTypes['AuthPolicyScope'], ParentType, ContextType>
-	project?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>
-	roles?: Resolver<ReadonlyArray<ResolversTypes['String']>, ParentType, ContextType>
-	mfaRequired?: Resolver<Maybe<ResolversTypes['Boolean']>, ParentType, ContextType>
-	tokenExpiration?: Resolver<Maybe<ResolversTypes['Interval']>, ParentType, ContextType>
-	idleTimeout?: Resolver<Maybe<ResolversTypes['Interval']>, ParentType, ContextType>
-	mfaGraceDuration?: Resolver<Maybe<ResolversTypes['Interval']>, ParentType, ContextType>
-	rememberMeAllowed?: Resolver<Maybe<ResolversTypes['Boolean']>, ParentType, ContextType>
-	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
-}
-
-export type CreateAuthPolicyErrorResolvers<
-	ContextType = any,
-	ParentType extends ResolversParentTypes['CreateAuthPolicyError'] = ResolversParentTypes['CreateAuthPolicyError'],
-> = {
-	code?: Resolver<ResolversTypes['CreateAuthPolicyErrorCode'], ParentType, ContextType>
-	developerMessage?: Resolver<ResolversTypes['String'], ParentType, ContextType>
-	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
-}
-
-export type CreateAuthPolicyResultResolvers<
-	ContextType = any,
-	ParentType extends ResolversParentTypes['CreateAuthPolicyResult'] = ResolversParentTypes['CreateAuthPolicyResult'],
-> = {
-	id?: Resolver<ResolversTypes['String'], ParentType, ContextType>
-	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
-}
-
-export type CreateAuthPolicyResponseResolvers<
-	ContextType = any,
-	ParentType extends ResolversParentTypes['CreateAuthPolicyResponse'] = ResolversParentTypes['CreateAuthPolicyResponse'],
-> = {
-	error?: Resolver<Maybe<ResolversTypes['CreateAuthPolicyError']>, ParentType, ContextType>
-	ok?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
-	result?: Resolver<Maybe<ResolversTypes['CreateAuthPolicyResult']>, ParentType, ContextType>
-	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
-}
-
-export type UpdateAuthPolicyErrorResolvers<
-	ContextType = any,
-	ParentType extends ResolversParentTypes['UpdateAuthPolicyError'] = ResolversParentTypes['UpdateAuthPolicyError'],
-> = {
-	code?: Resolver<ResolversTypes['UpdateAuthPolicyErrorCode'], ParentType, ContextType>
-	developerMessage?: Resolver<ResolversTypes['String'], ParentType, ContextType>
-	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
-}
-
-export type UpdateAuthPolicyResponseResolvers<
-	ContextType = any,
-	ParentType extends ResolversParentTypes['UpdateAuthPolicyResponse'] = ResolversParentTypes['UpdateAuthPolicyResponse'],
-> = {
-	error?: Resolver<Maybe<ResolversTypes['UpdateAuthPolicyError']>, ParentType, ContextType>
-	ok?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
-	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
-}
-
-export type DeleteAuthPolicyErrorResolvers<
-	ContextType = any,
-	ParentType extends ResolversParentTypes['DeleteAuthPolicyError'] = ResolversParentTypes['DeleteAuthPolicyError'],
-> = {
-	code?: Resolver<ResolversTypes['DeleteAuthPolicyErrorCode'], ParentType, ContextType>
-	developerMessage?: Resolver<ResolversTypes['String'], ParentType, ContextType>
-	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
-}
-
-export type DeleteAuthPolicyResponseResolvers<
-	ContextType = any,
-	ParentType extends ResolversParentTypes['DeleteAuthPolicyResponse'] = ResolversParentTypes['DeleteAuthPolicyResponse'],
-> = {
-	error?: Resolver<Maybe<ResolversTypes['DeleteAuthPolicyError']>, ParentType, ContextType>
-	ok?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
-	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
-}
-
-export type RevokeSessionErrorResolvers<
-	ContextType = any,
-	ParentType extends ResolversParentTypes['RevokeSessionError'] = ResolversParentTypes['RevokeSessionError'],
-> = {
-	code?: Resolver<ResolversTypes['RevokeSessionErrorCode'], ParentType, ContextType>
-	developerMessage?: Resolver<ResolversTypes['String'], ParentType, ContextType>
-	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
-}
-
-export type RevokeSessionResponseResolvers<
-	ContextType = any,
-	ParentType extends ResolversParentTypes['RevokeSessionResponse'] = ResolversParentTypes['RevokeSessionResponse'],
-> = {
-	error?: Resolver<Maybe<ResolversTypes['RevokeSessionError']>, ParentType, ContextType>
-	ok?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
-	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
-}
-
-export type SessionInfoResolvers<
-	ContextType = any,
-	ParentType extends ResolversParentTypes['SessionInfo'] = ResolversParentTypes['SessionInfo'],
-> = {
-	createdAt?: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>
-	createdIp?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>
-	createdUserAgent?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>
-	expiresAt?: Resolver<Maybe<ResolversTypes['DateTime']>, ParentType, ContextType>
-	id?: Resolver<ResolversTypes['String'], ParentType, ContextType>
-	isCurrent?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
-	lastIp?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>
-	lastUsedAt?: Resolver<Maybe<ResolversTypes['DateTime']>, ParentType, ContextType>
-	lastUserAgent?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>
-	trustForwardedClientInfo?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
-	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
 }
 
 export type EnableIdpErrorResolvers<
@@ -3204,7 +3361,6 @@ export type EnableIdpErrorResolvers<
 > = {
 	code?: Resolver<ResolversTypes['EnableIDPErrorCode'], ParentType, ContextType>
 	developerMessage?: Resolver<ResolversTypes['String'], ParentType, ContextType>
-	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
 }
 
 export type EnableIdpResponseResolvers<
@@ -3213,7 +3369,22 @@ export type EnableIdpResponseResolvers<
 > = {
 	error?: Resolver<Maybe<ResolversTypes['EnableIDPError']>, ParentType, ContextType>
 	ok?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
-	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
+}
+
+export type ForceSignOutPersonErrorResolvers<
+	ContextType = any,
+	ParentType extends ResolversParentTypes['ForceSignOutPersonError'] = ResolversParentTypes['ForceSignOutPersonError'],
+> = {
+	code?: Resolver<ResolversTypes['ForceSignOutPersonErrorCode'], ParentType, ContextType>
+	developerMessage?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+}
+
+export type ForceSignOutPersonResponseResolvers<
+	ContextType = any,
+	ParentType extends ResolversParentTypes['ForceSignOutPersonResponse'] = ResolversParentTypes['ForceSignOutPersonResponse'],
+> = {
+	error?: Resolver<Maybe<ResolversTypes['ForceSignOutPersonError']>, ParentType, ContextType>
+	ok?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
 }
 
 export type IdpOptionsOutputResolvers<
@@ -3223,7 +3394,7 @@ export type IdpOptionsOutputResolvers<
 	autoSignUp?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
 	exclusive?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
 	initReturnsConfig?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
-	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
+	requireVerifiedEmail?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
 }
 
 export type IdentityResolvers<ContextType = any, ParentType extends ResolversParentTypes['Identity'] = ResolversParentTypes['Identity']> = {
@@ -3235,7 +3406,6 @@ export type IdentityResolvers<ContextType = any, ParentType extends ResolversPar
 	projects?: Resolver<ReadonlyArray<ResolversTypes['IdentityProjectRelation']>, ParentType, ContextType>
 	roles?: Resolver<Maybe<ReadonlyArray<ResolversTypes['String']>>, ParentType, ContextType>
 	sessions?: Resolver<ReadonlyArray<ResolversTypes['SessionInfo']>, ParentType, ContextType>
-	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
 }
 
 export type IdentityGlobalPermissionsResolvers<
@@ -3244,7 +3414,6 @@ export type IdentityGlobalPermissionsResolvers<
 > = {
 	canCreateProject?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
 	canDeployEntrypoint?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
-	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
 }
 
 export type IdentityProjectRelationResolvers<
@@ -3253,7 +3422,6 @@ export type IdentityProjectRelationResolvers<
 > = {
 	memberships?: Resolver<ReadonlyArray<ResolversTypes['Membership']>, ParentType, ContextType>
 	project?: Resolver<ResolversTypes['Project'], ParentType, ContextType>
-	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
 }
 
 export type IdentityProviderResolvers<
@@ -3265,7 +3433,22 @@ export type IdentityProviderResolvers<
 	options?: Resolver<ResolversTypes['IDPOptionsOutput'], ParentType, ContextType>
 	slug?: Resolver<ResolversTypes['String'], ParentType, ContextType>
 	type?: Resolver<ResolversTypes['String'], ParentType, ContextType>
-	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
+}
+
+export type InitEmailOtpErrorResolvers<
+	ContextType = any,
+	ParentType extends ResolversParentTypes['InitEmailOtpError'] = ResolversParentTypes['InitEmailOtpError'],
+> = {
+	code?: Resolver<ResolversTypes['InitEmailOtpErrorCode'], ParentType, ContextType>
+	developerMessage?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+}
+
+export type InitEmailOtpResponseResolvers<
+	ContextType = any,
+	ParentType extends ResolversParentTypes['InitEmailOtpResponse'] = ResolversParentTypes['InitEmailOtpResponse'],
+> = {
+	error?: Resolver<Maybe<ResolversTypes['InitEmailOtpError']>, ParentType, ContextType>
+	ok?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
 }
 
 export type InitSignInIdpErrorResolvers<
@@ -3275,7 +3458,6 @@ export type InitSignInIdpErrorResolvers<
 	code?: Resolver<ResolversTypes['InitSignInIDPErrorCode'], ParentType, ContextType>
 	developerMessage?: Resolver<ResolversTypes['String'], ParentType, ContextType>
 	endUserMessage?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>
-	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
 }
 
 export type InitSignInIdpResponseResolvers<
@@ -3286,7 +3468,6 @@ export type InitSignInIdpResponseResolvers<
 	errors?: Resolver<ReadonlyArray<ResolversTypes['InitSignInIDPError']>, ParentType, ContextType>
 	ok?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
 	result?: Resolver<Maybe<ResolversTypes['InitSignInIDPResult']>, ParentType, ContextType>
-	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
 }
 
 export type InitSignInIdpResultResolvers<
@@ -3296,7 +3477,6 @@ export type InitSignInIdpResultResolvers<
 	authUrl?: Resolver<ResolversTypes['String'], ParentType, ContextType>
 	idpConfiguration?: Resolver<Maybe<ResolversTypes['Json']>, ParentType, ContextType>
 	sessionData?: Resolver<ResolversTypes['Json'], ParentType, ContextType>
-	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
 }
 
 export type InitSignInPasswordlessErrorResolvers<
@@ -3305,7 +3485,6 @@ export type InitSignInPasswordlessErrorResolvers<
 > = {
 	code?: Resolver<ResolversTypes['InitSignInPasswordlessErrorCode'], ParentType, ContextType>
 	developerMessage?: Resolver<ResolversTypes['String'], ParentType, ContextType>
-	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
 }
 
 export type InitSignInPasswordlessResponseResolvers<
@@ -3315,7 +3494,6 @@ export type InitSignInPasswordlessResponseResolvers<
 	error?: Resolver<Maybe<ResolversTypes['InitSignInPasswordlessError']>, ParentType, ContextType>
 	ok?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
 	result?: Resolver<Maybe<ResolversTypes['InitSignInPasswordlessResult']>, ParentType, ContextType>
-	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
 }
 
 export type InitSignInPasswordlessResultResolvers<
@@ -3324,7 +3502,6 @@ export type InitSignInPasswordlessResultResolvers<
 > = {
 	expiresAt?: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>
 	requestId?: Resolver<ResolversTypes['String'], ParentType, ContextType>
-	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
 }
 
 export interface IntervalScalarConfig extends GraphQLScalarTypeConfig<ResolversTypes['Interval'], any> {
@@ -3336,7 +3513,6 @@ export type InviteErrorResolvers<ContextType = any, ParentType extends Resolvers
 	developerMessage?: Resolver<ResolversTypes['String'], ParentType, ContextType>
 	endUserMessage?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>
 	membershipValidation?: Resolver<Maybe<ReadonlyArray<ResolversTypes['MembershipValidationError']>>, ParentType, ContextType>
-	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
 }
 
 export type InviteResponseResolvers<
@@ -3347,49 +3523,16 @@ export type InviteResponseResolvers<
 	errors?: Resolver<ReadonlyArray<ResolversTypes['InviteError']>, ParentType, ContextType>
 	ok?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
 	result?: Resolver<Maybe<ResolversTypes['InviteResult']>, ParentType, ContextType>
-	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
 }
 
 export type InviteResultResolvers<ContextType = any, ParentType extends ResolversParentTypes['InviteResult'] = ResolversParentTypes['InviteResult']> =
 	{
 		isNew?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
 		person?: Resolver<ResolversTypes['Person'], ParentType, ContextType>
-		__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
 	}
 
 export interface JsonScalarConfig extends GraphQLScalarTypeConfig<ResolversTypes['Json'], any> {
 	name: 'Json'
-}
-
-export type AuthLogEntryResolvers<
-	ContextType = any,
-	ParentType extends ResolversParentTypes['AuthLogEntry'] = ResolversParentTypes['AuthLogEntry'],
-> = {
-	createdAt?: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>
-	errorCode?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>
-	errorMessage?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>
-	eventData?: Resolver<Maybe<ResolversTypes['Json']>, ParentType, ContextType>
-	id?: Resolver<ResolversTypes['String'], ParentType, ContextType>
-	identityProviderId?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>
-	invokedByIdentityId?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>
-	ipAddress?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>
-	metadata?: Resolver<Maybe<ResolversTypes['Json']>, ParentType, ContextType>
-	personId?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>
-	personInputIdentifier?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>
-	success?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
-	targetPersonId?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>
-	type?: Resolver<ResolversTypes['String'], ParentType, ContextType>
-	userAgent?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>
-	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
-}
-
-export type AuthLogPageResolvers<
-	ContextType = any,
-	ParentType extends ResolversParentTypes['AuthLogPage'] = ResolversParentTypes['AuthLogPage'],
-> = {
-	entries?: Resolver<ReadonlyArray<ResolversTypes['AuthLogEntry']>, ParentType, ContextType>
-	hasMore?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
-	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
 }
 
 export type MailTemplateDataResolvers<
@@ -3403,13 +3546,11 @@ export type MailTemplateDataResolvers<
 	type?: Resolver<ResolversTypes['MailType'], ParentType, ContextType>
 	useLayout?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
 	variant?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>
-	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
 }
 
 export type MembershipResolvers<ContextType = any, ParentType extends ResolversParentTypes['Membership'] = ResolversParentTypes['Membership']> = {
 	role?: Resolver<ResolversTypes['String'], ParentType, ContextType>
 	variables?: Resolver<ReadonlyArray<ResolversTypes['VariableEntry']>, ParentType, ContextType>
-	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
 }
 
 export type MembershipValidationErrorResolvers<
@@ -3419,7 +3560,14 @@ export type MembershipValidationErrorResolvers<
 	code?: Resolver<ResolversTypes['MembershipValidationErrorCode'], ParentType, ContextType>
 	role?: Resolver<ResolversTypes['String'], ParentType, ContextType>
 	variable?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>
-	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
+}
+
+export type MfaEnrollmentResolvers<
+	ContextType = any,
+	ParentType extends ResolversParentTypes['MfaEnrollment'] = ResolversParentTypes['MfaEnrollment'],
+> = {
+	otpSecret?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+	otpUri?: Resolver<ResolversTypes['String'], ParentType, ContextType>
 }
 
 export type MutationResolvers<ContextType = any, ParentType extends ResolversParentTypes['Mutation'] = ResolversParentTypes['Mutation']> = {
@@ -3479,44 +3627,30 @@ export type MutationResolvers<ContextType = any, ParentType extends ResolversPar
 		RequireFields<MutationChangeProfileArgs, 'personId'>
 	>
 	configure?: Resolver<Maybe<ResolversTypes['ConfigureResponse']>, ParentType, ContextType, RequireFields<MutationConfigureArgs, 'config'>>
-	createAuthPolicy?: Resolver<
-		Maybe<ResolversTypes['CreateAuthPolicyResponse']>,
+	confirmEmailChange?: Resolver<
+		Maybe<ResolversTypes['ConfirmEmailChangeResponse']>,
 		ParentType,
 		ContextType,
-		RequireFields<MutationCreateAuthPolicyArgs, 'policy'>
+		RequireFields<MutationConfirmEmailChangeArgs, 'token'>
 	>
-	updateAuthPolicy?: Resolver<
-		Maybe<ResolversTypes['UpdateAuthPolicyResponse']>,
-		ParentType,
-		ContextType,
-		RequireFields<MutationUpdateAuthPolicyArgs, 'id' | 'policy'>
-	>
-	deleteAuthPolicy?: Resolver<
-		Maybe<ResolversTypes['DeleteAuthPolicyResponse']>,
-		ParentType,
-		ContextType,
-		RequireFields<MutationDeleteAuthPolicyArgs, 'id'>
-	>
-	resetPersonMfa?: Resolver<
-		Maybe<ResolversTypes['ResetPersonMfaResponse']>,
-		ParentType,
-		ContextType,
-		RequireFields<MutationResetPersonMfaArgs, 'personId'>
-	>
-	confirmOtp?: Resolver<Maybe<ResolversTypes['ConfirmOtpResponse']>, ParentType, ContextType, RequireFields<MutationConfirmOtpArgs, 'otpToken'>>
 	confirmEmailOtp?: Resolver<
 		Maybe<ResolversTypes['ConfirmEmailOtpResponse']>,
 		ParentType,
 		ContextType,
 		RequireFields<MutationConfirmEmailOtpArgs, 'otpToken'>
 	>
-	initEmailOtp?: Resolver<Maybe<ResolversTypes['InitEmailOtpResponse']>, ParentType, ContextType>
-	disableEmailOtp?: Resolver<Maybe<ResolversTypes['DisableEmailOtpResponse']>, ParentType, ContextType>
+	confirmOtp?: Resolver<Maybe<ResolversTypes['ConfirmOtpResponse']>, ParentType, ContextType, RequireFields<MutationConfirmOtpArgs, 'otpToken'>>
 	createApiKey?: Resolver<
 		Maybe<ResolversTypes['CreateApiKeyResponse']>,
 		ParentType,
 		ContextType,
 		RequireFields<MutationCreateApiKeyArgs, 'description' | 'memberships' | 'projectSlug'>
+	>
+	createAuthPolicy?: Resolver<
+		Maybe<ResolversTypes['CreateAuthPolicyResponse']>,
+		ParentType,
+		ContextType,
+		RequireFields<MutationCreateAuthPolicyArgs, 'policy'>
 	>
 	createGlobalApiKey?: Resolver<
 		Maybe<ResolversTypes['CreateApiKeyResponse']>,
@@ -3537,7 +3671,14 @@ export type MutationResolvers<ContextType = any, ParentType extends ResolversPar
 		RequireFields<MutationCreateResetPasswordRequestArgs, 'email'>
 	>
 	createSessionToken?: Resolver<Maybe<ResolversTypes['CreateSessionTokenResponse']>, ParentType, ContextType, Partial<MutationCreateSessionTokenArgs>>
+	deleteAuthPolicy?: Resolver<
+		Maybe<ResolversTypes['DeleteAuthPolicyResponse']>,
+		ParentType,
+		ContextType,
+		RequireFields<MutationDeleteAuthPolicyArgs, 'id'>
+	>
 	disableApiKey?: Resolver<Maybe<ResolversTypes['DisableApiKeyResponse']>, ParentType, ContextType, RequireFields<MutationDisableApiKeyArgs, 'id'>>
+	disableEmailOtp?: Resolver<Maybe<ResolversTypes['DisableEmailOtpResponse']>, ParentType, ContextType>
 	disableIDP?: Resolver<
 		Maybe<ResolversTypes['DisableIDPResponse']>,
 		ParentType,
@@ -3560,6 +3701,7 @@ export type MutationResolvers<ContextType = any, ParentType extends ResolversPar
 		ContextType,
 		RequireFields<MutationForceSignOutPersonArgs, 'personId'>
 	>
+	initEmailOtp?: Resolver<Maybe<ResolversTypes['InitEmailOtpResponse']>, ParentType, ContextType>
 	initSignInIDP?: Resolver<
 		Maybe<ResolversTypes['InitSignInIDPResponse']>,
 		ParentType,
@@ -3604,11 +3746,23 @@ export type MutationResolvers<ContextType = any, ParentType extends ResolversPar
 		ContextType,
 		RequireFields<MutationRemoveProjectMemberArgs, 'identityId' | 'projectSlug'>
 	>
+	requestEmailVerification?: Resolver<
+		Maybe<ResolversTypes['RequestEmailVerificationResponse']>,
+		ParentType,
+		ContextType,
+		RequireFields<MutationRequestEmailVerificationArgs, 'email'>
+	>
 	resetPassword?: Resolver<
 		Maybe<ResolversTypes['ResetPasswordResponse']>,
 		ParentType,
 		ContextType,
 		RequireFields<MutationResetPasswordArgs, 'password' | 'token'>
+	>
+	resetPersonMfa?: Resolver<
+		Maybe<ResolversTypes['ResetPersonMfaResponse']>,
+		ParentType,
+		ContextType,
+		RequireFields<MutationResetPersonMfaArgs, 'personId'>
 	>
 	revokeSession?: Resolver<
 		Maybe<ResolversTypes['RevokeSessionResponse']>,
@@ -3638,6 +3792,12 @@ export type MutationResolvers<ContextType = any, ParentType extends ResolversPar
 		ContextType,
 		RequireFields<MutationUnmanagedInviteArgs, 'email' | 'memberships' | 'projectSlug'>
 	>
+	updateAuthPolicy?: Resolver<
+		Maybe<ResolversTypes['UpdateAuthPolicyResponse']>,
+		ParentType,
+		ContextType,
+		RequireFields<MutationUpdateAuthPolicyArgs, 'id' | 'policy'>
+	>
 	updateIDP?: Resolver<Maybe<ResolversTypes['UpdateIDPResponse']>, ParentType, ContextType, RequireFields<MutationUpdateIdpArgs, 'identityProvider'>>
 	updateProject?: Resolver<
 		Maybe<ResolversTypes['UpdateProjectResponse']>,
@@ -3651,16 +3811,17 @@ export type MutationResolvers<ContextType = any, ParentType extends ResolversPar
 		ContextType,
 		RequireFields<MutationUpdateProjectMemberArgs, 'identityId' | 'memberships' | 'projectSlug'>
 	>
+	verifyEmail?: Resolver<Maybe<ResolversTypes['VerifyEmailResponse']>, ParentType, ContextType, RequireFields<MutationVerifyEmailArgs, 'token'>>
 }
 
 export type PersonResolvers<ContextType = any, ParentType extends ResolversParentTypes['Person'] = ResolversParentTypes['Person']> = {
 	email?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>
+	emailVerified?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
 	id?: Resolver<ResolversTypes['String'], ParentType, ContextType>
 	identity?: Resolver<ResolversTypes['Identity'], ParentType, ContextType>
 	name?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>
 	otpEnabled?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
 	passwordlessEnabled?: Resolver<Maybe<ResolversTypes['Boolean']>, ParentType, ContextType>
-	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
 }
 
 export type PrepareOtpResponseResolvers<
@@ -3669,7 +3830,6 @@ export type PrepareOtpResponseResolvers<
 > = {
 	ok?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
 	result?: Resolver<Maybe<ResolversTypes['PrepareOtpResult']>, ParentType, ContextType>
-	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
 }
 
 export type PrepareOtpResultResolvers<
@@ -3678,7 +3838,6 @@ export type PrepareOtpResultResolvers<
 > = {
 	otpSecret?: Resolver<ResolversTypes['String'], ParentType, ContextType>
 	otpUri?: Resolver<ResolversTypes['String'], ParentType, ContextType>
-	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
 }
 
 export type ProjectResolvers<ContextType = any, ParentType extends ResolversParentTypes['Project'] = ResolversParentTypes['Project']> = {
@@ -3688,7 +3847,6 @@ export type ProjectResolvers<ContextType = any, ParentType extends ResolversPare
 	name?: Resolver<ResolversTypes['String'], ParentType, ContextType>
 	roles?: Resolver<ReadonlyArray<ResolversTypes['RoleDefinition']>, ParentType, ContextType>
 	slug?: Resolver<ResolversTypes['String'], ParentType, ContextType>
-	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
 }
 
 export type ProjectIdentityRelationResolvers<
@@ -3697,7 +3855,6 @@ export type ProjectIdentityRelationResolvers<
 > = {
 	identity?: Resolver<ResolversTypes['Identity'], ParentType, ContextType>
 	memberships?: Resolver<ReadonlyArray<ResolversTypes['Membership']>, ParentType, ContextType>
-	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
 }
 
 export type QueryResolvers<ContextType = any, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = {
@@ -3730,7 +3887,6 @@ export type RegenerateBackupCodesErrorResolvers<
 > = {
 	code?: Resolver<ResolversTypes['RegenerateBackupCodesErrorCode'], ParentType, ContextType>
 	developerMessage?: Resolver<ResolversTypes['String'], ParentType, ContextType>
-	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
 }
 
 export type RegenerateBackupCodesResponseResolvers<
@@ -3740,7 +3896,6 @@ export type RegenerateBackupCodesResponseResolvers<
 	error?: Resolver<Maybe<ResolversTypes['RegenerateBackupCodesError']>, ParentType, ContextType>
 	ok?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
 	result?: Resolver<Maybe<ResolversTypes['RegenerateBackupCodesResult']>, ParentType, ContextType>
-	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
 }
 
 export type RegenerateBackupCodesResultResolvers<
@@ -3748,7 +3903,6 @@ export type RegenerateBackupCodesResultResolvers<
 	ParentType extends ResolversParentTypes['RegenerateBackupCodesResult'] = ResolversParentTypes['RegenerateBackupCodesResult'],
 > = {
 	backupCodes?: Resolver<ReadonlyArray<ResolversTypes['String']>, ParentType, ContextType>
-	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
 }
 
 export type RemoveGlobalIdentityRolesErrorResolvers<
@@ -3757,7 +3911,6 @@ export type RemoveGlobalIdentityRolesErrorResolvers<
 > = {
 	code?: Resolver<ResolversTypes['RemoveGlobalIdentityRolesErrorCode'], ParentType, ContextType>
 	developerMessage?: Resolver<ResolversTypes['String'], ParentType, ContextType>
-	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
 }
 
 export type RemoveGlobalIdentityRolesResponseResolvers<
@@ -3767,7 +3920,6 @@ export type RemoveGlobalIdentityRolesResponseResolvers<
 	error?: Resolver<Maybe<ResolversTypes['RemoveGlobalIdentityRolesError']>, ParentType, ContextType>
 	ok?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
 	result?: Resolver<Maybe<ResolversTypes['RemoveGlobalIdentityRolesResult']>, ParentType, ContextType>
-	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
 }
 
 export type RemoveGlobalIdentityRolesResultResolvers<
@@ -3775,7 +3927,6 @@ export type RemoveGlobalIdentityRolesResultResolvers<
 	ParentType extends ResolversParentTypes['RemoveGlobalIdentityRolesResult'] = ResolversParentTypes['RemoveGlobalIdentityRolesResult'],
 > = {
 	identity?: Resolver<ResolversTypes['Identity'], ParentType, ContextType>
-	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
 }
 
 export type RemoveMailTemplateErrorResolvers<
@@ -3785,7 +3936,6 @@ export type RemoveMailTemplateErrorResolvers<
 	code?: Resolver<ResolversTypes['RemoveMailTemplateErrorCode'], ParentType, ContextType>
 	developerMessage?: Resolver<ResolversTypes['String'], ParentType, ContextType>
 	endUserMessage?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>
-	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
 }
 
 export type RemoveMailTemplateResponseResolvers<
@@ -3795,7 +3945,6 @@ export type RemoveMailTemplateResponseResolvers<
 	error?: Resolver<Maybe<ResolversTypes['RemoveMailTemplateError']>, ParentType, ContextType>
 	errors?: Resolver<ReadonlyArray<ResolversTypes['RemoveMailTemplateError']>, ParentType, ContextType>
 	ok?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
-	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
 }
 
 export type RemoveProjectMemberErrorResolvers<
@@ -3805,7 +3954,6 @@ export type RemoveProjectMemberErrorResolvers<
 	code?: Resolver<ResolversTypes['RemoveProjectMemberErrorCode'], ParentType, ContextType>
 	developerMessage?: Resolver<ResolversTypes['String'], ParentType, ContextType>
 	endUserMessage?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>
-	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
 }
 
 export type RemoveProjectMemberResponseResolvers<
@@ -3815,7 +3963,22 @@ export type RemoveProjectMemberResponseResolvers<
 	error?: Resolver<Maybe<ResolversTypes['RemoveProjectMemberError']>, ParentType, ContextType>
 	errors?: Resolver<ReadonlyArray<ResolversTypes['RemoveProjectMemberError']>, ParentType, ContextType>
 	ok?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
-	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
+}
+
+export type RequestEmailVerificationErrorResolvers<
+	ContextType = any,
+	ParentType extends ResolversParentTypes['RequestEmailVerificationError'] = ResolversParentTypes['RequestEmailVerificationError'],
+> = {
+	code?: Resolver<ResolversTypes['RequestEmailVerificationErrorCode'], ParentType, ContextType>
+	developerMessage?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+}
+
+export type RequestEmailVerificationResponseResolvers<
+	ContextType = any,
+	ParentType extends ResolversParentTypes['RequestEmailVerificationResponse'] = ResolversParentTypes['RequestEmailVerificationResponse'],
+> = {
+	error?: Resolver<Maybe<ResolversTypes['RequestEmailVerificationError']>, ParentType, ContextType>
+	ok?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
 }
 
 export type ResetPasswordErrorResolvers<
@@ -3826,7 +3989,6 @@ export type ResetPasswordErrorResolvers<
 	developerMessage?: Resolver<ResolversTypes['String'], ParentType, ContextType>
 	endUserMessage?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>
 	weakPasswordReasons?: Resolver<Maybe<ReadonlyArray<ResolversTypes['WeakPasswordReason']>>, ParentType, ContextType>
-	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
 }
 
 export type ResetPasswordResponseResolvers<
@@ -3836,7 +3998,38 @@ export type ResetPasswordResponseResolvers<
 	error?: Resolver<Maybe<ResolversTypes['ResetPasswordError']>, ParentType, ContextType>
 	errors?: Resolver<ReadonlyArray<ResolversTypes['ResetPasswordError']>, ParentType, ContextType>
 	ok?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
-	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
+}
+
+export type ResetPersonMfaErrorResolvers<
+	ContextType = any,
+	ParentType extends ResolversParentTypes['ResetPersonMfaError'] = ResolversParentTypes['ResetPersonMfaError'],
+> = {
+	code?: Resolver<ResolversTypes['ResetPersonMfaErrorCode'], ParentType, ContextType>
+	developerMessage?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+}
+
+export type ResetPersonMfaResponseResolvers<
+	ContextType = any,
+	ParentType extends ResolversParentTypes['ResetPersonMfaResponse'] = ResolversParentTypes['ResetPersonMfaResponse'],
+> = {
+	error?: Resolver<Maybe<ResolversTypes['ResetPersonMfaError']>, ParentType, ContextType>
+	ok?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
+}
+
+export type RevokeSessionErrorResolvers<
+	ContextType = any,
+	ParentType extends ResolversParentTypes['RevokeSessionError'] = ResolversParentTypes['RevokeSessionError'],
+> = {
+	code?: Resolver<ResolversTypes['RevokeSessionErrorCode'], ParentType, ContextType>
+	developerMessage?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+}
+
+export type RevokeSessionResponseResolvers<
+	ContextType = any,
+	ParentType extends ResolversParentTypes['RevokeSessionResponse'] = ResolversParentTypes['RevokeSessionResponse'],
+> = {
+	error?: Resolver<Maybe<ResolversTypes['RevokeSessionError']>, ParentType, ContextType>
+	ok?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
 }
 
 export type RoleConditionVariableDefinitionResolvers<
@@ -3853,7 +4046,6 @@ export type RoleDefinitionResolvers<
 > = {
 	name?: Resolver<ResolversTypes['String'], ParentType, ContextType>
 	variables?: Resolver<ReadonlyArray<ResolversTypes['RoleVariableDefinition']>, ParentType, ContextType>
-	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
 }
 
 export type RoleEntityVariableDefinitionResolvers<
@@ -3883,7 +4075,19 @@ export type RoleVariableDefinitionResolvers<
 		ParentType,
 		ContextType
 	>
-	name?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+}
+
+export type SessionInfoResolvers<ContextType = any, ParentType extends ResolversParentTypes['SessionInfo'] = ResolversParentTypes['SessionInfo']> = {
+	createdAt?: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>
+	createdIp?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>
+	createdUserAgent?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>
+	expiresAt?: Resolver<Maybe<ResolversTypes['DateTime']>, ParentType, ContextType>
+	id?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+	isCurrent?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
+	lastIp?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>
+	lastUsedAt?: Resolver<Maybe<ResolversTypes['DateTime']>, ParentType, ContextType>
+	lastUserAgent?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>
+	trustForwardedClientInfo?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
 }
 
 export type SetProjectSecretErrorResolvers<
@@ -3892,7 +4096,6 @@ export type SetProjectSecretErrorResolvers<
 > = {
 	code?: Resolver<ResolversTypes['SetProjectSecretErrorCode'], ParentType, ContextType>
 	developerMessage?: Resolver<ResolversTypes['String'], ParentType, ContextType>
-	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
 }
 
 export type SetProjectSecretResponseResolvers<
@@ -3901,16 +4104,14 @@ export type SetProjectSecretResponseResolvers<
 > = {
 	error?: Resolver<Maybe<ResolversTypes['SetProjectSecretError']>, ParentType, ContextType>
 	ok?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
-	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
 }
 
 export type SignInErrorResolvers<ContextType = any, ParentType extends ResolversParentTypes['SignInError'] = ResolversParentTypes['SignInError']> = {
 	code?: Resolver<ResolversTypes['SignInErrorCode'], ParentType, ContextType>
 	developerMessage?: Resolver<ResolversTypes['String'], ParentType, ContextType>
 	endUserMessage?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>
-	retryAfter?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>
 	mfaEnrollment?: Resolver<Maybe<ResolversTypes['MfaEnrollment']>, ParentType, ContextType>
-	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
+	retryAfter?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>
 }
 
 export type SignInIdpErrorResolvers<
@@ -3920,7 +4121,6 @@ export type SignInIdpErrorResolvers<
 	code?: Resolver<ResolversTypes['SignInIDPErrorCode'], ParentType, ContextType>
 	developerMessage?: Resolver<ResolversTypes['String'], ParentType, ContextType>
 	endUserMessage?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>
-	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
 }
 
 export type SignInIdpResponseResolvers<
@@ -3931,7 +4131,6 @@ export type SignInIdpResponseResolvers<
 	errors?: Resolver<ReadonlyArray<ResolversTypes['SignInIDPError']>, ParentType, ContextType>
 	ok?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
 	result?: Resolver<Maybe<ResolversTypes['SignInIDPResult']>, ParentType, ContextType>
-	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
 }
 
 export type SignInIdpResultResolvers<
@@ -3950,7 +4149,6 @@ export type SignInPasswordlessErrorResolvers<
 > = {
 	code?: Resolver<ResolversTypes['SignInPasswordlessErrorCode'], ParentType, ContextType>
 	developerMessage?: Resolver<ResolversTypes['String'], ParentType, ContextType>
-	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
 }
 
 export type SignInPasswordlessResponseResolvers<
@@ -3960,7 +4158,6 @@ export type SignInPasswordlessResponseResolvers<
 	error?: Resolver<Maybe<ResolversTypes['SignInPasswordlessError']>, ParentType, ContextType>
 	ok?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
 	result?: Resolver<Maybe<ResolversTypes['SignInPasswordlessResult']>, ParentType, ContextType>
-	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
 }
 
 export type SignInPasswordlessResultResolvers<
@@ -3980,14 +4177,13 @@ export type SignInResponseResolvers<
 	errors?: Resolver<ReadonlyArray<ResolversTypes['SignInError']>, ParentType, ContextType>
 	ok?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
 	result?: Resolver<Maybe<ResolversTypes['SignInResult']>, ParentType, ContextType>
-	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
 }
 
 export type SignInResultResolvers<ContextType = any, ParentType extends ResolversParentTypes['SignInResult'] = ResolversParentTypes['SignInResult']> =
 	{
+		backupCodes?: Resolver<Maybe<ReadonlyArray<ResolversTypes['String']>>, ParentType, ContextType>
 		person?: Resolver<ResolversTypes['Person'], ParentType, ContextType>
 		token?: Resolver<ResolversTypes['String'], ParentType, ContextType>
-		backupCodes?: Resolver<Maybe<ReadonlyArray<ResolversTypes['String']>>, ParentType, ContextType>
 		__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
 	}
 
@@ -3996,7 +4192,6 @@ export type SignOutErrorResolvers<ContextType = any, ParentType extends Resolver
 		code?: Resolver<ResolversTypes['SignOutErrorCode'], ParentType, ContextType>
 		developerMessage?: Resolver<ResolversTypes['String'], ParentType, ContextType>
 		endUserMessage?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>
-		__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
 	}
 
 export type SignOutResponseResolvers<
@@ -4006,7 +4201,6 @@ export type SignOutResponseResolvers<
 	error?: Resolver<Maybe<ResolversTypes['SignOutError']>, ParentType, ContextType>
 	errors?: Resolver<ReadonlyArray<ResolversTypes['SignOutError']>, ParentType, ContextType>
 	ok?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
-	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
 }
 
 export type SignUpErrorResolvers<ContextType = any, ParentType extends ResolversParentTypes['SignUpError'] = ResolversParentTypes['SignUpError']> = {
@@ -4015,7 +4209,6 @@ export type SignUpErrorResolvers<ContextType = any, ParentType extends Resolvers
 	endPersonMessage?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>
 	recommendedAction?: Resolver<Maybe<ResolversTypes['SignUpRecommendedAction']>, ParentType, ContextType>
 	weakPasswordReasons?: Resolver<Maybe<ReadonlyArray<ResolversTypes['WeakPasswordReason']>>, ParentType, ContextType>
-	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
 }
 
 export type SignUpResponseResolvers<
@@ -4026,13 +4219,11 @@ export type SignUpResponseResolvers<
 	errors?: Resolver<ReadonlyArray<ResolversTypes['SignUpError']>, ParentType, ContextType>
 	ok?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
 	result?: Resolver<Maybe<ResolversTypes['SignUpResult']>, ParentType, ContextType>
-	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
 }
 
 export type SignUpResultResolvers<ContextType = any, ParentType extends ResolversParentTypes['SignUpResult'] = ResolversParentTypes['SignUpResult']> =
 	{
 		person?: Resolver<ResolversTypes['Person'], ParentType, ContextType>
-		__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
 	}
 
 export type ToggleMyPasswordlessErrorResolvers<
@@ -4041,7 +4232,6 @@ export type ToggleMyPasswordlessErrorResolvers<
 > = {
 	code?: Resolver<ResolversTypes['ToggleMyPasswordlessErrorCode'], ParentType, ContextType>
 	developerMessage?: Resolver<ResolversTypes['String'], ParentType, ContextType>
-	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
 }
 
 export type ToggleMyPasswordlessResponseResolvers<
@@ -4050,7 +4240,22 @@ export type ToggleMyPasswordlessResponseResolvers<
 > = {
 	error?: Resolver<Maybe<ResolversTypes['ToggleMyPasswordlessError']>, ParentType, ContextType>
 	ok?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
-	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
+}
+
+export type UpdateAuthPolicyErrorResolvers<
+	ContextType = any,
+	ParentType extends ResolversParentTypes['UpdateAuthPolicyError'] = ResolversParentTypes['UpdateAuthPolicyError'],
+> = {
+	code?: Resolver<ResolversTypes['UpdateAuthPolicyErrorCode'], ParentType, ContextType>
+	developerMessage?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+}
+
+export type UpdateAuthPolicyResponseResolvers<
+	ContextType = any,
+	ParentType extends ResolversParentTypes['UpdateAuthPolicyResponse'] = ResolversParentTypes['UpdateAuthPolicyResponse'],
+> = {
+	error?: Resolver<Maybe<ResolversTypes['UpdateAuthPolicyError']>, ParentType, ContextType>
+	ok?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
 }
 
 export type UpdateIdpErrorResolvers<
@@ -4059,7 +4264,6 @@ export type UpdateIdpErrorResolvers<
 > = {
 	code?: Resolver<ResolversTypes['UpdateIDPErrorCode'], ParentType, ContextType>
 	developerMessage?: Resolver<ResolversTypes['String'], ParentType, ContextType>
-	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
 }
 
 export type UpdateIdpResponseResolvers<
@@ -4068,7 +4272,6 @@ export type UpdateIdpResponseResolvers<
 > = {
 	error?: Resolver<Maybe<ResolversTypes['UpdateIDPError']>, ParentType, ContextType>
 	ok?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
-	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
 }
 
 export type UpdateProjectErrorResolvers<
@@ -4077,7 +4280,6 @@ export type UpdateProjectErrorResolvers<
 > = {
 	code?: Resolver<ResolversTypes['UpdateProjectErrorCode'], ParentType, ContextType>
 	developerMessage?: Resolver<ResolversTypes['String'], ParentType, ContextType>
-	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
 }
 
 export type UpdateProjectMemberErrorResolvers<
@@ -4088,7 +4290,6 @@ export type UpdateProjectMemberErrorResolvers<
 	developerMessage?: Resolver<ResolversTypes['String'], ParentType, ContextType>
 	endUserMessage?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>
 	membershipValidation?: Resolver<Maybe<ReadonlyArray<ResolversTypes['MembershipValidationError']>>, ParentType, ContextType>
-	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
 }
 
 export type UpdateProjectMemberResponseResolvers<
@@ -4098,7 +4299,6 @@ export type UpdateProjectMemberResponseResolvers<
 	error?: Resolver<Maybe<ResolversTypes['UpdateProjectMemberError']>, ParentType, ContextType>
 	errors?: Resolver<ReadonlyArray<ResolversTypes['UpdateProjectMemberError']>, ParentType, ContextType>
 	ok?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
-	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
 }
 
 export type UpdateProjectResponseResolvers<
@@ -4107,7 +4307,6 @@ export type UpdateProjectResponseResolvers<
 > = {
 	error?: Resolver<Maybe<ResolversTypes['UpdateProjectError']>, ParentType, ContextType>
 	ok?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
-	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
 }
 
 export type VariableEntryResolvers<
@@ -4116,7 +4315,22 @@ export type VariableEntryResolvers<
 > = {
 	name?: Resolver<ResolversTypes['String'], ParentType, ContextType>
 	values?: Resolver<ReadonlyArray<ResolversTypes['String']>, ParentType, ContextType>
-	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
+}
+
+export type VerifyEmailErrorResolvers<
+	ContextType = any,
+	ParentType extends ResolversParentTypes['VerifyEmailError'] = ResolversParentTypes['VerifyEmailError'],
+> = {
+	code?: Resolver<ResolversTypes['VerifyEmailErrorCode'], ParentType, ContextType>
+	developerMessage?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+}
+
+export type VerifyEmailResponseResolvers<
+	ContextType = any,
+	ParentType extends ResolversParentTypes['VerifyEmailResponse'] = ResolversParentTypes['VerifyEmailResponse'],
+> = {
+	error?: Resolver<Maybe<ResolversTypes['VerifyEmailError']>, ParentType, ContextType>
+	ok?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
 }
 
 export type Resolvers<ContextType = any> = {
@@ -4135,6 +4349,7 @@ export type Resolvers<ContextType = any> = {
 	ApiKeyWithToken?: ApiKeyWithTokenResolvers<ContextType>
 	AuthLogEntry?: AuthLogEntryResolvers<ContextType>
 	AuthLogPage?: AuthLogPageResolvers<ContextType>
+	AuthPolicy?: AuthPolicyResolvers<ContextType>
 	ChangeMyPasswordError?: ChangeMyPasswordErrorResolvers<ContextType>
 	ChangeMyPasswordResponse?: ChangeMyPasswordResponseResolvers<ContextType>
 	ChangeMyProfileError?: ChangeMyProfileErrorResolvers<ContextType>
@@ -4147,26 +4362,30 @@ export type Resolvers<ContextType = any> = {
 	CommonSignInResult?: CommonSignInResultResolvers<ContextType>
 	Config?: ConfigResolvers<ContextType>
 	ConfigCaptcha?: ConfigCaptchaResolvers<ContextType>
+	ConfigCaptchaProtect?: ConfigCaptchaProtectResolvers<ContextType>
+	ConfigEmailChange?: ConfigEmailChangeResolvers<ContextType>
 	ConfigLogin?: ConfigLoginResolvers<ContextType>
 	ConfigPassword?: ConfigPasswordResolvers<ContextType>
 	ConfigPasswordless?: ConfigPasswordlessResolvers<ContextType>
 	ConfigRateLimitWindow?: ConfigRateLimitWindowResolvers<ContextType>
 	ConfigRateLimits?: ConfigRateLimitsResolvers<ContextType>
+	ConfigSignup?: ConfigSignupResolvers<ContextType>
 	ConfigureError?: ConfigureErrorResolvers<ContextType>
 	ConfigureResponse?: ConfigureResponseResolvers<ContextType>
-	ConfirmOtpError?: ConfirmOtpErrorResolvers<ContextType>
-	ConfirmOtpResponse?: ConfirmOtpResponseResolvers<ContextType>
+	ConfirmEmailChangeError?: ConfirmEmailChangeErrorResolvers<ContextType>
+	ConfirmEmailChangeResponse?: ConfirmEmailChangeResponseResolvers<ContextType>
 	ConfirmEmailOtpError?: ConfirmEmailOtpErrorResolvers<ContextType>
 	ConfirmEmailOtpResponse?: ConfirmEmailOtpResponseResolvers<ContextType>
 	ConfirmEmailOtpResult?: ConfirmEmailOtpResultResolvers<ContextType>
-	InitEmailOtpError?: InitEmailOtpErrorResolvers<ContextType>
-	InitEmailOtpResponse?: InitEmailOtpResponseResolvers<ContextType>
-	DisableEmailOtpError?: DisableEmailOtpErrorResolvers<ContextType>
-	DisableEmailOtpResponse?: DisableEmailOtpResponseResolvers<ContextType>
+	ConfirmOtpError?: ConfirmOtpErrorResolvers<ContextType>
+	ConfirmOtpResponse?: ConfirmOtpResponseResolvers<ContextType>
 	ConfirmOtpResult?: ConfirmOtpResultResolvers<ContextType>
 	CreateApiKeyError?: CreateApiKeyErrorResolvers<ContextType>
 	CreateApiKeyResponse?: CreateApiKeyResponseResolvers<ContextType>
 	CreateApiKeyResult?: CreateApiKeyResultResolvers<ContextType>
+	CreateAuthPolicyError?: CreateAuthPolicyErrorResolvers<ContextType>
+	CreateAuthPolicyResponse?: CreateAuthPolicyResponseResolvers<ContextType>
+	CreateAuthPolicyResult?: CreateAuthPolicyResultResolvers<ContextType>
 	CreatePasswordResetRequestError?: CreatePasswordResetRequestErrorResolvers<ContextType>
 	CreatePasswordResetRequestResponse?: CreatePasswordResetRequestResponseResolvers<ContextType>
 	CreateProjectResponse?: CreateProjectResponseResolvers<ContextType>
@@ -4176,37 +4395,29 @@ export type Resolvers<ContextType = any> = {
 	CreateSessionTokenResponse?: CreateSessionTokenResponseResolvers<ContextType>
 	CreateSessionTokenResult?: CreateSessionTokenResultResolvers<ContextType>
 	DateTime?: GraphQLScalarType
+	DeleteAuthPolicyError?: DeleteAuthPolicyErrorResolvers<ContextType>
+	DeleteAuthPolicyResponse?: DeleteAuthPolicyResponseResolvers<ContextType>
 	DisableApiKeyError?: DisableApiKeyErrorResolvers<ContextType>
 	DisableApiKeyResponse?: DisableApiKeyResponseResolvers<ContextType>
+	DisableEmailOtpError?: DisableEmailOtpErrorResolvers<ContextType>
+	DisableEmailOtpResponse?: DisableEmailOtpResponseResolvers<ContextType>
 	DisableIDPError?: DisableIdpErrorResolvers<ContextType>
 	DisableIDPResponse?: DisableIdpResponseResolvers<ContextType>
 	DisableOtpError?: DisableOtpErrorResolvers<ContextType>
 	DisableOtpResponse?: DisableOtpResponseResolvers<ContextType>
 	DisablePersonError?: DisablePersonErrorResolvers<ContextType>
 	DisablePersonResponse?: DisablePersonResponseResolvers<ContextType>
-	ForceSignOutPersonError?: ForceSignOutPersonErrorResolvers<ContextType>
-	ForceSignOutPersonResponse?: ForceSignOutPersonResponseResolvers<ContextType>
-	ResetPersonMfaError?: ResetPersonMfaErrorResolvers<ContextType>
-	ResetPersonMfaResponse?: ResetPersonMfaResponseResolvers<ContextType>
-	MfaEnrollment?: MfaEnrollmentResolvers<ContextType>
-	AuthPolicy?: AuthPolicyResolvers<ContextType>
-	CreateAuthPolicyError?: CreateAuthPolicyErrorResolvers<ContextType>
-	CreateAuthPolicyResult?: CreateAuthPolicyResultResolvers<ContextType>
-	CreateAuthPolicyResponse?: CreateAuthPolicyResponseResolvers<ContextType>
-	UpdateAuthPolicyError?: UpdateAuthPolicyErrorResolvers<ContextType>
-	UpdateAuthPolicyResponse?: UpdateAuthPolicyResponseResolvers<ContextType>
-	DeleteAuthPolicyError?: DeleteAuthPolicyErrorResolvers<ContextType>
-	DeleteAuthPolicyResponse?: DeleteAuthPolicyResponseResolvers<ContextType>
-	RevokeSessionError?: RevokeSessionErrorResolvers<ContextType>
-	RevokeSessionResponse?: RevokeSessionResponseResolvers<ContextType>
-	SessionInfo?: SessionInfoResolvers<ContextType>
 	EnableIDPError?: EnableIdpErrorResolvers<ContextType>
 	EnableIDPResponse?: EnableIdpResponseResolvers<ContextType>
+	ForceSignOutPersonError?: ForceSignOutPersonErrorResolvers<ContextType>
+	ForceSignOutPersonResponse?: ForceSignOutPersonResponseResolvers<ContextType>
 	IDPOptionsOutput?: IdpOptionsOutputResolvers<ContextType>
 	Identity?: IdentityResolvers<ContextType>
 	IdentityGlobalPermissions?: IdentityGlobalPermissionsResolvers<ContextType>
 	IdentityProjectRelation?: IdentityProjectRelationResolvers<ContextType>
 	IdentityProvider?: IdentityProviderResolvers<ContextType>
+	InitEmailOtpError?: InitEmailOtpErrorResolvers<ContextType>
+	InitEmailOtpResponse?: InitEmailOtpResponseResolvers<ContextType>
 	InitSignInIDPError?: InitSignInIdpErrorResolvers<ContextType>
 	InitSignInIDPResponse?: InitSignInIdpResponseResolvers<ContextType>
 	InitSignInIDPResult?: InitSignInIdpResultResolvers<ContextType>
@@ -4221,6 +4432,7 @@ export type Resolvers<ContextType = any> = {
 	MailTemplateData?: MailTemplateDataResolvers<ContextType>
 	Membership?: MembershipResolvers<ContextType>
 	MembershipValidationError?: MembershipValidationErrorResolvers<ContextType>
+	MfaEnrollment?: MfaEnrollmentResolvers<ContextType>
 	Mutation?: MutationResolvers<ContextType>
 	Person?: PersonResolvers<ContextType>
 	PrepareOtpResponse?: PrepareOtpResponseResolvers<ContextType>
@@ -4238,13 +4450,20 @@ export type Resolvers<ContextType = any> = {
 	RemoveMailTemplateResponse?: RemoveMailTemplateResponseResolvers<ContextType>
 	RemoveProjectMemberError?: RemoveProjectMemberErrorResolvers<ContextType>
 	RemoveProjectMemberResponse?: RemoveProjectMemberResponseResolvers<ContextType>
+	RequestEmailVerificationError?: RequestEmailVerificationErrorResolvers<ContextType>
+	RequestEmailVerificationResponse?: RequestEmailVerificationResponseResolvers<ContextType>
 	ResetPasswordError?: ResetPasswordErrorResolvers<ContextType>
 	ResetPasswordResponse?: ResetPasswordResponseResolvers<ContextType>
+	ResetPersonMfaError?: ResetPersonMfaErrorResolvers<ContextType>
+	ResetPersonMfaResponse?: ResetPersonMfaResponseResolvers<ContextType>
+	RevokeSessionError?: RevokeSessionErrorResolvers<ContextType>
+	RevokeSessionResponse?: RevokeSessionResponseResolvers<ContextType>
 	RoleConditionVariableDefinition?: RoleConditionVariableDefinitionResolvers<ContextType>
 	RoleDefinition?: RoleDefinitionResolvers<ContextType>
 	RoleEntityVariableDefinition?: RoleEntityVariableDefinitionResolvers<ContextType>
 	RolePredefinedVariableDefinition?: RolePredefinedVariableDefinitionResolvers<ContextType>
 	RoleVariableDefinition?: RoleVariableDefinitionResolvers<ContextType>
+	SessionInfo?: SessionInfoResolvers<ContextType>
 	SetProjectSecretError?: SetProjectSecretErrorResolvers<ContextType>
 	SetProjectSecretResponse?: SetProjectSecretResponseResolvers<ContextType>
 	SignInError?: SignInErrorResolvers<ContextType>
@@ -4263,6 +4482,8 @@ export type Resolvers<ContextType = any> = {
 	SignUpResult?: SignUpResultResolvers<ContextType>
 	ToggleMyPasswordlessError?: ToggleMyPasswordlessErrorResolvers<ContextType>
 	ToggleMyPasswordlessResponse?: ToggleMyPasswordlessResponseResolvers<ContextType>
+	UpdateAuthPolicyError?: UpdateAuthPolicyErrorResolvers<ContextType>
+	UpdateAuthPolicyResponse?: UpdateAuthPolicyResponseResolvers<ContextType>
 	UpdateIDPError?: UpdateIdpErrorResolvers<ContextType>
 	UpdateIDPResponse?: UpdateIdpResponseResolvers<ContextType>
 	UpdateProjectError?: UpdateProjectErrorResolvers<ContextType>
@@ -4270,4 +4491,6 @@ export type Resolvers<ContextType = any> = {
 	UpdateProjectMemberResponse?: UpdateProjectMemberResponseResolvers<ContextType>
 	UpdateProjectResponse?: UpdateProjectResponseResolvers<ContextType>
 	VariableEntry?: VariableEntryResolvers<ContextType>
+	VerifyEmailError?: VerifyEmailErrorResolvers<ContextType>
+	VerifyEmailResponse?: VerifyEmailResponseResolvers<ContextType>
 }

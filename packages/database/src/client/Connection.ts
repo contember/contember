@@ -4,6 +4,7 @@ import { Pool, PoolConfig, PoolStatus } from './Pool.js'
 import { createPgClientFactory } from '../utils/index.js'
 import { DatabaseConfig } from '../types.js'
 import { AcquiredConnection } from './AcquiredConnection.js'
+import { ScopeLimitedConnection } from './ScopeLimitedConnection.js'
 import { Notification } from 'pg'
 
 class Connection implements Connection.ConnectionLike, Connection.ClientFactory, Connection.PoolStatusProvider {
@@ -29,6 +30,17 @@ class Connection implements Connection.ConnectionLike, Connection.ClientFactory,
 
 	public createClient(schema: string, queryMeta: Record<string, any>): Client {
 		return new Client(this, schema, queryMeta, new EventManager(this.eventManager))
+	}
+
+	/**
+	 * Returns a view of this connection that limits how many pool connections may be
+	 * acquired concurrently through it. Intended to be created per HTTP request so that
+	 * a single request cannot starve the shared pool. The returned view shares the same
+	 * underlying pool; only top-level scopes are counted (nested scopes reuse the already
+	 * acquired connection), so the limit must be at least 1.
+	 */
+	public withMaxConnections(maxConnections: number): Connection.ConnectionType {
+		return new ScopeLimitedConnection(this, maxConnections)
 	}
 
 	async scope<Result>(

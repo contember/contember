@@ -9,6 +9,8 @@ import { getPersonByIdSql } from './sql/getPersonByIdSql.js'
 import { getConfigSql } from './sql/getConfigSql.js'
 import { createSessionKeySql } from './sql/createSessionKeySql.js'
 import { getIdentityProjectsSql } from './sql/getIdentityProjectsSql.js'
+import { getIdentityByIdSql } from './sql/getIdentityByIdSql.js'
+import { getAuthPoliciesSql } from './sql/authPolicySql.js'
 
 const isDate = (val: unknown) => val instanceof Date
 
@@ -63,6 +65,8 @@ test('signInPasswordless - marks an unverified email verified before issuing the
 					response: { rowCount: 1 },
 				},
 				getConfigSql(),
+				getIdentityByIdSql({ identityId }),
+				getAuthPoliciesSql(),
 				createSessionKeySql({ apiKeyId, identityId }),
 			),
 			// SignInResponseFactory resolves the signed-in identity's projects when
@@ -112,6 +116,8 @@ test('signInPasswordless - skips the email-verified update when already verified
 					response: { rowCount: 1 },
 				},
 				getConfigSql(),
+				getIdentityByIdSql({ identityId }),
+				getAuthPoliciesSql(),
 				createSessionKeySql({ apiKeyId, identityId }),
 			),
 			// SignInResponseFactory resolves the signed-in identity's projects when

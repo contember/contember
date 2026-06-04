@@ -226,6 +226,8 @@ test('links by e-mail when provider requires a verified e-mail and the claim is 
 					response: { rowCount: 1 },
 				},
 				getConfigSql(),
+				getIdentityByIdSql({ identityId }),
+				getAuthPoliciesSql(),
 				createSessionKeySql({
 					apiKeyId: testUuid(2),
 					identityId,

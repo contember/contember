@@ -221,6 +221,9 @@ ${Object.values(entity.fields).map(field => this.generateField({ field, entity, 
 		if (column.typeAlias) {
 			parts.push(`typeAlias(${printJsValue(column.typeAlias)})`)
 		}
+		if (column.type === Model.ColumnType.Json && column.schema !== undefined) {
+			parts.push(`schema(${printJsValue(column.schema)})`)
+		}
 
 		// todo: sequence
 		// todo: maybe single column unique()

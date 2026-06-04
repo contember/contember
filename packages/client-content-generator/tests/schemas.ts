@@ -61,6 +61,23 @@ namespace ReducedHasManySchema {
 	}
 }
 
+namespace JsonSchemaSchema {
+	export class Foo {
+		// jsonColumn WITHOUT a schema – keeps `JSONValue`
+		plain = def.jsonColumn()
+		// jsonColumn WITH a schema – gets a derived type
+		structured = def.jsonColumn().schema({
+			type: 'object',
+			properties: {
+				name: { type: 'string' },
+				age: { type: 'integer' },
+				tags: { type: 'array', items: { type: 'string' } },
+			},
+			required: ['name'],
+		})
+	}
+}
+
 export const schemas = {
 	scalarsSchema: createSchema(ManyScalarsSchema),
 	enumSchema: createSchema(EnumSchema),
@@ -68,4 +85,5 @@ export const schemas = {
 	oneHasManySchema: createSchema(OneHasManySchema),
 	manyHasManySchema: createSchema(ManyHasManySchema),
 	reducedHasManySchema: createSchema(ReducedHasManySchema),
+	jsonSchemaSchema: createSchema(JsonSchemaSchema),
 }

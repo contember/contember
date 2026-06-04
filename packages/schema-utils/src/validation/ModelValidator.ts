@@ -1,6 +1,7 @@
 import { Model } from '@contember/schema'
 import { ErrorBuilder, ValidationError } from './errors.js'
 import { acceptEveryFieldVisitor, getTargetEntity, isColumn, isInverseRelation, isOwningRelation } from '../model/index.js'
+import { collectUnsupportedJsonSchemaKeywords, SUPPORTED_JSON_SCHEMA_KEYWORDS } from '../json-schema/index.js'
 
 const IDENTIFIER_PATTERN = /^[_a-zA-Z][_a-zA-Z0-9]*$/
 const RESERVED_WORDS = ['and', 'or', 'not']
@@ -109,6 +110,21 @@ export class ModelValidator {
 			if (field.sequence && field.nullable) {
 				errors.add('MODEL_INVALID_COLUMN_DEFINITION', 'Column with sequence cannot be nullable.')
 			}
+			this.validateColumnJsonSchema(field, errors)
+		}
+	}
+
+	private validateColumnJsonSchema(column: Model.AnyColumn, errors: ErrorBuilder): void {
+		if (column.type !== Model.ColumnType.Json || column.schema === undefined) {
+			return
+		}
+		for (const { keyword, path } of collectUnsupportedJsonSchemaKeywords(column.schema)) {
+			const location = path === '' ? 'at the schema root' : `at "${path}"`
+			errors.add(
+				'MODEL_INVALID_JSON_SCHEMA',
+				`JSON Schema on column "${column.name}" uses unsupported keyword "${keyword}" ${location}. `
+					+ `Only the following keywords are supported: ${SUPPORTED_JSON_SCHEMA_KEYWORDS.join(', ')}.`,
+			)
 		}
 	}
 

@@ -66,6 +66,11 @@ export namespace Model {
 				readonly start?: number
 			}
 			readonly collation?: Collation
+			/**
+			 * JSON Schema attached to a {@link ColumnType.Json} column. Input values are validated
+			 * against it on create/update. It is metadata only and does not affect the database schema.
+			 */
+			readonly schema?: JSONValue
 		}
 
 	export type Collation =

@@ -291,6 +291,36 @@ config = c.jsonColumn().columnType('json')
 ```
 In this example, the config property is a JSON column that is defined with the column type json in the database. This means that the config column will be of type json in the database, rather than the default jsonb type.
 
+### Validating JSON columns with a JSON Schema
+
+The `schema` method (available only on `jsonColumn()`) lets you attach a [JSON Schema](https://json-schema.org/) to a JSON column. The schema is stored as metadata in the Contember schema and the value provided on every `create` / `update` mutation is validated against it. Validation errors are reported the same way as the built-in field validation rules.
+
+#### Example how to attach a JSON Schema to a JSON column:
+
+```typescript
+address = c.jsonColumn().schema({
+	type: 'object',
+	properties: {
+		street: { type: 'string' },
+		zip: { type: 'string', pattern: '^[0-9]{5}$' },
+		country: { type: 'string', enum: ['CZ', 'SK'] },
+	},
+	required: ['street', 'zip'],
+	additionalProperties: false,
+})
+```
+
+Notes and limitations:
+
+- The schema is **metadata only** — it does not change the database column type and adds no database-level `CHECK` constraint. Changing the attached schema produces a metadata-only migration with no DDL.
+- **Validation runs on input only.** The value is validated on every `create` / `update` mutation that includes the column. **Existing rows are never re-validated** — changing (or first adding) a schema does *not* trigger any migration, backfill, or revalidation of data already stored, so rows written before the change (or written through paths that bypass validation) may not conform to the current schema.
+- The schema is **not enforced on the data-transfer / `contember import` path.** Import writes rows with raw `INSERT` statements that bypass the content API, so imported JSON values are not validated against the attached schema.
+- A schema-level `default` value (`jsonColumn().default(...)`) is **not** validated against the attached schema, because defaults are applied without going through input validation.
+- `null` values are not validated (use `notNull()` to forbid them) and a column is only validated when it is present in the mutation input.
+- The attached schema is exposed as part of the project schema metadata (e.g. via the System API `schema` query) but is **not** reflected in the Content API GraphQL SDL, nor used to derive a typed shape in the generated client — the column stays typed as `JSONValue`.
+- The `schema` method is defined on the shared column builder, but it is **only honored for JSON columns**; calling it on a non-JSON column (e.g. `stringColumn().schema(...)`) is silently ignored.
+- The validator implements a pragmatic subset of JSON Schema with no extra runtime dependency. It is *not* a full draft 2020-12 implementation. Supported keywords: `type` (including `integer` and type arrays), `enum`, `const`, object (`properties`, `required`, `additionalProperties`, `minProperties`, `maxProperties`), array (`items`, `minItems`, `maxItems`, `uniqueItems`), string (`minLength`, `maxLength`, `pattern`), number (`minimum`, `maximum`, `exclusiveMinimum`, `exclusiveMaximum`, `multipleOf`), and the combinators `allOf`, `anyOf`, `oneOf`, `not`. **All other keywords are silently ignored (treated as valid)** — including `$ref`, `$defs`, `format`, `patternProperties`, `propertyNames`, `dependentRequired`, `dependentSchemas`, `if` / `then` / `else`, `contains`, and the 2020-12 tuple keyword `prefixItems`. In particular `items` is applied to *all* array elements (draft-07 style); 2020-12 tuple validation via `prefixItems` will not be enforced. Treat anything not in the supported list as documentation rather than an enforced constraint.
+
 ### Default value
 
 The `default` method allows you to specify a default value for a column in your entity schema. When a default value is specified, it will be used as the value of the column when a new record is created if no value is explicitly provided.

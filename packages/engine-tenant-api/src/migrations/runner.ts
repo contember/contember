@@ -53,12 +53,12 @@ import _20260521130000apikeysessionpolicy from './2026-05-21-130000-api-key-sess
 import _20260521140000mfagraceduration from './2026-05-21-140000-mfa-grace-duration.js'
 import _20260521150000emailotpratelimit from './2026-05-21-150000-email-otp-rate-limit.js'
 import _20260526120000emailverificationtypes from './2026-05-26-120000-email-verification-types.js'
-import _20260526120000idpsession from './2026-05-26-120000-idp-session.js'
 import _20260526120010emailverification from './2026-05-26-120010-email-verification.js'
 import _20260526130000emailchangeverificationconfig from './2026-05-26-130000-email-change-verification-config.js'
 import _20260526130010idprequireverifiedemail from './2026-05-26-130010-idp-require-verified-email.js'
 import _20260526130020emailverificationratelimit from './2026-05-26-130020-email-verification-rate-limit.js'
 import _20260526130030captchaprotectflows from './2026-05-26-130030-captcha-protect-flows.js'
+import _20260526140000idpsession from './2026-05-26-140000-idp-session.js'
 import snapshot from './snapshot.js'
 import { computeTokenHash, Providers } from '../model/index.js'
 import { Logger } from '@contember/logger'
@@ -124,12 +124,12 @@ const migrations = {
 	'2026-05-21-140000-mfa-grace-duration': _20260521140000mfagraceduration,
 	'2026-05-21-150000-email-otp-rate-limit': _20260521150000emailotpratelimit,
 	'2026-05-26-120000-email-verification-types': _20260526120000emailverificationtypes,
-	'2026-05-26-120000-idp-session': _20260526120000idpsession,
 	'2026-05-26-120010-email-verification': _20260526120010emailverification,
 	'2026-05-26-130000-email-change-verification-config': _20260526130000emailchangeverificationconfig,
 	'2026-05-26-130010-idp-require-verified-email': _20260526130010idprequireverifiedemail,
 	'2026-05-26-130020-email-verification-rate-limit': _20260526130020emailverificationratelimit,
 	'2026-05-26-130030-captcha-protect-flows': _20260526130030captchaprotectflows,
+	'2026-05-26-140000-idp-session': _20260526140000idpsession,
 }
 
 export class TenantMigrationsRunner {

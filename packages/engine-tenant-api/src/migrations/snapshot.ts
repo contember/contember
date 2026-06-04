@@ -49,7 +49,10 @@ CREATE TYPE "auth_log_type" AS ENUM (
     'email_verify_init',
     'email_verify_complete',
     'email_change_init',
-    'email_change_complete'
+    'email_change_complete',
+    'idp_session_revalidated',
+    'idp_session_revoked',
+    'idp_session_revalidation_failed'
 );
 CREATE TYPE "config_policy" AS ENUM (
     'always',
@@ -189,6 +192,18 @@ CREATE TABLE "identity_provider" (
     "init_returns_config" boolean DEFAULT false NOT NULL,
     "require_verified_email" boolean DEFAULT false NOT NULL
 );
+CREATE TABLE "idp_session" (
+    "id" "uuid" NOT NULL,
+    "api_key_id" "uuid" NOT NULL,
+    "identity_provider_id" "uuid" NOT NULL,
+    "idp_session_id" "text",
+    "tokens" "bytea",
+    "tokens_version" integer,
+    "idp_expires_at" timestamp with time zone,
+    "token_obtained_at" timestamp with time zone,
+    "last_validated_at" timestamp with time zone DEFAULT "now"() NOT NULL,
+    "created_at" timestamp with time zone DEFAULT "now"() NOT NULL
+);
 CREATE TABLE "mail_template" (
     "id" "uuid" NOT NULL,
     "project_id" "uuid",
@@ -315,6 +330,8 @@ ALTER TABLE ONLY "identity_provider"
     ADD CONSTRAINT "identity_provider_id" PRIMARY KEY ("id");
 ALTER TABLE ONLY "identity_provider"
     ADD CONSTRAINT "identity_provider_slug_key" UNIQUE ("slug");
+ALTER TABLE ONLY "idp_session"
+    ADD CONSTRAINT "idp_session_pkey" PRIMARY KEY ("id");
 ALTER TABLE ONLY "mail_template"
     ADD CONSTRAINT "mail_template_pkey" PRIMARY KEY ("id");
 ALTER TABLE ONLY "person_auth_log"
@@ -347,6 +364,8 @@ CREATE INDEX "api_key_identity_id" ON "api_key" USING "btree" ("identity_id");
 CREATE UNIQUE INDEX "api_key_token_hash" ON "api_key" USING "btree" ("token_hash");
 CREATE INDEX "auth_policy_project_id_idx" ON "auth_policy" USING "btree" ("project_id");
 CREATE INDEX "identity_parent_id" ON "identity" USING "btree" ("parent_id");
+CREATE UNIQUE INDEX "idp_session_api_key_id" ON "idp_session" USING "btree" ("api_key_id");
+CREATE INDEX "idp_session_sid" ON "idp_session" USING "btree" ("identity_provider_id", "idp_session_id");
 CREATE UNIQUE INDEX "mail_template_identifier" ON "mail_template" USING "btree" ("project_id", "mail_type", "variant") WHERE ("project_id" IS NOT NULL);
 CREATE UNIQUE INDEX "mail_template_identifier_global" ON "mail_template" USING "btree" ("mail_type", "variant") WHERE ("project_id" IS NULL);
 CREATE INDEX "mail_template_project_index" ON "mail_template" USING "btree" ("project_id");
@@ -375,6 +394,10 @@ ALTER TABLE ONLY "auth_policy"
     ADD CONSTRAINT "auth_policy_project_id_fkey" FOREIGN KEY ("project_id") REFERENCES "project"("id") ON DELETE CASCADE;
 ALTER TABLE ONLY "identity"
     ADD CONSTRAINT "identity_parent_id_fkey" FOREIGN KEY ("parent_id") REFERENCES "identity"("id");
+ALTER TABLE ONLY "idp_session"
+    ADD CONSTRAINT "idp_session_api_key" FOREIGN KEY ("api_key_id") REFERENCES "api_key"("id") ON DELETE CASCADE;
+ALTER TABLE ONLY "idp_session"
+    ADD CONSTRAINT "idp_session_idp" FOREIGN KEY ("identity_provider_id") REFERENCES "identity_provider"("id") ON DELETE CASCADE;
 ALTER TABLE ONLY "mail_template"
     ADD CONSTRAINT "mail_template_project" FOREIGN KEY ("project_id") REFERENCES "project"("id") ON DELETE CASCADE;
 ALTER TABLE ONLY "person_auth_log"

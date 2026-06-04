@@ -218,6 +218,87 @@ The response `result.token` is the session API key — store it client-side and 
 
 Error codes: `INVALID_IDP_RESPONSE`, `IDP_VALIDATION_FAILED`, `PERSON_NOT_FOUND`, `PERSON_DISABLED`, `PERSON_ALREADY_EXISTS`.
 
+## Session re-validation
+
+:::note[Available since 2.3]
+:::
+
+By default the IdP is consulted **only at sign-in**. After that the Contember session lives on its own and is simply re-prolonged on every request — so if the user is de-provisioned at the IdP, or their IdP session is revoked, Contember keeps the session valid until it expires on its own.
+
+For OIDC providers you can opt in to **continuous re-validation**: the session is bound to the IdP session at sign-in (the token set is stored encrypted) and periodically re-checked against the IdP on the verify path. If the IdP says the session is gone, the Contember session is revoked.
+
+It is **off by default** — without it, IdP sessions behave exactly as before. Enable it per IdP under `configuration.revalidation`:
+
+```graphql
+mutation {
+  updateIDP(
+    identityProvider: "oidc-provider",
+    mergeConfiguration: true,
+    configuration: {
+      revalidation: {
+        enabled: true,
+        method: "refresh",
+        softRefreshThreshold: 0.5,
+        minInterval: "10 seconds",
+        mode: "auto"
+      }
+    }
+  ) { ok error { code developerMessage } }
+}
+```
+
+### Cadence is driven by the access-token lifetime
+
+Re-validation does **not** run on a fixed interval. It follows the lifetime of the access token the IdP issued (`expires_at`), which is exactly the provider's statement of "trust this until X":
+
+- **Fresh** — while the token is well within its lifetime, nothing happens (no IdP call).
+- **Soft** — once the token passes `softRefreshThreshold` of its lifetime (default `0.5`, i.e. half-expired), a **background** refresh is triggered. It runs *after* the response, so the request keeps zero added latency, and the token is renewed before it dies. A revocation discovered here is applied by disabling the api_key, so it takes effect on a *subsequent* request — the request that triggered the refresh is still served.
+- **Expired** — once the token has actually expired, the refresh becomes **blocking**: the request waits for the IdP, and a revoked grant fails it immediately.
+
+Setting `mode: "blocking"` makes every re-validation synchronous (zero revocation lag, at the cost of latency on the re-validation tick) — useful for regulated deployments. A burst of requests past the threshold triggers only one refresh (`minInterval` single-flight floor).
+
+:::caution[Revocation latency in `auto` mode]
+In the default `auto`/background mode the revocation is **not** guaranteed on the very next request:
+- the revoke writes `disabled_at` to the primary, but the verify path reads the api_key from a (possibly lagging) read replica, so a revoked session keeps authorizing until replication catches up;
+- the `minInterval` single-flight floor suppresses re-discovery in the meantime.
+
+So in the soft window the worst-case exposure is roughly `(1 − softRefreshThreshold)` of the remaining token lifetime plus a round-trip and replica lag — bounded by the token expiry, after which the refresh becomes blocking. **If you need near-immediate logout, use `mode: "blocking"` and/or short access-token lifetimes.**
+:::
+
+:::note[Bounded fail-open on a transient failure]
+A transient IdP/DB failure during a blocking refresh fails **open** (the session is kept) and spends the claim, so the next attempt is throttled by `minInterval`. This means an already-expired token can keep being served for up to one `minInterval` while the IdP is unreachable — an intentional anti-hammer / availability trade-off, not a revocation. These fail-opens are audited (see [Audit](#audit)).
+:::
+
+### Re-validation methods
+
+| `method` | How it re-checks | Notes |
+|---|---|---|
+| `refresh` (default) | OIDC refresh-token grant | Needs a refresh token, so `offline_access` is requested automatically. Rotates the token and advances the lifetime on each refresh. |
+| `userinfo` | Calls the userinfo endpoint with the stored access token | No refresh token, so the stored access token is never rotated. Once it passes the soft threshold the session re-probes the IdP on (at most) every `minInterval`, indefinitely, until the IdP rejects the token (HTTP 401 → revoked). |
+| `introspection` | RFC 7662 token introspection | Same cadence as `userinfo` — the token is not rotated, so the session keeps introspecting every `minInterval` until the IdP reports it inactive. |
+
+:::note
+With `userinfo`/`introspection` the session does not self-expire: because no token is rotated, re-validation keeps probing the IdP at the `minInterval` cadence for the life of the session. Choose a `minInterval` that the IdP can sustain, or prefer `refresh` where the IdP issues refresh tokens.
+:::
+
+A definitive IdP rejection (`invalid_grant`, inactive token) **revokes** the session and disables its api_key. Transient failures (network, IdP unavailable) fail **open** — the session is kept and retried later, so IdP downtime does not log everyone out. Disabling the IdP itself also revokes its sessions on the next check.
+
+### Configuration reference
+
+| Field | Default | Notes |
+|---|---|---|
+| `enabled` | `false` | Master switch. `false` = pre-2.3 behaviour (no session stored, no re-validation). |
+| `method` | `refresh` | `refresh` \| `userinfo` \| `introspection`. |
+| `softRefreshThreshold` | `0.5` | Fraction (0–1) of the token lifetime after which the proactive background refresh starts. |
+| `minInterval` | `"10 seconds"` | Single-flight floor between re-validation attempts (Postgres interval). |
+| `fallbackInterval` | `"5 minutes"` | Throttle used when the IdP returns no token expiry (Postgres interval). |
+| `mode` | `auto` | `auto` (background before expiry, blocking once expired) \| `blocking` (always synchronous). |
+| `onFailure` | `revoke` | Action on a revoked grant. |
+
+:::caution[Encryption key required]
+Refresh tokens are stored encrypted at rest, so `method: "refresh"` needs a configured encryption key (`CONTEMBER_ENCRYPTION_KEY`). Without one, a token-bearing session is simply **not** persisted — the session falls back to plain behaviour with no re-validation rather than storing secrets in plaintext or failing sign-in.
+:::
+
 ## Audit
 
 :::note[Available since 2.2]
@@ -232,4 +313,14 @@ Every IdP management call is recorded in the [audit log](/reference/engine/tenan
 | `disableIDP` | `idp_disable` | `{identityProvider}` |
 | `enableIDP` | `idp_enable` | `{identityProvider}` |
 
-Sign-in attempts via IdP are recorded as `idp_login`.
+Sign-in attempts via IdP are recorded as `idp_login`. When [session re-validation](#session-re-validation) revokes a session, it is recorded as `idp_session_revoked` with `event_data: {reason}` (e.g. `invalid_grant`, `inactive`, `idp_disabled`); a token rotation is recorded as `idp_session_revalidated`.
+
+A **fail-open** — re-validation could not be performed but the session was kept — is recorded as `idp_session_revalidation_failed` (with `success: true`, since it is not a security failure) and an `error_code`:
+
+| `error_code` | Meaning |
+|---|---|
+| `revalidation_error` | The IdP could not be reached / returned a transient error; the session was kept and will be retried. Throttled to one entry per `minInterval` per session, so a prolonged IdP outage surfaces here rather than silently. |
+| `config_invalid` | The stored IdP configuration could not be parsed at re-validation time; the session was kept. |
+| `encryption_disabled` | Re-validation is enabled on the IdP but no encryption key is configured, so at sign-in the token-bearing session was **not** stored — the session degraded to a plain, non-revalidated one. Recorded once per such sign-in. |
+
+Alerting on `idp_session_revalidation_failed` lets you distinguish "sessions are being re-validated" from "re-validation has been silently failing open".

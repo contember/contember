@@ -13,7 +13,9 @@ export interface Providers {
 	/**
 	 * Whether an encryption key is configured. When false, `encrypt` throws, so
 	 * secrets that can fall back to plaintext-at-rest (TOTP) must do so (version 0),
-	 * preserving pre-encryption behavior on deployments without a key.
+	 * preserving pre-encryption behavior on deployments without a key. For the same
+	 * reason, token-bearing IdP sessions are skipped when no key is configured, since
+	 * refresh tokens must be encrypted at rest and must never be stored in plaintext.
 	 */
 	encryptionEnabled: boolean
 }

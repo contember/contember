@@ -5,6 +5,8 @@ import { Response, ResponseError, ResponseOk } from '../utils/Response.js'
 import { InitSignInIdpErrorCode, InitSignInIdpResult, SignInIdpErrorCode } from '../../schema/index.js'
 import { DatabaseContext } from '../utils/index.js'
 import { ApiKeyRequestInfo, CreateIdentityCommand, CreatePersonCommand, CreatePersonIdentityProviderIdentifierCommand } from '../commands/index.js'
+import { CreateIdpSessionCommand } from '../commands/idp/CreateIdpSessionCommand.js'
+import { CreateAuthLogEntryCommand } from '../commands/authLog/CreateAuthLogEntryCommand.js'
 import { TenantRole } from '../authorization/index.js'
 import { NoPassword } from '../dtos/index.js'
 import { IdentityProviderRow } from '../queries/idp/types.js'
@@ -83,7 +85,46 @@ class IDPSignInManager {
 				})
 			}
 
-			const sessionToken = await this.apiKeyManager.createSessionApiKey(db, personRow.identity_id, expiration, requestInfo, trustForwardedInfo)
+			const { id: apiKeyId, token: sessionToken } = await this.apiKeyManager.createSessionApiKeyWithId(
+				db,
+				personRow.identity_id,
+				expiration,
+				requestInfo,
+				trustForwardedInfo,
+			)
+
+			// Bind the federated-session state to this session so it can be re-validated
+			// against the IdP later. Present only when the provider supports it and
+			// revalidation is enabled on the IdP configuration (A24). Refresh tokens must be
+			// encrypted at rest, so when no encryption key is configured we skip persisting a
+			// token-bearing session (it would otherwise crash or store secrets in plaintext) —
+			// the session then behaves like a plain session with no re-validation.
+			if (claim.idpSession) {
+				const hasTokens = !!claim.idpSession.tokens && Object.keys(claim.idpSession.tokens).length > 0
+				if (!hasTokens || db.providers.encryptionEnabled) {
+					await db.commandBus.execute(new CreateIdpSessionCommand(apiKeyId, provider.id, claim.idpSession))
+				} else {
+					// Re-validation is enabled on this IdP but no encryption key is configured, so we
+					// won't store the token-bearing session — it silently degrades to a plain,
+					// non-revalidated session. Audit the downgrade (errorCode `encryption_disabled`)
+					// so the operator can see that a session they expected to be continuously
+					// re-validated is in fact not protected, instead of failing closed at sign-in.
+					await db.commandBus.execute(
+						new CreateAuthLogEntryCommand({
+							type: 'idp_session_revalidation_failed',
+							invokedById: personRow.identity_id,
+							personId: personRow.id,
+							identityProviderId: provider.id,
+							personTokenId: apiKeyId,
+							success: true,
+							errorCode: 'encryption_disabled',
+							ipAddress: requestInfo?.ip,
+							userAgent: requestInfo?.userAgent,
+						}),
+					)
+				}
+			}
+
 			return new ResponseOk({
 				person: personRow,
 				token: sessionToken,

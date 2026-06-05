@@ -25,11 +25,15 @@ export class MigrationCreator {
 		initialSchema: Schema,
 		newSchema: Schema,
 		migrationName: string,
-		{ skipInitialSchemaValidation = false, skipNonModelDiffers = false }: { skipInitialSchemaValidation?: boolean; skipNonModelDiffers?: boolean } = {},
+		{ skipInitialSchemaValidation = false, skipNonModelDiffers = false, recreateViews = false }: {
+			skipInitialSchemaValidation?: boolean
+			skipNonModelDiffers?: boolean
+			recreateViews?: boolean
+		} = {},
 	): Promise<{ migration: Migration; initialSchema: Schema } | null> {
 		await this.migrationFilesManager.createDirIfNotExist()
 
-		const modifications = this.schemaDiffer.diffSchemas(initialSchema, newSchema, { skipInitialSchemaValidation, skipNonModelDiffers })
+		const modifications = this.schemaDiffer.diffSchemas(initialSchema, newSchema, { skipInitialSchemaValidation, skipNonModelDiffers, recreateViews })
 		if (modifications.length === 0) {
 			return null
 		}

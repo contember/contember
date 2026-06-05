@@ -15,6 +15,7 @@ type Options = {
 	execute?: true
 	yes?: true
 	'skip-initial-schema-validation'?: true
+	'recreate-views'?: true
 }
 
 export class MigrationDiffCommand extends Command<Args, Options> {
@@ -40,6 +41,12 @@ export class MigrationDiffCommand extends Command<Args, Options> {
 			.description('Do not ask for confirmation.')
 
 		configuration.option('skip-initial-schema-validation')
+		configuration //
+			.option('recreate-views')
+			.valueNone()
+			.description(
+				'Drop & recreate changed views instead of updating them in-place (CREATE OR REPLACE VIEW). Use when an in-place view update fails with SQLSTATE 42P16.',
+			)
 	}
 
 	protected async execute(input: Input<Args, Options>): Promise<void> {
@@ -47,6 +54,7 @@ export class MigrationDiffCommand extends Command<Args, Options> {
 		let shouldExecute = input.getOption('execute')
 		const yes = input.getOption('yes')
 		const skipInitialSchemaValidation = input.getOption('skip-initial-schema-validation') === true
+		const recreateViews = input.getOption('recreate-views') === true
 
 		const schema = await this.schemaLoader.loadSchema()
 		let stateMode = await this.schemaStateManager.isStateMode()
@@ -64,6 +72,7 @@ export class MigrationDiffCommand extends Command<Args, Options> {
 			const result = await this.migrationCreator.prepareMigration(initialSchema, schema, migrationName, {
 				skipInitialSchemaValidation: skipInitialSchemaValidation,
 				skipNonModelDiffers: stateMode,
+				recreateViews,
 			})
 
 			const schemaState = stateMode ? SchemaStateManager.schemaStateFromSchema(schema) : undefined

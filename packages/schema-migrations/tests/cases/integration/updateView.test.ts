@@ -364,3 +364,119 @@ DROP VIEW "author";
 CREATE VIEW "author" AS SELECT null as id, 'John' AS name, 0 AS age;
 CREATE VIEW "author2" AS SELECT * FROM author;`,
 	}))
+
+namespace RecreateViewsOriginalSchema {
+	@def.View("SELECT null as id, 'John' AS name")
+	export class Author {
+		name = def.stringColumn()
+	}
+
+	@def.View('SELECT * FROM author', { dependencies: [Author] })
+	export class Author2 {
+		name = def.stringColumn()
+	}
+}
+
+namespace RecreateViewsUpdatedSchema {
+	@def.View("SELECT null as id, 'Jack' AS name")
+	export class Author {
+		name = def.stringColumn()
+	}
+
+	@def.View('SELECT * FROM author', { dependencies: [Author] })
+	export class Author2 {
+		name = def.stringColumn()
+	}
+}
+
+// escape hatch: with `recreateViews`, even an SQL-only change (which is replaceable in-place)
+// drops & recreates the whole dependant cascade instead of emitting a single updateView
+describe('recreate views opt-out - SQL-only change drops & recreates instead of CREATE OR REPLACE', () =>
+	testMigrations({
+		diffOptions: { recreateViews: true },
+		original: createSchema(RecreateViewsOriginalSchema),
+		updated: createSchema(RecreateViewsUpdatedSchema),
+		diff: [
+			{
+				modification: 'removeEntity',
+				entityName: 'Author2',
+			},
+			{
+				modification: 'removeEntity',
+				entityName: 'Author',
+			},
+			{
+				modification: 'createView',
+				entity: {
+					name: 'Author',
+					primary: 'id',
+					primaryColumn: 'id',
+					unique: [],
+					indexes: [],
+					fields: {
+						id: {
+							name: 'id',
+							columnName: 'id',
+							nullable: false,
+							type: 'Uuid',
+							columnType: 'uuid',
+						},
+						name: {
+							name: 'name',
+							columnName: 'name',
+							nullable: true,
+							type: 'String',
+							columnType: 'text',
+						},
+					},
+					tableName: 'author',
+					eventLog: {
+						enabled: true,
+					},
+					view: {
+						sql: "SELECT null as id, 'Jack' AS name",
+					},
+				},
+			},
+			{
+				modification: 'createView',
+				entity: {
+					name: 'Author2',
+					primary: 'id',
+					primaryColumn: 'id',
+					unique: [],
+					indexes: [],
+					fields: {
+						id: {
+							name: 'id',
+							columnName: 'id',
+							nullable: false,
+							type: 'Uuid',
+							columnType: 'uuid',
+						},
+						name: {
+							name: 'name',
+							columnName: 'name',
+							nullable: true,
+							type: 'String',
+							columnType: 'text',
+						},
+					},
+					tableName: 'author2',
+					eventLog: {
+						enabled: true,
+					},
+					view: {
+						sql: 'SELECT * FROM author',
+						dependencies: [
+							'Author',
+						],
+					},
+				},
+			},
+		],
+		sql: SQL`DROP VIEW "author2";
+DROP VIEW "author";
+CREATE VIEW "author" AS SELECT null as id, 'Jack' AS name;
+CREATE VIEW "author2" AS SELECT * FROM author;`,
+	}))

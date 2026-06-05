@@ -1,4 +1,4 @@
-import { Migration, ModificationHandlerFactory, SchemaDiffer, SchemaMigrator, VERSION_LATEST } from '../../src/index.js'
+import { DiffOptions, Migration, ModificationHandlerFactory, SchemaDiffer, SchemaMigrator, VERSION_LATEST } from '../../src/index.js'
 import { Schema } from '@contember/schema'
 import { createMigrationBuilder } from '@contember/database-migrations'
 import { describe, expect, it, test } from 'bun:test'
@@ -16,17 +16,19 @@ export interface TestContext {
 	sql: string
 	noDiff?: boolean
 	databaseMetadata?: DatabaseMetadata
+	diffOptions?: DiffOptions
 }
 
 export function testDiffSchemas(
 	original: Partial<Schema>,
 	updated: Partial<Schema>,
 	expectedDiff: Migration.Modification[],
+	diffOptions: DiffOptions = {},
 ) {
 	const actualDiff = schemaDiffer.diffSchemas(
 		{ ...emptySchema, ...original },
 		{ ...emptySchema, ...updated },
-		{ skipRecreateValidation: true },
+		{ skipRecreateValidation: true, ...diffOptions },
 	)
 	try {
 		expect(actualDiff).toStrictEqual(expectedDiff)
@@ -85,12 +87,12 @@ export function testGenerateSql(
 	expect(actual).toEqual(expectedSql)
 }
 
-export function testMigrations({ original, updated, diff, noDiff, sql, databaseMetadata }: TestContext) {
+export function testMigrations({ original, updated, diff, noDiff, sql, databaseMetadata, diffOptions }: TestContext) {
 	test('diff schemas', () => {
 		if (noDiff) {
 			return
 		}
-		testDiffSchemas(original, updated, diff)
+		testDiffSchemas(original, updated, diff, diffOptions)
 	})
 	test('apply diff', () => {
 		testApplyDiff(original, updated, diff)

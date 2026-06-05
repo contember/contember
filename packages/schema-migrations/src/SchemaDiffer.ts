@@ -43,7 +43,7 @@ import {
 	UpdateValidationSchemaDiffer,
 	VERSION_LATEST,
 } from './modifications/index.js'
-import { RemoveChangedFieldDiffer, RemoveViewDiffer } from './modifications/differs/index.js'
+import { RemoveChangedFieldDiffer, RemoveViewDiffer, UpdateViewDiffer } from './modifications/differs/index.js'
 import { CreateIndexDiffer, RemoveIndexDiffer } from './modifications/indexes/index.js'
 import { CreateTriggerDiffer, RemoveTriggerDiffer, UpdateTriggerDiffer } from './modifications/actions/index.js'
 import { UpdateTargetDiffer } from './modifications/actions/UpdateTargetModification.js'
@@ -109,6 +109,7 @@ export class SchemaDiffer {
 			new CreateColumnDiffer(),
 			new CreateRelationDiffer(),
 			new CreateViewDiffer(),
+			new UpdateViewDiffer(),
 			new CreateRelationInverseSideDiffer(),
 			new CreateUniqueConstraintDiffer(),
 			new CreateIndexDiffer(),

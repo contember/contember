@@ -9,6 +9,18 @@ Once the user has authenticated with the identity provider, they will be redirec
 
 ## IdP configuration
 
+### Provider types
+
+Contember ships three IdP types, selected by the `type` argument of `addIDP`:
+
+| `type` | Provider | Configuration |
+|---|---|---|
+| `oidc` | Any OpenID Connect–compliant provider (Keycloak, Microsoft Entra, Auth0, Apereo CAS, …) | [OIDC configuration](#oidc-configuration) |
+| `facebook` | Facebook Login | [Facebook configuration](#facebook-configuration) |
+| `apple` | Sign in with Apple | [Apple configuration](#apple-configuration) |
+
+All three are built on the same OIDC machinery and share the [OIDC option set](#oidc-configuration) (`scope`, `claimMapping`, `revalidation`, …); they differ only in the credential fields and how the issuer is discovered. The walkthroughs below use `oidc`.
+
 ### Adding new IdP
 
 To add a new identity provider (IdP) in Contember, you will need to use the `addIDP` mutation provided by the [tenant API](/reference/engine/tenant/overview). This mutation allows you to specify the details of the identity provider you want to add, including its type, configuration, and options.
@@ -154,6 +166,42 @@ mutation {
 }
 ```
 
+### Facebook configuration
+
+`type: "facebook"` uses Contember's built-in Facebook endpoints; you supply the credentials from your Facebook app. The configuration shares the [OIDC options](#oidc-configuration) (`scope`, `claimMapping`, `revalidation`, …).
+
+| Field | Default | Notes |
+|---|---|---|
+| `clientId` | — | **Required.** Facebook app ID. |
+| `clientSecret` | — | **Required.** Facebook app secret. Redacted in the [audit log](#audit) and never returned by [`identityProviders`](#listing-configured-idps). |
+| `url` | — | **Required by the shared schema** — but the Facebook issuer is built in, so the value is not used for discovery. Set it to `https://www.facebook.com/.well-known/openid-configuration/`. |
+
+Besides the standard redirect/callback flow, `signInIDP` also accepts a **Facebook JS SDK** response in `data` instead of a callback `url`:
+
+```graphql
+data: {
+  authResponse: {
+    accessToken: "…",      # from FB.login()
+    signedRequest: "…"
+  }
+}
+```
+
+Contember verifies the `signedRequest` HMAC with the app secret and then fetches `id,email,name` from the Graph API.
+
+### Apple configuration
+
+`type: "apple"` uses Apple's fixed discovery endpoint and builds the client secret as a short-lived JWT signed with your Apple private key — so there is **no** `clientSecret` or `url` field. Shares the [OIDC options](#oidc-configuration).
+
+| Field | Default | Notes |
+|---|---|---|
+| `clientId` | — | **Required.** Your Apple **Services ID** (the OAuth client identifier). |
+| `teamId` | — | **Required.** Apple Developer Team ID — becomes the client-secret JWT issuer. |
+| `keyId` | — | **Required.** Key ID of the Apple sign-in key — becomes the JWT `kid`. |
+| `privateKey` | — | **Required.** The `.p8` private key (PKCS#8 PEM). Redacted in the [audit log](#audit) and never returned by [`identityProviders`](#listing-configured-idps). |
+
+Contember signs an ES256 client-secret JWT (`aud: appleid.apple.com`, 10-minute lifetime) per request, so no static client secret is stored.
+
 ### Updating existing IdP
 
 To update an existing identity provider (IdP) in Contember, you will need to use the updateIDP mutation. This mutation allows you to specify the updated details of the identity provider you want to update, including its configuration and options.
@@ -193,6 +241,10 @@ The options field allows you to specify updated options for the identity provide
 
 If the "ok" in response is `false`, you will find details in `error`, possible error codes are following: `NOT_FOUND`, `INVALID_CONFIGURATION`
 
+:::caution[`configuration` is replaced wholesale by default]
+By default `updateIDP` **replaces** the entire `configuration` object — any field you don't pass is dropped. To change a single field while keeping the rest, pass `mergeConfiguration: true`: each key you provide is merged into the stored configuration, and a key set to `null` is **removed**. Omitting `configuration` entirely leaves it untouched (handy when you only want to change `options`). The merge is **shallow** — a nested object such as `claimMapping` or `revalidation` is replaced as a whole, not deep-merged.
+:::
+
 ### Temporarily disabling and enabling an IdP
 
 In Contember, you can enable or disable an identity provider (IdP) using the `enableIDP` and `disableIDP` mutations. These mutations allow you to control whether an identity provider is available.
@@ -231,6 +283,30 @@ The enableIDP mutation works in a similar way to the disableIDP mutation, with t
 
 When you execute the disableIDP mutation, it will return a response indicating whether the operation was successful. If the operation was not successful, the ok field will be set to false and the error field will contain details about the error that occurred. Possible error code is `NOT_FOUND`.
 
+### Listing configured IdPs
+
+The `identityProviders` query returns every configured provider — enabled or disabled. It requires the `idp:list` permission (granted to `PROJECT_ADMIN` and `SUPER_ADMIN` by default), so it is meant for administrative tooling, not the public login screen.
+
+```graphql
+query {
+  identityProviders {
+    slug
+    type
+    disabledAt
+    configuration
+    options {
+      autoSignUp
+      exclusive
+      initReturnsConfig
+      requireVerifiedEmail
+      assumeEmailVerified
+    }
+  }
+}
+```
+
+`disabledAt` is `null` for an active provider and carries the timestamp of the last `disableIDP` otherwise. The returned `configuration` has its **secrets stripped** — OIDC/Facebook `clientSecret` and Apple `privateKey` are never exposed — so it is safe to surface in an admin UI.
+
 ## IdP authentication
 
 A two-step exchange: `initSignInIDP` produces the redirect URL and any state your client must remember, the user authenticates at the provider, and `signInIDP` consumes the callback URL to mint a session.
@@ -256,7 +332,7 @@ mutation {
 }
 ```
 
-The `identityProvider` field is the slug used when the IdP was added. `data.redirectUrl` is where the provider should send the user after authentication. The exact `data` shape is provider-specific — for OIDC the supported key is `redirectUrl`.
+The `identityProvider` field is the slug used when the IdP was added. `data.redirectUrl` is where the provider should send the user after authentication. The exact `data` shape is provider-specific — for `oidc`, `facebook` and `apple` the keys are `redirectUrl` (required) and an optional `responseMode` (the OAuth `response_mode`, e.g. `query` or `form_post`).
 
 The response carries:
 

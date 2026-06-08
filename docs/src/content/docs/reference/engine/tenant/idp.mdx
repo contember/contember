@@ -63,6 +63,97 @@ The options field allows you to specify additional options for the identity prov
 
 If the "ok" in response is `false`, you will find details in `error`, possible error codes are following: `ALREADY_EXISTS`, `UNKNOWN_TYPE`, `INVALID_CONFIGURATION`
 
+### OIDC configuration
+
+The `configuration` object passed to `addIDP` / `updateIDP` is provider-specific. For `type: "oidc"` the following fields are supported — only `url` is strictly required, the rest fall back to the defaults below:
+
+| Field | Default | Notes |
+|---|---|---|
+| `url` | — | **Required.** The provider's OpenID Connect discovery URL (`…/.well-known/openid-configuration`), used for issuer discovery. |
+| `clientId` | — | OAuth client ID issued by the provider. |
+| `clientSecret` | — | OAuth client secret. Never returned by the API and redacted in the [audit log](#audit). |
+| `scope` | `openid email` | Space-separated scopes requested at authorization. When [re-validation](#session-re-validation) uses `refresh`, `offline_access` is appended automatically. |
+| `claims` | — | *Deprecated* alias for `scope` — despite the name these are OIDC scopes, not claims. Prefer `scope`. |
+| `responseType` | `code` | OIDC `response_type`. One of `code`, `code id_token`, `code id_token token`, `code token`, `id_token`, `id_token token`, `none`. |
+| `idTokenSignedResponseAlg` | `RS256` | Expected signing algorithm of the ID token. |
+| `tokenEndpointAuthMethod` | `client_secret_basic` | *(since 2.2)* How the client authenticates to the token endpoint. See [Token endpoint authentication](#token-endpoint-authentication). |
+| `fetchUserInfo` | `false` | After the token exchange, also call the userinfo endpoint and merge its claims (userinfo wins over the ID token). Needed when the provider only returns some claims from userinfo. |
+| `returnOIDCResult` | `false` | Expose the provider's raw token-exchange response in `signInIDP`'s `result.idpResponse` (access token, raw claims, …). |
+| `additionalAuthorizedParties` | `[]` | Extra `azp` values accepted in the ID token besides the configured `clientId`. |
+| `timeout` | `5000` | HTTP timeout (ms) for calls to the provider. |
+| `claimMapping` | — | *(since 2.2)* Remap provider claims onto Contember's identity fields. See [Claim mapping](#claim-mapping). |
+| `revalidation` | — | *(since 2.3)* Continuous session re-validation. See [Session re-validation](#session-re-validation). |
+
+#### Token endpoint authentication
+
+:::note[Available since 2.2]
+:::
+
+`tokenEndpointAuthMethod` controls how the client proves its identity when exchanging the authorization code for tokens. The default is `client_secret_basic` (the secret in an HTTP Basic header). Some providers — notably certain **Apereo CAS** registrations — only accept the secret in the request body, which requires `client_secret_post`:
+
+```graphql
+mutation {
+  updateIDP(
+    identityProvider: "cas-provider",
+    mergeConfiguration: true,
+    configuration: { tokenEndpointAuthMethod: "client_secret_post" }
+  ) { ok error { code developerMessage } }
+}
+```
+
+Supported values: `client_secret_basic`, `client_secret_post`, `client_secret_jwt`, `private_key_jwt`, `tls_client_auth`, `self_signed_tls_client_auth`, `none`.
+
+#### Claim mapping
+
+:::note[Available since 2.2]
+:::
+
+By default Contember derives the identity from the standard OIDC claims: `sub` for the stable external identifier, `email` for the e-mail, `name` for the display name. A provider whose claims don't follow these defaults can be remapped via `claimMapping` — without a per-provider code change.
+
+| Field | Default | Notes |
+|---|---|---|
+| `externalIdentifier` | `sub` | Claim used as the **stable federation key** persisted per identity and matched on every subsequent sign-in. Must resolve to a scalar (string/number); a non-scalar or empty value is rejected at sign-in (see the caution below). |
+| `email` | `email` | Claim used as the e-mail address. A non-string value is ignored (treated as absent). |
+| `name` | `name` | Claim used as the display name. A non-string value is ignored. |
+| `attributesKey` | — | Key of a nested object whose properties are lifted to the top level before mapping. For providers that nest their claims — notably **Apereo CAS** userinfo, which returns them under `attributes`. |
+
+Each mapping value is a claim name, with **dot-paths** into nested objects supported (e.g. `user.id`, `address.region`).
+
+:::caution[Mapping the external identifier safely]
+`externalIdentifier` is the key that ties an IdP account to a Contember identity on every sign-in, so it must be stable and unique per user.
+
+- It must resolve to a **scalar**. A claim that resolves to an object/array, or to an empty string, is **rejected** at sign-in (`IDP_VALIDATION_FAILED`) — mapping such a value through would otherwise collapse multiple users onto a single key (account takeover). When the mapped claim is simply absent, Contember falls back to the signed `sub`.
+- Claims lifted via `attributesKey` (or fetched from userinfo) are **not** covered by the ID-token signature. A signed ID-token claim always wins over an `attributes`-level claim of the same name, but if you map `externalIdentifier` to a claim that *only* exists in userinfo / `attributes`, the federation key is no longer anchored to the signed subject. Prefer a signed claim where possible.
+:::
+
+##### Example: Apereo CAS
+
+Apereo CAS exposes user attributes nested under `attributes` in its userinfo response and, in many deployments, expects the client secret in the request body. The two new options combine to consume it without any code change — fetch userinfo, unwrap `attributes`, map the stable `oid` to the external identifier, and post the secret:
+
+```graphql
+mutation {
+  addIDP(
+    identityProvider: "cas-provider",
+    type: "oidc",
+    configuration: {
+      url: "https://cas.example.edu/cas/oidc/.well-known/openid-configuration",
+      clientId: "YOUR_CLIENT_ID",
+      clientSecret: "YOUR_CLIENT_SECRET",
+      scope: "openid email profile",
+      tokenEndpointAuthMethod: "client_secret_post",
+      fetchUserInfo: true,
+      claimMapping: {
+        attributesKey: "attributes",
+        externalIdentifier: "oid",
+        email: "email",
+        name: "name"
+      }
+    },
+    options: { autoSignUp: true }
+  ) { ok error { code developerMessage } }
+}
+```
+
 ### Updating existing IdP
 
 To update an existing identity provider (IdP) in Contember, you will need to use the updateIDP mutation. This mutation allows you to specify the updated details of the identity provider you want to update, including its configuration and options.

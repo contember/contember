@@ -59,6 +59,7 @@ The options field allows you to specify additional options for the identity prov
 | `exclusive` | `false` | Only this IdP may authenticate the matched accounts; disables linking by e-mail. |
 | `initReturnsConfig` | `false` | `initSignInIDP` returns the raw provider config to the client. |
 | `requireVerifiedEmail` | `false` | *(since 2.2)* For a non-`exclusive` provider, only auto-link to / sign in an existing local account by e-mail when the provider asserts the e-mail is **verified**. Guards against account takeover via an unverified provider claim. See [e-mail verification](/reference/engine/tenant/email-verification#idp-verified-email-gate). |
+| `assumeEmailVerified` | `false` | *(since 2.2)* Treat this provider's e-mails as **verified** even when it sends no `email_verified` claim, so `requireVerifiedEmail` can stay on for a trusted IdP that never emits the claim. **Waives** the verified-email gate — use **only** for a provider you fully trust to vouch for its accounts. See [e-mail verification](/reference/engine/tenant/email-verification#idp-verified-email-gate). |
 
 If the "ok" in response is `false`, you will find details in `error`, possible error codes are following: `ALREADY_EXISTS`, `UNKNOWN_TYPE`, `INVALID_CONFIGURATION`
 

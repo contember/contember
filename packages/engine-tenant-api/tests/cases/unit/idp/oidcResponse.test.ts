@@ -2,13 +2,14 @@ import { describe, expect, test } from 'bun:test'
 import { handleOIDCResponse } from '../../../../src/model/service/idp/providers/OIDCHelpers.js'
 
 /** A stub openid-client whose `callback` yields the given id-token claims and `userinfo` the given object. */
-const stubClient = (idTokenClaims: Record<string, unknown>, userInfo?: Record<string, unknown>) => ({
-	callback: async () => ({
-		access_token: 'access-token',
-		claims: () => idTokenClaims,
-	}),
-	userinfo: async () => userInfo ?? {},
-}) as any
+const stubClient = (idTokenClaims: Record<string, unknown>, userInfo?: Record<string, unknown>) =>
+	({
+		callback: async () => ({
+			access_token: 'access-token',
+			claims: () => idTokenClaims,
+		}),
+		userinfo: async () => userInfo ?? {},
+	}) as any
 
 const responseData = { parameters: {}, redirectUrl: 'https://app.example.com/cb' }
 

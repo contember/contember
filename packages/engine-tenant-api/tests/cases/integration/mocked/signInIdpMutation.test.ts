@@ -48,6 +48,7 @@ test('signs in idp with existing identity', async () => {
 						disabledAt: null,
 						initReturnsConfig: false,
 						requireVerifiedEmail: false,
+						assumeEmailVerified: false,
 						slug: 'mock',
 						type: 'mock',
 					},
@@ -123,6 +124,7 @@ test('does NOT link by e-mail when provider requires a verified e-mail and the c
 						exclusive: false,
 						initReturnsConfig: false,
 						requireVerifiedEmail: true,
+						assumeEmailVerified: false,
 						configuration: {
 							externalIdentifier,
 							email,
@@ -201,10 +203,98 @@ test('links by e-mail when provider requires a verified e-mail and the claim is 
 						exclusive: false,
 						initReturnsConfig: false,
 						requireVerifiedEmail: true,
+						assumeEmailVerified: false,
 						configuration: {
 							externalIdentifier,
 							email,
 							emailVerified: true,
+						},
+						disabledAt: null,
+						slug: 'mock',
+						type: 'mock',
+					},
+				}),
+				getPersonByIdpSql({
+					externalIdentifier,
+					identityProviderId: idpId,
+					response: null,
+				}),
+				getPersonByEmailSql({
+					email,
+					response: { personId, identityId, password: '123', roles: [] },
+				}),
+				{
+					sql: `insert into  "tenant"."person_identity_provider" ("id", "identity_provider_id", "person_id", "external_identifier") values  (?, ?, ?, ?)`,
+					parameters: [testUuid(1), idpId, personId, externalIdentifier],
+					response: { rowCount: 1 },
+				},
+				getConfigSql(),
+				getIdentityByIdSql({ identityId }),
+				getAuthPoliciesSql(),
+				createSessionKeySql({
+					apiKeyId: testUuid(2),
+					identityId,
+				}),
+			),
+			getIdentityProjectsSql({ identityId, projectId }),
+			selectMembershipsSql({
+				identityId,
+				projectId,
+				membershipsResponse: [{ role: 'editor', variables: [{ name: 'locale', values: ['cs'] }] }],
+			}),
+		],
+		return: {
+			data: {
+				signInIDP: {
+					ok: true,
+					errors: [],
+					result: {
+						token: '0000000000000000000000000000000000000000',
+					},
+				},
+			},
+		},
+		expectedAuthLog: {
+			type: 'idp_login',
+			response: expect.objectContaining({
+				ok: true,
+			}),
+		},
+	})
+})
+
+test('links by e-mail when require + assumeEmailVerified are set, even though the claim is unverified', async () => {
+	const externalIdentifier = 'abcd'
+	const email = 'john@doe.com'
+	const identityId = testUuid(2)
+	const personId = testUuid(7)
+	const projectId = testUuid(10)
+	const idpId = testUuid(20)
+	await executeTenantTest({
+		query: signInIDP({
+			identityProvider: 'mock',
+			idpResponse: {
+				url: 'test',
+			},
+			redirectUrl: 'test',
+			sessionData: {},
+		}),
+		executes: [
+			...sqlTransaction(
+				getIdpBySlugSql({
+					slug: 'mock',
+					response: {
+						id: idpId,
+						autoSignUp: false,
+						exclusive: false,
+						initReturnsConfig: false,
+						requireVerifiedEmail: true,
+						// trusted IdP: e-mails are treated as verified even though the claim says false
+						assumeEmailVerified: true,
+						configuration: {
+							externalIdentifier,
+							email,
+							emailVerified: false,
 						},
 						disabledAt: null,
 						slug: 'mock',
@@ -287,6 +377,7 @@ test('signs in exclusive idp', async () => {
 						exclusive: true,
 						initReturnsConfig: false,
 						requireVerifiedEmail: false,
+						assumeEmailVerified: false,
 						configuration: {
 							externalIdentifier: externalIdentifier,
 							email,

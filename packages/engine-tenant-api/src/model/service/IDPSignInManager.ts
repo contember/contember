@@ -178,8 +178,10 @@ class IDPSignInManager {
 				// e-mail is takeover-grade: if the provider returns an unverified
 				// (or attacker-controlled) e-mail, it could hijack the account. When
 				// the provider requires a verified e-mail, refuse to link — and to
-				// sign in — unless the provider asserts the address is verified.
-				if (provider.requireVerifiedEmail && claim.emailVerified !== true) {
+				// sign in — unless the address is asserted verified. `assumeEmailVerified`
+				// lets a trusted IdP that never emits the claim still satisfy the gate.
+				const emailVerified = provider.assumeEmailVerified || claim.emailVerified === true
+				if (provider.requireVerifiedEmail && !emailVerified) {
 					return { person: null, blockedReason: 'idp_email_unverified', blockedPersonId: personByEmail.id }
 				}
 				await this.saveIdpIdentifier(db, provider, claim, personByEmail)

@@ -59,6 +59,7 @@ import _20260526130010idprequireverifiedemail from './2026-05-26-130010-idp-requ
 import _20260526130020emailverificationratelimit from './2026-05-26-130020-email-verification-rate-limit.js'
 import _20260526130030captchaprotectflows from './2026-05-26-130030-captcha-protect-flows.js'
 import _20260526140000idpsession from './2026-05-26-140000-idp-session.js'
+import _20260608100000idpassumeemailverified from './2026-06-08-100000-idp-assume-email-verified.js'
 import snapshot from './snapshot.js'
 import { computeTokenHash, Providers } from '../model/index.js'
 import { Logger } from '@contember/logger'
@@ -141,6 +142,7 @@ const migrations = {
 	'2026-05-26-130020-email-verification-rate-limit': _20260526130020emailverificationratelimit,
 	'2026-05-26-130030-captcha-protect-flows': _20260526130030captchaprotectflows,
 	'2026-05-26-140000-idp-session': _20260526140000idpsession,
+	'2026-06-08-100000-idp-assume-email-verified': _20260608100000idpassumeemailverified,
 }
 
 export class TenantMigrationsRunner {

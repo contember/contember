@@ -25,6 +25,7 @@ export class UpdateIDPMutationResolver implements MutationResolvers {
 				exclusive: args.options?.exclusive ?? undefined,
 				initReturnsConfig: args.options?.initReturnsConfig ?? undefined,
 				requireVerifiedEmail: args.options?.requireVerifiedEmail ?? undefined,
+				assumeEmailVerified: args.options?.assumeEmailVerified ?? undefined,
 			},
 		}, args.mergeConfiguration ?? false)
 		if (!result.ok) {

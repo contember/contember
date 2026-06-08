@@ -18,6 +18,27 @@ export const OIDCRevalidationConfig = Typesafe.intersection(
 
 export type OIDCRevalidationConfig = ReturnType<typeof OIDCRevalidationConfig>
 
+/**
+ * Maps provider claims onto the normalized {@link IDPResponse} fields. Each value is a claim
+ * name, dot-path supported (e.g. `address.region`). Lets a provider whose claims don't follow
+ * the OIDC defaults still be consumed without a per-provider code change.
+ */
+export const OIDCClaimMapping = Typesafe.partial({
+	/** Claim used as the stable external identifier (the IdP subject). Default `sub`. */
+	externalIdentifier: Typesafe.string,
+	/** Claim used as the e-mail address. Default `email`. */
+	email: Typesafe.string,
+	/** Claim used as the display name. Default `name`. */
+	name: Typesafe.string,
+	/**
+	 * Key of a nested object whose properties are lifted to the top level before mapping.
+	 * Some providers (notably Apereo CAS userinfo) nest the actual claims under `attributes`.
+	 */
+	attributesKey: Typesafe.string,
+})
+
+export type OIDCClaimMapping = ReturnType<typeof OIDCClaimMapping>
+
 export const OIDCConfigurationOptions = Typesafe.partial({
 	responseType: Typesafe.enumeration<ResponseType>('code', 'code id_token', 'code id_token token', 'code token', 'id_token', 'id_token token', 'none'),
 	claims: Typesafe.string, // deprecated, use scope instead
@@ -42,6 +63,7 @@ export const OIDCConfigurationOptions = Typesafe.partial({
 	returnOIDCResult: Typesafe.boolean,
 	timeout: Typesafe.number,
 	revalidation: OIDCRevalidationConfig,
+	claimMapping: OIDCClaimMapping,
 })
 export const BaseOIDCConfiguration = Typesafe.intersection(
 	Typesafe.object({

@@ -29,9 +29,12 @@ export class OIDCProvider implements IdentityProviderHandler<OIDCConfiguration> 
 		return await handleOIDCResponse(
 			client,
 			responseData,
-			configuration.fetchUserInfo,
-			configuration.returnOIDCResult,
-			configuration.revalidation?.enabled === true,
+			{
+				fetchUserInfo: configuration.fetchUserInfo,
+				returnOIDCResult: configuration.returnOIDCResult,
+				captureSession: configuration.revalidation?.enabled === true,
+				claimMapping: configuration.claimMapping,
+			},
 		)
 	}
 

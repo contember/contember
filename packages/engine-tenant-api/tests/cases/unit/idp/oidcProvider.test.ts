@@ -20,4 +20,12 @@ describe('OIDCProvider.validateConfiguration', () => {
 		expect(() => provider.validateConfiguration({ ...baseConfig, tokenEndpointAuthMethod: 'magic' }))
 			.toThrow(InvalidIDPConfigurationError)
 	})
+
+	test('accepts a claimMapping with attributesKey and dot-path subject', () => {
+		const config = provider.validateConfiguration({
+			...baseConfig,
+			claimMapping: { externalIdentifier: 'oid', email: 'email', attributesKey: 'attributes' },
+		})
+		expect(config.claimMapping).toEqual({ externalIdentifier: 'oid', email: 'email', attributesKey: 'attributes' })
+	})
 })

@@ -172,7 +172,9 @@ class IDPSignInManager {
 		}
 
 		if (!provider.exclusive) {
-			const personByEmail = claim.email ? await db.queryHandler.fetch(PersonQuery.byEmail(claim.email)) : null
+			const personByEmail = typeof claim.email === 'string' && claim.email
+				? await db.queryHandler.fetch(PersonQuery.byEmail(claim.email))
+				: null
 			if (personByEmail) {
 				// Auto-linking an IdP identity to a pre-existing local account by
 				// e-mail is takeover-grade: if the provider returns an unverified

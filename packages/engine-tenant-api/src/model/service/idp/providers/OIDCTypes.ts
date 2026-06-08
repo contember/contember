@@ -24,7 +24,12 @@ export type OIDCRevalidationConfig = ReturnType<typeof OIDCRevalidationConfig>
  * the OIDC defaults still be consumed without a per-provider code change.
  */
 export const OIDCClaimMapping = Typesafe.partial({
-	/** Claim used as the stable external identifier (the IdP subject). Default `sub`. */
+	/**
+	 * Claim used as the stable external identifier (the IdP subject). Default `sub`.
+	 * Must resolve to a scalar (string/number) — a non-scalar claim is rejected at sign-in.
+	 * Mapping this to a claim that only appears in userInfo / `attributes` takes the federation
+	 * key off the signature-verified ID-token subject; prefer a signed claim where possible.
+	 */
 	externalIdentifier: Typesafe.string,
 	/** Claim used as the e-mail address. Default `email`. */
 	email: Typesafe.string,

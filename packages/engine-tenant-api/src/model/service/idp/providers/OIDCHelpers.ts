@@ -82,12 +82,15 @@ export const handleOIDCResponse = async (
 		// Merge ID-token claims with userInfo (userInfo wins, per spec). Then optionally lift a
 		// nested attributes object to the top level so providers that nest their claims (notably
 		// Apereo CAS userinfo, which returns them under `attributes`) map without a code change.
+		// The nested attributes are UNSIGNED, so they must not override a claim already present in
+		// the (signature-verified) ID-token / userInfo merge — spread them UNDER `source`, not over
+		// it, so a signed `sub` / `email_verified` keeps precedence over an attributes-level value.
 		let source: Record<string, unknown> = { ...claimsWithoutHashes, ...userInfo }
 		const attributesKey = claimMapping?.attributesKey
 		if (attributesKey) {
 			const nested = source[attributesKey]
 			if (nested && typeof nested === 'object' && !Array.isArray(nested)) {
-				source = { ...source, ...(nested as Record<string, unknown>) }
+				source = { ...(nested as Record<string, unknown>), ...source }
 			}
 		}
 
@@ -96,8 +99,28 @@ export const handleOIDCResponse = async (
 		const rawEmailVerified = source.email_verified
 		const emailVerified = rawEmailVerified === true || rawEmailVerified === 'true'
 
+		// `externalIdentifier` is the federation key persisted in `person_identity_provider` and
+		// matched on the next sign-in, so it must be a stable scalar. A `claimMapping` that pointed
+		// it at an object/array would otherwise be coerced by `String(...)` to `'[object Object]'` /
+		// a comma-join — collapsing every user of the provider onto one key (account takeover). Fail
+		// closed instead. The default `sub` path is safe (openid-client guarantees `sub` is a string).
 		const mappedSubject = getClaim(source, claimMapping?.externalIdentifier ?? 'sub')
-		const externalIdentifier = mappedSubject !== undefined && mappedSubject !== null ? String(mappedSubject) : claims.sub
+		let externalIdentifier: string
+		if (mappedSubject === undefined || mappedSubject === null) {
+			externalIdentifier = claims.sub
+		} else if (typeof mappedSubject === 'string' || typeof mappedSubject === 'number') {
+			externalIdentifier = String(mappedSubject)
+		} else {
+			throw new IDPValidationError(`The mapped externalIdentifier claim is not a scalar value`)
+		}
+		if (externalIdentifier === '') {
+			throw new IDPValidationError(`The mapped externalIdentifier claim resolved to an empty value`)
+		}
+
+		// `email` / `name` are typed `string | undefined` on IDPResponse and feed the by-e-mail
+		// account lookup (which crashes on a non-string). `...source` already placed the raw claim
+		// of whatever type, so OVERWRITE (don't conditionally add) with the mapped value when it is
+		// a string, otherwise `undefined` — a non-string claim must not leak through `...source`.
 		const email = getClaim(source, claimMapping?.email ?? 'email')
 		const name = getClaim(source, claimMapping?.name ?? 'name')
 
@@ -105,8 +128,8 @@ export const handleOIDCResponse = async (
 			...oidcResult,
 			...source,
 			externalIdentifier,
-			...(typeof email === 'string' ? { email } : {}),
-			...(typeof name === 'string' ? { name } : {}),
+			email: typeof email === 'string' ? email : undefined,
+			name: typeof name === 'string' ? name : undefined,
 			emailVerified,
 			...(idpSession ? { idpSession } : {}),
 		}

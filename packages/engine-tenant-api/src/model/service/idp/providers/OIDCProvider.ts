@@ -67,6 +67,7 @@ export class OIDCProvider implements IdentityProviderHandler<OIDCConfiguration> 
 				client_secret: configuration.clientSecret,
 				response_types: [configuration.responseType || 'code'],
 				id_token_signed_response_alg: configuration.idTokenSignedResponseAlg ?? 'RS256',
+				...(configuration.tokenEndpointAuthMethod ? { token_endpoint_auth_method: configuration.tokenEndpointAuthMethod } : {}),
 			},
 			undefined,
 			{

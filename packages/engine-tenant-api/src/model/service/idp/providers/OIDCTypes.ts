@@ -1,5 +1,5 @@
 import * as Typesafe from '@contember/typesafe'
-import { ResponseType } from 'openid-client'
+import { ClientAuthMethod, ResponseType } from 'openid-client'
 import { IDPRevalidationConfig } from '../IDPRevalidation.js'
 
 export interface OIDCSessionData {
@@ -24,6 +24,20 @@ export const OIDCConfigurationOptions = Typesafe.partial({
 	scope: Typesafe.string,
 	additionalAuthorizedParties: Typesafe.array(Typesafe.string),
 	idTokenSignedResponseAlg: Typesafe.string,
+	/**
+	 * How the client authenticates to the token endpoint. `openid-client` defaults to
+	 * `client_secret_basic`; set `client_secret_post` for providers (e.g. some Apereo CAS
+	 * registrations) that only accept the secret in the request body.
+	 */
+	tokenEndpointAuthMethod: Typesafe.enumeration<ClientAuthMethod>(
+		'client_secret_basic',
+		'client_secret_post',
+		'client_secret_jwt',
+		'private_key_jwt',
+		'tls_client_auth',
+		'self_signed_tls_client_auth',
+		'none',
+	),
 	fetchUserInfo: Typesafe.boolean,
 	returnOIDCResult: Typesafe.boolean,
 	timeout: Typesafe.number,

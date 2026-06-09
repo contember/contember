@@ -55,10 +55,14 @@ test('owner predicate with isNull', async () => {
         }`,
 		executes: [
 			{
-				sql: SQL`select "root_"."id" as "root_id"  from "public"."item" as "root_" 
-    left join  "public"."resource" as "root_resource" on  "root_"."resource_id" = "root_resource"."id" 
-    left join  "public"."person" as "root_resource_owner" on  "root_resource"."owner_id" = "root_resource_owner"."id"  
-	where "root_resource"."id" is null and "root_resource_owner"."person_id" = ? and "root_resource_owner"."person_id" = ?`,
+				// `{ resource: { id: { isNull: true } } }` means "no READABLE resource", so it lowers to
+				// `not (a present readable resource exists)` — i.e. not(resource present AND its read predicate).
+				// A present-but-unreadable resource therefore looks absent (no existence leak). The trailing
+				// `person_id = ?` is the Item root read predicate. See #895 / Semantic-2 absence.
+				sql: SQL`select "root_"."id" as "root_id"  from "public"."item" as "root_"
+    left join  "public"."resource" as "root_resource" on  "root_"."resource_id" = "root_resource"."id"
+    left join  "public"."person" as "root_resource_owner" on  "root_resource"."owner_id" = "root_resource_owner"."id"
+	where not(not("root_resource"."id" is null) and "root_resource_owner"."person_id" = ?) and "root_resource_owner"."person_id" = ?`,
 				response: {
 					rows: [],
 				},

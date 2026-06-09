@@ -1,0 +1,122 @@
+---
+title: Cloud API
+---
+
+Contember Cloud exposes a public REST API for managing your organizations, project groups,
+projects and credentials programmatically — everything you can do in the Cloud console, you can
+script.
+
+The API lives under `/api/v2` on the Cloud host (`https://selfcare.eu.contember.cloud`).
+
+:::tip[Interactive reference]
+The API is described by OpenAPI and the spec is always in sync with the running server:
+
+- **Swagger UI:** [https://selfcare.eu.contember.cloud/api/v2/docs](https://selfcare.eu.contember.cloud/api/v2/docs)
+- **OpenAPI document:** [https://selfcare.eu.contember.cloud/api/v2/openapi.json](https://selfcare.eu.contember.cloud/api/v2/openapi.json)
+
+Use the OpenAPI document to generate a typed client in your language of choice.
+:::
+
+## Authentication
+
+Every request is authenticated with a bearer token:
+
+```
+Authorization: Bearer <token>
+```
+
+Two kinds of token are accepted:
+
+- **Organization API key** (`ctk_…`) — a long-lived, organization-scoped credential carrying a
+  single [organization role](/cloud/permissions). This is what you use for automation.
+- **OAuth2 access token** — a user access token from the Cloud's OAuth/OIDC provider.
+
+### Creating an API key
+
+API keys are created from the Cloud console under **Organization → API keys**, or via the API.
+
+:::note
+Creating, listing and revoking API keys requires **user** authentication (an OAuth access token or
+the console) — an API key cannot mint or manage other API keys. Bootstrap your first key in the
+console, then use it for everything else.
+
+A key may only be granted a role you are allowed to grant: owners can grant any role, admins
+cannot grant a role higher than their own.
+:::
+
+```bash
+curl -X POST https://selfcare.eu.contember.cloud/api/v2/organizations/my-org/api-keys \
+  -H "Authorization: Bearer <oauth-access-token>" \
+  -H "Content-Type: application/json" \
+  -d '{ "name": "ci", "role": "org:developer" }'
+```
+
+```json
+{
+  "apiKey": { "id": "…", "name": "ci", "role": "org:developer", "prefix": "ctk_xxxxxx", "…": "…" },
+  "secret": "ctk_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+}
+```
+
+The `secret` is returned **only once**, at creation time — store it securely. Only its `prefix`
+is retained afterwards.
+
+## Resource hierarchy
+
+Resources are fully nested under their parent. Each path segment accepts either the resource's **id**
+or its **slug** (slugs are unique within their parent):
+
+```
+/api/v2/organizations/{org}
+                      /project-groups/{projectGroup}
+                                     /projects/{project}
+                                              /engine-api-keys
+```
+
+Errors are returned as [RFC 9457](https://www.rfc-editor.org/rfc/rfc9457) `application/problem+json`
+with a truthful HTTP status and a stable, machine-readable `code`.
+
+## Endpoints
+
+| Method & path | Body | Result |
+|---|---|---|
+| `POST /organizations/{org}/api-keys` | `{ name, role, expiresAt? }` | `201` — key + one-time `secret` |
+| `GET /organizations/{org}/api-keys` | — | `200` — active keys |
+| `DELETE /organizations/{org}/api-keys/{apiKey}` | — | `204` |
+| `POST /organizations/{org}/project-groups` | `{ projectGroupSlug, region?, tariff?, engineVersion?, adminVersion?, adminEmail?, databaseCluster? }` | `201` — project group |
+| `POST /organizations/{org}/project-groups/{projectGroup}/projects` | `{ projectSlug, projectName?, projectStudioId? }` | `201` — project |
+| `POST /…/projects/{project}/engine-api-keys` | `{ type }` | `201` — engine API key |
+
+`role` is one of `org:owner`, `org:billing`, `org:admin`, `org:developer`, `org:guest`.
+
+`type` (engine API key) is one of `deployer`, `project_admin`, `login` — these map to
+[Contember Engine roles](/reference/engine/tenant/api-keys), not Cloud roles.
+
+:::note
+When creating a project group with an API key (no acting user), `adminEmail` is **required** —
+there is no user email to fall back to.
+:::
+
+## End-to-end example
+
+Provision a project group, a project, and a deploy token for the Engine — all with one API key:
+
+```bash
+ORG=my-org
+KEY="Bearer ctk_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+
+# 1. Create a project group
+curl -X POST https://selfcare.eu.contember.cloud/api/v2/organizations/$ORG/project-groups \
+  -H "Authorization: $KEY" -H "Content-Type: application/json" \
+  -d '{ "projectGroupSlug": "my-pg", "adminEmail": "me@example.com" }'
+
+# 2. Create a project inside it
+curl -X POST https://selfcare.eu.contember.cloud/api/v2/organizations/$ORG/project-groups/my-pg/projects \
+  -H "Authorization: $KEY" -H "Content-Type: application/json" \
+  -d '{ "projectSlug": "blog", "projectName": "Blog" }'
+
+# 3. Issue an Engine API key (e.g. for deployment)
+curl -X POST https://selfcare.eu.contember.cloud/api/v2/organizations/$ORG/project-groups/my-pg/projects/blog/engine-api-keys \
+  -H "Authorization: $KEY" -H "Content-Type: application/json" \
+  -d '{ "type": "deployer" }'
+```

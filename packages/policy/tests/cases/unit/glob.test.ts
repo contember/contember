@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test'
-import { globMatch, globToRegExp } from '../../../src/index.js'
+import { globMatch } from '../../../src/index.js'
 
 describe('glob matching', () => {
 	test('exact match', () => {
@@ -54,45 +54,45 @@ describe('glob matching', () => {
 	})
 })
 
-describe('glob cache LRU', () => {
-	test('cache reuses compiled regex for same pattern', () => {
-		const a = globToRegExp('reuse-pattern:*')
-		const b = globToRegExp('reuse-pattern:*')
-		expect(a).toBe(b)
-	})
-
-	test('cache stays usable after exceeding the limit', () => {
-		// Push enough distinct patterns to far exceed CACHE_LIMIT (1024) and
-		// verify the cache still produces correct results — no crashes, no stale
-		// regexes. The exact eviction order is internal.
-		for (let i = 0; i < 1100; i++) {
-			expect(globMatch(`unique-pattern-${i}:*`, `unique-pattern-${i}:thing`)).toBe(true)
-		}
-		// Re-using an early pattern: it may or may not still be cached, but the
-		// behavior must be correct either way.
-		expect(globMatch('unique-pattern-0:*', 'unique-pattern-0:other')).toBe(true)
-		expect(globMatch('unique-pattern-0:*', 'mismatch')).toBe(false)
-	})
-})
-
-describe('glob consecutive-star collapse (catastrophic backtracking guard)', () => {
-	test('collapses runs of * into a single .*', () => {
-		// Each * must NOT emit its own `.*` (which produces `^.*.*.*a$` and
-		// backtracks exponentially on long non-matching input).
-		expect(globToRegExp('***a').source).toBe('^.*a$')
-		expect(globToRegExp('a***b').source).toBe('^a.*b$')
-		expect(globToRegExp('****').source).toBe('^.*$')
-	})
-
-	test('still matches correctly after collapse', () => {
+describe('glob * and ? combined', () => {
+	test('runs of mixed wildcards match correctly', () => {
 		expect(globMatch('***a', 'xyza')).toBe(true)
 		expect(globMatch('a***b', 'a-anything-b')).toBe(true)
 		expect(globMatch('a***b', 'a-anything')).toBe(false)
+		// `*?` means "at least one char"
+		expect(globMatch('*?', '')).toBe(false)
+		expect(globMatch('*?', 'a')).toBe(true)
+		expect(globMatch('*?*', 'a')).toBe(true)
+		expect(globMatch('a*?b', 'ab')).toBe(false)
+		expect(globMatch('a*?b', 'axb')).toBe(true)
+		expect(globMatch('a*?b', 'axyzb')).toBe(true)
 	})
 
-	test('many stars against long non-matching input resolves promptly', () => {
+	test('* matches newlines (any character)', () => {
+		expect(globMatch('a*b', 'a\nb')).toBe(true)
+		expect(globMatch('a?b', 'a\nb')).toBe(true)
+	})
+})
+
+describe('glob ReDoS resistance (no catastrophic backtracking)', () => {
+	// The matcher is linear (two-pointer, no regex), so adversarial patterns
+	// that made the old regex implementation backtrack exponentially must now
+	// resolve promptly. Each of these would hang a `RegExp`-based matcher.
+	test('long run of stars against long non-matching input resolves promptly', () => {
 		const start = Date.now()
 		expect(globMatch('*'.repeat(30) + 'x', 'y'.repeat(64))).toBe(false)
+		expect(Date.now() - start).toBeLessThan(100)
+	})
+
+	test('* and ? interleaved (`*?*?…`) resolves promptly', () => {
+		const start = Date.now()
+		expect(globMatch('*?'.repeat(40) + 'x', 'y'.repeat(200))).toBe(false)
+		expect(Date.now() - start).toBeLessThan(100)
+	})
+
+	test('stars separated by literals (`a*a*a*…`) resolves promptly', () => {
+		const start = Date.now()
+		expect(globMatch('a*'.repeat(40) + 'z', 'a'.repeat(200))).toBe(false)
 		expect(Date.now() - start).toBeLessThan(100)
 	})
 })

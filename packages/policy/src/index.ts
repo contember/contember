@@ -1,6 +1,6 @@
 export * from './types.js'
 export * from './engine.js'
-export { globMatch, globMatchAny, globToRegExp } from './glob.js'
+export { globMatch, globMatchAny } from './glob.js'
 export { hasUnresolvedPlaceholder, readPath, substituteString, substituteValue } from './context.js'
 export type { ConditionOperator, ConditionResult } from './conditions.js'
 export { defaultOperators, evaluateConditions, UnknownConditionOperatorError } from './conditions.js'

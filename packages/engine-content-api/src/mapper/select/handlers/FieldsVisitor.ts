@@ -235,8 +235,7 @@ export class FieldsVisitor implements Model.RelationByTypeVisitor<void>, Model.C
 	}
 
 	private getRequiredPredicate(entity: Model.Entity, field: Model.AnyField): Acl.Predicate | undefined {
-		const isRoot = this.relationPath.length === 0
-		const fieldPredicate = this.predicateFactory.getFieldPredicate(entity, Acl.Operation.read, field.name, isRoot)
+		const fieldPredicate = this.predicateFactory.getFieldReadPredicate(entity, field.name, this.relationPath)
 		return fieldPredicate.isSameAsPrimary ? undefined : fieldPredicate.predicate
 	}
 }

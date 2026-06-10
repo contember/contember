@@ -53,29 +53,19 @@ export class PredicatesInjector {
 			&& relationContext !== undefined
 			&& this.findBackReferencedAncestor(ancestorPath, relationContext.relation.name, relationContext.entity.name) !== undefined
 
+		// The back-referenced ancestor only guarantees the row-level (primary) predicate,
+		// so only that part can be simplified away. Cell-level predicates of the fields
+		// being filtered on must still be enforced, otherwise filtering on a field with
+		// a stricter read predicate would leak its value through row presence.
+		const effectiveFieldNames = shouldSimplify
+			? (fieldNames ?? []).filter(it => this.predicateFactory.shouldApplyCellLevelPredicate(entity, Acl.Operation.read, it, isQueryRoot))
+			: fieldNames
+
 		let predicatesWhere: Input.OptionalWhere
-		if (shouldSimplify) {
-			// The back-referenced ancestor only guarantees the row-level (primary) predicate,
-			// so only that part can be simplified away. Cell-level predicates of the fields
-			// being filtered on must still be enforced, otherwise filtering on a field with
-			// a stricter read predicate would leak its value through row presence.
-			const cellLevelFields = (fieldNames ?? []).filter(it =>
-				this.predicateFactory.shouldApplyCellLevelPredicate(entity, Acl.Operation.read, it, isQueryRoot)
-			)
-			if (cellLevelFields.length === 0) {
-				predicatesWhere = { [entity.primary]: { always: true } }
-			} else {
-				const rawPredicate = this.predicateFactory.create(entity, Acl.Operation.read, cellLevelFields, relationContext, isQueryRoot)
-				predicatesWhere = this.injectPredicatesToPredicate(
-					rawPredicate,
-					entity,
-					isBackReferenceContext ?? false,
-					ancestorPath ?? [],
-					isQueryRoot,
-				)
-			}
+		if (shouldSimplify && effectiveFieldNames?.length === 0) {
+			predicatesWhere = { [entity.primary]: { always: true } }
 		} else {
-			const rawPredicate = this.predicateFactory.create(entity, Acl.Operation.read, fieldNames, relationContext, isQueryRoot)
+			const rawPredicate = this.predicateFactory.create(entity, Acl.Operation.read, effectiveFieldNames, relationContext, isQueryRoot)
 			// Process the predicate to inject nested entity predicates
 			predicatesWhere = this.injectPredicatesToPredicate(
 				rawPredicate,

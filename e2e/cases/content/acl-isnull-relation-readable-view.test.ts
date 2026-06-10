@@ -177,6 +177,56 @@ namespace M2M {
 		visibility = def.stringColumn()
 	}
 }
+namespace OneHasOneInverse {
+	export const reader = acl.createRole('reader')
+	export const v = acl.createEntityVariable('company', 'Company', reader)
+
+	@acl.allow(reader, { read: true, when: { id: v } })
+	export class Company {
+		name = def.stringColumn()
+		parents = def.oneHasMany(Parent, 'company')
+	}
+
+	@acl.allow(reader, { read: true, when: { company: { id: v } } })
+	export class Parent {
+		name = def.stringColumn()
+		company = def.manyHasOne(Company, 'parents').notNull()
+		// inverse side: the FK lives on Child, so this exercises the join-on-target lowering path
+		child = def.oneHasOneInverse(Child, 'parent')
+	}
+
+	@acl.allow(reader, { read: true, when: { visibility: { eq: 'public' } } })
+	export class Child {
+		label = def.stringColumn()
+		visibility = def.stringColumn()
+		parent = def.oneHasOne(Parent, 'child').notNull()
+	}
+}
+namespace ManyHasManyInverse {
+	export const reader = acl.createRole('reader')
+	export const v = acl.createEntityVariable('company', 'Company', reader)
+
+	@acl.allow(reader, { read: true, when: { id: v } })
+	export class Company {
+		name = def.stringColumn()
+		parents = def.oneHasMany(Parent, 'company')
+	}
+
+	@acl.allow(reader, { read: true, when: { company: { id: v } } })
+	export class Parent {
+		name = def.stringColumn()
+		company = def.manyHasOne(Company, 'parents').notNull()
+		// inverse side: the junction is owned by Child, exercising the 'inverse' junction direction
+		child = def.manyHasManyInverse(Child, 'parents')
+	}
+
+	@acl.allow(reader, { read: true, when: { visibility: { eq: 'public' } } })
+	export class Child {
+		label = def.stringColumn()
+		visibility = def.stringColumn()
+		parents = def.manyHasMany(Parent, 'child')
+	}
+}
 
 test('MATRIX: to-one self-contained', async () => {
 	await runMatrix({
@@ -194,6 +244,13 @@ test('MATRIX: to-one self-contained', async () => {
 			).expect(200)
 			await t(
 				gql`mutation ($c: UUID!) { createParent(data: { name: "unreadable", company: { connect: { id: $c } }, child: { create: { label: "x", visibility: "private" } } }) { ok } }`,
+				{ variables: { c: company } },
+			).expect(200)
+			// COR-1: a PRESENT child whose read-predicate column is NULL (visibility unset) — the predicate is
+			// SQL-UNKNOWN, so the child is unreadable and must look absent. The NOT EXISTS lowering handles this;
+			// the old to-one `not(<present> AND <pred>)` form left such a parent matching neither isNull:true nor false.
+			await t(
+				gql`mutation ($c: UUID!) { createParent(data: { name: "nullpred", company: { connect: { id: $c } }, child: { create: { label: "x" } } }) { ok } }`,
 				{ variables: { c: company } },
 			).expect(200)
 			return { company }
@@ -289,4 +346,39 @@ test('MATRIX: manyHasMany self-contained', async () => {
 			return { company }
 		},
 	})
+})
+
+// Standard {absent, readable, unreadable} setup shared by the relation kinds whose Child has {label, visibility}.
+const stdVisibilitySetup = async (t: any) => {
+	const company = await mkCompany(t, 'Co')
+	await t(gql`mutation ($c: UUID!) { createParent(data: { name: "absent", company: { connect: { id: $c } } }) { ok } }`, {
+		variables: { c: company },
+	}).expect(200)
+	await t(
+		gql`mutation ($c: UUID!) { createParent(data: { name: "readable", company: { connect: { id: $c } }, child: { create: { label: "x", visibility: "public" } } }) { ok } }`,
+		{ variables: { c: company } },
+	).expect(200)
+	await t(
+		gql`mutation ($c: UUID!) { createParent(data: { name: "unreadable", company: { connect: { id: $c } }, child: { create: { label: "x", visibility: "private" } } }) { ok } }`,
+		{ variables: { c: company } },
+	).expect(200)
+	return { company }
+}
+// Force the EXISTS-in-has-many lowering (v1.3+ preset default); the legacy join mode is the createSchema default.
+const withExistsMode = (schema: any) => ({
+	...schema,
+	settings: { ...schema.settings, content: { ...schema.settings?.content, useExistsInHasManyFilter: true } },
+})
+
+test('MATRIX: oneHasOne inverse', async () => {
+	await runMatrix({ label: 'oneHasOne/inverse', relField: 'child', schema: createSchema(OneHasOneInverse), setup: stdVisibilitySetup })
+})
+test('MATRIX: manyHasMany inverse', async () => {
+	await runMatrix({ label: 'm2m/inverse', relField: 'child', schema: createSchema(ManyHasManyInverse), setup: stdVisibilitySetup })
+})
+test('MATRIX: oneHasMany self (useExistsInHasManyFilter=true)', async () => {
+	await runMatrix({ label: 'oneHasMany/self/exists', relField: 'child', schema: withExistsMode(createSchema(ManySelf)), setup: stdVisibilitySetup })
+})
+test('MATRIX: manyHasMany self (useExistsInHasManyFilter=true)', async () => {
+	await runMatrix({ label: 'm2m/self/exists', relField: 'child', schema: withExistsMode(createSchema(M2M)), setup: stdVisibilitySetup })
 })

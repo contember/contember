@@ -1798,6 +1798,80 @@ describe('predicates injector - root vs through (noRoot) relation target permiss
 	})
 })
 
+// SECURITY (SEC-1 x SEC-3 intersection): a self-referencing entity whose cell-level status DIVERGES between
+// the root and the through (`all`) permission sets, reached through a back-reference. `secret` is readable at
+// the query root only via `editor` (when isEditor), while `label`/`parent`/`children` are also readable THROUGH
+// a relation via `viewer` (when isViewer). So the row-level (primary) predicate is `isEditor` under root but
+// `isEditor OR isViewer` under `all` — which makes `secret` NOT cell-level under root, but cell-level under
+// `all`. When the back-reference simplification decides which field predicates to keep, it must consult the
+// SAME context the predicate is then built from (`all`, since a back-reference is through-access). If it used
+// the root-only context it would conclude `secret` is not cell-level, drop it, and leak the value of `secret`
+// for rows readable only via `viewer` through the back-reference filter.
+namespace BackRefThroughModel {
+	export const editorRole = acl.createRole('editor')
+	export const viewerRole = acl.createRole('viewer')
+
+	@acl.allow(editorRole, {
+		when: { isEditor: { eq: true } },
+		read: ['secret', 'label', 'parent', 'children'],
+	})
+	@acl.allow(viewerRole, {
+		through: true,
+		when: { isViewer: { eq: true } },
+		read: ['label', 'parent', 'children'],
+	})
+	export class Node {
+		secret = def.stringColumn()
+		label = def.stringColumn()
+		isEditor = def.boolColumn()
+		isViewer = def.boolColumn()
+		parent = def.manyHasOne(Node, 'children')
+		children = def.oneHasMany(Node, 'parent')
+	}
+}
+
+describe('predicates injector - SECURITY: cell-level decision uses the through context on a back-reference', () => {
+	const schema = createSchema(BackRefThroughModel)
+	const contextual = new PermissionFactory().createContextual(schema, ['editor', 'viewer'])
+
+	const injector = new PredicatesInjector(
+		schema.model,
+		new PredicateFactory(contextual.root, schema.model, new VariableInjector(schema.model, {}), contextual.all),
+	)
+
+	it('keeps the through-context cell-level predicate of `secret` on a root-query back-reference', () => {
+		// listNode(filter: { children: { parent: { secret: { eq: 'X' } } } }) — `parent` is a back-reference to
+		// Node, reached through `children`, so it is through-access and `secret` is cell-level under `all`.
+		const injected = injector.inject(schema.model.entities.Node, {
+			children: { parent: { secret: { eq: 'X' } } },
+		})
+
+		// `secret`'s read predicate (isEditor) must survive the back-reference simplification. Were the cell-level
+		// decision made against the root set, `secret` would look row-level there, be dropped, and the filter
+		// would leak `secret` for viewer-only-readable rows.
+		assert.deepStrictEqual(injected, {
+			and: [
+				{
+					children: {
+						and: [
+							{
+								parent: {
+									and: [
+										{ secret: { eq: 'X' } },
+										{ isEditor: { eq: true } },
+									],
+								},
+							},
+							{ or: [{ isEditor: { eq: true } }, { isViewer: { eq: true } }] },
+						],
+					},
+				},
+				{ isEditor: { eq: true } },
+			],
+		})
+	})
+})
+
 describe('predicate injector input handling', () => {
 	const schema = createSchema(DeepFilterModel)
 	const permissions = new AllowAllPermissionFactory().create(schema.model)

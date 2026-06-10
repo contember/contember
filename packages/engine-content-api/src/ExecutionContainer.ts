@@ -159,7 +159,10 @@ export class ExecutionContainerFactory {
 					whereOptimized,
 					(schema.settings.content?.useExistsInHasManyFilter ?? schema.settings.useExistsInHasManyFilter) === true,
 				))
-			.addService('orderByBuilder', ({ joinBuilder, schema }) => new OrderByBuilder(schema.model, joinBuilder))
+			.addService(
+				'orderByBuilder',
+				({ joinBuilder, predicateFactory, whereBuilder, schema }) => new OrderByBuilder(schema.model, joinBuilder, predicateFactory, whereBuilder),
+			)
 			.addService(
 				'relationFetcher',
 				({ whereBuilder, orderByBuilder, predicatesInjector, pathFactory }) =>

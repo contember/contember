@@ -55,7 +55,18 @@ export class PredicatesInjector {
 
 		let predicatesWhere: Input.OptionalWhere
 		if (shouldSimplify) {
-			predicatesWhere = { [entity.primary]: { always: true } }
+			// The back-referenced ancestor only guarantees the row-level (primary) predicate,
+			// so only that part can be simplified away. Cell-level predicates of the fields
+			// being filtered on must still be enforced, otherwise filtering on a field with
+			// a stricter read predicate would leak its value through row presence.
+			const cellLevelFields = (fieldNames ?? []).filter(it =>
+				this.predicateFactory.shouldApplyCellLevelPredicate(entity, Acl.Operation.read, it, isQueryRoot)
+			)
+			if (cellLevelFields.length === 0) {
+				predicatesWhere = { [entity.primary]: { always: true } }
+			} else {
+				predicatesWhere = this.predicateFactory.create(entity, Acl.Operation.read, cellLevelFields, relationContext, isQueryRoot)
+			}
 		} else {
 			predicatesWhere = this.predicateFactory.create(entity, Acl.Operation.read, fieldNames, relationContext, isQueryRoot)
 		}

@@ -50,7 +50,9 @@ export async function assertWithinGrantableSurface(
 	const seen = new Set<string>()
 	for (const document of documents) {
 		for (const cell of findUngrantableCells(surface, document)) {
-			const key = `${cell.action} ${cell.resource}`
+			// JSON-encode the pair for an unambiguous key (mirrors `findUngrantableCells`);
+			// this dedup only de-duplicates the reported violations, but keep it consistent.
+			const key = JSON.stringify([cell.action, cell.resource])
 			if (!seen.has(key)) {
 				seen.add(key)
 				violations.push(cell)

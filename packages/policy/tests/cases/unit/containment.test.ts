@@ -271,6 +271,18 @@ describe('findUngrantableCells — soundness corner cases', () => {
 			{ action: 'tenant:idp.add', resource: '*' },
 		])
 	})
+
+	test('dedup key does not conflate distinct cells with the same flat concatenation', () => {
+		// `{ab,c}` and `{a,bc}` both flatten to "abc"; a flat-join dedup key would
+		// record the first (grantable) cell and then skip the second as "already
+		// seen", letting the ungrantable `{a,bc}` escape the boundary. The
+		// JSON-encoded key keeps the two distinct, so the violation is reported
+		// regardless of statement order.
+		const s = computeGrantableSurface([allow(['ab'], ['c'])])
+		expect(findUngrantableCells(s, doc(allow(['ab'], ['c']), allow(['a'], ['bc'])))).toEqual([
+			{ action: 'a', resource: 'bc' },
+		])
+	})
 })
 
 describe('isCellGrantable', () => {

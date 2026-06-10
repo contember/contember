@@ -60,6 +60,8 @@ describe('translateAction — denylist (subject.targetRoles) actions', () => {
 		'person.changeProfile': PermissionActions.PERSON_CHANGE_PROFILE,
 		'person.changePassword': PermissionActions.PERSON_CHANGE_PASSWORD,
 		'person.createSessionToken': PermissionActions.PERSON_CREATE_SESSION_KEY,
+		'person.forceSignOut': PermissionActions.PERSON_FORCE_SIGN_OUT,
+		'person.viewSessions': PermissionActions.PERSON_VIEW_SESSIONS,
 	}
 
 	for (const [key, factory] of Object.entries(actions)) {

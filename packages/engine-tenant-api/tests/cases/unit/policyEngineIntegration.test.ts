@@ -99,20 +99,34 @@ describe('built-in policies', () => {
 		}
 	})
 
-	test('project_admin can disable normal people, not super_admin', async () => {
-		const pa = BUILTIN_POLICIES.find(p => p.slug === 'builtin:project_admin')!
-		const sources = [{ name: 'pa', statements: [...pa.document.statements] }]
-		expect(
-			await decision(sources, TenantActions.personDisable, 'person:abc', {
-				subject: { targetRoles: ['person'] },
-			}),
-		).toBe('allow')
-		expect(
-			await decision(sources, TenantActions.personDisable, 'person:abc', {
-				subject: { targetRoles: ['super_admin'] },
-			}),
-		).toBe('deny')
-	})
+	// Every action in the project_admin denylist deny-guard must be allowed
+	// against an ordinary target but denied against a super_admin / project_creator
+	// target. Pinning all six (not just one) guards against silently dropping an
+	// action from the deny statement — e.g. losing `forceSignOut`/`viewSessions`
+	// would let a project_admin force-sign-out or read a super_admin's sessions.
+	const denylistGuardedActions = [
+		TenantActions.personCreateSessionToken,
+		TenantActions.personDisable,
+		TenantActions.personChangeProfile,
+		TenantActions.personChangePassword,
+		TenantActions.personForceSignOut,
+		TenantActions.personViewSessions,
+	]
+	for (const action of denylistGuardedActions) {
+		test(`project_admin may ${action} an ordinary target but not a protected one`, async () => {
+			const pa = BUILTIN_POLICIES.find(p => p.slug === 'builtin:project_admin')!
+			const sources = [{ name: 'pa', statements: [...pa.document.statements] }]
+			expect(
+				await decision(sources, action, 'person:abc', { subject: { targetRoles: ['person'] } }),
+			).toBe('allow')
+			expect(
+				await decision(sources, action, 'person:abc', { subject: { targetRoles: ['super_admin'] } }),
+			).toBe('deny')
+			expect(
+				await decision(sources, action, 'person:abc', { subject: { targetRoles: ['project_creator'] } }),
+			).toBe('deny')
+		})
+	}
 
 	test('project_admin can manage IdP', async () => {
 		const pa = BUILTIN_POLICIES.find(p => p.slug === 'builtin:project_admin')!

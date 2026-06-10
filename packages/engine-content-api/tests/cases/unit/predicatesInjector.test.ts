@@ -1257,6 +1257,75 @@ describe('predicates injector - many-to-many relations', () => {
 	})
 })
 
+// A relation target whose root and through (noRoot) permissions diverge: role `editor` can read Secret at
+// the query root only for visible rows, while role `viewer` can read any Secret THROUGH a relation. The
+// `all` (through-inclusive) set is the union (readable unconditionally). When Secret is reached through a
+// relation, its predicate must come from `all`, not from the restrictive root set — otherwise a row the
+// viewer role is allowed to read through the relation is wrongly filtered out (fail-closed over-restriction).
+namespace MixedRootThroughModel {
+	export const editorRole = acl.createRole('editor')
+	export const viewerRole = acl.createRole('viewer')
+
+	@acl.allow([editorRole, viewerRole], {
+		read: ['name', 'secret'],
+	})
+	export class Document {
+		name = def.stringColumn()
+		secret = def.manyHasOne(Secret, 'documents')
+	}
+
+	@acl.allow(editorRole, {
+		when: { isVisible: { eq: true } },
+		read: ['label', 'isVisible', 'documents'],
+	})
+	@acl.allow(viewerRole, {
+		through: true,
+		read: ['label', 'isVisible', 'documents'],
+	})
+	export class Secret {
+		label = def.stringColumn()
+		isVisible = def.boolColumn()
+		documents = def.oneHasMany(Document, 'secret')
+	}
+}
+
+describe('predicates injector - root vs through (noRoot) relation target permissions', () => {
+	const schema = createSchema(MixedRootThroughModel)
+	const contextual = new PermissionFactory().createContextual(schema, ['editor', 'viewer'])
+
+	const injector = new PredicatesInjector(
+		schema.model,
+		new PredicateFactory(contextual.root, schema.model, new VariableInjector(schema.model, {}), contextual.all),
+	)
+
+	it('resolves a nested relation target predicate against the `all` permission set', () => {
+		const injected = injector.inject(schema.model.entities.Document, {
+			secret: { label: { eq: 'x' } },
+		})
+
+		// Secret is reached through Document.secret, so the through (viewer) permission applies: any row is
+		// readable, no predicate. Before the fix the nested target consulted the root set and the editor's
+		// `isVisible` predicate was wrongly ANDed in, hiding rows the viewer role may read through the relation.
+		assert.deepStrictEqual(injected, {
+			secret: { label: { eq: 'x' } },
+		})
+	})
+
+	it('still resolves a query-root entity against the root permission set (unchanged)', () => {
+		const injected = injector.inject(schema.model.entities.Secret, {
+			label: { eq: 'x' },
+		})
+
+		// As a root entry point only the editor's root permission applies, so the `isVisible` predicate is enforced.
+		assert.deepStrictEqual(injected, {
+			and: [
+				{ label: { eq: 'x' } },
+				{ isVisible: { eq: true } },
+			],
+		})
+	})
+})
+
 describe('predicate injector input handling', () => {
 	const schema = createSchema(DeepFilterModel)
 	const permissions = new AllowAllPermissionFactory().create(schema.model)

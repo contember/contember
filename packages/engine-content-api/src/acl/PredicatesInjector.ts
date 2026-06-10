@@ -13,7 +13,7 @@ export class PredicatesInjector {
 	): Input.OptionalWhere {
 		const isQueryRoot = !relationContext && (!ancestorPath || ancestorPath.length === 0)
 		const restrictedWhere = this.injectToWhere(where, entity, true, relationContext, false, ancestorPath ?? [], isQueryRoot)
-		return this.createWhere(entity, undefined, restrictedWhere, relationContext, false, ancestorPath ?? [], isQueryRoot)
+		return this.createWhere(entity, undefined, restrictedWhere, true, relationContext, false, ancestorPath ?? [], isQueryRoot)
 	}
 
 	/**
@@ -38,6 +38,7 @@ export class PredicatesInjector {
 		entity: Model.Entity,
 		fieldNames: string[] | undefined,
 		where: Input.OptionalWhere,
+		isRoot: boolean,
 		relationContext?: Model.AnyRelationContext,
 		isBackReferenceContext?: boolean,
 		ancestorPath?: readonly Model.AnyRelationContext[],
@@ -53,18 +54,24 @@ export class PredicatesInjector {
 			&& relationContext !== undefined
 			&& this.findBackReferencedAncestor(ancestorPath, relationContext.relation.name, relationContext.entity.name) !== undefined
 
+		// An entity is treated as a query root (consulting root-only permissions) only when it is both the
+		// root of this injection and `isQueryRoot`. A nested relation target is reached THROUGH a relation,
+		// so it must consult the `all` permission set (`isRoot = false`), otherwise a through-only target
+		// resolves to its restrictive root predicate (e.g. `{ primary: never }`) and the relation cannot be
+		// filtered/read at all. `isQueryRoot === undefined` (callers not tracking it) is preserved as-is.
+		const effectiveIsRoot = isRoot ? isQueryRoot : false
+
 		let predicatesWhere: Input.OptionalWhere
 		if (shouldSimplify) {
 			predicatesWhere = { [entity.primary]: { always: true } }
 		} else {
-			const rawPredicate = this.predicateFactory.create(entity, Acl.Operation.read, fieldNames, relationContext, isQueryRoot)
+			const rawPredicate = this.predicateFactory.create(entity, Acl.Operation.read, fieldNames, relationContext, effectiveIsRoot)
 			// Process the predicate to inject nested entity predicates
 			predicatesWhere = this.injectPredicatesToPredicate(
 				rawPredicate,
 				entity,
 				isBackReferenceContext ?? false,
 				ancestorPath ?? [],
-				isQueryRoot,
 			)
 		}
 
@@ -88,22 +95,21 @@ export class PredicatesInjector {
 		entity: Model.Entity,
 		isBackReferenceContext: boolean,
 		ancestorPath: readonly Model.AnyRelationContext[],
-		isQueryRoot?: boolean,
 	): Input.OptionalWhere {
 		const resultWhere: Writable<Input.OptionalWhere> = {}
 
 		if (where.and) {
 			resultWhere.and = where.and
 				.filter((it): it is Input.Where => !!it)
-				.map(it => this.injectPredicatesToPredicate(it, entity, isBackReferenceContext, ancestorPath, isQueryRoot))
+				.map(it => this.injectPredicatesToPredicate(it, entity, isBackReferenceContext, ancestorPath))
 		}
 		if (where.or) {
 			resultWhere.or = where.or
 				.filter((it): it is Input.Where => !!it)
-				.map(it => this.injectPredicatesToPredicate(it, entity, isBackReferenceContext, ancestorPath, isQueryRoot))
+				.map(it => this.injectPredicatesToPredicate(it, entity, isBackReferenceContext, ancestorPath))
 		}
 		if (where.not) {
-			resultWhere.not = this.injectPredicatesToPredicate(where.not, entity, isBackReferenceContext, ancestorPath, isQueryRoot)
+			resultWhere.not = this.injectPredicatesToPredicate(where.not, entity, isBackReferenceContext, ancestorPath)
 		}
 
 		const fields = Object.keys(where).filter(it => !['and', 'or', 'not'].includes(it))
@@ -132,17 +138,17 @@ export class PredicatesInjector {
 						context.targetEntity,
 						nestedIsBackReferenceContext,
 						nestedAncestorPath,
-						isQueryRoot,
 					)
 
 					// Check if we should simplify the target entity's predicate
 					const shouldSimplifyNested = nestedIsBackReferenceContext
 						&& this.findBackReferencedAncestor(nestedAncestorPath, context.relation.name, context.entity.name) !== undefined
 
-					// Get target entity's predicate (simplified if back-reference)
+					// Get target entity's predicate (simplified if back-reference). A relation target reached from
+					// within a predicate is always through-access, so it consults the `all` permission set (isRoot=false).
 					const targetPredicate = shouldSimplifyNested
 						? { [context.targetEntity.primary]: { always: true } }
-						: this.predicateFactory.create(context.targetEntity, Acl.Operation.read, undefined, context, isQueryRoot)
+						: this.predicateFactory.create(context.targetEntity, Acl.Operation.read, undefined, context, false)
 
 					// Optimization: avoid duplicate { id: always } when both are simplified
 					const primaryKey = context.targetEntity.primary
@@ -224,6 +230,6 @@ export class PredicatesInjector {
 			? fields
 			: fields.filter(it => this.predicateFactory.shouldApplyCellLevelPredicate(entity, Acl.Operation.read, it, isQueryRoot))
 
-		return this.createWhere(entity, fieldsForPredicate, resultWhere, relationContext, isBackReferenceContext, ancestorPath, isQueryRoot)
+		return this.createWhere(entity, fieldsForPredicate, resultWhere, isRoot, relationContext, isBackReferenceContext, ancestorPath, isQueryRoot)
 	}
 }

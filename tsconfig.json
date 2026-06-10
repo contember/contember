@@ -108,6 +108,9 @@
 			"path": "./packages/playground"
 		},
 		{
+			"path": "./packages/policy"
+		},
+		{
 			"path": "./packages/queryable"
 		},
 		{

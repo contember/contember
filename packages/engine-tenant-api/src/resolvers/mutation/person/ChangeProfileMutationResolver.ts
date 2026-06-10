@@ -12,7 +12,6 @@ import { TenantResolverContext } from '../../TenantResolverContext.js'
 import {
 	ConfigurationQuery,
 	EmailChangeManager,
-	IdentityScope,
 	PermissionActions,
 	PermissionContextFactory,
 	PersonManager,
@@ -43,7 +42,6 @@ export class ChangeProfileMutationResolver implements Pick<MutationResolvers, 'c
 		}
 
 		await context.requireAccess({
-			scope: new IdentityScope(person.identity_id),
 			action: PermissionActions.PERSON_CHANGE_PROFILE(person.roles),
 			message: 'You are not allowed to change a profile',
 		})

@@ -15,6 +15,7 @@
 		{ "path": "../../engine-content-api/src" },
 		{ "path": "../../graphql-utils/src" },
 		{ "path": "../../logger/src" },
+		{ "path": "../../policy/src" },
 		{ "path": "../../schema/src" },
 		{ "path": "../../schema-migrations/src" },
 		{ "path": "../../schema-utils/src" },

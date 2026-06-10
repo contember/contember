@@ -1,8 +1,6 @@
-import { AccessEvaluator, Authorizator } from '@contember/authorization'
 import { Connection, DatabaseConfig } from '@contember/database'
 import { Builder } from '@contember/dic'
 import {
-	AclSchemaAccessNodeFactory,
 	ApiKeyManager,
 	ApiKeyService,
 	AppleProvider,
@@ -17,7 +15,6 @@ import {
 	EmailVerificationManager,
 	FacebookProvider,
 	HCaptchaProvider,
-	Identity,
 	IdentityFactory,
 	IDPHandlerRegistry,
 	IDPManager,
@@ -32,14 +29,13 @@ import {
 	PasswordChangeManager,
 	PasswordResetManager,
 	PermissionContextFactory,
-	PermissionsFactory,
 	PersonAccessManager,
 	PersonManager,
+	PolicyService,
 	ProjectInitializer,
 	ProjectManager,
 	ProjectMemberManager,
 	ProjectSchemaResolver,
-	ProjectScopeFactory,
 	Providers,
 	RateLimiter,
 	RecaptchaV3Provider,
@@ -55,10 +51,14 @@ import { HibpChecker, HttpHibpChecker, NoopHibpChecker } from './model/service/H
 import {
 	AddIDPMutationResolver,
 	AddProjectMemberMutationResolver,
+	AssignPolicyMutationResolver,
+	BuiltinPolicyQueryResolver,
 	ChangePasswordMutationResolver,
 	ChangeProfileMutationResolver,
 	CreateApiKeyMutationResolver,
+	CreatePolicyMutationResolver,
 	CreateProjectMutationResolver,
+	DeletePolicyMutationResolver,
 	DisableApiKeyMutationResolver,
 	DisableIDPMutationResolver,
 	EmailOtpMutationResolver,
@@ -72,6 +72,7 @@ import {
 	MeQueryResolver,
 	OtpMutationResolver,
 	PersonQueryResolver,
+	PolicyQueryResolver,
 	ProjectMembersQueryResolver,
 	ProjectQueryResolver,
 	ProjectTypeResolver,
@@ -79,11 +80,13 @@ import {
 	RemoveProjectMemberMutationResolver,
 	ResetPasswordMutationResolver,
 	ResolverFactory,
+	RevokePolicyMutationResolver,
 	SetProjectSecretMutationResolver,
 	SignInMutationResolver,
 	SignOutMutationResolver,
 	SignUpMutationResolver,
 	TenantResolverContextFactory,
+	UpdatePolicyMutationResolver,
 	UpdateProjectMemberMutationResolver,
 	UpdateProjectMutationResolver,
 } from './resolvers/index.js'
@@ -118,7 +121,6 @@ export interface TenantContainer {
 	projectManager: ProjectManager
 	resolvers: Schema.Resolvers
 	resolverContextFactory: TenantResolverContextFactory
-	authorizator: Authorizator<Identity>
 	identityFetcher: IdentityFetcher
 	databaseContext: DatabaseContext
 	readDatabaseContext: DatabaseContext
@@ -152,7 +154,6 @@ export class TenantContainerFactory {
 				'projectManager',
 				'signUpManager',
 				'resolvers',
-				'authorizator',
 				'resolverContextFactory',
 				'identityFetcher',
 				'databaseContext',
@@ -168,9 +169,17 @@ export class TenantContainerFactory {
 			.addService('providers', () => ({ ...this.providers, ...args.cryptoProviders }))
 			.addService('mailer', () => createMailer(args.mailOptions))
 			.addService('projectSchemaResolver', () => args.projectSchemaResolver)
+			.addService('connection', () => args.connection)
+			.addService('readConnection', () => args.readConnection)
+			.addService(
+				'databaseContext',
+				({ connection, providers }) => new DatabaseContext(connection.createClient('tenant', { module: 'tenant' }), providers),
+			)
+			.addService(
+				'readDatabaseContext',
+				({ readConnection, providers }) => new DatabaseContext(readConnection.createClient('tenant', { module: 'tenant' }), providers),
+			)
 			.addService('templateRenderer', () => new TemplateRenderer())
-			.addService('accessEvaluator', ({}) => new AccessEvaluator.PermissionEvaluator(new PermissionsFactory().create()))
-			.addService('authorizator', ({ accessEvaluator }) => new Authorizator.Default(accessEvaluator))
 			.addService('userMailer', ({ mailer, templateRenderer }) => new UserMailer(mailer, templateRenderer))
 			.addService('apiKeyService', () => new ApiKeyService())
 			.addService('authPolicyResolver', () => new AuthPolicyResolver())
@@ -211,11 +220,10 @@ export class TenantContainerFactory {
 			.addService('passwordChangeManager', ({ providers, passwordStrengthValidator }) => new PasswordChangeManager(providers, passwordStrengthValidator))
 			.addService('projectMemberManager', () => new ProjectMemberManager())
 			.addService('identityFactory', ({ projectMemberManager }) => new IdentityFactory(projectMemberManager))
-			.addService('projectScopeFactory', () => new ProjectScopeFactory(new AclSchemaAccessNodeFactory()))
 			.addService(
 				'permissionContextFactory',
-				({ authorizator, identityFactory, projectScopeFactory, projectSchemaResolver }) =>
-					new PermissionContextFactory(authorizator, identityFactory, projectScopeFactory, projectSchemaResolver),
+				({ identityFactory, projectSchemaResolver, databaseContext }) =>
+					new PermissionContextFactory(identityFactory, projectSchemaResolver, databaseContext),
 			)
 			.addService('secretManager', ({ providers }) => new SecretsManager(providers))
 			.addService('projectManager', ({ secretManager, apiKeyService }) => new ProjectManager(secretManager, args.projectInitializer, apiKeyService))
@@ -249,6 +257,7 @@ export class TenantContainerFactory {
 			.addService('membershipValidator', ({ projectSchemaResolver }) => new MembershipValidator(projectSchemaResolver))
 			.addService('inviteManager', ({ providers, userMailer, projectSchemaResolver }) => new InviteManager(providers, userMailer, projectSchemaResolver))
 			.addService('mailTemplateManager', () => new MailTemplateManager())
+			.addService('policyService', () => new PolicyService())
 			.addService('rolesManager', () => new RolesManager())
 			.addService('configurationManager', () => new ConfigurationManager())
 			.addService(
@@ -258,8 +267,8 @@ export class TenantContainerFactory {
 			)
 			.addService(
 				'identityTypeResolver',
-				({ projectMemberManager, projectManager, permissionContextFactory }) =>
-					new IdentityTypeResolver(projectMemberManager, projectManager, permissionContextFactory),
+				({ projectMemberManager, projectManager, permissionContextFactory, policyService }) =>
+					new IdentityTypeResolver(projectMemberManager, projectManager, permissionContextFactory, policyService),
 			)
 			.addService(
 				'projectTypeResolver',
@@ -278,6 +287,8 @@ export class TenantContainerFactory {
 				({ projectManager, projectMemberManager }) => new ProjectMembersQueryResolver(projectManager, projectMemberManager),
 			)
 			.addService('mailTemplateQueryResolver', () => new MailTemplateQueryResolver())
+			.addService('policyQueryResolver', ({ policyService }) => new PolicyQueryResolver(policyService))
+			.addService('builtinPolicyQueryResolver', () => new BuiltinPolicyQueryResolver())
 			.addService(
 				'signUpMutationResolver',
 				({ signUpManager, apiKeyManager, captchaValidator, rateLimiter, emailVerificationManager, permissionContextFactory }) =>
@@ -389,21 +400,16 @@ export class TenantContainerFactory {
 				'togglePasswordlessMutationResolver',
 				({ configurationManager, personManager }) => new TogglePasswordlessMutationResolver(configurationManager, personManager),
 			)
+			.addService('createPolicyMutationResolver', ({ policyService }) => new CreatePolicyMutationResolver(policyService))
+			.addService('updatePolicyMutationResolver', ({ policyService }) => new UpdatePolicyMutationResolver(policyService))
+			.addService('deletePolicyMutationResolver', ({ policyService }) => new DeletePolicyMutationResolver(policyService))
+			.addService('assignPolicyMutationResolver', ({ policyService }) => new AssignPolicyMutationResolver(policyService))
+			.addService('revokePolicyMutationResolver', ({ policyService }) => new RevokePolicyMutationResolver(policyService))
 			.addService(
 				'resolverContextFactory',
 				({ permissionContextFactory, authLogService }) => new TenantResolverContextFactory(permissionContextFactory, authLogService),
 			)
 			.addService('resolvers', container => new ResolverFactory(container).create())
-			.addService('connection', () => args.connection)
-			.addService('readConnection', () => args.readConnection)
-			.addService(
-				'databaseContext',
-				({ connection, providers }) => new DatabaseContext(connection.createClient('tenant', { module: 'tenant' }), providers),
-			)
-			.addService(
-				'readDatabaseContext',
-				({ readConnection, providers }) => new DatabaseContext(readConnection.createClient('tenant', { module: 'tenant' }), providers),
-			)
 			.addService('identityFetcher', ({ databaseContext }) => new IdentityFetcher(databaseContext.client))
 			.addService('migrationsRunner', ({ providers }) => new TenantMigrationsRunner(args.dbCredentials, 'tenant', args.tenantCredentials, providers))
 	}

@@ -171,4 +171,43 @@ describe('membership resolver', () => {
 			variables: [{ name: 'lang', condition: { eq: 'cs' } }],
 		}])
 	})
+
+	it('should reject an assumed membership the invoker is not allowed to assume (403)', async () => {
+		// The invoker holds `viewer`, whose schema only permits assuming `editor`.
+		// Assuming `admin` is a well-formed, existing role (so membership resolution
+		// succeeds) but is outside the assumeMembership rule, so `verifyAssumedRoles`
+		// must reject with 403. This pins the escalation guard at the wiring level:
+		// if the gate were ever no-op'd, this test fails.
+		const membershipResolver = new ProjectMembershipResolver(
+			false,
+			createMock<ProjectMembershipFetcher>({
+				fetchMemberships(): Promise<readonly Acl.Membership[]> {
+					return Promise.resolve([{ role: 'viewer', variables: [] }])
+				},
+			}),
+		)
+		const promise = membershipResolver.resolveMemberships({
+			request: {
+				body: {},
+				get: () => JSON.stringify({ memberships: [{ role: 'admin', variables: [] }] }),
+			},
+			projectSlug: 'test',
+			identity: {
+				identityId: 'd4141336-6512-41ef-a25a-374de35a2806',
+				roles: [],
+			},
+			acl: {
+				roles: {
+					viewer: {
+						variables: {},
+						entities: {},
+						content: { assumeMembership: { editor: { variables: true } } },
+					},
+					editor: { variables: {}, entities: {} },
+					admin: { variables: {}, entities: {} },
+				},
+			},
+		})
+		await expect(promise).rejects.toMatchObject({ code: 403 })
+	})
 })

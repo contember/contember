@@ -19,7 +19,7 @@ export class AddProjectMemberMutationResolver implements MutationResolvers {
 	): Promise<AddProjectMemberResponse> {
 		const project = await this.projectManager.getProjectBySlug(context.db, projectSlug)
 		await context.requireAccess({
-			scope: await context.permissionContext.createProjectScope(project),
+			project,
 			action: PermissionActions.PROJECT_ADD_MEMBER(memberships),
 			message: 'You are not allowed to add a project member',
 		})

@@ -1,4 +1,5 @@
-import { MembershipMatcher } from '@contember/engine-tenant-api'
+import { ASSUME_MEMBERSHIP_ACTION, AssumeMembershipPolicySource, buildMembershipSubject } from '@contember/engine-tenant-api'
+import { PolicyEngine } from '@contember/policy'
 import * as Typesafe from '@contember/typesafe'
 import { Acl } from '@contember/schema'
 import { HttpErrorResponse } from '../common/index.js'
@@ -59,7 +60,7 @@ export class ProjectMembershipResolver {
 						+ parsedMemberships.errors.map(it => JSON.stringify(it)).join('\n'),
 				)
 			}
-			this.verifyAssumedRoles(explicitMemberships, acl, assumedMemberships)
+			await this.verifyAssumedRoles(explicitMemberships, acl, projectSlug, assumedMemberships)
 
 			return { effective: parsedMemberships.memberships, fetched: explicitMemberships }
 		}
@@ -97,14 +98,24 @@ export class ProjectMembershipResolver {
 		return value !== '' ? JSON.parse(value) : null
 	}
 
-	private verifyAssumedRoles(explicitMemberships: readonly Acl.Membership[], acl: Acl.Schema, assumedMemberships: readonly Acl.Membership[]) {
-		const membershipMatcher = new MembershipMatcher(explicitMemberships.map(it => ({
-			...it,
-			matchRule: acl.roles[it.role].content?.assumeMembership ?? {},
-		})))
-
+	private async verifyAssumedRoles(
+		explicitMemberships: readonly Acl.Membership[],
+		acl: Acl.Schema,
+		projectSlug: string,
+		assumedMemberships: readonly Acl.Membership[],
+	): Promise<void> {
+		const source = new AssumeMembershipPolicySource(
+			{ slug: projectSlug, acl },
+			explicitMemberships,
+		)
+		const engine = new PolicyEngine([source])
 		for (const assumed of assumedMemberships) {
-			if (!membershipMatcher.matches(assumed)) {
+			const allowed = await engine.isAllowed(
+				ASSUME_MEMBERSHIP_ACTION,
+				`project:${projectSlug}`,
+				{ subject: { membership: buildMembershipSubject(assumed) } },
+			)
+			if (!allowed) {
 				throw new HttpErrorResponse(403, `You are not allow to assume membership ${JSON.stringify(assumed)}`)
 			}
 		}

@@ -17,7 +17,7 @@ export class StaticIdentity implements Identity {
 	) {}
 
 	getProjectMemberships(projectSlug: string): Promise<readonly Acl.Membership[]> {
-		return Promise.resolve(this.projectMemberships[projectSlug] || {})
+		return Promise.resolve(this.projectMemberships[projectSlug] || [])
 	}
 }
 

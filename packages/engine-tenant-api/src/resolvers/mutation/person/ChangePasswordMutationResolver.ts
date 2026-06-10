@@ -7,7 +7,7 @@ import {
 } from '../../../schema/index.js'
 import { GraphQLResolveInfo } from 'graphql'
 import { TenantResolverContext } from '../../TenantResolverContext.js'
-import { IdentityScope, PasswordChangeManager, PermissionActions, PersonQuery } from '../../../model/index.js'
+import { PasswordChangeManager, PermissionActions, PersonQuery } from '../../../model/index.js'
 import { createErrorResponse } from '../../errorUtils.js'
 
 export class ChangePasswordMutationResolver implements MutationResolvers {
@@ -27,7 +27,6 @@ export class ChangePasswordMutationResolver implements MutationResolvers {
 		}
 
 		await context.requireAccess({
-			scope: new IdentityScope(person.identity_id),
 			action: PermissionActions.PERSON_CHANGE_PASSWORD(person.roles),
 			message: 'You are not allowed to change password',
 		})

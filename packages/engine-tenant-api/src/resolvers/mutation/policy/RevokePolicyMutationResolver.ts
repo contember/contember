@@ -1,0 +1,35 @@
+import { MutationResolvers, MutationRevokePolicyArgs, RevokePolicyResponse } from '../../../schema/index.js'
+import { TenantResolverContext } from '../../TenantResolverContext.js'
+import { PermissionActions, PolicyBoundaryError, PolicyService } from '../../../model/index.js'
+import { createErrorResponse } from '../../errorUtils.js'
+
+export class RevokePolicyMutationResolver implements MutationResolvers {
+	constructor(private readonly policyService: PolicyService) {}
+
+	async revokePolicy(
+		_: unknown,
+		{ identityId, policySlug }: MutationRevokePolicyArgs,
+		context: TenantResolverContext,
+	): Promise<RevokePolicyResponse> {
+		await context.requireAccess({
+			action: PermissionActions.POLICY_REVOKE,
+			message: 'You are not allowed to revoke a policy',
+		})
+		const policy = await this.policyService.getBySlug(context.db, policySlug)
+		if (!policy) {
+			return createErrorResponse('POLICY_NOT_FOUND', `Policy ${policySlug} not found`)
+		}
+		try {
+			const { revoked } = await this.policyService.revoke(context.db, context.identity, identityId, policySlug)
+			if (!revoked) {
+				return createErrorResponse('NOT_ASSIGNED', `Policy ${policySlug} is not assigned to identity ${identityId}`)
+			}
+			return { ok: true }
+		} catch (e) {
+			if (e instanceof PolicyBoundaryError) {
+				return createErrorResponse('EXCEEDS_PERMISSIONS', e.message)
+			}
+			throw e
+		}
+	}
+}

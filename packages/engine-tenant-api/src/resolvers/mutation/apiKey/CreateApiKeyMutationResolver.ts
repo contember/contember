@@ -29,7 +29,7 @@ export class CreateApiKeyMutationResolver implements MutationResolvers {
 	): Promise<CreateApiKeyResponse> {
 		const project = await this.projectManager.getProjectBySlug(context.db, projectSlug)
 		await context.requireAccess({
-			scope: await context.permissionContext.createProjectScope(project),
+			project,
 			action: PermissionActions.API_KEY_CREATE,
 			message: 'You are not allowed to create an API key for this project',
 		})

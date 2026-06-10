@@ -18,7 +18,11 @@ Identity, authentication, and project management API.
 
 ## Authorization
 
-Tenant-level roles: `LOGIN`, `PERSON`, `SUPER_ADMIN`, `PROJECT_CREATOR`, `PROJECT_ADMIN`, `ENTRYPOINT_DEPLOYER`, `PROJECT_MEMBER`, `SELF`. Permission actions defined in `PermissionActions.ts`.
+Tenant-level roles: `LOGIN`, `PERSON`, `SUPER_ADMIN`, `PROJECT_CREATOR`, `PROJECT_ADMIN`, `ENTRYPOINT_DEPLOYER`, `PROJECT_MEMBER`, `SELF`. Legacy permission actions in `PermissionActions.ts` are translated (`actionMapping.ts`) and evaluated through the `@contember/policy` engine in `PermissionContext`.
+
+Policy sources combine: built-in policies per role (`model/policy/builtinPolicies.ts`), custom policies stored in `tenant_policy` and assigned via `identity_policy` (`PolicyService` + `TenantDbPolicyProvider`, tags baked per assignment), and project-schema membership rules.
+
+**Grant boundary** (`model/policy/grantBoundary.ts`): policy CRUD is bounded by the actor's *own* grantable surface, so a delegated manager can never grant — or lift a deny on — anything beyond its own permissions. The rule (one check for create/update/assign/delete/revoke): every `(action, resource)` cell of every statement of the touched policy must be within the actor's surface, regardless of effect. Invariant: *you may only touch a policy you could author from scratch yourself.* The surface and containment math live in `@contember/policy` (`computeGrantableSurface`, `findUngrantableCells`); violations surface as the `EXCEEDS_PERMISSIONS` error code. Note: the actor's surface is its *global, unconditional* allows minus deny-guarded cells — conditional/membership-derived powers are intentionally excluded (delegate those via project schema).
 
 ## Architecture
 
@@ -35,7 +39,7 @@ CQRS pattern with Command/Query separation via `CommandBus` and `DatabaseQuery`.
 
 ## Database
 
-Core tables: `identity`, `person`, `api_key`, `person_token`, `project`, `project_membership`, `project_membership_variable`, `project_secret`, `identity_provider`, `person_identity_provider`, `mail_template`, `person_auth_log`, `config`
+Core tables: `identity`, `person`, `api_key`, `person_token`, `project`, `project_membership`, `project_membership_variable`, `project_secret`, `identity_provider`, `person_identity_provider`, `mail_template`, `person_auth_log`, `config`, `tenant_policy`, `identity_policy`
 
 ## GraphQL schema (generated)
 

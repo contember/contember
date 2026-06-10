@@ -26,9 +26,8 @@ export class UpdateProjectMemberMutationResolver implements MutationResolvers {
 		context: TenantResolverContext,
 	): Promise<UpdateProjectMemberResponse> {
 		const project = await this.projectManager.getProjectBySlug(context.db, projectSlug)
-		const projectScope = await context.permissionContext.createProjectScope(project)
 		await context.requireAccess({
-			scope: projectScope,
+			project,
 			action: PermissionActions.PROJECT_UPDATE_MEMBER([]),
 			message: 'You are not allowed to update project member variables',
 		})
@@ -39,7 +38,7 @@ export class UpdateProjectMemberMutationResolver implements MutationResolvers {
 			context.db,
 			{ id: project.id },
 			{ id: identityId },
-			context.permissionContext.createAccessVerifier(projectScope),
+			context.permissionContext.createAccessVerifier(project),
 		)
 		const membershipPatch = createMembershipModification(visibleMemberships, memberships)
 
@@ -52,7 +51,7 @@ export class UpdateProjectMemberMutationResolver implements MutationResolvers {
 		}))
 
 		await context.requireAccess({
-			scope: projectScope,
+			project,
 			action: PermissionActions.PROJECT_UPDATE_MEMBER(aclMemberships),
 			message: 'You are not allowed to update project member variables',
 		})

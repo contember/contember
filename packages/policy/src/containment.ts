@@ -1,0 +1,213 @@
+import { Policy, Statement } from './types.js'
+import { hasUnresolvedPlaceholder } from './context.js'
+
+/**
+ * One `(action, resource)` pair — the atomic unit of permission. A statement
+ * expands into the cartesian product of its `actions` × `resources`.
+ */
+export interface Cell {
+	readonly action: string
+	readonly resource: string
+}
+
+/**
+ * The set of `(action, resource)` cells an identity may hand to others, derived
+ * from its own effective statements. `allow` cells are what it can grant;
+ * `deny` cells are subtracted (a cell is grantable only if no deny overlaps it).
+ *
+ * See {@link computeGrantableSurface} for how conditions are treated.
+ */
+export interface GrantableSurface {
+	readonly allow: readonly Cell[]
+	readonly deny: readonly Cell[]
+}
+
+const PLACEHOLDER_RE = /\$\{[a-zA-Z0-9_.]+\}/g
+
+/**
+ * Replace every `${path}` placeholder with `*` — the maximal set of strings the
+ * pattern could expand to once a (caller-controlled) context value is filled in.
+ * Used on the GRANT side and on the DENY side of a surface, where over-approximating
+ * is the safe direction. Never use it to widen an ALLOW surface (that would be
+ * unsound — see {@link computeGrantableSurface}).
+ */
+export function maxExpand(pattern: string): string {
+	return pattern.replace(PLACEHOLDER_RE, '*')
+}
+
+/**
+ * Does glob `broad` match every string that glob `narrow` matches? I.e. is the
+ * language of `narrow` a subset of the language of `broad`?
+ *
+ * Globs use `*` (any run of chars) and `?` (exactly one char), matching the
+ * engine's matcher. Decided by DP over the two patterns:
+ *   - `*` in `broad` absorbs any run of `narrow` (incl. `narrow`'s own wildcards)
+ *   - `?` in `broad` covers exactly one char, so it can match a literal or `?`
+ *     in `narrow`, but NOT a `*` (which may stand for zero or many chars)
+ *   - a literal in `broad` must meet the same literal in `narrow`; it can never
+ *     be covered by `*`/`?` on the `narrow` side
+ *
+ * Examples: `globSubsumes('*', 'a.b') === true`,
+ * `globSubsumes('tenant:*', 'tenant:project.*') === true`,
+ * `globSubsumes('tenant:project.create', 'tenant:project.*') === false`.
+ */
+export function globSubsumes(broad: string, narrow: string): boolean {
+	const memo = new Map<number, boolean>()
+	const stride = narrow.length + 1
+	const rec = (i: number, j: number): boolean => {
+		const key = i * stride + j
+		const cached = memo.get(key)
+		if (cached !== undefined) {
+			return cached
+		}
+		let res: boolean
+		if (i === broad.length) {
+			// `broad` exhausted: it now matches only the empty string, so it
+			// subsumes `narrow` only when `narrow` is also exhausted.
+			res = j === narrow.length
+		} else if (broad[i] === '*') {
+			res = rec(i + 1, j) || (j < narrow.length && rec(i, j + 1))
+		} else if (broad[i] === '?') {
+			res = j < narrow.length && narrow[j] !== '*' && rec(i + 1, j + 1)
+		} else {
+			res = j < narrow.length && narrow[j] !== '*' && narrow[j] !== '?' && broad[i] === narrow[j] && rec(i + 1, j + 1)
+		}
+		memo.set(key, res)
+		return res
+	}
+	return rec(0, 0)
+}
+
+/**
+ * Do globs `a` and `b` share at least one common matching string? Used for the
+ * deny side of a surface: a grant cell is rejected if any deny cell *could*
+ * overlap it, even partially. DP symmetric in the two patterns.
+ *
+ * Examples: `globIntersects('a*', '*b') === true`,
+ * `globIntersects('tenant:idp.*', 'tenant:project.*') === false`,
+ * `globIntersects('tenant:identity.*', 'tenant:identity.addGlobalRoles') === true`.
+ */
+export function globIntersects(a: string, b: string): boolean {
+	const memo = new Map<number, boolean>()
+	const stride = b.length + 1
+	const rec = (i: number, j: number): boolean => {
+		const key = i * stride + j
+		const cached = memo.get(key)
+		if (cached !== undefined) {
+			return cached
+		}
+		let res: boolean
+		if (i === a.length && j === b.length) {
+			res = true
+		} else if (i < a.length && a[i] === '*') {
+			res = rec(i + 1, j) || (j < b.length && rec(i, j + 1))
+		} else if (j < b.length && b[j] === '*') {
+			res = rec(i, j + 1) || (i < a.length && rec(i + 1, j))
+		} else if (i < a.length && j < b.length) {
+			res = (a[i] === '?' || b[j] === '?' || a[i] === b[j]) && rec(i + 1, j + 1)
+		} else {
+			res = false
+		}
+		memo.set(key, res)
+		return res
+	}
+	return rec(0, 0)
+}
+
+const cellsOf = (stmt: Statement): Cell[] => {
+	const resources = stmt.resources && stmt.resources.length > 0 ? stmt.resources : ['*']
+	const cells: Cell[] = []
+	for (const action of stmt.actions) {
+		for (const resource of resources) {
+			cells.push({ action, resource })
+		}
+	}
+	return cells
+}
+
+/**
+ * Reduce an identity's effective statements to the cells it may delegate.
+ *
+ * Soundness rules (all conservative — they may grant *less* than theoretically
+ * possible, never more):
+ *   - **Conditional `allow`s are dropped.** A free-standing grant carries no
+ *     context, so we cannot prove it stays within a context-bound allow. Ignoring
+ *     them only shrinks the surface. (Membership-scoped delegation is expressed
+ *     in the project schema, not here.)
+ *   - **`allow` cells with an unresolved `${...}` are dropped** — we can't bound
+ *     what they expand to, and widening them to `*` would be unsound.
+ *   - **All `deny`s subtract, regardless of condition**, with `${...}` widened to
+ *     `*`. Over-subtracting is the safe direction: an action sitting under any
+ *     deny guard simply isn't delegable.
+ */
+export function computeGrantableSurface(statements: readonly Statement[]): GrantableSurface {
+	const allow: Cell[] = []
+	const deny: Cell[] = []
+	for (const stmt of statements) {
+		if (stmt.effect === 'allow') {
+			if (stmt.conditions && Object.keys(stmt.conditions).length > 0) {
+				continue
+			}
+			for (const cell of cellsOf(stmt)) {
+				if (hasUnresolvedPlaceholder(cell.action) || hasUnresolvedPlaceholder(cell.resource)) {
+					continue
+				}
+				allow.push(cell)
+			}
+		} else {
+			for (const cell of cellsOf(stmt)) {
+				deny.push({ action: maxExpand(cell.action), resource: maxExpand(cell.resource) })
+			}
+		}
+	}
+	return { allow, deny }
+}
+
+/**
+ * Is `cell` fully within `surface`? It must be subsumed by at least one allow
+ * cell (in BOTH dimensions, by a single cell — coverage cannot be stitched
+ * across cells) and not intersect any deny cell.
+ */
+export function isCellGrantable(surface: GrantableSurface, cell: Cell): boolean {
+	const allowed = surface.allow.some(a => globSubsumes(a.action, cell.action) && globSubsumes(a.resource, cell.resource))
+	if (!allowed) {
+		return false
+	}
+	return !surface.deny.some(d => globIntersects(d.action, cell.action) && globIntersects(d.resource, cell.resource))
+}
+
+/**
+ * Return the cells of `policy` that fall outside `surface` — empty iff the whole
+ * policy is within the actor's surface.
+ *
+ * Every statement is checked regardless of its effect: granting an `allow X` and
+ * removing a `deny X` both let the target end up with X, so an actor must hold X
+ * either way. (The invariant: "you may only touch a policy you could author from
+ * scratch yourself.") `${...}` placeholders are widened to `*` — a scoped actor
+ * cannot author a tag-parameterized cell unless its surface is wildcard there.
+ * Conditions on the policy's own statements are ignored; only `(action, resource)`
+ * matters.
+ */
+export function findUngrantableCells(surface: GrantableSurface, policy: Policy): Cell[] {
+	const violations: Cell[] = []
+	const seen = new Set<string>()
+	for (const stmt of policy.statements) {
+		for (const raw of cellsOf(stmt)) {
+			const cell: Cell = { action: maxExpand(raw.action), resource: maxExpand(raw.resource) }
+			// JSON-encode the pair rather than concatenating: action/resource are
+			// not charset-constrained (`validatePolicyDocument` only requires
+			// non-empty strings, and JSON permits NUL/control chars), so a flat
+			// join would let `{'a','bc'}` and `{'ab','c'}` collide — an ungrantable
+			// cell could then be skipped as "already seen" and escape the boundary.
+			const key = JSON.stringify([cell.action, cell.resource])
+			if (seen.has(key)) {
+				continue
+			}
+			seen.add(key)
+			if (!isCellGrantable(surface, cell)) {
+				violations.push(cell)
+			}
+		}
+	}
+	return violations
+}

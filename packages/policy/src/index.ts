@@ -1,0 +1,8 @@
+export * from './types.js'
+export * from './engine.js'
+export { globMatch, globMatchAny } from './glob.js'
+export { hasUnresolvedPlaceholder, readPath, substituteString, substituteValue } from './context.js'
+export type { ConditionOperator, ConditionResult } from './conditions.js'
+export { defaultOperators, evaluateConditions, UnknownConditionOperatorError } from './conditions.js'
+export type { Cell, GrantableSurface } from './containment.js'
+export { computeGrantableSurface, findUngrantableCells, globIntersects, globSubsumes, isCellGrantable, maxExpand } from './containment.js'

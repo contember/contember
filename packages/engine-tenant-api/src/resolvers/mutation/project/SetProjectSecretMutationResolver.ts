@@ -20,7 +20,7 @@ export class SetProjectSecretMutationResolver implements MutationResolvers {
 	): Promise<SetProjectSecretResponse> {
 		const project = await this.projectManager.getProjectBySlug(context.db, args.projectSlug)
 		await context.requireAccess({
-			scope: await context.permissionContext.createProjectScope(project),
+			project,
 			action: PermissionActions.PROJECT_SET_SECRET,
 			message: 'You are not allowed to set project secrets',
 		})

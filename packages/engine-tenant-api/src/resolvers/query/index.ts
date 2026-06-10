@@ -1,5 +1,7 @@
 export * from './AuthLogQueryResolver.js'
+export * from './BuiltinPolicyQueryResolver.js'
 export * from './MeQueryResolver.js'
+export * from './PolicyQueryResolver.js'
 export * from './ProjectMembersQueryResolver.js'
 export * from './ProjectQueryResolver.js'
 export * from './PersonQueryResolver.js'

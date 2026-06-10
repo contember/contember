@@ -1,7 +1,7 @@
 import { Acl, Input, Model } from '@contember/schema'
 import { Path } from './Path.js'
 import { JoinBuilder } from './JoinBuilder.js'
-import { CaseStatement, ConditionBuilder as SqlConditionBuilder, Literal, QueryBuilder, SelectBuilder, wrapIdentifier } from '@contember/database'
+import { CaseStatement, Literal, QueryBuilder, SelectBuilder, wrapIdentifier } from '@contember/database'
 import { acceptFieldVisitor, getColumnName, getTargetEntity } from '@contember/schema-utils'
 import { UserError } from '../../exception.js'
 import { PredicateFactory } from '../../acl/index.js'
@@ -117,8 +117,7 @@ export class OrderByBuilder {
 		const orderColumn: QueryBuilder.ColumnIdentifier = [path.alias, columnName]
 		const applyPlain = <O extends QueryBuilder.Orderable<any>>(o: O) => o.orderBy(orderColumn, direction)
 
-		const isRoot = relationPath.length === 0
-		const fieldPredicate = this.predicateFactory.getFieldPredicate(entity, Acl.Operation.read, fieldName, isRoot)
+		const fieldPredicate = this.predicateFactory.getFieldReadPredicate(entity, fieldName, relationPath)
 
 		// On the ACL-filtered entity a field whose read predicate equals the row-level predicate is readable
 		// for every returned row, so no guard is needed. Through a relation we always guard.
@@ -141,6 +140,7 @@ export class OrderByBuilder {
 			return [qb, orderable]
 		}
 
+		const isRoot = relationPath.length === 0
 		const relationContext = relationPath[relationPath.length - 1]
 		const predicateWhere = this.predicateFactory.buildPredicates(entity, [guardPredicate], relationContext, isRoot)
 		// The row-level predicate is already guaranteed in the WHERE of the ACL-filtered entity, so let the
@@ -150,26 +150,15 @@ export class OrderByBuilder {
 			: []
 
 		const columnLiteral = new Literal(`${wrapIdentifier(path.alias)}.${wrapIdentifier(columnName)}`)
-		let orderLiteral: Literal | undefined
-
-		qb = this.whereBuilder.buildAdvanced(
+		const { qb: guardedQb, condition } = this.whereBuilder.buildConditionLiteral(
+			qb,
 			entity,
 			path,
 			predicateWhere,
-			applyCondition => {
-				const condition = SqlConditionBuilder.process(clause => {
-					const applied = applyCondition(clause)
-					return applied.isEmpty() ? applied.raw('true') : applied
-				}).getSql() ?? new Literal('true')
-				orderLiteral = CaseStatement.createEmpty().when(condition, columnLiteral).compile()
-				return qb
-			},
 			{ relationPath, evaluatedPredicates },
 		)
-
-		if (orderLiteral === undefined) {
-			throw new Error('OrderByBuilder: order expression was not built')
-		}
+		qb = guardedQb
+		const orderLiteral = CaseStatement.createEmpty().when(condition, columnLiteral).compile()
 		qb = qb.orderBy(orderLiteral, direction)
 		if (orderable !== null) {
 			orderable = orderable.orderBy(orderLiteral, direction)

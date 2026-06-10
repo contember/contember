@@ -51,6 +51,36 @@ export class WhereBuilder {
 		})
 	}
 
+	/**
+	 * Compiles a where into a single boolean SQL condition (a `Literal`), applying any relation joins it needs
+	 * to `qb`. Shared by the read-predicate consumers that need the condition as an expression rather than a
+	 * WHERE clause: the projection predicate column (selected as a boolean) and the order-by guard (wrapped in
+	 * `CASE WHEN <condition> THEN <column> END`). An empty/trivially-true predicate compiles to `true`.
+	 */
+	public buildConditionLiteral<R extends SelectBuilder.Result>(
+		qb: SelectBuilder<R>,
+		entity: Model.Entity,
+		path: Path,
+		where: Input.OptionalWhere,
+		optimizationHints: WhereOptimizationHints = {},
+	): { qb: SelectBuilder<R>; condition: Literal } {
+		let condition: Literal = new Literal('true')
+		const resultQb = this.buildAdvanced<R>(
+			entity,
+			path,
+			where,
+			applyCondition => {
+				condition = SqlConditionBuilder.process(clause => {
+					const applied = applyCondition(clause)
+					return applied.isEmpty() ? applied.raw('true') : applied
+				}).getSql() ?? new Literal('true')
+				return qb
+			},
+			optimizationHints,
+		)
+		return { qb: resultQb, condition }
+	}
+
 	private buildInternal<R extends SelectBuilder.Result>({
 		callback,
 		...args

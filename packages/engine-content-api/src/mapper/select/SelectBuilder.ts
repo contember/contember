@@ -99,21 +99,14 @@ export class SelectBuilder {
 				const primaryPredicate = this.predicateFactory.create(entity, Acl.Operation.read, undefined, relationContext)
 				const fieldPredicate = this.predicateFactory.buildPredicates(entity, [predicate], relationContext)
 
-				this.qb = this.whereBuilder.buildAdvanced(
+				const { qb, condition } = this.whereBuilder.buildConditionLiteral(
+					this.qb,
 					entity,
 					path.back(),
 					fieldPredicate,
-					apply =>
-						this.qb.select(expr =>
-							expr.selectCondition(condition => {
-								condition = apply(condition)
-								if (condition.isEmpty()) {
-									return condition.raw('true')
-								}
-								return condition
-							}), predicatePath.alias),
 					{ relationPath: this.relationPath, evaluatedPredicates: [primaryPredicate] },
 				)
+				this.qb = qb.select(condition, predicatePath.alias)
 				fetchedPredicates.add(predicate)
 			}
 			return row => row[predicatePath.alias] === true

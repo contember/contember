@@ -64,6 +64,7 @@ const DENYLIST_TARGET_ROLE_ACTIONS = new Set([
 	'person.createSessionToken',
 	'person.forceSignOut',
 	'person.viewSessions',
+	'person.resetMfa',
 ])
 
 /**

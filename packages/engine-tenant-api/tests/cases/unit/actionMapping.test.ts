@@ -62,6 +62,7 @@ describe('translateAction — denylist (subject.targetRoles) actions', () => {
 		'person.createSessionToken': PermissionActions.PERSON_CREATE_SESSION_KEY,
 		'person.forceSignOut': PermissionActions.PERSON_FORCE_SIGN_OUT,
 		'person.viewSessions': PermissionActions.PERSON_VIEW_SESSIONS,
+		'person.resetMfa': PermissionActions.PERSON_RESET_MFA,
 	}
 
 	for (const [key, factory] of Object.entries(actions)) {

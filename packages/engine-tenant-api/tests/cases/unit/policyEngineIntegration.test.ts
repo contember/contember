@@ -101,7 +101,7 @@ describe('built-in policies', () => {
 
 	// Every action in the project_admin denylist deny-guard must be allowed
 	// against an ordinary target but denied against a super_admin / project_creator
-	// target. Pinning all six (not just one) guards against silently dropping an
+	// target. Pinning all of them (not just one) guards against silently dropping an
 	// action from the deny statement — e.g. losing `forceSignOut`/`viewSessions`
 	// would let a project_admin force-sign-out or read a super_admin's sessions.
 	const denylistGuardedActions = [
@@ -111,6 +111,7 @@ describe('built-in policies', () => {
 		TenantActions.personChangePassword,
 		TenantActions.personForceSignOut,
 		TenantActions.personViewSessions,
+		TenantActions.personResetMfa,
 	]
 	for (const action of denylistGuardedActions) {
 		test(`project_admin may ${action} an ordinary target but not a protected one`, async () => {

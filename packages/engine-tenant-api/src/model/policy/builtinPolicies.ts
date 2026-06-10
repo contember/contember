@@ -113,6 +113,7 @@ export const BUILTIN_POLICIES: readonly BuiltinPolicyDefinition[] = [
 						TenantActions.personChangePassword,
 						TenantActions.personForceSignOut,
 						TenantActions.personViewSessions,
+						TenantActions.personResetMfa,
 						TenantActions.projectViewMember,
 						TenantActions.projectAddMember,
 						TenantActions.projectUpdateMember,
@@ -172,6 +173,7 @@ export const BUILTIN_POLICIES: readonly BuiltinPolicyDefinition[] = [
 						TenantActions.personChangePassword,
 						TenantActions.personForceSignOut,
 						TenantActions.personViewSessions,
+						TenantActions.personResetMfa,
 					],
 					resources: ['*'],
 					conditions: {

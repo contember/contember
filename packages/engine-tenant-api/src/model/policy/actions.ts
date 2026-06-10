@@ -47,6 +47,7 @@ export const TenantActions = {
 	personForceSignOut: 'tenant:person.forceSignOut',
 	personRevokeSession: 'tenant:person.revokeSession',
 	personViewSessions: 'tenant:person.viewSessions',
+	personResetMfa: 'tenant:person.resetMfa',
 
 	// project
 	projectView: 'tenant:project.view',

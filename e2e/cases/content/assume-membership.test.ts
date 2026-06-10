@@ -58,4 +58,20 @@ test('Content API: assume membership', async () => {
 		.set('X-Contember-assume-membership', JSON.stringify({ memberships: [{ role: 'admin', variables: [] }] }))
 		.expect({ data: { listTag: [] } })
 		.expect(200)
+
+	// `test` may only assume `admin` (per assumeMembership above); assuming `test`
+	// itself is a valid, existing role but outside the rule, so the assume-membership
+	// guard must reject it with 403.
+	await tester(
+		gql`
+			query {
+				listTag {
+					id
+				}
+			}
+		`,
+		{ authorizationToken: authKey },
+	)
+		.set('X-Contember-assume-membership', JSON.stringify({ memberships: [{ role: 'test', variables: [] }] }))
+		.expect(403)
 })

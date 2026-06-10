@@ -215,7 +215,7 @@ tenant API builds per check. The set of available paths is deliberately small:
 | `identity.id` | always | UUID of the calling identity |
 | `identity.roles` | always | the caller's tenant roles |
 | `subject.roles` | role-granting actions: `addGlobalRoles`, `removeGlobalRoles`, `apiKey.createGlobal`, `person.signUp` | the roles the caller is trying to grant/use |
-| `subject.targetRoles` | person actions on another identity: `person.disable`, `person.changeProfile`, `person.changePassword`, `person.createSessionToken` | the roles already held by the target |
+| `subject.targetRoles` | person actions on another identity: `person.disable`, `person.changeProfile`, `person.changePassword`, `person.createSessionToken`, `person.forceSignOut`, `person.viewSessions` | the roles already held by the target |
 | `subject.membership.role`, `subject.membership.variables.<var>` | membership actions: `person.invite`, `person.inviteUnmanaged`, `project.viewMember`, `project.addMember`, `project.updateMember`, `project.removeMember` | the membership being granted/operated on (evaluated once per membership, AND-reduced) |
 
 `assignment.tags.*` is **not** an evaluation-time context path — assignment tags
@@ -362,6 +362,14 @@ the policy's actions/resources/conditions at load time, so a templated tag
 would let any caller with `policy:assign` rewrite the policy's effective
 surface at evaluation time. Such inputs return `INVALID_TAGS`.
 
+An **array** tag substituted into a `${...}` placeholder is comma-joined into a
+single string — there is no expansion into multiple actions, resources, or
+condition values. With `tags: { teams: ["a", "b"] }`, both
+`"project:${assignment.tags.teams}"` and a standalone `"${assignment.tags.teams}"`
+bake to one value (`"project:a,b"` / `"a,b"`), never two. To scope a policy to
+several actions/resources, list them explicitly rather than relying on tag
+expansion.
+
 ```graphql
 enum AssignPolicyErrorCode {
   POLICY_NOT_FOUND
@@ -456,9 +464,10 @@ guardrails from the legacy permission system:
   Project admins cannot grant themselves `super_admin` or
   `project_creator`, nor assign arbitrary unknown roles.
 - **Denylist on person actions.** `createSessionToken`, `disablePerson`,
-  `changePersonProfile`, and `changePersonPassword` are denied when
-  `subject.targetRoles` contains `super_admin` or `project_creator` — a
-  project admin cannot impersonate or disable a higher-privileged identity.
+  `changePersonProfile`, `changePersonPassword`, `forceSignOut`, and
+  `viewSessions` are denied when `subject.targetRoles` contains `super_admin`
+  or `project_creator` — a project admin cannot impersonate, disable,
+  force-sign-out, or read the sessions of a higher-privileged identity.
 
 These guards depend on the resolver populating `subject.roles` /
 `subject.targetRoles` on the request context. If the resolver forgets, the

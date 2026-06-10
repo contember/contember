@@ -114,6 +114,13 @@ const dateCmp = (cmp: (a: number, b: number) => boolean): ConditionOperator => (
  * Parse a date for the `date*` operators. Accepts `Date`, epoch numbers, and
  * strings.
  *
+ * A numeric value is interpreted as **milliseconds** since the epoch (matching
+ * `Date#getTime`), NOT seconds — a Unix-seconds value like `1700000000` resolves
+ * to 1970, not 2023. Note the asymmetry: a bare numeric *string* (`"1700000000"`)
+ * is not a valid `Date.parse` input and yields `undefined`, so the same epoch
+ * behaves differently as a number vs a string. Use millisecond epochs (or ISO
+ * strings) consistently.
+ *
  * Strings should be ISO 8601 — `Date.parse` is implementation-defined for
  * non-ISO formats (locale-dependent ordering, RFC-2822 quirks), so ambiguous
  * inputs like `"05/18/2026"` will parse differently across runtimes. Policy

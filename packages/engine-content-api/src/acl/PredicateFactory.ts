@@ -52,6 +52,20 @@ export class PredicateFactory {
 		}
 	}
 
+	/**
+	 * The field's read predicate for a given query path. An entity is treated as a query root (root-only
+	 * permissions) only when `relationPath` is empty; anything reached through a relation consults the
+	 * through-inclusive `all` set. This is the single place that maps a `relationPath` to the read context,
+	 * shared by projection (cell masking) and ordering (order-key guarding) so they always agree.
+	 */
+	public getFieldReadPredicate(
+		entity: Model.Entity,
+		fieldName: string,
+		relationPath: readonly Model.AnyRelationContext[],
+	): FieldRequiredPredicate {
+		return this.getFieldPredicate(entity, Acl.Operation.read, fieldName, relationPath.length === 0)
+	}
+
 	public shouldApplyCellLevelPredicate(
 		entity: Model.Entity,
 		operation: Acl.Operation.read,

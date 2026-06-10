@@ -1257,6 +1257,170 @@ describe('predicates injector - many-to-many relations', () => {
 	})
 })
 
+// SECURITY TEST: a field whose read predicate is stricter than the row-level predicate.
+// The row-level (primary) predicate is the OR-union of all field predicates, so any field
+// with its own predicate is stricter than the row union. When such a field is used in
+// a back-referenced filter, its cell-level predicate must NOT be dropped by the
+// back-reference simplification — otherwise row presence becomes an oracle on a field
+// the user cannot read.
+namespace CellLevelPredicateModel {
+	export const readerRole = acl.createRole('reader')
+
+	@acl.allow(readerRole, {
+		when: { isPublished: { eq: true } },
+		read: ['name', 'parent', 'children'],
+	})
+	@acl.allow(readerRole, {
+		when: { secretVisible: { eq: true } },
+		read: ['secret'],
+	})
+	export class Category {
+		name = def.stringColumn()
+		secret = def.stringColumn()
+		isPublished = def.boolColumn()
+		secretVisible = def.boolColumn()
+		parent = def.manyHasOne(Category, 'children')
+		children = def.oneHasMany(Category, 'parent')
+	}
+}
+
+describe('predicates injector - SECURITY: cell-level predicates on back-reference', () => {
+	const schema = createSchema(CellLevelPredicateModel)
+	const permissions = new PermissionFactory().create(schema, ['reader'])
+
+	const injector = new PredicatesInjector(
+		schema.model,
+		new PredicateFactory(permissions, schema.model, new VariableInjector(schema.model, {})),
+	)
+
+	const getChildrenContext = () => {
+		const relation = acceptFieldVisitor(schema.model, schema.model.entities.Category, 'children', {
+			visitColumn: () => {
+				throw new Error()
+			},
+			visitRelation: ctx => ctx,
+		})
+		return { relation, ancestorPath: [relation] }
+	}
+
+	it('keeps cell-level predicate of the filtered field on a simplified back-reference', () => {
+		const { relation, ancestorPath } = getChildrenContext()
+
+		const injected = injector.inject(
+			schema.model.entities.Category,
+			{
+				parent: { secret: { eq: 'X' } },
+			},
+			relation,
+			ancestorPath,
+		)
+
+		// The parent row-level predicate is simplified away (verified on the ancestor),
+		// but the cell-level predicate of `secret` must stay — without it, the filter
+		// would leak the value of an unreadable field through row presence
+		assert.deepStrictEqual(injected, {
+			and: [
+				{
+					and: [
+						{ parent: { and: [{ secret: { eq: 'X' } }, { secretVisible: { eq: true } }] } },
+						{ isPublished: { eq: true } },
+					],
+				},
+				{ or: [{ isPublished: { eq: true } }, { secretVisible: { eq: true } }] },
+			],
+		})
+	})
+
+	it('keeps cell-level predicates of all filtered fields on a simplified back-reference', () => {
+		const { relation, ancestorPath } = getChildrenContext()
+
+		const injected = injector.inject(
+			schema.model.entities.Category,
+			{
+				parent: { name: { eq: 'A' }, secret: { eq: 'X' } },
+			},
+			relation,
+			ancestorPath,
+		)
+
+		// Both `name` and `secret` have predicates stricter than the row union,
+		// so both cell-level predicates are enforced
+		assert.deepStrictEqual(injected, {
+			and: [
+				{
+					and: [
+						{
+							parent: {
+								and: [
+									{ name: { eq: 'A' }, secret: { eq: 'X' } },
+									{ and: [{ isPublished: { eq: true } }, { secretVisible: { eq: true } }] },
+								],
+							},
+						},
+						{ isPublished: { eq: true } },
+					],
+				},
+				{ or: [{ isPublished: { eq: true } }, { secretVisible: { eq: true } }] },
+			],
+		})
+	})
+
+	it('still simplifies to { id: always } when filtering on the primary only', () => {
+		const { relation, ancestorPath } = getChildrenContext()
+
+		const injected = injector.inject(
+			schema.model.entities.Category,
+			{
+				parent: { id: { in: [testUuid(1)] } },
+			},
+			relation,
+			ancestorPath,
+		)
+
+		// The primary's predicate IS the row-level predicate, already verified upstream
+		assert.deepStrictEqual(injected, {
+			and: [
+				{
+					and: [
+						{ parent: { and: [{ id: { in: [testUuid(1)] } }, { id: { always: true } }] } },
+						{ isPublished: { eq: true } },
+					],
+				},
+				{ or: [{ isPublished: { eq: true } }, { secretVisible: { eq: true } }] },
+			],
+		})
+	})
+
+	it('keeps cell-level predicate for a back-reference inside a root query filter', () => {
+		// The full attack shape: listCategory(filter: { children: { parent: { secret: { eq: 'X' } } } })
+		const injected = injector.inject(
+			schema.model.entities.Category,
+			{
+				children: { parent: { secret: { eq: 'X' } } },
+			},
+		)
+
+		assert.deepStrictEqual(injected, {
+			and: [
+				{
+					and: [
+						{
+							children: {
+								and: [
+									{ parent: { and: [{ secret: { eq: 'X' } }, { secretVisible: { eq: true } }] } },
+									{ isPublished: { eq: true } },
+								],
+							},
+						},
+						{ isPublished: { eq: true } },
+					],
+				},
+				{ or: [{ isPublished: { eq: true } }, { secretVisible: { eq: true } }] },
+			],
+		})
+	})
+})
+
 describe('predicate injector input handling', () => {
 	const schema = createSchema(DeepFilterModel)
 	const permissions = new AllowAllPermissionFactory().create(schema.model)

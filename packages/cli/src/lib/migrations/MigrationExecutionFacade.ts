@@ -115,19 +115,31 @@ export class MigrationExecutionFacade {
 			} while (true)
 		}
 
-		await this.migrationExecutor.executeMigrations({
-			client: this.systemClientProvider.get(),
-			migrations,
-			schemaState,
-			contentMigrationFactoryArgs: {
-				apiToken: project.token,
-				apiBaseUrl: project.endpoint,
-				projectName: project.name,
-				schemaVersionBuilder: this.schemaVersionBuilder,
-			},
-			log: message => console.log(message),
-			force,
-		})
+		try {
+			await this.migrationExecutor.executeMigrations({
+				client: this.systemClientProvider.get(),
+				migrations,
+				schemaState,
+				contentMigrationFactoryArgs: {
+					apiToken: project.token,
+					apiBaseUrl: project.endpoint,
+					projectName: project.name,
+					schemaVersionBuilder: this.schemaVersionBuilder,
+				},
+				log: message => console.log(message),
+				force,
+			})
+		} catch (e) {
+			if (isViewReplaceFailure(e)) {
+				console.error(
+					"\nAn in-place view update (CREATE OR REPLACE VIEW) failed — Postgres rejects it (SQLSTATE 42P16) when a view's"
+						+ ' output columns changed (e.g. reordered or retyped) even though its fields did not.\n'
+						+ 'Re-generate the migration with `migrations:diff <name> --recreate-views` to drop & recreate the affected'
+						+ ' views (and their dependants) instead.\n',
+				)
+			}
+			throw e
+		}
 		return true
 	}
 
@@ -166,3 +178,15 @@ export class MigrationExecutionFacade {
 
 const isProjectNotEmptyError = (e: unknown): boolean =>
 	Array.isArray(e) && e.some(it => it !== null && typeof it === 'object' && (it as { code?: unknown }).code === MigrateErrorCode.ProjectNotEmpty)
+
+// A failed `updateView` modification surfaces as MIGRATION_FAILED whose developerMessage embeds the failing
+// statement (`CREATE OR REPLACE VIEW …`). Since each modification's SQL is executed in isolation, that string
+// is a precise signal that an in-place view update — and not some other statement — is what Postgres rejected.
+const isViewReplaceFailure = (e: unknown): boolean =>
+	Array.isArray(e) && e.some(it =>
+		it !== null
+		&& typeof it === 'object'
+		&& (it as { code?: unknown }).code === MigrateErrorCode.MigrationFailed
+		&& typeof (it as { message?: unknown }).message === 'string'
+		&& (it as { message: string }).message.includes('CREATE OR REPLACE VIEW')
+	)

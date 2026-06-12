@@ -1,6 +1,30 @@
 import { Model } from '@contember/schema'
+import deepEqual from 'fast-deep-equal'
 import { Migration } from '../../Migration.js'
 import { removeEntityModification } from '../entities/index.js'
+
+/**
+ * Determines whether a view change can be applied in-place via `CREATE OR REPLACE VIEW`,
+ * i.e. without dropping & recreating the view (and cascading to its dependants).
+ *
+ * Postgres allows `CREATE OR REPLACE VIEW` only when the output columns stay the same
+ * (it may append new columns at the end). We conservatively allow it only when the
+ * entity is structurally identical and just the view metadata (`sql`/`dependencies`/`idSource`)
+ * differs. Materialized views are never replaceable (no `CREATE OR REPLACE MATERIALIZED VIEW`).
+ */
+export const isReplaceableViewChange = (original: Model.Entity, updated: Model.Entity): boolean => {
+	if (!original.view || !updated.view) {
+		return false
+	}
+	if (original.view.materialized || updated.view.materialized) {
+		return false
+	}
+	const stripView = (entity: Model.Entity): Omit<Model.Entity, 'view'> => {
+		const { view, ...rest } = entity
+		return rest
+	}
+	return deepEqual(stripView(original), stripView(updated))
+}
 
 type EntityDependantViews = Map<string, Set<Model.Entity>>
 export const getEntityDependantViews = (model: Model.Schema): EntityDependantViews => {

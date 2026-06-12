@@ -43,7 +43,7 @@ import {
 	UpdateValidationSchemaDiffer,
 	VERSION_LATEST,
 } from './modifications/index.js'
-import { RemoveChangedFieldDiffer, RemoveViewDiffer } from './modifications/differs/index.js'
+import { RemoveChangedFieldDiffer, RemoveViewDiffer, UpdateViewDiffer } from './modifications/differs/index.js'
 import { CreateIndexDiffer, RemoveIndexDiffer } from './modifications/indexes/index.js'
 import { CreateTriggerDiffer, RemoveTriggerDiffer, UpdateTriggerDiffer } from './modifications/actions/index.js'
 import { UpdateTargetDiffer } from './modifications/actions/UpdateTargetModification.js'
@@ -53,7 +53,18 @@ import { UpdateSettingsDiffer } from './modifications/settings/index.js'
 import { RemoveIndexNamesDiffer } from './modifications/upgrade/RemoveIndexNamesModification.js'
 import { ConvertOneHasManyToOneHasOneRelationDiffer } from './modifications/relations/ConvertOneHasManyToOneHasOneRelationModification.js'
 
-export type DiffOptions = { skipRecreateValidation?: boolean; skipInitialSchemaValidation?: boolean; skipNonModelDiffers?: boolean }
+export type DiffOptions = {
+	skipRecreateValidation?: boolean
+	skipInitialSchemaValidation?: boolean
+	skipNonModelDiffers?: boolean
+	/**
+	 * Disable the in-place `CREATE OR REPLACE VIEW` optimization and drop & recreate every
+	 * changed view (with its dependant cascade) instead. Escape hatch for views whose real
+	 * output columns drifted without a matching field change (which would otherwise fail at
+	 * execute time with `SQLSTATE 42P16`).
+	 */
+	recreateViews?: boolean
+}
 
 export class SchemaDiffer {
 	constructor(
@@ -67,6 +78,7 @@ export class SchemaDiffer {
 		skipInitialSchemaValidation = false,
 		skipRecreateValidation = false,
 		skipNonModelDiffers = false,
+		recreateViews = false,
 	}: DiffOptions = {}): Migration.Modification[] {
 		if (!skipInitialSchemaValidation) {
 			const originalErrors = SchemaValidator.validate(originalSchema)
@@ -87,7 +99,7 @@ export class SchemaDiffer {
 			new ConvertOneHasManyToOneHasOneRelationDiffer(),
 			new RemoveUniqueConstraintDiffer(),
 			new RemoveIndexDiffer(),
-			new RemoveViewDiffer(),
+			new RemoveViewDiffer(recreateViews),
 			new RemoveEntityDiffer(),
 			new RemoveFieldDiffer(),
 			new CreateEnumDiffer(),
@@ -109,6 +121,7 @@ export class SchemaDiffer {
 			new CreateColumnDiffer(),
 			new CreateRelationDiffer(),
 			new CreateViewDiffer(),
+			...recreateViews ? [] : [new UpdateViewDiffer()],
 			new CreateRelationInverseSideDiffer(),
 			new CreateUniqueConstraintDiffer(),
 			new CreateIndexDiffer(),

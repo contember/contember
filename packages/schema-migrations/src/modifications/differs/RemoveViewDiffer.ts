@@ -1,13 +1,24 @@
 import { Differ } from '../ModificationHandler.js'
 import { Schema } from '@contember/schema'
 import deepEqual from 'fast-deep-equal'
-import { cascadeRemoveDependantViews } from '../utils/viewDependencies.js'
+import { cascadeRemoveDependantViews, isReplaceableViewChange } from '../utils/viewDependencies.js'
 import { UpdateColumnDefinitionDiffer } from '../columns/index.js'
 
 /**
- * Remove changed or removed view.
+ * Remove views that were removed or changed in a way that requires a drop & recreate.
+ *
+ * View changes that can be applied in-place via `CREATE OR REPLACE VIEW` (see
+ * {@link isReplaceableViewChange}) are intentionally skipped here so they don't trigger
+ * the drop cascade onto dependant views – those are handled by `UpdateViewDiffer`.
+ *
+ * When `recreateAllViews` is set, the in-place optimization is disabled and every changed
+ * view drops & recreates (with its dependant cascade) as before. This is the escape hatch
+ * for the rare case where a view's actual output columns drifted without a matching field
+ * change, which `CREATE OR REPLACE VIEW` would reject at execute time (`SQLSTATE 42P16`).
  */
 export class RemoveViewDiffer implements Differ {
+	constructor(private readonly recreateAllViews: boolean = false) {}
+
 	createDiff(originalSchema: Schema, updatedSchema: Schema) {
 		const changedOrRemovedViews = Object.values(originalSchema.model.entities)
 			.filter(it => {
@@ -30,7 +41,8 @@ export class RemoveViewDiffer implements Differ {
 				}
 
 				if (!deepEqual(updatedEntity.view, it.view)) {
-					return true // view is different
+					// view changed – cascade only when it cannot be replaced in-place
+					return this.recreateAllViews || !isReplaceableViewChange(it, updatedEntity)
 				}
 
 				return false

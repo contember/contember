@@ -28,6 +28,8 @@ export class CreateAuthLogEntryCommand implements Command<void> {
 				metadata: this.data.metadata ?? {},
 				target_person_id: this.data.targetPersonId,
 				event_data: this.data.eventData,
+				geo_country: this.data.geoCountry,
+				device_fingerprint: this.data.deviceFingerprint,
 			})
 			.execute(db)
 	}
@@ -49,5 +51,9 @@ namespace CreateAuthLogEntryCommand {
 		metadata?: JSONValue
 		targetPersonId?: string
 		eventData?: JSONValue
+		/** A03: country derived from the trusted reverse-proxy geo header, when present. */
+		geoCountry?: string
+		/** A03: hash of the client user-agent (never the raw UA). */
+		deviceFingerprint?: string
 	}
 }

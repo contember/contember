@@ -1,5 +1,5 @@
 import { TenantResolverContext } from './TenantResolverContext.js'
-import { DatabaseContext, PermissionContext, PermissionContextFactory } from '../model/index.js'
+import { DatabaseContext, LoginRiskAnalyzer, PermissionContext, PermissionContextFactory } from '../model/index.js'
 import { Logger } from '@contember/logger'
 import { AuthLogService } from '../model/service/AuthLogService.js'
 
@@ -19,11 +19,12 @@ export class TenantResolverContextFactory {
 	constructor(
 		private readonly permissionContextFactory: PermissionContextFactory,
 		private readonly authLogService: AuthLogService,
+		private readonly loginRiskAnalyzer: LoginRiskAnalyzer,
 	) {}
 
 	public create(
 		authContext: { apiKeyId: string; identityId: string; roles: string[]; trustForwardedInfo?: boolean },
-		httpInfo: { ip: string; userAgent?: string; forwarderIp?: string; forwarderUserAgent?: string },
+		httpInfo: { ip: string; userAgent?: string; forwarderIp?: string; forwarderUserAgent?: string; geoCountry?: string },
 		db: DatabaseContext,
 		logger: Logger,
 	): TenantResolverContext {
@@ -31,6 +32,9 @@ export class TenantResolverContextFactory {
 			id: authContext.identityId,
 			roles: authContext.roles,
 		})
+		// A03: stamp every auth-log row with the trusted geo country (when present)
+		// and a UA fingerprint, so the next sign-in's anomaly check has a baseline.
+		const deviceFingerprint = this.loginRiskAnalyzer.fingerprint(httpInfo.userAgent) ?? undefined
 		return {
 			...createResolverContext(permissionContext, authContext.apiKeyId, authContext.trustForwardedInfo ?? false),
 			logAuthAction: async data => {
@@ -40,11 +44,14 @@ export class TenantResolverContextFactory {
 					clientIp: httpInfo.ip,
 					forwarderIp: httpInfo.forwarderIp,
 					forwarderUserAgent: httpInfo.forwarderUserAgent,
+					geoCountry: httpInfo.geoCountry,
+					deviceFingerprint,
 				}, data)
 			},
 			httpInfo: {
 				ip: httpInfo.ip,
 				userAgent: httpInfo.userAgent,
+				geoCountry: httpInfo.geoCountry,
 			},
 			db,
 			logger,

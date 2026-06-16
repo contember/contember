@@ -33,7 +33,7 @@ export interface Test {
 	/** A single expected auth log, or a sequence of them when the mutation emits more than one. */
 	expectedAuthLog?: AuthLogService.LogArgs | AuthLogService.LogArgs[]
 	callerTrustForwardedInfo?: boolean
-	httpInfo?: { ip?: string; userAgent?: string }
+	httpInfo?: { ip?: string; userAgent?: string; geoCountry?: string }
 	/** Override individual providers (e.g. a working `decrypt` to enable captcha). */
 	providers?: Partial<Providers>
 }
@@ -139,7 +139,7 @@ export const executeTenantTest = async (test: Test) => {
 			expect(args).toEqual(expectedAuthLogs.shift()!)
 		},
 		db: databaseContext,
-		httpInfo: { ip: test.httpInfo?.ip ?? '', userAgent: test.httpInfo?.userAgent },
+		httpInfo: { ip: test.httpInfo?.ip ?? '', userAgent: test.httpInfo?.userAgent, geoCountry: test.httpInfo?.geoCountry },
 	}
 
 	const schema = makeExecutableSchema({

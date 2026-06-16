@@ -52,7 +52,9 @@ CREATE TYPE "auth_log_type" AS ENUM (
     'email_change_complete',
     'idp_session_revalidated',
     'idp_session_revoked',
-    'idp_session_revalidation_failed'
+    'idp_session_revalidation_failed',
+    'unusual_login_detected',
+    'step_up_required'
 );
 CREATE TYPE "config_policy" AS ENUM (
     'always',
@@ -171,6 +173,10 @@ CREATE TABLE "config" (
     "captcha_protect_password_reset" boolean DEFAULT true NOT NULL,
     "captcha_protect_passwordless_init" boolean DEFAULT true NOT NULL,
     "captcha_protect_email_verification" boolean DEFAULT false NOT NULL,
+    "login_anomaly_detection_enabled" boolean DEFAULT false NOT NULL,
+    "login_anomaly_history_size" integer DEFAULT 10 NOT NULL,
+    "login_anomaly_email_threshold" integer DEFAULT 1 NOT NULL,
+    "login_anomaly_step_up_threshold" integer DEFAULT 3 NOT NULL,
     CONSTRAINT "config_captcha_complete" CHECK ((("captcha_provider" IS NULL) OR (("captcha_secret" IS NOT NULL) AND ("captcha_secret_version" IS NOT NULL)))),
     CONSTRAINT "config_captcha_provider_check" CHECK ((("captcha_provider" IS NULL) OR ("captcha_provider" = ANY (ARRAY['turnstile'::"text", 'hcaptcha'::"text", 'recaptchaV3'::"text"]))))
 );
@@ -245,7 +251,9 @@ CREATE TABLE "person_auth_log" (
     "identity_provider_id" "uuid",
     "metadata" "jsonb",
     "target_person_id" "uuid",
-    "event_data" "jsonb"
+    "event_data" "jsonb",
+    "geo_country" "text",
+    "device_fingerprint" "text"
 );
 CREATE TABLE "person_backup_code" (
     "id" "uuid" NOT NULL,

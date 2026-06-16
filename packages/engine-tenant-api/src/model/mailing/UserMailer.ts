@@ -9,6 +9,7 @@ import BackupCodesExhausted from './templates/BackupCodesExhausted.mustache.js'
 import EmailVerification from './templates/EmailVerification.mustache.js'
 import EmailChangeVerify from './templates/EmailChangeVerify.mustache.js'
 import EmailChangeNotify from './templates/EmailChangeNotify.mustache.js'
+import UnusualLogin from './templates/UnusualLogin.mustache.js'
 import { MailTemplateData, MailTemplateIdentifier, MailType } from './type.js'
 import { MailTemplateQuery } from '../queries/index.js'
 import Layout from './templates/Layout.mustache.js'
@@ -163,6 +164,20 @@ export class UserMailer {
 		const template = (await this.getCustomTemplate(dbContext, templateId)) || {
 			subject: 'You have no MFA backup codes left',
 			content: BackupCodesExhausted,
+			replyTo: null,
+		}
+		await this.sendMail(templateId, template, mailArguments)
+	}
+
+	async sendUnusualLoginEmail(
+		dbContext: DatabaseContext,
+		mailArguments: { email: string; geoCountry: string | null; ipAddress: string | null },
+		customMailOptions: { projectId: string | null; variant: string },
+	): Promise<void> {
+		const templateId = { type: MailType.unusualLogin, ...customMailOptions }
+		const template = (await this.getCustomTemplate(dbContext, templateId)) || {
+			subject: 'Unusual sign-in to your account',
+			content: UnusualLogin,
 			replyTo: null,
 		}
 		await this.sendMail(templateId, template, mailArguments)

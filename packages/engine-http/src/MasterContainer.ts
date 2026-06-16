@@ -159,6 +159,7 @@ export class MasterContainerFactory {
 					tenantGraphQLHandlerFactory,
 					systemGraphQLHandlerFactory,
 					logger,
+					serverConfig,
 				}) =>
 					new ProjectGroupContainerFactory(
 						debugMode,
@@ -170,6 +171,7 @@ export class MasterContainerFactory {
 						tenantGraphQLHandlerFactory,
 						systemGraphQLHandlerFactory,
 						logger,
+						serverConfig.http?.geoCountryHeader,
 					),
 			)
 			.addService(

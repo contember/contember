@@ -55,6 +55,8 @@ export class SignInMutationResolver implements MutationResolvers {
 			context.httpInfo,
 			args.options?.trustForwardedClientInfo === true && context.trustForwardedInfo,
 			args.backupCode || undefined,
+			configuration,
+			context.httpInfo.geoCountry,
 		)
 		await context.logAuthAction({
 			type: 'login',
@@ -77,6 +79,29 @@ export class SignInMutationResolver implements MutationResolvers {
 			await context.logAuthAction({
 				type: 'mfa_enrollment_required',
 				response,
+			})
+		}
+		// A03 anomaly audit. The risk scoring runs in SignInManager; the audit
+		// entries are emitted here at the resolver layer (per convention), with the
+		// score + reasons snapshot in event_data.
+		if (response.ok && response.result.unusualLoginDetected) {
+			await context.logAuthAction({
+				type: 'unusual_login_detected',
+				response,
+				personId: response.result.person.id,
+				eventData: response.result.risk ? { ...response.result.risk } : undefined,
+			})
+		}
+		if (!response.ok && response.metadata?.stepUpRequired) {
+			await context.logAuthAction({
+				type: 'unusual_login_detected',
+				response,
+				eventData: response.metadata.risk ? { ...response.metadata.risk } : undefined,
+			})
+			await context.logAuthAction({
+				type: 'step_up_required',
+				response,
+				eventData: response.metadata.risk ? { ...response.metadata.risk } : undefined,
 			})
 		}
 

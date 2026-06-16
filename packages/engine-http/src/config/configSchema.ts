@@ -164,6 +164,20 @@ export const serverConfigSchema = Typesafe.partial({
 				})
 			return cidrs.length > 0 ? cidrs : undefined
 		},
+		// A03: name of the trusted reverse-proxy header carrying the client's
+		// country (e.g. set by nginx with the GeoIP module). Opt-in — unset means
+		// the country signal is never read. Honored only through the same
+		// trust_forwarded_info gate as the forwarded IP/User-Agent, so an untrusted
+		// client can never spoof it. Header lookup is case-insensitive.
+		geoCountryHeader: (val: unknown): string | undefined => {
+			if (val === undefined || val === null || val === '') {
+				return undefined
+			}
+			if (typeof val === 'string') {
+				return val
+			}
+			return Typesafe.fail([])
+		},
 	}),
 	contentApi: Typesafe.partial({
 		schemaCacheTtlSeconds: Typesafe.integer,

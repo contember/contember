@@ -5,6 +5,8 @@ import { AuthLogService } from '../model/service/AuthLogService.js'
 export interface TenantResolverHttpInfo {
 	readonly ip: string
 	readonly userAgent?: string
+	/** A03: country from the trusted reverse-proxy geo header, when present + trusted. */
+	readonly geoCountry?: string
 }
 
 export interface TenantResolverContext {

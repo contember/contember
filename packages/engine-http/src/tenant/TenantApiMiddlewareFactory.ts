@@ -29,6 +29,7 @@ export class TenantApiMiddlewareFactory {
 									userAgent: authResult.clientUserAgent,
 									forwarderIp: authResult.forwarderIp,
 									forwarderUserAgent: authResult.forwarderUserAgent,
+									geoCountry: authResult.geoCountry,
 								},
 								db,
 								logger,

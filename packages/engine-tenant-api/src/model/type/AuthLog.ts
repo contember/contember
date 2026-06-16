@@ -47,3 +47,5 @@ export type AuthActionType =
 	| 'session_expired_idle'
 	| 'session_policy_applied'
 	| 'auth_policy_change'
+	| 'unusual_login_detected'
+	| 'step_up_required'

@@ -232,7 +232,27 @@ const schema: DocumentNode = gql`
 		defaultTokenExpiration: Interval!
 		maxTokenExpiration: Interval
 		mfaGraceDuration: Interval!
+		anomalyDetection: ConfigLoginAnomalyDetection!
     }
+
+	"""
+	Sign-in anomaly detection (A03). Opt-in, disabled by default. When enabled,
+	each successful password verification is scored against the person's last
+	historySize successful logins using signals derived from the trusted client
+	info (country from a reverse-proxy geo header, a user-agent fingerprint, and
+	the IP / IP prefix). The cumulative score then drives an action:
+	  - score >= emailThreshold  → an informational UNUSUAL_LOGIN email is sent.
+	  - score >= stepUpThreshold → a second factor (email OTP) is additionally
+	    required before a session is issued (reuses the existing step-up flow).
+	Country is only ever read through the same trusted-proxy gate as the
+	forwarded IP / User-Agent — never from an untrusted client.
+	"""
+	type ConfigLoginAnomalyDetection {
+		enabled: Boolean!
+		historySize: Int!
+		emailThreshold: Int!
+		stepUpThreshold: Int!
+	}
 
 	"""
 	Captcha config. The secret is never exposed; only the provider and (where
@@ -339,7 +359,15 @@ const schema: DocumentNode = gql`
 		defaultTokenExpiration: Interval
 		maxTokenExpiration: Interval
 		mfaGraceDuration: Interval
+		anomalyDetection: ConfigLoginAnomalyDetectionInput
     }
+
+	input ConfigLoginAnomalyDetectionInput {
+		enabled: Boolean
+		historySize: Int
+		emailThreshold: Int
+		stepUpThreshold: Int
+	}
 
 	"""
 	Provider null disables captcha verification. Secret is write-only.
@@ -1572,6 +1600,7 @@ const schema: DocumentNode = gql`
 		EMAIL_VERIFICATION
 		EMAIL_CHANGE_VERIFY
 		EMAIL_CHANGE_NOTIFY
+		UNUSUAL_LOGIN
 	}
 
 	input MailTemplateIdentifier {

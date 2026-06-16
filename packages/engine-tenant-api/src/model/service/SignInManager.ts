@@ -244,7 +244,16 @@ class SignInManager {
 				// 3-attempt cap still applies, and a fresh code is issued only when the
 				// client retries without a code.
 				if (!await this.emailOtpManager.verifyAndConsume(dbContext, person, otpCode)) {
-					return new ResponseError('INVALID_OTP_TOKEN', 'OTP token validation has failed', authLogData)
+					// A failed *forced* second factor is itself an anomaly signal — carry the
+					// step-up/risk metadata so the resolver still emits unusual_login_detected
+					// + step_up_required with the score/reasons, rather than logging it as an
+					// ordinary mistyped-OTP login indistinguishable from a normal 2FA typo.
+					return new ResponseError('INVALID_OTP_TOKEN', 'OTP token validation has failed', {
+						stepUpRequired: true,
+						unusualLoginDetected: true,
+						risk: riskMeta,
+						...authLogData,
+					})
 				}
 				// Step-up satisfied this request — fall through to notify + allow below.
 			} else {

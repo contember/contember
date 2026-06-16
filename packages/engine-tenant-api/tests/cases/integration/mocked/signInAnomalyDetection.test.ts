@@ -242,10 +242,22 @@ test('anomaly on, step-up retry with a wrong code: INVALID_OTP_TOKEN, no session
 		return: {
 			data: { signIn: { ok: false, errors: [{ code: 'INVALID_OTP_TOKEN' }], result: null } },
 		},
-		expectedAuthLog: {
-			type: 'login',
-			response: expect.objectContaining({ ok: false }),
-		},
+		// A failed *forced* step-up is itself an anomaly: it is audited as
+		// unusual_login_detected + step_up_required (with the score/reasons), not just a
+		// bare failed login indistinguishable from an ordinary mistyped 2FA code.
+		expectedAuthLog: [
+			{ type: 'login', response: expect.objectContaining({ ok: false }) },
+			expect.objectContaining({
+				type: 'unusual_login_detected',
+				eventData: { score: 3, reasons: ['new_country'] },
+				response: expect.objectContaining({ ok: false }),
+			}),
+			expect.objectContaining({
+				type: 'step_up_required',
+				eventData: { score: 3, reasons: ['new_country'] },
+				response: expect.objectContaining({ ok: false }),
+			}),
+		],
 	})
 })
 

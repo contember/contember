@@ -128,6 +128,26 @@ location /contember/ {
 
 The two `proxy_set_header` calls per header are intentional: the first one clears the header (overriding what the client sent), the second one sets the trusted value. Doing only the second one leaves the door open to header smuggling in some nginx versions.
 
+## Forwarded country (anomaly detection)
+
+[Sign-in anomaly detection](/reference/engine/tenant/anomaly-detection) can score a login by country. Contember does **not** bundle a GeoIP database; instead it reads the country from a configurable header that your reverse proxy injects — gated by the **exact same** `trustForwardedClientInfo` trust model as the forwarded IP/User-Agent.
+
+The header is **off by default**. Enable it by naming the header Contember should read:
+
+```bash
+CONTEMBER_HTTP_GEO_COUNTRY_HEADER="X-Contember-Client-Geo-Country"
+```
+
+Then have your proxy strip and re-inject it, alongside the IP/User-Agent headers:
+
+```nginx
+# nginx with the GeoIP/GeoIP2 module resolving $geoip_country_code
+proxy_set_header X-Contember-Client-Geo-Country "";              # strip client value
+proxy_set_header X-Contember-Client-Geo-Country $geoip_country_code;  # re-inject trusted value
+```
+
+The value is honored only when the api_key has `trustForwardedClientInfo: true` **and** the header name is configured. An untrusted key can never set a country. The value is trimmed and capped (64 chars) at the boundary, and is recorded in the audit log's `geo_country` column.
+
 ## Audit forensics
 
 Every request authenticated through a trust-forwarded chain produces audit entries where:

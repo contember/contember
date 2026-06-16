@@ -1,0 +1,74 @@
+---
+title: Sign-in anomaly detection
+---
+
+After a password (and any standing 2FA) is verified, but before a session is issued, the Tenant API can score the sign-in for risk and act on it: allow silently, send an informational email, or force a step-up second factor. It is **opt-in and disabled by default** — enabling the engine alone changes nothing.
+
+:::note[Available since 2.3]
+:::
+
+## Scope
+
+Scoring runs on the **password sign-in** (`signIn`) path only. This is deliberate: anomaly detection targets the classic username + password account — especially one with no second factor — where a leaked password is the whole attack. The other entry points are out of scope by design:
+
+- **IdP** (`signInIDP`) — the identity provider owns authentication (and its own anomaly/MFA policy); Contember only consumes the federated result.
+- **Passwordless** (`signInPasswordless`) — possession of the magic link already implies mailbox access.
+- **`createSessionToken`** — an admin minting a token carries the *admin's* client info, not the person's.
+
+These flows are **not scored**, but their successful logins **do** seed the baseline (see below), so they don't create blind spots for the password path that *is* scored. "Impossible travel" (geo + time) is also out of scope for v1.
+
+## Signals (v1)
+
+Each password sign-in is scored against the person's last *N* successful **interactive sign-ins** recorded in `person_auth_log` — password (`login`), IdP (`idp_login`), and passwordless (`passwordless_login`) all count toward this baseline, so a person who usually signs in via IdP or a magic link still has a baseline when they occasionally use their password. Three signals contribute to a cumulative score:
+
+| Signal | Weight | When it fires |
+|---|---|---|
+| New country | **high** (3) | The current country is present and never seen in history. |
+| New device fingerprint | **medium** (2) | A hash of the User-Agent not seen in history. |
+| New IP / IP-prefix | **low** (1) | The IP coarsened to a /24 (IPv4) or /48 (IPv6) prefix not seen in history. |
+
+A signal only fires when (a) the current value is known, (b) a baseline for **that** signal exists in history — at least one prior login recorded a non-null value for it — and (c) the current value is absent from that baseline. With **no history** (a person's first login, or an empty window) nothing fires — there is no baseline to deviate from, so the login is treated as known. The same holds **per signal**: when a signal has only just begun being collected (e.g. you configure the geo header at the same time you enable the feature, so every prior row has a null country), it stays silent until a baseline accumulates, rather than scoring every returning user's first login as a new country.
+
+:::note[No GeoIP database]
+Contember does **not** bundle MaxMind or any GeoIP DB. The country comes from a configurable trusted reverse-proxy header, read through the same trust gate as the forwarded IP/User-Agent — see [Trusted proxies and forwarded client info](/reference/engine/tenant/proxy-trust#forwarded-country-anomaly-detection). When no country is forwarded, the country signal simply never fires; the device and IP signals still work.
+
+"Impossible travel" (geo + time) is intentionally out of scope for v1.
+:::
+
+The device fingerprint is a salt-free SHA-256 of the User-Agent string — never the raw UA in a second column, and never a cross-site browser fingerprint.
+
+## Policy
+
+The action is driven by two score thresholds in tenant config:
+
+- score ≥ `emailThreshold` → send an `UNUSUAL_LOGIN` email.
+- score ≥ `stepUpThreshold` → additionally require a second factor before issuing the session (reuses the email-OTP step-up channel: the client receives `OTP_REQUIRED` and retries with `otpToken`).
+
+A login that already cleared a second factor in the same request is never asked to step up again.
+
+```graphql
+mutation {
+  configure(config: {
+    login: {
+      anomalyDetection: {
+        enabled: true
+        historySize: 10       # how many recent successful logins to compare against
+        emailThreshold: 1     # default: any low signal emails
+        stepUpThreshold: 3    # default: a high signal (new country) forces step-up
+      }
+    }
+  }) { ok error { code developerMessage } }
+}
+```
+
+With the shipped defaults (`emailThreshold: 1`, `stepUpThreshold: 3`): a new IP or device emails the user; a new country forces step-up. Set thresholds higher to suppress quieter signals.
+
+## What gets recorded
+
+- `person_auth_log.geo_country` and `person_auth_log.device_fingerprint` are stamped on **every** auth-log row (additive, nullable columns), so each sign-in builds the baseline for the next one.
+- When a login scores as unusual, an `unusual_login_detected` audit entry is written with the score and reasons in `event_data` (e.g. `{ "score": 3, "reasons": ["new_country"] }`).
+- When step-up is forced, the initial `OTP_REQUIRED` response records **both** an `unusual_login_detected` and a `step_up_required` entry (same `event_data`); the eventual successful retry is the normal `login` entry.
+
+## Mail template
+
+The `UNUSUAL_LOGIN` template ships with a default and can be overridden per project/variant like any other [mail template](/reference/engine/tenant/mail-templates). Available variables: `email`, `geoCountry`, `ipAddress`.

@@ -191,6 +191,7 @@ export const nav: NavItem[] = [
 					doc('reference/engine/tenant/proxy-trust'),
 					doc('reference/engine/tenant/password-policy'),
 					doc('reference/engine/tenant/anti-abuse'),
+					doc('reference/engine/tenant/anomaly-detection'),
 					doc('reference/engine/tenant/audit-log'),
 					doc('reference/engine/tenant/configuration'),
 					doc('reference/engine/tenant/mail-templates'),

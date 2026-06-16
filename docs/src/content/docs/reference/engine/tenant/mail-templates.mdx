@@ -16,6 +16,7 @@ Mail templates in Contember enable tailored communication for emails dispatched 
 | `EMAIL_VERIFICATION` | `signUp` (when `signup.requireEmailVerification` is on) or `requestEmailVerification`. Carries the verification token. See [e-mail verification](/reference/engine/tenant/email-verification). | 2.2 |
 | `EMAIL_CHANGE_VERIFY` | A self-service e-mail change is initiated via `changeMyProfile` with `emailChange.requireVerification` on. Sent to the **new** address; carries the confirmation token. | 2.2 |
 | `EMAIL_CHANGE_NOTIFY` | `confirmEmailChange` succeeds. Sent to the **old** address as a security notice. | 2.2 |
+| `UNUSUAL_LOGIN` | A sign-in scores as unusual under [anomaly detection](/reference/engine/tenant/anomaly-detection). Informational notice; variables: `email`, `geoCountry`, `ipAddress`. | 2.3 |
 
 Each type ships with a default template. In Contember Cloud setups, enhanced custom templates are pre-installed and can be modified or overwritten.
 
@@ -44,7 +45,7 @@ Each type ships with a default template. In Contember Cloud setups, enhanced cus
    }
    ```
   Input breakdown:
-- `type`: The mail type — one of the values from the table above (`NEW_USER_INVITED`, `EXISTING_USER_INVITED`, `RESET_PASSWORD_REQUEST`, `PASSWORDLESS_SIGN_IN`, `FORCED_SIGN_OUT`, `EMAIL_VERIFICATION`, `EMAIL_CHANGE_VERIFY`, `EMAIL_CHANGE_NOTIFY`).
+- `type`: The mail type — one of the values from the table above (`NEW_USER_INVITED`, `EXISTING_USER_INVITED`, `RESET_PASSWORD_REQUEST`, `PASSWORDLESS_SIGN_IN`, `FORCED_SIGN_OUT`, `EMAIL_VERIFICATION`, `EMAIL_CHANGE_VERIFY`, `EMAIL_CHANGE_NOTIFY`, `UNUSUAL_LOGIN`).
 - `subject`: The email's subject.
 - `content`: The email's main content, with Mustache variables for dynamic information.
 - `projectSlug`: To specify a particular project.

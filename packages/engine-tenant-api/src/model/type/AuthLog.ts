@@ -32,6 +32,8 @@ export type AuthActionType =
 	| 'idp_session_revalidated'
 	| 'idp_session_revoked'
 	| 'idp_session_revalidation_failed'
+	| 'idp_logout_initiated'
+	| 'idp_backchannel_logout'
 	| 'project_create'
 	| 'project_update'
 	| 'project_secret_change'

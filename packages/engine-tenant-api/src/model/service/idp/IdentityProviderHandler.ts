@@ -32,6 +32,22 @@ export type IDPResponse = {
 	idpSession?: IDPSessionState
 } & Record<string, unknown>
 
+/** Input for building an RP-initiated (front-channel) logout redirect URL. */
+export type LogoutUrlRequest = {
+	/** The ID token issued at sign-in, used as `id_token_hint`. */
+	idToken?: string
+	/** Where the IdP should redirect the browser after it has logged the user out. */
+	postLogoutRedirectUri?: string
+}
+
+/** Claims extracted from a validated OIDC back-channel logout token (the subset we act on). */
+export type LogoutTokenClaims = {
+	/** The IdP session id (`sid`) the logout applies to, when the token targets a single session. */
+	sid?: string
+	/** The subject (`sub`) the logout applies to, when the token targets all the subject's sessions. */
+	sub?: string
+}
+
 /** Outcome of a federated-session re-validation against the IdP. */
 export type RevalidationResult =
 	| {
@@ -61,4 +77,19 @@ export interface IdentityProviderHandler<Configuration extends {}> {
 	 * providers that cannot (Apple, Facebook, SAML — which rely on a short max lifetime + SLO).
 	 */
 	revalidate?: (configuration: Configuration, session: IDPSessionState) => Promise<RevalidationResult>
+
+	/**
+	 * Build an RP-initiated (front-channel) logout redirect URL for this session (A10).
+	 * Returns null when the IdP advertises no `end_session_endpoint` — the caller then falls
+	 * back to a local-only logout. Present only on providers that support Single Logout (OIDC).
+	 */
+	buildLogoutUrl?: (configuration: Configuration, request: LogoutUrlRequest) => Promise<string | null>
+
+	/**
+	 * Validate an IdP-signed back-channel logout token (A10) and extract the targeted
+	 * `sid` / `sub`. Throws when the token is invalid (bad signature, wrong issuer/audience,
+	 * missing the back-channel `events` claim, etc.). Present only on providers that support
+	 * OIDC back-channel logout.
+	 */
+	validateLogoutToken?: (configuration: Configuration, logoutToken: string) => Promise<LogoutTokenClaims>
 }

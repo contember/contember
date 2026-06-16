@@ -69,6 +69,12 @@ export const OIDCConfigurationOptions = Typesafe.partial({
 	timeout: Typesafe.number,
 	revalidation: OIDCRevalidationConfig,
 	claimMapping: OIDCClaimMapping,
+	/**
+	 * Where the IdP should send the browser back after an RP-initiated (front-channel) logout
+	 * (A10). Used as `post_logout_redirect_uri` in the end-session URL; must be registered at the
+	 * IdP. When unset, the IdP applies its own default post-logout behavior.
+	 */
+	postLogoutRedirectUri: Typesafe.string,
 })
 export const BaseOIDCConfiguration = Typesafe.intersection(
 	Typesafe.object({

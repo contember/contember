@@ -2024,6 +2024,13 @@ export type SignOutResponse = {
 	readonly error?: Maybe<SignOutError>
 	/** @deprecated Field no longer supported */
 	readonly errors: ReadonlyArray<SignOutError>
+	/**
+	 * When the session was federated via an OIDC identity provider that supports RP-initiated
+	 * (front-channel) logout, the URL the client should redirect the browser to so the user is
+	 * also signed out at the IdP (Single Logout). Null for plain sessions or legacy IdPs without
+	 * an end-session endpoint, in which case only a local logout happened.
+	 */
+	readonly logoutUrl?: Maybe<Scalars['String']['output']>
 	readonly ok: Scalars['Boolean']['output']
 }
 
@@ -4253,6 +4260,7 @@ export type SignOutResponseResolvers<
 > = {
 	error?: Resolver<Maybe<ResolversTypes['SignOutError']>, ParentType, ContextType>
 	errors?: Resolver<ReadonlyArray<ResolversTypes['SignOutError']>, ParentType, ContextType>
+	logoutUrl?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>
 	ok?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
 }
 

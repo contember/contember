@@ -1,9 +1,17 @@
 import { Client, custom, Issuer } from 'openid-client'
-import { IdentityProviderHandler, IDPResponse, IDPSessionState, InitIDPAuthResult, RevalidationResult } from '../IdentityProviderHandler.js'
+import {
+	IdentityProviderHandler,
+	IDPResponse,
+	IDPSessionState,
+	InitIDPAuthResult,
+	LogoutTokenClaims,
+	LogoutUrlRequest,
+	RevalidationResult,
+} from '../IdentityProviderHandler.js'
 import { InvalidIDPConfigurationError } from '../InvalidIDPConfigurationError.js'
 import { catchTypesafe } from './helpers.js'
 import { OIDCConfiguration, OIDCInitData, OIDCResponseData } from './OIDCTypes.js'
-import { handleOIDCResponse, initOIDCAuth, revalidateOIDC } from './OIDCHelpers.js'
+import { buildOIDCLogoutUrl, handleOIDCResponse, initOIDCAuth, revalidateOIDC, validateOIDCLogoutToken } from './OIDCHelpers.js'
 import { IDPValidationError } from '../IDPValidationError.js'
 
 const DEFAULT_OIDC_TIMEOUT = 5000
@@ -41,6 +49,16 @@ export class OIDCProvider implements IdentityProviderHandler<OIDCConfiguration> 
 	public async revalidate(configuration: OIDCConfiguration, session: IDPSessionState): Promise<RevalidationResult> {
 		const client = await this.createOIDCClient(configuration)
 		return await revalidateOIDC(client, configuration.revalidation?.method ?? 'refresh', session)
+	}
+
+	public async buildLogoutUrl(configuration: OIDCConfiguration, request: LogoutUrlRequest): Promise<string | null> {
+		const client = await this.createOIDCClient(configuration)
+		return buildOIDCLogoutUrl(client, request)
+	}
+
+	public async validateLogoutToken(configuration: OIDCConfiguration, logoutToken: string): Promise<LogoutTokenClaims> {
+		const client = await this.createOIDCClient(configuration)
+		return await validateOIDCLogoutToken(client, client.issuer, logoutToken)
 	}
 
 	/**

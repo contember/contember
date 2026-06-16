@@ -1,8 +1,16 @@
-import { Client, custom, errors, generators, TokenSet } from 'openid-client'
+import { Client, custom, errors, generators, Issuer, TokenSet } from 'openid-client'
+import { createRemoteJWKSet, jwtVerify } from 'jose'
 import { OIDCClaimMapping, OIDCResponseData } from './OIDCTypes.js'
 import { IDPValidationError } from '../IDPValidationError.js'
 import { IDPResponseError } from '../IDPResponseError.js'
-import { IDPResponse, IDPSessionState, InitIDPAuthResult, RevalidationResult } from '../IdentityProviderHandler.js'
+import {
+	IDPResponse,
+	IDPSessionState,
+	InitIDPAuthResult,
+	LogoutTokenClaims,
+	LogoutUrlRequest,
+	RevalidationResult,
+} from '../IdentityProviderHandler.js'
 
 /**
  * Build the persisted session state from an OIDC token set. Stores the tokens needed for
@@ -219,4 +227,120 @@ export const revalidateOIDC = async (
 		// transient (network / IdP unavailable) — propagate, do not revoke
 		throw e
 	}
+}
+
+/**
+ * Build an RP-initiated (front-channel) logout URL (OIDC RP-Initiated Logout 1.0). Returns null
+ * when the IdP advertises no `end_session_endpoint` — the caller then degrades to a local-only
+ * logout (legacy-IdP graceful fallback). The `id_token_hint` lets the IdP identify and confirm the
+ * session to terminate; `post_logout_redirect_uri` is where the IdP returns the browser afterwards.
+ */
+export const buildOIDCLogoutUrl = (client: Client, { idToken, postLogoutRedirectUri }: LogoutUrlRequest): string | null => {
+	if (!client.issuer.metadata.end_session_endpoint) {
+		return null
+	}
+	return client.endSessionUrl({
+		...(idToken ? { id_token_hint: idToken } : {}),
+		...(postLogoutRedirectUri ? { post_logout_redirect_uri: postLogoutRedirectUri } : {}),
+	})
+}
+
+/**
+ * The OIDC Back-Channel Logout 1.0 event member that MUST be present in a logout token's `events`
+ * claim. Its presence (and the absence of a `nonce`) is what distinguishes a logout token from an
+ * ID token — both are signed by the same IdP, so without this check an ID token could be replayed
+ * to forcibly log a user out.
+ */
+const BACKCHANNEL_LOGOUT_EVENT = 'http://schemas.openid.net/event/backchannel-logout'
+
+/**
+ * Max accepted age of a back-channel logout token, derived from its `iat`. OIDC Back-Channel Logout
+ * tokens are single-use and short-lived; bounding the age (together with requiring `exp`) limits the
+ * window in which a captured token could be replayed to force a logout.
+ */
+const LOGOUT_TOKEN_MAX_AGE_SECONDS = 120
+const LOGOUT_TOKEN_CLOCK_TOLERANCE_SECONDS = 5
+
+/**
+ * Remote JWKS sets keyed by `jwks_uri`. `createRemoteJWKSet` returns a function with its own internal
+ * key cache + fetch cooldown, so it MUST be reused across requests — re-creating it per call (as the
+ * unauthenticated back-channel endpoint would otherwise do) defeats the cache and turns every request
+ * into a potential outbound JWKS fetch. Keyed by URL, so two providers sharing an IdP share the set.
+ */
+const remoteJwksCache = new Map<string, ReturnType<typeof createRemoteJWKSet>>()
+
+const getRemoteJwks = (jwksUri: string): ReturnType<typeof createRemoteJWKSet> => {
+	let jwks = remoteJwksCache.get(jwksUri)
+	if (!jwks) {
+		jwks = createRemoteJWKSet(new URL(jwksUri))
+		remoteJwksCache.set(jwksUri, jwks)
+	}
+	return jwks
+}
+
+/**
+ * Validate an OIDC back-channel logout token (OIDC Back-Channel Logout 1.0 §2.4–2.6) and extract
+ * the targeted `sid` / `sub`. The token is a JWT signed by the IdP; we verify the signature against
+ * the issuer's JWKS and enforce the issuer + audience (client_id) the same way ID tokens are
+ * verified, pinning the signing algorithm to the provider's configured one, then assert the
+ * back-channel-specific claims:
+ *   - `iat` is present and recent and `exp` is present (§2.4 requires both) — bounds the replay window;
+ *   - `events` contains the back-channel-logout member (it really is a logout token);
+ *   - it carries a `sid` and/or `sub` (otherwise there is nothing to act on);
+ *   - it does NOT carry a `nonce` (a `nonce` means it is an ID token being replayed).
+ * Throws {@link IDPValidationError} on any failure so the caller can answer 400.
+ */
+export const validateOIDCLogoutToken = async (client: Client, issuer: Issuer<Client>, logoutToken: string): Promise<LogoutTokenClaims> => {
+	const jwksUri = issuer.metadata.jwks_uri
+	if (!jwksUri) {
+		throw new IDPValidationError('IdP has no jwks_uri; cannot verify logout token')
+	}
+	const clientId = client.metadata.client_id
+	if (typeof clientId !== 'string' || clientId === '') {
+		// The `aud` check is a core anti-token-substitution defence on this unauthenticated endpoint.
+		// jose treats `audience: undefined` as "skip the aud check entirely", so a missing client_id
+		// must fail closed (reject the token) rather than fall through and accept any audience.
+		throw new IDPValidationError('cannot verify logout token audience: client_id is missing')
+	}
+	const expectedAlg = typeof client.metadata.id_token_signed_response_alg === 'string'
+		? client.metadata.id_token_signed_response_alg
+		: 'RS256'
+	const jwks = getRemoteJwks(jwksUri)
+	let payload: Record<string, unknown>
+	try {
+		const verified = await jwtVerify(logoutToken, jwks, {
+			issuer: issuer.metadata.issuer,
+			audience: clientId,
+			// pin to the provider's configured signing alg so a JWKS containing a symmetric/none key
+			// can never be selected (defence-in-depth on top of jose's own key-type check).
+			algorithms: [expectedAlg],
+			// §2.4: `iat` and `exp` are REQUIRED. `maxTokenAge` makes `iat` required + bounds freshness;
+			// `requiredClaims` makes `exp` required (jose only checks `exp` when present).
+			maxTokenAge: LOGOUT_TOKEN_MAX_AGE_SECONDS,
+			requiredClaims: ['exp'],
+			clockTolerance: LOGOUT_TOKEN_CLOCK_TOLERANCE_SECONDS,
+		})
+		payload = verified.payload as Record<string, unknown>
+	} catch (e: any) {
+		throw new IDPValidationError(`Invalid logout token: ${e?.message ?? 'verification failed'}`)
+	}
+
+	// A logout token MUST NOT contain a nonce; its presence means an ID token is being replayed.
+	if ('nonce' in payload) {
+		throw new IDPValidationError('Logout token must not contain a nonce')
+	}
+
+	const events = payload.events
+	const hasLogoutEvent = typeof events === 'object' && events !== null && BACKCHANNEL_LOGOUT_EVENT in (events as Record<string, unknown>)
+	if (!hasLogoutEvent) {
+		throw new IDPValidationError('Logout token is missing the back-channel-logout event')
+	}
+
+	const sid = typeof payload.sid === 'string' ? payload.sid : undefined
+	const sub = typeof payload.sub === 'string' ? payload.sub : undefined
+	if (!sid && !sub) {
+		throw new IDPValidationError('Logout token must contain a sid or sub claim')
+	}
+
+	return { sid, sub }
 }

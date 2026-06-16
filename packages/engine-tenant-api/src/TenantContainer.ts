@@ -8,6 +8,7 @@ import {
 	AppleProvider,
 	AuthPolicyManager,
 	AuthPolicyResolver,
+	BackchannelLogoutManager,
 	BackupCodeManager,
 	CaptchaValidator,
 	DatabaseContext,
@@ -47,6 +48,7 @@ import {
 	RolesManager,
 	SecretsManager,
 	SignInManager,
+	SignOutManager,
 	SignUpManager,
 	TurnstileProvider,
 	UnpersistedApiKeyManager,
@@ -115,6 +117,7 @@ import { AuthLogService } from './model/service/AuthLogService.js'
 export interface TenantContainer {
 	projectMemberManager: ProjectMemberManager
 	apiKeyManager: ApiKeyManager
+	backchannelLogoutManager: BackchannelLogoutManager
 	signUpManager: SignUpManager
 	projectManager: ProjectManager
 	resolvers: Schema.Resolvers
@@ -149,6 +152,7 @@ export class TenantContainerFactory {
 			.build()
 			.pick(
 				'apiKeyManager',
+				'backchannelLogoutManager',
 				'projectMemberManager',
 				'projectManager',
 				'signUpManager',
@@ -185,6 +189,7 @@ export class TenantContainerFactory {
 				return idpRegistry
 			})
 			.addService('idpSessionRevalidator', ({ idpRegistry }) => new IdpSessionRevalidator(idpRegistry))
+			.addService('backchannelLogoutManager', ({ idpRegistry }) => new BackchannelLogoutManager(idpRegistry))
 			.addService('unpersistedApiKeyManager', () =>
 				UnpersistedApiKeyManager.createForRootTokens({
 					tokens: args.tenantCredentials.rootTokens,
@@ -195,6 +200,7 @@ export class TenantContainerFactory {
 				({ apiKeyService, authPolicyResolver, authLogService, unpersistedApiKeyManager, idpSessionRevalidator }) =>
 					new ApiKeyManager(apiKeyService, authPolicyResolver, authLogService, unpersistedApiKeyManager, idpSessionRevalidator),
 			)
+			.addService('signOutManager', ({ apiKeyManager, idpRegistry }) => new SignOutManager(apiKeyManager, idpRegistry))
 			.addService('emailValidator', () => new EmailValidator())
 			.addService('hibpChecker', (): HibpChecker => new HttpHibpChecker())
 			.addService('noopHibpChecker', (): HibpChecker => new NoopHibpChecker())
@@ -298,7 +304,7 @@ export class TenantContainerFactory {
 				'signInMutationResolver',
 				({ signInManager, signInResponseFactory, rateLimiter }) => new SignInMutationResolver(signInManager, signInResponseFactory, rateLimiter),
 			)
-			.addService('signOutMutationResolver', ({ apiKeyManager }) => new SignOutMutationResolver(apiKeyManager))
+			.addService('signOutMutationResolver', ({ signOutManager }) => new SignOutMutationResolver(signOutManager))
 			.addService(
 				'changeProfileMutationResolver',
 				({ personManager, emailChangeManager, permissionContextFactory }) =>

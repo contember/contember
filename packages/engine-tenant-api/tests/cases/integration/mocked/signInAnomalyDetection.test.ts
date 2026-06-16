@@ -1,9 +1,11 @@
-import { executeTenantTest } from '../../../src/testTenant.js'
+import { executeTenantTest, now } from '../../../src/testTenant.js'
 import { testUuid } from '../../../src/testUuid.js'
 import { selectMembershipsSql } from './sql/selectMembershipsSql.js'
 import { signInMutation } from './gql/signIn.js'
 import { getPersonByEmailSql } from './sql/getPersonByEmailSql.js'
 import { expect, test } from 'bun:test'
+import { OtpAuthenticator } from '../../../../src/index.js'
+import { Buffer } from 'buffer'
 import { createSessionKeySql } from './sql/createSessionKeySql.js'
 import { getIdentityProjectsSql } from './sql/getIdentityProjectsSql.js'
 import { getNextLoginAttemptSql } from './sql/getNextLoginAttemptSql.js'
@@ -256,6 +258,65 @@ test('anomaly on, step-up retry with a wrong code: INVALID_OTP_TOKEN, no session
 				type: 'step_up_required',
 				eventData: { score: 3, reasons: ['new_country'] },
 				response: expect.objectContaining({ ok: false }),
+			}),
+		],
+	})
+})
+
+test('anomaly on, step-up scored for a user who already cleared TOTP this request: no re-challenge, emails + signs in', async () => {
+	// A login that already proved a standing second factor (active TOTP) in THIS
+	// request must NOT be challenged again by the anomaly step-up (no email OTP), yet
+	// a high score must still send the informational UNUSUAL_LOGIN email and issue the
+	// session. Guards the `&& !mfaSatisfiedThisRequest` gate in applyRiskPolicy: a
+	// regression dropping it would re-challenge an already-2FA'd user (storm), and one
+	// skipping the fall-through would drop the notification — neither is otherwise
+	// covered (every other case here uses a person with no standing MFA).
+	const email = 'john@doe.com'
+	const password = '123'
+	const identityId = testUuid(2)
+	const personId = testUuid(7)
+	const projectId = testUuid(10)
+	const apiKeyId = testUuid(1)
+	const otpAuth = new OtpAuthenticator({
+		now: () => now,
+		randomBytes: () => Promise.resolve(Buffer.alloc(20)),
+	})
+	const otp = await otpAuth.create('john', 'contember')
+	await executeTenantTest({
+		query: signInMutation({ email, password, otpToken: otpAuth.generate(otp) }),
+		httpInfo: { userAgent: KNOWN_UA, geoCountry: 'US' },
+		executes: [
+			anomalyConfig,
+			getNextLoginAttemptSql(email),
+			getPersonByEmailSql({ email, response: { personId, identityId, password, roles: [], otpUri: otp.uri } }),
+			// active TOTP + valid token → verified here (no SQL); mfaSatisfiedThisRequest = true.
+			// applyRiskPolicy: US is a new country (high, 3 → stepUp) BUT MFA already satisfied
+			// this request → NO email-OTP challenge (no sendEmailOtpSql/getLatestEmailOtpTokenSql
+			// in this sequence); fall through to the informational UNUSUAL_LOGIN email.
+			getLoginHistorySql({ personId, rows: [{ geoCountry: 'CZ', deviceFingerprint: KNOWN_FINGERPRINT, ip: '10.0.0.5' }] }),
+			getMailTemplateSql({ type: 'unusualLogin', projectId: null }),
+			getMailTemplateSql({ type: 'unusualLogin', projectId: null }),
+			// createSessionApiKey (A19 session-policy queries)
+			anomalyConfig,
+			getIdentityByIdSql({ identityId }),
+			getAuthPoliciesSql(),
+			createSessionKeySql({ apiKeyId, identityId, userAgent: KNOWN_UA }),
+			getIdentityProjectsSql({ identityId, projectId }),
+			selectMembershipsSql({ identityId, projectId, membershipsResponse: [] }),
+		],
+		return: {
+			data: { signIn: { ok: true, errors: [], result: { token: '0000000000000000000000000000000000000000' } } },
+		},
+		sentMails: [{ subject: 'Unusual sign-in to your account' }],
+		// unusual_login_detected fires, but step_up_required must NOT (the factor was
+		// already satisfied, so no step-up was demanded).
+		expectedAuthLog: [
+			{ type: 'login', response: expect.objectContaining({ ok: true }) },
+			expect.objectContaining({
+				type: 'unusual_login_detected',
+				personId,
+				eventData: { score: 3, reasons: ['new_country'] },
+				response: expect.objectContaining({ ok: true }),
 			}),
 		],
 	})

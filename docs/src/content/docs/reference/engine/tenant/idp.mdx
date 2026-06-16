@@ -467,6 +467,49 @@ A definitive IdP rejection (`invalid_grant`, inactive token) **revokes** the ses
 Refresh tokens are stored encrypted at rest, so `method: "refresh"` needs a configured encryption key (`CONTEMBER_ENCRYPTION_KEY`). Without one, a token-bearing session is simply **not** persisted — the session falls back to plain behaviour with no re-validation rather than storing secrets in plaintext or failing sign-in.
 :::
 
+## Single Logout
+
+:::note[Available since 2.4]
+:::
+
+When a session was federated through an OIDC provider, signing out can also terminate the session **at the IdP** (OpenID Connect Single Logout), so the user is not silently re-authenticated by a still-live SSO session. Both flows build on the federated session captured by [session re-validation](#session-re-validation), so they take effect only when `configuration.revalidation.enabled` is set (that is when the IdP `sid` is stored at sign-in).
+
+### RP-initiated logout (front-channel)
+
+`signOut` returns a `logoutUrl` when the session was federated and the IdP advertises an `end_session_endpoint`:
+
+```graphql
+mutation { signOut { ok logoutUrl } }
+```
+
+Redirect the browser to `logoutUrl` to finish the logout at the IdP. It is `null` for plain/password sessions and for IdPs without an `end_session_endpoint` (where only a local logout happens).
+
+If you use the bundled admin client, this redirect is **opt-in** so a federated logout does not unexpectedly bounce existing apps through the IdP. Enable it per logout with the `idpLogout` flag — `<LogoutTrigger idpLogout>` or `useLogout()({ idpLogout: true })`; without it the client performs a local-only logout and redirects to `/` as before.
+
+Set where the IdP returns the browser afterwards with `configuration.postLogoutRedirectUri` — it must be registered as a post-logout redirect URI at the IdP:
+
+```json
+{
+  "url": "https://idp.example.com",
+  "clientId": "…",
+  "clientSecret": "…",
+  "postLogoutRedirectUri": "https://app.example.com/logged-out"
+}
+```
+
+### Back-channel logout
+
+For IdP-initiated logout — the IdP terminates the SSO session and notifies Contember directly — Contember exposes a public receiver endpoint:
+
+```
+POST /oidc/backchannel-logout?provider=<slug>
+Content-Type: application/x-www-form-urlencoded
+
+logout_token=<signed JWT>
+```
+
+Register this URL as the provider's **back-channel logout URI** at the IdP, putting the Contember provider [slug](#adding-new-idp) in the `?provider=` query parameter (the IdP knows only which client it is calling, not the Contember provider record). The endpoint is unauthenticated but acts only on a `logout_token` whose signature, issuer, audience and freshness validate against that provider: a token targeting a `sid` revokes that session; a `sub`-only token revokes all of that subject's federated sessions. It answers `200` on success, `400` for an invalid token, `404` for an unknown provider slug, and `501` when the provider does not support back-channel logout.
+
 ## Audit
 
 :::note[Available since 2.2]
@@ -482,6 +525,8 @@ Every IdP management call is recorded in the [audit log](/reference/engine/tenan
 | `enableIDP` | `idp_enable` | `{identityProvider}` |
 
 Sign-in attempts via IdP are recorded as `idp_login`. When [session re-validation](#session-re-validation) revokes a session, it is recorded as `idp_session_revoked` with `event_data: {reason}` (e.g. `invalid_grant`, `inactive`, `idp_disabled`); a token rotation is recorded as `idp_session_revalidated`.
+
+[Single Logout](#single-logout) adds two more *(since 2.4)*: signing out a federated session that produced an RP-initiated logout URL is recorded as `idp_logout_initiated` (`event_data: {all}`), and an IdP-initiated back-channel logout as `idp_backchannel_logout` (`event_data: {sid, sub, revokedCount}`). The back-channel audit write is best-effort — it never fails the logout — so a missing entry means observability was lost, not that the logout did not happen.
 
 A **fail-open** — re-validation could not be performed but the session was kept — is recorded as `idp_session_revalidation_failed` (with `success: true`, since it is not a security failure) and an `error_code`:
 

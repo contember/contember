@@ -54,6 +54,12 @@ mutation { signOut(all: true) { ok } }
 
 `signOut` requires a session token; it does not work with permanent API keys.
 
+When the session was federated via an OIDC provider that supports RP-initiated logout, `signOut` also returns a `logoutUrl` *(since 2.4)*. Redirect the browser there to terminate the session at the IdP as well (OIDC [Single Logout](/reference/engine/tenant/idp#single-logout)); it is `null` for plain/password sessions and for IdPs without an `end_session_endpoint`, where only a local logout happens. The `logoutUrl` is only produced when the IdP session was captured at sign-in — i.e. when [session re-validation](/reference/engine/tenant/idp#session-re-validation) (`configuration.revalidation.enabled`) is on for that provider; otherwise it is always `null` even if the IdP has an `end_session_endpoint`.
+
+```graphql
+mutation { signOut { ok logoutUrl } }
+```
+
 ## Admin: create session token
 
 A `SUPER_ADMIN` (or any role with the `PERSON_CREATE_SESSION_KEY` permission) can mint a session token for any person without credentials. Useful for impersonation and debugging:

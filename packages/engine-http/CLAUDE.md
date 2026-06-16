@@ -19,6 +19,7 @@ HTTP Request → Koa middleware (compress, bodyparse, CORS)
 - `/content/:projectSlug/:stageSlug` — Content GraphQL API (CRUD with ACL)
 - `/system/:projectSlug` — System API (migrations, schema, stages)
 - `/tenant` — Tenant API (auth, users, projects, memberships)
+- `/oidc/backchannel-logout` — OIDC Back-Channel Logout receiver (public; the IdP POSTs a signed `logout_token`, target provider selected via `?provider=<slug>`)
 - `/import`, `/export` — NDJSON data transfer
 - `/actions/:projectSlug` — Actions API (from plugin)
 - `/health` — Internal health check

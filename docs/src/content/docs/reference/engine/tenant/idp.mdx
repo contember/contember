@@ -19,7 +19,7 @@ Contember ships three IdP types, selected by the `type` argument of `addIDP`:
 | `facebook` | Facebook Login | [Facebook configuration](#facebook-configuration) |
 | `apple` | Sign in with Apple | [Apple configuration](#apple-configuration) |
 
-All three are built on the same OIDC machinery and share the [OIDC option set](#oidc-configuration) (`scope`, `claimMapping`, `revalidation`, …); they differ only in the credential fields and how the issuer is discovered. The walkthroughs below use `oidc`.
+All three are built on the same OIDC machinery and accept a common subset of the [OIDC configuration](#oidc-configuration) — `scope` (`claims`), `responseType`, and `additionalAuthorizedParties` — differing mainly in the credential fields and how the issuer is discovered. The richer OIDC options (`claimMapping`, `fetchUserInfo`, `returnOIDCResult`, `tokenEndpointAuthMethod`, and `revalidation`) are honored **only** by `type: "oidc"` — Facebook and Apple silently ignore them. The walkthroughs below use `oidc`.
 
 ### Adding new IdP
 
@@ -168,7 +168,7 @@ mutation {
 
 ### Facebook configuration
 
-`type: "facebook"` uses Contember's built-in Facebook endpoints; you supply the credentials from your Facebook app. The configuration shares the [OIDC options](#oidc-configuration) (`scope`, `claimMapping`, `revalidation`, …).
+`type: "facebook"` uses Contember's built-in Facebook endpoints; you supply the credentials from your Facebook app. It honors the common [OIDC options](#oidc-configuration) (`scope`, `responseType`, `additionalAuthorizedParties`) but **not** the `oidc`-only ones (`claimMapping`, `fetchUserInfo`, `returnOIDCResult`, `tokenEndpointAuthMethod`, `revalidation`).
 
 | Field | Default | Notes |
 |---|---|---|
@@ -191,7 +191,7 @@ Contember verifies the `signedRequest` HMAC with the app secret and then fetches
 
 ### Apple configuration
 
-`type: "apple"` uses Apple's fixed discovery endpoint and builds the client secret as a short-lived JWT signed with your Apple private key — so there is **no** `clientSecret` or `url` field. Shares the [OIDC options](#oidc-configuration).
+`type: "apple"` uses Apple's fixed discovery endpoint and builds the client secret as a short-lived JWT signed with your Apple private key — so there is **no** `clientSecret` or `url` field. Like Facebook, it honors the common [OIDC options](#oidc-configuration) (`scope`, `responseType`, `additionalAuthorizedParties`) but **not** the `oidc`-only ones (`claimMapping`, `fetchUserInfo`, `returnOIDCResult`, `tokenEndpointAuthMethod`, `revalidation`).
 
 | Field | Default | Notes |
 |---|---|---|

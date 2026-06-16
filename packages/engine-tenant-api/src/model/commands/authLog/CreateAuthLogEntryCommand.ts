@@ -38,7 +38,8 @@ export class CreateAuthLogEntryCommand implements Command<void> {
 namespace CreateAuthLogEntryCommand {
 	export type Entry = {
 		type: AuthActionType
-		invokedById: string
+		/** The identity that initiated the action. Omit (→ NULL) when there is no acting identity, e.g. an IdP-initiated back-channel logout. */
+		invokedById?: string
 		personInputIdentifier?: string
 		personId?: string
 		personTokenId?: string

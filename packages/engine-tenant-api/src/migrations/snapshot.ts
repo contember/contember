@@ -54,7 +54,9 @@ CREATE TYPE "auth_log_type" AS ENUM (
     'idp_session_revoked',
     'idp_session_revalidation_failed',
     'unusual_login_detected',
-    'step_up_required'
+    'step_up_required',
+    'idp_logout_initiated',
+    'idp_backchannel_logout'
 );
 CREATE TYPE "config_policy" AS ENUM (
     'always',

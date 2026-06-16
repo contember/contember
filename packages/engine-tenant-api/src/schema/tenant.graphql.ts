@@ -555,6 +555,13 @@ const schema: DocumentNode = gql`
 		ok: Boolean!
 		errors: [SignOutError!]! @deprecated
 		error: SignOutError
+		"""
+		When the session was federated via an OIDC identity provider that supports RP-initiated
+		(front-channel) logout, the URL the client should redirect the browser to so the user is
+		also signed out at the IdP (Single Logout). Null for plain sessions or legacy IdPs without
+		an end-session endpoint, in which case only a local logout happened.
+		"""
+		logoutUrl: String
 	}
 
 	type SignOutError {

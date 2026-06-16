@@ -7,7 +7,17 @@ import { JSONValue } from '@contember/schema'
 class AuthLogService {
 	async logAuthAction(
 		db: DatabaseContext,
-		ctx: { identityId: string; clientIp?: string; userAgent?: string; forwarderIp?: string; forwarderUserAgent?: string },
+		ctx: {
+			identityId: string
+			clientIp?: string
+			userAgent?: string
+			forwarderIp?: string
+			forwarderUserAgent?: string
+			/** A03: country from the trusted reverse-proxy geo header, when present. */
+			geoCountry?: string
+			/** A03: hash of the client user-agent, recorded for the next sign-in's history comparison. */
+			deviceFingerprint?: string
+		},
 		data: AuthLogService.LogArgs,
 	): Promise<void> {
 		const dataContainer = data.response.ok
@@ -44,6 +54,8 @@ class AuthLogService {
 				metadata,
 				targetPersonId: data.targetPersonId ?? authData?.data?.targetPersonId,
 				eventData: data.eventData ?? authData?.data?.eventData,
+				geoCountry: ctx.geoCountry,
+				deviceFingerprint: ctx.deviceFingerprint,
 			}),
 		)
 	}

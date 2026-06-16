@@ -11,6 +11,7 @@ export enum MailType {
 	emailVerification = 'emailVerification',
 	emailChangeVerify = 'emailChangeVerify',
 	emailChangeNotify = 'emailChangeNotify',
+	unusualLogin = 'unusualLogin',
 }
 
 export const mailTypeFromSchemaToDb = (type: SchemaMailType): MailType => {
@@ -25,6 +26,7 @@ export const mailTypeFromSchemaToDb = (type: SchemaMailType): MailType => {
 		EMAIL_VERIFICATION: MailType.emailVerification,
 		EMAIL_CHANGE_VERIFY: MailType.emailChangeVerify,
 		EMAIL_CHANGE_NOTIFY: MailType.emailChangeNotify,
+		UNUSUAL_LOGIN: MailType.unusualLogin,
 	}[type]
 }
 
@@ -40,6 +42,7 @@ export const mailTypeFromDbToSchema = (type: MailType): SchemaMailType => {
 		[MailType.emailVerification]: 'EMAIL_VERIFICATION' as const,
 		[MailType.emailChangeVerify]: 'EMAIL_CHANGE_VERIFY' as const,
 		[MailType.emailChangeNotify]: 'EMAIL_CHANGE_NOTIFY' as const,
+		[MailType.unusualLogin]: 'UNUSUAL_LOGIN' as const,
 	}[type]
 }
 

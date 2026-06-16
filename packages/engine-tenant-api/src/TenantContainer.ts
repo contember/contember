@@ -24,6 +24,7 @@ import {
 	IdpSessionRevalidator,
 	IDPSignInManager,
 	InviteManager,
+	LoginRiskAnalyzer,
 	MailTemplateManager,
 	MembershipValidator,
 	OIDCProvider,
@@ -175,6 +176,7 @@ export class TenantContainerFactory {
 			.addService('apiKeyService', () => new ApiKeyService())
 			.addService('authPolicyResolver', () => new AuthPolicyResolver())
 			.addService('authLogService', () => new AuthLogService())
+			.addService('loginRiskAnalyzer', ({ providers }) => new LoginRiskAnalyzer(providers.hash))
 			.addService('idpRegistry', () => {
 				const idpRegistry = new IDPHandlerRegistry()
 				idpRegistry.registerHandler('oidc', new OIDCProvider())
@@ -243,8 +245,17 @@ export class TenantContainerFactory {
 			.addService('authPolicyManager', ({ projectManager }) => new AuthPolicyManager(projectManager))
 			.addService(
 				'signInManager',
-				({ apiKeyManager, providers, otpManager, backupCodeManager, emailOtpManager, authPolicyResolver }) =>
-					new SignInManager(apiKeyManager, providers, otpManager, backupCodeManager, emailOtpManager, authPolicyResolver),
+				({ apiKeyManager, providers, otpManager, backupCodeManager, emailOtpManager, authPolicyResolver, loginRiskAnalyzer, userMailer }) =>
+					new SignInManager(
+						apiKeyManager,
+						providers,
+						otpManager,
+						backupCodeManager,
+						emailOtpManager,
+						authPolicyResolver,
+						loginRiskAnalyzer,
+						userMailer,
+					),
 			)
 			.addService('membershipValidator', ({ projectSchemaResolver }) => new MembershipValidator(projectSchemaResolver))
 			.addService('inviteManager', ({ providers, userMailer, projectSchemaResolver }) => new InviteManager(providers, userMailer, projectSchemaResolver))
@@ -391,7 +402,8 @@ export class TenantContainerFactory {
 			)
 			.addService(
 				'resolverContextFactory',
-				({ permissionContextFactory, authLogService }) => new TenantResolverContextFactory(permissionContextFactory, authLogService),
+				({ permissionContextFactory, authLogService, loginRiskAnalyzer }) =>
+					new TenantResolverContextFactory(permissionContextFactory, authLogService, loginRiskAnalyzer),
 			)
 			.addService('resolvers', container => new ResolverFactory(container).create())
 			.addService('connection', () => args.connection)

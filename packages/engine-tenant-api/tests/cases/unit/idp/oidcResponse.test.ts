@@ -91,6 +91,18 @@ describe('handleOIDCResponse — externalIdentifier scalar guard', () => {
 		const result = await handleOIDCResponse(client, responseData, { claimMapping: { externalIdentifier: 'uid' } })
 		expect(result.externalIdentifier).toBe('12345')
 	})
+
+	test('rejects a mapped subject that resolves to an empty string', async () => {
+		const client = stubClient({ sub: 's', oid: '' })
+		await expect(handleOIDCResponse(client, responseData, { claimMapping: { externalIdentifier: 'oid' } }))
+			.rejects.toThrow(IDPValidationError)
+	})
+
+	test('rejects an empty `sub` on the default path', async () => {
+		const client = stubClient({ sub: '' })
+		await expect(handleOIDCResponse(client, responseData))
+			.rejects.toThrow(IDPValidationError)
+	})
 })
 
 describe('handleOIDCResponse — signed claims win over unwrapped attributes', () => {

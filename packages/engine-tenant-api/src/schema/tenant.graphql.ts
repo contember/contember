@@ -837,8 +837,10 @@ const schema: DocumentNode = gql`
 	}
 
 	enum DisconnectIDPErrorCode {
-		""" The person has no connection to the given identity provider. """
+		""" The authenticated person has no IdP connection with the given id. """
 		NOT_FOUND
+		""" The caller is not a person (e.g. an API key) and so has no IdP connections to disconnect. """
+		NOT_A_PERSON
 		""" The person is not allowed to disconnect their last remaining sign-in method. """
 		LAST_AUTH_METHOD
 	}

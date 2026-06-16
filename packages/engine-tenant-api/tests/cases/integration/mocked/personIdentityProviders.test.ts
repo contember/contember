@@ -298,3 +298,23 @@ test('returns NOT_FOUND when the person is not connected to the given connection
 		},
 	})
 })
+
+test('returns NOT_A_PERSON when the caller is not a person', async () => {
+	await executeTenantTest({
+		// the identity is not a person (e.g. an api key) -> short-circuit before opening a transaction
+		query: disconnectMyIdentityProviderMutation({ id: testUuid(2) }),
+		executes: [
+			getPersonByIdentity({ identityId: authenticatedIdentityId, response: null }),
+		],
+		return: {
+			data: {
+				disconnectMyIdentityProvider: {
+					ok: false,
+					error: {
+						code: 'NOT_A_PERSON',
+					},
+				},
+			},
+		},
+	})
+})

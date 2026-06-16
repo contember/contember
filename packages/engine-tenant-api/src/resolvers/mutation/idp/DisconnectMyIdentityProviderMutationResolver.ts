@@ -22,7 +22,7 @@ export class DisconnectMyIdentityProviderMutationResolver implements Pick<Mutati
 
 		const person = await context.db.queryHandler.fetch(PersonQuery.byIdentity(context.identity.id))
 		if (!person) {
-			return createErrorResponse('NOT_FOUND', 'Only a person can disconnect an identity provider.')
+			return createErrorResponse('NOT_A_PERSON', 'Only a person can disconnect an identity provider.')
 		}
 
 		const result = await this.personIdentityProviderManager.disconnectIdentityProvider(context.db, person, args.id)

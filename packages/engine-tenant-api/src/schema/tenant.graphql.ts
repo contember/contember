@@ -105,8 +105,12 @@ const schema: DocumentNode = gql`
 		disableIDP(identityProvider: String!): DisableIDPResponse
 		enableIDP(identityProvider: String!): EnableIDPResponse
 
-		""" Disconnect one of the authenticated person's own external IdP connections. """
-		disconnectMyIdentityProvider(identityProvider: String!): DisconnectIDPResponse
+		"""
+		Disconnect one of the authenticated person's own external IdP connections,
+		addressed by the connection id (see PersonIdentityProvider.id) so a specific
+		connection can be removed even when the person has several to one provider.
+		"""
+		disconnectMyIdentityProvider(id: String!): DisconnectIDPResponse
 
 		prepareOtp(label: String): PrepareOtpResponse
 		confirmOtp(otpToken: String!): ConfirmOtpResponse

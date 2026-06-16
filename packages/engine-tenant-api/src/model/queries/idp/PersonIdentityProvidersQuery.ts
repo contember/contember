@@ -36,6 +36,8 @@ export class PersonIdentityProvidersQuery extends DatabaseQuery<PersonIdentityPr
 				expr => expr.columnsEq(['identity_provider', 'id'], ['person_identity_provider', 'identity_provider_id']),
 			)
 			.where({ person_id: this.personId })
+			.orderBy(['person_identity_provider', 'created_at'])
+			.orderBy(['person_identity_provider', 'id'])
 			.getResult(db)
 	}
 }

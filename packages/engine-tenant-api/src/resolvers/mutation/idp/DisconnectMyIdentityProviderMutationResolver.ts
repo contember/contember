@@ -25,7 +25,7 @@ export class DisconnectMyIdentityProviderMutationResolver implements Pick<Mutati
 			return createErrorResponse('NOT_FOUND', 'Only a person can disconnect an identity provider.')
 		}
 
-		const result = await this.personIdentityProviderManager.disconnectIdentityProvider(context.db, person, args.identityProvider)
+		const result = await this.personIdentityProviderManager.disconnectIdentityProvider(context.db, person, args.id)
 		if (!result.ok) {
 			return createErrorResponse(result.error, result.errorMessage)
 		}
@@ -34,7 +34,7 @@ export class DisconnectMyIdentityProviderMutationResolver implements Pick<Mutati
 			type: 'idp_disconnect',
 			response: new ResponseOk(null),
 			personId: person.id,
-			eventData: { slug: args.identityProvider },
+			eventData: { id: args.id, slug: result.result.slug },
 		})
 
 		return { ok: true }

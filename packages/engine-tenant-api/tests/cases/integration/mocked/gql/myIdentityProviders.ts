@@ -17,9 +17,9 @@ export const myIdentityProvidersQuery = (): GraphQLTestQuery => ({
 	variables: {},
 })
 
-export const disconnectMyIdentityProviderMutation = (variables: { identityProvider: string }): GraphQLTestQuery => ({
-	query: GQL`mutation($identityProvider: String!) {
-          disconnectMyIdentityProvider(identityProvider: $identityProvider) {
+export const disconnectMyIdentityProviderMutation = (variables: { id: string }): GraphQLTestQuery => ({
+	query: GQL`mutation($id: String!) {
+          disconnectMyIdentityProvider(id: $id) {
             ok
             error {
                 code

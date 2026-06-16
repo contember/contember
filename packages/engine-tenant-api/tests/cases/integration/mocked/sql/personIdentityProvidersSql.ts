@@ -18,7 +18,8 @@ export const getPersonIdentityProvidersSql = (args: {
 		SQL`SELECT "person_identity_provider"."id", "person_identity_provider"."created_at" as "createdAt", "person_identity_provider"."external_identifier" as "externalIdentifier", "identity_provider"."slug" as "identityProviderSlug", "identity_provider"."type" as "identityProviderType", "identity_provider"."disabled_at" as "identityProviderDisabledAt"
 	         FROM "tenant"."person_identity_provider"
 		              INNER JOIN "tenant"."identity_provider" AS "identity_provider" ON "identity_provider"."id" = "person_identity_provider"."identity_provider_id"
-	         WHERE "person_id" = ?`,
+	         WHERE "person_id" = ?
+	         ORDER BY "person_identity_provider"."created_at" ASC, "person_identity_provider"."id" ASC`,
 	parameters: [args.personId],
 	response: {
 		rows: args.response.map(it => ({

@@ -46,3 +46,25 @@ test('trustedProxies: invalid CIDR throws (fail-fast on misconfiguration)', () =
 test('trustedProxies: invalid prefixed entry throws', () => {
 	expect(() => trustedProxies('10.0.0.0/999')).toThrow()
 })
+
+// A03: the trusted reverse-proxy geo-country header name. Same bar as trustedProxies
+// since it gates a trust-boundary signal: undefined when unset, string passthrough,
+// fail-fast on a non-string value.
+const geoCountryHeader = (val: unknown): unknown => serverConfigSchema({ http: { geoCountryHeader: val } }).http?.geoCountryHeader
+
+test('geoCountryHeader: undefined when absent (feature off by default)', () => {
+	expect(serverConfigSchema({}).http?.geoCountryHeader).toBeUndefined()
+})
+
+test('geoCountryHeader: empty string yields undefined', () => {
+	expect(geoCountryHeader('')).toBeUndefined()
+})
+
+test('geoCountryHeader: a string passes through unchanged', () => {
+	expect(geoCountryHeader('X-Contember-Client-Geo-Country')).toBe('X-Contember-Client-Geo-Country')
+})
+
+test('geoCountryHeader: a non-string value throws (fail-fast on misconfiguration)', () => {
+	expect(() => geoCountryHeader(123)).toThrow()
+	expect(() => geoCountryHeader({})).toThrow()
+})

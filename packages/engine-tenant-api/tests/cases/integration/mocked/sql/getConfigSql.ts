@@ -31,6 +31,12 @@ export const getConfigSql = (overrides: Record<string, unknown> = {}): ExpectedQ
 				login_default_token_expiration: PostgresInterval('00:30:00'),
 				login_max_token_expiration: PostgresInterval('12:00:00'),
 				login_mfa_grace_duration: PostgresInterval('00:00:00'),
+				// A03 anomaly detection — feature-off defaults (matches column defaults).
+				// Tests that exercise the feature override these explicitly.
+				login_anomaly_detection_enabled: false,
+				login_anomaly_history_size: 10,
+				login_anomaly_email_threshold: 1,
+				login_anomaly_step_up_threshold: 3,
 				captcha_provider: null,
 				captcha_secret: null,
 				captcha_secret_version: null,

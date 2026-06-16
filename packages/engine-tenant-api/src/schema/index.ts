@@ -425,6 +425,7 @@ export type ConfigInput = {
 
 export type ConfigLogin = {
 	readonly __typename?: 'ConfigLogin'
+	readonly anomalyDetection: ConfigLoginAnomalyDetection
 	readonly attemptWindow: Scalars['Interval']['output']
 	readonly baseBackoff: Scalars['Interval']['output']
 	readonly defaultTokenExpiration: Scalars['Interval']['output']
@@ -442,7 +443,35 @@ export type ConfigLogin = {
 	readonly revealUserExists: Scalars['Boolean']['output']
 }
 
+/**
+ * Sign-in anomaly detection (A03). Opt-in, disabled by default. When enabled,
+ * each successful password verification is scored against the person's last
+ * historySize successful logins using signals derived from the trusted client
+ * info (country from a reverse-proxy geo header, a user-agent fingerprint, and
+ * the IP / IP prefix). The cumulative score then drives an action:
+ *   - score >= emailThreshold  → an informational UNUSUAL_LOGIN email is sent.
+ *   - score >= stepUpThreshold → a second factor (email OTP) is additionally
+ *     required before a session is issued (reuses the existing step-up flow).
+ * Country is only ever read through the same trusted-proxy gate as the
+ * forwarded IP / User-Agent — never from an untrusted client.
+ */
+export type ConfigLoginAnomalyDetection = {
+	readonly __typename?: 'ConfigLoginAnomalyDetection'
+	readonly emailThreshold: Scalars['Int']['output']
+	readonly enabled: Scalars['Boolean']['output']
+	readonly historySize: Scalars['Int']['output']
+	readonly stepUpThreshold: Scalars['Int']['output']
+}
+
+export type ConfigLoginAnomalyDetectionInput = {
+	readonly emailThreshold?: InputMaybe<Scalars['Int']['input']>
+	readonly enabled?: InputMaybe<Scalars['Boolean']['input']>
+	readonly historySize?: InputMaybe<Scalars['Int']['input']>
+	readonly stepUpThreshold?: InputMaybe<Scalars['Int']['input']>
+}
+
 export type ConfigLoginInput = {
+	readonly anomalyDetection?: InputMaybe<ConfigLoginAnomalyDetectionInput>
 	readonly attemptWindow?: InputMaybe<Scalars['Interval']['input']>
 	readonly baseBackoff?: InputMaybe<Scalars['Interval']['input']>
 	readonly defaultTokenExpiration?: InputMaybe<Scalars['Interval']['input']>
@@ -1133,6 +1162,7 @@ export type MailType =
 	| 'NEW_USER_INVITED'
 	| 'PASSWORDLESS_SIGN_IN'
 	| 'RESET_PASSWORD_REQUEST'
+	| 'UNUSUAL_LOGIN'
 
 export type MemberType =
 	| 'API_KEY'
@@ -2317,6 +2347,8 @@ export type ResolversTypes = {
 	ConfigEmailChangeInput: ConfigEmailChangeInput
 	ConfigInput: ConfigInput
 	ConfigLogin: ResolverTypeWrapper<ConfigLogin>
+	ConfigLoginAnomalyDetection: ResolverTypeWrapper<ConfigLoginAnomalyDetection>
+	ConfigLoginAnomalyDetectionInput: ConfigLoginAnomalyDetectionInput
 	ConfigLoginInput: ConfigLoginInput
 	ConfigPassword: ResolverTypeWrapper<ConfigPassword>
 	ConfigPasswordInput: ConfigPasswordInput
@@ -2576,6 +2608,8 @@ export type ResolversParentTypes = {
 	ConfigEmailChangeInput: ConfigEmailChangeInput
 	ConfigInput: ConfigInput
 	ConfigLogin: ConfigLogin
+	ConfigLoginAnomalyDetection: ConfigLoginAnomalyDetection
+	ConfigLoginAnomalyDetectionInput: ConfigLoginAnomalyDetectionInput
 	ConfigLoginInput: ConfigLoginInput
 	ConfigPassword: ConfigPassword
 	ConfigPasswordInput: ConfigPasswordInput
@@ -2999,6 +3033,7 @@ export type ConfigEmailChangeResolvers<
 }
 
 export type ConfigLoginResolvers<ContextType = any, ParentType extends ResolversParentTypes['ConfigLogin'] = ResolversParentTypes['ConfigLogin']> = {
+	anomalyDetection?: Resolver<ResolversTypes['ConfigLoginAnomalyDetection'], ParentType, ContextType>
 	attemptWindow?: Resolver<ResolversTypes['Interval'], ParentType, ContextType>
 	baseBackoff?: Resolver<ResolversTypes['Interval'], ParentType, ContextType>
 	defaultTokenExpiration?: Resolver<ResolversTypes['Interval'], ParentType, ContextType>
@@ -3007,6 +3042,16 @@ export type ConfigLoginResolvers<ContextType = any, ParentType extends Resolvers
 	mfaGraceDuration?: Resolver<ResolversTypes['Interval'], ParentType, ContextType>
 	revealLoginMethod?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
 	revealUserExists?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
+}
+
+export type ConfigLoginAnomalyDetectionResolvers<
+	ContextType = any,
+	ParentType extends ResolversParentTypes['ConfigLoginAnomalyDetection'] = ResolversParentTypes['ConfigLoginAnomalyDetection'],
+> = {
+	emailThreshold?: Resolver<ResolversTypes['Int'], ParentType, ContextType>
+	enabled?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
+	historySize?: Resolver<ResolversTypes['Int'], ParentType, ContextType>
+	stepUpThreshold?: Resolver<ResolversTypes['Int'], ParentType, ContextType>
 }
 
 export type ConfigPasswordResolvers<
@@ -4373,6 +4418,7 @@ export type Resolvers<ContextType = any> = {
 	ConfigCaptchaProtect?: ConfigCaptchaProtectResolvers<ContextType>
 	ConfigEmailChange?: ConfigEmailChangeResolvers<ContextType>
 	ConfigLogin?: ConfigLoginResolvers<ContextType>
+	ConfigLoginAnomalyDetection?: ConfigLoginAnomalyDetectionResolvers<ContextType>
 	ConfigPassword?: ConfigPasswordResolvers<ContextType>
 	ConfigPasswordless?: ConfigPasswordlessResolvers<ContextType>
 	ConfigRateLimitWindow?: ConfigRateLimitWindowResolvers<ContextType>

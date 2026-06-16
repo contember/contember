@@ -52,6 +52,12 @@ export class ConfigurationQuery extends DatabaseQuery<Config> {
 				defaultTokenExpiration: result.login_default_token_expiration,
 				maxTokenExpiration: result.login_max_token_expiration,
 				mfaGraceDuration: result.login_mfa_grace_duration,
+				anomalyDetection: {
+					enabled: result.login_anomaly_detection_enabled,
+					historySize: result.login_anomaly_history_size,
+					emailThreshold: result.login_anomaly_email_threshold,
+					stepUpThreshold: result.login_anomaly_step_up_threshold,
+				},
 			},
 			captcha: {
 				provider: result.captcha_provider,

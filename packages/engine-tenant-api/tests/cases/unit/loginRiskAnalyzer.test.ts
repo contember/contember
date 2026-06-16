@@ -70,6 +70,30 @@ describe('ipPrefix', () => {
 		expect(ipPrefix('0:0:0:0:0:ffff:203.0.113.42')).toBe('203.0.113.0/24')
 	})
 
+	test('a non-mapped IPv6 ending in :ffff:<dotted-quad> stays a /48, not a bogus /24', () => {
+		// The IPv4-mapped form requires the leading 80 bits to be zero. An address with
+		// a non-zero prefix that merely ends in `:ffff:1.2.3.4` (or NAT64 `64:ff9b::`)
+		// is a normal IPv6 address — it must coarsen to its /48, never collapse to the
+		// embedded dotted-quad's /24 (which would both miss real network changes and
+		// false-fire when the same /48 is written two ways).
+		expect(ipPrefix('2001:db8::ffff:1.2.3.4')).toBe('2001:db8:0::/48')
+		expect(ipPrefix('64:ff9b::ffff:1.2.3.4')).toBe('64:ff9b:0::/48')
+		expect(ipPrefix('64:ff9b::1.2.3.4')).toBe('64:ff9b:0::/48')
+		// ...and they must not collide with the genuine IPv4-mapped /24.
+		expect(ipPrefix('2001:db8::ffff:1.2.3.4')).not.toBe(ipPrefix('::ffff:1.2.3.4'))
+		// two different non-mapped /48s sharing a trailing dotted-quad stay distinct.
+		expect(ipPrefix('2001:db8::ffff:1.2.3.4')).not.toBe(ipPrefix('2001:dba::ffff:1.2.3.4'))
+	})
+
+	test('falls back to the raw value for an unparseable IPv6', () => {
+		// expandIpv6 rejects malformed input → ipPrefix returns a stable, lower-cased raw
+		// string (never throws, never mints a bogus prefix), and two distinct junk values
+		// do not collapse to one key.
+		expect(ipPrefix('1::2::3')).toBe('1::2::3')
+		expect(ipPrefix('2001:db8::g')).toBe('2001:db8::g')
+		expect(ipPrefix('1::2::3')).not.toBe(ipPrefix('4::5::6'))
+	})
+
 	test('returns null for empty/null', () => {
 		expect(ipPrefix(null)).toBeNull()
 		expect(ipPrefix('')).toBeNull()

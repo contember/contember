@@ -202,37 +202,60 @@ export const ipPrefix = (ip: string | null): string | null => {
 	if (trimmed.length === 0) {
 		return null
 	}
-	// IPv4-mapped IPv6 (::ffff:a.b.c.d, in any compressed/expanded form) → the
-	// embedded IPv4. Matches `::ffff:1.2.3.4` and `0:0:0:0:0:ffff:1.2.3.4` alike.
-	const mapped = /:ffff:(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})$/.exec(trimmed)
-	const value = mapped ? mapped[1] : trimmed
-	if (value.includes('.') && !value.includes(':')) {
-		const octets = value.split('.')
+	// Pure IPv4 (dotted quad, no colon) → /24.
+	if (!trimmed.includes(':')) {
+		const octets = trimmed.split('.')
 		if (octets.length === 4) {
 			return `${octets[0]}.${octets[1]}.${octets[2]}.0/24`
 		}
-		return value
+		return trimmed
 	}
-	if (value.includes(':')) {
-		const hextets = expandIpv6(value)
-		if (hextets === null || hextets.length < 3) {
-			return value
-		}
-		// Canonical /48 = the first three hextets, each with leading zeros stripped.
-		const network = hextets.slice(0, 3).map(h => parseInt(h, 16).toString(16))
-		return `${network.join(':')}::/48`
+	// IPv6. expandIpv6 also folds a trailing IPv4 dotted-quad (the ::ffff:a.b.c.d
+	// form, in any compressed/expanded spelling) into two hextets, so the whole
+	// address is canonicalized here in one place.
+	const hextets = expandIpv6(trimmed)
+	if (hextets === null) {
+		return trimmed
 	}
-	return value
+	// IPv4-mapped IPv6 (::ffff:a.b.c.d) carries the real client IPv4 in its low 32
+	// bits → coarsen THAT to a /24. Guarded on the leading 80 bits being zero AND
+	// the 6th hextet being ffff, so a *non-mapped* address that merely ends in
+	// `:ffff:<dotted-quad>` (e.g. 2001:db8::ffff:1.2.3.4, or NAT64 64:ff9b::1.2.3.4)
+	// stays a normal IPv6 /48 instead of collapsing to a bogus, colliding /24.
+	if (hextets.slice(0, 5).every(h => parseInt(h, 16) === 0) && parseInt(hextets[5], 16) === 0xffff) {
+		const hi = parseInt(hextets[6], 16)
+		const lo = parseInt(hextets[7], 16)
+		return `${hi >> 8}.${hi & 0xff}.${lo >> 8}.0/24`
+	}
+	// Canonical /48 = the first three hextets, each with leading zeros stripped.
+	const network = hextets.slice(0, 3).map(h => parseInt(h, 16).toString(16))
+	return `${network.join(':')}::/48`
 }
 
 /**
  * Expands an IPv6 address to its 8 hextets (as lower-case hex strings, leading
- * zeros kept — the caller strips them). Handles a single `::` run. Returns null
- * for anything that does not look like a valid IPv6 address so the caller can
+ * zeros kept — the caller strips them). Handles a single `::` run and a trailing
+ * IPv4 dotted-quad in the low 32 bits (`x:x:x:x:x:x:d.d.d.d`, e.g. the
+ * `::ffff:a.b.c.d` mapped form), which it folds into two hextets first. Returns
+ * null for anything that does not look like a valid IPv6 address so the caller can
  * fall back to a raw compare rather than mint a bogus prefix.
  */
 const expandIpv6 = (value: string): string[] | null => {
-	const parts = value.split('::')
+	// Fold a trailing IPv4 dotted-quad into two hextets so the rest works purely in
+	// hex groups (and a non-zero prefix before `:ffff:` is preserved as hextets,
+	// not mistaken for an IPv4-mapped address).
+	let normalized = value
+	const dotted = /^(.*:)(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})$/.exec(value)
+	if (dotted) {
+		const octets = [dotted[2], dotted[3], dotted[4], dotted[5]].map(Number)
+		if (octets.some(o => o > 255)) {
+			return null
+		}
+		const hi = ((octets[0] << 8) | octets[1]).toString(16)
+		const lo = ((octets[2] << 8) | octets[3]).toString(16)
+		normalized = `${dotted[1]}${hi}:${lo}`
+	}
+	const parts = normalized.split('::')
 	if (parts.length > 2) {
 		return null
 	}

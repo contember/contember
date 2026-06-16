@@ -10,6 +10,7 @@ export type IdentityProviderRow = {
 	exclusive: boolean
 	initReturnsConfig: boolean
 	requireVerifiedEmail: boolean
+	assumeEmailVerified: boolean
 }
 
 export type IdentityProviderDto =

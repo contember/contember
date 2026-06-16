@@ -127,7 +127,9 @@ mutation {
 }
 ```
 
-Auto-linking by e-mail is takeover-grade: a provider returning an unverified (or attacker-controlled) address could otherwise hijack a local account. With this option on, an unverified claim simply fails to link / sign in. Defaults to `false`. Only relevant for non-`exclusive` providers (exclusive providers never link by e-mail). See [IdP](/reference/engine/tenant/idp#configuration).
+Auto-linking by e-mail is takeover-grade: a provider returning an unverified (or attacker-controlled) address could otherwise hijack a local account. With this option on, an unverified claim fails to link / sign in. A blocked attempt surfaces to the client as the generic `PERSON_NOT_FOUND` — so it does not leak that the account exists — and is recorded in the [audit log](/reference/engine/tenant/audit-log) with reason `idp_email_unverified`. Defaults to `false`. Only relevant for non-`exclusive` providers (exclusive providers never link by e-mail). See [IdP](/reference/engine/tenant/idp#configuration).
+
+The gate is satisfied when the provider asserts the address is verified **or** when the IdP is configured with `assumeEmailVerified: true`. Some trusted providers vouch for their accounts but never emit an `email_verified` claim, which would otherwise always fail the gate; `assumeEmailVerified` treats such a provider's e-mails as verified even without the claim, so `requireVerifiedEmail` can stay on. It **waives** the gate for that provider, so the protection is then only as strong as that provider — use it only for an IdP you fully trust to assert addresses. Defaults to `false`. See [IdP options](/reference/engine/tenant/idp#configuration).
 
 ## Configuration
 

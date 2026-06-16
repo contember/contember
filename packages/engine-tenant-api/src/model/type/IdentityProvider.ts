@@ -10,4 +10,5 @@ export interface IdentityProviderOptions {
 	exclusive: boolean
 	initReturnsConfig: boolean
 	requireVerifiedEmail: boolean
+	assumeEmailVerified: boolean
 }

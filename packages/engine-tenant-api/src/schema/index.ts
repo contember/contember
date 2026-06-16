@@ -906,6 +906,7 @@ export type ForceSignOutPersonResponse = {
 }
 
 export type IdpOptions = {
+	readonly assumeEmailVerified?: InputMaybe<Scalars['Boolean']['input']>
 	readonly autoSignUp?: InputMaybe<Scalars['Boolean']['input']>
 	readonly exclusive?: InputMaybe<Scalars['Boolean']['input']>
 	readonly initReturnsConfig?: InputMaybe<Scalars['Boolean']['input']>
@@ -914,6 +915,12 @@ export type IdpOptions = {
 
 export type IdpOptionsOutput = {
 	readonly __typename?: 'IDPOptionsOutput'
+	/**
+	 * When true, e-mail addresses asserted by this provider are treated as verified
+	 * even without an "email_verified" claim. Use only for trusted providers.
+	 * Defaults to false.
+	 */
+	readonly assumeEmailVerified: Scalars['Boolean']['output']
 	readonly autoSignUp: Scalars['Boolean']['output']
 	readonly exclusive: Scalars['Boolean']['output']
 	readonly initReturnsConfig: Scalars['Boolean']['output']
@@ -3391,6 +3398,7 @@ export type IdpOptionsOutputResolvers<
 	ContextType = any,
 	ParentType extends ResolversParentTypes['IDPOptionsOutput'] = ResolversParentTypes['IDPOptionsOutput'],
 > = {
+	assumeEmailVerified?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
 	autoSignUp?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
 	exclusive?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
 	initReturnsConfig?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>

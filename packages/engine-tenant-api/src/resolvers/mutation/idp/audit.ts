@@ -13,6 +13,7 @@ export const idpRowToAuditSnapshot = (row: IdentityProviderRow | null): JSONValu
 		exclusive: row.exclusive,
 		initReturnsConfig: row.initReturnsConfig,
 		requireVerifiedEmail: row.requireVerifiedEmail,
+		assumeEmailVerified: row.assumeEmailVerified,
 		configurationKeys: Object.keys(row.configuration).sort(),
 	}
 }

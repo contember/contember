@@ -765,6 +765,12 @@ const schema: DocumentNode = gql`
 		Defaults to false.
 		"""
 		requireVerifiedEmail: Boolean!
+		"""
+		When true, e-mail addresses asserted by this provider are treated as verified
+		even without an "email_verified" claim. Use only for trusted providers.
+		Defaults to false.
+		"""
+		assumeEmailVerified: Boolean!
 	}
 
 	input IDPOptions {
@@ -772,6 +778,7 @@ const schema: DocumentNode = gql`
 		exclusive: Boolean
 		initReturnsConfig: Boolean
 		requireVerifiedEmail: Boolean
+		assumeEmailVerified: Boolean
 	}
 
 	# === passwordless sign in ===

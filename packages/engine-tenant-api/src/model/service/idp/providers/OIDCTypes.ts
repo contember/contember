@@ -1,5 +1,5 @@
 import * as Typesafe from '@contember/typesafe'
-import { ResponseType } from 'openid-client'
+import { ClientAuthMethod, ResponseType } from 'openid-client'
 import { IDPRevalidationConfig } from '../IDPRevalidation.js'
 
 export interface OIDCSessionData {
@@ -18,16 +18,57 @@ export const OIDCRevalidationConfig = Typesafe.intersection(
 
 export type OIDCRevalidationConfig = ReturnType<typeof OIDCRevalidationConfig>
 
+/**
+ * Maps provider claims onto the normalized {@link IDPResponse} fields. Each value is a claim
+ * name, dot-path supported (e.g. `address.region`). Lets a provider whose claims don't follow
+ * the OIDC defaults still be consumed without a per-provider code change.
+ */
+export const OIDCClaimMapping = Typesafe.partial({
+	/**
+	 * Claim used as the stable external identifier (the IdP subject). Default `sub`.
+	 * Must resolve to a scalar (string/number) — a non-scalar claim is rejected at sign-in.
+	 * Mapping this to a claim that only appears in userInfo / `attributes` takes the federation
+	 * key off the signature-verified ID-token subject; prefer a signed claim where possible.
+	 */
+	externalIdentifier: Typesafe.string,
+	/** Claim used as the e-mail address. Default `email`. */
+	email: Typesafe.string,
+	/** Claim used as the display name. Default `name`. */
+	name: Typesafe.string,
+	/**
+	 * Key of a nested object whose properties are lifted to the top level before mapping.
+	 * Some providers (notably Apereo CAS userinfo) nest the actual claims under `attributes`.
+	 */
+	attributesKey: Typesafe.string,
+})
+
+export type OIDCClaimMapping = ReturnType<typeof OIDCClaimMapping>
+
 export const OIDCConfigurationOptions = Typesafe.partial({
 	responseType: Typesafe.enumeration<ResponseType>('code', 'code id_token', 'code id_token token', 'code token', 'id_token', 'id_token token', 'none'),
 	claims: Typesafe.string, // deprecated, use scope instead
 	scope: Typesafe.string,
 	additionalAuthorizedParties: Typesafe.array(Typesafe.string),
 	idTokenSignedResponseAlg: Typesafe.string,
+	/**
+	 * How the client authenticates to the token endpoint. `openid-client` defaults to
+	 * `client_secret_basic`; set `client_secret_post` for providers (e.g. some Apereo CAS
+	 * registrations) that only accept the secret in the request body.
+	 */
+	tokenEndpointAuthMethod: Typesafe.enumeration<ClientAuthMethod>(
+		'client_secret_basic',
+		'client_secret_post',
+		'client_secret_jwt',
+		'private_key_jwt',
+		'tls_client_auth',
+		'self_signed_tls_client_auth',
+		'none',
+	),
 	fetchUserInfo: Typesafe.boolean,
 	returnOIDCResult: Typesafe.boolean,
 	timeout: Typesafe.number,
 	revalidation: OIDCRevalidationConfig,
+	claimMapping: OIDCClaimMapping,
 })
 export const BaseOIDCConfiguration = Typesafe.intersection(
 	Typesafe.object({

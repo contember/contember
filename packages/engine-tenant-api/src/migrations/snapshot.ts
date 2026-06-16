@@ -190,7 +190,8 @@ CREATE TABLE "identity_provider" (
     "auto_sign_up" boolean DEFAULT false NOT NULL,
     "exclusive" boolean DEFAULT false,
     "init_returns_config" boolean DEFAULT false NOT NULL,
-    "require_verified_email" boolean DEFAULT false NOT NULL
+    "require_verified_email" boolean DEFAULT false NOT NULL,
+    "assume_email_verified" boolean DEFAULT false NOT NULL
 );
 CREATE TABLE "idp_session" (
     "id" "uuid" NOT NULL,

@@ -29,9 +29,12 @@ export class OIDCProvider implements IdentityProviderHandler<OIDCConfiguration> 
 		return await handleOIDCResponse(
 			client,
 			responseData,
-			configuration.fetchUserInfo,
-			configuration.returnOIDCResult,
-			configuration.revalidation?.enabled === true,
+			{
+				fetchUserInfo: configuration.fetchUserInfo,
+				returnOIDCResult: configuration.returnOIDCResult,
+				captureSession: configuration.revalidation?.enabled === true,
+				claimMapping: configuration.claimMapping,
+			},
 		)
 	}
 
@@ -67,6 +70,7 @@ export class OIDCProvider implements IdentityProviderHandler<OIDCConfiguration> 
 				client_secret: configuration.clientSecret,
 				response_types: [configuration.responseType || 'code'],
 				id_token_signed_response_alg: configuration.idTokenSignedResponseAlg ?? 'RS256',
+				...(configuration.tokenEndpointAuthMethod ? { token_endpoint_auth_method: configuration.tokenEndpointAuthMethod } : {}),
 			},
 			undefined,
 			{

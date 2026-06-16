@@ -839,6 +839,7 @@ export const LoginToken: unique symbol;
 // @public (undocumented)
 export const LogoutTrigger: (input: {
     children: ReactNode;
+    idpLogout?: boolean;
 }) => JSX.Element;
 
 // Warning: (ae-forgotten-export) The symbol "identityFragment" needs to be exported by the entry point index.d.ts
@@ -1330,6 +1331,8 @@ export const signOutMutation: TenantApi.MutationFetcher<{
     readonly mutation?: ({
         readonly ok: boolean;
     } & {
+        readonly logoutUrl?: string;
+    } & {
         readonly error?: ({
             readonly code: TenantApi.SignOutErrorCode;
         } & {
@@ -1679,6 +1682,7 @@ export const useLoginForm: () => LoginFormContextValue;
 // @public (undocumented)
 export const useLogout: () => (input?: {
     noRedirect?: boolean;
+    idpLogout?: boolean;
 }) => Promise<void>;
 
 // @public (undocumented)

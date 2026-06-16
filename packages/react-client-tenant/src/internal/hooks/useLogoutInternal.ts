@@ -1,13 +1,13 @@
 import { useSetSessionToken } from '@contember/react-client'
 import { useCallback } from 'react'
-import { useSignOutMutation } from '../../hooks/index.js'
+import { signOutMutation, useTenantApi } from '../../hooks/index.js'
 
 export const useLogoutInternal = (clearIdentity?: () => void) => {
-	const tenantLogout = useSignOutMutation()
+	const tenantApi = useTenantApi()
 	const setSessionToken = useSetSessionToken()
 
 	return useCallback(
-		async ({ noRedirect = false }: { noRedirect?: boolean } = {}) => {
+		async ({ noRedirect = false, idpLogout = false }: { noRedirect?: boolean; idpLogout?: boolean } = {}) => {
 			if (navigator.credentials?.preventSilentAccess) {
 				try {
 					await navigator.credentials.preventSilentAccess()
@@ -18,18 +18,28 @@ export const useLogoutInternal = (clearIdentity?: () => void) => {
 			}
 			clearIdentity?.()
 			setSessionToken(undefined)
+			// RP-initiated (front-channel) Single Logout: when the session was federated via an OIDC
+			// IdP that advertises an end_session_endpoint, `signOut` returns the URL to send the
+			// browser to so the user is also signed out at the IdP. Opt-in via `idpLogout` — by
+			// default we keep the existing local-only redirect to `/`. We call the tenant API
+			// directly (not useSignOutMutation) because the generic mutation wrapper only surfaces a
+			// `result` payload, whereas `logoutUrl` is a top-level field on SignOutResponse.
+			let idpLogoutUrl: string | undefined
 			try {
-				const response = await tenantLogout({})
-				if (!response?.ok) {
-					console.warn(response?.error)
+				const { mutation } = await tenantApi(signOutMutation)
+				if (!mutation?.ok) {
+					console.warn(mutation?.error)
+				}
+				if (idpLogout) {
+					idpLogoutUrl = mutation?.logoutUrl ?? undefined
 				}
 			} catch (e) {
 				console.warn(e)
 			}
 			if (!noRedirect) {
-				window.location.href = '/' // todo better redirect?
+				window.location.href = idpLogoutUrl ?? '/' // todo better redirect?
 			}
 		},
-		[clearIdentity, setSessionToken, tenantLogout],
+		[clearIdentity, setSessionToken, tenantApi],
 	)
 }

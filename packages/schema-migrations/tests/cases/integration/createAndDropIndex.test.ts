@@ -1,5 +1,5 @@
-import { describe, it } from 'bun:test'
-import { testApplyDiff, testMigrations } from '../../src/tests.js'
+import { describe, expect, it } from 'bun:test'
+import { testApplyDiff, testGenerateSql, testMigrations } from '../../src/tests.js'
 import { SQL } from '../../src/tags.js'
 import { createSchema, SchemaDefinition as def } from '@contember/schema-definition'
 import { createDatabaseMetadata } from '@contember/database'
@@ -357,4 +357,33 @@ describe('remove one of two partial indexes on the same columns', () =>
 				},
 			],
 		)
+	}))
+
+// The physical DROP matches by columns only (the predicate is not in the DB metadata). Two partial
+// indexes on the same columns therefore both match — emitting a DROP for each would silently take out
+// the sibling the schema still expects. The handler must fail loudly instead of dropping both.
+describe('drop one of two same-column partial indexes', () =>
+	it('throws rather than dropping both physical indexes', () => {
+		expect(() =>
+			testGenerateSql(
+				createSchema(SchemaWithTwoPartialIndexes),
+				[
+					{
+						modification: 'removeIndex',
+						entityName: 'Article',
+						fields: ['title'],
+						where: "content = 'b'",
+					},
+				],
+				'',
+				createDatabaseMetadata({
+					foreignKeys: [],
+					indexes: [
+						{ tableName: 'article', columnNames: ['title'], indexName: 'idx_article_title_a', unique: false },
+						{ tableName: 'article', columnNames: ['title'], indexName: 'idx_article_title_b', unique: false },
+					],
+					uniqueConstraints: [],
+				}),
+			)
+		).toThrow(/unambiguously drop partial index/)
 	}))

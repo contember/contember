@@ -22,15 +22,27 @@ export class RemoveIndexModificationHandler implements ModificationHandler<Remov
 		// The DB-metadata layer (DatabaseMetadataResolver) does NOT expose the index predicate, so the
 		// physical DROP is matched by table + columns. Postgres' pg_index.indkey includes the INCLUDE
 		// columns alongside the key columns, so a covering index's metadata lists both — we match the
-		// same combined set here. Known limitation: two PARTIAL indexes on identical columns that differ
-		// only by WHERE are indistinguishable to the metadata and would both be dropped. Schema-level
-		// identity (see getSchemaUpdater) IS predicate-aware, so the diff never conflates them.
+		// same combined set here. Two PARTIAL indexes on identical columns that differ only by WHERE are
+		// therefore indistinguishable to the metadata; we detect that ambiguity below and fail loudly
+		// rather than DROP the sibling the schema still expects to exist. Schema-level identity (see
+		// getSchemaUpdater) IS predicate-aware, so the diff itself never conflates them.
 		const columns = [
 			...getIndexColumns({ entity, fields: index.fields, model: this.schema.model }),
 			...(index.include ? getIndexColumns({ entity, fields: index.include, model: this.schema.model }) : []),
 		]
 
 		const indexNames = databaseMetadata.indexes.filter({ tableName: entity.tableName, columnNames: columns, unique: false }).getNames()
+
+		// A partial index's predicate is invisible in the metadata, so several partial indexes on the
+		// same columns all match here. Dropping every match would silently take out the indexes the
+		// schema still expects — refuse instead, so the obsolete one can be dropped by hand.
+		if (index.where !== undefined && indexNames.length > 1) {
+			throw new Error(
+				`Cannot unambiguously drop partial index on entity ${this.data.entityName} (${index.fields.join(', ')}): `
+					+ `${indexNames.length} indexes match these columns and the predicate is not exposed in the database metadata. `
+					+ `Drop the obsolete index manually.`,
+			)
+		}
 
 		for (const name of indexNames) {
 			builder.sql(`DROP INDEX ${wrapIdentifier(name)}`)

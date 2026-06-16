@@ -75,6 +75,8 @@ export class ProjectGroupContainerFactory {
 		private readonly tenantGraphQLHandlerFactory: TenantGraphQLHandlerFactory,
 		private readonly systemGraphQLHandlerFactory: SystemGraphQLHandlerFactory,
 		private readonly logger: Logger,
+		/** A03: configured trusted geo-country header name, or undefined when off. */
+		private readonly geoCountryHeader?: string,
 	) {}
 
 	public create({ config, slug }: ProjectGroupContainerFactoryArgs): ProjectGroupContainer {
@@ -153,7 +155,8 @@ export class ProjectGroupContainerFactory {
 			.addService('systemGraphQLHandler', ({ systemContainer }) => this.systemGraphQLHandlerFactory.create(systemContainer.systemResolversFactory))
 			.addService(
 				'authenticator',
-				({ tenantDatabase, tenantReadDatabase, tenantContainer }) => new Authenticator(tenantDatabase, tenantReadDatabase, tenantContainer.apiKeyManager),
+				({ tenantDatabase, tenantReadDatabase, tenantContainer }) =>
+					new Authenticator(tenantDatabase, tenantReadDatabase, tenantContainer.apiKeyManager, this.geoCountryHeader),
 			)
 			.addService(
 				'projectMembershipResolver',

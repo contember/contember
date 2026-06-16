@@ -90,6 +90,7 @@ export const configTemplate: any = {
 			suppressAccessLog: '%?env.CONTEMBER_HTTP_SUPPRESS_ACCESS_LOG::string%',
 			trustedProxies: '%?env.CONTEMBER_HTTP_TRUSTED_PROXIES::string%',
 			responseStatusHeader: '%?env.CONTEMBER_HTTP_RESPONSE_STATUS_HEADER::string%',
+			geoCountryHeader: '%?env.CONTEMBER_HTTP_GEO_COUNTRY_HEADER::string%',
 		},
 		contentApi: {
 			schemaCacheTtlSeconds: '%?env.CONTEMBER_CONTENT_API_SCHEMA_CACHE_TTL_SECONDS::number%',

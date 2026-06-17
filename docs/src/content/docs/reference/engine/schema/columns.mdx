@@ -229,6 +229,8 @@ Available options for indexes:
 - `fields`: Array of field names to include in the index
 - `method`: Index method (`"btree"`, `"gin"`, `"gist"`, `"hash"`, `"brin"`, `"spgist"`)
 - `opClass`: Operator class applied to the indexed columns (e.g. `"gin_trgm_ops"` for trigram search). Requires the corresponding PostgreSQL extension to be installed.
+- `where`: Raw SQL predicate that turns the index into a [partial index](#partial-indexes) — only rows matching the predicate are indexed.
+- `include`: Array of additional field names stored in the index as non-key (payload) columns, creating a [covering index](#covering-indexes).
 
 :::tip
 Use `gin` method for JSON columns and array/list columns as it provides efficient indexing for these data types:
@@ -240,6 +242,38 @@ export class Article {
 }
 ```
 :::
+
+#### Partial indexes
+
+Provide a `where` predicate to create a [partial index](https://www.postgresql.org/docs/current/indexes-partial.html). PostgreSQL then indexes only the rows that satisfy the predicate, which keeps the index small and fast when you query a well-defined subset of a table — for example only non-deleted or published rows:
+
+```typescript
+@c.Index({ fields: ['title'], where: 'deleted_at IS NULL' })
+export class Article {
+	title = c.stringColumn()
+	deletedAt = c.dateTimeColumn()
+}
+```
+
+This generates `CREATE INDEX ON "article" ("title") WHERE (deleted_at IS NULL)`. The predicate is plain SQL evaluated by the database, so it references **database column names** (e.g. `deleted_at`), not schema field names.
+
+:::caution[`where` is raw SQL]
+The `where` value is written verbatim into the generated `CREATE INDEX` statement (wrapped in parentheses). It is a developer-authored predicate — like the body of a [`@c.View`](/reference/engine/schema/views) — and is **not** sanitized or templated, so it must never contain end-user input. It is validated only for being non-empty and free of a `;` statement terminator; an otherwise invalid predicate fails when the migration runs.
+:::
+
+#### Covering indexes
+
+Use `include` to add non-key (payload) columns to the index, creating a [covering index](https://www.postgresql.org/docs/current/indexes-index-only-scans.html). The included columns are not part of the index key but are stored alongside it, so a query that filters on the key fields and only reads the included fields can be answered by an index-only scan without touching the table:
+
+```typescript
+@c.Index({ fields: ['title'], include: ['publishedAt'] })
+export class Article {
+	title = c.stringColumn()
+	publishedAt = c.dateTimeColumn()
+}
+```
+
+This generates `CREATE INDEX ON "article" ("title") INCLUDE ("published_at")`. A field cannot appear in both `fields` and `include`, and `where` and `include` can be combined to create a partial covering index.
 
 #### Trigram indexes for fuzzy search
 

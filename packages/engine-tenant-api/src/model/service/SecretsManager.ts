@@ -1,6 +1,6 @@
 import { SetProjectSecretCommand, UpdateProjectCommand } from '../commands/index.js'
 import { Providers } from '../providers.js'
-import { ProjectSecretsQuery } from '../queries/index.js'
+import { ProjectSecretInfoRow, ProjectSecretKeysQuery, ProjectSecretsQuery } from '../queries/index.js'
 import { DatabaseContext } from '../utils/index.js'
 
 export class SecretsManager {
@@ -8,6 +8,11 @@ export class SecretsManager {
 
 	public async setSecret(dbContext: DatabaseContext, projectId: string, key: string, value: string): Promise<void> {
 		await this.setSecrets(dbContext, projectId, [{ key, value: Buffer.from(value) }])
+	}
+
+	/** Lists secret keys (with timestamps) without decrypting any values. */
+	public async listSecretKeys(dbContext: DatabaseContext, projectId: string): Promise<ProjectSecretInfoRow[]> {
+		return await dbContext.queryHandler.fetch(new ProjectSecretKeysQuery(projectId))
 	}
 
 	public async readSecrets(dbContext: DatabaseContext, projectId: string): Promise<Record<string, string>> {

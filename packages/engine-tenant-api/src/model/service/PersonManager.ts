@@ -1,6 +1,6 @@
 import { ChangeProfileCommand, ChangeProfileData } from '../commands/person/ChangeProfileCommand.js'
 import { Response, ResponseError, ResponseOk } from '../utils/Response.js'
-import { PersonQuery, PersonRow } from '../queries/index.js'
+import { PersonQuery, PersonRow, PersonsQuery, PersonsQueryFilter } from '../queries/index.js'
 import { DatabaseContext } from '../utils/index.js'
 import { EmailValidator, EmailValidatorError } from './EmailValidator.js'
 import { TogglePersonPasswordlessCommand } from '../commands/index.js'
@@ -16,6 +16,15 @@ class PersonManager {
 		return await dbContext.queryHandler.fetch(
 			PersonQuery.byId(personId),
 		)
+	}
+
+	async listPersons(
+		dbContext: DatabaseContext,
+		filter: PersonsQueryFilter = {},
+		limit?: number | null,
+		offset?: number | null,
+	): Promise<PersonRow[]> {
+		return await dbContext.queryHandler.fetch(new PersonsQuery(filter, limit, offset))
 	}
 
 	async changeProfile(dbContext: DatabaseContext, person: PersonRow, data: ChangeProfileData): Promise<PersonManager.ProfileChangeResponse> {

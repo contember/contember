@@ -125,9 +125,22 @@ export type AddProjectMemberResponse = {
 
 export type ApiKey = {
 	readonly __typename?: 'ApiKey'
+	readonly createdAt?: Maybe<Scalars['DateTime']['output']>
+	/**  Human-readable label, stored on the key's identity (`identity.description`).  */
+	readonly description?: Maybe<Scalars['String']['output']>
+	/**  False once the key has been disabled (`disableApiKey`).  */
+	readonly enabled?: Maybe<Scalars['Boolean']['output']>
+	readonly expiresAt?: Maybe<Scalars['DateTime']['output']>
 	readonly id: Scalars['String']['output']
 	readonly identity: Identity
+	readonly lastUsedAt?: Maybe<Scalars['DateTime']['output']>
+	readonly type?: Maybe<ApiKeyType>
 }
+
+export type ApiKeyType =
+	| 'ONE_OFF'
+	| 'PERMANENT'
+	| 'SESSION'
 
 export type ApiKeyWithToken = {
 	readonly __typename?: 'ApiKeyWithToken'
@@ -1561,12 +1574,26 @@ export type PasswordlessValidationType =
 export type Person = {
 	readonly __typename?: 'Person'
 	readonly email?: Maybe<Scalars['String']['output']>
+	/**
+	 * Whether e-mail based one-time-password 2FA is enabled for this person
+	 * (see `initEmailOtp` / `confirmEmailOtp` / `disableEmailOtp`). Independent
+	 * of `otpEnabled` (TOTP authenticator), so a UI can show each MFA method's
+	 * state separately.
+	 */
+	readonly emailOtpEnabled: Scalars['Boolean']['output']
 	readonly emailVerified: Scalars['Boolean']['output']
 	readonly id: Scalars['String']['output']
 	readonly identity: Identity
 	readonly name?: Maybe<Scalars['String']['output']>
 	readonly otpEnabled: Scalars['Boolean']['output']
 	readonly passwordlessEnabled?: Maybe<Scalars['Boolean']['output']>
+}
+
+/**  Filter for the `persons` query. Fields are combined with AND.  */
+export type PersonsFilter = {
+	readonly email?: InputMaybe<Scalars['String']['input']>
+	readonly identityId?: InputMaybe<Scalars['String']['input']>
+	readonly personId?: InputMaybe<Scalars['String']['input']>
 }
 
 export type PrepareOtpResponse = {
@@ -1583,11 +1610,26 @@ export type PrepareOtpResult = {
 
 export type Project = {
 	readonly __typename?: 'Project'
+	/**
+	 * Permanent API keys scoped to this project — keys whose identity is a member
+	 * of the project (excludes SESSION tokens and global keys). Each key's
+	 * project memberships are reachable via `apiKey.identity.projects` for
+	 * cloning when (re)issuing a key. Requires `project.view members` permission;
+	 * returns an empty list otherwise.
+	 */
+	readonly apiKeys: ReadonlyArray<ApiKey>
 	readonly config: Scalars['Json']['output']
 	readonly id: Scalars['String']['output']
 	readonly members: ReadonlyArray<ProjectIdentityRelation>
 	readonly name: Scalars['String']['output']
 	readonly roles: ReadonlyArray<RoleDefinition>
+	/**
+	 * Names of the project's secrets (see `setProjectSecret`). Secret VALUES are
+	 * never returned — only the keys and their timestamps — so a UI can show which
+	 * secrets exist. Requires the `project:viewSecrets` permission (project admins
+	 * + SUPER_ADMIN by default); returns an empty list otherwise.
+	 */
+	readonly secrets: ReadonlyArray<ProjectSecretInfo>
 	readonly slug: Scalars['String']['output']
 }
 
@@ -1620,6 +1662,14 @@ export type ProjectSecret = {
 	readonly value: Scalars['String']['input']
 }
 
+/**  Metadata about a project secret — never its value.  */
+export type ProjectSecretInfo = {
+	readonly __typename?: 'ProjectSecretInfo'
+	readonly createdAt: Scalars['DateTime']['output']
+	readonly key: Scalars['String']['output']
+	readonly updatedAt: Scalars['DateTime']['output']
+}
+
 export type Query = {
 	readonly __typename?: 'Query'
 	/**
@@ -1639,10 +1689,28 @@ export type Query = {
 	readonly authPolicies: ReadonlyArray<AuthPolicy>
 	readonly checkResetPasswordToken: CheckResetPasswordTokenCode
 	readonly configuration: Config
+	/**
+	 * List global (project-independent) permanent API keys — those created via
+	 * `createGlobalApiKey`, whose identity carries global roles and no project
+	 * membership. Requires the `apiKey:list` permission — by default granted
+	 * only to SUPER_ADMIN via the wildcard ALL-resource/ALL-privilege grant.
+	 * Returns an empty list when the caller may not list them. To list a
+	 * project's keys use `project.apiKeys`.
+	 */
+	readonly globalApiKeys: ReadonlyArray<ApiKey>
 	readonly identityProviders: ReadonlyArray<IdentityProvider>
 	readonly mailTemplates: ReadonlyArray<MailTemplateData>
 	readonly me: Identity
 	readonly personById?: Maybe<Person>
+	/**
+	 * List persons across the tenant. SUPER_ADMIN sees every person; otherwise
+	 * the result is scoped to persons who are members of a project the caller may
+	 * view members of (i.e. the same persons reachable via `project.members`),
+	 * so a PROJECT_ADMIN sees only their projects' members. `filter` matches by
+	 * e-mail (case-insensitive), `personId`, or `identityId`; `limit`/`offset`
+	 * paginate. Returns an empty list when the caller may not list anyone.
+	 */
+	readonly persons: ReadonlyArray<Person>
 	readonly projectBySlug?: Maybe<Project>
 	readonly projectMemberships: ReadonlyArray<Membership>
 	readonly projects: ReadonlyArray<Project>
@@ -1661,6 +1729,12 @@ export type QueryCheckResetPasswordTokenArgs = {
 
 export type QueryPersonByIdArgs = {
 	id: Scalars['String']['input']
+}
+
+export type QueryPersonsArgs = {
+	filter?: InputMaybe<PersonsFilter>
+	limit?: InputMaybe<Scalars['Int']['input']>
+	offset?: InputMaybe<Scalars['Int']['input']>
 }
 
 export type QueryProjectBySlugArgs = {
@@ -2321,6 +2395,7 @@ export type ResolversTypes = {
 	AddProjectMemberErrorCode: AddProjectMemberErrorCode
 	AddProjectMemberResponse: ResolverTypeWrapper<AddProjectMemberResponse>
 	ApiKey: ResolverTypeWrapper<Omit<ApiKey, 'identity'> & { identity: ResolversTypes['Identity'] }>
+	ApiKeyType: ApiKeyType
 	ApiKeyWithToken: ResolverTypeWrapper<Omit<ApiKeyWithToken, 'identity'> & { identity: ResolversTypes['Identity'] }>
 	AuthLogEntry: ResolverTypeWrapper<AuthLogEntry>
 	AuthLogFilter: AuthLogFilter
@@ -2477,10 +2552,12 @@ export type ResolversTypes = {
 	Mutation: ResolverTypeWrapper<Record<PropertyKey, never>>
 	PasswordlessValidationType: PasswordlessValidationType
 	Person: ResolverTypeWrapper<Omit<Person, 'identity'> & { identity: ResolversTypes['Identity'] }>
+	PersonsFilter: PersonsFilter
 	PrepareOtpResponse: ResolverTypeWrapper<PrepareOtpResponse>
 	PrepareOtpResult: ResolverTypeWrapper<PrepareOtpResult>
 	Project: ResolverTypeWrapper<
-		Omit<Project, 'members' | 'roles'> & {
+		Omit<Project, 'apiKeys' | 'members' | 'roles'> & {
+			apiKeys: ReadonlyArray<ResolversTypes['ApiKey']>
 			members: ReadonlyArray<ResolversTypes['ProjectIdentityRelation']>
 			roles: ReadonlyArray<ResolversTypes['RoleDefinition']>
 		}
@@ -2489,6 +2566,7 @@ export type ResolversTypes = {
 	ProjectMembersFilter: ProjectMembersFilter
 	ProjectMembersInput: ProjectMembersInput
 	ProjectSecret: ProjectSecret
+	ProjectSecretInfo: ResolverTypeWrapper<ProjectSecretInfo>
 	Query: ResolverTypeWrapper<Record<PropertyKey, never>>
 	RegenerateBackupCodesError: ResolverTypeWrapper<RegenerateBackupCodesError>
 	RegenerateBackupCodesErrorCode: RegenerateBackupCodesErrorCode
@@ -2709,9 +2787,11 @@ export type ResolversParentTypes = {
 	MfaEnrollment: MfaEnrollment
 	Mutation: Record<PropertyKey, never>
 	Person: Omit<Person, 'identity'> & { identity: ResolversParentTypes['Identity'] }
+	PersonsFilter: PersonsFilter
 	PrepareOtpResponse: PrepareOtpResponse
 	PrepareOtpResult: PrepareOtpResult
-	Project: Omit<Project, 'members' | 'roles'> & {
+	Project: Omit<Project, 'apiKeys' | 'members' | 'roles'> & {
+		apiKeys: ReadonlyArray<ResolversParentTypes['ApiKey']>
 		members: ReadonlyArray<ResolversParentTypes['ProjectIdentityRelation']>
 		roles: ReadonlyArray<ResolversParentTypes['RoleDefinition']>
 	}
@@ -2719,6 +2799,7 @@ export type ResolversParentTypes = {
 	ProjectMembersFilter: ProjectMembersFilter
 	ProjectMembersInput: ProjectMembersInput
 	ProjectSecret: ProjectSecret
+	ProjectSecretInfo: ProjectSecretInfo
 	Query: Record<PropertyKey, never>
 	RegenerateBackupCodesError: RegenerateBackupCodesError
 	RegenerateBackupCodesResponse: RegenerateBackupCodesResponse
@@ -2872,8 +2953,14 @@ export type AddProjectMemberResponseResolvers<
 }
 
 export type ApiKeyResolvers<ContextType = any, ParentType extends ResolversParentTypes['ApiKey'] = ResolversParentTypes['ApiKey']> = {
+	createdAt?: Resolver<Maybe<ResolversTypes['DateTime']>, ParentType, ContextType>
+	description?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>
+	enabled?: Resolver<Maybe<ResolversTypes['Boolean']>, ParentType, ContextType>
+	expiresAt?: Resolver<Maybe<ResolversTypes['DateTime']>, ParentType, ContextType>
 	id?: Resolver<ResolversTypes['String'], ParentType, ContextType>
 	identity?: Resolver<ResolversTypes['Identity'], ParentType, ContextType>
+	lastUsedAt?: Resolver<Maybe<ResolversTypes['DateTime']>, ParentType, ContextType>
+	type?: Resolver<Maybe<ResolversTypes['ApiKeyType']>, ParentType, ContextType>
 }
 
 export type ApiKeyWithTokenResolvers<
@@ -3876,6 +3963,7 @@ export type MutationResolvers<ContextType = any, ParentType extends ResolversPar
 
 export type PersonResolvers<ContextType = any, ParentType extends ResolversParentTypes['Person'] = ResolversParentTypes['Person']> = {
 	email?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>
+	emailOtpEnabled?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
 	emailVerified?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
 	id?: Resolver<ResolversTypes['String'], ParentType, ContextType>
 	identity?: Resolver<ResolversTypes['Identity'], ParentType, ContextType>
@@ -3901,11 +3989,13 @@ export type PrepareOtpResultResolvers<
 }
 
 export type ProjectResolvers<ContextType = any, ParentType extends ResolversParentTypes['Project'] = ResolversParentTypes['Project']> = {
+	apiKeys?: Resolver<ReadonlyArray<ResolversTypes['ApiKey']>, ParentType, ContextType>
 	config?: Resolver<ResolversTypes['Json'], ParentType, ContextType>
 	id?: Resolver<ResolversTypes['String'], ParentType, ContextType>
 	members?: Resolver<ReadonlyArray<ResolversTypes['ProjectIdentityRelation']>, ParentType, ContextType, Partial<ProjectMembersArgs>>
 	name?: Resolver<ResolversTypes['String'], ParentType, ContextType>
 	roles?: Resolver<ReadonlyArray<ResolversTypes['RoleDefinition']>, ParentType, ContextType>
+	secrets?: Resolver<ReadonlyArray<ResolversTypes['ProjectSecretInfo']>, ParentType, ContextType>
 	slug?: Resolver<ResolversTypes['String'], ParentType, ContextType>
 }
 
@@ -3915,6 +4005,15 @@ export type ProjectIdentityRelationResolvers<
 > = {
 	identity?: Resolver<ResolversTypes['Identity'], ParentType, ContextType>
 	memberships?: Resolver<ReadonlyArray<ResolversTypes['Membership']>, ParentType, ContextType>
+}
+
+export type ProjectSecretInfoResolvers<
+	ContextType = any,
+	ParentType extends ResolversParentTypes['ProjectSecretInfo'] = ResolversParentTypes['ProjectSecretInfo'],
+> = {
+	createdAt?: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>
+	key?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+	updatedAt?: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>
 }
 
 export type QueryResolvers<ContextType = any, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = {
@@ -3927,10 +4026,12 @@ export type QueryResolvers<ContextType = any, ParentType extends ResolversParent
 		RequireFields<QueryCheckResetPasswordTokenArgs, 'requestId' | 'token'>
 	>
 	configuration?: Resolver<ResolversTypes['Config'], ParentType, ContextType>
+	globalApiKeys?: Resolver<ReadonlyArray<ResolversTypes['ApiKey']>, ParentType, ContextType>
 	identityProviders?: Resolver<ReadonlyArray<ResolversTypes['IdentityProvider']>, ParentType, ContextType>
 	mailTemplates?: Resolver<ReadonlyArray<ResolversTypes['MailTemplateData']>, ParentType, ContextType>
 	me?: Resolver<ResolversTypes['Identity'], ParentType, ContextType>
 	personById?: Resolver<Maybe<ResolversTypes['Person']>, ParentType, ContextType, RequireFields<QueryPersonByIdArgs, 'id'>>
+	persons?: Resolver<ReadonlyArray<ResolversTypes['Person']>, ParentType, ContextType, Partial<QueryPersonsArgs>>
 	projectBySlug?: Resolver<Maybe<ResolversTypes['Project']>, ParentType, ContextType, RequireFields<QueryProjectBySlugArgs, 'slug'>>
 	projectMemberships?: Resolver<
 		ReadonlyArray<ResolversTypes['Membership']>,
@@ -4501,6 +4602,7 @@ export type Resolvers<ContextType = any> = {
 	PrepareOtpResult?: PrepareOtpResultResolvers<ContextType>
 	Project?: ProjectResolvers<ContextType>
 	ProjectIdentityRelation?: ProjectIdentityRelationResolvers<ContextType>
+	ProjectSecretInfo?: ProjectSecretInfoResolvers<ContextType>
 	Query?: QueryResolvers<ContextType>
 	RegenerateBackupCodesError?: RegenerateBackupCodesErrorResolvers<ContextType>
 	RegenerateBackupCodesResponse?: RegenerateBackupCodesResponseResolvers<ContextType>

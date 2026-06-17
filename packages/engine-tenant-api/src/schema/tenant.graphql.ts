@@ -16,9 +16,27 @@ const schema: DocumentNode = gql`
 	type Query {
 		me: Identity!
 		personById(id: String!): Person
+		"""
+		List persons across the tenant. SUPER_ADMIN sees every person; otherwise
+		the result is scoped to persons who are members of a project the caller may
+		view members of (i.e. the same persons reachable via \`project.members\`),
+		so a PROJECT_ADMIN sees only their projects' members. \`filter\` matches by
+		e-mail (case-insensitive), \`personId\`, or \`identityId\`; \`limit\`/\`offset\`
+		paginate. Returns an empty list when the caller may not list anyone.
+		"""
+		persons(filter: PersonsFilter, limit: Int, offset: Int): [Person!]!
 		projects: [Project!]!
 		projectBySlug(slug: String!): Project
 		projectMemberships(projectSlug: String!, identityId: String!): [Membership!]!
+		"""
+		List global (project-independent) permanent API keys — those created via
+		\`createGlobalApiKey\`, whose identity carries global roles and no project
+		membership. Requires the \`apiKey:list\` permission — by default granted
+		only to SUPER_ADMIN via the wildcard ALL-resource/ALL-privilege grant.
+		Returns an empty list when the caller may not list them. To list a
+		project's keys use \`project.apiKeys\`.
+		"""
+		globalApiKeys: [ApiKey!]!
 		checkResetPasswordToken(requestId: String!, token: String!): CheckResetPasswordTokenCode!
 
 		identityProviders: [IdentityProvider!]!
@@ -1176,15 +1194,43 @@ const schema: DocumentNode = gql`
 		name: String
 		otpEnabled: Boolean!
 		passwordlessEnabled: Boolean
+		"""
+		Whether e-mail based one-time-password 2FA is enabled for this person
+		(see \`initEmailOtp\` / \`confirmEmailOtp\` / \`disableEmailOtp\`). Independent
+		of \`otpEnabled\` (TOTP authenticator), so a UI can show each MFA method's
+		state separately.
+		"""
+		emailOtpEnabled: Boolean!
 		emailVerified: Boolean!
 		identity: Identity!
 	}
 
+	""" Filter for the \`persons\` query. Fields are combined with AND. """
+	input PersonsFilter {
+		email: String
+		personId: String
+		identityId: String
+	}
+
 	# === api key ===
+
+	enum ApiKeyType {
+		SESSION
+		PERMANENT
+		ONE_OFF
+	}
 
 	type ApiKey {
 		id: String!
 		identity: Identity!
+		""" Human-readable label, stored on the key's identity (\`identity.description\`). """
+		description: String
+		type: ApiKeyType
+		""" False once the key has been disabled (\`disableApiKey\`). """
+		enabled: Boolean
+		createdAt: DateTime
+		lastUsedAt: DateTime
+		expiresAt: DateTime
 	}
 
 	type ApiKeyWithToken {
@@ -1237,6 +1283,28 @@ const schema: DocumentNode = gql`
 			input: ProjectMembersInput,
 			memberType: MemberType @deprecated(reason: "Use args")
 		): [ProjectIdentityRelation!]!
+		"""
+		Permanent API keys scoped to this project — keys whose identity is a member
+		of the project (excludes SESSION tokens and global keys). Each key's
+		project memberships are reachable via \`apiKey.identity.projects\` for
+		cloning when (re)issuing a key. Requires \`project.view members\` permission;
+		returns an empty list otherwise.
+		"""
+		apiKeys: [ApiKey!]!
+		"""
+		Names of the project's secrets (see \`setProjectSecret\`). Secret VALUES are
+		never returned — only the keys and their timestamps — so a UI can show which
+		secrets exist. Requires the \`project:viewSecrets\` permission (project admins
+		+ SUPER_ADMIN by default); returns an empty list otherwise.
+		"""
+		secrets: [ProjectSecretInfo!]!
+	}
+
+	""" Metadata about a project secret — never its value. """
+	type ProjectSecretInfo {
+		key: String!
+		createdAt: DateTime!
+		updatedAt: DateTime!
 	}
 
 	input ProjectMembersInput {

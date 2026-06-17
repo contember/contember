@@ -75,7 +75,7 @@ export class IdentityTypeResolver implements IdentityResolvers {
 						return null
 					}
 					return {
-						project: { ...it, members: [], roles: [] },
+						project: { ...it, members: [], roles: [], apiKeys: [], secrets: [] },
 						memberships: memberships,
 					}
 				}),

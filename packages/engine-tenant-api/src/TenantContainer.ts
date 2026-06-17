@@ -108,6 +108,7 @@ import { AuthPolicyMutationResolver } from './resolvers/mutation/configuration/A
 import { AuthPolicyQueryResolver } from './resolvers/query/AuthPolicyQueryResolver.js'
 import { ResetPersonMfaMutationResolver } from './resolvers/mutation/person/ResetPersonMfaMutationResolver.js'
 import { AuthLogQueryResolver } from './resolvers/query/AuthLogQueryResolver.js'
+import { ApiKeyQueryResolver } from './resolvers/query/ApiKeyQueryResolver.js'
 import { PasswordlessMutationResolver } from './resolvers/mutation/person/PasswordlessMutationResolver.js'
 import { PasswordlessSignInManager } from './model/service/PasswordlessSignInManager.js'
 import { TogglePasswordlessMutationResolver } from './resolvers/mutation/person/TogglePasswordlessMutationResolver.js'
@@ -280,14 +281,15 @@ export class TenantContainerFactory {
 			)
 			.addService(
 				'projectTypeResolver',
-				({ projectMemberManager, projectSchemaResolver }) => new ProjectTypeResolver(projectMemberManager, projectSchemaResolver),
+				({ projectMemberManager, projectSchemaResolver, secretManager }) =>
+					new ProjectTypeResolver(projectMemberManager, projectSchemaResolver, secretManager),
 			)
 			.addService(
 				'signInResponseFactory',
 				({ permissionContextFactory, identityTypeResolver }) => new SignInResponseFactory(permissionContextFactory, identityTypeResolver),
 			)
 			.addService('meQueryResolver', () => new MeQueryResolver())
-			.addService('personQueryResolver', ({ personManager }) => new PersonQueryResolver(personManager))
+			.addService('personQueryResolver', ({ personManager, projectManager }) => new PersonQueryResolver(personManager, projectManager))
 			.addService('idpQueryResolver', ({ idpManager }) => new IDPQueryResolver(idpManager))
 			.addService('projectQueryResolver', ({ projectManager }) => new ProjectQueryResolver(projectManager))
 			.addService(
@@ -397,6 +399,7 @@ export class TenantContainerFactory {
 			.addService('authPolicyMutationResolver', ({ authPolicyManager }) => new AuthPolicyMutationResolver(authPolicyManager))
 			.addService('authPolicyQueryResolver', ({ authPolicyManager }) => new AuthPolicyQueryResolver(authPolicyManager))
 			.addService('authLogQueryResolver', () => new AuthLogQueryResolver())
+			.addService('apiKeyQueryResolver', () => new ApiKeyQueryResolver())
 			.addService(
 				'passwordlessMutationResolver',
 				({ passwordlessSignInManager, signInResponseFactory, captchaValidator, rateLimiter }) =>

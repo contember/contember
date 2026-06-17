@@ -21,7 +21,12 @@ const readEmailedCode = async (): Promise<string> => {
 	const body: string = messages[0].Content.Body
 	// strip quoted-printable soft line breaks and any '=XX' artifacts around the digits
 	const normalized = body.replace(/=\r?\n/g, '').replace(/=3D/g, '=')
-	const match = normalized.match(/(\d{6})/)
+	// The template prints the recipient address before the code, and our random
+	// `john-<base36>@doe.com` local part can itself contain a 6-digit run that
+	// `\d{6}` would grab instead of the real code (~0.3 % of addresses → a flaky
+	// INVALID_OTP_TOKEN). Strip email addresses first so only the OTP can match.
+	const withoutAddresses = normalized.replace(/[^\s<>()"]+@[^\s<>()"]+/g, '')
+	const match = withoutAddresses.match(/(\d{6})/)
 	expect(match).not.toBeNull()
 	return match![1]
 }

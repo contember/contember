@@ -6,9 +6,19 @@ Identity, authentication, and project management API.
 
 - **Sign-up** (`SignUpManager`): Create identity + person with email validation, password strength checking, bcrypt hashing
 - **Sign-in** (`SignInManager`): Password verification with rate limiting (configurable backoff), OTP/2FA support, creates session API key (default 30min expiry)
-- **IDP** (`IDPSignInManager`): OIDC, Facebook, Apple sign-in via `openid-client`. Init → redirect → callback flow with auto sign-up option
+- **IDP** (`IDPSignInManager`): OIDC, Facebook, Apple sign-in via `openid-client`. Init → redirect → callback flow with auto sign-up option. Supports RP-initiated (front-channel) Single Logout — `signOut` returns `logoutUrl` for federated sessions
 - **Passwordless** (`PasswordlessSignInManager`): Magic link flow via email tokens with optional MFA
-- **API Keys**: Three types — `SESSION` (short-lived), `PERMANENT` (integrations), `ONE_OFF` (sign-up flows)
+- **API Keys**: Three types (`ApiKeyType` enum) — `SESSION` (short-lived, surfaced as `Identity.sessions`), `PERMANENT` (integrations), `ONE_OFF` (sign-up flows)
+- **Email verification & email change** (`EmailVerificationManager`, `EmailChangeManager`): optional per-account e-mail verification at sign-up (`ConfigSignup.requireEmailVerification`) and a confirm-by-token flow for user-initiated address changes (`ConfigEmailChange.requireVerification`)
+
+### Multi-factor authentication
+
+- **TOTP** (`OtpManager`, `OtpAuthenticator`): authenticator-app 2FA — prepare/confirm/disable, surfaced as `Person.otpEnabled`
+- **Email OTP** (`EmailOtpManager`): e-mail one-time-password 2FA (`initEmailOtp` / `confirmEmailOtp` / `disableEmailOtp`), surfaced as `Person.emailOtpEnabled` — independent of TOTP, so a UI can show each method separately. Code dispatch is rate-limited per person (`ConfigRateLimits.emailOtpPerPerson`, enabled by default)
+- **Backup codes** (`BackupCodeManager`): one-shot recovery codes issued on MFA enrollment; `regenerateBackupCodes` reissues them
+- **Auth policies** (`AuthPolicyManager`, `AuthPolicyResolver`): per-role MFA / session policy (global or project-scoped) via `createAuthPolicy` / `updateAuthPolicy` / `deleteAuthPolicy` and the `authPolicies` query. With no rows configured, MFA enforcement is inert. Gated by `system:configure`
+- **Login risk / anomaly detection** (`LoginRiskAnalyzer`, A03): opt-in (off by default). Scores each successful login against the person's recent successful logins using trusted-proxy signals (country geo header, user-agent fingerprint, IP/IP-prefix); score thresholds trigger an informational `UNUSUAL_LOGIN` email or step-up email-OTP. Configured under `ConfigLogin.anomalyDetection`
+- Admin MFA/session operations: `resetPersonMfa`, `forceSignOutPerson`, `disablePerson`, `revokeSession` (and `Identity.sessions` listing)
 
 ## Project & Membership Management
 
@@ -16,9 +26,26 @@ Identity, authentication, and project management API.
 - `ProjectMemberManager`: Add/update/remove project memberships. SUPER_ADMIN and PROJECT_ADMIN get implicit admin role on all projects.
 - `InviteManager`: Invite users by email with configurable password setup method (CREATE_PASSWORD, RESET_PASSWORD, EMAIL_ONLY)
 
+## Read / listing queries
+
+GraphQL read fields whose visibility is enforced per-caller (the resolver returns an empty list rather than throwing when the caller lacks visibility, so batched queries don't abort on one forbidden target):
+
+- **`Query.persons(filter, limit, offset): [Person!]!`** — tenant-wide person listing. SUPER_ADMIN (via `person:list`) lists everyone; otherwise scoped to persons who are members of a project the caller may view members of (so a PROJECT_ADMIN sees only their projects' members). `filter` matches by email (case-insensitive), `personId`, or `identityId`. Resolver `query/PersonQueryResolver.ts`, model `queries/person/PersonsQuery.ts`.
+- **`Project.apiKeys: [ApiKey!]!`** — project-scoped permanent keys (excludes SESSION/ONE_OFF and global keys). Gated by `project.view members` (`PROJECT_VIEW_MEMBER`). Resolver `types/ProjectTypeResolver.ts`, model `queries/apiKey/ApiKeyListQuery.ts` (`ProjectApiKeysQuery`).
+- **`Query.globalApiKeys: [ApiKey!]!`** — global permanent keys (identity with no project membership, i.e. from `createGlobalApiKey`). Gated by `apiKey:list` (`API_KEY_LIST`). Resolver `query/ApiKeyQueryResolver.ts`, model `GlobalApiKeysQuery`.
+  - The enriched `ApiKey` type carries `description`, `type` (`ApiKeyType`), `enabled`, `createdAt`, `lastUsedAt`, `expiresAt`; mapped in `responseHelpers/ApiKeyResponseFactory.ts`. A key's project memberships (for cloning when re-issuing) are reachable lazily via `apiKey.identity.projects`.
+- **`Project.secrets: [ProjectSecretInfo!]!`** — secret KEYS + timestamps only, **never the values**. Gated by `project:viewSecrets` (`PROJECT_VIEW_SECRETS`). Resolver `ProjectTypeResolver.secrets` → `SecretsManager.listSecretKeys` → model `queries/project/ProjectSecretKeysQuery.ts`.
+- Also note `Identity.sessions: [SessionInfo!]!` (own sessions always visible; others via `person:viewSessions`) and `Query.authLog` (`system:viewAuthLog`, SUPER_ADMIN only by default).
+
 ## Authorization
 
-Tenant-level roles: `LOGIN`, `PERSON`, `SUPER_ADMIN`, `PROJECT_CREATOR`, `PROJECT_ADMIN`, `ENTRYPOINT_DEPLOYER`, `PROJECT_MEMBER`, `SELF`. Permission actions defined in `PermissionActions.ts`.
+Tenant-level roles (`Roles.ts`): `LOGIN`, `PERSON`, `SUPER_ADMIN`, `PROJECT_CREATOR`, `PROJECT_ADMIN`, `ENTRYPOINT_DEPLOYER`, `PROJECT_MEMBER`, `SELF`. Permission actions are defined in `PermissionActions.ts` (resource + privilege, some parameterized by `roles` / `memberships`); static grants per role live in `PermissionsFactory.ts`.
+
+- **`SUPER_ADMIN`** gets everything via a single wildcard grant (`resource: ALL, privilege: ALL`), so it implicitly satisfies every action including newly added ones.
+- **`PROJECT_ADMIN`** is reached two ways: (a) **per-project**, granted dynamically inside a project scope (`ProjectScope.getIdentityAccess`) when the calling identity's membership in that project includes the project `admin` role — `PROJECT_MEMBER` + `PROJECT_ADMIN` are then unioned into the access node *for that project only*; or (b) as a **global** tenant role held in `identity.roles`, in which case `ProjectMemberManager.getImplicitProjectMemberships` grants implicit project `admin` membership on **all** projects (same as global `SUPER_ADMIN`). Its `roles`-parameterized grants are further constrained by `projectAdminAllowedInputRoles` / `projectAdminUseRolesVerifier` (e.g. it may not act on `super_admin` / `project_creator` roles).
+- `LOGIN` / `PERSON` cover the unauthenticated sign-in actions and the self-service actions of a signed-in person, respectively.
+
+Notable permission actions: `person:list` (`PERSON_LIST`, tenant-wide person listing), `apiKey:list` (`API_KEY_LIST`, global permanent keys), `project:viewSecrets` (`PROJECT_VIEW_SECRETS`, granted to PROJECT_ADMIN + SUPER_ADMIN), `project:viewMembers` (`PROJECT_VIEW_MEMBER`, also gates `project.apiKeys`), `person:viewSessions`, `system:viewAuthLog`, `system:configure`.
 
 ## Architecture
 
@@ -28,14 +55,24 @@ CQRS pattern with Command/Query separation via `CommandBus` and `DatabaseQuery`.
 
 - `ApiKeyManager` — token creation, verification, prolongation. `verifyAndProlong` first consults `UnpersistedApiKeyManager` (configured root tokens, constant-time hash match, no DB row) and only then falls back to the `api_key` table lookup.
 - `UnpersistedApiKeyManager` — verifies configured root tokens that are NOT stored in the DB (enables zero-write rotation); built from `tenantCredentials.rootTokens` / `rootTokenHashes`, resolves to a fixed virtual `super_admin` identity (`UNPERSISTED_ROOT_IDENTITY_ID`).
-- `OtpManager` — TOTP 2FA setup/confirm/disable
-- `SecretsManager` — encrypted project secrets
-- `ConfigurationManager` — tenant-wide config (password policies, login settings, passwordless)
-- `UserMailer` — email notifications with Mustache templates (password reset, invitations, passwordless)
+- `OtpManager` / `OtpAuthenticator` — TOTP 2FA setup/confirm/disable
+- `EmailOtpManager` — e-mail OTP 2FA (init/confirm/disable); `BackupCodeManager` — MFA recovery codes
+- `AuthPolicyManager` (+ `AuthPolicyResolver`) — per-role MFA / session auth policies
+- `LoginRiskAnalyzer` — sign-in anomaly scoring (A03); see `RiskWeight` / `RiskAction`
+- `AuthLogService` — writes `person_auth_log` audit entries (the `authLog` query reads them)
+- `RateLimiter` — generic per-key rate limiting backed by `rate_limit_event` (per-IP windows, email-OTP-per-person, etc.)
+- `EmailVerificationManager` / `EmailChangeManager` — e-mail verification and confirm-by-token address change
+- `EmailValidator`, `PasswordStrengthValidator`, `HibpChecker` — input validation (HIBP = haveibeenpwned breach check)
+- `PersonAccessManager` — disable person + cascade-invalidate their api keys
+- `SecretsManager` — encrypted project secrets (`readSecrets`; `listSecretKeys` for key/timestamp listing without values)
+- `ConfigurationManager` — tenant-wide config (signup, email change, password policies, login/backoff, passwordless, captcha, rate limits, anomaly detection)
+- `UserMailer` — email notifications with Mustache templates (password reset, invitations, passwordless, email OTP, unusual login, verification)
 
 ## Database
 
-Core tables: `identity`, `person`, `api_key`, `person_token`, `project`, `project_membership`, `project_membership_variable`, `project_secret`, `identity_provider`, `person_identity_provider`, `mail_template`, `person_auth_log`, `config`
+Core tables (authoritative list = `snapshot.ts`): `identity`, `person`, `person_mfa` (MFA state incl. `email_otp_enabled` / `otp_activated_at`), `person_backup_code`, `api_key`, `person_token` (password-reset / passwordless / verification tokens), `project`, `project_membership`, `project_membership_variable`, `project_secret`, `identity_provider`, `person_identity_provider`, `idp_session`, `mail_template`, `person_auth_log` (audit log), `auth_policy` (per-role MFA/session policy), `rate_limit_event` (anti-abuse rate limiting), `config`.
+
+`Person.emailOtpEnabled` is mapped from `person_mfa.email_otp_enabled`; `Person.otpEnabled` from `person_mfa.otp_activated_at`.
 
 ## GraphQL schema (generated)
 

@@ -11,8 +11,8 @@ export interface PersonIdentityProviderRow {
 
 /**
  * Lists the external IdP connections of a single person, joined with the
- * identity provider they belong to. Used by the `myIdentityProviders` query
- * and by the disconnect flow to enforce ownership and lock-out protection.
+ * identity provider they belong to. Used by the `Person.identityProviders`
+ * field and by the disconnect flow to enforce ownership and lock-out protection.
  */
 export class PersonIdentityProvidersQuery extends DatabaseQuery<PersonIdentityProviderRow[]> {
 	constructor(

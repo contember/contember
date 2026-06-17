@@ -30,13 +30,12 @@ import {
 	ApiKeyQueryResolver,
 	AuthLogQueryResolver,
 	MeQueryResolver,
-	PersonIdentityProvidersQueryResolver,
 	PersonQueryResolver,
 	ProjectMembersQueryResolver,
 	ProjectQueryResolver,
 } from './query/index.js'
 import { DisconnectMyIdentityProviderMutationResolver } from './mutation/idp/index.js'
-import { IdentityTypeResolver, ProjectTypeResolver } from './types/index.js'
+import { IdentityTypeResolver, PersonTypeResolver, ProjectTypeResolver } from './types/index.js'
 import { DateTimeType, IntervalType, JSONType } from '@contember/graphql-utils'
 import { IDPQueryResolver } from './query/IDPQueryResolver.js'
 import { UpdateIDPMutationResolver } from './mutation/idp/UpdateIDPMutationResolver.js'
@@ -61,7 +60,6 @@ class ResolverFactory {
 			projectQueryResolver: ProjectQueryResolver
 			projectMembersQueryResolver: ProjectMembersQueryResolver
 			idpQueryResolver: IDPQueryResolver
-			personIdentityProvidersQueryResolver: PersonIdentityProvidersQueryResolver
 			mailTemplateQueryResolver: MailTemplateQueryResolver
 
 			signUpMutationResolver: SignUpMutationResolver
@@ -103,6 +101,7 @@ class ResolverFactory {
 			updateProjectMutationResolver: UpdateProjectMutationResolver
 
 			identityTypeResolver: IdentityTypeResolver
+			personTypeResolver: PersonTypeResolver
 			projectTypeResolver: ProjectTypeResolver
 
 			identityGlobalRolesMutationResolver: IdentityGlobalRolesMutationResolver
@@ -132,6 +131,9 @@ class ResolverFactory {
 				permissions: this.resolvers.identityTypeResolver.permissions.bind(this.resolvers.identityTypeResolver),
 				sessions: this.resolvers.identityTypeResolver.sessions.bind(this.resolvers.identityTypeResolver),
 			},
+			Person: {
+				identityProviders: this.resolvers.personTypeResolver.identityProviders.bind(this.resolvers.personTypeResolver),
+			},
 			Project: {
 				members: this.resolvers.projectTypeResolver.members.bind(this.resolvers.projectTypeResolver),
 				roles: this.resolvers.projectTypeResolver.roles.bind(this.resolvers.projectTypeResolver),
@@ -147,9 +149,6 @@ class ResolverFactory {
 				projects: this.resolvers.projectQueryResolver.projects.bind(this.resolvers.projectQueryResolver),
 				projectMemberships: this.resolvers.projectMembersQueryResolver.projectMemberships.bind(this.resolvers.projectMembersQueryResolver),
 				identityProviders: this.resolvers.idpQueryResolver.identityProviders.bind(this.resolvers.idpQueryResolver),
-				myIdentityProviders: this.resolvers.personIdentityProvidersQueryResolver.myIdentityProviders.bind(
-					this.resolvers.personIdentityProvidersQueryResolver,
-				),
 				mailTemplates: this.resolvers.mailTemplateQueryResolver.mailTemplates.bind(this.resolvers.mailTemplateQueryResolver),
 				configuration: this.resolvers.configurationQueryResolver.configuration.bind(this.resolvers.configurationQueryResolver),
 				authPolicies: this.resolvers.authPolicyQueryResolver.authPolicies.bind(this.resolvers.authPolicyQueryResolver),

@@ -41,9 +41,6 @@ const schema: DocumentNode = gql`
 
 		identityProviders: [IdentityProvider!]!
 
-		""" External IdP connections of the currently authenticated person. """
-		myIdentityProviders: [PersonIdentityProvider!]!
-
 		mailTemplates: [MailTemplateData!]!
 
 		configuration: Config!
@@ -1248,6 +1245,16 @@ const schema: DocumentNode = gql`
 		emailOtpEnabled: Boolean!
 		emailVerified: Boolean!
 		identity: Identity!
+
+		"""
+		External IdP connections of this person. Always visible for the calling
+		person (e.g. via \`me { person { identityProviders } }\`). For other
+		persons, visible to callers holding the \`person:viewIdp\` permission
+		against the target's roles — SUPER_ADMIN sees everyone; PROJECT_ADMIN
+		sees members whose roles fall within their allowed-input-roles. Returns
+		an empty list rather than throwing when the viewer lacks visibility.
+		"""
+		identityProviders: [PersonIdentityProvider!]!
 	}
 
 	""" Filter for the \`persons\` query. Fields are combined with AND. """

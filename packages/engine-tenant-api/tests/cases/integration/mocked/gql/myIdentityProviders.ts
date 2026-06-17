@@ -3,14 +3,18 @@ import { GQL } from '../../../../src/tags.js'
 
 export const myIdentityProvidersQuery = (): GraphQLTestQuery => ({
 	query: GQL`query {
-          myIdentityProviders {
-            id
-            createdAt
-            externalIdentifier
-            identityProvider {
-                slug
-                type
-                disabledAt
+          me {
+            person {
+              identityProviders {
+                id
+                createdAt
+                externalIdentifier
+                identityProvider {
+                    slug
+                    type
+                    disabledAt
+                }
+              }
             }
           }
         }`,

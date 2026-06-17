@@ -76,8 +76,8 @@ import {
 	MailTemplateMutationResolver,
 	MeQueryResolver,
 	OtpMutationResolver,
-	PersonIdentityProvidersQueryResolver,
 	PersonQueryResolver,
+	PersonTypeResolver,
 	ProjectMembersQueryResolver,
 	ProjectQueryResolver,
 	ProjectTypeResolver,
@@ -288,6 +288,7 @@ export class TenantContainerFactory {
 				({ projectMemberManager, projectSchemaResolver, secretManager }) =>
 					new ProjectTypeResolver(projectMemberManager, projectSchemaResolver, secretManager),
 			)
+			.addService('personTypeResolver', ({ personIdentityProviderManager }) => new PersonTypeResolver(personIdentityProviderManager))
 			.addService(
 				'signInResponseFactory',
 				({ permissionContextFactory, identityTypeResolver }) => new SignInResponseFactory(permissionContextFactory, identityTypeResolver),
@@ -298,10 +299,6 @@ export class TenantContainerFactory {
 				({ personManager, projectManager, projectMemberManager }) => new PersonQueryResolver(personManager, projectManager, projectMemberManager),
 			)
 			.addService('idpQueryResolver', ({ idpManager }) => new IDPQueryResolver(idpManager))
-			.addService(
-				'personIdentityProvidersQueryResolver',
-				({ personIdentityProviderManager }) => new PersonIdentityProvidersQueryResolver(personIdentityProviderManager),
-			)
 			.addService('projectQueryResolver', ({ projectManager }) => new ProjectQueryResolver(projectManager))
 			.addService(
 				'projectMembersQueryResolver',

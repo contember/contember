@@ -1622,6 +1622,15 @@ export type Person = {
 	readonly emailVerified: Scalars['Boolean']['output']
 	readonly id: Scalars['String']['output']
 	readonly identity: Identity
+	/**
+	 * External IdP connections of this person. Always visible for the calling
+	 * person (e.g. via `me { person { identityProviders } }`). For other
+	 * persons, visible to callers holding the `person:viewIdp` permission
+	 * against the target's roles — SUPER_ADMIN sees everyone; PROJECT_ADMIN
+	 * sees members whose roles fall within their allowed-input-roles. Returns
+	 * an empty list rather than throwing when the viewer lacks visibility.
+	 */
+	readonly identityProviders: ReadonlyArray<PersonIdentityProvider>
 	readonly name?: Maybe<Scalars['String']['output']>
 	readonly otpEnabled: Scalars['Boolean']['output']
 	readonly passwordlessEnabled?: Maybe<Scalars['Boolean']['output']>
@@ -1748,8 +1757,6 @@ export type Query = {
 	readonly identityProviders: ReadonlyArray<IdentityProvider>
 	readonly mailTemplates: ReadonlyArray<MailTemplateData>
 	readonly me: Identity
-	/**  External IdP connections of the currently authenticated person.  */
-	readonly myIdentityProviders: ReadonlyArray<PersonIdentityProvider>
 	readonly personById?: Maybe<Person>
 	/**
 	 * List persons across the tenant. SUPER_ADMIN sees every person; otherwise
@@ -4056,6 +4063,7 @@ export type PersonResolvers<ContextType = any, ParentType extends ResolversParen
 	emailVerified?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
 	id?: Resolver<ResolversTypes['String'], ParentType, ContextType>
 	identity?: Resolver<ResolversTypes['Identity'], ParentType, ContextType>
+	identityProviders?: Resolver<ReadonlyArray<ResolversTypes['PersonIdentityProvider']>, ParentType, ContextType>
 	name?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>
 	otpEnabled?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
 	passwordlessEnabled?: Resolver<Maybe<ResolversTypes['Boolean']>, ParentType, ContextType>
@@ -4129,7 +4137,6 @@ export type QueryResolvers<ContextType = any, ParentType extends ResolversParent
 	identityProviders?: Resolver<ReadonlyArray<ResolversTypes['IdentityProvider']>, ParentType, ContextType>
 	mailTemplates?: Resolver<ReadonlyArray<ResolversTypes['MailTemplateData']>, ParentType, ContextType>
 	me?: Resolver<ResolversTypes['Identity'], ParentType, ContextType>
-	myIdentityProviders?: Resolver<ReadonlyArray<ResolversTypes['PersonIdentityProvider']>, ParentType, ContextType>
 	personById?: Resolver<Maybe<ResolversTypes['Person']>, ParentType, ContextType, RequireFields<QueryPersonByIdArgs, 'id'>>
 	persons?: Resolver<ReadonlyArray<ResolversTypes['Person']>, ParentType, ContextType, Partial<QueryPersonsArgs>>
 	projectBySlug?: Resolver<Maybe<ResolversTypes['Project']>, ParentType, ContextType, RequireFields<QueryProjectBySlugArgs, 'slug'>>

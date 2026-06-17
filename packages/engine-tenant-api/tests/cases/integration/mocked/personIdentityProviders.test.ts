@@ -3,6 +3,7 @@ import { testUuid } from '../../../src/testUuid.js'
 import { expect, test } from 'bun:test'
 import { disconnectMyIdentityProviderMutation, myIdentityProvidersQuery } from './gql/myIdentityProviders.js'
 import { getPersonByIdentity } from './sql/getPersonByIdentity.js'
+import { getPersonsByIdentitySql } from './sql/getPersonsByIdentitySql.js'
 import { sqlTransaction } from './sql/sqlTransaction.js'
 import { disconnectPersonIdentityProviderSql, getPersonByIdentityForIdp, getPersonIdentityProvidersSql } from './sql/personIdentityProvidersSql.js'
 import { getConfigSql } from './sql/getConfigSql.js'
@@ -15,9 +16,9 @@ test('lists my identity providers', async () => {
 	await executeTenantTest({
 		query: myIdentityProvidersQuery(),
 		executes: [
-			getPersonByIdentity({
-				identityId: authenticatedIdentityId,
-				response: { personId, email: 'john@doe.com', name: 'John', roles: [], password: '123' },
+			getPersonsByIdentitySql({
+				identityIds: [authenticatedIdentityId],
+				response: [{ personId, identityId: authenticatedIdentityId, email: 'john@doe.com', roles: [] }],
 			}),
 			getPersonIdentityProvidersSql({
 				personId,
@@ -28,32 +29,38 @@ test('lists my identity providers', async () => {
 		],
 		return: {
 			data: {
-				myIdentityProviders: [
-					{
-						id: connectionId,
-						createdAt: createdAt.toISOString(),
-						externalIdentifier: 'ext-1',
-						identityProvider: {
-							slug: 'google',
-							type: 'oidc',
-							disabledAt: null,
-						},
+				me: {
+					person: {
+						identityProviders: [
+							{
+								id: connectionId,
+								createdAt: createdAt.toISOString(),
+								externalIdentifier: 'ext-1',
+								identityProvider: {
+									slug: 'google',
+									type: 'oidc',
+									disabledAt: null,
+								},
+							},
+						],
 					},
-				],
+				},
 			},
 		},
 	})
 })
 
-test('returns empty list when the caller is not a person', async () => {
+test('returns a null person when the caller is not a person', async () => {
 	await executeTenantTest({
 		query: myIdentityProvidersQuery(),
 		executes: [
-			getPersonByIdentity({ identityId: authenticatedIdentityId, response: null }),
+			getPersonsByIdentitySql({ identityIds: [authenticatedIdentityId], response: [] }),
 		],
 		return: {
 			data: {
-				myIdentityProviders: [],
+				me: {
+					person: null,
+				},
 			},
 		},
 	})

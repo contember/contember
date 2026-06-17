@@ -45,3 +45,38 @@ query personById($id: String!) {
 		},
 	})
 })
+
+test('get person by id query reflects emailOtpEnabled', async () => {
+	const email = 'otp@doe.com'
+	const personId = testUuid(1)
+	const identityId = testUuid(2)
+
+	await executeTenantTest({
+		query: {
+			query: GQL`
+query personById($id: String!) {
+	personById(id: $id) {
+		id
+		email
+		emailOtpEnabled
+	}
+}`,
+			variables: { id: personId },
+		},
+		executes: [
+			getPersonByIdSql({
+				personId,
+				response: { personId, email, roles: [], password: '123', identityId, emailOtpEnabled: true },
+			}),
+		],
+		return: {
+			data: {
+				personById: {
+					id: personId,
+					email,
+					emailOtpEnabled: true,
+				},
+			},
+		},
+	})
+})

@@ -15,6 +15,7 @@ export const getPersonByIdSql = (args: {
 		passwordlessEnabled?: boolean | null
 		emailVerifiedAt?: Date | null
 		emailVerificationRequired?: boolean
+		emailOtpEnabled?: boolean
 	}
 }): ExpectedQuery => ({
 	sql:
@@ -33,6 +34,7 @@ export const getPersonByIdSql = (args: {
 				roles: args.response.roles,
 				email: args.response.email,
 				name: args.response.name,
+				email_otp_enabled: args.response.emailOtpEnabled ?? false,
 				otp_uri: args.response.otpUri ?? null,
 				otp_activated_at: args.response.otpUri ? new Date() : null,
 				disabled_at: args.response.disabledAt ?? null,

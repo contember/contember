@@ -1,4 +1,4 @@
-import { createSchema } from '@contember/schema-definition'
+import { c, createSchema } from '@contember/schema-definition'
 import { expect, test } from 'bun:test'
 import * as basic from './schemas/basic.js'
 import * as complex from './schemas/complex.js'
@@ -36,3 +36,24 @@ for (const [name, def] of tests) {
 		}
 	})
 }
+
+namespace IndexOptionsSchema {
+	@c.Index({ fields: ['title'], opClass: 'text_pattern_ops' })
+	@c.Index({ fields: ['title'], method: 'gin', opClass: 'gin_trgm_ops' })
+	@c.Index({ fields: ['title'], include: ['content'], where: 'content IS NOT NULL' })
+	export class Article {
+		title = c.stringColumn()
+		content = c.stringColumn()
+	}
+}
+
+test('definition generator preserves index opClass, include and where options', () => {
+	const generator = new DefinitionCodeGenerator()
+	const generated = generator.generate(createSchema(IndexOptionsSchema))
+	// regression (ARCH-1): opClass used to be dropped on regeneration, silently degrading e.g. trigram search
+	expect(generated).toContain(`@c.Index({ fields: ['title'], opClass: 'text_pattern_ops' })`)
+	expect(generated).toContain(`@c.Index({ fields: ['title'], method: 'gin', opClass: 'gin_trgm_ops' })`)
+	expect(generated).toContain(`@c.Index({ fields: ['title'], include: ['content'], where: 'content IS NOT NULL' })`)
+	// opClass alone must force the options form, never the positional short form that would drop it
+	expect(generated).not.toContain(`@c.Index('title')`)
+})

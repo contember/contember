@@ -45,9 +45,23 @@ ${Object.values(entity.fields).map(field => this.generateField({ field, entity, 
 	}
 
 	private generateIndex({ entity, index }: { entity: Model.Entity; index: Model.Index }): string {
-		const fieldsList = `${index.fields.map(it => printJsValue(it)).join(', ')}`
-
-		return `@c.Index(${fieldsList})`
+		if (!index.method && !index.opClass && !index.where && !index.include?.length) {
+			return `@c.Index(${index.fields.map(it => printJsValue(it)).join(', ')})`
+		}
+		const options: Record<string, unknown> = { fields: index.fields }
+		if (index.method) {
+			options.method = index.method
+		}
+		if (index.opClass) {
+			options.opClass = index.opClass
+		}
+		if (index.include?.length) {
+			options.include = index.include
+		}
+		if (index.where) {
+			options.where = index.where
+		}
+		return `@c.Index(${printJsValue(options)})`
 	}
 
 	private generateView({ entity }: { entity: Model.Entity }): string | undefined {

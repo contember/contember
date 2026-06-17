@@ -9,7 +9,7 @@ Sign-in flows create a [session](/reference/engine/tenant/sessions). The Tenant 
 - `signInPasswordless` — magic link / OTP (see [passwordless](/reference/engine/tenant/passwordless))
 - `createSessionToken` — admin impersonation, no credentials required
 
-All of them rely on the same per-IP rate limiting, captcha, and `revealUserExists` masking described in [anti-abuse](/reference/engine/tenant/anti-abuse). All of them are recorded in the [audit log](/reference/engine/tenant/audit-log). *(since 2.3)* [Sign-in anomaly detection](/reference/engine/tenant/anomaly-detection), when enabled, scores only the password `signIn` path; the IdP and passwordless flows seed its baseline but are not themselves scored.
+All of them rely on the same per-IP rate limiting, captcha, and `revealUserExists` masking described in [anti-abuse](/reference/engine/tenant/anti-abuse). All of them are recorded in the [audit log](/reference/engine/tenant/audit-log). *(since 2.2)* [Sign-in anomaly detection](/reference/engine/tenant/anomaly-detection), when enabled, scores only the password `signIn` path; the IdP and passwordless flows seed its baseline but are not themselves scored.
 
 ## Password sign-in
 
@@ -40,7 +40,7 @@ Errors:
 | `PERSON_DISABLED` | The person has been disabled. |
 | `EMAIL_NOT_VERIFIED` | *(since 2.2)* The account was created while `signup.requireEmailVerification` was on and has not yet verified its e-mail. Prompt the user to verify, or resend via `requestEmailVerification`. See [e-mail verification](/reference/engine/tenant/email-verification). |
 | `NO_PASSWORD_SET` | The person has no password (IDP-only / passwordless-only). Only returned when `login.revealLoginMethod: true` *(since 2.2)*; otherwise collapsed into `INVALID_CREDENTIALS`. |
-| `OTP_REQUIRED` | The person has 2FA enabled and `otpToken` was missing — **or** *(since 2.3)* [anomaly detection](/reference/engine/tenant/anomaly-detection) forced a step-up for an unusual sign-in. The step-up case can occur even for an account with **no standing 2FA** and is indistinguishable from the 2FA case at the API; recover it identically by retrying `signIn` with `otpToken` set to the emailed code. |
+| `OTP_REQUIRED` | The person has 2FA enabled and `otpToken` was missing — **or** *(since 2.2)* [anomaly detection](/reference/engine/tenant/anomaly-detection) forced a step-up for an unusual sign-in. The step-up case can occur even for an account with **no standing 2FA** and is indistinguishable from the 2FA case at the API; recover it identically by retrying `signIn` with `otpToken` set to the emailed code. |
 | `INVALID_OTP_TOKEN` | 2FA token rejected. |
 | `RATE_LIMIT_EXCEEDED` | Per-IP login rate limit *(since 2.2)* or per-email exponential backoff hit. `retryAfter` carries the wait in seconds. |
 
@@ -54,7 +54,7 @@ mutation { signOut(all: true) { ok } }
 
 `signOut` requires a session token; it does not work with permanent API keys.
 
-When the session was federated via an OIDC provider that supports RP-initiated logout, `signOut` also returns a `logoutUrl` *(since 2.4)*. Redirect the browser there to terminate the session at the IdP as well (OIDC [Single Logout](/reference/engine/tenant/idp#single-logout)); it is `null` for plain/password sessions and for IdPs without an `end_session_endpoint`, where only a local logout happens. The `logoutUrl` is only produced when the IdP session was captured at sign-in — i.e. when [session re-validation](/reference/engine/tenant/idp#session-re-validation) (`configuration.revalidation.enabled`) is on for that provider; otherwise it is always `null` even if the IdP has an `end_session_endpoint`.
+When the session was federated via an OIDC provider that supports RP-initiated logout, `signOut` also returns a `logoutUrl` *(since 2.2)*. Redirect the browser there to terminate the session at the IdP as well (OIDC [Single Logout](/reference/engine/tenant/idp#single-logout)); it is `null` for plain/password sessions and for IdPs without an `end_session_endpoint`, where only a local logout happens. The `logoutUrl` is only produced when the IdP session was captured at sign-in — i.e. when [session re-validation](/reference/engine/tenant/idp#session-re-validation) (`configuration.revalidation.enabled`) is on for that provider; otherwise it is always `null` even if the IdP has an `end_session_endpoint`.
 
 ```graphql
 mutation { signOut { ok logoutUrl } }
@@ -87,7 +87,7 @@ All login behavior is controlled by the `login` section of the tenant [configura
 | `baseBackoff`, `maxBackoff`, `attemptWindow` | Per-email exponential backoff. Also drives the mail-init throttle for password reset and passwordless init. |
 | `defaultTokenExpiration` | Lifetime applied when the client omits `expiration`. |
 | `maxTokenExpiration` | Cap on client-requested `expiration`. |
-| `anomalyDetection` | *(since 2.3)* Opt-in [sign-in anomaly detection](/reference/engine/tenant/anomaly-detection) for the password path — score thresholds that email the user or force a step-up second factor on an unusual login. |
+| `anomalyDetection` | *(since 2.2)* Opt-in [sign-in anomaly detection](/reference/engine/tenant/anomaly-detection) for the password path — score thresholds that email the user or force a step-up second factor on an unusual login. |
 
 ## What the session can do
 

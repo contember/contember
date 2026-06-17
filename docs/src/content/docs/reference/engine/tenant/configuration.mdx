@@ -126,7 +126,7 @@ See [password policy](/reference/engine/tenant/password-policy) for individual f
 | `attemptWindow` | `PT5M` | How long failed attempts are remembered. |
 | `defaultTokenExpiration` | `PT30M` | Session token lifetime when the client omits `expiration`. |
 | `maxTokenExpiration` | `6 months` | Hard cap on client-requested `expiration`. |
-| `anomalyDetection` | *(disabled)* | *(since 2.3)* Sign-in [anomaly detection](/reference/engine/tenant/anomaly-detection) policy: `{ enabled, historySize, emailThreshold, stepUpThreshold }`. Opt-in; off by default. |
+| `anomalyDetection` | *(disabled)* | *(since 2.2)* Sign-in [anomaly detection](/reference/engine/tenant/anomaly-detection) policy: `{ enabled, historySize, emailThreshold, stepUpThreshold }`. Opt-in; off by default. |
 
 Intervals follow ISO 8601 duration syntax (`PT5M`, `PT1H`, `P1D`, …).
 

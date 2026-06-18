@@ -71,6 +71,7 @@ export class CreateEntityRelationInputFieldVisitor
 		}
 		return new GraphQLInputObjectType({
 			name: GqlTypeName`${entity.name}Create${relation.name}EntityRelationInput`,
+			description: relation.description,
 			fields: () =>
 				withAliasField
 					? {

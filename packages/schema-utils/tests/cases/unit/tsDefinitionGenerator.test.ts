@@ -6,7 +6,10 @@ import * as relations from './schemas/relations.js'
 import * as unique from './schemas/unique.js'
 import * as enum_ from './schemas/enum.js'
 import * as acl from './schemas/acl.js'
+import * as description from './schemas/description.js'
+import * as deprecated from './schemas/deprecated.js'
 import * as view from './schemas/view.js'
+import * as list from './schemas/list.js'
 import { readFile, writeFile } from 'fs/promises'
 import { join } from 'path'
 import { DefinitionCodeGenerator } from '../../../src/definition-generator/DefinitionCodeGenerator.js'
@@ -20,6 +23,9 @@ const tests = [
 	['unique', unique],
 	['enum', enum_],
 	['acl', acl],
+	['description', description],
+	['deprecated', deprecated],
+	['list', list],
 	['view', view],
 ] as const
 for (const [name, def] of tests) {

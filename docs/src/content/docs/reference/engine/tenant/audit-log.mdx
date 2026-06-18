@@ -48,15 +48,15 @@ Every entry carries:
 | `email_change_init` | *(since 2.2)* `changeMyProfile` initiates a verified e-mail change |
 | `email_change_complete` | *(since 2.2)* `confirmEmailChange` |
 | `2fa_enable`, `2fa_disable` | `confirmOtp`, `disableOtp` |
-| `unusual_login_detected` | *(since 2.3)* A password `signIn` scored as unusual by [anomaly detection](/reference/engine/tenant/anomaly-detection) — written when an `UNUSUAL_LOGIN` email is sent and on the step-up (`OTP_REQUIRED`) leg |
-| `step_up_required` | *(since 2.3)* Anomaly detection forced a second factor before issuing the session (written alongside `unusual_login_detected` on the step-up leg) |
+| `unusual_login_detected` | *(since 2.2)* A password `signIn` scored as unusual by [anomaly detection](/reference/engine/tenant/anomaly-detection) — written when an `UNUSUAL_LOGIN` email is sent and on the step-up (`OTP_REQUIRED`) leg |
+| `step_up_required` | *(since 2.2)* Anomaly detection forced a second factor before issuing the session (written alongside `unusual_login_detected` on the step-up leg) |
 
 A few auth events carry extra context so security-relevant outcomes stay distinguishable:
 
 - `idp_login` failures where a verified-email-required provider [refused to auto-link](/reference/engine/tenant/idp) an unverified claim to an existing account record `event_data.reason = "idp_email_unverified"` and the blocked account's `person_id`, even though the client-facing error stays a generic `PERSON_NOT_FOUND` (no account-existence leak).
 - `passwordless_login` that also satisfies a pending e-mail-verification requirement (clicking the magic link proves ownership) records `event_data.emailVerified = true`, so the trail shows when/how the address became verified.
 - `email_verify_complete` and `email_change_complete` carry the `person_id` and `person_token_id` on both success and failure paths.
-- `unusual_login_detected` and `step_up_required` *(since 2.3)* carry `event_data = { score, reasons }` — the cumulative risk score and which signals fired (e.g. `["new_country", "new_device"]`).
+- `unusual_login_detected` and `step_up_required` *(since 2.2)* carry `event_data = { score, reasons }` — the cumulative risk score and which signals fired (e.g. `["new_country", "new_device"]`).
 
 ### Session events (since 2.2)
 
@@ -87,6 +87,7 @@ A few auth events carry extra context so security-relevant outcomes stay disting
 | `idp_create` | `addIDP` | `{identityProvider, type, configurationKeys, options}` — only the *key names* of the configuration are stored; values (client secrets, OIDC URLs) are never persisted |
 | `idp_update` | `updateIDP` | `{before, after}` with configuration collapsed the same way |
 | `idp_disable`, `idp_enable` | `disableIDP`, `enableIDP` | `{identityProvider}` |
+| `idp_disconnect` | `disconnectMyIdentityProvider` | `{id, slug}` — the person's removed IdP [connection](/reference/engine/tenant/idp#personal-idp-connections) id and the provider slug |
 | `project_create` | `createProject` | `{projectSlug, name}` |
 | `project_update` | `updateProject` | `{before, after}` |
 | `project_secret_change` | `setProjectSecret` | `{projectSlug, key}` — only the secret name, never the value |

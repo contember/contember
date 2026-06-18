@@ -34,7 +34,8 @@ import {
 	ProjectMembersQueryResolver,
 	ProjectQueryResolver,
 } from './query/index.js'
-import { IdentityTypeResolver, ProjectTypeResolver } from './types/index.js'
+import { DisconnectMyIdentityProviderMutationResolver } from './mutation/idp/index.js'
+import { IdentityTypeResolver, PersonTypeResolver, ProjectTypeResolver } from './types/index.js'
 import { DateTimeType, IntervalType, JSONType } from '@contember/graphql-utils'
 import { IDPQueryResolver } from './query/IDPQueryResolver.js'
 import { UpdateIDPMutationResolver } from './mutation/idp/UpdateIDPMutationResolver.js'
@@ -73,6 +74,7 @@ class ResolverFactory {
 			disableIdpMutationResolver: DisableIDPMutationResolver
 			enableIdpMutationResolver: EnableIDPMutationResolver
 			updateIdpMutationResolver: UpdateIDPMutationResolver
+			disconnectMyIdentityProviderMutationResolver: DisconnectMyIdentityProviderMutationResolver
 			passwordlessMutationResolver: PasswordlessMutationResolver
 
 			disablePersonMutationResolver: DisablePersonMutationResolver
@@ -99,6 +101,7 @@ class ResolverFactory {
 			updateProjectMutationResolver: UpdateProjectMutationResolver
 
 			identityTypeResolver: IdentityTypeResolver
+			personTypeResolver: PersonTypeResolver
 			projectTypeResolver: ProjectTypeResolver
 
 			identityGlobalRolesMutationResolver: IdentityGlobalRolesMutationResolver
@@ -127,6 +130,9 @@ class ResolverFactory {
 				roles: this.resolvers.identityTypeResolver.roles.bind(this.resolvers.identityTypeResolver),
 				permissions: this.resolvers.identityTypeResolver.permissions.bind(this.resolvers.identityTypeResolver),
 				sessions: this.resolvers.identityTypeResolver.sessions.bind(this.resolvers.identityTypeResolver),
+			},
+			Person: {
+				identityProviders: this.resolvers.personTypeResolver.identityProviders.bind(this.resolvers.personTypeResolver),
 			},
 			Project: {
 				members: this.resolvers.projectTypeResolver.members.bind(this.resolvers.projectTypeResolver),
@@ -178,6 +184,9 @@ class ResolverFactory {
 				disableIDP: this.resolvers.disableIdpMutationResolver.disableIDP.bind(this.resolvers.disableIdpMutationResolver),
 				enableIDP: this.resolvers.enableIdpMutationResolver.enableIDP.bind(this.resolvers.enableIdpMutationResolver),
 				updateIDP: this.resolvers.updateIdpMutationResolver.updateIDP.bind(this.resolvers.updateIdpMutationResolver),
+				disconnectMyIdentityProvider: this.resolvers.disconnectMyIdentityProviderMutationResolver.disconnectMyIdentityProvider.bind(
+					this.resolvers.disconnectMyIdentityProviderMutationResolver,
+				),
 				disablePerson: this.resolvers.disablePersonMutationResolver.disablePerson.bind(this.resolvers.disablePersonMutationResolver),
 				forceSignOutPerson: this.resolvers.forceSignOutMutationResolver.forceSignOutPerson.bind(this.resolvers.forceSignOutMutationResolver),
 				resetPersonMfa: this.resolvers.resetPersonMfaMutationResolver.resetPersonMfa.bind(this.resolvers.resetPersonMfaMutationResolver),

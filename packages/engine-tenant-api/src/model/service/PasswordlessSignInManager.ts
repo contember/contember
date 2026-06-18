@@ -3,7 +3,6 @@ import { ConfigurationQuery, PersonQuery, PersonRow } from '../queries/index.js'
 import { Response, ResponseError, ResponseOk } from '../utils/Response.js'
 import {
 	ActivatePasswordlessOtpErrorCode,
-	ConfigPolicy,
 	InitSignInPasswordlessErrorCode,
 	InitSignInPasswordlessResult,
 	SignInPasswordlessErrorCode,
@@ -19,6 +18,7 @@ import {
 	MarkEmailVerifiedCommand,
 } from '../commands/index.js'
 import { getPreferredProject } from './helpers/getPreferredProject.js'
+import { isPasswordlessEnabled } from './helpers/isPasswordlessEnabled.js'
 import { ProjectManager } from './ProjectManager.js'
 import { PermissionContext } from '../authorization/index.js'
 import { PersonTokenQuery } from '../queries/personToken/PersonTokenQuery.js'
@@ -62,7 +62,7 @@ class PasswordlessSignInManager {
 					}),
 				})
 			}
-			if (!this.isEnabled(configuration.passwordless.enabled, person.passwordless_enabled)) {
+			if (!isPasswordlessEnabled(configuration.passwordless.enabled, person.passwordless_enabled)) {
 				return new ResponseError('PASSWORDLESS_DISABLED', 'Passwordless sign-in is disabled for this person', {
 					[AuthLogService.Key]: new AuthLogService.Bag({
 						personInput: email,
@@ -282,19 +282,6 @@ class PasswordlessSignInManager {
 				}),
 			})
 		})
-	}
-
-	private isEnabled(globalValue: ConfigPolicy, personValue: boolean | null): boolean {
-		switch (globalValue) {
-			case 'always':
-				return true
-			case 'never':
-				return false
-			case 'optIn':
-				return personValue === true
-			case 'optOut':
-				return personValue !== false
-		}
 	}
 }
 

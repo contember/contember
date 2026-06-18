@@ -19,6 +19,8 @@ export class PersonResponseFactory {
 				projects,
 				sessions: [],
 			},
+			// resolved by PersonTypeResolver.identityProviders; placeholder keeps the type complete
+			identityProviders: [],
 		}
 	}
 }

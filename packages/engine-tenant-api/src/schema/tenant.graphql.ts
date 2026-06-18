@@ -40,6 +40,7 @@ const schema: DocumentNode = gql`
 		checkResetPasswordToken(requestId: String!, token: String!): CheckResetPasswordTokenCode!
 
 		identityProviders: [IdentityProvider!]!
+
 		mailTemplates: [MailTemplateData!]!
 
 		configuration: Config!
@@ -100,6 +101,13 @@ const schema: DocumentNode = gql`
 		updateIDP(identityProvider: String!, type: String, configuration: Json, options: IDPOptions, mergeConfiguration: Boolean): UpdateIDPResponse
 		disableIDP(identityProvider: String!): DisableIDPResponse
 		enableIDP(identityProvider: String!): EnableIDPResponse
+
+		"""
+		Disconnect one of the authenticated person's own external IdP connections,
+		addressed by the connection id (see PersonIdentityProvider.id) so a specific
+		connection can be removed even when the person has several to one provider.
+		"""
+		disconnectMyIdentityProvider(id: String!): DisconnectIDPResponse
 
 		prepareOtp(label: String): PrepareOtpResponse
 		confirmOtp(otpToken: String!): ConfirmOtpResponse
@@ -800,6 +808,40 @@ const schema: DocumentNode = gql`
 		NOT_FOUND
 	}
 
+	""" A single external IdP connection of the currently authenticated person. """
+	type PersonIdentityProvider {
+		id: String!
+		createdAt: DateTime!
+		externalIdentifier: String!
+		identityProvider: IdentityProviderListItem!
+	}
+
+	""" Public view of an identity provider, exposed in personal IdP connection listings. """
+	type IdentityProviderListItem {
+		slug: String!
+		type: String!
+		disabledAt: DateTime
+	}
+
+	type DisconnectIDPResponse {
+		error: DisconnectIDPError
+		ok: Boolean!
+	}
+
+	type DisconnectIDPError {
+		code: DisconnectIDPErrorCode!
+		developerMessage: String!
+	}
+
+	enum DisconnectIDPErrorCode {
+		""" The authenticated person has no IdP connection with the given id. """
+		NOT_FOUND
+		""" The caller is not a person (e.g. an API key) and so has no IdP connections to disconnect. """
+		NOT_A_PERSON
+		""" The person is not allowed to disconnect their last remaining sign-in method. """
+		LAST_AUTH_METHOD
+	}
+
 	type IdentityProvider {
 		slug: String!
 		type: String!
@@ -1203,6 +1245,16 @@ const schema: DocumentNode = gql`
 		emailOtpEnabled: Boolean!
 		emailVerified: Boolean!
 		identity: Identity!
+
+		"""
+		External IdP connections of this person. Always visible for the calling
+		person (e.g. via \`me { person { identityProviders } }\`). For other
+		persons, visible to callers holding the \`person:viewIdp\` permission
+		against the target's roles — SUPER_ADMIN sees everyone; PROJECT_ADMIN
+		sees members whose roles fall within their allowed-input-roles. Returns
+		an empty list rather than throwing when the viewer lacks visibility.
+		"""
+		identityProviders: [PersonIdentityProvider!]!
 	}
 
 	""" Filter for the \`persons\` query. Fields are combined with AND. """

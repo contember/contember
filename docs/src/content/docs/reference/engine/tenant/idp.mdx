@@ -94,7 +94,7 @@ The `configuration` object passed to `addIDP` / `updateIDP` is provider-specific
 | `additionalAuthorizedParties` | `[]` | Extra `azp` values accepted in the ID token besides the configured `clientId`. |
 | `timeout` | `5000` | HTTP timeout (ms) for calls to the provider. |
 | `claimMapping` | — | *(since 2.2)* Remap provider claims onto Contember's identity fields. See [Claim mapping](#claim-mapping). |
-| `revalidation` | — | *(since 2.3)* Continuous session re-validation. See [Session re-validation](#session-re-validation). |
+| `revalidation` | — | *(since 2.2)* Continuous session re-validation. See [Session re-validation](#session-re-validation). |
 
 #### Token endpoint authentication
 
@@ -386,9 +386,82 @@ The response `result.token` is the session API key — store it client-side and 
 
 Error codes: `INVALID_IDP_RESPONSE`, `IDP_VALIDATION_FAILED`, `PERSON_NOT_FOUND`, `PERSON_DISABLED`, `PERSON_ALREADY_EXISTS`.
 
+## Personal IdP connections
+
+:::note[Available since 2.2]
+:::
+
+Once a person has signed in (or linked an account) through an IdP, the federation is stored as a **connection** on that person — one record per link. A person can be connected to several providers, and may even hold more than one connection to the same provider. A signed-in person can list and disconnect their own connections; administrators can inspect another person's.
+
+### Listing your connections
+
+The connections hang off the `Person` type, so the calling person reads their own through `me`. It is always visible to the person themselves — no special permission is required:
+
+```graphql
+query {
+  me {
+    person {
+      identityProviders {
+        id
+        createdAt
+        externalIdentifier
+        identityProvider {
+          slug
+          type
+          disabledAt
+        }
+      }
+    }
+  }
+}
+```
+
+`id` is the **connection** id (not the provider) — pass it to `disconnectMyIdentityProvider` to remove a specific link. `externalIdentifier` is the stable federation key (the provider's `sub`, see [claim mapping](#claim-mapping)). The nested `identityProvider` is a public view of the provider — `slug`, `type` and `disabledAt` only, never its configuration or secrets. `person` is `null` for a non-person caller (e.g. an API key), which therefore has no connections to show.
+
+### Viewing another person's connections
+
+The same field is reachable on any `Person`, e.g. through `personById`:
+
+```graphql
+query {
+  personById(id: "person-uuid") {
+    identityProviders {
+      id
+      externalIdentifier
+      identityProvider { slug }
+    }
+  }
+}
+```
+
+For a person **other than the caller** this requires the `person:viewIdp` permission against the target's roles — `SUPER_ADMIN` sees everyone; `PROJECT_ADMIN` sees members whose roles fall within their allowed-input roles, the same scoping as [session visibility](/reference/engine/tenant/sessions). When the viewer lacks visibility the field returns an empty list rather than erroring, so listing many people does not abort on a single forbidden target.
+
+### Disconnecting a connection
+
+`disconnectMyIdentityProvider(id)` removes one of the **calling person's own** connections, addressed by the connection `id` from the listing above:
+
+```graphql
+mutation {
+  disconnectMyIdentityProvider(id: "connection-uuid") {
+    ok
+    error { code developerMessage }
+  }
+}
+```
+
+To guard against accidental lock-out, a connection cannot be removed while it is the person's **last remaining sign-in method** — that is, they have no password, [passwordless sign-in](/reference/engine/tenant/passwordless) is not usable for them under the tenant policy, and no *other enabled* IdP connection remains. A connection to a [disabled provider](#temporarily-disabling-and-enabling-an-idp) does not count as a usable fallback, since it cannot be used to sign in.
+
+| `code` | Meaning |
+|---|---|
+| `NOT_FOUND` | The caller has no connection with that `id`. |
+| `NOT_A_PERSON` | The caller is not a person (e.g. an API key) and so has no connections to disconnect. |
+| `LAST_AUTH_METHOD` | Removing it would leave the person with no way to sign in. Set up a password or another sign-in method first. |
+
+A successful disconnect is recorded in the [audit log](#audit) as `idp_disconnect`.
+
 ## Session re-validation
 
-:::note[Available since 2.3]
+:::note[Available since 2.2]
 :::
 
 By default the IdP is consulted **only at sign-in**. After that the Contember session lives on its own and is simply re-prolonged on every request — so if the user is de-provisioned at the IdP, or their IdP session is revoked, Contember keeps the session valid until it expires on its own.
@@ -455,7 +528,7 @@ A definitive IdP rejection (`invalid_grant`, inactive token) **revokes** the ses
 
 | Field | Default | Notes |
 |---|---|---|
-| `enabled` | `false` | Master switch. `false` = pre-2.3 behaviour (no session stored, no re-validation). |
+| `enabled` | `false` | Master switch. `false` = pre-2.2 behaviour (no session stored, no re-validation). |
 | `method` | `refresh` | `refresh` \| `userinfo` \| `introspection`. |
 | `softRefreshThreshold` | `0.5` | Fraction (0–1) of the token lifetime after which the proactive background refresh starts. |
 | `minInterval` | `"10 seconds"` | Single-flight floor between re-validation attempts (Postgres interval). |
@@ -469,7 +542,7 @@ Refresh tokens are stored encrypted at rest, so `method: "refresh"` needs a conf
 
 ## Single Logout
 
-:::note[Available since 2.4]
+:::note[Available since 2.2]
 :::
 
 When a session was federated through an OIDC provider, signing out can also terminate the session **at the IdP** (OpenID Connect Single Logout), so the user is not silently re-authenticated by a still-live SSO session. Both flows build on the federated session captured by [session re-validation](#session-re-validation), so they take effect only when `configuration.revalidation.enabled` is set (that is when the IdP `sid` is stored at sign-in).
@@ -523,10 +596,11 @@ Every IdP management call is recorded in the [audit log](/reference/engine/tenan
 | `updateIDP` | `idp_update` | `{before, after}` with configuration collapsed the same way |
 | `disableIDP` | `idp_disable` | `{identityProvider}` |
 | `enableIDP` | `idp_enable` | `{identityProvider}` |
+| `disconnectMyIdentityProvider` | `idp_disconnect` | `{id, slug}` — the removed [connection](#personal-idp-connections) id and the provider slug |
 
 Sign-in attempts via IdP are recorded as `idp_login`. When [session re-validation](#session-re-validation) revokes a session, it is recorded as `idp_session_revoked` with `event_data: {reason}` (e.g. `invalid_grant`, `inactive`, `idp_disabled`); a token rotation is recorded as `idp_session_revalidated`.
 
-[Single Logout](#single-logout) adds two more *(since 2.4)*: signing out a federated session that produced an RP-initiated logout URL is recorded as `idp_logout_initiated` (`event_data: {all}`), and an IdP-initiated back-channel logout as `idp_backchannel_logout` (`event_data: {sid, sub, revokedCount}`). The back-channel audit write is best-effort — it never fails the logout — so a missing entry means observability was lost, not that the logout did not happen.
+[Single Logout](#single-logout) adds two more *(since 2.2)*: signing out a federated session that produced an RP-initiated logout URL is recorded as `idp_logout_initiated` (`event_data: {all}`), and an IdP-initiated back-channel logout as `idp_backchannel_logout` (`event_data: {sid, sub, revokedCount}`). The back-channel audit write is best-effort — it never fails the logout — so a missing entry means observability was lost, not that the logout did not happen.
 
 A **fail-open** — re-validation could not be performed but the session was kept — is recorded as `idp_session_revalidation_failed` (with `success: true`, since it is not a security failure) and an `error_code`:
 

@@ -37,6 +37,8 @@ export default class ManyHasOneProcessor implements FieldProcessor<ManyHasOneBui
 			ownedBy: fieldName,
 			target: entityName,
 			type: Model.RelationType.OneHasMany,
+			...(options.description !== undefined ? { description: options.description } : {}),
+			...(options.deprecationReason !== undefined ? { deprecationReason: options.deprecationReason } : {}),
 		}
 	}
 
@@ -52,6 +54,8 @@ export default class ManyHasOneProcessor implements FieldProcessor<ManyHasOneBui
 				columnName: joiningColumn.columnName || this.conventions.getJoiningColumnName(fieldName),
 				onDelete: joiningColumn.onDelete || Model.OnDelete.restrict,
 			},
+			...(options.description !== undefined ? { description: options.description } : {}),
+			...(options.deprecationReason !== undefined ? { deprecationReason: options.deprecationReason } : {}),
 		}
 	}
 }

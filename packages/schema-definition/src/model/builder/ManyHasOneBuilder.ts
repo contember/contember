@@ -9,30 +9,38 @@ type PartialOptions<K extends keyof ManyHasOneBuilder.Options> =
 class ManyHasOneBuilder<O extends PartialOptions<never> = PartialOptions<never>> implements FieldBuilder<O> {
 	constructor(private readonly options: O, private readonly addEntity: AddEntityCallback) {}
 
-	target(target: string, configurator?: EntityConfigurator): ManyHasOneBuilder<O & PartialOptions<'target'>> {
+	public target(target: string, configurator?: EntityConfigurator): ManyHasOneBuilder<O & PartialOptions<'target'>> {
 		if (configurator) {
 			this.addEntity(target, configurator)
 		}
 		return this.withOption('target', target)
 	}
 
-	inversedBy(inversedBy: string): ManyHasOneBuilder<O> {
+	public inversedBy(inversedBy: string): ManyHasOneBuilder<O> {
 		return this.withOption('inversedBy', inversedBy)
 	}
 
-	joiningColumn(columnName: string): ManyHasOneBuilder<O> {
+	public joiningColumn(columnName: string): ManyHasOneBuilder<O> {
 		return this.withOption('joiningColumn', { ...this.options.joiningColumn, columnName })
 	}
 
-	onDelete(onDelete: Model.OnDelete): ManyHasOneBuilder<O> {
+	public onDelete(onDelete: Model.OnDelete): ManyHasOneBuilder<O> {
 		return this.withOption('joiningColumn', { ...this.options.joiningColumn, onDelete })
 	}
 
-	notNull(): ManyHasOneBuilder<O> {
+	public notNull(): ManyHasOneBuilder<O> {
 		return this.withOption('nullable', false)
 	}
 
-	getOption(): O {
+	public description(description: string): ManyHasOneBuilder<O> {
+		return this.withOption('description', description)
+	}
+
+	public deprecated(deprecationReason: string): ManyHasOneBuilder<O> {
+		return this.withOption('deprecationReason', deprecationReason)
+	}
+
+	public getOption(): O {
 		return this.options
 	}
 
@@ -50,6 +58,8 @@ namespace ManyHasOneBuilder {
 		inversedBy?: string
 		joiningColumn?: Partial<Model.JoiningColumn>
 		nullable?: boolean
+		description?: string
+		deprecationReason?: string
 	}
 }
 

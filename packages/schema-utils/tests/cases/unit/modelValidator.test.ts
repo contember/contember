@@ -111,6 +111,110 @@ test('covering index include column overlaps key column', () => {
 	])
 })
 
+namespace IndexColumnOptionsNonKey {
+	@c.Index('title')
+	export class Article {
+		title = c.stringColumn()
+		rank = c.intColumn()
+	}
+}
+
+test('index column options reference a non-key column', () => {
+	const schema = createSchema(IndexColumnOptionsNonKey)
+	const article = schema.model.entities.Article
+	// `columnOptions` keys are always index key fields when built through the DSL; inject an invalid
+	// one directly to exercise the guard against hand-written/imported models.
+	const model: Model.Schema = {
+		...schema.model,
+		entities: {
+			...schema.model.entities,
+			Article: {
+				...article,
+				indexes: [{ fields: ['title'], columnOptions: { rank: { order: 'desc' } } }],
+			},
+		},
+	}
+	const validator = new ModelValidator(model)
+	expect(validator.validate()).toStrictEqual([
+		{
+			code: 'MODEL_INVALID_INDEX',
+			message: 'Column options reference field rank, which is not a key column of the index',
+			path: ['entities', 'Article', 'indexes'],
+		},
+	])
+})
+
+namespace IndexDuplicateKeyColumn {
+	@c.Index({ fields: [{ field: 'title' }, { field: 'title', order: 'desc' }] })
+	export class Article {
+		title = c.stringColumn()
+	}
+}
+
+test('index lists a key column more than once', () => {
+	const schema = createSchema(IndexDuplicateKeyColumn)
+	const validator = new ModelValidator(schema.model)
+	expect(validator.validate()).toStrictEqual([
+		{
+			code: 'MODEL_INVALID_INDEX',
+			message: 'Field title is listed more than once as an index key column',
+			path: ['entities', 'Article', 'indexes'],
+		},
+	])
+})
+
+namespace IndexSortOptionsOnNonBtree {
+	@c.Index({ fields: [{ field: 'title', order: 'desc' }], method: 'gin' })
+	export class Article {
+		title = c.stringColumn()
+	}
+}
+
+test('index sort order on a non-btree method', () => {
+	const schema = createSchema(IndexSortOptionsOnNonBtree)
+	const validator = new ModelValidator(schema.model)
+	expect(validator.validate()).toStrictEqual([
+		{
+			code: 'MODEL_INVALID_INDEX',
+			message: 'Column options (order/nulls) on field title are only supported for btree indexes, not "gin"',
+			path: ['entities', 'Article', 'indexes'],
+		},
+	])
+})
+
+namespace IndexInvalidOpClass {
+	@c.Index({ fields: ['title'], opClass: 'gin_trgm_ops); DROP TABLE article; --' })
+	export class Article {
+		title = c.stringColumn()
+	}
+}
+
+test('index operator class with an invalid (injection-shaped) value', () => {
+	const schema = createSchema(IndexInvalidOpClass)
+	const validator = new ModelValidator(schema.model)
+	expect(validator.validate()).toStrictEqual([
+		{
+			code: 'MODEL_INVALID_INDEX',
+			message:
+				'Invalid index operator class "gin_trgm_ops); DROP TABLE article; --": expected an identifier, optionally schema-qualified (e.g. "public.gin_trgm_ops")',
+			path: ['entities', 'Article', 'indexes'],
+		},
+	])
+})
+
+namespace IndexSchemaQualifiedOpClass {
+	@c.Index({ fields: ['title'], method: 'gin', opClass: 'public.gin_trgm_ops' })
+	export class Article {
+		title = c.stringColumn()
+	}
+}
+
+test('index operator class may be schema-qualified', () => {
+	const schema = createSchema(IndexSchemaQualifiedOpClass)
+	const validator = new ModelValidator(schema.model)
+	expect(validator.validate()).toStrictEqual([])
+})
+
 namespace PartialIndexEmptyPredicate {
 	@c.Index({ fields: ['title'], where: '   ' })
 	export class Article {

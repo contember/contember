@@ -67,6 +67,60 @@ namespace SchemaWithTwoPartialIndexes {
 	}
 }
 
+namespace SchemaWithSortOrderIndex {
+	@def.Index({ fields: [{ field: 'title', order: 'desc', nulls: 'last' }] })
+	export class Article {
+		title = def.stringColumn()
+	}
+}
+
+namespace SchemaWithPerColumnOpClassIndex {
+	@def.Index({ fields: [{ field: 'title', opClass: 'text_pattern_ops' }] })
+	export class Article {
+		title = def.stringColumn()
+	}
+}
+
+namespace SchemaWithPlainAndSortOrderIndex {
+	@def.Index('title')
+	@def.Index({ fields: [{ field: 'title', order: 'desc' }] })
+	export class Article {
+		title = def.stringColumn()
+	}
+}
+
+namespace SchemaWithDescIndex {
+	@def.Index({ fields: [{ field: 'title', order: 'desc' }] })
+	export class Article {
+		title = def.stringColumn()
+	}
+}
+
+namespace SchemaMultiColumnBase {
+	export class Article {
+		category = def.stringColumn()
+		publishedAt = def.dateTimeColumn()
+		title = def.stringColumn()
+	}
+}
+
+namespace SchemaWithMultiColumnOptionsIndex {
+	@def.Index({ fields: ['category', { field: 'publishedAt', order: 'desc', nulls: 'last' }, { field: 'title', opClass: 'text_pattern_ops' }] })
+	export class Article {
+		category = def.stringColumn()
+		publishedAt = def.dateTimeColumn()
+		title = def.stringColumn()
+	}
+}
+
+namespace SchemaWithOpClassPrecedenceIndex {
+	@def.Index({ fields: ['title', { field: 'content', opClass: 'text_pattern_ops' }], opClass: 'varchar_pattern_ops' })
+	export class Article {
+		title = def.stringColumn()
+		content = def.stringColumn()
+	}
+}
+
 namespace SchemaWithIndex {
 	@def.Index('title')
 	export class Article {
@@ -385,5 +439,144 @@ describe('drop one of two same-column partial indexes', () =>
 					uniqueConstraints: [],
 				}),
 			)
-		).toThrow(/unambiguously drop partial index/)
+		).toThrow(/unambiguously drop index/)
+	}))
+
+describe('create index with sort order', () =>
+	testMigrations({
+		original: createSchema(SchemaWithoutIndex),
+		updated: createSchema(SchemaWithSortOrderIndex),
+		diff: [
+			{
+				modification: 'createIndex',
+				entityName: 'Article',
+				index: { fields: ['title'], columnOptions: { title: { order: 'desc', nulls: 'last' } } },
+			},
+		],
+		sql: SQL`CREATE INDEX ON "article" ("title" DESC NULLS LAST);`,
+	}))
+
+describe('create index with per-column operator class', () =>
+	testMigrations({
+		original: createSchema(SchemaWithoutIndex),
+		updated: createSchema(SchemaWithPerColumnOpClassIndex),
+		diff: [
+			{
+				modification: 'createIndex',
+				entityName: 'Article',
+				index: { fields: ['title'], columnOptions: { title: { opClass: 'text_pattern_ops' } } },
+			},
+		],
+		sql: SQL`CREATE INDEX ON "article" ("title" text_pattern_ops);`,
+	}))
+
+// Schema-level identity is per-column-option-aware: two indexes on the same column differing only by
+// sort order must not be conflated — removing one must leave the other intact.
+describe('remove one of two indexes on the same column differing only by sort order', () =>
+	it('keeps the sibling index', () => {
+		testApplyDiff(
+			createSchema(SchemaWithPlainAndSortOrderIndex),
+			createSchema(SchemaWithIndex),
+			[
+				{
+					modification: 'removeIndex',
+					entityName: 'Article',
+					fields: ['title'],
+					columnOptions: { title: { order: 'desc' } },
+				},
+			],
+		)
+	}))
+
+// Changing column options on an existing index must recreate it (remove + create), never a no-op.
+describe('change index column options recreates the index', () =>
+	testMigrations({
+		original: createSchema(SchemaWithIndex),
+		updated: createSchema(SchemaWithDescIndex),
+		diff: [
+			{
+				modification: 'removeIndex',
+				entityName: 'Article',
+				fields: ['title'],
+			},
+			{
+				modification: 'createIndex',
+				entityName: 'Article',
+				index: { fields: ['title'], columnOptions: { title: { order: 'desc' } } },
+			},
+		],
+		sql: SQL`DROP INDEX "idx_article_title";
+CREATE INDEX ON "article" ("title" DESC);`,
+		databaseMetadata: createDatabaseMetadata({
+			foreignKeys: [],
+			indexes: [{
+				tableName: 'article',
+				columnNames: ['title'],
+				indexName: 'idx_article_title',
+				unique: false,
+			}],
+			uniqueConstraints: [],
+		}),
+	}))
+
+// Multi-column index mixing plain / order+nulls / per-column opClass — locks the clause ordering
+// (column [opclass] [ASC|DESC] [NULLS …]) and the field→column-name alignment across positions.
+describe('create multi-column index with mixed per-column options', () =>
+	testMigrations({
+		original: createSchema(SchemaMultiColumnBase),
+		updated: createSchema(SchemaWithMultiColumnOptionsIndex),
+		diff: [
+			{
+				modification: 'createIndex',
+				entityName: 'Article',
+				index: {
+					fields: ['category', 'publishedAt', 'title'],
+					columnOptions: { publishedAt: { order: 'desc', nulls: 'last' }, title: { opClass: 'text_pattern_ops' } },
+				},
+			},
+		],
+		sql: SQL`CREATE INDEX ON "article" ("category", "published_at" DESC NULLS LAST, "title" text_pattern_ops);`,
+	}))
+
+// Per-column opClass overrides the index-level opClass; columns without an override inherit the global one.
+describe('create index with per-column opClass overriding the index-level opClass', () =>
+	testMigrations({
+		original: createSchema(SchemaArticleBase),
+		updated: createSchema(SchemaWithOpClassPrecedenceIndex),
+		diff: [
+			{
+				modification: 'createIndex',
+				entityName: 'Article',
+				index: { fields: ['title', 'content'], opClass: 'varchar_pattern_ops', columnOptions: { content: { opClass: 'text_pattern_ops' } } },
+			},
+		],
+		sql: SQL`CREATE INDEX ON "article" ("title" varchar_pattern_ops, "content" text_pattern_ops);`,
+	}))
+
+// The physical DROP matches by columns only, so two indexes on the same column differing only by
+// per-column options both match — the handler must fail loudly rather than DROP both (CORR-1).
+describe('drop one of two same-column indexes differing only by column options', () =>
+	it('throws rather than dropping both physical indexes', () => {
+		expect(() =>
+			testGenerateSql(
+				createSchema(SchemaWithPlainAndSortOrderIndex),
+				[
+					{
+						modification: 'removeIndex',
+						entityName: 'Article',
+						fields: ['title'],
+						columnOptions: { title: { order: 'desc' } },
+					},
+				],
+				'',
+				createDatabaseMetadata({
+					foreignKeys: [],
+					indexes: [
+						{ tableName: 'article', columnNames: ['title'], indexName: 'idx_article_title_plain', unique: false },
+						{ tableName: 'article', columnNames: ['title'], indexName: 'idx_article_title_desc', unique: false },
+					],
+					uniqueConstraints: [],
+				}),
+			)
+		).toThrow(/unambiguously drop index/)
 	}))

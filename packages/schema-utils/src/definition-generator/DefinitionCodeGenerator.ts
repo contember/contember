@@ -45,10 +45,18 @@ ${Object.values(entity.fields).map(field => this.generateField({ field, entity, 
 	}
 
 	private generateIndex({ entity, index }: { entity: Model.Entity; index: Model.Index }): string {
-		if (!index.method && !index.opClass && !index.where && !index.include?.length) {
+		const hasColumnOptions = index.columnOptions !== undefined && Object.keys(index.columnOptions).length > 0
+		if (!index.method && !index.opClass && !index.where && !index.include?.length && !hasColumnOptions) {
 			return `@c.Index(${index.fields.map(it => printJsValue(it)).join(', ')})`
 		}
-		const options: Record<string, unknown> = { fields: index.fields }
+		const options: Record<string, unknown> = {
+			fields: hasColumnOptions
+				? index.fields.map(field => {
+					const columnOption = index.columnOptions?.[field]
+					return columnOption && Object.keys(columnOption).length > 0 ? { field, ...columnOption } : field
+				})
+				: index.fields,
+		}
 		if (index.method) {
 			options.method = index.method
 		}

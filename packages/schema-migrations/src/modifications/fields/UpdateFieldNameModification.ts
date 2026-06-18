@@ -70,10 +70,21 @@ export class UpdateFieldNameModificationHandler implements ModificationHandler<U
 			? updateEntity(this.data.entityName, ({ entity }) => {
 				return {
 					...entity,
-					indexes: entity.indexes.map(unique => ({
-						...unique,
-						fields: unique.fields.map(changeValue(this.data.fieldName, this.data.newFieldName)),
-					})),
+					indexes: entity.indexes.map(index => {
+						// columnOptions is keyed by field name, so a rename must move its entry too —
+						// otherwise the options are dropped on regenerate and the (now stale-keyed) entry
+						// fails model validation ("Column options reference field <old>, not a key column").
+						const columnOptions = index.columnOptions && this.data.fieldName in index.columnOptions
+							? Object.fromEntries(
+								Object.entries(index.columnOptions).map(([field, options]) => [field === this.data.fieldName ? this.data.newFieldName : field, options]),
+							)
+							: index.columnOptions
+						return {
+							...index,
+							fields: index.fields.map(changeValue(this.data.fieldName, this.data.newFieldName)),
+							...(columnOptions !== undefined ? { columnOptions } : {}),
+						}
+					}),
 				}
 			})
 			: undefined

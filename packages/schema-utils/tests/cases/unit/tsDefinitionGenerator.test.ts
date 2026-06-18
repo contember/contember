@@ -57,3 +57,19 @@ test('definition generator preserves index opClass, include and where options', 
 	// opClass alone must force the options form, never the positional short form that would drop it
 	expect(generated).not.toContain(`@c.Index('title')`)
 })
+
+namespace IndexColumnOptionsGenSchema {
+	@c.Index({ fields: ['title', { field: 'rank', order: 'desc', nulls: 'last' }] })
+	@c.Index({ fields: [{ field: 'title', opClass: 'text_pattern_ops' }] })
+	export class Article {
+		title = c.stringColumn()
+		rank = c.intColumn()
+	}
+}
+
+test('definition generator round-trips per-column index options', () => {
+	const generator = new DefinitionCodeGenerator()
+	const generated = generator.generate(createSchema(IndexColumnOptionsGenSchema))
+	expect(generated).toContain(`@c.Index({ fields: ['title', { field: 'rank', order: 'desc', nulls: 'last' }] })`)
+	expect(generated).toContain(`@c.Index({ fields: [{ field: 'title', opClass: 'text_pattern_ops' }] })`)
+})

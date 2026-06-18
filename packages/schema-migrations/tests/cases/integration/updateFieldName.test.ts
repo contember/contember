@@ -1,8 +1,25 @@
 import { describe } from 'bun:test'
 import { testMigrations } from '../../src/tests.js'
-import { SchemaBuilder } from '@contember/schema-definition'
+import { createSchema, SchemaBuilder, SchemaDefinition as def } from '@contember/schema-definition'
 import { Acl, Model } from '@contember/schema'
 import { SQL } from '../../src/tags.js'
+
+namespace IndexColumnOptionsRenameOriginal {
+	@def.Index({ fields: [{ field: 'rank', order: 'desc' }] })
+	export class Article {
+		rank = def.intColumn()
+		title = def.stringColumn()
+	}
+}
+
+namespace IndexColumnOptionsRenameUpdated {
+	@def.Index({ fields: [{ field: 'score', order: 'desc' }] })
+	export class Article {
+		// keep the DB column name so this is a pure field rename (no column-rename SQL)
+		score = def.intColumn().columnName('rank')
+		title = def.stringColumn()
+	}
+}
 
 describe('rename a field', () =>
 	testMigrations({
@@ -224,6 +241,24 @@ describe('rename relation with acl', () =>
 				entityName: 'Post',
 				fieldName: 'user',
 				newFieldName: 'author',
+			},
+		],
+		sql: SQL``,
+		noDiff: true,
+	}))
+
+// Renaming a field that carries per-column index options must move the columnOptions entry to the new
+// name (it is keyed by field name) — otherwise the options are lost and the schema fails validation.
+describe('rename a field carrying per-column index options', () =>
+	testMigrations({
+		original: { model: createSchema(IndexColumnOptionsRenameOriginal).model },
+		updated: { model: createSchema(IndexColumnOptionsRenameUpdated).model },
+		diff: [
+			{
+				modification: 'updateFieldName',
+				entityName: 'Article',
+				fieldName: 'rank',
+				newFieldName: 'score',
 			},
 		],
 		sql: SQL``,

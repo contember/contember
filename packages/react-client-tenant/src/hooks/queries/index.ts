@@ -1,5 +1,6 @@
 export * from './useGlobalApiKeysQuery.js'
 export * from './useMeQuery.js'
+export * from './useMyIdentityProvidersQuery.js'
 export * from './usePersonsQuery.js'
 export * from './useProjectApiKeysQuery.js'
 export * from './useProjectMembersQuery.js'

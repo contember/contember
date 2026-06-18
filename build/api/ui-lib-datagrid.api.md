@@ -57,6 +57,8 @@ export const DataGridBooleanFilter: React_2.NamedExoticComponent<Omit<DataViewBo
     label: ReactNode;
 }>;
 
+// Warning: (ae-unresolved-link) The @link reference could not be resolved: The package "@contember/react-ui-lib" does not have an export "DataViewBooleanFilterProps"
+//
 // @public
 export type DataGridBooleanFilterProps = Omit<DataViewBooleanFilterProps, 'children'> & {
     label: ReactNode;
@@ -341,10 +343,10 @@ export type DataGridNumberFilterProps = Omit<DataViewNumberFilterProps, 'childre
 // @public
 export const DataGridPagination: FC<DataGridPaginationProps>;
 
-// @public (undocumented)
+// @public
 export const DataGridPerPageSelector: () => JSX.Element;
 
-// @public (undocumented)
+// @public
 export type DataGridPredefinedDateRange = {
     start: string;
     end: string;

@@ -18,10 +18,10 @@ export const DimensionLabel: (input: {
     dimensionValue: ReactNode;
 }) => JSX.Element;
 
-// @public (undocumented)
+// @public
 export const DimensionsSwitcher: NamedExoticComponent<DimensionsSwitcherProps>;
 
-// @public (undocumented)
+// @public
 export type DimensionsSwitcherProps = {
     options: SugaredQualifiedEntityList['entities'];
     orderBy?: DataViewSortingDirections;
@@ -37,10 +37,10 @@ export type RenderLabelProps = {
     dimensionValue: string | null;
 };
 
-// @public (undocumented)
+// @public
 export const SideDimensions: NamedExoticComponent<SideDimensionsProps>;
 
-// @public (undocumented)
+// @public
 export type SideDimensionsProps = {
     dimension: string;
     as: string;

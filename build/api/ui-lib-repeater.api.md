@@ -17,20 +17,20 @@ import { RepeaterProps } from '@contember/react-repeater';
 // @public
 export const DefaultRepeater: NamedExoticComponent<DefaultRepeaterProps>;
 
-// @public (undocumented)
+// @public
 export type DefaultRepeaterProps = {
     title?: ReactNode;
     addButtonPosition?: 'none' | 'after' | 'before' | 'around';
     addButtonLabel?: ReactNode;
 } & RepeaterProps;
 
-// @public (undocumented)
+// @public
 export const RepeaterAddItemButton: (input: {
     children?: React.ReactNode;
     index?: RepeaterAddItemIndex;
 }) => JSX.Element;
 
-// @public (undocumented)
+// @public
 export const RepeaterDropIndicator: (input: {
     position: "before" | "after";
 }) => JSX.Element;

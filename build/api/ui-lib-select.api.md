@@ -16,20 +16,21 @@ import { SugaredRelativeEntityList } from '@contember/interface';
 import { SugaredRelativeSingleEntity } from '@contember/interface';
 import { SugaredRelativeSingleField } from '@contember/interface';
 
-// @public (undocumented)
+// @public
 export const DefaultSelectDataView: React_2.NamedExoticComponent<DefaultSelectDataViewProps>;
 
-// @public (undocumented)
+// @public
 export interface DefaultSelectDataViewProps {
-    // (undocumented)
     children: ReactNode;
-    // (undocumented)
     initialSorting?: DataViewSortingDirections;
-    // (undocumented)
     queryField?: DataViewUnionFilterFields;
 }
 
-// @public (undocumented)
+// Warning: (ae-unresolved-link) The @link reference could not be resolved: The package "@contember/react-ui-lib" does not have an export "SelectItemTrigger"
+// Warning: (ae-unresolved-link) The @link reference could not be resolved: The package "@contember/react-ui-lib" does not have an export "Popover"
+// Warning: (ae-unresolved-link) The @link reference could not be resolved: The package "@contember/react-ui-lib" does not have an export "PopoverTrigger"
+//
+// @public
 export const MultiSelectInput: React_2.NamedExoticComponent<MultiSelectInputProps>;
 
 // @public (undocumented)
@@ -43,61 +44,67 @@ export type MultiSelectInputProps = {
     initialSorting?: DataViewSortingDirections;
 };
 
-// @public (undocumented)
+// @public
 export const MultiSelectItemContentUI: React_2.ForwardRefExoticComponent<Omit<React_2.ClassAttributes<HTMLSpanElement> & React_2.HTMLAttributes<HTMLSpanElement> & {
     asChild?: boolean;
     children?: React_2.ReactNode;
     className?: string;
 }, "ref"> & React_2.RefAttributes<HTMLSpanElement>>;
 
-// @public (undocumented)
+// @public
 export const MultiSelectItemDragOverlayUI: React_2.ForwardRefExoticComponent<Omit<React_2.ClassAttributes<HTMLSpanElement> & React_2.HTMLAttributes<HTMLSpanElement> & {
     asChild?: boolean;
     children?: React_2.ReactNode;
     className?: string;
 }, "ref"> & React_2.RefAttributes<HTMLSpanElement>>;
 
-// @public (undocumented)
+// @public
 export const MultiSelectItemRemoveButtonUI: React_2.ForwardRefExoticComponent<Omit<React_2.ClassAttributes<HTMLSpanElement> & React_2.HTMLAttributes<HTMLSpanElement> & {
     asChild?: boolean;
     children?: React_2.ReactNode;
     className?: string;
 }, "ref"> & React_2.RefAttributes<HTMLSpanElement>>;
 
-// @public (undocumented)
+// @public
 export const MultiSelectItemUI: React_2.ForwardRefExoticComponent<Omit<React_2.ClassAttributes<HTMLSpanElement> & React_2.HTMLAttributes<HTMLSpanElement> & {
     asChild?: boolean;
     children?: React_2.ReactNode;
     className?: string;
 }, "ref"> & React_2.RefAttributes<HTMLSpanElement>>;
 
-// @public (undocumented)
+// @public
 export const MultiSelectItemWrapperUI: React_2.ForwardRefExoticComponent<Omit<React_2.ClassAttributes<HTMLDivElement> & React_2.HTMLAttributes<HTMLDivElement> & {
     asChild?: boolean;
     children?: React_2.ReactNode;
     className?: string;
 }, "ref"> & React_2.RefAttributes<HTMLDivElement>>;
 
-// @public (undocumented)
+// @public
 export const MultiSelectSortableItemContentUI: React_2.ForwardRefExoticComponent<Omit<React_2.ClassAttributes<HTMLSpanElement> & React_2.HTMLAttributes<HTMLSpanElement> & {
     asChild?: boolean;
     children?: React_2.ReactNode;
     className?: string;
 }, "ref"> & React_2.RefAttributes<HTMLSpanElement>>;
 
-// @public (undocumented)
+// @public
 export const SelectCreateNewTrigger: React_2.ForwardRefExoticComponent<React_2.RefAttributes<HTMLButtonElement>>;
 
-// @public (undocumented)
+// @public
 export const SelectDefaultFilter: React_2.MemoExoticComponent<() => JSX.Element>;
 
-// @public (undocumented)
+// @public
 export const SelectDefaultPlaceholderUI: () => JSX.Element;
 
-// @public (undocumented)
+// Warning: (ae-unresolved-link) The @link reference could not be resolved: The package "@contember/react-ui-lib" does not have an export "SelectPlaceholder"
+// Warning: (ae-unresolved-link) The @link reference could not be resolved: The package "@contember/react-ui-lib" does not have an export "SelectEachValue"
+// Warning: (ae-unresolved-link) The @link reference could not be resolved: The package "@contember/react-ui-lib" does not have an export "SelectItemTrigger"
+// Warning: (ae-unresolved-link) The @link reference could not be resolved: The package "@contember/react-ui-lib" does not have an export "Popover"
+// Warning: (ae-unresolved-link) The @link reference could not be resolved: The package "@contember/react-ui-lib" does not have an export "PopoverTrigger"
+//
+// @public
 export const SelectInput: React_2.NamedExoticComponent<SelectInputProps>;
 
-// @public (undocumented)
+// @public
 export const SelectInputActionsUI: React_2.ForwardRefExoticComponent<Omit<React_2.ClassAttributes<HTMLSpanElement> & React_2.HTMLAttributes<HTMLSpanElement> & {
     asChild?: boolean;
     children?: React_2.ReactNode;
@@ -116,14 +123,14 @@ export type SelectInputProps = {
     required?: boolean;
 };
 
-// @public (undocumented)
+// @public
 export const SelectInputUI: React_2.ForwardRefExoticComponent<Omit<React_2.ClassAttributes<HTMLButtonElement> & React_2.ButtonHTMLAttributes<HTMLButtonElement> & {
     asChild?: boolean;
     children?: React_2.ReactNode;
     className?: string;
 }, "ref"> & React_2.RefAttributes<HTMLButtonElement>>;
 
-// @public (undocumented)
+// @public
 export const SelectInputWrapperUI: React_2.ForwardRefExoticComponent<Omit<React_2.ClassAttributes<HTMLDivElement> & React_2.HTMLAttributes<HTMLDivElement> & {
     asChild?: boolean;
     children?: React_2.ReactNode;
@@ -133,7 +140,7 @@ export const SelectInputWrapperUI: React_2.ForwardRefExoticComponent<Omit<React_
 // @public (undocumented)
 export const SelectListInner: React_2.NamedExoticComponent<SelectListProps>;
 
-// @public (undocumented)
+// @public
 export const SelectListItemUI: React_2.ForwardRefExoticComponent<Omit<Omit<React_2.ClassAttributes<HTMLButtonElement> & React_2.ButtonHTMLAttributes<HTMLButtonElement> & {
     asChild?: boolean;
     children?: ReactNode;
@@ -153,14 +160,14 @@ export type SelectListProps = {
     filterToolbar?: ReactNode;
 };
 
-// @public (undocumented)
+// @public
 export const SelectPopoverContent: React_2.ForwardRefExoticComponent<Omit<Omit<PopoverContentProps & React_2.RefAttributes<HTMLDivElement>, "ref"> & React_2.RefAttributes<HTMLDivElement> & {
     asChild?: boolean;
     children?: React_2.ReactNode;
     className?: string;
 }, "ref"> & React_2.RefAttributes<HTMLDivElement>>;
 
-// @public (undocumented)
+// @public
 export const SortableMultiSelectInput: NamedExoticComponent<SortableMultiSelectInputProps>;
 
 // @public (undocumented)

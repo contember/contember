@@ -8,15 +8,15 @@ import { JSX } from 'react/jsx-runtime';
 import { ReactNode } from 'react';
 import { RoutingLinkTarget } from '@contember/interface';
 
-// @public (undocumented)
+// @public
 export const BackButton: (input: BackButtonProps) => JSX.Element;
 
-// @public (undocumented)
+// @public
 export type BackButtonProps = {
     label?: string;
 };
 
-// @public (undocumented)
+// @public
 export const LinkBackButton: (input: {
     children: ReactNode;
     to: RoutingLinkTarget;

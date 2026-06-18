@@ -7,14 +7,14 @@
 import { JSX } from 'react/jsx-runtime';
 import { PropsWithChildren } from 'react';
 
-// @public (undocumented)
+// @public
 export interface CommentProps extends PropsWithChildren {
 }
 
-// @public (undocumented)
+// @public
 export const LoginWithEmail: () => JSX.Element;
 
-// @public (undocumented)
+// @public
 export const Todo: (input: CommentProps) => JSX.Element | null;
 
 // (No @packageDocumentation comment for this package)

@@ -69,14 +69,16 @@ export class EntityTypeProvider {
 	}
 
 	private createEntity(entityName: string) {
+		const entity = getEntityFromSchema(this.schema, entityName)
 		return new GraphQLObjectType({
 			name: GqlTypeName`${entityName}`,
-			fields: () => this.getEntityFields(entityName),
+			deprecationReason: entity.deprecationReason,
+			description: entity.description,
+			fields: () => this.getEntityFields(entity),
 		} as GraphQLObjectTypeConfig<any, any>)
 	}
 
-	private getEntityFields(entityName: string) {
-		const entity = getEntityFromSchema(this.schema, entityName)
+	private getEntityFields(entity: Model.Entity) {
 		const accessVisitor = new FieldAccessVisitor(Acl.Operation.read, this.authorizator)
 		const accessibleFields = Object.values(entity.fields).filter(field => acceptFieldVisitor(this.schema, entity, field.name, accessVisitor))
 		const metaFields: { [field: string]: GraphQLFieldConfig<any, any> } = {}
@@ -89,7 +91,7 @@ export class EntityTypeProvider {
 
 		const metaField = {
 			type: new GraphQLObjectType({
-				name: GqlTypeName`${entityName}Meta`,
+				name: GqlTypeName`${entity.name}Meta`,
 				fields: metaFields,
 			}),
 			resolve: aliasAwareResolver,
@@ -108,6 +110,8 @@ export class EntityTypeProvider {
 				type,
 				args: acceptFieldVisitor(this.schema, entity, field.name, fieldArgsVisitor),
 				resolve: aliasAwareResolver,
+				deprecationReason: field.deprecationReason,
+				description: field.description,
 			}
 		}
 
@@ -117,6 +121,7 @@ export class EntityTypeProvider {
 				...provider.getFields(entity, accessibleFields),
 			}
 		}
+
 		return fields
 	}
 

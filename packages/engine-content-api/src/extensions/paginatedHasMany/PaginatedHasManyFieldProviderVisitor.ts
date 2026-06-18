@@ -15,15 +15,15 @@ type Result = [
 export class PaginatedHasManyFieldProviderVisitor implements Model.ColumnVisitor<Result[]>, Model.RelationByTypeVisitor<Result[]> {
 	constructor(private readonly paginatedFieldFactory: PaginatedFieldConfigFactory) {}
 
-	visitOneHasMany({ targetEntity, relation }: Model.OneHasManyContext) {
+	public visitOneHasMany({ targetEntity, relation }: Model.OneHasManyContext) {
 		return this.createField(targetEntity, relation)
 	}
 
-	visitManyHasManyOwning({ targetEntity, relation }: Model.ManyHasManyOwningContext) {
+	public visitManyHasManyOwning({ targetEntity, relation }: Model.ManyHasManyOwningContext) {
 		return this.createField(targetEntity, relation)
 	}
 
-	visitManyHasManyInverse({ targetEntity, relation }: Model.ManyHasManyInverseContext) {
+	public visitManyHasManyInverse({ targetEntity, relation }: Model.ManyHasManyInverseContext) {
 		return this.createField(targetEntity, relation)
 	}
 
@@ -33,6 +33,8 @@ export class PaginatedHasManyFieldProviderVisitor implements Model.ColumnVisitor
 				`paginate${capitalizeFirstLetter(relation.name)}`,
 				{
 					...this.paginatedFieldFactory.createFieldConfig(entity),
+					deprecationReason: relation.deprecationReason,
+					description: relation.description,
 					extensions: {
 						relationName: relation.name,
 						extensionKey: PaginatedHasManyFieldProvider.extensionName,
@@ -43,19 +45,19 @@ export class PaginatedHasManyFieldProviderVisitor implements Model.ColumnVisitor
 		]
 	}
 
-	visitColumn() {
+	public visitColumn() {
 		return []
 	}
 
-	visitManyHasOne() {
+	public visitManyHasOne() {
 		return []
 	}
 
-	visitOneHasOneInverse() {
+	public visitOneHasOneInverse() {
 		return []
 	}
 
-	visitOneHasOneOwning() {
+	public visitOneHasOneOwning() {
 		return []
 	}
 }

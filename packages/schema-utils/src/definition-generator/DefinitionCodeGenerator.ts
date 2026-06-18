@@ -3,6 +3,7 @@ import { acceptFieldVisitor, DefaultNamingConventions, isInverseRelation, Naming
 import { printJsValue } from '../utils/printJsValue.js'
 import { DefinitionNamingConventions } from './DefinitionNamingConventions.js'
 import { AclDefinitionCodeGenerator } from './AclDefinitionCodeGenerator.js'
+import { DEFAULT_ENTITY_DEPRECATION_REASON, DEFAULT_FIELD_DEPRECATION_REASON } from '../constants.js'
 
 export class DefinitionCodeGenerator {
 	constructor(
@@ -26,12 +27,14 @@ export class DefinitionCodeGenerator {
 	}
 
 	public generateEntity({ entity, schema }: { entity: Model.Entity; schema: Schema }): string {
+		const deprecated = this.generateDeprecated(entity)
+		const description = this.generateDescription(entity)
 		const uniqueConstraints = Object.values(entity.unique).map(constraint => this.generateUniqueConstraint({ entity, constraint }))
 		const indexes = Object.values(entity.indexes).map(index => this.generateIndex({ entity, index }))
 		const checks = (entity.checks ?? []).map(check => `@c.Check(${printJsValue({ name: check.name, expression: check.expression })})`)
 		const views = this.generateView({ entity })
 
-		const decorators = [...uniqueConstraints, ...indexes, ...checks, views].filter(it => !!it).map(it => `${it}\n`).join('')
+		const decorators = [deprecated, description, ...uniqueConstraints, ...indexes, ...checks, views].filter(it => !!it).map(it => `${it}\n`).join('')
 		const acl = this.aclGenerator.generateEntityAcl({ entity, schema })
 
 		return `\n${decorators}${acl}export class ${this.formatIdentifier(entity.name)} {
@@ -71,6 +74,22 @@ ${Object.values(entity.fields).map(field => this.generateField({ field, entity, 
 			options.where = index.where
 		}
 		return `@c.Index(${printJsValue(options)})`
+	}
+
+	private generateDescription(entity: Model.Entity): string | undefined {
+		if (!entity.description) {
+			return undefined
+		}
+
+		return `@c.Description(${printJsValue(entity.description)})`
+	}
+
+	private generateDeprecated(entity: Model.Entity): string | undefined {
+		if (!entity.deprecationReason) {
+			return undefined
+		}
+
+		return `@c.Deprecated(${entity.deprecationReason !== DEFAULT_ENTITY_DEPRECATION_REASON ? printJsValue(entity.deprecationReason) : ''})`
 	}
 
 	private generateView({ entity }: { entity: Model.Entity }): string | undefined {
@@ -123,6 +142,18 @@ ${Object.values(entity.fields).map(field => this.generateField({ field, entity, 
 			}
 			return `joiningColumn(${printJsValue(joiningColumnName)})`
 		}
+		const formatDeprecationReason = (deprecationReason?: string): string | undefined => {
+			if (!deprecationReason) {
+				return undefined
+			}
+			return `deprecated(${deprecationReason !== DEFAULT_FIELD_DEPRECATION_REASON ? printJsValue(deprecationReason) : ''})`
+		}
+		const formatDescriptionReason = (description?: string): string | undefined => {
+			if (!description) {
+				return undefined
+			}
+			return `description(${printJsValue(description)})`
+		}
 		const definition = acceptFieldVisitor<(string | undefined)[]>(schema.model, entity, field, {
 			visitColumn: ctx => {
 				return this.generateColumn(ctx)
@@ -131,6 +162,8 @@ ${Object.values(entity.fields).map(field => this.generateField({ field, entity, 
 				return [
 					formatRelationFactory('oneHasMany', relation),
 					...formatOrderBy(relation.orderBy),
+					formatDeprecationReason(relation.deprecationReason),
+					formatDescriptionReason(relation.description),
 				]
 			},
 			visitManyHasOne: ({ relation }) => {
@@ -139,12 +172,16 @@ ${Object.values(entity.fields).map(field => this.generateField({ field, entity, 
 					!relation.nullable ? 'notNull()' : undefined,
 					formatOnDelete(relation.joiningColumn.onDelete),
 					formatJoiningColumn(relation.joiningColumn.columnName, relation.name),
+					formatDeprecationReason(relation.deprecationReason),
+					formatDescriptionReason(relation.description),
 				]
 			},
 			visitOneHasOneInverse: ({ relation }) => {
 				return [
 					formatRelationFactory('oneHasOneInverse', relation),
 					!relation.nullable ? 'notNull()' : undefined,
+					formatDeprecationReason(relation.deprecationReason),
+					formatDescriptionReason(relation.description),
 				]
 			},
 			visitOneHasOneOwning: ({ relation }) => {
@@ -154,6 +191,8 @@ ${Object.values(entity.fields).map(field => this.generateField({ field, entity, 
 					formatOnDelete(relation.joiningColumn.onDelete),
 					formatJoiningColumn(relation.joiningColumn.columnName, relation.name),
 					relation.orphanRemoval ? 'removeOrphan()' : undefined,
+					formatDeprecationReason(relation.deprecationReason),
+					formatDescriptionReason(relation.description),
 				]
 			},
 			visitManyHasManyOwning: ({ entity, relation }) => {
@@ -193,12 +232,16 @@ ${Object.values(entity.fields).map(field => this.generateField({ field, entity, 
 					formatRelationFactory('manyHasMany', relation),
 					...formatOrderBy(relation.orderBy),
 					Object.keys(joiningTable).length > 0 ? `joiningTable(${printJsValue(joiningTable)})` : undefined,
+					formatDeprecationReason(relation.deprecationReason),
+					formatDescriptionReason(relation.description),
 				]
 			},
 			visitManyHasManyInverse: ({ relation }) => {
 				return [
 					formatRelationFactory('manyHasManyInverse', relation),
 					...formatOrderBy(relation.orderBy),
+					formatDeprecationReason(relation.deprecationReason),
+					formatDescriptionReason(relation.description),
 				]
 			},
 		})
@@ -246,6 +289,15 @@ ${Object.values(entity.fields).map(field => this.generateField({ field, entity, 
 		}
 		if (column.type === Model.ColumnType.Json && column.schema !== undefined) {
 			parts.push(`schema(${printJsValue(column.schema)})`)
+		}
+		if (column.deprecationReason) {
+			parts.push(`deprecated(${DEFAULT_FIELD_DEPRECATION_REASON !== column.deprecationReason ? printJsValue(column.deprecationReason) : ''})`)
+		}
+		if (column.description) {
+			parts.push(`description(${printJsValue(column.description)})`)
+		}
+		if (column.list) {
+			parts.push(`list()`)
 		}
 
 		// todo: sequence

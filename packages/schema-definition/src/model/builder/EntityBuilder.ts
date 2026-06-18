@@ -114,6 +114,8 @@ namespace EntityBuilder {
 		tableName?: string
 		orderBy?: Model.OrderBy[]
 		unique?: UniqueOptions[]
+		deprecationReason?: string
+		description?: string
 	}
 }
 

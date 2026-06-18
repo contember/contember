@@ -50,7 +50,7 @@ export type JSONArray = readonly JSONValue[]
 		let hasManyCode = ''
 		acceptEveryFieldVisitor(model, entity, {
 			visitHasMany: ctx => {
-				if (!options?.includeDeprecated && ctx.relation.deprecationReason) {
+				if (!options?.includeDeprecated && (ctx.relation.deprecationReason || ctx.targetEntity.deprecationReason)) {
 					return
 				}
 				hasManyCode += `\t\t${ctx.relation.name}: ${ctx.targetEntity.name}${
@@ -58,7 +58,7 @@ export type JSONArray = readonly JSONValue[]
 				}\n`
 			},
 			visitHasOne: ctx => {
-				if (!options?.includeDeprecated && ctx.relation.deprecationReason) {
+				if (!options?.includeDeprecated && (ctx.relation.deprecationReason || ctx.targetEntity.deprecationReason)) {
 					return
 				}
 				hasOneCode += `\t\t${ctx.relation.name}: ${ctx.targetEntity.name}\n`
@@ -81,7 +81,7 @@ export type JSONArray = readonly JSONValue[]
 		code += hasManyCode
 		code += '\t}\n'
 		code += '\thasManyBy: {\n'
-		code += this.formatReducedFields(model, entity)
+		code += this.formatReducedFields(model, entity, options)
 		code += '\t}\n'
 		code += '}\n'
 		return code
@@ -91,7 +91,7 @@ export type JSONArray = readonly JSONValue[]
 		let code = ''
 		acceptEveryFieldVisitor(model, entity, {
 			visitOneHasMany: ({ entity, relation, targetEntity, targetRelation }) => {
-				if (!options?.includeDeprecated && relation.deprecationReason) {
+				if (!options?.includeDeprecated && (relation.deprecationReason || targetEntity.deprecationReason)) {
 					return
 				}
 				if (!targetRelation) {

@@ -687,6 +687,7 @@ export type DeprecatedFoo <OverRelation extends string | never = never> = {
 		deprecatedLocales: DeprecatedFooLocale<'deprecatedFoo'>
 	}
 	hasManyBy: {
+		deprecatedLocalesByDeprecatedLocale: { entity: DeprecatedFooLocale; by: {deprecatedLocale: string}  }
 	}
 }
 export type DeprecatedFooLocale <OverRelation extends string | never = never> = {

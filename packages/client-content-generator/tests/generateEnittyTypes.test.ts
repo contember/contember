@@ -59,4 +59,18 @@ describe('generate entities', () => {
 	test('generate reduced has by deprecated', () => {
 		expect(entityGenerator.generate(schemas.reducedHasManySchema.model, { includeDeprecated: true })).toMatchSnapshot()
 	})
+
+	test('non-deprecated relation to a deprecated entity is dropped (no dangling reference)', () => {
+		const output = entityGenerator.generate(schemas.danglingDeprecatedRefSchema.model)
+		// the deprecated entity itself is excluded
+		expect(output).not.toContain('DeprecatedTarget')
+		// and the relation pointing to it must be dropped, otherwise the generated code references a missing type
+		expect(output).not.toContain('target:')
+	})
+
+	test('non-deprecated relation to a deprecated entity is kept when including deprecated', () => {
+		const output = entityGenerator.generate(schemas.danglingDeprecatedRefSchema.model, { includeDeprecated: true })
+		expect(output).toContain('export type DeprecatedTarget')
+		expect(output).toContain('target: DeprecatedTarget')
+	})
 })

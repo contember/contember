@@ -535,6 +535,24 @@ export interface DisableOtpTriggerProps {
     onSuccess?: () => void;
 }
 
+// @public (undocumented)
+export const disconnectMyIdentityProviderMutation: TenantApi.MutationFetcher<{
+    readonly mutation?: ({
+        readonly ok: boolean;
+    } & {
+        readonly error?: ({
+            readonly code: TenantApi.DisconnectIDPErrorCode;
+        } & {
+            readonly developerMessage: string;
+        }) | undefined;
+    }) | undefined;
+}, {
+    readonly id: string;
+}>;
+
+// @public (undocumented)
+export type DisconnectMyIdentityProviderMutationVariables = Parameters<ReturnType<typeof useDisconnectMyIdentityProviderMutation>>[0];
+
 // @internal (undocumented)
 export const FormContext: Context<FormContextValue<any, any, any>>;
 
@@ -886,6 +904,11 @@ export const LogoutTrigger: (input: {
 export type MeQueryData = ModelType<typeof identityFragment>;
 
 export { ModelType }
+
+// Warning: (ae-forgotten-export) The symbol "personIdentityProviderFragment" needs to be exported by the entry point index.d.ts
+//
+// @public (undocumented)
+export type MyIdentityProvidersQueryResult = readonly ModelType<typeof personIdentityProviderFragment>[];
 
 // @public (undocumented)
 export const OtpConfirmForm: (input: OtpConfirmFormProps) => JSX.Element;
@@ -1673,6 +1696,11 @@ export const useDisableMyPasswordlessMutation: (input?: TenantApiOptions) => (va
 export const useDisableOtpMutation: (input?: TenantApiOptions) => (variables: {}) => Promise<TenantMutationResponse<unknown, TenantApi.DisableOtpErrorCode>>;
 
 // @public (undocumented)
+export const useDisconnectMyIdentityProviderMutation: (input?: TenantApiOptions) => (variables: {
+    readonly id: string;
+}) => Promise<TenantMutationResponse<unknown, TenantApi.DisconnectIDPErrorCode>>;
+
+// @public (undocumented)
 export const useEnableMyPasswordlessMutation: (input?: TenantApiOptions) => (variables: {}) => Promise<TenantMutationResponse<unknown, TenantApi.ToggleMyPasswordlessErrorCode>>;
 
 // @public (undocumented)
@@ -1763,6 +1791,9 @@ export const useLogout: () => (input?: {
 
 // @public (undocumented)
 export const useMeQuery: (options?: TenantApiOptions) => (input: {}) => Promise<MeQueryData>;
+
+// @public (undocumented)
+export const useMyIdentityProvidersQuery: (options?: TenantApiOptions) => (input?: {}) => Promise<MyIdentityProvidersQueryResult>;
 
 // @public (undocumented)
 export const useOtpConfirmForm: () => OtpConfirmFormContextValue;

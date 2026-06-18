@@ -26,7 +26,14 @@ import {
 } from './mutation/index.js'
 
 import { Resolvers } from '../schema/index.js'
-import { AuthLogQueryResolver, MeQueryResolver, PersonQueryResolver, ProjectMembersQueryResolver, ProjectQueryResolver } from './query/index.js'
+import {
+	ApiKeyQueryResolver,
+	AuthLogQueryResolver,
+	MeQueryResolver,
+	PersonQueryResolver,
+	ProjectMembersQueryResolver,
+	ProjectQueryResolver,
+} from './query/index.js'
 import { IdentityTypeResolver, ProjectTypeResolver } from './types/index.js'
 import { DateTimeType, IntervalType, JSONType } from '@contember/graphql-utils'
 import { IDPQueryResolver } from './query/IDPQueryResolver.js'
@@ -103,6 +110,7 @@ class ResolverFactory {
 			authPolicyQueryResolver: AuthPolicyQueryResolver
 
 			authLogQueryResolver: AuthLogQueryResolver
+			apiKeyQueryResolver: ApiKeyQueryResolver
 
 			togglePasswordlessMutationResolver: TogglePasswordlessMutationResolver
 		},
@@ -123,10 +131,14 @@ class ResolverFactory {
 			Project: {
 				members: this.resolvers.projectTypeResolver.members.bind(this.resolvers.projectTypeResolver),
 				roles: this.resolvers.projectTypeResolver.roles.bind(this.resolvers.projectTypeResolver),
+				apiKeys: this.resolvers.projectTypeResolver.apiKeys.bind(this.resolvers.projectTypeResolver),
+				secrets: this.resolvers.projectTypeResolver.secrets.bind(this.resolvers.projectTypeResolver),
 			},
 			Query: {
 				me: this.resolvers.meQueryResolver.me.bind(this.resolvers.meQueryResolver),
 				personById: this.resolvers.personQueryResolver.personById.bind(this.resolvers.personQueryResolver),
+				persons: this.resolvers.personQueryResolver.persons.bind(this.resolvers.personQueryResolver),
+				globalApiKeys: this.resolvers.apiKeyQueryResolver.globalApiKeys.bind(this.resolvers.apiKeyQueryResolver),
 				projectBySlug: this.resolvers.projectQueryResolver.projectBySlug.bind(this.resolvers.projectQueryResolver),
 				projects: this.resolvers.projectQueryResolver.projects.bind(this.resolvers.projectQueryResolver),
 				projectMemberships: this.resolvers.projectMembersQueryResolver.projectMemberships.bind(this.resolvers.projectMembersQueryResolver),

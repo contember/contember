@@ -1,4 +1,5 @@
 export * from './ProjectSecretsQuery.js'
+export * from './ProjectSecretKeysQuery.js'
 export * from './ProjectBySlugQuery.js'
 export * from './ProjectsByIdentityQuery.js'
 export * from './ProjectsQuery.js'

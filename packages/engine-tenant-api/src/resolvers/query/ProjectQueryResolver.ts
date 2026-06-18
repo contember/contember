@@ -7,7 +7,7 @@ export class ProjectQueryResolver implements QueryResolvers {
 
 	async projects(parent: unknown, args: unknown, context: TenantResolverContext): Promise<readonly Project[]> {
 		return (await this.projectManager.getProjectsByIdentity(context.db, context.identity.id, context.permissionContext)).map(
-			it => ({ ...it, members: [], roles: [] }),
+			it => ({ ...it, members: [], roles: [], apiKeys: [], secrets: [] }),
 		)
 	}
 
@@ -27,6 +27,6 @@ export class ProjectQueryResolver implements QueryResolvers {
 			return null
 		}
 
-		return { ...project, members: [], roles: [] }
+		return { ...project, members: [], roles: [], apiKeys: [], secrets: [] }
 	}
 }

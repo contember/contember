@@ -29,6 +29,7 @@ namespace PermissionActions {
 	export const PERSON_VIEW_SESSIONS = (roles?: readonly string[]) => Authorizator.createAction(Resources.person, 'viewSessions', { roles })
 
 	export const PERSON_VIEW = Authorizator.createAction(Resources.person, 'view')
+	export const PERSON_LIST = Authorizator.createAction(Resources.person, 'list')
 	export const PERSON_SIGN_IN = Authorizator.createAction(Resources.person, 'signIn')
 	export const PERSON_SIGN_UP = (roles?: readonly string[]) => Authorizator.createAction(Resources.person, 'signUp', { roles })
 	export const PERSON_SIGN_OUT = Authorizator.createAction(Resources.person, 'signOut')
@@ -51,6 +52,7 @@ namespace PermissionActions {
 
 	export const PROJECT_VIEW = Authorizator.createAction(Resources.project, 'view')
 	export const PROJECT_SET_SECRET = Authorizator.createAction(Resources.project, 'setSecret')
+	export const PROJECT_VIEW_SECRETS = Authorizator.createAction(Resources.project, 'viewSecrets')
 	export const PROJECT_UPDATE = Authorizator.createAction(Resources.project, 'update')
 
 	export const PROJECT_CREATE = Authorizator.createAction(Resources.project, 'create')
@@ -68,6 +70,7 @@ namespace PermissionActions {
 	export const API_KEY_CREATE = Authorizator.createAction(Resources.apiKey, 'create')
 	export const API_KEY_CREATE_GLOBAL = (roles?: readonly string[]) => Authorizator.createAction(Resources.apiKey, 'createGlobal', { roles })
 	export const API_KEY_DISABLE = Authorizator.createAction(Resources.apiKey, 'disable')
+	export const API_KEY_LIST = Authorizator.createAction(Resources.apiKey, 'list')
 
 	export const MAIL_TEMPLATE_ADD = Authorizator.createAction(Resources.mailTemplate, 'add')
 	export const MAIL_TEMPLATE_REMOVE = Authorizator.createAction(Resources.mailTemplate, 'remove')

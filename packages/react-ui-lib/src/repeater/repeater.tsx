@@ -41,6 +41,10 @@ const RepeaterEmptyUI = uic('div', {
 	baseClass: 'italic text-sm text-gray-600',
 })
 
+/**
+ * A visual indicator for sortable repeater items,
+ * showing where an item will be dropped. It adapts its placement based on the `position` prop.
+ */
 export const RepeaterDropIndicator = ({ position }: { position: 'before' | 'after' }) => (
 	<div className={'relative'}>
 		<RepeaterSortableDropIndicator position={position}>
@@ -49,6 +53,11 @@ export const RepeaterDropIndicator = ({ position }: { position: 'before' | 'afte
 	</div>
 )
 
+/**
+ * A button that adds a new item to a repeater at a specified index.
+ * It wraps the `RepeaterAddItemTrigger` and displays customizable content.
+ * By default, it shows a plus icon alongside a localized label.
+ */
 export const RepeaterAddItemButton = ({ children, index }: { children?: React.ReactNode; index?: RepeaterAddItemIndex }) => (
 	<RepeaterAddItemTrigger index={index}>
 		<div>
@@ -65,7 +74,9 @@ export const RepeaterAddItemButton = ({ children, index }: { children?: React.Re
 )
 
 /**
- * A button that removes the item from the repeater.
+ * A button that removes an item from a repeater.
+ * It wraps the `RepeaterRemoveItemTrigger` and displays a customizable child element.
+ * By default, it shows a trash icon that turns red on hover.
  */
 export const RepeaterRemoveItemButton = ({ children }: { children?: React.ReactNode }) => (
 	<RepeaterRemoveItemTrigger>
@@ -86,22 +97,28 @@ export const RepeaterItemActions = uic('div', {
 	baseClass: 'absolute top-1 right-2 flex gap-2',
 })
 
+/**
+ * Props for the {@link DefaultRepeater} component.
+ */
 export type DefaultRepeaterProps =
 	& {
+		/**
+		 * Optional repeater title.
+		 */
 		title?: ReactNode
 		/**
-		 * Position of the add button.
+		 * Optional position of the add button.
 		 */
 		addButtonPosition?: 'none' | 'after' | 'before' | 'around'
+		/**
+		 * Optional label of the add button.
+		 */
 		addButtonLabel?: ReactNode
 	}
 	& RepeaterProps
 
 /**
  * DefaultRepeater is a wrapper around Repeater that provides a default UI for a list of items.
- *
- * ## Props {@link DefaultRepeaterProps}
- * - field or entities, sortableBy or orderBy, addButtonPosition, title
  *
  * ## Example
  * ```tsx

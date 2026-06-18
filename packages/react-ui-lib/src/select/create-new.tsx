@@ -5,6 +5,22 @@ import { SelectItemTrigger, SelectNewItem } from '@contember/react-select'
 import { dict } from '@contember/react-ui-lib-base'
 import { Dialog, DialogClose, DialogContent, DialogFooter, DialogTrigger } from '@contember/react-ui-lib-base'
 
+/**
+ * `CreateEntityDialog` is a modal component that facilitates the creation of a new entity.
+ * It integrates entity selection functionality with confirmation and cancellation actions.
+ *
+ * ## Example: Basic usage
+ * ```tsx
+ * <CreateEntityDialog
+ *   trigger={<Button>Create New Entity</Button>}
+ * >
+ *   <EntityForm />
+ * </CreateEntityDialog>
+ * ```
+ *
+ * @group SelectInput
+ * @group MultiSelectInput
+ */
 export const CreateEntityDialog = ({ trigger, children }: { trigger: ReactElement; children: ReactNode }) => {
 	return (
 		<Dialog>

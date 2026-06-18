@@ -24,6 +24,9 @@ export interface PersistTriggerProps {
 	 * Callback that is called when persist is successful.
 	 */
 	onPersistSuccess?: (result: SuccessfulPersistResult) => void
+	/**
+	 * Callback that is called when an error occurs during persist.
+	 */
 	onPersistError?: (result: ErrorPersistResult) => void
 }
 

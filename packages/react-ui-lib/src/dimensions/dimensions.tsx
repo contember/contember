@@ -22,15 +22,63 @@ import { Popover, PopoverContent, PopoverTrigger } from '@contember/react-ui-lib
 import { Button } from '@contember/react-ui-lib-base'
 import { DimensionLabelUI, DimensionLabelWrapperUI } from '@contember/react-ui-lib-base'
 
+/**
+ * Props for the {@link DimensionsSwitcher} component.
+ */
 export type DimensionsSwitcherProps = {
+	/**
+	 * Entity list for dimension options.
+	 */
 	options: SugaredQualifiedEntityList['entities']
+	/**
+	 * Specifies initial sorting of the options (e.g., `{ label: 'desc' }`).
+	 */
 	orderBy?: DataViewSortingDirections
+	/**
+	 * The name of the dimension to switch.
+	 */
 	dimension: string
+	/**
+	 * Child components or fields to render within the dimension selector.
+	 */
 	children: ReactNode
+	/**
+	 * Field containing unique dimension identifiers.
+	 */
 	slugField: SugaredRelativeSingleField['field']
+	/**
+	 * Enables multi-selection mode.
+	 */
 	isMulti?: boolean
 }
 
+/**
+ * `DimensionsSwitcher` is a UI component for switching between different dimensions of data.
+ *
+ * ## Example: Basic usage
+ * ```tsx
+ * <DimensionsSwitcher
+ *   dimension="locale"
+ *   slugField="code"
+ *   options="DimensionsLocale"
+ * >
+ *   <Field field="label" />
+ * </DimensionsSwitcher>
+ * ```
+ *
+ * ## Example: With initial sorting and multi-selection
+ * ```tsx
+ * <DimensionsSwitcher
+ *   dimension="locale"
+ *   slugField="code"
+ *   options="DimensionsLocale"
+ *   orderBy={{ label: 'desc' }}
+ *   isMulti
+ * >
+ *   <Field field="label" />
+ * </DimensionsSwitcher>
+ * ```
+ */
 export const DimensionsSwitcher = Component(({ options, dimension, children, slugField, orderBy, isMulti }: DimensionsSwitcherProps) => (
 	<DataView entities={options} initialSorting={orderBy}>
 		<DataViewLoaderState initial refreshing>
@@ -122,14 +170,47 @@ export type RenderLabelProps = {
 	dimensionValue: string | null
 }
 
+/**
+ * Props for the {@link SideDimensions} component.
+ */
 export type SideDimensionsProps = {
+	/**
+	 * The name of the dimension to render.
+	 */
 	dimension: string
+	/**
+	 * The name of the dimension variable to expose in the context.
+	 */
 	as: string
+	/**
+	 * The field to traverse via `HasOne` relationship.
+	 */
 	field: SugaredRelativeSingleEntity['field']
+	/**
+	 * Child components or fields to render within the dimension selector.
+	 */
 	children: ReactNode
+	/**
+	 * Optional custom label renderer. Receives the label and the current dimension value.
+	 */
 	renderLabel?: ({ label, dimensionValue }: RenderLabelProps) => ReactNode
 }
 
+/**
+ * `SideDimensions` is a layout component that renders content for a specific dimension
+ * within a flexible side panel. It wraps its content inside a `DimensionRenderer` and `HasOne` field relationship.
+ *
+ * ## Example: Basic Usage
+ * ```tsx
+ * <SideDimensions
+ *   dimension="locale"
+ *   as="currentLocale"
+ *   field="locales(locale.code = $currentLocale)"
+ * >
+ *   <InputField field="title" />
+ * </SideDimensions>
+ * ```
+ */
 export const SideDimensions = Component<SideDimensionsProps>(({ dimension, children, as, field, renderLabel }) => (
 	<div className="flex mt-4 gap-4">
 		<DimensionRenderer dimension={dimension} as={as}>

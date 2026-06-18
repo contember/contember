@@ -7,6 +7,23 @@ import { UploadIcon } from 'lucide-react'
 import { dict } from '@contember/react-ui-lib-base'
 import { Button } from '@contember/react-ui-lib-base'
 
+/**
+ * `UploaderDropzone` renders a file drop area UI for uploading files, with optional
+ * placeholder customization and conditional display of a loader while uploads are in progress.
+ *
+ * Requires usage within an uploader context providing file upload state.
+ *
+ * - Displays a loader when uploads are active and `inactiveOnUpload` is `true`
+ * - Supports custom placeholder content via `dropzonePlaceholder`
+ *
+ * ## Example: Basic usage with custom placeholder
+ * ```tsx
+ * <UploaderDropzone
+ *   inactiveOnUpload
+ *   dropzonePlaceholder={<div>Drop files here or click to upload</div>}
+ * />
+ * ```
+ */
 export const UploaderDropzone = ({ inactiveOnUpload, dropzonePlaceholder }: { inactiveOnUpload?: boolean; dropzonePlaceholder?: ReactNode }) => {
 	const filesInProgress = useUploaderStateFiles({ state: ['uploading', 'initial', 'finalizing'] })
 	const showLoader = inactiveOnUpload && filesInProgress.length > 0

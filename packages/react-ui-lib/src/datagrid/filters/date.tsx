@@ -23,6 +23,10 @@ import { Label } from '@contember/react-ui-lib-base'
 import { XIcon } from 'lucide-react'
 import { DataViewFieldLabel } from '../labels.js'
 
+/**
+ * A predefined date range for use with {@link DataGridDateFilter}.
+ * Each range has a `start` and `end` date in ISO (`YYYY-MM-DD`) format.
+ */
 export type DataGridPredefinedDateRange = { start: string; end: string; label: ReactNode }
 
 /**
@@ -36,14 +40,17 @@ export type DataGridDateFilterProps =
 	}
 
 /**
- * Date filter for DataGrid with default UI.
+ * `DataGridDateFilter` is a date filter component designed for use within a `DataGrid`.
+ * It provides a default UI for selecting date ranges and filtering data accordingly.
  *
- * ## Props {@link DataGridDateFilterProps}
- * field, label, ?ranges, ?name
- *
- * ## Example
+ * ## Example: Basic usage
  * ```tsx
- * <DataGridDateFilter field={'createdAt'} label="Created at" />
+ * <DataGridDateFilter field="createdAt" label="Created at" />
+ * ```
+ *
+ * ## Example: With predefined date ranges
+ * ```tsx
+ * <DataGridDateFilter field="updatedAt" ranges={[createDataGridDateRange('Last 7 days', -7, 0)]} />
  * ```
  */
 export const DataGridDateFilter = Component(({ label, ranges, ...props }: DataGridDateFilterProps) => (
@@ -94,7 +101,21 @@ const DataGridDateFilterList = () => (
 )
 
 /**
- * Utility function to create a predefined date range
+ * Creates a predefined date range object for use in a `DataGrid` filter.
+ *
+ * - Computes start and end dates based on the given day offsets.
+ * - Returns the range in `YYYY-MM-DD` format.
+ *
+ * @param label - The displayed label for the predefined range.
+ * @param dayDeltaStart - The number of days from today for the start date (negative for past dates).
+ * @param dayDeltaEnd - The number of days from today for the end date.
+ * @returns A `DataGridPredefinedDateRange` object with formatted start and end dates.
+ *
+ * ## Example: Last 7 days
+ * ```tsx
+ * const lastWeek = createDataGridDateRange('Last 7 days', -7, 0)
+ * // { label: 'Last 7 days', start: '2025-01-01', end: '2025-01-07' }
+ * ```
  */
 export const createDataGridDateRange = (label: ReactNode, dayDeltaStart: number, dayDeltaEnd: number): DataGridPredefinedDateRange => {
 	const start = new Date(new Date().setDate(new Date().getDate() + dayDeltaStart))

@@ -14,12 +14,13 @@ export interface DataGridTilesProps {
 }
 
 /**
- * Simple grid layout for DataView.
+ * `DataGridTiles` provides a simple grid layout for `DataView`, enabling a tile-based display.
+ * It must be used within a `DataView` context.
  *
- * ## Example
+ * ## Example: Basic usage
  * ```tsx
  * <DataGridTiles>
- *     <MyCustomTile />
+ *   <MyCustomTile />
  * </DataGridTiles>
  * ```
  */

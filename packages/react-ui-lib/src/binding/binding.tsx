@@ -5,6 +5,21 @@ import { NavigationGuardDialog } from './navigation-guard-dialog.js'
 import { usePersistErrorHandler } from './hooks.js'
 import { ErrorBoundary } from '../errors/error-boundary.js'
 
+/**
+ * `Binding` component - Core data management wrapper for Contember applications
+ *
+ * ## Subcomponents
+ * - {@link NavigationGuardDialog}: Prevents accidental navigation with unsaved changes
+ *
+ * ## Example
+ * ```tsx
+ * <Binding>
+ *   <EntitySubTree entity="Project(id: $id)">
+ *     <ArticleForm />
+ *   </EntitySubTree>
+ * </Binding>
+ * ```
+ */
 export const Binding = ({ children }: {
 	children: ReactNode
 }) => {

@@ -49,13 +49,17 @@ const BlockRepeaterContentWrapperUI = uic('div', {
 	baseClass: 'flex flex-col gap-2',
 })
 
+/**
+ * Props for {@link DefaultBlockRepeater} component.
+ */
 export type DefaultBlockRepeaterProps = BlockRepeaterProps
 
 const [BlockRepeaterEditModeContext, useBlockRepeaterEditMode] = createRequiredContext<boolean>('BlockRepeaterEditMode')
 
 /**
- *  The `DefaultBlockRepeater` component is a versatile and customizable block repeater shipped with a UI.
- *  It allows for the creation and management of repeatable content blocks within a form.
+ * `DefaultBlockRepeater` component is a versatile and customizable block repeater shipped with a UI.
+ * It allows for the creation and management of repeatable content blocks within a form.
+ *
  * Supports two modes of operation:
  *   - **Inline Edit Mode**: By providing only `children`, the blocks can be edited inline.
  *   - **Dual-Mode**: By providing both `form` and `children`, the component supports a dual-mode where blocks can be edited in a separate form view.

@@ -22,11 +22,80 @@ import { Transforms } from 'slate'
 export type BlockEditorFieldProps =
 	& BlockEditorProps
 	& {
+		/** Field for storing related entities */
 		referencesField: SugaredRelativeEntityList['field']
+		/** Field for entity type discrimination */
 		referenceDiscriminationField: SugaredRelativeSingleField['field']
+		/** Editor placeholder text */
 		placeholder?: string
 	}
 
+/**
+ * BlockEditorField component - Rich text editor with drag-and-drop block management
+ *
+ * ## Purpose
+ * Provides a structured content editing experience with sortable blocks and reference management
+ *
+ * ## Features
+ * - Drag-and-drop block reordering
+ * - Reference entity integration
+ * - Slate.js editor core
+ * - Plugin system extensibility
+ * - Collision detection and measuring strategies
+ *
+ * ## Example: Basic usage
+ * ```tsx
+ * <BlockEditorField
+ *   field="data"
+ *   referencesField="references"
+ *   referenceDiscriminationField="type"
+ * >
+ *   <EditorBlockToolbar>
+ *     <EditorReferenceTrigger referenceType="image">
+ *       <BlockButton><ImageIcon /> Image</BlockButton>
+ *     </EditorReferenceTrigger>
+ *   </EditorBlockToolbar>
+ *
+ *   <EditorBlock name="image" label="Image">
+ *     <ImageField baseField="image" urlField="url" />
+ *   </EditorBlock>
+ * </BlockEditorField>
+ * ```
+ *
+ * ## Example with custom plugins and toolbars (inline and block)
+ * ```tsx
+ * <BlockEditorField
+ *   field="data"
+ *   referencesField="references"
+ *   referenceDiscriminationField="type"
+ *   plugins={[
+ *     editor => {
+ *       editor.registerElement({
+ *         type: 'link',
+ *         isInline: true,
+ *         render: LinkElement,
+ *       })
+ *     },
+ *   ]}
+ * >
+ *   <EditorBlockToolbar>
+ *     <EditorReferenceTrigger referenceType="image">
+ *       <BlockButton>
+ *         <ImageIcon /> Image
+ *       </BlockButton>
+ *     </EditorReferenceTrigger>
+ *   </EditorBlockToolbar>
+ *
+ *   <EditorBlock name="quote" label="Quote">
+ *     <EditorBlockContent />
+ *   </EditorBlock>
+ *
+ *   <EditorBlock name="image" label="Image">
+ *     <ImageField baseField="image" urlField="url" />
+ *   </EditorBlock>
+ * </BlockEditorField>
+ * ```
+ */
 export const BlockEditorField = Component<BlockEditorFieldProps>(({ placeholder, children, ...props }) => {
 	return (
 		<BlockEditor

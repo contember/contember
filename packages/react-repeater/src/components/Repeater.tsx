@@ -34,6 +34,9 @@ export type RepeaterQualifiedProps =
 		sortableBy?: SugaredRelativeSingleField['field']
 	}
 
+/**
+ * Props for {@link Repeater}
+ */
 export type RepeaterProps =
 	| RepeaterQualifiedProps
 	| RepeaterRelativeProps

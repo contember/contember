@@ -17,12 +17,14 @@ export interface DataViewTableProps {
 }
 
 /**
- * Table layout for DataView.
+ * `DataGridTable` provides a table layout for `DataView`, allowing structured data representation.
+ * It must be used within a `DataView` context to function correctly.
  *
- * ## Example
+ * ## Example: Basic usage
  * ```tsx
  * <DataGridTable>
- *     <DataGridTextColumn header="Title" field="title" />
+ *   <DataGridTextColumn header="Title" field="title" />
+ *   <DataGridTextColumn header="Author" field="author" />
  * </DataGridTable>
  * ```
  */

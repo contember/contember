@@ -21,9 +21,10 @@ interface DataGridPaginationProps {
 }
 
 /**
- * Pagination controls UI for DataView.
+ * `DataGridPagination` provides pagination controls for navigating through pages in a `DataView`.
+ * It includes buttons for navigating to the first, previous, next, and last pages.
  *
- * ## Example
+ * ## Example: Basic Usage
  * ```tsx
  * <DataGridPagination />
  * ```
@@ -102,6 +103,15 @@ export const DataGridPagination: FC<DataGridPaginationProps> = ({ sticky }) => (
 	</PaginationWrapper>
 )
 
+/**
+ * `DataGridPerPageSelector` allows users to set the number of items displayed per page
+ * in a `DataView`. It provides a dropdown menu with preset options.
+ *
+ * ## Example: Basic Usage
+ * ```tsx
+ * <DataGridPerPageSelector />
+ * ```
+ */
 export const DataGridPerPageSelector = () => (
 	<div>
 		<p className="text-gray-400 text-xs font-semibold mb-1">{dict.datagrid.paginationRowsPerPage}</p>

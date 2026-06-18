@@ -22,8 +22,21 @@ export class CreateIndexModificationHandler implements ModificationHandler<Creat
 		})
 
 		const tableNameId = wrapIdentifier(entity.tableName)
-		const opClassSuffix = index.opClass ? ` public.${index.opClass}` : ''
-		const columnNameIds = columns.map(c => wrapIdentifier(c) + opClassSuffix)
+		// Each key column may carry its own operator class (falling back to the global opClass),
+		// sort direction (ASC is the default and omitted) and NULLS placement. Postgres expects
+		// the parts in this order: column [opclass] [ASC|DESC] [NULLS {FIRST|LAST}].
+		// The opclass is emitted verbatim (validated to an identifier shape in ModelValidator). Migrations
+		// run with search_path set to the stage schema, so the value must already carry any needed schema
+		// qualifier: an extension's class as "public.gin_trgm_ops", a built-in one (in pg_catalog) as
+		// plain "text_pattern_ops".
+		const columnNameIds = index.fields.map((field, i) => {
+			const options = index.columnOptions?.[field]
+			const opClass = options?.opClass ?? index.opClass
+			const opClassSuffix = opClass ? ` ${opClass}` : ''
+			const orderSuffix = options?.order === 'desc' ? ' DESC' : ''
+			const nullsSuffix = options?.nulls === 'first' ? ' NULLS FIRST' : options?.nulls === 'last' ? ' NULLS LAST' : ''
+			return wrapIdentifier(columns[i]) + opClassSuffix + orderSuffix + nullsSuffix
+		})
 		const methodClause = index.method ? ` USING ${index.method}` : ''
 
 		const includeClause = index.include?.length
@@ -57,8 +70,18 @@ export class CreateIndexModificationHandler implements ModificationHandler<Creat
 		const methodText = index.method ? ` using ${index.method}` : ''
 		const includeText = index.include?.length ? ` include (${index.include.join(', ')})` : ''
 		const whereText = index.where ? ` where ${index.where}` : ''
+		// columnOptions is part of index identity, so surface it in the description too — otherwise two
+		// indexes on the same columns differing only by sort order / NULLS / opClass render identically.
+		const columnOptionsText = index.columnOptions && Object.keys(index.columnOptions).length > 0
+			? ` options (${
+				Object.entries(index.columnOptions).map(([field, opts]) => {
+					const parts = [opts.order, opts.nulls ? `nulls ${opts.nulls}` : '', opts.opClass ? `opclass ${opts.opClass}` : ''].filter(Boolean)
+					return `${field}: ${parts.join(' ')}`
+				}).join(', ')
+			})`
+			: ''
 		return {
-			message: `Create index(${index.fields.join(', ')})${methodText}${includeText}${whereText} on entity ${this.data.entityName}`,
+			message: `Create index(${index.fields.join(', ')})${methodText}${includeText}${whereText}${columnOptionsText} on entity ${this.data.entityName}`,
 		}
 	}
 }

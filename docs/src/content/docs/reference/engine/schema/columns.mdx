@@ -226,9 +226,9 @@ export class Article {
 ```
 
 Available options for indexes:
-- `fields`: Array of field names to include in the index
+- `fields`: Array of indexed key columns. Each entry is either a field name, or an object `{ field, order?, nulls?, opClass? }` for [per-column options](#per-column-options).
 - `method`: Index method (`"btree"`, `"gin"`, `"gist"`, `"hash"`, `"brin"`, `"spgist"`)
-- `opClass`: Operator class applied to the indexed columns (e.g. `"gin_trgm_ops"` for trigram search). Requires the corresponding PostgreSQL extension to be installed.
+- `opClass`: Operator class applied to **every** key column (e.g. `"public.gin_trgm_ops"` for trigram search). It is written verbatim into the SQL, so an operator class provided by an extension must be **schema-qualified** (e.g. `"public.gin_trgm_ops"`) — see [trigram indexes](#trigram-indexes-for-fuzzy-search). For a different operator class per column, use the object form in `fields`.
 - `where`: Raw SQL predicate that turns the index into a [partial index](#partial-indexes) — only rows matching the predicate are indexed.
 - `include`: Array of additional field names stored in the index as non-key (payload) columns, creating a [covering index](#covering-indexes).
 
@@ -242,6 +242,32 @@ export class Article {
 }
 ```
 :::
+
+#### Per-column options
+
+Instead of a plain field name, an entry in `fields` can be an object that tunes that single key column — its sort direction, NULLS placement, and operator class:
+
+```typescript
+@c.Index({
+	fields: [
+		'category',
+		{ field: 'publishedAt', order: 'desc', nulls: 'last' },
+		{ field: 'title', opClass: 'text_pattern_ops' },
+	],
+})
+export class Article {
+	category = c.stringColumn()
+	publishedAt = c.dateTimeColumn()
+	title = c.stringColumn()
+}
+```
+
+This generates `CREATE INDEX ON "article" ("category", "published_at" DESC NULLS LAST, "title" text_pattern_ops)`.
+
+Per-column options:
+- `order`: `'asc'` (default) or `'desc'` — the sort direction stored in the index. Match it to your query `orderBy` so the database can read the order straight from the index instead of sorting the result. Only supported for `btree` indexes.
+- `nulls`: `'first'` or `'last'` — where NULL values are placed in the ordering. The default follows Postgres (`NULLS LAST` for ascending, `NULLS FIRST` for descending). Only supported for `btree` indexes.
+- `opClass`: operator class for that one column. It takes precedence over the index-level `opClass`, so a multi-column index can use a different operator class per column. Like the index-level option, it is written verbatim into the SQL, so a class provided by an extension must be schema-qualified (e.g. `'public.gin_trgm_ops'`); a built-in class such as `'text_pattern_ops'` needs no qualifier.
 
 #### Partial indexes
 
@@ -280,20 +306,22 @@ This generates `CREATE INDEX ON "article" ("title") INCLUDE ("published_at")`. A
 To make the [`similar` and `wordSimilar` filter operators](/reference/engine/content/queries#fuzzy-text-search-trigram-similarity) perform well, add a GIN index with the `gin_trgm_ops` operator class on the searched column:
 
 ```typescript
-@c.Index({ fields: ['title'], method: 'gin', opClass: 'gin_trgm_ops' })
+@c.Index({ fields: ['title'], method: 'gin', opClass: 'public.gin_trgm_ops' })
 export class Article {
 	title = c.stringColumn()
 }
 ```
 
-This generates `CREATE INDEX ... USING gin ("title" gin_trgm_ops)`.
+This generates `CREATE INDEX ... USING gin ("title" public.gin_trgm_ops)`.
 
-:::caution[Requires the `pg_trgm` extension]
-The `gin_trgm_ops` operator class is provided by the PostgreSQL `pg_trgm` extension. It must be enabled in your database before the migration that creates the index runs, otherwise the migration fails with `operator class "gin_trgm_ops" does not exist`. Enable it once per database with:
+:::caution[Requires the `pg_trgm` extension — and a schema-qualified `opClass`]
+The `gin_trgm_ops` operator class is provided by the PostgreSQL `pg_trgm` extension. It must be enabled in your database before the migration that creates the index runs, otherwise the migration fails with `operator class "public.gin_trgm_ops" does not exist`. Enable it once per database with:
 
 ```sql
 CREATE EXTENSION IF NOT EXISTS pg_trgm;
 ```
+
+Qualify the operator class with the schema the extension lives in (`public.gin_trgm_ops`). Migrations run with `search_path` set to the stage schema only, so an unqualified extension operator class would not be found — built-in classes (in `pg_catalog`, e.g. `text_pattern_ops`) resolve without a qualifier.
 :::
 
 ### Changing column name

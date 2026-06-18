@@ -119,6 +119,25 @@ test('index DSL with where and include', () => {
 	]))
 })
 
+namespace IndexColumnOptionsModel {
+	@c.Index({ fields: ['title', { field: 'rank', order: 'desc', nulls: 'last' }] })
+	@c.Index({ fields: [{ field: 'title', opClass: 'text_pattern_ops' }] })
+	export class Article {
+		title = c.stringColumn()
+		rank = c.intColumn()
+	}
+}
+
+test('index DSL with per-column options normalizes to fields + columnOptions', () => {
+	const schema = createSchema(IndexColumnOptionsModel)
+	const indexes = schema.model.entities.Article.indexes
+	expect(indexes).toHaveLength(2)
+	expect(indexes).toEqual(expect.arrayContaining([
+		{ fields: ['title', 'rank'], columnOptions: { rank: { order: 'desc', nulls: 'last' } } },
+		{ fields: ['title'], columnOptions: { title: { opClass: 'text_pattern_ops' } } },
+	]))
+})
+
 namespace StrictModel {
 	export class Genre {
 		name = c.stringColumn()

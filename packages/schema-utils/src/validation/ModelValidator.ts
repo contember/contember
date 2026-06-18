@@ -4,6 +4,8 @@ import { acceptEveryFieldVisitor, getTargetEntity, isColumn, isInverseRelation, 
 import { collectUnsupportedJsonSchemaKeywords, SUPPORTED_JSON_SCHEMA_KEYWORDS } from '../json-schema/index.js'
 
 const IDENTIFIER_PATTERN = /^[_a-zA-Z][_a-zA-Z0-9]*$/
+// An index operator class is an identifier, optionally schema-qualified (e.g. "public.gin_trgm_ops").
+const INDEX_OPCLASS_PATTERN = /^[_a-zA-Z][_a-zA-Z0-9$]*(\.[_a-zA-Z][_a-zA-Z0-9$]*)?$/
 const RESERVED_WORDS = ['and', 'or', 'not']
 
 export class ModelValidator {
@@ -73,6 +75,39 @@ export class ModelValidator {
 			for (const field of index.include ?? []) {
 				if (index.fields.includes(field)) {
 					errors.add('MODEL_INVALID_INDEX', `Field ${field} cannot be both an index key and an included (covering) column`)
+				}
+			}
+			// Per-column options (order/nulls/opClass) only apply to key columns.
+			for (const field of Object.keys(index.columnOptions ?? {})) {
+				if (!index.fields.includes(field)) {
+					errors.add('MODEL_INVALID_INDEX', `Column options reference field ${field}, which is not a key column of the index`)
+				}
+			}
+			// columnOptions is keyed by field name, so a key column appearing twice cannot carry distinct
+			// per-position options (the duplicate collapses to one entry) — reject the ambiguous shape.
+			const seenFields = new Set<string>()
+			for (const field of index.fields) {
+				if (seenFields.has(field)) {
+					errors.add('MODEL_INVALID_INDEX', `Field ${field} is listed more than once as an index key column`)
+				}
+				seenFields.add(field)
+			}
+			// Sort order and NULLS placement are btree-only; Postgres rejects them on other methods at apply time.
+			if (index.method !== undefined && index.method !== 'btree') {
+				for (const [field, options] of Object.entries(index.columnOptions ?? {})) {
+					if (options.order !== undefined || options.nulls !== undefined) {
+						errors.add('MODEL_INVALID_INDEX', `Column options (order/nulls) on field ${field} are only supported for btree indexes, not "${index.method}"`)
+					}
+				}
+			}
+			// opClass is emitted verbatim into CREATE INDEX, so constrain it to an identifier (optionally
+			// schema-qualified) — both to block SQL injection and to catch typos early with a clear message.
+			for (const opClass of [index.opClass, ...Object.values(index.columnOptions ?? {}).map(it => it.opClass)]) {
+				if (opClass !== undefined && !INDEX_OPCLASS_PATTERN.test(opClass)) {
+					errors.add(
+						'MODEL_INVALID_INDEX',
+						`Invalid index operator class "${opClass}": expected an identifier, optionally schema-qualified (e.g. "public.gin_trgm_ops")`,
+					)
 				}
 			}
 			// `where` is a raw SQL predicate embedded verbatim into CREATE INDEX. We don't parse SQL,

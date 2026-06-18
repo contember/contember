@@ -324,15 +324,28 @@ export namespace Model {
 
 	export type IndexMethod = 'btree' | 'gin' | 'gist' | 'hash' | 'brin' | 'spgist'
 
+	export type IndexColumnOrder = 'asc' | 'desc'
+	export type IndexColumnNulls = 'first' | 'last'
+
+	// per-key-column index options: sort direction, NULLS placement, and operator class
+	export type IndexColumnOptions = {
+		readonly order?: IndexColumnOrder
+		readonly nulls?: IndexColumnNulls
+		readonly opClass?: string
+	}
+
 	export type Index = {
 		readonly fields: readonly string[]
 		readonly name?: string
 		readonly method?: IndexMethod
+		// operator class applied to every key column (global); per-column opClass lives in columnOptions
 		readonly opClass?: string
 		// raw SQL boolean predicate for a PARTIAL index (CREATE INDEX ... WHERE <where>)
 		readonly where?: string
 		// entity field names for a COVERING index (CREATE INDEX ... INCLUDE (<include>))
 		readonly include?: readonly string[]
+		// per-key-column options (ASC/DESC, NULLS FIRST/LAST, operator class), keyed by field name
+		readonly columnOptions?: { readonly [field: string]: IndexColumnOptions }
 	}
 
 	export interface ColumnContext {

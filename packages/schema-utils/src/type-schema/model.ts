@@ -177,6 +177,14 @@ const indexSchemaBase = Typesafe.intersection(
 		opClass: Typesafe.string,
 		where: Typesafe.string,
 		include: Typesafe.array(Typesafe.string),
+		columnOptions: Typesafe.record(
+			Typesafe.string,
+			Typesafe.partial({
+				order: Typesafe.enumeration('asc', 'desc'),
+				nulls: Typesafe.enumeration('first', 'last'),
+				opClass: Typesafe.string,
+			}),
+		),
 	}),
 )
 const indexCheck: Typesafe.Equals<Model.Index, ReturnType<typeof indexSchemaBase>> = true

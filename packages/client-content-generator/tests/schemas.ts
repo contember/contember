@@ -138,6 +138,18 @@ namespace JsonSchemaSchema {
 	}
 }
 
+namespace DanglingDeprecatedRefSchema {
+	@c.Deprecated()
+	export class DeprecatedTarget {
+		name = c.stringColumn()
+	}
+
+	// non-deprecated entity holding a non-deprecated relation that points to a deprecated (excluded) entity
+	export class Active {
+		target = c.manyHasOne(DeprecatedTarget)
+	}
+}
+
 export const schemas = {
 	scalarsSchema: createSchema(ManyScalarsSchema),
 	enumSchema: createSchema(EnumSchema),
@@ -146,4 +158,5 @@ export const schemas = {
 	manyHasManySchema: createSchema(ManyHasManySchema),
 	reducedHasManySchema: createSchema(ReducedHasManySchema),
 	jsonSchemaSchema: createSchema(JsonSchemaSchema),
+	danglingDeprecatedRefSchema: createSchema(DanglingDeprecatedRefSchema),
 }

@@ -5,7 +5,7 @@ import { useCallback } from 'react'
 
 const identityFragment = TenantApi
 	.identity$$
-	.person(TenantApi.person$.id.email.name.otpEnabled)
+	.person(TenantApi.person$.id.email.name.otpEnabled.emailOtpEnabled)
 	.projects(
 		TenantApi
 			.identityProjectRelation$

@@ -14,7 +14,7 @@ import {
 	UpdateProjectMemberFormErrorCode,
 	VerifyEmailFormErrorCode,
 } from '@contember/react-identity'
-import { ActivatePasswordlessOtpErrorCode } from '@contember/graphql-client-tenant'
+import { ActivatePasswordlessOtpErrorCode, DisconnectIDPErrorCode } from '@contember/graphql-client-tenant'
 
 export const dict = {
 	inviteErrors: {
@@ -386,6 +386,26 @@ export const dict = {
 				'VARIABLE_NOT_FOUND': 'Variable not found',
 				'NOT_MEMBER': 'Not a member',
 			} satisfies Record<UpdateProjectMemberFormErrorCode, string>,
+		},
+		identityProviderConnections: {
+			provider: 'Provider',
+			account: 'External account',
+			connectedAt: 'Connected',
+			status: 'Status',
+			disabled: 'Disabled',
+			action: 'Action',
+			disconnect: 'Disconnect',
+			disconnectConfirmation: 'Are you sure you want to disconnect this identity provider?',
+			disconnected: 'Identity provider disconnected',
+			cancel: 'Cancel',
+			noResults: 'No connected identity providers',
+			failedToLoadData: 'Failed to load data',
+			errorMessages: {
+				'NOT_FOUND': 'This identity provider connection no longer exists',
+				'NOT_A_PERSON': 'Only a signed-in person can disconnect identity providers',
+				'LAST_AUTH_METHOD': 'You cannot disconnect your last remaining sign-in method',
+				'UNKNOWN_ERROR': 'Something went wrong. Please try again later',
+			} satisfies Record<DisconnectIDPErrorCode | 'UNKNOWN_ERROR', string>,
 		},
 	},
 }

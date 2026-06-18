@@ -121,6 +121,22 @@ namespace SchemaWithOpClassPrecedenceIndex {
 	}
 }
 
+namespace SchemaWithPlainAndGinIndex {
+	@def.Index('title')
+	@def.Index({ fields: ['title'], method: 'gin' })
+	export class Article {
+		title = def.stringColumn()
+	}
+}
+
+namespace SchemaWithPlainAndOpClassIndex {
+	@def.Index('title')
+	@def.Index({ fields: ['title'], opClass: 'text_pattern_ops' })
+	export class Article {
+		title = def.stringColumn()
+	}
+}
+
 namespace SchemaWithIndex {
 	@def.Index('title')
 	export class Article {
@@ -217,6 +233,9 @@ describe('change index method from btree to gin', () =>
 				modification: 'removeIndex',
 				entityName: 'Article',
 				fields: ['title'],
+				// method is identity-bearing, so the removeIndex carries it — otherwise its schema-level
+				// identity could not tell a btree index from a gin one on the same column.
+				method: 'btree',
 			},
 			{
 				modification: 'createIndex',
@@ -483,6 +502,42 @@ describe('remove one of two indexes on the same column differing only by sort or
 					entityName: 'Article',
 					fields: ['title'],
 					columnOptions: { title: { order: 'desc' } },
+				},
+			],
+		)
+	}))
+
+// Schema-level identity is method-aware: two indexes on the same column differing only by method
+// (btree vs gin) must not be conflated — removing the gin one must leave the plain btree one intact.
+describe('remove one of two indexes on the same column differing only by method', () =>
+	it('keeps the sibling index', () => {
+		testApplyDiff(
+			createSchema(SchemaWithPlainAndGinIndex),
+			createSchema(SchemaWithIndex),
+			[
+				{
+					modification: 'removeIndex',
+					entityName: 'Article',
+					fields: ['title'],
+					method: 'gin',
+				},
+			],
+		)
+	}))
+
+// Schema-level identity is also index-level-opClass-aware: removing the operator-class index must
+// leave the plain sibling on the same column intact.
+describe('remove one of two indexes on the same column differing only by index-level opClass', () =>
+	it('keeps the sibling index', () => {
+		testApplyDiff(
+			createSchema(SchemaWithPlainAndOpClassIndex),
+			createSchema(SchemaWithIndex),
+			[
+				{
+					modification: 'removeIndex',
+					entityName: 'Article',
+					fields: ['title'],
+					opClass: 'text_pattern_ops',
 				},
 			],
 		)

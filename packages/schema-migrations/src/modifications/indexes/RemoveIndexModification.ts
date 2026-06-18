@@ -6,12 +6,14 @@ import deepEqual from 'fast-deep-equal'
 import { getIndexColumns } from './utils.js'
 import { wrapIdentifier } from '../../utils/dbHelpers.js'
 
-type IndexIdentity = Pick<Model.Index, 'fields' | 'where' | 'include' | 'columnOptions'>
+type IndexIdentity = Pick<Model.Index, 'fields' | 'where' | 'include' | 'columnOptions' | 'method' | 'opClass'>
 const indexIdentityEquals = (a: IndexIdentity, b: IndexIdentity) =>
 	deepEqual(a.fields, b.fields)
 	&& (a.where ?? undefined) === (b.where ?? undefined)
 	&& deepEqual(a.include ?? undefined, b.include ?? undefined)
 	&& deepEqual(a.columnOptions ?? undefined, b.columnOptions ?? undefined)
+	&& (a.method ?? undefined) === (b.method ?? undefined)
+	&& (a.opClass ?? undefined) === (b.opClass ?? undefined)
 
 export class RemoveIndexModificationHandler implements ModificationHandler<RemoveIndexModificationData> {
 	constructor(private readonly data: RemoveIndexModificationData, private readonly schema: Schema) {}
@@ -26,12 +28,13 @@ export class RemoveIndexModificationHandler implements ModificationHandler<Remov
 		// The DB-metadata layer (DatabaseMetadataResolver) exposes only table + columns (as an unordered
 		// set) + uniqueness, so the physical DROP is matched by table + columns. Postgres' pg_index.indkey
 		// includes the INCLUDE columns alongside the key columns, so a covering index's metadata lists both —
-		// we match the same combined set here. Everything that distinguishes two indexes on the same column
-		// set — the partial WHERE predicate, per-column options (sort order / NULLS / operator class), and
-		// even key-column ORDER (the set comparison is order-insensitive) — is invisible to the metadata,
-		// so such siblings are indistinguishable here. We detect that ambiguity below and fail loudly rather
-		// than DROP a sibling the schema still expects to keep. Schema-level identity (see getSchemaUpdater)
-		// IS fully aware of these discriminators, so the diff itself never conflates them.
+		// we match the same combined set here. Everything else that distinguishes two indexes on the same
+		// column set — the partial WHERE predicate, per-column options (sort order / NULLS / operator class),
+		// key-column ORDER (the set comparison is order-insensitive), the index method, and the index-level
+		// operator class — is invisible to the metadata, so such siblings are indistinguishable here. We
+		// detect that ambiguity below and fail loudly rather than DROP a sibling the schema still expects to
+		// keep. Schema-level identity (see getSchemaUpdater) IS fully aware of these discriminators, so the
+		// diff itself never conflates them.
 		const columns = [
 			...getIndexColumns({ entity, fields: index.fields, model: this.schema.model }),
 			...(index.include ? getIndexColumns({ entity, fields: index.include, model: this.schema.model }) : []),
@@ -40,14 +43,14 @@ export class RemoveIndexModificationHandler implements ModificationHandler<Remov
 		const indexNames = databaseMetadata.indexes.filter({ tableName: entity.tableName, columnNames: columns, unique: false }).getNames()
 
 		// If more than one physical index matches these columns we cannot tell which one this modification
-		// targets (the metadata hides the predicate / per-column options / column order that distinguish
-		// them). Dropping every match would silently take out an index the schema still expects — refuse
-		// instead, so the obsolete one can be dropped by hand.
+		// targets (the metadata hides the predicate / per-column options / column order / index method /
+		// index-level operator class that distinguish them). Dropping every match would silently take out an
+		// index the schema still expects — refuse instead, so the obsolete one can be dropped by hand.
 		if (indexNames.length > 1) {
 			throw new Error(
 				`Cannot unambiguously drop index on entity ${this.data.entityName} (${index.fields.join(', ')}): `
 					+ `${indexNames.length} indexes match these columns and the database metadata does not expose the predicate (where), `
-					+ `per-column options (sort order / NULLS / operator class) or column order that distinguish them. `
+					+ `per-column options (sort order / NULLS / operator class), column order, index method or index-level operator class that distinguish them. `
 					+ `Drop the obsolete index manually.`,
 			)
 		}
@@ -84,12 +87,26 @@ export class RemoveIndexModificationHandler implements ModificationHandler<Remov
 			if (!index) {
 				throw new Error(`Index named "${this.data.indexName}" not found on entity ${entityName}`)
 			}
-			return { fields: index.fields, where: index.where, include: index.include, columnOptions: index.columnOptions }
+			return {
+				fields: index.fields,
+				where: index.where,
+				include: index.include,
+				columnOptions: index.columnOptions,
+				method: index.method,
+				opClass: index.opClass,
+			}
 		}
 		if (!this.data.fields) {
 			throw new Error(`removeIndex modification on entity ${entityName} requires either "indexName" or "fields"`)
 		}
-		return { fields: this.data.fields, where: this.data.where, include: this.data.include, columnOptions: this.data.columnOptions }
+		return {
+			fields: this.data.fields,
+			where: this.data.where,
+			include: this.data.include,
+			columnOptions: this.data.columnOptions,
+			method: this.data.method,
+			opClass: this.data.opClass,
+		}
 	}
 }
 
@@ -106,6 +123,8 @@ export type RemoveIndexModificationData =
 		where?: never
 		include?: never
 		columnOptions?: never
+		method?: never
+		opClass?: never
 	}
 	| {
 		entityName: string
@@ -113,6 +132,8 @@ export type RemoveIndexModificationData =
 		where?: string
 		include?: readonly string[]
 		columnOptions?: { readonly [field: string]: Model.IndexColumnOptions }
+		method?: Model.IndexMethod
+		opClass?: string
 		indexName?: never
 	}
 
@@ -133,12 +154,15 @@ export class RemoveIndexDiffer implements Differ {
 					removeIndexModification.createModification({
 						entityName: entity.name,
 						fields: index.fields,
-						// keep WHERE/INCLUDE/columnOptions in the modification so indexes that share the same
-						// key columns but differ by predicate or per-column options are removed individually;
-						// omit the keys when absent to keep legacy migration JSON byte-for-byte identical.
+						// keep every identity-bearing option (WHERE/INCLUDE/columnOptions/method/opClass) in the
+						// modification so indexes that share the same key columns but differ by any of them are
+						// removed individually; omit the keys when absent to keep legacy migration JSON
+						// byte-for-byte identical.
 						...(index.where !== undefined ? { where: index.where } : {}),
 						...(index.include !== undefined ? { include: index.include } : {}),
 						...(index.columnOptions !== undefined ? { columnOptions: index.columnOptions } : {}),
+						...(index.method !== undefined ? { method: index.method } : {}),
+						...(index.opClass !== undefined ? { opClass: index.opClass } : {}),
 					})
 				)
 		)

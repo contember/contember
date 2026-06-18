@@ -5,6 +5,18 @@ import { usePersistFeedbackHandlers } from './hooks.js'
 import { Button } from '@contember/react-ui-lib-base'
 import { SaveIcon } from 'lucide-react'
 
+/**
+ * `NavigationGuardDialog` component prompts users with a confirmation dialog when attempting to navigate away
+ * from a page with unsaved changes.
+ *
+ * This component integrates with {@link useBlockNavigationOnDirtyState} to prevent accidental data loss.
+ * The user can choose to save, discard, or cancel the navigation attempt.
+ *
+ * ## Example: Basic Usage
+ * ```tsx
+ * <NavigationGuardDialog />
+ * ```
+ */
 export const NavigationGuardDialog = () => {
 	const [resolver, setResolver] = useState<((value: BlockNavigationOnDirtyStateResult) => void) | null>(null)
 

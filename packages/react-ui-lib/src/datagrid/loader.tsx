@@ -11,10 +11,10 @@ export interface DataGridLoaderProps {
 }
 
 /**
- * A component that provides a loading state for a data grid.
- * It displays different loaders based on the current loading state.
+ * `DataGridLoader` manages the loading state for a data grid, displaying appropriate loaders
+ * based on the current state (refreshing, initial load, or failure).
  *
- * ## Example
+ * ## Example: Basic Usage
  * ```tsx
  * <DataGridLoader>
  *     <DataGridTable>

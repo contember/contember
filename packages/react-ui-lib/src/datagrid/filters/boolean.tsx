@@ -13,22 +13,22 @@ import { DataViewFieldLabel } from '../labels.js'
 
 /**
  * Props for {@link DataGridBooleanFilter}.
+ *
+ * Extends {@link DataViewBooleanFilterProps}, excluding the `children` prop.
  */
 export type DataGridBooleanFilterProps =
 	& Omit<DataViewBooleanFilterProps, 'children'>
 	& {
+		/** Label for the filter UI */
 		label: ReactNode
 	}
 
 /**
- * Boolean filter for DataGrid with default UI.
- *
- * ## Props {@link DataGridBooleanFilterProps}
- * field, label, ?name
+ * `DataGridBooleanFilter` provides a boolean filter for `DataGrid` with a default UI.
  *
  * ## Example
  * ```tsx
- * <DataGridBooleanFilter field={'locked'} label="Locked" />
+ * <DataGridBooleanFilter field="locked" label="Locked" />
  * ```
  */
 export const DataGridBooleanFilter = Component(({ label, ...props }: DataGridBooleanFilterProps) => (

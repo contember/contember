@@ -33,14 +33,15 @@ import { DataViewFieldLabel, DataViewHasManyLabel, DataViewHasOneLabel } from '.
 import { DataGridColumnLeaf } from './column-leaf.js'
 
 /**
- * Renders a column with action buttons. Should be used in a {@link DataGridTable}.
+ * `DataGridActionColumn` renders a column with action buttons in a `DataGridTable`.
+ * It is typically used to provide interactive controls such as edit, delete, or custom actions.
  *
- * ## Example
+ * ## Example: Basic usage with a button
  * ```tsx
  * <DataGridTable>
- *     <DataGridActionColumn>
- *         <Button>Click me</Button>
- *     </DataGridActionColumn>
+ *   <DataGridActionColumn>
+ *     <Button variant="outline">Click me</Button>
+ *   </DataGridActionColumn>
  * </DataGridTable>
  * ```
  */
@@ -84,10 +85,18 @@ export type DataGridTextColumnProps = {
 /**
  * Renders a column with text content and column controls in a header. Should be used in a {@link DataGridTable}.
  *
- * ## Example
+ * ## Example: Basic Usage
  * ```tsx
  * <DataGridTable>
  *     <DataGridTextColumn field="title" />
+ *     <DataGridTextColumn
+ *         field="subtitle"
+ *         format={it => (
+ *             <span className="text-blue-500 flex items-center gap-2">
+ *                 {it}
+ *             </span>
+ *         )}
+ *     />
  *     <DataGridTextColumn field="description" format={it => it.slice(0, 100)} />
  * </DataGridTable>
  * ```
@@ -140,6 +149,8 @@ export type DataGridBooleanColumnProps = {
  * ```tsx
  * <DataGridTable>
  *     <DataGridBooleanColumn field="isPublished" />
+ *     <DataGridBooleanColumn field="isActive" format={it => it ? 'Hooray' : 'Oh noooo!'} />
+ *     <DataGridBooleanColumn field="hasImage" format={it => it ? <CheckIcon /> : <XIcon />} />
  * </DataGridTable>
  * ```
  */
@@ -193,6 +204,9 @@ export type DataGridNumberColumnProps = {
  * ```tsx
  * <DataGridTable>
  *     <DataGridNumberColumn field="price" format={it => it.toFixed(2)} />
+ *     <DataGridNumberColumn field="price" header="Price with currency">
+ *         <Field field="price" /> <Field field="currency" />
+ *     </DataGridNumberColumn>
  * </DataGridTable>
  * ```
  */

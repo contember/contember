@@ -4,6 +4,15 @@ import { CreateSessionTokenForm, useCreateSessionTokenForm } from '@contember/re
 import { Loader } from '@contember/react-ui-lib-base'
 import { TenantFormError, TenantFormField } from '@contember/react-ui-lib-tenant'
 
+/**
+ * `LoginWithEmail` component handles user authentication using email.
+ * It integrates with session token management to facilitate authentication.
+ *
+ * ## Example: Basic Usage
+ * ```tsx
+ * <LoginWithEmail />
+ * ```
+ */
 export const LoginWithEmail = () => {
 	const sessionToken = useSessionTokenWithMeta()
 	const setSessionToken = useSetSessionToken()

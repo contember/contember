@@ -5,6 +5,15 @@ import { TenantFormError, TenantFormLabel } from './common.js'
 import { MembershipsControl, RolesConfig, useIntrospectionRolesConfig } from './memberships-control.js'
 import { dict } from '../dict.js'
 
+/**
+ * `UpdateProjectMemberFormFields` is a component for managing and updating a project member's roles and memberships.
+ * It integrates with the `useUpdateProjectMemberForm` hook and supports role introspection.
+ *
+ * ## Example
+ * ```tsx
+ * <UpdateProjectMemberFormFields projectSlug="my-project" />
+ * ```
+ */
 export const UpdateProjectMemberFormFields = ({ projectSlug, roles }: { projectSlug: string; roles?: RolesConfig }) => {
 	const form = useUpdateProjectMemberForm()
 	const rolesResolved = roles ?? useIntrospectionRolesConfig(projectSlug)

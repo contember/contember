@@ -34,19 +34,31 @@ import { DataViewFieldLabel } from '../labels.js'
 export type DataGridEnumFilterProps =
 	& Omit<DataViewEnumFilterProps, 'children'>
 	& {
+		/**
+		 * Options for the filter.
+		 */
 		options?: Record<string, ReactNode>
+		/**
+		 * Label for the filter.
+		 */
 		label?: ReactNode
 	}
 
 /**
- * Enum filter for DataGrid with default UI.
+ * `DataGridEnumFilter` is an enum-based filter component for `DataGrid` with a default UI.
+ * It allows filtering records based on predefined enum values.
  *
- * ## Props {@link DataGridEnumFilterProps}
- * field, label, ?name, ?options
- *
- * ## Example
+ * ## Example: Basic usage
  * ```tsx
- * <DataGridEnumFilter field={'status'} />
+ * <DataGridEnumFilter field="status" />
+ * ```
+ *
+ * ## Example: With custom enum options
+ * ```tsx
+ * <DataGridEnumFilter
+ *   field="status"
+ *   options={{ active: 'Active', inactive: 'Inactive' }}
+ * />
  * ```
  */
 export const DataGridEnumFilter = Component(({ options, label, ...props }: DataGridEnumFilterProps) => (
@@ -66,19 +78,36 @@ export const DataGridEnumFilter = Component(({ options, label, ...props }: DataG
 export type DataGridEnumListFilterProps =
 	& Omit<DataViewEnumFilterProps, 'children'>
 	& {
+		/**
+		 * Options for the filter.
+		 */
 		options?: Record<string, ReactNode>
+		/**
+		 * Label for the filter.
+		 */
 		label?: ReactNode
 	}
 
 /**
- * Enum list filter for DataGrid with default UI.
+ * `DataGridEnumListFilter` is a multi-select enum filter component for `DataGrid` with a default UI.
+ * It allows filtering records by selecting multiple predefined enum values.
  *
- * ## Props {@link DataGridEnumListFilterProps}
- * field, label, ?name, ?options
+ * - Wraps `DataViewEnumListFilter` to handle multi-selection filtering.
+ * - Uses `DataGridSingleFilterUI` for a structured filter layout.
+ * - Supports custom labels or defaults to the field's label.
+ * - Accepts an `options` prop to define available enum values.
  *
- * ## Example
+ * ## Example: Basic usage
  * ```tsx
- * <DataGridEnumFilter field={'status'} />
+ * <DataGridEnumListFilter field="status" />
+ * ```
+ *
+ * ## Example: With custom enum options
+ * ```tsx
+ * <DataGridEnumListFilter
+ *   field="status"
+ *   options={{ active: 'Active', inactive: 'Inactive', pending: 'Pending' }}
+ * />
  * ```
  */
 export const DataGridEnumListFilter = Component(({ options, label, ...props }: DataGridEnumListFilterProps) => (
@@ -97,11 +126,16 @@ export const DataGridEnumListFilter = Component(({ options, label, ...props }: D
  */
 export type DataGridEnumFieldTooltipProps = Omit<DataViewEnumFilterProps, 'children'>
 /**
- * Component for rendering a value with a tooltip that allows to include/exclude the value from the filter.
- * Used in {@link DataGridEnumColumn} but can be used in custom columns as well.
+ * `DataGridEnumFieldTooltip` renders a value with a tooltip that allows users to include or exclude
+ * the value from the filter. It is primarily used in {@link DataGridEnumColumn}, but can be
+ * utilized in custom columns as well.
  *
- * ## Props {@link DataGridEnumFieldTooltipProps}
- * field, label, ?name, ?options
+ * ## Example: Basic usage inside a custom column
+ * ```tsx
+ * <DataGridEnumFieldTooltip field="status" value="active">
+ *   <span>Active</span>
+ * </DataGridEnumFieldTooltip>
+ * ```
  */
 export const DataGridEnumFieldTooltip = (
 	{ children, actions, value, ...props }: DataGridEnumFieldTooltipProps & { children: ReactNode; value: string; actions?: ReactNode },

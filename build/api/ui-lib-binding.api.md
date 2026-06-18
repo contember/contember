@@ -15,7 +15,9 @@ import { ReactNode } from 'react';
 import { RoutingLinkTarget } from '@contember/interface';
 import { SuccessfulPersistResult } from '@contember/interface';
 
-// @public (undocumented)
+// Warning: (ae-unresolved-link) The @link reference could not be resolved: The package "@contember/react-ui-lib" does not have an export "NavigationGuardDialog"
+//
+// @public
 export const Binding: (input: {
     children: ReactNode;
 }) => JSX.Element;
@@ -28,42 +30,41 @@ export interface BindingStateRendererProps {
     children?: ReactNode;
 }
 
-// @public (undocumented)
+// @public
 export const DeleteEntityDialog: FC<DeleteEntityDialogProps>;
 
-// @public (undocumented)
+// @public
 export type DeleteEntityDialogProps = {
     trigger: ReactElement;
     immediatePersist?: boolean;
     onSuccessRedirectTo?: RoutingLinkTarget;
 };
 
-// @public (undocumented)
+// @public
 export const IdentityLoader: (input: {
     children: React.ReactNode;
 }) => JSX.Element;
 
-// @public (undocumented)
+// @public
 export const PersistButton: (input: PersistButtonProps) => JSX.Element;
 
-// @public (undocumented)
+// @public
 export interface PersistButtonProps extends ComponentProps<typeof Button> {
-    // (undocumented)
     label?: ReactNode;
 }
 
-// @public (undocumented)
+// @public
 export const usePersistErrorHandler: () => (result: ErrorPersistResult) => void;
 
-// @public (undocumented)
+// @public
 export const usePersistFeedbackHandlers: () => {
     onPersistSuccess: (result: SuccessfulPersistResult) => void;
 };
 
-// @public (undocumented)
+// @public
 export const usePersistSuccessHandler: () => (result: SuccessfulPersistResult) => void;
 
-// @public (undocumented)
+// @public
 export const usePersistWithFeedback: () => () => Promise<void | null>;
 
 // (No @packageDocumentation comment for this package)

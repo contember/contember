@@ -22,15 +22,52 @@ import {
 } from './ui.js'
 
 export type MultiSelectInputProps = {
+	/** Specifies the field to bind the selection to. */
 	field: SugaredRelativeEntityList['field']
+	/** An array of entities to populate the selection list. */
 	options?: SugaredQualifiedEntityList['entities']
+	/** React nodes for rendering the content of each selected item. */
 	children: ReactNode
+	/** Custom placeholder text when no items are selected. */
 	placeholder?: ReactNode
+	/** Content for creating a new entity. */
 	createNewForm?: ReactNode
+	/** Field used for querying and filtering options. */
 	queryField?: DataViewUnionFilterFields
+	/** Defines the initial sorting order for the options. */
 	initialSorting?: DataViewSortingDirections
 }
 
+/**
+ * MultiSelectInput is a component for selecting multiple values from a list of options,
+ * with support for inline entity creation, filtering, and sorting.
+ *
+ * ## Example: Basic usage with inline entity creation
+ * ```tsx
+ * <MultiSelectInput
+ *   field="tags"
+ *   placeholder="Select tags"
+ *   createNewForm={<div>Form to create a new tag</div>}
+ *   initialSorting="ASC"
+ * >
+ *   <Field field="name" />
+ * </MultiSelectInput>
+ * ```
+ *
+ * ## Sub-components
+ * - {@link SelectInputWrapperUI}
+ * - {@link SelectInputUI}
+ * - {@link SelectDefaultPlaceholderUI}
+ * - {@link MultiSelectItemWrapperUI}
+ * - {@link MultiSelectItemUI}
+ * - {@link MultiSelectItemContentUI}
+ * - {@link SelectItemTrigger}
+ * - {@link MultiSelectItemRemoveButtonUI}
+ * - {@link SelectInputActionsUI}
+ * - {@link SelectPopoverContent}
+ * - {@link Popover}
+ * - {@link PopoverTrigger}
+ */
 export const MultiSelectInput = Component<MultiSelectInputProps>(
 	({ field, queryField, options, children, placeholder, createNewForm, initialSorting }) => {
 		const id = useFormFieldId()

@@ -51,7 +51,7 @@ export const UploadedVideoView: React_2.NamedExoticComponent<UploadedVideoViewPr
 // @public (undocumented)
 export type UploadedVideoViewProps = FileUrlDataExtractorProps & GenericFileMetadataExtractorProps & VideoFileDataExtractorProps & BaseFileViewProps;
 
-// @public (undocumented)
+// @public
 export const UploaderDropzone: (input: {
     inactiveOnUpload?: boolean;
     dropzonePlaceholder?: ReactNode;

@@ -569,7 +569,6 @@ export interface PersistTriggerAttributes {
 // @public (undocumented)
 export interface PersistTriggerProps {
     children: ReactElement;
-    // (undocumented)
     onPersistError?: (result: ErrorPersistResult) => void;
     onPersistSuccess?: (result: SuccessfulPersistResult) => void;
 }

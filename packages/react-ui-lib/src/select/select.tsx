@@ -27,16 +27,54 @@ import { useFormFieldId } from '@contember/react-form'
 import { dict } from '@contember/react-ui-lib-base'
 
 export type SelectInputProps = {
+	/** The field to bind the selection to (`SugaredRelativeSingleEntity['field']`) */
 	field: SugaredRelativeSingleEntity['field']
+	/** React nodes for rendering each value or additional content inside the selection UI. */
 	children: ReactNode
+	/** Defines the entity options to be displayed. */
 	options?: SugaredQualifiedEntityList['entities']
+	/** Custom placeholder content when no value is selected. */
 	placeholder?: ReactNode
+	/** Content for creating a new entity, displayed within a `CreateEntityDialog`. */
 	createNewForm?: ReactNode
+	/** Specifies the field to query for filtering or sorting. */
 	queryField?: DataViewUnionFilterFields
+	/** Defines the initial sorting order of the options. */
 	initialSorting?: DataViewSortingDirections
+	/** Boolean flag to enforce validation for the selection input. */
 	required?: boolean
 }
 
+/**
+ * `SelectInput` is a versatile component for rendering a selectable input field with advanced functionality.
+ * It supports optional entity creation, validation, and sorting within the context of Contember's interface.
+ *
+ * ## Example: Basic usage with entity creation
+ * ```tsx
+ * <SelectInput
+ *   field="category"
+ *   placeholder="Select a category"
+ *   createNewForm={<div>Form for creating a new category</div>}
+ *   required
+ * >
+ *   <Field field="label" />
+ * </SelectInput>
+ * ```
+ *
+ * ## Sub-components
+ * - {@link SelectInputWrapperUI}
+ * - {@link SelectInputUI}
+ * - {@link SelectDefaultPlaceholderUI}
+ * - {@link SelectPlaceholder}
+ * - {@link SelectInputActionsUI}
+ * - {@link SelectListItemUI}
+ * - {@link SelectEachValue}
+ * - {@link SelectItemTrigger}
+ * - {@link SelectPopoverContent}
+ * - {@link DefaultSelectDataView}
+ * - {@link Popover}
+ * - {@link PopoverTrigger}
+ */
 export const SelectInput = Component<SelectInputProps>(
 	({ field, queryField, options, children, placeholder, createNewForm, initialSorting, required }) => {
 		const [open, setOpen] = React.useState(false)

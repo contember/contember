@@ -4,22 +4,16 @@
 
 ```ts
 
-// @public (undocumented)
+// @public
 export const formatImageResizeUrl: (src: string, options?: ImageResizeOptions) => string;
 
 // @public (undocumented)
 export interface ImageResizeOptions {
-    // (undocumented)
     blur?: number;
-    // (undocumented)
     fit?: 'scale-down' | 'contain' | 'cover' | 'crop' | 'pad';
-    // (undocumented)
     format?: 'auto' | 'avif' | 'webp' | 'jpeg' | 'baseline-jpeg' | 'json';
-    // (undocumented)
     height?: number;
-    // (undocumented)
     quality?: number;
-    // (undocumented)
     width?: number;
 }
 

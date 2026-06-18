@@ -7,12 +7,44 @@ import { DropIndicator } from '@contember/react-ui-lib-base'
 import { Portal } from '@radix-ui/react-portal'
 import { DragOverlay } from '@dnd-kit/core'
 
+/**
+ * BlockEditorHandle component - Drag handle for sortable blocks
+ *
+ * ## Example
+ * ```tsx
+ * <BlockEditorHandle />
+ * ```
+ */
 export const BlockEditorHandle = uic('span', {
 	baseClass:
 		'absolute top-1/2 -left-3 h-6 w-6 flex justify-end items-center opacity-10 hover:opacity-100 transition-opacity -translate-y-1/2 cursor-grab',
 	beforeChildren: <GripVerticalIcon size={16} />,
 })
 
+/**
+ * SortableBlock component - Drag-and-drop enabled block container for Slate editor
+ *
+ * ## Purpose
+ * Implements sortable functionality for editor blocks with visual feedback and overlay
+ *
+ * ## Example: Basic usage
+ * ```tsx
+ * <SortableBlock element={slateElement}>
+ *   <BlockContent />
+ * </SortableBlock>
+ * ```
+ *
+ * ## Example: Used within a BlockEditor
+ * ```tsx
+ * <BlockEditor
+ *   plugins={[
+ *     withSortable({
+ *       render: SortableBlock,
+ *     }),
+ *   ]}
+ * />
+ * ```
+ */
 export const SortableBlock = ({ children, element }: { children: ReactNode; element: Element }) => {
 	const sortable = useSortable({
 		id: element.key as string,

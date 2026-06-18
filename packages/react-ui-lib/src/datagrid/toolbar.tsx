@@ -26,18 +26,14 @@ export interface DataGridToolbarProps {
 }
 
 /**
- * Toolbar for DataGrid with default UI.
- * It contains
- * 	- filters (with default DataGridQueryFilter, which can be replaced by custom filters in children)
- * 	- settings (layout switcher, visible elements, per page selector)
- * 	- export button
- * 	- reload button
+ * `DataGridToolbar` provides a toolbar for `DataGrid` with default UI components.
+ * It includes filtering, layout settings, export functionality, and a reload button.
  *
- * ## Example
+ * ## Example: Basic usage with custom filters
  * ```tsx
  * <DataGridToolbar>
- *     <DataGridQueryFilter />
- *     <DataGridTextFilter field={'name'} label="Name" />
+ *   <DataGridQueryFilter />
+ *   <DataGridTextFilter field="name" label="Name" />
  * </DataGridToolbar>
  * ```
  */

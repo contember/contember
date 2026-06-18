@@ -15,12 +15,46 @@ import {
 } from '@contember/react-ui-lib-base'
 import { Button } from '@contember/react-ui-lib-base'
 
+/**
+ * Props for {@link DeleteEntityDialog} component.
+ */
 export type DeleteEntityDialogProps = {
+	/** Element that opens the dialog */
 	trigger: ReactElement
+	/** Controls if deletion happens immediately (default: true) */
 	immediatePersist?: boolean
+	/** Routing target after successful deletion */
 	onSuccessRedirectTo?: RoutingLinkTarget
 }
 
+/**
+ * `DeleteEntityDialog` component - Confirmation dialog for entity deletion
+ *
+ * Provides a user-friendly confirmation flow before deleting entities while handling persistence and redirects
+ *
+ * ## Example: Basic usage
+ * ```tsx
+ * <DeleteEntityDialog
+ *   trigger={<Button>Delete User</Button>}
+ * />
+ * ```
+ *
+ * ## Example: With delayed persistence
+ * ```tsx
+ * <DeleteEntityDialog
+ *   immediatePersist={false}
+ *   trigger={<Button>Mark for Deletion</Button>}
+ * />
+ * ```
+ *
+ * ## Example: With redirect
+ * ```tsx
+ * <DeleteEntityDialog
+ *   onSuccessRedirectTo="users"
+ *   trigger={<Button variant="destructive">Delete</Button>}
+ * />
+ * ```
+ */
 export const DeleteEntityDialog: FC<DeleteEntityDialogProps> = ({ trigger, immediatePersist, onSuccessRedirectTo }) => {
 	const redirect = useRedirect()
 	const handlePersistSuccess = onSuccessRedirectTo ? () => redirect(onSuccessRedirectTo) : undefined

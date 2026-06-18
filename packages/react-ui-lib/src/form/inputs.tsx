@@ -18,6 +18,9 @@ import { Component, Field } from '@contember/interface'
 import { useEnumOptionsFormatter } from '../labels/index.js'
 import { FormFieldLabel } from './labels.js'
 
+/**
+ * Props for the {@link InputField} component.
+ */
 export type InputFieldProps =
 	& Omit<FormInputProps, 'children'>
 	& Omit<FormContainerProps, 'children'>
@@ -26,6 +29,24 @@ export type InputFieldProps =
 		inputProps?: ComponentProps<typeof Input>
 	}
 
+/**
+ * `InputField` is a form input component that integrates with {@link FormFieldScope},
+ * {@link FormContainer}, and {@link FormInput} to provide a structured and configurable input field.
+ *
+ * ## Example: Basic usage
+ * ```tsx
+ * <InputField field="title" label="Article title" />
+ * ```
+ *
+ * ## Example: With additional input properties
+ * ```tsx
+ * <InputField
+ *   field="title"
+ *   label="Article title"
+ *   inputProps={{ placeholder: 'Enter a title' }}
+ * />
+ * ```
+ */
 export const InputField = Component((
 	{ field, label, description, inputProps, isNonbearing, defaultValue, required, parseValue, formatValue }: InputFieldProps,
 ) => (
@@ -38,6 +59,9 @@ export const InputField = Component((
 	</FormFieldScope>
 ))
 
+/**
+ * Props for the {@link TextareaField} component.
+ */
 export type TextareaFieldProps =
 	& Omit<FormInputProps, 'children'>
 	& Omit<FormContainerProps, 'children'>
@@ -46,6 +70,30 @@ export type TextareaFieldProps =
 		inputProps?: ComponentProps<typeof TextareaAutosize>
 	}
 
+/**
+ * `TextareaField` is a form textarea component that integrates with `FormFieldScope`,
+ * `FormContainer`, and `FormInput` to provide a structured and configurable multi-line input field.
+ *
+ * Must be used within a form context.
+ *
+ * ## Features
+ * - Supports field scoping for form state management
+ * - Includes a label and description for accessibility
+ * - Handles required validation
+ * - Supports automatic resizing with `TextareaAutosize`
+ * - Allows custom input properties via `inputProps`
+ *
+ * ## Example: Basic usage
+ * ```tsx
+ * <TextareaField
+ *   field="bio"
+ *   label="Biography"
+ *   description="Tell us about yourself"
+ *   required
+ *   inputProps={{ placeholder: "Write something..." }}
+ * />
+ * ```
+ */
 export const TextareaField = Component(({ field, label, description, inputProps, isNonbearing, defaultValue, required }: TextareaFieldProps) => (
 	<FormFieldScope field={field}>
 		<FormContainer description={description} label={label} required={required}>
@@ -64,6 +112,25 @@ export type CheckboxFieldProps =
 		inputProps?: Omit<React.InputHTMLAttributes<HTMLInputElement>, 'defaultValue'>
 	}
 
+/**
+ * CheckboxField is a component for boolean fields. Must be used within an Entity context.
+ *
+ * ## Requirements
+ * - Must be used within an Entity context (`<EntitySubTree />` or `<EntityListSubTree />`).
+ *
+ * ## Features:
+ * - Renders as a standard checkbox input
+ * - Label appears adjacent to the checkbox
+ * - Required state reflects field nullability (can be overridden)
+ *
+ * ## Example: Basic usage
+ * ```tsx
+ * <CheckboxField
+ *   field="isPublished"
+ *   label="Publish immediately"
+ * />
+ * ```
+ */
 export const CheckboxField = Component(({ field, label, description, inputProps, isNonbearing, defaultValue, required }: CheckboxFieldProps) => (
 	<FormFieldScope field={field}>
 		<FormContainer description={description} label={false}>
@@ -89,6 +156,38 @@ export type RadioEnumFieldProps =
 		inputProps?: Omit<React.InputHTMLAttributes<HTMLInputElement>, 'defaultValue'>
 	}
 
+/**
+ * RadioEnumField is a component for enum fields with radio button selection. Must be used within an Entity context.
+ *
+ * ## Requirements
+ * - Must be used within an Entity context (`<EntitySubTree />` or `<EntityListSubTree />`).
+ *
+ * ## Features
+ * - Can auto-generate options from enum definitions
+ * - Supports horizontal or vertical layout
+ * - Options can be provided explicitly or derived from enum labels
+ *
+ * ## Example: Basic usage
+ * ```tsx
+ * <RadioEnumField
+ *   field="status"
+ *   label="Article Status"
+ *   orientation="horizontal"
+ *   options={[
+ *     { value: 'draft', label: 'Draft' },
+ *     { value: 'published', label: 'Published' }
+ *   ]}
+ * />
+ * ```
+ *
+ * ## Example: Using enum auto-detection
+ * ```tsx
+ * <RadioEnumField
+ *   field="category"
+ *   label="Article Category"
+ * />
+ * ```
+ */
 export const RadioEnumField = Component<RadioEnumFieldProps>(({ field, label, description, required, ...rest }) => {
 	return (
 		<FormFieldScope field={field}>

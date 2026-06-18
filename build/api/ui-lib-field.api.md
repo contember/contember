@@ -22,12 +22,13 @@ export type EnumListFieldProps = {
     fallback?: ReactNode;
 };
 
-// @public (undocumented)
+// Warning: (ae-unresolved-link) The @link reference could not be resolved: The package "@contember/react-ui-lib" does not have an export "FieldView"
+//
+// @public
 export const FormattedField: NamedExoticComponent<FormattedFieldProps>;
 
-// @public (undocumented)
+// @public
 export interface FormattedFieldProps {
-    // (undocumented)
     field: SugaredRelativeSingleField['field'];
 }
 

@@ -10,7 +10,7 @@ import { NamedExoticComponent } from 'react';
 // @public
 export const DefaultBlockRepeater: NamedExoticComponent<BlockRepeaterProps>;
 
-// @public (undocumented)
+// @public
 export type DefaultBlockRepeaterProps = BlockRepeaterProps;
 
 // (No @packageDocumentation comment for this package)

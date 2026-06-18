@@ -16,18 +16,19 @@ import { DataViewFieldLabel } from '../labels.js'
 export type DataGridIsDefinedFilterProps =
 	& Omit<DataViewBooleanFilterProps, 'children'>
 	& {
+		/**
+		 * Label for the filter.
+		 */
 		label: ReactNode
 	}
 
 /**
- * Is defined filter for DataGrid with default UI.
+ * `DataGridIsDefinedFilter` is a filter component for `DataGrid` that checks whether a field is defined or not.
+ * It provides a default UI for filtering records based on the presence of a value.
  *
- * ## Props {@link DataGridIsDefinedFilterProps}
- * field, label, ?name
- *
- * ## Example
+ * ## Example: Basic usage
  * ```tsx
- * <DataGridIsDefinedFilter field={'deletedAt'} label="Is Deleted?" />
+ * <DataGridIsDefinedFilter field="deletedAt" label="Is Deleted?" />
  * ```
  */
 export const DataGridIsDefinedFilter = Component(({ label, ...props }: DataGridIsDefinedFilterProps) => (

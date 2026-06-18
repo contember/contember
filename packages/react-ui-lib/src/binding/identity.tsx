@@ -6,6 +6,19 @@ import { Card, CardContent } from '@contember/react-ui-lib-base'
 import { CircleAlert } from 'lucide-react'
 import { useEffect } from 'react'
 
+/**
+ * `IdentityLoader` component manages the loading state of user identity and renders appropriate UI based on state.
+ *
+ * This component handles different identity states, such as loading, failure, and successful authentication,
+ * ensuring a smooth user experience.
+ *
+ * ## Example: Wrapping an authenticated component
+ * ```tsx
+ * <IdentityLoader>
+ *   <Dashboard />
+ * </IdentityLoader>
+ * ```
+ */
 export const IdentityLoader = ({ children }: {
 	children: React.ReactNode
 }) => {

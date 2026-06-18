@@ -39,6 +39,44 @@ export type ImageFieldProps =
 	& BaseUploadFieldProps
 	& ImageFileTypeProps
 
+/**
+ * ImageField component - Specialized file upload for images
+ *
+ * ## Requirements
+ * - Must be used within an Entity context (`<EntitySubTree />` or `<EntityListSubTree />`).
+ *
+ * ## Features
+ * - Handles image file uploads with preview
+ * - Supports common image formats (from ImageFileTypeProps)
+ * - Integrated drag-and-drop zone
+ * - Auto-generated preview using UploadedImageView
+ * - Optional custom destruction control
+ *
+ * ## Example: Basic usage
+ * ```tsx
+ * <ImageField
+ *   label="Profile Picture"
+ *   urlField="avatar.url"
+ *   dropzonePlaceholder="Drag image here"
+ * />
+ * ```
+ *
+ * ## Example: With baseField and metadata fields
+ * ```tsx
+ * <ImageField
+ *   baseField="image"
+ *   urlField="url"
+ *   widthField="width"
+ *   heightField="height"
+ *   fileNameField="fileName"
+ *   fileSizeField="fileSize"
+ *   fileTypeField="fileType"
+ *   lastModifiedField="lastModified"
+ *   label="Image file"
+ *   description="Some description of the image file."
+ * />
+ * ```
+ */
 export const ImageField = Component<ImageFieldProps>(props => (
 	<UploadFieldInner {...props} fileType={createImageFileType(props)}>
 		{props.children ?? <UploadedImageView {...props} DestroyAction={DisconnectEntityTrigger} />}
@@ -49,6 +87,32 @@ export type AudioFieldProps =
 	& BaseUploadFieldProps
 	& AudioFileTypeProps
 
+/**
+ * `AudioField` is a specialized upload component for handling audio files. It provides built-in file validation, an audio preview, and metadata tracking.
+ *
+ * ## Example: Basic usage
+ * ```tsx
+ * <AudioField
+ *   label="Podcast File"
+ *   urlField="audio.url"
+ * />
+ * ```
+ *
+ * ## Example: With metadata fields
+ * ```tsx
+ * <AudioField
+ *   label="Podcast File"
+ *   baseField="audio"
+ *   urlField="url"
+ *   durationField="duration"
+ *   fileNameField="fileName"
+ *   fileSizeField="fileSize"
+ *   fileTypeField="fileType"
+ *   lastModifiedField="lastModified"
+ *   accept={{ 'audio/*': ['.mp3', '.wav', '.ogg'] }}
+ * />
+ * ```
+ */
 export const AudioField = Component<AudioFieldProps>(props => (
 	<UploadFieldInner {...props} fileType={createAudioFileType(props)}>
 		{props.children ?? <UploadedAudioView {...props} DestroyAction={DisconnectEntityTrigger} />}
@@ -59,6 +123,32 @@ export type VideoFieldProps =
 	& BaseUploadFieldProps
 	& VideoFileTypeProps
 
+/**
+ * `VideoField` is a specialized upload component for handling video files with built-in preview capabilities.
+ *
+ * ## Example: Basic usage
+ * ```tsx
+ * <VideoField
+ *   label="Demo Video"
+ *   urlField="video.url"
+ * />
+ * ```
+ *
+ * ## Example: With metadata fields
+ * ```tsx
+ * <VideoField
+ *   label="Demo Video"
+ *   baseField="video"
+ *   urlField="url"
+ *   durationField="duration"
+ *   fileNameField="fileName"
+ *   fileSizeField="fileSize"
+ *   fileTypeField="fileType"
+ *   lastModifiedField="lastModified"
+ *   accept={{ 'video/*': ['.mp4', '.webm', '.ogg'] }}
+ * />
+ * ```
+ */
 export const VideoField = Component<VideoFieldProps>(props => (
 	<UploadFieldInner {...props} fileType={createVideoFileType(props)}>
 		{props.children ?? <UploadedVideoView {...props} DestroyAction={DisconnectEntityTrigger} />}
@@ -69,6 +159,29 @@ export type FileFieldProps =
 	& BaseUploadFieldProps
 	& AnyFileTypeProps
 
+/**
+ * `FileField` is a generic file upload component that supports any file type.
+ *
+ * ## Example: Basic usage
+ * ```tsx
+ * <FileField label="Document" urlField="file.url" />
+ * ```
+ *
+ * ## Example: With metadata fields and custom dropzone placeholder
+ * ```tsx
+ * <FileField
+ *   label="Document"
+ *   baseField="document"
+ *   urlField="file.url"
+ *   fileNameField="fileName"
+ *   fileSizeField="fileSize"
+ *   fileTypeField="fileType"
+ *   lastModifiedField="lastModified"
+ *   dropzonePlaceholder="Drag PDF here"
+ *   accept={{ 'application/*': ['.pdf'] }}
+ * />
+ * ```
+ */
 export const FileField = Component<FileFieldProps>(props => (
 	<UploadFieldInner {...props} fileType={createAnyFileType(props)}>
 		{props.children ?? <UploadedAnyView {...props} DestroyAction={DisconnectEntityTrigger} />}

@@ -6,10 +6,32 @@ import { Loader } from '@contember/react-ui-lib-base'
 import { usePersistSuccessHandler } from './hooks.js'
 import { cn } from '@contember/react-ui-lib-base'
 
+/**
+ * Props for the {@link PersistButton} component.
+ */
 export interface PersistButtonProps extends ComponentProps<typeof Button> {
+	/**
+	 * Custom button text (default: dictionary.persist.persistButton)
+	 */
 	label?: ReactNode
 }
 
+/**
+ * `PersistButton` is a button component that triggers a persistence action (saves unsaved data).
+ *
+ * ## Used hooks
+ * - {@link usePersistSuccessHandler}: Handles success feedback after persistence
+ *
+ * ## Example: Basic usage
+ * ```tsx
+ * <PersistButton />
+ * ```
+ *
+ * ## Example: Custom label
+ * ```tsx
+ * <PersistButton label="Save Article" />
+ * ```
+ */
 export const PersistButton = ({ label, className, ...buttonProps }: PersistButtonProps) => {
 	return (
 		<PersistTrigger onPersistSuccess={usePersistSuccessHandler()}>

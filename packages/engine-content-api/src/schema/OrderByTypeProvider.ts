@@ -57,11 +57,16 @@ export class OrderByTypeProvider {
 			}
 
 			const field = acceptFieldVisitor(this.schema, name, fieldName, {
-				visitColumn: ({ column }) => ({
-					type: this.orderDirectionEnum,
-					deprecationReason: column.deprecationReason,
-					description: column.description,
-				}),
+				visitColumn: ({ column }) => {
+					if (column.list) {
+						return undefined
+					}
+					return {
+						type: this.orderDirectionEnum,
+						deprecationReason: column.deprecationReason,
+						description: column.description,
+					}
+				},
 				visitHasOne: ({ relation }) => ({
 					type: this.getEntityOrderByType(relation.target),
 					deprecationReason: relation.deprecationReason,

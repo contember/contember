@@ -12,7 +12,7 @@ export class TruncateMutationResolver implements MutationResolver<'truncate'> {
 		context: SystemResolverContext,
 		info: GraphQLResolveInfo,
 	): Promise<TruncateResponse> {
-		await this.projectTruncateExecutor.truncateProject(context.db, context.project, await context.getSchema())
+		await this.projectTruncateExecutor.truncateProject(context.db, context.project, await context.getSchema(), context.identity.id)
 		return {
 			ok: true,
 		}

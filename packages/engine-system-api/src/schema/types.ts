@@ -61,8 +61,8 @@ export type Event = {
 	readonly id: Scalars['String']['output']
 	readonly identityDescription: Scalars['String']['output']
 	readonly identityId: Scalars['String']['output']
-	readonly primaryKey: ReadonlyArray<Scalars['PrimaryKey']['output']>
-	readonly tableName: Scalars['String']['output']
+	readonly primaryKey?: Maybe<ReadonlyArray<Scalars['PrimaryKey']['output']>>
+	readonly tableName?: Maybe<Scalars['String']['output']>
 	readonly transactionId: Scalars['String']['output']
 	readonly type: EventType
 }
@@ -75,6 +75,7 @@ export type EventFilterRow = {
 export enum EventType {
 	Create = 'CREATE',
 	Delete = 'DELETE',
+	Truncate = 'TRUNCATE',
 	Update = 'UPDATE',
 }
 
@@ -298,6 +299,20 @@ export type Stage = {
 	readonly slug: Scalars['String']['output']
 }
 
+export type TruncateEvent = Event & {
+	readonly __typename?: 'TruncateEvent'
+	readonly appliedAt: Scalars['DateTime']['output']
+	readonly createdAt: Scalars['DateTime']['output']
+	readonly description: Scalars['String']['output']
+	readonly id: Scalars['String']['output']
+	readonly identityDescription: Scalars['String']['output']
+	readonly identityId: Scalars['String']['output']
+	readonly primaryKey?: Maybe<ReadonlyArray<Scalars['PrimaryKey']['output']>>
+	readonly tableName?: Maybe<Scalars['String']['output']>
+	readonly transactionId: Scalars['String']['output']
+	readonly type: EventType
+}
+
 export type TruncateResponse = {
 	readonly __typename?: 'TruncateResponse'
 	readonly ok: Scalars['Boolean']['output']
@@ -405,6 +420,7 @@ export type ResolversInterfaceTypes<_RefType extends Record<string, unknown>> = 
 	Event:
 		| (CreateEvent)
 		| (DeleteEvent)
+		| (TruncateEvent)
 		| (UpdateEvent)
 }
 
@@ -448,6 +464,7 @@ export type ResolversTypes = {
 	SnapshotInput: SnapshotInput
 	Stage: ResolverTypeWrapper<Stage>
 	String: ResolverTypeWrapper<Scalars['String']['output']>
+	TruncateEvent: ResolverTypeWrapper<TruncateEvent>
 	TruncateResponse: ResolverTypeWrapper<TruncateResponse>
 	UpdateEvent: ResolverTypeWrapper<UpdateEvent>
 }
@@ -486,6 +503,7 @@ export type ResolversParentTypes = {
 	SnapshotInput: SnapshotInput
 	Stage: Stage
 	String: Scalars['String']['output']
+	TruncateEvent: TruncateEvent
 	TruncateResponse: TruncateResponse
 	UpdateEvent: UpdateEvent
 }
@@ -525,7 +543,7 @@ export type DeleteEventResolvers<ContextType = any, ParentType extends Resolvers
 }
 
 export type EventResolvers<ContextType = any, ParentType extends ResolversParentTypes['Event'] = ResolversParentTypes['Event']> = {
-	__resolveType: TypeResolveFn<'CreateEvent' | 'DeleteEvent' | 'UpdateEvent', ParentType, ContextType>
+	__resolveType: TypeResolveFn<'CreateEvent' | 'DeleteEvent' | 'TruncateEvent' | 'UpdateEvent', ParentType, ContextType>
 }
 
 export type ExecutedMigrationResolvers<
@@ -645,6 +663,23 @@ export type StageResolvers<ContextType = any, ParentType extends ResolversParent
 	slug?: Resolver<ResolversTypes['String'], ParentType, ContextType>
 }
 
+export type TruncateEventResolvers<
+	ContextType = any,
+	ParentType extends ResolversParentTypes['TruncateEvent'] = ResolversParentTypes['TruncateEvent'],
+> = {
+	appliedAt?: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>
+	createdAt?: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>
+	description?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+	id?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+	identityDescription?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+	identityId?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+	primaryKey?: Resolver<Maybe<ReadonlyArray<ResolversTypes['PrimaryKey']>>, ParentType, ContextType>
+	tableName?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>
+	transactionId?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+	type?: Resolver<ResolversTypes['EventType'], ParentType, ContextType>
+	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
+}
+
 export type TruncateResponseResolvers<
 	ContextType = any,
 	ParentType extends ResolversParentTypes['TruncateResponse'] = ResolversParentTypes['TruncateResponse'],
@@ -687,6 +722,7 @@ export type Resolvers<ContextType = any> = {
 	Query?: QueryResolvers<ContextType>
 	Schema?: GraphQLScalarType
 	Stage?: StageResolvers<ContextType>
+	TruncateEvent?: TruncateEventResolvers<ContextType>
 	TruncateResponse?: TruncateResponseResolvers<ContextType>
 	UpdateEvent?: UpdateEventResolvers<ContextType>
 }

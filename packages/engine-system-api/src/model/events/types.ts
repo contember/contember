@@ -2,9 +2,10 @@ export enum EventType {
 	delete = 'delete',
 	update = 'update',
 	create = 'create',
+	truncate = 'truncate',
 }
 
-export type ContentEvent = UpdateEvent | CreateEvent | DeleteEvent
+export type ContentEvent = UpdateEvent | CreateEvent | DeleteEvent | TruncateEvent
 
 export interface Event {
 	readonly type: EventType
@@ -57,6 +58,19 @@ export class DeleteEvent implements Event {
 		public readonly transactionId: string,
 		public readonly rowId: string[],
 		public readonly tableName: string,
+	) {
+	}
+}
+
+export class TruncateEvent implements Event {
+	public readonly type = EventType.truncate
+
+	constructor(
+		public readonly id: string,
+		public readonly createdAt: Date,
+		public readonly appliedAt: Date,
+		public readonly identityId: string,
+		public readonly transactionId: string,
 	) {
 	}
 }

@@ -91,14 +91,15 @@ const schema: DocumentNode = gql`
 		createdAt: DateTime!
 		appliedAt: DateTime!
 		type: EventType!
-		tableName: String!
-		primaryKey: [PrimaryKey!]!
+		tableName: String
+		primaryKey: [PrimaryKey!]
 	}
 
 	enum EventType {
 		UPDATE
 		DELETE
 		CREATE
+		TRUNCATE
 	}
 
 	type UpdateEvent implements Event {
@@ -142,6 +143,19 @@ const schema: DocumentNode = gql`
 		tableName: String!
 		primaryKey: [PrimaryKey!]!
 		newValues: Json!
+	}
+
+	type TruncateEvent implements Event {
+		id: String!
+		transactionId: String!
+		identityId: String!
+		identityDescription: String!
+		description: String!
+		createdAt: DateTime!
+		appliedAt: DateTime!
+		type: EventType!
+		tableName: String
+		primaryKey: [PrimaryKey!]
 	}
 
 	# === executedMigrations ===

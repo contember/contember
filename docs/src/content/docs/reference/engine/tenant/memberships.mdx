@@ -91,6 +91,39 @@ query {
 }
 ```
 
+## Listing persons across the tenant
+
+:::note[Available since 2.4]
+:::
+
+`projectBySlug { members }` lists the members of one project. To list persons across the whole tenant — for a user-management UI — use the top-level `persons` query:
+
+```graphql
+query {
+  persons(filter: { email: "jane" }, limit: 50, offset: 0) {
+    id
+    email
+    name
+    otpEnabled
+    emailOtpEnabled
+    identity {
+      id
+      roles
+    }
+  }
+}
+```
+
+`filter` (all fields combined with AND, all optional) matches by `email` (case-insensitive substring), `personId`, or `identityId`. `limit` / `offset` paginate; the page size is capped server-side (default 100, max 1000), so an unbounded `limit` can't dump the whole table.
+
+Visibility is enforced per caller and gated by the `person:list` permission:
+
+- `SUPER_ADMIN` (which holds `person:list` by default) sees every person.
+- Anyone else sees **exactly the members reachable via `project.members`** — for each project the caller may view members of, the persons behind the visible memberships, with the same per-role filtering that `project.members` applies. So a `PROJECT_ADMIN` sees only their projects' members.
+- A caller who may not list anyone gets an empty list rather than an error.
+
+The projection deliberately omits password hashes and TOTP secrets. See [two-factor](/reference/engine/tenant/two-factor) for the `otpEnabled` / `emailOtpEnabled` MFA flags.
+
 ## Global identity roles
 
 Project memberships scope a person's access to a single project. **Global roles** (`super_admin`, `project_admin`, custom global roles defined in the tenant ACL — see [Tenant ACL permissions](/reference/engine/schema/acl#tenant-permissions)) are attached directly to an identity and are not project-scoped. Two mutations grant and revoke them:

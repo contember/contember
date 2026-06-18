@@ -1,8 +1,11 @@
-import { PersonRow } from '../../model/index.js'
+import { PersonListRow } from '../../model/index.js'
 import { IdentityProjectRelation, Person } from '../../schema/index.js'
 
 export class PersonResponseFactory {
-	public static createPersonResponse(personRow: Omit<PersonRow, 'roles'>, projects: ReadonlyArray<IdentityProjectRelation> = []): Person {
+	// Accepts the slim `PersonListRow` shape; the full `PersonRow` (from byId/auth
+	// lookups) is structurally compatible, so both listing and single-person paths
+	// reuse this without dragging secret columns through the listing.
+	public static createPersonResponse(personRow: PersonListRow, projects: ReadonlyArray<IdentityProjectRelation> = []): Person {
 		return {
 			id: personRow.id,
 			otpEnabled: !!personRow.otp_activated_at,

@@ -3,6 +3,7 @@ import { testUuid } from './testUuid.js'
 import {
 	AclSchemaAccessNodeFactory,
 	createResolverContext,
+	Identity,
 	PermissionContext,
 	ProjectSchemaResolver,
 	ProjectScopeFactory,
@@ -12,6 +13,7 @@ import {
 	TenantResolverContext,
 	typeDefs,
 } from '../../src/index.js'
+import { Authorizator } from '@contember/authorization'
 import { Buffer } from 'buffer'
 import { makeExecutableSchema } from '@graphql-tools/schema'
 import { executeGraphQlTest } from './testGraphql.js'
@@ -36,6 +38,13 @@ export interface Test {
 	httpInfo?: { ip?: string; userAgent?: string; geoCountry?: string }
 	/** Override individual providers (e.g. a working `decrypt` to enable captcha). */
 	providers?: Partial<Providers>
+	/** Tenant roles of the authenticated identity (default: none). */
+	identityRoles?: string[]
+	/**
+	 * Override the authorizator. The default allows every action; pass a custom one
+	 * to exercise forbidden / partially-allowed (e.g. per-role) ACL branches.
+	 */
+	authorizator?: Authorizator<Identity>
 }
 
 export const createUuidGenerator = () => {
@@ -120,8 +129,8 @@ export const executeTenantTest = async (test: Test) => {
 	const context: TenantResolverContext = {
 		...createResolverContext(
 			new PermissionContext(
-				new StaticIdentity(authenticatedIdentityId, []),
-				{
+				new StaticIdentity(authenticatedIdentityId, test.identityRoles ?? []),
+				test.authorizator ?? {
 					isAllowed: () => Promise.resolve(true),
 				},
 				new ProjectScopeFactory(new AclSchemaAccessNodeFactory()),

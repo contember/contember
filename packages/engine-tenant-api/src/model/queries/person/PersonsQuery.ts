@@ -1,5 +1,5 @@
 import { DatabaseQuery, DatabaseQueryable, Operator } from '@contember/database'
-import { PersonRow } from './types.js'
+import { PersonListRow } from './types.js'
 import { PersonQueryBuilderFactory } from './PersonQueryBuilderFactory.js'
 
 export interface PersonsQueryFilter {
@@ -7,14 +7,19 @@ export interface PersonsQueryFilter {
 	readonly personId?: string | null
 	readonly identityId?: string | null
 	/**
-	 * When set, restricts the result to persons who are members of at least one
-	 * of these projects. An empty array therefore matches nobody. Used to scope
-	 * the listing for non-SUPER_ADMIN callers to projects they may view.
+	 * When set, restricts the result to persons with one of these identity ids.
+	 * Used to scope the listing for non-SUPER_ADMIN callers to exactly the members
+	 * they may see (resolved via the same per-role filtering as `project.members`).
+	 * An empty array therefore matches nobody — callers should short-circuit
+	 * instead of issuing the query.
 	 */
-	readonly memberOfProjectIds?: readonly string[]
+	readonly identityIds?: readonly string[]
 }
 
-export class PersonsQuery extends DatabaseQuery<PersonRow[]> {
+const DEFAULT_LIMIT = 100
+const MAX_LIMIT = 1000
+
+export class PersonsQuery extends DatabaseQuery<PersonListRow[]> {
 	constructor(
 		private readonly filter: PersonsQueryFilter = {},
 		private readonly limit?: number | null,
@@ -23,26 +28,27 @@ export class PersonsQuery extends DatabaseQuery<PersonRow[]> {
 		super()
 	}
 
-	async fetch({ db }: DatabaseQueryable): Promise<PersonRow[]> {
-		const { email, personId, identityId, memberOfProjectIds } = this.filter
-		return await PersonQueryBuilderFactory.createPersonQueryBuilder()
+	async fetch({ db }: DatabaseQueryable): Promise<PersonListRow[]> {
+		const { email, personId, identityId, identityIds } = this.filter
+		// Cap server-side so an unbounded/negative `limit` can't dump the whole
+		// person table; mirrors the AuthLogQuery convention.
+		const limit = Math.min(Math.max(this.limit ?? DEFAULT_LIMIT, 0), MAX_LIMIT)
+		const offset = Math.max(this.offset ?? 0, 0)
+		return await PersonQueryBuilderFactory.createPersonListQueryBuilder()
 			.match(qb => (email ? qb.where(it => it.compare(['person', 'email'], Operator.containsCI, email)) : qb))
 			.match(qb => (personId ? qb.where(it => it.compare(['person', 'id'], Operator.eq, personId)) : qb))
 			.match(qb => (identityId ? qb.where(it => it.compare(['person', 'identity_id'], Operator.eq, identityId)) : qb))
-			.match(qb =>
-				memberOfProjectIds
-					? qb.where(it =>
-						it.exists(sub =>
-							sub
-								.from('project_membership')
-								.where(expr => expr.columnsEq(['project_membership', 'identity_id'], ['person', 'identity_id']))
-								.where(expr => expr.in(['project_membership', 'project_id'], [...memberOfProjectIds]))
-						)
-					)
-					: qb
-			)
+			.match(qb => (identityIds ? qb.where(it => it.in(['person', 'identity_id'], [...identityIds])) : qb))
 			.orderBy(['person', 'email'])
-			.limit(this.limit ?? undefined, this.offset ?? undefined)
+			.limit(limit, offset)
 			.getResult(db)
+	}
+
+	static get defaultLimit(): number {
+		return DEFAULT_LIMIT
+	}
+
+	static get maxLimit(): number {
+		return MAX_LIMIT
 	}
 }

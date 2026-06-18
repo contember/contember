@@ -6,43 +6,50 @@ export interface ListPersonsResponseRow {
 	identityId: string
 	email: string
 	name?: string
-	roles?: string[]
-	password?: string
 	emailOtpEnabled?: boolean
 }
 
+const COLUMNS =
+	'"person"."id", "person"."identity_id", "person"."email", "person"."name", "person_mfa"."totp_activated_at" AS "otp_activated_at", coalesce("person_mfa"."email_otp_enabled", false) AS "email_otp_enabled", "person"."passwordless_enabled", "person"."email_verified_at"'
+
+const FROM = `FROM "tenant"."person"
+	LEFT JOIN "tenant"."person_mfa" AS "person_mfa" ON "person_mfa"."person_id" = "person"."id"`
+
+/**
+ * Slim person listing emitted by `PersonsQuery` — no `password_hash` / TOTP
+ * secrets, capped to `limit 100 offset 0` by default. Supports the `email` and
+ * `identityIds` (scoped) filter variants.
+ */
 export const listPersonsSql = (args: {
 	emailFilter?: string
+	identityIds?: string[]
 	rows: ListPersonsResponseRow[]
-}): ExpectedQuery => ({
-	sql: args.emailFilter
-		? SQL`SELECT "person"."id", "person"."password_hash", "person_mfa"."totp_secret" AS "otp_secret", "person_mfa"."totp_secret_version" AS "otp_secret_version", "person_mfa"."totp_activated_at" AS "otp_activated_at", "person_mfa"."totp_pending_secret" AS "otp_pending_secret", "person_mfa"."totp_pending_version" AS "otp_pending_version", "person_mfa"."totp_pending_created_at" AS "otp_pending_created_at", coalesce("person_mfa"."email_otp_enabled", false) AS "email_otp_enabled", "person"."identity_id", "person"."email", "person"."name", "person"."disabled_at", "person"."passwordless_enabled", "person"."mfa_grace_until", "person"."email_verified_at", "person"."email_verification_required", "identity"."roles"
-			     FROM "tenant"."person"
-			          INNER JOIN "tenant"."identity" AS "identity" ON "identity"."id" = "person"."identity_id"
-			          LEFT JOIN "tenant"."person_mfa" AS "person_mfa" ON "person_mfa"."person_id" = "person"."id"
-			     WHERE "person"."email" ILIKE '%' || ? || '%'
-			     ORDER BY "person"."email" ASC`
-		: SQL`SELECT "person"."id", "person"."password_hash", "person_mfa"."totp_secret" AS "otp_secret", "person_mfa"."totp_secret_version" AS "otp_secret_version", "person_mfa"."totp_activated_at" AS "otp_activated_at", "person_mfa"."totp_pending_secret" AS "otp_pending_secret", "person_mfa"."totp_pending_version" AS "otp_pending_version", "person_mfa"."totp_pending_created_at" AS "otp_pending_created_at", coalesce("person_mfa"."email_otp_enabled", false) AS "email_otp_enabled", "person"."identity_id", "person"."email", "person"."name", "person"."disabled_at", "person"."passwordless_enabled", "person"."mfa_grace_until", "person"."email_verified_at", "person"."email_verification_required", "identity"."roles"
-			     FROM "tenant"."person"
-			          INNER JOIN "tenant"."identity" AS "identity" ON "identity"."id" = "person"."identity_id"
-			          LEFT JOIN "tenant"."person_mfa" AS "person_mfa" ON "person_mfa"."person_id" = "person"."id"
-			     ORDER BY "person"."email" ASC`,
-	parameters: args.emailFilter ? [args.emailFilter] : [],
-	response: {
-		rows: args.rows.map(row => ({
-			id: row.personId,
-			password_hash: `BCRYPTED-${row.password ?? '123'}`,
-			identity_id: row.identityId,
-			roles: row.roles ?? [],
-			email: row.email,
-			name: row.name,
-			email_otp_enabled: row.emailOtpEnabled ?? false,
-			otp_uri: null,
-			otp_activated_at: null,
-			disabled_at: null,
-			passwordless_enabled: null,
-			email_verified_at: null,
-			email_verification_required: false,
-		})),
-	},
-})
+}): ExpectedQuery => {
+	const where: string[] = []
+	const parameters: unknown[] = []
+	if (args.emailFilter) {
+		where.push(`"person"."email" ILIKE '%' || ? || '%'`)
+		parameters.push(args.emailFilter)
+	}
+	if (args.identityIds) {
+		where.push(`"person"."identity_id" IN (${args.identityIds.map(() => '?').join(', ')})`)
+		parameters.push(...args.identityIds)
+	}
+	const whereSql = where.length > 0 ? `WHERE ${where.join(' AND ')}` : ''
+	return {
+		sql: SQL`SELECT ${COLUMNS} ${FROM} ${whereSql} ORDER BY "person"."email" ASC limit 100 offset 0`,
+		parameters,
+		response: {
+			rows: args.rows.map(row => ({
+				id: row.personId,
+				identity_id: row.identityId,
+				email: row.email,
+				name: row.name ?? null,
+				otp_activated_at: null,
+				email_otp_enabled: row.emailOtpEnabled ?? false,
+				passwordless_enabled: null,
+				email_verified_at: null,
+			})),
+		},
+	}
+}

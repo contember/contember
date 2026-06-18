@@ -1,7 +1,26 @@
-import { PersonRow } from './types.js'
+import { PersonListRow, PersonRow } from './types.js'
 import { SelectBuilder } from '@contember/database'
 
 export class PersonQueryBuilderFactory {
+	/**
+	 * Slim builder for listings — selects only the columns surfaced by
+	 * {@link PersonResponseFactory}, omitting `password_hash` / `totp_secret*`
+	 * and the `identity` join that the full builder needs only for `roles`.
+	 */
+	public static createPersonListQueryBuilder() {
+		return SelectBuilder.create<PersonListRow>()
+			.select(['person', 'id'])
+			.select(['person', 'identity_id'])
+			.select(['person', 'email'])
+			.select(['person', 'name'])
+			.select(['person_mfa', 'totp_activated_at'], 'otp_activated_at')
+			.select(expr => expr.raw('coalesce("person_mfa"."email_otp_enabled", false)'), 'email_otp_enabled')
+			.select(['person', 'passwordless_enabled'])
+			.select(['person', 'email_verified_at'])
+			.from('person')
+			.leftJoin('person_mfa', 'person_mfa', expr => expr.columnsEq(['person_mfa', 'person_id'], ['person', 'id']))
+	}
+
 	public static createPersonQueryBuilder() {
 		return SelectBuilder.create<PersonRow>()
 			.select(['person', 'id'])

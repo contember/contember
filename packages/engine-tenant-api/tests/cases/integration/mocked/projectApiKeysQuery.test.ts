@@ -105,3 +105,38 @@ query {
 		},
 	})
 })
+
+test('project.apiKeys returns empty (no key query) for a caller without project view members', async () => {
+	const projectId = testUuid(1)
+
+	await executeTenantTest({
+		query: {
+			query: GQL`
+query {
+	projectBySlug(slug: "sandbox") {
+		apiKeys {
+			id
+		}
+	}
+}`,
+			variables: {},
+		},
+		// Allows project:view (so projectBySlug resolves) but denies project:viewMembers.
+		authorizator: {
+			isAllowed: async (identity, scope, action) => action.resource === 'project' && action.privilege === 'view',
+		},
+		executes: [
+			getProjectBySlugSql({
+				projectSlug: 'sandbox',
+				response: { id: projectId, name: 'sandbox', slug: 'sandbox', config: {} },
+			}),
+		],
+		return: {
+			data: {
+				projectBySlug: {
+					apiKeys: [],
+				},
+			},
+		},
+	})
+})

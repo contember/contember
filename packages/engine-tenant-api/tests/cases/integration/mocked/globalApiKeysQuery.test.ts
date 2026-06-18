@@ -54,3 +54,26 @@ query {
 		},
 	})
 })
+
+test('globalApiKeys returns empty (no query) for a caller without apiKey:list', async () => {
+	await executeTenantTest({
+		query: {
+			query: GQL`
+query {
+	globalApiKeys {
+		id
+	}
+}`,
+			variables: {},
+		},
+		authorizator: {
+			isAllowed: async () => false,
+		},
+		executes: [],
+		return: {
+			data: {
+				globalApiKeys: [],
+			},
+		},
+	})
+})

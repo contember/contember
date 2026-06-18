@@ -1,12 +1,13 @@
 import { Maybe, Person, QueryPersonByIdArgs, QueryPersonsArgs, QueryResolvers } from '../../schema/index.js'
 import { TenantResolverContext } from '../TenantResolverContext.js'
-import { PermissionActions, PersonManager, ProjectManager } from '../../model/index.js'
+import { PermissionActions, PersonManager, ProjectManager, ProjectMemberManager } from '../../model/index.js'
 import { PersonResponseFactory } from '../responseHelpers/PersonResponseFactory.js'
 
 export class PersonQueryResolver implements QueryResolvers {
 	constructor(
 		private readonly personManager: PersonManager,
 		private readonly projectManager: ProjectManager,
+		private readonly projectMemberManager: ProjectMemberManager,
 	) {}
 
 	async personById(
@@ -39,24 +40,32 @@ export class PersonQueryResolver implements QueryResolvers {
 			return rows.map(row => PersonResponseFactory.createPersonResponse(row))
 		}
 
-		// Otherwise scope to persons who are members of a project the caller may view
-		// members of — the same persons reachable via project.members, so a PROJECT_ADMIN
-		// sees only their projects' members.
+		// Otherwise scope to exactly the members the caller may see — the same set
+		// reachable via `project.members`. We resolve visible members per project
+		// through `getProjectMembers`, which applies per-membership-role filtering,
+		// so a caller whose `tenant.view` rule is restricted to some roles only sees
+		// those members (a plain `PROJECT_VIEW_MEMBER([])` gate would leak the whole
+		// membership, incl. admins, regardless of role).
 		const projects = await this.projectManager.getProjectsByIdentity(context.db, context.identity.id, context.permissionContext)
-		const visibleProjectIds: string[] = []
+		const visibleIdentityIds = new Set<string>()
 		for (const project of projects) {
 			const scope = await context.permissionContext.createProjectScope(project)
-			if (await context.permissionContext.isAllowed({ scope, action: PermissionActions.PROJECT_VIEW_MEMBER([]) })) {
-				visibleProjectIds.push(project.id)
+			const verifier = context.permissionContext.createAccessVerifier(scope)
+			if (!(await verifier(PermissionActions.PROJECT_VIEW_MEMBER([])))) {
+				continue
+			}
+			const members = await this.projectMemberManager.getProjectMembers(context.db, project.id, verifier, { filter: {} })
+			for (const member of members) {
+				visibleIdentityIds.add(member.identity.id)
 			}
 		}
-		if (visibleProjectIds.length === 0) {
+		if (visibleIdentityIds.size === 0) {
 			return []
 		}
 
 		const rows = await this.personManager.listPersons(
 			context.db,
-			{ ...filter, memberOfProjectIds: visibleProjectIds },
+			{ ...filter, identityIds: [...visibleIdentityIds] },
 			args.limit,
 			args.offset,
 		)

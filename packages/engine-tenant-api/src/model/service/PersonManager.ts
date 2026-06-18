@@ -1,6 +1,6 @@
 import { ChangeProfileCommand, ChangeProfileData } from '../commands/person/ChangeProfileCommand.js'
 import { Response, ResponseError, ResponseOk } from '../utils/Response.js'
-import { PersonQuery, PersonRow, PersonsQuery, PersonsQueryFilter } from '../queries/index.js'
+import { PersonListRow, PersonQuery, PersonRow, PersonsQuery, PersonsQueryFilter } from '../queries/index.js'
 import { DatabaseContext } from '../utils/index.js'
 import { EmailValidator, EmailValidatorError } from './EmailValidator.js'
 import { TogglePersonPasswordlessCommand } from '../commands/index.js'
@@ -23,7 +23,7 @@ class PersonManager {
 		filter: PersonsQueryFilter = {},
 		limit?: number | null,
 		offset?: number | null,
-	): Promise<PersonRow[]> {
+	): Promise<PersonListRow[]> {
 		return await dbContext.queryHandler.fetch(new PersonsQuery(filter, limit, offset))
 	}
 

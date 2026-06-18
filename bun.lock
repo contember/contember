@@ -158,6 +158,7 @@
         "contember-client-generator": "./dist/production/generate.cjs",
       },
       "dependencies": {
+        "@contember/cli-common": "workspace:*",
         "@contember/client-content": "workspace:*",
         "@contember/schema": "workspace:*",
         "@contember/schema-utils": "workspace:*",

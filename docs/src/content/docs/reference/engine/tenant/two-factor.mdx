@@ -91,7 +91,7 @@ The `Person` type exposes two independent, read-only MFA flags, so a UI can show
 | `otpEnabled` | TOTP authenticator (the flow documented above). |
 | `emailOtpEnabled` | E-mail one-time-password 2FA — a separate method enabled via `initEmailOtp` / `confirmEmailOtp` / `disableEmailOtp`. |
 
-:::note[emailOtpEnabled available since 2.4]
+:::note[emailOtpEnabled available since 2.2]
 :::
 
 Both are queryable wherever a `Person` is reachable — `me`, `personById`, the [`persons`](/reference/engine/tenant/memberships#listing-persons-across-the-tenant) listing, and `projectBySlug { members { identity { person } } }`:

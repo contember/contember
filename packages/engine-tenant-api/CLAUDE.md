@@ -6,7 +6,7 @@ Identity, authentication, and project management API.
 
 - **Sign-up** (`SignUpManager`): Create identity + person with email validation, password strength checking, bcrypt hashing
 - **Sign-in** (`SignInManager`): Password verification with rate limiting (configurable backoff), OTP/2FA support, creates session API key (default 30min expiry)
-- **IDP** (`IDPSignInManager`): OIDC, Facebook, Apple sign-in via `openid-client`. Init → redirect → callback flow with auto sign-up option. Supports RP-initiated (front-channel) Single Logout — `signOut` returns `logoutUrl` for federated sessions
+- **IDP** (`IDPSignInManager`): OIDC, Facebook, Apple sign-in via `openid-client`. Init → redirect → callback flow with auto sign-up option. Supports RP-initiated (front-channel) Single Logout — `signOut` returns `logoutUrl` for federated sessions. **Claim mapping** (A09, `IDPClaimSyncService`): an IdP's `configuration.claimMapping.rules` maps provider claims to **project memberships** (project role + membership variables) at sign-in and on OIDC session refresh — project memberships only, never global/tenant roles
 - **Passwordless** (`PasswordlessSignInManager`): Magic link flow via email tokens with optional MFA
 - **API Keys**: Three types (`ApiKeyType` enum) — `SESSION` (short-lived, surfaced as `Identity.sessions`), `PERMANENT` (integrations), `ONE_OFF` (sign-up flows)
 - **Email verification & email change** (`EmailVerificationManager`, `EmailChangeManager`): optional per-account e-mail verification at sign-up (`ConfigSignup.requireEmailVerification`) and a confirm-by-token flow for user-initiated address changes (`ConfigEmailChange.requireVerification`)
@@ -59,7 +59,8 @@ CQRS pattern with Command/Query separation via `CommandBus` and `DatabaseQuery`.
 - `EmailOtpManager` — e-mail OTP 2FA (init/confirm/disable); `BackupCodeManager` — MFA recovery codes
 - `AuthPolicyManager` (+ `AuthPolicyResolver`) — per-role MFA / session auth policies
 - `LoginRiskAnalyzer` — sign-in anomaly scoring (A03); see `RiskWeight` / `RiskAction`
-- `AuthLogService` — writes `person_auth_log` audit entries (the `authLog` query reads them)
+- `AuthLogService` — writes `person_auth_log` audit entries (the `authLog` query reads them). IdP claim mapping (A09) adds the `idp_role_mapped` (before/after membership delta) and `idp_role_mapping_failed` (fail-open marker, no claim values) events, emitted from the resolver on sign-in (`IDPMutationResolver`) and directly from `IdpSessionRevalidator` on OIDC session refresh (the verify hot path, not a GraphQL resolver)
+- `IDPClaimSyncService` — A09 claim→membership sync. Evaluates an IdP's `configuration.claimMapping.rules` against the provider claims and grants the resulting **project memberships** (never global roles). `syncPolicy` (`always`/`sticky`) and `unmatched` (`keep`/`remove`, vocabulary-bounded) control reconciliation. Two-layer validation shared with the direct add-member path via schema-utils `MembershipResolver` (config-time in `IDPManager.assertValidClaimMapping`; apply-time fail-closed backstop here). Fail-open on a malformed config; runs at sign-in and on OIDC refresh (`IdpSessionRevalidator`)
 - `RateLimiter` — generic per-key rate limiting backed by `rate_limit_event` (per-IP windows, email-OTP-per-person, etc.)
 - `EmailVerificationManager` / `EmailChangeManager` — e-mail verification and confirm-by-token address change
 - `EmailValidator`, `PasswordStrengthValidator`, `HibpChecker` — input validation (HIBP = haveibeenpwned breach check)

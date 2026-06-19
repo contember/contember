@@ -75,8 +75,10 @@ A few auth events carry extra context so security-relevant outcomes stay disting
 | `project_membership_create` | `addProjectMember` (success) | `{projectId, identityId, before: [], after: [{role, variables}]}` |
 | `project_membership_update` | `updateProjectMember` (success) | `{projectId, identityId, before, after}` |
 | `project_membership_remove` | `removeProjectMember` (success) | `{projectId, identityId, before, after: []}` |
+| `idp_role_mapped` *(since 2.2)* | `signInIDP` / session refresh — an IdP [membership mapping](/reference/engine/tenant/idp#membership-mapping) (re)synced project memberships | `{before: {memberships}, after: {memberships}, syncPolicy, unmatched}` — emitted only when the grants actually changed; the `before`/`after` snapshots include membership-variable **values**, which may be claim-derived (when a variable uses `passthrough` or `allow`) — those external values are persisted in `person_auth_log.event_data` and readable via `system:viewAuthLog` |
+| `idp_role_mapping_failed` *(since 2.2)* | `signInIDP` / session refresh — a configured membership mapping failed and was skipped (fail-open) | *(no event data — no claim values are stored)* — sign-in/refresh still succeeded; the mapping was not applied |
 
-`target_person_id` is resolved from the affected identity, so even when the actor is acting on someone else's identity the trail points at the right person.
+`target_person_id` is resolved from the affected identity, so even when the actor is acting on someone else's identity the trail points at the right person. `idp_role_mapped` / `idp_role_mapping_failed` are recorded against the affected (session) person whose memberships changed — the signing-in person on a sign-in, or the session owner on a refresh (there is no "signing-in" then) — with the IdP-driven sync (not a human admin) as the cause.
 
 ### Administrative events (since 2.2)
 

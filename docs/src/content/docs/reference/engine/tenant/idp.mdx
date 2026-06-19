@@ -242,7 +242,7 @@ The options field allows you to specify updated options for the identity provide
 If the "ok" in response is `false`, you will find details in `error`, possible error codes are following: `NOT_FOUND`, `INVALID_CONFIGURATION`
 
 :::caution[`configuration` is replaced wholesale by default]
-By default `updateIDP` **replaces** the entire `configuration` object — any field you don't pass is dropped. To change a single field while keeping the rest, pass `mergeConfiguration: true`: each key you provide is merged into the stored configuration, and a key set to `null` is **removed**. Omitting `configuration` entirely leaves it untouched (handy when you only want to change `options`). The merge is **shallow** — a nested object such as `claimMapping` or `revalidation` is replaced as a whole, not deep-merged.
+By default `updateIDP` **replaces** the entire `configuration` object — any field you don't pass is dropped. To change a single field while keeping the rest, pass `mergeConfiguration: true`: each key you provide is merged into the stored configuration, and a key set to `null` is **removed**. Omitting `configuration` entirely leaves it untouched (handy when you only want to change `options`). The merge is **recursive**: a nested object (such as `claimMapping` or `revalidation`) is deep-merged key-by-key, so updating one of its fields preserves the rest, and a key set to `null` removes it at any level. An array value (such as the A09 `rules` list) is replaced as a whole, never merged element-wise.
 :::
 
 ### Temporarily disabling and enabling an IdP
@@ -583,6 +583,125 @@ logout_token=<signed JWT>
 
 Register this URL as the provider's **back-channel logout URI** at the IdP, putting the Contember provider [slug](#adding-new-idp) in the `?provider=` query parameter (the IdP knows only which client it is calling, not the Contember provider record). The endpoint is unauthenticated but acts only on a `logout_token` whose signature, issuer, audience and freshness validate against that provider: a token targeting a `sid` revokes that session; a `sub`-only token revokes all of that subject's federated sessions. It answers `200` on success, `400` for an invalid token, `404` for an unknown provider slug, and `501` when the provider does not support back-channel logout.
 
+## Membership mapping
+
+:::note[Available since 2.2]
+:::
+
+A membership mapping turns the IdP's response into Contember **project memberships** on sign-in, so project authorization follows the IdP instead of being maintained by hand. It is **off by default** — without it, sign-in grants nothing. Configure it per IdP under `configuration.claimMapping`:
+
+```graphql
+mutation {
+  updateIDP(
+    identityProvider: "oidc-provider",
+    mergeConfiguration: true,
+    configuration: {
+      claimMapping: {
+        syncPolicy: "always",
+        unmatched: "keep",
+        rules: [
+          # grant a plain membership to everyone in the `Editors` IdP group
+          { claim: "groups", contains: "Editors", grantMembership: { project: "blog", role: "editor" } },
+          # grant a project membership, with membership variables, to the Sales department
+          {
+            claim: "department",
+            equals: "Sales",
+            grantMembership: { project: "crm", role: "salesperson", variables: [{ name: "region", values: ["eu"] }] }
+          }
+        ]
+      }
+    }
+  ) { ok error { code developerMessage } }
+}
+```
+
+A mapping grants **project memberships only** — never global/tenant roles. Global roles are privilege-bearing and granting them from external claims would be a privilege-escalation path, so they are not mappable; a config that tries to (a `grantRoles` on a rule) is rejected with `INVALID_CONFIGURATION`. A project membership stays within what an IdP configurer can already grant directly: configuring `claimMapping` requires `IDP_ADD` / `IDP_UPDATE`, held only by a **global** `project_admin` / `super_admin` who can already grant any project role directly. Note the mapping is bounded only by the **target project's ACL** — it can grant any role defined there and set arbitrary membership-variable values (subject to `map` / `allow`); it is **not** additionally constrained by a per-project `admin.tenant.manage` role/variable allowlist, so restricting that does not limit what a mapping can grant. Hand out global roles explicitly instead.
+
+:::note[Shared `claimMapping` key]
+On an `oidc` provider, `configuration.claimMapping` is also used for the [identity-field remap](#claim-mapping) (`email` / `name` / `externalIdentifier` / `attributesKey`). The two coexist in the same object — membership mapping only reads the `rules` field, the identity remap only reads its own fields. A `claimMapping` with no `rules` is treated as "no membership mapping" (the remap-only case), not an error. Because `updateIDP` with `mergeConfiguration: true` **deep-merges** nested config objects (see [Updating existing IdP](#updating-existing-idp)), updating the A09 `rules` preserves the OIDC identity-remap fields (`email`, `name`, `externalIdentifier`, `attributesKey`) in the same `claimMapping` object, and vice versa — send only the fields you want to change (and a field as `null` to remove it). Note that `rules` is an array, so it is replaced as a whole, not merged element-wise.
+:::
+
+Each **rule** inspects one `claim` from the IdP response and, when it matches, grants its `grantMembership`. Rules are independent and additive — every matching rule contributes, a non-matching rule is skipped. The `grantMembership.role` must exist in the target project's ACL schema, and each membership variable it sets must be a variable defined for that role — both validated at `addIDP`/`updateIDP` time (mirroring a direct add-member call). A project that doesn't exist yet is skipped at validation time — the grant is simply inert at sign-in until the project and role exist; note this means a mapping authored *before* its project exists is **not** re-validated when that project later appears. Equally, a rule targeting a project that does not exist (or was deleted) at sign-in time is silently skipped and is **not** reflected in the `idp_role_mapped` audit delta. The claims are whatever the provider returns (for OIDC, the userinfo/ID-token claims), so target a claim the **IdP** asserts — typically `groups` or `roles` — not a value the end user can edit (see the caution below). Note that **userinfo** claims are only merged into the claim surface at sign-in when `fetchUserInfo: true` (default `false`); a rule matching a claim the IdP returns *only* from userinfo (often `groups`/`roles`) then silently never fires — and because the rule is still well-formed, it produces **no** `idp_role_mapping_failed` marker, just a no-op. Set `fetchUserInfo: true` if your rules target userinfo-only claims. Only **OIDC-shaped** providers (`oidc`, `apple`) expose arbitrary claims for rule matching; Facebook's signed-request sign-in surfaces only the identity fields (`email` / `name` / `externalIdentifier`), so a rule matching on `groups`/`roles` never fires for a Facebook IdP. A rule's `claim` is a **flat key** (not a dot-path; only a variable's `from.claim` supports dot-paths).
+
+### Matching
+
+| Condition | Matches when |
+|---|---|
+| `equals` | the claim equals the value — for an array claim, when the value is one of its elements |
+| `contains` | for an **array** claim, when the value is an element; for a **string** claim, when it is a substring |
+| neither | the claim is **present and non-empty** — an explicit `null`, the boolean `false`, an empty array `[]` (user is in no groups), and an empty string `""` do **not** match (but a numeric `0` **does** count as present, unlike `false` — so don't use a `0`/`1` numeric flag as a presence gate); useful for a flag-style claim |
+
+A single rule may set **at most one** of `equals` or `contains`; a config that sets both is rejected at `addIDP`/`updateIDP` time with `INVALID_CONFIGURATION` (if one is nonetheless planted out-of-band, `equals` wins and `contains` is ignored). An **empty-string** `equals`/`contains` is likewise rejected — an empty `contains` would substring-match *every* string value of the claim (granting to every user of the IdP); to match on the claim's mere presence, omit both.
+
+An **unknown or misspelled key** on a rule, a `grantMembership`, a membership variable, or a `from` source is **rejected** at `addIDP`/`updateIDP` with `INVALID_CONFIGURATION` — so a typo like `equal` for `equals` (which would otherwise silently turn the rule into a match-everyone grant) or `grantMembershp` for `grantMembership` fails loudly instead of being silently dropped. The lone exception is the `map` lookup table, whose keys are arbitrary raw claim values by design.
+
+Matching is **type-strict**: `equals`, `contains`, and a variable's `from.where` compare values with no coercion, so a string `equals: "42"` does **not** match a numeric claim `42` — match a numeric claim with a numeric value (`equals: 42`). This differs from claim-derived membership-variable *values*, which are stringified (see the [Numeric claim values](#membership-variables) note).
+
+### `syncPolicy` and `unmatched`
+
+| Field | Default | Notes |
+|---|---|---|
+| `syncPolicy` | `always` | `always` re-applies the mapping on **every** sign-in — and, when [session re-validation](#session-re-validation) is enabled, again on each OIDC refresh **that returns fresh claims**, so a long-lived session's memberships track the IdP's current claims without a full re-login. Refresh-time resync depends on the [re-validation method](#re-validation-methods) delivering claims: `refresh` reconstructs the **same** claim surface sign-in builds — the refreshed ID-token claims plus a userinfo merge when `fetchUserInfo: true` — `userinfo` returns its endpoint's claims, and `introspection` returns **none** (no resync). Nested claims (`attributesKey`) and the identity-field mapping are applied on the refresh path exactly as at sign-in, so providers that nest their claims (e.g. Apereo CAS) resync correctly. Because `method: "refresh"` rebuilds the **complete** surface, a refresh reconciles **exactly like a sign-in**: grants are added/updated *and*, under `unmatched: "remove"`, memberships the mapping no longer grants are revoked — at the **membership-variable** level too, where a claim-derived variable is replaced with the IdP's current values, so it can both **widen and narrow**. The one exception is a **partial** surface — `method: "userinfo"` (no ID-token claims) or a `refresh` whose `fetchUserInfo` call failed — which stays **additive-only**: grants are refreshed but nothing is removed, so a rule keyed on a claim absent from the partial surface can't strip a membership the IdP still asserts; those removals are deferred to a full sign-in. `sticky` applies the mapping only when the account is first created by auto-sign-up, then never touches it again (refresh never re-applies a `sticky` mapping). |
+| `unmatched` | `keep` | `keep` only ever **adds** grants. `remove` makes the IdP the source of truth: a membership the mapping no longer grants is **revoked** — and so is a membership the mapping still grants but whose *declared* variable resolves to **no values**, since an empty membership variable is not a valid grant (the whole role is removed rather than left scoped to nothing — clearing the variable to an empty set would instead, for a `condition` variable, widen it to *allow-all*). Revocation is bounded to the mapping's own *vocabulary* — the `(project, role)` pairs named by **some current rule**; memberships and roles managed outside the mapping are never touched. **Caveat:** because the vocabulary is built from the *current* rules, removing a variable from a rule, deleting a rule, removing the whole `claimMapping`, or disconnecting the IdP takes the affected grant out of vocabulary — so a previously-granted membership (or a previously-written variable value) is **not** retroactively revoked on subsequent sign-ins. To revoke, keep the rule but stop matching it, or use the direct member API. |
+
+### Membership variables
+
+A `grantMembership` may also set **membership variables** — the per-membership values that parameterize row-level ACL. The simplest form is **constant** `values`:
+
+```graphql
+grantMembership: { project: "crm", role: "salesperson", variables: [{ name: "region", values: ["eu"] }] }
+```
+
+To derive a variable's values from a claim instead, give it a `from` source and (typically) a `map`. A common case: the IdP returns language codes and you store locale ids.
+
+```graphql
+variables: [
+  {
+    name: "locale",
+    # read + shape the claim into a flat list of raw values
+    from: { claim: "profile.languages", split: "," },
+    # translate each raw value (e.g. "cs", "en") into the value(s) actually stored
+    map: { cs: ["<cs-locale-id>"], en: ["<en-locale-id>"] }
+  }
+]
+```
+
+`from` shapes the claim into a flat list of raw string values (combine the options as needed):
+
+| Field | Effect |
+|---|---|
+| `claim` | claim to read, as a dot-path into the response (`profile.languages` descends into nested objects) |
+| `split` | split each **string** value on this delimiter (`"cs,en"` → `["cs","en"]`; OIDC-style `"cs en"` with `split: " "`) — a scalar string claim **and every string element of an array claim**; a no-op for non-string values; each resulting part is **trimmed** and **empty parts are dropped** (`"cs, en"` → `["cs","en"]`; `"cs,,en"` → `["cs","en"]`) |
+| `pick` | for an **array of objects** claim, take this dot-path field from each element (`[{ code, role }]` → the `code`s) |
+| `where` | for an **array of objects** claim, keep only elements whose dot-path `field` equals `equals`; **requires `pick`** — using `where` without `pick` is rejected at `addIDP`/`updateIDP` time with `INVALID_CONFIGURATION` |
+
+:::note[Numeric claim values]
+Claim values **read for a membership variable** (the `from` extraction) are coerced to strings via JavaScript `String()`, so numeric claims work — but only within the safe-integer range (`±2^53 − 1`). Configure exact identifiers (org/tenant ids) as **string** claims at the IdP rather than numbers to avoid precision loss. (Rule **matching** — `equals` / `contains` / `where` — is type-strict and does **not** coerce; see [Matching](#matching).)
+:::
+
+The raw values are then turned into the values actually stored:
+
+| Field | Effect |
+|---|---|
+| `map` | lookup table from a raw value to the value(s) to store; a raw value **absent** from the map is dropped… |
+| `passthrough` | …unless `passthrough: true`, which stores an unmapped raw value verbatim (**off by default** — see the caution) |
+| `allow` | optional allowlist applied to the claim-derived values (constant `values` are never filtered) |
+
+A variable's constant `values` and its claim-derived values are **unioned**. A variable that resolves to **no** values is not applied under `unmatched: "keep"` (the default), and the membership is kept as-is. Under `unmatched: "remove"`, a *declared* variable that resolves to no values **revokes the whole membership** — an empty membership variable is not a valid grant (see [`unmatched`](#syncpolicy-and-unmatched)).
+
+The one exception is the project **`admin`** role, which carries project-admin privilege from its **role name alone** (independent of its variables). A grant for `admin` whose *required* (non-fallback) variable resolves to no values is **dropped** rather than kept — otherwise the empty variable would be filtered out and the bare `admin` membership would confer *unscoped* project-admin. The drop is fail-closed (the grant simply doesn't apply) and is recorded with the `idp_role_mapping_failed` audit marker. To grant `admin`, either set its required variables from claims that are reliably present, or grant the unrestricted `admin` (a role with no required variables) deliberately.
+
+:::caution[Membership mapping grants real privilege from external input]
+A matching rule grants a project membership directly, so a careless mapping is an access-control risk:
+- **Target IdP-asserted claims only.** Map `groups`/`roles`, not user-editable fields like `name` or `email`. A `contains` rule on a user-controlled claim (e.g. `{ claim: "email", contains: "admin" }`) can be satisfied by an attacker who sets that value at the IdP.
+- **No global/tenant roles.** A mapping can only grant project memberships; `super_admin`, `project_creator`, `project_admin` and the like are never grantable this way. A `grantRoles` on a rule is rejected with `INVALID_CONFIGURATION`.
+- **No predefined variables.** A mapping cannot set a `predefined` membership variable (`identityID` / `personID`) — the runtime binds those to the signed-in identity. Attempting to set one is rejected with `INVALID_CONFIGURATION`, like `grantRoles`.
+- **`unmatched: "remove"` with `syncPolicy: "always"` re-evaluates on every login**, so a change in the IdP's claims (or an IdP outage that drops a claim) can revoke a user's memberships at the next sign-in. (Refresh-time resync never removes — only a full sign-in does.) Keep high-value memberships out of a `remove` mapping's vocabulary, or grant them outside the mapping.
+- **`passthrough` puts raw external claim values into row-level ACL.** Membership variables feed content-API row filters, so a raw claim value passed through becomes a row-level access grant. Keep `passthrough` off and translate values through `map` (or bound them with `allow`) unless the variable legitimately holds claim values rather than opaque ids. A **condition**-type membership variable is stricter still: its stored value is parsed as an ACL *condition*, so a claim-derived value is an arbitrary-filter injection vector — `addIDP`/`updateIDP` reject a condition variable whose value comes `from` a claim unless it is bounded by an `allow` allowlist, and reject `passthrough` on it outright. Furthermore, **all** values that can end up in a condition variable are validated as parseable ACL conditions at config time: this includes constant `values`, every entry in `map` (its output values), and every entry in `allow` — a malformed condition in any of these is rejected at `addIDP`/`updateIDP` time with `INVALID_CONFIGURATION`, so it can never be silently stored.
+:::
+
+Failure handling differs by path. On a **sign-in**, a **malformed** stored config is **skipped** so sign-in still succeeds (fail-open), recorded in the [audit log](#audit) as `idp_role_mapping_failed`; a **transient apply error** (e.g. a database error) instead **fails the sign-in** — it rolls back the whole transaction so no partial set of grants is ever committed. A third case sits between them: a **well-formed** config whose *individual* rule fails apply-time re-validation against the project's **current** ACL (the role/variable drifted since the mapping was authored, or the target project's row exists but its ACL is momentarily unresolvable) has that **rule dropped** — the remaining safe rules still apply and **sign-in succeeds**, with the drop recorded as `idp_role_mapping_failed` (a partial-apply fail-open, not a whole-mapping skip). On a **session refresh** the apply runs in its own transaction and is fully fail-open: a malformed config *or* a transient apply error is swallowed (the session is kept) and recorded as `idp_role_mapping_failed`. When a mapping actually changes an identity's memberships, the sync is recorded as `idp_role_mapped`.
+
 ## Audit
 
 :::note[Available since 2.2]
@@ -598,7 +717,9 @@ Every IdP management call is recorded in the [audit log](/reference/engine/tenan
 | `enableIDP` | `idp_enable` | `{identityProvider}` |
 | `disconnectMyIdentityProvider` | `idp_disconnect` | `{id, slug}` — the removed [connection](#personal-idp-connections) id and the provider slug |
 
-Sign-in attempts via IdP are recorded as `idp_login`. When [session re-validation](#session-re-validation) revokes a session, it is recorded as `idp_session_revoked` with `event_data: {reason}` (e.g. `invalid_grant`, `inactive`, `idp_disabled`); a token rotation is recorded as `idp_session_revalidated`.
+Sign-in attempts via IdP are recorded as `idp_login`. When a [membership mapping](#membership-mapping) changes an identity's project memberships (on sign-in or on a session refresh), that sync is recorded separately as `idp_role_mapped` with `event_data: {before, after, syncPolicy, unmatched}` (each of `before`/`after` is `{memberships}`) — only when grants actually changed, never on a no-op. Note that the `before`/`after` membership snapshots include membership-variable **values** for every role in the mapping's [vocabulary](#syncpolicy-and-unmatched) — both **claim-derived** values (when a variable uses `passthrough` or `allow`) **and any variable managed outside the mapping on that same role** (e.g. an admin-set `condition` filter), since the snapshot is bounded per `(project, role)`, not per variable name. All of those values are therefore persisted in `person_auth_log.event_data` and are readable via `system:viewAuthLog`. By contrast, `idp_role_mapping_failed` deliberately carries **no** claim values. A mapping that was configured but failed and was skipped (fail-open) is recorded as `idp_role_mapping_failed`.
+
+When [session re-validation](#session-re-validation) revokes a session, it is recorded as `idp_session_revoked` with `event_data: {reason}` (e.g. `invalid_grant`, `inactive`, `idp_disabled`); a token rotation is recorded as `idp_session_revalidated`.
 
 [Single Logout](#single-logout) adds two more *(since 2.2)*: signing out a federated session that produced an RP-initiated logout URL is recorded as `idp_logout_initiated` (`event_data: {all}`), and an IdP-initiated back-channel logout as `idp_backchannel_logout` (`event_data: {sid, sub, revokedCount}`). The back-channel audit write is best-effort — it never fails the logout — so a missing entry means observability was lost, not that the logout did not happen.
 

@@ -45,6 +45,12 @@ export interface Test {
 	 * to exercise forbidden / partially-allowed (e.g. per-role) ACL branches.
 	 */
 	authorizator?: Authorizator<Identity>
+	/**
+	 * Override the project schema resolver (default: a fixed schema defining roles `editor` / `reviewer`).
+	 * Pass `{ getSchema: () => Promise.resolve(undefined) }` to exercise the unresolvable-schema branch of
+	 * the A09 apply-time backstop.
+	 */
+	projectSchemaResolver?: ProjectSchemaResolver
 }
 
 export const createUuidGenerator = () => {
@@ -65,13 +71,37 @@ const schema: Schema = {
 						type: Acl.VariableType.entity,
 						entityName: 'Language',
 					},
+					// A condition variable for the claim-mapping config-validation tests. It carries a `fallback`
+					// so it is OPTIONAL — a membership that doesn't set it (e.g. createApiKey's editor grant)
+					// stays valid instead of failing with VARIABLE_EMPTY.
+					siteFilter: {
+						type: Acl.VariableType.condition,
+						fallback: { never: true },
+					},
+					// An entity variable used by the claim-mapping apply tests (a claim mapped to locale ids).
+					// Carries a `fallback` so it stays OPTIONAL on the direct add-member path, while A09's
+					// apply-time backstop now drops a grant naming a role/variable absent from the live ACL — so
+					// the variable must exist here for the happy-path apply tests to validate and be applied.
+					locale: {
+						type: Acl.VariableType.entity,
+						entityName: 'Locale',
+						fallback: { never: true },
+					},
 				},
+			},
+			// A second project role for the claim-mapping reconciliation tests (unmatched: remove grants and
+			// strips both `editor` and `reviewer`). Must exist in the live ACL or A09's apply-time backstop
+			// drops the grant for it.
+			reviewer: {
+				stages: '*',
+				entities: {},
+				variables: {},
 			},
 		},
 	},
 }
 
-const projectSchemaResolver: ProjectSchemaResolver = {
+const defaultProjectSchemaResolver: ProjectSchemaResolver = {
 	getSchema: project => Promise.resolve(schema),
 }
 
@@ -80,6 +110,7 @@ export const authenticatedApiKeyId = testUuid(998)
 
 export const executeTenantTest = async (test: Test) => {
 	const mailer = createMockedMailer()
+	const projectSchemaResolver = test.projectSchemaResolver ?? defaultProjectSchemaResolver
 	const providers: Providers = {
 		bcrypt: (value: string) => Promise.resolve('BCRYPTED-' + value),
 		bcryptCompare: (data: string, hash: string) => Promise.resolve('BCRYPTED-' + data === hash),

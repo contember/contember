@@ -54,6 +54,13 @@ export type RevalidationResult =
 		status: 'valid'
 		/** Fresh claims, if the revalidation method returned any (e.g. userinfo). */
 		claims?: Record<string, unknown>
+		/**
+		 * Whether `claims` represent the IdP's COMPLETE claim surface — the same one sign-in sees — so a
+		 * claim-mapping reconciliation may safely remove memberships under `unmatched: "remove"`. A partial
+		 * surface (a userinfo-only probe, or a refresh whose userinfo fetch failed) leaves this false, and the
+		 * caller keeps refresh-time sync additive-only to avoid stripping a grant the IdP still asserts.
+		 */
+		claimsComplete?: boolean
 		/** Updated session state to persist (e.g. a rotated refresh token). */
 		idpSession?: IDPSessionState
 	}

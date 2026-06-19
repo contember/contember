@@ -3,7 +3,7 @@ import { UpdateProjectMemberErrorCode } from '../../../schema/index.js'
 import { CreateOrUpdateProjectMembershipCommand } from './CreateOrUpdateProjectMembershipCommand.js'
 import { SelectBuilder } from '@contember/database'
 import { MembershipUpdateInput } from './types.js'
-import { RemoveProjectMembershipCommand } from './RemoveProjectMembershipsCommand.js'
+import { RemoveProjectMembershipCommand } from './RemoveProjectMembershipCommand.js'
 import { Response, ResponseError, ResponseOk } from '../../utils/Response.js'
 
 export class UpdateProjectMemberCommand implements Command<UpdateProjectMemberResponse> {

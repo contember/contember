@@ -11,11 +11,14 @@ import { TenantRole } from '../authorization/index.js'
 import { NoPassword } from '../dtos/index.js'
 import { IdentityProviderRow } from '../queries/idp/types.js'
 import { AuthLogService } from './AuthLogService.js'
+import { ClaimMappingAudit, IDPClaimSyncService } from './idp/IDPClaimSyncService.js'
+import { ClaimMapping, parseClaimMapping } from './idp/ClaimMapping.js'
 
 class IDPSignInManager {
 	constructor(
 		private readonly apiKeyManager: ApiKeyManager,
 		private readonly idpRegistry: IDPHandlerRegistry,
+		private readonly claimSyncService: IDPClaimSyncService,
 	) {}
 
 	async signInIDP(
@@ -85,6 +88,40 @@ class IDPSignInManager {
 				})
 			}
 
+			// A09 — map IdP claims to project memberships. Returns a `{ before, after }` delta only
+			// when something actually changed; the resolver emits the `idp_role_mapped` audit from it
+			// (audit stays at the resolver layer).
+			//
+			// Fail-open on a MALFORMED/out-of-band `claimMapping`: parsing is caught so a bad config can
+			// never lock the user out — sign-in proceeds without claim mapping and the resolver emits an
+			// `idp_role_mapping_failed` marker. A DB error during the apply itself is NOT caught: it
+			// propagates and rolls back the whole sign-in transaction, so a half-applied set of grants is
+			// never committed (failing sign-in on an infra error is the safe outcome).
+			let mapping: ClaimMapping | null = null
+			let claimMappingFailed = false
+			try {
+				mapping = parseClaimMapping(provider.configuration)
+			} catch {
+				claimMappingFailed = true
+			}
+			let claimMappingAudit: ClaimMappingAudit | null = null
+			if (mapping) {
+				const syncResult = await this.claimSyncService.sync(
+					db,
+					mapping,
+					claim,
+					{ id: personRow.identity_id },
+					resolved.isNewPerson === true,
+				)
+				claimMappingAudit = syncResult.audit
+				// The apply-time safety backstop dropped a configured rule (config-time validation was skipped, or
+				// the project's ACL drifted since): surface the same fail-open marker as a malformed config, so a
+				// silently-unapplied grant is visible to the operator. The resolver emits `idp_role_mapping_failed`.
+				if (syncResult.droppedUnsafeRules) {
+					claimMappingFailed = true
+				}
+			}
+
 			const { id: apiKeyId, token: sessionToken } = await this.apiKeyManager.createSessionApiKeyWithId(
 				db,
 				personRow.identity_id,
@@ -129,6 +166,9 @@ class IDPSignInManager {
 				person: personRow,
 				token: sessionToken,
 				idpResponse: claim,
+				claimMappingAudit,
+				claimMappingFailed,
+				identityProviderId: provider.id,
 				[AuthLogService.Key]: new AuthLogService.Bag({
 					personId: personRow.id,
 					identityProviderId: provider.id,
@@ -194,7 +234,7 @@ class IDPSignInManager {
 		if (provider.autoSignUp) {
 			const signedUpPerson = await this.signUp(db, claim, provider)
 			await this.saveIdpIdentifier(db, provider, claim, signedUpPerson)
-			return { person: signedUpPerson }
+			return { person: signedUpPerson, isNewPerson: true }
 		}
 
 		return { person: null }
@@ -229,6 +269,8 @@ namespace IDPSignInManager {
 		readonly person: PersonRow | null
 		readonly blockedReason?: 'idp_email_unverified'
 		readonly blockedPersonId?: string
+		/** True when the person row was just created by auto-sign-up (drives the `sticky` claim-mapping policy). */
+		readonly isNewPerson?: boolean
 	}
 
 	export type InitSignInIDPResponse = Response<InitSignInIdpResult, InitSignInIdpErrorCode>
@@ -237,6 +279,12 @@ namespace IDPSignInManager {
 		readonly person: PersonRow
 		readonly token: string
 		readonly idpResponse?: Record<string, unknown>
+		/** Identity provider the sign-in went through (for the resolver's audit). */
+		readonly identityProviderId?: string
+		/** Claim-mapping (A09) before/after delta — present only when a mapping changed grants. */
+		readonly claimMappingAudit?: ClaimMappingAudit | null
+		/** True when claim mapping failed and was skipped (fail-open) — drives the `idp_role_mapping_failed` audit. */
+		readonly claimMappingFailed?: boolean
 		[AuthLogService.Key]: AuthLogService.Bag
 	}
 

@@ -48,7 +48,10 @@ export class OIDCProvider implements IdentityProviderHandler<OIDCConfiguration> 
 
 	public async revalidate(configuration: OIDCConfiguration, session: IDPSessionState): Promise<RevalidationResult> {
 		const client = await this.createOIDCClient(configuration)
-		return await revalidateOIDC(client, configuration.revalidation?.method ?? 'refresh', session)
+		return await revalidateOIDC(client, configuration.revalidation?.method ?? 'refresh', session, {
+			claimMapping: configuration.claimMapping,
+			fetchUserInfo: configuration.fetchUserInfo,
+		})
 	}
 
 	public async buildLogoutUrl(configuration: OIDCConfiguration, request: LogoutUrlRequest): Promise<string | null> {

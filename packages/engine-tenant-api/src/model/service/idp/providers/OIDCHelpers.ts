@@ -63,12 +63,105 @@ export type HandleOIDCResponseOptions = {
 	claimMapping?: OIDCClaimMapping
 }
 
-/** Read a claim by name, supporting dot-paths into nested objects (`a.b.c`). */
+/**
+ * Read a claim by name, supporting dot-paths into nested objects (`a.b.c`). Own-property only at every
+ * segment (mirrors `ClaimMappingEvaluator.resolvePath`): a configured path must never descend into an
+ * inherited member, so a `__proto__` / `constructor` segment cannot surface an `Object.prototype` value
+ * as the externalIdentifier / email / name.
+ */
 const getClaim = (source: Record<string, unknown>, path: string): unknown =>
 	path.split('.').reduce<unknown>(
-		(acc, key) => (acc != null && typeof acc === 'object' ? (acc as Record<string, unknown>)[key] : undefined),
+		(
+			acc,
+			key,
+		) => (acc != null && typeof acc === 'object' && Object.prototype.hasOwnProperty.call(acc, key) ? (acc as Record<string, unknown>)[key] : undefined),
 		source,
 	)
+
+/**
+ * Lift a configured nested attributes object (`attributesKey`, notably Apereo CAS's `attributes`) to the
+ * top level so providers that nest their claims map without a code change. The nested attributes are
+ * UNSIGNED, so they are spread UNDER `source` — a signed top-level claim keeps precedence over an
+ * attributes-level value. Shared by the sign-in response handler ({@link handleOIDCResponse}) and the
+ * session-refresh path ({@link revalidateOIDC}) so BOTH see the same claim surface; without this, an
+ * `attributesKey` provider's A09 claim mapping would resolve at sign-in but silently not on refresh.
+ */
+export const liftNestedClaims = (source: Record<string, unknown>, attributesKey: string | undefined): Record<string, unknown> => {
+	if (!attributesKey) {
+		return source
+	}
+	const nested = Object.prototype.hasOwnProperty.call(source, attributesKey) ? source[attributesKey] : undefined
+	if (nested !== null && typeof nested === 'object' && !Array.isArray(nested)) {
+		return { ...nested, ...source }
+	}
+	return source
+}
+
+type NormalizedClaims = Record<string, unknown> & {
+	externalIdentifier: string
+	email: string | undefined
+	name: string | undefined
+	emailVerified: boolean
+}
+
+/**
+ * Build the normalized claim surface shared by sign-in ({@link handleOIDCResponse}) and session refresh
+ * ({@link revalidateOIDC}): lift any configured nested attributes object to the top level, then layer the
+ * mapped identity fields (`externalIdentifier` / `email` / `name` / `emailVerified`) over the raw claims.
+ * BOTH paths run this SAME normalization so an A09 claim-mapping rule resolves identically whether it
+ * targets a raw provider claim or one of the normalized identity fields — without it the two surfaces
+ * diverged (refresh saw the raw claim, sign-in the mapped value).
+ *
+ * `subFallback` is the signature-verified ID-token `sub`, used when a custom `externalIdentifier` mapping
+ * resolves to nothing: at sign-in it is guaranteed present; on refresh it is the refreshed id-token's `sub`
+ * (or, for the userinfo method, the userinfo `sub`). Throws (account-takeover guard) when the mapped
+ * subject is a non-scalar or resolves empty — the refresh caller catches this and skips the sync.
+ */
+const normalizeClaims = (
+	rawSource: Record<string, unknown>,
+	claimMapping: OIDCClaimMapping | undefined,
+	subFallback: string | undefined,
+): NormalizedClaims => {
+	const source = liftNestedClaims(rawSource, claimMapping?.attributesKey)
+
+	// The OIDC `email_verified` claim is a boolean per spec, but some providers send the
+	// string "true". userInfo (and any unwrapped attributes) take precedence over the ID token.
+	const rawEmailVerified = source.email_verified
+	const emailVerified = rawEmailVerified === true || rawEmailVerified === 'true'
+
+	// `externalIdentifier` is the federation key persisted in `person_identity_provider` and
+	// matched on the next sign-in, so it must be a stable scalar. A `claimMapping` that pointed
+	// it at an object/array would otherwise be coerced by `String(...)` to `'[object Object]'` /
+	// a comma-join — collapsing every user of the provider onto one key (account takeover). Fail
+	// closed instead. The default `sub` path is safe (openid-client guarantees `sub` is a string).
+	const mappedSubject = getClaim(source, claimMapping?.externalIdentifier ?? 'sub')
+	let externalIdentifier: string
+	if (mappedSubject === undefined || mappedSubject === null) {
+		externalIdentifier = subFallback ?? ''
+	} else if (typeof mappedSubject === 'string' || typeof mappedSubject === 'number') {
+		externalIdentifier = String(mappedSubject)
+	} else {
+		throw new IDPValidationError(`The mapped externalIdentifier claim is not a scalar value`)
+	}
+	if (externalIdentifier === '') {
+		throw new IDPValidationError(`The mapped externalIdentifier claim resolved to an empty value`)
+	}
+
+	// `email` / `name` are typed `string | undefined` on IDPResponse and feed the by-e-mail
+	// account lookup (which crashes on a non-string). `...source` already placed the raw claim
+	// of whatever type, so OVERWRITE (don't conditionally add) with the mapped value when it is
+	// a string, otherwise `undefined` — a non-string claim must not leak through `...source`.
+	const email = getClaim(source, claimMapping?.email ?? 'email')
+	const name = getClaim(source, claimMapping?.name ?? 'name')
+
+	return {
+		...source,
+		externalIdentifier,
+		email: typeof email === 'string' ? email : undefined,
+		name: typeof name === 'string' ? name : undefined,
+		emailVerified,
+	}
+}
 
 export const handleOIDCResponse = async (
 	client: Client,
@@ -87,58 +180,15 @@ export const handleOIDCResponse = async (
 		const oidcResult = returnOIDCResult ? result : {}
 		const idpSession = captureSession ? tokenSetToSessionState(result, typeof claims.sid === 'string' ? claims.sid : undefined) : undefined
 
-		// Merge ID-token claims with userInfo (userInfo wins, per spec). Then optionally lift a
-		// nested attributes object to the top level so providers that nest their claims (notably
-		// Apereo CAS userinfo, which returns them under `attributes`) map without a code change.
-		// The nested attributes are UNSIGNED, so they must not override a claim already present in
-		// the (signature-verified) ID-token / userInfo merge — spread them UNDER `source`, not over
-		// it, so a signed `sub` / `email_verified` keeps precedence over an attributes-level value.
-		let source: Record<string, unknown> = { ...claimsWithoutHashes, ...userInfo }
-		const attributesKey = claimMapping?.attributesKey
-		if (attributesKey) {
-			const nested = source[attributesKey]
-			if (nested && typeof nested === 'object' && !Array.isArray(nested)) {
-				source = { ...(nested as Record<string, unknown>), ...source }
-			}
-		}
-
-		// The OIDC `email_verified` claim is a boolean per spec, but some providers send the
-		// string "true". userInfo (and any unwrapped attributes) take precedence over the ID token.
-		const rawEmailVerified = source.email_verified
-		const emailVerified = rawEmailVerified === true || rawEmailVerified === 'true'
-
-		// `externalIdentifier` is the federation key persisted in `person_identity_provider` and
-		// matched on the next sign-in, so it must be a stable scalar. A `claimMapping` that pointed
-		// it at an object/array would otherwise be coerced by `String(...)` to `'[object Object]'` /
-		// a comma-join — collapsing every user of the provider onto one key (account takeover). Fail
-		// closed instead. The default `sub` path is safe (openid-client guarantees `sub` is a string).
-		const mappedSubject = getClaim(source, claimMapping?.externalIdentifier ?? 'sub')
-		let externalIdentifier: string
-		if (mappedSubject === undefined || mappedSubject === null) {
-			externalIdentifier = claims.sub
-		} else if (typeof mappedSubject === 'string' || typeof mappedSubject === 'number') {
-			externalIdentifier = String(mappedSubject)
-		} else {
-			throw new IDPValidationError(`The mapped externalIdentifier claim is not a scalar value`)
-		}
-		if (externalIdentifier === '') {
-			throw new IDPValidationError(`The mapped externalIdentifier claim resolved to an empty value`)
-		}
-
-		// `email` / `name` are typed `string | undefined` on IDPResponse and feed the by-e-mail
-		// account lookup (which crashes on a non-string). `...source` already placed the raw claim
-		// of whatever type, so OVERWRITE (don't conditionally add) with the mapped value when it is
-		// a string, otherwise `undefined` — a non-string claim must not leak through `...source`.
-		const email = getClaim(source, claimMapping?.email ?? 'email')
-		const name = getClaim(source, claimMapping?.name ?? 'name')
+		// Merge ID-token claims with userInfo (userInfo wins, per spec), then normalize the surface (lift
+		// nested attributes + map the identity fields). The refresh path runs the SAME normalization, so a
+		// claim mapping resolves identically at sign-in and on refresh. The default `sub` fallback is safe —
+		// openid-client guarantees `sub` is a string.
+		const normalized = normalizeClaims({ ...claimsWithoutHashes, ...userInfo }, claimMapping, claims.sub)
 
 		return {
 			...oidcResult,
-			...source,
-			externalIdentifier,
-			email: typeof email === 'string' ? email : undefined,
-			name: typeof name === 'string' ? name : undefined,
-			emailVerified,
+			...normalized,
 			...(idpSession ? { idpSession } : {}),
 		}
 	} catch (e: any) {
@@ -169,7 +219,9 @@ export const revalidateOIDC = async (
 	client: Client,
 	method: 'refresh' | 'userinfo' | 'introspection',
 	session: IDPSessionState,
+	options: { claimMapping?: OIDCClaimMapping; fetchUserInfo?: boolean } = {},
 ): Promise<RevalidationResult> => {
+	const { claimMapping, fetchUserInfo } = options
 	const tokens = session.tokens ?? {}
 	const refreshToken = typeof tokens.refresh_token === 'string' ? tokens.refresh_token : undefined
 	const accessToken = typeof tokens.access_token === 'string' ? tokens.access_token : undefined
@@ -180,14 +232,31 @@ export const revalidateOIDC = async (
 			}
 			const tokenSet = await client.refresh(refreshToken)
 			let claims: Record<string, unknown> | undefined
+			let claimsComplete = false
 			try {
-				claims = tokenSet.id_token ? tokenSet.claims() : undefined
+				// Reconstruct the SAME claim surface sign-in builds (handleOIDCResponse): the refreshed id-token
+				// claims merged with userInfo when `fetchUserInfo` is set — exactly as at sign-in — then the shared
+				// normalization (lift nested attributes + map identity fields). An `always` mapping therefore
+				// reconciles against an identical surface on refresh, so `claimsComplete` lets the caller enable
+				// `unmatched: "remove"` reconciliation here too (see IdpSessionRevalidator).
+				if (tokenSet.id_token) {
+					const idClaims = tokenSet.claims()
+					const userInfo = tokenSet.access_token && fetchUserInfo ? await client.userinfo(tokenSet) : {}
+					claims = normalizeClaims({ ...idClaims, ...userInfo }, claimMapping, typeof idClaims.sub === 'string' ? idClaims.sub : undefined)
+					claimsComplete = true
+				}
 			} catch {
+				// Building the surface failed (userinfo unreachable, a non-scalar `externalIdentifier`, …). The IdP
+				// already vouched for the session via the successful refresh, so KEEP it — just skip the claim sync
+				// this tick (no claims → no grant, no removal) and retry on a later refresh. Leaving claimsComplete
+				// false also guarantees a half-built surface can never drive a removal.
 				claims = undefined
+				claimsComplete = false
 			}
 			return {
 				status: 'valid',
 				claims,
+				claimsComplete,
 				// carry the stored tokens forward: a non-rotating IdP omits the refresh token here
 				idpSession: tokenSetToSessionState(tokenSet, session.sessionId, tokens),
 			}
@@ -197,7 +266,16 @@ export const revalidateOIDC = async (
 				return { status: 'revoked', reason: 'no_access_token' }
 			}
 			const userInfo = await client.userinfo(accessToken)
-			return { status: 'valid', claims: userInfo }
+			let claims: Record<string, unknown> | undefined
+			try {
+				claims = normalizeClaims(userInfo, claimMapping, typeof userInfo.sub === 'string' ? userInfo.sub : undefined)
+			} catch {
+				claims = undefined
+			}
+			// A userinfo probe carries no id-token claims, so its surface is NARROWER than sign-in's (id-token +
+			// userinfo): a rule keyed on an id-token-only claim would miss here. Keep refresh-time sync additive-only
+			// (`claimsComplete: false`) so `unmatched: "remove"` never strips a membership off this partial surface.
+			return { status: 'valid', claims, claimsComplete: false }
 		}
 		// introspection
 		const token = accessToken ?? refreshToken

@@ -13,7 +13,9 @@ jobs:
     steps:
       - uses: actions/checkout@v5
         with:
-          fetch-tags: true # extract-version enumerates `git tag -l` to pick the npm dist-tag
+          # full clone so extract-version can read `git tag -l`; fetch-tags
+          # collides with the tag-ref checkout on tag-triggered runs.
+          fetch-depth: 0
 
       - name: Setup node
         uses: actions/setup-node@v5
@@ -50,7 +52,9 @@ jobs:
     steps:
       - uses: actions/checkout@v5
         with:
-          fetch-tags: true # extract-version enumerates `git tag -l` to pick the docker tags
+          # full clone so extract-version can read `git tag -l`; fetch-tags
+          # collides with the tag-ref checkout on tag-triggered runs.
+          fetch-depth: 0
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3

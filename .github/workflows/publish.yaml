@@ -12,6 +12,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
+        with:
+          fetch-tags: true # extract-version enumerates `git tag -l` to pick the npm dist-tag
 
       - name: Setup node
         uses: actions/setup-node@v5
@@ -47,6 +49,8 @@ jobs:
         image: [cli, engine]
     steps:
       - uses: actions/checkout@v5
+        with:
+          fetch-tags: true # extract-version enumerates `git tag -l` to pick the docker tags
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3

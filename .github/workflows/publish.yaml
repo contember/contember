@@ -12,6 +12,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          # full clone so extract-version can read `git tag -l`; fetch-tags
+          # collides with the tag-ref checkout on tag-triggered runs.
+          fetch-depth: 0
 
       - name: Setup node
         uses: actions/setup-node@v4
@@ -47,6 +51,10 @@ jobs:
         image: [cli, engine]
     steps:
       - uses: actions/checkout@v4
+        with:
+          # full clone so extract-version can read `git tag -l`; fetch-tags
+          # collides with the tag-ref checkout on tag-triggered runs.
+          fetch-depth: 0
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v1

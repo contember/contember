@@ -34,7 +34,10 @@ const parseVersion = (version) => {
 	const inputVersion = getInput('version')
 	const version = parseVersion(inputVersion)
 	if (!version) {
-		return
+		// Fail loudly instead of silently emitting no outputs: an unparseable tag
+		// would otherwise lead to `npm publish --tag ''` on every package.
+		console.error(`extract-version: could not parse "${inputVersion}" (expected e.g. v2.2.0 or v2.2.0-alpha.1)`)
+		process.exit(1)
 	}
 	exec('git tag -l', (err, stdout) => {
 		if (err) {

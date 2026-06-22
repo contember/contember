@@ -8,9 +8,12 @@ fi
 
 version=$1
 
-# Validate the semver format using a regex
-if ! [[ $version =~ ^([0-9]+\.){2}[0-9]+(-[0-9A-Za-z-]+(\.[0-9A-Za-z-]+)*)?(\+[0-9A-Za-z-]+(\.[0-9A-Za-z-]+)*)?$ ]]; then
-    echo "Invalid semver: $version"
+# Validate the version format. Must stay a strict subset of what
+# .github/actions/extract-version accepts (MAJOR.MINOR.PATCH with an optional
+# -<prerelease>.<number>), otherwise the publish workflow can't parse the tag and
+# would emit no npm/docker tags.
+if ! [[ $version =~ ^[0-9]+\.[0-9]+\.[0-9]+(-[a-z]+\.[0-9]+)?$ ]]; then
+    echo "Invalid version: $version (expected e.g. 2.2.0 or 2.2.0-alpha.1)"
     exit 1
 fi
 

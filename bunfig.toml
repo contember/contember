@@ -1,2 +1,10 @@
+[install]
+# Force the hoisted node_modules layout. Bun's newer default ("isolated",
+# the node_modules/.bun store) gives each package its own node_modules, which
+# breaks `tsc`/`tsgo` declaration-emit portability (TS2883) and duplicates
+# type-only packages like @types/react (TS2322). Hoisting matches the layout
+# the project builds cleanly under and keeps it stable across bun versions.
+linker = "hoisted"
+
 [test]
 preload = "./buntest.ts"

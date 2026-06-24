@@ -303,7 +303,7 @@ export interface ReferenceElementRendererProps extends RenderElementProps, Refer
 }
 
 // @public (undocumented)
-export const referenceElementType: "reference";
+export const referenceElementType: 'reference';
 
 // @public (undocumented)
 export interface ResolvedDiscriminatedDatum<Datum> {

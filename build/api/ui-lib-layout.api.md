@@ -12,39 +12,42 @@ import { SlotSourceComponent } from '@contember/react-slots';
 import { SlotTargetComponent } from '@contember/react-slots';
 
 // @public (undocumented)
-export const LayoutBoxedComponent: {
-    (input: PropsWithChildren<{}>): JSX.Element;
+export function LayoutBoxedComponent(input: PropsWithChildren<{}>): JSX.Element;
+
+// @public (undocumented)
+export namespace LayoutBoxedComponent {
+    var // (undocumented)
     displayName: string;
-};
+}
 
 // @public (undocumented)
 export const LayoutComponent: (input: PropsWithChildren) => JSX.Element;
 
 // @public (undocumented)
 export const Slots: Readonly<{
-    readonly Title: SlotSourceComponent<"Title">;
-    readonly Logo: SlotSourceComponent<"Logo">;
-    readonly Navigation: SlotSourceComponent<"Navigation">;
-    readonly Footer: SlotSourceComponent<"Footer">;
+    readonly Actions: SlotSourceComponent<"Actions">;
     readonly Back: SlotSourceComponent<"Back">;
     readonly Content: SlotSourceComponent<"Content">;
     readonly ContentHeader: SlotSourceComponent<"ContentHeader">;
+    readonly Footer: SlotSourceComponent<"Footer">;
+    readonly Logo: SlotSourceComponent<"Logo">;
+    readonly Navigation: SlotSourceComponent<"Navigation">;
     readonly Sidebar: SlotSourceComponent<"Sidebar">;
-    readonly Actions: SlotSourceComponent<"Actions">;
+    readonly Title: SlotSourceComponent<"Title">;
     readonly UserNavigation: SlotSourceComponent<"UserNavigation">;
 }>;
 
 // @public (undocumented)
 export const SlotTargets: Readonly<{
-    readonly Title: SlotTargetComponent<"Title">;
-    readonly Logo: SlotTargetComponent<"Logo">;
-    readonly Navigation: SlotTargetComponent<"Navigation">;
-    readonly Footer: SlotTargetComponent<"Footer">;
+    readonly Actions: SlotTargetComponent<"Actions">;
     readonly Back: SlotTargetComponent<"Back">;
     readonly Content: SlotTargetComponent<"Content">;
     readonly ContentHeader: SlotTargetComponent<"ContentHeader">;
+    readonly Footer: SlotTargetComponent<"Footer">;
+    readonly Logo: SlotTargetComponent<"Logo">;
+    readonly Navigation: SlotTargetComponent<"Navigation">;
     readonly Sidebar: SlotTargetComponent<"Sidebar">;
-    readonly Actions: SlotTargetComponent<"Actions">;
+    readonly Title: SlotTargetComponent<"Title">;
     readonly UserNavigation: SlotTargetComponent<"UserNavigation">;
 }>;
 

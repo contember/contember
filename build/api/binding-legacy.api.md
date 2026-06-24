@@ -116,7 +116,7 @@ export class EntityAccessorImpl implements EntityAccessor {
     constructor(state: EntityRealmState, operations: EntityOperations, runtimeId: RuntimeId, key: EntityRealmKey, // ⚠️ This is *NOT* the id! ⚠️
     name: EntityName, fieldData: EntityAccessor.FieldData, dataFromServer: SingleEntityPersistedData | undefined, hasUnpersistedChanges: boolean, errors: ErrorAccessor | undefined, environment: Environment, getAccessor: EntityAccessor.GetEntityAccessor);
     // (undocumented)
-    readonly __type: "EntityAccessor";
+    readonly __type: 'EntityAccessor';
     // (undocumented)
     addError(error: ErrorAccessor.Error | string): () => void;
     // (undocumented)
@@ -151,7 +151,7 @@ export class EntityAccessorImpl implements EntityAccessor {
         updatable: boolean | undefined;
     };
     // (undocumented)
-    getMarker(): HasOneRelationMarker | EntitySubTreeMarker | HasManyRelationMarker | EntityListSubTreeMarker;
+    getMarker(): EntityListSubTreeMarker | EntitySubTreeMarker | HasManyRelationMarker | HasOneRelationMarker;
     // (undocumented)
     getParent(): EntityAccessor | EntityListAccessor | undefined;
     // (undocumented)
@@ -187,7 +187,7 @@ export class EntityListAccessorImpl implements EntityListAccessor {
         getAccessor: EntityAccessor.GetEntityAccessor;
     }>, _idsPersistedOnServer: ReadonlySet<EntityId>, hasUnpersistedChanges: boolean, errors: ErrorAccessor | undefined, environment: Environment, getAccessor: EntityListAccessor.GetEntityListAccessor);
     // (undocumented)
-    readonly __type: "EntityListAccessor";
+    readonly __type: 'EntityListAccessor';
     // (undocumented)
     addChildEventListener<Type extends keyof EntityAccessor.EntityEventListenerMap>(event: {
         type: Type;
@@ -295,7 +295,7 @@ export class FieldAccessorImpl<Value extends FieldValue = FieldValue> implements
     // Warning: (ae-forgotten-export) The symbol "FieldOperations" needs to be exported by the entry point index.d.ts
     constructor(state: FieldState<Value>, operations: FieldOperations, fieldName: FieldName, value: Value | null, valueOnServer: Value | null, defaultValue: Value | undefined, errors: ErrorAccessor | undefined, hasUnpersistedChanges: boolean, touchLog: ReadonlySet<string> | undefined, getAccessor: FieldAccessor.GetFieldAccessor<Value>, schema: SchemaColumn);
     // (undocumented)
-    readonly __type: "FieldAccessor";
+    readonly __type: 'FieldAccessor';
     // (undocumented)
     addError(error: ErrorAccessor.Error | string): () => void;
     // (undocumented)

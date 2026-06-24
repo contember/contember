@@ -92,7 +92,7 @@ export function useHasActiveSlotsFactory<T extends SlotTargetComponentsRecord<st
 export const useSlotTargetElement: (name: string) => HTMLElement | null | undefined;
 
 // @public
-export function useSlotTargetsFactory<R extends SlotTargetComponentsRecord<string>>(SlotTargets: R): <T>(slots: ReadonlyArray<keyof R & string>, override?: T) => NonNullable<T> | FunctionComponentElement<FragmentProps> | null;
+export function useSlotTargetsFactory<R extends SlotTargetComponentsRecord<string>>(SlotTargets: R): <T>(slots: ReadonlyArray<keyof R & string>, override?: T) => FunctionComponentElement<FragmentProps> | NonNullable<T> | null;
 
 // @public
 export const useTargetElementRegistrar: (name: string, aliases?: string[]) => (element: HTMLElement | null) => void;

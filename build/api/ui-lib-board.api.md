@@ -99,7 +99,7 @@ className?: string;
 
 // @public (undocumented)
 export const ColumnDropIndicator: (input: {
-    position: "before" | "after";
+    position: 'before' | 'after';
 }) => JSX.Element;
 
 // @public (undocumented)
@@ -115,7 +115,7 @@ export type DefaultBoardProps = {
 
 // @public (undocumented)
 export const ItemDropIndicator: (input: {
-    position: "before" | "after";
+    position: 'before' | 'after';
 }) => JSX.Element;
 
 // (No @packageDocumentation comment for this package)

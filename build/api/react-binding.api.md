@@ -54,10 +54,13 @@ import { TreeRootId } from '@contember/binding';
 export function AccessorProvider(props: EntityProviderProps): JSX.Element;
 
 // @public (undocumented)
-export const AccessorTree: {
-    (input: AccessorTreeProps): JSX.Element;
+export function AccessorTree(input: AccessorTreeProps): JSX.Element;
+
+// @public (undocumented)
+export namespace AccessorTree {
+    var // (undocumented)
     displayName: string;
-};
+}
 
 // @public (undocumented)
 export interface AccessorTreeProps {
@@ -687,7 +690,7 @@ export const useAccessorTreeState: () => AccessorTreeState;
 // @public
 export const useAccessorUpdateSubscription: <Accessor extends {
     addEventListener: (event: {
-        type: "update";
+        type: 'update';
     }, cb: (accessor: Accessor) => void) => () => void;
 }>(getAccessor: () => Accessor) => [Accessor, {
     update: () => void;
@@ -740,10 +743,10 @@ export function useEntity(sugaredRelativeSingleEntity: string | SugaredRelativeS
 export function useEntity(sugaredRelativeSingleEntity: string | SugaredRelativeSingleEntity | undefined): EntityAccessor | undefined;
 
 // @public (undocumented)
-export const useEntityBeforePersist: (listener: EntityAccessor.EntityEventListenerMap["beforePersist"]) => void;
+export const useEntityBeforePersist: (listener: EntityAccessor.EntityEventListenerMap['beforePersist']) => void;
 
 // @public (undocumented)
-export const useEntityBeforeUpdate: (listener: EntityAccessor.EntityEventListenerMap["beforeUpdate"]) => void;
+export const useEntityBeforeUpdate: (listener: EntityAccessor.EntityEventListenerMap['beforeUpdate']) => void;
 
 // @public (undocumented)
 export function useEntityEvent(type: 'beforePersist', listener: EntityAccessor.EntityEventListenerMap['beforePersist']): void;
@@ -842,10 +845,10 @@ export function useEntityListSubTreeParameters(qualifiedEntityList: SugaredQuali
 export function useEntityListSubTreeParameters(qualifiedEntityListOrAlias: Alias | SugaredQualifiedEntityList | SugaredUnconstrainedQualifiedEntityList): Alias | SugaredQualifiedEntityList | SugaredUnconstrainedQualifiedEntityList;
 
 // @public (undocumented)
-export const useEntityPersistError: (listener: EntityAccessor.EntityEventListenerMap["persistError"]) => void;
+export const useEntityPersistError: (listener: EntityAccessor.EntityEventListenerMap['persistError']) => void;
 
 // @public (undocumented)
-export const useEntityPersistSuccess: (listener: EntityAccessor.EntityEventListenerMap["persistSuccess"]) => void;
+export const useEntityPersistSuccess: (listener: EntityAccessor.EntityEventListenerMap['persistSuccess']) => void;
 
 // @public (undocumented)
 export const useEntitySubTree: (qualifiedSingleEntity: Alias | SugaredQualifiedSingleEntity | SugaredUnconstrainedQualifiedSingleEntity, ...treeId: [TreeRootId | undefined] | []) => EntityAccessor;
@@ -920,7 +923,7 @@ export function useEntitySubTreeParameters(qualifiedSingleEntityOrAlias: Alias |
 export const useEnvironment: () => Environment;
 
 // @public (undocumented)
-export const useExtendTree: () => (newFragment: ReactNode, options?: Omit<ExtendTreeOptions, "signal">) => Promise<TreeRootId | undefined>;
+export const useExtendTree: () => (newFragment: ReactNode, options?: Omit<ExtendTreeOptions, 'signal'>) => Promise<TreeRootId | undefined>;
 
 // @public (undocumented)
 export function useField<Value extends FieldValue = FieldValue>(sugaredRelativeSingleField: string | SugaredRelativeSingleField): FieldAccessor<Value>;
@@ -947,7 +950,7 @@ export const useLabelMiddleware: () => (it: ReactNode) => ReactNode;
 export const useMutationState: () => boolean;
 
 // @public (undocumented)
-export const useOnConnectionUpdate: (fieldName: FieldName, listener: EntityAccessor.EntityEventListenerMap["connectionUpdate"]) => void;
+export const useOnConnectionUpdate: (fieldName: FieldName, listener: EntityAccessor.EntityEventListenerMap['connectionUpdate']) => void;
 
 // @public (undocumented)
 export const usePersist: () => Persist;

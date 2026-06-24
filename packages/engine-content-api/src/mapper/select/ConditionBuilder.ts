@@ -81,6 +81,17 @@ export class ConditionBuilder {
 			null: (builder, value) => value ? builder.isNull(columnIdentifier) : builder.not(clause => clause.isNull(columnIdentifier)),
 		}
 
-		return handler[entries[0][0]](builder, entries[0][1])
+		// Dispatch through a generic helper so the key and the value stay correlated through a single
+		// type parameter K. Indexing `handler` with a union key would otherwise collapse the parameter
+		// type to `never`.
+		const apply = <K extends keyof Input.Condition<any>>(key: K): SqlConditionBuilder => {
+			const value = condition[key]
+			if (value === undefined) {
+				return builder
+			}
+			return handler[key](builder, value)
+		}
+
+		return apply(entries[0][0])
 	}
 }

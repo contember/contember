@@ -43,9 +43,9 @@ export interface DimensionLinkProps {
 export type DynamicRequestParameters = RequestParameters<RoutingParameter>;
 
 // @public (undocumented)
-export type IncompleteRequestState = Partial<RequestState<DynamicRequestParameters>> & {
+export type IncompleteRequestState = (Partial<RequestState<DynamicRequestParameters>> & {
     pageName: string;
-} | null;
+}) | null;
 
 // @public (undocumented)
 export type LazyPageModule = () => Promise<PageModule>;
@@ -56,12 +56,16 @@ export const Link: NamedExoticComponent<LinkProps>;
 // @public (undocumented)
 export type LinkProps = Omit<RoutingLinkProps, 'parametersResolver'>;
 
-// @public
-export const Page: {
-    <P>(props: PageProps<P>): JSX.Element | null;
+// @public (undocumented)
+export function Page<P>(props: PageProps<P>): JSX.Element | null;
+
+// @public (undocumented)
+export namespace Page {
+    var // (undocumented)
     displayName: string;
-    getPageName(props: PageProps<unknown>): string;
-};
+    var // (undocumented)
+    getPageName: (props: PageProps<unknown>) => string;
+}
 
 // @public (undocumented)
 export interface PageModule {

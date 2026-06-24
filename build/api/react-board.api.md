@@ -68,32 +68,41 @@ export type BoardDynamicColumnsBindingProps = {
 };
 
 // @public (undocumented)
-export const BoardEachColumn: {
-    (input: {
-        children: ReactNode;
-    }): JSX.Element;
-    staticRender(input: {
-        children: ReactNode;
-    }): JSX.Element;
-};
+export function BoardEachColumn(input: {
+    children: ReactNode;
+}): JSX.Element;
 
 // @public (undocumented)
-export const BoardEachItem: {
-    (input: {
+export namespace BoardEachColumn {
+    var // (undocumented)
+    staticRender: (input: {
         children: ReactNode;
-    }): JSX.Element;
-    staticRender(input: {
-        children: ReactNode;
-    }): JSX.Element;
-};
+    }) => JSX.Element;
+}
 
 // @public (undocumented)
-export const BoardItem: {
-    (input: {
+export function BoardEachItem(input: {
+    children: ReactNode;
+}): JSX.Element;
+
+// @public (undocumented)
+export namespace BoardEachItem {
+    var // (undocumented)
+    staticRender: (input: {
         children: ReactNode;
-    }): null;
-    staticRender(): null;
-};
+    }) => JSX.Element;
+}
+
+// @public (undocumented)
+export function BoardItem(input: {
+    children: ReactNode;
+}): null;
+
+// @public (undocumented)
+export namespace BoardItem {
+    var // (undocumented)
+    staticRender: () => null;
+}
 
 // @public (undocumented)
 export type BoardItemNode = {

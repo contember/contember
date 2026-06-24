@@ -146,8 +146,8 @@ export const SelectListItemUI: React_2.ForwardRefExoticComponent<Omit<Omit<React
     children?: ReactNode;
     className?: string;
 } & {
-    variant?: "link" | "default" | "destructive" | "outline" | "secondary" | "ghost" | null | undefined;
-    size?: "default" | "icon" | "xs" | "sm" | "lg" | null | undefined;
+    variant?: "default" | "destructive" | "ghost" | "link" | "outline" | "secondary" | null | undefined;
+    size?: "default" | "icon" | "lg" | "sm" | "xs" | null | undefined;
 }, "ref"> & React_2.RefAttributes<HTMLButtonElement> & {
     asChild?: boolean;
     children?: React_2.ReactNode;

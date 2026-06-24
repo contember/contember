@@ -300,7 +300,7 @@ export const UploaderClientContext: Context<UploadClient<any, FileUploadResult> 
 // @public (undocumented)
 export const UploaderEachFile: (input: {
     children: ReactNode;
-    state?: UploaderFileState["state"] | UploaderFileState["state"][];
+    state?: UploaderFileState['state'] | UploaderFileState['state'][];
     fallback?: ReactNode;
 }) => JSX.Element;
 
@@ -402,7 +402,7 @@ export type UploaderFileStateUploading = {
 export const UploaderHasFile: (input: {
     children: ReactNode;
     fallback?: ReactNode;
-    state?: UploaderFileState["state"] | UploaderFileState["state"][];
+    state?: UploaderFileState['state'] | UploaderFileState['state'][];
 }) => JSX.Element;
 
 // @public (undocumented)
@@ -455,7 +455,7 @@ export const useUploaderOptions: () => UploaderOptions;
 export const useUploaderState: () => UploaderState;
 
 // @public (undocumented)
-export const useUploaderStateFiles: (input?: UseUploaderStateFilesArgs) => UploaderState;
+export const useUploaderStateFiles: (input?: UseUploaderStateFilesArgs) => UploaderFileState[];
 
 // @public (undocumented)
 export type UseUploaderStateFilesArgs = {

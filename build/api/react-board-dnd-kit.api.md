@@ -46,28 +46,34 @@ export const BoardSortableColumnDragOverlay: (input: {
 // @public (undocumented)
 export const BoardSortableColumnDropIndicator: (input: {
     children: ReactNode;
-    position: "before" | "after";
+    position: 'before' | 'after';
 }) => JSX.Element | null;
 
 // @public (undocumented)
-export const BoardSortableEachColumn: {
-    (input: {
-        children: ReactNode;
-    }): JSX.Element;
-    staticRender(input: {
-        children: ReactNode;
-    }): JSX.Element;
-};
+export function BoardSortableEachColumn(input: {
+    children: ReactNode;
+}): JSX.Element;
 
 // @public (undocumented)
-export const BoardSortableEachItem: {
-    (input: {
+export namespace BoardSortableEachColumn {
+    var // (undocumented)
+    staticRender: (input: {
         children: ReactNode;
-    }): JSX.Element;
-    staticRender(input: {
+    }) => JSX.Element;
+}
+
+// @public (undocumented)
+export function BoardSortableEachItem(input: {
+    children: ReactNode;
+}): JSX.Element;
+
+// @public (undocumented)
+export namespace BoardSortableEachItem {
+    var // (undocumented)
+    staticRender: (input: {
         children: ReactNode;
-    }): JSX.Element;
-};
+    }) => JSX.Element;
+}
 
 // @public (undocumented)
 export const BoardSortableItemDragOverlay: (input: {
@@ -77,7 +83,7 @@ export const BoardSortableItemDragOverlay: (input: {
 // @public (undocumented)
 export const BoardSortableItemDropIndicator: (input: {
     children: ReactNode;
-    position: "before" | "after";
+    position: 'before' | 'after';
 }) => JSX.Element | null;
 
 // @public (undocumented)

@@ -41,7 +41,7 @@ export interface BlockRepeaterAddItemTriggerProps {
 
 // @internal (undocumented)
 export const BlockRepeaterConfigContext: Context<    {
-discriminatedBy: SugaredRelativeSingleField["field"];
+discriminatedBy: SugaredRelativeSingleField['field'];
 blocks: BlocksMap;
 }>;
 
@@ -56,7 +56,7 @@ export type BlocksMap = Record<string, BlockProps>;
 
 // @public
 export const useBlockRepeaterConfig: () => {
-    discriminatedBy: SugaredRelativeSingleField["field"];
+    discriminatedBy: SugaredRelativeSingleField['field'];
     blocks: BlocksMap;
 };
 

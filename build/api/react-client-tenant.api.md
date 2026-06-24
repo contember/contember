@@ -1816,7 +1816,7 @@ export const useSignOutMutation: (input?: TenantApiOptions) => (variables: {
 }) => Promise<TenantMutationResponse<unknown, TenantApi.SignOutErrorCode>>;
 
 // @public (undocumented)
-export const useTenantApi: (input?: TenantApiOptions) => <TData extends object, TVariables extends object>(fetcher: Fetcher<"Query" | "Mutation", TData, TVariables>, options?: {
+export const useTenantApi: (input?: TenantApiOptions) => <TData extends object, TVariables extends object>(fetcher: Fetcher<'Query' | 'Mutation', TData, TVariables>, options?: {
     readonly variables?: TVariables;
     readonly headers?: Record<string, string>;
     readonly apiToken?: string | typeof LoginToken;

@@ -158,7 +158,7 @@
       "@tailwindcss/cli": "^4.2.1",
       "tailwindcss": "^4.2.1",
       "tailwindcss-animate": "^1.0.7",
-      "typescript": "^6.0.1-rc",
+      "typescript": "7.0.1-rc",
       "uuid": "^13.0.0",
       "vite": "^7",
       "vite-tsconfig-paths": "^6.1.1",
@@ -167,7 +167,6 @@
     }
   },
   "resolutions": {
-    "typescript": "6.0.1-rc",
     "graphql": "16.13.1",
     "@types/node": "24.12.0",
     "rollup": "npm:@rollup/wasm-node@^4.43.0"

@@ -32,7 +32,7 @@ export const RepeaterAddItemButton: (input: {
 
 // @public
 export const RepeaterDropIndicator: (input: {
-    position: "before" | "after";
+    position: 'before' | 'after';
 }) => JSX.Element;
 
 // @public

@@ -55,7 +55,7 @@ export const anchorElementPlugin: (input: {
 }) => EditorElementPlugin<AnchorElement>;
 
 // @public (undocumented)
-export const anchorElementType: "anchor";
+export const anchorElementType: 'anchor';
 
 // @public (undocumented)
 export const anchorHtmlDeserializer: HtmlDeserializerPlugin;
@@ -95,8 +95,8 @@ export const ContemberEditor: {
         from?: Path;
         to?: Path;
     }) => boolean;
-    hasParentOfType: <Editor extends Editor_2, Element extends Element_2>(editor: Editor, nodeEntry: NodeEntry<Node_2 | Element_2>, type: Element["type"], suchThat?: Partial<Element>) => boolean;
-    isElementType: <Element extends Element_2>(element: Node_2, type: Element["type"], suchThat?: Partial<Element>) => boolean;
+    hasParentOfType: <Editor extends Editor_2, Element extends Element_2>(editor: Editor, nodeEntry: NodeEntry<Node_2 | Element_2>, type: Element['type'], suchThat?: Partial<Element>) => boolean;
+    isElementType: <Element extends Element_2>(element: Node_2, type: Element['type'], suchThat?: Partial<Element>) => boolean;
     permissivelyDeserializeNodes: <E extends Editor_2>(editor: E, serializedElement: string, errorMessage?: string) => Array<Element_2 | Text_2>;
     removeMarks: <T extends Text_2, E extends Editor_2>(editor: E, marks: TextSpecifics<T>) => void;
     serializeNodes: <E extends Editor_2>(editor: E, elements: Array<Element_2 | Text_2>, errorMessage?: string) => string;
@@ -406,7 +406,7 @@ export const headingElementPlugin: (input: {
 }) => EditorElementPlugin<HeadingElement>;
 
 // @public (undocumented)
-export const headingElementType: "heading";
+export const headingElementType: 'heading';
 
 // @public (undocumented)
 export const headingHtmlDeserializer: HtmlDeserializerPlugin;
@@ -431,7 +431,7 @@ export const horizontalRuleElementPlugin: (input: {
 }) => EditorElementPlugin<HorizontalRuleElement>;
 
 // @public (undocumented)
-export const horizontalRuleElementType: "horizontalRule";
+export const horizontalRuleElementType: 'horizontalRule';
 
 // @public (undocumented)
 export type HtmlDeserializerNextCallback = (children: NodeList | Node[], cumulativeTextAttrs: HtmlDeserializerTextAttrs) => Descendant[];
@@ -560,7 +560,7 @@ export const listItemElementPlugin: (input: {
 }) => EditorElementPlugin<ListItemElement>;
 
 // @public (undocumented)
-export const listItemElementType: "listItem";
+export const listItemElementType: 'listItem';
 
 // @public (undocumented)
 export interface OrderedListElement extends Element_2 {
@@ -576,7 +576,7 @@ export const orderedListElementPlugin: (input: {
 }) => EditorElementPlugin<OrderedListElement>;
 
 // @public (undocumented)
-export const orderedListElementType: "orderedList";
+export const orderedListElementType: 'orderedList';
 
 // @public (undocumented)
 export interface ParagraphElement extends Element_2 {
@@ -596,7 +596,7 @@ export const paragraphElementPlugin: (input: {
 }) => EditorElementPlugin<ParagraphElement>;
 
 // @public (undocumented)
-export const paragraphElementType: "paragraph";
+export const paragraphElementType: 'paragraph';
 
 // @public (undocumented)
 export const paragraphHtmlDeserializer: HtmlDeserializerPlugin;
@@ -625,7 +625,7 @@ export const scrollTargetElementPlugin: (input: {
 }) => EditorElementPlugin<ScrollTargetElement>;
 
 // @public (undocumented)
-export const scrollTargetElementType: "scrollTarget";
+export const scrollTargetElementType: 'scrollTarget';
 
 // @public (undocumented)
 export interface SerializableEditorNode {
@@ -659,7 +659,7 @@ export const tableCellElementPlugin: (input: {
 }) => EditorElementPlugin<TableCellElement>;
 
 // @public (undocumented)
-export const tableCellElementType: "tableCell";
+export const tableCellElementType: 'tableCell';
 
 // @public (undocumented)
 export interface TableElement extends Element_2 {
@@ -675,7 +675,7 @@ export const tableElementPlugin: (input: {
 }) => EditorElementPlugin<TableElement>;
 
 // @public (undocumented)
-export const tableElementType: "table";
+export const tableElementType: 'table';
 
 // @public (undocumented)
 export class TableModifications {
@@ -711,7 +711,7 @@ export const tableRowElementPlugin: (input: {
 }) => EditorElementPlugin<TableRowElement>;
 
 // @public (undocumented)
-export const tableRowElementType: "tableRow";
+export const tableRowElementType: 'tableRow';
 
 // @public (undocumented)
 export type TextSpecifics<Text extends Text_2> = Omit<Text, 'text'>;
@@ -736,7 +736,7 @@ export const unorderedListElementPlugin: (input: {
 }) => EditorElementPlugin<UnorderedListElement>;
 
 // @public (undocumented)
-export const unorderedListElementType: "unorderedList";
+export const unorderedListElementType: 'unorderedList';
 
 // @public (undocumented)
 export const withAnchors: (input: {

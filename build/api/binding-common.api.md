@@ -557,7 +557,7 @@ export namespace Environment {
         [key: string]: ((environment: Environment) => Value) | Value;
     }
     const // (undocumented)
-    createExtension: <S, R>(create: Extension<S, R>["create"], otherMethods?: Omit<Extension<S, R>, "create">) => Extension<S, R>;
+    createExtension: <S, R>(create: Extension<S, R>['create'], otherMethods?: Omit<Extension<S, R>, 'create'>) => Extension<S, R>;
 }
 
 // @public (undocumented)
@@ -1238,7 +1238,7 @@ export interface QualifiedEntityList {
 
 // @public (undocumented)
 export const QualifiedEntityParametersDefaults: {
-    readonly expectedMutation: "anyMutation";
+    readonly expectedMutation: 'anyMutation';
 };
 
 // @public (undocumented)
@@ -1373,7 +1373,7 @@ export type ReceivedFieldData = FieldValue | ReceivedEntityData | Array<Received
 
 // @public (undocumented)
 export const RelationDefaults: {
-    readonly expectedMutation: "anyMutation";
+    readonly expectedMutation: 'anyMutation';
 };
 
 // @public (undocumented)

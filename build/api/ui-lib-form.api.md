@@ -67,7 +67,7 @@ export type BaseUploadFieldProps = Omit<FormContainerProps, 'children'> & Upload
 // @public
 export const CheckboxField: NamedExoticComponent<Omit<FormCheckboxProps, "children"> & Omit<FormContainerProps, "children"> & {
 required?: boolean;
-inputProps?: Omit<React.InputHTMLAttributes<HTMLInputElement>, "defaultValue">;
+inputProps?: Omit<React.InputHTMLAttributes<HTMLInputElement>, 'defaultValue'>;
 }>;
 
 // @public (undocumented)

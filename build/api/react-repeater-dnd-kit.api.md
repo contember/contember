@@ -37,7 +37,7 @@ export const RepeaterSortableDragOverlay: (input: {
 // @public
 export const RepeaterSortableDropIndicator: (input: {
     children: ReactNode;
-    position: "before" | "after";
+    position: 'before' | 'after';
 }) => JSX.Element | null;
 
 // @public

@@ -4,7 +4,6 @@ import {
 	DisableApiKeyCommand,
 	DisableIdentityApiKeysCommand,
 	DisableOneOffApiKeyCommand,
-	PROLONG_THROTTLE_MS,
 	ProlongApiKeyCommand,
 } from '../../commands/index.js'
 import { ApiKey } from '../../type/index.js'
@@ -57,55 +56,49 @@ export class ApiKeyManager {
 			)
 		}
 
-		// Single injectable clock for all session-policy time math (matches issuance,
-		// which uses providers.now()), so the A19 idle/max logic is deterministically testable.
-		const now = dbContext.providers.now()
-		if (apiKeyRow.expires_at !== null && apiKeyRow.expires_at <= now) {
-			return new ResponseError(VerifyErrorCode.DISABLED, `API key expired at ${apiKeyRow.expires_at.toISOString()}`)
+		// A19 time gates are computed on the DATABASE clock by ApiKeyByTokenQuery
+		// (is_expired / is_max_expired / is_idle_expired against NOW()), so app/DB clock
+		// skew — or skew between engine instances — can't weaken them. The idle slack
+		// (PROLONG_THROTTLE_MS) is folded into the SQL too. See engine-tenant-api/CLAUDE.md.
+		if (apiKeyRow.is_expired) {
+			return new ResponseError(VerifyErrorCode.DISABLED, `API key expired at ${apiKeyRow.expires_at?.toISOString()}`)
 		}
 
-		// A19: absolute hard cap (defensive — the prolong clamp should already keep
+		// Absolute hard cap (defensive — the prolong clamp should already keep
 		// expires_at <= max_expires_at, but enforce it here regardless).
-		if (apiKeyRow.max_expires_at !== null && apiKeyRow.max_expires_at <= now) {
+		if (apiKeyRow.is_max_expired) {
 			await dbContext.commandBus.execute(new DisableApiKeyCommand(apiKeyRow.id))
 			return new ResponseError(
 				VerifyErrorCode.DISABLED,
-				`API key reached its maximum lifetime at ${apiKeyRow.max_expires_at.toISOString()}`,
+				`API key reached its maximum lifetime at ${apiKeyRow.max_expires_at?.toISOString()}`,
 			)
 		}
 
-		// A19: idle timeout. Reject + disable when the session has been idle longer
-		// than the policy's idle_timeout. A null idle_timeout (today's default) or a
-		// never-used key (last_used_at null) are never idle-expired.
-		if (apiKeyRow.idle_timeout !== null && apiKeyRow.last_used_at !== null) {
-			const idleMs = intervalToSeconds(apiKeyRow.idle_timeout) * 1000
-			// last_used_at is written at most once per PROLONG_THROTTLE_MS (tracking is
-			// throttled), so it can legitimately lag a continuously-active session by up
-			// to that window. Add the throttle as slack so a small idle_timeout can't
-			// idle-expire a session that is actually in use.
-			if (now.getTime() - apiKeyRow.last_used_at.getTime() > idleMs + PROLONG_THROTTLE_MS) {
-				await dbContext.commandBus.execute(new DisableApiKeyCommand(apiKeyRow.id))
-				try {
-					await this.authLogService.logSessionEvent(dbContext, {
-						type: 'session_expired_idle',
-						identityId: apiKeyRow.identity_id,
-						personId: apiKeyRow.person_id,
-						ipAddress: requestInfo?.ip,
-						userAgent: requestInfo?.userAgent,
-						success: false,
-						eventData: {
-							lastUsedAt: apiKeyRow.last_used_at?.toISOString() ?? null,
-							idleTimeout: String(apiKeyRow.idle_timeout),
-						},
-					})
-				} catch {
-					/* best-effort: auth path must stay resilient */
-				}
-				return new ResponseError(
-					VerifyErrorCode.DISABLED,
-					`API key was idle since ${apiKeyRow.last_used_at.toISOString()} and exceeded the idle timeout`,
-				)
+		// Idle timeout. Reject + disable when the session has been idle longer than the
+		// policy's idle_timeout. A null idle_timeout (today's default) or a never-used
+		// key (last_used_at null) are never idle-expired — the SQL encodes both.
+		if (apiKeyRow.is_idle_expired) {
+			await dbContext.commandBus.execute(new DisableApiKeyCommand(apiKeyRow.id))
+			try {
+				await this.authLogService.logSessionEvent(dbContext, {
+					type: 'session_expired_idle',
+					identityId: apiKeyRow.identity_id,
+					personId: apiKeyRow.person_id,
+					ipAddress: requestInfo?.ip,
+					userAgent: requestInfo?.userAgent,
+					success: false,
+					eventData: {
+						lastUsedAt: apiKeyRow.last_used_at?.toISOString() ?? null,
+						idleTimeout: String(apiKeyRow.idle_timeout),
+					},
+				})
+			} catch {
+				/* best-effort: auth path must stay resilient */
 			}
+			return new ResponseError(
+				VerifyErrorCode.DISABLED,
+				`API key was idle since ${apiKeyRow.last_used_at?.toISOString()} and exceeded the idle timeout`,
+			)
 		}
 
 		const effectiveInfo: ApiKeyRequestInfo | undefined = apiKeyRow.trust_forwarded_info && forwardedInfo
@@ -204,11 +197,10 @@ export class ApiKeyManager {
 			expirationCapped = Math.min(expirationCapped, intervalToSeconds(policy.tokenExpiration) / 60)
 		}
 
-		// Absolute hard cap: issued_at + policy.tokenExpiration. NULL = uncapped
-		// sliding window (today's behavior).
-		const issuedAt = dbContext.providers.now()
-		const maxExpiresAt = policy.tokenExpiration
-			? new Date(issuedAt.getTime() + intervalToSeconds(policy.tokenExpiration) * 1000)
+		// Absolute hard cap as a lifetime in seconds; CreateApiKeyCommand writes it as
+		// now() + interval on the DB clock. NULL = uncapped sliding window (today's behavior).
+		const maxExpirationSeconds = policy.tokenExpiration
+			? intervalToSeconds(policy.tokenExpiration)
 			: null
 
 		const command = new CreateApiKeyCommand({
@@ -218,7 +210,7 @@ export class ApiKeyManager {
 			requestInfo,
 			trustForwardedInfo,
 			idleTimeout: policy.idleTimeout ? intervalToPostgres(policy.idleTimeout) : null,
-			maxExpiresAt,
+			maxExpirationSeconds,
 		})
 		const { id, token } = await dbContext.commandBus.execute(command)
 		assert(token !== undefined)

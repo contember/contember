@@ -57,8 +57,8 @@ test('updates expires_at when prolongation is significant', async () => {
 		currentExpiration,
 		expectedQueries: [
 			{
-				sql: `update "tenant"."api_key" set "expires_at" = ? where "id" = ?`,
-				parameters: [(val: unknown) => val instanceof Date, 'api-key-id'],
+				sql: `update "tenant"."api_key" set "expires_at" = LEAST(now() + make_interval(secs => ?), "max_expires_at") where "id" = ?`,
+				parameters: [1800, 'api-key-id'],
 				response: { rowCount: 1 },
 			},
 		],
@@ -132,8 +132,8 @@ test('A19: clamps expires_at at max_expires_at when the sliding window would exc
 		maxExpiresAt,
 		expectedQueries: [
 			{
-				sql: `update "tenant"."api_key" set "expires_at" = ? where "id" = ?`,
-				parameters: [maxExpiresAt, 'api-key-id'],
+				sql: `update "tenant"."api_key" set "expires_at" = LEAST(now() + make_interval(secs => ?), "max_expires_at") where "id" = ?`,
+				parameters: [1800, 'api-key-id'],
 				response: { rowCount: 1 },
 			},
 		],
@@ -149,8 +149,8 @@ test('A19: unaffected when max_expires_at is null (today behavior)', async () =>
 		maxExpiresAt: null,
 		expectedQueries: [
 			{
-				sql: `update "tenant"."api_key" set "expires_at" = ? where "id" = ?`,
-				parameters: [new Date('2026-05-12T12:30:00Z'), 'api-key-id'],
+				sql: `update "tenant"."api_key" set "expires_at" = LEAST(now() + make_interval(secs => ?), "max_expires_at") where "id" = ?`,
+				parameters: [1800, 'api-key-id'],
 				response: { rowCount: 1 },
 			},
 		],

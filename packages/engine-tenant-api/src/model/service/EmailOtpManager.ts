@@ -83,7 +83,6 @@ export class EmailOtpManager {
 		const validation = validateToken({
 			entry: tokenResult,
 			token: code,
-			now: this.providers.now(),
 			validationType: 'otp',
 		})
 		if (!validation.ok) {

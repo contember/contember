@@ -154,7 +154,6 @@ class PasswordlessSignInManager {
 			const tokenValidationResult = validateToken({
 				entry: tokenResult,
 				token,
-				now: db.providers.now(),
 				validationType,
 			})
 			if (!tokenValidationResult.ok) {
@@ -259,7 +258,6 @@ class PasswordlessSignInManager {
 			const tokenValidationResult = validateToken({
 				entry: tokenResult,
 				token,
-				now: db.providers.now(),
 				validationType: 'token',
 			})
 			if (!tokenValidationResult.ok) {

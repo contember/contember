@@ -73,7 +73,7 @@ export class EmailVerificationManager {
 
 	public async verifyEmail(dbContext: DatabaseContext, token: string): Promise<VerifyEmailResponse> {
 		const tokenRow = await dbContext.queryHandler.fetch(PersonTokenQuery.byToken(token, 'email_verification'))
-		const validation = validateToken({ entry: tokenRow, token, now: dbContext.providers.now(), validationType: 'token' })
+		const validation = validateToken({ entry: tokenRow, token, validationType: 'token' })
 		if (!validation.ok) {
 			// Carry whatever we know about the subject so the audit log can tie the
 			// failure to a person/token even on an invalid/expired token (matches

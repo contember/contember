@@ -70,6 +70,7 @@ const person = (overrides: Partial<PersonRow> = {}): PersonRow => ({
 	disabled_at: null,
 	passwordless_enabled: null,
 	mfa_grace_until: null,
+	is_in_grace: false,
 	email_verified_at: null,
 	email_verification_required: false,
 	...overrides,

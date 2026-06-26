@@ -38,6 +38,9 @@ export class PersonQueryBuilderFactory {
 			.select(['person', 'disabled_at'])
 			.select(['person', 'passwordless_enabled'])
 			.select(['person', 'mfa_grace_until'])
+			// MFA grace gate on the DB clock (against now()), so app/DB skew can't
+			// extend the window. See SignInManager.enforceMfaEnrollment / CLAUDE.md.
+			.select(expr => expr.raw('"person"."mfa_grace_until" is not null and "person"."mfa_grace_until" > now()'), 'is_in_grace')
 			.select(['person', 'email_verified_at'])
 			.select(['person', 'email_verification_required'])
 			.select(['identity', 'roles'])

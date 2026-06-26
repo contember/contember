@@ -57,10 +57,10 @@ export class EmailChangeManager {
 		// "confirm your new e-mail" mails. Keyed on the normalized NEW address so
 		// the `email_change_init` auth-log entries (written with the same
 		// normalized address) actually drive the backoff. Reuses login_* config.
-		const nextAllowed = await dbContext.queryHandler.fetch(
+		const retryAfter = await dbContext.queryHandler.fetch(
 			new NextMailAttemptQuery(normalizedNewEmail, 'email_change_init', 'email_change_complete'),
 		)
-		if (nextAllowed > dbContext.providers.now()) {
+		if (retryAfter > 0) {
 			return new ResponseError('RATE_LIMIT_EXCEEDED', 'Too many e-mail change requests for this address.')
 		}
 

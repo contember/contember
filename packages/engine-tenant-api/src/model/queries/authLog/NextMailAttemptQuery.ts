@@ -12,7 +12,7 @@ import { AuthActionType } from '../../type/AuthLog.js'
  * `login_attempt_window` knobs — see ConfigRateLimits docstring for the
  * rationale.
  */
-export class NextMailAttemptQuery extends DatabaseQuery<Date> {
+export class NextMailAttemptQuery extends DatabaseQuery<number> {
 	constructor(
 		private readonly email: string,
 		private readonly initType: AuthActionType,
@@ -21,7 +21,7 @@ export class NextMailAttemptQuery extends DatabaseQuery<Date> {
 		super()
 	}
 
-	async fetch({ db }: DatabaseQueryable): Promise<Date> {
+	async fetch({ db }: DatabaseQueryable): Promise<number> {
 		const qb = SelectBuilder.create()
 			.with('cfg', it => it.from('config'))
 			.with('last_completion', it =>
@@ -61,20 +61,22 @@ export class NextMailAttemptQuery extends DatabaseQuery<Date> {
 			.select(
 				new Literal(`
 					CASE WHEN attempts.attempts = 0
-					THEN NOW()
-					ELSE LEAST(
-						attempts.last_attempt + cfg.login_max_backoff,
-						attempts.last_attempt + cfg.login_base_backoff * (POWER(2, attempts.attempts - 1))
-					) END`),
-				'next_allowed_attempt',
+					THEN 0
+					ELSE GREATEST(0, CEIL(EXTRACT(EPOCH FROM (
+						LEAST(
+							attempts.last_attempt + cfg.login_max_backoff,
+							attempts.last_attempt + cfg.login_base_backoff * (POWER(2, attempts.attempts - 1))
+						) - NOW()
+					)))) END`),
+				'retry_after_seconds',
 			)
 			.from('attempts')
 			.from('cfg')
 
 		const result = await qb.getResult(db)
 		if (result.length === 0) {
-			return new Date()
+			return 0
 		}
-		return result[0].next_allowed_attempt
+		return Number(result[0].retry_after_seconds)
 	}
 }

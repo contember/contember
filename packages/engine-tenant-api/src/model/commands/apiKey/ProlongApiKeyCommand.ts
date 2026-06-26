@@ -70,7 +70,10 @@ export class ProlongApiKeyCommand implements Command<void> {
 		if (updateTracking) {
 			values.last_ip = requestIp
 			values.last_user_agent = requestUserAgent
-			values.last_used_at = now
+			// last_used_at on the DB clock: it's compared against now() in the idle gate
+			// (ApiKeyByTokenQuery's is_idle_expired), so it must be written on the same
+			// clock. The app-clock `now` above only drives the write-rate throttle. See CLAUDE.md.
+			values.last_used_at = new Literal('now()')
 		}
 
 		const qb = UpdateBuilder.create()

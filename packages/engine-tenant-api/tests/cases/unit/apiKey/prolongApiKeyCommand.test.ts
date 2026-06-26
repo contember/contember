@@ -75,8 +75,8 @@ test('updates last_* on first usage', async () => {
 		tracking: { lastIp: null, lastUserAgent: null, lastUsedAt: null },
 		expectedQueries: [
 			{
-				sql: `update "tenant"."api_key" set "last_ip" = ?, "last_user_agent" = ?, "last_used_at" = ? where "id" = ?`,
-				parameters: ['203.0.113.5', 'curl', now, 'api-key-id'],
+				sql: `update "tenant"."api_key" set "last_ip" = ?, "last_user_agent" = ?, "last_used_at" = now() where "id" = ?`,
+				parameters: ['203.0.113.5', 'curl', 'api-key-id'],
 				response: { rowCount: 1 },
 			},
 		],
@@ -113,8 +113,8 @@ test('bypasses throttle when IP changes', async () => {
 		},
 		expectedQueries: [
 			{
-				sql: `update "tenant"."api_key" set "last_ip" = ?, "last_user_agent" = ?, "last_used_at" = ? where "id" = ?`,
-				parameters: ['198.51.100.7', 'curl', now, 'api-key-id'],
+				sql: `update "tenant"."api_key" set "last_ip" = ?, "last_user_agent" = ?, "last_used_at" = now() where "id" = ?`,
+				parameters: ['198.51.100.7', 'curl', 'api-key-id'],
 				response: { rowCount: 1 },
 			},
 		],
@@ -171,8 +171,8 @@ test('bypasses throttle when User-Agent changes', async () => {
 		},
 		expectedQueries: [
 			{
-				sql: `update "tenant"."api_key" set "last_ip" = ?, "last_user_agent" = ?, "last_used_at" = ? where "id" = ?`,
-				parameters: ['203.0.113.5', 'browser/2', now, 'api-key-id'],
+				sql: `update "tenant"."api_key" set "last_ip" = ?, "last_user_agent" = ?, "last_used_at" = now() where "id" = ?`,
+				parameters: ['203.0.113.5', 'browser/2', 'api-key-id'],
 				response: { rowCount: 1 },
 			},
 		],

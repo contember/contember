@@ -55,12 +55,12 @@ CQRS pattern with Command/Query separation via `CommandBus` and `DatabaseQuery`.
 
 **Any timestamp that participates in a time comparison must be both written and read on the database clock, and the comparison must be evaluated in SQL against `NOW()` — never a DB-stored value compared against a JS `Date`.** The DB is the single clock shared by every engine instance, so this is the only thing that's immune to app-vs-DB clock skew *and* skew between engine replicas. Routing everything through `providers.now()` instead would be weaker, not stronger (`providers.now()` is per-instance), and is impossible for column `DEFAULT NOW()`, triggers, and the system-api event store.
 
-Concretely, for any security gate (rate-limit/backoff, token expiry, API-key expiry/idle, session revalidation throttle):
+Concretely, for any security gate (rate-limit/backoff, token expiry, API-key expiry/idle, session revalidation throttle, MFA enrollment grace window):
 
 - **Write** the timestamp on the DB clock — `new Literal('now() + make_interval(secs => ?)', [seconds])` for a future expiry, `new Literal('now()')` for "now", or rely on the column's `DEFAULT NOW()`.
 - **Read/decide** in SQL — compute a primitive the app just branches on: a boolean (`expires_at <= now() AS is_expired`), a count against `occurred_at >= now() - make_interval(secs => ?)`, or a `retry_after_seconds`. The resolver/manager checks `is_expired` / `> 0`, it does not compare Dates.
 
-Reference implementations: `RateLimitCountQuery` / `NextLoginAttemptQuery` (backoff), `PersonTokenQuery.is_expired` (token expiry), `ApiKeyByTokenQuery.is_expired/is_max_expired/is_idle_expired` (session gates), `ClaimIdpRevalidationCommand` (revalidation throttle).
+Reference implementations: `RateLimitCountQuery` / `NextLoginAttemptQuery` (backoff), `PersonTokenQuery.is_expired` (token expiry), `ApiKeyByTokenQuery.is_expired/is_max_expired/is_idle_expired` (session gates; `last_used_at` is also written on the DB clock since it feeds `is_idle_expired`), `ClaimIdpRevalidationCommand` (revalidation throttle), `PersonRow.is_in_grace` + `SetMfaGraceUntilCommand` (MFA enrollment grace window).
 
 `providers.now()` is retained **only** for skew-neutral, non-compared uses: display/ordering timestamps (`created_at`, `issued_at`, `used_at`, `disabled_at`), response DTOs, audit-log entries, TOTP (RFC time-step, ±-tolerant by design), and the IdP soft-refresh window (compared against the IdP's own `idp_expires_at`). There is no lint rule enforcing this — keep new time gates on the DB clock by convention.
 

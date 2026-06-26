@@ -16,7 +16,6 @@ export type ApiKeySessionRow = {
 export class ApiKeySessionsByIdentityQuery extends DatabaseQuery<readonly ApiKeySessionRow[]> {
 	constructor(
 		private readonly identityId: string,
-		private readonly options: { now: Date },
 	) {
 		super()
 	}
@@ -36,10 +35,11 @@ export class ApiKeySessionsByIdentityQuery extends DatabaseQuery<readonly ApiKey
 			.where(it => it.compare(['api_key', 'identity_id'], Operator.eq, this.identityId))
 			.where(it => it.compare(['api_key', 'type'], Operator.eq, ApiKey.Type.SESSION))
 			.where(it => it.isNull(['api_key', 'disabled_at']))
+			// expires_at compared on the DB clock (NOW()) — see CLAUDE.md.
 			.where(it =>
 				it.or(or =>
 					or.isNull(['api_key', 'expires_at'])
-						.compare(['api_key', 'expires_at'], Operator.gt, this.options.now)
+						.raw('"api_key"."expires_at" > now()')
 				)
 			)
 			.orderBy(['api_key', 'created_at'], 'desc')

@@ -151,10 +151,13 @@ const run = async (args: {
 	if (policies.length > 0) {
 		queries.push(projectRolesQuery)
 	}
+	const hasComputedMaxExpiry = (args.policies ?? []).some(p => p.token_expiration !== null)
+	const insertSql = hasComputedMaxExpiry
+		? `INSERT INTO "tenant"."api_key" ("id", "token_hash", "type", "identity_id", "disabled_at", "expires_at", "expiration", "created_at", "created_ip", "created_user_agent", "trust_forwarded_info", "issued_at", "idle_timeout", "max_expires_at") VALUES (?, ?, ?, ?, ?, now() + make_interval(secs => ?), ?, ?, ?, ?, ?, ?, ?, now() + make_interval(secs => ?))`
+		: `INSERT INTO "tenant"."api_key" ("id", "token_hash", "type", "identity_id", "disabled_at", "expires_at", "expiration", "created_at", "created_ip", "created_user_agent", "trust_forwarded_info", "issued_at", "idle_timeout", "max_expires_at") VALUES (?, ?, ?, ?, ?, now() + make_interval(secs => ?), ?, ?, ?, ?, ?, ?, ?, ?)`
 	const insertParams: any[] = new Array(14)
 	queries.push({
-		sql:
-			`INSERT INTO "tenant"."api_key" ("id", "token_hash", "type", "identity_id", "disabled_at", "expires_at", "expiration", "created_at", "created_ip", "created_user_agent", "trust_forwarded_info", "issued_at", "idle_timeout", "max_expires_at") VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+		sql: insertSql,
 		// Each positional matcher records the value and always matches.
 		parameters: Array.from({ length: 14 }, (_, i) => (value: any) => {
 			insertParams[i] = value
@@ -186,7 +189,7 @@ const MAX_EXPIRES_AT = 13
 test('A19: no policy → identical to today (no idle_timeout / max_expires_at, default 30m window)', async () => {
 	const { insertParams: params, authLog } = await run({})
 	expect(params[EXPIRATION]).toBe(30)
-	expect(params[EXPIRES_AT]).toEqual(new Date('2026-05-21T12:30:00Z'))
+	expect(params[EXPIRES_AT]).toBe(1800)
 	expect(params[IDLE_TIMEOUT]).toBeNull()
 	expect(params[MAX_EXPIRES_AT]).toBeNull()
 	// issued_at is always set for session keys.
@@ -202,8 +205,8 @@ test('A19: tokenExpiration policy → max_expires_at set and initial expiry capp
 		policies: [policy({ token_expiration: PostgresInterval('00:10:00') })],
 	})
 	expect(params[EXPIRATION]).toBe(10)
-	expect(params[EXPIRES_AT]).toEqual(new Date('2026-05-21T12:10:00Z'))
-	expect(params[MAX_EXPIRES_AT]).toEqual(new Date('2026-05-21T12:10:00Z'))
+	expect(params[EXPIRES_AT]).toBe(600)
+	expect(params[MAX_EXPIRES_AT]).toBe(600)
 	// Non-inert policy applied → session_policy_applied audit fires.
 	expect(authLog.type).toBe('session_policy_applied')
 })
@@ -225,6 +228,6 @@ test('A19: rememberMeAllowed=false → client longer expiration is ignored, forc
 		policies: [policy({ remember_me_allowed: false })],
 	})
 	expect(params[EXPIRATION]).toBe(30)
-	expect(params[EXPIRES_AT]).toEqual(new Date('2026-05-21T12:30:00Z'))
+	expect(params[EXPIRES_AT]).toBe(1800)
 	expect(authLog.type).toBe('session_policy_applied')
 })

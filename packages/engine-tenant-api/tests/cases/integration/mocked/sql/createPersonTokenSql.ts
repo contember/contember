@@ -9,12 +9,12 @@ export const createPersonTokenSql = (args: {
 	meta?: unknown
 }): ExpectedQuery => ({
 	sql: SQL`INSERT INTO "tenant"."person_token" ("id", "token_hash", "person_id", "expires_at", "created_at", "used_at", "type", "meta")
-	         VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+	         VALUES (?, ?, ?, now() + make_interval(secs => ?), ?, ?, ?, ?)`,
 	parameters: [
 		args.resetId,
 		args.tokenHash,
 		args.personId,
-		(val: any) => val instanceof Date,
+		(val: any) => typeof val === 'number', // expires_at: ttl seconds for the DB-clock now()+interval
 		(val: any) => val instanceof Date,
 		null,
 		args.type,

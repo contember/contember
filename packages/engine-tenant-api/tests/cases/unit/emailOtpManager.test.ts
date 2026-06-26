@@ -81,6 +81,7 @@ const tokenRow = (overrides: Record<string, any> = {}) => ({
 	token_hash: RANDOM_TOKEN_HASH,
 	used_at: null,
 	expires_at: new Date(NOW.getTime() + 10 * 60 * 1000),
+	is_expired: false, // DB-clock `expires_at <= now()` computed by PersonTokenQuery
 	person_id: PERSON_ID,
 	otp_hash: EXPECTED_OTP_HASH,
 	otp_attempts: 0,
@@ -105,9 +106,9 @@ const makeManager = (providers: Providers, mailer = makeMailer()) => new EmailOt
 
 const INVALIDATE_PRIOR_SQL = `update "tenant"."person_token" set "used_at" = ? where "person_id" = ? and "type" = ? and "used_at" is null`
 const INSERT_TOKEN_SQL =
-	`insert into "tenant"."person_token" ("id", "token_hash", "person_id", "expires_at", "created_at", "used_at", "type", "otp_hash") values (?, ?, ?, ?, ?, ?, ?, ?)`
+	`insert into "tenant"."person_token" ("id", "token_hash", "person_id", "expires_at", "created_at", "used_at", "type", "otp_hash") values (?, ?, ?, now() + make_interval(secs => ?), ?, ?, ?, ?)`
 const SELECT_LATEST_SQL =
-	`select * from "tenant"."person_token" where "person_id" = ? and "type" = ? and "used_at" is null order by "created_at" desc limit 1`
+	`select *, "expires_at" <= now() as "is_expired" from "tenant"."person_token" where "person_id" = ? and "type" = ? and "used_at" is null order by "created_at" desc limit 1`
 // Atomic per-code attempt reservation (ClaimOtpAttemptCommand): increments only while
 // still unused and below the cap. params = [tokenId, maxAttempts].
 const CLAIM_ATTEMPT_SQL =
@@ -140,7 +141,7 @@ describe('EmailOtpManager', () => {
 					'uuid-1',
 					RANDOM_TOKEN_HASH,
 					PERSON_ID,
-					(v: any) => v instanceof Date,
+					(v: any) => typeof v === 'number', // expires_at: ttl seconds for the DB-clock now()+interval
 					NOW,
 					null,
 					'mfa_email_otp',

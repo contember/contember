@@ -95,7 +95,7 @@ export class EmailChangeManager {
 
 	public async confirmEmailChange(dbContext: DatabaseContext, token: string): Promise<ConfirmEmailChangeResponse> {
 		const tokenRow = await dbContext.queryHandler.fetch(PersonTokenQuery.byToken(token, 'email_change'))
-		const validation = validateToken({ entry: tokenRow, token, now: dbContext.providers.now(), validationType: 'token' })
+		const validation = validateToken({ entry: tokenRow, token, validationType: 'token' })
 		if (!validation.ok) {
 			// Tie the failure to a person/token in the audit log when we can, even
 			// for an invalid/expired token (matches verifyEmail / password reset).

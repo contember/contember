@@ -30,7 +30,7 @@ export interface RateLimitDecision {
  */
 export class RateLimiter {
 	constructor(
-		private readonly providers: Pick<Providers, 'hash' | 'now'>,
+		private readonly providers: Pick<Providers, 'hash'>,
 	) {}
 
 	private hashKey(key: string): Buffer {
@@ -64,8 +64,7 @@ export class RateLimiter {
 		if (limit <= 0 || windowSeconds <= 0) {
 			return { ok: true }
 		}
-		const windowStart = new Date(this.providers.now().getTime() - windowSeconds * 1000)
-		const count = await db.queryHandler.fetch(new RateLimitCountQuery(scope, this.hashKey(key), windowStart))
+		const count = await db.queryHandler.fetch(new RateLimitCountQuery(scope, this.hashKey(key), windowSeconds))
 		if (count < limit) {
 			return { ok: true }
 		}

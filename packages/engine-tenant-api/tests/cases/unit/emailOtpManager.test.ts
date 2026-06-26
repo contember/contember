@@ -90,8 +90,8 @@ const tokenRow = (overrides: Record<string, any> = {}) => ({
 // Rate-limit gate that fronts sendCode (email_otp_per_person). The mocked `hash`
 // provider stores the key verbatim, so the hashed key is just Buffer.from(PERSON_ID).
 const RL_COUNT_SQL = `select count(*)::text as count from "tenant"."rate_limit_event"
-	where "scope" = ? and "key_hash" = ? and "occurred_at" >= ?`
-const RL_INSERT_SQL = `insert into "tenant"."rate_limit_event" ("id", "scope", "key_hash", "occurred_at") values (?, ?, ?, ?)`
+	where "scope" = ? and "key_hash" = ? and occurred_at >= NOW() - make_interval(secs => ?)`
+const RL_INSERT_SQL = `insert into "tenant"."rate_limit_event" ("id", "scope", "key_hash") values (?, ?, ?)`
 const RL_KEY_HASH = Buffer.from(PERSON_ID)
 
 // limit 10 / 10 minutes — the shipped default.
@@ -121,12 +121,12 @@ describe('EmailOtpManager', () => {
 			// rate-limit gate: COUNT under limit, then record the event (uuid-0).
 			{
 				sql: RL_COUNT_SQL,
-				parameters: ['email_otp_per_person', RL_KEY_HASH, new Date(NOW.getTime() - 10 * 60 * 1000)],
+				parameters: ['email_otp_per_person', RL_KEY_HASH, 600],
 				response: { rows: [{ count: '0' }] },
 			},
 			{
 				sql: RL_INSERT_SQL,
-				parameters: ['uuid-0', 'email_otp_per_person', RL_KEY_HASH, NOW],
+				parameters: ['uuid-0', 'email_otp_per_person', RL_KEY_HASH],
 				response: { rowCount: 1 },
 			},
 			{
@@ -179,7 +179,7 @@ describe('EmailOtpManager', () => {
 			// COUNT already at the limit (10) → deny; no INSERT, no token, no mail.
 			{
 				sql: RL_COUNT_SQL,
-				parameters: ['email_otp_per_person', RL_KEY_HASH, new Date(NOW.getTime() - 10 * 60 * 1000)],
+				parameters: ['email_otp_per_person', RL_KEY_HASH, 600],
 				response: { rows: [{ count: '10' }] },
 			},
 		]

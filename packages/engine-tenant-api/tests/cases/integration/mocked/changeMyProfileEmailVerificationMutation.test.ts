@@ -152,7 +152,6 @@ test('changeMyProfile - email change is rate-limited per recipient', async () =>
 	const personId = testUuid(1)
 	const identityId = authenticatedIdentityId
 	const newEmail = 'jane@doe.com'
-	const future = new Date(now.getTime() + 60 * 1000)
 	await executeTenantTest({
 		query: changeMyProfileMutation({ email: newEmail }),
 		executes: [
@@ -166,7 +165,7 @@ test('changeMyProfile - email change is rate-limited per recipient', async () =>
 				email: newEmail,
 				initType: 'email_change_init',
 				completionType: 'email_change_complete',
-				response: { rows: [{ next_allowed_attempt: future }] },
+				response: { rows: [{ retry_after_seconds: 60 }] },
 			}),
 		],
 		return: {

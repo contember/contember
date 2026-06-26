@@ -21,14 +21,14 @@ const RANDOM_TOKEN_HASH = sha256('0'.repeat(40))
 export const sendEmailOtpSql = (args: { personId: string; rateLimitEventId: string; tokenId: string }): ExpectedQuery[] => [
 	{
 		sql: SQL`select count(*)::text as count from "tenant"."rate_limit_event"
-		where "scope" = ? and "key_hash" = ? and "occurred_at" >= ?`,
-		// mocked hash provider stores the key verbatim; window 10min → now - 600s.
-		parameters: ['email_otp_per_person', Buffer.from(args.personId), new Date(now.getTime() - 10 * 60 * 1000)],
+		where "scope" = ? and "key_hash" = ? and occurred_at >= NOW() - make_interval(secs => ?)`,
+		// mocked hash provider stores the key verbatim; window 10min → 600s.
+		parameters: ['email_otp_per_person', Buffer.from(args.personId), 600],
 		response: { rows: [{ count: '0' }] },
 	},
 	{
-		sql: SQL`insert into "tenant"."rate_limit_event" ("id", "scope", "key_hash", "occurred_at") values (?, ?, ?, ?)`,
-		parameters: [args.rateLimitEventId, 'email_otp_per_person', Buffer.from(args.personId), now],
+		sql: SQL`insert into "tenant"."rate_limit_event" ("id", "scope", "key_hash") values (?, ?, ?)`,
+		parameters: [args.rateLimitEventId, 'email_otp_per_person', Buffer.from(args.personId)],
 		response: { rowCount: 1 },
 	},
 	{

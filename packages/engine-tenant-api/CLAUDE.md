@@ -62,7 +62,12 @@ Concretely, for any security gate (rate-limit/backoff, token expiry, API-key exp
 
 Reference implementations: `RateLimitCountQuery` / `NextLoginAttemptQuery` (backoff), `PersonTokenQuery.is_expired` (token expiry), `ApiKeyByTokenQuery.is_expired/is_max_expired/is_idle_expired` (session gates; `last_used_at` is also written on the DB clock since it feeds `is_idle_expired`), `ClaimIdpRevalidationCommand` (revalidation throttle), `PersonRow.is_in_grace` + `SetMfaGraceUntilCommand` (MFA enrollment grace window).
 
-`providers.now()` is retained **only** for skew-neutral, non-compared uses: display/ordering timestamps (`created_at`, `issued_at`, `used_at`, `disabled_at`), response DTOs, audit-log entries, TOTP (RFC time-step, ±-tolerant by design), and the IdP soft-refresh window (compared against the IdP's own `idp_expires_at`). There is no lint rule enforcing this — keep new time gates on the DB clock by convention.
+`providers.now()` is retained **only** for app-clock uses that cannot weaken a security gate:
+
+- **Non-compared (skew-neutral):** display/ordering timestamps (`issued_at`, `used_at`, `disabled_at`), response DTOs, and TOTP (RFC time-step, ±-tolerant by design).
+- **Deliberate app-clock comparisons that are bounded write-rate optimizations, not gates:** the API-key prolong/tracking throttle (`ProlongApiKeyCommand`, `ApiKeyManager.shouldUpdateTracking`) compares `providers.now()` against the stored `expires_at` / `last_used_at` only to decide *whether* to write. The written value and the `is_expired` / `is_idle_expired` gates stay on the DB clock, and the idle gate folds in `PROLONG_THROTTLE_MS` of slack to cancel the throttle. Under clock skew the worst case is an extra write or — only if app-clock lag exceeds the entire `idle_timeout` — an over-eager, fail-closed session termination (→ re-auth); never a weakened gate. The IdP soft-refresh window is similarly compared against the IdP's own `idp_expires_at`, not a security boundary.
+
+Note `created_at` is **not** an app-clock value: `person_auth_log.created_at` is `DEFAULT now()` (DB clock) and is itself a backoff input (`NextLoginAttemptQuery` / `NextMailAttemptQuery`), so it follows the DB-clock rule above. There is no lint rule enforcing any of this — keep new time gates on the DB clock by convention.
 
 ## Key Services
 

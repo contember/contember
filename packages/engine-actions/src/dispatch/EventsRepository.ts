@@ -11,18 +11,25 @@ const DEFAULT_BATCH_SIZE = 1
 
 export class EventsRepository {
 	public async fetchBatch(actions: Actions.Schema, db: Client): Promise<FetchBatchResult> {
-		const primaryEvent = (await this.fetchInternal(db, 1))[0]
-		if (!primaryEvent) {
-			return { ok: false, backoffMs: await this.fetchBackOff(db) }
+		// Events referencing a target that no longer exists in the schema are terminally failed and
+		// skipped over; count them so the caller can report them as terminal failures.
+		let unknownTargetFailed = 0
+		while (true) {
+			const primaryEvent = (await this.fetchInternal(db, 1))[0]
+			if (!primaryEvent) {
+				return { ok: false, backoffMs: await this.fetchBackOff(db), unknownTargetFailed }
+			}
+			const target = actions.targets[primaryEvent.target]
+			if (!target) {
+				if (await this.markFailedOnUnknownTarget(db, primaryEvent.target, primaryEvent.id)) {
+					unknownTargetFailed++
+				}
+				continue
+			}
+			const batchSize = (target.batchSize ?? DEFAULT_BATCH_SIZE) - 1
+			const batch = batchSize > 0 ? await this.fetchInternal(db, batchSize) : []
+			return { ok: true, events: [primaryEvent, ...batch], target, unknownTargetFailed }
 		}
-		const target = actions.targets[primaryEvent.target]
-		if (!target) {
-			await this.markFailedOnUnknownTarget(db, primaryEvent.target, primaryEvent.id)
-			return await this.fetchBatch(actions, db)
-		}
-		const batchSize = (target.batchSize ?? DEFAULT_BATCH_SIZE) - 1
-		const batch = batchSize > 0 ? await this.fetchInternal(db, batchSize) : []
-		return { ok: true, events: [primaryEvent, ...batch], target }
 	}
 
 	private async fetchBackOff(db: Client): Promise<number | undefined> {
@@ -60,18 +67,25 @@ export class EventsRepository {
 			.execute(db)
 	}
 
-	public async persistProcessed(db: Client, events: HandledEvent[]): Promise<[number, number]> {
+	public async persistProcessed(db: Client, events: HandledEvent[]): Promise<PersistProcessedResult> {
 		return await db.transaction(async trx => {
 			await trx.query(Connection.REPEATABLE_READ)
 			const succeed = events.filter(it => it.result.ok)
 			await this.markSucceed(trx, succeed.map(it => it.row))
 
+			let retried = 0
+			let failed = 0
 			for (const event of events) {
 				if (!event.result.ok) {
-					await this.markFailed(trx, event)
+					const terminal = await this.markFailed(trx, event)
+					if (terminal) {
+						failed++
+					} else {
+						retried++
+					}
 				}
 			}
-			return [succeed.length, events.length - succeed.length]
+			return { succeeded: succeed.length, retried, failed }
 		})
 	}
 
@@ -124,42 +138,44 @@ export class EventsRepository {
 			.execute(db)
 	}
 
-	private async markFailed(db: Client, event: HandledEvent): Promise<void> {
+	/** Returns `true` when the event reached a terminal `failed` state, `false` when it will be retried. */
+	private async markFailed(db: Client, event: HandledEvent): Promise<boolean> {
 		const numRetries = event.row.num_retries + 1
 		const now = new Date()
 		const nextAttempt = new Date()
 		nextAttempt.setTime(
 			nextAttempt.getTime() + (event.target?.initialRepeatIntervalMs ?? DEFAULT_REPEAT_INTERVAL_MS) * Math.pow(2, event.row.num_retries),
 		)
+		const terminal = numRetries >= (event.target?.maxAttempts ?? DEFAULT_MAX_ATTEMPTS)
 		await UpdateBuilder.create()
 			.table('actions_event')
 			.values<EventRow>({
 				last_state_change: now,
 				num_retries: numRetries,
 				log: JSON.stringify([...event.row.log, event.result]) as any,
-				...(numRetries < (event.target?.maxAttempts ?? DEFAULT_MAX_ATTEMPTS)
+				...(terminal
 					? {
-						state: 'retrying',
-						visible_at: nextAttempt,
+						state: 'failed',
 					}
 					: {
-						state: 'failed',
+						state: 'retrying',
+						visible_at: nextAttempt,
 					}),
 			})
 			.where({ id: event.row.id })
 			.execute(db)
+		return terminal
 	}
 
-	private async markFailedOnUnknownTarget(db: Client, targetName: string, primaryEventId: string) {
-		await UpdateBuilder.create()
+	private async markFailedOnUnknownTarget(db: Client, targetName: string, primaryEventId: string): Promise<boolean> {
+		const affectedRows = await UpdateBuilder.create()
 			.table('actions_event')
 			.where(it =>
 				it.or(it =>
 					it
 						.and(it =>
 							it
-								.in('state', ['retrying', 'created', 'processing'])
-								.compare('visible_at', Operator.lte, 'now')
+								.in('state', ['processing'])
 								.compare('target', Operator.eq, targetName)
 						)
 						.and(it =>
@@ -177,9 +193,19 @@ export class EventsRepository {
 				resolved_at: new Date(),
 			})
 			.execute(db)
+		return affectedRows > 0
 	}
 }
 
 export type FetchBatchResult =
-	| { ok: true; events: EventRow[]; target: Actions.AnyTarget }
-	| { ok: false; backoffMs?: number }
+	| { ok: true; events: EventRow[]; target: Actions.AnyTarget; unknownTargetFailed: number }
+	| { ok: false; backoffMs?: number; unknownTargetFailed: number }
+
+export type PersistProcessedResult = {
+	/** Events delivered successfully (terminal). */
+	succeeded: number
+	/** Events whose delivery attempt failed and that will be retried later. */
+	retried: number
+	/** Events whose delivery attempt failed and that reached a terminal `failed` state. */
+	failed: number
+}

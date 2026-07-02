@@ -10,12 +10,32 @@ export interface FieldRequiredPredicate {
 }
 
 export class PredicateFactory {
+	// Request-scoped memoization: a PredicateFactory lives for one ExecutionContainer (one request), where
+	// permissions/allPermissions/variables are fixed, so a `create`/`buildPredicates` result depends only on
+	// its arguments. During one query these are called repeatedly with identical arguments (every projected
+	// field, every order-by key, the injector). The results are treated as immutable by consumers — the same
+	// contract VariableInjector already relies on — so returning a shared instance is safe. The key encodes
+	// EVERY input (entity, operation/predicate set, field list, the relation context, and which permission set
+	// the context resolves to) via JSON so no two distinct inputs can collide onto one entry.
+	private readonly createCache = new Map<string, Input.OptionalWhere>()
+	private readonly buildCache = new Map<string, Input.OptionalWhere>()
+
 	constructor(
 		private readonly permissions: Acl.Permissions,
 		private readonly model: Model.Schema,
 		private readonly variableInjector: VariableInjector,
 		private readonly allPermissions?: Acl.Permissions,
 	) {}
+
+	/** Which permission set `getPermissionsForContext` resolves to — part of every cache key. */
+	private permissionSetKey(isRoot?: boolean): 'all' | 'root' {
+		return isRoot === false && this.allPermissions ? 'all' : 'root'
+	}
+
+	/** Complete, collision-free key for a relation context (entity + relation fully determine type/targets). */
+	private relationContextKey(relationContext?: Model.AnyRelationContext): string {
+		return relationContext ? `${relationContext.entity.name}.${relationContext.relation.name}` : ''
+	}
 
 	/**
 	 * Selects the appropriate permission set based on query context:
@@ -102,6 +122,29 @@ export class PredicateFactory {
 		relationContext?: Model.AnyRelationContext,
 		isRoot?: boolean,
 	): Input.OptionalWhere {
+		const cacheKey = JSON.stringify([
+			entity.name,
+			operation,
+			fieldNames,
+			this.relationContextKey(relationContext),
+			this.permissionSetKey(isRoot),
+		])
+		const cached = this.createCache.get(cacheKey)
+		if (cached !== undefined) {
+			return cached
+		}
+		const result = this.createInternal(entity, operation, fieldNames, relationContext, isRoot)
+		this.createCache.set(cacheKey, result)
+		return result
+	}
+
+	private createInternal(
+		entity: Model.Entity,
+		operation: Acl.Operation.update | Acl.Operation.read | Acl.Operation.create,
+		fieldNames: string[] = [getRowLevelPredicatePseudoField(entity)],
+		relationContext?: Model.AnyRelationContext,
+		isRoot?: boolean,
+	): Input.OptionalWhere {
 		const perms = this.getPermissionsForContext(isRoot)
 		const entityPermissions: Acl.EntityPermissions = perms[entity.name]
 		const neverCondition: Input.Where = { [entity.primary]: { never: true } }
@@ -126,6 +169,27 @@ export class PredicateFactory {
 	}
 
 	public buildPredicates(
+		entity: Model.Entity,
+		predicates: Acl.PredicateReference[],
+		relationContext?: Model.AnyRelationContext,
+		isRoot?: boolean,
+	): Input.OptionalWhere {
+		const cacheKey = JSON.stringify([
+			entity.name,
+			predicates,
+			this.relationContextKey(relationContext),
+			this.permissionSetKey(isRoot),
+		])
+		const cached = this.buildCache.get(cacheKey)
+		if (cached !== undefined) {
+			return cached
+		}
+		const result = this.buildPredicatesInternal(entity, predicates, relationContext, isRoot)
+		this.buildCache.set(cacheKey, result)
+		return result
+	}
+
+	private buildPredicatesInternal(
 		entity: Model.Entity,
 		predicates: Acl.PredicateReference[],
 		relationContext?: Model.AnyRelationContext,

@@ -178,6 +178,122 @@ const hasManyPermissions: Acl.Permissions = {
 	},
 }
 
+const m2mSchema = new SchemaBuilder()
+	.entity('Post', e =>
+		e.manyHasMany('tags', r =>
+			r.target('Tag', e =>
+				e
+					.column('name', c => c.type(Model.ColumnType.String))
+					.column('isDeleted', c => c.type(Model.ColumnType.Bool))
+					.column('isPublic', c => c.type(Model.ColumnType.Bool)))))
+	.buildSchema()
+
+const m2mRootPermissions: Acl.Permissions = {
+	Post: {
+		predicates: {},
+		operations: {
+			read: {
+				id: true,
+				tags: true,
+			},
+		},
+	},
+	Tag: {
+		predicates: {
+			namePredicate: { isDeleted: { eq: false } },
+		},
+		operations: {
+			read: {
+				id: 'namePredicate',
+				name: 'namePredicate',
+			},
+		},
+	},
+}
+
+// A through grant widens the Tag row-level predicate, so `name` is cell-level in the `all` set
+// while it equals the row-level predicate in the root set.
+const m2mAllPermissions: Acl.Permissions = {
+	...m2mRootPermissions,
+	Tag: {
+		predicates: {
+			namePredicate: { isDeleted: { eq: false } },
+			rowPredicate: { or: [{ isDeleted: { eq: false } }, { isPublic: { eq: true } }] },
+		},
+		operations: {
+			read: {
+				id: 'rowPredicate',
+				name: 'namePredicate',
+			},
+		},
+	},
+}
+
+test('order by on a many-has-many junction fetch guards the order key against the through (all) permission set', async () => {
+	await execute({
+		schema: m2mSchema,
+		permissions: m2mRootPermissions,
+		allPermissions: m2mAllPermissions,
+		variables: {},
+		query: GQL`
+        query {
+          listPost {
+            id
+            tags(orderBy: [{name: asc}], limit: 1) {
+              id
+            }
+          }
+        }`,
+		executes: [
+			{
+				sql: SQL`select "root_"."id" as "root_id", "root_"."id" as "root_id" from "public"."post" as "root_"`,
+				parameters: [],
+				response: {
+					rows: [{ root_id: testUuid(1) }],
+				},
+			},
+			{
+				// The junction WHERE filters rows by the `all`-set row predicate, so the order key of the
+				// (all-set) cell-level `name` must be guarded — a row readable only through `isPublic` sorts as NULL.
+				sql: SQL`with "data" as
+					(select
+						"junction_"."tag_id",
+						"junction_"."post_id",
+						row_number() over(partition by "junction_"."post_id"
+							order by case when "root_"."is_deleted" = ? then "root_"."name" end asc, "root_"."id" asc) as "rowNumber_"
+					from "public"."post_tags" as "junction_"
+					inner join "public"."tag" as "root_" on "junction_"."tag_id" = "root_"."id"
+					where "junction_"."post_id" in (?) and ("root_"."is_deleted" = ? or "root_"."is_public" = ?)
+					order by case when "root_"."is_deleted" = ? then "root_"."name" end asc, "root_"."id" asc)
+					select "data".* from "data" where "data"."rowNumber_" <= ?`,
+				parameters: [false, testUuid(1), false, true, false, 1],
+				response: {
+					rows: [{ post_id: testUuid(1), tag_id: testUuid(10) }],
+				},
+			},
+			{
+				sql: SQL`select "root_"."id" as "root_id"
+					from "public"."tag" as "root_"
+					where "root_"."id" in (?) and ("root_"."is_deleted" = ? or "root_"."is_public" = ?)`,
+				parameters: [testUuid(10), false, true],
+				response: {
+					rows: [{ root_id: testUuid(10) }],
+				},
+			},
+		],
+		return: {
+			data: {
+				listPost: [
+					{
+						id: testUuid(1),
+						tags: [{ id: testUuid(10) }],
+					},
+				],
+			},
+		},
+	})
+})
+
 test('order by a cell-level field guards the order key in the window-function (limit) path too', async () => {
 	await execute({
 		schema: hasManySchema,

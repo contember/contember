@@ -168,7 +168,7 @@ describe('predicates injector elimination', () => {
 		assert.deepStrictEqual(result, { and: [{ coverPhoto: { image: { tags: { label: { eq: 'foo' } } } } }, { isPublished: { eq: true } }] })
 	})
 
-	it('eliminate back referencing predicate', () => {
+	it('keeps sibling row predicate on to-many back-reference filter, eliminates the own row predicate', () => {
 		const relation = acceptFieldVisitor(schema.model, schema.model.entities.Article, 'coverPhoto', {
 			visitColumn: () => {
 				throw new Error()
@@ -186,13 +186,18 @@ describe('predicates injector elimination', () => {
 			ancestorPath,
 		)
 
+		// SECURITY: `articles` (ImageUse -> oneHasMany Article) is a TO-MANY back-hop, so the user
+		// filter reaches sibling Articles that are NOT guaranteed readable — their row predicate
+		// { isPublished: true } MUST be kept (previously wrongly dropped to { id: always }).
+		// ImageUse's OWN row predicate `{ articles: canRead(coverPhoto) }` is still simplified,
+		// because the root Article we came from already guarantees it (predicate-in-predicate path).
 		assert.deepStrictEqual(injected, {
 			and: [
 				{
 					articles: {
 						and: [
 							{ id: { in: [testUuid(1)] } },
-							{ id: { always: true } },
+							{ isPublished: { eq: true } },
 						],
 					},
 				},
@@ -1198,7 +1203,7 @@ describe('predicates injector - many-to-many relations', () => {
 		})
 	})
 
-	it('should simplify Post predicate when filtering back via posts (m:n inverse is a back-reference)', () => {
+	it('should KEEP Post predicate when filtering back via posts (m:n inverse back-hop reaches unreadable siblings)', () => {
 		const { relation, ancestorPath } = getOwningContext()
 
 		const injected = injector.inject(
@@ -1210,15 +1215,16 @@ describe('predicates injector - many-to-many relations', () => {
 			ancestorPath,
 		)
 
-		// Post.tags has targetRelation=posts, so Tag.posts IS a back-reference
-		// Post's predicate is simplified, but user filter preserved
+		// SECURITY: Tag.posts is a TO-MANY (manyHasManyInverse) back-hop. It reaches sibling Posts
+		// sharing the tag, which are NOT guaranteed readable, so Post's row predicate
+		// { isPublished: true } MUST be kept (previously wrongly dropped to { id: always }).
 		assert.deepStrictEqual(injected, {
 			and: [
 				{
 					posts: {
 						and: [
 							{ title: { eq: 'Hello' } },
-							{ id: { always: true } },
+							{ isPublished: { eq: true } },
 						],
 					},
 				},
@@ -1227,7 +1233,7 @@ describe('predicates injector - many-to-many relations', () => {
 		})
 	})
 
-	it('should simplify Tag predicate when filtering back via tags (m:n owning is a back-reference)', () => {
+	it('should KEEP Tag predicate when filtering back via tags (m:n owning back-hop reaches unreadable siblings)', () => {
 		const { relation, ancestorPath } = getInverseContext()
 
 		const injected = injector.inject(
@@ -1239,15 +1245,16 @@ describe('predicates injector - many-to-many relations', () => {
 			ancestorPath,
 		)
 
-		// Tag.posts has targetRelation=tags, so Post.tags IS a back-reference
-		// Tag's predicate is simplified, but user filter preserved
+		// SECURITY: Post.tags is a TO-MANY (manyHasManyOwning) back-hop. It reaches sibling Tags
+		// shared across posts, which are NOT guaranteed readable, so Tag's row predicate
+		// { isActive: true } MUST be kept (previously wrongly dropped to { id: always }).
 		assert.deepStrictEqual(injected, {
 			and: [
 				{
 					tags: {
 						and: [
 							{ name: { eq: 'featured' } },
-							{ id: { always: true } },
+							{ isActive: { eq: true } },
 						],
 					},
 				},
@@ -1892,6 +1899,211 @@ describe('predicate injector input handling', () => {
 				not: null,
 				or: null,
 			},
+		})
+	})
+})
+
+// SECURITY: a to-many back-hop reaches the ancestor's SIBLINGS, which are NOT guaranteed readable.
+// Their row read predicate MUST be kept — dropping it (simplifying to { id: always }) turns a nested
+// user filter into a value/presence oracle over unreadable sibling rows.
+namespace ToManyBackReferenceLeakModel {
+	export const readerRole = acl.createRole('reader')
+
+	@acl.allow(readerRole, {
+		when: { isPublished: { eq: true } },
+		read: true,
+	})
+	export class Article {
+		isPublished = def.boolColumn()
+		title = def.stringColumn()
+		secret = def.stringColumn()
+		coverPhoto = def.manyHasOne(Image, 'articles')
+	}
+
+	@acl.allow(readerRole, {
+		when: { isVisible: { eq: true } },
+		read: true,
+	})
+	export class Image {
+		isVisible = def.boolColumn()
+		url = def.stringColumn()
+		articles = def.oneHasMany(Article, 'coverPhoto')
+	}
+}
+
+namespace ManyToManyBackReferenceLeakModel {
+	export const readerRole = acl.createRole('reader')
+
+	@acl.allow(readerRole, {
+		when: { isPublished: { eq: true } },
+		read: true,
+	})
+	export class Post {
+		title = def.stringColumn()
+		secret = def.stringColumn()
+		isPublished = def.boolColumn()
+		tags = def.manyHasMany(Tag, 'posts')
+	}
+
+	@acl.allow(readerRole, {
+		read: true,
+	})
+	export class Tag {
+		name = def.stringColumn()
+		posts = def.manyHasManyInverse(Post, 'tags')
+	}
+}
+
+// Article.secret has a cell-level read predicate (isSecretVisible) that differs from the row
+// predicate (isPublished), so the injector must apply the per-field predicate, not blanket-drop it.
+namespace CellLevelBackReferenceModel {
+	export const readerRole = acl.createRole('reader')
+
+	@acl.allow(readerRole, {
+		when: { isSecretVisible: { eq: true } },
+		read: ['secret'],
+	})
+	@acl.allow(readerRole, {
+		when: { isPublished: { eq: true } },
+		read: ['id', 'title', 'isPublished', 'isSecretVisible', 'coverPhoto'],
+	})
+	export class Article {
+		isPublished = def.boolColumn()
+		isSecretVisible = def.boolColumn()
+		title = def.stringColumn()
+		secret = def.stringColumn()
+		coverPhoto = def.manyHasOne(Image, 'articles')
+	}
+
+	@acl.allow(readerRole, {
+		read: true,
+	})
+	export class Image {
+		url = def.stringColumn()
+		articles = def.oneHasMany(Article, 'coverPhoto')
+	}
+}
+
+describe('predicates injector - SECURITY: to-many back-reference keeps sibling row predicate', () => {
+	const relationOf = (model: Model.Schema, entity: string, field: string) =>
+		acceptFieldVisitor(model, model.entities[entity], field, {
+			visitColumn: () => {
+				throw new Error()
+			},
+			visitRelation: ctx => ctx,
+		})
+
+	it('oneHasMany back-hop must NOT drop the sibling Article row predicate', () => {
+		const schema = createSchema(ToManyBackReferenceLeakModel)
+		const permissions = new PermissionFactory().create(schema, ['reader'])
+		const injector = new PredicatesInjector(
+			schema.model,
+			new PredicateFactory(permissions, schema.model, new VariableInjector(schema.model, {})),
+		)
+
+		// Article -> coverPhoto -> Image -> articles (oneHasMany back to Article) -> secret
+		// The inner `articles` reaches sibling Articles sharing the coverPhoto; their row predicate
+		// { isPublished: true } MUST be kept so unreadable siblings cannot be probed via `secret`.
+		const injected = injector.inject(schema.model.entities.Article, {
+			coverPhoto: { articles: { secret: { eq: 'X' } } },
+		})
+
+		assert.deepStrictEqual(injected, {
+			and: [
+				{
+					coverPhoto: {
+						and: [
+							{ articles: { and: [{ secret: { eq: 'X' } }, { isPublished: { eq: true } }] } },
+							{ isVisible: { eq: true } },
+						],
+					},
+				},
+				{ isPublished: { eq: true } },
+			],
+		})
+	})
+
+	it('CONTROL: manyHasOne back-hop still simplifies (to-one round-trip is safe, no over-restriction)', () => {
+		const schema = createSchema(ToManyBackReferenceLeakModel)
+		const permissions = new PermissionFactory().create(schema, ['reader'])
+		const injector = new PredicatesInjector(
+			schema.model,
+			new PredicateFactory(permissions, schema.model, new VariableInjector(schema.model, {})),
+		)
+
+		// We came Image -> articles -> Article; filter back via coverPhoto (manyHasOne, to-one).
+		// That round-trip re-reaches the exact verified Image row, so Image's predicate is safely
+		// simplified to { id: always } (NOT re-applied as { isVisible: true }).
+		const articlesRelation = relationOf(schema.model, 'Image', 'articles')
+		const injected = injector.inject(
+			schema.model.entities.Article,
+			{ coverPhoto: { url: { eq: 'x.jpg' } } },
+			articlesRelation,
+			[articlesRelation],
+		)
+
+		assert.deepStrictEqual(injected, {
+			and: [
+				{ coverPhoto: { and: [{ url: { eq: 'x.jpg' } }, { id: { always: true } }] } },
+				{ isPublished: { eq: true } },
+			],
+		})
+	})
+
+	it('manyHasMany back-hop must NOT drop the sibling Post row predicate', () => {
+		const schema = createSchema(ManyToManyBackReferenceLeakModel)
+		const permissions = new PermissionFactory().create(schema, ['reader'])
+		const injector = new PredicatesInjector(
+			schema.model,
+			new PredicateFactory(permissions, schema.model, new VariableInjector(schema.model, {})),
+		)
+
+		// Post -> tags -> Tag -> posts (manyHasManyInverse back to Post) -> secret
+		// The inner `posts` reaches sibling Posts sharing the tag; their row predicate
+		// { isPublished: true } MUST be kept.
+		const injected = injector.inject(schema.model.entities.Post, {
+			tags: { posts: { secret: { eq: 'X' } } },
+		})
+
+		assert.deepStrictEqual(injected, {
+			and: [
+				{ tags: { posts: { and: [{ secret: { eq: 'X' } }, { isPublished: { eq: true } }] } } },
+				{ isPublished: { eq: true } },
+			],
+		})
+	})
+
+	it('cell-level field via to-many back-hop keeps that field own read predicate', () => {
+		const schema = createSchema(CellLevelBackReferenceModel)
+		const permissions = new PermissionFactory().create(schema, ['reader'])
+		const injector = new PredicatesInjector(
+			schema.model,
+			new PredicateFactory(permissions, schema.model, new VariableInjector(schema.model, {})),
+		)
+
+		// Simulate Article -> coverPhoto -> Image, then filter back via `articles` (oneHasMany, to-many).
+		const coverPhotoRelation = relationOf(schema.model, 'Article', 'coverPhoto')
+
+		// Filtering on the cell-level `secret` keeps secret's own predicate { isSecretVisible: true }.
+		const injectedSecret = injector.inject(
+			schema.model.entities.Image,
+			{ articles: { secret: { eq: 'X' } } },
+			coverPhotoRelation,
+			[coverPhotoRelation],
+		)
+		assert.deepStrictEqual(injectedSecret, {
+			articles: { and: [{ secret: { eq: 'X' } }, { isSecretVisible: { eq: true } }] },
+		})
+
+		// Filtering on a row-shared field keeps the row predicate { isPublished: true }.
+		const injectedTitle = injector.inject(
+			schema.model.entities.Image,
+			{ articles: { title: { eq: 'T' } } },
+			coverPhotoRelation,
+			[coverPhotoRelation],
+		)
+		assert.deepStrictEqual(injectedTitle, {
+			articles: { and: [{ title: { eq: 'T' } }, { isPublished: { eq: true } }] },
 		})
 	})
 })

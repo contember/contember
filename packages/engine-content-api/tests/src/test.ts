@@ -17,6 +17,7 @@ export interface Test {
 	settings?: Settings.Schema
 	validation?: Validation.Schema
 	permissions?: Acl.Permissions
+	allPermissions?: Acl.Permissions
 	variables?: Acl.VariablesMap
 	query: string
 	queryVariables?: Record<string, any>
@@ -103,6 +104,7 @@ export const execute = async (test: Test) => {
 			executionContainer: executionContainerFactory
 				.create({
 					permissions,
+					allPermissions: test.allPermissions,
 					schema,
 					schemaMeta: {
 						id: 1,

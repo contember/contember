@@ -120,6 +120,27 @@ Audit: `project_secret_change` with `event_data` `{slug, key}` — never the val
 
 There is no `removeProjectSecret` mutation. To clear a secret, call `setProjectSecret` with an empty string.
 
+### Reading secret keys
+
+:::note[Available since 2.2]
+:::
+
+Secret **values** can never be read back through the API, but a management UI often needs to show *which* secrets exist. `Project.secrets` returns the keys and their timestamps only:
+
+```graphql
+query {
+  projectBySlug(slug: "my-blog") {
+    secrets {
+      key
+      createdAt
+      updatedAt
+    }
+  }
+}
+```
+
+This is gated by the `project:viewSecrets` permission (granted to project admins and `SUPER_ADMIN` by default); a caller without it gets an empty list rather than an error. No secret value is ever included in the response.
+
 ## Reading projects
 
 The companion queries are:

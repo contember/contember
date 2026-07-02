@@ -1,5 +1,5 @@
 import { InviteErrorCodes } from './hooks/useInvite.js'
-import { ChangeMyPasswordFormErrorCode, CreateApiKeyFormErrorCode } from '@contember/interface'
+import { ChangeMyPasswordFormErrorCode, CreateApiKeyFormErrorCode, CreateGlobalApiKeyFormErrorCode } from '@contember/interface'
 import {
 	ConfirmEmailChangeFormErrorCode,
 	InviteFormErrorCode,
@@ -14,7 +14,7 @@ import {
 	UpdateProjectMemberFormErrorCode,
 	VerifyEmailFormErrorCode,
 } from '@contember/react-identity'
-import { ActivatePasswordlessOtpErrorCode } from '@contember/graphql-client-tenant'
+import { ActivatePasswordlessOtpErrorCode, DisconnectIDPErrorCode } from '@contember/graphql-client-tenant'
 
 export const dict = {
 	inviteErrors: {
@@ -140,6 +140,73 @@ export const dict = {
 		memberDelete: {
 			cancel: 'Cancel',
 			confirm: 'Confirm',
+		},
+		mfa: {
+			totp: 'TOTP',
+			email: 'Email OTP',
+			none: 'None',
+		},
+		personsList: {
+			email: 'Email',
+			name: 'Name',
+			roles: 'Roles',
+			mfa: '2FA',
+			noEmail: 'No email',
+			noName: 'No name',
+			noRoles: 'None',
+			noResults: 'No users',
+			failedToLoadData: 'Failed to load data',
+			filterEmailPlaceholder: 'Filter by email',
+			previous: 'Previous',
+			next: 'Next',
+		},
+		globalApiKeyList: {
+			description: 'Description',
+			type: 'Type',
+			status: 'Status',
+			roles: 'Roles',
+			created: 'Created',
+			lastUsed: 'Last used',
+			expires: 'Expires',
+			action: 'Action',
+			enabled: 'Enabled',
+			disabled: 'Disabled',
+			unnamed: 'Unnamed API key',
+			noRoles: 'None',
+			never: 'Never',
+			noResults: 'No API keys',
+			failedToLoadData: 'Failed to load data',
+			previous: 'Previous',
+			next: 'Next',
+			disableConfirmation: 'Are you sure you want to disable this API key?',
+			disableSuccess: 'API key disabled',
+			disableFailed: 'Failed to disable API key',
+			cancel: 'Cancel',
+			disable: 'Disable',
+		},
+		createGlobalApiKey: {
+			description: 'Description',
+			roles: 'Roles',
+			addRole: 'Add role',
+			removeRole: 'Remove role',
+			rolePlaceholder: 'Role name',
+			submit: 'Create API key',
+			errorMessages: {
+				'FIELD_REQUIRED': 'This field is required',
+				'UNKNOWN_ERROR': 'Something went wrong. Please try again later',
+				'INVALID_MEMBERSHIP': 'Invalid membership',
+				'PROJECT_NOT_FOUND': 'Project not found',
+				'ROLE_NOT_FOUND': 'Role not found',
+				'VARIABLE_EMPTY': 'Variable empty',
+				'VARIABLE_NOT_FOUND': 'Variable not found',
+			} satisfies Record<CreateGlobalApiKeyFormErrorCode, string>,
+		},
+		projectSecretList: {
+			key: 'Key',
+			created: 'Created',
+			updated: 'Updated',
+			noResults: 'No secrets',
+			failedToLoadData: 'Failed to load data',
 		},
 		otpSetup: {
 			prepareContinue: 'Continue',
@@ -319,6 +386,26 @@ export const dict = {
 				'VARIABLE_NOT_FOUND': 'Variable not found',
 				'NOT_MEMBER': 'Not a member',
 			} satisfies Record<UpdateProjectMemberFormErrorCode, string>,
+		},
+		identityProviderConnections: {
+			provider: 'Provider',
+			account: 'External account',
+			connectedAt: 'Connected',
+			status: 'Status',
+			disabled: 'Disabled',
+			action: 'Action',
+			disconnect: 'Disconnect',
+			disconnectConfirmation: 'Are you sure you want to disconnect this identity provider?',
+			disconnected: 'Identity provider disconnected',
+			cancel: 'Cancel',
+			noResults: 'No connected identity providers',
+			failedToLoadData: 'Failed to load data',
+			errorMessages: {
+				'NOT_FOUND': 'This identity provider connection no longer exists',
+				'NOT_A_PERSON': 'Only a signed-in person can disconnect identity providers',
+				'LAST_AUTH_METHOD': 'You cannot disconnect your last remaining sign-in method',
+				'UNKNOWN_ERROR': 'Something went wrong. Please try again later',
+			} satisfies Record<DisconnectIDPErrorCode | 'UNKNOWN_ERROR', string>,
 		},
 	},
 }

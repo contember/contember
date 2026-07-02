@@ -1,4 +1,5 @@
 export * from './CreateApiKeyForm.js'
+export * from './CreateGlobalApiKeyForm.js'
 export * from './CreateSessionTokenForm.js'
 export * from './ChangeMyPasswordForm.js'
 export * from './InviteForm.js'

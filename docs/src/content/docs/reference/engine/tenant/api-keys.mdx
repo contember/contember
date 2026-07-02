@@ -98,6 +98,71 @@ The flag cannot be flipped on an existing api_key. To remove it, disable the key
 
 *(since 2.2)* Every `createApiKey` / `createGlobalApiKey` is recorded as `api_key_create` in the [audit log](/reference/engine/tenant/audit-log) with the api_key id, identity, and memberships/roles — never the token or its hash. `disableApiKey` is recorded as `api_key_disable`.
 
+## Listing API keys
+
+:::note[Available since 2.2]
+:::
+
+Permanent keys can be listed so a management UI can show which keys exist, who they belong to, and when they were last used. Two entry points cover the project-scoped and global cases — both return the enriched `ApiKey` type and **never** expose the token.
+
+Project-scoped permanent keys (excludes session tokens and global keys) live on the `Project` type and require the `project.view members` permission:
+
+```graphql
+query {
+  projectBySlug(slug: "my-blog") {
+    apiKeys {
+      id
+      description
+      type
+      enabled
+      createdAt
+      lastUsedAt
+      expiresAt
+      identity {
+        id
+        # memberships, handy for cloning a key when re-issuing it
+        projects {
+          project { slug }
+          memberships { role variables { name values } }
+        }
+      }
+    }
+  }
+}
+```
+
+Global permanent keys (those created via `createGlobalApiKey` — their identity carries global roles and no project membership) are read through the top-level query, gated by the `apiKey:list` permission (granted only to `SUPER_ADMIN` by default):
+
+```graphql
+query {
+  globalApiKeys {
+    id
+    description
+    type
+    enabled
+    createdAt
+    lastUsedAt
+    expiresAt
+    identity { id roles }
+  }
+}
+```
+
+Both fields return an empty list rather than throwing when the caller may not list the keys, so a batched query doesn't abort on a single forbidden target.
+
+### `ApiKey` fields
+
+| Field | Notes |
+|---|---|
+| `id` | The api-key id. Pass to `disableApiKey`. |
+| `identity` | The key's identity — `identity.id` to edit memberships, `identity.projects` for its project memberships, `identity.roles` for a global key's roles. |
+| `description` | Human-readable label, stored on the key's identity (`identity.description`). |
+| `type` | `ApiKeyType` — `SESSION`, `PERMANENT`, or `ONE_OFF`. Listings only return `PERMANENT` keys. |
+| `enabled` | `false` once the key has been disabled (`disableApiKey`). |
+| `createdAt` | When the key was minted. |
+| `lastUsedAt` | Timestamp of the most recent request authenticated with this key. |
+| `expiresAt` | Expiration, if any (permanent keys typically have none). |
+
 ## Session keys vs permanent keys
 
 API keys come in two flavors:

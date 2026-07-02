@@ -311,6 +311,39 @@ export type CreateApiKeyMutationResult = ModelType<typeof createApiKeyMutationRe
 export type CreateApiKeyMutationVariables = Parameters<ReturnType<typeof useCreateApiKeyMutation>>[0];
 
 // @public (undocumented)
+export const CreateGlobalApiKeyForm: (input: CreateGlobalApiKeyFormProps) => JSX.Element;
+
+// @public (undocumented)
+export type CreateGlobalApiKeyFormContextValue = FormContextValue<CreateGlobalApiKeyFormValues, CreateGlobalApiKeyFormErrorCode>;
+
+// @public (undocumented)
+export type CreateGlobalApiKeyFormError = FormError<CreateGlobalApiKeyFormValues, CreateGlobalApiKeyFormErrorCode>;
+
+// @public (undocumented)
+export type CreateGlobalApiKeyFormErrorCode = CreateApiKeyErrorCode | 'UNKNOWN_ERROR' | 'FIELD_REQUIRED';
+
+// @public (undocumented)
+export interface CreateGlobalApiKeyFormProps {
+    // (undocumented)
+    children: ReactElement;
+    // (undocumented)
+    initialRoles?: readonly string[];
+    // (undocumented)
+    onSuccess?: (args: {
+        result: CreateGlobalApiKeyMutationResult;
+    }) => void;
+}
+
+// @public (undocumented)
+export type CreateGlobalApiKeyFormState = FormState;
+
+// @public (undocumented)
+export type CreateGlobalApiKeyFormValues = {
+    description: string;
+    roles: readonly string[];
+};
+
+// @public (undocumented)
 export const createGlobalApiKeyMutation: TenantApi.MutationFetcher<{
     readonly mutation?: ({
         readonly ok: boolean;
@@ -502,6 +535,24 @@ export interface DisableOtpTriggerProps {
     onSuccess?: () => void;
 }
 
+// @public (undocumented)
+export const disconnectMyIdentityProviderMutation: TenantApi.MutationFetcher<{
+    readonly mutation?: ({
+        readonly ok: boolean;
+    } & {
+        readonly error?: ({
+            readonly code: TenantApi.DisconnectIDPErrorCode;
+        } & {
+            readonly developerMessage: string;
+        }) | undefined;
+    }) | undefined;
+}, {
+    readonly id: string;
+}>;
+
+// @public (undocumented)
+export type DisconnectMyIdentityProviderMutationVariables = Parameters<ReturnType<typeof useDisconnectMyIdentityProviderMutation>>[0];
+
 // @internal (undocumented)
 export const FormContext: Context<FormContextValue<any, any, any>>;
 
@@ -533,6 +584,11 @@ export type FormErrorCode = 'UNKNOWN_ERROR';
 
 // @public (undocumented)
 export type FormState = 'loading' | 'initial' | 'submitting' | 'error' | 'success';
+
+// Warning: (ae-forgotten-export) The symbol "globalApiKeyFragment" needs to be exported by the entry point index.d.ts
+//
+// @public (undocumented)
+export type GlobalApiKeysQueryResult = readonly ModelType<typeof globalApiKeyFragment>[];
 
 // @public (undocumented)
 export interface Identity {
@@ -849,6 +905,11 @@ export type MeQueryData = ModelType<typeof identityFragment>;
 
 export { ModelType }
 
+// Warning: (ae-forgotten-export) The symbol "personIdentityProviderFragment" needs to be exported by the entry point index.d.ts
+//
+// @public (undocumented)
+export type MyIdentityProvidersQueryResult = readonly ModelType<typeof personIdentityProviderFragment>[];
+
 // @public (undocumented)
 export const OtpConfirmForm: (input: OtpConfirmFormProps) => JSX.Element;
 
@@ -1059,6 +1120,18 @@ export interface Person {
     readonly otpEnabled: boolean;
 }
 
+// Warning: (ae-forgotten-export) The symbol "personFragment" needs to be exported by the entry point index.d.ts
+//
+// @public (undocumented)
+export type PersonsQueryResult = readonly ModelType<typeof personFragment>[];
+
+// @public (undocumented)
+export type PersonsQueryVariables = {
+    filter?: TenantApi.PersonsFilter;
+    limit?: number;
+    offset?: number;
+};
+
 // @public (undocumented)
 export const prepareOtpMutation: TenantApi.MutationFetcher<{
     readonly mutation?: ({
@@ -1079,6 +1152,16 @@ export type PrepareOtpMutationResult = ModelType<typeof TenantApi.prepareOtpResu
 
 // @public (undocumented)
 export type PrepareOtpMutationVariables = Parameters<ReturnType<typeof usePrepareOtpMutation>>[0];
+
+// Warning: (ae-forgotten-export) The symbol "apiKeyFragment" needs to be exported by the entry point index.d.ts
+//
+// @public (undocumented)
+export type ProjectApiKeysQueryResult = readonly ModelType<typeof apiKeyFragment>[];
+
+// @public (undocumented)
+export type ProjectApiKeysQueryVariables = {
+    projectSlug: string;
+};
 
 // Warning: (ae-forgotten-export) The symbol "projectMembershipsFragment" needs to be exported by the entry point index.d.ts
 //
@@ -1114,6 +1197,16 @@ export interface ProjectRolesDefinitionQueryVariables {
     // (undocumented)
     slug: string;
 }
+
+// Warning: (ae-forgotten-export) The symbol "projectSecretFragment" needs to be exported by the entry point index.d.ts
+//
+// @public (undocumented)
+export type ProjectSecretsQueryResult = readonly ModelType<typeof projectSecretFragment>[];
+
+// @public (undocumented)
+export type ProjectSecretsQueryVariables = {
+    projectSlug: string;
+};
 
 // @public (undocumented)
 export const removeProjectMemberMutation: TenantApi.MutationFetcher<{
@@ -1539,6 +1632,9 @@ readonly roles?: ReadonlyArray<string>;
 }, TenantApi.CreateApiKeyErrorCode>>;
 
 // @public (undocumented)
+export const useCreateGlobalApiKeyForm: () => CreateGlobalApiKeyFormContextValue;
+
+// @public (undocumented)
 export const useCreateGlobalApiKeyMutation: (input?: TenantApiOptions) => (variables: {
     readonly description: string;
     readonly roles?: ReadonlyArray<string>;
@@ -1600,6 +1696,11 @@ export const useDisableMyPasswordlessMutation: (input?: TenantApiOptions) => (va
 export const useDisableOtpMutation: (input?: TenantApiOptions) => (variables: {}) => Promise<TenantMutationResponse<unknown, TenantApi.DisableOtpErrorCode>>;
 
 // @public (undocumented)
+export const useDisconnectMyIdentityProviderMutation: (input?: TenantApiOptions) => (variables: {
+    readonly id: string;
+}) => Promise<TenantMutationResponse<unknown, TenantApi.DisconnectIDPErrorCode>>;
+
+// @public (undocumented)
 export const useEnableMyPasswordlessMutation: (input?: TenantApiOptions) => (variables: {}) => Promise<TenantMutationResponse<unknown, TenantApi.ToggleMyPasswordlessErrorCode>>;
 
 // @public (undocumented)
@@ -1610,6 +1711,9 @@ export const useFetchIdentity: () => [{
 
 // @public (undocumented)
 export const useForm: () => FormContextValue<any, any, any>;
+
+// @public (undocumented)
+export const useGlobalApiKeysQuery: (options?: TenantApiOptions) => (input?: {}) => Promise<GlobalApiKeysQueryResult>;
 
 // @public (undocumented)
 export const useIdentity: () => Identity | undefined;
@@ -1689,6 +1793,9 @@ export const useLogout: () => (input?: {
 export const useMeQuery: (options?: TenantApiOptions) => (input: {}) => Promise<MeQueryData>;
 
 // @public (undocumented)
+export const useMyIdentityProvidersQuery: (options?: TenantApiOptions) => (input?: {}) => Promise<MyIdentityProvidersQueryResult>;
+
+// @public (undocumented)
 export const useOtpConfirmForm: () => OtpConfirmFormContextValue;
 
 // @public (undocumented)
@@ -1713,6 +1820,9 @@ export const usePasswordResetForm: () => PasswordResetFormContextValue;
 export const usePasswordResetRequestForm: () => PasswordResetRequestFormContextValue;
 
 // @public (undocumented)
+export const usePersonsQuery: (options?: TenantApiOptions) => (variables?: PersonsQueryVariables) => Promise<PersonsQueryResult>;
+
+// @public (undocumented)
 export const usePrepareOtpMutation: (input?: TenantApiOptions) => (variables: {
     readonly label?: string;
 }) => Promise<TenantMutationResponse<    {
@@ -1722,6 +1832,9 @@ readonly otpSecret: string;
 }, never>>;
 
 // @public (undocumented)
+export const useProjectApiKeysQuery: (options?: TenantApiOptions) => (input: ProjectApiKeysQueryVariables) => Promise<ProjectApiKeysQueryResult>;
+
+// @public (undocumented)
 export const useProjectMembershipsQuery: (options?: TenantApiOptions) => (input: ProjectMembershipsQueryVariables) => Promise<ProjectMembershipsQueryResult>;
 
 // @public (undocumented)
@@ -1729,6 +1842,9 @@ export const useProjectMembersQuery: (input?: TenantApiOptions) => (input: Proje
 
 // @public (undocumented)
 export const useProjectRolesDefinitionQuery: (input?: TenantApiOptions) => (variables: ProjectRolesDefinitionQueryVariables) => Promise<ProjectRolesDefinitionQueryResult>;
+
+// @public (undocumented)
+export const useProjectSecretsQuery: (options?: TenantApiOptions) => (input: ProjectSecretsQueryVariables) => Promise<ProjectSecretsQueryResult>;
 
 // @public (undocumented)
 export const useRemoveProjectMemberMutation: (input?: TenantApiOptions) => (variables: {

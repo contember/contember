@@ -30,9 +30,9 @@ import * as Typesafe from '@contember/typesafe'
  * - neither    — the rule matches whenever the claim is merely present (and truthy for booleans).
  */
 /**
- * Where a membership variable's values come from when they are not constant. Reads one `claim` as a
- * dot-path into the IdP response (so nested claims like `profile.languages` work) and shapes the raw
- * value(s) into a flat list of strings:
+ * Where a membership variable's values come from when they are not constant. Reads one `claim` from the
+ * IdP response — by exact name first (a URL-namespaced claim with literal dots works), then as a dot-path
+ * (nested claims like `profile.languages`) — and shapes the raw value(s) into a flat list of strings:
  * - array claim       → its elements (`languages: ['cs','en']`)
  * - `split`           → split a delimited string claim (`'cs,en'`, OIDC-style `'cs en'`) into elements
  * - `pick` / `where`  → for an array-of-objects claim, keep elements matching `where` and take their
@@ -42,7 +42,7 @@ import * as Typesafe from '@contember/typesafe'
  */
 export const ClaimValueSource = Typesafe.noExtraProps(Typesafe.intersection(
 	Typesafe.object({
-		/** Claim to read, as a dot-path into the IdP response (e.g. `profile.languages`). */
+		/** Claim to read: the exact name first (URL-namespaced names work), then as a dot-path (e.g. `profile.languages`). */
 		claim: Typesafe.string,
 	}),
 	Typesafe.partial({
@@ -109,7 +109,7 @@ export type ClaimMappingMembership = ReturnType<typeof ClaimMappingMembership>
 
 export const ClaimMappingRule = Typesafe.noExtraProps(Typesafe.intersection(
 	Typesafe.object({
-		/** Name of the claim/attribute from the IdP response to inspect. */
+		/** Claim/attribute from the IdP response to inspect: the exact name first, then as a dot-path into nested objects. */
 		claim: Typesafe.string,
 	}),
 	Typesafe.partial({

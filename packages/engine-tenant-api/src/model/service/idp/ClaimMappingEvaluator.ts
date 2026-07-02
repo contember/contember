@@ -15,7 +15,7 @@ export const evaluateClaimMapping = (mapping: ClaimMapping, claims: Record<strin
 	const membershipByKey = new Map<string, MappedMembership>()
 
 	for (const rule of mapping.rules) {
-		if (!ruleMatches(rule, readClaim(claims, rule.claim))) {
+		if (!ruleMatches(rule, resolvePath(claims, rule.claim))) {
 			continue
 		}
 		if (rule.grantMembership) {
@@ -30,15 +30,6 @@ export const evaluateClaimMapping = (mapping: ClaimMapping, claims: Record<strin
 
 	return [...membershipByKey.values()]
 }
-
-/**
- * Read a rule's match claim by its (flat) key. Own-property only: a claim named `__proto__` /
- * `constructor` / `toString` must not resolve to an always-present inherited member and thereby
- * presence-match every sign-in. Rule claims are flat keys (unlike a variable's `from.claim`, which
- * is a dot-path); a dotted name simply won't be found here.
- */
-const readClaim = (claims: Record<string, unknown>, claim: string): unknown =>
-	Object.prototype.hasOwnProperty.call(claims, claim) ? claims[claim] : undefined
 
 const toMembership = (membership: ClaimMappingMembership, claims: Record<string, unknown>): MappedMembership => ({
 	project: membership.project,
@@ -150,11 +141,21 @@ export const extractClaimValues = (source: ClaimValueSource, claims: Record<stri
 	return [...new Set(out)]
 }
 
+/**
+ * Resolve a claim name — a rule's `claim` and a variable's `from.claim` / `pick` / `where.field` all
+ * use this same lookup. The EXACT name is tried first, so a claim whose name literally contains dots
+ * (URL-namespaced, e.g. Auth0's `https://example.com/roles`) stays addressable and wins over a nested
+ * path of the same spelling; only then is the name treated as a dot-path into nested objects
+ * (`realm_access.roles`). Own-property only at every step: never descend into inherited members, so a
+ * claim object can't surface `Object.prototype` via a `__proto__` segment (and a configured path can't
+ * read a prototype member).
+ */
 const resolvePath = (root: unknown, path: string): unknown => {
+	if (isRecord(root) && Object.prototype.hasOwnProperty.call(root, path)) {
+		return root[path]
+	}
 	let current: unknown = root
 	for (const key of path.split('.')) {
-		// Own-property only: never descend into inherited members, so a claim object can't surface
-		// `Object.prototype` via a `__proto__` segment (and a configured path can't read a prototype member).
 		if (!isRecord(current) || !Object.prototype.hasOwnProperty.call(current, key)) {
 			return undefined
 		}

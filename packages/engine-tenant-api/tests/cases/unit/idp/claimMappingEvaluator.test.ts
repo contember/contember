@@ -85,6 +85,30 @@ describe('evaluateClaimMapping', () => {
 		).toEqual([{ project: 'demo', role: 'editor', variables: [] }])
 	})
 
+	test('a rule claim resolves by exact name first, then as a dot-path (URL-namespaced + nested claims)', () => {
+		// exact name wins even when it contains dots (Auth0-style URL-namespaced claim)
+		expect(
+			evaluateClaimMapping(
+				mapping([{ claim: 'https://example.com/roles', contains: 'admin', grantMembership: { project: 'demo', role: 'admin' } }]),
+				{ 'https://example.com/roles': ['admin', 'user'] },
+			),
+		).toEqual([{ project: 'demo', role: 'admin', variables: [] }])
+		// dot-path fallback reaches a nested claim (Keycloak-style realm_access.roles)
+		expect(
+			evaluateClaimMapping(
+				mapping([{ claim: 'realm_access.roles', contains: 'editor', grantMembership: { project: 'demo', role: 'editor' } }]),
+				{ realm_access: { roles: ['editor'] } },
+			),
+		).toEqual([{ project: 'demo', role: 'editor', variables: [] }])
+		// when both spellings exist, the exact (literal) key takes precedence over the nested path
+		expect(
+			evaluateClaimMapping(
+				mapping([{ claim: 'a.b', equals: 'flat', grantMembership: { project: 'demo', role: 'editor' } }]),
+				{ 'a.b': 'flat', 'a': { b: 'nested' } },
+			),
+		).toEqual([{ project: 'demo', role: 'editor', variables: [] }])
+	})
+
 	test('grants memberships and dedupes by (project, role)', () => {
 		const result = evaluateClaimMapping(
 			mapping([
@@ -179,6 +203,12 @@ describe('extractClaimValues', () => {
 		expect(extractClaimValues({ claim: 'profile.languages' }, { profile: { languages: ['cs'] } })).toEqual(['cs'])
 		expect(extractClaimValues({ claim: 'profile.missing' }, { profile: {} })).toEqual([])
 		expect(extractClaimValues({ claim: 'profile.deep' }, { profile: 'not-an-object' })).toEqual([])
+	})
+
+	test('resolves a claim by exact name before falling back to the dot-path (URL-namespaced claims)', () => {
+		expect(extractClaimValues({ claim: 'https://example.com/roles' }, { 'https://example.com/roles': ['editor'] })).toEqual(['editor'])
+		// the literal key wins over a nested path of the same spelling
+		expect(extractClaimValues({ claim: 'a.b' }, { 'a.b': ['flat'], 'a': { b: ['nested'] } })).toEqual(['flat'])
 	})
 
 	test('filters and projects an array-of-objects claim', () => {

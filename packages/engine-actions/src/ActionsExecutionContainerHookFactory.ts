@@ -3,10 +3,14 @@ import { ListenerStoreProvider } from './ListenerStoreProvider.js'
 import { TriggerPayloadBuilder } from './triggers/TriggerPayloadBuilder.js'
 import { TriggerPayloadPersister } from './triggers/TriggerPayloadPersister.js'
 import { ExecutionContainerHook } from '@contember/engine-content-api'
+import { ActionsMetrics } from './ActionsMetrics.js'
 
 export class ActionsExecutionContainerHookFactory {
 	constructor(
 		private readonly listenerStoreProvider: ListenerStoreProvider,
+		// Resolved lazily: the metrics singleton lives in the master container and is wired up when the
+		// dispatch worker boots, which precedes any content request that could enqueue an event.
+		private readonly metricsProvider: () => ActionsMetrics | undefined,
 	) {
 	}
 
@@ -18,6 +22,7 @@ export class ActionsExecutionContainerHookFactory {
 					mapperFactory,
 					{ whereBuilder, schema, pathFactory, systemSchema, providers, stage, project, schemaMeta, joinBuilder, userInfo, triggeredActionsCollector },
 				) => {
+					const projectMetrics = this.metricsProvider()?.forProject(project.slug)
 					mapperFactory.hooks.push(mapper => {
 						const triggerPayloadPersister = new TriggerPayloadPersister(
 							mapper,
@@ -29,6 +34,7 @@ export class ActionsExecutionContainerHookFactory {
 							mapper.identityId,
 							userInfo,
 							triggeredActionsCollector,
+							projectMetrics,
 						)
 						const triggerPayloadBuilder = new TriggerPayloadBuilder(mapper)
 						const payloadManager = new TriggerPayloadManager(triggerPayloadBuilder, triggerPayloadPersister)

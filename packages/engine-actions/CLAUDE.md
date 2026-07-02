@@ -39,6 +39,24 @@ Mutations: `processBatch`, `retryEvent`, `stopEvent`, `setVariables` (MERGE/SET/
 
 Queries: `failedEvents`, `eventsToProcess`, `eventsInProcessing`, `event`, `variables`
 
+## Observability (`ActionsMetrics`)
+
+Cheap in-memory Prometheus metrics (no table polling), registered onto the engine's shared registry
+via `getMasterContainerHook`, labelled by `contember_project`:
+
+- `contember_actions_events_enqueued_total` — inflow (from `TriggerPayloadPersister`, pre-commit)
+- `contember_actions_events_succeeded_total` — terminal success
+- `contember_actions_delivery_attempts_failed_total` — failed webhook attempts (incl. retries)
+- `contember_actions_events_failed_total` — terminal failures (retries exhausted or unknown target)
+- `contember_actions_worker_heartbeat_timestamp_seconds` — gauge set each loop iteration; staleness ⇒ stuck/dead worker
+- `contember_actions_worker_crashed_total` — dispatch-loop crashes (each auto-restarted by the supervisor)
+
+Backlog is *estimated* as a trend: `enqueued − succeeded − failed` (rate comparison; the absolute value
+drifts across restarts and ignores manual retry/stop — query `actions_event` for an exact depth).
+
+The `ProjectDispatcher` idle wait is capped at `MAX_IDLE_SLEEP_MS` (30s) even when the queue is empty,
+so a lost `pg_notify` self-heals and the heartbeat keeps refreshing while idle.
+
 ## Plugin Integration
 
 Implements `Plugin` interface with:

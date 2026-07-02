@@ -28,6 +28,7 @@ import { VariablesManager } from './model/VariablesManager.js'
 import { AccessEvaluator, Authorizator } from '@contember/authorization'
 import { ActionsPermissionsFactory } from './authorization/index.js'
 import { WebhookFetcherNative } from './dispatch/WebhookFetcher.js'
+import { ActionsMetrics } from './ActionsMetrics.js'
 
 export {
 	TriggerHandler,
@@ -42,18 +43,31 @@ export { ListenerStoreProvider } from './ListenerStoreProvider.js'
 export default class ActionsPlugin implements Plugin {
 	name = 'contember/actions'
 
+	/**
+	 * Metrics singleton, created in {@link getMasterContainerHook} (where the Prometheus registry is
+	 * available) and read back here in {@link getExecutionContainerHook}, which runs in the per-request
+	 * content container with no access to master-level services.
+	 */
+	private actionsMetrics: ActionsMetrics | undefined
+
 	getSystemMigrations(): MigrationGroup {
 		return migrationsGroup
 	}
 
 	getExecutionContainerHook() {
-		const hookFactory = new ActionsExecutionContainerHookFactory(new ListenerStoreProvider())
+		const hookFactory = new ActionsExecutionContainerHookFactory(new ListenerStoreProvider(), () => this.actionsMetrics)
 		return hookFactory.create()
 	}
 
 	getMasterContainerHook() {
 		const hook: MasterContainerHook = (builder: MasterContainerBuilder) => {
 			return builder
+				.addService('actions_metrics', ({ promRegistry }) => {
+					const metrics = new ActionsMetrics(promRegistry)
+					// expose to getExecutionContainerHook (runs in a different container scope)
+					this.actionsMetrics = metrics
+					return metrics
+				})
 				.addService('actions_variableManager', () => {
 					return new VariablesManager()
 				})
@@ -65,8 +79,8 @@ export default class ActionsPlugin implements Plugin {
 					const targetHandlerResolver = new TargetHandlerResolver(webhookTargetHandler)
 					return new EventDispatcher(actions_eventRepository, actions_variableManager, targetHandlerResolver)
 				})
-				.addService('actions_dispatchWorkerSupervisorFactory', ({ actions_eventDispatcher }) => {
-					const projectDispatcherFactory = new ProjectDispatcherFactory(actions_eventDispatcher)
+				.addService('actions_dispatchWorkerSupervisorFactory', ({ actions_eventDispatcher, actions_metrics }) => {
+					const projectDispatcherFactory = new ProjectDispatcherFactory(actions_eventDispatcher, actions_metrics)
 					return new DispatchWorkerSupervisorFactory(projectDispatcherFactory)
 				})
 				.addService('actions_authorizator', () => {

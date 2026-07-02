@@ -37,7 +37,8 @@
     "@contember/schema-utils": "workspace:*",
     "@contember/typesafe": "workspace:*",
     "@graphql-tools/schema": "catalog:",
-    "graphql-tag": "catalog:"
+    "graphql-tag": "catalog:",
+    "prom-client": "catalog:"
   },
   "devDependencies": {
     "@types/bun": "catalog:",

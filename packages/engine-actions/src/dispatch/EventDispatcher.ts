@@ -13,8 +13,14 @@ type ProcessBatchArgs = {
 }
 
 type ProcessBatchResult = {
-	succeed: number
-	failed: number
+	/** Events delivered successfully (terminal). */
+	succeeded: number
+	/** Failed delivery attempts that will be retried. */
+	retried: number
+	/** Events terminally failed after a delivery attempt (retries exhausted). */
+	failedAfterAttempt: number
+	/** Events terminally failed without a delivery attempt (target missing from schema). */
+	failedUnknownTarget: number
 	backoffMs: number | undefined
 }
 
@@ -35,7 +41,13 @@ export class EventDispatcher {
 			batchLogger.debug('Nothing to process', {
 				backoffMs: batch.backoffMs ?? 'undefined',
 			})
-			return { failed: 0, succeed: 0, backoffMs: batch.backoffMs }
+			return {
+				succeeded: 0,
+				retried: 0,
+				failedAfterAttempt: 0,
+				failedUnknownTarget: batch.unknownTargetFailed,
+				backoffMs: batch.backoffMs,
+			}
 		}
 		const { target, events } = batch
 		try {
@@ -45,18 +57,30 @@ export class EventDispatcher {
 			})
 			const variables = await this.variablesManager.fetchVariables(db)
 			const handledEvents = await handler.handle({ target, events, logger: batchLogger, variables })
-			const [succeed, failed] = await this.eventsRepository.persistProcessed(db.client, handledEvents)
-			batchLogger.debug('Processing done', { succeed, failed })
-			return { succeed, failed, backoffMs: 0 }
+			const { succeeded, retried, failed } = await this.eventsRepository.persistProcessed(db.client, handledEvents)
+			batchLogger.debug('Processing done', { succeed: succeeded, failed })
+			return {
+				succeeded,
+				retried,
+				failedAfterAttempt: failed,
+				failedUnknownTarget: batch.unknownTargetFailed,
+				backoffMs: 0,
+			}
 		} catch (e) {
 			logger.error(e, { loc: 'EventDispatcher', batchId })
 			const failedEvents = events.map((it): HandledEvent => ({
 				row: it,
 				result: { ok: false, errorMessage: `Internal error` },
 			}))
-			await this.eventsRepository.persistProcessed(db.client, failedEvents)
+			const { succeeded, retried, failed } = await this.eventsRepository.persistProcessed(db.client, failedEvents)
 
-			return { succeed: 0, failed: batch.events.length, backoffMs: 0 }
+			return {
+				succeeded,
+				retried,
+				failedAfterAttempt: failed,
+				failedUnknownTarget: batch.unknownTargetFailed,
+				backoffMs: 0,
+			}
 		}
 	}
 }

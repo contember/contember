@@ -3,6 +3,7 @@ import { Mapper, TriggeredActionEvent, TriggeredActionsCollector } from '@contem
 import { Actions, ActionsPayload } from '@contember/schema'
 import { EventRow } from '../model/types.js'
 import { notify } from '../utils/notifyChannel.js'
+import { ProjectActionsMetrics } from '../ActionsMetrics.js'
 
 type EventRowToInsert = Omit<EventRow, 'created_at' | 'visible_at' | 'last_state_change' | 'log'> & {
 	created_at: string | Date
@@ -21,6 +22,7 @@ export class TriggerPayloadPersister {
 		private readonly identityId: string,
 		private readonly userInfo: { ipAddress: string | null; userAgent: string | null },
 		private readonly triggeredActionsCollector: TriggeredActionsCollector | undefined,
+		private readonly metrics: ProjectActionsMetrics | undefined,
 	) {
 	}
 
@@ -61,6 +63,10 @@ export class TriggerPayloadPersister {
 				.into('actions_event')
 				.values(rows)
 				.execute(this.client)
+
+			// Counted before commit (events are written in the mutation's transaction); a rollback
+			// would over-count enqueued. Acceptable for a backlog *trend*, which is the intended use.
+			this.metrics?.enqueued(rows.length)
 
 			if (collected && collected.length > 0) {
 				collector!.add(collected)

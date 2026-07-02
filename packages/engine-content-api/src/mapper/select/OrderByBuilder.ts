@@ -14,6 +14,16 @@ const orderByMapping = {
 	descNullsLast: 'desc nulls last',
 } as const
 
+// A read predicate collected while traversing an order-by relation hop (e.g. `Post.author` in
+// `orderBy: {author: {name: asc}}`), to be ANDed into the order-key guard. `false` = never readable.
+interface OrderByHopGuard {
+	entity: Model.Entity
+	path: Path
+	predicate: Acl.PredicateReference | false
+	relationPath: Model.AnyRelationContext[]
+	isAclFiltered: boolean
+}
+
 export class OrderByBuilder {
 	constructor(
 		private readonly schema: Model.Schema,
@@ -31,7 +41,7 @@ export class OrderByBuilder {
 		relationPath: Model.AnyRelationContext[] = [],
 	): [SelectBuilder<SelectBuilder.Result>, Orderable] {
 		return orderBy.reduce<[SelectBuilder<SelectBuilder.Result>, Orderable]>(
-			([qb, orderable], fieldOrderBy) => this.buildOne(qb, orderable, entity, path, fieldOrderBy, relationPath, true),
+			([qb, orderable], fieldOrderBy) => this.buildOne(qb, orderable, entity, path, fieldOrderBy, relationPath, true, []),
 			[qb, orderable],
 		)
 	}
@@ -46,6 +56,7 @@ export class OrderByBuilder {
 		// True while we are still on the ACL-filtered query entity (its row-level predicate is in the WHERE).
 		// Becomes false once we traverse into a relation, whose join is not ACL-filtered.
 		isAclFiltered: boolean,
+		hopGuards: OrderByHopGuard[],
 	): [SelectBuilder<SelectBuilder.Result>, Orderable] {
 		const entries = Object.entries(orderBy)
 		if (entries.length !== 1) {
@@ -74,7 +85,7 @@ export class OrderByBuilder {
 
 		if (typeof value === 'string') {
 			const columnName = getColumnName(this.schema, entity, fieldName)
-			return this.buildColumnOrder(qb, orderable, entity, path, fieldName, columnName, orderByMapping[value], relationPath, isAclFiltered)
+			return this.buildColumnOrder(qb, orderable, entity, path, fieldName, columnName, orderByMapping[value], relationPath, isAclFiltered, hopGuards)
 		} else {
 			const targetEntity = getTargetEntity(this.schema, entity, fieldName)
 			if (!targetEntity) {
@@ -89,14 +100,23 @@ export class OrderByBuilder {
 				visitRelation: context => context,
 			})
 
-			return this.buildOne(joined, orderable, targetEntity, newPath, value, [...relationPath, relationContext], false)
+			// The relation field itself has a read predicate: a row where the relation is cell-masked must not
+			// order by the hidden target's value (projection masks the nested object via the same predicate).
+			const hopPredicate = this.predicateFactory.getFieldReadPredicate(entity, fieldName, relationPath)
+			const hopGuard = isAclFiltered && hopPredicate.isSameAsPrimary ? true : hopPredicate.predicate
+			const nextHopGuards = hopGuard === true
+				? hopGuards
+				: [...hopGuards, { entity, path, predicate: hopGuard, relationPath, isAclFiltered }]
+
+			return this.buildOne(joined, orderable, targetEntity, newPath, value, [...relationPath, relationContext], false, nextHopGuards)
 		}
 	}
 
 	/**
-	 * Orders by a column, guarding the order key with the field's read predicate so that ordering can never
-	 * leak a value the role cannot read. A row whose value fails the predicate sorts as NULL (`CASE WHEN
-	 * <predicate> THEN <column> END`), mirroring how projection masks the same value to NULL.
+	 * Orders by a column, guarding the order key with the field's read predicate — ANDed with the read
+	 * predicates of every relation hop traversed to reach it — so that ordering can never leak a value the
+	 * role cannot read. A row failing any of the predicates sorts as NULL (`CASE WHEN <predicates> THEN
+	 * <column> END`), mirroring how projection masks the same value / relation to NULL.
 	 *
 	 * On the ACL-filtered query entity only cell-level fields (a read predicate stricter than the row-level
 	 * predicate) need guarding — the row-level predicate is already enforced in the WHERE. When ordering
@@ -113,6 +133,7 @@ export class OrderByBuilder {
 		direction: typeof orderByMapping[keyof typeof orderByMapping],
 		relationPath: Model.AnyRelationContext[],
 		isAclFiltered: boolean,
+		hopGuards: OrderByHopGuard[],
 	): [SelectBuilder<SelectBuilder.Result>, Orderable] {
 		const orderColumn: QueryBuilder.ColumnIdentifier = [path.alias, columnName]
 		const applyPlain = <O extends QueryBuilder.Orderable<any>>(o: O) => o.orderBy(orderColumn, direction)
@@ -123,15 +144,22 @@ export class OrderByBuilder {
 		// for every returned row, so no guard is needed. Through a relation we always guard.
 		const guardPredicate = isAclFiltered && fieldPredicate.isSameAsPrimary ? true : fieldPredicate.predicate
 
-		if (guardPredicate === true) {
-			qb = applyPlain(qb)
-			if (orderable !== null) {
-				orderable = applyPlain(orderable as QueryBuilder.Orderable<any>)
+		const allGuards: OrderByHopGuard[] = guardPredicate === true
+			? hopGuards
+			: [...hopGuards, { entity, path, predicate: guardPredicate, relationPath, isAclFiltered }]
+
+		let neverReadable = false
+		const guards: (OrderByHopGuard & { predicate: Acl.PredicateReference })[] = []
+		for (const guard of allGuards) {
+			if (guard.predicate === false) {
+				neverReadable = true
+			} else {
+				guards.push({ ...guard, predicate: guard.predicate })
 			}
-			return [qb, orderable]
 		}
-		if (guardPredicate === false) {
-			// The field is never readable: the order key is unconditionally NULL.
+
+		if (neverReadable) {
+			// The field, or a relation on the path to it, is never readable: the order key is unconditionally NULL.
 			const nullLiteral = new Literal('null')
 			qb = qb.orderBy(nullLiteral, direction)
 			if (orderable !== null) {
@@ -139,25 +167,38 @@ export class OrderByBuilder {
 			}
 			return [qb, orderable]
 		}
-
-		const isRoot = relationPath.length === 0
-		const relationContext = relationPath[relationPath.length - 1]
-		const predicateWhere = this.predicateFactory.buildPredicates(entity, [guardPredicate], relationContext, isRoot)
-		// The row-level predicate is already guaranteed in the WHERE of the ACL-filtered entity, so let the
-		// optimizer simplify it out of the cell-level predicate (mirrors SelectBuilder's predicate column).
-		const evaluatedPredicates = isAclFiltered
-			? [this.predicateFactory.create(entity, Acl.Operation.read, undefined, relationContext, isRoot)]
-			: []
+		if (guards.length === 0) {
+			qb = applyPlain(qb)
+			if (orderable !== null) {
+				orderable = applyPlain(orderable as QueryBuilder.Orderable<any>)
+			}
+			return [qb, orderable]
+		}
 
 		const columnLiteral = new Literal(`${wrapIdentifier(path.alias)}.${wrapIdentifier(columnName)}`)
-		const { qb: guardedQb, condition } = this.whereBuilder.buildConditionLiteral(
-			qb,
-			entity,
-			path,
-			predicateWhere,
-			{ relationPath, evaluatedPredicates },
-		)
-		qb = guardedQb
+		const conditions: Literal[] = []
+		for (const guard of guards) {
+			const isRoot = guard.relationPath.length === 0
+			const relationContext = guard.relationPath[guard.relationPath.length - 1]
+			const predicateWhere = this.predicateFactory.buildPredicates(guard.entity, [guard.predicate], relationContext, isRoot)
+			// The row-level predicate is already guaranteed in the WHERE of the ACL-filtered entity, so let the
+			// optimizer simplify it out of the cell-level predicate (mirrors SelectBuilder's predicate column).
+			const evaluatedPredicates = guard.isAclFiltered
+				? [this.predicateFactory.create(guard.entity, Acl.Operation.read, undefined, relationContext, isRoot)]
+				: []
+			const { qb: guardedQb, condition } = this.whereBuilder.buildConditionLiteral(
+				qb,
+				guard.entity,
+				guard.path,
+				predicateWhere,
+				{ relationPath: guard.relationPath, evaluatedPredicates },
+			)
+			qb = guardedQb
+			conditions.push(condition)
+		}
+		const condition = conditions.length === 1
+			? conditions[0]
+			: new Literal(conditions.map(it => `(${it.sql})`).join(' and '), conditions.flatMap(it => it.parameters))
 		const orderLiteral = CaseStatement.createEmpty().when(condition, columnLiteral).compile()
 		qb = qb.orderBy(orderLiteral, direction)
 		if (orderable !== null) {

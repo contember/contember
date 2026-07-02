@@ -178,6 +178,133 @@ const hasManyPermissions: Acl.Permissions = {
 	},
 }
 
+const hopSchema = new SchemaBuilder()
+	.entity('Post', e =>
+		e
+			.column('isPublished', c => c.type(Model.ColumnType.Bool))
+			.manyHasOne('author', r =>
+				r.target('Author', e =>
+					e
+						.column('name', c => c.type(Model.ColumnType.String))
+						.column('isActive', c => c.type(Model.ColumnType.Bool)))))
+	.buildSchema()
+
+const hopPermissions: Acl.Permissions = {
+	Post: {
+		predicates: {
+			authorReadable: { isPublished: { eq: true } },
+		},
+		operations: {
+			read: {
+				id: true,
+				author: 'authorReadable',
+			},
+		},
+	},
+	Author: {
+		predicates: {},
+		operations: {
+			read: {
+				id: true,
+				name: true,
+			},
+		},
+	},
+}
+
+test('order by through a relation guards the order key with the relation-field (hop) read predicate', async () => {
+	// `Post.author` is cell-masked for unpublished posts, so their order key must not reflect the hidden
+	// author's name even though `Author.name` itself is public.
+	await execute({
+		schema: hopSchema,
+		permissions: hopPermissions,
+		variables: {},
+		query: GQL`
+        query {
+          listPost(orderBy: [{author: {name: asc}}]) {
+            id
+          }
+        }`,
+		executes: [
+			{
+				sql: SQL`
+					select "root_"."id" as "root_id"
+					from "public"."post" as "root_"
+					left join "public"."author" as "root_author" on "root_"."author_id" = "root_author"."id"
+					order by case when "root_"."is_published" = ? then "root_author"."name" end asc, "root_"."id" asc
+				`,
+				parameters: [true],
+				response: {
+					rows: [{ root_id: testUuid(1) }],
+				},
+			},
+		],
+		return: {
+			data: {
+				listPost: [{ id: testUuid(1) }],
+			},
+		},
+	})
+})
+
+const hopAndTargetPermissions: Acl.Permissions = {
+	Post: {
+		predicates: {
+			authorReadable: { isPublished: { eq: true } },
+		},
+		operations: {
+			read: {
+				id: true,
+				author: 'authorReadable',
+			},
+		},
+	},
+	Author: {
+		predicates: {
+			authorVisible: { isActive: { eq: true } },
+		},
+		operations: {
+			read: {
+				id: 'authorVisible',
+				name: 'authorVisible',
+			},
+		},
+	},
+}
+
+test('order by through a relation combines the hop and target read predicates in the order-key guard', async () => {
+	await execute({
+		schema: hopSchema,
+		permissions: hopAndTargetPermissions,
+		variables: {},
+		query: GQL`
+        query {
+          listPost(orderBy: [{author: {name: asc}}]) {
+            id
+          }
+        }`,
+		executes: [
+			{
+				sql: SQL`
+					select "root_"."id" as "root_id"
+					from "public"."post" as "root_"
+					left join "public"."author" as "root_author" on "root_"."author_id" = "root_author"."id"
+					order by case when ("root_"."is_published" = ?) and ("root_author"."is_active" = ?) then "root_author"."name" end asc, "root_"."id" asc
+				`,
+				parameters: [true, true],
+				response: {
+					rows: [{ root_id: testUuid(1) }],
+				},
+			},
+		],
+		return: {
+			data: {
+				listPost: [{ id: testUuid(1) }],
+			},
+		},
+	})
+})
+
 const m2mSchema = new SchemaBuilder()
 	.entity('Post', e =>
 		e.manyHasMany('tags', r =>

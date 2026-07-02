@@ -1,9 +1,10 @@
 import { Actions, Model } from '@contember/schema'
-import { acceptFieldVisitor } from '../model/index.js'
+import { acceptFieldVisitor, isColumn } from '../model/index.js'
 import { ErrorBuilder, ValidationError } from './errors.js'
 import { assertNever } from '../utils/index.js'
 import * as Typesafe from '@contember/typesafe'
 import { whereSchema } from '../type-schema/where.js'
+import { auditLogColumns } from '../actions/auditLogColumns.js'
 
 const manyArgsSchema = (args: { schema: Model.Schema; entity: Model.Entity }) =>
 	Typesafe.partial({
@@ -19,7 +20,64 @@ export class ActionsValidator {
 	public validate(schema: Actions.Schema): ValidationError[] {
 		const errorBuilder = new ErrorBuilder([], ['actions'])
 		this.validateTriggers(schema, errorBuilder.for('triggers'))
+		this.validateTargets(schema, errorBuilder.for('targets'))
 		return errorBuilder.errors
+	}
+
+	private validateTargets(schema: Actions.Schema, errorBuilder: ErrorBuilder) {
+		for (const [name, target] of Object.entries(schema.targets)) {
+			if (target.type === 'auditLog') {
+				this.validateAuditLogTarget(target, errorBuilder.for(name))
+			}
+		}
+	}
+
+	private validateAuditLogTarget(target: Actions.AuditLogTarget, errorBuilder: ErrorBuilder): void {
+		const entity = this.model.entities[target.entity]
+		if (!entity) {
+			errorBuilder.add('ACTIONS_UNDEFINED_ENTITY', `Audit-log target entity ${target.entity} not found.`)
+			return
+		}
+		for (const column of auditLogColumns) {
+			const field = entity.fields[column.name]
+			if (!field) {
+				if (column.required) {
+					errorBuilder.add(
+						'ACTIONS_AUDIT_LOG_MISSING_COLUMN',
+						`Audit-log entity ${target.entity} is missing required column ${column.name} (${column.types.join(' | ')}).`,
+					)
+				}
+				continue
+			}
+			if (!isColumn(field) || !column.types.includes(field.type)) {
+				errorBuilder.add(
+					'ACTIONS_AUDIT_LOG_INVALID_COLUMN',
+					`Audit-log entity ${target.entity} column ${column.name} must be a ${column.types.join(' | ')} column.`,
+				)
+			} else if (column.name === 'eventNo' && field.sequence === undefined) {
+				errorBuilder.add(
+					'ACTIONS_AUDIT_LOG_INVALID_COLUMN',
+					`Audit-log entity ${target.entity} column ${column.name} must be backed by a sequence.`,
+				)
+			}
+		}
+		if (target.rootRelation !== undefined) {
+			this.validateAuditLogRootRelation(entity, target.rootRelation, errorBuilder.for('rootRelation'))
+		}
+	}
+
+	private validateAuditLogRootRelation(entity: Model.Entity, relationName: string, errorBuilder: ErrorBuilder): void {
+		const relation = entity.fields[relationName]
+		if (!relation) {
+			errorBuilder.add('ACTIONS_AUDIT_LOG_INVALID_ROOT_RELATION', `Audit-log root relation ${entity.name}.${relationName} not found.`)
+			return
+		}
+		if (relation.type !== Model.RelationType.ManyHasOne) {
+			errorBuilder.add(
+				'ACTIONS_AUDIT_LOG_INVALID_ROOT_RELATION',
+				`Audit-log root relation ${entity.name}.${relationName} must be a many-has-one relation.`,
+			)
+		}
 	}
 
 	private validateTriggers(schema: Actions.Schema, errorBuilder: ErrorBuilder) {
@@ -28,10 +86,34 @@ export class ActionsValidator {
 			if (name !== def.name) {
 				triggerErrorBuilder.add('ACTIONS_NAME_MISMATCH', `Trigger name ${def.name} does not match the name in a map ${name}`)
 			}
-			if (!schema.targets[def.target]) {
+			const target = schema.targets[def.target]
+			if (!target) {
 				triggerErrorBuilder.add('ACTIONS_UNDEFINED_TRIGGER_TARGET', `Trigger target ${def.target} not found`)
+			} else if (target.type === 'auditLog' && def.type !== 'watch') {
+				triggerErrorBuilder.add('ACTIONS_AUDIT_LOG_INVALID_TRIGGER', `Audit-log target ${def.target} can only be used by watch triggers.`)
+			} else if (target.type === 'auditLog' && target.rootRelation !== undefined) {
+				this.validateTriggerRootRelation(def, target, target.rootRelation, triggerErrorBuilder.for('target'))
 			}
 			this.validateTrigger(def, triggerErrorBuilder)
+		}
+	}
+
+	private validateTriggerRootRelation(
+		trigger: Actions.AnyTrigger,
+		target: Actions.AuditLogTarget,
+		rootRelation: string,
+		errorBuilder: ErrorBuilder,
+	): void {
+		const sinkEntity = this.model.entities[target.entity]
+		const relation = sinkEntity?.fields[rootRelation]
+		if (!sinkEntity || !relation || relation.type !== Model.RelationType.ManyHasOne) {
+			return
+		}
+		if (relation.target !== trigger.entity) {
+			errorBuilder.add(
+				'ACTIONS_AUDIT_LOG_INVALID_ROOT_RELATION',
+				`Audit-log root relation ${target.entity}.${rootRelation} targets ${relation.target}, but trigger ${trigger.name} watches ${trigger.entity}.`,
+			)
 		}
 	}
 

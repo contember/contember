@@ -46,6 +46,8 @@ Conditional: `@when(condition).assertMinLength(3, 'msg')`
 - `@trigger({ name, create?, update?, delete?, target })` — basic CRUD trigger
 - `@watch({ name, watch, target })` — deep change tracking
 - `createActionsTarget({ name, ...config })` — webhook target
+- `createAuditLogTarget({ entity, synchronous? })` — built-in audit-log target (writes into a content entity, no webhook). `entity` is an entity-class reference (or `() => Entity` thunk), resolved to a name in `ActionsFactory` (like View `dependencies`).
+- `@AuditLog({ watch, entity, name?, synchronous?, rootRelation? })` — sugar over `@watch` + an audit-log target. `entity` is a class reference / thunk pointing at an explicit sink in the model; extend `AuditLogEntity` for the default fields/indexes or write a compatible entity by hand. `actions/definition/auditLog.ts`.
 
 ## Metadata Storage
 

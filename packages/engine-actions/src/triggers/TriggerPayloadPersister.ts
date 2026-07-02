@@ -1,9 +1,10 @@
 import { Client, InsertBuilder } from '@contember/database'
 import { Mapper, TriggeredActionEvent, TriggeredActionsCollector } from '@contember/engine-content-api'
-import { Actions, ActionsPayload } from '@contember/schema'
+import { Actions, ActionsPayload, Schema } from '@contember/schema'
 import { EventRow } from '../model/types.js'
 import { notify } from '../utils/notifyChannel.js'
 import { ProjectActionsMetrics } from '../ActionsMetrics.js'
+import { AuditLogWriter, buildAuditLogRow } from '../audit/AuditLogWriter.js'
 
 type EventRowToInsert = Omit<EventRow, 'created_at' | 'visible_at' | 'last_state_change' | 'log'> & {
 	created_at: string | Date
@@ -23,10 +24,20 @@ export class TriggerPayloadPersister {
 		private readonly userInfo: { ipAddress: string | null; userAgent: string | null },
 		private readonly triggeredActionsCollector: TriggeredActionsCollector | undefined,
 		private readonly metrics: ProjectActionsMetrics | undefined,
+		private readonly schema: Schema,
+		private readonly auditLogWriter: AuditLogWriter,
 	) {
 	}
 
 	public async persist(trigger: Actions.AnyTrigger, payloads: ActionsPayload.AnyEventPayload[]): Promise<void> {
+		const target = this.schema.actions.targets[trigger.target]
+		// Synchronous audit-log short-circuit: write the audit row in this very
+		// transaction and skip the actions_event queue entirely.
+		if (target?.type === 'auditLog' && target.synchronous) {
+			await this.persistAuditLog(target, payloads)
+			return
+		}
+
 		const chunkSize = 100
 		if (!this.schemaId) {
 			throw new Error('Schema id is not set')
@@ -74,5 +85,24 @@ export class TriggerPayloadPersister {
 		}
 
 		await notify(this.client, this.projectSlug)
+	}
+
+	private async persistAuditLog(target: Actions.AuditLogTarget, payloads: ActionsPayload.AnyEventPayload[]): Promise<void> {
+		const createdAt = new Date()
+		for (const payload of payloads) {
+			if (payload.operation !== 'watch') {
+				throw new Error(`Audit-log target ${target.name} can only process watch trigger payloads.`)
+			}
+			const row = buildAuditLogRow(payload, {
+				createdAt,
+				transactionId: this.mapper.transactionId,
+				identityId: this.identityId,
+				ipAddress: this.userInfo.ipAddress,
+				userAgent: this.userInfo.userAgent,
+			})
+			// `mapper.db` is the content client bound to this stage's schema — the same
+			// place the audit content entity lives.
+			await this.auditLogWriter.write(this.mapper.db, this.schema, target.entity, row, { rootRelation: target.rootRelation })
+		}
 	}
 }

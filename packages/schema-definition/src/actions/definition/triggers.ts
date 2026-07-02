@@ -1,7 +1,7 @@
 import { DecoratorFunction, EntityConstructor } from '../../utils/index.js'
 import { Actions } from '@contember/schema'
 import { triggersStore } from './internal/store.js'
-import { ActionsTarget } from './targets.js'
+import { ActionsTarget, AnyTargetDefinition } from './targets.js'
 
 export type TriggerWebhookDefinition = {
 	webhook:
@@ -10,7 +10,7 @@ export type TriggerWebhookDefinition = {
 }
 
 export type TriggerTargetDefinition = {
-	target: (Omit<Actions.AnyTarget, 'name'> & { name?: string }) | ActionsTarget
+	target: (AnyTargetDefinition & { name?: string }) | ActionsTarget
 }
 
 export type TargetDefinition =

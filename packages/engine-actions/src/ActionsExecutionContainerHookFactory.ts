@@ -4,6 +4,7 @@ import { TriggerPayloadBuilder } from './triggers/TriggerPayloadBuilder.js'
 import { TriggerPayloadPersister } from './triggers/TriggerPayloadPersister.js'
 import { ExecutionContainerHook, InMemoryTriggeredActionsCollector, Mapper, TriggeredActionsCollector } from '@contember/engine-content-api'
 import { ActionsMetrics } from './ActionsMetrics.js'
+import { AuditLogWriter } from './audit/AuditLogWriter.js'
 
 // Each transaction attempt has its own mapper. Its action IDs reach the request collector only once the attempt
 // commits, so a rolled-back or retried attempt reports no event that was never stored.
@@ -46,6 +47,8 @@ export class ActionsExecutionContainerHookFactory {
 							userInfo,
 							attemptCollector,
 							projectMetrics,
+							schema,
+							new AuditLogWriter(providers),
 						)
 						const triggerPayloadBuilder = new TriggerPayloadBuilder(mapper)
 						const payloadManager = new TriggerPayloadManager(triggerPayloadBuilder, triggerPayloadPersister)

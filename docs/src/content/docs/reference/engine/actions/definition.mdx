@@ -235,6 +235,8 @@ To link the webhook target with an Action, the `target` property within the `@wa
 
 This method also permits the disabling of the watch while retaining the target definition, enabling any pending events to be dispatched even when the watch is inactive.
 
+Besides `webhook` targets, Contember ships a built-in [audit-log target](/reference/engine/actions/audit-log) that writes fired triggers straight into a content entity instead of calling an external endpoint.
+
 ## Events Priority
 
 Contember Actions facilitates event prioritization in `watch` and `trigger` actions. Considering that events from various actions are stored and processed in a single queue, the ability to assign priority levels to certain events is significant. Higher priority ensures these events are processed ahead of others, which is especially beneficial for critical operations or time-sensitive tasks.

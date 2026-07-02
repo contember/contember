@@ -1,0 +1,397 @@
+---
+title: Audit log
+---
+
+# <span className="version">Engine EE 2.2+</span> Audit log
+
+The **audit-log target** is a built-in Action target that persists a fired trigger
+straight into a content entity as an append-only audit row — instead of posting it
+to a [webhook](/reference/engine/actions/invocation). It is an engine-side
+short-circuit that replaces the usual *watch → webhook → external worker → content
+mutation* round-trip that projects used to hand-build for audit trails.
+
+Because the audit rows land in an ordinary content entity, the trail is queryable
+through the [Content API](/reference/engine/content/overview) with normal filtering,
+ordering and [ACL](/reference/engine/schema/acl) — no separate log store to reason
+about. The acting identity is captured natively, and the write can optionally run in
+the very same transaction as the change it records.
+
+:::note
+An audit-log target writes with full permissions, **bypassing content ACL by
+construction**, so no application role can forge or tamper with the rows. Reading the
+audit entity, on the other hand, is governed by regular ACL — see
+[Reading the audit log](#reading-the-audit-log).
+:::
+
+## Audit log vs. the built-in event log
+
+Contember also has a built-in [event log](/reference/engine/content/event-log), and at
+first glance the two look alike. They operate at different levels and solve different
+problems:
+
+- The **event log** is automatic and lives at the **database level**. A per-table row
+  trigger records one entry for **every changed row** — including many-has-many junction
+  rows — storing the raw table name, row id and a column-level diff. It is read through
+  the `events` query on the System API and gated by the `history`
+  [permission](/reference/engine/schema/acl).
+- The **audit log** is opt-in and lives at the **Content API level**. You `watch` an
+  aggregate and get one row per change, shaped around your **root entity and its
+  relations** — no reconstructing an aggregate from scattered per-row events.
+
+| | Event log | Audit log |
+|---|---|---|
+| Level | Database trigger | Content API / Actions |
+| Granularity | One entry per changed row & table | One row per watched aggregate change |
+| Scope | Every table (opt out with `@c.DisableEventLog`) | Only what you `watch` |
+| Captures direct DB writes | **Yes** — cannot be bypassed | No — only changes made through the Content API |
+| Shape | Raw table + row id + column diff | Root entity + selected relations + touched `nodes` |
+| Read via | `events` query on `/system/<project>` | Content API query on the sink entity |
+| Permissions | `history` System API permission | Regular content ACL on the sink |
+
+**Rules of thumb:**
+
+- Reach for the **event log** when you need an exhaustive, tamper-proof trail that no
+  code path can skip — it fires even on writes made straight against the database — and
+  you're comfortable working with low-level, per-row entries. Its DB-trigger nature also
+  keeps it cheap and impossible to forget.
+- Reach for the **audit log** when you want a readable, business-shaped history you can
+  query and display like any other content — grouped by the entity that matters, with its
+  relations already attached — and you only care about changes that go through Contember.
+
+The two are not mutually exclusive: keep the event log on for safety and add targeted
+audit logs for the entities whose history you actually surface to users.
+
+## Quick start with `@c.AuditLog`
+
+The `@c.AuditLog` decorator is the shortest way to wire an audited entity to an
+audit-log sink. It registers a
+[watch trigger](/reference/engine/actions/definition#defining-a-watch-action) with an
+audit-log target, while the sink remains an explicit content entity in your model.
+
+```typescript
+import { c } from '@contember/schema-definition'
+
+@c.AuditLog({
+  entity: () => ArticleAuditLog,
+  watch: `
+    title
+    tags {
+      name
+    }
+  `,
+})
+export class Article {
+  title = c.stringColumn()
+  tags = c.manyHasMany(Tag)
+}
+
+export class ArticleAuditLog extends c.AuditLogEntity {
+}
+```
+
+This appends a row to the explicit `ArticleAuditLog` content entity whenever
+`Article.title` or the `tags` relation changes (including on create and delete).
+
+:::note[Class reference, not a string]
+`entity` takes the sink **entity class**, resolved to its name at build time — the same
+style as relations (`c.manyHasOne(Entity)`) and View `dependencies`. Use a `() => Entity`
+thunk when the sink is declared *after* the audited entity or the two reference each other
+(e.g. through [`rootRelation`](#linking-to-the-audited-entity)); a bare `Entity` reference
+works when the sink is declared first.
+:::
+
+`@c.AuditLog` accepts:
+
+- `entity`: the sink entity, as a **reference to the entity class** (or a `() => Entity`
+  thunk — see the note above). The entity must be declared in the same schema. Extend
+  `c.AuditLogEntity` to use the default columns and indexes, or define the compatible
+  columns yourself.
+- `watch`: the fields and relations of the aggregate to track — same
+  [GraphQL-like selection](/reference/engine/actions/definition#defining-a-watch-action)
+  as `@c.Watch`.
+- `name` (optional): the trigger name. Defaults to `<entity_snake_case>_audit`
+  (e.g. `article_audit`).
+- `rootRelation` (optional): a many-has-one relation field on the sink entity that
+  points to the audited root entity. See [Linking to the audited entity](#linking-to-the-audited-entity).
+- `synchronous` (optional): see [Synchronous vs. asynchronous](#synchronous-vs-asynchronous).
+- `selection` (optional): a custom payload selection, like on `@c.Watch`.
+- `priority` (optional): event priority in the dispatch queue.
+
+`c.AuditLogEntity` carries the [convention columns](#the-audit-entity) plus an
+`eventNo` index, a `(rootEntity, rootId)` index and a GIN index on `nodes`. You still
+declare a concrete entity so ACL, extra columns, relations and project-specific indexes
+stay visible in the schema source.
+
+:::note[Remember to migrate]
+The sink is an ordinary content entity, so adding or changing it is a schema change like
+any other — create and apply a [migration](/reference/engine/migrations/overview).
+There is no engine-level migration involved.
+:::
+
+## The audit entity
+
+The audit sink is **always an entity you declare yourself** — neither `@c.AuditLog` nor
+`createAuditLogTarget` generates or alters it. The engine only *writes* into it, filling a
+fixed set of column names **by convention**: it looks up the recognised columns and writes
+the ones it finds. Any recognised column the entity omits is simply skipped; unrecognised
+columns are never touched. You therefore own its ACL, indexes and migrations like any other
+content entity.
+
+| Column | Type | Required | Meaning |
+|---|---|---|---|
+| `transactionId` | `uuidColumn` | yes | The database transaction that produced the change. All rows written by a single mutation share this value. |
+| `rootEntity` | `stringColumn` | yes | Name of the watched (root) entity, e.g. `Article`. |
+| `rootId` | `uuidColumn` / `stringColumn` | yes | Primary key of the watched entity instance. |
+| `data` | `jsonColumn` | yes | The full change payload — see [What is stored](#what-is-stored). |
+| `eventNo` | `intColumn().sequence()` | no | Monotonic per-table event number. Included by `c.AuditLogEntity`. |
+| `identityId` | `uuidColumn` | no | The acting identity. Captured natively; `null` for changes made without an identity (e.g. system/setup). |
+| `trigger` | `stringColumn` | no | Name of the trigger that fired the row. |
+| `nodes` | `jsonColumn` | no | Flat, de-duplicated list of every node touched by the change — see [What is stored](#what-is-stored). |
+| `createdAt` | `dateTimeColumn` | no | When the row was written. Give it `.default('now')`. |
+
+A sink is validated against this exact spec at schema build time: a missing
+**required** column, a column with the wrong type, or an `eventNo` that is present but not
+backed by a sequence (`.sequence()`) is a schema error.
+
+The default sink shape is:
+
+```typescript
+import { c } from '@contember/schema-definition'
+
+export class AuditLog extends c.AuditLogEntity {
+}
+```
+
+If you need a smaller or custom shape, define the compatible columns yourself.
+
+### What is stored
+
+`data` holds the entire watch payload: the list of change `events` plus a `meta`
+envelope with the actor and request context.
+
+```json5
+{
+  "events": [
+    {
+      "id": "…",
+      "path": [],
+      "entity": "Article",
+      "operation": "update",
+      "values": { "title": "Hi!" },
+      "old": { "title": "Hello world" }
+    }
+    // …one entry per changed node in the aggregate
+  ],
+  "meta": {
+    "transactionId": "…",
+    "eventId": "…",
+    "identityId": "…",
+    "ipAddress": "…",
+    "userAgent": "…"
+  }
+}
+```
+
+The shape of each entry in `events` is the same as the
+[watch event payload](/reference/engine/actions/invocation#watch-event-payload) sent
+to webhooks.
+
+`nodes` is a de-duplicated, flat list of every node the change touched, which makes
+"every audit entry that touched entity *X* id *Y*" a single GIN-indexed lookup:
+
+```json5
+[
+  { "id": "f4f0a97d-…", "entity": "Article" },
+  { "id": "8946a1ce-…", "entity": "Tag" }
+]
+```
+
+Populating `nodes` requires the trigger to run with `withNodes: true` — `@c.AuditLog`
+sets this automatically. If you wire the target up [manually](#explicit-target), enable
+it yourself.
+
+## Linking to the audited entity
+
+`rootEntity` and `rootId` always identify the audited instance as plain scalars — enough to
+look up history, and they keep working for shared sinks and even after the live row is gone.
+If you additionally want a **typed relation** from an audit row to the live root entity — so
+you can traverse it through the Content API like any other relation — declare a many-has-one
+on the sink yourself and name it with `rootRelation` (both `@c.AuditLog` and
+`createAuditLogTarget` accept it):
+
+```typescript
+import { c } from '@contember/schema-definition'
+
+@c.AuditLog({
+  entity: () => ArticleAuditLog,
+  watch: `title`,
+  rootRelation: 'article',
+})
+export class Article {
+  title = c.stringColumn()
+}
+
+export class ArticleAuditLog extends c.AuditLogEntity {
+  // You declare the relation; the engine only fills its foreign-key column from `rootId`.
+  article = c.manyHasOne(Article).setNullOnDelete()
+}
+```
+
+`rootRelation` is validated at build time: it must be a **many-has-one** on the sink whose
+target is exactly the watched entity, or it is a schema error. On write, the engine fills that
+relation's foreign-key column from `rootId` — you never set it yourself. With it in place you
+can join to the (current) root entity when reading:
+
+```graphql
+query {
+  listArticleAuditLog(orderBy: [{ createdAt: asc }]) {
+    createdAt
+    article { title }
+  }
+}
+```
+
+:::note
+Give the relation `.setNullOnDelete()` (or a cascade): an audit row for a *delete* — or any
+row whose root entity is later removed — must not block the delete, and `rootEntity` / `rootId`
+still record the identity afterwards. Because a many-has-one targets a single entity type,
+`rootRelation` suits a **dedicated** sink; a [shared sink](#sharing-a-sink-across-entities)
+mixing several root entities should rely on `rootEntity` / `rootId`.
+:::
+
+## Synchronous vs. asynchronous
+
+The `synchronous` flag controls *when* the row is written:
+
+- **`synchronous: true`** — the row is written **in the same transaction** as the
+  change it records. It is atomic (the change and its audit row commit or roll back
+  together), visible immediately, and does not go through the dispatch queue — so it
+  works even without the Actions worker running.
+- **`synchronous: false`** (default) — the event is enqueued and the row is written
+  later by the dispatch worker, reusing the queue's retry and backoff. This keeps the
+  audited mutation's transaction shorter, at the cost of a small delay and a dependency
+  on the [Actions worker](/reference/engine/actions/overview#local-development). Tune the
+  retry and batching with `maxAttempts`, `initialRepeatIntervalMs` and `batchSize` on the
+  target — the same knobs a webhook target takes. They are ignored under
+  `synchronous: true`, which never touches the queue.
+
+```typescript
+@c.AuditLog({
+  entity: () => ArticleAuditLog,
+  watch: `title`,
+  synchronous: true, // write atomically, in the audited transaction
+})
+export class Article {
+  title = c.stringColumn()
+}
+
+export class ArticleAuditLog extends c.AuditLogEntity {
+}
+```
+
+:::tip
+Use `synchronous: true` when the audit trail must be guaranteed to match committed
+data and you want it available immediately (e.g. compliance logs). Leave it
+asynchronous when you prefer to keep write transactions lean and can tolerate the
+audit row appearing shortly after the change.
+:::
+
+## Explicit target
+
+If you want to keep the target definition separate from the trigger — for example to
+[share one sink](#sharing-a-sink-across-entities) or to reuse the same configuration
+across several watches — declare it with `c.createAuditLogTarget()` and reference it
+from a `@c.Watch` trigger. This is the same
+[separate-target pattern](/reference/engine/actions/definition#using-separate-targets-for-shared-configuration)
+used for webhooks.
+
+```typescript
+import { c } from '@contember/schema-definition'
+
+export const auditLogTarget = c.createAuditLogTarget({
+  name: 'audit_log_target',
+  entity: () => AuditLog,
+  synchronous: true,
+})
+
+@c.Watch({
+  name: 'article_audit',
+  watch: `title`,
+  withNodes: true, // required so `nodes` is populated
+  target: auditLogTarget,
+})
+export class Article {
+  title = c.stringColumn()
+}
+
+export class AuditLog extends c.AuditLogEntity {
+}
+```
+
+As with `@c.AuditLog`, the sink entity must be declared in the model (see
+[The audit entity](#the-audit-entity)).
+
+## Sharing a sink across entities
+
+Point several audited entities at the same sink entity to collect all their history in one
+table. Rows from different sources are distinguished by `rootEntity` (and joined across
+by `nodes`).
+
+```typescript
+@c.AuditLog({ watch: `title`, entity: () => AuditLog })
+export class Article {
+  title = c.stringColumn()
+}
+
+@c.AuditLog({ watch: `name`, entity: () => AuditLog })
+export class Author {
+  name = c.stringColumn()
+}
+
+export class AuditLog extends c.AuditLogEntity {
+}
+```
+
+All referencing targets validate against the same explicit sink entity.
+
+## Reading the audit log
+
+The audit entity is a normal content entity, so you query it through the Content API:
+
+```graphql
+query {
+  listArticleAuditLog(orderBy: [{ createdAt: asc }]) {
+    createdAt
+    identityId
+    rootEntity
+    rootId
+    trigger
+    data
+    nodes
+  }
+}
+```
+
+Read access follows regular [ACL](/reference/engine/schema/acl). Because writes bypass
+ACL, you never need `create`/`update` permissions on the audit entity — grant only the
+`read` permission, to the roles that should be able to inspect the trail:
+
+```typescript
+import { c } from '@contember/schema-definition'
+import { auditor } from './roles'
+
+@c.Allow(auditor, { read: ['createdAt', 'eventNo', 'identityId', 'rootEntity', 'rootId', 'trigger', 'data', 'nodes'] })
+export class AuditLog extends c.AuditLogEntity {
+}
+```
+
+:::caution
+Extending `c.AuditLogEntity` does **not** grant ACL. No application role can read the
+sink until you grant one `read` permission. This is deliberate — audit trails should not
+be readable by accident.
+:::
+
+:::caution[Direct database changes]
+As with all Actions, only changes made **through the Contember API** are audited.
+Data modified directly in the database, bypassing the engine, produces no audit rows.
+:::

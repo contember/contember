@@ -46,8 +46,11 @@ export const c = {
 	// Actions entity decorators
 	Watch: ActionsDefinition.watch,
 	Trigger: ActionsDefinition.trigger,
+	AuditLog: ActionsDefinition.auditLog,
+	AuditLogEntity: ActionsDefinition.AuditLogEntity,
 	// Actions factories
 	createActionsTarget: ActionsDefinition.createTarget,
+	createAuditLogTarget: ActionsDefinition.createAuditLogTarget,
 
 	// Model
 	// Model entity decorators

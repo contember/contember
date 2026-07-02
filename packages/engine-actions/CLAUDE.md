@@ -7,6 +7,11 @@ Event-driven webhook system. Captures entity changes, queues events, and dispatc
 - **BasicTrigger**: Direct CRUD operations (create, update on specific fields, delete)
 - **WatchTrigger**: Deep change tracking through relations — fires when any watched nested field changes
 
+## Target Types
+
+- **WebhookTarget** (`webhook`): HTTP POST to an external endpoint (see below).
+- **AuditLogTarget** (`auditLog`): built-in short-circuit that writes an audit row into a content entity — no webhook (see below).
+
 ## Architecture
 
 ```
@@ -32,6 +37,36 @@ States: `created` → `processing` → `succeed` | `retrying` → `failed` | `st
 - Variable interpolation in URL/headers: `{{variableName}}`
 - Response: optional `{ failures: [{ eventId, error }] }`
 - Payload wrapped in meta envelope (eventId, transactionId, identity, timestamps, retries)
+
+## Audit-Log Target (built-in, no webhook)
+
+An engine-side short-circuit that persists a fired `watch` trigger straight into a
+**project content entity** as an append-only audit row — replacing the webhook →
+external-worker → content-mutation round-trip that projects used to hand-build.
+
+- **Decorator sugar:** `@c.AuditLog({ watch, entity, synchronous? })` on the audited entity
+  registers the watch trigger + target. `entity` is a class reference (or `() => Entity` thunk),
+  not a string — resolved to the entity name in `schema-definition`'s `ActionsFactory`. The sink
+  is an explicit content entity in the model; extend `c.AuditLogEntity` for the default
+  fields/indexes or define a compatible entity by hand for custom ACL/indexes.
+- **Explicit:** `c.createAuditLogTarget({ entity, synchronous? })` + `@c.Watch({ ..., withNodes: true, target })`.
+  Target type `auditLog`; `entity` likewise a class reference/thunk. The resolved schema keeps a plain name.
+- The sink entity's shape is validated against `@contember/schema-utils` `auditLogColumns`
+  (single source of truth) by `ActionsValidator` — required `transactionId`/`rootEntity`/`rootId`/`data`,
+  optional-but-typed `identityId`/`trigger`/`nodes`/`createdAt`.
+- Writes go through `audit/AuditLogWriter.ts` — a raw `InsertBuilder` into the entity's
+  table that **bypasses content ACL by construction** (like `TriggerPayloadPersister`
+  writes `actions_event`), so no application role can forge rows. Actor `identityId` is
+  captured natively (no `assumeIdentity` hack). Columns filled by convention:
+  `createdAt`, `transactionId`, `identityId`, `rootEntity`, `rootId`, `trigger`,
+  `data` (full payload), `nodes` (deduped touched-node list); missing ones are skipped.
+  JSON columns are `JSON.stringify`-ed (pg serializes JS arrays as array literals, not jsonb).
+- **Timing is configurable** via `synchronous`:
+  - `true` → written in the audited change's own transaction (`TriggerPayloadPersister`
+    short-circuits before enqueue). Atomic, no queue, no dispatch.
+  - `false`/omitted → enqueued to `actions_event` and written at dispatch time by
+    `AuditLogTargetHandler`, reusing the queue's retry/backoff.
+- No engine migration: the audit table is part of the project content schema.
 
 ## GraphQL API (mounted at `/actions/:projectSlug`)
 

@@ -206,6 +206,7 @@ export const nav: NavItem[] = [
 					doc('reference/engine/actions/definition'),
 					doc('reference/engine/actions/managing'),
 					doc('reference/engine/actions/invocation'),
+					doc('reference/engine/actions/audit-log'),
 				],
 			},
 		],

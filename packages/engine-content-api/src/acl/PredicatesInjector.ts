@@ -3,6 +3,19 @@ import { acceptFieldVisitor } from '@contember/schema-utils'
 import { PredicateFactory } from './PredicateFactory.js'
 
 export class PredicatesInjector {
+	/**
+	 * Back-reference simplification is only sound for to-one back-hops. A to-one round-trip
+	 * re-reaches the exact ancestor row (already verified readable), so its predicate can be dropped.
+	 * A to-many back-hop reaches the ancestor's SIBLINGS, which are NOT guaranteed readable — dropping
+	 * their row predicate would leak a value/presence oracle over unreadable rows. Fail-closed: only the
+	 * types listed here simplify; anything else keeps the full predicate.
+	 */
+	private static readonly toOneBackReferenceTypes = new Set<Model.AnyRelationContext['type']>([
+		'manyHasOne',
+		'oneHasOneOwning',
+		'oneHasOneInverse',
+	])
+
 	constructor(private readonly schema: Model.Schema, private readonly predicateFactory: PredicateFactory) {}
 
 	public inject(
@@ -46,12 +59,14 @@ export class PredicatesInjector {
 	): Input.OptionalWhere {
 		// Simplify predicates when:
 		// 1. We're in a back-reference context (inside a filter that traverses back)
-		// 2. AND the relation we traversed to get here corresponds to a relation in our query path
-		// This ensures we only simplify when the traversed relation actually corresponds
-		// to a relation in our query path (not just any relation to the same entity type)
+		// 2. AND the back-hop is to-one — a to-many back-hop reaches unreadable siblings, so its row
+		//    predicate must be kept (see toOneBackReferenceTypes)
+		// 3. AND the relation we traversed to get here corresponds to a relation in our query path
+		//    (not just any relation to the same entity type)
 		const shouldSimplify = isBackReferenceContext === true
 			&& ancestorPath !== undefined
 			&& relationContext !== undefined
+			&& PredicatesInjector.toOneBackReferenceTypes.has(relationContext.type)
 			&& this.findBackReferencedAncestor(ancestorPath, relationContext.relation.name, relationContext.entity.name) !== undefined
 
 		// An entity is treated as a query root (consulting root-only permissions) only when it is both the

@@ -56,7 +56,9 @@ CREATE TYPE "auth_log_type" AS ENUM (
     'unusual_login_detected',
     'step_up_required',
     'idp_logout_initiated',
-    'idp_backchannel_logout'
+    'idp_backchannel_logout',
+    'idp_role_mapped',
+    'idp_role_mapping_failed'
 );
 CREATE TYPE "config_policy" AS ENUM (
     'always',

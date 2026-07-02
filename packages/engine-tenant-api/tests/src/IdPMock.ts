@@ -13,6 +13,10 @@ export class IdPMock implements IdentityProviderHandler<any> {
 			externalIdentifier: configuration.externalIdentifier,
 			email: configuration.email,
 			emailVerified: configuration.emailVerified,
+			// Surface any extra claims configured on the mock (e.g. `groups`, `department`) verbatim,
+			// mirroring how real providers spread raw OIDC claims into the IDPResponse — lets tests
+			// drive claim-mapping (A09). `claimMapping` itself lives on the IdP config, not here.
+			...(configuration.claims ?? {}),
 		})
 	}
 

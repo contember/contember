@@ -35,6 +35,8 @@ export type AuthActionType =
 	| 'idp_logout_initiated'
 	| 'idp_backchannel_logout'
 	| 'idp_disconnect'
+	| 'idp_role_mapped'
+	| 'idp_role_mapping_failed'
 	| 'project_create'
 	| 'project_update'
 	| 'project_secret_change'

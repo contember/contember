@@ -9,6 +9,9 @@ import { DisableApiKeyCommand } from '../../commands/index.js'
 import { CreateAuthLogEntryCommand } from '../../commands/authLog/CreateAuthLogEntryCommand.js'
 import { REVALIDATION_DEFAULT_FALLBACK_INTERVAL, REVALIDATION_DEFAULT_MIN_INTERVAL, REVALIDATION_DEFAULT_SOFT_THRESHOLD } from './IDPRevalidation.js'
 import { IdentityProviderHandler, RevalidationResult } from './IdentityProviderHandler.js'
+import { IDPClaimSyncService } from './IDPClaimSyncService.js'
+import { parseClaimMapping } from './ClaimMapping.js'
+import { JSONValue } from '@contember/schema'
 
 export type RevalidationOutcome = 'valid' | 'revoked'
 
@@ -42,6 +45,7 @@ type Decision = null | { blocking: boolean; claimInterval: string }
 export class IdpSessionRevalidator {
 	constructor(
 		private readonly idpRegistry: IDPHandlerRegistry,
+		private readonly claimSyncService: IDPClaimSyncService,
 	) {
 	}
 
@@ -185,7 +189,93 @@ export class IdpSessionRevalidator {
 				// fall through — session stays valid, persist retried on a later request
 			}
 		}
+
+		// A09 — re-apply the IdP's claim mapping when the refresh returned fresh claims, so an `always`
+		// mapping keeps an established session's project memberships in sync with the IdP's current claims
+		// without requiring a full re-login. `sticky` mappings self-skip (the sync passes isNewPerson=false).
+		// `claimsComplete` tells the sync whether the refresh rebuilt sign-in's full claim surface, so it can
+		// reconcile (incl. `unmatched: "remove"`) exactly like sign-in. Strictly fail-open — see `syncClaims`.
+		if (result.claims) {
+			await this.syncClaims(dbContext, row, apiKeyRow, result.claims, result.claimsComplete === true, requestInfo)
+		}
 		return 'valid'
+	}
+
+	/**
+	 * Re-apply the claim mapping on a successful refresh. Runs in its own transaction (atomic apply of
+	 * the membership changes) and never throws: the IdP has already vouched for the session, so a
+	 * malformed mapping or a transient apply error must not revoke or fail it. A real membership change
+	 * is audited as `idp_role_mapped`; a failure is audited as `idp_role_mapping_failed` (fail-open
+	 * marker), mirroring the sign-in path. `claimsComplete` carries whether the refresh rebuilt sign-in's
+	 * full claim surface (so removal reconciliation is safe) — see `allowRemoval` below.
+	 */
+	private async syncClaims(
+		dbContext: DatabaseContext,
+		row: IdpSessionRow,
+		apiKeyRow: ApiKeyRow,
+		claims: Record<string, unknown>,
+		claimsComplete: boolean,
+		requestInfo?: ApiKeyRequestInfo,
+	): Promise<void> {
+		try {
+			const mapping = parseClaimMapping(row.providerConfiguration)
+			if (!mapping) {
+				return
+			}
+			// Atomic apply in its own transaction (the verify path has no surrounding one). `always`-only:
+			// the sync passes isNewPerson=false, so a `sticky` mapping self-skips and returns a null audit.
+			// Refresh mirrors sign-in as closely as the claim surface allows: when the provider returned its
+			// COMPLETE surface (`claimsComplete` — `method: "refresh"` rebuilding sign-in's id-token + userinfo
+			// merge), `unmatched: "remove"` reconciliation runs here too. A partial surface (a userinfo-only
+			// probe, or a refresh whose userinfo fetch failed) passes `allowRemoval: false`, so refresh stays
+			// additive-only and a membership the IdP still asserts is never stripped off an incomplete surface.
+			const { audit, droppedUnsafeRules } = await dbContext.transaction(db =>
+				this.claimSyncService.sync(db, mapping, claims, { id: apiKeyRow.identity_id }, false, { allowRemoval: claimsComplete })
+			)
+			if (audit) {
+				await this.logRoleMapping(dbContext, apiKeyRow, row, 'idp_role_mapped', audit, requestInfo)
+			}
+			// The apply-time safety backstop dropped a configured rule — emit the fail-open marker so a broken
+			// mapping is visible on the refresh path too, mirroring sign-in (the marker carries no claim values).
+			if (droppedUnsafeRules) {
+				await this.logRoleMapping(dbContext, apiKeyRow, row, 'idp_role_mapping_failed', undefined, requestInfo)
+			}
+		} catch {
+			// Strictly fail-open: a malformed mapping or a transient apply error must never revoke or
+			// fail an already-vouched-for session. The transaction rolls back any partial apply.
+			await this.logRoleMapping(dbContext, apiKeyRow, row, 'idp_role_mapping_failed', undefined, requestInfo)
+		}
+	}
+
+	private async logRoleMapping(
+		dbContext: DatabaseContext,
+		apiKeyRow: ApiKeyRow,
+		row: IdpSessionRow,
+		type: 'idp_role_mapped' | 'idp_role_mapping_failed',
+		eventData: JSONValue | undefined,
+		requestInfo?: ApiKeyRequestInfo,
+	): Promise<void> {
+		try {
+			await dbContext.commandBus.execute(
+				new CreateAuthLogEntryCommand({
+					type,
+					invokedById: apiKeyRow.identity_id,
+					personId: apiKeyRow.person_id ?? undefined,
+					// The membership change affects this session's own person — record it as the target too,
+					// so an admin querying membership changes by target_person_id sees IdP-driven grants/revokes
+					// (consistent with the project_membership_* audit events).
+					targetPersonId: apiKeyRow.person_id ?? undefined,
+					identityProviderId: row.identityProviderId,
+					personTokenId: apiKeyRow.id,
+					success: true,
+					eventData,
+					ipAddress: requestInfo?.ip,
+					userAgent: requestInfo?.userAgent,
+				}),
+			)
+		} catch {
+			// best-effort audit — never fail the request because the audit write failed
+		}
 	}
 
 	private async logRevalidated(dbContext: DatabaseContext, apiKeyRow: ApiKeyRow, row: IdpSessionRow, requestInfo?: ApiKeyRequestInfo): Promise<void> {

@@ -1,14 +1,27 @@
 import { describe, expect, test } from 'bun:test'
-import { IDPHandlerRegistry, IdpSessionRevalidator, RevalidationResult } from '../../../../src/model/service/idp/index.js'
+import { IDPClaimSyncService, IDPHandlerRegistry, IdpSessionRevalidator, RevalidationResult } from '../../../../src/model/service/idp/index.js'
 import { IdpSessionRow } from '../../../../src/model/queries/idp/IdpSessionByApiKeyQuery.js'
 import { DatabaseContext } from '../../../../src/index.js'
 import { ClaimIdpRevalidationCommand } from '../../../../src/model/commands/idp/ClaimIdpRevalidationCommand.js'
-import { DisableApiKeyCommand } from '../../../../src/model/commands/index.js'
+import { CreateOrUpdateProjectMembershipCommand, DisableApiKeyCommand, RemoveProjectMembershipCommand } from '../../../../src/model/commands/index.js'
 import { UpdateIdpSessionCommand } from '../../../../src/model/commands/idp/UpdateIdpSessionCommand.js'
 import { CreateAuthLogEntryCommand } from '../../../../src/model/commands/authLog/CreateAuthLogEntryCommand.js'
+import { ProjectBySlugQuery, ProjectMembershipByIdentityQuery } from '../../../../src/model/queries/index.js'
+import { Schema } from '@contember/schema'
+import { emptySchema } from '@contember/schema-utils'
 
 const NOW = new Date('2026-05-26T12:00:00Z')
 const t = (iso: string) => new Date(`2026-05-26T${iso}Z`)
+
+// All production constructions take the claim-sync service; it is stateless, so a fresh instance per
+// revalidator is fine. Tests that don't configure a claimMapping never reach it. The claim-sync service
+// resolves the project schema for its apply-time safety check: a project that EXISTS but whose schema can't
+// be resolved is now fail-closed (the grant is dropped — see IDPClaimSyncService.dropUnsafeRules). The
+// happy-path claim tests below grant the plain `editor` role on the existing `demo` project, so they need a
+// resolvable schema that defines that role (otherwise the apply-time backstop would drop the grant).
+const claimSyncSchema: Schema = { ...emptySchema, acl: { roles: { editor: { stages: '*', entities: {}, variables: {} } } } }
+const makeRevalidator = (registry: IDPHandlerRegistry) =>
+	new IdpSessionRevalidator(registry, new IDPClaimSyncService({ getSchema: () => Promise.resolve(claimSyncSchema) }))
 
 const apiKeyRow: any = {
 	id: 'api-key-1',
@@ -73,13 +86,13 @@ const tick = () => new Promise(resolve => setImmediate(resolve))
 describe('IdpSessionRevalidator — gating', () => {
 	test('no federated session → valid, no commands', async () => {
 		const h = createHarness(null)
-		expect(await new IdpSessionRevalidator(registryWith()).revalidate(h.dbContext, h.readDbContext, apiKeyRow)).toBe('valid')
+		expect(await makeRevalidator(registryWith()).revalidate(h.dbContext, h.readDbContext, apiKeyRow)).toBe('valid')
 		expect(h.executed).toHaveLength(0)
 	})
 
 	test('revalidation disabled → valid', async () => {
 		const h = createHarness(baseRow({ providerConfiguration: { revalidation: { enabled: false } } }))
-		expect(await new IdpSessionRevalidator(registryWith(async () => ({ status: 'valid' }))).revalidate(h.dbContext, h.readDbContext, apiKeyRow)).toBe(
+		expect(await makeRevalidator(registryWith(async () => ({ status: 'valid' }))).revalidate(h.dbContext, h.readDbContext, apiKeyRow)).toBe(
 			'valid',
 		)
 		expect(h.executed).toHaveLength(0)
@@ -87,7 +100,7 @@ describe('IdpSessionRevalidator — gating', () => {
 
 	test('provider disabled → revoked', async () => {
 		const h = createHarness(baseRow({ providerDisabledAt: t('11:30:00') }))
-		expect(await new IdpSessionRevalidator(registryWith(async () => ({ status: 'valid' }))).revalidate(h.dbContext, h.readDbContext, apiKeyRow)).toBe(
+		expect(await makeRevalidator(registryWith(async () => ({ status: 'valid' }))).revalidate(h.dbContext, h.readDbContext, apiKeyRow)).toBe(
 			'revoked',
 		)
 		expect(h.executed.some(c => c instanceof DisableApiKeyCommand)).toBe(true)
@@ -95,7 +108,7 @@ describe('IdpSessionRevalidator — gating', () => {
 
 	test('provider cannot revalidate → valid', async () => {
 		const h = createHarness(baseRow())
-		expect(await new IdpSessionRevalidator(registryWith(/* no revalidate */)).revalidate(h.dbContext, h.readDbContext, apiKeyRow)).toBe('valid')
+		expect(await makeRevalidator(registryWith(/* no revalidate */)).revalidate(h.dbContext, h.readDbContext, apiKeyRow)).toBe('valid')
 		expect(h.executed).toHaveLength(0)
 	})
 })
@@ -105,7 +118,7 @@ describe('IdpSessionRevalidator — lifetime-driven phases', () => {
 		let called = false
 		// obtained 11:55, expires 13:55 → softAt = 12:55 > NOW
 		const h = createHarness(baseRow({ tokenObtainedAt: t('11:55:00'), session: { tokens: { refresh_token: 'r' }, expiresAt: t('13:55:00') } }))
-		const out = await new IdpSessionRevalidator(registryWith(async () => {
+		const out = await makeRevalidator(registryWith(async () => {
 			called = true
 			return { status: 'valid' }
 		})).revalidate(h.dbContext, h.readDbContext, apiKeyRow)
@@ -117,7 +130,7 @@ describe('IdpSessionRevalidator — lifetime-driven phases', () => {
 	test('soft window → background (SWR): valid immediately, refresh after the response', async () => {
 		let called = false
 		const h = createHarness(baseRow()) // soft phase
-		const out = await new IdpSessionRevalidator(registryWith(async () => {
+		const out = await makeRevalidator(registryWith(async () => {
 			called = true
 			return { status: 'revoked', reason: 'invalid_grant' }
 		})).revalidate(h.dbContext, h.readDbContext, apiKeyRow)
@@ -132,7 +145,7 @@ describe('IdpSessionRevalidator — lifetime-driven phases', () => {
 	test('expired token → blocking: revoked returned synchronously', async () => {
 		// expires 11:30 (past), obtained 10:00 → hard
 		const h = createHarness(baseRow({ session: { tokens: { refresh_token: 'r' }, expiresAt: t('11:30:00') } }))
-		const out = await new IdpSessionRevalidator(registryWith(async () => ({ status: 'revoked', reason: 'invalid_grant' })))
+		const out = await makeRevalidator(registryWith(async () => ({ status: 'revoked', reason: 'invalid_grant' })))
 			.revalidate(h.dbContext, h.readDbContext, apiKeyRow)
 		expect(out).toBe('revoked')
 		expect(h.executed.some(c => c instanceof DisableApiKeyCommand)).toBe(true)
@@ -148,7 +161,7 @@ describe('IdpSessionRevalidator — lifetime-driven phases', () => {
 
 	test('expired token + valid refresh → valid, persists rotated session', async () => {
 		const h = createHarness(baseRow({ session: { tokens: { refresh_token: 'r' }, expiresAt: t('11:30:00') } }))
-		const out = await new IdpSessionRevalidator(
+		const out = await makeRevalidator(
 			registryWith(async () => ({ status: 'valid', idpSession: { tokens: { refresh_token: 'new' }, expiresAt: t('13:30:00') } })),
 		)
 			.revalidate(h.dbContext, h.readDbContext, apiKeyRow)
@@ -179,7 +192,7 @@ describe('IdpSessionRevalidator — lifetime-driven phases', () => {
 			queryHandler: { fetch: async () => baseRow({ session: { tokens: { refresh_token: 'r' }, expiresAt: t('11:30:00') } }) }, // expired → blocking
 		} as unknown as DatabaseContext
 
-		const out = await new IdpSessionRevalidator(
+		const out = await makeRevalidator(
 			registryWith(async () => ({ status: 'valid', idpSession: { tokens: { refresh_token: 'new' }, expiresAt: t('13:30:00') } })),
 		).revalidate(ctx, ctx, apiKeyRow)
 		expect(out).toBe('valid')
@@ -189,7 +202,7 @@ describe('IdpSessionRevalidator — lifetime-driven phases', () => {
 
 	test('mode=blocking forces synchronous revoke even in the soft window', async () => {
 		const h = createHarness(baseRow({ providerConfiguration: { revalidation: { enabled: true, mode: 'blocking' } } }))
-		const out = await new IdpSessionRevalidator(registryWith(async () => ({ status: 'revoked', reason: 'invalid_grant' })))
+		const out = await makeRevalidator(registryWith(async () => ({ status: 'revoked', reason: 'invalid_grant' })))
 			.revalidate(h.dbContext, h.readDbContext, apiKeyRow)
 		expect(out).toBe('revoked')
 		expect(h.executed.some(c => c instanceof DisableApiKeyCommand)).toBe(true)
@@ -198,7 +211,7 @@ describe('IdpSessionRevalidator — lifetime-driven phases', () => {
 	test('no token expiry → fallback background throttle (revalidates, deferred)', async () => {
 		let called = false
 		const h = createHarness(baseRow({ tokenObtainedAt: null, session: { sessionId: 's', tokens: { access_token: 'a' }, expiresAt: undefined } }))
-		const out = await new IdpSessionRevalidator(registryWith(async () => {
+		const out = await makeRevalidator(registryWith(async () => {
 			called = true
 			return { status: 'valid' }
 		})).revalidate(h.dbContext, h.readDbContext, apiKeyRow)
@@ -211,7 +224,7 @@ describe('IdpSessionRevalidator — lifetime-driven phases', () => {
 	test('throttled (claim lost) → valid, revalidate not called', async () => {
 		let called = false
 		const h = createHarness(baseRow(), { claim: false })
-		const out = await new IdpSessionRevalidator(registryWith(async () => {
+		const out = await makeRevalidator(registryWith(async () => {
 			called = true
 			return { status: 'valid' }
 		})).revalidate(h.dbContext, h.readDbContext, apiKeyRow)
@@ -222,7 +235,7 @@ describe('IdpSessionRevalidator — lifetime-driven phases', () => {
 
 	test('transient IdP failure in blocking phase → valid (fail open, no revoke)', async () => {
 		const h = createHarness(baseRow({ session: { tokens: { refresh_token: 'r' }, expiresAt: t('11:30:00') } }))
-		const out = await new IdpSessionRevalidator(registryWith(async () => {
+		const out = await makeRevalidator(registryWith(async () => {
 			throw new Error('ECONNREFUSED')
 		})).revalidate(h.dbContext, h.readDbContext, apiKeyRow)
 		expect(out).toBe('valid')
@@ -240,7 +253,7 @@ describe('IdpSessionRevalidator — lifetime-driven phases', () => {
 			},
 			revalidate: async () => ({ status: 'revoked', reason: 'invalid_grant' }),
 		})
-		const out = await new IdpSessionRevalidator(registry).revalidate(h.dbContext, h.readDbContext, apiKeyRow)
+		const out = await makeRevalidator(registry).revalidate(h.dbContext, h.readDbContext, apiKeyRow)
 		expect(out).toBe('valid')
 		expect(h.executed.some(c => c instanceof DisableApiKeyCommand)).toBe(false)
 	})
@@ -249,7 +262,7 @@ describe('IdpSessionRevalidator — lifetime-driven phases', () => {
 describe('IdpSessionRevalidator — audit logging', () => {
 	test('token rotation is audited as idp_session_revalidated', async () => {
 		const h = createHarness(baseRow({ session: { tokens: { refresh_token: 'r' }, expiresAt: t('11:30:00') } }))
-		await new IdpSessionRevalidator(
+		await makeRevalidator(
 			registryWith(async () => ({ status: 'valid', idpSession: { tokens: { refresh_token: 'new' }, expiresAt: t('13:30:00') } })),
 		).revalidate(h.dbContext, h.readDbContext, apiKeyRow)
 		const log = h.executed.find(c => c instanceof CreateAuthLogEntryCommand) as CreateAuthLogEntryCommand | undefined
@@ -262,14 +275,14 @@ describe('IdpSessionRevalidator — audit logging', () => {
 		const reqInfo = { ip: '203.0.113.7', userAgent: 'Mozilla/5.0 test' }
 
 		const revoked = createHarness(baseRow({ session: { tokens: { refresh_token: 'r' }, expiresAt: t('11:30:00') } }))
-		await new IdpSessionRevalidator(registryWith(async () => ({ status: 'revoked', reason: 'invalid_grant' })))
+		await makeRevalidator(registryWith(async () => ({ status: 'revoked', reason: 'invalid_grant' })))
 			.revalidate(revoked.dbContext, revoked.readDbContext, apiKeyRow, reqInfo)
 		const revokeLog = revoked.executed.find(c => c instanceof CreateAuthLogEntryCommand) as any
 		expect(revokeLog.data.ipAddress).toBe('203.0.113.7')
 		expect(revokeLog.data.userAgent).toBe('Mozilla/5.0 test')
 
 		const rotated = createHarness(baseRow({ session: { tokens: { refresh_token: 'r' }, expiresAt: t('11:30:00') } }))
-		await new IdpSessionRevalidator(
+		await makeRevalidator(
 			registryWith(async () => ({ status: 'valid', idpSession: { tokens: { refresh_token: 'new' }, expiresAt: t('13:30:00') } })),
 		).revalidate(rotated.dbContext, rotated.readDbContext, apiKeyRow, reqInfo)
 		const rotateLog = rotated.executed.find(c => c instanceof CreateAuthLogEntryCommand) as any
@@ -280,7 +293,7 @@ describe('IdpSessionRevalidator — audit logging', () => {
 	test('transient IdP failure (fail open) is audited as idp_session_revalidation_failed / revalidation_error', async () => {
 		// expired → blocking, so the failure audit runs synchronously
 		const h = createHarness(baseRow({ session: { tokens: { refresh_token: 'r' }, expiresAt: t('11:30:00') } }))
-		const out = await new IdpSessionRevalidator(registryWith(async () => {
+		const out = await makeRevalidator(registryWith(async () => {
 			throw new Error('ECONNREFUSED')
 		})).revalidate(h.dbContext, h.readDbContext, apiKeyRow, { ip: '203.0.113.7', userAgent: 'UA' })
 		expect(out).toBe('valid')
@@ -304,7 +317,7 @@ describe('IdpSessionRevalidator — audit logging', () => {
 			},
 			revalidate: async () => ({ status: 'revoked', reason: 'invalid_grant' }),
 		})
-		const out = await new IdpSessionRevalidator(registry).revalidate(h.dbContext, h.readDbContext, apiKeyRow)
+		const out = await makeRevalidator(registry).revalidate(h.dbContext, h.readDbContext, apiKeyRow)
 		expect(out).toBe('valid')
 		expect(h.executed.some(c => c instanceof DisableApiKeyCommand)).toBe(false)
 		const log = h.executed.find(c => c instanceof CreateAuthLogEntryCommand) as any
@@ -333,7 +346,7 @@ describe('IdpSessionRevalidator — audit logging', () => {
 			commandBus,
 			queryHandler: { fetch: async () => baseRow({ session: { tokens: { refresh_token: 'r' }, expiresAt: t('11:30:00') } }) },
 		} as unknown as DatabaseContext
-		const out = await new IdpSessionRevalidator(registryWith(async () => {
+		const out = await makeRevalidator(registryWith(async () => {
 			throw new Error('ECONNREFUSED')
 		})).revalidate(ctx, ctx, apiKeyRow)
 		expect(out).toBe('valid')
@@ -343,7 +356,7 @@ describe('IdpSessionRevalidator — audit logging', () => {
 		// userinfo / introspection return valid without an idpSession; logging every such tick
 		// (every minInterval) would flood the audit log, so it must stay silent.
 		const h = createHarness(baseRow({ session: { tokens: { access_token: 'a' }, expiresAt: t('11:30:00') } }))
-		const out = await new IdpSessionRevalidator(registryWith(async () => ({ status: 'valid' })))
+		const out = await makeRevalidator(registryWith(async () => ({ status: 'valid' })))
 			.revalidate(h.dbContext, h.readDbContext, apiKeyRow)
 		expect(out).toBe('valid')
 		expect(h.executed.some(c => c instanceof CreateAuthLogEntryCommand)).toBe(false)
@@ -374,7 +387,7 @@ describe('IdpSessionRevalidator — audit logging', () => {
 				queryHandler: { fetch: async () => baseRow() }, // soft phase → background (SWR)
 			} as unknown as DatabaseContext
 
-			const out = await new IdpSessionRevalidator(registryWith(async () => ({ status: 'revoked', reason: 'invalid_grant' })))
+			const out = await makeRevalidator(registryWith(async () => ({ status: 'revoked', reason: 'invalid_grant' })))
 				.revalidate(ctx, ctx, apiKeyRow)
 			expect(out).toBe('valid') // served from the still-valid token
 			await tick()
@@ -383,5 +396,194 @@ describe('IdpSessionRevalidator — audit logging', () => {
 		} finally {
 			process.off('unhandledRejection', onRejection)
 		}
+	})
+})
+
+describe('IdpSessionRevalidator — A09 claim mapping on refresh', () => {
+	// Expired token → blocking refresh that returns fresh claims; the row carries an `always` claim
+	// mapping granting `demo::editor` when `department === 'Editorial'`.
+	const expiredSession = { tokens: { refresh_token: 'r' }, expiresAt: t('11:30:00') }
+	const claimMappingRow = (claimMapping: unknown) =>
+		baseRow({ session: expiredSession, providerConfiguration: { revalidation: { enabled: true }, claimMapping } })
+
+	// A query-/transaction-aware harness: the claim sync runs its real reads/writes against this mock.
+	// `ProjectMembershipByIdentityQuery` returns [] the first time (before snapshot) and the granted
+	// membership the second time (after snapshot), so the before/after delta is non-empty.
+	const claimHarness = (row: IdpSessionRow, opts: { failTransaction?: boolean } = {}) => {
+		const executed: any[] = []
+		let membershipFetches = 0
+		const inner: any = {
+			providers: { now: () => NOW },
+			commandBus: {
+				execute: async (command: any) => {
+					executed.push(command)
+					if (command instanceof ClaimIdpRevalidationCommand) {
+						return true
+					}
+					if (command instanceof CreateOrUpdateProjectMembershipCommand) {
+						return 'membership-1'
+					}
+					return undefined
+				},
+			},
+			queryHandler: {
+				fetch: async (query: any) => {
+					if (query instanceof ProjectBySlugQuery) {
+						return { id: 'proj-1', slug: 'demo', name: 'demo', config: {} }
+					}
+					if (query instanceof ProjectMembershipByIdentityQuery) {
+						membershipFetches++
+						return membershipFetches === 1 ? [] : [{ role: 'editor', variables: [] }]
+					}
+					// IdpSessionByApiKeyQuery (and anything else) → the federated-session row
+					return row
+				},
+			},
+		}
+		inner.transaction = opts.failTransaction
+			? async () => {
+				throw new Error('claim-sync tx failed')
+			}
+			: async (cb: (db: any) => Promise<unknown>) => cb(inner)
+		return { ctx: inner as unknown as DatabaseContext, executed }
+	}
+
+	const validWithClaims = (claims: Record<string, unknown>, claimsComplete = false) =>
+		registryWith(async () => ({ status: 'valid', claims, claimsComplete }))
+
+	test('always mapping + fresh claims → re-applies the membership and audits idp_role_mapped', async () => {
+		const claimMapping = { rules: [{ claim: 'department', equals: 'Editorial', grantMembership: { project: 'demo', role: 'editor' } }] }
+		const h = claimHarness(claimMappingRow(claimMapping))
+		const out = await makeRevalidator(validWithClaims({ department: 'Editorial' })).revalidate(h.ctx, h.ctx, apiKeyRow)
+		expect(out).toBe('valid')
+		expect(h.executed.some(c => c instanceof CreateOrUpdateProjectMembershipCommand)).toBe(true)
+		const log = h.executed.find(c => c instanceof CreateAuthLogEntryCommand && (c as any).data.type === 'idp_role_mapped') as any
+		expect(log).toBeDefined()
+		expect(log.data.success).toBe(true)
+		expect(log.data.eventData.after.memberships).toEqual([{ project: 'demo', role: 'editor', variables: [] }])
+	})
+
+	test('sticky mapping is skipped on refresh (always-only) — no membership write, no audit', async () => {
+		const claimMapping = {
+			syncPolicy: 'sticky',
+			rules: [{ claim: 'department', equals: 'Editorial', grantMembership: { project: 'demo', role: 'editor' } }],
+		}
+		const h = claimHarness(claimMappingRow(claimMapping))
+		const out = await makeRevalidator(validWithClaims({ department: 'Editorial' })).revalidate(h.ctx, h.ctx, apiKeyRow)
+		expect(out).toBe('valid')
+		expect(h.executed.some(c => c instanceof CreateOrUpdateProjectMembershipCommand)).toBe(false)
+		expect(h.executed.some(c => c instanceof CreateAuthLogEntryCommand && (c as any).data.type === 'idp_role_mapped')).toBe(false)
+	})
+
+	test('claim sync failure is fail-open: session stays valid, audited as idp_role_mapping_failed', async () => {
+		const claimMapping = { rules: [{ claim: 'department', equals: 'Editorial', grantMembership: { project: 'demo', role: 'editor' } }] }
+		const h = claimHarness(claimMappingRow(claimMapping), { failTransaction: true })
+		const out = await makeRevalidator(validWithClaims({ department: 'Editorial' })).revalidate(h.ctx, h.ctx, apiKeyRow)
+		expect(out).toBe('valid')
+		expect(h.executed.some(c => c instanceof DisableApiKeyCommand)).toBe(false)
+		const log = h.executed.find(c => c instanceof CreateAuthLogEntryCommand && (c as any).data.type === 'idp_role_mapping_failed') as any
+		expect(log).toBeDefined()
+		expect(log.data.success).toBe(true)
+	})
+
+	test('refresh without fresh claims does not run claim sync', async () => {
+		const claimMapping = { rules: [{ claim: 'department', equals: 'Editorial', grantMembership: { project: 'demo', role: 'editor' } }] }
+		const h = claimHarness(claimMappingRow(claimMapping))
+		// revalidate returns valid but with NO claims (e.g. introspection) → nothing to map
+		const out = await makeRevalidator(registryWith(async () => ({ status: 'valid' }))).revalidate(h.ctx, h.ctx, apiKeyRow)
+		expect(out).toBe('valid')
+		expect(h.executed.some(c => c instanceof CreateOrUpdateProjectMembershipCommand)).toBe(false)
+		expect(h.executed.some(c => c instanceof CreateAuthLogEntryCommand)).toBe(false)
+	})
+
+	test('complete surface (method:refresh) + unmatched:remove → revokes on refresh, exactly like sign-in', async () => {
+		// Variant A: a `method: "refresh"` rebuilds sign-in's full claim surface (claimsComplete:true), so refresh
+		// reconciles like a sign-in — a rule that no longer matches strips its membership under `remove`.
+		const claimMapping = {
+			unmatched: 'remove',
+			rules: [{ claim: 'department', equals: 'Editorial', grantMembership: { project: 'demo', role: 'editor' } }],
+		}
+		const row = claimMappingRow(claimMapping)
+		const executed: any[] = []
+		let membershipFetches = 0
+		const inner: any = {
+			providers: { now: () => NOW },
+			commandBus: {
+				execute: async (command: any) => {
+					executed.push(command)
+					if (command instanceof ClaimIdpRevalidationCommand) {
+						return true
+					}
+					return undefined
+				},
+			},
+			queryHandler: {
+				fetch: async (query: any) => {
+					if (query instanceof ProjectBySlugQuery) {
+						return { id: 'proj-1', slug: 'demo', name: 'demo', config: {} }
+					}
+					if (query instanceof ProjectMembershipByIdentityQuery) {
+						membershipFetches++
+						// the before-snapshot + the remove reconciliation (reads 1 & 2) still see `editor`; the
+						// after-snapshot (read 3) sees it gone, so the audit delta is non-empty.
+						return membershipFetches <= 2 ? [{ role: 'editor', variables: [] }] : []
+					}
+					return row
+				},
+			},
+		}
+		inner.transaction = async (cb: (db: any) => Promise<unknown>) => cb(inner)
+		const ctx = inner as unknown as DatabaseContext
+		// the claim no longer matches → `editor` is out of the granted set → removed under `remove`
+		const out = await makeRevalidator(validWithClaims({ department: 'Sales' }, true)).revalidate(ctx, ctx, apiKeyRow)
+		expect(out).toBe('valid')
+		expect(executed.filter(c => c instanceof RemoveProjectMembershipCommand)).toHaveLength(1)
+		const log = executed.find(c => c instanceof CreateAuthLogEntryCommand && (c as any).data.type === 'idp_role_mapped') as any
+		expect(log).toBeDefined()
+		expect(log.data.eventData.before.memberships).toEqual([{ project: 'demo', role: 'editor', variables: [] }])
+		expect(log.data.eventData.after.memberships).toEqual([])
+	})
+
+	test('partial surface (userinfo / failed userinfo) + unmatched:remove → does NOT remove on refresh', async () => {
+		// A partial surface (claimsComplete:false — method:userinfo, or a refresh whose userinfo fetch failed)
+		// stays additive-only: a rule that misses here must not strip a membership the IdP still asserts. Removal
+		// is deferred to a full sign-in, which always sees the complete surface.
+		const claimMapping = {
+			unmatched: 'remove',
+			rules: [{ claim: 'department', equals: 'Editorial', grantMembership: { project: 'demo', role: 'editor' } }],
+		}
+		const row = claimMappingRow(claimMapping)
+		const executed: any[] = []
+		const inner: any = {
+			providers: { now: () => NOW },
+			commandBus: {
+				execute: async (command: any) => {
+					executed.push(command)
+					if (command instanceof ClaimIdpRevalidationCommand) {
+						return true
+					}
+					return undefined
+				},
+			},
+			queryHandler: {
+				fetch: async (query: any) => {
+					if (query instanceof ProjectBySlugQuery) {
+						return { id: 'proj-1', slug: 'demo', name: 'demo', config: {} }
+					}
+					if (query instanceof ProjectMembershipByIdentityQuery) {
+						return [{ role: 'editor', variables: [] }]
+					}
+					return row
+				},
+			},
+		}
+		inner.transaction = async (cb: (db: any) => Promise<unknown>) => cb(inner)
+		const ctx = inner as unknown as DatabaseContext
+		// claimsComplete defaults false → allowRemoval false → keep, so the still-asserted membership is left alone
+		const out = await makeRevalidator(validWithClaims({ department: 'Sales' })).revalidate(ctx, ctx, apiKeyRow)
+		expect(out).toBe('valid')
+		expect(executed.some(c => c instanceof RemoveProjectMembershipCommand)).toBe(false)
+		// nothing changed (removal off, no grant) → no idp_role_mapped audit
+		expect(executed.some(c => c instanceof CreateAuthLogEntryCommand && (c as any).data.type === 'idp_role_mapped')).toBe(false)
 	})
 })

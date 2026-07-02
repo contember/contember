@@ -20,6 +20,7 @@ import {
 	HCaptchaProvider,
 	Identity,
 	IdentityFactory,
+	IDPClaimSyncService,
 	IDPHandlerRegistry,
 	IDPManager,
 	IdpSessionRevalidator,
@@ -192,7 +193,8 @@ export class TenantContainerFactory {
 				idpRegistry.registerHandler('apple', new AppleProvider())
 				return idpRegistry
 			})
-			.addService('idpSessionRevalidator', ({ idpRegistry }) => new IdpSessionRevalidator(idpRegistry))
+			.addService('idpClaimSyncService', ({ projectSchemaResolver }) => new IDPClaimSyncService(projectSchemaResolver))
+			.addService('idpSessionRevalidator', ({ idpRegistry, idpClaimSyncService }) => new IdpSessionRevalidator(idpRegistry, idpClaimSyncService))
 			.addService('backchannelLogoutManager', ({ idpRegistry }) => new BackchannelLogoutManager(idpRegistry))
 			.addService('unpersistedApiKeyManager', () =>
 				UnpersistedApiKeyManager.createForRootTokens({
@@ -246,8 +248,11 @@ export class TenantContainerFactory {
 				({ userMailer, projectManager, emailValidator, apiKeyManager, permissionContextFactory }) =>
 					new EmailChangeManager(userMailer, projectManager, emailValidator, apiKeyManager, permissionContextFactory),
 			)
-			.addService('idpSignInManager', ({ apiKeyManager, idpRegistry }) => new IDPSignInManager(apiKeyManager, idpRegistry))
-			.addService('idpManager', ({ idpRegistry }) => new IDPManager(idpRegistry))
+			.addService(
+				'idpSignInManager',
+				({ apiKeyManager, idpRegistry, idpClaimSyncService }) => new IDPSignInManager(apiKeyManager, idpRegistry, idpClaimSyncService),
+			)
+			.addService('idpManager', ({ idpRegistry, projectSchemaResolver }) => new IDPManager(idpRegistry, projectSchemaResolver))
 			.addService('personIdentityProviderManager', () => new PersonIdentityProviderManager())
 			.addService('otpAuthenticator', ({ providers }) => new OtpAuthenticator(providers))
 			.addService('otpManager', ({ otpAuthenticator, providers }) => new OtpManager(otpAuthenticator, providers))

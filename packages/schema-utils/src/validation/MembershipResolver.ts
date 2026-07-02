@@ -19,13 +19,16 @@ export class MembershipResolver {
 		const parsed: ParsedMembership[] = []
 		const roles = acl.roles
 		for (const membership of memberships) {
-			if (!roles[membership.role]) {
+			// own-property lookup so a role named `__proto__` / `constructor` resolves to "not found"
+			// rather than an inherited Object.prototype member
+			if (!Object.prototype.hasOwnProperty.call(roles, membership.role)) {
 				errors.push(new MembershipValidationError(membership.role, MembershipValidationErrorType.ROLE_NOT_FOUND))
 				continue
 			}
 			const roleVariables = getRoleVariables(membership.role, acl)
 			for (const variable of membership.variables) {
-				if (!roleVariables[variable.name] || (!isAssumed && roleVariables[variable.name].type === Acl.VariableType.predefined)) {
+				const roleVariable = Object.prototype.hasOwnProperty.call(roleVariables, variable.name) ? roleVariables[variable.name] : undefined
+				if (!roleVariable || (!isAssumed && roleVariable.type === Acl.VariableType.predefined)) {
 					errors.push(
 						new MembershipValidationError(
 							membership.role,

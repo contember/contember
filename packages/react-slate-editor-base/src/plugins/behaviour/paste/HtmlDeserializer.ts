@@ -82,7 +82,7 @@ export class HtmlDeserializer {
 			return {
 				elements: processed.flatMap(item => {
 					if (item.text !== undefined) {
-						return item.isWhiteSpace ? [] : [this.createDefaultElement([item.text])]
+						return item.isWhiteSpace ? [] : [this.createDefaultElement(this.trimBlockBoundaryWhitespace([item.text]))]
 					} else if (item.element !== undefined) {
 						return [item.element]
 					}
@@ -108,7 +108,40 @@ export class HtmlDeserializer {
 
 	deserializeBlocks(list: Node[], cumulativeTextAttrs: TextAttrs): Descendant[] {
 		const result = this.processNodeListPaste(list, cumulativeTextAttrs)
-		return result?.texts ?? result?.elements ?? []
+		if (result?.texts !== undefined) {
+			return this.trimBlockBoundaryWhitespace(result.texts)
+		}
+		return result?.elements ?? []
+	}
+
+	// Collapsible whitespace at the start/end of a block renders as nothing in HTML,
+	// so strip it from the edges of a block's inline content. Non-breaking spaces are kept.
+	private trimBlockBoundaryWhitespace(texts: Descendant[]): Descendant[] {
+		const trimmed = [...texts]
+		const trimEdge = (direction: 'start' | 'end') => {
+			for (let i = direction === 'start' ? 0 : trimmed.length - 1; i >= 0 && i < trimmed.length;) {
+				const node = trimmed[i]
+				if (!SlateText.isText(node)) {
+					return
+				}
+				const text = direction === 'start' ? node.text.replace(/^[ \t\r\n]+/, '') : node.text.replace(/[ \t\r\n]+$/, '')
+				if (text !== '') {
+					trimmed[i] = { ...node, text }
+					return
+				}
+				if (trimmed.length === 1) {
+					trimmed[i] = { ...node, text }
+					return
+				}
+				trimmed.splice(i, 1)
+				if (direction === 'end') {
+					i--
+				}
+			}
+		}
+		trimEdge('start')
+		trimEdge('end')
+		return trimmed
 	}
 
 	private deserializeTextNode(node: Node, cumulativeTextAttrs: TextAttrs): Descendant[] | null {

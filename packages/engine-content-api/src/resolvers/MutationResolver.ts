@@ -1,7 +1,5 @@
 import { Input, Model, Result, Value } from '@contember/schema'
 import {
-	AfterCommitEvent,
-	BeforeCommitEvent,
 	ConstraintType,
 	convertError,
 	getInsertPrimary,
@@ -13,11 +11,12 @@ import {
 	MutationResultType,
 	tryMutation,
 } from '../mapper/index.js'
+import { runContentMutationTransaction } from './runContentMutationTransaction.js'
 import { ValidationResolver } from './ValidationResolver.js'
 import { GraphQLResolveInfo } from 'graphql'
 import { GraphQlQueryAstFactory } from './GraphQlQueryAstFactory.js'
 import { ImplementationException } from '../exception.js'
-import { DatabaseMetadata, retryTransaction } from '@contember/database'
+import { DatabaseMetadata } from '@contember/database'
 import { Operation, readOperationMeta } from '../schema/index.js'
 import { assertNever } from '../utils/index.js'
 import { InputPreValidator } from '../input-validation/index.js'
@@ -467,42 +466,14 @@ export class MutationResolver {
 	private async transaction<R extends { ok: boolean }>(
 		cb: (mapper: Mapper) => Promise<R>,
 	): Promise<R> {
-		return await retryTransaction(
-			async () => {
-				return await this.mapperFactory.transaction(async mapper => {
-					logger.debug('MutationResolver: Starting mutation transaction')
-					const result = await cb(mapper)
-					if (!result.ok) {
-						logger.debug('MutationResolver: Transaction failed, rolling back', { result })
-						await mapper.db.connection.rollback()
-					} else {
-						try {
-							await mapper.eventManager.fire(new BeforeCommitEvent())
-							logger.debug('MutationResolver: Transaction ok, committing')
-							await mapper.db.connection.commit()
-							await mapper.eventManager.fire(new AfterCommitEvent())
-						} catch (e) {
-							try {
-								await mapper.db.connection.rollback()
-							} catch {}
-							const err = convertError(this.schema, this.schemaDatabaseMetadata, e)
-							const errorResponse = this.createErrorResponse([err])
-							if (!errorResponse) {
-								throw new ImplementationException()
-							}
-							return { ...result, ...errorResponse }
-						}
-					}
-					return result
-				})
-			},
-			message => logger.warn(message),
-			{
-				maxAttempts: 15,
-				minTimeout: 10,
-				maxTimeout: 1000,
-			},
-		)
+		return runContentMutationTransaction(this.mapperFactory, cb, (result, e) => {
+			const err = convertError(this.schema, this.schemaDatabaseMetadata, e)
+			const errorResponse = this.createErrorResponse([err])
+			if (!errorResponse) {
+				throw new ImplementationException()
+			}
+			return { ...result, ...errorResponse }
+		})
 	}
 
 	private createErrorResponse(result: MutationResultList) {

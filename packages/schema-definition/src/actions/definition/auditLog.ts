@@ -2,7 +2,7 @@ import { DecoratorFunction, EntityConstructor } from '../../utils/index.js'
 import { Actions } from '@contember/schema'
 import { watch } from './triggers.js'
 import { EntityReference } from './targets.js'
-import { dateTimeColumn, Index, intColumn, jsonColumn, stringColumn, uuidColumn } from '../../model/definition/index.js'
+import { dateTimeColumn, DisableEventLog, Immutable, Index, intColumn, jsonColumn, stringColumn, uuidColumn } from '../../model/definition/index.js'
 
 export type AuditLogDefinition = {
 	/** Watch selection — which fields/relations of the audited aggregate to capture. */
@@ -71,7 +71,10 @@ export const auditLog = <T>(definition: AuditLogDefinition): DecoratorFunction<T
 /**
  * Base class for explicit audit-log sink entities. Extend it when the default
  * convention columns and indexes are enough, then add ACL and any project fields on
- * the concrete entity.
+ * the concrete entity. The event log is disabled — the audit rows *are* the log, so
+ * event-logging their own inserts would only double-record them — and the entity is
+ * marked immutable, so the Content API exposes no create/update/delete for it (only the
+ * engine writes the rows); reads still follow regular ACL.
  */
 export class AuditLogEntity {
 	createdAt = dateTimeColumn().notNull().default('now')
@@ -85,6 +88,9 @@ export class AuditLogEntity {
 	nodes = jsonColumn()
 }
 
+DisableEventLog()(AuditLogEntity)
+Immutable()(AuditLogEntity)
+Index<AuditLogEntity>({ fields: ['createdAt'] })(AuditLogEntity)
 Index<AuditLogEntity>({ fields: ['eventNo'] })(AuditLogEntity)
 Index<AuditLogEntity>({ fields: ['rootEntity', 'rootId'] })(AuditLogEntity)
 Index<AuditLogEntity>({ fields: ['nodes'], method: 'gin' })(AuditLogEntity)

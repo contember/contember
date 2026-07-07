@@ -48,7 +48,7 @@ Conditional: `@when(condition).assertMinLength(3, 'msg')`
 - `@watch({ name, watch, target })` — deep change tracking
 - `createActionsTarget({ name, ...config })` — webhook target
 - `createAuditLogTarget({ entity, synchronous? })` — built-in audit-log target (writes into a content entity, no webhook). `entity` is an entity-class reference (or `() => Entity` thunk), resolved to a name in `ActionsFactory` (like View `dependencies`).
-- `@AuditLog({ watch, entity, name?, synchronous?, rootRelation? })` — sugar over `@watch` + an audit-log target. `entity` is a class reference / thunk pointing at an explicit sink in the model; extend `AuditLogEntity` for the default fields/indexes or write a compatible entity by hand. `actions/definition/auditLog.ts`.
+- `@AuditLog({ watch, entity, name?, synchronous?, rootRelation? })` — sugar over `@watch` + an audit-log target. `entity` is a class reference / thunk pointing at an explicit sink in the model; extend `AuditLogEntity` for the default fields/indexes or write a compatible entity by hand. `actions/definition/auditLog.ts`. `AuditLogEntity` base carries `createdAt`+`eventNo`+`(rootEntity,rootId)`+GIN(`nodes`) indexes and applies `@DisableEventLog()` (no double logging) + `@Immutable()` (no create/update/delete via Content API — append-only by construction, not by ACL). Decorators on the base propagate to subclasses via `Reflect.getMetadata` prototype chain.
 
 ## Metadata Storage
 

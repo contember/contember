@@ -38,6 +38,14 @@ export class ActionsValidator {
 			errorBuilder.add('ACTIONS_UNDEFINED_ENTITY', `Audit-log target entity ${target.entity} not found.`)
 			return
 		}
+		// An audit sink must be append-only: only the engine writes it. Without this the
+		// Content API would expose create/update/delete and rows could be forged/tampered.
+		if (!entity.immutable) {
+			errorBuilder.add(
+				'ACTIONS_AUDIT_LOG_MUTABLE_ENTITY',
+				`Audit-log entity ${target.entity} must be immutable — extend AuditLogEntity or add @Immutable() so its rows cannot be forged, tampered with or deleted through the Content API.`,
+			)
+		}
 		for (const column of auditLogColumns) {
 			const field = entity.fields[column.name]
 			if (!field) {

@@ -1,9 +1,11 @@
-import { Retention, Schema } from '@contember/schema'
+import { Model, Retention, Schema } from '@contember/schema'
 import { getEntity } from '@contember/schema-utils'
 import { Stage, StagesQuery } from '@contember/engine-system-api'
-import { createWhereBuilder, PathFactory } from '@contember/engine-content-api'
+import { createWhereBuilder, ExecutionContainerFactory, PathFactory } from '@contember/engine-content-api'
+import { DatabaseMetadataResolver } from '@contember/database'
 import { isScheduleDue, ScheduledJob, ScheduledJobContext } from '@contember/engine-scheduler'
 import { RawRetentionExecutor, RetentionLimits } from './RawRetentionExecutor.js'
+import { ContentRetentionContext, ContentRetentionExecutor } from './ContentRetentionExecutor.js'
 import { toSchedulerSchedule } from './schedule.js'
 import { RetentionConfig } from './config.js'
 import { ProjectRetentionMetrics, RetentionMetrics } from './RetentionMetrics.js'
@@ -20,22 +22,26 @@ const runSubKey = (policyName: string, stageSlug: string): string => `${policyNa
  * The single scheduler job that drives retention. It carries no top-level schedule, so the scheduler
  * invokes {@link run} on every base tick; the job itself decides due-ness per policy and per stage using
  * {@link ScheduledJobContext.runStore} (keyed by `${policyName}\x1f${stageSlug}`) and each policy's own
- * schedule (falling back to the configured default). It runs the `raw` executor per due (policy, stage),
- * records the run — advancing last-run on success *and* error so a failing policy backs off to its next
- * window rather than retrying every tick.
+ * schedule (falling back to the configured default). It runs the strategy-selected executor per due
+ * (policy, stage), records the run — advancing last-run on success *and* error so a failing policy backs
+ * off to its next window rather than retrying every tick.
  */
 export class RetentionJob implements ScheduledJob {
 	public readonly name = RETENTION_JOB_NAME
 	// No `schedule`: due-ness is decided per policy/stage inside `run`.
 
+	private readonly databaseMetadataResolver = new DatabaseMetadataResolver()
+
 	constructor(
 		private readonly getConfig: () => RetentionConfig,
 		private readonly getMetrics: () => RetentionMetrics | undefined,
+		/** Master-singleton content-execution factory (with plugin hooks applied); required for the `content` strategy. */
+		private readonly getExecutionContainerFactory: () => ExecutionContainerFactory | undefined,
 	) {
 	}
 
 	public async run(ctx: ScheduledJobContext): Promise<void> {
-		const { schema } = await ctx.contentSchemaResolver.getSchema({ db: ctx.db })
+		const { schema, meta } = await ctx.contentSchemaResolver.getSchema({ db: ctx.db })
 		const policies = Object.values(schema.retention.policies)
 		if (policies.length === 0) {
 			return
@@ -46,7 +52,12 @@ export class RetentionJob implements ScheduledJob {
 			schema.model,
 			(schema.settings.content?.useExistsInHasManyFilter ?? schema.settings.useExistsInHasManyFilter) === true,
 		)
-		const executor = new RawRetentionExecutor(whereBuilder, new PathFactory())
+		const pathFactory = new PathFactory()
+		const rawExecutor = new RawRetentionExecutor(whereBuilder, pathFactory)
+		const executionContainerFactory = this.getExecutionContainerFactory()
+		const contentExecutor = executionContainerFactory !== undefined
+			? new ContentRetentionExecutor(executionContainerFactory, whereBuilder, pathFactory)
+			: undefined
 		const metrics = this.getMetrics()?.forProject(ctx.projectSlug)
 
 		for (const policy of policies) {
@@ -57,7 +68,7 @@ export class RetentionJob implements ScheduledJob {
 				if (!isScheduleDue(schedule, last?.lastRunAt ?? null, ctx.now)) {
 					continue
 				}
-				await this.runPolicyStage(ctx, schema, executor, policy, stage, config, metrics, subKey)
+				await this.runPolicyStage(ctx, schema, meta.id, rawExecutor, contentExecutor, policy, stage, config, metrics, subKey)
 			}
 		}
 	}
@@ -65,7 +76,9 @@ export class RetentionJob implements ScheduledJob {
 	private async runPolicyStage(
 		ctx: ScheduledJobContext,
 		schema: Schema,
-		executor: RawRetentionExecutor,
+		schemaMetaId: number | undefined,
+		rawExecutor: RawRetentionExecutor,
+		contentExecutor: ContentRetentionExecutor | undefined,
 		policy: Retention.Policy,
 		stage: Stage,
 		config: RetentionConfig,
@@ -75,18 +88,14 @@ export class RetentionJob implements ScheduledJob {
 		const start = process.hrtime.bigint()
 		const durationSeconds = () => Number(process.hrtime.bigint() - start) / 1e9
 		try {
-			if (policy.strategy === 'content') {
-				throw new Error(
-					`Retention policy "${policy.name}": strategy "content" is not yet implemented (phase 4). Use strategy "raw".`,
-				)
-			}
 			const entity = getEntity(schema.model, policy.entity)
 			const limits: RetentionLimits = {
 				batchSize: policy.batchSize ?? config.batchSize,
 				maxPerRun: policy.maxPerRun ?? config.maxPerRun,
 			}
-			const stageClient = ctx.db.client.forSchema(stage.schema)
-			const deleted = await executor.execute(stageClient, entity, policy, limits)
+			const deleted = policy.strategy === 'content'
+				? await this.runContentStrategy(ctx, schema, schemaMetaId, contentExecutor, entity, policy, stage, limits)
+				: await rawExecutor.execute(ctx.db.client.forSchema(stage.schema), entity, policy, limits)
 			metrics?.recordDeleted(policy.entity, policy.name, deleted)
 			metrics?.recordRun(policy.name, durationSeconds())
 			ctx.logger.info('Retention policy run complete', { policy: policy.name, stage: stage.slug, deleted })
@@ -97,5 +106,35 @@ export class RetentionJob implements ScheduledJob {
 			ctx.logger.error(e, { message: 'Retention policy run failed', policy: policy.name, stage: stage.slug })
 			await ctx.runStore.recordRun(this.name, 'error', subKey, ctx.now)
 		}
+	}
+
+	private async runContentStrategy(
+		ctx: ScheduledJobContext,
+		schema: Schema,
+		schemaMetaId: number | undefined,
+		contentExecutor: ContentRetentionExecutor | undefined,
+		entity: Model.Entity,
+		policy: Retention.Policy,
+		stage: Stage,
+		limits: RetentionLimits,
+	): Promise<number> {
+		if (contentExecutor === undefined) {
+			throw new Error(
+				`Retention policy "${policy.name}": strategy "content" requires the execution container factory, which is not available.`,
+			)
+		}
+		const stageClient = ctx.db.client.forSchema(stage.schema)
+		const schemaDatabaseMetadata = await this.databaseMetadataResolver.resolveMetadata(stageClient, stage.schema)
+		const context: ContentRetentionContext = {
+			schema,
+			schemaMeta: { id: schemaMetaId },
+			schemaDatabaseMetadata,
+			stageClient,
+			// The scheduler's `db` is the project's system database context, so its client schema is the system schema.
+			systemSchema: ctx.db.client.schema,
+			project: { slug: ctx.projectSlug },
+			stage: { id: stage.id, slug: stage.slug },
+		}
+		return contentExecutor.execute(context, entity, policy, limits)
 	}
 }

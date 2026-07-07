@@ -316,3 +316,27 @@ test('audit-log identityId must be nullable', () => {
 	const errors = SchemaValidator.validate(createSchema(NotNullIdentityAuditModel))
 	expect(errors.map(it => it.message).some(it => it.includes('identityId must be nullable'))).toBe(true)
 })
+
+namespace RetentionSugarModel {
+	@c.AuditLog({ watch: `title`, entity: () => ArticleAuditLog, retention: { olderThan: { interval: '90 days' } } })
+	export class Article {
+		title = c.stringColumn()
+	}
+
+	export class ArticleAuditLog extends c.AuditLogEntity {
+	}
+}
+
+test('@AuditLog: retention sugar emits a policy on the sink (createdAt default)', () => {
+	const schema = createSchema(RetentionSugarModel)
+
+	// Policy targets the SINK, not the audited entity, with olderThan.field defaulted to createdAt.
+	const policy = schema.retention.policies['article_audit_log_retention']
+	expect(policy).toBeDefined()
+	expect(policy).toMatchObject({
+		entity: 'ArticleAuditLog',
+		strategy: 'raw',
+		olderThan: { field: 'createdAt', interval: '90 days' },
+	})
+	expect(SchemaValidator.validate(schema).filter(it => it.code.startsWith('RETENTION'))).toStrictEqual([])
+})

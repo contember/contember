@@ -385,6 +385,14 @@ describe('GraphQL schema builder', () => {
 		})
 	})
 
+	it('immutable entity', async () => {
+		await testSchema({
+			schema: () => SchemaDefinition.createModel(ImmutableEntity),
+			permissions: schema => new AllowAllPermissionFactory().create(schema),
+			graphQlSchemaFile: 'schema-immutable-entity.gql',
+		})
+	})
+
 	it('no root ops', async () => {
 		const schema = createSchema(NoRootOperation)
 		const { root, all } = new PermissionFactory().createContextual(schema, ['editor'])
@@ -538,6 +546,14 @@ namespace RootWriteLookupRead {
 	})
 	export class Note {
 		text = c.stringColumn()
+	}
+}
+
+namespace ImmutableEntity {
+	// Even under AllowAll permissions, an immutable entity gets no create/update/delete/upsert.
+	@c.Immutable()
+	export class AuditLog {
+		message = def.stringColumn()
 	}
 }
 

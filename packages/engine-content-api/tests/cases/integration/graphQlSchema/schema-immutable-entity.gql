@@ -1,0 +1,114 @@
+type Query {
+  getAuditLog(by: AuditLogUniqueWhere!, filter: AuditLogWhere): AuditLog
+  listAuditLog(filter: AuditLogWhere, orderBy: [AuditLogOrderBy!], offset: Int, limit: Int): [AuditLog!]!
+  paginateAuditLog(filter: AuditLogWhere, orderBy: [AuditLogOrderBy!], skip: Int, first: Int): AuditLogConnection!
+  transaction: QueryTransaction
+  _info: Info
+}
+
+type AuditLog {
+  _meta: AuditLogMeta
+  id: UUID!
+  message: String
+}
+
+type AuditLogMeta {
+  id: FieldMeta
+  message: FieldMeta
+}
+
+type FieldMeta {
+  readable: Boolean
+  updatable: Boolean
+}
+
+scalar UUID
+
+input AuditLogUniqueWhere {
+  id: UUID
+}
+
+input AuditLogWhere {
+  id: UUIDCondition
+  message: StringCondition
+  and: [AuditLogWhere]
+  or: [AuditLogWhere]
+  not: AuditLogWhere
+}
+
+input UUIDCondition {
+  and: [UUIDCondition!]
+  or: [UUIDCondition!]
+  not: UUIDCondition
+  null: Boolean
+  isNull: Boolean
+  eq: UUID
+  notEq: UUID
+  in: [UUID!]
+  notIn: [UUID!]
+  lt: UUID
+  lte: UUID
+  gt: UUID
+  gte: UUID
+}
+
+input StringCondition {
+  and: [StringCondition!]
+  or: [StringCondition!]
+  not: StringCondition
+  null: Boolean
+  isNull: Boolean
+  eq: String
+  notEq: String
+  in: [String!]
+  notIn: [String!]
+  lt: String
+  lte: String
+  gt: String
+  gte: String
+  contains: String
+  startsWith: String
+  endsWith: String
+  containsCI: String
+  startsWithCI: String
+  endsWithCI: String
+  similar: String
+  wordSimilar: String
+}
+
+input AuditLogOrderBy {
+  _random: Boolean
+  _randomSeeded: Int
+  id: OrderDirection
+  message: OrderDirection
+}
+
+enum OrderDirection {
+  asc
+  desc
+  ascNullsFirst
+  descNullsLast
+}
+
+type AuditLogConnection {
+  pageInfo: PageInfo!
+  edges: [AuditLogEdge!]!
+}
+
+type PageInfo {
+  totalCount: Int!
+}
+
+type AuditLogEdge {
+  node: AuditLog!
+}
+
+type QueryTransaction {
+  getAuditLog(by: AuditLogUniqueWhere!, filter: AuditLogWhere): AuditLog
+  listAuditLog(filter: AuditLogWhere, orderBy: [AuditLogOrderBy!], offset: Int, limit: Int): [AuditLog!]!
+  paginateAuditLog(filter: AuditLogWhere, orderBy: [AuditLogOrderBy!], skip: Int, first: Int): AuditLogConnection!
+}
+
+type Info {
+  description: String
+}

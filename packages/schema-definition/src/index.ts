@@ -1,6 +1,7 @@
 import * as AclDefinition from './acl/definition/index.js'
 import { Role } from './acl/definition/index.js'
 import * as ActionsDefinition from './actions/definition/index.js'
+import * as RetentionDefinition from './retention/definition/index.js'
 import * as InputValidation from './validation/index.js'
 import { SchemaDefinition } from './model/index.js'
 import { createSchema } from './createSchema.js'
@@ -24,7 +25,7 @@ export type {
 	OneHasOneInverseDefinition,
 } from './model/definition/index.js'
 
-export { AclDefinition, ActionsDefinition, createSchema, InputValidation, SchemaDefinition }
+export { AclDefinition, ActionsDefinition, createSchema, InputValidation, RetentionDefinition, SchemaDefinition }
 
 export const c = {
 	// ACL
@@ -51,6 +52,9 @@ export const c = {
 	// Actions factories
 	createActionsTarget: ActionsDefinition.createTarget,
 	createAuditLogTarget: ActionsDefinition.createAuditLogTarget,
+
+	// Retention
+	Retention: RetentionDefinition.retention,
 
 	// Model
 	// Model entity decorators

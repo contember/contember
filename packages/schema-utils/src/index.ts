@@ -3,6 +3,7 @@ import { emptyModelSchema } from './model/index.js'
 import * as Typesafe from '@contember/typesafe'
 import { aclSchema, modelSchema, settingsSchema, validationSchema } from './type-schema/index.js'
 import { actionsSchema } from './type-schema/actions.js'
+import { retentionSchema } from './type-schema/retention.js'
 
 export * from './definition-generator/index.js'
 export * from './json-schema/index.js'
@@ -22,6 +23,7 @@ export const emptySchema: Schema = {
 	acl: { roles: {} },
 	validation: {},
 	actions: { triggers: {}, targets: {} },
+	retention: { policies: {} },
 	settings: {},
 }
 
@@ -30,5 +32,6 @@ export const schemaType: Typesafe.Type<Schema> = Typesafe.object({
 	acl: aclSchema,
 	validation: validationSchema,
 	actions: Typesafe.coalesce(actionsSchema, { triggers: {}, targets: {} }),
+	retention: Typesafe.coalesce(retentionSchema, { policies: {} }),
 	settings: Typesafe.coalesce(settingsSchema, {}),
 })

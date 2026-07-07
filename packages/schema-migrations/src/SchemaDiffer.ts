@@ -50,6 +50,9 @@ import { CreateTriggerDiffer, RemoveTriggerDiffer, UpdateTriggerDiffer } from '.
 import { UpdateTargetDiffer } from './modifications/actions/UpdateTargetModification.js'
 import { CreateTargetDiffer } from './modifications/actions/CreateTargetModification.js'
 import { RemoveTargetDiffer } from './modifications/actions/RemoveTargetModification.js'
+import { CreateRetentionPolicyDiffer } from './modifications/retention/CreateRetentionPolicyModification.js'
+import { UpdateRetentionPolicyDiffer } from './modifications/retention/UpdateRetentionPolicyModification.js'
+import { RemoveRetentionPolicyDiffer } from './modifications/retention/RemoveRetentionPolicyModification.js'
 import { UpdateSettingsDiffer } from './modifications/settings/index.js'
 import { RemoveIndexNamesDiffer } from './modifications/upgrade/RemoveIndexNamesModification.js'
 import { ConvertOneHasManyToOneHasOneRelationDiffer } from './modifications/relations/ConvertOneHasManyToOneHasOneRelationModification.js'
@@ -140,6 +143,9 @@ export class SchemaDiffer {
 				new CreateTriggerDiffer(),
 				new RemoveTriggerDiffer(),
 				new RemoveTargetDiffer(),
+				new UpdateRetentionPolicyDiffer(),
+				new CreateRetentionPolicyDiffer(),
+				new RemoveRetentionPolicyDiffer(),
 			],
 		]
 
@@ -158,6 +164,7 @@ export class SchemaDiffer {
 					acl: appliedDiffsSchema.acl,
 					validation: appliedDiffsSchema.validation,
 					actions: appliedDiffsSchema.actions,
+					retention: appliedDiffsSchema.retention,
 					settings: appliedDiffsSchema.settings,
 				}
 				: updatedSchema

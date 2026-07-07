@@ -59,6 +59,7 @@ export const c = {
 	Unique: SchemaDefinition.Unique,
 	View: SchemaDefinition.View,
 	DisableEventLog: SchemaDefinition.DisableEventLog,
+	Immutable: SchemaDefinition.Immutable,
 	OrderBy: SchemaDefinition.OrderBy,
 	// Model field factories
 	column: SchemaDefinition.column,

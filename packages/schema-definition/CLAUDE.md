@@ -27,6 +27,7 @@ Relation methods: `.inversedBy()`, `.joiningColumn()`, `.onDelete()` / `.cascade
 - `@View(sql, { dependencies?, idSource?, materialized? })` — database view
 - `@OrderBy(field, direction)` — default ordering
 - `@DisableEventLog()` — disable audit triggers
+- `@Immutable()` — mark entity immutable: Content API generates no create/update/delete mutations (rows written only by the engine, e.g. audit-log target); like `@View` but a real table. Sets `Model.Entity.immutable`.
 
 ## ACL Definition
 

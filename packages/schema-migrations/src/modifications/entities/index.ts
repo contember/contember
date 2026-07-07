@@ -1,6 +1,7 @@
 export * from './CreateEntityModification.js'
 export * from './CreateViewModification.js'
 export * from './RemoveEntityModification.js'
+export * from './ToggleEntityImmutableModification.js'
 export * from './ToggleEventLogModification.js'
 export * from './UpdateEntityNameModification.js'
 export * from './UpdateEntityTableNameModification.js'

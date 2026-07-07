@@ -382,6 +382,27 @@
         "pg": "catalog:",
       },
     },
+    "packages/engine-scheduler": {
+      "name": "@contember/engine-scheduler",
+      "version": "2.2.0-alpha.3",
+      "dependencies": {
+        "@contember/database": "workspace:*",
+        "@contember/database-migrations": "workspace:*",
+        "@contember/engine-common": "workspace:*",
+        "@contember/engine-http": "workspace:*",
+        "@contember/engine-plugins": "workspace:*",
+        "@contember/engine-system-api": "workspace:*",
+        "@contember/logger": "workspace:*",
+        "@contember/typesafe": "workspace:*",
+        "prom-client": "catalog:",
+      },
+      "devDependencies": {
+        "@types/bun": "catalog:",
+      },
+      "peerDependencies": {
+        "pg": "catalog:",
+      },
+    },
     "packages/engine-server": {
       "name": "@contember/engine-server",
       "version": "2.2.0-alpha.3",
@@ -390,6 +411,7 @@
         "@contember/engine-http": "workspace:*",
         "@contember/engine-plugins": "workspace:*",
         "@contember/engine-s3-plugin": "workspace:*",
+        "@contember/engine-scheduler": "workspace:*",
         "@contember/engine-vimeo-plugin": "workspace:*",
         "graphql": "catalog:",
         "pg": "catalog:",
@@ -1442,6 +1464,8 @@
     "@contember/engine-plugins": ["@contember/engine-plugins@workspace:packages/engine-plugins"],
 
     "@contember/engine-s3-plugin": ["@contember/engine-s3-plugin@workspace:packages/engine-s3-plugin"],
+
+    "@contember/engine-scheduler": ["@contember/engine-scheduler@workspace:packages/engine-scheduler"],
 
     "@contember/engine-server": ["@contember/engine-server@workspace:packages/engine-server"],
 

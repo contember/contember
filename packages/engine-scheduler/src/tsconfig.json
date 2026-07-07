@@ -1,0 +1,16 @@
+{
+	"extends": "../tsconfig.settings.json",
+	"compilerOptions": {
+		"outDir": "../dist/types"
+	},
+	"references": [
+		{ "path": "../../../packages/database/src" },
+		{ "path": "../../../packages/database-migrations/src" },
+		{ "path": "../../../packages/engine-common/src" },
+		{ "path": "../../../packages/engine-http/src" },
+		{ "path": "../../../packages/engine-plugins/src" },
+		{ "path": "../../../packages/engine-system-api/src" },
+		{ "path": "../../../packages/logger/src" },
+		{ "path": "../../../packages/typesafe/src" }
+	]
+}

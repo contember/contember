@@ -72,6 +72,9 @@
 			"path": "./packages/engine-s3-plugin"
 		},
 		{
+			"path": "./packages/engine-scheduler"
+		},
+		{
 			"path": "./packages/engine-server"
 		},
 		{

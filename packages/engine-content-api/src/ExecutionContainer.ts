@@ -92,6 +92,8 @@ export interface ExecutionContainer {
 	validationResolver: ValidationResolver
 	refreshViewResolver: RefreshViewResolver
 	triggeredActionsCollector: TriggeredActionsCollector | undefined
+	/** Exposed so engine-internal callers (e.g. retention's `content` strategy) can run `Mapper` ops in a transaction, below the GraphQL layer. */
+	mapperFactory: MapperFactory
 }
 
 export type ExecutionContainerBuilder = ReturnType<ExecutionContainerFactory['createBuilderInternal']>
@@ -303,6 +305,7 @@ export class ExecutionContainerFactory {
 			'mutationResolver',
 			'refreshViewResolver',
 			'triggeredActionsCollector',
+			'mapperFactory',
 		)
 	}
 }

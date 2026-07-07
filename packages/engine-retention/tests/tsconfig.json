@@ -1,0 +1,10 @@
+{
+	"extends": "../tsconfig.settings.json",
+	"compilerOptions": {
+		"outDir": "../dist/tests"
+	},
+	"references": [
+		{ "path": "../src" },
+		{ "path": "../../../packages/schema-definition/src" }
+	]
+}

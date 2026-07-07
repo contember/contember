@@ -18,6 +18,7 @@ export {
 	BeforeInsertEvent,
 	BeforeJunctionUpdateEvent,
 	BeforeUpdateEvent,
+	createWhereBuilder,
 	type DataModificationEvent,
 	EventManager,
 	type ExecutionContainer,

@@ -5,7 +5,8 @@ import { Path, PathFactory } from './Path.js'
 import { JoinBuilder } from './JoinBuilder.js'
 import { ConditionBuilder } from './ConditionBuilder.js'
 import { ConditionBuilder as SqlConditionBuilder, Literal, Operator, QueryBuilder, SelectBuilder, wrapIdentifier } from '@contember/database'
-import { WhereOptimizationHints, WhereOptimizer } from './optimizer/WhereOptimizer.js'
+import { WhereOptimizationHints, WhereOptimizer, WhereOptimizerOptions } from './optimizer/WhereOptimizer.js'
+import { ConditionOptimizer } from './optimizer/ConditionOptimizer.js'
 
 export class WhereBuilder {
 	constructor(
@@ -379,3 +380,23 @@ export class WhereBuilder {
 }
 
 export type WhereJoinDefinition = { path: Path; entity: Model.Entity; relationName: string }
+
+/**
+ * Builds a standalone {@link WhereBuilder} for a model — the same `Input.Where` → SQL compilation the
+ * content pipeline uses, but without an {@link ExecutionContainer} or any ACL/predicate wiring. Lets
+ * engine-internal consumers (e.g. `engine-retention`) compile a literal-valued `Input.Where` onto a
+ * raw SelectBuilder. The result carries no permission injection — the caller is responsible for that.
+ */
+export const createWhereBuilder = (
+	model: Model.Schema,
+	useExistsInHasManyFilter = false,
+	optimizerOptions?: WhereOptimizerOptions,
+): WhereBuilder =>
+	new WhereBuilder(
+		model,
+		new JoinBuilder(model),
+		new ConditionBuilder(),
+		new PathFactory(),
+		new WhereOptimizer(model, new ConditionOptimizer(), optimizerOptions),
+		useExistsInHasManyFilter,
+	)

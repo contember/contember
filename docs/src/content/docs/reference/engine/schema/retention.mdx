@@ -1,0 +1,224 @@
+---
+title: Retention
+---
+
+# <span className="version">Engine EE 2.2+</span> Retention
+
+**Retention** is scheduled, predicate-based deletion — a "cleanup" policy attached to an
+entity that periodically prunes rows matching a condition. An internal cron scheduler runs
+the policies in the background; you never write the delete yourself, you only declare *what*
+to keep and *how often* to sweep.
+
+Typical use cases:
+
+- **Prune audit logs** — drop [audit-log](/reference/engine/actions/audit-log) rows older
+  than your retention window (e.g. 90 days).
+- **Hard-delete soft-deleted rows** — permanently remove rows that were soft-deleted (flagged)
+  long enough ago.
+- **Expire temporary data** — delete one-time tokens, verification codes or scratch rows once
+  they are past their expiry.
+
+:::caution
+Retention is **destructive and irreversible**: it issues real `DELETE`s that Contember will
+not undo. The default `raw` strategy also **bypasses ACL and Actions** (see
+[Strategies](#strategies)). Always bound a policy with a predicate, test it against a small
+`maxPerRun`, and keep backups for anything you cannot afford to lose.
+:::
+
+## Defining a policy
+
+Attach a policy to an entity with the `@c.Retention` decorator:
+
+```typescript
+import { c } from '@contember/schema-definition'
+
+@c.Retention({
+  olderThan: { field: 'expiresAt', interval: '30 days' },
+})
+export class VerificationToken {
+  value = c.stringColumn()
+  expiresAt = c.dateTimeColumn()
+}
+```
+
+This prunes every `VerificationToken` whose `expiresAt` is more than 30 days in the past,
+on the default schedule.
+
+:::note[Remember to migrate]
+A retention policy is part of the schema, so adding or changing one is a schema change like
+any other — create and apply a [migration](/reference/engine/migrations/overview). The
+policy itself creates no tables and runs no SQL at migration time; it only takes effect once
+the scheduler picks it up.
+:::
+
+Unlike `@c.AuditLog`, the policy applies to the entity it decorates — there is no sink
+reference. You may declare **multiple policies on one entity** (each must have a unique
+name).
+
+## Options
+
+```typescript
+@c.Retention({
+  name: 'prune-used-tokens',
+  olderThan: { field: 'usedAt', interval: '7 days' },
+  where: { used: { eq: true } },
+  schedule: { everyMinutes: 60 },
+  strategy: 'raw',
+  batchSize: 5000,
+  maxPerRun: 1_000_000,
+})
+```
+
+| Option | Type | Default | Meaning |
+|---|---|---|---|
+| `name` | `string` | `<entity_snake_case>_retention` | Policy name, unique within the schema. |
+| `olderThan` | `{ field, interval }` | — | Age cutoff — see [Predicate](#predicate). |
+| `where` | Content-API filter | — | Extra condition — see [Predicate](#predicate). |
+| `schedule` | cron / interval | config default | When it runs — see [Schedule](#schedule). |
+| `strategy` | `'raw' \| 'content'` | `'raw'` | How rows are deleted — see [Strategies](#strategies). |
+| `batchSize` | `number` | `1000` | Rows deleted per batch (`LIMIT`). Must be positive. |
+| `maxPerRun` | `number` | `100000` | Safety cap on rows deleted per policy, per stage, per run. Must be positive. |
+
+## Predicate
+
+A policy needs at least one predicate — `olderThan`, `where`, or both. **A predicate-less
+policy is a schema error**, because it would delete every row of the table.
+
+### `olderThan`
+
+`olderThan` is sugar for `field < now() - interval`:
+
+- `field` must be a **`DateTime` column** of the entity.
+- `interval` is a **Postgres interval string** — `'30 days'`, `'6 months'`, `'1 hour'`, etc.
+  It is bound as a parameter and cast to `interval` in SQL, so it is not vulnerable to
+  injection.
+
+```typescript
+@c.Retention({
+  olderThan: { field: 'createdAt', interval: '90 days' },
+})
+export class LogLine {
+  message = c.stringColumn()
+  createdAt = c.dateTimeColumn().default('now')
+}
+```
+
+### `where`
+
+`where` is a regular [Content-API filter](/reference/engine/content/queries) over the entity,
+using **literal values only**. When both are given, `where` is **ANDed** with `olderThan`:
+
+```typescript
+// delete only *used* tokens that are also older than 7 days
+@c.Retention({
+  olderThan: { field: 'createdAt', interval: '7 days' },
+  where: { used: { eq: true } },
+})
+export class OneTimeToken {
+  used = c.boolColumn().default(false)
+  createdAt = c.dateTimeColumn().default('now')
+}
+```
+
+## Schedule
+
+`schedule` controls how often the policy sweeps. It is either a **cron string** or an
+**interval object**:
+
+```typescript
+schedule: { cron: '17 3 * * *' }   // every day at 03:17 (UTC)
+schedule: { everyMinutes: 60 }     // once an hour
+schedule: { everySeconds: 30 }     // twice a minute
+```
+
+Cron is a standard 5-field expression evaluated in **UTC**. When `schedule` is omitted, the
+policy uses the engine's configured default schedule (see [Configuration](#configuration)).
+
+## Strategies
+
+### `raw` (default)
+
+`raw` issues a **batched SQL `DELETE`** directly against the table. It is engine-internal, so:
+
+- It **bypasses content ACL** and the [immutability](/reference/engine/actions/audit-log#immutability)
+  gate — the same trust model as the audit-log writer. This is what lets it prune otherwise
+  append-only entities.
+- **Database-level foreign-key actions still fire**, because they are Postgres constraints, not
+  application logic: `onDelete` **cascade** / **set-null** and junction-row cleanup all happen
+  at the DB level exactly as they would for any delete.
+- The [event-log](/reference/engine/content/event-log) trigger still fires (unless the entity
+  opts out with `@c.DisableEventLog`), because it too is a DB trigger.
+- **Actions triggers do not fire.** A `raw` prune does *not* run
+  [`@c.Watch` / `@c.Trigger`](/reference/engine/actions/definition) triggers, and application-level
+  `removeOrphan` is **skipped**.
+
+That trade-off is intentional: retention is garbage collection, not a business mutation. If you
+need pruned deletes to fire Actions and honor `removeOrphan`, that is what the `content` strategy
+is for.
+
+Deletion is batched: each run deletes up to `batchSize` rows at a time and loops until a batch
+comes back short (nothing left) or `maxPerRun` is reached, keeping any single transaction bounded
+on large tables.
+
+### `content` (planned)
+
+:::note[Not yet available]
+`strategy: 'content'` is **not implemented yet**. Declaring it is accepted by the schema, but a
+policy that runs with it currently fails at execution with a "not yet implemented" error. Use
+`raw` for now.
+:::
+
+The planned `content` strategy will delete through the full content pipeline (with a privileged
+system identity), so that Actions delete triggers, application-level `removeOrphan` and ACL-aware
+cascade traversal all run — at the cost of the extra work per row.
+
+## Validation
+
+Policies are checked at schema build time. It is an error to:
+
+- reference an entity that does not exist, or reuse a policy `name`;
+- declare **no predicate** (`olderThan` and `where` both absent);
+- point `olderThan.field` at a missing field or a non-`DateTime` column, or give an empty interval;
+- give an invalid `where` for the entity, or an invalid / non-positive `schedule`;
+- set a non-positive `batchSize` or `maxPerRun`.
+
+There is also a `raw`-specific check: if a **`restrict` foreign key points *at* the pruned
+entity**, a `raw` delete would fail at runtime as soon as a referencing row exists. This is
+flagged as a schema error — switch that relation's
+[`onDelete`](/reference/engine/schema/relationships) to cascade / set-null, or use the `content`
+strategy once available.
+
+## The scheduler
+
+Retention policies are executed by Contember's internal **cron scheduler**, a background worker
+that ticks on a low base interval and fires each policy when its schedule is due. It is:
+
+- **Cluster-safe** — each run is taken under a per-(project, job) Postgres advisory lock, so only
+  one node in a cluster runs a given policy at a time.
+- **Restart-tolerant** — the last run of each policy is persisted (per project, per stage), so
+  cron/interval due-checks survive restarts and a fresh deploy does not replay history.
+- **Per stage** — a policy runs independently against **every stage** of the project.
+
+If a policy run fails, the error is logged and the run window advances anyway, so a failing policy
+backs off to its next scheduled window rather than retrying every tick.
+
+## Configuration
+
+The scheduler and retention defaults live in the server configuration:
+
+```yaml
+scheduler:
+  enabled: true          # register the scheduler worker at all (default: true)
+  baseTickSeconds: 60    # how often each project loop re-evaluates jobs (default: 60)
+  defaultSchedule:       # fallback schedule for jobs that declare none
+    everyMinutes: 60
+
+retention:
+  defaultSchedule:       # fallback for policies without their own `schedule`
+    everyMinutes: 60
+  batchSize: 1000        # default per-batch LIMIT
+  maxPerRun: 100000      # default per-policy, per-stage, per-run cap
+```
+
+Per-policy `schedule`, `batchSize` and `maxPerRun` override these defaults. Invalid values fail
+fast at startup.

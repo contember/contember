@@ -214,6 +214,9 @@
 		},
 		{
 			"path": "./packages/engine-scheduler"
+		},
+		{
+			"path": "./packages/engine-retention"
 		}
 	]
 }

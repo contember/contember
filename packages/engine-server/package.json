@@ -26,6 +26,7 @@
     "@contember/engine-actions": "workspace:*",
     "@contember/engine-http": "workspace:*",
     "@contember/engine-plugins": "workspace:*",
+    "@contember/engine-retention": "workspace:*",
     "@contember/engine-s3-plugin": "workspace:*",
     "@contember/engine-scheduler": "workspace:*",
     "@contember/engine-vimeo-plugin": "workspace:*",

@@ -4,6 +4,7 @@ import { AclValidator } from './AclValidator.js'
 import { ModelValidator } from './ModelValidator.js'
 import { ValidationValidator } from './ValidationValidator.js'
 import { ActionsValidator } from './ActionsValidator.js'
+import { RetentionValidator } from './RetentionValidator.js'
 
 export interface SchemaValidatorSkippedErrors {
 	readonly code: ValidationErrorCode
@@ -25,7 +26,10 @@ export class SchemaValidator {
 		const actionsValidator = new ActionsValidator(schema.model)
 		const actionsErrors = actionsValidator.validate(schema.actions)
 
-		const allErrors = [...aclErrors, ...modelErrors, ...validationErrors, ...actionsErrors]
+		const retentionValidator = new RetentionValidator(schema.model)
+		const retentionErrors = retentionValidator.validate(schema.retention)
+
+		const allErrors = [...aclErrors, ...modelErrors, ...validationErrors, ...actionsErrors, ...retentionErrors]
 		if (skippedErrors.length === 0) {
 			return allErrors
 		}

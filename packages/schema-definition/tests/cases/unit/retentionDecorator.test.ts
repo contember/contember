@@ -148,3 +148,16 @@ test('@Retention: raw strategy is fine without restrict relations', () => {
 	const schema = createSchema(RestrictModelClean)
 	expect(SchemaValidator.validate(schema).filter(it => it.code === 'RETENTION_RAW_RESTRICT_RELATION')).toStrictEqual([])
 })
+
+namespace EmptyPredicateModel {
+	// No olderThan and no where — would prune the whole table; must be a schema error.
+	@c.Retention({})
+	export class Article {
+		createdAt = c.dateTimeColumn()
+	}
+}
+
+test('@Retention: a policy must set olderThan and/or where', () => {
+	const schema = createSchema(EmptyPredicateModel)
+	expect(SchemaValidator.validate(schema).map(it => it.code)).toContain('RETENTION_EMPTY_PREDICATE')
+})

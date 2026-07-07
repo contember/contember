@@ -26,6 +26,14 @@ export class RetentionValidator {
 			return
 		}
 
+		// A policy with no predicate would prune every row of the table — require a bound.
+		if (policy.olderThan === undefined && policy.where === undefined) {
+			errorBuilder.add(
+				'RETENTION_EMPTY_PREDICATE',
+				`Retention policy ${policy.name} on ${entity.name} must set olderThan and/or where; a predicate-less policy would delete every row.`,
+			)
+		}
+
 		if (policy.olderThan !== undefined) {
 			this.validateOlderThan(entity, policy.olderThan, errorBuilder.for('olderThan'))
 		}

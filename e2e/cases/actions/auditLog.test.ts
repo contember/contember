@@ -19,6 +19,7 @@ namespace SyncAuditModel {
 		title = def.stringColumn().unique()
 	}
 
+	@def.Immutable()
 	export class AuditLog {
 		createdAt = def.dateTimeColumn().notNull().default('now')
 		transactionId = def.uuidColumn().notNull()
@@ -49,6 +50,7 @@ namespace AsyncAuditModel {
 		title = def.stringColumn().unique()
 	}
 
+	@def.Immutable()
 	export class AuditLog {
 		createdAt = def.dateTimeColumn().notNull().default('now')
 		transactionId = def.uuidColumn().notNull()
@@ -213,4 +215,21 @@ test('audit log: @AuditLog writes to an explicit sink entity end-to-end', async 
 	expect(rows[0].trigger).toBe('article_audit')
 	expect(rows[0].article.id).toBe(articleId)
 	expect(rows[0].data.events[0].operation).toBe('create')
+
+	// The sink is immutable (extends AuditLogEntity): the Content API exposes no
+	// create/update/delete mutations for it, so no role can forge, tamper or destroy rows.
+	const forge = await tester(gql`
+		mutation { createArticleAuditLog(data: { rootEntity: "Article", rootId: "x", data: "{}" }) { ok } }
+	`).expect(400)
+	expect(forge.body.errors[0].message).toContain('createArticleAuditLog')
+
+	const tamper = await tester(gql`
+		mutation { updateArticleAuditLog(by: { id: "${articleId}" }, data: { rootEntity: "x" }) { ok } }
+	`).expect(400)
+	expect(tamper.body.errors[0].message).toContain('updateArticleAuditLog')
+
+	const destroy = await tester(gql`
+		mutation { deleteArticleAuditLog(by: { id: "${articleId}" }) { ok } }
+	`).expect(400)
+	expect(destroy.body.errors[0].message).toContain('deleteArticleAuditLog')
 })

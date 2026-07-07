@@ -49,11 +49,19 @@ external-worker → content-mutation round-trip that projects used to hand-build
   not a string — resolved to the entity name in `schema-definition`'s `ActionsFactory`. The sink
   is an explicit content entity in the model; extend `c.AuditLogEntity` for the default
   fields/indexes or define a compatible entity by hand for custom ACL/indexes.
+- **Append-only by construction, not by ACL:** `c.AuditLogEntity` applies `@Immutable()`
+  (Content API generates no create/update/delete mutations — enforced in content-api
+  `EntityInputProvider`/`MutationProvider`, independent of ACL, so not even built-in
+  `admin`/`content_admin` can forge/tamper/destroy) and `@DisableEventLog()` (the audit
+  rows *are* the log). Retention is DB-level only (no delete mutation). A hand-written
+  sink should add `@c.Immutable()` itself.
 - **Explicit:** `c.createAuditLogTarget({ entity, synchronous? })` + `@c.Watch({ ..., withNodes: true, target })`.
   Target type `auditLog`; `entity` likewise a class reference/thunk. The resolved schema keeps a plain name.
 - The sink entity's shape is validated against `@contember/schema-utils` `auditLogColumns`
   (single source of truth) by `ActionsValidator` — required `transactionId`/`rootEntity`/`rootId`/`data`,
-  optional-but-typed `identityId`/`trigger`/`nodes`/`createdAt`.
+  optional-but-typed `identityId`/`trigger`/`nodes`/`createdAt`. The sink must also be
+  `immutable` (`ACTIONS_AUDIT_LOG_MUTABLE_ENTITY` otherwise) — enforces append-only even for
+  hand-written sinks that forget `@Immutable()`.
 - Writes go through `audit/AuditLogWriter.ts` — a raw `InsertBuilder` into the entity's
   table that **bypasses content ACL by construction** (like `TriggerPayloadPersister`
   writes `actions_event`), so no application role can forge rows. Actor `identityId` is

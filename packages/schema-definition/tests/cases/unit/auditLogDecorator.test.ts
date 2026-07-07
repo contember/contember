@@ -31,7 +31,14 @@ test('@AuditLog wires an explicit sink entity, watch trigger and target', () => 
 	expect(auditLog.fields.rootId.type).toBe(Model.ColumnType.String)
 	expect(auditLog.fields.transactionId.type).toBe(Model.ColumnType.Uuid)
 
-	// Indexes: eventNo, (rootEntity, rootId) btree + GIN on nodes.
+	// Event log is disabled on the sink (inherited from AuditLogEntity) — no double logging.
+	expect(auditLog.eventLog.enabled).toBe(false)
+
+	// Immutable (inherited from AuditLogEntity) — Content API generates no create/update/delete.
+	expect(auditLog.immutable).toBe(true)
+
+	// Indexes: createdAt, eventNo, (rootEntity, rootId) btree + GIN on nodes.
+	expect(auditLog.indexes.some(it => it.fields.join(',') === 'createdAt')).toBe(true)
 	expect(auditLog.indexes.some(it => it.fields.join(',') === 'eventNo')).toBe(true)
 	expect(auditLog.indexes.some(it => it.fields.join(',') === 'rootEntity,rootId')).toBe(true)
 	expect(auditLog.indexes.some(it => it.fields.join(',') === 'nodes' && it.method === 'gin')).toBe(true)
@@ -109,6 +116,7 @@ namespace UserSinkModel {
 	}
 
 	// Custom sink with an extra column.
+	@c.Immutable()
 	export class MyAudit {
 		createdAt = c.dateTimeColumn().notNull().default('now')
 		transactionId = c.uuidColumn().notNull()
@@ -123,6 +131,26 @@ test('@AuditLog: a user-defined sink entity is left untouched', () => {
 	const schema = createSchema(UserSinkModel)
 	expect(schema.model.entities['MyAudit'].fields.customField).toBeDefined()
 	expect(SchemaValidator.validate(schema).filter(it => it.code.startsWith('ACTIONS_AUDIT_LOG'))).toStrictEqual([])
+})
+
+namespace MutableSinkModel {
+	@c.AuditLog({ watch: `title`, entity: () => MutableAudit })
+	export class Article {
+		title = c.stringColumn()
+	}
+
+	// Valid columns, but NOT immutable — the Content API would expose create/update/delete.
+	export class MutableAudit {
+		transactionId = c.uuidColumn().notNull()
+		rootEntity = c.stringColumn().notNull()
+		rootId = c.stringColumn().notNull()
+		data = c.jsonColumn().notNull()
+	}
+}
+
+test('audit-log sink must be immutable', () => {
+	const schema = createSchema(MutableSinkModel)
+	expect(SchemaValidator.validate(schema).map(it => it.code)).toContain('ACTIONS_AUDIT_LOG_MUTABLE_ENTITY')
 })
 
 namespace BadSinkModel {

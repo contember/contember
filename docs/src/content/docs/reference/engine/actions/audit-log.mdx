@@ -17,9 +17,11 @@ about. The acting identity is captured natively, and the write can optionally ru
 the very same transaction as the change it records.
 
 :::note
-An audit-log target writes with full permissions, **bypassing content ACL by
-construction**, so no application role can forge or tamper with the rows. Reading the
-audit entity, on the other hand, is governed by regular ACL — see
+Audit rows are written by the engine with full permissions, **bypassing content ACL by
+construction**, and the sink entity is **[immutable](#immutability)** — the Content API
+generates no create/update/delete mutations for it, regardless of role. So no application
+role (not even a built-in admin) can forge, tamper with or destroy rows. Reading the audit
+entity, on the other hand, is governed by regular ACL — see
 [Reading the audit log](#reading-the-audit-log).
 :::
 
@@ -117,10 +119,17 @@ works when the sink is declared first.
 - `selection` (optional): a custom payload selection, like on `@c.Watch`.
 - `priority` (optional): event priority in the dispatch queue.
 
-`c.AuditLogEntity` carries the [convention columns](#the-audit-entity) plus an
-`eventNo` index, a `(rootEntity, rootId)` index and a GIN index on `nodes`. You still
-declare a concrete entity so ACL, extra columns, relations and project-specific indexes
-stay visible in the schema source.
+`c.AuditLogEntity` carries the [convention columns](#the-audit-entity) plus indexes on
+`createdAt` and `eventNo` (the time/order columns the read examples below use), a
+`(rootEntity, rootId)` index and a GIN index on `nodes`. You still declare a concrete
+entity so ACL, extra columns, relations and project-specific indexes stay visible in the
+schema source — add your own index for any read pattern the defaults don't cover (e.g.
+`identityId` to query by actor, or `transactionId` to group a single mutation's rows).
+
+It also disables the [event log](/reference/engine/content/event-log) on the sink
+(equivalent to [`@c.DisableEventLog`](/reference/engine/schema/entities)) — the audit rows
+*are* the log, so event-logging their own inserts would only double-record them. A
+hand-written sink should do the same.
 
 :::note[Remember to migrate]
 The sink is an ordinary content entity, so adding or changing it is a schema change like
@@ -150,8 +159,9 @@ content entity.
 | `createdAt` | `dateTimeColumn` | no | When the row was written. Give it `.default('now')`. |
 
 A sink is validated against this exact spec at schema build time: a missing
-**required** column, a column with the wrong type, or an `eventNo` that is present but not
-backed by a sequence (`.sequence()`) is a schema error.
+**required** column, a column with the wrong type, an `eventNo` that is present but not
+backed by a sequence (`.sequence()`), or a sink that is **not [immutable](#immutability)**
+is a schema error.
 
 The default sink shape is:
 
@@ -354,6 +364,24 @@ export class AuditLog extends c.AuditLogEntity {
 
 All referencing targets validate against the same explicit sink entity.
 
+## Immutability
+
+A sink extending `c.AuditLogEntity` is marked **immutable**: the Content API generates
+**no `create`, `update` or `delete` mutations** for it — the same way a
+[`@c.View`](/reference/engine/schema/entities) entity is non-mutable, but backed by a real
+table. This holds regardless of ACL — not even the built-in `admin` / `content_admin` roles
+can write to the sink through the API. Rows are written **only** by the engine's audit-log
+target, so the trail cannot be forged, edited or deleted by any application role.
+
+That is what makes the table genuinely append-only, rather than "append-only as long as
+the ACL is set up correctly". The trade-off: with no `delete` mutation either, you cannot
+prune the trail through the Content API — retention happens at the database level instead,
+see [Retention](#retention).
+
+Immutability is **required**, not optional: an audit-log target whose sink is not immutable
+is a schema error. If you hand-write a sink instead of extending `c.AuditLogEntity`, add
+`@c.Immutable()` yourself.
+
 ## Reading the audit log
 
 The audit entity is a normal content entity, so you query it through the Content API:
@@ -372,9 +400,10 @@ query {
 }
 ```
 
-Read access follows regular [ACL](/reference/engine/schema/acl). Because writes bypass
-ACL, you never need `create`/`update` permissions on the audit entity — grant only the
-`read` permission, to the roles that should be able to inspect the trail:
+Read access follows regular [ACL](/reference/engine/schema/acl). The sink is
+[immutable](#immutability), so the Content API exposes no create/update/delete for it —
+there is nothing to grant beyond `read`. Grant it to the roles that should be able to
+inspect the trail:
 
 ```typescript
 import { c } from '@contember/schema-definition'
@@ -394,4 +423,26 @@ be readable by accident.
 :::caution[Direct database changes]
 As with all Actions, only changes made **through the Contember API** are audited.
 Data modified directly in the database, bypassing the engine, produces no audit rows.
+:::
+
+## Retention
+
+An audit trail grows without bound — one row per watched change, kept forever — and
+Contember does **not** prune it for you. Because the sink is [immutable](#immutability) it
+has no `delete` mutation, so you cannot prune it through the Content API; retention happens
+at the **database level**, outside the engine:
+
+- **Bulk SQL delete** — a periodic `DELETE FROM … WHERE created_at < …` (e.g. older than
+  *now − 90 days*). The base `c.AuditLogEntity` indexes `createdAt`, so age-based deletes
+  stay cheap.
+- **Time partitioning** — for high-throughput trails, partition the table by time and drop
+  whole old partitions, which is far cheaper than deleting row by row.
+
+Both run outside Contember, so they are not themselves audited — and, by the same token,
+they sit outside the reach of any application role.
+
+:::caution
+Pruning the trail is a sensitive operation — whoever can delete audit rows can erase
+evidence. Keeping retention at the database level, off the API surface, is deliberate:
+restrict it to your operations / DBA path.
 :::

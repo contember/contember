@@ -118,6 +118,7 @@ works when the sink is declared first.
 - `synchronous` (optional): see [Synchronous vs. asynchronous](#synchronous-vs-asynchronous).
 - `selection` (optional): a custom payload selection, like on `@c.Watch`.
 - `priority` (optional): event priority in the dispatch queue.
+- `retention` (optional): auto-prune old rows from the sink on a schedule. See [Retention](#retention).
 
 `c.AuditLogEntity` carries the [convention columns](#the-audit-entity) plus indexes on
 `createdAt` and `eventNo` (the time/order columns the read examples below use), a
@@ -428,21 +429,33 @@ Data modified directly in the database, bypassing the engine, produces no audit 
 ## Retention
 
 An audit trail grows without bound — one row per watched change, kept forever. To cap that,
-add a [`@c.Retention`](/reference/engine/schema/retention) policy to the sink entity and the
-engine prunes old rows for you on a schedule:
+pass a `retention` option to `@c.AuditLog` and the engine prunes old rows for you on a
+schedule (`olderThan.field` defaults to the sink's `createdAt`):
 
 ```typescript
-import { c } from '@contember/schema-definition'
+@c.AuditLog({
+  entity: () => ArticleAuditLog,
+  watch: `title`,
+  retention: { olderThan: { interval: '90 days' } },
+})
+export class Article {
+  title = c.stringColumn()
+}
+```
 
+This drops every `ArticleAuditLog` row older than 90 days. It is exactly sugar for a
+[`@c.Retention`](/reference/engine/schema/retention) policy on the sink — write that directly
+if you prefer, or to prune a [shared sink](#sharing-a-sink-across-entities) once:
+
+```typescript
 @c.Retention({ olderThan: { field: 'createdAt', interval: '90 days' } })
 export class AuditLog extends c.AuditLogEntity {
 }
 ```
 
-This drops every audit row older than 90 days. The base `c.AuditLogEntity` indexes
-`createdAt`, so the age-based delete stays cheap. See
+The base `c.AuditLogEntity` indexes `createdAt`, so the age-based delete stays cheap. See
 [Retention](/reference/engine/schema/retention) for the full option set (schedule, `where`,
-batching) and the scheduler's semantics.
+`strategy`, batching) and the scheduler's semantics.
 
 :::note[Immutable, yet still pruned]
 The sink is [immutable](#immutability), so the Content API exposes no `delete` mutation — you

@@ -40,6 +40,9 @@ test('basic createSchema test', () => {
 			'targets': {},
 			'triggers': {},
 		},
+		'retention': {
+			'policies': {},
+		},
 		'model': {
 			'entities': {
 				'Book': {

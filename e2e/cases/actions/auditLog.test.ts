@@ -224,12 +224,12 @@ test('audit log: @AuditLog writes to an explicit sink entity end-to-end', async 
 	expect(forge.body.errors[0].message).toContain('createArticleAuditLog')
 
 	const tamper = await tester(gql`
-		mutation { updateArticleAuditLog(by: { id: "${articleId}" }, data: { rootEntity: "x" }) { ok } }
+		mutation { updateArticleAuditLog(by: { id: "x" }, data: { rootEntity: "x" }) { ok } }
 	`).expect(400)
 	expect(tamper.body.errors[0].message).toContain('updateArticleAuditLog')
 
 	const destroy = await tester(gql`
-		mutation { deleteArticleAuditLog(by: { id: "${articleId}" }) { ok } }
+		mutation { deleteArticleAuditLog(by: { id: "x" }) { ok } }
 	`).expect(400)
 	expect(destroy.body.errors[0].message).toContain('deleteArticleAuditLog')
 })

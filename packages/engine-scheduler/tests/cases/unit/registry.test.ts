@@ -23,7 +23,12 @@ describe('ScheduledJobRegistry', () => {
 	test('a registered no-op job can be ticked', async () => {
 		const registry = new ScheduledJobRegistry()
 		let ticked = 0
-		const job = { name: 'noop', run: async () => { ticked++ } }
+		const job = {
+			name: 'noop',
+			run: async () => {
+				ticked++
+			},
+		}
 		registry.register(job)
 
 		// The scheduler loop would iterate list() and invoke each job's run under a lock.

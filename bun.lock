@@ -384,7 +384,6 @@
         "@contember/engine-plugins": "workspace:*",
         "@contember/engine-scheduler": "workspace:*",
         "@contember/engine-system-api": "workspace:*",
-        "@contember/logger": "workspace:*",
         "@contember/schema": "workspace:*",
         "@contember/schema-utils": "workspace:*",
         "prom-client": "catalog:",
@@ -430,7 +429,6 @@
         "@contember/engine-plugins": "workspace:*",
         "@contember/engine-system-api": "workspace:*",
         "@contember/logger": "workspace:*",
-        "@contember/typesafe": "workspace:*",
         "prom-client": "catalog:",
       },
       "devDependencies": {

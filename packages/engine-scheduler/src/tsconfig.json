@@ -10,7 +10,6 @@
 		{ "path": "../../../packages/engine-http/src" },
 		{ "path": "../../../packages/engine-plugins/src" },
 		{ "path": "../../../packages/engine-system-api/src" },
-		{ "path": "../../../packages/logger/src" },
-		{ "path": "../../../packages/typesafe/src" }
+		{ "path": "../../../packages/logger/src" }
 	]
 }

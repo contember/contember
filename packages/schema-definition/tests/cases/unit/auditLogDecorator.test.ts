@@ -262,3 +262,27 @@ test('audit-log eventNo must be backed by a sequence when present', () => {
 	const errors = SchemaValidator.validate(schema)
 	expect(errors.map(it => it.code)).toContain('ACTIONS_AUDIT_LOG_INVALID_COLUMN')
 })
+
+namespace RetentionSugarModel {
+	@c.AuditLog({ watch: `title`, entity: () => ArticleAuditLog, retention: { olderThan: { interval: '90 days' } } })
+	export class Article {
+		title = c.stringColumn()
+	}
+
+	export class ArticleAuditLog extends c.AuditLogEntity {
+	}
+}
+
+test('@AuditLog: retention sugar emits a policy on the sink (createdAt default)', () => {
+	const schema = createSchema(RetentionSugarModel)
+
+	// Policy targets the SINK, not the audited entity, with olderThan.field defaulted to createdAt.
+	const policy = schema.retention.policies['article_audit_log_retention']
+	expect(policy).toBeDefined()
+	expect(policy).toMatchObject({
+		entity: 'ArticleAuditLog',
+		strategy: 'raw',
+		olderThan: { field: 'createdAt', interval: '90 days' },
+	})
+	expect(SchemaValidator.validate(schema).filter(it => it.code.startsWith('RETENTION'))).toStrictEqual([])
+})

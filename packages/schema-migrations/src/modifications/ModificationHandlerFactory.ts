@@ -35,6 +35,7 @@ import { createTriggerModification, patchTriggerModification, removeTriggerModif
 import { createTargetModification } from './actions/CreateTargetModification.js'
 import { removeTargetModification } from './actions/RemoveTargetModification.js'
 import { updateTargetModification } from './actions/UpdateTargetModification.js'
+import { createRetentionPolicyModification, removeRetentionPolicyModification, updateRetentionPolicyModification } from './retention/index.js'
 import { updateEntityOrderByModification } from './entities/UpdateEntityOrderByModification.js'
 import { toggleEntityImmutableModification } from './entities/ToggleEntityImmutableModification.js'
 import { removeIndexNamesModification } from './upgrade/RemoveIndexNamesModification.js'
@@ -102,6 +103,9 @@ namespace ModificationHandlerFactory {
 		createTargetModification,
 		updateTargetModification,
 		removeTargetModification,
+		createRetentionPolicyModification,
+		updateRetentionPolicyModification,
+		removeRetentionPolicyModification,
 	]
 
 	export const defaultFactoryMap: HandlerMap<any> = Object.fromEntries(handlers.map(it => [it.id, it]))

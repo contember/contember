@@ -186,6 +186,32 @@ export const serverConfigSchema = Typesafe.partial({
 			maxCrossOptimizationInput: Typesafe.number,
 		}),
 	}),
+	// Consumed by the engine-scheduler plugin. Kept as loose primitives here (engine-http must not
+	// depend on the plugin); the plugin validates/normalizes `defaultSchedule` into its Schedule type.
+	scheduler: Typesafe.partial({
+		enabled: Typesafe.boolean,
+		baseTickSeconds: Typesafe.number,
+		defaultSchedule: Typesafe.union(
+			Typesafe.string,
+			Typesafe.partial({
+				everySeconds: Typesafe.number,
+				everyMinutes: Typesafe.number,
+			}),
+		),
+	}),
+	// Consumed by the engine-retention plugin. Kept as loose primitives here (engine-http must not
+	// depend on the plugin); the plugin validates/normalizes `defaultSchedule` into its Schedule type.
+	retention: Typesafe.partial({
+		defaultSchedule: Typesafe.union(
+			Typesafe.string,
+			Typesafe.partial({
+				everySeconds: Typesafe.number,
+				everyMinutes: Typesafe.number,
+			}),
+		),
+		batchSize: Typesafe.number,
+		maxPerRun: Typesafe.number,
+	}),
 	logging: Typesafe.union(
 		(val): { sentry?: { dsn: string } } => Typesafe.valueAt(val, ['sentry', 'dsn']) === undefined ? {} : Typesafe.fail([]),
 		Typesafe.partial({

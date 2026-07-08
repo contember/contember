@@ -123,6 +123,7 @@ export const nav: NavItem[] = [
 					doc('reference/engine/schema/acl'),
 					doc('reference/engine/schema/tenant-acl'),
 					doc('reference/engine/schema/validations'),
+					doc('reference/engine/schema/retention'),
 				],
 			},
 			{

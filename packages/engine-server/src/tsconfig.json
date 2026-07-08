@@ -7,7 +7,9 @@
 		{ "path": "../../engine-actions/src" },
 		{ "path": "../../engine-http/src" },
 		{ "path": "../../engine-plugins/src" },
+		{ "path": "../../engine-retention/src" },
 		{ "path": "../../engine-s3-plugin/src" },
+		{ "path": "../../engine-scheduler/src" },
 		{ "path": "../../engine-vimeo-plugin/src" }
 	]
 }

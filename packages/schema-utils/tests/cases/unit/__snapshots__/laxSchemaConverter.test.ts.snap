@@ -1,4 +1,4 @@
-// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+// Bun Snapshot v1, https://bun.sh/docs/test/snapshots
 
 exports[`lax schema converter basic 1`] = `
 {
@@ -60,6 +60,95 @@ exports[`lax schema converter basic 1`] = `
         "archived",
       ],
     },
+  },
+  "retention": {
+    "policies": {},
+  },
+  "settings": {},
+  "validation": {},
+}
+`;
+
+exports[`lax schema converter one-has-many 1`] = `
+{
+  "acl": {
+    "roles": {},
+  },
+  "actions": {
+    "targets": {},
+    "triggers": {},
+  },
+  "model": {
+    "entities": {
+      "Article": {
+        "eventLog": {
+          "enabled": true,
+        },
+        "fields": {
+          "category": {
+            "inversedBy": "articles",
+            "joiningColumn": {
+              "columnName": "category_id",
+              "onDelete": "restrict",
+            },
+            "name": "category",
+            "nullable": true,
+            "target": "Category",
+            "type": "ManyHasOne",
+          },
+          "id": {
+            "columnName": "id",
+            "columnType": "uuid",
+            "name": "id",
+            "nullable": false,
+            "type": "Uuid",
+          },
+          "title": {
+            "columnName": "title",
+            "columnType": "text",
+            "name": "title",
+            "nullable": false,
+            "type": "String",
+          },
+        },
+        "indexes": [],
+        "name": "Article",
+        "primary": "id",
+        "primaryColumn": "id",
+        "tableName": "article",
+        "unique": [],
+      },
+      "Category": {
+        "eventLog": {
+          "enabled": true,
+        },
+        "fields": {
+          "articles": {
+            "name": "articles",
+            "ownedBy": "category",
+            "target": "Article",
+            "type": "OneHasMany",
+          },
+          "id": {
+            "columnName": "id",
+            "columnType": "uuid",
+            "name": "id",
+            "nullable": false,
+            "type": "Uuid",
+          },
+        },
+        "indexes": [],
+        "name": "Category",
+        "primary": "id",
+        "primaryColumn": "id",
+        "tableName": "category",
+        "unique": [],
+      },
+    },
+    "enums": {},
+  },
+  "retention": {
+    "policies": {},
   },
   "settings": {},
   "validation": {},
@@ -153,88 +242,8 @@ exports[`lax schema converter many-has-many 1`] = `
     },
     "enums": {},
   },
-  "settings": {},
-  "validation": {},
-}
-`;
-
-exports[`lax schema converter one-has-many 1`] = `
-{
-  "acl": {
-    "roles": {},
-  },
-  "actions": {
-    "targets": {},
-    "triggers": {},
-  },
-  "model": {
-    "entities": {
-      "Article": {
-        "eventLog": {
-          "enabled": true,
-        },
-        "fields": {
-          "category": {
-            "inversedBy": "articles",
-            "joiningColumn": {
-              "columnName": "category_id",
-              "onDelete": "restrict",
-            },
-            "name": "category",
-            "nullable": true,
-            "target": "Category",
-            "type": "ManyHasOne",
-          },
-          "id": {
-            "columnName": "id",
-            "columnType": "uuid",
-            "name": "id",
-            "nullable": false,
-            "type": "Uuid",
-          },
-          "title": {
-            "columnName": "title",
-            "columnType": "text",
-            "name": "title",
-            "nullable": false,
-            "type": "String",
-          },
-        },
-        "indexes": [],
-        "name": "Article",
-        "primary": "id",
-        "primaryColumn": "id",
-        "tableName": "article",
-        "unique": [],
-      },
-      "Category": {
-        "eventLog": {
-          "enabled": true,
-        },
-        "fields": {
-          "articles": {
-            "name": "articles",
-            "ownedBy": "category",
-            "target": "Article",
-            "type": "OneHasMany",
-          },
-          "id": {
-            "columnName": "id",
-            "columnType": "uuid",
-            "name": "id",
-            "nullable": false,
-            "type": "Uuid",
-          },
-        },
-        "indexes": [],
-        "name": "Category",
-        "primary": "id",
-        "primaryColumn": "id",
-        "tableName": "category",
-        "unique": [],
-      },
-    },
-    "enums": {},
+  "retention": {
+    "policies": {},
   },
   "settings": {},
   "validation": {},
@@ -319,6 +328,9 @@ exports[`lax schema converter one-has-one 1`] = `
       },
     },
     "enums": {},
+  },
+  "retention": {
+    "policies": {},
   },
   "settings": {},
   "validation": {},

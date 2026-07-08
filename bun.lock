@@ -360,6 +360,28 @@
         "pg": "catalog:",
       },
     },
+    "packages/engine-retention": {
+      "name": "@contember/engine-retention",
+      "version": "2.2.0-alpha.3",
+      "dependencies": {
+        "@contember/database": "workspace:*",
+        "@contember/engine-content-api": "workspace:*",
+        "@contember/engine-http": "workspace:*",
+        "@contember/engine-plugins": "workspace:*",
+        "@contember/engine-scheduler": "workspace:*",
+        "@contember/engine-system-api": "workspace:*",
+        "@contember/schema": "workspace:*",
+        "@contember/schema-utils": "workspace:*",
+        "prom-client": "catalog:",
+      },
+      "devDependencies": {
+        "@contember/schema-definition": "workspace:*",
+        "@types/bun": "catalog:",
+      },
+      "peerDependencies": {
+        "pg": "catalog:",
+      },
+    },
     "packages/engine-s3-plugin": {
       "name": "@contember/engine-s3-plugin",
       "version": "2.2.0-alpha.3",
@@ -382,6 +404,26 @@
         "pg": "catalog:",
       },
     },
+    "packages/engine-scheduler": {
+      "name": "@contember/engine-scheduler",
+      "version": "2.2.0-alpha.3",
+      "dependencies": {
+        "@contember/database": "workspace:*",
+        "@contember/database-migrations": "workspace:*",
+        "@contember/engine-common": "workspace:*",
+        "@contember/engine-http": "workspace:*",
+        "@contember/engine-plugins": "workspace:*",
+        "@contember/engine-system-api": "workspace:*",
+        "@contember/logger": "workspace:*",
+        "prom-client": "catalog:",
+      },
+      "devDependencies": {
+        "@types/bun": "catalog:",
+      },
+      "peerDependencies": {
+        "pg": "catalog:",
+      },
+    },
     "packages/engine-server": {
       "name": "@contember/engine-server",
       "version": "2.2.0-alpha.3",
@@ -389,7 +431,9 @@
         "@contember/engine-actions": "workspace:*",
         "@contember/engine-http": "workspace:*",
         "@contember/engine-plugins": "workspace:*",
+        "@contember/engine-retention": "workspace:*",
         "@contember/engine-s3-plugin": "workspace:*",
+        "@contember/engine-scheduler": "workspace:*",
         "@contember/engine-vimeo-plugin": "workspace:*",
         "graphql": "catalog:",
         "pg": "catalog:",
@@ -1441,7 +1485,11 @@
 
     "@contember/engine-plugins": ["@contember/engine-plugins@workspace:packages/engine-plugins"],
 
+    "@contember/engine-retention": ["@contember/engine-retention@workspace:packages/engine-retention"],
+
     "@contember/engine-s3-plugin": ["@contember/engine-s3-plugin@workspace:packages/engine-s3-plugin"],
+
+    "@contember/engine-scheduler": ["@contember/engine-scheduler@workspace:packages/engine-scheduler"],
 
     "@contember/engine-server": ["@contember/engine-server@workspace:packages/engine-server"],
 

@@ -2,6 +2,7 @@ import { DecoratorFunction, EntityConstructor } from '../../utils/index.js'
 import { Actions } from '@contember/schema'
 import { watch } from './triggers.js'
 import { EntityReference } from './targets.js'
+import { AuditLogRetentionDefinition, auditLogRetentionStore } from './internal/auditLogRetentionStore.js'
 import { dateTimeColumn, DisableEventLog, Immutable, Index, intColumn, jsonColumn, stringColumn, uuidColumn } from '../../model/definition/index.js'
 
 export type AuditLogDefinition = {
@@ -18,6 +19,9 @@ export type AuditLogDefinition = {
 	readonly rootRelation?: string
 	readonly selection?: Actions.SelectionNode | string
 	readonly priority?: number
+	/** Sugar for a `@c.Retention` policy on the sink — the engine prunes old audit rows on a schedule.
+	 * `olderThan.field` defaults to `createdAt`. */
+	readonly retention?: AuditLogRetentionDefinition
 }
 
 const snakeCase = (value: string): string => value.replace(/([a-z0-9])([A-Z])/g, '$1_$2').toLowerCase()
@@ -66,6 +70,12 @@ export const auditLog = <T>(definition: AuditLogDefinition): DecoratorFunction<T
 			synchronous: definition.synchronous,
 		},
 	})(cls, context)
+
+	// Sugar: emit a retention policy on the sink. The sink is a class ref/thunk, so the resolution is
+	// deferred to schema-build time (RetentionFactory), exactly like the audit target's `entity`.
+	if (definition.retention !== undefined) {
+		auditLogRetentionStore.update(cls, intents => [...intents, { sink: definition.entity, retention: definition.retention! }], context)
+	}
 }
 
 /**

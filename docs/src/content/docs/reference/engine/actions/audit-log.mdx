@@ -118,6 +118,7 @@ works when the sink is declared first.
 - `synchronous` (optional): see [Synchronous vs. asynchronous](#synchronous-vs-asynchronous).
 - `selection` (optional): a custom payload selection, like on `@c.Watch`.
 - `priority` (optional): event priority in the dispatch queue.
+- `retention` (optional): auto-prune old rows from the sink on a schedule. See [Retention](#retention).
 
 `c.AuditLogEntity` carries the [convention columns](#the-audit-entity) plus indexes on
 `createdAt` and `eventNo` (the time/order columns the read examples below use), a
@@ -427,22 +428,44 @@ Data modified directly in the database, bypassing the engine, produces no audit 
 
 ## Retention
 
-An audit trail grows without bound — one row per watched change, kept forever — and
-Contember does **not** prune it for you. Because the sink is [immutable](#immutability) it
-has no `delete` mutation, so you cannot prune it through the Content API; retention happens
-at the **database level**, outside the engine:
+An audit trail grows without bound — one row per watched change, kept forever. To cap that,
+pass a `retention` option to `@c.AuditLog` and the engine prunes old rows for you on a
+schedule (`olderThan.field` defaults to the sink's `createdAt`):
 
-- **Bulk SQL delete** — a periodic `DELETE FROM … WHERE created_at < …` (e.g. older than
-  *now − 90 days*). The base `c.AuditLogEntity` indexes `createdAt`, so age-based deletes
-  stay cheap.
-- **Time partitioning** — for high-throughput trails, partition the table by time and drop
-  whole old partitions, which is far cheaper than deleting row by row.
+```typescript
+@c.AuditLog({
+  entity: () => ArticleAuditLog,
+  watch: `title`,
+  retention: { olderThan: { interval: '90 days' } },
+})
+export class Article {
+  title = c.stringColumn()
+}
+```
 
-Both run outside Contember, so they are not themselves audited — and, by the same token,
-they sit outside the reach of any application role.
+This drops every `ArticleAuditLog` row older than 90 days. It is exactly sugar for a
+[`@c.Retention`](/reference/engine/schema/retention) policy on the sink — write that directly
+if you prefer, or to prune a [shared sink](#sharing-a-sink-across-entities) once:
+
+```typescript
+@c.Retention({ olderThan: { field: 'createdAt', interval: '90 days' } })
+export class AuditLog extends c.AuditLogEntity {
+}
+```
+
+The base `c.AuditLogEntity` indexes `createdAt`, so the age-based delete stays cheap. See
+[Retention](/reference/engine/schema/retention) for the full option set (schedule, `where`,
+`strategy`, batching) and the scheduler's semantics.
+
+:::note[Immutable, yet still pruned]
+The sink is [immutable](#immutability), so the Content API exposes no `delete` mutation — you
+cannot prune it *through the API*. Retention's default `raw` strategy deletes below that gate,
+engine-internally, so it prunes the sink anyway. The trail therefore stays append-only for
+every application role while still respecting your retention window.
+:::
 
 :::caution
-Pruning the trail is a sensitive operation — whoever can delete audit rows can erase
-evidence. Keeping retention at the database level, off the API surface, is deliberate:
-restrict it to your operations / DBA path.
+Pruning the trail is a sensitive operation — whoever can delete audit rows can erase evidence.
+Retention runs engine-internally, bypassing content ACL and Actions, and is irreversible: keep
+the policy under schema review and set the window deliberately.
 :::

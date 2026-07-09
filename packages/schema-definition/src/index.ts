@@ -4,6 +4,8 @@ import * as ActionsDefinition from './actions/definition/index.js'
 import * as InputValidation from './validation/index.js'
 import { SchemaDefinition } from './model/index.js'
 import { createSchema } from './createSchema.js'
+import { Description } from './model/definition/DescriptionDefinition.js'
+import { Deprecated } from './model/definition/DeprecatedDefinition.js'
 
 export { AllowAllPermissionFactory } from '@contember/schema-utils'
 export { PermissionsBuilder } from './acl/builder/PermissionsBuilder.js'
@@ -91,4 +93,7 @@ export const c = {
 	ValidateWhen: InputValidation.when,
 	// Validation utilities
 	rules: InputValidation.rules,
+
+	Description: Description,
+	Deprecated: Deprecated,
 }

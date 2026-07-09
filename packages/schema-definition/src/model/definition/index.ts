@@ -8,12 +8,14 @@ import { DefaultNamingConventions } from '@contember/schema-utils'
 import { StrictDefinitionValidator, StrictOptions } from '../../strict.js'
 
 export * from './fieldDefinitions/index.js'
+export * from './DescriptionDefinition.js'
 export * from './EventLogDefinition.js'
 export * from './IndexDefinition.js'
 export * from './OrderByDefinition.js'
 export * from './EnumDefinition.js'
 export * from './UniqueDefinition.js'
 export * from './ViewDefinition.js'
+export * from './DeprecatedDefinition.js'
 export { type EntityExtension, extendEntity } from './extensions.js'
 
 export abstract class Entity {

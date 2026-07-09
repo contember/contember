@@ -30,5 +30,10 @@
     "@contember/schema-definition": "workspace:*",
     "@types/node": "^20.16.11"
   },
-  "type": "module"
+  "type": "module",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/contember/contember.git",
+    "directory": "packages/schema-utils"
+  }
 }

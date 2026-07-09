@@ -12,5 +12,10 @@
   "type": "module",
   "scripts": {
     "pre-build": "rm -rf rm ./resources/templates/template-workspace/admin/lib && cp -r ../react-ui-lib/src ./resources/templates/template-workspace/admin/lib && rm ./resources/templates/template-workspace/admin/lib/index.ts ./resources/templates/template-workspace/admin/lib/tsconfig.json"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/contember/contember.git",
+    "directory": "packages/create"
   }
 }

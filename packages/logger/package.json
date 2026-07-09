@@ -28,5 +28,10 @@
   "dependencies": {
     "chalk": "^5.3.0"
   },
-  "type": "module"
+  "type": "module",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/contember/contember.git",
+    "directory": "packages/logger"
+  }
 }

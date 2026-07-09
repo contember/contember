@@ -36,5 +36,10 @@
   },
   "devDependencies": {
     "@types/uuid": "9.0.8"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/contember/contember.git",
+    "directory": "packages/binding-legacy"
   }
 }

@@ -32,5 +32,10 @@
   "peerDependencies": {
     "pg": "^8.9.0"
   },
-  "type": "module"
+  "type": "module",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/contember/contember.git",
+    "directory": "packages/database-migrations"
+  }
 }

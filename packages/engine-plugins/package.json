@@ -33,5 +33,10 @@
   "devDependencies": {
     "graphql": "^16.9.0"
   },
-  "type": "module"
+  "type": "module",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/contember/contember.git",
+    "directory": "packages/engine-plugins"
+  }
 }

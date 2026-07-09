@@ -49,5 +49,10 @@
     "pg": "^8.5.0"
   },
   "type": "module",
-  "version": "2.0.6"
+  "version": "2.0.6",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/contember/contember.git",
+    "directory": "packages/engine-actions"
+  }
 }

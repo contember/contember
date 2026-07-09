@@ -28,5 +28,10 @@
   "dependencies": {
     "@contember/logger": "workspace:*"
   },
-  "type": "module"
+  "type": "module",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/contember/contember.git",
+    "directory": "packages/engine-common"
+  }
 }

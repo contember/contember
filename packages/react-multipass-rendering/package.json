@@ -33,5 +33,10 @@
   },
   "peerDependencies": {
     "react": "^18 || ^19"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/contember/contember.git",
+    "directory": "packages/react-multipass-rendering"
   }
 }

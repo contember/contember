@@ -33,6 +33,7 @@ async function runMatrix({ label, relField, schema, setup }: RunArgs) {
 		const v = p[relField]
 		return v != null && !(Array.isArray(v) && v.length === 0)
 	}).map((p: any) => p.name).sort()
+	const allParentNames = names(readRes)
 
 	const q = gql`query ($filter: ParentWhere) { listParent(filter: $filter, orderBy: [{ name: asc }]) { name } }`
 	const match = async (filter: any) =>
@@ -42,6 +43,10 @@ async function runMatrix({ label, relField, schema, setup }: RunArgs) {
 	const isNullFalse = await match({ [relField]: { id: { isNull: false } } })
 	const notIsNull = await match({ not: { [relField]: { id: { isNull: true } } } })
 	const positive = await match({ [relField]: { label: { eq: 'x' } } })
+	const absenceOrPositive = await match({ [relField]: { or: [{ id: { isNull: true } }, { label: { eq: 'x' } }] } })
+	const absenceOrNoMatch = await match({ [relField]: { or: [{ id: { isNull: true } }, { label: { eq: 'no-match' } }] } })
+	const notAbsenceOrPositive = await match({ [relField]: { not: { or: [{ id: { isNull: true } }, { label: { eq: 'x' } }] } } })
+	const notAbsenceAndPositive = await match({ [relField]: { not: { and: [{ id: { isNull: true } }, { label: { eq: 'x' } }] } } })
 
 	console.log(`\n${label}: readsEmpty=[${readsEmpty}] hasReadable=[${hasReadable}]`)
 	console.log(`  isNull:true=[${isNullTrue}]  isNull:false=[${isNullFalse}]  not(isNull)=[${notIsNull}]  label=x=[${positive}]`)
@@ -51,8 +56,12 @@ async function runMatrix({ label, relField, schema, setup }: RunArgs) {
 	expect(isNullFalse, `${label} isNull:false must equal hasReadable`).toEqual(hasReadable)
 	expect(notIsNull, `${label} not(isNull) must equal hasReadable`).toEqual(hasReadable)
 	expect(positive, `${label} label=x must equal hasReadable`).toEqual(hasReadable)
+	expect(absenceOrPositive, `${label} absence OR positive must cover the readable view`).toEqual(allParentNames)
+	expect(absenceOrNoMatch, `${label} absence OR no-match must equal readsEmpty`).toEqual(readsEmpty)
+	expect(notAbsenceOrPositive, `${label} NOT(absence OR positive) must be empty`).toEqual([])
+	expect(notAbsenceAndPositive, `${label} NOT(absence AND positive) must equal hasReadable`).toEqual(hasReadable)
 	// excluded middle: isNull:true and isNull:false partition all parents
-	expect([...isNullTrue, ...isNullFalse].sort(), `${label} isNull true/false must partition`).toEqual(readRes.map((p: any) => p.name).sort())
+	expect([...isNullTrue, ...isNullFalse].sort(), `${label} isNull true/false must partition`).toEqual(allParentNames)
 }
 
 const mkCompany = async (t: any, name: string) =>

@@ -19,6 +19,8 @@ export class PredicateFactory {
 	// the context resolves to) via JSON so no two distinct inputs can collide onto one entry.
 	private readonly createCache = new Map<string, Input.OptionalWhere>()
 	private readonly buildCache = new Map<string, Input.OptionalWhere>()
+	// Preserve proof provenance; an identical user-authored AST is not an evaluated ancestor witness.
+	private readonly evaluatedPredicateReplacements = new WeakSet<Input.OptionalWhere>()
 
 	constructor(
 		private readonly permissions: Acl.Permissions,
@@ -86,6 +88,37 @@ export class PredicateFactory {
 		return this.getFieldPredicate(entity, Acl.Operation.read, fieldName, relationPath.length === 0)
 	}
 
+	public createReadPredicate(
+		entity: Model.Entity,
+		fieldNames: readonly string[] | undefined,
+		relationPath: readonly Model.AnyRelationContext[],
+	): Input.OptionalWhere {
+		return this.create(
+			entity,
+			Acl.Operation.read,
+			fieldNames,
+			relationPath[relationPath.length - 1],
+			relationPath.length === 0,
+		)
+	}
+
+	public buildReadPredicates(
+		entity: Model.Entity,
+		predicates: readonly Acl.PredicateReference[],
+		relationPath: readonly Model.AnyRelationContext[],
+	): Input.OptionalWhere {
+		return this.buildPredicates(
+			entity,
+			predicates,
+			relationPath[relationPath.length - 1],
+			relationPath.length === 0,
+		)
+	}
+
+	public isEvaluatedPredicateReplacement(where: Input.OptionalWhere): boolean {
+		return this.evaluatedPredicateReplacements.has(where)
+	}
+
 	public shouldApplyCellLevelPredicate(
 		entity: Model.Entity,
 		operation: Acl.Operation.read,
@@ -118,7 +151,7 @@ export class PredicateFactory {
 	public create(
 		entity: Model.Entity,
 		operation: Acl.Operation.update | Acl.Operation.read | Acl.Operation.create,
-		fieldNames: string[] = [getRowLevelPredicatePseudoField(entity)],
+		fieldNames: readonly string[] = [getRowLevelPredicatePseudoField(entity)],
 		relationContext?: Model.AnyRelationContext,
 		isRoot?: boolean,
 	): Input.OptionalWhere {
@@ -141,7 +174,7 @@ export class PredicateFactory {
 	private createInternal(
 		entity: Model.Entity,
 		operation: Acl.Operation.update | Acl.Operation.read | Acl.Operation.create,
-		fieldNames: string[] = [getRowLevelPredicatePseudoField(entity)],
+		fieldNames: readonly string[] = [getRowLevelPredicatePseudoField(entity)],
 		relationContext?: Model.AnyRelationContext,
 		isRoot?: boolean,
 	): Input.OptionalWhere {
@@ -170,7 +203,7 @@ export class PredicateFactory {
 
 	public buildPredicates(
 		entity: Model.Entity,
-		predicates: Acl.PredicateReference[],
+		predicates: readonly Acl.PredicateReference[],
 		relationContext?: Model.AnyRelationContext,
 		isRoot?: boolean,
 	): Input.OptionalWhere {
@@ -191,7 +224,7 @@ export class PredicateFactory {
 
 	private buildPredicatesInternal(
 		entity: Model.Entity,
-		predicates: Acl.PredicateReference[],
+		predicates: readonly Acl.PredicateReference[],
 		relationContext?: Model.AnyRelationContext,
 		isRoot?: boolean,
 	): Input.OptionalWhere {
@@ -216,7 +249,7 @@ export class PredicateFactory {
 	}
 
 	private getRequiredPredicates(
-		fieldNames: string[],
+		fieldNames: readonly string[],
 		fieldPermissions: Acl.FieldPermissions,
 	): Acl.PredicateReference[] | false {
 		const predicates: Acl.PredicateReference[] = []
@@ -244,7 +277,9 @@ export class PredicateFactory {
 			return where
 		}
 
-		const replacer = new EvaluatedPredicateReplacer(sourcePredicate, relationContext.entity, relationContext.targetRelation)
+		const replacement: Input.OptionalWhere = { [relationContext.entity.primary]: { always: true } }
+		this.evaluatedPredicateReplacements.add(replacement)
+		const replacer = new EvaluatedPredicateReplacer(sourcePredicate, relationContext.entity, relationContext.targetRelation, replacement)
 		return replacer.replace(where)
 	}
 }

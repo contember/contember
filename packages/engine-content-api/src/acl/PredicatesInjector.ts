@@ -47,6 +47,29 @@ export class PredicatesInjector {
 		)
 	}
 
+	private canSimplifyBackReference(
+		ancestorPath: readonly Model.AnyRelationContext[],
+		relationContext: Model.AnyRelationContext,
+		hasEvaluatedAncestorWitness = false,
+	): boolean {
+		const isBackReference = this.findBackReferencedAncestor(
+			ancestorPath,
+			relationContext.relation.name,
+			relationContext.entity.name,
+		) !== undefined
+		return isBackReference && (hasEvaluatedAncestorWitness || PredicatesInjector.toOneBackReferenceTypes.has(relationContext.type))
+	}
+
+	private isAlwaysTruePrimaryWhere(where: Input.OptionalWhere, primary: string): boolean {
+		const condition = where[primary]
+		return Object.keys(where).length === 1
+			&& condition !== null
+			&& typeof condition === 'object'
+			&& !Array.isArray(condition)
+			&& 'always' in condition
+			&& condition.always === true
+	}
+
 	private createWhere(
 		entity: Model.Entity,
 		fieldNames: string[] | undefined,
@@ -66,8 +89,7 @@ export class PredicatesInjector {
 		const shouldSimplify = isBackReferenceContext === true
 			&& ancestorPath !== undefined
 			&& relationContext !== undefined
-			&& PredicatesInjector.toOneBackReferenceTypes.has(relationContext.type)
-			&& this.findBackReferencedAncestor(ancestorPath, relationContext.relation.name, relationContext.entity.name) !== undefined
+			&& this.canSimplifyBackReference(ancestorPath, relationContext)
 
 		// An entity is treated as a query root (consulting root-only permissions) only when it is both the
 		// root of this injection and `isQueryRoot`. A nested relation target is reached THROUGH a relation,

@@ -178,13 +178,11 @@ export class OrderByBuilder {
 		const columnLiteral = new Literal(`${wrapIdentifier(path.alias)}.${wrapIdentifier(columnName)}`)
 		const conditions: Literal[] = []
 		for (const guard of guards) {
-			const isRoot = guard.relationPath.length === 0
-			const relationContext = guard.relationPath[guard.relationPath.length - 1]
-			const predicateWhere = this.predicateFactory.buildPredicates(guard.entity, [guard.predicate], relationContext, isRoot)
+			const predicateWhere = this.predicateFactory.buildReadPredicates(guard.entity, [guard.predicate], guard.relationPath)
 			// The row-level predicate is already guaranteed in the WHERE of the ACL-filtered entity, so let the
 			// optimizer simplify it out of the cell-level predicate (mirrors SelectBuilder's predicate column).
 			const evaluatedPredicates = guard.isAclFiltered
-				? [this.predicateFactory.create(guard.entity, Acl.Operation.read, undefined, relationContext, isRoot)]
+				? [this.predicateFactory.createReadPredicate(guard.entity, undefined, guard.relationPath)]
 				: []
 			const { qb: guardedQb, condition } = this.whereBuilder.buildConditionLiteral(
 				qb,

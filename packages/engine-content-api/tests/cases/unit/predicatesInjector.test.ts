@@ -189,8 +189,8 @@ describe('predicates injector elimination', () => {
 		// SECURITY: `articles` (ImageUse -> oneHasMany Article) is a TO-MANY back-hop, so the user
 		// filter reaches sibling Articles that are NOT guaranteed readable — their row predicate
 		// { isPublished: true } MUST be kept (previously wrongly dropped to { id: always }).
-		// ImageUse's OWN row predicate `{ articles: canRead(coverPhoto) }` is still simplified,
-		// because the root Article we came from already guarantees it (predicate-in-predicate path).
+		// ImageUse's own predicate reduces to an already-verified ancestor witness, so that
+		// ACL-derived back-reference can still be eliminated without inspecting a sibling.
 		assert.deepStrictEqual(injected, {
 			and: [
 				{
@@ -585,8 +585,7 @@ describe('predicates injector - non back-reference filter', () => {
 			ancestorPath,
 		)
 
-		// Image filter should have full predicate (uses: canRead)
-		// The main ImageUse predicate (articles: canRead) should be simplified
+		// The ACL-derived back-references reduce to already-verified ancestor witnesses.
 		assert.deepStrictEqual(injected, {
 			and: [
 				{
@@ -1954,6 +1953,38 @@ namespace ManyToManyBackReferenceLeakModel {
 	}
 }
 
+namespace AclPredicateToManyBackReferenceModel {
+	export const readerRole = acl.createRole('reader')
+
+	@acl.allow(readerRole, {
+		when: { isPublished: { eq: true } },
+		read: true,
+	})
+	export class Post {
+		title = def.stringColumn()
+		isPublished = def.boolColumn()
+		tags = def.manyHasMany(Tag, 'posts')
+		looseTags = def.manyHasMany(LooseTag, 'posts')
+	}
+
+	@acl.allow(readerRole, {
+		when: { posts: { title: { eq: 'allowed' } } },
+		read: true,
+	})
+	export class Tag {
+		name = def.stringColumn()
+		posts = def.manyHasManyInverse(Post, 'tags')
+	}
+
+	@acl.allow(readerRole, {
+		when: { posts: { id: { always: true } } },
+		read: true,
+	})
+	export class LooseTag {
+		posts = def.manyHasManyInverse(Post, 'looseTags')
+	}
+}
+
 // Article.secret has a cell-level read predicate (isSecretVisible) that differs from the row
 // predicate (isPublished), so the injector must apply the per-field predicate, not blanket-drop it.
 namespace CellLevelBackReferenceModel {
@@ -2104,6 +2135,58 @@ describe('predicates injector - SECURITY: to-many back-reference keeps sibling r
 		)
 		assert.deepStrictEqual(injectedTitle, {
 			articles: { and: [{ title: { eq: 'T' } }, { isPublished: { eq: true } }] },
+		})
+	})
+
+	it('keeps sibling row predicate when the to-many back-reference originates in an ACL predicate', () => {
+		const schema = createSchema(AclPredicateToManyBackReferenceModel)
+		const permissions = new PermissionFactory().create(schema, ['reader'])
+		const injector = new PredicatesInjector(
+			schema.model,
+			new PredicateFactory(permissions, schema.model, new VariableInjector(schema.model, {})),
+		)
+		const tagsRelation = relationOf(schema.model, 'Post', 'tags')
+
+		const injected = injector.inject(
+			schema.model.entities.Tag,
+			{},
+			tagsRelation,
+			[tagsRelation],
+		)
+
+		assert.deepStrictEqual(injected, {
+			posts: {
+				and: [
+					{ title: { eq: 'allowed' } },
+					{ isPublished: { eq: true } },
+				],
+			},
+		})
+	})
+
+	it('does not mistake a literal always condition for an evaluated ancestor witness', () => {
+		const schema = createSchema(AclPredicateToManyBackReferenceModel)
+		const permissions = new PermissionFactory().create(schema, ['reader'])
+		const injector = new PredicatesInjector(
+			schema.model,
+			new PredicateFactory(permissions, schema.model, new VariableInjector(schema.model, {})),
+		)
+		const looseTagsRelation = relationOf(schema.model, 'Post', 'looseTags')
+
+		const injected = injector.inject(
+			schema.model.entities.LooseTag,
+			{},
+			looseTagsRelation,
+			[looseTagsRelation],
+		)
+
+		assert.deepStrictEqual(injected, {
+			posts: {
+				and: [
+					{ id: { always: true } },
+					{ isPublished: { eq: true } },
+				],
+			},
 		})
 	})
 })

@@ -175,6 +175,129 @@ describe('where builder', () => {
 		assert.equal(createWhere(schema, { articles: { id: { null: true } } }), expected)
 	})
 
+	it('condition-level De Morgan absence lowers to NOT EXISTS', () => {
+		const schema = createSchema(WhereBuilderModel)
+		const where = createWhere(schema, {
+			author: {
+				id: { not: { isNull: false } },
+				name: { eq: 'John' },
+			},
+		}, 'Article')
+		compareWhere(
+			where,
+			`where not(exists (select 1
+				from "__SCHEMA__"."author" as "root_author"
+				where "root_"."author_id" = "root_author"."id" and "root_author"."name" = ?))`,
+		)
+	})
+
+	it('compound primary presence remains a valid relation filter', () => {
+		const schema = createSchema(WhereBuilderModel)
+		const where = createWhere(schema, {
+			author: {
+				id: {
+					and: [
+						{ isNull: false },
+						{ eq: '123e4567-e89b-12d3-a456-426614174000' },
+					],
+				},
+			},
+		}, 'Article')
+		compareWhere(
+			where,
+			`where exists (select 1
+				from "__SCHEMA__"."author" as "root_author"
+				where "root_"."author_id" = "root_author"."id" and "root_author"."id" = ?)`,
+		)
+	})
+
+	it('composes relation absence inside a multi-branch OR', () => {
+		const schema = createSchema(WhereBuilderModel)
+		const where = createWhere(schema, {
+			author: {
+				or: [
+					{ id: { isNull: true } },
+					{ name: { eq: 'John' } },
+				],
+			},
+		}, 'Article')
+		compareWhere(
+			where,
+			`where (not(exists (select 1
+				from "__SCHEMA__"."author" as "root_author"
+				where "root_"."author_id" = "root_author"."id"))
+				or exists (select 1
+				from "__SCHEMA__"."author" as "root_author"
+				where "root_"."author_id" = "root_author"."id" and "root_author"."name" = ?))`,
+		)
+	})
+
+	it('negates a mixed relation absence expression as a set expression', () => {
+		const schema = createSchema(WhereBuilderModel)
+		const where = createWhere(schema, {
+			author: {
+				not: {
+					or: [
+						{ id: { isNull: true } },
+						{ name: { eq: 'John' } },
+					],
+				},
+			},
+		}, 'Article')
+		compareWhere(
+			where,
+			`where not((not(exists (select 1
+				from "__SCHEMA__"."author" as "root_author"
+				where "root_"."author_id" = "root_author"."id"))
+				or exists (select 1
+				from "__SCHEMA__"."author" as "root_author"
+				where "root_"."author_id" = "root_author"."id" and "root_author"."name" = ?)))`,
+		)
+	})
+
+	it('negates a conjunctive relation absence expression', () => {
+		const schema = createSchema(WhereBuilderModel)
+		const where = createWhere(schema, {
+			author: {
+				not: {
+					and: [
+						{ id: { isNull: true } },
+						{ name: { eq: 'John' } },
+					],
+				},
+			},
+		}, 'Article')
+		compareWhere(
+			where,
+			`where exists (select 1
+				from "__SCHEMA__"."author" as "root_author"
+				where "root_"."author_id" = "root_author"."id" and "root_author"."name" = ?)`,
+		)
+	})
+
+	it('composes condition-level relation absence inside OR', () => {
+		const schema = createSchema(WhereBuilderModel)
+		const where = createWhere(schema, {
+			author: {
+				id: {
+					or: [
+						{ isNull: true },
+						{ eq: '123e4567-e89b-12d3-a456-426614174000' },
+					],
+				},
+			},
+		}, 'Article')
+		compareWhere(
+			where,
+			`where (not(exists (select 1
+				from "__SCHEMA__"."author" as "root_author"
+				where "root_"."author_id" = "root_author"."id"))
+				or exists (select 1
+				from "__SCHEMA__"."author" as "root_author"
+				where "root_"."author_id" = "root_author"."id" and "root_author"."id" = ?))`,
+		)
+	})
+
 	it('nested has-many absence is forced to NOT EXISTS even in legacy join mode', () => {
 		// COR-3: a has-many absence nested inside another relation must use a correlated NOT EXISTS, never the
 		// per-joined-row LEFT JOIN form (which would mis-evaluate `not` for a parent with mixed readable rows).

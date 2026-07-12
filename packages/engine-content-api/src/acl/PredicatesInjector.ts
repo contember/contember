@@ -47,6 +47,29 @@ export class PredicatesInjector {
 		)
 	}
 
+	private canSimplifyBackReference(
+		ancestorPath: readonly Model.AnyRelationContext[],
+		relationContext: Model.AnyRelationContext,
+		hasEvaluatedAncestorWitness = false,
+	): boolean {
+		const isBackReference = this.findBackReferencedAncestor(
+			ancestorPath,
+			relationContext.relation.name,
+			relationContext.entity.name,
+		) !== undefined
+		return isBackReference && (hasEvaluatedAncestorWitness || PredicatesInjector.toOneBackReferenceTypes.has(relationContext.type))
+	}
+
+	private isAlwaysTruePrimaryWhere(where: Input.OptionalWhere, primary: string): boolean {
+		const condition = where[primary]
+		return Object.keys(where).length === 1
+			&& condition !== null
+			&& typeof condition === 'object'
+			&& !Array.isArray(condition)
+			&& 'always' in condition
+			&& condition.always === true
+	}
+
 	private createWhere(
 		entity: Model.Entity,
 		fieldNames: string[] | undefined,
@@ -66,8 +89,7 @@ export class PredicatesInjector {
 		const shouldSimplify = isBackReferenceContext === true
 			&& ancestorPath !== undefined
 			&& relationContext !== undefined
-			&& PredicatesInjector.toOneBackReferenceTypes.has(relationContext.type)
-			&& this.findBackReferencedAncestor(ancestorPath, relationContext.relation.name, relationContext.entity.name) !== undefined
+			&& this.canSimplifyBackReference(ancestorPath, relationContext)
 
 		// An entity is treated as a query root (consulting root-only permissions) only when it is both the
 		// root of this injection and `isQueryRoot`. A nested relation target is reached THROUGH a relation,
@@ -147,6 +169,7 @@ export class PredicatesInjector {
 					if (relationWhere === null) {
 						return null
 					}
+					const hasEvaluatedAncestorWitness = this.predicateFactory.isEvaluatedPredicateReplacement(relationWhere)
 
 					// Check if this relation is a back-reference to somewhere in our ancestor path
 					const isBackReference = this.findBackReferencedAncestor(
@@ -165,9 +188,12 @@ export class PredicatesInjector {
 						nestedAncestorPath,
 					)
 
+					const primaryKey = context.targetEntity.primary
+					const nestedIsAlwaysTrue = this.isAlwaysTruePrimaryWhere(processedNestedWhere, primaryKey)
+
 					// Check if we should simplify the target entity's predicate
 					const shouldSimplifyNested = nestedIsBackReferenceContext
-						&& this.findBackReferencedAncestor(nestedAncestorPath, context.relation.name, context.entity.name) !== undefined
+						&& this.canSimplifyBackReference(nestedAncestorPath, context, hasEvaluatedAncestorWitness)
 
 					// Get target entity's predicate (simplified if back-reference). A relation target reached from
 					// within a predicate is always through-access, so it consults the `all` permission set (isRoot=false).
@@ -176,13 +202,7 @@ export class PredicatesInjector {
 						: this.predicateFactory.create(context.targetEntity, Acl.Operation.read, undefined, context, false)
 
 					// Optimization: avoid duplicate { id: always } when both are simplified
-					const primaryKey = context.targetEntity.primary
-					const nestedIsAlwaysTrue = Object.keys(processedNestedWhere).length === 1
-						&& (processedNestedWhere as Record<string, unknown>)[primaryKey] !== undefined
-						&& (processedNestedWhere as Record<string, Record<string, unknown>>)[primaryKey]?.always === true
-					const targetIsAlwaysTrue = Object.keys(targetPredicate).length === 1
-						&& (targetPredicate as Record<string, unknown>)[primaryKey] !== undefined
-						&& (targetPredicate as Record<string, Record<string, unknown>>)[primaryKey]?.always === true
+					const targetIsAlwaysTrue = this.isAlwaysTruePrimaryWhere(targetPredicate, primaryKey)
 
 					if (nestedIsAlwaysTrue && targetIsAlwaysTrue) {
 						return processedNestedWhere

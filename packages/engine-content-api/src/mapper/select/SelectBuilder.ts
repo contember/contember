@@ -94,10 +94,8 @@ export class SelectBuilder {
 			const predicatePath = path.for('__predicate').for(predicate)
 
 			if (!fetchedPredicates.has(predicate)) {
-				const relationContext = this.relationPath[this.relationPath.length - 1]
-
-				const primaryPredicate = this.predicateFactory.create(entity, Acl.Operation.read, undefined, relationContext)
-				const fieldPredicate = this.predicateFactory.buildPredicates(entity, [predicate], relationContext)
+				const primaryPredicate = this.predicateFactory.createReadPredicate(entity, undefined, this.relationPath)
+				const fieldPredicate = this.predicateFactory.buildReadPredicates(entity, [predicate], this.relationPath)
 
 				const { qb, condition } = this.whereBuilder.buildConditionLiteral(
 					this.qb,

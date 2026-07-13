@@ -1,5 +1,6 @@
 import { Acl, Input, Model } from '@contember/schema'
 import { Authorizator } from '../../acl/index.js'
+import { getManyHasManyMutationPermissions } from './ManyHasManyMutationPermissions.js'
 
 export class UpdateEntityRelationAllowedOperationsVisitor
 	implements Model.ColumnVisitor<never>, Model.RelationByTypeVisitor<Input.UpdateRelationOperation[]>
@@ -10,12 +11,12 @@ export class UpdateEntityRelationAllowedOperationsVisitor
 		throw new Error('UpdateEntityRelationAllowedOperationsVisitor: Not applicable for a column')
 	}
 
-	public visitManyHasManyInverse({ targetEntity, targetRelation }: Model.ManyHasManyInverseContext) {
-		return this.getAllowedOperations(targetEntity, targetEntity, targetRelation)
+	public visitManyHasManyInverse(context: Model.ManyHasManyInverseContext) {
+		return this.getAllowedManyHasManyOperations(context)
 	}
 
-	public visitManyHasManyOwning({ entity, targetEntity, relation }: Model.ManyHasManyOwningContext) {
-		return this.getAllowedOperations(targetEntity, entity, relation)
+	public visitManyHasManyOwning(context: Model.ManyHasManyOwningContext) {
+		return this.getAllowedManyHasManyOperations(context)
 	}
 
 	public visitOneHasMany({ targetRelation, targetEntity }: Model.OneHasManyContext) {
@@ -87,6 +88,44 @@ export class UpdateEntityRelationAllowedOperationsVisitor
 			result.push(Input.UpdateRelationOperation.connectOrCreate)
 		}
 
+		return result
+	}
+
+	private getAllowedManyHasManyOperations(
+		context: Model.ManyHasManyOwningContext | Model.ManyHasManyInverseContext,
+	): Input.UpdateRelationOperation[] {
+		const { targetEntity } = context
+		const { canMutateSourceRelation, canMutateJunction } = getManyHasManyMutationPermissions(
+			this.authorizator,
+			context,
+			Acl.Operation.update,
+		)
+		if (!canMutateSourceRelation) {
+			return []
+		}
+		const result: Input.UpdateRelationOperation[] = []
+		const canReadTarget = this.authorizator.getEntityPermission(Acl.Operation.read, targetEntity.name) !== 'no'
+		const canCreateTarget = this.authorizator.getEntityPermission(Acl.Operation.create, targetEntity.name) !== 'no'
+		const canUpdateTarget = this.authorizator.getEntityPermission(Acl.Operation.update, targetEntity.name) !== 'no'
+		const canDeleteTarget = this.authorizator.getEntityPermission(Acl.Operation.delete, targetEntity.name) !== 'no'
+		if (canMutateJunction && canReadTarget) {
+			result.push(Input.UpdateRelationOperation.connect, Input.UpdateRelationOperation.disconnect)
+		}
+		if (canMutateJunction && canCreateTarget) {
+			result.push(Input.UpdateRelationOperation.create)
+		}
+		if (canMutateJunction && canUpdateTarget) {
+			result.push(Input.UpdateRelationOperation.update)
+		}
+		if (canMutateJunction && canCreateTarget && canUpdateTarget) {
+			result.push(Input.UpdateRelationOperation.upsert)
+		}
+		if (canDeleteTarget) {
+			result.push(Input.UpdateRelationOperation.delete)
+		}
+		if (canMutateJunction && canReadTarget && canCreateTarget) {
+			result.push(Input.UpdateRelationOperation.connectOrCreate)
+		}
 		return result
 	}
 }

@@ -1,5 +1,5 @@
 import { Input, Model, Value } from '@contember/schema'
-import { Mapper } from '../Mapper.js'
+import { MutationAccess } from '../MutationAccess.js'
 import { UpdateBuilder } from './UpdateBuilder.js'
 import { hasManyProcessor, hasOneProcessor } from '../MutationProcessorHelper.js'
 import { OneHasOneInverseUpdateInputProcessor } from './relations/OneHasOneInverseUpdateInputProcessor.js'
@@ -24,13 +24,13 @@ export class SqlUpdateInputProcessor implements UpdateInputProcessor<SqlUpdateIn
 		private readonly primaryValue: Input.PrimaryValue,
 		private readonly data: MapperInput.UpdateDataInput,
 		private readonly updateBuilder: UpdateBuilder,
-		private readonly mapper: Mapper,
+		private readonly access: MutationAccess,
 	) {
-		this.oneHasOneInverseUpdateInputProcessor = new OneHasOneInverseUpdateInputProcessor(this.primaryValue, this.mapper)
-		this.oneHasOneOwningUpdateInputProcessor = new OneHasOneOwningUpdateInputProcessor(this.primaryValue, this.mapper, this.updateBuilder)
-		this.oneHasManyUpdateInputProcessor = new OneHasManyUpdateInputProcessor(this.mapper)
-		this.manyHasOneUpdateInputProcessor = new ManyHasOneUpdateInputProcessor(this.mapper, this.updateBuilder, this.primaryValue)
-		this.manyHasManyUpdateInputProcessor = new ManyHasManyUpdateInputProcessor(this.mapper)
+		this.oneHasOneInverseUpdateInputProcessor = new OneHasOneInverseUpdateInputProcessor(this.primaryValue, this.access)
+		this.oneHasOneOwningUpdateInputProcessor = new OneHasOneOwningUpdateInputProcessor(this.primaryValue, this.access, this.updateBuilder)
+		this.oneHasManyUpdateInputProcessor = new OneHasManyUpdateInputProcessor(this.access)
+		this.manyHasOneUpdateInputProcessor = new ManyHasOneUpdateInputProcessor(this.access, this.updateBuilder, this.primaryValue)
+		this.manyHasManyUpdateInputProcessor = new ManyHasManyUpdateInputProcessor(this.access)
 	}
 
 	public column({ entity, column }: Model.ColumnContext) {

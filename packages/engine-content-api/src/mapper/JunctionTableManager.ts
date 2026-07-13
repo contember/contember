@@ -13,6 +13,7 @@ import {
 } from './Result.js'
 import { ImplementationException } from '../exception.js'
 import { AfterJunctionUpdateEvent, BeforeJunctionUpdateEvent } from './EventManager.js'
+import { MutationAccess } from './MutationAccess.js'
 import { Mapper } from './Mapper.js'
 
 type OkResultFactory = () => MutationJunctionUpdateOk
@@ -21,6 +22,8 @@ type JunctionMutationResult =
 	| MutationJunctionUpdateOk
 	| MutationNothingToDo
 	| MutationNoResultError
+type JunctionConnectRow = { selected: boolean; inserted: boolean }
+type JunctionDisconnectRow = { selected: boolean; deleted: boolean }
 
 export class JunctionTableManager {
 	constructor(
@@ -34,19 +37,25 @@ export class JunctionTableManager {
 
 	public async connectJunction(
 		mapper: Mapper,
+		owningAccess: MutationAccess,
+		inverseAccess: MutationAccess,
 		owningEntity: Model.Entity,
 		relation: Model.ManyHasManyOwningRelation,
 		owningUnique: Input.PrimaryValue,
 		inverseUnique: Input.PrimaryValue,
+		operation: Acl.Operation.create | Acl.Operation.update,
 	): Promise<MutationResultList> {
 		const beforeEvent = new BeforeJunctionUpdateEvent(owningEntity, relation, owningUnique, inverseUnique, 'connect')
 		await mapper.eventManager.fire(beforeEvent)
 		const result = await this.executeJunctionModification(
 			mapper.db,
+			owningAccess,
+			inverseAccess,
 			owningEntity,
 			relation,
 			owningUnique,
 			inverseUnique,
+			operation,
 			this.connectJunctionHandler,
 		)
 		if (result.result !== MutationResultType.noResultError) {
@@ -65,19 +74,24 @@ export class JunctionTableManager {
 
 	public async disconnectJunction(
 		mapper: Mapper,
+		owningAccess: MutationAccess,
+		inverseAccess: MutationAccess,
 		owningEntity: Model.Entity,
 		relation: Model.ManyHasManyOwningRelation,
 		owningUnique: Input.PrimaryValue,
 		inverseUnique: Input.PrimaryValue,
 	): Promise<MutationResultList> {
-		const beforeEvent = new BeforeJunctionUpdateEvent(owningEntity, relation, owningUnique, inverseUnique, 'connect')
+		const beforeEvent = new BeforeJunctionUpdateEvent(owningEntity, relation, owningUnique, inverseUnique, 'disconnect')
 		await mapper.eventManager.fire(beforeEvent)
 		const result = await this.executeJunctionModification(
 			mapper.db,
+			owningAccess,
+			inverseAccess,
 			owningEntity,
 			relation,
 			owningUnique,
 			inverseUnique,
+			Acl.Operation.update,
 			this.disconnectJunctionHandler,
 		)
 		if (result.result !== MutationResultType.noResultError) {
@@ -97,10 +111,13 @@ export class JunctionTableManager {
 
 	private async executeJunctionModification(
 		db: Client,
+		owningAccess: MutationAccess,
+		inverseAccess: MutationAccess,
 		owningEntity: Model.Entity,
 		relation: Model.ManyHasManyOwningRelation,
 		owningPrimary: Input.PrimaryValue,
 		inversePrimary: Input.PrimaryValue,
+		operation: Acl.Operation.create | Acl.Operation.update,
 		handler: JunctionHandler,
 	): Promise<JunctionMutationResult> {
 		const joiningTable = relation.joiningTable
@@ -109,10 +126,22 @@ export class JunctionTableManager {
 			throw new ImplementationException()
 		}
 
-		const owningPredicate = this.predicateFactory.create(owningEntity, Acl.Operation.update, [relation.name])
+		const owningPredicate = this.predicateFactory.create(
+			owningEntity,
+			operation,
+			[relation.name],
+			owningAccess.relationContext,
+			owningAccess.isRoot,
+		)
 		let inversePredicate: Input.OptionalWhere = {}
 		if (relation.inversedBy) {
-			inversePredicate = this.predicateFactory.create(inverseEntity, Acl.Operation.update, [relation.inversedBy])
+			inversePredicate = this.predicateFactory.create(
+				inverseEntity,
+				operation,
+				[relation.inversedBy],
+				inverseAccess.relationContext,
+				inverseAccess.isRoot,
+			)
 		}
 
 		const hasNoPredicates = Object.keys(owningPredicate).length === 0 && Object.keys(inversePredicate).length === 0
@@ -209,7 +238,7 @@ export class JunctionConnectHandler implements JunctionHandler {
 			.from(qb => qb.from('data'))
 			.onConflict(ConflictActionType.doNothing)
 
-		const qb = SelectBuilder.create()
+		const qb = SelectBuilder.create<JunctionConnectRow>()
 			.with('data', dataCallback)
 			.with('insert', insert)
 			.from(new Literal('(values (null))'), 't')
@@ -219,10 +248,10 @@ export class JunctionConnectHandler implements JunctionHandler {
 			.select(expr => expr.raw('coalesce(insert.inserted, false)'), 'inserted')
 
 		const result = await qb.getResult(db)
-		if (result[0]['selected'] === false) {
+		if (result[0].selected === false) {
 			return new MutationNoResultError([])
 		}
-		if (result[0]['inserted'] === false) {
+		if (result[0].inserted === false) {
 			return new MutationNothingToDo([], NothingToDoReason.alreadyExists)
 		}
 		return okResultFactory()
@@ -244,7 +273,7 @@ export class JunctionDisconnectHandler implements JunctionHandler {
 
 		const result = await qb.execute(db)
 		if (result === 0) {
-			return new MutationNothingToDo([], NothingToDoReason.alreadyExists)
+			return new MutationNothingToDo([], NothingToDoReason.alreadyDeleted)
 		}
 		return okResultFactory()
 	}
@@ -272,7 +301,7 @@ export class JunctionDisconnectHandler implements JunctionHandler {
 			})
 			.returning(new Literal('true as deleted'))
 
-		const qb = SelectBuilder.create()
+		const qb = SelectBuilder.create<JunctionDisconnectRow>()
 			.with('data', dataCallback)
 			.with('delete', deleteQb)
 			.from(new Literal('(values (null))'), 't')
@@ -282,11 +311,11 @@ export class JunctionDisconnectHandler implements JunctionHandler {
 			.select(expr => expr.raw('coalesce(delete.deleted, false)'), 'deleted')
 
 		const result = await qb.getResult(db)
-		if (result[0]['selected'] === false) {
+		if (result[0].selected === false) {
 			return new MutationNoResultError([])
 		}
-		if (result[0]['inserted'] === false) {
-			return new MutationNothingToDo([], NothingToDoReason.alreadyExists)
+		if (result[0].deleted === false) {
+			return new MutationNothingToDo([], NothingToDoReason.alreadyDeleted)
 		}
 		return okResultFactory()
 	}

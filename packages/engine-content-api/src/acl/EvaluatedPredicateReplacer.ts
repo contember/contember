@@ -1,32 +1,29 @@
 import { Input, Model, Writable } from '@contember/schema'
 import { replaceWhere } from '../mapper/select/optimizer/WhereReplacer.js'
 
-export class EvaluatedPredicateReplacer {
-	constructor(
-		private readonly evaluatedPredicate: Input.OptionalWhere,
-		private readonly sourceEntity: Model.Entity,
-		private readonly relation: Model.AnyRelation,
-		private readonly replacement: Input.OptionalWhere,
-	) {
+export const replaceEvaluatedPredicate = (
+	where: Input.OptionalWhere,
+	evaluatedPredicate: Input.OptionalWhere,
+	relation: Model.AnyRelation,
+	replacement: Input.OptionalWhere,
+): Input.OptionalWhere => {
+	const { not, and, or, ...fields } = where
+	const result: Writable<Input.OptionalWhere> = { ...fields }
+	if (not) {
+		result.not = replaceEvaluatedPredicate(not, evaluatedPredicate, relation, replacement)
 	}
-
-	public replace(where: Input.OptionalWhere): Input.OptionalWhere {
-		const result: Writable<Input.OptionalWhere> = {}
-		for (const [key, value] of Object.entries(where)) {
-			if (key === 'not') {
-				result['not'] = this.replace(value as Input.OptionalWhere)
-			} else if (key === 'and' || key === 'or') {
-				result[key] = (value as Input.Where[]).map(it => this.replace(it))
-			} else if (key === this.relation.name && this.isOptionalWhere(value)) {
-				result[key] = replaceWhere(value, this.evaluatedPredicate, this.replacement)
-			} else {
-				result[key] = value
-			}
-		}
-		return result
+	if (and) {
+		result.and = and.map(item => isOptionalWhere(item) ? replaceEvaluatedPredicate(item, evaluatedPredicate, relation, replacement) : item)
 	}
-
-	private isOptionalWhere(value: unknown): value is Input.OptionalWhere {
-		return value !== null && value !== undefined && typeof value === 'object' && !Array.isArray(value)
+	if (or) {
+		result.or = or.map(item => isOptionalWhere(item) ? replaceEvaluatedPredicate(item, evaluatedPredicate, relation, replacement) : item)
 	}
+	const relationWhere = result[relation.name]
+	if (isOptionalWhere(relationWhere)) {
+		result[relation.name] = replaceWhere(relationWhere, evaluatedPredicate, replacement)
+	}
+	return result
 }
+
+const isOptionalWhere = (value: unknown): value is Input.OptionalWhere =>
+	value !== null && value !== undefined && typeof value === 'object' && !Array.isArray(value)

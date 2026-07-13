@@ -1,6 +1,7 @@
 import { Acl, Input, Model } from '@contember/schema'
 import { Authorizator } from '../../acl/index.js'
 import { ImplementationException } from '../../exception.js'
+import { getManyHasManyMutationPermissions } from './ManyHasManyMutationPermissions.js'
 
 export class CreateEntityRelationAllowedOperationsVisitor
 	implements Model.ColumnVisitor<never>, Model.RelationByTypeVisitor<Input.CreateRelationOperation[]>
@@ -11,12 +12,12 @@ export class CreateEntityRelationAllowedOperationsVisitor
 		throw new ImplementationException('CreateEntityRelationAllowedOperationsVisitor: Not applicable for a column')
 	}
 
-	public visitManyHasManyInverse({ targetEntity, targetRelation }: Model.ManyHasManyInverseContext) {
-		return this.getAllowedOperations(targetEntity, targetEntity, targetRelation)
+	public visitManyHasManyInverse(context: Model.ManyHasManyInverseContext) {
+		return this.getAllowedManyHasManyOperations(context)
 	}
 
-	public visitManyHasManyOwning({ entity, targetEntity, relation }: Model.ManyHasManyOwningContext) {
-		return this.getAllowedOperations(targetEntity, entity, relation)
+	public visitManyHasManyOwning(context: Model.ManyHasManyOwningContext) {
+		return this.getAllowedManyHasManyOperations(context)
 	}
 
 	public visitOneHasMany({ targetEntity, targetRelation }: Model.OneHasManyContext) {
@@ -64,6 +65,29 @@ export class CreateEntityRelationAllowedOperationsVisitor
 			result.push(Input.CreateRelationOperation.connectOrCreate)
 		}
 
+		return result
+	}
+
+	private getAllowedManyHasManyOperations(
+		context: Model.ManyHasManyOwningContext | Model.ManyHasManyInverseContext,
+	): Input.CreateRelationOperation[] {
+		const { targetEntity } = context
+		const { canMutateJunction } = getManyHasManyMutationPermissions(this.authorizator, context, Acl.Operation.create)
+		if (!canMutateJunction) {
+			return []
+		}
+		const result: Input.CreateRelationOperation[] = []
+		const canReadTarget = this.authorizator.getEntityPermission(Acl.Operation.read, targetEntity.name) !== 'no'
+		const canCreateTarget = this.authorizator.getEntityPermission(Acl.Operation.create, targetEntity.name) !== 'no'
+		if (canReadTarget) {
+			result.push(Input.CreateRelationOperation.connect)
+		}
+		if (canCreateTarget) {
+			result.push(Input.CreateRelationOperation.create)
+		}
+		if (canReadTarget && canCreateTarget) {
+			result.push(Input.CreateRelationOperation.connectOrCreate)
+		}
 		return result
 	}
 }

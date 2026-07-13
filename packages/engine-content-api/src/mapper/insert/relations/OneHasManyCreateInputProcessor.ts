@@ -1,5 +1,5 @@
 import { Input, Model } from '@contember/schema'
-import { Mapper } from '../../Mapper.js'
+import { MutationAccess } from '../../MutationAccess.js'
 import { CreateInputProcessor } from '../../../inputProcessing/index.js'
 import { SqlCreateInputProcessorResult } from '../SqlCreateInputProcessor.js'
 import { CheckedPrimary } from '../../CheckedPrimary.js'
@@ -9,24 +9,26 @@ type Context = Model.OneHasManyContext
 
 export class OneHasManyCreateInputProcessor implements CreateInputProcessor.HasManyRelationProcessor<Context, SqlCreateInputProcessorResult> {
 	constructor(
-		private readonly mapper: Mapper,
+		private readonly mapper: MutationAccess,
 	) {
 	}
 	public async connect(
-		{ entity, targetEntity, targetRelation, input }: Context & { input: Input.UniqueWhere | CheckedPrimary },
+		context: Context & { input: Input.UniqueWhere | CheckedPrimary },
 	) {
+		const { targetEntity, targetRelation, input } = context
 		return async ({ primary }: { primary: Input.PrimaryValue }) => {
-			return await this.mapper.update(targetEntity, input, {
+			return await this.mapper.through(context).update(targetEntity, input, {
 				[targetRelation.name]: { connect: new CheckedPrimary(primary) },
 			})
 		}
 	}
 
 	public async create(
-		{ entity, targetEntity, targetRelation, input }: Context & { input: MapperInput.CreateDataInput },
+		context: Context & { input: MapperInput.CreateDataInput },
 	) {
+		const { targetEntity, targetRelation, input } = context
 		return async ({ primary }: { primary: Input.PrimaryValue }) => {
-			return await this.mapper.insert(targetEntity, {
+			return await this.mapper.through(context).insert(targetEntity, {
 				...input,
 				[targetRelation.name]: { connect: new CheckedPrimary(primary) },
 			})
@@ -34,15 +36,16 @@ export class OneHasManyCreateInputProcessor implements CreateInputProcessor.HasM
 	}
 
 	public async connectOrCreate(
-		{ entity, targetRelation, targetEntity, input: { connect, create } }: Context & { input: MapperInput.ConnectOrCreateInput },
+		context: Context & { input: MapperInput.ConnectOrCreateInput },
 	) {
+		const { targetRelation, targetEntity, input: { connect, create } } = context
 		return async ({ primary }: { primary: Input.PrimaryValue }) => {
 			const connectData = {
 				[targetRelation.name]: {
 					connect: new CheckedPrimary(primary),
 				},
 			}
-			return await this.mapper.upsert(targetEntity, connect, connectData, {
+			return await this.mapper.through(context).upsert(targetEntity, connect, connectData, {
 				...create,
 				...connectData,
 			})

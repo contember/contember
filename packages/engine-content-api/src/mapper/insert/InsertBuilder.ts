@@ -6,6 +6,7 @@ import { ColumnValue, normalizeDbValue } from '../ColumnValue.js'
 import { PredicateFactory } from '../../acl/index.js'
 import { AfterInsertEvent, BeforeInsertEvent } from '../EventManager.js'
 import { Mapper } from '../Mapper.js'
+import { MutationAccess } from '../MutationAccess.js'
 
 export interface InsertResult {
 	values: ColumnValue[]
@@ -23,6 +24,7 @@ export class InsertBuilder {
 		private readonly whereBuilder: WhereBuilder,
 		private readonly pathFactory: PathFactory,
 		private readonly predicateFactory: PredicateFactory,
+		private readonly access: MutationAccess,
 	) {}
 
 	public addFieldValue(
@@ -38,7 +40,13 @@ export class InsertBuilder {
 	}
 
 	public addPredicates(fields: string[]): void {
-		const where = this.predicateFactory.create(this.entity, Acl.Operation.create, fields)
+		const where = this.predicateFactory.create(
+			this.entity,
+			Acl.Operation.create,
+			fields,
+			this.access.relationContext,
+			this.access.isRoot,
+		)
 		this.addWhere(where)
 	}
 

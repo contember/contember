@@ -7,6 +7,7 @@ import { ColumnValue, normalizeDbValue } from '../ColumnValue.js'
 import { PredicateFactory } from '../../acl/index.js'
 import { AfterUpdateEvent, BeforeUpdateEvent } from '../EventManager.js'
 import { Mapper } from '../Mapper.js'
+import { MutationAccess } from '../MutationAccess.js'
 
 export interface UpdateResult {
 	values: ColumnValue[]
@@ -27,6 +28,7 @@ export class UpdateBuilder {
 		private readonly primary: Input.PrimaryValue,
 		private readonly pathFactory: PathFactory,
 		private readonly predicateFactory: PredicateFactory,
+		private readonly access: MutationAccess,
 	) {}
 
 	public addFieldValue(
@@ -51,7 +53,13 @@ export class UpdateBuilder {
 	}
 
 	public addPredicates(fields: string[]): void {
-		const predicate = this.predicateFactory.create(this.entity, Acl.Operation.update, fields)
+		const predicate = this.predicateFactory.create(
+			this.entity,
+			Acl.Operation.update,
+			fields,
+			this.access.relationContext,
+			this.access.isRoot,
+		)
 		this.addNewWhere(predicate)
 		this.addOldWhere(predicate)
 	}

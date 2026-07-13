@@ -9,6 +9,7 @@ import { InsertBuilder } from './InsertBuilder.js'
 import { rowDataToFieldValues } from '../ColumnValue.js'
 import { DatabaseMetadata } from '@contember/database'
 import { MapperInput } from '../types.js'
+import { MutationAccess } from '../MutationAccess.js'
 
 export class Inserter {
 	constructor(
@@ -21,17 +22,18 @@ export class Inserter {
 
 	public async insert(
 		mapper: Mapper,
+		access: MutationAccess,
 		entity: Model.Entity,
 		data: MapperInput.CreateDataInput,
 		insertIdCallback: (id: string) => void,
 		builderCb: (builder: InsertBuilder) => void,
 	): Promise<MutationResultList> {
-		const insertBuilder = this.insertBuilderFactory.create(entity)
+		const insertBuilder = this.insertBuilderFactory.create(entity, access)
 
 		insertBuilder.addPredicates(Object.keys(data))
 
 		const visitor = new CreateInputVisitor<SqlCreateInputProcessorResult>(
-			new SqlCreateInputProcessor(insertBuilder, mapper, this.providers, this.options),
+			new SqlCreateInputProcessor(insertBuilder, access, this.providers, this.options),
 			this.schema,
 			data,
 		)

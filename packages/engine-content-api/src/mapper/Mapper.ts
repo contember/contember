@@ -1,4 +1,4 @@
-import { Input, Model } from '@contember/schema'
+import { Acl, Input, Model } from '@contember/schema'
 import { acceptFieldVisitor, getColumnName } from '@contember/schema-utils'
 import {
 	OrderByHelper,
@@ -24,6 +24,7 @@ import { CheckedPrimary } from './CheckedPrimary.js'
 import { ImplementationException } from '../exception.js'
 import { EventManager } from './EventManager.js'
 import { MapperInput } from './types.js'
+import { MutationAccess } from './MutationAccess.js'
 
 export class Mapper<ConnectionType extends Connection.ConnectionLike = Connection.ConnectionLike> {
 	private systemVariablesSetupDone: Promise<void> | undefined
@@ -54,13 +55,22 @@ export class Mapper<ConnectionType extends Connection.ConnectionLike = Connectio
 	}
 
 	public async selectField(entity: Model.Entity, where: Input.UniqueWhere | CheckedPrimary, fieldName: string) {
+		return this.selectFieldWithAccess(new MutationAccess(this), entity, where, fieldName)
+	}
+
+	public async selectFieldWithAccess(
+		access: MutationAccess,
+		entity: Model.Entity,
+		where: Input.UniqueWhere | CheckedPrimary,
+		fieldName: string,
+	) {
 		const columnName = getColumnName(this.schema, entity, fieldName)
 
 		const qb = SelectBuilder.create() //
 			.from(entity.tableName, 'root_')
 			.select(['root_', columnName])
 		const expandedWhere = this.uniqueWhereExpander.expand(entity, where)
-		const withPredicates = this.predicatesInjector.inject(entity, expandedWhere)
+		const withPredicates = this.predicatesInjector.inject(entity, expandedWhere, access.relationContext, access.relationPath)
 		const builtQb = this.whereBuilder.build(qb, entity, this.pathFactory.create([]), withPredicates)
 		const result = await builtQb.getResult(this.db)
 
@@ -188,14 +198,33 @@ export class Mapper<ConnectionType extends Connection.ConnectionLike = Connectio
 		data: MapperInput.CreateDataInput,
 		builderCb: (builder: InsertBuilder) => void = () => {},
 	): Promise<MutationResultList> {
+		return this.insertWithAccess(new MutationAccess(this), entity, data, builderCb)
+	}
+
+	public async insertWithAccess(
+		access: MutationAccess,
+		entity: Model.Entity,
+		data: MapperInput.CreateDataInput,
+		builderCb: (builder: InsertBuilder) => void = () => {},
+	): Promise<MutationResultList> {
 		if (entity.view) {
 			throw new ImplementationException()
 		}
 		await this.setupSystemVariables()
-		return tryMutation(this.schema, this.schemaDatabaseMetadata, () => this.insertInternal(entity, data, builderCb))
+		return tryMutation(this.schema, this.schemaDatabaseMetadata, () => this.insertInternal(access, entity, data, builderCb))
 	}
 
 	public async update(
+		entity: Model.Entity,
+		by: Input.UniqueWhere | CheckedPrimary,
+		data: MapperInput.UpdateDataInput,
+		filter?: Input.OptionalWhere,
+	): Promise<MutationResultList> {
+		return this.updateWithAccess(new MutationAccess(this), entity, by, data, filter)
+	}
+
+	public async updateWithAccess(
+		access: MutationAccess,
 		entity: Model.Entity,
 		by: Input.UniqueWhere | CheckedPrimary,
 		data: MapperInput.UpdateDataInput,
@@ -206,14 +235,23 @@ export class Mapper<ConnectionType extends Connection.ConnectionLike = Connectio
 		}
 		await this.setupSystemVariables()
 		return tryMutation(this.schema, this.schemaDatabaseMetadata, async () => {
-			const [primaryValue, err] = await this.getPrimaryValue(entity, by)
+			const [primaryValue, err] = await this.getPrimaryValueWithAccess(access, entity, by)
 			if (err) return [err]
 
-			return await this.updater.update(this, entity, primaryValue, data, filter)
+			return await this.updater.update(this, access, entity, primaryValue, data, filter)
 		})
 	}
 
 	public async updateInternal(
+		entity: Model.Entity,
+		by: Input.UniqueWhere | CheckedPrimary,
+		builderCb: (builder: UpdateBuilder) => void,
+	): Promise<MutationResultList> {
+		return this.updateInternalWithAccess(new MutationAccess(this), entity, by, builderCb)
+	}
+
+	public async updateInternalWithAccess(
+		access: MutationAccess,
 		entity: Model.Entity,
 		by: Input.UniqueWhere | CheckedPrimary,
 		builderCb: (builder: UpdateBuilder) => void,
@@ -223,13 +261,25 @@ export class Mapper<ConnectionType extends Connection.ConnectionLike = Connectio
 		}
 		await this.setupSystemVariables()
 		return tryMutation(this.schema, this.schemaDatabaseMetadata, async () => {
-			const [primaryValue, err] = await this.getPrimaryValue(entity, by)
+			const [primaryValue, err] = await this.getPrimaryValueWithAccess(access, entity, by)
 			if (err) return [err]
 
-			return await this.updater.updateCb(this, entity, primaryValue, builderCb)
+			return await this.updater.updateCb(this, access, entity, primaryValue, builderCb)
 		})
 	}
+
 	public async upsert(
+		entity: Model.Entity,
+		by: Input.UniqueWhere | CheckedPrimary,
+		update: MapperInput.UpdateDataInput,
+		create: MapperInput.CreateDataInput,
+		filter?: Input.OptionalWhere,
+	): Promise<MutationResultList> {
+		return this.upsertWithAccess(new MutationAccess(this), entity, by, update, create, filter)
+	}
+
+	public async upsertWithAccess(
+		access: MutationAccess,
 		entity: Model.Entity,
 		by: Input.UniqueWhere | CheckedPrimary,
 		update: MapperInput.UpdateDataInput,
@@ -241,20 +291,34 @@ export class Mapper<ConnectionType extends Connection.ConnectionLike = Connectio
 		}
 		await this.setupSystemVariables()
 		return tryMutation(this.schema, this.schemaDatabaseMetadata, async () => {
-			const [primaryValue] = await this.getPrimaryValue(entity, by)
+			const [primaryValue] = await this.getPrimaryValueWithAccess(access, entity, by)
 			if (primaryValue === undefined) {
-				return await this.insertInternal(entity, create)
+				return await this.insertInternal(access, entity, create)
 			}
-			return await this.updater.update(this, entity, primaryValue, update, filter)
+			return await this.updater.update(this, access, entity, primaryValue, update, filter)
 		})
 	}
 
-	private insertInternal(entity: Model.Entity, data: MapperInput.CreateDataInput, builderCb: (builder: InsertBuilder) => void = () => {}) {
-		return this.inserter.insert(this, entity, data, id => {
+	private insertInternal(
+		access: MutationAccess,
+		entity: Model.Entity,
+		data: MapperInput.CreateDataInput,
+		builderCb: (builder: InsertBuilder) => void = () => {},
+	) {
+		return this.inserter.insert(this, access, entity, data, () => {
 		}, builderCb)
 	}
 
 	public async delete(
+		entity: Model.Entity,
+		by: Input.UniqueWhere | CheckedPrimary,
+		filter?: Input.OptionalWhere,
+	): Promise<MutationResultList> {
+		return this.deleteWithAccess(new MutationAccess(this), entity, by, filter)
+	}
+
+	public async deleteWithAccess(
+		access: MutationAccess,
 		entity: Model.Entity,
 		by: Input.UniqueWhere | CheckedPrimary,
 		filter?: Input.OptionalWhere,
@@ -264,7 +328,7 @@ export class Mapper<ConnectionType extends Connection.ConnectionLike = Connectio
 		}
 		await this.setupSystemVariables()
 		return tryMutation(this.schema, this.schemaDatabaseMetadata, () => {
-			return this.deleteExecutor.execute(this, entity, by, filter)
+			return this.deleteExecutor.execute(this, access, entity, by, filter)
 		})
 	}
 
@@ -273,17 +337,47 @@ export class Mapper<ConnectionType extends Connection.ConnectionLike = Connectio
 		relation: Model.ManyHasManyOwningRelation | Model.ManyHasManyInverseRelation,
 		thisPrimary: Input.PrimaryValue,
 		otherPrimary: Input.PrimaryValue,
+		operation: Acl.Operation.create | Acl.Operation.update = Acl.Operation.update,
+	): Promise<MutationResultList> {
+		return this.connectJunctionWithAccess(new MutationAccess(this), entity, relation, thisPrimary, otherPrimary, operation)
+	}
+
+	public async connectJunctionWithAccess(
+		access: MutationAccess,
+		entity: Model.Entity,
+		relation: Model.ManyHasManyOwningRelation | Model.ManyHasManyInverseRelation,
+		thisPrimary: Input.PrimaryValue,
+		otherPrimary: Input.PrimaryValue,
+		operation: Acl.Operation.create | Acl.Operation.update = Acl.Operation.update,
 	): Promise<MutationResultList> {
 		await this.setupSystemVariables()
 		const err = () => {
 			throw new ImplementationException()
 		}
 		return await acceptFieldVisitor(this.schema, entity, relation, {
-			visitManyHasManyOwning: ({ entity, relation }) => {
-				return this.junctionTableManager.connectJunction(this, entity, relation, thisPrimary, otherPrimary)
+			visitManyHasManyOwning: context => {
+				return this.junctionTableManager.connectJunction(
+					this,
+					access,
+					access.through(context),
+					context.entity,
+					context.relation,
+					thisPrimary,
+					otherPrimary,
+					operation,
+				)
 			},
-			visitManyHasManyInverse: ({ targetEntity, targetRelation }) => {
-				return this.junctionTableManager.connectJunction(this, targetEntity, targetRelation, otherPrimary, thisPrimary)
+			visitManyHasManyInverse: context => {
+				return this.junctionTableManager.connectJunction(
+					this,
+					access.through(context),
+					access,
+					context.targetEntity,
+					context.targetRelation,
+					otherPrimary,
+					thisPrimary,
+					operation,
+				)
 			},
 			visitColumn: err,
 			visitOneHasMany: err,
@@ -299,16 +393,42 @@ export class Mapper<ConnectionType extends Connection.ConnectionLike = Connectio
 		thisPrimary: Input.PrimaryValue,
 		otherPrimary: Input.PrimaryValue,
 	): Promise<MutationResultList> {
+		return this.disconnectJunctionWithAccess(new MutationAccess(this), entity, relation, thisPrimary, otherPrimary)
+	}
+
+	public async disconnectJunctionWithAccess(
+		access: MutationAccess,
+		entity: Model.Entity,
+		relation: Model.ManyHasManyOwningRelation | Model.ManyHasManyInverseRelation,
+		thisPrimary: Input.PrimaryValue,
+		otherPrimary: Input.PrimaryValue,
+	): Promise<MutationResultList> {
 		await this.setupSystemVariables()
 		const err = () => {
 			throw new ImplementationException()
 		}
 		return await acceptFieldVisitor(this.schema, entity, relation, {
-			visitManyHasManyOwning: ({ entity, relation }) => {
-				return this.junctionTableManager.disconnectJunction(this, entity, relation, thisPrimary, otherPrimary)
+			visitManyHasManyOwning: context => {
+				return this.junctionTableManager.disconnectJunction(
+					this,
+					access,
+					access.through(context),
+					context.entity,
+					context.relation,
+					thisPrimary,
+					otherPrimary,
+				)
 			},
-			visitManyHasManyInverse: ({ targetEntity, targetRelation }) => {
-				return this.junctionTableManager.disconnectJunction(this, targetEntity, targetRelation, otherPrimary, thisPrimary)
+			visitManyHasManyInverse: context => {
+				return this.junctionTableManager.disconnectJunction(
+					this,
+					access.through(context),
+					access,
+					context.targetEntity,
+					context.targetRelation,
+					otherPrimary,
+					thisPrimary,
+				)
 			},
 			visitColumn: err,
 			visitOneHasMany: err,
@@ -322,10 +442,18 @@ export class Mapper<ConnectionType extends Connection.ConnectionLike = Connectio
 		entity: Model.Entity,
 		where: Input.UniqueWhere | CheckedPrimary,
 	): Promise<[Input.PrimaryValue, undefined] | [undefined, MutationEntryNotFoundError]> {
+		return this.getPrimaryValueWithAccess(new MutationAccess(this), entity, where)
+	}
+
+	public async getPrimaryValueWithAccess(
+		access: MutationAccess,
+		entity: Model.Entity,
+		where: Input.UniqueWhere | CheckedPrimary,
+	): Promise<[Input.PrimaryValue, undefined] | [undefined, MutationEntryNotFoundError]> {
 		if (where instanceof CheckedPrimary) {
 			return [where.primaryValue, undefined]
 		}
-		const result = await this.selectField(entity, where, entity.primary)
+		const result = await this.selectFieldWithAccess(access, entity, where, entity.primary)
 		return result ? [result, undefined] : [undefined, new MutationEntryNotFoundError([], where)]
 	}
 

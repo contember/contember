@@ -1,4 +1,4 @@
-import { Mapper } from '../../Mapper.js'
+import { MutationAccess } from '../../MutationAccess.js'
 import { ConstraintType, MutationConstraintViolationError, MutationEntryNotFoundError, MutationResultList } from '../../Result.js'
 import { CheckedPrimary } from '../../CheckedPrimary.js'
 import { Input, Model } from '@contember/schema'
@@ -10,14 +10,14 @@ type Context = Model.OneHasOneInverseContext
 
 export class OneHasOneInverseCreateInputProcessor implements CreateInputProcessor.HasOneRelationProcessor<Context, SqlCreateInputProcessorResult> {
 	constructor(
-		private readonly mapper: Mapper,
+		private readonly mapper: MutationAccess,
 	) {
 	}
 
 	public async connect(context: Context & { input: Input.UniqueWhere | CheckedPrimary }) {
 		return async ({ primary }: { primary: Input.PrimaryValue }) => {
 			const { targetEntity, input } = context
-			const [owner, err] = await this.mapper.getPrimaryValue(targetEntity, input)
+			const [owner, err] = await this.mapper.through(context).getPrimaryValue(targetEntity, input)
 			if (err) return [err]
 
 			return await this.connectInternal({ ...context, input: new CheckedPrimary(owner) }, primary)
@@ -25,10 +25,11 @@ export class OneHasOneInverseCreateInputProcessor implements CreateInputProcesso
 	}
 
 	public async create(
-		{ input, targetRelation, targetEntity }: Context & { input: MapperInput.CreateDataInput },
+		context: Context & { input: MapperInput.CreateDataInput },
 	) {
+		const { input, targetRelation, targetEntity } = context
 		return async ({ primary }: { primary: Input.PrimaryValue }) => {
-			return await this.mapper.insert(targetEntity, input, builder => {
+			return await this.mapper.through(context).insert(targetEntity, input, builder => {
 				builder.addPredicates([targetRelation.name])
 				builder.addFieldValue(targetRelation.name, primary)
 			})
@@ -39,7 +40,7 @@ export class OneHasOneInverseCreateInputProcessor implements CreateInputProcesso
 		{ input, ...context }: Context & { input: MapperInput.ConnectOrCreateInput },
 	) {
 		return async ({ primary }: { primary: Input.PrimaryValue }) => {
-			const [owner] = await this.mapper.getPrimaryValue(context.targetEntity, input.connect)
+			const [owner] = await this.mapper.through(context).getPrimaryValue(context.targetEntity, input.connect)
 			if (owner) {
 				return await this.connectInternal({ ...context, input: new CheckedPrimary(owner) }, primary)
 			}
@@ -49,10 +50,12 @@ export class OneHasOneInverseCreateInputProcessor implements CreateInputProcesso
 	}
 
 	private async connectInternal(
-		{ entity, targetEntity, targetRelation, relation, input }: Context & { input: CheckedPrimary },
+		context: Context & { input: CheckedPrimary },
 		primary: Input.PrimaryValue,
 	) {
-		const currentInverseSideOfOwner = await this.mapper.selectField(targetEntity, input, targetRelation.name)
+		const { entity, targetEntity, targetRelation, relation, input } = context
+		const targetAccess = this.mapper.through(context)
+		const currentInverseSideOfOwner = await targetAccess.selectField(targetEntity, input, targetRelation.name)
 		const orphanResult: MutationResultList = []
 		if (currentInverseSideOfOwner) {
 			if (targetRelation.orphanRemoval) {
@@ -64,7 +67,7 @@ export class OneHasOneInverseCreateInputProcessor implements CreateInputProcesso
 			}
 		}
 
-		const connectResult = await this.mapper.updateInternal(targetEntity, input, update => {
+		const connectResult = await targetAccess.updateInternal(targetEntity, input, update => {
 			update.addPredicates([targetRelation.name])
 			update.addFieldValue(targetRelation.name, primary)
 		})
@@ -79,7 +82,7 @@ export class OneHasOneInverseCreateInputProcessor implements CreateInputProcesso
 		context: Context & { input: MapperInput.CreateDataInput },
 		primary: Input.PrimaryValue,
 	) {
-		return await this.mapper.insert(context.targetEntity, context.input, builder => {
+		return await this.mapper.through(context).insert(context.targetEntity, context.input, builder => {
 			builder.addPredicates([context.targetRelation.name])
 			builder.addFieldValue(context.targetRelation.name, primary)
 		})

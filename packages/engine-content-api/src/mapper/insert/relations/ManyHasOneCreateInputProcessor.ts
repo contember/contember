@@ -1,6 +1,6 @@
 import { Input, Model } from '@contember/schema'
 import { getInsertPrimary, MutationEntryNotFoundError } from '../../Result.js'
-import { Mapper } from '../../Mapper.js'
+import { MutationAccess } from '../../MutationAccess.js'
 import { CreateInputProcessor } from '../../../inputProcessing/index.js'
 import { SqlCreateInputProcessorResult } from '../SqlCreateInputProcessor.js'
 import { InsertBuilder } from '../InsertBuilder.js'
@@ -11,23 +11,25 @@ type Context = Model.ManyHasOneContext
 
 export class ManyHasOneCreateInputProcessor implements CreateInputProcessor.HasManyRelationProcessor<Context, SqlCreateInputProcessorResult> {
 	constructor(
-		private readonly mapper: Mapper,
+		private readonly mapper: MutationAccess,
 		private readonly insertBuilder: InsertBuilder,
 	) {
 	}
 	public async connect(
-		{ targetEntity, relation, input }: Context & { input: Input.UniqueWhere | CheckedPrimary },
+		context: Context & { input: Input.UniqueWhere | CheckedPrimary },
 	) {
-		const [value, err] = await this.mapper.getPrimaryValue(targetEntity, input)
+		const { targetEntity, relation, input } = context
+		const [value, err] = await this.mapper.through(context).getPrimaryValue(targetEntity, input)
 		if (err) return [err]
 		this.insertBuilder.addFieldValue(relation.name, value)
 		return []
 	}
 
 	public async create(
-		{ relation, targetEntity, input }: Context & { input: MapperInput.CreateDataInput },
+		context: Context & { input: MapperInput.CreateDataInput },
 	) {
-		const insertResult = await this.mapper.insert(targetEntity, input)
+		const { relation, targetEntity, input } = context
+		const insertResult = await this.mapper.through(context).insert(targetEntity, input)
 		const value = getInsertPrimary(insertResult)
 		if (!value) {
 			return insertResult
@@ -37,13 +39,15 @@ export class ManyHasOneCreateInputProcessor implements CreateInputProcessor.HasM
 	}
 
 	public async connectOrCreate(
-		{ input: { connect, create }, relation, targetEntity }: Context & { input: MapperInput.ConnectOrCreateInput },
+		context: Context & { input: MapperInput.ConnectOrCreateInput },
 	) {
-		const [value] = await this.mapper.getPrimaryValue(targetEntity, connect)
+		const { input: { connect, create }, relation, targetEntity } = context
+		const targetAccess = this.mapper.through(context)
+		const [value] = await targetAccess.getPrimaryValue(targetEntity, connect)
 		if (value) {
 			this.insertBuilder.addFieldValue(relation.name, value)
 		} else {
-			const insertResult = await this.mapper.insert(targetEntity, create)
+			const insertResult = await targetAccess.insert(targetEntity, create)
 			const primary = getInsertPrimary(insertResult)
 			if (!primary) {
 				return insertResult

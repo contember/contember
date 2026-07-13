@@ -1,6 +1,6 @@
 import { Acl, Input, Model } from '@contember/schema'
 import { VariableInjector } from './VariableInjector.js'
-import { EvaluatedPredicateReplacer } from './EvaluatedPredicateReplacer.js'
+import { replaceEvaluatedPredicate } from './EvaluatedPredicateReplacer.js'
 
 const getRowLevelPredicatePseudoField = (entity: Model.Entity) => entity.primary
 
@@ -131,10 +131,9 @@ export class PredicateFactory {
 		return permissions?.[fieldName] !== permissions?.[rowLevelField]
 	}
 
-	/** Delete predicates are not context-aware — through-permission support is scoped to read operations only. */
-	public createDeletePredicate(entity: Model.Entity) {
+	public createDeletePredicate(entity: Model.Entity, relationContext?: Model.AnyRelationContext, isRoot = true) {
 		const neverCondition: Input.Where = { [entity.primary]: { never: true } }
-		const entityPermissions = this.permissions[entity.name]
+		const entityPermissions = this.getPermissionsForContext(isRoot)[entity.name]
 		if (!entityPermissions) {
 			return neverCondition
 		}
@@ -145,7 +144,7 @@ export class PredicateFactory {
 		if (deletePredicate === true) {
 			return {}
 		}
-		return this.buildPredicates(entity, [deletePredicate])
+		return this.buildPredicates(entity, [deletePredicate], relationContext, isRoot)
 	}
 
 	public create(
@@ -279,7 +278,6 @@ export class PredicateFactory {
 
 		const replacement: Input.OptionalWhere = { [relationContext.entity.primary]: { always: true } }
 		this.evaluatedPredicateReplacements.add(replacement)
-		const replacer = new EvaluatedPredicateReplacer(sourcePredicate, relationContext.entity, relationContext.targetRelation, replacement)
-		return replacer.replace(where)
+		return replaceEvaluatedPredicate(where, sourcePredicate, relationContext.targetRelation, replacement)
 	}
 }

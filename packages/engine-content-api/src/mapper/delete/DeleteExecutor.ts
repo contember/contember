@@ -28,6 +28,7 @@ import {
 import { getEntity } from '@contember/schema-utils'
 import { AfterUpdateEvent, BeforeDeleteEvent, BeforeUpdateEvent, EventManager } from '../EventManager.js'
 import { ImplementationException } from '../../exception.js'
+import { MutationAccess } from '../MutationAccess.js'
 
 type DeleteQueue = [entity: Model.Entity, ids: Input.PrimaryValue[]][]
 
@@ -45,12 +46,13 @@ export class DeleteExecutor {
 
 	public async execute(
 		mapper: Mapper,
+		access: MutationAccess,
 		entity: Model.Entity,
 		by: Input.UniqueWhere | CheckedPrimary,
 		filter?: Input.OptionalWhere,
 	): Promise<MutationResultList> {
 		return mapper.mutex.execute(async () => {
-			const [primaryValue, err] = await mapper.getPrimaryValue(entity, by)
+			const [primaryValue, err] = await access.getPrimaryValue(entity, by)
 			if (err) return [err]
 
 			if (mapper.deletedEntities.isDeleted(entity.name, primaryValue)) {
@@ -60,7 +62,7 @@ export class DeleteExecutor {
 			const primaryWhere = { [entity.primary]: { eq: primaryValue } }
 			const where = filter ? { and: [primaryWhere, filter] } : primaryWhere
 			const state = new DeleteState(mapper.deletedEntities)
-			const deletePrimary = await this.collectDeleteInfo(state, mapper, entity, where)
+			const deletePrimary = await this.collectDeleteInfo(state, mapper, entity, where, access)
 
 			const deleteQueue: DeleteQueue = [[entity, deletePrimary]]
 			await this.collectOrphanRemovals(state, mapper, deleteQueue)
@@ -128,8 +130,9 @@ export class DeleteExecutor {
 		mapper: Mapper,
 		entity: Model.Entity,
 		where: Input.OptionalWhere,
+		access = new MutationAccess(mapper),
 	): Promise<Input.PrimaryValue[]> {
-		const predicate = this.predicateFactory.createDeletePredicate(entity)
+		const predicate = this.predicateFactory.createDeletePredicate(entity, access.relationContext, access.isRoot)
 		const orphanRemovals = findRelationsWithOrphanRemoval(this.schema, entity)
 
 		const qb = SelectBuilder.create<DeleteInfoRow>()

@@ -8,7 +8,7 @@ import {
 	MutationNothingToDo,
 	NothingToDoReason,
 } from '../../Result.js'
-import { Mapper } from '../../Mapper.js'
+import { MutationAccess } from '../../MutationAccess.js'
 import { SqlUpdateInputProcessorResult } from '../SqlUpdateInputProcessor.js'
 import { UpdateBuilder } from '../UpdateBuilder.js'
 import { CheckedPrimary } from '../../CheckedPrimary.js'
@@ -18,25 +18,27 @@ type Context = Model.ManyHasOneContext
 
 export class ManyHasOneUpdateInputProcessor implements UpdateInputProcessor.HasOneRelationInputProcessor<Context, SqlUpdateInputProcessorResult> {
 	constructor(
-		private readonly mapper: Mapper,
+		private readonly mapper: MutationAccess,
 		private readonly builder: UpdateBuilder,
 		private readonly primary: Input.PrimaryValue,
 	) {
 	}
 
 	public async connect(
-		{ targetEntity, relation, input }: Context & { input: Input.UniqueWhere | CheckedPrimary },
+		context: Context & { input: Input.UniqueWhere | CheckedPrimary },
 	) {
-		const [value, err] = await this.mapper.getPrimaryValue(targetEntity, input)
+		const { targetEntity, relation, input } = context
+		const [value, err] = await this.mapper.through(context).getPrimaryValue(targetEntity, input)
 		if (err) return [err]
 		this.builder.addFieldValue(relation.name, value)
 		return []
 	}
 
 	public async create(
-		{ relation, targetEntity, input }: Context & { input: MapperInput.CreateDataInput },
+		context: Context & { input: MapperInput.CreateDataInput },
 	) {
-		const insertResult = await this.mapper.insert(targetEntity, input)
+		const { relation, targetEntity, input } = context
+		const insertResult = await this.mapper.through(context).insert(targetEntity, input)
 		const value = getInsertPrimary(insertResult)
 		if (!value) {
 			return insertResult
@@ -46,13 +48,15 @@ export class ManyHasOneUpdateInputProcessor implements UpdateInputProcessor.HasO
 	}
 
 	public async connectOrCreate(
-		{ input: { connect, create }, relation, targetEntity }: Context & { input: MapperInput.ConnectOrCreateInput },
+		context: Context & { input: MapperInput.ConnectOrCreateInput },
 	) {
-		const [value] = await this.mapper.getPrimaryValue(targetEntity, connect)
+		const { input: { connect, create }, relation, targetEntity } = context
+		const targetAccess = this.mapper.through(context)
+		const [value] = await targetAccess.getPrimaryValue(targetEntity, connect)
 		if (value) {
 			this.builder.addFieldValue(relation.name, value)
 		} else {
-			const insertResult = await this.mapper.insert(targetEntity, create)
+			const insertResult = await targetAccess.insert(targetEntity, create)
 			const primary = getInsertPrimary(insertResult)
 			if (!primary) {
 				return insertResult
@@ -64,8 +68,9 @@ export class ManyHasOneUpdateInputProcessor implements UpdateInputProcessor.HasO
 	}
 
 	public async update(
-		{ entity, relation, targetEntity, targetRelation, input }: Context & { input: MapperInput.UpdateDataInput },
+		context: Context & { input: MapperInput.UpdateDataInput },
 	) {
+		const { entity, relation, targetEntity, input } = context
 		return async ({ primary }: { primary: Input.PrimaryValue }) => {
 			const inversePrimary = await this.mapper.selectField(
 				entity,
@@ -75,16 +80,17 @@ export class ManyHasOneUpdateInputProcessor implements UpdateInputProcessor.HasO
 			if (!inversePrimary) {
 				return [new MutationNothingToDo([], NothingToDoReason.emptyRelation)]
 			}
-			return await this.mapper.update(targetEntity, new CheckedPrimary(inversePrimary), input)
+			return await this.mapper.through(context).update(targetEntity, new CheckedPrimary(inversePrimary), input)
 		}
 	}
 
 	public async upsert(
-		{ entity, relation, targetEntity, input: { create, update } }: Context & { input: UpdateInputProcessor.UpsertInput },
+		context: Context & { input: UpdateInputProcessor.UpsertInput },
 	) {
+		const { entity, relation, targetEntity, input: { create, update } } = context
 		const inversePrimary = await this.mapper.selectField(entity, { [entity.primary]: this.primary }, relation.name)
 		if (!inversePrimary) {
-			const insertResult = await this.mapper.insert(targetEntity, create)
+			const insertResult = await this.mapper.through(context).insert(targetEntity, create)
 			const insertPrimary = getInsertPrimary(insertResult)
 			if (insertPrimary) {
 				this.builder.addFieldValue(relation.name, insertPrimary)
@@ -92,7 +98,7 @@ export class ManyHasOneUpdateInputProcessor implements UpdateInputProcessor.HasO
 			return insertResult
 		}
 
-		return async () => await this.mapper.update(targetEntity, new CheckedPrimary(inversePrimary), update)
+		return async () => await this.mapper.through(context).update(targetEntity, new CheckedPrimary(inversePrimary), update)
 	}
 
 	public async disconnect(
@@ -106,8 +112,9 @@ export class ManyHasOneUpdateInputProcessor implements UpdateInputProcessor.HasO
 	}
 
 	public async delete(
-		{ entity, targetEntity, relation, targetRelation }: Context & { input: undefined },
+		context: Context & { input: undefined },
 	) {
+		const { entity, targetEntity, relation } = context
 		if (!relation.nullable && relation.joiningColumn.onDelete !== Model.OnDelete.cascade) {
 			return [new MutationConstraintViolationError([], ConstraintType.notNull)]
 		}
@@ -117,7 +124,7 @@ export class ManyHasOneUpdateInputProcessor implements UpdateInputProcessor.HasO
 				{ [entity.primary]: primary },
 				relation.name,
 			)
-			return await this.mapper.delete(targetEntity, { [targetEntity.primary]: inversePrimary })
+			return await this.mapper.through(context).delete(targetEntity, { [targetEntity.primary]: inversePrimary })
 		}
 	}
 }

@@ -15,6 +15,7 @@ import {
 import { UpdateBuilder } from './UpdateBuilder.js'
 import { rowDataToFieldValues } from '../ColumnValue.js'
 import { MapperInput } from '../types.js'
+import { MutationAccess } from '../MutationAccess.js'
 
 export class Updater {
 	constructor(
@@ -24,12 +25,13 @@ export class Updater {
 
 	public async update(
 		mapper: Mapper,
+		access: MutationAccess,
 		entity: Model.Entity,
 		primaryValue: Input.PrimaryValue,
 		data: MapperInput.UpdateDataInput,
 		filter?: Input.OptionalWhere,
 	): Promise<MutationResultList> {
-		const updateBuilder = this.updateBuilderFactory.create(entity, primaryValue)
+		const updateBuilder = this.updateBuilderFactory.create(entity, primaryValue, access)
 
 		const predicateFields = Object.keys(data)
 		updateBuilder.addPredicates(predicateFields)
@@ -38,7 +40,7 @@ export class Updater {
 		}
 
 		const visitor = new UpdateInputVisitor<SqlUpdateInputProcessorResult>(
-			new SqlUpdateInputProcessor(primaryValue, data, updateBuilder, mapper),
+			new SqlUpdateInputProcessor(primaryValue, data, updateBuilder, access),
 			this.schema,
 			data,
 		)
@@ -107,11 +109,12 @@ export class Updater {
 
 	public async updateCb(
 		mapper: Mapper,
+		access: MutationAccess,
 		entity: Model.Entity,
 		primaryValue: Input.PrimaryValue,
 		builderCb: (builder: UpdateBuilder) => void,
 	): Promise<MutationResultList> {
-		const updateBuilder = this.updateBuilderFactory.create(entity, primaryValue)
+		const updateBuilder = this.updateBuilderFactory.create(entity, primaryValue, access)
 
 		builderCb(updateBuilder)
 

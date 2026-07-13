@@ -8,7 +8,7 @@ import {
 } from '../../Result.js'
 import { UpdateInputProcessor } from '../../../inputProcessing/index.js'
 import { Input, Model } from '@contember/schema'
-import { Mapper } from '../../Mapper.js'
+import { MutationAccess } from '../../MutationAccess.js'
 import { SqlUpdateInputProcessorResult } from '../SqlUpdateInputProcessor.js'
 import { CheckedPrimary } from '../../CheckedPrimary.js'
 import { MapperInput } from '../../types.js'
@@ -20,13 +20,13 @@ export class OneHasOneInverseUpdateInputProcessor
 {
 	constructor(
 		private readonly primaryValue: Input.PrimaryValue,
-		private readonly mapper: Mapper,
+		private readonly mapper: MutationAccess,
 	) {
 	}
 
 	public async connect({ input, ...ctx }: Model.OneHasOneInverseContext & { input: Input.UniqueWhere | CheckedPrimary }) {
 		return async () => {
-			const [newOwner, err] = await this.mapper.getPrimaryValue(ctx.targetEntity, input)
+			const [newOwner, err] = await this.mapper.through(ctx).getPrimaryValue(ctx.targetEntity, input)
 			if (err) return [err]
 			return await this.connectInternal(ctx, newOwner)
 		}
@@ -36,7 +36,7 @@ export class OneHasOneInverseUpdateInputProcessor
 		{ input, ...ctx }: Model.OneHasOneInverseContext & { input: MapperInput.ConnectOrCreateInput },
 	) {
 		return async () => {
-			const [newOwner] = await this.mapper.getPrimaryValue(ctx.targetEntity, input.connect)
+			const [newOwner] = await this.mapper.through(ctx).getPrimaryValue(ctx.targetEntity, input.connect)
 			if (newOwner) {
 				return await this.connectInternal(ctx, newOwner)
 			}
@@ -50,9 +50,10 @@ export class OneHasOneInverseUpdateInputProcessor
 		}
 	}
 
-	public async update({ entity, targetEntity, targetRelation, input }: Model.OneHasOneInverseContext & { input: MapperInput.UpdateDataInput }) {
+	public async update(context: Model.OneHasOneInverseContext & { input: MapperInput.UpdateDataInput }) {
+		const { entity, targetEntity, targetRelation, input } = context
 		return async () => {
-			return await this.mapper.update(
+			return await this.mapper.through(context).update(
 				targetEntity,
 				{ [targetRelation.name]: { [entity.primary]: this.primaryValue } },
 				input,
@@ -63,7 +64,7 @@ export class OneHasOneInverseUpdateInputProcessor
 	public async upsert(context: Model.OneHasOneInverseContext & { input: UpdateInputProcessor.UpsertInput }) {
 		return async () => {
 			const { targetEntity, targetRelation, entity, input: { update, create } } = context
-			const result = await this.mapper.update(
+			const result = await this.mapper.through(context).update(
 				targetEntity,
 				{ [targetRelation.name]: { [entity.primary]: this.primaryValue } },
 				update,
@@ -78,12 +79,14 @@ export class OneHasOneInverseUpdateInputProcessor
 		}
 	}
 
-	public async disconnect({ entity, targetEntity, relation, targetRelation }: Model.OneHasOneInverseContext & { input: undefined }) {
+	public async disconnect(context: Model.OneHasOneInverseContext & { input: undefined }) {
+		const { entity, targetEntity, relation, targetRelation } = context
 		return async () => {
 			if (!relation.nullable && !targetRelation.orphanRemoval) {
 				return [new MutationConstraintViolationError([], ConstraintType.notNull)]
 			}
-			const [currentOwner] = await this.mapper.getPrimaryValue(targetEntity, {
+			const targetAccess = this.mapper.through(context)
+			const [currentOwner] = await targetAccess.getPrimaryValue(targetEntity, {
 				[targetRelation.name]: { [entity.primary]: this.primaryValue },
 			})
 			if (!currentOwner) {
@@ -93,7 +96,7 @@ export class OneHasOneInverseUpdateInputProcessor
 				return [new MutationConstraintViolationError([], ConstraintType.notNull)]
 			}
 
-			const result = await this.mapper.updateInternal(
+			const result = await targetAccess.updateInternal(
 				targetEntity,
 				new CheckedPrimary(currentOwner),
 				builder => {
@@ -108,21 +111,24 @@ export class OneHasOneInverseUpdateInputProcessor
 		}
 	}
 
-	public async delete({ entity, targetEntity, relation, targetRelation }: Model.OneHasOneInverseContext & { input: undefined }) {
+	public async delete(context: Model.OneHasOneInverseContext & { input: undefined }) {
+		const { entity, targetEntity, relation, targetRelation } = context
 		return async () => {
 			if (!relation.nullable && !targetRelation.orphanRemoval) {
 				return [new MutationConstraintViolationError([], ConstraintType.notNull)]
 			}
 			// orphan removal is handled in mapper.delete
-			return await this.mapper.delete(targetEntity, { [targetRelation.name]: { [entity.primary]: this.primaryValue } })
+			return await this.mapper.through(context).delete(targetEntity, { [targetRelation.name]: { [entity.primary]: this.primaryValue } })
 		}
 	}
 
 	private async connectInternal(
-		{ entity, targetEntity, targetRelation }: Model.OneHasOneInverseContext,
+		context: Model.OneHasOneInverseContext,
 		newOwner: Input.PrimaryValue,
 	) {
-		const [currentOwner] = await this.mapper.getPrimaryValue(targetEntity, {
+		const { entity, targetEntity, targetRelation } = context
+		const targetAccess = this.mapper.through(context)
+		const [currentOwner] = await targetAccess.getPrimaryValue(targetEntity, {
 			[targetRelation.name]: { [entity.primary]: this.primaryValue },
 		})
 		if (newOwner === currentOwner) {
@@ -134,17 +140,17 @@ export class OneHasOneInverseUpdateInputProcessor
 				// todo cascade delete support?
 				return [new MutationConstraintViolationError([], ConstraintType.notNull)]
 			}
-			const disconnectFromCurrentOwner = await this.mapper.updateInternal(targetEntity, new CheckedPrimary(currentOwner), builder => {
+			const disconnectFromCurrentOwner = await targetAccess.updateInternal(targetEntity, new CheckedPrimary(currentOwner), builder => {
 				builder.addPredicates([targetRelation.name])
 				builder.addFieldValue(targetRelation.name, null)
 			})
 			result.push(...disconnectFromCurrentOwner)
 		}
 		const orphanedInverseSide = targetRelation.orphanRemoval
-			? await this.mapper.selectField(targetEntity, { [targetEntity.primary]: newOwner }, targetRelation.name)
+			? await targetAccess.selectField(targetEntity, { [targetEntity.primary]: newOwner }, targetRelation.name)
 			: null
 
-		const connectToNewOwner = await this.mapper.updateInternal(targetEntity, new CheckedPrimary(newOwner), builder => {
+		const connectToNewOwner = await targetAccess.updateInternal(targetEntity, new CheckedPrimary(newOwner), builder => {
 			builder.addPredicates([targetRelation.name])
 			builder.addFieldValue(targetRelation.name, this.primaryValue)
 		})
@@ -158,9 +164,11 @@ export class OneHasOneInverseUpdateInputProcessor
 	}
 
 	private async createInternal(
-		{ entity, targetEntity, targetRelation, input }: Model.OneHasOneInverseContext & { input: MapperInput.CreateDataInput },
+		context: Model.OneHasOneInverseContext & { input: MapperInput.CreateDataInput },
 	) {
-		const [currentOwner] = await this.mapper.getPrimaryValue(targetEntity, {
+		const { entity, targetEntity, targetRelation, input } = context
+		const targetAccess = this.mapper.through(context)
+		const [currentOwner] = await targetAccess.getPrimaryValue(targetEntity, {
 			[targetRelation.name]: { [entity.primary]: this.primaryValue },
 		})
 		if (currentOwner && !targetRelation.nullable) {
@@ -169,14 +177,14 @@ export class OneHasOneInverseUpdateInputProcessor
 		}
 		const result: MutationResultList = []
 		if (currentOwner) {
-			const disconnectFromCurrentOwner = await this.mapper.updateInternal(targetEntity, new CheckedPrimary(currentOwner), builder => {
+			const disconnectFromCurrentOwner = await targetAccess.updateInternal(targetEntity, new CheckedPrimary(currentOwner), builder => {
 				builder.addPredicates([targetRelation.name])
 				builder.addFieldValue(targetRelation.name, null)
 			})
 			result.push(...disconnectFromCurrentOwner)
 		}
 
-		const connectToNewlyCreatedOwner = await this.mapper.insert(targetEntity, input, builder => {
+		const connectToNewlyCreatedOwner = await targetAccess.insert(targetEntity, input, builder => {
 			builder.addFieldValue(targetRelation.name, this.primaryValue)
 			builder.addPredicates([targetRelation.name])
 		})

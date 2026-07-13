@@ -1,6 +1,6 @@
 import { ConstraintType, getInsertPrimary, MutationConstraintViolationError, MutationEntryNotFoundError, MutationResultList } from '../../Result.js'
 import { InsertBuilder } from '../../insert/index.js'
-import { Mapper } from '../../Mapper.js'
+import { MutationAccess } from '../../MutationAccess.js'
 import { Input, Model } from '@contember/schema'
 import { CreateInputProcessor } from '../../../inputProcessing/index.js'
 import { SqlCreateInputProcessorResult } from '../SqlCreateInputProcessor.js'
@@ -11,14 +11,14 @@ type Context = Model.OneHasOneOwningContext
 
 export class OneHasOneOwningCreateInputProcessor implements CreateInputProcessor.HasOneRelationProcessor<Context, SqlCreateInputProcessorResult> {
 	constructor(
-		private readonly mapper: Mapper,
+		private readonly mapper: MutationAccess,
 		private readonly insertBuilder: InsertBuilder,
 	) {
 	}
 
 	public async connect(context: Context & { input: Input.UniqueWhere | CheckedPrimary }) {
 		const { input, relation, targetEntity } = context
-		const [inverseSide, err] = await this.mapper.getPrimaryValue(targetEntity, input)
+		const [inverseSide, err] = await this.mapper.through(context).getPrimaryValue(targetEntity, input)
 		if (err) return [err]
 		const disconnectResult = await this.disconnectCurrentOwner({ ...context, input: inverseSide })
 		if (disconnectResult.some(it => it.error)) {
@@ -29,7 +29,7 @@ export class OneHasOneOwningCreateInputProcessor implements CreateInputProcessor
 	}
 
 	public async create(context: Context & { input: MapperInput.CreateDataInput }) {
-		const insertResult = await this.mapper.insert(context.targetEntity, context.input)
+		const insertResult = await this.mapper.through(context).insert(context.targetEntity, context.input)
 		const primary = getInsertPrimary(insertResult)
 		if (!primary) {
 			return insertResult
@@ -39,7 +39,7 @@ export class OneHasOneOwningCreateInputProcessor implements CreateInputProcessor
 	}
 
 	public async connectOrCreate({ input, ...context }: Context & { input: MapperInput.ConnectOrCreateInput }) {
-		const [inverseSide] = await this.mapper.getPrimaryValue(context.targetEntity, input.connect)
+		const [inverseSide] = await this.mapper.through(context).getPrimaryValue(context.targetEntity, input.connect)
 		if (inverseSide) {
 			this.insertBuilder.addFieldValue(context.relation.name, inverseSide)
 			const disconnectResult = await this.disconnectCurrentOwner({ ...context, input: inverseSide })
@@ -48,7 +48,7 @@ export class OneHasOneOwningCreateInputProcessor implements CreateInputProcessor
 			}
 			return []
 		} else {
-			const insertResult = await this.mapper.insert(context.targetEntity, input.create)
+			const insertResult = await this.mapper.through(context).insert(context.targetEntity, input.create)
 			const primary = getInsertPrimary(insertResult)
 			if (primary) {
 				this.insertBuilder.addFieldValue(context.relation.name, primary)

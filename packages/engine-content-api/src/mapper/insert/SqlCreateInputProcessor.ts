@@ -1,5 +1,5 @@
 import { Input, Model, Value } from '@contember/schema'
-import { Mapper } from '../Mapper.js'
+import { MutationAccess } from '../MutationAccess.js'
 import { InsertBuilder } from './InsertBuilder.js'
 import { Providers, resolveColumnValue } from '@contember/schema-utils'
 import { CreateInputProcessor } from '../../inputProcessing/index.js'
@@ -21,15 +21,15 @@ export class SqlCreateInputProcessor implements CreateInputProcessor<SqlCreateIn
 
 	constructor(
 		private readonly insertBuilder: InsertBuilder,
-		private readonly mapper: Mapper,
+		private readonly access: MutationAccess,
 		private readonly providers: Providers,
 		private readonly options: { uuidVersion?: 4 | 7 } = {},
 	) {
-		this.oneHasOneInverseCreateInputProcessor = new OneHasOneInverseCreateInputProcessor(this.mapper)
-		this.oneHasOneOwningCreateInputProcessor = new OneHasOneOwningCreateInputProcessor(this.mapper, this.insertBuilder)
-		this.oneHasManyCreateInputProcessor = new OneHasManyCreateInputProcessor(this.mapper)
-		this.manyHasOneCreateInputProcessor = new ManyHasOneCreateInputProcessor(this.mapper, this.insertBuilder)
-		this.manyHasManyCreateInputProcessor = new ManyHasManyCreateInputProcessor(this.mapper)
+		this.oneHasOneInverseCreateInputProcessor = new OneHasOneInverseCreateInputProcessor(this.access)
+		this.oneHasOneOwningCreateInputProcessor = new OneHasOneOwningCreateInputProcessor(this.access, this.insertBuilder)
+		this.oneHasManyCreateInputProcessor = new OneHasManyCreateInputProcessor(this.access)
+		this.manyHasOneCreateInputProcessor = new ManyHasOneCreateInputProcessor(this.access, this.insertBuilder)
+		this.manyHasManyCreateInputProcessor = new ManyHasManyCreateInputProcessor(this.access)
 	}
 
 	public async column(context: Model.ColumnContext & { input: Input.ColumnValue | undefined }): Promise<SqlCreateInputProcessorResult> {

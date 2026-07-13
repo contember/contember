@@ -27,6 +27,7 @@ export namespace Acl {
 	export type PredefinedVariable = {
 		readonly type: VariableType.predefined
 		readonly value: PredefinedVariableValue
+		readonly fallback?: Input.Condition
 	}
 
 	export type ConditionVariable = {

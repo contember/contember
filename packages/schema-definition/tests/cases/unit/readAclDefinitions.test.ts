@@ -484,7 +484,7 @@ test('definition with invalid predicate references', () => {
 
 namespace ModelWithPredefinedVariables {
 	export const customerRole = c.createRole('customer')
-	export const personId = c.createPredefinedVariable('person', 'personID', customerRole)
+	export const personId = c.createPredefinedVariable('person', 'personID', customerRole, { always: true })
 
 	@c.Allow(customerRole, {
 		when: { personId: personId },
@@ -517,6 +517,7 @@ test('definition with predefined variables', () => {
 		'stages': '*',
 		'variables': {
 			'person': {
+				'fallback': { 'always': true },
 				'type': Acl.VariableType.predefined,
 				'value': 'personID',
 			},

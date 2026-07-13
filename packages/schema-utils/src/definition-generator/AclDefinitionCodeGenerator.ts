@@ -37,10 +37,12 @@ export class AclDefinitionCodeGenerator {
 
 				if (variableValues.type === Acl.VariableType.predefined) {
 					const varDefinition = printJsValue(variableValues.value)
-					variableDefinition += `createPredefinedVariable(${varFormatted}, ${varDefinition}, ${roleVarName})\n`
+					const fallback = variableValues.fallback === undefined ? '' : `, ${printJsValue(variableValues.fallback)}`
+					variableDefinition += `createPredefinedVariable(${varFormatted}, ${varDefinition}, ${roleVarName}${fallback})\n`
 				} else if (variableValues.type === Acl.VariableType.entity) {
 					const varDefinition = printJsValue(variableValues.entityName)
-					variableDefinition += `createEntityVariable(${varFormatted}, ${varDefinition}, ${roleVarName})\n`
+					const fallback = variableValues.fallback === undefined ? '' : `, ${printJsValue(variableValues.fallback)}`
+					variableDefinition += `createEntityVariable(${varFormatted}, ${varDefinition}, ${roleVarName}${fallback})\n`
 				} else {
 					throw new Error(`Variable type ${variableValues.type} not yet supported`)
 				}

@@ -32,11 +32,11 @@ export const createPredefinedVariable = <R extends Role<string>, Name extends st
 	value: Acl.PredefinedVariableValue,
 	roles: R | R[],
 	fallback?: Input.Condition,
-): VariableDefinition<Name, R, Acl.EntityVariable> => {
+): VariableDefinition<Name, R, Acl.PredefinedVariable> => {
 	return new VariableDefinition(
 		name,
 		Array.isArray(roles) ? roles : [roles],
-		{ type: Acl.VariableType.predefined, value },
+		{ type: Acl.VariableType.predefined, value, ...(fallback !== undefined ? { fallback } : {}) },
 	)
 }
 

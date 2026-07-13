@@ -81,6 +81,29 @@ test('read membership with predefined variable', () => {
 	])
 })
 
+test('uses a predefined person variable fallback when the identity has no person', () => {
+	const reader = new MembershipResolver()
+	const result = reader.resolve(
+		{
+			roles: {
+				editor: {
+					variables: {
+						person: { type: Acl.VariableType.predefined, value: 'personID', fallback: { always: true } },
+					},
+					entities: {},
+				},
+			},
+		},
+		[{ role: 'editor', variables: [] }],
+		{ identityId: id1 },
+		false,
+	)
+	expect(result.errors).toStrictEqual([])
+	expect(result.memberships).toStrictEqual([
+		{ role: 'editor', variables: [{ name: 'person', condition: { always: true } }] },
+	])
+})
+
 test('read membership with condition variable', () => {
 	const reader = new MembershipResolver()
 	const result = reader.resolve(

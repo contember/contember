@@ -67,7 +67,11 @@ export class MembershipResolver {
 					case 'personID':
 						parsedVariables.push({
 							name,
-							condition: { in: isAssumed && inputVariable ? inputVariable.values : identity.personId ? [identity.personId] : [] },
+							condition: isAssumed && inputVariable
+								? { in: inputVariable.values }
+								: identity.personId
+								? { in: [identity.personId] }
+								: variable.fallback ?? { never: true },
 						})
 						break
 					default:

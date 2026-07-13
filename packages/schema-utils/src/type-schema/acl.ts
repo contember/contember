@@ -57,10 +57,16 @@ const entityVariableSchema = Typesafe.intersection(
 )
 const entityVariableSchemaCheck: Typesafe.Equals<Acl.EntityVariable, ReturnType<typeof entityVariableSchema>> = true
 
-const predefinedVariableSchema = Typesafe.object({
-	type: Typesafe.literal(Acl.VariableType.predefined),
-	value: Typesafe.enumeration('identityID', 'personID'),
-})
+const predefinedVariableSchema: Typesafe.Type<Acl.PredefinedVariable> = Typesafe.intersection(
+	Typesafe.object({
+		type: Typesafe.literal(Acl.VariableType.predefined),
+		value: Typesafe.enumeration('identityID', 'personID'),
+	}),
+	Typesafe.partial({
+		fallback: conditionSchema(),
+	}),
+)
+const predefinedVariableSchemaCheck: Typesafe.Equals<Acl.PredefinedVariable, ReturnType<typeof predefinedVariableSchema>> = true
 const conditionVariableSchema = Typesafe.intersection(
 	Typesafe.object({
 		type: Typesafe.literal(Acl.VariableType.condition),

@@ -1,4 +1,4 @@
-import { Acl, Input, Model, Settings } from '@contember/schema'
+import { Input, Model, Settings } from '@contember/schema'
 import { Mapper } from '../../Mapper.js'
 import { RelationFetcher } from '../RelationFetcher.js'
 import { SelectExecutionHandlerContext } from '../SelectExecutionHandler.js'
@@ -8,6 +8,7 @@ import { ColumnValueGetter } from '../SelectHydrator.js'
 import { Providers } from '@contember/schema-utils'
 import { getColumnName } from '@contember/schema-utils'
 import { viewComputedId } from '../../../utils/viewComputedId.js'
+import { getFieldReadPredicate } from '../getFieldReadPredicate.js'
 
 export class FieldsVisitor implements Model.RelationByTypeVisitor<void>, Model.ColumnVisitor<void> {
 	constructor(
@@ -78,7 +79,7 @@ export class FieldsVisitor implements Model.RelationByTypeVisitor<void>, Model.C
 
 		this.executionContext.addColumn({
 			query: qb => qb.select(new Literal(selectFrom), columnAlias),
-			predicate: this.getRequiredPredicate(entity, column),
+			predicate: getFieldReadPredicate(this.predicateFactory, entity, column, this.relationPath),
 			valueGetter: columnValueGetter,
 		})
 	}
@@ -99,7 +100,7 @@ export class FieldsVisitor implements Model.RelationByTypeVisitor<void>, Model.C
 					ids: ids,
 				}),
 			defaultValue: [],
-			predicate: this.getRequiredPredicate(relationContext.entity, relationContext.relation),
+			predicate: getFieldReadPredicate(this.predicateFactory, relationContext.entity, relationContext.relation, this.relationPath),
 		})
 	}
 
@@ -120,7 +121,7 @@ export class FieldsVisitor implements Model.RelationByTypeVisitor<void>, Model.C
 					ids: ids,
 				}),
 			defaultValue: [],
-			predicate: this.getRequiredPredicate(relationContext.entity, relationContext.relation),
+			predicate: getFieldReadPredicate(this.predicateFactory, relationContext.entity, relationContext.relation, this.relationPath),
 		})
 	}
 
@@ -141,7 +142,7 @@ export class FieldsVisitor implements Model.RelationByTypeVisitor<void>, Model.C
 					ids: ids,
 				}),
 			defaultValue: [],
-			predicate: this.getRequiredPredicate(relationContext.entity, relationContext.relation),
+			predicate: getFieldReadPredicate(this.predicateFactory, relationContext.entity, relationContext.relation, this.relationPath),
 		})
 	}
 
@@ -172,7 +173,7 @@ export class FieldsVisitor implements Model.RelationByTypeVisitor<void>, Model.C
 				], targetRelation.name)
 			},
 			defaultValue: null,
-			predicate: this.getRequiredPredicate(relationContext.entity, relationContext.relation),
+			predicate: getFieldReadPredicate(this.predicateFactory, relationContext.entity, relationContext.relation, this.relationPath),
 		})
 	}
 
@@ -201,7 +202,7 @@ export class FieldsVisitor implements Model.RelationByTypeVisitor<void>, Model.C
 				], targetEntity.primary)
 			},
 			defaultValue: null,
-			predicate: this.getRequiredPredicate(relationContext.entity, relationContext.relation),
+			predicate: getFieldReadPredicate(this.predicateFactory, relationContext.entity, relationContext.relation, this.relationPath),
 		})
 	}
 
@@ -230,12 +231,7 @@ export class FieldsVisitor implements Model.RelationByTypeVisitor<void>, Model.C
 				], targetEntity.primary)
 			},
 			defaultValue: null,
-			predicate: this.getRequiredPredicate(relationContext.entity, relationContext.relation),
+			predicate: getFieldReadPredicate(this.predicateFactory, relationContext.entity, relationContext.relation, this.relationPath),
 		})
-	}
-
-	private getRequiredPredicate(entity: Model.Entity, field: Model.AnyField): Acl.Predicate | undefined {
-		const fieldPredicate = this.predicateFactory.getFieldReadPredicate(entity, field.name, this.relationPath)
-		return fieldPredicate.isSameAsPrimary ? undefined : fieldPredicate.predicate
 	}
 }

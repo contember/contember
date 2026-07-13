@@ -89,6 +89,30 @@ test('sorts by seeded random', async () => {
 	})
 })
 
+test('sorts by a zero random seed', async () => {
+	await execute({
+		schema: new SchemaBuilder().entity('Post', entity => entity).buildSchema(),
+		query: GQL`
+        query {
+          listPost(orderBy: [{_randomSeeded: 0}]) {
+            id
+          }
+        }`,
+		executes: [
+			{
+				sql: SQL`
+								with "rand_seed" as (select setseed(?))
+								select "root_"."id" as "root_id" from "public"."post" as "root_"
+									inner join "rand_seed" on true
+								order by random() asc`,
+				parameters: [0],
+				response: { rows: [{ root_id: testUuid(1) }] },
+			},
+		],
+		return: { data: { listPost: [{ id: testUuid(1) }] } },
+	})
+})
+
 test('sorts posts by random on has many relation', async () => {
 	await execute({
 		schema: new SchemaBuilder()
@@ -103,7 +127,7 @@ test('sorts posts by random on has many relation', async () => {
           listCategory {
             id
             title
-            posts(orderBy: [{_randomSeeded: 4555}], limit: 1) {
+            posts(orderBy: [{_randomSeeded: 4555}, {title: asc}], limit: 1) {
               id
               title
             }
@@ -128,15 +152,16 @@ test('sorts posts by random on has many relation', async () => {
 				sql: SQL`
 							with "data" as
 								(with "rand_seed" as
-									(select setseed(?))
-								select "junction_"."category_id",
-									"junction_"."post_id",
-									row_number() over(partition by "junction_"."category_id" order by random() asc) as "rownumber_"
-								from "public"."post_categories" as "junction_"
-									inner join "rand_seed" on true
-								where "junction_"."category_id" in (?, ?)
-								order by random() asc)
-							select "data".* from "data" where "data"."rownumber_" <= ?`,
+					(select setseed(?))
+				select "junction_"."category_id",
+					"junction_"."post_id",
+					row_number() over(partition by "junction_"."category_id" order by random() asc, "root_"."title" asc) as "rowNumber_"
+				from "public"."post_categories" as "junction_"
+					inner join "public"."post" as "root_" on "junction_"."post_id" = "root_"."id"
+					inner join "rand_seed" on true
+				where "junction_"."category_id" in (?, ?)
+				order by random() asc, "root_"."title" asc)
+			select "data".* from "data" where "data"."rowNumber_" <= ?`,
 				parameters: [4555 / Math.pow(2, 31), testUuid(1), testUuid(2), 1],
 				response: {
 					rows: [

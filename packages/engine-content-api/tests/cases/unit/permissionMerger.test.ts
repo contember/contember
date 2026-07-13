@@ -156,6 +156,43 @@ describe('Permission merger', () => {
 		})
 	})
 
+	it('merge materialized view refresh permission', () => {
+		execute({
+			acl: {
+				roles: {
+					role1: {
+						variables: {},
+						entities: {
+							Entity1: {
+								predicates: {},
+								operations: { refreshMaterializedView: true },
+							},
+						},
+					},
+					role2: {
+						variables: {},
+						entities: {
+							Entity1: {
+								predicates: {},
+								operations: { read: { id: true } },
+							},
+						},
+					},
+				},
+			},
+			roles: ['role1', 'role2'],
+			result: {
+				Entity1: {
+					predicates: {},
+					operations: {
+						refreshMaterializedView: true,
+						read: { id: true },
+					},
+				},
+			},
+		})
+	})
+
 	it('merge entity operations with predicates', () => {
 		execute({
 			acl: {

@@ -7,6 +7,7 @@ export class Authorizator {
 		private readonly permissions: Acl.Permissions,
 		private readonly defaultCustomPrimary: boolean,
 		private readonly allowRefreshMaterializedView: boolean,
+		private readonly rootPermissions: Acl.Permissions = permissions,
 	) {
 	}
 
@@ -28,6 +29,23 @@ export class Authorizator {
 
 	getFieldPredicate(operation: Acl.Operation.create | Acl.Operation.read | Acl.Operation.update, entity: string, field: string): Acl.Predicate {
 		return this.permissions[entity]?.operations[operation]?.[field] ?? false
+	}
+
+	isFieldNonNullSafe(operation: Acl.Operation.read, entity: string, field: string, primary: string): boolean {
+		return this.isFieldCoveredByRowPredicate(this.permissions, operation, entity, field, primary)
+			&& this.isFieldCoveredByRowPredicate(this.rootPermissions, operation, entity, field, primary)
+	}
+
+	private isFieldCoveredByRowPredicate(
+		permissions: Acl.Permissions,
+		operation: Acl.Operation.read,
+		entity: string,
+		field: string,
+		primary: string,
+	): boolean {
+		const fieldPredicate = permissions[entity]?.operations[operation]?.[field] ?? false
+		const primaryPredicate = permissions[entity]?.operations[operation]?.[primary] ?? false
+		return fieldPredicate === true || fieldPredicate === primaryPredicate
 	}
 
 	getFieldPermissions(

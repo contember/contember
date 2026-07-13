@@ -1,11 +1,14 @@
-import { test } from 'bun:test'
+import { expect, test } from 'bun:test'
 import { createTester, gql } from '../../src/tester.js'
-import { c, createSchema } from '@contember/schema-definition'
+import { AclDefinition as acl, c, createSchema } from '@contember/schema-definition'
 
 // null uuid
 const id = '00000000-0000-0000-0000-000000000000'
 
 namespace MaterializedViewTest {
+	export const reader = acl.createRole('reader')
+
+	@acl.allow(reader, { read: true, create: true })
 	export class Value {
 		value = c.intColumn()
 	}
@@ -89,4 +92,22 @@ test('Content API: materialized view', async () => {
 			},
 		})
 		.expect(200)
+
+	const email = `materialized-view-reader-${Date.now()}@example.com`
+	const identityId = await tester.tenant.signUp(email)
+	const authKey = await tester.tenant.signIn(email)
+	await tester.tenant.addProjectMember(identityId, tester.projectSlug, { role: 'reader', variables: [] })
+
+	await tester(
+		gql`
+		mutation {
+			refreshMaterializedView(name: Stats) { ok }
+		}
+	`,
+		{ authorizationToken: authKey },
+	)
+		.expect(400)
+		.expect(response => {
+			expect(response.body.errors[0].message).toContain('Cannot query field "refreshMaterializedView"')
+		})
 })

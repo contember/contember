@@ -132,6 +132,9 @@ export class PermissionFactory {
 		if (left.operations.customPrimary || right.operations.customPrimary) {
 			operations.customPrimary = true
 		}
+		if (left.operations.refreshMaterializedView || right.operations.refreshMaterializedView) {
+			operations.refreshMaterializedView = true
+		}
 		const noRoot: `${Acl.Operation}`[] = []
 
 		for (

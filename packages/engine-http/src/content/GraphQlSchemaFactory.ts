@@ -20,6 +20,24 @@ export interface GraphQLSchemaFactoryResult {
 	schema: GraphQLSchema
 }
 
+export const isMaterializedViewRefreshAllowed = (acl: Acl.Schema, roles: readonly string[]): boolean => {
+	const pendingRoles = [...roles]
+	const visitedRoles = new Set<string>()
+	while (pendingRoles.length > 0) {
+		const roleName = pendingRoles.pop()
+		if (roleName === undefined || visitedRoles.has(roleName)) {
+			continue
+		}
+		visitedRoles.add(roleName)
+		const role = acl.roles[roleName]
+		if (role?.content?.refreshMaterializedView) {
+			return true
+		}
+		pendingRoles.push(...(role?.inherits ?? []))
+	}
+	return false
+}
+
 export class GraphQlSchemaFactory {
 	constructor(
 		private readonly cache: ContentApiSpecificCache<Schema, GraphQLSchemaFactoryResult>,
@@ -39,7 +57,8 @@ export class GraphQlSchemaFactory {
 			const authorizator = new Authorizator(
 				allPermissions,
 				schema.acl.customPrimary ?? false,
-				Object.values(schema.acl.roles).some(it => it.content?.refreshMaterializedView),
+				isMaterializedViewRefreshAllowed(schema.acl, identity.projectRoles),
+				permissions,
 			)
 			const dataSchemaBuilder = this.graphqlSchemaBuilderFactory.create(schema.model, authorizator)
 			const introspectionSchemaFactory = new IntrospectionSchemaDefinitionFactory(

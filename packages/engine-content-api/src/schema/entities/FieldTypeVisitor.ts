@@ -3,7 +3,6 @@ import { Acl, Model } from '@contember/schema'
 import { ColumnTypeResolver } from '../ColumnTypeResolver.js'
 import { EntityTypeProvider } from '../EntityTypeProvider.js'
 import { Authorizator } from '../../acl/index.js'
-import { ImplementationException } from '../../exception.js'
 
 export class FieldTypeVisitor implements Model.ColumnVisitor<GraphQLOutputType>, Model.RelationByGenericTypeVisitor<GraphQLOutputType> {
 	constructor(
@@ -15,12 +14,7 @@ export class FieldTypeVisitor implements Model.ColumnVisitor<GraphQLOutputType>,
 
 	public visitColumn({ column, entity }: Model.ColumnContext): GraphQLOutputType {
 		const [type] = this.columnTypeResolver.getType(column)
-		const fieldPredicate = this.authorizator.getFieldPredicate(Acl.Operation.read, entity.name, column.name)
-		const idPredicate = this.authorizator.getFieldPredicate(Acl.Operation.read, entity.name, entity.primary)
-		if (!fieldPredicate || !idPredicate) {
-			throw new ImplementationException()
-		}
-		if (!column.nullable && (fieldPredicate === true || fieldPredicate === idPredicate)) {
+		if (!column.nullable && this.authorizator.isFieldNonNullSafe(Acl.Operation.read, entity.name, column.name, entity.primary)) {
 			return new GraphQLNonNull(type)
 		}
 		return type

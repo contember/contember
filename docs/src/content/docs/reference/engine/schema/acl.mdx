@@ -302,7 +302,7 @@ export class Product {
 
 ## `@c.AllowCustomPrimary`
 
-The `@c.AllowCustomPrimary` decorator allows client-generated IDs to be used as primary keys when creating or updating entities. This is particularly useful for use cases like synchronizing data between external systems or generating unique identifiers outside of Contember.
+The `@c.AllowCustomPrimary` decorator allows client-generated IDs to be used as primary keys when creating entities. This is particularly useful for use cases like synchronizing data between external systems or generating unique identifiers outside of Contember.
 
 - Unlike `@c.Allow`, this decorator must be applied directly to the entity class without specifying roles or conditions.
 
@@ -319,7 +319,7 @@ export class Order {
 }
 ```
 
-- This example enables the client to specify the `id` of an `Order` when creating or updating it.
+- This example enables the client to specify the `id` of an `Order` when creating it, including the create branch of an upsert.
 - No additional ACL rules are required to allow this behavior.
 
 

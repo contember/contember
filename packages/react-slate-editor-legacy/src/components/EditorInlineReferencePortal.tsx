@@ -1,4 +1,4 @@
-import { Entity, useEnvironment, VariableInputTransformer } from '@contember/react-binding'
+import { EntityKeyProvider, EnvironmentContext, useEnvironment, VariableInputTransformer } from '@contember/react-binding'
 import { Element as SlateElement, type Range as SlateRange } from 'slate'
 import { ReactNode, useEffect, useState } from 'react'
 import { EntityAccessor, EntityId, OptionallyVariableFieldValue } from '@contember/react-binding'
@@ -46,8 +46,10 @@ export const EditorInlineReferencePortal = (props: EditorInlineReferenceTriggerP
 		return null
 	}
 	return (
-		<Entity accessor={entity}>
-			{props.children}
-		</Entity>
+		// Same reasoning as in ReferenceElementWrapper: the accessor is held in state across persists,
+		// so we provide the stable accessor getter instead of a realm key that a persist may migrate.
+		<EntityKeyProvider entityKey={entity.getAccessor}>
+			<EnvironmentContext.Provider value={entity.environment}>{props.children}</EnvironmentContext.Provider>
+		</EntityKeyProvider>
 	)
 }

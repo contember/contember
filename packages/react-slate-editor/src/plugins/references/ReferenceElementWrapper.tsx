@@ -1,5 +1,5 @@
 import { FC, ReactNode } from 'react'
-import { AccessorProvider } from '@contember/react-binding'
+import { EntityKeyProvider, EnvironmentContext } from '@contember/react-binding'
 import { useReferencedEntity } from './useReferencedEntity'
 import { ReactEditor, useSlateStatic } from 'slate-react'
 import { ElementWithReference } from './elements'
@@ -13,5 +13,14 @@ export const ReferenceElementWrapper: FC<ReferenceElementWrapperProps> = ({ chil
 	const editor = useSlateStatic()
 	const path = ReactEditor.findPath(editor, element)
 	const ref = useReferencedEntity(path, element.referenceId)
-	return <AccessorProvider accessor={ref}>{children}</AccessorProvider>
+	// The entity is provided through its stable accessor getter rather than the realm key.
+	// Realm keys change when a successful persist assigns server identities (`changeRealmId`),
+	// but Slate does not re-render its cached element trees, so consumers below would keep
+	// resolving the captured stale key and crash with "Trying to retrieve a non-existent entity".
+	// The getter keeps resolving correctly because the realm state is re-keyed in place.
+	return (
+		<EntityKeyProvider entityKey={ref.getAccessor}>
+			<EnvironmentContext.Provider value={ref.environment}>{children}</EnvironmentContext.Provider>
+		</EntityKeyProvider>
+	)
 }

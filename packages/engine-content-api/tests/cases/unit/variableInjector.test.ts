@@ -67,4 +67,16 @@ describe('Variable injector', () => {
 			],
 		})
 	})
+
+	it('caches a shared predicate separately for each entity', () => {
+		const schema = new SchemaBuilder()
+			.entity('ColumnSource', entity => entity.column('value'))
+			.entity('RelationSource', entity => entity.manyHasOne('value', relation => relation.target('Target', target => target)))
+			.buildSchema()
+		const injector = new VariableInjector(schema, { variable: { eq: 'value' } })
+		const predicate: Acl.PredicateDefinition = { value: 'variable' }
+
+		assert.deepStrictEqual(injector.inject(schema.entities.ColumnSource, predicate), { value: { eq: 'value' } })
+		assert.deepStrictEqual(injector.inject(schema.entities.RelationSource, predicate), { value: { id: { eq: 'value' } } })
+	})
 })

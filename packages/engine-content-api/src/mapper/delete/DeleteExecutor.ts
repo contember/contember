@@ -132,7 +132,7 @@ export class DeleteExecutor {
 		where: Input.OptionalWhere,
 		access = new MutationAccess(mapper),
 	): Promise<Input.PrimaryValue[]> {
-		const predicate = this.predicateFactory.createDeletePredicate(entity, access.relationContext, access.isRoot)
+		const predicate = this.predicateFactory.createDeletePredicate(entity, access.predicateContext)
 		const orphanRemovals = findRelationsWithOrphanRemoval(this.schema, entity)
 
 		const qb = SelectBuilder.create<DeleteInfoRow>()

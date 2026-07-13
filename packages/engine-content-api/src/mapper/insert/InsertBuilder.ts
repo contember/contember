@@ -44,8 +44,7 @@ export class InsertBuilder {
 			this.entity,
 			Acl.Operation.create,
 			fields,
-			this.access.relationContext,
-			this.access.isRoot,
+			this.access.predicateContext,
 		)
 		this.addWhere(where)
 	}

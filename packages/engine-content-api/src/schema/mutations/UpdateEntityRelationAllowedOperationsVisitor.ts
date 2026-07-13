@@ -95,35 +95,39 @@ export class UpdateEntityRelationAllowedOperationsVisitor
 		context: Model.ManyHasManyOwningContext | Model.ManyHasManyInverseContext,
 	): Input.UpdateRelationOperation[] {
 		const { targetEntity } = context
-		const { canMutateSourceRelation, canMutateJunction } = getManyHasManyMutationPermissions(
+		const updateExisting = getManyHasManyMutationPermissions(
 			this.authorizator,
 			context,
-			Acl.Operation.update,
+			{ source: Acl.Operation.update, target: Acl.Operation.update },
 		)
-		if (!canMutateSourceRelation) {
+		if (!updateExisting.canMutateSourceRelation) {
 			return []
 		}
+		const createTarget = getManyHasManyMutationPermissions(this.authorizator, context, {
+			source: Acl.Operation.update,
+			target: Acl.Operation.create,
+		})
 		const result: Input.UpdateRelationOperation[] = []
 		const canReadTarget = this.authorizator.getEntityPermission(Acl.Operation.read, targetEntity.name) !== 'no'
 		const canCreateTarget = this.authorizator.getEntityPermission(Acl.Operation.create, targetEntity.name) !== 'no'
 		const canUpdateTarget = this.authorizator.getEntityPermission(Acl.Operation.update, targetEntity.name) !== 'no'
 		const canDeleteTarget = this.authorizator.getEntityPermission(Acl.Operation.delete, targetEntity.name) !== 'no'
-		if (canMutateJunction && canReadTarget) {
+		if (updateExisting.canMutateJunction && canReadTarget) {
 			result.push(Input.UpdateRelationOperation.connect, Input.UpdateRelationOperation.disconnect)
 		}
-		if (canMutateJunction && canCreateTarget) {
+		if (createTarget.canMutateJunction && canCreateTarget) {
 			result.push(Input.UpdateRelationOperation.create)
 		}
-		if (canMutateJunction && canUpdateTarget) {
+		if (updateExisting.canMutateJunction && canUpdateTarget) {
 			result.push(Input.UpdateRelationOperation.update)
 		}
-		if (canMutateJunction && canCreateTarget && canUpdateTarget) {
+		if (createTarget.canMutateJunction && updateExisting.canMutateJunction && canCreateTarget && canUpdateTarget) {
 			result.push(Input.UpdateRelationOperation.upsert)
 		}
 		if (canDeleteTarget) {
 			result.push(Input.UpdateRelationOperation.delete)
 		}
-		if (canMutateJunction && canReadTarget && canCreateTarget) {
+		if (updateExisting.canMutateJunction && createTarget.canMutateJunction && canReadTarget && canCreateTarget) {
 			result.push(Input.UpdateRelationOperation.connectOrCreate)
 		}
 		return result

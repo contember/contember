@@ -1,5 +1,7 @@
 export * from './Authorizator.js'
 export * from './PermissionFactory.js'
+export * from './PredicateContext.js'
+export * from './PredicateInjection.js'
 export * from './PredicateFactory.js'
 export * from './PredicatesInjector.js'
 export * from './VariableInjector.js'

@@ -57,8 +57,7 @@ export class UpdateBuilder {
 			this.entity,
 			Acl.Operation.update,
 			fields,
-			this.access.relationContext,
-			this.access.isRoot,
+			this.access.predicateContext,
 		)
 		this.addNewWhere(predicate)
 		this.addOldWhere(predicate)

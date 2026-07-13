@@ -427,6 +427,251 @@ test('CLASS 5 — to-many back-reference oracle: unreadable sibling secret canno
 })
 
 // =============================================================================================
+// CLASS 5b: relation-local NOT — target row guards must stay outside the user boolean expression
+// =============================================================================================
+namespace C5b {
+	export const reader = acl.createRole('reader')
+	export const companyVar = acl.createEntityVariable('company', 'Company', reader)
+
+	@acl.allow(reader, { read: ['id', 'name', 'parents'], when: { id: companyVar } })
+	export class Company {
+		name = def.stringColumn()
+		parents = def.oneHasMany(Parent, 'company')
+	}
+
+	@acl.allow(reader, {
+		read: ['id', 'name', 'company', 'children', 'featuredChild', 'tags', 'middle', 'middles'],
+		when: { company: { id: companyVar } },
+	})
+	export class Parent {
+		name = def.stringColumn()
+		company = def.manyHasOne(Company, 'parents').notNull()
+		children = def.oneHasMany(Child, 'parent')
+		featuredChild = def.manyHasOne(Child)
+		tags = def.manyHasMany(Child)
+		middle = def.manyHasOne(Middle)
+		middles = def.oneHasMany(Middle, 'parent')
+	}
+
+	@acl.allow(reader, { read: true })
+	export class Middle {
+		featuredChild = def.manyHasOne(Child)
+		children = def.oneHasMany(Child, 'middle')
+		tags = def.manyHasMany(Child)
+		parent = def.manyHasOne(Parent, 'middles')
+	}
+
+	@acl.allow(reader, { read: true, when: { visibility: { eq: 'yes' } } })
+	export class Child {
+		visibility = def.stringColumn()
+		parent = def.manyHasOne(Parent, 'children')
+		middle = def.manyHasOne(Middle, 'children')
+	}
+}
+
+test('CLASS 5b — enclosing NOT keeps a 1:N target guard positive', async () => {
+	const { restrictedA, teethA, teethB } = await assertLeakOracle({
+		schema: createSchema(C5b),
+		role: 'reader',
+		setupA: async t => {
+			const company = await create(t, 'Company', { name: 'Acme' })
+			const hiddenParent = await create(t, 'Parent', { name: 'hidden', company: connect(company) })
+			await create(t, 'Parent', {
+				name: 'readable',
+				company: connect(company),
+				children: { create: { visibility: 'yes' } },
+			})
+			return { variables: [{ name: 'company', values: [company] }], ctx: { hiddenParent } }
+		},
+		mutateToB: async (t, ctx) => {
+			await update(t, 'Parent', ctx.hiddenParent, { children: { create: { visibility: 'no' } } })
+		},
+		restrictedQueries: [{
+			query: gql`query { listParent(filter: { not: { children: { id: { isNull: false } } } }, orderBy: [{ name: asc }]) { name } }`,
+		}, {
+			query: gql`query { listParent(filter: { not: { children: { visibility: { eq: "blocked" } } } }, orderBy: [{ name: asc }]) { name } }`,
+		}],
+		teethQueries: [{
+			query: gql`query { listParent(filter: { not: { children: { id: { isNull: false } } } }, orderBy: [{ name: asc }]) { name } }`,
+		}],
+	})
+	expect(restrictedA[0].listParent).toStrictEqual([])
+	// Positive control: a readable child which does not match the negated value condition is retained.
+	expect(restrictedA[1].listParent).toStrictEqual([{ name: 'readable' }])
+	// Root sees absence turn into presence, proving the unreadable-row mutation has teeth.
+	expect(teethA[0].listParent).toStrictEqual([{ name: 'hidden' }])
+	expect(teethB[0].listParent).toStrictEqual([])
+})
+
+test('CLASS 5c — enclosing NOT gives absent and unreadable to-one targets the same result', async () => {
+	const { restrictedA, teethA, teethB } = await assertLeakOracle({
+		schema: createSchema(C5b),
+		role: 'reader',
+		setupA: async t => {
+			const company = await create(t, 'Company', { name: 'Acme' })
+			const absent = await create(t, 'Parent', { name: 'absent', company: connect(company) })
+			await create(t, 'Parent', {
+				name: 'visible',
+				company: connect(company),
+				featuredChild: { create: { visibility: 'yes' } },
+			})
+			return { variables: [{ name: 'company', values: [company] }], ctx: { absent } }
+		},
+		mutateToB: async (t, ctx) => {
+			await update(t, 'Parent', ctx.absent, { featuredChild: { create: { visibility: 'no' } } })
+		},
+		restrictedQueries: [{
+			query: gql`query { listParent(filter: { not: { featuredChild: { id: { isNull: false } } } }, orderBy: [{ name: asc }]) { name } }`,
+		}, {
+			query: gql`query { listParent(filter: { not: { featuredChild: { visibility: { eq: "blocked" } } } }, orderBy: [{ name: asc }]) { name } }`,
+		}],
+		teethQueries: [{
+			query: gql`query { listParent(filter: { not: { featuredChild: { id: { isNull: false } } } }, orderBy: [{ name: asc }]) { name } }`,
+		}],
+	})
+	expect(restrictedA[0].listParent).toStrictEqual([])
+	expect(restrictedA[1].listParent).toStrictEqual([{ name: 'visible' }])
+	expect(teethA[0].listParent).toStrictEqual([{ name: 'absent' }])
+	expect(teethB[0].listParent).toStrictEqual([])
+})
+
+test('CLASS 5d — enclosing NOT keeps an M:N target guard positive', async () => {
+	const { restrictedA, teethA, teethB } = await assertLeakOracle({
+		schema: createSchema(C5b),
+		role: 'reader',
+		setupA: async t => {
+			const company = await create(t, 'Company', { name: 'Acme' })
+			const absent = await create(t, 'Parent', { name: 'absent', company: connect(company) })
+			await create(t, 'Parent', {
+				name: 'visible',
+				company: connect(company),
+				tags: { create: { visibility: 'yes' } },
+			})
+			return { variables: [{ name: 'company', values: [company] }], ctx: { absent } }
+		},
+		mutateToB: async (t, ctx) => {
+			await update(t, 'Parent', ctx.absent, { tags: { create: { visibility: 'no' } } })
+		},
+		restrictedQueries: [{
+			query: gql`query { listParent(filter: { not: { tags: { id: { isNull: false } } } }, orderBy: [{ name: asc }]) { name } }`,
+		}, {
+			query: gql`query { listParent(filter: { not: { tags: { visibility: { eq: "blocked" } } } }, orderBy: [{ name: asc }]) { name } }`,
+		}],
+		teethQueries: [{
+			query: gql`query { listParent(filter: { not: { tags: { id: { isNull: false } } } }, orderBy: [{ name: asc }]) { name } }`,
+		}],
+	})
+	expect(restrictedA[0].listParent).toStrictEqual([])
+	expect(restrictedA[1].listParent).toStrictEqual([{ name: 'visible' }])
+	expect(teethA[0].listParent).toStrictEqual([{ name: 'absent' }])
+	expect(teethB[0].listParent).toStrictEqual([])
+})
+
+test('CLASS 5e — enclosing NOT carries leaf guards through an unrestricted intermediate', async () => {
+	const nestedRelations = ['featuredChild', 'children', 'tags']
+	const { restrictedA, teethA, teethB } = await assertLeakOracle({
+		schema: createSchema(C5b),
+		role: 'reader',
+		setupA: async t => {
+			const company = await create(t, 'Company', { name: 'Acme' })
+			const absentMiddle = await create(t, 'Middle', {})
+			await create(t, 'Parent', { name: 'absent', company: connect(company), middle: connect(absentMiddle) })
+			const visibleMiddle = await create(t, 'Middle', {
+				featuredChild: { create: { visibility: 'yes' } },
+				children: { create: { visibility: 'yes' } },
+				tags: { create: { visibility: 'yes' } },
+			})
+			await create(t, 'Parent', { name: 'visible', company: connect(company), middle: connect(visibleMiddle) })
+			return { variables: [{ name: 'company', values: [company] }], ctx: { absentMiddle } }
+		},
+		mutateToB: async (t, ctx) => {
+			await update(t, 'Middle', ctx.absentMiddle, {
+				featuredChild: { create: { visibility: 'no' } },
+				children: { create: { visibility: 'no' } },
+				tags: { create: { visibility: 'no' } },
+			})
+		},
+		restrictedQueries: nestedRelations.flatMap(relation => [{
+			query: `query { listParent(filter: { not: { middle: { ${relation}: { id: { isNull: false } } } } }, orderBy: [{ name: asc }]) { name } }`,
+		}, {
+			query: `query { listParent(filter: { not: { middle: { ${relation}: { visibility: { eq: "blocked" } } } } }, orderBy: [{ name: asc }]) { name } }`,
+		}]),
+		teethQueries: nestedRelations.map(relation => ({
+			query: `query { listParent(filter: { not: { middle: { ${relation}: { id: { isNull: false } } } } }, orderBy: [{ name: asc }]) { name } }`,
+		})),
+	})
+	for (let index = 0; index < nestedRelations.length; index++) {
+		expect(restrictedA[index * 2].listParent).toStrictEqual([])
+		expect(restrictedA[index * 2 + 1].listParent).toStrictEqual([{ name: 'visible' }])
+		expect(teethA[index].listParent).toStrictEqual([{ name: 'absent' }])
+		expect(teethB[index].listParent).toStrictEqual([])
+	}
+})
+
+test('CLASS 5f — deep guard alternatives remain OR-local across intermediate rows', async () => {
+	const { restrictedA, teethA, teethB } = await assertLeakOracle({
+		schema: createSchema(C5b),
+		role: 'reader',
+		setupA: async t => {
+			const company = await create(t, 'Company', { name: 'Acme' })
+			const absent = await create(t, 'Parent', { name: 'absent', company: connect(company) })
+			const absentMiddle = await create(t, 'Middle', { parent: connect(absent) })
+
+			const childrenOnly = await create(t, 'Parent', { name: 'children-only', company: connect(company) })
+			await create(t, 'Middle', { parent: connect(childrenOnly), children: { create: { visibility: 'yes' } } })
+
+			const tagsOnly = await create(t, 'Parent', { name: 'tags-only', company: connect(company) })
+			await create(t, 'Middle', { parent: connect(tagsOnly), tags: { create: { visibility: 'yes' } } })
+
+			const bothSame = await create(t, 'Parent', { name: 'both-same', company: connect(company) })
+			await create(t, 'Middle', {
+				parent: connect(bothSame),
+				children: { create: { visibility: 'yes' } },
+				tags: { create: { visibility: 'yes' } },
+			})
+
+			const bothDifferent = await create(t, 'Parent', { name: 'both-different', company: connect(company) })
+			await create(t, 'Middle', { parent: connect(bothDifferent), children: { create: { visibility: 'yes' } } })
+			await create(t, 'Middle', { parent: connect(bothDifferent), tags: { create: { visibility: 'yes' } } })
+
+			return { variables: [{ name: 'company', values: [company] }], ctx: { absentMiddle } }
+		},
+		mutateToB: async (t, ctx) => {
+			await update(t, 'Middle', ctx.absentMiddle, {
+				children: { create: { visibility: 'no' } },
+				tags: { create: { visibility: 'no' } },
+			})
+		},
+		restrictedQueries: [{
+			query: gql`query { listParent(filter: { not: { middles: { or: [
+				{ children: { id: { isNull: false } } },
+				{ tags: { id: { isNull: false } } }
+			] } } }, orderBy: [{ name: asc }]) { name } }`,
+		}, {
+			query: gql`query { listParent(filter: { not: { middles: { or: [
+				{ children: { visibility: { eq: "blocked" } } },
+				{ tags: { visibility: { eq: "blocked" } } }
+			] } } }, orderBy: [{ name: asc }]) { name } }`,
+		}],
+		teethQueries: [{
+			query: gql`query { listParent(filter: { not: { middles: { or: [
+				{ children: { id: { isNull: false } } },
+				{ tags: { id: { isNull: false } } }
+			] } } }, orderBy: [{ name: asc }]) { name } }`,
+		}],
+	})
+	expect(restrictedA[0].listParent).toStrictEqual([])
+	expect(restrictedA[1].listParent).toStrictEqual([
+		{ name: 'both-different' },
+		{ name: 'both-same' },
+		{ name: 'children-only' },
+		{ name: 'tags-only' },
+	])
+	expect(teethA[0].listParent).toStrictEqual([{ name: 'absent' }])
+	expect(teethB[0].listParent).toStrictEqual([])
+})
+
+// =============================================================================================
 // CLASS 6: _meta.readable through a relation (through:true grant — root vs all divergence)
 // =============================================================================================
 namespace C6 {

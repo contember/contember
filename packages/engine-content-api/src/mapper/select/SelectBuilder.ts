@@ -12,6 +12,7 @@ import { Mapper } from '../Mapper.js'
 import { FieldNode, ObjectNode } from '../../inputProcessing/index.js'
 import { assertNever } from '../../utils/index.js'
 import { PredicateFactory } from '../../acl/index.js'
+import type { PredicateInjection } from '../../acl/PredicateInjection.js'
 
 export class SelectBuilder {
 	private resolver: (value: SelectRow[]) => void = () => {
@@ -52,11 +53,18 @@ export class SelectBuilder {
 		input: ObjectNode<Input.ListQueryInput>,
 		path: Path,
 		groupBy?: string,
+		predicateInjection?: PredicateInjection,
 	) {
 		this.selectInternal(mapper, entity, path, input)
 		const where = input.args.filter
 		if (where) {
-			this.qb = this.whereBuilder.build(this.qb, entity, path, where, { relationPath: this.relationPath })
+			this.qb = this.whereBuilder.build(
+				this.qb,
+				entity,
+				path,
+				predicateInjection ?? where,
+				{ relationPath: this.relationPath },
+			)
 		}
 		const orderBy = input.args.orderBy || []
 

@@ -3,7 +3,7 @@ import { WhereBuilder } from './WhereBuilder.js'
 import { Client, LimitByGroupWrapper, Operator, SelectBuilder } from '@contember/database'
 import { Input, Model, Value } from '@contember/schema'
 import { OrderByBuilder } from './OrderByBuilder.js'
-import { PredicatesInjector } from '../../acl/index.js'
+import { createPredicateContextForEvaluatedRelationPath, PredicatesInjector } from '../../acl/index.js'
 import { FieldNode, ObjectNode } from '../../inputProcessing/index.js'
 import { JoiningColumns } from '../types.js'
 import { OrderByHelper } from './OrderByHelper.js'
@@ -272,11 +272,16 @@ export class RelationFetcher {
 			.from(joiningTable.tableName, 'junction_')
 			.where(clause => clause.in(['junction_', whereColumn], ids, primaryColumn.columnType))
 
-		const where = this.predicateInjector.inject(targetEntity, objectArgs.filter || {}, relationPath[relationPath.length - 1])
-		const hasWhere = where && Object.keys(where).length > 0
+		const predicateInjection = this.predicateInjector.injectForRead(
+			targetEntity,
+			objectArgs.filter || {},
+			createPredicateContextForEvaluatedRelationPath(relationPath),
+		)
+		const hasEffectivePredicate = Object.keys(predicateInjection.where).length > 0
+			|| (predicateInjection.guard !== undefined && Object.keys(predicateInjection.guard).length > 0)
 		const hasFieldOrderBy = objectArgs.orderBy?.some(orderBy => !orderBy._random && orderBy._randomSeeded === undefined) === true
 
-		if (hasWhere || hasFieldOrderBy) {
+		if (hasEffectivePredicate || hasFieldOrderBy) {
 			const path = this.pathFactory.create([])
 			qb = qb.join(
 				targetEntity.tableName,
@@ -289,8 +294,8 @@ export class RelationFetcher {
 			)
 		}
 
-		if (where && hasWhere) {
-			qb = this.whereBuilder.build(qb, targetEntity, this.pathFactory.create([]), where, { relationPath })
+		if (hasEffectivePredicate) {
+			qb = this.whereBuilder.build(qb, targetEntity, this.pathFactory.create([]), predicateInjection, { relationPath })
 		}
 		return qb
 	}

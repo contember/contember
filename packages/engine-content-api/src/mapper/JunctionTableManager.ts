@@ -43,7 +43,8 @@ export class JunctionTableManager {
 		relation: Model.ManyHasManyOwningRelation,
 		owningUnique: Input.PrimaryValue,
 		inverseUnique: Input.PrimaryValue,
-		operation: Acl.Operation.create | Acl.Operation.update,
+		owningOperation: Acl.Operation.create | Acl.Operation.update,
+		inverseOperation: Acl.Operation.create | Acl.Operation.update,
 	): Promise<MutationResultList> {
 		const beforeEvent = new BeforeJunctionUpdateEvent(owningEntity, relation, owningUnique, inverseUnique, 'connect')
 		await mapper.eventManager.fire(beforeEvent)
@@ -55,7 +56,8 @@ export class JunctionTableManager {
 			relation,
 			owningUnique,
 			inverseUnique,
-			operation,
+			owningOperation,
+			inverseOperation,
 			this.connectJunctionHandler,
 		)
 		if (result.result !== MutationResultType.noResultError) {
@@ -92,6 +94,7 @@ export class JunctionTableManager {
 			owningUnique,
 			inverseUnique,
 			Acl.Operation.update,
+			Acl.Operation.update,
 			this.disconnectJunctionHandler,
 		)
 		if (result.result !== MutationResultType.noResultError) {
@@ -117,7 +120,8 @@ export class JunctionTableManager {
 		relation: Model.ManyHasManyOwningRelation,
 		owningPrimary: Input.PrimaryValue,
 		inversePrimary: Input.PrimaryValue,
-		operation: Acl.Operation.create | Acl.Operation.update,
+		owningOperation: Acl.Operation.create | Acl.Operation.update,
+		inverseOperation: Acl.Operation.create | Acl.Operation.update,
 		handler: JunctionHandler,
 	): Promise<JunctionMutationResult> {
 		const joiningTable = relation.joiningTable
@@ -128,19 +132,17 @@ export class JunctionTableManager {
 
 		const owningPredicate = this.predicateFactory.create(
 			owningEntity,
-			operation,
+			owningOperation,
 			[relation.name],
-			owningAccess.relationContext,
-			owningAccess.isRoot,
+			owningAccess.predicateContext,
 		)
 		let inversePredicate: Input.OptionalWhere = {}
 		if (relation.inversedBy) {
 			inversePredicate = this.predicateFactory.create(
 				inverseEntity,
-				operation,
+				inverseOperation,
 				[relation.inversedBy],
-				inverseAccess.relationContext,
-				inverseAccess.isRoot,
+				inverseAccess.predicateContext,
 			)
 		}
 

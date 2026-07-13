@@ -4,6 +4,7 @@ import { Acl, Input } from '@contember/schema'
 import { PredicateFactory } from '../../../acl/index.js'
 import { WhereBuilder } from '../WhereBuilder.js'
 import { ObjectNode } from '../../../inputProcessing/index.js'
+import { getFieldPredicate } from '../getFieldPredicate.js'
 
 export class MetaHandler implements SelectExecutionHandler<{}> {
 	constructor(private readonly whereBuilder: WhereBuilder, private readonly predicateFactory: PredicateFactory) {}
@@ -36,12 +37,11 @@ export class MetaHandler implements SelectExecutionHandler<{}> {
 		if (entity.primary === fieldName) {
 			return
 		}
-		// `readable` is context-aware: through a relation it must use the through-inclusive `all` set,
-		// mirroring value masking in FieldsVisitor. `updatable` stays root-only because update
-		// enforcement (Updater/InsertBuilder/…) is not context-aware — through-permissions are read-scoped.
-		const fieldPredicate = operation === Acl.Operation.read
-			? this.predicateFactory.getFieldReadPredicate(entity, fieldName, context.relationPath)
-			: this.predicateFactory.getFieldPredicate(entity, operation, fieldName)
+		const field = entity.fields[fieldName]
+		if (!field) {
+			throw new Error(`Unknown field ${entity.name}.${fieldName}`)
+		}
+		const fieldPredicate = getFieldPredicate(this.predicateFactory, operation, entity, field, context.relationPath)
 		context.addColumn({
 			path: metaPath,
 			valueGetter: context.addPredicate(fieldPredicate.predicate),

@@ -1,5 +1,7 @@
 import { Acl } from '@contember/schema'
 import type { Input, Model } from '@contember/schema'
+import { createPredicateContext } from '../acl/PredicateContext.js'
+import type { PredicateContext, PredicatePermissionScope } from '../acl/PredicateContext.js'
 import type { CheckedPrimary } from './CheckedPrimary.js'
 import type { InsertBuilder } from './insert/index.js'
 import type { Mapper } from './Mapper.js'
@@ -10,19 +12,20 @@ import type { UpdateBuilder } from './update/index.js'
 export class MutationAccess {
 	constructor(
 		private readonly mapper: Mapper,
-		public readonly relationPath: readonly Model.AnyRelationContext[] = [],
+		private readonly permissionScope: PredicatePermissionScope = 'root',
+		private readonly throughPath: readonly Model.AnyRelationContext[] = [],
 	) {}
 
-	public get isRoot(): boolean {
-		return this.relationPath.length === 0
-	}
-
-	public get relationContext(): Model.AnyRelationContext | undefined {
-		return this.relationPath[this.relationPath.length - 1]
+	/**
+	 * Nested mutation access selects through-inclusive permissions, but never proves that a parent
+	 * row was evaluated. Keeping this witness-free prevents ACL predicate simplification in writes.
+	 */
+	public get predicateContext(): PredicateContext {
+		return createPredicateContext(this.permissionScope)
 	}
 
 	public through(relationContext: Model.AnyRelationContext): MutationAccess {
-		return new MutationAccess(this.mapper, [...this.relationPath, relationContext])
+		return new MutationAccess(this.mapper, 'through', [...this.throughPath, relationContext])
 	}
 
 	public selectField(entity: Model.Entity, where: Input.UniqueWhere | CheckedPrimary, fieldName: string) {
@@ -77,9 +80,30 @@ export class MutationAccess {
 		relation: Model.ManyHasManyOwningRelation | Model.ManyHasManyInverseRelation,
 		thisPrimary: Input.PrimaryValue,
 		otherPrimary: Input.PrimaryValue,
-		operation: Acl.Operation.create | Acl.Operation.update = Acl.Operation.update,
+		operation?: MutationJunctionOperation,
+	): Promise<MutationResultList>
+	public connectJunction(
+		entity: Model.Entity,
+		relation: Model.ManyHasManyOwningRelation | Model.ManyHasManyInverseRelation,
+		thisPrimary: Input.PrimaryValue,
+		otherPrimary: Input.PrimaryValue,
+		operations: MutationJunctionOperations,
+	): Promise<MutationResultList>
+	public connectJunction(
+		entity: Model.Entity,
+		relation: Model.ManyHasManyOwningRelation | Model.ManyHasManyInverseRelation,
+		thisPrimary: Input.PrimaryValue,
+		otherPrimary: Input.PrimaryValue,
+		operationsOrOperation?: MutationJunctionOperations | MutationJunctionOperation,
 	): Promise<MutationResultList> {
-		return this.mapper.connectJunctionWithAccess(this, entity, relation, thisPrimary, otherPrimary, operation)
+		return this.mapper.connectJunctionWithAccess(
+			this,
+			entity,
+			relation,
+			thisPrimary,
+			otherPrimary,
+			normalizeMutationJunctionOperations(operationsOrOperation),
+		)
 	}
 
 	public disconnectJunction(
@@ -90,4 +114,18 @@ export class MutationAccess {
 	): Promise<MutationResultList> {
 		return this.mapper.disconnectJunctionWithAccess(this, entity, relation, thisPrimary, otherPrimary)
 	}
+}
+
+export interface MutationJunctionOperations {
+	source: MutationJunctionOperation
+	target: MutationJunctionOperation
+}
+
+export type MutationJunctionOperation = Acl.Operation.create | Acl.Operation.update
+
+export const normalizeMutationJunctionOperations = (
+	operationsOrOperation?: MutationJunctionOperations | MutationJunctionOperation,
+): MutationJunctionOperations => {
+	const operation = operationsOrOperation ?? Acl.Operation.update
+	return typeof operation === 'string' ? { source: operation, target: operation } : operation
 }

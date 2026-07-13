@@ -1,4 +1,4 @@
-import { Acl, Input, Model } from '@contember/schema'
+import { Input, Model } from '@contember/schema'
 import { acceptFieldVisitor, getColumnName } from '@contember/schema-utils'
 import {
 	OrderByHelper,
@@ -11,7 +11,7 @@ import {
 	WhereBuilder,
 } from './select/index.js'
 import { Client, Connection, ConstraintHelper, DatabaseMetadata, SelectBuilder } from '@contember/database'
-import { PredicatesInjector } from '../acl/index.js'
+import { createPredicateContextForEvaluatedRelationPath, PredicatesInjector } from '../acl/index.js'
 import { JunctionTableManager } from './JunctionTableManager.js'
 import { DeletedEntitiesStorage, DeleteExecutor } from './delete/index.js'
 import { MutationEntryNotFoundError, MutationResultList } from './Result.js'
@@ -24,7 +24,8 @@ import { CheckedPrimary } from './CheckedPrimary.js'
 import { ImplementationException } from '../exception.js'
 import { EventManager } from './EventManager.js'
 import { MapperInput } from './types.js'
-import { MutationAccess } from './MutationAccess.js'
+import { MutationAccess, normalizeMutationJunctionOperations } from './MutationAccess.js'
+import type { MutationJunctionOperation, MutationJunctionOperations } from './MutationAccess.js'
 
 export class Mapper<ConnectionType extends Connection.ConnectionLike = Connection.ConnectionLike> {
 	private systemVariablesSetupDone: Promise<void> | undefined
@@ -70,8 +71,8 @@ export class Mapper<ConnectionType extends Connection.ConnectionLike = Connectio
 			.from(entity.tableName, 'root_')
 			.select(['root_', columnName])
 		const expandedWhere = this.uniqueWhereExpander.expand(entity, where)
-		const withPredicates = this.predicatesInjector.inject(entity, expandedWhere, access.relationContext, access.relationPath)
-		const builtQb = this.whereBuilder.build(qb, entity, this.pathFactory.create([]), withPredicates)
+		const predicateInjection = this.predicatesInjector.injectForRead(entity, expandedWhere, access.predicateContext)
+		const builtQb = this.whereBuilder.build(qb, entity, this.pathFactory.create([]), predicateInjection)
 		const result = await builtQb.getResult(this.db)
 
 		return result[0] !== undefined ? result[0][columnName] : undefined
@@ -149,14 +150,13 @@ export class Mapper<ConnectionType extends Connection.ConnectionLike = Connectio
 		const augmentedBuilder = qb.from(entity.tableName, path.alias).meta('path', [...input.path, input.alias])
 
 		const selector = this.selectBuilderFactory.create(augmentedBuilder, hydrator, relationPath)
-		const filterWithPredicates = this.predicatesInjector.inject(
+		const predicateInjection = this.predicatesInjector.injectForRead(
 			entity,
 			inputWithOrder.args.filter || {},
-			relationPath[relationPath.length - 1],
-			relationPath,
+			createPredicateContextForEvaluatedRelationPath(relationPath),
 		)
-		const inputWithPredicates = inputWithOrder.withArg('filter', filterWithPredicates)
-		selector.select(this, entity, inputWithPredicates, path, groupBy)
+		const inputWithPredicates = inputWithOrder.withArg('filter', predicateInjection.where)
+		selector.select(this, entity, inputWithPredicates, path, groupBy, predicateInjection)
 		return await selector.execute(this.db)
 	}
 
@@ -165,8 +165,8 @@ export class Mapper<ConnectionType extends Connection.ConnectionLike = Connectio
 		const qb = SelectBuilder.create()
 			.from(entity.tableName, path.alias)
 			.select(expr => expr.raw('count(*)'), 'row_count')
-		const withPredicates = this.predicatesInjector.inject(entity, filter)
-		const qbWithWhere = this.whereBuilder.build(qb, entity, path, withPredicates)
+		const predicateInjection = this.predicatesInjector.injectForRead(entity, filter)
+		const qbWithWhere = this.whereBuilder.build(qb, entity, path, predicateInjection)
 		const result = await qbWithWhere.getResult(this.db)
 		return result[0].row_count
 	}
@@ -183,8 +183,12 @@ export class Mapper<ConnectionType extends Connection.ConnectionLike = Connectio
 			.select(expr => expr.raw('count(*)'), 'row_count')
 			.select([path.alias, relation.joiningColumn.columnName])
 			.groupBy([path.alias, relation.joiningColumn.columnName])
-		const withPredicates = this.predicatesInjector.inject(entity, filter, relationPath[relationPath.length - 1], relationPath)
-		const qbWithWhere = this.whereBuilder.build(qb, entity, path, withPredicates, { relationPath })
+		const predicateInjection = this.predicatesInjector.injectForRead(
+			entity,
+			filter,
+			createPredicateContextForEvaluatedRelationPath(relationPath),
+		)
+		const qbWithWhere = this.whereBuilder.build(qb, entity, path, predicateInjection, { relationPath })
 		const rows = await qbWithWhere.getResult(this.db)
 		const result = new Map<string, number>()
 		for (const row of rows) {
@@ -337,9 +341,30 @@ export class Mapper<ConnectionType extends Connection.ConnectionLike = Connectio
 		relation: Model.ManyHasManyOwningRelation | Model.ManyHasManyInverseRelation,
 		thisPrimary: Input.PrimaryValue,
 		otherPrimary: Input.PrimaryValue,
-		operation: Acl.Operation.create | Acl.Operation.update = Acl.Operation.update,
+		operation?: MutationJunctionOperation,
+	): Promise<MutationResultList>
+	public async connectJunction(
+		entity: Model.Entity,
+		relation: Model.ManyHasManyOwningRelation | Model.ManyHasManyInverseRelation,
+		thisPrimary: Input.PrimaryValue,
+		otherPrimary: Input.PrimaryValue,
+		operations: MutationJunctionOperations,
+	): Promise<MutationResultList>
+	public async connectJunction(
+		entity: Model.Entity,
+		relation: Model.ManyHasManyOwningRelation | Model.ManyHasManyInverseRelation,
+		thisPrimary: Input.PrimaryValue,
+		otherPrimary: Input.PrimaryValue,
+		operationsOrOperation?: MutationJunctionOperations | MutationJunctionOperation,
 	): Promise<MutationResultList> {
-		return this.connectJunctionWithAccess(new MutationAccess(this), entity, relation, thisPrimary, otherPrimary, operation)
+		return this.connectJunctionWithAccess(
+			new MutationAccess(this),
+			entity,
+			relation,
+			thisPrimary,
+			otherPrimary,
+			normalizeMutationJunctionOperations(operationsOrOperation),
+		)
 	}
 
 	public async connectJunctionWithAccess(
@@ -348,8 +373,25 @@ export class Mapper<ConnectionType extends Connection.ConnectionLike = Connectio
 		relation: Model.ManyHasManyOwningRelation | Model.ManyHasManyInverseRelation,
 		thisPrimary: Input.PrimaryValue,
 		otherPrimary: Input.PrimaryValue,
-		operation: Acl.Operation.create | Acl.Operation.update = Acl.Operation.update,
+		operation?: MutationJunctionOperation,
+	): Promise<MutationResultList>
+	public async connectJunctionWithAccess(
+		access: MutationAccess,
+		entity: Model.Entity,
+		relation: Model.ManyHasManyOwningRelation | Model.ManyHasManyInverseRelation,
+		thisPrimary: Input.PrimaryValue,
+		otherPrimary: Input.PrimaryValue,
+		operations: MutationJunctionOperations,
+	): Promise<MutationResultList>
+	public async connectJunctionWithAccess(
+		access: MutationAccess,
+		entity: Model.Entity,
+		relation: Model.ManyHasManyOwningRelation | Model.ManyHasManyInverseRelation,
+		thisPrimary: Input.PrimaryValue,
+		otherPrimary: Input.PrimaryValue,
+		operationsOrOperation?: MutationJunctionOperations | MutationJunctionOperation,
 	): Promise<MutationResultList> {
+		const operations = normalizeMutationJunctionOperations(operationsOrOperation)
 		await this.setupSystemVariables()
 		const err = () => {
 			throw new ImplementationException()
@@ -364,7 +406,8 @@ export class Mapper<ConnectionType extends Connection.ConnectionLike = Connectio
 					context.relation,
 					thisPrimary,
 					otherPrimary,
-					operation,
+					operations.source,
+					operations.target,
 				)
 			},
 			visitManyHasManyInverse: context => {
@@ -376,7 +419,8 @@ export class Mapper<ConnectionType extends Connection.ConnectionLike = Connectio
 					context.targetRelation,
 					otherPrimary,
 					thisPrimary,
-					operation,
+					operations.target,
+					operations.source,
 				)
 			},
 			visitColumn: err,

@@ -168,6 +168,28 @@ describe('predicates injector elimination', () => {
 		assert.deepStrictEqual(result, { and: [{ coverPhoto: { image: { tags: { label: { eq: 'foo' } } } } }, { isPublished: { eq: true } }] })
 	})
 
+	it('normalizes optional legacy relation and ancestor arguments', () => {
+		const relation = acceptFieldVisitor(schema.model, schema.model.entities.Article, 'coverPhoto', {
+			visitColumn: () => {
+				throw new Error()
+			},
+			visitRelation: context => context,
+		})
+		const legacyInjector = new PredicatesInjector(
+			schema.model,
+			new PredicateFactory(
+				{},
+				schema.model,
+				new VariableInjector(schema.model, {}),
+				new AllowAllPermissionFactory().create(schema.model),
+			),
+		)
+
+		assert.deepStrictEqual(legacyInjector.inject(schema.model.entities.ImageUse, {}, relation), {})
+		assert.deepStrictEqual(legacyInjector.inject(schema.model.entities.ImageUse, {}, undefined, [relation]), {})
+		assert.deepStrictEqual(legacyInjector.inject(schema.model.entities.ImageUse, {}, undefined, []), { id: { never: true } })
+	})
+
 	it('keeps sibling row predicate on to-many back-reference filter, eliminates the own row predicate', () => {
 		const relation = acceptFieldVisitor(schema.model, schema.model.entities.Article, 'coverPhoto', {
 			visitColumn: () => {
@@ -205,6 +227,70 @@ describe('predicates injector elimination', () => {
 					articles: { id: { always: true } },
 				},
 			],
+		})
+	})
+})
+
+describe('predicates injector relation guard ingress', () => {
+	const schema = createSchema(DeepFilterModel)
+	const permissions = new PermissionFactory().create(schema, ['reader'])
+	const injector = new PredicatesInjector(
+		schema.model,
+		new PredicateFactory(permissions, schema.model, new VariableInjector(schema.model, {})),
+	)
+
+	it('keeps the relation target read guard separate from a user NOT condition', () => {
+		const coverPhoto = acceptFieldVisitor(schema.model, schema.model.entities.Article, 'coverPhoto', {
+			visitColumn: () => {
+				throw new Error()
+			},
+			visitRelation: context => context,
+		})
+		const relationWhere = { not: { url: { eq: 'probe' } } }
+		const injection = injector.injectForRead(schema.model.entities.Article, { coverPhoto: relationWhere })
+
+		assert.deepStrictEqual(injection.where, { coverPhoto: relationWhere })
+		assert.deepStrictEqual(injection.guard, { isPublished: { eq: true } })
+		assert.deepStrictEqual(injection.relationGuard.create(coverPhoto, relationWhere, []), {
+			articles: { id: { always: true } },
+		})
+	})
+})
+
+namespace CompoundRelationAclModel {
+	export const readerRole = acl.createRole('reader')
+
+	@acl.allow(readerRole, {
+		when: { author: { id: { isNull: true }, name: { eq: 'John' } } },
+		read: true,
+	})
+	export class Article {
+		title = def.stringColumn()
+		author = def.manyHasOne(Author)
+	}
+
+	@acl.allow(readerRole, { read: true })
+	export class Author {
+		name = def.stringColumn()
+	}
+}
+
+describe('predicates injector relation guard ingress for ACL predicates', () => {
+	const schema = createSchema(CompoundRelationAclModel)
+	const permissions = new PermissionFactory().create(schema, ['reader'])
+	const injector = new PredicatesInjector(
+		schema.model,
+		new PredicateFactory(permissions, schema.model, new VariableInjector(schema.model, {})),
+	)
+
+	it('preserves a compound relation predicate instead of turning its sibling into an absence remainder', () => {
+		const injection = injector.injectForRead(schema.model.entities.Article, {})
+		assert.deepStrictEqual(injection.where, {})
+		assert.deepStrictEqual(injection.guard, {
+			author: {
+				id: { isNull: true },
+				name: { eq: 'John' },
+			},
 		})
 	})
 })
@@ -344,7 +430,10 @@ describe('predicates injector - self referencing relations', () => {
 		assert.deepStrictEqual(injected, {
 			and: [
 				{
-					not: { parent: { and: [{ name: { eq: 'Excluded' } }, { id: { always: true } }] } },
+					and: [
+						{ not: { parent: { and: [{ name: { eq: 'Excluded' } }, { id: { always: true } }] } } },
+						{ parent: { id: { always: true } } },
+					],
 				},
 				{ isActive: { eq: true } },
 			],
@@ -707,23 +796,10 @@ describe('predicates injector - multi-level back-reference', () => {
 		// the predicate should NOT be simplified AND nested predicates should be applied
 		const injected = injector.inject(schema.model.entities.Employee, {})
 
-		// Full predicate with nested entity predicates applied:
-		// - Employee predicate: { department: { company: { isActive: true } } }
-		// - Department predicate: { company: { isActive: true } } is added
-		// - Company predicate: { isActive: true } is added inside company traversal
+		// Identical nested row guards collapse structurally, but the Company guard remains enforced.
 		assert.deepStrictEqual(injected, {
 			department: {
-				and: [
-					{
-						company: {
-							and: [
-								{ isActive: { eq: true } }, // from Employee predicate
-								{ isActive: { eq: true } }, // Company's own predicate
-							],
-						},
-					},
-					{ company: { isActive: { eq: true } } }, // Department's predicate
-				],
+				company: { isActive: { eq: true } },
 			},
 		})
 	})
@@ -873,16 +949,9 @@ describe('predicates injector - subsidiary edge case', () => {
 
 		const injected = injector.inject(schema.model.entities.Department, {})
 
-		// Full predicate with nested Company predicate:
-		// - Department predicate: { company: { isActive: true } }
-		// - Company predicate: { isActive: true } is also added when traversing company
+		// The identical source and target row guards collapse to one enforced predicate.
 		assert.deepStrictEqual(injected, {
-			company: {
-				and: [
-					{ isActive: { eq: true } }, // from Department predicate
-					{ isActive: { eq: true } }, // Company's own predicate
-				],
-			},
+			company: { isActive: { eq: true } },
 		})
 	})
 
@@ -1480,12 +1549,22 @@ describe('predicates injector - SECURITY: cell-level predicates on back-referenc
 		assert.deepStrictEqual(injected, {
 			and: [
 				{
-					not: {
-						and: [
-							{ parent: { and: [{ secret: { eq: 'X' } }, { secretVisible: { eq: true } }] } },
-							{ isPublished: { eq: true } },
-						],
-					},
+					and: [
+						{
+							not: {
+								and: [
+									{ parent: { and: [{ secret: { eq: 'X' } }, { secretVisible: { eq: true } }] } },
+									{ isPublished: { eq: true } },
+								],
+							},
+						},
+						{
+							and: [
+								{ parent: { and: [{ id: { always: true } }, { secretVisible: { eq: true } }] } },
+								{ isPublished: { eq: true } },
+							],
+						},
+					],
 				},
 				{ or: [{ isPublished: { eq: true } }, { secretVisible: { eq: true } }] },
 			],

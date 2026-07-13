@@ -21,7 +21,10 @@ export class ManyHasManyCreateInputProcessor implements CreateInputProcessor.Has
 		return async ({ primary }) => {
 			const [otherPrimary, err] = await this.mapper.through(context).getPrimaryValue(targetEntity, input)
 			if (err) return [err]
-			return await this.mapper.connectJunction(entity, relation, primary, otherPrimary, Acl.Operation.create)
+			return await this.mapper.connectJunction(entity, relation, primary, otherPrimary, {
+				source: Acl.Operation.create,
+				target: Acl.Operation.update,
+			})
 		}
 	}
 
@@ -37,7 +40,10 @@ export class ManyHasManyCreateInputProcessor implements CreateInputProcessor.Has
 			}
 			return [
 				...insertResult,
-				...(await this.mapper.connectJunction(entity, relation, primary, insertPrimary, Acl.Operation.create)),
+				...(await this.mapper.connectJunction(entity, relation, primary, insertPrimary, {
+					source: Acl.Operation.create,
+					target: Acl.Operation.create,
+				})),
 			]
 		}
 	}
@@ -48,14 +54,19 @@ export class ManyHasManyCreateInputProcessor implements CreateInputProcessor.Has
 		return async ({ primary }: { primary: Input.PrimaryValue }) => {
 			const targetAccess = this.mapper.through(context)
 			let [otherPrimary] = await targetAccess.getPrimaryValue(context.targetEntity, context.input.connect)
+			let targetOperation = Acl.Operation.update
 			if (!otherPrimary) {
 				const insertResult = await targetAccess.insert(context.targetEntity, context.input.create)
 				otherPrimary = getInsertPrimary(insertResult)
 				if (!otherPrimary) {
 					return insertResult
 				}
+				targetOperation = Acl.Operation.create
 			}
-			return await this.mapper.connectJunction(context.entity, context.relation, primary, otherPrimary, Acl.Operation.create)
+			return await this.mapper.connectJunction(context.entity, context.relation, primary, otherPrimary, {
+				source: Acl.Operation.create,
+				target: targetOperation,
+			})
 		}
 	}
 }

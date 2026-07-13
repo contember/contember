@@ -221,3 +221,98 @@ from "public"."article" as "root_"`,
 		},
 	})
 })
+
+namespace RelationAclManyHasManyTargetGuard {
+	export const readerRole = c.createRole('reader')
+
+	@c.Allow(readerRole, { read: true })
+	export class Post {
+		tags = c.manyHasMany(Tag)
+	}
+
+	@c.Allow(readerRole, {
+		when: { visible: { eq: true } },
+		read: true,
+	})
+	export class Tag {
+		name = c.stringColumn().notNull()
+		visible = c.boolColumn().notNull()
+	}
+}
+
+test('many-has-many count and pagination apply a target row guard with an empty user filter', async () => {
+	const schema = createSchema(RelationAclManyHasManyTargetGuard)
+	const permissions = new PermissionFactory().create(schema, ['reader'])
+
+	await execute({
+		schema: schema.model,
+		permissions,
+		variables: {},
+		query: GQL`
+			query {
+				listPost {
+					id
+					paginateTags(skip: 1, first: 1) {
+						pageInfo {
+							totalCount
+						}
+						edges {
+							node {
+								name
+							}
+						}
+					}
+				}
+			}
+		`,
+		executes: [
+			{
+				sql: SQL`select "root_"."id" as "root_id", "root_"."id" as "root_id"
+					from "public"."post" as "root_"`,
+				response: { rows: [{ root_id: testUuid(1) }] },
+			},
+			{
+				sql: SQL`select "junction_"."post_id", count(*) as "row_count"
+					from "public"."post_tags" as "junction_"
+					inner join "public"."tag" as "root_" on "junction_"."tag_id" = "root_"."id"
+					where "junction_"."post_id" in (?) and "root_"."visible" = ?
+					group by "junction_"."post_id"`,
+				parameters: [testUuid(1), true],
+				response: { rows: [{ post_id: testUuid(1), row_count: 2 }] },
+			},
+			{
+				sql: SQL`with "data" as
+					(select "junction_"."tag_id", "junction_"."post_id",
+						row_number() over(partition by "junction_"."post_id" order by "root_"."id" asc) as "rowNumber_"
+					from "public"."post_tags" as "junction_"
+					inner join "public"."tag" as "root_" on "junction_"."tag_id" = "root_"."id"
+					where "junction_"."post_id" in (?) and "root_"."visible" = ?
+					order by "root_"."id" asc)
+					select "data".* from "data"
+					where "data"."rowNumber_" > ? and "data"."rowNumber_" <= ?`,
+				parameters: [testUuid(1), true, 1, 2],
+				response: { rows: [{ post_id: testUuid(1), tag_id: testUuid(11) }] },
+			},
+			{
+				sql: SQL`select "root_"."name" as "root_name", "root_"."id" as "root_id"
+					from "public"."tag" as "root_"
+					where "root_"."id" in (?) and "root_"."visible" = ?`,
+				parameters: [testUuid(11), true],
+				response: { rows: [{ root_id: testUuid(11), root_name: 'visible tag' }] },
+			},
+		],
+		return: {
+			data: {
+				listPost: [
+					{
+						id: testUuid(1),
+						paginateTags: {
+							pageInfo: { totalCount: 2 },
+							edges: [{ node: { name: 'visible tag' } }],
+						},
+					},
+				],
+			},
+		},
+	})
+})

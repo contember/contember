@@ -72,20 +72,24 @@ export class CreateEntityRelationAllowedOperationsVisitor
 		context: Model.ManyHasManyOwningContext | Model.ManyHasManyInverseContext,
 	): Input.CreateRelationOperation[] {
 		const { targetEntity } = context
-		const { canMutateJunction } = getManyHasManyMutationPermissions(this.authorizator, context, Acl.Operation.create)
-		if (!canMutateJunction) {
-			return []
-		}
 		const result: Input.CreateRelationOperation[] = []
 		const canReadTarget = this.authorizator.getEntityPermission(Acl.Operation.read, targetEntity.name) !== 'no'
 		const canCreateTarget = this.authorizator.getEntityPermission(Acl.Operation.create, targetEntity.name) !== 'no'
-		if (canReadTarget) {
+		const canConnect = getManyHasManyMutationPermissions(this.authorizator, context, {
+			source: Acl.Operation.create,
+			target: Acl.Operation.update,
+		}).canMutateJunction
+		const canCreate = getManyHasManyMutationPermissions(this.authorizator, context, {
+			source: Acl.Operation.create,
+			target: Acl.Operation.create,
+		}).canMutateJunction
+		if (canConnect && canReadTarget) {
 			result.push(Input.CreateRelationOperation.connect)
 		}
-		if (canCreateTarget) {
+		if (canCreate && canCreateTarget) {
 			result.push(Input.CreateRelationOperation.create)
 		}
-		if (canReadTarget && canCreateTarget) {
+		if (canConnect && canCreate && canReadTarget && canCreateTarget) {
 			result.push(Input.CreateRelationOperation.connectOrCreate)
 		}
 		return result

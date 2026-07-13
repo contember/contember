@@ -8,7 +8,7 @@ import { ColumnValueGetter } from '../SelectHydrator.js'
 import { Providers } from '@contember/schema-utils'
 import { getColumnName } from '@contember/schema-utils'
 import { viewComputedId } from '../../../utils/viewComputedId.js'
-import { getFieldReadPredicate } from '../getFieldReadPredicate.js'
+import { getFieldReadPredicate } from '../getFieldPredicate.js'
 
 export class FieldsVisitor implements Model.RelationByTypeVisitor<void>, Model.ColumnVisitor<void> {
 	constructor(

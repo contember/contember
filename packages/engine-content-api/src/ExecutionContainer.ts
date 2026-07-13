@@ -177,11 +177,12 @@ export class ExecutionContainerFactory {
 			.addService('uniqueWhereExpander', ({ schema }) => new UniqueWhereExpander(schema.model))
 			.addService(
 				'hasManyToHasOneReducer',
-				({ uniqueWhereExpander, schema }) => new HasManyToHasOneReducerExecutionHandler(schema.model, uniqueWhereExpander),
+				({ uniqueWhereExpander, schema, predicateFactory }) =>
+					new HasManyToHasOneReducerExecutionHandler(schema.model, uniqueWhereExpander, predicateFactory),
 			)
 			.addService(
 				'paginatedHasManyExecutionHandler',
-				({ relationFetcher, schema }) => new PaginatedHasManyExecutionHandler(schema.model, relationFetcher),
+				({ relationFetcher, schema, predicateFactory }) => new PaginatedHasManyExecutionHandler(schema.model, relationFetcher, predicateFactory),
 			)
 			.addService('selectHandlers', ({ hasManyToHasOneReducer, paginatedHasManyExecutionHandler }) => ({
 				[HasManyToHasOneReducer.extensionName]: hasManyToHasOneReducer,

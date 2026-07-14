@@ -1,9 +1,9 @@
 import { Command } from '../Command.js'
 import { InsertBuilder, Literal } from '@contember/database'
-import { plusMinutes } from '../../utils/time.js'
 import { TokenHash } from '../../utils/index.js'
 import { PersonToken } from '../../type/index.js'
 import { JSONValue } from '@contember/schema'
+import { ImplementationException } from '../../../exceptions.js'
 
 class SavePersonTokenCommand implements Command<SavePersonTokenCommand.Result> {
 	constructor(
@@ -16,7 +16,7 @@ class SavePersonTokenCommand implements Command<SavePersonTokenCommand.Result> {
 
 	async execute({ db, providers }: Command.Args): Promise<SavePersonTokenCommand.Result> {
 		const id = providers.uuid()
-		await InsertBuilder.create()
+		const result = await InsertBuilder.create()
 			.into('person_token')
 			.values({
 				id: id,
@@ -32,12 +32,12 @@ class SavePersonTokenCommand implements Command<SavePersonTokenCommand.Result> {
 				type: this.type,
 				meta: this.meta,
 			})
+			.returning<{ expires_at: Date }>('expires_at')
 			.execute(db)
-
-		// expiresAt here is an app-clock approximation surfaced only in the response
-		// DTO (never compared server-side); the authoritative lifetime is the DB-clock
-		// `expires_at` column written above.
-		return { id, expiresAt: plusMinutes(providers.now(), this.expirationMinutes) }
+		if (result.length !== 1) {
+			throw new ImplementationException()
+		}
+		return { id, expiresAt: result[0].expires_at }
 	}
 }
 

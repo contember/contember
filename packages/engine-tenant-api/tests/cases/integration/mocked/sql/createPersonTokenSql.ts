@@ -1,5 +1,6 @@
 import { SQL } from '../../../../src/tags.js'
 import { ExpectedQuery } from '@contember/database-tester'
+import { now } from '../../../../src/testTenant.js'
 
 export const createPersonTokenSql = (args: {
 	resetId: string
@@ -9,7 +10,7 @@ export const createPersonTokenSql = (args: {
 	meta?: unknown
 }): ExpectedQuery => ({
 	sql: SQL`INSERT INTO "tenant"."person_token" ("id", "token_hash", "person_id", "expires_at", "created_at", "used_at", "type", "meta")
-	         VALUES (?, ?, ?, now() + make_interval(secs => ?), ?, ?, ?, ?)`,
+	         VALUES (?, ?, ?, now() + make_interval(secs => ?), ?, ?, ?, ?) RETURNING "expires_at"`,
 	parameters: [
 		args.resetId,
 		args.tokenHash,
@@ -20,5 +21,5 @@ export const createPersonTokenSql = (args: {
 		args.type,
 		args.meta ?? null,
 	],
-	response: { rowCount: 1 },
+	response: { rows: [{ expires_at: now }] },
 })

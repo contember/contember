@@ -123,6 +123,8 @@ export type EventMap<E extends AnyEvent = AnyEvent> = {
 export type EventListener<K extends keyof EventMap> = (event: EventMap[K], mapper: Mapper) => Promise<void>
 
 export class EventManager {
+	private readonly deferredUntilCommit: (BeforeJunctionUpdateEvent | AfterJunctionUpdateEvent)[] = []
+
 	private listeners: { [K in keyof EventMap]: EventListener<K>[] } = {
 		BeforeInsertEvent: [],
 		AfterInsertEvent: [],
@@ -144,7 +146,18 @@ export class EventManager {
 		this.listeners[type].push(cb)
 	}
 
+	public deferUntilCommit(event: BeforeJunctionUpdateEvent | AfterJunctionUpdateEvent): void {
+		this.deferredUntilCommit.push(event)
+	}
+
 	public async fire<K extends keyof EventMap>(event: EventMap[K]) {
+		if (event.type === 'BeforeCommitEvent') {
+			let deferredEvent = this.deferredUntilCommit.shift()
+			while (deferredEvent !== undefined) {
+				await this.fire(deferredEvent)
+				deferredEvent = this.deferredUntilCommit.shift()
+			}
+		}
 		for (const listener of this.listeners[event.type]) {
 			await listener(event, this.mapper)
 		}

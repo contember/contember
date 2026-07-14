@@ -10,7 +10,7 @@ import {
 	SelectResultObject,
 	WhereBuilder,
 } from './select/index.js'
-import { Client, Connection, ConstraintHelper, DatabaseMetadata, SelectBuilder } from '@contember/database'
+import { Client, Connection, ConstraintHelper, DatabaseMetadata, LockType, Operator, SelectBuilder } from '@contember/database'
 import { createPredicateContextForEvaluatedRelationPath, PredicatesInjector } from '../acl/index.js'
 import { JunctionTableManager } from './JunctionTableManager.js'
 import { DeletedEntitiesStorage, DeleteExecutor } from './delete/index.js'
@@ -499,6 +499,38 @@ export class Mapper<ConnectionType extends Connection.ConnectionLike = Connectio
 		}
 		const result = await this.selectFieldWithAccess(access, entity, where, entity.primary)
 		return result ? [result, undefined] : [undefined, new MutationEntryNotFoundError([], where)]
+	}
+
+	public async getConnectedPrimaryValueWithAccess(
+		access: MutationAccess,
+		context: Model.ManyHasManyOwningContext | Model.ManyHasManyInverseContext,
+		sourcePrimary: Input.PrimaryValue,
+		where: Input.UniqueWhere,
+	): Promise<[Input.PrimaryValue, undefined] | [undefined, MutationEntryNotFoundError]> {
+		const { targetEntity } = context
+		const owningRelation = context.type === 'manyHasManyOwning' ? context.relation : context.targetRelation
+		const joiningTable = owningRelation.joiningTable
+		const sourceColumn = context.type === 'manyHasManyOwning' ? joiningTable.joiningColumn : joiningTable.inverseJoiningColumn
+		const targetColumn = context.type === 'manyHasManyOwning' ? joiningTable.inverseJoiningColumn : joiningTable.joiningColumn
+
+		// Keep the junction stable until the checked target is deleted.
+		const qb = SelectBuilder.create<{ id: Input.PrimaryValue }>()
+			.from(targetEntity.tableName, 'root_')
+			.select(['root_', targetEntity.primaryColumn], 'id')
+			.join(
+				joiningTable.tableName,
+				'junction_',
+				condition => condition.compareColumns(['junction_', targetColumn.columnName], Operator.eq, ['root_', targetEntity.primaryColumn]),
+			)
+			.where(condition => condition.compare(['junction_', sourceColumn.columnName], Operator.eq, sourcePrimary))
+			.lock(LockType.forUpdate)
+		const expandedWhere = this.uniqueWhereExpander.expand(targetEntity, where)
+		const predicateInjection = this.predicatesInjector.injectForRead(targetEntity, expandedWhere, access.predicateContext)
+		const result = await this.whereBuilder.build(qb, targetEntity, this.pathFactory.create([]), predicateInjection).getResult(this.db)
+
+		return result[0] !== undefined
+			? [result[0].id, undefined]
+			: [undefined, new MutationEntryNotFoundError([], where)]
 	}
 
 	private async setupSystemVariables() {

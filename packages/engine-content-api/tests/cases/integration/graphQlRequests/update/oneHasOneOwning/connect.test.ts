@@ -1,5 +1,5 @@
 import { test } from 'bun:test'
-import { execute, sqlTransaction } from '../../../../../src/test.js'
+import { execute, relationOnlyUpdateLock, sqlTransaction } from '../../../../../src/test.js'
 import { GQL, SQL } from '../../../../../src/tags.js'
 import { testUuid } from '../../../../../src/testUuid.js'
 import { siteSettingSchema, siteSettingSchemaWithOrphanRemoval } from './schema.js'
@@ -36,6 +36,7 @@ test('connect - same owner', async () => {
 						rows: [{ id: testUuid(2) }],
 					},
 				},
+				...relationOnlyUpdateLock('site', 'id', testUuid(2)),
 			]),
 		],
 		return: {

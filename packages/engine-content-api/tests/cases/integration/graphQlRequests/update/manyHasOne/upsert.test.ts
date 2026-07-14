@@ -1,5 +1,5 @@
 import { test } from 'bun:test'
-import { execute, sqlTransaction } from '../../../../../src/test.js'
+import { execute, relationOnlyUpdateLock, sqlTransaction } from '../../../../../src/test.js'
 import { GQL, SQL } from '../../../../../src/tags.js'
 import { testUuid } from '../../../../../src/testUuid.js'
 import { postWithAuthor } from './schema.js'
@@ -31,6 +31,7 @@ test('upsert - exists', async () => {
 						rows: [{ author_id: testUuid(1) }],
 					},
 				},
+				...relationOnlyUpdateLock('post', 'id', testUuid(2)),
 				{
 					sql:
 						SQL`with "newData_" as (select ? :: text as "name", "root_"."name" as "name_old__", "root_"."id"  from "public"."author" as "root_"  where "root_"."id" = ?) 

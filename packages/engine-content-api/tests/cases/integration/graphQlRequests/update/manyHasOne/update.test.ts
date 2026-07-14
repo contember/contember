@@ -1,5 +1,5 @@
 import { test } from 'bun:test'
-import { execute, sqlTransaction } from '../../../../../src/test.js'
+import { execute, relationOnlyUpdateLock, sqlTransaction } from '../../../../../src/test.js'
 import { GQL, SQL } from '../../../../../src/tags.js'
 import { testUuid } from '../../../../../src/testUuid.js'
 import { postWithAuthor } from './schema.js'
@@ -22,6 +22,7 @@ test('update', async () => {
 					parameters: [testUuid(2)],
 					response: { rows: [{ id: testUuid(2) }] },
 				},
+				...relationOnlyUpdateLock('post', 'id', testUuid(2)),
 				{
 					sql: SQL`select "root_"."author_id"
                        from "public"."post" as "root_"

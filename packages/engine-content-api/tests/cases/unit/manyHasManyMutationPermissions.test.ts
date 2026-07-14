@@ -191,6 +191,19 @@ test('legacy junction operations normalize through the public Mapper APIs', asyn
 		parameters: [source, target],
 		response: { rows: [], rowCount: 1 },
 	}
+	const endpointLockQueries = [
+		{
+			sql:
+				'select "root_"."id" as "primary" from "public"."category" as "root_" where "root_"."id" in (?) order by "root_"."id" asc for update of "root_"',
+			parameters: [target],
+			response: { rows: [{ primary: target }], rowCount: 1 },
+		},
+		{
+			sql: 'select "root_"."id" as "primary" from "public"."post" as "root_" where "root_"."id" in (?) order by "root_"."id" asc for update of "root_"',
+			parameters: [source],
+			response: { rows: [{ primary: source }], rowCount: 1 },
+		},
+	]
 	const connection = createConnectionMock([
 		{
 			sql: 'select set_config(?, ?, false)',
@@ -202,7 +215,7 @@ test('legacy junction operations normalize through the public Mapper APIs', asyn
 			parameters: ['system.transaction_id', testUuid(4)],
 			response: { rows: [], rowCount: 1 },
 		},
-		...Array.from({ length: 9 }, () => insertQuery),
+		...Array.from({ length: 9 }, () => [...endpointLockQueries, insertQuery]).flat(),
 	])
 	const schema = { ...emptySchema, model: bidirectionalModel }
 	const mapper: Mapper = new ExecutionContainerFactory({ uuid: () => testUuid(4), now: () => new Date(0) })

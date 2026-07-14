@@ -68,24 +68,24 @@ export class Updater {
 			}
 		}
 
-		const result = await updateBuilder.execute(mapper)
+		const result = await updateBuilder.execute(mapper, filter)
+
+		if (result.relationOnlyFailure === 'notFound' || result.relationOnlyFailure === 'filterMismatch') {
+			const where: Input.OptionalWhere = {
+				and: [
+					filter ?? {},
+					{
+						[entity.primary]: { eq: primaryValue },
+					},
+				],
+			}
+			return [new MutationEntryNotFoundError([], where)]
+		}
+		if (!result.authorized) {
+			return [new MutationNoResultError([])]
+		}
 
 		if (!result.executed) {
-			if (filter && Object.keys(filter).length > 0) {
-				// direct update was not invoked, but we still need to check if the row matches the filter
-				const where: Input.OptionalWhere = {
-					and: [
-						filter,
-						{
-							[entity.primary]: { eq: primaryValue },
-						},
-					],
-				}
-				const count = await mapper.count(entity, where)
-				if (!count) {
-					return [new MutationEntryNotFoundError([], where)]
-				}
-			}
 			resultList.unshift(new MutationNothingToDo([], NothingToDoReason.noData))
 		} else if (result.affectedRows !== 1) {
 			return [new MutationNoResultError([])]
@@ -119,6 +119,10 @@ export class Updater {
 		builderCb(updateBuilder)
 
 		const result = await updateBuilder.execute(mapper)
+
+		if (!result.authorized) {
+			return [new MutationNoResultError([])]
+		}
 
 		if (!result.executed) {
 			return [new MutationNothingToDo([], NothingToDoReason.noData)]

@@ -92,9 +92,10 @@ test('applies a filter with only relation update', async () => {
 					response: { rows: [{ id: testUuid(1) }] },
 				},
 				{
-					sql: SQL`select count(*) as "row_count"  from "public"."article" as "root_"  where not("root_"."published_at" is null) and "root_"."id" = ?`,
+					sql:
+						SQL`select not("root_"."published_at" is null) as "filter_matches", true as "authorized" from "public"."article" as "root_" where "root_"."id" = ? for update of "root_"`,
 					parameters: [testUuid(1)],
-					response: { rows: [{ row_count: 0 }] },
+					response: { rows: [{ filter_matches: false, authorized: true }] },
 				},
 			]),
 		],

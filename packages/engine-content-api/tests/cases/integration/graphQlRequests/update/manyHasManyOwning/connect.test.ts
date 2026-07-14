@@ -1,5 +1,5 @@
 import { test } from 'bun:test'
-import { execute, sqlTransaction } from '../../../../../src/test.js'
+import { execute, junctionEndpointLocks, relationOnlyUpdateLock, sqlTransaction } from '../../../../../src/test.js'
 import { GQL, SQL } from '../../../../../src/tags.js'
 import { testUuid } from '../../../../../src/testUuid.js'
 import { postWithCategories } from './schema.js'
@@ -22,11 +22,16 @@ test('connect', async () => {
 					parameters: [testUuid(2)],
 					response: { rows: [{ id: testUuid(2) }] },
 				},
+				...relationOnlyUpdateLock('post', 'id', testUuid(2)),
 				{
 					sql: SQL`select "root_"."id" from "public"."category" as "root_" where "root_"."id" = ?`,
 					parameters: [testUuid(3)],
 					response: { rows: [{ id: testUuid(3) }] },
 				},
+				...junctionEndpointLocks([
+					{ table: 'post', primaryColumn: 'id', primary: testUuid(2) },
+					{ table: 'category', primaryColumn: 'id', primary: testUuid(3) },
+				]),
 				{
 					sql: SQL`insert into "public"."post_categories" ("post_id", "category_id")
               values (?, ?)

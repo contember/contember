@@ -1,5 +1,5 @@
 import { test } from 'bun:test'
-import { execute, failedTransaction, sqlTransaction } from '../../../../../src/test.js'
+import { execute, failedTransaction, junctionEndpointLocks, sqlTransaction } from '../../../../../src/test.js'
 import { c, createSchema, SchemaBuilder } from '@contember/schema-definition'
 import { Model } from '@contember/schema'
 import { GQL, SQL } from '../../../../../src/tags.js'
@@ -181,67 +181,79 @@ test('update m:n', async () => {
 				response: { rows: [{ id: testUuid(1) }] },
 			},
 			{
+				sql: SQL`select true as "authorized"
+					from "public"."post" as "root_"
+					where "root_"."id" = ? and "root_"."name" in (?, ?)
+					for update of "root_"`,
+				parameters: [testUuid(1), 'Lorem ipsum', 'Dolor sit'],
+				response: { rows: [{ authorized: true }] },
+			},
+			{
 				sql: SQL`select "root_"."id" from "public"."category" as "root_" where "root_"."id" = ?`,
 				parameters: [testUuid(2)],
 				response: { rows: [{ id: testUuid(2) }] },
 			},
+			...junctionEndpointLocks([
+				{ table: 'post', primaryColumn: 'id', primary: testUuid(1) },
+				{ table: 'category', primaryColumn: 'id', primary: testUuid(2) },
+			]),
 			{
-				sql: SQL`with "data" as
-            (select
-               "owning"."id" as "post_id",
-               "inverse"."id" as "category_id",
-               true as "selected"
-             from (values (null)) as "t" inner join "public"."post" as "owning" on true
-               inner join "public"."category" as "inverse" on true
-             where "owning"."name" in (?, ?) and "owning"."id" = ? and "inverse"."name" in (?, ?) and
-                   "inverse"."id" = ?),
-								"insert" as
-              (insert into "public"."post_categories" ("post_id", "category_id")
-                select
-                  "data"."post_id",
-                  "data"."category_id"
-                from "data"
-              on conflict do nothing
-              returning true as inserted)
-            select
-              coalesce(data.selected, false) as "selected",
-              coalesce(insert.inserted, false) as "inserted"
-            from (values (null)) as "t" left join "data" as "data" on true
-              left join "insert" as "insert" on true`,
+				sql: SQL`select true as "authorized"
+					from "public"."post" as "owning"
+						inner join "public"."category" as "inverse" on true
+					where "owning"."name" in (?, ?) and "owning"."id" = ?
+						and "inverse"."name" in (?, ?) and "inverse"."id" = ?`,
 				parameters: ['Lorem ipsum', 'Dolor sit', testUuid(1), 'foo', 'bar', testUuid(2)],
-				response: {
-					rows: [{ selected: true, inserted: true }],
-				},
+				response: { rows: [{ authorized: true }] },
+			},
+			{
+				sql: SQL`insert into "public"."post_categories" ("post_id", "category_id")
+					values (?, ?)
+					on conflict do nothing`,
+				parameters: [testUuid(1), testUuid(2)],
+				response: { rowCount: 1 },
+			},
+			{
+				sql: SQL`select true as "authorized"
+					from "public"."post" as "owning"
+						inner join "public"."category" as "inverse" on true
+					where "owning"."name" in (?, ?) and "owning"."id" = ?
+						and "inverse"."name" in (?, ?) and "inverse"."id" = ?`,
+				parameters: ['Lorem ipsum', 'Dolor sit', testUuid(1), 'foo', 'bar', testUuid(2)],
+				response: { rows: [{ authorized: true }] },
 			},
 			{
 				sql: SQL`select "root_"."id" from "public"."category" as "root_" where "root_"."id" = ?`,
 				parameters: [testUuid(3)],
 				response: { rows: [{ id: testUuid(3) }] },
 			},
+			...junctionEndpointLocks([
+				{ table: 'post', primaryColumn: 'id', primary: testUuid(1) },
+				{ table: 'category', primaryColumn: 'id', primary: testUuid(3) },
+			]),
 			{
-				sql: SQL`with "data" as
-            (select
-               "owning"."id" as "post_id",
-               "inverse"."id" as "category_id",
-               true as "selected"
-             from (values (null)) as "t" inner join "public"."post" as "owning" on true
-               inner join "public"."category" as "inverse" on true
-             where "owning"."name" in (?, ?) and "owning"."id" = ? and "inverse"."name" in (?, ?) and
-                   "inverse"."id" = ?),
-                "delete" as
-              (delete from "public"."post_categories"
-              using "data" as "data"
-              where "post_categories"."post_id" = "data"."post_id" and "post_categories"."category_id" = "data"."category_id"
-              returning true as deleted)
-            select
-              coalesce(data.selected, false) as "selected",
-              coalesce(delete.deleted, false) as "deleted"
-            from (values (null)) as "t" left join "data" as "data" on true
-              left join "delete" as "delete" on true`,
+				sql: SQL`select true as "authorized"
+					from "public"."post" as "owning"
+						inner join "public"."category" as "inverse" on true
+					where "owning"."name" in (?, ?) and "owning"."id" = ?
+						and "inverse"."name" in (?, ?) and "inverse"."id" = ?`,
 				parameters: ['Lorem ipsum', 'Dolor sit', testUuid(1), 'foo', 'bar', testUuid(3)],
-				response: {
-					rows: [{ selected: true, deleted: true }],
-				},
+				response: { rows: [{ authorized: true }] },
+			},
+			{
+				sql: SQL`delete from "public"."post_categories"
+					where "post_id" = ? and "category_id" = ?`,
+				parameters: [testUuid(1), testUuid(3)],
+				response: { rowCount: 1 },
+			},
+			{
+				sql: SQL`select true as "authorized"
+					from "public"."post" as "owning"
+						inner join "public"."category" as "inverse" on true
+					where "owning"."name" in (?, ?) and "owning"."id" = ?
+						and "inverse"."name" in (?, ?) and "inverse"."id" = ?`,
+				parameters: ['Lorem ipsum', 'Dolor sit', testUuid(1), 'foo', 'bar', testUuid(3)],
+				response: { rows: [{ authorized: true }] },
 			},
 		]),
 		return: {

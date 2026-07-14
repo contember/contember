@@ -38,8 +38,19 @@ export class MapperFactory {
 	}
 
 	public transaction<T>(cb: (mapper: Mapper<Connection.TransactionLike>) => Promise<T>): Promise<T> {
+		return this.transactionWithIsolation(Connection.REPEATABLE_READ, cb)
+	}
+
+	public mutationTransaction<T>(cb: (mapper: Mapper<Connection.TransactionLike>) => Promise<T>): Promise<T> {
+		return this.transactionWithIsolation(Connection.SERIALIZABLE, cb)
+	}
+
+	private transactionWithIsolation<T>(
+		isolationLevel: typeof Connection.REPEATABLE_READ | typeof Connection.SERIALIZABLE,
+		cb: (mapper: Mapper<Connection.TransactionLike>) => Promise<T>,
+	): Promise<T> {
 		return this.db.transaction(async trx => {
-			await trx.connection.query(Connection.REPEATABLE_READ)
+			await trx.connection.query(isolationLevel)
 			const mapper = this.createInternal(trx)
 			return await cb(mapper)
 		})

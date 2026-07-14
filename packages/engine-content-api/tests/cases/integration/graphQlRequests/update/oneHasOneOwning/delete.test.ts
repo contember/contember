@@ -1,5 +1,5 @@
 import { test } from 'bun:test'
-import { execute, failedTransaction, sqlTransaction } from '../../../../../src/test.js'
+import { execute, failedTransaction, relationOnlyUpdateLock, sqlTransaction } from '../../../../../src/test.js'
 import { GQL, SQL } from '../../../../../src/tags.js'
 import { testUuid } from '../../../../../src/testUuid.js'
 import { siteSettingSchema } from './schema.js'
@@ -22,6 +22,7 @@ test('delete', async () => {
 					parameters: [testUuid(2)],
 					response: { rows: [{ id: testUuid(2) }] },
 				},
+				...relationOnlyUpdateLock('site', 'id', testUuid(2)),
 				{
 					sql: SQL`select "root_"."setting_id"
                        from "public"."site" as "root_"
@@ -78,6 +79,7 @@ test('delete denied', async () => {
 					parameters: [testUuid(2)],
 					response: { rows: [{ id: testUuid(2) }] },
 				},
+				...relationOnlyUpdateLock('site', 'id', testUuid(2)),
 				{
 					sql: SQL`select "root_"."setting_id"
                        from "public"."site" as "root_"

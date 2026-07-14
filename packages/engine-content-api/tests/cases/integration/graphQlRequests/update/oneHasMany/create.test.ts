@@ -1,5 +1,5 @@
 import { test } from 'bun:test'
-import { execute, sqlTransaction } from '../../../../../src/test.js'
+import { execute, relationOnlyUpdateLock, sqlTransaction } from '../../../../../src/test.js'
 import { GQL, SQL } from '../../../../../src/tags.js'
 import { testUuid } from '../../../../../src/testUuid.js'
 import { postWithLocale } from './schema.js'
@@ -22,6 +22,7 @@ test('create', async () => {
 					parameters: [testUuid(2)],
 					response: { rows: [{ id: testUuid(2) }] },
 				},
+				...relationOnlyUpdateLock('post', 'id', testUuid(2)),
 				// {
 				// 	sql: SQL`select "root_"."id" as "root_id", "root_"."id" as "root_id" from "public"."post" as "root_" where "root_"."id" = ?`,
 				// 	parameters: [testUuid(2)],

@@ -1,4 +1,4 @@
-import { test } from 'bun:test'
+import { expect, test } from 'bun:test'
 import { execute, failedTransaction, sqlTransaction } from '../../../../../src/test.js'
 import { SchemaBuilder } from '@contember/schema-definition'
 import { Model } from '@contember/schema'
@@ -63,29 +63,10 @@ test('M:N create connectOrCreate existing branch uses the target update predicat
 				parameters: [testUuid(2)],
 				response: { rows: [{ id: testUuid(2) }] },
 			},
-			{
-				sql: SQL`with "data" as
-					(select
-						"owning"."id" as "post_id",
-						"inverse"."id" as "category_id",
-						true as "selected"
-					from (values (null)) as "t" inner join "public"."post" as "owning" on true
-						inner join "public"."category" as "inverse" on true
-					where "owning"."id" = ? and "inverse"."name" = ? and "inverse"."id" = ?),
-					"insert" as
-					(insert into "public"."post_categories" ("post_id", "category_id")
-						select "data"."post_id", "data"."category_id"
-						from "data"
-						on conflict do nothing
-						returning true as inserted)
-					select
-						coalesce(data.selected, false) as "selected",
-						coalesce(insert.inserted, false) as "inserted"
-					from (values (null)) as "t" left join "data" as "data" on true
-						left join "insert" as "insert" on true`,
+			...junctionConnectQueries(testUuid(1), testUuid(2), {
+				where: SQL`"owning"."id" = ? and "inverse"."name" = ? and "inverse"."id" = ?`,
 				parameters: [testUuid(1), 'connected category', testUuid(2)],
-				response: { rows: [{ selected: true, inserted: true }] },
-			},
+			}),
 		]),
 		return: {
 			data: {
@@ -141,29 +122,10 @@ test('M:N inverse create connect uses the target update predicate', async () => 
 				parameters: [testUuid(2)],
 				response: { rows: [{ id: testUuid(2) }] },
 			},
-			{
-				sql: SQL`with "data" as
-					(select
-						"owning"."id" as "post_id",
-						"inverse"."id" as "category_id",
-						true as "selected"
-					from (values (null)) as "t" inner join "public"."post" as "owning" on true
-						inner join "public"."category" as "inverse" on true
-					where "owning"."name" = ? and "owning"."id" = ? and "inverse"."id" = ?),
-					"insert" as
-					(insert into "public"."post_categories" ("post_id", "category_id")
-						select "data"."post_id", "data"."category_id"
-						from "data"
-						on conflict do nothing
-						returning true as inserted)
-					select
-						coalesce(data.selected, false) as "selected",
-						coalesce(insert.inserted, false) as "inserted"
-					from (values (null)) as "t" left join "data" as "data" on true
-						left join "insert" as "insert" on true`,
+			...junctionConnectQueries(testUuid(2), testUuid(1), {
+				where: SQL`"owning"."name" = ? and "owning"."id" = ? and "inverse"."id" = ?`,
 				parameters: ['connected post', testUuid(2), testUuid(1)],
-				response: { rows: [{ selected: true, inserted: true }] },
-			},
+			}),
 		]),
 		return: {
 			data: {
@@ -176,6 +138,7 @@ test('M:N inverse create connect uses the target update predicate', async () => 
 })
 
 test('M:N create create uses the target create predicate', async () => {
+	const events: string[] = []
 	await execute({
 		schema,
 		permissions: {
@@ -187,7 +150,7 @@ test('M:N create create uses the target create predicate', async () => {
 			},
 			Category: {
 				predicates: {
-					create_posts: { name: 'create_name' },
+					create_posts: { posts: { id: 'created_post' } },
 				},
 				operations: {
 					create: { id: true, name: true, posts: 'create_posts' },
@@ -195,7 +158,18 @@ test('M:N create create uses the target create predicate', async () => {
 			},
 		},
 		variables: {
-			create_name: { eq: 'created category' },
+			created_post: { eq: testUuid(1) },
+		},
+		setupMapper: mapper => {
+			mapper.eventManager.listen('BeforeJunctionUpdateEvent', async () => {
+				events.push('before junction')
+			})
+			mapper.eventManager.listen('AfterJunctionUpdateEvent', async () => {
+				events.push('after junction')
+			})
+			mapper.eventManager.listen('BeforeCommitEvent', async () => {
+				events.push('before commit')
+			})
 		},
 		query: GQL`mutation {
 			createPost(data: {name: "Post", categories: [{create: {name: "created category"}}]}) {
@@ -223,29 +197,14 @@ test('M:N create create uses the target create predicate', async () => {
 				parameters: [testUuid(2), 'created category'],
 				response: { rows: [{ id: testUuid(2) }] },
 			},
-			{
-				sql: SQL`with "data" as
-					(select
-						"owning"."id" as "post_id",
-						"inverse"."id" as "category_id",
-						true as "selected"
-					from (values (null)) as "t" inner join "public"."post" as "owning" on true
-						inner join "public"."category" as "inverse" on true
-					where "owning"."id" = ? and "inverse"."name" = ? and "inverse"."id" = ?),
-					"insert" as
-					(insert into "public"."post_categories" ("post_id", "category_id")
-						select "data"."post_id", "data"."category_id"
-						from "data"
-						on conflict do nothing
-						returning true as inserted)
-					select
-						coalesce(data.selected, false) as "selected",
-						coalesce(insert.inserted, false) as "inserted"
-					from (values (null)) as "t" left join "data" as "data" on true
-						left join "insert" as "insert" on true`,
-				parameters: [testUuid(1), 'created category', testUuid(2)],
-				response: { rows: [{ selected: true, inserted: true }] },
-			},
+			...junctionConnectQueries(testUuid(1), testUuid(2), {
+				where: SQL`"owning"."id" = ? and exists (select 1
+					from "public"."post_categories" as "inverseposts_junction_"
+					where "inverse"."id" = "inverseposts_junction_"."category_id"
+						and "inverseposts_junction_"."post_id" = ?) and "inverse"."id" = ?`,
+				parameters: [testUuid(1), testUuid(1), testUuid(2)],
+				preAuthorize: false,
+			}),
 		]),
 		return: {
 			data: {
@@ -255,9 +214,11 @@ test('M:N create create uses the target create predicate', async () => {
 			},
 		},
 	})
+	expect(events).toEqual(['before junction', 'after junction', 'before commit'])
 })
 
 test('M:N create create rolls back the new target and junction when the target create predicate denies', async () => {
+	const events: string[] = []
 	await execute({
 		schema,
 		permissions: {
@@ -269,7 +230,7 @@ test('M:N create create rolls back the new target and junction when the target c
 			},
 			Category: {
 				predicates: {
-					create_posts: { name: 'create_name' },
+					create_posts: { posts: { id: 'created_post' } },
 				},
 				operations: {
 					create: { id: true, name: true, posts: 'create_posts' },
@@ -277,7 +238,15 @@ test('M:N create create rolls back the new target and junction when the target c
 			},
 		},
 		variables: {
-			create_name: { eq: 'allowed category' },
+			created_post: { eq: testUuid(3) },
+		},
+		setupMapper: mapper => {
+			mapper.eventManager.listen('BeforeJunctionUpdateEvent', async () => {
+				events.push('before junction')
+			})
+			mapper.eventManager.listen('AfterJunctionUpdateEvent', async () => {
+				events.push('after junction')
+			})
 		},
 		query: GQL`mutation {
 			createPost(data: {name: "Post", categories: [{create: {name: "denied category"}}]}) {
@@ -305,29 +274,15 @@ test('M:N create create rolls back the new target and junction when the target c
 				parameters: [testUuid(2), 'denied category'],
 				response: { rows: [{ id: testUuid(2) }] },
 			},
-			{
-				sql: SQL`with "data" as
-					(select
-						"owning"."id" as "post_id",
-						"inverse"."id" as "category_id",
-						true as "selected"
-					from (values (null)) as "t" inner join "public"."post" as "owning" on true
-						inner join "public"."category" as "inverse" on true
-					where "owning"."id" = ? and "inverse"."name" = ? and "inverse"."id" = ?),
-					"insert" as
-					(insert into "public"."post_categories" ("post_id", "category_id")
-						select "data"."post_id", "data"."category_id"
-						from "data"
-						on conflict do nothing
-						returning true as inserted)
-					select
-						coalesce(data.selected, false) as "selected",
-						coalesce(insert.inserted, false) as "inserted"
-					from (values (null)) as "t" left join "data" as "data" on true
-						left join "insert" as "insert" on true`,
-				parameters: [testUuid(1), 'allowed category', testUuid(2)],
-				response: { rows: [{ selected: false, inserted: false }] },
-			},
+			...junctionConnectQueries(testUuid(1), testUuid(2), {
+				where: SQL`"owning"."id" = ? and exists (select 1
+					from "public"."post_categories" as "inverseposts_junction_"
+					where "inverse"."id" = "inverseposts_junction_"."category_id"
+						and "inverseposts_junction_"."post_id" = ?) and "inverse"."id" = ?`,
+				parameters: [testUuid(1), testUuid(3), testUuid(2)],
+				preAuthorize: false,
+				postAuthorized: false,
+			}),
 		]),
 		return: {
 			data: {
@@ -337,4 +292,54 @@ test('M:N create create rolls back the new target and junction when the target c
 			},
 		},
 	})
+	expect(events).toEqual([])
 })
+
+const junctionConnectQueries = (
+	owningId: string,
+	inverseId: string,
+	authorization: {
+		where: string
+		parameters: string[]
+		preAuthorize?: boolean
+		postAuthorized?: boolean
+	},
+) => {
+	const authorizationQuery = {
+		sql: SQL`select true as "authorized"
+			from "public"."post" as "owning"
+				inner join "public"."category" as "inverse" on true
+			where ${authorization.where}`,
+		parameters: authorization.parameters,
+		response: { rows: authorization.postAuthorized === false ? [] : [{ authorized: true }] },
+	}
+	return [
+		{
+			sql: SQL`select "root_"."id" as "primary"
+				from "public"."category" as "root_"
+				where "root_"."id" in (?)
+				order by "root_"."id" asc
+				for update of "root_"`,
+			parameters: [inverseId],
+			response: { rows: [{ primary: inverseId }] },
+		},
+		{
+			sql: SQL`select "root_"."id" as "primary"
+				from "public"."post" as "root_"
+				where "root_"."id" in (?)
+				order by "root_"."id" asc
+				for update of "root_"`,
+			parameters: [owningId],
+			response: { rows: [{ primary: owningId }] },
+		},
+		...(authorization.preAuthorize === false ? [] : [authorizationQuery]),
+		{
+			sql: SQL`insert into "public"."post_categories" ("post_id", "category_id")
+				values (?, ?)
+				on conflict do nothing`,
+			parameters: [owningId, inverseId],
+			response: { rowCount: 1 },
+		},
+		authorizationQuery,
+	]
+}

@@ -1,5 +1,5 @@
 import { test } from 'bun:test'
-import { execute, failedTransaction, sqlTransaction } from '../../../../../src/test.js'
+import { execute, failedTransaction, relationOnlyUpdateLock, sqlTransaction } from '../../../../../src/test.js'
 import { GQL, SQL } from '../../../../../src/tags.js'
 import { testUuid } from '../../../../../src/testUuid.js'
 import { postWithAuthor, postWithNullableAuthor } from './schema.js'
@@ -22,6 +22,7 @@ test('delete', async () => {
 					parameters: [testUuid(2)],
 					response: { rows: [{ id: testUuid(2) }] },
 				},
+				...relationOnlyUpdateLock('post', 'id', testUuid(2)),
 				{
 					sql: SQL`select "root_"."author_id"
                        from "public"."post" as "root_"
@@ -82,6 +83,7 @@ test('delete with cascade', async () => {
 					parameters: [testUuid(2)],
 					response: { rows: [{ id: testUuid(2) }] },
 				},
+				...relationOnlyUpdateLock('post', 'id', testUuid(2)),
 				{
 					sql: SQL`select "root_"."author_id"
                        from "public"."post" as "root_"
@@ -142,6 +144,7 @@ test('delete with cascade - denied', async () => {
 					parameters: [testUuid(2)],
 					response: { rows: [{ id: testUuid(2) }] },
 				},
+				...relationOnlyUpdateLock('post', 'id', testUuid(2)),
 				{
 					sql: SQL`select "root_"."author_id"
                        from "public"."post" as "root_"

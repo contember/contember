@@ -1,5 +1,5 @@
 import { test } from 'bun:test'
-import { execute, sqlTransaction } from '../../../../src/test.js'
+import { execute, relationOnlyUpdateLock, sqlTransaction } from '../../../../src/test.js'
 import { SchemaBuilder } from '@contember/schema-definition'
 import { Model } from '@contember/schema'
 import { GQL, SQL } from '../../../../src/tags.js'
@@ -137,6 +137,7 @@ test('upsert author (exists) with noop update)', async () => {
 					parameters: ['john-doe'],
 					response: { rows: [{ id: testUuid(2) }] },
 				},
+				...relationOnlyUpdateLock('author', 'id', testUuid(2)),
 				{
 					sql: SQL`select "root_"."id" as "root_id"  from "public"."author" as "root_"  where "root_"."slug" = ?`,
 					parameters: ['john-doe'],

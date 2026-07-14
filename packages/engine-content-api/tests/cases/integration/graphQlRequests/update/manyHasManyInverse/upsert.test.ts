@@ -1,5 +1,5 @@
 import { test } from 'bun:test'
-import { execute, sqlTransaction } from '../../../../../src/test.js'
+import { execute, junctionEndpointLocks, relationOnlyUpdateLock, sqlTransaction } from '../../../../../src/test.js'
 import { GQL, SQL } from '../../../../../src/tags.js'
 import { testUuid } from '../../../../../src/testUuid.js'
 import { postWithCategories } from './schema.js'
@@ -22,6 +22,7 @@ test('upsert - exists', async () => {
 					parameters: [testUuid(2)],
 					response: { rows: [{ id: testUuid(2) }] },
 				},
+				...relationOnlyUpdateLock('category', 'id', testUuid(2)),
 				{
 					sql: SQL`select "root_"."id" from "public"."post" as "root_" where "root_"."id" = ?`,
 					parameters: [testUuid(1)],
@@ -34,6 +35,10 @@ test('upsert - exists', async () => {
 					parameters: ['Lorem', testUuid(1)],
 					response: { rows: [{ title_old__: 'Foo' }] },
 				},
+				...junctionEndpointLocks([
+					{ table: 'category', primaryColumn: 'id', primary: testUuid(2) },
+					{ table: 'post', primaryColumn: 'id', primary: testUuid(1) },
+				]),
 				{
 					sql: SQL`insert into "public"."post_categories" ("post_id", "category_id")
               values (?, ?)
@@ -70,6 +75,7 @@ test('upsert - not exists', async () => {
 					parameters: [testUuid(2)],
 					response: { rows: [{ id: testUuid(2) }] },
 				},
+				...relationOnlyUpdateLock('category', 'id', testUuid(2)),
 				{
 					sql: SQL`select "root_"."id" from "public"."post" as "root_" where "root_"."id" = ?`,
 					parameters: [testUuid(1)],
@@ -85,6 +91,10 @@ test('upsert - not exists', async () => {
 					parameters: [testUuid(1), 'Ipsum'],
 					response: { rows: [{ id: testUuid(1) }] },
 				},
+				...junctionEndpointLocks([
+					{ table: 'category', primaryColumn: 'id', primary: testUuid(2) },
+					{ table: 'post', primaryColumn: 'id', primary: testUuid(1) },
+				]),
 				{
 					sql: SQL`insert into "public"."post_categories" ("post_id", "category_id")
               values (?, ?)

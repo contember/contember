@@ -50,27 +50,36 @@ test('self-referential M:N create connect normalizes the target update predicate
 				response: { rows: [{ id: testUuid(2) }] },
 			},
 			{
-				sql: SQL`with "data" as
-					(select
-						"owning"."id" as "person_id",
-						"inverse"."id" as "friends_id",
-						true as "selected"
-					from (values (null)) as "t" inner join "public"."person" as "owning" on true
+				sql: SQL`select "root_"."id" as "primary"
+					from "public"."person" as "root_"
+					where "root_"."id" in (?, ?)
+					order by "root_"."id" asc
+					for update of "root_"`,
+				parameters: [testUuid(1), testUuid(2)],
+				response: { rows: [{ primary: testUuid(1) }, { primary: testUuid(2) }] },
+			},
+			{
+				sql: SQL`select true as "authorized"
+					from "public"."person" as "owning"
 						inner join "public"."person" as "inverse" on true
-					where "owning"."id" = ? and "inverse"."name" = ? and "inverse"."id" = ?),
-					"insert" as
-					(insert into "public"."person_friends" ("person_id", "friends_id")
-						select "data"."person_id", "data"."friends_id"
-						from "data"
-						on conflict do nothing
-						returning true as inserted)
-					select
-						coalesce(data.selected, false) as "selected",
-						coalesce(insert.inserted, false) as "inserted"
-					from (values (null)) as "t" left join "data" as "data" on true
-						left join "insert" as "insert" on true`,
+					where "owning"."id" = ? and "inverse"."name" = ? and "inverse"."id" = ?`,
 				parameters: [testUuid(1), 'existing friend', testUuid(2)],
-				response: { rows: [{ selected: true, inserted: true }] },
+				response: { rows: [{ authorized: true }] },
+			},
+			{
+				sql: SQL`insert into "public"."person_friends" ("person_id", "friends_id")
+					values (?, ?)
+					on conflict do nothing`,
+				parameters: [testUuid(1), testUuid(2)],
+				response: { rowCount: 1 },
+			},
+			{
+				sql: SQL`select true as "authorized"
+					from "public"."person" as "owning"
+						inner join "public"."person" as "inverse" on true
+					where "owning"."id" = ? and "inverse"."name" = ? and "inverse"."id" = ?`,
+				parameters: [testUuid(1), 'existing friend', testUuid(2)],
+				response: { rows: [{ authorized: true }] },
 			},
 		]),
 		return: {

@@ -1,5 +1,5 @@
 import { test } from 'bun:test'
-import { execute, sqlTransaction } from '../../../../../src/test.js'
+import { execute, junctionEndpointLocks, sqlTransaction } from '../../../../../src/test.js'
 import { SchemaBuilder } from '@contember/schema-definition'
 import { Model } from '@contember/schema'
 import { GQL, SQL } from '../../../../../src/tags.js'
@@ -45,6 +45,10 @@ test('insert category with posts (many has many, inverse)', async () => {
 					parameters: [testUuid(2), 'Post 1'],
 					response: { rows: [{ id: testUuid(2) }] },
 				},
+				...junctionEndpointLocks([
+					{ table: 'category', primaryColumn: 'id', primary: testUuid(1) },
+					{ table: 'post', primaryColumn: 'id', primary: testUuid(2) },
+				]),
 				{
 					sql: SQL`insert into "public"."post_categories" ("post_id", "category_id")
           values (?, ?)
@@ -62,6 +66,10 @@ test('insert category with posts (many has many, inverse)', async () => {
 					parameters: [testUuid(3), 'Post 2'],
 					response: { rows: [{ id: testUuid(3) }] },
 				},
+				...junctionEndpointLocks([
+					{ table: 'category', primaryColumn: 'id', primary: testUuid(1) },
+					{ table: 'post', primaryColumn: 'id', primary: testUuid(3) },
+				]),
 				{
 					sql: SQL`insert into "public"."post_categories" ("post_id", "category_id")
           values (?, ?)

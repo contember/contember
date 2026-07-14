@@ -36,6 +36,14 @@ export class MutationAccess {
 		return this.mapper.getPrimaryValueWithAccess(this, entity, where)
 	}
 
+	public getConnectedPrimaryValue(
+		context: Model.ManyHasManyOwningContext | Model.ManyHasManyInverseContext,
+		sourcePrimary: Input.PrimaryValue,
+		where: Input.UniqueWhere,
+	) {
+		return this.mapper.getConnectedPrimaryValueWithAccess(this, context, sourcePrimary, where)
+	}
+
 	public insert(
 		entity: Model.Entity,
 		data: MapperInput.CreateDataInput,

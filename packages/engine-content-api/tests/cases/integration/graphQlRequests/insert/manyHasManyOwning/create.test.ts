@@ -1,5 +1,5 @@
 import { test } from 'bun:test'
-import { execute, sqlTransaction } from '../../../../../src/test.js'
+import { execute, junctionEndpointLocks, sqlTransaction } from '../../../../../src/test.js'
 import { SchemaBuilder } from '@contember/schema-definition'
 import { Model } from '@contember/schema'
 import { GQL, SQL } from '../../../../../src/tags.js'
@@ -42,6 +42,10 @@ test('insert post with categories (many has many, owning)', async () => {
 					parameters: [testUuid(2), 'Category 1'],
 					response: { rows: [{ id: testUuid(2) }] },
 				},
+				...junctionEndpointLocks([
+					{ table: 'post', primaryColumn: 'id', primary: testUuid(1) },
+					{ table: 'category', primaryColumn: 'id', primary: testUuid(2) },
+				]),
 				{
 					sql: SQL`insert into "public"."post_categories" ("post_id", "category_id")
           values (?, ?)
@@ -59,6 +63,10 @@ test('insert post with categories (many has many, owning)', async () => {
 					parameters: [testUuid(3), 'Category 2'],
 					response: { rows: [{ id: testUuid(3) }] },
 				},
+				...junctionEndpointLocks([
+					{ table: 'post', primaryColumn: 'id', primary: testUuid(1) },
+					{ table: 'category', primaryColumn: 'id', primary: testUuid(3) },
+				]),
 				{
 					sql: SQL`insert into "public"."post_categories" ("post_id", "category_id")
           values (?, ?)

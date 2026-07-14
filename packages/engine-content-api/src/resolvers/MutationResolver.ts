@@ -469,7 +469,7 @@ export class MutationResolver {
 	): Promise<R> {
 		return await retryTransaction(
 			async () => {
-				return await this.mapperFactory.transaction(async mapper => {
+				return await this.mapperFactory.mutationTransaction(async mapper => {
 					logger.debug('MutationResolver: Starting mutation transaction')
 					const result = await cb(mapper)
 					if (!result.ok) {

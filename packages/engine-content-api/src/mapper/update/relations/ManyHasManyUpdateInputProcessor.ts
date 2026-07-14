@@ -135,7 +135,10 @@ export class ManyHasManyUpdateInputProcessor implements UpdateInputProcessor.Has
 	) {
 		const { targetEntity, input } = context
 		return async ({ primary }: { primary: Input.PrimaryValue }) => {
-			return await this.mapper.through(context).delete(targetEntity, input)
+			const targetAccess = this.mapper.through(context)
+			const [targetPrimary, err] = await targetAccess.getConnectedPrimaryValue(context, primary, input)
+			if (err) return [err]
+			return await targetAccess.delete(targetEntity, new CheckedPrimary(targetPrimary))
 		}
 	}
 }

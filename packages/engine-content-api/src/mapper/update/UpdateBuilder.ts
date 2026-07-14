@@ -1,7 +1,7 @@
 import { tuple } from '../../utils/index.js'
 import { Acl, Input, Model, Value } from '@contember/schema'
 import { acceptEveryFieldVisitor, getColumnName, getColumnType } from '@contember/schema-utils'
-import { Operator, QueryBuilder, UpdateBuilder as DbUpdateBuilder, Value as DbValue } from '@contember/database'
+import { LockType, Operator, QueryBuilder, SelectBuilder, UpdateBuilder as DbUpdateBuilder, Value as DbValue } from '@contember/database'
 import { PathFactory, WhereBuilder } from '../select/index.js'
 import { ColumnValue, normalizeDbValue } from '../ColumnValue.js'
 import { PredicateFactory } from '../../acl/index.js'
@@ -13,6 +13,8 @@ export interface UpdateResult {
 	values: ColumnValue[]
 	executed: boolean
 	affectedRows: number | null
+	authorized: boolean
+	relationOnlyFailure?: 'notFound' | 'filterMismatch' | 'denied'
 }
 
 export class UpdateBuilder {
@@ -20,6 +22,7 @@ export class UpdateBuilder {
 
 	private newWhere: { and: Input.OptionalWhere[] } = { and: [] }
 	private oldWhere: { and: Input.OptionalWhere[] } = { and: [] }
+	private authorizationWhere: { and: Input.OptionalWhere[] } = { and: [] }
 
 	constructor(
 		private readonly schema: Model.Schema,
@@ -61,12 +64,20 @@ export class UpdateBuilder {
 		)
 		this.addNewWhere(predicate)
 		this.addOldWhere(predicate)
+		this.authorizationWhere.and.push(predicate)
 	}
 
-	public async execute(mapper: Mapper): Promise<UpdateResult> {
+	public async execute(mapper: Mapper, relationOnlyFilter?: Input.OptionalWhere): Promise<UpdateResult> {
 		const resolvedData = [...this.rowData.values()]
-		if (Object.keys(resolvedData).length === 0) {
-			return { values: [], affectedRows: null, executed: false }
+		if (resolvedData.length === 0) {
+			const relationOnlyFailure = await this.authorizeRelationOnlyUpdate(mapper, relationOnlyFilter)
+			return {
+				values: [],
+				affectedRows: null,
+				executed: false,
+				authorized: relationOnlyFailure === undefined,
+				relationOnlyFailure,
+			}
 		}
 		const oldColSuffix = '_old__'
 
@@ -147,6 +158,51 @@ export class UpdateBuilder {
 			await mapper.eventManager.fire(afterUpdateEvent)
 		}
 
-		return { values: resolvedData, affectedRows: result.length, executed: true }
+		return { values: resolvedData, affectedRows: result.length, executed: true, authorized: result.length === 1 }
+	}
+
+	private async authorizeRelationOnlyUpdate(
+		mapper: Mapper,
+		filter?: Input.OptionalWhere,
+	): Promise<UpdateResult['relationOnlyFailure']> {
+		const path = this.pathFactory.create([])
+		if (filter === undefined || Object.keys(filter).length === 0) {
+			let qb = SelectBuilder.create()
+				.select(expr => expr.raw('true'), 'authorized')
+				.from(this.entity.tableName, path.alias)
+				.lock(LockType.forUpdate, undefined, [path.alias])
+			qb = this.whereBuilder.build(qb, this.entity, path, {
+				and: [
+					{ [this.entity.primary]: { eq: this.primary } },
+					this.authorizationWhere,
+				],
+			})
+			return (await qb.getResult(mapper.db)).length === 1 ? undefined : 'denied'
+		}
+
+		let qb = SelectBuilder.create<{ filter_matches: boolean; authorized: boolean }>()
+			.from(this.entity.tableName, path.alias)
+			.lock(LockType.forUpdate, undefined, [path.alias])
+
+		const filterCondition = this.whereBuilder.buildConditionLiteral(qb, this.entity, path, filter)
+		qb = filterCondition.qb.select(filterCondition.condition, 'filter_matches')
+
+		const authorizationCondition = this.whereBuilder.buildConditionLiteral(qb, this.entity, path, this.authorizationWhere)
+		qb = authorizationCondition.qb.select(authorizationCondition.condition, 'authorized')
+		qb = this.whereBuilder.build(qb, this.entity, path, {
+			[this.entity.primary]: { eq: this.primary },
+		})
+
+		const [result] = await qb.getResult(mapper.db)
+		if (result === undefined) {
+			return 'notFound'
+		}
+		if (!result.authorized) {
+			return 'denied'
+		}
+		if (!result.filter_matches) {
+			return 'filterMismatch'
+		}
+		return undefined
 	}
 }

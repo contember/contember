@@ -1,5 +1,5 @@
 import { test } from 'bun:test'
-import { execute, sqlTransaction } from '../../../../../src/test.js'
+import { execute, relationOnlyUpdateLock, sqlTransaction } from '../../../../../src/test.js'
 import { GQL, SQL } from '../../../../../src/tags.js'
 import { testUuid } from '../../../../../src/testUuid.js'
 import { siteSettingSchema } from './schema.js'
@@ -22,6 +22,7 @@ test('upsert - exists', async () => {
 					parameters: [testUuid(2)],
 					response: { rows: [{ id: testUuid(2) }] },
 				},
+				...relationOnlyUpdateLock('site_setting', 'id', testUuid(2)),
 				{
 					sql: SQL`select "root_"."id"
                        from "public"."site" as "root_"
@@ -69,6 +70,7 @@ test('upsert - not exists', async () => {
 					parameters: [settingId],
 					response: { rows: [{ id: settingId }] },
 				},
+				...relationOnlyUpdateLock('site_setting', 'id', settingId),
 				{
 					sql: SQL`select "root_"."id"
                        from "public"."site" as "root_"

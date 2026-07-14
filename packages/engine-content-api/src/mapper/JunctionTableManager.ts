@@ -1,7 +1,7 @@
 import { getEntity } from '@contember/schema-utils'
 import { PathFactory, WhereBuilder } from './select/index.js'
 import { PredicateFactory } from '../acl/index.js'
-import { Client, ConflictActionType, DeleteBuilder, InsertBuilder, Literal, Operator, SelectBuilder } from '@contember/database'
+import { Client, ConflictActionType, DeleteBuilder, InsertBuilder, LockType, Operator, SelectBuilder } from '@contember/database'
 import { Acl, Input, Model } from '@contember/schema'
 import {
 	MutationJunctionUpdateOk,
@@ -22,8 +22,11 @@ type JunctionMutationResult =
 	| MutationJunctionUpdateOk
 	| MutationNothingToDo
 	| MutationNoResultError
-type JunctionConnectRow = { selected: boolean; inserted: boolean }
-type JunctionDisconnectRow = { selected: boolean; deleted: boolean }
+
+interface JunctionEndpoint {
+	entity: Model.Entity
+	primary: Input.PrimaryValue
+}
 
 export class JunctionTableManager {
 	constructor(
@@ -46,8 +49,6 @@ export class JunctionTableManager {
 		owningOperation: Acl.Operation.create | Acl.Operation.update,
 		inverseOperation: Acl.Operation.create | Acl.Operation.update,
 	): Promise<MutationResultList> {
-		const beforeEvent = new BeforeJunctionUpdateEvent(owningEntity, relation, owningUnique, inverseUnique, 'connect')
-		await mapper.eventManager.fire(beforeEvent)
 		const result = await this.executeJunctionModification(
 			mapper.db,
 			owningAccess,
@@ -61,6 +62,7 @@ export class JunctionTableManager {
 			this.connectJunctionHandler,
 		)
 		if (result.result !== MutationResultType.noResultError) {
+			const beforeEvent = new BeforeJunctionUpdateEvent(owningEntity, relation, owningUnique, inverseUnique, 'connect')
 			const afterEvent = new AfterJunctionUpdateEvent(
 				owningEntity,
 				relation,
@@ -69,7 +71,9 @@ export class JunctionTableManager {
 				'connect',
 				result.result === MutationResultType.ok,
 			)
-			await mapper.eventManager.fire(afterEvent)
+			beforeEvent.afterEvent = afterEvent
+			mapper.eventManager.deferUntilCommit(beforeEvent)
+			mapper.eventManager.deferUntilCommit(afterEvent)
 		}
 		return [result]
 	}
@@ -83,8 +87,6 @@ export class JunctionTableManager {
 		owningUnique: Input.PrimaryValue,
 		inverseUnique: Input.PrimaryValue,
 	): Promise<MutationResultList> {
-		const beforeEvent = new BeforeJunctionUpdateEvent(owningEntity, relation, owningUnique, inverseUnique, 'disconnect')
-		await mapper.eventManager.fire(beforeEvent)
 		const result = await this.executeJunctionModification(
 			mapper.db,
 			owningAccess,
@@ -98,6 +100,7 @@ export class JunctionTableManager {
 			this.disconnectJunctionHandler,
 		)
 		if (result.result !== MutationResultType.noResultError) {
+			const beforeEvent = new BeforeJunctionUpdateEvent(owningEntity, relation, owningUnique, inverseUnique, 'disconnect')
 			const afterEvent = new AfterJunctionUpdateEvent(
 				owningEntity,
 				relation,
@@ -107,7 +110,8 @@ export class JunctionTableManager {
 				result.result === MutationResultType.ok,
 			)
 			beforeEvent.afterEvent = afterEvent
-			await mapper.eventManager.fire(afterEvent)
+			mapper.eventManager.deferUntilCommit(beforeEvent)
+			mapper.eventManager.deferUntilCommit(afterEvent)
 		}
 		return [result]
 	}
@@ -146,38 +150,102 @@ export class JunctionTableManager {
 			)
 		}
 
-		const hasNoPredicates = Object.keys(owningPredicate).length === 0 && Object.keys(inversePredicate).length === 0
-
 		const okResultFactory = () => new MutationJunctionUpdateOk([], owningEntity, relation, owningPrimary, inversePrimary)
-		if (hasNoPredicates) {
-			return await handler.executeSimple({ db, joiningTable, owningPrimary, inversePrimary, okResultFactory })
-		} else {
-			const owningWhere: Input.OptionalWhere = {
-				and: [owningPredicate, { [owningEntity.primary]: { eq: owningPrimary } }],
-			}
-
-			const inverseWhere: Input.OptionalWhere = {
-				and: [inversePredicate, { [inverseEntity.primary]: { eq: inversePrimary } }],
-			}
-
-			const dataCallback: SelectBuilder.Callback = qb => {
-				qb = qb
-					.select(expr => expr.select(['owning', owningEntity.primaryColumn]), joiningTable.joiningColumn.columnName)
-					.select(
-						expr => expr.select(['inverse', inverseEntity.primaryColumn]),
-						joiningTable.inverseJoiningColumn.columnName,
-					)
-					.select(expr => expr.raw('true'), 'selected')
-					.from(new Literal('(values (null))'), 't')
-					.join(owningEntity.tableName, 'owning', condition => condition.raw('true'))
-					.join(inverseEntity.tableName, 'inverse', condition => condition.raw('true'))
-				qb = this.whereBuilder.build(qb, owningEntity, this.pathFactory.create([], 'owning'), owningWhere)
-				qb = this.whereBuilder.build(qb, inverseEntity, this.pathFactory.create([], 'inverse'), inverseWhere)
-				return qb
-			}
-
-			return await handler.executeComplex({ db, joiningTable, dataCallback, okResultFactory })
+		const endpointsExist = await this.lockEndpoints(db, [
+			{ entity: owningEntity, primary: owningPrimary },
+			{ entity: inverseEntity, primary: inversePrimary },
+		])
+		if (!endpointsExist) {
+			return new MutationNoResultError([])
 		}
+
+		const preOwningPredicate = owningOperation === Acl.Operation.update ? owningPredicate : {}
+		const preInversePredicate = inverseOperation === Acl.Operation.update ? inversePredicate : {}
+		if (
+			!await this.checkEndpointAuthorization(
+				db,
+				owningEntity,
+				inverseEntity,
+				owningPrimary,
+				inversePrimary,
+				preOwningPredicate,
+				preInversePredicate,
+			)
+		) {
+			return new MutationNoResultError([])
+		}
+
+		const result = await handler.execute({ db, joiningTable, owningPrimary, inversePrimary, okResultFactory })
+		if (result.result === MutationResultType.noResultError) {
+			return result
+		}
+
+		return await this.checkEndpointAuthorization(
+				db,
+				owningEntity,
+				inverseEntity,
+				owningPrimary,
+				inversePrimary,
+				owningPredicate,
+				inversePredicate,
+			)
+			? result
+			: new MutationNoResultError([])
+	}
+
+	private async lockEndpoints(db: Client, endpoints: readonly JunctionEndpoint[]): Promise<boolean> {
+		const lockGroups = new Map<string, JunctionEndpoint[]>()
+		for (const endpoint of endpoints) {
+			const key = `${endpoint.entity.tableName}\u0000${endpoint.entity.primaryColumn}`
+			const group = lockGroups.get(key)
+			if (group === undefined) {
+				lockGroups.set(key, [endpoint])
+			} else if (!group.some(it => it.primary === endpoint.primary)) {
+				group.push(endpoint)
+			}
+		}
+
+		for (const [, group] of [...lockGroups].sort(([left], [right]) => left.localeCompare(right))) {
+			const entity = group[0].entity
+			const primaries = group.map(it => it.primary).sort((left, right) => String(left).localeCompare(String(right)))
+			const path = this.pathFactory.create([])
+			const lockedRows = await SelectBuilder.create<{ primary: Input.PrimaryValue }>()
+				.select([path.alias, entity.primaryColumn], 'primary')
+				.from(entity.tableName, path.alias)
+				.where(condition => condition.in([path.alias, entity.primaryColumn], primaries))
+				.orderBy([path.alias, entity.primaryColumn])
+				.lock(LockType.forUpdate, undefined, [path.alias])
+				.getResult(db)
+			if (lockedRows.length !== primaries.length) {
+				return false
+			}
+		}
+		return true
+	}
+
+	private async checkEndpointAuthorization(
+		db: Client,
+		owningEntity: Model.Entity,
+		inverseEntity: Model.Entity,
+		owningPrimary: Input.PrimaryValue,
+		inversePrimary: Input.PrimaryValue,
+		owningPredicate: Input.OptionalWhere,
+		inversePredicate: Input.OptionalWhere,
+	): Promise<boolean> {
+		if (Object.keys(owningPredicate).length === 0 && Object.keys(inversePredicate).length === 0) {
+			return true
+		}
+
+		let qb = SelectBuilder.create().select(expr => expr.raw('true'), 'authorized')
+			.from(owningEntity.tableName, 'owning')
+			.join(inverseEntity.tableName, 'inverse', condition => condition.raw('true'))
+		qb = this.whereBuilder.build(qb, owningEntity, this.pathFactory.create([], 'owning'), {
+			and: [owningPredicate, { [owningEntity.primary]: { eq: owningPrimary } }],
+		})
+		qb = this.whereBuilder.build(qb, inverseEntity, this.pathFactory.create([], 'inverse'), {
+			and: [inversePredicate, { [inverseEntity.primary]: { eq: inversePrimary } }],
+		})
+		return (await qb.getResult(db)).length === 1
 	}
 }
 
@@ -189,21 +257,12 @@ interface JunctionSimpleExecutionArgs {
 	okResultFactory: OkResultFactory
 }
 
-interface JunctionComplexExecutionArgs {
-	db: Client
-	joiningTable: Model.JoiningTable
-	dataCallback: SelectBuilder.Callback
-	okResultFactory: OkResultFactory
-}
-
 interface JunctionHandler {
-	executeSimple(args: JunctionSimpleExecutionArgs): Promise<JunctionMutationResult>
-
-	executeComplex(args: JunctionComplexExecutionArgs): Promise<JunctionMutationResult>
+	execute(args: JunctionSimpleExecutionArgs): Promise<JunctionMutationResult>
 }
 
 export class JunctionConnectHandler implements JunctionHandler {
-	async executeSimple({
+	async execute({
 		db,
 		joiningTable,
 		owningPrimary,
@@ -223,45 +282,10 @@ export class JunctionConnectHandler implements JunctionHandler {
 		}
 		return okResultFactory()
 	}
-
-	async executeComplex({
-		db,
-		joiningTable,
-		dataCallback,
-		okResultFactory,
-	}: JunctionComplexExecutionArgs): Promise<JunctionMutationResult> {
-		const insert = InsertBuilder.create()
-			.into(joiningTable.tableName)
-			.values({
-				[joiningTable.joiningColumn.columnName]: expr => expr.select(['data', joiningTable.joiningColumn.columnName]),
-				[joiningTable.inverseJoiningColumn.columnName]: expr => expr.select(['data', joiningTable.inverseJoiningColumn.columnName]),
-			})
-			.returning(new Literal('true as inserted'))
-			.from(qb => qb.from('data'))
-			.onConflict(ConflictActionType.doNothing)
-
-		const qb = SelectBuilder.create<JunctionConnectRow>()
-			.with('data', dataCallback)
-			.with('insert', insert)
-			.from(new Literal('(values (null))'), 't')
-			.leftJoin('data', 'data', condition => condition.raw('true'))
-			.leftJoin('insert', 'insert', condition => condition.raw('true'))
-			.select(expr => expr.raw('coalesce(data.selected, false)'), 'selected')
-			.select(expr => expr.raw('coalesce(insert.inserted, false)'), 'inserted')
-
-		const result = await qb.getResult(db)
-		if (result[0].selected === false) {
-			return new MutationNoResultError([])
-		}
-		if (result[0].inserted === false) {
-			return new MutationNothingToDo([], NothingToDoReason.alreadyExists)
-		}
-		return okResultFactory()
-	}
 }
 
 export class JunctionDisconnectHandler implements JunctionHandler {
-	public async executeSimple({
+	public async execute({
 		db,
 		joiningTable,
 		owningPrimary,
@@ -275,48 +299,6 @@ export class JunctionDisconnectHandler implements JunctionHandler {
 
 		const result = await qb.execute(db)
 		if (result === 0) {
-			return new MutationNothingToDo([], NothingToDoReason.alreadyDeleted)
-		}
-		return okResultFactory()
-	}
-
-	public async executeComplex({
-		db,
-		joiningTable,
-		dataCallback,
-		okResultFactory,
-	}: JunctionComplexExecutionArgs): Promise<JunctionMutationResult> {
-		const deleteQb = DeleteBuilder.create()
-			.from(joiningTable.tableName)
-			.using('data')
-			.where(cond => {
-				cond = cond.compareColumns([joiningTable.tableName, joiningTable.joiningColumn.columnName], Operator.eq, [
-					'data',
-					joiningTable.joiningColumn.columnName,
-				])
-				cond = cond.compareColumns(
-					[joiningTable.tableName, joiningTable.inverseJoiningColumn.columnName],
-					Operator.eq,
-					['data', joiningTable.inverseJoiningColumn.columnName],
-				)
-				return cond
-			})
-			.returning(new Literal('true as deleted'))
-
-		const qb = SelectBuilder.create<JunctionDisconnectRow>()
-			.with('data', dataCallback)
-			.with('delete', deleteQb)
-			.from(new Literal('(values (null))'), 't')
-			.leftJoin('data', 'data', condition => condition.raw('true'))
-			.leftJoin('delete', 'delete', condition => condition.raw('true'))
-			.select(expr => expr.raw('coalesce(data.selected, false)'), 'selected')
-			.select(expr => expr.raw('coalesce(delete.deleted, false)'), 'deleted')
-
-		const result = await qb.getResult(db)
-		if (result[0].selected === false) {
-			return new MutationNoResultError([])
-		}
-		if (result[0].deleted === false) {
 			return new MutationNothingToDo([], NothingToDoReason.alreadyDeleted)
 		}
 		return okResultFactory()

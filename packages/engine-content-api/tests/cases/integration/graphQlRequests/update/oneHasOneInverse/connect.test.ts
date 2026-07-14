@@ -1,5 +1,5 @@
 import { test } from 'bun:test'
-import { execute, sqlTransaction } from '../../../../../src/test.js'
+import { execute, relationOnlyUpdateLock, sqlTransaction } from '../../../../../src/test.js'
 import { GQL, SQL } from '../../../../../src/tags.js'
 import { testUuid } from '../../../../../src/testUuid.js'
 import { siteSettingSchema, siteSettingSchemaWithOrphanRemoval } from './schema.js'
@@ -22,6 +22,7 @@ test('connect - same owner', async () => {
 					parameters: [testUuid(2)],
 					response: { rows: [{ id: testUuid(2) }] },
 				},
+				...relationOnlyUpdateLock('site_setting', 'id', testUuid(2)),
 				{
 					sql: SQL`select "root_"."id" from "public"."site" as "root_" where "root_"."id" = ?`,
 					parameters: [testUuid(1)],
@@ -67,6 +68,7 @@ test('connect - no owner', async () => {
 					parameters: [testUuid(2)],
 					response: { rows: [{ id: testUuid(2) }] },
 				},
+				...relationOnlyUpdateLock('site_setting', 'id', testUuid(2)),
 				{
 					sql: SQL`select "root_"."id" from "public"."site" as "root_" where "root_"."id" = ?`,
 					parameters: [testUuid(1)],
@@ -120,6 +122,7 @@ test('connect - different owner', async () => {
 					parameters: [testUuid(2)],
 					response: { rows: [{ id: testUuid(2) }] },
 				},
+				...relationOnlyUpdateLock('site_setting', 'id', testUuid(2)),
 				{
 					sql: SQL`select "root_"."id" from "public"."site" as "root_" where "root_"."id" = ?`,
 					parameters: [testUuid(1)],
@@ -181,6 +184,7 @@ test('connect - different owner & orphan removal enabled', async () => {
 					parameters: [testUuid(2)],
 					response: { rows: [{ id: testUuid(2) }] },
 				},
+				...relationOnlyUpdateLock('site_setting', 'id', testUuid(2)),
 				// new owner
 				{
 					sql: SQL`select "root_"."id" from "public"."site" as "root_" where "root_"."id" = ?`,

@@ -1,5 +1,5 @@
 import { test } from 'bun:test'
-import { execute, sqlTransaction } from '../../../../../src/test.js'
+import { execute, relationOnlyUpdateLock, sqlTransaction } from '../../../../../src/test.js'
 import { GQL, SQL } from '../../../../../src/tags.js'
 import { testUuid } from '../../../../../src/testUuid.js'
 import { siteSettingSchema } from './schema.js'
@@ -24,6 +24,7 @@ test('disconnect', async () => {
 					parameters: [settingId],
 					response: { rows: [{ id: settingId }] },
 				},
+				...relationOnlyUpdateLock('site_setting', 'id', settingId),
 				{
 					sql: SQL`select "root_"."id"
                        from "public"."site" as "root_"

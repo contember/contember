@@ -1,5 +1,5 @@
 import { test } from 'bun:test'
-import { execute, sqlTransaction } from '../../../../../src/test.js'
+import { execute, sqlReadTransaction } from '../../../../../src/test.js'
 import { SchemaBuilder } from '@contember/schema-definition'
 import { Model } from '@contember/schema'
 import { GQL, SQL } from '../../../../../src/tags.js'
@@ -27,7 +27,7 @@ test('transactions', async () => {
           }
         }`,
 		executes: [
-			...sqlTransaction([
+			...sqlReadTransaction([
 				{
 					sql: SQL`select "root_"."id" as "root_id"
 						         from "public"."post" as "root_"

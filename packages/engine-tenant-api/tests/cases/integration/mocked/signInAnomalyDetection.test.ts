@@ -29,8 +29,8 @@ const KNOWN_FINGERPRINT = Buffer.from(KNOWN_UA).toString('hex')
 // (the limit is 0, so it short-circuits the count and only records). The empty-IP
 // tests above skip this; the IP-signal test below sets an IP, so it appears.
 const recordLoginRateLimitSql = (ip: string): ExpectedQuery => ({
-	sql: `insert into  "tenant"."rate_limit_event" ("id", "scope", "key_hash", "occurred_at") values  (?, ?, ?, ?)`,
-	parameters: [() => true, 'login_per_ip', Buffer.from(ip), (value: unknown) => value instanceof Date],
+	sql: `insert into  "tenant"."rate_limit_event" ("id", "scope", "key_hash") values  (?, ?, ?)`,
+	parameters: [() => true, 'login_per_ip', Buffer.from(ip)],
 	response: { rowCount: 1 },
 })
 

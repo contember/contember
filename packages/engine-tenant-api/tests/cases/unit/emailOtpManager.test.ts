@@ -70,6 +70,7 @@ const person = (overrides: Partial<PersonRow> = {}): PersonRow => ({
 	disabled_at: null,
 	passwordless_enabled: null,
 	mfa_grace_until: null,
+	is_in_grace: false,
 	email_verified_at: null,
 	email_verification_required: false,
 	...overrides,
@@ -81,6 +82,7 @@ const tokenRow = (overrides: Record<string, any> = {}) => ({
 	token_hash: RANDOM_TOKEN_HASH,
 	used_at: null,
 	expires_at: new Date(NOW.getTime() + 10 * 60 * 1000),
+	is_expired: false, // DB-clock `expires_at <= now()` computed by PersonTokenQuery
 	person_id: PERSON_ID,
 	otp_hash: EXPECTED_OTP_HASH,
 	otp_attempts: 0,
@@ -90,8 +92,8 @@ const tokenRow = (overrides: Record<string, any> = {}) => ({
 // Rate-limit gate that fronts sendCode (email_otp_per_person). The mocked `hash`
 // provider stores the key verbatim, so the hashed key is just Buffer.from(PERSON_ID).
 const RL_COUNT_SQL = `select count(*)::text as count from "tenant"."rate_limit_event"
-	where "scope" = ? and "key_hash" = ? and "occurred_at" >= ?`
-const RL_INSERT_SQL = `insert into "tenant"."rate_limit_event" ("id", "scope", "key_hash", "occurred_at") values (?, ?, ?, ?)`
+	where "scope" = ? and "key_hash" = ? and occurred_at >= NOW() - make_interval(secs => ?)`
+const RL_INSERT_SQL = `insert into "tenant"."rate_limit_event" ("id", "scope", "key_hash") values (?, ?, ?)`
 const RL_KEY_HASH = Buffer.from(PERSON_ID)
 
 // limit 10 / 10 minutes — the shipped default.
@@ -105,9 +107,9 @@ const makeManager = (providers: Providers, mailer = makeMailer()) => new EmailOt
 
 const INVALIDATE_PRIOR_SQL = `update "tenant"."person_token" set "used_at" = ? where "person_id" = ? and "type" = ? and "used_at" is null`
 const INSERT_TOKEN_SQL =
-	`insert into "tenant"."person_token" ("id", "token_hash", "person_id", "expires_at", "created_at", "used_at", "type", "otp_hash") values (?, ?, ?, ?, ?, ?, ?, ?)`
+	`insert into "tenant"."person_token" ("id", "token_hash", "person_id", "expires_at", "created_at", "used_at", "type", "otp_hash") values (?, ?, ?, now() + make_interval(secs => ?), ?, ?, ?, ?)`
 const SELECT_LATEST_SQL =
-	`select * from "tenant"."person_token" where "person_id" = ? and "type" = ? and "used_at" is null order by "created_at" desc limit 1`
+	`select *, "expires_at" <= now() as "is_expired" from "tenant"."person_token" where "person_id" = ? and "type" = ? and "used_at" is null order by "created_at" desc limit 1`
 // Atomic per-code attempt reservation (ClaimOtpAttemptCommand): increments only while
 // still unused and below the cap. params = [tokenId, maxAttempts].
 const CLAIM_ATTEMPT_SQL =
@@ -121,12 +123,12 @@ describe('EmailOtpManager', () => {
 			// rate-limit gate: COUNT under limit, then record the event (uuid-0).
 			{
 				sql: RL_COUNT_SQL,
-				parameters: ['email_otp_per_person', RL_KEY_HASH, new Date(NOW.getTime() - 10 * 60 * 1000)],
+				parameters: ['email_otp_per_person', RL_KEY_HASH, 600],
 				response: { rows: [{ count: '0' }] },
 			},
 			{
 				sql: RL_INSERT_SQL,
-				parameters: ['uuid-0', 'email_otp_per_person', RL_KEY_HASH, NOW],
+				parameters: ['uuid-0', 'email_otp_per_person', RL_KEY_HASH],
 				response: { rowCount: 1 },
 			},
 			{
@@ -140,7 +142,7 @@ describe('EmailOtpManager', () => {
 					'uuid-1',
 					RANDOM_TOKEN_HASH,
 					PERSON_ID,
-					(v: any) => v instanceof Date,
+					(v: any) => typeof v === 'number', // expires_at: ttl seconds for the DB-clock now()+interval
 					NOW,
 					null,
 					'mfa_email_otp',
@@ -179,7 +181,7 @@ describe('EmailOtpManager', () => {
 			// COUNT already at the limit (10) → deny; no INSERT, no token, no mail.
 			{
 				sql: RL_COUNT_SQL,
-				parameters: ['email_otp_per_person', RL_KEY_HASH, new Date(NOW.getTime() - 10 * 60 * 1000)],
+				parameters: ['email_otp_per_person', RL_KEY_HASH, 600],
 				response: { rows: [{ count: '10' }] },
 			},
 		]

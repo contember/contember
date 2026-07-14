@@ -51,6 +51,24 @@ Notable permission actions: `person:list` (`PERSON_LIST`, tenant-wide person lis
 
 CQRS pattern with Command/Query separation via `CommandBus` and `DatabaseQuery`. `TenantContainerFactory` creates `TenantContainer` with all services wired via DIC.
 
+## Time / clock handling (security invariant)
+
+**Any timestamp that participates in a time comparison must be both written and read on the database clock, and the comparison must be evaluated in SQL against `NOW()` — never a DB-stored value compared against a JS `Date`.** The DB is the single clock shared by every engine instance, so this is the only thing that's immune to app-vs-DB clock skew *and* skew between engine replicas. Routing everything through `providers.now()` instead would be weaker, not stronger (`providers.now()` is per-instance), and is impossible for column `DEFAULT NOW()`, triggers, and the system-api event store.
+
+Concretely, for any security gate (rate-limit/backoff, token expiry, API-key expiry/idle, session revalidation throttle, MFA enrollment grace window):
+
+- **Write** the timestamp on the DB clock — `new Literal('now() + make_interval(secs => ?)', [seconds])` for a future expiry, `new Literal('now()')` for "now", or rely on the column's `DEFAULT NOW()`.
+- **Read/decide** in SQL — compute a primitive the app just branches on: a boolean (`expires_at <= now() AS is_expired`), a count against `occurred_at >= now() - make_interval(secs => ?)`, or a `retry_after_seconds`. The resolver/manager checks `is_expired` / `> 0`, it does not compare Dates.
+
+Reference implementations: `RateLimitCountQuery` / `NextLoginAttemptQuery` (backoff), `PersonTokenQuery.is_expired` (token expiry), `ApiKeyByTokenQuery.is_expired/is_max_expired/is_idle_expired` (session gates; `last_used_at` is also written on the DB clock since it feeds `is_idle_expired`), `ClaimIdpRevalidationCommand` (revalidation throttle), `PersonRow.is_in_grace` + `SetMfaGraceUntilCommand` (MFA enrollment grace window).
+
+`providers.now()` is retained **only** for app-clock uses that cannot weaken a security gate:
+
+- **Non-compared (skew-neutral):** display/ordering timestamps (`issued_at`, `used_at`, `disabled_at`), response DTOs, and TOTP (RFC time-step, ±-tolerant by design).
+- **Deliberate app-clock comparisons that are bounded write-rate optimizations, not gates:** the API-key prolong/tracking throttle (`ProlongApiKeyCommand`, `ApiKeyManager.shouldUpdateTracking`) compares `providers.now()` against the stored `expires_at` / `last_used_at` only to decide *whether* to write. The written value and the `is_expired` / `is_idle_expired` gates stay on the DB clock, and the idle gate folds in `PROLONG_THROTTLE_MS` of slack to cancel the throttle. Under clock skew the worst case is an extra write or — only if app-clock lag exceeds the entire `idle_timeout` — an over-eager, fail-closed session termination (→ re-auth); never a weakened gate. The IdP soft-refresh window is similarly compared against the IdP's own `idp_expires_at`, not a security boundary.
+
+Note `created_at` is **not** an app-clock value: `person_auth_log.created_at` is `DEFAULT now()` (DB clock) and is itself a backoff input (`NextLoginAttemptQuery` / `NextMailAttemptQuery`), so it follows the DB-clock rule above. There is no lint rule enforcing any of this — keep new time gates on the DB clock by convention.
+
 ## Key Services
 
 - `ApiKeyManager` — token creation, verification, prolongation. `verifyAndProlong` first consults `UnpersistedApiKeyManager` (configured root tokens, constant-time hash match, no DB row) and only then falls back to the `api_key` table lookup.

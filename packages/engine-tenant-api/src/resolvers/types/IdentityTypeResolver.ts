@@ -157,7 +157,7 @@ export class IdentityTypeResolver implements IdentityResolvers {
 			}
 		}
 		const rows = await context.db.queryHandler.fetch(
-			new ApiKeySessionsByIdentityQuery(parent.id, { now: context.db.providers.now() }),
+			new ApiKeySessionsByIdentityQuery(parent.id),
 		)
 		return rows.map(row => ({
 			id: row.id,

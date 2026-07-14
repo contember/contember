@@ -9,10 +9,9 @@ import { PersonToken } from '../../type/index.js'
 export class ResetPasswordCommand implements Command<ResetPasswordCommandResponse> {
 	constructor(private readonly token: string, private readonly password: string) {}
 
-	async execute({ db, providers, bus }: Command.Args): Promise<ResetPasswordCommandResponse> {
-		const now = providers.now()
+	async execute({ db, bus }: Command.Args): Promise<ResetPasswordCommandResponse> {
 		const token = await db.createQueryHandler().fetch(PersonTokenQuery.byToken(this.token, 'password_reset'))
-		const tokenValidationResult = validateToken({ entry: token, token: this.token, now, validationType: 'token' })
+		const tokenValidationResult = validateToken({ entry: token, token: this.token, validationType: 'token' })
 		if (!tokenValidationResult.ok) {
 			return tokenValidationResult
 		}

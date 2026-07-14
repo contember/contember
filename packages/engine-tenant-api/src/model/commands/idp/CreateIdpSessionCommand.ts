@@ -1,5 +1,5 @@
 import { Command } from '../Command.js'
-import { InsertBuilder } from '@contember/database'
+import { InsertBuilder, Literal } from '@contember/database'
 import type { IDPSessionState } from '../../service/idp/index.js'
 
 /**
@@ -32,7 +32,10 @@ export class CreateIdpSessionCommand implements Command<void> {
 				tokens_version: tokens?.version ?? null,
 				idp_expires_at: this.session.expiresAt ?? null,
 				token_obtained_at: providers.now(),
-				last_validated_at: providers.now(),
+				// last_validated_at is written on the DB clock to match the throttle
+				// comparison in ClaimIdpRevalidationCommand (`last_validated_at <= now() -
+				// interval`), so revalidation timing can't be skewed. See CLAUDE.md.
+				last_validated_at: new Literal('now()'),
 			})
 			.execute(db)
 	}

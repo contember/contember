@@ -1,7 +1,8 @@
-import { DatabaseQuery, DatabaseQueryable, Operator, SelectBuilder } from '@contember/database'
+import { DatabaseQuery, DatabaseQueryable, Literal, Operator, SelectBuilder } from '@contember/database'
 import { ApiKey } from '../../type/index.js'
 import { computeTokenHash } from '../../utils/index.js'
 import { IPostgresInterval } from 'postgres-interval'
+import { PROLONG_THROTTLE_MS } from '../../commands/apiKey/ProlongApiKeyCommand.js'
 
 export class ApiKeyByIdQuery extends DatabaseQuery<null | ApiKeyRow> {
 	constructor(private readonly apiKeyId: string) {
@@ -50,6 +51,10 @@ export type ApiKeyRow = {
 	readonly issued_at: Date | null
 	readonly idle_timeout: IPostgresInterval | null
 	readonly max_expires_at: Date | null
+	/** Time gates computed on the DB clock (against NOW()) so app/DB skew can't weaken them. */
+	readonly is_expired: boolean
+	readonly is_max_expired: boolean
+	readonly is_idle_expired: boolean
 }
 
 const apiKeyBaseQuery = SelectBuilder.create<null | ApiKeyRow>()
@@ -68,6 +73,17 @@ const apiKeyBaseQuery = SelectBuilder.create<null | ApiKeyRow>()
 	.select(['api_key', 'issued_at'])
 	.select(['api_key', 'idle_timeout'])
 	.select(['api_key', 'max_expires_at'])
+	// A19 time gates on the DB clock — see ApiKeyManager.verifyAndProlong / CLAUDE.md.
+	.select(new Literal('"api_key"."expires_at" is not null and "api_key"."expires_at" <= now()'), 'is_expired')
+	.select(new Literal('"api_key"."max_expires_at" is not null and "api_key"."max_expires_at" <= now()'), 'is_max_expired')
+	.select(
+		new Literal(
+			'"api_key"."idle_timeout" is not null and "api_key"."last_used_at" is not null'
+				+ ' and "api_key"."last_used_at" < now() - "api_key"."idle_timeout" - make_interval(secs => ?)',
+			[PROLONG_THROTTLE_MS / 1000],
+		),
+		'is_idle_expired',
+	)
 	.from('api_key')
 	.join('identity', 'identity', joinClause => joinClause.compareColumns(['api_key', 'identity_id'], Operator.eq, ['identity', 'id']))
 	.leftJoin(

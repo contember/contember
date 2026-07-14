@@ -1,7 +1,7 @@
 import { Command } from '../Command.js'
 import { ApiKey } from '../../type/index.js'
 import { ApiKeyHelper } from './ApiKeyHelper.js'
-import { QueryBuilder, UpdateBuilder } from '@contember/database'
+import { Literal, QueryBuilder, UpdateBuilder } from '@contember/database'
 
 /**
  * Tracking writes (`last_used_at`) are throttled to at most once per this window, so
@@ -59,12 +59,21 @@ export class ProlongApiKeyCommand implements Command<void> {
 
 		const values: QueryBuilder.Values = {}
 		if (updateExpiration && newExpiration !== null) {
-			values.expires_at = newExpiration
+			// Write the sliding expiry on the DB clock and clamp to the stored
+			// max_expires_at in SQL (LEAST ignores a NULL cap → uncapped window). The JS
+			// throttle above only decides *whether* to write; the expiry gate itself is
+			// computed on the DB clock. See engine-tenant-api/CLAUDE.md.
+			values.expires_at = new Literal('LEAST(now() + make_interval(secs => ?), "max_expires_at")', [
+				ApiKeyHelper.getSessionExpirationSeconds(this.expiration),
+			])
 		}
 		if (updateTracking) {
 			values.last_ip = requestIp
 			values.last_user_agent = requestUserAgent
-			values.last_used_at = now
+			// last_used_at on the DB clock: it's compared against now() in the idle gate
+			// (ApiKeyByTokenQuery's is_idle_expired), so it must be written on the same
+			// clock. The app-clock `now` above only drives the write-rate throttle. See CLAUDE.md.
+			values.last_used_at = new Literal('now()')
 		}
 
 		const qb = UpdateBuilder.create()

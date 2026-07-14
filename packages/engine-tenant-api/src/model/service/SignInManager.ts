@@ -323,8 +323,6 @@ class SignInManager {
 			return null
 		}
 
-		const now = this.providers.now()
-
 		// Resolve the effective grace duration (seconds). A per-policy override
 		// wins; otherwise we fall back to the global config default. Only fetch the
 		// config when the override is absent, to keep query shapes minimal.
@@ -337,17 +335,19 @@ class SignInManager {
 		}
 
 		// Grace handling. Default grace duration is 0 (immediate enforcement), so
-		// by default neither branch below opens a window.
+		// by default neither branch below opens a window. Whether we're still inside
+		// an open window is decided on the DB clock (PersonRow.is_in_grace, evaluated
+		// against now()); the null check below only distinguishes "never opened" from
+		// "opened (and possibly expired)". See engine-tenant-api/CLAUDE.md.
 		if (person.mfa_grace_until !== null) {
-			if (person.mfa_grace_until.getTime() > now.getTime()) {
+			if (person.is_in_grace) {
 				// Still inside an open grace window — allow sign-in.
 				return null
 			}
 			// Grace expired → fall through to enforcement.
 		} else if (graceSeconds > 0) {
-			// Open the grace window now and allow this sign-in.
-			const graceUntil = new Date(now.getTime() + graceSeconds * 1000)
-			await dbContext.commandBus.execute(new SetMfaGraceUntilCommand(person.id, graceUntil))
+			// Open the grace window (now() + graceSeconds on the DB clock) and allow this sign-in.
+			await dbContext.commandBus.execute(new SetMfaGraceUntilCommand(person.id, graceSeconds))
 			return null
 		}
 

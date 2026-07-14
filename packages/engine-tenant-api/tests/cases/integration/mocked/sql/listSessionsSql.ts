@@ -15,7 +15,7 @@ export interface SessionRow {
 
 export const listSessionsSql = (args: {
 	identityId: string
-	now: Date
+	now?: Date
 	rows: SessionRow[]
 }): ExpectedQuery => ({
 	sql: SQL`select "api_key"."id",
@@ -31,8 +31,8 @@ export const listSessionsSql = (args: {
 			where "api_key"."identity_id" = ?
 			  and "api_key"."type" = ?
 			  and "api_key"."disabled_at" is null
-			  and ("api_key"."expires_at" is null or "api_key"."expires_at" > ?)
+			  and ("api_key"."expires_at" is null or "api_key"."expires_at" > now())
 			order by "api_key"."created_at" desc`,
-	parameters: [args.identityId, 'session', args.now],
+	parameters: [args.identityId, 'session'],
 	response: { rows: args.rows },
 })

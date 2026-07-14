@@ -66,7 +66,7 @@ export class SelectBuilder {
 				[path.alias, groupByColumn],
 				(orderable, qb) => {
 					if (orderBy.length > 0) {
-						;[qb, orderable] = this.orderByBuilder.build(qb, orderable, entity, this.pathFactory.create([]), orderBy)
+						;[qb, orderable] = this.orderByBuilder.build(qb, orderable, entity, this.pathFactory.create([]), orderBy, this.relationPath)
 					}
 					return [orderable, qb]
 				},
@@ -75,7 +75,7 @@ export class SelectBuilder {
 			)
 		} else {
 			if (orderBy.length > 0) {
-				;[this.qb] = this.orderByBuilder.build(this.qb, null, entity, path, orderBy)
+				;[this.qb] = this.orderByBuilder.build(this.qb, null, entity, path, orderBy, this.relationPath)
 			}
 			this.qb = this.qb.limit(input.args.limit, input.args.offset)
 		}
@@ -94,26 +94,17 @@ export class SelectBuilder {
 			const predicatePath = path.for('__predicate').for(predicate)
 
 			if (!fetchedPredicates.has(predicate)) {
-				const relationContext = this.relationPath[this.relationPath.length - 1]
+				const primaryPredicate = this.predicateFactory.createReadPredicate(entity, undefined, this.relationPath)
+				const fieldPredicate = this.predicateFactory.buildReadPredicates(entity, [predicate], this.relationPath)
 
-				const primaryPredicate = this.predicateFactory.create(entity, Acl.Operation.read, undefined, relationContext)
-				const fieldPredicate = this.predicateFactory.buildPredicates(entity, [predicate], relationContext)
-
-				this.qb = this.whereBuilder.buildAdvanced(
+				const { qb, condition } = this.whereBuilder.buildConditionLiteral(
+					this.qb,
 					entity,
 					path.back(),
 					fieldPredicate,
-					apply =>
-						this.qb.select(expr =>
-							expr.selectCondition(condition => {
-								condition = apply(condition)
-								if (condition.isEmpty()) {
-									return condition.raw('true')
-								}
-								return condition
-							}), predicatePath.alias),
 					{ relationPath: this.relationPath, evaluatedPredicates: [primaryPredicate] },
 				)
+				this.qb = qb.select(condition, predicatePath.alias)
 				fetchedPredicates.add(predicate)
 			}
 			return row => row[predicatePath.alias] === true

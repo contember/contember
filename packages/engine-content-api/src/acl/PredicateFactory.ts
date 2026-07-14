@@ -10,12 +10,34 @@ export interface FieldRequiredPredicate {
 }
 
 export class PredicateFactory {
+	// Request-scoped memoization: a PredicateFactory lives for one ExecutionContainer (one request), where
+	// permissions/allPermissions/variables are fixed, so a `create`/`buildPredicates` result depends only on
+	// its arguments. During one query these are called repeatedly with identical arguments (every projected
+	// field, every order-by key, the injector). The results are treated as immutable by consumers — the same
+	// contract VariableInjector already relies on — so returning a shared instance is safe. The key encodes
+	// EVERY input (entity, operation/predicate set, field list, the relation context, and which permission set
+	// the context resolves to) via JSON so no two distinct inputs can collide onto one entry.
+	private readonly createCache = new Map<string, Input.OptionalWhere>()
+	private readonly buildCache = new Map<string, Input.OptionalWhere>()
+	// Preserve proof provenance; an identical user-authored AST is not an evaluated ancestor witness.
+	private readonly evaluatedPredicateReplacements = new WeakSet<Input.OptionalWhere>()
+
 	constructor(
 		private readonly permissions: Acl.Permissions,
 		private readonly model: Model.Schema,
 		private readonly variableInjector: VariableInjector,
 		private readonly allPermissions?: Acl.Permissions,
 	) {}
+
+	/** Which permission set `getPermissionsForContext` resolves to — part of every cache key. */
+	private permissionSetKey(isRoot?: boolean): 'all' | 'root' {
+		return isRoot === false && this.allPermissions ? 'all' : 'root'
+	}
+
+	/** Complete, collision-free key for a relation context (entity + relation fully determine type/targets). */
+	private relationContextKey(relationContext?: Model.AnyRelationContext): string {
+		return relationContext ? `${relationContext.entity.name}.${relationContext.relation.name}` : ''
+	}
 
 	/**
 	 * Selects the appropriate permission set based on query context:
@@ -52,6 +74,51 @@ export class PredicateFactory {
 		}
 	}
 
+	/**
+	 * The field's read predicate for a given query path. An entity is treated as a query root (root-only
+	 * permissions) only when `relationPath` is empty; anything reached through a relation consults the
+	 * through-inclusive `all` set. This is the single place that maps a `relationPath` to the read context,
+	 * shared by projection (cell masking) and ordering (order-key guarding) so they always agree.
+	 */
+	public getFieldReadPredicate(
+		entity: Model.Entity,
+		fieldName: string,
+		relationPath: readonly Model.AnyRelationContext[],
+	): FieldRequiredPredicate {
+		return this.getFieldPredicate(entity, Acl.Operation.read, fieldName, relationPath.length === 0)
+	}
+
+	public createReadPredicate(
+		entity: Model.Entity,
+		fieldNames: readonly string[] | undefined,
+		relationPath: readonly Model.AnyRelationContext[],
+	): Input.OptionalWhere {
+		return this.create(
+			entity,
+			Acl.Operation.read,
+			fieldNames,
+			relationPath[relationPath.length - 1],
+			relationPath.length === 0,
+		)
+	}
+
+	public buildReadPredicates(
+		entity: Model.Entity,
+		predicates: readonly Acl.PredicateReference[],
+		relationPath: readonly Model.AnyRelationContext[],
+	): Input.OptionalWhere {
+		return this.buildPredicates(
+			entity,
+			predicates,
+			relationPath[relationPath.length - 1],
+			relationPath.length === 0,
+		)
+	}
+
+	public isEvaluatedPredicateReplacement(where: Input.OptionalWhere): boolean {
+		return this.evaluatedPredicateReplacements.has(where)
+	}
+
 	public shouldApplyCellLevelPredicate(
 		entity: Model.Entity,
 		operation: Acl.Operation.read,
@@ -84,7 +151,30 @@ export class PredicateFactory {
 	public create(
 		entity: Model.Entity,
 		operation: Acl.Operation.update | Acl.Operation.read | Acl.Operation.create,
-		fieldNames: string[] = [getRowLevelPredicatePseudoField(entity)],
+		fieldNames: readonly string[] = [getRowLevelPredicatePseudoField(entity)],
+		relationContext?: Model.AnyRelationContext,
+		isRoot?: boolean,
+	): Input.OptionalWhere {
+		const cacheKey = JSON.stringify([
+			entity.name,
+			operation,
+			fieldNames,
+			this.relationContextKey(relationContext),
+			this.permissionSetKey(isRoot),
+		])
+		const cached = this.createCache.get(cacheKey)
+		if (cached !== undefined) {
+			return cached
+		}
+		const result = this.createInternal(entity, operation, fieldNames, relationContext, isRoot)
+		this.createCache.set(cacheKey, result)
+		return result
+	}
+
+	private createInternal(
+		entity: Model.Entity,
+		operation: Acl.Operation.update | Acl.Operation.read | Acl.Operation.create,
+		fieldNames: readonly string[] = [getRowLevelPredicatePseudoField(entity)],
 		relationContext?: Model.AnyRelationContext,
 		isRoot?: boolean,
 	): Input.OptionalWhere {
@@ -113,7 +203,28 @@ export class PredicateFactory {
 
 	public buildPredicates(
 		entity: Model.Entity,
-		predicates: Acl.PredicateReference[],
+		predicates: readonly Acl.PredicateReference[],
+		relationContext?: Model.AnyRelationContext,
+		isRoot?: boolean,
+	): Input.OptionalWhere {
+		const cacheKey = JSON.stringify([
+			entity.name,
+			predicates,
+			this.relationContextKey(relationContext),
+			this.permissionSetKey(isRoot),
+		])
+		const cached = this.buildCache.get(cacheKey)
+		if (cached !== undefined) {
+			return cached
+		}
+		const result = this.buildPredicatesInternal(entity, predicates, relationContext, isRoot)
+		this.buildCache.set(cacheKey, result)
+		return result
+	}
+
+	private buildPredicatesInternal(
+		entity: Model.Entity,
+		predicates: readonly Acl.PredicateReference[],
 		relationContext?: Model.AnyRelationContext,
 		isRoot?: boolean,
 	): Input.OptionalWhere {
@@ -138,7 +249,7 @@ export class PredicateFactory {
 	}
 
 	private getRequiredPredicates(
-		fieldNames: string[],
+		fieldNames: readonly string[],
 		fieldPermissions: Acl.FieldPermissions,
 	): Acl.PredicateReference[] | false {
 		const predicates: Acl.PredicateReference[] = []
@@ -166,7 +277,9 @@ export class PredicateFactory {
 			return where
 		}
 
-		const replacer = new EvaluatedPredicateReplacer(sourcePredicate, relationContext.entity, relationContext.targetRelation)
+		const replacement: Input.OptionalWhere = { [relationContext.entity.primary]: { always: true } }
+		this.evaluatedPredicateReplacements.add(replacement)
+		const replacer = new EvaluatedPredicateReplacer(sourcePredicate, relationContext.entity, relationContext.targetRelation, replacement)
 		return replacer.replace(where)
 	}
 }

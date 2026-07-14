@@ -139,8 +139,9 @@ class Compiler {
 		if (!lock) {
 			return Literal.empty
 		}
+		const of = lock.of && lock.of.length > 0 ? ` of ${lock.of.map(wrapIdentifier).join(', ')}` : ''
 		const modifier = lock.modifier ? ` ${lock.modifier}` : ''
-		return new Literal(` ${lock.type}` + modifier)
+		return new Literal(` ${lock.type}` + of + modifier)
 	}
 
 	private compileJoin(join: SelectBuilder.Options['join'], namespaceContext: Compiler.Context): Literal {

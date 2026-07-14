@@ -1,6 +1,11 @@
 import { expect, it } from 'bun:test'
 import { MutexDeadlockError } from '../../../src/utils/index.js'
 import { createConnectionMockAlt } from './createConnectionMockAlt.js'
+import { ClientErrorCodes, retryTransaction, SerializationFailureError } from '../../../src/index.js'
+
+class PostgreSqlDeadlockError extends Error {
+	public readonly code = ClientErrorCodes.T_R_DEADLOCK_DETECTED
+}
 
 it('support nested scope', async () => {
 	const [connection, end] = createConnectionMockAlt(
@@ -145,5 +150,27 @@ it('detects deadlock', async () => {
 	const [connection, end] = createConnectionMockAlt([])
 
 	await expect(connection.scope(async c1 => c1.scope(async () => await c1.query('SELECT 1')))).rejects.toThrow(MutexDeadlockError)
+	end()
+})
+
+it('maps a PostgreSQL deadlock to a retryable serialization failure', async () => {
+	const [connection, end] = createConnectionMockAlt([{ sql: 'SELECT 1', error: new PostgreSqlDeadlockError() }])
+
+	await expect(connection.query('SELECT 1')).rejects.toBeInstanceOf(SerializationFailureError)
+	end()
+})
+
+it('retries a mapped PostgreSQL deadlock', async () => {
+	const [connection, end] = createConnectionMockAlt(
+		[{ sql: 'SELECT 1', error: new PostgreSqlDeadlockError() }],
+		[{ sql: 'SELECT 1', result: { rows: [{ value: 1 }], rowCount: 1 } }],
+	)
+
+	const result = await retryTransaction(
+		() => connection.query<{ value: number }>('SELECT 1'),
+		() => {},
+		{ minTimeout: 0, maxTimeout: 0 },
+	)
+	expect(result.rows).toEqual([{ value: 1 }])
 	end()
 })

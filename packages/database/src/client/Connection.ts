@@ -163,6 +163,7 @@ namespace Connection {
 	}
 
 	export const REPEATABLE_READ = 'SET TRANSACTION ISOLATION LEVEL REPEATABLE READ'
+	export const SERIALIZABLE = 'SET TRANSACTION ISOLATION LEVEL SERIALIZABLE'
 }
 
 export { Connection }

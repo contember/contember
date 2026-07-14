@@ -135,8 +135,8 @@ class SelectBuilder<Result = SelectBuilder.Result> implements With.Aware, Where.
 		return this.withOption('limit', [limit, offset])
 	}
 
-	public lock(type: LockType, modifier?: LockModifier): SelectBuilder<Result> {
-		return this.withOption('lock', { type, modifier })
+	public lock(type: LockType, modifier?: LockModifier, of?: readonly string[]): SelectBuilder<Result> {
+		return this.withOption('lock', { type, modifier, of })
 	}
 
 	public meta(key: string, value: any): SelectBuilder<Result>
@@ -208,7 +208,7 @@ namespace SelectBuilder {
 			grouping: {
 				groupingElement: Literal[]
 			}
-			lock?: { type: LockType; modifier?: LockModifier }
+			lock?: { type: LockType; modifier?: LockModifier; of?: readonly string[] }
 			meta: Record<string, any>
 			union?: {
 				type: 'all' | 'distinct'

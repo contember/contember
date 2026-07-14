@@ -377,6 +377,22 @@ test('query builder: select with no key update', async () => {
 	})
 })
 
+test('query builder: scopes row locks to safely quoted aliases', async () => {
+	await execute({
+		query: async wrapper => {
+			const qb = wrapper
+				.selectBuilder()
+				.select('id')
+				.from('foo', 'root_')
+				.lock(LockType.forUpdate, undefined, ['root_', 'alias"with-quote'])
+
+			await qb.getResult(wrapper)
+		},
+		sql: SQL`select "id" from "public"."foo" as "root_" for update of "root_", "alias""with-quote"`,
+		parameters: [],
+	})
+})
+
 test('select union', async () => {
 	await execute({
 		query: async wrapper => {

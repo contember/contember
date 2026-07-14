@@ -85,6 +85,7 @@ export class AcquiredConnection implements Connection.AcquiredConnectionLike {
 					case ClientErrorCodes.UNIQUE_VIOLATION:
 						throw new UniqueViolationError(sql, parameters, error)
 					case ClientErrorCodes.T_R_SERIALIZATION_FAILURE:
+					case ClientErrorCodes.T_R_DEADLOCK_DETECTED:
 						throw new SerializationFailureError(sql, parameters, error)
 					case ClientErrorCodes.INVALID_TEXT_REPRESENTATION:
 					case ClientErrorCodes.DATETIME_FIELD_OVERFLOW:

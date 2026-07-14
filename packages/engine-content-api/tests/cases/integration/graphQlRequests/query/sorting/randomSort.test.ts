@@ -113,6 +113,52 @@ test('sorts by a zero random seed', async () => {
 	})
 })
 
+test('treats a null random seed as absent', async () => {
+	await execute({
+		schema: new SchemaBuilder().entity('Post', entity => entity).buildSchema(),
+		query: GQL`
+        query {
+          listPost(orderBy: [{_randomSeeded: null}], limit: 1) {
+            id
+          }
+        }`,
+		executes: [
+			{
+				sql: SQL`
+								select "root_"."id" as "root_id" from "public"."post" as "root_"
+								order by "root_"."id" asc
+								limit 1`,
+				parameters: [],
+				response: { rows: [{ root_id: testUuid(1) }] },
+			},
+		],
+		return: { data: { listPost: [{ id: testUuid(1) }] } },
+	})
+})
+
+test('treats a null random flag as absent', async () => {
+	await execute({
+		schema: new SchemaBuilder().entity('Post', entity => entity).buildSchema(),
+		query: GQL`
+        query {
+          listPost(orderBy: [{_random: null}], limit: 1) {
+            id
+          }
+        }`,
+		executes: [
+			{
+				sql: SQL`
+								select "root_"."id" as "root_id" from "public"."post" as "root_"
+								order by "root_"."id" asc
+								limit 1`,
+				parameters: [],
+				response: { rows: [{ root_id: testUuid(1) }] },
+			},
+		],
+		return: { data: { listPost: [{ id: testUuid(1) }] } },
+	})
+})
+
 test('sorts posts by random on has many relation', async () => {
 	await execute({
 		schema: new SchemaBuilder()

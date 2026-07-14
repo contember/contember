@@ -7,24 +7,35 @@ export class OrderByHelper {
 		objectNode: ObjectNode<Input.ListQueryInput>,
 		relationOrderBy: readonly Model.OrderBy[] | undefined,
 	): ObjectNode<Input.ListQueryInput> {
-		const inputOrder = objectNode.args.orderBy || []
+		const originalInputOrder = objectNode.args.orderBy || []
+		const inputOrder = originalInputOrder.filter(orderBy => !this.isNullRandomOrder(orderBy))
+		const normalizedObjectNode = inputOrder.length === originalInputOrder.length
+			? objectNode
+			: objectNode.withArg('orderBy', inputOrder)
 		const hasOrderBy = inputOrder.length > 0
 		const defaultOrderBy = relationOrderBy ?? entity.orderBy ?? []
 		if (!hasOrderBy && defaultOrderBy.length > 0) {
 			const defaultOrderByWithPrimary = [...defaultOrderBy, ...this.getPrimaryOrderBy(inputOrder, entity)]
-			return objectNode.withArg('orderBy', this.buildOrderBy(defaultOrderByWithPrimary))
+			return normalizedObjectNode.withArg('orderBy', this.buildOrderBy(defaultOrderByWithPrimary))
 		}
 		const hasLimit = typeof objectNode.args.limit === 'number'
 		const hasOffset = typeof objectNode.args.offset === 'number'
 		if (
 			(!hasLimit && !hasOffset && !hasOrderBy)
-			|| (hasOrderBy && (inputOrder[0]._random || inputOrder[0]._randomSeeded !== undefined))
+			|| (hasOrderBy && (inputOrder[0]._random === true || typeof inputOrder[0]._randomSeeded === 'number'))
 		) {
-			return objectNode
+			return normalizedObjectNode
 		}
 
 		const orderBy = this.buildOrderBy(this.getPrimaryOrderBy(inputOrder, entity))
-		return objectNode.withArg('orderBy', [...(inputOrder || []), ...orderBy])
+		return normalizedObjectNode.withArg('orderBy', [...inputOrder, ...orderBy])
+	}
+
+	private static isNullRandomOrder(orderBy: Input.OrderBy): boolean {
+		const entries = Object.entries(orderBy)
+		return entries.length === 1
+			&& (entries[0][0] === '_random' || entries[0][0] === '_randomSeeded')
+			&& entries[0][1] === null
 	}
 
 	private static buildOrderBy(defaultOrderBy: readonly Model.OrderBy[]): Input.OrderByFields[] {

@@ -59,13 +59,20 @@ export class OrderByBuilder {
 		hopGuards: OrderByHopGuard[],
 	): [SelectBuilder<SelectBuilder.Result>, Orderable] {
 		const entries = Object.entries(orderBy)
+		const isNullRandomOrder = entries.length === 1
+			&& (entries[0][0] === '_random' || entries[0][0] === '_randomSeeded')
+			&& entries[0][1] === null
+		if (isNullRandomOrder) {
+			return [qb, orderable]
+		}
 		if (entries.length !== 1) {
 			const fields = entries.map(it => it[0]).join(', ')
 			throw new UserError('Order by: only one field is expected in each item of order by clause, got: ' + fields)
 		}
-		if (orderBy._random || orderBy._randomSeeded !== undefined) {
-			if (orderBy._randomSeeded !== undefined) {
-				const seed = orderBy._randomSeeded / Math.pow(2, 31)
+		const randomSeed = typeof orderBy._randomSeeded === 'number' ? orderBy._randomSeeded : undefined
+		if (orderBy._random === true || randomSeed !== undefined) {
+			if (randomSeed !== undefined) {
+				const seed = randomSeed / Math.pow(2, 31)
 				if (seed < -1 || seed > 1) {
 					throw new UserError(`Order by: random seed must be in range of 32bit signed integer`)
 				}

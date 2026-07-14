@@ -161,6 +161,14 @@ jobs:
           TENANT_MAILER_HOST: 'localhost'
           TENANT_MAILER_PORT: '1025'
           TENANT_MAILER_FROM: 'contember@localhost'
+      - name: "Run tenant database integration tests"
+        run: bun test --conditions=typescript packages/engine-tenant-api/tests/cases/integration/database --no-file-parallelism
+        env:
+          TEST_DB_HOST: 127.0.0.1
+          TEST_DB_PORT: 5432
+          TEST_DB_USER: postgres
+          TEST_DB_PASSWORD: postgres
+          TEST_DB_NAME: test_tenant
       - name: "Run E2E tests"
         run: bun run test:e2e --no-file-parallelism
         env:

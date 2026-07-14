@@ -1,7 +1,7 @@
 import { SelectExecutionHandler, SelectExecutionHandlerContext } from '../SelectExecutionHandler.js'
 import { Path } from '../Path.js'
 import { Acl, Input } from '@contember/schema'
-import { PredicateFactory } from '../../../acl/index.js'
+import { createPredicateContext, PredicateFactory } from '../../../acl/index.js'
 import { WhereBuilder } from '../WhereBuilder.js'
 import { ObjectNode } from '../../../inputProcessing/index.js'
 import { getFieldPredicate } from '../getFieldPredicate.js'
@@ -41,10 +41,17 @@ export class MetaHandler implements SelectExecutionHandler<{}> {
 		if (!field) {
 			throw new Error(`Unknown field ${entity.name}.${fieldName}`)
 		}
-		const fieldPredicate = getFieldPredicate(this.predicateFactory, operation, entity, field, context.relationPath)
+		const getValue = operation === Acl.Operation.update
+			? context.addMutationPredicate(this.predicateFactory.create(
+				entity,
+				Acl.Operation.update,
+				[field.name],
+				createPredicateContext(context.relationPath.length === 0 ? 'root' : 'through'),
+			))
+			: context.addPredicate(getFieldPredicate(this.predicateFactory, operation, entity, field, context.relationPath).predicate)
 		context.addColumn({
 			path: metaPath,
-			valueGetter: context.addPredicate(fieldPredicate.predicate),
+			valueGetter: getValue,
 		})
 	}
 }

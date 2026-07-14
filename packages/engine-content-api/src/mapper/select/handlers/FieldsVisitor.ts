@@ -6,9 +6,11 @@ import { PredicateFactory } from '../../../acl/index.js'
 import { Literal, wrapIdentifier } from '@contember/database'
 import { ColumnValueGetter } from '../SelectHydrator.js'
 import { Providers } from '@contember/schema-utils'
+import { containsUpdatableMetadata, createRelationUpdatePredicates } from '../MetadataUpdateCapability.js'
 import { getColumnName } from '@contember/schema-utils'
 import { viewComputedId } from '../../../utils/viewComputedId.js'
 import { getFieldReadPredicate } from '../getFieldPredicate.js'
+import { ObjectNode } from '../../../inputProcessing/index.js'
 
 export class FieldsVisitor implements Model.RelationByTypeVisitor<void>, Model.ColumnVisitor<void> {
 	constructor(
@@ -101,6 +103,7 @@ export class FieldsVisitor implements Model.RelationByTypeVisitor<void>, Model.C
 				}),
 			defaultValue: [],
 			predicate: getFieldReadPredicate(this.predicateFactory, relationContext.entity, relationContext.relation, this.relationPath),
+			updatePredicate: this.getSourceUpdatePredicate(relationContext, field),
 		})
 	}
 
@@ -122,6 +125,7 @@ export class FieldsVisitor implements Model.RelationByTypeVisitor<void>, Model.C
 				}),
 			defaultValue: [],
 			predicate: getFieldReadPredicate(this.predicateFactory, relationContext.entity, relationContext.relation, this.relationPath),
+			updatePredicate: this.getSourceUpdatePredicate(relationContext, field),
 		})
 	}
 
@@ -143,6 +147,7 @@ export class FieldsVisitor implements Model.RelationByTypeVisitor<void>, Model.C
 				}),
 			defaultValue: [],
 			predicate: getFieldReadPredicate(this.predicateFactory, relationContext.entity, relationContext.relation, this.relationPath),
+			updatePredicate: this.getSourceUpdatePredicate(relationContext, field),
 		})
 	}
 
@@ -174,6 +179,7 @@ export class FieldsVisitor implements Model.RelationByTypeVisitor<void>, Model.C
 			},
 			defaultValue: null,
 			predicate: getFieldReadPredicate(this.predicateFactory, relationContext.entity, relationContext.relation, this.relationPath),
+			updatePredicate: this.getSourceUpdatePredicate(relationContext, this.executionContext.objectNode),
 		})
 	}
 
@@ -203,6 +209,7 @@ export class FieldsVisitor implements Model.RelationByTypeVisitor<void>, Model.C
 			},
 			defaultValue: null,
 			predicate: getFieldReadPredicate(this.predicateFactory, relationContext.entity, relationContext.relation, this.relationPath),
+			updatePredicate: this.getSourceUpdatePredicate(relationContext, this.executionContext.objectNode),
 		})
 	}
 
@@ -232,6 +239,17 @@ export class FieldsVisitor implements Model.RelationByTypeVisitor<void>, Model.C
 			},
 			defaultValue: null,
 			predicate: getFieldReadPredicate(this.predicateFactory, relationContext.entity, relationContext.relation, this.relationPath),
+			updatePredicate: this.getSourceUpdatePredicate(relationContext, this.executionContext.objectNode),
 		})
+	}
+
+	private getSourceUpdatePredicate(
+		relationContext: Model.AnyRelationContext,
+		objectNode: ObjectNode | undefined,
+	): Input.OptionalWhere | undefined {
+		if (objectNode === undefined || !containsUpdatableMetadata(objectNode)) {
+			return undefined
+		}
+		return createRelationUpdatePredicates(this.predicateFactory, relationContext, this.relationPath).source
 	}
 }

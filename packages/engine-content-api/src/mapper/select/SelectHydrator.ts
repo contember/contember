@@ -2,12 +2,19 @@ import { Path } from './Path.js'
 import { Value } from '@contember/schema'
 import { getFulfilledValues, getRejections } from '../../utils/index.js'
 import { logger } from '@contember/logger'
+import { MetadataUpdateMasker } from './MetadataUpdateCapability.js'
+
+type UpdateCapability = {
+	getValue: ColumnValueGetter<boolean>
+	masker: MetadataUpdateMasker
+}
 
 type DataPromises = {
 	path: Path
 	getParentValue: ColumnValueGetter<Value.PrimaryValue | null>
 	data: Promise<SelectNestedData>
 	defaultValue: SelectNestedDefaultValue
+	updateCapability?: UpdateCapability
 }
 
 type ResolvedData = {
@@ -15,6 +22,7 @@ type ResolvedData = {
 	getParentValue: ColumnValueGetter<Value.PrimaryValue | null>
 	data: SelectNestedData
 	defaultValue: SelectNestedDefaultValue
+	updateCapability?: UpdateCapability
 }
 
 export type ColumnValueGetter<T extends Value.FieldValue = Value.FieldValue> = (row: SelectRow) => T
@@ -27,6 +35,11 @@ type Column = {
 export class SelectHydrator {
 	private columns: Column[] = []
 	private promises: DataPromises[] = []
+	private updateCapability?: UpdateCapability
+
+	public setMetadataUpdateCapability(updateCapability: UpdateCapability): void {
+		this.updateCapability = updateCapability
+	}
 
 	public addColumn(path: Path, getValue: ColumnValueGetter) {
 		this.columns.push({ path, getValue })
@@ -37,8 +50,9 @@ export class SelectHydrator {
 		getParentValue: ColumnValueGetter<Value.PrimaryValue | null>,
 		data: Promise<SelectNestedData>,
 		defaultValue: SelectNestedDefaultValue,
+		updateCapability?: UpdateCapability,
 	) {
-		this.promises.push({ path, getParentValue, data, defaultValue })
+		this.promises.push({ path, getParentValue, data, defaultValue, updateCapability })
 	}
 
 	public async hydrateGroups(rows: SelectRow[], groupBy: string): Promise<SelectGroupedObjects> {
@@ -87,23 +101,29 @@ export class SelectHydrator {
 			currentObject[last] = this.formatValue(columnPath.getValue(row))
 		}
 
-		for (let { path, getParentValue, data, defaultValue } of resolvedData) {
+		for (let { path, getParentValue, data, defaultValue, updateCapability } of resolvedData) {
 			const pathTmp = [...path.path]
 			const last = pathTmp.pop() as string
 			const currentObject = pathTmp.reduce<any>((obj, part) => (obj?.[part]) || undefined, result)
 			const parentValue = getParentValue(row)
 			if (currentObject) {
-				currentObject[last] = (parentValue ? data[parentValue] : undefined) || defaultValue
+				const nestedValue = (parentValue ? data[parentValue] : undefined) || defaultValue
+				currentObject[last] = updateCapability !== undefined && !updateCapability.getValue(row)
+					? updateCapability.masker.mask(nestedValue)
+					: nestedValue
 			}
 		}
 
-		return result
+		return this.updateCapability !== undefined && !this.updateCapability.getValue(row)
+			? this.updateCapability.masker.maskObject(result)
+			: result
 	}
 
 	private async resolveDataPromises(): Promise<ResolvedData[]> {
 		const results = await Promise.allSettled(this.promises.map(async (it): Promise<ResolvedData> => ({
 			defaultValue: it.defaultValue,
 			getParentValue: it.getParentValue,
+			updateCapability: it.updateCapability,
 			path: it.path,
 			data: await it.data,
 		})))

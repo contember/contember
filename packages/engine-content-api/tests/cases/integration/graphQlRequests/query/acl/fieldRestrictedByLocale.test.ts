@@ -65,7 +65,8 @@ test('querying id and title', async () => {
 				sql: SQL`SELECT
 							 "root_"."id" AS "root_id",
 							 "root_"."locale" IN (?) AS "root___predicate_localePredicate",
-							 "root_"."title" AS "root_title"
+							 "root_"."title" AS "root_title",
+							 false AS "root___mutation_predicate_0"
 						 FROM "public"."post_locale" AS "root_"`,
 				parameters: ['cs'],
 				response: {
@@ -74,11 +75,13 @@ test('querying id and title', async () => {
 							root_id: testUuid(1),
 							root_title: null,
 							root___predicate_localePredicate: false,
+							root___mutation_predicate_0: false,
 						},
 						{
 							root_id: testUuid(2),
 							root_title: 'bar',
 							root___predicate_localePredicate: true,
+							root___mutation_predicate_0: false,
 						},
 					],
 				},

@@ -6,6 +6,7 @@ import { ImplementationException } from '../../exception.js'
 import { UniqueWhereExpander } from '../../inputProcessing/index.js'
 import { HasManyToHasOneReducerExtension } from './HasManyToHasOneReducer.js'
 import { PredicateFactory } from '../../acl/index.js'
+import { containsUpdatableMetadata, createRelationUpdatePredicates } from '../../mapper/select/MetadataUpdateCapability.js'
 
 export class HasManyToHasOneReducerExecutionHandler implements SelectExecutionHandler<Input.UniqueQueryInput, HasManyToHasOneReducerExtension> {
 	constructor(
@@ -19,16 +20,15 @@ export class HasManyToHasOneReducerExecutionHandler implements SelectExecutionHa
 		if (!objectNode) {
 			throw new Error()
 		}
+		const relationContext = acceptFieldVisitor(this.schema, entity, objectNode.extensions.relationName, {
+			visitRelation: context => context,
+			visitColumn: (): never => {
+				throw new ImplementationException('HasManyToHasOneReducerExecutionHandler: Not applicable for a column')
+			},
+		})
 		addData({
 			field: entity.primary,
 			dataProvider: async (ids: Input.PrimaryValue[]) => {
-				const relationContext = acceptFieldVisitor(this.schema, entity, objectNode.extensions.relationName, {
-					visitRelation: context => context,
-					visitColumn: (): never => {
-						throw new ImplementationException('HasManyToHasOneReducerExecutionHandler: Not applicable for a column')
-					},
-				})
-
 				const { targetEntity, targetRelation } = relationContext
 				if (!targetRelation || !isIt<Model.JoiningColumnRelation>(targetRelation, 'joiningColumn')) {
 					throw new Error('HasManyToHasOneReducerExecutionHandler: only applicable for relations with joiningColumn')
@@ -58,6 +58,9 @@ export class HasManyToHasOneReducerExecutionHandler implements SelectExecutionHa
 				getField(entity, objectNode.extensions.relationName),
 				context.relationPath,
 			),
+			updatePredicate: containsUpdatableMetadata(objectNode)
+				? createRelationUpdatePredicates(this.predicateFactory, relationContext, context.relationPath).source
+				: undefined,
 		})
 	}
 }

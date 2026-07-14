@@ -81,7 +81,7 @@ test('aliases', async () => {
 							 "root_"."id" AS "root_idx",
 							 "root_"."name" AS "root_name1",
 							 "root_"."name" AS "root_name2",
-							 "root_"."name" = ? AS "root___predicate_name_eq",
+							 "root_"."name" = ? AS "root___mutation_predicate_0",
 							 "root_"."id" AS "root_id"
 						 FROM "public"."author" AS "root_"`,
 				parameters: ['John'],
@@ -92,7 +92,7 @@ test('aliases', async () => {
 							root_idx: testUuid(1),
 							root_name1: 'John',
 							root_name2: 'John',
-							root___predicate_name_eq: true,
+							root___mutation_predicate_0: true,
 						},
 					],
 				},

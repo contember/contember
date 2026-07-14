@@ -13,6 +13,7 @@ import { FieldNode, ObjectNode } from '../../inputProcessing/index.js'
 import { assertNever } from '../../utils/index.js'
 import { PredicateFactory } from '../../acl/index.js'
 import type { PredicateInjection } from '../../acl/PredicateInjection.js'
+import { containsUpdatableMetadata, createMetadataUpdateMasker, createRelationUpdatePredicates } from './MetadataUpdateCapability.js'
 
 export class SelectBuilder {
 	private resolver: (value: SelectRow[]) => void = () => {
@@ -117,6 +118,37 @@ export class SelectBuilder {
 			}
 			return row => row[predicatePath.alias] === true
 		}
+		const mutationPredicates = new Map<Input.OptionalWhere, ColumnValueGetter<boolean>>()
+		const addMutationPredicate = (predicate: Input.OptionalWhere): ColumnValueGetter<boolean> => {
+			if (Object.keys(predicate).length === 0) {
+				return () => true
+			}
+			const existing = mutationPredicates.get(predicate)
+			if (existing !== undefined) {
+				return existing
+			}
+			const predicatePath = path.for('__mutation_predicate').for(String(mutationPredicates.size))
+			const { qb, condition } = this.whereBuilder.buildConditionLiteral(this.qb, entity, path, predicate)
+			this.qb = qb.select(condition, predicatePath.alias)
+			const getValue: ColumnValueGetter<boolean> = row => row[predicatePath.alias] === true
+			mutationPredicates.set(predicate, getValue)
+			return getValue
+		}
+
+		if (containsUpdatableMetadata(input) && this.relationPath.length > 0) {
+			const incomingRelation = this.relationPath[this.relationPath.length - 1]
+			const targetPredicate = createRelationUpdatePredicates(
+				this.predicateFactory,
+				incomingRelation,
+				this.relationPath.slice(0, -1),
+			).target
+			if (targetPredicate !== undefined) {
+				this.hydrator.setMetadataUpdateCapability({
+					getValue: addMutationPredicate(targetPredicate),
+					masker: createMetadataUpdateMasker(input),
+				})
+			}
+		}
 
 		for (let field of input.fields) {
 			const fieldPath = path.for(field.alias)
@@ -133,14 +165,26 @@ export class SelectBuilder {
 			const executionContext: SelectExecutionHandlerContext = {
 				mapper,
 				relationPath: this.relationPath,
-				addData: async ({ field, dataProvider, defaultValue, predicate }) => {
+				addData: async ({ field: parentField, dataProvider, defaultValue, predicate, updatePredicate, updateMetadataMasker }) => {
 					if (predicate === false) {
 						this.hydrator.addPromise(fieldPath, () => null, Promise.resolve({}), defaultValue ?? null)
 						return
 					}
 					const predicateGetter = predicate !== undefined && predicate !== true ? addPredicate(predicate) : null
-					const columnName = getColumnName(this.schema, entity, field)
-					const parentValuePath = path.for(field)
+					const updateCapability = (() => {
+						if (updatePredicate === undefined) {
+							return undefined
+						}
+						if (!(field instanceof ObjectNode)) {
+							throw new Error('Update metadata capability is only supported for object fields')
+						}
+						return {
+							getValue: addMutationPredicate(updatePredicate),
+							masker: updateMetadataMasker ?? createMetadataUpdateMasker(field),
+						}
+					})()
+					const columnName = getColumnName(this.schema, entity, parentField)
+					const parentValuePath = path.for(parentField)
 					let ids = await this.getColumnValues(parentValuePath, columnName, predicateGetter)
 
 					const data = ids.length > 0 ? dataProvider(ids) : Promise.resolve({})
@@ -149,8 +193,10 @@ export class SelectBuilder {
 						row => predicateGetter === null || predicateGetter(row) ? (row[parentValuePath.alias] as Value.PrimaryValue) : null,
 						data,
 						defaultValue ?? null,
+						updateCapability,
 					)
 				},
+				addMutationPredicate,
 				addColumn: ({ path = fieldPath, predicate, query, valueGetter }) => {
 					if (predicate === false) {
 						this.hydrator.addColumn(path, () => null)

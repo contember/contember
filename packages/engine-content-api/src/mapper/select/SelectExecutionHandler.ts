@@ -4,6 +4,7 @@ import { ColumnValueGetter, SelectNestedData, SelectNestedDefaultValue, SelectRo
 import { SelectBuilder } from '@contember/database'
 import { Mapper } from '../Mapper.js'
 import { FieldNode, ObjectNode } from '../../inputProcessing/index.js'
+import { MetadataUpdateMasker } from './MetadataUpdateCapability.js'
 
 export interface SelectExecutionHandler<
 	FieldArgs = unknown,
@@ -24,6 +25,7 @@ export type SelectExecutionHandlerContext<
 		entity: Model.Entity
 		relationPath: Model.AnyRelationContext[]
 		addPredicate: (predicate: Acl.Predicate) => (row: SelectRow) => boolean
+		addMutationPredicate: (predicate: Input.OptionalWhere) => ColumnValueGetter<boolean>
 		addColumn: (args: {
 			predicate?: Acl.Predicate
 			query?: (qb: SelectBuilder<SelectBuilder.Result>) => SelectBuilder<SelectBuilder.Result>
@@ -34,6 +36,8 @@ export type SelectExecutionHandlerContext<
 			field: string
 			dataProvider: DataCallback
 			predicate?: Acl.Predicate
+			updatePredicate?: Input.OptionalWhere
+			updateMetadataMasker?: MetadataUpdateMasker
 			defaultValue?: SelectNestedDefaultValue
 		}) => void
 	}

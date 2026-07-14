@@ -168,10 +168,10 @@ test('_meta.updatable uses root permissions at the query root', async () => {
 			}`,
 		executes: [
 			{
-				sql: SQL`select "root_"."id" as "root_id" from "public"."post_locale" as "root_"`,
+				sql: SQL`select "root_"."id" as "root_id", false as "root___mutation_predicate_0" from "public"."post_locale" as "root_"`,
 				parameters: [],
 				response: {
-					rows: [{ root_id: testUuid(3) }],
+					rows: [{ root_id: testUuid(3), root___mutation_predicate_0: false }],
 				},
 			},
 		],
@@ -260,14 +260,25 @@ test('_meta flags compile through-only cell predicates against the all permissio
 				sql: SQL`
 					select "root_"."post_id" as "__grouping_key",
 					       "root_"."id" as "root_id",
-					       "root_"."visible" = ? as "root___predicate_titleVisible"
+					       "root_"."visible" = ? as "root___predicate_titleVisible",
+					       "root_"."visible" = ? as "root___mutation_predicate_0"
 					from "public"."post_locale" as "root_" where "root_"."post_id" in (?, ?)
 				`,
-				parameters: [true, testUuid(1), testUuid(2)],
+				parameters: [true, true, testUuid(1), testUuid(2)],
 				response: {
 					rows: [
-						{ __grouping_key: testUuid(1), root_id: testUuid(3), root___predicate_titleVisible: true },
-						{ __grouping_key: testUuid(2), root_id: testUuid(4), root___predicate_titleVisible: false },
+						{
+							__grouping_key: testUuid(1),
+							root_id: testUuid(3),
+							root___predicate_titleVisible: true,
+							root___mutation_predicate_0: true,
+						},
+						{
+							__grouping_key: testUuid(2),
+							root_id: testUuid(4),
+							root___predicate_titleVisible: false,
+							root___mutation_predicate_0: false,
+						},
 					],
 				},
 			},
@@ -302,6 +313,12 @@ test('nested updates use the same through update predicate as _meta.updatable', 
 				sql: SQL`select "root_"."id" from "public"."post" as "root_" where "root_"."id" = ?`,
 				parameters: [testUuid(1)],
 				response: { rows: [{ id: testUuid(1) }] },
+			},
+			{
+				sql: SQL`select true as "authorized" from "public"."post" as "root_"
+						where "root_"."id" = ? for update of "root_"`,
+				parameters: [testUuid(1)],
+				response: { rows: [{ authorized: true }] },
 			},
 			{
 				sql: SQL`select "root_"."id" from "public"."post_locale" as "root_" where "root_"."id" = ? and "root_"."post_id" = ?`,

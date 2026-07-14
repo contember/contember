@@ -193,6 +193,115 @@ describe('Permission merger', () => {
 		})
 	})
 
+	it('preserves an explicit materialized view refresh denial across unrelated entity permissions', () => {
+		const acl: Acl.Schema = {
+			roles: {
+				denier: {
+					variables: {},
+					entities: {
+						Entity1: {
+							predicates: {},
+							operations: { refreshMaterializedView: false },
+						},
+					},
+				},
+				reader: {
+					variables: {},
+					entities: {
+						Entity1: {
+							predicates: {},
+							operations: { read: { id: true } },
+						},
+					},
+				},
+			},
+		}
+		const result: Acl.Permissions = {
+			Entity1: {
+				predicates: {},
+				operations: {
+					refreshMaterializedView: false,
+					read: { id: true },
+				},
+			},
+		}
+		for (const roles of [['denier', 'reader'], ['reader', 'denier']]) {
+			execute({ acl, roles, result })
+		}
+	})
+
+	it('allows an explicit materialized view refresh grant to win over a denial', () => {
+		execute({
+			acl: {
+				roles: {
+					denier: {
+						variables: {},
+						entities: {
+							Entity1: {
+								predicates: {},
+								operations: { refreshMaterializedView: false },
+							},
+						},
+					},
+					refresher: {
+						variables: {},
+						entities: {
+							Entity1: {
+								predicates: {},
+								operations: { refreshMaterializedView: true },
+							},
+						},
+					},
+				},
+			},
+			roles: ['denier', 'refresher'],
+			result: {
+				Entity1: {
+					predicates: {},
+					operations: { refreshMaterializedView: true },
+				},
+			},
+		})
+	})
+
+	it('preserves an inherited materialized view refresh denial', () => {
+		execute({
+			acl: {
+				roles: {
+					base: {
+						variables: {},
+						entities: {
+							Entity1: {
+								predicates: {},
+								operations: { refreshMaterializedView: false },
+							},
+						},
+					},
+					child: {
+						variables: {},
+						inherits: ['base'],
+						entities: {
+							Entity1: {
+								predicates: {},
+								operations: { read: { id: true } },
+							},
+						},
+					},
+				},
+			},
+			roles: ['child'],
+			result: {
+				Entity1: {
+					predicates: {},
+					operations: {
+						refreshMaterializedView: false,
+						read: { id: true },
+					},
+				},
+			},
+		})
+	})
+
 	it('merge entity operations with predicates', () => {
 		execute({
 			acl: {

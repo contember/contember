@@ -132,8 +132,12 @@ export class PermissionFactory {
 		if (left.operations.customPrimary || right.operations.customPrimary) {
 			operations.customPrimary = true
 		}
-		if (left.operations.refreshMaterializedView || right.operations.refreshMaterializedView) {
-			operations.refreshMaterializedView = true
+		const refreshMaterializedView = this.mergeOptionalBooleanPermission(
+			left.operations.refreshMaterializedView,
+			right.operations.refreshMaterializedView,
+		)
+		if (refreshMaterializedView !== undefined) {
+			operations.refreshMaterializedView = refreshMaterializedView
 		}
 		const noRoot: `${Acl.Operation}`[] = []
 
@@ -180,6 +184,16 @@ export class PermissionFactory {
 			predicates: predicates,
 			operations: operations,
 		}
+	}
+
+	private mergeOptionalBooleanPermission(left: boolean | undefined, right: boolean | undefined): boolean | undefined {
+		if (left === true || right === true) {
+			return true
+		}
+		if (left === false || right === false) {
+			return false
+		}
+		return undefined
 	}
 
 	private mergeOperationPermissions(

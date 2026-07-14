@@ -56,7 +56,7 @@ export class EventDispatcher {
 				events: batch.events.map(it => it.id),
 			})
 			const variables = await this.variablesManager.fetchVariables(db)
-			const handledEvents = await handler.handle({ target, events, logger: batchLogger, variables })
+			const handledEvents = await handler.handle({ target, events, logger: batchLogger, variables, db, schema })
 			const { succeeded, retried, failed } = await this.eventsRepository.persistProcessed(db.client, handledEvents)
 			batchLogger.debug('Processing done', { succeed: succeeded, failed })
 			return {
@@ -69,6 +69,7 @@ export class EventDispatcher {
 		} catch (e) {
 			logger.error(e, { loc: 'EventDispatcher', batchId })
 			const failedEvents = events.map((it): HandledEvent => ({
+				target,
 				row: it,
 				result: { ok: false, errorMessage: `Internal error` },
 			}))

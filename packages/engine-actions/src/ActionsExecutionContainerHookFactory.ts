@@ -4,6 +4,7 @@ import { TriggerPayloadBuilder } from './triggers/TriggerPayloadBuilder.js'
 import { TriggerPayloadPersister } from './triggers/TriggerPayloadPersister.js'
 import { ExecutionContainerHook } from '@contember/engine-content-api'
 import { ActionsMetrics } from './ActionsMetrics.js'
+import { AuditLogWriter } from './audit/AuditLogWriter.js'
 
 export class ActionsExecutionContainerHookFactory {
 	constructor(
@@ -35,6 +36,8 @@ export class ActionsExecutionContainerHookFactory {
 							userInfo,
 							triggeredActionsCollector,
 							projectMetrics,
+							schema,
+							new AuditLogWriter(providers),
 						)
 						const triggerPayloadBuilder = new TriggerPayloadBuilder(mapper)
 						const payloadManager = new TriggerPayloadManager(triggerPayloadBuilder, triggerPayloadPersister)

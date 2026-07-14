@@ -30,6 +30,7 @@ import {
 	RemoveEnumDiffer,
 	RemoveFieldDiffer,
 	RemoveUniqueConstraintDiffer,
+	ToggleEntityImmutableDiffer,
 	ToggleEventLogDiffer,
 	ToggleJunctionEventLogDiffer,
 	UpdateAclSchemaDiffer,
@@ -131,6 +132,7 @@ export class SchemaDiffer {
 				new UpdateValidationSchemaDiffer(this.options),
 			],
 			new UpdateEntityOrderByDiffer(),
+			new ToggleEntityImmutableDiffer(),
 			...skipNonModelDiffers ? [] : [
 				new UpdateTargetDiffer(),
 				new CreateTargetDiffer(),

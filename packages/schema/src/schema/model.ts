@@ -13,6 +13,13 @@ export namespace Model {
 		readonly view?: View
 		readonly eventLog: EventLogConfig
 		readonly orderBy?: readonly OrderBy[]
+		/**
+		 * Rows are written only by the engine (e.g. an audit-log target) — the Content API
+		 * generates no create/update/delete mutations for this entity, regardless of ACL.
+		 * Reads follow regular ACL. Mirrors how a `view` entity is non-mutable, but backed
+		 * by a real table.
+		 */
+		readonly immutable?: boolean
 	}
 
 	export type View = {

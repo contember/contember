@@ -237,6 +237,7 @@ const entitySchema = Typesafe.intersection(
 	Typesafe.partial({
 		view: viewSchema,
 		orderBy: orderBySchema,
+		immutable: Typesafe.boolean,
 	}),
 )
 

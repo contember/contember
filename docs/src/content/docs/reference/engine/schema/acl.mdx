@@ -42,7 +42,7 @@ A variable is defined for a certain *role* and is injected into a predicate at e
 
 - Represent more complex [column conditions](/reference/engine/content/queries#comparison-operators) that can be injected at runtime (e.g., a date range).
 
-All variable values are managed via the [Tenant API Memberships](/reference/engine/tenant/memberships) or the “Assume Membership” feature.
+Entity and condition variable values are provided by [Tenant API Memberships](/reference/engine/tenant/memberships) or the “Assume Membership” feature. Predefined variables normally come from the authenticated identity; an authorized assumed membership may supply them explicitly.
 
 :::note
 After changing ACL definitions, remember to create and apply a migration.
@@ -63,7 +63,8 @@ Creates a named role in your schema. You use the `roleName` in the [Tenant API f
     - `tenant`: permissions in the Tenant API (like `invite`, `manage`, etc.)
     - `system`: permissions in the System API (like `history`)
     - `stages`: by default `'*'`, meaning all stages
-    - `debug`: allows debugging GraphQL queries 
+    - `implicit`: assigns the role on normal requests even when the identity has no explicit membership for it
+    - `debug`: allows debugging GraphQL queries
     - `s3`, see [S3 ACL](/reference/engine/content/s3)
 
 - **Example**:
@@ -89,7 +90,7 @@ Defines an **entity variable** that will hold an ID or a list of IDs referencing
   - `variableName`: unique identifier for the variable (within the same role)
   - `entityName`: the entity name (e.g., `"Category"`)
   - `roleOrRoles`: either a single role or an array of roles
-  - `fallback?`: optional fallback condition (e.g., `"never"` or a condition like `{ id: { eq: SOME_ID } }`) if no variable is supplied
+  - `fallback?`: optional `Input.Condition` used when no variable is supplied, for example `{ never: true }` or `{ eq: SOME_ID }`. The condition applies to the referenced entity's primary field, so it is not wrapped in `{ id: ... }`.
 
 - **Example**:
 
@@ -98,8 +99,8 @@ Defines an **entity variable** that will hold an ID or a list of IDs referencing
   import { moderatorRole } from './roles'
 
   export const categoryIdVariable = c.createEntityVariable(
-    'categoryId', 
-    'Category', 
+    'categoryId',
+    'Category',
     moderatorRole
   )
   ```
@@ -113,7 +114,7 @@ Defines a variable referencing a **built-in** value (`identityID` or `personID`)
   - `variableName`: unique identifier for the variable (within the same role)
   - `value`: must be `"identityID"` or `"personID"`
   - `roleOrRoles`: the target role(s)
-  - `fallback?`: optional fallback if no predefined variable is available
+  - `fallback?`: optional `Input.Condition`. It is used only for a missing `personID`; for example, `{ never: true }` denies access and `{ eq: SOME_ID }` selects one explicit fallback ID.
 
 - **Example**:
 
@@ -127,8 +128,23 @@ Defines a variable referencing a **built-in** value (`identityID` or `personID`)
     'person',
     'personID',
     readerRole,
+    { never: true },
   )
   ```
+
+Predefined variables are resolved in this order:
+
+1. An explicitly supplied value in an authorized assumed membership.
+2. The signed-in identity's runtime value: `identityID`, or `personID` when the identity is linked to a person.
+3. For a missing `personID`, the configured fallback. Without a fallback, Contember uses `{ never: true }`.
+
+An `identityID` is always supplied by the runtime, so its fallback is not used during normal authentication. Predefined variables cannot be overridden by values stored in a regular project membership.
+
+Roles created with `{ implicit: true }` are assigned automatically on normal requests when the same role is not already present explicitly. Their predefined variables are resolved in the same way, including the `personID` fallback. This also applies when the identity has no explicit project membership.
+
+:::caution
+A `personID` fallback of `{ always: true }` is intentionally permissive: for an identity without a person, every candidate value satisfies that variable condition. After regenerating and applying the schema and deploying the updated engine, this can immediately broaden access for those identities. Prefer `{ never: true }` or a narrowly scoped condition such as `{ eq: SOME_ID }` unless public fallback access is intended.
+:::
 
 ### `createConditionVariable(variableName, roleOrRoles[, fallback])`
 
@@ -138,7 +154,7 @@ Defines a **condition variable** that can store an arbitrary complex condition (
 
   - `variableName`: the variable name
   - `roleOrRoles`: the target role(s)
-  - `fallback?`: optional fallback condition
+  - `fallback?`: optional `Input.Condition`, for example `{ never: true }` or a comparison condition appropriate for the variable
 
 - **Example**:
 
@@ -147,7 +163,7 @@ Defines a **condition variable** that can store an arbitrary complex condition (
   import { readerRole } from './roles'
 
   export const subscriptionVariable = c.createConditionVariable(
-    'subscription', 
+    'subscription',
     readerRole
   )
   ```
@@ -165,10 +181,10 @@ Most of the time, you will declare ACL rules directly in your schema using the `
 
 ```ts
 @c.Allow(
-  roleOrRoles, 
+  roleOrRoles,
   {
     when?: Filter,       // Condition for this rule
-    read?: boolean | string[], 
+    read?: boolean | string[],
     update?: boolean | string[],
     create?: boolean | string[],
     delete?: boolean,
@@ -187,7 +203,7 @@ Most of the time, you will declare ACL rules directly in your schema using the `
 - **`delete`**: A boolean. If `true`, allows deleting the entire row under the given `when` condition; if omitted or `false`, it does not allow deletion.
 - **`through`**:
   - If `true`, means that *root-level* access for the operation is **disallowed**, but the operation is still allowed **through relations**.
-  - If you set `through: true`, you are effectively restricting direct queries (like listBook) or direct mutations (e..g updateBook) on the root. However, you can still access this entity if you traverse from a parent entity that *does* allow a root-level operation.
+  - If you set `through: true`, you are effectively restricting direct queries (like `listBook`) or direct mutations (e.g. `updateBook`) on the root. However, you can still access this entity if you traverse from a parent entity that allows the corresponding relation operation.
   - You cannot mix "through" for the same operation in a conflicting way
 
 #### Multiple `@c.Allow` Decorators
@@ -298,6 +314,21 @@ export class Product {
 - `read` of `id` is allowed at root level.
 - `update` of `name` is **not** allowed at the root query/mutation because `through: true` prevents direct updates.
 - If an upstream entity relation to `Product` is allowed to update it, then the user can update `name` **through** that relation—provided the `category` is `isActive: true` or `isActive: false`.
+
+### ACL compatibility and security behavior
+
+Root and relation traversal are separate authorization contexts. This distinction affects both reads and writes:
+
+- A `through: true` read grant can expose an entity through an allowed relation without exposing its root `list`, `get`, or unique lookup fields.
+- Nested create, update, and delete operations use the target entity's through permissions, while the enclosing root mutation still needs its own permission. Conditional target and parent predicates are evaluated for the nested operation; selecting the parent row is not by itself proof that the nested write is allowed.
+- Generated relation variants inherit the source relation field's ACL predicate. When that relation is masked for a row, list and pagination variants return no related rows, their counts exclude masked rows, and unique/to-one variants return `null` instead of revealing the relation through an extension field.
+
+ACL can also affect the generated schema and introspection:
+
+- A database-level non-null field is exposed as nullable in a shared GraphQL output type when the effective role can read it in one context (for example through a relation) but it is not guaranteed readable in another context (for example at root). Clients must handle the masked `null` value.
+- ACL introspection omits unique-constraint metadata when any participating field is hidden. This prevents hidden fields from being inferred through schema metadata.
+
+After upgrading ACL behavior, regenerate or introspect the GraphQL schema again and update generated client types. Queries that relied on a through-only grant at root, nested writes that bypassed a target predicate, or relation extension fields that exposed a masked relation may stop succeeding or return empty/`null` results.
 
 
 ## `@c.AllowCustomPrimary`

@@ -1,7 +1,7 @@
 import { Input, Model, Value } from '@contember/schema'
 import { Mapper } from '../Mapper.js'
 import { UpdateBuilder } from './UpdateBuilder.js'
-import { hasManyProcessor, hasOneProcessor } from '../MutationProcessorHelper.js'
+import { hasManyProcessor, hasOneProcessor, relationFieldProcessor } from '../MutationProcessorHelper.js'
 import { OneHasOneInverseUpdateInputProcessor } from './relations/OneHasOneInverseUpdateInputProcessor.js'
 import { OneHasOneOwningUpdateInputProcessor } from './relations/OneHasOneOwningUpdateInputProcessor.js'
 import { OneHasManyUpdateInputProcessor } from './relations/OneHasManyUpdateInputProcessor.js'
@@ -48,6 +48,7 @@ export class SqlUpdateInputProcessor implements UpdateInputProcessor<SqlUpdateIn
 		upsert: hasManyProcessor(ctx => this.manyHasManyUpdateInputProcessor.upsert(ctx)),
 		delete: hasManyProcessor(ctx => this.manyHasManyUpdateInputProcessor.delete(ctx)),
 		disconnect: hasManyProcessor(ctx => this.manyHasManyUpdateInputProcessor.disconnect(ctx)),
+		set: relationFieldProcessor(ctx => this.manyHasManyUpdateInputProcessor.set(ctx)),
 	}
 
 	manyHasManyOwning: UpdateInputProcessor<SqlUpdateInputProcessorResult>['manyHasManyOwning'] = {
@@ -58,6 +59,7 @@ export class SqlUpdateInputProcessor implements UpdateInputProcessor<SqlUpdateIn
 		upsert: hasManyProcessor(ctx => this.manyHasManyUpdateInputProcessor.upsert(ctx)),
 		delete: hasManyProcessor(ctx => this.manyHasManyUpdateInputProcessor.delete(ctx)),
 		disconnect: hasManyProcessor(ctx => this.manyHasManyUpdateInputProcessor.disconnect(ctx)),
+		set: relationFieldProcessor(ctx => this.manyHasManyUpdateInputProcessor.set(ctx)),
 	}
 
 	manyHasOne: UpdateInputProcessor<SqlUpdateInputProcessorResult>['manyHasOne'] = {
@@ -78,6 +80,7 @@ export class SqlUpdateInputProcessor implements UpdateInputProcessor<SqlUpdateIn
 		upsert: hasManyProcessor(ctx => this.oneHasManyUpdateInputProcessor.upsert(ctx)),
 		delete: hasManyProcessor(ctx => this.oneHasManyUpdateInputProcessor.delete(ctx)),
 		disconnect: hasManyProcessor(ctx => this.oneHasManyUpdateInputProcessor.disconnect(ctx)),
+		set: relationFieldProcessor(ctx => this.oneHasManyUpdateInputProcessor.set(ctx)),
 	}
 
 	oneHasOneInverse: UpdateInputProcessor<SqlUpdateInputProcessorResult>['oneHasOneInverse'] = {

@@ -1,4 +1,13 @@
-import { GraphQLBoolean, GraphQLInputFieldConfig, GraphQLInputFieldConfigMap, GraphQLInputObjectType, GraphQLNonNull, GraphQLString } from 'graphql'
+import {
+	GraphQLBoolean,
+	GraphQLEnumType,
+	GraphQLInputFieldConfig,
+	GraphQLInputFieldConfigMap,
+	GraphQLInputObjectType,
+	GraphQLList,
+	GraphQLNonNull,
+	GraphQLString,
+} from 'graphql'
 import { Acl, Input, Model } from '@contember/schema'
 import { GqlTypeName } from '../utils.js'
 import { WhereTypeProvider } from '../WhereTypeProvider.js'
@@ -9,6 +18,14 @@ import { UpdateEntityRelationAllowedOperationsVisitor } from './UpdateEntityRela
 import { Authorizator } from '../../acl/index.js'
 import { ImplementationException } from '../../exception.js'
 import { ConnectOrCreateRelationInputProvider } from './ConnectOrCreateRelationInputProvider.js'
+
+const orphanRemovalStrategyEnum = new GraphQLEnumType({
+	name: 'OrphanRemovalStrategy',
+	values: {
+		[Input.OrphanRemovalStrategy.disconnect]: {},
+		[Input.OrphanRemovalStrategy.delete]: {},
+	},
+})
 
 export class UpdateEntityRelationInputFieldVisitor
 	implements Model.ColumnVisitor<never>, Model.RelationByGenericTypeVisitor<GraphQLInputObjectType | undefined>
@@ -136,10 +153,36 @@ export class UpdateEntityRelationInputFieldVisitor
 			return undefined
 		}
 
+		// The `set` operation declaratively replaces the whole collection. Its items reuse the
+		// positive operations (no delete/disconnect); orphans are removed via `orphanStrategy`.
+		const setItemFields = this.filterAllowedOperations(entity, relation, {
+			[Input.UpdateRelationOperation.create]: createInput,
+			[Input.UpdateRelationOperation.connect]: whereInput,
+			[Input.UpdateRelationOperation.connectOrCreate]: connectOrCreateInput,
+			[Input.UpdateRelationOperation.update]: updateSpecifiedInput,
+			[Input.UpdateRelationOperation.upsert]: upsertInput,
+		})
+		const setField = Object.keys(setItemFields).length > 0
+			? {
+				type: new GraphQLList(
+					new GraphQLNonNull(
+						new GraphQLInputObjectType({
+							name: GqlTypeName`${entity.name}Set${relation.name}ItemRelationInput`,
+							fields: () => ({
+								...setItemFields,
+								alias: { type: GraphQLString },
+							}),
+						}),
+					),
+				),
+			}
+			: undefined
+
 		return new GraphQLInputObjectType({
 			name: GqlTypeName`${entity.name}Update${relation.name}EntityRelationInput`,
 			fields: () => ({
 				...filteredFields,
+				...(setField ? { [Input.UpdateRelationOperation.set]: setField, orphanStrategy: { type: orphanRemovalStrategyEnum } } : {}),
 				alias: { type: GraphQLString },
 			}),
 		})

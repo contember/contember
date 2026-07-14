@@ -4,6 +4,7 @@ import { TriggerPayloadBuilder } from './triggers/TriggerPayloadBuilder.js'
 import { TriggerPayloadPersister } from './triggers/TriggerPayloadPersister.js'
 import { ExecutionContainerHook } from '@contember/engine-content-api'
 import { ActionsMetrics } from './ActionsMetrics.js'
+import { createAttemptScopedTriggeredActionsCollector } from './triggers/AttemptScopedTriggeredActionsCollector.js'
 
 export class ActionsExecutionContainerHookFactory {
 	constructor(
@@ -24,6 +25,10 @@ export class ActionsExecutionContainerHookFactory {
 				) => {
 					const projectMetrics = this.metricsProvider()?.forProject(project.slug)
 					mapperFactory.hooks.push(mapper => {
+						const attemptCollector = createAttemptScopedTriggeredActionsCollector(
+							triggeredActionsCollector,
+							publish => mapper.eventManager.listen('AfterCommitEvent', async () => publish()),
+						)
 						const triggerPayloadPersister = new TriggerPayloadPersister(
 							mapper,
 							mapper.db.forSchema(systemSchema),
@@ -33,7 +38,7 @@ export class ActionsExecutionContainerHookFactory {
 							schemaMeta.id,
 							mapper.identityId,
 							userInfo,
-							triggeredActionsCollector,
+							attemptCollector,
 							projectMetrics,
 						)
 						const triggerPayloadBuilder = new TriggerPayloadBuilder(mapper)

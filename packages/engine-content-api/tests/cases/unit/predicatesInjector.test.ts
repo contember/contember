@@ -246,7 +246,7 @@ describe('predicates injector relation guard ingress', () => {
 			},
 			visitRelation: context => context,
 		})
-		const relationWhere = { not: { url: { eq: 'probe' } } }
+		const relationWhere = { not: { image: { url: { eq: 'probe' } } } }
 		const injection = injector.injectForRead(schema.model.entities.Article, { coverPhoto: relationWhere })
 
 		assert.deepStrictEqual(injection.where, { coverPhoto: relationWhere })

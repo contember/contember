@@ -42,15 +42,26 @@ export class PredicatesInjector {
 		context: PredicateContext = rootQueryPredicateContext,
 	): PredicateInjection {
 		const initialRelationPath = getEvaluatedRelationPath(context) ?? []
-		const rootGuard = this.createReadGuard(
+		const fieldGuard = this.createFieldGuard(context, undefined, initialRelationPath)
+		const relationGuard = this.createRelationGuard(context, initialRelationPath, fieldGuard)
+		const rootRowGuard = this.createReadGuard(
 			entity,
-			this.collectReferencedFields(entity, where),
+			[],
 			true,
 			undefined,
 			initialRelationPath,
 			context,
 		)
-		const relationGuard = this.createRelationGuard(context, initialRelationPath)
+		const rootGuard = createGuardObligationWhere(
+			this.schema,
+			entity,
+			where,
+			rootRowGuard,
+			relationGuard,
+			[],
+			fieldGuard,
+			{ includeRelationTargets: false },
+		)
 		return { where, guard: rootGuard, relationGuard }
 	}
 
@@ -82,8 +93,8 @@ export class PredicatesInjector {
 				: createPredicateContextWithEvaluatedRelationPath('through', [relationContext])
 			: contextOrRelation
 		const initialRelationPath = getEvaluatedRelationPath(context) ?? []
-		const relationGuard = this.createRelationGuard(context, initialRelationPath)
 		const fieldGuard = this.createFieldGuard(context, relationContext, ancestorPath)
+		const relationGuard = this.createRelationGuard(context, initialRelationPath, fieldGuard)
 		const restrictedWhere = this.injectToWhere(where, entity, true, relationContext, false, ancestorPath, context, relationGuard, fieldGuard, [], {})
 		const injectedWhere = this.createWhere(entity, undefined, restrictedWhere, true, relationContext, false, ancestorPath, context)
 		return injectedWhere
@@ -92,18 +103,32 @@ export class PredicatesInjector {
 	private createRelationGuard(
 		context: PredicateContext,
 		initialRelationPath: readonly Model.AnyRelationContext[],
+		fieldGuard: FieldPredicateGuard,
 	): RelationPredicateGuard {
-		return {
-			create: (relationContext, relationWhere, traversedRelationPath) =>
-				this.createReadGuard(
+		const relationGuard: RelationPredicateGuard = {
+			create: (relationContext, relationWhere, traversedRelationPath) => {
+				const targetPath = [...traversedRelationPath, relationContext]
+				const targetRowGuard = this.createReadGuard(
 					relationContext.targetEntity,
-					this.collectReferencedFields(relationContext.targetEntity, relationWhere),
+					[],
 					false,
 					relationContext,
-					[...initialRelationPath, ...traversedRelationPath, relationContext],
+					[...initialRelationPath, ...targetPath],
 					context,
-				),
+				)
+				return createGuardObligationWhere(
+					this.schema,
+					relationContext.targetEntity,
+					relationWhere,
+					targetRowGuard,
+					relationGuard,
+					targetPath,
+					fieldGuard,
+					{ includeRelationTargets: false },
+				)
+			},
 		}
+		return relationGuard
 	}
 
 	private createFieldGuard(
@@ -176,36 +201,6 @@ export class PredicatesInjector {
 			&& !Array.isArray(condition)
 			&& 'always' in condition
 			&& condition.always === true
-	}
-
-	private collectReferencedFields(entity: Model.Entity, where: Input.OptionalWhere): string[] {
-		const fields = new Set<string>()
-		const visit = (currentWhere: Input.OptionalWhere): void => {
-			if (currentWhere.and) {
-				for (const item of currentWhere.and) {
-					if (item) {
-						visit(item)
-					}
-				}
-			}
-			if (currentWhere.or) {
-				for (const item of currentWhere.or) {
-					if (item) {
-						visit(item)
-					}
-				}
-			}
-			if (currentWhere.not) {
-				visit(currentWhere.not)
-			}
-			for (const fieldName of Object.keys(currentWhere)) {
-				if (fieldName !== 'and' && fieldName !== 'or' && fieldName !== 'not' && entity.fields[fieldName] !== undefined) {
-					fields.add(fieldName)
-				}
-			}
-		}
-		visit(where)
-		return [...fields]
 	}
 
 	private createReadGuard(
@@ -483,6 +478,7 @@ export class PredicatesInjector {
 				relationGuard,
 				traversedRelationPath,
 				fieldGuard,
+				{ polarity: 'negative' },
 			)
 			if (Object.keys(obligation).length === 0) {
 				resultWhere.not = injectedNot

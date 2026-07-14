@@ -134,7 +134,11 @@ test('CLASS 1 — order-by on a cell-level field: masked sort key cannot influen
 			await update(t, 'Item', ctx.c, { sortKey: 1 })
 		},
 		// masked sortKey ties → fall back to readable name; must stay [a,b,c] regardless of sortKey
-		restrictedQueries: [{ query: gql`query { listItem(orderBy: [{ sortKey: asc }, { name: asc }]) { name sortKey } }` }],
+		restrictedQueries: [{
+			query: gql`query { listItem(orderBy: [{ sortKey: asc }, { name: asc }]) { name sortKey } }`,
+		}, {
+			query: gql`query { listItem(filter: { or: [{ sortKey: { eq: 1 } }, { name: { eq: "a" } }] }) { name } }`,
+		}],
 		// root orders by the real sortKey → order flips when it is permuted
 		teethQueries: [{ query: gql`query { listItem(orderBy: [{ sortKey: asc }]) { name } }` }],
 	})
@@ -145,6 +149,8 @@ test('CLASS 1 — order-by on a cell-level field: masked sort key cannot influen
 		{ name: 'b', sortKey: null },
 		{ name: 'c', sortKey: null },
 	])
+	// The public OR branch must not inherit the unreadable sortKey branch's cell guard.
+	expect(restrictedA[1].listItem).toStrictEqual([{ name: 'a' }])
 	// teeth spelled out: root order really flips
 	expect(teethA[0].listItem.map((i: any) => i.name)).toStrictEqual(['a', 'b', 'c'])
 	expect(teethB[0].listItem.map((i: any) => i.name)).toStrictEqual(['c', 'b', 'a'])
@@ -182,7 +188,7 @@ namespace C2a {
 }
 
 test('CLASS 2a — order-by through a relation: masked target column cannot influence order', async () => {
-	const { teethA, teethB } = await assertLeakOracle({
+	const { restrictedA, teethA, teethB } = await assertLeakOracle({
 		schema: createSchema(C2a),
 		role: 'reader',
 		setupA: async t => {
@@ -199,9 +205,17 @@ test('CLASS 2a — order-by through a relation: masked target column cannot infl
 			await update(t, 'Author', ctx.a1, { name: 'c' })
 			await update(t, 'Author', ctx.a3, { name: 'a' })
 		},
-		restrictedQueries: [{ query: gql`query { listPost(orderBy: [{ author: { name: asc } }, { title: asc }]) { title } }` }],
+		restrictedQueries: [{
+			query: gql`query { listPost(orderBy: [{ author: { name: asc } }, { title: asc }]) { title } }`,
+		}, {
+			query: gql`query { listPost(
+				filter: { author: { or: [{ name: { eq: "a" } }, { id: { isNull: false } }] } }
+				orderBy: [{ title: asc }]
+			) { title } }`,
+		}],
 		teethQueries: [{ query: gql`query { listPost(orderBy: [{ author: { name: asc } }, { title: asc }]) { title } }` }],
 	})
+	expect(restrictedA[1].listPost).toStrictEqual([{ title: 't1' }, { title: 't2' }, { title: 't3' }])
 	expect(teethA[0].listPost.map((p: any) => p.title)).toStrictEqual(['t1', 't2', 't3'])
 	expect(teethB[0].listPost.map((p: any) => p.title)).toStrictEqual(['t3', 't2', 't1'])
 })
@@ -427,7 +441,7 @@ test('CLASS 5 — to-many back-reference oracle: unreadable sibling secret canno
 })
 
 // =============================================================================================
-// CLASS 5b: relation-local NOT — target row guards must stay outside the user boolean expression
+// CLASS 5b: relation-local NOT — set-lowered relations use readable-view Boolean semantics
 // =============================================================================================
 namespace C5b {
 	export const reader = acl.createRole('reader')
@@ -469,7 +483,7 @@ namespace C5b {
 	}
 }
 
-test('CLASS 5b — enclosing NOT keeps a 1:N target guard positive', async () => {
+test('CLASS 5b — enclosing NOT complements readable 1:N targets', async () => {
 	const { restrictedA, teethA, teethB } = await assertLeakOracle({
 		schema: createSchema(C5b),
 		role: 'reader',
@@ -495,9 +509,9 @@ test('CLASS 5b — enclosing NOT keeps a 1:N target guard positive', async () =>
 			query: gql`query { listParent(filter: { not: { children: { id: { isNull: false } } } }, orderBy: [{ name: asc }]) { name } }`,
 		}],
 	})
-	expect(restrictedA[0].listParent).toStrictEqual([])
-	// Positive control: a readable child which does not match the negated value condition is retained.
-	expect(restrictedA[1].listParent).toStrictEqual([{ name: 'readable' }])
+	expect(restrictedA[0].listParent).toStrictEqual([{ name: 'hidden' }])
+	// A value predicate is also evaluated over the readable child set for a 1:N relation.
+	expect(restrictedA[1].listParent).toStrictEqual([{ name: 'hidden' }, { name: 'readable' }])
 	// Root sees absence turn into presence, proving the unreadable-row mutation has teeth.
 	expect(teethA[0].listParent).toStrictEqual([{ name: 'hidden' }])
 	expect(teethB[0].listParent).toStrictEqual([])
@@ -529,13 +543,13 @@ test('CLASS 5c — enclosing NOT gives absent and unreadable to-one targets the 
 			query: gql`query { listParent(filter: { not: { featuredChild: { id: { isNull: false } } } }, orderBy: [{ name: asc }]) { name } }`,
 		}],
 	})
-	expect(restrictedA[0].listParent).toStrictEqual([])
-	expect(restrictedA[1].listParent).toStrictEqual([{ name: 'visible' }])
+	expect(restrictedA[0].listParent).toStrictEqual([{ name: 'absent' }])
+	expect(restrictedA[1].listParent).toStrictEqual([{ name: 'absent' }, { name: 'visible' }])
 	expect(teethA[0].listParent).toStrictEqual([{ name: 'absent' }])
 	expect(teethB[0].listParent).toStrictEqual([])
 })
 
-test('CLASS 5d — enclosing NOT keeps an M:N target guard positive', async () => {
+test('CLASS 5d — enclosing NOT complements readable M:N targets', async () => {
 	const { restrictedA, teethA, teethB } = await assertLeakOracle({
 		schema: createSchema(C5b),
 		role: 'reader',
@@ -561,8 +575,8 @@ test('CLASS 5d — enclosing NOT keeps an M:N target guard positive', async () =
 			query: gql`query { listParent(filter: { not: { tags: { id: { isNull: false } } } }, orderBy: [{ name: asc }]) { name } }`,
 		}],
 	})
-	expect(restrictedA[0].listParent).toStrictEqual([])
-	expect(restrictedA[1].listParent).toStrictEqual([{ name: 'visible' }])
+	expect(restrictedA[0].listParent).toStrictEqual([{ name: 'absent' }])
+	expect(restrictedA[1].listParent).toStrictEqual([{ name: 'absent' }, { name: 'visible' }])
 	expect(teethA[0].listParent).toStrictEqual([{ name: 'absent' }])
 	expect(teethB[0].listParent).toStrictEqual([])
 })
@@ -601,8 +615,8 @@ test('CLASS 5e — enclosing NOT carries leaf guards through an unrestricted int
 		})),
 	})
 	for (let index = 0; index < nestedRelations.length; index++) {
-		expect(restrictedA[index * 2].listParent).toStrictEqual([])
-		expect(restrictedA[index * 2 + 1].listParent).toStrictEqual([{ name: 'visible' }])
+		expect(restrictedA[index * 2].listParent).toStrictEqual([{ name: 'absent' }])
+		expect(restrictedA[index * 2 + 1].listParent).toStrictEqual([{ name: 'absent' }, { name: 'visible' }])
 		expect(teethA[index].listParent).toStrictEqual([{ name: 'absent' }])
 		expect(teethB[index].listParent).toStrictEqual([])
 	}
@@ -660,8 +674,9 @@ test('CLASS 5f — deep guard alternatives remain OR-local across intermediate r
 			] } } }, orderBy: [{ name: asc }]) { name } }`,
 		}],
 	})
-	expect(restrictedA[0].listParent).toStrictEqual([])
+	expect(restrictedA[0].listParent).toStrictEqual([{ name: 'absent' }])
 	expect(restrictedA[1].listParent).toStrictEqual([
+		{ name: 'absent' },
 		{ name: 'both-different' },
 		{ name: 'both-same' },
 		{ name: 'children-only' },

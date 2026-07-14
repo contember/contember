@@ -241,7 +241,7 @@ describe('where builder', () => {
 		for (const useAdvancedBuilder of [false, true]) {
 			assert.equal(
 				createWhere(schema, where, 'Article', injection, false, useAdvancedBuilder),
-				' where not("root_author"."name" = ?) and "root_"."is_public" = ?',
+				' where not(exists (select 1  from "__SCHEMA__"."author" as "root_author"  where "root_"."author_id" = "root_author"."id" and "root_author"."name" = ?)) and "root_"."is_public" = ?',
 			)
 		}
 	})
@@ -390,6 +390,21 @@ describe('where builder', () => {
 		)
 	})
 
+	it('treats guarded direct absence and condition-level NOT presence as equivalent', () => {
+		const schema = createSchema(WhereBuilderModel)
+		const directAbsence: Input.OptionalWhere = { author: { id: { isNull: true } } }
+		const negatedPresence: Input.OptionalWhere = { author: { not: { id: { isNull: false } } } }
+		const directSql = createWhere(schema, directAbsence, 'Article', readableRelationInjection(directAbsence))
+		const negatedSql = createWhere(schema, negatedPresence, 'Article', readableRelationInjection(negatedPresence))
+		assert.equal(directSql, negatedSql)
+		compareWhere(
+			directSql,
+			`where not(exists (select 1
+				from "__SCHEMA__"."author" as "root_author"
+				where "root_"."author_id" = "root_author"."id" and "root_author"."is_public" = ?))`,
+		)
+	})
+
 	it('keeps a relation target guard outside user NOT for to-one, to-many, and many-to-many filters', () => {
 		const schema = createSchema(WhereBuilderModel)
 		const probe = '123e4567-e89b-12d3-a456-426614174000'
@@ -440,7 +455,60 @@ describe('where builder', () => {
 		)
 	})
 
-	it('keeps a to-one target guard positive under an enclosing NOT', () => {
+	it('keeps a root cell guard local to the restricted branch of a mixed OR', () => {
+		const schema = createSchema(WhereBuilderModel)
+		const where: Input.OptionalWhere = {
+			or: [
+				{ secret: { eq: 'probe' } },
+				{ name: { eq: 'public fallback' } },
+			],
+		}
+		const sql = createWhere(schema, where, 'Author', createExplicitInjection(schema, 'Author', where))
+		const normalized = sql.replaceAll(/\s+/g, ' ').trim()
+		assert.equal(normalized.match(/"root_"\."secret_visible" = \?/g)?.length, 1)
+		assert.equal(
+			normalized.includes('("root_"."secret" = ? and "root_"."secret_visible" = ? or "root_"."name" = ?)'),
+			true,
+		)
+	})
+
+	it('keeps a nested cell guard local to the restricted branch of a mixed OR', () => {
+		const schema = createSchema(WhereBuilderModel)
+		const where: Input.OptionalWhere = {
+			author: {
+				or: [
+					{ secret: { eq: 'probe' } },
+					{ name: { eq: 'public fallback' } },
+				],
+			},
+		}
+		const sql = createWhere(schema, where, 'Article', createExplicitInjection(schema, 'Article', where))
+		const normalized = sql.replaceAll(/\s+/g, ' ').trim()
+		assert.equal(normalized.match(/"root_author"\."secret_visible" = \?/g)?.length, 1)
+		assert.equal(
+			normalized.includes('("root_author"."secret" = ? and "root_author"."secret_visible" = ? or "root_author"."name" = ?)'),
+			true,
+		)
+	})
+
+	it('does not apply a restricted branch cell guard to a relation absence branch', () => {
+		const schema = createSchema(WhereBuilderModel)
+		const where: Input.OptionalWhere = {
+			author: {
+				or: [
+					{ id: { isNull: true } },
+					{ secret: { eq: 'probe' } },
+				],
+			},
+		}
+		const sql = createWhere(schema, where, 'Article', createExplicitInjection(schema, 'Article', where))
+		const normalized = sql.replaceAll(/\s+/g, ' ').trim()
+		assert.equal(normalized.match(/"root_author"\."is_public" = \?/g)?.length, 2)
+		assert.equal(normalized.match(/"root_author"\."secret_visible" = \?/g)?.length, 1)
+		assert.equal(normalized.indexOf('"root_author"."secret_visible" = ?') > normalized.indexOf(' or exists ('), true)
+	})
+
+	it('treats an unreadable to-one target as absent under NOT presence', () => {
 		const schema = createSchema(WhereBuilderModel)
 		const where: Input.OptionalWhere = { not: { author: { id: { isNull: false } } } }
 		const injection = readableRelationInjection(where)
@@ -449,12 +517,48 @@ describe('where builder', () => {
 		assert.equal(optimized, unoptimized)
 		compareWhere(
 			optimized,
-			`where not(not("root_author"."id" is null) and "root_author"."is_public" = ?)
-				and "root_author"."is_public" = ?`,
+			`where not(exists (select 1
+				from "__SCHEMA__"."author" as "root_author"
+				where "root_"."author_id" = "root_author"."id" and "root_author"."is_public" = ?))`,
 		)
 	})
 
-	it('keeps an enclosing-NOT target guard local to its OR branch', () => {
+	it('uses the same readable-view NOT value semantics for to-one and to-many relations', () => {
+		const schema = createSchema(WhereBuilderModel)
+		const toOneWhere: Input.OptionalWhere = { not: { author: { name: { eq: 'blocked' } } } }
+		const toManyWhere: Input.OptionalWhere = { not: { articles: { title: { eq: 'blocked' } } } }
+		const toOne = createWhere(schema, toOneWhere, 'Article', readableRelationInjection(toOneWhere))
+		const toMany = createWhere(schema, toManyWhere, 'Author', readableRelationInjection(toManyWhere))
+		compareWhere(
+			toOne,
+			`where not(exists (select 1
+				from "__SCHEMA__"."author" as "root_author"
+				where "root_"."author_id" = "root_author"."id"
+					and "root_author"."name" = ?
+					and "root_author"."is_public" = ?))`,
+		)
+		compareWhere(
+			toMany,
+			`where not(exists (select 1
+				from "__SCHEMA__"."article" as "root_articles"
+				where "root_"."id" = "root_articles"."author_id"
+					and "root_articles"."title" = ?
+					and "root_articles"."is_public" = ?))`,
+		)
+	})
+
+	it('keeps a to-one target cell guard inside the readable-view NOT subquery', () => {
+		const schema = createSchema(WhereBuilderModel)
+		const where: Input.OptionalWhere = { not: { author: { secret: { eq: 'probe' } } } }
+		const sql = createWhere(schema, where, 'Article', createExplicitInjection(schema, 'Article', where))
+		const normalized = sql.replaceAll(/\s+/g, ' ').trim()
+		assert.equal(normalized.startsWith('where not(exists ('), true)
+		assert.equal(normalized.match(/"root_author"\."secret" = \?/g)?.length, 1)
+		assert.equal(normalized.match(/"root_author"\."secret_visible" = \?/g)?.length, 1)
+		assert.equal(normalized.match(/"root_author"\."is_public" = \?/g)?.length, 1)
+	})
+
+	it('keeps readable-view NOT presence local to its OR branch', () => {
 		const schema = createSchema(WhereBuilderModel)
 		const where: Input.OptionalWhere = {
 			or: [
@@ -465,13 +569,14 @@ describe('where builder', () => {
 		const sql = createWhere(schema, where, 'Article', readableRelationInjection(where))
 		compareWhere(
 			sql,
-			`where (not(not("root_author"."id" is null) and "root_author"."is_public" = ?)
-				and "root_author"."is_public" = ?
+			`where (not(exists (select 1
+				from "__SCHEMA__"."author" as "root_author"
+				where "root_"."author_id" = "root_author"."id" and "root_author"."is_public" = ?))
 				or "root_"."title" = ?)`,
 		)
 	})
 
-	it('keeps nested 1:N and M:N target guards positive under enclosing NOT in both filter modes', () => {
+	it('complements nested 1:N and M:N presence over readable targets in both filter modes', () => {
 		const schemas: Schema[] = [
 			createSchema(WhereBuilderModel),
 			{ ...createSchema(WhereBuilderModel), settings: { useExistsInHasManyFilter: true } },
@@ -486,12 +591,13 @@ describe('where builder', () => {
 				const where: Input.OptionalWhere = { not: nestedWhere }
 				const sql = createWhere(schema, where, 'Author', readableRelationInjection(where))
 				const normalized = sql.replaceAll(/\s+/g, ' ').trim()
-				assert.equal(normalized.includes(') and exists (select 1 from "__SCHEMA__"."article" as "root_articles"'), true)
-				assert.equal(normalized.match(/"root_articles"\."is_public" = \?/g)?.length, 2)
+				assert.equal(normalized.startsWith('where not(exists (select 1 from "__SCHEMA__"."article" as "root_articles"'), true)
+				assert.equal(normalized.includes(') and exists (select 1 from "__SCHEMA__"."article" as "root_articles"'), false)
+				assert.equal(normalized.match(/"root_articles"\."is_public" = \?/g)?.length, 1)
 				if ('comments' in nestedWhere.articles) {
-					assert.equal(normalized.match(/"root_articles_comments"\."is_public" = \?/g)?.length, 2)
+					assert.equal(normalized.match(/"root_articles_comments"\."is_public" = \?/g)?.length, 1)
 				} else {
-					assert.equal(normalized.match(/"root_articles_tags"\."name" = \?/g)?.length, 2)
+					assert.equal(normalized.match(/"root_articles_tags"\."name" = \?/g)?.length, 1)
 				}
 			}
 		}
@@ -518,12 +624,12 @@ describe('where builder', () => {
 		assert.equal(optimized, unoptimized)
 
 		const normalized = optimized.replaceAll(/\s+/g, ' ').trim()
-		assert.equal(normalized.match(/"root_article_author"\."is_public" = \?/g)?.length, 2)
-		assert.equal(normalized.includes(') and "root_article_author"."is_public" = ?'), true)
+		assert.equal(normalized.match(/"root_article_author"\."is_public" = \?/g)?.length, 1)
+		assert.equal(normalized.includes(') and "root_article_author"."is_public" = ?'), false)
 		assert.equal(normalized.endsWith('or "root_"."content" = ?)'), true)
 	})
 
-	it('carries legacy nested 1:N and M:N guards through an unrestricted intermediate under NOT', () => {
+	it('complements deep 1:N and M:N presence through an unrestricted intermediate', () => {
 		const schema = createSchema(WhereBuilderModel)
 		for (
 			const nestedWhere of [
@@ -538,12 +644,12 @@ describe('where builder', () => {
 			assert.equal(optimized, unoptimized)
 
 			const normalized = optimized.replaceAll(/\s+/g, ' ').trim()
-			assert.equal(normalized.includes(') and exists (select 1 from "__SCHEMA__"."article" as "root_articles"'), true)
+			assert.equal(normalized.includes(') and exists (select 1 from "__SCHEMA__"."article" as "root_articles"'), false)
 			assert.equal(normalized.includes('"root_articles"."is_public" = ?'), false)
 			if ('comments' in nestedWhere.articles) {
-				assert.equal(normalized.match(/"root_articles_comments"\."is_public" = \?/g)?.length, 2)
+				assert.equal(normalized.match(/"root_articles_comments"\."is_public" = \?/g)?.length, 1)
 			} else {
-				assert.equal(normalized.match(/"root_articles_tags"\."name" = \?/g)?.length, 2)
+				assert.equal(normalized.match(/"root_articles_tags"\."name" = \?/g)?.length, 1)
 			}
 		}
 	})
@@ -643,7 +749,11 @@ describe('where builder', () => {
 				const unoptimized = createWhere(schema, testCase.where, testCase.entity, variant, true)
 				assert.equal(optimized, expectedOptimized)
 				assert.equal(unoptimized, expectedUnoptimized)
-				for (const sql of [explicitOptimized, explicitUnoptimized, optimized, unoptimized]) {
+				for (const sql of [explicitOptimized, explicitUnoptimized]) {
+					assert.equal(sql.includes('"secret"'), false)
+					assert.equal(sql.match(/"root_(?:article_)?author"\."is_public" = \?/g)?.length, 1)
+				}
+				for (const sql of [optimized, unoptimized]) {
 					assert.equal(sql.includes('"secret"'), false)
 					assert.equal(sql.match(/"root_(?:article_)?author"\."is_public" = \?/g)?.length, 2)
 				}
@@ -793,11 +903,15 @@ describe('where builder', () => {
 				for (const disableOptimizer of [false, true]) {
 					const legacySql = createWhere(schema, testCase.where, testCase.entity, variant, disableOptimizer)
 					const explicitSql = createWhere(schema, testCase.where, testCase.entity, explicit, disableOptimizer)
-					assert.equal(explicitSql, legacySql)
-					assert.equal(legacySql.includes('"secret"'), false)
-					const matches = legacySql.match(testCase.guardPattern) ?? []
-					assert.equal(matches.filter(match => match.includes('"active"')).length, 2)
-					assert.equal(matches.filter(match => match.includes('"flag"')).length, 2)
+					for (const sql of [legacySql, explicitSql]) {
+						assert.equal(sql.includes('"secret"'), false)
+					}
+					const legacyMatches = legacySql.match(testCase.guardPattern) ?? []
+					assert.equal(legacyMatches.filter(match => match.includes('"active"')).length, 2)
+					assert.equal(legacyMatches.filter(match => match.includes('"flag"')).length, 2)
+					const explicitMatches = explicitSql.match(testCase.guardPattern) ?? []
+					assert.equal(explicitMatches.filter(match => match.includes('"active"')).length, 1)
+					assert.equal(explicitMatches.filter(match => match.includes('"flag"')).length, 1)
 				}
 			}
 		}
@@ -847,7 +961,7 @@ describe('where builder', () => {
 		})
 	})
 
-	it('keeps separate relation branch guards disjunctive under explicit and legacy NOT OR', () => {
+	it('complements explicit relation presence branches while preserving serialized legacy guards', () => {
 		const where: Input.OptionalWhere = {
 			not: {
 				or: [
@@ -908,18 +1022,21 @@ describe('where builder', () => {
 			for (const disableOptimizer of [false, true]) {
 				const legacySql = createWhere(schema, where, 'Article', legacy, disableOptimizer)
 				const explicitSql = createWhere(schema, where, 'Article', explicit, disableOptimizer)
-				assert.equal(explicitSql, legacySql)
-				const normalized = explicitSql.replaceAll(/\s+/g, ' ').trim()
-				assert.equal(normalized.match(/"root_author"\."is_public" = \?/g)?.length, 2)
-				assert.equal(normalized.match(/"root_tags"\."name" = \?/g)?.length, 2)
-				const positiveAuthorGuard = normalized.lastIndexOf('"root_author"."is_public" = ?')
-				const positiveTagGuard = normalized.lastIndexOf('"root_tags"."name" = ?')
-				assert.equal(normalized.slice(positiveAuthorGuard, positiveTagGuard).includes(' or '), true)
+				const explicitNormalized = explicitSql.replaceAll(/\s+/g, ' ').trim()
+				assert.equal(explicitNormalized.match(/"root_author"\."is_public" = \?/g)?.length, 1)
+				assert.equal(explicitNormalized.match(/"root_tags"\."name" = \?/g)?.length, 1)
+				assert.equal(explicitNormalized.startsWith('where not((exists ('), true)
+				const legacyNormalized = legacySql.replaceAll(/\s+/g, ' ').trim()
+				assert.equal(legacyNormalized.match(/"root_author"\."is_public" = \?/g)?.length, 2)
+				assert.equal(legacyNormalized.match(/"root_tags"\."name" = \?/g)?.length, 2)
+				const positiveAuthorGuard = legacyNormalized.lastIndexOf('"root_author"."is_public" = ?')
+				const positiveTagGuard = legacyNormalized.lastIndexOf('"root_tags"."name" = ?')
+				assert.equal(legacyNormalized.slice(positiveAuthorGuard, positiveTagGuard).includes(' or '), true)
 			}
 		}
 	})
 
-	it('keeps deep relation-guard OR alternatives disjunctive in legacy and exists modes', () => {
+	it('complements deep relation-presence OR alternatives in both filter modes', () => {
 		const schemas: Schema[] = [
 			createSchema(WhereBuilderModel),
 			{ ...createSchema(WhereBuilderModel), settings: { useExistsInHasManyFilter: true } },
@@ -941,16 +1058,10 @@ describe('where builder', () => {
 			assert.equal(optimized, unoptimized)
 
 			const normalized = optimized.replaceAll(/\s+/g, ' ').trim()
-			assert.equal(normalized.match(/"root_articles_comments"\."is_public" = \?/g)?.length, 2)
-			assert.equal(normalized.match(/"root_articles_tags"\."name" = \?/g)?.length, 2)
-			const obligation = normalized.slice(normalized.lastIndexOf(') and exists (select 1'))
-			assert.equal(obligation.includes('"root_articles_comments"."is_public" = ?'), true)
-			assert.equal(obligation.includes('"root_articles_tags"."name" = ?'), true)
-			assert.equal(
-				obligation.includes('"root_articles_comments"."is_public" = ? or "root_articles_tags"."name" = ?')
-					|| obligation.includes(') or exists ('),
-				true,
-			)
+			assert.equal(normalized.match(/"root_articles_comments"\."is_public" = \?/g)?.length, 1)
+			assert.equal(normalized.match(/"root_articles_tags"\."name" = \?/g)?.length, 1)
+			assert.equal(normalized.startsWith('where not(exists ('), true)
+			assert.equal(normalized.includes(') and exists (select 1'), false)
 		}
 	})
 

@@ -220,6 +220,7 @@ export class WhereBuilder {
 		allowManyJoin,
 		relationGuard,
 		traversedRelationPath,
+		forceRelationSetSemantics = false,
 	}: {
 		conditionBuilder: SqlConditionBuilder
 		entity: Model.Entity
@@ -229,6 +230,7 @@ export class WhereBuilder {
 		allowManyJoin: boolean
 		relationGuard?: RelationPredicateGuard
 		traversedRelationPath: readonly Model.AnyRelationContext[]
+		forceRelationSetSemantics?: boolean
 	}): SqlConditionBuilder {
 		const tableName = path.alias
 
@@ -246,6 +248,7 @@ export class WhereBuilder {
 							allowManyJoin,
 							relationGuard,
 							traversedRelationPath,
+							forceRelationSetSemantics,
 						}),
 					clause,
 				)
@@ -268,6 +271,7 @@ export class WhereBuilder {
 									allowManyJoin,
 									relationGuard,
 									traversedRelationPath,
+									forceRelationSetSemantics,
 								})
 							),
 					clause,
@@ -286,10 +290,11 @@ export class WhereBuilder {
 					allowManyJoin,
 					relationGuard,
 					traversedRelationPath,
+					forceRelationSetSemantics: forceRelationSetSemantics || relationGuard !== undefined,
 				})
 			)
 			if (relationGuard !== undefined) {
-				// Materialize once so OR branches stay local and generated guard fields are not resolved again.
+				// Keep scalar and cell guards positive while relation guards stay inside EXISTS.
 				const guardObligation = createGuardObligationWhere(
 					this.schema,
 					entity,
@@ -297,6 +302,11 @@ export class WhereBuilder {
 					{},
 					relationGuard,
 					traversedRelationPath,
+					undefined,
+					{
+						polarity: 'negative',
+						shouldMaterializeRelation: () => false,
+					},
 				)
 				if (Object.keys(guardObligation).length > 0) {
 					conditionBuilder = this.buildRecursive({
@@ -308,6 +318,7 @@ export class WhereBuilder {
 						allowManyJoin,
 						relationGuard: undefined,
 						traversedRelationPath,
+						forceRelationSetSemantics: false,
 					})
 				}
 			}
@@ -330,24 +341,21 @@ export class WhereBuilder {
 				if (!relationWhere || Object.keys(relationWhere).length === 0) {
 					return conditionBuilder
 				}
-				const targetGuard = this.normalizeGuard(
-					relationGuard?.create(context, relationWhere, traversedRelationPath),
-					targetEntity,
-				) ?? {}
 				const relationSetCondition = this.buildRelationSetCondition(
 					conditionBuilder,
 					context,
 					relationWhere,
-					targetGuard,
 					tableName,
 					entity,
 					targetPath,
 					relationGuard,
-					[...traversedRelationPath, context],
+					traversedRelationPath,
+					forceRelationSetSemantics,
 				)
 				if (relationSetCondition !== null) {
 					return relationSetCondition
 				}
+				const targetGuard = this.createRelationGuard(context, relationWhere, relationGuard, traversedRelationPath)
 				const guardedRelationWhere = this.combineWhereAnd([relationWhere, targetGuard])
 				if (isIt<Model.JoiningColumnRelation>(relation, 'joiningColumn')) {
 					const primaryCondition = this.transformWhereToPrimaryCondition(guardedRelationWhere, targetEntity.primary)
@@ -393,20 +401,16 @@ export class WhereBuilder {
 				if (!this.isOptionalWhere(fieldWhere)) {
 					return null
 				}
-				const targetGuard = this.normalizeGuard(
-					relationGuard?.create(context, fieldWhere, traversedRelationPath),
-					context.targetEntity,
-				) ?? {}
 				return this.buildRelationSetCondition(
 					conditionBuilder,
 					context,
 					fieldWhere,
-					targetGuard,
 					tableName,
 					entity,
 					targetPath,
 					relationGuard,
-					[...traversedRelationPath, context],
+					traversedRelationPath,
+					forceRelationSetSemantics,
 				)
 			}
 
@@ -575,22 +579,31 @@ export class WhereBuilder {
 		conditionBuilder: SqlConditionBuilder,
 		context: Model.AnyRelationContext,
 		where: Input.OptionalWhere,
-		guard: Input.OptionalWhere,
 		parentTableName: string,
 		parentEntity: Model.Entity,
 		targetPath: Path,
 		relationGuard: RelationPredicateGuard | undefined,
 		traversedRelationPath: readonly Model.AnyRelationContext[],
+		forceRelationSetSemantics: boolean,
 	): SqlConditionBuilder | null {
-		const expression = this.parseRelationWhere(where, context.targetEntity.primary)
-		if (expression.kind === 'row' || (expression.kind === 'exists' && Object.keys(expression.where).length === 0)) {
+		const parsedExpression = this.parseRelationWhere(where, context.targetEntity.primary)
+		if (parsedExpression.kind === 'row' && !forceRelationSetSemantics) {
+			return null
+		}
+		const expression: RelationSetExpression = parsedExpression.kind === 'row'
+			? { kind: 'exists', where: parsedExpression.where }
+			: parsedExpression
+		if (
+			expression.kind === 'exists'
+			&& Object.keys(expression.where).length === 0
+			&& Object.keys(this.createRelationGuard(context, expression.where, relationGuard, traversedRelationPath)).length === 0
+		) {
 			return null
 		}
 		return this.applyRelationSetExpression(
 			conditionBuilder,
 			expression,
 			context,
-			guard,
 			parentTableName,
 			parentEntity,
 			targetPath,
@@ -759,7 +772,6 @@ export class WhereBuilder {
 		conditionBuilder: SqlConditionBuilder,
 		expression: RelationSetExpression,
 		context: Model.AnyRelationContext,
-		guard: Input.OptionalWhere,
 		parentTableName: string,
 		parentEntity: Model.Entity,
 		targetPath: Path,
@@ -771,7 +783,6 @@ export class WhereBuilder {
 				builder,
 				operand,
 				context,
-				guard,
 				parentTableName,
 				parentEntity,
 				targetPath,
@@ -779,7 +790,8 @@ export class WhereBuilder {
 				traversedRelationPath,
 			)
 		switch (expression.kind) {
-			case 'exists':
+			case 'exists': {
+				const guard = this.createRelationGuard(context, expression.where, relationGuard, traversedRelationPath)
 				return conditionBuilder.exists(
 					this.buildRelationSubquery(
 						context,
@@ -789,10 +801,12 @@ export class WhereBuilder {
 						parentEntity,
 						targetPath,
 						relationGuard,
-						traversedRelationPath,
+						[...traversedRelationPath, context],
 					),
 				)
-			case 'notExists':
+			}
+			case 'notExists': {
+				const guard = this.createRelationGuard(context, expression.where, relationGuard, traversedRelationPath)
 				return conditionBuilder.not(clause =>
 					clause.exists(
 						this.buildRelationSubquery(
@@ -803,10 +817,11 @@ export class WhereBuilder {
 							parentEntity,
 							targetPath,
 							relationGuard,
-							traversedRelationPath,
+							[...traversedRelationPath, context],
 						),
 					)
 				)
+			}
 			case 'and':
 				return conditionBuilder.and(clause => expression.operands.reduce((builder, operand) => apply(builder, operand), clause))
 			case 'or':
@@ -814,6 +829,15 @@ export class WhereBuilder {
 			case 'not':
 				return conditionBuilder.not(clause => apply(clause, expression.operand))
 		}
+	}
+
+	private createRelationGuard(
+		context: Model.AnyRelationContext,
+		where: Input.OptionalWhere,
+		relationGuard: RelationPredicateGuard | undefined,
+		traversedRelationPath: readonly Model.AnyRelationContext[],
+	): Input.OptionalWhere {
+		return this.normalizeGuard(relationGuard?.create(context, where, traversedRelationPath), context.targetEntity) ?? {}
 	}
 
 	private isInputCondition(value: unknown): value is Input.Condition {

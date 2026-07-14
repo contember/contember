@@ -11,6 +11,16 @@ export interface FieldPredicateGuard {
 	): Input.OptionalWhere
 }
 
+export interface GuardObligationOptions {
+	readonly polarity?: 'positive' | 'negative'
+	readonly includeRelationTargets?: boolean
+	readonly shouldMaterializeRelation?: (
+		relationContext: Model.AnyRelationContext,
+		relationWhere: Input.OptionalWhere,
+		traversedRelationPath: readonly Model.AnyRelationContext[],
+	) => boolean
+}
+
 const isOptionalWhere = (value: unknown): value is Input.OptionalWhere =>
 	value !== null && value !== undefined && typeof value === 'object' && !Array.isArray(value)
 
@@ -35,8 +45,12 @@ export const createGuardObligationWhere = (
 	relationGuard: RelationPredicateGuard,
 	traversedRelationPath: readonly Model.AnyRelationContext[],
 	fieldGuard?: FieldPredicateGuard,
+	options: GuardObligationOptions = {},
 ): Input.OptionalWhere => {
-	const collect = (currentWhere: Input.OptionalWhere): { where: Input.OptionalWhere; hasGuard: boolean } => {
+	const collect = (
+		currentWhere: Input.OptionalWhere,
+		polarity: 'positive' | 'negative',
+	): { where: Input.OptionalWhere; hasGuard: boolean } => {
 		const conjuncts: Input.OptionalWhere[] = []
 		const directFieldNames: string[] = []
 		let hasGuard = false
@@ -45,7 +59,7 @@ export const createGuardObligationWhere = (
 			const andObligations: Input.OptionalWhere[] = []
 			for (const item of currentWhere.and) {
 				if (item) {
-					const obligation = collect(item)
+					const obligation = collect(item, polarity)
 					if (obligation.hasGuard) {
 						hasGuard = true
 						andObligations.push(obligation.where)
@@ -60,13 +74,20 @@ export const createGuardObligationWhere = (
 			const branches: { source: Input.OptionalWhere; obligation: Input.OptionalWhere; hasGuard: boolean }[] = []
 			for (const item of currentWhere.or) {
 				if (item) {
-					const obligation = collect(item)
+					const obligation = collect(item, polarity)
 					branches.push({ source: item, obligation: obligation.where, hasGuard: obligation.hasGuard })
 				}
 			}
 			if (branches.some(branch => branch.hasGuard)) {
 				hasGuard = true
-				const alternatives = branches.map(branch => branch.hasGuard ? branch.obligation : branch.source)
+				const alternatives = branches.map(branch => {
+					if (!branch.hasGuard) {
+						return branch.source
+					}
+					return polarity === 'positive'
+						? combineWhereAnd([branch.source, branch.obligation])
+						: branch.obligation
+				})
 				const orObligation = alternatives.some(alternative => Object.keys(alternative).length === 0)
 					? {}
 					: alternatives.length === 1
@@ -76,7 +97,7 @@ export const createGuardObligationWhere = (
 			}
 		}
 		if (currentWhere.not) {
-			const obligation = collect(currentWhere.not)
+			const obligation = collect(currentWhere.not, polarity === 'positive' ? 'negative' : 'positive')
 			if (obligation.hasGuard) {
 				hasGuard = true
 				conjuncts.push(obligation.where)
@@ -94,6 +115,12 @@ export const createGuardObligationWhere = (
 			const nestedGuard = acceptFieldVisitor<Input.OptionalWhere | null>(schema, entity, fieldName, {
 				visitColumn: () => null,
 				visitRelation: nestedContext => {
+					if (options.includeRelationTargets === false) {
+						return null
+					}
+					if (options.shouldMaterializeRelation?.(nestedContext, fieldWhere, traversedRelationPath) === false) {
+						return null
+					}
 					// Structured field guards supply cell predicates per branch, so this resolver contributes only the target row guard.
 					const nestedTargetGuard = relationGuard.create(nestedContext, fieldGuard === undefined ? fieldWhere : {}, traversedRelationPath)
 					const nestedObligation = createGuardObligationWhere(
@@ -104,6 +131,7 @@ export const createGuardObligationWhere = (
 						relationGuard,
 						[...traversedRelationPath, nestedContext],
 						fieldGuard,
+						options,
 					)
 					return Object.keys(nestedObligation).length === 0 ? null : { [fieldName]: nestedObligation }
 				},
@@ -122,6 +150,6 @@ export const createGuardObligationWhere = (
 		}
 		return { where: combineWhereAnd(conjuncts), hasGuard }
 	}
-	const nestedObligation = collect(where)
+	const nestedObligation = collect(where, options.polarity ?? 'positive')
 	return combineWhereAnd([targetGuard, nestedObligation.where])
 }

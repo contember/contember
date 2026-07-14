@@ -66,13 +66,14 @@ export class ProjectMembershipResolver {
 
 		const explicitProjectRoles = explicitMemberships.map(it => it.role)
 		const implicitRolesToAssign = implicitRoles.filter(it => !explicitProjectRoles.includes(it))
+		const membershipsToResolve: Acl.Membership[] = [
+			...explicitMemberships,
+			...implicitRolesToAssign.map(role => ({ role, variables: [] })),
+		]
 
 		return {
-			effective: [
-				// intentionally ignoring validation errors of stored memberships
-				...membershipResolver.resolve(acl, explicitMemberships, identity, false).memberships,
-				...implicitRolesToAssign.map(it => ({ role: it, variables: [] })),
-			],
+			// Resolve implicit predefined variables while preserving the existing ignored-error behavior.
+			effective: membershipResolver.resolve(acl, membershipsToResolve, identity, false).memberships,
 			fetched: explicitMemberships,
 		}
 	}

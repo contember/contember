@@ -1,4 +1,4 @@
-import { executeTenantTest } from '../../../src/testTenant.js'
+import { executeTenantTest, now } from '../../../src/testTenant.js'
 import { SQL } from '../../../src/tags.js'
 import { testUuid } from '../../../src/testUuid.js'
 import { expect, test } from 'bun:test'
@@ -62,7 +62,7 @@ test('requestEmailVerification - sends a verification mail for an unverified per
 			getNextMailAttemptSql({ email, initType: 'email_verify_init', completionType: 'email_verify_complete' }),
 			{
 				sql: SQL`INSERT INTO "tenant"."person_token" ("id", "token_hash", "person_id", "expires_at", "created_at", "used_at", "type", "meta")
-				         VALUES (?, ?, ?, now() + make_interval(secs => ?), ?, ?, ?, ?)`,
+				         VALUES (?, ?, ?, now() + make_interval(secs => ?), ?, ?, ?, ?) RETURNING "expires_at"`,
 				parameters: [
 					anyString,
 					anyString,
@@ -73,7 +73,7 @@ test('requestEmailVerification - sends a verification mail for an unverified per
 					'email_verification',
 					(val: any) => !!val && val.email === email,
 				],
-				response: { rowCount: 1 },
+				response: { rows: [{ expires_at: now }] },
 			},
 			getIdentityProjectsSql({ identityId, projectId }),
 			getMailTemplateSql({ type: 'emailVerification', projectId }),

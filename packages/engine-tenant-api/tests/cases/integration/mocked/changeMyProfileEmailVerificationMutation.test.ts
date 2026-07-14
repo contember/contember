@@ -36,7 +36,7 @@ test('changeMyProfile - email change is deferred when verification is required',
 			...sqlTransaction(
 				{
 					sql: SQL`INSERT INTO "tenant"."person_token" ("id", "token_hash", "person_id", "expires_at", "created_at", "used_at", "type", "meta")
-					         VALUES (?, ?, ?, now() + make_interval(secs => ?), ?, ?, ?, ?)`,
+					         VALUES (?, ?, ?, now() + make_interval(secs => ?), ?, ?, ?, ?) RETURNING "expires_at"`,
 					parameters: [
 						anyString,
 						anyString,
@@ -47,7 +47,7 @@ test('changeMyProfile - email change is deferred when verification is required',
 						'email_change',
 						(val: any) => !!val && val.email === newEmail,
 					],
-					response: { rowCount: 1 },
+					response: { rows: [{ expires_at: now }] },
 				},
 				getMailTemplateSql({ type: 'emailChangeVerify', projectId }),
 				getMailTemplateSql({ type: 'emailChangeVerify', projectId: null }),
@@ -108,7 +108,7 @@ test('changeMyProfile - email change is deferred for a verification-required acc
 			...sqlTransaction(
 				{
 					sql: SQL`INSERT INTO "tenant"."person_token" ("id", "token_hash", "person_id", "expires_at", "created_at", "used_at", "type", "meta")
-					         VALUES (?, ?, ?, now() + make_interval(secs => ?), ?, ?, ?, ?)`,
+					         VALUES (?, ?, ?, now() + make_interval(secs => ?), ?, ?, ?, ?) RETURNING "expires_at"`,
 					parameters: [
 						anyString,
 						anyString,
@@ -119,7 +119,7 @@ test('changeMyProfile - email change is deferred for a verification-required acc
 						'email_change',
 						(val: any) => !!val && val.email === newEmail,
 					],
-					response: { rowCount: 1 },
+					response: { rows: [{ expires_at: now }] },
 				},
 				getMailTemplateSql({ type: 'emailChangeVerify', projectId }),
 				getMailTemplateSql({ type: 'emailChangeVerify', projectId: null }),
@@ -210,7 +210,7 @@ test('changeMyProfile - name change is applied atomically within the email-chang
 				updatePersonProfileNameSql({ personId, name: newName }),
 				{
 					sql: SQL`INSERT INTO "tenant"."person_token" ("id", "token_hash", "person_id", "expires_at", "created_at", "used_at", "type", "meta")
-					         VALUES (?, ?, ?, now() + make_interval(secs => ?), ?, ?, ?, ?)`,
+					         VALUES (?, ?, ?, now() + make_interval(secs => ?), ?, ?, ?, ?) RETURNING "expires_at"`,
 					parameters: [
 						anyString,
 						anyString,
@@ -221,7 +221,7 @@ test('changeMyProfile - name change is applied atomically within the email-chang
 						'email_change',
 						(val: any) => !!val && val.email === newEmail,
 					],
-					response: { rowCount: 1 },
+					response: { rows: [{ expires_at: now }] },
 				},
 				getMailTemplateSql({ type: 'emailChangeVerify', projectId }),
 				getMailTemplateSql({ type: 'emailChangeVerify', projectId: null }),

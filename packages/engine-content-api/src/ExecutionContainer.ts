@@ -161,7 +161,8 @@ export class ExecutionContainerFactory {
 				))
 			.addService(
 				'orderByBuilder',
-				({ joinBuilder, predicateFactory, whereBuilder, schema }) => new OrderByBuilder(schema.model, joinBuilder, predicateFactory, whereBuilder),
+				({ joinBuilder, predicateFactory, predicatesInjector, whereBuilder, schema }) =>
+					new OrderByBuilder(schema.model, joinBuilder, predicateFactory, predicatesInjector, whereBuilder),
 			)
 			.addService(
 				'relationFetcher',
@@ -190,7 +191,9 @@ export class ExecutionContainerFactory {
 			}))
 			.addService(
 				'selectBuilderFactory',
-				({ whereBuilder, orderByBuilder, fieldsVisitorFactory, metaHandler, selectHandlers, pathFactory, predicateFactory, schema }) =>
+				(
+					{ whereBuilder, orderByBuilder, fieldsVisitorFactory, metaHandler, selectHandlers, pathFactory, predicateFactory, predicatesInjector, schema },
+				) =>
 					new (class implements SelectBuilderFactory {
 						create(qb: DbSelectBuilder, hydrator: SelectHydrator, relationPath: Model.AnyRelationContext[]): SelectBuilder {
 							return new SelectBuilder(
@@ -205,6 +208,7 @@ export class ExecutionContainerFactory {
 								pathFactory,
 								relationPath,
 								predicateFactory,
+								predicatesInjector,
 							)
 						}
 					})(),

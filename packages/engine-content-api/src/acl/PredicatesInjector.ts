@@ -113,12 +113,14 @@ export class PredicatesInjector {
 			predicatesWhere = { [entity.primary]: { always: true } }
 		} else {
 			const rawPredicate = this.predicateFactory.create(entity, Acl.Operation.read, effectiveFieldNames, relationContext, effectiveIsRoot)
-			// Process the predicate to inject nested entity predicates
+			// Process the predicate to inject nested entity predicates. The closure stack starts with `entity`
+			// because `rawPredicate` IS this entity's own read predicate — re-entering its expansion is a cycle.
 			predicatesWhere = this.injectPredicatesToPredicate(
 				rawPredicate,
 				entity,
 				isBackReferenceContext ?? false,
 				ancestorPath ?? [],
+				new Set([entity.name]),
 			)
 		}
 
@@ -133,6 +135,25 @@ export class PredicatesInjector {
 	}
 
 	/**
+	 * Recursively ACL-close an already-resolved FIELD (cell) read guard, exactly as {@link createWhere}
+	 * closes a row predicate. The projection cell mask and the order-key guard build the raw field guard via
+	 * `PredicateFactory.buildReadPredicates` (a predicate reference → WHERE) and lower it straight to SQL; that
+	 * raw guard has NO target `read` injected, so a guard traversing a relation (e.g. `Employee.salary` readable
+	 * only `{dept:{open:true}}`) leaks the traversed row's value when that row is itself unreadable
+	 * (`Dept.read = {company:{id:companyVar}}`). Routing the guard through this closure injects `Dept.read` under
+	 * the traversal → `{dept:{open:true, company:{id:companyVar}}}`, masking the cell in every state. For a guard
+	 * with no relation hops the closure is a structural no-op (byte-identical SQL). `relationPath` is the path
+	 * that reached `entity`, used for back-reference detection inside the traversal (mirrors the row path).
+	 */
+	public closeReadPredicate(
+		entity: Model.Entity,
+		where: Input.OptionalWhere,
+		relationPath: readonly Model.AnyRelationContext[] = [],
+	): Input.OptionalWhere {
+		return this.injectPredicatesToPredicate(where, entity, false, relationPath, new Set([entity.name]))
+	}
+
+	/**
 	 * Processes a predicate and injects nested entity predicates for any relation traversals.
 	 * This ensures that when a predicate like { department: { company: { name: 'Acme' } } }
 	 * is used, the predicates of Department and Company are also applied.
@@ -142,21 +163,22 @@ export class PredicatesInjector {
 		entity: Model.Entity,
 		isBackReferenceContext: boolean,
 		ancestorPath: readonly Model.AnyRelationContext[],
+		targetClosure: ReadonlySet<string>,
 	): Input.OptionalWhere {
 		const resultWhere: Writable<Input.OptionalWhere> = {}
 
 		if (where.and) {
 			resultWhere.and = where.and
 				.filter((it): it is Input.Where => !!it)
-				.map(it => this.injectPredicatesToPredicate(it, entity, isBackReferenceContext, ancestorPath))
+				.map(it => this.injectPredicatesToPredicate(it, entity, isBackReferenceContext, ancestorPath, targetClosure))
 		}
 		if (where.or) {
 			resultWhere.or = where.or
 				.filter((it): it is Input.Where => !!it)
-				.map(it => this.injectPredicatesToPredicate(it, entity, isBackReferenceContext, ancestorPath))
+				.map(it => this.injectPredicatesToPredicate(it, entity, isBackReferenceContext, ancestorPath, targetClosure))
 		}
 		if (where.not) {
-			resultWhere.not = this.injectPredicatesToPredicate(where.not, entity, isBackReferenceContext, ancestorPath)
+			resultWhere.not = this.injectPredicatesToPredicate(where.not, entity, isBackReferenceContext, ancestorPath, targetClosure)
 		}
 
 		const fields = Object.keys(where).filter(it => !['and', 'or', 'not'].includes(it))
@@ -186,6 +208,7 @@ export class PredicatesInjector {
 						context.targetEntity,
 						nestedIsBackReferenceContext,
 						nestedAncestorPath,
+						targetClosure,
 					)
 
 					const primaryKey = context.targetEntity.primary
@@ -199,7 +222,7 @@ export class PredicatesInjector {
 					// within a predicate is always through-access, so it consults the `all` permission set (isRoot=false).
 					const targetPredicate = shouldSimplifyNested
 						? { [context.targetEntity.primary]: { always: true } }
-						: this.predicateFactory.create(context.targetEntity, Acl.Operation.read, undefined, context, false)
+						: this.closeTargetPredicate(context, nestedIsBackReferenceContext, nestedAncestorPath, targetClosure)
 
 					// Optimization: avoid duplicate { id: always } when both are simplified
 					const targetIsAlwaysTrue = this.isAlwaysTruePrimaryWhere(targetPredicate, primaryKey)
@@ -222,6 +245,35 @@ export class PredicatesInjector {
 		}
 
 		return resultWhere
+	}
+
+	/**
+	 * The target entity's own read predicate for a relation reached from WITHIN another predicate, recursively
+	 * ACL-closed. Historically this was appended RAW via `PredicateFactory.create`, so any relation inside the
+	 * target's predicate never had ITS target's predicate injected — a readable-view leak: e.g.
+	 * `Parent.read = {room:{name}}` with `Room.read = {building:{code}}` and an independent `Building.read` left
+	 * the building's readability unenforced (a parent whose room's building is unreadable stayed visible).
+	 *
+	 * Closing recurses only through TO-ONE hops (to-many stays legacy, deferred to the to-many slice). A to-one
+	 * back-hop that re-reaches a row-gated ancestor is already collapsed to `{primary: always}` by the caller's
+	 * `shouldSimplifyNested`, so it never reaches here. `targetClosure` tracks the entities whose predicate is
+	 * being expanded up this branch: re-entering one is a genuine ACL cycle (e.g. a to-many round-trip or a
+	 * missing-inverse loop), where we fall back to the raw predicate — terminating exactly at the boundary the
+	 * pre-existing code stopped at (no infinite recursion, no new error, strictly less leakage than before).
+	 */
+	private closeTargetPredicate(
+		context: Model.AnyRelationContext,
+		isBackReferenceContext: boolean,
+		ancestorPath: readonly Model.AnyRelationContext[],
+		targetClosure: ReadonlySet<string>,
+	): Input.OptionalWhere {
+		const rawTargetPredicate = this.predicateFactory.create(context.targetEntity, Acl.Operation.read, undefined, context, false)
+		const isToOne = PredicatesInjector.toOneBackReferenceTypes.has(context.type)
+		if (!isToOne || targetClosure.has(context.targetEntity.name) || Object.keys(rawTargetPredicate).length === 0) {
+			return rawTargetPredicate
+		}
+		const nestedClosure = new Set(targetClosure).add(context.targetEntity.name)
+		return this.injectPredicatesToPredicate(rawTargetPredicate, context.targetEntity, isBackReferenceContext, ancestorPath, nestedClosure)
 	}
 
 	private injectToWhere(

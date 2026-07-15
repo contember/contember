@@ -4,7 +4,7 @@ import { JoinBuilder } from './JoinBuilder.js'
 import { CaseStatement, Literal, QueryBuilder, SelectBuilder, wrapIdentifier } from '@contember/database'
 import { acceptFieldVisitor, getColumnName, getTargetEntity } from '@contember/schema-utils'
 import { UserError } from '../../exception.js'
-import { PredicateFactory } from '../../acl/index.js'
+import { PredicateFactory, PredicatesInjector } from '../../acl/index.js'
 import { WhereBuilder } from './WhereBuilder.js'
 
 const orderByMapping = {
@@ -29,6 +29,7 @@ export class OrderByBuilder {
 		private readonly schema: Model.Schema,
 		private readonly joinBuilder: JoinBuilder,
 		private readonly predicateFactory: PredicateFactory,
+		private readonly predicatesInjector: PredicatesInjector,
 		private readonly whereBuilder: WhereBuilder,
 	) {}
 
@@ -178,7 +179,14 @@ export class OrderByBuilder {
 		const columnLiteral = new Literal(`${wrapIdentifier(path.alias)}.${wrapIdentifier(columnName)}`)
 		const conditions: Literal[] = []
 		for (const guard of guards) {
-			const predicateWhere = this.predicateFactory.buildReadPredicates(guard.entity, [guard.predicate], guard.relationPath)
+			// Close the order-key guard the same way projection closes the cell mask: a guard traversing a
+			// relation gets the traversed target's `read` injected, so ordering can never leak an unreadable
+			// traversed row's value. No-op for guards without relation hops.
+			const predicateWhere = this.predicatesInjector.closeReadPredicate(
+				guard.entity,
+				this.predicateFactory.buildReadPredicates(guard.entity, [guard.predicate], guard.relationPath),
+				guard.relationPath,
+			)
 			// The row-level predicate is already guaranteed in the WHERE of the ACL-filtered entity, so let the
 			// optimizer simplify it out of the cell-level predicate (mirrors SelectBuilder's predicate column).
 			const evaluatedPredicates = guard.isAclFiltered

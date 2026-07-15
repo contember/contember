@@ -707,10 +707,10 @@ describe('predicates injector - multi-level back-reference', () => {
 		// the predicate should NOT be simplified AND nested predicates should be applied
 		const injected = injector.inject(schema.model.entities.Employee, {})
 
-		// Full predicate with nested entity predicates applied:
-		// - Employee predicate: { department: { company: { isActive: true } } }
-		// - Department predicate: { company: { isActive: true } } is added
-		// - Company predicate: { isActive: true } is added inside company traversal
+		// Full predicate with nested entity predicates applied. Department's OWN predicate is now recursively
+		// ACL-closed too: its `company` hop gets Company's read predicate injected, exactly like the
+		// Employee-predicate branch — so a target entity's readability is enforced no matter which branch
+		// reaches it. Here Company.read == the authored condition, so the extra term is a (harmless) duplicate.
 		assert.deepStrictEqual(injected, {
 			department: {
 				and: [
@@ -722,7 +722,14 @@ describe('predicates injector - multi-level back-reference', () => {
 							],
 						},
 					},
-					{ company: { isActive: { eq: true } } }, // Department's predicate
+					{
+						company: {
+							and: [
+								{ isActive: { eq: true } }, // Department's predicate
+								{ isActive: { eq: true } }, // Company's own predicate, now closed under Department's predicate too
+							],
+						},
+					},
 				],
 			},
 		})
@@ -1063,9 +1070,9 @@ describe('predicates injector - SECURITY: inconsistent predicates must NOT be si
 
 		const injected = injector.inject(schema.model.entities.Employee, {})
 
-		// Employee's condition (name='Acme') is preserved
-		// Department's predicate { company: { isActive: true } } is applied
-		// Company's predicate { isActive: true } is applied inside the traversal
+		// Employee's condition (name='Acme') is preserved. Department's own predicate { company: { isActive } }
+		// is now recursively ACL-closed, so Company's read predicate is injected under it too — Company's
+		// readability is enforced regardless of which predicate branch reaches Company.
 		assert.deepStrictEqual(injected, {
 			department: {
 				and: [
@@ -1077,7 +1084,14 @@ describe('predicates injector - SECURITY: inconsistent predicates must NOT be si
 							],
 						},
 					},
-					{ company: { isActive: { eq: true } } }, // Department predicate
+					{
+						company: {
+							and: [
+								{ isActive: { eq: true } }, // Department predicate
+								{ isActive: { eq: true } }, // Company's own predicate, now closed under Department's predicate too
+							],
+						},
+					},
 				],
 			},
 		})

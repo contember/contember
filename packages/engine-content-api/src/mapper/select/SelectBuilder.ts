@@ -11,7 +11,7 @@ import { MetaHandler } from './handlers/index.js'
 import { Mapper } from '../Mapper.js'
 import { FieldNode, ObjectNode } from '../../inputProcessing/index.js'
 import { assertNever } from '../../utils/index.js'
-import { PredicateFactory } from '../../acl/index.js'
+import { PredicateFactory, PredicatesInjector } from '../../acl/index.js'
 
 export class SelectBuilder {
 	private resolver: (value: SelectRow[]) => void = () => {
@@ -33,6 +33,7 @@ export class SelectBuilder {
 		private readonly pathFactory: PathFactory,
 		private readonly relationPath: Model.AnyRelationContext[],
 		private readonly predicateFactory: PredicateFactory,
+		private readonly predicatesInjector: PredicatesInjector,
 	) {}
 
 	public async execute(db: Client): Promise<SelectRow[]> {
@@ -95,7 +96,14 @@ export class SelectBuilder {
 
 			if (!fetchedPredicates.has(predicate)) {
 				const primaryPredicate = this.predicateFactory.createReadPredicate(entity, undefined, this.relationPath)
-				const fieldPredicate = this.predicateFactory.buildReadPredicates(entity, [predicate], this.relationPath)
+				// Recursively ACL-close the field guard so a relation it traverses gets its target `read` injected
+				// (e.g. `salary` guard `{dept:{open:true}}` → `{dept:{open:true, company:{id:companyVar}}}`),
+				// masking the cell when the traversed row is unreadable. No-op for guards without relation hops.
+				const fieldPredicate = this.predicatesInjector.closeReadPredicate(
+					entity,
+					this.predicateFactory.buildReadPredicates(entity, [predicate], this.relationPath),
+					this.relationPath,
+				)
 
 				const { qb, condition } = this.whereBuilder.buildConditionLiteral(
 					this.qb,

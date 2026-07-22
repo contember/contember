@@ -11,6 +11,7 @@ namespace PermissionActions {
 		apiKey = 'apiKey',
 		mailTemplate = 'mailTemplate',
 		idp = 'idp',
+		customRole = 'customRole',
 	}
 
 	export const CONFIGURE = Authorizator.createAction(Resources.system, 'configure')
@@ -83,6 +84,9 @@ namespace PermissionActions {
 	export const IDP_DISABLE = Authorizator.createAction(Resources.idp, 'disable')
 	export const IDP_ENABLE = Authorizator.createAction(Resources.idp, 'enable')
 	export const IDP_LIST = Authorizator.createAction(Resources.idp, 'list')
+
+	export const CUSTOM_ROLE_MANAGE = Authorizator.createAction(Resources.customRole, 'manage')
+	export const CUSTOM_ROLE_VIEW = Authorizator.createAction(Resources.customRole, 'view')
 }
 
 export { PermissionActions }

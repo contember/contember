@@ -739,6 +739,23 @@ export type CreateAuthPolicyResult = {
 	readonly id: Scalars['String']['output']
 }
 
+export type CreateCustomRoleError = {
+	readonly __typename?: 'CreateCustomRoleError'
+	readonly code: CreateCustomRoleErrorCode
+	readonly developerMessage: Scalars['String']['output']
+}
+
+export type CreateCustomRoleErrorCode =
+	| 'INVALID_SLUG'
+	| 'SLUG_ALREADY_EXISTS'
+	| 'UNKNOWN_PERMISSION'
+
+export type CreateCustomRoleResponse = {
+	readonly __typename?: 'CreateCustomRoleResponse'
+	readonly error?: Maybe<CreateCustomRoleError>
+	readonly ok: Scalars['Boolean']['output']
+}
+
 export type CreatePasswordResetRequestError = {
 	readonly __typename?: 'CreatePasswordResetRequestError'
 	readonly code: CreatePasswordResetRequestErrorCode
@@ -816,6 +833,14 @@ export type CreateSessionTokenResult = CommonSignInResult & {
 	readonly token: Scalars['String']['output']
 }
 
+export type CustomRole = {
+	readonly __typename?: 'CustomRole'
+	readonly description?: Maybe<Scalars['String']['output']>
+	/** Permission identifiers in the `resource:privilege` form, e.g. `person:forceSignOut`. */
+	readonly permissions: ReadonlyArray<Scalars['String']['output']>
+	readonly slug: Scalars['String']['output']
+}
+
 export type DeleteAuthPolicyError = {
 	readonly __typename?: 'DeleteAuthPolicyError'
 	readonly code: DeleteAuthPolicyErrorCode
@@ -827,6 +852,20 @@ export type DeleteAuthPolicyErrorCode = 'NOT_FOUND'
 export type DeleteAuthPolicyResponse = {
 	readonly __typename?: 'DeleteAuthPolicyResponse'
 	readonly error?: Maybe<DeleteAuthPolicyError>
+	readonly ok: Scalars['Boolean']['output']
+}
+
+export type DeleteCustomRoleError = {
+	readonly __typename?: 'DeleteCustomRoleError'
+	readonly code: DeleteCustomRoleErrorCode
+	readonly developerMessage: Scalars['String']['output']
+}
+
+export type DeleteCustomRoleErrorCode = 'NOT_FOUND'
+
+export type DeleteCustomRoleResponse = {
+	readonly __typename?: 'DeleteCustomRoleResponse'
+	readonly error?: Maybe<DeleteCustomRoleError>
 	readonly ok: Scalars['Boolean']['output']
 }
 
@@ -1264,11 +1303,13 @@ export type Mutation = {
 	readonly confirmOtp?: Maybe<ConfirmOtpResponse>
 	readonly createApiKey?: Maybe<CreateApiKeyResponse>
 	readonly createAuthPolicy?: Maybe<CreateAuthPolicyResponse>
+	readonly createCustomRole?: Maybe<CreateCustomRoleResponse>
 	readonly createGlobalApiKey?: Maybe<CreateApiKeyResponse>
 	readonly createProject?: Maybe<CreateProjectResponse>
 	readonly createResetPasswordRequest?: Maybe<CreatePasswordResetRequestResponse>
 	readonly createSessionToken?: Maybe<CreateSessionTokenResponse>
 	readonly deleteAuthPolicy?: Maybe<DeleteAuthPolicyResponse>
+	readonly deleteCustomRole?: Maybe<DeleteCustomRoleResponse>
 	readonly disableApiKey?: Maybe<DisableApiKeyResponse>
 	readonly disableEmailOtp?: Maybe<DisableEmailOtpResponse>
 	readonly disableIDP?: Maybe<DisableIdpResponse>
@@ -1312,6 +1353,7 @@ export type Mutation = {
 	readonly signUp?: Maybe<SignUpResponse>
 	readonly unmanagedInvite?: Maybe<InviteResponse>
 	readonly updateAuthPolicy?: Maybe<UpdateAuthPolicyResponse>
+	readonly updateCustomRole?: Maybe<UpdateCustomRoleResponse>
 	readonly updateIDP?: Maybe<UpdateIdpResponse>
 	readonly updateProject?: Maybe<UpdateProjectResponse>
 	readonly updateProjectMember?: Maybe<UpdateProjectMemberResponse>
@@ -1399,6 +1441,12 @@ export type MutationCreateAuthPolicyArgs = {
 	policy: AuthPolicyInput
 }
 
+export type MutationCreateCustomRoleArgs = {
+	description?: InputMaybe<Scalars['String']['input']>
+	permissions: ReadonlyArray<Scalars['String']['input']>
+	slug: Scalars['String']['input']
+}
+
 export type MutationCreateGlobalApiKeyArgs = {
 	description: Scalars['String']['input']
 	options?: InputMaybe<CreateApiKeyOptions>
@@ -1430,6 +1478,10 @@ export type MutationCreateSessionTokenArgs = {
 
 export type MutationDeleteAuthPolicyArgs = {
 	id: Scalars['String']['input']
+}
+
+export type MutationDeleteCustomRoleArgs = {
+	slug: Scalars['String']['input']
 }
 
 export type MutationDisableApiKeyArgs = {
@@ -1578,6 +1630,12 @@ export type MutationUnmanagedInviteArgs = {
 export type MutationUpdateAuthPolicyArgs = {
 	id: Scalars['String']['input']
 	policy: AuthPolicyInput
+}
+
+export type MutationUpdateCustomRoleArgs = {
+	description?: InputMaybe<Scalars['String']['input']>
+	permissions?: InputMaybe<ReadonlyArray<Scalars['String']['input']>>
+	slug: Scalars['String']['input']
 }
 
 export type MutationUpdateIdpArgs = {
@@ -1745,6 +1803,17 @@ export type Query = {
 	readonly authPolicies: ReadonlyArray<AuthPolicy>
 	readonly checkResetPasswordToken: CheckResetPasswordTokenCode
 	readonly configuration: Config
+	/**
+	 * List permission identifiers (`resource:privilege`) grantable to a custom
+	 * role. Requires the `customRole:view` permission.
+	 */
+	readonly customRolePermissions: ReadonlyArray<Scalars['String']['output']>
+	/**
+	 * List custom roles (runtime-defined global roles carrying a bundle of tenant
+	 * permissions). Requires the `customRole:view` permission — granted to
+	 * SUPER_ADMIN by default and itself grantable to a custom role.
+	 */
+	readonly customRoles: ReadonlyArray<CustomRole>
 	/**
 	 * List global (project-independent) permanent API keys — those created via
 	 * `createGlobalApiKey`, whose identity carries global roles and no project
@@ -2242,6 +2311,22 @@ export type UpdateAuthPolicyResponse = {
 	readonly ok: Scalars['Boolean']['output']
 }
 
+export type UpdateCustomRoleError = {
+	readonly __typename?: 'UpdateCustomRoleError'
+	readonly code: UpdateCustomRoleErrorCode
+	readonly developerMessage: Scalars['String']['output']
+}
+
+export type UpdateCustomRoleErrorCode =
+	| 'NOT_FOUND'
+	| 'UNKNOWN_PERMISSION'
+
+export type UpdateCustomRoleResponse = {
+	readonly __typename?: 'UpdateCustomRoleResponse'
+	readonly error?: Maybe<UpdateCustomRoleError>
+	readonly ok: Scalars['Boolean']['output']
+}
+
 export type UpdateIdpError = {
 	readonly __typename?: 'UpdateIDPError'
 	readonly code: UpdateIdpErrorCode
@@ -2522,6 +2607,9 @@ export type ResolversTypes = {
 	CreateAuthPolicyErrorCode: CreateAuthPolicyErrorCode
 	CreateAuthPolicyResponse: ResolverTypeWrapper<CreateAuthPolicyResponse>
 	CreateAuthPolicyResult: ResolverTypeWrapper<CreateAuthPolicyResult>
+	CreateCustomRoleError: ResolverTypeWrapper<CreateCustomRoleError>
+	CreateCustomRoleErrorCode: CreateCustomRoleErrorCode
+	CreateCustomRoleResponse: ResolverTypeWrapper<CreateCustomRoleResponse>
 	CreatePasswordResetRequestError: ResolverTypeWrapper<CreatePasswordResetRequestError>
 	CreatePasswordResetRequestErrorCode: CreatePasswordResetRequestErrorCode
 	CreatePasswordResetRequestResponse: ResolverTypeWrapper<CreatePasswordResetRequestResponse>
@@ -2535,10 +2623,14 @@ export type ResolversTypes = {
 	CreateSessionTokenErrorCode: CreateSessionTokenErrorCode
 	CreateSessionTokenResponse: ResolverTypeWrapper<CreateSessionTokenResponse>
 	CreateSessionTokenResult: ResolverTypeWrapper<CreateSessionTokenResult>
+	CustomRole: ResolverTypeWrapper<CustomRole>
 	DateTime: ResolverTypeWrapper<Scalars['DateTime']['output']>
 	DeleteAuthPolicyError: ResolverTypeWrapper<DeleteAuthPolicyError>
 	DeleteAuthPolicyErrorCode: DeleteAuthPolicyErrorCode
 	DeleteAuthPolicyResponse: ResolverTypeWrapper<DeleteAuthPolicyResponse>
+	DeleteCustomRoleError: ResolverTypeWrapper<DeleteCustomRoleError>
+	DeleteCustomRoleErrorCode: DeleteCustomRoleErrorCode
+	DeleteCustomRoleResponse: ResolverTypeWrapper<DeleteCustomRoleResponse>
 	DisableApiKeyError: ResolverTypeWrapper<DisableApiKeyError>
 	DisableApiKeyErrorCode: DisableApiKeyErrorCode
 	DisableApiKeyResponse: ResolverTypeWrapper<DisableApiKeyResponse>
@@ -2695,6 +2787,9 @@ export type ResolversTypes = {
 	UpdateAuthPolicyError: ResolverTypeWrapper<UpdateAuthPolicyError>
 	UpdateAuthPolicyErrorCode: UpdateAuthPolicyErrorCode
 	UpdateAuthPolicyResponse: ResolverTypeWrapper<UpdateAuthPolicyResponse>
+	UpdateCustomRoleError: ResolverTypeWrapper<UpdateCustomRoleError>
+	UpdateCustomRoleErrorCode: UpdateCustomRoleErrorCode
+	UpdateCustomRoleResponse: ResolverTypeWrapper<UpdateCustomRoleResponse>
 	UpdateIDPError: ResolverTypeWrapper<UpdateIdpError>
 	UpdateIDPErrorCode: UpdateIdpErrorCode
 	UpdateIDPResponse: ResolverTypeWrapper<UpdateIdpResponse>
@@ -2784,6 +2879,8 @@ export type ResolversParentTypes = {
 	CreateAuthPolicyError: CreateAuthPolicyError
 	CreateAuthPolicyResponse: CreateAuthPolicyResponse
 	CreateAuthPolicyResult: CreateAuthPolicyResult
+	CreateCustomRoleError: CreateCustomRoleError
+	CreateCustomRoleResponse: CreateCustomRoleResponse
 	CreatePasswordResetRequestError: CreatePasswordResetRequestError
 	CreatePasswordResetRequestResponse: CreatePasswordResetRequestResponse
 	CreateProjectOptions: CreateProjectOptions
@@ -2794,9 +2891,12 @@ export type ResolversParentTypes = {
 	CreateSessionTokenError: CreateSessionTokenError
 	CreateSessionTokenResponse: CreateSessionTokenResponse
 	CreateSessionTokenResult: CreateSessionTokenResult
+	CustomRole: CustomRole
 	DateTime: Scalars['DateTime']['output']
 	DeleteAuthPolicyError: DeleteAuthPolicyError
 	DeleteAuthPolicyResponse: DeleteAuthPolicyResponse
+	DeleteCustomRoleError: DeleteCustomRoleError
+	DeleteCustomRoleResponse: DeleteCustomRoleResponse
 	DisableApiKeyError: DisableApiKeyError
 	DisableApiKeyResponse: DisableApiKeyResponse
 	DisableEmailOtpError: DisableEmailOtpError
@@ -2915,6 +3015,8 @@ export type ResolversParentTypes = {
 	UnmanagedInviteOptions: UnmanagedInviteOptions
 	UpdateAuthPolicyError: UpdateAuthPolicyError
 	UpdateAuthPolicyResponse: UpdateAuthPolicyResponse
+	UpdateCustomRoleError: UpdateCustomRoleError
+	UpdateCustomRoleResponse: UpdateCustomRoleResponse
 	UpdateIDPError: UpdateIdpError
 	UpdateIDPResponse: UpdateIdpResponse
 	UpdateProjectError: UpdateProjectError
@@ -3394,6 +3496,22 @@ export type CreateAuthPolicyResultResolvers<
 	id?: Resolver<ResolversTypes['String'], ParentType, ContextType>
 }
 
+export type CreateCustomRoleErrorResolvers<
+	ContextType = any,
+	ParentType extends ResolversParentTypes['CreateCustomRoleError'] = ResolversParentTypes['CreateCustomRoleError'],
+> = {
+	code?: Resolver<ResolversTypes['CreateCustomRoleErrorCode'], ParentType, ContextType>
+	developerMessage?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+}
+
+export type CreateCustomRoleResponseResolvers<
+	ContextType = any,
+	ParentType extends ResolversParentTypes['CreateCustomRoleResponse'] = ResolversParentTypes['CreateCustomRoleResponse'],
+> = {
+	error?: Resolver<Maybe<ResolversTypes['CreateCustomRoleError']>, ParentType, ContextType>
+	ok?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
+}
+
 export type CreatePasswordResetRequestErrorResolvers<
 	ContextType = any,
 	ParentType extends ResolversParentTypes['CreatePasswordResetRequestError'] = ResolversParentTypes['CreatePasswordResetRequestError'],
@@ -3462,6 +3580,12 @@ export type CreateSessionTokenResultResolvers<
 	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
 }
 
+export type CustomRoleResolvers<ContextType = any, ParentType extends ResolversParentTypes['CustomRole'] = ResolversParentTypes['CustomRole']> = {
+	description?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>
+	permissions?: Resolver<ReadonlyArray<ResolversTypes['String']>, ParentType, ContextType>
+	slug?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+}
+
 export interface DateTimeScalarConfig extends GraphQLScalarTypeConfig<ResolversTypes['DateTime'], any> {
 	name: 'DateTime'
 }
@@ -3479,6 +3603,22 @@ export type DeleteAuthPolicyResponseResolvers<
 	ParentType extends ResolversParentTypes['DeleteAuthPolicyResponse'] = ResolversParentTypes['DeleteAuthPolicyResponse'],
 > = {
 	error?: Resolver<Maybe<ResolversTypes['DeleteAuthPolicyError']>, ParentType, ContextType>
+	ok?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
+}
+
+export type DeleteCustomRoleErrorResolvers<
+	ContextType = any,
+	ParentType extends ResolversParentTypes['DeleteCustomRoleError'] = ResolversParentTypes['DeleteCustomRoleError'],
+> = {
+	code?: Resolver<ResolversTypes['DeleteCustomRoleErrorCode'], ParentType, ContextType>
+	developerMessage?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+}
+
+export type DeleteCustomRoleResponseResolvers<
+	ContextType = any,
+	ParentType extends ResolversParentTypes['DeleteCustomRoleResponse'] = ResolversParentTypes['DeleteCustomRoleResponse'],
+> = {
+	error?: Resolver<Maybe<ResolversTypes['DeleteCustomRoleError']>, ParentType, ContextType>
 	ok?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
 }
 
@@ -3889,6 +4029,12 @@ export type MutationResolvers<ContextType = any, ParentType extends ResolversPar
 		ContextType,
 		RequireFields<MutationCreateAuthPolicyArgs, 'policy'>
 	>
+	createCustomRole?: Resolver<
+		Maybe<ResolversTypes['CreateCustomRoleResponse']>,
+		ParentType,
+		ContextType,
+		RequireFields<MutationCreateCustomRoleArgs, 'permissions' | 'slug'>
+	>
 	createGlobalApiKey?: Resolver<
 		Maybe<ResolversTypes['CreateApiKeyResponse']>,
 		ParentType,
@@ -3913,6 +4059,12 @@ export type MutationResolvers<ContextType = any, ParentType extends ResolversPar
 		ParentType,
 		ContextType,
 		RequireFields<MutationDeleteAuthPolicyArgs, 'id'>
+	>
+	deleteCustomRole?: Resolver<
+		Maybe<ResolversTypes['DeleteCustomRoleResponse']>,
+		ParentType,
+		ContextType,
+		RequireFields<MutationDeleteCustomRoleArgs, 'slug'>
 	>
 	disableApiKey?: Resolver<Maybe<ResolversTypes['DisableApiKeyResponse']>, ParentType, ContextType, RequireFields<MutationDisableApiKeyArgs, 'id'>>
 	disableEmailOtp?: Resolver<Maybe<ResolversTypes['DisableEmailOtpResponse']>, ParentType, ContextType>
@@ -4041,6 +4193,12 @@ export type MutationResolvers<ContextType = any, ParentType extends ResolversPar
 		ContextType,
 		RequireFields<MutationUpdateAuthPolicyArgs, 'id' | 'policy'>
 	>
+	updateCustomRole?: Resolver<
+		Maybe<ResolversTypes['UpdateCustomRoleResponse']>,
+		ParentType,
+		ContextType,
+		RequireFields<MutationUpdateCustomRoleArgs, 'slug'>
+	>
 	updateIDP?: Resolver<Maybe<ResolversTypes['UpdateIDPResponse']>, ParentType, ContextType, RequireFields<MutationUpdateIdpArgs, 'identityProvider'>>
 	updateProject?: Resolver<
 		Maybe<ResolversTypes['UpdateProjectResponse']>,
@@ -4133,6 +4291,8 @@ export type QueryResolvers<ContextType = any, ParentType extends ResolversParent
 		RequireFields<QueryCheckResetPasswordTokenArgs, 'requestId' | 'token'>
 	>
 	configuration?: Resolver<ResolversTypes['Config'], ParentType, ContextType>
+	customRolePermissions?: Resolver<ReadonlyArray<ResolversTypes['String']>, ParentType, ContextType>
+	customRoles?: Resolver<ReadonlyArray<ResolversTypes['CustomRole']>, ParentType, ContextType>
 	globalApiKeys?: Resolver<ReadonlyArray<ResolversTypes['ApiKey']>, ParentType, ContextType>
 	identityProviders?: Resolver<ReadonlyArray<ResolversTypes['IdentityProvider']>, ParentType, ContextType>
 	mailTemplates?: Resolver<ReadonlyArray<ResolversTypes['MailTemplateData']>, ParentType, ContextType>
@@ -4527,6 +4687,22 @@ export type UpdateAuthPolicyResponseResolvers<
 	ok?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
 }
 
+export type UpdateCustomRoleErrorResolvers<
+	ContextType = any,
+	ParentType extends ResolversParentTypes['UpdateCustomRoleError'] = ResolversParentTypes['UpdateCustomRoleError'],
+> = {
+	code?: Resolver<ResolversTypes['UpdateCustomRoleErrorCode'], ParentType, ContextType>
+	developerMessage?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+}
+
+export type UpdateCustomRoleResponseResolvers<
+	ContextType = any,
+	ParentType extends ResolversParentTypes['UpdateCustomRoleResponse'] = ResolversParentTypes['UpdateCustomRoleResponse'],
+> = {
+	error?: Resolver<Maybe<ResolversTypes['UpdateCustomRoleError']>, ParentType, ContextType>
+	ok?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
+}
+
 export type UpdateIdpErrorResolvers<
 	ContextType = any,
 	ParentType extends ResolversParentTypes['UpdateIDPError'] = ResolversParentTypes['UpdateIDPError'],
@@ -4656,6 +4832,8 @@ export type Resolvers<ContextType = any> = {
 	CreateAuthPolicyError?: CreateAuthPolicyErrorResolvers<ContextType>
 	CreateAuthPolicyResponse?: CreateAuthPolicyResponseResolvers<ContextType>
 	CreateAuthPolicyResult?: CreateAuthPolicyResultResolvers<ContextType>
+	CreateCustomRoleError?: CreateCustomRoleErrorResolvers<ContextType>
+	CreateCustomRoleResponse?: CreateCustomRoleResponseResolvers<ContextType>
 	CreatePasswordResetRequestError?: CreatePasswordResetRequestErrorResolvers<ContextType>
 	CreatePasswordResetRequestResponse?: CreatePasswordResetRequestResponseResolvers<ContextType>
 	CreateProjectResponse?: CreateProjectResponseResolvers<ContextType>
@@ -4664,9 +4842,12 @@ export type Resolvers<ContextType = any> = {
 	CreateSessionTokenError?: CreateSessionTokenErrorResolvers<ContextType>
 	CreateSessionTokenResponse?: CreateSessionTokenResponseResolvers<ContextType>
 	CreateSessionTokenResult?: CreateSessionTokenResultResolvers<ContextType>
+	CustomRole?: CustomRoleResolvers<ContextType>
 	DateTime?: GraphQLScalarType
 	DeleteAuthPolicyError?: DeleteAuthPolicyErrorResolvers<ContextType>
 	DeleteAuthPolicyResponse?: DeleteAuthPolicyResponseResolvers<ContextType>
+	DeleteCustomRoleError?: DeleteCustomRoleErrorResolvers<ContextType>
+	DeleteCustomRoleResponse?: DeleteCustomRoleResponseResolvers<ContextType>
 	DisableApiKeyError?: DisableApiKeyErrorResolvers<ContextType>
 	DisableApiKeyResponse?: DisableApiKeyResponseResolvers<ContextType>
 	DisableEmailOtpError?: DisableEmailOtpErrorResolvers<ContextType>
@@ -4759,6 +4940,8 @@ export type Resolvers<ContextType = any> = {
 	ToggleMyPasswordlessResponse?: ToggleMyPasswordlessResponseResolvers<ContextType>
 	UpdateAuthPolicyError?: UpdateAuthPolicyErrorResolvers<ContextType>
 	UpdateAuthPolicyResponse?: UpdateAuthPolicyResponseResolvers<ContextType>
+	UpdateCustomRoleError?: UpdateCustomRoleErrorResolvers<ContextType>
+	UpdateCustomRoleResponse?: UpdateCustomRoleResponseResolvers<ContextType>
 	UpdateIDPError?: UpdateIdpErrorResolvers<ContextType>
 	UpdateIDPResponse?: UpdateIdpResponseResolvers<ContextType>
 	UpdateProjectError?: UpdateProjectErrorResolvers<ContextType>

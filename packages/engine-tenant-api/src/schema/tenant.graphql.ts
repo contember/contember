@@ -54,6 +54,19 @@ const schema: DocumentNode = gql`
 		authPolicies: [AuthPolicy!]!
 
 		"""
+		List custom roles (runtime-defined global roles carrying a bundle of tenant
+		permissions). Requires the \`customRole:view\` permission — granted to
+		SUPER_ADMIN by default and itself grantable to a custom role.
+		"""
+		customRoles: [CustomRole!]!
+
+		"""
+		List permission identifiers (\`resource:privilege\`) grantable to a custom
+		role. Requires the \`customRole:view\` permission.
+		"""
+		customRolePermissions: [String!]!
+
+		"""
 		Read the tenant audit log (\`person_auth_log\`). Requires the
 		\`system:viewAuthLog\` permission — by default granted only to
 		SUPER_ADMIN via the wildcard ALL-resource/ALL-privilege grant.
@@ -182,6 +195,11 @@ const schema: DocumentNode = gql`
 		createAuthPolicy(policy: AuthPolicyInput!): CreateAuthPolicyResponse
 		updateAuthPolicy(id: String!, policy: AuthPolicyInput!): UpdateAuthPolicyResponse
 		deleteAuthPolicy(id: String!): DeleteAuthPolicyResponse
+
+		# === custom roles (runtime-defined global roles) ===
+		createCustomRole(slug: String!, permissions: [String!]!, description: String): CreateCustomRoleResponse
+		updateCustomRole(slug: String!, permissions: [String!], description: String): UpdateCustomRoleResponse
+		deleteCustomRole(slug: String!): DeleteCustomRoleResponse
 
 		addProjectMailTemplate(template: MailTemplate!): AddMailTemplateResponse
 		@deprecated(reason: "use addMailTemplate")
@@ -1654,6 +1672,60 @@ const schema: DocumentNode = gql`
 	}
 
 	enum DeleteAuthPolicyErrorCode {
+		NOT_FOUND
+	}
+
+	# === custom roles (runtime-defined global roles) ===
+
+	type CustomRole {
+		slug: String!
+		description: String
+		"""Permission identifiers in the \`resource:privilege\` form, e.g. \`person:forceSignOut\`."""
+		permissions: [String!]!
+	}
+
+	type CreateCustomRoleResponse {
+		ok: Boolean!
+		error: CreateCustomRoleError
+	}
+
+	type CreateCustomRoleError {
+		code: CreateCustomRoleErrorCode!
+		developerMessage: String!
+	}
+
+	enum CreateCustomRoleErrorCode {
+		INVALID_SLUG
+		SLUG_ALREADY_EXISTS
+		UNKNOWN_PERMISSION
+	}
+
+	type UpdateCustomRoleResponse {
+		ok: Boolean!
+		error: UpdateCustomRoleError
+	}
+
+	type UpdateCustomRoleError {
+		code: UpdateCustomRoleErrorCode!
+		developerMessage: String!
+	}
+
+	enum UpdateCustomRoleErrorCode {
+		NOT_FOUND
+		UNKNOWN_PERMISSION
+	}
+
+	type DeleteCustomRoleResponse {
+		ok: Boolean!
+		error: DeleteCustomRoleError
+	}
+
+	type DeleteCustomRoleError {
+		code: DeleteCustomRoleErrorCode!
+		developerMessage: String!
+	}
+
+	enum DeleteCustomRoleErrorCode {
 		NOT_FOUND
 	}
 

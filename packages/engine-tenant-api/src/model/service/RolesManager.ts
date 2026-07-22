@@ -1,7 +1,8 @@
 import { DatabaseContext } from '../utils/index.js'
 import { PatchIdentityGlobalRoles } from '../commands/index.js'
 import { Response, ResponseError, ResponseOk } from '../utils/Response.js'
-import { TenantRole } from '../authorization/index.js'
+import { BUILTIN_TENANT_ROLES } from '../authorization/CustomRolePermissions.js'
+import { CustomRolesQuery } from '../queries/index.js'
 
 export class RolesManager {
 	async addGlobalRoles(dbContext: DatabaseContext, identityId: string, roles: readonly string[]): Promise<Response<null, GlobalRolesErrorCode>> {
@@ -18,7 +19,9 @@ export class RolesManager {
 		addRoles: readonly string[],
 		removeRoles: readonly string[],
 	): Promise<Response<null, GlobalRolesErrorCode>> {
-		const rolesValidationError = this.validateRoles([...addRoles, ...removeRoles])
+		// Only added roles are validated — removal must stay possible for a slug whose
+		// custom-role definition has been deleted in the meantime.
+		const rolesValidationError = await this.validateAddedRoles(dbContext, addRoles)
 		if (rolesValidationError) {
 			return rolesValidationError
 		}
@@ -29,11 +32,17 @@ export class RolesManager {
 		return new ResponseOk(null)
 	}
 
-	private validateRoles(roles: string[]): Response<null, GlobalRolesErrorCode> | null {
-		for (const role of roles) {
-			if (!Object.values(TenantRole).includes(role as TenantRole)) {
-				return new ResponseError('INVALID_ROLE', `Role ${role} is not valid`)
-			}
+	/** A role is valid when it is either a built-in tenant role or a defined custom role. */
+	private async validateAddedRoles(dbContext: DatabaseContext, roles: readonly string[]): Promise<Response<null, GlobalRolesErrorCode> | null> {
+		const customCandidates = roles.filter(it => !BUILTIN_TENANT_ROLES.has(it))
+		if (customCandidates.length === 0) {
+			return null
+		}
+		const customRoles = await dbContext.queryHandler.fetch(new CustomRolesQuery({ slugs: customCandidates }))
+		const existingSlugs = new Set(customRoles.map(it => it.slug))
+		const missingRole = customCandidates.find(it => !existingSlugs.has(it))
+		if (missingRole !== undefined) {
+			return new ResponseError('INVALID_ROLE', `Role ${missingRole} is not valid`)
 		}
 		return null
 	}

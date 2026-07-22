@@ -11,6 +11,7 @@ import {
 	BackchannelLogoutManager,
 	BackupCodeManager,
 	CaptchaValidator,
+	CustomRoleManager,
 	DatabaseContext,
 	EmailChangeManager,
 	EmailOtpManager,
@@ -109,6 +110,8 @@ import { ConfigurationManager } from './model/service/ConfigurationManager.js'
 import { ConfigurationMutationResolver } from './resolvers/mutation/configuration/ConfigurationMutationResolver.js'
 import { ConfigurationQueryResolver } from './resolvers/query/ConfigurationQueryResolver.js'
 import { AuthPolicyMutationResolver } from './resolvers/mutation/configuration/AuthPolicyMutationResolver.js'
+import { CustomRoleMutationResolver } from './resolvers/mutation/customRole/CustomRoleMutationResolver.js'
+import { CustomRoleQueryResolver } from './resolvers/query/CustomRoleQueryResolver.js'
 import { AuthPolicyQueryResolver } from './resolvers/query/AuthPolicyQueryResolver.js'
 import { ResetPersonMfaMutationResolver } from './resolvers/mutation/person/ResetPersonMfaMutationResolver.js'
 import { AuthLogQueryResolver } from './resolvers/query/AuthLogQueryResolver.js'
@@ -179,7 +182,8 @@ export class TenantContainerFactory {
 			.addService('mailer', () => createMailer(args.mailOptions))
 			.addService('projectSchemaResolver', () => args.projectSchemaResolver)
 			.addService('templateRenderer', () => new TemplateRenderer())
-			.addService('accessEvaluator', ({}) => new AccessEvaluator.PermissionEvaluator(new PermissionsFactory().create()))
+			.addService('permissions', () => new PermissionsFactory().create())
+			.addService('accessEvaluator', ({ permissions }) => new AccessEvaluator.PermissionEvaluator(permissions))
 			.addService('authorizator', ({ accessEvaluator }) => new Authorizator.Default(accessEvaluator))
 			.addService('userMailer', ({ mailer, templateRenderer }) => new UserMailer(mailer, templateRenderer))
 			.addService('apiKeyService', () => new ApiKeyService())
@@ -228,8 +232,8 @@ export class TenantContainerFactory {
 			.addService('projectScopeFactory', () => new ProjectScopeFactory(new AclSchemaAccessNodeFactory()))
 			.addService(
 				'permissionContextFactory',
-				({ authorizator, identityFactory, projectScopeFactory, projectSchemaResolver }) =>
-					new PermissionContextFactory(authorizator, identityFactory, projectScopeFactory, projectSchemaResolver),
+				({ permissions, identityFactory, projectScopeFactory, projectSchemaResolver }) =>
+					new PermissionContextFactory(permissions, identityFactory, projectScopeFactory, projectSchemaResolver),
 			)
 			.addService('secretManager', ({ providers }) => new SecretsManager(providers))
 			.addService('projectManager', ({ secretManager, apiKeyService }) => new ProjectManager(secretManager, args.projectInitializer, apiKeyService))
@@ -259,6 +263,7 @@ export class TenantContainerFactory {
 			.addService('backupCodeManager', ({ providers, userMailer }) => new BackupCodeManager(userMailer, providers))
 			.addService('emailOtpManager', ({ userMailer, providers, rateLimiter }) => new EmailOtpManager(userMailer, providers, rateLimiter))
 			.addService('authPolicyManager', ({ projectManager }) => new AuthPolicyManager(projectManager))
+			.addService('customRoleManager', () => new CustomRoleManager())
 			.addService(
 				'signInManager',
 				({ apiKeyManager, providers, otpManager, backupCodeManager, emailOtpManager, authPolicyResolver, loginRiskAnalyzer, userMailer }) =>
@@ -415,6 +420,8 @@ export class TenantContainerFactory {
 			.addService('configurationQueryResolver', ({ configurationManager }) => new ConfigurationQueryResolver(configurationManager))
 			.addService('authPolicyMutationResolver', ({ authPolicyManager }) => new AuthPolicyMutationResolver(authPolicyManager))
 			.addService('authPolicyQueryResolver', ({ authPolicyManager }) => new AuthPolicyQueryResolver(authPolicyManager))
+			.addService('customRoleMutationResolver', ({ customRoleManager }) => new CustomRoleMutationResolver(customRoleManager))
+			.addService('customRoleQueryResolver', ({ customRoleManager }) => new CustomRoleQueryResolver(customRoleManager))
 			.addService('authLogQueryResolver', () => new AuthLogQueryResolver())
 			.addService('apiKeyQueryResolver', () => new ApiKeyQueryResolver())
 			.addService(

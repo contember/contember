@@ -4,6 +4,7 @@ export * from './idp/index.js'
 
 export * from './AuthLogService.js'
 export * from './AuthPolicyManager.js'
+export * from './CustomRoleManager.js'
 export * from './AuthPolicyResolver.js'
 export * from './BackupCodeManager.js'
 export * from './EmailChangeManager.js'

@@ -1,0 +1,67 @@
+---
+title: Custom roles
+---
+
+Custom roles are **runtime-defined global roles**: a named bundle of tenant permission actions stored in the tenant database. They let you grant an identity a narrow set of administrative capabilities — e.g. a support team that may force-sign-out and reset MFA — without handing out the broad built-in `project_admin` or `super_admin` roles.
+
+A custom role only defines *what the role can do*. Assignment reuses the existing global-role mechanism: add the role's slug to an identity with [`addGlobalIdentityRoles`](/reference/engine/tenant/memberships), or issue a global API key carrying it.
+
+## Defining a role
+
+```graphql
+mutation {
+  createCustomRole(
+    slug: "support"
+    description: "Support team: session & MFA administration"
+    permissions: ["person:list", "person:view", "person:forceSignOut", "person:resetMfa", "person:viewSessions"]
+  ) {
+    ok
+    error { code developerMessage }
+  }
+}
+```
+
+Errors: `INVALID_SLUG` (malformed or colliding with a built-in role), `SLUG_ALREADY_EXISTS`, `UNKNOWN_PERMISSION` (not in the grantable catalog — including deliberately non-grantable actions, see below).
+
+`updateCustomRole(slug, permissions, description)` modifies an existing role (omitted arguments stay untouched); `deleteCustomRole(slug)` removes it. Deleting a role does not touch `identity.roles` — a leftover slug simply grants nothing.
+
+Changes take effect on the **next request** of affected identities; no re-login is needed (permissions are resolved per request, not baked into sessions).
+
+## Assigning the role
+
+```graphql
+mutation {
+  addGlobalIdentityRoles(identityId: "…", roles: ["support"]) { ok }
+}
+```
+
+Only `SUPER_ADMIN` can assign a custom role — `PROJECT_ADMIN`'s `addGlobalIdentityRoles` grant is restricted to an allowlist of built-in roles.
+
+## Reading definitions
+
+```graphql
+query {
+  customRoles { slug description permissions }
+  customRolePermissions   # the grantable vocabulary, e.g. for building a role editor UI
+}
+```
+
+Both are gated by `customRole:view`, which is itself grantable — so an admin-UI service account can read role definitions without being a super admin.
+
+## Permission vocabulary
+
+Permissions use the `resource:privilege` form and are validated against the engine's action catalog (`customRolePermissions` lists it). Examples: `person:forceSignOut`, `person:resetMfa`, `person:disable`, `person:viewSessions`, `person:list`, `system:viewAuthLog`, `project:viewMembers`.
+
+Two safety rails are built in and cannot be configured away:
+
+1. **Escalation vectors are never grantable**: `identity:addGlobalRoles`, `identity:removeGlobalRoles`, `apiKey:createGlobal`, `person:createSessionToken` (impersonation) and `customRole:manage` (self-editing role definitions) are rejected with `UNKNOWN_PERMISSION`. Managing role definitions therefore always requires `SUPER_ADMIN` (or the wildcard grant).
+2. **Target-role guard**: actions parameterized by the target's roles (`person:forceSignOut`, `person:resetMfa`, `person:disable`, …) always carry the same guard as `PROJECT_ADMIN`'s static grants — a custom role can never act on a person holding `super_admin` or `project_creator`.
+
+## Auditing
+
+Every definition change is written to the [audit log](/reference/engine/tenant/audit-log) as `custom_role_change` with the operation and an input snapshot.
+
+## Relation to other mechanisms
+
+- **Built-in roles** (`super_admin`, `project_admin`, …) are static grants in the engine; custom roles extend the same evaluation with DB-defined bundles. A custom role's slug must not collide with a built-in one.
+- **Project-scoped permissions** stay in the [project schema ACL](/reference/engine/schema/acl) (`tenant.invite` / `tenant.manage` / `tenant.view` on project roles). Custom roles are global — use them for tenant-wide capabilities, not per-project ones.

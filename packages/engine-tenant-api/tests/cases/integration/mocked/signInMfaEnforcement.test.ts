@@ -10,6 +10,7 @@ import { getIdentityProjectsSql } from './sql/getIdentityProjectsSql.js'
 import { selectMembershipsSql } from './sql/selectMembershipsSql.js'
 import { getAllProjectRolesByIdentitySql, getAuthPoliciesSql } from './sql/authPolicySql.js'
 import { getIdentityByIdSql } from './sql/getIdentityByIdSql.js'
+import { getCustomRolesSql } from './sql/getCustomRolesSql.js'
 import { generateBackupCodesSql } from './sql/generateBackupCodesSql.js'
 import { expect, test } from 'bun:test'
 import { Buffer } from 'buffer'
@@ -146,6 +147,8 @@ test('MFA required + valid pending code → enrolls (pending→active), returns 
 				],
 				response: { rowCount: 1 },
 			},
+			// the signed-in identity carries a non-builtin global role -> custom-role lookup
+			getCustomRolesSql({ slugs: ['editor'] }),
 			getIdentityProjectsSql({ identityId, projectId }),
 			selectMembershipsSql({ identityId, projectId, membershipsResponse: [] }),
 		],
@@ -261,6 +264,8 @@ test('MFA required + per-policy grace → opens grace window, sets mfa_grace_unt
 				parameters: [() => true, identityId, 'session_policy_applied', true, () => true, () => true],
 				response: { rowCount: 1 },
 			},
+			// the signed-in identity carries a non-builtin global role -> custom-role lookup
+			getCustomRolesSql({ slugs: ['editor'] }),
 			getIdentityProjectsSql({ identityId, projectId }),
 			selectMembershipsSql({ identityId, projectId, membershipsResponse: [] }),
 		],
@@ -308,6 +313,8 @@ test('MFA required + no policy grace override → global config default opens th
 				parameters: [() => true, identityId, 'session_policy_applied', true, () => true, () => true],
 				response: { rowCount: 1 },
 			},
+			// the signed-in identity carries a non-builtin global role -> custom-role lookup
+			getCustomRolesSql({ slugs: ['editor'] }),
 			getIdentityProjectsSql({ identityId, projectId }),
 			selectMembershipsSql({ identityId, projectId, membershipsResponse: [] }),
 		],

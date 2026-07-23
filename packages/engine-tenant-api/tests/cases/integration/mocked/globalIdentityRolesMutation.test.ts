@@ -3,11 +3,15 @@ import { testUuid } from '../../../src/testUuid.js'
 import { executeTenantTest } from '../../../src/testTenant.js'
 import { getPersonsByIdentitySql } from './sql/getPersonsByIdentitySql.js'
 import { expect, test } from 'bun:test'
-import { getCustomRolesSql } from './sql/getCustomRolesSql.js'
+import { getCustomRolesForValidationSql } from './sql/getCustomRolesSql.js'
 import { ExpectedQuery } from '@contember/database-tester'
+import { sqlReadCommittedTransaction } from './sql/sqlTransaction.js'
+import { getIdentityProjectMembershipPresenceSql } from './sql/getIdentityProjectMembershipPresenceSql.js'
 
-const selectIdentitySql = (args: { identityId: string; roles: readonly string[] }): ExpectedQuery => ({
-	sql: SQL`SELECT "id", "description", "roles" FROM "tenant"."identity" WHERE "id" IN (?)`,
+const selectIdentitySql = (args: { identityId: string; roles: readonly string[]; lock?: boolean }): ExpectedQuery => ({
+	sql: args.lock
+		? SQL`SELECT "id", "description", "roles" FROM "tenant"."identity" WHERE "id" IN (?) FOR UPDATE`
+		: SQL`SELECT "id", "description", "roles" FROM "tenant"."identity" WHERE "id" IN (?)`,
 	parameters: [args.identityId],
 	response: {
 		rows: [{ id: args.identityId, description: null, roles: args.roles }],
@@ -20,7 +24,7 @@ const patchIdentityRolesSql = (args: {
 	remove: readonly string[]
 }): ExpectedQuery => ({
 	sql: SQL`UPDATE "tenant"."identity" SET "roles" = (
-				SELECT JSONB_AGG(DISTINCT out_role)
+				SELECT COALESCE(JSONB_AGG(DISTINCT out_role), '[]'::jsonb)
 				FROM JSONB_ARRAY_ELEMENTS_TEXT(roles || ?::jsonb) t(out_role)
 				WHERE NOT(out_role = ANY (?::text[]))
 			) WHERE "id" = ?`,
@@ -40,13 +44,16 @@ test('adds a global identity role', async () => {
 			}
 		}`,
 		executes: [
-			selectIdentitySql({ identityId, roles: [] }),
-			patchIdentityRolesSql({ identityId, add: [role], remove: [] }),
-			selectIdentitySql({ identityId, roles: [role] }),
-			getPersonsByIdentitySql({
-				identityIds: [identityId],
-				response: [{ personId, identityId, email: 'john@doe.com' }],
-			}),
+			...sqlReadCommittedTransaction(
+				selectIdentitySql({ identityId, roles: [], lock: true }),
+				getIdentityProjectMembershipPresenceSql(identityId),
+				patchIdentityRolesSql({ identityId, add: [role], remove: [] }),
+				selectIdentitySql({ identityId, roles: [role] }),
+				getPersonsByIdentitySql({
+					identityIds: [identityId],
+					response: [{ personId, identityId, email: 'john@doe.com' }],
+				}),
+			),
 		],
 		return: {
 			data: {
@@ -80,13 +87,16 @@ test('removes a global identity role', async () => {
 			}
 		}`,
 		executes: [
-			selectIdentitySql({ identityId, roles: [role] }),
-			patchIdentityRolesSql({ identityId, add: [], remove: [role] }),
-			selectIdentitySql({ identityId, roles: [] }),
-			getPersonsByIdentitySql({
-				identityIds: [identityId],
-				response: [{ personId, identityId, email: 'john@doe.com' }],
-			}),
+			...sqlReadCommittedTransaction(
+				selectIdentitySql({ identityId, roles: [role], lock: true }),
+				getIdentityProjectMembershipPresenceSql(identityId),
+				patchIdentityRolesSql({ identityId, add: [], remove: [role] }),
+				selectIdentitySql({ identityId, roles: [] }),
+				getPersonsByIdentitySql({
+					identityIds: [identityId],
+					response: [{ personId, identityId, email: 'john@doe.com' }],
+				}),
+			),
 		],
 		return: {
 			data: {
@@ -120,24 +130,28 @@ test('adds a defined custom role', async () => {
 			}
 		}`,
 		executes: [
-			selectIdentitySql({ identityId, roles: [] }),
-			getCustomRolesSql({
-				slugs: [role],
-				response: [{
-					id: testUuid(50),
-					slug: role,
-					description: null,
-					permissions: ['person:forceSignOut'],
-					created_at: new Date(),
-					updated_at: new Date(),
-				}],
-			}),
-			patchIdentityRolesSql({ identityId, add: [role], remove: [] }),
-			selectIdentitySql({ identityId, roles: [role] }),
-			getPersonsByIdentitySql({
-				identityIds: [identityId],
-				response: [{ personId, identityId, email: 'john@doe.com' }],
-			}),
+			...sqlReadCommittedTransaction(
+				getCustomRolesForValidationSql({
+					slugs: [role],
+					response: [{
+						id: testUuid(50),
+						slug: role,
+						description: null,
+						grants: [{ permission: 'person:forceSignOut', config: null }],
+						created_at: new Date(),
+						updated_at: new Date(),
+						deleted_at: null,
+					}],
+				}),
+				selectIdentitySql({ identityId, roles: [], lock: true }),
+				getIdentityProjectMembershipPresenceSql(identityId),
+				patchIdentityRolesSql({ identityId, add: [role], remove: [] }),
+				selectIdentitySql({ identityId, roles: [role] }),
+				getPersonsByIdentitySql({
+					identityIds: [identityId],
+					response: [{ personId, identityId, email: 'john@doe.com' }],
+				}),
+			),
 		],
 		return: {
 			data: {
@@ -169,12 +183,13 @@ test('rejects an undefined custom role', async () => {
 			}
 		}`,
 		executes: [
-			selectIdentitySql({ identityId, roles: [] }),
-			getCustomRolesSql({ slugs: ['ghost'] }),
+			...sqlReadCommittedTransaction(
+				getCustomRolesForValidationSql({ slugs: ['ghost'] }),
+			),
 		],
-		return: (response: any) => {
-			expect(response.data.addGlobalIdentityRoles.ok).toBe(false)
-			expect(response.data.addGlobalIdentityRoles.error.code).toBe('INVALID_ROLE')
+		return: (response: object) => {
+			expect(response).toHaveProperty('data.addGlobalIdentityRoles.ok', false)
+			expect(response).toHaveProperty('data.addGlobalIdentityRoles.error.code', 'INVALID_ROLE')
 		},
 	})
 })
@@ -191,13 +206,16 @@ test('removes a dangling custom role slug without validation', async () => {
 			}
 		}`,
 		executes: [
-			selectIdentitySql({ identityId, roles: [role] }),
-			patchIdentityRolesSql({ identityId, add: [], remove: [role] }),
-			selectIdentitySql({ identityId, roles: [] }),
-			getPersonsByIdentitySql({
-				identityIds: [identityId],
-				response: [{ personId, identityId, email: 'john@doe.com' }],
-			}),
+			...sqlReadCommittedTransaction(
+				selectIdentitySql({ identityId, roles: [role], lock: true }),
+				getIdentityProjectMembershipPresenceSql(identityId),
+				patchIdentityRolesSql({ identityId, add: [], remove: [role] }),
+				selectIdentitySql({ identityId, roles: [] }),
+				getPersonsByIdentitySql({
+					identityIds: [identityId],
+					response: [{ personId, identityId, email: 'john@doe.com' }],
+				}),
+			),
 		],
 		return: {
 			data: {

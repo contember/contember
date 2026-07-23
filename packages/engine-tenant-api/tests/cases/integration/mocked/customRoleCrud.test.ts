@@ -1,176 +1,207 @@
+import { expect, test } from 'bun:test'
 import { executeTenantTest, now } from '../../../src/testTenant.js'
 import { GQL, SQL } from '../../../src/tags.js'
 import { testUuid } from '../../../src/testUuid.js'
-import { expect, test } from 'bun:test'
+import { sqlReadCommittedTransaction } from './sql/sqlTransaction.js'
 
-const customRoleRow = (slug: string, permissions: string[], description: string | null = null) => ({
+const listGrantInput = [{ permission: 'person:list' }]
+const listGrant = [{ permission: 'person:list', config: null }]
+
+const customRoleRow = (
+	slug: string,
+	grants: readonly object[],
+	description: string | null = null,
+	deletedAt: Date | null = null,
+) => ({
 	id: testUuid(50),
 	slug,
 	description,
-	permissions,
+	grants,
 	created_at: now,
 	updated_at: now,
+	deleted_at: deletedAt,
 })
 
-test('createCustomRole inserts a row and audits custom_role_change', async () => {
+test('createCustomRole stores canonical grants and audits the full role state', async () => {
 	await executeTenantTest({
 		query: {
-			query: GQL`mutation($slug: String!, $permissions: [String!]!) {
-				createCustomRole(slug: $slug, permissions: $permissions) { ok error { code } }
+			query: GQL`mutation($slug: String!, $grants: [CustomRoleGrantInput!]!) {
+				createCustomRole(slug: $slug, grants: $grants) { ok error { code } }
 			}`,
-			variables: { slug: 'support', permissions: ['person:forceSignOut', 'person:resetMfa'] },
+			variables: { slug: 'support', grants: listGrantInput },
 		},
 		executes: [
-			{
-				sql: SQL`select *  from "tenant"."custom_role" where "slug" in (?)  order by "slug" asc`,
-				parameters: ['support'],
-				response: { rows: [] },
-			},
-			{
-				sql: SQL`insert into "tenant"."custom_role" ("id", "slug", "description", "permissions", "created_at", "updated_at")
-					values (?, ?, ?, ?, ?, ?)`,
-				parameters: [testUuid(1), 'support', null, ['person:forceSignOut', 'person:resetMfa'], now, now],
-				response: { rowCount: 1 },
-			},
+			...sqlReadCommittedTransaction(
+				{
+					sql: SQL`select *  from "tenant"."custom_role" where "slug" in (?)  order by "slug" asc for share`,
+					parameters: ['support'],
+					response: { rows: [] },
+				},
+				{
+					sql: SQL`insert into  "tenant"."custom_role" ("id", "slug", "description", "grants", "created_at", "updated_at")
+						values  (?, ?, ?, ?, ?, ?)`,
+					parameters: [testUuid(1), 'support', null, JSON.stringify(listGrant), now, now],
+					response: { rowCount: 1 },
+				},
+			),
 		],
 		return: {
 			data: { createCustomRole: { ok: true, error: null } },
 		},
-		expectedAuthLog: expect.objectContaining({ type: 'custom_role_change' }),
-	})
-})
-
-test('createCustomRole rejects an unknown permission', async () => {
-	await executeTenantTest({
-		query: {
-			query: GQL`mutation($slug: String!, $permissions: [String!]!) {
-				createCustomRole(slug: $slug, permissions: $permissions) { ok error { code developerMessage } }
-			}`,
-			variables: { slug: 'support', permissions: ['person:doesNotExist'] },
-		},
-		executes: [],
-		return: (response: any) => {
-			expect(response.data.createCustomRole.ok).toBe(false)
-			expect(response.data.createCustomRole.error.code).toBe('UNKNOWN_PERMISSION')
+		expectedAuthLog: {
+			type: 'custom_role_change',
+			response: { ok: true, result: null },
+			eventData: {
+				operation: 'create',
+				after: { slug: 'support', description: null, grants: listGrant },
+			},
 		},
 	})
 })
 
-test('createCustomRole rejects an escalation-vector permission', async () => {
+test('createCustomRole rejects invalid and duplicate grant definitions', async () => {
 	await executeTenantTest({
 		query: {
-			query: GQL`mutation($slug: String!, $permissions: [String!]!) {
-				createCustomRole(slug: $slug, permissions: $permissions) { ok error { code } }
+			query: GQL`mutation($slug: String!, $grants: [CustomRoleGrantInput!]!) {
+				createCustomRole(slug: $slug, grants: $grants) { ok error { code } }
 			}`,
-			variables: { slug: 'support', permissions: ['identity:addGlobalRoles'] },
+			variables: {
+				slug: 'support',
+				grants: [{ permission: 'person:list' }, { permission: 'person:list' }],
+			},
 		},
-		executes: [],
-		return: (response: any) => {
-			expect(response.data.createCustomRole.ok).toBe(false)
-			expect(response.data.createCustomRole.error.code).toBe('UNKNOWN_PERMISSION')
+		executes: [...sqlReadCommittedTransaction()],
+		return: {
+			data: {
+				createCustomRole: {
+					ok: false,
+					error: { code: 'DUPLICATE_PERMISSION' },
+				},
+			},
+		},
+	})
+
+	await executeTenantTest({
+		query: {
+			query: GQL`mutation($slug: String!, $grants: [CustomRoleGrantInput!]!) {
+				createCustomRole(slug: $slug, grants: $grants) { ok error { code } }
+			}`,
+			variables: {
+				slug: 'support',
+				grants: [{ permission: 'identity:addGlobalRoles' }],
+			},
+		},
+		executes: [...sqlReadCommittedTransaction()],
+		return: {
+			data: {
+				createCustomRole: {
+					ok: false,
+					error: { code: 'INVALID_PERMISSION_CONFIGURATION' },
+				},
+			},
 		},
 	})
 })
 
-test('createCustomRole rejects a builtin role slug', async () => {
+test('createCustomRole permanently reserves a tombstoned slug', async () => {
 	await executeTenantTest({
 		query: {
-			query: GQL`mutation($slug: String!, $permissions: [String!]!) {
-				createCustomRole(slug: $slug, permissions: $permissions) { ok error { code } }
+			query: GQL`mutation($slug: String!, $grants: [CustomRoleGrantInput!]!) {
+				createCustomRole(slug: $slug, grants: $grants) { ok error { code } }
 			}`,
-			variables: { slug: 'super_admin', permissions: ['person:list'] },
-		},
-		executes: [],
-		return: (response: any) => {
-			expect(response.data.createCustomRole.ok).toBe(false)
-			expect(response.data.createCustomRole.error.code).toBe('INVALID_SLUG')
-		},
-	})
-})
-
-test('createCustomRole rejects a malformed slug', async () => {
-	await executeTenantTest({
-		query: {
-			query: GQL`mutation($slug: String!, $permissions: [String!]!) {
-				createCustomRole(slug: $slug, permissions: $permissions) { ok error { code } }
-			}`,
-			variables: { slug: 'Support Team', permissions: ['person:list'] },
-		},
-		executes: [],
-		return: (response: any) => {
-			expect(response.data.createCustomRole.ok).toBe(false)
-			expect(response.data.createCustomRole.error.code).toBe('INVALID_SLUG')
-		},
-	})
-})
-
-test('createCustomRole reports an existing slug', async () => {
-	await executeTenantTest({
-		query: {
-			query: GQL`mutation($slug: String!, $permissions: [String!]!) {
-				createCustomRole(slug: $slug, permissions: $permissions) { ok error { code } }
-			}`,
-			variables: { slug: 'support', permissions: ['person:list'] },
+			variables: { slug: 'support', grants: listGrantInput },
 		},
 		executes: [
-			{
-				sql: SQL`select *  from "tenant"."custom_role" where "slug" in (?)  order by "slug" asc`,
+			...sqlReadCommittedTransaction({
+				sql: SQL`select *  from "tenant"."custom_role" where "slug" in (?)  order by "slug" asc for share`,
 				parameters: ['support'],
-				response: { rows: [customRoleRow('support', ['person:list'])] },
-			},
+				response: { rows: [customRoleRow('support', listGrant, null, now)] },
+			}),
 		],
-		return: (response: any) => {
-			expect(response.data.createCustomRole.ok).toBe(false)
-			expect(response.data.createCustomRole.error.code).toBe('SLUG_ALREADY_EXISTS')
+		return: {
+			data: {
+				createCustomRole: {
+					ok: false,
+					error: { code: 'SLUG_ALREADY_EXISTS' },
+				},
+			},
 		},
 	})
 })
 
-test('updateCustomRole updates permissions and audits custom_role_change', async () => {
+test('updateCustomRole stores canonical grants and audits before and after state', async () => {
+	const forceSignOutGrant = [{
+		permission: 'person:forceSignOut',
+		config: {
+			target: {
+				globalRoles: { allowed: ['person'], denied: [] },
+				projectMemberships: 'none',
+			},
+		},
+	}]
 	await executeTenantTest({
 		query: {
-			query: GQL`mutation($slug: String!, $permissions: [String!]) {
-				updateCustomRole(slug: $slug, permissions: $permissions) { ok error { code } }
+			query: GQL`mutation($slug: String!, $grants: [CustomRoleGrantInput!]) {
+				updateCustomRole(slug: $slug, grants: $grants) { ok error { code } }
 			}`,
-			variables: { slug: 'support', permissions: ['person:forceSignOut'] },
+			variables: { slug: 'support', grants: forceSignOutGrant },
 		},
 		executes: [
-			{
-				sql: SQL`update "tenant"."custom_role" set "permissions" = ?, "updated_at" = ? where "slug" = ?`,
-				parameters: [['person:forceSignOut'], now, 'support'],
-				response: { rowCount: 1 },
-			},
+			...sqlReadCommittedTransaction(
+				{
+					sql: SQL`select *  from "tenant"."custom_role" where "deleted_at" is null and "slug" in (?)  order by "slug" asc for update`,
+					parameters: ['support'],
+					response: { rows: [customRoleRow('support', listGrant, 'Support team')] },
+				},
+				{
+					sql: SQL`update "tenant"."custom_role" set "grants" = ?, "updated_at" = ? where "slug" = ? and "deleted_at" is null`,
+					parameters: [JSON.stringify(forceSignOutGrant), now, 'support'],
+					response: { rowCount: 1 },
+				},
+			),
 		],
 		return: {
 			data: { updateCustomRole: { ok: true, error: null } },
 		},
-		expectedAuthLog: expect.objectContaining({ type: 'custom_role_change' }),
+		expectedAuthLog: {
+			type: 'custom_role_change',
+			response: { ok: true, result: null },
+			eventData: {
+				operation: 'update',
+				before: { slug: 'support', description: 'Support team', grants: listGrant },
+				after: { slug: 'support', description: 'Support team', grants: forceSignOutGrant },
+			},
+		},
 	})
 })
 
-test('updateCustomRole reports a missing role', async () => {
+test('updateCustomRole rejects an explicit null grants value', async () => {
 	await executeTenantTest({
 		query: {
-			query: GQL`mutation($slug: String!, $permissions: [String!]) {
-				updateCustomRole(slug: $slug, permissions: $permissions) { ok error { code } }
+			query: GQL`mutation($slug: String!, $grants: [CustomRoleGrantInput!]) {
+				updateCustomRole(slug: $slug, grants: $grants) { ok error { code } }
 			}`,
-			variables: { slug: 'ghost', permissions: ['person:forceSignOut'] },
+			variables: { slug: 'support', grants: null },
 		},
 		executes: [
-			{
-				sql: SQL`update "tenant"."custom_role" set "permissions" = ?, "updated_at" = ? where "slug" = ?`,
-				parameters: [['person:forceSignOut'], now, 'ghost'],
-				response: { rowCount: 0 },
-			},
+			...sqlReadCommittedTransaction({
+				sql: SQL`select *  from "tenant"."custom_role" where "deleted_at" is null and "slug" in (?)  order by "slug" asc for update`,
+				parameters: ['support'],
+				response: { rows: [customRoleRow('support', listGrant)] },
+			}),
 		],
-		return: (response: any) => {
-			expect(response.data.updateCustomRole.ok).toBe(false)
-			expect(response.data.updateCustomRole.error.code).toBe('NOT_FOUND')
+		return: {
+			data: {
+				updateCustomRole: {
+					ok: false,
+					error: { code: 'INVALID_PERMISSION_CONFIGURATION' },
+				},
+			},
 		},
 	})
 })
 
-test('deleteCustomRole deletes a row and audits custom_role_change', async () => {
+test('deleteCustomRole tombstones the role and removes every stale assignment atomically', async () => {
 	await executeTenantTest({
 		query: {
 			query: GQL`mutation($slug: String!) {
@@ -179,41 +210,87 @@ test('deleteCustomRole deletes a row and audits custom_role_change', async () =>
 			variables: { slug: 'support' },
 		},
 		executes: [
-			{
-				sql: SQL`delete from "tenant"."custom_role" where "slug" = ?`,
-				parameters: ['support'],
-				response: { rowCount: 1 },
-			},
+			...sqlReadCommittedTransaction(
+				{
+					sql: SQL`select *  from "tenant"."custom_role" where "deleted_at" is null and "slug" in (?)  order by "slug" asc for update`,
+					parameters: ['support'],
+					response: { rows: [customRoleRow('support', listGrant, 'Support team')] },
+				},
+				{
+					sql: SQL`update "tenant"."custom_role" set "deleted_at" = ?, "updated_at" = ? where "slug" = ? and "deleted_at" is null`,
+					parameters: [now, now, 'support'],
+					response: { rowCount: 1 },
+				},
+				{
+					sql: SQL`update  "tenant"."identity" set  "roles" =  roles - ?  where roles \\? ?`,
+					parameters: ['support', 'support'],
+					response: { rowCount: 2 },
+				},
+			),
 		],
 		return: {
 			data: { deleteCustomRole: { ok: true, error: null } },
 		},
-		expectedAuthLog: expect.objectContaining({ type: 'custom_role_change' }),
+		expectedAuthLog: {
+			type: 'custom_role_change',
+			response: { ok: true, result: null },
+			eventData: {
+				operation: 'delete',
+				before: { slug: 'support', description: 'Support team', grants: listGrant },
+				removedAssignments: 2,
+			},
+		},
 	})
 })
 
-test('customRoles lists rows, customRolePermissions lists the catalog', async () => {
+test('customRoles returns full grants and the catalog describes configuration requirements', async () => {
 	await executeTenantTest({
 		query: {
 			query: GQL`query {
-				customRoles { slug description permissions }
-				customRolePermissions
+				customRoles { slug description grants { permission config } }
+				customRolePermissions { name configurationKind configurationRequired defaultConfig }
 			}`,
 			variables: {},
 		},
 		executes: [
 			{
-				sql: SQL`select *  from "tenant"."custom_role" order by "slug" asc`,
+				sql: SQL`select *  from "tenant"."custom_role" where "deleted_at" is null order by "slug" asc`,
 				parameters: [],
-				response: { rows: [customRoleRow('support', ['person:forceSignOut'], 'Support team')] },
+				response: { rows: [customRoleRow('support', listGrant, 'Support team')] },
 			},
 		],
-		return: (response: any) => {
-			expect(response.data.customRoles).toEqual([
-				{ slug: 'support', description: 'Support team', permissions: ['person:forceSignOut'] },
+		return: (response: object) => {
+			expect(response).toHaveProperty('data.customRoles', [
+				{ slug: 'support', description: 'Support team', grants: listGrant },
 			])
-			expect(response.data.customRolePermissions).toContain('person:forceSignOut')
-			expect(response.data.customRolePermissions).not.toContain('identity:addGlobalRoles')
+			expect(response).toHaveProperty('data.customRolePermissions')
+			const serialized = JSON.stringify(response)
+			expect(serialized).toContain('"name":"identity:addGlobalRoles"')
+			expect(serialized).toContain('"configurationKind":"ROLE_MUTATION"')
+			expect(serialized).not.toContain('"name":"project:addMember"')
+		},
+	})
+})
+
+test('customRoles reports a persisted-invalid role as inert', async () => {
+	await executeTenantTest({
+		query: GQL`query {
+			customRoles { slug grants { permission config } }
+		}`,
+		executes: [{
+			sql: SQL`select *  from "tenant"."custom_role" where "deleted_at" is null order by "slug" asc`,
+			parameters: [],
+			response: {
+				rows: [customRoleRow('support', [
+					...listGrant,
+					{ permission: 'person:changePassword', config: { target: 'invalid' } },
+				])],
+			},
+		}],
+		return: {
+			data: {
+				customRoles: [{ slug: 'support', grants: [] }],
+			},
 		},
 	})
 })

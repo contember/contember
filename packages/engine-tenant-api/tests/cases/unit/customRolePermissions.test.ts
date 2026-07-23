@@ -1,159 +1,369 @@
 import { describe, expect, test } from 'bun:test'
-import { createConnectionMock, ExpectedQuery } from '@contember/database-tester'
-import { AccessEvaluator, AuthorizationScope, Authorizator } from '@contember/authorization'
 import {
 	buildCustomRolePermissions,
-	CustomRoleAccessEvaluator,
-	DatabaseContext,
+	CustomRoleGrantValidationError,
+	CustomRoleRow,
 	getGrantablePermissions,
+	parseCustomRoleGrants,
 	PermissionActions,
-	PermissionsFactory,
-	Providers,
-	StaticIdentity,
+	TargetIdentityPermissionTarget,
 } from '../../../src/index.js'
+import { Permissions } from '@contember/authorization'
 
 const NOW = new Date('2026-07-22T12:00:00.000Z')
 
-const providers: Providers = {
-	bcrypt: () => Promise.resolve('x'),
-	bcryptCompare: () => Promise.resolve(true),
-	now: () => NOW,
-	randomBytes: (len: number) => Promise.resolve(Buffer.alloc(len)),
-	uuid: () => 'uuid',
-	decrypt: () => {
-		throw new Error('not supported')
-	},
-	encrypt: () => {
-		throw new Error('not supported')
-	},
-	encryptionEnabled: false,
-	hash: value => Buffer.from(value.toString()),
-}
+const target = (
+	globalRoles: readonly string[],
+	hasProjectMemberships = false,
+): TargetIdentityPermissionTarget => ({
+	id: 'target',
+	globalRoles,
+	hasProjectMemberships,
+})
 
-const makeDb = (queries: ExpectedQuery[]) => {
-	const connection = createConnectionMock(queries)
-	return new DatabaseContext(connection.createClient('tenant', { module: 'tenant' }), providers)
-}
-
-const customRoleRow = (slug: string, permissions: string[]) => ({
+const customRoleRow = (slug: string, grants: unknown): CustomRoleRow => ({
 	id: 'id-' + slug,
 	slug,
 	description: null,
-	permissions,
+	grants,
 	created_at: NOW,
 	updated_at: NOW,
+	deleted_at: null,
 })
 
-const CUSTOM_ROLES_SQL = `select *  from "tenant"."custom_role" where "slug" in (?)  order by "slug" asc`
+const targetConfig = (allowed: readonly string[], projectMemberships: 'none' | 'any' = 'any') => ({
+	target: {
+		globalRoles: { allowed, denied: [] },
+		projectMemberships,
+	},
+})
 
-describe('grantable permission catalog', () => {
-	test('contains the person admin bundle', () => {
+describe('explicit grantable permission catalog', () => {
+	test('matches the complete explicit registry', () => {
+		expect(
+			[...getGrantablePermissions().values()]
+				.sort((left, right) => left.name.localeCompare(right.name))
+				.map(definition => [definition.name, definition.configurationKind, definition.configurationRequired]),
+		).toEqual([
+			['apiKey:createGlobal', 'GLOBAL_API_KEY', true],
+			['apiKey:list', 'NONE', false],
+			['customRole:view', 'NONE', false],
+			['entrypoint:deployEntrypoint', 'NONE', false],
+			['identity:addGlobalRoles', 'ROLE_MUTATION', true],
+			['identity:removeGlobalRoles', 'ROLE_MUTATION', true],
+			['idp:disable', 'NONE', false],
+			['idp:enable', 'NONE', false],
+			['idp:list', 'NONE', false],
+			['mailTemplate:add', 'MAIL_TEMPLATE_SCOPE', true],
+			['mailTemplate:list', 'MAIL_TEMPLATE_SCOPE', true],
+			['mailTemplate:remove', 'MAIL_TEMPLATE_SCOPE', true],
+			['person:changePassword', 'TARGET_IDENTITY', true],
+			['person:changeProfile', 'CHANGE_PROFILE', true],
+			['person:createSessionToken', 'CREATE_SESSION_TOKEN', true],
+			['person:disable', 'TARGET_IDENTITY', true],
+			['person:forceSignOut', 'TARGET_IDENTITY', true],
+			['person:list', 'NONE', false],
+			['person:resetMfa', 'TARGET_IDENTITY', true],
+			['person:signUp', 'ROLE_INPUT', true],
+			['person:view', 'NONE', false],
+			['person:viewIdp', 'TARGET_IDENTITY', true],
+			['person:viewSessions', 'TARGET_IDENTITY', true],
+			['project:create', 'NONE', false],
+			['system:configure', 'NONE', false],
+			['system:viewAuthLog', 'NONE', false],
+			['system:viewConfig', 'NONE', false],
+		])
+	})
+
+	test('contains configured v1 actions', () => {
 		const catalog = getGrantablePermissions()
-		for (const name of ['person:forceSignOut', 'person:resetMfa', 'person:disable', 'person:viewSessions', 'person:list', 'customRole:view']) {
+		for (
+			const name of [
+				'person:changePassword',
+				'person:changeProfile',
+				'person:createSessionToken',
+				'identity:addGlobalRoles',
+				'identity:removeGlobalRoles',
+				'apiKey:createGlobal',
+				'mailTemplate:add',
+				'mailTemplate:remove',
+				'mailTemplate:list',
+			]
+		) {
 			expect(catalog.has(name)).toBe(true)
 		}
 	})
 
-	test('never contains escalation vectors', () => {
+	test('does not automatically expose project, membership, IdP-write, or recursive administration actions', () => {
 		const catalog = getGrantablePermissions()
 		for (
-			const name of ['identity:addGlobalRoles', 'identity:removeGlobalRoles', 'apiKey:createGlobal', 'person:createSessionToken', 'customRole:manage']
+			const name of [
+				'project:view',
+				'project:addMember',
+				'person:invite',
+				'apiKey:create',
+				'idp:add',
+				'idp:update',
+				'customRole:manage',
+			]
 		) {
 			expect(catalog.has(name)).toBe(false)
 		}
 	})
+})
 
-	test('detects roles-parameterized actions', () => {
-		const catalog = getGrantablePermissions()
-		expect(catalog.get('person:forceSignOut')?.hasRolesMeta).toBe(true)
-		expect(catalog.get('person:resetMfa')?.hasRolesMeta).toBe(true)
-		expect(catalog.get('person:list')?.hasRolesMeta).toBe(false)
+describe('parseCustomRoleGrants', () => {
+	test('canonicalizes grants and role lists', () => {
+		const parsed = parseCustomRoleGrants([
+			{ permission: 'person:list' },
+			{
+				permission: 'person:signUp',
+				config: { roles: { allowed: ['support', 'login', 'support'] } },
+			},
+		])
+		expect(parsed.grants).toEqual([
+			{ permission: 'person:list', config: null },
+			{
+				permission: 'person:signUp',
+				config: { roles: { allowed: ['login', 'support'], denied: [] } },
+			},
+		])
+		expect(parsed.referencedRoles).toEqual(['login', 'support'])
+	})
+
+	test('rejects duplicate permissions, unknown fields, and protected delegated roles', () => {
+		expect(() =>
+			parseCustomRoleGrants([
+				{ permission: 'person:list' },
+				{ permission: 'person:list' },
+			])
+		).toThrow(CustomRoleGrantValidationError)
+		expect(() =>
+			parseCustomRoleGrants([
+				{ permission: 'person:signUp', config: { roles: { allowed: [] }, typo: true } },
+			])
+		).toThrow(CustomRoleGrantValidationError)
+		expect(() =>
+			parseCustomRoleGrants([
+				{ permission: 'person:signUp', config: { roles: { allowed: ['super_admin'] } } },
+			])
+		).toThrow(CustomRoleGrantValidationError)
 	})
 })
 
-describe('buildCustomRolePermissions', () => {
-	test('grants listed actions, skips unknown ones', () => {
-		const permissions = buildCustomRolePermissions([customRoleRow('support', ['person:forceSignOut', 'no:such', 'identity:addGlobalRoles'])])
-		const allowed = PermissionActions.PERSON_FORCE_SIGN_OUT(['person'])
+describe('compiled custom role permissions', () => {
+	test('sign-up role filters apply to assigned input roles, including configured denies', () => {
+		const permissions = buildCustomRolePermissions([
+			customRoleRow('onboarding', [{
+				permission: 'person:signUp',
+				config: { roles: { allowed: ['login', 'support'], denied: ['support'] } },
+			}]),
+		])
+		const ordinary = PermissionActions.PERSON_SIGN_UP([])
+		expect(permissions.isAllowed('onboarding', ordinary.resource, ordinary.privilege, ordinary.meta)).toBe(true)
+		const login = PermissionActions.PERSON_SIGN_UP(['login'])
+		expect(permissions.isAllowed('onboarding', login.resource, login.privilege, login.meta)).toBe(true)
+		const denied = PermissionActions.PERSON_SIGN_UP(['support'])
+		expect(permissions.isAllowed('onboarding', denied.resource, denied.privilege, denied.meta)).toBe(false)
+		const protectedRole = PermissionActions.PERSON_SIGN_UP(['project_creator'])
+		expect(permissions.isAllowed('onboarding', protectedRole.resource, protectedRole.privilege, protectedRole.meta)).toBe(false)
+	})
+
+	test('target constraints are explicit and project-membership aware', () => {
+		const permissions = buildCustomRolePermissions([
+			customRoleRow('support', [
+				{
+					permission: 'person:changePassword',
+					config: targetConfig(['person'], 'none'),
+				},
+			]),
+		])
+		const ordinary = PermissionActions.PERSON_CHANGE_PASSWORD(target(['person']))
+		expect(permissions.isAllowed('support', ordinary.resource, ordinary.privilege, ordinary.meta)).toBe(true)
+		const projectMember = PermissionActions.PERSON_CHANGE_PASSWORD(target(['person'], true))
+		expect(permissions.isAllowed('support', projectMember.resource, projectMember.privilege, projectMember.meta)).toBe(false)
+		const protectedTarget = PermissionActions.PERSON_CHANGE_PASSWORD(target(['super_admin']))
+		expect(permissions.isAllowed('support', protectedTarget.resource, protectedTarget.privilege, protectedTarget.meta)).toBe(false)
+	})
+
+	test('configured denied roles narrow access and immutable denied roles cannot be re-enabled', () => {
+		const permissions = buildCustomRolePermissions([
+			customRoleRow('support', [
+				{
+					permission: 'person:changePassword',
+					config: {
+						target: {
+							globalRoles: { allowed: ['login', 'person'], denied: ['login'] },
+							projectMemberships: 'any',
+						},
+					},
+				},
+			]),
+		])
+		const denied = PermissionActions.PERSON_CHANGE_PASSWORD(target(['login']))
+		expect(permissions.isAllowed('support', denied.resource, denied.privilege, denied.meta)).toBe(false)
+		expect(() =>
+			parseCustomRoleGrants([{
+				permission: 'person:changePassword',
+				config: {
+					target: {
+						globalRoles: { allowed: ['person', 'super_admin'], denied: [] },
+						projectMemberships: 'any',
+					},
+				},
+			}])
+		).toThrow(CustomRoleGrantValidationError)
+	})
+
+	test('profile grants constrain both target facts and the changed fields', () => {
+		const permissions = buildCustomRolePermissions([
+			customRoleRow('profile_support', [{
+				permission: 'person:changeProfile',
+				config: {
+					...targetConfig(['person']),
+					fields: { allowed: ['name'] },
+				},
+			}]),
+		])
+		const name = PermissionActions.PERSON_CHANGE_PROFILE(target(['person']), ['name'])
+		expect(permissions.isAllowed('profile_support', name.resource, name.privilege, name.meta)).toBe(true)
+		const email = PermissionActions.PERSON_CHANGE_PROFILE(target(['person']), ['email'])
+		expect(permissions.isAllowed('profile_support', email.resource, email.privilege, email.meta)).toBe(false)
+	})
+
+	test('global role mutation checks requested roles, target, and self assignment', () => {
+		const permissions = buildCustomRolePermissions([
+			customRoleRow('role_manager', [
+				{
+					permission: 'identity:addGlobalRoles',
+					config: {
+						roles: { allowed: ['support'] },
+						...targetConfig(['person', 'support']),
+						allowSelf: false,
+					},
+				},
+			]),
+		])
+		const allowed = PermissionActions.IDENTITY_ADD_GLOBAL_ROLES({
+			requestedRoles: ['support'],
+			target: target(['person']),
+			self: false,
+		})
+		expect(permissions.isAllowed('role_manager', allowed.resource, allowed.privilege, allowed.meta)).toBe(true)
+		const self = PermissionActions.IDENTITY_ADD_GLOBAL_ROLES({
+			requestedRoles: ['support'],
+			target: target(['person']),
+			self: true,
+		})
+		expect(permissions.isAllowed('role_manager', self.resource, self.privilege, self.meta)).toBe(false)
+	})
+
+	test('session-token grants require bounded explicit expiration and configured forwarding trust', () => {
+		const permissions = buildCustomRolePermissions([
+			customRoleRow('support', [
+				{
+					permission: 'person:createSessionToken',
+					config: {
+						...targetConfig(['person']),
+						session: {
+							maxExpirationMinutes: 30,
+							allowTrustForwardedClientInfo: false,
+						},
+					},
+				},
+			]),
+		])
+		const preflight = PermissionActions.PERSON_CREATE_SESSION_KEY({ phase: 'preflight' })
+		expect(permissions.isAllowed('support', preflight.resource, preflight.privilege, preflight.meta)).toBe(true)
+		const allowed = PermissionActions.PERSON_CREATE_SESSION_KEY({
+			phase: 'target',
+			target: target(['person']),
+			requestedExpirationMinutes: 30,
+			trustForwardedClientInfo: false,
+		})
 		expect(permissions.isAllowed('support', allowed.resource, allowed.privilege, allowed.meta)).toBe(true)
-		// denylisted name in a row is ignored even if it slipped past write-time validation
-		const escalation = PermissionActions.IDENTITY_ADD_GLOBAL_ROLES(['login'])
-		expect(permissions.isAllowed('support', escalation.resource, escalation.privilege, escalation.meta)).toBe(false)
+		const unbounded = PermissionActions.PERSON_CREATE_SESSION_KEY({
+			phase: 'target',
+			target: target(['person']),
+			requestedExpirationMinutes: null,
+			trustForwardedClientInfo: false,
+		})
+		expect(permissions.isAllowed('support', unbounded.resource, unbounded.privilege, unbounded.meta)).toBe(false)
 	})
 
-	test('roles-parameterized grants never target super_admin or project_creator', () => {
-		const permissions = buildCustomRolePermissions([customRoleRow('support', ['person:forceSignOut'])])
-		const forbidden = PermissionActions.PERSON_FORCE_SIGN_OUT(['super_admin'])
-		expect(permissions.isAllowed('support', forbidden.resource, forbidden.privilege, forbidden.meta)).toBe(false)
-		const forbidden2 = PermissionActions.PERSON_FORCE_SIGN_OUT(['project_creator'])
-		expect(permissions.isAllowed('support', forbidden2.resource, forbidden2.privilege, forbidden2.meta)).toBe(false)
-	})
-})
-
-describe('CustomRoleAccessEvaluator', () => {
-	const staticEvaluator = new AccessEvaluator.PermissionEvaluator(new PermissionsFactory().create())
-
-	const createAuthorizator = (db: DatabaseContext) => new Authorizator.Default(new CustomRoleAccessEvaluator(staticEvaluator, db))
-
-	test('static roles pass without touching the database', async () => {
-		const db = makeDb([])
-		const authorizator = createAuthorizator(db)
-		const identity = new StaticIdentity('id', ['super_admin'])
-		const allowed = await authorizator.isAllowed(identity, new AuthorizationScope.Global(), PermissionActions.PERSON_FORCE_SIGN_OUT(['person']))
-		expect(allowed).toBe(true)
-	})
-
-	test('custom role grants its bundle, single query per request', async () => {
-		const db = makeDb([
-			{
-				sql: CUSTOM_ROLES_SQL,
-				parameters: ['support'],
-				response: { rows: [customRoleRow('support', ['person:forceSignOut', 'person:viewSessions'])] },
-			},
+	test('global API key grants constrain assigned roles and forwarding trust', () => {
+		const permissions = buildCustomRolePermissions([
+			customRoleRow('integration_manager', [{
+				permission: 'apiKey:createGlobal',
+				config: {
+					roles: { allowed: ['login'], denied: [] },
+					allowTrustForwardedClientInfo: false,
+				},
+			}]),
 		])
-		const authorizator = createAuthorizator(db)
-		const identity = new StaticIdentity('id', ['person', 'support'])
-		const scope = new AuthorizationScope.Global()
-		expect(await authorizator.isAllowed(identity, scope, PermissionActions.PERSON_FORCE_SIGN_OUT(['person']))).toBe(true)
-		// second check is served from the memoized load — the mock would fail on a second query
-		expect(await authorizator.isAllowed(identity, scope, PermissionActions.PERSON_VIEW_SESSIONS(['person']))).toBe(true)
-		// not in the bundle
-		expect(await authorizator.isAllowed(identity, scope, PermissionActions.PERSON_RESET_MFA(['person']))).toBe(false)
+		const allowed = PermissionActions.API_KEY_CREATE_GLOBAL({
+			requestedRoles: ['login'],
+			trustForwardedClientInfo: false,
+		})
+		expect(permissions.isAllowed('integration_manager', allowed.resource, allowed.privilege, allowed.meta)).toBe(true)
+		const wrongRole = PermissionActions.API_KEY_CREATE_GLOBAL({
+			requestedRoles: ['project_admin'],
+			trustForwardedClientInfo: false,
+		})
+		expect(permissions.isAllowed('integration_manager', wrongRole.resource, wrongRole.privilege, wrongRole.meta)).toBe(false)
+		const forwarded = PermissionActions.API_KEY_CREATE_GLOBAL({
+			requestedRoles: ['login'],
+			trustForwardedClientInfo: true,
+		})
+		expect(permissions.isAllowed('integration_manager', forwarded.resource, forwarded.privilege, forwarded.meta)).toBe(false)
 	})
 
-	test('custom role cannot target a super_admin', async () => {
-		const db = makeDb([
-			{
-				sql: CUSTOM_ROLES_SQL,
-				parameters: ['support'],
-				response: { rows: [customRoleRow('support', ['person:forceSignOut'])] },
-			},
+	test('mail template grants match exact scope and type', () => {
+		const permissions = buildCustomRolePermissions([
+			customRoleRow('mailer', [
+				{
+					permission: 'mailTemplate:list',
+					config: {
+						global: false,
+						projects: ['blog'],
+						types: ['FORCED_SIGN_OUT'],
+					},
+				},
+			]),
 		])
-		const authorizator = createAuthorizator(db)
-		const identity = new StaticIdentity('id', ['support'])
-		const allowed = await authorizator.isAllowed(identity, new AuthorizationScope.Global(), PermissionActions.PERSON_FORCE_SIGN_OUT(['super_admin']))
-		expect(allowed).toBe(false)
+		const allowed = PermissionActions.MAIL_TEMPLATE_LIST({
+			kind: 'project',
+			projectSlug: 'blog',
+			type: 'FORCED_SIGN_OUT',
+		})
+		expect(permissions.isAllowed('mailer', allowed.resource, allowed.privilege, allowed.meta)).toBe(true)
+		const wrongProject = PermissionActions.MAIL_TEMPLATE_LIST({
+			kind: 'project',
+			projectSlug: 'shop',
+			type: 'FORCED_SIGN_OUT',
+		})
+		expect(permissions.isAllowed('mailer', wrongProject.resource, wrongProject.privilege, wrongProject.meta)).toBe(false)
 	})
 
-	test('unknown role without a row grants nothing', async () => {
-		const db = makeDb([
-			{
-				sql: CUSTOM_ROLES_SQL,
-				parameters: ['ghost'],
-				response: { rows: [] },
-			},
+	test('a role with any invalid persisted grant is entirely inert', () => {
+		const permissions = buildCustomRolePermissions([
+			customRoleRow('support', [
+				{ permission: 'person:list', config: null },
+				{ permission: 'person:changePassword', config: { target: 'invalid' } },
+			]),
 		])
-		const authorizator = createAuthorizator(db)
-		const identity = new StaticIdentity('id', ['ghost'])
-		const allowed = await authorizator.isAllowed(identity, new AuthorizationScope.Global(), PermissionActions.PERSON_FORCE_SIGN_OUT(['person']))
-		expect(allowed).toBe(false)
+		expect(permissions.isAllowed('support', 'person', 'list', undefined)).toBe(false)
+		const action = PermissionActions.PERSON_CHANGE_PASSWORD(target(['person']))
+		expect(permissions.isAllowed('support', action.resource, action.privilege, action.meta)).toBe(false)
 	})
 
-	test('builtin-only identities never query the database', async () => {
-		const db = makeDb([])
-		const authorizator = createAuthorizator(db)
-		const identity = new StaticIdentity('id', ['person'])
-		const allowed = await authorizator.isAllowed(identity, new AuthorizationScope.Global(), PermissionActions.PERSON_FORCE_SIGN_OUT(['person']))
-		expect(allowed).toBe(false)
+	test('object-prototype role names cannot leak permissions between maps', () => {
+		const permissions = buildCustomRolePermissions([
+			customRoleRow('constructor', [{ permission: 'person:list', config: null }]),
+		])
+		expect(permissions.isAllowed('constructor', 'person', 'list', undefined)).toBe(true)
+
+		const unrelated = new Permissions()
+		expect(unrelated.isAllowed('constructor', 'person', 'list', undefined)).toBe(false)
 	})
 })

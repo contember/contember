@@ -7,6 +7,9 @@ import { authenticatedIdentityId } from '../../../src/testTenant.js'
 import { getPersonByIdentity } from './sql/getPersonByIdentity.js'
 import { getPersonByEmailSql } from './sql/getPersonByEmailSql.js'
 import { getPersonByIdSql } from './sql/getPersonByIdSql.js'
+import { getIdentityProjectMembershipPresenceSql } from './sql/getIdentityProjectMembershipPresenceSql.js'
+import { sqlReadCommittedTransaction } from './sql/sqlTransaction.js'
+import { getIdentityByIdSql } from './sql/getIdentityByIdSql.js'
 
 test('changes my name and email', async () => {
 	const personId = testUuid(1)
@@ -16,12 +19,16 @@ test('changes my name and email', async () => {
 	await executeTenantTest({
 		query: changeProfileMutation({ personId, email, name }),
 		executes: [
-			getPersonByIdSql({
-				personId,
-				response: { personId, email: 'john.doe@example.com', name: 'John Doe', roles: [], password: '123456', identityId },
-			}),
-			getPersonByEmailSql({ email, response: null }),
-			updatePersonProfileNameAndEmailSql({ personId, email, name }),
+			...sqlReadCommittedTransaction(
+				getPersonByIdSql({
+					personId,
+					response: { personId, email: 'john.doe@example.com', name: 'John Doe', roles: [], password: '123456', identityId },
+				}),
+				getIdentityByIdSql({ identityId, lock: true }),
+				getIdentityProjectMembershipPresenceSql(identityId),
+				getPersonByEmailSql({ email, response: null }),
+				updatePersonProfileNameAndEmailSql({ personId, email, name }),
+			),
 		],
 		return: {
 			data: {

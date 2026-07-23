@@ -5,6 +5,9 @@ import { getPersonByIdSql } from './sql/getPersonByIdSql.js'
 import { updatePersonPasswordSql } from './sql/updatePesonPasswordSql.js'
 import { expect, test } from 'bun:test'
 import { getConfigSql } from './sql/getConfigSql.js'
+import { getIdentityProjectMembershipPresenceSql } from './sql/getIdentityProjectMembershipPresenceSql.js'
+import { sqlReadCommittedTransaction } from './sql/sqlTransaction.js'
+import { getIdentityByIdSql } from './sql/getIdentityByIdSql.js'
 
 test('changes a password', async () => {
 	const personId = testUuid(1)
@@ -13,12 +16,16 @@ test('changes a password', async () => {
 	await executeTenantTest({
 		query: changePasswordMutation({ personId, password }),
 		executes: [
-			getPersonByIdSql({
-				personId,
-				response: { personId, email: 'john@doe.com', roles: [], password: '123', identityId },
-			}),
-			getConfigSql(),
-			updatePersonPasswordSql({ personId, password }),
+			...sqlReadCommittedTransaction(
+				getPersonByIdSql({
+					personId,
+					response: { personId, email: 'john@doe.com', roles: [], password: '123', identityId },
+				}),
+				getIdentityByIdSql({ identityId, lock: true }),
+				getIdentityProjectMembershipPresenceSql(identityId),
+				getConfigSql(),
+				updatePersonPasswordSql({ personId, password }),
+			),
 		],
 		return: {
 			data: {

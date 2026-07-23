@@ -5,17 +5,22 @@ type CustomRoleRow = {
 	id: string
 	slug: string
 	description: string | null
-	permissions: string[]
+	grants: unknown
 	created_at: Date
 	updated_at: Date
+	deleted_at: Date | null
 }
 
-/**
- * The CustomRoleAccessEvaluator lookup — fired once per PermissionContext when the
- * identity carries a non-builtin global role and the static permission check denies.
- */
-export const getCustomRolesSql = (args: { slugs: string[]; response?: CustomRoleRow[] }): ExpectedQuery => ({
-	sql: SQL`select *  from "tenant"."custom_role" where "slug" in (?)  order by "slug" asc`,
+/** Request-scoped lookup used when a custom role participates in authorization. */
+export const getCustomRolesSql = (response: CustomRoleRow[] = []): ExpectedQuery => ({
+	sql: SQL`select *  from "tenant"."custom_role"  where "deleted_at" is null  order by "slug" asc`,
+	parameters: [],
+	response: { rows: response },
+})
+
+/** Locked active-role lookup used before assigning or referencing a custom role. */
+export const getCustomRolesForValidationSql = (args: { slugs: string[]; response?: CustomRoleRow[] }): ExpectedQuery => ({
+	sql: SQL`select *  from "tenant"."custom_role" where "deleted_at" is null and "slug" in (?)  order by "slug" asc for share`,
 	parameters: args.slugs,
 	response: { rows: args.response ?? [] },
 })

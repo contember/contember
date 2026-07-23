@@ -7,8 +7,11 @@ import {
 	type ConfigInput,
 	configureError$$,
 	configureResponse$$,
+	createCustomRoleError$$,
+	createCustomRoleResponse$$,
 	createProjectResponse$$,
 	createProjectResponseError$$,
+	customRole$,
 	disableIDPError$$,
 	disableIDPResponse$$,
 	enableIDPError$$,
@@ -17,11 +20,13 @@ import {
 	type MailTemplate,
 	mutation$,
 	query$,
+	updateCustomRoleError$$,
+	updateCustomRoleResponse$$,
 	updateIDPError$$,
 	updateIDPResponse$$,
 } from '@contember/graphql-client-tenant'
 import { Fetcher, TextWriter, util } from 'graphql-ts-client-api'
-import { TenantGlobalConfig, TenantIdpOptions, TenantMailTemplate } from './tenantConfig.js'
+import { TenantCustomRoleConfig, TenantGlobalConfig, TenantIdpOptions, TenantMailTemplate } from './tenantConfig.js'
 
 export const createTenantApiUrl = (url: string) => {
 	if (url.endsWith('/')) {
@@ -39,6 +44,10 @@ export interface RemoteIdentityProvider {
 	disabledAt: string | null
 }
 
+export interface RemoteCustomRole {
+	slug: string
+}
+
 interface MutationResult {
 	ok: boolean
 	error?: { code: string; developerMessage?: string } | null
@@ -53,6 +62,9 @@ const updateIdpFetcher = mutation$.updateIDP(updateIDPResponse$$.error(updateIDP
 const enableIdpFetcher = mutation$.enableIDP(enableIDPResponse$$.error(enableIDPError$$))
 const disableIdpFetcher = mutation$.disableIDP(disableIDPResponse$$.error(disableIDPError$$))
 const addMailTemplateFetcher = mutation$.addMailTemplate(addMailTemplateResponse$$.error(addMailTemplateError$$))
+const customRolesFetcher = query$.customRoles(customRole$.slug)
+const createCustomRoleFetcher = mutation$.createCustomRole(createCustomRoleResponse$$.error(createCustomRoleError$$))
+const updateCustomRoleFetcher = mutation$.updateCustomRole(updateCustomRoleResponse$$.error(updateCustomRoleError$$))
 
 export class TenantClient {
 	constructor(private readonly apiClient: GraphQlClient) {}
@@ -118,6 +130,29 @@ export class TenantClient {
 	public async addMailTemplate(template: TenantMailTemplate): Promise<void> {
 		const result = await this.exec(addMailTemplateFetcher, { template: template as MailTemplate })
 		this.assertOk(result.addMailTemplate, `addMailTemplate(${template.type}/${template.variant ?? ''})`)
+	}
+
+	public async listCustomRoles(): Promise<RemoteCustomRole[]> {
+		const result = await this.exec(customRolesFetcher, {})
+		return result.customRoles.map(role => ({ slug: role.slug }))
+	}
+
+	public async createCustomRole(slug: string, role: TenantCustomRoleConfig): Promise<void> {
+		const result = await this.exec(createCustomRoleFetcher, {
+			slug,
+			description: role.description,
+			grants: role.grants,
+		})
+		this.assertOk(result.createCustomRole, `createCustomRole(${slug})`)
+	}
+
+	public async updateCustomRole(slug: string, role: TenantCustomRoleConfig): Promise<void> {
+		const result = await this.exec(updateCustomRoleFetcher, {
+			slug,
+			description: role.description,
+			grants: role.grants,
+		})
+		this.assertOk(result.updateCustomRole, `updateCustomRole(${slug})`)
 	}
 
 	private async exec<TData extends object, TVariables extends object>(

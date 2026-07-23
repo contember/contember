@@ -25,7 +25,7 @@ export class TenantApplyCommand extends Command<Args, Options> {
 	}
 
 	protected configure(configuration: CommandConfiguration<Args, Options>): void {
-		configuration.description('Apply declarative tenant configuration (global config, identity providers, mail templates)')
+		configuration.description('Apply declarative tenant configuration (global config, identity providers, mail templates, custom roles)')
 		configuration.argument('config').optional().description(`Path to the tenant config file (default: ${DEFAULT_CONFIG_PATH})`)
 		configuration.option('dsn').valueRequired().description('Project DSN. Falls back to CONTEMBER_* environment variables.')
 		configuration.option('dry-run').valueNone().description('Print the actions that would be performed without executing them.')

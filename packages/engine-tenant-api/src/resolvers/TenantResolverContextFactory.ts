@@ -1,5 +1,5 @@
 import { TenantResolverContext } from './TenantResolverContext.js'
-import { DatabaseContext, LoginRiskAnalyzer, PermissionContext, PermissionContextFactory } from '../model/index.js'
+import { DatabaseContext, LoginRiskAnalyzer, PermissionContext, PermissionContextFactory, UNPERSISTED_ROOT_IDENTITY_ID } from '../model/index.js'
 import { Logger } from '@contember/logger'
 import { AuthLogService } from '../model/service/AuthLogService.js'
 
@@ -35,11 +35,13 @@ export class TenantResolverContextFactory {
 		// A03: stamp every auth-log row with the trusted geo country (when present)
 		// and a UA fingerprint, so the next sign-in's anomaly check has a baseline.
 		const deviceFingerprint = this.loginRiskAnalyzer.fingerprint(httpInfo.userAgent) ?? undefined
+		const unpersistedRoot = authContext.identityId === UNPERSISTED_ROOT_IDENTITY_ID
 		return {
 			...createResolverContext(permissionContext, authContext.apiKeyId, authContext.trustForwardedInfo ?? false),
-			logAuthAction: async data => {
-				await this.authLogService.logAuthAction(db, {
-					identityId: authContext.identityId,
+			logAuthAction: async (data, transaction) => {
+				await this.authLogService.logAuthAction(transaction ?? db, {
+					identityId: unpersistedRoot ? undefined : authContext.identityId,
+					unpersistedRoot,
 					userAgent: httpInfo.userAgent,
 					clientIp: httpInfo.ip,
 					forwarderIp: httpInfo.forwarderIp,

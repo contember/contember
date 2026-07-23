@@ -9,7 +9,7 @@ import { GraphQLResolveInfo } from 'graphql'
 import { TenantResolverContext } from '../../TenantResolverContext.js'
 import { ApiKeyManager, isTokenHash, MembershipValidator, PermissionActions, ProjectManager } from '../../../model/index.js'
 import { createMembershipValidationErrorResult } from '../../membershipUtils.js'
-import { createProjectNotFoundResponse } from '../../errorUtils.js'
+import { createErrorResponse, createProjectNotFoundResponse } from '../../errorUtils.js'
 import { UserInputError } from '@contember/graphql-utils'
 import { ResponseOk } from '../../../model/utils/Response.js'
 import { Acl, JSONValue } from '@contember/schema'
@@ -49,35 +49,39 @@ export class CreateApiKeyMutationResolver implements MutationResolvers {
 			}
 		}
 
-		const result = await this.apiKeyManager.createProjectPermanentApiKey(
-			context.db,
-			project.id,
-			memberships,
-			description,
-			tokenHash ?? undefined,
-			options?.trustForwardedClientInfo === true,
-		)
-
-		await context.logAuthAction({
-			type: 'api_key_create',
-			response: new ResponseOk(null),
-			eventData: {
-				scope: 'project',
-				projectSlug: project.slug,
-				apiKeyId: result.result.apiKey.id,
-				identityId: result.result.identity.id,
+		return await context.db.transaction(async db => {
+			const result = await this.apiKeyManager.createProjectPermanentApiKeyInTransaction(
+				db,
+				project.id,
+				memberships,
 				description,
-				memberships: memberships.map(membershipToJson),
-			},
-		})
+				tokenHash ?? undefined,
+				options?.trustForwardedClientInfo === true,
+			)
+			if (!result.ok) {
+				return createErrorResponse(result)
+			}
+			await context.logAuthAction({
+				type: 'api_key_create',
+				response: new ResponseOk(null),
+				eventData: {
+					scope: 'project',
+					projectSlug: project.slug,
+					apiKeyId: result.result.apiKey.id,
+					identityId: result.result.identity.id,
+					description,
+					memberships: memberships.map(membershipToJson),
+				},
+			}, db)
 
-		return {
-			ok: true,
-			errors: [],
-			result: {
-				apiKey: result.result.toApiKeyWithToken(),
-			},
-		}
+			return {
+				ok: true,
+				errors: [],
+				result: {
+					apiKey: result.result.toApiKeyWithToken(),
+				},
+			}
+		})
 	}
 
 	async createGlobalApiKey(
@@ -87,40 +91,48 @@ export class CreateApiKeyMutationResolver implements MutationResolvers {
 		info: GraphQLResolveInfo,
 	): Promise<CreateApiKeyResponse> {
 		roles ??= []
+		const trustForwardedClientInfo = options?.trustForwardedClientInfo === true
 		await context.requireAccess({
-			action: PermissionActions.API_KEY_CREATE_GLOBAL(roles),
+			action: PermissionActions.API_KEY_CREATE_GLOBAL({
+				requestedRoles: roles,
+				trustForwardedClientInfo,
+			}),
 			message: 'You are not allowed to create a global API key',
 		})
 		if (typeof tokenHash === 'string' && !isTokenHash(tokenHash)) {
 			throw new UserInputError('Invalid format of tokenHash. Must be hex-encoded sha256.')
 		}
-		const result = await this.apiKeyManager.createGlobalPermanentApiKey(
-			context.db,
-			description,
-			roles,
-			tokenHash ?? undefined,
-			options?.trustForwardedClientInfo === true,
-		)
-
-		await context.logAuthAction({
-			type: 'api_key_create',
-			response: new ResponseOk(null),
-			eventData: {
-				scope: 'global',
-				apiKeyId: result.result.apiKey.id,
-				identityId: result.result.identity.id,
+		return await context.db.transaction(async db => {
+			const result = await this.apiKeyManager.createGlobalPermanentApiKeyInTransaction(
+				db,
 				description,
-				roles: [...roles],
-			},
-		})
+				roles,
+				tokenHash ?? undefined,
+				trustForwardedClientInfo,
+			)
+			if (!result.ok) {
+				return createErrorResponse(result)
+			}
+			await context.logAuthAction({
+				type: 'api_key_create',
+				response: new ResponseOk(null),
+				eventData: {
+					scope: 'global',
+					apiKeyId: result.result.apiKey.id,
+					identityId: result.result.identity.id,
+					description,
+					roles: [...roles],
+				},
+			}, db)
 
-		return {
-			ok: true,
-			errors: [],
-			result: {
-				apiKey: result.result.toApiKeyWithToken(),
-			},
-		}
+			return {
+				ok: true,
+				errors: [],
+				result: {
+					apiKey: result.result.toApiKeyWithToken(),
+				},
+			}
+		})
 	}
 }
 

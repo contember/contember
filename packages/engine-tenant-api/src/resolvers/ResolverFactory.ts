@@ -47,6 +47,8 @@ import { ConfigurationMutationResolver } from './mutation/configuration/Configur
 import { ConfigurationQueryResolver } from './query/ConfigurationQueryResolver.js'
 import { AuthPolicyMutationResolver } from './mutation/configuration/AuthPolicyMutationResolver.js'
 import { AuthPolicyQueryResolver } from './query/AuthPolicyQueryResolver.js'
+import { CustomRoleMutationResolver } from './mutation/customRole/CustomRoleMutationResolver.js'
+import { CustomRoleQueryResolver } from './query/CustomRoleQueryResolver.js'
 import { ResetPersonMfaMutationResolver } from './mutation/person/ResetPersonMfaMutationResolver.js'
 import { PasswordlessMutationResolver } from './mutation/person/PasswordlessMutationResolver.js'
 import { TogglePasswordlessMutationResolver } from './mutation/person/TogglePasswordlessMutationResolver.js'
@@ -112,6 +114,9 @@ class ResolverFactory {
 			authPolicyMutationResolver: AuthPolicyMutationResolver
 			authPolicyQueryResolver: AuthPolicyQueryResolver
 
+			customRoleMutationResolver: CustomRoleMutationResolver
+			customRoleQueryResolver: CustomRoleQueryResolver
+
 			authLogQueryResolver: AuthLogQueryResolver
 			apiKeyQueryResolver: ApiKeyQueryResolver
 
@@ -152,6 +157,8 @@ class ResolverFactory {
 				mailTemplates: this.resolvers.mailTemplateQueryResolver.mailTemplates.bind(this.resolvers.mailTemplateQueryResolver),
 				configuration: this.resolvers.configurationQueryResolver.configuration.bind(this.resolvers.configurationQueryResolver),
 				authPolicies: this.resolvers.authPolicyQueryResolver.authPolicies.bind(this.resolvers.authPolicyQueryResolver),
+				customRoles: this.resolvers.customRoleQueryResolver.customRoles.bind(this.resolvers.customRoleQueryResolver),
+				customRolePermissions: this.resolvers.customRoleQueryResolver.customRolePermissions.bind(this.resolvers.customRoleQueryResolver),
 				authLog: this.resolvers.authLogQueryResolver.authLog.bind(this.resolvers.authLogQueryResolver),
 				checkResetPasswordToken: () => {
 					throw new Error('not implemented')
@@ -250,6 +257,10 @@ class ResolverFactory {
 				createAuthPolicy: this.resolvers.authPolicyMutationResolver.createAuthPolicy.bind(this.resolvers.authPolicyMutationResolver),
 				updateAuthPolicy: this.resolvers.authPolicyMutationResolver.updateAuthPolicy.bind(this.resolvers.authPolicyMutationResolver),
 				deleteAuthPolicy: this.resolvers.authPolicyMutationResolver.deleteAuthPolicy.bind(this.resolvers.authPolicyMutationResolver),
+
+				createCustomRole: this.resolvers.customRoleMutationResolver.createCustomRole.bind(this.resolvers.customRoleMutationResolver),
+				updateCustomRole: this.resolvers.customRoleMutationResolver.updateCustomRole.bind(this.resolvers.customRoleMutationResolver),
+				deleteCustomRole: this.resolvers.customRoleMutationResolver.deleteCustomRole.bind(this.resolvers.customRoleMutationResolver),
 			},
 		}
 	}

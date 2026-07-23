@@ -58,7 +58,8 @@ CREATE TYPE "auth_log_type" AS ENUM (
     'idp_logout_initiated',
     'idp_backchannel_logout',
     'idp_role_mapped',
-    'idp_role_mapping_failed'
+    'idp_role_mapping_failed',
+    'custom_role_change'
 );
 CREATE TYPE "config_policy" AS ENUM (
     'always',
@@ -183,6 +184,16 @@ CREATE TABLE "config" (
     "login_anomaly_step_up_threshold" integer DEFAULT 3 NOT NULL,
     CONSTRAINT "config_captcha_complete" CHECK ((("captcha_provider" IS NULL) OR (("captcha_secret" IS NOT NULL) AND ("captcha_secret_version" IS NOT NULL)))),
     CONSTRAINT "config_captcha_provider_check" CHECK ((("captcha_provider" IS NULL) OR ("captcha_provider" = ANY (ARRAY['turnstile'::"text", 'hcaptcha'::"text", 'recaptchaV3'::"text"]))))
+);
+CREATE TABLE "custom_role" (
+    "id" "uuid" NOT NULL,
+    "slug" "text" NOT NULL,
+    "description" "text",
+    "grants" "jsonb" NOT NULL,
+    "created_at" timestamp with time zone DEFAULT "now"() NOT NULL,
+    "updated_at" timestamp with time zone DEFAULT "now"() NOT NULL,
+    "deleted_at" timestamp with time zone,
+    CONSTRAINT "custom_role_grants_check" CHECK (("jsonb_typeof"("grants") = 'array'::"text"))
 );
 CREATE TABLE "identity" (
     "id" "uuid" NOT NULL,
@@ -335,6 +346,10 @@ ALTER TABLE ONLY "auth_policy"
     ADD CONSTRAINT "auth_policy_pkey" PRIMARY KEY ("id");
 ALTER TABLE ONLY "config"
     ADD CONSTRAINT "config_pkey" PRIMARY KEY ("id");
+ALTER TABLE ONLY "custom_role"
+    ADD CONSTRAINT "custom_role_pkey" PRIMARY KEY ("id");
+ALTER TABLE ONLY "custom_role"
+    ADD CONSTRAINT "custom_role_slug_key" UNIQUE ("slug");
 ALTER TABLE ONLY "person"
     ADD CONSTRAINT "email_unique" UNIQUE ("email");
 ALTER TABLE ONLY "identity"

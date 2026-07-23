@@ -11,6 +11,7 @@ export interface TenantConfigApplyOptions {
  * - identity providers are added or updated based on the current state, then
  *   enabled/disabled to match `disabled`.
  * - mail templates are upserted server-side by `addMailTemplate`.
+ * - custom roles are created or updated by slug.
  *
  * Nothing is ever removed — entries missing from the config are left untouched.
  */
@@ -65,6 +66,33 @@ export class TenantConfigApplier {
 				log(`addMailTemplate: ${template.type}${template.variant ? `/${template.variant}` : ''}`)
 				if (!dryRun) {
 					await client.addMailTemplate(template)
+				}
+			}
+		}
+
+		if (config.customRoles && Object.keys(config.customRoles).length > 0) {
+			const existing = await client.listCustomRoles()
+			const existingSlugs = new Set(existing.map(role => role.slug))
+			const configuredRoles = Object.entries(config.customRoles)
+			const missingRoles = configuredRoles.filter(([slug]) => !existingSlugs.has(slug))
+
+			// Create all slugs first so grants may reference roles declared later or cyclically.
+			for (const [slug, role] of missingRoles) {
+				log(`createCustomRole: ${slug}`)
+				if (!dryRun) {
+					await client.createCustomRole(slug, {
+						description: role.description,
+						grants: [],
+					})
+				}
+			}
+
+			for (const [slug, role] of configuredRoles) {
+				if (existingSlugs.has(slug)) {
+					log(`updateCustomRole: ${slug}`)
+				}
+				if (!dryRun) {
+					await client.updateCustomRole(slug, role)
 				}
 			}
 		}

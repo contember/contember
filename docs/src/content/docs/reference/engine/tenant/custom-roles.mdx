@@ -1,0 +1,267 @@
+---
+title: Custom roles
+---
+
+Custom roles are runtime-defined global roles. Each role contains an explicit list of tenant actions and, where required, a small action-specific
+configuration. They make it possible to delegate a narrow administrative capability without granting the broad built-in `project_admin` or
+`super_admin` role.
+
+Custom roles do not replace project schema ACL. Project membership and project-scoped authorization remain controlled by schema ACL and membership
+matching. The one project-aware exception is mail-template management, which can be limited to exact project slugs and mail types.
+
+## Defining a role
+
+Each grant has a stable permission name and either `null` or a strict JSON configuration:
+
+```graphql
+mutation {
+  createCustomRole(
+    slug: "support"
+    description: "Support team"
+    grants: [
+      { permission: "person:list" }
+      { permission: "person:view" }
+      {
+        permission: "person:forceSignOut"
+        config: {
+          target: {
+            globalRoles: {
+              allowed: ["person", "support"]
+              denied: []
+            }
+            projectMemberships: "none"
+          }
+        }
+      }
+    ]
+  ) {
+    ok
+    error { code developerMessage }
+  }
+}
+```
+
+Configuration is validated strictly. Unknown fields, invalid types, duplicate permissions, unsupported permission names, and references to
+nonexistent custom roles or projects are rejected. Updates replace the complete `grants` array when it is supplied; omitting it leaves the grants
+unchanged.
+
+Errors include `INVALID_SLUG`, `SLUG_ALREADY_EXISTS`, `UNKNOWN_PERMISSION`, `DUPLICATE_PERMISSION`, and
+`INVALID_PERMISSION_CONFIGURATION`.
+
+Deleting a role removes its slug from every identity and permanently reserves the slug. This prevents deleting and recreating a role from silently
+reactivating old assignments.
+
+For repeatable provisioning, define roles in a typed `tenant.config.ts`:
+
+```ts
+import { defineTenantConfig } from '@contember/cli'
+
+export default defineTenantConfig({
+  customRoles: {
+    support: {
+      description: 'Support team',
+      grants: [
+        { permission: 'person:list' },
+        { permission: 'person:view' },
+      ],
+    },
+  },
+})
+```
+
+Run `contember tenant:apply`. The CLI creates missing slugs before applying grants, so configured roles may reference each other regardless of
+declaration order. Existing roles are replaced with the configured definition; roles omitted from the file are left untouched. Grant config is
+fully discriminated by permission in TypeScript. See [declarative tenant configuration](/reference/engine/tenant/declarative-config).
+
+## Assigning a role
+
+Assignment uses the existing global-role API:
+
+```graphql
+mutation {
+  addGlobalIdentityRoles(identityId: "…", roles: ["support"]) { ok }
+}
+```
+
+The caller needs `identity:addGlobalRoles` for the requested role and target identity. A `super_admin` has it through the built-in wildcard grant;
+custom roles may receive a constrained version described below. The built-in `project_admin` grant remains limited by its hardcoded verifier.
+
+Changes apply on the next request. Permissions are resolved per request and are not copied into sessions.
+
+## Reading definitions and the catalog
+
+```graphql
+query {
+  customRoles {
+    slug
+    description
+    grants { permission config }
+  }
+  customRolePermissions {
+    name
+    configurationKind
+    configurationRequired
+    defaultConfig
+  }
+}
+```
+
+Both fields require `customRole:view`, which is itself grantable. The catalog is an explicit allowlist: adding a new engine action does not
+automatically expose it to custom roles.
+
+## Configuration shapes
+
+Role constraints have one shared meaning:
+
+```json
+{
+  "allowed": ["person", "support"],
+  "denied": ["suspended_support"]
+}
+```
+
+Every observed role must be in `allowed` and absent from `denied`. The code-owned restrictions on `super_admin` and `project_creator` always apply
+and cannot be weakened by configuration.
+
+### Input roles
+
+`person:signUp` uses:
+
+```json
+{
+  "roles": {
+    "allowed": ["support"],
+    "denied": []
+  }
+}
+```
+
+The allowlist covers roles requested for the new identity. An empty requested-role list is allowed.
+
+### Target identity
+
+`person:disable`, `person:forceSignOut`, `person:resetMfa`, `person:viewSessions`, `person:viewIdp`, and `person:changePassword` use:
+
+```json
+{
+  "target": {
+    "globalRoles": {
+      "allowed": ["person", "support"],
+      "denied": []
+    },
+    "projectMemberships": "none"
+  }
+}
+```
+
+`projectMemberships: "none"` restricts the action to identities without project memberships at the time of the operation. `"any"` explicitly
+allows targets regardless of project memberships.
+
+`person:changePassword` replaces the target's password and therefore delegates account takeover for a matching target. This authority remains
+meaningful if the target receives more privileges later; use it only for roles that are trusted with that consequence.
+
+### Profile fields
+
+`person:changeProfile` adds an explicit field allowlist:
+
+```json
+{
+  "target": {
+    "globalRoles": { "allowed": ["person"], "denied": [] },
+    "projectMemberships": "none"
+  },
+  "fields": {
+    "allowed": ["name"]
+  }
+}
+```
+
+Allowing `email` delegates a credential-recovery/account-takeover capability, not only cosmetic profile editing.
+
+### Session impersonation
+
+`person:createSessionToken` adds session limits:
+
+```json
+{
+  "target": {
+    "globalRoles": { "allowed": ["person"], "denied": [] },
+    "projectMemberships": "none"
+  },
+  "session": {
+    "maxExpirationMinutes": 30,
+    "allowTrustForwardedClientInfo": false
+  }
+}
+```
+
+The caller must request an explicit positive expiration no greater than the configured maximum. The result is a normal session for the target, not
+a privilege-capped token: later changes to the target's global roles or project memberships affect what that session can do until it expires.
+
+### Global-role changes
+
+`identity:addGlobalRoles` and `identity:removeGlobalRoles` constrain both the requested roles and the target:
+
+```json
+{
+  "roles": {
+    "allowed": ["support"],
+    "denied": []
+  },
+  "target": {
+    "globalRoles": { "allowed": ["person"], "denied": [] },
+    "projectMemberships": "none"
+  },
+  "allowSelf": false
+}
+```
+
+`allowSelf: false` prevents the holder from using this grant against its own identity.
+
+### Global API keys
+
+`apiKey:createGlobal` uses:
+
+```json
+{
+  "roles": {
+    "allowed": ["support"],
+    "denied": []
+  },
+  "allowTrustForwardedClientInfo": false
+}
+```
+
+The role allowlist covers the complete explicit role set assigned to the new API-key identity.
+
+### Mail templates
+
+`mailTemplate:add`, `mailTemplate:remove`, and `mailTemplate:list` each have an independent exact-scope configuration:
+
+```json
+{
+  "global": false,
+  "projects": ["project-a", "project-b"],
+  "types": ["FORCED_SIGN_OUT", "BACKUP_CODES_EXHAUSTED"]
+}
+```
+
+`global` controls global templates, `projects` contains exact canonical project slugs, and `types` contains exact mail types. Mixed template lists
+are filtered row by row. Globs, patterns, and arbitrary resource expressions are not supported.
+
+## Grantable surface
+
+Configuration-free grants currently include tenant-global reads and operations such as `person:list`, `person:view`, `system:viewConfig`,
+`system:viewAuthLog`, `apiKey:list`, `idp:list`, `project:create`, `entrypoint:deployEntrypoint`, and `customRole:view`.
+
+Project and membership actions such as invitations, project updates and secrets, project member management, and project API-key creation are not
+grantable. `customRole:manage` is also deliberately excluded so a custom role cannot edit its own definition. Use `customRolePermissions` as the
+authoritative catalog for the exact engine version.
+
+## Auditing
+
+Every successful definition change writes a `custom_role_change` audit entry. Create and update entries contain canonical grant snapshots; delete
+entries contain the previous snapshot and the number of removed assignments.
+
+Custom-role grants compile into the existing `Permissions.allow(..., verifier)` mechanism. They add no generic condition language, resource
+patterns, first-class deny statements, or separate authorization data flow.

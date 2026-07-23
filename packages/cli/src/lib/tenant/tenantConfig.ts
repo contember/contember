@@ -8,6 +8,7 @@ import type {
 	ConfigRateLimitWindowInput,
 	IDPOptions,
 	MailTemplate,
+	MailType,
 } from '@contember/graphql-client-tenant'
 
 // Enums and leaf input shapes are re-derived from the generated tenant client
@@ -74,6 +75,125 @@ export interface TenantIdpConfig {
 /** Maps to the `addMailTemplate(template: MailTemplate!)` mutation. */
 export type TenantMailTemplate = WithNullable<MailTemplate, 'projectSlug' | 'replyTo'>
 
+export interface TenantCustomRoleRoleConstraint {
+	readonly allowed: readonly string[]
+	readonly denied?: readonly string[]
+}
+
+export interface TenantCustomRoleTarget {
+	readonly globalRoles: TenantCustomRoleRoleConstraint
+	readonly projectMemberships: 'none' | 'any'
+}
+
+export interface TenantCustomRoleRoleInputConfig {
+	readonly roles: TenantCustomRoleRoleConstraint
+}
+
+export interface TenantCustomRoleTargetConfig {
+	readonly target: TenantCustomRoleTarget
+}
+
+export interface TenantCustomRoleMutationConfig extends TenantCustomRoleRoleInputConfig, TenantCustomRoleTargetConfig {
+	readonly allowSelf: boolean
+}
+
+export interface TenantCustomRoleGlobalApiKeyConfig extends TenantCustomRoleRoleInputConfig {
+	readonly allowTrustForwardedClientInfo: boolean
+}
+
+export interface TenantCustomRoleChangeProfileConfig extends TenantCustomRoleTargetConfig {
+	readonly fields: {
+		readonly allowed: readonly ('name' | 'email')[]
+	}
+}
+
+export interface TenantCustomRoleCreateSessionTokenConfig extends TenantCustomRoleTargetConfig {
+	readonly session: {
+		readonly maxExpirationMinutes: number
+		readonly allowTrustForwardedClientInfo: boolean
+	}
+}
+
+export interface TenantCustomRoleMailTemplateConfig {
+	readonly global: boolean
+	readonly projects: readonly string[]
+	readonly types: readonly MailType[]
+}
+
+export type TenantCustomRoleConfigFreePermission =
+	| 'system:configure'
+	| 'system:viewConfig'
+	| 'system:viewAuthLog'
+	| 'person:view'
+	| 'person:list'
+	| 'project:create'
+	| 'entrypoint:deployEntrypoint'
+	| 'apiKey:list'
+	| 'idp:disable'
+	| 'idp:enable'
+	| 'idp:list'
+	| 'customRole:view'
+
+export type TenantCustomRoleTargetPermission =
+	| 'person:disable'
+	| 'person:forceSignOut'
+	| 'person:resetMfa'
+	| 'person:viewSessions'
+	| 'person:viewIdp'
+	| 'person:changePassword'
+
+export type TenantCustomRoleMutationPermission =
+	| 'identity:addGlobalRoles'
+	| 'identity:removeGlobalRoles'
+
+export type TenantCustomRoleMailTemplatePermission =
+	| 'mailTemplate:add'
+	| 'mailTemplate:remove'
+	| 'mailTemplate:list'
+
+/**
+ * A custom-role grant discriminated by `permission`. Configured permissions
+ * require their exact action-specific config; config-free permissions reject it.
+ */
+export type TenantCustomRoleGrant =
+	| {
+		readonly permission: TenantCustomRoleConfigFreePermission
+		readonly config?: never
+	}
+	| {
+		readonly permission: 'person:signUp'
+		readonly config: TenantCustomRoleRoleInputConfig
+	}
+	| {
+		readonly permission: TenantCustomRoleTargetPermission
+		readonly config: TenantCustomRoleTargetConfig
+	}
+	| {
+		readonly permission: 'person:changeProfile'
+		readonly config: TenantCustomRoleChangeProfileConfig
+	}
+	| {
+		readonly permission: 'person:createSessionToken'
+		readonly config: TenantCustomRoleCreateSessionTokenConfig
+	}
+	| {
+		readonly permission: TenantCustomRoleMutationPermission
+		readonly config: TenantCustomRoleMutationConfig
+	}
+	| {
+		readonly permission: 'apiKey:createGlobal'
+		readonly config: TenantCustomRoleGlobalApiKeyConfig
+	}
+	| {
+		readonly permission: TenantCustomRoleMailTemplatePermission
+		readonly config: TenantCustomRoleMailTemplateConfig
+	}
+
+export interface TenantCustomRoleConfig {
+	readonly description?: string
+	readonly grants: readonly TenantCustomRoleGrant[]
+}
+
 /**
  * Declarative tenant configuration. Applied idempotently by
  * `contember tenant:apply`.
@@ -83,6 +203,8 @@ export interface TenantConfig {
 	/** Identity providers keyed by slug. */
 	identityProviders?: Record<string, TenantIdpConfig>
 	mailTemplates?: TenantMailTemplate[]
+	/** Custom roles keyed by slug. Missing roles are created; existing roles are replaced. */
+	customRoles?: Record<string, TenantCustomRoleConfig>
 }
 
 /**

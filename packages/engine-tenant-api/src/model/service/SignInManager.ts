@@ -383,7 +383,7 @@ class SignInManager {
 		dbContext: DatabaseContext,
 		personIdentifier: PersonUniqueIdentifier,
 		expiration?: number,
-		verifier?: (person: PersonRow) => Promise<void>,
+		verifier?: (person: PersonRow) => Promise<PersonRow>,
 		requestInfo?: ApiKeyRequestInfo,
 		trustForwardedInfo?: boolean,
 	): Promise<CreateSessionTokenResponse> {
@@ -407,24 +407,29 @@ class SignInManager {
 			throw new ImplementationException()
 		}
 
+		const verifiedPerson = verifier === undefined ? person : await verifier(person)
 		const inputValue = personIdentifier.type === 'email' ? personIdentifier.email : personIdentifier.id
-		if (person.disabled_at !== null) {
-			return new ResponseError('PERSON_DISABLED', `Person with id ${person.id} is disabled`, {
+		if (verifiedPerson.disabled_at !== null) {
+			return new ResponseError('PERSON_DISABLED', `Person with id ${verifiedPerson.id} is disabled`, {
 				[AuthLogService.Key]: new AuthLogService.Bag({
-					personId: person.id,
+					personId: verifiedPerson.id,
 					personInput: inputValue,
 				}),
 			})
 		}
 
-		await verifier?.(person)
-
-		const sessionToken = await this.apiKeyManager.createSessionApiKey(dbContext, person.identity_id, expiration, requestInfo, trustForwardedInfo)
+		const sessionToken = await this.apiKeyManager.createSessionApiKey(
+			dbContext,
+			verifiedPerson.identity_id,
+			expiration,
+			requestInfo,
+			trustForwardedInfo,
+		)
 		return new ResponseOk({
-			person,
+			person: verifiedPerson,
 			token: sessionToken,
 			[AuthLogService.Key]: new AuthLogService.Bag({
-				personId: person.id,
+				personId: verifiedPerson.id,
 				personInput: inputValue,
 			}),
 		})

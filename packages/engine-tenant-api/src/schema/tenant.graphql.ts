@@ -54,6 +54,19 @@ const schema: DocumentNode = gql`
 		authPolicies: [AuthPolicy!]!
 
 		"""
+		List custom roles (runtime-defined global roles carrying a bundle of tenant
+		permissions). Requires the \`customRole:view\` permission — granted to
+		SUPER_ADMIN by default and itself grantable to a custom role.
+		"""
+		customRoles: [CustomRole!]!
+
+		"""
+		List exact permission definitions grantable to a custom role. Requires
+		the \`customRole:view\` permission.
+		"""
+		customRolePermissions: [CustomRolePermissionDefinition!]!
+
+		"""
 		Read the tenant audit log (\`person_auth_log\`). Requires the
 		\`system:viewAuthLog\` permission — by default granted only to
 		SUPER_ADMIN via the wildcard ALL-resource/ALL-privilege grant.
@@ -182,6 +195,11 @@ const schema: DocumentNode = gql`
 		createAuthPolicy(policy: AuthPolicyInput!): CreateAuthPolicyResponse
 		updateAuthPolicy(id: String!, policy: AuthPolicyInput!): UpdateAuthPolicyResponse
 		deleteAuthPolicy(id: String!): DeleteAuthPolicyResponse
+
+		# === custom roles (runtime-defined global roles) ===
+		createCustomRole(slug: String!, grants: [CustomRoleGrantInput!]!, description: String): CreateCustomRoleResponse
+		updateCustomRole(slug: String!, grants: [CustomRoleGrantInput!], description: String): UpdateCustomRoleResponse
+		deleteCustomRole(slug: String!): DeleteCustomRoleResponse
 
 		addProjectMailTemplate(template: MailTemplate!): AddMailTemplateResponse
 		@deprecated(reason: "use addMailTemplate")
@@ -464,6 +482,7 @@ const schema: DocumentNode = gql`
 	enum SignUpErrorCode {
 		EMAIL_ALREADY_EXISTS
 		INVALID_EMAIL_FORMAT
+		INVALID_ROLE
 		TOO_WEAK
 		INVALID_CAPTCHA
 		RATE_LIMIT_EXCEEDED
@@ -1119,6 +1138,7 @@ const schema: DocumentNode = gql`
 	enum CreateApiKeyErrorCode {
 		PROJECT_NOT_FOUND
 		INVALID_MEMBERSHIP
+		INVALID_ROLE
 
 		VARIABLE_NOT_FOUND @deprecated
 		ROLE_NOT_FOUND @deprecated
@@ -1654,6 +1674,91 @@ const schema: DocumentNode = gql`
 	}
 
 	enum DeleteAuthPolicyErrorCode {
+		NOT_FOUND
+	}
+
+	# === custom roles (runtime-defined global roles) ===
+
+	type CustomRole {
+		slug: String!
+		description: String
+		grants: [CustomRoleGrant!]!
+	}
+
+	input CustomRoleGrantInput {
+		permission: String!
+		config: Json
+	}
+
+	type CustomRoleGrant {
+		permission: String!
+		config: Json
+	}
+
+	enum CustomRoleConfigurationKind {
+		NONE
+		ROLE_INPUT
+		TARGET_IDENTITY
+		ROLE_MUTATION
+		GLOBAL_API_KEY
+		CHANGE_PROFILE
+		CREATE_SESSION_TOKEN
+		MAIL_TEMPLATE_SCOPE
+	}
+
+	type CustomRolePermissionDefinition {
+		name: String!
+		configurationKind: CustomRoleConfigurationKind!
+		configurationRequired: Boolean!
+		defaultConfig: Json
+	}
+
+	type CreateCustomRoleResponse {
+		ok: Boolean!
+		error: CreateCustomRoleError
+	}
+
+	type CreateCustomRoleError {
+		code: CreateCustomRoleErrorCode!
+		developerMessage: String!
+	}
+
+	enum CreateCustomRoleErrorCode {
+		INVALID_SLUG
+		SLUG_ALREADY_EXISTS
+		UNKNOWN_PERMISSION
+		DUPLICATE_PERMISSION
+		INVALID_PERMISSION_CONFIGURATION
+	}
+
+	type UpdateCustomRoleResponse {
+		ok: Boolean!
+		error: UpdateCustomRoleError
+	}
+
+	type UpdateCustomRoleError {
+		code: UpdateCustomRoleErrorCode!
+		developerMessage: String!
+	}
+
+	enum UpdateCustomRoleErrorCode {
+		NOT_FOUND
+		UNKNOWN_PERMISSION
+		DUPLICATE_PERMISSION
+		INVALID_PERMISSION_CONFIGURATION
+	}
+
+	type DeleteCustomRoleResponse {
+		ok: Boolean!
+		error: DeleteCustomRoleError
+	}
+
+	type DeleteCustomRoleError {
+		code: DeleteCustomRoleErrorCode!
+		developerMessage: String!
+	}
+
+	enum DeleteCustomRoleErrorCode {
 		NOT_FOUND
 	}
 

@@ -93,7 +93,8 @@ A few auth events carry extra context so security-relevant outcomes stay disting
 | `project_create` | `createProject` | `{projectSlug, name}` |
 | `project_update` | `updateProject` | `{before, after}` |
 | `project_secret_change` | `setProjectSecret` | `{projectSlug, key}` — only the secret name, never the value |
-| `mail_template_change` | `addMailTemplate`, `removeMailTemplate` | `{action: 'add' \| 'remove', type, projectSlug?, variant?}` |
+| `mail_template_change` | `addMailTemplate`, `removeMailTemplate` | `{action: 'add' \| 'remove', mailType, projectSlug?, variant?}` |
+| `custom_role_change` | `createCustomRole`, `updateCustomRole`, `deleteCustomRole` | Canonical `{before, after}` grant snapshots, or the deleted snapshot plus `removedAssignments` |
 | `tenant_config_change` | `configure` | `{input}` — full ConfigInput with `captcha.secret` redacted to `***` |
 | `person_invite` | `invite`, `unmanagedInvite` | `{projectSlug, email, isNew, memberships}` |
 

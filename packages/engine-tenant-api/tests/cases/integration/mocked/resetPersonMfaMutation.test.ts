@@ -3,6 +3,9 @@ import { GQL, SQL } from '../../../src/tags.js'
 import { testUuid } from '../../../src/testUuid.js'
 import { getPersonByIdSql } from './sql/getPersonByIdSql.js'
 import { expect, test } from 'bun:test'
+import { getIdentityProjectMembershipPresenceSql } from './sql/getIdentityProjectMembershipPresenceSql.js'
+import { sqlReadCommittedTransaction } from './sql/sqlTransaction.js'
+import { getIdentityByIdSql } from './sql/getIdentityByIdSql.js'
 
 test('resetPersonMfa clears factors + backup codes and audits mfa_reset', async () => {
 	const personId = testUuid(1)
@@ -15,27 +18,31 @@ test('resetPersonMfa clears factors + backup codes and audits mfa_reset', async 
 			variables: { id: personId },
 		},
 		executes: [
-			getPersonByIdSql({
-				personId,
-				response: { personId, identityId, password: '123', roles: [], email: 'jane@doe.com' },
-			}),
-			{
-				sql: SQL`update "tenant"."person_mfa"
+			...sqlReadCommittedTransaction(
+				getPersonByIdSql({
+					personId,
+					response: { personId, identityId, password: '123', roles: [], email: 'jane@doe.com' },
+				}),
+				getIdentityByIdSql({ identityId, lock: true }),
+				getIdentityProjectMembershipPresenceSql(identityId),
+				{
+					sql: SQL`update "tenant"."person_mfa"
 					set "totp_secret" = ?, "totp_secret_version" = ?, "totp_activated_at" = ?, "totp_pending_secret" = ?, "totp_pending_version" = ?, "totp_pending_created_at" = ?, "email_otp_enabled" = ?
 					where "person_id" = ?`,
-				parameters: [null, null, null, null, null, null, false, personId],
-				response: { rowCount: 1 },
-			},
-			{
-				sql: SQL`update "tenant"."person" set "mfa_grace_until" = ? where "id" = ?`,
-				parameters: [null, personId],
-				response: { rowCount: 1 },
-			},
-			{
-				sql: SQL`delete from "tenant"."person_backup_code" where "person_id" = ?`,
-				parameters: [personId],
-				response: { rowCount: 2 },
-			},
+					parameters: [null, null, null, null, null, null, false, personId],
+					response: { rowCount: 1 },
+				},
+				{
+					sql: SQL`update "tenant"."person" set "mfa_grace_until" = ? where "id" = ?`,
+					parameters: [null, personId],
+					response: { rowCount: 1 },
+				},
+				{
+					sql: SQL`delete from "tenant"."person_backup_code" where "person_id" = ?`,
+					parameters: [personId],
+					response: { rowCount: 2 },
+				},
+			),
 		],
 		return: {
 			data: {
@@ -60,7 +67,7 @@ test('resetPersonMfa returns PERSON_NOT_FOUND', async () => {
 			variables: { id: personId },
 		},
 		executes: [
-			{
+			...sqlReadCommittedTransaction({
 				sql:
 					SQL`SELECT "person"."id", "person"."password_hash", "person_mfa"."totp_secret" AS "otp_secret", "person_mfa"."totp_secret_version" AS "otp_secret_version", "person_mfa"."totp_activated_at" AS "otp_activated_at", "person_mfa"."totp_pending_secret" AS "otp_pending_secret", "person_mfa"."totp_pending_version" AS "otp_pending_version", "person_mfa"."totp_pending_created_at" AS "otp_pending_created_at", coalesce("person_mfa"."email_otp_enabled", false) AS "email_otp_enabled", "person"."identity_id", "person"."email", "person"."name", "person"."disabled_at", "person"."passwordless_enabled", "person"."mfa_grace_until", "person"."email_verified_at", "person"."email_verification_required", "identity"."roles"
 					FROM "tenant"."person"
@@ -69,7 +76,7 @@ test('resetPersonMfa returns PERSON_NOT_FOUND', async () => {
 					WHERE "person"."id" = ?`,
 				parameters: [personId],
 				response: { rows: [] },
-			},
+			}),
 		],
 		return: {
 			data: {

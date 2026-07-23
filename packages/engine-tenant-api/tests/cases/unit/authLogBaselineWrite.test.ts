@@ -89,6 +89,29 @@ test('an absent country / user-agent stamps NULL (column omitted), never an empt
 	})
 })
 
+test('an unpersisted root actor is audited without a dangling identity foreign key', async () => {
+	await runWithQuery({
+		sql: `insert into  "tenant"."person_auth_log" ("id", "type", "success", "error_code", "metadata") values  (?, ?, ?, ?, ?)`,
+		parameters: [
+			() => true,
+			'custom_role_change',
+			true,
+			null,
+			(value: unknown) => {
+				expect(value).toEqual({ actor: 'unpersisted_root' })
+				return true
+			},
+		],
+		response: { rowCount: 1 },
+	}, async db => {
+		await new AuthLogService().logAuthAction(
+			db,
+			{ unpersistedRoot: true },
+			{ type: 'custom_role_change', response: new ResponseOk({}) },
+		)
+	})
+})
+
 test('TenantResolverContextFactory stamps device_fingerprint = analyzer.fingerprint(UA) and the geo country', async () => {
 	// The end-to-end stamping: the factory computes the fingerprint via the SAME
 	// LoginRiskAnalyzer.fingerprint that score() later compares history against, so a

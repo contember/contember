@@ -1,5 +1,6 @@
 import { Identity, IdentityGlobalPermissions, IdentityProjectRelation, IdentityResolvers, Maybe, Person, SessionInfo } from '../../schema/index.js'
 import {
+	createTargetIdentityPermissionTarget,
 	IdentityQuery,
 	PermissionActions,
 	PermissionContextFactory,
@@ -121,7 +122,7 @@ export class IdentityTypeResolver implements IdentityResolvers {
 			if (roles === null) {
 				return null
 			}
-			return this.permissionContextFactory.create(context.db, { id: parent.id, roles })
+			return this.permissionContextFactory.create(context.db, { id: parent.id, roles }, context.permissionContext.authorizator)
 		})()
 
 		if (!permissionsContext) {
@@ -145,12 +146,10 @@ export class IdentityTypeResolver implements IdentityResolvers {
 		// Return [] instead of throwing — listing many identities should not
 		// abort just because the viewer lacks visibility for one of them.
 		if (parent.id !== context.identity.id) {
-			const targetRoles = await this.roles(parent, {}, context)
-			if (targetRoles === null) {
-				return []
-			}
+			const [identity] = await context.db.queryHandler.fetch(new IdentityQuery([parent.id]))
+			const target = identity === undefined ? null : await createTargetIdentityPermissionTarget(context.db, identity)
 			const canView = await context.permissionContext.isAllowed({
-				action: PermissionActions.PERSON_VIEW_SESSIONS(targetRoles),
+				action: PermissionActions.PERSON_VIEW_SESSIONS(target),
 			})
 			if (!canView) {
 				return []

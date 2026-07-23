@@ -8,7 +8,8 @@ class AuthLogService {
 	async logAuthAction(
 		db: DatabaseContext,
 		ctx: {
-			identityId: string
+			identityId?: string
+			unpersistedRoot?: boolean
 			clientIp?: string
 			userAgent?: string
 			forwarderIp?: string
@@ -36,6 +37,9 @@ class AuthLogService {
 		}
 		if (ctx.forwarderUserAgent !== undefined) {
 			metadata.forwarderUserAgent = ctx.forwarderUserAgent
+		}
+		if (ctx.unpersistedRoot === true) {
+			metadata.actor = 'unpersisted_root'
 		}
 
 		await db.commandBus.execute(

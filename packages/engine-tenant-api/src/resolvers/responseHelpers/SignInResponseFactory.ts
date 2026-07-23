@@ -18,7 +18,7 @@ export class SignInResponseFactory {
 		const permissionContext = this.permissionContextFactory.create(context.db, {
 			id: identityId,
 			roles: signInResult.person.roles,
-		})
+		}, context.permissionContext.authorizator)
 		const projects = await this.identityTypeResolver.projects(
 			{ id: identityId, projects: [] },
 			{},

@@ -1,6 +1,6 @@
 import { ForceSignOutPersonResponse, MutationForceSignOutPersonArgs, MutationResolvers } from '../../../schema/index.js'
 import { TenantResolverContext } from '../../TenantResolverContext.js'
-import { ApiKeyManager, PermissionActions } from '../../../model/index.js'
+import { ApiKeyManager, lockTargetIdentityPermissionTarget, PermissionActions } from '../../../model/index.js'
 import { PersonManager } from '../../../model/service/PersonManager.js'
 import { createErrorResponse } from '../../errorUtils.js'
 import { ResponseError, ResponseOk } from '../../../model/utils/Response.js'
@@ -18,45 +18,48 @@ export class ForceSignOutMutationResolver implements Pick<MutationResolvers, 'fo
 		args: MutationForceSignOutPersonArgs,
 		context: TenantResolverContext,
 	): Promise<ForceSignOutPersonResponse> {
-		const targetPerson = await this.personManager.findPersonById(context.db, args.personId)
 		const reason = args.reason ?? null
+		const result = await context.db.transaction(async db => {
+			const targetPerson = await this.personManager.findPersonById(db, args.personId)
+			const target = targetPerson === null ? null : await lockTargetIdentityPermissionTarget(db, targetPerson.identity_id)
+			await context.requireAccess({
+				action: PermissionActions.PERSON_FORCE_SIGN_OUT(target),
+				message: 'You are not allowed to force sign out this person',
+			})
 
-		await context.requireAccess({
-			action: PermissionActions.PERSON_FORCE_SIGN_OUT(targetPerson?.roles ?? []),
-			message: 'You are not allowed to force sign out this person',
-		})
+			if (targetPerson === null) {
+				const response = new ResponseError('PERSON_NOT_FOUND', `Person <${args.personId}> was not found`)
+				await context.logAuthAction({
+					type: 'forced_sign_out',
+					response,
+					metadata: {
+						requestedPersonId: args.personId,
+						...(reason !== null ? { reason } : {}),
+					},
+				}, db)
+				return { response: createErrorResponse(response.error, response.errorMessage), targetPerson: null }
+			}
 
-		if (targetPerson === null) {
-			const response = new ResponseError('PERSON_NOT_FOUND', `Person <${args.personId}> was not found`)
+			await this.apiKeyManager.disableIdentityApiKeys(db, targetPerson.identity_id)
+
+			const response = new ResponseOk(null)
 			await context.logAuthAction({
 				type: 'forced_sign_out',
 				response,
-				metadata: {
-					requestedPersonId: args.personId,
-					...(reason !== null ? { reason } : {}),
-				},
-			})
-			return createErrorResponse(response.error, response.errorMessage)
-		}
+				targetPersonId: targetPerson.id,
+				metadata: reason !== null ? { reason } : undefined,
+			}, db)
+			return { response: { ok: true }, targetPerson }
+		}, { isolation: 'readCommitted' })
 
-		await this.apiKeyManager.disableIdentityApiKeys(context.db, targetPerson.identity_id)
-
-		const response = new ResponseOk(null)
-		await context.logAuthAction({
-			type: 'forced_sign_out',
-			response,
-			targetPersonId: targetPerson.id,
-			metadata: reason !== null ? { reason } : undefined,
-		})
-
-		if (targetPerson.email) {
+		if (result.targetPerson?.email) {
 			await this.userMailer.sendForcedSignOutEmail(
 				context.db,
-				{ email: targetPerson.email, reason },
+				{ email: result.targetPerson.email, reason },
 				{ projectId: null, variant: '' },
 			)
 		}
 
-		return { ok: true }
+		return result.response
 	}
 }

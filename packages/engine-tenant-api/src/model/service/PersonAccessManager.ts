@@ -4,22 +4,28 @@ import { DisablePersonCommand } from '../commands/person/DisablePersonCommand.js
 import { ApiKeyManager } from './apiKey/index.js'
 import { Response, ResponseError, ResponseOk } from '../utils/Response.js'
 import { DisablePersonErrorCode } from '../../schema/index.js'
+import { Connection } from '@contember/database'
 
 class PersonAccessManager {
 	constructor(private readonly apiKeyManager: ApiKeyManager) {}
 
 	async disablePerson(dbContext: DatabaseContext, person: PersonRow): Promise<PersonDisableAccessResponse> {
-		return await dbContext.transaction(async trx => {
-			if (person.disabled_at !== null) {
-				return new ResponseError('PERSON_ALREADY_DISABLED', 'Person is already disabled')
-			}
+		return await dbContext.transaction(trx => this.disablePersonInTransaction(trx, person))
+	}
 
-			// Deactivate person & invalidate all api keys associated with person identity
-			await this.disablePersonAccount(trx, person.id)
-			await this.disableIdentityApiKeys(trx, person.identity_id)
+	async disablePersonInTransaction(
+		dbContext: DatabaseContext<Connection.TransactionLike>,
+		person: PersonRow,
+	): Promise<PersonDisableAccessResponse> {
+		if (person.disabled_at !== null) {
+			return new ResponseError('PERSON_ALREADY_DISABLED', 'Person is already disabled')
+		}
 
-			return new ResponseOk(null)
-		})
+		// Deactivate person & invalidate all api keys associated with person identity
+		await this.disablePersonAccount(dbContext, person.id)
+		await this.disableIdentityApiKeys(dbContext, person.identity_id)
+
+		return new ResponseOk(null)
 	}
 
 	private async disablePersonAccount(dbContext: DatabaseContext, personId: string) {

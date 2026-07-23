@@ -4,6 +4,9 @@ import { testUuid } from '../../../src/testUuid.js'
 import { getPersonByIdSql } from './sql/getPersonByIdSql.js'
 import { getMailTemplateSql } from './sql/getMailTemplateSql.js'
 import { expect, test } from 'bun:test'
+import { getIdentityProjectMembershipPresenceSql } from './sql/getIdentityProjectMembershipPresenceSql.js'
+import { sqlReadCommittedTransaction } from './sql/sqlTransaction.js'
+import { getIdentityByIdSql } from './sql/getIdentityByIdSql.js'
 
 const disableIdentityApiKeysSql = (identityId: string) => ({
 	sql: SQL`update "tenant"."api_key" set "disabled_at" = ? where "identity_id" = ?`,
@@ -26,11 +29,15 @@ test('force sign-out – success with reason and mail', async () => {
 			variables: { id: personId, reason: 'security incident' },
 		},
 		executes: [
-			getPersonByIdSql({
-				personId,
-				response: { personId, identityId, password: '123', roles: [], email: 'jane@doe.com' },
-			}),
-			disableIdentityApiKeysSql(identityId),
+			...sqlReadCommittedTransaction(
+				getPersonByIdSql({
+					personId,
+					response: { personId, identityId, password: '123', roles: [], email: 'jane@doe.com' },
+				}),
+				getIdentityByIdSql({ identityId, lock: true }),
+				getIdentityProjectMembershipPresenceSql(identityId),
+				disableIdentityApiKeysSql(identityId),
+			),
 			getMailTemplateSql({ type: 'forcedSignOut', projectId: null }),
 			getMailTemplateSql({ type: 'forcedSignOut', projectId: null }),
 		],
@@ -67,7 +74,7 @@ test('force sign-out – PERSON_NOT_FOUND', async () => {
 			variables: { id: personId },
 		},
 		executes: [
-			{
+			...sqlReadCommittedTransaction({
 				sql:
 					SQL`SELECT "person"."id", "person"."password_hash", "person_mfa"."totp_secret" AS "otp_secret", "person_mfa"."totp_secret_version" AS "otp_secret_version", "person_mfa"."totp_activated_at" AS "otp_activated_at", "person_mfa"."totp_pending_secret" AS "otp_pending_secret", "person_mfa"."totp_pending_version" AS "otp_pending_version", "person_mfa"."totp_pending_created_at" AS "otp_pending_created_at", coalesce("person_mfa"."email_otp_enabled", false) AS "email_otp_enabled", "person"."identity_id", "person"."email", "person"."name", "person"."disabled_at", "person"."passwordless_enabled", "person"."mfa_grace_until", "person"."email_verified_at", "person"."email_verification_required", "identity"."roles"
 					FROM "tenant"."person"
@@ -76,7 +83,7 @@ test('force sign-out – PERSON_NOT_FOUND', async () => {
 					WHERE "person"."id" = ?`,
 				parameters: [personId],
 				response: { rows: [] },
-			},
+			}),
 		],
 		return: {
 			data: {

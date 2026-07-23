@@ -19,7 +19,7 @@ export class PatchIdentityGlobalRoles implements Command<boolean> {
 				roles: it =>
 					it.raw(
 						`(
-						SELECT JSONB_AGG(DISTINCT out_role)
+						SELECT COALESCE(JSONB_AGG(DISTINCT out_role), '[]'::jsonb)
 						FROM JSONB_ARRAY_ELEMENTS_TEXT(roles || ?::jsonb) t(out_role)
 						WHERE NOT(out_role = ANY (?::text[]))
 					)`,

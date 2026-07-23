@@ -7,7 +7,7 @@ export class CreateCustomRoleCommand implements Command<string> {
 		private readonly values: {
 			slug: string
 			description: string | null
-			permissions: readonly string[]
+			grants: unknown
 		},
 	) {}
 
@@ -20,7 +20,7 @@ export class CreateCustomRoleCommand implements Command<string> {
 				id,
 				slug: this.values.slug,
 				description: this.values.description,
-				permissions: [...this.values.permissions],
+				grants: JSON.stringify(this.values.grants),
 				created_at: now,
 				updated_at: now,
 			})

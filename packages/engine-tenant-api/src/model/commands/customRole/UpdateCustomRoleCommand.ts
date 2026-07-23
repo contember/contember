@@ -11,7 +11,7 @@ export class UpdateCustomRoleCommand implements Command<boolean> {
 		private readonly slug: string,
 		private readonly values: {
 			description?: string | null
-			permissions?: readonly string[]
+			grants?: unknown
 		},
 	) {}
 
@@ -19,9 +19,10 @@ export class UpdateCustomRoleCommand implements Command<boolean> {
 		const result = await UpdateBuilder.create()
 			.table('custom_role')
 			.where({ slug: this.slug })
+			.where(expr => expr.isNull('deleted_at'))
 			.values({
 				description: this.values.description,
-				permissions: this.values.permissions === undefined ? undefined : [...this.values.permissions],
+				grants: this.values.grants === undefined ? undefined : JSON.stringify(this.values.grants),
 				updated_at: providers.now(),
 			})
 			.execute(db)

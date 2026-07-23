@@ -686,6 +686,7 @@ export type CreateApiKeyError = {
 
 export type CreateApiKeyErrorCode =
 	| 'INVALID_MEMBERSHIP'
+	| 'INVALID_ROLE'
 	| 'PROJECT_NOT_FOUND'
 	| 'ROLE_NOT_FOUND'
 	| 'VARIABLE_EMPTY'
@@ -746,6 +747,8 @@ export type CreateCustomRoleError = {
 }
 
 export type CreateCustomRoleErrorCode =
+	| 'DUPLICATE_PERMISSION'
+	| 'INVALID_PERMISSION_CONFIGURATION'
 	| 'INVALID_SLUG'
 	| 'SLUG_ALREADY_EXISTS'
 	| 'UNKNOWN_PERMISSION'
@@ -836,9 +839,37 @@ export type CreateSessionTokenResult = CommonSignInResult & {
 export type CustomRole = {
 	readonly __typename?: 'CustomRole'
 	readonly description?: Maybe<Scalars['String']['output']>
-	/** Permission identifiers in the `resource:privilege` form, e.g. `person:forceSignOut`. */
-	readonly permissions: ReadonlyArray<Scalars['String']['output']>
+	readonly grants: ReadonlyArray<CustomRoleGrant>
 	readonly slug: Scalars['String']['output']
+}
+
+export type CustomRoleConfigurationKind =
+	| 'CHANGE_PROFILE'
+	| 'CREATE_SESSION_TOKEN'
+	| 'GLOBAL_API_KEY'
+	| 'MAIL_TEMPLATE_SCOPE'
+	| 'NONE'
+	| 'ROLE_INPUT'
+	| 'ROLE_MUTATION'
+	| 'TARGET_IDENTITY'
+
+export type CustomRoleGrant = {
+	readonly __typename?: 'CustomRoleGrant'
+	readonly config?: Maybe<Scalars['Json']['output']>
+	readonly permission: Scalars['String']['output']
+}
+
+export type CustomRoleGrantInput = {
+	readonly config?: InputMaybe<Scalars['Json']['input']>
+	readonly permission: Scalars['String']['input']
+}
+
+export type CustomRolePermissionDefinition = {
+	readonly __typename?: 'CustomRolePermissionDefinition'
+	readonly configurationKind: CustomRoleConfigurationKind
+	readonly configurationRequired: Scalars['Boolean']['output']
+	readonly defaultConfig?: Maybe<Scalars['Json']['output']>
+	readonly name: Scalars['String']['output']
 }
 
 export type DeleteAuthPolicyError = {
@@ -1443,7 +1474,7 @@ export type MutationCreateAuthPolicyArgs = {
 
 export type MutationCreateCustomRoleArgs = {
 	description?: InputMaybe<Scalars['String']['input']>
-	permissions: ReadonlyArray<Scalars['String']['input']>
+	grants: ReadonlyArray<CustomRoleGrantInput>
 	slug: Scalars['String']['input']
 }
 
@@ -1634,7 +1665,7 @@ export type MutationUpdateAuthPolicyArgs = {
 
 export type MutationUpdateCustomRoleArgs = {
 	description?: InputMaybe<Scalars['String']['input']>
-	permissions?: InputMaybe<ReadonlyArray<Scalars['String']['input']>>
+	grants?: InputMaybe<ReadonlyArray<CustomRoleGrantInput>>
 	slug: Scalars['String']['input']
 }
 
@@ -1804,10 +1835,10 @@ export type Query = {
 	readonly checkResetPasswordToken: CheckResetPasswordTokenCode
 	readonly configuration: Config
 	/**
-	 * List permission identifiers (`resource:privilege`) grantable to a custom
-	 * role. Requires the `customRole:view` permission.
+	 * List exact permission definitions grantable to a custom role. Requires
+	 * the `customRole:view` permission.
 	 */
-	readonly customRolePermissions: ReadonlyArray<Scalars['String']['output']>
+	readonly customRolePermissions: ReadonlyArray<CustomRolePermissionDefinition>
 	/**
 	 * List custom roles (runtime-defined global roles carrying a bundle of tenant
 	 * permissions). Requires the `customRole:view` permission — granted to
@@ -2251,6 +2282,7 @@ export type SignUpErrorCode =
 	| 'EMAIL_ALREADY_EXISTS'
 	| 'INVALID_CAPTCHA'
 	| 'INVALID_EMAIL_FORMAT'
+	| 'INVALID_ROLE'
 	| 'RATE_LIMIT_EXCEEDED'
 	| 'TOO_WEAK'
 
@@ -2318,6 +2350,8 @@ export type UpdateCustomRoleError = {
 }
 
 export type UpdateCustomRoleErrorCode =
+	| 'DUPLICATE_PERMISSION'
+	| 'INVALID_PERMISSION_CONFIGURATION'
 	| 'NOT_FOUND'
 	| 'UNKNOWN_PERMISSION'
 
@@ -2624,6 +2658,10 @@ export type ResolversTypes = {
 	CreateSessionTokenResponse: ResolverTypeWrapper<CreateSessionTokenResponse>
 	CreateSessionTokenResult: ResolverTypeWrapper<CreateSessionTokenResult>
 	CustomRole: ResolverTypeWrapper<CustomRole>
+	CustomRoleConfigurationKind: CustomRoleConfigurationKind
+	CustomRoleGrant: ResolverTypeWrapper<CustomRoleGrant>
+	CustomRoleGrantInput: CustomRoleGrantInput
+	CustomRolePermissionDefinition: ResolverTypeWrapper<CustomRolePermissionDefinition>
 	DateTime: ResolverTypeWrapper<Scalars['DateTime']['output']>
 	DeleteAuthPolicyError: ResolverTypeWrapper<DeleteAuthPolicyError>
 	DeleteAuthPolicyErrorCode: DeleteAuthPolicyErrorCode
@@ -2892,6 +2930,9 @@ export type ResolversParentTypes = {
 	CreateSessionTokenResponse: CreateSessionTokenResponse
 	CreateSessionTokenResult: CreateSessionTokenResult
 	CustomRole: CustomRole
+	CustomRoleGrant: CustomRoleGrant
+	CustomRoleGrantInput: CustomRoleGrantInput
+	CustomRolePermissionDefinition: CustomRolePermissionDefinition
 	DateTime: Scalars['DateTime']['output']
 	DeleteAuthPolicyError: DeleteAuthPolicyError
 	DeleteAuthPolicyResponse: DeleteAuthPolicyResponse
@@ -3582,8 +3623,26 @@ export type CreateSessionTokenResultResolvers<
 
 export type CustomRoleResolvers<ContextType = any, ParentType extends ResolversParentTypes['CustomRole'] = ResolversParentTypes['CustomRole']> = {
 	description?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>
-	permissions?: Resolver<ReadonlyArray<ResolversTypes['String']>, ParentType, ContextType>
+	grants?: Resolver<ReadonlyArray<ResolversTypes['CustomRoleGrant']>, ParentType, ContextType>
 	slug?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+}
+
+export type CustomRoleGrantResolvers<
+	ContextType = any,
+	ParentType extends ResolversParentTypes['CustomRoleGrant'] = ResolversParentTypes['CustomRoleGrant'],
+> = {
+	config?: Resolver<Maybe<ResolversTypes['Json']>, ParentType, ContextType>
+	permission?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+}
+
+export type CustomRolePermissionDefinitionResolvers<
+	ContextType = any,
+	ParentType extends ResolversParentTypes['CustomRolePermissionDefinition'] = ResolversParentTypes['CustomRolePermissionDefinition'],
+> = {
+	configurationKind?: Resolver<ResolversTypes['CustomRoleConfigurationKind'], ParentType, ContextType>
+	configurationRequired?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
+	defaultConfig?: Resolver<Maybe<ResolversTypes['Json']>, ParentType, ContextType>
+	name?: Resolver<ResolversTypes['String'], ParentType, ContextType>
 }
 
 export interface DateTimeScalarConfig extends GraphQLScalarTypeConfig<ResolversTypes['DateTime'], any> {
@@ -4033,7 +4092,7 @@ export type MutationResolvers<ContextType = any, ParentType extends ResolversPar
 		Maybe<ResolversTypes['CreateCustomRoleResponse']>,
 		ParentType,
 		ContextType,
-		RequireFields<MutationCreateCustomRoleArgs, 'permissions' | 'slug'>
+		RequireFields<MutationCreateCustomRoleArgs, 'grants' | 'slug'>
 	>
 	createGlobalApiKey?: Resolver<
 		Maybe<ResolversTypes['CreateApiKeyResponse']>,
@@ -4291,7 +4350,7 @@ export type QueryResolvers<ContextType = any, ParentType extends ResolversParent
 		RequireFields<QueryCheckResetPasswordTokenArgs, 'requestId' | 'token'>
 	>
 	configuration?: Resolver<ResolversTypes['Config'], ParentType, ContextType>
-	customRolePermissions?: Resolver<ReadonlyArray<ResolversTypes['String']>, ParentType, ContextType>
+	customRolePermissions?: Resolver<ReadonlyArray<ResolversTypes['CustomRolePermissionDefinition']>, ParentType, ContextType>
 	customRoles?: Resolver<ReadonlyArray<ResolversTypes['CustomRole']>, ParentType, ContextType>
 	globalApiKeys?: Resolver<ReadonlyArray<ResolversTypes['ApiKey']>, ParentType, ContextType>
 	identityProviders?: Resolver<ReadonlyArray<ResolversTypes['IdentityProvider']>, ParentType, ContextType>
@@ -4843,6 +4902,8 @@ export type Resolvers<ContextType = any> = {
 	CreateSessionTokenResponse?: CreateSessionTokenResponseResolvers<ContextType>
 	CreateSessionTokenResult?: CreateSessionTokenResultResolvers<ContextType>
 	CustomRole?: CustomRoleResolvers<ContextType>
+	CustomRoleGrant?: CustomRoleGrantResolvers<ContextType>
+	CustomRolePermissionDefinition?: CustomRolePermissionDefinitionResolvers<ContextType>
 	DateTime?: GraphQLScalarType
 	DeleteAuthPolicyError?: DeleteAuthPolicyErrorResolvers<ContextType>
 	DeleteAuthPolicyResponse?: DeleteAuthPolicyResponseResolvers<ContextType>

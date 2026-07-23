@@ -1,5 +1,5 @@
 import { Person, PersonIdentityProvider, PersonResolvers } from '../../schema/index.js'
-import { IdentityQuery, PermissionActions, PersonIdentityProviderManager } from '../../model/index.js'
+import { createTargetIdentityPermissionTarget, IdentityQuery, PermissionActions, PersonIdentityProviderManager } from '../../model/index.js'
 import { TenantResolverContext } from '../TenantResolverContext.js'
 
 export class PersonTypeResolver implements Pick<PersonResolvers, 'identityProviders'> {
@@ -15,8 +15,11 @@ export class PersonTypeResolver implements Pick<PersonResolvers, 'identityProvid
 		// single forbidden target — mirrors `Identity.sessions`.
 		if (parent.identity.id !== context.identity.id) {
 			const [identity] = await context.db.queryHandler.fetch(new IdentityQuery([parent.identity.id]))
+			const target = identity === undefined
+				? null
+				: await createTargetIdentityPermissionTarget(context.db, { id: identity.id, roles: identity.roles })
 			const canView = await context.permissionContext.isAllowed({
-				action: PermissionActions.PERSON_VIEW_IDP(identity?.roles ?? []),
+				action: PermissionActions.PERSON_VIEW_IDP(target),
 			})
 			if (!canView) {
 				return []

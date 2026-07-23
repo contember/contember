@@ -18,6 +18,6 @@ export interface TenantResolverContext {
 	readonly requireAccess: PermissionContext['requireAccess']
 	readonly db: DatabaseContext
 	readonly logger: Logger
-	readonly logAuthAction: (entry: AuthLogService.LogArgs) => Promise<void>
+	readonly logAuthAction: (entry: AuthLogService.LogArgs, db?: DatabaseContext) => Promise<void>
 	readonly httpInfo: TenantResolverHttpInfo
 }

@@ -1,14 +1,20 @@
 import { Command } from '../Command.js'
-import { DeleteBuilder } from '@contember/database'
+import { UpdateBuilder } from '@contember/database'
 
-/** Deletes a `custom_role` row by slug. Returns whether a row was removed. */
+/** Tombstones a role so its slug can never reactivate stale assignments. */
 export class DeleteCustomRoleCommand implements Command<boolean> {
 	constructor(private readonly slug: string) {}
 
-	async execute({ db }: Command.Args): Promise<boolean> {
-		const result = await DeleteBuilder.create()
-			.from('custom_role')
+	async execute({ db, providers }: Command.Args): Promise<boolean> {
+		const now = providers.now()
+		const result = await UpdateBuilder.create()
+			.table('custom_role')
 			.where({ slug: this.slug })
+			.where(expr => expr.isNull('deleted_at'))
+			.values({
+				deleted_at: now,
+				updated_at: now,
+			})
 			.execute(db)
 		return result > 0
 	}

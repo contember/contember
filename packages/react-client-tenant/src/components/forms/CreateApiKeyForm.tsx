@@ -64,6 +64,7 @@ export const CreateApiKeyForm = ({ children, onSuccess, projectSlug, initialMemb
 }
 
 const errorToField: Record<CreateApiKeyErrorCode, keyof CreateApiKeyFormValues | undefined> = {
+	INVALID_ROLE: undefined,
 	INVALID_MEMBERSHIP: 'memberships',
 	PROJECT_NOT_FOUND: undefined,
 	ROLE_NOT_FOUND: 'memberships',

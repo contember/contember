@@ -1,4 +1,4 @@
-import { CustomRole, QueryResolvers } from '../../schema/index.js'
+import { CustomRole, CustomRolePermissionDefinition, QueryResolvers } from '../../schema/index.js'
 import { CustomRoleManager, PermissionActions } from '../../model/index.js'
 import { getGrantablePermissions } from '../../model/authorization/CustomRolePermissions.js'
 import { TenantResolverContext } from '../TenantResolverContext.js'
@@ -19,16 +19,23 @@ export class CustomRoleQueryResolver implements Pick<QueryResolvers, 'customRole
 		return rows.map((row): CustomRole => ({
 			slug: row.slug,
 			description: row.description,
-			permissions: row.permissions,
+			grants: row.grants,
 		}))
 	}
 
-	async customRolePermissions(parent: unknown, args: unknown, context: TenantResolverContext): Promise<readonly string[]> {
+	async customRolePermissions(parent: unknown, args: unknown, context: TenantResolverContext): Promise<readonly CustomRolePermissionDefinition[]> {
 		await context.requireAccess({
 			action: PermissionActions.CUSTOM_ROLE_VIEW,
 			message: 'You are not allowed to view custom role permissions',
 		})
 
-		return [...getGrantablePermissions().keys()].sort()
+		return [...getGrantablePermissions().values()]
+			.sort((left, right) => left.name.localeCompare(right.name))
+			.map(definition => ({
+				name: definition.name,
+				configurationKind: definition.configurationKind,
+				configurationRequired: definition.configurationRequired,
+				defaultConfig: definition.defaultConfig,
+			}))
 	}
 }

@@ -1,6 +1,6 @@
 import { MutationResetPersonMfaArgs, MutationResolvers, ResetPersonMfaResponse } from '../../../schema/index.js'
 import { TenantResolverContext } from '../../TenantResolverContext.js'
-import { BackupCodeManager, PermissionActions } from '../../../model/index.js'
+import { BackupCodeManager, lockTargetIdentityPermissionTarget, PermissionActions } from '../../../model/index.js'
 import { PersonManager } from '../../../model/service/PersonManager.js'
 import { ResetPersonMfaCommand } from '../../../model/commands/index.js'
 import { createErrorResponse } from '../../errorUtils.js'
@@ -20,32 +20,35 @@ export class ResetPersonMfaMutationResolver implements Pick<MutationResolvers, '
 	) {}
 
 	async resetPersonMfa(parent: unknown, args: MutationResetPersonMfaArgs, context: TenantResolverContext): Promise<ResetPersonMfaResponse> {
-		const targetPerson = await this.personManager.findPersonById(context.db, args.personId)
+		return await context.db.transaction(async db => {
+			const targetPerson = await this.personManager.findPersonById(db, args.personId)
 
-		await context.requireAccess({
-			action: PermissionActions.PERSON_RESET_MFA(targetPerson?.roles ?? []),
-			message: 'You are not allowed to reset MFA for this person',
-		})
+			const target = targetPerson === null ? null : await lockTargetIdentityPermissionTarget(db, targetPerson.identity_id)
+			await context.requireAccess({
+				action: PermissionActions.PERSON_RESET_MFA(target),
+				message: 'You are not allowed to reset MFA for this person',
+			})
 
-		if (targetPerson === null) {
-			const response = new ResponseError('PERSON_NOT_FOUND', `Person <${args.personId}> was not found`)
+			if (targetPerson === null) {
+				const response = new ResponseError('PERSON_NOT_FOUND', `Person <${args.personId}> was not found`)
+				await context.logAuthAction({
+					type: 'mfa_reset',
+					response,
+					metadata: { requestedPersonId: args.personId },
+				}, db)
+				return createErrorResponse(response.error, response.errorMessage)
+			}
+
+			await db.commandBus.execute(new ResetPersonMfaCommand(targetPerson.id))
+			await this.backupCodeManager.deleteForPerson(db, targetPerson.id)
+
 			await context.logAuthAction({
 				type: 'mfa_reset',
-				response,
-				metadata: { requestedPersonId: args.personId },
-			})
-			return createErrorResponse(response.error, response.errorMessage)
-		}
+				response: new ResponseOk(null),
+				targetPersonId: targetPerson.id,
+			}, db)
 
-		await context.db.commandBus.execute(new ResetPersonMfaCommand(targetPerson.id))
-		await this.backupCodeManager.deleteForPerson(context.db, targetPerson.id)
-
-		await context.logAuthAction({
-			type: 'mfa_reset',
-			response: new ResponseOk(null),
-			targetPersonId: targetPerson.id,
-		})
-
-		return { ok: true }
+			return { ok: true }
+		}, { isolation: 'readCommitted' })
 	}
 }

@@ -7,7 +7,7 @@ import {
 } from '../../../schema/index.js'
 import { GraphQLResolveInfo } from 'graphql'
 import { TenantResolverContext } from '../../TenantResolverContext.js'
-import { IdentityScope, PasswordChangeManager, PermissionActions, PersonQuery } from '../../../model/index.js'
+import { IdentityScope, lockTargetIdentityPermissionTarget, PasswordChangeManager, PermissionActions, PersonQuery } from '../../../model/index.js'
 import { createErrorResponse } from '../../errorUtils.js'
 
 export class ChangePasswordMutationResolver implements MutationResolvers {
@@ -21,28 +21,31 @@ export class ChangePasswordMutationResolver implements MutationResolvers {
 		context: TenantResolverContext,
 		info: GraphQLResolveInfo,
 	): Promise<ChangePasswordResponse> {
-		const person = await context.db.queryHandler.fetch(PersonQuery.byId(args.personId))
-		if (!person) {
-			return createErrorResponse('PERSON_NOT_FOUND', 'Person not found')
-		}
+		return await context.db.transaction(async db => {
+			const person = await db.queryHandler.fetch(PersonQuery.byId(args.personId))
+			if (!person) {
+				return createErrorResponse('PERSON_NOT_FOUND', 'Person not found')
+			}
 
-		await context.requireAccess({
-			scope: new IdentityScope(person.identity_id),
-			action: PermissionActions.PERSON_CHANGE_PASSWORD(person.roles),
-			message: 'You are not allowed to change password',
-		})
-		const response = await this.passwordChangeManager.changePassword(context.db, person, args.password)
-		await context.logAuthAction({
-			type: 'password_change',
-			response,
-			personId: person.id,
-		})
+			const target = await lockTargetIdentityPermissionTarget(db, person.identity_id)
+			await context.requireAccess({
+				scope: new IdentityScope(person.identity_id),
+				action: PermissionActions.PERSON_CHANGE_PASSWORD(target),
+				message: 'You are not allowed to change password',
+			})
+			const response = await this.passwordChangeManager.changePassword(db, person, args.password)
+			await context.logAuthAction({
+				type: 'password_change',
+				response,
+				personId: person.id,
+			}, db)
 
-		if (!response.ok) {
-			return createErrorResponse(response)
-		}
+			if (!response.ok) {
+				return createErrorResponse(response)
+			}
 
-		return { ok: true, errors: [] }
+			return { ok: true, errors: [] }
+		}, { isolation: 'readCommitted' })
 	}
 
 	async changeMyPassword(

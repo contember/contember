@@ -15,8 +15,7 @@ import { ResponseOk } from '../../../model/utils/Response.js'
 /**
  * CRUD over `custom_role` (runtime-defined global roles). Gated by `customRole:manage`,
  * which is deliberately NOT grantable to a custom role — by default only SUPER_ADMIN
- * (via the wildcard grant) can manage role definitions. Every mutation audits
- * `custom_role_change` with a snapshot of the input.
+ * (via the wildcard grant) can manage role definitions.
  */
 export class CustomRoleMutationResolver implements Pick<MutationResolvers, 'createCustomRole' | 'updateCustomRole' | 'deleteCustomRole'> {
 	constructor(
@@ -29,25 +28,27 @@ export class CustomRoleMutationResolver implements Pick<MutationResolvers, 'crea
 			message: 'You are not allowed to manage custom roles',
 		})
 
-		const result = await this.customRoleManager.createRole(context.db, {
-			slug: args.slug,
-			description: args.description ?? null,
-			permissions: args.permissions,
-		})
+		const result = await context.db.transaction(async db => {
+			const result = await this.customRoleManager.createRole(db, {
+				slug: args.slug,
+				description: args.description ?? null,
+				grants: args.grants,
+			})
+			if (result.ok) {
+				await context.logAuthAction({
+					type: 'custom_role_change',
+					response: new ResponseOk(null),
+					eventData: {
+						operation: 'create',
+						after: result.result.role,
+					},
+				}, db)
+			}
+			return result
+		}, { isolation: 'readCommitted' })
 		if (!result.ok) {
 			return createErrorResponse(result.error, result.errorMessage)
 		}
-
-		await context.logAuthAction({
-			type: 'custom_role_change',
-			response: new ResponseOk(null),
-			eventData: {
-				operation: 'create',
-				slug: args.slug,
-				permissions: [...args.permissions],
-				description: args.description ?? null,
-			},
-		})
 
 		return { ok: true }
 	}
@@ -58,24 +59,27 @@ export class CustomRoleMutationResolver implements Pick<MutationResolvers, 'crea
 			message: 'You are not allowed to manage custom roles',
 		})
 
-		const result = await this.customRoleManager.updateRole(context.db, args.slug, {
-			description: args.description,
-			permissions: args.permissions ?? undefined,
-		})
+		const result = await context.db.transaction(async db => {
+			const result = await this.customRoleManager.updateRole(db, args.slug, {
+				description: args.description,
+				grants: args.grants,
+			})
+			if (result.ok) {
+				await context.logAuthAction({
+					type: 'custom_role_change',
+					response: new ResponseOk(null),
+					eventData: {
+						operation: 'update',
+						before: result.result.before,
+						after: result.result.after,
+					},
+				}, db)
+			}
+			return result
+		}, { isolation: 'readCommitted' })
 		if (!result.ok) {
 			return createErrorResponse(result.error, result.errorMessage)
 		}
-
-		await context.logAuthAction({
-			type: 'custom_role_change',
-			response: new ResponseOk(null),
-			eventData: {
-				operation: 'update',
-				slug: args.slug,
-				...(args.permissions !== undefined && args.permissions !== null ? { permissions: [...args.permissions] } : {}),
-				...(args.description !== undefined ? { description: args.description } : {}),
-			},
-		})
 
 		return { ok: true }
 	}
@@ -86,19 +90,24 @@ export class CustomRoleMutationResolver implements Pick<MutationResolvers, 'crea
 			message: 'You are not allowed to manage custom roles',
 		})
 
-		const result = await this.customRoleManager.deleteRole(context.db, args.slug)
+		const result = await context.db.transaction(async db => {
+			const result = await this.customRoleManager.deleteRole(db, args.slug)
+			if (result.ok) {
+				await context.logAuthAction({
+					type: 'custom_role_change',
+					response: new ResponseOk(null),
+					eventData: {
+						operation: 'delete',
+						before: result.result.before,
+						removedAssignments: result.result.removedAssignments,
+					},
+				}, db)
+			}
+			return result
+		}, { isolation: 'readCommitted' })
 		if (!result.ok) {
 			return createErrorResponse(result.error, result.errorMessage)
 		}
-
-		await context.logAuthAction({
-			type: 'custom_role_change',
-			response: new ResponseOk(null),
-			eventData: {
-				operation: 'delete',
-				slug: args.slug,
-			},
-		})
 
 		return { ok: true }
 	}

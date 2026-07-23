@@ -77,7 +77,7 @@ export class ResetPasswordMutationResolver implements MutationResolvers {
 		const permissionContext = await this.permissionContextFactory.create(context.db, {
 			id: person.identity_id,
 			roles: person.roles,
-		})
+		}, context.permissionContext.authorizator)
 		await this.passwordResetManager.createPasswordResetRequest(context.db, permissionContext, person, {
 			mailVariant: args.options?.mailVariant || undefined,
 			project: args.options?.mailProject || undefined,

@@ -189,9 +189,11 @@ CREATE TABLE "custom_role" (
     "id" "uuid" NOT NULL,
     "slug" "text" NOT NULL,
     "description" "text",
-    "permissions" "text"[] NOT NULL,
+    "grants" "jsonb" NOT NULL,
     "created_at" timestamp with time zone DEFAULT "now"() NOT NULL,
-    "updated_at" timestamp with time zone DEFAULT "now"() NOT NULL
+    "updated_at" timestamp with time zone DEFAULT "now"() NOT NULL,
+    "deleted_at" timestamp with time zone,
+    CONSTRAINT "custom_role_grants_check" CHECK (("jsonb_typeof"("grants") = 'array'::"text"))
 );
 CREATE TABLE "identity" (
     "id" "uuid" NOT NULL,

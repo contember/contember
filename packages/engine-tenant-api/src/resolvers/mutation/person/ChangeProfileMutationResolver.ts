@@ -13,10 +13,12 @@ import {
 	ConfigurationQuery,
 	EmailChangeManager,
 	IdentityScope,
+	lockTargetIdentityPermissionTarget,
 	PermissionActions,
 	PermissionContextFactory,
 	PersonManager,
 	PersonQuery,
+	ProfileField,
 } from '../../../model/index.js'
 import { createErrorResponse } from '../../errorUtils.js'
 import { normalizeEmail } from '../../../model/utils/email.js'
@@ -34,35 +36,47 @@ export class ChangeProfileMutationResolver implements Pick<MutationResolvers, 'c
 		context: TenantResolverContext,
 		info: GraphQLResolveInfo,
 	): Promise<ChangeProfileResponse> {
-		const person = await context.db.queryHandler.fetch(PersonQuery.byId(args.personId))
-		if (!person) {
-			return createErrorResponse('PERSON_NOT_FOUND', 'Person not found')
-		}
 		if (args.email === null) {
 			return createErrorResponse('INVALID_EMAIL_FORMAT', 'E-mail address cannot be null.')
 		}
+		const email = args.email
 
-		await context.requireAccess({
-			scope: new IdentityScope(person.identity_id),
-			action: PermissionActions.PERSON_CHANGE_PROFILE(person.roles),
-			message: 'You are not allowed to change a profile',
-		})
-		const result = await this.personManager.changeProfile(context.db, person, {
-			email: args.email,
-			name: args.name === '' ? null : args.name,
-		})
-		if (args.email) {
-			await context.logAuthAction({
-				type: 'email_change',
-				response: result,
+		return await context.db.transaction(async db => {
+			const person = await db.queryHandler.fetch(PersonQuery.byId(args.personId))
+			if (!person) {
+				return createErrorResponse('PERSON_NOT_FOUND', 'Person not found')
+			}
+
+			const target = await lockTargetIdentityPermissionTarget(db, person.identity_id)
+			const fields: ProfileField[] = []
+			if (args.name !== undefined) {
+				fields.push('name')
+			}
+			if (args.email !== undefined) {
+				fields.push('email')
+			}
+			await context.requireAccess({
+				scope: new IdentityScope(person.identity_id),
+				action: PermissionActions.PERSON_CHANGE_PROFILE(target, fields),
+				message: 'You are not allowed to change a profile',
 			})
-		}
+			const result = await this.personManager.changeProfile(db, person, {
+				email,
+				name: args.name === '' ? null : args.name,
+			})
+			if (email) {
+				await context.logAuthAction({
+					type: 'email_change',
+					response: result,
+				}, db)
+			}
 
-		if (!result.ok) {
-			return createErrorResponse(result.error, result.errorMessage)
-		}
+			if (!result.ok) {
+				return createErrorResponse(result.error, result.errorMessage)
+			}
 
-		return { ok: true }
+			return { ok: true }
+		}, { isolation: 'readCommitted' })
 	}
 
 	async changeMyProfile(
@@ -108,7 +122,7 @@ export class ChangeProfileMutationResolver implements Pick<MutationResolvers, 'c
 			const permissionContext = await this.permissionContextFactory.create(context.db, {
 				id: person.identity_id,
 				roles: person.roles,
-			})
+			}, context.permissionContext.authorizator)
 			const result = await this.emailChangeManager.requestEmailChange(
 				context.db,
 				permissionContext,

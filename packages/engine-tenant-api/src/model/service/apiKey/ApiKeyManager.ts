@@ -22,6 +22,8 @@ import { AuthPolicyResolver } from '../AuthPolicyResolver.js'
 import { AuthLogService } from '../AuthLogService.js'
 import { IdpSessionRevalidator } from '../idp/IdpSessionRevalidator.js'
 import { UnpersistedApiKeyManager } from './UnpersistedApiKeyManager.js'
+import { GlobalRoleValidator } from '../GlobalRoleValidator.js'
+import { Connection } from '@contember/database'
 
 export class ApiKeyManager {
 	constructor(
@@ -30,6 +32,7 @@ export class ApiKeyManager {
 		private readonly authLogService: AuthLogService,
 		private readonly unpersistedApiKeyManager: UnpersistedApiKeyManager = new UnpersistedApiKeyManager(),
 		private readonly idpSessionRevalidator?: IdpSessionRevalidator,
+		private readonly globalRoleValidator: GlobalRoleValidator = new GlobalRoleValidator(),
 	) {}
 
 	async verifyAndProlong(
@@ -277,9 +280,24 @@ export class ApiKeyManager {
 		tokenHash?: TokenHash,
 		trustForwardedInfo?: boolean,
 	): Promise<CreateApiKeyResponse> {
-		return await dbContext.transaction(async db => {
-			return await this.apiKeyService.createPermanentApiKey(db, description, roles, tokenHash, trustForwardedInfo)
-		})
+		return await dbContext.transaction(
+			db => this.createGlobalPermanentApiKeyInTransaction(db, description, roles, tokenHash, trustForwardedInfo),
+			{ isolation: 'readCommitted' },
+		)
+	}
+
+	async createGlobalPermanentApiKeyInTransaction(
+		db: DatabaseContext<Connection.TransactionLike>,
+		description: string,
+		roles: readonly string[],
+		tokenHash?: TokenHash,
+		trustForwardedInfo?: boolean,
+	): Promise<CreateApiKeyResponse> {
+		const invalidRole = await this.globalRoleValidator.findInvalidRole(db, roles)
+		if (invalidRole !== null) {
+			return new ResponseError('INVALID_ROLE', `Role ${invalidRole} is not valid or globally assignable`)
+		}
+		return await this.apiKeyService.createPermanentApiKey(db, description, roles, tokenHash, trustForwardedInfo)
 	}
 
 	async createProjectPermanentApiKey(
@@ -290,9 +308,21 @@ export class ApiKeyManager {
 		tokenHash?: TokenHash,
 		trustForwardedInfo?: boolean,
 	): Promise<CreateApiKeyResponse> {
-		return await dbContext.transaction(async db => {
-			return await this.apiKeyService.createProjectPermanentApiKey(db, projectId, memberships, description, tokenHash, trustForwardedInfo)
-		})
+		return await dbContext.transaction(
+			db => this.createProjectPermanentApiKeyInTransaction(db, projectId, memberships, description, tokenHash, trustForwardedInfo),
+			{ isolation: 'readCommitted' },
+		)
+	}
+
+	async createProjectPermanentApiKeyInTransaction(
+		db: DatabaseContext<Connection.TransactionLike>,
+		projectId: string,
+		memberships: readonly Acl.Membership[],
+		description: string,
+		tokenHash?: TokenHash,
+		trustForwardedInfo?: boolean,
+	): Promise<CreateApiKeyResponse> {
+		return await this.apiKeyService.createProjectPermanentApiKey(db, projectId, memberships, description, tokenHash, trustForwardedInfo)
 	}
 }
 

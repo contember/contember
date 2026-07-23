@@ -1,9 +1,15 @@
-import { DatabaseQuery, DatabaseQueryable, Literal, SelectBuilder } from '@contember/database'
+import { DatabaseQuery, DatabaseQueryable, Literal, LockType, SelectBuilder } from '@contember/database'
 import { CustomRoleRow } from '../../type/index.js'
 
 /** Lists `custom_role` rows, optionally restricted to the given slugs. */
 export class CustomRolesQuery extends DatabaseQuery<CustomRoleRow[]> {
-	constructor(private readonly filter?: { slugs: readonly string[] }) {
+	constructor(
+		private readonly filter?: {
+			readonly slugs?: readonly string[]
+			readonly includeDeleted?: boolean
+			readonly lock?: LockType
+		},
+	) {
 		super()
 	}
 
@@ -13,8 +19,15 @@ export class CustomRolesQuery extends DatabaseQuery<CustomRoleRow[]> {
 			.from('custom_role')
 			.select(new Literal('*'))
 			.orderBy('slug')
-		if (filter !== undefined) {
-			qb = qb.where(expr => expr.in('slug', filter.slugs))
+		if (filter?.includeDeleted !== true) {
+			qb = qb.where(expr => expr.isNull('deleted_at'))
+		}
+		if (filter?.slugs !== undefined) {
+			const slugs = filter.slugs
+			qb = qb.where(expr => expr.in('slug', slugs))
+		}
+		if (filter?.lock !== undefined) {
+			qb = qb.lock(filter.lock)
 		}
 		return await qb.getResult(db)
 	}

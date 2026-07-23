@@ -2,7 +2,9 @@
 title: Mail templates
 ---
 
-Mail templates in Contember enable tailored communication for emails dispatched by the Tenant API. Via the `/tenant` path and with either the `SUPER_ADMIN` or `PROJECT_ADMIN` global roles, users can create and manage these templates seamlessly.
+Mail templates in Contember enable tailored communication for emails dispatched by the Tenant API. Via the `/tenant` path, users with the
+appropriate built-in permission can create and manage templates. A [custom role](/reference/engine/tenant/custom-roles) can also receive separately
+configured `mailTemplate:add`, `mailTemplate:remove`, and `mailTemplate:list` grants, limited to exact global/project scopes and mail types.
 
 ## Mail Types
 

@@ -2,7 +2,9 @@
 title: Declarative configuration (CLI)
 ---
 
-Instead of calling the [`configure`](/reference/engine/tenant/configuration), [`addIDP`](/reference/engine/tenant/idp), and [`addMailTemplate`](/reference/engine/tenant/mail-templates) mutations by hand, you can describe the whole tenant setup in a typed `tenant.config.ts` file and apply it with a single command:
+Instead of calling the [`configure`](/reference/engine/tenant/configuration), [`addIDP`](/reference/engine/tenant/idp),
+[`addMailTemplate`](/reference/engine/tenant/mail-templates), and [custom-role](/reference/engine/tenant/custom-roles) mutations by hand, you
+can describe the whole tenant setup in a typed `tenant.config.ts` file and apply it with a single command:
 
 ```bash
 contember tenant:apply
@@ -69,10 +71,41 @@ export default defineTenantConfig({
       content: 'Click the link to reset your password: {{link}}',
     },
   ],
+
+  // → createCustomRole / updateCustomRole, keyed by role slug
+  customRoles: {
+    support: {
+      description: 'Support team',
+      grants: [
+        { permission: 'person:list' },
+        { permission: 'person:view' },
+        {
+          permission: 'person:changeProfile',
+          config: {
+            target: {
+              globalRoles: { allowed: ['person', 'support'] },
+              projectMemberships: 'none',
+            },
+            fields: { allowed: ['name'] },
+          },
+        },
+        {
+          permission: 'mailTemplate:list',
+          config: {
+            global: false,
+            projects: ['my-project'],
+            types: ['FORCED_SIGN_OUT'],
+          },
+        },
+      ],
+    },
+  },
 })
 ```
 
-The file is plain TypeScript executed by the CLI, so **secrets come straight from `process.env`** — never hardcode credentials.
+The custom-role `grants` field is a discriminated TypeScript union. Selecting a permission provides autocomplete for its exact configuration and
+causes missing, unsupported, or misspelled configuration fields to fail type checking. The file is plain TypeScript executed by the CLI, so
+**secrets come straight from `process.env`** — never hardcode credentials.
 
 ## Running it
 
@@ -103,17 +136,21 @@ contember tenant:apply --dry-run
 | `config` | `configure` | Always sent. All fields are optional and merged — unset fields preserve the current value. |
 | `identityProviders` | `addIDP` / `updateIDP`, then `enableIDP` / `disableIDP` | The CLI reads the current providers and chooses add vs. update per slug. `disabled: true` disables the provider; omitting it (or `false`) keeps/makes it enabled. |
 | `mailTemplates` | `addMailTemplate` | A server-side upsert keyed by `type` + `variant` (+ `projectSlug`). |
+| `customRoles` | `createCustomRole` / `updateCustomRole` | The CLI reads current roles by slug. It creates all missing slugs with empty grants before applying the configured definitions, so roles may reference roles declared later or cyclically. |
 
 :::tip[Nothing is removed]
-`tenant:apply` only adds and updates. Identity providers or mail templates that exist on the tenant but are **not** present in the config are left untouched. To remove one, do it explicitly via the corresponding mutation.
+`tenant:apply` only adds and updates. Identity providers, mail templates, or custom roles that exist on the tenant but are **not** present in the
+config are left untouched. To remove one, do it explicitly via the corresponding mutation.
 :::
 
 ## Permissions
 
-The underlying mutations require the `CONFIGURE`, `IDP_*`, and `MAIL_TEMPLATE_*` tenant permissions, held by `SUPER_ADMIN` and `PROJECT_ADMIN`.
+The underlying mutations require their corresponding tenant permissions. Custom-role provisioning specifically requires `customRole:view` and
+`customRole:manage`; management is deliberately not grantable to custom roles and is held by `SUPER_ADMIN`.
 
 :::caution[A deploy-only token is not enough]
-An `ENTRYPOINT_DEPLOYER` (deploy) token can run `deploy` but **cannot** configure the tenant. Use a token with `PROJECT_ADMIN` or `SUPER_ADMIN` privileges for `tenant:apply` — for example a dedicated CI API key.
+An `ENTRYPOINT_DEPLOYER` (deploy) token can run `deploy` but **cannot** configure the tenant. Use a token carrying every permission required by the
+configured sections. A config containing `customRoles` requires `SUPER_ADMIN`; use a dedicated CI API key.
 :::
 
 ## In CI

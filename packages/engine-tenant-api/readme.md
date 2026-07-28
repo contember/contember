@@ -27,13 +27,12 @@ Role constraints use:
 
 ```json
 {
-	"allowed": ["person", "support"],
-	"denied": ["suspended_support"]
+	"allowed": ["person", "support"]
 }
 ```
 
-Every observed role must be in `allowed` and absent from `denied`. `super_admin` and `project_creator` are always denied by code and cannot appear in
-an allowlist. Configured denies can only narrow this invariant.
+`allowed` is exhaustive — every role observed at the constrained position must appear in it. There is no `denied` counterpart; a constraint can only
+be expressed as an allowlist. `super_admin` and `project_creator` are always denied by code and cannot appear in an allowlist.
 
 Configured grant kinds:
 

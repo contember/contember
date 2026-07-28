@@ -73,8 +73,8 @@ export type TenantMailTemplate = MailTemplate
 export type TenantAuthPolicy = AuthPolicyInput
 
 export interface TenantCustomRoleRoleConstraint {
+	/** Exhaustive: every role observed at the constrained position must appear here. Not a filter, and there is no `denied` counterpart. */
 	readonly allowed: readonly string[]
-	readonly denied?: readonly string[]
 }
 
 export interface TenantCustomRoleTarget {

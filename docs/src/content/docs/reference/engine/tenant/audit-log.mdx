@@ -18,13 +18,13 @@ Every entry carries:
 | `success` | Whether the action succeeded; failures are recorded too |
 | `created_at` | Timestamp |
 | `person_id` | The actor's person (if the actor was a person, not a system token) |
-| `identity_id` | The actor's identity |
+| `identity_id` | The actor's identity. `NULL` for requests authenticated by an [unpersisted root token](/reference/engine/tenant/overview#unpersisted-root-tokens), whose virtual identity has no `identity` row — those are marked by `metadata.actor` instead |
 | `target_person_id` | The subject of the action when different from the actor (e.g. force sign-out, role grant, membership change) |
 | `client_ip` | The effective client IP (after [trust-forwarded-info](/reference/engine/tenant/proxy-trust) is applied) |
 | `user_agent` | The effective client User-Agent |
 | `person_input_identifier` | Free-form input string (the email submitted on a failed login, etc.) |
 | `error_code` | The `code` returned to the caller on failure |
-| `metadata` | JSONB — forensic context (forwarder IP/UA, `sessionId`, `reason`, …) |
+| `metadata` | JSONB — forensic context (forwarder IP/UA, `sessionId`, `reason`, `actor`, …) |
 | `event_data` | JSONB — domain payload: `{before, after}` snapshots, creation snapshots, redacted inputs |
 
 ## Event types
@@ -135,7 +135,7 @@ All fields are AND-combined; omitted fields are unconstrained.
 |---|---|
 | `types` | OR-combined list of `auth_log_type` values. |
 | `success` | Filter to successful or failed events only. |
-| `invokedByIdentityId` | Actor identity. |
+| `invokedByIdentityId` | Actor identity. Never matches root-token actions, whose `identity_id` is `NULL` — find those with `metadata->>'actor' = 'unpersisted_root'` in SQL. |
 | `personId` | Actor's person. |
 | `targetPersonId` | Subject of the action — for force sign-out, role grant, membership change, etc. |
 | `personInputIdentifier` | The free-form identifier submitted by the caller (usually the email on a failed `signIn` / `signUp`). Useful for tracking probe attempts against a specific email that does not exist in `person`. |
@@ -160,3 +160,4 @@ ORDER BY created_at DESC;
 - Admin events are recorded only on success — a denied permission check throws before the action runs, so there is nothing to audit at the resolver level (the permission failure is observable from the HTTP error response itself).
 - Secret-bearing inputs are redacted before they hit the log: captcha secret becomes `***`, IDP configuration is collapsed to a sorted list of keys, project secrets log only their key name, API keys log only their id and identity.
 - The forwarder's socket IP/UA are preserved in `metadata.forwarderIp` / `metadata.forwarderUserAgent` when [trust-forwarded-info](/reference/engine/tenant/proxy-trust) is in effect, so the trail still has a path back to the proxy.
+- Actions performed with an [unpersisted root token](/reference/engine/tenant/overview#unpersisted-root-tokens) carry `metadata.actor = 'unpersisted_root'` and a `NULL` `identity_id` — the virtual root identity has no `identity` row, so recording it would point at a foreign key that does not exist. Filter those with `metadata->>'actor' = 'unpersisted_root'`; the `invokedByIdentityId` GraphQL filter cannot reach them.

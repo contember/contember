@@ -29,7 +29,7 @@ In the JSON/YAML config these map to `tenant.credentials.rootTokens` and `tenant
 
 Because these tokens are never written to the database, rotation is trivial — just change the environment variable (or config) and restart; no migration or database write is involved, and revoking a token is as simple as removing it from the list. Incoming tokens are matched against the configured hashes using a constant-time comparison.
 
-A request authenticated by an unpersisted root token is granted the `super_admin` role (full access) and is attributed to a fixed virtual identity id that has no row in the `identity` table.
+A request authenticated by an unpersisted root token is granted the `super_admin` role (full access) and runs under a fixed virtual identity id that has no row in the `identity` table. Because that id references nothing, it is *not* what gets recorded in the [audit log](/reference/engine/tenant/audit-log): such entries have a `NULL` `identity_id` and carry `metadata.actor = 'unpersisted_root'` instead.
 
 ## Choosing the right token
 

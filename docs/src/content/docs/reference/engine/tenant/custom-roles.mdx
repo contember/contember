@@ -254,8 +254,18 @@ are filtered row by row. Globs, patterns, and arbitrary resource expressions are
 
 ## Grantable surface
 
-Configuration-free grants currently include tenant-global reads and operations such as `person:list`, `person:view`, `system:viewConfig`,
-`system:viewAuthLog`, `apiKey:list`, `idp:list`, `entrypoint:deployEntrypoint`, and `customRole:view`.
+The configuration-free grants are `person:view`, `person:list`, `system:viewConfig`, `system:viewAuthLog`, `apiKey:list`, `idp:list`, `idp:enable`,
+`idp:disable`, `entrypoint:deployEntrypoint`, `customRole:view`, and `system:configure`.
+
+:::caution[`system:configure` is broader than its name suggests]
+It gates the whole tenant configuration surface — password policy, captcha, rate limits, token expiration — **and** auth-policy management
+(`createAuthPolicy` / `updateAuthPolicy` / `deleteAuthPolicy`). A role holding it can weaken or remove the MFA and session policy for **any** role,
+including `super_admin`. It takes no configuration, so there is no way to narrow it. Grant it only to roles you would trust with tenant-wide
+security settings.
+:::
+
+`idp:enable` and `idp:disable` likewise take no configuration and therefore apply to every configured provider; a holder can disable a sign-in
+method for the whole tenant.
 
 Project creation and project/membership actions such as invitations, project updates and secrets, project member management, and project API-key
 creation are not grantable. `customRole:manage` is also deliberately excluded so a custom role cannot edit its own definition. Use

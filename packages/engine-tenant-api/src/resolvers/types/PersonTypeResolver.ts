@@ -1,5 +1,12 @@
 import { Person, PersonIdentityProvider, PersonResolvers } from '../../schema/index.js'
-import { type Config, ConfigurationQuery, IdentityQuery, PermissionActions, PersonIdentityProviderManager } from '../../model/index.js'
+import {
+	type Config,
+	ConfigurationQuery,
+	createTargetIdentityPermissionTarget,
+	PermissionActions,
+	PersonIdentityProviderManager,
+	targetIdentityLoader,
+} from '../../model/index.js'
 import { isPasswordlessEnabled } from '../../model/service/helpers/isPasswordlessEnabled.js'
 import { TenantResolverContext } from '../TenantResolverContext.js'
 
@@ -47,9 +54,10 @@ export class PersonTypeResolver implements Pick<PersonResolvers, 'identityProvid
 		// Return [] instead of throwing so listing many persons does not abort on a
 		// single forbidden target — mirrors `Identity.sessions`.
 		if (parent.identity.id !== context.identity.id) {
-			const [identity] = await context.db.queryHandler.fetch(new IdentityQuery([parent.identity.id]))
+			const identity = await context.db.batchLoad(targetIdentityLoader, parent.identity.id)
+			const target = identity === undefined ? null : await createTargetIdentityPermissionTarget(context.db, identity)
 			const canView = await context.permissionContext.isAllowed({
-				action: PermissionActions.PERSON_VIEW_IDP(identity?.roles ?? []),
+				action: PermissionActions.PERSON_VIEW_IDP(target),
 			})
 			if (!canView) {
 				return []

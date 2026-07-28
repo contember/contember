@@ -1,6 +1,7 @@
 import { executeTenantTest } from '../../../src/testTenant.js'
 import { GQL, SQL } from '../../../src/tags.js'
 import { testUuid } from '../../../src/testUuid.js'
+import { getIdentityProjectMembershipPresenceSql } from './sql/getIdentityProjectMembershipPresenceSql.js'
 import { getPersonByIdSql } from './sql/getPersonByIdSql.js'
 import { sqlTransaction } from './sql/sqlTransaction.js'
 import { expect, test } from 'bun:test'
@@ -26,6 +27,7 @@ test('disablePerson revokes the account and its api keys', async () => {
 				personId,
 				response: { personId, identityId, password: '123', roles: [], email: 'jane@doe.com', disabledAt: null },
 			}),
+			getIdentityProjectMembershipPresenceSql(identityId),
 			...sqlTransaction(
 				{
 					sql: SQL`update "tenant"."person" set "disabled_at" = ? where "id" = ?`,
@@ -73,6 +75,7 @@ test('disablePerson returns PERSON_ALREADY_DISABLED', async () => {
 					disabledAt: new Date('2019-09-04 12:00'),
 				},
 			}),
+			getIdentityProjectMembershipPresenceSql(identityId),
 			...sqlTransaction(),
 		],
 		return: {

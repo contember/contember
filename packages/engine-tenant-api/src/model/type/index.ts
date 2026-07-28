@@ -1,6 +1,7 @@
 export * from './ApiKey.js'
 export * from './AuthPolicy.js'
 export * from './Config.js'
+export * from './CustomRole.js'
 export * from './IdentityProvider.js'
 export * from './Project.js'
 export * from './Variables.js'

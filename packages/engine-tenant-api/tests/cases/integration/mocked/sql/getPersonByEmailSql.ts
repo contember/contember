@@ -17,6 +17,7 @@ export const getPersonByEmailSql = (args: {
 			mfaGraceUntil?: Date | null
 			emailVerifiedAt?: Date | null
 			emailVerificationRequired?: boolean
+			disabledAt?: Date | null
 		}
 }): ExpectedQuery => ({
 	sql:
@@ -41,7 +42,7 @@ export const getPersonByEmailSql = (args: {
 					otp_pending_secret: args.response.otpPendingUri ? Buffer.from(args.response.otpPendingUri, 'utf8') : null,
 					otp_pending_version: args.response.otpPendingUri ? 0 : null,
 					email_otp_enabled: args.response.emailOtpEnabled ?? false,
-					disabled_at: null,
+					disabled_at: args.response.disabledAt ?? null,
 					passwordless_enabled: null,
 					mfa_grace_until: args.response.mfaGraceUntil ?? null,
 					email_verified_at: args.response.emailVerifiedAt ?? null,

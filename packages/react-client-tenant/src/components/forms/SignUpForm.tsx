@@ -88,4 +88,5 @@ const errorToField: Record<SignUpErrorCode, keyof SignUpFormValues | undefined> 
 	TOO_WEAK: 'password',
 	INVALID_CAPTCHA: undefined,
 	RATE_LIMIT_EXCEEDED: undefined,
+	INVALID_ROLE: undefined,
 }

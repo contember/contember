@@ -1,18 +1,33 @@
 import { Permissions } from '@contember/authorization'
-import { PermissionActions } from './PermissionActions.js'
-import { TenantRole } from './Roles.js'
+import {
+	ChangeProfilePermissionMeta,
+	CreateSessionTokenPermissionMeta,
+	GlobalApiKeyPermissionMeta,
+	GlobalRoleMutationPermissionMeta,
+	PermissionActions,
+	TargetIdentityPermissionMeta,
+} from './PermissionActions.js'
+import { NON_DELEGABLE_TENANT_ROLES, TenantRole } from './Roles.js'
 
-const allowedRoles = new Set<string>([TenantRole.LOGIN, TenantRole.PROJECT_ADMIN, TenantRole.ENTRYPOINT_DEPLOYER])
+const projectAdminAllowsRoles = (roles: readonly string[] | undefined): boolean =>
+	roles === undefined || roles.every(role => !NON_DELEGABLE_TENANT_ROLES.has(role))
 
-const projectAdminAllowedInputRoles = ({ roles }: { roles?: readonly string[] }) => {
-	return roles === undefined || roles.every(it => allowedRoles.has(it))
-}
+const projectAdminAllowedSignUpRoles = (meta: { readonly requestedRoles?: readonly string[] }) => projectAdminAllowsRoles(meta.requestedRoles)
 
-const forbiddenRoles = new Set<string>([TenantRole.SUPER_ADMIN, TenantRole.PROJECT_CREATOR])
+const projectAdminAllowedGlobalApiKeyRoles = (meta: GlobalApiKeyPermissionMeta | undefined) => projectAdminAllowsRoles(meta?.requestedRoles)
 
-const projectAdminUseRolesVerifier = ({ roles }: { roles?: readonly string[] }) => {
-	return roles === undefined || roles.every(it => !forbiddenRoles.has(it))
-}
+const projectAdminAllowedRoleMutation = (meta: GlobalRoleMutationPermissionMeta | undefined) =>
+	meta === undefined
+	|| (
+		projectAdminAllowsRoles(meta.requestedRoles)
+		&& meta.target.globalRoles.every(role => !NON_DELEGABLE_TENANT_ROLES.has(role))
+	)
+
+const projectAdminMayTarget = (meta: TargetIdentityPermissionMeta) =>
+	meta.target === null || meta.target.globalRoles.every(role => !NON_DELEGABLE_TENANT_ROLES.has(role))
+
+const projectAdminMayCreateSession = (meta: CreateSessionTokenPermissionMeta) =>
+	meta.phase === 'preflight' || meta.target?.globalRoles.every(role => !NON_DELEGABLE_TENANT_ROLES.has(role)) === true
 
 class PermissionsFactory {
 	public create(): Permissions {
@@ -41,21 +56,27 @@ class PermissionsFactory {
 		permissions.allow(TenantRole.PROJECT_ADMIN, PermissionActions.PROJECT_VIEW)
 		permissions.allow(TenantRole.PROJECT_ADMIN, PermissionActions.IDENTITY_VIEW_PERMISSIONS)
 		permissions.allow(TenantRole.PROJECT_ADMIN, PermissionActions.PERSON_VIEW)
+		permissions.allow(TenantRole.PROJECT_ADMIN, PermissionActions.PERSON_LIST)
 		permissions.allow(TenantRole.PROJECT_ADMIN, PermissionActions.API_KEY_CREATE)
 		permissions.allow(TenantRole.PROJECT_ADMIN, PermissionActions.API_KEY_DISABLE)
-		permissions.allow(TenantRole.PROJECT_ADMIN, PermissionActions.API_KEY_CREATE_GLOBAL(), projectAdminAllowedInputRoles)
+		permissions.allow(TenantRole.PROJECT_ADMIN, PermissionActions.API_KEY_LIST)
+		permissions.allow(TenantRole.PROJECT_ADMIN, PermissionActions.API_KEY_CREATE_GLOBAL(), projectAdminAllowedGlobalApiKeyRoles)
 
-		permissions.allow(TenantRole.PROJECT_ADMIN, PermissionActions.PERSON_SIGN_UP(), projectAdminAllowedInputRoles)
-		permissions.allow(TenantRole.PROJECT_ADMIN, PermissionActions.IDENTITY_ADD_GLOBAL_ROLES(), projectAdminAllowedInputRoles)
-		permissions.allow(TenantRole.PROJECT_ADMIN, PermissionActions.IDENTITY_REMOVE_GLOBAL_ROLES(), projectAdminAllowedInputRoles)
-		permissions.allow(TenantRole.PROJECT_ADMIN, PermissionActions.PERSON_CREATE_SESSION_KEY(), projectAdminUseRolesVerifier)
-		permissions.allow(TenantRole.PROJECT_ADMIN, PermissionActions.PERSON_DISABLE(), projectAdminUseRolesVerifier)
-		permissions.allow(TenantRole.PROJECT_ADMIN, PermissionActions.PERSON_FORCE_SIGN_OUT(), projectAdminUseRolesVerifier)
-		permissions.allow(TenantRole.PROJECT_ADMIN, PermissionActions.PERSON_RESET_MFA(), projectAdminUseRolesVerifier)
-		permissions.allow(TenantRole.PROJECT_ADMIN, PermissionActions.PERSON_VIEW_SESSIONS(), projectAdminUseRolesVerifier)
-		permissions.allow(TenantRole.PROJECT_ADMIN, PermissionActions.PERSON_VIEW_IDP(), projectAdminUseRolesVerifier)
-		permissions.allow(TenantRole.PROJECT_ADMIN, PermissionActions.PERSON_CHANGE_PROFILE(), projectAdminUseRolesVerifier)
-		permissions.allow(TenantRole.PROJECT_ADMIN, PermissionActions.PERSON_CHANGE_PASSWORD(), projectAdminUseRolesVerifier)
+		permissions.allow(TenantRole.PROJECT_ADMIN, PermissionActions.PERSON_SIGN_UP(), projectAdminAllowedSignUpRoles)
+		permissions.allow(TenantRole.PROJECT_ADMIN, PermissionActions.IDENTITY_ADD_GLOBAL_ROLES(), projectAdminAllowedRoleMutation)
+		permissions.allow(TenantRole.PROJECT_ADMIN, PermissionActions.IDENTITY_REMOVE_GLOBAL_ROLES(), projectAdminAllowedRoleMutation)
+		permissions.allow(
+			TenantRole.PROJECT_ADMIN,
+			PermissionActions.PERSON_CREATE_SESSION_KEY({ phase: 'preflight' }),
+			projectAdminMayCreateSession,
+		)
+		permissions.allow(TenantRole.PROJECT_ADMIN, PermissionActions.PERSON_DISABLE(null), projectAdminMayTarget)
+		permissions.allow(TenantRole.PROJECT_ADMIN, PermissionActions.PERSON_FORCE_SIGN_OUT(null), projectAdminMayTarget)
+		permissions.allow(TenantRole.PROJECT_ADMIN, PermissionActions.PERSON_RESET_MFA(null), projectAdminMayTarget)
+		permissions.allow(TenantRole.PROJECT_ADMIN, PermissionActions.PERSON_VIEW_SESSIONS(null), projectAdminMayTarget)
+		permissions.allow(TenantRole.PROJECT_ADMIN, PermissionActions.PERSON_VIEW_IDP(null), projectAdminMayTarget)
+		permissions.allow(TenantRole.PROJECT_ADMIN, PermissionActions.PERSON_CHANGE_PROFILE(null, []), projectAdminMayTarget)
+		permissions.allow(TenantRole.PROJECT_ADMIN, PermissionActions.PERSON_CHANGE_PASSWORD(null), projectAdminMayTarget)
 
 		permissions.allow(TenantRole.PROJECT_ADMIN, PermissionActions.PROJECT_VIEW_MEMBER([]))
 		permissions.allow(TenantRole.PROJECT_ADMIN, PermissionActions.PROJECT_ADD_MEMBER([]))
@@ -66,9 +87,9 @@ class PermissionsFactory {
 		permissions.allow(TenantRole.PROJECT_ADMIN, PermissionActions.PERSON_INVITE([]))
 		permissions.allow(TenantRole.PROJECT_ADMIN, PermissionActions.PERSON_INVITE_UNMANAGED([]))
 
-		permissions.allow(TenantRole.PROJECT_ADMIN, PermissionActions.MAIL_TEMPLATE_ADD)
-		permissions.allow(TenantRole.PROJECT_ADMIN, PermissionActions.MAIL_TEMPLATE_REMOVE)
-		permissions.allow(TenantRole.PROJECT_ADMIN, PermissionActions.MAIL_TEMPLATE_LIST)
+		permissions.allow(TenantRole.PROJECT_ADMIN, PermissionActions.MAIL_TEMPLATE_ADD())
+		permissions.allow(TenantRole.PROJECT_ADMIN, PermissionActions.MAIL_TEMPLATE_REMOVE())
+		permissions.allow(TenantRole.PROJECT_ADMIN, PermissionActions.MAIL_TEMPLATE_LIST())
 
 		permissions.allow(TenantRole.PROJECT_ADMIN, PermissionActions.IDP_ADD)
 		permissions.allow(TenantRole.PROJECT_ADMIN, PermissionActions.IDP_UPDATE)
@@ -76,6 +97,8 @@ class PermissionsFactory {
 		permissions.allow(TenantRole.PROJECT_ADMIN, PermissionActions.IDP_ENABLE)
 		permissions.allow(TenantRole.PROJECT_ADMIN, PermissionActions.IDP_LIST)
 
+		permissions.allow(TenantRole.PROJECT_ADMIN, PermissionActions.AUTH_LOG_VIEW)
+		permissions.allow(TenantRole.PROJECT_ADMIN, PermissionActions.CUSTOM_ROLE_VIEW)
 		permissions.allow(TenantRole.PROJECT_ADMIN, PermissionActions.ENTRYPOINT_DEPLOY)
 		permissions.allow(TenantRole.PROJECT_ADMIN, PermissionActions.CONFIGURE)
 		permissions.allow(TenantRole.PROJECT_ADMIN, PermissionActions.CONFIG_VIEW)

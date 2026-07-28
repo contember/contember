@@ -55,6 +55,7 @@ export const dict = {
 			errorMessages: {
 				'FIELD_REQUIRED': 'This field is required',
 				'UNKNOWN_ERROR': 'Something went wrong. Please try again later',
+				'INVALID_ROLE': 'Invalid role',
 				'INVALID_MEMBERSHIP': 'Invalid membership',
 				'PROJECT_NOT_FOUND': 'Project not found',
 				'ROLE_NOT_FOUND': 'Role not found',
@@ -194,6 +195,7 @@ export const dict = {
 			errorMessages: {
 				'FIELD_REQUIRED': 'This field is required',
 				'UNKNOWN_ERROR': 'Something went wrong. Please try again later',
+				'INVALID_ROLE': 'Invalid role',
 				'INVALID_MEMBERSHIP': 'Invalid membership',
 				'PROJECT_NOT_FOUND': 'Project not found',
 				'ROLE_NOT_FOUND': 'Role not found',

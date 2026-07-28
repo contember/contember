@@ -26,8 +26,9 @@ Command-line interface for Contember project management. 22 commands for deploym
 - `config` → `configure` mutation (partial merge of password/login/passwordless/captcha/rateLimits)
 - `identityProviders` (keyed by slug) → `addIDP`/`updateIDP` chosen from current state, then `enableIDP`/`disableIDP` to match `disabled`
 - `mailTemplates` → `addMailTemplate` (server-side upsert)
+- `customRoles` (keyed by slug) → missing slugs are created first with empty grants, then every configured role is updated; this supports forward and cyclic role references
 
-Nothing is ever removed (no pruning). Authored with `defineTenantConfig` from the library export of `@contember/cli` (`src/index.ts`). Secrets come from `process.env` in the config file. Requires a token with **PROJECT_ADMIN/SUPER_ADMIN** privileges — a deploy-only (ENTRYPOINT_DEPLOYER) token is rejected by the API. Orchestration lives in `lib/tenant/` (`TenantClient`, `TenantConfigLoader`, `TenantConfigApplier`); no new server-side API was needed.
+Nothing is ever removed (no pruning). Custom-role grants are a discriminated union keyed by `permission`, with exact action-specific config types. Authored with `defineTenantConfig` from the library export of `@contember/cli` (`src/index.ts`). Secrets come from `process.env` in the config file. Custom-role provisioning requires **SUPER_ADMIN** because `customRole:manage` is not delegable; other sections need their corresponding tenant permissions. A deploy-only (ENTRYPOINT_DEPLOYER) token is rejected by the API. Orchestration lives in `lib/tenant/` (`TenantClient`, `TenantConfigLoader`, `TenantConfigApplier`).
 
 ## Connection
 

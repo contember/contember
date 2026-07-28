@@ -17,12 +17,13 @@ const schema: DocumentNode = gql`
 		me: Identity!
 		personById(id: String!): Person
 		"""
-		List persons across the tenant. SUPER_ADMIN sees every person; otherwise
-		the result is scoped to persons who are members of a project the caller may
-		view members of (i.e. the same persons reachable via \`project.members\`),
-		so a PROJECT_ADMIN sees only their projects' members. \`filter\` matches by
-		e-mail (case-insensitive), \`personId\`, or \`identityId\`; \`limit\`/\`offset\`
-		paginate. Returns an empty list when the caller may not list anyone.
+		List persons across the tenant. Requires the \`person:list\` permission —
+		held by SUPER_ADMIN and PROJECT_ADMIN, and grantable to a custom role — which
+		lists every person. Without it the result is scoped to persons who are members
+		of a project the caller may view members of (i.e. the same persons reachable
+		via \`project.members\`). \`filter\` matches by e-mail (case-insensitive),
+		\`personId\`, or \`identityId\`; \`limit\`/\`offset\` paginate. Returns an empty
+		list when the caller may not list anyone.
 		"""
 		persons(filter: PersonsFilter, limit: Int, offset: Int): [Person!]!
 		projects: [Project!]!
@@ -31,8 +32,8 @@ const schema: DocumentNode = gql`
 		"""
 		List global (project-independent) permanent API keys — those created via
 		\`createGlobalApiKey\`, whose identity carries global roles and no project
-		membership. Requires the \`apiKey:list\` permission — by default granted
-		only to SUPER_ADMIN via the wildcard ALL-resource/ALL-privilege grant.
+		membership. Requires the \`apiKey:list\` permission — granted to SUPER_ADMIN
+		and PROJECT_ADMIN by default, and grantable to a custom role.
 		Returns an empty list when the caller may not list them. To list a
 		project's keys use \`project.apiKeys\`.
 		"""
@@ -54,9 +55,23 @@ const schema: DocumentNode = gql`
 		authPolicies: [AuthPolicy!]!
 
 		"""
+		List custom roles (runtime-defined global roles carrying a bundle of tenant
+		permissions). Requires the \`customRole:view\` permission — granted to
+		SUPER_ADMIN and PROJECT_ADMIN by default, and itself grantable to a custom
+		role. Managing definitions needs \`customRole:manage\`, which is not grantable.
+		"""
+		customRoles: [CustomRole!]!
+
+		"""
+		List exact permission definitions grantable to a custom role. Requires
+		the \`customRole:view\` permission.
+		"""
+		customRolePermissions: [CustomRolePermissionDefinition!]!
+
+		"""
 		Read the tenant audit log (\`person_auth_log\`). Requires the
-		\`system:viewAuthLog\` permission — by default granted only to
-		SUPER_ADMIN via the wildcard ALL-resource/ALL-privilege grant.
+		\`system:viewAuthLog\` permission — granted to SUPER_ADMIN and
+		PROJECT_ADMIN by default, and grantable to a custom role.
 		Ordered by created_at DESC. Page size is capped server-side
 		(default 100, max 500); \`hasMore\` indicates a further page exists.
 		"""
@@ -182,6 +197,11 @@ const schema: DocumentNode = gql`
 		createAuthPolicy(policy: AuthPolicyInput!): CreateAuthPolicyResponse
 		updateAuthPolicy(id: String!, policy: AuthPolicyInput!): UpdateAuthPolicyResponse
 		deleteAuthPolicy(id: String!): DeleteAuthPolicyResponse
+
+		# === custom roles (runtime-defined global roles) ===
+		createCustomRole(slug: String!, grants: [CustomRoleGrantInput!]!, description: String): CreateCustomRoleResponse
+		updateCustomRole(slug: String!, grants: [CustomRoleGrantInput!], description: String): UpdateCustomRoleResponse
+		deleteCustomRole(slug: String!): DeleteCustomRoleResponse
 
 		addProjectMailTemplate(template: MailTemplate!): AddMailTemplateResponse
 		@deprecated(reason: "use addMailTemplate")
@@ -464,6 +484,7 @@ const schema: DocumentNode = gql`
 	enum SignUpErrorCode {
 		EMAIL_ALREADY_EXISTS
 		INVALID_EMAIL_FORMAT
+		INVALID_ROLE
 		TOO_WEAK
 		INVALID_CAPTCHA
 		RATE_LIMIT_EXCEEDED
@@ -1119,6 +1140,7 @@ const schema: DocumentNode = gql`
 	enum CreateApiKeyErrorCode {
 		PROJECT_NOT_FOUND
 		INVALID_MEMBERSHIP
+		INVALID_ROLE
 
 		VARIABLE_NOT_FOUND @deprecated
 		ROLE_NOT_FOUND @deprecated
@@ -1250,9 +1272,10 @@ const schema: DocumentNode = gql`
 		External IdP connections of this person. Always visible for the calling
 		person (e.g. via \`me { person { identityProviders } }\`). For other
 		persons, visible to callers holding the \`person:viewIdp\` permission
-		against the target's roles — SUPER_ADMIN sees everyone; PROJECT_ADMIN
-		sees members whose roles fall within their allowed-input-roles. Returns
-		an empty list rather than throwing when the viewer lacks visibility.
+		against the target — SUPER_ADMIN sees everyone; PROJECT_ADMIN sees
+		everyone except identities holding \`super_admin\` or \`project_creator\`;
+		a custom role is further bounded by its configured target constraints.
+		Returns an empty list rather than throwing when the viewer lacks visibility.
 		"""
 		identityProviders: [PersonIdentityProvider!]!
 	}
@@ -1305,8 +1328,9 @@ const schema: DocumentNode = gql`
 		Active SESSION-type api keys for this identity. Always visible for
 		the calling identity (e.g. via \`me { sessions }\`). For other identities,
 		visible to callers holding the \`person:viewSessions\` permission against
-		the target's roles — SUPER_ADMIN sees everyone; PROJECT_ADMIN sees
-		members whose roles fall within their allowed-input-roles. Returns an
+		the target — SUPER_ADMIN sees everyone; PROJECT_ADMIN sees everyone except
+		identities holding \`super_admin\` or \`project_creator\`; a custom role is
+		further bounded by its configured target constraints. Returns an
 		empty list rather than throwing when the viewer lacks visibility, so
 		batched identity queries do not abort on a single forbidden target.
 		"""
@@ -1655,6 +1679,97 @@ const schema: DocumentNode = gql`
 
 	enum DeleteAuthPolicyErrorCode {
 		NOT_FOUND
+	}
+
+	# === custom roles (runtime-defined global roles) ===
+
+	type CustomRole {
+		slug: String!
+		description: String
+		grants: [CustomRoleGrant!]!
+	}
+
+	input CustomRoleGrantInput {
+		permission: String!
+		config: Json
+	}
+
+	type CustomRoleGrant {
+		permission: String!
+		config: Json
+	}
+
+	enum CustomRoleConfigurationKind {
+		NONE
+		ROLE_INPUT
+		TARGET_IDENTITY
+		ROLE_MUTATION
+		GLOBAL_API_KEY
+		CHANGE_PROFILE
+		CREATE_SESSION_TOKEN
+		MAIL_TEMPLATE_SCOPE
+	}
+
+	type CustomRolePermissionDefinition {
+		name: String!
+		configurationKind: CustomRoleConfigurationKind!
+		configurationRequired: Boolean!
+		defaultConfig: Json
+	}
+
+	type CreateCustomRoleResponse {
+		ok: Boolean!
+		error: CreateCustomRoleError
+	}
+
+	type CreateCustomRoleError {
+		code: CreateCustomRoleErrorCode!
+		developerMessage: String!
+	}
+
+	enum CreateCustomRoleErrorCode {
+		INVALID_SLUG
+		SLUG_ALREADY_EXISTS
+		UNKNOWN_PERMISSION
+		DUPLICATE_PERMISSION
+		INVALID_PERMISSION_CONFIGURATION
+	}
+
+	type UpdateCustomRoleResponse {
+		ok: Boolean!
+		error: UpdateCustomRoleError
+	}
+
+	type UpdateCustomRoleError {
+		code: UpdateCustomRoleErrorCode!
+		developerMessage: String!
+	}
+
+	enum UpdateCustomRoleErrorCode {
+		NOT_FOUND
+		UNKNOWN_PERMISSION
+		DUPLICATE_PERMISSION
+		INVALID_PERMISSION_CONFIGURATION
+	}
+
+	type DeleteCustomRoleResponse {
+		ok: Boolean!
+		error: DeleteCustomRoleError
+	}
+
+	type DeleteCustomRoleError {
+		code: DeleteCustomRoleErrorCode!
+		developerMessage: String!
+	}
+
+	enum DeleteCustomRoleErrorCode {
+		NOT_FOUND
+		"""
+		Another custom role's grant configuration references this one. Remove the reference first —
+		deleting would leave that role un-resubmittable, and recreating this slug would silently
+		re-bind the reference to a different definition.
+		"""
+		ROLE_IN_USE
 	}
 
 	# === sessions ===

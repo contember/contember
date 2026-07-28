@@ -18,13 +18,13 @@ Every entry carries:
 | `success` | Whether the action succeeded; failures are recorded too |
 | `created_at` | Timestamp |
 | `person_id` | The actor's person (if the actor was a person, not a system token) |
-| `identity_id` | The actor's identity |
+| `identity_id` | The actor's identity. `NULL` for requests authenticated by an [unpersisted root token](/reference/engine/tenant/overview#unpersisted-root-tokens), whose virtual identity has no `identity` row — those are marked by `metadata.actor` instead |
 | `target_person_id` | The subject of the action when different from the actor (e.g. force sign-out, role grant, membership change) |
 | `client_ip` | The effective client IP (after [trust-forwarded-info](/reference/engine/tenant/proxy-trust) is applied) |
 | `user_agent` | The effective client User-Agent |
 | `person_input_identifier` | Free-form input string (the email submitted on a failed login, etc.) |
 | `error_code` | The `code` returned to the caller on failure |
-| `metadata` | JSONB — forensic context (forwarder IP/UA, `sessionId`, `reason`, …) |
+| `metadata` | JSONB — forensic context (forwarder IP/UA, `sessionId`, `reason`, `actor`, …) |
 | `event_data` | JSONB — domain payload: `{before, after}` snapshots, creation snapshots, redacted inputs |
 
 ## Event types
@@ -93,7 +93,8 @@ A few auth events carry extra context so security-relevant outcomes stay disting
 | `project_create` | `createProject` | `{projectSlug, name}` |
 | `project_update` | `updateProject` | `{before, after}` |
 | `project_secret_change` | `setProjectSecret` | `{projectSlug, key}` — only the secret name, never the value |
-| `mail_template_change` | `addMailTemplate`, `removeMailTemplate` | `{action: 'add' \| 'remove', type, projectSlug?, variant?}` |
+| `mail_template_change` | `addMailTemplate`, `removeMailTemplate` | `{action: 'add' \| 'remove', mailType, projectSlug?, variant?}` |
+| `custom_role_change` | `createCustomRole`, `updateCustomRole`, `deleteCustomRole` | `{operation, after}` on create, `{operation, before, after}` on update, `{operation, before, removedAssignments, removedAssignmentIdentityIds}` on delete — all three share one `type`, so `operation` is what tells them apart |
 | `tenant_config_change` | `configure` | `{input}` — full ConfigInput with `captcha.secret` redacted to `***` |
 | `person_invite` | `invite`, `unmanagedInvite` | `{projectSlug, email, isNew, memberships}` |
 
@@ -101,7 +102,8 @@ A few auth events carry extra context so security-relevant outcomes stay disting
 
 ### GraphQL
 
-The tenant API exposes the log via `Query.authLog`. Access requires the `system:viewAuthLog` permission — by default only `SUPER_ADMIN` has it (via the wildcard ALL-resource/ALL-privilege grant). Page size is capped server-side (default 100, max 500); `hasMore` indicates a further page exists.
+The tenant API exposes the log via `Query.authLog`. Access requires the `system:viewAuthLog` permission, held by `PROJECT_ADMIN` and `SUPER_ADMIN`
+by default. Page size is capped server-side (default 100, max 500); `hasMore` indicates a further page exists.
 
 ```graphql
 query AdminActionsAgainstPerson($target: String!, $after: DateTime!) {
@@ -133,7 +135,7 @@ All fields are AND-combined; omitted fields are unconstrained.
 |---|---|
 | `types` | OR-combined list of `auth_log_type` values. |
 | `success` | Filter to successful or failed events only. |
-| `invokedByIdentityId` | Actor identity. |
+| `invokedByIdentityId` | Actor identity. Never matches root-token actions, whose `identity_id` is `NULL` — find those with `metadata->>'actor' = 'unpersisted_root'` in SQL. |
 | `personId` | Actor's person. |
 | `targetPersonId` | Subject of the action — for force sign-out, role grant, membership change, etc. |
 | `personInputIdentifier` | The free-form identifier submitted by the caller (usually the email on a failed `signIn` / `signUp`). Useful for tracking probe attempts against a specific email that does not exist in `person`. |
@@ -158,3 +160,4 @@ ORDER BY created_at DESC;
 - Admin events are recorded only on success — a denied permission check throws before the action runs, so there is nothing to audit at the resolver level (the permission failure is observable from the HTTP error response itself).
 - Secret-bearing inputs are redacted before they hit the log: captcha secret becomes `***`, IDP configuration is collapsed to a sorted list of keys, project secrets log only their key name, API keys log only their id and identity.
 - The forwarder's socket IP/UA are preserved in `metadata.forwarderIp` / `metadata.forwarderUserAgent` when [trust-forwarded-info](/reference/engine/tenant/proxy-trust) is in effect, so the trail still has a path back to the proxy.
+- Actions performed with an [unpersisted root token](/reference/engine/tenant/overview#unpersisted-root-tokens) carry `metadata.actor = 'unpersisted_root'` and a `NULL` `identity_id` — the virtual root identity has no `identity` row, so recording it would point at a foreign key that does not exist. Filter those with `metadata->>'actor' = 'unpersisted_root'`; the `invokedByIdentityId` GraphQL filter cannot reach them.

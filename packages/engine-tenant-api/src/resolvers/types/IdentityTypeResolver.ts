@@ -1,5 +1,6 @@
 import { Identity, IdentityGlobalPermissions, IdentityProjectRelation, IdentityResolvers, Maybe, Person, SessionInfo } from '../../schema/index.js'
 import {
+	createTargetIdentityPermissionTarget,
 	IdentityQuery,
 	PermissionActions,
 	PermissionContextFactory,
@@ -7,6 +8,7 @@ import {
 	PersonRow,
 	ProjectManager,
 	ProjectMemberManager,
+	targetIdentityLoader,
 } from '../../model/index.js'
 import { ApiKeySessionsByIdentityQuery } from '../../model/queries/apiKey/index.js'
 import { TenantResolverContext } from '../TenantResolverContext.js'
@@ -121,7 +123,7 @@ export class IdentityTypeResolver implements IdentityResolvers {
 			if (roles === null) {
 				return null
 			}
-			return this.permissionContextFactory.create(context.db, { id: parent.id, roles })
+			return this.permissionContextFactory.create(context.db, { id: parent.id, roles }, context.permissionContext.authorizator)
 		})()
 
 		if (!permissionsContext) {
@@ -140,17 +142,15 @@ export class IdentityTypeResolver implements IdentityResolvers {
 		context: TenantResolverContext,
 	): Promise<SessionInfo[]> {
 		// Self: always allowed. Other identities: gated by PERSON_VIEW_SESSIONS
-		// against the target's roles, so PROJECT_ADMIN can peek at members but
-		// not at SUPER_ADMIN sessions (projectAdminUseRolesVerifier rule).
-		// Return [] instead of throwing — listing many identities should not
-		// abort just because the viewer lacks visibility for one of them.
+		// against the target, so PROJECT_ADMIN can peek at members but not at a
+		// super_admin's sessions. Return [] instead of throwing — listing many
+		// identities should not abort just because the viewer lacks visibility
+		// for one of them.
 		if (parent.id !== context.identity.id) {
-			const targetRoles = await this.roles(parent, {}, context)
-			if (targetRoles === null) {
-				return []
-			}
+			const identity = await context.db.batchLoad(targetIdentityLoader, parent.id)
+			const target = identity === undefined ? null : await createTargetIdentityPermissionTarget(context.db, identity)
 			const canView = await context.permissionContext.isAllowed({
-				action: PermissionActions.PERSON_VIEW_SESSIONS(targetRoles),
+				action: PermissionActions.PERSON_VIEW_SESSIONS(target),
 			})
 			if (!canView) {
 				return []

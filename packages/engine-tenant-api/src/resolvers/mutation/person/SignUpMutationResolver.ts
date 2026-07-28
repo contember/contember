@@ -92,7 +92,7 @@ export class SignUpMutationResolver implements MutationResolvers {
 				const permissionContext = await this.permissionContextFactory.create(context.db, {
 					id: personRow.identity_id,
 					roles: personRow.roles,
-				})
+				}, context.permissionContext.authorizator)
 				const sent = await this.emailVerificationManager.sendVerificationEmail(context.db, permissionContext, personRow)
 				if (sent) {
 					await context.logAuthAction({

@@ -46,8 +46,9 @@ Configured grant kinds:
 - `GLOBAL_API_KEY` (`apiKey:createGlobal`) — requested-role constraint and `allowTrustForwardedClientInfo`.
 - `MAIL_TEMPLATE_SCOPE` (`mailTemplate:add`, `mailTemplate:remove`, `mailTemplate:list`) —
   `{ "global": boolean, "projects": ["exact-slug"], "types": ["FORCED_SIGN_OUT", "..."] }`.
-- `NONE` — exact tenant-global actions with no configuration: `person:view`, `person:list`, `system:viewConfig`, `system:viewAuthLog`,
-  `apiKey:list`, `idp:list`, `idp:enable`, `idp:disable`, `entrypoint:deployEntrypoint`, `customRole:view`, `system:configure`. Note that
+- `NONE` — exact tenant-global actions with no configuration: `person:view`, `person:list`, `identity:viewPermissions`, `system:viewConfig`,
+  `system:viewAuthLog`, `apiKey:list`, `idp:list`, `idp:enable`, `idp:disable`, `entrypoint:deployEntrypoint`, `customRole:view`,
+  `system:configure`. Note that
   `system:configure` also gates auth-policy management, so a role holding it can weaken or remove the MFA/session policy of any role including
   `super_admin`, and it takes no configuration to narrow that.
 

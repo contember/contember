@@ -129,6 +129,7 @@ export type TenantCustomRoleConfigFreePermission =
 	| 'idp:enable'
 	| 'idp:list'
 	| 'customRole:view'
+	| 'identity:viewPermissions'
 
 export type TenantCustomRoleTargetPermission =
 	| 'person:disable'

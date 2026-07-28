@@ -1,5 +1,5 @@
 import { TenantResolverContext } from './TenantResolverContext.js'
-import { DatabaseContext, LoginRiskAnalyzer, PermissionContext, PermissionContextFactory } from '../model/index.js'
+import { DatabaseContext, LoginRiskAnalyzer, PermissionContext, PermissionContextFactory, UNPERSISTED_ROOT_IDENTITY_ID } from '../model/index.js'
 import { Logger } from '@contember/logger'
 import { AuthLogService } from '../model/service/AuthLogService.js'
 
@@ -22,24 +22,26 @@ export class TenantResolverContextFactory {
 		private readonly loginRiskAnalyzer: LoginRiskAnalyzer,
 	) {}
 
-	public create(
+	public async create(
 		authContext: { apiKeyId: string; identityId: string; roles: string[]; trustForwardedInfo?: boolean },
 		httpInfo: { ip: string; userAgent?: string; forwarderIp?: string; forwarderUserAgent?: string; geoCountry?: string },
 		db: DatabaseContext,
 		logger: Logger,
-	): TenantResolverContext {
-		const permissionContext = this.permissionContextFactory.create(db, {
+	): Promise<TenantResolverContext> {
+		const permissionContext = await this.permissionContextFactory.createPreloaded(db, {
 			id: authContext.identityId,
 			roles: authContext.roles,
 		})
 		// A03: stamp every auth-log row with the trusted geo country (when present)
 		// and a UA fingerprint, so the next sign-in's anomaly check has a baseline.
 		const deviceFingerprint = this.loginRiskAnalyzer.fingerprint(httpInfo.userAgent) ?? undefined
+		const unpersistedRoot = authContext.identityId === UNPERSISTED_ROOT_IDENTITY_ID
 		return {
 			...createResolverContext(permissionContext, authContext.apiKeyId, authContext.trustForwardedInfo ?? false),
-			logAuthAction: async data => {
-				await this.authLogService.logAuthAction(db, {
-					identityId: authContext.identityId,
+			logAuthAction: async (data, transaction) => {
+				await this.authLogService.logAuthAction(transaction ?? db, {
+					identityId: unpersistedRoot ? undefined : authContext.identityId,
+					unpersistedRoot,
 					userAgent: httpInfo.userAgent,
 					clientIp: httpInfo.ip,
 					forwarderIp: httpInfo.forwarderIp,

@@ -20,9 +20,14 @@ export class DatabaseContext<Conn extends Connection.ConnectionLike = Connection
 		return this.client.createQueryHandler()
 	}
 
-	public async transaction<T>(cb: (dbContext: DatabaseContext<Connection.TransactionLike>) => Promise<T>): Promise<T> {
+	public async transaction<T>(
+		cb: (dbContext: DatabaseContext<Connection.TransactionLike>) => Promise<T>,
+		options: { readonly isolation?: 'repeatableRead' | 'readCommitted' } = {},
+	): Promise<T> {
 		return await this.client.transaction(async db => {
-			await db.query(Connection.REPEATABLE_READ)
+			if (options.isolation !== 'readCommitted') {
+				await db.query(Connection.REPEATABLE_READ)
+			}
 			return await cb(new DatabaseContext(db, this.providers))
 		})
 	}

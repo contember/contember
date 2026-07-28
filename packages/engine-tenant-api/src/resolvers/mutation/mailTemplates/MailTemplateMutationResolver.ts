@@ -1,15 +1,24 @@
 import {
 	AddMailTemplateResponse,
+	MailType,
 	MutationAddProjectMailTemplateArgs,
 	MutationRemoveProjectMailTemplateArgs,
 	MutationResolvers,
 	RemoveMailTemplateResponse,
 } from '../../../schema/index.js'
 import { TenantResolverContext } from '../../TenantResolverContext.js'
-import { MailTemplateManager, mailTypeFromSchemaToDb, PermissionActions, ProjectManager } from '../../../model/index.js'
+import {
+	MailTemplateManager,
+	MailTemplatePermissionMeta,
+	mailTypeFromSchemaToDb,
+	PermissionActions,
+	Project,
+	ProjectManager,
+} from '../../../model/index.js'
 import { createErrorResponse, createProjectNotFoundResponse } from '../../errorUtils.js'
 import { validateEmail } from '../../../model/utils/email.js'
 import { ResponseOk } from '../../../model/utils/Response.js'
+import { Authorizator } from '@contember/authorization'
 
 export class MailTemplateMutationResolver implements MutationResolvers {
 	constructor(
@@ -17,17 +26,41 @@ export class MailTemplateMutationResolver implements MutationResolvers {
 		private readonly mailTemplateManager: MailTemplateManager,
 	) {}
 
+	/** A mail template is either global or project-scoped; both the scope and the permission meta follow from that. */
+	private async requireTemplateAccess(
+		context: TenantResolverContext,
+		projectSlug: string | null | undefined,
+		type: MailType,
+		action: (meta?: MailTemplatePermissionMeta) => Authorizator.Action<MailTemplatePermissionMeta | undefined>,
+		message: string,
+	): Promise<Project | null> {
+		const hasProject = projectSlug !== null && projectSlug !== undefined
+		const project = hasProject ? await this.projectManager.getProjectBySlug(context.db, projectSlug) : null
+		await context.requireAccess({
+			// an unknown slug must resolve to the denied project scope, never fall back to global
+			scope: hasProject ? await context.permissionContext.createProjectScope(project) : undefined,
+			action: action({
+				kind: hasProject ? 'project' : 'global',
+				projectSlug: hasProject ? projectSlug : null,
+				type,
+			}),
+			message,
+		})
+		return project
+	}
+
 	async addMailTemplate(
 		parent: any,
 		{ template: { content, projectSlug, subject, type, useLayout, variant, replyTo } }: MutationAddProjectMailTemplateArgs,
 		context: TenantResolverContext,
 	): Promise<AddMailTemplateResponse> {
-		const project = projectSlug ? await this.projectManager.getProjectBySlug(context.db, projectSlug) : null
-		await context.requireAccess({
-			scope: project ? await context.permissionContext.createProjectScope(project) : undefined,
-			action: PermissionActions.MAIL_TEMPLATE_ADD,
-			message: 'You are not allowed to add a mail template',
-		})
+		const project = await this.requireTemplateAccess(
+			context,
+			projectSlug,
+			type,
+			PermissionActions.MAIL_TEMPLATE_ADD,
+			'You are not allowed to add a mail template',
+		)
 		if (projectSlug && !project) {
 			return createProjectNotFoundResponse('PROJECT_NOT_FOUND', projectSlug)
 		}
@@ -67,12 +100,13 @@ export class MailTemplateMutationResolver implements MutationResolvers {
 		{ templateIdentifier: { projectSlug, type, variant } }: MutationRemoveProjectMailTemplateArgs,
 		context: TenantResolverContext,
 	): Promise<RemoveMailTemplateResponse> {
-		const project = projectSlug ? await this.projectManager.getProjectBySlug(context.db, projectSlug) : null
-		await context.requireAccess({
-			scope: project ? await context.permissionContext.createProjectScope(project) : undefined,
-			action: PermissionActions.MAIL_TEMPLATE_REMOVE,
-			message: 'You are not allowed to remove a mail template',
-		})
+		const project = await this.requireTemplateAccess(
+			context,
+			projectSlug,
+			type,
+			PermissionActions.MAIL_TEMPLATE_REMOVE,
+			'You are not allowed to remove a mail template',
+		)
 		if (projectSlug && !project) {
 			return createProjectNotFoundResponse('PROJECT_NOT_FOUND', projectSlug)
 		}
@@ -83,7 +117,7 @@ export class MailTemplateMutationResolver implements MutationResolvers {
 			type: mailTypeFromSchemaToDb(type),
 		})
 		if (!removed) {
-			return createErrorResponse('PROJECT_NOT_FOUND', 'Mail template not found')
+			return createErrorResponse('TEMPLATE_NOT_FOUND', 'Mail template not found')
 		}
 
 		await context.logAuthAction({

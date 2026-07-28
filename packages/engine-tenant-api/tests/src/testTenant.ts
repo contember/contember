@@ -38,11 +38,17 @@ export interface Test {
 	httpInfo?: { ip?: string; userAgent?: string; geoCountry?: string }
 	/** Override individual providers (e.g. a working `decrypt` to enable captcha). */
 	providers?: Partial<Providers>
-	/** Tenant roles of the authenticated identity (default: none). */
+	/**
+	 * Tenant roles of the authenticated identity (default: none). Setting this switches the
+	 * context to the REAL authorization stack — the static permission map plus
+	 * `CustomRoleAuthorizator` — instead of the allow-everything default, so the test
+	 * actually exercises what these roles may do. Custom-role slugs listed here trigger the
+	 * request-scoped `custom_role` lookup, which must appear in `executes`.
+	 */
 	identityRoles?: string[]
 	/**
-	 * Override the authorizator. The default allows every action; pass a custom one
-	 * to exercise forbidden / partially-allowed (e.g. per-role) ACL branches.
+	 * Override the authorizator. Without this and without `identityRoles`, every action is
+	 * allowed; pass a custom one to exercise forbidden / partially-allowed ACL branches.
 	 */
 	authorizator?: Authorizator<Identity>
 	/**
@@ -157,16 +163,26 @@ export const executeTenantTest = async (test: Test) => {
 		: [test.expectedAuthLog]
 
 	const databaseContext = tenantContainer.databaseContext
+	// `identityRoles` means "evaluate what these roles really may do", so it routes through
+	// the container's PermissionContextFactory — the static map plus CustomRoleAuthorizator.
+	// Without it (and without an explicit authorizator) the default stays allow-everything,
+	// which is what the bulk of these tests want.
+	const permissionContext = test.authorizator === undefined && test.identityRoles !== undefined
+		? await tenantContainer.permissionContextFactory.createPreloaded(databaseContext, {
+			id: authenticatedIdentityId,
+			roles: test.identityRoles,
+		})
+		: new PermissionContext(
+			new StaticIdentity(authenticatedIdentityId, test.identityRoles ?? []),
+			test.authorizator ?? {
+				isAllowed: () => Promise.resolve(true),
+			},
+			new ProjectScopeFactory(new AclSchemaAccessNodeFactory()),
+			projectSchemaResolver,
+		)
 	const context: TenantResolverContext = {
 		...createResolverContext(
-			new PermissionContext(
-				new StaticIdentity(authenticatedIdentityId, test.identityRoles ?? []),
-				test.authorizator ?? {
-					isAllowed: () => Promise.resolve(true),
-				},
-				new ProjectScopeFactory(new AclSchemaAccessNodeFactory()),
-				projectSchemaResolver,
-			),
+			permissionContext,
 			authenticatedApiKeyId,
 			test.callerTrustForwardedInfo ?? false,
 		),

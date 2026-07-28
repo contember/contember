@@ -3,6 +3,7 @@ import { GQL, SQL } from '../../../src/tags.js'
 import { testUuid } from '../../../src/testUuid.js'
 import { getPersonByIdSql } from './sql/getPersonByIdSql.js'
 import { expect, test } from 'bun:test'
+import { getIdentityProjectMembershipPresenceSql } from './sql/getIdentityProjectMembershipPresenceSql.js'
 
 test('resetPersonMfa clears factors + backup codes and audits mfa_reset', async () => {
 	const personId = testUuid(1)
@@ -19,10 +20,11 @@ test('resetPersonMfa clears factors + backup codes and audits mfa_reset', async 
 				personId,
 				response: { personId, identityId, password: '123', roles: [], email: 'jane@doe.com' },
 			}),
+			getIdentityProjectMembershipPresenceSql(identityId),
 			{
 				sql: SQL`update "tenant"."person_mfa"
-					set "totp_secret" = ?, "totp_secret_version" = ?, "totp_activated_at" = ?, "totp_pending_secret" = ?, "totp_pending_version" = ?, "totp_pending_created_at" = ?, "email_otp_enabled" = ?
-					where "person_id" = ?`,
+				set "totp_secret" = ?, "totp_secret_version" = ?, "totp_activated_at" = ?, "totp_pending_secret" = ?, "totp_pending_version" = ?, "totp_pending_created_at" = ?, "email_otp_enabled" = ?
+				where "person_id" = ?`,
 				parameters: [null, null, null, null, null, null, false, personId],
 				response: { rowCount: 1 },
 			},

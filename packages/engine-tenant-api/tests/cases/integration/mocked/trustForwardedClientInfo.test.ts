@@ -11,7 +11,7 @@ import { getConfigSql } from './sql/getConfigSql.js'
 import { getAuthPoliciesSql } from './sql/authPolicySql.js'
 import { getIdentityByIdSql } from './sql/getIdentityByIdSql.js'
 import { GQL } from '../../../src/tags.js'
-import { sqlTransaction } from './sql/sqlTransaction.js'
+import { sqlReadCommittedTransaction } from './sql/sqlTransaction.js'
 import { createIdentitySql } from './sql/createIdentitySql.js'
 import { createApiKeySql } from './sql/createApiKeySql.js'
 
@@ -109,7 +109,8 @@ test('createGlobalApiKey: trustForwardedClientInfo=true creates permanent key wi
 			variables: { description: 'backend service', roles: [], options: { trustForwardedClientInfo: true } },
 		},
 		executes: [
-			...sqlTransaction(
+			// read committed: the global-role validator takes a FOR SHARE lock on custom_role
+			...sqlReadCommittedTransaction(
 				createIdentitySql({ identityId, description: 'backend service' }),
 				createApiKeySql({ identityId, apiKeyId, trustForwardedInfo: true }),
 			),

@@ -15,3 +15,15 @@ export const sqlTransaction = (...queries: ExpectedQuery[]): ExpectedQuery[] => 
 		response: { rowCount: 1 },
 	},
 ]
+
+export const sqlReadCommittedTransaction = (...queries: ExpectedQuery[]): ExpectedQuery[] => [
+	{
+		sql: SQL`BEGIN;`,
+		response: { rowCount: 1 },
+	},
+	...queries,
+	{
+		sql: SQL`COMMIT;`,
+		response: { rowCount: 1 },
+	},
+]

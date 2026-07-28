@@ -10,6 +10,7 @@ import { createSessionKeySql } from './sql/createSessionKeySql.js'
 import { getConfigSql } from './sql/getConfigSql.js'
 import { getIdentityByIdSql } from './sql/getIdentityByIdSql.js'
 import { getAuthPoliciesSql } from './sql/authPolicySql.js'
+import { getIdentityProjectMembershipPresenceSql } from './sql/getIdentityProjectMembershipPresenceSql.js'
 
 test('create session key', async () => {
 	const email = 'john@doe.com'
@@ -21,6 +22,7 @@ test('create session key', async () => {
 		query: createSessionTokenMutation({ email }, { withData: true }),
 		executes: [
 			getPersonByEmailSql({ email, response: { personId, identityId, password: 'aaa', roles: [] } }),
+			getIdentityProjectMembershipPresenceSql(identityId),
 			getConfigSql(),
 			getIdentityByIdSql({ identityId }),
 			getAuthPoliciesSql(),
@@ -64,6 +66,37 @@ test('create session key', async () => {
 			type: 'create_session_token',
 			response: expect.objectContaining({
 				ok: true,
+			}),
+		}),
+	})
+})
+
+test('create session key is refused for a disabled person', async () => {
+	const email = 'john@doe.com'
+	const identityId = testUuid(2)
+	const personId = testUuid(7)
+	await executeTenantTest({
+		query: createSessionTokenMutation({ email }),
+		executes: [
+			getPersonByEmailSql({
+				email,
+				response: { personId, identityId, password: 'aaa', roles: [], disabledAt: new Date() },
+			}),
+		],
+		return: {
+			data: {
+				createSessionToken: {
+					ok: false,
+					error: { code: 'PERSON_DISABLED' },
+					result: null,
+				},
+			},
+		},
+		expectedAuthLog: expect.objectContaining({
+			type: 'create_session_token',
+			response: expect.objectContaining({
+				ok: false,
+				error: 'PERSON_DISABLED',
 			}),
 		}),
 	})

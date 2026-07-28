@@ -118,21 +118,21 @@ query {
 
 Visibility is enforced per caller and gated by the `person:list` permission:
 
-- `SUPER_ADMIN` (which holds `person:list` by default) sees every person.
-- Anyone else sees **exactly the members reachable via `project.members`** — for each project the caller may view members of, the persons behind the visible memberships, with the same per-role filtering that `project.members` applies. So a `PROJECT_ADMIN` sees only their projects' members.
+- `SUPER_ADMIN`, `PROJECT_ADMIN`, and a custom role granted `person:list` see every person.
+- A caller without `person:list` sees **exactly the members reachable via `project.members`** — for each project the caller may view members of, the persons behind the visible memberships, with the same per-role filtering that `project.members` applies.
 - A caller who may not list anyone gets an empty list rather than an error.
 
 The projection deliberately omits password hashes and TOTP secrets. See [two-factor](/reference/engine/tenant/two-factor) for the `otpEnabled` / `emailOtpEnabled` MFA flags.
 
 ## Global identity roles
 
-Project memberships scope a person's access to a single project. **Global roles** (`super_admin`, `project_admin`, custom global roles defined in the tenant ACL — see [Tenant ACL permissions](/reference/engine/schema/acl#tenant-permissions)) are attached directly to an identity and are not project-scoped. Two mutations grant and revoke them:
+Project memberships scope a person's access to a single project. **Global roles** — the built-in ones such as `super_admin` and `project_admin`, plus any [custom role](/reference/engine/tenant/custom-roles) — are attached directly to an identity and are not project-scoped. Two mutations grant and revoke them:
 
 ```graphql
 mutation {
   addGlobalIdentityRoles(
     identityId: "2f673a53-af33-42b1-9e17-e1305fa26d9d",
-    roles: ["super_admin", "monitor"]
+    roles: ["super_admin", "support"]
   ) {
     ok
     error { code developerMessage }
@@ -145,7 +145,7 @@ mutation {
 mutation {
   removeGlobalIdentityRoles(
     identityId: "2f673a53-af33-42b1-9e17-e1305fa26d9d",
-    roles: ["monitor"]
+    roles: ["support"]
   ) {
     ok
     error { code }
@@ -159,9 +159,11 @@ Errors:
 | Code | Cause |
 |---|---|
 | `IDENTITY_NOT_FOUND` | No such identity. |
-| `INVALID_ROLE` | A role in the list is not defined in the tenant ACL or the caller is not allowed to grant it. |
+| `INVALID_ROLE` | A role in the list is neither a globally assignable built-in role nor an existing [custom role](/reference/engine/tenant/custom-roles). |
 
-Both are gated by `identity:addGlobalRoles` / `identity:removeGlobalRoles` against the role list — `SUPER_ADMIN` can grant any role, `PROJECT_ADMIN` is restricted to the project-admin allowed-input-roles set, and any other identity needs an explicit ACL grant scoping which roles it may assign. `result.identity.roles` echoes the new role set after the mutation.
+The assignable vocabulary is the globally assignable built-in roles — `super_admin`, `project_creator`, `project_admin`, `entrypoint_deployer`, `login`, `person` — plus any custom role that currently exists. `self` and `project_member` are derived per request and are rejected. Removal is deliberately not validated, so a slug left over from a deleted custom role can always be cleaned up.
+
+Both are gated by `identity:addGlobalRoles` / `identity:removeGlobalRoles` against the role list *and* the target identity — `SUPER_ADMIN` can grant any role; a global `PROJECT_ADMIN` can grant anything from that vocabulary except `super_admin` and `project_creator`, and cannot act on an identity holding either; and a custom role is further bounded by its own configured `roles.allowed` and target constraints. `result.identity.roles` echoes the new role set after the mutation.
 
 ## Audit
 

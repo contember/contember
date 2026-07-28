@@ -186,6 +186,7 @@ export const nav: NavItem[] = [
 					doc('reference/engine/tenant/invites'),
 					doc('reference/engine/tenant/memberships'),
 					doc('reference/engine/tenant/disable-person'),
+					doc('reference/engine/tenant/custom-roles'),
 					doc('reference/engine/tenant/api-keys'),
 					doc('reference/engine/tenant/projects'),
 					doc('reference/engine/tenant/proxy-trust'),

@@ -163,7 +163,7 @@ Errors:
 
 The assignable vocabulary is the globally assignable built-in roles — `super_admin`, `project_creator`, `project_admin`, `entrypoint_deployer`, `login`, `person` — plus any custom role that currently exists. `self` and `project_member` are derived per request and are rejected. Removal is deliberately not validated, so a slug left over from a deleted custom role can always be cleaned up.
 
-Both are gated by `identity:addGlobalRoles` / `identity:removeGlobalRoles` against the role list *and* the target identity — `SUPER_ADMIN` can grant any role; a global `PROJECT_ADMIN` can grant anything from that vocabulary except `super_admin` and `project_creator`, and cannot act on an identity holding either; and a custom role is further bounded by its own configured `roles.allowed` and target constraints. `result.identity.roles` echoes the new role set after the mutation.
+Both are gated by `identity:addGlobalRoles` / `identity:removeGlobalRoles` against the role list *and* the target identity — `SUPER_ADMIN` can grant any role; a global `PROJECT_ADMIN` can grant anything from that vocabulary except `super_admin` and `project_creator`, and cannot act on an identity holding either; and a custom role is further bounded by its own configured `roles.allowed` and target constraints. `result.identity.roles` echoes the new role set after the mutation — but only to a caller that may read it: the field resolves to `null` without `identity:viewPermissions`, which `SUPER_ADMIN` and `PROJECT_ADMIN` hold by default and a custom role must be granted explicitly.
 
 ## Audit
 

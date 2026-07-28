@@ -400,6 +400,9 @@ const definitions: readonly CustomRolePermissionDefinition[] = [
 	noConfigDefinition('idp:enable', PermissionActions.IDP_ENABLE),
 	noConfigDefinition('idp:list', PermissionActions.IDP_LIST),
 	noConfigDefinition('customRole:view', PermissionActions.CUSTOM_ROLE_VIEW),
+	// Exposes role *names* only. Without it a role holding `identity:addGlobalRoles` reads
+	// `Identity.roles` as null — it could mutate a role set it was unable to look at first.
+	noConfigDefinition('identity:viewPermissions', PermissionActions.IDENTITY_VIEW_PERMISSIONS),
 	roleInputDefinition('person:signUp', PermissionActions.PERSON_SIGN_UP),
 	targetIdentityDefinition('person:disable', PermissionActions.PERSON_DISABLE),
 	targetIdentityDefinition('person:forceSignOut', PermissionActions.PERSON_FORCE_SIGN_OUT),

@@ -127,8 +127,7 @@ test('a mail-template grant still answers a project-scoped check, on its own exa
 		config: { global: false, projects: ['project-a'], types: ['RESET_PASSWORD_REQUEST'] },
 	}])])
 	const authorizator = new CustomRoleAuthorizator(innerAuthorizator(false), db)
-	const forProject = (projectSlug: string) =>
-		PermissionActions.MAIL_TEMPLATE_ADD({ kind: 'project', projectSlug, type: 'RESET_PASSWORD_REQUEST' })
+	const forProject = (projectSlug: string) => PermissionActions.MAIL_TEMPLATE_ADD({ kind: 'project', projectSlug, type: 'RESET_PASSWORD_REQUEST' })
 
 	expect(await authorizator.isAllowed(identity(['editor']), projectScope, forProject('project-a'))).toBe(true)
 	expect(await authorizator.isAllowed(identity(['editor']), projectScope, forProject('project-b'))).toBe(false)

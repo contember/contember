@@ -51,7 +51,12 @@ Errors include `INVALID_SLUG`, `SLUG_ALREADY_EXISTS`, `UNKNOWN_PERMISSION`, `DUP
 `INVALID_PERMISSION_CONFIGURATION`.
 
 Deleting a role removes its definition and strips the slug from every identity in the same transaction, so no assignment outlives the role. The slug
-becomes available again; the `custom_role_change` audit entry records what it used to grant.
+becomes available again; the `custom_role_change` audit entry records what it used to grant, and the id of every identity the slug was stripped from —
+a count alone could not answer "who lost what" afterwards.
+
+A role that another role's grant configuration references cannot be deleted: the delete fails with `ROLE_IN_USE` naming the referrers. Remove the
+reference first. Otherwise the referring role would become un-resubmittable — `tenant:apply` re-sends every configured role's full grants on every
+run — and recreating the slug would silently re-bind that reference to a different definition.
 
 Note that a slug carries no meaning of its own — recreating a deleted slug grants the new definition to anyone who is assigned it afterwards, and to
 anyone who already carries that string in `identity.roles` for unrelated reasons. Pick slugs that cannot collide with role names your deployment

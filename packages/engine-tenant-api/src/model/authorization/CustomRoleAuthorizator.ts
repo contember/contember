@@ -1,16 +1,23 @@
-import { Authorizator, Permissions } from '@contember/authorization'
+import { AuthorizationScope, Authorizator, Permissions } from '@contember/authorization'
 import { DatabaseContext } from '../utils/index.js'
 import { CustomRolesQuery } from '../queries/index.js'
 import { Identity } from './Identity.js'
 import { buildCustomRolePermissions, BUILTIN_TENANT_ROLES } from './CustomRolePermissions.js'
 
 export class CustomRolePermissionCache {
-	private loading: Promise<Permissions> | undefined
+	private loading: Promise<{ readonly global: Permissions; readonly projectScoped: Permissions }> | undefined
 
 	constructor(private readonly db: DatabaseContext) {}
 
-	load(): Promise<Permissions> {
-		this.loading ??= this.db.queryHandler.fetch(new CustomRolesQuery()).then(buildCustomRolePermissions)
+	/**
+	 * One query, two maps. `projectScoped` holds only the grants that carry their own project
+	 * filter, because the scope itself is not passed down to `Permissions.isAllowed`.
+	 */
+	load(): Promise<{ readonly global: Permissions; readonly projectScoped: Permissions }> {
+		this.loading ??= this.db.queryHandler.fetch(new CustomRolesQuery()).then(rows => ({
+			global: buildCustomRolePermissions(rows),
+			projectScoped: buildCustomRolePermissions(rows, { projectScoped: true }),
+		}))
 		return this.loading
 	}
 }
@@ -46,7 +53,10 @@ export class CustomRoleAuthorizator implements Authorizator<Identity> {
 		if (customRoles.length === 0) {
 			return false
 		}
-		const permissions = await this.customRoleCache.load()
+		// `Permissions.isAllowed` takes no scope, so a grant answering a project-scoped check would
+		// answer it for every project. Only grants carrying their own project filter get to try.
+		const loaded = await this.customRoleCache.load()
+		const permissions = scope instanceof AuthorizationScope.Global ? loaded.global : loaded.projectScoped
 		return customRoles.some(role => permissions.isAllowed(role, action.resource, action.privilege, action.meta))
 	}
 }

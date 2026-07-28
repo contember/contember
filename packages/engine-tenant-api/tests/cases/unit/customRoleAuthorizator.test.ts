@@ -1,5 +1,5 @@
 import { expect, test } from 'bun:test'
-import { AuthorizationScope, Authorizator, Permissions } from '@contember/authorization'
+import { AccessNode, AuthorizationScope, Authorizator, Permissions } from '@contember/authorization'
 import { CustomRoleAuthorizator } from '../../../src/model/authorization/CustomRoleAuthorizator.js'
 import { Identity } from '../../../src/model/authorization/Identity.js'
 import { buildCustomRolePermissions } from '../../../src/model/authorization/CustomRolePermissions.js'
@@ -106,4 +106,30 @@ test('compiled grants are keyed by slug alone, so no identity state can leak bet
 
 	expect(permissions.isAllowed('support', listAction.resource, listAction.privilege, listAction.meta)).toBe(true)
 	expect(permissions.isAllowed('other', listAction.resource, listAction.privilege, listAction.meta)).toBe(false)
+})
+
+test('a tenant-global grant cannot answer a project-scoped check', async () => {
+	// `Permissions.isAllowed` never sees the scope, so a grant that satisfied a project-scoped
+	// check would satisfy it on EVERY project — while the equivalent static project_admin grant
+	// is bounded by ProjectScope. Only grants carrying their own project filter may try.
+	const projectScope = new AuthorizationScope.Fixed(AccessNode.Fixed.denied())
+	const { db } = countingDb([supportRole()])
+	const authorizator = new CustomRoleAuthorizator(innerAuthorizator(false), db)
+
+	expect(await authorizator.isAllowed(identity(['support']), scope, listAction)).toBe(true)
+	expect(await authorizator.isAllowed(identity(['support']), projectScope, listAction)).toBe(false)
+})
+
+test('a mail-template grant still answers a project-scoped check, on its own exact filter', async () => {
+	const projectScope = new AuthorizationScope.Fixed(AccessNode.Fixed.denied())
+	const { db } = countingDb([row('editor', [{
+		permission: 'mailTemplate:add',
+		config: { global: false, projects: ['project-a'], types: ['RESET_PASSWORD_REQUEST'] },
+	}])])
+	const authorizator = new CustomRoleAuthorizator(innerAuthorizator(false), db)
+	const forProject = (projectSlug: string) =>
+		PermissionActions.MAIL_TEMPLATE_ADD({ kind: 'project', projectSlug, type: 'RESET_PASSWORD_REQUEST' })
+
+	expect(await authorizator.isAllowed(identity(['editor']), projectScope, forProject('project-a'))).toBe(true)
+	expect(await authorizator.isAllowed(identity(['editor']), projectScope, forProject('project-b'))).toBe(false)
 })

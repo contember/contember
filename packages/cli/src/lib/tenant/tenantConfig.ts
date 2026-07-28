@@ -76,8 +76,8 @@ export interface TenantIdpConfig {
 export type TenantMailTemplate = WithNullable<MailTemplate, 'projectSlug' | 'replyTo'>
 
 export interface TenantCustomRoleRoleConstraint {
+	/** Exhaustive: every role observed at the constrained position must appear here. Not a filter, and there is no `denied` counterpart. */
 	readonly allowed: readonly string[]
-	readonly denied?: readonly string[]
 }
 
 export interface TenantCustomRoleTarget {

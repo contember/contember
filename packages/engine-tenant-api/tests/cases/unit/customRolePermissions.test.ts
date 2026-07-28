@@ -237,7 +237,7 @@ describe('explicit grantable permission catalog', () => {
 			return permissions.isAllowed(TenantRole.PROJECT_ADMIN, action.resource, action.privilege, action.meta)
 		}
 
-		const effective = Object.values(TenantRole)
+		const effective: string[] = Object.values(TenantRole)
 			.filter(role => passesVerifier(role) && GLOBALLY_ASSIGNABLE_BUILTIN_ROLES.has(role))
 			.sort()
 		expect(effective).toEqual(['entrypoint_deployer', 'login', 'person', 'project_admin'])

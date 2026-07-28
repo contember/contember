@@ -10,6 +10,7 @@ import {
 	CustomRoleGrantValidationError,
 	parseCustomRoleGrants,
 	parsePersistedCustomRoleGrants,
+	parsePersistedCustomRoleReferences,
 } from '../authorization/CustomRolePermissions.js'
 import { ROLE_SLUG_PATTERN } from '../authorization/Roles.js'
 import { CreateCustomRoleErrorCode, DeleteCustomRoleErrorCode, UpdateCustomRoleErrorCode } from '../../schema/index.js'
@@ -36,6 +37,8 @@ type UpdateResult = {
 type DeleteResult = {
 	readonly before: CustomRoleState
 	readonly removedAssignments: number
+	/** Which identities lost the role — a count alone cannot answer "who lost what" after the fact. */
+	readonly removedAssignmentIdentityIds: readonly string[]
 }
 
 export class CustomRoleManager {
@@ -141,14 +144,28 @@ export class CustomRoleManager {
 		if (current === undefined) {
 			return new ResponseError('NOT_FOUND', `Custom role ${slug} not found`)
 		}
+		// References live inside an opaque jsonb blob — no FK can catch this. Read the other rows
+		// unlocked: a concurrent create/update naming this slug holds FOR SHARE on the row we
+		// already hold FOR UPDATE, so the two serialize without a second lock (and without the
+		// deadlock a reversed acquisition order would invite).
+		const referencedBy = (await db.queryHandler.fetch(new CustomRolesQuery()))
+			.filter(row => row.slug !== slug && parsePersistedCustomRoleReferences(row.grants).includes(slug))
+			.map(row => row.slug)
+		if (referencedBy.length > 0) {
+			return new ResponseError(
+				'ROLE_IN_USE',
+				`Custom role ${slug} is referenced by the grant configuration of ${referencedBy.join(', ')}`,
+			)
+		}
 		const deleted = await db.commandBus.execute(new DeleteCustomRoleCommand(slug))
 		if (!deleted) {
 			return new ResponseError('NOT_FOUND', `Custom role ${slug} not found`)
 		}
-		const removedAssignments = await db.commandBus.execute(new RemoveCustomRoleAssignmentsCommand(slug))
+		const removedAssignmentIdentityIds = await db.commandBus.execute(new RemoveCustomRoleAssignmentsCommand(slug))
 		return new ResponseOk({
 			before: this.toState(current),
-			removedAssignments,
+			removedAssignments: removedAssignmentIdentityIds.length,
+			removedAssignmentIdentityIds,
 		})
 	}
 

@@ -247,14 +247,20 @@ test('deleteCustomRole removes the role and every stale assignment atomically', 
 					response: { rows: [customRoleRow('support', listGrant, 'Support team')] },
 				},
 				{
+					// no FK can reach a reference buried in another role's grants jsonb, so it is scanned
+					sql: SQL`select *  from "tenant"."custom_role" order by "slug" asc`,
+					parameters: [],
+					response: { rows: [customRoleRow('support', listGrant, 'Support team')] },
+				},
+				{
 					sql: SQL`delete from  "tenant"."custom_role"  where "slug" = ?`,
 					parameters: ['support'],
 					response: { rowCount: 1 },
 				},
 				{
-					sql: SQL`update  "tenant"."identity" set  "roles" =  roles - ?  where roles \\? ?`,
+					sql: SQL`update  "tenant"."identity" set  "roles" =  roles - ?  where roles \\? ?  returning "id"`,
 					parameters: ['support', 'support'],
-					response: { rowCount: 2 },
+					response: { rows: [{ id: testUuid(60) }, { id: testUuid(61) }] },
 				},
 			),
 		],
@@ -268,6 +274,54 @@ test('deleteCustomRole removes the role and every stale assignment atomically', 
 				operation: 'delete',
 				before: { slug: 'support', description: 'Support team', grants: listGrant },
 				removedAssignments: 2,
+				removedAssignmentIdentityIds: [testUuid(60), testUuid(61)],
+			},
+		},
+	})
+})
+
+test('deleteCustomRole refuses a role another role references and leaves both intact', async () => {
+	const referencingGrant = [{
+		permission: 'identity:addGlobalRoles',
+		config: {
+			roles: { allowed: ['support'] },
+			target: { globalRoles: { allowed: ['person'] }, projectMemberships: 'any' },
+			allowSelf: false,
+		},
+	}]
+	await executeTenantTest({
+		query: {
+			query: GQL`mutation($slug: String!) {
+				deleteCustomRole(slug: $slug) { ok error { code developerMessage } }
+			}`,
+			variables: { slug: 'support' },
+		},
+		executes: [
+			...sqlReadCommittedTransaction(
+				{
+					sql: SQL`select *  from "tenant"."custom_role" where "slug" in (?)  order by "slug" asc for update`,
+					parameters: ['support'],
+					response: { rows: [customRoleRow('support', listGrant)] },
+				},
+				{
+					sql: SQL`select *  from "tenant"."custom_role" order by "slug" asc`,
+					parameters: [],
+					response: {
+						rows: [customRoleRow('manager', referencingGrant), customRoleRow('support', listGrant)],
+					},
+				},
+			),
+		],
+		// no DELETE and no identity UPDATE follow — the guard runs before either
+		return: {
+			data: {
+				deleteCustomRole: {
+					ok: false,
+					error: {
+						code: 'ROLE_IN_USE',
+						developerMessage: 'Custom role support is referenced by the grant configuration of manager',
+					},
+				},
 			},
 		},
 	})

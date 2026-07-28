@@ -35,6 +35,10 @@ export type GlobalApiKeyPermissionMeta = {
 	readonly trustForwardedClientInfo: boolean
 }
 
+export type ApiKeyPermissionMeta = {
+	readonly trustForwardedClientInfo: boolean
+}
+
 export type MailTemplatePermissionMeta = {
 	readonly kind: 'global' | 'project'
 	readonly projectSlug: string | null
@@ -117,7 +121,7 @@ namespace PermissionActions {
 	export const PROJECT_UPDATE_MEMBER = (memberships: readonly Acl.Membership[]) =>
 		Authorizator.createAction(Resources.project, 'updateMember', { memberships })
 
-	export const API_KEY_CREATE = Authorizator.createAction(Resources.apiKey, 'create')
+	export const API_KEY_CREATE = (meta?: ApiKeyPermissionMeta) => Authorizator.createAction(Resources.apiKey, 'create', meta)
 	export const API_KEY_CREATE_GLOBAL = (meta?: GlobalApiKeyPermissionMeta) => Authorizator.createAction(Resources.apiKey, 'createGlobal', meta)
 	export const API_KEY_DISABLE = Authorizator.createAction(Resources.apiKey, 'disable')
 	export const API_KEY_LIST = Authorizator.createAction(Resources.apiKey, 'list')

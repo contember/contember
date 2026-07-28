@@ -1,5 +1,6 @@
 import { Permissions } from '@contember/authorization'
 import {
+	ApiKeyPermissionMeta,
 	ChangeProfilePermissionMeta,
 	CreateSessionTokenPermissionMeta,
 	GlobalApiKeyPermissionMeta,
@@ -14,7 +15,17 @@ const projectAdminAllowsRoles = (roles: readonly string[] | undefined): boolean 
 
 const projectAdminAllowedSignUpRoles = (meta: { readonly requestedRoles?: readonly string[] }) => projectAdminAllowsRoles(meta.requestedRoles)
 
-const projectAdminAllowedGlobalApiKeyRoles = (meta: GlobalApiKeyPermissionMeta | undefined) => projectAdminAllowsRoles(meta?.requestedRoles)
+/**
+ * A key minted with trust-forwarded-info decides what lands in the audit log and what per-IP rate limits key on,
+ * so delegated authority may not mint one — same rule the custom-role grants apply via `allowTrustForwardedClientInfo`.
+ */
+const projectAdminAllowsTrustForwardedClientInfo = (meta: { readonly trustForwardedClientInfo?: boolean } | undefined) =>
+	meta?.trustForwardedClientInfo !== true
+
+const projectAdminAllowedApiKey = (meta: ApiKeyPermissionMeta | undefined) => projectAdminAllowsTrustForwardedClientInfo(meta)
+
+const projectAdminAllowedGlobalApiKeyRoles = (meta: GlobalApiKeyPermissionMeta | undefined) =>
+	projectAdminAllowsRoles(meta?.requestedRoles) && projectAdminAllowsTrustForwardedClientInfo(meta)
 
 const projectAdminAllowedRoleMutation = (meta: GlobalRoleMutationPermissionMeta | undefined) =>
 	meta === undefined
@@ -57,7 +68,7 @@ class PermissionsFactory {
 		permissions.allow(TenantRole.PROJECT_ADMIN, PermissionActions.IDENTITY_VIEW_PERMISSIONS)
 		permissions.allow(TenantRole.PROJECT_ADMIN, PermissionActions.PERSON_VIEW)
 		permissions.allow(TenantRole.PROJECT_ADMIN, PermissionActions.PERSON_LIST)
-		permissions.allow(TenantRole.PROJECT_ADMIN, PermissionActions.API_KEY_CREATE)
+		permissions.allow(TenantRole.PROJECT_ADMIN, PermissionActions.API_KEY_CREATE(), projectAdminAllowedApiKey)
 		permissions.allow(TenantRole.PROJECT_ADMIN, PermissionActions.API_KEY_DISABLE)
 		permissions.allow(TenantRole.PROJECT_ADMIN, PermissionActions.API_KEY_LIST)
 		permissions.allow(TenantRole.PROJECT_ADMIN, PermissionActions.API_KEY_CREATE_GLOBAL(), projectAdminAllowedGlobalApiKeyRoles)

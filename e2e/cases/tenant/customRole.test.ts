@@ -203,6 +203,26 @@ test('custom role grants its permission bundle at runtime', async () => {
 		},
 	)
 
+	// `customRole:manage` is not grantable, so a holder can never write itself a wider bundle —
+	// this is the rail that keeps every other constraint in this file meaningful
+	const selfDefineResp = await executeGraphql('/tenant', createCustomRoleMutation, {
+		authorizationToken: supportToken,
+		variables: { slug: `escalated_${rand()}`, grants: [{ permission: 'person:list' }] },
+	})
+	expect(selfDefineResp.body.errors?.[0]?.message).toMatch(/not allowed/i)
+
+	const selfUpdateResp = await executeGraphql('/tenant', updateCustomRoleMutation, {
+		authorizationToken: supportToken,
+		variables: { slug, grants: [{ permission: 'person:list' }] },
+	})
+	expect(selfUpdateResp.body.errors?.[0]?.message).toMatch(/not allowed/i)
+
+	const selfDeleteResp = await executeGraphql('/tenant', deleteCustomRoleMutation, {
+		authorizationToken: supportToken,
+		variables: { slug },
+	})
+	expect(selfDeleteResp.body.errors?.[0]?.message).toMatch(/not allowed/i)
+
 	// narrowing the bundle applies immediately as well
 	const updateResp = await executeGraphql('/tenant', updateCustomRoleMutation, {
 		variables: { slug, grants: [{ permission: 'customRole:view' }] },

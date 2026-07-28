@@ -1,26 +1,37 @@
 import { Authorizator } from './Authorizator.js'
 
+type PermissionVerifier = Permissions.PermissionsMap[string][string][string]
+type InternalPermissionsMap = Map<string, Map<string, Map<string, PermissionVerifier>>>
+
 class Permissions {
-	private permissions: Permissions.PermissionsMap = {}
+	private permissions: InternalPermissionsMap = new Map()
 
 	public allow<Meta extends {} | undefined = undefined>(
 		role: string,
 		{ resource, privilege }: Authorizator.Action<Meta>,
 		verifier: (meta: Meta) => boolean = () => true,
 	) {
-		this.permissions[role] ??= {}
-		this.permissions[role][resource] ??= {}
-		this.permissions[role][resource][privilege] = verifier
+		let rolePermissions = this.permissions.get(role)
+		if (rolePermissions === undefined) {
+			rolePermissions = new Map()
+			this.permissions.set(role, rolePermissions)
+		}
+		let resourcePermissions = rolePermissions.get(resource)
+		if (resourcePermissions === undefined) {
+			resourcePermissions = new Map()
+			rolePermissions.set(resource, resourcePermissions)
+		}
+		resourcePermissions.set(privilege, verifier)
 	}
 
 	public isAllowed(role: string, resource: string, action: string, meta: any): boolean {
-		const rolePermissions = this.permissions[role]
+		const rolePermissions = this.permissions.get(role)
 		if (!rolePermissions) {
 			return false
 		}
 		for (let tmpResource of [resource, Permissions.ALL]) {
 			for (let tmpAction of [action, Permissions.ALL]) {
-				if (rolePermissions[tmpResource]?.[tmpAction]?.(meta) === true) {
+				if (rolePermissions.get(tmpResource)?.get(tmpAction)?.(meta) === true) {
 					return true
 				}
 			}

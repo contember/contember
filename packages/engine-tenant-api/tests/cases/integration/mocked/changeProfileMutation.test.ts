@@ -7,6 +7,7 @@ import { authenticatedIdentityId } from '../../../src/testTenant.js'
 import { getPersonByIdentity } from './sql/getPersonByIdentity.js'
 import { getPersonByEmailSql } from './sql/getPersonByEmailSql.js'
 import { getPersonByIdSql } from './sql/getPersonByIdSql.js'
+import { getIdentityProjectMembershipPresenceSql } from './sql/getIdentityProjectMembershipPresenceSql.js'
 
 test('changes my name and email', async () => {
 	const personId = testUuid(1)
@@ -20,6 +21,7 @@ test('changes my name and email', async () => {
 				personId,
 				response: { personId, email: 'john.doe@example.com', name: 'John Doe', roles: [], password: '123456', identityId },
 			}),
+			getIdentityProjectMembershipPresenceSql(identityId),
 			getPersonByEmailSql({ email, response: null }),
 			updatePersonProfileNameAndEmailSql({ personId, email, name }),
 		],

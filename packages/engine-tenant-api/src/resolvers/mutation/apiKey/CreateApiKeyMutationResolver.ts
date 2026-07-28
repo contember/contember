@@ -9,7 +9,7 @@ import { GraphQLResolveInfo } from 'graphql'
 import { TenantResolverContext } from '../../TenantResolverContext.js'
 import { ApiKeyManager, isTokenHash, MembershipValidator, PermissionActions, ProjectManager } from '../../../model/index.js'
 import { createMembershipValidationErrorResult } from '../../membershipUtils.js'
-import { createProjectNotFoundResponse } from '../../errorUtils.js'
+import { createErrorResponse, createProjectNotFoundResponse } from '../../errorUtils.js'
 import { UserInputError } from '@contember/graphql-utils'
 import { ResponseOk } from '../../../model/utils/Response.js'
 import { Acl, JSONValue } from '@contember/schema'
@@ -57,6 +57,9 @@ export class CreateApiKeyMutationResolver implements MutationResolvers {
 			tokenHash ?? undefined,
 			options?.trustForwardedClientInfo === true,
 		)
+		if (!result.ok) {
+			return createErrorResponse(result)
+		}
 
 		await context.logAuthAction({
 			type: 'api_key_create',
@@ -87,8 +90,9 @@ export class CreateApiKeyMutationResolver implements MutationResolvers {
 		info: GraphQLResolveInfo,
 	): Promise<CreateApiKeyResponse> {
 		roles ??= []
+		const trustForwardedClientInfo = options?.trustForwardedClientInfo === true
 		await context.requireAccess({
-			action: PermissionActions.API_KEY_CREATE_GLOBAL(roles),
+			action: PermissionActions.API_KEY_CREATE_GLOBAL({ requestedRoles: roles, trustForwardedClientInfo }),
 			message: 'You are not allowed to create a global API key',
 		})
 		if (typeof tokenHash === 'string' && !isTokenHash(tokenHash)) {
@@ -99,8 +103,11 @@ export class CreateApiKeyMutationResolver implements MutationResolvers {
 			description,
 			roles,
 			tokenHash ?? undefined,
-			options?.trustForwardedClientInfo === true,
+			trustForwardedClientInfo,
 		)
+		if (!result.ok) {
+			return createErrorResponse(result)
+		}
 
 		await context.logAuthAction({
 			type: 'api_key_create',

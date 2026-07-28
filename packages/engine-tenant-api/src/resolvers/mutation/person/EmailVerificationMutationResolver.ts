@@ -67,7 +67,7 @@ export class EmailVerificationMutationResolver implements Pick<MutationResolvers
 			const permissionContext = await this.permissionContextFactory.create(context.db, {
 				id: person.identity_id,
 				roles: person.roles,
-			})
+			}, context.permissionContext.authorizator)
 			const sent = await this.emailVerificationManager.sendVerificationEmail(context.db, permissionContext, person, {
 				mailVariant: args.options?.mailVariant || undefined,
 				project: args.options?.mailProject || undefined,

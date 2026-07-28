@@ -1,6 +1,6 @@
 import { MutationResetPersonMfaArgs, MutationResolvers, ResetPersonMfaResponse } from '../../../schema/index.js'
 import { TenantResolverContext } from '../../TenantResolverContext.js'
-import { BackupCodeManager, PermissionActions } from '../../../model/index.js'
+import { BackupCodeManager, createPersonPermissionTarget, PermissionActions } from '../../../model/index.js'
 import { PersonManager } from '../../../model/service/PersonManager.js'
 import { ResetPersonMfaCommand } from '../../../model/commands/index.js'
 import { createErrorResponse } from '../../errorUtils.js'
@@ -23,7 +23,7 @@ export class ResetPersonMfaMutationResolver implements Pick<MutationResolvers, '
 		const targetPerson = await this.personManager.findPersonById(context.db, args.personId)
 
 		await context.requireAccess({
-			action: PermissionActions.PERSON_RESET_MFA(targetPerson?.roles ?? []),
+			action: PermissionActions.PERSON_RESET_MFA(await createPersonPermissionTarget(context.db, targetPerson)),
 			message: 'You are not allowed to reset MFA for this person',
 		})
 

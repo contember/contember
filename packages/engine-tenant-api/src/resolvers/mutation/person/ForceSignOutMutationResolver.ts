@@ -1,6 +1,6 @@
 import { ForceSignOutPersonResponse, MutationForceSignOutPersonArgs, MutationResolvers } from '../../../schema/index.js'
 import { TenantResolverContext } from '../../TenantResolverContext.js'
-import { ApiKeyManager, PermissionActions } from '../../../model/index.js'
+import { ApiKeyManager, createPersonPermissionTarget, PermissionActions } from '../../../model/index.js'
 import { PersonManager } from '../../../model/service/PersonManager.js'
 import { createErrorResponse } from '../../errorUtils.js'
 import { ResponseError, ResponseOk } from '../../../model/utils/Response.js'
@@ -22,7 +22,7 @@ export class ForceSignOutMutationResolver implements Pick<MutationResolvers, 'fo
 		const reason = args.reason ?? null
 
 		await context.requireAccess({
-			action: PermissionActions.PERSON_FORCE_SIGN_OUT(targetPerson?.roles ?? []),
+			action: PermissionActions.PERSON_FORCE_SIGN_OUT(await createPersonPermissionTarget(context.db, targetPerson)),
 			message: 'You are not allowed to force sign out this person',
 		})
 

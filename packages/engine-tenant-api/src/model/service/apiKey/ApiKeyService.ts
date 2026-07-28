@@ -4,7 +4,7 @@ import { ApiKey } from '../../type/index.js'
 import { createSetMembershipVariables } from '../membershipUtils.js'
 import { ImplementationException } from '../../../exceptions.js'
 import { Response, ResponseOk } from '../../utils/Response.js'
-import { ApiKeyWithToken } from '../../../schema/index.js'
+import { ApiKeyWithToken, CreateApiKeyErrorCode } from '../../../schema/index.js'
 import { Acl } from '@contember/schema'
 
 export class ApiKeyService {
@@ -48,7 +48,7 @@ export class ApiKeyService {
 	}
 }
 
-export type CreateApiKeyResponse = Response<CreateApiKeyResult, never>
+export type CreateApiKeyResponse = Response<CreateApiKeyResult, CreateApiKeyErrorCode>
 
 export class CreateApiKeyResult {
 	constructor(public readonly identity: { id: string; description?: string }, public readonly apiKey: { id: string; token?: string }) {

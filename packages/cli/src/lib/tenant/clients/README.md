@@ -10,7 +10,7 @@ never a raw `GraphQlClient`.
 | `TenantPersonClient`   | persons, global identity roles, sessions                       |
 | `TenantMemberClient`   | project memberships, invites                                   |
 | `TenantApiKeyClient`   | api keys                                                       |
-| `TenantPolicyClient`   | auth policies, mail templates, auth log                        |
+| `TenantPolicyClient`   | auth policies, mail templates, custom roles, auth log          |
 
 ## The pattern
 

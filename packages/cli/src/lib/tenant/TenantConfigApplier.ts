@@ -10,7 +10,10 @@ export interface TenantConfigApplyOptions {
 /** The slice of the domain clients the applier drives — structural, so a test can pass a fake. */
 export interface TenantConfigApplierClients {
 	readonly project: Pick<TenantProjectClient, 'configure' | 'listIdentityProviders' | 'addIdp' | 'updateIdp' | 'enableIdp' | 'disableIdp'>
-	readonly policy: Pick<TenantPolicyClient, 'addMailTemplate' | 'listAuthPolicies' | 'createAuthPolicy' | 'updateAuthPolicy'>
+	readonly policy: Pick<
+		TenantPolicyClient,
+		'addMailTemplate' | 'listAuthPolicies' | 'createAuthPolicy' | 'updateAuthPolicy' | 'listCustomRoles' | 'createCustomRole' | 'updateCustomRole'
+	>
 }
 
 export type TenantConfigActionType =
@@ -22,6 +25,8 @@ export type TenantConfigActionType =
 	| 'addMailTemplate'
 	| 'createAuthPolicy'
 	| 'updateAuthPolicy'
+	| 'createCustomRole'
+	| 'updateCustomRole'
 
 /** One step of the apply plan. In a dry run it is what would be done, otherwise what was done. */
 export interface TenantConfigAction {
@@ -56,6 +61,7 @@ export interface TenantConfigPlan {
  * - auth policies are matched to existing rows by what they target (scope,
  *   project, role set) and created or updated accordingly; every policy the
  *   config does not cover is warned about, including when the config lists none.
+ * - custom roles are created or updated by slug.
  *
  * Nothing is ever removed — entries missing from the config are left untouched.
  *
@@ -155,6 +161,26 @@ export class TenantConfigApplier {
 					const target = describeAuthPolicy(policy)
 					warn('UNMANAGED_AUTH_POLICY', target, `Auth policy ${target} exists but is not in the config; it stays in effect.`)
 				}
+			}
+		}
+
+		if (config.customRoles && Object.keys(config.customRoles).length > 0) {
+			const existing = await clients.policy.listCustomRoles()
+			const existingSlugs = new Set(existing.map(role => role.slug))
+			const configuredRoles = Object.entries(config.customRoles)
+			const missingRoles = configuredRoles.filter(([slug]) => !existingSlugs.has(slug))
+
+			// Create all slugs first so grants may reference roles declared later or cyclically.
+			for (const [slug, role] of missingRoles) {
+				await run('createCustomRole', slug, () =>
+					clients.policy.createCustomRole(slug, {
+						description: role.description,
+						grants: [],
+					}))
+			}
+
+			for (const [slug, role] of configuredRoles) {
+				await run('updateCustomRole', slug, () => clients.policy.updateCustomRole(slug, role))
 			}
 		}
 

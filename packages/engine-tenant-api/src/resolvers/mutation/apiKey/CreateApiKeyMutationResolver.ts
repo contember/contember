@@ -28,9 +28,10 @@ export class CreateApiKeyMutationResolver implements MutationResolvers {
 		info: GraphQLResolveInfo,
 	): Promise<CreateApiKeyResponse> {
 		const project = await this.projectManager.getProjectBySlug(context.db, projectSlug)
+		const trustForwardedClientInfo = options?.trustForwardedClientInfo === true
 		await context.requireAccess({
 			scope: await context.permissionContext.createProjectScope(project),
-			action: PermissionActions.API_KEY_CREATE,
+			action: PermissionActions.API_KEY_CREATE({ trustForwardedClientInfo }),
 			message: 'You are not allowed to create an API key for this project',
 		})
 		if (!project) {
@@ -55,7 +56,7 @@ export class CreateApiKeyMutationResolver implements MutationResolvers {
 			memberships,
 			description,
 			tokenHash ?? undefined,
-			options?.trustForwardedClientInfo === true,
+			trustForwardedClientInfo,
 		)
 		if (!result.ok) {
 			return createErrorResponse(result)

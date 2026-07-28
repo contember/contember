@@ -193,6 +193,14 @@ describe('explicit grantable permission catalog', () => {
 			)
 		}
 
+		// Not about a protected role: a key trusted to forward client info decides what lands in the
+		// audit log and what per-IP rate limits key on, so delegated authority may not mint one at all.
+		forbidden.push({
+			name: 'apiKey:createGlobal',
+			why: 'mints a key trusted to forward client info',
+			action: PermissionActions.API_KEY_CREATE_GLOBAL({ requestedRoles: [], trustForwardedClientInfo: true }),
+		})
+
 		// Mail-template grants are the one parameterized kind project_admin holds as an
 		// unconditional `{kind: 'any'}` wildcard, so no shape of them is forbidden to it.
 		const unguarded = ['mailTemplate:add', 'mailTemplate:list', 'mailTemplate:remove']
@@ -208,6 +216,18 @@ describe('explicit grantable permission catalog', () => {
 			const allowed = permissions.isAllowed(TenantRole.PROJECT_ADMIN, action.resource, action.privilege, action.meta)
 			expect(`${name} (${why}): ${allowed}`).toBe(`${name} (${why}): false`)
 		}
+	})
+
+	test('refuses a project api key trusted to forward client info', () => {
+		// `apiKey:create` is not grantable to a custom role, so it is outside the catalog tests above —
+		// but it mints the same forgeable credential, and project_admin reaches it on every project.
+		const permissions = new PermissionsFactory().create()
+		const ordinary = PermissionActions.API_KEY_CREATE({ trustForwardedClientInfo: false })
+		const trusted = PermissionActions.API_KEY_CREATE({ trustForwardedClientInfo: true })
+
+		expect(permissions.isAllowed(TenantRole.PROJECT_ADMIN, ordinary.resource, ordinary.privilege, ordinary.meta)).toBe(true)
+		expect(permissions.isAllowed(TenantRole.PROJECT_ADMIN, trusted.resource, trusted.privilege, trusted.meta)).toBe(false)
+		expect(permissions.isAllowed(TenantRole.SUPER_ADMIN, trusted.resource, trusted.privilege, trusted.meta)).toBe(true)
 	})
 
 	test('contains configured v1 actions', () => {

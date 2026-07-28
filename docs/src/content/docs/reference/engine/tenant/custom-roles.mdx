@@ -254,8 +254,11 @@ are filtered row by row. Globs, patterns, and arbitrary resource expressions are
 
 ## Grantable surface
 
-The configuration-free grants are `person:view`, `person:list`, `system:viewConfig`, `system:viewAuthLog`, `apiKey:list`, `idp:list`, `idp:enable`,
-`idp:disable`, `entrypoint:deployEntrypoint`, `customRole:view`, and `system:configure`.
+The configuration-free grants are `person:view`, `person:list`, `identity:viewPermissions`, `system:viewConfig`, `system:viewAuthLog`, `apiKey:list`,
+`idp:list`, `idp:enable`, `idp:disable`, `entrypoint:deployEntrypoint`, `customRole:view`, and `system:configure`.
+
+`identity:viewPermissions` exposes role *names* on `Identity.roles`. Pair it with `identity:addGlobalRoles` — without it the field reads as `null` for
+every identity other than the caller's own, so a role able to change a role set cannot look at that set first.
 
 :::caution[`system:configure` is broader than its name suggests]
 It gates the whole tenant configuration surface — password policy, captcha, rate limits, token expiration — **and** auth-policy management

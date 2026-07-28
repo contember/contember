@@ -110,6 +110,7 @@ export class CustomRoleMutationResolver implements Pick<MutationResolvers, 'crea
 						operation: 'delete',
 						before: result.result.before,
 						removedAssignments: result.result.removedAssignments,
+						removedAssignmentIdentityIds: [...result.result.removedAssignmentIdentityIds],
 					},
 				}, db)
 			}

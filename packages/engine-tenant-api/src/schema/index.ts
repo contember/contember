@@ -892,7 +892,9 @@ export type DeleteCustomRoleError = {
 	readonly developerMessage: Scalars['String']['output']
 }
 
-export type DeleteCustomRoleErrorCode = 'NOT_FOUND'
+export type DeleteCustomRoleErrorCode =
+	| 'NOT_FOUND'
+	| 'ROLE_IN_USE'
 
 export type DeleteCustomRoleResponse = {
 	readonly __typename?: 'DeleteCustomRoleResponse'

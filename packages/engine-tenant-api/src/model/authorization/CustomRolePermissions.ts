@@ -517,6 +517,10 @@ const decodePersistedGrants = (raw: unknown): ReturnType<typeof decodeCustomRole
 export const parsePersistedCustomRoleGrants = (raw: unknown): readonly CanonicalCustomRoleGrant[] =>
 	decodePersistedGrants(raw).map(item => ({ permission: item.permission, config: item.grant.canonicalConfig }))
 
+/** Role slugs a persisted row's configuration names. An undecodable row is wholly inert, so it references nothing. */
+export const parsePersistedCustomRoleReferences = (raw: unknown): readonly string[] =>
+	[...new Set(decodePersistedGrants(raw).flatMap(item => item.grant.referencedRoles))].sort()
+
 export const buildCustomRolePermissions = (rows: readonly CustomRoleRow[]): Permissions => {
 	const permissions = new Permissions()
 	for (const row of rows) {

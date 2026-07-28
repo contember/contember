@@ -1764,6 +1764,12 @@ const schema: DocumentNode = gql`
 
 	enum DeleteCustomRoleErrorCode {
 		NOT_FOUND
+		"""
+		Another custom role's grant configuration references this one. Remove the reference first —
+		deleting would leave that role un-resubmittable, and recreating this slug would silently
+		re-bind the reference to a different definition.
+		"""
+		ROLE_IN_USE
 	}
 
 	# === sessions ===

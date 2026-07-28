@@ -324,3 +324,29 @@ test('customRoles reports a persisted-invalid role as inert', async () => {
 		},
 	})
 })
+
+// `customRole:manage` is the single rail stopping a delegated principal from writing its own
+// permission bundle. These run through the REAL authorization stack (`identityRoles`), so
+// dropping any of the three `requireAccess` calls in CustomRoleMutationResolver turns them red.
+test.each([
+	[
+		'createCustomRole',
+		GQL`mutation { createCustomRole(slug: "escalated", grants: [{ permission: "person:list" }]) { ok } }`,
+	],
+	[
+		'updateCustomRole',
+		GQL`mutation { updateCustomRole(slug: "support", grants: [{ permission: "person:list" }]) { ok } }`,
+	],
+	['deleteCustomRole', GQL`mutation { deleteCustomRole(slug: "support") { ok } }`],
+])('%s is refused to project_admin and touches no data', async (field, query) => {
+	await executeTenantTest({
+		identityRoles: ['project_admin'],
+		query,
+		// project_admin is builtin-only, so the request-scoped custom_role preload is skipped too
+		executes: [],
+		return: {
+			data: { [field]: null },
+			errors: [{ message: 'You are not allowed to manage custom roles' }],
+		},
+	})
+})

@@ -453,11 +453,13 @@ const parseEnvelope = (
 	return { permission, config }
 }
 
-const decodeCustomRoleGrants = (raw: unknown): { readonly permission: string; readonly grant: DecodedGrant }[] => {
+const decodeCustomRoleGrants = (
+	raw: unknown,
+): { readonly permission: string; readonly definition: CustomRolePermissionDefinition; readonly grant: DecodedGrant }[] => {
 	if (!Array.isArray(raw)) {
 		throw new CustomRoleGrantValidationError('INVALID_PERMISSION_CONFIGURATION', 'Custom role grants must be an array')
 	}
-	const decoded: { readonly permission: string; readonly grant: DecodedGrant }[] = []
+	const decoded: { readonly permission: string; readonly definition: CustomRolePermissionDefinition; readonly grant: DecodedGrant }[] = []
 	const seen = new Set<string>()
 	for (let index = 0; index < raw.length; index++) {
 		let envelope: { readonly permission: string; readonly config: Typesafe.Json }
@@ -481,6 +483,7 @@ const decodeCustomRoleGrants = (raw: unknown): { readonly permission: string; re
 		try {
 			decoded.push({
 				permission: envelope.permission,
+				definition,
 				grant: definition.decode(envelope.config, [index, 'config']),
 			})
 		} catch (error) {
@@ -521,10 +524,24 @@ export const parsePersistedCustomRoleGrants = (raw: unknown): readonly Canonical
 export const parsePersistedCustomRoleReferences = (raw: unknown): readonly string[] =>
 	[...new Set(decodePersistedGrants(raw).flatMap(item => item.grant.referencedRoles))].sort()
 
-export const buildCustomRolePermissions = (rows: readonly CustomRoleRow[]): Permissions => {
+/**
+ * Configuration kinds that carry their own exact project filter (`mailTemplate:*` matches project
+ * slugs verbatim), so they can answer a project-scoped check on their own terms. Every other kind
+ * is bounded only by being tenant-global, and `CustomRoleAuthorizator` drops the scope — so letting
+ * one satisfy a scoped check would grant it on *every* project. New kinds default to the safe side.
+ */
+const PROJECT_BOUNDED_KINDS: ReadonlySet<CustomRoleConfigurationKind> = new Set<CustomRoleConfigurationKind>(['MAIL_TEMPLATE_SCOPE'])
+
+export const buildCustomRolePermissions = (
+	rows: readonly CustomRoleRow[],
+	{ projectScoped = false }: { readonly projectScoped?: boolean } = {},
+): Permissions => {
 	const permissions = new Permissions()
 	for (const row of rows) {
 		for (const item of decodePersistedGrants(row.grants)) {
+			if (projectScoped && !PROJECT_BOUNDED_KINDS.has(item.definition.configurationKind)) {
+				continue
+			}
 			item.grant.install(permissions, row.slug)
 		}
 	}

@@ -2,6 +2,7 @@ import { expect, test } from 'bun:test'
 import { AccessNode, AuthorizationScope, Authorizator, Permissions } from '@contember/authorization'
 import { CustomRoleAuthorizator } from '../../../src/model/authorization/CustomRoleAuthorizator.js'
 import { Identity } from '../../../src/model/authorization/Identity.js'
+import { IdentityScope } from '../../../src/model/authorization/IdentityScope.js'
 import { buildCustomRolePermissions } from '../../../src/model/authorization/CustomRolePermissions.js'
 import { PermissionActions } from '../../../src/model/authorization/PermissionActions.js'
 import { TenantRole } from '../../../src/model/authorization/Roles.js'
@@ -131,4 +132,18 @@ test('a mail-template grant still answers a project-scoped check, on its own exa
 
 	expect(await authorizator.isAllowed(identity(['editor']), projectScope, forProject('project-a'))).toBe(true)
 	expect(await authorizator.isAllowed(identity(['editor']), projectScope, forProject('project-b'))).toBe(false)
+})
+
+test('an IdentityScope does not restrict a tenant-global grant', async () => {
+	// `changeProfile` and `changePassword` are checked under an IdentityScope, which only *widens*
+	// (it adds `self` when the target is the caller) rather than bounding what a grant may reach.
+	// Treating it like a project scope silently broke every target-identity grant.
+	const { db } = countingDb([row('support', [{
+		permission: 'person:changePassword',
+		config: { target: { globalRoles: { allowed: ['person'] }, projectMemberships: 'any' } },
+	}])])
+	const authorizator = new CustomRoleAuthorizator(innerAuthorizator(false), db)
+	const action = PermissionActions.PERSON_CHANGE_PASSWORD({ id: 'target', globalRoles: ['person'], hasProjectMemberships: false })
+
+	expect(await authorizator.isAllowed(identity(['support']), new IdentityScope('someone-else'), action)).toBe(true)
 })

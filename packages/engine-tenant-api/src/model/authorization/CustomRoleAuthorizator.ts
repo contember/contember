@@ -2,6 +2,7 @@ import { AuthorizationScope, Authorizator, Permissions } from '@contember/author
 import { DatabaseContext } from '../utils/index.js'
 import { CustomRolesQuery } from '../queries/index.js'
 import { Identity } from './Identity.js'
+import { IdentityScope } from './IdentityScope.js'
 import { buildCustomRolePermissions, BUILTIN_TENANT_ROLES } from './CustomRolePermissions.js'
 
 export class CustomRolePermissionCache {
@@ -21,6 +22,15 @@ export class CustomRolePermissionCache {
 		return this.loading
 	}
 }
+
+/**
+ * Which scopes bound a check to one project. `Global` is unbounded and `IdentityScope` only *widens*
+ * (it adds `self` when the target is the caller), so neither constrains what a grant may reach —
+ * everything else is treated as project-bounded, so a scope kind added later fails closed rather
+ * than letting a tenant-global grant answer for every project.
+ */
+const isProjectBoundedScope = (scope: AuthorizationScope<Identity>): boolean =>
+	!(scope instanceof AuthorizationScope.Global) && !(scope instanceof IdentityScope)
 
 export class CustomRoleAuthorizator implements Authorizator<Identity> {
 	constructor(
@@ -53,10 +63,10 @@ export class CustomRoleAuthorizator implements Authorizator<Identity> {
 		if (customRoles.length === 0) {
 			return false
 		}
-		// `Permissions.isAllowed` takes no scope, so a grant answering a project-scoped check would
+		// `Permissions.isAllowed` takes no scope, so a grant answering a project-bounded check would
 		// answer it for every project. Only grants carrying their own project filter get to try.
 		const loaded = await this.customRoleCache.load()
-		const permissions = scope instanceof AuthorizationScope.Global ? loaded.global : loaded.projectScoped
+		const permissions = isProjectBoundedScope(scope) ? loaded.projectScoped : loaded.global
 		return customRoles.some(role => permissions.isAllowed(role, action.resource, action.privilege, action.meta))
 	}
 }

@@ -1,8 +1,9 @@
 import { describe, expect, test } from 'bun:test'
 import { createTestOutput } from '../../cli-common/tests/lib/testOutput.js'
 import { TenantConfigApplier, TenantConfigApplierClients } from '../src/lib/tenant/TenantConfigApplier.js'
-import type { RemoteAuthPolicy, RemoteIdentityProvider } from '../src/lib/tenant/clients/index.js'
-import type { TenantGlobalConfig } from '../src/lib/tenant/tenantConfig.js'
+import type { RemoteAuthPolicy, RemoteCustomRole, RemoteIdentityProvider } from '../src/lib/tenant/clients/index.js'
+import type { TenantCustomRoleConfig, TenantGlobalConfig } from '../src/lib/tenant/tenantConfig.js'
+import { defineTenantConfig } from '../src/lib/tenant/tenantConfig.js'
 
 const createPolicy = (policy: Pick<RemoteAuthPolicy, 'id' | 'scope' | 'project' | 'roles'>): RemoteAuthPolicy => ({
 	mfaRequired: null,
@@ -13,9 +14,14 @@ const createPolicy = (policy: Pick<RemoteAuthPolicy, 'id' | 'scope' | 'project' 
 	...policy,
 })
 
-const createClientsMock = (existingIdps: RemoteIdentityProvider[] = [], existingPolicies: RemoteAuthPolicy[] = []) => {
+const createClientsMock = (
+	existingIdps: RemoteIdentityProvider[] = [],
+	existingPolicies: RemoteAuthPolicy[] = [],
+	existingCustomRoles: RemoteCustomRole[] = [],
+) => {
 	const calls: string[] = []
 	const configured: TenantGlobalConfig[] = []
+	const updatedCustomRoles: { readonly slug: string; readonly role: TenantCustomRoleConfig }[] = []
 	const clients: TenantConfigApplierClients = {
 		project: {
 			configure: async (config: TenantGlobalConfig) => {
@@ -48,9 +54,17 @@ const createClientsMock = (existingIdps: RemoteIdentityProvider[] = [], existing
 			updateAuthPolicy: async (id: string) => {
 				calls.push(`updateAuthPolicy:${id}`)
 			},
+			listCustomRoles: async () => existingCustomRoles,
+			createCustomRole: async (slug: string, role: TenantCustomRoleConfig) => {
+				calls.push(`createCustomRole:${slug}:${role.grants.length}`)
+			},
+			updateCustomRole: async (slug: string, role: TenantCustomRoleConfig) => {
+				calls.push(`updateCustomRole:${slug}:${role.grants.length}`)
+				updatedCustomRoles.push({ slug, role })
+			},
 		},
 	}
-	return { clients, calls, configured }
+	return { clients, calls, configured, updatedCustomRoles }
 }
 
 const createApplier = () => {
@@ -274,6 +288,71 @@ describe('TenantConfigApplier', () => {
 		expect(calls).toEqual([])
 	})
 
+	test('creates all custom role slugs before applying configured grants', async () => {
+		const { clients, calls } = createClientsMock()
+		const { applier } = createApplier()
+		await applier.apply(clients, {
+			customRoles: {
+				support: {
+					grants: [{
+						permission: 'identity:addGlobalRoles',
+						config: {
+							roles: { allowed: ['reviewer'] },
+							target: {
+								globalRoles: { allowed: ['person'] },
+								projectMemberships: 'none',
+							},
+							allowSelf: false,
+						},
+					}],
+				},
+				reviewer: {
+					grants: [{ permission: 'person:view' }],
+				},
+			},
+		})
+		expect(calls).toEqual([
+			'createCustomRole:support:0',
+			'createCustomRole:reviewer:0',
+			'updateCustomRole:support:1',
+			'updateCustomRole:reviewer:1',
+		])
+	})
+
+	test('updates an existing custom role without recreating it', async () => {
+		const { clients, calls } = createClientsMock([], [], [{ slug: 'support' }])
+		const { applier } = createApplier()
+		await applier.apply(clients, {
+			customRoles: {
+				support: {
+					description: 'Support team',
+					grants: [{ permission: 'person:list' }],
+				},
+			},
+		})
+		expect(calls).toEqual(['updateCustomRole:support:1'])
+	})
+
+	test('clears an existing custom role description explicitly', async () => {
+		const { clients, updatedCustomRoles } = createClientsMock([], [], [{ slug: 'support' }])
+		const { applier } = createApplier()
+		await applier.apply(clients, {
+			customRoles: {
+				support: {
+					description: null,
+					grants: [{ permission: 'person:list' }],
+				},
+			},
+		})
+		expect(updatedCustomRoles).toEqual([{
+			slug: 'support',
+			role: {
+				description: null,
+				grants: [{ permission: 'person:list' }],
+			},
+		}])
+	})
+
 	test('dry run performs no mutations but still reads state and returns the plan', async () => {
 		const { clients, calls } = createClientsMock([])
 		const { applier } = createApplier()
@@ -282,6 +361,9 @@ describe('TenantConfigApplier', () => {
 			identityProviders: { google: { type: 'oidc', configuration: {} } },
 			mailTemplates: [{ type: 'RESET_PASSWORD_REQUEST', subject: 's', content: 'c' }],
 			authPolicies: [{ scope: 'global', roles: ['admin'] }],
+			customRoles: {
+				support: { grants: [{ permission: 'person:list' }] },
+			},
 		}, { dryRun: true })
 		expect(calls).toEqual([])
 		expect(actions).toEqual([
@@ -289,6 +371,8 @@ describe('TenantConfigApplier', () => {
 			{ action: 'addIdp', target: 'google' },
 			{ action: 'addMailTemplate', target: 'RESET_PASSWORD_REQUEST' },
 			{ action: 'createAuthPolicy', target: 'global [admin]' },
+			{ action: 'createCustomRole', target: 'support' },
+			{ action: 'updateCustomRole', target: 'support' },
 		])
 	})
 
@@ -320,5 +404,80 @@ describe('TenantConfigApplier', () => {
 
 		expect(stderr.text).toBe('')
 		expect(stdout.text).toBe('')
+	})
+
+	test('accepts every typed custom-role grant configuration kind', () => {
+		const config = defineTenantConfig({
+			customRoles: {
+				support: {
+					grants: [
+						{ permission: 'person:list' },
+						{
+							permission: 'person:signUp',
+							config: { roles: { allowed: ['person'] } },
+						},
+						{
+							permission: 'person:changePassword',
+							config: {
+								target: {
+									globalRoles: { allowed: ['person'] },
+									projectMemberships: 'none',
+								},
+							},
+						},
+						{
+							permission: 'person:changeProfile',
+							config: {
+								target: {
+									globalRoles: { allowed: ['person'] },
+									projectMemberships: 'none',
+								},
+								fields: { allowed: ['name'] },
+							},
+						},
+						{
+							permission: 'person:createSessionToken',
+							config: {
+								target: {
+									globalRoles: { allowed: ['person'] },
+									projectMemberships: 'none',
+								},
+								session: {
+									maxExpirationMinutes: 30,
+									allowTrustForwardedClientInfo: false,
+								},
+							},
+						},
+						{
+							permission: 'identity:addGlobalRoles',
+							config: {
+								roles: { allowed: ['support'] },
+								target: {
+									globalRoles: { allowed: ['person'] },
+									projectMemberships: 'none',
+								},
+								allowSelf: false,
+							},
+						},
+						{
+							permission: 'apiKey:createGlobal',
+							config: {
+								roles: { allowed: ['support'] },
+								allowTrustForwardedClientInfo: false,
+							},
+						},
+						{
+							permission: 'mailTemplate:list',
+							config: {
+								global: false,
+								projects: ['example'],
+								types: ['FORCED_SIGN_OUT'],
+							},
+						},
+					],
+				},
+			},
+		})
+		expect(config.customRoles?.support.grants).toHaveLength(8)
 	})
 })

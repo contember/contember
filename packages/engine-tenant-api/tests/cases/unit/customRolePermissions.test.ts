@@ -4,7 +4,9 @@ import {
 	CustomRoleGrantValidationError,
 	CustomRoleRow,
 	getGrantablePermissions,
+	GLOBALLY_ASSIGNABLE_BUILTIN_ROLES,
 	isConfigurationRequired,
+	NON_DELEGABLE_TENANT_ROLES,
 	parseCustomRoleGrants,
 	PermissionActions,
 	PermissionsFactory,
@@ -217,6 +219,37 @@ describe('explicit grantable permission catalog', () => {
 		for (const { name, why, action } of forbidden) {
 			const allowed = permissions.isAllowed(TenantRole.PROJECT_ADMIN, action.resource, action.privilege, action.meta)
 			expect(`${name} (${why}): ${allowed}`).toBe(`${name} (${why}): false`)
+		}
+	})
+
+	test('the global roles a project_admin can actually assign are a closed set', () => {
+		// Two independent halves bound this and neither is closed on its own: the PROJECT_ADMIN
+		// verifier is a *denylist* (NON_DELEGABLE_TENANT_ROLES), while GlobalRoleValidator rejects
+		// anything outside GLOBALLY_ASSIGNABLE_BUILTIN_ROLES — an *allowlist*. Only the
+		// intersection is closed, so a change to either half has to show up here.
+		const permissions = new PermissionsFactory().create()
+		const passesVerifier = (role: string) => {
+			const action = PermissionActions.IDENTITY_ADD_GLOBAL_ROLES({
+				requestedRoles: [role],
+				target: target(['person']),
+				self: false,
+			})
+			return permissions.isAllowed(TenantRole.PROJECT_ADMIN, action.resource, action.privilege, action.meta)
+		}
+
+		const effective = Object.values(TenantRole)
+			.filter(role => passesVerifier(role) && GLOBALLY_ASSIGNABLE_BUILTIN_ROLES.has(role))
+			.sort()
+		expect(effective).toEqual(['entrypoint_deployer', 'login', 'person', 'project_admin'])
+
+		// `self` and `project_member` are derived per request, never stored in identity.roles.
+		const NEVER_GLOBAL: ReadonlySet<string> = new Set([TenantRole.SELF, TenantRole.PROJECT_MEMBER])
+		for (const role of Object.values(TenantRole)) {
+			// a new TenantRole must be classified deliberately, not inherit a default
+			const classified = NON_DELEGABLE_TENANT_ROLES.has(role) || NEVER_GLOBAL.has(role) || GLOBALLY_ASSIGNABLE_BUILTIN_ROLES.has(role)
+			expect(`${role}: ${classified}`).toBe(`${role}: true`)
+			// the two halves must not disagree about a role being assignable at all
+			expect(`${role}: ${NEVER_GLOBAL.has(role) && GLOBALLY_ASSIGNABLE_BUILTIN_ROLES.has(role)}`).toBe(`${role}: false`)
 		}
 	})
 

@@ -11,7 +11,10 @@ export interface Identity {
 export interface Person {
 	readonly id: string
 	readonly email?: string
+	readonly name?: string
 	readonly otpEnabled: boolean
+	readonly emailOtpEnabled: boolean
+	readonly passwordlessEnabled?: boolean
 }
 
 export interface IdentityProject {

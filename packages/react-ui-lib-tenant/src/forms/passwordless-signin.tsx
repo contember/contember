@@ -50,18 +50,30 @@ export const PasswordlessSignInFormFields = ({ type, email }: { type: 'token' | 
 			)}
 
 			{(form.state === 'otp-required' || fieldErrors.includes('otpToken')) && (
-				<TenantFormField
-					form={form}
-					messages={dict.tenant.passwordlessSignIn.errorMessages}
-					field="otpToken"
-					autoComplete="one-time-code"
-					type="text"
-					required
-					autoFocus
-					maxLength={6}
-				>
-					{dict.tenant.passwordlessSignIn.otpToken}
-				</TenantFormField>
+				<>
+					<TenantFormField
+						form={form}
+						messages={dict.tenant.passwordlessSignIn.errorMessages}
+						field="otpToken"
+						autoComplete="one-time-code"
+						type="text"
+						required
+						autoFocus
+						maxLength={6}
+					>
+						{dict.tenant.passwordlessSignIn.otpToken}
+					</TenantFormField>
+					<TenantFormField
+						form={form}
+						messages={dict.tenant.passwordlessSignIn.errorMessages}
+						field="backupCode"
+						autoComplete="one-time-code"
+						type="text"
+					>
+						{dict.tenant.passwordlessSignIn.backupCode}
+					</TenantFormField>
+					<p className="text-sm text-gray-500">{dict.tenant.passwordlessSignIn.backupCodeHint}</p>
+				</>
 			)}
 
 			<Button type="submit" className="w-full" disabled={form.state === 'submitting'} ref={buttonRef}>

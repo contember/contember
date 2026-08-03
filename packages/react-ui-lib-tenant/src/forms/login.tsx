@@ -49,18 +49,30 @@ export const LoginFormFields = () => {
 			</TenantFormField>
 
 			{(form.state === 'otp-required' || fieldErrors.includes('otpToken')) && (
-				<TenantFormField
-					form={form}
-					messages={dict.tenant.login.errorMessages}
-					field="otpToken"
-					autoComplete="one-time-code"
-					type="text"
-					required
-					autoFocus
-					maxLength={6}
-				>
-					{dict.tenant.login.otpToken}
-				</TenantFormField>
+				<>
+					<TenantFormField
+						form={form}
+						messages={dict.tenant.login.errorMessages}
+						field="otpToken"
+						autoComplete="one-time-code"
+						type="text"
+						required
+						autoFocus
+						maxLength={6}
+					>
+						{dict.tenant.login.otpToken}
+					</TenantFormField>
+					<TenantFormField
+						form={form}
+						messages={dict.tenant.login.errorMessages}
+						field="backupCode"
+						autoComplete="one-time-code"
+						type="text"
+					>
+						{dict.tenant.login.backupCode}
+					</TenantFormField>
+					<p className="text-sm text-gray-500">{dict.tenant.login.backupCodeHint}</p>
+				</>
 			)}
 
 			<Button type="submit" className="w-full" disabled={form.state === 'submitting'}>

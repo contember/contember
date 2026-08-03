@@ -7,7 +7,7 @@ const projectIdentityRelationFragment = TenantApi
 	.projectIdentityRelation$
 	.identity(
 		TenantApi.identity$$
-			.person(TenantApi.person$.id.email.name.otpEnabled.emailOtpEnabled)
+			.person(TenantApi.person$.id.email.name.otpEnabled.emailOtpEnabled.disabledAt)
 			.apiKey(TenantApi.apiKey$$),
 	)
 	.memberships(TenantApi.membership$$.variables(TenantApi.variableEntry$$))

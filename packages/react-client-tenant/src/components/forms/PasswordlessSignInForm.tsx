@@ -10,6 +10,8 @@ import { TenantForm } from './TenantForm.js'
 export type PasswordlessSignInFormValues = {
 	token: string
 	otpToken: string
+	/** Alternative to `otpToken` for a user who lost their authenticator. */
+	backupCode: string
 }
 
 export type PasswordlessSignInFormErrorCode =
@@ -63,12 +65,14 @@ export const PasswordlessSignInForm = (
 			initialValues={useMemo(() => ({
 				token: token ?? '',
 				otpToken: '',
+				backupCode: '',
 			}), [token])}
 			validate={({ values, state }) => {
 				if (!values.token) {
 					return [{ code: 'FIELD_REQUIRED', field: 'token' }]
 				}
-				if (!values.otpToken && state === 'otp-required') {
+				// In the otp-required step either an otpToken or a backup code will do.
+				if (!values.otpToken && !values.backupCode && state === 'otp-required') {
 					return [{ code: 'FIELD_REQUIRED', field: 'otpToken' }]
 				} else if (values.otpToken && !values.otpToken.match(/^\d{6}$/)) {
 					return [{ code: 'INVALID_VALUE', field: 'otpToken' }]
@@ -81,6 +85,7 @@ export const PasswordlessSignInForm = (
 					expiration,
 					token: values.token,
 					mfaOtp: values.otpToken || undefined,
+					backupCode: values.backupCode || undefined,
 					validationType,
 				})
 				if (!result.ok && result.error === 'OTP_REQUIRED') {

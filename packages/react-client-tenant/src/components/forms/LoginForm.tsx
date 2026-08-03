@@ -12,6 +12,8 @@ export type LoginFormValues = {
 	email: string
 	password: string
 	otpToken: string
+	/** Alternative to `otpToken` for a user who lost their authenticator. */
+	backupCode: string
 }
 
 export type LoginFormErrorCode =
@@ -58,6 +60,7 @@ export const LoginForm = ({ children, expiration = DEFAULT_LOGIN_EXPIRATION, onS
 				email: '',
 				password: '',
 				otpToken: '',
+				backupCode: '',
 			}}
 			validate={({ values, state }) => {
 				const errors: LoginFormError[] = []
@@ -72,7 +75,8 @@ export const LoginForm = ({ children, expiration = DEFAULT_LOGIN_EXPIRATION, onS
 				} else if (values.password.length < 6) {
 					errors.push({ code: 'INVALID_VALUE', field: 'password' })
 				}
-				if (!values.otpToken && state === 'otp-required') {
+				// In the otp-required step either an otpToken or a backup code will do.
+				if (!values.otpToken && !values.backupCode && state === 'otp-required') {
 					errors.push({ code: 'FIELD_REQUIRED', field: 'otpToken' })
 				} else if (values.otpToken && !values.otpToken.match(/^\d{6}$/)) {
 					errors.push({ code: 'INVALID_VALUE', field: 'otpToken' })
@@ -84,6 +88,7 @@ export const LoginForm = ({ children, expiration = DEFAULT_LOGIN_EXPIRATION, onS
 					email: values.email!,
 					password: values.password!,
 					otpToken: values.otpToken || undefined,
+					backupCode: values.backupCode || undefined,
 					expiration: expiration,
 				})
 

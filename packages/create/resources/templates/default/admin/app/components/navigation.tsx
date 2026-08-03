@@ -1,13 +1,21 @@
 import { Link, LogoutTrigger, useIdentity } from '@contember/interface'
-import { BadgeCheckIcon, BellIcon, ChevronsUpDown, LogOutIcon } from 'lucide-react'
+import { BadgeCheckIcon, BellIcon, ChevronsUpDown, KeyRoundIcon, LogOutIcon, ScrollTextIcon, UserRoundIcon, UsersIcon } from 'lucide-react'
 import { dict } from '~/lib/dict'
 import { Avatar, AvatarFallback } from '~/lib/ui/avatar'
 import { AnchorButton, Button } from '~/lib/ui/button'
-import { DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '~/lib/ui/dropdown'
+import {
+	DropdownMenu,
+	DropdownMenuContent,
+	DropdownMenuGroup,
+	DropdownMenuItem,
+	DropdownMenuLabel,
+	DropdownMenuSeparator,
+	DropdownMenuTrigger,
+} from '~/lib/ui/dropdown'
 import { SidebarMenuButton } from '~/lib/ui/sidebar'
 import { useIsMobile } from '~/lib/utils/use-mobile'
 
-export const Navigation = () => (<div>Navigation</div>)
+export const Navigation = () => <div>Navigation</div>
 
 export const UserNavigation = () => {
 	const isMobile = useIsMobile()
@@ -67,6 +75,42 @@ export const UserNavigation = () => {
 							<AnchorButton variant="ghost" size="xs" className="flex gap-2">
 								<BellIcon size={16} />
 								API keys
+							</AnchorButton>
+						</Link>
+					</DropdownMenuItem>
+				</DropdownMenuGroup>
+				<DropdownMenuSeparator />
+				<DropdownMenuLabel className="text-xs text-muted-foreground">Tenant</DropdownMenuLabel>
+				<DropdownMenuGroup>
+					<DropdownMenuItem>
+						<Link to="tenant/members">
+							<AnchorButton variant="ghost" size="xs" className="flex gap-2">
+								<UsersIcon size={16} />
+								Members
+							</AnchorButton>
+						</Link>
+					</DropdownMenuItem>
+					<DropdownMenuItem>
+						<Link to="tenant/persons">
+							<AnchorButton variant="ghost" size="xs" className="flex gap-2">
+								<UserRoundIcon size={16} />
+								Persons
+							</AnchorButton>
+						</Link>
+					</DropdownMenuItem>
+					<DropdownMenuItem>
+						<Link to="tenant/projectSecrets">
+							<AnchorButton variant="ghost" size="xs" className="flex gap-2">
+								<KeyRoundIcon size={16} />
+								Project secrets
+							</AnchorButton>
+						</Link>
+					</DropdownMenuItem>
+					<DropdownMenuItem>
+						<Link to="tenant/auditLog">
+							<AnchorButton variant="ghost" size="xs" className="flex gap-2">
+								<ScrollTextIcon size={16} />
+								Audit log
 							</AnchorButton>
 						</Link>
 					</DropdownMenuItem>

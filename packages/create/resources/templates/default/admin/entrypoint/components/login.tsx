@@ -1,5 +1,5 @@
 import { ToastContent, useShowToast } from '~/lib/toast'
-import { dict } from '~/lib/dict'
+import { dict } from '~/lib/tenant/dict'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '~/lib/ui/card'
 import { AnchorButton, Button } from '~/lib/ui/button'
 import { LoginFormFields } from '~/lib/tenant'

@@ -953,6 +953,22 @@ export type EnableIdpResponse = {
 	readonly ok: Scalars['Boolean']['output']
 }
 
+export type EnablePersonError = {
+	readonly __typename?: 'EnablePersonError'
+	readonly code: EnablePersonErrorCode
+	readonly developerMessage: Scalars['String']['output']
+}
+
+export type EnablePersonErrorCode =
+	| 'PERSON_ALREADY_ENABLED'
+	| 'PERSON_NOT_FOUND'
+
+export type EnablePersonResponse = {
+	readonly __typename?: 'EnablePersonResponse'
+	readonly error?: Maybe<EnablePersonError>
+	readonly ok: Scalars['Boolean']['output']
+}
+
 export type ForceSignOutPersonError = {
 	readonly __typename?: 'ForceSignOutPersonError'
 	readonly code: ForceSignOutPersonErrorCode
@@ -1283,6 +1299,7 @@ export type Mutation = {
 	readonly disconnectMyIdentityProvider?: Maybe<DisconnectIdpResponse>
 	readonly enableIDP?: Maybe<EnableIdpResponse>
 	readonly enableMyPasswordless?: Maybe<ToggleMyPasswordlessResponse>
+	readonly enablePerson?: Maybe<EnablePersonResponse>
 	readonly forceSignOutPerson?: Maybe<ForceSignOutPersonResponse>
 	readonly initEmailOtp?: Maybe<InitEmailOtpResponse>
 	readonly initSignInIDP?: Maybe<InitSignInIdpResponse>
@@ -1452,6 +1469,10 @@ export type MutationEnableIdpArgs = {
 	identityProvider: Scalars['String']['input']
 }
 
+export type MutationEnablePersonArgs = {
+	personId: Scalars['String']['input']
+}
+
 export type MutationForceSignOutPersonArgs = {
 	personId: Scalars['String']['input']
 	reason?: InputMaybe<Scalars['String']['input']>
@@ -1611,6 +1632,11 @@ export type PasswordlessValidationType =
 
 export type Person = {
 	readonly __typename?: 'Person'
+	/**
+	 * When the account was disabled (see `disablePerson`), null while the person
+	 * is active. Read-only — flip it with `disablePerson` / `enablePerson`.
+	 */
+	readonly disabledAt?: Maybe<Scalars['DateTime']['output']>
 	readonly email?: Maybe<Scalars['String']['output']>
 	/**
 	 * Whether e-mail based one-time-password 2FA is enabled for this person
@@ -2561,6 +2587,9 @@ export type ResolversTypes = {
 	EnableIDPError: ResolverTypeWrapper<EnableIdpError>
 	EnableIDPErrorCode: EnableIdpErrorCode
 	EnableIDPResponse: ResolverTypeWrapper<EnableIdpResponse>
+	EnablePersonError: ResolverTypeWrapper<EnablePersonError>
+	EnablePersonErrorCode: EnablePersonErrorCode
+	EnablePersonResponse: ResolverTypeWrapper<EnablePersonResponse>
 	Float: ResolverTypeWrapper<Scalars['Float']['output']>
 	ForceSignOutPersonError: ResolverTypeWrapper<ForceSignOutPersonError>
 	ForceSignOutPersonErrorCode: ForceSignOutPersonErrorCode
@@ -2812,6 +2841,8 @@ export type ResolversParentTypes = {
 	EmailVerificationOptions: EmailVerificationOptions
 	EnableIDPError: EnableIdpError
 	EnableIDPResponse: EnableIdpResponse
+	EnablePersonError: EnablePersonError
+	EnablePersonResponse: EnablePersonResponse
 	Float: Scalars['Float']['output']
 	ForceSignOutPersonError: ForceSignOutPersonError
 	ForceSignOutPersonResponse: ForceSignOutPersonResponse
@@ -3598,6 +3629,22 @@ export type EnableIdpResponseResolvers<
 	ok?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
 }
 
+export type EnablePersonErrorResolvers<
+	ContextType = any,
+	ParentType extends ResolversParentTypes['EnablePersonError'] = ResolversParentTypes['EnablePersonError'],
+> = {
+	code?: Resolver<ResolversTypes['EnablePersonErrorCode'], ParentType, ContextType>
+	developerMessage?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+}
+
+export type EnablePersonResponseResolvers<
+	ContextType = any,
+	ParentType extends ResolversParentTypes['EnablePersonResponse'] = ResolversParentTypes['EnablePersonResponse'],
+> = {
+	error?: Resolver<Maybe<ResolversTypes['EnablePersonError']>, ParentType, ContextType>
+	ok?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
+}
+
 export type ForceSignOutPersonErrorResolvers<
 	ContextType = any,
 	ParentType extends ResolversParentTypes['ForceSignOutPersonError'] = ResolversParentTypes['ForceSignOutPersonError'],
@@ -3938,6 +3985,7 @@ export type MutationResolvers<ContextType = any, ParentType extends ResolversPar
 	>
 	enableIDP?: Resolver<Maybe<ResolversTypes['EnableIDPResponse']>, ParentType, ContextType, RequireFields<MutationEnableIdpArgs, 'identityProvider'>>
 	enableMyPasswordless?: Resolver<Maybe<ResolversTypes['ToggleMyPasswordlessResponse']>, ParentType, ContextType>
+	enablePerson?: Resolver<Maybe<ResolversTypes['EnablePersonResponse']>, ParentType, ContextType, RequireFields<MutationEnablePersonArgs, 'personId'>>
 	forceSignOutPerson?: Resolver<
 		Maybe<ResolversTypes['ForceSignOutPersonResponse']>,
 		ParentType,
@@ -4058,6 +4106,7 @@ export type MutationResolvers<ContextType = any, ParentType extends ResolversPar
 }
 
 export type PersonResolvers<ContextType = any, ParentType extends ResolversParentTypes['Person'] = ResolversParentTypes['Person']> = {
+	disabledAt?: Resolver<Maybe<ResolversTypes['DateTime']>, ParentType, ContextType>
 	email?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>
 	emailOtpEnabled?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
 	emailVerified?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
@@ -4681,6 +4730,8 @@ export type Resolvers<ContextType = any> = {
 	DisconnectIDPResponse?: DisconnectIdpResponseResolvers<ContextType>
 	EnableIDPError?: EnableIdpErrorResolvers<ContextType>
 	EnableIDPResponse?: EnableIdpResponseResolvers<ContextType>
+	EnablePersonError?: EnablePersonErrorResolvers<ContextType>
+	EnablePersonResponse?: EnablePersonResponseResolvers<ContextType>
 	ForceSignOutPersonError?: ForceSignOutPersonErrorResolvers<ContextType>
 	ForceSignOutPersonResponse?: ForceSignOutPersonResponseResolvers<ContextType>
 	IDPOptionsOutput?: IdpOptionsOutputResolvers<ContextType>

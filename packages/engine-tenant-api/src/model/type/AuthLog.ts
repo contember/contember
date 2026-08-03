@@ -16,6 +16,7 @@ export type AuthActionType =
 	| 'passwordless_login_exchange'
 	| 'passwordless_login'
 	| 'person_disable'
+	| 'person_enable'
 	| 'session_revoked_by_user'
 	| 'forced_sign_out'
 	| 'global_role_grant'

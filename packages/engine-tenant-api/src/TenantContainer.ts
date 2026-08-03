@@ -102,6 +102,7 @@ import { IDPQueryResolver } from './resolvers/query/IDPQueryResolver.js'
 import { UpdateIDPMutationResolver } from './resolvers/mutation/idp/UpdateIDPMutationResolver.js'
 import { TenantCredentials, TenantMigrationsRunner } from './migrations/index.js'
 import { DisablePersonMutationResolver } from './resolvers/mutation/person/DisablePersonMutationResolver.js'
+import { EnablePersonMutationResolver } from './resolvers/mutation/person/EnablePersonMutationResolver.js'
 import { ForceSignOutMutationResolver } from './resolvers/mutation/person/ForceSignOutMutationResolver.js'
 import { RevokeSessionMutationResolver } from './resolvers/mutation/person/RevokeSessionMutationResolver.js'
 import { MailTemplateQueryResolver } from './resolvers/query/MailTemplateQueryResolver.js'
@@ -392,6 +393,10 @@ export class TenantContainerFactory {
 			.addService(
 				'disablePersonMutationResolver',
 				({ personAccessManager, personManager }) => new DisablePersonMutationResolver(personAccessManager, personManager),
+			)
+			.addService(
+				'enablePersonMutationResolver',
+				({ personAccessManager, personManager }) => new EnablePersonMutationResolver(personAccessManager, personManager),
 			)
 			.addService(
 				'forceSignOutMutationResolver',

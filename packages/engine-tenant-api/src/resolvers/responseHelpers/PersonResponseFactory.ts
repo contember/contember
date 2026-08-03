@@ -14,6 +14,7 @@ export class PersonResponseFactory {
 			emailVerified: !!personRow.email_verified_at,
 			name: personRow.name,
 			passwordlessEnabled: personRow.passwordless_enabled,
+			disabledAt: personRow.disabled_at,
 			identity: {
 				id: personRow.identity_id,
 				projects,

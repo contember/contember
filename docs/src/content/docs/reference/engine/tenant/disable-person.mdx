@@ -2,7 +2,7 @@
 title: Disabling a person
 ---
 
-`disablePerson` permanently disables a person account. Once disabled, the person can no longer sign in via any flow — password, IDP, or passwordless. Existing sessions are **not** revoked by this mutation; pair it with [`forceSignOutPerson`](/reference/engine/tenant/sessions#admin-force-sign-out) if you also need to end the person's active sessions.
+`disablePerson` disables a person account. Once disabled, the person can no longer sign in via any flow — password, IDP, or passwordless. Existing sessions are **not** revoked by this mutation; pair it with [`forceSignOutPerson`](/reference/engine/tenant/sessions#admin-force-sign-out) if you also need to end the person's active sessions.
 
 ```graphql
 mutation {
@@ -46,8 +46,50 @@ mutation {
 
 ## Re-enabling
 
-There is no `enablePerson` mutation. To restore access, you need direct database access to clear the disabled flag — by design, disabling is meant to be a deliberate, long-term decision rather than a temporary suspension. Persons that need temporary lockouts should be force-signed-out instead.
+:::note[Available since 2.2]
+:::
+
+`enablePerson` is the exact inverse of `disablePerson` — it clears the disabled flag so the person can sign in again:
+
+```graphql
+mutation {
+  enablePerson(personId: "…") {
+    ok
+    error { code developerMessage }
+  }
+}
+```
+
+Errors:
+
+| Code | Cause |
+|---|---|
+| `PERSON_NOT_FOUND` | No person with that id. |
+| `PERSON_ALREADY_ENABLED` | The person is not disabled. |
+
+Enabling only lifts the sign-in block. API keys invalidated while the account was disabled stay invalidated, so the person has to sign in again.
+
+Permissions are the same as for disabling — `enablePerson` is gated by the very same `PERSON_DISABLE` action against the target's roles, so anyone who may disable a person may also re-enable them. There is no separate permission to grant.
+
+## Reading the disabled state
+
+:::note[Available since 2.2]
+:::
+
+`Person.disabledAt` exposes the state so a management UI can show it and offer the right action:
+
+```graphql
+query {
+  personById(id: "…") {
+    id
+    email
+    disabledAt
+  }
+}
+```
+
+It is the timestamp of the disabling, or `null` while the account is active. The field is read-only — change it with `disablePerson` / `enablePerson`. It is queryable wherever a `Person` is reachable — `me`, `personById`, the [`persons`](/reference/engine/tenant/memberships#listing-persons-across-the-tenant) listing, and `projectBySlug { members { identity { person } } }` — and needs no permission beyond the one that makes the `Person` visible in the first place.
 
 ## Audit
 
-Records `person_disable` in the [audit log](/reference/engine/tenant/audit-log) with `personId` set to the target.
+Both mutations record an entry in the [audit log](/reference/engine/tenant/audit-log) with `personId` set to the target — `disablePerson` records `person_disable`, `enablePerson` records `person_enable` *(since 2.2)*. A failed attempt against an existing person is recorded too, so a repeated `PERSON_ALREADY_ENABLED` shows up in the trail.

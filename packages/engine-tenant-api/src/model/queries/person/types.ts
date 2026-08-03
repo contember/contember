@@ -36,4 +36,5 @@ export interface PersonListRow {
 	readonly email_otp_enabled: boolean
 	readonly passwordless_enabled: boolean | null
 	readonly email_verified_at: Date | null
+	readonly disabled_at: Date | null
 }

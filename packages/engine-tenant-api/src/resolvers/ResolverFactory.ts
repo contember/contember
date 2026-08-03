@@ -40,6 +40,7 @@ import { DateTimeType, IntervalType, JSONType } from '@contember/graphql-utils'
 import { IDPQueryResolver } from './query/IDPQueryResolver.js'
 import { UpdateIDPMutationResolver } from './mutation/idp/UpdateIDPMutationResolver.js'
 import { DisablePersonMutationResolver } from './mutation/person/DisablePersonMutationResolver.js'
+import { EnablePersonMutationResolver } from './mutation/person/EnablePersonMutationResolver.js'
 import { ForceSignOutMutationResolver } from './mutation/person/ForceSignOutMutationResolver.js'
 import { RevokeSessionMutationResolver } from './mutation/person/RevokeSessionMutationResolver.js'
 import { MailTemplateQueryResolver } from './query/MailTemplateQueryResolver.js'
@@ -78,6 +79,7 @@ class ResolverFactory {
 			passwordlessMutationResolver: PasswordlessMutationResolver
 
 			disablePersonMutationResolver: DisablePersonMutationResolver
+			enablePersonMutationResolver: EnablePersonMutationResolver
 			forceSignOutMutationResolver: ForceSignOutMutationResolver
 			resetPersonMfaMutationResolver: ResetPersonMfaMutationResolver
 			revokeSessionMutationResolver: RevokeSessionMutationResolver
@@ -188,6 +190,7 @@ class ResolverFactory {
 					this.resolvers.disconnectMyIdentityProviderMutationResolver,
 				),
 				disablePerson: this.resolvers.disablePersonMutationResolver.disablePerson.bind(this.resolvers.disablePersonMutationResolver),
+				enablePerson: this.resolvers.enablePersonMutationResolver.enablePerson.bind(this.resolvers.enablePersonMutationResolver),
 				forceSignOutPerson: this.resolvers.forceSignOutMutationResolver.forceSignOutPerson.bind(this.resolvers.forceSignOutMutationResolver),
 				resetPersonMfa: this.resolvers.resetPersonMfaMutationResolver.resetPersonMfa.bind(this.resolvers.resetPersonMfaMutationResolver),
 				revokeSession: this.resolvers.revokeSessionMutationResolver.revokeSession.bind(this.resolvers.revokeSessionMutationResolver),

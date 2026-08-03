@@ -7,10 +7,11 @@ export interface ListPersonsResponseRow {
 	email: string
 	name?: string
 	emailOtpEnabled?: boolean
+	disabledAt?: Date | null
 }
 
 const COLUMNS =
-	'"person"."id", "person"."identity_id", "person"."email", "person"."name", "person_mfa"."totp_activated_at" AS "otp_activated_at", coalesce("person_mfa"."email_otp_enabled", false) AS "email_otp_enabled", "person"."passwordless_enabled", "person"."email_verified_at"'
+	'"person"."id", "person"."identity_id", "person"."email", "person"."name", "person_mfa"."totp_activated_at" AS "otp_activated_at", coalesce("person_mfa"."email_otp_enabled", false) AS "email_otp_enabled", "person"."passwordless_enabled", "person"."email_verified_at", "person"."disabled_at"'
 
 const FROM = `FROM "tenant"."person"
 	LEFT JOIN "tenant"."person_mfa" AS "person_mfa" ON "person_mfa"."person_id" = "person"."id"`
@@ -49,6 +50,7 @@ export const listPersonsSql = (args: {
 				email_otp_enabled: row.emailOtpEnabled ?? false,
 				passwordless_enabled: null,
 				email_verified_at: null,
+				disabled_at: row.disabledAt ?? null,
 			})),
 		},
 	}

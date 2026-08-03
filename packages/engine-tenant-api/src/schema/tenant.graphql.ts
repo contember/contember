@@ -119,6 +119,7 @@ const schema: DocumentNode = gql`
 		disableEmailOtp: DisableEmailOtpResponse
 
 		disablePerson(personId: String!): DisablePersonResponse
+		enablePerson(personId: String!): EnablePersonResponse
 		forceSignOutPerson(personId: String!, reason: String): ForceSignOutPersonResponse
 		resetPersonMfa(personId: String!): ResetPersonMfaResponse
 		revokeSession(sessionId: String!): RevokeSessionResponse
@@ -1244,6 +1245,11 @@ const schema: DocumentNode = gql`
 		"""
 		emailOtpEnabled: Boolean!
 		emailVerified: Boolean!
+		"""
+		When the account was disabled (see \`disablePerson\`), null while the person
+		is active. Read-only — flip it with \`disablePerson\` / \`enablePerson\`.
+		"""
+		disabledAt: DateTime
 		identity: Identity!
 
 		"""
@@ -1538,6 +1544,23 @@ const schema: DocumentNode = gql`
 
 	enum DisablePersonErrorCode {
 		PERSON_ALREADY_DISABLED
+		PERSON_NOT_FOUND
+	}
+
+	# === enablePerson ===
+
+	type EnablePersonResponse {
+		ok: Boolean!
+		error: EnablePersonError
+	}
+
+	type EnablePersonError {
+		code: EnablePersonErrorCode!
+		developerMessage: String!
+	}
+
+	enum EnablePersonErrorCode {
+		PERSON_ALREADY_ENABLED
 		PERSON_NOT_FOUND
 	}
 

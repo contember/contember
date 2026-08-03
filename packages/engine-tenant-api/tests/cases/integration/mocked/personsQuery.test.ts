@@ -11,6 +11,7 @@ test('persons query lists all persons (SUPER_ADMIN path, no filter)', async () =
 	const identity1 = testUuid(2)
 	const person2 = testUuid(3)
 	const identity2 = testUuid(4)
+	const disabledAt = new Date('2019-09-04T12:00:00.000Z')
 
 	await executeTenantTest({
 		query: {
@@ -21,6 +22,7 @@ query {
 		email
 		name
 		emailOtpEnabled
+		disabledAt
 		identity {
 			id
 		}
@@ -31,7 +33,7 @@ query {
 		executes: [
 			listPersonsSql({
 				rows: [
-					{ personId: person1, identityId: identity1, email: 'alice@example.com', name: 'Alice', emailOtpEnabled: true },
+					{ personId: person1, identityId: identity1, email: 'alice@example.com', name: 'Alice', emailOtpEnabled: true, disabledAt },
 					{ personId: person2, identityId: identity2, email: 'bob@example.com', name: 'Bob' },
 				],
 			}),
@@ -39,8 +41,15 @@ query {
 		return: {
 			data: {
 				persons: [
-					{ id: person1, email: 'alice@example.com', name: 'Alice', emailOtpEnabled: true, identity: { id: identity1 } },
-					{ id: person2, email: 'bob@example.com', name: 'Bob', emailOtpEnabled: false, identity: { id: identity2 } },
+					{
+						id: person1,
+						email: 'alice@example.com',
+						name: 'Alice',
+						emailOtpEnabled: true,
+						disabledAt: disabledAt.toISOString(),
+						identity: { id: identity1 },
+					},
+					{ id: person2, email: 'bob@example.com', name: 'Bob', emailOtpEnabled: false, disabledAt: null, identity: { id: identity2 } },
 				],
 			},
 		},

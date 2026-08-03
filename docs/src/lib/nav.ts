@@ -94,6 +94,7 @@ export const nav: NavItem[] = [
 				items: [
 					doc('reference/interface/ui-components/overview', 'Overview'),
 					doc('reference/interface/ui-components/datagrid'),
+					doc('reference/interface/ui-components/tenant'),
 				],
 			},
 		],

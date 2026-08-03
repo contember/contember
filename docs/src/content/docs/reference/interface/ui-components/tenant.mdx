@@ -1,0 +1,138 @@
+---
+title: Tenant
+---
+
+Contember ships a full set of UI Components for a **tenant management dashboard** — sign-in, self-service account settings, project membership, API keys, tenant-wide administration, and project secrets — on top of the [Tenant API](/reference/engine/tenant/overview).
+
+:::note[Available since 2.2]
+Account self-service (profile, e-mail OTP, backup codes, passwordless toggle, sessions), admin person management (`PersonDetail`, disable/enable/force-sign-out/reset-MFA, global roles), the audit log listing, and project secrets are new in this release. Earlier versions only covered sign-in, invites, project members, and API keys.
+:::
+
+## Two layers, one pairing
+
+The tenant UI is split across two packages, same as the rest of the interface:
+
+- **`@contember/react-client-tenant`** ships the **form providers**, **triggers**, and **hooks** — the data layer. A provider (e.g. `ChangeProfileForm`) runs the mutation and exposes a `useXForm()` context; a trigger (e.g. `DisablePersonTrigger`) fires a single mutation on click.
+- **`@contember/react-ui-lib-tenant`** ships the matching **field components** (e.g. `ChangeProfileFormFields`) and **listing components** (e.g. `PersonsList`) — pre-styled Tailwind/Shadcn markup with no logic of its own. A field component reads its state through the provider's `useXForm()` hook, so it only renders correctly nested inside the matching provider.
+
+A host app always pairs the two:
+
+```tsx
+<ChangeProfileForm personId={personId} onSuccess={() => refresh()}>
+	<form className="grid gap-4">
+		<ChangeProfileFormFields />
+	</form>
+</ChangeProfileForm>
+```
+
+The provider/trigger/hook half is re-exported through `react-identity` and then `@contember/interface`, so it is reachable with a single import next to the rest of the binding API. The field/listing half is **not** re-exported through `interface` — pull it from `@contember/react-ui-lib-tenant` directly, or, in a project scaffolded by `@contember/create`, from the copy already sitting in your project.
+
+### The `admin/lib/tenant` copy
+
+Like the rest of the [UI Components](/reference/interface/ui-components/overview), `react-ui-lib-tenant` is meant to be **owned**, not depended on. `scripts/assemble-ui-lib.mjs` copies its source into `admin/lib/tenant` at scaffold time (and again on `scripts/update-ui-lib.sh`), rewriting the `@contember/react-ui-lib-tenant` imports to `~/lib/tenant`. The template imports it as:
+
+```tsx
+import { ApiKeyList, PersonDetail, PersonsList, /* … */ } from '~/lib/tenant'
+```
+
+Open any of those files under `admin/lib/tenant` and edit freely — styling, markup, added columns — there is nothing to eject from.
+
+## Sign-in
+
+| Export | What it does | From |
+|---|---|---|
+| `LoginForm` / `LoginFormFields` | E-mail + password sign-in; walks the `otp-required` step for TOTP or e-mail OTP, with a *(since 2.2)* backup-code fallback | client-tenant / ui-lib-tenant |
+| `PasswordlessSignInInitForm` / `PasswordlessSignInInitFormFields` | Requests a magic-link / one-time-code e-mail | client-tenant / ui-lib-tenant |
+| `PasswordlessSignInForm` / `PasswordlessSignInFormFields` | Verifies the magic-link token or code; same OTP + *(since 2.2)* backup-code step as `LoginForm` | client-tenant / ui-lib-tenant |
+| `PasswordResetRequestForm` / `PasswordResetRequestFormFields` | Requests a password-reset e-mail | client-tenant / ui-lib-tenant |
+| `PasswordResetForm` / `PasswordResetFormFields` | Sets a new password from a reset token | client-tenant / ui-lib-tenant |
+| `VerifyEmailForm` / `VerifyEmailFormFields` | Confirms an e-mail-verification token | client-tenant / ui-lib-tenant |
+| `ConfirmEmailChangeForm` / `ConfirmEmailChangeFormFields` | Confirms a pending e-mail address change | client-tenant / ui-lib-tenant |
+| `RequestEmailVerificationForm` / `RequestEmailVerificationFormFields` | Re-sends the e-mail verification link | client-tenant / ui-lib-tenant |
+| `IDP`, `IDPInitTrigger` | Redirect-based sign-in with an external identity provider (OIDC, Google, …) | client-tenant |
+
+## My account
+
+| Export | What it does | From |
+|---|---|---|
+| `ChangeMyProfileForm` / `ChangeMyProfileFormFields` | Edit your own e-mail and name | client-tenant / ui-lib-tenant |
+| `ChangeMyPasswordForm` / `ChangeMyPasswordFormFields` | Change your own password (current + new) | client-tenant / ui-lib-tenant |
+| `OtpSetup` | Authenticator-app (TOTP) enroll / disable, including the QR code | ui-lib-tenant |
+| `EmailOtpSetup` | E-mail one-time-code 2FA enroll / disable | ui-lib-tenant |
+| `BackupCodes` / `BackupCodesDisplay` | View the current MFA state and regenerate recovery codes; `BackupCodesDisplay` renders a fresh code set once, right after it is issued | ui-lib-tenant |
+| `PasswordlessToggle` | Enable / disable passwordless sign-in for yourself | ui-lib-tenant |
+| `SessionList` (no `personId`) | Your own active sessions, with a revoke action per row | ui-lib-tenant |
+| `IdentityProviderConnections` | Connected external identity providers, with a disconnect action | ui-lib-tenant |
+
+## Project members
+
+| Export | What it does | From |
+|---|---|---|
+| `InviteForm` / `InviteFormFields` | Invite a new person by e-mail, with initial project roles | client-tenant / ui-lib-tenant |
+| `AddProjectMemberForm` / `AddProjectMemberFormFields` | Add an **existing** identity (by id) to the project, with roles | client-tenant / ui-lib-tenant |
+| `UpdateProjectMemberForm` / `UpdateProjectMemberFormFields` | Change an existing member's roles and membership variables | client-tenant / ui-lib-tenant |
+| `PersonList` (aliased `MemberList`) | The project's member table — roles, MFA badges, edit/remove | ui-lib-tenant |
+| `MembershipsControl`, `useIntrospectionRolesConfig` | Role/variable picker; roles are introspected from the project's schema unless you pass your own `RolesConfig` | ui-lib-tenant |
+
+## API keys
+
+| Export | What it does | From |
+|---|---|---|
+| `CreateApiKeyForm` / `CreateApiKeyFormFields` | Create a project-scoped permanent API key | client-tenant / ui-lib-tenant |
+| `ApiKeyList` | The project's permanent keys — roles, status, created/last-used/expiry, disable action. Rewritten this release onto `useProjectApiKeysQuery` | ui-lib-tenant |
+| `CreateGlobalApiKeyForm` / `CreateGlobalApiKeyFormFields` | Create a tenant-wide (global) API key with global roles | client-tenant / ui-lib-tenant |
+| `GlobalApiKeyList` | Global keys listing + disable action | ui-lib-tenant |
+
+## Tenant administration
+
+Needs a global role (typically `SUPER_ADMIN`) or an explicit tenant ACL grant — see [Permissions](#permissions) below.
+
+| Export | What it does | From |
+|---|---|---|
+| `PersonsList` | Tenant-wide person listing — e-mail filter, roles, MFA badges, *(since 2.2)* a disabled-state column, row actions, and an `onSelectPerson` callback for opening `PersonDetail` | ui-lib-tenant |
+| `PersonDetail` | Admin view of one person — profile, password, MFA state + reset, global roles, sessions, connected identity providers | ui-lib-tenant |
+| `DisablePersonAction` / `EnablePersonAction` / `ForceSignOutPersonAction` / `ResetPersonMfaAction` | Confirm-dialog action buttons (from `person-actions.tsx`), each wrapping the matching trigger below | ui-lib-tenant |
+| `DisablePersonTrigger` / `EnablePersonTrigger` / `ForceSignOutPersonTrigger` / `ResetPersonMfaTrigger` | The one-shot mutation triggers behind the actions above | client-tenant |
+| `ChangeProfileForm` / `ChangeProfileFormFields` | Admin edits another person's e-mail and name | client-tenant / ui-lib-tenant |
+| `ChangePasswordForm` / `SetPersonPasswordFormFields` | Admin sets another person's password directly (no current-password check) | client-tenant / ui-lib-tenant |
+| `GlobalRolesControl` | Add / remove tenant-wide (global) roles on an identity | ui-lib-tenant |
+| `AuthLogList` | The authentication audit log — filter by event type(s), success/failure, and person identifier, with pagination | ui-lib-tenant |
+
+## Project secrets
+
+| Export | What it does | From |
+|---|---|---|
+| `SetProjectSecretForm` / `SetProjectSecretFormFields` | Set a project secret's value. The value is write-only — it is never returned by the API again | client-tenant / ui-lib-tenant |
+| `ProjectSecretList` | Secret **keys** and timestamps only, never values | ui-lib-tenant |
+
+## End-to-end example
+
+A provider + fields pairing, from the project template's `admin/app/pages/tenant.tsx` (`~/lib/tenant` is the copied `react-ui-lib-tenant`, see above):
+
+```tsx
+import { ChangeMyProfileForm, useIdentity } from '@contember/react-identity'
+import { ChangeMyProfileFormFields } from '~/lib/tenant'
+
+const person = useIdentity()?.person
+
+// keyed on the identity values: the form snapshots initialValues on mount
+<ChangeMyProfileForm
+	key={`${person?.email ?? ''} ${person?.name ?? ''}`}
+	initialValues={{ email: person?.email ?? '', name: person?.name ?? '' }}
+	onSuccess={() => showToast(<ToastContent>Profile updated</ToastContent>, { type: 'success' })}
+>
+	<form className="grid gap-4">
+		<ChangeMyProfileFormFields />
+	</form>
+</ChangeMyProfileForm>
+```
+
+The `key` matters: the form snapshots `initialValues` when it mounts, so re-keying on the loaded values is what makes the fields pick up a fresh profile after e.g. a refetch. See the full `Security`, `Members`, `ApiKeys`, `Persons`, `AuditLog`, and `ProjectSecrets` page components in that same template file for how the pieces above compose into full pages.
+
+## Permissions
+
+`PersonsList` and `GlobalApiKeyList` read the `persons` and `globalApiKeys` queries, both of which check the caller's permission server-side and return an **empty array** rather than an error when it's missing — an under-privileged caller just sees an empty table. `AuthLogList`'s underlying `authLog` query is stricter: it requires `system:viewAuthLog` and throws on a missing grant, so that list renders its failed-to-load state instead of an empty table for a caller without audit-log access. Either way, none of the three throws for lack of data to display — worst case is an empty or errored listing, not a crashed page. See [Tenant ACL permissions](/reference/engine/schema/acl#tenant-permissions) for granting these.
+
+## Not covered here
+
+Tenant configuration, auth policies, mail templates, and identity-provider administration are deliberately **code/IaC-driven** and have no corresponding UI component — see the [Tenant API reference](/reference/engine/tenant/overview) for those.

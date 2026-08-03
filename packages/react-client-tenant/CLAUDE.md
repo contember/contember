@@ -12,16 +12,16 @@ It is built on top of `@contember/graphql-client-tenant` — a fully typed clien
 
 ## Hooks
 
-- **Queries** (`hooks/queries/`): `useMeQuery`, `useProjectMembersQuery`, `useProjectMembershipsQuery`, `useProjectRolesDefinitionQuery`, `usePersonsQuery`, `useProjectApiKeysQuery`, `useGlobalApiKeysQuery`, `useProjectSecretsQuery`.
-- **Mutations** (`hooks/mutations/`, grouped by domain): `apiKey`, `auth`, `memberships`, `invite`, `otp`, `passwordReset`, `passwordless`, `emailVerification`, `profile`, `idp`.
+- **Queries** (`hooks/queries/`): `useMeQuery`, `useProjectMembersQuery`, `useProjectMembershipsQuery`, `useProjectRolesDefinitionQuery`, `usePersonsQuery`, `usePersonQuery` (single person by id, incl. sessions and identity providers), `useProjectApiKeysQuery`, `useGlobalApiKeysQuery`, `useProjectSecretsQuery`, `useMySessionsQuery` / `usePersonSessionsQuery` (own vs. admin-view sessions), `useAuthLogQuery` (paginated, filterable audit log).
+- **Mutations** (`hooks/mutations/`, grouped by domain): `apiKey`, `auth`, `emailOtp` (init/confirm/disable e-mail OTP), `emailVerification`, `identity` (`useAddGlobalIdentityRolesMutation` / `useRemoveGlobalIdentityRolesMutation`), `idp`, `invite`, `memberships`, `otp` (incl. `useRegenerateBackupCodesMutation`), `passwordReset`, `passwordless`, `person` (`useDisablePersonMutation`, `useEnablePersonMutation`, `useForceSignOutPersonMutation`, `useResetPersonMfaMutation`, `useChangePasswordMutation` — admin sets a person's password directly), `profile`, `project` (`useSetProjectSecretMutation`), `session` (`useRevokeSessionMutation`).
 
 Each hook defines a fragment with the `TenantApi.x$` / `x$$` fetchers, derives its result type via `ModelType<typeof fragment>`, and passes query arguments with `ParameterRef.of(...)`.
 
 ## Components
 
-- **Form providers** (`components/forms/`): `TenantForm` plus per-flow wrappers — `LoginForm`, `InviteForm`, `CreateApiKeyForm`, `CreateGlobalApiKeyForm`, `UpdateProjectMemberForm`, `ChangeMyPasswordForm`, `PasswordReset*`, `VerifyEmailForm`, `PasswordlessSignIn*`, `Otp*`, etc. Each exposes a `useXForm()` hook (a typed view of `useForm`) consumed by the field components in `react-ui-lib-tenant`. Form state is `FormContextValue<Values, ErrorCode>` (`values` / `errors` / `state` / `setValue`).
+- **Form providers** (`components/forms/`): `TenantForm` plus per-flow wrappers — `LoginForm` (now with a `backupCode` fallback field alongside `otpToken`), `InviteForm`, `AddProjectMemberForm`, `CreateApiKeyForm`, `CreateGlobalApiKeyForm`, `UpdateProjectMemberForm`, `ChangeMyPasswordForm`, `ChangeMyProfileForm`, `ChangeProfileForm` (admin edits another person), `ChangePasswordForm` (admin sets another person's password), `PasswordReset*`, `VerifyEmailForm`, `EmailOtpConfirmForm`, `SetProjectSecretForm`, `PasswordlessSignIn*` (also with a `backupCode` fallback), `Otp*`, etc. Each exposes a `useXForm()` hook (a typed view of `useForm`) consumed by the field components in `react-ui-lib-tenant`. Form state is `FormContextValue<Values, ErrorCode>` (`values` / `errors` / `state` / `setValue`).
 - **Identity** (`components/`, `contexts.ts`): `IdentityProvider`, `IdentityState`, and the `useIdentity` / `useIdentityMethods` / `useIdentityState` contexts; `useFetchIdentity`, `useLogout`.
-- **Triggers** (`components/triggers/`): `DisableOtpTrigger`, `LogoutTrigger`, `RemoveProjectMemberTrigger`, `TenantActionTrigger`.
+- **Triggers** (`components/triggers/`): `DisableOtpTrigger`, `LogoutTrigger`, `RemoveProjectMemberTrigger`, `TenantActionTrigger`, plus one-shot admin/self-service triggers: `DisablePersonTrigger`, `EnablePersonTrigger`, `ForceSignOutPersonTrigger`, `ResetPersonMfaTrigger`, `RevokeSessionTrigger`, `RegenerateBackupCodesTrigger`, `InitEmailOtpTrigger`, `DisableEmailOtpTrigger`, `EnableMyPasswordlessTrigger`, `DisableMyPasswordlessTrigger`.
 - **IDP** (`components/idp/`): `IDP`, `IDPInitTrigger`, `IDPState` + `useIDPState`.
 
 ## Public API surface

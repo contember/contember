@@ -26,9 +26,10 @@ export type ConfigurationQueryResult = ModelType<typeof configFragment>
  * Reads the tenant-wide configuration. Read-only on purpose — the write path is
  * `contember tenant:apply`, there is no `useConfigureMutation`.
  *
- * Requires `system:configure`; the resolver **throws** for a caller without it
- * rather than returning a default, so consumers must treat the rejection as a
- * normal "not visible to you" state.
+ * Requires `system:viewConfig` — the read counterpart of `system:configure`, not
+ * the same action. The resolver **throws** for a caller without it rather than
+ * returning a default, so consumers must treat the rejection as a normal
+ * "not visible to you" state.
  */
 export const useConfigurationQuery = (options: TenantApiOptions = {}) => {
 	const executor = useTenantApi(options)

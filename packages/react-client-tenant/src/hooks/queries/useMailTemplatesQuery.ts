@@ -12,6 +12,8 @@ export type MailTemplatesQueryResult = readonly ModelType<typeof mailTemplateFra
  *
  * Read-only on purpose — templates are written with `contember tenant:apply`.
  * A template not listed here means the built-in default is in use.
+ *
+ * Requires `mailTemplate:list`; the resolver **throws** for a caller without it.
  */
 export const useMailTemplatesQuery = (options: TenantApiOptions = {}) => {
 	const executor = useTenantApi(options)

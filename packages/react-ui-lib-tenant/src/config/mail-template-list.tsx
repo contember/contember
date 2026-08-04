@@ -21,8 +21,9 @@ const templateKey = (template: { type: string; variant?: string | null; projectS
  * `MailTemplateList` shows the configured mail templates read-only, with the body
  * collapsed behind a toggle.
  *
- * Templates are written with `contember tenant:apply`. A type missing from this
- * list is not broken — it means the built-in default is in use.
+ * Templates are written with `contember tenant:apply`; reading them requires
+ * `mailTemplate:list`. A type missing from this list is not broken — it means the
+ * built-in default is in use.
  *
  * ## Example
  * ```tsx

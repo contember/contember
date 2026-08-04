@@ -45,9 +45,9 @@ const SettingsTable = ({ rows }: { rows: readonly (readonly [string, ReactNode])
  * `TenantConfigView` shows the tenant-wide configuration read-only. There is no
  * editing counterpart on purpose — the write path is `contember tenant:apply`.
  *
- * Requires `system:configure`. A caller without it gets a "no permission"
- * message rather than an error, because the resolver rejects instead of
- * returning defaults.
+ * Requires `system:viewConfig` (the read counterpart of `system:configure`). A
+ * caller without it gets a "no permission" message rather than an error, because
+ * the resolver rejects instead of returning defaults.
  *
  * ## Example
  * ```tsx

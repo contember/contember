@@ -73,7 +73,7 @@ Open any of those files under `admin/lib/tenant` and edit freely — styling, ma
 
 | Export | What it does | From |
 |---|---|---|
-| `InviteForm` / `InviteFormFields` | Invite a new person by e-mail, with initial project roles. *(since 2.3)* Pass `allowUnmanaged` to both to offer a "do not send an invitation e-mail" checkbox, which switches the submit to `unmanagedInvite` and reveals an optional password field — for seeding, migrations and air-gapped setups | client-tenant / ui-lib-tenant |
+| `InviteForm` / `InviteFormFields` | Invite a new person by e-mail, with initial project roles. *(since 2.3)* Pass `allowUnmanaged` to **both** to offer a "do not send an invitation e-mail" checkbox, which switches the submit to `unmanagedInvite` and reveals an optional password field — for seeding, migrations and air-gapped setups. Passing it only to the fields throws on submit instead of quietly mailing | client-tenant / ui-lib-tenant |
 | `AddProjectMemberForm` / `AddProjectMemberFormFields` | Add an **existing** identity (by id) to the project, with roles | client-tenant / ui-lib-tenant |
 | `UpdateProjectMemberForm` / `UpdateProjectMemberFormFields` | Change an existing member's roles and membership variables | client-tenant / ui-lib-tenant |
 | `PersonList` (aliased `MemberList`) | The project's member table — roles, MFA badges, edit/remove | ui-lib-tenant |
@@ -122,7 +122,7 @@ Needs a global role (typically `SUPER_ADMIN`) or an explicit tenant ACL grant �
 | `MailTemplateList` | Configured mail templates, body collapsed behind a toggle. A type missing here means the built-in default is in use | ui-lib-tenant |
 
 :::caution[These queries reject rather than return empty]
-Unlike the listing queries, all four resolvers throw a `ForbiddenError` for a caller without the permission (`system:configure`, or `idp:list` for providers). Use `isForbiddenError` from `react-client-tenant` to tell that apart from a real failure — the components already do, and render "you do not have permission to view this" instead of an error box.
+Unlike the listing queries, all four resolvers throw a `ForbiddenError` for a caller without the permission. Each one gates on its own action — `system:viewConfig` for the tenant settings, `system:configure` for auth policies, `idp:list` for providers, `mailTemplate:list` for templates — so a narrow ACL grant has to name the right one. Use `isForbiddenError` from `react-client-tenant` to tell that apart from a real failure — the components already do, and render "you do not have permission to view this" instead of an error box.
 :::
 
 Policies **aggregate**, they do not override by specificity: an identity is subject to every policy matching any of its roles, and the strictest value wins. `AuthPolicyList` states this under the table.

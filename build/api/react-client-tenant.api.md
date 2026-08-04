@@ -33,6 +33,7 @@ import { SetProjectSecretErrorCode } from '@contember/graphql-client-tenant';
 import { SetStateAction } from 'react';
 import { SignInErrorCode } from '@contember/graphql-client-tenant';
 import { SignInIDPErrorCode } from '@contember/graphql-client-tenant';
+import { SignUpErrorCode } from '@contember/graphql-client-tenant';
 import * as TenantApi from '@contember/graphql-client-tenant';
 import { UpdateProjectMemberErrorCode } from '@contember/graphql-client-tenant';
 import { VerifyEmailErrorCode } from '@contember/graphql-client-tenant';
@@ -148,6 +149,11 @@ export type AuthLogQueryVariables = {
     limit?: number;
     offset?: number;
 };
+
+// Warning: (ae-forgotten-export) The symbol "authPolicyFragment" needs to be exported by the entry point index.d.ts
+//
+// @public (undocumented)
+export type AuthPoliciesQueryResult = readonly ModelType<typeof authPolicyFragment>[];
 
 // @public (undocumented)
 export const ChangeMyPasswordForm: (input: ChangeMyPasswordFormProps) => JSX.Element;
@@ -354,6 +360,11 @@ export type ChangeProfileFormValues = {
 
 // @public (undocumented)
 export type ChangeProfileMutationVariables = Parameters<ReturnType<typeof useChangeProfileMutation>>[0];
+
+// Warning: (ae-forgotten-export) The symbol "configFragment" needs to be exported by the entry point index.d.ts
+//
+// @public (undocumented)
+export type ConfigurationQueryResult = ModelType<typeof configFragment>;
 
 // @public (undocumented)
 export const ConfirmEmailChangeForm: (input: ConfirmEmailChangeFormProps) => JSX.Element;
@@ -1036,6 +1047,11 @@ export interface IdentityProviderProps {
     children: ReactNode;
 }
 
+// Warning: (ae-forgotten-export) The symbol "identityProviderFragment" needs to be exported by the entry point index.d.ts
+//
+// @public (undocumented)
+export type IdentityProvidersQueryResult = readonly ModelType<typeof identityProviderFragment>[];
+
 // @public (undocumented)
 export const IdentityState: (input: IdentityStateProps) => JSX.Element | null;
 
@@ -1202,6 +1218,7 @@ export type InviteFormErrorCode = InviteErrorCode | 'UNKNOWN_ERROR' | 'FIELD_REQ
 
 // @public (undocumented)
 export interface InviteFormProps {
+    allowUnmanaged?: boolean;
     // (undocumented)
     children: ReactElement;
     // (undocumented)
@@ -1224,6 +1241,8 @@ export type InviteFormValues = {
     email: string;
     name: string;
     memberships: readonly MembershipInput[];
+    unmanaged: boolean;
+    password: string;
 };
 
 // @public (undocumented)
@@ -1283,6 +1302,9 @@ export type InviteMutationResult = ModelType<typeof inviteMutationResult>;
 // @public (undocumented)
 export type InviteMutationVariables = Parameters<ReturnType<typeof useInviteMutation>>[0];
 
+// @public
+export const isForbiddenError: (error: unknown) => boolean;
+
 // @public (undocumented)
 export const LoginForm: (input: LoginFormProps) => JSX.Element;
 
@@ -1324,6 +1346,11 @@ export const LogoutTrigger: (input: {
     children: ReactNode;
     idpLogout?: boolean;
 }) => JSX.Element;
+
+// Warning: (ae-forgotten-export) The symbol "mailTemplateFragment" needs to be exported by the entry point index.d.ts
+//
+// @public (undocumented)
+export type MailTemplatesQueryResult = readonly ModelType<typeof mailTemplateFragment>[];
 
 // Warning: (ae-forgotten-export) The symbol "identityFragment" needs to be exported by the entry point index.d.ts
 //
@@ -2080,6 +2107,92 @@ export const signOutMutation: TenantApi.MutationFetcher<{
 // @public (undocumented)
 export type SignOutMutationVariables = Parameters<ReturnType<typeof useSignOutMutation>>[0];
 
+// @public
+export const SignUpForm: (input: SignUpFormProps) => JSX.Element;
+
+// @public (undocumented)
+export type SignUpFormContextValue = FormContextValue<SignUpFormValues, SignUpFormErrorCode>;
+
+// @public (undocumented)
+export type SignUpFormError = FormError<SignUpFormValues, SignUpFormErrorCode>;
+
+// @public (undocumented)
+export type SignUpFormErrorCode = SignUpErrorCode | 'FIELD_REQUIRED' | 'INVALID_VALUE' | 'PASSWORD_MISMATCH' | 'UNKNOWN_ERROR';
+
+// @public (undocumented)
+export interface SignUpFormProps {
+    // (undocumented)
+    captchaToken?: string;
+    // (undocumented)
+    children: ReactElement;
+    // (undocumented)
+    onSuccess?: (args: {
+        result: SignUpMutationResult;
+    }) => void;
+    roles?: readonly string[];
+}
+
+// @public (undocumented)
+export type SignUpFormState = FormState;
+
+// @public (undocumented)
+export type SignUpFormValues = {
+    email: string;
+    password: string;
+    passwordConfirmation: string;
+    name: string;
+};
+
+// @public
+export const signUpMutation: TenantApi.MutationFetcher<{
+    readonly mutation?: ({
+        readonly ok: boolean;
+    } & {
+        readonly error?: ({
+            readonly code: TenantApi.SignUpErrorCode;
+        } & {
+            readonly developerMessage: string;
+        } & {
+            readonly weakPasswordReasons?: ReadonlyArray<TenantApi.WeakPasswordReason>;
+        } & {
+            readonly recommendedAction?: TenantApi.SignUpRecommendedAction;
+        }) | undefined;
+    } & {
+        readonly result?: {
+            readonly person: {
+                readonly id: string;
+            } & {
+                readonly email?: string;
+            } & {
+                readonly name?: string;
+            } & {
+                readonly identity: {
+                    readonly id: string;
+                } & {
+                    readonly description?: string;
+                } & {
+                    readonly roles?: ReadonlyArray<string>;
+                };
+            };
+        } | undefined;
+    }) | undefined;
+}, {
+    readonly email: string;
+    readonly password?: string;
+    readonly passwordHash?: string;
+    readonly roles?: ReadonlyArray<string>;
+    readonly name?: string;
+    readonly captchaToken?: string;
+}>;
+
+// Warning: (ae-forgotten-export) The symbol "signUpMutationResult" needs to be exported by the entry point index.d.ts
+//
+// @public (undocumented)
+export type SignUpMutationResult = ModelType<typeof signUpMutationResult>;
+
+// @public (undocumented)
+export type SignUpMutationVariables = Parameters<ReturnType<typeof useSignUpMutation>>[0];
+
 // @public (undocumented)
 export type TenantApiOptions = {
     readonly headers?: Record<string, string>;
@@ -2132,6 +2245,64 @@ export type TenantQueryLoaderState<Result> = {
     state: 'refreshing';
     data: Result;
 };
+
+// @public
+export const unmanagedInviteMutation: TenantApi.MutationFetcher<{
+    readonly mutation?: ({
+        readonly ok: boolean;
+    } & {
+        readonly error?: ({
+            readonly code: TenantApi.InviteErrorCode;
+        } & {
+            readonly developerMessage: string;
+        } & {
+            readonly endUserMessage?: string;
+        } & {
+            readonly membershipValidation?: readonly ({
+                readonly code: TenantApi.MembershipValidationErrorCode;
+            } & {
+                readonly role: string;
+            } & {
+                readonly variable?: string;
+            })[] | undefined;
+        }) | undefined;
+    } & {
+        readonly result?: ({
+            readonly isNew: boolean;
+        } & {
+            readonly person: {
+                readonly id: string;
+            } & {
+                readonly email?: string;
+            } & {
+                readonly name?: string;
+            } & {
+                readonly identity: {
+                    readonly id: string;
+                } & {
+                    readonly description?: string;
+                } & {
+                    readonly roles?: ReadonlyArray<string>;
+                };
+            };
+        }) | undefined;
+    }) | undefined;
+}, {
+    readonly email: string;
+    readonly name?: string;
+    readonly projectSlug: string;
+    readonly memberships: ReadonlyArray<TenantApi.MembershipInput>;
+    readonly options?: TenantApi.UnmanagedInviteOptions;
+    readonly password?: string;
+}>;
+
+// Warning: (ae-forgotten-export) The symbol "unmanagedInviteMutationResult" needs to be exported by the entry point index.d.ts
+//
+// @public (undocumented)
+export type UnmanagedInviteMutationResult = ModelType<typeof unmanagedInviteMutationResult>;
+
+// @public (undocumented)
+export type UnmanagedInviteMutationVariables = Parameters<ReturnType<typeof useUnmanagedInviteMutation>>[0];
 
 // @public (undocumented)
 export const UpdateProjectMemberForm: (input: UpdateProjectMemberFormProps) => JSX.Element;
@@ -2229,6 +2400,9 @@ export const useAddProjectMemberMutation: (input?: TenantApiOptions) => (variabl
 // @public (undocumented)
 export const useAuthLogQuery: (options?: TenantApiOptions) => (variables?: AuthLogQueryVariables) => Promise<AuthLogQueryResult>;
 
+// @public
+export const useAuthPoliciesQuery: (options?: TenantApiOptions) => (input?: {}) => Promise<AuthPoliciesQueryResult>;
+
 // @public (undocumented)
 export const useChangeMyPasswordForm: () => ChangeMyPasswordFormContextValue;
 
@@ -2265,6 +2439,9 @@ export const useChangeProfileMutation: (input?: TenantApiOptions) => (variables:
     readonly email?: string;
     readonly name?: string;
 }) => Promise<TenantMutationResponse<unknown, TenantApi.ChangeProfileErrorCode>>;
+
+// @public
+export const useConfigurationQuery: (options?: TenantApiOptions) => (input?: {}) => Promise<ConfigurationQueryResult>;
 
 // @public (undocumented)
 export const useConfirmEmailChangeForm: () => ConfirmEmailChangeFormContextValue;
@@ -2424,6 +2601,9 @@ export const useIdentity: () => Identity | undefined;
 // @public (undocumented)
 export const useIdentityMethods: () => IdentityMethods;
 
+// @public
+export const useIdentityProvidersQuery: (options?: TenantApiOptions) => (input?: {}) => Promise<IdentityProvidersQueryResult>;
+
 // @public (undocumented)
 export const useIdentityState: () => IdentityStateValue;
 
@@ -2494,6 +2674,9 @@ export const useLogout: () => (input?: {
     noRedirect?: boolean;
     idpLogout?: boolean;
 }) => Promise<void>;
+
+// @public
+export const useMailTemplatesQuery: (options?: TenantApiOptions) => (input?: {}) => Promise<MailTemplatesQueryResult>;
 
 // @public (undocumented)
 export const useMeQuery: (options?: TenantApiOptions) => (input: {}) => Promise<MeQueryData>;
@@ -2686,6 +2869,35 @@ export const useSignOutMutation: (input?: TenantApiOptions) => (variables: {
 }) => Promise<TenantMutationResponse<unknown, TenantApi.SignOutErrorCode>>;
 
 // @public (undocumented)
+export const useSignUpForm: () => SignUpFormContextValue;
+
+// @public (undocumented)
+export const useSignUpMutation: (input?: TenantApiOptions) => (variables: {
+    readonly email: string;
+    readonly password?: string;
+    readonly passwordHash?: string;
+    readonly roles?: ReadonlyArray<string>;
+    readonly name?: string;
+    readonly captchaToken?: string;
+}) => Promise<TenantMutationResponse<    {
+readonly person: {
+readonly id: string;
+} & {
+readonly email?: string;
+} & {
+readonly name?: string;
+} & {
+readonly identity: {
+readonly id: string;
+} & {
+readonly description?: string;
+} & {
+readonly roles?: ReadonlyArray<string>;
+};
+};
+}, TenantApi.SignUpErrorCode>>;
+
+// @public (undocumented)
 export const useTenantApi: (input?: TenantApiOptions) => <TData extends object, TVariables extends object>(fetcher: Fetcher<'Query' | 'Mutation', TData, TVariables>, options?: {
     readonly variables?: TVariables;
     readonly headers?: Record<string, string>;
@@ -2697,6 +2909,34 @@ export const useTenantMutation: <TResult, TError extends string = never, TVariab
 
 // @public (undocumented)
 export const useTenantQueryLoader: <TVariables extends object, Result>(fetcher: (variables: TVariables) => Promise<Result>, variables: TVariables) => [TenantQueryLoaderState<Result>, TenantQueryLoaderMethods];
+
+// @public (undocumented)
+export const useUnmanagedInviteMutation: (input?: TenantApiOptions) => (variables: {
+    readonly email: string;
+    readonly name?: string;
+    readonly projectSlug: string;
+    readonly memberships: ReadonlyArray<TenantApi.MembershipInput>;
+    readonly options?: TenantApi.UnmanagedInviteOptions;
+    readonly password?: string;
+}) => Promise<TenantMutationResponse<    {
+readonly isNew: boolean;
+} & {
+readonly person: {
+readonly id: string;
+} & {
+readonly email?: string;
+} & {
+readonly name?: string;
+} & {
+readonly identity: {
+readonly id: string;
+} & {
+readonly description?: string;
+} & {
+readonly roles?: ReadonlyArray<string>;
+};
+};
+}, TenantApi.InviteErrorCode>>;
 
 // @public (undocumented)
 export const useUpdateProjectMemberForm: () => UpdateProjectMemberFormContextValue;

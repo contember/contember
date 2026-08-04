@@ -1,13 +1,14 @@
 import { Maybe, Project, QueryProjectBySlugArgs, QueryResolvers } from '../../schema/index.js'
 import { TenantResolverContext } from '../TenantResolverContext.js'
 import { PermissionActions, ProjectManager } from '../../model/index.js'
+import { ProjectResponseFactory } from '../responseHelpers/ProjectResponseFactory.js'
 
 export class ProjectQueryResolver implements QueryResolvers {
 	constructor(private readonly projectManager: ProjectManager) {}
 
 	async projects(parent: unknown, args: unknown, context: TenantResolverContext): Promise<readonly Project[]> {
 		return (await this.projectManager.getProjectsByIdentity(context.db, context.identity.id, context.permissionContext)).map(
-			it => ({ ...it, members: [], roles: [], apiKeys: [], secrets: [] }),
+			ProjectResponseFactory.createProjectResponse,
 		)
 	}
 
@@ -27,6 +28,6 @@ export class ProjectQueryResolver implements QueryResolvers {
 			return null
 		}
 
-		return { ...project, members: [], roles: [], apiKeys: [], secrets: [] }
+		return ProjectResponseFactory.createProjectResponse(project)
 	}
 }

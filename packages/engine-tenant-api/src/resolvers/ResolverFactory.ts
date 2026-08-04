@@ -141,6 +141,7 @@ class ResolverFactory {
 				roles: this.resolvers.projectTypeResolver.roles.bind(this.resolvers.projectTypeResolver),
 				apiKeys: this.resolvers.projectTypeResolver.apiKeys.bind(this.resolvers.projectTypeResolver),
 				secrets: this.resolvers.projectTypeResolver.secrets.bind(this.resolvers.projectTypeResolver),
+				permissions: this.resolvers.projectTypeResolver.permissions.bind(this.resolvers.projectTypeResolver),
 			},
 			Query: {
 				me: this.resolvers.meQueryResolver.me.bind(this.resolvers.meQueryResolver),

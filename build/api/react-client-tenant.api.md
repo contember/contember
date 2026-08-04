@@ -1015,9 +1015,7 @@ export interface Identity {
     // (undocumented)
     readonly id: string;
     // (undocumented)
-    readonly permissions: {
-        readonly canCreateProject: boolean;
-    };
+    readonly permissions: IdentityGlobalPermissions;
     // (undocumented)
     readonly person?: Person;
     // (undocumented)
@@ -1028,6 +1026,24 @@ export interface Identity {
 
 // @internal (undocumented)
 export const IdentityContext: Context<Identity | undefined>;
+
+// @public
+export interface IdentityGlobalPermissions {
+    // (undocumented)
+    readonly canCreateGlobalApiKey: boolean;
+    // (undocumented)
+    readonly canCreateProject: boolean;
+    // (undocumented)
+    readonly canDeployEntrypoint: boolean;
+    // (undocumented)
+    readonly canListGlobalApiKeys: boolean;
+    readonly canListPersons: boolean;
+    // (undocumented)
+    readonly canManageConfiguration: boolean;
+    // (undocumented)
+    readonly canViewAuthLog: boolean;
+    readonly canViewConfiguration: boolean;
+}
 
 // @public (undocumented)
 export interface IdentityMethods {
@@ -1044,6 +1060,8 @@ export const IdentityMethodsContext: Context<IdentityMethods>;
 export interface IdentityProject {
     // (undocumented)
     readonly name: string;
+    // (undocumented)
+    readonly permissions: ProjectPermissions;
     // (undocumented)
     readonly roles: readonly string[];
     // (undocumented)
@@ -1681,6 +1699,25 @@ export type ProjectMembersQueryResult = readonly ModelType<typeof projectIdentit
 export type ProjectMembersQueryVariables = {
     projectSlug: string;
 } & TenantApi.ProjectMembersInput;
+
+// @public
+export interface ProjectPermissions {
+    // (undocumented)
+    readonly canAddMember: boolean;
+    // (undocumented)
+    readonly canCreateApiKey: boolean;
+    // (undocumented)
+    readonly canRemoveMember: boolean;
+    readonly canSetSecret: boolean;
+    // (undocumented)
+    readonly canUpdate: boolean;
+    // (undocumented)
+    readonly canUpdateMember: boolean;
+    // (undocumented)
+    readonly canViewMembers: boolean;
+    // (undocumented)
+    readonly canViewSecrets: boolean;
+}
 
 // Warning: (ae-forgotten-export) The symbol "projectRolesDefinitionFragment" needs to be exported by the entry point index.d.ts
 //

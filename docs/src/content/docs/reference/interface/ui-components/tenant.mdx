@@ -50,6 +50,11 @@ Open any of those files under `admin/lib/tenant` and edit freely — styling, ma
 | `ConfirmEmailChangeForm` / `ConfirmEmailChangeFormFields` | Confirms a pending e-mail address change | client-tenant / ui-lib-tenant |
 | `RequestEmailVerificationForm` / `RequestEmailVerificationFormFields` | Re-sends the e-mail verification link | client-tenant / ui-lib-tenant |
 | `IDP`, `IDPInitTrigger` | Redirect-based sign-in with an external identity provider (OIDC, Google, …) | client-tenant |
+| `SignUpForm` / `SignUpFormFields` | *(since 2.3)* Open registration. Creates the account only — it does **not** sign anyone in, so follow a success with `LoginForm`, or with a "check your inbox" screen when `config.signup.requireEmailVerification` is on | client-tenant / ui-lib-tenant |
+
+:::note[IdP buttons are configured, not discovered]
+`IDPInitTrigger` needs its provider slug from your own application config. `Query.identityProviders` requires `idp:list`, so an unauthenticated login page cannot ask the API which providers exist.
+:::
 
 ## My account
 
@@ -68,7 +73,7 @@ Open any of those files under `admin/lib/tenant` and edit freely — styling, ma
 
 | Export | What it does | From |
 |---|---|---|
-| `InviteForm` / `InviteFormFields` | Invite a new person by e-mail, with initial project roles | client-tenant / ui-lib-tenant |
+| `InviteForm` / `InviteFormFields` | Invite a new person by e-mail, with initial project roles. *(since 2.3)* Pass `allowUnmanaged` to **both** to offer a "do not send an invitation e-mail" checkbox, which switches the submit to `unmanagedInvite` and reveals an optional password field — for seeding, migrations and air-gapped setups. Passing it only to the fields throws on submit instead of quietly mailing | client-tenant / ui-lib-tenant |
 | `AddProjectMemberForm` / `AddProjectMemberFormFields` | Add an **existing** identity (by id) to the project, with roles | client-tenant / ui-lib-tenant |
 | `UpdateProjectMemberForm` / `UpdateProjectMemberFormFields` | Change an existing member's roles and membership variables | client-tenant / ui-lib-tenant |
 | `PersonList` (aliased `MemberList`) | The project's member table — roles, MFA badges, edit/remove | ui-lib-tenant |
@@ -105,6 +110,23 @@ Needs a global role (typically `SUPER_ADMIN`) or an explicit tenant ACL grant �
 | `SetProjectSecretForm` / `SetProjectSecretFormFields` | Set a project secret's value. The value is write-only — it is never returned by the API again | client-tenant / ui-lib-tenant |
 | `ProjectSecretList` | Secret **keys** and timestamps only, never values | ui-lib-tenant |
 
+## Configuration (read-only)
+
+*(since 2.3)* These four views display configuration that is written with [`contember tenant:apply`](/reference/engine/tenant/declarative-config). There is no editing counterpart by design — each view says so, rather than offering an affordance it would have to refuse.
+
+| Export | What it does | From |
+|---|---|---|
+| `TenantConfigView` | Tenant-wide settings — sign-up, e-mail change, password policy, passwordless, login backoff, anomaly detection, captcha, rate limits | ui-lib-tenant |
+| `AuthPolicyList` | Configured per-role MFA / session policies. Without it an enforced MFA requirement is invisible to an administrator — they only meet it as a sign-in prompt | ui-lib-tenant |
+| `IdentityProviderList` | Identity providers on the tenant, with the public configuration collapsed behind a toggle | ui-lib-tenant |
+| `MailTemplateList` | Configured mail templates, body collapsed behind a toggle. A type missing here means the built-in default is in use | ui-lib-tenant |
+
+:::caution[These queries reject rather than return empty]
+Unlike the listing queries, all four resolvers throw a `ForbiddenError` for a caller without the permission. Each one gates on its own action — `system:viewConfig` for the tenant settings, `system:configure` for auth policies, `idp:list` for providers, `mailTemplate:list` for templates — so a narrow ACL grant has to name the right one. Use `isForbiddenError` from `react-client-tenant` to tell that apart from a real failure — the components already do, and render "you do not have permission to view this" instead of an error box.
+:::
+
+Policies **aggregate**, they do not override by specificity: an identity is subject to every policy matching any of its roles, and the strictest value wins. `AuthPolicyList` states this under the table.
+
 ## End-to-end example
 
 A provider + fields pairing, from the project template's `admin/app/pages/tenant.tsx` (`~/lib/tenant` is the copied `react-ui-lib-tenant`, see above):
@@ -135,4 +157,6 @@ The `key` matters: the form snapshots `initialValues` when it mounts, so re-keyi
 
 ## Not covered here
 
-Tenant configuration, auth policies, mail templates, and identity-provider administration are deliberately **code/IaC-driven** and have no corresponding UI component — see the [Tenant API reference](/reference/engine/tenant/overview) for those.
+**Writing** tenant configuration, auth policies, mail templates and identity providers stays code/IaC-driven — read-only views exist (above), but the write path is [`contember tenant:apply`](/reference/engine/tenant/declarative-config). Project lifecycle (`createProject` / `updateProject`) has no UI either.
+
+`createSessionToken` — impersonation / support login — has a hook and a `CreateSessionTokenForm` provider in `react-client-tenant` but deliberately no styled component: it is the most sensitive operation in the API, so a host app has to build the surface it wants around it.

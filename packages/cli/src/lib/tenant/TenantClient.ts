@@ -4,9 +4,13 @@ import {
 	addIDPResponse$$,
 	addMailTemplateError$$,
 	addMailTemplateResponse$$,
+	authPolicy$$,
+	type AuthPolicyInput,
 	type ConfigInput,
 	configureError$$,
 	configureResponse$$,
+	createAuthPolicyError$$,
+	createAuthPolicyResponse$$,
 	createProjectResponse$$,
 	createProjectResponseError$$,
 	disableIDPError$$,
@@ -17,11 +21,14 @@ import {
 	type MailTemplate,
 	mutation$,
 	query$,
+	updateAuthPolicyError$$,
+	updateAuthPolicyResponse$$,
 	updateIDPError$$,
 	updateIDPResponse$$,
 } from '@contember/graphql-client-tenant'
 import { Fetcher, TextWriter, util } from 'graphql-ts-client-api'
-import { TenantGlobalConfig, TenantIdpOptions, TenantMailTemplate } from './tenantConfig.js'
+import { describeAuthPolicy } from './authPolicy.js'
+import { TenantAuthPolicy, TenantGlobalConfig, TenantIdpOptions, TenantMailTemplate } from './tenantConfig.js'
 
 export const createTenantApiUrl = (url: string) => {
 	if (url.endsWith('/')) {
@@ -39,6 +46,13 @@ export interface RemoteIdentityProvider {
 	disabledAt: string | null
 }
 
+export interface RemoteAuthPolicy {
+	id: string
+	scope: string
+	project: string | null
+	roles: readonly string[]
+}
+
 interface MutationResult {
 	ok: boolean
 	error?: { code: string; developerMessage?: string } | null
@@ -53,6 +67,9 @@ const updateIdpFetcher = mutation$.updateIDP(updateIDPResponse$$.error(updateIDP
 const enableIdpFetcher = mutation$.enableIDP(enableIDPResponse$$.error(enableIDPError$$))
 const disableIdpFetcher = mutation$.disableIDP(disableIDPResponse$$.error(disableIDPError$$))
 const addMailTemplateFetcher = mutation$.addMailTemplate(addMailTemplateResponse$$.error(addMailTemplateError$$))
+const authPoliciesFetcher = query$.authPolicies(authPolicy$$)
+const createAuthPolicyFetcher = mutation$.createAuthPolicy(createAuthPolicyResponse$$.error(createAuthPolicyError$$))
+const updateAuthPolicyFetcher = mutation$.updateAuthPolicy(updateAuthPolicyResponse$$.error(updateAuthPolicyError$$))
 
 export class TenantClient {
 	constructor(private readonly apiClient: GraphQlClient) {}
@@ -118,6 +135,28 @@ export class TenantClient {
 	public async addMailTemplate(template: TenantMailTemplate): Promise<void> {
 		const result = await this.exec(addMailTemplateFetcher, { template: template as MailTemplate })
 		this.assertOk(result.addMailTemplate, `addMailTemplate(${template.type}/${template.variant ?? ''})`)
+	}
+
+	public async listAuthPolicies(): Promise<RemoteAuthPolicy[]> {
+		const result = await this.exec(authPoliciesFetcher, {})
+		return result.authPolicies.map(it => ({
+			id: it.id,
+			scope: it.scope,
+			project: it.project ?? null,
+			roles: it.roles,
+		}))
+	}
+
+	// Same widening as `configure`: the config type allows an explicit `null` to
+	// clear a field, which the generated input renders as merely optional.
+	public async createAuthPolicy(policy: TenantAuthPolicy): Promise<void> {
+		const result = await this.exec(createAuthPolicyFetcher, { policy: policy as AuthPolicyInput })
+		this.assertOk(result.createAuthPolicy, `createAuthPolicy(${describeAuthPolicy(policy)})`)
+	}
+
+	public async updateAuthPolicy(id: string, policy: TenantAuthPolicy): Promise<void> {
+		const result = await this.exec(updateAuthPolicyFetcher, { id, policy: policy as AuthPolicyInput })
+		this.assertOk(result.updateAuthPolicy, `updateAuthPolicy(${describeAuthPolicy(policy)})`)
 	}
 
 	private async exec<TData extends object, TVariables extends object>(

@@ -9,7 +9,7 @@ import {
 	SetProjectSecretForm,
 	useIdentity,
 } from '@contember/react-identity'
-import { KeyRoundIcon, LockKeyholeIcon, ScrollTextIcon, UserRoundIcon, UsersIcon } from 'lucide-react'
+import { KeyRoundIcon, LockKeyholeIcon, ScrollTextIcon, SettingsIcon, UserRoundIcon, UsersIcon } from 'lucide-react'
 import { ReactNode, useRef, useState } from 'react'
 import { Slots } from '~/lib/layout'
 import {
@@ -17,6 +17,7 @@ import {
 	ApiKeyList,
 	ApiKeyListController,
 	AuthLogList,
+	AuthPolicyList,
 	BackupCodes,
 	ChangeMyPasswordFormFields,
 	ChangeMyProfileFormFields,
@@ -26,7 +27,9 @@ import {
 	GlobalApiKeyList,
 	GlobalApiKeyListController,
 	IdentityProviderConnections,
+	IdentityProviderList,
 	InviteFormFields,
+	MailTemplateList,
 	MemberListController,
 	OtpSetup,
 	PasswordlessToggle,
@@ -38,6 +41,7 @@ import {
 	ProjectSecretListController,
 	SessionList,
 	SetProjectSecretFormFields,
+	TenantConfigView,
 } from '~/lib/tenant'
 import { ToastContent, useShowToast } from '~/lib/toast'
 import { Card, CardContent, CardHeader, CardTitle } from '~/lib/ui/card'
@@ -144,13 +148,15 @@ export const Members = () => {
 					<InviteForm
 						projectSlug={projectSlug}
 						initialMemberships={[{ role: 'admin', variables: [] }]}
+						allowUnmanaged
 						onSuccess={args => {
-							showToast(<ToastContent>Invitation sent to {args.result.person?.email}</ToastContent>, { type: 'success' })
+							showToast(<ToastContent>Member created: {args.result.person?.email}</ToastContent>, { type: 'success' })
 							memberListController.current?.refresh()
 						}}
 					>
 						<form>
-							<InviteFormFields projectSlug={projectSlug} />
+							{/* allowUnmanaged offers the "no invitation e-mail" path, for seeding and air-gapped setups */}
+							<InviteFormFields projectSlug={projectSlug} allowUnmanaged />
 						</form>
 					</InviteForm>
 				</Panel>
@@ -303,6 +309,53 @@ export const AuditLog = () => (
 				<AuthLogList />
 			</CardContent>
 		</Card>
+	</>
+)
+
+export const Configuration = () => (
+	<>
+		<Slots.Title>
+			<Title icon={<SettingsIcon />}>Configuration</Title>
+		</Slots.Title>
+
+		{/* Read-only throughout: all four areas are written with `contember tenant:apply`. */}
+		<div className="flex flex-col gap-4">
+			<Card className="w-[80rem] max-w-full">
+				<CardHeader>
+					<CardTitle className="text-2xl">Auth policies</CardTitle>
+				</CardHeader>
+				<CardContent>
+					<AuthPolicyList />
+				</CardContent>
+			</Card>
+
+			<Card className="w-[80rem] max-w-full">
+				<CardHeader>
+					<CardTitle className="text-2xl">Identity providers</CardTitle>
+				</CardHeader>
+				<CardContent>
+					<IdentityProviderList />
+				</CardContent>
+			</Card>
+
+			<Card className="w-[80rem] max-w-full">
+				<CardHeader>
+					<CardTitle className="text-2xl">Mail templates</CardTitle>
+				</CardHeader>
+				<CardContent>
+					<MailTemplateList />
+				</CardContent>
+			</Card>
+
+			<Card className="w-[80rem] max-w-full">
+				<CardHeader>
+					<CardTitle className="text-2xl">Tenant settings</CardTitle>
+				</CardHeader>
+				<CardContent>
+					<TenantConfigView />
+				</CardContent>
+			</Card>
+		</div>
 	</>
 )
 

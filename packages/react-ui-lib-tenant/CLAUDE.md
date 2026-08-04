@@ -17,7 +17,7 @@ Ready-made admin UI for **tenant management** — a full tenant dashboard: sign-
 ## Forms (`forms/`)
 
 - `common.tsx` — `TenantFormField` / `TenantFormError` / `TenantFormLabel` / `TenantFormInput`, generic over a `FormContextValue`.
-- Field components: `InviteFormFields` (with `allowUnmanaged` for the no-mail path — must be paired with `allowUnmanaged` on `InviteForm`, or the form still mails), `SignUpFormFields`, `CreateApiKeyFormFields`, `CreateGlobalApiKeyFormFields`, `UpdateProjectMemberFormFields`, `AddProjectMemberFormFields`, `ChangeMyProfileFormFields`, `ChangeProfileFormFields`, `SetPersonPasswordFormFields`, `SetProjectSecretFormFields`, plus auth forms (`login`, `password-reset`, `verify-email`, passwordless variants incl. the backup-code fallback field, …).
+- Field components: `InviteFormFields` (with `allowUnmanaged` for the no-mail path — must be paired with `allowUnmanaged` on `InviteForm`, which throws on submit if it is not), `SignUpFormFields`, `CreateApiKeyFormFields`, `CreateGlobalApiKeyFormFields`, `UpdateProjectMemberFormFields`, `AddProjectMemberFormFields`, `ChangeMyProfileFormFields`, `ChangeProfileFormFields`, `SetPersonPasswordFormFields`, `SetProjectSecretFormFields`, plus auth forms (`login`, `password-reset`, `verify-email`, passwordless variants incl. the backup-code fallback field, …).
 - `GlobalRolesControl` — add/remove tenant-wide (global) roles on an identity; free-text role input since the API can't enumerate configured roles.
 - `MembershipsControl` — role/variable picker, with `useIntrospectionRolesConfig(projectSlug)` resolving roles from the project schema.
 

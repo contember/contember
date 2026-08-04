@@ -436,6 +436,7 @@ export const dict = {
 			} satisfies Record<SignUpFormErrorCode, string>,
 			title: 'Create an account',
 		},
+
 		passwordReset: {
 			token: 'Reset code',
 			password: 'Password',

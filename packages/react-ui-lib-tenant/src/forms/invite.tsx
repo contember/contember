@@ -60,7 +60,6 @@ export const InviteFormFields = ({ projectSlug, roles, allowUnmanaged }: InviteF
 				<>
 					<label className="flex items-center gap-2 mt-2">
 						<CheckboxInput
-							type="checkbox"
 							checked={form.values.unmanaged}
 							onChange={e => form.setValue('unmanaged', e.target.checked)}
 						/>
@@ -83,7 +82,7 @@ export const InviteFormFields = ({ projectSlug, roles, allowUnmanaged }: InviteF
 			)}
 
 			<Button type="submit" className="w-full" disabled={form.state === 'submitting'}>
-				{form.values.unmanaged ? dict.tenant.invite.submitUnmanaged : dict.tenant.invite.submit}
+				{allowUnmanaged && form.values.unmanaged ? dict.tenant.invite.submitUnmanaged : dict.tenant.invite.submit}
 			</Button>
 		</div>
 	)

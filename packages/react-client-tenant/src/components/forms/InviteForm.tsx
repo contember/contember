@@ -9,7 +9,7 @@ export type InviteFormValues = {
 	email: string
 	name: string
 	memberships: readonly MembershipInput[]
-	/** Switches to `unmanagedInvite`: create the member without sending mail. Ignored unless `allowUnmanaged`. */
+	/** Switches to `unmanagedInvite`: create the member without sending mail. Requires `allowUnmanaged` on the form. */
 	unmanaged: boolean
 	/** Only read when `unmanaged` is set; empty means the account is created without a password. */
 	password: string
@@ -34,7 +34,8 @@ export interface InviteFormProps {
 	/**
 	 * Lets the form submit through `unmanagedInvite` when `values.unmanaged` is
 	 * set — no invitation e-mail, optionally with a password. Off by default, so
-	 * a host app has to opt into offering it.
+	 * a host app has to opt into offering it. Submitting with `values.unmanaged`
+	 * set but this off throws rather than falling back to a mailed invitation.
 	 */
 	allowUnmanaged?: boolean
 	onSuccess?: (args: { result: InviteMutationResult }) => void
@@ -68,7 +69,14 @@ export const InviteForm = (
 				return errors
 			}}
 			execute={async ({ values }) => {
-				if (allowUnmanaged && values.unmanaged) {
+				if (values.unmanaged && !allowUnmanaged) {
+					// `InviteFormFields` takes its own `allowUnmanaged`, so the two can drift.
+					// Failing beats quietly mailing someone who asked for no mail.
+					throw new Error(
+						'InviteForm: values.unmanaged is set but the form was not given allowUnmanaged. Pass it to both InviteForm and InviteFormFields.',
+					)
+				}
+				if (values.unmanaged) {
 					return await unmanagedInvite({
 						email: values.email,
 						name: values.name,

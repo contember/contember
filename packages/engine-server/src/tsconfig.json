@@ -6,6 +6,7 @@
 	"references": [
 		{ "path": "../../engine-actions/src" },
 		{ "path": "../../engine-http/src" },
+		{ "path": "../../engine-panel/src" },
 		{ "path": "../../engine-plugins/src" },
 		{ "path": "../../engine-s3-plugin/src" },
 		{ "path": "../../engine-vimeo-plugin/src" }

@@ -23,7 +23,8 @@
 		"packages/playground/api/client",
 		"packages/client-content/tests/client",
 		"packages/graphql-client-tenant/src/generated",
-		"packages/graphql-client-system/src/generated"
+		"packages/graphql-client-system/src/generated",
+		"packages/engine-panel/src/generated"
 	],
 	"plugins": [
 		"https://plugins.dprint.dev/typescript-0.95.11.wasm"

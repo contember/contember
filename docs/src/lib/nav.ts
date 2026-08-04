@@ -110,6 +110,7 @@ export const nav: NavItem[] = [
 				collapsed: true,
 				items: [
 					doc('reference/engine/configuration/database'),
+					doc('reference/engine/configuration/management-panel'),
 				],
 			},
 			{

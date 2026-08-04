@@ -63,6 +63,9 @@
 			"path": "./packages/engine-http"
 		},
 		{
+			"path": "./packages/engine-panel"
+		},
+		{
 			"path": "./packages/engine-plugins"
 		},
 		{
@@ -103,6 +106,9 @@
 		},
 		{
 			"path": "./packages/migrations-client"
+		},
+		{
+			"path": "./packages/panel-ui"
 		},
 		{
 			"path": "./packages/playground"

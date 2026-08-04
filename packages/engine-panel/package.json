@@ -1,7 +1,8 @@
 {
-  "name": "@contember/engine-server",
-  "version": "2.2.0-alpha.3",
+  "name": "@contember/engine-panel",
   "license": "Apache-2.0",
+  "version": "2.2.0-alpha.3",
+  "type": "module",
   "main": "./dist/production/index.js",
   "typings": "./dist/types/index.d.ts",
   "exports": {
@@ -22,24 +23,16 @@
       }
     }
   },
-  "dependencies": {
-    "@contember/engine-actions": "workspace:*",
-    "@contember/engine-http": "workspace:*",
-    "@contember/engine-panel": "workspace:*",
-    "@contember/engine-plugins": "workspace:*",
-    "@contember/engine-s3-plugin": "workspace:*",
-    "@contember/engine-vimeo-plugin": "workspace:*",
-    "graphql": "catalog:",
-    "pg": "catalog:",
-    "uuid": "catalog:"
+  "scripts": {
+    "pre-build": "bun ./scripts/buildAssets.ts"
   },
-  "devDependencies": {
-    "@types/node": "catalog:"
-  },
-  "type": "module",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/contember/contember.git",
-    "directory": "packages/engine-server"
+    "directory": "packages/engine-panel"
+  },
+  "devDependencies": {
+    "@contember/engine-http": "workspace:*",
+    "@types/node": "catalog:"
   }
 }

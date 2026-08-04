@@ -1,0 +1,53 @@
+---
+title: Management panel
+---
+
+The engine can serve a management UI itself, so a self-hosted deployment gets one without running a
+separate admin application. It is disabled by default.
+
+:::note[Available since 2.2]
+The panel is being built module by module. Today it serves the application shell; sign-in and the
+management modules land in following releases.
+:::
+
+## Enabling it
+
+```bash
+CONTEMBER_PANEL_ENABLED=true
+CONTEMBER_PANEL_PATH=/panel   # optional, this is the default
+```
+
+Or in `config.yaml`:
+
+```yaml
+server:
+  panel:
+    enabled: true
+    path: /panel
+```
+
+With the flag off, the panel path returns the same `404 Route not found` as any other unknown path —
+an engine with the panel disabled is indistinguishable from one that never had it.
+
+## What gets served
+
+The panel is a single-page application bundled into the engine binary: there is no directory to
+mount, no extra image, and no version skew between the UI and the API it talks to. Everything under
+the configured path is served from that bundle — content-hashed assets are served immutable, and any
+other path returns the application shell so client-side routing works.
+
+The panel's own API traffic lives directly under the same path (`/panel/api`), on the same origin as
+the page, so there is no CORS setup and no separate host to configure.
+
+:::caution[Put it behind the same protection as your API]
+The panel is served from the engine's HTTP port. If that port is public, so is the panel's login
+page. It is served with `frame-ancestors 'none'`, `noindex` and a restrictive Content-Security-Policy,
+but the usual network-level protections you apply to the API apply here too.
+:::
+
+## Building from source
+
+The panel assets are generated into the server bundle by `pre-build`. When you build the engine
+yourself, `scripts/server-build/run.sh` takes care of it; if you invoke `bun build` directly, run
+`bun run --filter=@contember/engine-panel pre-build` first. An engine built without the assets
+refuses to start with the panel enabled rather than serving a blank page.

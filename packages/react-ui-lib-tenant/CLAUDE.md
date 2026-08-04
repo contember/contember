@@ -17,7 +17,7 @@ Ready-made admin UI for **tenant management** — a full tenant dashboard: sign-
 ## Forms (`forms/`)
 
 - `common.tsx` — `TenantFormField` / `TenantFormError` / `TenantFormLabel` / `TenantFormInput`, generic over a `FormContextValue`.
-- Field components: `InviteFormFields`, `CreateApiKeyFormFields`, `CreateGlobalApiKeyFormFields`, `UpdateProjectMemberFormFields`, `AddProjectMemberFormFields`, `ChangeMyProfileFormFields`, `ChangeProfileFormFields`, `SetPersonPasswordFormFields`, `SetProjectSecretFormFields`, plus auth forms (`login`, `password-reset`, `verify-email`, passwordless variants incl. the backup-code fallback field, …).
+- Field components: `InviteFormFields` (with `allowUnmanaged` for the no-mail path — must be paired with `allowUnmanaged` on `InviteForm`, or the form still mails), `SignUpFormFields`, `CreateApiKeyFormFields`, `CreateGlobalApiKeyFormFields`, `UpdateProjectMemberFormFields`, `AddProjectMemberFormFields`, `ChangeMyProfileFormFields`, `ChangeProfileFormFields`, `SetPersonPasswordFormFields`, `SetProjectSecretFormFields`, plus auth forms (`login`, `password-reset`, `verify-email`, passwordless variants incl. the backup-code fallback field, …).
 - `GlobalRolesControl` — add/remove tenant-wide (global) roles on an identity; free-text role input since the API can't enumerate configured roles.
 - `MembershipsControl` — role/variable picker, with `useIntrospectionRolesConfig(projectSlug)` resolving roles from the project schema.
 
@@ -27,6 +27,17 @@ Field components read their form state via a `useXForm()` hook — the **provide
 
 - `security/` — `SessionList` (own sessions with `personId` omitted, or an admin view of another person's with `personId` set; revoke action), `PasswordlessToggle` (enable/disable passwordless sign-in for self).
 - `otp/` — `OtpSetup` (TOTP enroll / disable flow, QR code), `EmailOtpSetup` (e-mail OTP enroll / disable), `BackupCodes` / `BackupCodesDisplay` (regenerate recovery codes; `BackupCodesDisplay` shows a freshly issued code set once — it is never retrievable again after that).
+
+## Configuration, read-only (`config/`)
+
+`TenantConfigView`, `AuthPolicyList`, `IdentityProviderList`, `MailTemplateList` — display-only views over the four configuration queries. There is no editing counterpart by design; `ManagedByCliNote` points at `contember tenant:apply` instead.
+
+Two things differ from the listings:
+
+- **These resolvers throw instead of returning empty.** `renderConfigQueryState` (`config/common.tsx`) uses `isForbiddenError` from `react-client-tenant` to render "no permission" as an ordinary state, so a non-admin does not get a red error box on a page that simply is not theirs.
+- **`renderConfigQueryState` is a helper, not a component** — the caller `return`s its result and then narrows on `'data' in query`. Deliberately lowercase.
+
+`IdentityProviderList` renders `configuration` behind a toggle. It arrives already filtered by `IdentityProviderHandler.getPublicConfiguration` (built-in oidc/apple/facebook strip the client secret); a third-party handler that omits the method returns the raw blob, which is why the view warns rather than promising safety.
 
 ## Other
 

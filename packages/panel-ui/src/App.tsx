@@ -1,20 +1,72 @@
-import { lazy, Suspense } from 'react'
+import { IdentityProvider, IdentityState } from '@contember/react-client-tenant'
+import { IdentityEnvironmentProvider } from '@contember/react-identity'
+import { RoutingProvider } from '@contember/react-routing'
+import { SlotsProvider } from '@contember/react-slots'
+import { Button, Toaster } from '@contember/react-ui-lib-base'
+import { useCallback, useState } from 'react'
 import type { PanelRuntimeConfig } from './config.js'
+import { panelRegistry } from './modules/index.js'
+import { AccessDeniedScreen } from './shell/AccessDeniedScreen.js'
+import { LoginScreen } from './shell/LoginScreen.js'
+import { PanelClient } from './shell/PanelClient.js'
+import { PanelLayout } from './shell/PanelLayout.js'
+import { PanelRouter } from './shell/PanelRouter.js'
+import { CenteredScreen, FullScreenLoader, MessageCard } from './shell/screens.js'
+import { useSignOut } from './shell/signOut.js'
 
-// Lazy on purpose, even for a placeholder: the build is embedded into the engine binary, so every
-// module has to be a separate chunk from the very first commit — see the plan, §3.4.
-const Diagnostics = lazy(() => import('./modules/diagnostics.js').then(it => ({ default: it.Diagnostics })))
+const IdentityFailed = () => {
+	const signOut = useSignOut()
+	return (
+		<CenteredScreen>
+			<MessageCard title="Cannot load your identity" description="The panel could not reach the tenant API.">
+				<Button className="w-full" onClick={signOut}>Sign in again</Button>
+			</MessageCard>
+		</CenteredScreen>
+	)
+}
 
-export const App = ({ config }: { config: PanelRuntimeConfig }) => (
-	<main className="mx-auto flex min-h-screen max-w-2xl flex-col justify-center gap-6 p-8">
-		<div>
-			<h1 className="text-2xl font-semibold">Contember management</h1>
-			<p className="mt-1 text-sm text-neutral-500">
-				The panel is served by the engine. Sign-in and the management modules are not wired up yet.
-			</p>
-		</div>
-		<Suspense fallback={<p className="text-sm text-neutral-500">Loading…</p>}>
-			<Diagnostics config={config} />
-		</Suspense>
-	</main>
-)
+/** A panel denial wins over every other state — see `isPanelAccessDenied`. */
+const PanelGate = ({ accessDenied }: { accessDenied: boolean }) => {
+	if (accessDenied) {
+		return <AccessDeniedScreen />
+	}
+	return (
+		<>
+			<IdentityState state="loading">
+				<FullScreenLoader />
+			</IdentityState>
+			<IdentityState state={['none', 'cleared']}>
+				<LoginScreen />
+			</IdentityState>
+			<IdentityState state="failed">
+				<IdentityFailed />
+			</IdentityState>
+			<IdentityState state="success">
+				<PanelLayout>
+					<PanelRouter />
+				</PanelLayout>
+			</IdentityState>
+		</>
+	)
+}
+
+export const App = ({ config }: { config: PanelRuntimeConfig }) => {
+	const [accessDenied, setAccessDenied] = useState(false)
+	const onAccessDenied = useCallback(() => setAccessDenied(true), [])
+
+	return (
+		<PanelClient apiBaseUrl={config.apiBaseUrl} onAccessDenied={onAccessDenied}>
+			<RoutingProvider basePath={config.basePath} routes={panelRegistry.routes}>
+				<IdentityProvider>
+					<IdentityEnvironmentProvider>
+						<SlotsProvider>
+							<Toaster>
+								<PanelGate accessDenied={accessDenied} />
+							</Toaster>
+						</SlotsProvider>
+					</IdentityEnvironmentProvider>
+				</IdentityProvider>
+			</RoutingProvider>
+		</PanelClient>
+	)
+}

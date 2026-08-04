@@ -3,5 +3,16 @@
 	"compilerOptions": {
 		"noEmit": true,
 		"emitDeclarationOnly": false
-	}
+	},
+	"references": [
+		{ "path": "../../graphql-client/src" },
+		{ "path": "../../interface/src" },
+		{ "path": "../../react-client/src" },
+		{ "path": "../../react-client-tenant/src" },
+		{ "path": "../../react-identity/src" },
+		{ "path": "../../react-routing/src" },
+		{ "path": "../../react-slots/src" },
+		{ "path": "../../react-ui-lib-base/src" },
+		{ "path": "../../react-ui-lib-tenant/src" }
+	]
 }

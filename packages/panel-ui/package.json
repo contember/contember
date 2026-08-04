@@ -14,6 +14,16 @@
     "directory": "packages/panel-ui"
   },
   "dependencies": {
+    "@contember/graphql-client": "workspace:*",
+    "@contember/interface": "workspace:*",
+    "@contember/react-client": "workspace:*",
+    "@contember/react-client-tenant": "workspace:*",
+    "@contember/react-identity": "workspace:*",
+    "@contember/react-routing": "workspace:*",
+    "@contember/react-slots": "workspace:*",
+    "@contember/react-ui-lib-base": "workspace:*",
+    "@contember/react-ui-lib-tenant": "workspace:*",
+    "lucide-react": "catalog:",
     "react": "catalog:",
     "react-dom": "catalog:"
   },

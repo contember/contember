@@ -1,7 +1,7 @@
 import { useProjectSlug } from '@contember/react-client'
-import { InviteForm } from '@contember/react-client-tenant'
+import { AddProjectMemberForm, InviteForm } from '@contember/react-client-tenant'
 import { ToastContent, useShowToast } from '@contember/react-ui-lib-base'
-import { InviteFormFields, type MemberListController, PersonList } from '@contember/react-ui-lib-tenant'
+import { AddProjectMemberFormFields, InviteFormFields, type MemberListController, PersonList } from '@contember/react-ui-lib-tenant'
 import { useRef } from 'react'
 import { formClassName, PageStack, PanelSection } from '../../shell/screens.js'
 import { PanelSlots } from '../../shell/slots.js'
@@ -35,6 +35,23 @@ const Members = ({ projectSlug }: { projectSlug: string }) => {
 						<InviteFormFields projectSlug={projectSlug} allowUnmanaged />
 					</form>
 				</InviteForm>
+			</PanelSection>
+
+			<PanelSection
+				title="Add an existing identity"
+				description="For an identity that already exists elsewhere in the tenant — take its id from Persons or from another project's members."
+			>
+				<AddProjectMemberForm
+					projectSlug={projectSlug}
+					onSuccess={() => {
+						showToast(<ToastContent>Member added</ToastContent>, { type: 'success' })
+						listController.current?.refresh()
+					}}
+				>
+					<form className={formClassName}>
+						<AddProjectMemberFormFields projectSlug={projectSlug} />
+					</form>
+				</AddProjectMemberForm>
 			</PanelSection>
 		</PageStack>
 	)

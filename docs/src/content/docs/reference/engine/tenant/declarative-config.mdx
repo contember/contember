@@ -120,7 +120,7 @@ contember tenant:apply --dry-run
 | `config` | `configure` | Always sent. All fields are optional and merged — unset fields preserve the current value. |
 | `identityProviders` | `addIDP` / `updateIDP`, then `enableIDP` / `disableIDP` | The CLI reads the current providers and chooses add vs. update per slug. `disabled: true` disables the provider; omitting it (or `false`) keeps/makes it enabled. |
 | `mailTemplates` | `addMailTemplate` | A server-side upsert keyed by `type` + `variant` (+ `projectSlug`). |
-| `authPolicies` | `createAuthPolicy` / `updateAuthPolicy` | `auth_policy` rows have no slug, so an entry is matched to an existing policy by what it targets: `scope` + `project` + the `roles` **set** (order is irrelevant). No match means a new policy. |
+| `authPolicies` | `createAuthPolicy` / `updateAuthPolicy` | `auth_policy` rows have no slug, so an entry is matched to an existing policy by what it targets: `scope` + `project` + the `roles` **set** (order is irrelevant). No match means a new policy. Two entries with the same target are rejected before anything is written — they would create two rows the next apply could no longer tell apart. |
 
 :::tip[Nothing is removed]
 `tenant:apply` only adds and updates. Identity providers, mail templates or auth policies that exist on the tenant but are **not** present in the config are left untouched. To remove one, do it explicitly via the corresponding mutation.
@@ -128,6 +128,8 @@ contember tenant:apply --dry-run
 
 :::caution[Editing `roles` creates a second policy]
 Because the role set is part of a policy's identity, changing `roles: ['editor']` to `roles: ['editor', 'author']` does not edit that policy — it creates a new one and leaves the old one in force. Auth policies aggregate strictest-wins, so the stale row keeps applying. `tenant:apply` prints a warning for every policy on the tenant that the config does not cover; delete the leftover with `deleteAuthPolicy`.
+
+The warning is why `authPolicies: []` differs from omitting the key: an empty list still means "I manage policies here", so leftovers are reported. Omitting `authPolicies` skips the section entirely and says nothing.
 :::
 
 ## Permissions

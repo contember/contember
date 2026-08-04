@@ -13,7 +13,8 @@ export interface TenantConfigApplyOptions {
  *   enabled/disabled to match `disabled`.
  * - mail templates are upserted server-side by `addMailTemplate`.
  * - auth policies are matched to existing rows by what they target (scope,
- *   project, role set) and created or updated accordingly.
+ *   project, role set) and created or updated accordingly; every policy the
+ *   config does not cover is warned about, including when the config lists none.
  *
  * Nothing is ever removed — entries missing from the config are left untouched.
  */
@@ -21,6 +22,10 @@ export class TenantConfigApplier {
 	public async apply(client: TenantClient, config: TenantConfig, options: TenantConfigApplyOptions = {}): Promise<void> {
 		const dryRun = options.dryRun === true
 		const log = (message: string) => console.log(`${dryRun ? '[dry-run] ' : ''}${message}`)
+
+		// Up front, before anything has been written: two entries targeting the same
+		// scope/project/roles are one policy to the applier but two rows server-side.
+		assertDistinctAuthPolicies(config.authPolicies)
 
 		if (config.config) {
 			log('configure: applying global tenant config')
@@ -72,14 +77,15 @@ export class TenantConfigApplier {
 			}
 		}
 
-		if (config.authPolicies && config.authPolicies.length > 0) {
+		// `[]` is meaningful here, unlike for the other sections: it says "I manage
+		// policies and there are none", which is exactly when the warning below matters.
+		if (config.authPolicies) {
 			const existing = await client.listAuthPolicies()
 			const existingByKey = new Map(existing.map(it => [authPolicyKey(it), it]))
-			const managedKeys = new Set<string>()
+			const managedKeys = new Set(config.authPolicies.map(authPolicyKey))
 
 			for (const policy of config.authPolicies) {
 				const key = authPolicyKey(policy)
-				managedKeys.add(key)
 				const current = existingByKey.get(key)
 				if (!current) {
 					log(`createAuthPolicy: ${describeAuthPolicy(policy)}`)
@@ -102,5 +108,22 @@ export class TenantConfigApplier {
 				}
 			}
 		}
+	}
+}
+
+/**
+ * A policy's identity is its target, so two config entries with the same
+ * scope/project/roles are indistinguishable to the applier but produce two rows
+ * server-side — the second of which would then be silently orphaned on the next
+ * run. Cheaper to reject than to reconcile.
+ */
+const assertDistinctAuthPolicies = (policies: TenantConfig['authPolicies']): void => {
+	const seen = new Set<string>()
+	for (const policy of policies ?? []) {
+		const key = authPolicyKey(policy)
+		if (seen.has(key)) {
+			throw `Duplicate auth policy in the config: ${describeAuthPolicy(policy)}. Policies are identified by scope, project and role set.`
+		}
+		seen.add(key)
 	}
 }

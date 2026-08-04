@@ -20,8 +20,9 @@ import {
 	useShowToast,
 } from '@contember/react-ui-lib-base'
 import { BanIcon, RefreshCwIcon } from 'lucide-react'
-import { useDisableApiKeyMutation, useGlobalApiKeysQuery, useTenantQueryLoader } from '@contember/react-client-tenant'
+import { toFormErrorCode, useDisableApiKeyMutation, useGlobalApiKeysQuery, useTenantQueryLoader } from '@contember/react-client-tenant'
 import { dict } from '../dict.js'
+import { actionErrorMessage } from '../errors.js'
 
 const formatDateTime = (value?: string | null): ReactNode => {
 	if (!value) {
@@ -49,8 +50,8 @@ export const GlobalApiKeyList = ({ controller }: GlobalApiKeyListProps) => {
 		refresh()
 		showToast(<ToastContent>{dict.tenant.globalApiKeyList.disableSuccess}</ToastContent>, { type: 'success' })
 	}
-	const onDisableError = () => {
-		showToast(<ToastContent>{dict.tenant.globalApiKeyList.disableFailed}</ToastContent>, { type: 'error' })
+	const onDisableError = (code: string) => {
+		showToast(<ToastContent>{actionErrorMessage(code, dict.tenant.globalApiKeyList.disableFailed)}</ToastContent>, { type: 'error' })
 	}
 
 	if (query.state === 'error') {
@@ -107,16 +108,22 @@ export const GlobalApiKeyList = ({ controller }: GlobalApiKeyListProps) => {
 	)
 }
 
-const DisableApiKeyDialog = ({ apiKeyId, onSuccess, onError }: { apiKeyId: string; onSuccess: () => void; onError: () => void }) => {
+const DisableApiKeyDialog = ({ apiKeyId, onSuccess, onError }: { apiKeyId: string; onSuccess: () => void; onError: (code: string) => void }) => {
 	const disableApiKey = useDisableApiKeyMutation()
 	const [open, setOpen] = useState(false)
 	const onConfirm = async () => {
-		const result = await disableApiKey({ id: apiKeyId })
-		setOpen(false)
-		if (result.ok) {
-			onSuccess()
-		} else {
-			onError()
+		try {
+			const result = await disableApiKey({ id: apiKeyId })
+			setOpen(false)
+			if (result.ok) {
+				onSuccess()
+			} else {
+				onError('UNKNOWN_ERROR')
+			}
+		} catch (e) {
+			// A denied mutation throws; without this the dialog would just hang on an unhandled rejection.
+			setOpen(false)
+			onError(toFormErrorCode(e))
 		}
 	}
 	return (

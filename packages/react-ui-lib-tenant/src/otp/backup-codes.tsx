@@ -15,6 +15,7 @@ import {
 	useShowToast,
 } from '@contember/react-ui-lib-base'
 import { dict } from '../dict.js'
+import { actionErrorMessage } from '../errors.js'
 
 export interface BackupCodesDisplayProps {
 	codes: readonly string[]
@@ -66,8 +67,8 @@ export const BackupCodes = () => {
 								setCodes(backupCodes)
 								showToast(<ToastContent>{dict.tenant.backupCodes.regenerateSuccess}</ToastContent>, { type: 'success' })
 							}}
-							onError={() => {
-								showToast(<ToastContent>{dict.tenant.backupCodes.regenerateFailed}</ToastContent>, { type: 'error' })
+							onError={({ code }) => {
+								showToast(<ToastContent>{actionErrorMessage(code, dict.tenant.backupCodes.regenerateFailed)}</ToastContent>, { type: 'error' })
 							}}
 						>
 							<AlertDialogAction variant="destructive">{dict.tenant.backupCodes.regenerate}</AlertDialogAction>

@@ -17,24 +17,36 @@ import { Context } from 'react';
 import { CreateApiKeyErrorCode } from '@contember/graphql-client-tenant';
 import { CreatePasswordResetRequestErrorCode } from '@contember/graphql-client-tenant';
 import { CreateSessionTokenErrorCode } from '@contember/graphql-client-tenant';
+import { DisableEmailOtpErrorCode } from '@contember/graphql-client-tenant';
+import { DisableOtpErrorCode } from '@contember/graphql-client-tenant';
+import { DisablePersonErrorCode } from '@contember/graphql-client-tenant';
+import { EnablePersonErrorCode } from '@contember/graphql-client-tenant';
 import { Fetcher } from 'graphql-ts-client-api';
+import { ForceSignOutPersonErrorCode } from '@contember/graphql-client-tenant';
+import { InitEmailOtpErrorCode } from '@contember/graphql-client-tenant';
 import { InitSignInIDPErrorCode } from '@contember/graphql-client-tenant';
 import { InviteErrorCode } from '@contember/graphql-client-tenant';
 import { InviteOptions } from '@contember/graphql-client-tenant';
 import { JSX } from 'react/jsx-runtime';
 import { MembershipInput } from '@contember/graphql-client-tenant';
 import { ModelType } from 'graphql-ts-client-api';
+import { MouseEventHandler } from 'react';
 import { MutationFetcher } from '@contember/graphql-client-tenant';
 import { ReactElement } from 'react';
 import { ReactNode } from 'react';
+import { RegenerateBackupCodesErrorCode } from '@contember/graphql-client-tenant';
+import { RemoveProjectMemberErrorCode } from '@contember/graphql-client-tenant';
 import { RequestEmailVerificationErrorCode } from '@contember/graphql-client-tenant';
 import { ResetPasswordErrorCode } from '@contember/graphql-client-tenant';
+import { ResetPersonMfaErrorCode } from '@contember/graphql-client-tenant';
+import { RevokeSessionErrorCode } from '@contember/graphql-client-tenant';
 import { SetProjectSecretErrorCode } from '@contember/graphql-client-tenant';
 import { SetStateAction } from 'react';
 import { SignInErrorCode } from '@contember/graphql-client-tenant';
 import { SignInIDPErrorCode } from '@contember/graphql-client-tenant';
 import { SignUpErrorCode } from '@contember/graphql-client-tenant';
 import * as TenantApi from '@contember/graphql-client-tenant';
+import { ToggleMyPasswordlessErrorCode } from '@contember/graphql-client-tenant';
 import { UpdateProjectMemberErrorCode } from '@contember/graphql-client-tenant';
 import { VerifyEmailErrorCode } from '@contember/graphql-client-tenant';
 
@@ -767,7 +779,7 @@ export interface DisableEmailOtpTriggerProps {
     // (undocumented)
     children: ReactElement;
     // (undocumented)
-    onError?: (e: unknown) => void;
+    onError?: (args: TenantActionErrorArgs<DisableEmailOtpErrorCode>) => void;
     // (undocumented)
     onSuccess?: () => void;
 }
@@ -780,7 +792,7 @@ export interface DisableMyPasswordlessTriggerProps {
     // (undocumented)
     children: ReactElement;
     // (undocumented)
-    onError?: (e: unknown) => void;
+    onError?: (args: TenantActionErrorArgs<ToggleMyPasswordlessErrorCode>) => void;
     // (undocumented)
     onSuccess?: () => void;
 }
@@ -811,7 +823,7 @@ export interface DisableOtpTriggerProps {
     // (undocumented)
     children: ReactElement;
     // (undocumented)
-    onError?: (e: unknown) => void;
+    onError?: (args: TenantActionErrorArgs<DisableOtpErrorCode>) => void;
     // (undocumented)
     onSuccess?: () => void;
 }
@@ -841,7 +853,7 @@ export const DisablePersonTrigger: (input: DisablePersonTriggerProps) => JSX.Ele
 export type DisablePersonTriggerProps = DisablePersonMutationVariables & {
     children: ReactElement;
     onSuccess?: () => void;
-    onError?: (e: unknown) => void;
+    onError?: (args: TenantActionErrorArgs<DisablePersonErrorCode>) => void;
 };
 
 // @public (undocumented)
@@ -899,7 +911,7 @@ export interface EnableMyPasswordlessTriggerProps {
     // (undocumented)
     children: ReactElement;
     // (undocumented)
-    onError?: (e: unknown) => void;
+    onError?: (args: TenantActionErrorArgs<ToggleMyPasswordlessErrorCode>) => void;
     // (undocumented)
     onSuccess?: () => void;
 }
@@ -929,7 +941,7 @@ export const EnablePersonTrigger: (input: EnablePersonTriggerProps) => JSX.Eleme
 export type EnablePersonTriggerProps = EnablePersonMutationVariables & {
     children: ReactElement;
     onSuccess?: () => void;
-    onError?: (e: unknown) => void;
+    onError?: (args: TenantActionErrorArgs<EnablePersonErrorCode>) => void;
 };
 
 // @public (undocumented)
@@ -958,7 +970,7 @@ export const ForceSignOutPersonTrigger: (input: ForceSignOutPersonTriggerProps) 
 export type ForceSignOutPersonTriggerProps = ForceSignOutPersonMutationVariables & {
     children: ReactElement;
     onSuccess?: () => void;
-    onError?: (e: unknown) => void;
+    onError?: (args: TenantActionErrorArgs<ForceSignOutPersonErrorCode>) => void;
 };
 
 // @internal (undocumented)
@@ -987,8 +999,8 @@ export type FormError<V extends FormValueType, E extends string> = {
     developerMessage?: string;
 };
 
-// @public (undocumented)
-export type FormErrorCode = 'UNKNOWN_ERROR';
+// @public
+export type FormErrorCode = 'UNKNOWN_ERROR' | 'FORBIDDEN';
 
 // @public (undocumented)
 export type FormState = 'loading' | 'initial' | 'submitting' | 'error' | 'success';
@@ -1178,7 +1190,7 @@ export interface InitEmailOtpTriggerProps {
     // (undocumented)
     children: ReactElement;
     // (undocumented)
-    onError?: (e: unknown) => void;
+    onError?: (args: TenantActionErrorArgs<InitEmailOtpErrorCode>) => void;
     // (undocumented)
     onSuccess?: () => void;
 }
@@ -1727,7 +1739,7 @@ export interface RegenerateBackupCodesTriggerProps {
     // (undocumented)
     children: ReactElement;
     // (undocumented)
-    onError?: (e: unknown) => void;
+    onError?: (args: TenantActionErrorArgs<RegenerateBackupCodesErrorCode>) => void;
     onSuccess?: (args: {
         result: RegenerateBackupCodesMutationResult;
     }) => void;
@@ -1795,7 +1807,7 @@ export const RemoveProjectMemberTrigger: (input: RemoveProjectMemberTriggerProps
 export type RemoveProjectMemberTriggerProps = RemoveProjectMemberMutationVariables & {
     children: ReactElement;
     onSuccess?: () => void;
-    onError?: (e: unknown) => void;
+    onError?: (args: TenantActionErrorArgs<RemoveProjectMemberErrorCode>) => void;
 };
 
 // @public (undocumented)
@@ -1894,7 +1906,7 @@ export const ResetPersonMfaTrigger: (input: ResetPersonMfaTriggerProps) => JSX.E
 export type ResetPersonMfaTriggerProps = ResetPersonMfaMutationVariables & {
     children: ReactElement;
     onSuccess?: () => void;
-    onError?: (e: unknown) => void;
+    onError?: (args: TenantActionErrorArgs<ResetPersonMfaErrorCode>) => void;
 };
 
 // @public (undocumented)
@@ -1922,7 +1934,7 @@ export const RevokeSessionTrigger: (input: RevokeSessionTriggerProps) => JSX.Ele
 export type RevokeSessionTriggerProps = RevokeSessionMutationVariables & {
     children: ReactElement;
     onSuccess?: () => void;
-    onError?: (e: unknown) => void;
+    onError?: (args: TenantActionErrorArgs<RevokeSessionErrorCode>) => void;
 };
 
 // @public (undocumented)
@@ -2193,6 +2205,38 @@ export type SignUpMutationResult = ModelType<typeof signUpMutationResult>;
 // @public (undocumented)
 export type SignUpMutationVariables = Parameters<ReturnType<typeof useSignUpMutation>>[0];
 
+// @public
+export type TenantActionErrorArgs<Error extends string = never> = {
+    code: Error | FormErrorCode;
+    error: unknown;
+};
+
+// @public (undocumented)
+export const TenantActionTrigger: <OkResult, Error extends string>(input: TenantActionTriggerProps<OkResult, Error>) => JSX.Element;
+
+// @public (undocumented)
+export interface TenantActionTriggerProps<OkResult, Error extends string> {
+    // (undocumented)
+    children: ReactElement;
+    // (undocumented)
+    execute: () => Promise<({
+        ok: true;
+    } & (OkResult extends undefined ? {} : {
+        result: OkResult;
+    })) | {
+        ok: false;
+        error?: Error;
+    }>;
+    // (undocumented)
+    onClick?: MouseEventHandler<HTMLButtonElement>;
+    // (undocumented)
+    onError?: (args: TenantActionErrorArgs<Error>) => void;
+    // (undocumented)
+    onSuccess?: (args: {
+        result: OkResult;
+    }) => void;
+}
+
 // @public (undocumented)
 export type TenantApiOptions = {
     readonly headers?: Record<string, string>;
@@ -2245,6 +2289,9 @@ export type TenantQueryLoaderState<Result> = {
     state: 'refreshing';
     data: Result;
 };
+
+// @public
+export const toFormErrorCode: (error: unknown) => FormErrorCode;
 
 // @public
 export const unmanagedInviteMutation: TenantApi.MutationFetcher<{

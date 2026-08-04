@@ -1,5 +1,6 @@
 import { ReactElement, useCallback } from 'react'
-import { TenantActionTrigger } from './TenantActionTrigger.js'
+import { EnablePersonErrorCode } from '@contember/graphql-client-tenant'
+import { TenantActionErrorArgs, TenantActionTrigger } from './TenantActionTrigger.js'
 import { EnablePersonMutationVariables, useEnablePersonMutation } from '../../hooks/index.js'
 
 export type EnablePersonTriggerProps =
@@ -7,7 +8,7 @@ export type EnablePersonTriggerProps =
 	& {
 		children: ReactElement
 		onSuccess?: () => void
-		onError?: (e: unknown) => void
+		onError?: (args: TenantActionErrorArgs<EnablePersonErrorCode>) => void
 	}
 
 export const EnablePersonTrigger = ({ personId, ...props }: EnablePersonTriggerProps) => {

@@ -31,6 +31,7 @@ import {
 	DisconnectIDPErrorCode,
 	RemoveGlobalIdentityRolesErrorCode,
 } from '@contember/graphql-client-tenant'
+import { FormErrorCode } from '@contember/react-client-tenant'
 
 export const dict = {
 	inviteErrors: {
@@ -44,6 +45,11 @@ export const dict = {
 		fallback: 'Failed to invite user',
 	} satisfies Record<InviteErrorCodes | 'fallback', string>,
 	tenant: {
+		/** Fallback for the codes any form or action can raise; a per-form `errorMessages` entry still wins. */
+		commonErrorMessages: {
+			UNKNOWN_ERROR: 'Something went wrong. Please try again later',
+			FORBIDDEN: 'You do not have permission to do this',
+		} satisfies Record<FormErrorCode, string>,
 		memberList: {
 			failedToLoadData: 'Failed to load data',
 			noResults: 'No results',

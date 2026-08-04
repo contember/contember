@@ -1,12 +1,13 @@
 import { ReactElement, useCallback } from 'react'
+import { DisableEmailOtpErrorCode } from '@contember/graphql-client-tenant'
 import { useDisableEmailOtpMutation } from '../../hooks/index.js'
-import { TenantActionTrigger } from './TenantActionTrigger.js'
+import { TenantActionErrorArgs, TenantActionTrigger } from './TenantActionTrigger.js'
 import { useIdentityMethods } from '../../contexts.js'
 
 export interface DisableEmailOtpTriggerProps {
 	children: ReactElement
 	onSuccess?: () => void
-	onError?: (e: unknown) => void
+	onError?: (args: TenantActionErrorArgs<DisableEmailOtpErrorCode>) => void
 }
 
 export const DisableEmailOtpTrigger = ({ onSuccess, ...props }: DisableEmailOtpTriggerProps) => {

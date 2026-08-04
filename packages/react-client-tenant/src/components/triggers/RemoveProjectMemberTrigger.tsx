@@ -1,5 +1,6 @@
 import { ReactElement, useCallback } from 'react'
-import { TenantActionTrigger } from './TenantActionTrigger.js'
+import { RemoveProjectMemberErrorCode } from '@contember/graphql-client-tenant'
+import { TenantActionErrorArgs, TenantActionTrigger } from './TenantActionTrigger.js'
 import { RemoveProjectMemberMutationVariables, useRemoveProjectMemberMutation } from '../../hooks/index.js'
 
 export type RemoveProjectMemberTriggerProps =
@@ -7,7 +8,7 @@ export type RemoveProjectMemberTriggerProps =
 	& {
 		children: ReactElement
 		onSuccess?: () => void
-		onError?: (e: unknown) => void
+		onError?: (args: TenantActionErrorArgs<RemoveProjectMemberErrorCode>) => void
 	}
 
 export const RemoveProjectMemberTrigger = ({ identityId, projectSlug, ...props }: RemoveProjectMemberTriggerProps) => {

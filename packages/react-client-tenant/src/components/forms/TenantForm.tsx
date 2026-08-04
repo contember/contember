@@ -1,6 +1,7 @@
 import { ComponentType, ReactElement, useCallback, useEffect, useState } from 'react'
 import { Slot } from '@radix-ui/react-slot'
 import { FormContextValue } from '../../types/forms.js'
+import { toFormErrorCode } from '../../types/forbidden.js'
 import { FormContext } from '../../contexts.js'
 import { useReferentiallyStableCallback } from '@contember/react-utils'
 
@@ -82,10 +83,13 @@ export const TenantForm = <T extends FormContextValue<any, any, any>, OkResult =
 				onSuccess?.({ result: 'result' in response ? response.result : undefined as OkResult })
 			}
 		} catch (e) {
-			console.error(e)
+			const code = toFormErrorCode(e)
+			if (code !== 'FORBIDDEN') {
+				console.error(e)
+			}
 			setState('error')
 			setErrors([{
-				code: 'UNKNOWN_ERROR',
+				code,
 				developerMessage: typeof e === 'string'
 					? e
 					: (e && typeof e === 'object' && 'message' in e && typeof e.message === 'string')

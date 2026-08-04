@@ -10,6 +10,7 @@ import { useProjectSlug } from '@contember/react-client'
 import { UpdateProjectMemberForm } from '@contember/interface'
 import { ToastContent, useShowToast } from '@contember/react-ui-lib-base'
 import { dict } from '../dict.js'
+import { actionErrorMessage } from '../errors.js'
 import { MemberDeleteDialog } from './member-delete-dialog.js'
 import { Dialog, DialogContent, DialogTrigger } from '@contember/react-ui-lib-base'
 import { RolesConfig, UpdateProjectMemberFormFields } from '../forms/index.js'
@@ -52,8 +53,8 @@ export const MemberList = ({ filter, labels, tableColumns, controller, tableHead
 		refresh()
 		showToast(<ToastContent>{labels.deleted}</ToastContent>, { type: 'success' })
 	}
-	const onDeleteError = () => {
-		showToast(<ToastContent>{labels.deleteFailed}</ToastContent>, { type: 'error' })
+	const onDeleteError = ({ code }: { code: string }) => {
+		showToast(<ToastContent>{actionErrorMessage(code, labels.deleteFailed)}</ToastContent>, { type: 'error' })
 	}
 
 	switch (query.state) {

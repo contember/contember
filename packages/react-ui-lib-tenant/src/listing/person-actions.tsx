@@ -18,6 +18,7 @@ import {
 import { BanIcon, LogOutIcon, ShieldOffIcon, UserCheckIcon } from 'lucide-react'
 import { DisablePersonTrigger, EnablePersonTrigger, ForceSignOutPersonTrigger, ResetPersonMfaTrigger } from '@contember/interface'
 import { dict } from '../dict.js'
+import { actionErrorMessage } from '../errors.js'
 
 export interface PersonActionProps {
 	personId: string
@@ -77,7 +78,8 @@ export const DisablePersonAction = ({ personId, onSuccess }: PersonActionProps) 
 						showToast(<ToastContent>{dict.tenant.personActions.disableSuccess}</ToastContent>, { type: 'success' })
 						onSuccess()
 					}}
-					onError={() => showToast(<ToastContent>{dict.tenant.personActions.disableFailed}</ToastContent>, { type: 'error' })}
+					onError={({ code }) =>
+						showToast(<ToastContent>{actionErrorMessage(code, dict.tenant.personActions.disableFailed)}</ToastContent>, { type: 'error' })}
 				>
 					{children}
 				</DisablePersonTrigger>
@@ -101,7 +103,8 @@ export const EnablePersonAction = ({ personId, onSuccess }: PersonActionProps) =
 						showToast(<ToastContent>{dict.tenant.personActions.enableSuccess}</ToastContent>, { type: 'success' })
 						onSuccess()
 					}}
-					onError={() => showToast(<ToastContent>{dict.tenant.personActions.enableFailed}</ToastContent>, { type: 'error' })}
+					onError={({ code }) =>
+						showToast(<ToastContent>{actionErrorMessage(code, dict.tenant.personActions.enableFailed)}</ToastContent>, { type: 'error' })}
 				>
 					{children}
 				</EnablePersonTrigger>
@@ -128,7 +131,8 @@ export const ForceSignOutPersonAction = ({ personId, onSuccess }: PersonActionPr
 						showToast(<ToastContent>{dict.tenant.personActions.forceSignOutSuccess}</ToastContent>, { type: 'success' })
 						onSuccess()
 					}}
-					onError={() => showToast(<ToastContent>{dict.tenant.personActions.forceSignOutFailed}</ToastContent>, { type: 'error' })}
+					onError={({ code }) =>
+						showToast(<ToastContent>{actionErrorMessage(code, dict.tenant.personActions.forceSignOutFailed)}</ToastContent>, { type: 'error' })}
 				>
 					{children}
 				</ForceSignOutPersonTrigger>
@@ -164,7 +168,8 @@ export const ResetPersonMfaAction = ({ personId, onSuccess }: PersonActionProps)
 						showToast(<ToastContent>{dict.tenant.personActions.resetMfaSuccess}</ToastContent>, { type: 'success' })
 						onSuccess()
 					}}
-					onError={() => showToast(<ToastContent>{dict.tenant.personActions.resetMfaFailed}</ToastContent>, { type: 'error' })}
+					onError={({ code }) =>
+						showToast(<ToastContent>{actionErrorMessage(code, dict.tenant.personActions.resetMfaFailed)}</ToastContent>, { type: 'error' })}
 				>
 					{children}
 				</ResetPersonMfaTrigger>

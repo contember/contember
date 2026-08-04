@@ -2,13 +2,14 @@ import { DisableMyPasswordlessTrigger, EnableMyPasswordlessTrigger, useIdentity 
 import { Button } from '@contember/react-ui-lib-base'
 import { ToastContent, useShowToast } from '@contember/react-ui-lib-base'
 import { dict } from '../dict.js'
+import { actionErrorMessage } from '../errors.js'
 
 export const PasswordlessToggle = () => {
 	const identity = useIdentity()
 	const showToast = useShowToast()
 
-	const onError = () => {
-		showToast(<ToastContent>{dict.tenant.passwordlessToggle.toggleFailed}</ToastContent>, { type: 'error' })
+	const onError = ({ code }: { code: string }) => {
+		showToast(<ToastContent>{actionErrorMessage(code, dict.tenant.passwordlessToggle.toggleFailed)}</ToastContent>, { type: 'error' })
 	}
 
 	const person = identity?.person

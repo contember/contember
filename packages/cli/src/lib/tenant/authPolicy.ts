@@ -11,8 +11,7 @@ interface AuthPolicyIdentity {
  * set of roles. Roles are sorted because `AuthPolicyResolver` treats them as a
  * set (it matches with `roles.some(...)`), so ordering carries no meaning.
  */
-export const authPolicyKey = (policy: AuthPolicyIdentity): string =>
-	JSON.stringify([policy.scope, policy.project ?? null, [...policy.roles].sort()])
+export const authPolicyKey = (policy: AuthPolicyIdentity): string => JSON.stringify([policy.scope, policy.project ?? null, [...policy.roles].sort()])
 
 /** Human-readable label for logs and error messages. */
 export const describeAuthPolicy = (policy: AuthPolicyIdentity): string => {

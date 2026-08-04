@@ -21,6 +21,7 @@ import {
 	PasswordResetFormErrorCode,
 	PasswordResetRequestFormErrorCode,
 	RequestEmailVerificationFormErrorCode,
+	SignUpFormErrorCode,
 	UpdateProjectMemberFormErrorCode,
 	VerifyEmailFormErrorCode,
 } from '@contember/react-identity'
@@ -416,6 +417,25 @@ export const dict = {
 			confirm: 'Confirm',
 		},
 
+		signUp: {
+			email: 'E-mail',
+			name: 'Name',
+			password: 'Password',
+			passwordConfirmation: 'Confirm password',
+			submit: 'Create account',
+			errorMessages: {
+				'FIELD_REQUIRED': 'This field is required',
+				'INVALID_VALUE': 'Invalid value',
+				'PASSWORD_MISMATCH': 'Passwords do not match',
+				'UNKNOWN_ERROR': 'Something went wrong. Please try again later',
+				'EMAIL_ALREADY_EXISTS': 'An account with this e-mail already exists',
+				'INVALID_EMAIL_FORMAT': 'Invalid e-mail format',
+				'TOO_WEAK': 'Password is too weak',
+				'INVALID_CAPTCHA': 'Captcha verification failed',
+				'RATE_LIMIT_EXCEEDED': 'Too many attempts. Please try again later',
+			} satisfies Record<SignUpFormErrorCode, string>,
+			title: 'Create an account',
+		},
 		passwordReset: {
 			token: 'Reset code',
 			password: 'Password',

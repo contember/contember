@@ -44,6 +44,10 @@ export default defineTenantConfig({
     rateLimits: {
       loginPerIp: { limit: 20, window: 'PT1H' },
     },
+    panel: {
+      globalRoles: ['super_admin'],
+      projectRoles: ['admin'],
+    },
   },
 
   // → addIDP / updateIDP, keyed by provider slug
@@ -130,6 +134,27 @@ contember tenant:apply --dry-run
 Because the role set is part of a policy's identity, changing `roles: ['editor']` to `roles: ['editor', 'author']` does not edit that policy — it creates a new one and leaves the old one in force. Auth policies aggregate strictest-wins, so the stale row keeps applying. `tenant:apply` prints a warning for every policy on the tenant that the config does not cover; delete the leftover with `deleteAuthPolicy`.
 
 The warning is why `authPolicies: []` differs from omitting the key: an empty list still means "I manage policies here", so leftovers are reported. Omitting `authPolicies` skips the section entirely and says nothing.
+:::
+
+## Panel access
+
+`config.panel` says who may enter the [management panel](/reference/engine/configuration/management-panel) served by the engine:
+
+```ts
+config: {
+  panel: {
+    globalRoles: ['super_admin'],
+    projectRoles: ['admin'],
+  },
+}
+```
+
+An identity may enter when one of its global roles (`identity.roles`) is listed in `globalRoles`, or when it holds a membership with one of `projectRoles` in at least one project. The values above are the defaults. Each list is replaced as a whole; omitting one leaves it unchanged, and an empty list closes that dimension. With both empty, nobody can enter.
+
+The panel must also be enabled on the deployment (`CONTEMBER_PANEL_ENABLED`) — this setting only decides who gets in once it is served.
+
+:::note[This is an entry gate, not authority]
+Being allowed into the panel grants no rights. Everything done inside it goes through the tenant API and the same ACL as any other client, so a user still sees and changes only what their roles and memberships already permit.
 :::
 
 ## Permissions

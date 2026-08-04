@@ -59,6 +59,9 @@ export const getConfigSql = (overrides: Record<string, unknown> = {}): ExpectedQ
 				captcha_protect_password_reset: true,
 				captcha_protect_passwordless_init: true,
 				captcha_protect_email_verification: false,
+				// Management panel entry gate — matches the column defaults.
+				panel_global_roles: ['super_admin'],
+				panel_project_roles: ['admin'],
 				...overrides,
 			},
 		],

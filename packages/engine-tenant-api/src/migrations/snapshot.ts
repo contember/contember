@@ -182,6 +182,8 @@ CREATE TABLE "config" (
     "login_anomaly_history_size" integer DEFAULT 10 NOT NULL,
     "login_anomaly_email_threshold" integer DEFAULT 1 NOT NULL,
     "login_anomaly_step_up_threshold" integer DEFAULT 3 NOT NULL,
+    "panel_global_roles" "text"[] DEFAULT '{super_admin}'::"text"[] NOT NULL,
+    "panel_project_roles" "text"[] DEFAULT '{admin}'::"text"[] NOT NULL,
     CONSTRAINT "config_captcha_complete" CHECK ((("captcha_provider" IS NULL) OR (("captcha_secret" IS NOT NULL) AND ("captcha_secret_version" IS NOT NULL)))),
     CONSTRAINT "config_captcha_provider_check" CHECK ((("captcha_provider" IS NULL) OR ("captcha_provider" = ANY (ARRAY['turnstile'::"text", 'hcaptcha'::"text", 'recaptchaV3'::"text"]))))
 );

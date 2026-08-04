@@ -1,12 +1,15 @@
 import { describe, expect, test } from 'bun:test'
 import { TenantConfigApplier } from '../src/lib/tenant/TenantConfigApplier.js'
 import type { RemoteAuthPolicy, RemoteIdentityProvider, TenantClient } from '../src/lib/tenant/TenantClient.js'
+import type { TenantGlobalConfig } from '../src/lib/tenant/tenantConfig.js'
 
 const createClientMock = (existingIdps: RemoteIdentityProvider[] = [], existingPolicies: RemoteAuthPolicy[] = []) => {
 	const calls: string[] = []
+	const configured: TenantGlobalConfig[] = []
 	const client = {
-		configure: async () => {
+		configure: async (config: TenantGlobalConfig) => {
 			calls.push('configure')
+			configured.push(config)
 		},
 		listIdentityProviders: async () => existingIdps,
 		addIdp: async (slug: string) => {
@@ -32,7 +35,7 @@ const createClientMock = (existingIdps: RemoteIdentityProvider[] = [], existingP
 			calls.push(`updateAuthPolicy:${id}`)
 		},
 	}
-	return { client: client as unknown as TenantClient, calls }
+	return { client: client as unknown as TenantClient, calls, configured }
 }
 
 const captureWarnings = async (fn: () => Promise<unknown>): Promise<string[]> => {
@@ -54,6 +57,15 @@ describe('TenantConfigApplier', () => {
 		const { client, calls } = createClientMock()
 		await new TenantConfigApplier().apply(client, { config: { password: { minLength: 8 } } })
 		expect(calls).toEqual(['configure'])
+	})
+
+	// The applier does not model config sections; new ones (here: panel) must reach `configure` verbatim.
+	test('forwards the management panel access lists verbatim', async () => {
+		const { client, configured } = createClientMock()
+		await new TenantConfigApplier().apply(client, {
+			config: { panel: { globalRoles: ['super_admin', 'ops'], projectRoles: [] } },
+		})
+		expect(configured).toEqual([{ panel: { globalRoles: ['super_admin', 'ops'], projectRoles: [] } }])
 	})
 
 	test('adds a new identity provider', async () => {

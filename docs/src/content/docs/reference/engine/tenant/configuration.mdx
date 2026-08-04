@@ -157,6 +157,15 @@ Sliding-window per-IP limits. `limit: 0` (the default) disables that scope. See 
 | `passwordlessInitPerIp` | `initSignInPasswordless` |
 | `emailVerificationPerIp` | `requestEmailVerification` |
 
+### `panel` *(since 2.2)*
+
+Who may enter the [management panel](/reference/engine/configuration/management-panel). An entry gate for the console only — it grants no rights, and the panel is served at all only when the deployment enables it.
+
+| Field | Default | Notes |
+|---|---|---|
+| `globalRoles` | `["super_admin"]` | Global roles (`identity.roles`) allowed in. |
+| `projectRoles` | `["admin"]` | Membership roles allowed in, matched in any project. |
+
 ## Recommended hardening baseline
 
 ```graphql

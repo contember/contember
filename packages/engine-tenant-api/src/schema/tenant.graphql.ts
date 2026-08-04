@@ -202,6 +202,7 @@ const schema: DocumentNode = gql`
 		login: ConfigLogin!
 		captcha: ConfigCaptcha!
 		rateLimits: ConfigRateLimits!
+		panel: ConfigPanel!
 	}
 
 	type ConfigSignup {
@@ -335,6 +336,21 @@ const schema: DocumentNode = gql`
 		window: Interval!
 	}
 
+	"""
+	Who may enter the management panel. This is an entry gate for the console
+	only, not an authorization system: everything done inside the panel still
+	goes through the tenant ACL, so being allowed in grants no extra rights.
+	An identity may enter when its global roles intersect globalRoles, or when
+	it holds a membership with one of projectRoles in at least one project.
+	Both lists empty means nobody can enter.
+	"""
+	type ConfigPanel {
+		"""Global roles (identity.roles) that may use the management panel."""
+		globalRoles: [String!]!
+		"""Project membership roles that may use the management panel, in any project."""
+		projectRoles: [String!]!
+	}
+
 	input ConfigInput {
 		signup: ConfigSignupInput
 		emailChange: ConfigEmailChangeInput
@@ -343,6 +359,7 @@ const schema: DocumentNode = gql`
 		login: ConfigLoginInput
 		captcha: ConfigCaptchaInput
 		rateLimits: ConfigRateLimitsInput
+		panel: ConfigPanelInput
 	}
 
 	input ConfigSignupInput {
@@ -426,6 +443,15 @@ const schema: DocumentNode = gql`
 	input ConfigRateLimitWindowInput {
 		limit: Int
 		window: Interval
+	}
+
+	"""
+	Each list is replaced as a whole; omitting one leaves it unchanged. An empty
+	list closes the panel for that dimension.
+	"""
+	input ConfigPanelInput {
+		globalRoles: [String!]
+		projectRoles: [String!]
 	}
 	
 	type ConfigureResponse {

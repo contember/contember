@@ -362,6 +362,7 @@ export type Config = {
 	readonly captcha: ConfigCaptcha
 	readonly emailChange: ConfigEmailChange
 	readonly login: ConfigLogin
+	readonly panel: ConfigPanel
 	readonly password: ConfigPassword
 	readonly passwordless: ConfigPasswordless
 	readonly rateLimits: ConfigRateLimits
@@ -430,6 +431,7 @@ export type ConfigInput = {
 	readonly captcha?: InputMaybe<ConfigCaptchaInput>
 	readonly emailChange?: InputMaybe<ConfigEmailChangeInput>
 	readonly login?: InputMaybe<ConfigLoginInput>
+	readonly panel?: InputMaybe<ConfigPanelInput>
 	readonly password?: InputMaybe<ConfigPasswordInput>
 	readonly passwordless?: InputMaybe<ConfigPasswordlessInput>
 	readonly rateLimits?: InputMaybe<ConfigRateLimitsInput>
@@ -493,6 +495,31 @@ export type ConfigLoginInput = {
 	readonly mfaGraceDuration?: InputMaybe<Scalars['Interval']['input']>
 	readonly revealLoginMethod?: InputMaybe<Scalars['Boolean']['input']>
 	readonly revealUserExists?: InputMaybe<Scalars['Boolean']['input']>
+}
+
+/**
+ * Who may enter the management panel. This is an entry gate for the console
+ * only, not an authorization system: everything done inside the panel still
+ * goes through the tenant ACL, so being allowed in grants no extra rights.
+ * An identity may enter when its global roles intersect globalRoles, or when
+ * it holds a membership with one of projectRoles in at least one project.
+ * Both lists empty means nobody can enter.
+ */
+export type ConfigPanel = {
+	readonly __typename?: 'ConfigPanel'
+	/** Global roles (identity.roles) that may use the management panel. */
+	readonly globalRoles: ReadonlyArray<Scalars['String']['output']>
+	/** Project membership roles that may use the management panel, in any project. */
+	readonly projectRoles: ReadonlyArray<Scalars['String']['output']>
+}
+
+/**
+ * Each list is replaced as a whole; omitting one leaves it unchanged. An empty
+ * list closes the panel for that dimension.
+ */
+export type ConfigPanelInput = {
+	readonly globalRoles?: InputMaybe<ReadonlyArray<Scalars['String']['input']>>
+	readonly projectRoles?: InputMaybe<ReadonlyArray<Scalars['String']['input']>>
 }
 
 export type ConfigPassword = {
@@ -2514,6 +2541,8 @@ export type ResolversTypes = {
 	ConfigLoginAnomalyDetection: ResolverTypeWrapper<ConfigLoginAnomalyDetection>
 	ConfigLoginAnomalyDetectionInput: ConfigLoginAnomalyDetectionInput
 	ConfigLoginInput: ConfigLoginInput
+	ConfigPanel: ResolverTypeWrapper<ConfigPanel>
+	ConfigPanelInput: ConfigPanelInput
 	ConfigPassword: ResolverTypeWrapper<ConfigPassword>
 	ConfigPasswordInput: ConfigPasswordInput
 	ConfigPasswordless: ResolverTypeWrapper<ConfigPasswordless>
@@ -2786,6 +2815,8 @@ export type ResolversParentTypes = {
 	ConfigLoginAnomalyDetection: ConfigLoginAnomalyDetection
 	ConfigLoginAnomalyDetectionInput: ConfigLoginAnomalyDetectionInput
 	ConfigLoginInput: ConfigLoginInput
+	ConfigPanel: ConfigPanel
+	ConfigPanelInput: ConfigPanelInput
 	ConfigPassword: ConfigPassword
 	ConfigPasswordInput: ConfigPasswordInput
 	ConfigPasswordless: ConfigPasswordless
@@ -3190,6 +3221,7 @@ export type ConfigResolvers<ContextType = any, ParentType extends ResolversParen
 	captcha?: Resolver<ResolversTypes['ConfigCaptcha'], ParentType, ContextType>
 	emailChange?: Resolver<ResolversTypes['ConfigEmailChange'], ParentType, ContextType>
 	login?: Resolver<ResolversTypes['ConfigLogin'], ParentType, ContextType>
+	panel?: Resolver<ResolversTypes['ConfigPanel'], ParentType, ContextType>
 	password?: Resolver<ResolversTypes['ConfigPassword'], ParentType, ContextType>
 	passwordless?: Resolver<ResolversTypes['ConfigPasswordless'], ParentType, ContextType>
 	rateLimits?: Resolver<ResolversTypes['ConfigRateLimits'], ParentType, ContextType>
@@ -3242,6 +3274,11 @@ export type ConfigLoginAnomalyDetectionResolvers<
 	enabled?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
 	historySize?: Resolver<ResolversTypes['Int'], ParentType, ContextType>
 	stepUpThreshold?: Resolver<ResolversTypes['Int'], ParentType, ContextType>
+}
+
+export type ConfigPanelResolvers<ContextType = any, ParentType extends ResolversParentTypes['ConfigPanel'] = ResolversParentTypes['ConfigPanel']> = {
+	globalRoles?: Resolver<ReadonlyArray<ResolversTypes['String']>, ParentType, ContextType>
+	projectRoles?: Resolver<ReadonlyArray<ResolversTypes['String']>, ParentType, ContextType>
 }
 
 export type ConfigPasswordResolvers<
@@ -4684,6 +4721,7 @@ export type Resolvers<ContextType = any> = {
 	ConfigEmailChange?: ConfigEmailChangeResolvers<ContextType>
 	ConfigLogin?: ConfigLoginResolvers<ContextType>
 	ConfigLoginAnomalyDetection?: ConfigLoginAnomalyDetectionResolvers<ContextType>
+	ConfigPanel?: ConfigPanelResolvers<ContextType>
 	ConfigPassword?: ConfigPasswordResolvers<ContextType>
 	ConfigPasswordless?: ConfigPasswordlessResolvers<ContextType>
 	ConfigRateLimitWindow?: ConfigRateLimitWindowResolvers<ContextType>

@@ -96,6 +96,10 @@ export class ConfigurationQuery extends DatabaseQuery<Config> {
 					window: result.rate_limit_email_verification_per_ip_window,
 				},
 			},
+			panel: {
+				globalRoles: result.panel_global_roles,
+				projectRoles: result.panel_project_roles,
+			},
 		}
 	}
 }

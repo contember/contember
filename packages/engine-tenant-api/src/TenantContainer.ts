@@ -32,6 +32,7 @@ import {
 	OIDCProvider,
 	OtpAuthenticator,
 	OtpManager,
+	PanelAccessResolver,
 	PasswordChangeManager,
 	PasswordResetManager,
 	PermissionContextFactory,
@@ -126,6 +127,7 @@ export interface TenantContainer {
 	backchannelLogoutManager: BackchannelLogoutManager
 	signUpManager: SignUpManager
 	projectManager: ProjectManager
+	panelAccessResolver: PanelAccessResolver
 	resolvers: Schema.Resolvers
 	resolverContextFactory: TenantResolverContextFactory
 	authorizator: Authorizator<Identity>
@@ -161,6 +163,7 @@ export class TenantContainerFactory {
 				'backchannelLogoutManager',
 				'projectMemberManager',
 				'projectManager',
+				'panelAccessResolver',
 				'signUpManager',
 				'resolvers',
 				'authorizator',
@@ -185,6 +188,7 @@ export class TenantContainerFactory {
 			.addService('userMailer', ({ mailer, templateRenderer }) => new UserMailer(mailer, templateRenderer))
 			.addService('apiKeyService', () => new ApiKeyService())
 			.addService('authPolicyResolver', () => new AuthPolicyResolver())
+			.addService('panelAccessResolver', ({ providers }) => new PanelAccessResolver(providers))
 			.addService('authLogService', () => new AuthLogService())
 			.addService('loginRiskAnalyzer', ({ providers }) => new LoginRiskAnalyzer(providers.hash))
 			.addService('idpRegistry', () => {

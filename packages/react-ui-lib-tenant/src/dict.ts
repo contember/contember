@@ -99,7 +99,11 @@ export const dict = {
 			name: 'Name',
 			roles: 'Roles',
 			submit: 'Invite',
+			submitUnmanaged: 'Create member',
 			addRole: 'Add new role',
+			unmanaged: 'Do not send an invitation e-mail',
+			unmanagedDescription: 'Creates the member directly. Leave the password empty to make them use a password reset.',
+			password: 'Password',
 			errorMessages: {
 				'FIELD_REQUIRED': 'This field is required',
 				'UNKNOWN_ERROR': 'Something went wrong. Please try again later',

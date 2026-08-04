@@ -148,13 +148,15 @@ export const Members = () => {
 					<InviteForm
 						projectSlug={projectSlug}
 						initialMemberships={[{ role: 'admin', variables: [] }]}
+						allowUnmanaged
 						onSuccess={args => {
-							showToast(<ToastContent>Invitation sent to {args.result.person?.email}</ToastContent>, { type: 'success' })
+							showToast(<ToastContent>Member created: {args.result.person?.email}</ToastContent>, { type: 'success' })
 							memberListController.current?.refresh()
 						}}
 					>
 						<form>
-							<InviteFormFields projectSlug={projectSlug} />
+							{/* allowUnmanaged offers the "no invitation e-mail" path, for seeding and air-gapped setups */}
+							<InviteFormFields projectSlug={projectSlug} allowUnmanaged />
 						</form>
 					</InviteForm>
 				</Panel>

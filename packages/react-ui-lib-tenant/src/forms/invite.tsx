@@ -1,11 +1,22 @@
 import { InviteFormErrorCode, useInviteForm } from '@contember/react-identity'
-import { Button } from '@contember/react-ui-lib-base'
+import { Button, CheckboxInput } from '@contember/react-ui-lib-base'
 import { Loader } from '@contember/react-ui-lib-base'
 import { TenantFormError, TenantFormField, TenantFormLabel } from './common.js'
 import { MembershipsControl, RolesConfig, useIntrospectionRolesConfig } from './memberships-control.js'
 import { dict } from '../dict.js'
 
-export const InviteFormFields = ({ projectSlug, roles }: { projectSlug: string; roles?: RolesConfig }) => {
+export interface InviteFormFieldsProps {
+	projectSlug: string
+	roles?: RolesConfig
+	/**
+	 * Offers the "do not send an invitation e-mail" checkbox and the password
+	 * field it reveals. Must be paired with `allowUnmanaged` on `InviteForm`;
+	 * without it the form still mails.
+	 */
+	allowUnmanaged?: boolean
+}
+
+export const InviteFormFields = ({ projectSlug, roles, allowUnmanaged }: InviteFormFieldsProps) => {
 	const form = useInviteForm()
 	const rolesResolved = roles ?? useIntrospectionRolesConfig(projectSlug)
 	return (
@@ -45,8 +56,34 @@ export const InviteFormFields = ({ projectSlug, roles }: { projectSlug: string; 
 				roles={rolesResolved}
 			/>
 
+			{allowUnmanaged && (
+				<>
+					<label className="flex items-center gap-2 mt-2">
+						<CheckboxInput
+							type="checkbox"
+							checked={form.values.unmanaged}
+							onChange={e => form.setValue('unmanaged', e.target.checked)}
+						/>
+						<span className="text-sm">{dict.tenant.invite.unmanaged}</span>
+					</label>
+					<p className="text-sm text-gray-500">{dict.tenant.invite.unmanagedDescription}</p>
+
+					{form.values.unmanaged && (
+						<TenantFormField
+							form={form}
+							messages={dict.tenant.invite.errorMessages}
+							field="password"
+							type="password"
+							autoComplete="new-password"
+						>
+							{dict.tenant.invite.password}
+						</TenantFormField>
+					)}
+				</>
+			)}
+
 			<Button type="submit" className="w-full" disabled={form.state === 'submitting'}>
-				{dict.tenant.invite.submit}
+				{form.values.unmanaged ? dict.tenant.invite.submitUnmanaged : dict.tenant.invite.submit}
 			</Button>
 		</div>
 	)

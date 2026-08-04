@@ -7,6 +7,7 @@
 		{ "path": "../../react-client/src" },
 		{ "path": "../../react-utils/src" },
 		{ "path": "../../graphql-client-tenant/src" },
+		{ "path": "../../graphql-client/src" },
 
 	]
 }

@@ -77,9 +77,15 @@ export class Authenticator {
 	}
 
 	public async authenticate(
-		{ request, timer, clientIp }: { request: IncomingMessage; timer: Timer; clientIp?: string },
+		{ request, timer, clientIp, fallbackToken }: {
+			request: IncomingMessage
+			timer: Timer
+			clientIp?: string
+			/** Used when the request carries no Authorization header — lets a caller authenticate an anonymous request on the client's behalf. */
+			fallbackToken?: string
+		},
 	): Promise<AuthResult | null> {
-		const authHeader = request.headers.authorization
+		const authHeader = request.headers.authorization ?? (fallbackToken !== undefined ? `Bearer ${fallbackToken}` : undefined)
 		if (!authHeader) {
 			return null
 		}

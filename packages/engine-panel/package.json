@@ -31,8 +31,10 @@
     "url": "git+https://github.com/contember/contember.git",
     "directory": "packages/engine-panel"
   },
+  "dependencies": {
+    "@contember/engine-http": "workspace:*"
+  },
   "devDependencies": {
-    "@contember/engine-http": "workspace:*",
     "@types/node": "catalog:"
   }
 }

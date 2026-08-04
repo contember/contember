@@ -45,9 +45,42 @@ page. It is served with `frame-ancestors 'none'`, `noindex` and a restrictive Co
 but the usual network-level protections you apply to the API apply here too.
 :::
 
+## Who may sign in
+
+Enabling the panel decides whether it is served at all. Who may enter it is part of the **tenant
+configuration**, not of the deployment environment:
+
+```ts title="tenant.config.ts"
+config: {
+  panel: {
+    globalRoles: ['super_admin'],
+    projectRoles: ['admin'],
+  },
+}
+```
+
+An identity may enter when one of these holds:
+
+- one of its global roles (`identity.roles`) is listed in `globalRoles`, or
+- it has a membership with one of `projectRoles` in **at least one** project.
+
+The defaults are `globalRoles: ['super_admin']` and `projectRoles: ['admin']`. An empty list closes
+that dimension; both empty means nobody can enter.
+
+See [declarative configuration](/reference/engine/tenant/declarative-config) for how to apply this,
+or set it with the [`configure`](/reference/engine/tenant/configuration) mutation directly.
+
+:::note[This is an entry gate, not authority]
+Being allowed into the panel grants no rights. Every action taken inside it goes through the same
+tenant API and the same ACL as any other client, so a user only ever sees and changes what their
+roles and memberships already permit. Widening these lists opens the door; it does not hand out
+permissions.
+:::
+
 ## Building from source
 
 The panel assets are generated into the server bundle by `pre-build`. When you build the engine
-yourself, `scripts/server-build/run.sh` takes care of it; if you invoke `bun build` directly, run
-`bun run --filter=@contember/engine-panel pre-build` first. An engine built without the assets
-refuses to start with the panel enabled rather than serving a blank page.
+yourself, `scripts/server-build/run.sh` takes care of it; if you invoke `bun build` or run the engine
+straight from source, run `bun run --filter=@contember/engine-panel pre-build` first. Without the
+assets the engine still starts, logs that the panel is enabled but unbuilt, and does not serve it —
+a released build cannot end up in that state, because the asset build fails when it produces nothing.

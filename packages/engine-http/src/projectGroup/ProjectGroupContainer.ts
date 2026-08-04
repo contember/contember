@@ -55,6 +55,12 @@ export interface ProjectGroupContainer {
 	tenantContainer: TenantContainer
 	tenantGraphQLHandler: TenantGraphQLHandler
 
+	/**
+	 * The group's configured `login`-role token, if any. Exposed so a first-party UI served by the
+	 * engine can authenticate pre-sign-in calls without the token ever reaching the browser.
+	 */
+	loginToken: string | undefined
+
 	systemContainer: SystemContainer
 	systemGraphQLHandler: SystemGraphQLHandler
 }
@@ -82,6 +88,7 @@ export class ProjectGroupContainerFactory {
 	public create({ config, slug }: ProjectGroupContainerFactoryArgs): ProjectGroupContainer {
 		return new Builder({})
 			.addService('slug', () => slug)
+			.addService('loginToken', () => config.credentials.loginToken)
 			.addService('logger', ({ slug }) => this.logger.child({ projectGroup: slug }))
 			.addService('providers', () => this.providers)
 			.addService('tenantDbCredentials', () => config.db)
@@ -175,6 +182,7 @@ export class ProjectGroupContainerFactory {
 				'projectMembershipResolver',
 				'tenantGraphQLHandler',
 				'slug',
+				'loginToken',
 				'logger',
 			)
 	}

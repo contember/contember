@@ -9,7 +9,7 @@ const identityFragment = TenantApi
 	.projects(
 		TenantApi
 			.identityProjectRelation$
-			.project(TenantApi.project$$)
+			.project(TenantApi.project$$.permissions(TenantApi.projectPermissions$$))
 			.memberships(TenantApi.membership$$.variables(TenantApi.variableEntry$$)),
 	)
 	.permissions(TenantApi.identityGlobalPermissions$$)

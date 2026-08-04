@@ -1,4 +1,5 @@
 import type {
+	AuthPolicyInput,
 	ConfigCaptchaInput,
 	ConfigInput,
 	ConfigLoginInput,
@@ -15,7 +16,7 @@ import type {
 // stay in sync with the schema. The only thing layered on top is `| null` on the
 // fields where the API treats an explicit `null`/`''` as "clear/disable" — the
 // codegen renders nullable inputs as optional only and drops the `| null`.
-export type { CaptchaProvider, ConfigPolicy, MailType } from '@contember/graphql-client-tenant'
+export type { AuthPolicyScope, CaptchaProvider, ConfigPolicy, MailType } from '@contember/graphql-client-tenant'
 
 /**
  * ISO 8601 duration string, e.g. `"P1D"` (1 day) or `"PT5M"` (5 minutes).
@@ -75,6 +76,20 @@ export interface TenantIdpConfig {
 export type TenantMailTemplate = WithNullable<MailTemplate, 'projectSlug' | 'replyTo'>
 
 /**
+ * A per-role MFA / session policy. `project` is a project slug, required for
+ * `scope: 'project'` and rejected for `scope: 'global'` (validated server-side).
+ *
+ * Unlike identity providers there is no server-side slug, so entries are matched
+ * against existing rows by `scope` + `project` + the `roles` **set** (order does
+ * not matter). Editing `roles` therefore reads as a different policy: a new row
+ * is created and the old one is left in place — see `TenantConfigApplier`.
+ */
+export type TenantAuthPolicy = WithNullable<
+	AuthPolicyInput,
+	'project' | 'mfaRequired' | 'tokenExpiration' | 'idleTimeout' | 'mfaGraceDuration' | 'rememberMeAllowed'
+>
+
+/**
  * Declarative tenant configuration. Applied idempotently by
  * `contember tenant:apply`.
  */
@@ -83,6 +98,7 @@ export interface TenantConfig {
 	/** Identity providers keyed by slug. */
 	identityProviders?: Record<string, TenantIdpConfig>
 	mailTemplates?: TenantMailTemplate[]
+	authPolicies?: TenantAuthPolicy[]
 }
 
 /**

@@ -1,3 +1,4 @@
+import { authPolicyKey, describeAuthPolicy } from './authPolicy.js'
 import { TenantClient } from './TenantClient.js'
 import { TenantConfig } from './tenantConfig.js'
 
@@ -11,6 +12,8 @@ export interface TenantConfigApplyOptions {
  * - identity providers are added or updated based on the current state, then
  *   enabled/disabled to match `disabled`.
  * - mail templates are upserted server-side by `addMailTemplate`.
+ * - auth policies are matched to existing rows by what they target (scope,
+ *   project, role set) and created or updated accordingly.
  *
  * Nothing is ever removed — entries missing from the config are left untouched.
  */
@@ -65,6 +68,37 @@ export class TenantConfigApplier {
 				log(`addMailTemplate: ${template.type}${template.variant ? `/${template.variant}` : ''}`)
 				if (!dryRun) {
 					await client.addMailTemplate(template)
+				}
+			}
+		}
+
+		if (config.authPolicies && config.authPolicies.length > 0) {
+			const existing = await client.listAuthPolicies()
+			const existingByKey = new Map(existing.map(it => [authPolicyKey(it), it]))
+			const managedKeys = new Set<string>()
+
+			for (const policy of config.authPolicies) {
+				const key = authPolicyKey(policy)
+				managedKeys.add(key)
+				const current = existingByKey.get(key)
+				if (!current) {
+					log(`createAuthPolicy: ${describeAuthPolicy(policy)}`)
+					if (!dryRun) {
+						await client.createAuthPolicy(policy)
+					}
+				} else {
+					log(`updateAuthPolicy: ${describeAuthPolicy(policy)}`)
+					if (!dryRun) {
+						await client.updateAuthPolicy(current.id, policy)
+					}
+				}
+			}
+
+			// Policies are aggregated strictest-wins, so one left behind by a config
+			// edit keeps enforcing. Nothing is pruned, but silence would hide it.
+			for (const policy of existing) {
+				if (!managedKeys.has(authPolicyKey(policy))) {
+					console.warn(`Warning: auth policy ${describeAuthPolicy(policy)} exists but is not in the config; it stays in effect.`)
 				}
 			}
 		}

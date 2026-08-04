@@ -1,8 +1,8 @@
 import { describe, expect, test } from 'bun:test'
 import { TenantConfigApplier } from '../src/lib/tenant/TenantConfigApplier.js'
-import type { RemoteIdentityProvider, TenantClient } from '../src/lib/tenant/TenantClient.js'
+import type { RemoteAuthPolicy, RemoteIdentityProvider, TenantClient } from '../src/lib/tenant/TenantClient.js'
 
-const createClientMock = (existingIdps: RemoteIdentityProvider[] = []) => {
+const createClientMock = (existingIdps: RemoteIdentityProvider[] = [], existingPolicies: RemoteAuthPolicy[] = []) => {
 	const calls: string[] = []
 	const client = {
 		configure: async () => {
@@ -23,6 +23,13 @@ const createClientMock = (existingIdps: RemoteIdentityProvider[] = []) => {
 		},
 		addMailTemplate: async (template: { type: string }) => {
 			calls.push(`addMailTemplate:${template.type}`)
+		},
+		listAuthPolicies: async () => existingPolicies,
+		createAuthPolicy: async (policy: { roles: readonly string[] }) => {
+			calls.push(`createAuthPolicy:${[...policy.roles].sort().join('+')}`)
+		},
+		updateAuthPolicy: async (id: string) => {
+			calls.push(`updateAuthPolicy:${id}`)
 		},
 	}
 	return { client: client as unknown as TenantClient, calls }
@@ -75,12 +82,63 @@ describe('TenantConfigApplier', () => {
 		expect(calls).toEqual(['addMailTemplate:RESET_PASSWORD_REQUEST'])
 	})
 
+	test('creates an auth policy that does not exist yet', async () => {
+		const { client, calls } = createClientMock([], [])
+		await new TenantConfigApplier().apply(client, {
+			authPolicies: [{ scope: 'global', roles: ['admin'], mfaRequired: true }],
+		})
+		expect(calls).toEqual(['createAuthPolicy:admin'])
+	})
+
+	test('updates the policy targeting the same scope and roles', async () => {
+		const { client, calls } = createClientMock([], [{ id: 'p1', scope: 'global', project: null, roles: ['admin'] }])
+		await new TenantConfigApplier().apply(client, {
+			authPolicies: [{ scope: 'global', roles: ['admin'], mfaRequired: true }],
+		})
+		expect(calls).toEqual(['updateAuthPolicy:p1'])
+	})
+
+	test('matches roles as a set, not as an ordered list', async () => {
+		const { client, calls } = createClientMock([], [{ id: 'p1', scope: 'global', project: null, roles: ['editor', 'admin'] }])
+		await new TenantConfigApplier().apply(client, {
+			authPolicies: [{ scope: 'global', roles: ['admin', 'editor'] }],
+		})
+		expect(calls).toEqual(['updateAuthPolicy:p1'])
+	})
+
+	test('keeps global and project policies with the same roles apart', async () => {
+		const { client, calls } = createClientMock([], [{ id: 'p1', scope: 'global', project: null, roles: ['admin'] }])
+		await new TenantConfigApplier().apply(client, {
+			authPolicies: [{ scope: 'project', project: 'blog', roles: ['admin'] }],
+		})
+		expect(calls).toEqual(['createAuthPolicy:admin'])
+	})
+
+	test('warns about an existing policy the config does not manage', async () => {
+		const warnings: string[] = []
+		const originalWarn = console.warn
+		console.warn = (message: string) => {
+			warnings.push(message)
+		}
+		try {
+			const { client } = createClientMock([], [{ id: 'stale', scope: 'global', project: null, roles: ['old_role'] }])
+			await new TenantConfigApplier().apply(client, {
+				authPolicies: [{ scope: 'global', roles: ['admin'] }],
+			})
+		} finally {
+			console.warn = originalWarn
+		}
+		expect(warnings).toHaveLength(1)
+		expect(warnings[0]).toContain('old_role')
+	})
+
 	test('dry run performs no mutations but still reads state', async () => {
 		const { client, calls } = createClientMock([])
 		await new TenantConfigApplier().apply(client, {
 			config: { password: { minLength: 8 } },
 			identityProviders: { google: { type: 'oidc', configuration: {} } },
 			mailTemplates: [{ type: 'RESET_PASSWORD_REQUEST', subject: 's', content: 'c' }],
+			authPolicies: [{ scope: 'global', roles: ['admin'] }],
 		}, { dryRun: true })
 		expect(calls).toEqual([])
 	})

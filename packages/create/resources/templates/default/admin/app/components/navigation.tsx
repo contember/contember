@@ -1,5 +1,15 @@
 import { Link, LogoutTrigger, useIdentity } from '@contember/interface'
-import { BadgeCheckIcon, BellIcon, ChevronsUpDown, KeyRoundIcon, LogOutIcon, ScrollTextIcon, UserRoundIcon, UsersIcon } from 'lucide-react'
+import {
+	BadgeCheckIcon,
+	BellIcon,
+	ChevronsUpDown,
+	KeyRoundIcon,
+	LogOutIcon,
+	ScrollTextIcon,
+	SettingsIcon,
+	UserRoundIcon,
+	UsersIcon,
+} from 'lucide-react'
 import { dict } from '~/lib/dict'
 import { Avatar, AvatarFallback } from '~/lib/ui/avatar'
 import { AnchorButton, Button } from '~/lib/ui/button'
@@ -111,6 +121,14 @@ export const UserNavigation = () => {
 							<AnchorButton variant="ghost" size="xs" className="flex gap-2">
 								<ScrollTextIcon size={16} />
 								Audit log
+							</AnchorButton>
+						</Link>
+					</DropdownMenuItem>
+					<DropdownMenuItem>
+						<Link to="tenant/configuration">
+							<AnchorButton variant="ghost" size="xs" className="flex gap-2">
+								<SettingsIcon size={16} />
+								Configuration
 							</AnchorButton>
 						</Link>
 					</DropdownMenuItem>

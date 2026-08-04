@@ -1,5 +1,5 @@
 import { AuthLogList } from '@contember/react-ui-lib-tenant'
-import { PanelSection } from '../../shell/screens.js'
+import { PageHeader, PageStack, PanelSection } from '../../shell/screens.js'
 import { PanelSlots } from '../../shell/slots.js'
 
 /**
@@ -10,10 +10,14 @@ import { PanelSlots } from '../../shell/slots.js'
  * `system:viewAuthLog` gets the list's own "no permission" line; nothing to handle here.
  */
 export const AuthLogPage = () => (
-	<>
+	<PageStack>
 		<PanelSlots.Title>Auth log</PanelSlots.Title>
+		<PageHeader
+			title="Auth log"
+			description="Every authentication event the tenant recorded: sign-ins and their failures, MFA changes, invitations, password and e-mail changes."
+		/>
 		<PanelSection>
 			<AuthLogList />
 		</PanelSection>
-	</>
+	</PageStack>
 )

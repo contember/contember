@@ -2,30 +2,29 @@ import { useProjectSlug } from '@contember/react-client'
 import { AddProjectMemberForm, InviteForm } from '@contember/react-client-tenant'
 import { ToastContent, useShowToast } from '@contember/react-ui-lib-base'
 import { AddProjectMemberFormFields, InviteFormFields, type MemberListController, PersonList } from '@contember/react-ui-lib-tenant'
+import { UserPlusIcon } from 'lucide-react'
 import { useRef } from 'react'
-import { formClassName, PageStack, PanelSection } from '../../shell/screens.js'
+import { FormDialog } from '../../shell/FormDialog.js'
+import { formClassName, PageHeader, PageStack, PanelSection } from '../../shell/screens.js'
 import { PanelSlots } from '../../shell/slots.js'
 
 /**
- * `PersonList` brings the per-row edit and delete affordances with it, so membership management is
- * the list plus the invite form. The list is empty rather than failing for a caller who may not
- * read the project's members.
+ * `PersonList` brings the per-row edit and delete affordances with it, so the page is that list
+ * plus the two ways of getting into it. The list is empty rather than failing for a caller who may
+ * not read the project's members.
  */
 const Members = ({ projectSlug }: { projectSlug: string }) => {
 	const showToast = useShowToast()
 	const listController = useRef<MemberListController>(undefined)
 
-	return (
-		<PageStack>
-			<PanelSection title="Members">
-				<PersonList controller={listController} />
-			</PanelSection>
-
-			<PanelSection title="Invite a member">
+	const invite = (
+		<FormDialog label="Invite" title="Invite a member" description="Creates a new person and gives them access to this project.">
+			{close => (
 				<InviteForm
 					projectSlug={projectSlug}
 					allowUnmanaged
 					onSuccess={({ result }) => {
+						close()
 						showToast(<ToastContent>Member created: {result.person?.email}</ToastContent>, { type: 'success' })
 						listController.current?.refresh()
 					}}
@@ -35,15 +34,23 @@ const Members = ({ projectSlug }: { projectSlug: string }) => {
 						<InviteFormFields projectSlug={projectSlug} allowUnmanaged />
 					</form>
 				</InviteForm>
-			</PanelSection>
+			)}
+		</FormDialog>
+	)
 
-			<PanelSection
-				title="Add an existing identity"
-				description="For an identity that already exists elsewhere in the tenant — take its id from Persons or from another project's members."
-			>
+	const addExisting = (
+		<FormDialog
+			label="Add existing"
+			title="Add an existing identity"
+			description="For an identity that already exists elsewhere in the tenant — take its id from Persons or from another project's members."
+			icon={<UserPlusIcon className="size-4" />}
+			variant="outline"
+		>
+			{close => (
 				<AddProjectMemberForm
 					projectSlug={projectSlug}
 					onSuccess={() => {
+						close()
 						showToast(<ToastContent>Member added</ToastContent>, { type: 'success' })
 						listController.current?.refresh()
 					}}
@@ -52,6 +59,24 @@ const Members = ({ projectSlug }: { projectSlug: string }) => {
 						<AddProjectMemberFormFields projectSlug={projectSlug} />
 					</form>
 				</AddProjectMemberForm>
+			)}
+		</FormDialog>
+	)
+
+	return (
+		<PageStack>
+			<PageHeader
+				title="Members"
+				description="People with access to this project. Roles and their variables come from the project's own schema, so what a member may see is decided there."
+				actions={
+					<>
+						{addExisting}
+						{invite}
+					</>
+				}
+			/>
+			<PanelSection>
+				<PersonList controller={listController} />
 			</PanelSection>
 		</PageStack>
 	)

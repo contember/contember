@@ -19,7 +19,7 @@ import {
 	SidebarRail,
 	SidebarTrigger,
 } from '@contember/react-ui-lib-base'
-import { LogOutIcon, UserIcon } from 'lucide-react'
+import { BoxIcon, LogOutIcon } from 'lucide-react'
 import type { ReactNode } from 'react'
 import { panelRegistry } from '../modules/index.js'
 import { indexPageName } from '../modules/registry.js'
@@ -32,18 +32,23 @@ import { PanelSlotTargets } from './slots.js'
 const SignedInAs = () => {
 	const identity = useIdentity()
 	const signOut = useSignOut()
+	const email = identity?.person?.email
+	const name = identity?.person?.name ?? email ?? 'Signed in'
 
 	return (
-		<>
-			<div className="flex items-center gap-2 overflow-hidden px-2 text-sm">
-				<UserIcon className="size-4 shrink-0 text-muted-foreground" />
-				<span className="truncate">{identity?.person?.email ?? identity?.person?.name ?? 'Signed in'}</span>
+		<div className="flex items-center gap-2.5 rounded-md px-2 py-1.5">
+			<span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-muted text-xs font-semibold uppercase text-muted-foreground">
+				{name.slice(0, 1)}
+			</span>
+			<div className="flex min-w-0 flex-col leading-tight">
+				<span className="truncate text-sm font-medium">{name}</span>
+				{email !== undefined && email !== name && <span className="truncate text-xs text-muted-foreground">{email}</span>}
 			</div>
-			<Button variant="outline" size="sm" className="w-full gap-2" onClick={signOut}>
+			<Button variant="ghost" size="icon" className="ml-auto size-8 shrink-0 text-muted-foreground" onClick={signOut} title="Sign out">
 				<LogOutIcon className="size-4" />
-				Sign out
+				<span className="sr-only">Sign out</span>
 			</Button>
-		</>
+		</div>
 	)
 }
 
@@ -61,7 +66,15 @@ export const PanelLayout = ({ children }: { children: ReactNode }) => {
 				<Sidebar collapsible="offcanvas" side="left">
 					<SidebarHeader>
 						<Link to={indexPageName}>
-							<a className="px-2 py-1 font-semibold">Contember management</a>
+							<a className="flex items-center gap-2.5 rounded-md px-2 py-1.5 transition-colors hover:bg-sidebar-accent">
+								<span className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-primary text-primary-foreground">
+									<BoxIcon className="size-4" />
+								</span>
+								<span className="flex flex-col leading-tight">
+									<span className="text-sm font-semibold">Contember</span>
+									<span className="text-xs text-muted-foreground">Management</span>
+								</span>
+							</a>
 						</Link>
 					</SidebarHeader>
 					<SidebarContent>
@@ -72,7 +85,7 @@ export const PanelLayout = ({ children }: { children: ReactNode }) => {
 						</SidebarGroup>
 						{projectModules.length > 0 && (
 							<SidebarGroup>
-								<SidebarGroupLabel>{projectName ?? 'Project'}</SidebarGroupLabel>
+								<SidebarGroupLabel>Project</SidebarGroupLabel>
 								<SidebarGroupContent className="flex flex-col gap-2">
 									<ProjectSwitcher projectSlug={projectSlug} />
 									{projectSlug !== undefined && <PanelNavigation modules={projectModules} projectSlug={projectSlug} />}
@@ -91,13 +104,24 @@ export const PanelLayout = ({ children }: { children: ReactNode }) => {
 						<SidebarInsetHeaderActions>
 							<SidebarTrigger className="-ml-1" />
 							<Separator orientation="vertical" className="mr-2 h-4" />
-							<PanelSlotTargets.Title />
+							{/* Breadcrumb rather than a heading: the page itself carries the h1. */}
+							<nav className="flex items-center gap-2 text-sm">
+								{projectName !== undefined && (
+									<>
+										<span className="text-muted-foreground">{projectName}</span>
+										<span className="text-muted-foreground/50">/</span>
+									</>
+								)}
+								<PanelSlotTargets.Title className="font-medium" />
+							</nav>
 						</SidebarInsetHeaderActions>
 						<SidebarInsetHeaderActions>
 							<PanelSlotTargets.Actions />
 						</SidebarInsetHeaderActions>
 					</SidebarInsetHeader>
-					<SidebarInsetContent>{children}</SidebarInsetContent>
+					<SidebarInsetContent className="bg-muted/40 p-0">
+						<div className="mx-auto w-full max-w-5xl px-6 py-8">{children}</div>
+					</SidebarInsetContent>
 				</SidebarInset>
 			</SidebarLayout>
 		</SidebarProvider>

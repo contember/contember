@@ -3,7 +3,8 @@ import { SetProjectSecretForm } from '@contember/react-client-tenant'
 import { ToastContent, useShowToast } from '@contember/react-ui-lib-base'
 import { ProjectSecretList, type ProjectSecretListController, SetProjectSecretFormFields } from '@contember/react-ui-lib-tenant'
 import { useRef } from 'react'
-import { formClassName, PageStack, PanelSection } from '../../shell/screens.js'
+import { FormDialog } from '../../shell/FormDialog.js'
+import { formClassName, PageHeader, PageStack, PanelSection } from '../../shell/screens.js'
 import { PanelSlots } from '../../shell/slots.js'
 
 /** Secrets are write-only: the API answers with names and timestamps, never a value. */
@@ -11,17 +12,17 @@ const ProjectSecrets = ({ projectSlug }: { projectSlug: string }) => {
 	const showToast = useShowToast()
 	const listController = useRef<ProjectSecretListController>(undefined)
 
-	return (
-		<PageStack>
-			<PanelSection title="Secrets">
-				{/* Empty rather than failing for a caller who may not read them. */}
-				<ProjectSecretList controller={listController} />
-			</PanelSection>
-
-			<PanelSection title="Set a secret" description="An existing key is overwritten; there is no way to read the old value back.">
+	const setSecret = (
+		<FormDialog
+			label="Set secret"
+			title="Set a secret"
+			description="An existing key is overwritten; there is no way to read the old value back."
+		>
+			{close => (
 				<SetProjectSecretForm
 					projectSlug={projectSlug}
 					onSuccess={() => {
+						close()
 						showToast(<ToastContent>Secret saved</ToastContent>, { type: 'success' })
 						listController.current?.refresh()
 					}}
@@ -30,6 +31,20 @@ const ProjectSecrets = ({ projectSlug }: { projectSlug: string }) => {
 						<SetProjectSecretFormFields />
 					</form>
 				</SetProjectSecretForm>
+			)}
+		</FormDialog>
+	)
+
+	return (
+		<PageStack>
+			<PageHeader
+				title="Secrets"
+				description="Values the project's configuration reads at runtime. They are encrypted at rest and never returned by the API — only their names and timestamps are."
+				actions={setSecret}
+			/>
+			{/* Empty rather than failing for a caller who may not read them. */}
+			<PanelSection>
+				<ProjectSecretList controller={listController} />
 			</PanelSection>
 		</PageStack>
 	)

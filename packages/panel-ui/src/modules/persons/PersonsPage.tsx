@@ -1,7 +1,7 @@
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@contember/react-ui-lib-base'
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@contember/react-ui-lib-base'
 import { PersonDetail, PersonsList, type PersonsListController } from '@contember/react-ui-lib-tenant'
 import { useRef, useState } from 'react'
-import { PanelSection } from '../../shell/screens.js'
+import { PageHeader, PageStack, PanelSection } from '../../shell/screens.js'
 import { PanelSlots } from '../../shell/slots.js'
 
 /**
@@ -15,8 +15,12 @@ export const PersonsPage = () => {
 	const [selectedPersonId, setSelectedPersonId] = useState<string>()
 
 	return (
-		<>
+		<PageStack>
 			<PanelSlots.Title>Persons</PanelSlots.Title>
+			<PageHeader
+				title="Persons"
+				description="Everyone with an account in this tenant. A super admin sees all of them; anyone else sees the members of the projects they administer."
+			/>
 			<PanelSection>
 				<PersonsList controller={listController} onSelectPerson={setSelectedPersonId} />
 			</PanelSection>
@@ -30,13 +34,14 @@ export const PersonsPage = () => {
 					}
 				}}
 			>
-				<DialogContent className="max-h-[90vh] max-w-3xl overflow-y-auto">
+				<DialogContent className="max-h-[85vh] max-w-3xl overflow-y-auto">
 					<DialogHeader>
 						<DialogTitle>Person</DialogTitle>
+						<DialogDescription>Profile, password, two-factor state, global roles and sessions.</DialogDescription>
 					</DialogHeader>
 					{selectedPersonId !== undefined && <PersonDetail personId={selectedPersonId} />}
 				</DialogContent>
 			</Dialog>
-		</>
+		</PageStack>
 	)
 }

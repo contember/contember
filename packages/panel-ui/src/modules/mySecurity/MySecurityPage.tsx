@@ -1,5 +1,5 @@
 import { ChangeMyPasswordForm, ChangeMyProfileForm, useIdentity } from '@contember/react-client-tenant'
-import { ToastContent, useShowToast } from '@contember/react-ui-lib-base'
+import { Separator, ToastContent, useShowToast } from '@contember/react-ui-lib-base'
 import {
 	BackupCodes,
 	ChangeMyPasswordFormFields,
@@ -10,7 +10,7 @@ import {
 	PasswordlessToggle,
 	SessionList,
 } from '@contember/react-ui-lib-tenant'
-import { formClassName, PageStack, PanelSection } from '../../shell/screens.js'
+import { formClassName, PageHeader, PageStack, SettingsRow, SettingsStack } from '../../shell/screens.js'
 import { PanelSlots } from '../../shell/slots.js'
 
 const Profile = () => {
@@ -32,59 +32,82 @@ const Profile = () => {
 	)
 }
 
+const Password = () => {
+	const showToast = useShowToast()
+
+	return (
+		<ChangeMyPasswordForm onSuccess={() => showToast(<ToastContent>Password changed</ToastContent>, { type: 'success' })}>
+			<form className={formClassName}>
+				<ChangeMyPasswordFormFields />
+			</form>
+		</ChangeMyPasswordForm>
+	)
+}
+
+/** The three MFA methods read as one setting, so they share a row instead of each owning a card. */
+const TwoFactor = () => (
+	<div className="flex flex-col gap-6">
+		<div className="flex flex-col gap-3">
+			<h3 className="text-sm font-medium text-muted-foreground">Authenticator app</h3>
+			<OtpSetup />
+		</div>
+		<Separator />
+		<div className="flex flex-col gap-3">
+			<h3 className="text-sm font-medium text-muted-foreground">E-mail code</h3>
+			<EmailOtpSetup />
+		</div>
+		<Separator />
+		<div className="flex flex-col gap-3">
+			<h3 className="text-sm font-medium text-muted-foreground">Backup codes</h3>
+			<BackupCodes />
+		</div>
+	</div>
+)
+
 /**
- * The signed-in person's own security settings. Everything here is a `me`-scoped tenant call, so it
- * works for anyone the panel gate let in.
+ * The signed-in person's own account. Everything here is a `me`-scoped tenant call, so it works for
+ * anyone the panel gate let in.
  *
  * The identity-provider section only lists and disconnects: connecting one is a redirect flow whose
  * callback URL belongs to the public-facing app, not to the API host.
  */
-export const MySecurityPage = () => {
-	const showToast = useShowToast()
+export const MySecurityPage = () => (
+	<PageStack>
+		<PanelSlots.Title>My security</PanelSlots.Title>
+		<PageHeader title="My security" description="Your own account: how you sign in, what protects it, and where it is currently signed in." />
+		<SettingsStack>
+			<SettingsRow
+				title="Profile"
+				description="With e-mail-change verification enabled, a new address only takes effect once the link mailed to it is opened."
+			>
+				<Profile />
+			</SettingsRow>
 
-	return (
-		<>
-			<PanelSlots.Title>My security</PanelSlots.Title>
-			<PageStack>
-				<PanelSection
-					title="Profile"
-					description="With e-mail-change verification enabled, a new address only takes effect once the link mailed to it is opened."
-				>
-					<Profile />
-				</PanelSection>
+			<SettingsRow title="Password" description="Changing it does not sign your other sessions out — revoke them below if that is what you want.">
+				<Password />
+			</SettingsRow>
 
-				<PanelSection title="Change password">
-					<ChangeMyPasswordForm onSuccess={() => showToast(<ToastContent>Password changed</ToastContent>, { type: 'success' })}>
-						<form className={formClassName}>
-							<ChangeMyPasswordFormFields />
-						</form>
-					</ChangeMyPasswordForm>
-				</PanelSection>
+			<SettingsRow
+				title="Two-factor authentication"
+				description="An authenticator app and an e-mail code are independent; either one satisfies a policy that requires MFA. Backup codes are the way back in when both are unavailable."
+			>
+				<TwoFactor />
+			</SettingsRow>
 
-				<PanelSection title="Two-factor — authenticator app">
-					<OtpSetup />
-				</PanelSection>
+			<SettingsRow title="Passwordless sign-in" description="Sign in with a link or code mailed to your address instead of a password.">
+				<PasswordlessToggle />
+			</SettingsRow>
 
-				<PanelSection title="Two-factor — e-mail code">
-					<EmailOtpSetup />
-				</PanelSection>
+			<SettingsRow
+				title="Connected identity providers"
+				description="External accounts that can sign in as you. Connecting one starts in the public-facing app; here you can only see and disconnect them."
+			>
+				<IdentityProviderConnections />
+			</SettingsRow>
 
-				<PanelSection title="Backup codes">
-					<BackupCodes />
-				</PanelSection>
-
-				<PanelSection title="Passwordless sign-in">
-					<PasswordlessToggle />
-				</PanelSection>
-
-				<PanelSection title="Connected identity providers">
-					<IdentityProviderConnections />
-				</PanelSection>
-
-				<PanelSection title="Active sessions">
-					<SessionList />
-				</PanelSection>
-			</PageStack>
-		</>
-	)
-}
+			<SettingsRow title="Active sessions" description="Every device holding a valid session token for this account.">
+				<SessionList />
+			</SettingsRow>
+		</SettingsStack>
+	</PageStack>
+)

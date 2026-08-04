@@ -2,12 +2,16 @@ import { LoginForm } from '@contember/react-client-tenant'
 import { Link, useCurrentRequest } from '@contember/react-routing'
 import { AnchorButton, Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@contember/react-ui-lib-base'
 import { LoginFormFields } from '@contember/react-ui-lib-tenant'
+import { BoxIcon } from 'lucide-react'
 import { indexPageName, resetRequestPageName } from '../modules/registry.js'
 import { CenteredScreen } from './screens.js'
 
 const SignInCard = () => (
 	<Card className="relative w-96 max-w-full">
 		<CardHeader>
+			<span className="mb-2 flex size-10 items-center justify-center rounded-lg bg-primary text-primary-foreground">
+				<BoxIcon className="size-5" />
+			</span>
 			<CardTitle className="text-2xl">Contember management</CardTitle>
 			<CardDescription>Sign in to manage this installation.</CardDescription>
 		</CardHeader>

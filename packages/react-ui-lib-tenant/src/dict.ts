@@ -716,6 +716,7 @@ export const dict = {
 			filterPerson: 'Person identifier',
 			filterPersonPlaceholder: 'E-mail or identifier used to sign in',
 			noResults: 'No entries',
+			forbidden: 'You do not have permission to view the auth log.',
 			failedToLoadData: 'Failed to load data',
 			previous: 'Previous',
 			next: 'Next',

@@ -18,7 +18,7 @@ import {
 } from '@contember/react-ui-lib-base'
 import { ChevronLeftIcon, ChevronRightIcon, RefreshCwIcon } from 'lucide-react'
 import { AuthLogFilter } from '@contember/graphql-client-tenant'
-import { useAuthLogQuery, useTenantQueryLoader } from '@contember/react-client-tenant'
+import { isForbiddenError, useAuthLogQuery, useTenantQueryLoader } from '@contember/react-client-tenant'
 import { dict } from '../dict.js'
 
 const perPage = 20
@@ -116,8 +116,11 @@ export const AuthLogList = ({ controller }: AuthLogListProps) => {
 					</Select>
 				</div>
 			</div>
+			{/* `authLog` rejects rather than answering an empty page, so "not yours to see" is an ordinary state here. */}
 			{query.state === 'error'
-				? <div className="text-destructive italic">{dict.tenant.authLog.failedToLoadData}</div>
+				? isForbiddenError(query.error)
+					? <div className="text-gray-500 italic">{dict.tenant.authLog.forbidden}</div>
+					: <div className="text-destructive italic">{dict.tenant.authLog.failedToLoadData}</div>
 				: (
 					<div className="relative">
 						{query.state !== 'success' && <Loader position="absolute" />}

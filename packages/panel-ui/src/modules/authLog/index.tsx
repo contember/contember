@@ -15,4 +15,6 @@ export const authLogModule: PanelModule = {
 	load: async () => ({
 		authLog: (await import('./AuthLogPage.js')).AuthLogPage,
 	}),
+	// The query throws without this, so the page has nothing to show but a notice.
+	isAvailable: ({ identity }) => identity.permissions.canViewAuthLog,
 }

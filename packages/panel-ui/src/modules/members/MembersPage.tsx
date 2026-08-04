@@ -5,7 +5,8 @@ import { AddProjectMemberFormFields, InviteFormFields, type MemberListController
 import { UserPlusIcon } from 'lucide-react'
 import { useRef } from 'react'
 import { FormDialog } from '../../shell/FormDialog.js'
-import { formClassName, PageHeader, PageStack, PanelSection } from '../../shell/screens.js'
+import { useProjectPermissions } from '../../shell/permissions.js'
+import { formClassName, NoAccessState, PageHeader, PageStack, PanelSection } from '../../shell/screens.js'
 import { PanelSlots } from '../../shell/slots.js'
 
 /**
@@ -16,6 +17,7 @@ import { PanelSlots } from '../../shell/slots.js'
 const Members = ({ projectSlug }: { projectSlug: string }) => {
 	const showToast = useShowToast()
 	const listController = useRef<MemberListController>(undefined)
+	const permissions = useProjectPermissions()
 
 	const invite = (
 		<FormDialog label="Invite" title="Invite a member" description="Creates a new person and gives them access to this project.">
@@ -68,16 +70,20 @@ const Members = ({ projectSlug }: { projectSlug: string }) => {
 			<PageHeader
 				title="Members"
 				description="People with access to this project. Roles and their variables come from the project's own schema, so what a member may see is decided there."
-				actions={
+				actions={permissions?.canAddMember === false ? undefined : (
 					<>
 						{addExisting}
 						{invite}
 					</>
-				}
+				)}
 			/>
-			<PanelSection>
-				<PersonList controller={listController} />
-			</PanelSection>
+			{permissions?.canViewMembers === false
+				? <NoAccessState description="Adding a member does not imply seeing who else is one; this account may do one and not the other." />
+				: (
+					<PanelSection>
+						<PersonList controller={listController} />
+					</PanelSection>
+				)}
 		</PageStack>
 	)
 }

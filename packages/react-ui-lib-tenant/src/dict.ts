@@ -142,9 +142,12 @@ export const dict = {
 		login: {
 			email: 'Email',
 			password: 'Password',
-			otpToken: '2FA OTP token',
-			backupCode: 'Backup code',
-			backupCodeHint: 'Lost your authenticator? Use one of your backup codes instead.',
+			mfa: {
+				otpToken: '2FA OTP token',
+				backupCode: 'Backup code',
+				useBackupCode: 'Lost your authenticator? Use a backup code.',
+				useOtpToken: 'Use your authenticator app instead.',
+			},
 			forgotPassword: 'Forgot password?',
 			login: 'Login',
 			errorMessages: {
@@ -550,9 +553,12 @@ export const dict = {
 		},
 		passwordlessSignIn: {
 			token: 'Verification code',
-			otpToken: '2FA OTP token',
-			backupCode: 'Backup code',
-			backupCodeHint: 'Lost your authenticator? Use one of your backup codes instead.',
+			mfa: {
+				otpToken: '2FA OTP token',
+				backupCode: 'Backup code',
+				useBackupCode: 'Lost your authenticator? Use a backup code.',
+				useOtpToken: 'Use your authenticator app instead.',
+			},
 			submit: 'Sign in',
 			errorMessages: {
 				'FIELD_REQUIRED': 'This field is required',

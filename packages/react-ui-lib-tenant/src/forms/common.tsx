@@ -6,7 +6,7 @@ import { dataAttribute } from '@contember/utilities'
 import { Label } from '@contember/react-ui-lib-base'
 import { dict } from '../dict.js'
 
-type FormErrorMessages<CtxValue extends FormContextValue<any, any, any>> = Record<
+export type FormErrorMessages<CtxValue extends FormContextValue<any, any, any>> = Record<
 	(CtxValue extends FormContextValue<any, infer E> ? E : never) & string,
 	string | undefined
 >

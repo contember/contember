@@ -501,6 +501,20 @@
       "name": "@contember/graphql-client",
       "version": "2.2.0-alpha.3",
     },
+    "packages/graphql-client-actions": {
+      "name": "@contember/graphql-client-actions",
+      "version": "2.2.0-alpha.3",
+      "dependencies": {
+        "graphql-ts-client-api": "catalog:",
+      },
+      "devDependencies": {
+        "@contember/engine-actions": "workspace:*",
+        "@graphql-tools/schema": "catalog:",
+        "@types/node": "catalog:",
+        "graphql": "catalog:",
+        "graphql-ts-client-codegen": "catalog:",
+      },
+    },
     "packages/graphql-client-system": {
       "name": "@contember/graphql-client-system",
       "version": "2.2.0-alpha.3",
@@ -1494,6 +1508,8 @@
     "@contember/graphql-builder": ["@contember/graphql-builder@workspace:packages/graphql-builder"],
 
     "@contember/graphql-client": ["@contember/graphql-client@workspace:packages/graphql-client"],
+
+    "@contember/graphql-client-actions": ["@contember/graphql-client-actions@workspace:packages/graphql-client-actions"],
 
     "@contember/graphql-client-system": ["@contember/graphql-client-system@workspace:packages/graphql-client-system"],
 

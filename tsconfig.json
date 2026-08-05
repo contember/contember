@@ -90,6 +90,9 @@
 			"path": "./packages/graphql-client"
 		},
 		{
+			"path": "./packages/graphql-client-actions"
+		},
+		{
 			"path": "./packages/graphql-client-system"
 		},
 		{

@@ -4,7 +4,7 @@
  * than on a timer.
  */
 export class TtlCache<T> {
-	private readonly entries = new Map<string, { value: T; expiresAt: number }>()
+	private readonly entries = new Map<string, { value: Promise<T>; expiresAt: number }>()
 
 	constructor(
 		private readonly ttlMs: number,
@@ -13,15 +13,27 @@ export class TtlCache<T> {
 	) {}
 
 	public async resolve(key: string, compute: () => Promise<T>): Promise<T> {
-		const now = this.now()
 		const cached = this.entries.get(key)
-		if (cached && cached.expiresAt > now) {
-			return cached.value
+		if (cached && cached.expiresAt > this.now()) {
+			return await cached.value
 		}
-		const value = await compute()
-		this.entries.set(key, { value, expiresAt: now + this.ttlMs })
-		this.sweep(now)
-		return value
+		// The promise is stored before it settles, so a page's worth of parallel requests shares one
+		// lookup — caching the resolved value instead would let every one of them miss and recompute.
+		const pending = compute()
+		this.entries.set(key, { value: pending, expiresAt: this.now() + this.ttlMs })
+		try {
+			const value = await pending
+			// Charge the TTL from when the answer is actually known, not from before the lookup.
+			this.entries.set(key, { value: pending, expiresAt: this.now() + this.ttlMs })
+			this.sweep(this.now())
+			return value
+		} catch (error) {
+			// Never memoise a failure — the next caller should try again.
+			if (this.entries.get(key)?.value === pending) {
+				this.entries.delete(key)
+			}
+			throw error
+		}
 	}
 
 	public get size(): number {

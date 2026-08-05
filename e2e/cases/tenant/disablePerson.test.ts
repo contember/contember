@@ -51,7 +51,10 @@ test('enablePerson restores signIn and reports the disabled state', async () => 
 	const personId: string = personResp.body.data.me.person.id
 	expect(personResp.body.data.me.person.disabledAt).toBe(null)
 
-	await executeGraphql('/tenant', disableMutation, { variables: { id: personId } })
+	// Asserted rather than fired and forgotten: a silent failure here surfaces one step later as
+	// enablePerson reporting PERSON_ALREADY_ENABLED, which blames the wrong mutation.
+	const disableResp = await executeGraphql('/tenant', disableMutation, { variables: { id: personId } })
+	expect(disableResp.body.data.disablePerson).toEqual({ ok: true, error: null })
 
 	const enableResp = await executeGraphql('/tenant', enableMutation, { variables: { id: personId } })
 	expect(enableResp.body.data.enablePerson).toEqual({ ok: true, error: null })

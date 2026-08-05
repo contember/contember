@@ -6,10 +6,12 @@ The engine can serve a management UI itself, so a self-hosted deployment gets on
 separate admin application. It is disabled by default.
 
 :::note[Available since 2.2]
-The panel ships with sign-in and ten modules: projects and a per-project overview, project members,
-project and global API keys, project secrets, tenant-wide persons, the authentication log, a
-read-only view of the tenant configuration, and self-service account security. See the
-[tenant UI components](/reference/interface/ui-components/tenant) for the pieces it is assembled from.
+The panel ships with sign-in and thirteen modules: projects and a per-project overview, project
+members, project and global API keys, project secrets, tenant-wide persons, the authentication log, a
+read-only view of the tenant configuration, self-service account security, the project's stages and
+executed migrations, its data history, and — where the actions plugin is installed — the webhook
+queue. See the [tenant UI components](/reference/interface/ui-components/tenant) for the pieces the
+tenant modules are assembled from.
 :::
 
 ## Enabling it
@@ -44,6 +46,15 @@ the page, so there is no CORS setup and no separate host to configure.
 Plugins can serve their API from that mount too, and the panel tells the UI which ones are there — a
 module whose plugin is not installed simply does not appear. With the actions plugin enabled, the
 panel serves `/panel/api/actions/:project` alongside the tenant, content and system paths.
+
+## What the panel does not do
+
+The system modules are read-only. Stages, executed migrations and the data history are shown;
+**migrations are not executed from the panel** — that stays with
+[`contember migrations:execute`](/reference/cli), the same division as the read-only
+[tenant configuration](/reference/engine/tenant/configuration) view. The actions module is the one
+place the panel writes outside the tenant API: retrying, stopping and dispatching a queued event, and
+setting the variables a webhook target interpolates, are operational work with no CLI equivalent.
 
 :::caution[Put it behind the same protection as your API]
 The panel is served from the engine's HTTP port. If that port is public, so is the panel's login

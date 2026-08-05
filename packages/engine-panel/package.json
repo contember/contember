@@ -24,7 +24,7 @@
     }
   },
   "scripts": {
-    "pre-build": "bun ./scripts/buildAssets.ts"
+    "build:assets": "bun ./scripts/buildAssets.ts"
   },
   "repository": {
     "type": "git",

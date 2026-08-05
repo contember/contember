@@ -163,7 +163,8 @@ jobs:
           TENANT_MAILER_PORT: '1025'
           TENANT_MAILER_FROM: 'contember@localhost'
       - name: "Run E2E tests"
-        run: bun run test:e2e --no-file-parallelism
+        # No parallelism flag needed: bun runs test files sequentially unless --parallel is given.
+        run: bun run test:e2e
         env:
           CONTEMBER_API_URL: "http://localhost:4000"
           CONTEMBER_ROOT_TOKEN: '0000000000000000000000000000000000000000'

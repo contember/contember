@@ -27,7 +27,7 @@ const SignInCard = () => (
 
 /**
  * The "forgot password" link in `LoginFormFields` lands here. Reset mails link to the public-facing
- * app, so the panel cannot complete a reset on its own — see PANEL-PLAN §7, open decision 5.
+ * app, whose URL the engine does not know, so the panel cannot complete a reset on its own.
  */
 const PasswordResetNotice = () => (
 	<Card className="w-96 max-w-full">
@@ -48,8 +48,8 @@ const PasswordResetNotice = () => (
 
 /**
  * E-mail + password, TOTP and backup codes. IdP buttons and magic links are deliberately absent:
- * their redirect URLs are registered against the public-facing app, not the API host
- * (PANEL-PLAN §4.4).
+ * their redirect URLs are registered against the public-facing app, not the API host, so they would
+ * send the user out of the panel and never back.
  */
 export const LoginScreen = () => {
 	const request = useCurrentRequest()

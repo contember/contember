@@ -6,7 +6,7 @@ import { useProjectEntryTarget } from './navigation.js'
 
 /**
  * `me { projects }` only returns projects the identity belongs to, so the switcher is
- * self-filtering — no extra permission probe (PANEL-PLAN §3.3).
+ * self-filtering — no extra permission probe.
  */
 export const ProjectSwitcher = ({ projectSlug }: { projectSlug: string | undefined }) => {
 	const identity = useIdentity()

@@ -1,7 +1,10 @@
 import type { RouteMap } from '@contember/react-routing'
 import type { PanelModule, PanelModuleContext } from './types.js'
 
-/** Fixed position of the project slug for every project-scoped module — see PANEL-PLAN §3.1. */
+/**
+ * Fixed position of the project slug for every project-scoped module, so the switcher can swap
+ * projects by rewriting one route parameter instead of knowing each module's URL shape.
+ */
 export const projectRoutePrefix = '/p/:project'
 
 /** Routes the shell owns; module page names may not collide with them. */

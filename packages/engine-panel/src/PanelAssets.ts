@@ -21,16 +21,16 @@ export class PanelAssetStore {
 
 	/** True when the panel was not built into this binary — see `scripts/buildAssets.ts`. */
 	public isEmpty(): boolean {
-		return this.assets[indexAssetPath] === undefined
+		return this.get(indexAssetPath) === undefined
 	}
 
 	public getContentType(path: string): string | undefined {
-		return this.assets[path]?.contentType
+		return this.get(path)?.contentType
 	}
 
 	/** Gzipped bytes, decoded from base64 on first use and kept for the process lifetime. */
 	public getGzip(path: string): Buffer | undefined {
-		const asset = this.assets[path]
+		const asset = this.get(path)
 		if (!asset) {
 			return undefined
 		}
@@ -40,5 +40,13 @@ export class PanelAssetStore {
 			this.decoded.set(path, decoded)
 		}
 		return decoded
+	}
+
+	/**
+	 * The map is a plain object literal, so a request for `constructor` or `toString` would otherwise
+	 * resolve an inherited member and blow up further down. The route is unauthenticated.
+	 */
+	private get(path: string): PanelAsset | undefined {
+		return Object.hasOwn(this.assets, path) ? this.assets[path] : undefined
 	}
 }

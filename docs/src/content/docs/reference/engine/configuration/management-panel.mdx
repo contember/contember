@@ -6,8 +6,10 @@ The engine can serve a management UI itself, so a self-hosted deployment gets on
 separate admin application. It is disabled by default.
 
 :::note[Available since 2.2]
-The panel is being built module by module. Today it serves the application shell; sign-in and the
-management modules land in following releases.
+The panel ships with sign-in and modules for projects, persons, project members, API keys, global API
+keys, project secrets, the authentication log, a read-only view of the tenant configuration, and
+self-service account security. See the [tenant UI components](/reference/interface/ui-components/tenant)
+for the pieces it is assembled from.
 :::
 
 ## Enabling it
@@ -43,6 +45,14 @@ the page, so there is no CORS setup and no separate host to configure.
 The panel is served from the engine's HTTP port. If that port is public, so is the panel's login
 page. It is served with `frame-ancestors 'none'`, `noindex` and a restrictive Content-Security-Policy,
 but the usual network-level protections you apply to the API apply here too.
+
+Enabling the panel also makes `/panel/api/tenant` answer **unauthenticated** requests with the
+privileges of the deployment's login token — the operations a sign-in screen needs (`signIn`,
+password reset, magic links, IdP redirects) and nothing else. This is what every admin application
+already exposes by shipping `CONTEMBER_LOGIN_TOKEN` to the browser, except the token itself never
+leaves the server. Anonymous calls are accepted from the panel's own origin only, so another site
+cannot drive them from a visitor's browser. Give this path the same protection you would give a
+published login token.
 :::
 
 ## Who may sign in
@@ -65,7 +75,11 @@ An identity may enter when one of these holds:
 - it has a membership with one of `projectRoles` in **at least one** project.
 
 The defaults are `globalRoles: ['super_admin']` and `projectRoles: ['admin']`. An empty list closes
-that dimension; both empty means nobody can enter.
+that dimension; with both empty no identity can reach the console.
+
+This governs the console, not the deployment flag. The unauthenticated sign-in operations described
+above stay reachable while the panel is enabled, so closing both lists is not a way to switch the
+panel off — set `CONTEMBER_PANEL_ENABLED=false` for that.
 
 See [declarative configuration](/reference/engine/tenant/declarative-config) for how to apply this,
 or set it with the [`configure`](/reference/engine/tenant/configuration) mutation directly.
@@ -79,8 +93,17 @@ permissions.
 
 ## Building from source
 
-The panel assets are generated into the server bundle by `pre-build`. When you build the engine
-yourself, `scripts/server-build/run.sh` takes care of it; if you invoke `bun build` or run the engine
-straight from source, run `bun run --filter=@contember/engine-panel pre-build` first. Without the
-assets the engine still starts, logs that the panel is enabled but unbuilt, and does not serve it —
-a released build cannot end up in that state, because the asset build fails when it produces nothing.
+When you build the engine yourself, `scripts/server-build/run.sh` generates the panel assets into the
+bundle for you. If you invoke `bun build` directly, or run the engine **straight from source** (as
+`docker-compose up engine` does), run this first:
+
+```bash
+bun run --filter=@contember/engine-panel build:assets
+```
+
+It is deliberately not part of the repo-wide `pre-build`, so that unrelated builds — the CLI image,
+for one — do not have to build a panel they cannot use.
+
+Without the assets the engine still starts, logs that the panel is enabled but unbuilt, and does not
+serve it. A released build cannot end up in that state, because the asset build fails when it
+produces nothing.

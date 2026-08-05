@@ -41,6 +41,10 @@ other path returns the application shell so client-side routing works.
 The panel's own API traffic lives directly under the same path (`/panel/api`), on the same origin as
 the page, so there is no CORS setup and no separate host to configure.
 
+Plugins can serve their API from that mount too, and the panel tells the UI which ones are there — a
+module whose plugin is not installed simply does not appear. With the actions plugin enabled, the
+panel serves `/panel/api/actions/:project` alongside the tenant, content and system paths.
+
 :::caution[Put it behind the same protection as your API]
 The panel is served from the engine's HTTP port. If that port is public, so is the panel's login
 page. It is served with `frame-ancestors 'none'`, `noindex` and a restrictive Content-Security-Policy,

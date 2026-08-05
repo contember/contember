@@ -36,6 +36,9 @@ bun run format            # Auto-format (dprint)
 docker-compose up --detach       # Start postgres, redis, mailhog, minio, adminer
 docker-compose up engine         # Run engine server (port 4000)
 
+# Fill the local engine with data for every management panel page (idempotent)
+bun --conditions=typescript scripts/dev/seed-local.ts
+
 # Create a new package
 ./scripts/dev/create-package.sh <package-name>
 ```

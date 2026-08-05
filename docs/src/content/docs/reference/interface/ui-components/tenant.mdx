@@ -50,7 +50,7 @@ Open any of those files under `admin/lib/tenant` and edit freely — styling, ma
 | `ConfirmEmailChangeForm` / `ConfirmEmailChangeFormFields` | Confirms a pending e-mail address change | client-tenant / ui-lib-tenant |
 | `RequestEmailVerificationForm` / `RequestEmailVerificationFormFields` | Re-sends the e-mail verification link | client-tenant / ui-lib-tenant |
 | `IDP`, `IDPInitTrigger` | Redirect-based sign-in with an external identity provider (OIDC, Google, …) | client-tenant |
-| `SignUpForm` / `SignUpFormFields` | *(since 2.3)* Open registration. Creates the account only — it does **not** sign anyone in, so follow a success with `LoginForm`, or with a "check your inbox" screen when `config.signup.requireEmailVerification` is on | client-tenant / ui-lib-tenant |
+| `SignUpForm` / `SignUpFormFields` | *(since 2.2)* Open registration. Creates the account only — it does **not** sign anyone in, so follow a success with `LoginForm`, or with a "check your inbox" screen when `config.signup.requireEmailVerification` is on | client-tenant / ui-lib-tenant |
 
 :::note[IdP buttons are configured, not discovered]
 `IDPInitTrigger` needs its provider slug from your own application config. `Query.identityProviders` requires `idp:list`, so an unauthenticated login page cannot ask the API which providers exist.
@@ -73,10 +73,10 @@ Open any of those files under `admin/lib/tenant` and edit freely — styling, ma
 
 | Export | What it does | From |
 |---|---|---|
-| `InviteForm` / `InviteFormFields` | Invite a new person by e-mail, with initial project roles. *(since 2.3)* Pass `allowUnmanaged` to **both** to offer a "do not send an invitation e-mail" checkbox, which switches the submit to `unmanagedInvite` and reveals an optional password field — for seeding, migrations and air-gapped setups. Passing it only to the fields throws on submit instead of quietly mailing | client-tenant / ui-lib-tenant |
+| `InviteForm` / `InviteFormFields` | Invite a new person by e-mail, with initial project roles. *(since 2.2)* Pass `allowUnmanaged` to **both** to offer a "do not send an invitation e-mail" checkbox, which switches the submit to `unmanagedInvite` and reveals an optional password field — for seeding, migrations and air-gapped setups. Passing it only to the fields throws on submit instead of quietly mailing | client-tenant / ui-lib-tenant |
 | `AddProjectMemberForm` / `AddProjectMemberFormFields` | Add an **existing** identity (by id) to the project, with roles | client-tenant / ui-lib-tenant |
 | `UpdateProjectMemberForm` / `UpdateProjectMemberFormFields` | Change an existing member's roles and membership variables | client-tenant / ui-lib-tenant |
-| `PersonList` (aliased `MemberList`) | The project's member table — roles, MFA badges, edit/remove | ui-lib-tenant |
+| `PersonList` | `MemberList` specialized to `memberType: 'PERSON'` — the project's member table with roles, MFA badges, edit/remove | ui-lib-tenant |
 | `MembershipsControl`, `useIntrospectionRolesConfig` | Role/variable picker; roles are introspected from the project's schema unless you pass your own `RolesConfig` | ui-lib-tenant |
 
 ## API keys
@@ -112,7 +112,7 @@ Needs a global role (typically `SUPER_ADMIN`) or an explicit tenant ACL grant �
 
 ## Configuration (read-only)
 
-*(since 2.3)* These four views display configuration that is written with [`contember tenant:apply`](/reference/engine/tenant/declarative-config). There is no editing counterpart by design — each view says so, rather than offering an affordance it would have to refuse.
+*(since 2.2)* These four views display configuration that is written with [`contember tenant:apply`](/reference/engine/tenant/declarative-config). There is no editing counterpart by design — each view says so, rather than offering an affordance it would have to refuse.
 
 | Export | What it does | From |
 |---|---|---|
@@ -149,11 +149,32 @@ const person = useIdentity()?.person
 </ChangeMyProfileForm>
 ```
 
-The `key` matters: the form snapshots `initialValues` when it mounts, so re-keying on the loaded values is what makes the fields pick up a fresh profile after e.g. a refetch. See the full `Security`, `Members`, `ApiKeys`, `Persons`, `AuditLog`, and `ProjectSecrets` page components in that same template file for how the pieces above compose into full pages.
+The `key` matters: the form snapshots `initialValues` when it mounts, so re-keying on the loaded values is what makes the fields pick up a fresh profile after e.g. a refetch. See the full `Security`, `Members`, `ApiKeys`, `Persons`, `AuditLog`, `Configuration` and `ProjectSecrets` page components in that same template file for how the pieces above compose into full pages.
+
+### Refreshing a listing
+
+Every listing takes an optional `controller` ref and assigns a `refresh` handle to it, so a host app can reload the table after a mutation it owns:
+
+```tsx
+const members = useRef<MemberListController>(undefined)
+
+<AddProjectMemberForm projectSlug={slug} onSuccess={() => members.current?.refresh()}>
+  <AddProjectMemberFormFields projectSlug={slug} />
+</AddProjectMemberForm>
+<MemberList controller={members} />
+```
+
+The controller type is named after its listing (`MemberListController`, `PersonsListController`, `AuthLogListController`, …) and the pattern is the same for all of them.
 
 ## Permissions
 
-`PersonsList` and `GlobalApiKeyList` read the `persons` and `globalApiKeys` queries, both of which check the caller's permission server-side and return an **empty array** rather than an error when it's missing — an under-privileged caller just sees an empty table. `AuthLogList`'s underlying `authLog` query is stricter: it requires `system:viewAuthLog` and throws on a missing grant, so that list renders its failed-to-load state instead of an empty table for a caller without audit-log access. Either way, none of the three throws for lack of data to display — worst case is an empty or errored listing, not a crashed page. See [Tenant ACL permissions](/reference/engine/schema/acl#tenant-permissions) for granting these.
+Permission failure is not uniform, so these three listings behave differently:
+
+- `GlobalApiKeyList` reads `globalApiKeys`, which checks server-side and returns an **empty array** when the grant is missing — an under-privileged caller just sees an empty table.
+- `PersonsList` reads `persons`, which **narrows** rather than empties: without `person:list` the caller still gets the members of the projects they administer, and an empty table only means there were none.
+- `AuthLogList` reads `authLog`, which requires `system:viewAuthLog` and **throws**. The list detects that with `isForbiddenError` and renders a "no permission" notice, keeping its failed-to-load state for genuine failures.
+
+None of the three crashes the page. The read-only configuration views above throw in the same way as `authLog` and render the same kind of notice. See [permission introspection](/reference/engine/tenant/permissions) for asking up front what the caller may do, and [Tenant ACL permissions](/reference/engine/schema/acl#tenant-permissions) for granting these.
 
 ## Not covered here
 

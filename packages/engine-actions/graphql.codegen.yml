@@ -10,7 +10,7 @@ generates:
       enumsAsTypes: "1"
       scalars:
         DateTime: Date
-        Uuid: string
+        UUID: string
         Json: any
     plugins:
       - "typescript"

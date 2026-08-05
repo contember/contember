@@ -27,7 +27,7 @@ export class ResolversFactory {
 		} = {
 			Json: JSONType,
 			DateTime: DateTimeType,
-			Uuid: UuidType,
+			UUID: UuidType,
 			Mutation: {
 				processBatch: this.processBatchMutationResolver.processBatch.bind(this.processBatchMutationResolver),
 				setVariables: this.setVariablesMutationResolver.setVariables.bind(this.setVariablesMutationResolver),

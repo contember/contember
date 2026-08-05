@@ -2,9 +2,10 @@ import * as React from 'react'
 import { useState } from 'react'
 import { Button, Input, ToastContent, useShowToast } from '@contember/react-ui-lib-base'
 import { PlusIcon, XIcon } from 'lucide-react'
-import { useAddGlobalIdentityRolesMutation, useRemoveGlobalIdentityRolesMutation } from '@contember/react-client-tenant'
+import { toFormErrorCode, useAddGlobalIdentityRolesMutation, useRemoveGlobalIdentityRolesMutation } from '@contember/react-client-tenant'
 import { AddGlobalIdentityRolesErrorCode, RemoveGlobalIdentityRolesErrorCode } from '@contember/graphql-client-tenant'
 import { dict } from '../dict.js'
+import { actionErrorMessage } from '../errors.js'
 
 export interface GlobalRolesControlProps {
 	identityId: string
@@ -32,31 +33,49 @@ export const GlobalRolesControl = ({ identityId, roles, onChange }: GlobalRolesC
 		showToast(<ToastContent>{message}</ToastContent>, { type: 'error' })
 	}
 
+	const onThrown = (error: unknown) => {
+		const message = actionErrorMessage(toFormErrorCode(error), dict.tenant.globalRoles.errorMessages.UNKNOWN_ERROR)
+		showToast(<ToastContent>{message}</ToastContent>, { type: 'error' })
+	}
+
 	const onAdd = async () => {
 		const role = newRole.trim()
 		if (!role) {
 			return
 		}
 		setSubmitting(true)
-		const result = await addRoles({ identityId, roles: [role] })
-		setSubmitting(false)
-		if (result.ok) {
-			setNewRole('')
-			showToast(<ToastContent>{dict.tenant.globalRoles.addSuccess}</ToastContent>, { type: 'success' })
-		} else {
-			onError(result.error)
+		try {
+			const result = await addRoles({ identityId, roles: [role] })
+			if (result.ok) {
+				setNewRole('')
+				showToast(<ToastContent>{dict.tenant.globalRoles.addSuccess}</ToastContent>, { type: 'success' })
+			} else {
+				onError(result.error)
+			}
+		} catch (error) {
+			// A denied mutation throws rather than answering `ok: false` — without this the control
+			// would stay disabled forever with nothing said. Reachable: a project admin cannot grant
+			// a global role, and `PersonDetail` renders this for them.
+			onThrown(error)
+		} finally {
+			setSubmitting(false)
 		}
 		onChange?.()
 	}
 
 	const onRemove = async (role: string) => {
 		setSubmitting(true)
-		const result = await removeRoles({ identityId, roles: [role] })
-		setSubmitting(false)
-		if (result.ok) {
-			showToast(<ToastContent>{dict.tenant.globalRoles.removeSuccess}</ToastContent>, { type: 'success' })
-		} else {
-			onError(result.error)
+		try {
+			const result = await removeRoles({ identityId, roles: [role] })
+			if (result.ok) {
+				showToast(<ToastContent>{dict.tenant.globalRoles.removeSuccess}</ToastContent>, { type: 'success' })
+			} else {
+				onError(result.error)
+			}
+		} catch (error) {
+			onThrown(error)
+		} finally {
+			setSubmitting(false)
 		}
 		onChange?.()
 	}

@@ -1,6 +1,9 @@
+import { actionsModule } from './actions/index.js'
 import { authLogModule } from './authLog/index.js'
 import { configurationModule } from './configuration/index.js'
+import { deploymentModule } from './deployment/index.js'
 import { globalApiKeysModule } from './globalApiKeys/index.js'
+import { historyModule } from './history/index.js'
 import { membersModule } from './members/index.js'
 import { mySecurityModule } from './mySecurity/index.js'
 import { personsModule } from './persons/index.js'
@@ -29,6 +32,9 @@ export const panelModules: readonly PanelModule[] = [
 	membersModule,
 	projectApiKeysModule,
 	projectSecretsModule,
+	deploymentModule,
+	historyModule,
+	actionsModule,
 ]
 
 /** Built once at startup so a bad registration fails loudly rather than on the first click. */

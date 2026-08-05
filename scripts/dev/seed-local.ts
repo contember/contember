@@ -1,15 +1,22 @@
 /**
- * Fills the local engine with enough data that every page of the management panel has something to show.
+ * Fills the local engine with enough data that every page of the management panel has something to show,
+ * on more than one project and with enough volume that the paged pages actually page.
  *
  * Run: bun --conditions=typescript scripts/dev/seed-local.ts
  *
+ * Options (all optional):
+ *   --projects=playground,demo-shop   projects to seed; a missing one is created by the CLI
+ *   --history-events=1500             content events per project written by the bulk phase
+ *   --actions-events=1000             actions events per project written by the bulk phase
+ *   --api-url= --token= --login-token= --sink-url= --fail-url= --dsn=
+ *
  * Everything goes through the public APIs (tenant / content / system / actions). The single exception is the
- * `visible_at` nudge in the actions phase, which only skips the retry backoff so the engine itself can drive an
+ * `visible_at` nudge in the actions phases, which only skips the retry backoff so the engine itself can drive an
  * event to the terminal `failed` state inside one run — state, payload, target and log stay the engine's own.
  *
  * Idempotent: every row it writes carries the `panel-seed` marker or a fixed id, and each phase is skipped when
- * its marker is already there. Nothing is ever deleted except the two content rows the seed creates to record a
- * delete event in the history.
+ * its marker is already there — so a re-run adds nothing and a bigger `--history-events` on a seeded project is
+ * ignored. Nothing is ever deleted except the content rows the seed creates to record delete events.
  */
 import { spawnSync } from 'node:child_process'
 import { fileURLToPath } from 'node:url'
@@ -40,10 +47,24 @@ type Options = {
 	apiUrl: string
 	token: string
 	loginToken: string
-	project: string
+	projects: readonly string[]
+	historyEvents: number
+	actionsEvents: number
 	dsn: string | undefined
 	sinkUrl: string
 	failUrl: string
+}
+
+const parseCount = (values: Map<string, string>, key: string, fallback: number): number => {
+	const raw = values.get(key)
+	if (raw === undefined) {
+		return fallback
+	}
+	const parsed = Number(raw)
+	if (!Number.isInteger(parsed) || parsed < 0) {
+		throw new Error(`--${key} must be a non-negative whole number, got ${raw}`)
+	}
+	return parsed
 }
 
 const parseOptions = (argv: readonly string[]): Options => {
@@ -55,23 +76,44 @@ const parseOptions = (argv: readonly string[]): Options => {
 		}
 		values.set(match[1], match[2])
 	}
-	const known = ['api-url', 'token', 'login-token', 'project', 'dsn', 'sink-url', 'fail-url']
+	const known = ['api-url', 'token', 'login-token', 'projects', 'history-events', 'actions-events', 'dsn', 'sink-url', 'fail-url']
 	for (const key of values.keys()) {
 		if (!known.includes(key)) {
 			throw new Error(`Unknown option --${key}. Known: ${known.map(it => `--${it}`).join(', ')}`)
 		}
 	}
+	const projects = [...new Set((values.get('projects') ?? 'playground,demo-shop').split(',').map(it => it.trim()).filter(it => it !== ''))]
+	if (projects.length === 0) {
+		throw new Error('--projects needs at least one project slug')
+	}
+	const dsn = values.get('dsn') ?? process.env.DATABASE_URL
+	// One DSN cannot address two project databases, so it is only accepted for a single-project run.
+	if (dsn !== undefined && projects.length > 1) {
+		throw new Error('--dsn works with a single project only; drop it and use PGHOST / PGPORT / PGUSER / PGPASSWORD instead')
+	}
 	return {
 		apiUrl: (values.get('api-url') ?? process.env.CONTEMBER_API_URL ?? 'http://localhost:3001').replace(/\/+$/, ''),
 		token: values.get('token') ?? process.env.CONTEMBER_ROOT_TOKEN ?? ROOT_TOKEN,
 		loginToken: values.get('login-token') ?? process.env.CONTEMBER_LOGIN_TOKEN ?? LOGIN_TOKEN,
-		project: values.get('project') ?? 'playground',
-		dsn: values.get('dsn') ?? process.env.DATABASE_URL,
+		projects,
+		historyEvents: parseCount(values, 'history-events', 1500),
+		actionsEvents: parseCount(values, 'actions-events', 1000),
+		dsn,
 		// Both URLs are dialled by the engine, so they are resolved inside its container, not on the host.
 		sinkUrl: values.get('sink-url') ?? 'http://localhost:4000/?panelSeedSink=',
 		failUrl: values.get('fail-url') ?? 'http://127.0.0.1:9',
 	}
 }
+
+const chunk = <T>(items: readonly T[], size: number): readonly (readonly T[])[] => {
+	const batches: T[][] = []
+	for (let index = 0; index < items.length; index += size) {
+		batches.push(items.slice(index, index + size))
+	}
+	return batches
+}
+
+const range = (count: number): readonly number[] => Array.from({ length: count }, (_, index) => index)
 
 // ---------------------------------------------------------------------------------------------- json helpers
 
@@ -103,6 +145,13 @@ const asOptionalString = (value: unknown, path: string): string | undefined => {
 		return undefined
 	}
 	return asString(value, path)
+}
+
+const asNumber = (value: unknown, path: string): number => {
+	if (typeof value !== 'number') {
+		throw new Error(`Expected a number at ${path}, got ${JSON.stringify(value)}`)
+	}
+	return value
 }
 
 const asBoolean = (value: unknown, path: string): boolean => {
@@ -197,24 +246,41 @@ const countExecutedMigrations = async (system: GraphQlEndpoint): Promise<number>
 	return asArray(data['executedMigrations'], 'executedMigrations').length
 }
 
+/** The CLI creates the project as its first step, so this covers both "not migrated" and "does not exist". */
+const runCliMigrations = (project: string): void => {
+	const command = `docker compose run --rm -e CONTEMBER_PROJECT_NAME=${project} cli migrations:execute --yes`
+	log(`Project ${project} is not migrated — running: ${command}`)
+	const result = spawnSync(
+		'docker',
+		['compose', 'run', '--rm', '-e', `CONTEMBER_PROJECT_NAME=${project}`, 'cli', 'migrations:execute', '--yes'],
+		{ cwd: repoRoot, stdio: 'inherit' },
+	)
+	if (result.status !== 0) {
+		throw new Error(`Could not migrate ${project}. Run this yourself and then re-run the seed:\n  ${command}`)
+	}
+}
+
 const ensureMigrations = async (system: GraphQlEndpoint, project: string): Promise<number> => {
 	const executed = await countExecutedMigrations(system)
 	if (executed > 0) {
 		return executed
 	}
-	log(`Project ${project} has no executed migrations — running the CLI.`)
-	const result = spawnSync('docker', ['compose', 'run', '--rm', 'cli', 'migrations:execute', '--yes'], { cwd: repoRoot, stdio: 'inherit' })
-	if (result.status !== 0) {
-		throw new Error(
-			`Could not migrate ${project}. Run this yourself and then re-run the seed:\n`
-				+ '  docker compose run --rm cli migrations:execute --yes',
-		)
-	}
+	runCliMigrations(project)
 	const after = await countExecutedMigrations(system)
 	if (after === 0) {
 		throw new Error(`Project ${project} still reports no executed migrations. Run: docker compose run --rm cli migrations:execute --yes`)
 	}
 	return after
+}
+
+/** Every project the seed touches runs the playground migrations, so both projects share one content schema. */
+const ensureProject = async (tenant: GraphQlEndpoint, apiUrl: string, token: string, project: string): Promise<number> => {
+	const existing = (await tenant.request('query($project: String!) { projectBySlug(slug: $project) { slug } }', { project }))['projectBySlug']
+	if (existing === null || existing === undefined) {
+		runCliMigrations(project)
+	}
+	const system = new GraphQlEndpoint(`${apiUrl}/system/${project}`, token)
+	return await ensureMigrations(system, project)
 }
 
 // ---------------------------------------------------------------------------------------------- tenant
@@ -316,18 +382,11 @@ const seedPeople = async (tenant: GraphQlEndpoint, project: string): Promise<num
 	return created
 }
 
-const seedApiKeys = async (tenant: GraphQlEndpoint, project: string): Promise<number> => {
+const seedProjectApiKey = async (tenant: GraphQlEndpoint, project: string): Promise<number> => {
 	let created = 0
-	const existing = await tenant.request(
-		'query($project: String!) { projectBySlug(slug: $project) { apiKeys { description } } globalApiKeys { description } }',
-		{
-			project,
-		},
-	)
+	const existing = await tenant.request('query($project: String!) { projectBySlug(slug: $project) { apiKeys { description } } }', { project })
 	const projectKeys = asArray(asRecord(existing['projectBySlug'], 'projectBySlug')['apiKeys'], 'apiKeys')
 		.map((it, index) => asOptionalString(asRecord(it, `apiKeys[${index}]`)['description'], 'description'))
-	const globalKeys = asArray(existing['globalApiKeys'], 'globalApiKeys')
-		.map((it, index) => asOptionalString(asRecord(it, `globalApiKeys[${index}]`)['description'], 'description'))
 
 	if (!projectKeys.includes(projectApiKeyDescription)) {
 		const data = await tenant.request(
@@ -345,6 +404,15 @@ const seedApiKeys = async (tenant: GraphQlEndpoint, project: string): Promise<nu
 		log(`  project api key token (shown once): ${asOptionalString(token, 'token') ?? '<hidden>'}`)
 		created++
 	}
+	return created
+}
+
+/** Global keys belong to no project, so this runs once per tenant, not once per project. */
+const seedGlobalApiKey = async (tenant: GraphQlEndpoint): Promise<number> => {
+	let created = 0
+	const existing = await tenant.request('{ globalApiKeys { description } }')
+	const globalKeys = asArray(existing['globalApiKeys'], 'globalApiKeys')
+		.map((it, index) => asOptionalString(asRecord(it, `globalApiKeys[${index}]`)['description'], 'description'))
 
 	if (!globalKeys.includes(globalApiKeyDescription)) {
 		const data = await tenant.request(
@@ -567,6 +635,134 @@ const seedHistory = async (content: GraphQlEndpoint): Promise<{ created: number;
 	return { created: 5, updated: 3, deleted: 2 }
 }
 
+// ---------------------------------------------------------------------------------------------- bulk content history
+
+/** One aliased mutation per row, all in one transaction: the round trips, not the rows, are what costs time. */
+const bulkBatchSize = 100
+
+/** Slug of the row written last by the bulk history phase — its presence means the phase is done. */
+const bulkHistoryMarkerSlug = 'panel-seed-bulk-history'
+
+type BulkEntity = {
+	readonly entity: string
+	readonly table: string
+	readonly create: (index: number, run: string) => string
+	readonly update: (index: number) => string
+}
+
+const taskStates = ['backlog', 'todo', 'inProgress', 'done']
+
+/** Six tables so the history table filter has something to narrow down. All of them are plain columns only. */
+const bulkEntities: readonly BulkEntity[] = [
+	{
+		entity: 'GridAuthor',
+		table: 'grid_author',
+		create: (index, run) => `{ name: "Bulk author ${index}", slug: "bulk-${run}-author-${index}" }`,
+		update: index => `{ name: "Bulk author ${index} (renamed)" }`,
+	},
+	{
+		entity: 'GridCategory',
+		table: 'grid_category',
+		create: (index, run) => `{ name: "Bulk category ${index}", slug: "bulk-${run}-category-${index}" }`,
+		update: index => `{ name: "Bulk category ${index} (renamed)" }`,
+	},
+	{
+		entity: 'GridTag',
+		table: 'grid_tag',
+		create: (index, run) => `{ name: "Bulk tag ${index}", slug: "bulk-${run}-tag-${index}" }`,
+		update: index => `{ name: "Bulk tag ${index} (renamed)" }`,
+	},
+	{
+		entity: 'BoardTag',
+		table: 'board_tag',
+		create: (index, run) => `{ name: "Bulk board tag ${index}", slug: "bulk-${run}-board-tag-${index}", color: "#2f6fed" }`,
+		update: () => '{ color: "#e0483d" }',
+	},
+	{
+		entity: 'BoardUser',
+		table: 'board_user',
+		create: (index, run) => `{ name: "Bulk user ${index}", username: "bulk-${run}-user-${index}", order: ${index} }`,
+		update: index => `{ name: "Bulk user ${index} (renamed)" }`,
+	},
+	{
+		entity: 'BoardTask',
+		table: 'board_task',
+		create: index =>
+			`{ title: "Bulk task ${index}", description: "Seeded task ${index}", status: ${taskStates[index % taskStates.length]}, order: ${index} }`,
+		update: index => `{ status: done, title: "Bulk task ${index} (done)" }`,
+	},
+]
+
+/** Runs many aliased mutations as one request and one transaction; returns the `node.id` of each, when asked for. */
+const runContentBatch = async (content: GraphQlEndpoint, mutations: readonly string[]): Promise<readonly (string | undefined)[]> => {
+	const query = `mutation {\n${mutations.map((it, index) => `\tm${index}: ${it}`).join('\n')}\n}`
+	const data = await content.request(query)
+	return mutations.map((_, index) => {
+		const field = `m${index}`
+		const result = asRecord(data[field], field)
+		if (!asBoolean(result['ok'], `${field}.ok`)) {
+			throw new Error(`${field} failed: ${asOptionalString(result['errorMessage'], `${field}.errorMessage`) ?? 'no message'}`)
+		}
+		const node = result['node']
+		if (node === null || node === undefined) {
+			return undefined
+		}
+		return asString(asRecord(node, `${field}.node`)['id'], `${field}.node.id`)
+	})
+}
+
+type BulkHistoryResult = { readonly created: number; readonly updated: number; readonly deleted: number; readonly skipped: boolean }
+
+/** Creates, updates and deletes across six tables until the project holds roughly `target` visible events. */
+const seedBulkHistory = async (content: GraphQlEndpoint, target: number): Promise<BulkHistoryResult> => {
+	const marker = await content.request('query($slug: String!) { getGridCategory(by: { slug: $slug }) { id } }', { slug: bulkHistoryMarkerSlug })
+	if (marker['getGridCategory'] !== null) {
+		return { created: 0, updated: 0, deleted: 0, skipped: true }
+	}
+	if (target <= 0) {
+		return { created: 0, updated: 0, deleted: 0, skipped: false }
+	}
+
+	// A run id in every slug, so the leftovers of an interrupted run never collide with the next one.
+	const run = Date.now().toString(36)
+	const createCount = Math.max(bulkEntities.length, Math.round(target * 0.55))
+	const rows: { readonly entity: BulkEntity; readonly index: number; readonly id: string }[] = []
+	const plan = range(createCount).map(index => ({ entity: bulkEntities[index % bulkEntities.length], index }))
+	for (const batch of chunk(plan, bulkBatchSize)) {
+		const ids = await runContentBatch(
+			content,
+			batch.map(it => `create${it.entity.entity}(data: ${it.entity.create(it.index, run)}) { ok errorMessage node { id } }`),
+		)
+		for (const [position, it] of batch.entries()) {
+			const id = ids[position]
+			if (id === undefined) {
+				throw new Error(`create${it.entity.entity} answered without a node id`)
+			}
+			rows.push({ entity: it.entity, index: it.index, id })
+		}
+	}
+
+	const updateCount = Math.min(rows.length, Math.round(target * 0.3))
+	for (const batch of chunk(rows.slice(0, updateCount), bulkBatchSize)) {
+		await runContentBatch(
+			content,
+			batch.map(it => `update${it.entity.entity}(by: { id: "${it.id}" }, data: ${it.entity.update(it.index)}) { ok errorMessage }`),
+		)
+	}
+
+	// Deletes take the tail, so a row is never deleted before the update phase has touched it.
+	const deleteCount = Math.min(rows.length, Math.max(0, target - createCount - updateCount))
+	for (const batch of chunk(rows.slice(rows.length - deleteCount), bulkBatchSize)) {
+		await runContentBatch(content, batch.map(it => `delete${it.entity.entity}(by: { id: "${it.id}" }) { ok errorMessage }`))
+	}
+
+	await runContentBatch(content, [
+		`createGridCategory(data: { name: "Panel seed bulk history marker", slug: "${bulkHistoryMarkerSlug}" }) { ok errorMessage node { id } }`,
+	])
+
+	return { created: createCount + 1, updated: updateCount, deleted: deleteCount, skipped: false }
+}
+
 // ---------------------------------------------------------------------------------------------- actions
 
 type ActionsEventSummary = { readonly id: string; readonly state: string; readonly attempts: number }
@@ -693,80 +889,248 @@ const seedActions = async (content: GraphQlEndpoint, actions: GraphQlEndpoint, s
 	return { events, nudged: [...new Set(nudged)], skipped: false }
 }
 
+// ---------------------------------------------------------------------------------------------- bulk actions
+
+/** Value of the row written last by the bulk actions phase — its presence means the phase is done. */
+const bulkActionsMarker = 'panel-seed bulk actions complete'
+
+/**
+ * How many events are driven to each terminal or waiting state. The rest of the target is left in `created`,
+ * which is what a real backlog looks like. Only these need dispatching, and a batch is one event, so keeping
+ * them in the dozens is what keeps a run to about a minute.
+ */
+const bulkActionsSpread = { succeed: 18, failed: 5, retrying: 12, stopped: 25 }
+
+type BulkActionsResult = {
+	readonly skipped: boolean
+	readonly succeed: number
+	readonly failed: number
+	readonly retrying: number
+	readonly stopped: number
+	readonly backlog: number
+}
+
+/** Every watched row change is one event, so a batch of aliased creates is a batch of events. */
+const createActionsEntries = async (content: GraphQlEndpoint, values: readonly string[]): Promise<void> => {
+	for (const batch of chunk(values, bulkBatchSize)) {
+		await runContentBatch(content, batch.map(value => `createActionsEntry(data: { value: ${JSON.stringify(value)} }) { ok errorMessage node { id } }`))
+	}
+}
+
+/** Creates the given entries and returns the ids of the events they raised. Only for batches well under 200. */
+const emitEvents = async (content: GraphQlEndpoint, actions: GraphQlEndpoint, values: readonly string[]): Promise<readonly string[]> => {
+	const before = new Set(await pendingEventIds(actions))
+	await createActionsEntries(content, values)
+	const fresh = (await pendingEventIds(actions)).filter(it => !before.has(it))
+	if (fresh.length !== values.length) {
+		throw new Error(`Expected ${values.length} new actions events, saw ${fresh.length}`)
+	}
+	return fresh
+}
+
+const countEventsInState = async (sql: Client, ids: readonly string[], state: string): Promise<number> => {
+	const result = await sql.query('SELECT count(*)::int AS count FROM system.actions_event WHERE id = ANY($1::uuid[]) AND state = $2', [ids, state])
+	return asNumber(asRecord(result.rows[0], 'row')['count'], 'count')
+}
+
+const seedBulkActions = async (
+	content: GraphQlEndpoint,
+	actions: GraphQlEndpoint,
+	sql: Client,
+	options: Options,
+	target: number,
+): Promise<BulkActionsResult> => {
+	const marker = await content.request('query($value: String!) { listActionsEntry(filter: { value: { eq: $value } }, limit: 1) { id } }', {
+		value: bulkActionsMarker,
+	})
+	const empty = { skipped: false, succeed: 0, failed: 0, retrying: 0, stopped: 0, backlog: 0 }
+	if (asArray(marker['listActionsEntry'], 'listActionsEntry').length > 0) {
+		return { ...empty, skipped: true }
+	}
+	if (target <= 0) {
+		return empty
+	}
+
+	// A batch always takes the oldest visible event, so the spread below is only honest while the queue is quiet.
+	// The small phase leaves an event or two open and a half-finished earlier run a few more — those get delivered
+	// here with the rest. A real backlog means a bulk run stopped midway: refuse rather than deliver it away.
+	const waiting = await pendingEventIds(actions)
+	if (waiting.length > 100) {
+		throw new Error(
+			`The actions queue already holds ${waiting.length} visible events. Stop or process them first — the bulk phase would deliver them all.`,
+		)
+	}
+
+	// Delivered for real against a target that answers 200.
+	await setActionsUrl(actions, options.sinkUrl)
+	const delivered = await emitEvents(content, actions, range(bulkActionsSpread.succeed).map(index => `panel-seed bulk delivered ${index + 1}`))
+	// Retrying leftovers become visible again as their backoff expires, so the drain gets room beyond the count.
+	await drainQueue(actions, waiting.length + delivered.length + 20)
+
+	// Failed for real against an unreachable target. `failed` is terminal only once the attempts run out, so
+	// each round nudges visible_at past the exponential backoff — nothing else about the events is touched.
+	await setActionsUrl(actions, options.failUrl)
+	const failing = await emitEvents(content, actions, range(bulkActionsSpread.failed).map(index => `panel-seed bulk exhausted ${index + 1}`))
+	for (let round = 0; round < failing.length * 15; round++) {
+		if (await countEventsInState(sql, failing, 'failed') === failing.length) {
+			break
+		}
+		await processBatch(actions)
+		await sql.query("UPDATE system.actions_event SET visible_at = now() WHERE id = ANY($1::uuid[]) AND state = 'retrying'", [failing])
+	}
+
+	// One attempt each, then they wait for the next retry — the queue always has some of these.
+	const retrying = await emitEvents(content, actions, range(bulkActionsSpread.retrying).map(index => `panel-seed bulk retrying ${index + 1}`))
+	for (let round = 0; round < retrying.length * 3; round++) {
+		if (await countEventsInState(sql, retrying, 'created') === 0) {
+			break
+		}
+		await processBatch(actions)
+	}
+
+	// Stopped by hand, the way an operator drops an event that is never going to be delivered.
+	const stopping = await emitEvents(content, actions, range(bulkActionsSpread.stopped).map(index => `panel-seed bulk stopped ${index + 1}`))
+	for (const batch of chunk(stopping, bulkBatchSize)) {
+		const query = `mutation {\n${batch.map((id, index) => `\ts${index}: stopEvent(id: ${JSON.stringify(id)}) { ok }`).join('\n')}\n}`
+		const data = await actions.request(query)
+		for (const index of range(batch.length)) {
+			if (!asBoolean(asRecord(data[`s${index}`], `s${index}`)['ok'], `s${index}.ok`)) {
+				throw new Error(`stopEvent ${batch[index]} did not report ok`)
+			}
+		}
+	}
+
+	// The backlog: created, never dispatched, because the local override runs the engine without a dispatch worker.
+	const driven = bulkActionsSpread.succeed + bulkActionsSpread.failed + bulkActionsSpread.retrying + bulkActionsSpread.stopped
+	const backlog = Math.max(0, target - driven - 1)
+	await createActionsEntries(content, range(backlog).map(index => `panel-seed bulk backlog ${index + 1}`))
+	await createActionsEntries(content, [bulkActionsMarker])
+
+	return {
+		skipped: false,
+		succeed: await countEventsInState(sql, delivered, 'succeed'),
+		failed: await countEventsInState(sql, failing, 'failed'),
+		retrying: await countEventsInState(sql, retrying, 'retrying'),
+		stopped: await countEventsInState(sql, stopping, 'stopped'),
+		backlog: backlog + 1,
+	}
+}
+
 // ---------------------------------------------------------------------------------------------- summary
 
-const summarize = async (tenant: GraphQlEndpoint, system: GraphQlEndpoint, actions: GraphQlEndpoint, project: string): Promise<void> => {
+/** Counts straight from the project database — the queue and history APIs page, they do not total. */
+const countByColumn = async (sql: Client, query: string): Promise<readonly (readonly [string, number])[]> => {
+	const result = await sql.query(query)
+	return result.rows.map((row, index) => {
+		const record = asRecord(row, `rows[${index}]`)
+		return [asString(record['key'], 'key'), asNumber(record['count'], 'count')] as const
+	})
+}
+
+const format = (counts: readonly (readonly [string, number])[]): string =>
+	counts.length === 0 ? 'none' : counts.map(([key, count]) => `${key}=${count}`).join(', ')
+
+const summarizeProject = async (
+	tenant: GraphQlEndpoint,
+	system: GraphQlEndpoint,
+	actions: GraphQlEndpoint,
+	sql: Client,
+	project: string,
+): Promise<void> => {
+	log(`  ${project}:`)
 	const tenantData = await tenant.request(
-		`query($project: String!) {
-			projectBySlug(slug: $project) { members { identity { id } } apiKeys { description } secrets { key } }
-			globalApiKeys { description }
-		}`,
+		'query($project: String!) { projectBySlug(slug: $project) { members { identity { id } } apiKeys { description } secrets { key } } }',
 		{ project },
 	)
 	const projectData = asRecord(tenantData['projectBySlug'], 'projectBySlug')
-	log(`  members on ${project}: ${asArray(projectData['members'], 'members').length}`)
-	log(`  project api keys: ${asArray(projectData['apiKeys'], 'apiKeys').length}`)
-	log(`  project secrets: ${asArray(projectData['secrets'], 'secrets').length}`)
-	log(`  global api keys: ${asArray(tenantData['globalApiKeys'], 'globalApiKeys').length}`)
-	const signIns = await countSeedSignIns(tenant)
-	log(`  sign-ins by seeded persons in the auth log: ${signIns.succeeded} ok, ${signIns.failed} failed`)
+	log(`    members: ${asArray(projectData['members'], 'members').length}`)
+	log(`    project api keys: ${asArray(projectData['apiKeys'], 'apiKeys').length}`)
+	log(`    project secrets: ${asArray(projectData['secrets'], 'secrets').length}`)
 
-	for (const type of ['CREATE', 'UPDATE', 'DELETE']) {
-		const data = await system.request('query($type: EventType!) { events(args: { filter: { types: [$type] }, limit: 10000 }) { id } }', { type })
-		log(`  history ${type.toLowerCase()} events: ${asArray(data['events'], 'events').length}`)
-	}
 	const migrations = await system.request('{ executedMigrations { version } stages { slug } }')
-	log(`  executed migrations: ${asArray(migrations['executedMigrations'], 'executedMigrations').length}`)
-	log(`  stages: ${asArray(migrations['stages'], 'stages').map((it, index) => asString(asRecord(it, `stages[${index}]`)['slug'], 'slug')).join(', ')}`)
-
-	// The API lists only the non-terminal queues; succeed / stopped events are reachable one id at a time.
-	const queue = await actions.request(
-		'{ eventsToProcess(args: { limit: 500 }) { id } failedEvents(args: { limit: 500 }) { id } variables { name value } }',
+	log(`    executed migrations: ${asArray(migrations['executedMigrations'], 'executedMigrations').length}`)
+	log(
+		`    stages: ${asArray(migrations['stages'], 'stages').map((it, index) => asString(asRecord(it, `stages[${index}]`)['slug'], 'slug')).join(', ')}`,
 	)
-	log(`  actions events waiting to process: ${asArray(queue['eventsToProcess'], 'eventsToProcess').length}`)
-	log(`  actions events failed or retrying: ${asArray(queue['failedEvents'], 'failedEvents').length}`)
+
+	// Only transactions registered for a stage reach the history API, so the counts join the same way it does.
+	const visibleEvents = 'FROM system.event_data e JOIN system.stage_transaction t ON t.transaction_id = e.transaction_id'
+	log(
+		`    history events by type: ${
+			format(await countByColumn(sql, `SELECT e.type::text AS key, count(*)::int AS count ${visibleEvents} GROUP BY 1 ORDER BY 1`))
+		}`,
+	)
+	log(
+		`    history events by table: ${
+			format(await countByColumn(sql, `SELECT e.table_name AS key, count(*)::int AS count ${visibleEvents} GROUP BY 1 ORDER BY 2 DESC LIMIT 8`))
+		}`,
+	)
+	const firstPage = await system.request('{ events(args: { limit: 25 }) { id type tableName } }')
+	log(`    history first page through the API: ${asArray(firstPage['events'], 'events').length} events`)
+
+	log(
+		`    actions events by state: ${
+			format(await countByColumn(sql, 'SELECT state::text AS key, count(*)::int AS count FROM system.actions_event GROUP BY 1 ORDER BY 1'))
+		}`,
+	)
+	const queue = await actions.request(
+		'{ eventsToProcess(args: { limit: 20 }) { id } failedEvents(args: { limit: 20 }) { id } eventsInProcessing(args: { limit: 20 }) { id } variables { name value } }',
+	)
+	log(
+		`    actions queue first page: toProcess ${asArray(queue['eventsToProcess'], 'eventsToProcess').length}, failed or retrying ${
+			asArray(queue['failedEvents'], 'failedEvents').length
+		}, in processing ${asArray(queue['eventsInProcessing'], 'eventsInProcessing').length}`,
+	)
 	const variables = asArray(queue['variables'], 'variables')
 		.map((it, index) => {
 			const variable = asRecord(it, `variables[${index}]`)
 			return `${asString(variable['name'], 'name')}=${asString(variable['value'], 'value')}`
 		})
-	log(`  actions variables: ${variables.join(', ')}`)
+	log(`    actions variables: ${variables.join(', ')}`)
+}
+
+const summarizeTenant = async (tenant: GraphQlEndpoint): Promise<void> => {
+	const data = await tenant.request('{ globalApiKeys { description } projects { slug } persons(limit: 1000) { id } }')
+	log(
+		`  projects: ${asArray(data['projects'], 'projects').map((it, index) => asString(asRecord(it, `projects[${index}]`)['slug'], 'slug')).join(', ')}`,
+	)
+	log(`  persons: ${asArray(data['persons'], 'persons').length}`)
+	log(`  global api keys: ${asArray(data['globalApiKeys'], 'globalApiKeys').length}`)
+	const signIns = await countSeedSignIns(tenant)
+	log(`  sign-ins by seeded persons in the auth log: ${signIns.succeeded} ok, ${signIns.failed} failed`)
 }
 
 // ---------------------------------------------------------------------------------------------- main
 
-const main = async (): Promise<void> => {
-	const options = parseOptions(process.argv.slice(2))
-	const tenant = new GraphQlEndpoint(`${options.apiUrl}/tenant`, options.token)
-	const login = new GraphQlEndpoint(`${options.apiUrl}/tenant`, options.loginToken)
-	const system = new GraphQlEndpoint(`${options.apiUrl}/system/${options.project}`, options.token)
-	const content = new GraphQlEndpoint(`${options.apiUrl}/content/${options.project}/live`, options.token)
-	const actions = new GraphQlEndpoint(`${options.apiUrl}/actions/${options.project}`, options.token)
-
-	log(`Seeding ${options.project} through ${options.apiUrl}`)
-
-	const project = asRecord(
-		(await tenant.request('query($project: String!) { projectBySlug(slug: $project) { slug } }', { project: options.project }))['projectBySlug'],
-		'projectBySlug',
+const connectToProject = (options: Options, project: string): Client =>
+	new Client(
+		options.dsn !== undefined ? { connectionString: options.dsn } : {
+			host: process.env.PGHOST ?? 'localhost',
+			port: Number(process.env.PGPORT ?? '3005'),
+			user: process.env.PGUSER ?? 'contember',
+			password: process.env.PGPASSWORD ?? 'contember',
+			// A project's database is named after its slug unless the deployment overrides it.
+			database: project,
+		},
 	)
-	log(`Project ${asString(project['slug'], 'slug')} found.`)
 
-	const migrations = await ensureMigrations(system, options.project)
-	log(`Migrations executed: ${migrations}`)
+const seedProject = async (options: Options, tenant: GraphQlEndpoint, project: string): Promise<void> => {
+	const system = new GraphQlEndpoint(`${options.apiUrl}/system/${project}`, options.token)
+	const content = new GraphQlEndpoint(`${options.apiUrl}/content/${project}/live`, options.token)
+	const actions = new GraphQlEndpoint(`${options.apiUrl}/actions/${project}`, options.token)
+
+	log('')
+	log(`=== ${project}`)
+	log(`Migrations executed: ${await ensureProject(tenant, options.apiUrl, options.token, project)}`)
 
 	log('Tenant: persons and memberships')
-	const createdPersons = await seedPeople(tenant, options.project)
-	log(`  new persons: ${createdPersons} (of ${seedPersons.length})`)
+	log(`  new persons: ${await seedPeople(tenant, project)} (of ${seedPersons.length})`)
 
-	log('Tenant: api keys')
-	log(`  new api keys: ${await seedApiKeys(tenant, options.project)}`)
+	log('Tenant: project api key')
+	log(`  new api keys: ${await seedProjectApiKey(tenant, project)}`)
 
 	log('Tenant: project secrets')
-	log(`  secrets set: ${await seedSecretsForProject(tenant, options.project)}`)
-
-	log('Tenant: auth log')
-	const authWritten = await seedAuthLog(tenant, login)
-	log(authWritten === 0 ? '  already seeded, no new sign-ins' : `  sign-in attempts recorded: ${authWritten}`)
+	log(`  secrets set: ${await seedSecretsForProject(tenant, project)}`)
 
 	log('Content: history')
 	const history = await seedHistory(content)
@@ -776,18 +1140,19 @@ const main = async (): Promise<void> => {
 			: `  rows created ${history.created}, updated ${history.updated}, deleted ${history.deleted}`,
 	)
 
-	log('Actions: variables, events and dispatch')
-	const sql = new Client(
-		options.dsn !== undefined ? { connectionString: options.dsn } : {
-			host: process.env.PGHOST ?? 'localhost',
-			port: Number(process.env.PGPORT ?? '3005'),
-			user: process.env.PGUSER ?? 'contember',
-			password: process.env.PGPASSWORD ?? 'contember',
-			database: process.env.PGDATABASE ?? options.project,
-		},
+	log(`Content: bulk history (target ${options.historyEvents} events)`)
+	const bulkHistory = await seedBulkHistory(content, options.historyEvents)
+	log(
+		bulkHistory.skipped
+			? '  already seeded, no new rows'
+			: `  rows created ${bulkHistory.created}, updated ${bulkHistory.updated}, deleted ${bulkHistory.deleted}`,
 	)
+	log(`  tables to type into the history filter: ${bulkEntities.map(it => it.table).join(', ')}`)
+
+	const sql = connectToProject(options, project)
 	await sql.connect()
 	try {
+		log('Actions: variables, events and dispatch')
 		const result = await seedActions(content, actions, sql, options)
 		if (result.skipped) {
 			log('  already seeded, no new events')
@@ -797,22 +1162,66 @@ const main = async (): Promise<void> => {
 				states.set(event.state, (states.get(event.state) ?? 0) + 1)
 			}
 			log(`  events by state: ${[...states].map(([state, count]) => `${state}=${count}`).join(', ')}`)
-			for (const event of result.events) {
-				log(`    ${event.id} ${event.state} after ${event.attempts} attempt(s)`)
-			}
 			if (result.nudged.length > 0) {
 				log(`  SQL-nudged rows (visible_at only, to skip the retry backoff): ${result.nudged.join(', ')}`)
 				log("  their state, payload, target and log are the engine's own — nothing else was written by hand")
 			}
 		}
+
+		log(`Actions: bulk queue (target ${options.actionsEvents} events)`)
+		const bulkActions = await seedBulkActions(content, actions, sql, options, options.actionsEvents)
+		log(
+			bulkActions.skipped
+				? '  already seeded, no new events'
+				: `  succeed ${bulkActions.succeed}, failed ${bulkActions.failed}, retrying ${bulkActions.retrying}, stopped ${bulkActions.stopped}, `
+					+ `created ${bulkActions.backlog}`,
+		)
 	} finally {
 		await sql.end()
 	}
+}
+
+const main = async (): Promise<void> => {
+	const started = Date.now()
+	const options = parseOptions(process.argv.slice(2))
+	const tenant = new GraphQlEndpoint(`${options.apiUrl}/tenant`, options.token)
+	const login = new GraphQlEndpoint(`${options.apiUrl}/tenant`, options.loginToken)
+
+	log(`Seeding ${options.projects.join(', ')} through ${options.apiUrl}`)
+
+	log('Tenant: global api key')
+	log(`  new api keys: ${await seedGlobalApiKey(tenant)}`)
+
+	for (const project of options.projects) {
+		await seedProject(options, tenant, project)
+	}
+
+	// After the projects, because it signs in as persons the first project creates.
+	log('')
+	log('Tenant: auth log')
+	const authWritten = await seedAuthLog(tenant, login)
+	log(authWritten === 0 ? '  already seeded, no new sign-ins' : `  sign-in attempts recorded: ${authWritten}`)
 
 	log('')
 	log('Now in the local engine:')
-	await summarize(tenant, system, actions, options.project)
+	await summarizeTenant(tenant)
+	for (const project of options.projects) {
+		const sql = connectToProject(options, project)
+		await sql.connect()
+		try {
+			await summarizeProject(
+				tenant,
+				new GraphQlEndpoint(`${options.apiUrl}/system/${project}`, options.token),
+				new GraphQlEndpoint(`${options.apiUrl}/actions/${project}`, options.token),
+				sql,
+				project,
+			)
+		} finally {
+			await sql.end()
+		}
+	}
 	log('')
+	log(`Done in ${Math.round((Date.now() - started) / 1000)}s.`)
 	log(`Open http://localhost:3001/panel (sign in as ${seedPersons[0].email} / ${SEED_PASSWORD}, or admin@localhost / admin@localhost)`)
 }
 

@@ -35,10 +35,16 @@ export class PanelPlugin implements Plugin {
 					// The panel's own API mount. Registered before the asset route so `/panel/api/...` is
 					// never swallowed by the SPA fallback, and mirroring the public paths so the client's
 					// existing URL building (`${apiBaseUrl}${path}`) needs no special cases.
+					// Only tenant takes anonymous callers — it is the one the sign-in screen talks to
+					// before there is a session. Content and system have no pre-sign-in consumer.
 					const api = new PanelApiControllerFactory(new ConfiguredPanelAccessCheck())
-					it.addRoute('panel-api', `${basePath}/api/tenant`, api.create(tenantApiMiddlewareFactory.create()))
-					it.addRoute('panel-api', `${basePath}/api/content/:projectSlug/:stageSlug`, api.create(contentApiMiddlewareFactory.create()))
-					it.addRoute('panel-api', `${basePath}/api/system/:projectSlug`, api.create(systemApiMiddlewareFactory.create()))
+					it.addRoute('panel-api', `${basePath}/api/tenant`, api.create(tenantApiMiddlewareFactory.create(), { allowAnonymous: true }))
+					it.addRoute(
+						'panel-api',
+						`${basePath}/api/content/:projectSlug/:stageSlug`,
+						api.create(contentApiMiddlewareFactory.create(), { allowAnonymous: false }),
+					)
+					it.addRoute('panel-api', `${basePath}/api/system/:projectSlug`, api.create(systemApiMiddlewareFactory.create(), { allowAnonymous: false }))
 
 					const controller = new PanelController({
 						basePath,

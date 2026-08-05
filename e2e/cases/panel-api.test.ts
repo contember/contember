@@ -32,6 +32,25 @@ test('the panel API signs in an anonymous caller with the injected login token',
 	expect(response.body.data.signIn.result.token).toBeString()
 })
 
+test('the anonymous tenant path is same-origin only', async () => {
+	// `Access-Control-Allow-Origin: *` is app-wide, and this path needs no credentials — without the
+	// origin check any page could drive sign-in and password reset from a visitor's browser.
+	const email = `panel-${rand()}@doe.com`
+	const body = { query: signInMutation, variables: { email, password: 'HWGA51KKpJ4lSW' } }
+
+	await supertest(apiUrl).post('/panel/api/tenant').set('Origin', 'https://evil.example.com').send(body).expect(403)
+	await supertest(apiUrl).post('/panel/api/tenant').set('Sec-Fetch-Site', 'cross-site').send(body).expect(403)
+	await supertest(apiUrl).post('/panel/api/tenant').set('Sec-Fetch-Site', 'same-origin').send(body).expect(200)
+})
+
+test('the panel content and system mounts refuse an anonymous caller', async () => {
+	// The login token is injected for the sign-in screen, which only ever talks to tenant.
+	const tester = await createTester(emptySchema)
+
+	await postAnonymous(`/panel/api/content/${tester.projectSlug}/live`, '{ __typename }').expect(401)
+	await postAnonymous(`/panel/api/system/${tester.projectSlug}`, 'query { stages { slug } }').expect(401)
+})
+
 test('the public tenant API still rejects the same anonymous request', async () => {
 	// The login token is injected for the panel mount only; nothing about the public API changed.
 	const email = `panel-${rand()}@doe.com`

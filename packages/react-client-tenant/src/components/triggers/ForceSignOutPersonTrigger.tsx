@@ -1,5 +1,6 @@
 import { ReactElement, useCallback } from 'react'
-import { TenantActionTrigger } from './TenantActionTrigger.js'
+import { ForceSignOutPersonErrorCode } from '@contember/graphql-client-tenant'
+import { TenantActionErrorArgs, TenantActionTrigger } from './TenantActionTrigger.js'
 import { ForceSignOutPersonMutationVariables, useForceSignOutPersonMutation } from '../../hooks/index.js'
 
 export type ForceSignOutPersonTriggerProps =
@@ -7,7 +8,7 @@ export type ForceSignOutPersonTriggerProps =
 	& {
 		children: ReactElement
 		onSuccess?: () => void
-		onError?: (e: unknown) => void
+		onError?: (args: TenantActionErrorArgs<ForceSignOutPersonErrorCode>) => void
 	}
 
 export const ForceSignOutPersonTrigger = ({ personId, reason, ...props }: ForceSignOutPersonTriggerProps) => {

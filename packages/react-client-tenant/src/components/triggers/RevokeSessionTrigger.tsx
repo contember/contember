@@ -1,5 +1,6 @@
 import { ReactElement, useCallback } from 'react'
-import { TenantActionTrigger } from './TenantActionTrigger.js'
+import { RevokeSessionErrorCode } from '@contember/graphql-client-tenant'
+import { TenantActionErrorArgs, TenantActionTrigger } from './TenantActionTrigger.js'
 import { RevokeSessionMutationVariables, useRevokeSessionMutation } from '../../hooks/index.js'
 
 export type RevokeSessionTriggerProps =
@@ -7,7 +8,7 @@ export type RevokeSessionTriggerProps =
 	& {
 		children: ReactElement
 		onSuccess?: () => void
-		onError?: (e: unknown) => void
+		onError?: (args: TenantActionErrorArgs<RevokeSessionErrorCode>) => void
 	}
 
 export const RevokeSessionTrigger = ({ sessionId, ...props }: RevokeSessionTriggerProps) => {

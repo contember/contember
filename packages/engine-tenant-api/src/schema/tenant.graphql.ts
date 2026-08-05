@@ -1345,9 +1345,54 @@ const schema: DocumentNode = gql`
 		sessions: [SessionInfo!]!
 	}
 
+	"""
+	What the identity may do tenant-wide, evaluated against the same ACL the resolvers enforce.
+
+	This is for building a UI that does not offer what it cannot deliver — it is **not** a security
+	boundary, and answering \`true\` here grants nothing. Every operation is still checked when it is
+	called. The distinction matters because permission failure is not uniform across this API: some
+	queries answer an empty list, others throw, and every mutation throws, so a client cannot tell
+	"nothing to show" from "not yours to see" by trying.
+	"""
 	type IdentityGlobalPermissions {
 		canCreateProject: Boolean!
 		canDeployEntrypoint: Boolean!
+		""" Read \`configuration\`, \`authPolicies\`, \`identityProviders\` and \`mailTemplates\` — all four throw otherwise. """
+		canViewConfiguration: Boolean!
+		""" Write the tenant configuration (\`configure\`). The CLI is the usual write path. """
+		canManageConfiguration: Boolean!
+		""" Read \`authLog\`, which throws otherwise. """
+		canViewAuthLog: Boolean!
+		"""
+		List every person in the tenant. Without it \`persons\` still answers, narrowed to the members
+		of the projects the caller administers — so this marks a full listing, not access to one.
+		"""
+		canListPersons: Boolean!
+		""" Read \`globalApiKeys\`, which answers an empty list otherwise. """
+		canListGlobalApiKeys: Boolean!
+		canCreateGlobalApiKey: Boolean!
+	}
+
+	"""
+	What the calling identity may do in this project. Same contract as
+	\`IdentityGlobalPermissions\`: advisory, evaluated per caller, never a substitute for the checks in
+	the resolvers.
+	"""
+	type ProjectPermissions {
+		""" Read \`members\` and \`apiKeys\`; both answer an empty list otherwise. """
+		canViewMembers: Boolean!
+		""" Invite or add a member (\`invite\`, \`addProjectMember\`). Which roles may be granted is checked per membership. """
+		canAddMember: Boolean!
+		canUpdateMember: Boolean!
+		canRemoveMember: Boolean!
+		""" Read \`secrets\` (their names, never values); answers an empty list otherwise. """
+		canViewSecrets: Boolean!
+		""" Write a project secret (\`setProjectSecret\`). Distinct from viewing: a project admin commonly has one and not the other. """
+		canSetSecret: Boolean!
+		""" Create an API key scoped to this project. """
+		canCreateApiKey: Boolean!
+		""" Update the project itself (\`updateProject\`). """
+		canUpdate: Boolean!
 	}
 
 	type IdentityProjectRelation {
@@ -1382,6 +1427,8 @@ const schema: DocumentNode = gql`
 		+ SUPER_ADMIN by default); returns an empty list otherwise.
 		"""
 		secrets: [ProjectSecretInfo!]!
+		""" What the calling identity may do here. Advisory — for building the UI, not for enforcing it. """
+		permissions: ProjectPermissions!
 	}
 
 	""" Metadata about a project secret — never its value. """

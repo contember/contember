@@ -2,14 +2,19 @@ import { Slot } from '@radix-ui/react-slot'
 import { ComponentType, MouseEventHandler, ReactElement, useMemo, useState } from 'react'
 import { composeEventHandlers } from '@radix-ui/primitive'
 import { useReferentiallyStableCallback } from '@contember/react-utils'
+import { toFormErrorCode } from '../../types/forbidden.js'
+import { FormErrorCode } from '../../types/forms.js'
 
 const SlotButton = Slot as ComponentType<React.ButtonHTMLAttributes<HTMLButtonElement>>
+
+/** What an action's `onError` receives. `code` is `FORBIDDEN` when the API refused, not when it failed. */
+export type TenantActionErrorArgs<Error extends string = never> = { code: Error | FormErrorCode; error: unknown }
 
 export interface TenantActionTriggerProps<OkResult, Error extends string> {
 	children: ReactElement
 	onClick?: MouseEventHandler<HTMLButtonElement>
 	onSuccess?: (args: { result: OkResult }) => void
-	onError?: (args: { code: Error | 'UNKNOWN_ERROR'; error: unknown }) => void
+	onError?: (args: TenantActionErrorArgs<Error>) => void
 	execute: () => Promise<({ ok: true } & (OkResult extends undefined ? {} : { result: OkResult })) | { ok: false; error?: Error }>
 }
 
@@ -33,9 +38,12 @@ export const TenantActionTrigger = <OkResult, Error extends string>(
 				onError?.({ code: response.error ?? 'UNKNOWN_ERROR', error: response })
 			}
 		} catch (e) {
-			console.error(e)
+			const code = toFormErrorCode(e)
+			if (code !== 'FORBIDDEN') {
+				console.error(e)
+			}
 			setSubmitting(false)
-			onError?.({ code: 'UNKNOWN_ERROR', error: e })
+			onError?.({ code, error: e })
 		}
 	}, [execute, onError, onSuccess])
 

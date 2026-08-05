@@ -23,6 +23,7 @@ import { BanIcon, RefreshCwIcon } from 'lucide-react'
 import { useMySessionsQuery, usePersonSessionsQuery, useTenantQueryLoader } from '@contember/react-client-tenant'
 import { RevokeSessionTrigger } from '@contember/interface'
 import { dict } from '../dict.js'
+import { actionErrorMessage } from '../errors.js'
 
 const formatDateTime = (value?: string | null): ReactNode => {
 	if (!value) {
@@ -57,8 +58,8 @@ export const SessionList = ({ personId, controller }: SessionListProps) => {
 		refresh()
 		showToast(<ToastContent>{dict.tenant.sessionList.revokeSuccess}</ToastContent>, { type: 'success' })
 	}
-	const onRevokeError = () => {
-		showToast(<ToastContent>{dict.tenant.sessionList.revokeFailed}</ToastContent>, { type: 'error' })
+	const onRevokeError = ({ code }: { code: string }) => {
+		showToast(<ToastContent>{actionErrorMessage(code, dict.tenant.sessionList.revokeFailed)}</ToastContent>, { type: 'error' })
 	}
 
 	if (query.state === 'error') {
@@ -111,7 +112,9 @@ export const SessionList = ({ personId, controller }: SessionListProps) => {
 	)
 }
 
-const RevokeSessionDialog = ({ sessionId, onSuccess, onError }: { sessionId: string; onSuccess: () => void; onError: () => void }) => {
+const RevokeSessionDialog = (
+	{ sessionId, onSuccess, onError }: { sessionId: string; onSuccess: () => void; onError: (args: { code: string }) => void },
+) => {
 	return (
 		<AlertDialog>
 			<AlertDialogTrigger asChild>

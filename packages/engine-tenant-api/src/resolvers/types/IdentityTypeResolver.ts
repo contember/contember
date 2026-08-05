@@ -13,6 +13,7 @@ import { TenantResolverContext } from '../TenantResolverContext.js'
 import { notEmpty } from '../../utils/array.js'
 import { batchLoader } from '../../utils/batchQuery.js'
 import { PersonResponseFactory } from '../responseHelpers/PersonResponseFactory.js'
+import { ProjectResponseFactory } from '../responseHelpers/ProjectResponseFactory.js'
 
 export class IdentityTypeResolver implements IdentityResolvers {
 	private personLoader = batchLoader<string, Record<string, PersonRow>, PersonRow>(
@@ -75,7 +76,7 @@ export class IdentityTypeResolver implements IdentityResolvers {
 						return null
 					}
 					return {
-						project: { ...it, members: [], roles: [], apiKeys: [], secrets: [] },
+						project: ProjectResponseFactory.createProjectResponse(it),
 						memberships: memberships,
 					}
 				}),
@@ -128,9 +129,38 @@ export class IdentityTypeResolver implements IdentityResolvers {
 			return null
 		}
 
+		// Advisory only — every one of these is checked again where it is used. It exists so a UI can
+		// stop offering what it cannot deliver: the operations behind these flags fail in three
+		// different ways (empty list, thrown query, thrown mutation), so probing is not an option.
+		const [
+			canCreateProject,
+			canDeployEntrypoint,
+			canViewConfiguration,
+			canManageConfiguration,
+			canViewAuthLog,
+			canListPersons,
+			canListGlobalApiKeys,
+			canCreateGlobalApiKey,
+		] = await Promise.all([
+			permissionsContext.isAllowed({ action: PermissionActions.PROJECT_CREATE }),
+			permissionsContext.isAllowed({ action: PermissionActions.ENTRYPOINT_DEPLOY }),
+			permissionsContext.isAllowed({ action: PermissionActions.CONFIG_VIEW }),
+			permissionsContext.isAllowed({ action: PermissionActions.CONFIGURE }),
+			permissionsContext.isAllowed({ action: PermissionActions.AUTH_LOG_VIEW }),
+			permissionsContext.isAllowed({ action: PermissionActions.PERSON_LIST }),
+			permissionsContext.isAllowed({ action: PermissionActions.API_KEY_LIST }),
+			permissionsContext.isAllowed({ action: PermissionActions.API_KEY_CREATE_GLOBAL() }),
+		])
+
 		return {
-			canCreateProject: await permissionsContext.isAllowed({ action: PermissionActions.PROJECT_CREATE }),
-			canDeployEntrypoint: await permissionsContext.isAllowed({ action: PermissionActions.ENTRYPOINT_DEPLOY }),
+			canCreateProject,
+			canDeployEntrypoint,
+			canViewConfiguration,
+			canManageConfiguration,
+			canViewAuthLog,
+			canListPersons,
+			canListGlobalApiKeys,
+			canCreateGlobalApiKey,
 		}
 	}
 

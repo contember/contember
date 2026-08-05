@@ -1062,10 +1062,33 @@ export type Identity = {
 	readonly sessions: ReadonlyArray<SessionInfo>
 }
 
+/**
+ * What the identity may do tenant-wide, evaluated against the same ACL the resolvers enforce.
+ *
+ * This is for building a UI that does not offer what it cannot deliver — it is **not** a security
+ * boundary, and answering `true` here grants nothing. Every operation is still checked when it is
+ * called. The distinction matters because permission failure is not uniform across this API: some
+ * queries answer an empty list, others throw, and every mutation throws, so a client cannot tell
+ * "nothing to show" from "not yours to see" by trying.
+ */
 export type IdentityGlobalPermissions = {
 	readonly __typename?: 'IdentityGlobalPermissions'
+	readonly canCreateGlobalApiKey: Scalars['Boolean']['output']
 	readonly canCreateProject: Scalars['Boolean']['output']
 	readonly canDeployEntrypoint: Scalars['Boolean']['output']
+	/**  Read `globalApiKeys`, which answers an empty list otherwise.  */
+	readonly canListGlobalApiKeys: Scalars['Boolean']['output']
+	/**
+	 * List every person in the tenant. Without it `persons` still answers, narrowed to the members
+	 * of the projects the caller administers — so this marks a full listing, not access to one.
+	 */
+	readonly canListPersons: Scalars['Boolean']['output']
+	/**  Write the tenant configuration (`configure`). The CLI is the usual write path.  */
+	readonly canManageConfiguration: Scalars['Boolean']['output']
+	/**  Read `authLog`, which throws otherwise.  */
+	readonly canViewAuthLog: Scalars['Boolean']['output']
+	/**  Read `configuration`, `authPolicies`, `identityProviders` and `mailTemplates` — all four throw otherwise.  */
+	readonly canViewConfiguration: Scalars['Boolean']['output']
 }
 
 export type IdentityProjectRelation = {
@@ -1731,6 +1754,8 @@ export type Project = {
 	readonly id: Scalars['String']['output']
 	readonly members: ReadonlyArray<ProjectIdentityRelation>
 	readonly name: Scalars['String']['output']
+	/**  What the calling identity may do here. Advisory — for building the UI, not for enforcing it.  */
+	readonly permissions: ProjectPermissions
 	readonly roles: ReadonlyArray<RoleDefinition>
 	/**
 	 * Names of the project's secrets (see `setProjectSecret`). Secret VALUES are
@@ -1764,6 +1789,29 @@ export type ProjectMembersInput = {
 	readonly filter?: InputMaybe<ProjectMembersFilter>
 	readonly limit?: InputMaybe<Scalars['Int']['input']>
 	readonly offset?: InputMaybe<Scalars['Int']['input']>
+}
+
+/**
+ * What the calling identity may do in this project. Same contract as
+ * `IdentityGlobalPermissions`: advisory, evaluated per caller, never a substitute for the checks in
+ * the resolvers.
+ */
+export type ProjectPermissions = {
+	readonly __typename?: 'ProjectPermissions'
+	/**  Invite or add a member (`invite`, `addProjectMember`). Which roles may be granted is checked per membership.  */
+	readonly canAddMember: Scalars['Boolean']['output']
+	/**  Create an API key scoped to this project.  */
+	readonly canCreateApiKey: Scalars['Boolean']['output']
+	readonly canRemoveMember: Scalars['Boolean']['output']
+	/**  Write a project secret (`setProjectSecret`). Distinct from viewing: a project admin commonly has one and not the other.  */
+	readonly canSetSecret: Scalars['Boolean']['output']
+	/**  Update the project itself (`updateProject`).  */
+	readonly canUpdate: Scalars['Boolean']['output']
+	readonly canUpdateMember: Scalars['Boolean']['output']
+	/**  Read `members` and `apiKeys`; both answer an empty list otherwise.  */
+	readonly canViewMembers: Scalars['Boolean']['output']
+	/**  Read `secrets` (their names, never values); answers an empty list otherwise.  */
+	readonly canViewSecrets: Scalars['Boolean']['output']
 }
 
 export type ProjectSecret = {
@@ -2684,6 +2732,7 @@ export type ResolversTypes = {
 	ProjectIdentityRelation: ResolverTypeWrapper<Omit<ProjectIdentityRelation, 'identity'> & { identity: ResolversTypes['Identity'] }>
 	ProjectMembersFilter: ProjectMembersFilter
 	ProjectMembersInput: ProjectMembersInput
+	ProjectPermissions: ResolverTypeWrapper<ProjectPermissions>
 	ProjectSecret: ProjectSecret
 	ProjectSecretInfo: ResolverTypeWrapper<ProjectSecretInfo>
 	Query: ResolverTypeWrapper<Record<PropertyKey, never>>
@@ -2925,6 +2974,7 @@ export type ResolversParentTypes = {
 	ProjectIdentityRelation: Omit<ProjectIdentityRelation, 'identity'> & { identity: ResolversParentTypes['Identity'] }
 	ProjectMembersFilter: ProjectMembersFilter
 	ProjectMembersInput: ProjectMembersInput
+	ProjectPermissions: ProjectPermissions
 	ProjectSecret: ProjectSecret
 	ProjectSecretInfo: ProjectSecretInfo
 	Query: Record<PropertyKey, never>
@@ -3724,8 +3774,14 @@ export type IdentityGlobalPermissionsResolvers<
 	ContextType = any,
 	ParentType extends ResolversParentTypes['IdentityGlobalPermissions'] = ResolversParentTypes['IdentityGlobalPermissions'],
 > = {
+	canCreateGlobalApiKey?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
 	canCreateProject?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
 	canDeployEntrypoint?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
+	canListGlobalApiKeys?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
+	canListPersons?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
+	canManageConfiguration?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
+	canViewAuthLog?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
+	canViewConfiguration?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
 }
 
 export type IdentityProjectRelationResolvers<
@@ -4187,6 +4243,7 @@ export type ProjectResolvers<ContextType = any, ParentType extends ResolversPare
 	id?: Resolver<ResolversTypes['String'], ParentType, ContextType>
 	members?: Resolver<ReadonlyArray<ResolversTypes['ProjectIdentityRelation']>, ParentType, ContextType, Partial<ProjectMembersArgs>>
 	name?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+	permissions?: Resolver<ResolversTypes['ProjectPermissions'], ParentType, ContextType>
 	roles?: Resolver<ReadonlyArray<ResolversTypes['RoleDefinition']>, ParentType, ContextType>
 	secrets?: Resolver<ReadonlyArray<ResolversTypes['ProjectSecretInfo']>, ParentType, ContextType>
 	slug?: Resolver<ResolversTypes['String'], ParentType, ContextType>
@@ -4198,6 +4255,20 @@ export type ProjectIdentityRelationResolvers<
 > = {
 	identity?: Resolver<ResolversTypes['Identity'], ParentType, ContextType>
 	memberships?: Resolver<ReadonlyArray<ResolversTypes['Membership']>, ParentType, ContextType>
+}
+
+export type ProjectPermissionsResolvers<
+	ContextType = any,
+	ParentType extends ResolversParentTypes['ProjectPermissions'] = ResolversParentTypes['ProjectPermissions'],
+> = {
+	canAddMember?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
+	canCreateApiKey?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
+	canRemoveMember?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
+	canSetSecret?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
+	canUpdate?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
+	canUpdateMember?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
+	canViewMembers?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
+	canViewSecrets?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
 }
 
 export type ProjectSecretInfoResolvers<
@@ -4802,6 +4873,7 @@ export type Resolvers<ContextType = any> = {
 	PrepareOtpResult?: PrepareOtpResultResolvers<ContextType>
 	Project?: ProjectResolvers<ContextType>
 	ProjectIdentityRelation?: ProjectIdentityRelationResolvers<ContextType>
+	ProjectPermissions?: ProjectPermissionsResolvers<ContextType>
 	ProjectSecretInfo?: ProjectSecretInfoResolvers<ContextType>
 	Query?: QueryResolvers<ContextType>
 	RegenerateBackupCodesError?: RegenerateBackupCodesErrorResolvers<ContextType>

@@ -1,12 +1,13 @@
 import { ReactElement, useCallback } from 'react'
+import { ToggleMyPasswordlessErrorCode } from '@contember/graphql-client-tenant'
 import { useDisableMyPasswordlessMutation } from '../../hooks/index.js'
-import { TenantActionTrigger } from './TenantActionTrigger.js'
+import { TenantActionErrorArgs, TenantActionTrigger } from './TenantActionTrigger.js'
 import { useIdentityMethods } from '../../contexts.js'
 
 export interface DisableMyPasswordlessTriggerProps {
 	children: ReactElement
 	onSuccess?: () => void
-	onError?: (e: unknown) => void
+	onError?: (args: TenantActionErrorArgs<ToggleMyPasswordlessErrorCode>) => void
 }
 
 export const DisableMyPasswordlessTrigger = ({ onSuccess, ...props }: DisableMyPasswordlessTriggerProps) => {

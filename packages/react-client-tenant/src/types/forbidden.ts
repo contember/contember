@@ -1,4 +1,5 @@
 import { GraphQlClientError } from '@contember/graphql-client'
+import { FormErrorCode } from './forms.js'
 
 /**
  * Tells a permission rejection apart from a genuine failure.
@@ -21,3 +22,10 @@ export const isForbiddenError = (error: unknown): boolean => {
 	}
 	return error.errors?.some(it => it?.extensions?.code === 'ForbiddenError') ?? false
 }
+
+/**
+ * Classifies an error thrown by a mutation. Unlike the queries above, a denied mutation always
+ * throws — it never answers `ok: false` — so without this split every denial would reach the user
+ * as "something went wrong, please try again later", which is advice they cannot act on.
+ */
+export const toFormErrorCode = (error: unknown): FormErrorCode => isForbiddenError(error) ? 'FORBIDDEN' : 'UNKNOWN_ERROR'

@@ -456,6 +456,12 @@ export class WhereBuilder {
 		if (operands.length === 0) {
 			return { kind: 'row', where: { [primary]: { never: true } } }
 		}
+		// An unconstrained branch (`{}`, `{and: []}`) makes the whole disjunction unconstrained. Promoting it via
+		// `toRelationSetExpression` would turn it into a bare `EXISTS(<any related row>)` with no read predicate,
+		// which leaks the presence of an unreadable row. Stay on the legacy row path, as before the set lowering.
+		if (operands.some(it => it.kind === 'row' && Object.keys(it.where).length === 0)) {
+			return { kind: 'row', where: {} }
+		}
 		if (operands.every((it): it is RelationRowExpression => it.kind === 'row')) {
 			return { kind: 'row', where: { or: operands.map(it => it.where) } }
 		}

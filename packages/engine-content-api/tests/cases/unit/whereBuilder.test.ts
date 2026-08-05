@@ -382,6 +382,42 @@ describe('where builder', () => {
 			`where exists (select 1 from "__SCHEMA__"."article" as "root_articles" where "root_"."id" = "root_articles"."author_id")`,
 		)
 	})
+
+	it('SECURITY: an unconstrained OR branch does not become an unguarded EXISTS', () => {
+		// `{ or: [ {}, … ] }` is reachable from any client filter, and `PredicatesInjector` attaches no read
+		// predicate to an empty branch. Promoting it to a set expression would emit a bare `EXISTS(<any related
+		// row>)` that swallows the guarded branch, turning the filter into a presence oracle over unreadable rows.
+		const schema = createSchema(WhereBuilderModel)
+		const where = createWhere(schema, {
+			author: {
+				or: [
+					{},
+					// what the injector produces for `{ id: { isNull: false } }` + `Author.read`
+					{ and: [{ id: { isNull: false } }, { isPublic: { eq: true } }] },
+				],
+			},
+		}, 'Article')
+		compareWhere(
+			where,
+			`where (not("root_author"."id" is null) and "root_author"."is_public" = ?)`,
+		)
+	})
+
+	it('SECURITY: an empty and-array branch in an OR is treated the same', () => {
+		const schema = createSchema(WhereBuilderModel)
+		const where = createWhere(schema, {
+			author: {
+				or: [
+					{ and: [] },
+					{ and: [{ id: { isNull: false } }, { isPublic: { eq: true } }] },
+				],
+			},
+		}, 'Article')
+		compareWhere(
+			where,
+			`where (not("root_author"."id" is null) and "root_author"."is_public" = ?)`,
+		)
+	})
 })
 
 const compareWhere = (actual: string, expected: string) => {

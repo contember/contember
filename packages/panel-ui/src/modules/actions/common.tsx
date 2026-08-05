@@ -67,6 +67,12 @@ export const JsonBlock = ({ value }: { value: unknown }) => (
 
 export const formatDateTime = (value: string | undefined): string => value === undefined ? '—' : new Date(value).toLocaleString()
 
+/** The queue puts two timestamps in every row; in full they crowd out the error message. */
+export const formatDateTimeShort = (value: string | undefined): string =>
+	value === undefined
+		? '—'
+		: new Date(value).toLocaleString(undefined, { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit' })
+
 /** A denied mutation throws; without this split a denial reads as "try again", which is advice nobody can act on. */
 export const actionsErrorMessage = (error: unknown): string =>
 	isForbiddenError(error)

@@ -11,6 +11,7 @@ import {
 	TableHead,
 	TableHeader,
 	TableRow,
+	TableWrapper,
 	ToastContent,
 	useShowToast,
 } from '@contember/react-ui-lib-base'
@@ -19,7 +20,7 @@ import { PlayIcon, RefreshCwIcon, SlidersHorizontalIcon } from 'lucide-react'
 import { type ReactNode, useState } from 'react'
 import { PageHeader, PageStack, PanelSection } from '../../shell/screens.js'
 import { PanelSlots } from '../../shell/slots.js'
-import { actionsErrorMessage, eventErrorText, EventStateBadge, formatDateTime, OffsetPager } from './common.js'
+import { actionsErrorMessage, eventErrorText, EventStateBadge, formatDateTime, formatDateTimeShort, OffsetPager } from './common.js'
 import {
 	type ActionsEventListItem,
 	type EventListFetcher,
@@ -87,47 +88,53 @@ const EventListSection = ({ title, description, emptyMessage, list, rowActions }
 					{events !== undefined && events.length === 0
 						? <p className="text-sm text-muted-foreground">{emptyMessage}</p>
 						: (
-							<Table>
-								<TableHeader>
-									<TableRow>
-										<TableHead>State</TableHead>
-										<TableHead>Target</TableHead>
-										<TableHead>Created</TableHead>
-										<TableHead>Last state change</TableHead>
-										<TableHead>Retries</TableHead>
-										<TableHead>Error</TableHead>
-										<TableHead />
-									</TableRow>
-								</TableHeader>
-								<TableBody>
-									{events?.map(event => {
-										const error = eventErrorText(event.log)
-										return (
-											<TableRow key={event.id}>
-												<TableCell>
-													<EventStateBadge state={event.state} />
-												</TableCell>
-												<TableCell className="font-mono text-xs">
-													{event.target}
-													<span className="text-muted-foreground">{' @ '}{event.stage}</span>
-												</TableCell>
-												<TableCell className="whitespace-nowrap">{formatDateTime(event.createdAt)}</TableCell>
-												<TableCell className="whitespace-nowrap">{formatDateTime(event.lastStateChange)}</TableCell>
-												<TableCell>{event.numRetries}</TableCell>
-												<TableCell className="max-w-sm truncate text-destructive" title={error}>{error ?? '—'}</TableCell>
-												<TableCell>
-													<div className="flex items-center justify-end gap-2">
-														{rowActions?.(event)}
-														<Link to={{ pageName: 'actionsEvent', parameters: { project: projectSlug, eventId: event.id } }}>
-															<AnchorButton variant="ghost" size="xs">Detail</AnchorButton>
-														</Link>
-													</div>
-												</TableCell>
-											</TableRow>
-										)
-									})}
-								</TableBody>
-							</Table>
+							<TableWrapper>
+								<Table>
+									<TableHeader>
+										<TableRow>
+											<TableHead>State</TableHead>
+											<TableHead>Target</TableHead>
+											{/* One timestamp column: the creation time rides in its title, and the error message needs the width more. */}
+											<TableHead>Last change</TableHead>
+											<TableHead>Retries</TableHead>
+											{/* Takes the leftover width so a long message truncates instead of pushing the actions off-screen. */}
+											<TableHead className="w-full">Error</TableHead>
+											<TableHead />
+										</TableRow>
+									</TableHeader>
+									<TableBody>
+										{events?.map(event => {
+											const error = eventErrorText(event.log)
+											return (
+												<TableRow key={event.id}>
+													<TableCell>
+														<EventStateBadge state={event.state} />
+													</TableCell>
+													<TableCell className="font-mono text-xs">
+														{event.target}
+														<span className="text-muted-foreground">{' @ '}{event.stage}</span>
+													</TableCell>
+													<TableCell className="whitespace-nowrap" title={`Created ${formatDateTime(event.createdAt)}`}>
+														{formatDateTimeShort(event.lastStateChange)}
+													</TableCell>
+													<TableCell>{event.numRetries}</TableCell>
+													<TableCell className="w-full max-w-0 text-destructive">
+														<div className="truncate" title={error}>{error ?? '—'}</div>
+													</TableCell>
+													<TableCell>
+														<div className="flex items-center justify-end gap-2">
+															{rowActions?.(event)}
+															<Link to={{ pageName: 'actionsEvent', parameters: { project: projectSlug, eventId: event.id } }}>
+																<AnchorButton variant="ghost" size="xs">Detail</AnchorButton>
+															</Link>
+														</div>
+													</TableCell>
+												</TableRow>
+											)
+										})}
+									</TableBody>
+								</Table>
+							</TableWrapper>
 						)}
 				</div>
 			)}

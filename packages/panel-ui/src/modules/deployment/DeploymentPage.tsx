@@ -1,5 +1,5 @@
 import { useTenantQueryLoader } from '@contember/react-client-tenant'
-import { Button, Loader, Table, TableCell, TableHead, TableHeader, TableRow } from '@contember/react-ui-lib-base'
+import { Button, Loader, Table, TableBody, TableCell, TableHead, TableHeader, TableRow, TableWrapper } from '@contember/react-ui-lib-base'
 import { renderConfigQueryState } from '@contember/react-ui-lib-tenant'
 import { RefreshCwIcon, TerminalIcon } from 'lucide-react'
 import { PageHeader, PageStack, PanelSection } from '../../shell/screens.js'
@@ -34,22 +34,26 @@ const StagesTable = ({ stages }: { stages: readonly DeploymentStage[] }) => {
 	}
 
 	return (
-		<Table>
-			<TableHeader>
-				<TableRow>
-					<TableHead>Slug</TableHead>
-					<TableHead>Name</TableHead>
-					<TableHead>Id</TableHead>
-				</TableRow>
-			</TableHeader>
-			{stages.map(stage => (
-				<TableRow key={stage.id}>
-					<TableCell className="font-mono text-xs">{stage.slug}</TableCell>
-					<TableCell className="font-medium">{stage.name}</TableCell>
-					<TableCell className="font-mono text-xs text-muted-foreground">{stage.id}</TableCell>
-				</TableRow>
-			))}
-		</Table>
+		<TableWrapper>
+			<Table>
+				<TableHeader>
+					<TableRow>
+						<TableHead>Slug</TableHead>
+						<TableHead>Name</TableHead>
+						<TableHead>Id</TableHead>
+					</TableRow>
+				</TableHeader>
+				<TableBody>
+					{stages.map(stage => (
+						<TableRow key={stage.id}>
+							<TableCell className="font-mono text-xs">{stage.slug}</TableCell>
+							<TableCell className="font-medium">{stage.name}</TableCell>
+							<TableCell className="font-mono text-xs text-muted-foreground">{stage.id}</TableCell>
+						</TableRow>
+					))}
+				</TableBody>
+			</Table>
+		</TableWrapper>
 	)
 }
 
@@ -84,26 +88,30 @@ const MigrationsTable = ({ migrations }: { migrations: readonly ExecutedMigratio
 	const newestFirst = [...migrations].sort((a, b) => b.version.localeCompare(a.version))
 
 	return (
-		<Table>
-			<TableHeader>
-				<TableRow>
-					<TableHead>Version</TableHead>
-					<TableHead>Name</TableHead>
-					<TableHead>Executed at</TableHead>
-					<TableHead>Format</TableHead>
-					<TableHead>Checksum</TableHead>
-				</TableRow>
-			</TableHeader>
-			{newestFirst.map(migration => (
-				<TableRow key={migration.version}>
-					<TableCell className="font-mono text-xs whitespace-nowrap">{migration.version}</TableCell>
-					<TableCell className="font-medium">{migration.name}</TableCell>
-					<TableCell className="whitespace-nowrap">{formatDateTime(migration.executedAt)}</TableCell>
-					<TableCell>{migration.formatVersion ?? '—'}</TableCell>
-					<TableCell className="font-mono text-xs text-muted-foreground">{migration.checksum ?? '—'}</TableCell>
-				</TableRow>
-			))}
-		</Table>
+		<TableWrapper>
+			<Table>
+				<TableHeader>
+					<TableRow>
+						<TableHead>Version</TableHead>
+						<TableHead>Name</TableHead>
+						<TableHead>Executed at</TableHead>
+						<TableHead>Format</TableHead>
+						<TableHead>Checksum</TableHead>
+					</TableRow>
+				</TableHeader>
+				<TableBody>
+					{newestFirst.map(migration => (
+						<TableRow key={migration.version}>
+							<TableCell className="font-mono text-xs whitespace-nowrap">{migration.version}</TableCell>
+							<TableCell className="font-medium">{migration.name}</TableCell>
+							<TableCell className="whitespace-nowrap">{formatDateTime(migration.executedAt)}</TableCell>
+							<TableCell>{migration.formatVersion ?? '—'}</TableCell>
+							<TableCell className="font-mono text-xs text-muted-foreground">{migration.checksum ?? '—'}</TableCell>
+						</TableRow>
+					))}
+				</TableBody>
+			</Table>
+		</TableWrapper>
 	)
 }
 

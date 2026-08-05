@@ -19,6 +19,7 @@ import {
 	TableHead,
 	TableHeader,
 	TableRow,
+	TableWrapper,
 	ToastContent,
 	useShowToast,
 } from '@contember/react-ui-lib-base'
@@ -152,36 +153,38 @@ const ActionsVariables = () => {
 								/>
 							)
 							: (
-								<Table>
-									<TableHeader>
-										<TableRow>
-											<TableHead>Name</TableHead>
-											<TableHead>Value</TableHead>
-											<TableHead />
-										</TableRow>
-									</TableHeader>
-									<TableBody>
-										{variables?.map(variable => (
-											<TableRow key={variable.name}>
-												<TableCell className="font-mono text-xs">{variable.name}</TableCell>
-												<TableCell className="font-mono text-xs break-all">{variable.value}</TableCell>
-												<TableCell>
-													<div className="flex justify-end">
-														<FormDialog
-															label="Edit"
-															title={`Set ${variable.name}`}
-															description="Takes effect on the next dispatch; events already in flight keep the old value."
-															icon={<PencilIcon className="size-4" />}
-															variant="outline"
-														>
-															{close => <SetVariableForm initial={variable} close={close} onSaved={refresh} />}
-														</FormDialog>
-													</div>
-												</TableCell>
+								<TableWrapper>
+									<Table>
+										<TableHeader>
+											<TableRow>
+												<TableHead>Name</TableHead>
+												<TableHead>Value</TableHead>
+												<TableHead />
 											</TableRow>
-										))}
-									</TableBody>
-								</Table>
+										</TableHeader>
+										<TableBody>
+											{variables?.map(variable => (
+												<TableRow key={variable.name}>
+													<TableCell className="font-mono text-xs">{variable.name}</TableCell>
+													<TableCell className="font-mono text-xs break-all">{variable.value}</TableCell>
+													<TableCell>
+														<div className="flex justify-end">
+															<FormDialog
+																label="Edit"
+																title={`Set ${variable.name}`}
+																description="Takes effect on the next dispatch; events already in flight keep the old value."
+																icon={<PencilIcon className="size-4" />}
+																variant="outline"
+															>
+																{close => <SetVariableForm initial={variable} close={close} onSaved={refresh} />}
+															</FormDialog>
+														</div>
+													</TableCell>
+												</TableRow>
+											))}
+										</TableBody>
+									</Table>
+								</TableWrapper>
 							)}
 					</div>
 				)}

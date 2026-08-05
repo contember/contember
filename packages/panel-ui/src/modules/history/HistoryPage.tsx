@@ -13,10 +13,12 @@ import {
 	SelectTrigger,
 	SelectValue,
 	Table,
+	TableBody,
 	TableCell,
 	TableHead,
 	TableHeader,
 	TableRow,
+	TableWrapper,
 } from '@contember/react-ui-lib-base'
 import { renderConfigQueryState } from '@contember/react-ui-lib-tenant'
 import { ChevronDownIcon, ChevronLeftIcon, ChevronRightIcon, ChevronUpIcon, RefreshCwIcon } from 'lucide-react'
@@ -42,6 +44,10 @@ const orderLabels: Record<EventsOrder, string> = {
 
 /** The panel has no i18n, so the browser's locale formats the ISO strings the API returns. */
 const formatDateTime = (value: string): string => new Date(value).toLocaleString()
+
+/** Two timestamps and a row id per line: in full they push the table past the card. The full value is the cell's title. */
+const formatDateTimeShort = (value: string): string =>
+	new Date(value).toLocaleString(undefined, { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit' })
 
 /** A truncate event has no row of its own. The generated type says `undefined`, the API sends `null`. */
 const formatPrimaryKey = (primaryKey: HistoryEvent['primaryKey']): string => primaryKey ? primaryKey.join(', ') : '—'
@@ -87,53 +93,62 @@ const EventsTable = ({ events }: { events: readonly HistoryEvent[] }) => {
 	const [expanded, setExpanded] = useState<string>()
 
 	return (
-		<Table>
-			<TableHeader>
-				<TableRow>
-					<TableHead>Applied at</TableHead>
-					<TableHead>Created at</TableHead>
-					<TableHead>Type</TableHead>
-					<TableHead>Table</TableHead>
-					<TableHead>Row</TableHead>
-					<TableHead>Identity</TableHead>
-					<TableHead className="w-12" />
-				</TableRow>
-			</TableHeader>
-			{events.length === 0 && (
-				<TableRow>
-					<TableCell colSpan={7} className="text-gray-500 italic">No event matches this filter.</TableCell>
-				</TableRow>
-			)}
-			{events.map(event => (
-				<Fragment key={event.id}>
+		<TableWrapper>
+			<Table>
+				<TableHeader>
 					<TableRow>
-						<TableCell className="whitespace-nowrap">{formatDateTime(event.appliedAt)}</TableCell>
-						<TableCell className="whitespace-nowrap text-muted-foreground">{formatDateTime(event.createdAt)}</TableCell>
-						<TableCell className="font-mono text-xs">{event.type}</TableCell>
-						<TableCell className="font-medium">{event.tableName ?? '—'}</TableCell>
-						<TableCell className="font-mono text-xs">{formatPrimaryKey(event.primaryKey)}</TableCell>
-						<TableCell>{event.identityDescription}</TableCell>
-						<TableCell>
-							<Button
-								variant="ghost"
-								size="sm"
-								onClick={() => setExpanded(expanded === event.id ? undefined : event.id)}
-							>
-								{expanded === event.id ? <ChevronUpIcon className="size-4" /> : <ChevronDownIcon className="size-4" />}
-								<span className="sr-only">Toggle detail</span>
-							</Button>
-						</TableCell>
+						<TableHead>Applied at</TableHead>
+						<TableHead>Created at</TableHead>
+						<TableHead>Type</TableHead>
+						<TableHead>Table</TableHead>
+						<TableHead>Row</TableHead>
+						<TableHead>Identity</TableHead>
+						<TableHead className="w-12" />
 					</TableRow>
-					{expanded === event.id && (
+				</TableHeader>
+				<TableBody>
+					{events.length === 0 && (
 						<TableRow>
-							<TableCell colSpan={7} className="bg-muted/40">
-								<EventDetail event={event} />
-							</TableCell>
+							<TableCell colSpan={7} className="text-gray-500 italic">No event matches this filter.</TableCell>
 						</TableRow>
 					)}
-				</Fragment>
-			))}
-		</Table>
+					{events.map(event => (
+						<Fragment key={event.id}>
+							<TableRow>
+								<TableCell className="whitespace-nowrap" title={formatDateTime(event.appliedAt)}>{formatDateTimeShort(event.appliedAt)}</TableCell>
+								<TableCell className="whitespace-nowrap text-muted-foreground" title={formatDateTime(event.createdAt)}>
+									{formatDateTimeShort(event.createdAt)}
+								</TableCell>
+								<TableCell className="font-mono text-xs">{event.type}</TableCell>
+								<TableCell className="font-medium">{event.tableName ?? '—'}</TableCell>
+								{/* A row id is a UUID; showing its head is enough to tell rows apart, and the expander has it in full. */}
+								<TableCell className="max-w-[11rem]">
+									<div className="truncate font-mono text-xs" title={formatPrimaryKey(event.primaryKey)}>{formatPrimaryKey(event.primaryKey)}</div>
+								</TableCell>
+								<TableCell>{event.identityDescription}</TableCell>
+								<TableCell>
+									<Button
+										variant="ghost"
+										size="sm"
+										onClick={() => setExpanded(expanded === event.id ? undefined : event.id)}
+									>
+										{expanded === event.id ? <ChevronUpIcon className="size-4" /> : <ChevronDownIcon className="size-4" />}
+										<span className="sr-only">Toggle detail</span>
+									</Button>
+								</TableCell>
+							</TableRow>
+							{expanded === event.id && (
+								<TableRow>
+									<TableCell colSpan={7} className="bg-muted/40">
+										<EventDetail event={event} />
+									</TableCell>
+								</TableRow>
+							)}
+						</Fragment>
+					))}
+				</TableBody>
+			</Table>
+		</TableWrapper>
 	)
 }
 
@@ -232,11 +247,12 @@ const HistoryBrowser = () => {
 							<EventsTable events={query.data} />
 						</div>
 						{/* The API reports no total, so paging goes as far as a full page keeps arriving. */}
-						<div className="flex justify-between gap-2">
+						<div className="flex items-center justify-between gap-2">
 							<Button variant="outline" disabled={page === 0} onClick={() => setPage(page - 1)}>
 								<ChevronLeftIcon className="size-4" />
 								<span className="sr-only">Previous page</span>
 							</Button>
+							<span className="text-xs text-muted-foreground">Page {page + 1}</span>
 							<Button variant="outline" disabled={query.data.length < perPage} onClick={() => setPage(page + 1)}>
 								<ChevronRightIcon className="size-4" />
 								<span className="sr-only">Next page</span>

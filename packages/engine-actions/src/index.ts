@@ -98,6 +98,7 @@ export default class ActionsPlugin implements Plugin {
 							actions_dispatchWorkerSupervisorFactory,
 							actions_variableManager,
 							actions_authorizator,
+							panelApiMount,
 						},
 					) => {
 						const handlerFactory = new ActionsGraphQLHandlerFactory()
@@ -127,6 +128,13 @@ export default class ActionsPlugin implements Plugin {
 						)
 						it.addRoute('actions', '/actions/:projectSlug', actionsMiddlewareFactory.create())
 						it.addWebsocketRoute('actions', '/actions/_worker', actionsWebsocketMiddlewareFactory.create())
+						// Does nothing unless the panel is served; when it is, the panel's access gate applies
+						// and the UI learns the actions module has an API to talk to.
+						panelApiMount.mount(it, {
+							name: 'actions',
+							path: 'actions/:projectSlug',
+							controller: actionsMiddlewareFactory.create(),
+						})
 					},
 				)
 				.setupService(

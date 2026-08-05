@@ -1357,9 +1357,13 @@ const schema: DocumentNode = gql`
 	type IdentityGlobalPermissions {
 		canCreateProject: Boolean!
 		canDeployEntrypoint: Boolean!
-		""" Read \`configuration\`, \`authPolicies\`, \`identityProviders\` and \`mailTemplates\` — all four throw otherwise. """
+		""" Read \`configuration\`, which throws otherwise. The other configuration queries gate on their own actions. """
 		canViewConfiguration: Boolean!
-		""" Write the tenant configuration (\`configure\`). The CLI is the usual write path. """
+		"""
+		Write the tenant configuration (\`configure\`), and read \`authPolicies\`. The CLI is the usual
+		write path. \`identityProviders\` and \`mailTemplates\` have no flag of their own yet — they gate
+		on \`idp:list\` and \`mailTemplate:list\`.
+		"""
 		canManageConfiguration: Boolean!
 		""" Read \`authLog\`, which throws otherwise. """
 		canViewAuthLog: Boolean!

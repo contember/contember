@@ -1083,11 +1083,15 @@ export type IdentityGlobalPermissions = {
 	 * of the projects the caller administers — so this marks a full listing, not access to one.
 	 */
 	readonly canListPersons: Scalars['Boolean']['output']
-	/**  Write the tenant configuration (`configure`). The CLI is the usual write path.  */
+	/**
+	 * Write the tenant configuration (`configure`), and read `authPolicies`. The CLI is the usual
+	 * write path. `identityProviders` and `mailTemplates` have no flag of their own yet — they gate
+	 * on `idp:list` and `mailTemplate:list`.
+	 */
 	readonly canManageConfiguration: Scalars['Boolean']['output']
 	/**  Read `authLog`, which throws otherwise.  */
 	readonly canViewAuthLog: Scalars['Boolean']['output']
-	/**  Read `configuration`, `authPolicies`, `identityProviders` and `mailTemplates` — all four throw otherwise.  */
+	/**  Read `configuration`, which throws otherwise. The other configuration queries gate on their own actions.  */
 	readonly canViewConfiguration: Scalars['Boolean']['output']
 }
 

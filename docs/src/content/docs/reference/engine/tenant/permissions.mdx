@@ -55,8 +55,8 @@ query {
 | --- | --- | --- |
 | `canCreateProject` | `project:create` | `createProject` |
 | `canDeployEntrypoint` | `entrypoint:deployEntrypoint` | deploy |
-| `canViewConfiguration` | `system:viewConfig` | `configuration`, `authPolicies`, `identityProviders`, `mailTemplates` |
-| `canManageConfiguration` | `system:configure` | `configure` and the policy / IdP / mail-template mutations |
+| `canViewConfiguration` | `system:viewConfig` | `configuration` |
+| `canManageConfiguration` | `system:configure` | `configure`, the policy / IdP / mail-template mutations, and reading `authPolicies` |
 | `canViewAuthLog` | `system:viewAuthLog` | `authLog` |
 | `canListPersons` | `person:list` | the **full** `persons` listing |
 | `canListGlobalApiKeys` | `apiKey:list` | `globalApiKeys` |
@@ -65,6 +65,12 @@ query {
 `canListPersons` marks a *full* listing, not access to one. Without it `persons` still answers,
 narrowed to the members of the projects the caller administers — so hiding the listing on a `false`
 would remove something that works.
+
+The four configuration queries do **not** share one gate: `configuration` needs `system:viewConfig`,
+`authPolicies` needs `system:configure`, and `identityProviders` and `mailTemplates` gate on
+`idp:list` and `mailTemplate:list`, which have no introspection flag yet. With the built-in roles
+this is invisible, because `SUPER_ADMIN` and `PROJECT_ADMIN` hold all four — it matters once a custom
+role bundle grants them separately.
 
 `permissions` is nullable, and is `null` when read on another identity whose roles the caller may
 not see (`identity:viewPermissions`). On `me` it is always present.

@@ -11,7 +11,7 @@ import { Logger } from '@contember/logger'
 import { Schema } from '@contember/schema'
 import Koa from 'koa'
 import { createSecretKey } from 'node:crypto'
-import { Application } from './application/index.js'
+import { Application, DisabledPanelApiMount, PanelApiMount } from './application/index.js'
 import { createNotFoundMiddleware, HttpResponse } from './common/index.js'
 import { ProjectConfigResolver } from './config/projectConfigResolver.js'
 import { TenantConfigResolver } from './config/tenantConfigResolver.js'
@@ -261,6 +261,9 @@ export class MasterContainerFactory {
 				'exportApiMiddlewareFactory',
 				({ projectGroupResolver, exportExecutor }) => new ExportApiControllerFactory(projectGroupResolver, exportExecutor),
 			)
+			// Replaced by the panel plugin when it serves the panel; see `PanelApiMount`. Declared here so
+			// a plugin can mount its API into the panel without depending on the panel package.
+			.addService('panelApiMount', (): PanelApiMount => new DisabledPanelApiMount())
 			.addService('application', ({ projectGroupResolver, serverConfig, logger, debugMode, version, promRegistry }) => {
 				const app = new Application(
 					projectGroupResolver,

@@ -51,7 +51,7 @@ export class EventsQueryResolver implements QueryResolvers<ActionsContext> {
 		return rows.map(row => ({
 			id: row.id,
 			createdAt: row.created_at,
-			resolvedAt: row.created_at,
+			resolvedAt: row.resolved_at ?? undefined,
 			lastStateChange: row.last_state_change,
 			visibleAt: row.visible_at,
 			log: row.log,

@@ -4,13 +4,15 @@ import { ToastContent, useShowToast } from '@contember/react-ui-lib-base'
 import { ProjectSecretList, type ProjectSecretListController, SetProjectSecretFormFields } from '@contember/react-ui-lib-tenant'
 import { useRef } from 'react'
 import { FormDialog } from '../../shell/FormDialog.js'
-import { formClassName, PageHeader, PageStack, PanelSection } from '../../shell/screens.js'
+import { useProjectPermissions } from '../../shell/permissions.js'
+import { formClassName, NoAccessState, PageHeader, PageStack, PanelSection } from '../../shell/screens.js'
 import { PanelSlots } from '../../shell/slots.js'
 
 /** Secrets are write-only: the API answers with names and timestamps, never a value. */
 const ProjectSecrets = ({ projectSlug }: { projectSlug: string }) => {
 	const showToast = useShowToast()
 	const listController = useRef<ProjectSecretListController>(undefined)
+	const permissions = useProjectPermissions()
 
 	const setSecret = (
 		<FormDialog
@@ -40,12 +42,15 @@ const ProjectSecrets = ({ projectSlug }: { projectSlug: string }) => {
 			<PageHeader
 				title="Secrets"
 				description="Values the project's configuration reads at runtime. They are encrypted at rest and never returned by the API — only their names and timestamps are."
-				actions={setSecret}
+				actions={permissions?.canSetSecret === false ? undefined : setSecret}
 			/>
-			{/* Empty rather than failing for a caller who may not read them. */}
-			<PanelSection>
-				<ProjectSecretList controller={listController} />
-			</PanelSection>
+			{permissions?.canViewSecrets === false
+				? <NoAccessState description="Setting a secret does not imply reading which ones exist; this account may do one and not the other." />
+				: (
+					<PanelSection>
+						<ProjectSecretList controller={listController} />
+					</PanelSection>
+				)}
 		</PageStack>
 	)
 }

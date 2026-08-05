@@ -4,13 +4,15 @@ import { Input, ToastContent, useShowToast } from '@contember/react-ui-lib-base'
 import { ApiKeyList, type ApiKeyListController, CreateApiKeyFormFields } from '@contember/react-ui-lib-tenant'
 import { useRef } from 'react'
 import { FormDialog } from '../../shell/FormDialog.js'
-import { formClassName, PageHeader, PageStack, PanelSection } from '../../shell/screens.js'
+import { useProjectPermissions } from '../../shell/permissions.js'
+import { formClassName, NoAccessState, PageHeader, PageStack, PanelSection } from '../../shell/screens.js'
 import { PanelSlots } from '../../shell/slots.js'
 
 /** Keys whose identity is a member of this project; the roles come from the project's own schema. */
 const ProjectApiKeys = ({ projectSlug }: { projectSlug: string }) => {
 	const showToast = useShowToast()
 	const listController = useRef<ApiKeyListController>(undefined)
+	const permissions = useProjectPermissions()
 
 	const createKey = (
 		<FormDialog label="Create key" title="Create an API key" description="The key becomes a member of this project with the roles you pick.">
@@ -42,11 +44,16 @@ const ProjectApiKeys = ({ projectSlug }: { projectSlug: string }) => {
 			<PageHeader
 				title="API keys"
 				description="Permanent keys scoped to this project. The token is readable once, at creation — afterwards the API keeps only its hash."
-				actions={createKey}
+				actions={permissions?.canCreateApiKey === false ? undefined : createKey}
 			/>
-			<PanelSection>
-				<ApiKeyList controller={listController} />
-			</PanelSection>
+			{/* `Project.apiKeys` rides on the member-view permission and answers empty without it. */}
+			{permissions?.canViewMembers === false
+				? <NoAccessState description="Listing a project's API keys needs the same permission as listing its members." />
+				: (
+					<PanelSection>
+						<ApiKeyList controller={listController} />
+					</PanelSection>
+				)}
 		</PageStack>
 	)
 }

@@ -15,4 +15,6 @@ export const configurationModule: PanelModule = {
 	load: async () => ({
 		configuration: (await import('./ConfigurationPage.js')).ConfigurationPage,
 	}),
+	// All four views throw without it; every one of them would render the same notice.
+	isAvailable: ({ identity }) => identity.permissions.canViewConfiguration,
 }

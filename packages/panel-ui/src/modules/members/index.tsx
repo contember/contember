@@ -1,4 +1,5 @@
 import { UsersIcon } from 'lucide-react'
+import { mayPerform, projectPermissionsOf } from '../../shell/permissions.js'
 import type { PanelModule } from '../types.js'
 
 export const membersModule: PanelModule = {
@@ -14,4 +15,5 @@ export const membersModule: PanelModule = {
 	load: async () => ({
 		projectMembers: (await import('./MembersPage.js')).MembersPage,
 	}),
+	isAvailable: ({ identity, projectSlug }) => mayPerform(projectPermissionsOf(identity, projectSlug)?.canViewMembers),
 }

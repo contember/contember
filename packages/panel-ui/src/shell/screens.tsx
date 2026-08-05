@@ -1,4 +1,5 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, Loader } from '@contember/react-ui-lib-base'
+import { LockIcon } from 'lucide-react'
 import type { ReactNode } from 'react'
 
 export const CenteredScreen = ({ children }: { children: ReactNode }) => (
@@ -108,6 +109,14 @@ export const EmptyState = ({ icon, title, description, children }: {
 		</div>
 		{children}
 	</div>
+)
+
+/**
+ * For a listing the caller may not read. The tenant API answers these with an empty page rather
+ * than an error, so without saying it outright the page would claim there is nothing there.
+ */
+export const NoAccessState = ({ description }: { description: string }) => (
+	<EmptyState icon={<LockIcon className="size-5" />} title="Not available to this account" description={description} />
 )
 
 /** Forms now always sit inside something that constrains them — a dialog or a settings row. */

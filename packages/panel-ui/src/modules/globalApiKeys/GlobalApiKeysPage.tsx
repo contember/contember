@@ -1,15 +1,16 @@
-import { CreateGlobalApiKeyForm } from '@contember/react-client-tenant'
+import { CreateGlobalApiKeyForm, useIdentity } from '@contember/react-client-tenant'
 import { Input, ToastContent, useShowToast } from '@contember/react-ui-lib-base'
 import { CreateGlobalApiKeyFormFields, GlobalApiKeyList, type GlobalApiKeyListController } from '@contember/react-ui-lib-tenant'
 import { useRef } from 'react'
 import { FormDialog } from '../../shell/FormDialog.js'
-import { formClassName, PageHeader, PageStack, PanelSection } from '../../shell/screens.js'
+import { formClassName, NoAccessState, PageHeader, PageStack, PanelSection } from '../../shell/screens.js'
 import { PanelSlots } from '../../shell/slots.js'
 
 /** Keys that carry tenant-wide roles instead of a project membership. */
 export const GlobalApiKeysPage = () => {
 	const showToast = useShowToast()
 	const listController = useRef<GlobalApiKeyListController>(undefined)
+	const permissions = useIdentity()?.permissions
 
 	const createKey = (
 		<FormDialog label="Create key" title="Create a global API key" description="Roles are tenant roles, not project roles.">
@@ -41,11 +42,16 @@ export const GlobalApiKeysPage = () => {
 			<PageHeader
 				title="Global API keys"
 				description="Permanent keys whose identity carries tenant-wide roles and no project membership. The token is readable once, at creation."
-				actions={createKey}
+				actions={permissions?.canCreateGlobalApiKey === false ? undefined : createKey}
 			/>
-			<PanelSection>
-				<GlobalApiKeyList controller={listController} />
-			</PanelSection>
+			{/* The query answers an empty page for a caller who may not list them — say so instead. */}
+			{permissions?.canListGlobalApiKeys === false
+				? <NoAccessState description="Listing tenant-wide API keys needs the apiKey:list permission." />
+				: (
+					<PanelSection>
+						<GlobalApiKeyList controller={listController} />
+					</PanelSection>
+				)}
 		</PageStack>
 	)
 }

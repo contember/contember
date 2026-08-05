@@ -1,4 +1,5 @@
-import { ApiKey, ProjectIdentityRelation, ProjectMembersArgs, ProjectResolvers, ProjectSecretInfo } from '../../schema/index.js'
+import { ApiKey, ProjectIdentityRelation, ProjectMembersArgs, ProjectPermissions, ProjectResolvers, ProjectSecretInfo } from '../../schema/index.js'
+import { Authorizator } from '@contember/authorization'
 import { TenantResolverContext } from '../TenantResolverContext.js'
 import { PermissionActions, Project, ProjectApiKeysQuery, ProjectMemberManager, ProjectSchemaResolver, SecretsManager } from '../../model/index.js'
 import { getRoleVariables } from '@contember/schema-utils'
@@ -69,6 +70,37 @@ export class ProjectTypeResolver implements ProjectResolvers {
 			...it,
 			identity: { ...it.identity, projects: [], sessions: [] },
 		}))
+	}
+
+	/**
+	 * Advisory, for building a UI that does not offer what it cannot deliver. Every one of these is
+	 * checked again where it is used, so answering `true` here grants nothing.
+	 *
+	 * The membership-parameterized actions are asked with an empty membership list, the same coarse
+	 * "do you hold this at all" question `apiKeys` and `members` already ask — which roles may
+	 * actually be granted is still decided per membership when the mutation runs.
+	 */
+	async permissions(
+		parent: Omit<Project, 'config'>,
+		args: unknown,
+		context: TenantResolverContext,
+	): Promise<ProjectPermissions> {
+		const scope = await context.permissionContext.createProjectScope(parent)
+		const isAllowed = (action: Authorizator.Action) => context.permissionContext.isAllowed({ scope, action })
+
+		const [canViewMembers, canAddMember, canUpdateMember, canRemoveMember, canViewSecrets, canSetSecret, canCreateApiKey, canUpdate] = await Promise
+			.all([
+				isAllowed(PermissionActions.PROJECT_VIEW_MEMBER([])),
+				isAllowed(PermissionActions.PROJECT_ADD_MEMBER([])),
+				isAllowed(PermissionActions.PROJECT_UPDATE_MEMBER([])),
+				isAllowed(PermissionActions.PROJECT_REMOVE_MEMBER([])),
+				isAllowed(PermissionActions.PROJECT_VIEW_SECRETS),
+				isAllowed(PermissionActions.PROJECT_SET_SECRET),
+				isAllowed(PermissionActions.API_KEY_CREATE),
+				isAllowed(PermissionActions.PROJECT_UPDATE),
+			])
+
+		return { canViewMembers, canAddMember, canUpdateMember, canRemoveMember, canViewSecrets, canSetSecret, canCreateApiKey, canUpdate }
 	}
 
 	async roles(parent: Omit<Project, 'config'>, args: unknown, context: TenantResolverContext) {

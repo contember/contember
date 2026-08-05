@@ -18,7 +18,9 @@ export interface InviteFormFieldsProps {
 
 export const InviteFormFields = ({ projectSlug, roles, allowUnmanaged }: InviteFormFieldsProps) => {
 	const form = useInviteForm()
-	const rolesResolved = roles ?? useIntrospectionRolesConfig(projectSlug)
+	// See `add-project-member.tsx`: the hook must not sit behind `??`.
+	const introspectedRoles = useIntrospectionRolesConfig(projectSlug)
+	const rolesResolved = roles ?? introspectedRoles
 	return (
 		<div className="relative flex flex-col gap-2">
 			{form.state === 'submitting' ? <Loader position="absolute" /> : null}

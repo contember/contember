@@ -16,7 +16,10 @@ import { dict } from '../dict.js'
  */
 export const AddProjectMemberFormFields = ({ projectSlug, roles }: { projectSlug: string; roles?: RolesConfig }) => {
 	const form = useAddProjectMemberForm()
-	const rolesResolved = roles ?? useIntrospectionRolesConfig(projectSlug)
+	// Unconditionally, then pick: behind `??` the hook would run only on renders where `roles` is
+	// nullish, and a caller whose roles arrive from a query flips that mid-life.
+	const introspectedRoles = useIntrospectionRolesConfig(projectSlug)
+	const rolesResolved = roles ?? introspectedRoles
 	return (
 		<div className="relative flex flex-col gap-2">
 			{form.state === 'submitting' ? <Loader position="absolute" /> : null}

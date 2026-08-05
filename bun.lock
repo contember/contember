@@ -605,6 +605,8 @@
       "version": "2.2.0-alpha.3",
       "dependencies": {
         "@contember/graphql-client": "workspace:*",
+        "@contember/graphql-client-actions": "workspace:*",
+        "@contember/graphql-client-system": "workspace:*",
         "@contember/interface": "workspace:*",
         "@contember/react-client": "workspace:*",
         "@contember/react-client-tenant": "workspace:*",
@@ -613,6 +615,7 @@
         "@contember/react-slots": "workspace:*",
         "@contember/react-ui-lib-base": "workspace:*",
         "@contember/react-ui-lib-tenant": "workspace:*",
+        "graphql-ts-client-api": "catalog:",
         "lucide-react": "catalog:",
         "react": "catalog:",
         "react-dom": "catalog:",

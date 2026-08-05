@@ -6,6 +6,8 @@
 	},
 	"references": [
 		{ "path": "../../graphql-client/src" },
+		{ "path": "../../graphql-client-actions/src" },
+		{ "path": "../../graphql-client-system/src" },
 		{ "path": "../../interface/src" },
 		{ "path": "../../react-client/src" },
 		{ "path": "../../react-client-tenant/src" },

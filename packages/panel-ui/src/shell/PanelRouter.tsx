@@ -1,9 +1,9 @@
 import { EnvironmentContext, useEnvironment } from '@contember/interface'
-import { useIdentity } from '@contember/react-client-tenant'
 import { useCurrentRequest, useRedirect } from '@contember/react-routing'
 import { lazy, Suspense, useEffect, useMemo } from 'react'
 import { panelRegistry } from '../modules/index.js'
 import { indexPageName, type PanelPage, resetRequestPageName } from '../modules/registry.js'
+import { useAvailableModules } from './modules.js'
 import { ProjectScopeProvider } from './ProjectScopeProvider.js'
 import { stringParameter } from './requestParameters.js'
 import { InlineLoader, MessageCard, NotFound } from './screens.js'
@@ -13,14 +13,11 @@ const redirectingPages = new Set([indexPageName, resetRequestPageName])
 
 /** Where `/panel/` lands: the first global module the identity may use. */
 const useDefaultPageName = (): string | undefined => {
-	const identity = useIdentity()
+	const modules = useAvailableModules(undefined)
 	return useMemo(() => {
-		if (identity === undefined) {
-			return undefined
-		}
-		const module = panelRegistry.availableModules({ identity, projectSlug: undefined }).find(it => it.scope === 'global')
+		const module = modules.find(it => it.scope === 'global')
 		return module === undefined ? undefined : panelRegistry.entryPageOf(module)
-	}, [identity])
+	}, [modules])
 }
 
 const DefaultPageRedirect = () => {

@@ -5,6 +5,7 @@ import { Link, useCurrentRequest } from '@contember/react-routing'
 import { Card } from '@contember/react-ui-lib-base'
 import { ArrowRightIcon } from 'lucide-react'
 import type { ReactNode } from 'react'
+import { useAvailableModules } from '../../shell/modules.js'
 import { PageHeader, PageStack } from '../../shell/screens.js'
 import { PanelSlots } from '../../shell/slots.js'
 import { panelRegistry } from '../index.js'
@@ -18,15 +19,13 @@ const Fact = ({ label, children }: { label: string; children: ReactNode }) => (
 
 /** Composed from the registry, so a new project module appears here without an edit. */
 const ProjectModuleLinks = ({ projectSlug }: { projectSlug: string }) => {
-	const identity = useIdentity()
 	const request = useCurrentRequest()
-	if (identity === undefined || request === null) {
+	const available = useAvailableModules(projectSlug)
+	if (request === null) {
 		return null
 	}
 	const currentModule = panelRegistry.pages.get(request.pageName)?.module
-	const modules = panelRegistry
-		.availableModules({ identity, projectSlug })
-		.filter(it => it.scope === 'project' && it !== currentModule)
+	const modules = available.filter(it => it.scope === 'project' && it !== currentModule)
 
 	return (
 		<div className="grid grid-cols-[repeat(auto-fill,minmax(15rem,1fr))] gap-4">

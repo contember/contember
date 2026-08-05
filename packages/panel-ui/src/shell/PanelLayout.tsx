@@ -21,8 +21,8 @@ import {
 } from '@contember/react-ui-lib-base'
 import { BoxIcon, LogOutIcon } from 'lucide-react'
 import type { ReactNode } from 'react'
-import { panelRegistry } from '../modules/index.js'
 import { indexPageName } from '../modules/registry.js'
+import { useAvailableModules } from './modules.js'
 import { PanelNavigation } from './PanelNavigation.js'
 import { ProjectSwitcher } from './ProjectSwitcher.js'
 import { useProjectParameter } from './requestParameters.js'
@@ -55,7 +55,7 @@ const SignedInAs = () => {
 export const PanelLayout = ({ children }: { children: ReactNode }) => {
 	const identity = useIdentity()
 	const projectSlug = useProjectParameter()
-	const modules = identity === undefined ? [] : panelRegistry.availableModules({ identity, projectSlug })
+	const modules = useAvailableModules(projectSlug)
 	const globalModules = modules.filter(it => it.scope === 'global')
 	const projectModules = modules.filter(it => it.scope === 'project')
 	const projectName = identity?.projects.find(it => it.slug === projectSlug)?.name

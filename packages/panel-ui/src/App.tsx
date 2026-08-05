@@ -9,6 +9,7 @@ import { panelRegistry } from './modules/index.js'
 import { AccessDeniedScreen } from './shell/AccessDeniedScreen.js'
 import { LoginScreen } from './shell/LoginScreen.js'
 import { PanelClient } from './shell/PanelClient.js'
+import { PanelConfigProvider } from './shell/PanelConfigContext.js'
 import { PanelLayout } from './shell/PanelLayout.js'
 import { PanelRouter } from './shell/PanelRouter.js'
 import { CenteredScreen, FullScreenLoader, MessageCard } from './shell/screens.js'
@@ -55,18 +56,20 @@ export const App = ({ config }: { config: PanelRuntimeConfig }) => {
 	const onAccessDenied = useCallback(() => setAccessDenied(true), [])
 
 	return (
-		<PanelClient apiBaseUrl={config.apiBaseUrl} onAccessDenied={onAccessDenied}>
-			<RoutingProvider basePath={config.basePath} routes={panelRegistry.routes}>
-				<IdentityProvider>
-					<IdentityEnvironmentProvider>
-						<SlotsProvider>
-							<Toaster>
-								<PanelGate accessDenied={accessDenied} />
-							</Toaster>
-						</SlotsProvider>
-					</IdentityEnvironmentProvider>
-				</IdentityProvider>
-			</RoutingProvider>
-		</PanelClient>
+		<PanelConfigProvider config={config}>
+			<PanelClient apiBaseUrl={config.apiBaseUrl} onAccessDenied={onAccessDenied}>
+				<RoutingProvider basePath={config.basePath} routes={panelRegistry.routes}>
+					<IdentityProvider>
+						<IdentityEnvironmentProvider>
+							<SlotsProvider>
+								<Toaster>
+									<PanelGate accessDenied={accessDenied} />
+								</Toaster>
+							</SlotsProvider>
+						</IdentityEnvironmentProvider>
+					</IdentityProvider>
+				</RoutingProvider>
+			</PanelClient>
+		</PanelConfigProvider>
 	)
 }

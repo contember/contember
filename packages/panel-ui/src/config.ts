@@ -7,15 +7,24 @@ export interface PanelRuntimeConfig {
 	basePath: string
 	/** Prefix for every API call; the per-API paths (`/tenant`, `/content/...`) are appended to it. */
 	apiBaseUrl: string
+	/**
+	 * APIs plugins have mounted under {@link apiBaseUrl}, e.g. `actions`. Tenant, content and system
+	 * are always there and are not listed. A module whose plugin is missing hides itself.
+	 */
+	pluginApis: readonly string[]
 }
 
 const configElementId = 'contember-panel-config'
 const placeholder = '__CONTEMBER_PANEL_CONFIG__'
 
-/** Used by `vite dev`, where nothing substitutes the placeholders. */
+/**
+ * Used by `vite dev`, where nothing substitutes the placeholders. Every plugin API is listed: a
+ * module under development must be reachable, and hiding one is nav tidiness rather than a boundary.
+ */
 const developmentConfig: PanelRuntimeConfig = {
 	basePath: '/',
 	apiBaseUrl: '/panel/api',
+	pluginApis: ['actions'],
 }
 
 export const getPanelConfig = (): PanelRuntimeConfig => {

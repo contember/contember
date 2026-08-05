@@ -17,6 +17,8 @@ export interface PanelModuleContext {
 	readonly identity: Identity
 	/** The project the navigation is being composed for; `undefined` outside a project scope. */
 	readonly projectSlug: string | undefined
+	/** APIs plugins have mounted into the panel — a module backed by a plugin checks for its own. */
+	readonly pluginApis: readonly string[]
 }
 
 /** What {@link PanelModule.load} resolves to: page name -> component. */

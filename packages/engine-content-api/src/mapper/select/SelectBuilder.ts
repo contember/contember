@@ -87,15 +87,23 @@ export class SelectBuilder {
 		}
 
 		const fetchedPredicates = new Set()
-		const addPredicate = (predicate: Acl.Predicate): ColumnValueGetter<boolean> => {
+		const addPredicate = (predicate: Acl.Predicate, options?: { rootOnly?: boolean }): ColumnValueGetter<boolean> => {
 			if (typeof predicate === 'boolean') {
 				return () => predicate
 			}
-			const predicatePath = path.for('__predicate').for(predicate)
+			// A root-resolved name may denote a different definition than the same name in the `all` set, so the
+			// two must not share a column. Only the override gets a suffix, keeping every other alias unchanged.
+			const rootOnly = options?.rootOnly === true && this.relationPath.length > 0
+			const predicateKey = rootOnly ? `${predicate}__rootPerms` : predicate
+			const predicatePath = path.for('__predicate').for(predicateKey)
 
-			if (!fetchedPredicates.has(predicate)) {
+			if (!fetchedPredicates.has(predicateKey)) {
 				const primaryPredicate = this.predicateFactory.createReadPredicate(entity, undefined, this.relationPath)
-				const fieldPredicate = this.predicateFactory.buildReadPredicates(entity, [predicate], this.relationPath)
+				const fieldPredicate = rootOnly
+					// No relation context: `optimizePredicates` would eliminate parts against the root set, but the
+					// parent rows were filtered with the `all` set — an unsound elimination. Skip it instead.
+					? this.predicateFactory.buildPredicates(entity, [predicate], undefined, true)
+					: this.predicateFactory.buildReadPredicates(entity, [predicate], this.relationPath)
 
 				const { qb, condition } = this.whereBuilder.buildConditionLiteral(
 					this.qb,
@@ -105,7 +113,7 @@ export class SelectBuilder {
 					{ relationPath: this.relationPath, evaluatedPredicates: [primaryPredicate] },
 				)
 				this.qb = qb.select(condition, predicatePath.alias)
-				fetchedPredicates.add(predicate)
+				fetchedPredicates.add(predicateKey)
 			}
 			return row => row[predicatePath.alias] === true
 		}

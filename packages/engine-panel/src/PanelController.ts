@@ -8,6 +8,8 @@ export interface PanelControllerArgs {
 	/** Prefix the panel prepends to every API path, e.g. `/panel/api`. */
 	apiBaseUrl: string
 	assets: PanelAssetStore
+	/** Plugin APIs mounted under {@link apiBaseUrl}; read on the first request, see {@link PanelController.indexHtml}. */
+	pluginApis: () => readonly string[]
 }
 
 /** Everything the controller reads from a request — see {@link PanelController.handle}. */
@@ -51,10 +53,20 @@ const contentSecurityPolicy = [
  * file request. The panel's API traffic is a separate, regular route.
  */
 export class PanelController {
-	private readonly indexHtml: Buffer
+	/**
+	 * Rendered on the first request rather than here: the plugins that mount their API into the panel
+	 * are not all registered yet while the container is still being built, and the shell carries the
+	 * list. Built once and kept, since nothing in it can change afterwards.
+	 */
+	private indexHtml: Buffer | undefined
+	private readonly indexSource: Buffer
 
 	constructor(private readonly args: PanelControllerArgs) {
-		this.indexHtml = this.renderIndex()
+		const source = args.assets.getGzip(indexAssetPath)
+		if (source === undefined) {
+			throw new Error('The panel UI was not built into this binary. Run `bun run pre-build` before building the server.')
+		}
+		this.indexSource = source
 	}
 
 	public create(): InternalHttpController {
@@ -82,6 +94,7 @@ export class PanelController {
 
 		if (path === undefined || gzip === undefined) {
 			// Anything that is not a built file is a client-side route — serve the app shell.
+			this.indexHtml ??= this.renderIndex()
 			return this.respond(request, this.indexHtml, {
 				'Content-Type': 'text/html; charset=utf-8',
 				'Cache-Control': 'no-store',
@@ -110,15 +123,12 @@ export class PanelController {
 	}
 
 	private renderIndex(): Buffer {
-		const source = this.args.assets.getGzip(indexAssetPath)
-		if (source === undefined) {
-			throw new Error('The panel UI was not built into this binary. Run `bun run pre-build` before building the server.')
-		}
 		const config = JSON.stringify({
 			basePath: `${this.args.basePath}/`,
 			apiBaseUrl: this.args.apiBaseUrl,
+			pluginApis: this.args.pluginApis(),
 		})
-		const html = gunzipSync(source)
+		const html = gunzipSync(this.indexSource)
 			.toString('utf8')
 			// An absolute base href keeps the relative asset URLs resolving from the panel root at any
 			// route depth, which is what lets the mount path stay configurable.

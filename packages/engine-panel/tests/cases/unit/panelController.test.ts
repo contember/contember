@@ -17,11 +17,12 @@ const assets: PanelAssetMap = {
 	'assets/index-def456.css': asset('text/css; charset=utf-8', 'body{color:red}'),
 }
 
-const createController = (basePath = '/panel') =>
+const createController = (basePath = '/panel', pluginApis: () => readonly string[] = () => []) =>
 	new PanelController({
 		basePath,
 		apiBaseUrl: `${basePath}/api`,
 		assets: new PanelAssetStore(assets),
+		pluginApis,
 	})
 
 const get = (path: string | undefined, overrides: Partial<PanelRequest> = {}) =>
@@ -43,7 +44,7 @@ describe('panel controller', () => {
 		const html = bodyText(get(undefined))
 
 		expect(html).toContain('<base href="/panel/">')
-		expect(html).toContain('{"basePath":"/panel/","apiBaseUrl":"/panel/api"}')
+		expect(html).toContain('{"basePath":"/panel/","apiBaseUrl":"/panel/api","pluginApis":[]}')
 		expect(html).not.toContain('__CONTEMBER_PANEL_')
 	})
 
@@ -110,8 +111,20 @@ describe('panel controller', () => {
 		expect(response.headers['Allow']).toBe('GET, HEAD')
 	})
 
+	// The plugins that mount into the panel register after the controller is constructed, so the
+	// shell must be rendered from the list as it stands when it is first served.
+	test('reports the plugin APIs mounted by the time the shell is served', () => {
+		const mounted: string[] = []
+		const controller = createController('/panel', () => mounted)
+		mounted.push('actions')
+
+		const html = gunzipSync(controller.handle({ method: 'GET', path: undefined, acceptEncoding: 'gzip' }).body).toString('utf8')
+
+		expect(html).toContain('"pluginApis":["actions"]')
+	})
+
 	test('refuses to start without a built panel', () => {
-		expect(() => new PanelController({ basePath: '/panel', apiBaseUrl: '/panel/api', assets: new PanelAssetStore({}) }))
+		expect(() => new PanelController({ basePath: '/panel', apiBaseUrl: '/panel/api', assets: new PanelAssetStore({}), pluginApis: () => [] }))
 			.toThrow(/not built into this binary/)
 	})
 })

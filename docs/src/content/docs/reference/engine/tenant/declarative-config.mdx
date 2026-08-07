@@ -44,6 +44,10 @@ export default defineTenantConfig({
     rateLimits: {
       loginPerIp: { limit: 20, window: 'PT1H' },
     },
+    panel: {
+      globalRoles: ['super_admin', 'project_admin'],
+      projectRoles: ['admin'],
+    },
   },
 
   // → addIDP / updateIDP, keyed by provider slug
@@ -67,6 +71,23 @@ export default defineTenantConfig({
       variant: 'en',
       subject: 'Reset your password',
       content: 'Click the link to reset your password: {{link}}',
+    },
+  ],
+
+  // → createAuthPolicy / updateAuthPolicy, matched by scope + project + roles
+  authPolicies: [
+    {
+      scope: 'global',
+      roles: ['super_admin'],
+      mfaRequired: true,
+      tokenExpiration: 'PT8H',
+    },
+    {
+      scope: 'project',
+      project: 'blog',
+      roles: ['editor'],
+      idleTimeout: 'PT30M',
+      rememberMeAllowed: false,
     },
   ],
 })
@@ -103,14 +124,42 @@ contember tenant:apply --dry-run
 | `config` | `configure` | Always sent. All fields are optional and merged — unset fields preserve the current value. |
 | `identityProviders` | `addIDP` / `updateIDP`, then `enableIDP` / `disableIDP` | The CLI reads the current providers and chooses add vs. update per slug. `disabled: true` disables the provider; omitting it (or `false`) keeps/makes it enabled. |
 | `mailTemplates` | `addMailTemplate` | A server-side upsert keyed by `type` + `variant` (+ `projectSlug`). |
+| `authPolicies` | `createAuthPolicy` / `updateAuthPolicy` | `auth_policy` rows have no slug, so an entry is matched to an existing policy by what it targets: `scope` + `project` + the `roles` **set** (order is irrelevant). No match means a new policy. Two entries with the same target are rejected before anything is written — they would create two rows the next apply could no longer tell apart. |
 
 :::tip[Nothing is removed]
-`tenant:apply` only adds and updates. Identity providers or mail templates that exist on the tenant but are **not** present in the config are left untouched. To remove one, do it explicitly via the corresponding mutation.
+`tenant:apply` only adds and updates. Identity providers, mail templates or auth policies that exist on the tenant but are **not** present in the config are left untouched. To remove one, do it explicitly via the corresponding mutation.
+:::
+
+:::caution[Editing `roles` creates a second policy]
+Because the role set is part of a policy's identity, changing `roles: ['editor']` to `roles: ['editor', 'author']` does not edit that policy — it creates a new one and leaves the old one in force. Auth policies aggregate strictest-wins, so the stale row keeps applying. `tenant:apply` prints a warning for every policy on the tenant that the config does not cover; delete the leftover with `deleteAuthPolicy`.
+
+The warning is why `authPolicies: []` differs from omitting the key: an empty list still means "I manage policies here", so leftovers are reported. Omitting `authPolicies` skips the section entirely and says nothing.
+:::
+
+## Panel access
+
+`config.panel` says who may enter the [management panel](/reference/engine/configuration/management-panel) served by the engine:
+
+```ts
+config: {
+  panel: {
+    globalRoles: ['super_admin', 'project_admin'],
+    projectRoles: ['admin'],
+  },
+}
+```
+
+An identity may enter when one of its global roles (`identity.roles`) is listed in `globalRoles`, or when it holds a membership with one of `projectRoles` in at least one project. The values above are the defaults. Each list is replaced as a whole; omitting one leaves it unchanged, and an empty list closes that dimension. With both empty, nobody can enter.
+
+The panel must also be enabled on the deployment (`CONTEMBER_PANEL_ENABLED`) — this setting only decides who gets in once it is served.
+
+:::note[This is an entry gate, not authority]
+Being allowed into the panel grants no rights. Everything done inside it goes through the tenant API and the same ACL as any other client, so a user still sees and changes only what their roles and memberships already permit.
 :::
 
 ## Permissions
 
-The underlying mutations require the `CONFIGURE`, `IDP_*`, and `MAIL_TEMPLATE_*` tenant permissions, held by `SUPER_ADMIN` and `PROJECT_ADMIN`.
+The underlying mutations require the `CONFIGURE`, `IDP_*`, `MAIL_TEMPLATE_*`, and (for auth policies) `system:configure` tenant permissions, held by `SUPER_ADMIN` and `PROJECT_ADMIN`.
 
 :::caution[A deploy-only token is not enough]
 An `ENTRYPOINT_DEPLOYER` (deploy) token can run `deploy` but **cannot** configure the tenant. Use a token with `PROJECT_ADMIN` or `SUPER_ADMIN` privileges for `tenant:apply` — for example a dedicated CI API key.

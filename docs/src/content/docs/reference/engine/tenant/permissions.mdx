@@ -1,0 +1,169 @@
+---
+title: Permission introspection
+---
+
+The tenant API can tell a client what the caller is allowed to do, so an admin UI can stop offering
+operations that will be refused. `me { permissions }` covers the tenant-wide ones and
+`project { permissions }` the per-project ones.
+
+:::note[Available since 2.2]
+`IdentityGlobalPermissions` previously carried only `canCreateProject` and `canDeployEntrypoint`.
+The remaining fields and the whole `ProjectPermissions` type ship in engine **2.2**.
+:::
+
+:::caution[Advisory, not authorization]
+These flags mirror the ACL; they do not apply it. Every operation is checked again when it runs, so
+a `true` here grants nothing and a client that ignores them is not less secure — only less pleasant.
+Never use them as a substitute for a server-side check.
+:::
+
+## Why it exists
+
+Permission failure is not uniform across this API, so a client cannot discover its own rights by
+trying:
+
+| Behaviour | Where |
+| --- | --- |
+| Answers an empty list | `globalApiKeys`, `persons`, `project.members`, `project.apiKeys`, `project.secrets` |
+| Throws `ForbiddenError` | `configuration`, `authPolicies`, `identityProviders`, `mailTemplates`, `authLog` |
+| Throws `ForbiddenError` | **every** mutation — a denial is never reported as `ok: false` |
+
+An empty list is indistinguishable from "there is nothing here", so a UI reading `globalApiKeys`
+cannot tell a tenant with no keys from a caller who may not see them. Probing with a mutation is
+worse: it would have to perform the write to find out.
+
+## Tenant-wide
+
+```graphql
+query {
+  me {
+    permissions {
+      canCreateProject
+      canDeployEntrypoint
+      canViewConfiguration
+      canListIdentityProviders
+      canListMailTemplates
+      canManageConfiguration
+      canViewAuthLog
+      canListPersons
+      canListGlobalApiKeys
+      canCreateGlobalApiKey
+    }
+  }
+}
+```
+
+| Field | Permission | Covers |
+| --- | --- | --- |
+| `canCreateProject` | `project:create` | `createProject` |
+| `canDeployEntrypoint` | `entrypoint:deployEntrypoint` | deploy |
+| `canViewConfiguration` | `system:viewConfig` | `configuration` |
+| `canListIdentityProviders` | `idp:list` | `identityProviders` |
+| `canListMailTemplates` | `mailTemplate:list` | `mailTemplates` |
+| `canManageConfiguration` | `system:configure` | `configure`, auth-policy mutations, and `authPolicies` |
+| `canViewAuthLog` | `system:viewAuthLog` | `authLog` |
+| `canListPersons` | `person:list` | the **full** `persons` listing |
+| `canListGlobalApiKeys` | `apiKey:list` | `globalApiKeys` |
+| `canCreateGlobalApiKey` | `apiKey:createGlobal` | `createGlobalApiKey` |
+
+`canListPersons` marks a *full* listing, not access to one. Without it `persons` still answers,
+narrowed to the members of the projects the caller administers — so hiding the listing on a `false`
+would remove something that works.
+
+The four configuration queries do **not** share one gate: `configuration` needs `system:viewConfig`,
+`authPolicies` needs `system:configure`, and `identityProviders` and `mailTemplates` gate on
+`idp:list` and `mailTemplate:list`.
+
+`permissions` is nullable, and is `null` when read on another identity whose roles the caller may
+not see (`identity:viewPermissions`). On `me` it is always present.
+
+## Per project
+
+`Project.permissions` is evaluated for the calling identity, so it is reachable wherever a project
+is — including `me { projects }`, which is the cheap way to get them all at once:
+
+```graphql
+query {
+  me {
+    projects {
+      project {
+        slug
+        permissions {
+          canViewMembers
+          canAddMember
+          canUpdateMember
+          canRemoveMember
+          canViewSecrets
+          canSetSecret
+          canCreateApiKey
+          canUpdate
+        }
+      }
+    }
+  }
+}
+```
+
+| Field | Permission | Covers |
+| --- | --- | --- |
+| `canViewMembers` | `project:viewMembers` | `project.members` **and** `project.apiKeys` |
+| `canAddMember` | `project:addMember` | `invite`, `unmanagedInvite`, `addProjectMember` |
+| `canUpdateMember` | `project:updateMember` | `updateProjectMember` |
+| `canRemoveMember` | `project:removeMember` | `removeProjectMember` |
+| `canViewSecrets` | `project:viewSecrets` | `project.secrets` |
+| `canSetSecret` | `project:setSecret` | `setProjectSecret` |
+| `canCreateApiKey` | `apiKey:create` | `createApiKey` |
+| `canUpdate` | `project:update` | `updateProject` |
+
+The membership-parameterized permissions (`canAddMember`, `canUpdateMember`, `canRemoveMember`) are
+evaluated with an empty membership list — the same coarse "do you hold this at all" question that
+`project.members` asks before returning anything. **Which** roles the caller may actually grant is
+still decided per membership when the mutation runs, so a `true` here does not promise that every
+role is available.
+
+`canViewSecrets` and `canSetSecret` are genuinely independent, and the split is not academic: the
+default project ACL gives a project admin the first and not the second. A UI that infers one from
+the other will offer a *Set secret* button that always fails.
+
+## Worked example
+
+A person whose only right is the `admin` role in one project:
+
+```json
+{
+  "me": {
+    "permissions": {
+      "canCreateProject": false,
+      "canDeployEntrypoint": false,
+      "canViewConfiguration": false,
+      "canListIdentityProviders": false,
+      "canListMailTemplates": false,
+      "canManageConfiguration": false,
+      "canViewAuthLog": false,
+      "canListPersons": false,
+      "canListGlobalApiKeys": false,
+      "canCreateGlobalApiKey": false
+    },
+    "projects": [
+      {
+        "project": {
+          "slug": "blog",
+          "permissions": {
+            "canViewMembers": true,
+            "canAddMember": true,
+            "canUpdateMember": true,
+            "canRemoveMember": true,
+            "canViewSecrets": true,
+            "canSetSecret": false,
+            "canCreateApiKey": true,
+            "canUpdate": false
+          }
+        }
+      }
+    ]
+  }
+}
+```
+
+Read straight off: no tenant administration at all, full run of one project's membership, and
+secrets that may be read but not written.

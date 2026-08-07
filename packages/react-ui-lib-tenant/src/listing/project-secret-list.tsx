@@ -13,6 +13,27 @@ export interface ProjectSecretListProps {
 	controller?: { current?: ProjectSecretListController }
 }
 
+/**
+ * `ProjectSecretList` lists the project secret keys and their timestamps; values are never returned by the API.
+ *
+ * The listing does not embed the editing form — a host app renders `SetProjectSecretForm` next to it and reloads
+ * the listing through the controller.
+ *
+ * ## Example
+ * ```tsx
+ * const controller = useRef<ProjectSecretListController>(undefined)
+ * return (
+ * 	<>
+ * 		<ProjectSecretList controller={controller} />
+ * 		<SetProjectSecretForm projectSlug={projectSlug} onSuccess={() => controller.current?.refresh()}>
+ * 			<form className="grid gap-4">
+ * 				<SetProjectSecretFormFields />
+ * 			</form>
+ * 		</SetProjectSecretForm>
+ * 	</>
+ * )
+ * ```
+ */
 export const ProjectSecretList = ({ controller }: ProjectSecretListProps) => {
 	const projectSlug = useProjectSlug()!
 	const [query, { refresh }] = useTenantQueryLoader(useProjectSecretsQuery(), {

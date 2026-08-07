@@ -4,6 +4,7 @@ import { Loader } from '@contember/react-ui-lib-base'
 import { TenantFormError, TenantFormField } from './common.js'
 import { dict } from '../dict.js'
 import { Link } from '@contember/interface'
+import { MfaCodeFields } from './mfa-code-fields.js'
 
 export const LoginFormFields = () => {
 	const form = useLoginForm()
@@ -49,18 +50,11 @@ export const LoginFormFields = () => {
 			</TenantFormField>
 
 			{(form.state === 'otp-required' || fieldErrors.includes('otpToken')) && (
-				<TenantFormField
+				<MfaCodeFields
 					form={form}
 					messages={dict.tenant.login.errorMessages}
-					field="otpToken"
-					autoComplete="one-time-code"
-					type="text"
-					required
-					autoFocus
-					maxLength={6}
-				>
-					{dict.tenant.login.otpToken}
-				</TenantFormField>
+					labels={dict.tenant.login.mfa}
+				/>
 			)}
 
 			<Button type="submit" className="w-full" disabled={form.state === 'submitting'}>

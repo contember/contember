@@ -4,11 +4,15 @@ import { Input } from '@contember/react-ui-lib-base'
 import { HTMLInputTypeAttribute, useState } from 'react'
 import { dataAttribute } from '@contember/utilities'
 import { Label } from '@contember/react-ui-lib-base'
+import { dict } from '../dict.js'
 
-type FormErrorMessages<CtxValue extends FormContextValue<any, any, any>> = Record<
+export type FormErrorMessages<CtxValue extends FormContextValue<any, any, any>> = Record<
 	(CtxValue extends FormContextValue<any, infer E> ? E : never) & string,
 	string | undefined
 >
+
+/** Codes any form can raise, so a per-form dict does not have to carry them. It still wins if it does. */
+const commonErrorMessages: Partial<Record<string, string>> = dict.tenant.commonErrorMessages
 
 export interface TenantFormErrorsProps<CtxValue extends FormContextValue<any, any, any>> {
 	form: CtxValue
@@ -22,7 +26,10 @@ export const TenantFormError = <CtxValue extends FormContextValue<any, any, any>
 			{form.errors
 				.filter(error => error.field === field)
 				.filter(it => !(it.code in messages && ((messages as any)[it.code] === undefined)))
-				.map(error => [error.code, { error: (messages as any)[error.code] || 'Unknown error', developerMessage: error.developerMessage }])
+				.map(error => [error.code, {
+					error: (messages as any)[error.code] || commonErrorMessages[error.code] || 'Unknown error',
+					developerMessage: error.developerMessage,
+				}])
 				.map(([code, error]) => {
 					return <TenantFormSingleError key={code} {...error} />
 				})}

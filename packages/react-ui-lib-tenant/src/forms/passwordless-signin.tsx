@@ -4,6 +4,7 @@ import { Loader } from '@contember/react-ui-lib-base'
 import { TenantFormError, TenantFormField } from './common.js'
 import { dict } from '../dict.js'
 import { useEffect, useRef, useState } from 'react'
+import { MfaCodeFields } from './mfa-code-fields.js'
 
 export const PasswordlessSignInFormFields = ({ type, email }: { type: 'token' | 'otp'; email?: string }) => {
 	const form = usePasswordlessSignInForm()
@@ -50,18 +51,11 @@ export const PasswordlessSignInFormFields = ({ type, email }: { type: 'token' | 
 			)}
 
 			{(form.state === 'otp-required' || fieldErrors.includes('otpToken')) && (
-				<TenantFormField
+				<MfaCodeFields
 					form={form}
 					messages={dict.tenant.passwordlessSignIn.errorMessages}
-					field="otpToken"
-					autoComplete="one-time-code"
-					type="text"
-					required
-					autoFocus
-					maxLength={6}
-				>
-					{dict.tenant.passwordlessSignIn.otpToken}
-				</TenantFormField>
+					labels={dict.tenant.passwordlessSignIn.mfa}
+				/>
 			)}
 
 			<Button type="submit" className="w-full" disabled={form.state === 'submitting'} ref={buttonRef}>

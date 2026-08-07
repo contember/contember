@@ -1,19 +1,51 @@
 import { useProjectSlug } from '@contember/react-client'
-import { ChangeMyPasswordForm, CreateApiKeyForm, InviteForm } from '@contember/react-identity'
-import { KeyRoundIcon, LockKeyholeIcon, UsersIcon } from 'lucide-react'
-import { ReactNode, useRef } from 'react'
+import {
+	AddProjectMemberForm,
+	ChangeMyPasswordForm,
+	ChangeMyProfileForm,
+	CreateApiKeyForm,
+	CreateGlobalApiKeyForm,
+	InviteForm,
+	SetProjectSecretForm,
+	useIdentity,
+} from '@contember/react-identity'
+import { KeyRoundIcon, LockKeyholeIcon, ScrollTextIcon, SettingsIcon, UserRoundIcon, UsersIcon } from 'lucide-react'
+import { ReactNode, useRef, useState } from 'react'
 import { Slots } from '~/lib/layout'
 import {
+	AddProjectMemberFormFields,
 	ApiKeyList,
+	ApiKeyListController,
+	AuthLogList,
+	AuthPolicyList,
+	BackupCodes,
 	ChangeMyPasswordFormFields,
+	ChangeMyProfileFormFields,
 	CreateApiKeyFormFields,
+	CreateGlobalApiKeyFormFields,
+	EmailOtpSetup,
+	GlobalApiKeyList,
+	GlobalApiKeyListController,
+	IdentityProviderConnections,
+	IdentityProviderList,
 	InviteFormFields,
+	MailTemplateList,
 	MemberListController,
 	OtpSetup,
+	PasswordlessToggle,
+	PersonDetail,
 	PersonList,
+	PersonsList,
+	PersonsListController,
+	ProjectSecretList,
+	ProjectSecretListController,
+	SessionList,
+	SetProjectSecretFormFields,
+	TenantConfigView,
 } from '~/lib/tenant'
 import { ToastContent, useShowToast } from '~/lib/toast'
 import { Card, CardContent, CardHeader, CardTitle } from '~/lib/ui/card'
+import { Dialog, DialogContent } from '~/lib/ui/dialog'
 import { Input } from '~/lib/ui/input'
 
 const Title = ({ icon, children }: { icon?: ReactNode; children: ReactNode }) => {
@@ -25,8 +57,19 @@ const Title = ({ icon, children }: { icon?: ReactNode; children: ReactNode }) =>
 	)
 }
 
+const Panel = ({ title, children }: { title: string; children: ReactNode }) => (
+	<Card className="w-[40rem] max-w-full">
+		<CardHeader>
+			<CardTitle className="text-2xl">{title}</CardTitle>
+		</CardHeader>
+		<CardContent>{children}</CardContent>
+	</Card>
+)
+
 export const Security = () => {
 	const showToast = useShowToast()
+	const identity = useIdentity()
+	const person = identity?.person
 
 	return (
 		<>
@@ -35,25 +78,53 @@ export const Security = () => {
 			</Slots.Title>
 
 			<div className="flex flex-col gap-4">
-				<Card className="w-[40rem] max-w-full">
+				<Panel title="Profile">
+					{/* keyed on the identity values: the form snapshots initialValues on mount */}
+					<ChangeMyProfileForm
+						key={`${person?.email ?? ''} ${person?.name ?? ''}`}
+						initialValues={{ email: person?.email ?? '', name: person?.name ?? '' }}
+						onSuccess={() => showToast(<ToastContent>Profile updated</ToastContent>, { type: 'success' })}
+					>
+						<form className="grid gap-4">
+							<ChangeMyProfileFormFields />
+						</form>
+					</ChangeMyProfileForm>
+				</Panel>
+
+				<Panel title="Change password">
+					<ChangeMyPasswordForm onSuccess={() => showToast(<ToastContent>Password changed</ToastContent>, { type: 'success' })}>
+						<form className="grid gap-4">
+							<ChangeMyPasswordFormFields />
+						</form>
+					</ChangeMyPasswordForm>
+				</Panel>
+
+				<Panel title="Two-factor — authenticator app">
+					<OtpSetup />
+				</Panel>
+
+				<Panel title="Two-factor — e-mail code">
+					<EmailOtpSetup />
+				</Panel>
+
+				<Panel title="Backup codes">
+					<BackupCodes />
+				</Panel>
+
+				<Panel title="Passwordless sign-in">
+					<PasswordlessToggle />
+				</Panel>
+
+				<Panel title="Connected identity providers">
+					<IdentityProviderConnections />
+				</Panel>
+
+				<Card className="w-[60rem] max-w-full">
 					<CardHeader>
-						<CardTitle className="text-2xl">Change Password</CardTitle>
+						<CardTitle className="text-2xl">Active sessions</CardTitle>
 					</CardHeader>
 					<CardContent>
-						<ChangeMyPasswordForm onSuccess={() => showToast(
-							<ToastContent>Password changed</ToastContent>, { type: 'success' })}>
-							<form className="grid gap-4">
-								<ChangeMyPasswordFormFields />
-							</form>
-						</ChangeMyPasswordForm>
-					</CardContent>
-				</Card>
-				<Card className="w-[40rem] max-w-full">
-					<CardHeader>
-						<CardTitle className="text-2xl">Two-factor setup</CardTitle>
-					</CardHeader>
-					<CardContent>
-						<OtpSetup />
+						<SessionList />
 					</CardContent>
 				</Card>
 			</div>
@@ -65,6 +136,8 @@ export const Members = () => {
 	const projectSlug = useProjectSlug()!
 	const showToast = useShowToast()
 	const memberListController = useRef<MemberListController>(undefined)
+	const identity = useIdentity()
+	const permissions = identity?.projects.find(project => project.slug === projectSlug)?.permissions
 
 	return (
 		<>
@@ -73,35 +146,50 @@ export const Members = () => {
 			</Slots.Title>
 
 			<div className="flex flex-col gap-4">
-				<Card className="w-[40rem] max-w-full">
-					<CardHeader>
-						<CardTitle className="text-2xl">Invite</CardTitle>
-					</CardHeader>
-					<CardContent>
-						<InviteForm
-							projectSlug={projectSlug}
-							initialMemberships={[{ role: 'admin', variables: [] }]}
-							onSuccess={args => {
-								showToast(
-									<ToastContent>Invitation sent to {args.result.person?.email}</ToastContent>, { type: 'success' })
-								memberListController.current?.refresh()
-							}}
-						>
-							<form>
-								<InviteFormFields projectSlug={projectSlug} />
-							</form>
-						</InviteForm>
-					</CardContent>
-				</Card>
-				<Card className="w-[40rem] max-w-full">
+				{permissions?.canAddMember !== false && <Panel title="Invite">
+					<InviteForm
+						projectSlug={projectSlug}
+						initialMemberships={[{ role: 'admin', variables: [] }]}
+						allowUnmanaged
+						onSuccess={args => {
+							showToast(<ToastContent>Member created: {args.result.person?.email}</ToastContent>, { type: 'success' })
+							memberListController.current?.refresh()
+						}}
+					>
+						<form>
+							{/* allowUnmanaged offers the "no invitation e-mail" path, for seeding and air-gapped setups */}
+							<InviteFormFields projectSlug={projectSlug} allowUnmanaged />
+						</form>
+					</InviteForm>
+				</Panel>}
+
+				{permissions?.canAddMember !== false && <Panel title="Add an existing identity">
+					<AddProjectMemberForm
+						projectSlug={projectSlug}
+						initialMemberships={[{ role: 'admin', variables: [] }]}
+						onSuccess={() => {
+							showToast(<ToastContent>Member added</ToastContent>, { type: 'success' })
+							memberListController.current?.refresh()
+						}}
+					>
+						<form>
+							<AddProjectMemberFormFields projectSlug={projectSlug} />
+						</form>
+					</AddProjectMemberForm>
+				</Panel>}
+
+				{permissions?.canViewMembers !== false && <Card className="w-[60rem] max-w-full">
 					<CardHeader>
 						<CardTitle className="text-2xl">Members</CardTitle>
 					</CardHeader>
 					<CardContent>
-						<PersonList controller={memberListController} />
+						<PersonList
+							controller={memberListController}
+							canUpdateMember={permissions?.canUpdateMember}
+							canRemoveMember={permissions?.canRemoveMember}
+						/>
 					</CardContent>
-				</Card>
-
+				</Card>}
 			</div>
 		</>
 	)
@@ -110,7 +198,20 @@ export const Members = () => {
 export const ApiKeys = () => {
 	const projectSlug = useProjectSlug()!
 	const showToast = useShowToast()
-	const memberListController = useRef<MemberListController>(undefined)
+	const identity = useIdentity()
+	const permissions = identity?.projects.find(project => project.slug === projectSlug)?.permissions
+	const globalPermissions = identity?.permissions
+	const apiKeyListController = useRef<ApiKeyListController>(undefined)
+	const globalApiKeyListController = useRef<GlobalApiKeyListController>(undefined)
+
+	const showToken = (token?: string) => {
+		showToast(
+			<ToastContent title="API key created">
+				<Input value={token ?? ''} type="text" />
+			</ToastContent>,
+			{ type: 'success' },
+		)
+	}
 
 	return (
 		<>
@@ -119,41 +220,191 @@ export const ApiKeys = () => {
 			</Slots.Title>
 
 			<div className="flex flex-col gap-4">
-				<div>
-					<Card className="w-[40rem] max-w-full">
-						<CardHeader>
-							<CardTitle className="text-2xl">Create API key</CardTitle>
-						</CardHeader>
-						<CardContent>
-							<CreateApiKeyForm
-								projectSlug={projectSlug}
-								initialMemberships={[{ role: 'admin', variables: [] }]}
-								onSuccess={args => {
-									showToast((
-										<ToastContent title="API key created">
-											<Input value={args.result.apiKey.token} type="text" />
-										</ToastContent>
-									), { type: 'success' })
-									memberListController.current?.refresh()
-								}}
-							>
-								<form className="grid gap-4">
-									<CreateApiKeyFormFields projectSlug={projectSlug} />
-								</form>
-							</CreateApiKeyForm>
-						</CardContent>
-					</Card>
-				</div>
-				<div>
-					<Card className="w-[40rem] max-w-full">
-						<CardHeader>
-							<CardTitle className="text-2xl">API keys</CardTitle>
-						</CardHeader>
-						<CardContent>
-							<ApiKeyList controller={memberListController} />
-						</CardContent>
-					</Card>
-				</div>
+				{permissions?.canCreateApiKey !== false && <Panel title="Create API key">
+					<CreateApiKeyForm
+						projectSlug={projectSlug}
+						initialMemberships={[{ role: 'admin', variables: [] }]}
+						onSuccess={args => {
+							showToken(args.result.apiKey.token)
+							apiKeyListController.current?.refresh()
+						}}
+					>
+						<form className="grid gap-4">
+							<CreateApiKeyFormFields projectSlug={projectSlug} />
+						</form>
+					</CreateApiKeyForm>
+				</Panel>}
+
+				{permissions?.canViewMembers !== false && <Card className="w-[60rem] max-w-full">
+					<CardHeader>
+						<CardTitle className="text-2xl">Project API keys</CardTitle>
+					</CardHeader>
+					<CardContent>
+						<ApiKeyList controller={apiKeyListController} />
+					</CardContent>
+				</Card>}
+
+				{/* global keys carry tenant-wide roles instead of a project membership — SUPER_ADMIN only */}
+				{globalPermissions?.canCreateGlobalApiKey !== false && <Panel title="Create global API key">
+					<CreateGlobalApiKeyForm
+						onSuccess={args => {
+							showToken(args.result.apiKey.token)
+							globalApiKeyListController.current?.refresh()
+						}}
+					>
+						<form className="grid gap-4">
+							<CreateGlobalApiKeyFormFields />
+						</form>
+					</CreateGlobalApiKeyForm>
+				</Panel>}
+
+				{globalPermissions?.canListGlobalApiKeys !== false && <Card className="w-[60rem] max-w-full">
+					<CardHeader>
+						<CardTitle className="text-2xl">Global API keys</CardTitle>
+					</CardHeader>
+					<CardContent>
+						<GlobalApiKeyList controller={globalApiKeyListController} />
+					</CardContent>
+				</Card>}
+			</div>
+		</>
+	)
+}
+
+export const Persons = () => {
+	const personsListController = useRef<PersonsListController>(undefined)
+	const [selectedPersonId, setSelectedPersonId] = useState<string>()
+
+	return (
+		<>
+			<Slots.Title>
+				<Title icon={<UserRoundIcon />}>Persons</Title>
+			</Slots.Title>
+
+			<Card className="w-[80rem] max-w-full">
+				<CardHeader>
+					<CardTitle className="text-2xl">Persons</CardTitle>
+				</CardHeader>
+				<CardContent>
+					<PersonsList controller={personsListController} onSelectPerson={setSelectedPersonId} />
+				</CardContent>
+			</Card>
+
+			<Dialog
+				open={selectedPersonId !== undefined}
+				onOpenChange={open => {
+					if (!open) {
+						setSelectedPersonId(undefined)
+						personsListController.current?.refresh()
+					}
+				}}
+			>
+				<DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
+					{selectedPersonId && <PersonDetail personId={selectedPersonId} />}
+				</DialogContent>
+			</Dialog>
+		</>
+	)
+}
+
+export const AuditLog = () => (
+	<>
+		<Slots.Title>
+			<Title icon={<ScrollTextIcon />}>Audit log</Title>
+		</Slots.Title>
+
+		<Card className="w-[80rem] max-w-full">
+			<CardContent className="pt-6">
+				<AuthLogList />
+			</CardContent>
+		</Card>
+	</>
+)
+
+export const Configuration = () => (
+	<>
+		<Slots.Title>
+			<Title icon={<SettingsIcon />}>Configuration</Title>
+		</Slots.Title>
+
+		{/* Read-only throughout: all four areas are written with `contember tenant:apply`. */}
+		<div className="flex flex-col gap-4">
+			<Card className="w-[80rem] max-w-full">
+				<CardHeader>
+					<CardTitle className="text-2xl">Auth policies</CardTitle>
+				</CardHeader>
+				<CardContent>
+					<AuthPolicyList />
+				</CardContent>
+			</Card>
+
+			<Card className="w-[80rem] max-w-full">
+				<CardHeader>
+					<CardTitle className="text-2xl">Identity providers</CardTitle>
+				</CardHeader>
+				<CardContent>
+					<IdentityProviderList />
+				</CardContent>
+			</Card>
+
+			<Card className="w-[80rem] max-w-full">
+				<CardHeader>
+					<CardTitle className="text-2xl">Mail templates</CardTitle>
+				</CardHeader>
+				<CardContent>
+					<MailTemplateList />
+				</CardContent>
+			</Card>
+
+			<Card className="w-[80rem] max-w-full">
+				<CardHeader>
+					<CardTitle className="text-2xl">Tenant settings</CardTitle>
+				</CardHeader>
+				<CardContent>
+					<TenantConfigView />
+				</CardContent>
+			</Card>
+		</div>
+	</>
+)
+
+export const ProjectSecrets = () => {
+	const projectSlug = useProjectSlug()!
+	const showToast = useShowToast()
+	const secretListController = useRef<ProjectSecretListController>(undefined)
+	const identity = useIdentity()
+	const permissions = identity?.projects.find(project => project.slug === projectSlug)?.permissions
+
+	return (
+		<>
+			<Slots.Title>
+				<Title icon={<KeyRoundIcon />}>Project secrets</Title>
+			</Slots.Title>
+
+			<div className="flex flex-col gap-4">
+				{permissions?.canSetSecret !== false && <Panel title="Set a secret">
+					<SetProjectSecretForm
+						projectSlug={projectSlug}
+						onSuccess={() => {
+							showToast(<ToastContent>Secret saved</ToastContent>, { type: 'success' })
+							secretListController.current?.refresh()
+						}}
+					>
+						<form className="grid gap-4">
+							<SetProjectSecretFormFields />
+						</form>
+					</SetProjectSecretForm>
+				</Panel>}
+
+				{permissions?.canViewSecrets !== false && <Card className="w-[60rem] max-w-full">
+					<CardHeader>
+						<CardTitle className="text-2xl">Secrets</CardTitle>
+					</CardHeader>
+					<CardContent>
+						{/* values are never readable — the API returns keys and timestamps only */}
+						<ProjectSecretList controller={secretListController} />
+					</CardContent>
+				</Card>}
 			</div>
 		</>
 	)

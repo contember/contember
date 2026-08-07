@@ -1,17 +1,58 @@
 import { Link, LogoutTrigger, useIdentity } from '@contember/interface'
-import { BadgeCheckIcon, BellIcon, ChevronsUpDown, LogOutIcon } from 'lucide-react'
+import { useProjectSlug } from '@contember/react-client'
+import {
+	BadgeCheckIcon,
+	BellIcon,
+	ChevronsUpDown,
+	KeyRoundIcon,
+	LogOutIcon,
+	ScrollTextIcon,
+	SettingsIcon,
+	UserRoundIcon,
+	UsersIcon,
+} from 'lucide-react'
 import { dict } from '~/lib/dict'
 import { Avatar, AvatarFallback } from '~/lib/ui/avatar'
 import { AnchorButton, Button } from '~/lib/ui/button'
-import { DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '~/lib/ui/dropdown'
+import {
+	DropdownMenu,
+	DropdownMenuContent,
+	DropdownMenuGroup,
+	DropdownMenuItem,
+	DropdownMenuLabel,
+	DropdownMenuSeparator,
+	DropdownMenuTrigger,
+} from '~/lib/ui/dropdown'
 import { SidebarMenuButton } from '~/lib/ui/sidebar'
 import { useIsMobile } from '~/lib/utils/use-mobile'
 
-export const Navigation = () => (<div>Navigation</div>)
+export const Navigation = () => <div>Navigation</div>
 
 export const UserNavigation = () => {
 	const isMobile = useIsMobile()
 	const identity = useIdentity()
+	const projectSlug = useProjectSlug()
+	const projectPermissions = identity?.projects.find(project => project.slug === projectSlug)?.permissions
+	const globalPermissions = identity?.permissions
+	// Hide an item only when the flags say it is refused. Unknown — identity still loading, or no
+	// project in scope so `projectPermissions` is undefined — shows it, matching `tenant.tsx` and the
+	// panel's own `mayPerform`. These flags exist to stop the UI promising what it cannot deliver, not
+	// to hide what it can, and gating on `=== true` makes the whole menu flicker in on every load.
+	const showApiKeys = projectPermissions?.canViewMembers !== false
+		|| projectPermissions?.canCreateApiKey !== false
+		|| globalPermissions?.canListGlobalApiKeys !== false
+		|| globalPermissions?.canCreateGlobalApiKey !== false
+	const showMembers = projectPermissions?.canViewMembers !== false
+		|| projectPermissions?.canAddMember !== false
+		|| projectPermissions?.canUpdateMember !== false
+		|| projectPermissions?.canRemoveMember !== false
+	const showPersons = globalPermissions?.canListPersons !== false
+		|| identity?.projects.some(project => project.permissions.canViewMembers) !== false
+	const showSecrets = projectPermissions?.canViewSecrets !== false || projectPermissions?.canSetSecret !== false
+	const showConfiguration = globalPermissions?.canViewConfiguration !== false
+		|| globalPermissions?.canManageConfiguration !== false
+		|| globalPermissions?.canListIdentityProviders !== false
+		|| globalPermissions?.canListMailTemplates !== false
 
 	const userEmail = identity?.person?.email
 	const userInitial = userEmail?.substring(0, 1).toLocaleUpperCase()
@@ -62,14 +103,60 @@ export const UserNavigation = () => {
 							</AnchorButton>
 						</Link>
 					</DropdownMenuItem>
-					<DropdownMenuItem>
-						<Link to="tenant/apiKeys">
+					{showApiKeys && (
+						<DropdownMenuItem>
+							<Link to="tenant/apiKeys">
+								<AnchorButton variant="ghost" size="xs" className="flex gap-2">
+									<BellIcon size={16} />
+									API keys
+								</AnchorButton>
+							</Link>
+						</DropdownMenuItem>
+					)}
+				</DropdownMenuGroup>
+				<DropdownMenuSeparator />
+				<DropdownMenuLabel className="text-xs text-muted-foreground">Tenant</DropdownMenuLabel>
+				<DropdownMenuGroup>
+					{showMembers && <DropdownMenuItem>
+						<Link to="tenant/members">
 							<AnchorButton variant="ghost" size="xs" className="flex gap-2">
-								<BellIcon size={16} />
-								API keys
+								<UsersIcon size={16} />
+								Members
 							</AnchorButton>
 						</Link>
-					</DropdownMenuItem>
+					</DropdownMenuItem>}
+					{showPersons && <DropdownMenuItem>
+						<Link to="tenant/persons">
+							<AnchorButton variant="ghost" size="xs" className="flex gap-2">
+								<UserRoundIcon size={16} />
+								Persons
+							</AnchorButton>
+						</Link>
+					</DropdownMenuItem>}
+					{showSecrets && <DropdownMenuItem>
+						<Link to="tenant/projectSecrets">
+							<AnchorButton variant="ghost" size="xs" className="flex gap-2">
+								<KeyRoundIcon size={16} />
+								Project secrets
+							</AnchorButton>
+						</Link>
+					</DropdownMenuItem>}
+					{globalPermissions?.canViewAuthLog === true && <DropdownMenuItem>
+						<Link to="tenant/auditLog">
+							<AnchorButton variant="ghost" size="xs" className="flex gap-2">
+								<ScrollTextIcon size={16} />
+								Audit log
+							</AnchorButton>
+						</Link>
+					</DropdownMenuItem>}
+					{showConfiguration && <DropdownMenuItem>
+						<Link to="tenant/configuration">
+							<AnchorButton variant="ghost" size="xs" className="flex gap-2">
+								<SettingsIcon size={16} />
+								Configuration
+							</AnchorButton>
+						</Link>
+					</DropdownMenuItem>}
 				</DropdownMenuGroup>
 				<DropdownMenuSeparator />
 				<DropdownMenuItem>

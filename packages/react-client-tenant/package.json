@@ -34,6 +34,7 @@
     "directory": "packages/react-client-tenant"
   },
   "dependencies": {
+    "@contember/graphql-client": "workspace:*",
     "@contember/graphql-client-tenant": "workspace:*",
     "@contember/react-client": "workspace:*",
     "@contember/react-utils": "workspace:*",

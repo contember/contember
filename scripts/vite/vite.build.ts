@@ -10,6 +10,9 @@ const extraEntrypoints = {
 	'create': ['run'],
 	'client-content-generator': ['generate', 'index'],
 	playground: [],
+	// Vite apps, not libraries — they have their own build. Listed with no entrypoints so the
+	// library build skips them while `tsc --build` still typechecks them.
+	'panel-ui': [],
 }
 
 export default defineConfig(({ command, mode }) => {

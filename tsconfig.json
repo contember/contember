@@ -63,6 +63,9 @@
 			"path": "./packages/engine-http"
 		},
 		{
+			"path": "./packages/engine-panel"
+		},
+		{
 			"path": "./packages/engine-plugins"
 		},
 		{
@@ -87,6 +90,9 @@
 			"path": "./packages/graphql-client"
 		},
 		{
+			"path": "./packages/graphql-client-actions"
+		},
+		{
 			"path": "./packages/graphql-client-system"
 		},
 		{
@@ -103,6 +109,9 @@
 		},
 		{
 			"path": "./packages/migrations-client"
+		},
+		{
+			"path": "./packages/panel-ui"
 		},
 		{
 			"path": "./packages/playground"

@@ -22,6 +22,8 @@ HTTP Request → Koa middleware (compress, bodyparse, CORS)
 - `/oidc/backchannel-logout` — OIDC Back-Channel Logout receiver (public; the IdP POSTs a signed `logout_token`, target provider selected via `?provider=<slug>`)
 - `/import`, `/export` — NDJSON data transfer
 - `/actions/:projectSlug` — Actions API (from plugin)
+- `/panel/...` — management panel and its own API mount (from plugin); plugins add their API to it
+  through the `panelApiMount` service, see `application/PanelApiMount.ts`
 - `/health` — Internal health check
 
 ## Container Hierarchy

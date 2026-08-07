@@ -77,20 +77,20 @@ export class Authenticator {
 	}
 
 	public async authenticate(
-		{ request, timer, clientIp }: { request: IncomingMessage; timer: Timer; clientIp?: string },
+		{ request, timer, clientIp, fallbackIdentity }: {
+			request: IncomingMessage
+			timer: Timer
+			clientIp?: string
+			/**
+			 * Identity to act as when the request carries no Authorization header. Lets a first-party UI
+			 * served by this process reach a pre-sign-in surface without a token existing anywhere to be
+			 * leaked or misconfigured — the roles come from the caller, not from the database. An actual
+			 * Authorization header always wins, so this can never widen a credentialed request.
+			 */
+			fallbackIdentity?: VerifyResult
+		},
 	): Promise<AuthResult | null> {
-		const authHeader = request.headers.authorization
-		if (!authHeader) {
-			return null
-		}
-
-		const authHeaderPattern = /^Bearer\s+(\w+)$/i
-
-		const match = authHeader.match(authHeaderPattern)
-		if (match === null) {
-			throw this.createAuthError(`invalid Authorization header format`)
-		}
-		const [, token] = match
+		const authHeader = request.headers.authorization || undefined
 		const socketIp = sanitizeIp(clientIp)
 		const socketUserAgent = sanitizeUserAgent(readHeader(request, 'user-agent'))
 		const forwardedIp = sanitizeIp(readHeader(request, forwardedClientIpHeader))
@@ -104,18 +104,17 @@ export class Authenticator {
 		const forwardedInfo = (forwardedIp !== undefined || forwardedUserAgent !== undefined)
 			? { ip: forwardedIp, userAgent: forwardedUserAgent }
 			: undefined
-		const authResult = await timer(
-			'Auth',
-			() => this.apiKeyManager.verifyAndProlong(this.tenantDatabase, this.tenantReadDatabase, token, socketInfo, forwardedInfo),
-		)
-		if (!authResult.ok) {
-			throw this.createAuthError(authResult.errorMessage)
+		const verified = authHeader !== undefined
+			? await this.verifyAuthorizationHeader(authHeader, timer, socketInfo, forwardedInfo)
+			: fallbackIdentity
+		if (verified === undefined) {
+			return null
 		}
 		const assumedIdentityId = request.headers[assumeIdentityHeader] ?? undefined
 		if (Array.isArray(assumedIdentityId)) {
 			throw new HttpErrorResponse(400, `Invalid ${assumedIdentityId} header format`)
 		}
-		const trustForwarded = authResult.result.trustForwardedInfo && forwardedInfo !== undefined
+		const trustForwarded = verified.trustForwardedInfo && forwardedInfo !== undefined
 		// A03: the geo country is only ever exposed under the exact same gate as the
 		// forwarded IP/UA — a trusted key that actually forwarded client info. This
 		// keeps the signals consistent: we never score a real client country against
@@ -124,7 +123,7 @@ export class Authenticator {
 		// yields no country.
 		const trustGeo = trustForwarded && forwardedGeoCountry !== undefined
 		return {
-			...authResult.result,
+			...verified,
 			assumedIdentityId,
 			clientIp: trustForwarded ? (forwardedInfo?.ip ?? socketIp) : socketIp,
 			clientUserAgent: trustForwarded ? (forwardedInfo?.userAgent ?? socketUserAgent) : socketUserAgent,
@@ -132,5 +131,26 @@ export class Authenticator {
 			forwarderUserAgent: trustForwarded ? socketUserAgent : undefined,
 			geoCountry: trustGeo ? forwardedGeoCountry : undefined,
 		}
+	}
+
+	private async verifyAuthorizationHeader(
+		authHeader: string,
+		timer: Timer,
+		socketInfo: { ip?: string; userAgent?: string },
+		forwardedInfo: { ip?: string; userAgent?: string } | undefined,
+	): Promise<VerifyResult> {
+		const match = authHeader.match(/^Bearer\s+(\w+)$/i)
+		if (match === null) {
+			throw this.createAuthError(`invalid Authorization header format`)
+		}
+		const [, token] = match
+		const authResult = await timer(
+			'Auth',
+			() => this.apiKeyManager.verifyAndProlong(this.tenantDatabase, this.tenantReadDatabase, token, socketInfo, forwardedInfo),
+		)
+		if (!authResult.ok) {
+			throw this.createAuthError(authResult.errorMessage)
+		}
+		return authResult.result
 	}
 }

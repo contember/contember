@@ -206,6 +206,13 @@ export const serverConfigSchema = Typesafe.partial({
 					configEncryptionKey: Typesafe.string,
 				}),
 			)(val, path),
+	// Management panel served by the engine (@contember/engine-panel). Off by default: the API port is
+	// often public, so a login page appears only when an operator asks for it. `path` is the mount
+	// point, e.g. "/panel"; the panel's API lives directly under it.
+	panel: Typesafe.partial({
+		enabled: Typesafe.boolean,
+		path: Typesafe.string,
+	}),
 	monitoringPort: Typesafe.number,
 	workerCount: Typesafe.union(Typesafe.number, Typesafe.string),
 	applicationWorker: Typesafe.string,

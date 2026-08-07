@@ -92,6 +92,10 @@ export const configTemplate: any = {
 			responseStatusHeader: '%?env.CONTEMBER_HTTP_RESPONSE_STATUS_HEADER::string%',
 			geoCountryHeader: '%?env.CONTEMBER_HTTP_GEO_COUNTRY_HEADER::string%',
 		},
+		panel: {
+			enabled: '%?env.CONTEMBER_PANEL_ENABLED::bool%',
+			path: '%?env.CONTEMBER_PANEL_PATH%',
+		},
 		contentApi: {
 			schemaCacheTtlSeconds: '%?env.CONTEMBER_CONTENT_API_SCHEMA_CACHE_TTL_SECONDS::number%',
 			whereOptimizer: {

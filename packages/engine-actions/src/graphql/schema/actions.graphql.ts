@@ -4,7 +4,7 @@ import { DocumentNode } from 'graphql'
 export const schema: DocumentNode = gql`
     scalar DateTime
     scalar Json
-    scalar Uuid
+    scalar UUID
 
     schema {
         query: Query
@@ -15,14 +15,14 @@ export const schema: DocumentNode = gql`
         failedEvents(args: EventArgs): [Event!]!
         eventsToProcess(args: EventArgs): [Event!]!
         eventsInProcessing(args: EventArgs): [Event!]!
-        event(id: Uuid!): Event
+        event(id: UUID!): Event
         variables: [Variable!]!
     }
 
     type Mutation {
         processBatch: ProcessBatchResponse!
-        retryEvent(id: Uuid!): RetryEventResponse!
-        stopEvent(id: Uuid!): StopEventResponse!
+        retryEvent(id: UUID!): RetryEventResponse!
+        stopEvent(id: UUID!): StopEventResponse!
         setVariables(args: SetVariablesArgs!): SetVariablesResponse!
     }
 
@@ -33,9 +33,9 @@ export const schema: DocumentNode = gql`
     }
 
     type Event {
-        id: Uuid!
-        transactionId: Uuid!
-        identityId: Uuid
+        id: UUID!
+        transactionId: UUID!
+        identityId: UUID
         ipAddress: String
         userAgent: String
         createdAt: DateTime!

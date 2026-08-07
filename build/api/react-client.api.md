@@ -69,10 +69,16 @@ export const SetSessionTokenContext: Context<(token: string | undefined) => void
 export const StageSlugContext: Context<string | undefined>;
 
 // @public (undocumented)
+export const useActionsGraphQlClient: (projectSlug: string) => GraphQlClient;
+
+// @public (undocumented)
 export const useApiBaseUrl: () => string;
 
 // @public (undocumented)
 export const useContentGraphQlClient: (projectSlug: string, stageSlug: string) => GraphQlClient;
+
+// @public (undocumented)
+export const useCurrentActionsGraphQlClient: () => GraphQlClient;
 
 // @public (undocumented)
 export const useCurrentContentGraphQlClient: () => GraphQlClient;

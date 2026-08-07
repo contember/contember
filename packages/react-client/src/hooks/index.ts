@@ -1,5 +1,7 @@
 export * from './useGraphQlClient.js'
+export * from './useActionsGraphQlClient.js'
 export * from './useContentGraphQlClient.js'
+export * from './useCurrentActionsGraphQlClient.js'
 export * from './useCurrentContentGraphQlClient.js'
 export * from './useCurrentSystemGraphQlClient.js'
 export * from './useSystemGraphQlClient.js'

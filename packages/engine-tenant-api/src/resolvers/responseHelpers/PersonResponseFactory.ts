@@ -14,6 +14,11 @@ export class PersonResponseFactory {
 			emailVerified: !!personRow.email_verified_at,
 			name: personRow.name,
 			passwordlessEnabled: personRow.passwordless_enabled,
+			// resolved by PersonTypeResolver, which needs the tenant policy; placeholders keep the
+			// non-nullable field types complete
+			passwordlessAvailable: false,
+			passwordlessSelfManaged: false,
+			disabledAt: personRow.disabled_at,
 			identity: {
 				id: personRow.identity_id,
 				projects,

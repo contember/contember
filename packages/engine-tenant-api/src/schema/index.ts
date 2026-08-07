@@ -362,6 +362,7 @@ export type Config = {
 	readonly captcha: ConfigCaptcha
 	readonly emailChange: ConfigEmailChange
 	readonly login: ConfigLogin
+	readonly panel: ConfigPanel
 	readonly password: ConfigPassword
 	readonly passwordless: ConfigPasswordless
 	readonly rateLimits: ConfigRateLimits
@@ -430,6 +431,7 @@ export type ConfigInput = {
 	readonly captcha?: InputMaybe<ConfigCaptchaInput>
 	readonly emailChange?: InputMaybe<ConfigEmailChangeInput>
 	readonly login?: InputMaybe<ConfigLoginInput>
+	readonly panel?: InputMaybe<ConfigPanelInput>
 	readonly password?: InputMaybe<ConfigPasswordInput>
 	readonly passwordless?: InputMaybe<ConfigPasswordlessInput>
 	readonly rateLimits?: InputMaybe<ConfigRateLimitsInput>
@@ -493,6 +495,31 @@ export type ConfigLoginInput = {
 	readonly mfaGraceDuration?: InputMaybe<Scalars['Interval']['input']>
 	readonly revealLoginMethod?: InputMaybe<Scalars['Boolean']['input']>
 	readonly revealUserExists?: InputMaybe<Scalars['Boolean']['input']>
+}
+
+/**
+ * Who may enter the management panel. This is an entry gate for the console
+ * only, not an authorization system: everything done inside the panel still
+ * goes through the tenant ACL, so being allowed in grants no extra rights.
+ * An identity may enter when its global roles intersect globalRoles, or when
+ * it holds a membership with one of projectRoles in at least one project.
+ * Both lists empty means nobody can enter.
+ */
+export type ConfigPanel = {
+	readonly __typename?: 'ConfigPanel'
+	/** Global roles (identity.roles) that may use the management panel. */
+	readonly globalRoles: ReadonlyArray<Scalars['String']['output']>
+	/** Project membership roles that may use the management panel, in any project. */
+	readonly projectRoles: ReadonlyArray<Scalars['String']['output']>
+}
+
+/**
+ * Each list is replaced as a whole; omitting one leaves it unchanged. An empty
+ * list closes the panel for that dimension.
+ */
+export type ConfigPanelInput = {
+	readonly globalRoles?: InputMaybe<ReadonlyArray<Scalars['String']['input']>>
+	readonly projectRoles?: InputMaybe<ReadonlyArray<Scalars['String']['input']>>
 }
 
 export type ConfigPassword = {
@@ -953,6 +980,22 @@ export type EnableIdpResponse = {
 	readonly ok: Scalars['Boolean']['output']
 }
 
+export type EnablePersonError = {
+	readonly __typename?: 'EnablePersonError'
+	readonly code: EnablePersonErrorCode
+	readonly developerMessage: Scalars['String']['output']
+}
+
+export type EnablePersonErrorCode =
+	| 'PERSON_ALREADY_ENABLED'
+	| 'PERSON_NOT_FOUND'
+
+export type EnablePersonResponse = {
+	readonly __typename?: 'EnablePersonResponse'
+	readonly error?: Maybe<EnablePersonError>
+	readonly ok: Scalars['Boolean']['output']
+}
+
 export type ForceSignOutPersonError = {
 	readonly __typename?: 'ForceSignOutPersonError'
 	readonly code: ForceSignOutPersonErrorCode
@@ -1019,10 +1062,37 @@ export type Identity = {
 	readonly sessions: ReadonlyArray<SessionInfo>
 }
 
+/**
+ * What the identity may do tenant-wide, evaluated against the same ACL the resolvers enforce.
+ *
+ * This is for building a UI that does not offer what it cannot deliver — it is **not** a security
+ * boundary, and answering `true` here grants nothing. Every operation is still checked when it is
+ * called. The distinction matters because permission failure is not uniform across this API: some
+ * queries answer an empty list, others throw, and every mutation throws, so a client cannot tell
+ * "nothing to show" from "not yours to see" by trying.
+ */
 export type IdentityGlobalPermissions = {
 	readonly __typename?: 'IdentityGlobalPermissions'
+	readonly canCreateGlobalApiKey: Scalars['Boolean']['output']
 	readonly canCreateProject: Scalars['Boolean']['output']
 	readonly canDeployEntrypoint: Scalars['Boolean']['output']
+	/**  Read `globalApiKeys`, which answers an empty list otherwise.  */
+	readonly canListGlobalApiKeys: Scalars['Boolean']['output']
+	/**  Read `identityProviders`.  */
+	readonly canListIdentityProviders: Scalars['Boolean']['output']
+	/**  Read `mailTemplates`.  */
+	readonly canListMailTemplates: Scalars['Boolean']['output']
+	/**
+	 * List every person in the tenant. Without it `persons` still answers, narrowed to the members
+	 * of the projects the caller administers — so this marks a full listing, not access to one.
+	 */
+	readonly canListPersons: Scalars['Boolean']['output']
+	/** Write the tenant configuration (`configure`) and read `authPolicies`. The CLI is the usual write path. */
+	readonly canManageConfiguration: Scalars['Boolean']['output']
+	/**  Read `authLog`, which throws otherwise.  */
+	readonly canViewAuthLog: Scalars['Boolean']['output']
+	/**  Read `configuration`, which throws otherwise. The other configuration queries gate on their own actions.  */
+	readonly canViewConfiguration: Scalars['Boolean']['output']
 }
 
 export type IdentityProjectRelation = {
@@ -1283,6 +1353,7 @@ export type Mutation = {
 	readonly disconnectMyIdentityProvider?: Maybe<DisconnectIdpResponse>
 	readonly enableIDP?: Maybe<EnableIdpResponse>
 	readonly enableMyPasswordless?: Maybe<ToggleMyPasswordlessResponse>
+	readonly enablePerson?: Maybe<EnablePersonResponse>
 	readonly forceSignOutPerson?: Maybe<ForceSignOutPersonResponse>
 	readonly initEmailOtp?: Maybe<InitEmailOtpResponse>
 	readonly initSignInIDP?: Maybe<InitSignInIdpResponse>
@@ -1452,6 +1523,10 @@ export type MutationEnableIdpArgs = {
 	identityProvider: Scalars['String']['input']
 }
 
+export type MutationEnablePersonArgs = {
+	personId: Scalars['String']['input']
+}
+
 export type MutationForceSignOutPersonArgs = {
 	personId: Scalars['String']['input']
 	reason?: InputMaybe<Scalars['String']['input']>
@@ -1611,6 +1686,11 @@ export type PasswordlessValidationType =
 
 export type Person = {
 	readonly __typename?: 'Person'
+	/**
+	 * When the account was disabled (see `disablePerson`), null while the person
+	 * is active. Read-only — flip it with `disablePerson` / `enablePerson`.
+	 */
+	readonly disabledAt?: Maybe<Scalars['DateTime']['output']>
 	readonly email?: Maybe<Scalars['String']['output']>
 	/**
 	 * Whether e-mail based one-time-password 2FA is enabled for this person
@@ -1633,7 +1713,21 @@ export type Person = {
 	readonly identityProviders: ReadonlyArray<PersonIdentityProvider>
 	readonly name?: Maybe<Scalars['String']['output']>
 	readonly otpEnabled: Scalars['Boolean']['output']
+	/**
+	 * Whether passwordless sign-in is actually usable for this person right now: the tenant-wide
+	 * policy resolved against `passwordlessEnabled`, i.e. the very same decision `signIn` makes. A UI
+	 * offering an enable/disable toggle must branch on this — under an `always` or `never` policy the
+	 * raw opt-in flag says nothing about what will happen.
+	 */
+	readonly passwordlessAvailable: Scalars['Boolean']['output']
+	/**  The person's own opt-in flag; `null` means "follow the tenant policy". On its own it does not say whether passwordless sign-in works — see `passwordlessAvailable`.  */
 	readonly passwordlessEnabled?: Maybe<Scalars['Boolean']['output']>
+	/**
+	 * Whether `passwordlessEnabled` is what decides `passwordlessAvailable`. False under an `always`
+	 * or `never` policy, where the person's own flag is ignored — a UI should then report the state
+	 * rather than offer a toggle that changes nothing.
+	 */
+	readonly passwordlessSelfManaged: Scalars['Boolean']['output']
 }
 
 /**  A single external IdP connection of the currently authenticated person.  */
@@ -1678,6 +1772,8 @@ export type Project = {
 	readonly id: Scalars['String']['output']
 	readonly members: ReadonlyArray<ProjectIdentityRelation>
 	readonly name: Scalars['String']['output']
+	/**  What the calling identity may do here. Advisory — for building the UI, not for enforcing it.  */
+	readonly permissions: ProjectPermissions
 	readonly roles: ReadonlyArray<RoleDefinition>
 	/**
 	 * Names of the project's secrets (see `setProjectSecret`). Secret VALUES are
@@ -1711,6 +1807,29 @@ export type ProjectMembersInput = {
 	readonly filter?: InputMaybe<ProjectMembersFilter>
 	readonly limit?: InputMaybe<Scalars['Int']['input']>
 	readonly offset?: InputMaybe<Scalars['Int']['input']>
+}
+
+/**
+ * What the calling identity may do in this project. Same contract as
+ * `IdentityGlobalPermissions`: advisory, evaluated per caller, never a substitute for the checks in
+ * the resolvers.
+ */
+export type ProjectPermissions = {
+	readonly __typename?: 'ProjectPermissions'
+	/**  Invite or add a member (`invite`, `addProjectMember`). Which roles may be granted is checked per membership.  */
+	readonly canAddMember: Scalars['Boolean']['output']
+	/**  Create an API key scoped to this project.  */
+	readonly canCreateApiKey: Scalars['Boolean']['output']
+	readonly canRemoveMember: Scalars['Boolean']['output']
+	/**  Write a project secret (`setProjectSecret`). Distinct from viewing: a project admin commonly has one and not the other.  */
+	readonly canSetSecret: Scalars['Boolean']['output']
+	/**  Update the project itself (`updateProject`).  */
+	readonly canUpdate: Scalars['Boolean']['output']
+	readonly canUpdateMember: Scalars['Boolean']['output']
+	/**  Read `members` and `apiKeys`; both answer an empty list otherwise.  */
+	readonly canViewMembers: Scalars['Boolean']['output']
+	/**  Read `secrets` (their names, never values); answers an empty list otherwise.  */
+	readonly canViewSecrets: Scalars['Boolean']['output']
 }
 
 export type ProjectSecret = {
@@ -2488,6 +2607,8 @@ export type ResolversTypes = {
 	ConfigLoginAnomalyDetection: ResolverTypeWrapper<ConfigLoginAnomalyDetection>
 	ConfigLoginAnomalyDetectionInput: ConfigLoginAnomalyDetectionInput
 	ConfigLoginInput: ConfigLoginInput
+	ConfigPanel: ResolverTypeWrapper<ConfigPanel>
+	ConfigPanelInput: ConfigPanelInput
 	ConfigPassword: ResolverTypeWrapper<ConfigPassword>
 	ConfigPasswordInput: ConfigPasswordInput
 	ConfigPasswordless: ResolverTypeWrapper<ConfigPasswordless>
@@ -2561,6 +2682,9 @@ export type ResolversTypes = {
 	EnableIDPError: ResolverTypeWrapper<EnableIdpError>
 	EnableIDPErrorCode: EnableIdpErrorCode
 	EnableIDPResponse: ResolverTypeWrapper<EnableIdpResponse>
+	EnablePersonError: ResolverTypeWrapper<EnablePersonError>
+	EnablePersonErrorCode: EnablePersonErrorCode
+	EnablePersonResponse: ResolverTypeWrapper<EnablePersonResponse>
 	Float: ResolverTypeWrapper<Scalars['Float']['output']>
 	ForceSignOutPersonError: ResolverTypeWrapper<ForceSignOutPersonError>
 	ForceSignOutPersonErrorCode: ForceSignOutPersonErrorCode
@@ -2626,6 +2750,7 @@ export type ResolversTypes = {
 	ProjectIdentityRelation: ResolverTypeWrapper<Omit<ProjectIdentityRelation, 'identity'> & { identity: ResolversTypes['Identity'] }>
 	ProjectMembersFilter: ProjectMembersFilter
 	ProjectMembersInput: ProjectMembersInput
+	ProjectPermissions: ResolverTypeWrapper<ProjectPermissions>
 	ProjectSecret: ProjectSecret
 	ProjectSecretInfo: ResolverTypeWrapper<ProjectSecretInfo>
 	Query: ResolverTypeWrapper<Record<PropertyKey, never>>
@@ -2757,6 +2882,8 @@ export type ResolversParentTypes = {
 	ConfigLoginAnomalyDetection: ConfigLoginAnomalyDetection
 	ConfigLoginAnomalyDetectionInput: ConfigLoginAnomalyDetectionInput
 	ConfigLoginInput: ConfigLoginInput
+	ConfigPanel: ConfigPanel
+	ConfigPanelInput: ConfigPanelInput
 	ConfigPassword: ConfigPassword
 	ConfigPasswordInput: ConfigPasswordInput
 	ConfigPasswordless: ConfigPasswordless
@@ -2812,6 +2939,8 @@ export type ResolversParentTypes = {
 	EmailVerificationOptions: EmailVerificationOptions
 	EnableIDPError: EnableIdpError
 	EnableIDPResponse: EnableIdpResponse
+	EnablePersonError: EnablePersonError
+	EnablePersonResponse: EnablePersonResponse
 	Float: Scalars['Float']['output']
 	ForceSignOutPersonError: ForceSignOutPersonError
 	ForceSignOutPersonResponse: ForceSignOutPersonResponse
@@ -2863,6 +2992,7 @@ export type ResolversParentTypes = {
 	ProjectIdentityRelation: Omit<ProjectIdentityRelation, 'identity'> & { identity: ResolversParentTypes['Identity'] }
 	ProjectMembersFilter: ProjectMembersFilter
 	ProjectMembersInput: ProjectMembersInput
+	ProjectPermissions: ProjectPermissions
 	ProjectSecret: ProjectSecret
 	ProjectSecretInfo: ProjectSecretInfo
 	Query: Record<PropertyKey, never>
@@ -3159,6 +3289,7 @@ export type ConfigResolvers<ContextType = any, ParentType extends ResolversParen
 	captcha?: Resolver<ResolversTypes['ConfigCaptcha'], ParentType, ContextType>
 	emailChange?: Resolver<ResolversTypes['ConfigEmailChange'], ParentType, ContextType>
 	login?: Resolver<ResolversTypes['ConfigLogin'], ParentType, ContextType>
+	panel?: Resolver<ResolversTypes['ConfigPanel'], ParentType, ContextType>
 	password?: Resolver<ResolversTypes['ConfigPassword'], ParentType, ContextType>
 	passwordless?: Resolver<ResolversTypes['ConfigPasswordless'], ParentType, ContextType>
 	rateLimits?: Resolver<ResolversTypes['ConfigRateLimits'], ParentType, ContextType>
@@ -3211,6 +3342,11 @@ export type ConfigLoginAnomalyDetectionResolvers<
 	enabled?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
 	historySize?: Resolver<ResolversTypes['Int'], ParentType, ContextType>
 	stepUpThreshold?: Resolver<ResolversTypes['Int'], ParentType, ContextType>
+}
+
+export type ConfigPanelResolvers<ContextType = any, ParentType extends ResolversParentTypes['ConfigPanel'] = ResolversParentTypes['ConfigPanel']> = {
+	globalRoles?: Resolver<ReadonlyArray<ResolversTypes['String']>, ParentType, ContextType>
+	projectRoles?: Resolver<ReadonlyArray<ResolversTypes['String']>, ParentType, ContextType>
 }
 
 export type ConfigPasswordResolvers<
@@ -3598,6 +3734,22 @@ export type EnableIdpResponseResolvers<
 	ok?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
 }
 
+export type EnablePersonErrorResolvers<
+	ContextType = any,
+	ParentType extends ResolversParentTypes['EnablePersonError'] = ResolversParentTypes['EnablePersonError'],
+> = {
+	code?: Resolver<ResolversTypes['EnablePersonErrorCode'], ParentType, ContextType>
+	developerMessage?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+}
+
+export type EnablePersonResponseResolvers<
+	ContextType = any,
+	ParentType extends ResolversParentTypes['EnablePersonResponse'] = ResolversParentTypes['EnablePersonResponse'],
+> = {
+	error?: Resolver<Maybe<ResolversTypes['EnablePersonError']>, ParentType, ContextType>
+	ok?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
+}
+
 export type ForceSignOutPersonErrorResolvers<
 	ContextType = any,
 	ParentType extends ResolversParentTypes['ForceSignOutPersonError'] = ResolversParentTypes['ForceSignOutPersonError'],
@@ -3640,8 +3792,16 @@ export type IdentityGlobalPermissionsResolvers<
 	ContextType = any,
 	ParentType extends ResolversParentTypes['IdentityGlobalPermissions'] = ResolversParentTypes['IdentityGlobalPermissions'],
 > = {
+	canCreateGlobalApiKey?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
 	canCreateProject?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
 	canDeployEntrypoint?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
+	canListGlobalApiKeys?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
+	canListIdentityProviders?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
+	canListMailTemplates?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
+	canListPersons?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
+	canManageConfiguration?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
+	canViewAuthLog?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
+	canViewConfiguration?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
 }
 
 export type IdentityProjectRelationResolvers<
@@ -3938,6 +4098,7 @@ export type MutationResolvers<ContextType = any, ParentType extends ResolversPar
 	>
 	enableIDP?: Resolver<Maybe<ResolversTypes['EnableIDPResponse']>, ParentType, ContextType, RequireFields<MutationEnableIdpArgs, 'identityProvider'>>
 	enableMyPasswordless?: Resolver<Maybe<ResolversTypes['ToggleMyPasswordlessResponse']>, ParentType, ContextType>
+	enablePerson?: Resolver<Maybe<ResolversTypes['EnablePersonResponse']>, ParentType, ContextType, RequireFields<MutationEnablePersonArgs, 'personId'>>
 	forceSignOutPerson?: Resolver<
 		Maybe<ResolversTypes['ForceSignOutPersonResponse']>,
 		ParentType,
@@ -4058,6 +4219,7 @@ export type MutationResolvers<ContextType = any, ParentType extends ResolversPar
 }
 
 export type PersonResolvers<ContextType = any, ParentType extends ResolversParentTypes['Person'] = ResolversParentTypes['Person']> = {
+	disabledAt?: Resolver<Maybe<ResolversTypes['DateTime']>, ParentType, ContextType>
 	email?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>
 	emailOtpEnabled?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
 	emailVerified?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
@@ -4066,7 +4228,9 @@ export type PersonResolvers<ContextType = any, ParentType extends ResolversParen
 	identityProviders?: Resolver<ReadonlyArray<ResolversTypes['PersonIdentityProvider']>, ParentType, ContextType>
 	name?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>
 	otpEnabled?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
+	passwordlessAvailable?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
 	passwordlessEnabled?: Resolver<Maybe<ResolversTypes['Boolean']>, ParentType, ContextType>
+	passwordlessSelfManaged?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
 }
 
 export type PersonIdentityProviderResolvers<
@@ -4101,6 +4265,7 @@ export type ProjectResolvers<ContextType = any, ParentType extends ResolversPare
 	id?: Resolver<ResolversTypes['String'], ParentType, ContextType>
 	members?: Resolver<ReadonlyArray<ResolversTypes['ProjectIdentityRelation']>, ParentType, ContextType, Partial<ProjectMembersArgs>>
 	name?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+	permissions?: Resolver<ResolversTypes['ProjectPermissions'], ParentType, ContextType>
 	roles?: Resolver<ReadonlyArray<ResolversTypes['RoleDefinition']>, ParentType, ContextType>
 	secrets?: Resolver<ReadonlyArray<ResolversTypes['ProjectSecretInfo']>, ParentType, ContextType>
 	slug?: Resolver<ResolversTypes['String'], ParentType, ContextType>
@@ -4112,6 +4277,20 @@ export type ProjectIdentityRelationResolvers<
 > = {
 	identity?: Resolver<ResolversTypes['Identity'], ParentType, ContextType>
 	memberships?: Resolver<ReadonlyArray<ResolversTypes['Membership']>, ParentType, ContextType>
+}
+
+export type ProjectPermissionsResolvers<
+	ContextType = any,
+	ParentType extends ResolversParentTypes['ProjectPermissions'] = ResolversParentTypes['ProjectPermissions'],
+> = {
+	canAddMember?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
+	canCreateApiKey?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
+	canRemoveMember?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
+	canSetSecret?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
+	canUpdate?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
+	canUpdateMember?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
+	canViewMembers?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
+	canViewSecrets?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
 }
 
 export type ProjectSecretInfoResolvers<
@@ -4635,6 +4814,7 @@ export type Resolvers<ContextType = any> = {
 	ConfigEmailChange?: ConfigEmailChangeResolvers<ContextType>
 	ConfigLogin?: ConfigLoginResolvers<ContextType>
 	ConfigLoginAnomalyDetection?: ConfigLoginAnomalyDetectionResolvers<ContextType>
+	ConfigPanel?: ConfigPanelResolvers<ContextType>
 	ConfigPassword?: ConfigPasswordResolvers<ContextType>
 	ConfigPasswordless?: ConfigPasswordlessResolvers<ContextType>
 	ConfigRateLimitWindow?: ConfigRateLimitWindowResolvers<ContextType>
@@ -4681,6 +4861,8 @@ export type Resolvers<ContextType = any> = {
 	DisconnectIDPResponse?: DisconnectIdpResponseResolvers<ContextType>
 	EnableIDPError?: EnableIdpErrorResolvers<ContextType>
 	EnableIDPResponse?: EnableIdpResponseResolvers<ContextType>
+	EnablePersonError?: EnablePersonErrorResolvers<ContextType>
+	EnablePersonResponse?: EnablePersonResponseResolvers<ContextType>
 	ForceSignOutPersonError?: ForceSignOutPersonErrorResolvers<ContextType>
 	ForceSignOutPersonResponse?: ForceSignOutPersonResponseResolvers<ContextType>
 	IDPOptionsOutput?: IdpOptionsOutputResolvers<ContextType>
@@ -4713,6 +4895,7 @@ export type Resolvers<ContextType = any> = {
 	PrepareOtpResult?: PrepareOtpResultResolvers<ContextType>
 	Project?: ProjectResolvers<ContextType>
 	ProjectIdentityRelation?: ProjectIdentityRelationResolvers<ContextType>
+	ProjectPermissions?: ProjectPermissionsResolvers<ContextType>
 	ProjectSecretInfo?: ProjectSecretInfoResolvers<ContextType>
 	Query?: QueryResolvers<ContextType>
 	RegenerateBackupCodesError?: RegenerateBackupCodesErrorResolvers<ContextType>

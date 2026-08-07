@@ -3,6 +3,18 @@ import { CreateAuthLogEntryCommand } from '../commands/authLog/CreateAuthLogEntr
 import { Response } from '../utils/Response.js'
 import { AuthActionType } from '../type/AuthLog.js'
 import { JSONValue } from '@contember/schema'
+import { isUnpersistedIdentityId } from './apiKey/UnpersistedApiKeyManager.js'
+
+/**
+ * `person_auth_log.invoked_by_id` is a foreign key into `identity`, and a virtual identity (a
+ * configured root token, the panel's pre-sign-in caller) has no row there — writing it would abort
+ * the insert and lose the entry entirely. The id is kept in `metadata` instead, so the caller is
+ * still recorded, just not as a reference.
+ */
+const invokedBy = (identityId: string): { invokedById?: string; metadata?: Record<string, JSONValue> } =>
+	isUnpersistedIdentityId(identityId)
+		? { metadata: { invokedByUnpersistedIdentityId: identityId } }
+		: { invokedById: identityId }
 
 class AuthLogService {
 	async logAuthAction(
@@ -37,13 +49,15 @@ class AuthLogService {
 		if (ctx.forwarderUserAgent !== undefined) {
 			metadata.forwarderUserAgent = ctx.forwarderUserAgent
 		}
+		const invoker = invokedBy(ctx.identityId)
+		Object.assign(metadata, invoker.metadata)
 
 		await db.commandBus.execute(
 			new CreateAuthLogEntryCommand({
 				success: data.response.ok,
 				personInputIdentifier: data.personInput ?? authData?.data?.personInput,
 				personId: data.personId ?? authData?.data?.personId,
-				invokedById: ctx.identityId,
+				invokedById: invoker.invokedById,
 				type: data.type,
 				identityProviderId: data.identityProviderId ?? authData?.data?.identityProviderId,
 				errorCode: data.response.ok ? null : data.response.error,
@@ -77,10 +91,12 @@ class AuthLogService {
 			eventData?: JSONValue
 		},
 	): Promise<void> {
+		const invoker = invokedBy(entry.identityId)
 		await db.commandBus.execute(
 			new CreateAuthLogEntryCommand({
 				type: entry.type,
-				invokedById: entry.identityId,
+				invokedById: invoker.invokedById,
+				metadata: invoker.metadata,
 				personId: entry.personId ?? undefined,
 				success: entry.success,
 				ipAddress: entry.ipAddress,

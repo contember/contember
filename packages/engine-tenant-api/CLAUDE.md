@@ -37,6 +37,14 @@ GraphQL read fields whose visibility is enforced per-caller (the resolver return
 - **`Project.secrets: [ProjectSecretInfo!]!`** — secret KEYS + timestamps only, **never the values**. Gated by `project:viewSecrets` (`PROJECT_VIEW_SECRETS`). Resolver `ProjectTypeResolver.secrets` → `SecretsManager.listSecretKeys` → model `queries/project/ProjectSecretKeysQuery.ts`.
 - Also note `Identity.sessions: [SessionInfo!]!` (own sessions always visible; others via `person:viewSessions`) and `Query.authLog` (`system:viewAuthLog`, SUPER_ADMIN only by default).
 
+## Permission introspection
+
+`Identity.permissions` (`IdentityGlobalPermissions`) and `Project.permissions` (`ProjectPermissions`) report what the **calling** identity may do, evaluated through the same `permissionContext.isAllowed` the resolvers use. They exist because permission failure is not uniform — some reads answer empty, others throw, and every mutation throws — so a client cannot discover its own rights by trying. **Advisory only:** the resolvers still check everything, so a `true` grants nothing.
+
+Resolvers: `types/IdentityTypeResolver.permissions` (tenant-wide; `null` for another identity whose roles the caller may not see) and `types/ProjectTypeResolver.permissions` (project-scoped, asked through `createProjectScope`). The membership-parameterized actions are asked with an empty membership list — the same coarse gate `Project.members` uses; which roles may actually be granted is still decided per membership at mutation time.
+
+When adding a flag, add it to both the SDL and the resolver, and remember `ProjectResponseFactory` — it carries the placeholder that satisfies the non-nullable `Project.permissions` field on parent objects the type resolver later replaces.
+
 ## Authorization
 
 Tenant-level roles (`Roles.ts`): `LOGIN`, `PERSON`, `SUPER_ADMIN`, `PROJECT_CREATOR`, `PROJECT_ADMIN`, `ENTRYPOINT_DEPLOYER`, `PROJECT_MEMBER`, `SELF`. Permission actions are defined in `PermissionActions.ts` (resource + privilege, some parameterized by `roles` / `memberships`); static grants per role live in `PermissionsFactory.ts`.

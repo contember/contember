@@ -5,12 +5,14 @@ import { test } from 'bun:test'
 import { listPersonsSql } from './sql/listPersonsSql.js'
 import { sqlTransaction } from './sql/sqlTransaction.js'
 import { getIdentityProjectsSql } from './sql/getIdentityProjectsSql.js'
+import { getConfigSql } from './sql/getConfigSql.js'
 
 test('persons query lists all persons (SUPER_ADMIN path, no filter)', async () => {
 	const person1 = testUuid(1)
 	const identity1 = testUuid(2)
 	const person2 = testUuid(3)
 	const identity2 = testUuid(4)
+	const disabledAt = new Date('2019-09-04T12:00:00.000Z')
 
 	await executeTenantTest({
 		query: {
@@ -21,6 +23,9 @@ query {
 		email
 		name
 		emailOtpEnabled
+		disabledAt
+		passwordlessAvailable
+		passwordlessSelfManaged
 		identity {
 			id
 		}
@@ -31,16 +36,43 @@ query {
 		executes: [
 			listPersonsSql({
 				rows: [
-					{ personId: person1, identityId: identity1, email: 'alice@example.com', name: 'Alice', emailOtpEnabled: true },
-					{ personId: person2, identityId: identity2, email: 'bob@example.com', name: 'Bob' },
+					{
+						personId: person1,
+						identityId: identity1,
+						email: 'alice@example.com',
+						name: 'Alice',
+						emailOtpEnabled: true,
+						passwordlessEnabled: true,
+						disabledAt,
+					},
+					{ personId: person2, identityId: identity2, email: 'bob@example.com', name: 'Bob', passwordlessEnabled: false },
 				],
 			}),
+			getConfigSql({ passwordless_enabled: 'optIn' }),
 		],
 		return: {
 			data: {
 				persons: [
-					{ id: person1, email: 'alice@example.com', name: 'Alice', emailOtpEnabled: true, identity: { id: identity1 } },
-					{ id: person2, email: 'bob@example.com', name: 'Bob', emailOtpEnabled: false, identity: { id: identity2 } },
+					{
+						id: person1,
+						email: 'alice@example.com',
+						name: 'Alice',
+						emailOtpEnabled: true,
+						disabledAt: disabledAt.toISOString(),
+						passwordlessAvailable: true,
+						passwordlessSelfManaged: true,
+						identity: { id: identity1 },
+					},
+					{
+						id: person2,
+						email: 'bob@example.com',
+						name: 'Bob',
+						emailOtpEnabled: false,
+						disabledAt: null,
+						passwordlessAvailable: false,
+						passwordlessSelfManaged: true,
+						identity: { id: identity2 },
+					},
 				],
 			},
 		},

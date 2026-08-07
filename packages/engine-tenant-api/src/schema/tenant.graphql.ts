@@ -119,6 +119,7 @@ const schema: DocumentNode = gql`
 		disableEmailOtp: DisableEmailOtpResponse
 
 		disablePerson(personId: String!): DisablePersonResponse
+		enablePerson(personId: String!): EnablePersonResponse
 		forceSignOutPerson(personId: String!, reason: String): ForceSignOutPersonResponse
 		resetPersonMfa(personId: String!): ResetPersonMfaResponse
 		revokeSession(sessionId: String!): RevokeSessionResponse
@@ -201,6 +202,7 @@ const schema: DocumentNode = gql`
 		login: ConfigLogin!
 		captcha: ConfigCaptcha!
 		rateLimits: ConfigRateLimits!
+		panel: ConfigPanel!
 	}
 
 	type ConfigSignup {
@@ -334,6 +336,21 @@ const schema: DocumentNode = gql`
 		window: Interval!
 	}
 
+	"""
+	Who may enter the management panel. This is an entry gate for the console
+	only, not an authorization system: everything done inside the panel still
+	goes through the tenant ACL, so being allowed in grants no extra rights.
+	An identity may enter when its global roles intersect globalRoles, or when
+	it holds a membership with one of projectRoles in at least one project.
+	Both lists empty means nobody can enter.
+	"""
+	type ConfigPanel {
+		"""Global roles (identity.roles) that may use the management panel."""
+		globalRoles: [String!]!
+		"""Project membership roles that may use the management panel, in any project."""
+		projectRoles: [String!]!
+	}
+
 	input ConfigInput {
 		signup: ConfigSignupInput
 		emailChange: ConfigEmailChangeInput
@@ -342,6 +359,7 @@ const schema: DocumentNode = gql`
 		login: ConfigLoginInput
 		captcha: ConfigCaptchaInput
 		rateLimits: ConfigRateLimitsInput
+		panel: ConfigPanelInput
 	}
 
 	input ConfigSignupInput {
@@ -425,6 +443,15 @@ const schema: DocumentNode = gql`
 	input ConfigRateLimitWindowInput {
 		limit: Int
 		window: Interval
+	}
+
+	"""
+	Each list is replaced as a whole; omitting one leaves it unchanged. An empty
+	list closes the panel for that dimension.
+	"""
+	input ConfigPanelInput {
+		globalRoles: [String!]
+		projectRoles: [String!]
 	}
 	
 	type ConfigureResponse {
@@ -1235,7 +1262,21 @@ const schema: DocumentNode = gql`
 		email: String
 		name: String
 		otpEnabled: Boolean!
+		""" The person's own opt-in flag; \`null\` means "follow the tenant policy". On its own it does not say whether passwordless sign-in works — see \`passwordlessAvailable\`. """
 		passwordlessEnabled: Boolean
+		"""
+		Whether passwordless sign-in is actually usable for this person right now: the tenant-wide
+		policy resolved against \`passwordlessEnabled\`, i.e. the very same decision \`signIn\` makes. A UI
+		offering an enable/disable toggle must branch on this — under an \`always\` or \`never\` policy the
+		raw opt-in flag says nothing about what will happen.
+		"""
+		passwordlessAvailable: Boolean!
+		"""
+		Whether \`passwordlessEnabled\` is what decides \`passwordlessAvailable\`. False under an \`always\`
+		or \`never\` policy, where the person's own flag is ignored — a UI should then report the state
+		rather than offer a toggle that changes nothing.
+		"""
+		passwordlessSelfManaged: Boolean!
 		"""
 		Whether e-mail based one-time-password 2FA is enabled for this person
 		(see \`initEmailOtp\` / \`confirmEmailOtp\` / \`disableEmailOtp\`). Independent
@@ -1244,6 +1285,11 @@ const schema: DocumentNode = gql`
 		"""
 		emailOtpEnabled: Boolean!
 		emailVerified: Boolean!
+		"""
+		When the account was disabled (see \`disablePerson\`), null while the person
+		is active. Read-only — flip it with \`disablePerson\` / \`enablePerson\`.
+		"""
+		disabledAt: DateTime
 		identity: Identity!
 
 		"""
@@ -1313,9 +1359,60 @@ const schema: DocumentNode = gql`
 		sessions: [SessionInfo!]!
 	}
 
+	"""
+	What the identity may do tenant-wide, evaluated against the same ACL the resolvers enforce.
+
+	This is for building a UI that does not offer what it cannot deliver — it is **not** a security
+	boundary, and answering \`true\` here grants nothing. Every operation is still checked when it is
+	called. The distinction matters because permission failure is not uniform across this API: some
+	queries answer an empty list, others throw, and every mutation throws, so a client cannot tell
+	"nothing to show" from "not yours to see" by trying.
+	"""
 	type IdentityGlobalPermissions {
 		canCreateProject: Boolean!
 		canDeployEntrypoint: Boolean!
+		""" Read \`configuration\`, which throws otherwise. The other configuration queries gate on their own actions. """
+		canViewConfiguration: Boolean!
+		""" Read \`identityProviders\`. """
+		canListIdentityProviders: Boolean!
+		""" Read \`mailTemplates\`. """
+		canListMailTemplates: Boolean!
+		"""
+		Write the tenant configuration (\`configure\`) and read \`authPolicies\`. The CLI is the usual write path.
+		"""
+		canManageConfiguration: Boolean!
+		""" Read \`authLog\`, which throws otherwise. """
+		canViewAuthLog: Boolean!
+		"""
+		List every person in the tenant. Without it \`persons\` still answers, narrowed to the members
+		of the projects the caller administers — so this marks a full listing, not access to one.
+		"""
+		canListPersons: Boolean!
+		""" Read \`globalApiKeys\`, which answers an empty list otherwise. """
+		canListGlobalApiKeys: Boolean!
+		canCreateGlobalApiKey: Boolean!
+	}
+
+	"""
+	What the calling identity may do in this project. Same contract as
+	\`IdentityGlobalPermissions\`: advisory, evaluated per caller, never a substitute for the checks in
+	the resolvers.
+	"""
+	type ProjectPermissions {
+		""" Read \`members\` and \`apiKeys\`; both answer an empty list otherwise. """
+		canViewMembers: Boolean!
+		""" Invite or add a member (\`invite\`, \`addProjectMember\`). Which roles may be granted is checked per membership. """
+		canAddMember: Boolean!
+		canUpdateMember: Boolean!
+		canRemoveMember: Boolean!
+		""" Read \`secrets\` (their names, never values); answers an empty list otherwise. """
+		canViewSecrets: Boolean!
+		""" Write a project secret (\`setProjectSecret\`). Distinct from viewing: a project admin commonly has one and not the other. """
+		canSetSecret: Boolean!
+		""" Create an API key scoped to this project. """
+		canCreateApiKey: Boolean!
+		""" Update the project itself (\`updateProject\`). """
+		canUpdate: Boolean!
 	}
 
 	type IdentityProjectRelation {
@@ -1350,6 +1447,8 @@ const schema: DocumentNode = gql`
 		+ SUPER_ADMIN by default); returns an empty list otherwise.
 		"""
 		secrets: [ProjectSecretInfo!]!
+		""" What the calling identity may do here. Advisory — for building the UI, not for enforcing it. """
+		permissions: ProjectPermissions!
 	}
 
 	""" Metadata about a project secret — never its value. """
@@ -1538,6 +1637,23 @@ const schema: DocumentNode = gql`
 
 	enum DisablePersonErrorCode {
 		PERSON_ALREADY_DISABLED
+		PERSON_NOT_FOUND
+	}
+
+	# === enablePerson ===
+
+	type EnablePersonResponse {
+		ok: Boolean!
+		error: EnablePersonError
+	}
+
+	type EnablePersonError {
+		code: EnablePersonErrorCode!
+		developerMessage: String!
+	}
+
+	enum EnablePersonErrorCode {
+		PERSON_ALREADY_ENABLED
 		PERSON_NOT_FOUND
 	}
 

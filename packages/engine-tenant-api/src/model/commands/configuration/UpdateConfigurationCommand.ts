@@ -79,6 +79,8 @@ export class UpdateConfigurationCommand implements Command<void> {
 					rate_limit_email_otp_per_person_window: rl?.emailOtpPerPerson?.window ?? undefined,
 					rate_limit_email_verification_per_ip_limit: rl?.emailVerificationPerIp?.limit ?? undefined,
 					rate_limit_email_verification_per_ip_window: rl?.emailVerificationPerIp?.window ?? undefined,
+					panel_global_roles: this.configuration.panel?.globalRoles ?? undefined,
+					panel_project_roles: this.configuration.panel?.projectRoles ?? undefined,
 				} satisfies {
 					[K in keyof ConfigRow]: (IPostgresInterval extends ConfigRow[K] ? string : never) | Exclude<ConfigRow[K], IPostgresInterval> | undefined
 				},

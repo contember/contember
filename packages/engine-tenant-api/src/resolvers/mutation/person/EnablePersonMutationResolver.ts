@@ -1,20 +1,20 @@
-import { DisablePersonResponse, MutationDisablePersonArgs, MutationResolvers } from '../../../schema/index.js'
+import { EnablePersonResponse, MutationEnablePersonArgs, MutationResolvers } from '../../../schema/index.js'
 import { TenantResolverContext } from '../../TenantResolverContext.js'
 import { PermissionActions, PersonAccessManager } from '../../../model/index.js'
 import { PersonManager } from '../../../model/service/PersonManager.js'
 import { createErrorResponse } from '../../errorUtils.js'
 
-export class DisablePersonMutationResolver implements MutationResolvers {
+export class EnablePersonMutationResolver implements MutationResolvers {
 	constructor(
 		private readonly personAccessManager: PersonAccessManager,
 		private readonly personManager: PersonManager,
 	) {}
 
-	async disablePerson(
+	async enablePerson(
 		parent: unknown,
-		args: MutationDisablePersonArgs,
+		args: MutationEnablePersonArgs,
 		context: TenantResolverContext,
-	): Promise<DisablePersonResponse> {
+	): Promise<EnablePersonResponse> {
 		const targetPerson = await this.personManager.findPersonById(context.db, args.personId)
 
 		if (targetPerson === null) {
@@ -27,14 +27,15 @@ export class DisablePersonMutationResolver implements MutationResolvers {
 			}
 		}
 
+		// Enabling is the inverse of disabling, so it is the same privilege — a separate resource/privilege pair would need an ACL change everywhere.
 		await context.requireAccess({
 			action: PermissionActions.PERSON_DISABLE(targetPerson.roles),
-			message: 'You are not allowed to disable person account',
+			message: 'You are not allowed to enable person account',
 		})
 
-		const result = await this.personAccessManager.disablePerson(context.db, targetPerson)
+		const result = await this.personAccessManager.enablePerson(context.db, targetPerson)
 		await context.logAuthAction({
-			type: 'person_disable',
+			type: 'person_enable',
 			response: result,
 			targetPersonId: targetPerson.id,
 		})

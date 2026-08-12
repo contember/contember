@@ -375,13 +375,13 @@ describe('errors', () => {
 describe('parser diagnostics', () => {
 	test('Application routes deprecated options through human Output', async () => {
 		const { application, test: io } = createApplication({ ['deprecated']: () => new DeprecatedCommand() })
-		expect(await application.execute(['deprecated', '--old'])).toBe(ExitCode.Success)
+		expect(await application.execute(['deprecated', '--old', '--no-color'])).toBe(ExitCode.Success)
 		expect(io.stderr.lines).toStrictEqual(['Option --old is deprecated.'])
 	})
 
 	test('Command.run routes deprecated options after applying the final mode', async () => {
 		const human = createTestOutput()
-		await new DeprecatedCommand().run(['--old'], human.output)
+		await new DeprecatedCommand().run(['--old', '--no-color'], human.output)
 		expect(human.stderr.lines).toStrictEqual(['Option --old is deprecated.'])
 
 		const json = createTestOutput()

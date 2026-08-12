@@ -1,8 +1,10 @@
-import { Command, CommandConfiguration, Input } from '@contember/cli-common'
+import { CliError, Command, CommandConfiguration, ExitCode, Input, Output } from '@contember/cli-common'
 import { RemoteProjectResolver } from '../../lib/project/RemoteProjectResolver.js'
-import { TenantClient } from '../../lib/tenant/TenantClient.js'
+import { TenantApiTransport } from '../../lib/tenant/TenantApiTransport.js'
+import { createTenantClients } from '../../lib/tenant/clients/index.js'
 import { TenantConfigLoader } from '../../lib/tenant/TenantConfigLoader.js'
-import { TenantConfigApplier } from '../../lib/tenant/TenantConfigApplier.js'
+import { TenantConfigAction, TenantConfigApplier } from '../../lib/tenant/TenantConfigApplier.js'
+import { humanText } from './tenantOutput.js'
 
 type Args = {
 	config?: string
@@ -31,27 +33,53 @@ export class TenantApplyCommand extends Command<Args, Options> {
 		configuration.option('dry-run').valueNone().description('Print the actions that would be performed without executing them.')
 	}
 
-	protected async execute(input: Input<Args, Options>): Promise<void | number> {
+	protected async execute(input: Input<Args, Options>, output: Output): Promise<void> {
 		const configPath = input.getArgument('config') ?? DEFAULT_CONFIG_PATH
 		const dsn = input.getOption('dsn')
 		const dryRun = input.getOption('dry-run') === true
 
 		const remoteProject = this.remoteProjectResolver.resolve(dsn)
 		if (!remoteProject) {
-			throw `Project not defined. Please provide a DSN (--dsn) or set CONTEMBER_* environment variables.`
+			throw new CliError('Project not defined. Please provide a DSN (--dsn) or set CONTEMBER_* environment variables.', {
+				code: 'PROJECT_NOT_DEFINED',
+				exitCode: ExitCode.InputError,
+			})
 		}
 
 		const config = await this.tenantConfigLoader.loadConfig(configPath)
-		const client = TenantClient.create(remoteProject.endpoint, remoteProject.token)
+		const clients = createTenantClients(TenantApiTransport.create(remoteProject.endpoint, remoteProject.token))
 
-		console.log(`Applying tenant config from ${configPath}`)
-		console.log(`API URL: ${remoteProject.endpoint}`)
-		console.log('')
+		output.info(`Applying tenant config from ${configPath}`)
+		output.info(`API URL: ${remoteProject.endpoint}`)
 
-		await this.tenantConfigApplier.apply(client, config, { dryRun })
+		const actions = await this.tenantConfigApplier.apply(clients, config, { dryRun })
 
-		console.log('')
-		console.log(dryRun ? 'Dry run complete. No changes were made.' : 'Tenant configuration applied.')
-		return 0
+		const result: TenantConfigApplyResult = { configPath, dryRun, actions }
+		output.data(result, {
+			human: renderApplyResult,
+			quiet: value => value.actions.map(formatAction),
+		})
+
+		if (actions.length === 0) {
+			output.info('Nothing to apply, the config declares no actions.')
+		} else {
+			output.info(dryRun ? 'Dry run complete. No changes were made.' : 'Tenant configuration applied.')
+		}
 	}
+}
+
+export interface TenantConfigApplyResult {
+	configPath: string
+	dryRun: boolean
+	actions: TenantConfigAction[]
+}
+
+const formatAction = (action: TenantConfigAction): string =>
+	action.target === null ? humanText(action.action) : `${humanText(action.action)}:${humanText(action.target)}`
+
+const renderApplyResult = (result: TenantConfigApplyResult): string => {
+	if (result.actions.length === 0) {
+		return 'No tenant configuration actions.'
+	}
+	return result.actions.map(formatAction).join('\n')
 }

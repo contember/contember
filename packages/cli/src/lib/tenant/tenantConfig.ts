@@ -11,11 +11,8 @@ import type {
 	MailTemplate,
 } from '@contember/graphql-client-tenant'
 
-// Enums and leaf input shapes are re-derived from the generated tenant client
-// (`@contember/graphql-client-tenant`, generated from `tenant.graphql`), so they
-// stay in sync with the schema. The only thing layered on top is `| null` on the
-// fields where the API treats an explicit `null`/`''` as "clear/disable" — the
-// codegen renders nullable inputs as optional only and drops the `| null`.
+// These aliases keep tenant config authoring aligned with the GraphQL schema.
+// The generator preserves nullable input fields, including explicit `null`.
 export type { AuthPolicyScope, CaptchaProvider, ConfigPolicy, MailType } from '@contember/graphql-client-tenant'
 
 /**
@@ -23,36 +20,24 @@ export type { AuthPolicyScope, CaptchaProvider, ConfigPolicy, MailType } from '@
  */
 export type Interval = string
 
-/** Adds `| null` to the given keys of an otherwise non-nullable generated input. */
-type WithNullable<T, K extends keyof T> = Omit<T, K> & { readonly [P in K]?: T[P] | null }
+export type TenantPasswordConfig = ConfigPasswordInput
 
-export type TenantPasswordConfig = WithNullable<ConfigPasswordInput, 'pattern'>
+export type TenantLoginConfig = ConfigLoginInput
 
-export type TenantLoginConfig = WithNullable<ConfigLoginInput, 'maxTokenExpiration'>
-
-export type TenantPasswordlessConfig = WithNullable<ConfigPasswordlessInput, 'url'>
+export type TenantPasswordlessConfig = ConfigPasswordlessInput
 
 /**
  * `provider: null` disables captcha verification.
  * `secret` is write-only: `null`/omitted leaves the stored value unchanged, `''` clears it.
  */
-export type TenantCaptchaConfig = WithNullable<ConfigCaptchaInput, 'provider' | 'secret' | 'threshold'>
+export type TenantCaptchaConfig = ConfigCaptchaInput
 
 export type TenantRateLimitWindow = ConfigRateLimitWindowInput
 
 export type TenantRateLimitsConfig = ConfigRateLimitsInput
 
-/**
- * Maps to the tenant `configure(config: ConfigInput!)` mutation. New config
- * groups added to the schema flow through automatically; only the groups that
- * need `| null` overrides are pinned.
- */
-export type TenantGlobalConfig = Omit<ConfigInput, 'password' | 'login' | 'passwordless' | 'captcha'> & {
-	readonly password?: TenantPasswordConfig
-	readonly login?: TenantLoginConfig
-	readonly passwordless?: TenantPasswordlessConfig
-	readonly captcha?: TenantCaptchaConfig
-}
+/** Maps to the tenant `configure(config: ConfigInput!)` mutation. */
+export type TenantGlobalConfig = ConfigInput
 
 export type TenantIdpOptions = IDPOptions
 
@@ -73,7 +58,7 @@ export interface TenantIdpConfig {
 }
 
 /** Maps to the `addMailTemplate(template: MailTemplate!)` mutation. */
-export type TenantMailTemplate = WithNullable<MailTemplate, 'projectSlug' | 'replyTo'>
+export type TenantMailTemplate = MailTemplate
 
 /**
  * A per-role MFA / session policy. `project` is a project slug, required for
@@ -84,10 +69,7 @@ export type TenantMailTemplate = WithNullable<MailTemplate, 'projectSlug' | 'rep
  * not matter). Editing `roles` therefore reads as a different policy: a new row
  * is created and the old one is left in place — see `TenantConfigApplier`.
  */
-export type TenantAuthPolicy = WithNullable<
-	AuthPolicyInput,
-	'project' | 'mfaRequired' | 'tokenExpiration' | 'idleTimeout' | 'mfaGraceDuration' | 'rememberMeAllowed'
->
+export type TenantAuthPolicy = AuthPolicyInput
 
 /**
  * Declarative tenant configuration. Applied idempotently by

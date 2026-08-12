@@ -50,6 +50,7 @@ export class ProjectMembersQuery extends DatabaseQuery<ProjectMembersQueryResult
 
 				return qb
 			})
+			.orderBy(['identity', 'id'])
 			.limit(this.projectMemberInput.limit ?? undefined, this.projectMemberInput.offset ?? undefined)
 			.getResult(db)
 	}

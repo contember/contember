@@ -1,9 +1,9 @@
 #!/usr/bin/env node
 import { Application, CommandManager, exitProcess, Output, readGlobalOptionsFromArgs, renderCliError } from '@contember/cli-common'
 import { WorkspaceCreateCommand } from './commands/index.js'
+import { FileSystem } from './lib/FileSystem.js'
 import { TemplateInstaller } from './lib/TemplateInstaller.js'
 import { resourcesDir } from './paths.js'
-import { FileSystem } from './lib/FileSystem.js'
 
 const output = new Output()
 output.applyGlobalOptions(readGlobalOptionsFromArgs(process.argv.slice(2)))
@@ -14,6 +14,7 @@ output.applyGlobalOptions(readGlobalOptionsFromArgs(process.argv.slice(2)))
 				new TemplateInstaller(
 					resourcesDir,
 					new FileSystem(),
+					output,
 				),
 			),
 	})

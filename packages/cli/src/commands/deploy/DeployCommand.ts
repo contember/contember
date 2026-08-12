@@ -1,4 +1,4 @@
-import { Command, CommandConfiguration, Input } from '@contember/cli-common'
+import { CliError, Command, CommandConfiguration, escapeTerminalText, ExitCode, Input, Output } from '@contember/cli-common'
 import prompts from 'prompts'
 import { maskToken } from '../../lib/maskToken.js'
 import { MigrationExecutionFacade } from '../../lib/migrations/MigrationExecutionFacade.js'
@@ -22,10 +22,21 @@ type Options = {
 	snapshot?: boolean
 }
 
+/** The result of a deploy, printed via `output.data` — the token is deliberately never part of it. */
+export interface DeployResult {
+	project: string
+	apiUrl: string
+	adminUrl: string | null
+	migrationsDeployed: boolean
+	adminDeployed: boolean
+}
+
 export class DeployCommand extends Command<Args, Options> {
 	constructor(
 		private readonly adminDeployer: AdminDeployer,
-		private readonly migrationExecutionFacade: MigrationExecutionFacade,
+		// narrowed to the one method used: the real facade has a deep, partly-external dependency
+		// graph that is impractical to construct for tests, and this keeps the DI wiring unchanged.
+		private readonly migrationExecutionFacade: Pick<MigrationExecutionFacade, 'execute'>,
 		private readonly fs: FileSystem,
 		private readonly remoteProjectProvider: RemoteProjectProvider,
 		private readonly remoteProjectResolver: RemoteProjectResolver,
@@ -51,12 +62,15 @@ export class DeployCommand extends Command<Args, Options> {
 			.description('Do not ask for confirmation.')
 	}
 
-	protected async execute(input: Input<Args, Options>): Promise<void | number> {
+	protected async execute(input: Input<Args, Options>, output: Output): Promise<void | number> {
 		const dsn = input.getArgument('dsn')
 		const adminEndpoint = input.getOption('admin')
 		const remoteProject = this.remoteProjectResolver.resolve(dsn, adminEndpoint)
 		if (!remoteProject) {
-			throw `Project not defined. Please provide DSN or environment variables CONTEMBER_*`
+			throw new CliError('Project not defined. Please provide DSN or environment variables CONTEMBER_*', {
+				code: 'PROJECT_NOT_DEFINED',
+				exitCode: ExitCode.NotFound,
+			})
 		}
 		this.remoteProjectProvider.setRemoteProject(remoteProject)
 
@@ -66,38 +80,48 @@ export class DeployCommand extends Command<Args, Options> {
 
 		const deployAdmin = input.getOption('no-admin') !== true && !!remoteProject.adminEndpoint && !!projectAdminDistDir
 
-		console.log('')
-		console.log('Contember project deployment configuration:')
-		console.log(`Target project name: ${remoteProject.name}`)
-		console.log(`API URL: ${remoteProject.endpoint}`)
-		console.log(`Admin URL: ${remoteProject.adminEndpoint ?? 'none'}`)
-		console.log(`Deploy token: ${maskToken(remoteProject.token)}`)
-		console.log('')
+		output.info('')
+		output.info('Contember project deployment configuration:')
+		output.info(`Target project name: ${remoteProject.name}`)
+		output.info(`API URL: ${remoteProject.endpoint}`)
+		output.info(`Admin URL: ${remoteProject.adminEndpoint ?? 'none'}`)
+		output.info(`Deploy token: ${maskToken(remoteProject.token)}`)
+		output.info('')
 
 		if (deployAdmin && !(await this.fs.pathExists(`${projectAdminDistDir}/index.html`))) {
-			throw `Missing ${projectAdminDistDir}/index.html. Please build admin before deploying.`
+			throw new CliError(`Missing ${projectAdminDistDir}/index.html. Please build admin before deploying.`, {
+				code: 'ADMIN_BUILD_MISSING',
+				exitCode: ExitCode.InputError,
+				details: { path: `${projectAdminDistDir}/index.html` },
+			})
 		}
 
+		let migrationsConfirmed = false
+		let migrationsDeployed = false
 		if (deployMigration) {
-			const result = await this.migrationExecutionFacade.execute({
+			migrationsDeployed = await this.migrationExecutionFacade.execute({
 				force: false,
 				requireConfirmation: !yes,
 				additionalMessage: deployAdmin ? 'Admin will be deployed.' : 'Admin will NOT be deployed.',
 				useSnapshot: input.getOption('snapshot') === true,
+				onConfirmed: () => {
+					migrationsConfirmed = true
+				},
 			})
-			if (!result) {
-				return
-			}
 		}
 
+		let adminDeployed = false
 		if (deployAdmin) {
-			if (!deployMigration && !yes) {
-				if (!process.stdin.isTTY) {
-					throw 'TTY not available. Pass --yes option to confirm execution.'
+			if (!migrationsDeployed && !migrationsConfirmed && !yes) {
+				if (!output.canPrompt()) {
+					throw new CliError('TTY not available. Pass --yes to confirm execution.', {
+						code: 'TTY_UNAVAILABLE',
+						exitCode: ExitCode.InputError,
+					})
 				}
-				console.log('Admin will be deployed.')
-				console.log('(to skip this dialog, you can pass --yes option)')
-				console.log('')
+				output.info('Admin will be deployed.')
+				output.info('(to skip this dialog, you can pass --yes option)')
+				output.info('')
 				const { ok } = await prompts({
 					type: 'confirm',
 					name: 'ok',
@@ -111,12 +135,29 @@ export class DeployCommand extends Command<Args, Options> {
 				dir: projectAdminDistDir,
 				root: input.getOption('root') === true,
 			})
+			adminDeployed = true
 		}
 
-		console.log('')
-		console.log('Deployment successful')
-		console.log(`API URL: ${remoteProject.endpoint}`)
-		console.log(`Admin URL: ${remoteProject.adminEndpoint ?? 'none'}`)
+		const deployResult: DeployResult = {
+			project: remoteProject.name,
+			apiUrl: remoteProject.endpoint,
+			adminUrl: remoteProject.adminEndpoint ?? null,
+			migrationsDeployed,
+			adminDeployed,
+		}
+		output.data(
+			deployResult,
+			{
+				human: it =>
+					[
+						'',
+						'Deployment successful',
+						`API URL: ${escapeTerminalText(it.apiUrl)}`,
+						`Admin URL: ${it.adminUrl === null ? 'none' : escapeTerminalText(it.adminUrl)}`,
+					].join('\n'),
+				quiet: it => it.apiUrl,
+			},
+		)
 
 		return 0
 	}

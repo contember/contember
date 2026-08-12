@@ -3,6 +3,7 @@ import { MigrationsValidator } from './MigrationsValidator.js'
 import { emptySchema } from '@contember/schema-utils'
 import { MigrationVersionHelper } from '@contember/engine-common'
 import { SystemClientProvider } from '../SystemClientProvider.js'
+import { CliError, ExitCode } from '@contember/cli-common'
 
 export class MigrationRebaseFacade {
 	constructor(
@@ -22,7 +23,7 @@ export class MigrationRebaseFacade {
 		)
 		const valid = await this.migrationsValidator.validate(schemaWithoutMigrations, migrations)
 		if (!valid) {
-			throw `Cannot rebase migrations`
+			throw new CliError('Cannot rebase migrations', { code: 'MIGRATIONS_INVALID', exitCode: ExitCode.InputError })
 		}
 
 		let i = 0

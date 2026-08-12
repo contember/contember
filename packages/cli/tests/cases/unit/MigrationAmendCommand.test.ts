@@ -18,9 +18,10 @@ import {
 	SchemaVersionBuilder,
 	VERSION_LATEST,
 } from '@contember/migrations-client'
-import { Input } from '@contember/cli-common'
+import { CliError, ExitCode, Input } from '@contember/cli-common'
 import { MigrationAmendCommand } from '../../../src/commands/migrations/MigrationAmendCommand.js'
 import { SchemaLoader } from '../../../src/lib/schema/SchemaLoader.js'
+import { createTestOutput } from '../../../../cli-common/tests/lib/testOutput.js'
 
 namespace BlogModel {
 	export class Author {
@@ -86,7 +87,7 @@ const buildCommand = (migrationsDir: string, loadedSchema: Schema, calls?: Syste
 	return { command, schemaStateManager }
 }
 
-const run = (command: MigrationAmendCommand) => command.execute(new Input({}, { force: false, yes: true }))
+const run = (command: MigrationAmendCommand) => command.execute(new Input({}, { force: false, yes: true }), createTestOutput().output)
 
 describe('MigrationAmendCommand (schema state mode)', () => {
 	let migrationsDir: string
@@ -122,6 +123,20 @@ describe('MigrationAmendCommand (schema state mode)', () => {
 		expect(code).toBe(0)
 		const state = await schemaStateManager.readState()
 		expect(Object.keys(state.acl.roles)).toStrictEqual(['editor'])
+	})
+
+	test('non-interactive state-only amendment refuses before writing state', async () => {
+		const model = createSchema(BlogModel)
+		const { command, schemaStateManager } = buildCommand(migrationsDir, { ...model, acl: aclWith('editor') })
+		const { output } = createTestOutput({ stdinTty: false })
+
+		const error = await command.run([], output).then(() => null, (reason: unknown) => reason)
+
+		expect(error).toBeInstanceOf(CliError)
+		expect(error instanceof CliError ? error.code : null).toBe('TTY_UNAVAILABLE')
+		expect(error instanceof CliError ? error.exitCode : null).toBe(ExitCode.InputError)
+		const state = await schemaStateManager.readState()
+		expect(Object.keys(state.acl.roles)).toStrictEqual(['admin'])
 	})
 
 	test('leaves state untouched when nothing changed', async () => {

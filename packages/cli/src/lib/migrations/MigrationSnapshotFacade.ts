@@ -15,6 +15,7 @@ import {
 	SnapshotManager,
 	VERSION_LATEST,
 } from '@contember/migrations-client'
+import { CliError, ExitCode, Output } from '@contember/cli-common'
 
 export class MigrationSnapshotFacade {
 	constructor(
@@ -24,14 +25,15 @@ export class MigrationSnapshotFacade {
 		private readonly schemaMigrator: SchemaMigrator,
 		private readonly schemaStateManager: SchemaStateManager,
 		private readonly snapshotManager: SnapshotManager,
+		private readonly output: Output = new Output(),
 	) {
 	}
 
-	/** Collapses all migrations into a single schema snapshot and writes snapshot.json. */
-	async create(): Promise<SnapshotFile> {
+	/** Builds a snapshot in memory without changing the filesystem. */
+	async prepare(): Promise<SnapshotFile> {
 		const files = await this.migrationsResolver.getMigrationFiles()
 		if (files.length === 0) {
-			throw 'No migrations to snapshot'
+			throw new CliError('No migrations to snapshot', { code: 'MIGRATIONS_NOT_FOUND', exitCode: ExitCode.NotFound })
 		}
 		const stateMode = await this.schemaStateManager.isStateMode()
 		const version = files[files.length - 1].version
@@ -67,8 +69,11 @@ export class MigrationSnapshotFacade {
 			covers,
 			contentMigrations,
 		}
-		await this.snapshotManager.write(snapshot)
 		return snapshot
+	}
+
+	async write(snapshot: SnapshotFile): Promise<void> {
+		await this.snapshotManager.write(snapshot)
 	}
 
 	/**
@@ -87,7 +92,7 @@ export class MigrationSnapshotFacade {
 		const snapshot = await this.snapshotManager.read()
 		const stale = await this.findStaleness(snapshot)
 		if (stale) {
-			console.warn(`Ignoring snapshot: ${stale}. Run "migrations:snapshot" to regenerate it.`)
+			this.output.warn(`Ignoring snapshot: ${stale}. Run "migrations snapshot" to regenerate it.`)
 			return null
 		}
 		return snapshot
@@ -101,7 +106,7 @@ export class MigrationSnapshotFacade {
 		for (const covered of snapshot.covers) {
 			const file = byVersion.get(covered.version)
 			if (!file) {
-				throw `Snapshot covers missing migration ${covered.name}`
+				throw new CliError(`Snapshot covers missing migration ${covered.name}`, { code: 'SNAPSHOT_COVER_MISSING', exitCode: ExitCode.NotFound })
 			}
 			covers.push(migrationContentToInput(covered.version, covered.name, await file.getContent()))
 		}
@@ -115,13 +120,13 @@ export class MigrationSnapshotFacade {
 	/** Offline check that the snapshot still equals a full replay of all migrations. */
 	async verify(): Promise<{ ok: boolean; message: string }> {
 		if (!(await this.snapshotManager.exists())) {
-			throw 'No snapshot found. Run "migrations:snapshot" first.'
+			throw new CliError('No snapshot found. Run "migrations snapshot" first.', { code: 'SNAPSHOT_NOT_FOUND', exitCode: ExitCode.NotFound })
 		}
 		const snapshot = await this.snapshotManager.read()
 
 		const stale = await this.findStaleness(snapshot)
 		if (stale) {
-			return { ok: false, message: `Snapshot is stale: ${stale}. Run "migrations:snapshot" to regenerate it.` }
+			return { ok: false, message: `Snapshot is stale: ${stale}. Run "migrations snapshot" to regenerate it.` }
 		}
 
 		const stateMode = await this.schemaStateManager.isStateMode()
@@ -150,14 +155,14 @@ export class MigrationSnapshotFacade {
 		}
 		return {
 			ok: false,
-			message: 'Snapshot does not match a full replay of all migrations. Run "migrations:snapshot" to regenerate it.',
+			message: 'Snapshot does not match a full replay of all migrations. Run "migrations snapshot" to regenerate it.',
 		}
 	}
 
 	private async findStaleness(snapshot: SnapshotFile): Promise<string | null> {
 		// The collapsed snapshot is built differently per mode (state mode omits the non-model parts,
 		// see create()), and on bootstrap the non-model overlay is driven by the *current* mode. A mode
-		// switch since the snapshot was created (e.g. migrations:init-state) leaves the covers untouched
+		// switch since the snapshot was created (e.g. migrations init-state) leaves the covers untouched
 		// and would otherwise pass unnoticed, so treat it as stale and fall back to a full replay.
 		if (snapshot.stateMode !== await this.schemaStateManager.isStateMode()) {
 			return `schema state mode changed since the snapshot was created`

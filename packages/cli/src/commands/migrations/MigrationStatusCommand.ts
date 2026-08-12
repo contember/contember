@@ -1,8 +1,7 @@
-import { Command, CommandConfiguration, Input } from '@contember/cli-common'
+import { Command, CommandConfiguration, Input, Output } from '@contember/cli-common'
 import { MigrationFilesManager, MigrationState, sortMigrations, SystemClient } from '@contember/migrations-client'
-import chalk from 'chalk'
 import { MigrationsStatusFacade } from '../../lib/migrations/MigrationsStatusFacade.js'
-import { MigrationPrinter } from '../../lib/migrations/MigrationPrinter.js'
+import { MigrationPrinter, migrationStatusColumns } from '../../lib/migrations/MigrationPrinter.js'
 import { SystemClientProvider } from '../../lib/SystemClientProvider.js'
 
 type Args = {}
@@ -39,7 +38,7 @@ export class MigrationStatusCommand extends Command<Args, Options> {
 			.description('Restores migrations locally missing')
 	}
 
-	protected async execute(input: Input<Args, Options>): Promise<number> {
+	protected async execute(input: Input<Args, Options>, output: Output): Promise<number> {
 		const onlyErrors = input.getOption('only-errors')
 		const onlyToExecute = input.getOption('only-to-execute')
 		const restoreMissing = input.getOption('restore-missing')
@@ -49,7 +48,7 @@ export class MigrationStatusCommand extends Command<Args, Options> {
 		if (restoreMissing) {
 			const missing = status.errorMigrations.filter(it => it.state === MigrationState.EXECUTED_MISSING)
 			for (const migration of missing) {
-				console.log(`Restoring migration ${migration.name}`)
+				output.info(`Restoring migration ${migration.name}`)
 				const fullMigration = await this.systemClientProvider.get().getExecutedMigration(migration.version)
 				await this.migrationFilesManager.createFile(
 					JSON.stringify(
@@ -73,12 +72,13 @@ export class MigrationStatusCommand extends Command<Args, Options> {
 			])
 			: status.allMigrations
 
-		console.log(this.migrationPrinter.printStatusTable(filtered))
+		// the status is the answer of this command, so it goes to stdout — as a table, JSON or bare names
+		output.table(migrationStatusColumns, this.migrationPrinter.statusRows(filtered), 'migration')
 
 		const hasErrors = status.errorMigrations.length > 0
 
 		if (hasErrors) {
-			console.error(chalk.redBright('Some migrations are broken'))
+			output.error('Some migrations are broken')
 		}
 
 		return hasErrors ? 1 : 0

@@ -1,4 +1,4 @@
-import { Command, CommandConfiguration, Input } from '@contember/cli-common'
+import { CliError, Command, CommandConfiguration, ExitCode, Input, Output } from '@contember/cli-common'
 import { renderProjectInfoHtml } from '../../lib/project/docs/projectDescribe.js'
 import { writeFile } from 'node:fs/promises'
 import { join } from 'node:path'
@@ -29,24 +29,22 @@ export class ProjectGenerateDocumentationCommand extends Command<Args, Options> 
 		configuration.option('name').valueRequired().description('project name (for the title)')
 	}
 
-	protected async execute(input: Input<Args, Options>): Promise<number> {
+	protected async execute(input: Input<Args, Options>, output: Output): Promise<void> {
 		const schema = input.getOption('source') === 'migrations'
 			? await this.schemaVersionBuilder.buildSchema()
 			: await this.schemaLoader.loadSchema()
-		if (!validateSchemaAndPrintErrors(schema, 'Defined schema is invalid:')) {
-			return 1
+		if (!validateSchemaAndPrintErrors(schema, 'Defined schema is invalid:', undefined, output)) {
+			throw new CliError('Defined schema is invalid', { code: 'SCHEMA_INVALID', exitCode: ExitCode.InputError })
 		}
 		const name = input.getOption('name') ?? 'Contember project'
 
 		const html = await renderProjectInfoHtml(schema, name)
-		const output = input.getOption('output') ?? `${name.toLowerCase().replace(/\s+/g, '-')}.html`
-		if (output === '-') {
-			console.log(html)
-		} else {
-			console.log(`Documentation saved to ${output}`)
-			await writeFile(join(process.cwd(), output), html)
+		const destination = input.getOption('output') ?? `${name.toLowerCase().replace(/\s+/g, '-')}.html`
+		if (destination === '-') {
+			output.data(html, { human: value => value, quiet: value => value.split('\n') })
+			return
 		}
-
-		return 0
+		await writeFile(join(process.cwd(), destination), html)
+		output.data({ path: destination }, it => `Documentation saved to ${it.path}`)
 	}
 }

@@ -1,6 +1,9 @@
-import { Command, CommandConfiguration, Input } from '@contember/cli-common'
+import { CliError, Command, CommandConfiguration, ExitCode, Input, Output } from '@contember/cli-common'
 import { Migration, MigrationsResolver } from '@contember/migrations-client'
 import { MigrationRebaseFacade } from '../../lib/migrations/MigrationRebaseFacade.js'
+import prompts from 'prompts'
+
+type MigrationRebaser = Pick<MigrationRebaseFacade, 'rebase'>
 
 type Args = {
 	migration: string[]
@@ -13,7 +16,7 @@ type Options = {
 export class MigrationRebaseCommand extends Command<Args, Options> {
 	constructor(
 		private readonly migrationsResolver: MigrationsResolver,
-		private readonly migrationRebaseFacade: MigrationRebaseFacade,
+		private readonly migrationRebaseFacade: MigrationRebaser,
 	) {
 		super()
 	}
@@ -27,20 +30,41 @@ export class MigrationRebaseCommand extends Command<Args, Options> {
 			.description('Do not ask for confirmation.')
 	}
 
-	protected async execute(input: Input<Args, Options>): Promise<void> {
+	protected async execute(input: Input<Args, Options>, output: Output): Promise<void> {
 		const migrationNames = input.getArgument('migration')
 
 		const migrations: Migration[] = []
 		for (const migrationName of migrationNames) {
 			const migration = await this.migrationsResolver.findSchemaMigrationByVersion(migrationName)
 			if (!migration) {
-				throw `Migration ${migrationName} not found`
+				throw new CliError(`Migration ${migrationName} not found`, { code: 'MIGRATION_NOT_FOUND', exitCode: ExitCode.NotFound })
 			}
 			migrations.push(migration)
 		}
 
-		console.log('Rebasing: ' + migrations.map(it => it.name).join(', '))
+		output.info('Rebasing: ' + migrations.map(it => it.name).join(', '))
+		if (!input.getOption('yes')) {
+			if (!output.canPrompt()) {
+				throw new CliError('TTY not available. Pass --yes to confirm rebasing.', {
+					code: 'TTY_UNAVAILABLE',
+					exitCode: ExitCode.InputError,
+				})
+			}
+			const { confirmed } = await prompts({
+				type: 'confirm',
+				name: 'confirmed',
+				message: 'Rewrite these migrations?',
+				initial: false,
+			})
+			if (confirmed !== true) {
+				throw new CliError('Migration rebase aborted', { code: 'OPERATION_ABORTED', exitCode: ExitCode.InputError })
+			}
+		}
 		await this.migrationRebaseFacade.rebase(migrations)
-		console.log('Done')
+		const result = { migrations: migrations.map(it => it.name), count: migrations.length }
+		output.data(result, {
+			human: value => `Rebased ${value.count} migration(s)`,
+			quiet: value => value.migrations,
+		})
 	}
 }

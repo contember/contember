@@ -1,12 +1,12 @@
-import { Command, CommandConfiguration, Input } from '@contember/cli-common'
+import { CliError, Command, CommandConfiguration, escapeTerminalText, ExitCode, Input, Output } from '@contember/cli-common'
 import { createWriteStream } from 'node:fs'
 import { maskToken } from '../../lib/maskToken.js'
 import { pipeline } from 'node:stream/promises'
-import { printProgressLine } from '../../lib/transfer/stdio.js'
-import { createGunzip, createGzip } from 'node:zlib'
+import { createProgressReporter } from '../../lib/transfer/stdio.js'
+import { createGzip } from 'node:zlib'
 import { RemoteProjectResolver } from '../../lib/project/RemoteProjectResolver.js'
-import { DataTransferClient } from '../../lib/transfer/DataTransferClient.js'
-import { Readable } from 'node:stream'
+import { DataTransferClient, toDataExportStream, toDataTransferStreamError } from '../../lib/transfer/DataTransferClient.js'
+import { PassThrough } from 'node:stream'
 
 type Args = {
 	source?: string
@@ -19,6 +19,13 @@ type Options = {
 	'no-gzip-transfer'?: boolean
 	output?: string
 	'exclude-table'?: string[]
+}
+
+export interface ExportResult {
+	readonly project: string
+	readonly endpoint: string
+	readonly file: string
+	readonly exported: true
 }
 
 export class ExportCommand extends Command<Args, Options> {
@@ -40,19 +47,19 @@ export class ExportCommand extends Command<Args, Options> {
 		configuration.option('exclude-table').valueArray()
 	}
 
-	protected async execute(input: Input<Args, Options>): Promise<void | number> {
+	protected async execute(input: Input<Args, Options>, output: Output): Promise<void | number> {
 		const from = input.getArgument('source')
 		const project = await this.remoteProjectResolver.resolve(from)
 		if (!project) {
-			throw `Project not defined`
+			throw new CliError('Project not defined', { code: 'PROJECT_NOT_DEFINED', exitCode: ExitCode.NotFound })
 		}
 
-		console.log('')
-		console.log('Exporting data from a following project')
-		console.log('')
-		console.log(`Project name: ${project.name}`)
-		console.log(`API URL: ${project.endpoint}`)
-		console.log(`Token: ${maskToken(project.token)}`)
+		output.info('')
+		output.info('Exporting data from a following project')
+		output.info('')
+		output.info(`Project name: ${project.name}`)
+		output.info(`API URL: ${project.endpoint}`)
+		output.info(`Token: ${maskToken(project.token)}`)
 
 		const gzipOutput = !input.getOption('no-gzip-output') && !input.getOption('no-gzip')
 		const gzipTransfer = !input.getOption('no-gzip-transfer')
@@ -65,21 +72,19 @@ export class ExportCommand extends Command<Args, Options> {
 			includeSystem,
 			gzip: gzipTransfer,
 		})
-		if (!response.body) {
-			throw new Error('Response does not contain a readable stream.')
-		}
-
 		let transferred = 0
 		let start = Date.now()
 		let lastMbReported = 0
-		console.log('')
-		const stream = Readable.fromWeb(response.body as any)
-		stream.on('data', chunk => {
-			transferred += chunk.length
+		output.info('')
+		const printProgress = createProgressReporter(output)
+		const stream = toDataExportStream(response)
+		const progressStream = new PassThrough()
+		progressStream.on('data', chunk => {
+			transferred += chunk instanceof Uint8Array ? chunk.byteLength : 0
 			const currentMb = Math.floor(transferred / 1024 / 1024)
 			if (currentMb > lastMbReported) {
 				const durationS = Math.floor((Date.now() - start) / 1000)
-				printProgressLine(`transferred ${currentMb} MiB; ${durationS} seconds`)
+				printProgress(`transferred ${currentMb} MiB; ${durationS} seconds`)
 				lastMbReported = currentMb
 			}
 		})
@@ -87,13 +92,25 @@ export class ExportCommand extends Command<Args, Options> {
 		const fileName = input.getOption('output') ?? `${project.name}.jsonl${gzipOutput ? '.gz' : ''}`
 		const fileStream = createWriteStream(fileName)
 
-		const responseStream = !gzipOutput
-			? stream
-			: stream.pipe(createGzip())
+		try {
+			if (gzipOutput) {
+				await pipeline(stream, progressStream, createGzip(), fileStream)
+			} else {
+				await pipeline(stream, progressStream, fileStream)
+			}
+		} catch (cause) {
+			throw toDataTransferStreamError('Export', cause)
+		}
 
-		await pipeline(responseStream, fileStream)
-
-		console.log('\nExport done.')
-		console.log(`Data saved to ${fileName}`)
+		const result: ExportResult = {
+			project: project.name,
+			endpoint: project.endpoint,
+			file: fileName,
+			exported: true,
+		}
+		output.data(result, {
+			human: it => ['', 'Export done.', `Data saved to ${escapeTerminalText(it.file)}`].join('\n'),
+			quiet: it => it.file,
+		})
 	}
 }

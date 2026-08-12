@@ -31,8 +31,6 @@ export class MigrationCreator {
 			recreateViews?: boolean
 		} = {},
 	): Promise<{ migration: Migration; initialSchema: Schema } | null> {
-		await this.migrationFilesManager.createDirIfNotExist()
-
 		const modifications = this.schemaDiffer.diffSchemas(initialSchema, newSchema, { skipInitialSchemaValidation, skipNonModelDiffers, recreateViews })
 		if (modifications.length === 0) {
 			return null
@@ -44,6 +42,7 @@ export class MigrationCreator {
 	}
 
 	async saveMigration(migration: Migration): Promise<string> {
+		await this.migrationFilesManager.createDirIfNotExist()
 		const jsonDiff = MigrationCreator.createContent(migration)
 		const filename = await this.migrationFilesManager.createFile(jsonDiff, migration.name)
 		return filename

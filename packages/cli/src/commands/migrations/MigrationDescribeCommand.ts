@@ -1,4 +1,4 @@
-import { Command, CommandConfiguration, Input } from '@contember/cli-common'
+import { CliError, Command, CommandConfiguration, ExitCode, Input, Output } from '@contember/cli-common'
 import { MigrationPrinter } from '../../lib/migrations/MigrationPrinter.js'
 import { MigrationsResolver, SchemaVersionBuilder } from '@contember/migrations-client'
 
@@ -27,7 +27,7 @@ export class MigrationDescribeCommand extends Command<Args, Options> {
 		configuration.option('no-sql').valueNone()
 	}
 
-	protected async execute(input: Input<Args, Options>): Promise<void> {
+	protected async execute(input: Input<Args, Options>, output: Output): Promise<void> {
 		const migrationArg = input.getArgument('migration')
 		const sqlOnly = input.getOption('sql-only')
 		const noSql = input.getOption('no-sql')
@@ -37,9 +37,11 @@ export class MigrationDescribeCommand extends Command<Args, Options> {
 			: await this.migrationsResolver.findLatestSchemaMigration()
 
 		if (!migration) {
-			throw 'Undefined migration'
+			throw new CliError('Undefined migration', { code: 'MIGRATION_NOT_FOUND', exitCode: ExitCode.NotFound })
 		}
 		const schema = await this.schemaVersionBuilder.buildSchemaUntil(migration.version)
-		this.migrationPrinter.printMigrationDescription(schema, migration, { sqlOnly, noSql })
+		// the description is what the user asked for, so it is data: structured with --json, formatted for a human otherwise
+		const description = this.migrationPrinter.describeMigration(schema, migration)
+		output.data(description, it => this.migrationPrinter.formatMigrationDescription(it, { sqlOnly, noSql }))
 	}
 }

@@ -155,6 +155,14 @@ describe('aliases', () => {
 			'workspace update api',
 		])
 	})
+
+	test('accepts aliases of the same factory that normalize to the canonical name', () => {
+		expect(() => createManager([['foo bar', 'foo:bar']])).not.toThrow()
+	})
+
+	test('rejects different factories whose names normalize to the same token sequence', () => {
+		expect(() => createManager([['foo bar'], ['foo:bar']])).toThrow(InvalidConfigurationError)
+	})
 })
 
 describe('shorthand', () => {

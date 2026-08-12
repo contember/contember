@@ -38,7 +38,14 @@ export class CommandManager {
 		for (const entry of this.entries) {
 			for (const name of [entry.name, ...entry.aliases]) {
 				const tokens = splitTokens(name)
-				this.lookup.set(tokens.join(' '), entry)
+				const normalizedName = tokens.join(' ')
+				const existing = this.lookup.get(normalizedName)
+				if (existing !== undefined && existing.create !== entry.create) {
+					throw new InvalidConfigurationError(
+						`Command names "${existing.name}" and "${name}" both normalize to "${normalizedName}" but use different factories.`,
+					)
+				}
+				this.lookup.set(normalizedName, entry)
 				for (let i = 1; i < tokens.length; i++) {
 					const prefix = tokens.slice(0, i).join(' ')
 					const group = this.groups.get(prefix) ?? []

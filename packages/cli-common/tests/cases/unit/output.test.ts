@@ -1,7 +1,7 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
 import chalk from 'chalk'
 import { escapeTerminalText, Output, OutputStream, OutputTableColumn } from '../../../src/index.js'
-import { createTestOutput } from '../../lib/testOutput.js'
+import { CapturingStream, createTestOutput } from '../../lib/testOutput.js'
 
 beforeAll(() => {
 	// deterministic assertions regardless of the terminal the suite runs in
@@ -313,8 +313,8 @@ describe('Output.progress', () => {
 })
 
 describe('Output.canPrompt', () => {
-	test('is true only in human mode on a TTY', () => {
-		const { output } = createTestOutput({ stdinTty: true })
+	test('is true only in human mode when stdin and diagnostic output are TTYs', () => {
+		const { output } = createTestOutput({ stdinTty: true, stderrTty: true })
 		output.setMode('human')
 		expect(output.canPrompt()).toBe(true)
 		output.setMode('json')
@@ -323,10 +323,37 @@ describe('Output.canPrompt', () => {
 		expect(output.canPrompt()).toBe(false)
 	})
 
-	test('is false without a TTY', () => {
-		const { output } = createTestOutput({ stdinTty: false })
+	test('is false when stdin is not a TTY', () => {
+		const { output } = createTestOutput({ stdinTty: false, stderrTty: true })
 		output.setMode('human')
 		expect(output.canPrompt()).toBe(false)
+	})
+
+	test('is false when diagnostic output is not a TTY', () => {
+		const { output } = createTestOutput({ stdinTty: true, stderrTty: false })
+		output.setMode('human')
+		expect(output.canPrompt()).toBe(false)
+	})
+})
+
+describe('Output.promptOutput', () => {
+	test('uses the real process stderr by default', () => {
+		const output = new Output()
+		expect(output.promptOutput).toBe(process.stderr)
+	})
+
+	test('adapts an injected diagnostic stream to a Writable with TTY metadata', async () => {
+		const stderr = new CapturingStream(true, 132)
+		const output = new Output({ stderr })
+
+		expect(output.promptOutput.writable).toBe(true)
+		expect(output.promptOutput.isTTY).toBe(true)
+		expect(output.promptOutput.columns).toBe(132)
+
+		await new Promise<void>((resolve, reject) => {
+			output.promptOutput.write('prompt text', error => error ? reject(error) : resolve())
+		})
+		expect(stderr.text).toBe('prompt text')
 	})
 })
 

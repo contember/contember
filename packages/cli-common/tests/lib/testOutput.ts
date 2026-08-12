@@ -3,7 +3,7 @@ import { Output, OutputStream } from '../../src/index.js'
 export class CapturingStream implements OutputStream {
 	public chunks: string[] = []
 
-	constructor(public readonly isTty: boolean = false) {}
+	constructor(public readonly isTty: boolean = false, public readonly columns: number = 80) {}
 
 	public write(text: string): void {
 		this.chunks.push(text)

@@ -11,6 +11,7 @@ export type {
 	OutputDataOptions,
 	OutputMode,
 	OutputOptions,
+	PromptOutputStream,
 	OutputScalar,
 	OutputStream,
 	OutputTableColumn,

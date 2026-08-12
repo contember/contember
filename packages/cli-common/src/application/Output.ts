@@ -2,6 +2,7 @@
 
 import chalk from 'chalk'
 import chalkTable from 'chalk-table'
+import { Writable } from 'node:stream'
 import type { GlobalOptionValues } from './GlobalOptions.js'
 
 export type OutputMode = 'human' | 'json' | 'quiet'
@@ -9,6 +10,7 @@ export type OutputMode = 'human' | 'json' | 'quiet'
 export interface OutputStream {
 	write(text: string): void
 	readonly isTty: boolean
+	readonly columns?: number
 	onError?(listener: (error: unknown) => void): void
 }
 
@@ -16,6 +18,11 @@ export interface OutputOptions {
 	stdout?: OutputStream
 	stderr?: OutputStream
 	isStdinTty?: () => boolean
+}
+
+export interface PromptOutputStream extends Writable {
+	readonly isTTY: boolean
+	readonly columns: number
 }
 
 export type OutputScalar = string | number | boolean | bigint | null | undefined
@@ -62,11 +69,13 @@ export class Output {
 	private readonly stdout: OutputStream
 	private readonly stderr: OutputStream
 	private readonly stdinIsTty: () => boolean
+	private readonly promptStderr: PromptOutputStream
 
 	constructor(options: OutputOptions = {}) {
 		this.stdout = options.stdout ?? createProcessStream(process.stdout)
 		this.stderr = options.stderr ?? createProcessStream(process.stderr)
 		this.stdinIsTty = options.isStdinTty ?? (() => process.stdin.isTTY === true)
+		this.promptStderr = options.stderr === undefined ? process.stderr : createPromptStream(this.stderr)
 		this.stdout.onError?.(handleStreamError)
 		this.stderr.onError?.(handleStreamError)
 	}
@@ -188,9 +197,14 @@ export class Output {
 		writeStream(this.stderr, '\r\u001b[K')
 	}
 
-	/** False in json/quiet mode or when stdin is not a TTY — a prompt would hang such a run. */
+	/** False unless both sides of an interactive prompt are TTYs in human mode. */
 	public canPrompt(): boolean {
-		return this.currentMode === 'human' && this.stdinIsTty()
+		return this.currentMode === 'human' && this.stdinIsTty() && this.stderr.isTty
+	}
+
+	/** A real Writable suitable for the `stdout` option of interactive prompt libraries. */
+	public get promptOutput(): PromptOutputStream {
+		return this.promptStderr
 	}
 
 	/**
@@ -223,10 +237,37 @@ const createProcessStream = (stream: NodeJS.WriteStream): OutputStream => ({
 	get isTty() {
 		return stream.isTTY === true
 	},
+	get columns() {
+		return stream.columns
+	},
 	onError: listener => {
 		stream.on('error', error => listener(error))
 	},
 })
+
+class PromptWritable extends Writable {
+	public readonly isTTY: boolean
+
+	constructor(private readonly stream: OutputStream) {
+		super({ decodeStrings: false })
+		this.isTTY = stream.isTty
+	}
+
+	public get columns(): number {
+		return this.stream.columns ?? 80
+	}
+
+	public _write(chunk: string | Uint8Array, encoding: BufferEncoding, callback: (error?: Error | null) => void): void {
+		try {
+			writeStream(this.stream, typeof chunk === 'string' ? chunk : Buffer.from(chunk).toString(encoding))
+			callback()
+		} catch (error) {
+			callback(error instanceof Error ? error : new Error(String(error)))
+		}
+	}
+}
+
+const createPromptStream = (stream: OutputStream): PromptOutputStream => new PromptWritable(stream)
 
 const writeStream = (stream: OutputStream, text: string): void => {
 	try {

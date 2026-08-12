@@ -10,11 +10,12 @@ class CapturingStream implements OutputStream {
 	}
 }
 
-const createOutput = (): Output => new Output({
-	stdout: new CapturingStream(),
-	stderr: new CapturingStream(),
-	isStdinTty: () => true,
-})
+const createOutput = (): Output =>
+	new Output({
+		stdout: new CapturingStream(),
+		stderr: new CapturingStream(),
+		isStdinTty: () => true,
+	})
 
 describe('promptConfirm', () => {
 	test('binds diagnostic output and maps a confirmed answer', async () => {
@@ -35,16 +36,18 @@ describe('promptConfirm', () => {
 
 	test('maps rejection and cancellation to false', async () => {
 		const output = createOutput()
-		expect(await promptConfirmWithRunner(output, { message: 'Continue?' }, async question => {
-			expect(question).toStrictEqual({
-				type: 'confirm',
-				name: 'value',
-				message: 'Continue?',
-				stdout: output.promptOutput,
-			})
-			expect('initial' in question).toBe(false)
-			return { value: false }
-		})).toBe(false)
+		expect(
+			await promptConfirmWithRunner(output, { message: 'Continue?' }, async question => {
+				expect(question).toStrictEqual({
+					type: 'confirm',
+					name: 'value',
+					message: 'Continue?',
+					stdout: output.promptOutput,
+				})
+				expect('initial' in question).toBe(false)
+				return { value: false }
+			}),
+		).toBe(false)
 		expect(await promptConfirmWithRunner(output, { message: 'Continue?' }, async () => ({}))).toBe(false)
 	})
 

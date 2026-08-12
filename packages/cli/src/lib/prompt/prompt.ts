@@ -3,8 +3,8 @@ import prompts from 'prompts'
 import {
 	type ConfirmPromptOptions,
 	type PromptAnswer,
-	type PromptQuestion,
 	promptConfirmWithRunner,
+	type PromptQuestion,
 	promptSelectWithRunner,
 	type SelectPromptChoice,
 	type SelectPromptOptions,
@@ -17,8 +17,7 @@ const runPrompt = async <Q extends PromptQuestion>(question: Q): Promise<PromptA
 	return answer
 }
 
-export const promptConfirm = (output: Output, options: ConfirmPromptOptions): Promise<boolean> =>
-	promptConfirmWithRunner(output, options, runPrompt)
+export const promptConfirm = (output: Output, options: ConfirmPromptOptions): Promise<boolean> => promptConfirmWithRunner(output, options, runPrompt)
 
 export const promptSelect = <const T extends string>(output: Output, options: SelectPromptOptions<T>): Promise<T | undefined> =>
 	promptSelectWithRunner(output, options, runPrompt)

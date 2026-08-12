@@ -11,12 +11,12 @@ export type {
 	OutputDataOptions,
 	OutputMode,
 	OutputOptions,
-	PromptOutputStream,
 	OutputScalar,
 	OutputStream,
 	OutputTableColumn,
 	OutputTableColumns,
 	ParsedCommandInput,
+	PromptOutputStream,
 } from './application/index.js'
 export {
 	Application,

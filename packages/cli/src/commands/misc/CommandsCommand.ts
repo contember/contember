@@ -63,9 +63,12 @@ export class CommandsCommand extends Command<Args, Options> {
 			}
 		})
 
-		output.data(commands, it => {
-			const width = Math.max(0, ...it.map(command => command.name.length))
-			return it.map(command => `${command.name.padEnd(width)}    ${command.description}`).join('\n')
+		output.data(commands, {
+			human: it => {
+				const width = Math.max(0, ...it.map(command => command.name.length))
+				return it.map(command => `${command.name.padEnd(width)}    ${command.description}`).join('\n')
+			},
+			quiet: it => it.map(command => command.name),
 		})
 	}
 }

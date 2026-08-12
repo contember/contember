@@ -55,6 +55,20 @@ describe('Output.data', () => {
 		expect(stdout.text).toBe('project-1\n')
 	})
 
+	test('quiet mode rejects an object before writing stdout', () => {
+		const { output, stdout } = createTestOutput()
+		output.setMode('quiet')
+		expect(() => output.data({ id: 'project-1' })).toThrow('Quiet output requires a scalar value')
+		expect(stdout.text).toBe('')
+	})
+
+	test('quiet mode rejects an object array before writing any stdout', () => {
+		const { output, stdout } = createTestOutput()
+		output.setMode('quiet')
+		expect(() => output.data(['first', { id: 'project-1' }])).toThrow('Quiet output requires a scalar value')
+		expect(stdout.text).toBe('')
+	})
+
 	test('json mode ignores all projections', () => {
 		const { output, stdout } = createTestOutput()
 		const value = { id: 'project-1', name: 'Blog' }
@@ -157,22 +171,6 @@ describe('Output.table column formatter', () => {
 	})
 })
 
-describe('Output.list', () => {
-	test('json mode prints a JSON array', () => {
-		const { output, stdout } = createTestOutput()
-		output.setMode('json')
-		output.list(['a', 'b'])
-		expect(JSON.parse(stdout.text)).toStrictEqual(['a', 'b'])
-	})
-
-	test('quiet mode prints one value per line', () => {
-		const { output, stdout } = createTestOutput()
-		output.setMode('quiet')
-		output.list(['a', 'b'])
-		expect(stdout.text).toBe('a\nb\n')
-	})
-})
-
 describe('Output diagnostics', () => {
 	test('go to stderr in human mode', () => {
 		const { output, stdout, stderr } = createTestOutput()
@@ -220,16 +218,15 @@ describe('terminal escaping', () => {
 		expect(escapeTerminalText('\u001f \u007e\u007f\u0080\u009f\u00a0Příliš žluťoučký 🐘')).toBe(' \u007e\u00a0Příliš žluťoučký 🐘')
 	})
 
-	test('sanitizes untrusted list, table, and diagnostic values in human mode', () => {
+	test('sanitizes untrusted table and diagnostic values in human mode', () => {
 		const { output, stdout, stderr } = createTestOutput()
 		output.setMode('human')
-		output.list(['list\u001b[31m'])
 		output.table([{ field: 'value', name: 'Value' }], [{ value: 'cell\u0007\u001b]8;;https://example.test' }])
 		output.warn('warning\u001b[2J')
 		expect(stdout.text).not.toContain('\u001b')
 		expect(stdout.text).not.toContain('\u0007')
 		expect(stderr.text).not.toContain('\u001b')
-		expect(stdout.text).toContain('list[31m')
+		expect(stdout.text).toContain('cell]8;;https://example.test')
 		expect(stderr.text).toContain('warning[2J')
 	})
 })
@@ -383,5 +380,14 @@ describe('Output.applyGlobalOptions', () => {
 		chalk.level = 3
 		output.applyGlobalOptions({ json: false, quiet: false, color: false, help: false })
 		expect(chalk.level).toBe(0)
+	})
+
+	test('restores supported color after a machine execution', () => {
+		const { output } = createTestOutput()
+		chalk.level = 2
+		output.applyGlobalOptions({ json: true, quiet: false, color: true, help: false })
+		expect(chalk.level).toBe(0)
+		output.applyGlobalOptions({ json: false, quiet: false, color: true, help: false })
+		expect(chalk.level).toBe(2)
 	})
 })

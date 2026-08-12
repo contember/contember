@@ -7,6 +7,8 @@ import type { GlobalOptionValues } from './GlobalOptions.js'
 
 export type OutputMode = 'human' | 'json' | 'quiet'
 
+let supportedChalkLevel = chalk.level
+
 export interface OutputStream {
 	write(text: string): void
 	readonly isTty: boolean
@@ -99,8 +101,16 @@ export class Output {
 
 	public applyGlobalOptions(globals: GlobalOptionValues): void {
 		this.setMode(resolveOutputMode(globals))
-		if (!globals.color || this.currentMode !== 'human') {
-			// chalk is a process-wide singleton, so this also disables colors in modules importing it directly
+		if (globals.color && this.currentMode === 'human') {
+			if (chalk.level === 0) {
+				chalk.level = supportedChalkLevel
+			} else {
+				supportedChalkLevel = chalk.level
+			}
+		} else {
+			if (chalk.level !== 0) {
+				supportedChalkLevel = chalk.level
+			}
 			chalk.level = 0
 		}
 	}
@@ -152,16 +162,6 @@ export class Output {
 			return cells
 		})
 		this.writeStdout(chalkTable<string>({ columns: columns.map(it => ({ field: it.field, name: it.name })) }, data))
-	}
-
-	public list(values: string[]): void {
-		if (this.currentMode === 'json') {
-			this.writeStdout(JSON.stringify(values, null, 2))
-			return
-		}
-		for (const value of values) {
-			this.writeStdout(this.currentMode === 'human' ? escapeTerminalText(value) : value)
-		}
 	}
 
 	// DIAGNOSTICS → stderr
@@ -319,5 +319,11 @@ const formatCell = (value: unknown): string => {
 
 const toScalarLines = (value: unknown): string[] => {
 	const values: unknown[] = Array.isArray(value) ? value : [value]
+	if (!values.every(isOutputScalar)) {
+		throw new TypeError('Quiet output requires a scalar value or an array of scalar values. Pass an explicit quiet projection for structured data.')
+	}
 	return values.filter(it => it !== undefined && it !== null).map(formatCell)
 }
+
+const isOutputScalar = (value: unknown): value is OutputScalar =>
+	value === null || value === undefined || ['string', 'number', 'boolean', 'bigint'].includes(typeof value)

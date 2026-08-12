@@ -18,6 +18,7 @@ export class ProjectGenerateDocumentationCommand extends Command<Args, Options> 
 	constructor(
 		private readonly schemaLoader: SchemaLoader,
 		private readonly schemaVersionBuilder: SchemaVersionBuilder,
+		private readonly renderDocumentation: typeof renderProjectInfoHtml = renderProjectInfoHtml,
 	) {
 		super()
 	}
@@ -38,13 +39,13 @@ export class ProjectGenerateDocumentationCommand extends Command<Args, Options> 
 		}
 		const name = input.getOption('name') ?? 'Contember project'
 
-		const html = await renderProjectInfoHtml(schema, name)
+		const html = await this.renderDocumentation(schema, name)
 		const destination = input.getOption('output') ?? `${name.toLowerCase().replace(/\s+/g, '-')}.html`
 		if (destination === '-') {
-			output.data(html, { human: value => value, quiet: value => value.split('\n') })
+			output.data(html, { human: value => value, quiet: () => destination })
 			return
 		}
 		await writeFile(join(process.cwd(), destination), html)
-		output.data({ path: destination }, it => `Documentation saved to ${it.path}`)
+		output.data({ path: destination }, { human: it => `Documentation saved to ${it.path}`, quiet: it => it.path })
 	}
 }

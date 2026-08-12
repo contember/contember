@@ -24,6 +24,6 @@ export class TenantProjectShowCommand extends Command<Args, Options> {
 		if (!project) {
 			throw new CliError(`Project "${slug}" not found.`, { code: 'PROJECT_NOT_FOUND', exitCode: ExitCode.NotFound })
 		}
-		output.data(project)
+		output.data(project, { quiet: it => it.slug })
 	}
 }

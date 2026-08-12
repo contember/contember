@@ -1,4 +1,4 @@
-import { Command, CommandConfiguration, Input, Output } from '@contember/cli-common'
+import { CliError, Command, CommandConfiguration, ExitCode, Input, Output } from '@contember/cli-common'
 import { TenantClientProvider } from '../../../lib/TenantClientProvider.js'
 
 type Args = {}
@@ -16,6 +16,12 @@ export class TenantConfigShowCommand extends Command<Args, Options> {
 	}
 
 	protected async execute(input: Input<Args, Options>, output: Output): Promise<void> {
+		if (output.isQuiet) {
+			throw new CliError('Quiet output is not supported for tenant configuration.', {
+				code: 'QUIET_OUTPUT_UNSUPPORTED',
+				exitCode: ExitCode.InputError,
+			})
+		}
 		const config = await this.tenantClientProvider.project().configuration()
 		output.data(config)
 	}

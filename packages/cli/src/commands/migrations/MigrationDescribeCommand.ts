@@ -42,6 +42,9 @@ export class MigrationDescribeCommand extends Command<Args, Options> {
 		const schema = await this.schemaVersionBuilder.buildSchemaUntil(migration.version)
 		// the description is what the user asked for, so it is data: structured with --json, formatted for a human otherwise
 		const description = this.migrationPrinter.describeMigration(schema, migration)
-		output.data(description, it => this.migrationPrinter.formatMigrationDescription(it, { sqlOnly, noSql }))
+		output.data(description, {
+			human: it => this.migrationPrinter.formatMigrationDescription(it, { sqlOnly, noSql }),
+			quiet: () => migration.version,
+		})
 	}
 }

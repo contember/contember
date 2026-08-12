@@ -65,6 +65,6 @@ export class TenantPersonShowCommand extends Command<Args, Options> {
 		if (person.roles === null) {
 			output.info('Roles are hidden: your token may not read the roles of this identity.')
 		}
-		output.data(person, formatPersonDetail)
+		output.data(person, { human: formatPersonDetail, quiet: it => it.id })
 	}
 }

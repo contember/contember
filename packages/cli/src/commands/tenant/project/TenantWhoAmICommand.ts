@@ -17,6 +17,6 @@ export class TenantWhoAmICommand extends Command<Args, Options> {
 
 	protected async execute(input: Input<Args, Options>, output: Output): Promise<void> {
 		const me = await this.tenantClientProvider.project().whoAmI()
-		output.data(me)
+		output.data(me, { quiet: it => it.id })
 	}
 }

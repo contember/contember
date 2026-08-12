@@ -33,23 +33,40 @@ const createClients = (data: unknown) => {
 describe('TenantApiKeyClient', () => {
 	test('listProjectApiKeys selects project.apiKeys with the project slug variable', async () => {
 		const { clients, requests } = createClients({
-			projectBySlug: { apiKeys: [{ id: 'project-key', description: 'CI' }] },
+			projectBySlug: {
+				apiKeys: [{
+					id: 'project-key',
+					description: 'CI',
+					identity: {
+						id: 'identity-project',
+						projects: [{
+							project: { slug: 'blog' },
+							memberships: [{ role: 'editor', variables: [{ name: 'locale', values: ['cs'] }] }],
+						}],
+					},
+				}],
+			},
 		})
 
 		const result = await clients.apiKey.listProjectApiKeys('blog')
 
 		expect(result).toEqual([{
 			id: 'project-key',
+			identityId: 'identity-project',
 			description: 'CI',
 			type: null,
 			enabled: null,
 			createdAt: null,
 			lastUsedAt: null,
 			expiresAt: null,
+			memberships: [{ role: 'editor', variables: [{ name: 'locale', values: ['cs'] }] }],
 		}])
 		expect(requests[0].variables).toEqual({ slug: 'blog' })
 		expect(requests[0].query).toContain('projectBySlug')
 		expect(requests[0].query).toContain('apiKeys')
+		expect(requests[0].query).toContain('identity')
+		expect(requests[0].query).toContain('memberships')
+		expect(requests[0].query).toContain('values')
 	})
 
 	test('listProjectApiKeys reports a missing or invisible project as typed not-found', async () => {
@@ -160,11 +177,27 @@ describe('tenant api-key commands', () => {
 			const hasTokenHash = isRecord(variables) && typeof variables.tokenHash === 'string'
 
 			if (query.includes('globalApiKeys')) {
-				return json({ globalApiKeys: [{ id: 'k1', type: 'PERMANENT', enabled: true }] })
+				return json({ globalApiKeys: [{ id: 'k1', type: 'PERMANENT', enabled: true, identity: { id: 'identity-global', roles: ['super_admin'] } }] })
 			}
 			if (query.includes('projectBySlug') && query.includes('apiKeys')) {
 				const projectSlug = isRecord(variables) ? variables.slug : undefined
-				return json({ projectBySlug: projectSlug === 'missing' ? null : { apiKeys: [{ id: 'project-key', description: 'CI' }] } })
+				return json({
+					projectBySlug: projectSlug === 'missing'
+						? null
+						: {
+							apiKeys: [{
+								id: 'project-key',
+								description: 'CI',
+								identity: {
+									id: 'identity-project',
+									projects: [{
+										project: { slug: projectSlug },
+										memberships: [{ role: 'editor', variables: [{ name: 'locale', values: ['cs'] }] }],
+									}],
+								},
+							}],
+						},
+				})
 			}
 			if (query.includes('createGlobalApiKey')) {
 				const apiKey = credentialContract === 'missing-generated'
@@ -213,8 +246,20 @@ describe('tenant api-key commands', () => {
 			await new TenantApiKeyListCommand(createProvider()).run(['--json'], output)
 
 			expect(JSON.parse(stdout.text)).toEqual([
-				{ id: 'k1', description: null, type: 'PERMANENT', enabled: true, createdAt: null, lastUsedAt: null, expiresAt: null },
+				{
+					id: 'k1',
+					identityId: 'identity-global',
+					description: null,
+					type: 'PERMANENT',
+					enabled: true,
+					createdAt: null,
+					lastUsedAt: null,
+					expiresAt: null,
+					globalRoles: ['super_admin'],
+				},
 			])
+			expect(sent[0].query).toContain('identity')
+			expect(sent[0].query).toContain('roles')
 			expect(stderr.text).toBe('')
 		})
 
@@ -233,16 +278,31 @@ describe('tenant api-key commands', () => {
 
 			expect(JSON.parse(stdout.text)).toEqual([{
 				id: 'project-key',
+				identityId: 'identity-project',
 				description: 'CI',
 				type: null,
 				enabled: null,
 				createdAt: null,
 				lastUsedAt: null,
 				expiresAt: null,
+				memberships: [{ role: 'editor', variables: [{ name: 'locale', values: ['cs'] }] }],
 			}])
 			expect(sent[0].variables).toEqual({ slug: 'blog' })
 			expect(sent[0].query).toContain('projectBySlug')
+			expect(sent[0].query).toContain('memberships')
 			expect(stderr.text).toBe('')
+		})
+
+		test('human output includes the identity and effective grant context', async () => {
+			const globalOutput = createTestOutput()
+			await new TenantApiKeyListCommand(createProvider()).run([], globalOutput.output)
+			expect(globalOutput.stdout.text).toContain('identity-global')
+			expect(globalOutput.stdout.text).toContain('super_admin')
+
+			const projectOutput = createTestOutput()
+			await new TenantApiKeyListCommand(createProvider()).run(['--project', 'blog'], projectOutput.output)
+			expect(projectOutput.stdout.text).toContain('identity-project')
+			expect(projectOutput.stdout.text).toContain('editor (locale: cs)')
 		})
 
 		test('--project reports a null project response as typed not-found', async () => {

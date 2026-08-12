@@ -14,7 +14,6 @@ import {
 	TenantPersonSignOutCommand,
 	TenantPersonUpdateCommand,
 	TenantSessionCreateCommand,
-	TenantSessionRevokeCommand,
 } from '../../../src/commands/tenant/person/index.js'
 import { RemoteProject } from '../../../src/lib/project/RemoteProject.js'
 import { RemoteProjectProvider } from '../../../src/lib/project/RemoteProjectProvider.js'
@@ -136,14 +135,25 @@ describe('tenant person list', () => {
 		expect(stderr.text).toBe('')
 	})
 
-	test('a non-numeric --limit is an input error and no request is sent', async () => {
+	test('invalid GraphQL pagination integers are rejected locally', async () => {
 		const { output } = createTestOutput()
 
-		await expectCliError(
-			() => new TenantPersonListCommand(createProvider()).run(['--limit', 'lots'], output),
-			'INVALID_OPTION_VALUE',
-			ExitCode.InputError,
-		)
+		for (
+			const { flag, value, code } of [
+				{ flag: '--limit', value: '0', code: 'INVALID_PAGINATION_LIMIT' },
+				{ flag: '--limit', value: 'lots', code: 'INVALID_PAGINATION_LIMIT' },
+				{ flag: '--limit', value: '2147483648', code: 'INVALID_PAGINATION_LIMIT' },
+				{ flag: '--limit', value: '9007199254740992', code: 'INVALID_PAGINATION_LIMIT' },
+				{ flag: '--offset', value: '2147483648', code: 'INVALID_PAGINATION_OFFSET' },
+				{ flag: '--offset', value: '9007199254740992', code: 'INVALID_PAGINATION_OFFSET' },
+			]
+		) {
+			await expectCliError(
+				() => new TenantPersonListCommand(createProvider()).run([flag, value], output),
+				code,
+				ExitCode.InputError,
+			)
+		}
 		expect(requests).toHaveLength(0)
 	})
 })
@@ -196,19 +206,21 @@ describe('tenant person show', () => {
 				createdIp: null,
 				createdUserAgent: null,
 				isCurrent: false,
+				trustForwardedClientInfo: false,
 			}],
 			identityProviders: [{ id: 'pi1', slug: 'google', type: 'oidc', externalIdentifier: 'ext-1', createdAt: '2026-01-03T00:00:00Z' }],
 		})
 		expect(stderr.text).toBe('')
 	})
 
-	test('human mode keeps the session ids on stdout so they can be fed to "tenant session revoke"', async () => {
+	test('human mode includes session ids and forwarded-client trust', async () => {
 		answerWith({ personById: personDetailRow })
 		const { output, stdout } = createTestOutput()
 
 		await new TenantPersonShowCommand(createProvider()).run(['p1'], output)
 
 		expect(stdout.text).toContain('s1')
+		expect(stdout.text).toContain('trust forwarded client info no')
 		expect(stdout.text).toContain('google (oidc)')
 	})
 
@@ -691,32 +703,6 @@ describe('tenant session create', () => {
 		}
 		expect(stdout.text).toBe('')
 		expect(stderr.text).toBe('')
-	})
-})
-
-describe('tenant session revoke', () => {
-	test('refuses to run non-interactively without --yes', async () => {
-		const { output } = createTestOutput()
-
-		await expectCliError(() => new TenantSessionRevokeCommand(createProvider()).run(['s1'], output), 'TTY_UNAVAILABLE', ExitCode.InputError)
-		expect(requests).toHaveLength(0)
-	})
-
-	test('with --yes it revokes the session', async () => {
-		answerWith({ revokeSession: { ok: true } })
-		const { output, stdout } = createTestOutput()
-
-		await new TenantSessionRevokeCommand(createProvider()).run(['s1', '--yes', '--json'], output)
-
-		expect(requests[0].variables).toEqual({ sessionId: 's1' })
-		expect(JSON.parse(stdout.text)).toEqual({ sessionId: 's1', revoked: true })
-	})
-
-	test('an unknown session is a not-found error', async () => {
-		answerWith({ revokeSession: { ok: false, error: { code: 'SESSION_NOT_FOUND', developerMessage: 'gone' } } })
-		const { output } = createTestOutput()
-
-		await expectCliError(() => new TenantSessionRevokeCommand(createProvider()).run(['s1', '--yes'], output), 'SESSION_NOT_FOUND', ExitCode.NotFound)
 	})
 })
 

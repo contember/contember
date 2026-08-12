@@ -580,6 +580,18 @@ describe('tenant mail-template add', () => {
 		expect(sentRequests).toEqual([])
 	})
 
+	test('explicitly empty project and variant selectors are rejected before the request', async () => {
+		for (const flag of ['--project=', '--variant=']) {
+			const { output } = createTestOutput()
+			await expectCliError(
+				new TenantMailTemplateAddCommand(createProvider(), noStdin).run(['EMAIL_OTP', '--subject', 's', '--content', 'c', flag], output),
+				'EMPTY_MAIL_TEMPLATE_SELECTOR',
+				ExitCode.InputError,
+			)
+		}
+		expect(sentRequests).toEqual([])
+	})
+
 	test('--content and --content-stdin together are ambiguous', async () => {
 		const { output } = createTestOutput()
 
@@ -614,6 +626,18 @@ describe('tenant mail-template remove', () => {
 
 		expect(sentRequests[0].variables).toEqual({ templateIdentifier: { type: 'EMAIL_OTP' } })
 		expect(JSON.parse(stdout.text)).toEqual({ projectSlug: null, type: 'EMAIL_OTP', variant: null })
+	})
+
+	test('explicitly empty project and variant selectors are rejected before the request', async () => {
+		for (const flag of ['--project=', '--variant=']) {
+			const { output } = createTestOutput()
+			await expectCliError(
+				new TenantMailTemplateRemoveCommand(createProvider()).run(['EMAIL_OTP', '--yes', flag], output),
+				'EMPTY_MAIL_TEMPLATE_SELECTOR',
+				ExitCode.InputError,
+			)
+		}
+		expect(sentRequests).toEqual([])
 	})
 })
 

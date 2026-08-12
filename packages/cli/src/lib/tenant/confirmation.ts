@@ -1,5 +1,5 @@
 import { CliError, ExitCode, Output } from '@contember/cli-common'
-import prompts from 'prompts'
+import { promptConfirm } from '../prompt/index.js'
 
 export interface ConfirmationArgs {
 	readonly yes: boolean
@@ -25,8 +25,8 @@ export const requireConfirmation = async ({ yes, output, warning }: Confirmation
 	}
 	output.warn(warning)
 	output.info('(to skip this dialog, you can pass the --yes option)')
-	const answers: { ok?: unknown } = await prompts({ type: 'confirm', name: 'ok', message: 'Do you want to continue?' })
-	if (answers.ok !== true) {
+	const confirmed = await promptConfirm(output, { message: 'Do you want to continue?' })
+	if (!confirmed) {
 		throw new CliError('Aborted by the user.', { code: 'ABORTED', exitCode: ExitCode.InputError })
 	}
 }

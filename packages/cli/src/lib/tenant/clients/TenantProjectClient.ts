@@ -33,7 +33,10 @@ import {
 	project$,
 	projectSecretInfo$$,
 	query$,
+	roleConditionVariableDefinition$$,
 	roleDefinition$,
+	roleEntityVariableDefinition$$,
+	rolePredefinedVariableDefinition$$,
 	roleVariableDefinition$$,
 	setProjectSecretError$$,
 	setProjectSecretResponse$$,
@@ -42,6 +45,7 @@ import {
 	updateProjectError$$,
 	updateProjectResponse$$,
 } from '@contember/graphql-client-tenant'
+import type { ModelType } from 'graphql-ts-client-api'
 import { TenantApiTransport } from '../TenantApiTransport.js'
 import { TenantGlobalConfig, TenantIdpOptions } from '../tenantConfig.js'
 
@@ -59,9 +63,15 @@ export interface TenantProjectSummary {
 
 export interface TenantProjectRole {
 	name: string
-	/** Variable names the role expects (see `addProjectMember`'s `memberships[].variables`) — kinds/entity targets are not exposed here. */
+	/** Variable names the role expects, retained for compatibility. */
 	variables: string[]
+	variableDefinitions: TenantProjectRoleVariableDefinition[]
 }
+
+export type TenantProjectRoleVariableDefinition =
+	| { type: 'entity'; name: string; entityName: string }
+	| { type: 'predefined'; name: string; value: string }
+	| { type: 'condition'; name: string }
 
 export interface TenantProjectSecret {
 	key: string
@@ -194,10 +204,24 @@ const configurationFetcher = query$.configuration(
 		),
 )
 const projectsFetcher = query$.projects(project$.id.name.slug)
+const roleVariableFetcher = roleVariableDefinition$$
+	.on(roleConditionVariableDefinition$$)
+	.on(roleEntityVariableDefinition$$)
+	.on(rolePredefinedVariableDefinition$$)
+const toRoleVariableDefinition = (variable: ModelType<typeof roleVariableFetcher>): TenantProjectRoleVariableDefinition => {
+	switch (variable.__typename) {
+		case 'RoleEntityVariableDefinition':
+			return { type: 'entity', name: variable.name, entityName: variable.entityName }
+		case 'RolePredefinedVariableDefinition':
+			return { type: 'predefined', name: variable.name, value: variable.value }
+		case 'RoleConditionVariableDefinition':
+			return { type: 'condition', name: variable.name }
+	}
+}
 const projectBySlugFetcher = query$.projectBySlug(
 	project$
 		.id.name.slug.config
-		.roles(roleDefinition$.name.variables(roleVariableDefinition$$))
+		.roles(roleDefinition$.name.variables(roleVariableFetcher))
 		.secrets(projectSecretInfo$$),
 )
 const identityProvidersFetcher = query$.identityProviders(identityProvider$.slug.type.disabledAt)
@@ -237,7 +261,11 @@ export class TenantProjectClient {
 			name: project.name,
 			slug: project.slug,
 			config: project.config,
-			roles: project.roles.map(role => ({ name: role.name, variables: role.variables.map(it => it.name) })),
+			roles: project.roles.map(role => ({
+				name: role.name,
+				variables: role.variables.map(it => it.name),
+				variableDefinitions: role.variables.map(toRoleVariableDefinition),
+			})),
 			secrets: project.secrets.map(it => ({ key: it.key, createdAt: it.createdAt, updatedAt: it.updatedAt })),
 		}
 	}

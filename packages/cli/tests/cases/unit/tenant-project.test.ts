@@ -84,7 +84,14 @@ describe('TenantProjectShowCommand ("tenant project show")', () => {
 				name: 'Blog',
 				slug: 'blog',
 				config: { foo: 1 },
-				roles: [{ name: 'editor', variables: [{ name: 'language' }] }],
+				roles: [{
+					name: 'editor',
+					variables: [
+						{ __typename: 'RoleEntityVariableDefinition', name: 'author', entityName: 'Author' },
+						{ __typename: 'RolePredefinedVariableDefinition', name: 'language', value: 'cs' },
+						{ __typename: 'RoleConditionVariableDefinition', name: 'published' },
+					],
+				}],
 				secrets: [{ key: 'API_KEY', createdAt: '2024-01-01T00:00:00Z', updatedAt: '2024-01-02T00:00:00Z' }],
 			},
 		})
@@ -97,10 +104,41 @@ describe('TenantProjectShowCommand ("tenant project show")', () => {
 			name: 'Blog',
 			slug: 'blog',
 			config: { foo: 1 },
-			roles: [{ name: 'editor', variables: ['language'] }],
+			roles: [{
+				name: 'editor',
+				variables: ['author', 'language', 'published'],
+				variableDefinitions: [
+					{ type: 'entity', name: 'author', entityName: 'Author' },
+					{ type: 'predefined', name: 'language', value: 'cs' },
+					{ type: 'condition', name: 'published' },
+				],
+			}],
 			secrets: [{ key: 'API_KEY', createdAt: '2024-01-01T00:00:00Z', updatedAt: '2024-01-02T00:00:00Z' }],
 		})
 		expect(requests[0].variables).toEqual({ slug: 'blog' })
+		expect(requests[0].query).toContain('__typename')
+		expect(requests[0].query).toContain('entityName')
+		expect(requests[0].query).toContain('value')
+	})
+
+	test('human output retains role variable definition metadata', async () => {
+		responder = () => ({
+			projectBySlug: {
+				id: 'p1',
+				name: 'Blog',
+				slug: 'blog',
+				config: {},
+				roles: [{ name: 'editor', variables: [{ __typename: 'RoleEntityVariableDefinition', name: 'author', entityName: 'Author' }] }],
+				secrets: [],
+			},
+		})
+		const { output, stdout } = createTestOutput()
+
+		await new TenantProjectShowCommand(createTenantClientProvider()).run(['blog'], output)
+
+		expect(stdout.text).toContain('variableDefinitions')
+		expect(stdout.text).toContain('entityName')
+		expect(stdout.text).toContain('Author')
 	})
 
 	// a missing project and a forbidden one are indistinguishable at the API — both surface as a typed not-found

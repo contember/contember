@@ -61,20 +61,6 @@ export const assertBcryptHash = (hash: string): void => {
 	}
 }
 
-export const parseNonNegativeInteger = (value: string | undefined, option: string): number | undefined => {
-	if (value === undefined) {
-		return undefined
-	}
-	const parsed = Number(value)
-	if (!Number.isInteger(parsed) || parsed < 0) {
-		throw new CliError(`--${option} must be a non-negative integer, got "${value}".`, {
-			code: 'INVALID_OPTION_VALUE',
-			exitCode: ExitCode.InputError,
-		})
-	}
-	return parsed
-}
-
 export type CaptchaTokenOptions = {
 	readonly ['captcha-token']?: string
 	readonly ['captcha-token-env']?: string

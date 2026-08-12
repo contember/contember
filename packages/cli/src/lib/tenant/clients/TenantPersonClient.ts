@@ -29,8 +29,6 @@ import {
 	removeGlobalIdentityRolesResult$,
 	resetPersonMfaError$$,
 	resetPersonMfaResponse$$,
-	revokeSessionError$$,
-	revokeSessionResponse$$,
 	sessionInfo$$,
 	type SignInOptions,
 	signUpError$$,
@@ -59,6 +57,7 @@ export interface TenantPersonSession {
 	createdIp: string | null
 	createdUserAgent: string | null
 	isCurrent: boolean
+	trustForwardedClientInfo: boolean
 }
 
 export interface TenantPersonIdentityProvider {
@@ -143,7 +142,6 @@ const changePasswordFetcher = mutation$.changePassword(changePasswordResponse$$.
 const disablePersonFetcher = mutation$.disablePerson(disablePersonResponse$$.error(disablePersonError$$))
 const forceSignOutPersonFetcher = mutation$.forceSignOutPerson(forceSignOutPersonResponse$$.error(forceSignOutPersonError$$))
 const resetPersonMfaFetcher = mutation$.resetPersonMfa(resetPersonMfaResponse$$.error(resetPersonMfaError$$))
-const revokeSessionFetcher = mutation$.revokeSession(revokeSessionResponse$$.error(revokeSessionError$$))
 const createResetPasswordRequestFetcher = mutation$.createResetPasswordRequest(
 	createPasswordResetRequestResponse$$.error(createPasswordResetRequestError$$),
 )
@@ -212,6 +210,7 @@ export class TenantPersonClient {
 				createdIp: it.createdIp ?? null,
 				createdUserAgent: it.createdUserAgent ?? null,
 				isCurrent: it.isCurrent,
+				trustForwardedClientInfo: it.trustForwardedClientInfo,
 			})),
 			identityProviders: person.identityProviders.map(it => ({
 				id: it.id,
@@ -287,11 +286,6 @@ export class TenantPersonClient {
 			email: tokenResult.person.email ?? null,
 			name: tokenResult.person.name ?? null,
 		}
-	}
-
-	public async revokeSession(sessionId: string): Promise<void> {
-		const result = await this.transport.exec(revokeSessionFetcher, { sessionId })
-		this.transport.assertOk(result.revokeSession, `revokeSession(${sessionId})`)
 	}
 
 	/** Returns the identity's roles after the change, or null when the caller may not read them. */

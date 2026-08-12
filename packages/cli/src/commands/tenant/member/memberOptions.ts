@@ -12,17 +12,6 @@ export const requireOptionValue = (value: string | undefined, name: string): str
 	return value
 }
 
-export const parseIntegerOption = (value: string | undefined, name: string): number | undefined => {
-	if (value === undefined) {
-		return undefined
-	}
-	const parsed = Number(value)
-	if (!Number.isInteger(parsed) || parsed < 0) {
-		throw new CliError(`Option --${name} must be a non-negative integer, got "${value}".`, { code: 'INVALID_INPUT', exitCode: ExitCode.InputError })
-	}
-	return parsed
-}
-
 /** Both the fetched `TenantMembership` and the `MembershipInput` sent to the API, which differ only in readonly-ness. */
 export interface MembershipLike {
 	readonly role: string

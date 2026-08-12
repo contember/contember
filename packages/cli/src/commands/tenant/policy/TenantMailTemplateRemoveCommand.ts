@@ -1,7 +1,14 @@
 import { Command, CommandConfiguration, Input, Output } from '@contember/cli-common'
 import { TenantClientProvider } from '../../../lib/TenantClientProvider.js'
 import { requireConfirmation } from '../../../lib/tenant/confirmation.js'
-import { describeMailTemplate, formatMailTemplateRef, MailTemplateRef, mailTypeValues, parseMailType } from './policyInput.js'
+import {
+	describeMailTemplate,
+	formatMailTemplateRef,
+	MailTemplateRef,
+	mailTypeValues,
+	parseMailType,
+	parseOptionalMailTemplateSelector,
+} from './policyInput.js'
 
 type Args = {
 	type: string
@@ -31,9 +38,9 @@ export class TenantMailTemplateRemoveCommand extends Command<Args, Options> {
 
 	protected async execute(input: Input<Args, Options>, output: Output): Promise<void> {
 		const ref: MailTemplateRef = {
-			projectSlug: input.getOption('project') ?? null,
+			projectSlug: parseOptionalMailTemplateSelector(input.getOption('project'), '--project') ?? null,
 			type: parseMailType(input.getArgument('type')),
-			variant: input.getOption('variant') ?? null,
+			variant: parseOptionalMailTemplateSelector(input.getOption('variant'), '--variant') ?? null,
 		}
 		const description = describeMailTemplate(ref)
 		await requireConfirmation({

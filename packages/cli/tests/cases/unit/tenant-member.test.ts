@@ -158,6 +158,27 @@ describe('tenant member list', () => {
 		expect(requests).toHaveLength(0)
 	})
 
+	test('invalid GraphQL pagination integers are rejected locally', async () => {
+		const { output } = createTestOutput()
+
+		for (
+			const { flag, value, code } of [
+				{ flag: '--limit', value: '0', code: 'INVALID_PAGINATION_LIMIT' },
+				{ flag: '--limit', value: '2147483648', code: 'INVALID_PAGINATION_LIMIT' },
+				{ flag: '--limit', value: '9007199254740992', code: 'INVALID_PAGINATION_LIMIT' },
+				{ flag: '--offset', value: '2147483648', code: 'INVALID_PAGINATION_OFFSET' },
+				{ flag: '--offset', value: '9007199254740992', code: 'INVALID_PAGINATION_OFFSET' },
+			]
+		) {
+			await expectCliError(
+				new TenantMemberListCommand(clientProvider()).run(['--project', 'blog', flag, value], output),
+				code,
+				ExitCode.InputError,
+			)
+		}
+		expect(requests).toHaveLength(0)
+	})
+
 	test('an empty result warns that it may be a permission problem, on stderr only', async () => {
 		responseData = { projectBySlug: { members: [] } }
 		const { output, stdout, stderr } = createTestOutput()

@@ -9,7 +9,7 @@ type Args = {
 
 type Options = {}
 
-/** Renders the whole record as an indented block — the sessions are what `tenant session revoke` needs. */
+/** Renders the whole record as an indented block. */
 const formatPersonDetail = (person: TenantPersonDetail): string => {
 	const lines = [
 		`Person:       ${humanText(person.id)}`,
@@ -26,7 +26,9 @@ const formatPersonDetail = (person: TenantPersonDetail): string => {
 		lines.push(
 			`  ${humanText(session.id)}  created ${humanText(session.createdAt)}  last used ${
 				session.lastUsedAt === null ? '-' : humanText(session.lastUsedAt)
-			}  from ${session.lastIp === null ? '-' : humanText(session.lastIp)}`,
+			}  from ${session.lastIp === null ? '-' : humanText(session.lastIp)}  trust forwarded client info ${
+				session.trustForwardedClientInfo ? 'yes' : 'no'
+			}`,
 		)
 	}
 	lines.push(`Identity providers: ${person.identityProviders.length === 0 ? 'none' : ''}`)

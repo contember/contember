@@ -7,22 +7,40 @@ import {
 	createApiKeyResult$,
 	disableApiKeyError$$,
 	disableApiKeyResponse$$,
+	identity$,
+	identityProjectRelation$,
+	membership$,
 	type MembershipInput,
 	mutation$,
 	project$,
 	query$,
+	variableEntry$$,
 } from '@contember/graphql-client-tenant'
 import { CliError, ExitCode } from '@contember/cli-common'
 import { TenantApiTransport } from '../TenantApiTransport.js'
 
 export interface TenantApiKey {
 	id: string
+	identityId: string
 	description: string | null
 	type: string | null
 	enabled: boolean | null
 	createdAt: string | null
 	lastUsedAt: string | null
 	expiresAt: string | null
+}
+
+export interface TenantGlobalApiKey extends TenantApiKey {
+	globalRoles: string[] | null
+}
+
+export interface TenantApiKeyMembership {
+	role: string
+	variables: { name: string; values: string[] }[]
+}
+
+export interface TenantProjectApiKey extends TenantApiKey {
+	memberships: TenantApiKeyMembership[]
 }
 
 export interface TenantApiKeyWithToken {
@@ -47,8 +65,16 @@ export interface CreateGlobalApiKeyArgs {
 }
 
 // Fetchers are immutable and reusable, so they are built once at module load.
-const globalApiKeysFetcher = query$.globalApiKeys(apiKey$$)
-const projectApiKeysFetcher = query$.projectBySlug(project$.apiKeys(apiKey$$))
+const globalApiKeysFetcher = query$.globalApiKeys(apiKey$$.identity(identity$.id.roles))
+const projectApiKeysFetcher = query$.projectBySlug(
+	project$.apiKeys(
+		apiKey$$.identity(
+			identity$.id.projects(
+				identityProjectRelation$.project(project$.slug).memberships(membership$.role.variables(variableEntry$$)),
+			),
+		),
+	),
+)
 const createApiKeyFetcher = mutation$.createApiKey(
 	createApiKeyResponse$$.error(createApiKeyError$$).result(createApiKeyResult$.apiKey(apiKeyWithToken$$)),
 )
@@ -64,12 +90,15 @@ export class TenantApiKeyClient {
 	) {
 	}
 
-	public async listGlobalApiKeys(): Promise<TenantApiKey[]> {
+	public async listGlobalApiKeys(): Promise<TenantGlobalApiKey[]> {
 		const result = await this.transport.exec(globalApiKeysFetcher, {})
-		return result.globalApiKeys.map(toApiKey)
+		return result.globalApiKeys.map(it => ({
+			...toApiKey(it),
+			globalRoles: it.identity.roles ? [...it.identity.roles] : null,
+		}))
 	}
 
-	public async listProjectApiKeys(projectSlug: string): Promise<TenantApiKey[]> {
+	public async listProjectApiKeys(projectSlug: string): Promise<TenantProjectApiKey[]> {
 		const result = await this.transport.exec(projectApiKeysFetcher, { slug: projectSlug })
 		const project = result.projectBySlug
 		if (!project) {
@@ -79,7 +108,13 @@ export class TenantApiKeyClient {
 				details: { projectSlug },
 			})
 		}
-		return project.apiKeys.map(toApiKey)
+		return project.apiKeys.map(it => ({
+			...toApiKey(it),
+			memberships: it.identity.projects.find(relation => relation.project.slug === projectSlug)?.memberships.map(membership => ({
+				role: membership.role,
+				variables: membership.variables.map(variable => ({ name: variable.name, values: [...variable.values] })),
+			})) ?? [],
+		}))
 	}
 
 	/** Project-scoped key. The token in the result is shown exactly once — the server does not store or re-expose it. */
@@ -117,6 +152,7 @@ export class TenantApiKeyClient {
 
 const toApiKey = (it: {
 	readonly id: string
+	readonly identity: { readonly id: string }
 	readonly description?: string
 	readonly type?: string
 	readonly enabled?: boolean
@@ -125,6 +161,7 @@ const toApiKey = (it: {
 	readonly expiresAt?: string
 }): TenantApiKey => ({
 	id: it.id,
+	identityId: it.identity.id,
 	description: it.description ?? null,
 	type: it.type ?? null,
 	enabled: it.enabled ?? null,

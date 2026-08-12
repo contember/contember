@@ -7,16 +7,17 @@ const repoRoot = resolve(import.meta.dir, '../../..')
 const cliEntry = join(repoRoot, 'packages/cli/src/run.ts')
 
 const runCli = async (args: string[]) => {
+	const env = { ...process.env }
+	delete env.CONTEMBER_PROJECT_NAME
 	const proc = Bun.spawn(['bun', '--conditions=typescript', cliEntry, ...args], {
 		cwd: repoRoot,
 		env: {
-			...process.env,
+			...env,
 			CONTEMBER_API_URL: apiUrl,
 			CONTEMBER_API_TOKEN: rootToken,
 			CONTEMBER_CLI_PACKAGE_ROOT: join(repoRoot, 'packages/cli'),
 			CONTEMBER_DIR: repoRoot,
 			CONTEMBER_DSN: '',
-			CONTEMBER_PROJECT_NAME: 'cli_session_test',
 			CONTEMBER_SKIP_VERSION_CHECK: '1',
 			NO_COLOR: '1',
 		},
@@ -88,6 +89,11 @@ const expectSessionIdentity = async (token: string, identityId: string, email: s
 }
 
 test('CLI: tenant session create is discoverable and keeps structured output process-safe', async () => {
+	const projectListResult = await runCli(['tenant', 'project', 'list', '--json'])
+	expect(projectListResult.exitCode).toBe(0)
+	expect(projectListResult.stderr).toBe('')
+	expect(Array.isArray(JSON.parse(projectListResult.stdout))).toBe(true)
+
 	const catalogResult = await runCli(['commands', '--json'])
 	expect(catalogResult.exitCode).toBe(0)
 	expect(catalogResult.stderr).toBe('')

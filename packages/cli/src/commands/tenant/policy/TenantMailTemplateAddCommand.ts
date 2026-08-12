@@ -1,7 +1,15 @@
 import { Command, CommandConfiguration, Input, Output } from '@contember/cli-common'
 import { TenantClientProvider } from '../../../lib/TenantClientProvider.js'
 import { TenantMailTemplate } from '../../../lib/tenant/tenantConfig.js'
-import { describeMailTemplate, formatMailTemplateRef, MailTemplateRef, mailTypeValues, parseMailType, readTextInput } from './policyInput.js'
+import {
+	describeMailTemplate,
+	formatMailTemplateRef,
+	MailTemplateRef,
+	mailTypeValues,
+	parseMailType,
+	parseOptionalMailTemplateSelector,
+	readTextInput,
+} from './policyInput.js'
 import { readStdinText, StdinReader } from '../../../lib/tenant/stdin.js'
 
 type Args = {
@@ -46,6 +54,8 @@ export class TenantMailTemplateAddCommand extends Command<Args, Options> {
 
 	protected async execute(input: Input<Args, Options>, output: Output): Promise<void> {
 		const type = parseMailType(input.getArgument('type'))
+		const variant = parseOptionalMailTemplateSelector(input.getOption('variant'), '--variant')
+		const projectSlug = parseOptionalMailTemplateSelector(input.getOption('project'), '--project')
 		const subject = input.getOption('subject')
 		const content = await readTextInput({
 			label: 'template body',
@@ -60,8 +70,8 @@ export class TenantMailTemplateAddCommand extends Command<Args, Options> {
 			type,
 			subject,
 			content,
-			variant: input.getOption('variant'),
-			projectSlug: input.getOption('project'),
+			variant,
+			projectSlug,
 			replyTo: input.getOption('reply-to'),
 			// omitted means "use the server default", which is true — only an explicit opt-out is sent
 			useLayout: input.getOption('no-layout') === true ? false : undefined,

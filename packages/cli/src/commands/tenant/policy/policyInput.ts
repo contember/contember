@@ -83,6 +83,14 @@ export const describeMailTemplate = (ref: MailTemplateRef): string =>
 /** Stable scalar form for quiet output. */
 export const formatMailTemplateRef = (ref: MailTemplateRef): string => `${ref.projectSlug ?? 'global'}:${ref.type}:${ref.variant ?? 'default'}`
 
+/** Omitted selects the default scope/variant; an explicitly empty selector is almost certainly a shell mistake. */
+export const parseOptionalMailTemplateSelector = (value: string | undefined, flag: '--project' | '--variant'): string | undefined => {
+	if (value === '') {
+		throw inputError(`${flag} must not be empty. Omit it to select the default.`, 'EMPTY_MAIL_TEMPLATE_SELECTOR')
+	}
+	return value
+}
+
 /** Case-insensitive, so `reset_password_request` works as well as the schema's `RESET_PASSWORD_REQUEST`. */
 export const parseMailType = (value: string): MailType => {
 	const normalized = value.toUpperCase()

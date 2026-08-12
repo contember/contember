@@ -2,7 +2,7 @@ import { Command, CommandConfiguration, Input, Output } from '@contember/cli-com
 import { PersonsFilter } from '@contember/graphql-client-tenant'
 import { TenantClientProvider } from '../../../lib/TenantClientProvider.js'
 import { TenantPerson } from '../../../lib/tenant/clients/TenantPersonClient.js'
-import { parseNonNegativeInteger } from './personInput.js'
+import { parsePaginationLimit, parsePaginationOffset } from '../../../lib/tenant/input/pagination.js'
 
 type Args = {}
 
@@ -44,8 +44,8 @@ export class TenantPersonListCommand extends Command<Args, Options> {
 
 		const persons = await this.tenantClientProvider.person().listPersons({
 			filter: hasFilter ? filter : undefined,
-			limit: parseNonNegativeInteger(input.getOption('limit'), 'limit'),
-			offset: parseNonNegativeInteger(input.getOption('offset'), 'offset'),
+			limit: parsePaginationLimit(input.getOption('limit')),
+			offset: parsePaginationOffset(input.getOption('offset')),
 		})
 
 		if (persons.length === 0) {

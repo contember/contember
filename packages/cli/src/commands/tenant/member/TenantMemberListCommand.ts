@@ -2,7 +2,8 @@ import { CliError, Command, CommandConfiguration, ExitCode, Input, Output } from
 import type { MemberType } from '@contember/graphql-client-tenant'
 import { TenantClientProvider } from '../../../lib/TenantClientProvider.js'
 import type { TenantProjectMember } from '../../../lib/tenant/clients/index.js'
-import { formatMemberships, parseIntegerOption, requireOptionValue } from './memberOptions.js'
+import { parsePaginationLimit, parsePaginationOffset } from '../../../lib/tenant/input/pagination.js'
+import { formatMemberships, requireOptionValue } from './memberOptions.js'
 
 type Args = {}
 
@@ -46,8 +47,8 @@ export class TenantMemberListCommand extends Command<Args, Options> {
 				personId: input.getOption('person'),
 				memberType: parseMemberType(input.getOption('type')),
 			},
-			limit: parseIntegerOption(input.getOption('limit'), 'limit'),
-			offset: parseIntegerOption(input.getOption('offset'), 'offset'),
+			limit: parsePaginationLimit(input.getOption('limit')),
+			offset: parsePaginationOffset(input.getOption('offset')),
 		})
 
 		output.table<TenantProjectMember>(

@@ -42,6 +42,10 @@ export class CliError extends Error {
 	}
 }
 
+const unexpectedCliErrors = new WeakSet<CliError>()
+
+export const isUnexpectedCliError = (error: CliError): boolean => unexpectedCliErrors.has(error)
+
 /**
  * Normalizes anything thrown by a command into a {@link CliError}. Legacy `throw 'some message'` is
  * treated as an input error, everything else unexpected as an internal one.
@@ -57,9 +61,13 @@ export const toCliError = (error: unknown): CliError => {
 		return new CliError(error, { code: 'ERROR', exitCode: ExitCode.InputError })
 	}
 	if (error instanceof Error) {
-		return new CliError(error.message, { code: 'UNKNOWN', exitCode: ExitCode.InternalError, details: error.stack, cause: error })
+		const cliError = new CliError(error.message, { code: 'UNKNOWN', exitCode: ExitCode.InternalError, details: error.stack, cause: error })
+		unexpectedCliErrors.add(cliError)
+		return cliError
 	}
-	return new CliError(safeString(error), { code: 'UNKNOWN', exitCode: ExitCode.InternalError, details: error })
+	const cliError = new CliError(safeString(error), { code: 'UNKNOWN', exitCode: ExitCode.InternalError, details: error })
+	unexpectedCliErrors.add(cliError)
+	return cliError
 }
 
 const safeString = (value: unknown): string => {

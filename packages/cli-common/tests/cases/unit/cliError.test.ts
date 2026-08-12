@@ -74,6 +74,33 @@ describe('renderCliError', () => {
 		})
 	})
 
+	test('json mode redacts unexpected error messages and stacks', () => {
+		const { output, stdout, stderr } = createTestOutput()
+		output.setMode('json')
+		const normalized = toCliError(new Error('sentinel-internal-message'))
+		const exitCode = renderCliError(normalized, output)
+		expect(exitCode).toBe(ExitCode.InternalError)
+		expect(stdout.text).toBe('')
+		expect(stderr.text).not.toContain('sentinel-internal-message')
+		expect(JSON.parse(stderr.text)).toStrictEqual({
+			ok: false,
+			error: { code: 'UNKNOWN', message: 'An unexpected error occurred.', retryable: false, details: null },
+		})
+	})
+
+	test('json mode preserves an explicit CliError with UNKNOWN code', () => {
+		const { output, stderr } = createTestOutput()
+		output.setMode('json')
+		const error = new CliError('public failure', { code: 'UNKNOWN', exitCode: ExitCode.InternalError, details: { operation: 'deploy' } })
+		renderCliError(error, output)
+		expect(JSON.parse(stderr.text).error).toStrictEqual({
+			code: 'UNKNOWN',
+			message: 'public failure',
+			retryable: false,
+			details: { operation: 'deploy' },
+		})
+	})
+
 	test('normalizes circular and bigint details before JSON rendering', () => {
 		const details: Record<string, unknown> = { count: 2n }
 		details.self = details

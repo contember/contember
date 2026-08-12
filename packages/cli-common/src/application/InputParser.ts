@@ -11,7 +11,10 @@ export class InputParser {
 	constructor(private _arguments: Argument[], private options: Option[]) {}
 
 	parse<Args extends Arguments, Opts extends Options>(args: string[]): InputParserResult<Args, Opts> {
-		args = args.reduce<string[]>((acc, arg) => [...acc, ...(arg.startsWith('-') ? arg.split('=', 2) : [arg])], [])
+		args = args.flatMap(arg => {
+			const separator = arg.startsWith('-') ? arg.indexOf('=') : -1
+			return separator === -1 ? [arg] : [arg.slice(0, separator), arg.slice(separator + 1)]
+		})
 		let options: Options = {}
 		let argumentValues: Arguments = {}
 		const diagnostics: string[] = []

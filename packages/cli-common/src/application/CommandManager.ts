@@ -21,7 +21,7 @@ export interface CommandCatalogEntry {
 
 export type CommandResolution =
 	| { readonly type: 'command'; readonly entry: CommandCatalogEntry; readonly args: string[] }
-	| { readonly type: 'group'; readonly name: string; readonly entries: readonly CommandCatalogEntry[] }
+	| { readonly type: 'group'; readonly name: string; readonly entries: readonly CommandCatalogEntry[]; readonly args: string[] }
 
 const splitTokens = (name: string): string[] => name.split(/[\s:]+/).filter(it => it !== '')
 
@@ -93,7 +93,8 @@ export class CommandManager {
 
 		const group = this.groups.get(tokens.join(' '))
 		if (group !== undefined && group.length > 0) {
-			return { type: 'group', name: tokens.join(' '), entries: group }
+			const argvIndex = checkpoints[checkpoints.length - 1]?.argvIndex ?? 0
+			return { type: 'group', name: tokens.join(' '), entries: group, args: args.slice(argvIndex) }
 		}
 
 		for (let i = checkpoints.length - 1; i >= 0; i--) {

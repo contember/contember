@@ -68,6 +68,10 @@ export class Application {
 		try {
 			const resolution = this.commandManager.resolve(args)
 			if (resolution.type === 'group') {
+				const groupHelp = resolution.args.length === 1 && (resolution.args[0] === '--help' || resolution.args[0] === '-h')
+				if (resolution.args.length > 0 && !groupHelp) {
+					throw new InvalidInputError(`Unexpected input after command group "${resolution.name}": ${resolution.args.join(' ')}`)
+				}
 				this.printGroupHelp(resolution.name, resolution.entries)
 				return ExitCode.Success
 			}

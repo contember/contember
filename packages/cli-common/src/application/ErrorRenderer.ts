@@ -1,5 +1,5 @@
 import chalk from 'chalk'
-import { ExitCode, toCliError } from './CliError.js'
+import { ExitCode, isUnexpectedCliError, toCliError } from './CliError.js'
 import { escapeTerminalText, Output } from './Output.js'
 
 /**
@@ -9,7 +9,7 @@ import { escapeTerminalText, Output } from './Output.js'
 export const renderCliError = (error: unknown, output: Output): ExitCode => {
 	const cliError = toCliError(error)
 	if (output.isJson) {
-		output.writeStderr(serializeError(cliError))
+		output.writeStderr(serializeError(cliError, isUnexpectedCliError(cliError)))
 		return cliError.exitCode
 	}
 	output.writeStderr(chalk.red(`Error [${escapeTerminalText(cliError.code)}]: ${escapeTerminalText(cliError.message)}`))
@@ -19,16 +19,16 @@ export const renderCliError = (error: unknown, output: Output): ExitCode => {
 	return cliError.exitCode
 }
 
-const serializeError = (error: ReturnType<typeof toCliError>): string => {
+const serializeError = (error: ReturnType<typeof toCliError>, unexpected: boolean): string => {
 	try {
 		return JSON.stringify(
 			{
 				ok: false,
 				error: {
 					code: error.code,
-					message: error.message,
+					message: unexpected ? 'An unexpected error occurred.' : error.message,
 					retryable: error.retryable,
-					details: error.details ?? null,
+					details: unexpected ? null : error.details ?? null,
 				},
 			},
 			null,

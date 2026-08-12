@@ -133,12 +133,15 @@ class RunOverridingCommand extends Command<{}, {}> {
 const createApplication = (extra: CommandFactoryList = {}): { application: Application; test: TestOutput } => {
 	const printSchema = () => new PrintSchemaCommand()
 	const tenantApply = () => new GroupCommand()
+	const workspaceUpdateApi = () => new GroupCommand()
 	const commands: CommandFactoryList = {
 		['project print-schema']: printSchema,
 		['project:print-schema']: printSchema,
 		['echo']: () => new EchoCommand(),
 		['tenant apply']: tenantApply,
 		['tenant:apply']: tenantApply,
+		['workspace update api']: workspaceUpdateApi,
+		['workspace:update:api']: workspaceUpdateApi,
 		...extra,
 	}
 	const testOutput = createTestOutput()
@@ -253,6 +256,28 @@ describe('help', () => {
 		expect(io.stderr.text).toContain('tenant apply')
 	})
 
+	test('a group with -h prints its commands and succeeds', async () => {
+		const { application, test: io } = createApplication()
+		expect(await application.execute(['tenant', '-h'])).toBe(ExitCode.Success)
+		expect(io.stderr.text).toContain('tenant apply')
+	})
+
+	for (const args of [['tenant', '--nonsense'], ['tenant', '--help=unexpected'], ['project', '--json']]) {
+		test(`a group rejects trailing input: ${args.join(' ')}`, async () => {
+			const { application, test: io } = createApplication()
+			expect(await application.execute(args)).toBe(ExitCode.InputError)
+			expect(io.stderr.text).not.toContain('Usage: tenant <command>')
+			expect(io.stderr.text).toContain('INVALID_INPUT')
+		})
+	}
+
+	test('an intermediate group rejects trailing input', async () => {
+		const { application, test: io } = createApplication()
+		expect(await application.execute(['workspace', 'update', '--execute'])).toBe(ExitCode.InputError)
+		expect(io.stderr.text).not.toContain('Usage: workspace update <command>')
+		expect(io.stderr.text).toContain('INVALID_INPUT')
+	})
+
 	test('a command help goes to stderr and lists the global options', async () => {
 		const { application, test: io } = createApplication()
 		expect(await application.execute(['echo', '--help'])).toBe(ExitCode.Success)
@@ -273,7 +298,12 @@ describe('errors', () => {
 		const io = createTestOutput()
 		io.output.applyGlobalOptions(readGlobalOptionsFromArgs(['--json']))
 		expect(renderCliError(new Error('bootstrap failed'), io.output)).toBe(ExitCode.InternalError)
-		expect(JSON.parse(io.stderr.text).error).toMatchObject({ code: 'UNKNOWN', message: 'bootstrap failed' })
+		expect(JSON.parse(io.stderr.text).error).toStrictEqual({
+			code: 'UNKNOWN',
+			message: 'An unexpected error occurred.',
+			retryable: false,
+			details: null,
+		})
 	})
 
 	test('an unknown command exits with an input error', async () => {

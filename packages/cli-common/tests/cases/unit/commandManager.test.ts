@@ -208,6 +208,7 @@ describe('groups', () => {
 		expect(resolution.type).toBe('group')
 		if (resolution.type === 'group') {
 			expect(resolution.name).toBe('migrations')
+			expect(resolution.args).toStrictEqual([])
 			expect(resolution.entries.map(it => it.name).sort()).toStrictEqual(['migrations describe', 'migrations diff', 'migrations execute'])
 		}
 	})
@@ -221,7 +222,20 @@ describe('groups', () => {
 	})
 
 	test('a group followed by an option still resolves to a group', () => {
-		expect(defaultManager().resolve(['tenant', '--help']).type).toBe('group')
+		const resolution = defaultManager().resolve(['tenant', '--help'])
+		expect(resolution.type).toBe('group')
+		if (resolution.type === 'group') {
+			expect(resolution.args).toStrictEqual(['--help'])
+		}
+	})
+
+	test('an intermediate group retains its trailing argv', () => {
+		const resolution = defaultManager().resolve(['workspace', 'update', '--execute'])
+		expect(resolution.type).toBe('group')
+		if (resolution.type === 'group') {
+			expect(resolution.name).toBe('workspace update')
+			expect(resolution.args).toStrictEqual(['--execute'])
+		}
 	})
 })
 

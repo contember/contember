@@ -61,12 +61,22 @@ contember commands --json
 
 ## Output
 
-The rule is strict and has no exceptions:
+The streams have fixed roles:
 
 - **stdout is data.** The result of the command, nothing else.
-- **stderr is diagnostics.** Progress, warnings, confirmations, help and errors never mix with result data.
+- **stderr is diagnostics.** Progress, warnings, confirmations and help never mix with result data.
 
-So a command can always be piped without filtering its diagnostics out.
+In `--json` and `--quiet` modes, the stable automation contract has three outcome classes:
+
+- A successful command exits with `0`. It writes result data to stdout when it has a payload; otherwise
+  stdout may be empty.
+- A result-bearing domain check or a batch with partial failures may exit nonzero while still writing
+  its result to stdout. It does not write a fatal error envelope.
+- An invocation, transport or internal failure that aborts the command writes the error to stderr and
+  leaves stdout empty. In JSON mode, stderr contains the fatal error envelope described below.
+
+Use the exit code to distinguish a nonzero result from success. In human mode, a command may write
+contextual data to stdout before a later fatal summary on stderr.
 
 ### `--json`
 
@@ -97,6 +107,10 @@ contember tenant project list --quiet
 
 `--no-color` disables ANSI colors. Colors are disabled automatically in `--json` and `--quiet` mode.
 
+Put `--json`, `--quiet` and `--no-color` after the command name. For example, use
+`contember tenant person list --json`, not `contember --json tenant person list`. Leading `--help` or
+`-h` is recognized separately as application help; put it after a command to see that command's help.
+
 ### Interactivity
 
 Destructive commands ask for confirmation. Pass `--yes` to skip the prompt. Without a TTY, and in
@@ -126,7 +140,9 @@ caller cannot fix by changing the input — exits with `2`.
 
 ## Errors
 
-Every error is written to stderr, never to stdout. In human mode it is a one-line summary:
+A fatal failure that aborts a command is written to stderr. In `--json` and `--quiet` modes, stdout
+stays empty. In human mode, the command may already have written contextual data to stdout before the
+one-line fatal summary:
 
 ```text
 Error [PROJECT_NOT_DEFINED]: Project not defined. Set CONTEMBER_DSN, or CONTEMBER_API_URL, CONTEMBER_API_TOKEN and CONTEMBER_PROJECT_NAME.
@@ -150,6 +166,9 @@ With `--json` the same error becomes an envelope on stderr, while stdout stays e
 verbatim, for example `PERSON_NOT_FOUND` or `ALREADY_MEMBER`. `retryable` tells a caller whether
 repeating the same call can succeed; it is `true` for the transient failures that exit with `4`.
 
+A nonzero exit does not by itself mean that stderr contains an error. Domain checks and partial batch
+results use stdout as described in [Output](#output).
+
 ## Connecting to a project
 
 The CLI reads the connection from environment variables:
@@ -171,9 +190,9 @@ Some commands can override this per run:
 - `actions *` take `--project`, which is a project name or a full DSN.
 
 :::note
-The other `tenant *` commands have no `--dsn` option — they take the connection from the
-`CONTEMBER_*` variables only. Their `--project` option is the **target** project slug inside the
-tenant API, not the connection.
+The tenant API commands other than `tenant apply` have no `--dsn` option. They can connect with only
+`CONTEMBER_API_URL` and `CONTEMBER_API_TOKEN`; `CONTEMBER_PROJECT_NAME` is not required. Their
+`--project` option is the **target** project slug inside the tenant API, not the connection.
 :::
 
 ## Command reference
@@ -206,6 +225,14 @@ See the [migrations chapter](/reference/engine/migrations/overview).
 | `migrations snapshot` | Creates a schema snapshot (`snapshot.json`) that bootstraps a fresh database in one step instead of replaying every migration. |
 | `migrations status` | Shows status of executed migrations on an instance & sync status. |
 | `migrations verify-snapshot` | Verifies that `snapshot.json` still matches a full replay of all migrations. |
+
+`migrations snapshot` asks for confirmation before writing. An unattended, JSON, quiet or non-TTY
+run must pass `--yes` explicitly. The snapshot result is written to stdout; progress and warnings are
+diagnostics on stderr. For example:
+
+```bash
+contember migrations snapshot --yes --json > snapshot-result.json
+```
 
 ### project
 
@@ -248,7 +275,7 @@ API keys, auth policies and mail templates. Most of these need a token with `SUP
 | --- | --- |
 | `tenant whoami` | Show the identity, global roles and project access of the current API token. |
 | `tenant project list` | List projects on the tenant. |
-| `tenant project show <slug>` | Show a project by slug. |
+| `tenant project show <slug>` | Show a project by slug, including ACL roles and their discriminated `variableDefinitions`. |
 | `tenant project create <slug>` | Create a project. |
 | `tenant project update <slug>` | Update a project's name and/or config. |
 | `tenant project secret set <slug> <key>` | Set a project secret from exactly one explicit source: `--value`, `--value-env <name>` or `--value-stdin`. |
@@ -274,7 +301,6 @@ all other leading, trailing and embedded whitespace is preserved.
 | `tenant person reset-mfa <id>` | Reset every MFA factor of a locked-out person: active and pending TOTP, e-mail OTP, and their backup codes. |
 | `tenant person sign-out <id>` | Force sign-out: revoke every active session of a person. |
 | `tenant session create` | Create a one-time session token for exactly one person selected by `--email` or `--person-id`. The token is shown once. |
-| `tenant session revoke <sessionId>` | Revoke a single session. Session ids are listed by `tenant person show`. |
 | `tenant identity role add <identityId> <role...>` | Grant global (project-independent) roles to an identity. |
 | `tenant identity role remove <identityId> <role...>` | Revoke global (project-independent) roles from an identity. |
 
@@ -312,9 +338,12 @@ SHA-256 password reset token hash with one of `--reset-token-hash`, `--reset-tok
 
 | Command | Description |
 | --- | --- |
-| `tenant api-key list` | List global permanent API keys, or project-scoped keys with `--project <slug>`. |
+| `tenant api-key list` | List global permanent API keys with their identity and visible global roles, or project-scoped keys with their identity and memberships using `--project <slug>`. |
 | `tenant api-key create --description <text>` | Create a permanent API key, scoped to a project or global. Prints the token — it is shown exactly once. |
 | `tenant api-key disable <id>` | Disable a permanent API key, revoking its token immediately. |
+
+For global keys, `globalRoles` is nullable. Human output shows `(not visible)` when the caller cannot
+inspect an identity's roles.
 
 `tenant api-key create` and `tenant session create` accept `--trust-forwarded-client-info`. Enable it
 only when the tenant endpoint is behind a trusted proxy that removes client-supplied forwarding headers

@@ -86,12 +86,11 @@ const systemData = async (project: string, query: string) => {
 	return (await res.json() as { data: any }).data
 }
 
-// Diagnostics (progress, confirmations, warnings) are asserted on stderr: under the output contract
-// stdout carries data only. Exit codes and the data itself are unaffected.
+// Command results are data on stdout; progress and warnings remain diagnostics on stderr.
 test('CLI: migrations:snapshot + migrations:execute bootstraps a fresh project from the snapshot', async () => {
-	const snapshotResult = await runCli(['migrations:snapshot'])
+	const snapshotResult = await runCli(['migrations:snapshot', '--yes'])
 	expect(snapshotResult.exitCode).toBe(0)
-	expect(snapshotResult.stderr).toContain('Snapshot created: 2 migrations')
+	expect(snapshotResult.stdout).toContain('Snapshot created: 2 migrations')
 
 	// the snapshot file is written next to the migrations
 	expect(await fs.stat(join(migrationsDir, 'snapshot.json')).then(() => true, () => false)).toBe(true)
@@ -137,7 +136,7 @@ test('CLI: migrations:snapshot + migrations:execute bootstraps a fresh project f
 }, 60000)
 
 test('CLI: a snapshot left stale by an amend is ignored, and a full replay bootstraps the amended schema', async () => {
-	expect((await runCli(['migrations:snapshot'])).exitCode).toBe(0)
+	expect((await runCli(['migrations:snapshot', '--yes'])).exitCode).toBe(0)
 
 	// amend the covered migration (as `migrations:amend` rewrites the file): same version/filename, new
 	// modifications — Tag instead of Category. The snapshot's checksum no longer matches.
@@ -185,12 +184,12 @@ test('CLI: a snapshot left stale by an amend is ignored, and a full replay boots
 }, 60000)
 
 test('CLI: migrations:verify-snapshot passes for a fresh snapshot and fails (exit 1) once it goes stale', async () => {
-	expect((await runCli(['migrations:snapshot'])).exitCode).toBe(0)
+	expect((await runCli(['migrations:snapshot', '--yes'])).exitCode).toBe(0)
 
 	// offline check — no project/connection needed
 	const fresh = await runCli(['migrations:verify-snapshot'])
 	expect(fresh.exitCode).toBe(0)
-	expect(fresh.stderr).toContain('up to date')
+	expect(fresh.stdout).toContain('up to date')
 
 	// amend a covered migration; the committed snapshot no longer matches a replay
 	await fs.writeFile(
@@ -204,5 +203,5 @@ test('CLI: migrations:verify-snapshot passes for a fresh snapshot and fails (exi
 
 	const stale = await runCli(['migrations:verify-snapshot'])
 	expect(stale.exitCode).toBe(1)
-	expect(stale.stderr).toContain('stale')
+	expect(stale.stdout).toContain('stale')
 }, 60000)

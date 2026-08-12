@@ -1,6 +1,6 @@
 import { CliError, Command, CommandConfiguration, ExitCode, Input, Output } from '@contember/cli-common'
 import { MigrationSnapshotFacade } from '../../lib/migrations/MigrationSnapshotFacade.js'
-import prompts from 'prompts'
+import { promptConfirm } from '../../lib/prompt/index.js'
 
 type Args = {}
 
@@ -41,13 +41,11 @@ export class MigrationSnapshotCommand extends Command<Args, Options> {
 					exitCode: ExitCode.InputError,
 				})
 			}
-			const { confirmed } = await prompts({
-				type: 'confirm',
-				name: 'confirmed',
+			const confirmed = await promptConfirm(output, {
 				message: 'Write snapshot.json?',
 				initial: false,
 			})
-			if (confirmed !== true) {
+			if (!confirmed) {
 				throw new CliError('Snapshot creation aborted', {
 					code: 'OPERATION_ABORTED',
 					exitCode: ExitCode.InputError,

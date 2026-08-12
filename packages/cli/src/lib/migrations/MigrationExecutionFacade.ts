@@ -1,9 +1,9 @@
-import prompts from 'prompts'
 import { MigrationPrinter } from './MigrationPrinter.js'
 import {
 	isSchemaMigration,
 	MigrateErrorCode,
 	MigrationExecutor,
+	MigrationToExecuteOkStatus,
 	SchemaState,
 	SchemaStateManager,
 	SchemaVersionBuilder,
@@ -16,6 +16,8 @@ import { SystemClientProvider } from '../SystemClientProvider.js'
 import { TenantClientProvider } from '../TenantClientProvider.js'
 import { RemoteProjectProvider } from '../project/RemoteProjectProvider.js'
 import { CliError, ExitCode, Output } from '@contember/cli-common'
+import { GraphQlClientError } from '@contember/graphql-client'
+import { promptSelect } from '../prompt/index.js'
 
 export class MigrationExecutionFacade {
 	constructor(
@@ -40,7 +42,7 @@ export class MigrationExecutionFacade {
 		useSnapshot = true,
 		onConfirmed,
 	}: {
-		requireConfirmation: boolean
+		requireConfirmation: boolean | ((migrations: MigrationToExecuteOkStatus[]) => boolean)
 		force?: boolean
 		until?: string
 		additionalMessage?: string
@@ -66,9 +68,20 @@ export class MigrationExecutionFacade {
 			return false
 		}
 
+		let migrationsToConfirm: MigrationToExecuteOkStatus[] = []
 		if (localMigrations.length > 0) {
-			this.output.info('Will inspect and execute pending migrations from:')
-			localMigrations.forEach(it => this.output.info(it.name))
+			const status = await this.resolvePreflightStatus({ force })
+			migrationsToConfirm = until
+				? status.migrationsToExecute.filter(it => it.version <= MigrationVersionHelper.extractVersion(until))
+				: status.migrationsToExecute
+			if (migrationsToConfirm.length === 0 && !schemaState) {
+				this.output.info('No migrations to execute')
+				return false
+			}
+			if (migrationsToConfirm.length > 0) {
+				this.output.info('Will execute following migrations:')
+				migrationsToConfirm.forEach(it => this.output.info(it.name))
+			}
 		}
 		if (schemaState && localMigrations.length === 0) {
 			this.output.info('Will update schema state')
@@ -77,7 +90,7 @@ export class MigrationExecutionFacade {
 			this.output.info(additionalMessage)
 		}
 
-		if (requireConfirmation) {
+		if (typeof requireConfirmation === 'function' ? requireConfirmation(migrationsToConfirm) : requireConfirmation) {
 			if (!this.output.canPrompt()) {
 				throw new CliError('TTY not available. Pass --yes to confirm execution.', {
 					code: 'TTY_UNAVAILABLE',
@@ -85,20 +98,18 @@ export class MigrationExecutionFacade {
 				})
 			}
 			do {
-				const { action } = await prompts({
-					type: 'select',
-					name: 'action',
+				const action = await promptSelect(this.output, {
 					message: 'Do you want to continue?',
 					choices: [
-						{ value: 'yes', title: localMigrations.length > 0 ? 'Execute migrations' : 'Update schema state' },
-						...(localMigrations.length > 0 ? [{ value: 'describe', title: 'Describe migrations' }] : []),
+						{ value: 'yes', title: migrationsToConfirm.length > 0 ? 'Execute migrations' : 'Update schema state' },
+						...(migrationsToConfirm.length > 0 ? [{ value: 'describe', title: 'Describe migrations' }] : []),
 						{ value: 'no', title: 'Abort' },
 					],
 				})
 				if (action === 'describe') {
-					const schema = await this.schemaVersionBuilder.buildSchemaUntil(localMigrations[0].version)
-					for (const migration of localMigrations) {
-						const content = await migration.getContent()
+					const schema = await this.schemaVersionBuilder.buildSchemaUntil(migrationsToConfirm[0].version)
+					for (const migration of migrationsToConfirm) {
+						const content = await migration.localMigration.getContent()
 						if (isSchemaMigration(content)) {
 							this.migrationPrinter.printMigrationDescription(schema, content, { noSql: true })
 						}
@@ -124,10 +135,6 @@ export class MigrationExecutionFacade {
 		let migrations = until
 			? status.migrationsToExecute.filter(it => it.version <= MigrationVersionHelper.extractVersion(until))
 			: status.migrationsToExecute
-		if (migrations.length > 0) {
-			this.output.info('Will execute following migrations:')
-			migrations.forEach(it => this.output.info(it.name))
-		}
 		if (schemaState && migrations.length === 0) {
 			this.output.info('Updating schema state')
 		}
@@ -173,6 +180,17 @@ export class MigrationExecutionFacade {
 			throw e
 		}
 		return true
+	}
+
+	private async resolvePreflightStatus({ force }: { force?: boolean }) {
+		try {
+			return await this.migrationStatusFacade.resolveMigrationsStatus({ force })
+		} catch (error) {
+			if (!(error instanceof GraphQlClientError) || error.response?.status !== 404) {
+				throw error
+			}
+			return await this.migrationStatusFacade.resolveMigrationsStatusFromExecuted([], { force })
+		}
 	}
 
 	private async getSnapshotToApply({ until }: { until?: string }): Promise<SnapshotFile | undefined> {

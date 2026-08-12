@@ -16,7 +16,7 @@ import { RemoteProject } from '../../../src/lib/project/RemoteProject.js'
 class CapturingStream implements OutputStream {
 	public chunks: string[] = []
 
-	constructor(public readonly isTty: boolean = false) {}
+	constructor(public readonly isTty: boolean = false, public readonly columns: number = 80) {}
 
 	public write(text: string): void {
 		this.chunks.push(text)
@@ -27,9 +27,9 @@ class CapturingStream implements OutputStream {
 	}
 }
 
-const createTestOutput = ({ stdinTty = false }: { stdinTty?: boolean } = {}) => {
+const createTestOutput = ({ stdinTty = false, stderrTty = false }: { stdinTty?: boolean; stderrTty?: boolean } = {}) => {
 	const stdout = new CapturingStream()
-	const stderr = new CapturingStream()
+	const stderr = new CapturingStream(stderrTty)
 	return { stdout, stderr, output: new Output({ stdout, stderr, isStdinTty: () => stdinTty }) }
 }
 
@@ -221,7 +221,7 @@ describe('DeployCommand', () => {
 			adminDistDir: '/project/admin/dist',
 			facadeResult: false,
 		})
-		const { output } = createTestOutput({ stdinTty: true })
+		const { output } = createTestOutput({ stdinTty: true, stderrTty: true })
 		prompts.inject([true])
 
 		const code = await command.execute(new Input({}, { admin: 'https://admin.example.com' }), output)
@@ -235,7 +235,7 @@ describe('DeployCommand', () => {
 			adminDistDir: '/project/admin/dist',
 			facadeResult: false,
 		})
-		const { output } = createTestOutput({ stdinTty: true })
+		const { output } = createTestOutput({ stdinTty: true, stderrTty: true })
 		prompts.inject([false])
 
 		const code = await command.execute(new Input({}, { admin: 'https://admin.example.com' }), output)

@@ -13,6 +13,8 @@ import {
 	MigrationFilesManager,
 	MigrationParser,
 	MigrationsResolver,
+	MigrationState,
+	MigrationToExecuteOkStatus,
 	ModificationHandlerFactory,
 	SchemaDiffer,
 	SchemaMigrator,
@@ -22,12 +24,19 @@ import {
 } from '@contember/migrations-client'
 import { CliError, ExitCode } from '@contember/cli-common'
 import { MigrationDiffCommand } from '../../../src/commands/migrations/MigrationDiffCommand.js'
+import { MigrationExecutionFacade } from '../../../src/lib/migrations/MigrationExecutionFacade.js'
 import { MigrationPrinter } from '../../../src/lib/migrations/MigrationPrinter.js'
 import { SchemaLoader } from '../../../src/lib/schema/SchemaLoader.js'
 import { createTestOutput } from '../../../../cli-common/tests/lib/testOutput.js'
 
 namespace BlogModel {
 	export class Article {
+		title = c.stringColumn()
+	}
+}
+
+namespace ExistingModel {
+	export class LegacyArticle {
 		title = c.stringColumn()
 	}
 }
@@ -69,21 +78,40 @@ const listTree = async (): Promise<string[]> => {
 const buildCommand = async (schema: Schema, existingMigration = false) => {
 	const migrationsDir = path.join(workDir, 'migrations')
 	const filesManager = new MigrationFilesManager(migrationsDir, { json: new JsonLoader(new MigrationParser()) })
+	const modificationFactory = new ModificationHandlerFactory(ModificationHandlerFactory.defaultFactoryMap)
+	const schemaMigrator = new SchemaMigrator(modificationFactory)
+	const schemaDiffer = new SchemaDiffer(schemaMigrator)
 	if (existingMigration) {
 		await filesManager.createDirIfNotExist()
 		await filesManager.createFile(
-			JSON.stringify({ formatVersion: VERSION_LATEST, modifications: [] }),
+			JSON.stringify({
+				formatVersion: VERSION_LATEST,
+				modifications: schemaDiffer.diffSchemas(emptySchema, createSchema(ExistingModel)),
+			}),
 			'2024-01-01-120000-existing',
 		)
 	}
 	const migrationsResolver = new MigrationsResolver(filesManager)
-	const modificationFactory = new ModificationHandlerFactory(ModificationHandlerFactory.defaultFactoryMap)
-	const schemaMigrator = new SchemaMigrator(modificationFactory)
 	const stateManager = new SchemaStateManager(path.join(migrationsDir, 'state'))
 	const schemaVersionBuilder = new SchemaVersionBuilder(migrationsResolver, schemaMigrator, stateManager)
-	const schemaDiffer = new SchemaDiffer(schemaMigrator)
 	const loader: SchemaLoader = { loadSchema: async () => schema }
-	const executor = { execute: async () => true }
+	const executionConfirmations: boolean[] = []
+	const executor = {
+		execute: async (options: Parameters<MigrationExecutionFacade['execute']>[0]) => {
+			const migrations = await migrationsResolver.getMigrationFiles()
+			const pendingFiles = existingMigration ? migrations : migrations.slice(-1)
+			const pending: MigrationToExecuteOkStatus[] = pendingFiles.map(localMigration => ({
+				state: MigrationState.TO_EXECUTE_OK,
+				version: localMigration.version,
+				name: localMigration.name,
+				localMigration,
+			}))
+			executionConfirmations.push(
+				typeof options.requireConfirmation === 'function' ? options.requireConfirmation(pending) : options.requireConfirmation,
+			)
+			return true
+		},
+	}
 	const output = createTestOutput()
 	const command = new MigrationDiffCommand(
 		loader,
@@ -94,19 +122,39 @@ const buildCommand = async (schema: Schema, existingMigration = false) => {
 		stateManager,
 		migrationsResolver,
 	)
-	return { command, migrationsDir }
+	return { command, migrationsDir, executionConfirmations }
 }
 
 test('declining a diff leaves a new project filesystem untouched', async () => {
 	const { command } = await buildCommand(createSchema(BlogModel))
 	const before = await listTree()
-	const { output } = createTestOutput({ stdinTty: true })
+	const { output } = createTestOutput({ stdinTty: true, stderrTty: true })
 	prompts.inject(['no'])
 
 	const error = await command.run(['change'], output).then(() => null, (reason: unknown) => reason)
 
 	expect(error instanceof CliError ? error.code : null).toBe('OPERATION_ABORTED')
 	expect(await listTree()).toStrictEqual(before)
+})
+
+test('executing a new diff requires a second confirmation when older migrations are pending', async () => {
+	const { command, executionConfirmations } = await buildCommand(createSchema(BlogModel), true)
+	const { output } = createTestOutput({ stdinTty: true, stderrTty: true })
+	prompts.inject(['yes'])
+
+	await command.run(['change', '--execute'], output)
+
+	expect(executionConfirmations).toStrictEqual([true])
+})
+
+test('executing a new diff does not require a redundant second confirmation when it is the only pending migration', async () => {
+	const { command, executionConfirmations } = await buildCommand(createSchema(BlogModel))
+	const { output } = createTestOutput({ stdinTty: true, stderrTty: true })
+	prompts.inject(['yes'])
+
+	await command.run(['change', '--execute'], output)
+
+	expect(executionConfirmations).toStrictEqual([false])
 })
 
 test('non-interactive diff refusal leaves a new project filesystem untouched', async () => {

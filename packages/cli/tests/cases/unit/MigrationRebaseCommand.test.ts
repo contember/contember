@@ -49,7 +49,7 @@ test('non-interactive rebase refusal returns an input error without rewriting mi
 
 test('declining rebase returns OPERATION_ABORTED without invoking the facade', async () => {
 	const { command, getCalls } = await buildCommand()
-	const { output } = createTestOutput({ stdinTty: true })
+	const { output } = createTestOutput({ stdinTty: true, stderrTty: true })
 	prompts.inject([false])
 
 	const error = await command.run(['2024-01-01-120000'], output).then(() => null, (reason: unknown) => reason)

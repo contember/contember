@@ -149,7 +149,7 @@ describe('MigrationSnapshotFacade', () => {
 
 	test('declining snapshot creation does not write', async () => {
 		const { command, snapshotManager } = await setup(migrationsDir)
-		const { output } = createTestOutput({ stdinTty: true })
+		const { output } = createTestOutput({ stdinTty: true, stderrTty: true })
 		prompts.inject([false])
 
 		const error = await command.run([], output).then(() => null, (reason: unknown) => reason)

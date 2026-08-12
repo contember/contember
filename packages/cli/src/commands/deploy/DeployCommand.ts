@@ -1,5 +1,4 @@
 import { CliError, Command, CommandConfiguration, escapeTerminalText, ExitCode, Input, Output } from '@contember/cli-common'
-import prompts from 'prompts'
 import { maskToken } from '../../lib/maskToken.js'
 import { MigrationExecutionFacade } from '../../lib/migrations/MigrationExecutionFacade.js'
 import { AdminDeployer } from '../../lib/admin/AdminDeployer.js'
@@ -8,6 +7,7 @@ import { RemoteProject } from '../../lib/project/RemoteProject.js'
 import { Workspace } from '../../lib/workspace/Workspace.js'
 import { RemoteProjectProvider } from '../../lib/project/RemoteProjectProvider.js'
 import { RemoteProjectResolver } from '../../lib/project/RemoteProjectResolver.js'
+import { promptConfirm } from '../../lib/prompt/index.js'
 
 type Args = {
 	dsn?: string
@@ -122,9 +122,7 @@ export class DeployCommand extends Command<Args, Options> {
 				output.info('Admin will be deployed.')
 				output.info('(to skip this dialog, you can pass --yes option)')
 				output.info('')
-				const { ok } = await prompts({
-					type: 'confirm',
-					name: 'ok',
+				const ok = await promptConfirm(output, {
 					message: `Do you want to continue?`,
 				})
 				if (!ok) {

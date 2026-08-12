@@ -1,6 +1,5 @@
 import { CliError, Command, CommandConfiguration, ExitCode, Input, Output } from '@contember/cli-common'
 import { InvalidSchemaException, SchemaMigrator } from '@contember/schema-migrations'
-import prompts from 'prompts'
 import { emptySchema } from '@contember/schema-utils'
 import { MigrationCreator, MigrationsResolver, SchemaStateManager, SchemaVersionBuilder } from '@contember/migrations-client'
 import { MigrationsStatusFacade } from '../../lib/migrations/MigrationsStatusFacade.js'
@@ -9,6 +8,7 @@ import { MigrationsValidator } from '../../lib/migrations/MigrationsValidator.js
 import { MigrationPrinter } from '../../lib/migrations/MigrationPrinter.js'
 import { printValidationErrors } from '../../lib/schema/SchemaValidationPrinter.js'
 import { SystemClientProvider } from '../../lib/SystemClientProvider.js'
+import { promptSelect } from '../../lib/prompt/index.js'
 
 type Args = {
 	migration?: string
@@ -190,9 +190,7 @@ export class MigrationAmendCommand extends Command<Args, Options> {
 			return true
 		}
 		assertCanPrompt(output)
-		const { action } = await prompts({
-			type: 'select',
-			name: 'action',
+		const action = await promptSelect(output, {
 			message: 'Do you want to continue?',
 			choices: [
 				{ value: 'yes', title: 'Yes' },
@@ -208,9 +206,7 @@ export class MigrationAmendCommand extends Command<Args, Options> {
 			return false
 		}
 		assertCanPrompt(output)
-		const { action } = await prompts({
-			type: 'select',
-			name: 'action',
+		const action = await promptSelect(output, {
 			message:
 				'The amendment results in a no-op migration because the changes introduced by the latest migration were reverted.\nYou can choose to remove the latest migration or to modify it so it is empty.',
 			choices: [

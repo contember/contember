@@ -3,9 +3,10 @@ import * as fs from 'node:fs/promises'
 import * as os from 'node:os'
 import * as path from 'node:path'
 import chalk from 'chalk'
-import { GraphQlClient } from '@contember/graphql-client'
+import { GraphQlClient, GraphQlClientError } from '@contember/graphql-client'
 import {
 	ExecutedMigrationInfo,
+	isSchemaMigration,
 	JsonLoader,
 	MigrationDescriber,
 	MigrationExecutor,
@@ -25,6 +26,8 @@ import {
 	VERSION_LATEST,
 } from '@contember/migrations-client'
 import { emptySchema } from '@contember/schema-utils'
+import { c, createSchema } from '@contember/schema-definition'
+import { calculateMigrationChecksum } from '@contember/schema-migrations'
 import { CliError, ExitCode } from '@contember/cli-common'
 import { MigrationExecutionFacade } from '../../../src/lib/migrations/MigrationExecutionFacade.js'
 import { MigrationPrinter } from '../../../src/lib/migrations/MigrationPrinter.js'
@@ -48,13 +51,25 @@ type Event =
 	| { type: 'execute-migrations'; schemaState: SchemaState | undefined }
 
 class RecordingSystemClient extends SystemClient {
-	constructor(private readonly events: Event[]) {
+	constructor(
+		private readonly events: Event[],
+		private readonly executedMigrations: ExecutedMigrationInfo[],
+		private readonly missingUntilCreated: boolean,
+	) {
 		super(new GraphQlClient({ url: 'http://system.test', apiToken: 'token' }))
 	}
 
 	override async listExecutedMigrations(): Promise<ExecutedMigrationInfo[]> {
 		this.events.push({ type: 'list-executed' })
-		return []
+		if (this.missingUntilCreated && !this.events.some(event => event.type === 'create-project')) {
+			throw new GraphQlClientError(
+				'Project not found',
+				'bad request',
+				{ url: 'http://system.test', query: '', variables: {} },
+				new Response(null, { status: 404 }),
+			)
+		}
+		return this.executedMigrations
 	}
 
 	override async migrateFromSnapshot(...args: Parameters<SystemClient['migrateFromSnapshot']>): Promise<void> {
@@ -131,6 +146,12 @@ class RecordingSnapshotFacade extends MigrationSnapshotFacade {
 
 let workDir: string
 
+namespace ExecutionModel {
+	export class Article {
+		title = c.stringColumn()
+	}
+}
+
 beforeAll(() => {
 	chalk.level = 0
 })
@@ -143,28 +164,30 @@ afterEach(async () => {
 	await fs.rm(workDir, { recursive: true, force: true })
 })
 
-const createHarness = async ({ state = false, migration = false, snapshot = false, stdinTty = false } = {}) => {
+const createHarness = async (
+	{ state = false, migration = false, snapshot = false, remoteExecuted = false, remoteMissing = false, stdinTty = false } = {},
+) => {
 	const events: Event[] = []
 	const migrationsDir = path.join(workDir, 'migrations')
 	const filesManager = new MigrationFilesManager(migrationsDir, { json: new JsonLoader(new MigrationParser()) })
+	const modificationFactory = new ModificationHandlerFactory(ModificationHandlerFactory.defaultFactoryMap)
+	const schemaMigrator = new SchemaMigrator(modificationFactory)
+	const schemaDiffer = new SchemaDiffer(schemaMigrator)
 	if (migration) {
 		await filesManager.createDirIfNotExist()
 		await filesManager.createFile(
-			JSON.stringify({ formatVersion: VERSION_LATEST, modifications: [] }),
+			JSON.stringify({ formatVersion: VERSION_LATEST, modifications: schemaDiffer.diffSchemas(emptySchema, createSchema(ExecutionModel)) }),
 			'2024-01-01-120000-init',
 		)
 	}
 	const migrationsResolver = new MigrationsResolver(filesManager)
-	const modificationFactory = new ModificationHandlerFactory(ModificationHandlerFactory.defaultFactoryMap)
-	const schemaMigrator = new SchemaMigrator(modificationFactory)
 	const stateManager = new SchemaStateManager(path.join(migrationsDir, 'state'))
 	if (state) {
 		await stateManager.extractState(emptySchema)
 	}
 	const schemaVersionBuilder = new SchemaVersionBuilder(migrationsResolver, schemaMigrator, stateManager)
-	const schemaDiffer = new SchemaDiffer(schemaMigrator)
 	const snapshotManager = new SnapshotManager(path.join(migrationsDir, 'snapshot.json'))
-	const io = createTestOutput({ stdinTty })
+	const io = createTestOutput({ stdinTty, stderrTty: stdinTty })
 	const snapshotFacade = new RecordingSnapshotFacade(
 		events,
 		migrationsResolver,
@@ -180,7 +203,22 @@ const createHarness = async ({ state = false, migration = false, snapshot = fals
 		await snapshotFacade.write(prepared)
 		events.splice(0)
 	}
-	const systemClient = new RecordingSystemClient(events)
+	const executedMigrations: ExecutedMigrationInfo[] = []
+	if (remoteExecuted) {
+		const [localMigration] = await migrationsResolver.getMigrationFiles()
+		const content = await localMigration.getContent()
+		if (!isSchemaMigration(content)) {
+			throw new Error('Expected a schema migration')
+		}
+		executedMigrations.push({
+			name: localMigration.name,
+			version: localMigration.version,
+			formatVersion: content.formatVersion,
+			checksum: calculateMigrationChecksum(content),
+			executedAt: new Date(0),
+		})
+	}
+	const systemClient = new RecordingSystemClient(events, executedMigrations, remoteMissing)
 	const systemProvider = new RecordingSystemClientProvider(systemClient)
 	const tenantProvider = new RecordingTenantClientProvider(new RecordingTenantProjectClient(events))
 	const projectProvider = new RemoteProjectProvider()
@@ -245,7 +283,7 @@ test('does not notify confirmation when interactive execution is declined', asyn
 })
 
 test('does not notify confirmation when there is no migration work to confirm', async () => {
-	const { facade } = await createHarness({ stdinTty: true })
+	const { facade, events } = await createHarness({ stdinTty: true })
 	let confirmations = 0
 
 	const result = await facade.execute({
@@ -257,6 +295,23 @@ test('does not notify confirmation when there is no migration work to confirm', 
 
 	expect(result).toBe(false)
 	expect(confirmations).toBe(0)
+	expect(events).toStrictEqual([])
+})
+
+test('an already-current project with local migrations returns without prompting or mutation', async () => {
+	const { facade, events } = await createHarness({ migration: true, remoteExecuted: true })
+	let confirmations = 0
+
+	const result = await facade.execute({
+		requireConfirmation: true,
+		onConfirmed: () => {
+			confirmations++
+		},
+	})
+
+	expect(result).toBe(false)
+	expect(confirmations).toBe(0)
+	expect(events).toStrictEqual([{ type: 'list-executed' }])
 })
 
 test('declining with a usable snapshot neither builds nor applies it', async () => {
@@ -266,17 +321,21 @@ test('declining with a usable snapshot neither builds nor applies it', async () 
 	const error = await facade.execute({ requireConfirmation: true }).then(() => null, (reason: unknown) => reason)
 
 	expect(error instanceof CliError ? error.code : null).toBe('OPERATION_ABORTED')
-	expect(events).toStrictEqual([])
+	expect(events).toStrictEqual([{ type: 'list-executed' }])
 })
 
 test('confirmed snapshot execution creates a tokenless project before building and applying the snapshot', async () => {
-	const { facade, events } = await createHarness({ migration: true, snapshot: true, stdinTty: true })
+	const { facade, events } = await createHarness({ migration: true, snapshot: true, remoteMissing: true, stdinTty: true })
 	prompts.inject(['yes'])
 
 	await facade.execute({ requireConfirmation: true })
 
-	expect(events[0]).toStrictEqual({ type: 'create-project', details: { noDeployToken: true } })
 	const types = events.map(event => event.type)
+	expect(types.indexOf('list-executed')).toBeLessThan(types.indexOf('create-project'))
+	expect(events.find(event => event.type === 'create-project')).toStrictEqual({
+		type: 'create-project',
+		details: { noDeployToken: true },
+	})
 	expect(types.indexOf('snapshot-build')).toBeGreaterThan(types.indexOf('create-project'))
 	expect(types.indexOf('snapshot-apply')).toBeGreaterThan(types.indexOf('snapshot-build'))
 	expect(types.indexOf('execute-migrations')).toBeGreaterThan(types.indexOf('snapshot-apply'))

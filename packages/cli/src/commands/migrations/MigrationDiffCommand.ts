@@ -1,11 +1,11 @@
 import { CliError, Command, CommandConfiguration, ExitCode, Input, Output } from '@contember/cli-common'
 import { InvalidSchemaException } from '@contember/schema-migrations'
-import prompts from 'prompts'
 import { MigrationCreator, MigrationsResolver, SchemaStateManager, SchemaVersionBuilder } from '@contember/migrations-client'
 import { SchemaLoader } from '../../lib/schema/SchemaLoader.js'
 import { MigrationPrinter } from '../../lib/migrations/MigrationPrinter.js'
 import { MigrationExecutionFacade } from '../../lib/migrations/MigrationExecutionFacade.js'
 import { printValidationErrors } from '../../lib/schema/SchemaValidationPrinter.js'
+import { promptConfirm, promptSelect } from '../../lib/prompt/index.js'
 
 type MigrationExecutor = Pick<MigrationExecutionFacade, 'execute'>
 
@@ -90,13 +90,11 @@ export class MigrationDiffCommand extends Command<Args, Options> {
 								exitCode: ExitCode.InputError,
 							})
 						}
-						const { confirmed } = await prompts({
-							type: 'confirm',
-							name: 'confirmed',
+						const confirmed = await promptConfirm(output, {
 							message: 'Write the schema state changes?',
 							initial: false,
 						})
-						if (confirmed !== true) {
+						if (!confirmed) {
 							throw abortedError('Schema state update')
 						}
 					}
@@ -133,9 +131,7 @@ export class MigrationDiffCommand extends Command<Args, Options> {
 						exitCode: ExitCode.InputError,
 					})
 				}
-				const { action } = await prompts({
-					type: 'select',
-					name: 'action',
+				const action = await promptSelect(output, {
 					message: 'Do you want to continue?',
 					choices: [
 						{ value: 'yes', title: 'Yes' },
@@ -169,7 +165,9 @@ export class MigrationDiffCommand extends Command<Args, Options> {
 			if (shouldExecute) {
 				await this.migrationExecutorFacade.execute({
 					force: false,
-					requireConfirmation: false,
+					requireConfirmation: yes
+						? false
+						: migrations => migrations.some(migration => migration.name !== result.migration.name),
 				})
 			}
 			output.data(

@@ -1,5 +1,5 @@
 import { CliError, ExitCode, Input, Output } from '@contember/cli-common'
-import prompts from 'prompts'
+import { promptConfirm } from '../../lib/prompt/index.js'
 
 export const confirmImport = async (input: Input<{}, { yes: boolean }>, output: Output): Promise<boolean> => {
 	if (input.getOption('yes')) {
@@ -14,9 +14,7 @@ export const confirmImport = async (input: Input<{}, { yes: boolean }>, output: 
 	output.warn('This will completely wipe the target project.')
 	output.info('(to skip this dialog, you can pass --yes option)')
 	output.info('')
-	const { ok } = await prompts({
-		type: 'confirm',
-		name: 'ok',
+	const ok = await promptConfirm(output, {
 		message: `Do you want to continue?`,
 	})
 	return ok

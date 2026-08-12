@@ -1,4 +1,4 @@
-import { MigrationsResolver, MigrationsStatusResolver } from '@contember/migrations-client'
+import { ExecutedMigrationInfo, MigrationsResolver, MigrationsStatusResolver } from '@contember/migrations-client'
 import { SystemClientProvider } from '../SystemClientProvider.js'
 import { MigrationPrinter } from './MigrationPrinter.js'
 import { CliError, ExitCode, Output } from '@contember/cli-common'
@@ -17,6 +17,13 @@ export class MigrationsStatusFacade {
 
 	public resolveMigrationsStatus = async ({ force, allowError }: { force?: boolean; allowError?: boolean }) => {
 		const executedMigrations = await this.systemClientProvider.get().listExecutedMigrations()
+		return await this.resolveMigrationsStatusFromExecuted(executedMigrations, { force, allowError })
+	}
+
+	public resolveMigrationsStatusFromExecuted = async (
+		executedMigrations: ExecutedMigrationInfo[],
+		{ force, allowError }: { force?: boolean; allowError?: boolean },
+	) => {
 		const localMigrations = await this.migrationsResolver.getMigrationFiles()
 		const status = await this.migrationsStatusResolver.getMigrationsStatus(executedMigrations, localMigrations, force)
 		if (status.errorMigrations.length > 0 && !allowError) {

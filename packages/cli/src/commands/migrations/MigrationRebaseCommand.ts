@@ -1,7 +1,7 @@
 import { CliError, Command, CommandConfiguration, ExitCode, Input, Output } from '@contember/cli-common'
 import { Migration, MigrationsResolver } from '@contember/migrations-client'
 import { MigrationRebaseFacade } from '../../lib/migrations/MigrationRebaseFacade.js'
-import prompts from 'prompts'
+import { promptConfirm } from '../../lib/prompt/index.js'
 
 type MigrationRebaser = Pick<MigrationRebaseFacade, 'rebase'>
 
@@ -50,13 +50,11 @@ export class MigrationRebaseCommand extends Command<Args, Options> {
 					exitCode: ExitCode.InputError,
 				})
 			}
-			const { confirmed } = await prompts({
-				type: 'confirm',
-				name: 'confirmed',
+			const confirmed = await promptConfirm(output, {
 				message: 'Rewrite these migrations?',
 				initial: false,
 			})
-			if (confirmed !== true) {
+			if (!confirmed) {
 				throw new CliError('Migration rebase aborted', { code: 'OPERATION_ABORTED', exitCode: ExitCode.InputError })
 			}
 		}

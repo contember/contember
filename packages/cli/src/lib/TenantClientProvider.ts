@@ -8,11 +8,11 @@ import {
 	TenantPolicyClient,
 	TenantProjectClient,
 } from './tenant/clients/index.js'
-import { RemoteProjectProvider } from './project/RemoteProjectProvider.js'
+import type { TenantConnectionSource } from './tenant/TenantConnection.js'
 
 export class TenantClientProvider {
 	constructor(
-		private readonly remoteProjectProvider: RemoteProjectProvider,
+		private readonly connectionSource: TenantConnectionSource,
 	) {
 	}
 
@@ -46,7 +46,7 @@ export class TenantClientProvider {
 	}
 
 	public transport(): TenantApiTransport {
-		const project = this.remoteProjectProvider.get()
-		return TenantApiTransport.create(project.endpoint, project.token)
+		const connection = this.connectionSource.get()
+		return TenantApiTransport.create(connection.endpoint, connection.token)
 	}
 }

@@ -119,11 +119,12 @@ import {
 	TenantProjectShowCommand,
 	TenantProjectUpdateCommand,
 	TenantSessionCreateCommand,
-	TenantSessionRevokeCommand,
 	TenantWhoAmICommand,
 } from './commands/tenant/index.js'
 import { ImportTenantConfigLoader, TranspilingTenantConfigLoader } from './lib/tenant/TenantConfigLoader.js'
 import { TenantConfigApplier } from './lib/tenant/TenantConfigApplier.js'
+import { TenantConnectionProvider } from './lib/tenant/TenantConnectionProvider.js'
+import { TenantConnectionResolver } from './lib/tenant/TenantConnectionResolver.js'
 
 const jsSample = `
 export const query = \`\`
@@ -156,6 +157,8 @@ export const createContainer = ({ env, version, runtime, workspace, output }: {
 		.addService('jsCodeRunner', ({ jsExecutor, jsBuilder }) => new JsCodeRunner(jsBuilder, jsExecutor))
 		.addService('workspaceResolver', ({ yamlHandler }) => new WorkspaceResolver(yamlHandler))
 		.addService('remoteProjectResolver', ({ env }) => new RemoteProjectResolver(env))
+		.addService('tenantConnectionResolver', ({ env }) => new TenantConnectionResolver(env))
+		.addService('tenantConnectionProvider', ({ tenantConnectionResolver }) => new TenantConnectionProvider(tenantConnectionResolver))
 		.addService('remoteProjectProvider', ({ remoteProjectResolver }) => {
 			const provider = new RemoteProjectProvider()
 			const remoteProject = remoteProjectResolver.resolve()
@@ -165,7 +168,7 @@ export const createContainer = ({ env, version, runtime, workspace, output }: {
 			return provider
 		})
 		.addService('systemClientProvider', ({ remoteProjectProvider }) => new SystemClientProvider(remoteProjectProvider))
-		.addService('tenantClientProvider', ({ remoteProjectProvider }) => new TenantClientProvider(remoteProjectProvider))
+		.addService('tenantClientProvider', ({ tenantConnectionProvider }) => new TenantClientProvider(tenantConnectionProvider))
 		.addService('adminClient', ({ remoteProjectProvider }) => new AdminClient(remoteProjectProvider))
 		.addService('migrationFilesManager', ({ jsCodeRunner, workspace }) => {
 			const runJs = runtime === 'bun' ? (file: string) => import(file) : jsCodeRunner.run
@@ -404,7 +407,6 @@ export const createContainer = ({ env, version, runtime, workspace, output }: {
 			({ tenantClientProvider }) => new TenantPersonResetPasswordRequestCommand(tenantClientProvider),
 		)
 		.addService('tenantSessionCreateCommand', ({ tenantClientProvider }) => new TenantSessionCreateCommand(tenantClientProvider))
-		.addService('tenantSessionRevokeCommand', ({ tenantClientProvider }) => new TenantSessionRevokeCommand(tenantClientProvider))
 		.addService('tenantIdentityRoleAddCommand', ({ tenantClientProvider }) => new TenantIdentityRoleAddCommand(tenantClientProvider))
 		.addService('tenantIdentityRoleRemoveCommand', ({ tenantClientProvider }) => new TenantIdentityRoleRemoveCommand(tenantClientProvider))
 		.addService('tenantMemberListCommand', ({ tenantClientProvider }) => new TenantMemberListCommand(tenantClientProvider))
@@ -483,7 +485,6 @@ export const createContainer = ({ env, version, runtime, workspace, output }: {
 			register('tenant person reset-mfa', () => dic.tenantPersonResetMfaCommand, 'tenant:person:reset-mfa')
 			register('tenant person reset-password-request', () => dic.tenantPersonResetPasswordRequestCommand, 'tenant:person:reset-password-request')
 			register('tenant session create', () => dic.tenantSessionCreateCommand, 'tenant:session:create')
-			register('tenant session revoke', () => dic.tenantSessionRevokeCommand, 'tenant:session:revoke')
 			register('tenant identity role add', () => dic.tenantIdentityRoleAddCommand, 'tenant:identity:role:add')
 			register('tenant identity role remove', () => dic.tenantIdentityRoleRemoveCommand, 'tenant:identity:role:remove')
 			register('tenant member list', () => dic.tenantMemberListCommand, 'tenant:member:list')

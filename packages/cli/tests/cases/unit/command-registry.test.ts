@@ -77,7 +77,6 @@ const expectedTenantCommands = [
 	'tenant project show',
 	'tenant project update',
 	'tenant session create',
-	'tenant session revoke',
 	'tenant whoami',
 ]
 

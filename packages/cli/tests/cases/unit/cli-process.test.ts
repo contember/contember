@@ -1,4 +1,5 @@
 import { describe, expect, test } from 'bun:test'
+import { randomUUID } from 'node:crypto'
 import * as fs from 'node:fs'
 import * as os from 'node:os'
 import { join, resolve } from 'node:path'
@@ -9,6 +10,7 @@ const cliEntry = join(repoRoot, 'packages/cli/src/run.ts')
 const builtCliEntry = join(repoRoot, 'packages/cli/dist/production/run.js')
 const cliPackageJson = join(repoRoot, 'packages/cli/package.json')
 const testBuiltCli = process.env.CONTEMBER_TEST_BUILT_CLI === '1'
+const cliInvocation = testBuiltCli ? ['node', builtCliEntry] : ['bun', '--conditions=typescript', cliEntry]
 const workspace = fs.mkdtempSync(join(os.tmpdir(), 'contember-cli-process-'))
 fs.mkdirSync(join(workspace, 'api/migrations'), { recursive: true })
 
@@ -27,7 +29,7 @@ const readCliPackageVersion = (): string => {
 }
 
 const runCli = async (args: string[]) => {
-	const proc = Bun.spawn(['bun', '--conditions=typescript', cliEntry, ...args], {
+	const proc = Bun.spawn([...cliInvocation, ...args], {
 		cwd: repoRoot,
 		env: { ...process.env, CONTEMBER_SKIP_VERSION_CHECK: '1', CONTEMBER_DIR: workspace, NO_COLOR: '1' },
 		stdout: 'pipe',
@@ -43,7 +45,7 @@ const runCli = async (args: string[]) => {
 
 const shellQuote = (value: string): string => `'${value.replaceAll("'", "'\\''")}'`
 
-const cliCommand = (args: string[]): string => ['bun', '--conditions=typescript', cliEntry, ...args].map(shellQuote).join(' ')
+const cliCommand = (args: string[]): string => [...cliInvocation, ...args].map(shellQuote).join(' ')
 
 const shellEnv = { ...process.env, CONTEMBER_SKIP_VERSION_CHECK: '1', CONTEMBER_DIR: workspace, NO_COLOR: '1' }
 
@@ -184,7 +186,8 @@ describe('piped stdout', () => {
 	}, 60000)
 
 	test('a reader that goes away does not hang the CLI or leak a stack trace', async () => {
-		const proc = Bun.spawn(['sh', '-c', `${cliCommand(['commands', '--json'])} | head -c 100`], {
+		const statusFile = join(workspace, `closed-reader-status-${randomUUID()}`)
+		const proc = Bun.spawn(['sh', '-c', `{ ${cliCommand(['commands', '--json'])}; echo $? > ${shellQuote(statusFile)}; } | head -c 100`], {
 			cwd: repoRoot,
 			env: shellEnv,
 			stdout: 'pipe',
@@ -193,6 +196,7 @@ describe('piped stdout', () => {
 		const [stdout, stderr] = await Promise.all([new Response(proc.stdout).text(), new Response(proc.stderr).text()])
 		await proc.exited
 		expect(stdout.length).toBe(100)
+		expect(Number(fs.readFileSync(statusFile, 'utf8').trim())).toBe(0)
 		expect(stderr).not.toContain('EPIPE')
 		expect(stderr).not.toContain('Unhandled')
 	}, 30000)
@@ -218,7 +222,7 @@ describe('errors', () => {
 
 	test('--json applies before a fallible bootstrap step', async () => {
 		const missingPackageRoot = join(workspace, 'missing-package-root')
-		const proc = Bun.spawn(['bun', '--conditions=typescript', cliEntry, '--json'], {
+		const proc = Bun.spawn([...cliInvocation, '--json'], {
 			cwd: repoRoot,
 			env: { ...shellEnv, CONTEMBER_CLI_PACKAGE_ROOT: missingPackageRoot },
 			stdout: 'pipe',
@@ -241,7 +245,7 @@ describe('errors', () => {
 		const emptyVersionPackageRoot = join(workspace, 'empty-version-package-root')
 		fs.mkdirSync(emptyVersionPackageRoot)
 		fs.writeFileSync(join(emptyVersionPackageRoot, 'package.json'), JSON.stringify({ version: '' }))
-		const proc = Bun.spawn(['bun', '--conditions=typescript', cliEntry, '--json'], {
+		const proc = Bun.spawn([...cliInvocation, '--json'], {
 			cwd: repoRoot,
 			env: { ...shellEnv, CONTEMBER_CLI_PACKAGE_ROOT: emptyVersionPackageRoot },
 			stdout: 'pipe',

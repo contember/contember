@@ -1,10 +1,14 @@
 import { afterEach, describe, expect, test } from 'bun:test'
+import { existsSync } from 'node:fs'
 import { mkdtemp, rm } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { join, resolve } from 'node:path'
 
 const repoRoot = resolve(import.meta.dir, '../../../../..')
-const entrypoint = join(repoRoot, 'packages/create/src/run.ts')
+const sourceEntrypoint = join(repoRoot, 'packages/create/src/run.ts')
+const builtEntrypoint = join(repoRoot, 'packages/create/dist/production/run.js')
+const testBuiltCli = process.env.CONTEMBER_TEST_BUILT_CLI === '1'
+const createInvocation = testBuiltCli ? ['node', builtEntrypoint] : ['bun', '--conditions=typescript', sourceEntrypoint]
 const temporaryDirectories: string[] = []
 
 afterEach(async () => {
@@ -12,7 +16,10 @@ afterEach(async () => {
 })
 
 const runCreate = async (cwd: string, args: string[]) => {
-	const process = Bun.spawn(['bun', '--conditions=typescript', entrypoint, ...args], {
+	if (testBuiltCli && !existsSync(builtEntrypoint)) {
+		throw new Error(`Built create entrypoint is missing: ${builtEntrypoint}`)
+	}
+	const process = Bun.spawn([...createInvocation, ...args], {
 		cwd,
 		env: { ...Bun.env, NO_COLOR: '1' },
 		stdin: 'ignore',

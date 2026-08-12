@@ -25,7 +25,7 @@ jobs:
           - job_name: build
             run_script: |
               bun run build
-              CONTEMBER_TEST_BUILT_CLI=1 bun test --conditions=typescript packages/cli/tests/cases/unit/cli-process.test.ts --test-name-pattern "the built ESM entrypoint starts under Node"
+              CONTEMBER_TEST_BUILT_CLI=1 bun test --conditions=typescript packages/cli/tests/cases/unit/cli-process.test.ts packages/create/tests/cases/unit/create-process.test.ts
 
           - job_name: api-exporter
             run_script: |

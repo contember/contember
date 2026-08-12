@@ -35,56 +35,91 @@ const tenantSourceFiles = (dir: string): string[] =>
 		return entry.isDirectory() ? tenantSourceFiles(path) : entry.name.endsWith('.ts') ? [path] : []
 	})
 
-/**
- * The command names the tenant unit is contracted to expose. Spelled out on purpose: the point of this
- * list is to fail when a command lands in `commands/tenant/` but never reaches `dic.ts`.
- */
-const expectedTenantCommands = [
-	'tenant api-key create',
-	'tenant api-key disable',
-	'tenant api-key list',
-	'tenant apply',
-	'tenant auth-log',
-	'tenant config show',
-	'tenant identity role add',
-	'tenant identity role remove',
-	'tenant idp list',
-	'tenant mail-template add',
-	'tenant mail-template list',
-	'tenant mail-template remove',
-	'tenant member add',
-	'tenant member invite',
-	'tenant member invite-unmanaged',
-	'tenant member list',
-	'tenant member remove',
-	'tenant member update',
-	'tenant person create',
-	'tenant person disable',
-	'tenant person list',
-	'tenant person reset-mfa',
-	'tenant person reset-password-request',
-	'tenant person set-password',
-	'tenant person show',
-	'tenant person sign-out',
-	'tenant person update',
-	'tenant policy create',
-	'tenant policy delete',
-	'tenant policy list',
-	'tenant policy update',
-	'tenant project create',
-	'tenant project list',
-	'tenant project secret set',
-	'tenant project show',
-	'tenant project update',
-	'tenant session create',
-	'tenant whoami',
+interface ExpectedCommand {
+	readonly name: string
+	readonly aliases: readonly string[]
+}
+
+/** Public command names and aliases are an explicit compatibility contract, independent of `dic.ts`. */
+const expectedCommandCatalog: readonly ExpectedCommand[] = [
+	{ name: 'deploy', aliases: [] },
+	{ name: 'version', aliases: [] },
+	{ name: 'commands', aliases: [] },
+	{ name: 'data export', aliases: ['data:export'] },
+	{ name: 'data import', aliases: ['data:import'] },
+	{ name: 'data transfer', aliases: ['data:transfer'] },
+	{ name: 'migrations diff', aliases: ['migrations:diff'] },
+	{ name: 'migrations amend', aliases: ['migrations:amend'] },
+	{ name: 'migrations blank', aliases: ['migrations:blank'] },
+	{ name: 'migrations init-state', aliases: ['migrations:init-state'] },
+	{ name: 'migrations describe', aliases: ['migrations:describe'] },
+	{ name: 'migrations execute', aliases: ['migrations:execute'] },
+	{ name: 'migrations rebase', aliases: ['migrations:rebase'] },
+	{ name: 'migrations snapshot', aliases: ['migrations:snapshot'] },
+	{ name: 'migrations verify-snapshot', aliases: ['migrations:verify-snapshot'] },
+	{ name: 'migrations status', aliases: ['migrations:status'] },
+	{ name: 'workspace update api', aliases: ['workspace:update:api'] },
+	{ name: 'project validate', aliases: ['project:validate'] },
+	{ name: 'project print-schema', aliases: ['project:print-schema'] },
+	{ name: 'project generate-doc', aliases: ['project:generate-doc'] },
+	{ name: 'actions list-variables', aliases: ['actions:list-variables'] },
+	{ name: 'actions set-variables', aliases: ['actions:set-variables'] },
+	{ name: 'actions failed-events', aliases: ['actions:failed-events'] },
+	{ name: 'actions retry-event', aliases: ['actions:retry-event'] },
+	{ name: 'actions get-event', aliases: ['actions:get-event'] },
+	{ name: 'actions stop-event', aliases: ['actions:stop-event'] },
+	{ name: 'tenant apply', aliases: ['tenant:apply'] },
+	{ name: 'tenant whoami', aliases: ['tenant:whoami'] },
+	{ name: 'tenant auth-log', aliases: ['tenant:auth-log'] },
+	{ name: 'tenant config show', aliases: ['tenant:config:show'] },
+	{ name: 'tenant idp list', aliases: ['tenant:idp:list'] },
+	{ name: 'tenant project list', aliases: ['tenant:project:list'] },
+	{ name: 'tenant project show', aliases: ['tenant:project:show'] },
+	{ name: 'tenant project create', aliases: ['tenant:project:create'] },
+	{ name: 'tenant project update', aliases: ['tenant:project:update'] },
+	{ name: 'tenant project secret set', aliases: ['tenant:project:secret:set'] },
+	{ name: 'tenant person list', aliases: ['tenant:person:list'] },
+	{ name: 'tenant person show', aliases: ['tenant:person:show'] },
+	{ name: 'tenant person create', aliases: ['tenant:person:create'] },
+	{ name: 'tenant person update', aliases: ['tenant:person:update'] },
+	{ name: 'tenant person set-password', aliases: ['tenant:person:set-password'] },
+	{ name: 'tenant person disable', aliases: ['tenant:person:disable'] },
+	{ name: 'tenant person sign-out', aliases: ['tenant:person:sign-out'] },
+	{ name: 'tenant person reset-mfa', aliases: ['tenant:person:reset-mfa'] },
+	{ name: 'tenant person reset-password-request', aliases: ['tenant:person:reset-password-request'] },
+	{ name: 'tenant session create', aliases: ['tenant:session:create'] },
+	{ name: 'tenant identity role add', aliases: ['tenant:identity:role:add'] },
+	{ name: 'tenant identity role remove', aliases: ['tenant:identity:role:remove'] },
+	{ name: 'tenant member list', aliases: ['tenant:member:list'] },
+	{ name: 'tenant member add', aliases: ['tenant:member:add'] },
+	{ name: 'tenant member update', aliases: ['tenant:member:update'] },
+	{ name: 'tenant member remove', aliases: ['tenant:member:remove'] },
+	{ name: 'tenant member invite', aliases: ['tenant:member:invite'] },
+	{ name: 'tenant member invite-unmanaged', aliases: ['tenant:member:invite-unmanaged'] },
+	{ name: 'tenant api-key list', aliases: ['tenant:api-key:list'] },
+	{ name: 'tenant api-key create', aliases: ['tenant:api-key:create'] },
+	{ name: 'tenant api-key disable', aliases: ['tenant:api-key:disable'] },
+	{ name: 'tenant policy list', aliases: ['tenant:policy:list'] },
+	{ name: 'tenant policy create', aliases: ['tenant:policy:create'] },
+	{ name: 'tenant policy update', aliases: ['tenant:policy:update'] },
+	{ name: 'tenant policy delete', aliases: ['tenant:policy:delete'] },
+	{ name: 'tenant mail-template list', aliases: ['tenant:mail-template:list'] },
+	{ name: 'tenant mail-template add', aliases: ['tenant:mail-template:add'] },
+	{ name: 'tenant mail-template remove', aliases: ['tenant:mail-template:remove'] },
 ]
 
+const expectedTenantCommands = expectedCommandCatalog.map(it => it.name).filter(it => it.startsWith('tenant '))
+
 describe('command registry', () => {
-	test('every registered command constructs and its configuration validates', () => {
+	test('every manifest command is registered, constructs, and validates its configuration', () => {
 		const { dic } = createTestContainer()
 
-		for (const entry of dic.commandManager.getCommands()) {
+		for (const expected of expectedCommandCatalog) {
+			const entry = dic.commandManager.getCommands().find(it => it.name === expected.name)
+			expect(entry).toBeDefined()
+			if (entry === undefined) {
+				continue
+			}
 			// getConfiguration() runs configure() and CommandConfiguration.validate()
 			expect(() => entry.create().getConfiguration()).not.toThrow()
 		}
@@ -106,22 +141,30 @@ describe('command registry', () => {
 		expect(offenders).toEqual([])
 	})
 
-	test('every canonical name is the space form and its colon alias resolves to the same factory', () => {
+	test('the public catalog contains exactly the expected canonical names and silent aliases', () => {
 		const { dic } = createTestContainer()
+		const registered = dic.commandManager.getCommands()
+		const actualCatalog = registered.map(it => ({ name: it.name, aliases: [...it.aliases] })).sort((a, b) => a.name.localeCompare(b.name))
+		const expectedCatalog = expectedCommandCatalog.map(it => ({ name: it.name, aliases: [...it.aliases] })).sort((a, b) => a.name.localeCompare(b.name))
 
-		for (const entry of dic.commandManager.getCommands()) {
-			if (entry.tokens.length === 1) {
-				expect(entry.aliases).toEqual([])
-				continue
+		expect(actualCatalog).toEqual(expectedCatalog)
+		for (const entry of registered) {
+			for (const alias of entry.aliases) {
+				expect(dic.commandList[alias]).toBe(dic.commandList[entry.name])
+				const resolved = dic.commandManager.resolve([alias])
+				expect(resolved.type).toBe('command')
+				expect(resolved.type === 'command' ? resolved.entry.name : null).toBe(entry.name)
 			}
-			const colonForm = entry.tokens.join(':')
-			// the space form must be registered first, otherwise the colon form would become the canonical name
-			expect(entry.aliases).toEqual([colonForm])
-			expect(dic.commandList[colonForm]).toBe(dic.commandList[entry.name])
-			const resolved = dic.commandManager.resolve([colonForm])
-			expect(resolved.type).toBe('command')
-			expect(resolved.type === 'command' ? resolved.entry.name : null).toBe(entry.name)
 		}
+	})
+
+	test('the legacy migr:exe shorthand resolves without becoming a catalog alias', () => {
+		const { dic } = createTestContainer()
+		const resolved = dic.commandManager.resolve(['migr:exe'])
+
+		expect(resolved.type).toBe('command')
+		expect(resolved.type === 'command' ? resolved.entry.name : null).toBe('migrations execute')
+		expect(dic.commandManager.getCommands().find(it => it.name === 'migrations execute')?.aliases).not.toContain('migr:exe')
 	})
 
 	test('no command name is a strict prefix of another', () => {

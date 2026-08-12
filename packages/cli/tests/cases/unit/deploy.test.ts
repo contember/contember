@@ -10,6 +10,12 @@ import { RemoteProjectProvider } from '../../../src/lib/project/RemoteProjectPro
 import { RemoteProjectResolver } from '../../../src/lib/project/RemoteProjectResolver.js'
 import { Workspace } from '../../../src/lib/workspace/Workspace.js'
 import { RemoteProject } from '../../../src/lib/project/RemoteProject.js'
+import { createContainer } from '../../../src/dic.js'
+import { mkdtemp, rm } from 'node:fs/promises'
+import { tmpdir } from 'node:os'
+import { join } from 'node:path'
+import { emptySchema } from '@contember/schema-utils'
+import { SchemaStateManager } from '@contember/migrations-client'
 
 // Mirrors packages/cli-common/tests/lib/testOutput.ts — that helper isn't part of the package's
 // public exports, so it can't be imported across the package boundary.
@@ -123,6 +129,113 @@ const buildCommand = ({
 }
 
 describe('DeployCommand', () => {
+	test('positional DSN supplies the migration tenant endpoint and token without environment connection variables', async () => {
+		const deployToken = 'positional-deploy-token'
+		const requests: { url: string; authorization: string | null }[] = []
+		globalThis.fetch = async (input, init) => {
+			const url = input instanceof Request ? input.url : input.toString()
+			requests.push({
+				url,
+				authorization: new Headers(init?.headers).get('authorization'),
+			})
+			const query = JSON.parse(String(init?.body)).query
+			const data = url.endsWith('/tenant')
+				? { createProject: { ok: true, result: { deployerApiKey: null } } }
+				: query.includes('executedMigrations')
+				? { executedMigrations: [] }
+				: { migrate: { ok: true, errors: [] } }
+			return new Response(JSON.stringify({ data }), { status: 200 })
+		}
+		const workspaceDir = await mkdtemp(join(tmpdir(), 'contember-deploy-dsn-'))
+		const migrationsDir = join(workspaceDir, 'api/migrations')
+		await new SchemaStateManager(join(migrationsDir, 'state')).extractState(emptySchema)
+		const { output } = createTestOutput()
+		const dic = createContainer({
+			env: {},
+			version: '0.0.0-test',
+			runtime: 'node',
+			workspace: { baseDir: workspaceDir, apiDir: join(workspaceDir, 'api'), migrationsDir },
+			output,
+		})
+
+		try {
+			const exitCode = await dic.application.execute([
+				'deploy',
+				`contember://blog:${deployToken}@deploy.example.test`,
+				'--yes',
+				'--no-admin',
+				'--json',
+			])
+
+			expect(exitCode).toBe(0)
+			expect(requests.map(request => request.url)).toStrictEqual([
+				'https://deploy.example.test/tenant',
+				'https://deploy.example.test/system/blog',
+				'https://deploy.example.test/system/blog',
+			])
+			expect(requests.every(request => request.authorization === `Bearer ${deployToken}`)).toBe(true)
+		} finally {
+			await rm(workspaceDir, { recursive: true, force: true })
+		}
+	})
+
+	test('migration project creation does not use a different environment tenant connection', async () => {
+		const deployToken = 'positional-deploy-token'
+		const environmentToken = 'environment-tenant-token'
+		const requests: { url: string; authorization: string | null }[] = []
+		globalThis.fetch = async (input, init) => {
+			const url = input instanceof Request ? input.url : input.toString()
+			requests.push({
+				url,
+				authorization: new Headers(init?.headers).get('authorization'),
+			})
+			const query = JSON.parse(String(init?.body)).query
+			const data = query.includes('createProject')
+				? { createProject: { ok: true, result: { deployerApiKey: null } } }
+				: query.includes('executedMigrations')
+				? { executedMigrations: [] }
+				: query.includes('projects')
+				? { projects: [] }
+				: { migrate: { ok: true, errors: [] } }
+			return new Response(JSON.stringify({ data }), { status: 200 })
+		}
+		const workspaceDir = await mkdtemp(join(tmpdir(), 'contember-deploy-dsn-'))
+		const migrationsDir = join(workspaceDir, 'api/migrations')
+		await new SchemaStateManager(join(migrationsDir, 'state')).extractState(emptySchema)
+		const { output } = createTestOutput()
+		const dic = createContainer({
+			env: { apiUrl: 'https://environment.example.test', apiToken: environmentToken },
+			version: '0.0.0-test',
+			runtime: 'node',
+			workspace: { baseDir: workspaceDir, apiDir: join(workspaceDir, 'api'), migrationsDir },
+			output,
+		})
+
+		try {
+			await dic.application.execute([
+				'deploy',
+				`contember://blog:${deployToken}@deploy.example.test`,
+				'--yes',
+				'--no-admin',
+				'--json',
+			])
+			await dic.tenantClientProvider.project().listProjects()
+
+			expect(
+				requests.slice(0, 3).every(request =>
+					request.url.startsWith('https://deploy.example.test/')
+					&& request.authorization === `Bearer ${deployToken}`
+				),
+			).toBe(true)
+			expect(requests[3]).toStrictEqual({
+				url: 'https://environment.example.test/tenant',
+				authorization: `Bearer ${environmentToken}`,
+			})
+		} finally {
+			await rm(workspaceDir, { recursive: true, force: true })
+		}
+	})
+
 	test('emits the deploy result as data, without the token, in --json mode', async () => {
 		const { command, adminDeployer } = buildCommand({ adminDistDir: '/project/admin/dist' })
 		const { output, stdout, stderr } = createTestOutput()

@@ -169,6 +169,7 @@ export const createContainer = ({ env, version, runtime, workspace, output }: {
 		})
 		.addService('systemClientProvider', ({ remoteProjectProvider }) => new SystemClientProvider(remoteProjectProvider))
 		.addService('tenantClientProvider', ({ tenantConnectionProvider }) => new TenantClientProvider(tenantConnectionProvider))
+		.addService('migrationTenantClientProvider', ({ remoteProjectProvider }) => new TenantClientProvider(remoteProjectProvider))
 		.addService('adminClient', ({ remoteProjectProvider }) => new AdminClient(remoteProjectProvider))
 		.addService('migrationFilesManager', ({ jsCodeRunner, workspace }) => {
 			const runJs = runtime === 'bun' ? (file: string) => import(file) : jsCodeRunner.run
@@ -237,7 +238,7 @@ export const createContainer = ({ env, version, runtime, workspace, output }: {
 			'migrationExecutionFacade',
 			({
 				systemClientProvider,
-				tenantClientProvider,
+				migrationTenantClientProvider,
 				remoteProjectProvider,
 				schemaVersionBuilder,
 				migrationPrinter,
@@ -249,7 +250,7 @@ export const createContainer = ({ env, version, runtime, workspace, output }: {
 			}) =>
 				new MigrationExecutionFacade(
 					systemClientProvider,
-					tenantClientProvider,
+					migrationTenantClientProvider,
 					remoteProjectProvider,
 					schemaVersionBuilder,
 					migrationPrinter,

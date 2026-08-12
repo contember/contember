@@ -436,7 +436,7 @@ export const createContainer = ({ env, version, runtime, workspace, output }: {
 			// Canonical multi-token names always retain their silent colon compatibility alias.
 			const register = (name: string, factory: CommandFactory) => {
 				commands[name] = factory
-				const colonAlias = name.includes(' ') ? name.replaceAll(' ', ':') : undefined
+				const colonAlias = name.includes(' ') ? name.split(' ').join(':') : undefined
 				if (colonAlias !== undefined) {
 					commands[colonAlias] = factory
 				}

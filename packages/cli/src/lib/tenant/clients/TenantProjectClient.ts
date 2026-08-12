@@ -45,6 +45,7 @@ import {
 	updateProjectError$$,
 	updateProjectResponse$$,
 } from '@contember/graphql-client-tenant'
+import { CliError, ExitCode } from '@contember/cli-common'
 import type { ModelType } from 'graphql-ts-client-api'
 import { TenantApiTransport } from '../TenantApiTransport.js'
 import { TenantGlobalConfig, TenantIdpOptions } from '../tenantConfig.js'
@@ -216,6 +217,11 @@ const toRoleVariableDefinition = (variable: ModelType<typeof roleVariableFetcher
 			return { type: 'predefined', name: variable.name, value: variable.value }
 		case 'RoleConditionVariableDefinition':
 			return { type: 'condition', name: variable.name }
+		case 'RoleVariableDefinition':
+			throw new CliError(`Tenant API returned an abstract role variable definition for "${variable.name}".`, {
+				code: 'TENANT_API_INVALID_RESPONSE',
+				exitCode: ExitCode.InternalError,
+			})
 	}
 }
 const projectBySlugFetcher = query$.projectBySlug(

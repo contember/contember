@@ -141,6 +141,31 @@ describe('TenantProjectShowCommand ("tenant project show")', () => {
 		expect(stdout.text).toContain('Author')
 	})
 
+	test('rejects an abstract role variable definition as an invalid tenant response', async () => {
+		responder = () => ({
+			projectBySlug: {
+				id: 'p1',
+				name: 'Blog',
+				slug: 'blog',
+				config: {},
+				roles: [{ name: 'editor', variables: [{ __typename: 'RoleVariableDefinition', name: 'unknown' }] }],
+				secrets: [],
+			},
+		})
+		const { output } = createTestOutput()
+
+		try {
+			await new TenantProjectShowCommand(createTenantClientProvider()).run(['blog'], output)
+			throw new Error('expected a CliError to be thrown')
+		} catch (error) {
+			expect(error).toBeInstanceOf(CliError)
+			if (error instanceof CliError) {
+				expect(error.code).toBe('TENANT_API_INVALID_RESPONSE')
+				expect(error.exitCode).toBe(ExitCode.InternalError)
+			}
+		}
+	})
+
 	// a missing project and a forbidden one are indistinguishable at the API — both surface as a typed not-found
 	test('a missing project is reported as PROJECT_NOT_FOUND, not a bare null on stdout', async () => {
 		responder = () => ({ projectBySlug: null })

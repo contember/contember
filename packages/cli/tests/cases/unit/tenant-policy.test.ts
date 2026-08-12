@@ -308,7 +308,7 @@ describe('tenant policy create', () => {
 		expect(sentRequests[0].variables).toEqual({ policy: { scope: 'global', roles: [] } })
 	})
 
-	test('a global policy preserves an explicit project null', async () => {
+	test('a global policy normalizes an explicit project null to omission', async () => {
 		responses = { createAuthPolicy: { ok: true, result: { id: 'pol-9' } } }
 		const { output, stdout } = createTestOutput()
 
@@ -317,7 +317,7 @@ describe('tenant policy create', () => {
 			output,
 		)
 
-		expect(sentRequests[0].variables).toEqual({ policy: { scope: 'global', project: null, roles: [] } })
+		expect(sentRequests[0].variables).toEqual({ policy: { scope: 'global', roles: [] } })
 		expect(JSON.parse(stdout.text)).toEqual({ id: 'pol-9', scope: 'global', project: null })
 	})
 
@@ -410,11 +410,16 @@ describe('tenant policy update', () => {
 		const { output, stdout } = createTestOutput()
 
 		await new TenantPolicyUpdateCommand(createProvider(), noStdin).run(
-			['pol-1', '--json', '--policy', '{"scope":"global","project":null,"roles":["admin"],"idleTimeout":null}'],
+			[
+				'pol-1',
+				'--json',
+				'--policy',
+				'{"scope":"global","project":null,"roles":["admin"],"mfaRequired":null,"tokenExpiration":null,"idleTimeout":null,"mfaGraceDuration":null,"rememberMeAllowed":null}',
+			],
 			output,
 		)
 
-		expect(sentRequests[0].variables).toEqual({ id: 'pol-1', policy: { scope: 'global', project: null, roles: ['admin'], idleTimeout: null } })
+		expect(sentRequests[0].variables).toEqual({ id: 'pol-1', policy: { scope: 'global', roles: ['admin'] } })
 		expect(JSON.parse(stdout.text)).toEqual({ id: 'pol-1', scope: 'global', project: null })
 	})
 })

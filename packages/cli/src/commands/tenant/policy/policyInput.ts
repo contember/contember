@@ -124,10 +124,10 @@ export const parseAuthPolicyInput = (raw: string): AuthPolicyInput => {
 	}
 	const scope = readEnum(record.scope, Object.values(authPolicyScopes), 'scope')
 	const project = readOptionalString(record.project, 'project')
-	if (scope === 'project' && (project === undefined || project === null)) {
+	if (scope === 'project' && project === undefined) {
 		throw inputError('A project-scoped policy needs "project" (the project slug).', 'INVALID_POLICY')
 	}
-	if (scope === 'global' && project !== undefined && project !== null) {
+	if (scope === 'global' && project !== undefined) {
 		throw inputError('A global policy must not carry "project".', 'INVALID_POLICY')
 	}
 	return {
@@ -175,9 +175,9 @@ const readEnum = <T extends string>(value: unknown, allowed: T[], field: string)
 	return found
 }
 
-const readOptionalString = (value: unknown, field: string): string | null | undefined => {
+const readOptionalString = (value: unknown, field: string): string | undefined => {
 	if (value === undefined || value === null) {
-		return value
+		return undefined
 	}
 	if (typeof value !== 'string') {
 		throw inputError(`"${field}" must be a string.`, 'INVALID_POLICY')
@@ -185,9 +185,9 @@ const readOptionalString = (value: unknown, field: string): string | null | unde
 	return value
 }
 
-const readOptionalBoolean = (value: unknown, field: string): boolean | null | undefined => {
+const readOptionalBoolean = (value: unknown, field: string): boolean | undefined => {
 	if (value === undefined || value === null) {
-		return value
+		return undefined
 	}
 	if (typeof value !== 'boolean') {
 		throw inputError(`"${field}" must be a boolean.`, 'INVALID_POLICY')

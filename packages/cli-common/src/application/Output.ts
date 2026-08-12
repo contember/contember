@@ -257,7 +257,7 @@ class PromptWritable extends Writable {
 		return this.stream.columns ?? 80
 	}
 
-	public _write(chunk: string | Uint8Array, encoding: BufferEncoding, callback: (error?: Error | null) => void): void {
+	public override _write(chunk: string | Uint8Array, encoding: BufferEncoding, callback: (error?: Error | null) => void): void {
 		try {
 			writeStream(this.stream, typeof chunk === 'string' ? chunk : Buffer.from(chunk).toString(encoding))
 			callback()

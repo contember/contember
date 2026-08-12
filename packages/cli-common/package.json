@@ -28,7 +28,8 @@
     "@types/npm-package-arg": "catalog:"
   },
   "dependencies": {
-    "chalk": "catalog:"
+    "chalk": "catalog:",
+    "chalk-table": "catalog:"
   },
   "type": "module",
   "repository": {

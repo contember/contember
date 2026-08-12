@@ -22,8 +22,7 @@ export class Pnpm implements PackageManager {
 			...PackageManagerHelpers.formatPackagesToInstall(dependencies),
 		], {
 			cwd: pckg.dir,
-			stderr: process.stderr,
-			stdout: process.stdout,
+			display: 'pnpm add dependencies',
 		})
 		await output
 	}

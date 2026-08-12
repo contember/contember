@@ -20,8 +20,7 @@ export class Bun implements PackageManager {
 			...PackageManagerHelpers.formatPackagesToInstall(dependencies),
 		], {
 			cwd: pckg.dir,
-			stderr: process.stderr,
-			stdout: process.stdout,
+			display: 'bun add dependencies',
 		})
 		await output
 	}

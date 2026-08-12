@@ -93,16 +93,20 @@ describe('TenantMemberClient', () => {
 
 describe('TenantApiKeyClient', () => {
 	test('listGlobalApiKeys normalizes nullables', async () => {
-		const { clients } = createClients({ globalApiKeys: [{ id: 'k1', type: 'PERMANENT', enabled: true }] })
+		const { clients } = createClients({
+			globalApiKeys: [{ id: 'k1', type: 'PERMANENT', enabled: true, identity: { id: 'i1', roles: ['super_admin'] } }],
+		})
 
 		expect(await clients.apiKey.listGlobalApiKeys()).toEqual([{
 			id: 'k1',
+			identityId: 'i1',
 			description: null,
 			type: 'PERMANENT',
 			enabled: true,
 			createdAt: null,
 			lastUsedAt: null,
 			expiresAt: null,
+			globalRoles: ['super_admin'],
 		}])
 	})
 })

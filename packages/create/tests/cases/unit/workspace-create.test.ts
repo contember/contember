@@ -72,7 +72,7 @@ describe('WorkspaceCreateCommand output', () => {
 		const { command } = createCommand()
 		const { output, stdout } = createOutput()
 
-		await command.run(['demo\u001b[31m'], output)
+		await command.run(['demo\u001b[31m', '--no-color'], output)
 
 		expect(stdout.text).toContain('Contember project successfully created in /work/demo[31m')
 		expect(stdout.text).not.toContain('\u001b')

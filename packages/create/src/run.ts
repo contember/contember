@@ -14,7 +14,6 @@ output.applyGlobalOptions(readGlobalOptionsFromArgs(process.argv.slice(2)))
 				new TemplateInstaller(
 					resourcesDir,
 					new FileSystem(),
-					output,
 				),
 			),
 	})

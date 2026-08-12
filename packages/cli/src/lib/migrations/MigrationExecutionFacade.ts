@@ -186,7 +186,10 @@ export class MigrationExecutionFacade {
 		try {
 			return await this.migrationStatusFacade.resolveMigrationsStatus({ force })
 		} catch (error) {
-			if (!(error instanceof GraphQlClientError) || error.response?.status !== 404) {
+			const projectNotFound = error instanceof CliError
+				? error.code === 'SYSTEM_API_NOT_FOUND'
+				: error instanceof GraphQlClientError && error.response?.status === 404
+			if (!projectNotFound) {
 				throw error
 			}
 			return await this.migrationStatusFacade.resolveMigrationsStatusFromExecuted([], { force })

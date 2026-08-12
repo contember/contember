@@ -1,5 +1,5 @@
 import { Command, CommandConfiguration, Input, Output } from '@contember/cli-common'
-import { MigrationFilesManager, MigrationState, sortMigrations, SystemClient } from '@contember/migrations-client'
+import { MigrationFilesManager, MigrationState, sortMigrations } from '@contember/migrations-client'
 import { MigrationsStatusFacade } from '../../lib/migrations/MigrationsStatusFacade.js'
 import { MigrationPrinter, migrationStatusColumns } from '../../lib/migrations/MigrationPrinter.js'
 import { SystemClientProvider } from '../../lib/SystemClientProvider.js'
@@ -12,12 +12,20 @@ type Options = {
 	['restore-missing']?: true
 }
 
+type MigrationStatusResolver = Pick<MigrationsStatusFacade, 'resolveMigrationsStatus'>
+type MigrationFileWriter = Pick<MigrationFilesManager, 'createFile'>
+type MigrationStatusPrinter = Pick<MigrationPrinter, 'statusRows'>
+
+interface MigrationSystemClientProvider {
+	get(): Pick<ReturnType<SystemClientProvider['get']>, 'getExecutedMigration'>
+}
+
 export class MigrationStatusCommand extends Command<Args, Options> {
 	constructor(
-		private readonly migrationsStatusFacade: MigrationsStatusFacade,
-		private readonly migrationFilesManager: MigrationFilesManager,
-		private readonly systemClientProvider: SystemClientProvider,
-		private readonly migrationPrinter: MigrationPrinter,
+		private readonly migrationsStatusFacade: MigrationStatusResolver,
+		private readonly migrationFilesManager: MigrationFileWriter,
+		private readonly systemClientProvider: MigrationSystemClientProvider,
+		private readonly migrationPrinter: MigrationStatusPrinter,
 	) {
 		super()
 	}

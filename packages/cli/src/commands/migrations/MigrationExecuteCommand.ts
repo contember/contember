@@ -10,9 +10,11 @@ type Options = {
 	['no-snapshot']?: boolean
 }
 
+type MigrationExecutor = Pick<MigrationExecutionFacade, 'execute'>
+
 export class MigrationExecuteCommand extends Command<Args, Options> {
 	constructor(
-		private readonly migrationExecutorFacade: MigrationExecutionFacade,
+		private readonly migrationExecutorFacade: MigrationExecutor,
 	) {
 		super()
 	}

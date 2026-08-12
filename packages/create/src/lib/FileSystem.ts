@@ -7,6 +7,8 @@ export class FileSystem {
 	writeFile = fs.writeFile
 	rename = fs.rename
 	readDir = fs.readdir
+	lstat = fs.lstat
+	realPath = fs.realpath
 	copy = (source: string, destination: string, options?: { filter?: (source: string, destination: string) => boolean }) =>
 		fs.cp(source, destination, { recursive: true, ...options })
 	unlink = fs.unlink

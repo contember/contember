@@ -1,0 +1,20 @@
+diff --git a/dist/index-688c5d50.js b/dist/index-688c5d50.js
+index d9fd2b3b41deb7c978e10f2530961841f87c8152..626c8361d26fb26e3855e7b75e9b525ca5b2a6a6 100644
+--- a/dist/index-688c5d50.js
++++ b/dist/index-688c5d50.js
+@@ -14057,3 +14057 @@ class Degit extends Events__default['default'] {
+-					console.error(
+-						source.cyan(`> ${event.message.replace('options.', '--')}`)
+-					);
++					this._info(event);
+@@ -14063,3 +14061 @@ class Degit extends Events__default['default'] {
+-					console.error(
+-						source.magenta(`! ${event.message.replace('options.', '--')}`)
+-					);
++					this._warn(event);
+@@ -14068,4 +14064 @@ class Degit extends Events__default['default'] {
+-				await d.clone(dest).catch(err => {
+-					console.error(source.red(`! ${err.message}`));
+-					process.exit(1);
+-				});
++				await d.clone(dest);

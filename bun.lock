@@ -1275,6 +1275,7 @@
   },
   "patchedDependencies": {
     "graphql-ts-client-codegen@3.1.17": "patches/graphql-ts-client-codegen@3.1.17.patch",
+    "degit@2.8.4": "patches/degit@2.8.4.patch",
   },
   "overrides": {
     "@types/node": "24.12.0",

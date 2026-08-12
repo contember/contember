@@ -227,6 +227,35 @@ describe('DataTransferClient transport errors', () => {
 		}
 	})
 
+	test('uploads importSequence events unchanged and in stream order', async () => {
+		const lines = [
+			JSON.stringify(['importSequence', { table: 'article', column: 'id', value: 42 }]),
+			JSON.stringify(['insertBegin', { table: 'article', columns: ['id'] }]),
+			JSON.stringify(['insertRow', [43]]),
+			JSON.stringify(['insertEnd']),
+		]
+		const expectedBody = `${lines.join('\n')}\n`
+		let uploadedBody = ''
+		globalThis.fetch = async (_input, init) => {
+			uploadedBody = await new Response(init?.body).text()
+			return Response.json({ ok: true })
+		}
+		const client = new DataTransferClient()
+
+		await client.dataImport({
+			stream: Readable.from([
+				`${lines[0]}\n${lines[1].slice(0, 12)}`,
+				`${lines[1].slice(12)}\n${lines[2]}\n`,
+				`${lines[3]}\n`,
+			]),
+			project: new RemoteProject('blog', 'https://api.example.test', 'distinctive-token-value'),
+			printProgress: () => undefined,
+			gzip: false,
+		})
+
+		expect(uploadedBody).toBe(expectedBody)
+	})
+
 	test('classifies an upload destination failure without hanging', async () => {
 		globalThis.fetch = async () => {
 			throw new Error('distinctive-destination-secret')

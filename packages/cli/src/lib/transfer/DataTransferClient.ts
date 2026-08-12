@@ -23,6 +23,7 @@ const transferStreamError = (action: 'Import' | 'Export', cause: unknown): CliEr
 type TransferCommandName =
 	| 'importSystemSchemaBegin'
 	| 'importContentSchemaBegin'
+	| 'importSequence'
 	| 'insertBegin'
 	| 'insertRow'
 	| 'insertEnd'
@@ -30,6 +31,7 @@ type TransferCommandName =
 const transferCommandNames: ReadonlySet<string> = new Set<TransferCommandName>([
 	'importSystemSchemaBegin',
 	'importContentSchemaBegin',
+	'importSequence',
 	'insertBegin',
 	'insertRow',
 	'insertEnd',
@@ -252,6 +254,8 @@ export class DataTransferClient {
 					return JSON.stringify([event.name, { ...requireEventPayload(event), project: project.name }])
 				case 'importContentSchemaBegin':
 					return JSON.stringify([event.name, { ...requireEventPayload(event), project: project.name }])
+				case 'importSequence':
+					break
 				case 'insertBegin':
 					if (typeof event.payload?.table !== 'string') {
 						throw new Error('Insert event has no table')

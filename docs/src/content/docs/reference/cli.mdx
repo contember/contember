@@ -3,7 +3,8 @@ title: Contember CLI
 ---
 
 `@contember/cli` is the command line tool for developing and operating Contember projects. It manages
-migrations, validates and prints the schema, transfers data, deploys, and covers the whole tenant API.
+migrations, validates and prints the schema, transfers data, deploys, and provides tenant-administration
+commands.
 
 Run it without arguments to see the list of commands:
 
@@ -265,9 +266,10 @@ See [managing actions](/reference/engine/actions/managing).
 
 ### tenant
 
-Full coverage of the [tenant API](/reference/engine/tenant/overview) — projects, persons, members,
-API keys, auth policies and mail templates. Most of these need a token with `SUPER_ADMIN` or
-`PROJECT_ADMIN` privileges.
+Tenant-administration commands cover projects, persons, members, API keys, auth policies, mail
+templates and the auth log. They do not expose every [tenant API](/reference/engine/tenant/overview)
+operation, such as end-user sign-in, sign-up verification and identity-provider authentication flows.
+Most administration commands need a token with `SUPER_ADMIN` or `PROJECT_ADMIN` privileges.
 
 #### Projects and configuration
 
@@ -299,7 +301,7 @@ all other leading, trailing and embedded whitespace is preserved.
 | `tenant person set-password <id>` | Set the password of a person. The new password is read from stdin or from an environment variable. |
 | `tenant person reset-password-request <email>` | Send a password-reset e-mail to an address. |
 | `tenant person reset-mfa <id>` | Reset every MFA factor of a locked-out person: active and pending TOTP, e-mail OTP, and their backup codes. |
-| `tenant person sign-out <id>` | Force sign-out: revoke every active session of a person. |
+| `tenant person sign-out <id>` | Force sign-out: revoke every active session and disable all attached API keys, including permanent keys. |
 | `tenant session create` | Create a one-time session token for exactly one person selected by `--email` or `--person-id`. The token is shown once. |
 | `tenant identity role add <identityId> <role...>` | Grant global (project-independent) roles to an identity. |
 | `tenant identity role remove <identityId> <role...>` | Revoke global (project-independent) roles from an identity. |
@@ -309,6 +311,11 @@ one of `--captcha-token`, `--captcha-token-env <name>` or `--captcha-token-stdin
 visible in shell history and process listings. When `tenant person create` also needs a password from
 stdin, put either the password or the captcha token in an environment variable because only one input
 can consume stdin.
+
+`tenant person list` returns one page. The server uses a page size of 100 by default and caps it at
+1000; the command never fetches more pages automatically. Set `--limit` to choose the page size and
+`--offset` to page explicitly. The `--email` filter is a case-insensitive substring match. `%` and `_`
+in the supplied value are treated as literal characters, not wildcard syntax.
 
 `tenant session create` requires exactly one of `--email` and `--person-id`. Use `--expiration` for a
 positive lifetime in minutes. In quiet mode it prints only the token.
@@ -339,11 +346,20 @@ SHA-256 password reset token hash with one of `--reset-token-hash`, `--reset-tok
 | Command | Description |
 | --- | --- |
 | `tenant api-key list` | List global permanent API keys with their identity and visible global roles, or project-scoped keys with their identity and memberships using `--project <slug>`. |
-| `tenant api-key create --description <text>` | Create a permanent API key, scoped to a project or global. Prints the token — it is shown exactly once. |
+| `tenant api-key create --description <text> (--project <slug> \| --global)` | Create a permanent API key, scoped to exactly one project or globally. |
 | `tenant api-key disable <id>` | Disable a permanent API key, revoking its token immediately. |
 
 For global keys, `globalRoles` is nullable. Human output shows `(not visible)` when the caller cannot
 inspect an identity's roles.
+
+`tenant api-key create` requires exactly one target: `--project <slug>` or `--global`. A project key
+also requires at least one membership, supplied by repeated `--role`, `--memberships <json>` or
+`--memberships-stdin`. For a global key, repeated `--role` options grant global tenant roles.
+
+Without `--token-hash`, the server generates the token and the command prints it once; it cannot be
+retrieved later. With `--token-hash <sha256-hex>`, the caller provisions a precomputed token hash. The
+server never receives the plaintext token, so the command returns or prints the API-key id instead of
+a token.
 
 `tenant api-key create` and `tenant session create` accept `--trust-forwarded-client-info`. Enable it
 only when the tenant endpoint is behind a trusted proxy that removes client-supplied forwarding headers
@@ -354,13 +370,21 @@ and sets the real client IP and user agent. Otherwise a client can spoof audit m
 | Command | Description |
 | --- | --- |
 | `tenant policy list` | List the configured auth policies (per-role MFA and session policy). |
-| `tenant policy create` | Create an auth policy from an `AuthPolicyInput` JSON document. |
-| `tenant policy update <id>` | Replace an auth policy with the given `AuthPolicyInput` JSON document. |
+| `tenant policy create (--policy <json> \| --policy-stdin)` | Create an auth policy from an `AuthPolicyInput` JSON document. |
+| `tenant policy update <id> (--policy <json> \| --policy-stdin)` | Replace an auth policy with the given `AuthPolicyInput` JSON document. |
 | `tenant policy delete <id>` | Delete an auth policy. |
 | `tenant mail-template list` | List the configured [mail templates](/reference/engine/tenant/mail-templates), global and project-scoped. |
-| `tenant mail-template add <type> --subject <text>` | Add or replace a mail template. Existing templates with the same project, type and variant are overwritten. |
-| `tenant mail-template remove <type>` | Remove a mail template, so the built-in one is used again. |
+| `tenant mail-template add <type> --subject <text> (--content <text> \| --content-stdin)` | Add or replace a mail template. Existing templates with the same project, type and variant are overwritten. |
+| `tenant mail-template remove <type>` | Remove the selected global or project-scoped mail template. |
 | `tenant auth-log` | Read the tenant [auth log](/reference/engine/tenant/audit-log). Requires the `system:viewAuthLog` permission. |
+
+`tenant policy create` and `tenant policy update` require exactly one policy source: `--policy <json>`
+or `--policy-stdin`. `tenant mail-template add` requires exactly one body source: `--content <text>` or
+`--content-stdin`. Both body sources permit intentionally empty content.
+
+Removing a project-scoped mail template restores fallback to the matching global template. If no
+matching global template exists, the built-in template is used. Removing a global template falls back
+directly to the built-in template.
 
 `tenant auth-log --limit` must be a positive GraphQL Int (at most `2147483647`); the server defaults
 to 100 and caps the returned page at 500. `--offset` must be a non-negative GraphQL Int. JSON output

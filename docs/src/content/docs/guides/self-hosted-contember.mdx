@@ -76,7 +76,20 @@ TENANT_MAILER_FROM: "noreply@example.com"
 
 HTTP server should start on the specified port. You can add a load-balancer in front of the app. The container is stateless and therefore horizontally scalable.
 
-After the server is running Contember CLI can be used to set up other API tokens and invite users. Deploy your projects to this instance by running `contember deploy blog --yes` command with `CONTEMBER_API_URL` and `CONTEMBER_API_TOKEN` environment variables set. You can use either superadmin token or create token with `deployer` role (using `contember tenant:create-api-key` command).
+After the server is running, use Contember CLI to set up other API tokens and invite users. Deploy the
+`blog` project to this instance with `CONTEMBER_API_URL` and `CONTEMBER_API_TOKEN` set:
+
+```bash
+contember deploy blog --yes
+```
+
+The API token can be the superadmin token. You can also create a project-scoped deployment token:
+
+```bash
+contember tenant api-key create --project blog --description "Blog deployment" --role deployer
+```
+
+The command prints the new token once. Store it and use it as `CONTEMBER_API_TOKEN` for later deploys.
 
 
 ## Deploy Contember Interface

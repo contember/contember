@@ -1,12 +1,10 @@
 # CLAUDE.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
-
 ## Project Overview
 
 Contember is an open-source platform for building data-driven web applications. It provides a GraphQL API, role-based access control, authentication, and a well-structured PostgreSQL database. The admin interface is built with React.
 
-This is a **monorepo with 72 packages** under `packages/`, using **Bun** as the package manager and runtime.
+This is a monorepo under `packages/`, using **Bun** as the package manager and runtime.
 
 ## Common Commands
 
@@ -48,41 +46,9 @@ bun --conditions=typescript scripts/dev/seed-local.ts
 
 ### High-Level Overview
 
-```
-                          ┌─────────────────────┐
-                          │    engine-server     │  Entry point: bootstraps & clusters
-                          └──────────┬──────────┘
-                                     │
-                          ┌──────────┴──────────┐
-                          │     engine-http      │  Koa HTTP layer, routing, auth
-                          └──┬───────┬────────┬─┘
-                             │       │        │
-              ┌──────────────┘       │        └──────────────┐
-              ▼                      ▼                       ▼
-   ┌──────────────────┐  ┌──────────────────┐  ┌──────────────────┐
-   │engine-content-api│  │engine-system-api │  │engine-tenant-api │
-   │ GraphQL CRUD     │  │ Migrations,      │  │ Auth, users,     │
-   │ with ACL         │  │ schema, stages   │  │ projects, roles  │
-   └────────┬─────────┘  └────────┬─────────┘  └────────┬─────────┘
-            │                     │                      │
-            └─────────────┬───────┘──────────────────────┘
-                          ▼
-              ┌───────────────────┐     ┌─────────────────────┐
-              │     database      │     │   schema / schema-  │
-              │ Query builder,    │     │   definition /      │
-              │ pool, transactions│     │   schema-migrations │
-              └───────────────────┘     └─────────────────────┘
-```
-
-**Frontend stack:**
-```
-interface (re-exports) ── react-binding ── binding-common / binding-legacy
-                        ├── react-form, react-dataview, react-select
-                        ├── react-slate-editor-legacy (rich text)
-                        ├── react-uploader, react-repeater
-                        ├── react-routing, react-identity
-                        └── react-client ── client-content ── graphql-client
-```
+- Backend: `engine-server` → `engine-http` → content, system and tenant APIs → database/schema packages.
+- Frontend: `interface` → `react-binding` and feature packages → React clients → GraphQL clients.
+- Dependency injection follows master → project group → project → execution container scopes.
 
 ### Package Groups
 
@@ -93,7 +59,7 @@ interface (re-exports) ── react-binding ── binding-common / binding-lega
 - **React Binding** (`binding-common`, `binding-legacy`, `react-binding`): The data binding layer. Statically analyzes React component trees to generate GraphQL queries (markers), maintains a normalized TreeStore, collects mutations, and provides EntityAccessor/FieldAccessor/EntityListAccessor hooks.
 - **React UI** (`react-form`, `react-dataview`, `react-select`, `react-slate-editor-legacy`, `react-uploader`, `react-repeater`, `react-routing`, `react-identity`): Higher-level UI components that all integrate with react-binding via useField/useEntity/useEntityList hooks and environment extensions.
 - **Clients** (`graphql-client`, `client-content`, `client-content-generator`, `client`): `graphql-client` is a fetch-based GraphQL HTTP client. `client-content` provides a typed query/mutation builder with fluent entity selection. `client-content-generator` generates fully-typed TypeScript SDK from schema.
-- **CLI** (`cli`, `cli-common`): 22 commands for deploy, migrations (diff/execute/amend/rebase/status), data transfer (export/import), project validation, and actions management. Connects via DSN or env vars.
+- **CLI** (`cli`, `cli-common`): Commands for deploy, migrations, data transfer, project validation, actions and tenant management. Connects via DSN or env vars.
 - **Core** (`dic`, `authorization`, `logger`, `utilities`, `typesafe`): `dic` is a type-safe DI container with builder pattern, lazy resolution, and circular dependency detection. `authorization` uses a composable AccessNode tree (Union/Intersection/Negate/Roles/Fixed) evaluated against a role->resource->privilege permission map.
 
 ### Key Architectural Patterns
@@ -109,7 +75,7 @@ interface (re-exports) ── react-binding ── binding-common / binding-lega
 
 - **Dual output**: Each package produces ESM (`.js`) and CommonJS (`.cjs`) in `dist/production/` and `dist/development/`.
 - **Conditional exports**: Package.json uses `import`/`require` with `production`/`development` conditions, plus a `typescript` condition pointing to source.
-- **TypeScript**: Strict mode, composite builds with project references, `ES2020` target, `bundler` module resolution, experimental decorators enabled. Uses TypeScript 6.0.1-rc.
+- **TypeScript**: Strict mode, composite builds with project references, `ES2020` target, `bundler` module resolution, experimental decorators enabled. Uses TypeScript 7.0.1-rc.
 - **Scoped packages**: All packages are published as `@contember/{name}`.
 - **Internal deps**: Use `workspace:*` references; external deps are version-centralized via workspace catalog in root `package.json`.
 
@@ -128,15 +94,6 @@ interface (re-exports) ── react-binding ── binding-common / binding-lega
 - **Linter**: Biome — recommended ruleset with project-specific overrides.
 - **Commits**: Conventional Commits format, e.g. `fix(content-api): handle null in orderBy`.
 
-## Per-Package Structure
+## Module-Specific Context
 
-```
-packages/{name}/
-├── src/           # Source code, index.ts is the main export
-├── tests/         # Test files
-├── dist/          # Build output (production/ + development/ + types/)
-├── tsconfig.json  # Project reference wrapper
-└── package.json
-```
-
-Individual packages contain their own CLAUDE.md with package-specific architecture details.
+Read the nearest package-level `CLAUDE.md` when present; it provides local invariants and commands.

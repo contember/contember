@@ -2,44 +2,343 @@
 title: Contember CLI
 ---
 
-There is a command line tool, which helps you with developing Contember projects and running them.
+`@contember/cli` is the command line tool for developing and operating Contember projects. It manages
+migrations, validates and prints the schema, transfers data, deploys, and covers the whole tenant API.
 
-Run it without any args to see a help
-```text
+Run it without arguments to see the list of commands:
+
+```bash
 npm run contember
-``` 
-Which will print the available commands
-```text
-Contember CLI version X.Y.Z
-Usage: <command> <command args>
-    deploy                   Deploy Contember project
-    migrations:amend         Amends latest migration
-    migrations:describe      Describes a migration
-    migrations:diff          Creates schema migration diff for given project
-    migrations:execute       Executes migrations on an instance
-    migrations:rebase        Rebase migrations on filesystem and in local instance
-    migrations:status        Shows status of executed migrations on an instance & sync status
-    project:create           Creates a new Contember project
-    project:print-schema     Prints project schema
-    project:validate         Validates project schema
-    tenant:create-api-key    Creates an API key
-    tenant:invite            Invites a user by an email
-    tenant:reset-password    Resets user password
-    tenant:sign-in           Signs in a user
-    version                  Prints Contember CLI version
-    workspace:update:api     Updates Contember API version and all related packages
 ```
 
-## Commands
+Every command is also scriptable: stdout carries data, stderr carries diagnostics, `--json` makes the
+data machine readable and the exit code tells a caller what went wrong.
+
+## Command names
+
+The canonical form is space separated, noun first, verb second:
+
+```bash
+contember migrations diff add-article
+contember tenant person list
+```
+
+The older colon form keeps working everywhere and prints no deprecation warning, so existing scripts
+and CI pipelines do not need to change:
+
+```bash
+contember migrations:diff add-article
+contember tenant:person:list
+```
+
 :::tip
-You can use non-ambiguous abbreviation for commands,
-for example `npm run contember migr:exe`, which runs `migrations:execute` command
+You can abbreviate each part of a command name as long as the result stays unambiguous, for example
+`contember migr:exe` runs `migrations execute`. An ambiguous abbreviation fails and lists the
+candidates.
 :::
 
-### migrations:diff
+## Discovering commands
 
-See [migrations chapter](/reference/engine/migrations/overview).
+A command group on its own prints the commands it contains, on stderr:
 
-### tenant:apply
+```bash
+contember tenant
+contember tenant person
+```
 
-Applies a declarative `tenant.config.ts` (global config, identity providers, mail templates) to a tenant, idempotently. See [declarative tenant configuration](/reference/engine/tenant/declarative-config).
+`--help` (or `-h`) works on any command and prints its arguments, its options and the global options:
+
+```bash
+contember migrations diff --help
+```
+
+For tooling, `commands` prints the whole catalog — every command with its group, description,
+aliases, arguments and options:
+
+```bash
+contember commands --json
+```
+
+## Output
+
+The rule is strict and has no exceptions:
+
+- **stdout is data.** The result of the command, nothing else.
+- **stderr is diagnostics.** Progress, warnings, confirmations, help and errors never mix with result data.
+
+So a command can always be piped without filtering its diagnostics out.
+
+### `--json`
+
+`--json` is a global option, available on every command. It turns the data on stdout into JSON and
+switches errors to the envelope described below. Informational messages, warnings, progress and child
+process output are suppressed. When a command emits result data, it writes one JSON document: the bare
+value, not a wrapper, so it pipes straight into `jq`:
+
+```bash
+contember commands --json | jq -r '.[] | select(.group == "tenant") | .name'
+```
+
+```bash
+contember tenant person list --json | jq -r '.[].email'
+```
+
+### `--quiet`
+
+`--quiet` (or `-q`) drops informational diagnostics and child process output, and reduces stdout to
+bare scalar values, one per line — useful when you only need an id or a name. A fatal error is still
+reported on stderr:
+
+```bash
+contember tenant project list --quiet
+```
+
+### `--no-color`
+
+`--no-color` disables ANSI colors. Colors are disabled automatically in `--json` and `--quiet` mode.
+
+### Interactivity
+
+Destructive commands ask for confirmation. Pass `--yes` to skip the prompt. Without a TTY, and in
+`--json` or `--quiet` mode, a prompt would hang forever, so the command fails immediately with the
+`TTY_UNAVAILABLE` error instead. `--json` does not imply `--yes`.
+
+Secrets and long inputs are read from stdin or from an environment variable only behind an explicit
+flag — for example `--password-stdin`, `--password-env`, `--config-stdin`, `--content-stdin`,
+`--memberships-stdin` and `--policy-stdin`. A normal run never reads stdin implicitly. Literal secret
+options are documented per command. Prefer stdin or an environment variable wherever the command
+offers them, because an option value lands in the shell history and in `ps`.
+
+## Exit codes
+
+| Code | Meaning |
+| --- | --- |
+| `0` | Success. |
+| `1` | Input error — invalid input, failed validation, unknown command. |
+| `2` | Internal error — unexpected, a bug. |
+| `3` | Not found. |
+| `4` | Transient failure — network, timeout, 5xx. The caller **should** retry. |
+| `5` | Conflict — the thing already exists. |
+| `6` | Forbidden — authentication or permission denied. |
+
+An error that carries no more specific classification exits with `1`; an unexpected failure — one the
+caller cannot fix by changing the input — exits with `2`.
+
+## Errors
+
+Every error is written to stderr, never to stdout. In human mode it is a one-line summary:
+
+```text
+Error [PROJECT_NOT_DEFINED]: Project not defined. Set CONTEMBER_DSN, or CONTEMBER_API_URL, CONTEMBER_API_TOKEN and CONTEMBER_PROJECT_NAME.
+```
+
+With `--json` the same error becomes an envelope on stderr, while stdout stays empty:
+
+```json
+{
+  "ok": false,
+  "error": {
+    "code": "COMMAND_NOT_FOUND",
+    "message": "Command \"nope\" not found.",
+    "retryable": false,
+    "details": null
+  }
+}
+```
+
+`code` is a stable machine readable slug — for tenant failures it is the tenant API error code
+verbatim, for example `PERSON_NOT_FOUND` or `ALREADY_MEMBER`. `retryable` tells a caller whether
+repeating the same call can succeed; it is `true` for the transient failures that exit with `4`.
+
+## Connecting to a project
+
+The CLI reads the connection from environment variables:
+
+| Variable | Meaning |
+| --- | --- |
+| `CONTEMBER_DSN` | Full DSN, `contember://project:token@endpoint`. Takes precedence over the variables below. |
+| `CONTEMBER_API_URL` | API endpoint. `CONTEMBER_INSTANCE` is accepted as an alias. |
+| `CONTEMBER_API_TOKEN` | API token. |
+| `CONTEMBER_PROJECT_NAME` | Project name. |
+| `CONTEMBER_DIR` | Workspace directory. Defaults to the current directory. |
+
+Some commands can override this per run:
+
+- `deploy [dsn]` takes a DSN as its first argument.
+- `tenant apply` takes `--dsn`.
+- `data export`, `data import` and `data transfer` take a project name or a full DSN as their
+  source/target argument.
+- `actions *` take `--project`, which is a project name or a full DSN.
+
+:::note
+The other `tenant *` commands have no `--dsn` option — they take the connection from the
+`CONTEMBER_*` variables only. Their `--project` option is the **target** project slug inside the
+tenant API, not the connection.
+:::
+
+## Command reference
+
+The tables below list every command with its required arguments and required options. Run
+`contember <command> --help` for the optional ones, or `contember commands --json` for the whole
+catalog in one machine readable document.
+
+### Top level
+
+| Command | Description |
+| --- | --- |
+| `commands` | Lists all commands with their arguments and options. |
+| `deploy [dsn]` | Deploy Contember project. |
+| `version` | Prints Contember CLI version. |
+
+### migrations
+
+See the [migrations chapter](/reference/engine/migrations/overview).
+
+| Command | Description |
+| --- | --- |
+| `migrations amend [migration]` | Amends latest migration. |
+| `migrations blank <migrationName> [format]` | Creates new blank migration file. |
+| `migrations describe [migration]` | Describes a migration. |
+| `migrations diff <migrationName>` | Creates schema migration diff. |
+| `migrations execute` | Executes migrations on Contember server. |
+| `migrations init-state` | Enables schema state mode by extracting ACL, validation, actions and settings into the `state/` directory. |
+| `migrations rebase <migration...>` | Rebase migrations on filesystem and in local instance. |
+| `migrations snapshot` | Creates a schema snapshot (`snapshot.json`) that bootstraps a fresh database in one step instead of replaying every migration. |
+| `migrations status` | Shows status of executed migrations on an instance & sync status. |
+| `migrations verify-snapshot` | Verifies that `snapshot.json` still matches a full replay of all migrations. |
+
+### project
+
+| Command | Description |
+| --- | --- |
+| `project generate-doc` | Generates HTML documentation from project schema. |
+| `project print-schema` | Prints project schema. |
+| `project validate` | Validates project schema. |
+
+### data
+
+| Command | Description |
+| --- | --- |
+| `data export [source]` | Export data from a project. |
+| `data import <file> [target]` | Import data into a project. |
+| `data transfer <source> [target]` | Transfer data between projects. |
+
+### actions
+
+See [managing actions](/reference/engine/actions/managing).
+
+| Command | Description |
+| --- | --- |
+| `actions failed-events` | Show failed events. |
+| `actions get-event <eventIds...>` | Get one or more events by id. |
+| `actions list-variables` | Show action variables. |
+| `actions retry-event <eventIds...>` | Retry one or more events. |
+| `actions set-variables <variables...>` | Set action variables. |
+| `actions stop-event <eventIds...>` | Stop one or more events. |
+
+### tenant
+
+Full coverage of the [tenant API](/reference/engine/tenant/overview) — projects, persons, members,
+API keys, auth policies and mail templates. Most of these need a token with `SUPER_ADMIN` or
+`PROJECT_ADMIN` privileges.
+
+#### Projects and configuration
+
+| Command | Description |
+| --- | --- |
+| `tenant whoami` | Show the identity, global roles and project access of the current API token. |
+| `tenant project list` | List projects on the tenant. |
+| `tenant project show <slug>` | Show a project by slug. |
+| `tenant project create <slug>` | Create a project. |
+| `tenant project update <slug>` | Update a project's name and/or config. |
+| `tenant project secret set <slug> <key>` | Set a project secret from exactly one explicit source: `--value`, `--value-env <name>` or `--value-stdin`. |
+| `tenant config show` | Show the tenant-wide configuration (signup, password policy, login, captcha, rate limits). |
+| `tenant idp list` | List configured identity providers. |
+| `tenant apply [config]` | Apply declarative tenant configuration. See [declarative tenant configuration](/reference/engine/tenant/declarative-config). |
+
+`tenant project secret set` never reads stdin unless `--value-stdin` is present. Literal and
+environment-backed values are sent byte-for-byte. The stdin form removes exactly one final LF or CRLF;
+all other leading, trailing and embedded whitespace is preserved.
+
+#### Persons and sessions
+
+| Command | Description |
+| --- | --- |
+| `tenant person list` | List persons. A `SUPER_ADMIN` sees everyone, anyone else only the members of projects they may view members of. |
+| `tenant person show <id>` | Show a single person with their roles, active sessions and identity provider connections. |
+| `tenant person create <email>` | Create a person (tenant `signUp`). Consumes the per-IP sign-up rate limit and verifies a captcha when one is configured. |
+| `tenant person update <id>` | Change the profile of a person. Only the fields you pass are changed; neither can be cleared. |
+| `tenant person disable <id>` | Disable a person. They can no longer sign in and all of their API keys are invalidated. |
+| `tenant person set-password <id>` | Set the password of a person. The new password is read from stdin or from an environment variable. |
+| `tenant person reset-password-request <email>` | Send a password-reset e-mail to an address. |
+| `tenant person reset-mfa <id>` | Reset every MFA factor of a locked-out person: active and pending TOTP, e-mail OTP, and their backup codes. |
+| `tenant person sign-out <id>` | Force sign-out: revoke every active session of a person. |
+| `tenant session create` | Create a one-time session token for exactly one person selected by `--email` or `--person-id`. The token is shown once. |
+| `tenant session revoke <sessionId>` | Revoke a single session. Session ids are listed by `tenant person show`. |
+| `tenant identity role add <identityId> <role...>` | Grant global (project-independent) roles to an identity. |
+| `tenant identity role remove <identityId> <role...>` | Revoke global (project-independent) roles from an identity. |
+
+`tenant person create` and `tenant person reset-password-request` accept a captcha token from exactly
+one of `--captcha-token`, `--captcha-token-env <name>` or `--captcha-token-stdin`. The literal form is
+visible in shell history and process listings. When `tenant person create` also needs a password from
+stdin, put either the password or the captcha token in an environment variable because only one input
+can consume stdin.
+
+`tenant session create` requires exactly one of `--email` and `--person-id`. Use `--expiration` for a
+positive lifetime in minutes. In quiet mode it prints only the token.
+
+#### Project members
+
+| Command | Description |
+| --- | --- |
+| `tenant member list --project <slug>` | List the members of a project with their memberships. |
+| `tenant member add --project <slug> --identity <id>` | Add an existing identity to a project. |
+| `tenant member update --project <slug> --identity <id>` | Replace the memberships of an existing project member. |
+| `tenant member remove --project <slug> --identity <id>` | Remove an identity from a project. |
+| `tenant member invite --project <slug> --email <email>` | Invite a person to a project by e-mail. |
+| `tenant member invite-unmanaged --project <slug> --email <email>` | Invite a person to a project without sending any e-mail. |
+
+Memberships are given either as repeated `--role` options, or as a JSON document via `--memberships`
+or `--memberships-stdin` when a role takes variables. An empty membership list on `tenant member
+update` removes every membership. It requires an interactive confirmation or `--yes`; in JSON, quiet
+or non-TTY use, pass `--yes` explicitly.
+
+`tenant member invite-unmanaged` requires exactly one credential source. Choose a plaintext password
+with one of `--password`, `--password-env <name>` or `--password-stdin`, or choose a caller-generated
+SHA-256 password reset token hash with one of `--reset-token-hash`, `--reset-token-hash-env <name>` or
+`--reset-token-hash-stdin`. Password and reset-token-hash sources are mutually exclusive.
+
+#### API keys
+
+| Command | Description |
+| --- | --- |
+| `tenant api-key list` | List global permanent API keys, or project-scoped keys with `--project <slug>`. |
+| `tenant api-key create --description <text>` | Create a permanent API key, scoped to a project or global. Prints the token — it is shown exactly once. |
+| `tenant api-key disable <id>` | Disable a permanent API key, revoking its token immediately. |
+
+`tenant api-key create` and `tenant session create` accept `--trust-forwarded-client-info`. Enable it
+only when the tenant endpoint is behind a trusted proxy that removes client-supplied forwarding headers
+and sets the real client IP and user agent. Otherwise a client can spoof audit metadata.
+
+#### Auth policies, mail templates and the auth log
+
+| Command | Description |
+| --- | --- |
+| `tenant policy list` | List the configured auth policies (per-role MFA and session policy). |
+| `tenant policy create` | Create an auth policy from an `AuthPolicyInput` JSON document. |
+| `tenant policy update <id>` | Replace an auth policy with the given `AuthPolicyInput` JSON document. |
+| `tenant policy delete <id>` | Delete an auth policy. |
+| `tenant mail-template list` | List the configured [mail templates](/reference/engine/tenant/mail-templates), global and project-scoped. |
+| `tenant mail-template add <type> --subject <text>` | Add or replace a mail template. Existing templates with the same project, type and variant are overwritten. |
+| `tenant mail-template remove <type>` | Remove a mail template, so the built-in one is used again. |
+| `tenant auth-log` | Read the tenant [auth log](/reference/engine/tenant/audit-log). Requires the `system:viewAuthLog` permission. |
+
+`tenant auth-log --limit` must be a positive GraphQL Int (at most `2147483647`); the server defaults
+to 100 and caps the returned page at 500. `--offset` must be a non-negative GraphQL Int. JSON output
+includes `hasMore` and `nextOffset` for paging.
+
+### workspace
+
+| Command | Description |
+| --- | --- |
+| `workspace update api <version>` | Updates Contember API version and all related packages. |

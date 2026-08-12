@@ -240,6 +240,26 @@ describe('TenantApiTransport.assertOk', () => {
 		expect(error.details).toEqual({ operation: 'testOperation', code: 'INVALID_CONFIG', developerMessage: 'nope' })
 	})
 
+	test('copies only allowlisted recovery fields into details', async () => {
+		const error = await assertFails({
+			ok: false,
+			error: {
+				code: 'TOO_WEAK',
+				developerMessage: 'weak',
+				weakPasswordReasons: ['TOO_SHORT', 'UNKNOWN_REASON', 42],
+				recommendedAction: 'RESET_PASSWORD',
+			},
+		})
+
+		expect(error.details).toEqual({
+			operation: 'testOperation',
+			code: 'TOO_WEAK',
+			developerMessage: 'weak',
+			weakPasswordReasons: ['TOO_SHORT'],
+			recommendedAction: 'RESET_PASSWORD',
+		})
+	})
+
 	test('a missing error object becomes an internal error', async () => {
 		const error = await assertFails({ ok: false })
 

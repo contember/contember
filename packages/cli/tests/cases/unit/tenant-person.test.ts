@@ -1,5 +1,5 @@
 import { afterAll, afterEach, beforeAll, describe, expect, test } from 'bun:test'
-import { CliError, ExitCode, toCliError } from '@contember/cli-common'
+import { CliError, ExitCode, renderCliError, toCliError } from '@contember/cli-common'
 import { createTestOutput } from '../../../../cli-common/tests/lib/testOutput.js'
 import {
 	TenantIdentityRoleAddCommand,
@@ -61,7 +61,7 @@ const createProvider = (): TenantClientProvider => {
 	return new TenantClientProvider(remoteProjectProvider)
 }
 
-const expectCliError = async (run: () => Promise<unknown>, code: string, exitCode: ExitCode): Promise<void> => {
+const expectCliError = async (run: () => Promise<unknown>, code: string, exitCode: ExitCode): Promise<CliError> => {
 	let thrown: unknown
 	try {
 		await run()
@@ -72,7 +72,9 @@ const expectCliError = async (run: () => Promise<unknown>, code: string, exitCod
 	if (thrown instanceof CliError) {
 		expect(thrown.code).toBe(code)
 		expect(thrown.exitCode).toBe(exitCode)
+		return thrown
 	}
+	throw new Error('expected a CliError to be thrown')
 }
 
 const personRow = {
@@ -96,6 +98,18 @@ const expectedPerson = {
 }
 
 describe('tenant person list', () => {
+	test('documents substring semantics and forwards literal wildcard characters for server-side escaping', async () => {
+		const command = new TenantPersonListCommand(createProvider())
+		const emailOption = command.getConfiguration().getOptions().find(it => it.name === 'email')
+		expect(emailOption?.description).toContain('case-insensitive substring')
+		answerWith({ persons: [] })
+		const { output } = createTestOutput()
+
+		await command.run(['--email', '%alice_example%'], output)
+
+		expect(requests[0].variables).toMatchObject({ filter: { email: '%alice_example%' } })
+	})
+
 	test('--json prints a bare array on stdout and nothing else', async () => {
 		answerWith({ persons: [personRow] })
 		const { output, stdout, stderr } = createTestOutput()
@@ -265,6 +279,16 @@ describe('tenant person show', () => {
 })
 
 describe('tenant person create', () => {
+	test('rejects an empty person name before the network', async () => {
+		const { output } = createTestOutput()
+		await expectCliError(
+			() => new TenantPersonCreateCommand(createProvider()).run(['alice@example.com', '--name', '   '], output),
+			'EMPTY_NAME',
+			ExitCode.InputError,
+		)
+		expect(requests).toHaveLength(0)
+	})
+
 	test('reads the password from stdin and keeps stdout free of diagnostics', async () => {
 		answerWith({ signUp: { ok: true, result: { person: personRow } } })
 		const { output, stdout, stderr } = createTestOutput()
@@ -400,6 +424,49 @@ describe('tenant person create', () => {
 		)
 	})
 
+	test('recovery details are allowlisted in human and JSON errors', async () => {
+		const secret = 'server-only-secret'
+		answerWith({
+			signUp: {
+				ok: false,
+				error: {
+					code: 'EMAIL_ALREADY_EXISTS',
+					developerMessage: 'account exists',
+					weakPasswordReasons: ['TOO_SHORT', 'SERVER_INVENTED_REASON'],
+					recommendedAction: 'RESET_PASSWORD',
+					secret,
+				},
+			},
+		})
+		const { output } = createTestOutput()
+		const error = await expectCliError(
+			() => new TenantPersonCreateCommand(createProvider()).run(['alice@example.com'], output),
+			'EMAIL_ALREADY_EXISTS',
+			ExitCode.Conflict,
+		)
+		expect(requests[0].query).toContain('weakPasswordReasons')
+		expect(requests[0].query).toContain('recommendedAction')
+		expect(error.details).toEqual({
+			operation: 'signUp(alice@example.com)',
+			code: 'EMAIL_ALREADY_EXISTS',
+			developerMessage: 'account exists',
+			weakPasswordReasons: ['TOO_SHORT'],
+			recommendedAction: 'RESET_PASSWORD',
+		})
+		expect(JSON.stringify(error.details)).not.toContain(secret)
+
+		const human = createTestOutput()
+		renderCliError(error, human.output)
+		expect(human.stderr.text).toContain('EMAIL_ALREADY_EXISTS')
+		expect(human.stderr.text).not.toContain(secret)
+
+		const json = createTestOutput()
+		json.output.setMode('json')
+		renderCliError(error, json.output)
+		expect(JSON.parse(json.stderr.text).error.details).toEqual(error.details)
+		expect(json.stderr.text).not.toContain(secret)
+	})
+
 	test('the sign-up rate limit is reported as retryable', async () => {
 		answerWith({ signUp: { ok: false, error: { code: 'RATE_LIMIT_EXCEEDED', developerMessage: 'retry after 3600s' } } })
 		const { output } = createTestOutput()
@@ -413,6 +480,16 @@ describe('tenant person create', () => {
 })
 
 describe('tenant person update', () => {
+	test('rejects an empty person name before the network', async () => {
+		const { output } = createTestOutput()
+		await expectCliError(
+			() => new TenantPersonUpdateCommand(createProvider()).run(['p1', '--name', ''], output),
+			'EMPTY_NAME',
+			ExitCode.InputError,
+		)
+		expect(requests).toHaveLength(0)
+	})
+
 	test('without any field it is an input error', async () => {
 		const { output } = createTestOutput()
 
@@ -432,6 +509,18 @@ describe('tenant person update', () => {
 })
 
 describe('tenant person set-password', () => {
+	test('preserves allowlisted weak-password reasons', async () => {
+		answerWith({ changePassword: { ok: false, error: { code: 'TOO_WEAK', developerMessage: 'weak', weakPasswordReasons: ['COMPROMISED'] } } })
+		const { output } = createTestOutput()
+		const error = await expectCliError(
+			() => new TenantPersonSetPasswordCommand(createProvider(), async () => 'sekret').run(['p1', '--password-stdin', '--yes'], output),
+			'TOO_WEAK',
+			ExitCode.InputError,
+		)
+		expect(requests[0].query).toContain('weakPasswordReasons')
+		expect(error.details).toMatchObject({ weakPasswordReasons: ['COMPROMISED'] })
+	})
+
 	test('refuses to run non-interactively without --yes', async () => {
 		process.env.TEST_PERSON_PASSWORD = 'sekret'
 		const { output } = createTestOutput()
@@ -499,6 +588,17 @@ describe('tenant person disable', () => {
 })
 
 describe('tenant person sign-out', () => {
+	test('help and human output describe permanent API-key invalidation', async () => {
+		const command = new TenantPersonSignOutCommand(createProvider())
+		expect(command.getConfiguration().getDescription()).toContain('permanent keys')
+		answerWith({ forceSignOutPerson: { ok: true } })
+		const { output, stderr } = createTestOutput()
+
+		await command.run(['p1', '--yes'], output)
+
+		expect(stderr.text).toContain('permanent keys')
+	})
+
 	test('refuses to run non-interactively without --yes', async () => {
 		const { output } = createTestOutput()
 

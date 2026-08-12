@@ -540,6 +540,21 @@ describe('tenant api-key commands', () => {
 			expect(isRecord(sent[0].variables) ? sent[0].variables.memberships : null).toEqual([{ role: 'editor', variables: [] }])
 		})
 
+		test('--project rejects an explicit empty membership list before the network', async () => {
+			const { output } = createTestOutput()
+			try {
+				await new TenantApiKeyCreateCommand(createProvider()).run(
+					['--project', 'blog', '--description', 'ci key', '--memberships', '[]'],
+					output,
+				)
+				throw new Error('expected a CliError to be thrown')
+			} catch (error) {
+				expect(error).toMatchObject({ code: 'INVALID_MEMBERSHIPS', exitCode: ExitCode.InputError })
+				expect(error instanceof Error ? error.message : '').toContain('At least one membership')
+			}
+			expect(sent).toEqual([])
+		})
+
 		test('a misspelled membership key is reported instead of being silently dropped', async () => {
 			const { output } = createTestOutput()
 

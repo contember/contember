@@ -27,7 +27,9 @@ export class TenantPersonSignOutCommand extends Command<Args, Options> {
 	}
 
 	protected configure(configuration: CommandConfiguration<Args, Options>): void {
-		configuration.description('Force sign-out: revoke every active session of a person. An account-recovery operation, recorded in the auth log.')
+		configuration.description(
+			'Force sign-out: revoke every active session and disable all attached API keys, including permanent keys. An account-recovery operation, recorded in the auth log.',
+		)
 		configuration.argument('id').description('Person id.')
 		configuration.option('reason').valueRequired().description('Reason stored with the auth log entry, e.g. an incident id.')
 		configuration.option('yes').valueNone().description('Do not ask for confirmation.')
@@ -40,12 +42,16 @@ export class TenantPersonSignOutCommand extends Command<Args, Options> {
 		await requireConfirmation({
 			yes: input.getOption('yes') === true,
 			output,
-			warning: `This will revoke every active session of person ${personId}.`,
+			warning: `This will revoke every active session and disable all attached API keys of person ${personId}, including permanent keys.`,
 		})
 
 		await this.tenantClientProvider.person().forceSignOutPerson(personId, reason)
 
-		output.info(`Every session of person ${personId} was revoked${reason !== undefined ? ` (reason: ${reason})` : ''}.`)
+		output.info(
+			`Every session of person ${personId} was revoked and all attached API keys, including permanent keys, were disabled${
+				reason !== undefined ? ` (reason: ${reason})` : ''
+			}.`,
+		)
 		output.data<SignOutResult>(
 			{ personId, signedOut: true, reason: reason ?? null },
 			{ human: it => humanText(it.personId), quiet: it => it.personId },

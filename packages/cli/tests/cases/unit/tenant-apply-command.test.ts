@@ -171,6 +171,29 @@ describe('TenantApplyCommand', () => {
 		expect(persistedCaptchaSecretVersion).toBe(7)
 	})
 
+	test('captcha secret null alone skips configure and continues with later actions', async () => {
+		const tenantConfig: TenantConfig = {
+			config: { captcha: { secret: null } },
+			identityProviders: { google: { type: 'oidc', configuration: {} } },
+			mailTemplates: [{ type: 'RESET_PASSWORD_REQUEST', subject: 's', content: 'c' }],
+		}
+		const { command, output, stdout } = createCommand({ tenantConfig })
+
+		await command.run(['--json'], output)
+
+		expect(requestedVariables).toEqual([
+			{},
+			{ identityProvider: 'google', type: 'oidc', configuration: {}, options: undefined },
+			{ template: { type: 'RESET_PASSWORD_REQUEST', subject: 's', content: 'c' } },
+		])
+		expect(JSON.parse(stdout.text).actions).toEqual([
+			{ action: 'addIdp', target: 'google' },
+			{ action: 'addMailTemplate', target: 'RESET_PASSWORD_REQUEST' },
+		])
+		expect(persistedCaptchaSecret).toBe('stored-secret')
+		expect(persistedCaptchaSecretVersion).toBe(7)
+	})
+
 	test('an empty captcha secret clears the stored secret and version', async () => {
 		const { command, output } = createCommand({ tenantConfig: { config: { captcha: { secret: '' } } } })
 

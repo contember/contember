@@ -2,7 +2,7 @@ import { CliError, Command, CommandConfiguration, ExitCode, Input, Output } from
 import { TenantClientProvider } from '../../../lib/TenantClientProvider.js'
 import { TenantApiKeyWithToken } from '../../../lib/tenant/clients/TenantApiKeyClient.js'
 import { readStdinText, StdinReader } from '../../../lib/tenant/stdin.js'
-import { configureMembershipOptions, MembershipOptions, readMembershipInputSource, resolveMemberships } from '../member/membershipInput.js'
+import { configureMembershipOptions, MembershipOptions, readMembershipInputSource, resolveNonEmptyMemberships } from '../member/membershipInput.js'
 import { assertGeneratedTenantToken, assertTenantCredentialContract, humanText } from '../tenantOutput.js'
 
 type Args = {}
@@ -80,7 +80,7 @@ export class TenantApiKeyCreateCommand extends Command<Args, Options> {
 		const apiKey = project !== undefined
 			? await this.tenantClientProvider.apiKey().createApiKey({
 				projectSlug: project,
-				memberships: await resolveMemberships(membershipSource, this.readStdin),
+				memberships: await resolveNonEmptyMemberships(membershipSource, this.readStdin),
 				description,
 				tokenHash,
 				options,

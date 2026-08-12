@@ -1,6 +1,6 @@
 import { CliError, Command, CommandConfiguration, ExitCode, Input, Output } from '@contember/cli-common'
 import { TenantClientProvider } from '../../../lib/TenantClientProvider.js'
-import { humanText } from '../tenantOutput.js'
+import { humanText, requireNonEmptyTenantName } from '../tenantOutput.js'
 
 type Args = {
 	id: string
@@ -35,7 +35,7 @@ export class TenantPersonUpdateCommand extends Command<Args, Options> {
 	protected async execute(input: Input<Args, Options>, output: Output): Promise<void> {
 		const personId = input.getArgument('id')
 		const email = input.getOption('email')
-		const name = input.getOption('name')
+		const name = requireNonEmptyTenantName(input.getOption('name'), 'Person')
 		if (email === undefined && name === undefined) {
 			throw new CliError('Nothing to update. Pass --email, --name, or both.', {
 				code: 'NOTHING_TO_UPDATE',

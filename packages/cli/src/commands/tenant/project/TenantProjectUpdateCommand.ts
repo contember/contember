@@ -2,7 +2,7 @@ import { CliError, Command, CommandConfiguration, ExitCode, Input, Output } from
 import { TenantClientProvider } from '../../../lib/TenantClientProvider.js'
 import { resolveJsonConfigOption } from './jsonConfigOption.js'
 import { readStdinText, type StdinReader } from '../../../lib/tenant/stdin.js'
-import { humanText } from '../tenantOutput.js'
+import { humanText, requireNonEmptyTenantName } from '../tenantOutput.js'
 
 type Args = {
 	slug: string
@@ -33,7 +33,7 @@ export class TenantProjectUpdateCommand extends Command<Args, Options> {
 
 	protected async execute(input: Input<Args, Options>, output: Output): Promise<void> {
 		const slug = input.getArgument('slug')
-		const name = input.getOption('name')
+		const name = requireNonEmptyTenantName(input.getOption('name'), 'Project')
 		const configOption = input.getOption('config')
 		const configFromStdin = input.getOption('config-stdin') === true
 		const configProvided = configOption !== undefined || configFromStdin

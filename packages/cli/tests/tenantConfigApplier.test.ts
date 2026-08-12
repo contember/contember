@@ -77,6 +77,40 @@ describe('TenantConfigApplier', () => {
 		expect(configured).toEqual([{ panel: { globalRoles: ['super_admin', 'ops'], projectRoles: [] } }])
 	})
 
+	test('skips a schema-level no-op and continues with later actions', async () => {
+		const { clients, calls } = createClientsMock([])
+		const { applier } = createApplier()
+		const actions = await applier.apply(clients, {
+			config: { password: { minLength: null }, captcha: { secret: null } },
+			identityProviders: { google: { type: 'oidc', configuration: {} } },
+			mailTemplates: [{ type: 'RESET_PASSWORD_REQUEST', subject: 's', content: 'c' }],
+		})
+		expect(calls).toEqual(['addIdp:google', 'addMailTemplate:RESET_PASSWORD_REQUEST'])
+		expect(actions).toEqual([
+			{ action: 'addIdp', target: 'google' },
+			{ action: 'addMailTemplate', target: 'RESET_PASSWORD_REQUEST' },
+		])
+	})
+
+	test('a dry run omits no-op configure but keeps the rest of the plan', async () => {
+		const { clients, calls } = createClientsMock([])
+		const { applier } = createApplier()
+		const actions = await applier.apply(clients, {
+			config: { captcha: { secret: null, protect: { signUp: null } } },
+			identityProviders: { google: { type: 'oidc', configuration: {} } },
+		}, { dryRun: true })
+		expect(calls).toEqual([])
+		expect(actions).toEqual([{ action: 'addIdp', target: 'google' }])
+	})
+
+	test('keeps explicit null clears that map to nullable database columns', async () => {
+		const { clients, calls } = createClientsMock()
+		const { applier } = createApplier()
+		const actions = await applier.apply(clients, { config: { password: { pattern: null } } })
+		expect(calls).toEqual(['configure'])
+		expect(actions).toEqual([{ action: 'configure', target: null }])
+	})
+
 	test('adds a new identity provider', async () => {
 		const { clients, calls } = createClientsMock([])
 		const { applier } = createApplier()

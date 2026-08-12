@@ -2,7 +2,7 @@ import { CliError, Command, CommandConfiguration, ExitCode, Input, Output } from
 import { TenantClientProvider } from '../../../lib/TenantClientProvider.js'
 import { TenantPerson } from '../../../lib/tenant/clients/TenantPersonClient.js'
 import { assertBcryptHash, type CaptchaTokenOptions, configureCaptchaTokenOptions, resolveCaptchaToken, resolveSecret } from './personInput.js'
-import { humanText } from '../tenantOutput.js'
+import { humanText, requireNonEmptyTenantName } from '../tenantOutput.js'
 import { readStdinText, StdinReader } from '../../../lib/tenant/stdin.js'
 
 type Args = {
@@ -47,6 +47,7 @@ export class TenantPersonCreateCommand extends Command<Args, Options> {
 
 	protected async execute(input: Input<Args, Options>, output: Output): Promise<void> {
 		const email = input.getArgument('email')
+		const name = requireNonEmptyTenantName(input.getOption('name'), 'Person')
 		const passwordFromStdin = input.getOption('password-stdin') === true
 		const passwordHashFromStdin = input.getOption('password-hash-stdin') === true
 		const captchaFromStdin = input.getOption('captcha-token-stdin') === true
@@ -86,7 +87,7 @@ export class TenantPersonCreateCommand extends Command<Args, Options> {
 			email,
 			password,
 			passwordHash,
-			name: input.getOption('name'),
+			name,
 			roles: input.getOption('role'),
 			captchaToken,
 		})

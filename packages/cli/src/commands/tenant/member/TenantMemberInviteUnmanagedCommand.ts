@@ -1,7 +1,7 @@
 import { CliError, Command, CommandConfiguration, ExitCode, Input, Output } from '@contember/cli-common'
 import { TenantClientProvider } from '../../../lib/TenantClientProvider.js'
 import { formatMemberships, requireOptionValue } from './memberOptions.js'
-import { configureMembershipOptions, MembershipOptions, readMembershipInputSource, resolveMemberships } from './membershipInput.js'
+import { configureMembershipOptions, MembershipOptions, readMembershipInputSource, resolveNonEmptyMemberships } from './membershipInput.js'
 import { readStdinText, StdinReader } from '../../../lib/tenant/stdin.js'
 import { environmentInput, literalInput, resolveRequiredTenantInput, stdinInput, type TenantInputSource } from '../../../lib/tenant/input/index.js'
 import { humanText } from '../tenantOutput.js'
@@ -67,7 +67,7 @@ export class TenantMemberInviteUnmanagedCommand extends Command<Args, Options> {
 				exitCode: ExitCode.InputError,
 			})
 		}
-		const memberships = await resolveMemberships(readMembershipInputSource(input), this.readStdin)
+		const memberships = await resolveNonEmptyMemberships(readMembershipInputSource(input), this.readStdin)
 		const credentialSources: TenantInputSource<'password' | 'reset-token-hash'>[] = []
 		const password = input.getOption('password')
 		const passwordEnv = input.getOption('password-env')

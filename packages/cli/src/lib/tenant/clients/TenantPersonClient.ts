@@ -135,10 +135,10 @@ const personByIdFetcher = query$.personById(
 		.identityProviders(personIdentityProvider$.id.createdAt.externalIdentifier.identityProvider(identityProviderListItem$$)),
 )
 const signUpFetcher = mutation$.signUp(
-	signUpResponse$$.error(signUpError$$).result(signUpResult$.person(person$$.identity(identity$.id))),
+	signUpResponse$$.error(signUpError$$.weakPasswordReasons.recommendedAction).result(signUpResult$.person(person$$.identity(identity$.id))),
 )
 const changeProfileFetcher = mutation$.changeProfile(changeProfileResponse$$.error(changeProfileError$$))
-const changePasswordFetcher = mutation$.changePassword(changePasswordResponse$$.error(changePasswordError$$))
+const changePasswordFetcher = mutation$.changePassword(changePasswordResponse$$.error(changePasswordError$$.weakPasswordReasons))
 const disablePersonFetcher = mutation$.disablePerson(disablePersonResponse$$.error(disablePersonError$$))
 const forceSignOutPersonFetcher = mutation$.forceSignOutPerson(forceSignOutPersonResponse$$.error(forceSignOutPersonError$$))
 const resetPersonMfaFetcher = mutation$.resetPersonMfa(resetPersonMfaResponse$$.error(resetPersonMfaError$$))

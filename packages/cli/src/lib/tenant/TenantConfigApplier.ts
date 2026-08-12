@@ -31,7 +31,7 @@ export interface TenantConfigAction {
 
 /**
  * Applies a {@link TenantConfig} to a tenant idempotently:
- * - `configure` is a partial merge, so it is always (re)sent.
+ * - `configure` is a partial merge and is sent only when the schema maps at least one value to a database change.
  * - identity providers are added or updated based on the current state, then
  *   enabled/disabled to match `disabled`.
  * - mail templates are upserted server-side by `addMailTemplate`.
@@ -72,7 +72,7 @@ export class TenantConfigApplier {
 		const existingAuthPolicies = config.authPolicies === undefined ? undefined : await clients.policy.listAuthPolicies()
 		assertDistinctExistingAuthPolicies(existingAuthPolicies)
 
-		if (config.config && hasDeclaredConfigValue(config.config)) {
+		if (config.config && hasEffectiveConfigValue(config.config)) {
 			const globalConfig = config.config
 			await run('configure', null, () => clients.project.configure(globalConfig))
 		}
@@ -168,13 +168,24 @@ const assertDistinctAuthPolicies = (policies: TenantConfig['authPolicies']): voi
 	}
 }
 
-/** Explicit `null` is an instruction to clear a value; empty objects are not mutations. */
-const hasDeclaredConfigValue = (value: unknown): boolean => {
+/** Null clears only the fields that the tenant update command maps to a nullable database column. */
+const nullableConfigClearPaths = new Set([
+	'passwordless.url',
+	'password.pattern',
+	'login.maxTokenExpiration',
+	'captcha.provider',
+	'captcha.threshold',
+])
+
+const hasEffectiveConfigValue = (value: unknown, path: readonly string[] = []): boolean => {
 	if (value === undefined) {
 		return false
 	}
-	if (value === null || typeof value !== 'object') {
+	if (value === null) {
+		return nullableConfigClearPaths.has(path.join('.'))
+	}
+	if (typeof value !== 'object') {
 		return true
 	}
-	return Object.values(value).some(hasDeclaredConfigValue)
+	return Object.entries(value).some(([key, item]) => hasEffectiveConfigValue(item, [...path, key]))
 }

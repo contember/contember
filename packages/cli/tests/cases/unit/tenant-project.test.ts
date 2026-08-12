@@ -185,6 +185,17 @@ describe('TenantProjectShowCommand ("tenant project show")', () => {
 })
 
 describe('TenantProjectCreateCommand ("tenant project create")', () => {
+	test('rejects an empty project name before the network', async () => {
+		const { output } = createTestOutput()
+		try {
+			await new TenantProjectCreateCommand(createTenantClientProvider()).run(['blog', '--name', '   '], output)
+			throw new Error('expected a CliError to be thrown')
+		} catch (error) {
+			expect(error).toMatchObject({ code: 'EMPTY_NAME', exitCode: ExitCode.InputError })
+		}
+		expect(requests).toHaveLength(0)
+	})
+
 	test('--json keeps the issued deploy token in the structured result and diagnostics empty', async () => {
 		responder = () => ({ createProject: { ok: true, result: { deployerApiKey: { id: 'k1', token: GENERATED_TOKEN } } } })
 		const { output, stdout, stderr } = createTestOutput()
@@ -298,6 +309,17 @@ describe('TenantProjectCreateCommand ("tenant project create")', () => {
 })
 
 describe('TenantProjectUpdateCommand ("tenant project update")', () => {
+	test('rejects an empty project name before the network', async () => {
+		const { output } = createTestOutput()
+		try {
+			await new TenantProjectUpdateCommand(createTenantClientProvider()).run(['blog', '--name', ''], output)
+			throw new Error('expected a CliError to be thrown')
+		} catch (error) {
+			expect(error).toMatchObject({ code: 'EMPTY_NAME', exitCode: ExitCode.InputError })
+		}
+		expect(requests).toHaveLength(0)
+	})
+
 	test('sends name, config and mergeConfig, and echoes the applied change on stdout', async () => {
 		responder = () => ({ updateProject: { ok: true } })
 		const { output, stdout } = createTestOutput()

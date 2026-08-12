@@ -1,7 +1,7 @@
 import { Command, CommandConfiguration, Input, Output } from '@contember/cli-common'
 import { TenantClientProvider } from '../../../lib/TenantClientProvider.js'
 import { formatMemberships, requireOptionValue } from './memberOptions.js'
-import { configureMembershipOptions, MembershipOptions, readMembershipInputSource, resolveMemberships } from './membershipInput.js'
+import { configureMembershipOptions, MembershipOptions, readMembershipInputSource, resolveNonEmptyMemberships } from './membershipInput.js'
 import { readStdinText, StdinReader } from '../../../lib/tenant/stdin.js'
 import { humanText } from '../tenantOutput.js'
 
@@ -31,7 +31,7 @@ export class TenantMemberAddCommand extends Command<Args, Options> {
 	protected async execute(input: Input<Args, Options>, output: Output): Promise<void> {
 		const projectSlug = requireOptionValue(input.getOption('project'), 'project')
 		const identityId = requireOptionValue(input.getOption('identity'), 'identity')
-		const memberships = await resolveMemberships(readMembershipInputSource(input), this.readStdin)
+		const memberships = await resolveNonEmptyMemberships(readMembershipInputSource(input), this.readStdin)
 
 		// reported before the call so a CI log records the attempt even when the mutation fails
 		output.info(`Adding identity ${identityId} to project ${projectSlug} as ${formatMemberships(memberships)}`)

@@ -2,9 +2,9 @@ import { CliError, Command, CommandConfiguration, ExitCode, Input, Output } from
 import type { InviteMethod } from '@contember/graphql-client-tenant'
 import { TenantClientProvider } from '../../../lib/TenantClientProvider.js'
 import { formatMemberships, requireOptionValue } from './memberOptions.js'
-import { configureMembershipOptions, MembershipOptions, readMembershipInputSource, resolveMemberships } from './membershipInput.js'
+import { configureMembershipOptions, MembershipOptions, readMembershipInputSource, resolveNonEmptyMemberships } from './membershipInput.js'
 import { readStdinText, StdinReader } from '../../../lib/tenant/stdin.js'
-import { humanText } from '../tenantOutput.js'
+import { humanText, requireNonEmptyTenantName } from '../tenantOutput.js'
 
 type Args = {}
 
@@ -48,13 +48,14 @@ export class TenantMemberInviteCommand extends Command<Args, Options> {
 	protected async execute(input: Input<Args, Options>, output: Output): Promise<void> {
 		const projectSlug = requireOptionValue(input.getOption('project'), 'project')
 		const email = requireOptionValue(input.getOption('email'), 'email')
-		const memberships = await resolveMemberships(readMembershipInputSource(input), this.readStdin)
+		const name = requireNonEmptyTenantName(input.getOption('name'), 'Person')
+		const memberships = await resolveNonEmptyMemberships(readMembershipInputSource(input), this.readStdin)
 
 		output.info(`Inviting ${email} to project ${projectSlug} as ${formatMemberships(memberships)}`)
 		const result = await this.tenantClientProvider.member().invite({
 			projectSlug,
 			email,
-			name: input.getOption('name'),
+			name,
 			memberships,
 			options: { method: parseInviteMethod(input.getOption('method')), mailVariant: input.getOption('mail-variant') },
 		})

@@ -2,7 +2,7 @@ import { Command, CommandConfiguration, Input, Output } from '@contember/cli-com
 import { TenantClientProvider } from '../../../lib/TenantClientProvider.js'
 import { resolveJsonConfigOption } from './jsonConfigOption.js'
 import { readStdinText, type StdinReader } from '../../../lib/tenant/stdin.js'
-import { assertGeneratedTenantToken, assertTenantCredentialContract, humanText } from '../tenantOutput.js'
+import { assertGeneratedTenantToken, assertTenantCredentialContract, humanText, requireNonEmptyTenantName } from '../tenantOutput.js'
 
 type Args = {
 	slug: string
@@ -35,7 +35,7 @@ export class TenantProjectCreateCommand extends Command<Args, Options> {
 
 	protected async execute(input: Input<Args, Options>, output: Output): Promise<void> {
 		const slug = input.getArgument('slug')
-		const name = input.getOption('name')
+		const name = requireNonEmptyTenantName(input.getOption('name'), 'Project')
 		const config = await resolveJsonConfigOption(input.getOption('config'), input.getOption('config-stdin') === true, this.readStdinFn)
 		const ifNotExists = input.getOption('if-not-exists') === true
 		const noDeployToken = input.getOption('no-deploy-token') === true

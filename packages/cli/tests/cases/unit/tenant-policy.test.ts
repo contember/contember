@@ -481,13 +481,13 @@ describe('tenant mail-template list', () => {
 		expect(JSON.parse(jsonOutput.stdout.text)[0].content).toBe(unsafeContent)
 	})
 
-	test('--quiet prints only the mail types', async () => {
+	test('--quiet prints stable composite mail-template identities', async () => {
 		responses = { mailTemplates: [mailTemplateRow] }
 		const { output, stdout, stderr } = createTestOutput()
 
 		await new TenantMailTemplateListCommand(createProvider()).run(['--quiet'], output)
 
-		expect(stdout.lines).toEqual(['RESET_PASSWORD_REQUEST'])
+		expect(stdout.lines).toEqual(['global:RESET_PASSWORD_REQUEST:default'])
 		expect(stderr.text).toBe('')
 	})
 })

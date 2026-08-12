@@ -78,6 +78,15 @@ export const resolveMemberships = async (source: MembershipInputSource, readStdi
 	)
 }
 
+/** Creation operations must not create an identity with no project access. */
+export const resolveNonEmptyMemberships = async (source: MembershipInputSource, readStdin: StdinReader): Promise<MembershipInput[]> => {
+	const memberships = await resolveMemberships(source, readStdin)
+	if (memberships.length === 0) {
+		throw membershipInputError('At least one membership is required for this operation.')
+	}
+	return memberships
+}
+
 const membershipInputError = (message: string, details?: unknown): CliError =>
 	new CliError(message, { code: 'INVALID_MEMBERSHIPS', exitCode: ExitCode.InputError, details })
 

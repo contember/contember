@@ -25,7 +25,7 @@ export class TenantPersonListCommand extends Command<Args, Options> {
 		configuration.description(
 			'List persons. A SUPER_ADMIN sees everyone, anyone else only the members of projects they may view members of.',
 		)
-		configuration.option('email').valueRequired().description('Filter by e-mail address (case-insensitive, exact match).')
+		configuration.option('email').valueRequired().description('Filter by e-mail address (case-insensitive substring match).')
 		configuration.option('person-id').valueRequired().description('Filter by person id.')
 		configuration.option('identity-id').valueRequired().description('Filter by identity id.')
 		configuration.option('limit').valueRequired().description(

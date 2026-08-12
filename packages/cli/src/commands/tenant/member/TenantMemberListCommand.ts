@@ -40,12 +40,21 @@ export class TenantMemberListCommand extends Command<Args, Options> {
 
 	protected async execute(input: Input<Args, Options>, output: Output): Promise<void> {
 		const projectSlug = requireOptionValue(input.getOption('project'), 'project')
+		const email = input.getOption('email')
+		const personId = input.getOption('person')
+		const memberType = parseMemberType(input.getOption('type'))
+		if (memberType === 'API_KEY' && (email !== undefined || personId !== undefined)) {
+			throw new CliError('Options --email and --person cannot be combined with --type API_KEY.', {
+				code: 'INVALID_MEMBER_FILTER',
+				exitCode: ExitCode.InputError,
+			})
+		}
 		const members = await this.tenantClientProvider.member().listProjectMembers(projectSlug, {
 			filter: {
 				identityId: input.getOption('identity'),
-				email: input.getOption('email'),
-				personId: input.getOption('person'),
-				memberType: parseMemberType(input.getOption('type')),
+				email,
+				personId,
+				memberType,
 			},
 			limit: parsePaginationLimit(input.getOption('limit')),
 			offset: parsePaginationOffset(input.getOption('offset')),

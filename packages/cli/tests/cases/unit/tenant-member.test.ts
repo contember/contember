@@ -158,6 +158,18 @@ describe('tenant member list', () => {
 		expect(requests).toHaveLength(0)
 	})
 
+	test('--type API_KEY rejects person-only filters before sending a request', async () => {
+		for (const filter of [['--email', 'jane@example.com'], ['--person', 'p1']]) {
+			const { output } = createTestOutput()
+			await expectCliError(
+				new TenantMemberListCommand(clientProvider()).run(['--project', 'blog', '--type', 'API_KEY', ...filter], output),
+				'INVALID_MEMBER_FILTER',
+				ExitCode.InputError,
+			)
+		}
+		expect(requests).toHaveLength(0)
+	})
+
 	test('invalid GraphQL pagination integers are rejected locally', async () => {
 		const { output } = createTestOutput()
 
@@ -198,6 +210,38 @@ describe('tenant member list', () => {
 })
 
 describe('membership input', () => {
+	test('creation commands reject an explicit empty membership list before the network', async () => {
+		const runs = [
+			(output: ReturnType<typeof createTestOutput>['output']) =>
+				new TenantMemberAddCommand(clientProvider()).run(['--project', 'blog', '--identity', 'i1', '--memberships', '[]'], output),
+			(output: ReturnType<typeof createTestOutput>['output']) =>
+				new TenantMemberInviteCommand(clientProvider()).run(['--project', 'blog', '--email', 'jane@example.com', '--memberships', '[]'], output),
+			(output: ReturnType<typeof createTestOutput>['output']) =>
+				new TenantMemberInviteUnmanagedCommand(clientProvider()).run(
+					['--project', 'blog', '--email', 'jane@example.com', '--memberships', '[]'],
+					output,
+				),
+		]
+		for (const run of runs) {
+			const { output } = createTestOutput()
+			const error = await expectCliError(run(output), 'INVALID_MEMBERSHIPS', ExitCode.InputError)
+			expect(error.message).toContain('At least one membership')
+		}
+		expect(requests).toHaveLength(0)
+	})
+
+	test('an empty invite name is rejected before the network', async () => {
+		const { output } = createTestOutput()
+		await expectCliError(
+			new TenantMemberInviteCommand(clientProvider()).run(
+				['--project', 'blog', '--email', 'jane@example.com', '--name', '   ', '--role', 'editor'],
+				output,
+			),
+			'EMPTY_NAME',
+			ExitCode.InputError,
+		)
+		expect(requests).toHaveLength(0)
+	})
 	test('a repeated --role becomes a membership without variables', async () => {
 		responseData = { addProjectMember: { ok: true } }
 		const { output, stdout } = createTestOutput()

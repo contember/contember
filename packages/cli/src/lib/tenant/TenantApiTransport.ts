@@ -17,7 +17,12 @@ export const createTenantApiUrl = (url: string): string => {
 /** The shape every tenant `*Response` mutation payload shares. */
 export interface TenantMutationResult {
 	readonly ok: boolean
-	readonly error?: { readonly code: string; readonly developerMessage?: string | null } | null
+	readonly error?: {
+		readonly code: string
+		readonly developerMessage?: string | null
+		readonly weakPasswordReasons?: readonly unknown[] | null
+		readonly recommendedAction?: unknown
+	} | null
 }
 
 /**
@@ -89,12 +94,36 @@ export const buildRequestDocument = (fetcher: Fetcher<'Query' | 'Mutation', obje
 export const tenantMutationError = (result: TenantMutationResult | null | undefined, operation: string): CliError => {
 	const code = result?.error?.code ?? 'UNKNOWN'
 	const developerMessage = result?.error?.developerMessage ?? null
+	const details: Record<string, unknown> = { operation, code, developerMessage }
+	const weakPasswordReasons = result?.error?.weakPasswordReasons?.filter(isWeakPasswordReason)
+	if (weakPasswordReasons !== undefined && weakPasswordReasons.length > 0) {
+		details.weakPasswordReasons = weakPasswordReasons
+	}
+	const recommendedAction = result?.error?.recommendedAction
+	if (isSignUpRecommendedAction(recommendedAction)) {
+		details.recommendedAction = recommendedAction
+	}
 	return new CliError(`${operation} failed: ${code}${developerMessage ? ` — ${developerMessage}` : ''}`, {
 		code,
 		exitCode: tenantErrorCodeToExitCode(code),
-		details: { operation, code, developerMessage },
+		details,
 	})
 }
+
+const weakPasswordReasons = [
+	'TOO_SHORT',
+	'MISSING_UPPERCASE',
+	'MISSING_LOWERCASE',
+	'MISSING_DIGIT',
+	'MISSING_SPECIAL',
+	'INVALID_PATTERN',
+	'BLACKLISTED',
+	'COMPROMISED',
+]
+
+const isWeakPasswordReason = (value: unknown): value is string => typeof value === 'string' && weakPasswordReasons.includes(value)
+
+const isSignUpRecommendedAction = (value: unknown): value is string => value === 'SIGN_IN' || value === 'RESET_PASSWORD'
 
 /**
  * The tenant API returns a per-mutation error code enum (see `tenant.graphql`). Only the codes that are

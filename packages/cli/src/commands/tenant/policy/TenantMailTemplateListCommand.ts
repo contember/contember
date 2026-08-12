@@ -2,6 +2,7 @@ import { Command, CommandConfiguration, Input, Output, OutputTableColumn } from 
 import { TenantClientProvider } from '../../../lib/TenantClientProvider.js'
 import { TenantMailTemplateData } from '../../../lib/tenant/clients/index.js'
 import { humanText } from '../tenantOutput.js'
+import { formatMailTemplateRef } from './policyInput.js'
 
 type Args = {}
 type Options = {}
@@ -37,6 +38,10 @@ export class TenantMailTemplateListCommand extends Command<Args, Options> {
 
 	protected async execute(input: Input<Args, Options>, output: Output): Promise<void> {
 		const templates = await this.tenantClientProvider.policy().listMailTemplates()
+		if (output.isQuiet) {
+			output.data(templates, { quiet: rows => rows.map(formatMailTemplateRef) })
+			return
+		}
 		output.table(columns, templates, 'type')
 		if (templates.length === 0) {
 			output.info('No mail templates are configured. The built-in ones are used.')

@@ -9,6 +9,7 @@ import type { AsyncBatchUpdatesOptions } from '@contember/binding-common';
 import { BatchUpdatesOptions } from '@contember/binding-common';
 import type { BijectiveIndexedMap } from '@contember/utilities';
 import { ContentEntitySelection } from '@contember/client';
+import { ContentMutation } from '@contember/client';
 import { ContentQuery } from '@contember/client';
 import { ContentQueryBuilder } from '@contember/client';
 import { DataBindingTransactionResult } from '@contember/binding-common';
@@ -40,6 +41,7 @@ import type { PersistErrorOptions } from '@contember/binding-common';
 import type { PersistSuccessOptions } from '@contember/binding-common';
 import type { PlaceholderName } from '@contember/binding-common';
 import { ReceivedDataTree } from '@contember/binding-common';
+import { ReceivedEntityData } from '@contember/binding-common';
 import { RelativeEntityList } from '@contember/binding-common';
 import { RelativeSingleEntity } from '@contember/binding-common';
 import { RelativeSingleField } from '@contember/binding-common';
@@ -340,6 +342,12 @@ export class FieldAccessorImpl<Value extends FieldValue = FieldValue> implements
 }
 
 // @public (undocumented)
+export class MutationGenerator {
+    // (undocumented)
+    static getPersistMutation(treeStore: TreeStore, qb: ContentQueryBuilder): PersistMutationResult;
+}
+
+// @public (undocumented)
 export class NormalizedPersistedData {
     constructor(subTreeDataStore: SubTreeDataStore, persistedEntityDataStore: PersistedEntityDataStore);
     // (undocumented)
@@ -350,6 +358,12 @@ export class NormalizedPersistedData {
 
 // @public (undocumented)
 export type PersistedEntityDataStore = Map<UniqueEntityId, SingleEntityPersistedData>;
+
+// @public (undocumented)
+export type PersistMutationResult = {
+    mutations: Record<string, ContentMutation<ReceivedEntityData>>;
+    operations: SubMutationOperation[];
+};
 
 // @public (undocumented)
 export class QueryGenerator {
@@ -387,6 +401,24 @@ export class StateInitializer {
 }
 
 // @public (undocumented)
+export type SubMutationOperation = {
+    alias: string;
+    subTreePlaceholder: PlaceholderName;
+    subTreeType: 'list' | 'single';
+} & ({
+    type: 'delete';
+    id: EntityId;
+} | {
+    type: 'update';
+    markers: EntityFieldMarkers;
+    id: EntityId;
+} | {
+    type: 'create';
+    markers: EntityFieldMarkers;
+    id: EntityId;
+});
+
+// @public (undocumented)
 export type SubTreeDataStore = Map<PlaceholderName, ServerId | EntityListPersistedData>;
 
 // @public (undocumented)
@@ -398,8 +430,6 @@ export class TreeAugmenter {
     extendTreeStates(newTreeId: TreeRootId | undefined, newMarkerTree: MarkerTreeRoot): void;
     // (undocumented)
     resetCreatingSubTrees(): void;
-    // Warning: (ae-forgotten-export) The symbol "SubMutationOperation" needs to be exported by the entry point index.d.ts
-    //
     // (undocumented)
     updatePersistedData(response: ReceivedDataTree, operations: SubMutationOperation[]): void;
 }

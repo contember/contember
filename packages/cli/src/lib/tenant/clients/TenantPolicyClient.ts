@@ -23,6 +23,7 @@ import {
 	updateAuthPolicyError$$,
 	updateAuthPolicyResponse$$,
 } from '@contember/graphql-client-tenant'
+import { describeAuthPolicy } from '../authPolicy.js'
 import { TenantApiTransport } from '../TenantApiTransport.js'
 import { TenantMailTemplate } from '../tenantConfig.js'
 
@@ -118,11 +119,12 @@ export class TenantPolicyClient {
 	/** Returns the id of the created policy — the only thing `createAuthPolicy` hands back. */
 	public async createAuthPolicy(policy: AuthPolicyInput): Promise<string> {
 		const result = await this.transport.exec(createAuthPolicyFetcher, { policy })
-		this.transport.assertOk(result.createAuthPolicy, 'createAuthPolicy')
+		// a policy has no slug, so the target is the only thing that identifies it in an error
+		this.transport.assertOk(result.createAuthPolicy, `createAuthPolicy(${describeAuthPolicy(policy)})`)
 		const id = result.createAuthPolicy?.result?.id
 		if (id === undefined) {
 			// ok without a result breaks the schema contract, so there is nothing sensible to report back
-			throw new CliError('createAuthPolicy reported success without returning an id.', {
+			throw new CliError(`createAuthPolicy(${describeAuthPolicy(policy)}) reported success without returning an id.`, {
 				code: 'TENANT_API_INVALID_RESPONSE',
 				exitCode: ExitCode.InternalError,
 			})
@@ -132,7 +134,7 @@ export class TenantPolicyClient {
 
 	public async updateAuthPolicy(id: string, policy: AuthPolicyInput): Promise<void> {
 		const result = await this.transport.exec(updateAuthPolicyFetcher, { id, policy })
-		this.transport.assertOk(result.updateAuthPolicy, `updateAuthPolicy(${id})`)
+		this.transport.assertOk(result.updateAuthPolicy, `updateAuthPolicy(${id}: ${describeAuthPolicy(policy)})`)
 	}
 
 	public async deleteAuthPolicy(id: string): Promise<void> {

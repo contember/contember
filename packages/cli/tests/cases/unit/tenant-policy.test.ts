@@ -99,6 +99,8 @@ describe('TenantPolicyClient', () => {
 			if (e instanceof CliError) {
 				expect(e.code).toBe('PROJECT_NOT_FOUND')
 				expect(e.exitCode).toBe(ExitCode.NotFound)
+				// a policy has no slug, so the message has to name the target it was applying
+				expect(e.message).toContain('createAuthPolicy(project:ghost [])')
 			}
 		}
 	})
@@ -405,6 +407,20 @@ describe('tenant policy create', () => {
 })
 
 describe('tenant policy update', () => {
+	test('names both the id and the target when the update is rejected', async () => {
+		const { clients } = createClients({ updateAuthPolicy: { ok: false, error: { code: 'NOT_FOUND', developerMessage: 'gone' } } })
+
+		try {
+			await clients.policy.updateAuthPolicy('pol-1', { scope: 'project', project: 'blog', roles: ['admin'] })
+			throw new Error('expected a CliError to be thrown')
+		} catch (e) {
+			expect(e).toBeInstanceOf(CliError)
+			if (e instanceof CliError) {
+				expect(e.message).toContain('updateAuthPolicy(pol-1: project:blog [admin])')
+			}
+		}
+	})
+
 	test('sends the id together with the replacement policy', async () => {
 		responses = { updateAuthPolicy: { ok: true } }
 		const { output, stdout } = createTestOutput()

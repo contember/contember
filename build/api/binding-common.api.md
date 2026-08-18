@@ -1164,6 +1164,7 @@ export interface PersistOptions {
     onPersistSuccess?: (options: PersistSuccessOptions) => void | Promise<void>;
     // (undocumented)
     signal?: AbortSignal;
+    silentErrors?: boolean;
 }
 
 // @public (undocumented)

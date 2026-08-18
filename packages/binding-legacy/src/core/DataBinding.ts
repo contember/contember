@@ -116,7 +116,7 @@ export class DataBinding<Node> {
 		this.contentClient = new ContentClient(contentApiClient)
 	}
 
-	private async persist({ onPersistError, onPersistSuccess, signal }: PersistOptions = {}) {
+	private async persist({ onPersistError, onPersistSuccess, signal, silentErrors }: PersistOptions = {}) {
 		return await this.eventManager.persistOperation(async () => {
 			// TODO if the tree is in an inconsistent state, wait for lock releases
 
@@ -125,7 +125,7 @@ export class DataBinding<Node> {
 			})
 			await this.eventManager.triggerOnBeforePersist()
 
-			await this.checkErrorsBeforePersist(onPersistError)
+			await this.checkErrorsBeforePersist(onPersistError, silentErrors)
 
 			const mutationResult = MutationGenerator.getPersistMutation(this.treeStore, this.queryBuilder)
 
@@ -154,7 +154,7 @@ export class DataBinding<Node> {
 					throw await this.persistFail({
 						errors: [e],
 						type: 'invalidResponse',
-					})
+					}, silentErrors)
 				} else {
 					throw e
 				}
@@ -175,19 +175,19 @@ export class DataBinding<Node> {
 					errors: this.accessorErrorManager.getErrors(),
 					type: 'invalidInput',
 					response,
-				})
+				}, silentErrors)
 			}
 		})
 	}
 
-	private async checkErrorsBeforePersist(onPersistError: PersistOptions['onPersistError']) {
+	private async checkErrorsBeforePersist(onPersistError: PersistOptions['onPersistError'], silentErrors?: boolean) {
 		if (this.accessorErrorManager.hasErrors()) {
 			await this.eventManager.triggerOnPersistError(this.bindingOperations)
 			await onPersistError?.(this.bindingOperations)
 			throw await this.persistFail({
 				errors: this.accessorErrorManager.getErrors(),
 				type: 'invalidInput',
-			})
+			}, silentErrors)
 		}
 	}
 
@@ -250,8 +250,10 @@ export class DataBinding<Node> {
 		return result
 	}
 
-	private async persistFail(error: ErrorPersistResult): Promise<ErrorPersistResult> {
-		await this.eventListenerStore.invoke({ type: 'persistError' }, error)
+	private async persistFail(error: ErrorPersistResult, silentErrors?: boolean): Promise<ErrorPersistResult> {
+		if (!silentErrors) {
+			await this.eventListenerStore.invoke({ type: 'persistError' }, error)
+		}
 		return error
 	}
 

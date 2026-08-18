@@ -1,12 +1,12 @@
 import { Command, CommandConfiguration, Input, Output, OutputTableColumn } from '@contember/cli-common'
 import { TenantClientProvider } from '../../../lib/TenantClientProvider.js'
-import { TenantAuthPolicy } from '../../../lib/tenant/clients/index.js'
+import { RemoteAuthPolicy } from '../../../lib/tenant/clients/index.js'
 import { humanText } from '../tenantOutput.js'
 
 type Args = {}
 type Options = {}
 
-const columns: OutputTableColumn<TenantAuthPolicy>[] = [
+const columns: OutputTableColumn<RemoteAuthPolicy>[] = [
 	{ field: 'id', name: 'ID' },
 	{ field: 'scope', name: 'Scope' },
 	{ field: 'project', name: 'Project' },

@@ -26,7 +26,8 @@ import {
 import { TenantApiTransport } from '../TenantApiTransport.js'
 import { TenantMailTemplate } from '../tenantConfig.js'
 
-export interface TenantAuthPolicy {
+/** A policy as it exists server-side. The config-side counterpart is `TenantAuthPolicy` in `tenantConfig.ts`. */
+export interface RemoteAuthPolicy {
 	id: string
 	scope: AuthPolicyScope
 	/** Project slug, `null` for a global policy. */
@@ -99,7 +100,7 @@ export class TenantPolicyClient {
 	) {
 	}
 
-	public async listAuthPolicies(): Promise<TenantAuthPolicy[]> {
+	public async listAuthPolicies(): Promise<RemoteAuthPolicy[]> {
 		const result = await this.transport.exec(authPoliciesFetcher, {})
 		return result.authPolicies.map(it => ({
 			id: it.id,

@@ -1,10 +1,10 @@
 import { describe, expect, test } from 'bun:test'
 import { createTestOutput } from '../../cli-common/tests/lib/testOutput.js'
 import { TenantConfigApplier, TenantConfigApplierClients } from '../src/lib/tenant/TenantConfigApplier.js'
-import type { RemoteIdentityProvider, TenantAuthPolicy } from '../src/lib/tenant/clients/index.js'
+import type { RemoteAuthPolicy, RemoteIdentityProvider } from '../src/lib/tenant/clients/index.js'
 import type { TenantGlobalConfig } from '../src/lib/tenant/tenantConfig.js'
 
-const createPolicy = (policy: Pick<TenantAuthPolicy, 'id' | 'scope' | 'project' | 'roles'>): TenantAuthPolicy => ({
+const createPolicy = (policy: Pick<RemoteAuthPolicy, 'id' | 'scope' | 'project' | 'roles'>): RemoteAuthPolicy => ({
 	mfaRequired: null,
 	tokenExpiration: null,
 	idleTimeout: null,
@@ -13,7 +13,7 @@ const createPolicy = (policy: Pick<TenantAuthPolicy, 'id' | 'scope' | 'project' 
 	...policy,
 })
 
-const createClientsMock = (existingIdps: RemoteIdentityProvider[] = [], existingPolicies: TenantAuthPolicy[] = []) => {
+const createClientsMock = (existingIdps: RemoteIdentityProvider[] = [], existingPolicies: RemoteAuthPolicy[] = []) => {
 	const calls: string[] = []
 	const configured: TenantGlobalConfig[] = []
 	const clients: TenantConfigApplierClients = {

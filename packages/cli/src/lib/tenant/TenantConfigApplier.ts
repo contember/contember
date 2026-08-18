@@ -1,6 +1,6 @@
 import { Output } from '@contember/cli-common'
 import { authPolicyKey, describeAuthPolicy } from './authPolicy.js'
-import { type TenantAuthPolicy as RemoteAuthPolicy, TenantPolicyClient, TenantProjectClient } from './clients/index.js'
+import { type RemoteAuthPolicy, TenantPolicyClient, TenantProjectClient } from './clients/index.js'
 import { TenantConfig } from './tenantConfig.js'
 
 export interface TenantConfigApplyOptions {

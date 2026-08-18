@@ -18,11 +18,15 @@ services:
       DEFAULT_DB_USER: 'contember'
       DEFAULT_DB_PASSWORD: 'contember'
 
+      # The host port, not the service name: the engine only signs URLs here and hands them to the
+      # browser, which resolves them itself.
       DEFAULT_S3_ENDPOINT: 'http://localhost:1483'
       DEFAULT_S3_BUCKET: 'contember'
       DEFAULT_S3_REGION: ''
       DEFAULT_S3_KEY: 'contember'
       DEFAULT_S3_SECRET: 'contember'
+      # A Contember provider name, not the image behind `object-storage`: it selects path-style
+      # addressing and no object ACL (public read comes from the store's own config instead).
       DEFAULT_S3_PROVIDER: 'minio'
 
       TENANT_MAILER_HOST: 'mailhog'
@@ -81,19 +85,37 @@ services:
       timeout: 5s
       retries: 10
 
-  minio:
-    image: bitnami/minio
+  object-storage:
+    image: chrislusf/seaweedfs:4.42
+
+    # `mini` runs master + volume + filer + S3 in a single process. Both flags override a default
+    # that would bite you: `autoCreateBucket` is on by default and silently creates a bucket on the
+    # first write, so a typo would look like a working upload, and telemetry is on by default and
+    # reports to telemetry.seaweedfs.com every 24 h.
+    command: >
+      mini -dir=/data -s3.port=9000 -s3.config=/etc/seaweedfs/identities.json
+      -s3.autoCreateBucket=false -master.telemetry=false
 
     environment:
-      MINIO_ROOT_USER: 'contember'
-      MINIO_ROOT_PASSWORD: 'contember'
-      MINIO_DEFAULT_BUCKETS: 'contember:download'
+      # Created on start, an existing one left alone. Public read and the signing credentials live
+      # in the identities file — see docker/object-storage/README.md.
+      S3_BUCKET: 'contember'
 
     ports:
       - '1483:9000'
 
     volumes:
-      - minio-data:/bitnami/minio/data
+      - object-storage-data:/data
+      - ./docker/object-storage/identities.json:/etc/seaweedfs/identities.json:ro
+
+    # The S3 port starts answering ~0.5 s before the bucket exists, so probing it (or `/healthz`)
+    # would report ready while an upload still fails with `NoSuchBucket`. The filer 404s on a bucket
+    # that isn't there yet, so ask it instead.
+    healthcheck:
+      test: [ 'CMD-SHELL', 'curl -fsS -o /dev/null "http://127.0.0.1:8888/buckets/contember/?limit=1"' ]
+      interval: 2s
+      timeout: 3s
+      retries: 30
 
   mailhog:
     image: mailhog/mailhog
@@ -121,4 +143,4 @@ services:
 
 volumes:
   pgsql-data: ~
-  minio-data: ~
+  object-storage-data: ~

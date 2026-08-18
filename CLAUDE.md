@@ -32,7 +32,7 @@ bun run format:check      # Check formatting (dprint)
 bun run format            # Auto-format (dprint)
 
 # Local dev environment
-docker-compose up --detach       # Start postgres, redis, mailhog, minio, adminer
+docker-compose up --detach       # Start postgres, redis, mailhog, object-storage, adminer
 docker-compose up engine         # Run engine server (port 4000)
 
 # Fill the local engine with data for every management panel page (idempotent)

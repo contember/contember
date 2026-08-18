@@ -6,7 +6,7 @@ Beside operations for your data, there are mutations related to S3 compatible st
 
 ## S3 server
 
-In Contember development stack, there is bundled Minio server, which is S3 compatible storage server, therefore you don't have to setup anything on localhost as it is running out of box. For production [see our guide](/guides/self-hosted-contember#s3)
+In Contember development stack, there is a bundled SeaweedFS server, which is an S3 compatible storage server, therefore you don't have to setup anything on localhost as it is running out of box. Set `DEFAULT_S3_PROVIDER` to `minio` for it — the provider name selects path-style addressing without object ACL, which is what SeaweedFS and other MinIO-compatible servers need. For production [see our guide](/guides/self-hosted-contember#s3)
 
 ## Signing upload URL
 

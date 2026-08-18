@@ -7,7 +7,7 @@
 #        COMPOSE_PROJECT_NAME=contember-oss-myworktree
 #        CONTEMBER_ENGINE_PORT=3101
 #        CONTEMBER_ADMINER_PORT=3102
-#        CONTEMBER_MINIO_PORT=3103
+#        CONTEMBER_OBJECT_STORAGE_PORT=3103
 #        CONTEMBER_POSTGRES_PORT=3105
 #        CONTEMBER_MAILHOG_PORT=3106
 #      (COMPOSE_PROJECT_NAME is required — otherwise two worktrees both default to their
@@ -25,8 +25,8 @@ services:
   adminer:
     ports: [ '${CONTEMBER_ADMINER_PORT:-3002}:8080' ]
 
-  minio:
-    ports: [ '${CONTEMBER_MINIO_PORT:-3003}:9000' ]
+  object-storage:
+    ports: [ '${CONTEMBER_OBJECT_STORAGE_PORT:-3003}:9000' ]
 
   postgres:
     ports: [ '${CONTEMBER_POSTGRES_PORT:-3005}:5432' ]

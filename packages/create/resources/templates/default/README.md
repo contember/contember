@@ -67,7 +67,9 @@ Follow these steps to set up and run your project locally:
 | S3               | 1483 | [http://localhost:1483](http://localhost:1483) |
 | MailPit          | 1484 | [http://localhost:1484](http://localhost:1484) |
 | Adminer          | 1485 | [http://localhost:1485](http://localhost:1485) |
-| S3 Dashboard     | 1486 | [http://localhost:1486](http://localhost:1486) |
+
+The S3 endpoint on 1483 is an API, not a web UI — reach it with an S3 client (`contember` /
+`contember`).
 
 When you're done, stop the Docker containers with:
 

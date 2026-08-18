@@ -21,6 +21,7 @@ const API_URL = 'http://tenant.test'
  */
 const requestedUrls: string[] = []
 const requestedVariables: Record<string, unknown>[] = []
+let existingAuthPolicies: Record<string, unknown>[] = []
 let persistedCaptchaSecret: string | null = 'stored-secret'
 let persistedCaptchaSecretVersion: number | null = 7
 const originalFetch = globalThis.fetch
@@ -34,7 +35,7 @@ beforeAll(() => {
 			applyCaptchaSecretEffect(variables)
 		}
 		const data = query.startsWith('query')
-			? { identityProviders: [] }
+			? (query.includes('authPolicies') ? { authPolicies: existingAuthPolicies } : { identityProviders: [] })
 			: { [['configure', 'addIDP', 'addMailTemplate'].find(it => query.includes(it)) ?? 'unknown']: { ok: true } }
 		return new Response(JSON.stringify({ data }), { status: 200 })
 	}
@@ -47,6 +48,7 @@ afterAll(() => {
 beforeEach(() => {
 	requestedUrls.length = 0
 	requestedVariables.length = 0
+	existingAuthPolicies = []
 	persistedCaptchaSecret = 'stored-secret'
 	persistedCaptchaSecretVersion = 7
 })
@@ -99,7 +101,23 @@ describe('TenantApplyCommand', () => {
 
 		await command.run(['--dry-run', '--json'], output)
 
-		expect(JSON.parse(stdout.text)).toEqual({ configPath: 'tenant.config.ts', dryRun: true, actions: expectedPlan })
+		expect(JSON.parse(stdout.text)).toEqual({ configPath: 'tenant.config.ts', dryRun: true, actions: expectedPlan, warnings: [] })
+		expect(stderr.text).toBe('')
+	})
+
+	// output.warn writes nothing outside human mode, so an unmanaged policy would otherwise be
+	// invisible to exactly the callers this contract exists for
+	test('--json carries an unmanaged auth policy that stderr cannot report', async () => {
+		existingAuthPolicies = [{ id: 'stale', scope: 'global', project: null, roles: ['old_role'] }]
+		const { command, output, stdout, stderr } = createCommand({ tenantConfig: { authPolicies: [] } })
+
+		await command.run(['--json'], output)
+
+		expect(JSON.parse(stdout.text).warnings).toEqual([{
+			code: 'UNMANAGED_AUTH_POLICY',
+			target: 'global [old_role]',
+			message: 'Auth policy global [old_role] exists but is not in the config; it stays in effect.',
+		}])
 		expect(stderr.text).toBe('')
 	})
 
@@ -146,7 +164,7 @@ describe('TenantApplyCommand', () => {
 
 		await command.run(['--json'], output)
 
-		expect(JSON.parse(stdout.text)).toEqual({ configPath: 'tenant.config.ts', dryRun: false, actions: expectedPlan })
+		expect(JSON.parse(stdout.text)).toEqual({ configPath: 'tenant.config.ts', dryRun: false, actions: expectedPlan, warnings: [] })
 		expect(stderr.text).toBe('')
 	})
 
@@ -209,7 +227,7 @@ describe('TenantApplyCommand', () => {
 		await command.run(['--json'], output)
 
 		expect(requestedUrls).toEqual([])
-		expect(JSON.parse(stdout.text)).toEqual({ configPath: 'tenant.config.ts', dryRun: false, actions: [] })
+		expect(JSON.parse(stdout.text)).toEqual({ configPath: 'tenant.config.ts', dryRun: false, actions: [], warnings: [] })
 	})
 
 	test('an unresolvable project is a typed input error', async () => {

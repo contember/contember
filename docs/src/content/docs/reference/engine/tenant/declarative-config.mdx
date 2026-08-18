@@ -134,6 +134,8 @@ contember tenant:apply --dry-run
 Because the role set is part of a policy's identity, changing `roles: ['editor']` to `roles: ['editor', 'author']` does not edit that policy — it creates a new one and leaves the old one in force. Auth policies aggregate strictest-wins, so the stale row keeps applying. `tenant:apply` prints a warning for every policy on the tenant that the config does not cover; delete the leftover with `deleteAuthPolicy`.
 
 The warning is why `authPolicies: []` differs from omitting the key: an empty list still means "I manage policies here", so leftovers are reported. Omitting `authPolicies` skips the section entirely and says nothing.
+
+`--json` and `--quiet` suppress diagnostics, so the warning is also part of the result document under `warnings`, as `{ code: 'UNMANAGED_AUTH_POLICY', target, message }`. `--quiet` prints actions only — use `--json` when the leftovers matter.
 :::
 
 ## Panel access

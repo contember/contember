@@ -29,6 +29,24 @@ export interface TenantConfigAction {
 	target: string | null
 }
 
+export type TenantConfigWarningCode = 'UNMANAGED_AUTH_POLICY'
+
+/** Server-side state the config does not cover. Nothing is pruned, so it stays in effect. */
+export interface TenantConfigWarning {
+	code: TenantConfigWarningCode
+	target: string
+	message: string
+}
+
+/**
+ * The outcome of an apply. Warnings are returned rather than only printed: `output.warn` is silent
+ * outside human mode, and an unmanaged policy is exactly what an agent running `--json` needs to see.
+ */
+export interface TenantConfigPlan {
+	actions: TenantConfigAction[]
+	warnings: TenantConfigWarning[]
+}
+
 /**
  * Applies a {@link TenantConfig} to a tenant idempotently:
  * - `configure` is a partial merge and is sent only when the schema maps at least one value to a database change.
@@ -53,9 +71,14 @@ export class TenantConfigApplier {
 		clients: TenantConfigApplierClients,
 		config: TenantConfig,
 		options: TenantConfigApplyOptions = {},
-	): Promise<TenantConfigAction[]> {
+	): Promise<TenantConfigPlan> {
 		const dryRun = options.dryRun === true
 		const actions: TenantConfigAction[] = []
+		const warnings: TenantConfigWarning[] = []
+		const warn = (code: TenantConfigWarningCode, target: string, message: string) => {
+			warnings.push({ code, target, message })
+			this.output.warn(message)
+		}
 		const run = async (action: TenantConfigActionType, target: string | null, execute: () => Promise<void>) => {
 			actions.push({ action, target })
 			if (dryRun) {
@@ -129,12 +152,13 @@ export class TenantConfigApplier {
 			// edit keeps enforcing. Nothing is pruned, but silence would hide it.
 			for (const policy of existing) {
 				if (!managedKeys.has(authPolicyKey(policy))) {
-					this.output.warn(`Warning: auth policy ${describeAuthPolicy(policy)} exists but is not in the config; it stays in effect.`)
+					const target = describeAuthPolicy(policy)
+					warn('UNMANAGED_AUTH_POLICY', target, `Auth policy ${target} exists but is not in the config; it stays in effect.`)
 				}
 			}
 		}
 
-		return actions
+		return { actions, warnings }
 	}
 }
 

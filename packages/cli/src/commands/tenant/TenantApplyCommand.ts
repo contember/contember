@@ -3,7 +3,7 @@ import { RemoteProjectResolver } from '../../lib/project/RemoteProjectResolver.j
 import { TenantApiTransport } from '../../lib/tenant/TenantApiTransport.js'
 import { createTenantClients } from '../../lib/tenant/clients/index.js'
 import { TenantConfigLoader } from '../../lib/tenant/TenantConfigLoader.js'
-import { TenantConfigAction, TenantConfigApplier } from '../../lib/tenant/TenantConfigApplier.js'
+import { TenantConfigAction, TenantConfigApplier, TenantConfigWarning } from '../../lib/tenant/TenantConfigApplier.js'
 import { humanText } from './tenantOutput.js'
 
 type Args = {
@@ -52,11 +52,13 @@ export class TenantApplyCommand extends Command<Args, Options> {
 		output.info(`Applying tenant config from ${configPath}`)
 		output.info(`API URL: ${remoteProject.endpoint}`)
 
-		const actions = await this.tenantConfigApplier.apply(clients, config, { dryRun })
+		const { actions, warnings } = await this.tenantConfigApplier.apply(clients, config, { dryRun })
 
-		const result: TenantConfigApplyResult = { configPath, dryRun, actions }
+		const result: TenantConfigApplyResult = { configPath, dryRun, actions, warnings }
 		output.data(result, {
 			human: renderApplyResult,
+			// deliberately actions only: quiet is a scalar stream meant for piping, and the applier
+			// already printed the warnings on stderr wherever they are not suppressed
 			quiet: value => value.actions.map(formatAction),
 		})
 
@@ -72,6 +74,8 @@ export interface TenantConfigApplyResult {
 	configPath: string
 	dryRun: boolean
 	actions: TenantConfigAction[]
+	/** Reachable in `--json` only; `output.warn` writes nothing outside human mode. */
+	warnings: TenantConfigWarning[]
 }
 
 const formatAction = (action: TenantConfigAction): string =>

@@ -62,7 +62,7 @@ describe('TenantConfigApplier', () => {
 	test('sends configure when global config is present', async () => {
 		const { clients, calls } = createClientsMock()
 		const { applier } = createApplier()
-		const actions = await applier.apply(clients, { config: { password: { minLength: 8 } } })
+		const { actions } = await applier.apply(clients, { config: { password: { minLength: 8 } } })
 		expect(calls).toEqual(['configure'])
 		expect(actions).toEqual([{ action: 'configure', target: null }])
 	})
@@ -80,7 +80,7 @@ describe('TenantConfigApplier', () => {
 	test('skips a schema-level no-op and continues with later actions', async () => {
 		const { clients, calls } = createClientsMock([])
 		const { applier } = createApplier()
-		const actions = await applier.apply(clients, {
+		const { actions } = await applier.apply(clients, {
 			config: { password: { minLength: null }, captcha: { secret: null } },
 			identityProviders: { google: { type: 'oidc', configuration: {} } },
 			mailTemplates: [{ type: 'RESET_PASSWORD_REQUEST', subject: 's', content: 'c' }],
@@ -95,7 +95,7 @@ describe('TenantConfigApplier', () => {
 	test('a dry run omits no-op configure but keeps the rest of the plan', async () => {
 		const { clients, calls } = createClientsMock([])
 		const { applier } = createApplier()
-		const actions = await applier.apply(clients, {
+		const { actions } = await applier.apply(clients, {
 			config: { captcha: { secret: null, protect: { signUp: null } } },
 			identityProviders: { google: { type: 'oidc', configuration: {} } },
 		}, { dryRun: true })
@@ -106,7 +106,7 @@ describe('TenantConfigApplier', () => {
 	test('keeps explicit null clears that map to nullable database columns', async () => {
 		const { clients, calls } = createClientsMock()
 		const { applier } = createApplier()
-		const actions = await applier.apply(clients, { config: { password: { pattern: null } } })
+		const { actions } = await applier.apply(clients, { config: { password: { pattern: null } } })
 		expect(calls).toEqual(['configure'])
 		expect(actions).toEqual([{ action: 'configure', target: null }])
 	})
@@ -114,7 +114,7 @@ describe('TenantConfigApplier', () => {
 	test('adds a new identity provider', async () => {
 		const { clients, calls } = createClientsMock([])
 		const { applier } = createApplier()
-		const actions = await applier.apply(clients, {
+		const { actions } = await applier.apply(clients, {
 			identityProviders: { google: { type: 'oidc', configuration: {} } },
 		})
 		expect(calls).toEqual(['addIdp:google'])
@@ -151,7 +151,7 @@ describe('TenantConfigApplier', () => {
 	test('upserts mail templates', async () => {
 		const { clients, calls } = createClientsMock()
 		const { applier } = createApplier()
-		const actions = await applier.apply(clients, {
+		const { actions } = await applier.apply(clients, {
 			mailTemplates: [{ type: 'RESET_PASSWORD_REQUEST', subject: 's', content: 'c', variant: 'cs' }],
 		})
 		expect(calls).toEqual(['addMailTemplate:RESET_PASSWORD_REQUEST'])
@@ -161,7 +161,7 @@ describe('TenantConfigApplier', () => {
 	test('creates an auth policy that does not exist yet', async () => {
 		const { clients, calls } = createClientsMock([], [])
 		const { applier } = createApplier()
-		const actions = await applier.apply(clients, {
+		const { actions } = await applier.apply(clients, {
 			authPolicies: [{ scope: 'global', roles: ['admin'], mfaRequired: true }],
 		})
 		expect(calls).toEqual(['createAuthPolicy:admin'])
@@ -171,7 +171,7 @@ describe('TenantConfigApplier', () => {
 	test('updates the policy targeting the same scope and roles', async () => {
 		const { clients, calls } = createClientsMock([], [createPolicy({ id: 'p1', scope: 'global', project: null, roles: ['admin'] })])
 		const { applier } = createApplier()
-		const actions = await applier.apply(clients, {
+		const { actions } = await applier.apply(clients, {
 			authPolicies: [{ scope: 'global', roles: ['admin'], mfaRequired: true }],
 		})
 		expect(calls).toEqual(['updateAuthPolicy:p1'])
@@ -199,12 +199,15 @@ describe('TenantConfigApplier', () => {
 	test('warns about an existing policy the config does not manage', async () => {
 		const { clients } = createClientsMock([], [createPolicy({ id: 'stale', scope: 'global', project: null, roles: ['old_role'] })])
 		const { applier, stderr } = createApplier()
-		await applier.apply(clients, {
+		const { warnings } = await applier.apply(clients, {
 			authPolicies: [{ scope: 'global', roles: ['admin'] }],
 		})
-		const warnings = stderr.lines.filter(it => it.includes('stays in effect'))
-		expect(warnings).toHaveLength(1)
-		expect(warnings[0]).toContain('old_role')
+		expect(warnings).toEqual([{
+			code: 'UNMANAGED_AUTH_POLICY',
+			target: 'global [old_role]',
+			message: 'Auth policy global [old_role] exists but is not in the config; it stays in effect.',
+		}])
+		expect(stderr.lines.filter(it => it.includes('stays in effect'))).toHaveLength(1)
 	})
 
 	// An empty list is the case the warning exists for: the config claims to manage
@@ -212,7 +215,9 @@ describe('TenantConfigApplier', () => {
 	test('warns about existing policies when the config lists none', async () => {
 		const { clients, calls } = createClientsMock([], [createPolicy({ id: 'stale', scope: 'global', project: null, roles: ['old_role'] })])
 		const { applier, stderr } = createApplier()
-		await applier.apply(clients, { authPolicies: [] })
+		const { warnings } = await applier.apply(clients, { authPolicies: [] })
+		expect(warnings).toHaveLength(1)
+		expect(warnings[0].code).toBe('UNMANAGED_AUTH_POLICY')
 		expect(stderr.lines).toHaveLength(1)
 		expect(stderr.lines[0]).toContain('old_role')
 		expect(calls).toEqual([])
@@ -221,7 +226,8 @@ describe('TenantConfigApplier', () => {
 	test('stays silent about existing policies when the config does not mention them at all', async () => {
 		const { clients } = createClientsMock([], [createPolicy({ id: 'stale', scope: 'global', project: null, roles: ['old_role'] })])
 		const { applier, stderr } = createApplier()
-		await applier.apply(clients, {})
+		const { warnings } = await applier.apply(clients, {})
+		expect(warnings).toEqual([])
 		expect(stderr.text).toBe('')
 	})
 
@@ -271,7 +277,7 @@ describe('TenantConfigApplier', () => {
 	test('dry run performs no mutations but still reads state and returns the plan', async () => {
 		const { clients, calls } = createClientsMock([])
 		const { applier } = createApplier()
-		const actions = await applier.apply(clients, {
+		const { actions } = await applier.apply(clients, {
 			config: { password: { minLength: 8 } },
 			identityProviders: { google: { type: 'oidc', configuration: {} } },
 			mailTemplates: [{ type: 'RESET_PASSWORD_REQUEST', subject: 's', content: 'c' }],

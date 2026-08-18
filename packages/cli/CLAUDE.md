@@ -19,6 +19,7 @@ Run `pre-build` before process tests; generated GraphQL client barrels are requi
 - Write only through the shared `Output`. Stdout is result data; stderr is diagnostics. Never use `console.*`.
 - Use `output.data(value, { human, quiet })` for typed projections. JSON emits the raw value; quiet emits scalars.
 - Suppress informational diagnostics, progress and subprocess noise in JSON and quiet modes. JSON errors are one stderr document.
+- Diagnostics do not reach JSON or quiet callers. Anything the caller must act on belongs in the `output.data` payload, not only in `output.warn`.
 - Read the output mode from raw argv before workspace/container bootstrap so bootstrap failures use the requested format.
 - Throw `CliError` with a stable code and correct `ExitCode`. Let `Application` render command failures.
 - Never prompt in JSON, quiet or non-TTY runs. Require `--yes` or throw `TTY_UNAVAILABLE`.

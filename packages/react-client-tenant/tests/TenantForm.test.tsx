@@ -1,5 +1,5 @@
-import { describe, expect, it } from 'bun:test'
-import { fireEvent, render } from '@testing-library/react'
+import { afterEach, describe, expect, it } from 'bun:test'
+import { cleanup, fireEvent, render } from '@testing-library/react'
 import { GraphQlClientError } from '@contember/graphql-client'
 import { TenantForm } from '../src/components/forms/TenantForm.js'
 import { useForm } from '../src/contexts.js'
@@ -29,6 +29,11 @@ const renderProbe = (execute: () => Promise<never>) => {
 	)
 	return result
 }
+
+// Unmount between the cases: without it the second render leaves two forms in the document and
+// getByText('submit') fails on the duplicate. Auto-cleanup only kicks in when the testing library
+// sees a global afterEach, which it doesn't reliably do here.
+afterEach(cleanup)
 
 describe('TenantForm error codes', () => {
 	it('reports a denied mutation as FORBIDDEN', async () => {

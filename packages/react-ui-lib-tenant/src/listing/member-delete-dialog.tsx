@@ -20,7 +20,7 @@ export interface MemberDeleteProps {
 	identityId: string
 	projectSlug: string
 	onSuccess: () => void
-	onError: (e: unknown) => void
+	onError: (args: { code: string }) => void
 }
 
 export const MemberDeleteDialog = ({ onError, title, identityId, onSuccess, projectSlug }: MemberDeleteProps) => {

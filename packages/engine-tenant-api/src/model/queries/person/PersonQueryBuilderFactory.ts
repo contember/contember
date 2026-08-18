@@ -17,6 +17,7 @@ export class PersonQueryBuilderFactory {
 			.select(expr => expr.raw('coalesce("person_mfa"."email_otp_enabled", false)'), 'email_otp_enabled')
 			.select(['person', 'passwordless_enabled'])
 			.select(['person', 'email_verified_at'])
+			.select(['person', 'disabled_at'])
 			.from('person')
 			.leftJoin('person_mfa', 'person_mfa', expr => expr.columnsEq(['person_mfa', 'person_id'], ['person', 'id']))
 	}

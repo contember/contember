@@ -10,6 +10,7 @@ import { useProjectSlug } from '@contember/react-client'
 import { UpdateProjectMemberForm } from '@contember/interface'
 import { ToastContent, useShowToast } from '@contember/react-ui-lib-base'
 import { dict } from '../dict.js'
+import { actionErrorMessage } from '../errors.js'
 import { MemberDeleteDialog } from './member-delete-dialog.js'
 import { Dialog, DialogContent, DialogTrigger } from '@contember/react-ui-lib-base'
 import { RolesConfig, UpdateProjectMemberFormFields } from '../forms/index.js'
@@ -27,13 +28,17 @@ export interface MemberListProps {
 	tableHeaders: string[]
 	controller?: { current?: MemberListController }
 	roles?: RolesConfig
+	canUpdateMember?: boolean
+	canRemoveMember?: boolean
 }
 
 export interface MemberListController {
 	refresh: () => void
 }
 
-export const MemberList = ({ filter, labels, tableColumns, controller, tableHeaders, roles }: MemberListProps) => {
+export const MemberList = (
+	{ filter, labels, tableColumns, controller, tableHeaders, roles, canUpdateMember, canRemoveMember }: MemberListProps,
+) => {
 	const projectSlug = useProjectSlug()!
 	const [page, setPage] = useState(0)
 
@@ -52,8 +57,8 @@ export const MemberList = ({ filter, labels, tableColumns, controller, tableHead
 		refresh()
 		showToast(<ToastContent>{labels.deleted}</ToastContent>, { type: 'success' })
 	}
-	const onDeleteError = () => {
-		showToast(<ToastContent>{labels.deleteFailed}</ToastContent>, { type: 'error' })
+	const onDeleteError = ({ code }: { code: string }) => {
+		showToast(<ToastContent>{actionErrorMessage(code, labels.deleteFailed)}</ToastContent>, { type: 'error' })
 	}
 
 	switch (query.state) {
@@ -95,14 +100,18 @@ export const MemberList = ({ filter, labels, tableColumns, controller, tableHead
 								{tableColumns(it)}
 								<TableCell key="role">{it.memberships.map((m: any) => m.role).join(', ')}</TableCell>
 								<TableCell className="space-x-2 whitespace-nowrap">
-									<MemberDeleteDialog
-										identityId={it.identity.id}
-										projectSlug={projectSlug}
-										onSuccess={onDeleteMember}
-										onError={onDeleteError}
-										title={labels.deleteConfirmation}
-									/>
-									<EditMembershipDialog projectSlug={projectSlug} identityId={it.identity.id} onSuccess={refresh} roles={roles} />
+									{canRemoveMember !== false && (
+										<MemberDeleteDialog
+											identityId={it.identity.id}
+											projectSlug={projectSlug}
+											onSuccess={onDeleteMember}
+											onError={onDeleteError}
+											title={labels.deleteConfirmation}
+										/>
+									)}
+									{canUpdateMember !== false && (
+										<EditMembershipDialog projectSlug={projectSlug} identityId={it.identity.id} onSuccess={refresh} roles={roles} />
+									)}
 								</TableCell>
 							</TableRow>
 						))}

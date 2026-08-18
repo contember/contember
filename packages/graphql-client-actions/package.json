@@ -1,0 +1,44 @@
+{
+  "name": "@contember/graphql-client-actions",
+  "version": "2.2.0-alpha.3",
+  "license": "Apache-2.0",
+  "type": "module",
+  "scripts": {
+    "pre-build": "bun ./scripts/generateClient.ts && tsc --build ./src"
+  },
+  "main": "./dist/production/index.js",
+  "typings": "./dist/types/index.d.ts",
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/types/index.d.ts",
+        "development": "./dist/development/index.js",
+        "production": "./dist/production/index.js",
+        "typescript": "./src/index.ts",
+        "default": "./dist/production/index.js"
+      },
+      "require": {
+        "types": "./dist/types/index.d.ts",
+        "development": "./dist/development/index.cjs",
+        "production": "./dist/production/index.cjs",
+        "typescript": "./src/index.ts",
+        "default": "./dist/production/index.cjs"
+      }
+    }
+  },
+  "dependencies": {
+    "graphql-ts-client-api": "catalog:"
+  },
+  "devDependencies": {
+    "@contember/engine-actions": "workspace:*",
+    "@graphql-tools/schema": "catalog:",
+    "@types/node": "catalog:",
+    "graphql": "catalog:",
+    "graphql-ts-client-codegen": "catalog:"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/contember/contember.git",
+    "directory": "packages/graphql-client-actions"
+  }
+}

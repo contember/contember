@@ -40,6 +40,7 @@ import { DateTimeType, IntervalType, JSONType } from '@contember/graphql-utils'
 import { IDPQueryResolver } from './query/IDPQueryResolver.js'
 import { UpdateIDPMutationResolver } from './mutation/idp/UpdateIDPMutationResolver.js'
 import { DisablePersonMutationResolver } from './mutation/person/DisablePersonMutationResolver.js'
+import { EnablePersonMutationResolver } from './mutation/person/EnablePersonMutationResolver.js'
 import { ForceSignOutMutationResolver } from './mutation/person/ForceSignOutMutationResolver.js'
 import { RevokeSessionMutationResolver } from './mutation/person/RevokeSessionMutationResolver.js'
 import { MailTemplateQueryResolver } from './query/MailTemplateQueryResolver.js'
@@ -78,6 +79,7 @@ class ResolverFactory {
 			passwordlessMutationResolver: PasswordlessMutationResolver
 
 			disablePersonMutationResolver: DisablePersonMutationResolver
+			enablePersonMutationResolver: EnablePersonMutationResolver
 			forceSignOutMutationResolver: ForceSignOutMutationResolver
 			resetPersonMfaMutationResolver: ResetPersonMfaMutationResolver
 			revokeSessionMutationResolver: RevokeSessionMutationResolver
@@ -133,12 +135,15 @@ class ResolverFactory {
 			},
 			Person: {
 				identityProviders: this.resolvers.personTypeResolver.identityProviders.bind(this.resolvers.personTypeResolver),
+				passwordlessAvailable: this.resolvers.personTypeResolver.passwordlessAvailable.bind(this.resolvers.personTypeResolver),
+				passwordlessSelfManaged: this.resolvers.personTypeResolver.passwordlessSelfManaged.bind(this.resolvers.personTypeResolver),
 			},
 			Project: {
 				members: this.resolvers.projectTypeResolver.members.bind(this.resolvers.projectTypeResolver),
 				roles: this.resolvers.projectTypeResolver.roles.bind(this.resolvers.projectTypeResolver),
 				apiKeys: this.resolvers.projectTypeResolver.apiKeys.bind(this.resolvers.projectTypeResolver),
 				secrets: this.resolvers.projectTypeResolver.secrets.bind(this.resolvers.projectTypeResolver),
+				permissions: this.resolvers.projectTypeResolver.permissions.bind(this.resolvers.projectTypeResolver),
 			},
 			Query: {
 				me: this.resolvers.meQueryResolver.me.bind(this.resolvers.meQueryResolver),
@@ -188,6 +193,7 @@ class ResolverFactory {
 					this.resolvers.disconnectMyIdentityProviderMutationResolver,
 				),
 				disablePerson: this.resolvers.disablePersonMutationResolver.disablePerson.bind(this.resolvers.disablePersonMutationResolver),
+				enablePerson: this.resolvers.enablePersonMutationResolver.enablePerson.bind(this.resolvers.enablePersonMutationResolver),
 				forceSignOutPerson: this.resolvers.forceSignOutMutationResolver.forceSignOutPerson.bind(this.resolvers.forceSignOutMutationResolver),
 				resetPersonMfa: this.resolvers.resetPersonMfaMutationResolver.resetPersonMfa.bind(this.resolvers.resetPersonMfaMutationResolver),
 				revokeSession: this.resolvers.revokeSessionMutationResolver.revokeSession.bind(this.resolvers.revokeSessionMutationResolver),

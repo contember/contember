@@ -10,6 +10,30 @@ import { VerifyResult } from './ApiKeyManager.js'
  */
 export const UNPERSISTED_ROOT_IDENTITY_ID = 'f3b2c4d6-0000-4000-8000-000000000001'
 
+/**
+ * Well-known identity id for the pre-sign-in caller of a first-party UI served by the engine (the
+ * management panel's login screen). It holds exactly {@link TenantRole.LOGIN} and exists only in
+ * memory, so the surface it opens is fixed by this file rather than by whatever token an operator
+ * happened to configure.
+ */
+export const UNPERSISTED_LOGIN_IDENTITY_ID = 'f3b2c4d6-0000-4000-8000-000000000002'
+
+const unpersistedIdentityIds: ReadonlySet<string> = new Set([UNPERSISTED_ROOT_IDENTITY_ID, UNPERSISTED_LOGIN_IDENTITY_ID])
+
+/**
+ * Whether an identity id is one of the virtual identities above, i.e. has no row in `identity`.
+ * Anything writing a foreign key to `identity` must ask first — see `AuthLogService`.
+ */
+export const isUnpersistedIdentityId = (identityId: string | undefined): boolean => identityId !== undefined && unpersistedIdentityIds.has(identityId)
+
+/**
+ * The pre-sign-in caller of an engine-served UI, as an already-verified result. There is no token to
+ * present: the surface is reached by being routed there, so nothing is compared and nothing is read
+ * from the database.
+ */
+export const createUnpersistedLoginVerifyResult = (): VerifyResult =>
+	new VerifyResult(UNPERSISTED_LOGIN_IDENTITY_ID, UNPERSISTED_LOGIN_IDENTITY_ID, [TenantRole.LOGIN], null, false)
+
 export interface UnpersistedApiKey {
 	readonly tokenHash: TokenHash
 	readonly identityId: string

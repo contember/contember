@@ -1,0 +1,41 @@
+{
+  "name": "@contember/panel-ui",
+  "license": "Apache-2.0",
+  "version": "2.2.0-alpha.3",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "build": "vite build",
+    "dev": "vite --port 1490 --host 0.0.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/contember/contember.git",
+    "directory": "packages/panel-ui"
+  },
+  "dependencies": {
+    "@contember/graphql-client": "workspace:*",
+    "@contember/graphql-client-actions": "workspace:*",
+    "@contember/graphql-client-system": "workspace:*",
+    "@contember/interface": "workspace:*",
+    "@contember/react-client": "workspace:*",
+    "@contember/react-client-tenant": "workspace:*",
+    "@contember/react-identity": "workspace:*",
+    "@contember/react-routing": "workspace:*",
+    "@contember/react-slots": "workspace:*",
+    "@contember/react-ui-lib-base": "workspace:*",
+    "@contember/react-ui-lib-tenant": "workspace:*",
+    "graphql-ts-client-api": "catalog:",
+    "lucide-react": "catalog:",
+    "react": "catalog:",
+    "react-dom": "catalog:"
+  },
+  "devDependencies": {
+    "@tailwindcss/vite": "catalog:",
+    "@types/react": "catalog:",
+    "@types/react-dom": "catalog:",
+    "@vitejs/plugin-react": "catalog:",
+    "tailwindcss": "catalog:",
+    "vite": "catalog:"
+  }
+}

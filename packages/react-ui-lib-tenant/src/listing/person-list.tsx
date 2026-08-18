@@ -9,7 +9,14 @@ import { RolesConfig } from '../forms/index.js'
 const filter: ProjectMembersFilter = {
 	memberType: 'PERSON',
 }
-export const PersonList = (props: { controller?: { current?: MemberListController }; roles?: RolesConfig }) => (
+export const PersonList = (
+	props: {
+		controller?: { current?: MemberListController }
+		roles?: RolesConfig
+		canUpdateMember?: boolean
+		canRemoveMember?: boolean
+	},
+) => (
 	<MemberList
 		{...props}
 		filter={filter}

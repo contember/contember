@@ -6,6 +6,10 @@ const disableMutation = `mutation($id: String!) {
 	disablePerson(personId: $id) { ok error { code } }
 }`
 
+const enableMutation = `mutation($id: String!) {
+	enablePerson(personId: $id) { ok error { code } }
+}`
+
 const signInMutation = `mutation($email: String!, $password: String!) {
 	signIn(email: $email, password: $password) { ok error { code } }
 }`
@@ -34,6 +38,46 @@ test('disablePerson blocks future signIn with PERSON_DISABLED', async () => {
 	const second = await executeGraphql('/tenant', disableMutation, { variables: { id: personId } })
 	expect(second.body.data.disablePerson.ok).toBe(false)
 	expect(second.body.data.disablePerson.error.code).toBe('PERSON_ALREADY_DISABLED')
+})
+
+test('enablePerson restores signIn and reports the disabled state', async () => {
+	const tester = await createTester(emptySchema)
+	const email = `jane-${rand()}@doe.com`
+	const password = 'HWGA51KKpJ4lSW'
+	await tester.tenant.signUp(email, password)
+
+	const token = await tester.tenant.signIn(email, password)
+	const personResp = await executeGraphql('/tenant', `query { me { person { id disabledAt } } }`, { authorizationToken: token })
+	const personId: string = personResp.body.data.me.person.id
+	expect(personResp.body.data.me.person.disabledAt).toBe(null)
+
+	// Asserted rather than fired and forgotten: a silent failure here surfaces one step later as
+	// enablePerson reporting PERSON_ALREADY_ENABLED, which blames the wrong mutation.
+	const disableResp = await executeGraphql('/tenant', disableMutation, { variables: { id: personId } })
+	expect(disableResp.body.data.disablePerson).toEqual({ ok: true, error: null })
+
+	const enableResp = await executeGraphql('/tenant', enableMutation, { variables: { id: personId } })
+	expect(enableResp.body.data.enablePerson).toEqual({ ok: true, error: null })
+
+	const retry = await executeGraphql('/tenant', signInMutation, {
+		authorizationToken: loginToken,
+		variables: { email, password },
+	})
+	expect(retry.body.data.signIn.ok).toBe(true)
+
+	const second = await executeGraphql('/tenant', enableMutation, { variables: { id: personId } })
+	expect(second.body.data.enablePerson.ok).toBe(false)
+	expect(second.body.data.enablePerson.error.code).toBe('PERSON_ALREADY_ENABLED')
+})
+
+test('enablePerson returns PERSON_NOT_FOUND for unknown id', async () => {
+	const tester = await createTester(emptySchema)
+	void tester
+	const resp = await executeGraphql('/tenant', enableMutation, {
+		variables: { id: '00000000-0000-0000-0000-000000000000' },
+	})
+	expect(resp.body.data.enablePerson.ok).toBe(false)
+	expect(resp.body.data.enablePerson.error.code).toBe('PERSON_NOT_FOUND')
 })
 
 test('disablePerson returns PERSON_NOT_FOUND for unknown id', async () => {

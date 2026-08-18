@@ -347,6 +347,16 @@
         "pg": "catalog:",
       },
     },
+    "packages/engine-panel": {
+      "name": "@contember/engine-panel",
+      "version": "2.2.0-alpha.3",
+      "dependencies": {
+        "@contember/engine-http": "workspace:*",
+      },
+      "devDependencies": {
+        "@types/node": "catalog:",
+      },
+    },
     "packages/engine-plugins": {
       "name": "@contember/engine-plugins",
       "version": "2.2.0-alpha.3",
@@ -388,6 +398,7 @@
       "dependencies": {
         "@contember/engine-actions": "workspace:*",
         "@contember/engine-http": "workspace:*",
+        "@contember/engine-panel": "workspace:*",
         "@contember/engine-plugins": "workspace:*",
         "@contember/engine-s3-plugin": "workspace:*",
         "@contember/engine-vimeo-plugin": "workspace:*",
@@ -490,6 +501,20 @@
       "name": "@contember/graphql-client",
       "version": "2.2.0-alpha.3",
     },
+    "packages/graphql-client-actions": {
+      "name": "@contember/graphql-client-actions",
+      "version": "2.2.0-alpha.3",
+      "dependencies": {
+        "graphql-ts-client-api": "catalog:",
+      },
+      "devDependencies": {
+        "@contember/engine-actions": "workspace:*",
+        "@graphql-tools/schema": "catalog:",
+        "@types/node": "catalog:",
+        "graphql": "catalog:",
+        "graphql-ts-client-codegen": "catalog:",
+      },
+    },
     "packages/graphql-client-system": {
       "name": "@contember/graphql-client-system",
       "version": "2.2.0-alpha.3",
@@ -573,6 +598,35 @@
       },
       "devDependencies": {
         "@types/node": "catalog:",
+      },
+    },
+    "packages/panel-ui": {
+      "name": "@contember/panel-ui",
+      "version": "2.2.0-alpha.3",
+      "dependencies": {
+        "@contember/graphql-client": "workspace:*",
+        "@contember/graphql-client-actions": "workspace:*",
+        "@contember/graphql-client-system": "workspace:*",
+        "@contember/interface": "workspace:*",
+        "@contember/react-client": "workspace:*",
+        "@contember/react-client-tenant": "workspace:*",
+        "@contember/react-identity": "workspace:*",
+        "@contember/react-routing": "workspace:*",
+        "@contember/react-slots": "workspace:*",
+        "@contember/react-ui-lib-base": "workspace:*",
+        "@contember/react-ui-lib-tenant": "workspace:*",
+        "graphql-ts-client-api": "catalog:",
+        "lucide-react": "catalog:",
+        "react": "catalog:",
+        "react-dom": "catalog:",
+      },
+      "devDependencies": {
+        "@tailwindcss/vite": "catalog:",
+        "@types/react": "catalog:",
+        "@types/react-dom": "catalog:",
+        "@vitejs/plugin-react": "catalog:",
+        "tailwindcss": "catalog:",
+        "vite": "catalog:",
       },
     },
     "packages/playground": {
@@ -726,6 +780,7 @@
       "name": "@contember/react-client-tenant",
       "version": "2.2.0-alpha.3",
       "dependencies": {
+        "@contember/graphql-client": "workspace:*",
         "@contember/graphql-client-tenant": "workspace:*",
         "@contember/react-client": "workspace:*",
         "@contember/react-utils": "workspace:*",
@@ -1439,6 +1494,8 @@
 
     "@contember/engine-http": ["@contember/engine-http@workspace:packages/engine-http"],
 
+    "@contember/engine-panel": ["@contember/engine-panel@workspace:packages/engine-panel"],
+
     "@contember/engine-plugins": ["@contember/engine-plugins@workspace:packages/engine-plugins"],
 
     "@contember/engine-s3-plugin": ["@contember/engine-s3-plugin@workspace:packages/engine-s3-plugin"],
@@ -1455,6 +1512,8 @@
 
     "@contember/graphql-client": ["@contember/graphql-client@workspace:packages/graphql-client"],
 
+    "@contember/graphql-client-actions": ["@contember/graphql-client-actions@workspace:packages/graphql-client-actions"],
+
     "@contember/graphql-client-system": ["@contember/graphql-client-system@workspace:packages/graphql-client-system"],
 
     "@contember/graphql-client-tenant": ["@contember/graphql-client-tenant@workspace:packages/graphql-client-tenant"],
@@ -1466,6 +1525,8 @@
     "@contember/logger": ["@contember/logger@workspace:packages/logger"],
 
     "@contember/migrations-client": ["@contember/migrations-client@workspace:packages/migrations-client"],
+
+    "@contember/panel-ui": ["@contember/panel-ui@workspace:packages/panel-ui"],
 
     "@contember/playground": ["@contember/playground@workspace:packages/playground"],
 

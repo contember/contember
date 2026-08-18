@@ -5,7 +5,8 @@
   "private": true,
   "scripts": {
     "pre-build": "bun run --filter=\"*\" pre-build",
-    "build": "bun run pre-build && bun run ts:build && bun vite:build",
+    "build": "bun run pre-build && bun run panel:assets && bun run ts:build && bun vite:build",
+    "panel:assets": "bun run --filter=@contember/engine-panel build:assets",
     "vite:build": "./scripts/vite/build.sh",
     "clean": "bun run clean:generated && bun run clean:dependencies",
     "clean:dependencies": "rm -rf packages/*/node_modules || true; rm -rf node_modules || true",

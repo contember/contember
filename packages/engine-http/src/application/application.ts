@@ -329,6 +329,9 @@ export class Application {
 		if (response.contentType) {
 			ctx.set('Content-type', response.contentType)
 		}
+		for (const [name, value] of Object.entries(response.headers ?? {})) {
+			ctx.set(name, value)
+		}
 		ctx.status = response.code
 		if (response.body !== undefined) {
 			ctx.body = response.body
@@ -337,6 +340,7 @@ export class Application {
 
 	private sendRawHttpResponse(socket: Duplex, response: HttpResponse) {
 		const headers: Record<string, string> = {
+			...response.headers,
 			'Connection': 'close',
 			'Content-Type': response.contentType ?? 'text/plain',
 			'Content-Length': String(response.body?.length ?? 0),

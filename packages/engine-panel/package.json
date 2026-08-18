@@ -1,0 +1,40 @@
+{
+  "name": "@contember/engine-panel",
+  "license": "Apache-2.0",
+  "version": "2.2.0-alpha.3",
+  "type": "module",
+  "main": "./dist/production/index.js",
+  "typings": "./dist/types/index.d.ts",
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/types/index.d.ts",
+        "development": "./dist/development/index.js",
+        "production": "./dist/production/index.js",
+        "typescript": "./src/index.ts",
+        "default": "./dist/production/index.js"
+      },
+      "require": {
+        "types": "./dist/types/index.d.ts",
+        "development": "./dist/development/index.cjs",
+        "production": "./dist/production/index.cjs",
+        "typescript": "./src/index.ts",
+        "default": "./dist/production/index.cjs"
+      }
+    }
+  },
+  "scripts": {
+    "build:assets": "bun ./scripts/buildAssets.ts"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/contember/contember.git",
+    "directory": "packages/engine-panel"
+  },
+  "dependencies": {
+    "@contember/engine-http": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/node": "catalog:"
+  }
+}

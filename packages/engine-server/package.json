@@ -25,6 +25,7 @@
   "dependencies": {
     "@contember/engine-actions": "workspace:*",
     "@contember/engine-http": "workspace:*",
+    "@contember/engine-panel": "workspace:*",
     "@contember/engine-plugins": "workspace:*",
     "@contember/engine-s3-plugin": "workspace:*",
     "@contember/engine-vimeo-plugin": "workspace:*",

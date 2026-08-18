@@ -5,11 +5,15 @@ import { useCallback } from 'react'
 
 const identityFragment = TenantApi
 	.identity$$
-	.person(TenantApi.person$.id.email.name.otpEnabled.emailOtpEnabled)
+	// `passwordlessAvailable` / `passwordlessSelfManaged` resolve the tenant policy server-side; the raw
+	// `passwordlessEnabled` opt-in alone cannot tell a UI what signing in will actually do.
+	.person(
+		TenantApi.person$.id.email.name.otpEnabled.emailOtpEnabled.passwordlessEnabled.passwordlessAvailable.passwordlessSelfManaged,
+	)
 	.projects(
 		TenantApi
 			.identityProjectRelation$
-			.project(TenantApi.project$$)
+			.project(TenantApi.project$$.permissions(TenantApi.projectPermissions$$))
 			.memberships(TenantApi.membership$$.variables(TenantApi.variableEntry$$)),
 	)
 	.permissions(TenantApi.identityGlobalPermissions$$)

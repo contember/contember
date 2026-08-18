@@ -1,8 +1,21 @@
 import { useCallback, useMemo, useState } from 'react'
-import { Identity, IdentityMethods, IdentityStateValue } from '../types/index.js'
+import { Identity, IdentityGlobalPermissions, IdentityMethods, IdentityStateValue } from '../types/index.js'
 import { GraphQlClientError, useSessionToken } from '@contember/react-client'
 import { useLogoutInternal } from '../internal/hooks/useLogoutInternal.js'
 import { useMeQuery } from './queries/index.js'
+
+const deniedGlobalPermissions: IdentityGlobalPermissions = {
+	canCreateProject: false,
+	canDeployEntrypoint: false,
+	canViewConfiguration: false,
+	canListIdentityProviders: false,
+	canListMailTemplates: false,
+	canManageConfiguration: false,
+	canViewAuthLog: false,
+	canListPersons: false,
+	canListGlobalApiKeys: false,
+	canCreateGlobalApiKey: false,
+}
 
 export const useFetchIdentity = (): [{ state: IdentityStateValue; identity: Identity | undefined }, IdentityMethods] => {
 	const sessionToken = useSessionToken()
@@ -22,7 +35,6 @@ export const useFetchIdentity = (): [{ state: IdentityStateValue; identity: Iden
 			const response = await fetchMe({})
 			const person = response.person
 			const projects = response.projects
-			const permissions = response.permissions ?? { canCreateProject: false }
 
 			setIdentityState({
 				state: 'success',
@@ -34,8 +46,11 @@ export const useFetchIdentity = (): [{ state: IdentityStateValue; identity: Iden
 						name: it.project.name,
 						slug: it.project.slug,
 						roles: it.memberships.map(it => it.role),
+						permissions: it.project.permissions,
 					})),
-					permissions,
+					// `permissions` is nullable on an identity the caller may not inspect; that never
+					// applies to `me`, but denying everything is the safe reading if it ever does.
+					permissions: response.permissions ?? deniedGlobalPermissions,
 				},
 			})
 		} catch (e) {

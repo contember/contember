@@ -130,7 +130,9 @@ export const useIntrospectionRolesConfig = (projectSlug: string): RolesConfig | 
 		for (const role of roles) {
 			const variables: RolesConfig[string]['variables'] = {}
 			for (const variable of role.variables) {
-				if (variable.__typename === 'RolePredefinedVariableDefinition') {
+				// `__typename` is not selectable through the generated fetchers, so it is always undefined here;
+				// `value` is what only a predefined variable carries, and those the user cannot set.
+				if ('value' in variable) {
 					continue
 				}
 				variables[variable.name] = {

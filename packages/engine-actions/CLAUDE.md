@@ -39,6 +39,9 @@ Mutations: `processBatch`, `retryEvent`, `stopEvent`, `setVariables` (MERGE/SET/
 
 Queries: `failedEvents`, `eventsToProcess`, `eventsInProcessing`, `event`, `variables`
 
+Also mounted at `/panel/api/actions/:projectSlug` via the `panelApiMount` service when the management
+panel is served, which is what makes the API reachable from the panel UI.
+
 ## Observability (`ActionsMetrics`)
 
 Cheap in-memory Prometheus metrics (no table polling), registered onto the engine's shared registry

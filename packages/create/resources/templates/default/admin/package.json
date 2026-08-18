@@ -25,6 +25,7 @@
     "@contember/react-block-repeater": "{version}",
     "@contember/react-board": "{version}",
     "@contember/react-board-dnd-kit": "{version}",
+    "@contember/react-client": "{version}",
     "@contember/react-dataview": "{version}",
     "@contember/react-form": "{version}",
     "@contember/react-repeater": "{version}",

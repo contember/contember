@@ -94,6 +94,7 @@ export const nav: NavItem[] = [
 				items: [
 					doc('reference/interface/ui-components/overview', 'Overview'),
 					doc('reference/interface/ui-components/datagrid'),
+					doc('reference/interface/ui-components/tenant'),
 				],
 			},
 		],
@@ -109,6 +110,7 @@ export const nav: NavItem[] = [
 				collapsed: true,
 				items: [
 					doc('reference/engine/configuration/database'),
+					doc('reference/engine/configuration/management-panel'),
 				],
 			},
 			{
@@ -188,6 +190,7 @@ export const nav: NavItem[] = [
 					doc('reference/engine/tenant/disable-person'),
 					doc('reference/engine/tenant/api-keys'),
 					doc('reference/engine/tenant/projects'),
+					doc('reference/engine/tenant/permissions'),
 					doc('reference/engine/tenant/proxy-trust'),
 					doc('reference/engine/tenant/password-policy'),
 					doc('reference/engine/tenant/anti-abuse'),

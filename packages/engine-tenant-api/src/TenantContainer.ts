@@ -32,6 +32,7 @@ import {
 	OIDCProvider,
 	OtpAuthenticator,
 	OtpManager,
+	PanelAccessResolver,
 	PasswordChangeManager,
 	PasswordResetManager,
 	PermissionContextFactory,
@@ -102,6 +103,7 @@ import { IDPQueryResolver } from './resolvers/query/IDPQueryResolver.js'
 import { UpdateIDPMutationResolver } from './resolvers/mutation/idp/UpdateIDPMutationResolver.js'
 import { TenantCredentials, TenantMigrationsRunner } from './migrations/index.js'
 import { DisablePersonMutationResolver } from './resolvers/mutation/person/DisablePersonMutationResolver.js'
+import { EnablePersonMutationResolver } from './resolvers/mutation/person/EnablePersonMutationResolver.js'
 import { ForceSignOutMutationResolver } from './resolvers/mutation/person/ForceSignOutMutationResolver.js'
 import { RevokeSessionMutationResolver } from './resolvers/mutation/person/RevokeSessionMutationResolver.js'
 import { MailTemplateQueryResolver } from './resolvers/query/MailTemplateQueryResolver.js'
@@ -125,6 +127,7 @@ export interface TenantContainer {
 	backchannelLogoutManager: BackchannelLogoutManager
 	signUpManager: SignUpManager
 	projectManager: ProjectManager
+	panelAccessResolver: PanelAccessResolver
 	resolvers: Schema.Resolvers
 	resolverContextFactory: TenantResolverContextFactory
 	authorizator: Authorizator<Identity>
@@ -160,6 +163,7 @@ export class TenantContainerFactory {
 				'backchannelLogoutManager',
 				'projectMemberManager',
 				'projectManager',
+				'panelAccessResolver',
 				'signUpManager',
 				'resolvers',
 				'authorizator',
@@ -184,6 +188,7 @@ export class TenantContainerFactory {
 			.addService('userMailer', ({ mailer, templateRenderer }) => new UserMailer(mailer, templateRenderer))
 			.addService('apiKeyService', () => new ApiKeyService())
 			.addService('authPolicyResolver', () => new AuthPolicyResolver())
+			.addService('panelAccessResolver', ({ providers }) => new PanelAccessResolver(providers))
 			.addService('authLogService', () => new AuthLogService())
 			.addService('loginRiskAnalyzer', ({ providers }) => new LoginRiskAnalyzer(providers.hash))
 			.addService('idpRegistry', () => {
@@ -392,6 +397,10 @@ export class TenantContainerFactory {
 			.addService(
 				'disablePersonMutationResolver',
 				({ personAccessManager, personManager }) => new DisablePersonMutationResolver(personAccessManager, personManager),
+			)
+			.addService(
+				'enablePersonMutationResolver',
+				({ personAccessManager, personManager }) => new EnablePersonMutationResolver(personAccessManager, personManager),
 			)
 			.addService(
 				'forceSignOutMutationResolver',

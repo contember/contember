@@ -48,6 +48,9 @@ export type ConfigRow = {
 	rate_limit_email_otp_per_person_window: IPostgresInterval
 	rate_limit_email_verification_per_ip_limit: number
 	rate_limit_email_verification_per_ip_window: IPostgresInterval
+	// Readonly: the GraphQL input renders list values as ReadonlyArray, which is written straight to these columns.
+	panel_global_roles: readonly string[]
+	panel_project_roles: readonly string[]
 }
 
 export type Config =

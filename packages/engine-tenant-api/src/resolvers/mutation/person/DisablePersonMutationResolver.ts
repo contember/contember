@@ -11,7 +11,7 @@ export class DisablePersonMutationResolver implements MutationResolvers {
 	) {}
 
 	async disablePerson(
-		parent: any,
+		parent: unknown,
 		args: MutationDisablePersonArgs,
 		context: TenantResolverContext,
 	): Promise<DisablePersonResponse> {
@@ -36,7 +36,7 @@ export class DisablePersonMutationResolver implements MutationResolvers {
 		await context.logAuthAction({
 			type: 'person_disable',
 			response: result,
-			personId: targetPerson.id,
+			targetPersonId: targetPerson.id,
 		})
 		if (!result.ok) {
 			return createErrorResponse(result.error, result.errorMessage)

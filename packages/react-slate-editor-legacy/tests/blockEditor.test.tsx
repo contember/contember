@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it } from 'bun:test'
 import { c, createSchema } from '@contember/schema-definition'
-import { EntitySubTree } from '@contember/react-binding'
+import { EntitySubTree, Field, HasMany } from '@contember/react-binding'
 import { Editor, Transforms } from 'slate'
 import { useSlateStatic } from 'slate-react'
 import { BindingHarness, createBindingHarness } from '../../react-binding/tests/lib/harness/index.js'
@@ -201,5 +201,84 @@ describe('block editor', () => {
 		await harness.persist()
 
 		expect(blocksOf(harness)).toHaveLength(4)
+	})
+})
+
+namespace NestedBlockEditorModel {
+	export class Article {
+		sections = c.oneHasMany(Section, 'article')
+	}
+
+	export class Section {
+		article = c.manyHasOne(Article, 'sections').notNull()
+		order = c.intColumn().notNull()
+		blocks = c.oneHasMany(Block, 'section')
+	}
+
+	export class Block {
+		section = c.manyHasOne(Section, 'blocks').notNull()
+		order = c.intColumn().notNull()
+		content = c.stringColumn()
+	}
+}
+
+const nestedSchema = convertModelToAdminSchema(createSchema(NestedBlockEditorModel).model)
+
+const mountNestedEditor = async (onPersistSuccess?: () => void) => {
+	harness = await createBindingHarness({
+		schema: nestedSchema,
+		data: { article: { id: articleId, sections: [] } },
+		node: (
+			<EntitySubTree entity={`Article(id = '${articleId}')`} alias="article" onPersistSuccess={() => onPersistSuccess?.()}>
+				<HasMany field="sections" orderBy="order">
+					<Field field="order" />
+					<BlockEditor
+						field="blocks"
+						sortableBy="order"
+						contentField="content"
+						renderSortableBlock={({ children }) => <>{children}</>}
+					>
+						<CaptureEditor />
+					</BlockEditor>
+				</HasMany>
+			</EntitySubTree>
+		),
+	})
+	return harness
+}
+
+const sectionsOf = (harness: BindingHarness) => Array.from(harness.getEntity('article').getEntityList({ field: 'sections', orderBy: 'order' }))
+
+describe('block editor on an entity the persist creates', () => {
+	// The editor reaches for its entity from slate callbacks, and a persist that creates that entity changes its
+	// realm key. Holding the key rather than the entity's own accessor getter made every such callback throw until
+	// React had re-rendered.
+	it('keeps writing into its entity after the persist gives it an id', async () => {
+		let editDuringPersist: (() => void) | undefined
+		const harness = await mountNestedEditor(() => editDuringPersist?.())
+
+		await harness.update(() => {
+			harness.getEntity('article')
+				.getEntityList({ field: 'sections', orderBy: 'order' })
+				.createNewEntity(getAccessor => getAccessor().getField('order').updateValue(0))
+		})
+		await harness.update(() => {
+			Transforms.insertText(editor!, 'draft', { at: { path: [0, 0], offset: 0 } })
+		})
+
+		const section = sectionsOf(harness)[0]
+		expect(section.existsOnServer).toBe(false)
+		expect(Array.from(section.getEntityList('blocks')).map(it => textOf(it.getField<string>('content').value))).toEqual(['draft'])
+
+		editDuringPersist = () => {
+			Transforms.insertText(editor!, '!', { at: { path: [0, 0], offset: 5 } })
+		}
+		await harness.persist()
+		editDuringPersist = undefined
+
+		const persistedSection = sectionsOf(harness)[0]
+		expect(persistedSection.existsOnServer).toBe(true)
+		expect(Array.from(persistedSection.getEntityList('blocks')).map(it => textOf(it.getField<string>('content').value)))
+			.toEqual(['draft!'])
 	})
 })

@@ -45,6 +45,19 @@ export const useBlockEditorOnChange = ({ refreshBlocks, editor, sortedBlocksRef,
 
 		if (operationsType === 'text' && topLevelBlocks.length > 0) {
 			// Fast path: we're just typing and need to at most update top-level blocks. Typically just one though.
+			const blockList = getParentEntityRef.current().getEntityList(desugaredBlockList)
+			const isBlockOnList = (topLevelIndex: number) => {
+				const block = topLevelBlocks[topLevelIndex]
+				return block !== undefined && blockList.hasEntityId(block.id)
+			}
+			const isCacheStale = operations.some(
+				operation => (operation.type === 'insert_text' || operation.type === 'remove_text') && !isBlockOnList(operation.path[0]),
+			)
+			if (isCacheStale) {
+				// The cached blocks no longer describe the list — their ids changed under us, which a persist does to
+				// every block it has just created. Saving into them would throw, so go through a full refresh instead.
+				return refreshBlocks()
+			}
 			return getParentEntityRef.current().batchUpdates(getEntity => {
 				for (const operation of operations) {
 					switch (operation.type) {

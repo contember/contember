@@ -27,7 +27,8 @@ export const createBinding = ({ node, schema }: { node: ReactNode; schema: Schem
 	)
 
 	const treeAugmenter = new TreeAugmenter(eventManager, stateInitializer, treeStore)
-	treeAugmenter.extendTreeStates(undefined, generator.generate())
+	const markerTree = generator.generate()
+	treeAugmenter.extendTreeStates(undefined, markerTree)
 
-	return { eventManager, treeStore, environment }
+	return { eventManager, treeStore, environment, markerTree }
 }

@@ -44,15 +44,17 @@ export class ApiKeyManager {
 			return new ResponseError(VerifyErrorCode.DISABLED, `API key expired at ${apiKeyRow.expires_at.toISOString()}`)
 		}
 
-		setImmediate(async () => {
-			await dbContext.commandBus.execute(
+		// Detached (runs after the response), so a rejection here would be an unhandledRejection and can take the
+		// worker down. Tracking is best-effort — the next request writes it again.
+		setImmediate(() => {
+			dbContext.commandBus.execute(
 				new ProlongApiKeyCommand(
 					apiKeyRow.id,
 					apiKeyRow.type,
 					apiKeyRow.expiration,
 					apiKeyRow.expires_at,
 				),
-			)
+			).catch(() => {})
 		})
 
 		return new ResponseOk(new VerifyResult(apiKeyRow.identity_id, apiKeyRow.id, apiKeyRow.roles, apiKeyRow.person_id))

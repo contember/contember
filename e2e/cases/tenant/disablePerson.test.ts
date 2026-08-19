@@ -14,6 +14,25 @@ const signInMutation = `mutation($email: String!, $password: String!) {
 	signIn(email: $email, password: $password) { ok error { code } }
 }`
 
+/**
+ * Looked up as the admin rather than through `me`, on purpose. Authenticating as the person schedules a background
+ * write to their `api_key` row (`ApiKeyManager.verifyAndProlong` fires it from `setImmediate` and does not await
+ * it), and `disablePerson` updates that very row inside a repeatable-read transaction. The two race, and the
+ * mutation is the one that loses — it aborts with `could not serialize access due to concurrent update`, which the
+ * caller sees as `Internal server error` and this test used to see as a bare `null`. The root token has no
+ * `api_key` row, so asking as the admin leaves the person's row alone.
+ */
+const personsQuery = `query($email: String!) {
+	persons(filter: { email: $email }) { id disabledAt }
+}`
+
+const findPerson = async (email: string): Promise<{ id: string; disabledAt: string | null }> => {
+	const resp = await executeGraphql('/tenant', personsQuery, { variables: { email } })
+	const persons = resp.body.data.persons
+	expect(persons).toHaveLength(1)
+	return persons[0]
+}
+
 test('disablePerson blocks future signIn with PERSON_DISABLED', async () => {
 	const tester = await createTester(emptySchema)
 	const email = `john-${rand()}@doe.com`
@@ -21,9 +40,8 @@ test('disablePerson blocks future signIn with PERSON_DISABLED', async () => {
 	await tester.tenant.signUp(email, password)
 
 	// initial signIn works
-	const token = await tester.tenant.signIn(email, password)
-	const personResp = await executeGraphql('/tenant', `query { me { person { id } } }`, { authorizationToken: token })
-	const personId: string = personResp.body.data.me.person.id
+	await tester.tenant.signIn(email, password)
+	const personId = (await findPerson(email)).id
 
 	const disableResp = await executeGraphql('/tenant', disableMutation, { variables: { id: personId } })
 	expect(disableResp.body.data.disablePerson).toEqual({ ok: true, error: null })
@@ -46,10 +64,10 @@ test('enablePerson restores signIn and reports the disabled state', async () => 
 	const password = 'HWGA51KKpJ4lSW'
 	await tester.tenant.signUp(email, password)
 
-	const token = await tester.tenant.signIn(email, password)
-	const personResp = await executeGraphql('/tenant', `query { me { person { id disabledAt } } }`, { authorizationToken: token })
-	const personId: string = personResp.body.data.me.person.id
-	expect(personResp.body.data.me.person.disabledAt).toBe(null)
+	await tester.tenant.signIn(email, password)
+	const person = await findPerson(email)
+	const personId = person.id
+	expect(person.disabledAt).toBe(null)
 
 	// Asserted rather than fired and forgotten: a silent failure here surfaces one step later as
 	// enablePerson reporting PERSON_ALREADY_ENABLED, which blames the wrong mutation.

@@ -127,8 +127,10 @@ export class ApiKeyManager {
 			}
 		}
 
-		setImmediate(async () => {
-			await dbContext.commandBus.execute(
+		// Detached (runs after the response), so a rejection here would be an unhandledRejection and can take the
+		// worker down. Tracking is best-effort — the next request writes it again.
+		setImmediate(() => {
+			dbContext.commandBus.execute(
 				new ProlongApiKeyCommand(
 					apiKeyRow.id,
 					apiKeyRow.type,
@@ -142,7 +144,7 @@ export class ApiKeyManager {
 					},
 					apiKeyRow.max_expires_at,
 				),
-			)
+			).catch(() => {})
 		})
 
 		return new ResponseOk(

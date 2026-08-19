@@ -1,3 +1,4 @@
+import { Logger } from '@contember/logger'
 import { PersonQuery, PersonRow } from '../queries/index.js'
 import { DatabaseContext } from '../utils/index.js'
 import { DisablePersonCommand } from '../commands/person/DisablePersonCommand.js'
@@ -9,7 +10,9 @@ import { DisablePersonErrorCode, EnablePersonErrorCode } from '../../schema/inde
 class PersonAccessManager {
 	constructor(private readonly apiKeyManager: ApiKeyManager) {}
 
-	async disablePerson(dbContext: DatabaseContext, person: PersonRow): Promise<PersonDisableAccessResponse> {
+	async disablePerson(dbContext: DatabaseContext, person: PersonRow, logger: Logger): Promise<PersonDisableAccessResponse> {
+		// Retried: the api_key update races the target's own background session tracking and loses with a 40001,
+		// which would otherwise leave the person enabled behind an internal error. Nothing here escapes the transaction.
 		return await dbContext.transaction(async trx => {
 			if (person.disabled_at !== null) {
 				return new ResponseError('PERSON_ALREADY_DISABLED', 'Person is already disabled')
@@ -20,7 +23,7 @@ class PersonAccessManager {
 			await this.disableIdentityApiKeys(trx, person.identity_id)
 
 			return new ResponseOk(null)
-		})
+		}, { retry: { logger } })
 	}
 
 	async enablePerson(dbContext: DatabaseContext, person: PersonRow): Promise<PersonEnableAccessResponse> {

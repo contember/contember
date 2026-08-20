@@ -1,5 +1,5 @@
 import { Argument, ArgumentConfiguration } from './Argument.js'
-import { Option, OptionConfiguration, OptionMode } from './Option.js'
+import { mergeOptions, Option, OptionConfiguration, OptionMode } from './Option.js'
 import { InputParser } from './InputParser.js'
 import { UsageFormat, UsageFormatter } from './UsageFormatter.js'
 import { Arguments, Options } from './Input.js'
@@ -26,7 +26,7 @@ export class CommandConfiguration<Args extends Arguments, TOptions extends Optio
 		return new OptionConfiguration(option)
 	}
 
-	public validate() {
+	public validate(reservedOptions: readonly Option[] = []) {
 		let hasVariadic = false
 		let hasOptional = false
 		for (let argument of this.arguments) {
@@ -37,14 +37,32 @@ export class CommandConfiguration<Args extends Arguments, TOptions extends Optio
 				throw new InvalidConfigurationError(`A variadic argument must be the last`)
 			}
 		}
+		for (const option of this.options) {
+			const collision = reservedOptions.find(reserved =>
+				reserved.name === option.name
+				|| (option.shortcut !== undefined && reserved.shortcut === option.shortcut)
+			)
+			if (collision !== undefined) {
+				throw new InvalidConfigurationError(`Option --${option.name} conflicts with reserved global option --${collision.name}`)
+			}
+		}
 	}
 
 	public getDescription(): string {
 		return this.descriptionValue
 	}
 
-	public createParser(): InputParser {
-		return new InputParser(this.arguments, this.options)
+	public getArguments(): readonly Argument[] {
+		return [...this.arguments]
+	}
+
+	public getOptions(): readonly Option[] {
+		return [...this.options]
+	}
+
+	/** Appends shared options for a single parser pass after configuration validation. */
+	public createParser(extraOptions: readonly Option[] = []): InputParser {
+		return new InputParser(this.arguments, mergeOptions(this.options, extraOptions))
 	}
 
 	public getUsage(args: { format?: UsageFormat; indent?: string } = {}): string {

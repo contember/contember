@@ -16,3 +16,6 @@
 # env / config
 /docker-compose.override.yaml
 /.env
+
+# scratch workspaces written by e2e cases that need repo-local module resolution
+e2e/.tmp-*

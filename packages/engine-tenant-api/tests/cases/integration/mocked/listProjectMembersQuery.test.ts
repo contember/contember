@@ -4,14 +4,18 @@ import { testUuid } from '../../../src/testUuid.js'
 import { test } from 'bun:test'
 import { sqlTransaction } from './sql/sqlTransaction.js'
 
-test('list project members by email query', async () => {
+test('list project members by email query with stable pagination order', async () => {
 	await executeTenantTest({
 		query: {
 			query: GQL`
 query {	
 	projectBySlug(slug: "sandbox") {
 		members(
-			input: { filter: { email: ["foo@localhost", "bar@localhost"], memberType: PERSON } }
+			input: {
+				filter: { email: ["foo@localhost", "bar@localhost"], memberType: PERSON }
+				limit: 10
+				offset: 20
+			}
 		) {
 			identity {
 				id
@@ -41,7 +45,8 @@ query {
 					sql: `select "id", "description"  from "tenant"."identity"  
                             where exists (select ?::int  from "tenant"."project_membership"  
                                                          where "project_membership"."identity_id" = "identity"."id" and "project_id" = ?) 
-                              and exists (select ?::int  from "tenant"."person"  where "person"."identity_id" = "identity"."id" and "email" in (?, ?))`,
+				              and exists (select ?::int  from "tenant"."person"  where "person"."identity_id" = "identity"."id" and "email" in (?, ?))
+				            order by "identity"."id" asc limit 10 offset 20`,
 					parameters: [1, testUuid(1), 1, 'foo@localhost', 'bar@localhost'],
 					response: {
 						rows: [

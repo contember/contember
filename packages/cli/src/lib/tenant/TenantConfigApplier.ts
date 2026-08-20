@@ -1,14 +1,55 @@
+import { Output } from '@contember/cli-common'
 import { authPolicyKey, describeAuthPolicy } from './authPolicy.js'
-import { type RemoteAuthPolicy, TenantClient } from './TenantClient.js'
+import { type RemoteAuthPolicy, TenantPolicyClient, TenantProjectClient } from './clients/index.js'
 import { TenantConfig } from './tenantConfig.js'
 
 export interface TenantConfigApplyOptions {
 	dryRun?: boolean
 }
 
+/** The slice of the domain clients the applier drives — structural, so a test can pass a fake. */
+export interface TenantConfigApplierClients {
+	readonly project: Pick<TenantProjectClient, 'configure' | 'listIdentityProviders' | 'addIdp' | 'updateIdp' | 'enableIdp' | 'disableIdp'>
+	readonly policy: Pick<TenantPolicyClient, 'addMailTemplate' | 'listAuthPolicies' | 'createAuthPolicy' | 'updateAuthPolicy'>
+}
+
+export type TenantConfigActionType =
+	| 'configure'
+	| 'addIdp'
+	| 'updateIdp'
+	| 'enableIdp'
+	| 'disableIdp'
+	| 'addMailTemplate'
+	| 'createAuthPolicy'
+	| 'updateAuthPolicy'
+
+/** One step of the apply plan. In a dry run it is what would be done, otherwise what was done. */
+export interface TenantConfigAction {
+	action: TenantConfigActionType
+	target: string | null
+}
+
+export type TenantConfigWarningCode = 'UNMANAGED_AUTH_POLICY'
+
+/** Server-side state the config does not cover. Nothing is pruned, so it stays in effect. */
+export interface TenantConfigWarning {
+	code: TenantConfigWarningCode
+	target: string
+	message: string
+}
+
+/**
+ * The outcome of an apply. Warnings are returned rather than only printed: `output.warn` is silent
+ * outside human mode, and an unmanaged policy is exactly what an agent running `--json` needs to see.
+ */
+export interface TenantConfigPlan {
+	actions: TenantConfigAction[]
+	warnings: TenantConfigWarning[]
+}
+
 /**
  * Applies a {@link TenantConfig} to a tenant idempotently:
- * - `configure` is a partial merge, so it is always (re)sent.
+ * - `configure` is a partial merge and is sent only when the schema maps at least one value to a database change.
  * - identity providers are added or updated based on the current state, then
  *   enabled/disabled to match `disabled`.
  * - mail templates are upserted server-side by `addMailTemplate`.
@@ -17,65 +58,74 @@ export interface TenantConfigApplyOptions {
  *   config does not cover is warned about, including when the config lists none.
  *
  * Nothing is ever removed — entries missing from the config are left untouched.
+ *
+ * Returns the plan as data; the caller prints it. The applier itself only reports each action on stderr.
  */
 export class TenantConfigApplier {
-	public async apply(client: TenantClient, config: TenantConfig, options: TenantConfigApplyOptions = {}): Promise<void> {
+	constructor(
+		private readonly output: Output = new Output(),
+	) {
+	}
+
+	public async apply(
+		clients: TenantConfigApplierClients,
+		config: TenantConfig,
+		options: TenantConfigApplyOptions = {},
+	): Promise<TenantConfigPlan> {
 		const dryRun = options.dryRun === true
-		const log = (message: string) => console.log(`${dryRun ? '[dry-run] ' : ''}${message}`)
+		const actions: TenantConfigAction[] = []
+		const warnings: TenantConfigWarning[] = []
+		const warn = (code: TenantConfigWarningCode, target: string, message: string) => {
+			warnings.push({ code, target, message })
+			this.output.warn(message)
+		}
+		const run = async (action: TenantConfigActionType, target: string | null, execute: () => Promise<void>) => {
+			actions.push({ action, target })
+			if (dryRun) {
+				return
+			}
+			// info, not progress: `tenant apply` mostly runs in CI, where a non-TTY progress line would leave no record of what was touched
+			this.output.info(target === null ? action : `${action}: ${target}`)
+			await execute()
+		}
 
 		// Up front, before anything has been written: two entries targeting the same
 		// scope/project/roles are one policy to the applier but two rows server-side.
 		assertDistinctAuthPolicies(config.authPolicies)
-		const existingAuthPolicies = config.authPolicies === undefined ? undefined : await client.listAuthPolicies()
+		const existingAuthPolicies = config.authPolicies === undefined ? undefined : await clients.policy.listAuthPolicies()
 		assertDistinctExistingAuthPolicies(existingAuthPolicies)
 
-		if (config.config) {
-			log('configure: applying global tenant config')
-			if (!dryRun) {
-				await client.configure(config.config)
-			}
+		if (config.config && hasEffectiveConfigValue(config.config)) {
+			const globalConfig = config.config
+			await run('configure', null, () => clients.project.configure(globalConfig))
 		}
 
 		if (config.identityProviders && Object.keys(config.identityProviders).length > 0) {
-			const existing = await client.listIdentityProviders()
+			const existing = await clients.project.listIdentityProviders()
 			const existingBySlug = new Map(existing.map(it => [it.slug, it]))
 
 			for (const [slug, idp] of Object.entries(config.identityProviders)) {
 				const current = existingBySlug.get(slug)
 				if (!current) {
-					log(`addIDP: ${slug} (${idp.type})`)
-					if (!dryRun) {
-						await client.addIdp(slug, idp.type, idp.configuration, idp.options)
-					}
+					await run('addIdp', slug, () => clients.project.addIdp(slug, idp.type, idp.configuration, idp.options))
 				} else {
-					log(`updateIDP: ${slug} (${idp.type})`)
-					if (!dryRun) {
-						await client.updateIdp(slug, idp.type, idp.configuration, idp.options)
-					}
+					await run('updateIdp', slug, () => clients.project.updateIdp(slug, idp.type, idp.configuration, idp.options))
 				}
 
 				const wantDisabled = idp.disabled === true
 				const isDisabled = current ? current.disabledAt !== null : false
 				if (wantDisabled && !isDisabled) {
-					log(`disableIDP: ${slug}`)
-					if (!dryRun) {
-						await client.disableIdp(slug)
-					}
+					await run('disableIdp', slug, () => clients.project.disableIdp(slug))
 				} else if (!wantDisabled && isDisabled) {
-					log(`enableIDP: ${slug}`)
-					if (!dryRun) {
-						await client.enableIdp(slug)
-					}
+					await run('enableIdp', slug, () => clients.project.enableIdp(slug))
 				}
 			}
 		}
 
 		if (config.mailTemplates && config.mailTemplates.length > 0) {
 			for (const template of config.mailTemplates) {
-				log(`addMailTemplate: ${template.type}${template.variant ? `/${template.variant}` : ''}`)
-				if (!dryRun) {
-					await client.addMailTemplate(template)
-				}
+				const target = `${template.type}${template.variant ? `/${template.variant}` : ''}`
+				await run('addMailTemplate', target, () => clients.policy.addMailTemplate(template))
 			}
 		}
 
@@ -87,18 +137,14 @@ export class TenantConfigApplier {
 			const managedKeys = new Set(config.authPolicies.map(authPolicyKey))
 
 			for (const policy of config.authPolicies) {
-				const key = authPolicyKey(policy)
-				const current = existingByKey.get(key)
+				const current = existingByKey.get(authPolicyKey(policy))
+				const target = describeAuthPolicy(policy)
 				if (!current) {
-					log(`createAuthPolicy: ${describeAuthPolicy(policy)}`)
-					if (!dryRun) {
-						await client.createAuthPolicy(policy)
-					}
+					await run('createAuthPolicy', target, async () => {
+						await clients.policy.createAuthPolicy(policy)
+					})
 				} else {
-					log(`updateAuthPolicy: ${describeAuthPolicy(policy)}`)
-					if (!dryRun) {
-						await client.updateAuthPolicy(current.id, policy)
-					}
+					await run('updateAuthPolicy', target, () => clients.policy.updateAuthPolicy(current.id, policy))
 				}
 			}
 
@@ -106,10 +152,13 @@ export class TenantConfigApplier {
 			// edit keeps enforcing. Nothing is pruned, but silence would hide it.
 			for (const policy of existing) {
 				if (!managedKeys.has(authPolicyKey(policy))) {
-					console.warn(`Warning: auth policy ${describeAuthPolicy(policy)} exists but is not in the config; it stays in effect.`)
+					const target = describeAuthPolicy(policy)
+					warn('UNMANAGED_AUTH_POLICY', target, `Auth policy ${target} exists but is not in the config; it stays in effect.`)
 				}
 			}
 		}
+
+		return { actions, warnings }
 	}
 }
 
@@ -141,4 +190,26 @@ const assertDistinctAuthPolicies = (policies: TenantConfig['authPolicies']): voi
 		}
 		seen.add(key)
 	}
+}
+
+/** Null clears only the fields that the tenant update command maps to a nullable database column. */
+const nullableConfigClearPaths = new Set([
+	'passwordless.url',
+	'password.pattern',
+	'login.maxTokenExpiration',
+	'captcha.provider',
+	'captcha.threshold',
+])
+
+const hasEffectiveConfigValue = (value: unknown, path: readonly string[] = []): boolean => {
+	if (value === undefined) {
+		return false
+	}
+	if (value === null) {
+		return nullableConfigClearPaths.has(path.join('.'))
+	}
+	if (typeof value !== 'object') {
+		return true
+	}
+	return Object.entries(value).some(([key, item]) => hasEffectiveConfigValue(item, [...path, key]))
 }

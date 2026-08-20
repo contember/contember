@@ -7,6 +7,18 @@ export type Option = {
 	mode: OptionMode
 }
 
+/** Combines option sets while omitting duplicate definitions. */
+export const mergeOptions = (options: readonly Option[], extra: readonly Option[]): Option[] => {
+	const result = [...options]
+	for (const option of extra) {
+		const shadowed = result.some(it => it.name === option.name || (option.shortcut !== undefined && it.shortcut === option.shortcut))
+		if (!shadowed) {
+			result.push(option)
+		}
+	}
+	return result
+}
+
 export enum OptionMode {
 	VALUE_NONE = 'value_none',
 	VALUE_OPTIONAL = 'value_optional',

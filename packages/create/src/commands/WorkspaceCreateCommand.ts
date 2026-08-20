@@ -1,4 +1,4 @@
-import { Command, CommandConfiguration, Input } from '@contember/cli-common'
+import { Command, CommandConfiguration, escapeTerminalText, Input, Output } from '@contember/cli-common'
 import { join } from 'node:path'
 import chalk from 'chalk'
 import { TemplateInstaller } from '../lib/TemplateInstaller.js'
@@ -13,9 +13,29 @@ type Options = {
 	template: string
 }
 
+export interface WorkspaceCreateResult {
+	projectName: string
+	projectDirectory: string
+	template: string
+	packageManager: string
+}
+
+export interface WorkspaceCreateRuntime {
+	cwd(): string
+	getPackageVersion(): Promise<string>
+	detectPackageManager(): string
+}
+
+const defaultRuntime: WorkspaceCreateRuntime = {
+	cwd: () => process.cwd(),
+	getPackageVersion,
+	detectPackageManager,
+}
+
 export class WorkspaceCreateCommand extends Command<Args, Options> {
 	constructor(
-		private readonly templateInstaller: TemplateInstaller,
+		private readonly templateInstaller: Pick<TemplateInstaller, 'installTemplate'>,
+		private readonly runtime: WorkspaceCreateRuntime = defaultRuntime,
 	) {
 		super()
 	}
@@ -26,35 +46,43 @@ export class WorkspaceCreateCommand extends Command<Args, Options> {
 		configuration.option('template').shortcut('t').valueRequired().description('Template name or remote source')
 	}
 
-	protected async execute(input: Input<Args, Options>): Promise<void> {
+	protected async execute(input: Input<Args, Options>, output: Output): Promise<void> {
 		const projectName = input.getArgument('projectName')
-		const projectDirectory = join(process.cwd(), projectName)
-		const packageManager = detectPackageManager()
+		const projectDirectory = join(this.runtime.cwd(), projectName)
+		const packageManager = this.runtime.detectPackageManager()
 		const template = input.getOption('template') ?? 'default'
 
 		await this.templateInstaller.installTemplate(template, projectDirectory, {
-			version: await getPackageVersion(),
+			version: await this.runtime.getPackageVersion(),
 			projectName: projectName,
 			packageManager: packageManager,
 		})
 
-		console.log(createDocs(projectDirectory, projectName, packageManager))
+		const result: WorkspaceCreateResult = { projectName, projectDirectory, template, packageManager }
+		output.data(result, {
+			human: value => createDocs(value),
+			quiet: value => value.projectDirectory,
+		})
 	}
 }
 
-const createDocs = (projectDirectory: string, projectName: string, packageManager: string) => `
-Contember project successfully created in ${projectDirectory}
+const createDocs = ({ projectDirectory, projectName, packageManager }: WorkspaceCreateResult) => {
+	const safeProjectDirectory = escapeTerminalText(projectDirectory)
+	const safeProjectName = escapeTerminalText(projectName)
+	const safePackageManager = escapeTerminalText(packageManager)
+	return `
+Contember project successfully created in ${safeProjectDirectory}
 
 Next steps:
 
 1. Navigate to the project directory:
-   $ ${chalk.green(`cd ${projectName}`)}
+   $ ${chalk.green(`cd ${safeProjectName}`)}
 
 2. Install dependencies:
-   $ ${chalk.green(`${packageManager} install`)}
+   $ ${chalk.green(`${safePackageManager} install`)}
 
 3. Start the Contember stack:
-   $ ${chalk.green(`${packageManager} start`)}
+   $ ${chalk.green(`${safePackageManager} start`)}
 
 Available services:
 
@@ -74,3 +102,4 @@ ${chalk.bold('Development Tools')}
 
 ${chalk.bold('Need help?')} Ask the community: https://github.com/orgs/contember/discussions
 `
+}

@@ -1,8 +1,6 @@
-export const printProgressLine = (message: string) => {
-	if (!process.stdout.clearLine) {
-		return
-	}
-	process.stdout.clearLine(0)
-	process.stdout.cursorTo(0)
-	process.stdout.write(message)
+import { Output } from '@contember/cli-common'
+
+/** Binds a single-line progress reporter to the command's Output instead of writing to stdout directly. */
+export const createProgressReporter = (output: Output) => (message: string): void => {
+	output.progress(message)
 }

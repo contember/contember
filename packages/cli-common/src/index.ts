@@ -1,4 +1,42 @@
-export type { CommandFactoryList } from './application/index.js'
-export { Application, Command, CommandConfiguration, CommandManager, Input } from './application/index.js'
+export type {
+	Argument,
+	CommandCatalogEntry,
+	CommandFactory,
+	CommandFactoryList,
+	CommandResolution,
+	GlobalOptionValues,
+	InputParserResult,
+	JsonValue,
+	Option,
+	OutputDataOptions,
+	OutputMode,
+	OutputOptions,
+	OutputScalar,
+	OutputStream,
+	OutputTableColumn,
+	OutputTableColumns,
+	ParsedCommandInput,
+	PromptOutputStream,
+} from './application/index.js'
+export {
+	Application,
+	CliError,
+	Command,
+	CommandConfiguration,
+	CommandManager,
+	escapeTerminalText,
+	ExitCode,
+	exitProcess,
+	globalOptions,
+	Input,
+	InvalidConfigurationError,
+	InvalidInputError,
+	mergeOptions,
+	OptionMode,
+	Output,
+	readGlobalOptionsFromArgs,
+	renderCliError,
+	toCliError,
+} from './application/index.js'
 export * from './npm/index.js'
 export * from './utils/index.js'

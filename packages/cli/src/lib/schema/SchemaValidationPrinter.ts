@@ -1,12 +1,13 @@
+import { Output } from '@contember/cli-common'
 import { ValidationError } from '@contember/schema-utils'
 
-export const printValidationErrors = (errors: ValidationError[], message?: string) => {
+// diagnostic only — never the command's own data output; callers that don't yet pass `output` fall back to a fresh one
+export const printValidationErrors = (errors: ValidationError[], message?: string, output: Output = new Output()) => {
 	if (errors.length === 0) {
 		return
 	}
-	console.group(message || 'Schema is invalid:')
+	output.error(message || 'Schema is invalid:')
 	for (const err of errors) {
-		console.log(`${err.path.join('.')}: [${err.code}] ${err.message}`)
+		output.error(`  ${err.path.join('.')}: [${err.code}] ${err.message}`)
 	}
-	console.groupEnd()
 }

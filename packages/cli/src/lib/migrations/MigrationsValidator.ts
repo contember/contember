@@ -3,11 +3,13 @@ import { Schema } from '@contember/schema'
 import { SchemaValidatorSkippedErrors } from '@contember/schema-utils'
 import { MigrationDescriber, MigrationVersionHelper, SchemaMigrator, SchemaUpdateError } from '@contember/schema-migrations'
 import { validateSchemaAndPrintErrors } from '../schema/SchemaValidationHelper.js'
+import { Output } from '@contember/cli-common'
 
 export class MigrationsValidator {
 	constructor(
 		private readonly describer: MigrationDescriber,
 		private readonly migrator: SchemaMigrator,
+		private readonly output: Output = new Output(),
 	) {
 	}
 
@@ -23,7 +25,7 @@ export class MigrationsValidator {
 				migratedSchema = this.migrator.applyModifications(migratedSchema, migration.modifications, migration.formatVersion)
 			} catch (e) {
 				if (e instanceof SchemaUpdateError) {
-					console.error(`Migration ${migration.name} has failed`)
+					this.output.error(`Migration ${migration.name} has failed`)
 				}
 				throw e
 			}
@@ -32,7 +34,7 @@ export class MigrationsValidator {
 				...skippedErrors.filter(it => it.skipUntil && MigrationVersionHelper.extractVersion(it.skipUntil) >= migration.version),
 				...migration.skippedErrors ?? [],
 			]
-			projectValid = validateSchemaAndPrintErrors(migratedSchema, errorMessage, skippedErrors)
+			projectValid = validateSchemaAndPrintErrors(migratedSchema, errorMessage, skippedErrors, this.output)
 				&& projectValid
 		}
 		return projectValid

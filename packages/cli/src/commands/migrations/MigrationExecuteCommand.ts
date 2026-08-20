@@ -1,4 +1,4 @@
-import { Command, CommandConfiguration, Input } from '@contember/cli-common'
+import { Command, CommandConfiguration, Input, Output } from '@contember/cli-common'
 import { MigrationExecutionFacade } from '../../lib/migrations/MigrationExecutionFacade.js'
 
 type Args = {}
@@ -10,9 +10,11 @@ type Options = {
 	['no-snapshot']?: boolean
 }
 
+type MigrationExecutor = Pick<MigrationExecutionFacade, 'execute'>
+
 export class MigrationExecuteCommand extends Command<Args, Options> {
 	constructor(
-		private readonly migrationExecutorFacade: MigrationExecutionFacade,
+		private readonly migrationExecutorFacade: MigrationExecutor,
 	) {
 		super()
 	}
@@ -33,15 +35,20 @@ export class MigrationExecuteCommand extends Command<Args, Options> {
 			.description('Do not ask for confirmation.')
 	}
 
-	protected async execute(input: Input<Args, Options>): Promise<void> {
+	protected async execute(input: Input<Args, Options>, output: Output): Promise<void> {
 		const force = input.getOption('force')
 		const until = input.getOption('until')
 
-		await this.migrationExecutorFacade.execute({
+		const changed = await this.migrationExecutorFacade.execute({
 			force,
 			until,
 			requireConfirmation: !input.getOption('yes'),
 			useSnapshot: input.getOption('no-snapshot') !== true,
+		})
+		const result = { status: changed ? 'completed' : 'noop', until: until ?? null }
+		output.data(result, {
+			human: value => value.status === 'completed' ? 'Migrations executed' : 'No migrations to execute',
+			quiet: value => value.status,
 		})
 	}
 }

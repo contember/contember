@@ -28,6 +28,7 @@ import { FileSystem } from './lib/fs/FileSystem.js'
 import { WorkspaceResolver } from './lib/workspace/WorkspaceResolver.js'
 import { YamlHandler } from './lib/fs/YamlHandler.js'
 import {
+	CommandsCommand,
 	DeployCommand,
 	MigrationAmendCommand,
 	MigrationBlankCommand,
@@ -57,10 +58,12 @@ import { ExportCommand, ImportCommand, TransferCommand } from './commands/transf
 import {
 	Application,
 	Bun,
+	CommandFactory,
 	CommandFactoryList,
 	CommandManager,
 	CommandRunner,
 	Npm,
+	Output,
 	PackageWorkspaceResolver,
 	Pnpm,
 	Yarn,
@@ -78,9 +81,50 @@ import { ActionsListFailedEventsCommand } from './commands/actions/ActionsListFa
 import { ActionsRetryEventCommand } from './commands/actions/ActionsRetryEventCommand.js'
 import { ActionsGetEventCommand } from './commands/actions/ActionsGetEventCommand.js'
 import { ActionsStopEventCommand } from './commands/actions/ActionsStopEventCommand.js'
-import { TenantApplyCommand } from './commands/tenant/index.js'
+import {
+	TenantApiKeyCreateCommand,
+	TenantApiKeyDisableCommand,
+	TenantApiKeyListCommand,
+	TenantApplyCommand,
+	TenantAuthLogCommand,
+	TenantConfigShowCommand,
+	TenantIdentityRoleAddCommand,
+	TenantIdentityRoleRemoveCommand,
+	TenantIdpListCommand,
+	TenantMailTemplateAddCommand,
+	TenantMailTemplateListCommand,
+	TenantMailTemplateRemoveCommand,
+	TenantMemberAddCommand,
+	TenantMemberInviteCommand,
+	TenantMemberInviteUnmanagedCommand,
+	TenantMemberListCommand,
+	TenantMemberRemoveCommand,
+	TenantMemberUpdateCommand,
+	TenantPersonCreateCommand,
+	TenantPersonDisableCommand,
+	TenantPersonListCommand,
+	TenantPersonResetMfaCommand,
+	TenantPersonResetPasswordRequestCommand,
+	TenantPersonSetPasswordCommand,
+	TenantPersonShowCommand,
+	TenantPersonSignOutCommand,
+	TenantPersonUpdateCommand,
+	TenantPolicyCreateCommand,
+	TenantPolicyDeleteCommand,
+	TenantPolicyListCommand,
+	TenantPolicyUpdateCommand,
+	TenantProjectCreateCommand,
+	TenantProjectListCommand,
+	TenantProjectSecretSetCommand,
+	TenantProjectShowCommand,
+	TenantProjectUpdateCommand,
+	TenantSessionCreateCommand,
+	TenantWhoAmICommand,
+} from './commands/tenant/index.js'
 import { ImportTenantConfigLoader, TranspilingTenantConfigLoader } from './lib/tenant/TenantConfigLoader.js'
 import { TenantConfigApplier } from './lib/tenant/TenantConfigApplier.js'
+import { TenantConnectionProvider } from './lib/tenant/TenantConnectionProvider.js'
+import { TenantConnectionResolver } from './lib/tenant/TenantConnectionResolver.js'
 
 const jsSample = `
 export const query = \`\`
@@ -93,17 +137,19 @@ export const variables = {}
 // export default async () => ({ queries: [] })
 `
 
-export const createContainer = ({ env, version, runtime, workspace }: {
+export const createContainer = ({ env, version, runtime, workspace, output }: {
 	workspace: Workspace
 	env: CliEnv
 	version: string
 	runtime: 'node' | 'bun'
+	output: Output
 }) => {
 	return new Builder({})
 		.addService('env', () => env)
 		.addService('version', () => version)
 		.addService('runtime', () => runtime)
 		.addService('workspace', () => workspace)
+		.addService('output', () => output)
 		.addService('fs', () => new FileSystem())
 		.addService('yamlHandler', ({ fs }) => new YamlHandler(fs))
 		.addService('jsExecutor', () => new EvalExecutor())
@@ -111,6 +157,8 @@ export const createContainer = ({ env, version, runtime, workspace }: {
 		.addService('jsCodeRunner', ({ jsExecutor, jsBuilder }) => new JsCodeRunner(jsBuilder, jsExecutor))
 		.addService('workspaceResolver', ({ yamlHandler }) => new WorkspaceResolver(yamlHandler))
 		.addService('remoteProjectResolver', ({ env }) => new RemoteProjectResolver(env))
+		.addService('tenantConnectionResolver', ({ env }) => new TenantConnectionResolver(env))
+		.addService('tenantConnectionProvider', ({ tenantConnectionResolver }) => new TenantConnectionProvider(tenantConnectionResolver))
 		.addService('remoteProjectProvider', ({ remoteProjectResolver }) => {
 			const provider = new RemoteProjectProvider()
 			const remoteProject = remoteProjectResolver.resolve()
@@ -120,7 +168,8 @@ export const createContainer = ({ env, version, runtime, workspace }: {
 			return provider
 		})
 		.addService('systemClientProvider', ({ remoteProjectProvider }) => new SystemClientProvider(remoteProjectProvider))
-		.addService('tenantClientProvider', ({ remoteProjectProvider }) => new TenantClientProvider(remoteProjectProvider))
+		.addService('tenantClientProvider', ({ tenantConnectionProvider }) => new TenantClientProvider(tenantConnectionProvider))
+		.addService('migrationTenantClientProvider', ({ remoteProjectProvider }) => new TenantClientProvider(remoteProjectProvider))
 		.addService('adminClient', ({ remoteProjectProvider }) => new AdminClient(remoteProjectProvider))
 		.addService('migrationFilesManager', ({ jsCodeRunner, workspace }) => {
 			const runJs = runtime === 'bun' ? (file: string) => import(file) : jsCodeRunner.run
@@ -130,8 +179,8 @@ export const createContainer = ({ env, version, runtime, workspace }: {
 				js: new JsLoader(new MigrationParser(), runJs),
 			})
 		})
-		.addService('packageWorkspaceResolver', ({ workspace, fs }) => {
-			const commandRunner = new CommandRunner()
+		.addService('packageWorkspaceResolver', ({ workspace, fs, output }) => {
+			const commandRunner = new CommandRunner(output)
 			return new PackageWorkspaceResolver(workspace.baseDir, fs, [
 				new Yarn(fs, commandRunner),
 				new YarnClassic(fs, commandRunner),
@@ -164,12 +213,12 @@ export const createContainer = ({ env, version, runtime, workspace }: {
 				js: jsSample,
 			}))
 		.addService('migrationDescriber', ({ modificationHandlerFactory }) => new MigrationDescriber(modificationHandlerFactory))
-		.addService('migrationPrinter', ({ migrationDescriber }) => new MigrationPrinter(migrationDescriber))
+		.addService('migrationPrinter', ({ migrationDescriber, output }) => new MigrationPrinter(migrationDescriber, output))
 		.addService('migrationsExecutor', () => new MigrationExecutor())
 		.addService('migrationsStatusResolver', () => new MigrationsStatusResolver())
 		.addService(
 			'migrationSnapshotFacade',
-			({ migrationsResolver, schemaVersionBuilder, schemaDiffer, schemaMigrator, schemaStateManager, snapshotManager }) =>
+			({ migrationsResolver, schemaVersionBuilder, schemaDiffer, schemaMigrator, schemaStateManager, snapshotManager, output }) =>
 				new MigrationSnapshotFacade(
 					migrationsResolver,
 					schemaVersionBuilder,
@@ -177,18 +226,19 @@ export const createContainer = ({ env, version, runtime, workspace }: {
 					schemaMigrator,
 					schemaStateManager,
 					snapshotManager,
+					output,
 				),
 		)
 		.addService(
 			'migrationsStatusFacade',
-			({ systemClientProvider, migrationsResolver, migrationsStatusResolver, migrationPrinter }) =>
-				new MigrationsStatusFacade(systemClientProvider, migrationsResolver, migrationsStatusResolver, migrationPrinter),
+			({ systemClientProvider, migrationsResolver, migrationsStatusResolver, migrationPrinter, output }) =>
+				new MigrationsStatusFacade(systemClientProvider, migrationsResolver, migrationsStatusResolver, migrationPrinter, output),
 		)
 		.addService(
 			'migrationExecutionFacade',
 			({
 				systemClientProvider,
-				tenantClientProvider,
+				migrationTenantClientProvider,
 				remoteProjectProvider,
 				schemaVersionBuilder,
 				migrationPrinter,
@@ -196,10 +246,11 @@ export const createContainer = ({ env, version, runtime, workspace }: {
 				migrationsStatusFacade,
 				schemaStateManager,
 				migrationSnapshotFacade,
+				output,
 			}) =>
 				new MigrationExecutionFacade(
 					systemClientProvider,
-					tenantClientProvider,
+					migrationTenantClientProvider,
 					remoteProjectProvider,
 					schemaVersionBuilder,
 					migrationPrinter,
@@ -207,9 +258,13 @@ export const createContainer = ({ env, version, runtime, workspace }: {
 					migrationsStatusFacade,
 					schemaStateManager,
 					migrationSnapshotFacade,
+					output,
 				),
 		)
-		.addService('migrationsValidator', ({ migrationDescriber, schemaMigrator }) => new MigrationsValidator(migrationDescriber, schemaMigrator))
+		.addService(
+			'migrationsValidator',
+			({ migrationDescriber, schemaMigrator, output }) => new MigrationsValidator(migrationDescriber, schemaMigrator, output),
+		)
 		.addService(
 			'migrationRebaseFacade',
 			({ schemaVersionBuilder, migrationsValidator, systemClientProvider, migrationFilesManager, schemaStateManager }) =>
@@ -220,7 +275,10 @@ export const createContainer = ({ env, version, runtime, workspace }: {
 			({ workspace, jsCodeRunner, runtime }) =>
 				runtime === 'bun' ? new ImportSchemaLoader(workspace) : new TranspilingSchemaLoader(workspace, jsCodeRunner),
 		)
-		.addService('adminDeployer', ({ remoteProjectProvider, adminClient, fs }) => new AdminDeployer(remoteProjectProvider, adminClient, fs))
+		.addService(
+			'adminDeployer',
+			({ remoteProjectProvider, adminClient, fs, output }) => new AdminDeployer(remoteProjectProvider, adminClient, fs, output),
+		)
 		.addService('dataTransferClient', () => new DataTransferClient())
 		.addService(
 			'deployCommand',
@@ -323,59 +381,152 @@ export const createContainer = ({ env, version, runtime, workspace }: {
 			'tenantConfigLoader',
 			({ jsCodeRunner }) => runtime === 'bun' ? new ImportTenantConfigLoader() : new TranspilingTenantConfigLoader(jsCodeRunner),
 		)
-		.addService('tenantConfigApplier', () => new TenantConfigApplier())
+		.addService('tenantConfigApplier', ({ output }) => new TenantConfigApplier(output))
 		.addService(
 			'tenantApplyCommand',
 			({ remoteProjectResolver, tenantConfigLoader, tenantConfigApplier }) =>
 				new TenantApplyCommand(remoteProjectResolver, tenantConfigLoader, tenantConfigApplier),
 		)
+		.addService('tenantProjectListCommand', ({ tenantClientProvider }) => new TenantProjectListCommand(tenantClientProvider))
+		.addService('tenantProjectShowCommand', ({ tenantClientProvider }) => new TenantProjectShowCommand(tenantClientProvider))
+		.addService('tenantProjectCreateCommand', ({ tenantClientProvider }) => new TenantProjectCreateCommand(tenantClientProvider))
+		.addService('tenantProjectUpdateCommand', ({ tenantClientProvider }) => new TenantProjectUpdateCommand(tenantClientProvider))
+		.addService('tenantProjectSecretSetCommand', ({ tenantClientProvider }) => new TenantProjectSecretSetCommand(tenantClientProvider))
+		.addService('tenantConfigShowCommand', ({ tenantClientProvider }) => new TenantConfigShowCommand(tenantClientProvider))
+		.addService('tenantIdpListCommand', ({ tenantClientProvider }) => new TenantIdpListCommand(tenantClientProvider))
+		.addService('tenantWhoAmICommand', ({ tenantClientProvider }) => new TenantWhoAmICommand(tenantClientProvider))
+		.addService('tenantPersonListCommand', ({ tenantClientProvider }) => new TenantPersonListCommand(tenantClientProvider))
+		.addService('tenantPersonShowCommand', ({ tenantClientProvider }) => new TenantPersonShowCommand(tenantClientProvider))
+		.addService('tenantPersonCreateCommand', ({ tenantClientProvider }) => new TenantPersonCreateCommand(tenantClientProvider))
+		.addService('tenantPersonUpdateCommand', ({ tenantClientProvider }) => new TenantPersonUpdateCommand(tenantClientProvider))
+		.addService('tenantPersonSetPasswordCommand', ({ tenantClientProvider }) => new TenantPersonSetPasswordCommand(tenantClientProvider))
+		.addService('tenantPersonDisableCommand', ({ tenantClientProvider }) => new TenantPersonDisableCommand(tenantClientProvider))
+		.addService('tenantPersonSignOutCommand', ({ tenantClientProvider }) => new TenantPersonSignOutCommand(tenantClientProvider))
+		.addService('tenantPersonResetMfaCommand', ({ tenantClientProvider }) => new TenantPersonResetMfaCommand(tenantClientProvider))
+		.addService(
+			'tenantPersonResetPasswordRequestCommand',
+			({ tenantClientProvider }) => new TenantPersonResetPasswordRequestCommand(tenantClientProvider),
+		)
+		.addService('tenantSessionCreateCommand', ({ tenantClientProvider }) => new TenantSessionCreateCommand(tenantClientProvider))
+		.addService('tenantIdentityRoleAddCommand', ({ tenantClientProvider }) => new TenantIdentityRoleAddCommand(tenantClientProvider))
+		.addService('tenantIdentityRoleRemoveCommand', ({ tenantClientProvider }) => new TenantIdentityRoleRemoveCommand(tenantClientProvider))
+		.addService('tenantMemberListCommand', ({ tenantClientProvider }) => new TenantMemberListCommand(tenantClientProvider))
+		.addService('tenantMemberAddCommand', ({ tenantClientProvider }) => new TenantMemberAddCommand(tenantClientProvider))
+		.addService('tenantMemberUpdateCommand', ({ tenantClientProvider }) => new TenantMemberUpdateCommand(tenantClientProvider))
+		.addService('tenantMemberRemoveCommand', ({ tenantClientProvider }) => new TenantMemberRemoveCommand(tenantClientProvider))
+		.addService('tenantMemberInviteCommand', ({ tenantClientProvider }) => new TenantMemberInviteCommand(tenantClientProvider))
+		.addService(
+			'tenantMemberInviteUnmanagedCommand',
+			({ tenantClientProvider }) => new TenantMemberInviteUnmanagedCommand(tenantClientProvider),
+		)
+		.addService('tenantApiKeyListCommand', ({ tenantClientProvider }) => new TenantApiKeyListCommand(tenantClientProvider))
+		.addService('tenantApiKeyCreateCommand', ({ tenantClientProvider }) => new TenantApiKeyCreateCommand(tenantClientProvider))
+		.addService('tenantApiKeyDisableCommand', ({ tenantClientProvider }) => new TenantApiKeyDisableCommand(tenantClientProvider))
+		.addService('tenantPolicyListCommand', ({ tenantClientProvider }) => new TenantPolicyListCommand(tenantClientProvider))
+		.addService('tenantPolicyCreateCommand', ({ tenantClientProvider }) => new TenantPolicyCreateCommand(tenantClientProvider))
+		.addService('tenantPolicyUpdateCommand', ({ tenantClientProvider }) => new TenantPolicyUpdateCommand(tenantClientProvider))
+		.addService('tenantPolicyDeleteCommand', ({ tenantClientProvider }) => new TenantPolicyDeleteCommand(tenantClientProvider))
+		.addService('tenantMailTemplateListCommand', ({ tenantClientProvider }) => new TenantMailTemplateListCommand(tenantClientProvider))
+		.addService('tenantMailTemplateAddCommand', ({ tenantClientProvider }) => new TenantMailTemplateAddCommand(tenantClientProvider))
+		.addService('tenantMailTemplateRemoveCommand', ({ tenantClientProvider }) => new TenantMailTemplateRemoveCommand(tenantClientProvider))
+		.addService('tenantAuthLogCommand', ({ tenantClientProvider }) => new TenantAuthLogCommand(tenantClientProvider))
+		.addService('commandsCommand', () => new CommandsCommand())
 		.addService('commandList', dic => {
-			const commands: CommandFactoryList = {
-				['deploy']: () => dic.deployCommand,
-				['version']: () => dic.versionCommand,
-				['data:export']: () => dic.exportCommand,
-				['data:import']: () => dic.importCommand,
-				['data:transfer']: () => dic.transferCommand,
-				['migrations:diff']: () => dic.migrationDiffCommand,
-				['migrations:amend']: () => dic.migrationAmendCommand,
-				['migrations:blank']: () => dic.migrationBlankCommand,
-				['migrations:init-state']: () => dic.migrationInitStateCommand,
-				['migrations:describe']: () => dic.migrationDescribeCommand,
-				['migrations:execute']: () => dic.migrationExecuteCommand,
-				['migrations:rebase']: () => dic.migrationRebaseCommand,
-				['migrations:snapshot']: () => dic.migrationSnapshotCommand,
-				['migrations:verify-snapshot']: () => dic.migrationVerifySnapshotCommand,
-				['migrations:status']: () => dic.migrationStatusCommand,
-				['workspace:update:api']: () => dic.workspaceUpdateCommand,
-				['project:validate']: () => dic.projectValidateCommand,
-				['project:print-schema']: () => dic.projectPrintSchemaCommand,
-				['project:generate-doc']: () => dic.projectGenerateDocumentationCommand,
-				['actions:list-variables']: () => dic.actionsListVariables,
-				['actions:set-variables']: () => dic.actionsSetVariables,
-				['actions:failed-events']: () => dic.actionsListFailedEvents,
-				['actions:retry-event']: () => dic.actionsRetryEvent,
-				['actions:get-event']: () => dic.actionsGetEvent,
-				['actions:stop-event']: () => dic.actionsStopEvent,
-				['tenant:apply']: () => dic.tenantApplyCommand,
+			const commands: CommandFactoryList = {}
+			// Canonical multi-token names always retain their silent colon compatibility alias.
+			const register = (name: string, factory: CommandFactory) => {
+				commands[name] = factory
+				const colonAlias = name.includes(' ') ? name.split(' ').join(':') : undefined
+				if (colonAlias !== undefined) {
+					commands[colonAlias] = factory
+				}
 			}
+			register('deploy', () => dic.deployCommand)
+			register('version', () => dic.versionCommand)
+			register('commands', () => dic.commandsCommand)
+			register('data export', () => dic.exportCommand)
+			register('data import', () => dic.importCommand)
+			register('data transfer', () => dic.transferCommand)
+			register('migrations diff', () => dic.migrationDiffCommand)
+			register('migrations amend', () => dic.migrationAmendCommand)
+			register('migrations blank', () => dic.migrationBlankCommand)
+			register('migrations init-state', () => dic.migrationInitStateCommand)
+			register('migrations describe', () => dic.migrationDescribeCommand)
+			register('migrations execute', () => dic.migrationExecuteCommand)
+			register('migrations rebase', () => dic.migrationRebaseCommand)
+			register('migrations snapshot', () => dic.migrationSnapshotCommand)
+			register('migrations verify-snapshot', () => dic.migrationVerifySnapshotCommand)
+			register('migrations status', () => dic.migrationStatusCommand)
+			register('workspace update api', () => dic.workspaceUpdateCommand)
+			register('project validate', () => dic.projectValidateCommand)
+			register('project print-schema', () => dic.projectPrintSchemaCommand)
+			register('project generate-doc', () => dic.projectGenerateDocumentationCommand)
+			register('actions list-variables', () => dic.actionsListVariables)
+			register('actions set-variables', () => dic.actionsSetVariables)
+			register('actions failed-events', () => dic.actionsListFailedEvents)
+			register('actions retry-event', () => dic.actionsRetryEvent)
+			register('actions get-event', () => dic.actionsGetEvent)
+			register('actions stop-event', () => dic.actionsStopEvent)
+			register('tenant apply', () => dic.tenantApplyCommand)
+			register('tenant whoami', () => dic.tenantWhoAmICommand)
+			register('tenant auth-log', () => dic.tenantAuthLogCommand)
+			register('tenant config show', () => dic.tenantConfigShowCommand)
+			register('tenant idp list', () => dic.tenantIdpListCommand)
+			register('tenant project list', () => dic.tenantProjectListCommand)
+			register('tenant project show', () => dic.tenantProjectShowCommand)
+			register('tenant project create', () => dic.tenantProjectCreateCommand)
+			register('tenant project update', () => dic.tenantProjectUpdateCommand)
+			register('tenant project secret set', () => dic.tenantProjectSecretSetCommand)
+			register('tenant person list', () => dic.tenantPersonListCommand)
+			register('tenant person show', () => dic.tenantPersonShowCommand)
+			register('tenant person create', () => dic.tenantPersonCreateCommand)
+			register('tenant person update', () => dic.tenantPersonUpdateCommand)
+			register('tenant person set-password', () => dic.tenantPersonSetPasswordCommand)
+			register('tenant person disable', () => dic.tenantPersonDisableCommand)
+			register('tenant person sign-out', () => dic.tenantPersonSignOutCommand)
+			register('tenant person reset-mfa', () => dic.tenantPersonResetMfaCommand)
+			register('tenant person reset-password-request', () => dic.tenantPersonResetPasswordRequestCommand)
+			register('tenant session create', () => dic.tenantSessionCreateCommand)
+			register('tenant identity role add', () => dic.tenantIdentityRoleAddCommand)
+			register('tenant identity role remove', () => dic.tenantIdentityRoleRemoveCommand)
+			register('tenant member list', () => dic.tenantMemberListCommand)
+			register('tenant member add', () => dic.tenantMemberAddCommand)
+			register('tenant member update', () => dic.tenantMemberUpdateCommand)
+			register('tenant member remove', () => dic.tenantMemberRemoveCommand)
+			register('tenant member invite', () => dic.tenantMemberInviteCommand)
+			register('tenant member invite-unmanaged', () => dic.tenantMemberInviteUnmanagedCommand)
+			register('tenant api-key list', () => dic.tenantApiKeyListCommand)
+			register('tenant api-key create', () => dic.tenantApiKeyCreateCommand)
+			register('tenant api-key disable', () => dic.tenantApiKeyDisableCommand)
+			register('tenant policy list', () => dic.tenantPolicyListCommand)
+			register('tenant policy create', () => dic.tenantPolicyCreateCommand)
+			register('tenant policy update', () => dic.tenantPolicyUpdateCommand)
+			register('tenant policy delete', () => dic.tenantPolicyDeleteCommand)
+			register('tenant mail-template list', () => dic.tenantMailTemplateListCommand)
+			register('tenant mail-template add', () => dic.tenantMailTemplateAddCommand)
+			register('tenant mail-template remove', () => dic.tenantMailTemplateRemoveCommand)
 			return commands
 		})
-		.addService('commandManager', ({ commandList }) => new CommandManager(commandList))
+		.addService('commandManager', ({ commandList, commandsCommand }) => {
+			const commandManager = new CommandManager(commandList)
+			commandsCommand.setCommandManager(commandManager)
+			return commandManager
+		})
 		.addService(
 			'versionChecker',
 			({ version, workspace, packageWorkspaceResolver, dockerComposeManager }) =>
 				new VersionChecker(version, workspace.baseDir, packageWorkspaceResolver, dockerComposeManager),
 		)
-		.addService('application', ({ commandManager, versionChecker }) => {
+		.addService('application', ({ commandManager, versionChecker, output }) => {
 			const app = new Application(
 				commandManager,
 				`Contember CLI version ${version}`,
+				output,
 				{
 					beforeRun: async ({ name }) => {
-						if (
-							!process.env.CONTEMBER_SKIP_VERSION_CHECK
-							&& !['deploy', 'version', 'data:export', 'data:import', 'data:transfer', 'tenant:apply'].includes(name)
-						) {
+						// the tenant commands only talk to a remote API — they must run outside a Contember workspace too
+						const skipped = ['deploy', 'version', 'commands', 'data export', 'data import', 'data transfer']
+						if (!process.env.CONTEMBER_SKIP_VERSION_CHECK && !skipped.includes(name) && !name.startsWith('tenant ')) {
 							await versionChecker.checkVersions()
 						}
 					},

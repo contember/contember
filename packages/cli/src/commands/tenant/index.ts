@@ -1,1 +1,6 @@
 export * from './TenantApplyCommand.js'
+export * from './project/index.js'
+export * from './person/index.js'
+export * from './member/index.js'
+export * from './apikey/index.js'
+export * from './policy/index.js'

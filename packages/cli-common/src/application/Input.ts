@@ -8,6 +8,12 @@ export class Input<Args extends Arguments = Arguments, Opts extends Options = Op
 		return this.options[name]
 	}
 
+	/** Reads an option that is not part of the command signature — the global ones parsed in the same pass. */
+	getRawOption(name: string): string | boolean | string[] | undefined {
+		const options: Options = this.options
+		return options[name]
+	}
+
 	getArgument<Name extends keyof Args>(name: Name): Args[Name] {
 		return this.args[name]
 	}

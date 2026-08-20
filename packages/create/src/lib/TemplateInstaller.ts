@@ -1,7 +1,18 @@
 import { join } from 'node:path'
-import { FileSystem } from './FileSystem.js'
-import jsyaml from 'js-yaml'
 import degit from 'degit'
+import jsyaml from 'js-yaml'
+import { FileSystem } from './FileSystem.js'
+
+interface TemplateInstallerOutput {
+	warn(message: string): void
+}
+
+type CloneTemplate = (source: string, target: string) => Promise<void>
+
+const cloneTemplate: CloneTemplate = async (source, target) => {
+	const emitter = degit(source, { cache: false, force: true, verbose: true })
+	await emitter.clone(target)
+}
 
 export class TemplateInstaller {
 	private localTemplates: Record<string, string>
@@ -9,6 +20,8 @@ export class TemplateInstaller {
 	constructor(
 		private readonly resourceDir: string,
 		private readonly fs: FileSystem,
+		private readonly output: TemplateInstallerOutput,
+		private readonly clone: CloneTemplate = cloneTemplate,
 	) {
 		this.localTemplates = {
 			['default']: join(this.resourceDir, 'templates/default'),
@@ -20,85 +33,90 @@ export class TemplateInstaller {
 		targetDir: string,
 		variables: Record<string, string> = {},
 	) => {
-		let removeTemplate = () => {}
+		let temporaryTemplateDir: string | undefined
+		let remoteTemplate: string | undefined
 
 		if (this.localTemplates[template]) {
 			template = this.localTemplates[template]
 		} else {
-			const tmpDir = await this.fs.createTempDir()
+			remoteTemplate = template
+			temporaryTemplateDir = await this.fs.createTempDir()
+			template = temporaryTemplateDir
+		}
 
-			try {
-				const emitter = degit(template, { cache: false, force: true, verbose: true })
-				await emitter.clone(tmpDir)
-
-				removeTemplate = () => {
-					try {
-						this.fs.remove(tmpDir, { recursive: true, force: true })
-					} catch (error) {
-						console.error(`Failed to clean up template: ${error}`)
-					}
+		try {
+			if (remoteTemplate !== undefined) {
+				try {
+					await this.clone(remoteTemplate, template)
+				} catch (error) {
+					throw new Error(`Failed to clone template from repository: ${error}`)
 				}
-
-				template = tmpDir
-			} catch (error) {
-				throw new Error(`Failed to clone template from repository: ${error}`)
 			}
-		}
 
-		const templateConfigFile = join(template, 'contember.template.yaml')
-		if (!(await this.fs.pathExists(templateConfigFile))) {
-			removeTemplate()
-			throw new Error(`${template} is not a Contember template`)
-		}
-		const config = (await this.readYaml(templateConfigFile)) as {
-			type?: string
-			remove?: string[]
-			patchPackageJson?: boolean
-			rename?: Record<string, string>
-			copy?: Record<string, string>
-			replaceVariables?: string[]
-		}
-		const nodeModulesDir = join(template, 'node_modules')
-		const skippedFiles = new Set([...(config.remove || []).map(it => join(template, it)), templateConfigFile])
-		if (await this.fs.pathExists(targetDir)) {
-			throw `${targetDir} already exists`
-		}
-		await this.fs.copy(template, targetDir, {
-			filter: src => !src.startsWith(nodeModulesDir) && !skippedFiles.has(src),
-		})
-
-		removeTemplate()
-
-		if (config.patchPackageJson) {
-			await this.replaceFileContent(join(targetDir, 'package.json'), content => {
-				const {
-					name,
-					version,
-					'scripts-template': scripts,
-					scripts: _nullScripts,
-					license,
-					...json
-				} = JSON.parse(content)
-				return JSON.stringify({ scripts, ...json }, null, '  ')
+			const templateConfigFile = join(template, 'contember.template.yaml')
+			if (!(await this.fs.pathExists(templateConfigFile))) {
+				throw new Error(`${template} is not a Contember template`)
+			}
+			const config = (await this.readYaml(templateConfigFile)) as {
+				type?: string
+				remove?: string[]
+				patchPackageJson?: boolean
+				rename?: Record<string, string>
+				copy?: Record<string, string>
+				replaceVariables?: string[]
+			}
+			const nodeModulesDir = join(template, 'node_modules')
+			const skippedFiles = new Set([...(config.remove || []).map(it => join(template, it)), templateConfigFile])
+			if (await this.fs.pathExists(targetDir)) {
+				throw `${targetDir} already exists`
+			}
+			await this.fs.copy(template, targetDir, {
+				filter: src => !src.startsWith(nodeModulesDir) && !skippedFiles.has(src),
 			})
-		}
-		for (const [source, target] of Object.entries(config.rename || {})) {
-			await this.fs.rename(join(targetDir, source), join(targetDir, target))
-		}
-		for (const [source, target] of Object.entries(config.copy || {})) {
-			await this.fs.copy(join(targetDir, source), join(targetDir, target))
-		}
 
-		for (const file of config.replaceVariables || []) {
-			const path = join(targetDir, file)
-			if (!(await this.fs.pathExists(path))) {
-				continue
+			if (config.patchPackageJson) {
+				await this.replaceFileContent(join(targetDir, 'package.json'), content => {
+					const {
+						name,
+						version,
+						'scripts-template': scripts,
+						scripts: _nullScripts,
+						license,
+						...json
+					} = JSON.parse(content)
+					return JSON.stringify({ scripts, ...json }, null, '  ')
+				})
 			}
-			await this.replaceFileContent(path, content =>
-				Object.entries(variables).reduce(
-					(content, [key, value]) => content.replace(new RegExp(`{${key}}`, 'g'), value),
-					content,
-				))
+			for (const [source, target] of Object.entries(config.rename || {})) {
+				await this.fs.rename(join(targetDir, source), join(targetDir, target))
+			}
+			for (const [source, target] of Object.entries(config.copy || {})) {
+				await this.fs.copy(join(targetDir, source), join(targetDir, target))
+			}
+
+			for (const file of config.replaceVariables || []) {
+				const path = join(targetDir, file)
+				if (!(await this.fs.pathExists(path))) {
+					continue
+				}
+				await this.replaceFileContent(path, content =>
+					Object.entries(variables).reduce(
+						(content, [key, value]) => content.replace(new RegExp(`{${key}}`, 'g'), value),
+						content,
+					))
+			}
+		} finally {
+			if (temporaryTemplateDir !== undefined) {
+				await this.cleanupTemporaryTemplate(temporaryTemplateDir)
+			}
+		}
+	}
+
+	private cleanupTemporaryTemplate = async (path: string): Promise<void> => {
+		try {
+			await this.fs.remove(path, { recursive: true, force: true })
+		} catch {
+			this.output.warn('Failed to clean up the temporary template directory.')
 		}
 	}
 

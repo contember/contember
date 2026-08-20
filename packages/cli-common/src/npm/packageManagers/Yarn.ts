@@ -20,8 +20,7 @@ export class Yarn implements PackageManager {
 			...PackageManagerHelpers.formatPackagesToInstall(dependencies),
 		], {
 			cwd: pckg.dir,
-			stderr: process.stderr,
-			stdout: process.stdout,
+			display: 'yarn add dependencies',
 		})
 		await output
 	}

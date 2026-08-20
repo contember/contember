@@ -1,4 +1,4 @@
-import { Command, CommandConfiguration, Input } from '@contember/cli-common'
+import { CliError, Command, CommandConfiguration, ExitCode, Input, Output } from '@contember/cli-common'
 import {
 	Authorizator,
 	EntityRulesResolver,
@@ -47,7 +47,7 @@ export class ProjectPrintSchemaCommand extends Command<Args, Options> {
 		configuration.option('omit-settings').valueNone()
 	}
 
-	protected async execute(input: Input<Args, Options>): Promise<number> {
+	protected async execute(input: Input<Args, Options>, output: Output): Promise<void> {
 		const format = input.getOption('format') || 'graphql'
 
 		const schema = input.getOption('source') === 'migrations'
@@ -62,8 +62,8 @@ export class ProjectPrintSchemaCommand extends Command<Args, Options> {
 			settings: input.getOption('omit-settings') ? emptySchema.settings : schema.settings,
 		}
 
-		if (!validateSchemaAndPrintErrors(filteredSchema, 'Defined schema is invalid:')) {
-			return 1
+		if (!validateSchemaAndPrintErrors(filteredSchema, 'Defined schema is invalid:', undefined, output)) {
+			throw new CliError('Defined schema is invalid', { code: 'SCHEMA_INVALID', exitCode: ExitCode.InputError })
 		}
 
 		const permissionFactory = new PermissionFactory()
@@ -82,19 +82,20 @@ export class ProjectPrintSchemaCommand extends Command<Args, Options> {
 			authorizator,
 		)
 
-		const printByLine = (out: string) => {
-			out.split('\n').forEach(line => {
-				process.stdout.write(line + '\n')
-			})
-		}
 		if (format === 'schema') {
 			if (inputRoles) {
-				throw `--roles option is not supported for "schema" format`
+				throw new CliError('The --role option is not supported for the "schema" format', { code: 'UNSUPPORTED_OPTION', exitCode: ExitCode.InputError })
 			}
-			const jsonString = JSON.stringify(schemaNormalized, null, '\t')
-			printByLine(jsonString)
+			// human mode keeps the tab-indented rendering; --json is a single JSON.stringify of the same value, not a re-encoding of this string
+			output.data(schemaNormalized, {
+				human: value => JSON.stringify(value, null, '\t'),
+				quiet: value => JSON.stringify(value),
+			})
 		} else if (format === 'introspection') {
-			printByLine(JSON.stringify(introspection.create(), null, '\t'))
+			output.data(introspection.create(), {
+				human: value => JSON.stringify(value, null, '\t'),
+				quiet: value => JSON.stringify(value),
+			})
 		} else if (format === 'graphql') {
 			const contentSchema = schemaBuilderFactory.create(schemaNormalized.model, authorizator).build()
 			const introspectionSchemaFactory = new IntrospectionSchemaDefinitionFactory(introspection)
@@ -104,11 +105,12 @@ export class ProjectPrintSchemaCommand extends Command<Args, Options> {
 			})
 			gqlSchema.description = '' // this enforces schema definition print
 			const printedSchema = printSchema(gqlSchema).replace('""""""\n', '') // remove empty comment
-			printByLine(printedSchema)
+			output.data(printedSchema, {
+				human: value => value,
+				quiet: value => value.split('\n'),
+			})
 		} else {
-			throw `Unknown format ${format}`
+			throw new CliError(`Unknown schema format "${format}"`, { code: 'UNKNOWN_FORMAT', exitCode: ExitCode.InputError })
 		}
-
-		return 0
 	}
 }

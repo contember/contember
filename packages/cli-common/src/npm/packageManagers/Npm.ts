@@ -20,8 +20,7 @@ export class Npm implements PackageManager {
 			...PackageManagerHelpers.formatPackagesToInstall(dependencies),
 		], {
 			cwd: pckg.dir,
-			stderr: process.stderr,
-			stdout: process.stdout,
+			display: 'npm install dependencies',
 		})
 		await output
 	}

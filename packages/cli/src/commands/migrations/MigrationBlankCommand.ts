@@ -1,4 +1,4 @@
-import { Command, CommandConfiguration, Input } from '@contember/cli-common'
+import { Command, CommandConfiguration, Input, Output } from '@contember/cli-common'
 import { MigrationCreator } from '@contember/migrations-client'
 
 type Args = {
@@ -22,11 +22,11 @@ export class MigrationBlankCommand extends Command<Args, Options> {
 			.description('Migration file format (js, ts, json), default is ts.')
 	}
 
-	protected async execute(input: Input<Args, Options>): Promise<number> {
+	protected async execute(input: Input<Args, Options>, output: Output): Promise<number> {
 		const migrationName = input.getArgument('migrationName')
 		const migrationFormat = input.getArgument('format') || 'ts'
 		const filename = await this.migrationCreator.createEmptyMigrationFile(migrationName, migrationFormat)
-		console.log(`${filename} created`)
+		output.data({ path: filename }, { human: value => `${value.path} created`, quiet: value => value.path })
 		return 0
 	}
 }

@@ -1,0 +1,39 @@
+diff --git a/dist/InputWriter.js b/dist/InputWriter.js
+index 66946d6ad63feec6127fa398e206a67db8b3db28..925c4c13681c6979c4e124a6cc3ca868243fce9f 100644
+--- a/dist/InputWriter.js
++++ b/dist/InputWriter.js
+@@ -51,11 +51,33 @@ class InputWriter extends Writer_1.Writer {
+                 t("?");
+             }
+             t(": ");
+-            this.typeRef(field.type);
++            this.inputTypeRef(field.type);
+             t(";\n");
+         }
+         this.leave("\n");
+     }
++    inputTypeRef(type) {
++        if (type instanceof graphql_1.GraphQLNonNull) {
++            this.inputTypeCoreRef(type.ofType);
++        }
++        else {
++            this.inputTypeCoreRef(type);
++            this.text(" | null");
++        }
++    }
++    inputTypeCoreRef(type) {
++        if (type instanceof graphql_1.GraphQLList) {
++            if (!this.config.arrayEditable) {
++                this.text("Readonly");
++            }
++            this.text("Array<");
++            this.inputTypeRef(type.ofType);
++            this.text(">");
++        }
++        else {
++            this.typeRef(type);
++        }
++    }
+ }
+ exports.InputWriter = InputWriter;
+ const COMMENT = `/*

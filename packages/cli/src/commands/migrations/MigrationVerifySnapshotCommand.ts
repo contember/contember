@@ -1,4 +1,4 @@
-import { Command, CommandConfiguration, Input } from '@contember/cli-common'
+import { Command, CommandConfiguration, Input, Output } from '@contember/cli-common'
 import { MigrationSnapshotFacade } from '../../lib/migrations/MigrationSnapshotFacade.js'
 
 type Args = {}
@@ -16,13 +16,12 @@ export class MigrationVerifySnapshotCommand extends Command<Args, Options> {
 		configuration.description('Verifies that snapshot.json still matches a full replay of all migrations')
 	}
 
-	protected async execute(input: Input<Args, Options>): Promise<number> {
+	protected async execute(input: Input<Args, Options>, output: Output): Promise<number> {
 		const result = await this.migrationSnapshotFacade.verify()
-		if (result.ok) {
-			console.log(result.message)
-			return 0
-		}
-		console.error(result.message)
-		return 1
+		output.data(result, {
+			human: value => value.message,
+			quiet: value => value.ok,
+		})
+		return result.ok ? 0 : 1
 	}
 }

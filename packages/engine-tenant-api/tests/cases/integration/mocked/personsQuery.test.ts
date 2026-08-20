@@ -156,7 +156,8 @@ query {
 					// ProjectMembersQuery (filter {}) — every member identity of the project
 					sql: SQL`select "id", "description" from "tenant"."identity"
 						where exists (select ?::int from "tenant"."project_membership"
-							where "project_membership"."identity_id" = "identity"."id" and "project_id" = ?)`,
+							where "project_membership"."identity_id" = "identity"."id" and "project_id" = ?)
+						order by "identity"."id" asc`,
 					parameters: [1, projectId],
 					response: {
 						rows: [

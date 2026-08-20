@@ -1,7 +1,6 @@
-import { Command, CommandConfiguration, Input } from '@contember/cli-common'
+import { Command, CommandConfiguration, Input, Output } from '@contember/cli-common'
 import { RemoteProjectResolver } from '../../lib/project/RemoteProjectResolver.js'
-import { ActionsClient } from '../../lib/actions/ActionsClient.js'
-import chalkTable from 'chalk-table'
+import { ActionsClientResolver, resolveActionsClient } from '../../lib/actions/resolveActionsClient.js'
 
 type Args = {}
 
@@ -12,6 +11,7 @@ type Options = {
 export class ActionsListVariablesCommand extends Command<Args, Options> {
 	constructor(
 		private readonly remoteProjectResolver: RemoteProjectResolver,
+		private readonly resolveClient: ActionsClientResolver = resolveActionsClient,
 	) {
 		super()
 	}
@@ -21,16 +21,16 @@ export class ActionsListVariablesCommand extends Command<Args, Options> {
 		configuration.option('project').valueRequired()
 	}
 
-	protected async execute(input: Input<Args, Options>): Promise<void | number> {
-		const dsn = input.getOption('project')
-		const project = await this.remoteProjectResolver.resolve(dsn)
-		if (!project) {
-			throw `Project not defined`
-		}
-		const api = ActionsClient.create(project.endpoint, project.name, project.token)
+	protected async execute(input: Input<Args, Options>, output: Output): Promise<void> {
+		const api = await this.resolveClient(this.remoteProjectResolver, input.getOption('project'))
 		const result = await api.listVariables()
-		console.log(chalkTable({
-			columns: ['name', 'value'],
-		}, result))
+		output.table(
+			[
+				{ field: 'name', name: 'Name' },
+				{ field: 'value', name: 'Value' },
+			],
+			result,
+			'name',
+		)
 	}
 }

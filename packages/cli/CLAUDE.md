@@ -1,53 +1,46 @@
 # cli
 
-Command-line interface for Contember project management. 22 commands for deployment, migrations, data transfer, validation, and actions management.
+Contember project and tenant CLI. Treat `docs/src/content/docs/reference/cli.mdx` and runtime help as the user-facing reference; do not duplicate the command catalog here.
 
 ## Commands
 
-**Deploy**: `deploy` — deploy with migrations + admin
+```bash
+bun run pre-build
+bun test --conditions=typescript packages/cli/tests
+bun test --conditions=typescript packages/cli/tests/cases/unit/<file>.test.ts
+```
 
-**Migrations** (10): `migrations:diff`, `migrations:amend`, `migrations:blank`, `migrations:describe`, `migrations:execute`, `migrations:rebase`, `migrations:status`, `migrations:init-state`, `migrations:snapshot`, `migrations:verify-snapshot`
+Run `pre-build` before process tests; generated GraphQL client barrels are required. CI runs it before the test suite.
 
-`migrations:snapshot` collapses all migrations into `{migrationsDir}/snapshot.json` (commit it). `migrations:execute` bootstraps an empty DB from it in one step (opt-out `--no-snapshot`); `deploy` ignores it unless `--snapshot`. The server refuses a snapshot on a non-empty project. `migrations:verify-snapshot` offline-checks that the snapshot still equals a full replay. See `MigrationSnapshotFacade` and `engine-system-api` `migrateFromSnapshot`.
+## Critical invariants
 
-**Data Transfer** (3): `data:export`, `data:import`, `data:transfer`
-
-**Project** (3): `project:validate`, `project:print-schema`, `project:generate-doc`
-
-**Actions** (6): `actions:list-variables`, `actions:set-variables`, `actions:failed-events`, `actions:get-event`, `actions:retry-event`, `actions:stop-event`
-
-**Tenant**: `tenant:apply [config] [--dsn] [--dry-run]` — apply declarative tenant configuration
-
-**Other**: `workspace:update:api`, `version`
-
-## Tenant configuration
-
-`tenant:apply` reads a typed `tenant.config.ts` (path overridable via the first arg, default `tenant.config.ts`) and applies it idempotently to the tenant API:
-- `config` → `configure` mutation (partial merge of password/login/passwordless/captcha/rateLimits)
-- `identityProviders` (keyed by slug) → `addIDP`/`updateIDP` chosen from current state, then `enableIDP`/`disableIDP` to match `disabled`
-- `mailTemplates` → `addMailTemplate` (server-side upsert)
-- `authPolicies` → `createAuthPolicy`/`updateAuthPolicy`, matched to existing rows by `scope` + `project` + the `roles` **set** (`authPolicy.ts`), since `auth_policy` has no slug. Editing `roles` therefore creates a second policy and leaves the old one enforcing — the applier warns about every uncovered policy, including when the config lists none (`authPolicies: []` means "I manage these"; omitting the key skips the section and stays silent). Two config entries with the same target are rejected up front, before any mutation runs.
-
-Nothing is ever removed (no pruning). Authored with `defineTenantConfig` from the library export of `@contember/cli` (`src/index.ts`). Secrets come from `process.env` in the config file. Requires a token with **PROJECT_ADMIN/SUPER_ADMIN** privileges — a deploy-only (ENTRYPOINT_DEPLOYER) token is rejected by the API. Orchestration lives in `lib/tenant/` (`TenantClient`, `TenantConfigLoader`, `TenantConfigApplier`); no new server-side API was needed.
-
-## Connection
-
-Connects via DSN (`contember://project:token@endpoint`) or env vars:
-- `CONTEMBER_DSN` — full DSN
-- `CONTEMBER_API_URL` / `CONTEMBER_INSTANCE` — endpoint
-- `CONTEMBER_API_TOKEN` — auth token
-- `CONTEMBER_PROJECT_NAME` — project name
-
-## Workspace Configuration
-
-Reads `contember.yaml`:
-- `apiDir`: `./api` (schema source)
-- `migrationsDir`: `{apiDir}/migrations`
-- `adminDir`: `./admin`
+- Use canonical space-separated noun→verb names. Register the same factory under a silent colon alias in `dic.ts`.
+- Reserve global option names and shortcuts: `--json`, `--quiet`/`-q`, `--no-color`, `--help`/`-h`.
+- Write only through the shared `Output`. Stdout is result data; stderr is diagnostics. Never use `console.*`.
+- Use `output.data(value, { human, quiet })` for typed projections. JSON emits the raw value; quiet emits scalars.
+- Suppress informational diagnostics, progress and subprocess noise in JSON and quiet modes. JSON errors are one stderr document.
+- Diagnostics do not reach JSON or quiet callers. Anything the caller must act on belongs in the `output.data` payload, not only in `output.warn`.
+- Read the output mode from raw argv before workspace/container bootstrap so bootstrap failures use the requested format.
+- Throw `CliError` with a stable code and correct `ExitCode`. Let `Application` render command failures.
+- Never prompt in JSON, quiet or non-TTY runs. Require `--yes` or throw `TTY_UNAVAILABLE`.
+- Never read stdin implicitly. Reach `lib/tenant/stdin.ts` only behind an explicit `--*-stdin` option.
+- Pass the shared `Output` to `CommandRunner`. Give it only human-safe display text; never raw argv or secrets.
 
 ## Architecture
 
-- Entry: `run.ts` → creates DI container (`dic.ts`) → `CommandManager` dispatches
-- Schema loaded from `{apiDir}/index.ts` via `ImportSchemaLoader` (Bun) or `TranspilingSchemaLoader` (Node)
-- Migration facades coordinate diff/execute/rebase with user confirmation
-- All commands extend `Command<Args, Options>` from `@contember/cli-common`
+- Entry: `run.ts` → `dic.ts` → `Application` → `CommandManager`.
+- Commands extend `Command<Args, Options>` and receive `Output` as the second `execute` argument.
+- Tenant commands use `TenantClientProvider` and domain clients over `TenantApiTransport`.
+- Read `lib/tenant/clients/README.md` before adding a tenant client method.
+- Reuse `lib/tenant/input/` for explicit input sources and GraphQL pagination bounds.
+- `tenant apply` loads `tenant.config.ts` and applies additions/updates without pruning.
+- Tenant commands except `tenant apply` use `CONTEMBER_*`; their `--project` selects a tenant project, not the connection.
+- Migration snapshots live at `{migrationsDir}/snapshot.json`; commit them and verify with `migrations verify-snapshot`.
+
+## Adding a command
+
+1. Add the class under `commands/<group>/` and export it from the group barrel.
+2. Register its service and canonical/colon names in `dic.ts`.
+3. Add focused command tests with human, JSON, quiet and failure cases as applicable.
+4. Keep `command-registry.test.ts` green; it checks construction, aliases, prefixes, tenant exports and the catalog.
+5. Update user documentation only when the public contract changes.

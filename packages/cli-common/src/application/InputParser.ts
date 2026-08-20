@@ -2,13 +2,22 @@ import { Argument } from './Argument.js'
 import { Option, OptionMode } from './Option.js'
 import { Arguments, Input, Options } from './Input.js'
 
+export interface InputParserResult<Args extends Arguments, Opts extends Options> {
+	readonly input: Input<Args, Opts>
+	readonly diagnostics: readonly string[]
+}
+
 export class InputParser {
 	constructor(private _arguments: Argument[], private options: Option[]) {}
 
-	parse<Args extends Arguments, Opts extends Options>(args: string[]): Input<Args, Opts> {
-		args = args.reduce<string[]>((acc, arg) => [...acc, ...(arg.startsWith('-') ? arg.split('=', 2) : [arg])], [])
+	parse<Args extends Arguments, Opts extends Options>(args: string[]): InputParserResult<Args, Opts> {
+		args = args.flatMap(arg => {
+			const separator = arg.startsWith('-') ? arg.indexOf('=') : -1
+			return separator === -1 ? [arg] : [arg.slice(0, separator), arg.slice(separator + 1)]
+		})
 		let options: Options = {}
 		let argumentValues: Arguments = {}
+		const diagnostics: string[] = []
 
 		let i = 0
 		let argumentNumber = 0
@@ -61,7 +70,7 @@ export class InputParser {
 			}
 			if (option) {
 				if (option.deprecated) {
-					console.warn(`Option ${option.name} is deprecated.`)
+					diagnostics.push(`Option --${option.name} is deprecated.`)
 				}
 				if (option.mode === OptionMode.VALUE_NONE) {
 					options[option.name] = true
@@ -99,7 +108,7 @@ export class InputParser {
 			}
 		}
 
-		return new Input<Args, Opts>(argumentValues as Args, options as Opts)
+		return { input: new Input<Args, Opts>(argumentValues as Args, options as Opts), diagnostics }
 	}
 
 	private tryParseValue(arg: string | undefined): string | undefined {

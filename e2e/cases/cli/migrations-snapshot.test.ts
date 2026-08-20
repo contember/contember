@@ -86,8 +86,9 @@ const systemData = async (project: string, query: string) => {
 	return (await res.json() as { data: any }).data
 }
 
+// Command results are data on stdout; progress and warnings remain diagnostics on stderr.
 test('CLI: migrations:snapshot + migrations:execute bootstraps a fresh project from the snapshot', async () => {
-	const snapshotResult = await runCli(['migrations:snapshot'])
+	const snapshotResult = await runCli(['migrations:snapshot', '--yes'])
 	expect(snapshotResult.exitCode).toBe(0)
 	expect(snapshotResult.stdout).toContain('Snapshot created: 2 migrations')
 
@@ -103,8 +104,8 @@ test('CLI: migrations:snapshot + migrations:execute bootstraps a fresh project f
 
 	const executeResult = await runCli(['migrations:execute', '--yes'], env)
 	expect(executeResult.exitCode).toBe(0)
-	expect(executeResult.stdout).toContain('Bootstrapping from snapshot')
-	expect(executeResult.stdout).toContain('Snapshot applied')
+	expect(executeResult.stderr).toContain('Bootstrapping from snapshot')
+	expect(executeResult.stderr).toContain('Snapshot applied')
 
 	// the collapsed migrations are recorded as executed
 	const data = await systemData(project, `query { executedMigrations { version } }`)
@@ -122,12 +123,20 @@ test('CLI: migrations:snapshot + migrations:execute bootstraps a fresh project f
 	// re-running execute on the now non-empty project does not use the snapshot
 	const rerun = await runCli(['migrations:execute', '--yes'], env)
 	expect(rerun.exitCode).toBe(0)
-	expect(rerun.stdout).not.toContain('Bootstrapping from snapshot')
-	expect(rerun.stdout).toContain('No migrations to execute')
+	expect(rerun.stderr).not.toContain('Bootstrapping from snapshot')
+	expect(rerun.stderr).toContain('No migrations to execute')
+	// the alias is silent: it never prints a deprecation notice
+	expect(rerun.stderr).not.toMatch(/deprecat/i)
+
+	// the canonical space form is the very same command — same exit code, same bytes on both streams
+	const spaceForm = await runCli(['migrations', 'execute', '--yes'], env)
+	expect(spaceForm.exitCode).toBe(rerun.exitCode)
+	expect(spaceForm.stdout).toBe(rerun.stdout)
+	expect(spaceForm.stderr).toBe(rerun.stderr)
 }, 60000)
 
 test('CLI: a snapshot left stale by an amend is ignored, and a full replay bootstraps the amended schema', async () => {
-	expect((await runCli(['migrations:snapshot'])).exitCode).toBe(0)
+	expect((await runCli(['migrations:snapshot', '--yes'])).exitCode).toBe(0)
 
 	// amend the covered migration (as `migrations:amend` rewrites the file): same version/filename, new
 	// modifications — Tag instead of Category. The snapshot's checksum no longer matches.
@@ -151,8 +160,8 @@ test('CLI: a snapshot left stale by an amend is ignored, and a full replay boots
 	expect(executeResult.exitCode).toBe(0)
 	// the snapshot is detected as stale and skipped — a full replay runs instead
 	expect(executeResult.stderr).toContain('Ignoring snapshot')
-	expect(executeResult.stdout).not.toContain('Bootstrapping from snapshot')
-	expect(executeResult.stdout).toContain('Will execute following migrations')
+	expect(executeResult.stderr).not.toContain('Bootstrapping from snapshot')
+	expect(executeResult.stderr).toContain('Will execute following migrations')
 
 	// the registry matches a full replay of the (amended) files
 	const data = await systemData(project, `query { executedMigrations { version } }`)
@@ -175,7 +184,7 @@ test('CLI: a snapshot left stale by an amend is ignored, and a full replay boots
 }, 60000)
 
 test('CLI: migrations:verify-snapshot passes for a fresh snapshot and fails (exit 1) once it goes stale', async () => {
-	expect((await runCli(['migrations:snapshot'])).exitCode).toBe(0)
+	expect((await runCli(['migrations:snapshot', '--yes'])).exitCode).toBe(0)
 
 	// offline check — no project/connection needed
 	const fresh = await runCli(['migrations:verify-snapshot'])
@@ -194,5 +203,5 @@ test('CLI: migrations:verify-snapshot passes for a fresh snapshot and fails (exi
 
 	const stale = await runCli(['migrations:verify-snapshot'])
 	expect(stale.exitCode).toBe(1)
-	expect(stale.stderr).toContain('stale')
+	expect(stale.stdout).toContain('stale')
 }, 60000)

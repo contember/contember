@@ -24,8 +24,8 @@ jobs:
 
           - job_name: build
             run_script: |
-              bun run pre-build
-              bun run ts:build
+              bun run build
+              CONTEMBER_TEST_BUILT_CLI=1 bun test --conditions=typescript packages/cli/tests/cases/unit/cli-process.test.ts packages/create/tests/cases/unit/create-process.test.ts
 
           - job_name: api-exporter
             run_script: |
@@ -38,7 +38,9 @@ jobs:
             run_script: bunx deptective
 
           - job_name: test
+            # Source-level process tests require generated GraphQL client barrels.
             run_script: |
+                bun run pre-build
                 bun run test
                 bun run test:legacy-decorators
 

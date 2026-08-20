@@ -14,12 +14,11 @@ export class UpdateConfigurationCommand implements Command<void> {
 		const captcha = this.configuration.captcha
 		const rl = this.configuration.rateLimits
 
-		// Encrypt captcha secret at rest. Empty string clears the value;
-		// non-empty re-encrypts so we always rotate to the latest key version.
+		// Null and omission preserve the stored secret; only an empty string clears it.
 		let captchaSecretCol: Buffer | null | undefined
 		let captchaSecretVersionCol: number | null | undefined
-		if (captcha?.secret !== undefined) {
-			if (captcha.secret === '' || captcha.secret === null) {
+		if (captcha?.secret !== undefined && captcha.secret !== null) {
+			if (captcha.secret === '') {
 				captchaSecretCol = null
 				captchaSecretVersionCol = null
 			} else {

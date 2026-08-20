@@ -18,6 +18,10 @@ import {
 	VERSION_LATEST,
 } from '@contember/migrations-client'
 import { MigrationSnapshotFacade } from '../../../src/lib/migrations/MigrationSnapshotFacade.js'
+import { MigrationSnapshotCommand } from '../../../src/commands/migrations/MigrationSnapshotCommand.js'
+import { CliError, ExitCode } from '@contember/cli-common'
+import { createTestOutput } from '../../../../cli-common/tests/lib/testOutput.js'
+import prompts from 'prompts'
 
 namespace ModelA {
 	export class Author {
@@ -77,8 +81,15 @@ const setup = async (migrationsDir: string) => {
 		schemaMigrator,
 		schemaStateManager,
 		snapshotManager,
+		createTestOutput().output,
 	)
-	return { facade, schemaDiffer, snapshotManager }
+	return { facade, schemaDiffer, snapshotManager, command: new MigrationSnapshotCommand(facade) }
+}
+
+const writeSnapshot = async (facade: MigrationSnapshotFacade) => {
+	const snapshot = await facade.prepare()
+	await facade.write(snapshot)
+	return snapshot
 }
 
 describe('MigrationSnapshotFacade', () => {
@@ -104,8 +115,8 @@ describe('MigrationSnapshotFacade', () => {
 		await fs.rm(migrationsDir, { recursive: true, force: true })
 	})
 
-	test('create collapses all migrations and records what they cover', async () => {
-		const snapshot = await (await freshFacade()).create()
+	test('prepare and write collapse all migrations and record what they cover', async () => {
+		const snapshot = await writeSnapshot(await freshFacade())
 
 		expect(snapshot.version).toBe('2024-01-03-120000')
 		expect(snapshot.covers.map(it => it.type)).toStrictEqual(['schema', 'schema', 'content'])
@@ -116,8 +127,59 @@ describe('MigrationSnapshotFacade', () => {
 		expect(snapshot.snapshot.modifications.length).toBeGreaterThan(0)
 	})
 
+	test('prepare is read-only until the caller writes the snapshot', async () => {
+		const { facade, snapshotManager } = await setup(migrationsDir)
+
+		await facade.prepare()
+
+		expect(await snapshotManager.exists()).toBe(false)
+	})
+
+	test('non-interactive snapshot refusal does not write and returns an input error', async () => {
+		const { command, snapshotManager } = await setup(migrationsDir)
+		const { output } = createTestOutput({ stdinTty: false })
+
+		const error = await command.run([], output).then(() => null, (reason: unknown) => reason)
+
+		expect(error).toBeInstanceOf(CliError)
+		expect(error instanceof CliError ? error.code : null).toBe('TTY_UNAVAILABLE')
+		expect(error instanceof CliError ? error.exitCode : null).toBe(ExitCode.InputError)
+		expect(await snapshotManager.exists()).toBe(false)
+	})
+
+	test('declining snapshot creation does not write', async () => {
+		const { command, snapshotManager } = await setup(migrationsDir)
+		const { output } = createTestOutput({ stdinTty: true, stderrTty: true })
+		prompts.inject([false])
+
+		const error = await command.run([], output).then(() => null, (reason: unknown) => reason)
+
+		expect(error instanceof CliError ? error.code : null).toBe('OPERATION_ABORTED')
+		expect(await snapshotManager.exists()).toBe(false)
+	})
+
+	test('confirmed snapshot writes once and emits structured JSON with a quiet path', async () => {
+		const jsonSetup = await setup(migrationsDir)
+		const json = createTestOutput()
+		await jsonSetup.command.run(['--yes', '--json'], json.output)
+
+		expect(JSON.parse(json.stdout.text)).toStrictEqual({
+			version: '2024-01-03-120000',
+			coveredMigrations: 3,
+			contentMigrations: ['2024-01-03-120000'],
+			path: 'snapshot.json',
+		})
+		expect(await jsonSetup.snapshotManager.exists()).toBe(true)
+
+		await fs.rm(path.join(migrationsDir, 'snapshot.json'))
+		const quietSetup = await setup(migrationsDir)
+		const quiet = createTestOutput()
+		await quietSetup.command.run(['--yes', '--quiet'], quiet.output)
+		expect(quiet.stdout.text).toBe('snapshot.json\n')
+	})
+
 	test('a freshly created snapshot verifies against a full replay', async () => {
-		await (await freshFacade()).create()
+		await writeSnapshot(await freshFacade())
 		const result = await (await freshFacade()).verify()
 		expect(result.ok).toBe(true)
 	})
@@ -136,7 +198,7 @@ describe('MigrationSnapshotFacade', () => {
 			await write('2024-01-01-120000-a.json', { formatVersion: VERSION_LATEST, modifications: schemaDiffer.diffSchemas(emptySchema, a) })
 			await write('2024-01-02-120000-b.json', { formatVersion: VERSION_LATEST, modifications: schemaDiffer.diffSchemas(a, b) })
 
-			await (await setup(dir)).facade.create()
+			await writeSnapshot((await setup(dir)).facade)
 			const result = await (await setup(dir)).facade.verify()
 			expect(result.ok).toBe(true)
 		} finally {
@@ -145,7 +207,7 @@ describe('MigrationSnapshotFacade', () => {
 	})
 
 	test('verify fails when a covered migration changed after the snapshot', async () => {
-		await (await freshFacade()).create()
+		await writeSnapshot(await freshFacade())
 		// tamper with a covered schema migration, then re-read from a fresh process
 		await fs.writeFile(
 			path.join(migrationsDir, '2024-01-02-120000-b.json'),
@@ -158,12 +220,12 @@ describe('MigrationSnapshotFacade', () => {
 	})
 
 	test('getUsableSnapshot returns the snapshot for an empty project', async () => {
-		await (await freshFacade()).create()
+		await writeSnapshot(await freshFacade())
 		expect(await (await freshFacade()).getUsableSnapshot([])).not.toBeNull()
 	})
 
 	test('getUsableSnapshot returns null when the project already has executed migrations', async () => {
-		await (await freshFacade()).create()
+		await writeSnapshot(await freshFacade())
 		const executed = [{
 			version: '2024-01-01-120000',
 			name: '2024-01-01-120000-a',
@@ -175,13 +237,13 @@ describe('MigrationSnapshotFacade', () => {
 	})
 
 	test('getUsableSnapshot returns null (with a warning) when a covered migration is stale', async () => {
-		await (await freshFacade()).create()
+		await writeSnapshot(await freshFacade())
 		await fs.rm(path.join(migrationsDir, '2024-01-01-120000-a.json'))
 		expect(await (await freshFacade()).getUsableSnapshot([])).toBeNull()
 	})
 
 	test('getUsableSnapshot ignores the snapshot when a migration was added within the covered range', async () => {
-		await (await freshFacade()).create()
+		await writeSnapshot(await freshFacade())
 		// a migration whose version falls between two covered migrations, added without regenerating the
 		// snapshot. Bootstrapping would then fail with MUST_FOLLOW_LATEST, so it must fall back to replay.
 		await fs.writeFile(
@@ -197,7 +259,7 @@ describe('MigrationSnapshotFacade', () => {
 
 	test('verify fails when a covered migration changed type', async () => {
 		const { schemaDiffer } = await setup(migrationsDir)
-		await (await freshFacade()).create()
+		await writeSnapshot(await freshFacade())
 		// the seed migration was recorded as a content cover; rewrite it into a schema migration. Its
 		// modifications are absent from the collapsed snapshot, so it no longer equals a full replay.
 		await fs.writeFile(
@@ -216,7 +278,7 @@ describe('MigrationSnapshotFacade', () => {
 	})
 
 	test('verify fails when schema state mode was toggled after the snapshot', async () => {
-		await (await freshFacade()).create()
+		await writeSnapshot(await freshFacade())
 		// enabling state mode (migrations:init-state) only creates the state/ dir — it leaves the covered
 		// migration files untouched, so without an explicit guard the snapshot would pass unnoticed.
 		await fs.mkdir(path.join(migrationsDir, 'state'), { recursive: true })
@@ -229,7 +291,7 @@ describe('MigrationSnapshotFacade', () => {
 
 	test('buildSnapshotInput maps covered migrations to GraphQL inputs', async () => {
 		const facade = await freshFacade()
-		const snapshot = await facade.create()
+		const snapshot = await writeSnapshot(facade)
 		const input = await facade.buildSnapshotInput(snapshot)
 
 		expect(input.covers).toHaveLength(3)

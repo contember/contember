@@ -399,7 +399,7 @@ test('order by on a many-has-many junction fetch guards the order key against th
 	await execute({
 		schema: m2mSchema,
 		permissions: m2mRootPermissions,
-		allPermissions: m2mAllPermissions,
+		nestedPermissions: m2mAllPermissions,
 		variables: {},
 		query: GQL`
         query {

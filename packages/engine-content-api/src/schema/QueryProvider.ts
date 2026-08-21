@@ -12,6 +12,7 @@ import { PaginatedFieldConfigFactory } from './PaginatedFieldConfigFactory.js'
 export class QueryProvider {
 	constructor(
 		private readonly authorizator: Authorizator,
+		private readonly rootAuthorizator: Authorizator,
 		private readonly whereTypeProvider: WhereTypeProvider,
 		private readonly orderByTypeProvider: OrderByTypeProvider,
 		private readonly entityTypeProvider: EntityTypeProvider,
@@ -19,10 +20,9 @@ export class QueryProvider {
 	) {}
 
 	public getQueries(entity: Model.Entity): { [fieldName: string]: GraphQLFieldConfig<any, Context, any> } {
-		if (this.authorizator.getEntityPermission(Acl.Operation.read, entity.name) === 'no') {
-			return {}
-		}
-		if (this.authorizator.isRootOperationDisallowed(entity.name, Acl.Operation.read)) {
+		// Root entry points are gated on the root grants alone; `through` grants exist to apply only
+		// when the entity is reached over a relation, so they must not open a root query.
+		if (this.rootAuthorizator.getEntityPermission(Acl.Operation.read, entity.name) === 'no') {
 			return {}
 		}
 		return {

@@ -29,7 +29,7 @@ export class OneHasOneOwningCreateInputProcessor implements CreateInputProcessor
 	}
 
 	public async create(context: Context & { input: MapperInput.CreateDataInput }) {
-		const insertResult = await this.mapper.insert(context.targetEntity, context.input)
+		const insertResult = await this.mapper.insert(context.targetEntity, context.input, 'nested')
 		const primary = getInsertPrimary(insertResult)
 		if (!primary) {
 			return insertResult
@@ -48,7 +48,7 @@ export class OneHasOneOwningCreateInputProcessor implements CreateInputProcessor
 			}
 			return []
 		} else {
-			const insertResult = await this.mapper.insert(context.targetEntity, input.create)
+			const insertResult = await this.mapper.insert(context.targetEntity, input.create, 'nested')
 			const primary = getInsertPrimary(insertResult)
 			if (primary) {
 				this.insertBuilder.addFieldValue(context.relation.name, primary)
@@ -75,6 +75,6 @@ export class OneHasOneOwningCreateInputProcessor implements CreateInputProcessor
 		return await this.mapper.updateInternal(entity, currentOwnerUnique, builder => {
 			builder.addPredicates([relation.name])
 			builder.addFieldValue(relation.name, null)
-		})
+		}, 'nested')
 	}
 }

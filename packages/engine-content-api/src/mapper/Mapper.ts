@@ -11,7 +11,7 @@ import {
 	WhereBuilder,
 } from './select/index.js'
 import { Client, Connection, ConstraintHelper, DatabaseMetadata, RequestMemoryBudget, SelectBuilder } from '@contember/database'
-import { PredicatesInjector } from '../acl/index.js'
+import { AclScope, PredicatesInjector } from '../acl/index.js'
 import { JunctionTableManager } from './JunctionTableManager.js'
 import { DeletedEntitiesStorage, DeleteExecutor } from './delete/index.js'
 import { MutationEntryNotFoundError, MutationResultList } from './Result.js'
@@ -190,19 +190,21 @@ export class Mapper<ConnectionType extends Connection.ConnectionLike = Connectio
 	public async insert(
 		entity: Model.Entity,
 		data: MapperInput.CreateDataInput,
+		scope: AclScope,
 		builderCb: (builder: InsertBuilder) => void = () => {},
 	): Promise<MutationResultList> {
 		if (entity.view) {
 			throw new ImplementationException()
 		}
 		await this.setupSystemVariables()
-		return tryMutation(this.schema, this.schemaDatabaseMetadata, () => this.insertInternal(entity, data, builderCb))
+		return tryMutation(this.schema, this.schemaDatabaseMetadata, () => this.insertInternal(entity, data, scope, builderCb))
 	}
 
 	public async update(
 		entity: Model.Entity,
 		by: Input.UniqueWhere | CheckedPrimary,
 		data: MapperInput.UpdateDataInput,
+		scope: AclScope,
 		filter?: Input.OptionalWhere,
 	): Promise<MutationResultList> {
 		if (entity.view) {
@@ -213,7 +215,7 @@ export class Mapper<ConnectionType extends Connection.ConnectionLike = Connectio
 			const [primaryValue, err] = await this.getPrimaryValue(entity, by)
 			if (err) return [err]
 
-			return await this.updater.update(this, entity, primaryValue, data, filter)
+			return await this.updater.update(this, entity, primaryValue, data, scope, filter)
 		})
 	}
 
@@ -221,6 +223,7 @@ export class Mapper<ConnectionType extends Connection.ConnectionLike = Connectio
 		entity: Model.Entity,
 		by: Input.UniqueWhere | CheckedPrimary,
 		builderCb: (builder: UpdateBuilder) => void,
+		scope: AclScope,
 	): Promise<MutationResultList> {
 		if (entity.view) {
 			throw new ImplementationException()
@@ -230,7 +233,7 @@ export class Mapper<ConnectionType extends Connection.ConnectionLike = Connectio
 			const [primaryValue, err] = await this.getPrimaryValue(entity, by)
 			if (err) return [err]
 
-			return await this.updater.updateCb(this, entity, primaryValue, builderCb)
+			return await this.updater.updateCb(this, entity, primaryValue, builderCb, scope)
 		})
 	}
 	public async upsert(
@@ -238,6 +241,7 @@ export class Mapper<ConnectionType extends Connection.ConnectionLike = Connectio
 		by: Input.UniqueWhere | CheckedPrimary,
 		update: MapperInput.UpdateDataInput,
 		create: MapperInput.CreateDataInput,
+		scope: AclScope,
 		filter?: Input.OptionalWhere,
 	): Promise<MutationResultList> {
 		if (entity.view) {
@@ -247,20 +251,33 @@ export class Mapper<ConnectionType extends Connection.ConnectionLike = Connectio
 		return tryMutation(this.schema, this.schemaDatabaseMetadata, async () => {
 			const [primaryValue] = await this.getPrimaryValue(entity, by)
 			if (primaryValue === undefined) {
-				return await this.insertInternal(entity, create)
+				return await this.insertInternal(entity, create, scope)
 			}
-			return await this.updater.update(this, entity, primaryValue, update, filter)
+			return await this.updater.update(this, entity, primaryValue, update, scope, filter)
 		})
 	}
 
-	private insertInternal(entity: Model.Entity, data: MapperInput.CreateDataInput, builderCb: (builder: InsertBuilder) => void = () => {}) {
-		return this.inserter.insert(this, entity, data, id => {
-		}, builderCb)
+	private insertInternal(
+		entity: Model.Entity,
+		data: MapperInput.CreateDataInput,
+		scope: AclScope,
+		builderCb: (builder: InsertBuilder) => void = () => {},
+	) {
+		return this.inserter.insert(
+			this,
+			entity,
+			data,
+			id => {
+			},
+			builderCb,
+			scope,
+		)
 	}
 
 	public async delete(
 		entity: Model.Entity,
 		by: Input.UniqueWhere | CheckedPrimary,
+		scope: AclScope,
 		filter?: Input.OptionalWhere,
 	): Promise<MutationResultList> {
 		if (entity.view) {
@@ -268,7 +285,7 @@ export class Mapper<ConnectionType extends Connection.ConnectionLike = Connectio
 		}
 		await this.setupSystemVariables()
 		return tryMutation(this.schema, this.schemaDatabaseMetadata, () => {
-			return this.deleteExecutor.execute(this, entity, by, filter)
+			return this.deleteExecutor.execute(this, entity, by, scope, filter)
 		})
 	}
 
@@ -277,6 +294,7 @@ export class Mapper<ConnectionType extends Connection.ConnectionLike = Connectio
 		relation: Model.ManyHasManyOwningRelation | Model.ManyHasManyInverseRelation,
 		thisPrimary: Input.PrimaryValue,
 		otherPrimary: Input.PrimaryValue,
+		scope: AclScope,
 	): Promise<MutationResultList> {
 		await this.setupSystemVariables()
 		const err = () => {
@@ -284,10 +302,10 @@ export class Mapper<ConnectionType extends Connection.ConnectionLike = Connectio
 		}
 		return await acceptFieldVisitor(this.schema, entity, relation, {
 			visitManyHasManyOwning: ({ entity, relation }) => {
-				return this.junctionTableManager.connectJunction(this, entity, relation, thisPrimary, otherPrimary)
+				return this.junctionTableManager.connectJunction(this, entity, relation, thisPrimary, otherPrimary, scope)
 			},
 			visitManyHasManyInverse: ({ targetEntity, targetRelation }) => {
-				return this.junctionTableManager.connectJunction(this, targetEntity, targetRelation, otherPrimary, thisPrimary)
+				return this.junctionTableManager.connectJunction(this, targetEntity, targetRelation, otherPrimary, thisPrimary, scope)
 			},
 			visitColumn: err,
 			visitOneHasMany: err,
@@ -302,6 +320,7 @@ export class Mapper<ConnectionType extends Connection.ConnectionLike = Connectio
 		relation: Model.ManyHasManyOwningRelation | Model.ManyHasManyInverseRelation,
 		thisPrimary: Input.PrimaryValue,
 		otherPrimary: Input.PrimaryValue,
+		scope: AclScope,
 	): Promise<MutationResultList> {
 		await this.setupSystemVariables()
 		const err = () => {
@@ -309,10 +328,10 @@ export class Mapper<ConnectionType extends Connection.ConnectionLike = Connectio
 		}
 		return await acceptFieldVisitor(this.schema, entity, relation, {
 			visitManyHasManyOwning: ({ entity, relation }) => {
-				return this.junctionTableManager.disconnectJunction(this, entity, relation, thisPrimary, otherPrimary)
+				return this.junctionTableManager.disconnectJunction(this, entity, relation, thisPrimary, otherPrimary, scope)
 			},
 			visitManyHasManyInverse: ({ targetEntity, targetRelation }) => {
-				return this.junctionTableManager.disconnectJunction(this, targetEntity, targetRelation, otherPrimary, thisPrimary)
+				return this.junctionTableManager.disconnectJunction(this, targetEntity, targetRelation, otherPrimary, thisPrimary, scope)
 			},
 			visitColumn: err,
 			visitOneHasMany: err,

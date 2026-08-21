@@ -15,6 +15,7 @@ import {
 import { UpdateBuilder } from './UpdateBuilder.js'
 import { rowDataToFieldValues } from '../ColumnValue.js'
 import { MapperInput } from '../types.js'
+import { AclScope } from '../../acl/index.js'
 
 export class Updater {
 	constructor(
@@ -27,9 +28,10 @@ export class Updater {
 		entity: Model.Entity,
 		primaryValue: Input.PrimaryValue,
 		data: MapperInput.UpdateDataInput,
+		scope: AclScope,
 		filter?: Input.OptionalWhere,
 	): Promise<MutationResultList> {
-		const updateBuilder = this.updateBuilderFactory.create(entity, primaryValue)
+		const updateBuilder = this.updateBuilderFactory.create(entity, primaryValue, scope)
 
 		const predicateFields = Object.keys(data)
 		updateBuilder.addPredicates(predicateFields)
@@ -110,8 +112,9 @@ export class Updater {
 		entity: Model.Entity,
 		primaryValue: Input.PrimaryValue,
 		builderCb: (builder: UpdateBuilder) => void,
+		scope: AclScope,
 	): Promise<MutationResultList> {
-		const updateBuilder = this.updateBuilderFactory.create(entity, primaryValue)
+		const updateBuilder = this.updateBuilderFactory.create(entity, primaryValue, scope)
 
 		builderCb(updateBuilder)
 

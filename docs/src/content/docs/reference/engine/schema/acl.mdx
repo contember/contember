@@ -186,9 +186,10 @@ Most of the time, you will declare ACL rules directly in your schema using the `
   - If omitted or `false`, the operation is disallowed by this rule (but can still be granted by another rule).
 - **`delete`**: A boolean. If `true`, allows deleting the entire row under the given `when` condition; if omitted or `false`, it does not allow deletion.
 - **`through`**:
-  - If `true`, means that *root-level* access for the operation is **disallowed**, but the operation is still allowed **through relations**.
-  - If you set `through: true`, you are effectively restricting direct queries (like listBook) or direct mutations (e..g updateBook) on the root. However, you can still access this entity if you traverse from a parent entity that *does* allow a root-level operation.
-  - You cannot mix "through" for the same operation in a conflicting way
+  - If `true`, this rule grants the operation **only when the entity is reached over a relation** — never at the root. It does not open a direct query (`listBook`) or a direct mutation (`updateBook`).
+  - `through` rules are **additive**. The permissions in effect under a relation are the root rules *plus* the `through` ones, so the same role, entity and operation can carry both: read `title` anywhere, read `secret` only through a relation.
+  - A root query or mutation is generated only when the **root** rules grant that operation. If every rule for an operation is `through: true`, the corresponding entry point disappears.
+  - Field-level `through` is enforced at execution time, not in the schema: a field granted only via `through` still appears on the entity type (types are shared between root and nested positions), and is denied when you read or write it at the root — the same way a field behind a row-level predicate behaves.
 
 #### Multiple `@c.Allow` Decorators
 
@@ -296,8 +297,9 @@ export class Product {
 ```
 
 - `read` of `id` is allowed at root level.
-- `update` of `name` is **not** allowed at the root query/mutation because `through: true` prevents direct updates.
+- `update` of `name` is **not** allowed at the root query/mutation, because the only rules granting it are `through: true`. No `updateProduct` mutation is generated.
 - If an upstream entity relation to `Product` is allowed to update it, then the user can update `name` **through** that relation—provided the `category` is `isActive: true` or `isActive: false`.
+- Adding a plain `@c.Allow(publicRole, { update: ['name'] })` alongside these would *also* allow the root update; the rules combine rather than conflict.
 
 
 ## `@c.AllowCustomPrimary`

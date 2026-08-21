@@ -2,6 +2,7 @@ import { DeletedEntitiesStorage } from './DeletedEntitiesStorage.js'
 import { Input } from '@contember/schema'
 import { ImplementationException } from '../../exception.js'
 import { MutationResult, MutationResultList } from '../Result.js'
+import { AclScope } from '../../acl/index.js'
 
 export class DeleteState {
 	private plannedDelete = new DeletedEntitiesStorage()
@@ -14,6 +15,12 @@ export class DeleteState {
 
 	constructor(
 		private alreadyDeleted: DeletedEntitiesStorage,
+		/**
+		 * Scope of the delete that started this cascade. Cascades and orphan removals inherit it
+		 * rather than escalating - a root delete stays evaluated against the root grants all the way
+		 * down, the same way it behaved before the scope existed.
+		 */
+		public readonly scope: AclScope,
 	) {
 	}
 

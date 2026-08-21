@@ -69,11 +69,11 @@ const allPermissions: Acl.Permissions = {
 	},
 }
 
-test('_meta.readable follows the through (all) permission set through a relation, updatable stays root-only', async () => {
+test('_meta.readable and _meta.updatable follow the nested permission set through a relation', async () => {
 	await execute({
 		schema,
 		permissions,
-		allPermissions,
+		nestedPermissions: allPermissions,
 		query: GQL`
 			query {
 				listPost {
@@ -123,8 +123,8 @@ test('_meta.readable follows the through (all) permission set through a relation
 							{
 								id: testUuid(3),
 								title: 'foo',
-								// readable must match the actual (unmasked) value, which uses the through set.
-								_meta: { title: { readable: true, updatable: false } },
+								// readable must match the actual (unmasked) value; updatable matches a nested update, both use the nested set.
+								_meta: { title: { readable: true, updatable: true } },
 							},
 						],
 					},
@@ -133,7 +133,7 @@ test('_meta.readable follows the through (all) permission set through a relation
 							{
 								id: testUuid(4),
 								title: 'bar',
-								_meta: { title: { readable: true, updatable: false } },
+								_meta: { title: { readable: true, updatable: true } },
 							},
 						],
 					},
@@ -175,11 +175,11 @@ const predicateAllPermissions: Acl.Permissions = {
 	},
 }
 
-test('_meta.readable compiles a through-only cell predicate against the all permission set', async () => {
+test('_meta.readable compiles a through-only cell predicate against the nested permission set', async () => {
 	await execute({
 		schema,
 		permissions: predicatePermissions,
-		allPermissions: predicateAllPermissions,
+		nestedPermissions: predicateAllPermissions,
 		query: GQL`
 			query {
 				listPost {
@@ -232,9 +232,8 @@ test('_meta.readable compiles a through-only cell predicate against the all perm
 	})
 })
 
-// `updatable` reads the predicate NAME from the root set. Merging roles renames predicates and drops `noRoot`
-// ones, so the root name need not exist in `all` at all — here `rootUpdatable` does not. Resolving it against
-// `all` (which the query path implies for a nested entity) threw `Undefined predicate`, i.e. a hard 500.
+// Root and nested sets carry different update predicates. A nested `_meta.updatable` must take both the predicate
+// NAME and its definition from the nested set - a nested update is enforced against that set too.
 const divergentPermissions: Acl.Permissions = {
 	Post: permissions.Post,
 	PostLocale: {
@@ -257,11 +256,11 @@ const divergentAllPermissions: Acl.Permissions = {
 	},
 }
 
-test('nested _meta.updatable resolves the root predicate name against the root permission set', async () => {
+test('nested _meta.updatable resolves its predicate against the nested permission set', async () => {
 	await execute({
 		schema,
 		permissions: divergentPermissions,
-		allPermissions: divergentAllPermissions,
+		nestedPermissions: divergentAllPermissions,
 		query: GQL`
 			query {
 				listPost {
@@ -288,18 +287,18 @@ test('nested _meta.updatable resolves the root predicate name against the root p
 				},
 			},
 			{
-				// the ROOT definition (`visible = true`), not the through one (`visible = false`)
+				// the nested definition (`visible = false`), not the root one (`visible = true`)
 				sql: SQL`
 					select "root_"."post_id" as "__grouping_key",
 					       "root_"."id" as "root_id",
-					       "root_"."visible" = ? as "root___predicate_rootUpdatable__rootPerms"
+					       "root_"."visible" = ? as "root___predicate_throughUpdatable"
 					from "public"."post_locale" as "root_" where "root_"."post_id" in (?, ?)
 				`,
-				parameters: [true, testUuid(1), testUuid(2)],
+				parameters: [false, testUuid(1), testUuid(2)],
 				response: {
 					rows: [
-						{ __grouping_key: testUuid(1), root_id: testUuid(3), root___predicate_rootUpdatable__rootPerms: true },
-						{ __grouping_key: testUuid(2), root_id: testUuid(4), root___predicate_rootUpdatable__rootPerms: false },
+						{ __grouping_key: testUuid(1), root_id: testUuid(3), root___predicate_throughUpdatable: true },
+						{ __grouping_key: testUuid(2), root_id: testUuid(4), root___predicate_throughUpdatable: false },
 					],
 				},
 			},

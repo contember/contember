@@ -584,12 +584,13 @@ test('no root - valid', () => {
 	const schema = createSchema(NoRoot)
 	expect(schema.acl.roles.public.entities.Book).toStrictEqual({
 		operations: {
-			noRoot: [Acl.Operation.update],
 			read: {
 				id: true,
 			},
-			update: {
-				id: 'or_foo_eq_1_foo_eq_2',
+			through: {
+				update: {
+					id: 'or_foo_eq_1_foo_eq_2',
+				},
 			},
 		},
 		predicates: {
@@ -611,7 +612,7 @@ test('no root - valid', () => {
 	})
 })
 
-namespace NoRootInvalid {
+namespace RootAndThroughCombined {
 	export const publicRole = c.createRole('public')
 
 	@c.Allow(publicRole, {
@@ -629,8 +630,34 @@ namespace NoRootInvalid {
 	}
 }
 
-test('no root - invalid combo', () => {
-	expect(() => createSchema(NoRootInvalid)).toThrow('Operation update cannot be both allowed and disallowed on root on entity Book')
+// Used to throw: "Operation update cannot be both allowed and disallowed on root". Each grant now
+// lands in its own bucket, so the two compose instead of conflicting.
+test('root and through grants on the same operation', () => {
+	const schema = createSchema(RootAndThroughCombined)
+	expect(schema.acl.roles.public.entities.Book).toStrictEqual({
+		operations: {
+			update: {
+				id: 'foo_eq_1',
+			},
+			through: {
+				update: {
+					id: 'foo_eq_2',
+				},
+			},
+		},
+		predicates: {
+			foo_eq_1: {
+				foo: {
+					eq: 1,
+				},
+			},
+			foo_eq_2: {
+				foo: {
+					eq: 2,
+				},
+			},
+		},
+	})
 })
 
 namespace AllowFactoryModel {

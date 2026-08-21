@@ -24,14 +24,11 @@ export type SelectExecutionHandlerContext<
 		entity: Model.Entity
 		relationPath: Model.AnyRelationContext[]
 		/**
-		 * Compiles a predicate REFERENCE into a per-row boolean (and selects the backing column).
-		 *
-		 * The reference is resolved against the permission set the query path implies — the through-inclusive
-		 * `all` set for anything nested. Pass `rootOnly` when the name was taken from the root set instead:
-		 * merging roles renames predicates (`__merge__a__b`) and drops `noRoot` ones, so resolving a root name
-		 * against `all` either throws `Undefined predicate` or silently picks a different definition.
+		 * Compiles a predicate REFERENCE into a per-row boolean (and selects the backing column). The reference
+		 * must come from the permission set the query path implies (see `aclScopeFromPath`), since that is the
+		 * set its definition is resolved against.
 		 */
-		addPredicate: (predicate: Acl.Predicate, options?: { rootOnly?: boolean }) => (row: SelectRow) => boolean
+		addPredicate: (predicate: Acl.Predicate) => (row: SelectRow) => boolean
 		addColumn: (args: {
 			predicate?: Acl.Predicate
 			query?: (qb: SelectBuilder<SelectBuilder.Result>) => SelectBuilder<SelectBuilder.Result>

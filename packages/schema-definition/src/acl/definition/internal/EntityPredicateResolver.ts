@@ -62,8 +62,18 @@ export class EntityPredicatesResolver {
 		return new EntityPredicatesResolver(aclDefinitions, predicates, predicateNamesMap, generatedNames)
 	}
 
-	createFieldPredicate(op: 'create' | 'update' | 'read' | 'delete', field: string, isPrimary: boolean): true | undefined | string {
-		const fieldWhens = EntityPredicatesResolver.getMatchingWhens(this.aclDefinitions, op, field, isPrimary)
+	/**
+	 * `definitions` narrows the grants considered - `AclFactory` passes the root and the `through`
+	 * partition separately so each ends up in its own bucket, while the predicate map and the
+	 * used-predicate accounting stay shared across both.
+	 */
+	createFieldPredicate(
+		op: 'create' | 'update' | 'read' | 'delete',
+		field: string,
+		isPrimary: boolean,
+		definitions: AllowDefinition<any>[] = this.aclDefinitions,
+	): true | undefined | string {
+		const fieldWhens = EntityPredicatesResolver.getMatchingWhens(definitions, op, field, isPrimary)
 		if (fieldWhens.length === 0) {
 			return undefined
 		}

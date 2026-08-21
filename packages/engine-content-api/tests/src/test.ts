@@ -17,7 +17,8 @@ export interface Test {
 	settings?: Settings.Schema
 	validation?: Validation.Schema
 	permissions?: Acl.Permissions
-	allPermissions?: Acl.Permissions
+	/** Permission set effective under a relation (root grants plus `through` ones). Defaults to `permissions`. */
+	nestedPermissions?: Acl.Permissions
 	variables?: Acl.VariablesMap
 	query: string
 	queryVariables?: Record<string, any>
@@ -78,10 +79,11 @@ export const failedTransaction = (executes: SqlQuery[]): SqlQuery[] => {
 
 export const execute = async (test: Test) => {
 	const permissions: Acl.Permissions = test.permissions || new AllowAllPermissionFactory().create(test.schema)
-	// Mirror production (GraphQlSchemaFactory): the GraphQL schema is built from the through-inclusive `all` set,
-	// so fields granted only through a relation are still exposed.
-	const authorizator = new Authorizator(test.allPermissions ?? permissions, false, false)
-	const builder = new GraphQlSchemaBuilderFactory().create(test.schema, authorizator)
+	// Mirror production (GraphQlSchemaFactory): types are shaped by the nested set, root fields by the root set.
+	const nestedPermissions: Acl.Permissions = test.nestedPermissions ?? permissions
+	const authorizator = new Authorizator(nestedPermissions, false, false)
+	const rootAuthorizator = new Authorizator(permissions, false, false)
+	const builder = new GraphQlSchemaBuilderFactory().create(test.schema, authorizator, rootAuthorizator)
 	const graphQLSchema = builder.build()
 
 	const connection = createConnectionMock(test.executes)
@@ -107,7 +109,7 @@ export const execute = async (test: Test) => {
 			executionContainer: executionContainerFactory
 				.create({
 					permissions,
-					allPermissions: test.allPermissions,
+					allPermissions: nestedPermissions,
 					schema,
 					schemaMeta: {
 						id: 1,

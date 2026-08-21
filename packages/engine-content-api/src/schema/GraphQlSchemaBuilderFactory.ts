@@ -32,14 +32,21 @@ import { ConnectOrCreateRelationInputProvider } from './mutations/ConnectOrCreat
 import { RefreshViewMutationProvider } from './RefreshViewMutationProvider.js'
 
 export class GraphQlSchemaBuilderFactory {
-	public create(schema: Model.Schema, authorizator: Authorizator): GraphQlSchemaBuilder {
-		return this.createContainerBuilder(schema, authorizator).build().graphQlSchemaBuilder
+	/**
+	 * `authorizator` shapes the types - it must carry the nested permission set, so a field granted
+	 * only via `through` still exists on the shared type. `rootAuthorizator` gates the root query and
+	 * mutation fields and therefore must carry the root grants only. Callers with a single flat
+	 * permission set can omit it.
+	 */
+	public create(schema: Model.Schema, authorizator: Authorizator, rootAuthorizator?: Authorizator): GraphQlSchemaBuilder {
+		return this.createContainerBuilder(schema, authorizator, rootAuthorizator).build().graphQlSchemaBuilder
 	}
 
-	public createContainerBuilder(schema: Model.Schema, authorizator: Authorizator) {
+	public createContainerBuilder(schema: Model.Schema, authorizator: Authorizator, rootAuthorizator: Authorizator = authorizator) {
 		return new Builder({})
 			.addService('schema', () => schema)
 			.addService('authorizator', () => authorizator)
+			.addService('rootAuthorizator', () => rootAuthorizator)
 			.addService('customTypesProvider', ({}) => new CustomTypesProvider())
 			.addService('enumsProvider', ({ schema }) => new EnumsProvider(schema))
 			.addService(
@@ -79,8 +86,8 @@ export class GraphQlSchemaBuilderFactory {
 			)
 			.addService(
 				'queryProvider',
-				({ authorizator, whereTypeProvider, orderByTypeProvider, entityTypeProvider, paginatedFieldConfigFactory }) =>
-					new QueryProvider(authorizator, whereTypeProvider, orderByTypeProvider, entityTypeProvider, paginatedFieldConfigFactory),
+				({ authorizator, rootAuthorizator, whereTypeProvider, orderByTypeProvider, entityTypeProvider, paginatedFieldConfigFactory }) =>
+					new QueryProvider(authorizator, rootAuthorizator, whereTypeProvider, orderByTypeProvider, entityTypeProvider, paginatedFieldConfigFactory),
 			)
 			.addService('createEntityInputProviderAccessor', ({}) => new Accessor<EntityInputProvider<EntityInputType.create>>())
 			.addService('createEntityRelationAllowedOperationsVisitor', ({ authorizator }) => new CreateEntityRelationAllowedOperationsVisitor(authorizator))
@@ -160,9 +167,18 @@ export class GraphQlSchemaBuilderFactory {
 			.addService('resultSchemaTypeProvider', ({}) => new ResultSchemaTypeProvider())
 			.addService(
 				'mutationProvider',
-				({ authorizator, whereTypeProvider, entityTypeProvider, createEntityInputProvider, updateEntityInputProvider, resultSchemaTypeProvider }) =>
+				({
+					authorizator,
+					rootAuthorizator,
+					whereTypeProvider,
+					entityTypeProvider,
+					createEntityInputProvider,
+					updateEntityInputProvider,
+					resultSchemaTypeProvider,
+				}) =>
 					new MutationProvider(
 						authorizator,
+						rootAuthorizator,
 						whereTypeProvider,
 						entityTypeProvider,
 						createEntityInputProvider,

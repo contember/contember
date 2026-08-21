@@ -69,7 +69,8 @@ export class ProjectPrintSchemaCommand extends Command<Args, Options> {
 		const permissionFactory = new PermissionFactory()
 		const inputRoles = input.getOption('role')
 		const schemaNormalized = input.getOption('normalize') ? normalizeSchema(filteredSchema) : filteredSchema
-		const permissions = permissionFactory.create(schemaNormalized, inputRoles || ['admin'])
+		// Introspection renders types, so it needs the nested set - the same one the engine builds them from.
+		const { all: permissions } = permissionFactory.createContextual(schemaNormalized, inputRoles || ['admin'])
 		const schemaBuilderFactory = new GraphQlSchemaBuilderFactory()
 		const authorizator = new Authorizator(
 			permissions,

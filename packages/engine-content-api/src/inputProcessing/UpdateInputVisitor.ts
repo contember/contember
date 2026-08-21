@@ -113,7 +113,7 @@ export class UpdateInputVisitor<Result> implements Model.ColumnVisitor<Promise<R
 		}
 		// GraphQL coerces a single object into a single-element list, so a bare `{ set: ... }` arrives here as `[{ set: ... }]`.
 		const elements = Array.isArray(input) ? input : [input]
-		const hasSet = elements.some(it => it && 'set' in it && (it as MapperInput.SetManyRelationInput).set !== undefined)
+		const hasSet = elements.some(it => it && (it as MapperInput.SetManyRelationInput).set != null)
 		if (hasSet) {
 			if (elements.length !== 1) {
 				throw new UserError('A "set" operation must be the only item of a has-many relation input.')
@@ -185,20 +185,26 @@ export class UpdateInputVisitor<Result> implements Model.ColumnVisitor<Promise<R
 				`Invalid orphanStrategy "${orphanStrategy}". Expected one of: ${Object.values(Input.OrphanRemovalStrategy).join(', ')}.`,
 			)
 		}
-		for (const item of input.set) {
+		// Strip null-valued keys before dispatching, exactly as the per-item path does: nullable
+		// GraphQL variables are the reason `filterObject` exists, and both the pre-validator and
+		// the mapper dispatch on key presence, so a `null` operation key would pick its branch.
+		const items = input.set.map(it => filterObject(it, (k, v) => v !== null && v !== undefined))
+		for (const item of items) {
 			this.verifySetItemOperations(item)
 		}
 		return [
 			await processor.set({
 				...context,
-				input: { items: input.set, orphanStrategy },
+				input: { items, orphanStrategy },
 			}),
 		]
 	}
 
 	private verifyOperations(input: object) {
 		const keys = Object.keys(input).filter(it => it !== 'alias')
-		const ops = Object.values(Input.UpdateRelationOperation) as string[]
+		// `set` lives in the same enum but is not a per-item operation - accepting it here would
+		// fall through to an ImplementationException (a 500) instead of a UserError.
+		const ops = (Object.values(Input.UpdateRelationOperation) as string[]).filter(it => it !== Input.UpdateRelationOperation.set)
 		if (keys.length !== 1 || !ops.includes(keys[0])) {
 			const found = keys.length === 0 ? 'none' : keys.join(', ')
 			throw new UserError(

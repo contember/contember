@@ -24,6 +24,11 @@ test('set with default orphanStrategy (disconnect) - junction', async () => {
 					response: { rows: [{ id: testUuid(2) }] },
 				},
 				{
+					sql: SQL`select "junction_"."category_id" as "primary_" from "public"."post_categories" as "junction_" where "junction_"."post_id" = ?`,
+					parameters: [testUuid(2)],
+					response: { rows: [{ primary_: testUuid(1) }, { primary_: testUuid(3) }] },
+				},
+				{
 					sql: SQL`select "root_"."id" from "public"."category" as "root_" where "root_"."id" = ?`,
 					parameters: [testUuid(1)],
 					response: { rows: [{ id: testUuid(1) }] },
@@ -32,11 +37,6 @@ test('set with default orphanStrategy (disconnect) - junction', async () => {
 					sql: SQL`insert into  "public"."post_categories" ("post_id", "category_id") values  (?, ?) on conflict  do nothing`,
 					parameters: [testUuid(2), testUuid(1)],
 					response: { rowCount: 1 },
-				},
-				{
-					sql: SQL`select "junction_"."category_id" as "primary_" from "public"."post_categories" as "junction_" where "junction_"."post_id" = ?`,
-					parameters: [testUuid(2)],
-					response: { rows: [{ primary_: testUuid(1) }, { primary_: testUuid(3) }] },
 				},
 				// orphan (id=3) is disconnected from the junction
 				{
@@ -81,6 +81,11 @@ test('set with orphanStrategy delete - junction', async () => {
 					response: { rows: [{ id: testUuid(2) }] },
 				},
 				{
+					sql: SQL`select "junction_"."category_id" as "primary_" from "public"."post_categories" as "junction_" where "junction_"."post_id" = ?`,
+					parameters: [testUuid(2)],
+					response: { rows: [{ primary_: testUuid(1) }, { primary_: testUuid(3) }] },
+				},
+				{
 					sql: SQL`select "root_"."id" from "public"."category" as "root_" where "root_"."id" = ?`,
 					parameters: [testUuid(1)],
 					response: { rows: [{ id: testUuid(1) }] },
@@ -89,11 +94,6 @@ test('set with orphanStrategy delete - junction', async () => {
 					sql: SQL`insert into  "public"."post_categories" ("post_id", "category_id") values  (?, ?) on conflict  do nothing`,
 					parameters: [testUuid(2), testUuid(1)],
 					response: { rowCount: 1 },
-				},
-				{
-					sql: SQL`select "junction_"."category_id" as "primary_" from "public"."post_categories" as "junction_" where "junction_"."post_id" = ?`,
-					parameters: [testUuid(2)],
-					response: { rows: [{ primary_: testUuid(1) }, { primary_: testUuid(3) }] },
 				},
 				// orphan (id=3) is deleted
 				{
@@ -201,6 +201,12 @@ test('set with a connectOrCreate item (existing target) - junction', async () =>
 					parameters: [testUuid(2)],
 					response: { rows: [{ id: testUuid(2) }] },
 				},
+				// snapshot the members up front - orphans are members from *before* the operation
+				{
+					sql: SQL`select "junction_"."category_id" as "primary_" from "public"."post_categories" as "junction_" where "junction_"."post_id" = ?`,
+					parameters: [testUuid(2)],
+					response: { rows: [{ primary_: testUuid(1) }, { primary_: testUuid(3) }] },
+				},
 				// the set helper resolves the connectOrCreate target up-front to mark it desired
 				{
 					sql: SQL`select "root_"."id" from "public"."category" as "root_" where "root_"."id" = ?`,
@@ -217,12 +223,6 @@ test('set with a connectOrCreate item (existing target) - junction', async () =>
 					sql: SQL`insert into  "public"."post_categories" ("post_id", "category_id") values  (?, ?) on conflict  do nothing`,
 					parameters: [testUuid(2), testUuid(1)],
 					response: { rowCount: 1 },
-				},
-				// current members - the connected one plus an orphan (id=3)
-				{
-					sql: SQL`select "junction_"."category_id" as "primary_" from "public"."post_categories" as "junction_" where "junction_"."post_id" = ?`,
-					parameters: [testUuid(2)],
-					response: { rows: [{ primary_: testUuid(1) }, { primary_: testUuid(3) }] },
 				},
 				{
 					sql: SQL`select "root_"."id" from "public"."category" as "root_" where "root_"."id" = ?`,
@@ -300,6 +300,16 @@ test('set applies the target read predicate when computing orphans - junction', 
 					parameters: [testUuid(2)],
 					response: { rows: [{ id: testUuid(2) }] },
 				},
+				// snapshot the members up front - orphans are members from *before* the operation
+				// snapshot the members up front - orphans are members from *before* the operation
+				// snapshot the members up front - orphans are members from *before* the operation
+				{
+					sql: SQL`select "junction_"."category_id" as "primary_" from "public"."post_categories" as "junction_"
+						inner join "public"."category" as "root_" on "junction_"."category_id" = "root_"."id"
+						where "junction_"."post_id" = ? and "root_"."name" = ?`,
+					parameters: [testUuid(2), 'visible'],
+					response: { rows: [{ primary_: testUuid(1) }, { primary_: testUuid(3) }] },
+				},
 				// resolving the connect target applies Category's read predicate
 				{
 					sql: SQL`select "root_"."id" from "public"."category" as "root_" where "root_"."id" = ? and "root_"."name" = ?`,
@@ -310,16 +320,6 @@ test('set applies the target read predicate when computing orphans - junction', 
 					sql: SQL`insert into  "public"."post_categories" ("post_id", "category_id") values  (?, ?) on conflict  do nothing`,
 					parameters: [testUuid(2), testUuid(1)],
 					response: { rowCount: 1 },
-				},
-				// orphan-candidate fetch joins the target entity and applies its read predicate, so members
-				// the role cannot read are excluded from the diff. Unreadable current members are simply
-				// absent from this result and are therefore left untouched.
-				{
-					sql: SQL`select "junction_"."category_id" as "primary_" from "public"."post_categories" as "junction_"
-						inner join "public"."category" as "root_" on "junction_"."category_id" = "root_"."id"
-						where "junction_"."post_id" = ? and "root_"."name" = ?`,
-					parameters: [testUuid(2), 'visible'],
-					response: { rows: [{ primary_: testUuid(1) }, { primary_: testUuid(3) }] },
 				},
 				// the readable omitted member (id=3) is disconnected from the junction
 				{
@@ -364,6 +364,11 @@ test('set with orphanStrategy delete is rejected when delete is ACL-denied - jun
 					response: { rows: [{ id: testUuid(2) }] },
 				},
 				{
+					sql: SQL`select "junction_"."category_id" as "primary_" from "public"."post_categories" as "junction_" where "junction_"."post_id" = ?`,
+					parameters: [testUuid(2)],
+					response: { rows: [{ primary_: testUuid(1) }, { primary_: testUuid(3) }] },
+				},
+				{
 					sql: SQL`select "root_"."id" from "public"."category" as "root_" where "root_"."id" = ?`,
 					parameters: [testUuid(1)],
 					response: { rows: [{ id: testUuid(1) }] },
@@ -372,11 +377,6 @@ test('set with orphanStrategy delete is rejected when delete is ACL-denied - jun
 					sql: SQL`insert into  "public"."post_categories" ("post_id", "category_id") values  (?, ?) on conflict  do nothing`,
 					parameters: [testUuid(2), testUuid(1)],
 					response: { rowCount: 1 },
-				},
-				{
-					sql: SQL`select "junction_"."category_id" as "primary_" from "public"."post_categories" as "junction_" where "junction_"."post_id" = ?`,
-					parameters: [testUuid(2)],
-					response: { rows: [{ primary_: testUuid(1) }, { primary_: testUuid(3) }] },
 				},
 				// orphan (id=3): delete is attempted, but the ACL predicate denies it
 				{
@@ -395,6 +395,88 @@ test('set with orphanStrategy delete is rejected when delete is ACL-denied - jun
 			data: {
 				updatePost: {
 					ok: false,
+				},
+			},
+		},
+	})
+})
+
+// The manyHasMany connectOrCreate processor returns junction results only, so the created primary
+// cannot be recovered from the step result. The pre-operation snapshot is what keeps the freshly
+// created record out of the orphan set.
+test('set with a connectOrCreate item that creates - junction', async () => {
+	await execute({
+		schema: postWithCategories,
+		query: GQL`mutation {
+        updatePost(
+            by: {id: "${testUuid(2)}"},
+            data: {categories: {orphanStrategy: delete, set: [{connectOrCreate: {connect: {id: "${testUuid(10)}"}, create: {name: "Ipsum"}}}]}}
+          ) {
+          ok
+        }
+      }`,
+		executes: [
+			...sqlTransaction([
+				{
+					sql: SQL`select "root_"."id" from "public"."post" as "root_" where "root_"."id" = ?`,
+					parameters: [testUuid(2)],
+					response: { rows: [{ id: testUuid(2) }] },
+				},
+				// snapshot the members up front - orphans are members from *before* the operation
+				{
+					sql: SQL`select "junction_"."category_id" as "primary_" from "public"."post_categories" as "junction_" where "junction_"."post_id" = ?`,
+					parameters: [testUuid(2)],
+					response: { rows: [{ primary_: testUuid(3) }] },
+				},
+				// the set helper resolves the connectOrCreate target up-front - it does not exist
+				{
+					sql: SQL`select "root_"."id" from "public"."category" as "root_" where "root_"."id" = ?`,
+					parameters: [testUuid(10)],
+					response: { rows: [] },
+				},
+				// connectOrCreate processor resolves the target again and creates it
+				{
+					sql: SQL`select "root_"."id" from "public"."category" as "root_" where "root_"."id" = ?`,
+					parameters: [testUuid(10)],
+					response: { rows: [] },
+				},
+				{
+					sql: SQL`with "root_" as
+							(select ? :: uuid as "id", ? :: text as "name")
+							insert into "public"."category" ("id", "name")
+							select "root_"."id", "root_"."name"
+              from "root_"
+							returning "id"`,
+					parameters: [testUuid(1), 'Ipsum'],
+					response: { rows: [{ id: testUuid(1) }] },
+				},
+				{
+					sql: SQL`insert into  "public"."post_categories" ("post_id", "category_id") values  (?, ?) on conflict  do nothing`,
+					parameters: [testUuid(2), testUuid(1)],
+					response: { rowCount: 1 },
+				},
+				// only the pre-existing member (id=3) is deleted; the created category is never orphaned
+				{
+					sql: SQL`select "root_"."id" from "public"."category" as "root_" where "root_"."id" = ?`,
+					parameters: [testUuid(3)],
+					response: { rows: [{ id: testUuid(3) }] },
+				},
+				{
+					sql: SQL`select "root_"."id" as "id", true as "allowed" from "public"."category" as "root_" where "root_"."id" = ?`,
+					parameters: [testUuid(3)],
+					response: { rows: [{ id: testUuid(3), allowed: true }] },
+				},
+				{
+					sql: SQL`delete from "public"."category" where "id" in (?)`,
+					parameters: [testUuid(3)],
+					response: { rows: [{ id: testUuid(3) }] },
+				},
+			]),
+		],
+		return: {
+			data: {
+				updatePost: {
+					ok: true,
 				},
 			},
 		},

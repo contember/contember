@@ -95,10 +95,9 @@ ${chalk.bold('API & Backend')}
 
 ${chalk.bold('Development Tools')}
 - PostgreSQL database     ${chalk.blue('http://localhost:1482')}    ${chalk.grey('credentials: contember / contember')}
-- Minio S3 storage        ${chalk.blue('http://localhost:1483')}
+- S3 object storage       ${chalk.blue('http://localhost:1483')}    ${chalk.grey('credentials: contember / contember')}
 - Mailpit SMTP testing    ${chalk.blue('http://localhost:1484')}
 - Adminer DB manager      ${chalk.blue('http://localhost:1485')}
-- Minio Dashboard         ${chalk.blue('http://localhost:1486')}    ${chalk.grey('credentials: contember / contember')}
 
 ${chalk.bold('Need help?')} Ask the community: https://github.com/orgs/contember/discussions
 `

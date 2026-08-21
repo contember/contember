@@ -1,0 +1,13 @@
+{
+	"identities": [
+		{
+			"name": "anonymous",
+			"actions": ["Read:contember"]
+		},
+		{
+			"name": "contember",
+			"credentials": [{ "accessKey": "contember", "secretKey": "contember" }],
+			"actions": ["Admin", "Read", "Write", "List", "Tagging"]
+		}
+	]
+}

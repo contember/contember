@@ -2,6 +2,7 @@ import * as Typesafe from '@contember/typesafe'
 
 export enum S3Providers {
 	aws = 'aws',
+	// Path-style addressing with no object ACL — the right value for any MinIO-compatible server, SeaweedFS included.
 	minio = 'minio',
 	ceph = 'ceph',
 	localstack = 'localstack',

@@ -131,15 +131,20 @@ export class UpdateInputPreValidationProcessor implements UpdateInputProcessor<R
 		input: UpdateInputProcessor.SetManyInput
 	}) {
 		const results: Result[] = []
-		for (const item of context.input.items) {
+		// index/alias have to travel with each item, otherwise every item's validation errors
+		// collapse onto the same path and a client cannot tell which one failed.
+		for (const [index, item] of context.input.items.entries()) {
+			const position = { index, alias: item.alias }
 			if ('create' in item) {
-				results.push(...(await this.processCreate({ ...context, input: item.create })))
+				results.push(...(await this.processCreate({ ...context, ...position, input: item.create })))
 			} else if ('connectOrCreate' in item) {
-				results.push(...(await this.processCreate({ ...context, input: item.connectOrCreate.create })))
+				results.push(...(await this.processCreate({ ...context, ...position, input: item.connectOrCreate.create })))
 			} else if ('update' in item) {
-				results.push(...(await this.processUpdate({ ...context, input: item.update.data })))
+				results.push(...(await this.processUpdate({ ...context, ...position, input: item.update.data })))
 			} else if ('upsert' in item) {
-				results.push(...(await this.processUpsert({ ...context, input: { update: item.upsert.update, create: item.upsert.create } })))
+				results.push(
+					...(await this.processUpsert({ ...context, ...position, input: { update: item.upsert.update, create: item.upsert.create } })),
+				)
 			}
 		}
 		return results

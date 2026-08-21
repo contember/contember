@@ -58,6 +58,13 @@ export const executeGraphql = (
 		latestError = e
 	})
 	result.on('response', e => {
+		// The tests assert on `body.data`, which the API leaves null once a request errors out. Reporting just that
+		// null names nothing, so put whatever came back in the log — otherwise a failure here, and an intermittent
+		// one especially, carries no way to tell what went wrong.
+		const errors = e.body?.errors
+		if (Array.isArray(errors) && errors.length > 0) {
+			console.error(`GraphQL errors from POST ${path}: ${JSON.stringify(errors)}`)
+		}
 		if (!options.keepExtensions && 'extensions' in e.body) {
 			const { extensions, ...rest } = e.body
 			e.body = rest

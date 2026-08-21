@@ -149,6 +149,16 @@ mutation {
 per-item operations in the same list. It is currently supported on "has many" relations only.
 :::
 
+`set` has to read the current members to tell which of them became orphans, so it is only present
+in the schema for roles that can read the target entity. Likewise `orphanStrategy` only appears
+when the role is allowed to delete the target entity.
+
+:::caution
+On a *one has many* relation whose owning side is not nullable, an orphan cannot be disconnected -
+there is nowhere to put the null. Use `orphanStrategy: delete` for such relations; the default
+`disconnect` fails with a not-null constraint violation.
+:::
+
 ## Transactions
 
 Each mutation (with its nested mutations) is wrapped into individual transaction, meaning that for query:

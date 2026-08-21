@@ -162,7 +162,13 @@ export class UpdateEntityRelationInputFieldVisitor
 			[Input.UpdateRelationOperation.update]: updateSpecifiedInput,
 			[Input.UpdateRelationOperation.upsert]: upsertInput,
 		})
-		const setField = Object.keys(setItemFields).length > 0
+		// Orphans are computed by diffing the current members against the input, and that diff is taken
+		// through the target's read predicate. A role that cannot read the target sees an empty
+		// collection, so `set` could only ever add - it is not offered at all. This is about reading,
+		// not about `disconnect`: `orphanStrategy: delete` is just as unusable without it.
+		const canReadTarget = this.authorizator.getEntityPermission(Acl.Operation.read, targetEntity.name) !== 'no'
+		const canDeleteOrphans = this.getAllowedOperations(entity, relation).includes(Input.UpdateRelationOperation.delete)
+		const setField = canReadTarget && Object.keys(setItemFields).length > 0
 			? {
 				type: new GraphQLList(
 					new GraphQLNonNull(
@@ -182,10 +188,25 @@ export class UpdateEntityRelationInputFieldVisitor
 			name: GqlTypeName`${entity.name}Update${relation.name}EntityRelationInput`,
 			fields: () => ({
 				...filteredFields,
-				...(setField ? { [Input.UpdateRelationOperation.set]: setField, orphanStrategy: { type: orphanRemovalStrategyEnum } } : {}),
+				...(setField
+					? {
+						[Input.UpdateRelationOperation.set]: setField,
+						// Only exposed when the role may delete the target - `disconnect` is the default anyway.
+						...(canDeleteOrphans ? { orphanStrategy: { type: orphanRemovalStrategyEnum } } : {}),
+					}
+					: {}),
 				alias: { type: GraphQLString },
 			}),
 		})
+	}
+
+	private getAllowedOperations(entity: Model.Entity, relation: Model.Relation): Input.UpdateRelationOperation[] {
+		return acceptFieldVisitor(
+			this.schema,
+			entity,
+			relation.name,
+			this.updateEntityRelationAllowedOperationsVisitor,
+		)
 	}
 
 	private filterAllowedOperations(
@@ -193,12 +214,7 @@ export class UpdateEntityRelationInputFieldVisitor
 		relation: Model.Relation,
 		graphQlFields: { [key: string]: GraphQLInputFieldConfig | undefined },
 	): GraphQLInputFieldConfigMap {
-		const allowedOperations = acceptFieldVisitor(
-			this.schema,
-			entity,
-			relation.name,
-			this.updateEntityRelationAllowedOperationsVisitor,
-		)
+		const allowedOperations = this.getAllowedOperations(entity, relation)
 		return filterObject(
 			graphQlFields,
 			(key, value): value is GraphQLInputFieldConfig => allowedOperations.includes(key as Input.UpdateRelationOperation) && value !== undefined,

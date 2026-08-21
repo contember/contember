@@ -172,11 +172,11 @@ export class UpdateInputVisitor<Result> implements Model.ColumnVisitor<Promise<R
 		input: MapperInput.SetManyRelationInput,
 	): Promise<Result[]> {
 		const keys = Object.keys(filterObject(input, (k, v) => v !== null && v !== undefined))
-		const allowedKeys = ['set', 'orphanStrategy']
+		const allowedKeys = ['set', 'orphanStrategy', 'alias']
 		const unexpected = keys.filter(it => !allowedKeys.includes(it))
 		if (unexpected.length > 0) {
 			throw new UserError(
-				`Unexpected key(s) ${unexpected.join(', ')} alongside "set". Only "orphanStrategy" is allowed.`,
+				`Unexpected key(s) ${unexpected.join(', ')} alongside "set". Only "orphanStrategy" and "alias" are allowed.`,
 			)
 		}
 		const orphanStrategy = input.orphanStrategy ?? Input.OrphanRemovalStrategy.disconnect

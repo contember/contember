@@ -1,7 +1,7 @@
 import { PathFactory, WhereBuilder } from '../select/index.js'
 import { Input, Model } from '@contember/schema'
 import { UpdateBuilder } from './UpdateBuilder.js'
-import { PredicateFactory } from '../../acl/index.js'
+import { AclScope, PredicateFactory } from '../../acl/index.js'
 
 export class UpdateBuilderFactory {
 	constructor(
@@ -11,7 +11,7 @@ export class UpdateBuilderFactory {
 		private readonly predicateFactory: PredicateFactory,
 	) {}
 
-	public create(entity: Model.Entity, primary: Input.PrimaryValue): UpdateBuilder {
+	public create(entity: Model.Entity, primary: Input.PrimaryValue, scope: AclScope): UpdateBuilder {
 		return new UpdateBuilder(
 			this.schema,
 			entity,
@@ -19,6 +19,7 @@ export class UpdateBuilderFactory {
 			primary,
 			this.pathFactory,
 			this.predicateFactory,
+			scope,
 		)
 	}
 }

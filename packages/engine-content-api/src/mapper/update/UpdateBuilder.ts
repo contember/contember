@@ -4,7 +4,7 @@ import { acceptEveryFieldVisitor, getColumnName, getColumnType } from '@contembe
 import { Operator, QueryBuilder, UpdateBuilder as DbUpdateBuilder, Value as DbValue } from '@contember/database'
 import { PathFactory, WhereBuilder } from '../select/index.js'
 import { ColumnValue, normalizeDbValue } from '../ColumnValue.js'
-import { PredicateFactory } from '../../acl/index.js'
+import { AclScope, PredicateFactory } from '../../acl/index.js'
 import { AfterUpdateEvent, BeforeUpdateEvent } from '../EventManager.js'
 import { Mapper } from '../Mapper.js'
 
@@ -27,6 +27,7 @@ export class UpdateBuilder {
 		private readonly primary: Input.PrimaryValue,
 		private readonly pathFactory: PathFactory,
 		private readonly predicateFactory: PredicateFactory,
+		private readonly scope: AclScope,
 	) {}
 
 	public addFieldValue(
@@ -51,7 +52,7 @@ export class UpdateBuilder {
 	}
 
 	public addPredicates(fields: string[]): void {
-		const predicate = this.predicateFactory.create(this.entity, Acl.Operation.update, fields)
+		const predicate = this.predicateFactory.create(this.entity, Acl.Operation.update, this.scope, fields)
 		this.addNewWhere(predicate)
 		this.addOldWhere(predicate)
 	}

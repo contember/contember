@@ -56,6 +56,7 @@ export class OneHasOneInverseUpdateInputProcessor
 				targetEntity,
 				{ [targetRelation.name]: { [entity.primary]: this.primaryValue } },
 				input,
+				'nested',
 			)
 		}
 	}
@@ -67,6 +68,7 @@ export class OneHasOneInverseUpdateInputProcessor
 				targetEntity,
 				{ [targetRelation.name]: { [entity.primary]: this.primaryValue } },
 				update,
+				'nested',
 			)
 			if (result[0].result === MutationResultType.notFoundError) {
 				return await this.createInternal({
@@ -100,9 +102,10 @@ export class OneHasOneInverseUpdateInputProcessor
 					builder.addPredicates([targetRelation.name])
 					builder.addFieldValue(targetRelation.name, null)
 				},
+				'nested',
 			)
 			if (targetRelation.orphanRemoval) {
-				result.push(...(await this.mapper.delete(entity, { [entity.primary]: this.primaryValue })))
+				result.push(...(await this.mapper.delete(entity, { [entity.primary]: this.primaryValue }, 'nested')))
 			}
 			return result
 		}
@@ -114,7 +117,7 @@ export class OneHasOneInverseUpdateInputProcessor
 				return [new MutationConstraintViolationError([], ConstraintType.notNull)]
 			}
 			// orphan removal is handled in mapper.delete
-			return await this.mapper.delete(targetEntity, { [targetRelation.name]: { [entity.primary]: this.primaryValue } })
+			return await this.mapper.delete(targetEntity, { [targetRelation.name]: { [entity.primary]: this.primaryValue } }, 'nested')
 		}
 	}
 
@@ -137,7 +140,7 @@ export class OneHasOneInverseUpdateInputProcessor
 			const disconnectFromCurrentOwner = await this.mapper.updateInternal(targetEntity, new CheckedPrimary(currentOwner), builder => {
 				builder.addPredicates([targetRelation.name])
 				builder.addFieldValue(targetRelation.name, null)
-			})
+			}, 'nested')
 			result.push(...disconnectFromCurrentOwner)
 		}
 		const orphanedInverseSide = targetRelation.orphanRemoval
@@ -147,11 +150,11 @@ export class OneHasOneInverseUpdateInputProcessor
 		const connectToNewOwner = await this.mapper.updateInternal(targetEntity, new CheckedPrimary(newOwner), builder => {
 			builder.addPredicates([targetRelation.name])
 			builder.addFieldValue(targetRelation.name, this.primaryValue)
-		})
+		}, 'nested')
 		result.push(...connectToNewOwner)
 
 		if (orphanedInverseSide) {
-			const deleteOrphanedInverseSide = await this.mapper.delete(entity, { [entity.primary]: orphanedInverseSide })
+			const deleteOrphanedInverseSide = await this.mapper.delete(entity, { [entity.primary]: orphanedInverseSide }, 'nested')
 			result.push(...deleteOrphanedInverseSide)
 		}
 		return result
@@ -172,11 +175,11 @@ export class OneHasOneInverseUpdateInputProcessor
 			const disconnectFromCurrentOwner = await this.mapper.updateInternal(targetEntity, new CheckedPrimary(currentOwner), builder => {
 				builder.addPredicates([targetRelation.name])
 				builder.addFieldValue(targetRelation.name, null)
-			})
+			}, 'nested')
 			result.push(...disconnectFromCurrentOwner)
 		}
 
-		const connectToNewlyCreatedOwner = await this.mapper.insert(targetEntity, input, builder => {
+		const connectToNewlyCreatedOwner = await this.mapper.insert(targetEntity, input, 'nested', builder => {
 			builder.addFieldValue(targetRelation.name, this.primaryValue)
 			builder.addPredicates([targetRelation.name])
 		})

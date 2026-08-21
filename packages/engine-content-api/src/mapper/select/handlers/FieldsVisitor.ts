@@ -2,7 +2,7 @@ import { Acl, Input, Model, Settings } from '@contember/schema'
 import { Mapper } from '../../Mapper.js'
 import { RelationFetcher } from '../RelationFetcher.js'
 import { SelectExecutionHandlerContext } from '../SelectExecutionHandler.js'
-import { PredicateFactory } from '../../../acl/index.js'
+import { aclScopeFromPath, PredicateFactory } from '../../../acl/index.js'
 import { Literal, wrapIdentifier } from '@contember/database'
 import { ColumnValueGetter } from '../SelectHydrator.js'
 import { Providers } from '@contember/schema-utils'
@@ -235,8 +235,12 @@ export class FieldsVisitor implements Model.RelationByTypeVisitor<void>, Model.C
 	}
 
 	private getRequiredPredicate(entity: Model.Entity, field: Model.AnyField): Acl.Predicate | undefined {
-		const isRoot = this.relationPath.length === 0
-		const fieldPredicate = this.predicateFactory.getFieldPredicate(entity, Acl.Operation.read, field.name, isRoot)
+		const fieldPredicate = this.predicateFactory.getFieldPredicate(
+			entity,
+			Acl.Operation.read,
+			field.name,
+			aclScopeFromPath(this.relationPath),
+		)
 		return fieldPredicate.isSameAsPrimary ? undefined : fieldPredicate.predicate
 	}
 }

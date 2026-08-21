@@ -62,11 +62,25 @@ export namespace Acl {
 		delete = 'delete',
 	}
 
+	/**
+	 * Grants that apply only when the entity is reached through a relation, never at the query
+	 * or mutation root. Additive to the root grants - the effective nested permission set is
+	 * the union of both.
+	 */
+	export type ThroughOperations = {
+		readonly read?: FieldPermissions
+		readonly create?: FieldPermissions
+		readonly update?: FieldPermissions
+		readonly delete?: Predicate
+	}
+
 	export type EntityOperations = {
 		readonly read?: FieldPermissions
 		readonly create?: FieldPermissions
 		readonly update?: FieldPermissions
 		readonly delete?: Predicate
+		readonly through?: ThroughOperations
+		/** @deprecated superseded by `through`; still read for schemas migrated before it existed. */
 		readonly noRoot?: readonly `${Operation}`[]
 
 		readonly customPrimary?: boolean

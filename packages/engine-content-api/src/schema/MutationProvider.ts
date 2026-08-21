@@ -15,6 +15,7 @@ type FieldConfig<TArgs> = GraphQLFieldConfig<any, Context, TArgs>
 export class MutationProvider {
 	constructor(
 		private readonly authorizator: Authorizator,
+		private readonly rootAuthorizator: Authorizator,
 		private readonly whereTypeProvider: WhereTypeProvider,
 		private readonly entityTypeProvider: EntityTypeProvider,
 		private readonly createEntityInputProvider: EntityInputProvider<EntityInputType.create>,
@@ -34,7 +35,8 @@ export class MutationProvider {
 	}
 
 	protected getCreateMutation(entity: Model.Entity): FieldConfig<Input.CreateInput> | undefined {
-		if (this.authorizator.isRootOperationDisallowed(entity.name, Acl.Operation.create)) {
+		// Root entry points are gated on the root grants alone - a `through` grant must not open one.
+		if (this.rootAuthorizator.getEntityPermission(Acl.Operation.create, entity.name) === 'no') {
 			return undefined
 		}
 		const entityName = entity.name
@@ -62,13 +64,10 @@ export class MutationProvider {
 
 	protected getDeleteMutation(entity: Model.Entity): FieldConfig<Input.DeleteInput> | undefined {
 		const entityName = entity.name
-		if (this.authorizator.isRootOperationDisallowed(entityName, Acl.Operation.delete)) {
-			return undefined
-		}
 		if (entity.view) {
 			return undefined
 		}
-		if (this.authorizator.getEntityPermission(Acl.Operation.delete, entityName) === 'no') {
+		if (this.rootAuthorizator.getEntityPermission(Acl.Operation.delete, entityName) === 'no') {
 			return undefined
 		}
 		const uniqueWhere = this.whereTypeProvider.getEntityUniqueWhereType(entityName)
@@ -98,7 +97,7 @@ export class MutationProvider {
 	}
 
 	protected getUpdateMutation(entity: Model.Entity): FieldConfig<Input.UpdateInput> | undefined {
-		if (this.authorizator.isRootOperationDisallowed(entity.name, Acl.Operation.update)) {
+		if (this.rootAuthorizator.getEntityPermission(Acl.Operation.update, entity.name) === 'no') {
 			return undefined
 		}
 		const entityName = entity.name
@@ -136,8 +135,8 @@ export class MutationProvider {
 
 	private getUpsertMutation(entity: Model.Entity): FieldConfig<Input.UpsertInput> | undefined {
 		if (
-			this.authorizator.isRootOperationDisallowed(entity.name, Acl.Operation.update)
-			|| this.authorizator.isRootOperationDisallowed(entity.name, Acl.Operation.create)
+			this.rootAuthorizator.getEntityPermission(Acl.Operation.update, entity.name) === 'no'
+			|| this.rootAuthorizator.getEntityPermission(Acl.Operation.create, entity.name) === 'no'
 		) {
 			return undefined
 		}

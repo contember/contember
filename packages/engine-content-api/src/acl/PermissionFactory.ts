@@ -1,5 +1,5 @@
 import { Acl, Model, Schema, Writable } from '@contember/schema'
-import { getEntity, PredicateDefinitionProcessor } from '@contember/schema-utils'
+import { getEntity, PredicateDefinitionProcessor, splitEntityPermissions } from '@contember/schema-utils'
 import { mapObject } from '../utils/index.js'
 import { prefixVariable } from './VariableUtils.js'
 
@@ -12,32 +12,57 @@ export interface ContextualPermissions {
 	all: Acl.Permissions
 }
 
+/**
+ * `root` covers what a role may do as the query or mutation root; `all` adds the grants that apply
+ * only when the entity is reached through a relation.
+ */
+export type PermissionScope = 'root' | 'all'
+
 export class PermissionFactory {
-	public create(schema: Schema, roles: readonly string[], prefix?: string): Acl.Permissions {
-		return this.createInternal(schema, roles, false, prefix)
+	public create(schema: Schema, roles: readonly string[], prefix?: string, scope: PermissionScope = 'root'): Acl.Permissions {
+		return this.createInternal(schema, roles, scope, prefix)
 	}
 
 	public createContextual(schema: Schema, roles: readonly string[]): ContextualPermissions {
 		return {
-			root: this.createInternal(schema, roles, false),
-			all: this.createInternal(schema, roles, true),
+			root: this.createInternal(schema, roles, 'root'),
+			all: this.createInternal(schema, roles, 'all'),
 		}
 	}
 
-	private createInternal(schema: Schema, roles: readonly string[], includeThrough: boolean, prefix?: string): Acl.Permissions {
+	private createInternal(schema: Schema, roles: readonly string[], scope: PermissionScope, prefix?: string): Acl.Permissions {
 		let result: Acl.Permissions = {}
 		for (let role of roles) {
 			const roleDefinition = schema.acl.roles[role] || { entities: {} }
-			let rolePermissions: Acl.Permissions = this.prefixPredicatesWithRole(schema.model, roleDefinition.entities, prefix || role)
+			let rolePermissions: Acl.Permissions = this.projectScope(
+				this.prefixPredicatesWithRole(schema.model, roleDefinition.entities, prefix || role),
+				scope,
+			)
 			if (roleDefinition.inherits) {
-				const inheritedPermissions = this.createInternal(schema, roleDefinition.inherits, includeThrough, prefix || role)
-				rolePermissions = this.mergePermissions(inheritedPermissions, rolePermissions, includeThrough)
+				const inheritedPermissions = this.createInternal(schema, roleDefinition.inherits, scope, prefix || role)
+				rolePermissions = this.mergePermissions(inheritedPermissions, rolePermissions)
 			}
-			result = this.mergePermissions(result, rolePermissions, includeThrough)
+			result = this.mergePermissions(result, rolePermissions)
 		}
 		result = this.makePrimaryPredicatesUnionOfAllFields(schema.model, result)
 
 		return result
+	}
+
+	/**
+	 * Flattens each entity to the grants effective in the requested scope, so everything downstream
+	 * merges plain permission sets and never has to reason about `through` again. The projection runs
+	 * per role, before any merging - which is what keeps a single role's root set free of its own
+	 * through-only grants.
+	 */
+	private projectScope(permissions: Acl.Permissions, scope: PermissionScope): Acl.Permissions {
+		return mapObject(permissions, (entityPermissions): Acl.EntityPermissions => {
+			const { root, through } = splitEntityPermissions(entityPermissions)
+			if (scope === 'root' || Object.keys(through.operations).length === 0) {
+				return root
+			}
+			return this.mergeEntityPermissions(root, through)
+		})
 	}
 
 	private prefixPredicatesWithRole(model: Model.Schema, permissions: Acl.Permissions, role: string): Acl.Permissions {
@@ -114,11 +139,11 @@ export class PermissionFactory {
 		})
 	}
 
-	private mergePermissions(left: Acl.Permissions, right: Acl.Permissions, includeThrough = false): Acl.Permissions {
+	private mergePermissions(left: Acl.Permissions, right: Acl.Permissions): Acl.Permissions {
 		const result = { ...left }
 		for (let entityName in right) {
 			if (result[entityName] !== undefined) {
-				result[entityName] = this.mergeEntityPermissions(result[entityName], right[entityName], includeThrough)
+				result[entityName] = this.mergeEntityPermissions(result[entityName], right[entityName])
 			} else {
 				result[entityName] = right[entityName]
 			}
@@ -126,13 +151,16 @@ export class PermissionFactory {
 		return result
 	}
 
-	private mergeEntityPermissions(left: Acl.EntityPermissions, right: Acl.EntityPermissions, includeThrough = false): Acl.EntityPermissions {
+	/**
+	 * Both sides are already scope-projected, so this is a plain union of grants - `through` and the
+	 * legacy `noRoot` never reach here.
+	 */
+	private mergeEntityPermissions(left: Acl.EntityPermissions, right: Acl.EntityPermissions): Acl.EntityPermissions {
 		let predicates: Writable<Acl.PredicateMap> = {}
 		const operations: Writable<Acl.EntityOperations> = {}
 		if (left.operations.customPrimary || right.operations.customPrimary) {
 			operations.customPrimary = true
 		}
-		const noRoot: `${Acl.Operation}`[] = []
 
 		for (
 			let operation of [
@@ -141,16 +169,12 @@ export class PermissionFactory {
 				'update',
 			] as const
 		) {
-			const { predicates: opPredicates, permissions: fieldPermissions, noRoot: opNoRoot } = this.mergeOperationPermissions(
-				left,
-				right,
-				operation,
-				includeThrough,
+			const { predicates: opPredicates, permissions: fieldPermissions } = this.mergeFieldPermissions(
+				left.predicates,
+				left.operations[operation],
+				right.predicates,
+				right.operations[operation],
 			)
-
-			if (opNoRoot) {
-				noRoot.push(operation)
-			}
 
 			predicates = { ...predicates, ...opPredicates }
 			if (Object.keys(fieldPermissions).length > 0) {
@@ -158,10 +182,12 @@ export class PermissionFactory {
 			}
 		}
 
-		const { predicateDefinition, predicate, noRoot: opNoRoot } = this.mergeDeletePermissions(left, right, includeThrough)
-		if (opNoRoot) {
-			noRoot.push('delete')
-		}
+		const { predicateDefinition, predicate } = this.mergePredicates(
+			left.predicates,
+			left.operations.delete,
+			right.predicates,
+			right.operations.delete,
+		)
 		if (predicate === true) {
 			operations.delete = true
 		} else if (predicateDefinition !== undefined && typeof predicate === 'string') {
@@ -169,84 +195,9 @@ export class PermissionFactory {
 			operations.delete = predicate
 		}
 
-		if (noRoot.length > 0) {
-			operations.noRoot = noRoot
-		}
-
 		return {
 			predicates: predicates,
 			operations: operations,
-		}
-	}
-
-	private mergeOperationPermissions(
-		left: Acl.EntityPermissions,
-		right: Acl.EntityPermissions,
-		operation: 'create' | 'read' | 'update',
-		includeThrough = false,
-	): {
-		noRoot: boolean
-		predicates: Acl.PredicateMap
-		permissions: Acl.FieldPermissions
-	} {
-		const { noRoot, leftPermissions, rightPermissions } = this.resolveNoRoot(left, right, operation, includeThrough)
-		return {
-			noRoot,
-			...this.mergeFieldPermissions(
-				left.predicates,
-				leftPermissions,
-				right.predicates,
-				rightPermissions,
-			),
-		}
-	}
-
-	private mergeDeletePermissions(left: Acl.EntityPermissions, right: Acl.EntityPermissions, includeThrough = false): {
-		noRoot: boolean
-		predicate: Acl.PredicateReference | boolean
-		predicateDefinition: Acl.PredicateDefinition | undefined
-	} {
-		const { noRoot, leftPermissions, rightPermissions } = this.resolveNoRoot(left, right, 'delete', includeThrough)
-
-		return {
-			noRoot,
-			...this.mergePredicates(
-				left.predicates,
-				leftPermissions,
-				right.predicates,
-				rightPermissions,
-			),
-		}
-	}
-
-	private resolveNoRoot<const Op extends `${Acl.Operation}`>(
-		left: Acl.EntityPermissions,
-		right: Acl.EntityPermissions,
-		operation: Op,
-		includeThrough = false,
-	): {
-		noRoot: boolean
-		leftPermissions: Acl.EntityPermissions['operations'][Op] | undefined
-		rightPermissions: Acl.EntityPermissions['operations'][Op] | undefined
-	} {
-		const leftRootForbidden = left.operations.noRoot?.includes(operation) || false
-		const rightRootForbidden = right.operations.noRoot?.includes(operation) || false
-		const leftPermissions = left.operations[operation]
-		const rightPermissions = right.operations[operation]
-
-		const rootForbidden = (leftRootForbidden && rightRootForbidden)
-			|| (leftRootForbidden && !rightPermissions)
-			|| (rightRootForbidden && !leftPermissions)
-
-		// When includeThrough is true, keep all permissions regardless of noRoot
-		// (used for "all" permissions that apply when accessing through relations)
-		const resolvedLeftPermissions = !includeThrough && !rootForbidden && leftRootForbidden ? undefined : leftPermissions
-		const resolvedRightPermissions = !includeThrough && !rootForbidden && rightRootForbidden ? undefined : rightPermissions
-
-		return {
-			noRoot: rootForbidden,
-			leftPermissions: resolvedLeftPermissions,
-			rightPermissions: resolvedRightPermissions,
 		}
 	}
 

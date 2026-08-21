@@ -33,6 +33,14 @@ export default class PermissionOverrider {
 					: {
 						customPrimary: overrides.operations.customPrimary ?? original.operations.customPrimary,
 					}),
+				...(original.operations.through || overrides.operations.through
+					? {
+						through: this.overrideThroughOperations(
+							original.operations.through ?? {},
+							overrides.operations.through ?? {},
+						),
+					}
+					: {}),
 				...(original.operations.noRoot || overrides.operations.noRoot
 					? {
 						noRoot: [
@@ -42,6 +50,22 @@ export default class PermissionOverrider {
 					}
 					: {}),
 			},
+		}
+	}
+
+	private overrideThroughOperations(
+		original: Acl.ThroughOperations,
+		overrides: Acl.ThroughOperations,
+	): Acl.ThroughOperations {
+		return {
+			create: { ...(original.create || {}), ...(overrides.create || {}) },
+			read: { ...(original.read || {}), ...(overrides.read || {}) },
+			update: { ...(original.update || {}), ...(overrides.update || {}) },
+			...(original.delete === undefined && overrides.delete === undefined
+				? {}
+				: {
+					delete: overrides.delete ?? original.delete,
+				}),
 		}
 	}
 }

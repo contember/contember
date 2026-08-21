@@ -20,7 +20,7 @@ export class ManyHasManyCreateInputProcessor implements CreateInputProcessor.Has
 		return async ({ primary }) => {
 			const [otherPrimary, err] = await this.mapper.getPrimaryValue(targetEntity, input)
 			if (err) return [err]
-			return await this.mapper.connectJunction(entity, relation, primary, otherPrimary)
+			return await this.mapper.connectJunction(entity, relation, primary, otherPrimary, 'nested')
 		}
 	}
 
@@ -28,14 +28,14 @@ export class ManyHasManyCreateInputProcessor implements CreateInputProcessor.Has
 		{ entity, targetEntity, relation, input }: Context & { input: MapperInput.CreateDataInput },
 	) {
 		return async ({ primary }: { primary: Input.PrimaryValue }) => {
-			const insertResult = await this.mapper.insert(targetEntity, input)
+			const insertResult = await this.mapper.insert(targetEntity, input, 'nested')
 			const insertPrimary = getInsertPrimary(insertResult)
 			if (!insertPrimary) {
 				return insertResult
 			}
 			return [
 				...insertResult,
-				...(await this.mapper.connectJunction(entity, relation, primary, insertPrimary)),
+				...(await this.mapper.connectJunction(entity, relation, primary, insertPrimary, 'nested')),
 			]
 		}
 	}
@@ -46,13 +46,13 @@ export class ManyHasManyCreateInputProcessor implements CreateInputProcessor.Has
 		return async ({ primary }: { primary: Input.PrimaryValue }) => {
 			let [otherPrimary] = await this.mapper.getPrimaryValue(context.targetEntity, context.input.connect)
 			if (!otherPrimary) {
-				const insertResult = await this.mapper.insert(context.targetEntity, context.input.create)
+				const insertResult = await this.mapper.insert(context.targetEntity, context.input.create, 'nested')
 				otherPrimary = getInsertPrimary(insertResult)
 				if (!otherPrimary) {
 					return insertResult
 				}
 			}
-			return await this.mapper.connectJunction(context.entity, context.relation, primary, otherPrimary)
+			return await this.mapper.connectJunction(context.entity, context.relation, primary, otherPrimary, 'nested')
 		}
 	}
 }

@@ -93,11 +93,21 @@ const predicatesSchema = Typesafe.record(
 
 const predicatesSchemaCheck: Typesafe.Equals<Acl.PredicateMap, ReturnType<typeof predicatesSchema>> = true
 
+const throughOperationsSchema = Typesafe.partial({
+	read: fieldPermissionsSchema,
+	create: fieldPermissionsSchema,
+	update: fieldPermissionsSchema,
+	delete: Typesafe.union(Typesafe.string, Typesafe.boolean),
+})
+
+const throughOpSchemaCheck: Typesafe.Equals<Acl.ThroughOperations, ReturnType<typeof throughOperationsSchema>> = true
+
 const entityOperationsSchema = Typesafe.partial({
 	read: fieldPermissionsSchema,
 	create: fieldPermissionsSchema,
 	update: fieldPermissionsSchema,
 	delete: Typesafe.union(Typesafe.string, Typesafe.boolean),
+	through: throughOperationsSchema,
 	customPrimary: Typesafe.boolean,
 	refreshMaterializedView: Typesafe.boolean,
 	noRoot: Typesafe.array(Typesafe.enumeration('create', 'read', 'update', 'delete')),

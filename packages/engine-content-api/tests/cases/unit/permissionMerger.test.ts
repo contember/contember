@@ -571,7 +571,7 @@ describe('Permission merger', () => {
 	})
 
 	it('merge noRootOperations', () => {
-		execute({
+		executeContextual({
 			acl: {
 				roles: {
 					role1: {
@@ -608,7 +608,14 @@ describe('Permission merger', () => {
 				},
 			},
 			roles: ['role1', 'role2'],
-			result: {
+			// Every grant here is through-only, so nothing is reachable at the root.
+			rootResult: {
+				Entity2: {
+					operations: {},
+					predicates: {},
+				},
+			},
+			allResult: {
 				Entity2: {
 					operations: {
 						update: {
@@ -619,7 +626,6 @@ describe('Permission merger', () => {
 							id: true,
 							title: true,
 						},
-						noRoot: ['read', 'update'],
 					},
 					predicates: {},
 				},
@@ -628,7 +634,7 @@ describe('Permission merger', () => {
 	})
 
 	it('merge delete #1', () => {
-		execute({
+		executeContextual({
 			acl: {
 				roles: {
 					role1: {
@@ -655,11 +661,16 @@ describe('Permission merger', () => {
 				},
 			},
 			roles: ['role1', 'role2'],
-			result: {
+			rootResult: {
+				Entity2: {
+					operations: {},
+					predicates: {},
+				},
+			},
+			allResult: {
 				Entity2: {
 					operations: {
 						delete: true,
-						noRoot: ['delete'],
 					},
 					predicates: {},
 				},
@@ -708,8 +719,8 @@ describe('Permission merger', () => {
 		})
 	})
 
-	it('merge delete #2', () => {
-		execute({
+	it('merge delete #3', () => {
+		executeContextual({
 			acl: {
 				roles: {
 					role1: {
@@ -736,11 +747,16 @@ describe('Permission merger', () => {
 				},
 			},
 			roles: ['role1', 'role2'],
-			result: {
+			rootResult: {
+				Entity2: {
+					operations: {},
+					predicates: {},
+				},
+			},
+			allResult: {
 				Entity2: {
 					operations: {
 						delete: true,
-						noRoot: ['delete'],
 					},
 					predicates: {},
 				},
@@ -807,7 +823,7 @@ describe('Permission merger', () => {
 	})
 
 	it('merge permissions with no root', () => {
-		execute({
+		executeContextual({
 			acl: {
 				roles: {
 					role1: {
@@ -845,10 +861,15 @@ describe('Permission merger', () => {
 				},
 			},
 			roles: ['role1', 'role2'],
-			result: {
+			rootResult: {
+				Entity2: {
+					operations: {},
+					predicates: {},
+				},
+			},
+			allResult: {
 				Entity2: {
 					operations: {
-						noRoot: ['read'],
 						read: {
 							title: '__merge__foo__foo',
 							id: '__merge__foo__foo',

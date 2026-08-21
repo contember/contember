@@ -56,10 +56,6 @@ export class Authorizator {
 		return this.permissions?.[entity]?.operations?.customPrimary ?? this.defaultCustomPrimary
 	}
 
-	isRootOperationDisallowed(entity: string, operation: Acl.Operation): boolean {
-		return this.permissions?.[entity]?.operations?.noRoot?.includes(operation) ?? false
-	}
-
 	isRefreshMaterializedViewAllowed(entity: string): boolean {
 		return this.permissions?.[entity]?.operations?.refreshMaterializedView ?? this.allowRefreshMaterializedView
 	}

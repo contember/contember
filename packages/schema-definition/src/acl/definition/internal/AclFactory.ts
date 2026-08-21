@@ -61,55 +61,51 @@ export class AclFactory {
 		)
 	}
 
+	/**
+	 * A `through: true` grant lands in its own bucket instead of flipping a per-operation flag, so
+	 * root and through grants on the same entity and operation compose instead of conflicting.
+	 */
 	private createPermissionsFromAllow(rolePermissions: PermissionsByEntity, entity: Model.Entity): Acl.EntityPermissions {
 		const predicatesResolver = EntityPredicatesResolver.create(rolePermissions, this.model, entity)
+		const definitions = rolePermissions.get(entity.name)?.definitions ?? []
 
-		const entityOperations: Writable<Acl.EntityOperations> = {}
-		const noRootOptions = this.getNoRootOptions(entity, rolePermissions.get(entity.name))
-		if (noRootOptions?.length) {
-			entityOperations.noRoot = noRootOptions
+		const entityOperations: Writable<Acl.EntityOperations> = {
+			...this.createOperations(entity, predicatesResolver, definitions.filter(it => it.through !== true)),
 		}
-		for (const op of ['create', 'update', 'read'] as const) {
-			const fieldPermissions: Writable<Acl.FieldPermissions> = {}
-			for (const field of Object.keys(entity.fields)) {
-				const predicate = predicatesResolver.createFieldPredicate(op, field, field === entity.primary)
-				if (predicate !== undefined) {
-					fieldPermissions[field] = predicate
-				}
-			}
-			if (Object.keys(fieldPermissions).length > 0) {
-				entityOperations[op] = fieldPermissions
-			}
+		const throughOperations = this.createOperations(entity, predicatesResolver, definitions.filter(it => it.through === true))
+		if (Object.keys(throughOperations).length > 0) {
+			entityOperations.through = throughOperations
 		}
-		const delPredicate = predicatesResolver.createFieldPredicate('delete', '', false)
-		if (delPredicate !== undefined) {
-			entityOperations.delete = delPredicate
-		}
+
 		return {
 			predicates: predicatesResolver.getUsedPredicates(),
 			operations: entityOperations,
 		}
 	}
 
-	getNoRootOptions(entity: Model.Entity, permissions?: EntityPermissions): Acl.EntityOperations['noRoot'] {
-		const allowedRoot = new Set<Acl.Operation>()
-		const disallowedRoot = new Set<Acl.Operation>()
-		for (const def of permissions?.definitions ?? []) {
-			const noRoot = def.through === true
-			for (const op of ['create', 'read', 'update', 'delete'] as const) {
-				if (def[op]) {
-					const currentSet = noRoot ? disallowedRoot : allowedRoot
-					currentSet.add(op as Acl.Operation)
-
-					const otherSet = noRoot ? allowedRoot : disallowedRoot
-
-					if (otherSet.has(op as Acl.Operation)) {
-						throw new Error(`Operation ${op} cannot be both allowed and disallowed on root on entity ${entity.name}`)
-					}
+	private createOperations(
+		entity: Model.Entity,
+		predicatesResolver: EntityPredicatesResolver,
+		definitions: AllowDefinition<any>[],
+	): Acl.ThroughOperations {
+		const operations: Writable<Acl.ThroughOperations> = {}
+		for (const op of ['create', 'update', 'read'] as const) {
+			const fieldPermissions: Writable<Acl.FieldPermissions> = {}
+			for (const field of Object.keys(entity.fields)) {
+				const predicate = predicatesResolver.createFieldPredicate(op, field, field === entity.primary, definitions)
+				if (predicate !== undefined) {
+					fieldPermissions[field] = predicate
 				}
 			}
+			if (Object.keys(fieldPermissions).length > 0) {
+				operations[op] = fieldPermissions
+			}
 		}
-		return [...disallowedRoot.values()]
+		const delPredicate = predicatesResolver.createFieldPredicate('delete', '', false, definitions)
+		if (delPredicate !== undefined) {
+			operations.delete = delPredicate
+		}
+		return operations
 	}
 
 	private createVariables(role: Role, variables: VariableDefinition[]): Acl.Variables {

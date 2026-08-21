@@ -1,0 +1,264 @@
+type Query {
+  getArticle(by: ArticleUniqueWhere!, filter: ArticleWhere): Article
+  listArticle(filter: ArticleWhere, orderBy: [ArticleOrderBy!], offset: Int, limit: Int): [Article!]!
+  paginateArticle(filter: ArticleWhere, orderBy: [ArticleOrderBy!], skip: Int, first: Int): ArticleConnection!
+  validateUpdateArticle(by: ArticleUniqueWhere!, data: ArticleUpdateInput!): _ValidationResult!
+  getAuthor(by: AuthorUniqueWhere!, filter: AuthorWhere): Author
+  listAuthor(filter: AuthorWhere, orderBy: [AuthorOrderBy!], offset: Int, limit: Int): [Author!]!
+  paginateAuthor(filter: AuthorWhere, orderBy: [AuthorOrderBy!], skip: Int, first: Int): AuthorConnection!
+  validateUpdateAuthor(by: AuthorUniqueWhere!, data: AuthorUpdateInput!): _ValidationResult!
+  transaction: QueryTransaction
+  _info: Info
+}
+
+type Article {
+  _meta: ArticleMeta
+  id: UUID!
+  title: String
+  author(filter: AuthorWhere): Author
+}
+
+type ArticleMeta {
+  id: FieldMeta
+  title: FieldMeta
+  author: FieldMeta
+}
+
+type FieldMeta {
+  readable: Boolean
+  updatable: Boolean
+}
+
+scalar UUID
+
+type Author {
+  _meta: AuthorMeta
+  id: UUID!
+  name: String
+  secret: String
+}
+
+type AuthorMeta {
+  id: FieldMeta
+  name: FieldMeta
+  secret: FieldMeta
+}
+
+input AuthorWhere {
+  id: UUIDCondition
+  name: StringCondition
+  secret: StringCondition
+  and: [AuthorWhere]
+  or: [AuthorWhere]
+  not: AuthorWhere
+}
+
+input UUIDCondition {
+  and: [UUIDCondition!]
+  or: [UUIDCondition!]
+  not: UUIDCondition
+  null: Boolean
+  isNull: Boolean
+  eq: UUID
+  notEq: UUID
+  in: [UUID!]
+  notIn: [UUID!]
+  lt: UUID
+  lte: UUID
+  gt: UUID
+  gte: UUID
+}
+
+input StringCondition {
+  and: [StringCondition!]
+  or: [StringCondition!]
+  not: StringCondition
+  null: Boolean
+  isNull: Boolean
+  eq: String
+  notEq: String
+  in: [String!]
+  notIn: [String!]
+  lt: String
+  lte: String
+  gt: String
+  gte: String
+  contains: String
+  startsWith: String
+  endsWith: String
+  containsCI: String
+  startsWithCI: String
+  endsWithCI: String
+  similar: String
+  wordSimilar: String
+}
+
+input ArticleUniqueWhere {
+  id: UUID
+}
+
+input ArticleWhere {
+  id: UUIDCondition
+  title: StringCondition
+  author: AuthorWhere
+  and: [ArticleWhere]
+  or: [ArticleWhere]
+  not: ArticleWhere
+}
+
+input ArticleOrderBy {
+  _random: Boolean
+  _randomSeeded: Int
+  id: OrderDirection
+  title: OrderDirection
+  author: AuthorOrderBy
+}
+
+enum OrderDirection {
+  asc
+  desc
+  ascNullsFirst
+  descNullsLast
+}
+
+input AuthorOrderBy {
+  _random: Boolean
+  _randomSeeded: Int
+  id: OrderDirection
+  name: OrderDirection
+  secret: OrderDirection
+}
+
+type ArticleConnection {
+  pageInfo: PageInfo!
+  edges: [ArticleEdge!]!
+}
+
+type PageInfo {
+  totalCount: Int!
+}
+
+type ArticleEdge {
+  node: Article!
+}
+
+type _ValidationResult {
+  valid: Boolean!
+  errors: [_ValidationError!]!
+}
+
+type _ValidationError {
+  path: [_PathFragment!]!
+  message: _ValidationMessage!
+}
+
+union _PathFragment = _FieldPathFragment | _IndexPathFragment
+
+type _FieldPathFragment {
+  field: String!
+}
+
+type _IndexPathFragment {
+  index: Int!
+  alias: String
+}
+
+type _ValidationMessage {
+  text: String!
+}
+
+input ArticleUpdateInput {
+  title: String
+  author: ArticleUpdateAuthorEntityRelationInput
+  _dummy_field_: Boolean
+}
+
+input ArticleUpdateAuthorEntityRelationInput {
+  connect: AuthorUniqueWhere
+  update: AuthorUpdateInput
+  disconnect: Boolean
+}
+
+input AuthorUniqueWhere {
+  id: UUID
+}
+
+input AuthorUpdateInput {
+  secret: String
+  _dummy_field_: Boolean
+}
+
+type AuthorConnection {
+  pageInfo: PageInfo!
+  edges: [AuthorEdge!]!
+}
+
+type AuthorEdge {
+  node: Author!
+}
+
+type QueryTransaction {
+  getArticle(by: ArticleUniqueWhere!, filter: ArticleWhere): Article
+  listArticle(filter: ArticleWhere, orderBy: [ArticleOrderBy!], offset: Int, limit: Int): [Article!]!
+  paginateArticle(filter: ArticleWhere, orderBy: [ArticleOrderBy!], skip: Int, first: Int): ArticleConnection!
+  validateUpdateArticle(by: ArticleUniqueWhere!, data: ArticleUpdateInput!): _ValidationResult!
+  getAuthor(by: AuthorUniqueWhere!, filter: AuthorWhere): Author
+  listAuthor(filter: AuthorWhere, orderBy: [AuthorOrderBy!], offset: Int, limit: Int): [Author!]!
+  paginateAuthor(filter: AuthorWhere, orderBy: [AuthorOrderBy!], skip: Int, first: Int): AuthorConnection!
+  validateUpdateAuthor(by: AuthorUniqueWhere!, data: AuthorUpdateInput!): _ValidationResult!
+}
+
+type Info {
+  description: String
+}
+
+type Mutation {
+  updateArticle(by: ArticleUniqueWhere!, filter: ArticleWhere, data: ArticleUpdateInput!): ArticleUpdateResult!
+  transaction(options: MutationTransactionOptions): MutationTransaction!
+  query: Query!
+}
+
+type ArticleUpdateResult implements MutationResult {
+  ok: Boolean!
+  errorMessage: String
+  errors: [_MutationError!]!
+  node: Article
+  validation: _ValidationResult!
+}
+
+interface MutationResult {
+  ok: Boolean!
+  errorMessage: String
+  errors: [_MutationError!]!
+}
+
+type _MutationError {
+  path: [_PathFragment!]! @deprecated(reason: "Use `paths`.")
+  paths: [[_PathFragment!]!]!
+  type: _MutationErrorType!
+  message: String
+}
+
+enum _MutationErrorType {
+  NotNullConstraintViolation
+  UniqueConstraintViolation
+  ForeignKeyConstraintViolation
+  NotFoundOrDenied
+  NonUniqueWhereInput
+  InvalidDataInput
+  SqlError
+}
+
+type MutationTransaction {
+  ok: Boolean!
+  errorMessage: String
+  errors: [_MutationError!]!
+  validation: _ValidationResult!
+  updateArticle(by: ArticleUniqueWhere!, filter: ArticleWhere, data: ArticleUpdateInput!): ArticleUpdateResult!
+  query: Query
+}
+
+input MutationTransactionOptions {
+  deferForeignKeyConstraints: Boolean
+  deferUniqueConstraints: Boolean
+}

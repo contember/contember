@@ -11,7 +11,10 @@ import { fileURLToPath } from 'node:url'
 
 interface Test {
 	schema: (builder: SchemaBuilder) => SchemaBuilder | Model.Schema
+	/** Shapes the types - pass the nested set, the one that includes `through` grants. */
 	permissions: (schema: Model.Schema) => Acl.Permissions
+	/** Gates the root query and mutation fields. Defaults to `permissions` when the two coincide. */
+	rootPermissions?: (schema: Model.Schema) => Acl.Permissions
 	graphQlSchemaFile: string
 }
 
@@ -22,8 +25,10 @@ const testSchema = async (test: Test) => {
 	const schema = schemaResult instanceof SchemaBuilder ? schemaResult.buildSchema() : schemaResult
 	const schemaWithAcl = { ...schema, acl: { roles: {}, variables: {} } }
 	const permissions = test.permissions(schemaWithAcl)
+	const rootPermissions = test.rootPermissions ? test.rootPermissions(schemaWithAcl) : permissions
 	const authorizator = new Authorizator(permissions, false, false)
-	const graphQlSchemaBuilder = schemaFactory.create(schemaWithAcl, authorizator)
+	const rootAuthorizator = new Authorizator(rootPermissions, false, false)
+	const graphQlSchemaBuilder = schemaFactory.create(schemaWithAcl, authorizator, rootAuthorizator)
 	const graphQlSchema = graphQlSchemaBuilder.build()
 
 	const result = await graphql({
@@ -382,14 +387,25 @@ describe('GraphQL schema builder', () => {
 
 	it('no root ops', async () => {
 		const schema = createSchema(NoRootOperation)
+		const { root, all } = new PermissionFactory().createContextual(schema, ['editor'])
 
 		await testSchema({
 			schema: () => schema.model,
-			permissions: () => {
-				const factory = new PermissionFactory()
-				return factory.create(schema, ['editor'])
-			},
+			permissions: () => all,
+			rootPermissions: () => root,
 			graphQlSchemaFile: 'schema-no-root-ops.gql',
+		})
+	})
+
+	it('root and through grants on the same entity', async () => {
+		const schema = createSchema(MixedRootAndThrough)
+		const { root, all } = new PermissionFactory().createContextual(schema, ['editor'])
+
+		await testSchema({
+			schema: () => schema.model,
+			permissions: () => all,
+			rootPermissions: () => root,
+			graphQlSchemaFile: 'schema-mixed-root-through.gql',
 		})
 	})
 
@@ -414,6 +430,30 @@ namespace ViewEntity {
 	@def.View("SELECT null as id, 'John' AS name")
 	export class Author {
 		name = def.stringColumn()
+	}
+}
+
+/**
+ * `title` is readable at the root, `secret` only through a relation. Both belong to the same role,
+ * entity and operation - a combination the ACL factory used to reject outright.
+ */
+namespace MixedRootAndThrough {
+	export const editorRole = c.createRole('editor')
+
+	@c.Allow(editorRole, {
+		read: true,
+		update: true,
+	})
+	export class Article {
+		title = c.stringColumn()
+		author = c.manyHasOne(Author)
+	}
+
+	@c.Allow(editorRole, { read: ['name'] })
+	@c.Allow(editorRole, { through: true, read: ['secret'], update: ['secret'] })
+	export class Author {
+		name = c.stringColumn()
+		secret = c.stringColumn()
 	}
 }
 

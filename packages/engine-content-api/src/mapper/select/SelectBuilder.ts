@@ -11,7 +11,7 @@ import { MetaHandler } from './handlers/index.js'
 import { Mapper } from '../Mapper.js'
 import { FieldNode, ObjectNode } from '../../inputProcessing/index.js'
 import { assertNever } from '../../utils/index.js'
-import { PredicateFactory } from '../../acl/index.js'
+import { aclScopeFromPath, PredicateFactory } from '../../acl/index.js'
 
 export class SelectBuilder {
 	private resolver: (value: SelectRow[]) => void = () => {
@@ -96,8 +96,10 @@ export class SelectBuilder {
 			if (!fetchedPredicates.has(predicate)) {
 				const relationContext = this.relationPath[this.relationPath.length - 1]
 
-				const primaryPredicate = this.predicateFactory.create(entity, Acl.Operation.read, undefined, relationContext)
-				const fieldPredicate = this.predicateFactory.buildPredicates(entity, [predicate], relationContext)
+				const scope = aclScopeFromPath(this.relationPath)
+
+				const primaryPredicate = this.predicateFactory.create(entity, Acl.Operation.read, scope, undefined, relationContext)
+				const fieldPredicate = this.predicateFactory.buildPredicates(entity, [predicate], scope, relationContext)
 
 				this.qb = this.whereBuilder.buildAdvanced(
 					entity,

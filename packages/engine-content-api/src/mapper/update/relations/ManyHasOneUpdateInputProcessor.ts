@@ -36,7 +36,7 @@ export class ManyHasOneUpdateInputProcessor implements UpdateInputProcessor.HasO
 	public async create(
 		{ relation, targetEntity, input }: Context & { input: MapperInput.CreateDataInput },
 	) {
-		const insertResult = await this.mapper.insert(targetEntity, input)
+		const insertResult = await this.mapper.insert(targetEntity, input, 'nested')
 		const value = getInsertPrimary(insertResult)
 		if (!value) {
 			return insertResult
@@ -52,7 +52,7 @@ export class ManyHasOneUpdateInputProcessor implements UpdateInputProcessor.HasO
 		if (value) {
 			this.builder.addFieldValue(relation.name, value)
 		} else {
-			const insertResult = await this.mapper.insert(targetEntity, create)
+			const insertResult = await this.mapper.insert(targetEntity, create, 'nested')
 			const primary = getInsertPrimary(insertResult)
 			if (!primary) {
 				return insertResult
@@ -75,7 +75,7 @@ export class ManyHasOneUpdateInputProcessor implements UpdateInputProcessor.HasO
 			if (!inversePrimary) {
 				return [new MutationNothingToDo([], NothingToDoReason.emptyRelation)]
 			}
-			return await this.mapper.update(targetEntity, new CheckedPrimary(inversePrimary), input)
+			return await this.mapper.update(targetEntity, new CheckedPrimary(inversePrimary), input, 'nested')
 		}
 	}
 
@@ -84,7 +84,7 @@ export class ManyHasOneUpdateInputProcessor implements UpdateInputProcessor.HasO
 	) {
 		const inversePrimary = await this.mapper.selectField(entity, { [entity.primary]: this.primary }, relation.name)
 		if (!inversePrimary) {
-			const insertResult = await this.mapper.insert(targetEntity, create)
+			const insertResult = await this.mapper.insert(targetEntity, create, 'nested')
 			const insertPrimary = getInsertPrimary(insertResult)
 			if (insertPrimary) {
 				this.builder.addFieldValue(relation.name, insertPrimary)
@@ -92,7 +92,7 @@ export class ManyHasOneUpdateInputProcessor implements UpdateInputProcessor.HasO
 			return insertResult
 		}
 
-		return async () => await this.mapper.update(targetEntity, new CheckedPrimary(inversePrimary), update)
+		return async () => await this.mapper.update(targetEntity, new CheckedPrimary(inversePrimary), update, 'nested')
 	}
 
 	public async disconnect(
@@ -117,7 +117,7 @@ export class ManyHasOneUpdateInputProcessor implements UpdateInputProcessor.HasO
 				{ [entity.primary]: primary },
 				relation.name,
 			)
-			return await this.mapper.delete(targetEntity, { [targetEntity.primary]: inversePrimary })
+			return await this.mapper.delete(targetEntity, { [targetEntity.primary]: inversePrimary }, 'nested')
 		}
 	}
 }

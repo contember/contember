@@ -34,11 +34,6 @@ test('set with default orphanStrategy (disconnect) - inverse junction', async ()
 					response: { rows: [{ id: testUuid(1) }] },
 				},
 				{
-					sql: SQL`insert into  "public"."post_categories" ("post_id", "category_id") values  (?, ?) on conflict  do nothing`,
-					parameters: [testUuid(1), testUuid(2)],
-					response: { rowCount: 1 },
-				},
-				{
 					sql: SQL`select "root_"."id" from "public"."post" as "root_" where "root_"."id" = ?`,
 					parameters: [testUuid(3)],
 					response: { rows: [{ id: testUuid(3) }] },
@@ -47,6 +42,11 @@ test('set with default orphanStrategy (disconnect) - inverse junction', async ()
 					sql: SQL`delete from "public"."post_categories"
               where "post_id" = ? and "category_id" = ?`,
 					parameters: [testUuid(3), testUuid(2)],
+					response: { rowCount: 1 },
+				},
+				{
+					sql: SQL`insert into  "public"."post_categories" ("post_id", "category_id") values  (?, ?) on conflict  do nothing`,
+					parameters: [testUuid(1), testUuid(2)],
 					response: { rowCount: 1 },
 				},
 			]),
@@ -189,11 +189,6 @@ test('set applies the target read predicate when computing orphans - inverse jun
 					parameters: [testUuid(1), 'visible'],
 					response: { rows: [{ id: testUuid(1) }] },
 				},
-				{
-					sql: SQL`insert into  "public"."post_categories" ("post_id", "category_id") values  (?, ?) on conflict  do nothing`,
-					parameters: [testUuid(1), testUuid(2)],
-					response: { rowCount: 1 },
-				},
 				// the readable omitted member (id=3) is disconnected from the junction
 				{
 					sql: SQL`select "root_"."id" from "public"."post" as "root_" where "root_"."id" = ? and "root_"."title" = ?`,
@@ -204,6 +199,11 @@ test('set applies the target read predicate when computing orphans - inverse jun
 					sql: SQL`delete from "public"."post_categories"
               where "post_id" = ? and "category_id" = ?`,
 					parameters: [testUuid(3), testUuid(2)],
+					response: { rowCount: 1 },
+				},
+				{
+					sql: SQL`insert into  "public"."post_categories" ("post_id", "category_id") values  (?, ?) on conflict  do nothing`,
+					parameters: [testUuid(1), testUuid(2)],
 					response: { rowCount: 1 },
 				},
 			]),

@@ -34,14 +34,6 @@ test('set with default orphanStrategy (disconnect)', async () => {
 					parameters: [testUuid(1)],
 					response: { rows: [{ id: testUuid(1) }] },
 				},
-				// connect: point the target locale to the post
-				{
-					sql:
-						SQL`with "newData_" as (select ? :: uuid as "post_id", "root_"."post_id" as "post_id_old__", "root_"."id", "root_"."title", "root_"."locale"  from "public"."post_locale" as "root_"  where "root_"."id" = ?)
-						update  "public"."post_locale" set  "post_id" =  "newData_"."post_id"   from "newData_"  where "post_locale"."id" = "newData_"."id"  returning "post_id_old__"`,
-					parameters: [testUuid(2), testUuid(1)],
-					response: { rows: [{ post_id_old__: testUuid(99) }] },
-				},
 				// orphan (id=3) is disconnected: resolve it
 				{
 					sql: SQL`select "root_"."id" from "public"."post_locale" as "root_" where "root_"."id" = ? and "root_"."post_id" = ?`,
@@ -55,6 +47,14 @@ test('set with default orphanStrategy (disconnect)', async () => {
 						update  "public"."post_locale" set  "post_id" =  "newData_"."post_id"   from "newData_"  where "post_locale"."id" = "newData_"."id"  returning "post_id_old__"`,
 					parameters: [null, testUuid(3)],
 					response: { rows: [{ post_id_old__: testUuid(2) }] },
+				},
+				// connect: point the target locale to the post
+				{
+					sql:
+						SQL`with "newData_" as (select ? :: uuid as "post_id", "root_"."post_id" as "post_id_old__", "root_"."id", "root_"."title", "root_"."locale"  from "public"."post_locale" as "root_"  where "root_"."id" = ?)
+						update  "public"."post_locale" set  "post_id" =  "newData_"."post_id"   from "newData_"  where "post_locale"."id" = "newData_"."id"  returning "post_id_old__"`,
+					parameters: [testUuid(2), testUuid(1)],
+					response: { rows: [{ post_id_old__: testUuid(99) }] },
 				},
 			]),
 		],
@@ -96,13 +96,6 @@ test('set with orphanStrategy delete', async () => {
 					parameters: [testUuid(1)],
 					response: { rows: [{ id: testUuid(1) }] },
 				},
-				{
-					sql:
-						SQL`with "newData_" as (select ? :: uuid as "post_id", "root_"."post_id" as "post_id_old__", "root_"."id", "root_"."title", "root_"."locale"  from "public"."post_locale" as "root_"  where "root_"."id" = ?)
-						update  "public"."post_locale" set  "post_id" =  "newData_"."post_id"   from "newData_"  where "post_locale"."id" = "newData_"."id"  returning "post_id_old__"`,
-					parameters: [testUuid(2), testUuid(1)],
-					response: { rows: [{ post_id_old__: testUuid(99) }] },
-				},
 				// orphan (id=3) is deleted
 				{
 					sql: SQL`select "root_"."id" from "public"."post_locale" as "root_" where "root_"."id" = ? and "root_"."post_id" = ?`,
@@ -118,6 +111,13 @@ test('set with orphanStrategy delete', async () => {
 					sql: SQL`delete from "public"."post_locale" where "id" in (?)`,
 					parameters: [testUuid(3)],
 					response: { rows: [{ id: testUuid(3) }] },
+				},
+				{
+					sql:
+						SQL`with "newData_" as (select ? :: uuid as "post_id", "root_"."post_id" as "post_id_old__", "root_"."id", "root_"."title", "root_"."locale"  from "public"."post_locale" as "root_"  where "root_"."id" = ?)
+						update  "public"."post_locale" set  "post_id" =  "newData_"."post_id"   from "newData_"  where "post_locale"."id" = "newData_"."id"  returning "post_id_old__"`,
+					parameters: [testUuid(2), testUuid(1)],
+					response: { rows: [{ post_id_old__: testUuid(99) }] },
 				},
 			]),
 		],
@@ -203,14 +203,19 @@ test('set with a create item and an orphan disconnect', async () => {
 					parameters: [testUuid(2)],
 					response: { rows: [{ primary_: testUuid(1) }, { primary_: testUuid(3) }] },
 				},
-				// create a new locale connected to the post
+				// phase 2: a `create` item names no existing member, so both are orphans and go first
 				{
-					sql:
-						SQL`with "root_" as (select ? :: uuid as "id", ? :: text as "title", ? :: text as "locale", ? :: uuid as "post_id") insert into  "public"."post_locale" ("id", "title", "locale", "post_id") select "root_"."id", "root_"."title", "root_"."locale", "root_"."post_id"  from "root_"  returning "id"`,
-					parameters: [testUuid(1), 'cs', 'cs', testUuid(2)],
+					sql: SQL`select "root_"."id" from "public"."post_locale" as "root_" where "root_"."id" = ? and "root_"."post_id" = ?`,
+					parameters: [testUuid(1), testUuid(2)],
 					response: { rows: [{ id: testUuid(1) }] },
 				},
-				// orphan (id=3) is disconnected
+				{
+					sql:
+						SQL`with "newData_" as (select ? :: uuid as "post_id", "root_"."post_id" as "post_id_old__", "root_"."id", "root_"."title", "root_"."locale"  from "public"."post_locale" as "root_"  where "root_"."id" = ?)
+						update  "public"."post_locale" set  "post_id" =  "newData_"."post_id"   from "newData_"  where "post_locale"."id" = "newData_"."id"  returning "post_id_old__"`,
+					parameters: [null, testUuid(1)],
+					response: { rows: [{ post_id_old__: testUuid(2) }] },
+				},
 				{
 					sql: SQL`select "root_"."id" from "public"."post_locale" as "root_" where "root_"."id" = ? and "root_"."post_id" = ?`,
 					parameters: [testUuid(3), testUuid(2)],
@@ -222,6 +227,13 @@ test('set with a create item and an orphan disconnect', async () => {
 						update  "public"."post_locale" set  "post_id" =  "newData_"."post_id"   from "newData_"  where "post_locale"."id" = "newData_"."id"  returning "post_id_old__"`,
 					parameters: [null, testUuid(3)],
 					response: { rows: [{ post_id_old__: testUuid(2) }] },
+				},
+				// phase 3: only now is the new locale inserted
+				{
+					sql:
+						SQL`with "root_" as (select ? :: uuid as "id", ? :: text as "title", ? :: text as "locale", ? :: uuid as "post_id") insert into  "public"."post_locale" ("id", "title", "locale", "post_id") select "root_"."id", "root_"."title", "root_"."locale", "root_"."post_id"  from "root_"  returning "id"`,
+					parameters: [testUuid(1), 'cs', 'cs', testUuid(2)],
+					response: { rows: [{ id: testUuid(1) }] },
 				},
 			]),
 		],
@@ -249,13 +261,7 @@ test('set must be the only item', async () => {
           }
         }`,
 			executes: [
-				...sqlTransaction([
-					{
-						sql: SQL`select "root_"."id" from "public"."post" as "root_" where "root_"."id" = ?`,
-						parameters: [testUuid(2)],
-						response: { rows: [{ id: testUuid(2) }] },
-					},
-				]),
+				...sqlTransaction([]),
 			],
 			return: {},
 		})
@@ -291,13 +297,15 @@ test('set with an update item (updates an existing member, no orphans)', async (
 					parameters: [testUuid(2)],
 					response: { rows: [{ primary_: testUuid(1) }] },
 				},
-				// the set helper resolves the update target primary up-front
+				// phase 1 resolves the update target scoped to the owner, so a partial composite
+				// unique key would work here just as it does for a plain per-item update
 				{
-					sql: SQL`select "root_"."id" from "public"."post_locale" as "root_" where "root_"."id" = ?`,
-					parameters: [testUuid(1)],
+					sql: SQL`select "root_"."id" from "public"."post_locale" as "root_" where "root_"."id" = ? and "root_"."post_id" = ?`,
+					parameters: [testUuid(1), testUuid(2)],
 					response: { rows: [{ id: testUuid(1) }] },
 				},
-				// the update processor resolves it again scoped to the owner, then updates
+				// no orphans - the only member is the one the input names
+				// phase 3: the update processor resolves it again, then updates
 				{
 					sql: SQL`select "root_"."id" from "public"."post_locale" as "root_" where "root_"."id" = ? and "root_"."post_id" = ?`,
 					parameters: [testUuid(1), testUuid(2)],
@@ -352,6 +360,18 @@ test('set with a connectOrCreate item (existing target) and an orphan disconnect
 					parameters: [testUuid(1)],
 					response: { rows: [{ id: testUuid(1) }] },
 				},
+				{
+					sql: SQL`select "root_"."id" from "public"."post_locale" as "root_" where "root_"."id" = ? and "root_"."post_id" = ?`,
+					parameters: [testUuid(3), testUuid(2)],
+					response: { rows: [{ id: testUuid(3) }] },
+				},
+				{
+					sql:
+						SQL`with "newData_" as (select ? :: uuid as "post_id", "root_"."post_id" as "post_id_old__", "root_"."id", "root_"."title", "root_"."locale"  from "public"."post_locale" as "root_"  where "root_"."id" = ?)
+						update  "public"."post_locale" set  "post_id" =  "newData_"."post_id"   from "newData_"  where "post_locale"."id" = "newData_"."id"  returning "post_id_old__"`,
+					parameters: [null, testUuid(3)],
+					response: { rows: [{ post_id_old__: testUuid(2) }] },
+				},
 				// connectOrCreate processor resolves the target again, finds it, and connects it
 				{
 					sql: SQL`select "root_"."id" from "public"."post_locale" as "root_" where "root_"."id" = ?`,
@@ -364,18 +384,6 @@ test('set with a connectOrCreate item (existing target) and an orphan disconnect
 						update  "public"."post_locale" set  "post_id" =  "newData_"."post_id"   from "newData_"  where "post_locale"."id" = "newData_"."id"  returning "post_id_old__"`,
 					parameters: [testUuid(2), testUuid(1)],
 					response: { rows: [{ post_id_old__: testUuid(99) }] },
-				},
-				{
-					sql: SQL`select "root_"."id" from "public"."post_locale" as "root_" where "root_"."id" = ? and "root_"."post_id" = ?`,
-					parameters: [testUuid(3), testUuid(2)],
-					response: { rows: [{ id: testUuid(3) }] },
-				},
-				{
-					sql:
-						SQL`with "newData_" as (select ? :: uuid as "post_id", "root_"."post_id" as "post_id_old__", "root_"."id", "root_"."title", "root_"."locale"  from "public"."post_locale" as "root_"  where "root_"."id" = ?)
-						update  "public"."post_locale" set  "post_id" =  "newData_"."post_id"   from "newData_"  where "post_locale"."id" = "newData_"."id"  returning "post_id_old__"`,
-					parameters: [null, testUuid(3)],
-					response: { rows: [{ post_id_old__: testUuid(2) }] },
 				},
 			]),
 		],
@@ -411,21 +419,34 @@ test('set with an upsert item that creates (target does not exist)', async () =>
 				{
 					sql: SQL`select "root_"."id" as "primary_" from "public"."post_locale" as "root_" where "root_"."post_id" = ?`,
 					parameters: [testUuid(2)],
-					response: { rows: [{ primary_: testUuid(1) }] },
+					response: { rows: [{ primary_: testUuid(3) }] },
 				},
-				// the set helper resolves the upsert target up-front - it does not exist
-				{
-					sql: SQL`select "root_"."id" from "public"."post_locale" as "root_" where "root_"."id" = ?`,
-					parameters: [testUuid(1)],
-					response: { rows: [] },
-				},
-				// upsert processor tries the update first, scoped to the owner - not found
+				// phase 1 resolves the upsert target within the collection - it is not there
 				{
 					sql: SQL`select "root_"."id" from "public"."post_locale" as "root_" where "root_"."id" = ? and "root_"."post_id" = ?`,
 					parameters: [testUuid(1), testUuid(2)],
 					response: { rows: [] },
 				},
-				// falls back to insert; its primary becomes a desired member
+				// phase 2: the member the input does not name is disconnected first
+				{
+					sql: SQL`select "root_"."id" from "public"."post_locale" as "root_" where "root_"."id" = ? and "root_"."post_id" = ?`,
+					parameters: [testUuid(3), testUuid(2)],
+					response: { rows: [{ id: testUuid(3) }] },
+				},
+				{
+					sql:
+						SQL`with "newData_" as (select ? :: uuid as "post_id", "root_"."post_id" as "post_id_old__", "root_"."id", "root_"."title", "root_"."locale"  from "public"."post_locale" as "root_"  where "root_"."id" = ?)
+						update  "public"."post_locale" set  "post_id" =  "newData_"."post_id"   from "newData_"  where "post_locale"."id" = "newData_"."id"  returning "post_id_old__"`,
+					parameters: [null, testUuid(3)],
+					response: { rows: [{ post_id_old__: testUuid(2) }] },
+				},
+				// phase 3: the upsert processor tries the update first, scoped to the owner - not found
+				{
+					sql: SQL`select "root_"."id" from "public"."post_locale" as "root_" where "root_"."id" = ? and "root_"."post_id" = ?`,
+					parameters: [testUuid(1), testUuid(2)],
+					response: { rows: [] },
+				},
+				// falls back to insert
 				{
 					sql:
 						SQL`with "root_" as (select ? :: uuid as "id", ? :: text as "title", ? :: text as "locale", ? :: uuid as "post_id") insert into  "public"."post_locale" ("id", "title", "locale", "post_id") select "root_"."id", "root_"."title", "root_"."locale", "root_"."post_id"  from "root_"  returning "id"`,
@@ -471,13 +492,6 @@ test('set with orphanStrategy delete is rejected when delete is ACL-denied', asy
 					sql: SQL`select "root_"."id" from "public"."post_locale" as "root_" where "root_"."id" = ?`,
 					parameters: [testUuid(1)],
 					response: { rows: [{ id: testUuid(1) }] },
-				},
-				{
-					sql:
-						SQL`with "newData_" as (select ? :: uuid as "post_id", "root_"."post_id" as "post_id_old__", "root_"."id", "root_"."title", "root_"."locale"  from "public"."post_locale" as "root_"  where "root_"."id" = ?)
-						update  "public"."post_locale" set  "post_id" =  "newData_"."post_id"   from "newData_"  where "post_locale"."id" = "newData_"."id"  returning "post_id_old__"`,
-					parameters: [testUuid(2), testUuid(1)],
-					response: { rows: [{ post_id_old__: testUuid(99) }] },
 				},
 				// orphan (id=3): delete is attempted, but the ACL predicate denies it
 				{
@@ -564,9 +578,9 @@ test('empty set clears the whole collection (disconnect)', async () => {
 	})
 })
 
-// An upsert whose `by` matches a record that exists but belongs elsewhere falls back to an insert.
-// The desired member is then the *inserted* record, not the one `by` resolved to - otherwise the
-// record the mutation just created would be orphaned right away.
+// An upsert whose `by` names a record outside the collection falls back to an insert. Phase 1
+// resolves `by` within the collection, so it marks nothing, and the record the insert creates
+// cannot be an orphan - it did not exist when the snapshot was taken.
 test('set with an upsert item whose "by" matches a record outside the collection', async () => {
 	await execute({
 		schema: postWithNullableLocale,
@@ -591,26 +605,13 @@ test('set with an upsert item whose "by" matches a record outside the collection
 					parameters: [testUuid(2)],
 					response: { rows: [{ primary_: testUuid(3) }] },
 				},
-				// the set helper resolves the upsert target up-front - it exists, but not in this collection
-				{
-					sql: SQL`select "root_"."id" from "public"."post_locale" as "root_" where "root_"."id" = ?`,
-					parameters: [testUuid(10)],
-					response: { rows: [{ id: testUuid(10) }] },
-				},
-				// upsert processor tries the update first, scoped to the owner - not found
+				// phase 1 resolves `by` within the collection - not there, so nothing is marked
 				{
 					sql: SQL`select "root_"."id" from "public"."post_locale" as "root_" where "root_"."id" = ? and "root_"."post_id" = ?`,
 					parameters: [testUuid(10), testUuid(2)],
 					response: { rows: [] },
 				},
-				// falls back to insert; the inserted primary - not testUuid(10) - is the desired member
-				{
-					sql:
-						SQL`with "root_" as (select ? :: uuid as "id", ? :: text as "title", ? :: text as "locale", ? :: uuid as "post_id") insert into  "public"."post_locale" ("id", "title", "locale", "post_id") select "root_"."id", "root_"."title", "root_"."locale", "root_"."post_id"  from "root_"  returning "id"`,
-					parameters: [testUuid(1), 'cs', 'cs', testUuid(2)],
-					response: { rows: [{ id: testUuid(1) }] },
-				},
-				// only the pre-existing member (id=3) is orphaned; the inserted record stays connected
+				// phase 2: only the pre-existing member (id=3) is orphaned
 				{
 					sql: SQL`select "root_"."id" from "public"."post_locale" as "root_" where "root_"."id" = ? and "root_"."post_id" = ?`,
 					parameters: [testUuid(3), testUuid(2)],
@@ -622,6 +623,19 @@ test('set with an upsert item whose "by" matches a record outside the collection
 						update  "public"."post_locale" set  "post_id" =  "newData_"."post_id"   from "newData_"  where "post_locale"."id" = "newData_"."id"  returning "post_id_old__"`,
 					parameters: [null, testUuid(3)],
 					response: { rows: [{ post_id_old__: testUuid(2) }] },
+				},
+				// phase 3: the upsert processor tries its own scoped update first - not found
+				{
+					sql: SQL`select "root_"."id" from "public"."post_locale" as "root_" where "root_"."id" = ? and "root_"."post_id" = ?`,
+					parameters: [testUuid(10), testUuid(2)],
+					response: { rows: [] },
+				},
+				// falls back to insert; the new record survives the operation
+				{
+					sql:
+						SQL`with "root_" as (select ? :: uuid as "id", ? :: text as "title", ? :: text as "locale", ? :: uuid as "post_id") insert into  "public"."post_locale" ("id", "title", "locale", "post_id") select "root_"."id", "root_"."title", "root_"."locale", "root_"."post_id"  from "root_"  returning "id"`,
+					parameters: [testUuid(1), 'cs', 'cs', testUuid(2)],
+					response: { rows: [{ id: testUuid(1) }] },
 				},
 			]),
 		],
@@ -718,13 +732,6 @@ test('set with the default orphanStrategy fails on a not-null owning relation', 
 					parameters: [testUuid(1)],
 					response: { rows: [{ id: testUuid(1) }] },
 				},
-				{
-					sql:
-						SQL`with "newData_" as (select ? :: uuid as "post_id", "root_"."post_id" as "post_id_old__", "root_"."id", "root_"."title", "root_"."locale"  from "public"."post_locale" as "root_"  where "root_"."id" = ?)
-						update  "public"."post_locale" set  "post_id" =  "newData_"."post_id"   from "newData_"  where "post_locale"."id" = "newData_"."id"  returning "post_id_old__"`,
-					parameters: [testUuid(2), testUuid(1)],
-					response: { rows: [{ post_id_old__: testUuid(2) }] },
-				},
 				// orphan (id=3): resolved, but there is no way to detach it
 				{
 					sql: SQL`select "root_"."id" from "public"."post_locale" as "root_" where "root_"."id" = ? and "root_"."post_id" = ?`,
@@ -738,6 +745,141 @@ test('set with the default orphanStrategy fails on a not-null owning relation', 
 				updatePost: {
 					ok: false,
 					errors: [{ type: 'NotNullConstraintViolation' }],
+				},
+			},
+		},
+	})
+})
+
+// Nullable GraphQL variables mean an operation key can arrive as an explicit null. The per-item
+// path strips those before dispatching; `set` items have to behave the same, or the null key
+// picks its branch and the mutation dies with an internal error.
+test('set strips null-valued operation keys from an item', async () => {
+	await execute({
+		schema: postWithNullableLocale,
+		query: GQL`mutation {
+        updatePost(
+            by: {id: "${testUuid(2)}"},
+            data: {locales: {set: [{connect: null, create: {locale: "cs", title: "cs"}}]}}
+          ) {
+          ok
+        }
+      }`,
+		executes: [
+			...sqlTransaction([
+				{
+					sql: SQL`select "root_"."id" from "public"."post" as "root_" where "root_"."id" = ?`,
+					parameters: [testUuid(2)],
+					response: { rows: [{ id: testUuid(2) }] },
+				},
+				{
+					sql: SQL`select "root_"."id" as "primary_" from "public"."post_locale" as "root_" where "root_"."post_id" = ?`,
+					parameters: [testUuid(2)],
+					response: { rows: [] },
+				},
+				{
+					sql:
+						SQL`with "root_" as (select ? :: uuid as "id", ? :: text as "title", ? :: text as "locale", ? :: uuid as "post_id") insert into  "public"."post_locale" ("id", "title", "locale", "post_id") select "root_"."id", "root_"."title", "root_"."locale", "root_"."post_id"  from "root_"  returning "id"`,
+					parameters: [testUuid(1), 'cs', 'cs', testUuid(2)],
+					response: { rows: [{ id: testUuid(1) }] },
+				},
+			]),
+		],
+		return: {
+			data: {
+				updatePost: {
+					ok: true,
+				},
+			},
+		},
+	})
+})
+
+// `set: null` is schema-valid (the field is a nullable list). It must be treated as "not provided",
+// like every other null in a relation input, rather than routed into the set path.
+test('set: null is treated as no operation', async () => {
+	let error: unknown
+	try {
+		await execute({
+			schema: postWithNullableLocale,
+			query: GQL`mutation {
+          updatePost(
+              by: {id: "${testUuid(2)}"},
+              data: {locales: {set: null}}
+            ) {
+            ok
+          }
+        }`,
+			executes: [
+				...sqlTransaction([
+					{
+						sql: SQL`select "root_"."id" from "public"."post" as "root_" where "root_"."id" = ?`,
+						parameters: [testUuid(2)],
+						response: { rows: [{ id: testUuid(2) }] },
+					},
+				]),
+			],
+			return: {},
+		})
+	} catch (e) {
+		error = e
+	}
+	if (!(error instanceof Error) || !error.message.includes('Expected exactly one of')) {
+		throw new Error(`Expected a user error about a missing operation, got: ${String(error)}`)
+	}
+})
+
+// The owner scope is what lets a partial composite unique key address a member, so phase 1 has to
+// resolve `update.by` the same way the processor does - a global lookup would reject `{locale}`
+// as non-unique on an entity whose unique key is (locale, post).
+test('set resolves a partial composite unique `by` within the collection', async () => {
+	await execute({
+		schema: postWithNullableLocale,
+		query: GQL`mutation {
+        updatePost(
+            by: {id: "${testUuid(2)}"},
+            data: {locales: {set: [{update: {by: {locale: "cs"}, data: {title: "Hello"}}}]}}
+          ) {
+          ok
+        }
+      }`,
+		executes: [
+			...sqlTransaction([
+				{
+					sql: SQL`select "root_"."id" from "public"."post" as "root_" where "root_"."id" = ?`,
+					parameters: [testUuid(2)],
+					response: { rows: [{ id: testUuid(2) }] },
+				},
+				{
+					sql: SQL`select "root_"."id" as "primary_" from "public"."post_locale" as "root_" where "root_"."post_id" = ?`,
+					parameters: [testUuid(2)],
+					response: { rows: [{ primary_: testUuid(1) }] },
+				},
+				// phase 1: `{locale: "cs"}` alone is only unique once the owner completes it
+				{
+					sql: SQL`select "root_"."id" from "public"."post_locale" as "root_" where "root_"."locale" = ? and "root_"."post_id" = ?`,
+					parameters: ['cs', testUuid(2)],
+					response: { rows: [{ id: testUuid(1) }] },
+				},
+				// phase 3: the update processor resolves it again, then updates
+				{
+					sql: SQL`select "root_"."id" from "public"."post_locale" as "root_" where "root_"."locale" = ? and "root_"."post_id" = ?`,
+					parameters: ['cs', testUuid(2)],
+					response: { rows: [{ id: testUuid(1) }] },
+				},
+				{
+					sql:
+						SQL`with "newData_" as (select ? :: text as "title", "root_"."title" as "title_old__", "root_"."id", "root_"."locale", "root_"."post_id"  from "public"."post_locale" as "root_"  where "root_"."id" = ?)
+						update  "public"."post_locale" set  "title" =  "newData_"."title"   from "newData_"  where "post_locale"."id" = "newData_"."id"  returning "title_old__"`,
+					parameters: ['Hello', testUuid(1)],
+					response: { rows: [{ title_old__: 'Hi' }] },
+				},
+			]),
+		],
+		return: {
+			data: {
+				updatePost: {
+					ok: true,
 				},
 			},
 		},

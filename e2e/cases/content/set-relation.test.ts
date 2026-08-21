@@ -14,6 +14,20 @@ namespace OneHasManyModel {
 	}
 }
 
+namespace CompositeUniqueModel {
+	export class Post {
+		slug = c.stringColumn().unique()
+		locales = c.oneHasMany(PostLocale, 'post')
+	}
+
+	@c.Unique('locale', 'post')
+	export class PostLocale {
+		post = c.manyHasOne(Post, 'locales')
+		locale = c.stringColumn()
+		title = c.stringColumn()
+	}
+}
+
 namespace ManyHasManyModel {
 	export class Article {
 		slug = c.stringColumn().unique()
@@ -214,6 +228,130 @@ test('Content API: set on manyHasMany', async () => {
 				{ label: 'b', articles: [] },
 				{ label: 'fresh', articles: [{ slug: 'article' }] },
 			])
+		})
+		.expect(200)
+})
+
+test('Content API: set replaces a collection behind a composite unique key', async () => {
+	const tester = await createTester(createSchema(CompositeUniqueModel))
+
+	const created = await tester(gql`mutation {
+		createPost(data: {slug: "post", locales: [{create: {locale: "cs", title: "old cs"}}, {create: {locale: "en", title: "old en"}}]}) {
+			ok
+			node { id }
+		}
+	}`).expect(200)
+	const post = created.body.data.createPost.node.id
+
+	// The unique key includes the owner, so the old and the new "cs" row cannot coexist. Orphan
+	// removal has to run before the inserts, otherwise this - the whole point of `set` - deadlocks
+	// on the constraint.
+	await tester(
+		gql`mutation($post: UUID!) {
+			updatePost(by: {id: $post}, data: {locales: {orphanStrategy: delete, set: [
+				{create: {locale: "cs", title: "new cs"}}
+				{create: {locale: "de", title: "new de"}}
+			]}}) {
+				ok
+				errorMessage
+			}
+		}`,
+		{ variables: { post } },
+	)
+		.expect(response => {
+			expect(response.body.data.updatePost).toStrictEqual({ ok: true, errorMessage: null })
+		})
+		.expect(200)
+
+	await tester(gql`query {
+		listPostLocale(orderBy: [{locale: asc}]) { locale title }
+	}`)
+		.expect(response => {
+			expect(response.body.data.listPostLocale).toStrictEqual([
+				{ locale: 'cs', title: 'new cs' },
+				{ locale: 'de', title: 'new de' },
+			])
+		})
+		.expect(200)
+})
+
+test('Content API: set accepts a partial composite unique `by`', async () => {
+	const tester = await createTester(createSchema(CompositeUniqueModel))
+
+	const created = await tester(gql`mutation {
+		createPost(data: {slug: "post", locales: [{create: {locale: "cs", title: "old"}}, {create: {locale: "en", title: "drop me"}}]}) {
+			ok
+			node { id }
+		}
+	}`).expect(200)
+	const post = created.body.data.createPost.node.id
+
+	// `{locale: "cs"}` is only unique once the owner completes it - the same shape the per-item
+	// form accepts.
+	await tester(
+		gql`mutation($post: UUID!) {
+			updatePost(by: {id: $post}, data: {locales: {orphanStrategy: delete, set: [{update: {by: {locale: "cs"}, data: {title: "kept"}}}]}}) {
+				ok
+				errorMessage
+			}
+		}`,
+		{ variables: { post } },
+	)
+		.expect(response => {
+			expect(response.body.data.updatePost).toStrictEqual({ ok: true, errorMessage: null })
+		})
+		.expect(200)
+
+	await tester(gql`query {
+		listPostLocale(orderBy: [{locale: asc}]) { locale title }
+	}`)
+		.expect(response => {
+			expect(response.body.data.listPostLocale).toStrictEqual([{ locale: 'cs', title: 'kept' }])
+		})
+		.expect(200)
+})
+
+test('Content API: set handles null-valued input the way the per-item form does', async () => {
+	const tester = await createTester(createSchema(OneHasManyModel))
+
+	const created = await tester(gql`mutation {
+		createPost(data: {slug: "post"}) { ok node { id } }
+	}`).expect(200)
+	const post = created.body.data.createPost.node.id
+
+	// a null operation key is stripped, so this is a plain create - not a 500
+	await tester(
+		gql`mutation($post: UUID!) {
+			updatePost(by: {id: $post}, data: {locales: {set: [{connect: null, create: {title: "created"}}]}}) {
+				ok
+				errorMessage
+			}
+		}`,
+		{ variables: { post } },
+	)
+		.expect(response => {
+			expect(response.body.data.updatePost).toStrictEqual({ ok: true, errorMessage: null })
+		})
+		.expect(200)
+
+	// `set: null` means "not provided", which leaves the relation input with no operation
+	await tester(
+		gql`mutation($post: UUID!) {
+			updatePost(by: {id: $post}, data: {locales: {set: null}}) { ok }
+		}`,
+		{ variables: { post } },
+	)
+		.expect(response => {
+			expect(response.status).not.toBe(500)
+			expect(String(response.body.errors?.[0]?.message)).toContain('Expected exactly one of')
+		})
+
+	await tester(
+		gql`query($post: UUID!) { getPost(by: {id: $post}) { locales { title } } }`,
+		{ variables: { post } },
+	)
+		.expect(response => {
+			expect(response.body.data.getPost.locales).toStrictEqual([{ title: 'created' }])
 		})
 		.expect(200)
 })

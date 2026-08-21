@@ -125,8 +125,11 @@ not part of the provided list is an *orphan* and is removed according to `orphan
   is the safest option and is used when `orphanStrategy` is omitted.
 - `delete` - the orphan record is deleted entirely.
 
-The desired records are connected/created first and orphan removal runs afterwards, so records
-that are present both before and after the operation are never transiently removed.
+Orphans are removed *before* the listed records are established. That ordering matters for a
+unique key that includes the owner - `unique(['locale', 'post'])`, the "replace all translations"
+shape - where the old and the new row cannot coexist. A record the list names is never removed
+and re-added: which records are orphans is decided up front, from the collection as it was before
+the mutation, so a record the list creates cannot be an orphan either.
 
 ```graphql
 mutation {
@@ -151,7 +154,15 @@ per-item operations in the same list. It is currently supported on "has many" re
 
 `set` has to read the current members to tell which of them became orphans, so it is only present
 in the schema for roles that can read the target entity. Likewise `orphanStrategy` only appears
-when the role is allowed to delete the target entity.
+when the role is allowed to delete the target entity. Where the role's read permission carries a
+row-level predicate, members it hides are invisible to the diff and are therefore kept, not
+orphaned - `set` replaces the part of the collection the role can see.
+
+Each item behaves exactly as the same operation does outside `set`. In particular an `update`
+item addresses an existing member on a *one has many* relation (its `by` is completed with the
+owner, so a partial composite unique key such as `{locale: "cs"}` identifies a row), and fails
+with `NotFoundOrDenied` if the record is not a member; on a *many has many* relation the same
+item updates the record and connects it.
 
 :::caution
 On a *one has many* relation whose owning side is not nullable, an orphan cannot be disconnected -

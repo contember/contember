@@ -1,7 +1,7 @@
 import { Input, Model } from '@contember/schema'
 import { Mapper } from '../../Mapper.js'
 import { UpdateInputProcessor } from '../../../inputProcessing/index.js'
-import { getInsertPrimary, MutationResultList, prependPath } from '../../Result.js'
+import { MutationResult, MutationResultList, prependPath } from '../../Result.js'
 import { CheckedPrimary } from '../../CheckedPrimary.js'
 import { MapperInput } from '../../types.js'
 import { SqlUpdateInputProcessorResult } from '../SqlUpdateInputProcessor.js'
@@ -33,15 +33,38 @@ const runStep = async (result: SqlUpdateInputProcessorResult, primary: Input.Pri
 }
 
 /**
+ * `update` and `upsert` on a oneHasMany resolve their `by` *within* the collection - the processor
+ * completes the where with the owner, which is what lets a partial composite unique key (say
+ * `unique(['locale', 'post'])` addressed by `{locale}` alone) identify a row. Resolving such a
+ * where globally would fail as non-unique, so the lookup has to be scoped the same way.
+ * Every other lookup - and every lookup on a junction relation - is global, again matching the
+ * processor it feeds.
+ */
+const scopeToOwner = <Context extends HasManyContext>(
+	context: Context,
+	ownerPrimary: Input.PrimaryValue,
+	where: Input.UniqueWhere,
+): Input.UniqueWhere => {
+	if (context.type !== 'oneHasMany') {
+		return where
+	}
+	return { ...where, [context.targetRelation.name]: { [context.entity.primary]: ownerPrimary } }
+}
+
+/**
  * Implements the declarative `set` operation for has-many relations.
  *
- * The resulting collection consists exactly of the entities described by `items`. The desired
- * members are connected/created/updated first, then any entity that was a member before the
- * operation but is not in the desired set is removed according to `orphanStrategy`
- * (`disconnect` by default, or `delete`).
+ * Runs in three phases:
  *
- * Orphan removal runs *after* the desired members are established so that entities both in the
- * current and the desired set are never transiently removed.
+ * 1. resolve which of the current members the input names, without writing anything;
+ * 2. remove the members it does not name, according to `orphanStrategy`;
+ * 3. connect/create/update the members it does name.
+ *
+ * Removal comes first so that the old and the new row never coexist: a unique key that includes
+ * the owner - `unique(['locale', 'post'])`, the "replace all translations" shape this operation
+ * exists for - would otherwise be violated by the intermediate state. Phase 1 writes nothing, so
+ * a member named by the input is never removed and re-added; and a record created in phase 3
+ * cannot be an orphan, because orphans come from a snapshot taken before it existed.
  */
 export const processSetManyRelationInput = async <Context extends HasManyContext>(
 	mapper: Mapper,
@@ -59,44 +82,76 @@ export const processSetManyRelationInput = async <Context extends HasManyContext
 			desiredPrimaries.add(String(primary))
 		}
 	}
+	const itemPath = (index: number, alias?: string) => [{ index, alias }]
+	const fail = (index: number, alias: string | undefined, err: MutationResult): MutationResultList => {
+		return [...results, ...prependPath(itemPath(index, alias), [err])]
+	}
 
-	// An orphan is a member from *before* the operation that the input does not mention, so the
-	// snapshot must be taken up front. Reading it afterwards would classify rows created by this
-	// very input as orphans whenever their primary cannot be recovered from the step result -
-	// e.g. manyHasMany `connectOrCreate`, which returns junction results only.
 	const currentPrimaries = await mapper.fetchHasManyPrimaries(context, ownerPrimary)
 
-	let index = 0
-	for (const item of input.items) {
-		const alias = item.alias
-		const path = [{ index, alias }]
-		let stepResult: MutationResultList
+	// Phase 1 - which current members does the input name? `create` never names one, and a target
+	// that does not exist yet is not a member either, so both simply leave the set unmarked.
+	const connectTargets: CheckedPrimary[] = []
+	for (const [index, item] of input.items.entries()) {
 		if ('connect' in item) {
 			const [primary, err] = await mapper.getPrimaryValue(targetEntity, item.connect)
 			if (err) {
-				return [...results, ...prependPath(path, [err])]
+				return fail(index, item.alias, err)
+			}
+			connectTargets[index] = new CheckedPrimary(primary)
+			markDesired(primary)
+		} else if ('update' in item) {
+			const [primary, err] = await mapper.getPrimaryValue(targetEntity, scopeToOwner(context, ownerPrimary, item.update.by))
+			if (err) {
+				return fail(index, item.alias, err)
 			}
 			markDesired(primary)
-			stepResult = await runStep(await processor.connect({ ...context, input: new CheckedPrimary(primary), index, alias }), ownerPrimary)
+		} else if ('upsert' in item) {
+			// A missing target is not an error here - the processor falls back to creating it.
+			const [primary] = await mapper.getPrimaryValue(targetEntity, scopeToOwner(context, ownerPrimary, item.upsert.by))
+			markDesired(primary)
+		} else if ('connectOrCreate' in item) {
+			const [primary] = await mapper.getPrimaryValue(targetEntity, item.connectOrCreate.connect)
+			markDesired(primary)
+		} else if (!('create' in item)) {
+			throw new ImplementationException('Unknown "set" item operation; the input visitor should have rejected it.')
+		}
+	}
+
+	// Phase 2 - remove the members the input does not name.
+	for (const current of currentPrimaries) {
+		if (desiredPrimaries.has(String(current))) {
+			continue
+		}
+		const where: Input.UniqueWhere = { [targetEntity.primary]: current }
+		const orphanResult = input.orphanStrategy === Input.OrphanRemovalStrategy.delete
+			? await runStep(await processor.delete({ ...context, input: where, index: 0, alias: undefined }), ownerPrimary)
+			: await runStep(await processor.disconnect({ ...context, input: where, index: 0, alias: undefined }), ownerPrimary)
+		results.push(...orphanResult)
+		if (orphanResult.some(it => it.error)) {
+			return results
+		}
+	}
+
+	// Phase 3 - establish the members the input does name.
+	for (const [index, item] of input.items.entries()) {
+		const alias = item.alias
+		let stepResult: MutationResultList
+		if ('connect' in item) {
+			stepResult = await runStep(
+				await processor.connect({ ...context, input: connectTargets[index], index, alias }),
+				ownerPrimary,
+			)
 		} else if ('create' in item) {
 			stepResult = await runStep(await processor.create({ ...context, input: item.create, index, alias }), ownerPrimary)
-			markDesired(getInsertPrimary(stepResult))
 		} else if ('connectOrCreate' in item) {
-			const [existing] = await mapper.getPrimaryValue(targetEntity, item.connectOrCreate.connect)
 			stepResult = await runStep(await processor.connectOrCreate({ ...context, input: item.connectOrCreate, index, alias }), ownerPrimary)
-			markDesired(getInsertPrimary(stepResult) ?? existing)
 		} else if ('update' in item) {
-			const [primary, err] = await mapper.getPrimaryValue(targetEntity, item.update.by)
-			if (err) {
-				return [...results, ...prependPath(path, [err])]
-			}
-			markDesired(primary)
 			stepResult = await runStep(
 				await processor.update({ ...context, input: { where: item.update.by, data: item.update.data }, index, alias }),
 				ownerPrimary,
 			)
 		} else if ('upsert' in item) {
-			const [existing] = await mapper.getPrimaryValue(targetEntity, item.upsert.by)
 			stepResult = await runStep(
 				await processor.upsert({
 					...context,
@@ -106,28 +161,11 @@ export const processSetManyRelationInput = async <Context extends HasManyContext
 				}),
 				ownerPrimary,
 			)
-			// An upsert whose `by` matches a non-member falls back to an insert, so the inserted primary wins.
-			markDesired(getInsertPrimary(stepResult) ?? existing)
 		} else {
 			throw new ImplementationException('Unknown "set" item operation; the input visitor should have rejected it.')
 		}
-		results.push(...prependPath(path, stepResult))
+		results.push(...prependPath(itemPath(index, alias), stepResult))
 		if (stepResult.some(it => it.error)) {
-			return results
-		}
-		index++
-	}
-
-	for (const current of currentPrimaries) {
-		if (desiredPrimaries.has(String(current))) {
-			continue
-		}
-		const where: Input.UniqueWhere = { [targetEntity.primary]: current }
-		const orphanResult = input.orphanStrategy === Input.OrphanRemovalStrategy.delete
-			? await runStep(await processor.delete({ ...context, input: where, index, alias: undefined }), ownerPrimary)
-			: await runStep(await processor.disconnect({ ...context, input: where, index, alias: undefined }), ownerPrimary)
-		results.push(...orphanResult)
-		if (orphanResult.some(it => it.error)) {
 			return results
 		}
 	}

@@ -226,3 +226,50 @@ where "root_author"."verified" = ? and ("root_author"."published" = ? or "root_a
 		},
 	})
 })
+
+/**
+ * `AuthorWhere` carries `secret` because the where-input, like the entity type, is shared between
+ * both scopes and filtering by it is legitimate under a relation. At the root the field is not
+ * readable, so the injected read predicate is a never-condition and the filter matches nothing -
+ * the wider input surface is fail-closed, not a way to probe a value the role cannot read.
+ */
+namespace RootFilterOnThroughOnlyField {
+	export const editorRole = c.createRole('editor')
+
+	@c.Allow(editorRole, { read: ['name'] })
+	@c.Allow(editorRole, { through: true, read: ['secret'] })
+	export class Author {
+		name = c.stringColumn().notNull()
+		secret = c.stringColumn().notNull()
+	}
+}
+
+test('a root filter on a through-only field matches nothing', async () => {
+	const schema = createSchema(RootFilterOnThroughOnlyField)
+	const { root, all } = new PermissionFactory().createContextual(schema, ['editor'])
+
+	await execute({
+		schema: schema.model,
+		permissions: root,
+		nestedPermissions: all,
+		query: GQL`
+        query {
+          listAuthor(filter: {secret: {eq: "shh"}}) {
+          	name
+          }
+        }`,
+		executes: [
+			{
+				sql: SQL`select "root_"."name" as "root_name", "root_"."id" as "root_id" 
+from "public"."author" as "root_" where false`,
+				parameters: [],
+				response: { rows: [] },
+			},
+		],
+		return: {
+			data: {
+				listAuthor: [],
+			},
+		},
+	})
+})

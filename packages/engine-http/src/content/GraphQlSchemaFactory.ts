@@ -36,12 +36,13 @@ export class GraphQlSchemaFactory {
 		return this.cache.fetch(schema, cacheKey, () => {
 			const { root: permissions, all: allPermissions } = this.permissionFactory.createContextual(schema, identity.projectRoles)
 
-			const authorizator = new Authorizator(
-				allPermissions,
-				schema.acl.customPrimary ?? false,
-				Object.values(schema.acl.roles).some(it => it.content?.refreshMaterializedView),
-			)
-			const dataSchemaBuilder = this.graphqlSchemaBuilderFactory.create(schema.model, authorizator)
+			const customPrimary = schema.acl.customPrimary ?? false
+			const refreshMaterializedView = Object.values(schema.acl.roles).some(it => it.content?.refreshMaterializedView)
+			// Types are shaped by the nested set, so a field granted only through a relation still exists
+			// on the shared type; the root query and mutation fields are gated on the root set alone.
+			const authorizator = new Authorizator(allPermissions, customPrimary, refreshMaterializedView)
+			const rootAuthorizator = new Authorizator(permissions, customPrimary, refreshMaterializedView)
+			const dataSchemaBuilder = this.graphqlSchemaBuilderFactory.create(schema.model, authorizator, rootAuthorizator)
 			const introspectionSchemaFactory = new IntrospectionSchemaDefinitionFactory(
 				new IntrospectionSchemaFactory(
 					schema.model,

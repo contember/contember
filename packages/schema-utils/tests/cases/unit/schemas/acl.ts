@@ -22,6 +22,17 @@ export class Article {
 }
 
 @c.Allow(editorRole, {
+	through: true,
+	read: ['fileName'],
+	delete: true,
+})
+export class Attachment {
+	fileName = c.stringColumn()
+	size = c.intColumn()
+	comment = c.manyHasOne(Comment)
+}
+
+@c.Allow(editorRole, {
 	read: true,
 })
 @c.Allow(readerRole, {
@@ -29,4 +40,19 @@ export class Article {
 })
 export class Category {
 	name = c.stringColumn()
+}
+
+@c.Allow(editorRole, {
+	when: { article: { category: { id: categoryEditorVariable } } },
+	through: true,
+	read: true,
+	update: ['note'],
+})
+@c.Allow(editorRole, {
+	read: ['content'],
+})
+export class Comment {
+	content = c.stringColumn()
+	note = c.stringColumn()
+	article = c.manyHasOne(Article)
 }

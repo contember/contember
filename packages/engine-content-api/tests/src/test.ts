@@ -17,6 +17,8 @@ export interface Test {
 	settings?: Settings.Schema
 	validation?: Validation.Schema
 	permissions?: Acl.Permissions
+	/** Permission set effective under a relation (root grants plus `through` ones). Defaults to `permissions`. */
+	nestedPermissions?: Acl.Permissions
 	variables?: Acl.VariablesMap
 	query: string
 	queryVariables?: Record<string, any>
@@ -76,8 +78,10 @@ export const failedTransaction = (executes: SqlQuery[]): SqlQuery[] => {
 
 export const execute = async (test: Test) => {
 	const permissions: Acl.Permissions = test.permissions || new AllowAllPermissionFactory().create(test.schema)
-	const authorizator = new Authorizator(permissions, false, false)
-	const builder = new GraphQlSchemaBuilderFactory().create(test.schema, authorizator)
+	const nestedPermissions: Acl.Permissions = test.nestedPermissions ?? permissions
+	const authorizator = new Authorizator(nestedPermissions, false, false)
+	const rootAuthorizator = new Authorizator(permissions, false, false)
+	const builder = new GraphQlSchemaBuilderFactory().create(test.schema, authorizator, rootAuthorizator)
 	const graphQLSchema = builder.build()
 
 	const connection = createConnectionMock(test.executes)
@@ -103,6 +107,7 @@ export const execute = async (test: Test) => {
 			executionContainer: executionContainerFactory
 				.create({
 					permissions,
+					allPermissions: nestedPermissions,
 					schema,
 					schemaMeta: {
 						id: 1,

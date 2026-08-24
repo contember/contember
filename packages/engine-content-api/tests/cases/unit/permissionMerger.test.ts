@@ -571,7 +571,7 @@ describe('Permission merger', () => {
 	})
 
 	it('merge noRootOperations', () => {
-		execute({
+		executeContextual({
 			acl: {
 				roles: {
 					role1: {
@@ -608,7 +608,14 @@ describe('Permission merger', () => {
 				},
 			},
 			roles: ['role1', 'role2'],
-			result: {
+			// Every grant here is through-only, so nothing is reachable at the root.
+			rootResult: {
+				Entity2: {
+					operations: {},
+					predicates: {},
+				},
+			},
+			allResult: {
 				Entity2: {
 					operations: {
 						update: {
@@ -619,7 +626,6 @@ describe('Permission merger', () => {
 							id: true,
 							title: true,
 						},
-						noRoot: ['read', 'update'],
 					},
 					predicates: {},
 				},
@@ -628,7 +634,7 @@ describe('Permission merger', () => {
 	})
 
 	it('merge delete #1', () => {
-		execute({
+		executeContextual({
 			acl: {
 				roles: {
 					role1: {
@@ -655,11 +661,16 @@ describe('Permission merger', () => {
 				},
 			},
 			roles: ['role1', 'role2'],
-			result: {
+			rootResult: {
+				Entity2: {
+					operations: {},
+					predicates: {},
+				},
+			},
+			allResult: {
 				Entity2: {
 					operations: {
 						delete: true,
-						noRoot: ['delete'],
 					},
 					predicates: {},
 				},
@@ -708,8 +719,8 @@ describe('Permission merger', () => {
 		})
 	})
 
-	it('merge delete #2', () => {
-		execute({
+	it('merge delete #3', () => {
+		executeContextual({
 			acl: {
 				roles: {
 					role1: {
@@ -736,11 +747,16 @@ describe('Permission merger', () => {
 				},
 			},
 			roles: ['role1', 'role2'],
-			result: {
+			rootResult: {
+				Entity2: {
+					operations: {},
+					predicates: {},
+				},
+			},
+			allResult: {
 				Entity2: {
 					operations: {
 						delete: true,
-						noRoot: ['delete'],
 					},
 					predicates: {},
 				},
@@ -807,7 +823,7 @@ describe('Permission merger', () => {
 	})
 
 	it('merge permissions with no root', () => {
-		execute({
+		executeContextual({
 			acl: {
 				roles: {
 					role1: {
@@ -845,10 +861,15 @@ describe('Permission merger', () => {
 				},
 			},
 			roles: ['role1', 'role2'],
-			result: {
+			rootResult: {
+				Entity2: {
+					operations: {},
+					predicates: {},
+				},
+			},
+			allResult: {
 				Entity2: {
 					operations: {
-						noRoot: ['read'],
 						read: {
 							title: '__merge__foo__foo',
 							id: '__merge__foo__foo',
@@ -1000,6 +1021,919 @@ describe('Contextual permission merger', () => {
 							id: true,
 							lorem: true,
 							bar: true,
+						},
+					},
+				},
+			},
+		})
+	})
+})
+
+describe('Contextual permission merger - through bucket', () => {
+	// Returns the raw projections, so a test can assert which operation keys exist: `toEqual` treats an
+	// explicitly `undefined` key as absent, which is the one distinction the three-state flags need.
+	const buildContextual = (acl: Acl.Schema, roles: string[]) => {
+		const model: Model.Schema = new SchemaBuilder()
+			.entity('Entity1', e => e.column('lorem').column('bar'))
+			.entity('Entity2', e => e.oneHasOne('xyz', r => r.target('Entity1')))
+			.buildSchema()
+		return new PermissionFactory().createContextual({ ...emptySchema, model, acl }, roles)
+	}
+
+	it('single role: root and through grants on the same operation compose', () => {
+		executeContextual({
+			acl: {
+				roles: {
+					role1: {
+						variables: {},
+						entities: {
+							Entity1: {
+								predicates: {
+									rootPred: { lorem: { eq: 'root' } },
+									throughPred: { bar: { eq: 'through' } },
+								},
+								operations: {
+									read: { title: 'rootPred' },
+									through: {
+										read: { content: 'throughPred' },
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+			roles: ['role1'],
+			// The scope projection runs per role, so a single role's through grant never leaks into its root set.
+			rootResult: {
+				Entity1: {
+					operations: {
+						read: {
+							title: 'rootPred',
+							id: 'rootPred',
+						},
+					},
+					// The shared predicate map is handed over untouched, so the unreferenced through predicate stays in it.
+					predicates: {
+						rootPred: { lorem: { eq: 'root' } },
+						throughPred: { bar: { eq: 'through' } },
+					},
+				},
+			},
+			allResult: {
+				Entity1: {
+					operations: {
+						read: {
+							title: 'rootPred',
+							content: 'throughPred',
+							id: '__merge__rootPred__throughPred',
+						},
+					},
+					predicates: {
+						rootPred: { lorem: { eq: 'root' } },
+						throughPred: { bar: { eq: 'through' } },
+						__merge__rootPred__throughPred: {
+							or: [{ lorem: { eq: 'root' } }, { bar: { eq: 'through' } }],
+						},
+					},
+				},
+			},
+		})
+	})
+
+	it('single role: a through-only entity keeps an empty root entry', () => {
+		executeContextual({
+			acl: {
+				roles: {
+					role1: {
+						variables: {},
+						entities: {
+							Entity1: {
+								predicates: {},
+								operations: {
+									through: {
+										read: { title: true },
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+			roles: ['role1'],
+			rootResult: {
+				Entity1: {
+					operations: {},
+					predicates: {},
+				},
+			},
+			allResult: {
+				Entity1: {
+					operations: {
+						read: {
+							title: true,
+							id: true,
+						},
+					},
+					predicates: {},
+				},
+			},
+		})
+	})
+
+	it('two roles: through predicates merge in all, root stays empty', () => {
+		executeContextual({
+			acl: {
+				roles: {
+					role1: {
+						variables: {},
+						entities: {
+							Entity1: {
+								predicates: { throughA: { lorem: { eq: 'a' } } },
+								operations: {
+									through: {
+										read: { title: 'throughA' },
+									},
+								},
+							},
+						},
+					},
+					role2: {
+						variables: {},
+						entities: {
+							Entity1: {
+								predicates: { throughB: { lorem: { eq: 'b' } } },
+								operations: {
+									through: {
+										read: { title: 'throughB' },
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+			roles: ['role1', 'role2'],
+			rootResult: {
+				Entity1: {
+					operations: {},
+					predicates: {},
+				},
+			},
+			allResult: {
+				Entity1: {
+					operations: {
+						read: {
+							title: '__merge__throughA__throughB',
+							id: '__merge__throughA__throughB',
+						},
+					},
+					predicates: {
+						__merge__throughA__throughB: {
+							or: [{ lorem: { eq: 'a' } }, { lorem: { eq: 'b' } }],
+						},
+					},
+				},
+			},
+		})
+	})
+
+	it('two roles: a root predicate and a through predicate on the same field', () => {
+		executeContextual({
+			acl: {
+				roles: {
+					throughRole: {
+						variables: {},
+						entities: {
+							Entity1: {
+								predicates: { thr: { lorem: { eq: 'through' } } },
+								operations: {
+									through: {
+										read: { title: 'thr' },
+									},
+								},
+							},
+						},
+					},
+					rootRole: {
+						variables: {},
+						entities: {
+							Entity1: {
+								predicates: { rt: { lorem: { eq: 'root' } } },
+								operations: {
+									read: { title: 'rt' },
+								},
+							},
+						},
+					},
+				},
+			},
+			roles: ['throughRole', 'rootRole'],
+			rootResult: {
+				Entity1: {
+					operations: {
+						read: {
+							title: 'rt',
+							id: 'rt',
+						},
+					},
+					predicates: {
+						rt: { lorem: { eq: 'root' } },
+					},
+				},
+			},
+			allResult: {
+				Entity1: {
+					operations: {
+						read: {
+							title: '__merge__thr__rt',
+							id: '__merge__thr__rt',
+						},
+					},
+					predicates: {
+						__merge__thr__rt: {
+							or: [{ lorem: { eq: 'through' } }, { lorem: { eq: 'root' } }],
+						},
+					},
+				},
+			},
+		})
+	})
+
+	it('inherits: a through grant on the parent stays through-only in the child', () => {
+		executeContextual({
+			acl: {
+				roles: {
+					base: {
+						variables: {},
+						entities: {
+							Entity1: {
+								predicates: { thr: { lorem: { eq: 'inherited' } } },
+								operations: {
+									through: {
+										read: { title: 'thr' },
+									},
+								},
+							},
+						},
+					},
+					child: {
+						variables: {},
+						inherits: ['base'],
+						entities: {
+							Entity1: {
+								predicates: { own: { bar: { eq: 'own' } } },
+								operations: {
+									read: { description: 'own' },
+								},
+							},
+						},
+					},
+				},
+			},
+			roles: ['child'],
+			rootResult: {
+				Entity1: {
+					operations: {
+						read: {
+							description: 'own',
+							id: 'own',
+						},
+					},
+					predicates: {
+						own: { bar: { eq: 'own' } },
+					},
+				},
+			},
+			allResult: {
+				Entity1: {
+					operations: {
+						read: {
+							title: 'thr',
+							description: 'own',
+							id: '__merge__thr__own',
+						},
+					},
+					predicates: {
+						thr: { lorem: { eq: 'inherited' } },
+						own: { bar: { eq: 'own' } },
+						__merge__thr__own: {
+							or: [{ lorem: { eq: 'inherited' } }, { bar: { eq: 'own' } }],
+						},
+					},
+				},
+			},
+		})
+	})
+
+	it('inherits: a through grant on the child does not affect the inherited root grant', () => {
+		executeContextual({
+			acl: {
+				roles: {
+					base: {
+						variables: {},
+						entities: {
+							Entity1: {
+								predicates: { rt: { lorem: { eq: 'inherited' } } },
+								operations: {
+									read: { title: 'rt' },
+								},
+							},
+						},
+					},
+					child: {
+						variables: {},
+						inherits: ['base'],
+						entities: {
+							Entity1: {
+								predicates: { thr: { bar: { eq: 'own' } } },
+								operations: {
+									through: {
+										read: { description: 'thr' },
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+			roles: ['child'],
+			rootResult: {
+				Entity1: {
+					operations: {
+						read: {
+							title: 'rt',
+							id: 'rt',
+						},
+					},
+					predicates: {
+						rt: { lorem: { eq: 'inherited' } },
+					},
+				},
+			},
+			allResult: {
+				Entity1: {
+					operations: {
+						read: {
+							title: 'rt',
+							description: 'thr',
+							id: '__merge__rt__thr',
+						},
+					},
+					predicates: {
+						rt: { lorem: { eq: 'inherited' } },
+						thr: { bar: { eq: 'own' } },
+						__merge__rt__thr: {
+							or: [{ lorem: { eq: 'inherited' } }, { bar: { eq: 'own' } }],
+						},
+					},
+				},
+			},
+		})
+	})
+
+	it('through delete: true is granted under a relation only', () => {
+		executeContextual({
+			acl: {
+				roles: {
+					role1: {
+						variables: {},
+						entities: {
+							Entity1: {
+								predicates: {},
+								operations: {
+									read: { title: true },
+									through: {
+										delete: true,
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+			roles: ['role1'],
+			rootResult: {
+				Entity1: {
+					operations: {
+						read: {
+							title: true,
+							id: true,
+						},
+					},
+					predicates: {},
+				},
+			},
+			allResult: {
+				Entity1: {
+					operations: {
+						read: {
+							title: true,
+							id: true,
+						},
+						delete: true,
+					},
+					predicates: {},
+				},
+			},
+		})
+	})
+
+	it('through delete: a predicate delete composes with the root one', () => {
+		executeContextual({
+			acl: {
+				roles: {
+					role1: {
+						variables: {},
+						entities: {
+							Entity1: {
+								predicates: {
+									rootDel: { lorem: { eq: 'root' } },
+									throughDel: { bar: { eq: 'through' } },
+								},
+								operations: {
+									delete: 'rootDel',
+									through: {
+										delete: 'throughDel',
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+			roles: ['role1'],
+			rootResult: {
+				Entity1: {
+					operations: {
+						delete: 'rootDel',
+					},
+					predicates: {
+						rootDel: { lorem: { eq: 'root' } },
+						throughDel: { bar: { eq: 'through' } },
+					},
+				},
+			},
+			allResult: {
+				Entity1: {
+					operations: {
+						delete: '__merge__rootDel__throughDel',
+					},
+					predicates: {
+						__merge__rootDel__throughDel: {
+							or: [{ lorem: { eq: 'root' } }, { bar: { eq: 'through' } }],
+						},
+					},
+				},
+			},
+		})
+	})
+
+	it('customPrimary and refreshMaterializedView survive the scope projection of an entity with a through bucket', () => {
+		executeContextual({
+			acl: {
+				roles: {
+					role1: {
+						variables: {},
+						entities: {
+							Entity1: {
+								predicates: {},
+								operations: {
+									customPrimary: true,
+									refreshMaterializedView: true,
+									read: { title: true },
+									through: {
+										read: { content: true },
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+			roles: ['role1'],
+			rootResult: {
+				Entity1: {
+					operations: {
+						customPrimary: true,
+						refreshMaterializedView: true,
+						read: {
+							title: true,
+							id: true,
+						},
+					},
+					predicates: {},
+				},
+			},
+			allResult: {
+				Entity1: {
+					operations: {
+						customPrimary: true,
+						refreshMaterializedView: true,
+						read: {
+							title: true,
+							content: true,
+							id: true,
+						},
+					},
+					predicates: {},
+				},
+			},
+		})
+	})
+
+	it('customPrimary and refreshMaterializedView survive the scope projection that short-circuits without a through bucket', () => {
+		executeContextual({
+			acl: {
+				roles: {
+					role1: {
+						variables: {},
+						entities: {
+							Entity1: {
+								predicates: {},
+								operations: {
+									customPrimary: true,
+									refreshMaterializedView: true,
+									read: { title: true },
+								},
+							},
+						},
+					},
+				},
+			},
+			roles: ['role1'],
+			rootResult: {
+				Entity1: {
+					operations: {
+						customPrimary: true,
+						refreshMaterializedView: true,
+						read: {
+							title: true,
+							id: true,
+						},
+					},
+					predicates: {},
+				},
+			},
+			allResult: {
+				Entity1: {
+					operations: {
+						customPrimary: true,
+						refreshMaterializedView: true,
+						read: {
+							title: true,
+							id: true,
+						},
+					},
+					predicates: {},
+				},
+			},
+		})
+	})
+
+	it('two roles: refreshMaterializedView is granted if any role grants it', () => {
+		executeContextual({
+			acl: {
+				roles: {
+					viewRole: {
+						variables: {},
+						entities: {
+							Entity1: {
+								predicates: {},
+								operations: {
+									refreshMaterializedView: true,
+									read: { title: true },
+								},
+							},
+						},
+					},
+					otherRole: {
+						variables: {},
+						entities: {
+							Entity1: {
+								predicates: {},
+								operations: {
+									read: { description: true },
+									through: {
+										read: { content: true },
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+			roles: ['viewRole', 'otherRole'],
+			rootResult: {
+				Entity1: {
+					operations: {
+						refreshMaterializedView: true,
+						read: {
+							title: true,
+							description: true,
+							id: true,
+						},
+					},
+					predicates: {},
+				},
+			},
+			allResult: {
+				Entity1: {
+					operations: {
+						refreshMaterializedView: true,
+						read: {
+							title: true,
+							description: true,
+							content: true,
+							id: true,
+						},
+					},
+					predicates: {},
+				},
+			},
+		})
+	})
+
+	it('an explicit customPrimary and refreshMaterializedView denial survives the scope projection', () => {
+		executeContextual({
+			acl: {
+				roles: {
+					role1: {
+						variables: {},
+						entities: {
+							Entity1: {
+								predicates: {},
+								operations: {
+									customPrimary: false,
+									refreshMaterializedView: false,
+									read: { title: true },
+									through: {
+										read: { content: true },
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+			roles: ['role1'],
+			// A dropped `false` would not stay denied: Authorizator resolves the flags with `??`, so an absent
+			// key falls back to the role-level default instead of denying.
+			rootResult: {
+				Entity1: {
+					operations: {
+						customPrimary: false,
+						refreshMaterializedView: false,
+						read: {
+							title: true,
+							id: true,
+						},
+					},
+					predicates: {},
+				},
+			},
+			allResult: {
+				Entity1: {
+					operations: {
+						customPrimary: false,
+						refreshMaterializedView: false,
+						read: {
+							title: true,
+							content: true,
+							id: true,
+						},
+					},
+					predicates: {},
+				},
+			},
+		})
+	})
+
+	it('two roles: an explicit denial loses to another role granting the flag', () => {
+		executeContextual({
+			acl: {
+				roles: {
+					denyingRole: {
+						variables: {},
+						entities: {
+							Entity1: {
+								predicates: {},
+								operations: {
+									customPrimary: false,
+									refreshMaterializedView: false,
+									read: { title: true },
+								},
+							},
+						},
+					},
+					grantingRole: {
+						variables: {},
+						entities: {
+							Entity1: {
+								predicates: {},
+								operations: {
+									customPrimary: true,
+									refreshMaterializedView: true,
+									read: { description: true },
+								},
+							},
+						},
+					},
+				},
+			},
+			roles: ['denyingRole', 'grantingRole'],
+			rootResult: {
+				Entity1: {
+					operations: {
+						customPrimary: true,
+						refreshMaterializedView: true,
+						read: {
+							title: true,
+							description: true,
+							id: true,
+						},
+					},
+					predicates: {},
+				},
+			},
+			allResult: {
+				Entity1: {
+					operations: {
+						customPrimary: true,
+						refreshMaterializedView: true,
+						read: {
+							title: true,
+							description: true,
+							id: true,
+						},
+					},
+					predicates: {},
+				},
+			},
+		})
+	})
+
+	it('flags no role states stay absent, leaving the role-level default in charge', () => {
+		const { root, all } = buildContextual({
+			roles: {
+				role1: {
+					variables: {},
+					entities: {
+						Entity1: {
+							predicates: {},
+							operations: {
+								read: { title: true },
+							},
+						},
+					},
+				},
+				role2: {
+					variables: {},
+					entities: {
+						Entity1: {
+							predicates: {},
+							operations: {
+								read: { description: true },
+								through: {
+									read: { content: true },
+								},
+							},
+						},
+					},
+				},
+			},
+		}, ['role1', 'role2'])
+
+		// Asserted on the key list, because a `customPrimary: undefined` would compare equal to an absent one.
+		assert.deepStrictEqual(Object.keys(root.Entity1.operations), ['read'])
+		assert.deepStrictEqual(Object.keys(all.Entity1.operations), ['read'])
+		assert.deepStrictEqual(root.Entity1.operations.read, { title: true, description: true, id: true })
+		assert.deepStrictEqual(all.Entity1.operations.read, { title: true, description: true, content: true, id: true })
+	})
+
+	it('primary predicate is the union of the fields readable in that scope', () => {
+		executeContextual({
+			acl: {
+				roles: {
+					role1: {
+						variables: {},
+						entities: {
+							Entity1: {
+								predicates: {
+									pA: { lorem: { eq: 'a' } },
+									pB: { bar: { eq: 'b' } },
+									pC: { lorem: { eq: 'c' } },
+								},
+								operations: {
+									read: { title: 'pA', description: 'pB' },
+									through: {
+										read: { content: 'pC' },
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+			roles: ['role1'],
+			// makePrimaryPredicatesUnionOfAllFields runs once per scope, so root unions only the root fields.
+			rootResult: {
+				Entity1: {
+					operations: {
+						read: {
+							title: 'pA',
+							description: 'pB',
+							id: '__merge__pA__pB',
+						},
+					},
+					predicates: {
+						pA: { lorem: { eq: 'a' } },
+						pB: { bar: { eq: 'b' } },
+						pC: { lorem: { eq: 'c' } },
+						__merge__pA__pB: {
+							or: [{ lorem: { eq: 'a' } }, { bar: { eq: 'b' } }],
+						},
+					},
+				},
+			},
+			allResult: {
+				Entity1: {
+					operations: {
+						read: {
+							title: 'pA',
+							description: 'pB',
+							content: 'pC',
+							id: '__merge____merge__pA__pB__pC',
+						},
+					},
+					predicates: {
+						pA: { lorem: { eq: 'a' } },
+						pB: { bar: { eq: 'b' } },
+						pC: { lorem: { eq: 'c' } },
+						__merge__pA__pB: {
+							or: [{ lorem: { eq: 'a' } }, { bar: { eq: 'b' } }],
+						},
+						__merge____merge__pA__pB__pC: {
+							or: [
+								{ or: [{ lorem: { eq: 'a' } }, { bar: { eq: 'b' } }] },
+								{ lorem: { eq: 'c' } },
+							],
+						},
+					},
+				},
+			},
+		})
+	})
+
+	it('legacy noRoot and the new through bucket merge into one nested set', () => {
+		executeContextual({
+			acl: {
+				roles: {
+					legacyRole: {
+						variables: {},
+						entities: {
+							Entity1: {
+								predicates: { legacyPred: { lorem: { eq: 'legacy' } } },
+								operations: {
+									read: { title: 'legacyPred' },
+									noRoot: ['read'],
+								},
+							},
+						},
+					},
+					throughRole: {
+						variables: {},
+						entities: {
+							Entity1: {
+								predicates: { newPred: { bar: { eq: 'new' } } },
+								operations: {
+									through: {
+										read: { title: 'newPred' },
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+			roles: ['legacyRole', 'throughRole'],
+			rootResult: {
+				Entity1: {
+					operations: {},
+					predicates: {},
+				},
+			},
+			allResult: {
+				Entity1: {
+					operations: {
+						read: {
+							title: '__merge__legacyPred__newPred',
+							id: '__merge__legacyPred__newPred',
+						},
+					},
+					predicates: {
+						__merge__legacyPred__newPred: {
+							or: [{ lorem: { eq: 'legacy' } }, { bar: { eq: 'new' } }],
 						},
 					},
 				},

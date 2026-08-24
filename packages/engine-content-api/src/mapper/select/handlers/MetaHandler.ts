@@ -1,7 +1,7 @@
 import { SelectExecutionHandler, SelectExecutionHandlerContext } from '../SelectExecutionHandler.js'
 import { Path } from '../Path.js'
 import { Acl, Input } from '@contember/schema'
-import { PredicateFactory } from '../../../acl/index.js'
+import { aclScopeFromPath, PredicateFactory } from '../../../acl/index.js'
 import { WhereBuilder } from '../WhereBuilder.js'
 import { ObjectNode } from '../../../inputProcessing/index.js'
 
@@ -32,11 +32,11 @@ export class MetaHandler implements SelectExecutionHandler<{}> {
 		metaPath: Path,
 		operation: Acl.Operation.read | Acl.Operation.update,
 	): void {
-		const { entity } = context
+		const { entity, relationPath } = context
 		if (entity.primary === fieldName) {
 			return
 		}
-		const fieldPredicate = this.predicateFactory.getFieldPredicate(entity, operation, fieldName)
+		const fieldPredicate = this.predicateFactory.getFieldPredicate(entity, operation, fieldName, aclScopeFromPath(relationPath))
 		context.addColumn({
 			path: metaPath,
 			valueGetter: context.addPredicate(fieldPredicate.predicate),

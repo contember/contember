@@ -18,7 +18,7 @@ export class OneHasManyCreateInputProcessor implements CreateInputProcessor.HasM
 		return async ({ primary }: { primary: Input.PrimaryValue }) => {
 			return await this.mapper.update(targetEntity, input, {
 				[targetRelation.name]: { connect: new CheckedPrimary(primary) },
-			})
+			}, 'nested')
 		}
 	}
 
@@ -29,7 +29,7 @@ export class OneHasManyCreateInputProcessor implements CreateInputProcessor.HasM
 			return await this.mapper.insert(targetEntity, {
 				...input,
 				[targetRelation.name]: { connect: new CheckedPrimary(primary) },
-			})
+			}, 'nested')
 		}
 	}
 
@@ -45,7 +45,7 @@ export class OneHasManyCreateInputProcessor implements CreateInputProcessor.HasM
 			return await this.mapper.upsert(targetEntity, connect, connectData, {
 				...create,
 				...connectData,
-			})
+			}, 'nested')
 		}
 	}
 }

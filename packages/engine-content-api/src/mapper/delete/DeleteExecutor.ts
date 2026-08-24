@@ -2,7 +2,7 @@ import { Acl, Input, Model } from '@contember/schema'
 import { assertNever } from '../../utils/index.js'
 import { Client, DeleteBuilder, Literal, SelectBuilder } from '@contember/database'
 import { PathFactory, WhereBuilder } from '../select/index.js'
-import { PredicateFactory } from '../../acl/index.js'
+import { AclScope, PredicateFactory } from '../../acl/index.js'
 import { UpdateBuilderFactory } from '../update/index.js'
 import {
 	ConstraintType,
@@ -47,6 +47,7 @@ export class DeleteExecutor {
 		mapper: Mapper,
 		entity: Model.Entity,
 		by: Input.UniqueWhere | CheckedPrimary,
+		scope: AclScope,
 		filter?: Input.OptionalWhere,
 	): Promise<MutationResultList> {
 		return mapper.mutex.execute(async () => {
@@ -59,7 +60,7 @@ export class DeleteExecutor {
 
 			const primaryWhere = { [entity.primary]: { eq: primaryValue } }
 			const where = filter ? { and: [primaryWhere, filter] } : primaryWhere
-			const state = new DeleteState(mapper.deletedEntities)
+			const state = new DeleteState(mapper.deletedEntities, scope)
 			const deletePrimary = await this.collectDeleteInfo(state, mapper, entity, where)
 
 			const deleteQueue: DeleteQueue = [[entity, deletePrimary]]
@@ -129,7 +130,7 @@ export class DeleteExecutor {
 		entity: Model.Entity,
 		where: Input.OptionalWhere,
 	): Promise<Input.PrimaryValue[]> {
-		const predicate = this.predicateFactory.createDeletePredicate(entity)
+		const predicate = this.predicateFactory.createDeletePredicate(entity, state.scope)
 		const orphanRemovals = findRelationsWithOrphanRemoval(this.schema, entity)
 
 		const qb = SelectBuilder.create<DeleteInfoRow>()
@@ -187,7 +188,7 @@ export class DeleteExecutor {
 		relation: Model.ManyHasOneRelation | Model.OneHasOneOwningRelation,
 		values: Input.PrimaryValue[],
 	): Promise<void> {
-		const predicate = this.predicateFactory.createDeletePredicate(entity)
+		const predicate = this.predicateFactory.createDeletePredicate(entity, state.scope)
 		const orphanRemovals = findRelationsWithOrphanRemoval(this.schema, entity)
 
 		const qb = this.createFetchByIdQueryBuilder(entity, relation, values)
@@ -216,7 +217,7 @@ export class DeleteExecutor {
 		relation: Model.ManyHasOneRelation | Model.OneHasOneOwningRelation,
 		values: Input.PrimaryValue[],
 	): Promise<void> {
-		const predicate = this.predicateFactory.create(entity, Acl.Operation.update, [relation.name])
+		const predicate = this.predicateFactory.create(entity, Acl.Operation.update, state.scope, [relation.name])
 
 		const qb = this.createFetchByIdQueryBuilder(entity, relation, values)
 		const qbWithAllowed = this.qbWithAllowed(entity, predicate, qb)

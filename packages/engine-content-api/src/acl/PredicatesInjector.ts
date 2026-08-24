@@ -1,19 +1,25 @@
 import { Acl, Input, Model, Writable } from '@contember/schema'
 import { acceptFieldVisitor } from '@contember/schema-utils'
 import { PredicateFactory } from './PredicateFactory.js'
+import { aclScopeFromPath } from './AclScope.js'
 
 export class PredicatesInjector {
 	constructor(private readonly schema: Model.Schema, private readonly predicateFactory: PredicateFactory) {}
 
+	/**
+	 * The ACL scope is derived from the ancestor path at each node rather than decided once here and
+	 * carried down: an entity reached over a relation is nested even when the query itself started at
+	 * the root, so its `through` grants have to apply.
+	 */
 	public inject(
 		entity: Model.Entity,
 		where: Input.OptionalWhere,
 		relationContext?: Model.AnyRelationContext,
 		ancestorPath?: readonly Model.AnyRelationContext[],
 	): Input.OptionalWhere {
-		const isQueryRoot = !relationContext && (!ancestorPath || ancestorPath.length === 0)
-		const restrictedWhere = this.injectToWhere(where, entity, true, relationContext, false, ancestorPath ?? [], isQueryRoot)
-		return this.createWhere(entity, undefined, restrictedWhere, relationContext, false, ancestorPath ?? [], isQueryRoot)
+		const path = ancestorPath ?? []
+		const restrictedWhere = this.injectToWhere(where, entity, true, relationContext, false, path)
+		return this.createWhere(entity, undefined, restrictedWhere, relationContext, false, path)
 	}
 
 	/**
@@ -41,7 +47,6 @@ export class PredicatesInjector {
 		relationContext?: Model.AnyRelationContext,
 		isBackReferenceContext?: boolean,
 		ancestorPath?: readonly Model.AnyRelationContext[],
-		isQueryRoot?: boolean,
 	): Input.OptionalWhere {
 		// Simplify predicates when:
 		// 1. We're in a back-reference context (inside a filter that traverses back)
@@ -57,14 +62,19 @@ export class PredicatesInjector {
 		if (shouldSimplify) {
 			predicatesWhere = { [entity.primary]: { always: true } }
 		} else {
-			const rawPredicate = this.predicateFactory.create(entity, Acl.Operation.read, fieldNames, relationContext, isQueryRoot)
+			const rawPredicate = this.predicateFactory.create(
+				entity,
+				Acl.Operation.read,
+				aclScopeFromPath(ancestorPath),
+				fieldNames,
+				relationContext,
+			)
 			// Process the predicate to inject nested entity predicates
 			predicatesWhere = this.injectPredicatesToPredicate(
 				rawPredicate,
 				entity,
 				isBackReferenceContext ?? false,
 				ancestorPath ?? [],
-				isQueryRoot,
 			)
 		}
 
@@ -88,22 +98,21 @@ export class PredicatesInjector {
 		entity: Model.Entity,
 		isBackReferenceContext: boolean,
 		ancestorPath: readonly Model.AnyRelationContext[],
-		isQueryRoot?: boolean,
 	): Input.OptionalWhere {
 		const resultWhere: Writable<Input.OptionalWhere> = {}
 
 		if (where.and) {
 			resultWhere.and = where.and
 				.filter((it): it is Input.Where => !!it)
-				.map(it => this.injectPredicatesToPredicate(it, entity, isBackReferenceContext, ancestorPath, isQueryRoot))
+				.map(it => this.injectPredicatesToPredicate(it, entity, isBackReferenceContext, ancestorPath))
 		}
 		if (where.or) {
 			resultWhere.or = where.or
 				.filter((it): it is Input.Where => !!it)
-				.map(it => this.injectPredicatesToPredicate(it, entity, isBackReferenceContext, ancestorPath, isQueryRoot))
+				.map(it => this.injectPredicatesToPredicate(it, entity, isBackReferenceContext, ancestorPath))
 		}
 		if (where.not) {
-			resultWhere.not = this.injectPredicatesToPredicate(where.not, entity, isBackReferenceContext, ancestorPath, isQueryRoot)
+			resultWhere.not = this.injectPredicatesToPredicate(where.not, entity, isBackReferenceContext, ancestorPath)
 		}
 
 		const fields = Object.keys(where).filter(it => !['and', 'or', 'not'].includes(it))
@@ -132,7 +141,6 @@ export class PredicatesInjector {
 						context.targetEntity,
 						nestedIsBackReferenceContext,
 						nestedAncestorPath,
-						isQueryRoot,
 					)
 
 					// Check if we should simplify the target entity's predicate
@@ -142,7 +150,13 @@ export class PredicatesInjector {
 					// Get target entity's predicate (simplified if back-reference)
 					const targetPredicate = shouldSimplifyNested
 						? { [context.targetEntity.primary]: { always: true } }
-						: this.predicateFactory.create(context.targetEntity, Acl.Operation.read, undefined, context, isQueryRoot)
+						: this.predicateFactory.create(
+							context.targetEntity,
+							Acl.Operation.read,
+							aclScopeFromPath(nestedAncestorPath),
+							undefined,
+							context,
+						)
 
 					// Optimization: avoid duplicate { id: always } when both are simplified
 					const primaryKey = context.targetEntity.primary
@@ -180,21 +194,20 @@ export class PredicatesInjector {
 		relationContext: Model.AnyRelationContext | undefined,
 		isBackReferenceContext: boolean,
 		ancestorPath: readonly Model.AnyRelationContext[],
-		isQueryRoot?: boolean,
 	): Input.OptionalWhere {
 		const resultWhere: Writable<Input.OptionalWhere> = {}
 		if (where.and) {
 			resultWhere.and = where.and.filter((it): it is Input.Where => !!it).map(it =>
-				this.injectToWhere(it, entity, isRoot, relationContext, isBackReferenceContext, ancestorPath, isQueryRoot)
+				this.injectToWhere(it, entity, isRoot, relationContext, isBackReferenceContext, ancestorPath)
 			)
 		}
 		if (where.or) {
 			resultWhere.or = where.or.filter((it): it is Input.Where => !!it).map(it =>
-				this.injectToWhere(it, entity, isRoot, relationContext, isBackReferenceContext, ancestorPath, isQueryRoot)
+				this.injectToWhere(it, entity, isRoot, relationContext, isBackReferenceContext, ancestorPath)
 			)
 		}
 		if (where.not) {
-			resultWhere.not = this.injectToWhere(where.not, entity, isRoot, relationContext, isBackReferenceContext, ancestorPath, isQueryRoot)
+			resultWhere.not = this.injectToWhere(where.not, entity, isRoot, relationContext, isBackReferenceContext, ancestorPath)
 		}
 
 		const fields = Object.keys(where).filter(it => !['and', 'or', 'not'].includes(it))
@@ -216,14 +229,14 @@ export class PredicatesInjector {
 					const nestedIsBackReferenceContext = isBackReference || isBackReferenceContext
 					// Build extended ancestor path for nested traversal
 					const nestedAncestorPath: Model.AnyRelationContext[] = [...ancestorPath, context]
-					return this.injectToWhere(relationWhere, context.targetEntity, false, context, nestedIsBackReferenceContext, nestedAncestorPath, isQueryRoot)
+					return this.injectToWhere(relationWhere, context.targetEntity, false, context, nestedIsBackReferenceContext, nestedAncestorPath)
 				},
 			})
 		}
 		const fieldsForPredicate = !isRoot
 			? fields
-			: fields.filter(it => this.predicateFactory.shouldApplyCellLevelPredicate(entity, Acl.Operation.read, it, isQueryRoot))
+			: fields.filter(it => this.predicateFactory.shouldApplyCellLevelPredicate(entity, Acl.Operation.read, it, aclScopeFromPath(ancestorPath)))
 
-		return this.createWhere(entity, fieldsForPredicate, resultWhere, relationContext, isBackReferenceContext, ancestorPath, isQueryRoot)
+		return this.createWhere(entity, fieldsForPredicate, resultWhere, relationContext, isBackReferenceContext, ancestorPath)
 	}
 }

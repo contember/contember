@@ -1,6 +1,7 @@
 import { Acl, Input, Model } from '@contember/schema'
 import { VariableInjector } from './VariableInjector.js'
 import { EvaluatedPredicateReplacer } from './EvaluatedPredicateReplacer.js'
+import { AclScope } from './AclScope.js'
 
 const getRowLevelPredicatePseudoField = (entity: Model.Entity) => entity.primary
 
@@ -14,20 +15,19 @@ export class PredicateFactory {
 		private readonly permissions: Acl.Permissions,
 		private readonly model: Model.Schema,
 		private readonly variableInjector: VariableInjector,
-		private readonly allPermissions?: Acl.Permissions,
+		private readonly nestedPermissions?: Acl.Permissions,
 	) {}
 
 	/**
-	 * Selects the appropriate permission set based on query context:
-	 * - `isRoot === false` (nested/relation context): uses allPermissions (includes through-only permissions)
-	 * - `isRoot === true` or `isRoot === undefined` (root or unknown context): uses root-only permissions
+	 * `nested` uses the permission set that includes `through` grants; `root` uses the root grants
+	 * only. The scope is a required argument on every entry point - see {@link AclScope}.
 	 *
-	 * The `undefined` vs `true` distinction matters: `undefined` is the default for callers
-	 * that don't track root context, and must fall through to root permissions for safety.
+	 * `nestedPermissions` is optional so that callers with a single flat permission set (tests, the
+	 * system API's internal executor) keep working; they simply get the same set for both scopes.
 	 */
-	private getPermissionsForContext(isRoot?: boolean): Acl.Permissions {
-		if (isRoot === false && this.allPermissions) {
-			return this.allPermissions
+	private permissionsFor(scope: AclScope): Acl.Permissions {
+		if (scope === 'nested' && this.nestedPermissions) {
+			return this.nestedPermissions
 		}
 		return this.permissions
 	}
@@ -36,9 +36,9 @@ export class PredicateFactory {
 		entity: Model.Entity,
 		operation: Acl.Operation.update | Acl.Operation.read | Acl.Operation.create,
 		fieldName: string,
-		isRoot?: boolean,
+		scope: AclScope,
 	): FieldRequiredPredicate {
-		const perms = this.getPermissionsForContext(isRoot)
+		const perms = this.permissionsFor(scope)
 		const permissions = perms[entity.name]?.operations?.[operation]
 		const predicate = permissions?.[fieldName] ?? false
 		const rowLevelField = getRowLevelPredicatePseudoField(entity)
@@ -56,18 +56,17 @@ export class PredicateFactory {
 		entity: Model.Entity,
 		operation: Acl.Operation.read,
 		fieldName: string,
-		isRoot?: boolean,
+		scope: AclScope,
 	): boolean {
-		const perms = this.getPermissionsForContext(isRoot)
+		const perms = this.permissionsFor(scope)
 		const rowLevelField = getRowLevelPredicatePseudoField(entity)
 		const permissions = perms[entity.name]?.operations?.[operation]
 		return permissions?.[fieldName] !== permissions?.[rowLevelField]
 	}
 
-	/** Delete predicates are not context-aware — through-permission support is scoped to read operations only. */
-	public createDeletePredicate(entity: Model.Entity) {
+	public createDeletePredicate(entity: Model.Entity, scope: AclScope) {
 		const neverCondition: Input.Where = { [entity.primary]: { never: true } }
-		const entityPermissions = this.permissions[entity.name]
+		const entityPermissions = this.permissionsFor(scope)[entity.name]
 		if (!entityPermissions) {
 			return neverCondition
 		}
@@ -78,17 +77,17 @@ export class PredicateFactory {
 		if (deletePredicate === true) {
 			return {}
 		}
-		return this.buildPredicates(entity, [deletePredicate])
+		return this.buildPredicates(entity, [deletePredicate], scope)
 	}
 
 	public create(
 		entity: Model.Entity,
 		operation: Acl.Operation.update | Acl.Operation.read | Acl.Operation.create,
+		scope: AclScope,
 		fieldNames: string[] = [getRowLevelPredicatePseudoField(entity)],
 		relationContext?: Model.AnyRelationContext,
-		isRoot?: boolean,
 	): Input.OptionalWhere {
-		const perms = this.getPermissionsForContext(isRoot)
+		const perms = this.permissionsFor(scope)
 		const entityPermissions: Acl.EntityPermissions = perms[entity.name]
 		const neverCondition: Input.Where = { [entity.primary]: { never: true } }
 
@@ -108,16 +107,16 @@ export class PredicateFactory {
 			return neverCondition
 		}
 
-		return this.buildPredicates(entity, operationPredicates, relationContext, isRoot)
+		return this.buildPredicates(entity, operationPredicates, scope, relationContext)
 	}
 
 	public buildPredicates(
 		entity: Model.Entity,
 		predicates: Acl.PredicateReference[],
+		scope: AclScope,
 		relationContext?: Model.AnyRelationContext,
-		isRoot?: boolean,
 	): Input.OptionalWhere {
-		const perms = this.getPermissionsForContext(isRoot)
+		const perms = this.permissionsFor(scope)
 		const entityPermissions: Acl.EntityPermissions = perms[entity.name] ?? {}
 
 		const predicatesWhere: Input.Where[] = predicates.reduce(
@@ -134,7 +133,7 @@ export class PredicateFactory {
 			return {}
 		}
 		const where: Input.Where = predicatesWhere.length === 1 ? predicatesWhere[0] : { and: predicatesWhere }
-		return this.optimizePredicates(where, relationContext, isRoot)
+		return this.optimizePredicates(where, scope, relationContext)
 	}
 
 	private getRequiredPredicates(
@@ -157,11 +156,11 @@ export class PredicateFactory {
 		return predicates
 	}
 
-	public optimizePredicates(where: Input.OptionalWhere, relationContext?: Model.AnyRelationContext, isRoot?: boolean) {
+	public optimizePredicates(where: Input.OptionalWhere, scope: AclScope, relationContext?: Model.AnyRelationContext) {
 		if (!relationContext || !relationContext.targetRelation) {
 			return where
 		}
-		const sourcePredicate = this.create(relationContext.entity, Acl.Operation.read, [relationContext.relation.name], undefined, isRoot)
+		const sourcePredicate = this.create(relationContext.entity, Acl.Operation.read, scope, [relationContext.relation.name])
 		if (Object.keys(sourcePredicate).length === 0) {
 			return where
 		}

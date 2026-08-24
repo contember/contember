@@ -27,7 +27,7 @@ export class ManyHasOneCreateInputProcessor implements CreateInputProcessor.HasM
 	public async create(
 		{ relation, targetEntity, input }: Context & { input: MapperInput.CreateDataInput },
 	) {
-		const insertResult = await this.mapper.insert(targetEntity, input)
+		const insertResult = await this.mapper.insert(targetEntity, input, 'nested')
 		const value = getInsertPrimary(insertResult)
 		if (!value) {
 			return insertResult
@@ -43,7 +43,7 @@ export class ManyHasOneCreateInputProcessor implements CreateInputProcessor.HasM
 		if (value) {
 			this.insertBuilder.addFieldValue(relation.name, value)
 		} else {
-			const insertResult = await this.mapper.insert(targetEntity, create)
+			const insertResult = await this.mapper.insert(targetEntity, create, 'nested')
 			const primary = getInsertPrimary(insertResult)
 			if (!primary) {
 				return insertResult

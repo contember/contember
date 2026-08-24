@@ -253,7 +253,7 @@ export class MutationResolver {
 		queryAst: ObjectNode<Input.UpdateInput>,
 	): Promise<WithoutNode<Result.UpdateResult>> {
 		const input = queryAst.args
-		const result = await mapper.update(entity, input.by, input.data, input.filter)
+		const result = await mapper.update(entity, input.by, input.data, 'root', input.filter)
 		const errorResponse = this.createErrorResponse(result)
 		if (errorResponse) {
 			return errorResponse
@@ -310,7 +310,7 @@ export class MutationResolver {
 		queryAst: ObjectNode<Input.CreateInput>,
 	): Promise<WithoutNode<Result.CreateResult>> {
 		const input = queryAst.args
-		const result = await mapper.insert(entity, input.data)
+		const result = await mapper.insert(entity, input.data, 'root')
 		const errorResponse = this.createErrorResponse(result)
 		if (errorResponse) {
 			return errorResponse
@@ -385,7 +385,7 @@ export class MutationResolver {
 		queryAst: ObjectNode<Input.UpsertInput>,
 	): Promise<WithoutNode<Result.UpsertResult>> {
 		const input = queryAst.args
-		const result = await mapper.upsert(entity, input.by, input.update, input.create, input.filter)
+		const result = await mapper.upsert(entity, input.by, input.update, input.create, 'root', input.filter)
 		const errorResponse = this.createErrorResponse(result)
 		if (errorResponse) {
 			return errorResponse
@@ -427,7 +427,7 @@ export class MutationResolver {
 
 		const nodes = await this.resolveResultNodes(mapper, entity, input.by, queryAst)
 
-		const result = await mapper.delete(entity, queryAst.args.by, queryAst.args.filter)
+		const result = await mapper.delete(entity, queryAst.args.by, 'root', queryAst.args.filter)
 		if (
 			result.length >= 1
 			&& (result[0].result === MutationResultType.ok || result[0].result === MutationResultType.nothingToDo)

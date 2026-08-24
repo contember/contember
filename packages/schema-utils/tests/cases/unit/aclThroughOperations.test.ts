@@ -92,3 +92,80 @@ test('a noRoot entry for an operation with no grant drops nothing', () => {
 	expect(root.operations).toStrictEqual({ read: { id: true } })
 	expect(through.operations).toStrictEqual({})
 })
+
+test('a legacy noRoot grant survives an empty declared through bucket for the same operation', () => {
+	const { root, through } = splitEntityPermissions({
+		predicates,
+		operations: {
+			read: { title: true, content: true },
+			noRoot: ['read'],
+			through: { read: {} },
+		},
+	})
+
+	expect(root.operations).toStrictEqual({})
+	expect(through.operations).toStrictEqual({ read: { title: true, content: true } })
+})
+
+test('a legacy noRoot grant merges with a populated declared through bucket', () => {
+	const { root, through } = splitEntityPermissions({
+		predicates,
+		operations: {
+			read: { title: true, content: true },
+			noRoot: ['read'],
+			through: { read: { secret: 'throughPredicate' } },
+		},
+	})
+
+	expect(root.operations).toStrictEqual({})
+	expect(through.operations).toStrictEqual({
+		read: { title: true, content: true, secret: 'throughPredicate' },
+	})
+})
+
+test('the declared through grant wins on a field both grants name', () => {
+	const { root, through } = splitEntityPermissions({
+		predicates,
+		operations: {
+			read: { title: true, content: 'rootPredicate' },
+			noRoot: ['read'],
+			through: { read: { title: 'throughPredicate' } },
+		},
+	})
+
+	expect(root.operations).toStrictEqual({})
+	expect(through.operations).toStrictEqual({
+		read: { title: 'throughPredicate', content: 'rootPredicate' },
+	})
+})
+
+test('a legacy noRoot delete survives a through bucket that does not declare delete', () => {
+	const { root, through } = splitEntityPermissions({
+		predicates,
+		operations: {
+			delete: 'rootPredicate',
+			noRoot: ['delete'],
+			through: { read: { secret: 'throughPredicate' } },
+		},
+	})
+
+	expect(root.operations).toStrictEqual({})
+	expect(through.operations).toStrictEqual({
+		read: { secret: 'throughPredicate' },
+		delete: 'rootPredicate',
+	})
+})
+
+test('a declared through delete wins over a legacy noRoot delete', () => {
+	const { root, through } = splitEntityPermissions({
+		predicates,
+		operations: {
+			delete: 'rootPredicate',
+			noRoot: ['delete'],
+			through: { delete: 'throughPredicate' },
+		},
+	})
+
+	expect(root.operations).toStrictEqual({})
+	expect(through.operations).toStrictEqual({ delete: 'throughPredicate' })
+})

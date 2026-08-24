@@ -168,6 +168,10 @@ export class AclValidator {
 				this.validateFieldPermissions(operation, entity, predicates, errorBuilder.for(op))
 			}
 		}
+		if (operations.through !== undefined) {
+			// through grants reference the same fields and the same predicate map, so the same rules apply
+			this.validateOperations(operations.through, entity, predicates, errorBuilder.for('through'))
+		}
 	}
 
 	private validateFieldPermissions(

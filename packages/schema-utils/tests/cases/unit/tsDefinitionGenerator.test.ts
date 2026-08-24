@@ -12,6 +12,7 @@ import { join } from 'path'
 import { DefinitionCodeGenerator } from '../../../src/definition-generator/DefinitionCodeGenerator.js'
 import { dirname } from 'node:path'
 import { fileURLToPath } from 'node:url'
+import { Acl } from '@contember/schema'
 
 const tests = [
 	['basic', basic],
@@ -72,4 +73,70 @@ test('definition generator round-trips per-column index options', () => {
 	const generated = generator.generate(createSchema(IndexColumnOptionsGenSchema))
 	expect(generated).toContain(`@c.Index({ fields: ['title', { field: 'rank', order: 'desc', nulls: 'last' }] })`)
 	expect(generated).toContain(`@c.Index({ fields: [{ field: 'title', opClass: 'text_pattern_ops' }] })`)
+})
+
+namespace LegacyAclModel {
+	export class Attachment {
+		fileName = c.stringColumn()
+		size = c.intColumn()
+	}
+}
+
+// `noRoot` cannot be expressed through `@c.Allow` - it only appears in schemas stored before `through` existed, so the acl is hand-written here
+const legacyNoRootAcl: Acl.Schema = {
+	roles: {
+		editor: {
+			stages: '*',
+			variables: {},
+			entities: {
+				Attachment: {
+					predicates: {},
+					operations: {
+						read: { fileName: true, size: true },
+						update: { fileName: true },
+						noRoot: ['read'],
+					},
+				},
+			},
+		},
+	},
+}
+
+test('definition generator keeps a legacy noRoot grant out of the root scope', () => {
+	const generator = new DefinitionCodeGenerator()
+	const generated = generator.generate({ ...createSchema(LegacyAclModel), acl: legacyNoRootAcl })
+	// regression: `noRoot` used to be ignored, so a through-only grant was regenerated as a full root grant - an escalation, not just a loss
+	expect(generated).not.toContain(`@c.Allow(editorRole, {\n\tread: true,\n\tupdate: ['fileName'],\n})`)
+	expect(generated).toContain(`@c.Allow(editorRole, {\n\tupdate: ['fileName'],\n})\n@c.Allow(editorRole, {\n\tthrough: true,\n\tread: true,\n})\n`)
+})
+
+const legacyMixedAcl: Acl.Schema = {
+	roles: {
+		editor: {
+			stages: '*',
+			variables: {},
+			entities: {
+				Attachment: {
+					predicates: { small: { size: { lt: 100 } } },
+					operations: {
+						read: { fileName: 'small', size: 'small' },
+						update: { fileName: true },
+						delete: 'small',
+						noRoot: ['read', 'delete'],
+						through: { update: { size: true } },
+					},
+				},
+			},
+		},
+	},
+}
+
+test('definition generator combines a legacy noRoot grant with a declared through bucket', () => {
+	const generator = new DefinitionCodeGenerator()
+	const generated = generator.generate({ ...createSchema(LegacyAclModel), acl: legacyMixedAcl })
+	// regression: the predicate-gated noRoot grant was emitted as a root grant and the declared `through` bucket was dropped entirely
+	expect(generated).not.toContain(`@c.Allow(editorRole, {\n\twhen: { size: { lt: 100 } },\n\tread: true,\n\tdelete: true,\n})`)
+	expect(generated).toContain(`@c.Allow(editorRole, {\n\twhen: { size: { lt: 100 } },\n\tthrough: true,\n\tread: true,\n\tdelete: true,\n})`)
+	expect(generated).toContain(`@c.Allow(editorRole, {\n\tupdate: ['fileName'],\n})`)
+	expect(generated).toContain(`@c.Allow(editorRole, {\n\tthrough: true,\n\tupdate: ['size'],\n})`)
 })

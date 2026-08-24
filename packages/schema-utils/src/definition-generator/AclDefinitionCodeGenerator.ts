@@ -1,4 +1,4 @@
-import { PredicateDefinitionProcessor } from '../acl/index.js'
+import { PredicateDefinitionProcessor, splitEntityPermissions } from '../acl/index.js'
 import { IndentDecider, Literal, printJsValue } from '../utils/printJsValue.js'
 import { Acl, Model, Schema } from '@contember/schema'
 import { DefinitionNamingConventions } from './DefinitionNamingConventions.js'
@@ -61,37 +61,57 @@ export class AclDefinitionCodeGenerator {
 				continue
 			}
 			const roleVarName = this.definitionNamingConventions.roleVarName(roleName)
+			// the `through` bucket is a separate grant set, so it needs its own `@c.Allow` block - merging it into the root one would widen it to the root scope
+			// splitting also folds the legacy `noRoot` flag into that bucket, so an old stored schema does not regenerate as a plain root grant
+			const { root, through } = splitEntityPermissions(entityPermission)
 			for (const [predicateName, predicateDefinition] of Object.entries(entityPermission.predicates)) {
 				const operations = this.getMatchingOperations({
 					predicate: predicateName,
-					operations: entityPermission.operations,
+					operations: root.operations,
 					numberOfEntityFieldsWithoutId,
 				})
+				const throughOperations = this.getMatchingOperations({
+					predicate: predicateName,
+					operations: through.operations,
+					numberOfEntityFieldsWithoutId,
+				})
+				if (Object.keys(operations).length === 0 && Object.keys(throughOperations).length === 0) {
+					continue
+				}
+				const processor = new PredicateDefinitionProcessor(schema.model)
+				const when = processor.process(entity, predicateDefinition, {
+					handleColumn: ctx => {
+						if (typeof ctx.value === 'string' && ctx.value in roleDefinition.variables) {
+							return new Literal(this.definitionNamingConventions.variableVarName(roleName, ctx.value))
+						}
+						return ctx.value
+					},
+					handleRelation: ctx => {
+						return ctx.value
+					},
+				})
 				if (Object.keys(operations).length > 0) {
-					const processor = new PredicateDefinitionProcessor(schema.model)
-					const when = processor.process(entity, predicateDefinition, {
-						handleColumn: ctx => {
-							if (typeof ctx.value === 'string' && ctx.value in roleDefinition.variables) {
-								return new Literal(this.definitionNamingConventions.variableVarName(roleName, ctx.value))
-							}
-							return ctx.value
-						},
-						handleRelation: ctx => {
-							return ctx.value
-						},
-					})
-					const aclDefinition = printJsValue({ when, ...operations }, indentFirstLevel)
-					aclOutput.push(`@c.Allow(${roleVarName}, ${aclDefinition})\n`)
+					aclOutput.push(`@c.Allow(${roleVarName}, ${printJsValue({ when, ...operations }, indentFirstLevel)})\n`)
+				}
+				if (Object.keys(throughOperations).length > 0) {
+					aclOutput.push(`@c.Allow(${roleVarName}, ${printJsValue({ when, through: true, ...throughOperations }, indentFirstLevel)})\n`)
 				}
 			}
 			const trueOperations = this.getMatchingOperations({
 				predicate: true,
-				operations: entityPermission.operations,
+				operations: root.operations,
 				numberOfEntityFieldsWithoutId,
 			})
 			if (Object.keys(trueOperations).length > 0) {
-				const aclDefinition = printJsValue({ ...trueOperations }, indentFirstLevel)
-				aclOutput.push(`@c.Allow(${roleVarName}, ${aclDefinition})\n`)
+				aclOutput.push(`@c.Allow(${roleVarName}, ${printJsValue({ ...trueOperations }, indentFirstLevel)})\n`)
+			}
+			const trueThroughOperations = this.getMatchingOperations({
+				predicate: true,
+				operations: through.operations,
+				numberOfEntityFieldsWithoutId,
+			})
+			if (Object.keys(trueThroughOperations).length > 0) {
+				aclOutput.push(`@c.Allow(${roleVarName}, ${printJsValue({ through: true, ...trueThroughOperations }, indentFirstLevel)})\n`)
 			}
 		}
 

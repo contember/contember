@@ -142,3 +142,57 @@ describe('handleOIDCResponse — non-string email/name do not leak', () => {
 		expect(result.email).toBeUndefined()
 	})
 })
+
+describe('handleOIDCResponse — display name', () => {
+	// `name` is optional in OIDC core and several providers (Apereo CAS, Entra ID, Keycloak under its
+	// default mappers) omit it while sending the parts. Without the fallback CreatePersonCommand lands
+	// on its own last-resort default and the person ends up named after their e-mail's local part.
+	test('composes the name from given_name + family_name when there is no `name` claim', async () => {
+		const client = stubClient({ sub: 's', email: 'jan@example.com', given_name: 'Jan', family_name: 'Novák' })
+		const result = await handleOIDCResponse(client, responseData)
+		expect(result.name).toBe('Jan Novák')
+	})
+
+	test('an explicit `name` claim still wins over the parts', async () => {
+		const client = stubClient({ sub: 's', name: 'Jan Novák ml.', given_name: 'Jan', family_name: 'Novák' })
+		const result = await handleOIDCResponse(client, responseData)
+		expect(result.name).toBe('Jan Novák ml.')
+	})
+
+	test('only one part present → that part alone, no stray whitespace', async () => {
+		expect((await handleOIDCResponse(stubClient({ sub: 's', given_name: 'Jan' }), responseData)).name).toBe('Jan')
+		expect((await handleOIDCResponse(stubClient({ sub: 's', family_name: 'Novák' }), responseData)).name).toBe('Novák')
+	})
+
+	test('blank / non-string parts are ignored rather than composed into whitespace', async () => {
+		expect((await handleOIDCResponse(stubClient({ sub: 's', given_name: '  ', family_name: '' }), responseData)).name)
+			.toBeUndefined()
+		expect((await handleOIDCResponse(stubClient({ sub: 's', given_name: ['Jan'], family_name: 3 }), responseData)).name)
+			.toBeUndefined()
+	})
+
+	test('a blank `name` claim falls back to the parts', async () => {
+		const client = stubClient({ sub: 's', name: '   ', given_name: 'Jan', family_name: 'Novák' })
+		expect((await handleOIDCResponse(client, responseData)).name).toBe('Jan Novák')
+	})
+
+	test('an explicitly mapped name claim is honoured as-is — no silent substitution', async () => {
+		// Mapping a claim states where the name lives; falling back to other claims would defeat that.
+		const client = stubClient({ sub: 's', displayName: 'Jan N.', given_name: 'Jan', family_name: 'Novák' })
+		expect((await handleOIDCResponse(client, responseData, { claimMapping: { name: 'displayName' } })).name).toBe('Jan N.')
+		const missing = stubClient({ sub: 's', given_name: 'Jan', family_name: 'Novák' })
+		expect((await handleOIDCResponse(missing, responseData, { claimMapping: { name: 'displayName' } })).name).toBeUndefined()
+	})
+
+	test('the parts are read after attributes-lifting, so a CAS-shaped userinfo works', async () => {
+		const client = stubClient(
+			{ sub: 's' },
+			{ sub: 's', attributes: { given_name: 'Jan', family_name: 'Novák' } },
+		)
+		const result = await handleOIDCResponse(client, responseData, {
+			fetchUserInfo: true,
+			claimMapping: { attributesKey: 'attributes' },
+		})
+		expect(result.name).toBe('Jan Novák')
+	})
+})

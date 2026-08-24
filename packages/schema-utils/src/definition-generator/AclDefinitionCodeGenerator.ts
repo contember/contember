@@ -54,7 +54,7 @@ export class AclDefinitionCodeGenerator {
 
 	public generateEntityAcl({ entity, schema }: { entity: Model.Entity; schema: Schema }): string {
 		const aclOutput: string[] = []
-		const numberOfEntityFieldsWithoutId = Object.keys(entity.fields).length - 1
+		const nonPrimaryFields = Object.keys(entity.fields).filter(it => it !== entity.primary)
 		for (const [roleName, roleDefinition] of Object.entries(schema.acl.roles)) {
 			const entityPermission = roleDefinition.entities[entity.name]
 			if (!entityPermission) {
@@ -65,7 +65,8 @@ export class AclDefinitionCodeGenerator {
 				const operations = this.getMatchingOperations({
 					predicate: predicateName,
 					operations: entityPermission.operations,
-					numberOfEntityFieldsWithoutId,
+					entity,
+					nonPrimaryFields,
 				})
 				if (Object.keys(operations).length > 0) {
 					const processor = new PredicateDefinitionProcessor(schema.model)
@@ -87,7 +88,8 @@ export class AclDefinitionCodeGenerator {
 			const trueOperations = this.getMatchingOperations({
 				predicate: true,
 				operations: entityPermission.operations,
-				numberOfEntityFieldsWithoutId,
+				entity,
+				nonPrimaryFields,
 			})
 			if (Object.keys(trueOperations).length > 0) {
 				const aclDefinition = printJsValue({ ...trueOperations }, indentFirstLevel)
@@ -101,16 +103,17 @@ export class AclDefinitionCodeGenerator {
 		return `${aclOutput.join('')}`
 	}
 
-	private getMatchingOperations({ operations, predicate, numberOfEntityFieldsWithoutId }: {
+	private getMatchingOperations({ operations, predicate, entity, nonPrimaryFields }: {
 		operations: Acl.EntityOperations
 		predicate: Acl.Predicate
-		numberOfEntityFieldsWithoutId: number
+		entity: Model.Entity
+		nonPrimaryFields: string[]
 	}): { read?: string[] | true; create?: string[] | boolean; update?: string[] | boolean; delete?: true } {
 		const result: ReturnType<AclDefinitionCodeGenerator['getMatchingOperations']> = {}
 		for (const op of ['read', 'create', 'update'] as const) {
 			const fields = Object.entries(operations[op] ?? {}).filter(([, it]) => it === predicate).map(([it]) => it)
 			if (fields.length === 0) {
-			} else if (fields.length === numberOfEntityFieldsWithoutId) {
+			} else if (this.coversEveryNonPrimaryField(fields, entity, nonPrimaryFields)) {
 				result[op] = true
 			} else {
 				result[op] = fields
@@ -121,5 +124,18 @@ export class AclDefinitionCodeGenerator {
 		}
 
 		return result
+	}
+
+	/**
+	 * `read: true` re-parses as every field except the primary, so it may only stand in for a grant that
+	 * covers exactly that set. Comparing counts instead treated a grant naming the primary plus all but
+	 * one field as complete, and regenerating it silently granted the missing field.
+	 */
+	private coversEveryNonPrimaryField(fields: string[], entity: Model.Entity, nonPrimaryFields: string[]): boolean {
+		if (fields.includes(entity.primary)) {
+			return false
+		}
+		const granted = new Set(fields)
+		return nonPrimaryFields.every(it => granted.has(it))
 	}
 }

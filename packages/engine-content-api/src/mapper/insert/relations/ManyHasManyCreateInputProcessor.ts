@@ -5,12 +5,15 @@ import { CreateInputProcessor } from '../../../inputProcessing/index.js'
 import { SqlCreateInputProcessorResult } from '../SqlCreateInputProcessor.js'
 import { CheckedPrimary } from '../../CheckedPrimary.js'
 import { MapperInput } from '../../types.js'
+import { AclScope } from '../../../acl/index.js'
 
 type Context = Model.ManyHasManyOwningContext | Model.ManyHasManyInverseContext
 
 export class ManyHasManyCreateInputProcessor implements CreateInputProcessor.HasManyRelationProcessor<Context, SqlCreateInputProcessorResult> {
 	constructor(
 		private readonly mapper: Mapper,
+		/** Scope of the entity being written, the one that declares this relation; the other side of the junction stays nested. */
+		private readonly scope: AclScope,
 	) {
 	}
 
@@ -20,7 +23,7 @@ export class ManyHasManyCreateInputProcessor implements CreateInputProcessor.Has
 		return async ({ primary }) => {
 			const [otherPrimary, err] = await this.mapper.getPrimaryValue(targetEntity, input)
 			if (err) return [err]
-			return await this.mapper.connectJunction(entity, relation, primary, otherPrimary, 'nested')
+			return await this.mapper.connectJunction(entity, relation, primary, otherPrimary, this.scope)
 		}
 	}
 
@@ -35,7 +38,7 @@ export class ManyHasManyCreateInputProcessor implements CreateInputProcessor.Has
 			}
 			return [
 				...insertResult,
-				...(await this.mapper.connectJunction(entity, relation, primary, insertPrimary, 'nested')),
+				...(await this.mapper.connectJunction(entity, relation, primary, insertPrimary, this.scope)),
 			]
 		}
 	}
@@ -52,7 +55,7 @@ export class ManyHasManyCreateInputProcessor implements CreateInputProcessor.Has
 					return insertResult
 				}
 			}
-			return await this.mapper.connectJunction(context.entity, context.relation, primary, otherPrimary, 'nested')
+			return await this.mapper.connectJunction(context.entity, context.relation, primary, otherPrimary, this.scope)
 		}
 	}
 }

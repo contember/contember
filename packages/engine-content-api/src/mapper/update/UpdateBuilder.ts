@@ -1,7 +1,7 @@
 import { tuple } from '../../utils/index.js'
 import { Acl, Input, Model, Value } from '@contember/schema'
 import { acceptEveryFieldVisitor, getColumnName, getColumnType } from '@contember/schema-utils'
-import { Operator, QueryBuilder, UpdateBuilder as DbUpdateBuilder, Value as DbValue } from '@contember/database'
+import { Operator, QueryBuilder, SelectBuilder, UpdateBuilder as DbUpdateBuilder, Value as DbValue } from '@contember/database'
 import { PathFactory, WhereBuilder } from '../select/index.js'
 import { ColumnValue, normalizeDbValue } from '../ColumnValue.js'
 import { AclScope, PredicateFactory } from '../../acl/index.js'
@@ -19,6 +19,8 @@ export class UpdateBuilder {
 
 	private newWhere: { and: Input.OptionalWhere[] } = { and: [] }
 	private oldWhere: { and: Input.OptionalWhere[] } = { and: [] }
+	private predicateFields: string[] = []
+	private fieldsCheckedElsewhere = new Set<string>()
 
 	constructor(
 		private readonly schema: Model.Schema,
@@ -53,8 +55,43 @@ export class UpdateBuilder {
 
 	public addPredicates(fields: string[]): void {
 		const predicate = this.predicateFactory.create(this.entity, Acl.Operation.update, this.scope, fields)
+		this.predicateFields.push(...fields)
 		this.addNewWhere(predicate)
 		this.addOldWhere(predicate)
+	}
+
+	/**
+	 * Declares that another statement of this mutation resolves this field's update predicate. A m:n
+	 * write does exactly that: `JunctionTableManager` builds the same predicate for the side it was
+	 * called about, so re-checking it here would only cost a query.
+	 */
+	public markPredicateCheckedElsewhere(field: string): void {
+		this.fieldsCheckedElsewhere.add(field)
+	}
+
+	/**
+	 * Checks the row against the predicates of the fields nothing else covers. {@link execute} skips
+	 * the statement when there is no column to set, so with relation-only data the predicates never
+	 * reach the database on their own - which used to let a mutation write through a relation the
+	 * role may not update at this scope.
+	 */
+	public async verifyPredicates(mapper: Mapper): Promise<boolean> {
+		const fields = this.predicateFields.filter(it => !this.fieldsCheckedElsewhere.has(it))
+		if (fields.length === 0) {
+			return true
+		}
+		const predicate = this.predicateFactory.create(this.entity, Acl.Operation.update, this.scope, fields)
+		if (Object.keys(predicate).length === 0) {
+			return true
+		}
+		const path = this.pathFactory.create([])
+		const qb = SelectBuilder.create()
+			.from(this.entity.tableName, path.alias)
+			.select([path.alias, this.entity.primaryColumn])
+		const where: Input.OptionalWhere = { and: [predicate, { [this.entity.primary]: { eq: this.primary } }] }
+		const result = await this.whereBuilder.build(qb, this.entity, path, where).getResult(mapper.db)
+
+		return result.length > 0
 	}
 
 	public async execute(mapper: Mapper): Promise<UpdateResult> {

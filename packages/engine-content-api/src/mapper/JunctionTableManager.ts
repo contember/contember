@@ -22,6 +22,17 @@ type JunctionMutationResult =
 	| MutationNothingToDo
 	| MutationNoResultError
 
+/**
+ * A junction write touches two entities, and they do not sit in the same place: the entity the
+ * caller named is where the mutation already is - the root, when the mutation is a root one - while
+ * the other one is only ever reached over the relation. Resolving both with a single scope is what
+ * let a `through`-only grant on the named entity apply at the mutation root.
+ */
+export interface JunctionScopes {
+	owning: AclScope
+	inverse: AclScope
+}
+
 export class JunctionTableManager {
 	constructor(
 		private readonly schema: Model.Schema,
@@ -38,7 +49,7 @@ export class JunctionTableManager {
 		relation: Model.ManyHasManyOwningRelation,
 		owningUnique: Input.PrimaryValue,
 		inverseUnique: Input.PrimaryValue,
-		scope: AclScope,
+		scopes: JunctionScopes,
 	): Promise<MutationResultList> {
 		const beforeEvent = new BeforeJunctionUpdateEvent(owningEntity, relation, owningUnique, inverseUnique, 'connect')
 		await mapper.eventManager.fire(beforeEvent)
@@ -49,7 +60,7 @@ export class JunctionTableManager {
 			owningUnique,
 			inverseUnique,
 			this.connectJunctionHandler,
-			scope,
+			scopes,
 		)
 		if (result.result !== MutationResultType.noResultError) {
 			const afterEvent = new AfterJunctionUpdateEvent(
@@ -71,7 +82,7 @@ export class JunctionTableManager {
 		relation: Model.ManyHasManyOwningRelation,
 		owningUnique: Input.PrimaryValue,
 		inverseUnique: Input.PrimaryValue,
-		scope: AclScope,
+		scopes: JunctionScopes,
 	): Promise<MutationResultList> {
 		const beforeEvent = new BeforeJunctionUpdateEvent(owningEntity, relation, owningUnique, inverseUnique, 'connect')
 		await mapper.eventManager.fire(beforeEvent)
@@ -82,7 +93,7 @@ export class JunctionTableManager {
 			owningUnique,
 			inverseUnique,
 			this.disconnectJunctionHandler,
-			scope,
+			scopes,
 		)
 		if (result.result !== MutationResultType.noResultError) {
 			const afterEvent = new AfterJunctionUpdateEvent(
@@ -106,7 +117,7 @@ export class JunctionTableManager {
 		owningPrimary: Input.PrimaryValue,
 		inversePrimary: Input.PrimaryValue,
 		handler: JunctionHandler,
-		scope: AclScope,
+		scopes: JunctionScopes,
 	): Promise<JunctionMutationResult> {
 		const joiningTable = relation.joiningTable
 		const inverseEntity = getEntity(this.schema, relation.target)
@@ -114,10 +125,10 @@ export class JunctionTableManager {
 			throw new ImplementationException()
 		}
 
-		const owningPredicate = this.predicateFactory.create(owningEntity, Acl.Operation.update, scope, [relation.name])
+		const owningPredicate = this.predicateFactory.create(owningEntity, Acl.Operation.update, scopes.owning, [relation.name])
 		let inversePredicate: Input.OptionalWhere = {}
 		if (relation.inversedBy) {
-			inversePredicate = this.predicateFactory.create(inverseEntity, Acl.Operation.update, scope, [relation.inversedBy])
+			inversePredicate = this.predicateFactory.create(inverseEntity, Acl.Operation.update, scopes.inverse, [relation.inversedBy])
 		}
 
 		const hasNoPredicates = Object.keys(owningPredicate).length === 0 && Object.keys(inversePredicate).length === 0

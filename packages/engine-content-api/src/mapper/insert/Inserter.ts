@@ -33,7 +33,7 @@ export class Inserter {
 		insertBuilder.addPredicates(Object.keys(data))
 
 		const visitor = new CreateInputVisitor<SqlCreateInputProcessorResult>(
-			new SqlCreateInputProcessor(insertBuilder, mapper, this.providers, this.options),
+			new SqlCreateInputProcessor(insertBuilder, mapper, this.providers, scope, this.options),
 			this.schema,
 			data,
 		)

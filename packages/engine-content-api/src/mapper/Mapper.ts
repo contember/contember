@@ -285,6 +285,10 @@ export class Mapper<ConnectionType extends Connection.ConnectionLike = Connectio
 		})
 	}
 
+	/**
+	 * `scope` belongs to `entity` - the side the caller named. The other side of the junction is
+	 * reached over the relation, so it always resolves as nested.
+	 */
 	public async connectJunction(
 		entity: Model.Entity,
 		relation: Model.ManyHasManyOwningRelation | Model.ManyHasManyInverseRelation,
@@ -298,10 +302,16 @@ export class Mapper<ConnectionType extends Connection.ConnectionLike = Connectio
 		}
 		return await acceptFieldVisitor(this.schema, entity, relation, {
 			visitManyHasManyOwning: ({ entity, relation }) => {
-				return this.junctionTableManager.connectJunction(this, entity, relation, thisPrimary, otherPrimary, scope)
+				return this.junctionTableManager.connectJunction(this, entity, relation, thisPrimary, otherPrimary, {
+					owning: scope,
+					inverse: 'nested',
+				})
 			},
 			visitManyHasManyInverse: ({ targetEntity, targetRelation }) => {
-				return this.junctionTableManager.connectJunction(this, targetEntity, targetRelation, otherPrimary, thisPrimary, scope)
+				return this.junctionTableManager.connectJunction(this, targetEntity, targetRelation, otherPrimary, thisPrimary, {
+					owning: 'nested',
+					inverse: scope,
+				})
 			},
 			visitColumn: err,
 			visitOneHasMany: err,
@@ -311,6 +321,7 @@ export class Mapper<ConnectionType extends Connection.ConnectionLike = Connectio
 		})
 	}
 
+	/** See {@link connectJunction} for how `scope` maps onto the two sides. */
 	public async disconnectJunction(
 		entity: Model.Entity,
 		relation: Model.ManyHasManyOwningRelation | Model.ManyHasManyInverseRelation,
@@ -324,10 +335,16 @@ export class Mapper<ConnectionType extends Connection.ConnectionLike = Connectio
 		}
 		return await acceptFieldVisitor(this.schema, entity, relation, {
 			visitManyHasManyOwning: ({ entity, relation }) => {
-				return this.junctionTableManager.disconnectJunction(this, entity, relation, thisPrimary, otherPrimary, scope)
+				return this.junctionTableManager.disconnectJunction(this, entity, relation, thisPrimary, otherPrimary, {
+					owning: scope,
+					inverse: 'nested',
+				})
 			},
 			visitManyHasManyInverse: ({ targetEntity, targetRelation }) => {
-				return this.junctionTableManager.disconnectJunction(this, targetEntity, targetRelation, otherPrimary, thisPrimary, scope)
+				return this.junctionTableManager.disconnectJunction(this, targetEntity, targetRelation, otherPrimary, thisPrimary, {
+					owning: 'nested',
+					inverse: scope,
+				})
 			},
 			visitColumn: err,
 			visitOneHasMany: err,

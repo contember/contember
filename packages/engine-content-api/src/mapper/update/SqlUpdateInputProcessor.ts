@@ -10,6 +10,7 @@ import { UpdateInputProcessor } from '../../inputProcessing/index.js'
 import { MutationResultList } from '../Result.js'
 import { ManyHasOneUpdateInputProcessor } from './relations/ManyHasOneUpdateInputProcessor.js'
 import { MapperInput } from '../types.js'
+import { AclScope } from '../../acl/index.js'
 
 export type SqlUpdateInputProcessorResult = MutationResultList | ((ctx: { primary: Input.PrimaryValue }) => Promise<MutationResultList>)
 
@@ -25,12 +26,14 @@ export class SqlUpdateInputProcessor implements UpdateInputProcessor<SqlUpdateIn
 		private readonly data: MapperInput.UpdateDataInput,
 		private readonly updateBuilder: UpdateBuilder,
 		private readonly mapper: Mapper,
+		/** Scope of the entity being updated; relation targets are always reached over a relation and stay nested. */
+		private readonly scope: AclScope,
 	) {
 		this.oneHasOneInverseUpdateInputProcessor = new OneHasOneInverseUpdateInputProcessor(this.primaryValue, this.mapper)
 		this.oneHasOneOwningUpdateInputProcessor = new OneHasOneOwningUpdateInputProcessor(this.primaryValue, this.mapper, this.updateBuilder)
 		this.oneHasManyUpdateInputProcessor = new OneHasManyUpdateInputProcessor(this.mapper)
 		this.manyHasOneUpdateInputProcessor = new ManyHasOneUpdateInputProcessor(this.mapper, this.updateBuilder, this.primaryValue)
-		this.manyHasManyUpdateInputProcessor = new ManyHasManyUpdateInputProcessor(this.mapper)
+		this.manyHasManyUpdateInputProcessor = new ManyHasManyUpdateInputProcessor(this.mapper, this.scope, this.updateBuilder)
 	}
 
 	public column({ entity, column }: Model.ColumnContext) {

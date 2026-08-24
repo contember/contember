@@ -419,3 +419,84 @@ test('the same through-only field is writable when the entity is created through
 		},
 	})
 })
+
+/**
+ * `JunctionTableManager` resolves the owning side's `update` grant for the relation field even when
+ * the row is being created, so the create path needs the same root/nested distinction as the update
+ * path. `Content.categories` is granted only through a relation.
+ */
+namespace RootCreateWithThroughJunction {
+	export const editorRole = c.createRole('editor')
+
+	@c.Allow(editorRole, { read: ['id', 'contents'], create: ['contents'], update: ['contents'] })
+	export class Page {
+		contents: c.OneHasManyDefinition = c.oneHasMany(Content, 'page')
+	}
+
+	// `create` on the relation field is granted at the root, so the insert itself passes and the
+	// denial can only come from the junction write, which resolves the `update` grant.
+	@c.Allow(editorRole, { read: ['id', 'title'], create: ['title', 'page', 'categories'], update: ['title'] })
+	@c.Allow(editorRole, { through: true, update: ['categories'] })
+	export class Content {
+		title = c.stringColumn()
+		page = c.manyHasOne(Page, 'contents')
+		categories = c.manyHasMany(Category, 'contents')
+	}
+
+	@c.Allow(editorRole, { read: ['id'], update: ['contents'] })
+	export class Category {
+		contents: c.ManyHasManyInverse<Content> = c.manyHasManyInverse(Content, 'categories')
+	}
+}
+
+test('a root create denies a junction write granted only through a relation', async () => {
+	const schema = createSchema(RootCreateWithThroughJunction)
+	const { root, all } = new PermissionFactory().createContextual(schema, ['editor'])
+
+	await execute({
+		schema: schema.model,
+		permissions: root,
+		nestedPermissions: all,
+		query: GQL`mutation {
+        createContent(data: {title: "Hello", categories: [{connect: {id: "${testUuid(3)}"}}]}) {
+          ok
+        }
+      }`,
+		executes: [
+			...failedTransaction([
+				{
+					sql: SQL`with "root_" as (select ? :: uuid as "id", ? :: text as "title", ? :: uuid as "page_id")
+						insert into "public"."content" ("id", "title", "page_id")
+						select "root_"."id", "root_"."title", "root_"."page_id" from "root_" returning "id"`,
+					parameters: [testUuid(1), 'Hello', null],
+					response: { rows: [{ id: testUuid(1) }] },
+				},
+				{
+					sql: SQL`select "root_"."id" from "public"."category" as "root_" where "root_"."id" = ?`,
+					parameters: [testUuid(3)],
+					response: { rows: [{ id: testUuid(3) }] },
+				},
+				{
+					sql: SQL`with "data" as (select "owning"."id" as "content_id", "inverse"."id" as "category_id", true as "selected"
+							from (values (null)) as "t"
+							inner join "public"."content" as "owning" on true
+							inner join "public"."category" as "inverse" on true
+							where false and "inverse"."id" = ?),
+						"insert" as (insert into "public"."content_categories" ("content_id", "category_id")
+							select "data"."content_id", "data"."category_id" from "data" on conflict do nothing returning true as inserted)
+						select coalesce(data.selected, false) as "selected", coalesce(insert.inserted, false) as "inserted"
+						from (values (null)) as "t" left join "data" as "data" on true left join "insert" as "insert" on true`,
+					parameters: [testUuid(3)],
+					response: { rows: [{ selected: false, inserted: false }] },
+				},
+			]),
+		],
+		return: {
+			data: {
+				createContent: {
+					ok: false,
+				},
+			},
+		},
+	})
+})

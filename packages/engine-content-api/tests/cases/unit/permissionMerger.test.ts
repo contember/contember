@@ -1007,3 +1007,194 @@ describe('Contextual permission merger', () => {
 		})
 	})
 })
+
+describe('Contextual permission merger - entity flags', () => {
+	it('two roles: refreshMaterializedView is granted if any role grants it', () => {
+		const result: Acl.Permissions = {
+			Entity1: {
+				operations: {
+					refreshMaterializedView: true,
+					read: {
+						title: true,
+						description: true,
+						id: true,
+					},
+				},
+				predicates: {},
+			},
+		}
+		executeContextual({
+			acl: {
+				roles: {
+					viewRole: {
+						variables: {},
+						entities: {
+							Entity1: {
+								predicates: {},
+								operations: {
+									refreshMaterializedView: true,
+									read: { title: true },
+								},
+							},
+						},
+					},
+					otherRole: {
+						variables: {},
+						entities: {
+							Entity1: {
+								predicates: {},
+								operations: {
+									read: { description: true },
+								},
+							},
+						},
+					},
+				},
+			},
+			roles: ['viewRole', 'otherRole'],
+			rootResult: result,
+			allResult: result,
+		})
+	})
+
+	it('two roles: an explicit customPrimary and refreshMaterializedView denial survives the merge', () => {
+		// A dropped `false` would not stay denied: Authorizator resolves the flags with `??`, so an absent
+		// key falls back to the role-level default instead of denying.
+		const result: Acl.Permissions = {
+			Entity1: {
+				operations: {
+					customPrimary: false,
+					refreshMaterializedView: false,
+					read: {
+						title: true,
+						description: true,
+						id: true,
+					},
+				},
+				predicates: {},
+			},
+		}
+		executeContextual({
+			acl: {
+				roles: {
+					denyingRole: {
+						variables: {},
+						entities: {
+							Entity1: {
+								predicates: {},
+								operations: {
+									customPrimary: false,
+									refreshMaterializedView: false,
+									read: { title: true },
+								},
+							},
+						},
+					},
+					otherRole: {
+						variables: {},
+						entities: {
+							Entity1: {
+								predicates: {},
+								operations: {
+									read: { description: true },
+								},
+							},
+						},
+					},
+				},
+			},
+			roles: ['denyingRole', 'otherRole'],
+			rootResult: result,
+			allResult: result,
+		})
+	})
+
+	it('two roles: an explicit denial loses to another role granting the flag', () => {
+		const result: Acl.Permissions = {
+			Entity1: {
+				operations: {
+					customPrimary: true,
+					refreshMaterializedView: true,
+					read: {
+						title: true,
+						description: true,
+						id: true,
+					},
+				},
+				predicates: {},
+			},
+		}
+		executeContextual({
+			acl: {
+				roles: {
+					denyingRole: {
+						variables: {},
+						entities: {
+							Entity1: {
+								predicates: {},
+								operations: {
+									customPrimary: false,
+									refreshMaterializedView: false,
+									read: { title: true },
+								},
+							},
+						},
+					},
+					grantingRole: {
+						variables: {},
+						entities: {
+							Entity1: {
+								predicates: {},
+								operations: {
+									customPrimary: true,
+									refreshMaterializedView: true,
+									read: { description: true },
+								},
+							},
+						},
+					},
+				},
+			},
+			roles: ['denyingRole', 'grantingRole'],
+			rootResult: result,
+			allResult: result,
+		})
+	})
+
+	it('flags no role states stay absent, leaving the role-level default in charge', () => {
+		const model: Model.Schema = new SchemaBuilder()
+			.entity('Entity1', e => e.column('lorem').column('bar'))
+			.buildSchema()
+		const acl: Acl.Schema = {
+			roles: {
+				role1: {
+					variables: {},
+					entities: {
+						Entity1: {
+							predicates: {},
+							operations: {
+								read: { title: true },
+							},
+						},
+					},
+				},
+				role2: {
+					variables: {},
+					entities: {
+						Entity1: {
+							predicates: {},
+							operations: {
+								read: { description: true },
+							},
+						},
+					},
+				},
+			},
+		}
+		const { root, all } = new PermissionFactory().createContextual({ ...emptySchema, model, acl }, ['role1', 'role2'])
+
+		// Asserted on the key list, because a `customPrimary: undefined` would compare equal to an absent one.
+		assert.deepStrictEqual(Object.keys(root.Entity1.operations), ['read'])
+		assert.deepStrictEqual(Object.keys(all.Entity1.operations), ['read'])
+	})
+})

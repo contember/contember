@@ -1,0 +1,201 @@
+type Query {
+  getArticle(by: ArticleUniqueWhere!, filter: ArticleWhere): Article
+  listArticle(filter: ArticleWhere, orderBy: [ArticleOrderBy!], offset: Int, limit: Int): [Article!]!
+  paginateArticle(filter: ArticleWhere, orderBy: [ArticleOrderBy!], skip: Int, first: Int): ArticleConnection!
+  getAuthor(by: AuthorUniqueWhere!, filter: AuthorWhere): Author
+  listAuthor(filter: AuthorWhere, orderBy: [AuthorOrderBy!], offset: Int, limit: Int): [Author!]!
+  paginateAuthor(filter: AuthorWhere, orderBy: [AuthorOrderBy!], skip: Int, first: Int): AuthorConnection!
+  transaction: QueryTransaction
+  _info: Info
+}
+
+type Article {
+  _meta: ArticleMeta
+  id: UUID!
+  title: String!
+  author(filter: AuthorWhere): Author
+  image(filter: ImageWhere): Image
+}
+
+type ArticleMeta {
+  id: FieldMeta
+  title: FieldMeta
+  author: FieldMeta
+  image: FieldMeta
+}
+
+type FieldMeta {
+  readable: Boolean
+  updatable: Boolean
+}
+
+scalar UUID
+
+type Author {
+  _meta: AuthorMeta
+  id: UUID!
+  name: String!
+  secret: String
+  classified: String
+}
+
+type AuthorMeta {
+  id: FieldMeta
+  name: FieldMeta
+  secret: FieldMeta
+  classified: FieldMeta
+}
+
+input AuthorWhere {
+  id: UUIDCondition
+  name: StringCondition
+  secret: StringCondition
+  classified: StringCondition
+  and: [AuthorWhere]
+  or: [AuthorWhere]
+  not: AuthorWhere
+}
+
+input UUIDCondition {
+  and: [UUIDCondition!]
+  or: [UUIDCondition!]
+  not: UUIDCondition
+  null: Boolean
+  isNull: Boolean
+  eq: UUID
+  notEq: UUID
+  in: [UUID!]
+  notIn: [UUID!]
+  lt: UUID
+  lte: UUID
+  gt: UUID
+  gte: UUID
+}
+
+input StringCondition {
+  and: [StringCondition!]
+  or: [StringCondition!]
+  not: StringCondition
+  null: Boolean
+  isNull: Boolean
+  eq: String
+  notEq: String
+  in: [String!]
+  notIn: [String!]
+  lt: String
+  lte: String
+  gt: String
+  gte: String
+  contains: String
+  startsWith: String
+  endsWith: String
+  containsCI: String
+  startsWithCI: String
+  endsWithCI: String
+  similar: String
+  wordSimilar: String
+}
+
+type Image {
+  _meta: ImageMeta
+  id: UUID!
+  url: String!
+}
+
+type ImageMeta {
+  id: FieldMeta
+  url: FieldMeta
+}
+
+input ImageWhere {
+  id: UUIDCondition
+  url: StringCondition
+  and: [ImageWhere]
+  or: [ImageWhere]
+  not: ImageWhere
+}
+
+input ArticleUniqueWhere {
+  id: UUID
+}
+
+input ArticleWhere {
+  id: UUIDCondition
+  title: StringCondition
+  author: AuthorWhere
+  image: ImageWhere
+  and: [ArticleWhere]
+  or: [ArticleWhere]
+  not: ArticleWhere
+}
+
+input ArticleOrderBy {
+  _random: Boolean
+  _randomSeeded: Int
+  id: OrderDirection
+  title: OrderDirection
+  author: AuthorOrderBy
+  image: ImageOrderBy
+}
+
+enum OrderDirection {
+  asc
+  desc
+  ascNullsFirst
+  descNullsLast
+}
+
+input AuthorOrderBy {
+  _random: Boolean
+  _randomSeeded: Int
+  id: OrderDirection
+  name: OrderDirection
+  secret: OrderDirection
+  classified: OrderDirection
+}
+
+input ImageOrderBy {
+  _random: Boolean
+  _randomSeeded: Int
+  id: OrderDirection
+  url: OrderDirection
+}
+
+type ArticleConnection {
+  pageInfo: PageInfo!
+  edges: [ArticleEdge!]!
+}
+
+type PageInfo {
+  totalCount: Int!
+}
+
+type ArticleEdge {
+  node: Article!
+}
+
+input AuthorUniqueWhere {
+  id: UUID
+}
+
+type AuthorConnection {
+  pageInfo: PageInfo!
+  edges: [AuthorEdge!]!
+}
+
+type AuthorEdge {
+  node: Author!
+}
+
+type QueryTransaction {
+  getArticle(by: ArticleUniqueWhere!, filter: ArticleWhere): Article
+  listArticle(filter: ArticleWhere, orderBy: [ArticleOrderBy!], offset: Int, limit: Int): [Article!]!
+  paginateArticle(filter: ArticleWhere, orderBy: [ArticleOrderBy!], skip: Int, first: Int): ArticleConnection!
+  getAuthor(by: AuthorUniqueWhere!, filter: AuthorWhere): Author
+  listAuthor(filter: AuthorWhere, orderBy: [AuthorOrderBy!], offset: Int, limit: Int): [Author!]!
+  paginateAuthor(filter: AuthorWhere, orderBy: [AuthorOrderBy!], skip: Int, first: Int): AuthorConnection!
+}
+
+type Info {
+  description: String
+}

@@ -409,6 +409,18 @@ describe('GraphQL schema builder', () => {
 		})
 	})
 
+	it('not null columns with root and through grants', async () => {
+		const schema = createSchema(NotNullRootAndThrough)
+		const { root, all } = new PermissionFactory().createContextual(schema, ['editor'])
+
+		await testSchema({
+			schema: () => schema.model,
+			permissions: () => all,
+			rootPermissions: () => root,
+			graphQlSchemaFile: 'schema-not-null-through.gql',
+		})
+	})
+
 	it('array', async () => {
 		const schema = createSchema({
 			Foo: class Foo {
@@ -454,6 +466,39 @@ namespace MixedRootAndThrough {
 	export class Author {
 		name = c.stringColumn()
 		secret = c.stringColumn()
+	}
+}
+
+/**
+ * Every column is `notNull`, so this pins down which of them may stay non-null. The type is shared
+ * by the root and the nested scope, so only a column the root scope always fills qualifies - unless
+ * the entity is unreachable at the root, in which case the root scope constrains nothing.
+ */
+namespace NotNullRootAndThrough {
+	export const editorRole = c.createRole('editor')
+
+	@c.Allow(editorRole, {
+		read: true,
+	})
+	export class Article {
+		title = c.stringColumn().notNull()
+		author = c.manyHasOne(Author).notNull()
+		image = c.manyHasOne(Image).notNull()
+	}
+
+	@c.Allow(editorRole, { read: ['name'] })
+	@c.Allow(editorRole, { through: true, read: ['secret'] })
+	@c.Allow(editorRole, { through: true, when: { disclosed: { eq: true } }, read: ['classified'] })
+	export class Author {
+		name = c.stringColumn().notNull()
+		secret = c.stringColumn().notNull()
+		classified = c.stringColumn().notNull()
+		disclosed = c.boolColumn().notNull()
+	}
+
+	@c.Allow(editorRole, { through: true, read: ['url'] })
+	export class Image {
+		url = c.stringColumn().notNull()
 	}
 }
 

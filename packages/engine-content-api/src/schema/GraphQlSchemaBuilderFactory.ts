@@ -62,8 +62,8 @@ export class GraphQlSchemaBuilderFactory {
 			.addService('orderByTypeProvider', ({ schema, authorizator }) => new OrderByTypeProvider(schema, authorizator))
 			.addService(
 				'entityTypeProvider',
-				({ schema, authorizator, columnTypeResolver, whereTypeProvider, orderByTypeProvider }) =>
-					new EntityTypeProvider(schema, authorizator, columnTypeResolver, whereTypeProvider, orderByTypeProvider),
+				({ schema, authorizator, rootAuthorizator, columnTypeResolver, whereTypeProvider, orderByTypeProvider }) =>
+					new EntityTypeProvider(schema, authorizator, rootAuthorizator, columnTypeResolver, whereTypeProvider, orderByTypeProvider),
 			)
 			.addService(
 				'paginatedFieldConfigFactory',

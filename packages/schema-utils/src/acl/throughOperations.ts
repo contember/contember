@@ -11,7 +11,9 @@ const FIELD_OPERATIONS = ['read', 'create', 'update'] as const
  * replacement for them.
  *
  * The legacy `noRoot` flag is understood as well: it marked a whole operation as through-only, and
- * schemas migrated before `through` existed still carry it (stored migrations keep patching it).
+ * schemas migrated before `through` existed still carry it (stored migrations keep patching it). A
+ * legacy grant and a declared `through` grant for the same operation are merged, never discarded -
+ * the declared one wins on a field both of them name.
  */
 export const splitEntityPermissions = (permissions: Acl.EntityPermissions): {
 	root: Acl.EntityPermissions
@@ -36,13 +38,17 @@ export const splitEntityPermissions = (permissions: Acl.EntityPermissions): {
 		}
 		const grant = root[operation]
 		delete root[operation]
-		if (grant !== undefined && through[operation] === undefined) {
-			through[operation] = grant
+		if (grant === undefined) {
+			continue
 		}
+		// Both grants belong to the through scope, so merge them field-wise instead of picking one - an
+		// already declared `through` grant is the current format, so it wins on a field both of them name.
+		through[operation] = { ...grant, ...through[operation] }
 	}
 	if (legacyThroughOperations.includes('delete')) {
 		const grant = root.delete
 		delete root.delete
+		// A single predicate has no empty shape, so an undeclared `through.delete` is exactly `undefined`.
 		if (grant !== undefined && through.delete === undefined) {
 			through.delete = grant
 		}

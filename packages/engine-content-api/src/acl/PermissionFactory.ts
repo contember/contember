@@ -158,8 +158,12 @@ export class PermissionFactory {
 	private mergeEntityPermissions(left: Acl.EntityPermissions, right: Acl.EntityPermissions): Acl.EntityPermissions {
 		let predicates: Writable<Acl.PredicateMap> = {}
 		const operations: Writable<Acl.EntityOperations> = {}
-		if (left.operations.customPrimary || right.operations.customPrimary) {
-			operations.customPrimary = true
+		// Three-state: unstated stays unstated so the role-level default still applies, an explicit `false` survives, and `true` wins across roles.
+		if (left.operations.customPrimary !== undefined || right.operations.customPrimary !== undefined) {
+			operations.customPrimary = (left.operations.customPrimary ?? false) || (right.operations.customPrimary ?? false)
+		}
+		if (left.operations.refreshMaterializedView !== undefined || right.operations.refreshMaterializedView !== undefined) {
+			operations.refreshMaterializedView = (left.operations.refreshMaterializedView ?? false) || (right.operations.refreshMaterializedView ?? false)
 		}
 
 		for (

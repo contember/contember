@@ -40,7 +40,7 @@ export class Updater {
 		}
 
 		const visitor = new UpdateInputVisitor<SqlUpdateInputProcessorResult>(
-			new SqlUpdateInputProcessor(primaryValue, data, updateBuilder, mapper),
+			new SqlUpdateInputProcessor(primaryValue, data, updateBuilder, mapper, scope),
 			this.schema,
 			data,
 		)
@@ -71,6 +71,10 @@ export class Updater {
 		const result = await updateBuilder.execute(mapper)
 
 		if (!result.executed) {
+			// direct update was not invoked, so its predicates never reached the database
+			if (!(await updateBuilder.verifyPredicates(mapper))) {
+				return [new MutationNoResultError([])]
+			}
 			if (filter && Object.keys(filter).length > 0) {
 				// direct update was not invoked, but we still need to check if the row matches the filter
 				const where: Input.OptionalWhere = {

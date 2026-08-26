@@ -7,7 +7,8 @@ const tsconfig = join(root, 'tsconfig.json')
 
 const tsconfigJson = JSON.parse(fs.readFileSync(tsconfig, 'utf-8'))
 
-const packages = fs.readdirSync(join(root, 'packages')).map(it => `packages/${it}`)
+// sorted, not readdir order: a clean `tsc --build` follows this order, and `database-tester` must come before the packages whose tests import it
+const packages = fs.readdirSync(join(root, 'packages')).sort().map(it => `packages/${it}`)
 
 const references = packages.filter(p => fs.existsSync(join(root, p, 'package.json'))).map(p => ({ path: './' + p }))
 tsconfigJson.references = references

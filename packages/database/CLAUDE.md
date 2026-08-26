@@ -16,6 +16,12 @@ All builders are **immutable** — each method returns a new instance.
 
 Builders compile to `Literal` objects (SQL string + parameters array). The `Compiler` handles schema context, CTE alias tracking, and `__SCHEMA__` placeholder replacement.
 
+## Writing to a jsonb column
+
+`JSON.stringify` the value before passing it to `InsertBuilder.values(...)`. `pg` serializes a JS **object** as JSON (correct for jsonb) but a JS **array** as a PostgreSQL array literal (`{...}`), which corrupts the column — an empty `[]` comes back as `{}`, no longer an array. Stringifying makes pg send text, which the implicit text→jsonb assignment cast parses correctly. `engine-actions`' `EventsRepository` does this for its `log` column.
+
+This is invisible to a mapper unit test; cover a new raw jsonb write with an e2e assertion.
+
 ## Connection Management
 
 - `Connection.create(config)` — pool-based (default 10 connections)

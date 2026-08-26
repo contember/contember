@@ -36,6 +36,12 @@ Row-level and field-level security via predicate injection into every SQL operat
 - `PredicatesInjector` — ANDs user predicates with ACL predicates on every query
 - `VariableInjector` — replaces variable references with identity-specific values
 
+### Read-path guarding
+
+- `PredicateFactory.getFieldPredicate(...)` resolves a field's ACL predicate; `getPermissionsForContext(isRoot)` picks the permission set — root-only unless the caller passes `isRoot === false` (nested/relation context), which adds `through: true` permissions (`allPermissions`). An unknown context falls back to the narrower root set, so the two sets can **over-restrict, never leak**.
+- Projection cell-masking happens during JS hydration (`SelectBuilder` maps `row => predicateGetter(row) ? row[alias] : null`), not in SQL. The predicate boolean column is also consumed by relation fetching (`getColumnValues`) and by the hydrator, so moving the mask into the SQL expression is not a local change.
+- **`WhereOptimizer`'s `isLast` handling is deliberately conservative.** The obvious one-line "fix" (`Number(i) === relationPath.length` → `- 1`) drops the has-many `EXISTS` requirement, collapsing `{ articles: { author: { id: { isNull: false } } } }` to `{ id: { always: true } }` — an over-match. Verified empirically; it needs a real optimizer change, not a tweak.
+
 ## GraphQL Schema Building
 
 `GraphQlSchemaBuilderFactory` → `GraphQlSchemaBuilder`:

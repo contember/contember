@@ -106,3 +106,27 @@ Regenerate (works from any worktree; needs `docker compose up -d postgres` + loc
 The script runs the migrations with local `bun` against the current checkout (so it picks up THIS branch's migrations, not whatever the engine container has mounted), auto-discovers the running postgres container, dumps the schema, and formats the result. Do NOT run migrations inside the `engine` container for this — it mounts the main repo, not your worktree.
 
 Verify the snapshot matches the migrations by bootstrapping two fresh DBs — one with `CONTEMBER_MIGRATIONS_NO_SNAPSHOT=1` (replays migrations), one without (uses the snapshot) — and diffing `pg_dump` of both; they must be schema-identical.
+
+**Migration order is forward-only.** The `migration-order` CI job (`scripts/migrations/check-migration-order.sh`, pure git, no DB) rejects any PR whose new migration filename sorts at or before the newest migration already on the base branch — otherwise a fresh DB and an upgraded DB would replay them in a different relative order. Rebasing an older branch onto a main that has gained a migration is what usually trips it, and `bun test`, `tsc` and a local snapshot regen all stay green. Check with `./scripts/migrations/check-migration-order.sh origin/main`; fix by re-timestamping — `git mv` the file to a current `YYYY-MM-DD-HHMMSS-<name>.ts`, update the import, key and position in `runner.ts`, then regenerate the snapshot. For additive, independent migrations it comes back byte-identical; verify with a zero-diff regen.
+
+**The snapshot script discovers its database by container label** (`docker ps --filter label=com.docker.compose.service=postgres | head -n1`). With more than one compose project running it grabs whichever sorts first and dies on `role "contember" does not exist` — cleanly, with no writes, so it reads as broken tooling rather than the wrong database. Name it explicitly, and serialize concurrent runs because the script uses a fixed `migration_snapshot` database:
+
+```bash
+SNAPSHOT_PG_CONTAINER=contember-oss-postgres-1 ./scripts/create-migrations-snapshot/run.sh tenant
+flock /tmp/contember-tenant-snapshot.lock ./scripts/create-migrations-snapshot/run.sh tenant   # when several jobs may run it at once
+```
+
+## Mocked SQL tests
+
+`tests/cases/integration/mocked/**` assert against **exact** mocked SQL (`ExpectedQuery`). When a shared query changes shape on main, a branch that hard-codes the old SQL fails with `Expected query #1 does not match SQL` — with no textual conflict and no type error, so only `bun test` catches it. This is the classic post-rebase failure here (e.g. the person-by-identity query gaining the `person_mfa` join and the `totp_*` / `email_otp_enabled` / `mfa_grace_until` columns).
+
+Copy the current SQL from the shared helper (`tests/cases/integration/mocked/sql/getPersonByIdentity.ts`) verbatim — whitespace and case are normalized by the `SQL` tag — and update the duplicated response columns. Better still, have such a helper reuse the shared one rather than duplicating it.
+
+## Conventions for new tenant features
+
+- **Audit at the resolver layer.** The one exception is `ApiKeyManager.verifyAndProlong`, a hot path that emits its own events.
+- **`AuthActionType` enum values are added in the migration that wires their call site** (`ALTER TYPE ADD VALUE`), never reserved ahead of use. The auth-log payload column is `event_data`, plain `{ before, after }` JSON.
+- **A new mail template ships its migration and its default template in the same PR.**
+- **MFA TOTP must work without an encryption key.** With no `CONTEMBER_ENCRYPTION_KEY` the version-0 plaintext fallback applies; encryption engages when a key is present, gated by `providers.encryptionEnabled` (from `CryptoWrapper.enabled`).
+- Existing behavior stays unchanged: new capability is gated by config or policy, with defaults matching today.
+- **An SDL change reaches beyond this package.** `graphql-client-tenant` is generated from the SDL at build time and surfaces transitively in `react-client-tenant`, whose `build/api/react-client-tenant.api.md` **is** committed and checked by the `api-exporter` CI job. So adding a field can fail `ae:test` with "You have changed the API signature for this project" while `bun test` and `ts:build` pass — regenerate with `bun run ae:update` (Docker) and commit the diff.

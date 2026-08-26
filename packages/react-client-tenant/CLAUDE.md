@@ -33,6 +33,8 @@ Each hook defines a fragment with the `TenantApi.x$` / `x$$` fetchers, derives i
 
 ## Public API surface
 
-`react-client-tenant.api.md` (in `build/api`) is checked by the `api-exporter` CI job. After adding/removing exports, regenerate it with `bun run ae:update` and commit the diff.
+`react-client-tenant.api.md` (in `build/api`) is checked by the `api-exporter` CI job. After adding/removing exports, regenerate it with `bun run ae:update` and commit the diff. A change to the **engine's tenant SDL** can shift this surface too, through the generated client — so an SDL-only PR can fail `api-exporter` while `bun test` and `ts:build` pass.
+
+The package has a single `"."` export, so anything missing from the `src/index.ts` barrel is unreachable for consumers.
 
 See [tenant API reference](https://docs.contember.com/reference/engine/tenant/overview) for the underlying operations.

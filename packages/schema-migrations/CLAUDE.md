@@ -40,6 +40,22 @@ interface Migration {
 - **Relation type visitors**: Different SQL for different relation types (ManyHasOne → FK column, ManyHasManyOwning → junction table, inverse → no SQL)
 - **Version tracking**: Format versions control backward-compatible behavior changes
 
+## PostgreSQL extensions
+
+Contember deliberately does **not** run `CREATE EXTENSION` from schema or system migrations. A feature that needs one (the `similar` / `wordSimilar` trigram operators, the `gin_trgm_ops` index `opClass`) only documents the prerequisite; enabling it is a one-off operator task per database.
+
+Extensions typically require superuser, behave differently on managed PostgreSQL, and a failed `CREATE EXTENSION` mid-migration is hard to roll back — auto-installing one could break the migration run itself. Document the requirement in the relevant docs page with a `:::caution[...]` admonition instead (see `docs/CLAUDE.md`).
+
+## View updates
+
+A view whose SQL changed used to drop and recreate its entire dependant cascade, re-emit full entity definitions and re-patch all ACL — a single view change could produce a 50–170 kB migration. Cause: `RemoveViewDiffer` + `CreateViewDiffer` always took the destructive path, and `removeEntity` stripped the entity's ACL for `UpdateAclSchemaDiffer` to add straight back.
+
+`UpdateViewDiffer` (with `isReplaceableViewChange` in `modifications/utils/viewDependencies.ts`, wired into `SchemaDiffer` after `CreateViewDiffer`) now emits a single `updateView` (`CREATE OR REPLACE VIEW`) for SQL-only and view-metadata changes on non-materialized views — no dependant cascade, no ACL re-patch. Materialized views and structural changes still cascade.
+
+**`CREATE OR REPLACE VIEW` is narrower than it looks** (verified on PG16): the new query must produce the same column names, in the same order, with the same types, and may only append at the end. Any deviation is a hard error (SQLSTATE 42P16) and transactional — column reorder, middle insert, and *any* type change including widening (`int`→`bigint`, `varchar(10)`→`varchar(20)`, `text`→`varchar`, `int`→`numeric`) all fail.
+
+`isReplaceableViewChange` compares Contember `fields`, which is **necessary but not sufficient**, because a view's real column types and order come from the SQL body rather than the field metadata. The two residual cases — a SQL column reorder with an unchanged field set, and output-type drift without a matching field-type change — fail loudly at execute time, before any data is touched, never silently; both imply a schema/SQL inconsistency that the old drop-and-recreate masked.
+
 ## Key Files
 
 - `SchemaDiffer.ts` — main differ orchestrator

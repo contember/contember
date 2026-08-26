@@ -47,7 +47,7 @@ Two things differ from the listings:
 ## Conventions
 
 - **Data**: `useTenantQueryLoader(useXQuery(), variables)`, then `switch (query.state)` over `loading | refreshing | success | error`. Project-scoped lists read the slug via `useProjectSlug()`.
-- **i18n**: a single static `dict.ts` (no message formatter). Components read `dict.tenant.*`; add new strings there.
+- **i18n**: a single static `dict.ts` (no message formatter). Components read `dict.tenant.*`; add new strings there. `react-ui-lib-base` also exports a `dict`, and `react-ui-lib` star-exports both packages — so this one must be re-exported under a distinct name (`tenantDict`), or ES ambiguity silently drops it.
 - **Error messages**: `dict.tenant.commonErrorMessages` covers the codes any form or action can raise (`UNKNOWN_ERROR`, `FORBIDDEN`). `TenantFormError` falls back to it, so a per-form `errorMessages` map does not have to list them; a one-shot action passes its `onError` code through `actionErrorMessage` (`errors.ts`) instead. Do not paper a denial over with the generic "failed" line — the user cannot retry their way out of one.
 - **UI primitives** come from `@contember/react-ui-lib-base`; icons from `lucide-react`. Styling is Tailwind utility classes inline.
 - **`useTenantQueryLoader` memoizes variables only one level deep** (`useObjectMemo`, plain `!==` per key) — a nested object (e.g. `AuthLogList`'s `filter`) must be `useMemo`'d by the caller, or a new object identity every render defeats the memo and the component refetches in a loop. See `auth-log-list.tsx` / `persons-list.tsx` for the pattern.

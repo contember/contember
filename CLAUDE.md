@@ -79,6 +79,37 @@ bun --conditions=typescript scripts/dev/seed-local.ts
 - **Scoped packages**: All packages are published as `@contember/{name}`.
 - **Internal deps**: Use `workspace:*` references; external deps are version-centralized via workspace catalog in root `package.json`.
 
+## Generated Artifacts
+
+Several **tracked** files are build output. Never hand-edit them, and never commit their regenerated form.
+
+| Artifact | Produced by | Committed as |
+|---|---|---|
+| `packages/graphql-client-{tenant,system,actions}/src/generated` | `bun run pre-build` (from the tenant/system SDL) | small stubs (2–6 lines each) |
+| `packages/engine-panel/src/generated/assets.ts` | `bun run panel:assets` | 379-byte stub |
+| `packages/engine-{tenant,system}-api/src/schema/index.ts`, `src/migrations/snapshot.ts` | codegen / snapshot scripts | the real file (see the package's CLAUDE.md) |
+| `packages/create/resources/templates/default/admin/lib/` | `assemble-ui-lib.mjs` at pre-build | gitignored, not committed at all |
+
+`scripts/setup.sh` marks the stub files **`assume-unchanged`** (`git ls-files -v` shows a lowercase `h`) so local build output stays out of `git status`. Consequences:
+
+- A **fresh worktree does not have that bit**, so after `pre-build` those files show up as modified. That churn is a build artifact — restore it with `git checkout HEAD -- packages/graphql-client-*/src/generated`.
+- Mid-rebase this bites hard: *any* unstaged change makes `git rebase --continue` abort with `You must edit all merge conflicts and then mark them as resolved` even though nothing is unmerged and no conflict markers exist. Restore the generated files first, then continue.
+- **`git add -f` overrides `assume-unchanged`.** Rewriting history (`git reset` + re-add, squash) therefore commits whatever the working tree holds — after a build that is megabytes of generated client instead of the stub. Tag a backup before any rewrite (`git tag backup/<branch> HEAD`), verify `git diff --stat backup/<branch> HEAD` is empty before pushing, then re-run `bash scripts/setup.sh` to restore the bits.
+
+A bundle entrypoint that imports a generated client must run `pre-build` itself — both `scripts/cli-build/run.sh` and `scripts/server-build/run.sh` do (panel-ui imports the fetchers as values, so a clean checkout would otherwise bundle `undefined`).
+
+## CI
+
+- The `check` job is a **fail-fast matrix** (format, lint, build, test, lint-imports, api-exporter). One failing entry cancels the rest, and `gh pr checks` renders cancelled as `fail`, so a single error looks like five. Read the real conclusions first:
+  ```bash
+  gh run view <runId> --json jobs -q '.jobs[] | [.conclusion, (.name|gsub("\n";" "))] | @tsv'
+  ```
+- **`test-db (12..16)` is the e2e suite**, not unit-test shards — one job per PostgreSQL major, each building the server, starting it, and running `bun run test:e2e`. Also fail-fast. See `e2e/CLAUDE.md`.
+- `snapshot` verifies the committed tenant/system migration snapshots against a replay of the migrations; `migration-order` rejects a new migration whose filename sorts before the newest one on the base branch (pure git). See `packages/engine-tenant-api/CLAUDE.md`.
+- **The workflow triggers on `pull_request`, pushes to `main`, and tags only** (`docs/**`-only PRs are skipped via `paths-ignore`). Pushing a feature branch verifies nothing; open the PR.
+- `lint-imports` runs `bunx deptective`, which catches missing workspace dependencies that `tsc` does not — a transitively reachable import typechecks fine and still fails this job.
+- `api-exporter` compares `build/api/*.api.md`, which `ts:build` and `test` do NOT regenerate. Changing a public surface (including one *generated* from the tenant SDL) leaves the report stale — run `bun run ae:update` and commit the diff.
+
 ## Testing
 
 - **Framework**: `bun test` (Bun's built-in test runner):
@@ -90,8 +121,10 @@ bun --conditions=typescript scripts/dev/seed-local.ts
 
 ## Code Style
 
-- **Formatter**: dprint — tabs, single quotes, 150 char line width.
+- **Formatter**: dprint — tabs, single quotes, 150 char line width. It has no markdown plugin, so `format:check` ignores `.md`/`.mdx`.
 - **Linter**: Biome — recommended ruleset with project-specific overrides.
+- **Import extensions**: relative imports carry an explicit `.js` (`useImportExtensions: error`), directory barrels as `/index.js`. This applies to test files too, which a source-only review easily misses.
+- A nested `biome.json` anywhere inside the repo (e.g. a scratch git worktree checked out under the repo root) breaks repo-wide `bun run lint` with "nested root configuration". Lint your files directly (`bunx biome lint <files>`) until it is removed.
 - **Commits**: Conventional Commits format, e.g. `fix(content-api): handle null in orderBy`.
 
 ## Module-Specific Context

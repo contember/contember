@@ -55,3 +55,11 @@ React components declare what data they need via `<Field>`, `<HasOne>`, `<HasMan
 3. Executes via ContentClient
 4. Merges response into `TreeStore.persistedData`
 5. Fires `persistSuccess` events, clears dirtiness
+
+### Entity keys migrate on persist — do not cache them
+
+A newly created entity's realm key carries a `C-` prefix that is deliberately replaced with the server id on persist (`OperationsHelpers.changeRealmId` and `TreeAugmenter` in `binding-legacy`). The realm object is re-keyed **in place**, so anything holding the *realm* (the `getAccessor` getter from `EntityKeyContext`) keeps working, while anything holding the *key string* goes stale and blows up with `Trying to retrieve a non-existent entity: key 'C-…'`.
+
+This bites hardest in consumers that cache element trees and never re-render them — Slate editors are the canonical case. **Provide reference entities via the stable `getAccessor` getter, never by storing the key.**
+
+Known limitation, tracked in issue #922: `purgeStaleListenersAfterIdChange` drops `update` / `connectionUpdate` listeners on migrated realms, and because getter identity is stable, consumers inside reference elements never resubscribe — stale UI, no data loss. Relaxing the purge in core needs dedicated persist+listener tests; there is a 2022 revert precedent for doing it carelessly.

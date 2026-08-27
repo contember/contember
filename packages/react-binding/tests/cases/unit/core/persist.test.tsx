@@ -172,4 +172,30 @@ describe('persist', () => {
 		await expect(harness.persist()).rejects.toMatchObject({ type: 'invalidInput' })
 		expect(seenErrors).toHaveLength(1)
 	})
+
+	it('attaches an execution error ending at a list item to that item', async () => {
+		const harness = await mountArticle()
+
+		harness.server.failNextMutation({
+			errorMessage: `Execution has failed:\nop_1.blocks.0(_${firstBlockId.replace(/-/g, '_')}): NotFoundOrDenied`,
+			errors: [{
+				type: 'NotFoundOrDenied',
+				message: 'NotFoundOrDenied',
+				paths: [[{ field: 'blocks' }, { index: 0, alias: `_${firstBlockId.replace(/-/g, '_')}` }]],
+			}],
+		})
+		await harness.update(() => {
+			blocksOf(harness).getChildEntityById(firstBlockId).getField('content').updateValue('changed')
+		})
+
+		await expect(harness.persist()).rejects.toMatchObject({
+			type: 'invalidInput',
+			errors: [{ type: 'execution', code: 'NotFoundOrDenied' }],
+		})
+		expect(blocksOf(harness).getChildEntityById(firstBlockId).errors?.errors).toMatchObject([
+			{ type: 'execution', code: 'NotFoundOrDenied' },
+		])
+		expect(blocksOf(harness).getChildEntityById(secondBlockId).errors).toBeUndefined()
+	})
+
 })

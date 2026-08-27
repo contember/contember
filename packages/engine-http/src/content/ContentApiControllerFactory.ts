@@ -43,17 +43,6 @@ export class ContentApiControllerFactory {
 			if (!stage) {
 				return new HttpErrorResponse(404, `Stage ${params.stageSlug} NOT found`)
 			}
-			const notModifiedRes = await this.notModifiedChecker.checkNotModified({
-				request: context.request,
-				body: context.body,
-				timer: context.timer,
-				systemDatabase,
-				stageId: stage.id,
-			})
-			if (notModifiedRes?.isModified === false) {
-				return new HttpResponse(304)
-			}
-
 			const schemaWithMeta = await projectContainer.contentSchemaResolver.getSchema({ db: systemDatabase, stage: stage.slug, normalize: true })
 			const schema = schemaWithMeta.schema
 			const { effective: memberships, fetched: fetchedMemberships } = await timer(
@@ -125,11 +114,32 @@ export class ContentApiControllerFactory {
 				return newHandler
 			})()
 
+			// Parse the operation up front: the not-modified check and the connection choice both need
+			// the operation type. Cost: a 304 now also pays membership resolution, schema and database
+			// metadata resolution and the parse/validate pass, all of which are cached.
+			const prepareResult = handler.prepare(koa.request)
+			if (!prepareResult.ok) {
+				return prepareResult.respond(koa.response)
+			}
+			const prepared = prepareResult.prepared
+
+			const notModifiedRes = await this.notModifiedChecker.checkNotModified({
+				request: context.request,
+				operation: prepared.operation,
+				timer: context.timer,
+				systemDatabase,
+				stageId: stage.id,
+			})
+			if (notModifiedRes?.isModified === false) {
+				return new HttpResponse(304)
+			}
+
 			await logger.scope(async logger => {
 				logger.debug('Content query processing started')
 
 				await timer('GraphQL', () =>
-					handler({
+					handler.execute({
+						prepared,
 						request: koa.request,
 						response: koa.response,
 						createContext: ({ operation }) => {

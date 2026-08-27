@@ -38,9 +38,32 @@ interface FactoryArgs<Context> {
 	listeners: GraphQLListener<Context>[]
 }
 
-export type GraphQLQueryHandler<Context> = (
-	args: { request: Request; response: Response; createContext: ({}: { operation: OperationTypeNode }) => Context },
-) => any
+/** Outcome of parsing a GraphQL request, before any context or database connection exists. */
+export interface PreparedGraphQLRequest {
+	readonly document: DocumentNode
+	readonly operation: OperationTypeNode
+	readonly operationName: string | null
+	/** Unvalidated: on GET this is the raw query-string value, not necessarily an object. */
+	readonly variables: unknown
+}
+
+export type PrepareResult<Context> =
+	| { ok: true; prepared: PreparedGraphQLRequest }
+	| { ok: false; respond: (response: Response) => void }
+
+export type GraphQLQueryHandlerArgs<Context> = {
+	request: Request
+	response: Response
+	createContext: (ctx: { operation: OperationTypeNode }) => Context
+}
+
+export type GraphQLQueryHandler<Context> =
+	& ((args: GraphQLQueryHandlerArgs<Context>) => Promise<void>)
+	& {
+		/** Parses and validates the request so the caller can route by operation type before executing. */
+		prepare(request: Request): PrepareResult<Context>
+		execute(args: GraphQLQueryHandlerArgs<Context> & { prepared: PreparedGraphQLRequest }): Promise<void>
+	}
 
 const hitCacheMaxAgeSeconds = 10 * 60
 const documentCacheMaxAgeSeconds = hitCacheMaxAgeSeconds * 10
@@ -63,32 +86,32 @@ export const createGraphQLQueryHandler = <Context>({
 	})
 	let lastPrune = Date.now()
 
-	return async ({ request, response, createContext }) => {
+	const sendResponse = (response: Response, listenersQueue: GraphQLListener<Context>[], code: number, data: unknown) => {
+		response.status = code
+		response.body = JSON.stringify(data)
+		response.set('Content-type', 'application/json')
+
+		listenersQueue.forEach(it => {
+			it.onShutdown && listenersQueue.push(it.onShutdown({ response: data }) || {})
+		})
+	}
+
+	const prepare = (request: Request): PrepareResult<Context> => {
 		const now = Date.now()
 		if ((now - lastPrune) > pruneIntervalSeconds * 1000) {
 			documentCache.purgeStale()
 			lastPrune = now
 		}
-		const listenersQueue = [...listeners]
-
-		listenersQueue.forEach(it => {
-			it.onStart && listenersQueue.push(it.onStart({}) || {})
+		// a fresh queue is enough here: onStart runs in execute, so nothing has been appended yet
+		const fail = (code: number, data: unknown): PrepareResult<Context> => ({
+			ok: false,
+			respond: response => sendResponse(response, [...listeners], code, data),
 		})
-
-		const respond = (code: number, data: any) => {
-			response.status = code
-			response.body = JSON.stringify(data)
-			response.set('Content-type', 'application/json')
-
-			listenersQueue.forEach(it => {
-				it.onShutdown && listenersQueue.push(it.onShutdown({ response: data }) || {})
-			})
-		}
 		try {
 			if (!schemaValidated) {
 				const validationResult = validateSchema(schema)
 				if (validationResult.length) {
-					return respond(400, {
+					return fail(400, {
 						errors: validationResult,
 					})
 				}
@@ -96,7 +119,7 @@ export const createGraphQLQueryHandler = <Context>({
 			}
 			const resolvedRequest = request.method === 'POST' ? (request.body as any) : request.query
 			if (!resolvedRequest.query) {
-				return respond(400, {
+				return fail(400, {
 					errors: [{ message: 'Missing request query' }],
 				})
 			}
@@ -106,7 +129,7 @@ export const createGraphQLQueryHandler = <Context>({
 				doc = parse(resolvedRequest.query)
 				const validationResult = validate(schema, doc)
 				if (validationResult.length) {
-					return respond(400, { errors: validationResult })
+					return fail(400, { errors: validationResult })
 				}
 				if (hitCache.get(queryHash)) {
 					documentCache.set(queryHash, doc)
@@ -117,25 +140,51 @@ export const createGraphQLQueryHandler = <Context>({
 			const operationName = resolvedRequest.operationName ?? null
 			const operation = resolveOperationType(document, operationName)
 
+			return {
+				ok: true,
+				prepared: { document, operation, operationName, variables: resolvedRequest.variables },
+			}
+		} catch (e) {
+			if (e instanceof GraphQLError) {
+				return fail(e instanceof ForbiddenError ? 403 : 400, { errors: [e] })
+			}
+			logger.error(e)
+			return fail(500, { errors: [{ message: 'Internal error' }] })
+		}
+	}
+
+	const executePrepared = async (
+		{ prepared, response, createContext }: GraphQLQueryHandlerArgs<Context> & { prepared: PreparedGraphQLRequest },
+	): Promise<void> => {
+		const listenersQueue = [...listeners]
+
+		listenersQueue.forEach(it => {
+			it.onStart && listenersQueue.push(it.onStart({}) || {})
+		})
+
+		const respond = (code: number, data: unknown) => sendResponse(response, listenersQueue, code, data)
+		try {
+			const { document, operation, operationName, variables } = prepared
 			const context = createContext({ operation })
 			listenersQueue.forEach(it => {
 				it.onExecute && listenersQueue.push(it.onExecute({ context, document, operation }) || {})
 			})
-			const response = await execute({
+			const result = await execute({
 				schema,
 				document,
 				operationName: operationName,
-				variableValues: resolvedRequest.variables,
+				// graphql-js wants a variable map; on GET the raw query-string value is not one
+				variableValues: typeof variables === 'object' && variables !== null ? { ...variables } : undefined,
 				contextValue: context,
 			})
 			listenersQueue.forEach(it => {
-				it.onResponse && listenersQueue.push(it.onResponse({ context, response }) || {})
+				it.onResponse && listenersQueue.push(it.onResponse({ context, response: result }) || {})
 			})
-			if (response.errors && response.errors.length > 0) {
-				const [code, errors] = processErrors(response.errors)
-				respond(code && !response.data ? code : 200, { ...response, errors })
+			if (result.errors && result.errors.length > 0) {
+				const [code, errors] = processErrors(result.errors)
+				respond(code && !result.data ? code : 200, { ...result, errors })
 			} else {
-				respond(200, response)
+				respond(200, result)
 			}
 		} catch (e) {
 			if (e instanceof GraphQLError) {
@@ -145,6 +194,16 @@ export const createGraphQLQueryHandler = <Context>({
 			return respond(500, { errors: [{ message: 'Internal error' }] })
 		}
 	}
+
+	const handler = async (args: GraphQLQueryHandlerArgs<Context>): Promise<void> => {
+		const prepareResult = prepare(args.request)
+		if (!prepareResult.ok) {
+			return prepareResult.respond(args.response)
+		}
+		return await executePrepared({ ...args, prepared: prepareResult.prepared })
+	}
+
+	return Object.assign(handler, { prepare, execute: executePrepared })
 }
 
 export const extractOriginalError = (e: Error): Error => {

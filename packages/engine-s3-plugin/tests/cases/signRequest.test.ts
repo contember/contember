@@ -37,6 +37,13 @@ test('sign s3 request - prefix', () => {
 	)
 })
 
+test('sign s3 request - a sibling prefix is not a prefix', () => {
+	const service = createS3Service('test', 'lorem')
+	expect(() => service.getSignedReadUrl({ objectKey: 'loremipsum/foo.jpg', expiration: null })).toThrow(
+		'Given object key "loremipsum/foo.jpg" does not start with a project prefix "lorem"',
+	)
+})
+
 test('sign upload', () => {
 	const service = createS3Service('test')
 	const signed = service.getSignedUploadUrl({

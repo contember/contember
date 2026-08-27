@@ -3,6 +3,7 @@ import { EventRow, HandledEvent } from './types'
 import { Actions } from '@contember/schema'
 import { eventsToProcessSpecification, eventsToProcessStateSpecification } from '../model/EventsToProcessSpecification'
 import { notify } from '../utils/notifyChannel'
+import { Logger } from '@contember/logger'
 
 const ACK_TIMEOUT_MS = 1_000 * 60 * 10 // 10 minutes
 const DEFAULT_REPEAT_INTERVAL_MS = 5_000 // 5 seconds
@@ -61,7 +62,7 @@ export class EventsRepository {
 			.execute(db)
 	}
 
-	public async persistProcessed(db: Client, events: HandledEvent[]): Promise<[number, number]> {
+	public async persistProcessed(db: Client, events: HandledEvent[], logger: Logger): Promise<[number, number]> {
 		return await db.transaction(async trx => {
 			await trx.query(Connection.REPEATABLE_READ)
 			const succeed = events.filter(it => it.result.ok)
@@ -69,7 +70,18 @@ export class EventsRepository {
 
 			for (const event of events) {
 				if (!event.result.ok) {
-					await this.markFailed(trx, event)
+					const terminal = await this.markFailed(trx, event)
+					if (terminal) {
+						// Nothing else reports a given-up event; the target is named, never described by URL or headers.
+						logger.error('Action event failed permanently, no attempts left', {
+							eventId: event.row.id,
+							target: event.row.target,
+							trigger: event.row.trigger,
+							attempts: event.row.num_retries + 1,
+							code: event.result.code,
+							errorMessage: event.result.errorMessage,
+						})
+					}
 				}
 			}
 			return [succeed.length, events.length - succeed.length]
@@ -125,30 +137,32 @@ export class EventsRepository {
 			.execute(db)
 	}
 
-	private async markFailed(db: Client, event: HandledEvent): Promise<void> {
+	private async markFailed(db: Client, event: HandledEvent): Promise<boolean> {
 		const numRetries = event.row.num_retries + 1
 		const now = new Date()
 		const nextAttempt = new Date()
 		nextAttempt.setTime(
 			nextAttempt.getTime() + (event.target?.initialRepeatIntervalMs ?? DEFAULT_REPEAT_INTERVAL_MS) * Math.pow(2, event.row.num_retries),
 		)
+		const terminal = numRetries >= (event.target?.maxAttempts ?? DEFAULT_MAX_ATTEMPTS)
 		await UpdateBuilder.create()
 			.table('actions_event')
 			.values<EventRow>({
 				last_state_change: now,
 				num_retries: numRetries,
 				log: JSON.stringify([...event.row.log, event.result]) as any,
-				...(numRetries < (event.target?.maxAttempts ?? DEFAULT_MAX_ATTEMPTS)
+				...(terminal
 					? {
-						state: 'retrying',
-						visible_at: nextAttempt,
+						state: 'failed',
 					}
 					: {
-						state: 'failed',
+						state: 'retrying',
+						visible_at: nextAttempt,
 					}),
 			})
 			.where({ id: event.row.id })
 			.execute(db)
+		return terminal
 	}
 
 	private async markFailedOnUnknownTarget(db: Client, targetName: string, primaryEventId: string) {

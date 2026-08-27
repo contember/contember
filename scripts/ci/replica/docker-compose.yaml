@@ -1,18 +1,20 @@
-# A streaming primary and its hot standby, mirroring the `test-db-replica` CI job so that
-# `e2e/replica` can be reproduced locally. See ./README.md for the commands.
-#
-# bitnamilegacy/, not bitnami/: Broadcom moved the versioned Bitnami images there and the
-# `bitnami/postgresql:16` tag no longer resolves.
+# A streaming primary and its hot standby on the official `postgres` image, so that `e2e/replica`
+# can be reproduced locally. The `test-db-replica` CI job starts this very file - the topology is
+# described here once. See ./README.md for the commands.
+name: contember-replica
+
 services:
 
   db:
-    image: bitnamilegacy/postgresql:16
+    image: postgres:${POSTGRES_VERSION:-16}
     environment:
-      POSTGRESQL_USERNAME: postgres
-      POSTGRESQL_PASSWORD: postgres
-      POSTGRESQL_REPLICATION_MODE: master
-      POSTGRESQL_REPLICATION_USER: replicator
-      POSTGRESQL_REPLICATION_PASSWORD: replicator
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    # wal_keep_size covers the gap between the base backup and the standby's first stream
+    command: [ 'postgres', '-c', 'wal_keep_size=256MB' ]
+    volumes:
+      - primary-data:/var/lib/postgresql/data
+      - ./primary-init.sh:/docker-entrypoint-initdb.d/10-replication-hba.sh:ro
     ports:
       - '${PRIMARY_PORT:-5432}:5432'
     healthcheck:
@@ -22,19 +24,33 @@ services:
       retries: 30
 
   db_replica:
-    image: bitnamilegacy/postgresql:16
-    environment:
-      POSTGRESQL_USERNAME: postgres
-      POSTGRESQL_PASSWORD: postgres
-      POSTGRESQL_REPLICATION_MODE: slave
-      POSTGRESQL_REPLICATION_USER: replicator
-      POSTGRESQL_REPLICATION_PASSWORD: replicator
-      POSTGRESQL_MASTER_HOST: db
-      POSTGRESQL_MASTER_PORT_NUMBER: '5432'
+    image: postgres:${POSTGRES_VERSION:-16}
+    depends_on:
+      db:
+        condition: service_healthy
+    # the entrypoint's initdb dance only runs for `postgres`; this takes the data from the primary instead
+    user: postgres
+    command:
+      - bash
+      - -c
+      - |
+        set -e
+        if [ ! -s "$$PGDATA/PG_VERSION" ]; then
+          pg_basebackup --host=db --port=5432 --username=postgres --pgdata="$$PGDATA" --wal-method=stream --write-recovery-conf --progress
+          chmod 0700 "$$PGDATA"
+        fi
+        exec postgres
+    volumes:
+      - standby-data:/var/lib/postgresql/data
     ports:
       - '${STANDBY_PORT:-5433}:5432'
     healthcheck:
       test: [ 'CMD-SHELL', 'pg_isready -U postgres' ]
       interval: 2s
       timeout: 5s
-      retries: 30
+      # the base backup runs before the server starts
+      retries: 60
+
+volumes:
+  primary-data:
+  standby-data:

@@ -1,15 +1,23 @@
 # Local reproduction of `test-db-replica`
 
 `e2e/replica` needs what `test-db` cannot give it: a **real streaming standby** that can be held
-back on purpose. `docker-compose.yaml` here starts the same pair the CI job uses — a bitnami
-primary (`db`) and its hot standby (`db_replica`) — and nothing else. The engine runs on the host,
-exactly as it does on the runner.
+back on purpose. `docker-compose.yaml` here starts a `postgres` primary (`db`) and its hot standby
+(`db_replica`), and nothing else. The engine runs on the host, exactly as it does on the runner.
+
+The `test-db-replica` job starts **this same file**, so the topology is described once. The standby
+is not a second copy of the primary's configuration: `db_replica` takes a `pg_basebackup` of `db`
+on first start and then streams from it, and `primary-init.sh` adds the one `pg_hba.conf` line
+(`host replication all all trust`) that the base backup needs — initdb trusts replication
+connections from localhost only.
 
 ## 1. Start the pair
 
 ```bash
 docker compose -f scripts/ci/replica/docker-compose.yaml up -d --wait
 ```
+
+`--wait` matters: the standby copies the primary before it starts serving, so it is unreachable for
+a few seconds after `up` returns without it. Override `POSTGRES_VERSION` to test another major.
 
 Ports 5432 (primary) and 5433 (standby) are published. If either is taken, override them —
 the rest of the commands then use your ports:
@@ -81,9 +89,6 @@ PGPASSWORD=postgres psql -h 127.0.0.1 -p 5433 -U postgres -c "select pg_wal_repl
 docker compose -f scripts/ci/replica/docker-compose.yaml down -v
 ```
 
-## Follow-up
-
-`bitnamilegacy/postgresql` is a frozen archive: it receives no updates and could disappear. The
-robust long-term form is `postgres:16` with a standby built by `pg_basebackup -R` in a compose
-step, which would also let the workflow services and this file stop describing the same topology
-twice.
+**Use `-v`.** Both databases live in named volumes and the standby only takes its base backup when
+its volume is empty. Dropping the containers but keeping the volumes leaves a standby pointing at a
+primary that no longer has the same history, and it fails to start.

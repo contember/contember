@@ -200,44 +200,14 @@ jobs:
         ports:
           - 8025:8025
           - 1025:1025
-      # bitnamilegacy/, not bitnami/: Broadcom moved the versioned Bitnami images there and the
-      # `bitnami/postgresql:16` tag no longer resolves.
-      db:
-        image: bitnamilegacy/postgresql:16
-        env:
-          POSTGRESQL_USERNAME: postgres
-          POSTGRESQL_PASSWORD: postgres
-          POSTGRESQL_REPLICATION_MODE: master
-          POSTGRESQL_REPLICATION_USER: replicator
-          POSTGRESQL_REPLICATION_PASSWORD: replicator
-        ports:
-          - 5432:5432
-        options: >-
-          --health-cmd "pg_isready -U postgres"
-          --health-interval 2s
-          --health-timeout 5s
-          --health-retries 30
-      db_replica:
-        image: bitnamilegacy/postgresql:16
-        env:
-          POSTGRESQL_USERNAME: postgres
-          POSTGRESQL_PASSWORD: postgres
-          POSTGRESQL_REPLICATION_MODE: slave
-          POSTGRESQL_REPLICATION_USER: replicator
-          POSTGRESQL_REPLICATION_PASSWORD: replicator
-          # service containers reach each other by service label; the standby waits for it itself
-          POSTGRESQL_MASTER_HOST: db
-          POSTGRESQL_MASTER_PORT_NUMBER: 5432
-        ports:
-          - 5433:5432
-        options: >-
-          --health-cmd "pg_isready -U postgres"
-          --health-interval 2s
-          --health-timeout 5s
-          --health-retries 30
 
     steps:
       - uses: actions/checkout@v5
+      # not service containers: the standby is built with pg_basebackup from a file in the repo,
+      # which a service container cannot reach - it starts before the checkout. The same file is
+      # what a developer runs locally, so the topology is described once.
+      - name: "Start the primary and its standby"
+        run: docker compose -f scripts/ci/replica/docker-compose.yaml up -d --wait
       - uses: oven-sh/setup-bun@v2
         with:
             bun-version: 1.3.14

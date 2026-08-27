@@ -1,8 +1,23 @@
 # e2e
 
-Integration tests that run against a **live engine and PostgreSQL**, not against mocks. In CI this is the `test-db (14..18)` matrix — one job per PostgreSQL major, each building the server, starting it via `start-server.sh` and running `bun run test:e2e`. It is fail-fast, and like the rest of the workflow it runs on `pull_request`, pushes to `main` and tags — never on a plain branch push.
+Integration tests that run against a **live engine and PostgreSQL**, not against mocks. There are two suites and two CI jobs:
+
+| Directory | CI job | Database |
+| --- | --- | --- |
+| `e2e/cases` | `test-db (14..18)` — one job per PostgreSQL major | one server, which the engine also uses as its own read replica |
+| `e2e/replica` | `test-db-replica` | a primary and a **real streaming standby** |
+
+`bun run test:e2e` globs **`e2e/cases` only**. `e2e/replica` needs a standby it can hold back, so it is run explicitly (`bun test --conditions=typescript e2e/replica`) and never by `test:e2e`. Both jobs build the server and start it via `start-server.sh`, both are fail-fast, and like the rest of the workflow they run on `pull_request`, pushes to `main` and tags — never on a plain branch push.
 
 `test-db` is therefore the only place where authorization grants, resolvers and SQL meet for real — a feature covered solely by unit and mocked tests is not covered here.
+
+## Read replica routing is on in `test-db`
+
+`test-db` sets `DEFAULT_DB_READ_HOST` to the primary itself: same `system_identifier`, same version, so read-after-write routing is enabled and **every content case goes through it**. Queries are served from the "replica" and mutations return `X-Contember-Write-Ref`, which is what lets `cases/content/read-after-write.test.ts` assert the header contract without a standby. It also means a routing regression shows up as an unrelated content case failing.
+
+The second pool this creates is not free: the peak backend count over the suite went from ~69 to ~97 of PostgreSQL's default `max_connections=100`, so the job releases idle read connections after 2 s (`DEFAULT_DB_READ_POOL_IDLE_TIMEOUT_MS`). Anything that adds pools or long-held connections has very little headroom left.
+
+What `test-db` **cannot** show is a replica that lags — the primary never does. That is what `e2e/replica` is for: it pauses WAL replay on the standby and observes the fallback to the primary and the acknowledgement after catch-up. Run it locally with `scripts/ci/replica/` — see [its README](../scripts/ci/replica/README.md).
 
 ## Running locally
 

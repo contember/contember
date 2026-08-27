@@ -22,7 +22,7 @@ export interface BindingHarnessOptions {
 	node: ReactNode
 	/** What the content API answers the initial query with, keyed by sub-tree alias. */
 	data?: SubTreeFixtures
-	/** The binding debug-logs every query it sends. Turn this on when a test needs to see them. */
+	/** The binding debug-logs every query it sends and every error it receives. Turn this on to see them. */
 	logRequests?: boolean
 }
 
@@ -62,16 +62,19 @@ export const createBindingHarness = async (
 		server.setData(data)
 	}
 
+	// The binding debug-logs its queries and dumps a console.table of every error it receives.
 	const quietly = async (operation: () => Promise<void>) => {
 		if (logRequests) {
 			return await operation()
 		}
-		const debug = console.debug
+		const { debug, table } = console
 		console.debug = () => {}
+		console.table = () => {}
 		try {
 			await operation()
 		} finally {
 			console.debug = debug
+			console.table = table
 		}
 	}
 

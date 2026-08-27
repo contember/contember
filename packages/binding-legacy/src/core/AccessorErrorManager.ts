@@ -199,9 +199,8 @@ export class AccessorErrorManager {
 				childState = state.children.get(childKey)!
 			}
 
-			if (childError.nodeType === 'iNode') {
-				this.setEntityStateErrors(childState as EntityRealmState, childError)
-			}
+			// Also handles leaf errors, i.e. execution errors whose path ends at the list item itself (e.g. NotFoundOrDenied).
+			this.setEntityStateErrors(childState as EntityRealmState, childError)
 		}
 	}
 

@@ -5,10 +5,11 @@ import { paragraphHtmlDeserializer } from '../../src/plugins/element/paragraphs/
 
 const paragraph = (children: Descendant[]): SlateElement => ({ type: 'paragraph', children } as SlateElement)
 
-const createDeserializer = () => new HtmlDeserializer(
-	children => paragraph(children),
-	[paragraphHtmlDeserializer],
-)
+const createDeserializer = () =>
+	new HtmlDeserializer(
+		children => paragraph(children),
+		[paragraphHtmlDeserializer],
+	)
 
 const deserialize = (html: string) => {
 	const document = new DOMParser().parseFromString(html, 'text/html')

@@ -22,7 +22,7 @@ export class IDPManager {
 		return await db.transaction(async (db): Promise<RegisterIDPResponse> => {
 			try {
 				const providerService = this.idpRegistry.getHandler(idp.type)
-				providerService.validateConfiguration(idp.configuration)
+				this.assertNoUnknownConfigurationKeys(providerService.validateConfiguration(idp.configuration), idp.configuration)
 			} catch (e) {
 				if (e instanceof IdentityProviderNotFoundError) {
 					return new ResponseError('UNKNOWN_TYPE', `IDP type ${idp.type} not found`)
@@ -99,7 +99,7 @@ export class IDPManager {
 				const type = data.type ?? existing.type
 				const providerService = this.idpRegistry.getHandler(type)
 				if (data.configuration !== undefined || type !== existing.type) {
-					providerService.validateConfiguration(newConfiguration)
+					this.assertNoUnknownConfigurationKeys(providerService.validateConfiguration(newConfiguration), newConfiguration)
 				}
 			} catch (e) {
 				if (e instanceof InvalidIDPConfigurationError) {
@@ -117,6 +117,34 @@ export class IDPManager {
 
 			return new ResponseOk(null)
 		})
+	}
+
+	/**
+	 * Reject top-level `configuration` keys the provider does not recognise.
+	 *
+	 * Every provider configuration is parsed with `Typesafe.partial`, which silently DROPS unknown
+	 * properties. Without this check `addIDP` / `updateIDP` answer `ok` to a configuration the
+	 * provider will never act on — a typo like `fetchUserinfo` (lowercase i) reads as a successfully
+	 * applied setting while the option stays off, and an option that a given engine version does not
+	 * support yet looks indistinguishable from one that works.
+	 *
+	 * The parsed result carries exactly the keys the provider understood, so the difference against
+	 * the submitted object is the set of ignored keys. All of them are reported at once (rather than
+	 * the first, as `Typesafe.noExtraProps` would) so a configuration with several typos takes one
+	 * round trip to fix.
+	 *
+	 * Write time only: reading a stored configuration is deliberately left untouched, so a row written
+	 * before this check keeps authenticating instead of locking its users out.
+	 */
+	private assertNoUnknownConfigurationKeys(parsed: {}, submitted: Record<string, unknown>): void {
+		const known = new Set(Object.keys(parsed))
+		const unknown = Object.keys(submitted).filter(key => !known.has(key))
+		if (unknown.length > 0) {
+			throw new InvalidIDPConfigurationError(
+				`unknown configuration ${unknown.length === 1 ? 'property' : 'properties'} ${unknown.join(', ')}; `
+					+ `remove ${unknown.length === 1 ? 'it' : 'them'} or check the spelling — the provider would ignore ${unknown.length === 1 ? 'it' : 'them'}`,
+			)
+		}
 	}
 
 	public async listIDP(db: DatabaseContext): Promise<IdentityProviderDto[]> {

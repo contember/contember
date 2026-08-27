@@ -45,7 +45,7 @@ export const useBlockEditorState = ({ editor, blockList, sortableBy, contentFiel
 		sortedBlocksRef.current = sortedBlocks
 	}, [sortedBlocks])
 	const blockElementCache = useBlockElementCache({ editor, blockList, sortableBy, contentField })
-	const blockElementPathRefs = useBlockElementPathRefs({ editor, blockList })
+	const blockElementPathRefs = useBlockElementPathRefs({ editor, blockList, sortableBy })
 
 	const refreshBlocks = useRefreshBlocks({
 		editor,

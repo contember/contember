@@ -102,12 +102,14 @@ export class S3Service {
 		if (objectKey.startsWith(publicPrefix)) {
 			objectKey = objectKey.substring(publicPrefix.length)
 		}
-		if (this.config.prefix && !objectKey.startsWith(this.config.prefix)) {
+		// the separator is a part of the prefix: without it, a project prefixed "blog" reaches into "blog-staging" in a shared bucket
+		const prefix = this.config.prefix ? this.config.prefix + '/' : ''
+		if (prefix && !objectKey.startsWith(prefix)) {
 			throw new ForbiddenError(
 				`Given object key "${objectKey}" does not start with a project prefix "${this.config.prefix}"`,
 			)
 		}
-		const localObjectKey = this.config.prefix ? objectKey.substring(this.config.prefix.length + 1) : objectKey
+		const localObjectKey = objectKey.substring(prefix.length)
 		this.authorizator.verifyReadAccess({ key: localObjectKey })
 
 		const url = this.signer.sign({

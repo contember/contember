@@ -215,6 +215,15 @@ export interface RoutingContextValue {
 // @public
 export const RoutingLink: NamedExoticComponent<RoutingLinkProps>;
 
+// @public
+export const RoutingLinkFields: NamedExoticComponent<RoutingLinkFieldsProps>;
+
+// @public (undocumented)
+export interface RoutingLinkFieldsProps {
+    // (undocumented)
+    to: RoutingLinkTarget;
+}
+
 // @public (undocumented)
 export interface RoutingLinkParams {
     // (undocumented)

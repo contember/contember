@@ -72,7 +72,9 @@ const IfFilter = Component<IfFilterProps>(
 	({ children, condition, then, else: elseIn }, env) => {
 		const desugaredFilter = QueryLanguage.desugarFilter(condition, env)
 		const collectedFields = new FilterFieldsCollector(env.getSchema(), desugaredFilter).collectFields(env.getSubTreeNode().entity)
-		const additionalFields = <>{Array.from(collectedFields).map(it => <Field field={it} key={it} />)}</>
+		// Nonbearing: reading a field to decide what to render must not be a reason to create the entity. A bearing
+		// field would also win the marker merge, overriding a nonbearing one registered for the same field elsewhere.
+		const additionalFields = <>{Array.from(collectedFields).map(it => <Field field={it} key={it} isNonbearing />)}</>
 
 		return (
 			<>

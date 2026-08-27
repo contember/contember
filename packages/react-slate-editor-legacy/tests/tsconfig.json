@@ -1,0 +1,16 @@
+{
+	"extends": "../../../tsconfig.settings.json",
+	"compilerOptions": {
+		"noEmit": true,
+		"emitDeclarationOnly": false,
+		// The binding test harness lives in react-binding's tests, so the program reaches outside this directory.
+		"rootDir": "../.."
+	},
+	"include": [
+		"**/*",
+		"../../react-binding/tests/lib/**/*"
+	],
+	"references": [
+		{ "path": "../src" },
+	],
+}

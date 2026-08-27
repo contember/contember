@@ -16,6 +16,7 @@ import { MutableRefObject, useCallback } from 'react'
 import { BlockElementCache } from './useBlockElementCache'
 import { BlockElementPathRefs } from './useBlockElementPathRefs'
 import { isInitialSlateState } from '../utils/isInitialSlateState'
+import { isBlockAccountingStale } from './isBlockAccountingStale'
 
 export type RefreshBlocks = (args?: { forceInitialBlock?: boolean }) => void
 
@@ -74,6 +75,28 @@ export const useRefreshBlocks = (
 				return
 			}
 			const getBlockList = blockList.getAccessor
+
+			// Never recreate the whole content. Once the accounting stops describing the list — most notably right
+			// after a persist, where the ids of freshly created blocks change and the map keyed by them goes stale
+			// until the persistSuccess listener rebuilds it — the loop creating entities below would add a second
+			// block for every node of the editor, and the next persist would save the article twice. Bail out
+			// instead: the next render remaps the refs (see useBlockEditorSlateNodes) and the change after that
+			// goes through normally.
+			let orphanedBlockRefs = 0
+			for (const blockId of blockElementPathRefs.keys()) {
+				if (!blockList.hasEntityId(blockId)) {
+					orphanedBlockRefs++
+				}
+			}
+			const blockCount = blockList.length - (trashFakeBlockId.current === undefined ? 0 : 1)
+			if (isBlockAccountingStale({ trackedBlocks: blockElementPathRefs.size, orphanedBlocks: orphanedBlockRefs, blockCount })) {
+				console.error(
+					`BlockEditor: not refreshing blocks — the block accounting is out of sync with the entity list `
+						+ `(${orphanedBlockRefs} of ${blockElementPathRefs.size} tracked blocks are missing from a list of ${blockCount}). `
+						+ `Nothing was changed, so the content cannot get duplicated.`,
+				)
+				return
+			}
 
 			let cleanupStack = () => {
 			}

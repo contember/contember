@@ -34,9 +34,9 @@ export class EventDispatcher {
 
 	async processBatch({ db, contentSchemaResolver, logger }: ProcessBatchArgs): Promise<ProcessBatchResult> {
 		const schema = (await contentSchemaResolver.getSchema({ db, normalize: true })).schema
-		const batch = await this.eventsRepository.fetchBatch(schema.actions, db.client)
 		const batchId = Math.random().toString().substring(2)
 		const batchLogger = logger.child({ loc: 'Actions.EventDispatcher', batchId })
+		const batch = await this.eventsRepository.fetchBatch(schema.actions, db.client, batchLogger)
 		if (!batch.ok) {
 			batchLogger.debug('Nothing to process', {
 				backoffMs: batch.backoffMs ?? 'undefined',
@@ -57,7 +57,7 @@ export class EventDispatcher {
 			})
 			const variables = await this.variablesManager.fetchVariables(db)
 			const handledEvents = await handler.handle({ target, events, logger: batchLogger, variables })
-			const { succeeded, retried, failed } = await this.eventsRepository.persistProcessed(db.client, handledEvents)
+			const { succeeded, retried, failed } = await this.eventsRepository.persistProcessed(db.client, handledEvents, batchLogger)
 			batchLogger.debug('Processing done', { succeed: succeeded, failed })
 			return {
 				succeeded,
@@ -72,7 +72,7 @@ export class EventDispatcher {
 				row: it,
 				result: { ok: false, errorMessage: `Internal error` },
 			}))
-			const { succeeded, retried, failed } = await this.eventsRepository.persistProcessed(db.client, failedEvents)
+			const { succeeded, retried, failed } = await this.eventsRepository.persistProcessed(db.client, failedEvents, batchLogger)
 
 			return {
 				succeeded,

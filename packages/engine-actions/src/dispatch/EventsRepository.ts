@@ -3,6 +3,7 @@ import { EventRow, HandledEvent } from './types.js'
 import { Actions } from '@contember/schema'
 import { eventsToProcessSpecification, eventsToProcessStateSpecification } from '../model/EventsToProcessSpecification.js'
 import { notify } from '../utils/notifyChannel.js'
+import { Logger } from '@contember/logger'
 
 const ACK_TIMEOUT_MS = 1_000 * 60 * 10 // 10 minutes
 const DEFAULT_REPEAT_INTERVAL_MS = 5_000 // 5 seconds
@@ -10,7 +11,7 @@ const DEFAULT_MAX_ATTEMPTS = 10
 const DEFAULT_BATCH_SIZE = 1
 
 export class EventsRepository {
-	public async fetchBatch(actions: Actions.Schema, db: Client): Promise<FetchBatchResult> {
+	public async fetchBatch(actions: Actions.Schema, db: Client, logger: Logger): Promise<FetchBatchResult> {
 		// Events referencing a target that no longer exists in the schema are terminally failed and
 		// skipped over; count them so the caller can report them as terminal failures.
 		let unknownTargetFailed = 0
@@ -23,6 +24,12 @@ export class EventsRepository {
 			if (!target) {
 				if (await this.markFailedOnUnknownTarget(db, primaryEvent.target, primaryEvent.id)) {
 					unknownTargetFailed++
+					// Never retried: the schema has to name the target again before such an event can be delivered.
+					logger.error('Action event failed permanently, its target is not in the schema', {
+						eventId: primaryEvent.id,
+						target: primaryEvent.target,
+						trigger: primaryEvent.trigger,
+					})
 				}
 				continue
 			}
@@ -67,7 +74,7 @@ export class EventsRepository {
 			.execute(db)
 	}
 
-	public async persistProcessed(db: Client, events: HandledEvent[]): Promise<PersistProcessedResult> {
+	public async persistProcessed(db: Client, events: HandledEvent[], logger: Logger): Promise<PersistProcessedResult> {
 		return await db.transaction(async trx => {
 			await trx.query(Connection.REPEATABLE_READ)
 			const succeed = events.filter(it => it.result.ok)
@@ -80,6 +87,15 @@ export class EventsRepository {
 					const terminal = await this.markFailed(trx, event)
 					if (terminal) {
 						failed++
+						// Nothing else reports a given-up event; the target is named, never described by URL or headers.
+						logger.error('Action event failed permanently, no attempts left', {
+							eventId: event.row.id,
+							target: event.row.target,
+							trigger: event.row.trigger,
+							attempts: event.row.num_retries + 1,
+							code: event.result.code,
+							errorMessage: event.result.errorMessage,
+						})
 					} else {
 						retried++
 					}

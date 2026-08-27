@@ -24,6 +24,7 @@ import { InputPreValidator } from '../input-validation/index.js'
 import { ObjectNode } from '../inputProcessing/index.js'
 import { executeReadOperations } from './ReadHelpers.js'
 import { logger } from '@contember/logger'
+import { queryTransactionId, WriteRefSink } from '../WriteRefSink.js'
 
 type WithoutNode<T extends { node: any }> = Pick<T, Exclude<keyof T, 'node'>>
 
@@ -39,6 +40,7 @@ export class MutationResolver {
 		private readonly inputValidator: InputPreValidator,
 		private readonly graphqlQueryAstFactory: GraphQlQueryAstFactory,
 		private readonly schemaDatabaseMetadata: DatabaseMetadata,
+		private readonly writeRefSink?: WriteRefSink,
 	) {}
 
 	public async resolveTransaction(info: GraphQLResolveInfo, options: TransactionOptions): Promise<Result.TransactionResult> {
@@ -478,8 +480,15 @@ export class MutationResolver {
 					} else {
 						try {
 							await mapper.eventManager.fire(new BeforeCommitEvent())
+							const sink = this.writeRefSink
+							// read after the before-commit listeners (they may still assign the id) and before COMMIT, which discards it
+							const transactionId = sink ? await queryTransactionId(mapper.db) : null
 							logger.debug('MutationResolver: Transaction ok, committing')
 							await mapper.db.connection.commit()
+							if (sink && transactionId !== null) {
+								// the data is committed regardless of what the after-commit listeners do
+								sink.record(transactionId)
+							}
 							await mapper.eventManager.fire(new AfterCommitEvent())
 						} catch (e) {
 							try {

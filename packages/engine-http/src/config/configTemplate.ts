@@ -36,6 +36,9 @@ export const configTemplate: any = {
 				password: `%?tenant.env.DB_READ_PASSWORD%`,
 				database: `%?tenant.env.DB_READ_NAME%`,
 				...createDbConfigTemplate('tenant.env.DB_READ'),
+				readAfterWrite: {
+					enabled: `%?tenant.env.DB_READ_AFTER_WRITE_ENABLED::bool%`,
+				},
 			},
 		},
 		mailer: {
@@ -77,6 +80,9 @@ export const configTemplate: any = {
 				password: `%?project.secret.db.read.password||project.env.DB_READ_PASSWORD%`,
 				database: `%?project.env.DB_READ_NAME%`,
 				...createDbConfigTemplate('project.env.DB_READ'),
+				readAfterWrite: {
+					enabled: `%?project.env.DB_READ_AFTER_WRITE_ENABLED::bool%`,
+				},
 			},
 		},
 	},

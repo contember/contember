@@ -84,7 +84,10 @@ export class Application {
 		koa.use(bodyParser({
 			jsonLimit: this.serverConfig.http?.requestBodySize || '1mb',
 		}))
-		koa.use(corsMiddleware())
+		koa.use(corsMiddleware({
+			// a cross-origin script cannot read a response header that is not listed here
+			exposeHeaders: ['X-Contember-Ref', 'X-Contember-Write-Ref', 'X-Contember-Read-After-Visible'],
+		}))
 		const versionMatch = this.version?.match(/^(0\.\d+|\d+)/)
 		const versionSimplified = versionMatch?.[1] ?? 'unknown'
 		koa.use(async ctx => {

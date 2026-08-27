@@ -37,6 +37,7 @@ it('resolves tenant config', () => {
 			read: {
 				host: 'c0.cluster-ro-abc.eu-west-1.rds.amazonaws.com',
 				pool: {},
+				readAfterWrite: {},
 			},
 		},
 		mailer: {},
@@ -66,6 +67,7 @@ it('resolves tenant config with statement and lock timeouts', () => {
 			read: {
 				host: 'c0.cluster-ro-abc.eu-west-1.rds.amazonaws.com',
 				pool: {},
+				readAfterWrite: {},
 			},
 		},
 		mailer: {},
@@ -164,9 +166,48 @@ it('resolves project config', () => {
 			read: {
 				host: 'c0.cluster-ro-abc.eu-west-1.rds.amazonaws.com',
 				pool: {},
+				readAfterWrite: {},
 			},
 			useTenantDb: true,
 			systemSchema: 'system_test_e',
 		},
 	})
+})
+
+// A project without its own database inherits the tenant's `read` block whole (see
+// createProjectConfigResolver), so the tenant switch is what turns read-after-write off for it.
+it('a useTenantDb project inherits the tenant read-after-write switch', () => {
+	const tenantResolver = createTenantConfigResolver({ ...env, TENANT_DB_READ_AFTER_WRITE_ENABLED: 'false' }, configTemplate.tenant)
+	const resolvedTenantConfig = tenantResolver('test', tenantConfig)
+	assert.deepEqual(resolvedTenantConfig.db.read?.readAfterWrite, { enabled: false })
+
+	const projectConfigResolver = createProjectConfigResolver(env, configTemplate, [])
+	const resolvedProjectConfig = projectConfigResolver(
+		'test-p',
+		{ db: { useTenantDb: true } },
+		{},
+		resolvedTenantConfig,
+	)
+
+	assert.deepEqual(resolvedProjectConfig.db.read?.readAfterWrite, { enabled: false })
+})
+
+it('a project with its own read replica takes the switch from its own env', () => {
+	const tenantResolver = createTenantConfigResolver(env, configTemplate.tenant)
+	const resolvedTenantConfig = tenantResolver('test', tenantConfig)
+
+	const projectEnv = {
+		...env,
+		TEST_P_DB_HOST: 'project-db.example.com',
+		TEST_P_DB_PORT: '5432',
+		TEST_P_DB_USER: 'project_user',
+		TEST_P_DB_PASSWORD: 'project_pass',
+		TEST_P_DB_NAME: 'project_db',
+		TEST_P_DB_READ_HOST: 'project-replica.example.com',
+		TEST_P_DB_READ_AFTER_WRITE_ENABLED: 'false',
+	}
+	const projectConfigResolver = createProjectConfigResolver(projectEnv, configTemplate, [])
+	const resolvedProjectConfig = projectConfigResolver('test-p', {}, {}, resolvedTenantConfig)
+
+	assert.deepEqual(resolvedProjectConfig.db.read?.readAfterWrite, { enabled: false })
 })

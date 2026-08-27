@@ -1,7 +1,7 @@
 import { createAclVariables, ExecutionContainerFactory } from '@contember/engine-content-api'
-import { StageBySlugQuery } from '@contember/engine-system-api'
-import { Client } from '@contember/database'
-import { GraphQLSchema } from 'graphql'
+import { DatabaseContext, StageBySlugQuery } from '@contember/engine-system-api'
+import { Client, Connection, DatabaseError, PinnedConnection } from '@contember/database'
+import { GraphQLSchema, OperationTypeNode } from 'graphql'
 import { HttpController } from '../application/index.js'
 import { HttpErrorResponse, HttpResponse } from '../common/index.js'
 import { GraphQLKoaState } from '../graphql/index.js'
@@ -10,9 +10,25 @@ import { ContentQueryHandler, ContentQueryHandlerFactory } from './ContentQueryH
 import { GraphQlSchemaFactory } from './GraphQlSchemaFactory.js'
 import { NotModifiedChecker } from './NotModifiedChecker.js'
 import { TestTransactionService } from '../testing/index.js'
+import {
+	databaseErrorAttributes,
+	formatWriteRef,
+	isVisibleOnReplica,
+	parseReadAfterHeader,
+	readAfterHeaderName,
+	readAfterVisibleHeaderName,
+	SimpleWriteRefSink,
+	writeRefHeaderName,
+} from './readAfterWrite/index.js'
 
 const debugHeader = 'x-contember-debug'
 const testSessionHeader = 'x-contember-test-session'
+
+/** Result of the attempt to serve a request from a pinned replica connection. */
+type PinnedOutcome =
+	| { kind: 'done'; response: HttpResponse | undefined }
+	| { kind: 'miss' }
+	| { kind: 'error'; error: unknown }
 
 export class ContentApiControllerFactory {
 	constructor(
@@ -123,83 +139,187 @@ export class ContentApiControllerFactory {
 			}
 			const prepared = prepareResult.prepared
 
-			const notModifiedRes = await this.notModifiedChecker.checkNotModified({
-				request: context.request,
-				operation: prepared.operation,
-				timer: context.timer,
-				systemDatabase,
-				stageId: stage.id,
-			})
-			if (notModifiedRes?.isModified === false) {
-				return new HttpResponse(304)
+			// Read-after-write: a query carrying write refs may only be served from a replica that has
+			// already applied them. The whole request - the not-modified check included - then runs on
+			// that one pinned replica connection, otherwise a lagging replica could answer 304 wrongly.
+			const readAfterWriteState = await projectContainer.readAfterWrite.resolve()
+			const writeRefSink = readAfterWriteState.enabled ? new SimpleWriteRefSink() : undefined
+			const readAfter = readAfterWriteState.enabled && prepared.operation === OperationTypeNode.QUERY && !testContentDatabase
+				? parseReadAfterHeader(koa.request.get(readAfterHeaderName) || undefined, readAfterWriteState.clusterId)
+				: null
+
+			const maxConnectionsPerRequest = 'maxConnectionsPerRequest' in project.db
+				? project.db.maxConnectionsPerRequest
+				: undefined
+			// Optionally cap how many pool connections this single request may hold concurrently,
+			// so one request cannot starve the shared pool under high concurrency. Defaults to unlimited.
+			const capConnections = (connection: Connection): Connection.ConnectionType =>
+				maxConnectionsPerRequest !== undefined ? connection.withMaxConnections(maxConnectionsPerRequest) : connection
+
+			const runRequest = async ({ connection, routedSystemDatabase, ack }: {
+				connection: Connection.ConnectionType
+				routedSystemDatabase: DatabaseContext
+				ack: string[] | null
+			}): Promise<HttpResponse | undefined> => {
+				const setAckHeader = () => {
+					if (ack !== null) {
+						koa.response.set(readAfterVisibleHeaderName, ack.join(','))
+					}
+				}
+				const notModifiedRes = await this.notModifiedChecker.checkNotModified({
+					request: context.request,
+					operation: prepared.operation,
+					timer: context.timer,
+					systemDatabase: routedSystemDatabase,
+					stageId: stage.id,
+				})
+				if (notModifiedRes?.isModified === false) {
+					// the probe already proved these refs are visible here, so the client may retire them
+					setAckHeader()
+					return new HttpResponse(304)
+				}
+
+				await logger.scope(async logger => {
+					logger.debug('Content query processing started')
+
+					await timer('GraphQL', () =>
+						handler.execute({
+							prepared,
+							request: koa.request,
+							response: koa.response,
+							createContext: ({ operation }) => {
+								;(koa.state as GraphQLKoaState).graphql = {
+									operationName: operation,
+								}
+
+								const contentDatabase = testContentDatabase ?? connection.createClient(stage.schema, { module: 'content' })
+
+								const identityVariables = createAclVariables(schema.acl, memberships)
+								let identityId = authResult.identityId
+								if (
+									authResult.assumedIdentityId
+									&& memberships.some(it => schema.acl.roles[it.role].system?.assumeIdentity)
+								) {
+									identityId = authResult.assumedIdentityId
+								}
+
+								const executionContainer = this.executionContainerFactory.create({
+									db: contentDatabase,
+									identityVariables,
+									identityId,
+									schema,
+									schemaMeta: { id: schemaWithMeta.meta.id },
+									schemaDatabaseMetadata,
+									permissions,
+									allPermissions,
+									systemSchema: projectContainer.systemDatabaseContextFactory.schemaName,
+									stage,
+									project,
+									userInfo: {
+										ipAddress: clientIp,
+										userAgent: authResult.clientUserAgent ?? null,
+									},
+									writeRefSink,
+								})
+
+								return {
+									db: contentDatabase,
+									identityVariables,
+									identityId,
+									executionContainer,
+									timer,
+									requestDebug,
+									project,
+								}
+							},
+						}))
+					logger.debug('Content query finished')
+				})
+
+				setAckHeader()
+				if (readAfterWriteState.enabled && writeRefSink?.xid !== undefined) {
+					koa.response.set(writeRefHeaderName, formatWriteRef(readAfterWriteState.clusterId, writeRefSink.xid))
+				}
+
+				notModifiedRes?.setResponseHeader(context.response)
+				return undefined
 			}
 
-			await logger.scope(async logger => {
-				logger.debug('Content query processing started')
+			// never log the token values themselves - only how many there were
+			const logDecision = (route: 'replica' | 'primary' | 'off', reason?: string) =>
+				logger.debug(`readAfterWrite: ${route}`, { tokenCount: readAfter?.tokens.length ?? 0, reason })
 
-				await timer('GraphQL', () =>
-					handler.execute({
-						prepared,
-						request: koa.request,
-						response: koa.response,
-						createContext: ({ operation }) => {
-							;(koa.state as GraphQLKoaState).graphql = {
-								operationName: operation,
-							}
+			if (readAfter === null) {
+				logDecision('off')
+				const baseConnection = prepared.operation === OperationTypeNode.QUERY
+					? projectContainer.readConnection
+					: projectContainer.connection
+				return await runRequest({
+					connection: capConnections(baseConnection),
+					routedSystemDatabase: prepared.operation === OperationTypeNode.QUERY
+						? projectContainer.systemReadDatabaseContext
+						: projectContainer.systemDatabaseContext,
+					ack: null,
+				})
+			}
 
-							const baseConnection = operation === 'query' ? projectContainer.readConnection : projectContainer.connection
-							const maxConnectionsPerRequest = 'maxConnectionsPerRequest' in project.db
-								? project.db.maxConnectionsPerRequest
-								: undefined
-							// Optionally cap how many pool connections this single request may hold concurrently,
-							// so one request cannot starve the shared pool under high concurrency. Defaults to unlimited.
-							const connection = maxConnectionsPerRequest !== undefined
-								? baseConnection.withMaxConnections(maxConnectionsPerRequest)
-								: baseConnection
-							const contentDatabase = testContentDatabase ?? connection.createClient(stage.schema, { module: 'content' })
+			const runOnPrimary = async (reason: string) => {
+				logDecision('primary', reason)
+				return await runRequest({
+					connection: capConnections(projectContainer.connection),
+					routedSystemDatabase: projectContainer.systemDatabaseContext,
+					ack: null,
+				})
+			}
 
-							const identityVariables = createAclVariables(schema.acl, memberships)
-							let identityId = authResult.identityId
-							if (
-								authResult.assumedIdentityId
-								&& memberships.some(it => schema.acl.roles[it.role].system?.assumeIdentity)
-							) {
-								identityId = authResult.assumedIdentityId
-							}
+			if (!readAfter.valid) {
+				return await runOnPrimary('unusable tokens')
+			}
 
-							const executionContainer = this.executionContainerFactory.create({
-								db: contentDatabase,
-								identityVariables,
-								identityId,
-								schema,
-								schemaMeta: { id: schemaWithMeta.meta.id },
-								schemaDatabaseMetadata,
-								permissions,
-								allPermissions,
-								systemSchema: projectContainer.systemDatabaseContextFactory.schemaName,
-								stage,
-								project,
-								userInfo: {
-									ipAddress: clientIp,
-									userAgent: authResult.clientUserAgent ?? null,
-								},
-							})
-
-							return {
-								db: contentDatabase,
-								identityVariables,
-								identityId,
-								executionContainer,
-								timer,
-								requestDebug,
-								project,
-							}
-						},
-					}))
-				logger.debug('Content query finished')
-			})
-
-			notModifiedRes?.setResponseHeader(context.response)
+			const tokens = readAfter.tokens
+			let replicaAcquired = false
+			let outcome: PinnedOutcome
+			try {
+				outcome = await projectContainer.readConnection.scope(async (acquired): Promise<PinnedOutcome> => {
+					replicaAcquired = true
+					if (!await isVisibleOnReplica(acquired, readAfter.xids, logger)) {
+						return { kind: 'miss' }
+					}
+					logDecision('replica')
+					const pinned = new PinnedConnection(acquired, projectContainer.readConnection)
+					try {
+						const response = await runRequest({
+							connection: pinned,
+							routedSystemDatabase: projectContainer.systemDatabaseContextFactory.create(pinned),
+							ack: tokens,
+						})
+						return { kind: 'done', response }
+					} catch (e) {
+						if (e instanceof DatabaseError) {
+							// the connection may be left mid-transaction (a timed-out ROLLBACK, a broken socket);
+							// throwing lets the pool dispose it instead of running the next probe in a leaked snapshot
+							throw e
+						}
+						// an application error says nothing about the connection - do not dispose a healthy one
+						return { kind: 'error', error: e }
+					}
+				})
+			} catch (e) {
+				// only a failure to acquire the replica connection may fall back; whatever the request
+				// itself threw was re-thrown above and must reach the client
+				if (replicaAcquired) {
+					throw e
+				}
+				logger.warn('Read-after-write: could not acquire a replica connection, serving from the primary', databaseErrorAttributes(e))
+				return await runOnPrimary('replica unavailable')
+			}
+			if (outcome.kind === 'error') {
+				throw outcome.error
+			}
+			if (outcome.kind === 'done') {
+				return outcome.response
+			}
+			return await runOnPrimary('replica behind')
 		}
 	}
 }

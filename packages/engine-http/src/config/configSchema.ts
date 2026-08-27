@@ -37,8 +37,16 @@ const dbConfigSchemaInner = Typesafe.intersection(
 )
 
 const readDbSchema = Typesafe.intersection(
-	Typesafe.partial(dbConfigRequired),
-	Typesafe.partial(dbConfigOptional),
+	Typesafe.intersection(
+		Typesafe.partial(dbConfigRequired),
+		Typesafe.partial(dbConfigOptional),
+	),
+	Typesafe.partial({
+		// Read-after-write routing of Content API queries. On whenever a replica is configured.
+		readAfterWrite: Typesafe.partial({
+			enabled: Typesafe.boolean,
+		}),
+	}),
 )
 
 export const dbConfigSchema = Typesafe.intersection(

@@ -23,6 +23,9 @@ const articleId = 'aaaaaaaa-0000-0000-0000-000000000001'
 const firstBlockId = 'bbbbbbbb-0000-0000-0000-000000000001'
 const secondBlockId = 'bbbbbbbb-0000-0000-0000-000000000002'
 
+/** The alias the binding puts on a list item in a mutation, and which the engine echoes back in the error path. */
+const aliasOf = (id: string) => `_${id.replace(/-/g, '_')}`
+
 const articleData = {
 	id: articleId,
 	title: 'Hello',
@@ -177,11 +180,11 @@ describe('persist', () => {
 		const harness = await mountArticle()
 
 		harness.server.failNextMutation({
-			errorMessage: `Execution has failed:\nop_1.blocks.0(_${firstBlockId.replace(/-/g, '_')}): NotFoundOrDenied`,
+			errorMessage: `Execution has failed:\nop_1.blocks.0(${aliasOf(firstBlockId)}): NotFoundOrDenied`,
 			errors: [{
 				type: 'NotFoundOrDenied',
 				message: 'NotFoundOrDenied',
-				paths: [[{ field: 'blocks' }, { index: 0, alias: `_${firstBlockId.replace(/-/g, '_')}` }]],
+				paths: [[{ field: 'blocks' }, { index: 0, alias: aliasOf(firstBlockId) }]],
 			}],
 		})
 		await harness.update(() => {
@@ -196,6 +199,57 @@ describe('persist', () => {
 			{ type: 'execution', code: 'NotFoundOrDenied' },
 		])
 		expect(blocksOf(harness).getChildEntityById(secondBlockId).errors).toBeUndefined()
+	})
+
+	it('gives every failing row of one response its own error', async () => {
+		const harness = await mountArticle()
+
+		harness.server.failNextMutation({
+			errorMessage: 'Execution has failed.',
+			errors: [
+				{ type: 'NotFoundOrDenied', message: 'first row', paths: [[{ field: 'blocks' }, { index: 0, alias: aliasOf(firstBlockId) }]] },
+				{ type: 'NotFoundOrDenied', message: 'second row', paths: [[{ field: 'blocks' }, { index: 1, alias: aliasOf(secondBlockId) }]] },
+			],
+		})
+		await harness.update(() => {
+			blocksOf(harness).getChildEntityById(firstBlockId).getField('content').updateValue('changed')
+		})
+
+		await expect(harness.persist()).rejects.toMatchObject({ type: 'invalidInput' })
+		expect(blocksOf(harness).getChildEntityById(firstBlockId).errors?.errors).toMatchObject([{ developerMessage: 'first row' }])
+		expect(blocksOf(harness).getChildEntityById(secondBlockId).errors?.errors).toMatchObject([{ developerMessage: 'second row' }])
+		expect(blocksOf(harness).errors).toBeUndefined()
+	})
+
+	it('gives every failing field of one response its own error', async () => {
+		const harness = await mountArticle()
+
+		harness.server.failNextMutation({
+			errorMessage: 'Execution has failed.',
+			errors: [
+				{
+					type: 'InvalidDataInput',
+					message: 'first content',
+					paths: [[{ field: 'blocks' }, { index: 0, alias: aliasOf(firstBlockId) }, { field: 'content' }]],
+				},
+				{
+					type: 'InvalidDataInput',
+					message: 'second content',
+					paths: [[{ field: 'blocks' }, { index: 1, alias: aliasOf(secondBlockId) }, { field: 'content' }]],
+				},
+			],
+		})
+		await harness.update(() => {
+			blocksOf(harness).getChildEntityById(firstBlockId).getField('content').updateValue('changed')
+		})
+
+		await expect(harness.persist()).rejects.toMatchObject({
+			type: 'invalidInput',
+			errors: [{ developerMessage: 'first content' }, { developerMessage: 'second content' }],
+		})
+		const contentOf = (id: string) => blocksOf(harness).getChildEntityById(id).getField('content').errors?.errors
+		expect(contentOf(firstBlockId)).toMatchObject([{ developerMessage: 'first content' }])
+		expect(contentOf(secondBlockId)).toMatchObject([{ developerMessage: 'second content' }])
 	})
 
 	it('keeps the persistError event quiet when the caller asks for silent errors', async () => {

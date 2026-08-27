@@ -1,0 +1,40 @@
+# A streaming primary and its hot standby, mirroring the `test-db-replica` CI job so that
+# `e2e/replica` can be reproduced locally. See ./README.md for the commands.
+#
+# bitnamilegacy/, not bitnami/: Broadcom moved the versioned Bitnami images there and the
+# `bitnami/postgresql:16` tag no longer resolves.
+services:
+
+  db:
+    image: bitnamilegacy/postgresql:16
+    environment:
+      POSTGRESQL_USERNAME: postgres
+      POSTGRESQL_PASSWORD: postgres
+      POSTGRESQL_REPLICATION_MODE: master
+      POSTGRESQL_REPLICATION_USER: replicator
+      POSTGRESQL_REPLICATION_PASSWORD: replicator
+    ports:
+      - '${PRIMARY_PORT:-5432}:5432'
+    healthcheck:
+      test: [ 'CMD-SHELL', 'pg_isready -U postgres' ]
+      interval: 2s
+      timeout: 5s
+      retries: 30
+
+  db_replica:
+    image: bitnamilegacy/postgresql:16
+    environment:
+      POSTGRESQL_USERNAME: postgres
+      POSTGRESQL_PASSWORD: postgres
+      POSTGRESQL_REPLICATION_MODE: slave
+      POSTGRESQL_REPLICATION_USER: replicator
+      POSTGRESQL_REPLICATION_PASSWORD: replicator
+      POSTGRESQL_MASTER_HOST: db
+      POSTGRESQL_MASTER_PORT_NUMBER: '5432'
+    ports:
+      - '${STANDBY_PORT:-5433}:5432'
+    healthcheck:
+      test: [ 'CMD-SHELL', 'pg_isready -U postgres' ]
+      interval: 2s
+      timeout: 5s
+      retries: 30

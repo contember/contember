@@ -153,6 +153,16 @@ jobs:
           DEFAULT_DB_PASSWORD: postgres
           DEFAULT_DB_USER: postgres
           DEFAULT_DB_PORT: 5432
+          # The primary doubles as its own "replica": same system_identifier and version, so
+          # read-after-write is enabled and every content test exercises the routing.
+          DEFAULT_DB_READ_HOST: 127.0.0.1
+          DEFAULT_DB_READ_PORT: 5432
+          # This reaches the tenant database as well - tenant.env.* falls back TENANT_* -> DEFAULT_* -
+          # so every database, not only every project, now holds a second pool. That took the peak
+          # backend count over the whole suite from ~69 to ~97 of PostgreSQL's default
+          # max_connections=100; releasing an idle read connection after 2 s instead of 10 s puts it
+          # back at the one-pool level.
+          DEFAULT_DB_READ_POOL_IDLE_TIMEOUT_MS: 2000
           DEFAULT_DB_STATEMENT_TIMEOUT_MS: 3000
           DEFAULT_DB_QUERY_TIMEOUT_MS: 3000
           TENANT_DB_NAME: test_tenant
@@ -166,9 +176,106 @@ jobs:
           TENANT_MAILER_FROM: 'contember@localhost'
       - name: "Run E2E tests"
         # No parallelism flag needed: bun runs test files sequentially unless --parallel is given.
+        # `test:e2e` globs e2e/cases only; e2e/replica needs a standby and has its own job below.
         run: bun run test:e2e
         env:
           CONTEMBER_API_URL: "http://localhost:4000"
           CONTEMBER_ROOT_TOKEN: '0000000000000000000000000000000000000000'
           CONTEMBER_LOGIN_TOKEN: '1111111111111111111111111111111111111111'
           MAILHOG_URL: "http://localhost:8025"
+
+
+  test-db-replica:
+    # Read-after-write against a real streaming standby, which `test-db` cannot show: there the
+    # primary is its own replica and never lags. These tests pause WAL replay on the standby, so
+    # the fallback to the primary and the acknowledgement after catch-up are actually observed.
+    # Reproduce locally with scripts/ci/replica/ — see its README.
+    needs: [ ]
+    runs-on: ubuntu-latest
+    services:
+      mailhog:
+        image: mailhog/mailhog
+        env:
+          MH_CORS_ORIGIN: "*"
+        ports:
+          - 8025:8025
+          - 1025:1025
+      # bitnamilegacy/, not bitnami/: Broadcom moved the versioned Bitnami images there and the
+      # `bitnami/postgresql:16` tag no longer resolves.
+      db:
+        image: bitnamilegacy/postgresql:16
+        env:
+          POSTGRESQL_USERNAME: postgres
+          POSTGRESQL_PASSWORD: postgres
+          POSTGRESQL_REPLICATION_MODE: master
+          POSTGRESQL_REPLICATION_USER: replicator
+          POSTGRESQL_REPLICATION_PASSWORD: replicator
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 2s
+          --health-timeout 5s
+          --health-retries 30
+      db_replica:
+        image: bitnamilegacy/postgresql:16
+        env:
+          POSTGRESQL_USERNAME: postgres
+          POSTGRESQL_PASSWORD: postgres
+          POSTGRESQL_REPLICATION_MODE: slave
+          POSTGRESQL_REPLICATION_USER: replicator
+          POSTGRESQL_REPLICATION_PASSWORD: replicator
+          # service containers reach each other by service label; the standby waits for it itself
+          POSTGRESQL_MASTER_HOST: db
+          POSTGRESQL_MASTER_PORT_NUMBER: 5432
+        ports:
+          - 5433:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 2s
+          --health-timeout 5s
+          --health-retries 30
+
+    steps:
+      - uses: actions/checkout@v5
+      - uses: oven-sh/setup-bun@v2
+        with:
+            bun-version: 1.3.14
+      - name: Install deps
+        run: |
+          bun --version
+          bun install --frozen-lockfile
+      - name: build
+        run: bun run pre-build
+      - name: "Build server"
+        run: ./scripts/server-build/run.sh
+
+      - name: Start server
+        run: ./e2e/start-server.sh
+        env:
+          NODE_ENV: production
+          DEFAULT_DB_HOST: 127.0.0.1
+          DEFAULT_DB_PASSWORD: postgres
+          DEFAULT_DB_USER: postgres
+          DEFAULT_DB_PORT: 5432
+          DEFAULT_DB_READ_HOST: 127.0.0.1
+          DEFAULT_DB_READ_PORT: 5433
+          DEFAULT_DB_STATEMENT_TIMEOUT_MS: 3000
+          DEFAULT_DB_QUERY_TIMEOUT_MS: 3000
+          TENANT_DB_NAME: test_tenant
+          CONTEMBER_PORT: 4000
+          CONTEMBER_MONITORING_PORT: 4001
+          CONTEMBER_ROOT_TOKEN: '0000000000000000000000000000000000000000'
+          CONTEMBER_LOGIN_TOKEN: '1111111111111111111111111111111111111111'
+          TENANT_MAILER_HOST: 'localhost'
+          TENANT_MAILER_PORT: '1025'
+          TENANT_MAILER_FROM: 'contember@localhost'
+      - name: "Run replica E2E tests"
+        run: bun test --conditions=typescript e2e/replica
+        env:
+          CONTEMBER_API_URL: "http://localhost:4000"
+          CONTEMBER_ROOT_TOKEN: '0000000000000000000000000000000000000000'
+          CONTEMBER_LOGIN_TOKEN: '1111111111111111111111111111111111111111'
+          MAILHOG_URL: "http://localhost:8025"
+          # superuser: the tests pause and resume WAL replay on the standby
+          E2E_REPLICA_DSN: "postgres://postgres:postgres@127.0.0.1:5433/postgres"

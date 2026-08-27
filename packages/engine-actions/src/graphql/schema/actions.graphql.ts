@@ -100,6 +100,17 @@ export const schema: DocumentNode = gql`
     type Variable {
         name: String!
         value: String!
+        source: VariableSource!
     }
+
+	"""
+	Where the value comes from.
+	- DATABASE is stored in the project database and can be changed with setVariables
+	- ENVIRONMENT is supplied by the engine environment, overrides a stored value of the same name and is read-only
+	"""
+	enum VariableSource {
+		DATABASE
+		ENVIRONMENT
+	}
 
 `

@@ -136,6 +136,7 @@ export type StopEventResponse = {
 export type Variable = {
 	readonly __typename?: 'Variable'
 	readonly name: Scalars['String']['output']
+	readonly source: VariableSource
 	readonly value: Scalars['String']['output']
 }
 
@@ -143,6 +144,15 @@ export type VariableInput = {
 	readonly name: Scalars['String']['input']
 	readonly value: Scalars['String']['input']
 }
+
+/**
+ * Where the value comes from.
+ * - DATABASE is stored in the project database and can be changed with setVariables
+ * - ENVIRONMENT is supplied by the engine environment, overrides a stored value of the same name and is read-only
+ */
+export type VariableSource =
+	| 'DATABASE'
+	| 'ENVIRONMENT'
 
 export type ResolverTypeWrapper<T> = Promise<T> | T
 
@@ -231,6 +241,7 @@ export type ResolversTypes = {
 	UUID: ResolverTypeWrapper<Scalars['UUID']['output']>
 	Variable: ResolverTypeWrapper<Variable>
 	VariableInput: VariableInput
+	VariableSource: VariableSource
 }
 
 /** Mapping between all available schema types and the resolvers parents */
@@ -334,6 +345,7 @@ export interface UUIDScalarConfig extends GraphQLScalarTypeConfig<ResolversTypes
 
 export type VariableResolvers<ContextType = any, ParentType extends ResolversParentTypes['Variable'] = ResolversParentTypes['Variable']> = {
 	name?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+	source?: Resolver<ResolversTypes['VariableSource'], ParentType, ContextType>
 	value?: Resolver<ResolversTypes['String'], ParentType, ContextType>
 	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
 }

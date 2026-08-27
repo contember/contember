@@ -4,12 +4,13 @@ import { createContainer, readConfig } from '@contember/engine-http'
 
 import { createLogger, JsonStreamLoggerHandler } from '@contember/logger'
 ;(async () => {
-	const { serverConfig, projectConfigResolver, tenantConfigResolver } = await readConfig()
+	const { serverConfig, projectConfigResolver, tenantConfigResolver, env } = await readConfig()
 	const container = await createContainer({
 		debugMode: false,
 		serverConfig,
 		projectConfigResolver,
 		tenantConfigResolver,
+		env,
 		plugins: [],
 		logger: createLogger(new JsonStreamLoggerHandler(process.stderr)),
 	})

@@ -119,6 +119,7 @@
       "version": "2.2.0-alpha.3",
       "dependencies": {
         "chalk": "catalog:",
+        "chalk-table": "catalog:",
       },
       "devDependencies": {
         "@types/js-yaml": "catalog:",
@@ -258,6 +259,7 @@
         "prom-client": "catalog:",
       },
       "devDependencies": {
+        "@contember/database-tester": "workspace:*",
         "@types/bun": "catalog:",
         "@types/ws": "catalog:",
         "graphql": "catalog:",

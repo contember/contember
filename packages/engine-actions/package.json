@@ -41,6 +41,7 @@
     "prom-client": "catalog:"
   },
   "devDependencies": {
+    "@contember/database-tester": "workspace:*",
     "@types/bun": "catalog:",
     "@types/ws": "catalog:",
     "graphql": "catalog:"

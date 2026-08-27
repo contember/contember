@@ -14,7 +14,7 @@ You must include a Bearer token in Authorization header. To view and setup varia
 Variables are dynamic values that can be used to customize the behavior of your Actions. These variables can be referenced in your Actions' configurations using double curly brackets `{{}}`, e.g. `{{baseUrl}}`.
 
 ### Retrieving Variables:
-To retrieve the variables defined for your Contember project, you can make a GraphQL query to the `variables` field. This will provide you with a list of variables, including their names and current values. 
+To retrieve the variables defined for your Contember project, you can make a GraphQL query to the `variables` field. This will provide you with a list of variables, including their names, current values and where each value comes from. 
 
 Example:
 
@@ -23,9 +23,12 @@ query {
   variables {
     name
     value
+    source
   }
 }
 ```
+
+`source` is `DATABASE` for a value stored in the project database and `ENVIRONMENT` for a value supplied by the engine environment.
 
 ### Updating Variables
 
@@ -67,6 +70,19 @@ The `mode` field in the `SetVariablesArgs` input of `setVariables` mutation allo
 	- When `mode` is set to `APPEND_ONLY_MISSING`, the new variable values provided in the mutation will be appended to the existing variables only if they do not already exist.
 	- Existing variables that are not included in the mutation will retain their current values.
 	- If a variable is included in the mutation and it already exists, its value will not be updated.
+
+### Variables from the environment
+
+A value can also come from the engine environment instead of the project database, so a secret is delivered by the same mechanism as every other secret the engine holds and survives a database restore unchanged.
+
+The engine reads a variable named `apiKey` for a project `my-project` from:
+
+1. `MY_PROJECT_ACTIONS_VARIABLE_apiKey`
+2. `DEFAULT_ACTIONS_VARIABLE_apiKey`, shared by every project
+
+The project part of the name follows the same rule as `%project.env.*%` in the server configuration: the project slug uppercased, with dashes replaced by underscores. An empty value counts as unset. Because the name after the prefix is taken literally, name such a variable the way you name an environment variable — `{{API_KEY}}` read from `MY_PROJECT_ACTIONS_VARIABLE_API_KEY`.
+
+A variable supplied this way overrides a stored row of the same name and is read-only: it is reported with `source: ENVIRONMENT` and `setVariables` refuses to write it, so exactly one place owns the value.
 
 
 ## Event queries

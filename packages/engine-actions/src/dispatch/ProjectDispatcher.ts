@@ -83,6 +83,7 @@ export class ProjectDispatcher implements Runnable {
 								db,
 								contentSchemaResolver: this.contentSchemaResolver,
 								logger,
+								project: { slug: this.projectSlug },
 							})
 							const terminalFailed = failedAfterAttempt + failedUnknownTarget
 							this.metrics.succeeded(succeeded)

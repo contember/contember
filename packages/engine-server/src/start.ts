@@ -28,7 +28,7 @@ process.on('warning', message => {
 	const version = await getServerVersion()
 	printStartInfo({ version, isDebug }, logger)
 	const plugins = await loadPlugins()
-	const { serverConfig, projectConfigResolver, tenantConfigResolver } = await resolveServerConfig({ plugins, serverConfigSchema })
+	const { serverConfig, projectConfigResolver, tenantConfigResolver, env } = await resolveServerConfig({ plugins, serverConfigSchema })
 
 	if (process.argv[2] === 'validate') {
 		process.exit(0)
@@ -51,6 +51,7 @@ process.on('warning', message => {
 		serverConfig,
 		projectConfigResolver,
 		tenantConfigResolver,
+		env,
 		plugins,
 		processType,
 		version,

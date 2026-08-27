@@ -12,7 +12,7 @@ export class SetVariablesMutationResolver implements MutationResolvers<ActionsCo
 	async setVariables(parent: unknown, { args }: MutationSetVariablesArgs, ctx: ActionsContext) {
 		await ctx.requireAccess(ActionsAuthorizationActions.VARIABLES_SET)
 
-		await this.variablesManager.setVariables(ctx.db, args)
+		await this.variablesManager.setVariables(ctx.db, args, ctx.project.slug)
 
 		return {
 			ok: true,

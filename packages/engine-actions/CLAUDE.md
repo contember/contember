@@ -33,6 +33,18 @@ States: `created` → `processing` → `succeed` | `retrying` → `failed` | `st
 - Response: optional `{ failures: [{ eventId, error }] }`
 - Payload wrapped in meta envelope (eventId, transactionId, identity, timestamps, retries)
 
+## Variables
+
+`{{name}}` in a target's URL or headers, resolved at dispatch time from two sources:
+
+- rows in `actions_variable`, written by the `setVariables` mutation
+- the engine environment — `<PROJECT>_ACTIONS_VARIABLE_<NAME>`, falling back to `DEFAULT_ACTIONS_VARIABLE_<NAME>`,
+  with the project part built by `projectNameToEnvName` (the same convention as `%project.env.X%`)
+
+An environment value overrides a row of the same name, is reported as `source: ENVIRONMENT` and `setVariables`
+rejects it, so exactly one writer owns each value. The env map reaches `VariablesManager` as the master
+container's `env` service; the project slug comes from `ProjectDispatcher` (worker) or `ActionsContext` (API).
+
 ## GraphQL API (mounted at `/actions/:projectSlug`)
 
 Mutations: `processBatch`, `retryEvent`, `stopEvent`, `setVariables` (MERGE/SET/APPEND_ONLY_MISSING)

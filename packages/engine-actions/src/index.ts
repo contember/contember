@@ -68,8 +68,8 @@ export default class ActionsPlugin implements Plugin {
 					this.actionsMetrics = metrics
 					return metrics
 				})
-				.addService('actions_variableManager', () => {
-					return new VariablesManager()
+				.addService('actions_variableManager', ({ env }) => {
+					return new VariablesManager(env)
 				})
 				.addService('actions_eventRepository', () => {
 					return new EventsRepository()

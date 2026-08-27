@@ -3,7 +3,7 @@ import { SystemContainerFactory } from '@contember/engine-system-api'
 import { TenantContainerFactory } from '@contember/engine-tenant-api'
 import { ModificationHandlerFactory } from '@contember/schema-migrations'
 import { Initializer } from './bootstrap/index.js'
-import { ServerConfig } from './config/config.js'
+import { Env, ServerConfig } from './config/config.js'
 
 import { DatabaseMetadataResolver } from '@contember/database'
 import { ExecutionContainerFactory, GraphQlSchemaBuilderFactory, PermissionFactory } from '@contember/engine-content-api'
@@ -68,6 +68,8 @@ export interface MasterContainerArgs {
 	serverConfig: ServerConfig
 	projectConfigResolver: ProjectConfigResolver
 	tenantConfigResolver: TenantConfigResolver
+	/** The environment the config was resolved from, so a plugin can read its own `<PROJECT>_*` values out of it. */
+	env: Env
 	plugins: Plugin[]
 	logger: Logger
 	version?: string
@@ -92,12 +94,14 @@ export class MasterContainerFactory {
 		plugins,
 		projectConfigResolver,
 		tenantConfigResolver,
+		env,
 		version,
 		logger,
 		processType,
 	}: MasterContainerArgs) {
 		return new Builder({})
 			.addService('serverConfig', () => serverConfig)
+			.addService('env', () => env)
 			.addService('debugMode', () => debugMode)
 			.addService('version', () => version)
 			.addService('processType', () => processType)

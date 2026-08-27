@@ -1,5 +1,6 @@
 import { GraphQlClientError, GraphQlErrorType } from './GraphQlClientError.js'
-import { GraphQlClientOptions, GraphQlClientRequestOptions } from './GraphQlClientRequestOptions.js'
+import { GraphQlClientBaseOptions, GraphQlClientOptions, GraphQlClientRequestOptions } from './GraphQlClientRequestOptions.js'
+import { WriteRefTracker } from './WriteRefTracker.js'
 
 export class GraphQlClient {
 	constructor(
@@ -41,6 +42,8 @@ ${query}`
 
 		try {
 			response = await this.doExecute(query, options)
+			// Before the body is even read: a mutation that fails on a later root has still committed the first one.
+			this.resolveWriteRefTracker(options)?.captureResponse(response)
 			this.options?.onResponse?.(response)
 			options?.onResponse?.(response)
 
@@ -86,10 +89,12 @@ ${query}`
 
 	protected async doExecute(
 		query: string,
-		{ apiToken, signal, variables, headers }: GraphQlClientRequestOptions = {},
+		options: GraphQlClientRequestOptions = {},
 	): Promise<Response> {
+		const { apiToken, signal, variables, headers } = options
 		const resolvedHeaders: Record<string, string> = {
 			'Content-Type': 'application/json',
+			...this.resolveWriteRefTracker(options)?.requestHeaders(),
 			...this.options.headers,
 			...headers,
 		}
@@ -105,6 +110,10 @@ ${query}`
 			signal,
 			body: JSON.stringify({ query, variables }),
 		})
+	}
+
+	private resolveWriteRefTracker(options: GraphQlClientBaseOptions): WriteRefTracker | undefined {
+		return options.readAfterWrite ?? this.options.readAfterWrite
 	}
 }
 

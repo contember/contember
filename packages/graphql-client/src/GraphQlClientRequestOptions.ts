@@ -1,9 +1,13 @@
+import { WriteRefTracker } from './WriteRefTracker.js'
+
 export interface GraphQlClientBaseOptions {
 	readonly apiToken?: string
 	readonly headers?: Record<string, string>
 	readonly onBeforeRequest?: (query: { query: string; variables: GraphQlClientVariables }) => void
 	readonly onResponse?: (response: Response) => void
 	readonly onData?: (json: unknown) => void
+	/** Carries outstanding write references to the server and picks up the ones it returns. */
+	readonly readAfterWrite?: WriteRefTracker
 }
 
 export interface GraphQlClientOptions extends GraphQlClientBaseOptions {

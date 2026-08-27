@@ -1,9 +1,11 @@
-import { memo, useCallback, useMemo, useState } from 'react'
+import { memo, useCallback, useMemo, useRef, useState } from 'react'
+import { WriteRefTracker } from '@contember/graphql-client'
 import {
 	ApiBaseUrlContext,
 	GraphQlClientFactoryContext,
 	LoginTokenContext,
 	ProjectSlugContext,
+	ReadAfterWriteTrackersContext,
 	SessionTokenContext,
 	SetSessionTokenContext,
 	StageSlugContext,
@@ -17,6 +19,8 @@ export interface ContemberClientProps {
 	project?: string
 	stage?: string
 	graphqlClientFactory?: GraphQlClientFactory
+	/** Ask the API to serve a query only from a replica that has already seen this identity's writes. */
+	readAfterWrite?: boolean
 }
 
 const sessionTokenKey = 'contember_session_token'
@@ -32,6 +36,7 @@ export const ContemberClient = memo<ContemberClientProps & { children: React.Rea
 	sessionToken,
 	stage,
 	graphqlClientFactory,
+	readAfterWrite = true,
 }) {
 	const [localStorageSessionToken, setLocalStorageSessionToken] = useLocalStorageSessionToken()
 
@@ -41,6 +46,13 @@ export const ContemberClient = memo<ContemberClientProps & { children: React.Rea
 		source: localStorageSessionToken ? 'localstorage' : (sessionToken ? 'props' : undefined),
 	}), [localStorageSessionToken, sessionToken])
 
+	// Write references belong to the identity that made them, so a different token starts from an empty map.
+	const trackersRef = useRef<{ token: string | undefined; trackers: Map<string, WriteRefTracker> } | null>(null)
+	if (trackersRef.current === null || trackersRef.current.token !== sessionTokenContextValue.token) {
+		trackersRef.current = { token: sessionTokenContextValue.token, trackers: new Map() }
+	}
+	const readAfterWriteTrackers = readAfterWrite ? trackersRef.current.trackers : undefined
+
 	return (
 		<ApiBaseUrlContext.Provider value={apiBaseUrl}>
 			<LoginTokenContext.Provider value={loginToken}>
@@ -49,7 +61,9 @@ export const ContemberClient = memo<ContemberClientProps & { children: React.Rea
 						<ProjectSlugContext.Provider value={project}>
 							<StageSlugContext.Provider value={stage}>
 								<GraphQlClientFactoryContext.Provider value={graphqlClientFactory}>
-									{children}
+									<ReadAfterWriteTrackersContext.Provider value={readAfterWriteTrackers}>
+										{children}
+									</ReadAfterWriteTrackersContext.Provider>
 								</GraphQlClientFactoryContext.Provider>
 							</StageSlugContext.Provider>
 						</ProjectSlugContext.Provider>

@@ -1,4 +1,5 @@
 import { createContext, createRequiredContext } from '@contember/react-utils'
+import { WriteRefTracker } from '@contember/graphql-client'
 import { GraphQlClientFactory, SessionTokenContextValue } from './types/index.js'
 
 const SessionTokenContext_ = createContext<SessionTokenContextValue>('SessionTokenContext', {
@@ -40,3 +41,9 @@ const GraphQlClientFactoryContext_ = createContext<GraphQlClientFactory | undefi
 
 export const GraphQlClientFactoryContext = GraphQlClientFactoryContext_[0]
 export const useGraphQlClientFactory = GraphQlClientFactoryContext_[1]
+
+/** Write references of the current identity, one tracker per API path. `undefined` when read-after-write is off. */
+const ReadAfterWriteTrackersContext_ = createContext<Map<string, WriteRefTracker> | undefined>('ReadAfterWriteTrackersContext', undefined)
+
+export const ReadAfterWriteTrackersContext = ReadAfterWriteTrackersContext_[0]
+export const useReadAfterWriteTrackers = ReadAfterWriteTrackersContext_[1]

@@ -321,6 +321,60 @@ describe('webhook response', () => {
 				},
 			},
 		])
+
+		const warnings = testLoggerHandler.messages.filter(it => it.level.name === 'warn')
+		assert.equal(warnings.length, 1)
+		assert.equal(warnings[0].message, 'Webhook target returned a malformed response')
+		// exact match: the parser message quotes the payload and must not reach the log
+		assert.deepStrictEqual(warnings[0].ownAttributes, {
+			target: 'test_target',
+			status: 200,
+			events: [event1.id, event2.id],
+		})
+	})
+
+	test('response naming events outside the batch', async () => {
+		const testLoggerHandler = new TestLoggerHandler()
+		const logger = createLogger(testLoggerHandler)
+
+		const webhookHandler = new WebhookTargetHandler({
+			fetch(): Promise<FetcherResponse> {
+				return Promise.resolve({
+					ok: true,
+					headers: new Headers([['content-type', 'application/json']]),
+					responseText: `{"failures": [{"eventId": "${testUuid(999)}"}]}`,
+					status: 200,
+					statusText: 'OK',
+				})
+			},
+		})
+
+		const target: Actions.AnyTarget = {
+			name: 'test_target',
+			type: 'webhook',
+			url: 'http://localhost',
+		}
+
+		const event1 = createTestEvent(0)
+		const event2 = createTestEvent(1)
+		const result = await webhookHandler.handle({
+			logger,
+			target: target,
+			events: [event1, event2],
+			variables: {},
+		})
+		assert.equal(result.every(it => !it.result.ok), true)
+
+		const warnings = testLoggerHandler.messages.filter(it => it.level.name === 'warn')
+		assert.equal(warnings.length, 1)
+		assert.equal(warnings[0].message, 'Webhook target reported failures for event ids outside the batch')
+		// exact match: the unknown ids are strings the target chose, only their count may be logged
+		assert.deepStrictEqual(warnings[0].ownAttributes, {
+			target: 'test_target',
+			status: 200,
+			unknownEventIds: 1,
+			events: [event1.id, event2.id],
+		})
 	})
 
 	test('ignored invalid response', async () => {
@@ -378,6 +432,7 @@ describe('webhook response', () => {
 				},
 			},
 		])
+		assert.deepStrictEqual(testLoggerHandler.messages, [])
 	})
 
 	test('partially successful response', async () => {
@@ -436,5 +491,15 @@ describe('webhook response', () => {
 				},
 			},
 		])
+
+		const warnings = testLoggerHandler.messages.filter(it => it.level.name === 'warn')
+		assert.equal(warnings.length, 1)
+		assert.equal(warnings[0].message, 'Webhook target reported failed events')
+		// exact match: only the events the target rejected, never the reasons it gave
+		assert.deepStrictEqual(warnings[0].ownAttributes, {
+			target: 'test_target',
+			status: 200,
+			events: [event1.id],
+		})
 	})
 })

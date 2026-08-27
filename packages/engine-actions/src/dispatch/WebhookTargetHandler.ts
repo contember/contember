@@ -107,11 +107,28 @@ export class WebhookTargetHandler implements InvokeHandler<Actions.WebhookTarget
 			const missingEvents = Object.keys(failedEvents).filter(it => !eventsInBatch.has(it))
 
 			if (missingEvents.length) {
+				// Only the count of unknown ids: they are strings the target chose, not ours.
+				logger.warn('Webhook target reported failures for event ids outside the batch', {
+					target: target.name,
+					status: response.status,
+					unknownEventIds: missingEvents.length,
+					events: events.map(it => it.id),
+				})
 				return () => ({
 					ok: false,
 					code: response.status,
 					response: response.responseText,
 					errorMessage: 'Invalid response: undefined events IDs: ' + missingEvents.join('; '),
+				})
+			}
+
+			const failedIds = events.filter(it => failedEvents[it.id]).map(it => it.id)
+			if (failedIds.length) {
+				// Per-event errors come from the target's payload and stay in the event log, not here.
+				logger.warn('Webhook target reported failed events', {
+					target: target.name,
+					status: response.status,
+					events: failedIds,
 				})
 			}
 
@@ -126,6 +143,12 @@ export class WebhookTargetHandler implements InvokeHandler<Actions.WebhookTarget
 				}
 			}
 		} catch (e: any) {
+			// The parser message quotes the offending payload, so it stays in the event log only.
+			logger.warn('Webhook target returned a malformed response', {
+				target: target.name,
+				status: response.status,
+				events: events.map(it => it.id),
+			})
 			return () => ({
 				ok: false,
 				code: response.status,

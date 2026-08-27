@@ -26,6 +26,10 @@ This is unrelated to [`x-contember-ref`](/reference/engine/content/advanced/cach
 
 The headers are used by the Content API (`/content/...`) only; mutations always run on the primary.
 
+:::caution[Check what sits in front of the API]
+Three new headers have to survive the trip. A reverse proxy, CDN or WAF that filters headers must pass **`X-Contember-Read-After` on the request** and must not strip `X-Contember-Write-Ref` or `X-Contember-Read-After-Visible` from the response — a stripped request header silently degrades to plain eventual consistency, and a stripped response header makes the client hold its references until they expire. Browsers are already handled: the engine lists both response headers in `Access-Control-Expose-Headers`, and the request header is covered by the CORS preflight.
+:::
+
 The acknowledgement is **all-or-nothing**. The server checks the whole set of references in one go, so it either serves the query from the replica and echoes every reference back, or serves it from the primary and sends no `X-Contember-Read-After-Visible` at all. There is never a partial list, and an unacknowledged reference is simply kept by the client for the next query.
 
 ## Example flow
@@ -69,6 +73,15 @@ The request runs on the primary, with no acknowledgement, whenever:
 - no replica connection can be acquired (the response is still correct; the server logs a warning).
 
 There is no waiting or polling, so replication lag never slows a query down — but the fallback is not free: the server acquires a replica connection and runs the check on it before it gives up and queries the primary. A client that constantly misses pays that round trip on every query.
+
+## What a reference costs
+
+Sending references is not free even when they hit. On top of the visibility check itself, the whole request — the not-modified check and every SQL statement of the query — is pinned to that one replica connection and runs **serialized** on it. A query that fetches several relations normally issues those statements concurrently and waits for the slowest; pinned, it waits for their sum. A wide or deep query therefore costs noticeably more with references than without.
+
+That is the price of not reading a stale value, and it is paid only while references are outstanding — at most until they are acknowledged, and never longer than the tracker's 30 second TTL. Two consequences worth designing for:
+
+- a read that does not need to see the client's own write is better served by a client without a tracker, not by one whose references happen to be acknowledged;
+- the server holds one replica connection per reference-carrying request, so `read.pool.maxConnections` has to cover the number of them you expect at once. Beyond that the requests fall back to the primary — correct, but neither pinned nor acknowledged.
 
 ## JavaScript clients
 

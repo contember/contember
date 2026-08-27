@@ -19,7 +19,6 @@ export const normalizeSchema = <S extends Schema>(schema: S): S => {
 						'**': {
 							upload: true,
 							read: true,
-							delete: true,
 						},
 					},
 					content: {
@@ -44,7 +43,6 @@ export const normalizeSchema = <S extends Schema>(schema: S): S => {
 						'**': {
 							upload: true,
 							read: true,
-							delete: true,
 						},
 					},
 					content: {

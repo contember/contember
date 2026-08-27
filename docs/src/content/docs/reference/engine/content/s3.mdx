@@ -82,7 +82,7 @@ mutation {
 }
 ```
 
-Just like `generateReadUrl`, this mutation accepts a public URL instead of an object key. It requires a `delete` operation in an ACL and it is idempotent — deleting an object which does not exist succeeds. When the storage rejects the request, an error is returned.
+Just like `generateReadUrl`, this mutation accepts a public URL instead of an object key. It requires a `delete` operation in an ACL, which no role has by default — see [Allowing a delete](#allowing-a-delete). It is idempotent — deleting an object which does not exist succeeds. When the storage rejects the request, an error is returned.
 
 :::note
 Deleting an object does not purge a CDN cache. If you delete a file because it must stop being served (e.g. a takedown or an erasure request), purge the cache of your CDN as well.
@@ -90,21 +90,20 @@ Deleting an object does not purge a CDN cache. If you delete a file because it m
 
 ## Configuring S3 ACL
 
-To use S3 functionality, each role in the [ACL schema](/reference/engine/schema/acl) must have defined ACL rules. This is the most simple rule, which allows all operations on any key:
+To use S3 functionality, each role in the [ACL schema](/reference/engine/schema/acl) must have defined ACL rules. This is the most simple rule, which allows reading and uploading any key:
 ```typescript
 const adminRole = {
   s3: {
     '**': {
       read: true,
       upload: true,
-      delete: true,
     }
   },
   // ... variables, stage, entities...
 }
 ```
 
-In a key you define a glob-like pattern for an S3 object key and in a value you define allowed operations (`read`, `upload` and `delete`, the last one available since 2.2). We use [picomatch](https://github.com/micromatch/picomatch) library for a pattern matching.
+In a key you define a glob-like pattern for an S3 object key and in a value you define allowed operations (`read`, `upload` and `delete`, the last one available since 2.2 and covered in [Allowing a delete](#allowing-a-delete)). We use [picomatch](https://github.com/micromatch/picomatch) library for a pattern matching.
 
 #### Example patterns
 
@@ -120,6 +119,52 @@ Contember will try to find any rule for an object key, which allows given operat
 `read` option only affects `generateReadUrl` mutation and does not affect upload ACL (`PUBLIC_READ`, `PRIVATE`) nor public read URL in any way.
 :::
 
-:::note
-`delete` is a separate operation — it is not implied by `upload`. Roles `admin` and `contentAdmin` have it enabled for all objects.
+### Allowing a delete
+
+`delete` is opt-in. It is a separate operation, not implied by `upload`, and **no role has it unless you grant it** —
+including the built-in `admin` and `content_admin`, which get `read` and `upload` on `**` but not `delete`. Deleting
+an object is irreversible, so a role gets that capability only when you say so.
+
+For your own roles, grant it like any other option:
+
+```typescript
+import { c } from '@contember/schema-definition'
+
+export const editorRole = c.createRole('editor', {
+  s3: {
+    'images/**': {
+      read: true,
+      upload: true,
+      delete: true,
+    },
+  },
+})
+```
+
+The built-in roles have no definition of their own, so granting them a delete means overriding their `s3` section in
+the `createSchema` callback. Unlike `content` and `system`, this section is not merged with the built-in one — what
+you define replaces it completely, so repeat `read` and `upload`:
+
+```typescript
+import { createSchema } from '@contember/schema-definition'
+import * as model from './model'
+
+export default createSchema(model, schema => ({
+  ...schema,
+  acl: {
+    ...schema.acl,
+    roles: {
+      ...schema.acl.roles,
+      admin: { ...schema.acl.roles.admin, s3: { '**': { read: true, upload: true, delete: true } } },
+    },
+  },
+}))
+```
+
+Only the keys you set are overridden, so the entity permissions, stages and variables of the built-in role stay
+untouched.
+
+:::caution
+Do not use `c.createRole('admin', …)` for this. A role defined that way also carries its own `entities`, which
+replaces the built-in allow-all entity permissions — the role keeps its name but loses access to your data.
 :::

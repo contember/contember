@@ -12,7 +12,7 @@ import {
 	TreeStore,
 } from '@contember/binding-legacy'
 import { MutationGenerator, SubMutationOperation } from '@contember/binding-legacy'
-import { ContentQueryBuilder } from '@contember/client'
+import { ContentQueryBuilder, MutationError, Result, ValidationError } from '@contember/client'
 import { GraphQlClient } from '@contember/graphql-client'
 import { WireConnection, wireConnection, WireEntity, WireValue } from './wireData.js'
 
@@ -28,9 +28,15 @@ export interface RecordedRequest {
 	variables: Record<string, unknown>
 }
 
+/** A {@link MutationError} as it travels over the wire, where the code is a plain string rather than an enum member. */
+export type MutationErrorFixture = Omit<MutationError, 'type'> & { readonly type: `${Result.ExecutionErrorType}` }
+
 export interface MutationFailure {
 	errorMessage: string
-	errors?: unknown[]
+	/** Execution errors, i.e. what the engine reports when the write itself is refused. */
+	errors?: MutationErrorFixture[]
+	/** Validation errors. The engine reports these instead of running the mutation, so they take precedence. */
+	validation?: ValidationError[]
 }
 
 /**
@@ -126,7 +132,7 @@ export class FakeContentApi {
 					ok: false,
 					errorMessage: failure.errorMessage,
 					errors: failure.errors ?? [],
-					validation: null,
+					validation: this.validationResult(failure),
 					node: null,
 				}
 		}
@@ -135,9 +141,13 @@ export class FakeContentApi {
 			ok: failure === undefined,
 			errorMessage: failure?.errorMessage ?? null,
 			errors: failure?.errors ?? [],
-			validation: null,
+			validation: failure === undefined ? null : this.validationResult(failure),
 			...results,
 		}
+	}
+
+	private validationResult(failure: MutationFailure) {
+		return failure.validation === undefined ? null : { valid: false, errors: failure.validation }
 	}
 
 	private nodeForOperation(operation: SubMutationOperation): WireEntity | null {

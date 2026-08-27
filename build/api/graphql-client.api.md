@@ -10,7 +10,7 @@ export class GraphQlClient {
     // (undocumented)
     get apiUrl(): string;
     // (undocumented)
-    protected doExecute(query: string, input?: GraphQlClientRequestOptions): Promise<Response>;
+    protected doExecute(query: string, options?: GraphQlClientRequestOptions): Promise<Response>;
     // (undocumented)
     execute<T = unknown>(query: string, options?: GraphQlClientRequestOptions): Promise<T>;
     // (undocumented)
@@ -32,6 +32,7 @@ export interface GraphQlClientBaseOptions {
     readonly onData?: (json: unknown) => void;
     // (undocumented)
     readonly onResponse?: (response: Response) => void;
+    readonly readAfterWrite?: WriteRefTracker;
 }
 
 // @public (undocumented)
@@ -78,6 +79,31 @@ export type GraphQlErrorRequest = {
 
 // @public (undocumented)
 export type GraphQlErrorType = 'aborted' | 'network error' | 'invalid response body' | 'bad request' | 'unauthorized' | 'forbidden' | 'server error' | 'response errors';
+
+// @public
+export const READ_AFTER_WRITE_HEADERS: {
+    readonly writeRef: 'X-Contember-Write-Ref';
+    readonly readAfter: 'X-Contember-Read-After';
+    readonly readAfterVisible: 'X-Contember-Read-After-Visible';
+};
+
+// @public
+export class WriteRefTracker {
+    constructor(options?: WriteRefTrackerOptions);
+    captureResponse(response: Response): void;
+    requestHeaders(): Record<string, string>;
+    get tokens(): readonly string[];
+}
+
+// @public (undocumented)
+export interface WriteRefTrackerOptions {
+    // (undocumented)
+    readonly maxTokens?: number;
+    // (undocumented)
+    readonly now?: () => number;
+    // (undocumented)
+    readonly ttlMs?: number;
+}
 
 // (No @packageDocumentation comment for this package)
 

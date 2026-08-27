@@ -8,6 +8,7 @@ import { Context } from 'react';
 import { GraphQlClient } from '@contember/graphql-client';
 import { GraphQlClientOptions } from '@contember/graphql-client';
 import { NamedExoticComponent } from 'react';
+import { WriteRefTracker } from '@contember/graphql-client';
 
 // @public (undocumented)
 export const ApiBaseUrlContext: Context<string>;
@@ -31,6 +32,7 @@ export interface ContemberClientProps {
     loginToken?: string;
     // (undocumented)
     project?: string;
+    readAfterWrite?: boolean;
     // (undocumented)
     sessionToken?: string;
     // (undocumented)
@@ -48,6 +50,9 @@ export const LoginTokenContext: Context<string | undefined>;
 
 // @public (undocumented)
 export const ProjectSlugContext: Context<string | undefined>;
+
+// @public (undocumented)
+export const ReadAfterWriteTrackersContext: Context<Map<string, WriteRefTracker> | undefined>;
 
 // @public (undocumented)
 export const SessionTokenContext: Context<SessionTokenContextValue>;
@@ -87,16 +92,27 @@ export const useCurrentContentGraphQlClient: () => GraphQlClient;
 export const useCurrentSystemGraphQlClient: () => GraphQlClient;
 
 // @public (undocumented)
-export const useGraphQlClient: (path: string) => GraphQlClient;
+export const useGraphQlClient: (path: string, options?: UseGraphQlClientOptions) => GraphQlClient;
 
 // @public (undocumented)
 export const useGraphQlClientFactory: () => GraphQlClientFactory | undefined;
+
+// @public (undocumented)
+export interface UseGraphQlClientOptions {
+    readonly readAfterWrite?: boolean;
+}
 
 // @public (undocumented)
 export const useLoginToken: () => string | undefined;
 
 // @public (undocumented)
 export const useProjectSlug: () => string | undefined;
+
+// @public
+export const useReadAfterWriteTracker: (path: string, enabled?: boolean) => WriteRefTracker | undefined;
+
+// @public (undocumented)
+export const useReadAfterWriteTrackers: () => Map<string, WriteRefTracker> | undefined;
 
 // @public (undocumented)
 export const useSessionToken: () => string | undefined;

@@ -16,7 +16,7 @@ export class WriteRefTracker {
 	private readonly maxTokens: number
 	private readonly now: () => number
 
-	/** token -> when it was inserted; a Map keeps the insertion order. */
+	/** Token to its insertion time; a Map keeps the insertion order. */
 	private readonly insertedAt = new Map<string, number>()
 
 	constructor(options: WriteRefTrackerOptions = {}) {

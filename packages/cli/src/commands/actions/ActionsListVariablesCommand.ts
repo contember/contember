@@ -27,7 +27,9 @@ export class ActionsListVariablesCommand extends Command<Args, Options> {
 		output.table(
 			[
 				{ field: 'name', name: 'Name' },
-				{ field: 'value', name: 'Value' },
+				// an environment value is not returned by the API, so there is nothing to print but its absence
+				{ field: 'value', name: 'Value', format: value => value ?? '<not readable>' },
+				{ field: 'source', name: 'Source', format: source => source === 'ENVIRONMENT' ? 'Environment (read-only)' : 'Database' },
 			],
 			result,
 			'name',

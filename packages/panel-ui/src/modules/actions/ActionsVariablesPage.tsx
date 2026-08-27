@@ -121,7 +121,7 @@ const ActionsVariables = () => {
 		<PageStack>
 			<PageHeader
 				title="Variables"
-				description="Values the dispatcher interpolates into a target's URL and headers as {{name}}. A variable the engine environment supplies overrides a stored one of the same name and cannot be edited here. Whatever the API returns is shown as it is — it does not mask values."
+				description="Values the dispatcher interpolates into a target's URL and headers as {{name}}. A variable the engine environment supplies overrides a stored one of the same name; the API does not return its value and it cannot be edited here. A stored value is shown as it is — it is not masked."
 				actions={
 					<>
 						<Link to={{ pageName: 'actionsQueue', parameters: { project: projectSlug } }}>
@@ -167,7 +167,9 @@ const ActionsVariables = () => {
 											{variables?.map(variable => (
 												<TableRow key={variable.name}>
 													<TableCell className="font-mono text-xs">{variable.name}</TableCell>
-													<TableCell className="font-mono text-xs break-all">{variable.value}</TableCell>
+													<TableCell className="font-mono text-xs break-all">
+														{variable.value ?? <span className="font-sans text-muted-foreground">Not readable — held by the engine environment</span>}
+													</TableCell>
 													<TableCell className="text-xs text-muted-foreground">
 														{variable.source === 'ENVIRONMENT' ? 'Environment (read-only)' : 'Database'}
 													</TableCell>

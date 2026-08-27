@@ -137,7 +137,8 @@ export type Variable = {
 	readonly __typename?: 'Variable'
 	readonly name: Scalars['String']['output']
 	readonly source: VariableSource
-	readonly value: Scalars['String']['output']
+	/** Null when the value is not readable, which is every ENVIRONMENT one. */
+	readonly value?: Maybe<Scalars['String']['output']>
 }
 
 export type VariableInput = {
@@ -147,8 +148,8 @@ export type VariableInput = {
 
 /**
  * Where the value comes from.
- * - DATABASE is stored in the project database and can be changed with setVariables
- * - ENVIRONMENT is supplied by the engine environment, overrides a stored value of the same name and is read-only
+ * - DATABASE is stored in the project database, readable and writable with setVariables
+ * - ENVIRONMENT is supplied by the engine environment, overrides a stored value of the same name, and is neither readable nor writable
  */
 export type VariableSource =
 	| 'DATABASE'
@@ -346,7 +347,7 @@ export interface UUIDScalarConfig extends GraphQLScalarTypeConfig<ResolversTypes
 export type VariableResolvers<ContextType = any, ParentType extends ResolversParentTypes['Variable'] = ResolversParentTypes['Variable']> = {
 	name?: Resolver<ResolversTypes['String'], ParentType, ContextType>
 	source?: Resolver<ResolversTypes['VariableSource'], ParentType, ContextType>
-	value?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+	value?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>
 	__isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
 }
 

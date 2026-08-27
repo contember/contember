@@ -68,13 +68,32 @@ describe('variables from the environment', () => {
 		expect(await manager.fetchVariables(db, 'my-project')).toEqual({ API_KEY: 'from-db', baseUrl: 'http://localhost' })
 	})
 
-	test('listing reports where each value comes from', async () => {
+	test('listing reports where each value comes from, sorted by name', async () => {
 		const manager = new VariablesManager({ MY_PROJECT_ACTIONS_VARIABLE_API_KEY: 'from-env' })
 		const db = createDb([selectVariables([{ name: 'API_KEY', value: 'from-db' }, { name: 'baseUrl', value: 'http://localhost' }])])
 
 		expect(await manager.listVariables(db, 'my-project')).toEqual([
+			{ name: 'API_KEY', value: null, source: 'ENVIRONMENT' },
 			{ name: 'baseUrl', value: 'http://localhost', source: 'DATABASE' },
-			{ name: 'API_KEY', value: 'from-env', source: 'ENVIRONMENT' },
+		])
+	})
+
+	test('listing never returns an environment value, not even the one it shadows', async () => {
+		const manager = new VariablesManager({ MY_PROJECT_ACTIONS_VARIABLE_API_KEY: 'from-env' })
+		const db = createDb([selectVariables([{ name: 'API_KEY', value: 'from-db' }])])
+
+		const listed = JSON.stringify(await manager.listVariables(db, 'my-project'))
+		expect(listed).not.toContain('from-env')
+		expect(listed).not.toContain('from-db')
+	})
+
+	test('a stored variable named after an Object prototype member is still listed and writable', async () => {
+		const manager = new VariablesManager({ MY_PROJECT_ACTIONS_VARIABLE_API_KEY: 'from-env' })
+		const db = createDb([selectVariables([{ name: 'toString', value: 'from-db' }])])
+
+		expect(await manager.listVariables(db, 'my-project')).toEqual([
+			{ name: 'API_KEY', value: null, source: 'ENVIRONMENT' },
+			{ name: 'toString', value: 'from-db', source: 'DATABASE' },
 		])
 	})
 })
@@ -87,6 +106,21 @@ describe('setVariables', () => {
 		await expect(manager.setVariables(db, { variables: [{ name: 'API_KEY', value: 'attempted' }] }, 'my-project')).rejects.toThrow(
 			'Variables supplied by the environment are read-only: API_KEY',
 		)
+	})
+
+	test('does not mistake an Object prototype member for an environment variable', async () => {
+		const manager = new VariablesManager({})
+		const db = createDb(transaction(
+			selectVariables([]),
+			{
+				sql:
+					'insert into "system"."actions_variable" ("id", "name", "value") values (?, ?, ?) on conflict ("name") do update set "value" = ?, "updated_at" = NOW()',
+				parameters: [testUuid(1), 'toString', 'plain', 'plain'],
+				response: { rowCount: 1 },
+			},
+		))
+
+		await manager.setVariables(db, { variables: [{ name: 'toString', value: 'plain' }] }, 'my-project')
 	})
 
 	test('writes a variable the environment does not supply', async () => {

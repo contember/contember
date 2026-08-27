@@ -113,7 +113,7 @@ class ErrorsPreprocessor {
 					} else {
 						this.rejectCorruptData()
 					}
-				} else if ('index' in path) {
+				} else if ('index' in pathNode) {
 					if (currentNode.nodeType === 'iNode') {
 						const alias = pathNode.alias
 

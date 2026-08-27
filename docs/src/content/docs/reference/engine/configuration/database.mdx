@@ -59,6 +59,18 @@ Contember manages its own connection pool. All pool options are optional and liv
 | `maxUses` | Dispose a connection after it has been acquired this many times. | unlimited |
 | `maxAgeMs` | Dispose a connection once it reaches this age (after it is returned to the pool). | unlimited |
 
+### Per-request connection limit
+
+`maxConnectionsPerRequest` sits next to `pool` rather than inside it, because it does not size the pool — it caps how many of its connections **one HTTP request** may hold at the same time.
+
+| Option | Description | Default |
+|---|---|---|
+| `maxConnectionsPerRequest` | Maximum number of pool connections a single request may hold concurrently. | unlimited |
+
+Contember fetches the relations of a query concurrently, so one deep request can hold several connections at once. On a busy instance that lets a single expensive request starve the shared pool; setting this bounds it, at the cost of serializing part of that request. Only connections acquired at the top level count — a nested transaction reuses the one it is already on, so the limit can never deadlock a request against itself. The lowest meaningful value is `1`.
+
+A request that read-after-write pins to a replica connection is unaffected: it already holds exactly one connection for its whole duration, which is narrower than any limit you could set here. The limit still applies to every other request, including one that carried write references and then fell back to the primary.
+
 ## Read replica
 
 If you run a PostgreSQL read replica, point read-only traffic at it with a `read` sub-config. It accepts the **same options** as the primary connection (`host`, `port`, `user`, `password`, `database`, `ssl`, the timeouts, and `pool`). Any option you omit is inherited from the primary connection; the replica is only used when at least a `host` is provided.
@@ -116,15 +128,28 @@ If a requirement is not met, Contember logs one error and keeps the feature off;
 
 #### Supported topologies
 
-The check and the query must run on the same physical reader, so:
+**`read.host` must reach one and only one reader.** Anything that spreads connections over several readers is unsupported:
 
 - direct connections to the primary and to the replica are supported;
 - a connection pooler in front of a **single** replica is supported;
-- a transaction-mode pooler that spreads connections over **several** readers is **not** supported — consecutive statements can land on different readers with different replication positions.
+- **round-robin DNS** over several replicas — a Kubernetes `Service` in front of several replica pods, a load balancer, or a managed **cluster reader endpoint** — is **not** supported;
+- a transaction-mode pooler that spreads connections over **several** readers is **not** supported.
+
+The reason is the acknowledgement, not the routing within one request. A request that carries references is pinned to a single connection, so its own statements always see one consistent reader. But the acknowledgement tells the client to **forget** a reference once *that* reader has applied it, and with several readers behind one host name the next request can be served by a different one that has not:
+
+1. a mutation returns reference `T`;
+2. a query carrying `T` is served by replica X, which has applied it — `T` is acknowledged and the client drops it;
+3. the next query carries nothing, is served by replica Y, which is still behind, and reads stale data.
+
+Nothing detects this: every replica of the same primary reports the same `system_identifier`, so the requirement check passes. If you cannot guarantee a single reader, set `readAfterWrite.enabled: false` and treat the replica as eventually consistent.
 
 #### Platform coverage
 
 The mechanism is derived from PostgreSQL's own hot-standby implementation and is exercised in CI against a self-hosted streaming replica. Managed services built on streaming replication — Amazon RDS for PostgreSQL, Azure Database for PostgreSQL Flexible Server and Google Cloud SQL — are expected to behave the same way, but have not been exercised. Amazon Aurora and Google AlloyDB are unverified.
+
+:::caution[Point `read.host` at one instance, not at a reader endpoint]
+An Amazon RDS or Aurora **cluster reader endpoint** is round-robin DNS over every replica in the cluster, and the equivalent exists on the other platforms. With more than one replica behind it, the topology rule above is violated. Use a specific **instance** endpoint instead — or, if you need to spread reads over the fleet, keep the replica for reads and set `readAfterWrite.enabled: false`.
+:::
 
 ## Config file
 
@@ -193,6 +218,7 @@ Replace `<PREFIX>` below with `DEFAULT`, `TENANT`, or a project slug (`<PROJECT>
 | `queryTimeoutMs` | `<PREFIX>_DB_QUERY_TIMEOUT_MS` | number |
 | `statementTimeoutMs` | `<PREFIX>_DB_STATEMENT_TIMEOUT_MS` | number |
 | `lockTimeoutMs` | `<PREFIX>_DB_LOCK_TIMEOUT_MS` | number |
+| `maxConnectionsPerRequest` | `<PREFIX>_DB_MAX_CONNECTIONS_PER_REQUEST` | number |
 | `pool.maxConnections` | `<PREFIX>_DB_POOL_MAX_CONNECTIONS` | number |
 | `pool.maxConnecting` | `<PREFIX>_DB_POOL_MAX_CONNECTING` | number |
 | `pool.maxIdle` | `<PREFIX>_DB_POOL_MAX_IDLE` | number |

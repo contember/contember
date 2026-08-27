@@ -152,15 +152,45 @@ const normalizeClaims = (
 	// of whatever type, so OVERWRITE (don't conditionally add) with the mapped value when it is
 	// a string, otherwise `undefined` — a non-string claim must not leak through `...source`.
 	const email = getClaim(source, claimMapping?.email ?? 'email')
-	const name = getClaim(source, claimMapping?.name ?? 'name')
+	const name = resolveName(source, claimMapping)
 
 	return {
 		...source,
 		externalIdentifier,
 		email: typeof email === 'string' ? email : undefined,
-		name: typeof name === 'string' ? name : undefined,
+		name,
 		emailVerified,
 	}
+}
+
+/**
+ * Resolve the display name, falling back to `given_name` + `family_name` when there is no usable
+ * `name` claim.
+ *
+ * `name` is optional in OIDC core and plenty of providers omit it while sending the parts — Apereo
+ * CAS and Entra ID do, and so does Keycloak under its default mappers. Without the fallback,
+ * `CreatePersonCommand` lands on its own last-resort default and a federated person ends up named
+ * after the local part of their e-mail (`jan.novak`) despite the IdP having reported "Jan Novák".
+ * A single-path `claimMapping.name` cannot express this: the value has to be composed from two
+ * claims, not selected from one.
+ *
+ * An explicitly configured `claimMapping.name` is honoured as-is, fallback included — mapping a
+ * claim is a statement about where the name lives, and quietly substituting a different source
+ * would defeat it. A blank claim counts as absent: an empty string is not a display name, and
+ * treating it as one would keep the fallback (and `CreatePersonCommand`'s) from ever running.
+ */
+const resolveName = (source: Record<string, unknown>, claimMapping: OIDCClaimMapping | undefined): string | undefined => {
+	const mapped = getClaim(source, claimMapping?.name ?? 'name')
+	if (typeof mapped === 'string' && mapped.trim() !== '') {
+		return mapped
+	}
+	if (claimMapping?.name !== undefined) {
+		return undefined
+	}
+	const parts = [getClaim(source, 'given_name'), getClaim(source, 'family_name')]
+		.filter((part): part is string => typeof part === 'string' && part.trim() !== '')
+		.map(part => part.trim())
+	return parts.length > 0 ? parts.join(' ') : undefined
 }
 
 export const handleOIDCResponse = async (

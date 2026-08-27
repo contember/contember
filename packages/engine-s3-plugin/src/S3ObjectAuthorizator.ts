@@ -13,16 +13,24 @@ export type S3ObjectReadRule = {
 	matcher?: (key: string) => boolean
 }
 
+export type S3ObjectDeleteRule = {
+	pattern: string
+	matcher?: (key: string) => boolean
+}
+
 export class S3ObjectAuthorizator {
 	private readonly uploadRules: S3ObjectUploadRule[]
 	private readonly readRules: S3ObjectReadRule[]
+	private readonly deleteRules: S3ObjectDeleteRule[]
 
 	constructor(
 		uploadRules: Omit<S3ObjectUploadRule, 'matcher'>[],
 		readRules: Omit<S3ObjectReadRule, 'matcher'>[],
+		deleteRules: Omit<S3ObjectDeleteRule, 'matcher'>[] = [],
 	) {
 		this.uploadRules = uploadRules
 		this.readRules = readRules
+		this.deleteRules = deleteRules
 	}
 
 	public verifyReadAccess({ key }: { key: string }): void {
@@ -35,6 +43,18 @@ export class S3ObjectAuthorizator {
 		}
 
 		throw new ForbiddenError(`Read access forbidden for object key ${key}`)
+	}
+
+	public verifyDeleteAccess({ key }: { key: string }): void {
+		for (const rule of this.deleteRules) {
+			rule.matcher ??= pm(rule.pattern)
+
+			if (rule.matcher(key)) {
+				return
+			}
+		}
+
+		throw new ForbiddenError(`Delete access forbidden for object key ${key}`)
 	}
 
 	public verifyUploadAccess({ key, size }: { key: string; size: number | null }): void {

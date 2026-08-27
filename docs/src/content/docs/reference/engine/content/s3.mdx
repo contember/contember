@@ -2,7 +2,7 @@
 title: Storing files on S3
 ---
 
-Beside operations for your data, there are mutations related to S3 compatible storage. Contember itself doesn't store your files, but it can help you with signing URLs for uploading (or reading) those files. 
+Beside operations for your data, there are mutations related to S3 compatible storage. Contember itself doesn't store your files, but it can help you with signing URLs for uploading (or reading) those files, and it can delete them for you. 
 
 ## S3 server
 
@@ -67,23 +67,44 @@ If you store public URL instead of object key, don't worry. Contember will recog
 
 You can also optionally set an expiration of the URL (default 3600 seconds)
 
+## Deleting an object
+
+:::note[Available since 2.2]
+:::
+
+Unlike an upload or a read, a delete moves no bytes through your application, so there is no URL to sign — Contember signs the request and calls the storage itself:
+
+```
+mutation {
+  deleteS3Object(objectKey: "images/5b934fe1-0e30-4761-9e00-d4bfabbddf34.png") {
+    objectKey
+  }
+}
+```
+
+Just like `generateReadUrl`, this mutation accepts a public URL instead of an object key. It requires a `delete` operation in an ACL and it is idempotent — deleting an object which does not exist succeeds. When the storage rejects the request, an error is returned.
+
+:::note
+Deleting an object does not purge a CDN cache. If you delete a file because it must stop being served (e.g. a takedown or an erasure request), purge the cache of your CDN as well.
+:::
 
 ## Configuring S3 ACL
 
-To use S3 functionality, each role in the [ACL schema](/reference/engine/schema/acl) must have defined ACL rules. This is the most simple rule, which allows both operations on any key:
+To use S3 functionality, each role in the [ACL schema](/reference/engine/schema/acl) must have defined ACL rules. This is the most simple rule, which allows all operations on any key:
 ```typescript
 const adminRole = {
   s3: {
     '**': {
       read: true,
       upload: true,
+      delete: true,
     }
   },
   // ... variables, stage, entities...
 }
 ```
 
-In a key you define a glob-like pattern for an S3 object key and in a value you define allowed operations (`read` and `upload`). We use [picomatch](https://github.com/micromatch/picomatch) library for a pattern matching.
+In a key you define a glob-like pattern for an S3 object key and in a value you define allowed operations (`read`, `upload` and `delete`, the last one available since 2.2). We use [picomatch](https://github.com/micromatch/picomatch) library for a pattern matching.
 
 #### Example patterns
 
@@ -97,4 +118,8 @@ Contember will try to find any rule for an object key, which allows given operat
 
 :::note
 `read` option only affects `generateReadUrl` mutation and does not affect upload ACL (`PUBLIC_READ`, `PRIVATE`) nor public read URL in any way.
+:::
+
+:::note
+`delete` is a separate operation — it is not implied by `upload`. Roles `admin` and `contentAdmin` have it enabled for all objects.
 :::

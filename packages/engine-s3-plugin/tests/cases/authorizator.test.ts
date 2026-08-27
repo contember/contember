@@ -13,6 +13,17 @@ test('required upload pattern', () => {
 	expect(() => authorizator.verifyUploadAccess({ key: 'lorem.jpg', size: null })).toThrow('Upload access forbidden for object key lorem.jpg')
 })
 
+test('required delete pattern', () => {
+	const authorizator = new S3ObjectAuthorizator([], [], [{ pattern: 'foo/**' }])
+	expect(() => authorizator.verifyDeleteAccess({ key: 'foo/lorem.jpg' })).not.toThrow()
+	expect(() => authorizator.verifyDeleteAccess({ key: 'lorem.jpg' })).toThrow('Delete access forbidden for object key lorem.jpg')
+})
+
+test('delete is not implied by upload nor read', () => {
+	const authorizator = new S3ObjectAuthorizator([{ pattern: '**' }], [{ pattern: '**' }])
+	expect(() => authorizator.verifyDeleteAccess({ key: 'foo/lorem.jpg' })).toThrow('Delete access forbidden for object key foo/lorem.jpg')
+})
+
 test('max upload size', () => {
 	const authorizator = new S3ObjectAuthorizator([{ pattern: '**', maxSize: 1024 }], [])
 	expect(() => authorizator.verifyUploadAccess({ key: 'lorem.jpg', size: 1000 })).not.toThrow()

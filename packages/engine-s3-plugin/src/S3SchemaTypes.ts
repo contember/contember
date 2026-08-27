@@ -44,6 +44,14 @@ export const S3SignedUpload = new GraphQLObjectType({
 	},
 })
 
+export const S3DeletedObject = new GraphQLObjectType({
+	name: 'S3DeletedObject',
+	fields: {
+		objectKey: { type: new GraphQLNonNull(GraphQLString) },
+		bucket: { type: new GraphQLNonNull(GraphQLString) },
+	},
+})
+
 export const S3Acl = new GraphQLEnumType({
 	name: 'S3Acl',
 	values: {

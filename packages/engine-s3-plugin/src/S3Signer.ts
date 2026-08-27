@@ -4,10 +4,16 @@ import qs from 'qs'
 import { BinaryLike, createHash, createHmac } from 'node:crypto'
 
 interface S3Request {
-	action: 'read' | 'upload'
+	action: 'read' | 'upload' | 'delete'
 	key: string
 	expiration: number
 	headers: Record<string, string>
+}
+
+const methods: Record<S3Request['action'], string> = {
+	read: 'GET',
+	upload: 'PUT',
+	delete: 'DELETE',
 }
 
 const hmac = (secret: BinaryLike, data: BinaryLike) => createHmac('sha256', secret).update(data).digest()
@@ -36,7 +42,7 @@ export class S3Signer {
 		const queryString = this.getQueryParams(request, nowFormatted)
 		const path = uris.basePath + '/' + request.key
 		const lines = [
-			request.action === 'read' ? 'GET' : 'PUT',
+			methods[request.action],
 			path,
 			queryString,
 			this.getSignedHeaders(request),

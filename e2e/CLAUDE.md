@@ -1,6 +1,6 @@
 # e2e
 
-Integration tests that run against a **live engine and PostgreSQL**, not against mocks. In CI this is the `test-db (12..16)` matrix — one job per PostgreSQL major, each building the server, starting it via `start-server.sh` and running `bun run test:e2e`. It is fail-fast, and like the rest of the workflow it runs on `pull_request`, pushes to `main` and tags — never on a plain branch push.
+Integration tests that run against a **live engine and PostgreSQL**, not against mocks. In CI this is the `test-db (14..18)` matrix — one job per PostgreSQL major, each building the server, starting it via `start-server.sh` and running `bun run test:e2e`. It is fail-fast, and like the rest of the workflow it runs on `pull_request`, pushes to `main` and tags — never on a plain branch push.
 
 `test-db` is therefore the only place where authorization grants, resolvers and SQL meet for real — a feature covered solely by unit and mocked tests is not covered here.
 

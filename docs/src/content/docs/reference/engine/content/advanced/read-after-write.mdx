@@ -1,0 +1,118 @@
+---
+title: Read-after-write consistency
+description: How a client asks the Content API to serve a query only from a replica that has already applied its own writes — the headers, the WriteRefTracker and the ContemberClient prop.
+---
+
+:::note[Available since 2.2]
+:::
+
+When the engine is configured with a [read replica](/reference/engine/configuration/database#read-replica), Content API queries can be served from it. Replication is asynchronous, so a query issued right after a mutation may reach a replica that has not applied that mutation yet, and the client reads its own write back as stale data.
+
+To avoid it, the Content API exchanges three headers with the client. The client keeps a small set of references to its recent writes and sends them with every request; the server serves the query from the replica only if the replica has already applied them, and otherwise falls back to the primary. The result is **read-your-writes** for the client that carries the references. It is not monotonic reads across clients — another client, another device or another browser tab has its own set of references and can still observe an older snapshot.
+
+Nothing is required from a client that does not send the headers: it keeps the plain eventually-consistent behaviour. The headers are also harmless when no replica is configured — everything already runs on the primary.
+
+:::note
+This is unrelated to [`x-contember-ref`](/reference/engine/content/advanced/caching), which is about `304 Not Modified` caching — the two ref values have nothing in common and neither protocol reads the other's header. They do meet in one place: the not-modified check runs on the same connection the request was routed to, so a `304 Not Modified` response also carries `X-Contember-Read-After-Visible`. A client that combines both must read the acknowledgement on a `304` as well, not only on a `200`.
+:::
+
+## Headers
+
+| Header | Where | Meaning |
+| --- | --- | --- |
+| `X-Contember-Write-Ref` | mutation response | Reference to the write this request committed, in the form `<cluster>:<transaction id>`. Treat it as opaque. Absent when the mutation wrote nothing, and absent altogether while the feature is inactive (no replica configured, disabled, or a requirement not met). |
+| `X-Contember-Read-After` | request | References the client wants the query to see, comma-separated, at most **16** distinct values. |
+| `X-Contember-Read-After-Visible` | query response | The references of the request, repeated, once the replica serving the query has been proven to have applied them. |
+
+The headers are used by the Content API (`/content/...`) only; mutations always run on the primary.
+
+The acknowledgement is **all-or-nothing**. The server checks the whole set of references in one go, so it either serves the query from the replica and echoes every reference back, or serves it from the primary and sends no `X-Contember-Read-After-Visible` at all. There is never a partial list, and an unacknowledged reference is simply kept by the client for the next query.
+
+## Example flow
+
+#### A mutation
+
+```http
+POST /content/my-project/live
+
+{ "query": "mutation { createArticle(data: { title: \"Hello\" }) { ok } }" }
+```
+
+```http
+200 OK
+X-Contember-Write-Ref: 7412094958558216905:1054
+```
+
+#### The next query carries the reference
+
+```http
+POST /content/my-project/live
+X-Contember-Read-After: 7412094958558216905:1054
+
+{ "query": "{ listArticle { title } }" }
+```
+
+If the replica has already applied the write, the whole request is served from that replica and the response acknowledges the references:
+
+```http
+200 OK
+X-Contember-Read-After-Visible: 7412094958558216905:1054
+```
+
+#### When the request falls back to the primary
+
+The request runs on the primary, with no acknowledgement, whenever:
+
+- the `X-Contember-Read-After` header is unusable — a malformed reference, a reference from a different cluster, or more than 16 of them. The header is rejected **as a whole**, not per reference, so one bad value discards the rest;
+- the replica has not applied the references yet;
+- the visibility check on the replica fails;
+- no replica connection can be acquired (the response is still correct; the server logs a warning).
+
+There is no waiting or polling, so replication lag never slows a query down — but the fallback is not free: the server acquires a replica connection and runs the check on it before it gives up and queries the primary. A client that constantly misses pays that round trip on every query.
+
+## JavaScript clients
+
+`@contember/graphql-client` (re-exported by `@contember/client`) ships `WriteRefTracker`, which keeps the outstanding references and sets and reads all three headers. Pass one as the `readAfterWrite` option of `GraphQlClient`:
+
+```ts
+import { GraphQlClient, WriteRefTracker } from '@contember/graphql-client'
+
+const client = new GraphQlClient({
+	url: 'https://api.example.com/content/my-project/live',
+	apiToken: process.env.CONTEMBER_API_TOKEN,
+	readAfterWrite: new WriteRefTracker(),
+})
+```
+
+`ContentClient` from `@contember/client-content` takes such a client, so a typed query or mutation goes through the tracker as well. The option is also accepted per request, which overrides the client-wide one.
+
+A tracker holds at most **16** references and drops one **30 seconds** after it was recorded (`maxTokens` and `ttlMs` constructor options). Both limits are deliberate: dropping a reference only costs consistency, never correctness, so the tracker never grows and never throws.
+
+References belong to the identity that made the writes. Use one tracker per identity — never a single tracker shared by several users.
+
+## React
+
+`ContemberClient` sets this up on its own: the content API client it provides gets a tracker, and the trackers are discarded whenever the session token changes, so references never leak between identities. Turn it off with the `readAfterWrite` prop, which defaults to `true`:
+
+```tsx
+import { ContemberClient } from '@contember/react-client'
+
+<ContemberClient apiBaseUrl={apiBaseUrl} project="my-project" stage="live" readAfterWrite={false}>
+	{children}
+</ContemberClient>
+```
+
+## Server-side rendering and serverless
+
+There is no long-lived per-user client on a server, so a module-level tracker would mix identities and would not survive more than one instance. Create the tracker per request, and carry the references with the user instead:
+
+- after a mutation, read `tracker.tokens` (or the `X-Contember-Write-Ref` response header) and store the values where the user's session lives — a cookie is enough, they are opaque and short-lived;
+- on the next request, send them back in the `X-Contember-Read-After` header, e.g. through the `headers` option of the client;
+- drop the ones the response acknowledges in `X-Contember-Read-After-Visible`.
+
+An explicit `X-Contember-Read-After` in `headers` **replaces** the tracker's header instead of merging with it, so pass either the whole set of references or none — a tracker and a hand-written header on the same request do not add up.
+
+## See also
+
+- [Database configuration](/reference/engine/configuration/database#read-after-write-consistency) — enabling and disabling the feature on the server, and its requirements.
+- [Caching](/reference/engine/content/advanced/caching) — the unrelated `x-contember-ref` header.

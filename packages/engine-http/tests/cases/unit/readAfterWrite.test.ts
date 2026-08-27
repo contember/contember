@@ -261,6 +261,26 @@ describe('read-after-write resolver', () => {
 		expect(replica.queries).toHaveLength(2)
 	})
 
+	test('a check the database will never allow is a permanent no, logged once', async () => {
+		const primary = new FakeConnection(() => clusterRows(160000, clusterId))
+		const replica = new FakeConnection((sql, parameters) => {
+			throw new QueryError(sql, parameters, Object.assign(new Error('permission denied for function pg_control_system'), { code: '42501' }))
+		})
+		const { resolver, handler } = createResolver({
+			project: createProject({ host: 'replica.example.com' }),
+			primary,
+			replica,
+		})
+
+		expect(await resolver.resolve()).toStrictEqual({ enabled: false })
+		expect(await resolver.resolve()).toStrictEqual({ enabled: false })
+		expect(levelsOf(handler)).toStrictEqual(['error'])
+		expect(handler.messages[0].ownAttributes.errorCode).toBe('42501')
+		expect(handler.messages[0].ownAttributes.errorMessage).toBe('permission denied for function pg_control_system')
+		// permanent, not retried
+		expect(replica.queries).toHaveLength(1)
+	})
+
 	test('concurrent first requests run the check once', async () => {
 		const primary = new FakeConnection(() => clusterRows(160000, clusterId))
 		const replica = new FakeConnection(() => clusterRows(160000, clusterId))

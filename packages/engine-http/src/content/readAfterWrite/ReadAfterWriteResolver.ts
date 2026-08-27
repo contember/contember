@@ -1,4 +1,4 @@
-import { Connection } from '@contember/database'
+import { ClientErrorCodes, Connection, DatabaseError } from '@contember/database'
 import { Logger } from '@contember/logger'
 import { ProjectConfig } from '../../project/config.js'
 import { databaseErrorAttributes } from './errorLogging.js'
@@ -13,6 +13,17 @@ const minServerVersion = 140000
 const clusterQuery = `SELECT current_setting('server_version_num')::int AS version, system_identifier::text AS cluster_id FROM pg_control_system()`
 
 const disabled: ReadAfterWriteState = { enabled: false }
+
+/** SQLSTATEs of a check that cannot succeed on this database, however many times it is repeated. */
+const permanentErrorCodes: ReadonlySet<string> = new Set<string>([
+	ClientErrorCodes.INSUFFICIENT_PRIVILEGE,
+	ClientErrorCodes.UNDEFINED_FUNCTION,
+	ClientErrorCodes.FEATURE_NOT_SUPPORTED,
+	ClientErrorCodes.SYNTAX_ERROR,
+])
+
+const isPermanentError = (error: unknown): boolean =>
+	error instanceof DatabaseError && error.code !== undefined && permanentErrorCodes.has(error.code)
 
 type ClusterInfo = { version: number; clusterId: string }
 
@@ -36,6 +47,15 @@ export class ReadAfterWriteResolver {
 			return this.state
 		}
 		const pending: Promise<ReadAfterWriteState> = this.check().catch(e => {
+			if (isPermanentError(e)) {
+				// a revoked privilege or a missing function does not heal itself; keep the cached "no",
+				// otherwise every request would repeat the check and log this again
+				this.logger.error(
+					`Read-after-write disabled for project ${this.project.slug}: the database cluster check cannot succeed here`,
+					databaseErrorAttributes(e),
+				)
+				return disabled
+			}
 			// a connection error says nothing about the configuration - keep the feature undecided
 			if (this.state === pending) {
 				this.state = undefined

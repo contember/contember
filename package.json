@@ -19,7 +19,7 @@
     "start": "docker compose up --detach && bun run contember migrations:execute --yes",
     "test": "bun test --conditions=typescript packages",
     "test:legacy-decorators": "bun --cwd=packages/schema-definition/tests test --conditions=typescript cases/unit",
-    "test:e2e": "bun test --conditions=typescript e2e",
+    "test:e2e": "bun test --conditions=typescript e2e/cases",
     "ts:build": "tsc --build",
     "ts:watch": "tsc --build --watch",
     "ts:clean": "tsc --build --clean",

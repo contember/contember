@@ -12,7 +12,7 @@ import { S3Service, S3ServiceFactory } from './S3Service.js'
 import { Project3Config, resolveS3Config, S3Config } from './Config.js'
 import { GraphQLSchemaContributor, GraphQLSchemaContributorContext, Providers } from '@contember/engine-plugins'
 import * as types from './S3SchemaTypes.js'
-import { S3Acl, S3GenerateSignedUploadInput, S3SignedRead, S3SignedUpload } from './S3SchemaTypes.js'
+import { S3Acl, S3DeletedObject, S3GenerateSignedUploadInput, S3SignedRead, S3SignedUpload } from './S3SchemaTypes.js'
 import { S3ObjectAuthorizator } from './S3ObjectAuthorizator.js'
 
 interface Identity {
@@ -30,6 +30,7 @@ export type S3SchemaAcl = Record<
 	{
 		read?: boolean
 		upload?: S3SchemaUploadAcl
+		delete?: boolean
 	}
 >
 
@@ -56,17 +57,23 @@ export class S3SchemaContributor implements GraphQLSchemaContributor {
 		const readRules = rules.filter(([, it]) => it.read).map(([it]) => ({
 			pattern: it,
 		}))
+		const deleteRules = rules.filter(([, it]) => it.delete).map(([it]) => ({
+			pattern: it,
+		}))
 
-		if (uploadRules.length === 0 && readRules.length === 0) {
+		if (uploadRules.length === 0 && readRules.length === 0 && deleteRules.length === 0) {
 			return undefined
 		}
 
-		const authorizator = new S3ObjectAuthorizator(uploadRules, readRules)
+		const authorizator = new S3ObjectAuthorizator(uploadRules, readRules, deleteRules)
 		const uploadMutation = this.createUploadMutation(authorizator)
 		const readMutation = this.createReadMutation(authorizator)
+		const deleteMutation = this.createDeleteMutation(authorizator)
 		const mutation = {
 			generateUploadUrl: uploadMutation as GraphQLFieldConfig<any, any, any>,
 			generateReadUrl: readMutation,
+			// not "deleteObject" — a content mutation for an entity named "Object" would shadow it
+			deleteS3Object: deleteMutation,
 		}
 		return {
 			mutation: new GraphQLObjectType({
@@ -104,6 +111,25 @@ export class S3SchemaContributor implements GraphQLSchemaContributor {
 				return s3.getSignedReadUrl({ objectKey: args.objectKey, expiration: args.expiration ?? null })
 			},
 		} as GraphQLFieldConfig<any, any, any>
+	}
+
+	private createDeleteMutation(authorizator: S3ObjectAuthorizator): GraphQLFieldConfig<any, any, any> {
+		return {
+			type: new GraphQLNonNull(S3DeletedObject),
+			args: {
+				objectKey: {
+					type: new GraphQLNonNull(GraphQLString),
+				},
+			},
+			resolve: async (parent: any, args: { objectKey: string }, ctx: { project: Project3Config }) => {
+				if (!ctx.project.s3) {
+					throw new GraphQLError('S3 is not configured for this project')
+				}
+				const s3Config = resolveS3Config(ctx.project.s3)
+				const s3 = this.s3Factory.create(s3Config, this.providers, authorizator)
+				return await s3.deleteObject({ objectKey: args.objectKey })
+			},
+		}
 	}
 
 	private createUploadMutation(authorizator: S3ObjectAuthorizator): GraphQLFieldConfig<any, any, any> {

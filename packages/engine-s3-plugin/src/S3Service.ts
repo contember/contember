@@ -23,6 +23,22 @@ type SignedUploadUrl = {
 	method: string
 }
 
+type DeletedObject = {
+	bucket: string
+	objectKey: string
+}
+
+export type S3FetchResponse = {
+	readonly ok: boolean
+	readonly status: number
+	text(): Promise<string>
+}
+
+export type S3Fetch = (url: string, init: { method: string; signal: AbortSignal }) => Promise<S3FetchResponse>
+
+const deleteUrlExpiration = 60
+const deleteTimeoutMs = 10_000
+
 export class S3Service {
 	private readonly publicBaseUrl: string
 
@@ -32,6 +48,7 @@ export class S3Service {
 		public readonly config: S3Config,
 		private readonly providers: Pick<Providers, 'uuid' | 'now'>,
 		private readonly authorizator: S3ObjectAuthorizator,
+		private readonly fetch: S3Fetch = (url, init) => globalThis.fetch(url, init),
 	) {
 		this.publicBaseUrl = resolveS3PublicBaseUrl(config)
 		this.signer = new S3Signer(config, providers)
@@ -97,7 +114,56 @@ export class S3Service {
 
 	public getSignedReadUrl({ objectKey, expiration }: { objectKey: string; expiration: number | null }): SignedReadUrl {
 		const bucket = this.config.bucket
+		const resolved = this.resolveObjectKey(objectKey)
+		this.authorizator.verifyReadAccess({ key: resolved.localObjectKey })
 
+		const url = this.signer.sign({
+			action: 'read',
+			expiration: expiration ?? 3600,
+			key: resolved.objectKey,
+			headers: {},
+		})
+
+		return {
+			bucket,
+			objectKey: resolved.objectKey,
+			url,
+			headers: [],
+			method: 'GET',
+		}
+	}
+
+	/**
+	 * Unlike an upload or a read, a delete carries no payload, so the signed URL never leaves the server.
+	 */
+	public async deleteObject({ objectKey }: { objectKey: string }): Promise<DeletedObject> {
+		const bucket = this.config.bucket
+		const resolved = this.resolveObjectKey(objectKey)
+		this.authorizator.verifyDeleteAccess({ key: resolved.localObjectKey })
+
+		const url = this.signer.sign({
+			action: 'delete',
+			expiration: deleteUrlExpiration,
+			key: resolved.objectKey,
+			headers: {},
+		})
+
+		const response = await this.fetch(url, { method: 'DELETE', signal: AbortSignal.timeout(deleteTimeoutMs) })
+		if (!response.ok) {
+			throw new Error(`Failed to delete an object "${resolved.objectKey}": S3 responded with ${response.status}: ${await response.text()}`)
+		}
+
+		return {
+			bucket,
+			objectKey: resolved.objectKey,
+		}
+	}
+
+	public formatPublicUrl(key: string): string {
+		return `${this.publicBaseUrl}/${key}`
+	}
+
+	private resolveObjectKey(objectKey: string): { objectKey: string; localObjectKey: string } {
 		const publicPrefix = this.formatPublicUrl('')
 		if (objectKey.startsWith(publicPrefix)) {
 			objectKey = objectKey.substring(publicPrefix.length)
@@ -108,26 +174,8 @@ export class S3Service {
 			)
 		}
 		const localObjectKey = this.config.prefix ? objectKey.substring(this.config.prefix.length + 1) : objectKey
-		this.authorizator.verifyReadAccess({ key: localObjectKey })
 
-		const url = this.signer.sign({
-			action: 'read',
-			expiration: expiration ?? 3600,
-			key: objectKey,
-			headers: {},
-		})
-
-		return {
-			bucket,
-			objectKey,
-			url,
-			headers: [],
-			method: 'GET',
-		}
-	}
-
-	public formatPublicUrl(key: string): string {
-		return `${this.publicBaseUrl}/${key}`
+		return { objectKey, localObjectKey }
 	}
 }
 

@@ -1,9 +1,9 @@
 import { expect, test } from 'bun:test'
-import { S3ObjectAuthorizator, S3Service } from '../../src/index.js'
+import { S3Fetch, S3ObjectAuthorizator, S3Service } from '../../src/index.js'
 
 const mocked = new Date('2021-07-02T17:22Z')
 const constantUuid = '9fce3907-ff2b-45bb-b4ce-eff5527dd315'
-const createS3Service = (bucket: string, prefix = '') =>
+const createS3Service = (bucket: string, prefix = '', fetch?: S3Fetch) =>
 	new S3Service(
 		{
 			bucket,
@@ -18,8 +18,19 @@ const createS3Service = (bucket: string, prefix = '') =>
 			uuid: () => constantUuid,
 			now: () => mocked,
 		},
-		new S3ObjectAuthorizator([{ pattern: '**' }], [{ pattern: '**' }]),
+		new S3ObjectAuthorizator([{ pattern: '**' }], [{ pattern: '**' }], [{ pattern: '**' }]),
+		fetch,
 	)
+
+const createFetchMock = (response: { ok: boolean; status: number; body?: string } = { ok: true, status: 204 }) => {
+	const calls: { url: string; method: string }[] = []
+	const fetch: S3Fetch = async (url, init) => {
+		calls.push({ url, method: init.method })
+		return { ...response, text: async () => response.body ?? '' }
+	}
+
+	return { calls, fetch }
+}
 
 test('sign s3 request', () => {
 	const service = createS3Service('test')
@@ -70,6 +81,57 @@ test('sign upload #2', () => {
 	})
 	expect(signed.url).toEqual(
 		'https://test.s3.eu-central-1.amazonaws.com/foo/9fce3907-ff2b-45bb-b4ce-eff5527dd315bar.jpeg?Cache-Control=immutable&Content-Type=image%2Fjpeg&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=test%2F20210702%2Feu-central-1%2Fs3%2Faws4_request&X-Amz-Date=20210702T172200Z&X-Amz-Expires=1800&X-Amz-Signature=979a93bca65a98ce6b2bf97d2bf2afe7d5f2fa805f7d596187675416c86a3bd5&X-Amz-SignedHeaders=cache-control%3Bcontent-disposition%3Bhost%3Bx-amz-acl&x-amz-acl=public-read',
+	)
+})
+
+test('delete object', async () => {
+	const { calls, fetch } = createFetchMock()
+	const service = createS3Service('test', '', fetch)
+	const deleted = await service.deleteObject({ objectKey: 'foo.jpg' })
+	expect(deleted).toEqual({ bucket: 'test', objectKey: 'foo.jpg' })
+	expect(calls).toEqual([{
+		method: 'DELETE',
+		url:
+			'https://test.s3.eu-central-1.amazonaws.com/foo.jpg?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=test%2F20210702%2Feu-central-1%2Fs3%2Faws4_request&X-Amz-Date=20210702T172200Z&X-Amz-Expires=60&X-Amz-Signature=441f2003478d8dc8761b6c4c48c6c0805a36d1f088138a5b89d6bea365922663&X-Amz-SignedHeaders=host',
+	}])
+})
+
+test('delete object - public url is accepted', async () => {
+	const { calls, fetch } = createFetchMock()
+	const service = createS3Service('test', 'lorem', fetch)
+	const deleted = await service.deleteObject({
+		objectKey: 'https://test.s3.eu-central-1.amazonaws.com/lorem/foo.jpg',
+	})
+	expect(deleted.objectKey).toEqual('lorem/foo.jpg')
+	expect(calls.length).toEqual(1)
+})
+
+test('delete object - project prefix is enforced', async () => {
+	const { calls, fetch } = createFetchMock()
+	const service = createS3Service('test', 'lorem', fetch)
+	await expect(service.deleteObject({ objectKey: 'ipsum/foo.jpg' })).rejects.toThrow(
+		'Given object key "ipsum/foo.jpg" does not start with a project prefix "lorem"',
+	)
+	expect(calls.length).toEqual(0)
+})
+
+test('delete object - acl is verified', async () => {
+	const { calls, fetch } = createFetchMock()
+	const service = new S3Service(
+		{ bucket: 'test', region: 'eu-central-1', credentials: { key: 'test', secret: 'abcd' }, prefix: '' },
+		{ uuid: () => constantUuid, now: () => mocked },
+		new S3ObjectAuthorizator([{ pattern: '**' }], [{ pattern: '**' }], [{ pattern: 'foo/**' }]),
+		fetch,
+	)
+	await expect(service.deleteObject({ objectKey: 'bar/foo.jpg' })).rejects.toThrow('Delete access forbidden for object key bar/foo.jpg')
+	expect(calls.length).toEqual(0)
+})
+
+test('delete object - s3 failure', async () => {
+	const { fetch } = createFetchMock({ ok: false, status: 403, body: '<Error>AccessDenied</Error>' })
+	const service = createS3Service('test', '', fetch)
+	await expect(service.deleteObject({ objectKey: 'foo.jpg' })).rejects.toThrow(
+		'Failed to delete an object "foo.jpg": S3 responded with 403: <Error>AccessDenied</Error>',
 	)
 })
 

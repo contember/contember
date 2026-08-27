@@ -3,6 +3,7 @@ import { EventRow, HandledEvent, InvokeHandler, InvokeHandlerArgs } from './type
 import { VariablesMap } from '../model/VariablesManager.js'
 import * as Typesafe from '@contember/typesafe'
 import { FetcherResponse, WebhookFetcher } from './WebhookFetcher.js'
+import { Logger } from '@contember/logger'
 
 const DEFAULT_TIMEOUT_MS = 30_000 // 30 seconds
 
@@ -40,6 +41,8 @@ export class WebhookTargetHandler implements InvokeHandler<Actions.WebhookTarget
 			eventResponseFactory = this.createResponseFactory({
 				response: response,
 				events,
+				target,
+				logger,
 			})
 		} catch (e) {
 			logger.warn(e)
@@ -58,11 +61,20 @@ export class WebhookTargetHandler implements InvokeHandler<Actions.WebhookTarget
 		return events.map(it => ({ target, row: it, result: { durationMs, ...eventResponseFactory(it) } }))
 	}
 
-	private createResponseFactory({ response, events }: {
+	private createResponseFactory({ response, events, target, logger }: {
 		response: FetcherResponse
 		events: EventRow[]
+		target: Actions.WebhookTarget
+		logger: Logger
 	}): EventResponseFactory {
 		if (!response.ok) {
+			// The target is identified by name only: its URL and headers may carry credentials.
+			logger.warn('Webhook target responded with an error status', {
+				target: target.name,
+				status: response.status,
+				statusText: response.statusText,
+				events: events.map(it => it.id),
+			})
 			return () => ({
 				ok: false,
 				code: response.status,

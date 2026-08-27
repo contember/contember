@@ -36,6 +36,10 @@ export interface BaseRelation {
     // (undocumented)
     __typename: '_Relation';
     // (undocumented)
+    deprecationReason: string | null;
+    // (undocumented)
+    description: string | null;
+    // (undocumented)
     name: FieldName;
     // (undocumented)
     nullable: boolean | null;
@@ -1449,6 +1453,10 @@ export interface SchemaColumn {
     __typename: '_Column';
     // (undocumented)
     defaultValue: any;
+    // (undocumented)
+    deprecationReason: string | null;
+    // (undocumented)
+    description: string | null;
     // (undocumented)
     enumName: SchemaEnumName | null;
     // (undocumented)

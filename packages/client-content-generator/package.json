@@ -33,6 +33,7 @@
     "ae:test": "api-extractor run"
   },
   "dependencies": {
+    "@contember/cli-common": "workspace:*",
     "@contember/client-content": "workspace:*",
     "@contember/schema": "workspace:*",
     "@contember/schema-utils": "workspace:*"

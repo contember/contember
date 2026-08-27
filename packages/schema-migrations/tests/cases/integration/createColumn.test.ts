@@ -38,6 +38,40 @@ SET CONSTRAINTS ALL IMMEDIATE; SET CONSTRAINTS ALL DEFERRED;
 ALTER TABLE "author" ALTER "name" SET NOT NULL;`,
 	}))
 
+describe('create a column with deprecation flag', () =>
+	testMigrations({
+		original: createSchema({
+			Author: class Author {
+				email = def.stringColumn().unique()
+			},
+		}),
+		updated: createSchema({
+			Author: class Author {
+				deprecated = def.stringColumn().deprecated('deprecated')
+				email = def.stringColumn().unique()
+			},
+		}),
+		noDiff: true,
+		diff: [
+			{
+				modification: 'createColumn',
+				entityName: 'Author',
+				field: {
+					columnName: 'deprecated',
+					name: 'deprecated',
+					nullable: true,
+					type: Model.ColumnType.String,
+					columnType: 'text',
+					deprecationReason: 'deprecated',
+				},
+				fillValue: 'unnamed author',
+			},
+		],
+		sql: SQL`ALTER TABLE "author" ADD "deprecated" text;
+UPDATE "author" SET "deprecated" = $pga$unnamed author$pga$;
+SET CONSTRAINTS ALL IMMEDIATE; SET CONSTRAINTS ALL DEFERRED;`,
+	}))
+
 describe('create a column with copy value', () =>
 	testMigrations({
 		original: createSchema({

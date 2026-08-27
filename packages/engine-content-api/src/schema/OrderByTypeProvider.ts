@@ -61,9 +61,17 @@ export class OrderByTypeProvider {
 					if (column.list) {
 						return undefined
 					}
-					return ({ type: this.orderDirectionEnum })
+					return {
+						type: this.orderDirectionEnum,
+						deprecationReason: column.deprecationReason,
+						description: column.description,
+					}
 				},
-				visitHasOne: ({ relation }) => ({ type: this.getEntityOrderByType(relation.target) }),
+				visitHasOne: ({ relation }) => ({
+					type: this.getEntityOrderByType(relation.target),
+					deprecationReason: relation.deprecationReason,
+					description: relation.description,
+				}),
 				visitHasMany: () => undefined,
 			} as Model.FieldVisitor<GraphQLInputFieldConfig | undefined>)
 

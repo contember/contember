@@ -26,6 +26,8 @@ export const convertModelToAdminSchema = (model: Model.Schema): SchemaStore => {
 								type: column.type,
 								defaultValue: column.default ?? null,
 								enumName: column.type === Model.ColumnType.Enum ? column.columnType : null,
+								deprecationReason: null,
+								description: null,
 							}
 						},
 						visitManyHasManyInverse: ({ relation }) => {
@@ -41,6 +43,8 @@ export const convertModelToAdminSchema = (model: Model.Schema): SchemaStore => {
 								orphanRemoval: null,
 								// todo
 								orderBy: null,
+								deprecationReason: null,
+								description: null,
 							}
 						},
 						visitManyHasManyOwning: ({ relation }) => {
@@ -56,6 +60,8 @@ export const convertModelToAdminSchema = (model: Model.Schema): SchemaStore => {
 								orphanRemoval: null,
 								// todo
 								orderBy: null,
+								deprecationReason: null,
+								description: null,
 							}
 						},
 						visitManyHasOne: ({ relation }) => {
@@ -71,6 +77,8 @@ export const convertModelToAdminSchema = (model: Model.Schema): SchemaStore => {
 								orderBy: null,
 								// todo
 								onDelete: null,
+								deprecationReason: null,
+								description: null,
 							}
 						},
 						visitOneHasMany: ({ relation }) => {
@@ -86,6 +94,8 @@ export const convertModelToAdminSchema = (model: Model.Schema): SchemaStore => {
 								onDelete: null,
 								// todo
 								orderBy: null,
+								deprecationReason: null,
+								description: null,
 							}
 						},
 						visitOneHasOneInverse: ({ relation }) => {
@@ -100,6 +110,8 @@ export const convertModelToAdminSchema = (model: Model.Schema): SchemaStore => {
 								orderBy: null,
 								orphanRemoval: null,
 								onDelete: null,
+								deprecationReason: null,
+								description: null,
 							}
 						},
 						visitOneHasOneOwning: ({ relation }) => {
@@ -115,6 +127,8 @@ export const convertModelToAdminSchema = (model: Model.Schema): SchemaStore => {
 								// todo
 								onDelete: null,
 								orphanRemoval: null,
+								deprecationReason: null,
+								description: null,
 							}
 						},
 					})

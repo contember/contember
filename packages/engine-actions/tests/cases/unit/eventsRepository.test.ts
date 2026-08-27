@@ -77,7 +77,11 @@ describe('fetchBatch', () => {
 			{ rowCount: 0, rows: [] },
 		], queries)
 
-		const result = await new EventsRepository().fetchBatch({ triggers: {}, targets: { test_target: target } }, client)
+		const result = await new EventsRepository().fetchBatch(
+			{ triggers: {}, targets: { test_target: target } },
+			client,
+			createLogger(new TestLoggerHandler()),
+		)
 
 		expect(result).toEqual({ ok: true, events: [eventRow], target })
 		expect(queries).toHaveLength(2)
@@ -138,5 +142,47 @@ describe('persistProcessed', () => {
 
 		expect(result).toEqual([0, 1])
 		expect(errorsOf(testLoggerHandler)).toHaveLength(0)
+	})
+})
+
+describe('fetchBatch log', () => {
+	test('logs an error when the event names a target the schema does not have', async () => {
+		const testLoggerHandler = new TestLoggerHandler()
+		const client = createStubClient([
+			{ rowCount: 1, rows: [eventRow] },
+			{ rowCount: 1, rows: [] },
+		])
+
+		const result = await new EventsRepository().fetchBatch(
+			{ triggers: {}, targets: {} },
+			client,
+			createLogger(testLoggerHandler),
+		)
+
+		expect(result).toEqual({ ok: false, backoffMs: undefined })
+		const errors = errorsOf(testLoggerHandler)
+		expect(errors).toHaveLength(1)
+		expect(errors[0].message).toBe('Action event failed permanently, its target is not in the schema')
+		expect(errors[0].ownAttributes).toStrictEqual({
+			eventId: testUuid(1),
+			target: 'test_target',
+			trigger: 'test',
+		})
+	})
+
+	test('stays quiet when the target is in the schema', async () => {
+		const testLoggerHandler = new TestLoggerHandler()
+		const client = createStubClient([
+			{ rowCount: 1, rows: [eventRow] },
+		])
+
+		const result = await new EventsRepository().fetchBatch(
+			{ triggers: {}, targets: { test_target: webhookTarget } },
+			client,
+			createLogger(testLoggerHandler),
+		)
+
+		expect(result).toEqual({ ok: true, events: [eventRow], target: webhookTarget })
+		expect(testLoggerHandler.messages).toStrictEqual([])
 	})
 })

@@ -11,7 +11,7 @@ const DEFAULT_MAX_ATTEMPTS = 10
 const DEFAULT_BATCH_SIZE = 1
 
 export class EventsRepository {
-	public async fetchBatch(actions: Actions.Schema, db: Client): Promise<FetchBatchResult> {
+	public async fetchBatch(actions: Actions.Schema, db: Client, logger: Logger): Promise<FetchBatchResult> {
 		const primaryEvent = (await this.fetchInternal(db, 1))[0]
 		if (!primaryEvent) {
 			return { ok: false, backoffMs: await this.fetchBackOff(db) }
@@ -19,7 +19,13 @@ export class EventsRepository {
 		const target = actions.targets[primaryEvent.target]
 		if (!target) {
 			await this.markFailedOnUnknownTarget(db, primaryEvent.target, primaryEvent.id)
-			return await this.fetchBatch(actions, db)
+			// Never retried: the schema has to name the target again before such an event can be delivered.
+			logger.error('Action event failed permanently, its target is not in the schema', {
+				eventId: primaryEvent.id,
+				target: primaryEvent.target,
+				trigger: primaryEvent.trigger,
+			})
+			return await this.fetchBatch(actions, db, logger)
 		}
 		const batchSize = (target.batchSize ?? DEFAULT_BATCH_SIZE) - 1
 		// A batch is delivered to the primary event's target, so it may only take events of that target.

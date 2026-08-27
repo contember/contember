@@ -48,6 +48,13 @@ test('sign s3 request - prefix', () => {
 	)
 })
 
+test('sign s3 request - a sibling prefix is not a prefix', () => {
+	const service = createS3Service('test', 'lorem')
+	expect(() => service.getSignedReadUrl({ objectKey: 'loremipsum/foo.jpg', expiration: null })).toThrow(
+		'Given object key "loremipsum/foo.jpg" does not start with a project prefix "lorem"',
+	)
+})
+
 test('sign upload', () => {
 	const service = createS3Service('test')
 	const signed = service.getSignedUploadUrl({
@@ -111,6 +118,15 @@ test('delete object - project prefix is enforced', async () => {
 	const service = createS3Service('test', 'lorem', fetch)
 	await expect(service.deleteObject({ objectKey: 'ipsum/foo.jpg' })).rejects.toThrow(
 		'Given object key "ipsum/foo.jpg" does not start with a project prefix "lorem"',
+	)
+	expect(calls.length).toEqual(0)
+})
+
+test('delete object - a sibling prefix is not a prefix', async () => {
+	const { calls, fetch } = createFetchMock()
+	const service = createS3Service('test', 'lorem', fetch)
+	await expect(service.deleteObject({ objectKey: 'loremipsum/foo.jpg' })).rejects.toThrow(
+		'Given object key "loremipsum/foo.jpg" does not start with a project prefix "lorem"',
 	)
 	expect(calls.length).toEqual(0)
 })

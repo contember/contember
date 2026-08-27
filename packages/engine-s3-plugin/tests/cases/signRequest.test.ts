@@ -33,6 +33,13 @@ test('sign s3 request - prefix', () => {
 	expect(signed.url).toEqual('https://test.s3.eu-central-1.amazonaws.com/lorem/foo.jpg?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=test%2F20210702%2Feu-central-1%2Fs3%2Faws4_request&X-Amz-Date=20210702T172200Z&X-Amz-Expires=3600&X-Amz-Signature=f6c69dc306422c2b3242c9d9d42147336817720ffae249af8bd91cc7062e9f6d&X-Amz-SignedHeaders=host')
 })
 
+test('sign s3 request - a sibling prefix is not a prefix', () => {
+	const service = createS3Service('test', 'lorem')
+	expect(() => service.getSignedReadUrl({ objectKey: 'loremipsum/foo.jpg', expiration: null })).toThrow(
+		'Given object key "loremipsum/foo.jpg" does not start with a project prefix "lorem"',
+	)
+})
+
 test('sign upload', () => {
 	const service = createS3Service('test')
 	const signed = service.getSignedUploadUrl({ contentType: 'image/jpeg', acl: 'PUBLIC_READ', expiration: 1800, contentDisposition: null, extension: null, fileName: null, prefix: null, suffix: null, size: null })

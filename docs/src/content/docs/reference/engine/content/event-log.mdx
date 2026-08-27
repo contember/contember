@@ -8,6 +8,13 @@ Every operation changing the content is logged in an event log.
 Events in event log are NOT transformed when you execute a migration.
 :::
 
+:::tip[Looking for a readable, entity-shaped history?]
+The event log is a low-level, per-row trail captured by database triggers. If you want a
+readable audit trail grouped by a root entity and its relations — queryable as ordinary
+content — see the [audit log](/reference/engine/actions/audit-log) and how the two
+[compare](/reference/engine/actions/audit-log#audit-log-vs-the-built-in-event-log).
+:::
+
 ## Querying the event log
 
 Anyone with [history permission](/reference/engine/schema/acl#history) can query the event log. You can do it by sending GraphQL `events` query to `/system/<project>` endpoint.

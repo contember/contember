@@ -46,8 +46,11 @@ export const c = {
 	// Actions entity decorators
 	Watch: ActionsDefinition.watch,
 	Trigger: ActionsDefinition.trigger,
+	AuditLog: ActionsDefinition.auditLog,
+	AuditLogEntity: ActionsDefinition.AuditLogEntity,
 	// Actions factories
 	createActionsTarget: ActionsDefinition.createTarget,
+	createAuditLogTarget: ActionsDefinition.createAuditLogTarget,
 
 	// Model
 	// Model entity decorators
@@ -56,6 +59,7 @@ export const c = {
 	Unique: SchemaDefinition.Unique,
 	View: SchemaDefinition.View,
 	DisableEventLog: SchemaDefinition.DisableEventLog,
+	Immutable: SchemaDefinition.Immutable,
 	OrderBy: SchemaDefinition.OrderBy,
 	// Model field factories
 	column: SchemaDefinition.column,

@@ -65,7 +65,7 @@ export class MutationProvider {
 		if (this.authorizator.isRootOperationDisallowed(entityName, Acl.Operation.delete)) {
 			return undefined
 		}
-		if (entity.view) {
+		if (entity.view || entity.immutable) {
 			return undefined
 		}
 		if (this.authorizator.getEntityPermission(Acl.Operation.delete, entityName) === 'no') {

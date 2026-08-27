@@ -32,7 +32,23 @@ const webhookTargetSchema = Typesafe.intersection(
 )
 const webhookTargetSchemaCheck: Typesafe.Equals<Actions.WebhookTarget, ReturnType<typeof webhookTargetSchema>> = true
 
-const anyTargetSchema: Typesafe.Type<Actions.AnyTarget> = Typesafe.union(webhookTargetSchema)
+const auditLogTargetSchema = Typesafe.intersection(
+	Typesafe.object({
+		type: Typesafe.literal('auditLog'),
+		name: Typesafe.string,
+		entity: Typesafe.string,
+	}),
+	Typesafe.partial({
+		rootRelation: Typesafe.string,
+		synchronous: Typesafe.boolean,
+		maxAttempts: Typesafe.integer,
+		initialRepeatIntervalMs: Typesafe.integer,
+		batchSize: Typesafe.integer,
+	}),
+)
+const auditLogTargetSchemaCheck: Typesafe.Equals<Actions.AuditLogTarget, ReturnType<typeof auditLogTargetSchema>> = true
+
+const anyTargetSchema: Typesafe.Type<Actions.AnyTarget> = Typesafe.union(webhookTargetSchema, auditLogTargetSchema)
 
 const watchTriggerSchema = Typesafe.intersection(
 	Typesafe.object({

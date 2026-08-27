@@ -8,7 +8,7 @@ Pure TypeScript type definitions for the Contember schema. No runtime logic — 
 - **ACL** (`acl.ts`): `Roles`, `EntityPermissions`, `EntityOperations`, `FieldPermissions`, `PredicateDefinition`, variables (`EntityVariable`, `PredefinedVariable`, `ConditionVariable`), `Membership`, tenant/system/content permissions
 - **Input** (`input.ts`): GraphQL input types for mutations (Create/Update/Delete/Upsert), query inputs (Where, OrderBy, Condition with all operators), relation operations (connect, disconnect, create, etc.)
 - **Validation** (`validation.ts`): `Validator` discriminated union (and, or, not, pattern, range, etc.), `ValidationRule`, entity rules
-- **Actions** (`actions.ts`): `BasicTrigger`, `WatchTrigger`, `WebhookTarget`, `SelectionNode`
+- **Actions** (`actions.ts`): `BasicTrigger`, `WatchTrigger`, `WebhookTarget`, `AuditLogTarget` (built-in audit sink), `SelectionNode`
 - **Result** (`result.ts`): Mutation results, validation results, execution errors with path fragments
 - **Settings** (`settings.ts`): `TenantSettings`, `ContentSettings` (uuidVersion 4/7, date formats)
 

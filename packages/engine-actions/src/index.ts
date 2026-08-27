@@ -29,6 +29,9 @@ import { AccessEvaluator, Authorizator } from '@contember/authorization'
 import { ActionsPermissionsFactory } from './authorization/index.js'
 import { WebhookFetcherNative } from './dispatch/WebhookFetcher.js'
 import { ActionsMetrics } from './ActionsMetrics.js'
+import { AuditLogTargetHandler } from './dispatch/AuditLogTargetHandler.js'
+import { AuditLogWriter } from './audit/AuditLogWriter.js'
+import { createProviders } from '@contember/engine-http'
 
 export {
 	TriggerHandler,
@@ -76,7 +79,8 @@ export default class ActionsPlugin implements Plugin {
 				})
 				.addService('actions_eventDispatcher', ({ actions_eventRepository, actions_variableManager }) => {
 					const webhookTargetHandler = new WebhookTargetHandler(new WebhookFetcherNative())
-					const targetHandlerResolver = new TargetHandlerResolver(webhookTargetHandler)
+					const auditLogTargetHandler = new AuditLogTargetHandler(new AuditLogWriter(createProviders()))
+					const targetHandlerResolver = new TargetHandlerResolver(webhookTargetHandler, auditLogTargetHandler)
 					return new EventDispatcher(actions_eventRepository, actions_variableManager, targetHandlerResolver)
 				})
 				.addService('actions_dispatchWorkerSupervisorFactory', ({ actions_eventDispatcher, actions_metrics }) => {

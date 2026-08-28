@@ -162,7 +162,10 @@ describe('read-after-write resolver', () => {
 		})
 
 		expect(await resolver.resolve()).toStrictEqual({ enabled: true, clusterId })
-		expect(handler.messages).toHaveLength(0)
+		// the operator gets exactly one line saying the feature came up, and nothing above info
+		expect(handler.messages).toHaveLength(1)
+		expect(handler.messages[0].level.name).toBe('info')
+		expect(handler.messages[0].message).toContain('Read-after-write enabled')
 	})
 
 	test('an explicit enabled: true is honoured', async () => {

@@ -90,6 +90,8 @@ export class ReadAfterWriteResolver {
 			this.logger.error(`Read-after-write disabled for project ${this.project.slug}: ${problem}`)
 			return disabled
 		}
+		// the one line that tells an operator the feature is actually on here; every later decision is per-request
+		this.logger.info(`Read-after-write enabled for project ${this.project.slug}`, { clusterId: primary.clusterId })
 		return { enabled: true, clusterId: primary.clusterId }
 	}
 

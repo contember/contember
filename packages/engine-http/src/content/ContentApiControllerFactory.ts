@@ -273,6 +273,10 @@ export class ContentApiControllerFactory {
 			}
 
 			if (!readAfter.valid) {
+				// a client or a proxy mangling the header turns the feature off for it, silently and indefinitely
+				logger.warn('Read-after-write: the request carried unusable write refs, serving from the primary', {
+					tokenCount: readAfter.tokens.length,
+				})
 				return await runOnPrimary('unusable tokens')
 			}
 
@@ -282,7 +286,7 @@ export class ContentApiControllerFactory {
 			try {
 				outcome = await projectContainer.readConnection.scope(async (acquired): Promise<PinnedOutcome> => {
 					replicaAcquired = true
-					if (!await isVisibleOnReplica(acquired, readAfter.xids, logger)) {
+					if (!await timer('ReadAfterWriteProbe', () => isVisibleOnReplica(acquired, readAfter.xids, logger))) {
 						return { kind: 'miss' }
 					}
 					logDecision('replica')

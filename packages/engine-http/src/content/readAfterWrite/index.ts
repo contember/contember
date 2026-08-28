@@ -1,3 +1,4 @@
+export * from './connectionHealth.js'
 export * from './errorLogging.js'
 export * from './headers.js'
 export * from './probe.js'

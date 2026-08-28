@@ -1,6 +1,6 @@
 import { createAclVariables, ExecutionContainerFactory } from '@contember/engine-content-api'
 import { DatabaseContext, StageBySlugQuery } from '@contember/engine-system-api'
-import { Client, Connection, DatabaseError, PinnedConnection } from '@contember/database'
+import { Client, Connection, EventManager, PinnedConnection } from '@contember/database'
 import { GraphQLSchema, OperationTypeNode } from 'graphql'
 import { HttpController } from '../application/index.js'
 import { HttpErrorResponse, HttpResponse } from '../common/index.js'
@@ -12,9 +12,11 @@ import { NotModifiedChecker } from './NotModifiedChecker.js'
 import { TestTransactionService } from '../testing/index.js'
 import {
 	databaseErrorAttributes,
+	errorCompromisesConnection,
 	formatWriteRef,
 	isVisibleOnReplica,
 	parseReadAfterHeader,
+	queryFailureCompromisesConnection,
 	readAfterHeaderName,
 	readAfterVisibleHeaderName,
 	SimpleWriteRefSink,
@@ -29,6 +31,13 @@ type PinnedOutcome =
 	| { kind: 'done'; response: HttpResponse | undefined }
 	| { kind: 'miss' }
 	| { kind: 'error'; error: unknown }
+
+/** Carries a finished outcome out of the pinned scope while still making the pool drop the connection. */
+class CompromisedPinnedConnection extends Error {
+	constructor(public readonly outcome: PinnedOutcome, public readonly failure: unknown) {
+		super('The pinned replica connection is no longer usable')
+	}
+}
 
 export class ContentApiControllerFactory {
 	constructor(
@@ -283,6 +292,10 @@ export class ContentApiControllerFactory {
 			const tokens = readAfter.tokens
 			let replicaAcquired = false
 			let outcome: PinnedOutcome
+			// The pool decides on release by whether the callback threw, but graphql-js turns a failed
+			// resolver into a response - so the connection's own query stream, not the control flow,
+			// is what says whether it may serve the next probe.
+			const pinnedEvents = new EventManager(projectContainer.readConnection.eventManager)
 			try {
 				outcome = await projectContainer.readConnection.scope(async (acquired): Promise<PinnedOutcome> => {
 					replicaAcquired = true
@@ -290,32 +303,47 @@ export class ContentApiControllerFactory {
 						return { kind: 'miss' }
 					}
 					logDecision('replica')
-					const pinned = new PinnedConnection(acquired, projectContainer.readConnection)
-					try {
-						const response = await runRequest({
-							connection: pinned,
-							routedSystemDatabase: projectContainer.systemDatabaseContextFactory.create(pinned),
-							ack: tokens,
-						})
-						return { kind: 'done', response }
-					} catch (e) {
-						if (e instanceof DatabaseError) {
-							// the connection may be left mid-transaction (a timed-out ROLLBACK, a broken socket);
-							// throwing lets the pool dispose it instead of running the next probe in a leaked snapshot
-							throw e
+					let compromised: unknown
+					// armed only past the probe: a probe that failed says nothing about the connection itself
+					pinnedEvents.on(EventManager.Event.queryError, (query, error) => {
+						if (compromised === undefined && queryFailureCompromisesConnection(error)) {
+							compromised = error
 						}
-						// an application error says nothing about the connection - do not dispose a healthy one
-						return { kind: 'error', error: e }
+					})
+					const pinned = new PinnedConnection(acquired, projectContainer.readConnection)
+					let result: PinnedOutcome
+					try {
+						result = {
+							kind: 'done',
+							response: await runRequest({
+								connection: pinned,
+								routedSystemDatabase: projectContainer.systemDatabaseContextFactory.create(pinned),
+								ack: tokens,
+							}),
+						}
+					} catch (e) {
+						if (compromised === undefined && errorCompromisesConnection(e)) {
+							compromised = e
+						}
+						result = { kind: 'error', error: e }
 					}
-				})
+					if (compromised !== undefined) {
+						// the connection may be left mid-transaction; only throwing makes the pool drop it
+						throw new CompromisedPinnedConnection(result, compromised)
+					}
+					return result
+				}, { eventManager: pinnedEvents })
 			} catch (e) {
-				// only a failure to acquire the replica connection may fall back; whatever the request
-				// itself threw was re-thrown above and must reach the client
-				if (replicaAcquired) {
+				if (e instanceof CompromisedPinnedConnection) {
+					logger.warn('Read-after-write: a statement failed on the pinned replica connection, disposing it', databaseErrorAttributes(e.failure))
+					outcome = e.outcome
+				} else if (replicaAcquired) {
+					// whatever the request itself threw must reach the client
 					throw e
+				} else {
+					logger.warn('Read-after-write: could not acquire a replica connection, serving from the primary', databaseErrorAttributes(e))
+					return await runOnPrimary('replica unavailable')
 				}
-				logger.warn('Read-after-write: could not acquire a replica connection, serving from the primary', databaseErrorAttributes(e))
-				return await runOnPrimary('replica unavailable')
 			}
 			if (outcome.kind === 'error') {
 				throw outcome.error

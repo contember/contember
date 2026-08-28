@@ -533,6 +533,45 @@ describe('content api pinned connection error handling', () => {
 		await harness.close()
 	})
 
+	test('a content query whose statement breaks the connection disposes it, response or not', async () => {
+		// graphql-js turns a failed resolver into a response, so nothing throws out of the request here
+		const harness = createHarness({
+			replicaFailQuery: sql => sql === contentMarker ? new Error('connection terminated unexpectedly') : undefined,
+		})
+
+		const { koa } = await harness.request({
+			query: '{ marker }',
+			headers: { 'x-contember-read-after': token },
+		})
+
+		expect(contentQueriesOf(harness.replica)).toHaveLength(1)
+		expect(koa.response.get('X-Contember-Read-After-Visible')).toBe(token)
+		expect(harness.replica.clientsDisposed()).toBe(1)
+		await timeout()
+		// the disposed connection is gone, the next statement has to establish a new one
+		await harness.replica.connection.query('SELECT reuse')
+		expect(harness.replica.clientsCreated()).toBe(2)
+		await harness.close()
+	})
+
+	test('a content query that fails on a constraint keeps the pooled connection', async () => {
+		const harness = createHarness({
+			replicaFailQuery: sql => sql === contentMarker ? Object.assign(new Error('duplicate key'), { code: '23505' }) : undefined,
+		})
+
+		await harness.request({
+			query: '{ marker }',
+			headers: { 'x-contember-read-after': token },
+		})
+
+		// a unique violation says nothing about the session - do not spend a good connection on it
+		expect(harness.replica.clientsDisposed()).toBe(0)
+		await timeout()
+		await harness.replica.connection.query('SELECT reuse')
+		expect(harness.replica.clientsCreated()).toBe(1)
+		await harness.close()
+	})
+
 	test('a database error is rethrown and the pooled connection is disposed', async () => {
 		const harness = createHarness({
 			latestTransactionId: 'tx-42',

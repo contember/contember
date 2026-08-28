@@ -341,6 +341,23 @@ describe('content api read-after-write routing', () => {
 		await harness.close()
 	})
 
+	test('a mutation carrying tokens runs on the primary, unprobed and unacknowledged', async () => {
+		const harness = createHarness()
+
+		// the client-wide tracker sends the header on every request, mutations included - only the
+		// operation type keeps them off a read-only standby
+		const { koa } = await harness.request({
+			query: 'mutation { touch }',
+			headers: { 'x-contember-read-after': token },
+		})
+
+		expect(probeQueriesOf(harness.replica)).toHaveLength(0)
+		expect(contentQueriesOf(harness.replica)).toHaveLength(0)
+		expect(contentQueriesOf(harness.primary)).toHaveLength(1)
+		expect(koa.response.get('X-Contember-Read-After-Visible')).toBe('')
+		await harness.close()
+	})
+
 	test('a query without tokens goes to the replica without probing', async () => {
 		const harness = createHarness()
 

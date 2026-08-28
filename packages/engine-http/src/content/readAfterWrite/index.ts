@@ -1,4 +1,5 @@
 export * from './connectionHealth.js'
+export * from './ContentConnectionRouter.js'
 export * from './errorLogging.js'
 export * from './headers.js'
 export * from './probe.js'

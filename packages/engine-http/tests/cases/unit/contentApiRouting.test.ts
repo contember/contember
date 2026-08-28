@@ -25,7 +25,7 @@ import { ProjectContainer } from '../../../src/project/ProjectContainer.js'
 import { ProjectDatabaseMetadataResolver } from '../../../src/project/ProjectDatabaseMetadataResolver.js'
 import { ProjectConfig } from '../../../src/project/config.js'
 import { ProjectGroupContainer } from '../../../src/projectGroup/ProjectGroupContainer.js'
-import { ReadAfterWriteResolver } from '../../../src/content/readAfterWrite/index.js'
+import { ContentConnectionRouter, ReadAfterWriteResolver } from '../../../src/content/readAfterWrite/index.js'
 import { TestTransactionService } from '../../../src/testing/index.js'
 import { createProviders } from '../../../src/providers.js'
 
@@ -220,6 +220,7 @@ const createHarness = ({ notModifiedChecker, latestTransactionId = null, replica
 			create: () => ({ schema: graphQlSchema, permissions: {} }),
 		}),
 		new TestTransactionService(false),
+		new ContentConnectionRouter(),
 	).create()
 
 	const projectGroup: ProjectGroupContainer = {

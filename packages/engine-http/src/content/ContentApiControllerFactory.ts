@@ -1,6 +1,6 @@
 import { createAclVariables, ExecutionContainerFactory } from '@contember/engine-content-api'
-import { DatabaseContext, StageBySlugQuery } from '@contember/engine-system-api'
-import { Client, Connection, EventManager, PinnedConnection } from '@contember/database'
+import { StageBySlugQuery } from '@contember/engine-system-api'
+import { Client } from '@contember/database'
 import { GraphQLSchema, OperationTypeNode } from 'graphql'
 import { HttpController } from '../application/index.js'
 import { HttpErrorResponse, HttpResponse } from '../common/index.js'
@@ -11,12 +11,10 @@ import { GraphQlSchemaFactory } from './GraphQlSchemaFactory.js'
 import { NotModifiedChecker } from './NotModifiedChecker.js'
 import { TestTransactionService } from '../testing/index.js'
 import {
-	databaseErrorAttributes,
-	errorCompromisesConnection,
+	ContentConnectionRouter,
+	ContentRoute,
 	formatWriteRef,
-	isVisibleOnReplica,
 	parseReadAfterHeader,
-	queryFailureCompromisesConnection,
 	readAfterHeaderName,
 	readAfterVisibleHeaderName,
 	SimpleWriteRefSink,
@@ -26,19 +24,6 @@ import {
 const debugHeader = 'x-contember-debug'
 const testSessionHeader = 'x-contember-test-session'
 
-/** Result of the attempt to serve a request from a pinned replica connection. */
-type PinnedOutcome =
-	| { kind: 'done'; response: HttpResponse | undefined }
-	| { kind: 'miss' }
-	| { kind: 'error'; error: unknown }
-
-/** Carries a finished outcome out of the pinned scope while still making the pool drop the connection. */
-class CompromisedPinnedConnection extends Error {
-	constructor(public readonly outcome: PinnedOutcome, public readonly failure: unknown) {
-		super('The pinned replica connection is no longer usable')
-	}
-}
-
 export class ContentApiControllerFactory {
 	constructor(
 		private readonly notModifiedChecker: NotModifiedChecker,
@@ -47,6 +32,7 @@ export class ContentApiControllerFactory {
 		private readonly projectContextResolver: ProjectContextResolver,
 		private readonly graphQlSchemaFactory: GraphQlSchemaFactory,
 		private readonly testTransactionService: TestTransactionService,
+		private readonly connectionRouter: ContentConnectionRouter,
 	) {
 	}
 
@@ -149,27 +135,15 @@ export class ContentApiControllerFactory {
 			const prepared = prepareResult.prepared
 
 			// Read-after-write: a query carrying write refs may only be served from a replica that has
-			// already applied them. The whole request - the not-modified check included - then runs on
-			// that one pinned replica connection, otherwise a lagging replica could answer 304 wrongly.
+			// already applied them. Which connection that is, is the router's call; this side only
+			// parses the header and turns the outcome back into response headers.
 			const readAfterWriteState = await projectContainer.readAfterWrite.resolve()
 			const writeRefSink = readAfterWriteState.enabled ? new SimpleWriteRefSink() : undefined
 			const readAfter = readAfterWriteState.enabled && prepared.operation === OperationTypeNode.QUERY && !testContentDatabase
 				? parseReadAfterHeader(koa.request.get(readAfterHeaderName) || undefined, readAfterWriteState.clusterId)
 				: null
 
-			const maxConnectionsPerRequest = 'maxConnectionsPerRequest' in project.db
-				? project.db.maxConnectionsPerRequest
-				: undefined
-			// Optionally cap how many pool connections this single request may hold concurrently,
-			// so one request cannot starve the shared pool under high concurrency. Defaults to unlimited.
-			const capConnections = (connection: Connection): Connection.ConnectionType =>
-				maxConnectionsPerRequest !== undefined ? connection.withMaxConnections(maxConnectionsPerRequest) : connection
-
-			const runRequest = async ({ connection, routedSystemDatabase, ack }: {
-				connection: Connection.ConnectionType
-				routedSystemDatabase: DatabaseContext
-				ack: string[] | null
-			}): Promise<HttpResponse | undefined> => {
+			const runRequest = async ({ connection, systemDatabase: routedSystemDatabase, ack }: ContentRoute): Promise<HttpResponse | undefined> => {
 				const setAckHeader = () => {
 					if (ack !== null) {
 						koa.response.set(readAfterVisibleHeaderName, ack.join(','))
@@ -254,104 +228,21 @@ export class ContentApiControllerFactory {
 				return undefined
 			}
 
-			// never log the token values themselves - only how many there were
-			const logDecision = (route: 'replica' | 'primary' | 'off', reason?: string) =>
-				logger.debug(`readAfterWrite: ${route}`, { tokenCount: readAfter?.tokens.length ?? 0, reason })
-
-			if (readAfter === null) {
-				logDecision('off')
-				const baseConnection = prepared.operation === OperationTypeNode.QUERY
-					? projectContainer.readConnection
-					: projectContainer.connection
-				return await runRequest({
-					connection: capConnections(baseConnection),
-					routedSystemDatabase: prepared.operation === OperationTypeNode.QUERY
-						? projectContainer.systemReadDatabaseContext
-						: projectContainer.systemDatabaseContext,
-					ack: null,
-				})
-			}
-
-			const runOnPrimary = async (reason: string) => {
-				logDecision('primary', reason)
-				return await runRequest({
-					connection: capConnections(projectContainer.connection),
-					routedSystemDatabase: projectContainer.systemDatabaseContext,
-					ack: null,
-				})
-			}
-
-			if (!readAfter.valid) {
-				// a client or a proxy mangling the header turns the feature off for it, silently and indefinitely
-				logger.warn('Read-after-write: the request carried unusable write refs, serving from the primary', {
-					tokenCount: readAfter.tokens.length,
-				})
-				return await runOnPrimary('unusable tokens')
-			}
-
-			const tokens = readAfter.tokens
-			let replicaAcquired = false
-			let outcome: PinnedOutcome
-			// The pool decides on release by whether the callback threw, but graphql-js turns a failed
-			// resolver into a response - so the connection's own query stream, not the control flow,
-			// is what says whether it may serve the next probe.
-			const pinnedEvents = new EventManager(projectContainer.readConnection.eventManager)
-			try {
-				outcome = await projectContainer.readConnection.scope(async (acquired): Promise<PinnedOutcome> => {
-					replicaAcquired = true
-					if (!await timer('ReadAfterWriteProbe', () => isVisibleOnReplica(acquired, readAfter.xids, logger))) {
-						return { kind: 'miss' }
-					}
-					logDecision('replica')
-					let compromised: unknown
-					// armed only past the probe: a probe that failed says nothing about the connection itself
-					pinnedEvents.on(EventManager.Event.queryError, (query, error) => {
-						if (compromised === undefined && queryFailureCompromisesConnection(error)) {
-							compromised = error
-						}
-					})
-					const pinned = new PinnedConnection(acquired, projectContainer.readConnection)
-					let result: PinnedOutcome
-					try {
-						result = {
-							kind: 'done',
-							response: await runRequest({
-								connection: pinned,
-								routedSystemDatabase: projectContainer.systemDatabaseContextFactory.create(pinned),
-								ack: tokens,
-							}),
-						}
-					} catch (e) {
-						if (compromised === undefined && errorCompromisesConnection(e)) {
-							compromised = e
-						}
-						result = { kind: 'error', error: e }
-					}
-					if (compromised !== undefined) {
-						// the connection may be left mid-transaction; only throwing makes the pool drop it
-						throw new CompromisedPinnedConnection(result, compromised)
-					}
-					return result
-				}, { eventManager: pinnedEvents })
-			} catch (e) {
-				if (e instanceof CompromisedPinnedConnection) {
-					logger.warn('Read-after-write: a statement failed on the pinned replica connection, disposing it', databaseErrorAttributes(e.failure))
-					outcome = e.outcome
-				} else if (replicaAcquired) {
-					// whatever the request itself threw must reach the client
-					throw e
-				} else {
-					logger.warn('Read-after-write: could not acquire a replica connection, serving from the primary', databaseErrorAttributes(e))
-					return await runOnPrimary('replica unavailable')
-				}
-			}
-			if (outcome.kind === 'error') {
-				throw outcome.error
-			}
-			if (outcome.kind === 'done') {
-				return outcome.response
-			}
-			return await runOnPrimary('replica behind')
+			return await this.connectionRouter.route({
+				connections: {
+					primary: projectContainer.connection,
+					replica: projectContainer.readConnection,
+					systemOnPrimary: projectContainer.systemDatabaseContext,
+					systemOnReplica: projectContainer.systemReadDatabaseContext,
+					systemOn: connection => projectContainer.systemDatabaseContextFactory.create(connection),
+				},
+				operation: prepared.operation,
+				readAfter,
+				maxConnectionsPerRequest: 'maxConnectionsPerRequest' in project.db ? project.db.maxConnectionsPerRequest : undefined,
+				logger,
+				timer,
+				run: runRequest,
+			})
 		}
 	}
 }

@@ -86,6 +86,43 @@ describe('graphql handler prepare', () => {
 		expect(prepared.variables).toEqual({ value: 'hi' })
 	})
 
+	test('parses the variables sent as a query-string value on GET', () => {
+		const handler = createHandler()
+		const query = 'query ($value: String) { echo(value: $value) }'
+		const result = handler.prepare(
+			createKoaContext({
+				method: 'GET',
+				url: `/?query=${encodeURIComponent(query)}&variables=${encodeURIComponent('{"value":"hi"}')}`,
+			}).request,
+		)
+		if (!result.ok) {
+			throw new Error('Expected prepare to succeed')
+		}
+		expect(result.prepared.variables).toEqual({ value: 'hi' })
+	})
+
+	test('variables that are not valid JSON respond with 400', () => {
+		const context = createKoaContext({ method: 'GET', url: `/?query=${encodeURIComponent('{ hello }')}&variables=nonsense` })
+		const result = createHandler().prepare(context.request)
+		if (result.ok) {
+			throw new Error('Expected prepare to fail')
+		}
+		result.respond(context.response)
+		expect(context.response.status).toBe(400)
+		expect(parseBody(context).errors[0].message).toBe('Variables must be valid JSON.')
+	})
+
+	test('variables that are not an object respond with 400', () => {
+		const context = createKoaContext({ body: { query: '{ hello }', variables: [1, 2] } })
+		const result = createHandler().prepare(context.request)
+		if (result.ok) {
+			throw new Error('Expected prepare to fail')
+		}
+		result.respond(context.response)
+		expect(context.response.status).toBe(400)
+		expect(parseBody(context).errors[0].message).toBe('Variables must be provided as an object.')
+	})
+
 	test('missing query responds with 400', () => {
 		const context = createKoaContext({ body: {} })
 		const result = createHandler().prepare(context.request)
@@ -247,6 +284,22 @@ describe('graphql handler callable form', () => {
 		expect(operations).toEqual([])
 		expect(context.response.status).toBe(400)
 		expect(parseBody(context).errors).toHaveLength(1)
+	})
+
+	test('a GET with variables executes with them applied, not silently unset', async () => {
+		const handler = createHandler()
+		const query = 'query ($value: String) { echo(value: $value) }'
+		const context = createKoaContext({
+			method: 'GET',
+			url: `/?query=${encodeURIComponent(query)}&variables=${encodeURIComponent('{"value":"hi"}')}`,
+		})
+		await handler({
+			request: context.request,
+			response: context.response,
+			createContext: () => ({ marker: 'test' }),
+		})
+		expect(context.response.status).toBe(200)
+		expect(parseBody(context)).toEqual({ data: { echo: 'hi' } })
 	})
 
 	test('keeps the listener queue semantics', async () => {

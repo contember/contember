@@ -43,8 +43,7 @@ export interface PreparedGraphQLRequest {
 	readonly document: DocumentNode
 	readonly operation: OperationTypeNode
 	readonly operationName: string | null
-	/** Unvalidated: on GET this is the raw query-string value, not necessarily an object. */
-	readonly variables: unknown
+	readonly variables: Record<string, unknown> | undefined
 }
 
 export type PrepareResult<Context> =
@@ -142,7 +141,7 @@ export const createGraphQLQueryHandler = <Context>({
 
 			return {
 				ok: true,
-				prepared: { document, operation, operationName, variables: resolvedRequest.variables },
+				prepared: { document, operation, operationName, variables: parseVariables(resolvedRequest.variables) },
 			}
 		} catch (e) {
 			if (e instanceof GraphQLError) {
@@ -173,8 +172,7 @@ export const createGraphQLQueryHandler = <Context>({
 				schema,
 				document,
 				operationName: operationName,
-				// graphql-js wants a variable map; on GET the raw query-string value is not one
-				variableValues: typeof variables === 'object' && variables !== null ? { ...variables } : undefined,
+				variableValues: variables,
 				contextValue: context,
 			})
 			listenersQueue.forEach(it => {
@@ -239,6 +237,25 @@ const processErrors = (errors: readonly any[]): [number | null, any[]] => {
 		}
 	}
 	return [has500 ? 500 : has400 ? 400 : has403 ? 403 : null, resultErrors]
+}
+
+/** On GET the variables arrive as a raw query-string value; anything but an absent or object-shaped one is a client error. */
+const parseVariables = (value: unknown): Record<string, unknown> | undefined => {
+	if (value === undefined || value === null || value === '') {
+		return undefined
+	}
+	let parsed: unknown = value
+	if (typeof value === 'string') {
+		try {
+			parsed = JSON.parse(value)
+		} catch {
+			throw new GraphQLError('Variables must be valid JSON.')
+		}
+	}
+	if (typeof parsed !== 'object' || parsed === null || Array.isArray(parsed)) {
+		throw new GraphQLError('Variables must be provided as an object.')
+	}
+	return { ...parsed as Record<string, unknown> }
 }
 
 const resolveOperationType = (document: DocumentNode, operationName: string | null): OperationTypeNode => {

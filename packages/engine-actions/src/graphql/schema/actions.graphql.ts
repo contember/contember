@@ -99,7 +99,19 @@ export const schema: DocumentNode = gql`
 
     type Variable {
         name: String!
-        value: String!
+        """Null when the value is not readable, which is every ENVIRONMENT one."""
+        value: String
+        source: VariableSource!
     }
+
+	"""
+	Where the value comes from.
+	- DATABASE is stored in the project database, readable and writable with setVariables
+	- ENVIRONMENT is supplied by the engine environment, overrides a stored value of the same name, and is neither readable nor writable
+	"""
+	enum VariableSource {
+		DATABASE
+		ENVIRONMENT
+	}
 
 `

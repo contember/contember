@@ -10,6 +10,7 @@ type ProcessBatchArgs = {
 	db: DatabaseContext
 	contentSchemaResolver: ContentSchemaResolver
 	logger: Logger
+	project: { slug: string }
 }
 
 type ProcessBatchResult = {
@@ -32,7 +33,7 @@ export class EventDispatcher {
 	) {
 	}
 
-	async processBatch({ db, contentSchemaResolver, logger }: ProcessBatchArgs): Promise<ProcessBatchResult> {
+	async processBatch({ db, contentSchemaResolver, logger, project }: ProcessBatchArgs): Promise<ProcessBatchResult> {
 		const schema = (await contentSchemaResolver.getSchema({ db, normalize: true })).schema
 		const batchId = Math.random().toString().substring(2)
 		const batchLogger = logger.child({ loc: 'Actions.EventDispatcher', batchId })
@@ -55,7 +56,7 @@ export class EventDispatcher {
 			batchLogger.debug('Processing started', {
 				events: batch.events.map(it => it.id),
 			})
-			const variables = await this.variablesManager.fetchVariables(db)
+			const variables = await this.variablesManager.fetchVariables(db, project.slug)
 			const handledEvents = await handler.handle({ target, events, logger: batchLogger, variables })
 			const { succeeded, retried, failed } = await this.eventsRepository.persistProcessed(db.client, handledEvents, batchLogger)
 			batchLogger.debug('Processing done', { succeed: succeeded, failed })

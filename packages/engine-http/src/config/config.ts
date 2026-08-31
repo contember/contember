@@ -22,6 +22,7 @@ export async function readConfig<T extends ServerConfig>(
 	serverConfig: T
 	projectConfigResolver: ProjectConfigResolver
 	tenantConfigResolver: TenantConfigResolver
+	env: Env
 }> {
 	const loader = new ConfigLoader()
 	const configs = await Promise.all(
@@ -49,5 +50,6 @@ export async function readConfig<T extends ServerConfig>(
 		serverConfig,
 		projectConfigResolver: createProjectConfigResolver(env, rawConfig, configProcessors),
 		tenantConfigResolver: createTenantConfigResolver(env, rawConfig.tenant),
+		env,
 	}
 }

@@ -18,15 +18,16 @@ export class ActionsClient {
 		return new ActionsClient(graphqlClient)
 	}
 
-	public async listVariables(): Promise<{ name: string; value: string }[]> {
+	public async listVariables(): Promise<Variable[]> {
 		const query = `query {
   variables {
   	name
   	value
+  	source
   }
 }`
 		const result = await this.execute<{
-			variables: Array<{ name: string; value: string }>
+			variables: Array<Variable>
 		}>(query)
 		return result.variables
 	}
@@ -113,6 +114,11 @@ export class ActionsClient {
 
 /** The subset of ActionsClient commands depend on — structural, so tests can pass a plain fake without a cast. */
 export type ActionsApi = Pick<ActionsClient, 'listVariables' | 'setVariables' | 'listFailedEvents' | 'retryEvent' | 'stopEvent' | 'getEvent'>
+
+export type VariableSource = 'DATABASE' | 'ENVIRONMENT'
+
+/** An `ENVIRONMENT` value is not returned by the API — it stays in the operator's secret store. */
+export type Variable = { name: string; value: string | null; source: VariableSource }
 
 export type SetVariablesMode = 'MERGE' | 'SET' | 'APPEND_ONLY_MISSING'
 

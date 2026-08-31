@@ -121,7 +121,7 @@ const ActionsVariables = () => {
 		<PageStack>
 			<PageHeader
 				title="Variables"
-				description="Values the dispatcher interpolates into a target's URL and headers as {{name}}. Whatever the API returns is shown as it is — it does not mask values."
+				description="Values the dispatcher interpolates into a target's URL and headers as {{name}}. A variable the engine environment supplies overrides a stored one of the same name; the API does not return its value and it cannot be edited here. A stored value is shown as it is — it is not masked."
 				actions={
 					<>
 						<Link to={{ pageName: 'actionsQueue', parameters: { project: projectSlug } }}>
@@ -159,6 +159,7 @@ const ActionsVariables = () => {
 											<TableRow>
 												<TableHead>Name</TableHead>
 												<TableHead>Value</TableHead>
+												<TableHead>Source</TableHead>
 												<TableHead />
 											</TableRow>
 										</TableHeader>
@@ -166,18 +167,26 @@ const ActionsVariables = () => {
 											{variables?.map(variable => (
 												<TableRow key={variable.name}>
 													<TableCell className="font-mono text-xs">{variable.name}</TableCell>
-													<TableCell className="font-mono text-xs break-all">{variable.value}</TableCell>
+													<TableCell className="font-mono text-xs break-all">
+														{variable.value ?? <span className="font-sans text-muted-foreground">Not readable — held by the engine environment</span>}
+													</TableCell>
+													<TableCell className="text-xs text-muted-foreground">
+														{variable.source === 'ENVIRONMENT' ? 'Environment (read-only)' : 'Database'}
+													</TableCell>
 													<TableCell>
 														<div className="flex justify-end">
-															<FormDialog
-																label="Edit"
-																title={`Set ${variable.name}`}
-																description="Takes effect on the next dispatch; events already in flight keep the old value."
-																icon={<PencilIcon className="size-4" />}
-																variant="outline"
-															>
-																{close => <SetVariableForm initial={variable} close={close} onSaved={refresh} />}
-															</FormDialog>
+															{/* An environment value has one writer, the operator's secret store, so the API refuses to set it. */}
+															{variable.source === 'DATABASE' && (
+																<FormDialog
+																	label="Edit"
+																	title={`Set ${variable.name}`}
+																	description="Takes effect on the next dispatch; events already in flight keep the old value."
+																	icon={<PencilIcon className="size-4" />}
+																	variant="outline"
+																>
+																	{close => <SetVariableForm initial={variable} close={close} onSaved={refresh} />}
+																</FormDialog>
+															)}
 														</div>
 													</TableCell>
 												</TableRow>

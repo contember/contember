@@ -77,7 +77,7 @@ const createProjectParametersResolver = (slug: string, env: Env, secrets: Projec
 	throw new UndefinedParameterError(`Parameter "${parts.join('.')}" not found.`)
 }
 
-const projectNameToEnvName = (projectName: string): string => {
+export const projectNameToEnvName = (projectName: string): string => {
 	const envName = projectName.toUpperCase().replace(/-/g, '_')
 	if (envName === 'TENANT') {
 		throw new Error('Forbidden project name')

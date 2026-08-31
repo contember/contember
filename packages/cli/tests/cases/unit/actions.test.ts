@@ -3,7 +3,7 @@ import chalk from 'chalk'
 import { CliError, ExitCode, Output, OutputStream, renderCliError } from '@contember/cli-common'
 import { GraphQlClient } from '@contember/graphql-client'
 import { RemoteProjectResolver } from '../../../src/lib/project/RemoteProjectResolver.js'
-import { ActionsApi, ActionsClient, Event } from '../../../src/lib/actions/ActionsClient.js'
+import { ActionsApi, ActionsClient, Event, Variable } from '../../../src/lib/actions/ActionsClient.js'
 import { ActionsClientResolver, resolveActionsClient } from '../../../src/lib/actions/resolveActionsClient.js'
 import { runActionMutationBatch } from '../../../src/lib/actions/runActionMutationBatch.js'
 import { ActionsListFailedEventsCommand } from '../../../src/commands/actions/ActionsListFailedEventsCommand.js'
@@ -159,7 +159,10 @@ describe('actions failed-events', () => {
 })
 
 describe('actions list-variables', () => {
-	const variables = [{ name: 'a', value: '1' }, { name: 'b', value: '2' }]
+	const variables: Variable[] = [
+		{ name: 'a', value: '1', source: 'DATABASE' },
+		{ name: 'b', value: null, source: 'ENVIRONMENT' },
+	]
 
 	test('--json prints the raw variable array', async () => {
 		const command = new ActionsListVariablesCommand(remoteProjectResolver, resolverFor(fakeApi({ listVariables: async () => variables })))
@@ -179,6 +182,18 @@ describe('actions list-variables', () => {
 
 		expect(code).toBe(ExitCode.Success)
 		expect(stdout.lines).toStrictEqual(['a', 'b'])
+	})
+
+	test('names the source and does not invent a value for an environment variable', async () => {
+		const command = new ActionsListVariablesCommand(remoteProjectResolver, resolverFor(fakeApi({ listVariables: async () => variables })))
+		const { output, stdout } = createTestOutput()
+
+		const code = await command.run([], output)
+
+		expect(code).toBe(ExitCode.Success)
+		expect(stdout.text).toContain('Database')
+		expect(stdout.text).toContain('Environment (read-only)')
+		expect(stdout.text).toContain('<not readable>')
 	})
 })
 

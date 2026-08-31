@@ -12,9 +12,6 @@ export class VariablesQueryResolver implements QueryResolvers<ActionsContext> {
 	async variables(parent: unknown, args: unknown, ctx: ActionsContext) {
 		await ctx.requireAccess(ActionsAuthorizationActions.VARIABLES_VIEW)
 
-		return Object.entries(await this.variablesManager.fetchVariables(ctx.db)).map(([name, value]) => ({
-			name,
-			value,
-		}))
+		return await this.variablesManager.listVariables(ctx.db, ctx.project.slug)
 	}
 }

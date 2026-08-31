@@ -3,6 +3,7 @@ import Koa from 'koa'
 
 export * from './config/config.js'
 export * from './config/ConfigProcessor.js'
+export { projectNameToEnvName } from './config/projectConfigResolver.js'
 export * from './config/tenantConfigResolver.js'
 export * from './common/index.js'
 export * from './content/index.js'

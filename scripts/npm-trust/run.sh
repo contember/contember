@@ -21,7 +21,7 @@ for dir in packages/*; do
       fi
 
       echo "Setting trusted publisher for $name..."
-      npm trust github "$name" --file="$WORKFLOW" --repository="$REPO" --yes
+      npm trust github "$name" --file="$WORKFLOW" --repository="$REPO" --allow-publish --yes
     fi
   fi
 done

@@ -50,24 +50,13 @@ export class PredicatesInjector {
 	private canSimplifyBackReference(
 		ancestorPath: readonly Model.AnyRelationContext[],
 		relationContext: Model.AnyRelationContext,
-		hasEvaluatedAncestorWitness = false,
 	): boolean {
 		const isBackReference = this.findBackReferencedAncestor(
 			ancestorPath,
 			relationContext.relation.name,
 			relationContext.entity.name,
 		) !== undefined
-		return isBackReference && (hasEvaluatedAncestorWitness || PredicatesInjector.toOneBackReferenceTypes.has(relationContext.type))
-	}
-
-	private isAlwaysTruePrimaryWhere(where: Input.OptionalWhere, primary: string): boolean {
-		const condition = where[primary]
-		return Object.keys(where).length === 1
-			&& condition !== null
-			&& typeof condition === 'object'
-			&& !Array.isArray(condition)
-			&& 'always' in condition
-			&& condition.always === true
+		return isBackReference && PredicatesInjector.toOneBackReferenceTypes.has(relationContext.type)
 	}
 
 	private createWhere(

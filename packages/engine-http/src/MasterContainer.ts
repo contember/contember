@@ -17,6 +17,7 @@ import { ProjectConfigResolver } from './config/projectConfigResolver.js'
 import { TenantConfigResolver } from './config/tenantConfigResolver.js'
 import {
 	ContentApiControllerFactory,
+	ContentConnectionRouter,
 	ContentQueryHandlerFactory,
 	GraphQLSchemaContributor,
 	GraphQlSchemaFactory,
@@ -214,6 +215,7 @@ export class MasterContainerFactory {
 					(serverConfig.test?.transactionTtlSeconds ?? 60) * 1000,
 				))
 			.addService('notModifiedChecker', () => new NotModifiedChecker())
+			.addService('contentConnectionRouter', () => new ContentConnectionRouter())
 			.addService('contentQueryHandlerFactory', ({ debugMode }) => new ContentQueryHandlerFactory(debugMode))
 			.addService('projectContextResolver', () => new ProjectContextResolver())
 			.addService(
@@ -226,6 +228,7 @@ export class MasterContainerFactory {
 						contentQueryHandlerFactory,
 						graphQlSchemaFactory,
 						testTransactionService,
+						contentConnectionRouter,
 					},
 				) =>
 					new ContentApiControllerFactory(
@@ -235,6 +238,7 @@ export class MasterContainerFactory {
 						projectContextResolver,
 						graphQlSchemaFactory,
 						testTransactionService,
+						contentConnectionRouter,
 					),
 			)
 			.addService('tenantApiMiddlewareFactory', () => new TenantApiMiddlewareFactory())

@@ -1,7 +1,7 @@
 import { createAclVariables, ExecutionContainerFactory } from '@contember/engine-content-api'
 import { StageBySlugQuery } from '@contember/engine-system-api'
 import { Client } from '@contember/database'
-import { GraphQLSchema } from 'graphql'
+import { GraphQLSchema, OperationTypeNode } from 'graphql'
 import { HttpController } from '../application/index.js'
 import { HttpErrorResponse, HttpResponse } from '../common/index.js'
 import { GraphQLKoaState } from '../graphql/index.js'
@@ -10,6 +10,16 @@ import { ContentQueryHandler, ContentQueryHandlerFactory } from './ContentQueryH
 import { GraphQlSchemaFactory } from './GraphQlSchemaFactory.js'
 import { NotModifiedChecker } from './NotModifiedChecker.js'
 import { TestTransactionService } from '../testing/index.js'
+import {
+	ContentConnectionRouter,
+	ContentRoute,
+	formatWriteRef,
+	parseReadAfterHeader,
+	readAfterHeaderName,
+	readAfterVisibleHeaderName,
+	SimpleWriteRefSink,
+	writeRefHeaderName,
+} from './readAfterWrite/index.js'
 
 const debugHeader = 'x-contember-debug'
 const testSessionHeader = 'x-contember-test-session'
@@ -22,6 +32,7 @@ export class ContentApiControllerFactory {
 		private readonly projectContextResolver: ProjectContextResolver,
 		private readonly graphQlSchemaFactory: GraphQlSchemaFactory,
 		private readonly testTransactionService: TestTransactionService,
+		private readonly connectionRouter: ContentConnectionRouter,
 	) {
 	}
 
@@ -43,17 +54,6 @@ export class ContentApiControllerFactory {
 			if (!stage) {
 				return new HttpErrorResponse(404, `Stage ${params.stageSlug} NOT found`)
 			}
-			const notModifiedRes = await this.notModifiedChecker.checkNotModified({
-				request: context.request,
-				body: context.body,
-				timer: context.timer,
-				systemDatabase,
-				stageId: stage.id,
-			})
-			if (notModifiedRes?.isModified === false) {
-				return new HttpResponse(304)
-			}
-
 			const schemaWithMeta = await projectContainer.contentSchemaResolver.getSchema({ db: systemDatabase, stage: stage.slug, normalize: true })
 			const schema = schemaWithMeta.schema
 			const { effective: memberships, fetched: fetchedMemberships } = await timer(
@@ -125,71 +125,124 @@ export class ContentApiControllerFactory {
 				return newHandler
 			})()
 
-			await logger.scope(async logger => {
-				logger.debug('Content query processing started')
+			// Parse the operation up front: the not-modified check and the connection choice both need
+			// the operation type. Cost: a 304 now also pays membership resolution, schema and database
+			// metadata resolution and the parse/validate pass, all of which are cached.
+			const prepareResult = handler.prepare(koa.request)
+			if (!prepareResult.ok) {
+				return prepareResult.respond(koa.response)
+			}
+			const prepared = prepareResult.prepared
 
-				await timer('GraphQL', () =>
-					handler({
-						request: koa.request,
-						response: koa.response,
-						createContext: ({ operation }) => {
-							;(koa.state as GraphQLKoaState).graphql = {
-								operationName: operation,
-							}
+			// Read-after-write: a query carrying write refs may only be served from a replica that has
+			// already applied them. Which connection that is, is the router's call; this side only
+			// parses the header and turns the outcome back into response headers.
+			const readAfterWriteState = await projectContainer.readAfterWrite.resolve()
+			const writeRefSink = readAfterWriteState.enabled ? new SimpleWriteRefSink() : undefined
+			const readAfter = readAfterWriteState.enabled && prepared.operation === OperationTypeNode.QUERY && !testContentDatabase
+				? parseReadAfterHeader(koa.request.get(readAfterHeaderName) || undefined, readAfterWriteState.clusterId)
+				: null
 
-							const baseConnection = operation === 'query' ? projectContainer.readConnection : projectContainer.connection
-							const maxConnectionsPerRequest = 'maxConnectionsPerRequest' in project.db
-								? project.db.maxConnectionsPerRequest
-								: undefined
-							// Optionally cap how many pool connections this single request may hold concurrently,
-							// so one request cannot starve the shared pool under high concurrency. Defaults to unlimited.
-							const connection = maxConnectionsPerRequest !== undefined
-								? baseConnection.withMaxConnections(maxConnectionsPerRequest)
-								: baseConnection
-							const contentDatabase = testContentDatabase ?? connection.createClient(stage.schema, { module: 'content' })
+			const runRequest = async ({ connection, systemDatabase: routedSystemDatabase, ack }: ContentRoute): Promise<HttpResponse | undefined> => {
+				const setAckHeader = () => {
+					if (ack !== null) {
+						koa.response.set(readAfterVisibleHeaderName, ack.join(','))
+					}
+				}
+				const notModifiedRes = await this.notModifiedChecker.checkNotModified({
+					request: context.request,
+					operation: prepared.operation,
+					timer: context.timer,
+					systemDatabase: routedSystemDatabase,
+					stageId: stage.id,
+				})
+				if (notModifiedRes?.isModified === false) {
+					// the probe already proved these refs are visible here, so the client may retire them
+					setAckHeader()
+					return new HttpResponse(304)
+				}
 
-							const identityVariables = createAclVariables(schema.acl, memberships)
-							let identityId = authResult.identityId
-							if (
-								authResult.assumedIdentityId
-								&& memberships.some(it => schema.acl.roles[it.role].system?.assumeIdentity)
-							) {
-								identityId = authResult.assumedIdentityId
-							}
+				await logger.scope(async logger => {
+					logger.debug('Content query processing started')
 
-							const executionContainer = this.executionContainerFactory.create({
-								db: contentDatabase,
-								identityVariables,
-								identityId,
-								schema,
-								schemaMeta: { id: schemaWithMeta.meta.id },
-								schemaDatabaseMetadata,
-								permissions,
-								allPermissions,
-								systemSchema: projectContainer.systemDatabaseContextFactory.schemaName,
-								stage,
-								project,
-								userInfo: {
-									ipAddress: clientIp,
-									userAgent: authResult.clientUserAgent ?? null,
-								},
-							})
+					await timer('GraphQL', () =>
+						handler.execute({
+							prepared,
+							request: koa.request,
+							response: koa.response,
+							createContext: ({ operation }) => {
+								;(koa.state as GraphQLKoaState).graphql = {
+									operationName: operation,
+								}
 
-							return {
-								db: contentDatabase,
-								identityVariables,
-								identityId,
-								executionContainer,
-								timer,
-								requestDebug,
-								project,
-							}
-						},
-					}))
-				logger.debug('Content query finished')
+								const contentDatabase = testContentDatabase ?? connection.createClient(stage.schema, { module: 'content' })
+
+								const identityVariables = createAclVariables(schema.acl, memberships)
+								let identityId = authResult.identityId
+								if (
+									authResult.assumedIdentityId
+									&& memberships.some(it => schema.acl.roles[it.role].system?.assumeIdentity)
+								) {
+									identityId = authResult.assumedIdentityId
+								}
+
+								const executionContainer = this.executionContainerFactory.create({
+									db: contentDatabase,
+									identityVariables,
+									identityId,
+									schema,
+									schemaMeta: { id: schemaWithMeta.meta.id },
+									schemaDatabaseMetadata,
+									permissions,
+									allPermissions,
+									systemSchema: projectContainer.systemDatabaseContextFactory.schemaName,
+									stage,
+									project,
+									userInfo: {
+										ipAddress: clientIp,
+										userAgent: authResult.clientUserAgent ?? null,
+									},
+									writeRefSink,
+								})
+
+								return {
+									db: contentDatabase,
+									identityVariables,
+									identityId,
+									executionContainer,
+									timer,
+									requestDebug,
+									project,
+								}
+							},
+						}))
+					logger.debug('Content query finished')
+				})
+
+				setAckHeader()
+				if (readAfterWriteState.enabled && writeRefSink?.xid !== undefined) {
+					koa.response.set(writeRefHeaderName, formatWriteRef(readAfterWriteState.clusterId, writeRefSink.xid))
+				}
+
+				notModifiedRes?.setResponseHeader(context.response)
+				return undefined
+			}
+
+			return await this.connectionRouter.route({
+				connections: {
+					primary: projectContainer.connection,
+					replica: projectContainer.readConnection,
+					systemOnPrimary: projectContainer.systemDatabaseContext,
+					systemOnReplica: projectContainer.systemReadDatabaseContext,
+					systemOn: connection => projectContainer.systemDatabaseContextFactory.create(connection),
+				},
+				operation: prepared.operation,
+				readAfter,
+				maxConnectionsPerRequest: 'maxConnectionsPerRequest' in project.db ? project.db.maxConnectionsPerRequest : undefined,
+				logger,
+				timer,
+				run: runRequest,
 			})
-
-			notModifiedRes?.setResponseHeader(context.response)
 		}
 	}
 }

@@ -43,6 +43,7 @@ import {
 	ValidationDataSelector,
 } from './input-validation/index.js'
 import { RefreshViewResolver } from './resolvers/RefreshViewResolver.js'
+import { WriteRefSink } from './WriteRefSink.js'
 
 export interface TriggeredActionEvent {
 	id: string
@@ -83,6 +84,7 @@ export type ExecutionContainerArgs = {
 	project: { slug: string }
 	stage: { id: string; slug: string }
 	userInfo: { ipAddress: string | null; userAgent: string | null }
+	writeRefSink?: WriteRefSink
 }
 
 export interface ExecutionContainer {
@@ -124,11 +126,13 @@ export class ExecutionContainerFactory {
 			project,
 			schemaDatabaseMetadata,
 			userInfo,
+			writeRefSink,
 		}: ExecutionContainerArgs,
 	) {
 		return new Builder({})
 			.addService('systemSchema', () => systemSchema)
 			.addService('db', () => db)
+			.addService('writeRefSink', (): WriteRefSink | undefined => writeRefSink)
 			.addService('project', () => project)
 			.addService('stage', () => stage)
 			.addService('triggeredActionsCollector', (): TriggeredActionsCollector | undefined =>
@@ -279,11 +283,11 @@ export class ExecutionContainerFactory {
 			)
 			.addService(
 				'mutationResolver',
-				({ mapperFactory, inputPreValidator, queryAstFactory, schema, schemaDatabaseMetadata }) =>
-					new MutationResolver(schema.model, mapperFactory, inputPreValidator, queryAstFactory, schemaDatabaseMetadata),
+				({ mapperFactory, inputPreValidator, queryAstFactory, schema, schemaDatabaseMetadata, writeRefSink }) =>
+					new MutationResolver(schema.model, mapperFactory, inputPreValidator, queryAstFactory, schemaDatabaseMetadata, writeRefSink),
 			)
 			.addService('validationResolver', ({ inputPreValidator, mapperFactory }) => new ValidationResolver(mapperFactory, inputPreValidator))
-			.addService('refreshViewResolver', ({ schema, mapperFactory }) => new RefreshViewResolver(schema, mapperFactory))
+			.addService('refreshViewResolver', ({ schema, mapperFactory, writeRefSink }) => new RefreshViewResolver(schema, mapperFactory, writeRefSink))
 	}
 
 	public create(args: ExecutionContainerArgs): ExecutionContainer {

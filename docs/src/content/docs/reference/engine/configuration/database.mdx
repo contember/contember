@@ -59,6 +59,18 @@ Contember manages its own connection pool. All pool options are optional and liv
 | `maxUses` | Dispose a connection after it has been acquired this many times. | unlimited |
 | `maxAgeMs` | Dispose a connection once it reaches this age (after it is returned to the pool). | unlimited |
 
+### Per-request connection limit
+
+`maxConnectionsPerRequest` sits next to `pool` rather than inside it, because it does not size the pool — it caps how many of its connections **one HTTP request** may hold at the same time.
+
+| Option | Description | Default |
+|---|---|---|
+| `maxConnectionsPerRequest` | Maximum number of pool connections a single request may hold concurrently. | unlimited |
+
+Contember fetches the relations of a query concurrently, so one deep request can hold several connections at once. On a busy instance that lets a single expensive request starve the shared pool; setting this bounds it, at the cost of serializing part of that request. Only connections acquired at the top level count — a nested transaction reuses the one it is already on, so the limit can never deadlock a request against itself. The lowest meaningful value is `1`.
+
+A request that read-after-write pins to a replica connection is unaffected: it already holds exactly one connection for its whole duration, which is narrower than any limit you could set here. The limit still applies to every other request, including one that carried write references and then fell back to the primary.
+
 ## Read replica
 
 If you run a PostgreSQL read replica, point read-only traffic at it with a `read` sub-config. It accepts the **same options** as the primary connection (`host`, `port`, `user`, `password`, `database`, `ssl`, the timeouts, and `pool`). Any option you omit is inherited from the primary connection; the replica is only used when at least a `host` is provided.
@@ -74,6 +86,70 @@ tenant:
     read:
       host: replica.db.example.com
 ```
+
+In the Content API only `query` operations may be served from the replica; a mutation always runs on the primary connection.
+
+### Read-after-write consistency
+
+:::note[Available since 2.2]
+:::
+
+Replication is asynchronous. Without any further help, a query issued right after a mutation may land on a replica that has not applied that mutation yet, so the client reads its own write back as stale data — plain eventual consistency.
+
+Contember therefore tags each committed write and lets the client ask for it: a mutation response carries an `X-Contember-Write-Ref` header, and the client sends the references it has not had acknowledged yet back in `X-Contember-Read-After`. That gives **read-your-writes** to the client that carries the references. It does not give monotonic reads across clients — another client, device or browser tab has its own set of references and can still observe an older snapshot. See [Read-after-write consistency](/reference/engine/content/advanced/read-after-write) for the headers and the JavaScript clients.
+
+**Routing.** A query that carries references is served from a single pinned replica connection when that replica has already applied all of them. The whole request runs on the primary instead, with nothing acknowledged, whenever the reference header is unusable (a malformed reference, a reference from another cluster, or more than 16 of them — the header is rejected as a whole, not per reference), the replica has not applied the references yet, the visibility check fails, or no replica connection can be acquired. The server never waits or polls for the replica to catch up, so replication lag never slows a query down; the fallback still costs a replica acquire plus one check round trip before the primary query runs.
+
+**Cost of the pinned path.** A query that carries references holds one replica connection for the whole request, and every statement of that request runs serialized on it — there is no intra-request parallelism, and `maxConnectionsPerRequest` does not apply to it. Size `read.pool.maxConnections` for the number of reference-carrying queries you expect to run concurrently: once the replica pool cannot hand out a connection, those requests log a warning and fall back to the primary.
+
+The feature is on when a read replica is configured (`read.host`) and the requirements below are met. Turn it off to send every query to the replica regardless of the references:
+
+| Option | Environment variable | Default | Meaning |
+| --- | --- | --- | --- |
+| `read.readAfterWrite.enabled` | `<PREFIX>_DB_READ_AFTER_WRITE_ENABLED` | `true` when `read.host` is set | Set to `false` to disable read-after-write and always route queries to the replica. |
+
+```yaml
+projects:
+  blog:
+    db:
+      host: primary.db.example.com
+      read:
+        host: replica.db.example.com
+        readAfterWrite:
+          enabled: false
+```
+
+#### Requirements
+
+- **PostgreSQL 14 or newer** on both the primary and the replica.
+- The replica must be a **physical replica of that primary** — both clusters must report the same `pg_control_system().system_identifier`. A logically replicated database, or a second independent cluster, does not qualify.
+
+If a requirement is not met, Contember logs one error and keeps the feature off; queries are then routed to the replica as before, with plain eventual consistency.
+
+#### Supported topologies
+
+**`read.host` must reach one and only one reader.** Anything that spreads connections over several readers is unsupported:
+
+- direct connections to the primary and to the replica are supported;
+- a connection pooler in front of a **single** replica is supported;
+- **round-robin DNS** over several replicas — a Kubernetes `Service` in front of several replica pods, a load balancer, or a managed **cluster reader endpoint** — is **not** supported;
+- a transaction-mode pooler that spreads connections over **several** readers is **not** supported.
+
+The reason is the acknowledgement, not the routing within one request. A request that carries references is pinned to a single connection, so its own statements always see one consistent reader. But the acknowledgement tells the client to **forget** a reference once *that* reader has applied it, and with several readers behind one host name the next request can be served by a different one that has not:
+
+1. a mutation returns reference `T`;
+2. a query carrying `T` is served by replica X, which has applied it — `T` is acknowledged and the client drops it;
+3. the next query carries nothing, is served by replica Y, which is still behind, and reads stale data.
+
+Nothing detects this: every replica of the same primary reports the same `system_identifier`, so the requirement check passes. If you cannot guarantee a single reader, set `readAfterWrite.enabled: false` and treat the replica as eventually consistent.
+
+#### Platform coverage
+
+The mechanism is derived from PostgreSQL's own hot-standby implementation and is exercised in CI against a self-hosted streaming replica. Managed services built on streaming replication — Amazon RDS for PostgreSQL, Azure Database for PostgreSQL Flexible Server and Google Cloud SQL — are expected to behave the same way, but have not been exercised. Amazon Aurora and Google AlloyDB are unverified.
+
+:::caution[Point `read.host` at one instance, not at a reader endpoint]
+An Amazon RDS or Aurora **cluster reader endpoint** is round-robin DNS over every replica in the cluster, and the equivalent exists on the other platforms. With more than one replica behind it, the topology rule above is violated. Use a specific **instance** endpoint instead — or, if you need to spread reads over the fleet, keep the replica for reads and set `readAfterWrite.enabled: false`.
+:::
 
 ## Config file
 
@@ -142,6 +218,7 @@ Replace `<PREFIX>` below with `DEFAULT`, `TENANT`, or a project slug (`<PROJECT>
 | `queryTimeoutMs` | `<PREFIX>_DB_QUERY_TIMEOUT_MS` | number |
 | `statementTimeoutMs` | `<PREFIX>_DB_STATEMENT_TIMEOUT_MS` | number |
 | `lockTimeoutMs` | `<PREFIX>_DB_LOCK_TIMEOUT_MS` | number |
+| `maxConnectionsPerRequest` | `<PREFIX>_DB_MAX_CONNECTIONS_PER_REQUEST` | number |
 | `pool.maxConnections` | `<PREFIX>_DB_POOL_MAX_CONNECTIONS` | number |
 | `pool.maxConnecting` | `<PREFIX>_DB_POOL_MAX_CONNECTING` | number |
 | `pool.maxIdle` | `<PREFIX>_DB_POOL_MAX_IDLE` | number |
@@ -167,6 +244,13 @@ The read replica uses the same names with a `READ_` segment, for both the connec
 | `read.lockTimeoutMs` | `<PREFIX>_DB_READ_LOCK_TIMEOUT_MS` |
 | `read.pool.maxConnections` | `<PREFIX>_DB_READ_POOL_MAX_CONNECTIONS` |
 | … | … and the rest, following the same pattern |
+| `read.readAfterWrite.enabled` | `<PREFIX>_DB_READ_AFTER_WRITE_ENABLED` |
+
+:::note
+`<PREFIX>_DB_READ_AFTER_WRITE_ENABLED` is spelled with a single `READ_` — there is no `…_DB_READ_READ_AFTER_WRITE_ENABLED` form. It is a boolean, and it only matters when a read replica is configured; see [read-after-write consistency](#read-after-write-consistency).
+
+A project with `db.useTenantDb: true` inherits the whole `read` block, `readAfterWrite` included, from `tenant.db` — a project-level `read` without a `host` is dropped. `<PROJECT>_DB_READ_AFTER_WRITE_ENABLED` therefore has no effect on such a project; set `TENANT_DB_READ_AFTER_WRITE_ENABLED` (or `DEFAULT_DB_READ_AFTER_WRITE_ENABLED`) instead.
+:::
 
 ### Example
 
@@ -192,9 +276,10 @@ BLOG_DB_POOL_MAX_CONNECTIONS=20
 BLOG_DB_READ_HOST=replica.db.example.com
 ```
 
-Boolean variables (`*_SSL`) accept `true`, `on`, or `1` as truthy; anything else is falsy.
+Boolean variables (`*_SSL`, `*_READ_AFTER_WRITE_ENABLED`) accept `true`, `on`, or `1` as truthy; anything else is falsy.
 
 ## See also
 
 - [Self-host Contember](/guides/self-hosted-contember) — end-to-end deployment, including the minimal database variables.
 - [Data transfer](/reference/engine/content/transfer) — export/import, which bypass the configured statement/lock timeouts.
+- [Read-after-write consistency](/reference/engine/content/advanced/read-after-write) — the headers and the JavaScript clients that make a replica safe to read right after a mutation.

@@ -20,6 +20,12 @@ export type ProjectConfig = {
 				& Partial<DatabaseConfig>
 				& {
 					pool?: Omit<PoolConfig, 'logError'>
+					/**
+					 * Read-after-write consistency for Content API queries. Enabled whenever a read
+					 * replica is configured and both databases qualify; set to false to always route
+					 * queries to the replica.
+					 */
+					readAfterWrite?: { enabled?: boolean }
 				}
 		}
 } & Record<string, unknown>

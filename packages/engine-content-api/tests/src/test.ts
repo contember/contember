@@ -1,8 +1,8 @@
 import { Acl, Model, Schema, Settings, Validation } from '@contember/schema'
-import { Authorizator, ExecutionContainerFactory, GraphQlSchemaBuilderFactory } from '../../src/index.js'
+import { Authorizator, ExecutionContainerFactory, GraphQlSchemaBuilderFactory, WriteRefSink } from '../../src/index.js'
 import { AllowAllPermissionFactory, emptySchema } from '@contember/schema-utils'
 import { executeGraphQlTest } from './testGraphql.js'
-import { Client, emptyDatabaseMetadata } from '@contember/database'
+import { Client, Connection, emptyDatabaseMetadata } from '@contember/database'
 import { createConnectionMock } from '@contember/database-tester'
 import { createUuidGenerator, testUuid } from './testUuid.js'
 
@@ -22,6 +22,9 @@ export interface Test {
 	queryVariables?: Record<string, any>
 	executes: SqlQuery[]
 	return: object
+	writeRefSink?: WriteRefSink
+	/** replaces the default connection mock, e.g. to make COMMIT fail */
+	createConnection?: (queries: SqlQuery[]) => Connection.ConnectionType
 }
 
 const SQL_BEGIN = {
@@ -61,6 +64,12 @@ export const sqlTransaction = (executes: SqlQuery[]): SqlQuery[] => {
 	]
 }
 
+export const sqlWriteRef = (xid: string | null): SqlQuery => ({
+	sql: 'SELECT pg_current_xact_id_if_assigned()::text AS xid',
+	parameters: [],
+	response: { rows: [{ xid }] },
+})
+
 export const failedTransaction = (executes: SqlQuery[]): SqlQuery[] => {
 	return [
 		SQL_BEGIN,
@@ -80,7 +89,8 @@ export const execute = async (test: Test) => {
 	const builder = new GraphQlSchemaBuilderFactory().create(test.schema, authorizator)
 	const graphQLSchema = builder.build()
 
-	const connection = createConnectionMock(test.executes)
+	const createConnection: (queries: SqlQuery[]) => Connection.ConnectionType = test.createConnection ?? createConnectionMock
+	const connection = createConnection(test.executes)
 
 	const db = new Client(connection, 'public', {})
 	const schema: Schema = { ...emptySchema, model: test.schema, validation: test.validation || {}, settings: test.settings || emptySchema.settings }
@@ -115,6 +125,7 @@ export const execute = async (test: Test) => {
 					project: { slug: 'test' },
 					schemaDatabaseMetadata: emptyDatabaseMetadata,
 					userInfo: { ipAddress: null, userAgent: null },
+					writeRefSink: test.writeRefSink,
 				}),
 			timer: (label: any, cb: any) => cb(),
 		},

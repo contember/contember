@@ -11,7 +11,7 @@ import {
 import { GraphQlSchemaBuilderFactory, PermissionFactory } from '@contember/engine-content-api'
 import { Logger } from '@contember/logger'
 import { ProjectConfig } from './config.js'
-import { ContentSchemaResolver } from '../content/index.js'
+import { ContentSchemaResolver, ReadAfterWriteResolver } from '../content/index.js'
 import { Providers } from '../providers.js'
 import { Plugin } from '../plugin/Plugin.js'
 import { ServerConfig } from '../config/config.js'
@@ -26,6 +26,7 @@ export interface ProjectContainer {
 	connection: Connection
 	readConnection: Connection
 	contentSchemaResolver: ContentSchemaResolver
+	readAfterWrite: ReadAfterWriteResolver
 	projectInitializer: ProjectInitializer
 	projectDatabaseMetadataResolver: ProjectDatabaseMetadataResolver
 }
@@ -73,6 +74,7 @@ export class ProjectContainerFactory {
 				'systemDatabaseContext',
 				'systemReadDatabaseContext',
 				'contentSchemaResolver',
+				'readAfterWrite',
 				'projectInitializer',
 				'logger',
 				'projectDatabaseMetadataResolver',
@@ -98,6 +100,10 @@ export class ProjectContainerFactory {
 				}, err => logger.error(err))
 			})
 			.addService('contentSchemaResolver', () => new ContentSchemaResolver(this.schemaProvider))
+			.addService(
+				'readAfterWrite',
+				({ project, connection, readConnection, logger }) => new ReadAfterWriteResolver(project, connection, readConnection, logger),
+			)
 			.addService('systemSchemaName', ({ project }) => project.db.systemSchema ?? 'system')
 			.addService('systemDatabaseContextFactory', ({ systemSchemaName }) => new DatabaseContextFactory(systemSchemaName, this.providers))
 			.addService('systemDatabaseContext', ({ connection, systemDatabaseContextFactory }) => systemDatabaseContextFactory.create(connection))

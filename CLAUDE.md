@@ -105,7 +105,7 @@ A bundle entrypoint that imports a generated client must run `pre-build` itself 
   ```bash
   gh run view <runId> --json jobs -q '.jobs[] | [.conclusion, (.name|gsub("\n";" "))] | @tsv'
   ```
-- **`test-db (12..16)` is the e2e suite**, not unit-test shards — one job per PostgreSQL major, each building the server, starting it, and running `bun run test:e2e`. Also fail-fast. See `e2e/CLAUDE.md`.
+- **`test-db (14..18)` is the e2e suite**, not unit-test shards — one job per PostgreSQL major, each building the server, starting it, and running `bun run test:e2e`. Also fail-fast. See `e2e/CLAUDE.md`.
 - `snapshot` verifies the committed tenant/system migration snapshots against a replay of the migrations; `migration-order` rejects a new migration whose filename sorts before the newest one on the base branch (pure git). See `packages/engine-tenant-api/CLAUDE.md`.
 - **The workflow triggers on `pull_request`, pushes to `main`, and tags only** (`docs/**`-only PRs are skipped via `paths-ignore`). Pushing a feature branch verifies nothing; open the PR.
 - `lint-imports` runs `bunx deptective`, which catches missing workspace dependencies that `tsc` does not — a transitively reachable import typechecks fine and still fails this job.

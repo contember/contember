@@ -1,3 +1,5 @@
 export * from './GraphQlClient.js'
 export * from './GraphQlClientRequestOptions.js'
 export * from './GraphQlClientError.js'
+export * from './ReadAfterWriteHeaders.js'
+export * from './WriteRefTracker.js'

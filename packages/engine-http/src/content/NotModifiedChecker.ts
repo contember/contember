@@ -1,6 +1,7 @@
 import { DatabaseContext, LatestTransactionIdByStageQuery } from '@contember/engine-system-api'
 import { Timer } from '../application/index.js'
 import { IncomingMessage, ServerResponse } from 'node:http'
+import { OperationTypeNode } from 'graphql'
 
 const NotModifiedHeaderName = 'x-contember-ref'
 
@@ -10,21 +11,20 @@ export interface NotModifiedCheckResult {
 }
 
 export class NotModifiedChecker {
-	public async checkNotModified({ request, body, timer, systemDatabase, stageId }: {
-		body: any
+	public async checkNotModified({ request, operation, timer, systemDatabase, stageId }: {
 		request: IncomingMessage
+		operation: OperationTypeNode
 		timer: Timer
 		systemDatabase: DatabaseContext
 		stageId: string
 	}): Promise<NotModifiedCheckResult | null> {
+		if (operation !== OperationTypeNode.QUERY) {
+			return null
+		}
 		if (request.headers[NotModifiedHeaderName] === undefined) {
 			return null
 		}
 		const requestRef = request.headers[NotModifiedHeaderName]
-		const isMutation = typeof body === 'object' && body !== null && 'query' in body && String(body.query).includes('mutation')
-		if (isMutation) {
-			return null
-		}
 		const latestRef = await timer('NotModifiedCheck', () => {
 			const queryHandler = systemDatabase.queryHandler
 			return queryHandler.fetch(new LatestTransactionIdByStageQuery(stageId))

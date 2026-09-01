@@ -54,6 +54,9 @@ services:
       DEFAULT_DB_QUERY_TIMEOUT_MS: 3000
       DEFAULT_DB_HOST: 'postgres'
       DEFAULT_DB_PORT: '5432'
+      # same host as the primary: enables read-after-write routing locally, as CI does
+      DEFAULT_DB_READ_HOST: 'postgres'
+      DEFAULT_DB_READ_PORT: '5432'
       DEFAULT_DB_USER: 'contember'
       DEFAULT_DB_PASSWORD: 'contember'
       DEFAULT_DB_POOL_MAX_IDLE: '1'

@@ -6,6 +6,7 @@ export * from './inputProcessing/index.js'
 export { EntityRulesResolver } from './input-validation/index.js'
 export * from './types.js'
 export * from './ExecutionContainer.js'
+export type { WriteRefSink } from './WriteRefSink.js'
 export { graphql } from 'graphql'
 export { UserError } from './exception.js'
 export {

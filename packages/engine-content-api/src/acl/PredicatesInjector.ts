@@ -57,15 +57,7 @@ export class PredicatesInjector {
 		if (shouldSimplify) {
 			predicatesWhere = { [entity.primary]: { always: true } }
 		} else {
-			const rawPredicate = this.predicateFactory.create(entity, Acl.Operation.read, fieldNames, relationContext, isQueryRoot)
-			// Process the predicate to inject nested entity predicates
-			predicatesWhere = this.injectPredicatesToPredicate(
-				rawPredicate,
-				entity,
-				isBackReferenceContext ?? false,
-				ancestorPath ?? [],
-				isQueryRoot,
-			)
+			predicatesWhere = this.predicateFactory.create(entity, Acl.Operation.read, fieldNames, relationContext, isQueryRoot)
 		}
 
 		const and = [where, predicatesWhere].filter(it => Object.keys(it).length > 0)
@@ -76,101 +68,6 @@ export class PredicatesInjector {
 			return and[0]
 		}
 		return { and: and }
-	}
-
-	/**
-	 * Processes a predicate and injects nested entity predicates for any relation traversals.
-	 * This ensures that when a predicate like { department: { company: { name: 'Acme' } } }
-	 * is used, the predicates of Department and Company are also applied.
-	 */
-	private injectPredicatesToPredicate(
-		where: Input.OptionalWhere,
-		entity: Model.Entity,
-		isBackReferenceContext: boolean,
-		ancestorPath: readonly Model.AnyRelationContext[],
-		isQueryRoot?: boolean,
-	): Input.OptionalWhere {
-		const resultWhere: Writable<Input.OptionalWhere> = {}
-
-		if (where.and) {
-			resultWhere.and = where.and
-				.filter((it): it is Input.Where => !!it)
-				.map(it => this.injectPredicatesToPredicate(it, entity, isBackReferenceContext, ancestorPath, isQueryRoot))
-		}
-		if (where.or) {
-			resultWhere.or = where.or
-				.filter((it): it is Input.Where => !!it)
-				.map(it => this.injectPredicatesToPredicate(it, entity, isBackReferenceContext, ancestorPath, isQueryRoot))
-		}
-		if (where.not) {
-			resultWhere.not = this.injectPredicatesToPredicate(where.not, entity, isBackReferenceContext, ancestorPath, isQueryRoot)
-		}
-
-		const fields = Object.keys(where).filter(it => !['and', 'or', 'not'].includes(it))
-
-		for (const field of fields) {
-			resultWhere[field] = acceptFieldVisitor(this.schema, entity, field, {
-				visitColumn: () => where[field],
-				visitRelation: context => {
-					const relationWhere = where[field] as Input.OptionalWhere | null
-					if (relationWhere === null) {
-						return null
-					}
-
-					// Check if this relation is a back-reference to somewhere in our ancestor path
-					const isBackReference = this.findBackReferencedAncestor(
-						ancestorPath,
-						context.relation.name,
-						context.entity.name,
-					) !== undefined
-					const nestedIsBackReferenceContext = isBackReference || isBackReferenceContext
-					const nestedAncestorPath: readonly Model.AnyRelationContext[] = [...ancestorPath, context]
-
-					// Recursively process the nested where (always do this to handle deeper nesting)
-					const processedNestedWhere = this.injectPredicatesToPredicate(
-						relationWhere,
-						context.targetEntity,
-						nestedIsBackReferenceContext,
-						nestedAncestorPath,
-						isQueryRoot,
-					)
-
-					// Check if we should simplify the target entity's predicate
-					const shouldSimplifyNested = nestedIsBackReferenceContext
-						&& this.findBackReferencedAncestor(nestedAncestorPath, context.relation.name, context.entity.name) !== undefined
-
-					// Get target entity's predicate (simplified if back-reference)
-					const targetPredicate = shouldSimplifyNested
-						? { [context.targetEntity.primary]: { always: true } }
-						: this.predicateFactory.create(context.targetEntity, Acl.Operation.read, undefined, context, isQueryRoot)
-
-					// Optimization: avoid duplicate { id: always } when both are simplified
-					const primaryKey = context.targetEntity.primary
-					const nestedIsAlwaysTrue = Object.keys(processedNestedWhere).length === 1
-						&& (processedNestedWhere as Record<string, unknown>)[primaryKey] !== undefined
-						&& (processedNestedWhere as Record<string, Record<string, unknown>>)[primaryKey]?.always === true
-					const targetIsAlwaysTrue = Object.keys(targetPredicate).length === 1
-						&& (targetPredicate as Record<string, unknown>)[primaryKey] !== undefined
-						&& (targetPredicate as Record<string, Record<string, unknown>>)[primaryKey]?.always === true
-
-					if (nestedIsAlwaysTrue && targetIsAlwaysTrue) {
-						return processedNestedWhere
-					}
-
-					// Combine the processed nested where with target entity's predicate
-					const parts = [processedNestedWhere, targetPredicate].filter(it => Object.keys(it).length > 0)
-					if (parts.length === 0) {
-						return {}
-					}
-					if (parts.length === 1) {
-						return parts[0]
-					}
-					return { and: parts }
-				},
-			})
-		}
-
-		return resultWhere
 	}
 
 	private injectToWhere(

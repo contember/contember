@@ -19,9 +19,6 @@ export class PredicateFactory {
 	// the context resolves to) via JSON so no two distinct inputs can collide onto one entry.
 	private readonly createCache = new Map<string, Input.OptionalWhere>()
 	private readonly buildCache = new Map<string, Input.OptionalWhere>()
-	// Preserve proof provenance; an identical user-authored AST is not an evaluated ancestor witness.
-	private readonly evaluatedPredicateReplacements = new WeakSet<Input.OptionalWhere>()
-
 	constructor(
 		private readonly permissions: Acl.Permissions,
 		private readonly model: Model.Schema,
@@ -113,10 +110,6 @@ export class PredicateFactory {
 			relationPath[relationPath.length - 1],
 			relationPath.length === 0,
 		)
-	}
-
-	public isEvaluatedPredicateReplacement(where: Input.OptionalWhere): boolean {
-		return this.evaluatedPredicateReplacements.has(where)
 	}
 
 	public shouldApplyCellLevelPredicate(
@@ -277,9 +270,7 @@ export class PredicateFactory {
 			return where
 		}
 
-		const replacement: Input.OptionalWhere = { [relationContext.entity.primary]: { always: true } }
-		this.evaluatedPredicateReplacements.add(replacement)
-		const replacer = new EvaluatedPredicateReplacer(sourcePredicate, relationContext.entity, relationContext.targetRelation, replacement)
+		const replacer = new EvaluatedPredicateReplacer(sourcePredicate, relationContext.entity, relationContext.targetRelation)
 		return replacer.replace(where)
 	}
 }

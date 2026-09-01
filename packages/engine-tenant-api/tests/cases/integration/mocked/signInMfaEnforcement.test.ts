@@ -245,9 +245,9 @@ test('MFA required + per-policy grace → opens grace window, sets mfa_grace_unt
 			getAllProjectRolesByIdentitySql({ identityId }),
 			// Per-policy grace override is present → the global config is NOT read here.
 			{
-				// Grace window opened: now (12:00) + 1h.
-				sql: SQL`update "tenant"."person" set "mfa_grace_until" = ? where "id" = ?`,
-				parameters: [new Date('2019-09-04 13:00'), personId],
+				// Grace window opened on the DB clock: now() + 1h (3600s).
+				sql: SQL`update "tenant"."person" set "mfa_grace_until" = now() + make_interval(secs => ?) where "id" = ?`,
+				parameters: [3600, personId],
 				response: { rowCount: 1 },
 			},
 			getConfigSql(),
@@ -294,8 +294,9 @@ test('MFA required + no policy grace override → global config default opens th
 			// non-zero (2h), so a grace window opens instead of forcing enrollment.
 			getConfigSql({ login_mfa_grace_duration: PostgresInterval('02:00:00') }),
 			{
-				sql: SQL`update "tenant"."person" set "mfa_grace_until" = ? where "id" = ?`,
-				parameters: [new Date('2019-09-04 14:00'), personId],
+				// Grace window opened on the DB clock: now() + 2h (7200s).
+				sql: SQL`update "tenant"."person" set "mfa_grace_until" = now() + make_interval(secs => ?) where "id" = ?`,
+				parameters: [7200, personId],
 				response: { rowCount: 1 },
 			},
 			getConfigSql(),

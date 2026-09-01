@@ -74,11 +74,11 @@ class PasswordlessSignInManager {
 			// Per-email exponential backoff on outbound mails — bound the spam
 			// pressure on a real user even if attackers spray the endpoint.
 			// Reuses login_* backoff config against person_auth_log.
-			const nextAllowed = await db.queryHandler.fetch(
+			const retryAfter = await db.queryHandler.fetch(
 				new NextMailAttemptQuery(email, 'passwordless_login_init', 'passwordless_login'),
 			)
-			if (nextAllowed > new Date()) {
-				const retryAfterSeconds = Math.max(1, Math.ceil((nextAllowed.getTime() - Date.now()) / 1000))
+			if (retryAfter > 0) {
+				const retryAfterSeconds = Math.max(1, retryAfter)
 				return new ResponseError(
 					'RATE_LIMIT_EXCEEDED',
 					`Too many passwordless sign-in requests for this email. Retry after ${retryAfterSeconds}s.`,
@@ -154,7 +154,6 @@ class PasswordlessSignInManager {
 			const tokenValidationResult = validateToken({
 				entry: tokenResult,
 				token,
-				now: db.providers.now(),
 				validationType,
 			})
 			if (!tokenValidationResult.ok) {
@@ -259,7 +258,6 @@ class PasswordlessSignInManager {
 			const tokenValidationResult = validateToken({
 				entry: tokenResult,
 				token,
-				now: db.providers.now(),
 				validationType: 'token',
 			})
 			if (!tokenValidationResult.ok) {

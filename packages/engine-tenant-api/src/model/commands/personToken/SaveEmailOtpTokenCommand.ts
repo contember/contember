@@ -1,5 +1,5 @@
 import { Command } from '../Command.js'
-import { InsertBuilder } from '@contember/database'
+import { InsertBuilder, Literal } from '@contember/database'
 import { plusMinutes } from '../../utils/time.js'
 import { computeTokenHash, generateToken, TokenHash } from '../../utils/index.js'
 
@@ -20,7 +20,6 @@ export class SaveEmailOtpTokenCommand implements Command<SaveEmailOtpTokenComman
 
 	async execute({ db, providers }: Command.Args): Promise<SaveEmailOtpTokenCommand.Result> {
 		const id = providers.uuid()
-		const expiresAt = plusMinutes(providers.now(), this.expirationMinutes)
 		const tokenHash: TokenHash = computeTokenHash(await generateToken(providers))
 		const otpHash = computeTokenHash(this.code)
 		await InsertBuilder.create()
@@ -29,7 +28,8 @@ export class SaveEmailOtpTokenCommand implements Command<SaveEmailOtpTokenComman
 				id: id,
 				token_hash: tokenHash,
 				person_id: this.personId,
-				expires_at: expiresAt,
+				// expires_at on the DATABASE clock — see SavePersonTokenCommand / CLAUDE.md.
+				expires_at: new Literal('now() + make_interval(secs => ?)', [this.expirationMinutes * 60]),
 				created_at: providers.now(),
 				used_at: null,
 				type: 'mfa_email_otp',
@@ -37,7 +37,8 @@ export class SaveEmailOtpTokenCommand implements Command<SaveEmailOtpTokenComman
 			})
 			.execute(db)
 
-		return { id, expiresAt }
+		// Display-only approximation; the DB-clock `expires_at` column is authoritative.
+		return { id, expiresAt: plusMinutes(providers.now(), this.expirationMinutes) }
 	}
 }
 

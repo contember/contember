@@ -38,10 +38,10 @@ export class PasswordResetManager {
 		// Per-email exponential backoff on outbound mails — don't spam a real
 		// user with reset mails just because attackers keep poking the
 		// endpoint. Reuses login_* backoff config against person_auth_log.
-		const nextAllowed = await dbContext.queryHandler.fetch(
+		const retryAfter = await dbContext.queryHandler.fetch(
 			new NextMailAttemptQuery(person.email, 'password_reset_init', 'password_reset'),
 		)
-		if (nextAllowed > new Date()) {
+		if (retryAfter > 0) {
 			return
 		}
 

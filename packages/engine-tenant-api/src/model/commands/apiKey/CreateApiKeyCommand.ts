@@ -1,7 +1,7 @@
 import { Command } from '../Command.js'
 import { ApiKey } from '../../type/index.js'
 import { ApiKeyHelper } from './ApiKeyHelper.js'
-import { InsertBuilder } from '@contember/database'
+import { InsertBuilder, Literal } from '@contember/database'
 import { computeTokenHash, generateToken, TokenHash } from '../../utils/index.js'
 import { ApiKeyRequestInfo } from './ProlongApiKeyCommand.js'
 
@@ -18,7 +18,11 @@ interface CreateSessionApiKeyArgs {
 	 * `idleTimeout` is a Postgres interval literal (e.g. `'15 minutes'`).
 	 */
 	idleTimeout?: string | null
-	maxExpiresAt?: Date | null
+	/**
+	 * Absolute lifetime cap in seconds (A19). Written as `now() + interval` on the DB
+	 * clock so the cap is compared against the same clock. NULL = uncapped.
+	 */
+	maxExpirationSeconds?: number | null
 }
 
 interface CreatePermanentApiKeyArgs {
@@ -51,9 +55,11 @@ export class CreateApiKeyCommand implements Command<CreateApiKeyCommandResult> {
 		const args = this.args
 		const sessionPolicy = args.type === ApiKey.Type.SESSION
 			? {
-				issued_at: providers.now(),
+				issued_at: providers.now(), // display/ordering only, never compared
 				idle_timeout: args.idleTimeout ?? null,
-				max_expires_at: args.maxExpiresAt ?? null,
+				max_expires_at: args.maxExpirationSeconds != null
+					? new Literal('now() + make_interval(secs => ?)', [args.maxExpirationSeconds])
+					: null,
 			}
 			: { issued_at: null, idle_timeout: null, max_expires_at: null }
 		await InsertBuilder.create()
@@ -64,7 +70,8 @@ export class CreateApiKeyCommand implements Command<CreateApiKeyCommandResult> {
 				type: this.args.type,
 				identity_id: this.args.identityId,
 				disabled_at: null,
-				expires_at: ApiKeyHelper.getExpiration(providers, this.args.type, this.args.expiration),
+				// expires_at on the DB clock so the verify gate compares like-for-like.
+				expires_at: ApiKeyHelper.getExpirationLiteral(this.args.type, this.args.expiration),
 				expiration: this.args.expiration || null,
 				created_at: providers.now(),
 				created_ip: this.args.requestInfo?.ip || null,

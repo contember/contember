@@ -19,7 +19,7 @@ const personTokenByIdSql = (args: {
 	personId: string
 	token: string
 }) => ({
-	sql: SQL`SELECT * FROM "tenant"."person_token" WHERE "id" = ? AND "type" = ?`,
+	sql: SQL`SELECT *, "expires_at" <= now() as "is_expired" FROM "tenant"."person_token" WHERE "id" = ? AND "type" = ?`,
 	parameters: [args.requestId, 'passwordless'],
 	response: {
 		rows: [
@@ -29,6 +29,7 @@ const personTokenByIdSql = (args: {
 				person_id: args.personId,
 				created_at: now,
 				expires_at: new Date(now.getTime() + 60 * 60 * 1000),
+				is_expired: false,
 				used_at: null,
 				otp_hash: null,
 				otp_attempts: 0,

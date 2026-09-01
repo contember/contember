@@ -21,14 +21,14 @@ const RANDOM_TOKEN_HASH = sha256('0'.repeat(40))
 export const sendEmailOtpSql = (args: { personId: string; rateLimitEventId: string; tokenId: string }): ExpectedQuery[] => [
 	{
 		sql: SQL`select count(*)::text as count from "tenant"."rate_limit_event"
-		where "scope" = ? and "key_hash" = ? and "occurred_at" >= ?`,
-		// mocked hash provider stores the key verbatim; window 10min → now - 600s.
-		parameters: ['email_otp_per_person', Buffer.from(args.personId), new Date(now.getTime() - 10 * 60 * 1000)],
+		where "scope" = ? and "key_hash" = ? and occurred_at >= NOW() - make_interval(secs => ?)`,
+		// mocked hash provider stores the key verbatim; window 10min → 600s.
+		parameters: ['email_otp_per_person', Buffer.from(args.personId), 600],
 		response: { rows: [{ count: '0' }] },
 	},
 	{
-		sql: SQL`insert into "tenant"."rate_limit_event" ("id", "scope", "key_hash", "occurred_at") values (?, ?, ?, ?)`,
-		parameters: [args.rateLimitEventId, 'email_otp_per_person', Buffer.from(args.personId), now],
+		sql: SQL`insert into "tenant"."rate_limit_event" ("id", "scope", "key_hash") values (?, ?, ?)`,
+		parameters: [args.rateLimitEventId, 'email_otp_per_person', Buffer.from(args.personId)],
 		response: { rowCount: 1 },
 	},
 	{
@@ -38,12 +38,12 @@ export const sendEmailOtpSql = (args: { personId: string; rateLimitEventId: stri
 	},
 	{
 		sql:
-			SQL`INSERT INTO "tenant"."person_token" ("id", "token_hash", "person_id", "expires_at", "created_at", "used_at", "type", "otp_hash") VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+			SQL`INSERT INTO "tenant"."person_token" ("id", "token_hash", "person_id", "expires_at", "created_at", "used_at", "type", "otp_hash") VALUES (?, ?, ?, now() + make_interval(secs => ?), ?, ?, ?, ?)`,
 		parameters: [
 			args.tokenId,
 			RANDOM_TOKEN_HASH,
 			args.personId,
-			(v: any) => v instanceof Date,
+			(v: any) => typeof v === 'number', // expires_at: ttl seconds for the DB-clock now()+interval
 			now,
 			null,
 			'mfa_email_otp',
@@ -55,7 +55,8 @@ export const sendEmailOtpSql = (args: { personId: string; rateLimitEventId: stri
 
 /** Mocks the lookup of the latest unused email-OTP token for a person. */
 export const getLatestEmailOtpTokenSql = (args: { personId: string; tokenId: string | null }): ExpectedQuery => ({
-	sql: SQL`select * from "tenant"."person_token" where "person_id" = ? and "type" = ? and "used_at" is null order by "created_at" desc limit 1`,
+	sql:
+		SQL`select *, "expires_at" <= now() as "is_expired" from "tenant"."person_token" where "person_id" = ? and "type" = ? and "used_at" is null order by "created_at" desc limit 1`,
 	parameters: [args.personId, 'mfa_email_otp'],
 	response: {
 		rows: args.tokenId
@@ -66,6 +67,7 @@ export const getLatestEmailOtpTokenSql = (args: { personId: string; tokenId: str
 					token_hash: RANDOM_TOKEN_HASH,
 					used_at: null,
 					expires_at: new Date(now.getTime() + 10 * 60 * 1000),
+					is_expired: false,
 					person_id: args.personId,
 					otp_hash: EMAIL_OTP_CODE_HASH,
 					otp_attempts: 0,

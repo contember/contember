@@ -37,11 +37,10 @@ export const timingSafeCompareHash = (a: TokenHash, b: TokenHash): boolean => {
 	return crypto.timingSafeEqual(bufferA, bufferB)
 }
 
-export const validateToken = ({ entry, validationType, token, now }: {
+export const validateToken = ({ entry, validationType, token }: {
 	entry: PersonToken.Row | null
 	validationType: PersonToken.ValidationType
 	token: string
-	now: Date
 }): Response<PersonToken.Row, PersonToken.TokenValidationError> => {
 	if (!entry) {
 		return new ResponseError('TOKEN_NOT_FOUND', 'Token not found')
@@ -72,7 +71,7 @@ export const validateToken = ({ entry, validationType, token, now }: {
 	if (entry.used_at) {
 		return new ResponseError('TOKEN_USED', 'Token used at ' + entry.used_at.toISOString())
 	}
-	if (entry.expires_at < now) {
+	if (entry.is_expired) {
 		return new ResponseError('TOKEN_EXPIRED', 'Token expired at ' + entry.expires_at.toISOString())
 	}
 	return new ResponseOk(entry)

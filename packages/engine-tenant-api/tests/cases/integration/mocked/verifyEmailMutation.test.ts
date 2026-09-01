@@ -19,7 +19,7 @@ test('verifyEmail - marks the email verified and consumes the token', async () =
 		query: verifyEmailMutation({ token }),
 		executes: [
 			{
-				sql: SQL`SELECT * FROM "tenant"."person_token" WHERE "token_hash" = ? AND "type" = ?`,
+				sql: SQL`SELECT *, "expires_at" <= now() as "is_expired" FROM "tenant"."person_token" WHERE "token_hash" = ? AND "type" = ?`,
 				parameters: [anyString, 'email_verification'],
 				response: {
 					rows: [
@@ -29,6 +29,7 @@ test('verifyEmail - marks the email verified and consumes the token', async () =
 							person_id: personId,
 							created_at: now,
 							expires_at: new Date(now.getTime() + 60 * 60 * 1000),
+							is_expired: false,
 							used_at: null,
 							otp_hash: null,
 							otp_attempts: 0,
@@ -77,7 +78,7 @@ test('verifyEmail - rejects a token issued for a different e-mail address', asyn
 		query: verifyEmailMutation({ token }),
 		executes: [
 			{
-				sql: SQL`SELECT * FROM "tenant"."person_token" WHERE "token_hash" = ? AND "type" = ?`,
+				sql: SQL`SELECT *, "expires_at" <= now() as "is_expired" FROM "tenant"."person_token" WHERE "token_hash" = ? AND "type" = ?`,
 				parameters: [anyString, 'email_verification'],
 				response: {
 					rows: [
@@ -87,6 +88,7 @@ test('verifyEmail - rejects a token issued for a different e-mail address', asyn
 							person_id: personId,
 							created_at: now,
 							expires_at: new Date(now.getTime() + 60 * 60 * 1000),
+							is_expired: false,
 							used_at: null,
 							otp_hash: null,
 							otp_attempts: 0,
@@ -122,7 +124,7 @@ test('verifyEmail - token expired', async () => {
 		query: verifyEmailMutation({ token }),
 		executes: [
 			{
-				sql: SQL`SELECT * FROM "tenant"."person_token" WHERE "token_hash" = ? AND "type" = ?`,
+				sql: SQL`SELECT *, "expires_at" <= now() as "is_expired" FROM "tenant"."person_token" WHERE "token_hash" = ? AND "type" = ?`,
 				parameters: [anyString, 'email_verification'],
 				response: {
 					rows: [
@@ -133,6 +135,7 @@ test('verifyEmail - token expired', async () => {
 							created_at: now,
 							// Expired an hour before the mocked clock — no consume/verify follows.
 							expires_at: new Date(now.getTime() - 60 * 60 * 1000),
+							is_expired: true,
 							used_at: null,
 							otp_hash: null,
 							otp_attempts: 0,
@@ -165,7 +168,7 @@ test('verifyEmail - token already used', async () => {
 		query: verifyEmailMutation({ token }),
 		executes: [
 			{
-				sql: SQL`SELECT * FROM "tenant"."person_token" WHERE "token_hash" = ? AND "type" = ?`,
+				sql: SQL`SELECT *, "expires_at" <= now() as "is_expired" FROM "tenant"."person_token" WHERE "token_hash" = ? AND "type" = ?`,
 				parameters: [anyString, 'email_verification'],
 				response: {
 					rows: [
@@ -175,6 +178,7 @@ test('verifyEmail - token already used', async () => {
 							person_id: personId,
 							created_at: now,
 							expires_at: new Date(now.getTime() + 60 * 60 * 1000),
+							is_expired: false,
 							// Already consumed — a replay must not re-verify or re-consume.
 							used_at: new Date(now.getTime() - 60 * 1000),
 							otp_hash: null,
@@ -206,7 +210,7 @@ test('verifyEmail - token not found', async () => {
 		query: verifyEmailMutation({ token }),
 		executes: [
 			{
-				sql: SQL`SELECT * FROM "tenant"."person_token" WHERE "token_hash" = ? AND "type" = ?`,
+				sql: SQL`SELECT *, "expires_at" <= now() as "is_expired" FROM "tenant"."person_token" WHERE "token_hash" = ? AND "type" = ?`,
 				parameters: [anyString, 'email_verification'],
 				response: { rows: [] },
 			},

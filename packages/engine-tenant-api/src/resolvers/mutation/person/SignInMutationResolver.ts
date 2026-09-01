@@ -37,11 +37,11 @@ export class SignInMutationResolver implements MutationResolvers {
 			)
 		}
 
-		const nextAllowedSignIn = await context.db.queryHandler.fetch(new NextLoginAttemptQuery(args.email))
-		if (nextAllowedSignIn > new Date()) {
+		const retryAfterSignIn = await context.db.queryHandler.fetch(new NextLoginAttemptQuery(args.email))
+		if (retryAfterSignIn > 0) {
 			return createErrorResponse(
 				new ResponseError('RATE_LIMIT_EXCEEDED', `Too many attempts, please try again later.`, {
-					retryAfter: Math.ceil((nextAllowedSignIn.getTime() - Date.now()) / 1000),
+					retryAfter: retryAfterSignIn,
 				}),
 			)
 		}

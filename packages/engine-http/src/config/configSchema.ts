@@ -120,6 +120,8 @@ export const telemetryConfigSchema = Typesafe.partial({
 		samplerRatio: Typesafe.number,
 		// Whether a client-supplied traceparent may become the parent of the request span.
 		acceptIncoming: Typesafe.enumeration('none', 'trusted-proxies', 'all'),
+		// Whether outgoing Actions webhooks carry a traceparent header. Enabled when absent.
+		propagateToWebhooks: Typesafe.boolean,
 		traceIdResponseHeader: Typesafe.boolean,
 		maxSpansPerRequest: Typesafe.number,
 		sql: Typesafe.partial({

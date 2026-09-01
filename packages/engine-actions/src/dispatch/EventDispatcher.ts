@@ -5,6 +5,7 @@ import { Logger } from '@contember/logger'
 import { ContentSchemaResolver } from '@contember/engine-http'
 import { DatabaseContext } from '@contember/engine-system-api'
 import { VariablesManager } from '../model/VariablesManager.js'
+import { Tracer } from '@contember/telemetry'
 
 type ProcessBatchArgs = {
 	db: DatabaseContext
@@ -30,6 +31,7 @@ export class EventDispatcher {
 		private readonly eventsRepository: EventsRepository,
 		private readonly variablesManager: VariablesManager,
 		private readonly invokeResolver: TargetHandlerResolver,
+		private readonly tracer: Tracer,
 	) {
 	}
 
@@ -51,37 +53,59 @@ export class EventDispatcher {
 			}
 		}
 		const { target, events } = batch
-		try {
-			const handler = this.invokeResolver.resolveHandler(target)
-			batchLogger.debug('Processing started', {
-				events: batch.events.map(it => it.id),
-			})
-			const variables = await this.variablesManager.fetchVariables(db, project.slug)
-			const handledEvents = await handler.handle({ target, events, logger: batchLogger, variables })
-			const { succeeded, retried, failed } = await this.eventsRepository.persistProcessed(db.client, handledEvents, batchLogger)
-			batchLogger.debug('Processing done', { succeed: succeeded, failed })
-			return {
-				succeeded,
-				retried,
-				failedAfterAttempt: failed,
-				failedUnknownTarget: batch.unknownTargetFailed,
-				backoffMs: 0,
-			}
-		} catch (e) {
-			logger.error(e, { loc: 'EventDispatcher', batchId })
-			const failedEvents = events.map((it): HandledEvent => ({
-				row: it,
-				result: { ok: false, errorMessage: `Internal error` },
-			}))
-			const { succeeded, retried, failed } = await this.eventsRepository.persistProcessed(db.client, failedEvents, batchLogger)
+		return await this.tracer.span('actions.dispatch', async span => {
+			try {
+				const handler = this.invokeResolver.resolveHandler(target)
+				batchLogger.debug('Processing started', {
+					events: batch.events.map(it => it.id),
+				})
+				const variables = await this.variablesManager.fetchVariables(db, project.slug)
+				const handledEvents = await handler.handle({ target, events, logger: batchLogger, variables })
+				const { succeeded, retried, failed } = await this.eventsRepository.persistProcessed(db.client, handledEvents, batchLogger)
+				batchLogger.debug('Processing done', { succeed: succeeded, failed })
+				span.setAttributes({
+					'contember.actions.succeeded': succeeded,
+					'contember.actions.retried': retried,
+					'contember.actions.failed': failed,
+				})
+				return {
+					succeeded,
+					retried,
+					failedAfterAttempt: failed,
+					failedUnknownTarget: batch.unknownTargetFailed,
+					backoffMs: 0,
+				}
+			} catch (e) {
+				span.recordException(e)
+				span.setStatus('error', e instanceof Error ? e.message : String(e))
+				logger.error(e, { loc: 'EventDispatcher', batchId })
+				const failedEvents = events.map((it): HandledEvent => ({
+					row: it,
+					result: { ok: false, errorMessage: `Internal error` },
+				}))
+				const { succeeded, retried, failed } = await this.eventsRepository.persistProcessed(db.client, failedEvents, batchLogger)
+				span.setAttributes({
+					'contember.actions.succeeded': succeeded,
+					'contember.actions.retried': retried,
+					'contember.actions.failed': failed,
+				})
 
-			return {
-				succeeded,
-				retried,
-				failedAfterAttempt: failed,
-				failedUnknownTarget: batch.unknownTargetFailed,
-				backoffMs: 0,
+				return {
+					succeeded,
+					retried,
+					failedAfterAttempt: failed,
+					failedUnknownTarget: batch.unknownTargetFailed,
+					backoffMs: 0,
+				}
 			}
-		}
+		}, {
+			kind: 'consumer',
+			attributes: {
+				'contember.project': project.slug,
+				'contember.actions.target': target.name,
+				'contember.actions.batch_id': batchId,
+				'contember.actions.events': events.length,
+			},
+		})
 	}
 }

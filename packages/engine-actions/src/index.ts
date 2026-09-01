@@ -74,10 +74,12 @@ export default class ActionsPlugin implements Plugin {
 				.addService('actions_eventRepository', () => {
 					return new EventsRepository()
 				})
-				.addService('actions_eventDispatcher', ({ actions_eventRepository, actions_variableManager }) => {
-					const webhookTargetHandler = new WebhookTargetHandler(new WebhookFetcherNative())
+				.addService('actions_eventDispatcher', ({ actions_eventRepository, actions_variableManager, tracer, serverConfig }) => {
+					const webhookTargetHandler = new WebhookTargetHandler(new WebhookFetcherNative(), tracer, {
+						propagateToWebhooks: serverConfig.telemetry?.traces?.propagateToWebhooks ?? true,
+					})
 					const targetHandlerResolver = new TargetHandlerResolver(webhookTargetHandler)
-					return new EventDispatcher(actions_eventRepository, actions_variableManager, targetHandlerResolver)
+					return new EventDispatcher(actions_eventRepository, actions_variableManager, targetHandlerResolver, tracer)
 				})
 				.addService('actions_dispatchWorkerSupervisorFactory', ({ actions_eventDispatcher, actions_metrics }) => {
 					const projectDispatcherFactory = new ProjectDispatcherFactory(actions_eventDispatcher, actions_metrics)

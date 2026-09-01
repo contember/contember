@@ -213,6 +213,9 @@
 			"path": "./packages/schema-utils"
 		},
 		{
+			"path": "./packages/telemetry"
+		},
+		{
 			"path": "./packages/typesafe"
 		},
 		{

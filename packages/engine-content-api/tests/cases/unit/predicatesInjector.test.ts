@@ -700,27 +700,13 @@ describe('predicates injector - multi-level back-reference', () => {
 
 	it('should NOT simplify when filtering via non-ancestor relation', () => {
 		// If we query Employee directly (not through Company->Department chain)
-		// the predicate should NOT be simplified AND nested predicates should be applied
+		// the predicate should NOT be simplified — it is applied verbatim.
+		// Relation hops inside the predicate are the author's rule (as-definer semantics),
+		// so Department's/Company's own read predicates are NOT re-applied inside it.
 		const injected = injector.inject(schema.model.entities.Employee, {})
 
-		// Full predicate with nested entity predicates applied:
-		// - Employee predicate: { department: { company: { isActive: true } } }
-		// - Department predicate: { company: { isActive: true } } is added
-		// - Company predicate: { isActive: true } is added inside company traversal
 		assert.deepStrictEqual(injected, {
-			department: {
-				and: [
-					{
-						company: {
-							and: [
-								{ isActive: { eq: true } }, // from Employee predicate
-								{ isActive: { eq: true } }, // Company's own predicate
-							],
-						},
-					},
-					{ company: { isActive: { eq: true } } }, // Department's predicate
-				],
-			},
+			department: { company: { isActive: { eq: true } } },
 		})
 	})
 
@@ -864,21 +850,13 @@ describe('predicates injector - subsidiary edge case', () => {
 	it('should correctly handle predicate when Company in predicate is NOT in path', () => {
 		// Query Department directly (not through Company chain)
 		// Department's predicate: { company: { isActive: true } }
-		// Since we didn't traverse through Company, the predicate MUST be fully applied
-		// AND Company's own predicate should also be applied
+		// Since we didn't traverse through Company, the predicate MUST be fully applied —
+		// verbatim, without re-applying Company's own predicate inside it (as-definer semantics)
 
 		const injected = injector.inject(schema.model.entities.Department, {})
 
-		// Full predicate with nested Company predicate:
-		// - Department predicate: { company: { isActive: true } }
-		// - Company predicate: { isActive: true } is also added when traversing company
 		assert.deepStrictEqual(injected, {
-			company: {
-				and: [
-					{ isActive: { eq: true } }, // from Department predicate
-					{ isActive: { eq: true } }, // Company's own predicate
-				],
-			},
+			company: { isActive: { eq: true } },
 		})
 	})
 
@@ -1012,8 +990,8 @@ describe('predicates injector - SECURITY: inconsistent predicates must NOT be si
 		// Company predicate: { isActive: true } - verified when querying Company
 		// Employee predicate: { department: { company: { name: 'Acme' } } } - checks DIFFERENT field!
 		//
-		// SECURITY: The name='Acme' condition MUST be preserved (not simplified).
-		// But Department and Company predicates CAN be simplified because we came through them.
+		// SECURITY: The name='Acme' condition MUST be preserved (not simplified) —
+		// Employee itself is not a back-reference, so its predicate is applied verbatim.
 
 		const companyDepartmentsRelation = acceptFieldVisitor(schema.model, schema.model.entities.Company, 'departments', {
 			visitColumn: () => {
@@ -1032,50 +1010,20 @@ describe('predicates injector - SECURITY: inconsistent predicates must NOT be si
 
 		const injected = injector.inject(schema.model.entities.Employee, {}, departmentEmployeesRelation, ancestorPath)
 
-		// The name='Acme' condition is preserved (not simplified)
-		// Department's predicate is simplified to { id: always } (we came from Department)
-		// Company's predicate is simplified to { id: always } (we came through Company)
 		assert.deepStrictEqual(injected, {
-			department: {
-				and: [
-					{
-						company: {
-							and: [
-								{ name: { eq: 'Acme' } },
-								{ id: { always: true } }, // Company predicate simplified
-							],
-						},
-					},
-					{ id: { always: true } }, // Department predicate simplified
-				],
-			},
+			department: { company: { name: { eq: 'Acme' } } },
 		})
 	})
 
-	it('direct Employee query: ALL nested predicates MUST be applied (no ancestor path)', () => {
-		// Query Employee DIRECTLY (not through Company -> Department path)
-		// In this case, neither Company nor Department was verified at any parent level.
-		// So BOTH Department's and Company's predicates MUST be applied.
+	it('direct Employee query: predicate is applied verbatim (as-definer, no nested re-application)', () => {
+		// Query Employee DIRECTLY (not through Company -> Department path).
+		// The predicate is the author's rule: its relation hops are NOT additionally
+		// guarded by Department's/Company's own read predicates (as-definer semantics).
 
 		const injected = injector.inject(schema.model.entities.Employee, {})
 
-		// Employee's condition (name='Acme') is preserved
-		// Department's predicate { company: { isActive: true } } is applied
-		// Company's predicate { isActive: true } is applied inside the traversal
 		assert.deepStrictEqual(injected, {
-			department: {
-				and: [
-					{
-						company: {
-							and: [
-								{ name: { eq: 'Acme' } },
-								{ isActive: { eq: true } }, // Company predicate
-							],
-						},
-					},
-					{ company: { isActive: { eq: true } } }, // Department predicate
-				],
-			},
+			department: { company: { name: { eq: 'Acme' } } },
 		})
 	})
 

@@ -56,7 +56,34 @@ telemetry:
       delayMs: 5000
 ```
 
-The exporter endpoint may also come from the standard `OTEL_EXPORTER_OTLP_TRACES_ENDPOINT` or `OTEL_EXPORTER_OTLP_ENDPOINT` environment variables, and the service name from `OTEL_SERVICE_NAME`; explicit configuration wins. `/v1/traces` is appended to the endpoint automatically. The `console` exporter prints spans to the log instead — useful in development.
+`/v1/traces` is appended to the endpoint automatically. The `console` exporter prints spans to the log instead — useful in development.
+
+### Environment variables
+
+Everything above can be set without a config file. Each option maps to a `CONTEMBER_TELEMETRY_*` variable, and the standard OpenTelemetry variables fill the exporter-related gaps; a value in the config file wins over the environment.
+
+| Variable | Option |
+|---|---|
+| `CONTEMBER_TELEMETRY_TRACES_ENABLED` | `traces.enabled` |
+| `CONTEMBER_TELEMETRY_EXPORTER_TYPE` | `traces.exporter.type` |
+| `CONTEMBER_TELEMETRY_OTLP_ENDPOINT` | `traces.exporter.endpoint` |
+| `CONTEMBER_TELEMETRY_OTLP_TIMEOUT_MS` | `traces.exporter.timeoutMs` |
+| `CONTEMBER_TELEMETRY_SAMPLER` / `_SAMPLER_RATIO` | `traces.sampler` / `samplerRatio` |
+| `CONTEMBER_TELEMETRY_ACCEPT_INCOMING` | `traces.acceptIncoming` |
+| `CONTEMBER_TELEMETRY_PROPAGATE_TO_WEBHOOKS` | `traces.propagateToWebhooks` |
+| `CONTEMBER_TELEMETRY_TRACE_ID_RESPONSE_HEADER` | `traces.traceIdResponseHeader` |
+| `CONTEMBER_TELEMETRY_MAX_SPANS_PER_REQUEST` | `traces.maxSpansPerRequest` |
+| `CONTEMBER_TELEMETRY_SQL_ENABLED` / `_SQL_INCLUDE_QUERY_TEXT` / `_SQL_MIN_DURATION_MS` | `traces.sql.*` |
+| `OTEL_EXPORTER_OTLP_TRACES_ENDPOINT`, `OTEL_EXPORTER_OTLP_ENDPOINT` | exporter endpoint fallback |
+| `OTEL_EXPORTER_OTLP_TRACES_HEADERS`, `OTEL_EXPORTER_OTLP_HEADERS` | exporter headers fallback (`key=value,key2=value2`, values may be percent-encoded) |
+| `OTEL_SERVICE_NAME` | `resource.serviceName` fallback |
+
+The minimal env-only setup:
+
+```bash
+CONTEMBER_TELEMETRY_TRACES_ENABLED=true
+CONTEMBER_TELEMETRY_OTLP_ENDPOINT=http://collector:4318
+```
 
 ### Sampling
 

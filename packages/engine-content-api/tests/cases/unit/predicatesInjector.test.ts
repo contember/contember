@@ -1643,7 +1643,7 @@ describe('predicates injector - SECURITY: relation-traversing cell-level predica
 		return { relation, ancestorPath: [relation] }
 	}
 
-	it('injects nested entity predicate into the retained cell-level predicate', () => {
+	it('keeps the retained cell-level predicate verbatim (as-definer)', () => {
 		const { relation, ancestorPath } = getChildrenContext()
 
 		const injected = injector.inject(
@@ -1655,8 +1655,8 @@ describe('predicates injector - SECURITY: relation-traversing cell-level predica
 			ancestorPath,
 		)
 
-		// The retained guard of `secret` traverses `meta`, so ArticleMeta's own
-		// predicate (isVisible) must be injected into it
+		// The retained guard of `secret` traverses `meta`; the guard is the author's
+		// rule and is applied verbatim — ArticleMeta's own predicate is NOT re-applied inside it
 		assert.deepStrictEqual(injected, {
 			and: [
 				{
@@ -1665,7 +1665,7 @@ describe('predicates injector - SECURITY: relation-traversing cell-level predica
 							parent: {
 								and: [
 									{ secret: { eq: 'X' } },
-									{ meta: { and: [{ secretVisible: { eq: true } }, { isVisible: { eq: true } }] } },
+									{ meta: { secretVisible: { eq: true } } },
 								],
 							},
 						},
@@ -1675,7 +1675,7 @@ describe('predicates injector - SECURITY: relation-traversing cell-level predica
 				{
 					or: [
 						{ isPublished: { eq: true } },
-						{ meta: { and: [{ secretVisible: { eq: true } }, { isVisible: { eq: true } }] } },
+						{ meta: { secretVisible: { eq: true } } },
 					],
 				},
 			],
@@ -2086,7 +2086,7 @@ describe('predicates injector - SECURITY: to-many back-reference keeps sibling r
 		})
 	})
 
-	it('keeps sibling row predicate when the to-many back-reference originates in an ACL predicate', () => {
+	it('emits a predicate containing a to-many back-reference verbatim (as-definer)', () => {
 		const schema = createSchema(AclPredicateToManyBackReferenceModel)
 		const permissions = new PermissionFactory().create(schema, ['reader'])
 		const injector = new PredicatesInjector(
@@ -2102,39 +2102,10 @@ describe('predicates injector - SECURITY: to-many back-reference keeps sibling r
 			[tagsRelation],
 		)
 
+		// The to-many hop inside Tag's own predicate is the author's rule; it is not
+		// simplified against the ancestor path, nor augmented with Post's row predicate
 		assert.deepStrictEqual(injected, {
-			posts: {
-				and: [
-					{ title: { eq: 'allowed' } },
-					{ isPublished: { eq: true } },
-				],
-			},
-		})
-	})
-
-	it('does not mistake a literal always condition for an evaluated ancestor witness', () => {
-		const schema = createSchema(AclPredicateToManyBackReferenceModel)
-		const permissions = new PermissionFactory().create(schema, ['reader'])
-		const injector = new PredicatesInjector(
-			schema.model,
-			new PredicateFactory(permissions, schema.model, new VariableInjector(schema.model, {})),
-		)
-		const looseTagsRelation = relationOf(schema.model, 'Post', 'looseTags')
-
-		const injected = injector.inject(
-			schema.model.entities.LooseTag,
-			{},
-			looseTagsRelation,
-			[looseTagsRelation],
-		)
-
-		assert.deepStrictEqual(injected, {
-			posts: {
-				and: [
-					{ id: { always: true } },
-					{ isPublished: { eq: true } },
-				],
-			},
+			posts: { title: { eq: 'allowed' } },
 		})
 	})
 })

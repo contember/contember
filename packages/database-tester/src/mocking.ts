@@ -63,13 +63,10 @@ ${expected.sql}`
 				}
 			}
 		}
-		evm.fire(EventManager.Event.queryStart, { sql: expected.sql, parameters: expected.parameters ?? [], meta })
+		const query = { sql: expected.sql, parameters: expected.parameters ?? [], meta }
+		evm.fire(EventManager.Event.queryStart, query)
 		await new Promise(resolve => setTimeout(resolve, 1))
-		evm.fire(EventManager.Event.queryEnd, {
-			sql: expected.sql,
-			parameters: expected.parameters ?? [],
-			meta,
-		}, {} as any)
+		evm.fire(EventManager.Event.queryEnd, query, {} as any)
 
 		return expected.response as any
 	}

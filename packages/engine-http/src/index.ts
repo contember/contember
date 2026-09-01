@@ -28,6 +28,7 @@ export * from './testing/index.js'
 export * from './utils/serverStartup.js'
 export * from './utils/serverTermination.js'
 export * from './utils/sentry.js'
+export * from './telemetry/index.js'
 export * from './MasterContainer.js'
 export { serverConfigSchema } from './config/configSchema.js'
 

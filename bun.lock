@@ -320,6 +320,7 @@
         "@contember/schema": "workspace:*",
         "@contember/schema-migrations": "workspace:*",
         "@contember/schema-utils": "workspace:*",
+        "@contember/telemetry": "workspace:*",
         "@contember/typesafe": "workspace:*",
         "@graphql-tools/merge": "catalog:",
         "@graphql-tools/schema": "catalog:",

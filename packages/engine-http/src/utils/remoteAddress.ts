@@ -21,7 +21,7 @@ function isPrivate(ip: string): boolean {
 		|| r === 'linkLocal' // IPv6 fe80::/10
 }
 
-function isInCIDR(ip: string, cidrs: string[]): boolean {
+export function isInCIDR(ip: string, cidrs: readonly string[]): boolean {
 	if (!cidrs || cidrs.length === 0) {
 		return false
 	}

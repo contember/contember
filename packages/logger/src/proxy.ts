@@ -62,3 +62,5 @@ export const getLogger = (): Logger => {
 	}
 	return logger
 }
+
+export const tryGetLogger = (): Logger | undefined => loggerStore.getStore()

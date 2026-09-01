@@ -28,6 +28,30 @@ export type TelemetryEnv = Record<string, string | undefined>
 
 export const defaultServiceName = 'contember-engine'
 
+export const parseOtlpHeaders = (raw: string): Record<string, string> => {
+	const headers: Record<string, string> = {}
+	for (const entry of raw.split(',')) {
+		const trimmed = entry.trim()
+		if (trimmed === '') {
+			continue
+		}
+		const eq = trimmed.indexOf('=')
+		if (eq <= 0) {
+			throw new Error(`Invalid OTLP headers entry "${trimmed}", expected comma-separated key=value pairs.`)
+		}
+		headers[trimmed.slice(0, eq).trim()] = decodeURIComponent(trimmed.slice(eq + 1).trim())
+	}
+	return headers
+}
+
+export const resolveOtlpHeaders = (configured: Record<string, string> | undefined, env: TelemetryEnv): Record<string, string> => {
+	if (configured !== undefined && Object.keys(configured).length > 0) {
+		return { ...configured }
+	}
+	const raw = env.OTEL_EXPORTER_OTLP_TRACES_HEADERS || env.OTEL_EXPORTER_OTLP_HEADERS
+	return raw ? parseOtlpHeaders(raw) : {}
+}
+
 export const resolveOtlpEndpoint = (configured: string | undefined, env: TelemetryEnv): string => {
 	const endpoint = configured || env.OTEL_EXPORTER_OTLP_TRACES_ENDPOINT || env.OTEL_EXPORTER_OTLP_ENDPOINT
 	if (!endpoint) {
@@ -68,7 +92,7 @@ export const createTelemetry = (
 		: new OtlpHttpSpanExporter({
 			endpoint: resolveOtlpEndpoint(traces.exporter?.endpoint, env),
 			resource,
-			headers: { ...traces.exporter?.headers },
+			headers: resolveOtlpHeaders(traces.exporter?.headers, env),
 			timeoutMs: traces.exporter?.timeoutMs,
 		})
 	const batchProcessor = createBatchSpanProcessor({

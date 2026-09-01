@@ -6,7 +6,6 @@ export class EvaluatedPredicateReplacer {
 		private readonly evaluatedPredicate: Input.OptionalWhere,
 		private readonly sourceEntity: Model.Entity,
 		private readonly relation: Model.AnyRelation,
-		private readonly replacement: Input.OptionalWhere,
 	) {
 	}
 
@@ -18,7 +17,7 @@ export class EvaluatedPredicateReplacer {
 			} else if (key === 'and' || key === 'or') {
 				result[key] = (value as Input.Where[]).map(it => this.replace(it))
 			} else if (key === this.relation.name && this.isOptionalWhere(value)) {
-				result[key] = replaceWhere(value, this.evaluatedPredicate, this.replacement)
+				result[key] = replaceWhere(value, this.evaluatedPredicate, { [this.sourceEntity.primary]: { always: true } })
 			} else {
 				result[key] = value
 			}

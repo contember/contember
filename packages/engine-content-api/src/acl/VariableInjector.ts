@@ -2,12 +2,13 @@ import { Acl, Input, Model } from '@contember/schema'
 import { PredicateDefinitionProcessor } from '@contember/schema-utils'
 
 export class VariableInjector {
-	private injectorCache = new WeakMap<Acl.PredicateDefinition, Input.Where>()
+	private injectorCache = new WeakMap<Acl.PredicateDefinition, Map<string, Input.Where>>()
 
 	constructor(private readonly schema: Model.Schema, private readonly variables: Acl.VariablesMap) {}
 
 	public inject(entity: Model.Entity, where: Acl.PredicateDefinition): Input.Where {
-		const cacheEntry = this.injectorCache.get(where)
+		const entityCache = this.injectorCache.get(where)
+		const cacheEntry = entityCache?.get(entity.name)
 		if (cacheEntry !== undefined) {
 			return cacheEntry
 		}
@@ -27,7 +28,11 @@ export class VariableInjector {
 				return value
 			},
 		})
-		this.injectorCache.set(where, resultWhere)
+		if (entityCache) {
+			entityCache.set(entity.name, resultWhere)
+		} else {
+			this.injectorCache.set(where, new Map([[entity.name, resultWhere]]))
+		}
 		return resultWhere
 	}
 }

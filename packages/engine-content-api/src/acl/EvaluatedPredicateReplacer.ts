@@ -16,12 +16,16 @@ export class EvaluatedPredicateReplacer {
 				result['not'] = this.replace(value as Input.OptionalWhere)
 			} else if (key === 'and' || key === 'or') {
 				result[key] = (value as Input.Where[]).map(it => this.replace(it))
-			} else if (key === this.relation.name) {
-				result[key] = replaceWhere(value as Input.Where, this.evaluatedPredicate, { [this.sourceEntity.primary]: { always: true } })
+			} else if (key === this.relation.name && this.isOptionalWhere(value)) {
+				result[key] = replaceWhere(value, this.evaluatedPredicate, { [this.sourceEntity.primary]: { always: true } })
 			} else {
 				result[key] = value
 			}
 		}
 		return result
+	}
+
+	private isOptionalWhere(value: unknown): value is Input.OptionalWhere {
+		return value !== null && value !== undefined && typeof value === 'object' && !Array.isArray(value)
 	}
 }

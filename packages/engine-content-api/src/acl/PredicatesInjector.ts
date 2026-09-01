@@ -3,6 +3,19 @@ import { acceptFieldVisitor } from '@contember/schema-utils'
 import { PredicateFactory } from './PredicateFactory.js'
 
 export class PredicatesInjector {
+	/**
+	 * Back-reference simplification is only sound for to-one back-hops. A to-one round-trip
+	 * re-reaches the exact ancestor row (already verified readable), so its predicate can be dropped.
+	 * A to-many back-hop reaches the ancestor's SIBLINGS, which are NOT guaranteed readable — dropping
+	 * their row predicate would leak a value/presence oracle over unreadable rows. Fail-closed: only the
+	 * types listed here simplify; anything else keeps the full predicate.
+	 */
+	private static readonly toOneBackReferenceTypes = new Set<Model.AnyRelationContext['type']>([
+		'manyHasOne',
+		'oneHasOneOwning',
+		'oneHasOneInverse',
+	])
+
 	constructor(private readonly schema: Model.Schema, private readonly predicateFactory: PredicateFactory) {}
 
 	public inject(
@@ -13,7 +26,7 @@ export class PredicatesInjector {
 	): Input.OptionalWhere {
 		const isQueryRoot = !relationContext && (!ancestorPath || ancestorPath.length === 0)
 		const restrictedWhere = this.injectToWhere(where, entity, true, relationContext, false, ancestorPath ?? [], isQueryRoot)
-		return this.createWhere(entity, undefined, restrictedWhere, relationContext, false, ancestorPath ?? [], isQueryRoot)
+		return this.createWhere(entity, undefined, restrictedWhere, true, relationContext, false, ancestorPath ?? [], isQueryRoot)
 	}
 
 	/**
@@ -34,10 +47,23 @@ export class PredicatesInjector {
 		)
 	}
 
+	private canSimplifyBackReference(
+		ancestorPath: readonly Model.AnyRelationContext[],
+		relationContext: Model.AnyRelationContext,
+	): boolean {
+		const isBackReference = this.findBackReferencedAncestor(
+			ancestorPath,
+			relationContext.relation.name,
+			relationContext.entity.name,
+		) !== undefined
+		return isBackReference && PredicatesInjector.toOneBackReferenceTypes.has(relationContext.type)
+	}
+
 	private createWhere(
 		entity: Model.Entity,
 		fieldNames: string[] | undefined,
 		where: Input.OptionalWhere,
+		isRoot: boolean,
 		relationContext?: Model.AnyRelationContext,
 		isBackReferenceContext?: boolean,
 		ancestorPath?: readonly Model.AnyRelationContext[],
@@ -45,19 +71,37 @@ export class PredicatesInjector {
 	): Input.OptionalWhere {
 		// Simplify predicates when:
 		// 1. We're in a back-reference context (inside a filter that traverses back)
-		// 2. AND the relation we traversed to get here corresponds to a relation in our query path
-		// This ensures we only simplify when the traversed relation actually corresponds
-		// to a relation in our query path (not just any relation to the same entity type)
+		// 2. AND the back-hop is to-one — a to-many back-hop reaches unreadable siblings, so its row
+		//    predicate must be kept (see toOneBackReferenceTypes)
+		// 3. AND the relation we traversed to get here corresponds to a relation in our query path
+		//    (not just any relation to the same entity type)
 		const shouldSimplify = isBackReferenceContext === true
 			&& ancestorPath !== undefined
 			&& relationContext !== undefined
-			&& this.findBackReferencedAncestor(ancestorPath, relationContext.relation.name, relationContext.entity.name) !== undefined
+			&& this.canSimplifyBackReference(ancestorPath, relationContext)
+
+		// An entity is treated as a query root (consulting root-only permissions) only when it is both the
+		// root of this injection and `isQueryRoot`. A nested relation target is reached THROUGH a relation,
+		// so it must consult the `all` permission set (`isRoot = false`), otherwise a through-only target
+		// resolves to its restrictive root predicate (e.g. `{ primary: never }`) and the relation cannot be
+		// filtered/read at all. `isQueryRoot === undefined` (callers not tracking it) is preserved as-is.
+		const effectiveIsRoot = isRoot ? isQueryRoot : false
+
+		// The back-referenced ancestor only guarantees the row-level (primary) predicate,
+		// so only that part can be simplified away. Cell-level predicates of the fields
+		// being filtered on must still be enforced, otherwise filtering on a field with
+		// a stricter read predicate would leak its value through row presence. Whether a field
+		// is cell-level is decided against the same (effective) permission context the predicate
+		// is built from, so the two stay consistent under through-access.
+		const effectiveFieldNames = shouldSimplify
+			? (fieldNames ?? []).filter(it => this.predicateFactory.shouldApplyCellLevelPredicate(entity, Acl.Operation.read, it, effectiveIsRoot))
+			: fieldNames
 
 		let predicatesWhere: Input.OptionalWhere
-		if (shouldSimplify) {
+		if (shouldSimplify && effectiveFieldNames?.length === 0) {
 			predicatesWhere = { [entity.primary]: { always: true } }
 		} else {
-			predicatesWhere = this.predicateFactory.create(entity, Acl.Operation.read, fieldNames, relationContext, isQueryRoot)
+			predicatesWhere = this.predicateFactory.create(entity, Acl.Operation.read, effectiveFieldNames, relationContext, effectiveIsRoot)
 		}
 
 		const and = [where, predicatesWhere].filter(it => Object.keys(it).length > 0)
@@ -121,6 +165,6 @@ export class PredicatesInjector {
 			? fields
 			: fields.filter(it => this.predicateFactory.shouldApplyCellLevelPredicate(entity, Acl.Operation.read, it, isQueryRoot))
 
-		return this.createWhere(entity, fieldsForPredicate, resultWhere, relationContext, isBackReferenceContext, ancestorPath, isQueryRoot)
+		return this.createWhere(entity, fieldsForPredicate, resultWhere, isRoot, relationContext, isBackReferenceContext, ancestorPath, isQueryRoot)
 	}
 }

@@ -13,7 +13,7 @@ export class PredicatesInjector {
 	): Input.OptionalWhere {
 		const isQueryRoot = !relationContext && (!ancestorPath || ancestorPath.length === 0)
 		const restrictedWhere = this.injectToWhere(where, entity, true, relationContext, false, ancestorPath ?? [], isQueryRoot)
-		return this.createWhere(entity, undefined, restrictedWhere, relationContext, false, ancestorPath ?? [], isQueryRoot)
+		return this.createWhere(entity, undefined, restrictedWhere, true, relationContext, false, ancestorPath ?? [], isQueryRoot)
 	}
 
 	/**
@@ -38,6 +38,7 @@ export class PredicatesInjector {
 		entity: Model.Entity,
 		fieldNames: string[] | undefined,
 		where: Input.OptionalWhere,
+		isRoot: boolean,
 		relationContext?: Model.AnyRelationContext,
 		isBackReferenceContext?: boolean,
 		ancestorPath?: readonly Model.AnyRelationContext[],
@@ -53,19 +54,28 @@ export class PredicatesInjector {
 			&& relationContext !== undefined
 			&& this.findBackReferencedAncestor(ancestorPath, relationContext.relation.name, relationContext.entity.name) !== undefined
 
+		// An entity is treated as a query root (consulting root-only permissions) only when it is both the
+		// root of this injection and `isQueryRoot`. A nested relation target is reached THROUGH a relation,
+		// so it must consult the `all` permission set (`isRoot = false`), otherwise a through-only target
+		// resolves to its restrictive root predicate (e.g. `{ primary: never }`) and the relation cannot be
+		// filtered/read at all. `isQueryRoot === undefined` (callers not tracking it) is preserved as-is.
+		const effectiveIsRoot = isRoot ? isQueryRoot : false
+
 		// The back-referenced ancestor only guarantees the row-level (primary) predicate,
 		// so only that part can be simplified away. Cell-level predicates of the fields
 		// being filtered on must still be enforced, otherwise filtering on a field with
-		// a stricter read predicate would leak its value through row presence.
+		// a stricter read predicate would leak its value through row presence. Whether a field
+		// is cell-level is decided against the same (effective) permission context the predicate
+		// is built from, so the two stay consistent under through-access.
 		const effectiveFieldNames = shouldSimplify
-			? (fieldNames ?? []).filter(it => this.predicateFactory.shouldApplyCellLevelPredicate(entity, Acl.Operation.read, it, isQueryRoot))
+			? (fieldNames ?? []).filter(it => this.predicateFactory.shouldApplyCellLevelPredicate(entity, Acl.Operation.read, it, effectiveIsRoot))
 			: fieldNames
 
 		let predicatesWhere: Input.OptionalWhere
 		if (shouldSimplify && effectiveFieldNames?.length === 0) {
 			predicatesWhere = { [entity.primary]: { always: true } }
 		} else {
-			predicatesWhere = this.predicateFactory.create(entity, Acl.Operation.read, effectiveFieldNames, relationContext, isQueryRoot)
+			predicatesWhere = this.predicateFactory.create(entity, Acl.Operation.read, effectiveFieldNames, relationContext, effectiveIsRoot)
 		}
 
 		const and = [where, predicatesWhere].filter(it => Object.keys(it).length > 0)
@@ -129,6 +139,6 @@ export class PredicatesInjector {
 			? fields
 			: fields.filter(it => this.predicateFactory.shouldApplyCellLevelPredicate(entity, Acl.Operation.read, it, isQueryRoot))
 
-		return this.createWhere(entity, fieldsForPredicate, resultWhere, relationContext, isBackReferenceContext, ancestorPath, isQueryRoot)
+		return this.createWhere(entity, fieldsForPredicate, resultWhere, isRoot, relationContext, isBackReferenceContext, ancestorPath, isQueryRoot)
 	}
 }

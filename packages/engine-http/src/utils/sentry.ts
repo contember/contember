@@ -34,12 +34,17 @@ export class SentryLoggerHandler implements LoggerHandler {
 			scope.setExtra('requestId', entry.loggerAttributes.requestId)
 
 			scope.addEventProcessor(event => {
+				const traceId = entry.loggerAttributes.traceId
+				const spanId = entry.loggerAttributes.spanId
 				return {
 					...event,
 					request: {
 						url: entry.loggerAttributes.url ?? entry.ownAttributes.url,
 						data: entry.loggerAttributes[LoggerRequestBody],
 					},
+					...(typeof traceId === 'string' && typeof spanId === 'string'
+						? { contexts: { ...event.contexts, trace: { trace_id: traceId, span_id: spanId } } }
+						: {}),
 				}
 			})
 			return scope

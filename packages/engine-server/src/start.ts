@@ -4,6 +4,7 @@ import {
 	createContainer,
 	createDefaultLogger,
 	createSentryLoggerHandler,
+	createTelemetry,
 	getServerVersion,
 	isDebugMode,
 	listenOnProcessTermination,
@@ -39,6 +40,8 @@ process.on('warning', message => {
 		logger.addHandler(sentryhandler)
 	}
 
+	const telemetry = createTelemetry({ config: serverConfig.telemetry, logger, env })
+
 	const workerConfig = serverConfig.workerCount || 1
 
 	const workerCount = workerConfig === 'auto' ? os.cpus().length : Number(workerConfig)
@@ -56,11 +59,20 @@ process.on('warning', message => {
 		processType,
 		version,
 		logger,
+		tracer: telemetry.tracer,
 	})
 
 	let initializedProjects: string[] = []
 	const terminationJobs: TerminationJob[] = []
 	listenOnProcessTermination(terminationJobs, logger)
+
+	const spanProcessor = telemetry.processor
+	if (spanProcessor !== undefined) {
+		terminationJobs.push(async () => {
+			await spanProcessor.shutdown()
+			logger.info('Telemetry spans flushed')
+		})
+	}
 
 	if (cluster.isMaster) {
 		const monitoringPort = serverConfig.monitoringPort

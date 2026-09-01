@@ -1,6 +1,6 @@
 import { ConfigLoader, createObjectParametersResolver, Merger, resolveParameters } from '@contember/config-loader'
 
-import { serverConfigSchema as defaultServerConfigSchema, tenantConfigSchema } from './configSchema.js'
+import { serverConfigSchema as defaultServerConfigSchema, telemetryConfigSchema, tenantConfigSchema } from './configSchema.js'
 import { configTemplate } from './configTemplate.js'
 import { createProjectConfigResolver, ProjectConfigResolver } from './projectConfigResolver.js'
 import { createTenantConfigResolver, TenantConfigResolver } from './tenantConfigResolver.js'
@@ -9,6 +9,7 @@ import { ConfigProcessor } from './ConfigProcessor.js'
 
 export type ServerConfig = ReturnType<typeof defaultServerConfigSchema>
 export type TenantConfig = ReturnType<typeof tenantConfigSchema>
+export type TelemetryConfig = ReturnType<typeof telemetryConfigSchema>
 
 export type ConfigSource = { data: string; type: 'file' | 'json' | 'yaml' }
 

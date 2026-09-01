@@ -103,6 +103,38 @@ export const tenantConfigSchema = Typesafe.intersection(
 	}),
 )
 
+export const telemetryConfigSchema = Typesafe.partial({
+	resource: Typesafe.partial({
+		serviceName: Typesafe.string,
+		attributes: Typesafe.record(Typesafe.string, Typesafe.string),
+	}),
+	traces: Typesafe.partial({
+		enabled: Typesafe.boolean,
+		exporter: Typesafe.partial({
+			type: Typesafe.enumeration('otlp-http', 'console'),
+			endpoint: Typesafe.string,
+			headers: Typesafe.record(Typesafe.string, Typesafe.string),
+			timeoutMs: Typesafe.number,
+		}),
+		sampler: Typesafe.enumeration('always', 'never', 'ratio', 'parentRatio'),
+		samplerRatio: Typesafe.number,
+		// Whether a client-supplied traceparent may become the parent of the request span.
+		acceptIncoming: Typesafe.enumeration('none', 'trusted-proxies', 'all'),
+		traceIdResponseHeader: Typesafe.boolean,
+		maxSpansPerRequest: Typesafe.number,
+		sql: Typesafe.partial({
+			enabled: Typesafe.boolean,
+			includeQueryText: Typesafe.boolean,
+			minDurationMs: Typesafe.number,
+		}),
+		batch: Typesafe.partial({
+			maxQueueSize: Typesafe.number,
+			maxBatchSize: Typesafe.number,
+			delayMs: Typesafe.number,
+		}),
+	}),
+})
+
 export const serverConfigSchema = Typesafe.partial({
 	port: Typesafe.number,
 	http: Typesafe.partial({
@@ -194,6 +226,7 @@ export const serverConfigSchema = Typesafe.partial({
 			}),
 		}),
 	),
+	telemetry: telemetryConfigSchema,
 	projectGroup: (val: unknown, path: PropertyKey[] = []) =>
 		Typesafe.valueAt(val, ['domainMapping']) === undefined
 			? undefined

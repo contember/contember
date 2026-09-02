@@ -114,8 +114,9 @@ test('sql spans: a failed query is recorded as an error', () => {
 
 	const sqlSpan = exporter.spans[0]
 	expect(sqlSpan.name).toBe('DELETE')
-	expect(sqlSpan.status).toStrictEqual({ code: 'error', message: 'deadlock detected' })
+	expect(sqlSpan.status).toStrictEqual({ code: 'error', message: undefined })
 	expect(sqlSpan.events.map(it => it.name)).toStrictEqual(['exception'])
+	expect(sqlSpan.events[0].attributes?.['exception.message']).toBe('Database query failed')
 	expect(sqlSpan.attributes['db.contember.execution_ms']).toBeUndefined()
 })
 

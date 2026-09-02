@@ -10,7 +10,15 @@ export const neverSampler = (): Sampler => ({ shouldSample: () => false })
 export const ratioSampler = (ratio: number): Sampler => {
 	const threshold = Math.min(Math.max(ratio, 0), 1) * UINT32_RANGE
 	return {
-		shouldSample: ({ traceId }) => Number.parseInt(traceId.slice(0, 8), 16) < threshold,
+		shouldSample: ({ traceId }) => {
+			const folded = (
+				Number.parseInt(traceId.slice(0, 8), 16)
+				^ Number.parseInt(traceId.slice(8, 16), 16)
+				^ Number.parseInt(traceId.slice(16, 24), 16)
+				^ Number.parseInt(traceId.slice(24, 32), 16)
+			) >>> 0
+			return folded < threshold
+		},
 	}
 }
 

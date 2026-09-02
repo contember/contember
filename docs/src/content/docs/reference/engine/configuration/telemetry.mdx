@@ -11,11 +11,12 @@ The engine can record every API request as a distributed trace: a server span pe
 Tracing is **off by default**. The minimal configuration:
 
 ```yaml
-telemetry:
-  traces:
-    enabled: true
-    exporter:
-      endpoint: http://collector:4318
+server:
+  telemetry:
+    traces:
+      enabled: true
+      exporter:
+        endpoint: http://collector:4318
 ```
 
 ## What gets traced
@@ -29,31 +30,32 @@ telemetry:
 ## Full configuration
 
 ```yaml
-telemetry:
-  resource:
-    serviceName: contember-engine        # or OTEL_SERVICE_NAME
-    attributes: { deployment.environment: production }
-  traces:
-    enabled: true
-    exporter:
-      type: otlp-http                    # otlp-http | console
-      endpoint: http://collector:4318    # or OTEL_EXPORTER_OTLP_TRACES_ENDPOINT / OTEL_EXPORTER_OTLP_ENDPOINT
-      headers: { authorization: 'Bearer …' }
-      timeoutMs: 10000
-    sampler: parentRatio                 # always | never | ratio | parentRatio
-    samplerRatio: 1.0
-    acceptIncoming: trusted-proxies      # none | trusted-proxies | all
-    propagateToWebhooks: true
-    traceIdResponseHeader: false
-    maxSpansPerRequest: 1000
-    sql:
+server:
+  telemetry:
+    resource:
+      serviceName: contember-engine        # or OTEL_SERVICE_NAME
+      attributes: { deployment.environment: production }
+    traces:
       enabled: true
-      includeQueryText: false            # parameter values are never exported
-      minDurationMs: 0                   # drop successful SQL spans faster than this
-    batch:
-      maxQueueSize: 2048
-      maxBatchSize: 512
-      delayMs: 5000
+      exporter:
+        type: otlp-http                    # otlp-http | console
+        endpoint: http://collector:4318    # or OTEL_EXPORTER_OTLP_TRACES_ENDPOINT / OTEL_EXPORTER_OTLP_ENDPOINT
+        headers: { authorization: 'Bearer …' }
+        timeoutMs: 10000
+      sampler: parentRatio                 # always | never | ratio | parentRatio
+      samplerRatio: 1.0
+      acceptIncoming: trusted-proxies      # none | trusted-proxies | all
+      propagateToWebhooks: true
+      traceIdResponseHeader: false
+      maxSpansPerRequest: 1000
+      sql:
+        enabled: true
+        includeQueryText: false            # parameter values are never exported
+        minDurationMs: 0                   # drop successful SQL spans faster than this
+      batch:
+        maxQueueSize: 2048
+        maxBatchSize: 512
+        delayMs: 5000
 ```
 
 `/v1/traces` is appended to the endpoint automatically. The `console` exporter prints spans to the log instead — useful in development.

@@ -1,5 +1,5 @@
 import { IncomingHttpHeaders } from 'node:http'
-import { parseTraceparent, SpanContext } from '@contember/telemetry'
+import { parseTraceparent, parseTracestate, SpanContext } from '@contember/telemetry'
 import { isInCIDR } from '../utils/remoteAddress.js'
 
 export type AcceptIncomingTraceMode = 'none' | 'trusted-proxies' | 'all'
@@ -42,5 +42,6 @@ export const resolveIncomingSpanContext = (
 		return undefined
 	}
 	const tracestate = request.headers.tracestate
-	return typeof tracestate === 'string' ? { ...parsed, traceState: tracestate } : parsed
+	const traceState = typeof tracestate === 'string' ? parseTracestate(tracestate) : undefined
+	return traceState ? { ...parsed, traceState } : parsed
 }

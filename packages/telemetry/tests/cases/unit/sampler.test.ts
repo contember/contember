@@ -11,12 +11,23 @@ test('always and never samplers ignore the trace id', () => {
 	expect(neverSampler().shouldSample({ traceId, name: 'a' })).toBe(false)
 })
 
-test('ratio sampler decides from the first four trace id bytes', () => {
+test('ratio sampler decides from all four trace id words', () => {
 	const sampler = ratioSampler(0.5)
 	expect(sampler.shouldSample({ traceId: traceIdWithPrefix('00000000'), name: 'a' })).toBe(true)
 	expect(sampler.shouldSample({ traceId: traceIdWithPrefix('7fffffff'), name: 'a' })).toBe(true)
 	expect(sampler.shouldSample({ traceId: traceIdWithPrefix('80000000'), name: 'a' })).toBe(false)
 	expect(sampler.shouldSample({ traceId: traceIdWithPrefix('ffffffff'), name: 'a' })).toBe(false)
+})
+
+test('ratio sampler mixes the random suffix of timestamp-prefixed trace ids', () => {
+	const sampler = ratioSampler(0.5)
+	const words = ['68b81c00', '00000000', '00000000', '00000000']
+	expect(sampler.shouldSample({ traceId: words.join(''), name: 'base' })).toBe(true)
+	for (let index = 1; index < words.length; index++) {
+		const changed = [...words]
+		changed[index] = '80000000'
+		expect(sampler.shouldSample({ traceId: changed.join(''), name: `word-${index}` })).toBe(false)
+	}
 })
 
 test('ratio sampler is deterministic per trace id', () => {

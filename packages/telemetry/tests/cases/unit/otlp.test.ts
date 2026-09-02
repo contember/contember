@@ -1,5 +1,5 @@
 import { expect, test } from 'bun:test'
-import { encodeSpan, encodeSpans, ReadableSpan, SpanKind } from '../../../src/index.js'
+import { encodeAttributes, encodeSpan, encodeSpans, ReadableSpan, SpanKind } from '../../../src/index.js'
 
 const linkedContext = { traceId: 'aaaaaaaabbbbbbbbccccccccdddddddd', spanId: '1111111122222222', traceFlags: 1 }
 
@@ -98,4 +98,29 @@ test('maps every span kind to its OTLP number', () => {
 	for (const [kind, code] of kinds) {
 		expect(encodeSpan({ ...span, kind }).kind).toBe(code)
 	}
+})
+
+test('sanitizes string data at the OTLP encoding boundary', () => {
+	const oversized = 'x'.repeat(5000)
+	expect(encodeAttributes({ value: oversized, values: [oversized] })).toEqual([
+		{ key: 'value', value: { stringValue: 'x'.repeat(4096) } },
+		{ key: 'values', value: { arrayValue: { values: [{ stringValue: 'x'.repeat(4096) }] } } },
+	])
+	const encoded = encodeSpan({
+		...span,
+		events: [{
+			name: 'exception',
+			timeUnixNano: 1n,
+			attributes: {
+				'exception.message': 'query failed\nSELECT * FROM secrets',
+				'exception.stacktrace': 'Error: query failed\nSELECT * FROM secrets\nparameters: [password]\n    at execute (/srv/database.ts:12:3)',
+			},
+		}],
+		status: { code: 'error', message: oversized },
+	})
+	expect(encoded.events[0].attributes).toEqual([
+		{ key: 'exception.message', value: { stringValue: 'query failed' } },
+		{ key: 'exception.stacktrace', value: { stringValue: 'Error: query failed\n    at execute (/srv/database.ts:12:3)' } },
+	])
+	expect(encoded.status).toEqual({ code: 2, message: 'x'.repeat(4096) })
 })

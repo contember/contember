@@ -143,7 +143,7 @@ export class Application {
 				this.sendRawHttpResponse(socket, new HttpErrorResponse(503, 'Server is shutting down'))
 				return
 			}
-			wsRequests.push(this.handleWebsocketRequest(wss, abortController.signal, req, socket, head))
+			wsRequests.push(this.handleWebsocketRequest(wss, abortController.signal, req, socket, head).finally(() => socket.destroy()))
 		})
 		await new Promise<void>(resolve => {
 			server.listen(this.serverConfig.port, () => resolve())
@@ -182,7 +182,6 @@ export class Application {
 		socket: stream.Duplex,
 		head: Buffer,
 	): Promise<void> {
-		let webSocketContext: WebSocketContext | null = null
 		let requestLogger = this.logger
 		const { timer, send: sendTimer } = this.createTimer()
 		const clientIp = getClientIP(req, this.trustedProxies)
@@ -192,81 +191,97 @@ export class Application {
 			if (!matchedRequest) {
 				throw new HttpErrorResponse(404, 'Route not found')
 			}
-			requestLogger = this.createRequestLogger(req, undefined, matchedRequest.module, clientIp)
-
-			const groupContainer = await this.projectGroupResolver.resolveContainer({ request: req })
-
-			requestLogger = requestLogger.child({
-				projectGroup: groupContainer.slug,
-			})
-
-			const authResult = await groupContainer.authenticator.authenticate({ request: req, timer, clientIp })
-			requestLogger.debug('User authenticated', { authResult })
-			requestLogger = requestLogger.child({
-				user: authResult?.identityId,
-			})
-
-			const effectiveClientIp = authResult?.clientIp ?? clientIp
-
-			if (abortSignal.aborted) {
-				throw new HttpErrorResponse(503, 'Server is shutting down')
-			}
-			const ws = await new Promise<WebSocket>(resolve =>
-				wss.handleUpgrade(req, socket, head, (ws, request) => {
-					resolve(ws)
-				})
-			)
-			const wsEstablished = performance.now()
-			ws.on('error', e => {
-				requestLogger.error(e, {
-					websocketOpenMs: performance.now() - wsEstablished,
-				})
-			})
-			if (abortSignal.aborted) {
-				await this.closeWebsocket(ws)
-				return
-			}
-			const pendingWork: Promise<void>[] = []
-			const context: WebSocketContext = {
-				ws,
-				abortSignal,
-				logger: requestLogger,
-				timer,
-				tracer: this.tracer,
-				url,
-				request: req,
-				clientIp: effectiveClientIp,
-				authResult,
-				params: matchedRequest.params,
-				projectGroup: groupContainer,
-				waitUntil: promise => pendingWork.push(promise),
-			}
-			webSocketContext = context
-			await this.withIncomingTrace(req, () =>
-				this.tracer.span(`WS ${matchedRequest.mask}`, () => matchedRequest.controller(context), {
+			const established = await this.withIncomingTrace(req, async () => {
+				const span = this.tracer.startSpan(`WS ${matchedRequest.mask}`, {
 					kind: 'server',
 					attributes: {
 						'http.request.method': req.method ?? 'GET',
 						'url.path': url.pathname,
 						'contember.module': matchedRequest.module,
 					},
-				}))
-			if (abortSignal.aborted && ws.readyState === WebSocket.OPEN) {
-				ws.close(1012)
+				})
+				return await this.tracer.withSpan(span, async () => {
+					const pendingWork: Promise<void>[] = []
+					try {
+						requestLogger = this.createRequestLogger(req, undefined, matchedRequest.module, clientIp, span.context)
+						const groupContainer = await this.projectGroupResolver.resolveContainer({ request: req })
+						requestLogger = requestLogger.child({ projectGroup: groupContainer.slug })
+						span.setAttribute('contember.project_group', groupContainer.slug ?? 'unknown')
+						if (matchedRequest.params.projectSlug !== undefined) {
+							span.setAttribute('contember.project', matchedRequest.params.projectSlug)
+						}
+
+						const authResult = await groupContainer.authenticator.authenticate({ request: req, timer, clientIp })
+						requestLogger.debug('User authenticated', { authResult })
+						requestLogger = requestLogger.child({ user: authResult?.identityId })
+						if (authResult) {
+							span.setAttribute('contember.identity_id', authResult.identityId)
+						}
+
+						if (abortSignal.aborted) {
+							throw new HttpErrorResponse(503, 'Server is shutting down')
+						}
+						const ws = await new Promise<WebSocket>(resolve => wss.handleUpgrade(req, socket, head, ws => resolve(ws)))
+						const establishedAt = performance.now()
+						const closed = new Promise<void>(resolve => ws.once('close', () => resolve()))
+						ws.on('error', e => {
+							requestLogger.error(e, {
+								websocketOpenMs: performance.now() - establishedAt,
+							})
+						})
+						span.setAttribute('http.response.status_code', 101)
+						if (abortSignal.aborted) {
+							await this.closeWebsocket(ws)
+							return undefined
+						}
+						const context: WebSocketContext = {
+							ws,
+							abortSignal,
+							logger: requestLogger,
+							timer,
+							tracer: this.tracer,
+							url,
+							request: req,
+							clientIp: authResult?.clientIp ?? clientIp,
+							authResult,
+							params: matchedRequest.params,
+							projectGroup: groupContainer,
+							waitUntil: promise => pendingWork.push(promise),
+						}
+						await matchedRequest.controller(context)
+						if (abortSignal.aborted && ws.readyState === WebSocket.OPEN) {
+							ws.close(1012)
+						}
+						return { closed, pendingWork, establishedAt }
+					} catch (error) {
+						const response = error instanceof HttpResponse ? error : new HttpErrorResponse(500, 'Internal server error')
+						span.setAttribute('http.response.status_code', response.code)
+						if (response.code >= 500) {
+							span.setStatus('error')
+						}
+						if (!(error instanceof HttpResponse)) {
+							span.recordException(error)
+							requestLogger.error(error)
+						}
+						this.sendRawHttpResponse(socket, response)
+						requestLogger.debug('Websocket connection failed')
+						return undefined
+					} finally {
+						span.end()
+					}
+				})
+			})
+			if (established === undefined) {
+				return
 			}
+			const { closed, pendingWork, establishedAt } = established
 			requestLogger.debug('Websocket connection established')
 
-			if (ws.readyState !== WebSocket.CLOSED) {
-				await new Promise<void>(resolve => {
-					ws.on('close', () => {
-						requestLogger.debug('Websocket connection closed', {
-							websocketOpenMs: performance.now() - wsEstablished,
-						})
-						resolve()
-					})
-				})
-			}
+			await closed
 			await Promise.allSettled(pendingWork)
+			requestLogger.debug('Websocket connection closed', {
+				websocketOpenMs: performance.now() - establishedAt,
+			})
 		} catch (e) {
 			if (e instanceof HttpResponse) {
 				this.sendRawHttpResponse(socket, e)
@@ -293,19 +308,44 @@ export class Application {
 			}
 			return await this.processHttpRequest(ctx, null)
 		}
-		return await this.withIncomingTrace(ctx.req, () =>
-			this.tracer.span(
-				`HTTP ${ctx.request.method} ${matchedRequest.mask}`,
-				span => this.processHttpRequest(ctx, matchedRequest, span),
-				{
-					kind: 'server',
-					attributes: {
-						'http.request.method': ctx.request.method,
-						'url.path': ctx.request.URL.pathname,
-						'contember.module': matchedRequest.module,
-					},
+		return await this.withIncomingTrace(ctx.req, async () => {
+			const span = this.tracer.startSpan(`HTTP ${ctx.request.method} ${matchedRequest.mask}`, {
+				kind: 'server',
+				attributes: {
+					'http.request.method': ctx.request.method,
+					'url.path': ctx.request.URL.pathname,
+					'contember.module': matchedRequest.module,
 				},
-			))
+			})
+			if (span.context.traceId === INVALID_TRACE_ID) {
+				return await this.processHttpRequest(ctx, matchedRequest, span)
+			}
+			const endSpan = () => {
+				ctx.res.off('finish', endSpan)
+				ctx.res.off('close', closeSpan)
+				span.end()
+			}
+			const closeSpan = () => {
+				if (!ctx.res.writableFinished) {
+					span.setStatus('error', 'Response closed before completion')
+				}
+				endSpan()
+			}
+			ctx.res.once('finish', endSpan)
+			ctx.res.once('close', closeSpan)
+			try {
+				return await this.tracer.withSpan(span, () => this.processHttpRequest(ctx, matchedRequest, span))
+			} catch (error) {
+				span.recordException(error)
+				span.setStatus('error')
+				endSpan()
+				throw error
+			} finally {
+				if (ctx.res.writableFinished) {
+					endSpan()
+				}
+			}
+		})
 	}
 
 	private async processHttpRequest(
@@ -379,14 +419,21 @@ export class Application {
 			} else {
 				this.sendHttpResponse(ctx, new HttpErrorResponse(500, 'Internal server error'))
 				span?.recordException(e)
-				span?.setStatus('error', e instanceof Error ? e.message : String(e))
+				span?.setStatus('error')
 				requestLogger.error(e)
 			}
 		} finally {
+			const responseStatus = ctx.status
+			if (responseStatus >= 500) {
+				span?.setStatus('error')
+			}
 			this.maybeForceHttpOk(ctx, matchedRequest?.module)
 			const requestDebugMode = (httpContext as HttpContext | null)?.requestDebugMode ?? false
 			span?.setAttribute('http.response.status_code', ctx.status)
 			this.sendTraceIdHeader(ctx, span, requestDebugMode)
+			if (span !== undefined && span.context.traceId !== INVALID_TRACE_ID && ctx.response.body instanceof Readable) {
+				ctx.body = createTracedReadable(ctx.response.body, this.tracer, span)
+			}
 			sendTimer({
 				req: ctx.req,
 				response: ctx.res,
@@ -612,6 +659,27 @@ export const createEventTimer = (tracer: Tracer, times: EventTime[], globalStart
 		})()
 	}
 	return res
+}
+
+const createTracedReadable = (body: Readable, tracer: Tracer, span: Span): Readable => {
+	const iterator = body[Symbol.asyncIterator]()
+	return Readable.from((async function*() {
+		let completed = false
+		try {
+			while (true) {
+				const next = await tracer.withSpan(span, () => iterator.next())
+				if (next.done) {
+					completed = true
+					return
+				}
+				yield next.value
+			}
+		} finally {
+			if (!completed && iterator.return !== undefined) {
+				await tracer.withSpan(span, () => iterator.return?.())
+			}
+		}
+	})())
 }
 
 /** @deprecated use `tracer` from the request context instead */

@@ -57,6 +57,14 @@ test('telemetry: non-boolean enabled is rejected', () => {
 	expect(() => serverConfigSchema({ telemetry: { traces: { enabled: 'yes' } } })).toThrow()
 })
 
+test('telemetry: batch settings must be positive integers', () => {
+	for (const field of ['maxQueueSize', 'maxBatchSize', 'delayMs']) {
+		for (const value of [0, -1, 1.5]) {
+			expect(() => serverConfigSchema({ telemetry: { traces: { batch: { [field]: value } } } })).toThrow()
+		}
+	}
+})
+
 test('otlp endpoint: explicit config wins over both env variables', () => {
 	expect(resolveOtlpEndpoint('http://configured:4318', {
 		OTEL_EXPORTER_OTLP_TRACES_ENDPOINT: 'http://traces:4318',
@@ -148,8 +156,16 @@ test('otlp headers: parses comma-separated key=value pairs with encoding and spa
 	})
 })
 
-test('otlp headers: malformed entry is rejected', () => {
-	expect(() => parseOtlpHeaders('no-equals-sign')).toThrow()
+test('otlp headers: malformed entry is rejected without exposing it', () => {
+	const secret = 'secret-token-without-equals-sign'
+	let error: unknown
+	try {
+		parseOtlpHeaders(secret)
+	} catch (caught) {
+		error = caught
+	}
+	expect(error).toBeInstanceOf(Error)
+	expect(error instanceof Error ? error.message : '').not.toContain(secret)
 })
 
 test('otlp headers: configured headers win over both env variables', () => {

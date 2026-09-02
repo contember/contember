@@ -58,8 +58,8 @@ export const createSqlSpansRegistrar = (tracer: Tracer, { includeQueryText }: Sq
 				return
 			}
 			spans.delete(query)
-			span.recordException(error)
-			span.setStatus('error', error.message)
+			span.recordException(new Error('Database query failed'))
+			span.setStatus('error')
 			span.end()
 		}
 

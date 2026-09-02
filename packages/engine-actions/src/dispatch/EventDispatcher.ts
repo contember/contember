@@ -77,7 +77,7 @@ export class EventDispatcher {
 				}
 			} catch (e) {
 				span.recordException(e)
-				span.setStatus('error', e instanceof Error ? e.message : String(e))
+				span.setStatus('error')
 				logger.error(e, { loc: 'EventDispatcher', batchId })
 				const failedEvents = events.map((it): HandledEvent => ({
 					row: it,

@@ -51,6 +51,7 @@ export interface Span {
 export interface Tracer {
 	span<T>(name: string, cb: (span: Span) => T, options?: SpanOptions): T
 	startSpan(name: string, options?: SpanOptions & { parent?: SpanContext }): Span
+	withSpan<T>(span: Span, cb: () => T): T
 	activeSpanContext(): SpanContext | undefined
 }
 

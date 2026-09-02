@@ -123,7 +123,6 @@ export default class ActionsPlugin implements Plugin {
 						)
 						const actionsWebsocketMiddlewareFactory = new ActionsWebsocketControllerFactory(
 							debugMode,
-							actionsContextResolver,
 							actions_dispatchWorkerSupervisorFactory,
 						)
 						it.addRoute('actions', '/actions/:projectSlug', actionsMiddlewareFactory.create())

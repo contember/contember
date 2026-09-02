@@ -70,6 +70,15 @@ export class Application {
 	async listen(): Promise<RunningApplication> {
 		const koa = new Koa()
 		const wss = new WebSocketServer({ noServer: true })
+		let closing = false
+		koa.use(async (ctx, next) => {
+			if (closing) {
+				ctx.status = 503
+				ctx.set('Connection', 'close')
+				return
+			}
+			await next()
+		})
 		for (const middleware of this.middlewares) {
 			koa.use(middleware)
 		}
@@ -87,11 +96,36 @@ export class Application {
 			await this.handleHttpRequest(ctx)
 		})
 
-		const server = http.createServer(koa.callback())
+		const activeHttpRequests = new Set<Promise<void>>()
+		const handleHttpRequest = koa.callback()
+		const server = http.createServer((request, response) => {
+			if (closing) {
+				handleHttpRequest(request, response)
+				return
+			}
+			let resolveRequest = () => {}
+			const completed = new Promise<void>(resolve => {
+				resolveRequest = resolve
+			})
+			activeHttpRequests.add(completed)
+			const complete = () => {
+				response.off('finish', complete)
+				response.off('close', complete)
+				activeHttpRequests.delete(completed)
+				resolveRequest()
+			}
+			response.once('finish', complete)
+			response.once('close', complete)
+			handleHttpRequest(request, response)
+		})
 		const abortController = new AbortController()
 
 		const wsRequests: (Promise<void>)[] = []
 		server.on('upgrade', (req, socket, head) => {
+			if (closing) {
+				socket.destroy()
+				return
+			}
 			wsRequests.push(this.handleWebsocketRequest(wss, abortController.signal, req, socket, head))
 		})
 		await new Promise<void>(resolve => {
@@ -101,9 +135,19 @@ export class Application {
 		return {
 			server,
 			close: async () => {
+				closing = true
 				abortController.abort()
 				await Promise.all(wsRequests)
-				await new Promise(resolve => server.close(resolve))
+				while (activeHttpRequests.size > 0) {
+					await Promise.all(activeHttpRequests)
+				}
+				// Bun does not finish server.close() after a WebSocket upgrade unless all connections are closed first.
+				if (process.versions.bun !== undefined && wsRequests.length > 0) {
+					server.closeAllConnections()
+				}
+				if (server.listening) {
+					await new Promise<void>((resolve, reject) => server.close(error => error === undefined ? resolve() : reject(error)))
+				}
 			},
 		}
 	}
@@ -139,12 +183,22 @@ export class Application {
 				user: authResult?.identityId,
 			})
 
+			if (abortSignal.aborted) {
+				socket.destroy()
+				return
+			}
 			const ws = await new Promise<WebSocket>(resolve =>
 				wss.handleUpgrade(req, socket, head, (ws, request) => {
 					resolve(ws)
 				})
 			)
+			if (abortSignal.aborted) {
+				ws.close(1012)
+				await new Promise<void>(resolve => ws.once('close', () => resolve()))
+				return
+			}
 			const wsEstablished = performance.now()
+			const pendingWork: Promise<void>[] = []
 			webSocketContext = {
 				ws,
 				abortSignal,
@@ -156,8 +210,12 @@ export class Application {
 				authResult,
 				params: matchedRequest.params,
 				projectGroup: groupContainer,
+				waitUntil: promise => pendingWork.push(promise),
 			}
 			await matchedRequest.controller(webSocketContext)
+			if (abortSignal.aborted && ws.readyState === WebSocket.OPEN) {
+				ws.close(1012)
+			}
 			requestLogger.debug('Websocket connection established')
 			ws.on('error', e => {
 				requestLogger.error(e, {
@@ -165,14 +223,17 @@ export class Application {
 				})
 			})
 
-			return new Promise<void>(resolve => {
-				ws.on('close', () => {
-					requestLogger.debug('Websocket connection closed', {
-						websocketOpenMs: performance.now() - wsEstablished,
+			if (ws.readyState !== WebSocket.CLOSED) {
+				await new Promise<void>(resolve => {
+					ws.on('close', () => {
+						requestLogger.debug('Websocket connection closed', {
+							websocketOpenMs: performance.now() - wsEstablished,
+						})
+						resolve()
 					})
-					resolve()
 				})
-			})
+			}
+			await Promise.allSettled(pendingWork)
 		} catch (e) {
 			if (e instanceof HttpResponse) {
 				this.sendRawHttpResponse(socket, e)
@@ -461,6 +522,7 @@ export type WebSocketContext =
 	& {
 		ws: WebSocket
 		abortSignal: AbortSignal
+		waitUntil(promise: Promise<void>): void
 	}
 
 export type HttpControllerResponse = Promise<HttpErrorResponse | undefined | void> | HttpErrorResponse | undefined | void

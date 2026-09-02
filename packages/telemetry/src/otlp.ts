@@ -1,4 +1,5 @@
 import { Attributes, AttributeValue, ReadableSpan, Resource, SpanKind, SpanStatusCode } from './types.js'
+import { sanitizeAttributes, sanitizeStatusMessage } from './sanitize.js'
 
 export const SCOPE_NAME = '@contember/telemetry'
 
@@ -75,7 +76,7 @@ const encodeValue = (value: AttributeValue): OtlpValue => {
 }
 
 export const encodeAttributes = (attributes: Attributes | undefined): OtlpKeyValue[] =>
-	Object.entries(attributes ?? {}).map(([key, value]) => ({ key, value: encodeValue(value) }))
+	Object.entries(sanitizeAttributes(attributes)).map(([key, value]) => ({ key, value: encodeValue(value) }))
 
 export const encodeSpan = (span: ReadableSpan): OtlpSpan => ({
 	traceId: span.context.traceId,
@@ -101,7 +102,7 @@ export const encodeSpan = (span: ReadableSpan): OtlpSpan => ({
 	...span.status.code === 'unset' ? {} : {
 		status: {
 			code: SPAN_STATUS_CODES[span.status.code],
-			...span.status.message !== undefined ? { message: span.status.message } : {},
+			...span.status.message !== undefined ? { message: sanitizeStatusMessage(span.status.message) } : {},
 		},
 	},
 })

@@ -126,7 +126,7 @@ test('webhook: the span identifies the target by name only', async () => {
 test('webhook: a failed fetch is recorded on the span', async () => {
 	const { exporter, tracer, flush } = createRecordingTracer()
 	const { fetcher } = createFetcher(async () => {
-		throw new Error('connection refused')
+		throw new Error('Request cannot contain credentials: https://user:secret@example.com/hook')
 	})
 	const handler = new WebhookTargetHandler(fetcher, tracer, { propagateToWebhooks: true })
 
@@ -136,7 +136,24 @@ test('webhook: a failed fetch is recorded on the span', async () => {
 	expect(result.every(it => !it.result.ok)).toBe(true)
 	const span = webhookSpanOf(exporter.spans)
 	expect(span.status.code).toBe('error')
-	expect(span.status.message).toBe('connection refused')
+	expect(span.status.message).toBe('Webhook request failed')
 	expect(span.events.map(it => it.name)).toStrictEqual(['exception'])
+	expect(span.events[0].attributes?.['exception.message']).toBe('Webhook request failed')
+	expect(Object.values(span.events[0].attributes ?? {}).join('\n')).not.toContain('secret')
 	expect(span.attributes['http.response.status_code']).toBeUndefined()
+})
+
+test('webhook: a non-success response marks the span as failed', async () => {
+	const { exporter, tracer, flush } = createRecordingTracer()
+	const { fetcher } = createFetcher(async () => ({ ...okResponse, ok: false, status: 503, statusText: 'Service Unavailable' }))
+	const handler = new WebhookTargetHandler(fetcher, tracer, { propagateToWebhooks: true })
+
+	const result = await handle(handler, createTarget())
+	await flush()
+
+	expect(result.every(it => !it.result.ok)).toBe(true)
+	const span = webhookSpanOf(exporter.spans)
+	expect(span.status).toStrictEqual({ code: 'error', message: undefined })
+	expect(span.events).toStrictEqual([])
+	expect(span.attributes['http.response.status_code']).toBe(503)
 })

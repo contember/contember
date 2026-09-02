@@ -44,16 +44,28 @@ export class WebhookTargetHandler implements InvokeHandler<Actions.WebhookTarget
 		let eventResponseFactory: EventResponseFactory
 		try {
 			// The target is identified by name only: its URL and headers may carry credentials.
-			const response = await this.tracer.span('webhook', async span => {
-				const response = await this.fetch(timeoutMs ?? DEFAULT_TIMEOUT_MS, target, variables, events)
-				span.setAttribute('http.response.status_code', response.status)
-				return response
-			}, {
+			const span = this.tracer.startSpan('webhook', {
 				kind: 'client',
 				attributes: {
 					'contember.actions.target': target.name,
 					'contember.actions.events': events.length,
 				},
+			})
+			const response = await this.tracer.withSpan(span, async () => {
+				try {
+					const response = await this.fetch(timeoutMs ?? DEFAULT_TIMEOUT_MS, target, variables, events)
+					span.setAttribute('http.response.status_code', response.status)
+					if (!response.ok) {
+						span.setStatus('error')
+					}
+					return response
+				} catch (error) {
+					span.recordException(new Error('Webhook request failed'))
+					span.setStatus('error', 'Webhook request failed')
+					throw error
+				} finally {
+					span.end()
+				}
 			})
 
 			eventResponseFactory = this.createResponseFactory({

@@ -205,8 +205,12 @@ export class MasterContainerFactory {
 			})
 			.addService(
 				'projectGroupContainer',
-				({ tenantConfigResolver, projectGroupContainerFactory }) =>
-					projectGroupContainerFactory.create({ slug: undefined, config: tenantConfigResolver(undefined, {}) }),
+				({ tenantConfigResolver, projectGroupContainerFactory, projectGroupContainerTelemetryHook }) => {
+					projectGroupContainerTelemetryHook.register()
+					const container = projectGroupContainerFactory.create({ slug: undefined, config: tenantConfigResolver(undefined, {}) })
+					projectGroupContainerTelemetryHook.registerContainer(container)
+					return container
+				},
 			)
 			.addService('projectGroupResolver', ({ serverConfig, projectGroupContainerResolver }): ProjectGroupResolver => {
 				const encryptionKey = serverConfig.projectGroup?.configEncryptionKey
@@ -343,7 +347,10 @@ export class MasterContainerFactory {
 				},
 			)
 			.addService('initializer', ({ projectGroupContainer }) => new Initializer(projectGroupContainer))
-			.addService('applicationWorkers', () => new ApplicationWorkerManager())
+			.addService('applicationWorkers', ({ projectGroupContainerTelemetryHook }) => {
+				projectGroupContainerTelemetryHook.register()
+				return new ApplicationWorkerManager()
+			})
 			.setupService('executionContainerFactory', (it, { plugins }) => {
 				for (const plugin of plugins) {
 					if (plugin.getExecutionContainerHook) {

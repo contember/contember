@@ -103,6 +103,11 @@ export const tenantConfigSchema = Typesafe.intersection(
 	}),
 )
 
+const positiveInteger: Typesafe.Type<number> = (input, path = []) => {
+	const value = Typesafe.integer(input, path)
+	return value > 0 ? value : Typesafe.fail(path, 'must be a positive integer')
+}
+
 export const telemetryConfigSchema = Typesafe.partial({
 	resource: Typesafe.partial({
 		serviceName: Typesafe.string,
@@ -130,9 +135,9 @@ export const telemetryConfigSchema = Typesafe.partial({
 			minDurationMs: Typesafe.number,
 		}),
 		batch: Typesafe.partial({
-			maxQueueSize: Typesafe.number,
-			maxBatchSize: Typesafe.number,
-			delayMs: Typesafe.number,
+			maxQueueSize: positiveInteger,
+			maxBatchSize: positiveInteger,
+			delayMs: positiveInteger,
 		}),
 	}),
 })

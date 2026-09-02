@@ -23,6 +23,10 @@ test('trust gate: trusted-proxies accepts a peer inside the configured CIDRs', (
 	expect(isIncomingTraceTrusted({ mode: 'trusted-proxies', peerAddress: '::1', trustedProxies: TRUSTED_PROXIES })).toBe(true)
 })
 
+test('trust gate: trusted-proxies accepts an IPv4-mapped IPv6 peer inside an IPv4 CIDR', () => {
+	expect(isIncomingTraceTrusted({ mode: 'trusted-proxies', peerAddress: '::ffff:10.1.2.3', trustedProxies: TRUSTED_PROXIES })).toBe(true)
+})
+
 test('trust gate: trusted-proxies rejects a peer outside the configured CIDRs', () => {
 	expect(isIncomingTraceTrusted({ mode: 'trusted-proxies', peerAddress: '203.0.113.10', trustedProxies: TRUSTED_PROXIES })).toBe(false)
 })
@@ -53,6 +57,31 @@ test('incoming context: tracestate is passed through', () => {
 		trustedProxies: TRUSTED_PROXIES,
 	})
 	expect(context?.traceState).toBe('vendor=value')
+})
+
+test('incoming context: malformed tracestate is omitted without discarding a valid traceparent', () => {
+	const context = resolveIncomingSpanContext(request('10.0.0.1', { traceparent: TRACEPARENT, tracestate: 'Vendor=value' }), {
+		mode: 'trusted-proxies',
+		trustedProxies: TRUSTED_PROXIES,
+	})
+	expect(context).toStrictEqual({
+		traceId: '0af7651916cd43dd8448eb211c80319c',
+		spanId: 'b7ad6b7169203331',
+		traceFlags: 1,
+	})
+})
+
+test('incoming context: overlong tracestate is omitted without discarding a valid traceparent', () => {
+	const tracestate = `${'a'.repeat(256)}=${'x'.repeat(256)}`
+	const context = resolveIncomingSpanContext(request('10.0.0.1', { traceparent: TRACEPARENT, tracestate }), {
+		mode: 'trusted-proxies',
+		trustedProxies: TRUSTED_PROXIES,
+	})
+	expect(context).toStrictEqual({
+		traceId: '0af7651916cd43dd8448eb211c80319c',
+		spanId: 'b7ad6b7169203331',
+		traceFlags: 1,
+	})
 })
 
 test('incoming context: ignored when the peer is not trusted', () => {

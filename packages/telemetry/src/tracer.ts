@@ -3,6 +3,7 @@ import { tryGetLogger, withLogger } from '@contember/logger'
 import { generateSpanId, generateTraceId, INVALID_SPAN_ID, INVALID_TRACE_ID } from './ids.js'
 import { TRACE_FLAG_SAMPLED } from './propagation.js'
 import { parentRatioSampler } from './sampler.js'
+import { describeExceptionMessage } from './sanitize.js'
 import { NonRecordingSpan, SpanImpl } from './span.js'
 import { Sampler, Span, SpanContext, SpanOptions, SpanProcessor, Tracer } from './types.js'
 
@@ -29,6 +30,8 @@ export interface CreateTracerOptions {
 export const createTracer = (
 	{ sampler = parentRatioSampler(1), processor, maxSpansPerRecordingTrace = 1000 }: CreateTracerOptions,
 ): Tracer => {
+	const startedSpans = new WeakMap<Span, ActiveSpan>()
+
 	const create = (name: string, options: SpanOptions | undefined, parent: ActiveSpan | undefined): { span: Span; active: ActiveSpan } => {
 		const traceId = parent?.context.traceId ?? generateTraceId()
 		const spanId = generateSpanId()
@@ -55,6 +58,14 @@ export const createTracer = (
 		return { span, active: { context, budget } }
 	}
 
+	const activate = <T>(active: ActiveSpan, cb: () => T): T => {
+		const logger = tryGetLogger()
+		const run = logger === undefined
+			? cb
+			: () => withLogger(logger.child({ traceId: active.context.traceId, spanId: active.context.spanId }), cb)
+		return activeSpanStore.run(active, run)
+	}
+
 	return {
 		span: <T>(name: string, cb: (span: Span) => T, options?: SpanOptions): T => {
 			const { span, active } = create(name, options, activeSpanStore.getStore())
@@ -73,16 +84,15 @@ export const createTracer = (
 				}
 				return result
 			}
-			const logger = tryGetLogger()
-			const withFrames = logger === undefined
-				? run
-				: () => withLogger(logger.child({ traceId: active.context.traceId, spanId: active.context.spanId }), run)
-			return activeSpanStore.run(active, withFrames)
+			return activate(active, run)
 		},
 		startSpan: (name, options) => {
 			const parent = options?.parent !== undefined ? { context: options.parent } : activeSpanStore.getStore()
-			return create(name, options, parent).span
+			const created = create(name, options, parent)
+			startedSpans.set(created.span, created.active)
+			return created.span
 		},
+		withSpan: (span, cb) => activate(startedSpans.get(span) ?? { context: span.context }, cb),
 		activeSpanContext: () => activeSpanStore.getStore()?.context,
 	}
 }
@@ -92,12 +102,13 @@ const noopSpan = new NonRecordingSpan({ traceId: INVALID_TRACE_ID, spanId: INVAL
 export const noopTracer: Tracer = {
 	span: <T>(name: string, cb: (span: Span) => T): T => cb(noopSpan),
 	startSpan: () => noopSpan,
+	withSpan: <T>(span: Span, cb: () => T): T => cb(),
 	activeSpanContext: () => undefined,
 }
 
 const failSpan = (span: Span, error: unknown): void => {
 	span.recordException(error)
-	span.setStatus('error', error instanceof Error ? error.message : String(error))
+	span.setStatus('error', describeExceptionMessage(error))
 	span.end()
 }
 

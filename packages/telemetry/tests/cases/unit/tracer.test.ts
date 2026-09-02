@@ -184,6 +184,33 @@ test('startSpan uses the active span as parent', () => {
 	expect(manual.parentSpanId).toBe(root.context.spanId)
 })
 
+test('withSpan activates a manual span across await boundaries without ending it', async () => {
+	const { tracer, spans } = createTestTracer()
+	const manual = tracer.startSpan('manual')
+	await tracer.withSpan(manual, async () => {
+		await new Promise(resolve => setTimeout(resolve, 1))
+		expect(tracer.activeSpanContext()).toEqual(manual.context)
+		tracer.span('child', () => {})
+	})
+	expect(tracer.activeSpanContext()).toBeUndefined()
+	expect(spans.map(it => it.name)).toEqual(['child'])
+	manual.end()
+	const [child, recordedManual] = spans
+	expect(child.parentSpanId).toBe(recordedManual.context.spanId)
+})
+
+test('withSpan shares the manual span trace budget', () => {
+	const { tracer, spans } = createTestTracer({ maxSpansPerRecordingTrace: 2 })
+	const manual = tracer.startSpan('manual')
+	tracer.withSpan(manual, () => {
+		tracer.span('child-0', span => expect(span.isRecording).toBe(true))
+		tracer.span('child-1', span => expect(span.isRecording).toBe(false))
+	})
+	manual.end()
+	expect(spans.map(it => it.name)).toEqual(['child-0', 'manual'])
+	expect(spans[1].attributes['contember.spans_dropped']).toBe(1)
+})
+
 test('caps the number of recording spans per trace', () => {
 	const { tracer, spans } = createTestTracer({ maxSpansPerRecordingTrace: 3 })
 	tracer.span('root', () => {
@@ -222,6 +249,106 @@ test('log entries written inside a span carry the trace ids', async () => {
 	expect(inside.loggerAttributes.spanId).toBe(spans[0].context.spanId)
 })
 
+test('log entries written inside a manual span carry the trace ids', async () => {
+	const handler = new TestLoggerHandler()
+	const { tracer } = createTestTracer()
+	const manual = tracer.startSpan('manual')
+	await createLogger(handler).scope(async () => {
+		await tracer.withSpan(manual, async () => {
+			await Promise.resolve()
+			currentLogger.info('inside')
+		})
+	})
+	manual.end()
+	expect(handler.messages[0].loggerAttributes.traceId).toBe(manual.context.traceId)
+	expect(handler.messages[0].loggerAttributes.spanId).toBe(manual.context.spanId)
+})
+
+test('removes multiline exception details while retaining stack frames', () => {
+	const { tracer, spans } = createTestTracer()
+	const error = new Error('query failed\nSELECT * FROM secrets\nparameters: [password]')
+	error.stack = 'Error: query failed\nSELECT * FROM secrets\nparameters: [password]\n    at execute (/srv/database.ts:12:3)'
+	expect(() =>
+		tracer.span('query', () => {
+			throw error
+		})
+	).toThrow('query failed')
+	const exception = spans[0].events[0].attributes
+	expect(spans[0].status.message).toBe('query failed')
+	expect(exception?.['exception.message']).toBe('query failed')
+	expect(exception?.['exception.stacktrace']).toBe('Error: query failed\n    at execute (/srv/database.ts:12:3)')
+	expect(exception?.['exception.stacktrace']).not.toContain('SELECT')
+	expect(exception?.['exception.stacktrace']).not.toContain('password')
+})
+
+test('does not record query text or parameters from a database query error', () => {
+	const { tracer, spans } = createTestTracer()
+	const error = Object.assign(new Error('Database query error: invalid input token\nSQL: SELECT secret\nparameters: token'), {
+		name: 'QueryError',
+		sql: 'SELECT secret',
+		parameters: ['token'],
+		code: '22P02',
+	})
+	expect(() =>
+		tracer.span('query', () => {
+			throw error
+		})
+	).toThrow()
+	const recorded = spans[0]
+	const exception = recorded.events[0].attributes
+	expect(recorded.status.message).toBe('Database query failed')
+	expect(exception?.['exception.message']).toBe('Database query failed')
+	expect(exception?.['exception.code']).toBe('22P02')
+	expect(Object.values(exception ?? {}).join('\n')).not.toContain('SELECT secret')
+	expect(Object.values(exception ?? {}).join('\n')).not.toContain('token')
+})
+
+test('caps exported string values and exception fields', () => {
+	const { tracer, spans } = createTestTracer()
+	const oversized = 'x'.repeat(5000)
+	tracer.span('large', span => {
+		span.setAttribute('attribute', oversized)
+		span.setAttribute('array', [oversized])
+		span.addEvent('event', { value: oversized })
+		span.addLink(remoteParent('01'), { value: oversized })
+		span.setStatus('error', oversized)
+		const error = new Error(`${oversized}\nSELECT secret`)
+		error.name = oversized
+		span.recordException(error)
+	}, { attributes: { initial: oversized } })
+	const recorded = spans[0]
+	expect(recorded.attributes.initial).toBe('x'.repeat(4096))
+	expect(recorded.attributes.attribute).toBe('x'.repeat(4096))
+	expect(recorded.attributes.array).toEqual(['x'.repeat(4096)])
+	expect(recorded.events[0].attributes?.value).toBe('x'.repeat(4096))
+	expect(recorded.links[0].attributes?.value).toBe('x'.repeat(4096))
+	expect(recorded.status.message).toBe('x'.repeat(4096))
+	expect(recorded.events[1].attributes?.['exception.type']).toBe('x'.repeat(4096))
+	expect(recorded.events[1].attributes?.['exception.message']).toBe('x'.repeat(4096))
+	expect(recorded.events[1].attributes?.['exception.stacktrace']).toHaveLength(4096)
+	expect(recorded.events[1].attributes?.['exception.stacktrace']).not.toContain('SELECT')
+})
+
+test('safely records a non-Error whose string conversion throws', () => {
+	const { tracer, spans } = createTestTracer()
+	const thrown = {
+		toString: () => {
+			throw new Error('stringification failed')
+		},
+	}
+	let caught: unknown
+	try {
+		tracer.span('failure', () => {
+			throw thrown
+		})
+	} catch (error) {
+		caught = error
+	}
+	expect(caught).toBe(thrown)
+	expect(spans[0].status.message).toBe('Unknown exception')
+	expect(spans[0].events[0].attributes?.['exception.message']).toBe('Unknown exception')
+})
+
 test('works without an active logger', () => {
 	const { tracer, spans } = createTestTracer()
 	tracer.span('root', () => {})
@@ -235,5 +362,8 @@ test('noop tracer runs the callback and records nothing', () => {
 		return 'value'
 	})).toBe('value')
 	expect(noopTracer.activeSpanContext()).toBeUndefined()
-	expect(noopTracer.startSpan('manual').isRecording).toBe(false)
+	const manual = noopTracer.startSpan('manual')
+	expect(manual.isRecording).toBe(false)
+	expect(noopTracer.withSpan(manual, () => 'manual value')).toBe('manual value')
+	expect(noopTracer.activeSpanContext()).toBeUndefined()
 })

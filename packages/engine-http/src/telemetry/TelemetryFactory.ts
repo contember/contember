@@ -37,7 +37,7 @@ export const parseOtlpHeaders = (raw: string): Record<string, string> => {
 		}
 		const eq = trimmed.indexOf('=')
 		if (eq <= 0) {
-			throw new Error(`Invalid OTLP headers entry "${trimmed}", expected comma-separated key=value pairs.`)
+			throw new Error('Invalid OTLP headers, expected comma-separated key=value pairs.')
 		}
 		headers[trimmed.slice(0, eq).trim()] = decodeURIComponent(trimmed.slice(eq + 1).trim())
 	}

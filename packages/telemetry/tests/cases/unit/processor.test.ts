@@ -45,6 +45,47 @@ test('forceFlush drains a queue below the batch size', async () => {
 	expect(exporter.spans.map(it => it.name)).toEqual(['a'])
 })
 
+test('normalizes zero options so forceFlush cannot hang', async () => {
+	const exported: string[] = []
+	const exporter: SpanExporter = {
+		export: spans => {
+			if (spans.length === 0) {
+				return new Promise<void>(() => {})
+			}
+			exported.push(...spans.map(it => it.name))
+			return Promise.resolve()
+		},
+		shutdown: async () => {},
+	}
+	const processor = createBatchSpanProcessor({ exporter, maxQueueSize: 0, maxBatchSize: 0, delayMs: 0 })
+	processor.onEnd(createSpan('a'))
+	let timeout: ReturnType<typeof setTimeout> | undefined
+	try {
+		await Promise.race([
+			processor.forceFlush(),
+			new Promise<never>((_, reject) => {
+				timeout = setTimeout(() => reject(new Error('forceFlush timed out')), 1000)
+			}),
+		])
+	} finally {
+		if (timeout !== undefined) {
+			clearTimeout(timeout)
+		}
+	}
+	expect(exported).toEqual(['a'])
+	await processor.shutdown()
+})
+
+test('floors non-integer queue limits to positive integers', async () => {
+	const exporter = new TestSpanExporter()
+	const processor = createBatchSpanProcessor({ exporter, maxQueueSize: 1.9, maxBatchSize: 10.9, delayMs: 60_000.9 })
+	processor.onEnd(createSpan('a'))
+	processor.onEnd(createSpan('b'))
+	await processor.forceFlush()
+	expect(exporter.spans.map(it => it.name)).toEqual(['b'])
+	await processor.shutdown()
+})
+
 test('drops the oldest spans when the queue is full', async () => {
 	const errors: unknown[] = []
 	const exporter = new TestSpanExporter()

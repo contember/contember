@@ -39,6 +39,10 @@ export class ProjectDispatcher implements Runnable {
 
 	public async run({ logger, onError, onClose }: RunnableArgs): Promise<Running> {
 		return await new Promise<Running>(async (resolve, reject) => {
+			let resolveDispatchFinished = () => {}
+			const dispatchFinished = new Promise<void>(resolve => {
+				resolveDispatchFinished = resolve
+			})
 			let resolvePending = () => {}
 			let rejectPending = (e: any) => {}
 
@@ -54,6 +58,7 @@ export class ProjectDispatcher implements Runnable {
 			let succeedTotal = 0
 			let failedTotal = 0
 			let aborted = false
+			let endPromise: Promise<void> | undefined
 
 			try {
 				await this.db.scope(async db => {
@@ -65,14 +70,18 @@ export class ProjectDispatcher implements Runnable {
 						.run({ onError: rejectPendingRef, onClose: resolvePendingRef })
 
 					resolve({
-						end: async () => {
-							aborted = true
-							await listener.end()
-							this.metrics.dispose()
-							logger.info('Worker terminated', {
-								succeed: succeedTotal,
-								failed: failedTotal,
-							})
+						end: () => {
+							endPromise ??= (async () => {
+								aborted = true
+								resolvePendingRef()
+								await dispatchFinished
+								this.metrics.dispose()
+								logger.info('Worker terminated', {
+									succeed: succeedTotal,
+									failed: failedTotal,
+								})
+							})()
+							return endPromise
 						},
 					})
 
@@ -96,6 +105,9 @@ export class ProjectDispatcher implements Runnable {
 							if (pendingError) {
 								throw pendingError
 							}
+							if (aborted) {
+								break
+							}
 
 							// queue is empty (or next retry is in the future), wait — but never longer than
 							// MAX_IDLE_SLEEP_MS, so a lost notification self-heals and the heartbeat stays fresh.
@@ -117,13 +129,16 @@ export class ProjectDispatcher implements Runnable {
 						}
 						onClose?.()
 					} catch (e) {
-						await listener.end()
 						this.metrics.crashed()
 						onError(e)
+					} finally {
+						await listener.end()
 					}
 				})
 			} catch (e) {
 				reject(e)
+			} finally {
+				resolveDispatchFinished()
 			}
 		})
 	}

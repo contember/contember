@@ -64,11 +64,33 @@ process.on('warning', message => {
 
 	let initializedProjects: string[] = []
 	const terminationJobs: TerminationJob[] = []
-	listenOnProcessTermination(terminationJobs, logger)
+	const finalTerminationJobs: TerminationJob[] = []
+	listenOnProcessTermination(terminationJobs, logger, finalTerminationJobs)
 
 	const spanProcessor = telemetry.processor
 	if (spanProcessor !== undefined) {
 		terminationJobs.push(async () => {
+			let timer: ReturnType<typeof setTimeout> | undefined
+			let flushed = false
+			try {
+				await Promise.race([
+					spanProcessor.forceFlush().then(() => {
+						flushed = true
+					}),
+					new Promise<void>(resolve => {
+						timer = setTimeout(resolve, 5000)
+					}),
+				])
+			} finally {
+				if (timer !== undefined) {
+					clearTimeout(timer)
+				}
+			}
+			if (!flushed) {
+				logger.warn('Telemetry pre-shutdown flush timed out')
+			}
+		})
+		finalTerminationJobs.push(async () => {
 			await spanProcessor.shutdown()
 			logger.info('Telemetry spans flushed')
 		})
@@ -119,7 +141,7 @@ process.on('warning', message => {
 			},
 		})
 		terminationJobs.push(async () => {
-			;(await runningWorker).end()
+			await (await runningWorker).end()
 		})
 		await runningWorker
 		logger.info(`Contember Worker ${workerName} started.`)

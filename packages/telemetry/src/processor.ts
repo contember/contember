@@ -2,6 +2,8 @@ import { ReadableSpan, SpanExporter, SpanProcessor } from './types.js'
 
 const ERROR_REPORT_INTERVAL_MS = 60_000
 
+const normalizePositiveInteger = (value: number, fallback: number): number => Number.isFinite(value) ? Math.max(1, Math.floor(value)) : fallback
+
 export interface BatchSpanProcessorOptions {
 	exporter: SpanExporter
 	maxQueueSize?: number
@@ -11,8 +13,17 @@ export interface BatchSpanProcessorOptions {
 }
 
 export const createBatchSpanProcessor = (
-	{ exporter, maxQueueSize = 2048, maxBatchSize = 512, delayMs = 5000, onError }: BatchSpanProcessorOptions,
+	{
+		exporter,
+		maxQueueSize: configuredMaxQueueSize = 2048,
+		maxBatchSize: configuredMaxBatchSize = 512,
+		delayMs: configuredDelayMs = 5000,
+		onError,
+	}: BatchSpanProcessorOptions,
 ): SpanProcessor => {
+	const maxQueueSize = normalizePositiveInteger(configuredMaxQueueSize, 2048)
+	const maxBatchSize = normalizePositiveInteger(configuredMaxBatchSize, 512)
+	const delayMs = normalizePositiveInteger(configuredDelayMs, 5000)
 	const queue: ReadableSpan[] = []
 	let droppedSpanCount = 0
 	let exporting: Promise<void> | undefined

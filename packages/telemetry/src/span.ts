@@ -11,6 +11,7 @@ import {
 	SpanStatus,
 	SpanStatusCode,
 } from './types.js'
+import { describeException, sanitizeAttributes, sanitizeAttributeValue, sanitizeStatusMessage } from './sanitize.js'
 
 export const nowUnixNano = (): bigint => BigInt(Math.round((performance.timeOrigin + performance.now()) * 1e6))
 
@@ -33,13 +34,16 @@ export class SpanImpl implements Span {
 		private readonly onEnd: (span: ReadableSpan) => void,
 	) {
 		this.kind = options?.kind ?? 'internal'
-		this.attributes = { ...options?.attributes }
-		this.links = [...options?.links ?? []]
+		this.attributes = sanitizeAttributes(options?.attributes)
+		this.links = (options?.links ?? []).map(link => ({
+			context: link.context,
+			...link.attributes === undefined ? {} : { attributes: sanitizeAttributes(link.attributes) },
+		}))
 	}
 
 	setAttribute(key: string, value: AttributeValue): this {
 		if (this.endTimeUnixNano === undefined) {
-			this.attributes[key] = value
+			this.attributes[key] = sanitizeAttributeValue(key, value)
 		}
 		return this
 	}
@@ -53,14 +57,14 @@ export class SpanImpl implements Span {
 
 	addEvent(name: string, attributes?: Attributes): this {
 		if (this.endTimeUnixNano === undefined) {
-			this.events.push({ name, timeUnixNano: nowUnixNano(), attributes })
+			this.events.push({ name, timeUnixNano: nowUnixNano(), attributes: attributes === undefined ? undefined : sanitizeAttributes(attributes) })
 		}
 		return this
 	}
 
 	addLink(context: SpanContext, attributes?: Attributes): this {
 		if (this.endTimeUnixNano === undefined) {
-			this.links.push({ context, attributes })
+			this.links.push({ context, attributes: attributes === undefined ? undefined : sanitizeAttributes(attributes) })
 		}
 		return this
 	}
@@ -71,7 +75,7 @@ export class SpanImpl implements Span {
 
 	setStatus(code: SpanStatusCode, message?: string): this {
 		if (this.endTimeUnixNano === undefined) {
-			this.status = { code, message }
+			this.status = { code, message: message === undefined ? undefined : sanitizeStatusMessage(message) }
 		}
 		return this
 	}
@@ -130,15 +134,4 @@ export class NonRecordingSpan implements Span {
 
 	end(): void {
 	}
-}
-
-const describeException = (error: unknown): Attributes => {
-	if (!(error instanceof Error)) {
-		return { 'exception.message': String(error) }
-	}
-	const attributes: Attributes = { 'exception.type': error.name, 'exception.message': error.message }
-	if (error.stack !== undefined) {
-		attributes['exception.stacktrace'] = error.stack
-	}
-	return attributes
 }

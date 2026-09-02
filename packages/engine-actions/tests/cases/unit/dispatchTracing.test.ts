@@ -174,7 +174,7 @@ test('dispatch: a handler failure marks the span while the batch is still persis
 	expect(repository.persisted[0].every(it => !it.result.ok)).toBe(true)
 	const span = dispatchSpanOf(exporter.spans)
 	expect(span.status.code).toBe('error')
-	expect(span.status.message).toBe('handler exploded')
+	expect(span.status.message).toBeUndefined()
 	expect(span.events.map(it => it.name)).toStrictEqual(['exception'])
 	expect(span.attributes['contember.actions.retried']).toBe(2)
 })

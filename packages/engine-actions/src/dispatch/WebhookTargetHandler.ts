@@ -23,6 +23,35 @@ const ResponseType = Typesafe.noExtraProps(Typesafe.object({
 
 type EventResponseFactory = (eventRow: EventRow) => { ok: boolean; code?: number; response?: string; errorMessage?: string; durationMs?: number }
 
+class WebhookRequestError extends Error {
+	public readonly code?: string | number
+
+	constructor(error: unknown) {
+		super('Webhook request failed')
+		try {
+			if (error instanceof Error) {
+				this.name = error.name
+			}
+		} catch {
+		}
+		const seen = new Set<object>()
+		let current = error
+		while (typeof current === 'object' && current !== null && !seen.has(current)) {
+			seen.add(current)
+			try {
+				const code = 'code' in current ? current.code : undefined
+				if (typeof code === 'string' || typeof code === 'number') {
+					this.code = code
+					break
+				}
+				current = 'cause' in current ? current.cause : undefined
+			} catch {
+				break
+			}
+		}
+	}
+}
+
 export type WebhookTargetHandlerOptions = {
 	propagateToWebhooks: boolean
 }
@@ -60,7 +89,7 @@ export class WebhookTargetHandler implements InvokeHandler<Actions.WebhookTarget
 					}
 					return response
 				} catch (error) {
-					span.recordException(new Error('Webhook request failed'))
+					span.recordException(new WebhookRequestError(error))
 					span.setStatus('error', 'Webhook request failed')
 					throw error
 				} finally {

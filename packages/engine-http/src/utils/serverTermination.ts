@@ -29,7 +29,7 @@ export const listenOnProcessTermination = (jobs: TerminationJob[], logger: Logge
 	const execute = createTerminationExecutor(jobs, finalJobs)
 	for (const [signal, code] of Object.entries(signals)) {
 		process.on(signal, async () => {
-			logger.info(`Process ${process.pid} received a ${signal} signal, executing ${jobs.length} termination jobs`)
+			logger.info(`Process ${process.pid} received a ${signal} signal, executing ${jobs.length + finalJobs.length} termination jobs`)
 			await execute({ signal: signal as keyof typeof signals, code })
 			logger.info(cluster.isMaster ? `All terminated, exiting` : 'All terminated, exiting a worker')
 			process.exit(128 + code)

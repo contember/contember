@@ -369,7 +369,11 @@ export class Application {
 			span?.setAttribute('http.response.status_code', ctx.status)
 			this.sendTraceIdHeader(ctx, span, requestDebugMode)
 			if (span !== undefined && span.context.traceId !== INVALID_TRACE_ID && ctx.response.body instanceof Readable) {
+				const contentLength = ctx.response.get('Content-Length')
 				ctx.body = createTracedReadable(ctx.response.body, this.tracer, span)
+				if (contentLength !== '') {
+					ctx.set('Content-Length', contentLength)
+				}
 			}
 			sendTimer({
 				req: ctx.req,

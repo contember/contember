@@ -156,6 +156,7 @@ test('ends the HTTP root span after a streamed response finishes', async () => {
 	})
 	application.addRoute('transfer', '/stream', context => {
 		context.koa.status = 200
+		context.koa.set('Content-Length', '11')
 		context.koa.body = Readable.from((async function*() {
 			yield 'first'
 			await streamReleased
@@ -166,6 +167,7 @@ test('ends the HTTP root span after a streamed response finishes', async () => {
 	const { running, httpUrl } = await listen(application)
 	try {
 		const response = await fetch(`${httpUrl}/stream`)
+		expect(response.headers.get('content-length')).toBe('11')
 		expect(spans.some(it => it.name === 'HTTP GET /stream')).toBe(false)
 		releaseStream()
 		expect(await response.text()).toBe('firstsecond')

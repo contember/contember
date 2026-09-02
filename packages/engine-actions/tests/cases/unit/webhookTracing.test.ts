@@ -126,7 +126,9 @@ test('webhook: the span identifies the target by name only', async () => {
 test('webhook: a failed fetch is recorded on the span', async () => {
 	const { exporter, tracer, flush } = createRecordingTracer()
 	const { fetcher } = createFetcher(async () => {
-		throw new Error('Request cannot contain credentials: https://user:secret@example.com/hook')
+		throw Object.assign(new TypeError('Request cannot contain credentials: https://user:secret@example.com/hook'), {
+			cause: Object.assign(new Error('Connection failed'), { code: 'ECONNREFUSED' }),
+		})
 	})
 	const handler = new WebhookTargetHandler(fetcher, tracer, { propagateToWebhooks: true })
 
@@ -138,6 +140,8 @@ test('webhook: a failed fetch is recorded on the span', async () => {
 	expect(span.status.code).toBe('error')
 	expect(span.status.message).toBe('Webhook request failed')
 	expect(span.events.map(it => it.name)).toStrictEqual(['exception'])
+	expect(span.events[0].attributes?.['exception.type']).toBe('TypeError')
+	expect(span.events[0].attributes?.['exception.code']).toBe('ECONNREFUSED')
 	expect(span.events[0].attributes?.['exception.message']).toBe('Webhook request failed')
 	expect(Object.values(span.events[0].attributes ?? {}).join('\n')).not.toContain('secret')
 	expect(span.attributes['http.response.status_code']).toBeUndefined()

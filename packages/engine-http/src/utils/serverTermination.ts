@@ -48,7 +48,7 @@ export const listenOnProcessTermination = (
 				logger.info(`Process ${process.pid} received a SIGTERM signal, serving for another ${sigtermDelayMs} ms before terminating`)
 				await new Promise(resolve => setTimeout(resolve, sigtermDelayMs))
 			}
-			logger.info(`Process ${process.pid} received a ${signal} signal, executing ${jobs.length} termination jobs`)
+			logger.info(`Process ${process.pid} received a ${signal} signal, executing ${jobs.length + finalJobs.length} termination jobs`)
 			await execute({ signal: signal as keyof typeof signals, code })
 			logger.info(cluster.isMaster ? `All terminated, exiting` : 'All terminated, exiting a worker')
 			process.exit(128 + code)

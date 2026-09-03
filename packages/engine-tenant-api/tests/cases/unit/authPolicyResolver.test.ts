@@ -29,7 +29,8 @@ const makeDb = (queries: ExpectedQuery[]) => {
 }
 
 const POLICIES_SQL = `select *  from "tenant"."auth_policy"`
-const PROJECT_ROLES_SQL = `select "project_id", "role" from "tenant"."project_membership" where "identity_id" = ?`
+const PROJECT_ROLES_SQL =
+	`select "project_id", "role" from "tenant"."project_membership" where "identity_id" = ? and ("lease_expires_at" is null or "lease_expires_at" > now())`
 
 const policyRow = (overrides: Record<string, unknown>) => ({
 	id: 'p',

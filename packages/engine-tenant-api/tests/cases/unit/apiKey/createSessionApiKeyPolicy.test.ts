@@ -89,7 +89,8 @@ const authPoliciesQuery = (rows: PolicyRow[] = []): ExpectedQuery => ({
 })
 
 const projectRolesQuery: ExpectedQuery = {
-	sql: `select "project_id", "role" from "tenant"."project_membership" where "identity_id" = ?`,
+	sql:
+		`select "project_id", "role" from "tenant"."project_membership" where "identity_id" = ? and ("lease_expires_at" is null or "lease_expires_at" > now())`,
 	parameters: [IDENTITY_ID],
 	response: { rows: [] },
 }

@@ -1,7 +1,17 @@
 import { DatabaseQuery, DatabaseQueryable, SelectBuilder } from '@contember/database'
 import { byProjectSlug } from './ProjectSlugSpecification.js'
+import { withUnexpiredLease } from './MembershipLeaseSpecification.js'
 import { Acl } from '@contember/schema'
 
+/**
+ * The identity's memberships in a project, with their variable values — the read every access decision
+ * for that project resolves through ({@link ProjectMemberManager.getStoredProjectsMemberships}).
+ *
+ * A membership whose IdP lease has lapsed is excluded ({@link withUnexpiredLease}), so an expired grant
+ * is invisible everywhere at once: the content/system/actions APIs, the tenant authorization identity,
+ * the member listing, and the before/after snapshots the membership audits are built from. That last one
+ * is deliberate — an audit that reported a grant nobody holds would describe access that does not exist.
+ */
 class ProjectMembershipByIdentityQuery extends DatabaseQuery<ProjectMembershipByIdentityQuery.Result> {
 	constructor(private readonly project: { id: string } | { slug: string }, private readonly identityId: string[]) {
 		super()
@@ -23,7 +33,8 @@ class ProjectMembershipByIdentityQuery extends DatabaseQuery<ProjectMembershipBy
 								project_id: this.project.id,
 							})
 							: qb.match(byProjectSlug(this.project.slug))
-					))
+					)
+					.match(withUnexpiredLease()))
 			.with('variables', qb =>
 				qb
 					.select('membership_id')

@@ -56,7 +56,7 @@ query {
 				},
 				{
 					sql: `with 
-    					"memberships" as (select "project_membership"."id", "project_membership"."role", "project_membership"."identity_id"  from "tenant"."project_membership"  where "identity_id" in (?) and "project_id" = ?), 
+    					"memberships" as (select "project_membership"."id", "project_membership"."role", "project_membership"."identity_id"  from "tenant"."project_membership"  where "identity_id" in (?) and "project_id" = ? and ("lease_expires_at" is null or "lease_expires_at" > now())), 
     					"variables" as (select "membership_id", json_agg(json_build_object('name', variable, 'values', value)) as "variables"  from "tenant"."project_membership_variable" inner join  "memberships" on  "project_membership_variable"."membership_id" = "memberships"."id"   group by "membership_id") 
 						select "role", coalesce(variables, '[]'::json) as "variables", "identity_id" as "identityId"  from "memberships" left join  "variables" on  "memberships"."id" = "variables"."membership_id"`,
 					parameters: [testUuid(2), testUuid(1)],

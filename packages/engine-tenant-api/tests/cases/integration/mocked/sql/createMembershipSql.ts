@@ -30,10 +30,14 @@ export const createMembershipSql = (args: {
 			response: { rows: [{ id: args.membershipId }] },
 		}
 		: {
-			sql: SQL`INSERT INTO "tenant"."project_membership" ("id", "project_id", "identity_id", "role")
-			         VALUES (?, ?, ?, ?)
-			         ON CONFLICT ("project_id", "identity_id", "role") DO UPDATE SET "role" = ?
+			// A32: an unleased write CLEARS both columns. It is an upsert, so an operator granting a role
+			// whose lease has lapsed lands on that row; keeping the stale expiry would report success and
+			// grant nothing.
+			sql: SQL`INSERT INTO "tenant"."project_membership" ("id", "project_id", "identity_id", "role", "lease_expires_at", "identity_provider_id")
+			         VALUES (?, ?, ?, ?, ?, ?)
+			         ON CONFLICT ("project_id", "identity_id", "role")
+			         DO UPDATE SET "role" = ?, "lease_expires_at" = ?, "identity_provider_id" = ?
 			         RETURNING "id"`,
-			parameters: [args.membershipId, args.projectId, args.identityId, args.role, args.role],
+			parameters: [args.membershipId, args.projectId, args.identityId, args.role, null, null, args.role, null, null],
 			response: { rows: [{ id: args.membershipId }] },
 		}

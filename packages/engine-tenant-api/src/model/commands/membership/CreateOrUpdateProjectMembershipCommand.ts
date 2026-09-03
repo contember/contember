@@ -14,9 +14,12 @@ export class CreateOrUpdateProjectMembershipCommand implements Command<void> {
 		 * and conflict-update, so a write is at once a grant and a renewal. Only the IdP claim-mapping apply
 		 * passes it.
 		 *
-		 * Omitted (the default) leaves both columns alone rather than clearing them: every other caller —
-		 * the operator add/update-member path above all — then emits exactly the statement it emitted before
-		 * leases existed, and a membership nothing leases stays unexpiring.
+		 * Omitted (the default) CLEARS both columns, which is what makes an operator's grant mean what it
+		 * says. The write is an upsert, so an operator granting a role whose lease has already lapsed —
+		 * a row the read path hides but the unique key still holds — lands on that row; leaving the stale
+		 * expiry in place would report success and grant nothing. Taking the lease off hands the membership
+		 * to whoever wrote it last, and a mapping with `unmatched: 'remove'` still reclaims it at the next
+		 * federated sign-in.
 		 */
 		private readonly lease?: MembershipLease,
 	) {}
@@ -26,7 +29,7 @@ export class CreateOrUpdateProjectMembershipCommand implements Command<void> {
 		// `now()` is the DATABASE clock on both sides of the lease — stamped here, compared in the
 		// membership queries — so a skewed application clock can neither shorten nor extend a grant.
 		const leaseValues: QueryBuilder.Values = lease === undefined
-			? {}
+			? { lease_expires_at: null, identity_provider_id: null }
 			: {
 				lease_expires_at: expr => expr.raw('now() + ?::interval', lease.duration),
 				identity_provider_id: lease.identityProviderId,

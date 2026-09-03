@@ -202,7 +202,7 @@ test('a lease is stamped only on what the mapping grants — an operator-managed
 	})
 })
 
-test('a mapping with no lease writes no expiry and runs no sweep — sign-in is what it was before A32', async () => {
+test('a mapping with no lease grants without an expiry and runs no sweep', async () => {
 	const identityId = testUuid(2)
 	const personId = testUuid(7)
 	const idpId = testUuid(20)

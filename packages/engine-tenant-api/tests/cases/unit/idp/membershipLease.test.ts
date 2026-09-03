@@ -97,15 +97,18 @@ describe('A32 membership lease — what a grant writes', () => {
 		})
 	})
 
-	test('an unleased grant emits the statement it emitted before leases existed', async () => {
-		// The regression guard for "off by default": no lease configured must mean no lease column, not a
-		// column written as NULL — an operator-managed membership never acquires an expiry this way.
+	test('an unleased grant clears the expiry, so it cannot land dead on a lapsed row', async () => {
+		// This is an upsert on `(project_id, identity_id, role)`. An operator granting a role whose lease has
+		// lapsed — a row the read path hides but the unique key still holds — updates THAT row, so leaving
+		// the stale expiry alone would report success and grant nothing. Both columns are therefore written
+		// as NULL, not omitted, and the membership belongs to whoever wrote it last.
 		await withMockedDb([{
-			sql: SQL`INSERT INTO "tenant"."project_membership" ("id", "project_id", "identity_id", "role")
-			         VALUES (?, ?, ?, ?)
-			         ON CONFLICT ("project_id", "identity_id", "role") DO UPDATE SET "role" = ?
+			sql: SQL`INSERT INTO "tenant"."project_membership" ("id", "project_id", "identity_id", "role", "lease_expires_at", "identity_provider_id")
+			         VALUES (?, ?, ?, ?, ?, ?)
+			         ON CONFLICT ("project_id", "identity_id", "role")
+			         DO UPDATE SET "role" = ?, "lease_expires_at" = ?, "identity_provider_id" = ?
 			         RETURNING "id"`,
-			parameters: [providers.uuid(), projectId, identityId, 'editor', 'editor'],
+			parameters: [providers.uuid(), projectId, identityId, 'editor', null, null, 'editor', null, null],
 			response: { rows: [{ id: 'membership-1' }] },
 		}], async db => {
 			await db.commandBus.execute(new CreateOrUpdateProjectMembershipCommand(projectId, identityId, membership))

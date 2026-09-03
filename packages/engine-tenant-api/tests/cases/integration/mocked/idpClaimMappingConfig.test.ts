@@ -330,3 +330,78 @@ test('updateIDP runs the same claimMapping validation (rejects a merged-in grant
 		},
 	})
 })
+
+// A32 — a `membershipLease` only means something under a mapping that owns its memberships and re-runs.
+// The other two combinations are rejected here rather than quietly redefining the policy fields.
+
+test("addIDP rejects a membershipLease under unmatched: 'keep' (the default)", async () => {
+	// `keep` promises the mapping never revokes; a lease revokes whatever it stops renewing, so accepting
+	// the pair would turn `keep` into a delayed `remove`.
+	await expectInvalidConfiguration({
+		externalIdentifier: 'sub',
+		claimMapping: {
+			membershipLease: '30 days',
+			rules: [{ claim: 'department', equals: 'Editorial', grantMembership: { project: 'demo', role: 'editor' } }],
+		},
+	})
+	await expectInvalidConfiguration({
+		externalIdentifier: 'sub',
+		claimMapping: {
+			unmatched: 'keep',
+			membershipLease: '30 days',
+			rules: [{ claim: 'department', equals: 'Editorial', grantMembership: { project: 'demo', role: 'editor' } }],
+		},
+	})
+})
+
+test("addIDP rejects a membershipLease under syncPolicy: 'sticky'", async () => {
+	// a sticky mapping never re-runs, so nothing would renew the lease and every grant would self-destruct
+	await expectInvalidConfiguration({
+		externalIdentifier: 'sub',
+		claimMapping: {
+			syncPolicy: 'sticky',
+			unmatched: 'remove',
+			membershipLease: '30 days',
+			rules: [{ claim: 'department', equals: 'Editorial', grantMembership: { project: 'demo', role: 'editor' } }],
+		},
+	})
+})
+
+test('addIDP rejects a membershipLease that is not a duration', async () => {
+	for (const membershipLease of ['30', 'soon', '0 days', '30 fortnights', '30 days; drop table', '']) {
+		await expectInvalidConfiguration({
+			externalIdentifier: 'sub',
+			claimMapping: {
+				unmatched: 'remove',
+				membershipLease,
+				rules: [{ claim: 'department', equals: 'Editorial', grantMembership: { project: 'demo', role: 'editor' } }],
+			},
+		})
+	}
+})
+
+test('addIDP accepts a membershipLease with unmatched: remove (validation passes; fails later at the existence check)', async () => {
+	await executeTenantTest({
+		query: addIDP({
+			externalIdentifier: 'sub',
+			claimMapping: {
+				unmatched: 'remove',
+				membershipLease: '30 days',
+				rules: [{ claim: 'department', equals: 'Editorial', grantMembership: { project: 'demo', role: 'editor' } }],
+			},
+		}),
+		executes: [
+			...sqlTransaction(
+				{
+					sql:
+						'select "id", "slug", "type", "configuration", "disabled_at" as "disabledAt", "auto_sign_up" as "autoSignUp", "exclusive", "init_returns_config" as "initReturnsConfig", "require_verified_email" as "requireVerifiedEmail", "assume_email_verified" as "assumeEmailVerified"  from "tenant"."identity_provider"  where "slug" = ?',
+					parameters: ['oidc'],
+					response: { rows: [{ id: '123', slug: 'oidc' }] },
+				},
+			),
+		],
+		return: {
+			data: { addIDP: { ok: false, error: { code: 'ALREADY_EXISTS' } } },
+		},
+	})
+})

@@ -587,3 +587,83 @@ describe('IdpSessionRevalidator — A09 claim mapping on refresh', () => {
 		expect(executed.some(c => c instanceof CreateAuthLogEntryCommand && (c as any).data.type === 'idp_role_mapped')).toBe(false)
 	})
 })
+
+describe('IdpSessionRevalidator — A32 membership lease renewal on refresh', () => {
+	// A32's whole point is that a grant may not outlive the last time the IdP confirmed it. A long-lived
+	// session refreshes for weeks without a sign-in, so the refresh path has to renew as well — it does so
+	// through the same apply the sign-in path uses, not through anything wired up here.
+	const expiredSession = { tokens: { refresh_token: 'r' }, expiresAt: t('11:30:00') }
+	const leasedMapping = {
+		unmatched: 'remove',
+		membershipLease: '30 days',
+		rules: [{ claim: 'department', equals: 'Editorial', grantMembership: { project: 'demo', role: 'editor' } }],
+	}
+
+	const harness = (claimMapping: unknown) => {
+		const executed: any[] = []
+		const row = baseRow({
+			session: expiredSession,
+			providerConfiguration: { revalidation: { enabled: true }, claimMapping },
+		})
+		const inner: any = {
+			providers: { now: () => NOW },
+			commandBus: {
+				execute: async (command: any) => {
+					executed.push(command)
+					return command instanceof ClaimIdpRevalidationCommand ? true : undefined
+				},
+			},
+			queryHandler: {
+				fetch: async (query: any) => {
+					if (query instanceof ProjectBySlugQuery) {
+						return { id: 'proj-1', slug: 'demo', name: 'demo', config: {} }
+					}
+					if (query instanceof ProjectMembershipByIdentityQuery) {
+						return [{ role: 'editor', variables: [] }]
+					}
+					return row
+				},
+			},
+		}
+		inner.transaction = async (cb: (db: any) => Promise<unknown>) => cb(inner)
+		return { ctx: inner as unknown as DatabaseContext, executed }
+	}
+
+	const leaseOf = (executed: any[]) => (executed.find(c => c instanceof CreateOrUpdateProjectMembershipCommand) as any)?.lease
+
+	test('a refresh that re-grants the membership pushes its expiry forward and names the provider', async () => {
+		const h = harness(leasedMapping)
+		const out = await makeRevalidator(registryWith(async () => ({ status: 'valid', claims: { department: 'Editorial' }, claimsComplete: true })))
+			.revalidate(h.ctx, h.ctx, apiKeyRow)
+		expect(out).toBe('valid')
+		expect(leaseOf(h.executed)).toEqual({ duration: '30 days', identityProviderId: 'idp-1' })
+	})
+
+	test('a partial claim surface still renews what it did re-grant', async () => {
+		// `claimsComplete: false` downgrades this apply to additive-only, but the rule DID match, so the IdP
+		// has vouched for the membership just as it would at sign-in — refusing to renew here would expire
+		// people for no reason other than that their session refreshed instead of restarting.
+		const h = harness(leasedMapping)
+		const out = await makeRevalidator(registryWith(async () => ({ status: 'valid', claims: { department: 'Editorial' } })))
+			.revalidate(h.ctx, h.ctx, apiKeyRow)
+		expect(out).toBe('valid')
+		expect(leaseOf(h.executed)).toEqual({ duration: '30 days', identityProviderId: 'idp-1' })
+	})
+
+	test('a mapping with no lease renews nothing — the grant is written exactly as before A32', async () => {
+		const h = harness({ rules: leasedMapping.rules })
+		await makeRevalidator(registryWith(async () => ({ status: 'valid', claims: { department: 'Editorial' }, claimsComplete: true })))
+			.revalidate(h.ctx, h.ctx, apiKeyRow)
+		expect(h.executed.some(c => c instanceof CreateOrUpdateProjectMembershipCommand)).toBe(true)
+		expect(leaseOf(h.executed)).toBeUndefined()
+	})
+
+	test('a rule that no longer matches is not renewed, so its lease is left to lapse', async () => {
+		// The renewal follows the grant, never the vocabulary: a membership the claims no longer justify
+		// keeps whatever expiry it had, and simply runs out.
+		const h = harness(leasedMapping)
+		await makeRevalidator(registryWith(async () => ({ status: 'valid', claims: { department: 'Sales' }, claimsComplete: true })))
+			.revalidate(h.ctx, h.ctx, apiKeyRow)
+		expect(h.executed.some(c => c instanceof CreateOrUpdateProjectMembershipCommand)).toBe(false)
+	})
+})

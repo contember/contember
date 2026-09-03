@@ -28,6 +28,7 @@ import {
 	InviteManager,
 	LoginRiskAnalyzer,
 	MailTemplateManager,
+	MembershipLeaseSweeper,
 	MembershipValidator,
 	OIDCProvider,
 	OtpAuthenticator,
@@ -199,6 +200,7 @@ export class TenantContainerFactory {
 				return idpRegistry
 			})
 			.addService('idpClaimSyncService', ({ projectSchemaResolver }) => new IDPClaimSyncService(projectSchemaResolver))
+			.addService('membershipLeaseSweeper', () => new MembershipLeaseSweeper())
 			.addService('idpSessionRevalidator', ({ idpRegistry, idpClaimSyncService }) => new IdpSessionRevalidator(idpRegistry, idpClaimSyncService))
 			.addService('backchannelLogoutManager', ({ idpRegistry }) => new BackchannelLogoutManager(idpRegistry))
 			.addService('unpersistedApiKeyManager', () =>
@@ -255,7 +257,8 @@ export class TenantContainerFactory {
 			)
 			.addService(
 				'idpSignInManager',
-				({ apiKeyManager, idpRegistry, idpClaimSyncService }) => new IDPSignInManager(apiKeyManager, idpRegistry, idpClaimSyncService),
+				({ apiKeyManager, idpRegistry, idpClaimSyncService, membershipLeaseSweeper }) =>
+					new IDPSignInManager(apiKeyManager, idpRegistry, idpClaimSyncService, membershipLeaseSweeper),
 			)
 			.addService('idpManager', ({ idpRegistry, projectSchemaResolver }) => new IDPManager(idpRegistry, projectSchemaResolver))
 			.addService('personIdentityProviderManager', () => new PersonIdentityProviderManager())

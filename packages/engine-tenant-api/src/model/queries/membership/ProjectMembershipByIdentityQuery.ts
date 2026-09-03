@@ -8,9 +8,15 @@ import { Acl } from '@contember/schema'
  * for that project resolves through ({@link ProjectMemberManager.getStoredProjectsMemberships}).
  *
  * A membership whose IdP lease has lapsed is excluded ({@link withUnexpiredLease}), so an expired grant
- * is invisible everywhere at once: the content/system/actions APIs, the tenant authorization identity,
- * the member listing, and the before/after snapshots the membership audits are built from. That last one
- * is deliberate — an audit that reported a grant nobody holds would describe access that does not exist.
+ * is invisible to every access decision at once: the content/system/actions APIs, the tenant
+ * authorization identity, the roles reported for a project member, and the before/after snapshots the
+ * membership audits are built from. That last one is deliberate — an audit that reported a grant nobody
+ * holds would describe access that does not exist.
+ *
+ * What a lapsed row does still do is exist. Queries that only ask WHETHER a membership row is there —
+ * the project listing, the member listing, the operator add-member conflict check — do not carry this
+ * predicate, so until the sweep collects it the row can still put someone in a member list with no roles
+ * or answer ALREADY_MEMBER. None of those grant anything; the predicate here is what decides access.
  */
 class ProjectMembershipByIdentityQuery extends DatabaseQuery<ProjectMembershipByIdentityQuery.Result> {
 	constructor(private readonly project: { id: string } | { slug: string }, private readonly identityId: string[]) {

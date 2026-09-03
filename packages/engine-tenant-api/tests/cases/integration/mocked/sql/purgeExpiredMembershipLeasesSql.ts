@@ -16,7 +16,9 @@ export const purgeExpiredMembershipLeasesSql = (args: {
 				WHERE "lease_expires_at" <= now()
 				ORDER BY "lease_expires_at"
 				LIMIT ?
+				FOR UPDATE SKIP LOCKED
 			)
+			AND "lease_expires_at" <= now()
 			RETURNING "identity_id", "project_id", "role"
 		)
 		SELECT "expired"."identity_id" AS "identityId", "project"."slug" AS "project", "expired"."role" AS "role", "person"."id" AS "personId"

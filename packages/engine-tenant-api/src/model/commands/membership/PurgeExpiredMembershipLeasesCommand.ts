@@ -20,6 +20,13 @@ export class PurgeExpiredMembershipLeasesCommand implements Command<PurgeExpired
 
 	async execute({ db }: Command.Args): Promise<PurgeExpiredMembershipLeasesCommand.Row[]> {
 		const result = await db.query<PurgeExpiredMembershipLeasesCommand.Row>(
+			// The expiry predicate is repeated on the DELETE itself, not left to the subquery alone. A row
+			// picked by the subquery can be renewed by a sign-in that commits while this statement waits on
+			// it, and Postgres then re-checks only the OUTER qualification — an id match, which still holds —
+			// so a subquery-only predicate deletes the grant that sign-in just renewed. `SKIP LOCKED` on top
+			// leaves a row somebody else is already renewing alone: this runs on the sign-in path, and there
+			// is nothing to gain by queueing behind a transaction whose whole effect is to push the lease
+			// forward.
 			`WITH "expired" AS (
 				DELETE FROM "project_membership"
 				WHERE "id" IN (
@@ -27,7 +34,9 @@ export class PurgeExpiredMembershipLeasesCommand implements Command<PurgeExpired
 					WHERE "lease_expires_at" <= now()
 					ORDER BY "lease_expires_at"
 					LIMIT ?
+					FOR UPDATE SKIP LOCKED
 				)
+				AND "lease_expires_at" <= now()
 				RETURNING "identity_id", "project_id", "role"
 			)
 			SELECT "expired"."identity_id" AS "identityId", "project"."slug" AS "project", "expired"."role" AS "role", "person"."id" AS "personId"

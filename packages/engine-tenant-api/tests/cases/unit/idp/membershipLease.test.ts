@@ -165,6 +165,9 @@ describe('A32 membership lease — an expired lease grants nothing', () => {
 describe('A32 membership lease — the hygiene sweep', () => {
 	// The sweep is not what makes an expired lease harmless — the filter above already did that. It clears
 	// the residue: rows that grant nothing but still occupy their membership unique key.
+	// `FOR UPDATE SKIP LOCKED` and the repeated `lease_expires_at <= now()` on the DELETE are both
+	// load-bearing, not decoration: without the repeat, a row renewed by a sign-in committing while this
+	// statement waits on it is still deleted, because Postgres re-checks only the outer qualification.
 	const sweepSql = (limit: number, rows: Record<string, unknown>[]): ExpectedQuery => ({
 		sql: SQL`WITH "expired" AS (
 				DELETE FROM "project_membership"
@@ -173,7 +176,9 @@ describe('A32 membership lease — the hygiene sweep', () => {
 					WHERE "lease_expires_at" <= now()
 					ORDER BY "lease_expires_at"
 					LIMIT ?
+					FOR UPDATE SKIP LOCKED
 				)
+				AND "lease_expires_at" <= now()
 				RETURNING "identity_id", "project_id", "role"
 			)
 			SELECT "expired"."identity_id" AS "identityId", "project"."slug" AS "project", "expired"."role" AS "role", "person"."id" AS "personId"

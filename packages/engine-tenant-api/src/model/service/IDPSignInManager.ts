@@ -13,12 +13,14 @@ import { IdentityProviderRow } from '../queries/idp/types.js'
 import { AuthLogService } from './AuthLogService.js'
 import { ClaimMappingAudit, IDPClaimSyncService } from './idp/IDPClaimSyncService.js'
 import { ClaimMapping, parseClaimMapping } from './idp/ClaimMapping.js'
+import { MembershipLeaseSweeper } from './idp/MembershipLeaseSweeper.js'
 
 class IDPSignInManager {
 	constructor(
 		private readonly apiKeyManager: ApiKeyManager,
 		private readonly idpRegistry: IDPHandlerRegistry,
 		private readonly claimSyncService: IDPClaimSyncService,
+		private readonly leaseSweeper: MembershipLeaseSweeper,
 	) {}
 
 	async signInIDP(
@@ -29,7 +31,10 @@ class IDPSignInManager {
 		requestInfo?: ApiKeyRequestInfo,
 		trustForwardedInfo?: boolean,
 	): Promise<IDPSignInManager.SignInIDPResponse> {
-		return dbContext.transaction(async (db): Promise<IDPSignInManager.SignInIDPResponse> => {
+		// A32: set inside the transaction, acted on after it — the hygiene sweep below deletes OTHER
+		// identities' lapsed memberships, so it must not hold their row locks for the length of a sign-in.
+		let leaseConfigured = false
+		const response = await dbContext.transaction(async (db): Promise<IDPSignInManager.SignInIDPResponse> => {
 			const provider = await db.queryHandler.fetch(new IdentityProviderBySlugQuery(idpSlug))
 			if (!provider || provider.disabledAt) {
 				throw new Error('provider not found')
@@ -106,11 +111,13 @@ class IDPSignInManager {
 			}
 			let claimMappingAudit: ClaimMappingAudit | null = null
 			if (mapping) {
+				leaseConfigured = mapping.membershipLease !== undefined
 				const syncResult = await this.claimSyncService.sync(
 					db,
 					mapping,
 					claim,
 					{ id: personRow.identity_id },
+					provider,
 					resolved.isNewPerson === true,
 				)
 				claimMappingAudit = syncResult.audit
@@ -176,6 +183,13 @@ class IDPSignInManager {
 				}),
 			})
 		})
+		// A32 housekeeping, deliberately outside the transaction and non-fatal: it only removes memberships
+		// the access path already refuses. Gated on this provider configuring a lease, so a deployment
+		// without one never issues the statement.
+		if (leaseConfigured) {
+			await this.leaseSweeper.sweep(dbContext)
+		}
+		return response
 	}
 
 	async initSignInIDP(dbContext: DatabaseContext, idpSlug: string, data: unknown): Promise<IDPSignInManager.InitSignInIDPResponse> {

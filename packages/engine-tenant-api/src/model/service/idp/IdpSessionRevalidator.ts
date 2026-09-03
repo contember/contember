@@ -230,7 +230,9 @@ export class IdpSessionRevalidator {
 			// probe, or a refresh whose userinfo fetch failed) passes `allowRemoval: false`, so refresh stays
 			// additive-only and a membership the IdP still asserts is never stripped off an incomplete surface.
 			const { audit, droppedUnsafeRules } = await dbContext.transaction(db =>
-				this.claimSyncService.sync(db, mapping, claims, { id: apiKeyRow.identity_id }, false, { allowRemoval: claimsComplete })
+				this.claimSyncService.sync(db, mapping, claims, { id: apiKeyRow.identity_id }, { id: row.identityProviderId }, false, {
+					allowRemoval: claimsComplete,
+				})
 			)
 			if (audit) {
 				await this.logRoleMapping(dbContext, apiKeyRow, row, 'idp_role_mapped', audit, requestInfo)

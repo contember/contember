@@ -10,7 +10,14 @@ import { DatabaseContext } from '../../../../src/index.js'
 // no network), so the real provider can be used here rather than a pass-through double.
 
 const OIDC_BASE = { url: 'https://idp.example.com', clientId: 'client', clientSecret: 'secret' }
-const OPTIONS = { autoSignUp: false, exclusive: false, initReturnsConfig: false, requireVerifiedEmail: false, assumeEmailVerified: false }
+const OPTIONS = {
+	autoSignUp: false,
+	exclusive: false,
+	initReturnsConfig: false,
+	requireVerifiedEmail: false,
+	assumeEmailVerified: false,
+	disableLocalAuthentication: false,
+}
 
 const makeManager = () => {
 	const registry = new IDPHandlerRegistry()

@@ -72,7 +72,7 @@ test('addIDP accepts a claimMapping whose membership role IS defined in the proj
 			...sqlTransaction(
 				{
 					sql:
-						'select "id", "slug", "type", "configuration", "disabled_at" as "disabledAt", "auto_sign_up" as "autoSignUp", "exclusive", "init_returns_config" as "initReturnsConfig", "require_verified_email" as "requireVerifiedEmail", "assume_email_verified" as "assumeEmailVerified"  from "tenant"."identity_provider"  where "slug" = ?',
+						'select "id", "slug", "type", "configuration", "disabled_at" as "disabledAt", "auto_sign_up" as "autoSignUp", "exclusive", "init_returns_config" as "initReturnsConfig", "require_verified_email" as "requireVerifiedEmail", "assume_email_verified" as "assumeEmailVerified", "disable_local_authentication" as "disableLocalAuthentication"  from "tenant"."identity_provider"  where "slug" = ?',
 					parameters: ['oidc'],
 					response: { rows: [{ id: '123', slug: 'oidc' }] },
 				},
@@ -227,7 +227,7 @@ test('addIDP accepts a condition variable bounded by an allow allowlist plus a v
 			...sqlTransaction(
 				{
 					sql:
-						'select "id", "slug", "type", "configuration", "disabled_at" as "disabledAt", "auto_sign_up" as "autoSignUp", "exclusive", "init_returns_config" as "initReturnsConfig", "require_verified_email" as "requireVerifiedEmail", "assume_email_verified" as "assumeEmailVerified"  from "tenant"."identity_provider"  where "slug" = ?',
+						'select "id", "slug", "type", "configuration", "disabled_at" as "disabledAt", "auto_sign_up" as "autoSignUp", "exclusive", "init_returns_config" as "initReturnsConfig", "require_verified_email" as "requireVerifiedEmail", "assume_email_verified" as "assumeEmailVerified", "disable_local_authentication" as "disableLocalAuthentication"  from "tenant"."identity_provider"  where "slug" = ?',
 					parameters: ['oidc'],
 					response: { rows: [{ id: '123', slug: 'oidc' }] },
 				},
@@ -274,7 +274,7 @@ test('addIDP accepts a condition variable whose constant value IS a valid condit
 			...sqlTransaction(
 				{
 					sql:
-						'select "id", "slug", "type", "configuration", "disabled_at" as "disabledAt", "auto_sign_up" as "autoSignUp", "exclusive", "init_returns_config" as "initReturnsConfig", "require_verified_email" as "requireVerifiedEmail", "assume_email_verified" as "assumeEmailVerified"  from "tenant"."identity_provider"  where "slug" = ?',
+						'select "id", "slug", "type", "configuration", "disabled_at" as "disabledAt", "auto_sign_up" as "autoSignUp", "exclusive", "init_returns_config" as "initReturnsConfig", "require_verified_email" as "requireVerifiedEmail", "assume_email_verified" as "assumeEmailVerified", "disable_local_authentication" as "disableLocalAuthentication"  from "tenant"."identity_provider"  where "slug" = ?',
 					parameters: ['oidc'],
 					response: { rows: [{ id: '123', slug: 'oidc' }] },
 				},
@@ -305,7 +305,7 @@ test('updateIDP runs the same claimMapping validation (rejects a merged-in grant
 	}
 	const selectIdp = {
 		sql:
-			'select "id", "slug", "type", "configuration", "disabled_at" as "disabledAt", "auto_sign_up" as "autoSignUp", "exclusive", "init_returns_config" as "initReturnsConfig", "require_verified_email" as "requireVerifiedEmail", "assume_email_verified" as "assumeEmailVerified"  from "tenant"."identity_provider"  where "slug" = ?',
+			'select "id", "slug", "type", "configuration", "disabled_at" as "disabledAt", "auto_sign_up" as "autoSignUp", "exclusive", "init_returns_config" as "initReturnsConfig", "require_verified_email" as "requireVerifiedEmail", "assume_email_verified" as "assumeEmailVerified", "disable_local_authentication" as "disableLocalAuthentication"  from "tenant"."identity_provider"  where "slug" = ?',
 		parameters: ['mock'],
 		response: { rows: [idpRow] },
 	}

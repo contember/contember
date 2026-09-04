@@ -566,6 +566,11 @@ const schema: DocumentNode = gql`
 		MFA_ENROLLMENT_REQUIRED
 		EMAIL_NOT_VERIFIED
 		RATE_LIMIT_EXCEEDED
+		"""
+		The person is linked to an identity provider with
+		\`disableLocalAuthentication\`, so password sign-in is not available to them.
+		"""
+		IDP_REQUIRED
 	}
 
 	type SignInResult implements CommonSignInResult {
@@ -893,6 +898,13 @@ const schema: DocumentNode = gql`
 		Defaults to false.
 		"""
 		assumeEmailVerified: Boolean!
+		"""
+		When true, a person linked to this provider may authenticate ONLY through it:
+		password sign-in and passwordless sign-in are refused and no password-reset
+		mail is sent. Disabling the provider lifts the restriction, which is the
+		break-glass for an IdP outage. Defaults to false.
+		"""
+		disableLocalAuthentication: Boolean!
 	}
 
 	input IDPOptions {
@@ -901,6 +913,7 @@ const schema: DocumentNode = gql`
 		initReturnsConfig: Boolean
 		requireVerifiedEmail: Boolean
 		assumeEmailVerified: Boolean
+		disableLocalAuthentication: Boolean
 	}
 
 	# === passwordless sign in ===
@@ -922,6 +935,11 @@ const schema: DocumentNode = gql`
 		PASSWORDLESS_DISABLED
 		INVALID_CAPTCHA
 		RATE_LIMIT_EXCEEDED
+		"""
+		The person is linked to an identity provider with
+		\`disableLocalAuthentication\`, so passwordless sign-in is not available to them.
+		"""
+		IDP_REQUIRED
 	}
 	
 	type InitSignInPasswordlessResult {
@@ -959,6 +977,11 @@ const schema: DocumentNode = gql`
 		OTP_REQUIRED
 		INVALID_OTP_TOKEN
 		MFA_ENROLLMENT_REQUIRED
+		"""
+		The person became linked to an identity provider with
+		\`disableLocalAuthentication\` after this magic link was issued.
+		"""
+		IDP_REQUIRED
 	}
 
 	type SignInPasswordlessResult implements CommonSignInResult {

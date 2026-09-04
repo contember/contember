@@ -204,7 +204,8 @@ CREATE TABLE "identity_provider" (
     "exclusive" boolean DEFAULT false,
     "init_returns_config" boolean DEFAULT false NOT NULL,
     "require_verified_email" boolean DEFAULT false NOT NULL,
-    "assume_email_verified" boolean DEFAULT false NOT NULL
+    "assume_email_verified" boolean DEFAULT false NOT NULL,
+    "disable_local_authentication" boolean DEFAULT false NOT NULL
 );
 CREATE TABLE "idp_session" (
     "id" "uuid" NOT NULL,

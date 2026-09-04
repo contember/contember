@@ -56,6 +56,7 @@ test('claim mapping grants a project membership on sign-in', async () => {
 						initReturnsConfig: false,
 						requireVerifiedEmail: false,
 						assumeEmailVerified: false,
+						disableLocalAuthentication: false,
 						configuration: {
 							externalIdentifier,
 							email,
@@ -143,6 +144,7 @@ test('claim mapping grants a membership with a claim-derived variable (mapped va
 						initReturnsConfig: false,
 						requireVerifiedEmail: false,
 						assumeEmailVerified: false,
+						disableLocalAuthentication: false,
 						configuration: {
 							externalIdentifier,
 							email,
@@ -242,6 +244,7 @@ test('a granted membership whose declared variable resolves to no values keeps t
 						initReturnsConfig: false,
 						requireVerifiedEmail: false,
 						assumeEmailVerified: false,
+						disableLocalAuthentication: false,
 						configuration: {
 							externalIdentifier,
 							email,
@@ -332,6 +335,7 @@ test('sticky sync policy skips re-mapping for an existing person (no membership 
 						initReturnsConfig: false,
 						requireVerifiedEmail: false,
 						assumeEmailVerified: false,
+						disableLocalAuthentication: false,
 						configuration: {
 							externalIdentifier,
 							email,
@@ -393,6 +397,7 @@ test('a malformed stored claimMapping is skipped (fail-open) — sign-in succeed
 						initReturnsConfig: false,
 						requireVerifiedEmail: false,
 						assumeEmailVerified: false,
+						disableLocalAuthentication: false,
 						configuration: {
 							externalIdentifier,
 							email,
@@ -456,6 +461,7 @@ test('a claim mapping referencing a non-existent project is skipped, sign-in sti
 						initReturnsConfig: false,
 						requireVerifiedEmail: false,
 						assumeEmailVerified: false,
+						disableLocalAuthentication: false,
 						configuration: {
 							externalIdentifier,
 							email,
@@ -521,6 +527,7 @@ test('unmatched: remove strips a no-longer-granted membership in a mapped projec
 						initReturnsConfig: false,
 						requireVerifiedEmail: false,
 						assumeEmailVerified: false,
+						disableLocalAuthentication: false,
 						configuration: {
 							externalIdentifier,
 							email,
@@ -623,6 +630,7 @@ test('unmatched: remove revokes the whole membership when a declared variable re
 						initReturnsConfig: false,
 						requireVerifiedEmail: false,
 						assumeEmailVerified: false,
+						disableLocalAuthentication: false,
 						configuration: {
 							externalIdentifier,
 							email,
@@ -737,6 +745,7 @@ test('sticky sync policy APPLIES on a brand-new auto-signed-up person', async ()
 						initReturnsConfig: false,
 						requireVerifiedEmail: false,
 						assumeEmailVerified: false,
+						disableLocalAuthentication: false,
 						configuration: {
 							externalIdentifier,
 							email,
@@ -822,6 +831,7 @@ test('unmatched: remove revokes a vocabulary membership even when no rule matche
 						initReturnsConfig: false,
 						requireVerifiedEmail: false,
 						assumeEmailVerified: false,
+						disableLocalAuthentication: false,
 						configuration: {
 							externalIdentifier,
 							email,
@@ -919,6 +929,7 @@ test('unmatched: remove never strips a membership outside the mapping vocabulary
 						initReturnsConfig: false,
 						requireVerifiedEmail: false,
 						assumeEmailVerified: false,
+						disableLocalAuthentication: false,
 						configuration: {
 							externalIdentifier,
 							email,
@@ -1023,6 +1034,7 @@ test('a passthrough claim-derived variable writes only allow-listed values (the 
 						initReturnsConfig: false,
 						requireVerifiedEmail: false,
 						assumeEmailVerified: false,
+						disableLocalAuthentication: false,
 						configuration: {
 							externalIdentifier,
 							email,
@@ -1121,6 +1133,7 @@ test('TEST-4: a claimMapping carrying only the OIDC identity-field remap (no rul
 						initReturnsConfig: false,
 						requireVerifiedEmail: false,
 						assumeEmailVerified: false,
+						disableLocalAuthentication: false,
 						configuration: {
 							externalIdentifier,
 							email,
@@ -1177,6 +1190,7 @@ test('a passthrough claim-derived variable with allow:[] writes no variable, kee
 						initReturnsConfig: false,
 						requireVerifiedEmail: false,
 						assumeEmailVerified: false,
+						disableLocalAuthentication: false,
 						configuration: {
 							externalIdentifier,
 							email,

@@ -10,7 +10,10 @@ export class UpdateIdpCommand implements Command<void> {
 	}
 
 	async execute({ db }: Command.Args): Promise<void> {
-		const { configuration, options: { autoSignUp, exclusive, initReturnsConfig, requireVerifiedEmail, assumeEmailVerified } = {} } = this.data
+		const {
+			configuration,
+			options: { autoSignUp, exclusive, initReturnsConfig, requireVerifiedEmail, assumeEmailVerified, disableLocalAuthentication } = {},
+		} = this.data
 		await UpdateBuilder.create()
 			.table('identity_provider')
 			.values({
@@ -20,6 +23,7 @@ export class UpdateIdpCommand implements Command<void> {
 				init_returns_config: initReturnsConfig,
 				require_verified_email: requireVerifiedEmail,
 				assume_email_verified: assumeEmailVerified,
+				disable_local_authentication: disableLocalAuthentication,
 			})
 			.where({
 				id: this.id,

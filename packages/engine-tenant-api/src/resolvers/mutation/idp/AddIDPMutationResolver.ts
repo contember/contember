@@ -26,6 +26,7 @@ export class AddIDPMutationResolver implements MutationResolvers {
 				initReturnsConfig: args.options?.initReturnsConfig ?? false,
 				requireVerifiedEmail: args.options?.requireVerifiedEmail ?? false,
 				assumeEmailVerified: args.options?.assumeEmailVerified ?? false,
+				disableLocalAuthentication: args.options?.disableLocalAuthentication ?? false,
 			},
 		})
 		if (!result.ok) {

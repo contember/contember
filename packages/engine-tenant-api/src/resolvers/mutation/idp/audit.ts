@@ -14,6 +14,7 @@ export const idpRowToAuditSnapshot = (row: IdentityProviderRow | null): JSONValu
 		initReturnsConfig: row.initReturnsConfig,
 		requireVerifiedEmail: row.requireVerifiedEmail,
 		assumeEmailVerified: row.assumeEmailVerified,
+		disableLocalAuthentication: row.disableLocalAuthentication,
 		configurationKeys: Object.keys(row.configuration).sort(),
 	}
 }

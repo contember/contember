@@ -81,6 +81,7 @@ test('a DB error during the membership apply rolls back the whole sign-in (no se
 					initReturnsConfig: false,
 					requireVerifiedEmail: false,
 					assumeEmailVerified: false,
+					disableLocalAuthentication: false,
 					configuration: {
 						externalIdentifier,
 						email,
@@ -151,6 +152,7 @@ test('sticky leaves an existing local account being LINKED to the IdP untouched 
 						initReturnsConfig: false,
 						requireVerifiedEmail: false,
 						assumeEmailVerified: false,
+						disableLocalAuthentication: false,
 						configuration: {
 							externalIdentifier,
 							email,
@@ -219,6 +221,7 @@ test('apply-time guard drops a grant that would inject a claim into a condition 
 						initReturnsConfig: false,
 						requireVerifiedEmail: false,
 						assumeEmailVerified: false,
+						disableLocalAuthentication: false,
 						configuration: {
 							externalIdentifier,
 							email,
@@ -299,6 +302,7 @@ test('TEST-1: under unmatched:remove, a rule dropped by the apply-time guard doe
 						initReturnsConfig: false,
 						requireVerifiedEmail: false,
 						assumeEmailVerified: false,
+						disableLocalAuthentication: false,
 						configuration: {
 							externalIdentifier,
 							email,
@@ -382,6 +386,7 @@ test('SEC: apply-time guard drops an `admin` grant whose claim-derived variable 
 						initReturnsConfig: false,
 						requireVerifiedEmail: false,
 						assumeEmailVerified: false,
+						disableLocalAuthentication: false,
 						configuration: {
 							externalIdentifier,
 							email,
@@ -465,6 +470,7 @@ test('SEC: a legitimate `admin` grant (role has no required variable) is still a
 						initReturnsConfig: false,
 						requireVerifiedEmail: false,
 						assumeEmailVerified: false,
+						disableLocalAuthentication: false,
 						configuration: {
 							externalIdentifier,
 							email,

@@ -210,6 +210,37 @@ test('shutdown waits for worker cleanup started by a peer disconnect', async () 
 	}
 })
 
+test('a worker whose cleanup fails stays tracked for the next stop', async () => {
+	const worker: Runnable = {
+		run: async () => ({
+			end: (): Promise<void> => Promise.reject(new Error('Worker cleanup failed')),
+		}),
+	}
+	const { client, closed, messages, opened, running } = await listen(() => worker)
+	let applicationClosed = false
+
+	try {
+		await opened
+		await waitFor(() => messages.includes('ready'))
+		client.send(JSON.stringify({ type: 'startWorker' }))
+		await waitFor(() => messages.includes('workerStarted'))
+		client.send(JSON.stringify({ type: 'stopAllWorkers' }))
+		await waitFor(() => messages.filter(it => it === 'error:Worker cleanup failed').length === 1)
+		client.send(JSON.stringify({ type: 'stopAllWorkers' }))
+		await waitFor(() => messages.filter(it => it === 'error:Worker cleanup failed').length === 2)
+		expect(messages).not.toContain('message:all stopped')
+
+		await running.close()
+		applicationClosed = true
+		expect(await closed).toBe(1012)
+	} finally {
+		client.terminate()
+		if (!applicationClosed) {
+			await running.close()
+		}
+	}
+})
+
 test('reports a manual worker cleanup failure without blocking shutdown', async () => {
 	const worker: Runnable = {
 		run: async () => ({

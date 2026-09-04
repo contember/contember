@@ -89,19 +89,18 @@ export class ActionsWebsocketControllerFactory {
 
 			const stopAll = (): Promise<void> => {
 				stopAllPromise ??= (async () => {
-					const currentWorkers = workers.map(async it => {
+					// a worker stays tracked until its own end() resolves, so a failed cleanup is not forgotten
+					const results = await Promise.allSettled(workers.map(async it => {
 						await (await it.running).end()
+						workers = workers.filter(worker => worker !== it)
 						send({
 							type: 'workedStopped',
 							workerId: it.id,
 						})
-					})
-					workers = []
-					const results = await Promise.allSettled(currentWorkers)
-					for (const result of results) {
-						if (result.status === 'rejected') {
-							throw result.reason
-						}
+					}))
+					const errors = results.flatMap(it => it.status === 'rejected' ? [it.reason] : [])
+					if (errors.length > 0) {
+						throw new AggregateError(errors, 'Worker cleanup failed')
 					}
 				})().finally(() => {
 					stopAllPromise = undefined

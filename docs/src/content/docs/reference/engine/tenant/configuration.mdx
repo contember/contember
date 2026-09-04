@@ -120,7 +120,7 @@ See [password policy](/reference/engine/tenant/password-policy) for individual f
 | Field | Default | Notes |
 |---|---|---|
 | `revealUserExists` | `true` | When `false`, unknown-email failures on sign-in / reset / passwordless-init are masked. See [anti-abuse — enumeration protection](/reference/engine/tenant/anti-abuse#enumeration-protection). |
-| `revealLoginMethod` | `true` | *(since 2.2)* When `false`, `signIn` collapses `NO_PASSWORD_SET` / `INVALID_PASSWORD` into a generic `INVALID_CREDENTIALS` and `signUp` omits the `recommendedAction` hint on `EMAIL_ALREADY_EXISTS`. Orthogonal to `revealUserExists` — `UNKNOWN_EMAIL` is still controlled by that flag. |
+| `revealLoginMethod` | `true` | *(since 2.2)* When `false`, `signIn` collapses `NO_PASSWORD_SET` / `INVALID_PASSWORD` / `IDP_REQUIRED` into a generic `INVALID_CREDENTIALS`, `initSignInPasswordless` masks `IDP_REQUIRED` as `PASSWORDLESS_DISABLED`, and `signUp` omits the `recommendedAction` hint on `EMAIL_ALREADY_EXISTS`. Orthogonal to `revealUserExists` — `UNKNOWN_EMAIL` is still controlled by that flag. |
 | `baseBackoff` | `PT1S` | Starting backoff between per-email login attempts. Also drives the per-email mail-init throttle for password reset and passwordless init. |
 | `maxBackoff` | `PT1M` | Upper bound for the exponential backoff. |
 | `attemptWindow` | `PT5M` | How long failed attempts are remembered. |

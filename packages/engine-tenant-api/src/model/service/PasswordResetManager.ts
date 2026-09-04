@@ -1,6 +1,6 @@
 import { Response, ResponseError, ResponseOk } from '../utils/Response.js'
 import { UserMailer } from '../mailing/index.js'
-import { ConfigurationQuery, PersonRow } from '../queries/index.js'
+import { ConfigurationQuery, LocalAuthDisablingIdpsQuery, PersonRow } from '../queries/index.js'
 import { PermissionContext } from '../authorization/index.js'
 import { ProjectManager } from './ProjectManager.js'
 import { DatabaseContext } from '../utils/index.js'
@@ -33,6 +33,14 @@ export class PasswordResetManager {
 	): Promise<void> {
 		if (!person.email) {
 			throw new ImplementationException()
+		}
+
+		// A person federated through a provider with `disableLocalAuthentication`
+		// cannot sign in with a password, so a reset mail would only offer them a
+		// credential the tenant refuses — and one more link worth phishing.
+		const exclusiveIdps = await dbContext.queryHandler.fetch(new LocalAuthDisablingIdpsQuery(person.id))
+		if (exclusiveIdps.length > 0) {
+			return
 		}
 
 		// Per-email exponential backoff on outbound mails — don't spam a real

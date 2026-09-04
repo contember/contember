@@ -8,6 +8,7 @@ export interface PersonIdpConnectionRow {
 	slug: string
 	type: string
 	disabledAt?: Date | null
+	disableLocalAuthentication?: boolean
 }
 
 export const getPersonIdentityProvidersSql = (args: {
@@ -15,7 +16,7 @@ export const getPersonIdentityProvidersSql = (args: {
 	response: PersonIdpConnectionRow[]
 }): ExpectedQuery => ({
 	sql:
-		SQL`SELECT "person_identity_provider"."id", "person_identity_provider"."created_at" as "createdAt", "person_identity_provider"."external_identifier" as "externalIdentifier", "identity_provider"."slug" as "identityProviderSlug", "identity_provider"."type" as "identityProviderType", "identity_provider"."disabled_at" as "identityProviderDisabledAt"
+		SQL`SELECT "person_identity_provider"."id", "person_identity_provider"."created_at" as "createdAt", "person_identity_provider"."external_identifier" as "externalIdentifier", "identity_provider"."slug" as "identityProviderSlug", "identity_provider"."type" as "identityProviderType", "identity_provider"."disabled_at" as "identityProviderDisabledAt", "identity_provider"."disable_local_authentication" as "identityProviderDisableLocalAuthentication"
 	         FROM "tenant"."person_identity_provider"
 		              INNER JOIN "tenant"."identity_provider" AS "identity_provider" ON "identity_provider"."id" = "person_identity_provider"."identity_provider_id"
 	         WHERE "person_id" = ?
@@ -29,6 +30,7 @@ export const getPersonIdentityProvidersSql = (args: {
 			identityProviderSlug: it.slug,
 			identityProviderType: it.type,
 			identityProviderDisabledAt: it.disabledAt ?? null,
+			identityProviderDisableLocalAuthentication: it.disableLocalAuthentication ?? false,
 		})),
 	},
 })

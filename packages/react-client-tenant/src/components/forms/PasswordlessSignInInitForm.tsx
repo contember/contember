@@ -70,4 +70,5 @@ const errorToField: Record<TenantApi.InitSignInPasswordlessErrorCode, keyof Pass
 	PASSWORDLESS_DISABLED: undefined,
 	RATE_LIMIT_EXCEEDED: undefined,
 	INVALID_CAPTCHA: undefined,
+	IDP_REQUIRED: undefined,
 }

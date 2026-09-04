@@ -108,4 +108,5 @@ const errorToField: Record<TenantApi.SignInPasswordlessErrorCode, keyof Password
 	INVALID_OTP_TOKEN: 'otpToken',
 	OTP_REQUIRED: undefined,
 	MFA_ENROLLMENT_REQUIRED: undefined,
+	IDP_REQUIRED: undefined,
 }

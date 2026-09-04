@@ -49,6 +49,7 @@ test('signs in idp with existing identity', async () => {
 						initReturnsConfig: false,
 						requireVerifiedEmail: false,
 						assumeEmailVerified: false,
+						disableLocalAuthentication: false,
 						slug: 'mock',
 						type: 'mock',
 					},
@@ -125,6 +126,7 @@ test('does NOT link by e-mail when provider requires a verified e-mail and the c
 						initReturnsConfig: false,
 						requireVerifiedEmail: true,
 						assumeEmailVerified: false,
+						disableLocalAuthentication: false,
 						configuration: {
 							externalIdentifier,
 							email,
@@ -204,6 +206,7 @@ test('links by e-mail when provider requires a verified e-mail and the claim is 
 						initReturnsConfig: false,
 						requireVerifiedEmail: true,
 						assumeEmailVerified: false,
+						disableLocalAuthentication: false,
 						configuration: {
 							externalIdentifier,
 							email,
@@ -291,6 +294,7 @@ test('links by e-mail when require + assumeEmailVerified are set, even though th
 						requireVerifiedEmail: true,
 						// trusted IdP: e-mails are treated as verified even though the claim says false
 						assumeEmailVerified: true,
+						disableLocalAuthentication: false,
 						configuration: {
 							externalIdentifier,
 							email,
@@ -378,6 +382,7 @@ test('signs in exclusive idp', async () => {
 						initReturnsConfig: false,
 						requireVerifiedEmail: false,
 						assumeEmailVerified: false,
+						disableLocalAuthentication: false,
 						configuration: {
 							externalIdentifier: externalIdentifier,
 							email,

@@ -119,3 +119,5 @@ The new password is validated against the active [password policy](/reference/en
 
 - Trigger the public [password reset](/reference/engine/tenant/password-reset) flow.
 - Have an admin call `changePassword` directly.
+
+*(since 2.2)* Neither helps a person linked to an identity provider with [`disableLocalAuthentication`](/reference/engine/tenant/idp#idp-only-authentication): `signIn` refuses their password with `IDP_REQUIRED` and the reset mail is not sent.

@@ -68,10 +68,11 @@ The options field allows you to specify additional options for the identity prov
 | Option | Default | Notes |
 |---|---|---|
 | `autoSignUp` | `false` | Create a new account for an unknown e-mail instead of failing. |
-| `exclusive` | `false` | Only this IdP may authenticate the matched accounts; disables linking by e-mail. |
+| `exclusive` | `false` | Never link to an existing account by e-mail, and create auto-signed-up accounts **without** an e-mail address, so they hold no local credential at all. To keep the address and still refuse local sign-in, use `disableLocalAuthentication`. |
 | `initReturnsConfig` | `false` | `initSignInIDP` returns the raw provider config to the client. |
 | `requireVerifiedEmail` | `false` | *(since 2.2)* For a non-`exclusive` provider, only auto-link to / sign in an existing local account by e-mail when the provider asserts the e-mail is **verified**. Guards against account takeover via an unverified provider claim. See [e-mail verification](/reference/engine/tenant/email-verification#idp-verified-email-gate). |
 | `assumeEmailVerified` | `false` | *(since 2.2)* Treat this provider's e-mails as **verified** even when it sends no `email_verified` claim, so `requireVerifiedEmail` can stay on for a trusted IdP that never emits the claim. **Waives** the verified-email gate — use **only** for a provider you fully trust to vouch for its accounts. See [e-mail verification](/reference/engine/tenant/email-verification#idp-verified-email-gate). |
+| `disableLocalAuthentication` | `false` | *(since 2.2)* A person linked to this provider may sign in **only** through it: password and passwordless sign-in answer `IDP_REQUIRED`, no password-reset mail is sent, and the person cannot disconnect the link. Disabling the provider lifts the restriction. See [IdP-only authentication](#idp-only-authentication). |
 
 If the "ok" in response is `false`, you will find details in `error`, possible error codes are following: `ALREADY_EXISTS`, `UNKNOWN_TYPE`, `INVALID_CONFIGURATION`
 
@@ -283,6 +284,26 @@ The enableIDP mutation works in a similar way to the disableIDP mutation, with t
 
 When you execute the disableIDP mutation, it will return a response indicating whether the operation was successful. If the operation was not successful, the ok field will be set to false and the error field will contain details about the error that occurred. Possible error code is `NOT_FOUND`.
 
+### IdP-only authentication
+
+:::note[Available since 2.2]
+:::
+
+[Claim mapping](#claim-mapping) can make a provider authoritative for a person's memberships, but it only runs when the person signs in *through the provider*. A password, a magic link or a password-reset mail would still let someone the directory has dropped sign in with the memberships they last held. `options.disableLocalAuthentication` closes those doors: a person linked to such a provider may authenticate **only** through it.
+
+| Path | Answer |
+|---|---|
+| `signIn` | `IDP_REQUIRED`, before the password is compared |
+| `initSignInPasswordless`, `signInPasswordless` | `IDP_REQUIRED` — a magic link issued before the person was linked is refused too |
+| `createResetPasswordRequest` | `ok: true`, no mail sent |
+| `disconnectMyIdentityProvider` | `IDP_REQUIRED` — the link is what enforces the policy, so the person cannot remove it |
+
+The marker is the person's [connection](#personal-idp-connections) to the provider, so it also covers an account that predates the provider and was linked by e-mail matching, not only one created by `autoSignUp`. Sessions that already exist stay valid; the option only changes how new ones are obtained. Permanent API keys and `createSessionToken` are unaffected.
+
+`IDP_REQUIRED` names the provider, which reveals both that the person exists and how they sign in, so it is masked like `NO_PASSWORD_SET`: unless both `login.revealUserExists` and `login.revealLoginMethod` are `true`, `signIn` answers `INVALID_CREDENTIALS` and `initSignInPasswordless` answers `PASSWORDLESS_DISABLED`.
+
+**Break-glass.** A [disabled provider](#temporarily-disabling-and-enabling-an-idp) does not count: `disableIDP` hands local sign-in back to everyone linked to it, with no deploy, and `enableIDP` takes it away again. The caller of `disableIDP` must still be able to authenticate — keep a permanent API key, or an administrator who is not linked to the provider, for the case where the provider itself is the outage. Disconnecting the link stays refused while the provider is disabled; to let people remove it, turn the option off with `updateIDP`.
+
 ### Listing configured IdPs
 
 The `identityProviders` query returns every configured provider — enabled or disabled. It requires the `idp:list` permission (granted to `PROJECT_ADMIN` and `SUPER_ADMIN` by default), so it is meant for administrative tooling, not the public login screen.
@@ -300,6 +321,7 @@ query {
       initReturnsConfig
       requireVerifiedEmail
       assumeEmailVerified
+      disableLocalAuthentication
     }
   }
 }
@@ -451,11 +473,14 @@ mutation {
 
 To guard against accidental lock-out, a connection cannot be removed while it is the person's **last remaining sign-in method** — that is, they have no password, [passwordless sign-in](/reference/engine/tenant/passwordless) is not usable for them under the tenant policy, and no *other enabled* IdP connection remains. A connection to a [disabled provider](#temporarily-disabling-and-enabling-an-idp) does not count as a usable fallback, since it cannot be used to sign in.
 
+*(since 2.2)* A connection to a provider with [`disableLocalAuthentication`](#idp-only-authentication) cannot be removed by the person at all, not even while the provider is disabled — the link is what binds them to the provider, so removing it would lift the policy.
+
 | `code` | Meaning |
 |---|---|
 | `NOT_FOUND` | The caller has no connection with that `id`. |
 | `NOT_A_PERSON` | The caller is not a person (e.g. an API key) and so has no connections to disconnect. |
 | `LAST_AUTH_METHOD` | Removing it would leave the person with no way to sign in. Set up a password or another sign-in method first. |
+| `IDP_REQUIRED` | *(since 2.2)* The provider has `disableLocalAuthentication`, so this connection is the only way the person may sign in. An operator can turn the option off with `updateIDP`. |
 
 A successful disconnect is recorded in the [audit log](#audit) as `idp_disconnect`.
 

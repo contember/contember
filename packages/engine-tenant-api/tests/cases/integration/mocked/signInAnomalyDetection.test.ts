@@ -3,6 +3,7 @@ import { testUuid } from '../../../src/testUuid.js'
 import { selectMembershipsSql } from './sql/selectMembershipsSql.js'
 import { signInMutation } from './gql/signIn.js'
 import { getPersonByEmailSql } from './sql/getPersonByEmailSql.js'
+import { localAuthDisablingIdpsSql } from './sql/localAuthDisablingIdpsSql.js'
 import { expect, test } from 'bun:test'
 import { OtpAuthenticator } from '../../../../src/index.js'
 import { Buffer } from 'buffer'
@@ -51,6 +52,7 @@ test('anomaly off by default: a new country does not add any queries (baseline p
 			getConfigSql(),
 			getNextLoginAttemptSql(email),
 			getPersonByEmailSql({ email, response: { personId, identityId, password, roles: [] } }),
+			localAuthDisablingIdpsSql({ personId }),
 			getAuthPoliciesSql(),
 			getConfigSql(),
 			getIdentityByIdSql({ identityId }),
@@ -83,6 +85,7 @@ test('anomaly on, new device only (medium): sends UNUSUAL_LOGIN email, still sig
 			anomalyConfig,
 			getNextLoginAttemptSql(email),
 			getPersonByEmailSql({ email, response: { personId, identityId, password, roles: [] } }),
+			localAuthDisablingIdpsSql({ personId }),
 			// enforceMfaEnrollment (no policies → inert, single query)
 			getAuthPoliciesSql(),
 			// applyRiskPolicy: history (same country, different device → medium 2) then email
@@ -131,6 +134,7 @@ test('anomaly on, new country (high): requires step-up, dispatches email OTP, re
 			anomalyConfig,
 			getNextLoginAttemptSql(email),
 			getPersonByEmailSql({ email, response: { personId, identityId, password, roles: [] } }),
+			localAuthDisablingIdpsSql({ personId }),
 			// enforceMfaEnrollment (no policies → inert, single query)
 			getAuthPoliciesSql(),
 			// history: previously only ever seen in CZ → US is a new country (high, 3) → step-up.
@@ -185,6 +189,7 @@ test('anomaly on, step-up retry with the emailed code: consumes it and signs in 
 			anomalyConfig,
 			getNextLoginAttemptSql(email),
 			getPersonByEmailSql({ email, response: { personId, identityId, password, roles: [] } }),
+			localAuthDisablingIdpsSql({ personId }),
 			// enforceMfaEnrollment (no policies → inert; otpToken is ignored here)
 			getAuthPoliciesSql(),
 			// previously only ever seen in CZ → US is a new country (high, 3) → step-up.
@@ -235,6 +240,7 @@ test('anomaly on, step-up retry with a wrong code: INVALID_OTP_TOKEN, no session
 			anomalyConfig,
 			getNextLoginAttemptSql(email),
 			getPersonByEmailSql({ email, response: { personId, identityId, password, roles: [] } }),
+			localAuthDisablingIdpsSql({ personId }),
 			getAuthPoliciesSql(),
 			getLoginHistorySql({ personId, rows: [{ geoCountry: 'CZ', deviceFingerprint: KNOWN_FINGERPRINT, ip: '10.0.0.5' }] }),
 			// wrong code: token is found and an attempt is claimed, but validation fails.
@@ -289,6 +295,7 @@ test('anomaly on, step-up scored for a user who already cleared TOTP this reques
 			anomalyConfig,
 			getNextLoginAttemptSql(email),
 			getPersonByEmailSql({ email, response: { personId, identityId, password, roles: [], otpUri: otp.uri } }),
+			localAuthDisablingIdpsSql({ personId }),
 			// active TOTP + valid token → verified here (no SQL); mfaSatisfiedThisRequest = true.
 			// applyRiskPolicy: US is a new country (high, 3 → stepUp) BUT MFA already satisfied
 			// this request → NO email-OTP challenge (no sendEmailOtpSql/getLatestEmailOtpTokenSql
@@ -343,6 +350,7 @@ test('anomaly on, new IP prefix only (low): the client IP flows into scoring →
 			recordLoginRateLimitSql(clientIp),
 			getNextLoginAttemptSql(email),
 			getPersonByEmailSql({ email, response: { personId, identityId, password, roles: [] } }),
+			localAuthDisablingIdpsSql({ personId }),
 			getAuthPoliciesSql(),
 			// history IP is 10.0.0.5 (/24 = 10.0.0.0) → current 203.0.113.9 (/24 = 203.0.113.0)
 			// is a new prefix; country + device match → score 1 → email.
@@ -388,6 +396,7 @@ test('anomaly on, custom historySize flows into the baseline query limit', async
 			anomalyConfig3,
 			getNextLoginAttemptSql(email),
 			getPersonByEmailSql({ email, response: { personId, identityId, password, roles: [] } }),
+			localAuthDisablingIdpsSql({ personId }),
 			getAuthPoliciesSql(),
 			// limit 3, not the default 10. Same country + device → score 0 → clean.
 			getLoginHistorySql({ personId, limit: 3, rows: [{ geoCountry: 'CZ', deviceFingerprint: KNOWN_FINGERPRINT, ip: '10.0.0.5' }] }),
@@ -422,6 +431,7 @@ test('anomaly on, historySize <= 0 is clamped to a limit of 1', async () => {
 			anomalyConfig0,
 			getNextLoginAttemptSql(email),
 			getPersonByEmailSql({ email, response: { personId, identityId, password, roles: [] } }),
+			localAuthDisablingIdpsSql({ personId }),
 			getAuthPoliciesSql(),
 			getLoginHistorySql({ personId, limit: 1, rows: [{ geoCountry: 'CZ', deviceFingerprint: KNOWN_FINGERPRINT, ip: '10.0.0.5' }] }),
 			anomalyConfig0,
@@ -452,6 +462,7 @@ test('anomaly on, all signals match history: no email, no step-up, signs in clea
 			anomalyConfig,
 			getNextLoginAttemptSql(email),
 			getPersonByEmailSql({ email, response: { personId, identityId, password, roles: [] } }),
+			localAuthDisablingIdpsSql({ personId }),
 			// enforceMfaEnrollment (no policies → inert, single query)
 			getAuthPoliciesSql(),
 			// same country, same device → score 0 → allow, no email.

@@ -108,10 +108,10 @@ export class SignInMutationResolver implements MutationResolvers {
 		if (!response.ok) {
 			const { revealUserExists, revealLoginMethod } = configuration.login
 			const collapseAll = !revealUserExists
-				&& ['NO_PASSWORD_SET', 'PERSON_DISABLED', 'INVALID_PASSWORD', 'UNKNOWN_EMAIL'].includes(response.error)
+				&& ['NO_PASSWORD_SET', 'PERSON_DISABLED', 'INVALID_PASSWORD', 'UNKNOWN_EMAIL', 'IDP_REQUIRED'].includes(response.error)
 			const collapseMethodOnly = revealUserExists
 				&& !revealLoginMethod
-				&& ['NO_PASSWORD_SET', 'INVALID_PASSWORD'].includes(response.error)
+				&& ['NO_PASSWORD_SET', 'INVALID_PASSWORD', 'IDP_REQUIRED'].includes(response.error)
 			if (collapseAll || collapseMethodOnly) {
 				return createErrorResponse('INVALID_CREDENTIALS', 'Invalid credentials')
 			}

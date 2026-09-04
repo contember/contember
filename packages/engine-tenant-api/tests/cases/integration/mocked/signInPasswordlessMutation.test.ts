@@ -6,6 +6,7 @@ import { signInPasswordlessMutation } from './gql/passwordless.js'
 import { computeTokenHash } from '../../../../src/index.js'
 import { sqlTransaction } from './sql/sqlTransaction.js'
 import { getPersonByIdSql } from './sql/getPersonByIdSql.js'
+import { localAuthDisablingIdpsSql } from './sql/localAuthDisablingIdpsSql.js'
 import { getConfigSql } from './sql/getConfigSql.js'
 import { createSessionKeySql } from './sql/createSessionKeySql.js'
 import { getIdentityProjectsSql } from './sql/getIdentityProjectsSql.js'
@@ -54,6 +55,7 @@ test('signInPasswordless - marks an unverified email verified before issuing the
 					personId,
 					response: { personId, identityId, password: '123', roles: [], email: 'john@doe.com', emailVerifiedAt: null },
 				}),
+				localAuthDisablingIdpsSql({ personId }),
 				{
 					sql: SQL`UPDATE "tenant"."person_token" SET "used_at" = ? WHERE "id" = ? AND "used_at" IS NULL`,
 					parameters: [isDate, requestId],
@@ -110,6 +112,7 @@ test('signInPasswordless - skips the email-verified update when already verified
 					personId,
 					response: { personId, identityId, password: '123', roles: [], email: 'john@doe.com', emailVerifiedAt: now },
 				}),
+				localAuthDisablingIdpsSql({ personId }),
 				{
 					sql: SQL`UPDATE "tenant"."person_token" SET "used_at" = ? WHERE "id" = ? AND "used_at" IS NULL`,
 					parameters: [isDate, requestId],
@@ -141,6 +144,39 @@ test('signInPasswordless - skips the email-verified update when already verified
 		expectedAuthLog: {
 			type: 'passwordless_login',
 			response: expect.objectContaining({ ok: true }),
+		},
+	})
+})
+
+test('signInPasswordless - a link created while the magic link was in flight still refuses the session', async () => {
+	const requestId = testUuid(1)
+	const personId = testUuid(2)
+	const identityId = testUuid(3)
+	const token = 'passwordless-token'
+	await executeTenantTest({
+		query: signInPasswordlessMutation({ requestId, token, validationType: 'token' }),
+		executes: [
+			...sqlTransaction(
+				personTokenByIdSql({ requestId, personId, token }),
+				getPersonByIdSql({
+					personId,
+					response: { personId, identityId, password: '123', roles: [], email: 'john@doe.com', emailVerifiedAt: now },
+				}),
+				localAuthDisablingIdpsSql({ personId, slugs: ['corporateSso'] }),
+			),
+		],
+		return: {
+			data: {
+				signInPasswordless: {
+					ok: false,
+					error: { code: 'IDP_REQUIRED' },
+					result: null,
+				},
+			},
+		},
+		expectedAuthLog: {
+			type: 'passwordless_login',
+			response: expect.objectContaining({ ok: false }),
 		},
 	})
 })

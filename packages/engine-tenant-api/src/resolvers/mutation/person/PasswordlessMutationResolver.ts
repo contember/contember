@@ -68,6 +68,13 @@ export class PasswordlessMutationResolver
 				// If the user does not exist, we don't want to reveal that
 				return createErrorResponse('PASSWORDLESS_DISABLED', 'Passwordless sign-in is disabled for this person')
 			}
+			// Naming the provider tells the caller both that the person exists and how
+			// they authenticate, so it needs both reveal flags. PASSWORDLESS_DISABLED is
+			// the neutral answer this endpoint already gives for an unknown address.
+			const { revealUserExists, revealLoginMethod } = configuration.login
+			if (result.error === 'IDP_REQUIRED' && !(revealUserExists && revealLoginMethod)) {
+				return createErrorResponse('PASSWORDLESS_DISABLED', 'Passwordless sign-in is disabled for this person')
+			}
 
 			return createErrorResponse(result.error, result.errorMessage)
 		}

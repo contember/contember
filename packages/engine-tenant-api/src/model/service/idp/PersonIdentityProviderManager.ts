@@ -29,6 +29,14 @@ export class PersonIdentityProviderManager {
 				return new ResponseError('NOT_FOUND', `You are not connected to the identity provider connection "${connectionId}".`)
 			}
 
+			// The link is what binds the person to the provider's policy, so they cannot remove it themselves.
+			if (connection.identityProviderDisableLocalAuthentication) {
+				return new ResponseError(
+					'IDP_REQUIRED',
+					`The identity provider "${connection.identityProviderSlug}" is the only way you may sign in; its connection cannot be removed.`,
+				)
+			}
+
 			const configuration = await db.queryHandler.fetch(new ConfigurationQuery(db.providers))
 			const hasPassword = person.password_hash !== null
 			const hasPasswordless = isPasswordlessEnabled(configuration.passwordless.enabled, person.passwordless_enabled)

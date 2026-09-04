@@ -11,6 +11,7 @@ export type IdentityProviderRow = {
 	initReturnsConfig: boolean
 	requireVerifiedEmail: boolean
 	assumeEmailVerified: boolean
+	disableLocalAuthentication: boolean
 }
 
 export type IdentityProviderDto =

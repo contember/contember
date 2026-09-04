@@ -3,6 +3,7 @@ import { SQL } from '../../../src/tags.js'
 import { testUuid } from '../../../src/testUuid.js'
 import { signInMutation } from './gql/signIn.js'
 import { getPersonByEmailSql } from './sql/getPersonByEmailSql.js'
+import { localAuthDisablingIdpsSql } from './sql/localAuthDisablingIdpsSql.js'
 import { getConfigSql } from './sql/getConfigSql.js'
 import { getNextLoginAttemptSql } from './sql/getNextLoginAttemptSql.js'
 import { createSessionKeySql } from './sql/createSessionKeySql.js'
@@ -48,6 +49,7 @@ test('MFA required + no factor + no code → MFA_ENROLLMENT_REQUIRED with pendin
 			getConfigSql(),
 			getNextLoginAttemptSql(email),
 			getPersonByEmailSql({ email, response: { personId, identityId, password, roles: ['editor'] } }),
+			localAuthDisablingIdpsSql({ personId }),
 			requiringPolicy(),
 			getAllProjectRolesByIdentitySql({ identityId }),
 			// Enforcement resolves the grace duration: the matched policy has no
@@ -113,6 +115,7 @@ test('MFA required + valid pending code → enrolls (pending→active), returns 
 			getConfigSql(),
 			getNextLoginAttemptSql(email),
 			getPersonByEmailSql({ email, response: { personId, identityId, password, roles: ['editor'], otpPendingUri: otp.uri } }),
+			localAuthDisablingIdpsSql({ personId }),
 			requiringPolicy(),
 			getAllProjectRolesByIdentitySql({ identityId }),
 			// Enforcement resolves the grace duration from the global config default.
@@ -173,6 +176,7 @@ test('MFA required + invalid pending code → INVALID_OTP_TOKEN', async () => {
 			getConfigSql(),
 			getNextLoginAttemptSql(email),
 			getPersonByEmailSql({ email, response: { personId, identityId, password, roles: ['editor'], otpPendingUri: pendingUri } }),
+			localAuthDisablingIdpsSql({ personId }),
 			requiringPolicy(),
 			getAllProjectRolesByIdentitySql({ identityId }),
 			// Enforcement resolves the grace duration from the global config default.
@@ -206,6 +210,7 @@ test('active TOTP + requiring policy → existing OTP_REQUIRED path (policy not 
 			getConfigSql(),
 			getNextLoginAttemptSql(email),
 			getPersonByEmailSql({ email, response: { personId, identityId, password, roles: ['editor'], otpUri } }),
+			localAuthDisablingIdpsSql({ personId }),
 		],
 		return: {
 			data: {
@@ -241,6 +246,7 @@ test('MFA required + per-policy grace → opens grace window, sets mfa_grace_unt
 			getConfigSql(),
 			getNextLoginAttemptSql(email),
 			getPersonByEmailSql({ email, response: { personId, identityId, password, roles: ['editor'] } }),
+			localAuthDisablingIdpsSql({ personId }),
 			gracePolicy(),
 			getAllProjectRolesByIdentitySql({ identityId }),
 			// Per-policy grace override is present → the global config is NOT read here.
@@ -288,6 +294,7 @@ test('MFA required + no policy grace override → global config default opens th
 			getConfigSql(),
 			getNextLoginAttemptSql(email),
 			getPersonByEmailSql({ email, response: { personId, identityId, password, roles: ['editor'] } }),
+			localAuthDisablingIdpsSql({ personId }),
 			requiringPolicy(),
 			getAllProjectRolesByIdentitySql({ identityId }),
 			// No per-policy override → the global config default is read; here it is

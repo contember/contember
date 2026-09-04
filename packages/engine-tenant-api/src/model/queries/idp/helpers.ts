@@ -13,13 +13,14 @@ export const createBaseIdpQuery = () =>
 		.select('init_returns_config', 'initReturnsConfig')
 		.select('require_verified_email', 'requireVerifiedEmail')
 		.select('assume_email_verified', 'assumeEmailVerified')
+		.select('disable_local_authentication', 'disableLocalAuthentication')
 		.from('identity_provider')
 
 export const createIdpDto = (
-	{ exclusive, autoSignUp, initReturnsConfig, requireVerifiedEmail, assumeEmailVerified, ...row }: IdentityProviderRow,
+	{ exclusive, autoSignUp, initReturnsConfig, requireVerifiedEmail, assumeEmailVerified, disableLocalAuthentication, ...row }: IdentityProviderRow,
 ): IdentityProviderDto => {
 	return {
 		...row,
-		options: { autoSignUp, exclusive, initReturnsConfig, requireVerifiedEmail, assumeEmailVerified },
+		options: { autoSignUp, exclusive, initReturnsConfig, requireVerifiedEmail, assumeEmailVerified, disableLocalAuthentication },
 	}
 }

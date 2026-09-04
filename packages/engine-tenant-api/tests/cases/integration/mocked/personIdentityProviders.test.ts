@@ -278,6 +278,73 @@ test('refuses to disconnect when the only other connection is to a disabled prov
 	})
 })
 
+test('refuses to disconnect a provider that disables local authentication, even though a password remains', async () => {
+	const personId = testUuid(1)
+	const connectionId = testUuid(2)
+	await executeTenantTest({
+		query: disconnectMyIdentityProviderMutation({ id: connectionId }),
+		executes: [
+			// the password would be usable again the moment the link is gone, which is exactly the escape to close
+			getPersonByIdentityForIdp({ identityId: authenticatedIdentityId, personId, passwordHash: 'BCRYPTED-123' }),
+			...sqlTransaction(
+				getPersonIdentityProvidersSql({
+					personId,
+					response: [
+						{ id: connectionId, createdAt, externalIdentifier: 'ext-1', slug: 'corporateSso', type: 'oidc', disableLocalAuthentication: true },
+					],
+				}),
+			),
+		],
+		return: {
+			data: {
+				disconnectMyIdentityProvider: {
+					ok: false,
+					error: {
+						code: 'IDP_REQUIRED',
+					},
+				},
+			},
+		},
+	})
+})
+
+test('still refuses while that provider is disabled: break-glass reopens local sign-in, not self-unlinking', async () => {
+	const personId = testUuid(1)
+	const connectionId = testUuid(2)
+	await executeTenantTest({
+		query: disconnectMyIdentityProviderMutation({ id: connectionId }),
+		executes: [
+			getPersonByIdentityForIdp({ identityId: authenticatedIdentityId, personId, passwordHash: 'BCRYPTED-123' }),
+			...sqlTransaction(
+				getPersonIdentityProvidersSql({
+					personId,
+					response: [
+						{
+							id: connectionId,
+							createdAt,
+							externalIdentifier: 'ext-1',
+							slug: 'corporateSso',
+							type: 'oidc',
+							disabledAt: new Date('2021-01-01T00:00:00.000Z'),
+							disableLocalAuthentication: true,
+						},
+					],
+				}),
+			),
+		],
+		return: {
+			data: {
+				disconnectMyIdentityProvider: {
+					ok: false,
+					error: {
+						code: 'IDP_REQUIRED',
+					},
+				},
+			},
+		},
+	})
+})
+
 test('returns NOT_FOUND when the person is not connected to the given connection', async () => {
 	const personId = testUuid(1)
 	await executeTenantTest({

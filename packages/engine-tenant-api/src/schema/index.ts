@@ -948,6 +948,11 @@ export type DisconnectIdpError = {
 }
 
 export type DisconnectIdpErrorCode =
+	/**
+	 * The provider has `disableLocalAuthentication`, so this connection is the only way
+	 * the person may sign in and cannot be removed by them — not even while the provider is disabled.
+	 */
+	| 'IDP_REQUIRED'
 	/**  The person is not allowed to disconnect their last remaining sign-in method.  */
 	| 'LAST_AUTH_METHOD'
 	/**  The caller is not a person (e.g. an API key) and so has no IdP connections to disconnect.  */
@@ -1013,6 +1018,7 @@ export type ForceSignOutPersonResponse = {
 export type IdpOptions = {
 	readonly assumeEmailVerified?: InputMaybe<Scalars['Boolean']['input']>
 	readonly autoSignUp?: InputMaybe<Scalars['Boolean']['input']>
+	readonly disableLocalAuthentication?: InputMaybe<Scalars['Boolean']['input']>
 	readonly exclusive?: InputMaybe<Scalars['Boolean']['input']>
 	readonly initReturnsConfig?: InputMaybe<Scalars['Boolean']['input']>
 	readonly requireVerifiedEmail?: InputMaybe<Scalars['Boolean']['input']>
@@ -1027,6 +1033,13 @@ export type IdpOptionsOutput = {
 	 */
 	readonly assumeEmailVerified: Scalars['Boolean']['output']
 	readonly autoSignUp: Scalars['Boolean']['output']
+	/**
+	 * When true, a person linked to this provider may authenticate ONLY through it:
+	 * password sign-in and passwordless sign-in are refused and no password-reset
+	 * mail is sent. Disabling the provider lifts the restriction, which is the
+	 * break-glass for an IdP outage. Defaults to false.
+	 */
+	readonly disableLocalAuthentication: Scalars['Boolean']['output']
 	readonly exclusive: Scalars['Boolean']['output']
 	readonly initReturnsConfig: Scalars['Boolean']['output']
 	/**
@@ -1169,6 +1182,11 @@ export type InitSignInPasswordlessError = {
 }
 
 export type InitSignInPasswordlessErrorCode =
+	/**
+	 * The person is linked to an identity provider with
+	 * `disableLocalAuthentication`, so passwordless sign-in is not available to them.
+	 */
+	| 'IDP_REQUIRED'
 	| 'INVALID_CAPTCHA'
 	| 'PASSWORDLESS_DISABLED'
 	| 'PERSON_NOT_FOUND'
@@ -2150,6 +2168,11 @@ export type SignInError = {
 
 export type SignInErrorCode =
 	| 'EMAIL_NOT_VERIFIED'
+	/**
+	 * The person is linked to an identity provider with
+	 * `disableLocalAuthentication`, so password sign-in is not available to them.
+	 */
+	| 'IDP_REQUIRED'
 	| 'INVALID_CREDENTIALS'
 	| 'INVALID_OTP_TOKEN'
 	| 'INVALID_PASSWORD'
@@ -2214,6 +2237,11 @@ export type SignInPasswordlessError = {
 }
 
 export type SignInPasswordlessErrorCode =
+	/**
+	 * The person became linked to an identity provider with
+	 * `disableLocalAuthentication` after this magic link was issued.
+	 */
+	| 'IDP_REQUIRED'
 	| 'INVALID_OTP_TOKEN'
 	| 'MFA_ENROLLMENT_REQUIRED'
 	| 'OTP_REQUIRED'
@@ -3772,6 +3800,7 @@ export type IdpOptionsOutputResolvers<
 > = {
 	assumeEmailVerified?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
 	autoSignUp?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
+	disableLocalAuthentication?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
 	exclusive?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
 	initReturnsConfig?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
 	requireVerifiedEmail?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>

@@ -60,6 +60,7 @@ test('SEC-1: a grant for a project that does not exist yet is KEPT but inert —
 						initReturnsConfig: false,
 						requireVerifiedEmail: false,
 						assumeEmailVerified: false,
+						disableLocalAuthentication: false,
 						configuration: { externalIdentifier, email, claims: { department: 'Editorial' }, claimMapping: { rules: [editorRule] } },
 						disabledAt: null,
 						slug: 'mock',
@@ -111,6 +112,7 @@ test('SEC-1: a grant for an EXISTING project whose schema is unresolvable is DRO
 						initReturnsConfig: false,
 						requireVerifiedEmail: false,
 						assumeEmailVerified: false,
+						disableLocalAuthentication: false,
 						configuration: { externalIdentifier, email, claims: { department: 'Editorial' }, claimMapping: { rules: [editorRule] } },
 						disabledAt: null,
 						slug: 'mock',
@@ -170,6 +172,7 @@ test('TEST-3: a partial drop applies the safe grant AND still emits the fail-ope
 						initReturnsConfig: false,
 						requireVerifiedEmail: false,
 						assumeEmailVerified: false,
+						disableLocalAuthentication: false,
 						configuration: {
 							externalIdentifier,
 							email,
@@ -264,6 +267,7 @@ test('TEST-4: an allow-bounded claim-derived `condition` variable writes ONLY th
 						initReturnsConfig: false,
 						requireVerifiedEmail: false,
 						assumeEmailVerified: false,
+						disableLocalAuthentication: false,
 						configuration: {
 							externalIdentifier,
 							email,

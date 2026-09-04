@@ -1,4 +1,5 @@
 import { Command } from '../Command.js'
+import { UpdateBuilder } from '@contember/database'
 
 /**
  * Atomically claim the right to re-validate a federated session: bump `last_validated_at`
@@ -17,12 +18,14 @@ export class ClaimIdpRevalidationCommand implements Command<boolean> {
 	}
 
 	async execute({ db }: Command.Args): Promise<boolean> {
-		const result = await db.query(
-			`UPDATE "idp_session"
-			 SET "last_validated_at" = now()
-			 WHERE "id" = ? AND "last_validated_at" <= now() - ?::interval`,
-			[this.id, this.interval],
-		)
-		return (result.rowCount ?? 0) > 0
+		// Both sides of the window read the database clock, never `providers.now()` — the claim must be
+		// decided by the same clock that stamps it, or concurrent requests could each think they won.
+		const affected = await UpdateBuilder.create()
+			.table('idp_session')
+			.values({ last_validated_at: expr => expr.raw('now()') })
+			.where({ id: this.id })
+			.where(expr => expr.raw('"last_validated_at" <= now() - ?::interval', this.interval))
+			.execute(db)
+		return affected > 0
 	}
 }

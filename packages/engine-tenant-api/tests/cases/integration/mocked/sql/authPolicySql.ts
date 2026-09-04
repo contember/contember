@@ -40,7 +40,9 @@ export const getAllProjectRolesByIdentitySql = (args: {
 	identityId: string
 	rows?: { projectId: string; role: string }[]
 }): ExpectedQuery => ({
-	sql: SQL`select "project_id", "role" from "tenant"."project_membership" where "identity_id" = ?`,
+	sql: SQL`select "project_id", "role"
+	         from "tenant"."project_membership"
+	         where "identity_id" = ? and ("lease_expires_at" is null or "lease_expires_at" > now())`,
 	parameters: [args.identityId],
 	response: {
 		rows: (args.rows ?? []).map(r => ({ project_id: r.projectId, role: r.role })),

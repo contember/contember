@@ -1,4 +1,5 @@
 export * from './AllProjectRolesByIdentityQuery.js'
+export * from './MembershipLeaseSpecification.js'
 export * from './ProjectMembershipByIdentityQuery.js'
 export * from './ProjectMembersQuery.js'
 export * from './ProjectRolesByIdentityQuery.js'

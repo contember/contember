@@ -65,6 +65,8 @@ import _20260616130000idplogout from './2026-06-16-130000-idp-logout.js'
 import _20260618120000idpclaimmapping from './2026-06-18-120000-idp-claim-mapping.js'
 import _20260803120000personenableauthlog from './2026-08-03-120000-person-enable-auth-log.js'
 import _20260804120000configpanel from './2026-08-04-120000-config-panel.js'
+import _20260903120000idpmembershipleasetypes from './2026-09-03-120000-idp-membership-lease-types.js'
+import _20260903120010idpmembershiplease from './2026-09-03-120010-idp-membership-lease.js'
 import snapshot from './snapshot.js'
 import { computeTokenHash, Providers } from '../model/index.js'
 import { Logger } from '@contember/logger'
@@ -153,6 +155,8 @@ const migrations = {
 	'2026-06-18-120000-idp-claim-mapping': _20260618120000idpclaimmapping,
 	'2026-08-03-120000-person-enable-auth-log': _20260803120000personenableauthlog,
 	'2026-08-04-120000-config-panel': _20260804120000configpanel,
+	'2026-09-03-120000-idp-membership-lease-types': _20260903120000idpmembershipleasetypes,
+	'2026-09-03-120010-idp-membership-lease': _20260903120010idpmembershiplease,
 }
 
 export class TenantMigrationsRunner {

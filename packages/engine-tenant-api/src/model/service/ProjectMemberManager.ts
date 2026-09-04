@@ -6,7 +6,12 @@ import {
 	UpdateProjectMemberCommand,
 	UpdateProjectMemberResponse,
 } from '../commands/index.js'
-import { ProjectMembershipByIdentityQuery, ProjectMembersQuery } from '../queries/index.js'
+import {
+	ProjectMemberMembership,
+	ProjectMembershipByIdentityQuery,
+	ProjectMembershipsForDisplayQuery,
+	ProjectMembersQuery,
+} from '../queries/index.js'
 import { AddProjectMemberErrorCode, ProjectMembersInput } from '../../schema/index.js'
 import { AccessVerifier, PermissionActions, TenantRole } from '../authorization/index.js'
 import { indexListBy, notEmpty } from '../../utils/array.js'
@@ -58,6 +63,19 @@ export class ProjectMemberManager {
 		]
 	}
 
+	/** The listing counterpart of {@link getAllProjectMemberships}: a lapsed membership is reported as inactive, not dropped. */
+	async getAllProjectMembershipsForDisplay(
+		dbContext: DatabaseContext,
+		project: { id: string } | { slug: string },
+		identity: { id: string; roles?: readonly string[] },
+		verifier: AccessVerifier | undefined,
+	): Promise<readonly ProjectMemberMembership[]> {
+		return [
+			...this.getImplicitProjectMemberships(identity).map(membership => this.asDisplayMembership(identity.id, membership)),
+			...await this.getStoredProjectMembershipsForDisplay(dbContext, project, identity, verifier),
+		]
+	}
+
 	async getEffectiveProjectMemberships(
 		dbContext: DatabaseContext,
 		project: { id: string } | { slug: string },
@@ -85,6 +103,26 @@ export class ProjectMemberManager {
 		return await this.filterMemberships(memberships, verifier)
 	}
 
+	async getStoredProjectMembershipsForDisplay(
+		dbContext: DatabaseContext,
+		project: { id: string } | { slug: string },
+		identity: { id: string },
+		verifier: AccessVerifier | undefined,
+	): Promise<readonly ProjectMemberMembership[]> {
+		const memberships = await dbContext.queryHandler.fetch(
+			new ProjectMembershipsForDisplayQuery(project, [identity.id]),
+		)
+		if (verifier === undefined) {
+			return memberships
+		}
+		return await this.filterMembershipsForDisplay(memberships, verifier)
+	}
+
+	/** A synthetic membership has no row, so it carries no lease and is never inactive. */
+	private asDisplayMembership(identityId: string, membership: Acl.Membership): ProjectMemberMembership {
+		return { identityId, membership, leaseExpiresAt: null, active: true }
+	}
+
 	private getImplicitProjectMemberships(identity: { id: string; roles?: readonly string[] }): readonly Acl.Membership[] {
 		if (identity.roles?.includes(TenantRole.SUPER_ADMIN) || identity.roles?.includes(TenantRole.PROJECT_ADMIN)) {
 			return [{ role: ProjectRole.ADMIN, variables: [] }]
@@ -101,13 +139,14 @@ export class ProjectMemberManager {
 		return dbContext.transaction(async db => {
 			const members = await db.queryHandler.fetch(new ProjectMembersQuery(projectId, input))
 			const memberships = await db.queryHandler.fetch(
-				new ProjectMembershipByIdentityQuery(
+				new ProjectMembershipsForDisplayQuery(
 					{ id: projectId },
 					members.map(it => it.id),
 				),
 			)
-			const filteredMemberships = await this.filterMemberships(memberships, accessVerifier)
+			const filteredMemberships = await this.filterMembershipsForDisplay(memberships, accessVerifier)
 			const byIdentity = indexListBy(filteredMemberships, 'identityId')
+			// Only the verifier drops a member here; a lapsed lease leaves the row in place, listed as inactive.
 			return members
 				.map(it => (byIdentity[it.id] ? { identity: it, memberships: byIdentity[it.id] } : null))
 				.filter(notEmpty)
@@ -119,22 +158,46 @@ export class ProjectMemberManager {
 		verifier: AccessVerifier,
 	): Promise<T[]> {
 		const filteredMemberships: T[] = []
-		nextMembership: for (const membership of memberships) {
-			if (!(await verifier(PermissionActions.PROJECT_VIEW_MEMBER([{ role: membership.role, variables: [] }])))) {
-				continue
+		for (const membership of memberships) {
+			const filtered = await this.filterMembership(membership, verifier)
+			if (filtered !== null) {
+				filteredMemberships.push({ ...membership, variables: filtered.variables })
 			}
-			const variables: { values: Acl.MembershipVariable['values']; name: string }[] = []
-			for (const variable of membership.variables) {
-				const values = await this.filterProjectMembershipVariableValues(membership, variable, verifier)
-				if (values.length === 0) {
-					continue nextMembership
-				}
-				variables.push({ name: variable.name, values })
-			}
-			filteredMemberships.push({ ...membership, variables })
 		}
 
 		return filteredMemberships
+	}
+
+	private async filterMembershipsForDisplay(
+		memberships: readonly ProjectMemberMembership[],
+		verifier: AccessVerifier,
+	): Promise<ProjectMemberMembership[]> {
+		const filteredMemberships: ProjectMemberMembership[] = []
+		for (const row of memberships) {
+			const membership = await this.filterMembership(row.membership, verifier)
+			if (membership !== null) {
+				filteredMemberships.push({ ...row, membership })
+			}
+		}
+
+		return filteredMemberships
+	}
+
+	/** Null when the verifier hides the membership, by its role or by leaving one of its variables empty. */
+	private async filterMembership(membership: Acl.Membership, verifier: AccessVerifier): Promise<Acl.Membership | null> {
+		if (!(await verifier(PermissionActions.PROJECT_VIEW_MEMBER([{ role: membership.role, variables: [] }])))) {
+			return null
+		}
+		const variables: { values: Acl.MembershipVariable['values']; name: string }[] = []
+		for (const variable of membership.variables) {
+			const values = await this.filterProjectMembershipVariableValues(membership, variable, verifier)
+			if (values.length === 0) {
+				return null
+			}
+			variables.push({ name: variable.name, values })
+		}
+
+		return { role: membership.role, variables }
 	}
 
 	private async filterProjectMembershipVariableValues(
@@ -168,5 +231,5 @@ export type AddProjectMemberResponse = Response<null, AddProjectMemberErrorCode>
 
 export type GetProjectMembersResponse = {
 	identity: { id: string }
-	memberships: readonly Acl.Membership[]
+	memberships: readonly ProjectMemberMembership[]
 }[]

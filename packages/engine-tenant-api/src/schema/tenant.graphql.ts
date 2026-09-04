@@ -1240,6 +1240,10 @@ const schema: DocumentNode = gql`
 	type Membership {
 		role: String!
 		variables: [VariableEntry!]!
+		""" When the granting IdP claim mapping must confirm this membership again; null when it carries no lease. """
+		leaseExpiresAt: DateTime
+		""" False once the lease has lapsed: the membership then grants nothing but is still listed. """
+		active: Boolean!
 	}
 
 	type MembershipValidationError {

@@ -4,6 +4,8 @@ import { testUuid } from '../../../src/testUuid.js'
 import { test } from 'bun:test'
 import { sqlTransaction } from './sql/sqlTransaction.js'
 
+const lapsedAt = new Date('2024-01-01T00:00:00.000Z')
+
 test('list project members by email query with stable pagination order', async () => {
 	await executeTenantTest({
 		query: {
@@ -22,6 +24,8 @@ query {
 			}
 			memberships {
 				role
+				active
+				leaseExpiresAt
 				variables {
 					name
 					values
@@ -51,21 +55,29 @@ query {
 					response: {
 						rows: [
 							{ id: testUuid(2), description: 'foobar' },
+							{ id: testUuid(3), description: 'lapsed' },
 						],
 					},
 				},
 				{
-					sql: `with 
-    					"memberships" as (select "project_membership"."id", "project_membership"."role", "project_membership"."identity_id"  from "tenant"."project_membership"  where "identity_id" in (?) and "project_id" = ?), 
-    					"variables" as (select "membership_id", json_agg(json_build_object('name', variable, 'values', value)) as "variables"  from "tenant"."project_membership_variable" inner join  "memberships" on  "project_membership_variable"."membership_id" = "memberships"."id"   group by "membership_id") 
-						select "role", coalesce(variables, '[]'::json) as "variables", "identity_id" as "identityId"  from "memberships" left join  "variables" on  "memberships"."id" = "variables"."membership_id"`,
-					parameters: [testUuid(2), testUuid(1)],
+					sql:
+						`with "memberships" as (select "project_membership"."id", "project_membership"."role", "project_membership"."identity_id", "project_membership"."lease_expires_at"  from "tenant"."project_membership"  where "identity_id" in (?, ?) and "project_id" = ?), "variables" as (select "membership_id", json_agg(json_build_object('name', variable, 'values', value)) as "variables"  from "tenant"."project_membership_variable" inner join  "memberships" on  "project_membership_variable"."membership_id" = "memberships"."id"   group by "membership_id") select "role", coalesce(variables, '[]'::json) as "variables", "identity_id" as "identityId", "memberships"."lease_expires_at" as "leaseExpiresAt", ("memberships"."lease_expires_at" is null or "memberships"."lease_expires_at" > now()) as "active"  from "memberships" left join  "variables" on  "memberships"."id" = "variables"."membership_id"`,
+					parameters: [testUuid(2), testUuid(3), testUuid(1)],
 					response: {
 						rows: [
 							{
 								role: 'foo',
 								variables: [{ values: ['x', 'y'], name: 'xyz' }],
 								identityId: testUuid(2),
+								leaseExpiresAt: null,
+								active: true,
+							},
+							{
+								role: 'bar',
+								variables: [],
+								identityId: testUuid(3),
+								leaseExpiresAt: lapsedAt,
+								active: false,
 							},
 						],
 					},
@@ -78,7 +90,11 @@ query {
 					members: [
 						{
 							identity: { id: testUuid(2) },
-							memberships: [{ role: 'foo', variables: [{ name: 'xyz', values: ['x', 'y'] }] }],
+							memberships: [{ role: 'foo', active: true, leaseExpiresAt: null, variables: [{ name: 'xyz', values: ['x', 'y'] }] }],
+						},
+						{
+							identity: { id: testUuid(3) },
+							memberships: [{ role: 'bar', active: false, leaseExpiresAt: lapsedAt.toISOString(), variables: [] }],
 						},
 					],
 				},

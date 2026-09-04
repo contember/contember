@@ -125,6 +125,27 @@ export const ClaimMappingRule = Typesafe.noExtraProps(Typesafe.intersection(
 export type ClaimMappingRule = ReturnType<typeof ClaimMappingRule>
 
 /**
+ * How long a claim-granted membership stays effective without being renewed, as a
+ * `<positive integer> <unit>` duration (`30 days`, `12 hours`, `6 months`). The grammar is
+ * deliberately narrow — the value is handed to Postgres as an `interval`, and a narrow, validated
+ * shape keeps a typo from becoming an interval nobody intended.
+ */
+const LEASE_DURATION_PATTERN = /^[1-9]\d{0,5}[ \t]+(second|minute|hour|day|week|month)s?$/
+
+export const ClaimMappingLease = ((): Typesafe.Type<string> => {
+	return (input: unknown, path: PropertyKey[] = []) => {
+		if (typeof input !== 'string' || !LEASE_DURATION_PATTERN.test(input.trim())) {
+			throw Typesafe.ParseError.format(
+				input,
+				path,
+				'a lease duration such as "30 days" (a positive integer and one of second/minute/hour/day/week/month)',
+			)
+		}
+		return input.trim()
+	}
+})()
+
+/**
  * The validated A09 mapping. `rules` is required here — {@link parseClaimMapping} only returns a
  * mapping once it has confirmed `rules` is present, and returns `null` otherwise (so an OIDC-only
  * `claimMapping` is treated as "no role mapping", not an error).
@@ -150,6 +171,21 @@ export const ClaimMapping = Typesafe.intersection(
 		 *              outside the mapping's vocabulary are never removed.
 		 */
 		unmatched: Typesafe.enumeration('keep', 'remove'),
+		/**
+		 * Time bound on a claim-granted membership (A32). Absent (the default) ⇒ grants never expire, which
+		 * is the pre-A32 behaviour: reconciliation happens only while the person keeps authenticating, so
+		 * someone dropped from a directory group who never signs in again keeps their grants forever.
+		 *
+		 * With a lease, every membership this mapping grants carries an expiry that each successful sync
+		 * pushes forward; once it lapses the membership grants nothing (see
+		 * {@link ProjectMembershipByIdentityQuery}). The bound is therefore "how long a grant may outlive
+		 * the last time the IdP confirmed it", not a session or token lifetime — size it above the interval
+		 * an ordinary user goes without signing in, or ordinary absence revokes them.
+		 *
+		 * Only meaningful together with `syncPolicy: 'always'` and `unmatched: 'remove'`; the other
+		 * combinations are rejected at config time (see {@link findClaimMappingShapeErrors}).
+		 */
+		membershipLease: ClaimMappingLease,
 	}),
 )
 
@@ -166,7 +202,7 @@ export const isRecord = (value: unknown): value is Record<string, unknown> => ty
  * `rules` (e.g. the OIDC identity-field remap, which shares this key). Returning `null` keeps both
  * the pre-A09 sign-in path and the OIDC remap untouched.
  *
- * Only the A09 fields (`rules`, `syncPolicy`, `unmatched`) are validated; any other keys on the
+ * Only the A09 fields (`rules`, `syncPolicy`, `unmatched`, `membershipLease`) are validated; any other keys on the
  * `claimMapping` object (the OIDC remap fields) are ignored, so the two features coexist. Throws via
  * Typesafe when `rules` is present but structurally malformed (e.g. a rule missing its required
  * `claim`), so an A09 misconfiguration surfaces loudly rather than silently dropping grants.
@@ -176,7 +212,7 @@ export const isRecord = (value: unknown): value is Record<string, unknown> => ty
  * REJECTED, not silently stripped — a misconfiguration surfaces loudly instead of degrading into a
  * grants-nothing or match-everyone rule. The one exception is the top-level `claimMapping` object
  * itself: it is the key SHARED with the OIDC identity-remap (`email`/`name`/`externalIdentifier`/
- * `attributesKey`), so this parse first projects only the A09 fields (`rules`/`syncPolicy`/`unmatched`)
+ * `attributesKey`), so this parse first projects only the A09 fields (`rules`/`syncPolicy`/`unmatched`/`membershipLease`)
  * into a fresh object (above) and deliberately does NOT apply `noExtraProps` there — the OIDC remap
  * fields must coexist. The `map` lookup table is likewise a `record` (arbitrary keys are legitimate),
  * not a strict object. The removed `grantRoles` key is still caught separately by
@@ -194,6 +230,9 @@ export const parseClaimMapping = (configuration: Record<string, unknown>): Claim
 	}
 	if (raw.unmatched !== undefined) {
 		input.unmatched = raw.unmatched
+	}
+	if (raw.membershipLease !== undefined) {
+		input.membershipLease = raw.membershipLease
 	}
 	return ClaimMapping(input, ['claimMapping'])
 }
@@ -244,9 +283,32 @@ export const findRemovedRuleKeys = (configuration: Record<string, unknown>): str
  *   is nothing to project, so the source can only ever resolve to no values;
  * - a variable's `from.split` must not be the empty string — `''.split('')` explodes every claim value
  *   into its individual characters (the same class of footgun as an empty `equals` / `contains`).
+ *
+ * A `membershipLease` additionally constrains the two policy fields, because the other combinations are
+ * self-defeating rather than merely unusual (see the two checks below).
  */
 export const findClaimMappingShapeErrors = (mapping: ClaimMapping): string[] => {
 	const errors: string[] = []
+	if (mapping.membershipLease !== undefined) {
+		// `keep` promises the mapping never revokes. A lease revokes — and revokes MORE than a live sync
+		// would, because a `keep` sync leaves an ungranted membership in place while the lease, having
+		// nothing to renew it, lets it lapse. That turns `keep` into a delayed `remove` the operator never
+		// asked for, so the two are rejected together instead of silently redefining `keep`.
+		if ((mapping.unmatched ?? DEFAULT_UNMATCHED) !== 'remove') {
+			errors.push(
+				`claimMapping sets 'membershipLease' with unmatched: '${
+					mapping.unmatched ?? DEFAULT_UNMATCHED
+				}'; a lease revokes what it does not renew, which 'keep' promises never to do — set unmatched: 'remove' to let the IdP own these memberships, or drop the lease`,
+			)
+		}
+		// `sticky` applies the mapping once, at account creation, and never again — so nothing would ever
+		// renew the lease and every grant would self-destruct one lease later.
+		if ((mapping.syncPolicy ?? DEFAULT_SYNC_POLICY) !== 'always') {
+			errors.push(
+				`claimMapping sets 'membershipLease' with syncPolicy: 'sticky'; a sticky mapping never re-runs, so no sign-in would ever renew the lease and every grant would expire once — use syncPolicy: 'always' or drop the lease`,
+			)
+		}
+	}
 	for (const rule of mapping.rules) {
 		if (rule.grantMembership === undefined) {
 			errors.push(

@@ -10,6 +10,7 @@ import { getPersonByEmailSql } from './sql/getPersonByEmailSql.js'
 import { createSessionKeySql } from './sql/createSessionKeySql.js'
 import { getIdentityProjectsSql } from './sql/getIdentityProjectsSql.js'
 import { selectMembershipsSql } from './sql/selectMembershipsSql.js'
+import { selectMembershipsForDisplaySql } from './sql/selectMembershipsForDisplaySql.js'
 import { getConfigSql } from './sql/getConfigSql.js'
 import { getIdentityByIdSql } from './sql/getIdentityByIdSql.js'
 import { getAuthPoliciesSql } from './sql/authPolicySql.js'
@@ -106,22 +107,14 @@ test('a DB error during the membership apply rolls back the whole sign-in (no se
 			selectMembershipsSql({ identityId, projectId: mappedProjectId, membershipsResponse: [] }),
 			// apply: resolve project, then the membership upsert returns NO row → ImplementationException
 			getProjectBySlugSql({ projectSlug: 'demo', response: project }),
-			{
-				sql: SQL`INSERT INTO "tenant"."project_membership" ("id", "project_id", "identity_id", "role")
-				         VALUES (?, ?, ?, ?)
-				         ON CONFLICT ("project_id", "identity_id", "role") DO UPDATE SET "role" = ?
-				         RETURNING "id"`,
-				parameters: [membershipId, mappedProjectId, identityId, 'editor', 'editor'],
-				response: { rows: [] },
-			},
+			{ ...createMembershipSql({ membershipId, identityId, projectId: mappedProjectId, role: 'editor' }), response: { rows: [] } },
 			// The apply throws here; the exception propagates out of the transaction so COMMIT is never
 			// reached (no `COMMIT;` is enqueued below) — i.e. the sign-in is rolled back, not committed.
 			// (The connection mock surfaces the throw without emitting a ROLLBACK statement of its own.)
 		],
-		return: (response: any) => {
-			expect(response.data?.signInIDP ?? null).toBe(null)
-			expect(Array.isArray(response.errors) && response.errors.length > 0).toBe(true)
-		},
+		// Pinned exactly: a mocked-SQL mismatch also nulls the field and adds an error, so "some error" would
+		// pass whether or not the rollback happened. The ImplementationException carries an empty message.
+		return: { data: { signInIDP: null }, errors: [{ message: '' }] },
 		// the sign-in throws before the resolver audits anything, so no auth log is emitted
 	})
 })
@@ -183,7 +176,7 @@ test('sticky leaves an existing local account being LINKED to the IdP untouched 
 				createSessionKeySql({ apiKeyId: testUuid(2), identityId }),
 			),
 			getIdentityProjectsSql({ identityId, projectId }),
-			selectMembershipsSql({ identityId, projectId, membershipsResponse: [] }),
+			selectMembershipsForDisplaySql({ identityId, projectId, membershipsResponse: [] }),
 		],
 		return: {
 			data: { signInIDP: { ok: true, errors: [], result: { token: '0000000000000000000000000000000000000000' } } },
@@ -253,7 +246,7 @@ test('apply-time guard drops a grant that would inject a claim into a condition 
 				createSessionKeySql({ apiKeyId, identityId }),
 			),
 			getIdentityProjectsSql({ identityId, projectId }),
-			selectMembershipsSql({ identityId, projectId, membershipsResponse: [] }),
+			selectMembershipsForDisplaySql({ identityId, projectId, membershipsResponse: [] }),
 		],
 		return: {
 			data: { signInIDP: { ok: true, errors: [], result: { token: '0000000000000000000000000000000000000000' } } },
@@ -333,7 +326,7 @@ test('TEST-1: under unmatched:remove, a rule dropped by the apply-time guard doe
 			),
 			getIdentityProjectsSql({ identityId, projectId }),
 			// the pre-existing editor membership is intact in the post-sign-in session read (never reconciled)
-			selectMembershipsSql({ identityId, projectId, membershipsResponse: [{ role: 'editor', variables: [] }] }),
+			selectMembershipsForDisplaySql({ identityId, projectId, membershipsResponse: [{ role: 'editor', variables: [] }] }),
 		],
 		return: {
 			data: { signInIDP: { ok: true, errors: [], result: { token: '0000000000000000000000000000000000000000' } } },
@@ -420,7 +413,7 @@ test('SEC: apply-time guard drops an `admin` grant whose claim-derived variable 
 				createSessionKeySql({ apiKeyId, identityId }),
 			),
 			getIdentityProjectsSql({ identityId, projectId: sessionProjectId }),
-			selectMembershipsSql({ identityId, projectId: sessionProjectId, membershipsResponse: [] }),
+			selectMembershipsForDisplaySql({ identityId, projectId: sessionProjectId, membershipsResponse: [] }),
 		],
 		return: {
 			data: { signInIDP: { ok: true, errors: [], result: { token: '0000000000000000000000000000000000000000' } } },
@@ -500,7 +493,7 @@ test('SEC: a legitimate `admin` grant (role has no required variable) is still a
 				createSessionKeySql({ apiKeyId, identityId }),
 			),
 			getIdentityProjectsSql({ identityId, projectId: sessionProjectId }),
-			selectMembershipsSql({ identityId, projectId: sessionProjectId, membershipsResponse: [{ role: 'admin', variables: [] }] }),
+			selectMembershipsForDisplaySql({ identityId, projectId: sessionProjectId, membershipsResponse: [{ role: 'admin', variables: [] }] }),
 		],
 		return: {
 			data: { signInIDP: { ok: true, errors: [], result: { token: '0000000000000000000000000000000000000000' } } },

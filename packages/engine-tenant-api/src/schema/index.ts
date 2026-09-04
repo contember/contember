@@ -1281,6 +1281,10 @@ export type MemberType =
 
 export type Membership = {
 	readonly __typename?: 'Membership'
+	/**  False once the lease has lapsed: the membership then grants nothing but is still listed.  */
+	readonly active: Scalars['Boolean']['output']
+	/**  When the granting IdP claim mapping must confirm this membership again; null when it carries no lease.  */
+	readonly leaseExpiresAt?: Maybe<Scalars['DateTime']['output']>
 	readonly role: Scalars['String']['output']
 	readonly variables: ReadonlyArray<VariableEntry>
 }
@@ -3946,6 +3950,8 @@ export type MailTemplateDataResolvers<
 }
 
 export type MembershipResolvers<ContextType = any, ParentType extends ResolversParentTypes['Membership'] = ResolversParentTypes['Membership']> = {
+	active?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
+	leaseExpiresAt?: Resolver<Maybe<ResolversTypes['DateTime']>, ParentType, ContextType>
 	role?: Resolver<ResolversTypes['String'], ParentType, ContextType>
 	variables?: Resolver<ReadonlyArray<ResolversTypes['VariableEntry']>, ParentType, ContextType>
 }

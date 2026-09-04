@@ -7,7 +7,7 @@ import { getConfigSql } from './sql/getConfigSql.js'
 import { getNextLoginAttemptSql } from './sql/getNextLoginAttemptSql.js'
 import { createSessionKeySql } from './sql/createSessionKeySql.js'
 import { getIdentityProjectsSql } from './sql/getIdentityProjectsSql.js'
-import { selectMembershipsSql } from './sql/selectMembershipsSql.js'
+import { selectMembershipsForDisplaySql } from './sql/selectMembershipsForDisplaySql.js'
 import { getAllProjectRolesByIdentitySql, getAuthPoliciesSql } from './sql/authPolicySql.js'
 import { getIdentityByIdSql } from './sql/getIdentityByIdSql.js'
 import { generateBackupCodesSql } from './sql/generateBackupCodesSql.js'
@@ -147,7 +147,7 @@ test('MFA required + valid pending code → enrolls (pending→active), returns 
 				response: { rowCount: 1 },
 			},
 			getIdentityProjectsSql({ identityId, projectId }),
-			selectMembershipsSql({ identityId, projectId, membershipsResponse: [] }),
+			selectMembershipsForDisplaySql({ identityId, projectId, membershipsResponse: [] }),
 		],
 		return: (response: any) => {
 			expect(response.data.signIn.ok).toBe(true)
@@ -262,7 +262,7 @@ test('MFA required + per-policy grace → opens grace window, sets mfa_grace_unt
 				response: { rowCount: 1 },
 			},
 			getIdentityProjectsSql({ identityId, projectId }),
-			selectMembershipsSql({ identityId, projectId, membershipsResponse: [] }),
+			selectMembershipsForDisplaySql({ identityId, projectId, membershipsResponse: [] }),
 		],
 		return: (response: any) => {
 			expect(response.data.signIn.ok).toBe(true)
@@ -309,7 +309,7 @@ test('MFA required + no policy grace override → global config default opens th
 				response: { rowCount: 1 },
 			},
 			getIdentityProjectsSql({ identityId, projectId }),
-			selectMembershipsSql({ identityId, projectId, membershipsResponse: [] }),
+			selectMembershipsForDisplaySql({ identityId, projectId, membershipsResponse: [] }),
 		],
 		return: (response: any) => {
 			expect(response.data.signIn.ok).toBe(true)

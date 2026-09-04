@@ -7,7 +7,7 @@ import { getIdpBySlugSql } from './sql/getIdpBySlugSql.js'
 import { getPersonByIdpSql } from './sql/getPersonByIdpSql.js'
 import { createSessionKeySql } from './sql/createSessionKeySql.js'
 import { getIdentityProjectsSql } from './sql/getIdentityProjectsSql.js'
-import { selectMembershipsSql } from './sql/selectMembershipsSql.js'
+import { selectMembershipsForDisplaySql } from './sql/selectMembershipsForDisplaySql.js'
 import { createIdentitySql } from './sql/createIdentitySql.js'
 import { createPersonSql } from './sql/createPersonSql.js'
 import { getConfigSql } from './sql/getConfigSql.js'
@@ -73,7 +73,7 @@ test('signs in idp with existing identity', async () => {
 				}),
 			),
 			getIdentityProjectsSql({ identityId: identityId, projectId: projectId }),
-			selectMembershipsSql({
+			selectMembershipsForDisplaySql({
 				identityId: identityId,
 				projectId,
 				membershipsResponse: [{ role: 'editor', variables: [{ name: 'locale', values: ['cs'] }] }],
@@ -237,7 +237,7 @@ test('links by e-mail when provider requires a verified e-mail and the claim is 
 				}),
 			),
 			getIdentityProjectsSql({ identityId, projectId }),
-			selectMembershipsSql({
+			selectMembershipsForDisplaySql({
 				identityId,
 				projectId,
 				membershipsResponse: [{ role: 'editor', variables: [{ name: 'locale', values: ['cs'] }] }],
@@ -324,7 +324,7 @@ test('links by e-mail when require + assumeEmailVerified are set, even though th
 				}),
 			),
 			getIdentityProjectsSql({ identityId, projectId }),
-			selectMembershipsSql({
+			selectMembershipsForDisplaySql({
 				identityId,
 				projectId,
 				membershipsResponse: [{ role: 'editor', variables: [{ name: 'locale', values: ['cs'] }] }],
@@ -408,7 +408,7 @@ test('signs in exclusive idp', async () => {
 				}),
 			),
 			getIdentityProjectsSql({ identityId: identityId, projectId: projectId }),
-			selectMembershipsSql({
+			selectMembershipsForDisplaySql({
 				identityId: identityId,
 				projectId,
 				membershipsResponse: [{ role: 'editor', variables: [{ name: 'locale', values: ['cs'] }] }],

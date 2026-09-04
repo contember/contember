@@ -26,6 +26,12 @@ export class ProjectMembersQueryResolver implements QueryResolvers {
 		}
 		const verifier = context.permissionContext.createAccessVerifier(projectScope)
 
-		return await this.projectMemberManager.getAllProjectMemberships(context.db, { id: project.id }, { id: args.identityId }, verifier)
+		const memberships = await this.projectMemberManager.getAllProjectMembershipsForDisplay(
+			context.db,
+			{ id: project.id },
+			{ id: args.identityId },
+			verifier,
+		)
+		return memberships.map(({ membership, active, leaseExpiresAt }) => ({ ...membership, active, leaseExpiresAt }))
 	}
 }

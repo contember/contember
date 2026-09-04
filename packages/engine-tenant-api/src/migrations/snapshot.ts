@@ -59,7 +59,8 @@ CREATE TYPE "auth_log_type" AS ENUM (
     'idp_backchannel_logout',
     'idp_role_mapped',
     'idp_role_mapping_failed',
-    'person_enable'
+    'person_enable',
+    'idp_membership_lease_expired'
 );
 CREATE TYPE "config_policy" AS ENUM (
     'always',
@@ -309,7 +310,9 @@ CREATE TABLE "project_membership" (
     "id" "uuid" NOT NULL,
     "project_id" "uuid" NOT NULL,
     "identity_id" "uuid" NOT NULL,
-    "role" "text" NOT NULL
+    "role" "text" NOT NULL,
+    "lease_expires_at" timestamp with time zone,
+    "identity_provider_id" "uuid"
 );
 CREATE TABLE "project_membership_variable" (
     "id" "uuid" NOT NULL,
@@ -395,6 +398,7 @@ CREATE INDEX "person_identity_provider_person_id" ON "person_identity_provider" 
 CREATE UNIQUE INDEX "person_password_reset_token" ON "person_token" USING "btree" ("token_hash");
 CREATE INDEX "project_alias" ON "project" USING "gin" ((("config" -> 'alias'::"text")));
 CREATE INDEX "project_membership_identity_index" ON "project_membership" USING "btree" ("identity_id");
+CREATE INDEX "project_membership_lease_expires_at" ON "project_membership" USING "btree" ("lease_expires_at") WHERE ("lease_expires_at" IS NOT NULL);
 CREATE UNIQUE INDEX "project_membership_unique" ON "project_membership" USING "btree" ("project_id", "identity_id", "role");
 CREATE INDEX "project_secret_project_index" ON "project_secret" USING "btree" ("project_id");
 CREATE UNIQUE INDEX "project_secret_unique" ON "project_secret" USING "btree" ("project_id", "key");
@@ -440,6 +444,8 @@ ALTER TABLE ONLY "person_token"
     ADD CONSTRAINT "person_password_reset_person" FOREIGN KEY ("person_id") REFERENCES "person"("id") ON DELETE CASCADE;
 ALTER TABLE ONLY "project_membership"
     ADD CONSTRAINT "project_membership_identity" FOREIGN KEY ("identity_id") REFERENCES "identity"("id") ON DELETE CASCADE;
+ALTER TABLE ONLY "project_membership"
+    ADD CONSTRAINT "project_membership_identity_provider" FOREIGN KEY ("identity_provider_id") REFERENCES "identity_provider"("id") ON DELETE SET NULL;
 ALTER TABLE ONLY "project_membership"
     ADD CONSTRAINT "project_membership_project" FOREIGN KEY ("project_id") REFERENCES "project"("id") ON DELETE CASCADE;
 ALTER TABLE ONLY "project_membership_variable"

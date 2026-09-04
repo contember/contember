@@ -8,6 +8,7 @@ import { getPersonByIdpSql } from './sql/getPersonByIdpSql.js'
 import { createSessionKeySql } from './sql/createSessionKeySql.js'
 import { getIdentityProjectsSql } from './sql/getIdentityProjectsSql.js'
 import { selectMembershipsSql } from './sql/selectMembershipsSql.js'
+import { selectMembershipsForDisplaySql } from './sql/selectMembershipsForDisplaySql.js'
 import { getConfigSql } from './sql/getConfigSql.js'
 import { getIdentityByIdSql } from './sql/getIdentityByIdSql.js'
 import { getAuthPoliciesSql } from './sql/authPolicySql.js'
@@ -91,7 +92,7 @@ test('claim mapping grants a project membership on sign-in', async () => {
 				createSessionKeySql({ apiKeyId, identityId }),
 			),
 			getIdentityProjectsSql({ identityId, projectId: sessionProjectId }),
-			selectMembershipsSql({
+			selectMembershipsForDisplaySql({
 				identityId,
 				projectId: sessionProjectId,
 				membershipsResponse: [{ role: 'editor', variables: [{ name: 'locale', values: ['cs'] }] }],
@@ -192,7 +193,7 @@ test('claim mapping grants a membership with a claim-derived variable (mapped va
 				createSessionKeySql({ apiKeyId, identityId }),
 			),
 			getIdentityProjectsSql({ identityId, projectId: sessionProjectId }),
-			selectMembershipsSql({
+			selectMembershipsForDisplaySql({
 				identityId,
 				projectId: sessionProjectId,
 				membershipsResponse: [{ role: 'editor', variables: [{ name: 'locale', values: ['uuid-cs'] }] }],
@@ -289,7 +290,7 @@ test('a granted membership whose declared variable resolves to no values keeps t
 				createSessionKeySql({ apiKeyId, identityId }),
 			),
 			getIdentityProjectsSql({ identityId, projectId: sessionProjectId }),
-			selectMembershipsSql({ identityId, projectId: sessionProjectId, membershipsResponse: [{ role: 'editor', variables: [] }] }),
+			selectMembershipsForDisplaySql({ identityId, projectId: sessionProjectId, membershipsResponse: [{ role: 'editor', variables: [] }] }),
 		],
 		return: {
 			data: { signInIDP: { ok: true, errors: [], result: { token: '0000000000000000000000000000000000000000' } } },
@@ -360,7 +361,7 @@ test('sticky sync policy skips re-mapping for an existing person (no membership 
 				createSessionKeySql({ apiKeyId, identityId }),
 			),
 			getIdentityProjectsSql({ identityId, projectId }),
-			selectMembershipsSql({
+			selectMembershipsForDisplaySql({
 				identityId,
 				projectId,
 				membershipsResponse: [{ role: 'editor', variables: [{ name: 'locale', values: ['cs'] }] }],
@@ -419,7 +420,7 @@ test('a malformed stored claimMapping is skipped (fail-open) — sign-in succeed
 				createSessionKeySql({ apiKeyId, identityId }),
 			),
 			getIdentityProjectsSql({ identityId, projectId }),
-			selectMembershipsSql({ identityId, projectId, membershipsResponse: [] }),
+			selectMembershipsForDisplaySql({ identityId, projectId, membershipsResponse: [] }),
 		],
 		return: {
 			data: { signInIDP: { ok: true, errors: [], result: { token: '0000000000000000000000000000000000000000' } } },
@@ -488,7 +489,7 @@ test('a claim mapping referencing a non-existent project is skipped, sign-in sti
 				createSessionKeySql({ apiKeyId, identityId }),
 			),
 			getIdentityProjectsSql({ identityId, projectId }),
-			selectMembershipsSql({ identityId, projectId, membershipsResponse: [] }),
+			selectMembershipsForDisplaySql({ identityId, projectId, membershipsResponse: [] }),
 		],
 		return: {
 			data: { signInIDP: { ok: true, errors: [], result: { token: '0000000000000000000000000000000000000000' } } },
@@ -570,7 +571,7 @@ test('unmatched: remove strips a no-longer-granted membership in a mapped projec
 				createSessionKeySql({ apiKeyId, identityId }),
 			),
 			getIdentityProjectsSql({ identityId, projectId: sessionProjectId }),
-			selectMembershipsSql({
+			selectMembershipsForDisplaySql({
 				identityId,
 				projectId: sessionProjectId,
 				membershipsResponse: [{ role: 'editor', variables: [{ name: 'locale', values: ['cs'] }] }],
@@ -685,7 +686,7 @@ test('unmatched: remove revokes the whole membership when a declared variable re
 				createSessionKeySql({ apiKeyId, identityId }),
 			),
 			getIdentityProjectsSql({ identityId, projectId: sessionProjectId }),
-			selectMembershipsSql({
+			selectMembershipsForDisplaySql({
 				identityId,
 				projectId: sessionProjectId,
 				membershipsResponse: [],
@@ -776,7 +777,7 @@ test('sticky sync policy APPLIES on a brand-new auto-signed-up person', async ()
 				createSessionKeySql({ apiKeyId, identityId }),
 			),
 			getIdentityProjectsSql({ identityId, projectId: sessionProjectId }),
-			selectMembershipsSql({ identityId, projectId: sessionProjectId, membershipsResponse: [{ role: 'editor', variables: [] }] }),
+			selectMembershipsForDisplaySql({ identityId, projectId: sessionProjectId, membershipsResponse: [{ role: 'editor', variables: [] }] }),
 		],
 		return: {
 			data: { signInIDP: { ok: true, errors: [], result: { token: '0000000000000000000000000000000000000000' } } },
@@ -862,7 +863,7 @@ test('unmatched: remove revokes a vocabulary membership even when no rule matche
 				createSessionKeySql({ apiKeyId, identityId }),
 			),
 			getIdentityProjectsSql({ identityId, projectId: sessionProjectId }),
-			selectMembershipsSql({ identityId, projectId: sessionProjectId, membershipsResponse: [] }),
+			selectMembershipsForDisplaySql({ identityId, projectId: sessionProjectId, membershipsResponse: [] }),
 		],
 		return: {
 			data: { signInIDP: { ok: true, errors: [], result: { token: '0000000000000000000000000000000000000000' } } },
@@ -963,7 +964,7 @@ test('unmatched: remove never strips a membership outside the mapping vocabulary
 				createSessionKeySql({ apiKeyId, identityId }),
 			),
 			getIdentityProjectsSql({ identityId, projectId: sessionProjectId }),
-			selectMembershipsSql({ identityId, projectId: sessionProjectId, membershipsResponse: [{ role: 'editor', variables: [] }] }),
+			selectMembershipsForDisplaySql({ identityId, projectId: sessionProjectId, membershipsResponse: [{ role: 'editor', variables: [] }] }),
 		],
 		return: {
 			data: { signInIDP: { ok: true, errors: [], result: { token: '0000000000000000000000000000000000000000' } } },
@@ -1071,7 +1072,7 @@ test('a passthrough claim-derived variable writes only allow-listed values (the 
 				createSessionKeySql({ apiKeyId, identityId }),
 			),
 			getIdentityProjectsSql({ identityId, projectId: sessionProjectId }),
-			selectMembershipsSql({
+			selectMembershipsForDisplaySql({
 				identityId,
 				projectId: sessionProjectId,
 				membershipsResponse: [{ role: 'editor', variables: [{ name: 'locale', values: ['cs'] }] }],
@@ -1145,7 +1146,7 @@ test('TEST-4: a claimMapping carrying only the OIDC identity-field remap (no rul
 				createSessionKeySql({ apiKeyId, identityId }),
 			),
 			getIdentityProjectsSql({ identityId, projectId }),
-			selectMembershipsSql({ identityId, projectId, membershipsResponse: [] }),
+			selectMembershipsForDisplaySql({ identityId, projectId, membershipsResponse: [] }),
 		],
 		return: {
 			data: { signInIDP: { ok: true, errors: [], result: { token: '0000000000000000000000000000000000000000' } } },
@@ -1219,7 +1220,7 @@ test('a passthrough claim-derived variable with allow:[] writes no variable, kee
 				createSessionKeySql({ apiKeyId, identityId }),
 			),
 			getIdentityProjectsSql({ identityId, projectId: sessionProjectId }),
-			selectMembershipsSql({ identityId, projectId: sessionProjectId, membershipsResponse: [{ role: 'editor', variables: [] }] }),
+			selectMembershipsForDisplaySql({ identityId, projectId: sessionProjectId, membershipsResponse: [{ role: 'editor', variables: [] }] }),
 		],
 		return: {
 			data: { signInIDP: { ok: true, errors: [], result: { token: '0000000000000000000000000000000000000000' } } },

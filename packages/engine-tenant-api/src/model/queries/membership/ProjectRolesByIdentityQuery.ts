@@ -1,5 +1,6 @@
 import { DatabaseQuery, DatabaseQueryable, SelectBuilder } from '@contember/database'
 import { byProjectSlug } from './ProjectSlugSpecification.js'
+import { withUnexpiredLease } from './MembershipLeaseSpecification.js'
 
 class ProjectRolesByIdentityQuery extends DatabaseQuery<ProjectRolesByIdentityQuery.Result> {
 	constructor(private readonly project: { id: string } | { slug: string }, private readonly identityId: string) {
@@ -18,7 +19,8 @@ class ProjectRolesByIdentityQuery extends DatabaseQuery<ProjectRolesByIdentityQu
 				project_id: this.project.id,
 			})
 			: qb.match(byProjectSlug(this.project.slug))
-		const result = await qbWithProjectWhere.getResult(db)
+		// an expired IdP lease grants no role, here as everywhere else
+		const result = await qbWithProjectWhere.match(withUnexpiredLease()).getResult(db)
 
 		return { roles: result.map(it => it.role) }
 	}

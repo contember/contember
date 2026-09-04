@@ -1,6 +1,14 @@
 import { ApiKeyManager } from './apiKey/index.js'
 import { IdentityProviderBySlugQuery, PersonByIdPQuery, PersonQuery, PersonRow } from '../queries/index.js'
-import { IDPHandlerRegistry, IDPResponse, IDPResponseError, IDPValidationError } from './idp/index.js'
+import {
+	CLAIM_MAPPING_FAILED_LEASE_UNRENEWED,
+	ClaimMappingFailureReason,
+	hasConfiguredMembershipLease,
+	IDPHandlerRegistry,
+	IDPResponse,
+	IDPResponseError,
+	IDPValidationError,
+} from './idp/index.js'
 import { Response, ResponseError, ResponseOk } from '../utils/Response.js'
 import { InitSignInIdpErrorCode, InitSignInIdpResult, SignInIdpErrorCode } from '../../schema/index.js'
 import { DatabaseContext } from '../utils/index.js'
@@ -13,12 +21,14 @@ import { IdentityProviderRow } from '../queries/idp/types.js'
 import { AuthLogService } from './AuthLogService.js'
 import { ClaimMappingAudit, IDPClaimSyncService } from './idp/IDPClaimSyncService.js'
 import { ClaimMapping, parseClaimMapping } from './idp/ClaimMapping.js'
+import { MembershipLeaseSweeper } from './idp/MembershipLeaseSweeper.js'
 
 class IDPSignInManager {
 	constructor(
 		private readonly apiKeyManager: ApiKeyManager,
 		private readonly idpRegistry: IDPHandlerRegistry,
 		private readonly claimSyncService: IDPClaimSyncService,
+		private readonly leaseSweeper: MembershipLeaseSweeper,
 	) {}
 
 	async signInIDP(
@@ -29,7 +39,10 @@ class IDPSignInManager {
 		requestInfo?: ApiKeyRequestInfo,
 		trustForwardedInfo?: boolean,
 	): Promise<IDPSignInManager.SignInIDPResponse> {
-		return dbContext.transaction(async (db): Promise<IDPSignInManager.SignInIDPResponse> => {
+		// A32: set inside the transaction, acted on after it — the hygiene sweep below deletes OTHER
+		// identities' lapsed memberships, so it must not hold their row locks for the length of a sign-in.
+		let leaseConfigured = false
+		const response = await dbContext.transaction(async (db): Promise<IDPSignInManager.SignInIDPResponse> => {
 			const provider = await db.queryHandler.fetch(new IdentityProviderBySlugQuery(idpSlug))
 			if (!provider || provider.disabledAt) {
 				throw new Error('provider not found')
@@ -99,18 +112,27 @@ class IDPSignInManager {
 			// never committed (failing sign-in on an infra error is the safe outcome).
 			let mapping: ClaimMapping | null = null
 			let claimMappingFailed = false
+			let claimMappingFailureReason: ClaimMappingFailureReason | undefined
 			try {
 				mapping = parseClaimMapping(provider.configuration)
 			} catch {
 				claimMappingFailed = true
+				// The parser could not read the lease, but the provider still configures one: nothing renews it, so its
+				// grants expire silently. Mark that distinctly from a merely dropped rule, and still sweep what lapsed.
+				if (hasConfiguredMembershipLease(provider.configuration)) {
+					claimMappingFailureReason = CLAIM_MAPPING_FAILED_LEASE_UNRENEWED
+					leaseConfigured = true
+				}
 			}
 			let claimMappingAudit: ClaimMappingAudit | null = null
 			if (mapping) {
+				leaseConfigured = mapping.membershipLease !== undefined
 				const syncResult = await this.claimSyncService.sync(
 					db,
 					mapping,
 					claim,
 					{ id: personRow.identity_id },
+					provider,
 					resolved.isNewPerson === true,
 				)
 				claimMappingAudit = syncResult.audit
@@ -168,6 +190,7 @@ class IDPSignInManager {
 				idpResponse: claim,
 				claimMappingAudit,
 				claimMappingFailed,
+				claimMappingFailureReason,
 				identityProviderId: provider.id,
 				[AuthLogService.Key]: new AuthLogService.Bag({
 					personId: personRow.id,
@@ -176,6 +199,15 @@ class IDPSignInManager {
 				}),
 			})
 		})
+		// A32 housekeeping: outside the transaction and detached (after the response), so no sign-in waits on it and
+		// a rejection cannot become an unhandledRejection. Gated on this provider configuring a lease, so a
+		// deployment without one never issues the statement.
+		if (leaseConfigured) {
+			setImmediate(() => {
+				this.leaseSweeper.sweep(dbContext).catch(() => {})
+			})
+		}
+		return response
 	}
 
 	async initSignInIDP(dbContext: DatabaseContext, idpSlug: string, data: unknown): Promise<IDPSignInManager.InitSignInIDPResponse> {
@@ -285,6 +317,8 @@ namespace IDPSignInManager {
 		readonly claimMappingAudit?: ClaimMappingAudit | null
 		/** True when claim mapping failed and was skipped (fail-open) — drives the `idp_role_mapping_failed` audit. */
 		readonly claimMappingFailed?: boolean
+		/** Distinguishing reason for that audit; absent for the ordinary fail-open. Never carries claim values. */
+		readonly claimMappingFailureReason?: ClaimMappingFailureReason
 		[AuthLogService.Key]: AuthLogService.Bag
 	}
 

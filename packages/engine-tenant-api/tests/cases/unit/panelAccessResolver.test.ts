@@ -30,7 +30,8 @@ const resolve = async (queries: ExpectedQuery[], globalRoles: readonly string[])
 }
 
 const projectRolesSql = (roles: string[]): ExpectedQuery => ({
-	sql: 'select "project_id", "role" from "tenant"."project_membership" where "identity_id" = ?',
+	sql:
+		'select "project_id", "role" from "tenant"."project_membership" where "identity_id" = ? and ("lease_expires_at" is null or "lease_expires_at" > now())',
 	parameters: [identityId],
 	response: { rows: roles.map((role, index) => ({ project_id: `project-${index}`, role })) },
 })

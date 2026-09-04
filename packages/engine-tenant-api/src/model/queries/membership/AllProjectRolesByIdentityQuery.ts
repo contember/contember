@@ -1,4 +1,5 @@
 import { DatabaseQuery, DatabaseQueryable, SelectBuilder } from '@contember/database'
+import { withUnexpiredLease } from './MembershipLeaseSpecification.js'
 
 /**
  * Returns every (project_id, role) pair the identity holds across ALL projects.
@@ -22,6 +23,8 @@ class AllProjectRolesByIdentityQuery extends DatabaseQuery<AllProjectRolesByIden
 			.where({
 				identity_id: this.identityId,
 			})
+			// an expired IdP lease must not raise the session policy or open the panel either
+			.match(withUnexpiredLease())
 			.getResult(db)
 
 		return result.map(it => ({ projectId: it.project_id, role: it.role }))

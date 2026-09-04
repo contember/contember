@@ -1,7 +1,7 @@
 import { executeTenantTest, now } from '../../../src/testTenant.js'
 import { SQL } from '../../../src/tags.js'
 import { testUuid } from '../../../src/testUuid.js'
-import { selectMembershipsSql } from './sql/selectMembershipsSql.js'
+import { selectMembershipsForDisplaySql } from './sql/selectMembershipsForDisplaySql.js'
 import { signInMutation } from './gql/signIn.js'
 import { getPersonByEmailSql } from './sql/getPersonByEmailSql.js'
 import { SignInErrorCode } from '../../../../src/schema/index.js'
@@ -37,7 +37,7 @@ test('signs in', async () => {
 			getAuthPoliciesSql(),
 			createSessionKeySql({ apiKeyId: apiKeyId, identityId: identityId }),
 			getIdentityProjectsSql({ identityId: identityId, projectId: projectId }),
-			selectMembershipsSql({
+			selectMembershipsForDisplaySql({
 				identityId: identityId,
 				projectId,
 				membershipsResponse: [{ role: 'editor', variables: [{ name: 'locale', values: ['cs'] }] }],
@@ -100,7 +100,7 @@ test('signs in - normalize email', async () => {
 			getAuthPoliciesSql(),
 			createSessionKeySql({ apiKeyId: apiKeyId, identityId: identityId }),
 			getIdentityProjectsSql({ identityId: identityId, projectId: projectId }),
-			selectMembershipsSql({
+			selectMembershipsForDisplaySql({
 				identityId: identityId,
 				projectId,
 				membershipsResponse: [{ role: 'editor', variables: [{ name: 'locale', values: ['cs'] }] }],
@@ -211,7 +211,7 @@ test('sign in - email verification required but already verified', async () => {
 			getAuthPoliciesSql(),
 			createSessionKeySql({ apiKeyId, identityId }),
 			getIdentityProjectsSql({ identityId, projectId }),
-			selectMembershipsSql({ identityId, projectId, membershipsResponse: [] }),
+			selectMembershipsForDisplaySql({ identityId, projectId, membershipsResponse: [] }),
 		],
 		return: {
 			data: {
@@ -332,7 +332,7 @@ test('sign in - valid otp token', async () => {
 			getAuthPoliciesSql(),
 			createSessionKeySql({ apiKeyId, identityId }),
 			getIdentityProjectsSql({ identityId, projectId }),
-			selectMembershipsSql({
+			selectMembershipsForDisplaySql({
 				identityId,
 				projectId,
 				membershipsResponse: [],
@@ -387,7 +387,7 @@ test('sign in - valid backup code (when OTP is required)', async () => {
 			getAuthPoliciesSql(),
 			createSessionKeySql({ apiKeyId, identityId }),
 			getIdentityProjectsSql({ identityId, projectId }),
-			selectMembershipsSql({
+			selectMembershipsForDisplaySql({
 				identityId,
 				projectId,
 				membershipsResponse: [],
@@ -483,7 +483,7 @@ test('sign in - email OTP enabled, valid code: signs in', async () => {
 			getAuthPoliciesSql(),
 			createSessionKeySql({ apiKeyId, identityId }),
 			getIdentityProjectsSql({ identityId, projectId }),
-			selectMembershipsSql({ identityId, projectId, membershipsResponse: [] }),
+			selectMembershipsForDisplaySql({ identityId, projectId, membershipsResponse: [] }),
 		],
 		return: {
 			data: {

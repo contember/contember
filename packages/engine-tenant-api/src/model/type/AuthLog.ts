@@ -38,6 +38,7 @@ export type AuthActionType =
 	| 'idp_disconnect'
 	| 'idp_role_mapped'
 	| 'idp_role_mapping_failed'
+	| 'idp_membership_lease_expired'
 	| 'project_create'
 	| 'project_update'
 	| 'project_secret_change'

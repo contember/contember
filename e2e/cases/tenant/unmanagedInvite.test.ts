@@ -84,6 +84,10 @@ test('does not send an email and sets given password', async () => {
 									memberships: [
 										{
 											role: 'editor',
+											// membership$$ selects every scalar, so the A32 lease fields come along; an
+											// operator-granted membership carries no lease
+											active: true,
+											leaseExpiresAt: null,
 											variables: [
 												{
 													name: 'language',

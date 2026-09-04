@@ -644,6 +644,68 @@ Matching is **type-strict**: `equals`, `contains`, and a variable's `from.where`
 | `syncPolicy` | `always` | `always` re-applies the mapping on **every** sign-in — and, when [session re-validation](#session-re-validation) is enabled, again on each OIDC refresh **that returns fresh claims**, so a long-lived session's memberships track the IdP's current claims without a full re-login. Refresh-time resync depends on the [re-validation method](#re-validation-methods) delivering claims: `refresh` reconstructs the **same** claim surface sign-in builds — the refreshed ID-token claims plus a userinfo merge when `fetchUserInfo: true` — `userinfo` returns its endpoint's claims, and `introspection` returns **none** (no resync). Nested claims (`attributesKey`) and the identity-field mapping are applied on the refresh path exactly as at sign-in, so providers that nest their claims (e.g. Apereo CAS) resync correctly. Because `method: "refresh"` rebuilds the **complete** surface, a refresh reconciles **exactly like a sign-in**: grants are added/updated *and*, under `unmatched: "remove"`, memberships the mapping no longer grants are revoked — at the **membership-variable** level too, where a claim-derived variable is replaced with the IdP's current values, so it can both **widen and narrow**. The one exception is a **partial** surface — `method: "userinfo"` (no ID-token claims) or a `refresh` whose `fetchUserInfo` call failed — which stays **additive-only**: grants are refreshed but nothing is removed, so a rule keyed on a claim absent from the partial surface can't strip a membership the IdP still asserts; those removals are deferred to a full sign-in. One caveat the engine cannot detect: some IdPs release certain claims **only at authentication** and omit them from a *refreshed* ID token — the surface is then structurally complete but semantically slimmer, and under `unmatched: "remove"` a rule keyed on such a claim would revoke the membership on refresh. If your IdP does this, key rules on claims it also asserts on refresh, enable `fetchUserInfo: true` (userinfo is re-fetched on refresh), or use `unmatched: "keep"`. `sticky` applies the mapping only when the account is first created by auto-sign-up, then never touches it again (refresh never re-applies a `sticky` mapping). |
 | `unmatched` | `keep` | `keep` only ever **adds** grants. `remove` makes the IdP the source of truth: a membership the mapping no longer grants is **revoked** — and so is a membership the mapping still grants but whose *declared* variable resolves to **no values**, since an empty membership variable is not a valid grant (the whole role is removed rather than left scoped to nothing — clearing the variable to an empty set would instead, for a `condition` variable, widen it to *allow-all*). Revocation is bounded to the mapping's own *vocabulary* — the `(project, role)` pairs named by **some current rule**; memberships and roles managed outside the mapping are never touched. **Caveat:** because the vocabulary is built from the *current* rules, removing a variable from a rule, deleting a rule, removing the whole `claimMapping`, or disconnecting the IdP takes the affected grant out of vocabulary — so a previously-granted membership (or a previously-written variable value) is **not** retroactively revoked on subsequent sign-ins. To revoke, keep the rule but stop matching it, or use the direct member API. |
 
+Adding a [`membershipLease`](#membership-lease) narrows both fields: a lease is valid **only** with `unmatched: "remove"` and `syncPolicy: "always"`, so the defaults above are not a valid pairing with one. Adding just `membershipLease: "30 days"` to a mapping that leaves `unmatched` at its default is rejected at `addIDP`/`updateIDP` with `INVALID_CONFIGURATION`.
+
+### Membership lease
+
+:::note[Available since 2.2]
+:::
+
+Without a lease, a claim-granted membership never expires: the mapping reconciles only while the person keeps authenticating, so someone dropped from a directory group who never signs in again keeps the grant forever. `membershipLease` bounds that. Every membership the mapping grants then carries an expiry, each successful sync pushes that expiry forward, and a membership whose lease has lapsed grants nothing.
+
+```graphql
+claimMapping: {
+  syncPolicy: "always",
+  unmatched: "remove",
+  membershipLease: "30 days",
+  rules: [ … ]
+}
+```
+
+The value is a `<positive integer> <unit>` duration — `30 days`, `12 hours`, `6 months`. The unit is one of `second`, `minute`, `hour`, `day`, `week` or `month`, singular or plural, and the integer is between `1` and `999999`. The grammar is deliberately narrow, because the value is handed to PostgreSQL as an `interval`: there is no `year` unit, no fraction (`1.5 days`) and no compound duration (`1 day 12 hours`). Anything else is rejected at `addIDP`/`updateIDP` with `INVALID_CONFIGURATION`.
+
+:::caution[Size the lease by the gap between sign-ins]
+A lease bounds **how long a grant may outlive the last time the IdP confirmed it**. It is not a session, token or refresh-token lifetime, and it keeps running while the person is away. Size it comfortably above the longest interval an ordinary user goes without signing in — holidays, parental leave, a seasonal contributor — or ordinary absence revokes people. A lease of a few days revokes anyone who takes a week off.
+:::
+
+A lease is accepted only with `unmatched: "remove"` and `syncPolicy: "always"`; the other two combinations are rejected at `addIDP`/`updateIDP` with `INVALID_CONFIGURATION`, in a message naming the field to change.
+
+| Combined with | Why it is rejected | Remedy |
+|---|---|---|
+| `unmatched: "keep"` (the default) | `keep` promises the mapping never revokes, but a lease revokes what it does not renew — the pair is a delayed `remove` the operator never chose. It would in fact revoke **more** than a live `remove` sync does: a `keep` sync leaves an ungranted membership in place, while the lease, having nothing to renew it, lets that same membership lapse. | set `unmatched: "remove"` to let the IdP own these memberships, or drop the lease |
+| `syncPolicy: "sticky"` | `sticky` applies the mapping once, when the account is first created by auto-sign-up, and never re-runs — so nothing would ever renew the lease and every grant would self-destruct exactly one lease after it was made. | set `syncPolicy: "always"`, or drop the lease |
+
+**Renewal** happens on every successful sync: a sign-in, and — under the `always` policy a lease requires — each OIDC session refresh that returns claims (see [`syncPolicy`](#syncpolicy-and-unmatched)). A sync renews exactly the memberships it granted on that run, never the whole vocabulary: on a *partial* claim surface (`method: "userinfo"`, or a `refresh` whose `fetchUserInfo` call failed) a membership the partial claims did not re-grant keeps the expiry it already had, so a refresh that cannot see the whole picture extends nothing it cannot vouch for. If the stored mapping stops parsing it renews nothing at all and every grant it made lapses one lease later — that case is recorded as `idp_role_mapping_failed` with `event_data: {reason: "mapping_invalid_lease_unrenewed"}`, so an impending silent mass lapse is distinguishable from an ordinary skipped mapping.
+
+**An expired membership grants nothing**, from the instant its lease lapses: it is excluded from the content, system and actions APIs, from the tenant authorization identity, and from the `before`/`after` snapshots the membership audits are built from (an audit reporting a grant nobody holds would describe access that does not exist). Enforcement sits on the read that resolves memberships for an access decision, not on a background job, so it holds whether or not the sweep below ever runs.
+
+The row itself stays until the sweep collects it. Queries that only ask **whether** a membership row exists do not carry the expiry predicate, so meanwhile the person is still **listed** as a project member — with `active: false` — and `addProjectMember` for that project and identity still answers `ALREADY_MEMBER`, as it does for any existing membership row. Neither grants access; see [memberships](/reference/engine/tenant/memberships#creating-a-project-membership) for what an operator does about it.
+
+**Reading the lease.** A `Membership` carries two fields for it, wherever one is returned (`Project.members`, `Identity.projects`, `Query.projectMemberships`):
+
+| Field | Meaning |
+|---|---|
+| `leaseExpiresAt: DateTime` | when the granting mapping must confirm this membership again; `null` when the membership carries no lease — every operator-managed grant, and every grant from a mapping that configures none |
+| `active: Boolean!` | `false` once the lease has lapsed: the membership then grants nothing but is still listed |
+
+`leaseExpiresAt` is worth reading on an **active** membership too — it is how an operator sees an expiry coming instead of discovering it afterwards:
+
+```graphql
+query {
+  projectMemberships(projectSlug: "my-blog", identityId: "2f673a53-af33-42b1-9e17-e1305fa26d9d") {
+    role
+    active
+    leaseExpiresAt
+  }
+}
+```
+
+**The sweep.** Lapsed rows are deleted by a housekeeping sweep that runs opportunistically after a federated sign-in through an IdP that configures a lease — the engine has no scheduler, and since this is not what enforces expiry it is deliberately kept out of the authentication path: it runs detached from the sign-in, in its own transaction, and a failure is logged rather than surfaced. It is global (it collects every lapsed lease, not only the signing-in person's or that provider's), takes at most 100 rows per run and leaves the rest to the next one. Each removal is recorded in the [audit log](/reference/engine/tenant/audit-log) as `idp_membership_lease_expired`. In a deployment where nobody signs in through such a provider again the sweep simply never runs — the expired grants are still refused, they just keep their rows.
+
+**Turning the lease off.** Removing `membershipLease` from a provider's `claimMapping` — or removing the whole `claimMapping` — clears the expiry on that provider's memberships whose lease is **still running**: they become unbounded grants and stand until something removes them, exactly as if no lease had ever been configured. Memberships whose lease had **already lapsed** are not restored; they stay lapsed and are collected by the sweep as usual, so someone who should come back is re-granted by the IdP at their next sign-in, or added by an operator. With `mergeConfiguration: true` the removal has to be explicit (`membershipLease: null`), because a key you merely omit is **kept** (see [Updating existing IdP](#updating-existing-idp)).
+
+Nothing else clears a lease, so anything that merely stops the sync lets the grants lapse instead — [disabling the IdP](#temporarily-disabling-and-enabling-an-idp) (sign-in through it stops, so nothing renews), or deleting the rule that granted a membership. The second is the one case where the vocabulary caveat under [`unmatched`](#syncpolicy-and-unmatched) does not leave a grant standing forever: with a lease configured, a grant that falls out of the mapping's vocabulary is not revoked immediately, but it stops being renewed and lapses one lease later.
+
 ### Membership variables
 
 A `grantMembership` may also set **membership variables** — the per-membership values that parameterize row-level ACL. The simplest form is **constant** `values`:
@@ -717,7 +779,7 @@ Every IdP management call is recorded in the [audit log](/reference/engine/tenan
 | `enableIDP` | `idp_enable` | `{identityProvider}` |
 | `disconnectMyIdentityProvider` | `idp_disconnect` | `{id, slug}` — the removed [connection](#personal-idp-connections) id and the provider slug |
 
-Sign-in attempts via IdP are recorded as `idp_login`. When a [membership mapping](#membership-mapping) changes an identity's project memberships (on sign-in or on a session refresh), that sync is recorded separately as `idp_role_mapped` with `event_data: {before, after, syncPolicy, unmatched}` (each of `before`/`after` is `{memberships}`) — only when grants actually changed, never on a no-op. Note that the `before`/`after` membership snapshots include membership-variable **values** for every role in the mapping's [vocabulary](#syncpolicy-and-unmatched) — both **claim-derived** values (when a variable uses `passthrough` or `allow`) **and any variable managed outside the mapping on that same role** (e.g. an admin-set `condition` filter), since the snapshot is bounded per `(project, role)`, not per variable name. All of those values are therefore persisted in `person_auth_log.event_data` and are readable via `system:viewAuthLog`. By contrast, `idp_role_mapping_failed` deliberately carries **no** claim values. A mapping that was configured but failed and was skipped (fail-open) is recorded as `idp_role_mapping_failed`.
+Sign-in attempts via IdP are recorded as `idp_login`. When a [membership mapping](#membership-mapping) changes an identity's project memberships (on sign-in or on a session refresh), that sync is recorded separately as `idp_role_mapped` with `event_data: {before, after, syncPolicy, unmatched}` (each of `before`/`after` is `{memberships}`) — only when grants actually changed, never on a no-op. Note that the `before`/`after` membership snapshots include membership-variable **values** for every role in the mapping's [vocabulary](#syncpolicy-and-unmatched) — both **claim-derived** values (when a variable uses `passthrough` or `allow`) **and any variable managed outside the mapping on that same role** (e.g. an admin-set `condition` filter), since the snapshot is bounded per `(project, role)`, not per variable name. All of those values are therefore persisted in `person_auth_log.event_data` and are readable via `system:viewAuthLog`. By contrast, `idp_role_mapping_failed` deliberately carries **no** claim values. A mapping that was configured but failed and was skipped (fail-open) is recorded as `idp_role_mapping_failed` — with `event_data: {reason: "mapping_invalid_lease_unrenewed"}` when that mapping also configures a [membership lease](#membership-lease), since the failure means nothing renewed it. A lease that lapses is recorded separately, as `idp_membership_lease_expired`, when the sweep collects the membership: one entry per person, listing what they lost, and with no actor and no provider on the row (nobody acted, and the sweep is global).
 
 When [session re-validation](#session-re-validation) revokes a session, it is recorded as `idp_session_revoked` with `event_data: {reason}` (e.g. `invalid_grant`, `inactive`, `idp_disabled`); a token rotation is recorded as `idp_session_revalidated`.
 

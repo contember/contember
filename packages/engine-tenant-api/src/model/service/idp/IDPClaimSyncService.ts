@@ -6,7 +6,7 @@ import { ProjectSchemaResolver } from '../../type/index.js'
 import { Acl, ProjectRole } from '@contember/schema'
 import { MembershipResolver } from '@contember/schema-utils'
 import { ProjectBySlugQuery, ProjectMembershipByIdentityQuery } from '../../queries/index.js'
-import { CreateOrUpdateProjectMembershipCommand, RemoveProjectMembershipCommand } from '../../commands/index.js'
+import { CreateOrUpdateProjectMembershipCommand, MembershipLease, RemoveProjectMembershipCommand } from '../../commands/index.js'
 
 export type ClaimMappingSnapshot = {
 	readonly memberships: readonly MappedMembership[]
@@ -42,6 +42,12 @@ export type ClaimMappingSyncResult = {
  * The caller parses the mapping (via {@link parseClaimMapping}) and decides the fail-open policy: a
  * malformed config is caught by the caller before this runs, while a DB error raised here propagates
  * so the surrounding transaction rolls back the partial apply (no half-applied grants).
+ *
+ * A32 — when the mapping configures a `membershipLease`, every membership this grants is stamped with an
+ * expiry that this same apply pushes forward on each run. Reconciliation otherwise only ever happens
+ * while the person keeps authenticating, so without a lease a grant outlives the claim that produced it
+ * for as long as its holder stays away. The lease bounds that gap; expiry itself is enforced on the read
+ * that resolves memberships for an access decision ({@link withUnexpiredLease}), never here.
  */
 export class IDPClaimSyncService {
 	constructor(
@@ -54,6 +60,8 @@ export class IDPClaimSyncService {
 		mapping: ClaimMapping,
 		claims: Record<string, unknown>,
 		identity: { id: string },
+		/** The provider whose mapping this is — recorded on every membership it leases. */
+		identityProvider: { id: string },
 		isNewPerson: boolean,
 		options: { allowRemoval?: boolean } = {},
 	): Promise<ClaimMappingSyncResult> {
@@ -112,7 +120,15 @@ export class IDPClaimSyncService {
 		}
 		const before = await this.snapshot(db, identity.id, vocabularyMemberships)
 
-		await this.applyMemberships(db, identity.id, memberships, vocabularyMemberships, unmatched)
+		// The lease renews HERE, on the shared apply — so every path that reaches a successful sync renews
+		// by construction: sign-in, and the OIDC refresh in `IdpSessionRevalidator`. It renews exactly the
+		// memberships this sync granted, never the whole vocabulary: on a partial claim surface
+		// (`allowRemoval: false`) the ungranted ones keep the expiry they had, so a refresh that could not
+		// see the whole picture extends nothing it cannot vouch for.
+		const lease = mapping.membershipLease === undefined
+			? undefined
+			: { duration: mapping.membershipLease, identityProviderId: identityProvider.id }
+		await this.applyMemberships(db, identity.id, memberships, vocabularyMemberships, unmatched, lease)
 
 		const after = await this.snapshot(db, identity.id, vocabularyMemberships)
 
@@ -268,6 +284,7 @@ export class IDPClaimSyncService {
 		grantedMemberships: readonly MappedMembership[],
 		vocabularyMemberships: ReadonlyMap<string, ReadonlySet<string>>,
 		unmatched: NonNullable<ClaimMapping['unmatched']>,
+		lease: MembershipLease | undefined,
 	): Promise<void> {
 		// Group granted memberships by project so each project is resolved (slug -> id) only once.
 		const byProject = new Map<string, MappedMembership[]>()
@@ -300,6 +317,8 @@ export class IDPClaimSyncService {
 				// rule): a role the mapping could grant but doesn't this sign-in is stripped, while a
 				// membership role no rule names (managed outside the mapping) is left untouched.
 				const vocabularyRoles = vocabularyMemberships.get(projectSlug) ?? new Set<string>()
+				// A membership whose lease has lapsed is not in `existing` (the query filters it out) and so is
+				// never explicitly revoked here — it already grants nothing, and the sweep collects the row.
 				const existing = await db.queryHandler.fetch(new ProjectMembershipByIdentityQuery({ id: project.id }, [identityId]))
 				for (const membership of existing) {
 					if (vocabularyRoles.has(membership.role) && !grantedRoles.has(membership.role)) {
@@ -338,6 +357,10 @@ export class IDPClaimSyncService {
 								.filter(it => it.values.length > 0)
 								.map(it => ({ name: it.name, set: [...it.values] })),
 						},
+						// A32: leasing is bounded exactly as removal is — to the (project, role) vocabulary the rules
+						// name, so a role no rule names is never stamped. `undefined` (no lease configured) CLEARS
+						// both columns, taking over another provider's lease here too: whoever wrote it last owns it.
+						lease,
 					),
 				)
 			}
@@ -355,7 +378,8 @@ export class IDPClaimSyncService {
 	 * can disclose claim-derived / admin-managed variable values for a mapped role to system:viewAuthLog
 	 * readers — by design (the recorded value is the ACL grant being audited). Variable values are included
 	 * so a sign-in that only changes a claim-derived membership variable — itself a row-level ACL grant — is
-	 * still detected as a change and audited.
+	 * still detected as a change and audited. A membership whose lease has lapsed is absent from both sides:
+	 * the delta describes access as it actually stands, so renewing a lapsed grant reads as restoring it.
 	 */
 	private async snapshot(
 		db: DatabaseContext,

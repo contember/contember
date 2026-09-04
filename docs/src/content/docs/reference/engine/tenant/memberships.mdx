@@ -38,6 +38,10 @@ enum AddProjectMemberErrorCode {
 }
 ```
 
+:::note[`ALREADY_MEMBER` for a membership that grants nothing]
+*(since 2.2)* A membership granted by an IdP claim mapping can carry a [lease](/reference/engine/tenant/idp#membership-lease). Once the lease lapses the membership grants nothing, but its row survives until a housekeeping sweep collects it — and `addProjectMember` refuses whenever a membership row for that project and identity exists, lapsed or not. The membership is [listed](#viewing-project-members) with `active: false`, so use `updateProjectMember` instead of retrying: an operator write clears the lease, turning the membership into an ordinary grant that stands until someone removes it.
+:::
+
 ## Updating a project membership
 
 You can update existing member of an project using `updateProjectMember` mutation. Arguments and response structure of the mutation are the same as of `addProjectMeber` mutation. Only error codes differs:
@@ -85,11 +89,25 @@ query {
           name
           values
         }
+        # since 2.2 — see below
+        active
+        leaseExpiresAt
       }
     }
   }
 }
 ```
+
+:::note[Available since 2.2]
+A `Membership` also reports the state of its IdP [membership lease](/reference/engine/tenant/idp#membership-lease), wherever one is returned (`projectBySlug { members }`, `identity { projects }`, `projectMemberships`):
+
+| Field | Meaning |
+|---|---|
+| `leaseExpiresAt: DateTime` | when the granting IdP claim mapping must confirm this membership again; `null` when the membership carries no lease — every membership an operator granted, and every grant from a mapping that configures none |
+| `active: Boolean!` | `false` once the lease has lapsed: the membership then grants nothing, but stays listed until the sweep collects it |
+
+`leaseExpiresAt` is worth reading on an **active** membership too — it is how you see an expiry coming instead of discovering it afterwards.
+:::
 
 ## Listing persons across the tenant
 

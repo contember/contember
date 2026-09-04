@@ -1,5 +1,5 @@
 import { ApiKeyManager } from './apiKey/index.js'
-import { ConfigurationQuery, PersonQuery, PersonRow } from '../queries/index.js'
+import { ConfigurationQuery, LocalAuthDisablingIdpsQuery, PersonQuery, PersonRow } from '../queries/index.js'
 import { Response, ResponseError, ResponseOk } from '../utils/Response.js'
 import {
 	ActivatePasswordlessOtpErrorCode,
@@ -62,6 +62,16 @@ class PasswordlessSignInManager {
 					}),
 				})
 			}
+			const exclusiveIdps = await db.queryHandler.fetch(new LocalAuthDisablingIdpsQuery(person.id))
+			if (exclusiveIdps.length > 0) {
+				return new ResponseError('IDP_REQUIRED', `Sign in using ${exclusiveIdps.join(' or ')}`, {
+					[AuthLogService.Key]: new AuthLogService.Bag({
+						personInput: email,
+						personId: person.id,
+					}),
+				})
+			}
+
 			if (!isPasswordlessEnabled(configuration.passwordless.enabled, person.passwordless_enabled)) {
 				return new ResponseError('PASSWORDLESS_DISABLED', 'Passwordless sign-in is disabled for this person', {
 					[AuthLogService.Key]: new AuthLogService.Bag({
@@ -178,6 +188,18 @@ class PasswordlessSignInManager {
 			}
 			if (personRow.disabled_at !== null) {
 				return new ResponseError('PERSON_DISABLED', `Person is disabled`, {
+					[AuthLogService.Key]: new AuthLogService.Bag({
+						personId: personRow.id,
+						tokenId: tokenResult?.id,
+					}),
+				})
+			}
+
+			// Re-checked here and not only at init: a link created while this magic link
+			// was in flight would otherwise still mint a locally authenticated session.
+			const exclusiveIdps = await db.queryHandler.fetch(new LocalAuthDisablingIdpsQuery(personRow.id))
+			if (exclusiveIdps.length > 0) {
+				return new ResponseError('IDP_REQUIRED', `Sign in using ${exclusiveIdps.join(' or ')}`, {
 					[AuthLogService.Key]: new AuthLogService.Bag({
 						personId: personRow.id,
 						tokenId: tokenResult?.id,

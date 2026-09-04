@@ -1,6 +1,6 @@
 import { CreateSessionTokenErrorCode, MfaEnrollment, SignInErrorCode } from '../../schema/index.js'
 import { ApiKeyManager, AuthPolicyResolver, BackupCodeManager, EmailOtpManager, LoginRiskAnalyzer, OtpManager } from '../service/index.js'
-import { ConfigurationQuery, PersonQuery, PersonRow, PersonUniqueIdentifier } from '../queries/index.js'
+import { ConfigurationQuery, LocalAuthDisablingIdpsQuery, PersonQuery, PersonRow, PersonUniqueIdentifier } from '../queries/index.js'
 import { Config } from '../type/Config.js'
 import { Providers } from '../providers.js'
 import { DatabaseContext } from '../utils/index.js'
@@ -51,6 +51,14 @@ class SignInManager {
 				personId: person.id,
 			}),
 		}
+		// Refused before the password is even looked at: for a person federated
+		// through a provider with `disableLocalAuthentication`, a password is not a
+		// credential this tenant accepts, however it got set.
+		const exclusiveIdps = await dbContext.queryHandler.fetch(new LocalAuthDisablingIdpsQuery(person.id))
+		if (exclusiveIdps.length > 0) {
+			return new ResponseError('IDP_REQUIRED', `Sign in using ${exclusiveIdps.join(' or ')}`, authLogData)
+		}
+
 		if (!person.password_hash) {
 			return new ResponseError('NO_PASSWORD_SET', `No password set`, authLogData)
 		}

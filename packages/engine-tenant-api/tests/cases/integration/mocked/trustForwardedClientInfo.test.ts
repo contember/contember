@@ -3,6 +3,7 @@ import { testUuid } from '../../../src/testUuid.js'
 import { selectMembershipsSql } from './sql/selectMembershipsSql.js'
 import { signInMutation } from './gql/signIn.js'
 import { getPersonByEmailSql } from './sql/getPersonByEmailSql.js'
+import { localAuthDisablingIdpsSql } from './sql/localAuthDisablingIdpsSql.js'
 import { expect, test } from 'bun:test'
 import { createSessionKeySql } from './sql/createSessionKeySql.js'
 import { getIdentityProjectsSql } from './sql/getIdentityProjectsSql.js'
@@ -29,6 +30,7 @@ test('signIn: trustForwardedClientInfo=true is propagated when caller has the fl
 			getConfigSql(),
 			getNextLoginAttemptSql(email),
 			getPersonByEmailSql({ email, response: { personId, identityId, password, roles: [] } }),
+			localAuthDisablingIdpsSql({ personId }),
 			getAuthPoliciesSql(),
 			getConfigSql(),
 			getIdentityByIdSql({ identityId }),
@@ -68,6 +70,7 @@ test('signIn: trustForwardedClientInfo=true is silently dropped when caller has 
 			getConfigSql(),
 			getNextLoginAttemptSql(email),
 			getPersonByEmailSql({ email, response: { personId, identityId, password, roles: [] } }),
+			localAuthDisablingIdpsSql({ personId }),
 			getAuthPoliciesSql(),
 			getConfigSql(),
 			getIdentityByIdSql({ identityId }),

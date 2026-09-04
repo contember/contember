@@ -8,6 +8,7 @@ import { getPersonByIdpSql } from './sql/getPersonByIdpSql.js'
 import { createSessionKeySql } from './sql/createSessionKeySql.js'
 import { getIdentityProjectsSql } from './sql/getIdentityProjectsSql.js'
 import { selectMembershipsSql } from './sql/selectMembershipsSql.js'
+import { selectMembershipsForDisplaySql } from './sql/selectMembershipsForDisplaySql.js'
 import { getConfigSql } from './sql/getConfigSql.js'
 import { getIdentityByIdSql } from './sql/getIdentityByIdSql.js'
 import { getAuthPoliciesSql } from './sql/authPolicySql.js'
@@ -32,6 +33,15 @@ const externalIdentifier = 'abcd'
 const email = 'john@doe.com'
 const mappedProject = (id: string) => ({ id, name: 'demo', slug: 'demo', config: {} } as any)
 const lease = { duration: '30 days', identityProviderId: testUuid(20) }
+
+/**
+ * The sweep is dispatched with `setImmediate` after the response and takes its own transaction, so its
+ * statements interleave with the reads that build the response. Splitting off `begin` is that interleaving.
+ */
+const detachedSweep = () => {
+	const [begin, ...rest] = sqlTransaction(purgeExpiredMembershipLeasesSql({ limit: MEMBERSHIP_LEASE_SWEEP_LIMIT }))
+	return { begin, rest }
+}
 
 const idpSql = (claimMapping: unknown) =>
 	getIdpBySlugSql({
@@ -70,6 +80,7 @@ test('a leased mapping stamps the expiry on the membership it grants, then sweep
 	const membershipId = testUuid(1)
 	const apiKeyId = testUuid(2)
 	const project = mappedProject(mappedProjectId)
+	const sweep = detachedSweep()
 	await executeTenantTest({
 		query: baseSignInQuery,
 		executes: [
@@ -95,14 +106,16 @@ test('a leased mapping stamps the expiry on the membership it grants, then sweep
 				getAuthPoliciesSql(),
 				createSessionKeySql({ apiKeyId, identityId }),
 			),
-			// outside the transaction: the sweep must not hold other identities' row locks across a sign-in
-			purgeExpiredMembershipLeasesSql({ limit: MEMBERSHIP_LEASE_SWEEP_LIMIT }),
 			getIdentityProjectsSql({ identityId, projectId: sessionProjectId }),
-			selectMembershipsSql({
+			// outside the sign-in transaction and in one of its own: the sweep must not hold other identities'
+			// row locks across the sign-in it rides on
+			sweep.begin,
+			selectMembershipsForDisplaySql({
 				identityId,
 				projectId: sessionProjectId,
 				membershipsResponse: [{ role: 'editor', variables: [{ name: 'locale', values: ['cs'] }] }],
 			}),
+			...sweep.rest,
 		],
 		return: {
 			data: { signInIDP: { ok: true, errors: [], result: { token: '0000000000000000000000000000000000000000' } } },
@@ -138,6 +151,7 @@ test('a lease is stamped only on what the mapping grants — an operator-managed
 	const membershipId = testUuid(1)
 	const apiKeyId = testUuid(2)
 	const project = mappedProject(mappedProjectId)
+	const sweep = detachedSweep()
 	const existing = [
 		{ role: 'editor', variables: [] },
 		{ role: 'reviewer', variables: [] },
@@ -171,13 +185,14 @@ test('a lease is stamped only on what the mapping grants — an operator-managed
 				getAuthPoliciesSql(),
 				createSessionKeySql({ apiKeyId, identityId }),
 			),
-			purgeExpiredMembershipLeasesSql({ limit: MEMBERSHIP_LEASE_SWEEP_LIMIT }),
 			getIdentityProjectsSql({ identityId, projectId: sessionProjectId }),
-			selectMembershipsSql({
+			sweep.begin,
+			selectMembershipsForDisplaySql({
 				identityId,
 				projectId: sessionProjectId,
 				membershipsResponse: [{ role: 'editor', variables: [{ name: 'locale', values: ['cs'] }] }],
 			}),
+			...sweep.rest,
 		],
 		return: {
 			data: { signInIDP: { ok: true, errors: [], result: { token: '0000000000000000000000000000000000000000' } } },
@@ -235,7 +250,7 @@ test('a mapping with no lease grants without an expiry and runs no sweep', async
 			),
 			// no sweep statement here: nothing in this deployment leases anything
 			getIdentityProjectsSql({ identityId, projectId: sessionProjectId }),
-			selectMembershipsSql({
+			selectMembershipsForDisplaySql({
 				identityId,
 				projectId: sessionProjectId,
 				membershipsResponse: [{ role: 'editor', variables: [{ name: 'locale', values: ['cs'] }] }],
@@ -258,6 +273,54 @@ test('a mapping with no lease grants without an expiry and runs no sweep', async
 					syncPolicy: 'always',
 					unmatched: 'remove',
 				},
+			},
+		],
+	})
+})
+
+test('a mapping that fails to parse while configuring a lease still sweeps, audited as unrenewed', async () => {
+	// The parser cannot read the lease, but the provider still configures one, so nothing renews the grants it
+	// already stamped. Sign-in stays fail-open; the marker says the leases are now unrenewed, and lapsed ones go.
+	const identityId = testUuid(2)
+	const personId = testUuid(7)
+	const idpId = testUuid(20)
+	const sessionProjectId = testUuid(10)
+	const apiKeyId = testUuid(1)
+	const sweep = detachedSweep()
+	await executeTenantTest({
+		query: baseSignInQuery,
+		executes: [
+			...sqlTransaction(
+				// a rule with no `claim` — parseClaimMapping throws, so `membershipLease` is never read
+				idpSql({ membershipLease: '30 days', rules: [{ contains: 'x', grantMembership: { project: 'demo', role: 'editor' } }] }),
+				getPersonByIdpSql({
+					externalIdentifier,
+					identityProviderId: idpId,
+					response: { email, password: '123', identityId, personId, roles: [] },
+				}),
+				// the parse failed before any snapshot/apply query — no membership is written or stripped
+				getConfigSql(),
+				getIdentityByIdSql({ identityId }),
+				getAuthPoliciesSql(),
+				createSessionKeySql({ apiKeyId, identityId }),
+			),
+			getIdentityProjectsSql({ identityId, projectId: sessionProjectId }),
+			sweep.begin,
+			selectMembershipsForDisplaySql({ identityId, projectId: sessionProjectId, membershipsResponse: [] }),
+			...sweep.rest,
+		],
+		return: {
+			data: { signInIDP: { ok: true, errors: [], result: { token: '0000000000000000000000000000000000000000' } } },
+		},
+		expectedAuthLog: [
+			{ type: 'idp_login', response: expect.objectContaining({ ok: true }) },
+			{
+				type: 'idp_role_mapping_failed',
+				response: expect.objectContaining({ ok: true }),
+				personId,
+				targetPersonId: personId,
+				identityProviderId: idpId,
+				eventData: { reason: 'mapping_invalid_lease_unrenewed' },
 			},
 		],
 	})

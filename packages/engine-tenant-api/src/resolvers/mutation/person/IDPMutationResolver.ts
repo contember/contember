@@ -88,6 +88,8 @@ export class IDPMutationResolver implements MutationResolvers {
 				personId: signIn.result.person.id,
 				targetPersonId: signIn.result.person.id,
 				identityProviderId: signIn.result.identityProviderId,
+				// distinguishes a mapping whose failure also stops a configured lease from being renewed
+				eventData: signIn.result.claimMappingFailureReason ? { reason: signIn.result.claimMappingFailureReason } : undefined,
 			})
 		}
 		if (!signIn.ok) {

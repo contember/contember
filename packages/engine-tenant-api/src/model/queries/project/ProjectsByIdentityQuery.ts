@@ -1,6 +1,7 @@
 import { DatabaseQuery, DatabaseQueryable, SelectBuilder } from '@contember/database'
 import { ProjectsQuery } from './ProjectsQuery.js'
 import { PermissionActions, PermissionContext } from '../../authorization/index.js'
+import { withUnexpiredLease } from '../membership/index.js'
 import { Project } from '../../type/index.js'
 
 export class ProjectsByIdentityQuery extends DatabaseQuery<Project[]> {
@@ -26,6 +27,8 @@ export class ProjectsByIdentityQuery extends DatabaseQuery<Project[]> {
 			.where(where =>
 				where.in(
 					['project', 'id'],
+					// deliberately unleased: this asks which projects the SUBJECT is associated with, and a lapsed
+					// membership still associates them — filtering here would hide an inactive member from operators
 					SelectBuilder.create() //
 						.from('project_membership')
 						.select('project_id')
@@ -40,9 +43,10 @@ export class ProjectsByIdentityQuery extends DatabaseQuery<Project[]> {
 			: qb.where(where =>
 				where.in(
 					['project', 'id'],
+					// the CALLER's own membership, so this one IS an access decision: a lapsed lease grants no view
 					SelectBuilder.create().from('project_membership').select('project_id').where({
 						identity_id: this.permissionContext.identity.id,
-					}),
+					}).match(withUnexpiredLease()),
 				)
 			)
 

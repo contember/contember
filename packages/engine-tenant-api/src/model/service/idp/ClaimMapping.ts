@@ -130,7 +130,7 @@ export type ClaimMappingRule = ReturnType<typeof ClaimMappingRule>
  * deliberately narrow — the value is handed to Postgres as an `interval`, and a narrow, validated
  * shape keeps a typo from becoming an interval nobody intended.
  */
-const LEASE_DURATION_PATTERN = /^[1-9]\d*\s+(second|minute|hour|day|week|month)s?$/
+const LEASE_DURATION_PATTERN = /^[1-9]\d{0,5}[ \t]+(second|minute|hour|day|week|month)s?$/
 
 export const ClaimMappingLease = ((): Typesafe.Type<string> => {
 	return (input: unknown, path: PropertyKey[] = []) => {

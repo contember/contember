@@ -67,8 +67,8 @@ export class ProjectTypeResolver implements ProjectResolvers {
 			args.input ?? { filter: { memberType: args.memberType } },
 		)
 		return members.map(it => ({
-			...it,
 			identity: { ...it.identity, projects: [], sessions: [] },
+			memberships: it.memberships.map(({ membership, active, leaseExpiresAt }) => ({ ...membership, active, leaseExpiresAt })),
 		}))
 	}
 

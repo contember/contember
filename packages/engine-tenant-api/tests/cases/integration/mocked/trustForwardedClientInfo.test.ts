@@ -1,6 +1,6 @@
 import { executeTenantTest } from '../../../src/testTenant.js'
 import { testUuid } from '../../../src/testUuid.js'
-import { selectMembershipsSql } from './sql/selectMembershipsSql.js'
+import { selectMembershipsForDisplaySql } from './sql/selectMembershipsForDisplaySql.js'
 import { signInMutation } from './gql/signIn.js'
 import { getPersonByEmailSql } from './sql/getPersonByEmailSql.js'
 import { expect, test } from 'bun:test'
@@ -35,7 +35,7 @@ test('signIn: trustForwardedClientInfo=true is propagated when caller has the fl
 			getAuthPoliciesSql(),
 			createSessionKeySql({ apiKeyId, identityId, trustForwardedInfo: true }),
 			getIdentityProjectsSql({ identityId, projectId }),
-			selectMembershipsSql({
+			selectMembershipsForDisplaySql({
 				identityId,
 				projectId,
 				membershipsResponse: [{ role: 'editor', variables: [] }],
@@ -74,7 +74,7 @@ test('signIn: trustForwardedClientInfo=true is silently dropped when caller has 
 			getAuthPoliciesSql(),
 			createSessionKeySql({ apiKeyId, identityId, trustForwardedInfo: false }),
 			getIdentityProjectsSql({ identityId, projectId }),
-			selectMembershipsSql({
+			selectMembershipsForDisplaySql({
 				identityId,
 				projectId,
 				membershipsResponse: [{ role: 'editor', variables: [] }],

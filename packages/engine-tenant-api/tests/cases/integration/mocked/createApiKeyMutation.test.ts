@@ -1,7 +1,7 @@
 import { testUuid } from '../../../src/testUuid.js'
 import { executeTenantTest } from '../../../src/testTenant.js'
 import { SQL } from '../../../src/tags.js'
-import { selectMembershipsSql } from './sql/selectMembershipsSql.js'
+import { selectMembershipsForDisplaySql } from './sql/selectMembershipsForDisplaySql.js'
 import { createApiKeyMutation } from './gql/createApiKey.js'
 import { getProjectBySlugSql } from './sql/getProjectBySlugSql.js'
 import { createMembershipSql } from './sql/createMembershipSql.js'
@@ -50,7 +50,7 @@ test('create api key', async () => {
 					rows: [{ id: projectId, name: 'test', slug: 'test' }],
 				},
 			},
-			selectMembershipsSql({
+			selectMembershipsForDisplaySql({
 				identityId: identityId,
 				projectId: projectId,
 				membershipsResponse: [{ role: role, variables: [{ name: 'language', values: [languageId] }] }],

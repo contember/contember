@@ -484,6 +484,8 @@ describe('IdpSessionRevalidator — A09 claim mapping on refresh', () => {
 		const log = h.executed.find(c => c instanceof CreateAuthLogEntryCommand && (c as any).data.type === 'idp_role_mapping_failed') as any
 		expect(log).toBeDefined()
 		expect(log.data.success).toBe(true)
+		// no lease configured → the plain marker, nothing to distinguish
+		expect(log.data.eventData).toBeUndefined()
 	})
 
 	test('refresh without fresh claims does not run claim sync', async () => {
@@ -656,6 +658,32 @@ describe('IdpSessionRevalidator — A32 membership lease renewal on refresh', ()
 			.revalidate(h.ctx, h.ctx, apiKeyRow)
 		expect(h.executed.some(c => c instanceof CreateOrUpdateProjectMembershipCommand)).toBe(true)
 		expect(leaseOf(h.executed)).toBeUndefined()
+	})
+
+	test('a mapping that stops parsing while it configures a lease is audited with a distinguishing reason', async () => {
+		// Nothing renews the lease once the mapping stops parsing, so every grant it made expires — the operator
+		// must be able to tell that apart from the `a rule was dropped` marker, which uses the same event type.
+		const h = harness({ ...leasedMapping, rules: [{ equals: 'Editorial', grantMembership: { project: 'demo', role: 'editor' } }] })
+		const out = await makeRevalidator(registryWith(async () => ({ status: 'valid', claims: { department: 'Editorial' }, claimsComplete: true })))
+			.revalidate(h.ctx, h.ctx, apiKeyRow)
+		expect(out).toBe('valid')
+		expect(h.executed.some(c => c instanceof CreateOrUpdateProjectMembershipCommand)).toBe(false)
+		const log = h.executed.find(c => c instanceof CreateAuthLogEntryCommand && (c as any).data.type === 'idp_role_mapping_failed') as any
+		expect(log).toBeDefined()
+		expect(log.data.success).toBe(true)
+		expect(log.data.eventData).toEqual({ reason: 'mapping_invalid_lease_unrenewed' })
+		// the marker records no claim values, leased or not
+		expect(JSON.stringify(log.data.eventData)).not.toContain('Editorial')
+	})
+
+	test('the same broken mapping without a lease keeps the plain marker', async () => {
+		const h = harness({ rules: [{ equals: 'Editorial', grantMembership: { project: 'demo', role: 'editor' } }] })
+		const out = await makeRevalidator(registryWith(async () => ({ status: 'valid', claims: { department: 'Editorial' }, claimsComplete: true })))
+			.revalidate(h.ctx, h.ctx, apiKeyRow)
+		expect(out).toBe('valid')
+		const log = h.executed.find(c => c instanceof CreateAuthLogEntryCommand && (c as any).data.type === 'idp_role_mapping_failed') as any
+		expect(log).toBeDefined()
+		expect(log.data.eventData).toBeUndefined()
 	})
 
 	test('a rule that no longer matches is not renewed, so its lease is left to lapse', async () => {

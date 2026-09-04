@@ -368,7 +368,9 @@ test("addIDP rejects a membershipLease under syncPolicy: 'sticky'", async () => 
 })
 
 test('addIDP rejects a membershipLease that is not a duration', async () => {
-	for (const membershipLease of ['30', 'soon', '0 days', '30 fortnights', '30 days; drop table', '']) {
+	// The upper bound and the non-breaking space of a doc copy-paste both used to reach PostgreSQL and
+	// throw inside the sign-in transaction, breaking every federated sign-in through the provider.
+	for (const membershipLease of ['30', 'soon', '0 days', '30 fortnights', '30 days; drop table', '', '200000000 days', '30\u00A0days']) {
 		await expectInvalidConfiguration({
 			externalIdentifier: 'sub',
 			claimMapping: {
@@ -381,27 +383,31 @@ test('addIDP rejects a membershipLease that is not a duration', async () => {
 })
 
 test('addIDP accepts a membershipLease with unmatched: remove (validation passes; fails later at the existence check)', async () => {
-	await executeTenantTest({
-		query: addIDP({
-			externalIdentifier: 'sub',
-			claimMapping: {
-				unmatched: 'remove',
-				membershipLease: '30 days',
-				rules: [{ claim: 'department', equals: 'Editorial', grantMembership: { project: 'demo', role: 'editor' } }],
-			},
-		}),
-		executes: [
-			...sqlTransaction(
-				{
-					sql:
-						'select "id", "slug", "type", "configuration", "disabled_at" as "disabledAt", "auto_sign_up" as "autoSignUp", "exclusive", "init_returns_config" as "initReturnsConfig", "require_verified_email" as "requireVerifiedEmail", "assume_email_verified" as "assumeEmailVerified"  from "tenant"."identity_provider"  where "slug" = ?',
-					parameters: ['oidc'],
-					response: { rows: [{ id: '123', slug: 'oidc' }] },
+	// `999999 days` is the largest magnitude the pattern takes — pins the upper bound as accepted, so the
+	// rejection above is a boundary and not a blanket ban on large leases.
+	for (const membershipLease of ['30 days', '999999 days']) {
+		await executeTenantTest({
+			query: addIDP({
+				externalIdentifier: 'sub',
+				claimMapping: {
+					unmatched: 'remove',
+					membershipLease,
+					rules: [{ claim: 'department', equals: 'Editorial', grantMembership: { project: 'demo', role: 'editor' } }],
 				},
-			),
-		],
-		return: {
-			data: { addIDP: { ok: false, error: { code: 'ALREADY_EXISTS' } } },
-		},
-	})
+			}),
+			executes: [
+				...sqlTransaction(
+					{
+						sql:
+							'select "id", "slug", "type", "configuration", "disabled_at" as "disabledAt", "auto_sign_up" as "autoSignUp", "exclusive", "init_returns_config" as "initReturnsConfig", "require_verified_email" as "requireVerifiedEmail", "assume_email_verified" as "assumeEmailVerified"  from "tenant"."identity_provider"  where "slug" = ?',
+						parameters: ['oidc'],
+						response: { rows: [{ id: '123', slug: 'oidc' }] },
+					},
+				),
+			],
+			return: {
+				data: { addIDP: { ok: false, error: { code: 'ALREADY_EXISTS' } } },
+			},
+		})
+	}
 })

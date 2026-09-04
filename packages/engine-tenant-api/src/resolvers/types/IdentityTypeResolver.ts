@@ -66,18 +66,19 @@ export class IdentityTypeResolver implements IdentityResolvers {
 					const verifier = isSelf
 						? undefined
 						: context.permissionContext.createAccessVerifier(await context.permissionContext.createProjectScope(it))
-					const memberships = await this.projectMemberManager.getAllProjectMemberships(
+					const memberships = await this.projectMemberManager.getAllProjectMembershipsForDisplay(
 						context.db,
 						{ id: it.id },
 						{ id: parent.id, roles },
 						verifier,
 					)
+					// Empty only when the verifier hid every membership; a lapsed lease keeps the project listed.
 					if (memberships.length === 0) {
 						return null
 					}
 					return {
 						project: ProjectResponseFactory.createProjectResponse(it),
-						memberships: memberships,
+						memberships: memberships.map(({ membership, active, leaseExpiresAt }) => ({ ...membership, active, leaseExpiresAt })),
 					}
 				}),
 			)

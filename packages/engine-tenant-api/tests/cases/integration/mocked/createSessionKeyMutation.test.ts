@@ -1,7 +1,7 @@
 import { executeTenantTest } from '../../../src/testTenant.js'
 import { SQL } from '../../../src/tags.js'
 import { testUuid } from '../../../src/testUuid.js'
-import { selectMembershipsSql } from './sql/selectMembershipsSql.js'
+import { selectMembershipsForDisplaySql } from './sql/selectMembershipsForDisplaySql.js'
 import { getPersonByEmailSql } from './sql/getPersonByEmailSql.js'
 import { expect, test } from 'bun:test'
 import { getIdentityProjectsSql } from './sql/getIdentityProjectsSql.js'
@@ -26,7 +26,7 @@ test('create session key', async () => {
 			getAuthPoliciesSql(),
 			createSessionKeySql({ apiKeyId: apiKeyId, identityId: identityId }),
 			getIdentityProjectsSql({ identityId: identityId, projectId: projectId }),
-			selectMembershipsSql({
+			selectMembershipsForDisplaySql({
 				identityId: identityId,
 				projectId,
 				membershipsResponse: [{ role: 'editor', variables: [{ name: 'locale', values: ['cs'] }] }],

@@ -357,10 +357,9 @@ export class IDPClaimSyncService {
 								.filter(it => it.values.length > 0)
 								.map(it => ({ name: it.name, set: [...it.values] })),
 						},
-						// A32: leasing is bounded exactly as removal is — to the (project, role) vocabulary the
-						// rules name, which is the set this loop writes. A membership for a role no rule names is
-						// never stamped and therefore never expires, whoever created it. `undefined` when the
-						// mapping configures no lease, which leaves both columns (and the statement) untouched.
+						// A32: leasing is bounded exactly as removal is — to the (project, role) vocabulary the rules
+						// name, so a role no rule names is never stamped. `undefined` (no lease configured) CLEARS
+						// both columns, taking over another provider's lease here too: whoever wrote it last owns it.
 						lease,
 					),
 				)

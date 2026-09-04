@@ -10,10 +10,19 @@ import { CreateAuthLogEntryCommand } from '../../commands/authLog/CreateAuthLogE
 import { REVALIDATION_DEFAULT_FALLBACK_INTERVAL, REVALIDATION_DEFAULT_MIN_INTERVAL, REVALIDATION_DEFAULT_SOFT_THRESHOLD } from './IDPRevalidation.js'
 import { IdentityProviderHandler, RevalidationResult } from './IdentityProviderHandler.js'
 import { IDPClaimSyncService } from './IDPClaimSyncService.js'
-import { parseClaimMapping } from './ClaimMapping.js'
+import { isRecord, parseClaimMapping } from './ClaimMapping.js'
 import { JSONValue } from '@contember/schema'
 
 export type RevalidationOutcome = 'valid' | 'revoked'
+
+/** `idp_role_mapping_failed` reason for a broken mapping that also configures a lease: nothing renews it, so its grants lapse silently. */
+export const CLAIM_MAPPING_FAILED_LEASE_UNRENEWED = 'mapping_invalid_lease_unrenewed'
+
+export type ClaimMappingFailureReason = typeof CLAIM_MAPPING_FAILED_LEASE_UNRENEWED
+
+/** Raw read — reached only once the parse has already failed, so it must not re-parse. */
+export const hasConfiguredMembershipLease = (configuration: Record<string, unknown>): boolean =>
+	isRecord(configuration.claimMapping) && configuration.claimMapping.membershipLease !== undefined
 
 type ResolvedRevalidationConfig = {
 	enabled: boolean
@@ -244,8 +253,12 @@ export class IdpSessionRevalidator {
 			}
 		} catch {
 			// Strictly fail-open: a malformed mapping or a transient apply error must never revoke or
-			// fail an already-vouched-for session. The transaction rolls back any partial apply.
-			await this.logRoleMapping(dbContext, apiKeyRow, row, 'idp_role_mapping_failed', undefined, requestInfo)
+			// fail an already-vouched-for session. The transaction rolls back any partial apply. Nothing
+			// renewed the lease either, so the marker says so (mirrors sign-in; still no claim values).
+			const eventData = hasConfiguredMembershipLease(row.providerConfiguration)
+				? { reason: CLAIM_MAPPING_FAILED_LEASE_UNRENEWED }
+				: undefined
+			await this.logRoleMapping(dbContext, apiKeyRow, row, 'idp_role_mapping_failed', eventData, requestInfo)
 		}
 	}
 

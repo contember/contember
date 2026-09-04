@@ -1,6 +1,6 @@
 import { executeTenantTest, now } from '../../../src/testTenant.js'
 import { testUuid } from '../../../src/testUuid.js'
-import { selectMembershipsSql } from './sql/selectMembershipsSql.js'
+import { selectMembershipsForDisplaySql } from './sql/selectMembershipsForDisplaySql.js'
 import { signInMutation } from './gql/signIn.js'
 import { getPersonByEmailSql } from './sql/getPersonByEmailSql.js'
 import { expect, test } from 'bun:test'
@@ -57,7 +57,7 @@ test('anomaly off by default: a new country does not add any queries (baseline p
 			getAuthPoliciesSql(),
 			createSessionKeySql({ apiKeyId, identityId, userAgent: KNOWN_UA }),
 			getIdentityProjectsSql({ identityId, projectId }),
-			selectMembershipsSql({ identityId, projectId, membershipsResponse: [] }),
+			selectMembershipsForDisplaySql({ identityId, projectId, membershipsResponse: [] }),
 		],
 		return: {
 			data: { signIn: { ok: true, errors: [], result: { token: '0000000000000000000000000000000000000000' } } },
@@ -95,7 +95,7 @@ test('anomaly on, new device only (medium): sends UNUSUAL_LOGIN email, still sig
 			getAuthPoliciesSql(),
 			createSessionKeySql({ apiKeyId, identityId, userAgent: 'Mozilla/5.0 (NewBrowser)' }),
 			getIdentityProjectsSql({ identityId, projectId }),
-			selectMembershipsSql({ identityId, projectId, membershipsResponse: [] }),
+			selectMembershipsForDisplaySql({ identityId, projectId, membershipsResponse: [] }),
 		],
 		return: {
 			data: {
@@ -201,7 +201,7 @@ test('anomaly on, step-up retry with the emailed code: consumes it and signs in 
 			getAuthPoliciesSql(),
 			createSessionKeySql({ apiKeyId, identityId, userAgent: KNOWN_UA }),
 			getIdentityProjectsSql({ identityId, projectId }),
-			selectMembershipsSql({ identityId, projectId, membershipsResponse: [] }),
+			selectMembershipsForDisplaySql({ identityId, projectId, membershipsResponse: [] }),
 		],
 		return: {
 			data: { signIn: { ok: true, errors: [], result: { token: '0000000000000000000000000000000000000000' } } },
@@ -302,7 +302,7 @@ test('anomaly on, step-up scored for a user who already cleared TOTP this reques
 			getAuthPoliciesSql(),
 			createSessionKeySql({ apiKeyId, identityId, userAgent: KNOWN_UA }),
 			getIdentityProjectsSql({ identityId, projectId }),
-			selectMembershipsSql({ identityId, projectId, membershipsResponse: [] }),
+			selectMembershipsForDisplaySql({ identityId, projectId, membershipsResponse: [] }),
 		],
 		return: {
 			data: { signIn: { ok: true, errors: [], result: { token: '0000000000000000000000000000000000000000' } } },
@@ -354,7 +354,7 @@ test('anomaly on, new IP prefix only (low): the client IP flows into scoring →
 			getAuthPoliciesSql(),
 			createSessionKeySql({ apiKeyId, identityId, ip: clientIp, userAgent: KNOWN_UA }),
 			getIdentityProjectsSql({ identityId, projectId }),
-			selectMembershipsSql({ identityId, projectId, membershipsResponse: [] }),
+			selectMembershipsForDisplaySql({ identityId, projectId, membershipsResponse: [] }),
 		],
 		return: {
 			data: { signIn: { ok: true, errors: [], result: { token: '0000000000000000000000000000000000000000' } } },
@@ -396,7 +396,7 @@ test('anomaly on, custom historySize flows into the baseline query limit', async
 			getAuthPoliciesSql(),
 			createSessionKeySql({ apiKeyId, identityId, userAgent: KNOWN_UA }),
 			getIdentityProjectsSql({ identityId, projectId }),
-			selectMembershipsSql({ identityId, projectId, membershipsResponse: [] }),
+			selectMembershipsForDisplaySql({ identityId, projectId, membershipsResponse: [] }),
 		],
 		return: {
 			data: { signIn: { ok: true, errors: [], result: { token: '0000000000000000000000000000000000000000' } } },
@@ -429,7 +429,7 @@ test('anomaly on, historySize <= 0 is clamped to a limit of 1', async () => {
 			getAuthPoliciesSql(),
 			createSessionKeySql({ apiKeyId, identityId, userAgent: KNOWN_UA }),
 			getIdentityProjectsSql({ identityId, projectId }),
-			selectMembershipsSql({ identityId, projectId, membershipsResponse: [] }),
+			selectMembershipsForDisplaySql({ identityId, projectId, membershipsResponse: [] }),
 		],
 		return: {
 			data: { signIn: { ok: true, errors: [], result: { token: '0000000000000000000000000000000000000000' } } },
@@ -462,7 +462,7 @@ test('anomaly on, all signals match history: no email, no step-up, signs in clea
 			getAuthPoliciesSql(),
 			createSessionKeySql({ apiKeyId, identityId, userAgent: KNOWN_UA }),
 			getIdentityProjectsSql({ identityId, projectId }),
-			selectMembershipsSql({ identityId, projectId, membershipsResponse: [] }),
+			selectMembershipsForDisplaySql({ identityId, projectId, membershipsResponse: [] }),
 		],
 		return: {
 			data: { signIn: { ok: true, errors: [], result: { token: '0000000000000000000000000000000000000000' } } },

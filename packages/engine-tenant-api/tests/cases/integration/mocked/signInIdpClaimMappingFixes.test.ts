@@ -8,6 +8,7 @@ import { getPersonByIdpSql } from './sql/getPersonByIdpSql.js'
 import { createSessionKeySql } from './sql/createSessionKeySql.js'
 import { getIdentityProjectsSql } from './sql/getIdentityProjectsSql.js'
 import { selectMembershipsSql } from './sql/selectMembershipsSql.js'
+import { selectMembershipsForDisplaySql } from './sql/selectMembershipsForDisplaySql.js'
 import { getConfigSql } from './sql/getConfigSql.js'
 import { getIdentityByIdSql } from './sql/getIdentityByIdSql.js'
 import { getAuthPoliciesSql } from './sql/authPolicySql.js'
@@ -78,7 +79,7 @@ test('SEC-1: a grant for a project that does not exist yet is KEPT but inert —
 				createSessionKeySql({ apiKeyId, identityId }),
 			),
 			getIdentityProjectsSql({ identityId, projectId: sessionProjectId }),
-			selectMembershipsSql({ identityId, projectId: sessionProjectId, membershipsResponse: [] }),
+			selectMembershipsForDisplaySql({ identityId, projectId: sessionProjectId, membershipsResponse: [] }),
 		],
 		return: {
 			data: { signInIDP: { ok: true, errors: [], result: { token: '0000000000000000000000000000000000000000' } } },
@@ -126,7 +127,7 @@ test('SEC-1: a grant for an EXISTING project whose schema is unresolvable is DRO
 				createSessionKeySql({ apiKeyId, identityId }),
 			),
 			getIdentityProjectsSql({ identityId, projectId: sessionProjectId }),
-			selectMembershipsSql({ identityId, projectId: sessionProjectId, membershipsResponse: [] }),
+			selectMembershipsForDisplaySql({ identityId, projectId: sessionProjectId, membershipsResponse: [] }),
 		],
 		return: {
 			data: { signInIDP: { ok: true, errors: [], result: { token: '0000000000000000000000000000000000000000' } } },
@@ -206,7 +207,7 @@ test('TEST-3: a partial drop applies the safe grant AND still emits the fail-ope
 				createSessionKeySql({ apiKeyId, identityId }),
 			),
 			getIdentityProjectsSql({ identityId, projectId: sessionProjectId }),
-			selectMembershipsSql({ identityId, projectId: sessionProjectId, membershipsResponse: [{ role: 'editor', variables: [] }] }),
+			selectMembershipsForDisplaySql({ identityId, projectId: sessionProjectId, membershipsResponse: [{ role: 'editor', variables: [] }] }),
 		],
 		return: {
 			data: { signInIDP: { ok: true, errors: [], result: { token: '0000000000000000000000000000000000000000' } } },
@@ -311,7 +312,7 @@ test('TEST-4: an allow-bounded claim-derived `condition` variable writes ONLY th
 				createSessionKeySql({ apiKeyId, identityId }),
 			),
 			getIdentityProjectsSql({ identityId, projectId: sessionProjectId }),
-			selectMembershipsSql({
+			selectMembershipsForDisplaySql({
 				identityId,
 				projectId: sessionProjectId,
 				membershipsResponse: [{ role: 'editor', variables: [{ name: 'siteFilter', values: ['{"eq":"site-1"}'] }] }],

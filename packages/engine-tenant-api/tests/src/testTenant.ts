@@ -196,6 +196,13 @@ export const executeTenantTest = async (test: Test) => {
 		return: test.return,
 		schema: schema,
 	})
+	// A32 dispatches its lease sweep with `setImmediate` after the response, and each mocked query resolves on
+	// its own timer, so drain both queues until the stream goes quiet. Without this a detached statement nobody
+	// awaits lands after the assertions and a missing one looks consumed.
+	for (let round = 0; round < 12 && (round < 2 || test.executes.length > 0); round++) {
+		await new Promise(resolve => setImmediate(resolve))
+		await new Promise(resolve => setTimeout(resolve, 1))
+	}
 	for (const email of test.sentMails || []) {
 		mailer.expectMessage(email)
 	}

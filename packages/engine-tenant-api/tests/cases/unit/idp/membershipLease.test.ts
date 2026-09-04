@@ -1,7 +1,11 @@
 import { describe, expect, test } from 'bun:test'
 import { createConnectionMock, type ExpectedQuery } from '@contember/database-tester'
+import { Client, Connection } from '@contember/database'
+import { createLogger, TestLoggerHandler, withLogger } from '@contember/logger'
 import {
 	AllProjectRolesByIdentityQuery,
+	type Command,
+	CommandBus,
 	CreateOrUpdateProjectMembershipCommand,
 	DatabaseContext,
 	findClaimMappingShapeErrors,
@@ -12,8 +16,11 @@ import {
 	ProjectRolesByIdentityQuery,
 	type Providers,
 	PurgeExpiredMembershipLeasesCommand,
+	type TransactionOptions,
 } from '../../../../src/index.js'
 import { CreateAuthLogEntryCommand } from '../../../../src/model/commands/authLog/CreateAuthLogEntryCommand.js'
+import { purgeExpiredMembershipLeasesSql } from '../../integration/mocked/sql/purgeExpiredMembershipLeasesSql.js'
+import { sqlTransaction } from '../../integration/mocked/sql/sqlTransaction.js'
 import { SQL } from '../../../src/tags.js'
 
 // A32 — the lease itself, away from the sign-in / refresh flows that renew it: what a configured lease
@@ -31,9 +38,39 @@ const providers: Providers = {
 	hash: value => Buffer.from(value.toString()),
 }
 
-const withMockedDb = async (expected: ExpectedQuery[], cb: (db: DatabaseContext) => Promise<void>): Promise<void> => {
+// The sweep swallows every failure, the mocked connection included, so its SQL expectations cannot fail a
+// test. What it did is asserted on the commands themselves instead — these two record them on the way past.
+class RecordingCommandBus<Conn extends Connection.ConnectionLike> extends CommandBus<Conn> {
+	constructor(client: Client<Conn>, providers: Providers, private readonly executed: Command<unknown>[]) {
+		super(client, providers)
+	}
+
+	public override async execute<T>(command: Command<T>): Promise<T> {
+		this.executed.push(command)
+		return await super.execute(command)
+	}
+}
+
+class RecordingDbContext<Conn extends Connection.ConnectionLike = Connection.ConnectionLike> extends DatabaseContext<Conn> {
+	constructor(client: Client<Conn>, providers: Providers, public readonly executed: Command<unknown>[] = []) {
+		super(client, providers)
+	}
+
+	public override get commandBus(): CommandBus<Conn> {
+		return new RecordingCommandBus(this.client, this.providers, this.executed)
+	}
+
+	public override async transaction<T>(
+		cb: (db: DatabaseContext<Connection.TransactionLike>) => Promise<T>,
+		options: TransactionOptions = {},
+	): Promise<T> {
+		return await super.transaction(db => cb(new RecordingDbContext(db.client, db.providers, this.executed)), options)
+	}
+}
+
+const withMockedDb = async (expected: ExpectedQuery[], cb: (db: RecordingDbContext) => Promise<void>): Promise<void> => {
 	const connection = createConnectionMock(expected)
-	await cb(new DatabaseContext(connection.createClient('tenant', { module: 'tenant' }), providers))
+	await cb(new RecordingDbContext(connection.createClient('tenant', { module: 'tenant' }), providers))
 	expect(expected).toHaveLength(0)
 }
 
@@ -70,7 +107,20 @@ describe('A32 membership lease — what a lease may be configured with', () => {
 
 	test('only a positive whole duration parses; anything else fails the mapping outright', () => {
 		expect(mapping({ rules, unmatched: 'remove', membershipLease: ' 30  days ' }).membershipLease).toBe('30  days')
-		for (const membershipLease of ['30', 'days', '0 days', '-1 day', '1.5 days', '30 fortnights', "1 day'; drop", '']) {
+		const rejected = [
+			'30',
+			'days',
+			'0 days',
+			'-1 day',
+			'1.5 days',
+			'30 fortnights',
+			"1 day'; drop",
+			'',
+			// postgres answers these two at `now() + ?::interval` time, where nothing can catch them any more:
+			'200000000 days', // timestamp out of range
+			'30\u00A0days', // invalid input syntax for type interval — that is a non-breaking space
+		]
+		for (const membershipLease of rejected) {
 			expect(() => parseClaimMapping({ claimMapping: { rules, unmatched: 'remove', membershipLease } })).toThrow()
 		}
 	})
@@ -168,69 +218,90 @@ describe('A32 membership lease — an expired lease grants nothing', () => {
 describe('A32 membership lease — the hygiene sweep', () => {
 	// The sweep is not what makes an expired lease harmless — the filter above already did that. It clears
 	// the residue: rows that grant nothing but still occupy their membership unique key.
-	// `FOR UPDATE SKIP LOCKED` and the repeated `lease_expires_at <= now()` on the DELETE are both
-	// load-bearing, not decoration: without the repeat, a row renewed by a sign-in committing while this
-	// statement waits on it is still deleted, because Postgres re-checks only the outer qualification.
-	const sweepSql = (limit: number, rows: Record<string, unknown>[]): ExpectedQuery => ({
-		sql: SQL`WITH "expired" AS (
-				DELETE FROM "project_membership"
-				WHERE "id" IN (
-					SELECT "id" FROM "project_membership"
-					WHERE "lease_expires_at" <= now()
-					ORDER BY "lease_expires_at"
-					LIMIT ?
-					FOR UPDATE SKIP LOCKED
-				)
-				AND "lease_expires_at" <= now()
-				RETURNING "identity_id", "project_id", "role"
-			)
-			SELECT "expired"."identity_id" AS "identityId", "project"."slug" AS "project", "expired"."role" AS "role", "person"."id" AS "personId"
-			FROM "expired"
-			INNER JOIN "project" ON "project"."id" = "expired"."project_id"
-			LEFT JOIN "person" ON "person"."identity_id" = "expired"."identity_id"`,
-		parameters: [limit],
-		response: { rows },
+
+	const auditInsertSql = (eventData: unknown): ExpectedQuery => ({
+		sql: SQL`INSERT INTO "tenant"."person_auth_log" ("id", "person_id", "type", "success", "metadata", "target_person_id", "event_data")
+		         VALUES (?, ?, ?, ?, ?, ?, ?)`,
+		parameters: [providers.uuid(), 'person-1', 'idp_membership_lease_expired', true, {}, 'person-1', eventData],
+		response: { rowCount: 1 },
 	})
 
-	test('one audit entry per person, listing what they lost; an identity with no person is removed silently', async () => {
-		await withMockedDb([
-			sweepSql(MEMBERSHIP_LEASE_SWEEP_LIMIT, [
-				{ identityId: 'identity-1', personId: 'person-1', project: 'demo', role: 'editor' },
-				{ identityId: 'identity-1', personId: 'person-1', project: 'demo', role: 'reviewer' },
-				// an API-key identity: nothing to audit against, but the membership still had to go
-				{ identityId: 'identity-2', personId: null, project: 'demo', role: 'editor' },
-			]),
-			{
-				sql: SQL`INSERT INTO "tenant"."person_auth_log" ("id", "person_id", "type", "success", "metadata", "target_person_id", "event_data")
-				         VALUES (?, ?, ?, ?, ?, ?, ?)`,
-				// no invoked_by_id and no identity_provider_id: nobody acted, and the sweep is global — the
-				// sign-in that happened to trigger it is not the provider whose grant lapsed
-				parameters: [
-					providers.uuid(),
-					'person-1',
-					'idp_membership_lease_expired',
-					true,
-					{},
-					'person-1',
-					{ memberships: [{ project: 'demo', role: 'editor' }, { project: 'demo', role: 'reviewer' }] },
-				],
-				response: { rowCount: 1 },
+	test('one audit entry per person, naming each lapsed grantor; an identity with no person is removed silently', async () => {
+		const memberships = [
+			{ project: 'demo', role: 'editor', identityProviderId: 'idp-1' },
+			{ project: 'demo', role: 'reviewer', identityProviderId: 'idp-2' },
+		]
+		await withMockedDb(
+			sqlTransaction(
+				purgeExpiredMembershipLeasesSql({
+					limit: MEMBERSHIP_LEASE_SWEEP_LIMIT,
+					rows: [
+						{ identityId: 'identity-1', personId: 'person-1', project: 'demo', role: 'editor', identityProviderId: 'idp-1' },
+						{ identityId: 'identity-1', personId: 'person-1', project: 'demo', role: 'reviewer', identityProviderId: 'idp-2' },
+						// an API-key identity: nothing to audit against, but the membership still had to go
+						{ identityId: 'identity-2', personId: null, project: 'demo', role: 'editor', identityProviderId: 'idp-1' },
+					],
+				}),
+				auditInsertSql({ memberships }),
+			),
+			async db => {
+				const handler = new TestLoggerHandler()
+				await withLogger(createLogger(handler), async () => await new MembershipLeaseSweeper().sweep(db))
+
+				// nothing was swallowed, so the mocked SQL above really was matched
+				expect(handler.messages).toHaveLength(0)
+				expect(db.executed.filter(it => it instanceof PurgeExpiredMembershipLeasesCommand)).toHaveLength(1)
+				// one entry for person-1 and none for the API key; `identityProviderId` rides per membership,
+				// the row column staying null because the sweep is global
+				expect(db.executed.filter(it => it instanceof CreateAuthLogEntryCommand)).toEqual([
+					new CreateAuthLogEntryCommand({
+						type: 'idp_membership_lease_expired',
+						personId: 'person-1',
+						targetPersonId: 'person-1',
+						success: true,
+						eventData: { memberships },
+					}),
+				])
 			},
-		], async db => {
-			await new MembershipLeaseSweeper().sweep(db)
-		})
+		)
 	})
 
-	test('a failing sweep is swallowed — it is housekeeping riding on somebody else sign-in', async () => {
-		const db = new DatabaseContext(createConnectionMock([]).createClient('tenant', { module: 'tenant' }), providers)
-		db.commandBus.execute = async () => {
-			throw new Error('deadlock')
+	test('the delete and its audit are one transaction, so a crash cannot lose the record of what went', async () => {
+		// asserted by the BEGIN / COMMIT the mock demands around both statements
+		await withMockedDb(
+			sqlTransaction(
+				purgeExpiredMembershipLeasesSql({
+					limit: MEMBERSHIP_LEASE_SWEEP_LIMIT,
+					rows: [{ identityId: 'identity-1', personId: 'person-1', project: 'demo', role: 'editor', identityProviderId: null }],
+				}),
+				auditInsertSql({ memberships: [{ project: 'demo', role: 'editor', identityProviderId: null }] }),
+			),
+			async db => {
+				const handler = new TestLoggerHandler()
+				await withLogger(createLogger(handler), async () => await new MembershipLeaseSweeper().sweep(db))
+				expect(handler.messages).toHaveLength(0)
+			},
+		)
+	})
+
+	test('a failing sweep is swallowed but logged — it is housekeeping riding on somebody else sign-in', async () => {
+		class FailingDbContext extends DatabaseContext {
+			public override async transaction<T>(): Promise<T> {
+				throw new Error('deadlock')
+			}
 		}
-		expect(await new MembershipLeaseSweeper().sweep(db).then(() => 'resolved')).toBe('resolved')
+		const db = new FailingDbContext(createConnectionMock([]).createClient('tenant', { module: 'tenant' }), providers)
+		const handler = new TestLoggerHandler()
+		await withLogger(createLogger(handler), async () => {
+			expect(await new MembershipLeaseSweeper().sweep(db).then(() => 'resolved')).toBe('resolved')
+		})
+		// a permanently broken sweep must not be indistinguishable from an empty one
+		expect(handler.messages).toHaveLength(1)
+		expect(handler.messages[0].message).toContain('deadlock')
 	})
 
 	test('the delete is bounded, so a mass lapse cannot stall the request it rides on', async () => {
-		await withMockedDb([sweepSql(7, [])], async db => {
+		await withMockedDb([purgeExpiredMembershipLeasesSql({ limit: 7 })], async db => {
 			await db.commandBus.execute(new PurgeExpiredMembershipLeasesCommand(7))
 		})
 	})

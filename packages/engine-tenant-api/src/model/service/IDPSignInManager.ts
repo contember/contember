@@ -1,6 +1,14 @@
 import { ApiKeyManager } from './apiKey/index.js'
 import { IdentityProviderBySlugQuery, PersonByIdPQuery, PersonQuery, PersonRow } from '../queries/index.js'
-import { IDPHandlerRegistry, IDPResponse, IDPResponseError, IDPValidationError } from './idp/index.js'
+import {
+	CLAIM_MAPPING_FAILED_LEASE_UNRENEWED,
+	ClaimMappingFailureReason,
+	hasConfiguredMembershipLease,
+	IDPHandlerRegistry,
+	IDPResponse,
+	IDPResponseError,
+	IDPValidationError,
+} from './idp/index.js'
 import { Response, ResponseError, ResponseOk } from '../utils/Response.js'
 import { InitSignInIdpErrorCode, InitSignInIdpResult, SignInIdpErrorCode } from '../../schema/index.js'
 import { DatabaseContext } from '../utils/index.js'
@@ -104,10 +112,17 @@ class IDPSignInManager {
 			// never committed (failing sign-in on an infra error is the safe outcome).
 			let mapping: ClaimMapping | null = null
 			let claimMappingFailed = false
+			let claimMappingFailureReason: ClaimMappingFailureReason | undefined
 			try {
 				mapping = parseClaimMapping(provider.configuration)
 			} catch {
 				claimMappingFailed = true
+				// The parser could not read the lease, but the provider still configures one: nothing renews it, so its
+				// grants expire silently. Mark that distinctly from a merely dropped rule, and still sweep what lapsed.
+				if (hasConfiguredMembershipLease(provider.configuration)) {
+					claimMappingFailureReason = CLAIM_MAPPING_FAILED_LEASE_UNRENEWED
+					leaseConfigured = true
+				}
 			}
 			let claimMappingAudit: ClaimMappingAudit | null = null
 			if (mapping) {
@@ -175,6 +190,7 @@ class IDPSignInManager {
 				idpResponse: claim,
 				claimMappingAudit,
 				claimMappingFailed,
+				claimMappingFailureReason,
 				identityProviderId: provider.id,
 				[AuthLogService.Key]: new AuthLogService.Bag({
 					personId: personRow.id,
@@ -183,11 +199,13 @@ class IDPSignInManager {
 				}),
 			})
 		})
-		// A32 housekeeping, deliberately outside the transaction and non-fatal: it only removes memberships
-		// the access path already refuses. Gated on this provider configuring a lease, so a deployment
-		// without one never issues the statement.
+		// A32 housekeeping: outside the transaction and detached (after the response), so no sign-in waits on it and
+		// a rejection cannot become an unhandledRejection. Gated on this provider configuring a lease, so a
+		// deployment without one never issues the statement.
 		if (leaseConfigured) {
-			await this.leaseSweeper.sweep(dbContext)
+			setImmediate(() => {
+				this.leaseSweeper.sweep(dbContext).catch(() => {})
+			})
 		}
 		return response
 	}
@@ -299,6 +317,8 @@ namespace IDPSignInManager {
 		readonly claimMappingAudit?: ClaimMappingAudit | null
 		/** True when claim mapping failed and was skipped (fail-open) — drives the `idp_role_mapping_failed` audit. */
 		readonly claimMappingFailed?: boolean
+		/** Distinguishing reason for that audit; absent for the ordinary fail-open. Never carries claim values. */
+		readonly claimMappingFailureReason?: ClaimMappingFailureReason
 		[AuthLogService.Key]: AuthLogService.Bag
 	}
 

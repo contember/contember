@@ -167,22 +167,25 @@ query {
 					},
 				},
 				{
-					// ProjectMembershipByIdentityQuery — the roles of those identities
-					sql: SQL`with "memberships" as (select "project_membership"."id", "project_membership"."role", "project_membership"."identity_id"
+					// ProjectMembershipsForDisplayQuery — the roles of those identities, lapsed leases included
+					sql: SQL`with "memberships" as (select "project_membership"."id", "project_membership"."role", "project_membership"."identity_id",
+							"project_membership"."lease_expires_at"
 						from "tenant"."project_membership"
-						where "identity_id" IN (?, ?) and "project_id" = ? and ("lease_expires_at" is null or "lease_expires_at" > now())),
+						where "identity_id" in (?, ?) and "project_id" = ?),
 						"variables" as (select "membership_id", json_agg(json_build_object('name', variable, 'values', value)) as "variables"
 							from "tenant"."project_membership_variable"
 								inner join "memberships" on "project_membership_variable"."membership_id" = "memberships"."id"
 							group by "membership_id")
-						select "role", coalesce(variables, '[]'::json) as "variables", "identity_id" as "identityId"
+						select "role", coalesce(variables, '[]'::json) as "variables", "identity_id" as "identityId",
+							"memberships"."lease_expires_at" as "leaseExpiresAt",
+							("memberships"."lease_expires_at" is null or "memberships"."lease_expires_at" > now()) as "active"
 						from "memberships"
 							left join "variables" on "memberships"."id" = "variables"."membership_id"`,
 					parameters: [identityAdmin, identityEditor, projectId],
 					response: {
 						rows: [
-							{ role: 'admin', variables: [], identityId: identityAdmin },
-							{ role: 'editor', variables: [], identityId: identityEditor },
+							{ role: 'admin', variables: [], identityId: identityAdmin, leaseExpiresAt: null, active: true },
+							{ role: 'editor', variables: [], identityId: identityEditor, leaseExpiresAt: null, active: true },
 						],
 					},
 				},

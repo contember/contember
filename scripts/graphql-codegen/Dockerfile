@@ -2,6 +2,8 @@ FROM oven/bun:1.3.10 AS build
 WORKDIR /src
 COPY package.json /src
 COPY bun.lock /src
+# package.json declares patchedDependencies, so the patches must exist before install resolves them
+COPY patches /src/patches
 RUN bun install install
 RUN bun add graphql @graphql-codegen/cli @graphql-codegen/typescript @graphql-codegen/typescript-operations @graphql-codegen/typescript-resolvers
 COPY . /src

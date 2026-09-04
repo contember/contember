@@ -18,8 +18,10 @@ import { cpuUsage, memoryUsage } from 'node:process'
 import { performance } from 'node:perf_hooks'
 import { getClientIP } from '../utils/remoteAddress.js'
 import { isForceHttpOkRequested, shouldForceHttpOk } from './forceHttpOk.js'
+import { INVALID_TRACE_ID, noopTracer, Span, SpanContext, Tracer, withSpanContext } from '@contember/telemetry'
+import { AcceptIncomingTraceMode, resolveIncomingSpanContext } from '../telemetry/incomingTrace.js'
 
-type Route<C> = { match: RequestMatcher; controller: C; module: string }
+type Route<C> = { match: RequestMatcher; controller: C; module: string; mask: string }
 export class Application {
 	private middlewares: KoaMiddleware<any>[] = []
 
@@ -30,6 +32,8 @@ export class Application {
 	private suppressAccessLog: boolean | RegExp
 	private trustedProxies: string[]
 	private forceHttpOkEnabled: boolean
+	private acceptIncomingTrace: AcceptIncomingTraceMode
+	private traceIdResponseHeader: boolean
 
 	constructor(
 		private readonly projectGroupResolver: ProjectGroupResolver,
@@ -37,11 +41,14 @@ export class Application {
 		private readonly debugMode: boolean,
 		private readonly version: string | undefined,
 		private readonly logger: Logger,
+		private readonly tracer: Tracer = noopTracer,
 	) {
 		const suppressAccessLogRaw = serverConfig.http?.suppressAccessLog
 		this.suppressAccessLog = suppressAccessLogRaw === true ? true : suppressAccessLogRaw ? new RegExp(suppressAccessLogRaw) : false
 		this.trustedProxies = serverConfig.http?.trustedProxies ?? []
 		this.forceHttpOkEnabled = serverConfig.http?.responseStatusHeader ?? true
+		this.acceptIncomingTrace = serverConfig.telemetry?.traces?.acceptIncoming ?? 'trusted-proxies'
+		this.traceIdResponseHeader = serverConfig.telemetry?.traces?.traceIdResponseHeader ?? false
 	}
 
 	addMiddleware(middleware: KoaMiddleware<any>) {
@@ -52,6 +59,7 @@ export class Application {
 		this.routes.push({
 			module,
 			controller,
+			mask,
 			match: createRequestMatcher(mask),
 		})
 	}
@@ -60,6 +68,7 @@ export class Application {
 		this.internalRoutes.push({
 			module,
 			controller,
+			mask,
 			match: createRequestMatcher(mask),
 		})
 	}
@@ -68,6 +77,7 @@ export class Application {
 		this.websocketRoutes.push({
 			module,
 			controller,
+			mask,
 			match: createRequestMatcher(mask),
 		})
 	}
@@ -97,7 +107,7 @@ export class Application {
 
 		const wsRequests: (Promise<void>)[] = []
 		server.on('upgrade', (req, socket, head) => {
-			wsRequests.push(this.handleWebsocketRequest(wss, abortController.signal, req, socket, head))
+			wsRequests.push(this.handleWebsocketRequest(wss, abortController.signal, req, socket, head).finally(() => socket.destroy()))
 		})
 		await new Promise<void>(resolve => {
 			server.listen(this.serverConfig.port, () => resolve())
@@ -120,7 +130,6 @@ export class Application {
 		socket: stream.Duplex,
 		head: Buffer,
 	): Promise<void> {
-		let webSocketContext: WebSocketContext | null = null
 		let requestLogger = this.logger
 		const { timer, send: sendTimer } = this.createTimer()
 		const clientIp = getClientIP(req, this.trustedProxies)
@@ -130,55 +139,85 @@ export class Application {
 			if (!matchedRequest) {
 				throw new HttpErrorResponse(404, 'Route not found')
 			}
-			requestLogger = this.createRequestLogger(req, undefined, matchedRequest.module, clientIp)
-
-			const groupContainer = await this.projectGroupResolver.resolveContainer({ request: req })
-
-			requestLogger = requestLogger.child({
-				projectGroup: groupContainer.slug,
-			})
-
-			const authResult = await groupContainer.authenticator.authenticate({ request: req, timer, clientIp })
-			requestLogger.debug('User authenticated', { authResult })
-			requestLogger = requestLogger.child({
-				user: authResult?.identityId,
-			})
-
-			const effectiveClientIp = authResult?.clientIp ?? clientIp
-
-			const ws = await new Promise<WebSocket>(resolve =>
-				wss.handleUpgrade(req, socket, head, (ws, request) => {
-					resolve(ws)
+			const established = await this.withIncomingTrace(req, async () => {
+				const span = this.tracer.startSpan(`WS ${matchedRequest.mask}`, {
+					kind: 'server',
+					attributes: {
+						'http.request.method': req.method ?? 'GET',
+						'url.path': url.pathname,
+						'contember.module': matchedRequest.module,
+					},
 				})
-			)
-			const wsEstablished = performance.now()
-			webSocketContext = {
-				ws,
-				abortSignal,
-				logger: requestLogger,
-				timer,
-				url,
-				request: req,
-				clientIp: effectiveClientIp,
-				authResult,
-				params: matchedRequest.params,
-				projectGroup: groupContainer,
+				return await this.tracer.withSpan(span, async () => {
+					const pendingWork: Promise<void>[] = []
+					try {
+						requestLogger = this.createRequestLogger(req, undefined, matchedRequest.module, clientIp, span.context)
+						const groupContainer = await this.projectGroupResolver.resolveContainer({ request: req })
+						requestLogger = requestLogger.child({ projectGroup: groupContainer.slug })
+						span.setAttribute('contember.project_group', groupContainer.slug ?? 'unknown')
+						if (matchedRequest.params.projectSlug !== undefined) {
+							span.setAttribute('contember.project', matchedRequest.params.projectSlug)
+						}
+
+						const authResult = await groupContainer.authenticator.authenticate({ request: req, timer, clientIp })
+						requestLogger.debug('User authenticated', { authResult })
+						requestLogger = requestLogger.child({ user: authResult?.identityId })
+						if (authResult) {
+							span.setAttribute('contember.identity_id', authResult.identityId)
+						}
+
+						const ws = await new Promise<WebSocket>(resolve => wss.handleUpgrade(req, socket, head, ws => resolve(ws)))
+						const closed = new Promise<void>(resolve => ws.once('close', () => resolve()))
+						const context: WebSocketContext = {
+							ws,
+							abortSignal,
+							logger: requestLogger,
+							timer,
+							tracer: this.tracer,
+							url,
+							request: req,
+							clientIp: authResult?.clientIp ?? clientIp,
+							authResult,
+							params: matchedRequest.params,
+							projectGroup: groupContainer,
+							waitUntil: promise => pendingWork.push(promise),
+						}
+						await matchedRequest.controller(context)
+						span.setAttribute('http.response.status_code', 101)
+						return { ws, closed, pendingWork, establishedAt: performance.now() }
+					} catch (error) {
+						const response = error instanceof HttpResponse ? error : new HttpErrorResponse(500, 'Internal server error')
+						span.setAttribute('http.response.status_code', response.code)
+						if (response.code >= 500) {
+							span.setStatus('error')
+						}
+						if (!(error instanceof HttpResponse)) {
+							span.recordException(error)
+							requestLogger.error(error)
+						}
+						this.sendRawHttpResponse(socket, response)
+						requestLogger.debug('Websocket connection failed')
+						return undefined
+					} finally {
+						span.end()
+					}
+				})
+			})
+			if (established === undefined) {
+				return
 			}
-			await matchedRequest.controller(webSocketContext)
+			const { ws, closed, pendingWork, establishedAt } = established
 			requestLogger.debug('Websocket connection established')
 			ws.on('error', e => {
 				requestLogger.error(e, {
-					websocketOpenMs: performance.now() - wsEstablished,
+					websocketOpenMs: performance.now() - establishedAt,
 				})
 			})
 
-			return new Promise<void>(resolve => {
-				ws.on('close', () => {
-					requestLogger.debug('Websocket connection closed', {
-						websocketOpenMs: performance.now() - wsEstablished,
-					})
-					resolve()
-				})
+			await closed
+			await Promise.allSettled(pendingWork)
+			requestLogger.debug('Websocket connection closed', {
+				websocketOpenMs: performance.now() - establishedAt,
 			})
 		} catch (e) {
 			if (e instanceof HttpResponse) {
@@ -204,10 +243,56 @@ export class Application {
 			if (internalMatchedRequest) {
 				return await this.handleInternalRequest(internalMatchedRequest, ctx)
 			}
+			return await this.processHttpRequest(ctx, null)
 		}
+		return await this.withIncomingTrace(ctx.req, async () => {
+			const span = this.tracer.startSpan(`HTTP ${ctx.request.method} ${matchedRequest.mask}`, {
+				kind: 'server',
+				attributes: {
+					'http.request.method': ctx.request.method,
+					'url.path': ctx.request.URL.pathname,
+					'contember.module': matchedRequest.module,
+				},
+			})
+			if (span.context.traceId === INVALID_TRACE_ID) {
+				return await this.processHttpRequest(ctx, matchedRequest, span)
+			}
+			const endSpan = () => {
+				ctx.res.off('finish', endSpan)
+				ctx.res.off('close', closeSpan)
+				span.end()
+			}
+			const closeSpan = () => {
+				if (!ctx.res.writableFinished) {
+					span.setStatus('error', 'Response closed before completion')
+				}
+				endSpan()
+			}
+			ctx.res.once('finish', endSpan)
+			ctx.res.once('close', closeSpan)
+			try {
+				return await this.tracer.withSpan(span, () => this.processHttpRequest(ctx, matchedRequest, span))
+			} catch (error) {
+				span.recordException(error)
+				span.setStatus('error')
+				endSpan()
+				throw error
+			} finally {
+				if (ctx.res.writableFinished) {
+					endSpan()
+				}
+			}
+		})
+	}
+
+	private async processHttpRequest(
+		ctx: KoaContext<{ module?: string; projectGroup?: string; project?: string }>,
+		matchedRequest: MatchedRequest<HttpController> | null,
+		span?: Span,
+	) {
 		let httpContext: HttpContext | null = null
 		const clientIp = getClientIP(ctx.req, this.trustedProxies)
-		let requestLogger = this.createRequestLogger(ctx.req, ctx.request.body, matchedRequest?.module, clientIp)
+		let requestLogger = this.createRequestLogger(ctx.req, ctx.request.body, matchedRequest?.module, clientIp, span?.context)
 		const { timer, send: sendTimer } = this.createTimer()
 
 		try {
@@ -228,12 +313,19 @@ export class Application {
 			})
 			ctx.state.projectGroup = groupContainer.slug
 			ctx.state.project = matchedRequest.params.projectSlug
+			span?.setAttribute('contember.project_group', groupContainer.slug ?? 'unknown')
+			if (matchedRequest.params.projectSlug !== undefined) {
+				span?.setAttribute('contember.project', matchedRequest.params.projectSlug)
+			}
 
 			const authResult = await groupContainer.authenticator.authenticate({ request: ctx.req, timer, clientIp })
 			requestLogger.debug('User authenticated', { authResult })
 			requestLogger = requestLogger.child({
 				user: authResult?.identityId,
 			})
+			if (authResult) {
+				span?.setAttribute('contember.identity_id', authResult.identityId)
+			}
 
 			const effectiveClientIp = authResult?.clientIp ?? clientIp
 
@@ -245,6 +337,7 @@ export class Application {
 					clientIp: effectiveClientIp,
 					logger,
 					timer,
+					tracer: this.tracer,
 					request: ctx.req,
 					response: ctx.res,
 					requestDebugMode: false,
@@ -262,19 +355,50 @@ export class Application {
 				this.sendHttpResponse(ctx, e)
 			} else {
 				this.sendHttpResponse(ctx, new HttpErrorResponse(500, 'Internal server error'))
+				span?.recordException(e)
+				span?.setStatus('error')
 				requestLogger.error(e)
 			}
 		} finally {
+			const responseStatus = ctx.status
+			if (responseStatus >= 500) {
+				span?.setStatus('error')
+			}
 			this.maybeForceHttpOk(ctx, matchedRequest?.module)
+			const requestDebugMode = (httpContext as HttpContext | null)?.requestDebugMode ?? false
+			span?.setAttribute('http.response.status_code', ctx.status)
+			this.sendTraceIdHeader(ctx, span, requestDebugMode)
+			if (span !== undefined && span.context.traceId !== INVALID_TRACE_ID && ctx.response.body instanceof Readable) {
+				const contentLength = ctx.response.get('Content-Length')
+				ctx.body = createTracedReadable(ctx.response.body, this.tracer, span)
+				if (contentLength !== '') {
+					ctx.set('Content-Length', contentLength)
+				}
+			}
 			sendTimer({
 				req: ctx.req,
 				response: ctx.res,
 				body: ctx.response.body,
-				requestDebugMode: (httpContext as HttpContext | null)?.requestDebugMode ?? false,
+				requestDebugMode,
 				logger: requestLogger,
 			})
 			requestLogger.debug('Request processing finished')
 		}
+	}
+
+	private withIncomingTrace<T>(request: IncomingMessage, cb: () => T): T {
+		const incoming = resolveIncomingSpanContext(request, { mode: this.acceptIncomingTrace, trustedProxies: this.trustedProxies })
+		return incoming === undefined ? cb() : withSpanContext(incoming, cb)
+	}
+
+	private sendTraceIdHeader(ctx: KoaContext<{}>, span: Span | undefined, requestDebugMode: boolean): void {
+		if (span === undefined || ctx.res.headersSent || span.context.traceId === INVALID_TRACE_ID) {
+			return
+		}
+		if (!this.traceIdResponseHeader && !this.debugMode && !requestDebugMode) {
+			return
+		}
+		ctx.set('x-contember-trace-id', span.context.traceId)
 	}
 
 	private async handleInternalRequest(matchedRequest: MatchedRequest<InternalHttpController>, ctx: KoaContext<{ module?: string }>) {
@@ -358,13 +482,17 @@ export class Application {
 		)
 	}
 
-	private createRequestLogger(request: IncomingMessage, body: any, module?: string, remoteAddress?: string): Logger {
+	private createRequestLogger(request: IncomingMessage, body: any, module?: string, remoteAddress?: string, spanContext?: SpanContext): Logger {
+		const traceAttributes = spanContext === undefined || spanContext.traceId === INVALID_TRACE_ID
+			? {}
+			: { traceId: spanContext.traceId, spanId: spanContext.spanId }
 		return this.logger.child({
 			method: request.method,
 			uri: request.url,
 			requestId: Math.random().toString().substring(2),
 			module,
 			remoteAddress,
+			...traceAttributes,
 			[LoggerRequestBody]: body,
 		}, {
 			handler: FingerCrossedLoggerHandler.factory(),
@@ -376,24 +504,7 @@ export class Application {
 		const globalStart = performance.now()
 		const cpuUsageStart = cpuUsage()
 		const memoryUsageStart = memoryUsage()
-		const timer: Timer = (name: string, cb) => {
-			const start = performance.now()
-			const time: EventTime = { label: name, start: Math.round(start - globalStart) }
-			times.push(time)
-			const res = cb()
-
-			if (res instanceof Promise) {
-				;(async () => {
-					try {
-						await res
-					} catch {
-					} finally {
-						time.duration = Math.round(performance.now() - start)
-					}
-				})()
-			}
-			return res
-		}
+		const timer = createEventTimer(this.tracer, times, globalStart)
 
 		const send = (ctx: { req: IncomingMessage; response?: ServerResponse; body?: unknown; requestDebugMode: boolean; logger: Logger }) => {
 			if (ctx.response && !ctx.response.headersSent && (ctx.requestDebugMode || this.debugMode) && times.length) {
@@ -445,18 +556,59 @@ export class Application {
 		for (const route of routes) {
 			const params = route.match({ url })
 			if (params !== null) {
-				return { params, controller: route.controller, module: route.module }
+				return { params, controller: route.controller, module: route.module, mask: route.mask }
 			}
 		}
 		return null
 	}
 }
 
-type EventTime = { label: string; start: number; duration?: number }
+export type EventTime = { label: string; start: number; duration?: number }
 
+export const createEventTimer = (tracer: Tracer, times: EventTime[], globalStart: number): Timer => (name, cb) => {
+	const start = performance.now()
+	const time: EventTime = { label: name, start: Math.round(start - globalStart) }
+	times.push(time)
+	const res = tracer.span(name, () => cb())
+
+	if (res instanceof Promise) {
+		;(async () => {
+			try {
+				await res
+			} catch {
+			} finally {
+				time.duration = Math.round(performance.now() - start)
+			}
+		})()
+	}
+	return res
+}
+
+const createTracedReadable = (body: Readable, tracer: Tracer, span: Span): Readable => {
+	const iterator = body[Symbol.asyncIterator]()
+	return Readable.from((async function*() {
+		let completed = false
+		try {
+			while (true) {
+				const next = await tracer.withSpan(span, () => iterator.next())
+				if (next.done) {
+					completed = true
+					return
+				}
+				yield next.value
+			}
+		} finally {
+			if (!completed && iterator.return !== undefined) {
+				await tracer.withSpan(span, () => iterator.return?.())
+			}
+		}
+	})())
+}
+
+/** @deprecated use `tracer` from the request context instead */
 export type Timer = <T>(event: string, cb: () => T) => T
 
-export type MatchedRequest<C> = { params: Params; controller: C; module: string }
+export type MatchedRequest<C> = { params: Params; controller: C; module: string; mask: string }
 
 export type BaseRequestContext = {
 	logger: Logger
@@ -472,6 +624,7 @@ export type ApplicationContext =
 		projectGroup: ProjectGroupContainer
 		authResult: AuthResult | null
 		timer: Timer
+		tracer: Tracer
 	}
 
 export type BaseHttpRequestContext = {
@@ -496,6 +649,7 @@ export type WebSocketContext =
 	& {
 		ws: WebSocket
 		abortSignal: AbortSignal
+		waitUntil(promise: Promise<void>): void
 	}
 
 export type HttpControllerResponse = Promise<HttpErrorResponse | undefined | void> | HttpErrorResponse | undefined | void

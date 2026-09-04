@@ -67,7 +67,10 @@ export class ActionsWebsocketControllerFactory {
 			}
 
 			let workers: { id: string; running: Promise<Running> }[] = []
+			let stopAllPromise: Promise<void> | undefined
+			let connectionClosing = false
 			const abortListener = async () => {
+				connectionClosing = true
 				send({ type: 'message', message: 'shutting down' })
 				await stopAll()
 				send({ type: 'message', message: 'closing connection' })
@@ -75,16 +78,21 @@ export class ActionsWebsocketControllerFactory {
 			}
 			ctx.abortSignal.addEventListener('abort', abortListener)
 
-			const stopAll = async () => {
-				const currentWorkers = workers.map(async it => {
-					await (await it.running).end()
-					send({
-						type: 'workedStopped',
-						workerId: it.id,
+			const stopAll = (): Promise<void> => {
+				stopAllPromise ??= (async () => {
+					const currentWorkers = workers.map(async it => {
+						await (await it.running).end()
+						send({
+							type: 'workedStopped',
+							workerId: it.id,
+						})
 					})
+					workers = []
+					await Promise.all(currentWorkers)
+				})().finally(() => {
+					stopAllPromise = undefined
 				})
-				workers = []
-				await Promise.all(currentWorkers)
+				return stopAllPromise
 			}
 			send({ type: 'ready' })
 
@@ -110,6 +118,10 @@ export class ActionsWebsocketControllerFactory {
 
 				switch (data.type) {
 					case 'startWorker':
+						if (connectionClosing || stopAllPromise !== undefined) {
+							send({ type: 'error', message: 'Workers are stopping' })
+							break
+						}
 						const workerId = Math.random().toString().substring(2)
 						const dispatchSupervisor = this.dispatchWorkerSupervisorFactory.create(projectGroup)
 						try {
@@ -139,11 +151,19 @@ export class ActionsWebsocketControllerFactory {
 				ws.ping()
 			}, 5000)
 
-			ws.addEventListener('close', async () => {
-				ctx.abortSignal.removeEventListener('abort', abortListener)
-				clearInterval(pingHandle)
-				await stopAll()
-			})
+			ctx.waitUntil(
+				new Promise<void>(resolve => {
+					ws.addEventListener('close', () => {
+						connectionClosing = true
+						ctx.abortSignal.removeEventListener('abort', abortListener)
+						clearInterval(pingHandle)
+						void stopAll().then(resolve, error => {
+							logger.error(error, { message: 'Websocket worker cleanup failed' })
+							resolve()
+						})
+					})
+				}),
+			)
 		}
 	}
 }

@@ -113,6 +113,27 @@ export const configTemplate: any = {
 				dsn: '%?env.SENTRY_DSN%',
 			},
 		},
+		telemetry: {
+			traces: {
+				enabled: '%?env.CONTEMBER_TELEMETRY_TRACES_ENABLED::bool%',
+				exporter: {
+					type: '%?env.CONTEMBER_TELEMETRY_EXPORTER_TYPE%',
+					endpoint: '%?env.CONTEMBER_TELEMETRY_OTLP_ENDPOINT%',
+					timeoutMs: '%?env.CONTEMBER_TELEMETRY_OTLP_TIMEOUT_MS::number%',
+				},
+				sampler: '%?env.CONTEMBER_TELEMETRY_SAMPLER%',
+				samplerRatio: '%?env.CONTEMBER_TELEMETRY_SAMPLER_RATIO::number%',
+				acceptIncoming: '%?env.CONTEMBER_TELEMETRY_ACCEPT_INCOMING%',
+				propagateToWebhooks: '%?env.CONTEMBER_TELEMETRY_PROPAGATE_TO_WEBHOOKS::bool%',
+				traceIdResponseHeader: '%?env.CONTEMBER_TELEMETRY_TRACE_ID_RESPONSE_HEADER::bool%',
+				maxSpansPerRequest: '%?env.CONTEMBER_TELEMETRY_MAX_SPANS_PER_REQUEST::number%',
+				sql: {
+					enabled: '%?env.CONTEMBER_TELEMETRY_SQL_ENABLED::bool%',
+					includeQueryText: '%?env.CONTEMBER_TELEMETRY_SQL_INCLUDE_QUERY_TEXT::bool%',
+					minDurationMs: '%?env.CONTEMBER_TELEMETRY_SQL_MIN_DURATION_MS::number%',
+				},
+			},
+		},
 		test: {
 			transactions: '%?env.CONTEMBER_TEST_TRANSACTIONS::bool%',
 			transactionTtlSeconds: '%?env.CONTEMBER_TEST_TRANSACTION_TTL_SECONDS::number%',

@@ -103,6 +103,45 @@ export const tenantConfigSchema = Typesafe.intersection(
 	}),
 )
 
+const positiveInteger: Typesafe.Type<number> = (input, path = []) => {
+	const value = Typesafe.integer(input, path)
+	return value > 0 ? value : Typesafe.fail(path, 'must be a positive integer')
+}
+
+export const telemetryConfigSchema = Typesafe.partial({
+	resource: Typesafe.partial({
+		serviceName: Typesafe.string,
+		attributes: Typesafe.record(Typesafe.string, Typesafe.string),
+	}),
+	traces: Typesafe.partial({
+		enabled: Typesafe.boolean,
+		exporter: Typesafe.partial({
+			type: Typesafe.enumeration('otlp-http', 'console'),
+			endpoint: Typesafe.string,
+			headers: Typesafe.record(Typesafe.string, Typesafe.string),
+			timeoutMs: Typesafe.number,
+		}),
+		sampler: Typesafe.enumeration('always', 'never', 'ratio', 'parentRatio'),
+		samplerRatio: Typesafe.number,
+		// Whether a client-supplied traceparent may become the parent of the request span.
+		acceptIncoming: Typesafe.enumeration('none', 'trusted-proxies', 'all'),
+		// Whether outgoing Actions webhooks carry a traceparent header. Enabled when absent.
+		propagateToWebhooks: Typesafe.boolean,
+		traceIdResponseHeader: Typesafe.boolean,
+		maxSpansPerRequest: Typesafe.number,
+		sql: Typesafe.partial({
+			enabled: Typesafe.boolean,
+			includeQueryText: Typesafe.boolean,
+			minDurationMs: Typesafe.number,
+		}),
+		batch: Typesafe.partial({
+			maxQueueSize: positiveInteger,
+			maxBatchSize: positiveInteger,
+			delayMs: positiveInteger,
+		}),
+	}),
+})
+
 export const serverConfigSchema = Typesafe.partial({
 	port: Typesafe.number,
 	http: Typesafe.partial({
@@ -194,6 +233,7 @@ export const serverConfigSchema = Typesafe.partial({
 			}),
 		}),
 	),
+	telemetry: telemetryConfigSchema,
 	projectGroup: (val: unknown, path: PropertyKey[] = []) =>
 		Typesafe.valueAt(val, ['domainMapping']) === undefined
 			? undefined

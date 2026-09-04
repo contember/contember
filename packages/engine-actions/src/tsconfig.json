@@ -15,6 +15,7 @@
 		{ "path": "../../../packages/logger/src" },
 		{ "path": "../../../packages/schema/src" },
 		{ "path": "../../../packages/schema-utils/src" },
+		{ "path": "../../../packages/telemetry/src" },
 		{ "path": "../../../packages/typesafe/src" },
 		{ "path": "../../../packages/engine-plugins/src" },
 		{ "path": "../../../packages/engine-http/src" }

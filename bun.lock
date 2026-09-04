@@ -253,6 +253,7 @@
         "@contember/logger": "workspace:*",
         "@contember/schema": "workspace:*",
         "@contember/schema-utils": "workspace:*",
+        "@contember/telemetry": "workspace:*",
         "@contember/typesafe": "workspace:*",
         "@graphql-tools/schema": "catalog:",
         "graphql-tag": "catalog:",
@@ -320,6 +321,7 @@
         "@contember/schema": "workspace:*",
         "@contember/schema-migrations": "workspace:*",
         "@contember/schema-utils": "workspace:*",
+        "@contember/telemetry": "workspace:*",
         "@contember/typesafe": "workspace:*",
         "@graphql-tools/merge": "catalog:",
         "@graphql-tools/schema": "catalog:",
@@ -1253,6 +1255,16 @@
         "@types/node": "catalog:",
       },
     },
+    "packages/telemetry": {
+      "name": "@contember/telemetry",
+      "version": "2.2.0-alpha.5",
+      "dependencies": {
+        "@contember/logger": "workspace:*",
+      },
+      "devDependencies": {
+        "@types/node": "catalog:",
+      },
+    },
     "packages/typesafe": {
       "name": "@contember/typesafe",
       "version": "2.2.0-alpha.5",
@@ -1598,6 +1610,8 @@
     "@contember/schema-migrations": ["@contember/schema-migrations@workspace:packages/schema-migrations"],
 
     "@contember/schema-utils": ["@contember/schema-utils@workspace:packages/schema-utils"],
+
+    "@contember/telemetry": ["@contember/telemetry@workspace:packages/telemetry"],
 
     "@contember/typesafe": ["@contember/typesafe@workspace:packages/typesafe"],
 

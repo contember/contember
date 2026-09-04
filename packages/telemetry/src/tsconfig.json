@@ -1,0 +1,10 @@
+{
+	"extends": "../tsconfig.settings.json",
+	"compilerOptions": {
+		"esModuleInterop": true,
+		"outDir": "../dist/types"
+	},
+	"references": [
+		{ "path": "../../logger/src" }
+	]
+}

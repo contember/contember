@@ -8,6 +8,7 @@ import { Env, ServerConfig } from './config/config.js'
 import { DatabaseMetadataResolver } from '@contember/database'
 import { ExecutionContainerFactory, GraphQlSchemaBuilderFactory, PermissionFactory } from '@contember/engine-content-api'
 import { Logger } from '@contember/logger'
+import { noopTracer, Tracer } from '@contember/telemetry'
 import { Schema } from '@contember/schema'
 import Koa from 'koa'
 import { createSecretKey } from 'node:crypto'
@@ -34,6 +35,7 @@ import { ProjectGroupResolver } from './projectGroup/ProjectGroupResolver.js'
 import { createColllectHttpMetricsMiddleware, createShowMetricsMiddleware } from './prometheus/index.js'
 import { ProjectGroupContainerMetricsHook } from './prometheus/ProjectGroupContainerMetricsHook.js'
 import { PrometheusRegistryFactory } from './prometheus/PrometheusRegistryFactory.js'
+import { ProjectGroupContainerTelemetryHook } from './telemetry/ProjectGroupContainerTelemetryHook.js'
 import { createProviders, Providers } from './providers.js'
 import { SystemApiMiddlewareFactory, SystemGraphQLContextFactory, SystemGraphQLHandlerFactory } from './system/index.js'
 import { ContentQueryExecutorImpl } from './system/ContentQueryExecutor.js'
@@ -74,6 +76,8 @@ export interface MasterContainerArgs {
 	logger: Logger
 	version?: string
 	processType: ProcessType
+	/** Tracer built from the `telemetry` config; defaults to a no-op one. */
+	tracer?: Tracer
 }
 
 export type MasterContainerBuilder = ReturnType<MasterContainerFactory['createBuilderInternal']>
@@ -98,6 +102,7 @@ export class MasterContainerFactory {
 		version,
 		logger,
 		processType,
+		tracer,
 	}: MasterContainerArgs) {
 		return new Builder({})
 			.addService('serverConfig', () => serverConfig)
@@ -151,6 +156,7 @@ export class MasterContainerFactory {
 			.addService('tenantGraphQLHandlerFactory', () => new TenantGraphQLHandlerFactory())
 			.addService('systemGraphQLHandlerFactory', ({ debugMode }) => new SystemGraphQLHandlerFactory(debugMode))
 			.addService('logger', () => logger)
+			.addService('tracer', (): Tracer => tracer ?? noopTracer)
 			.addService(
 				'projectGroupContainerFactory',
 				({
@@ -187,6 +193,11 @@ export class MasterContainerFactory {
 				'projectGroupContainerMetricsHook',
 				({ projectGroupContainerResolver }) => new ProjectGroupContainerMetricsHook(projectGroupContainerResolver),
 			)
+			.addService(
+				'projectGroupContainerTelemetryHook',
+				({ projectGroupContainerResolver, tracer, serverConfig }) =>
+					new ProjectGroupContainerTelemetryHook(projectGroupContainerResolver, tracer, serverConfig.telemetry?.traces?.sql),
+			)
 			.addService('promRegistry', ({ promRegistryFactory, projectGroupContainerMetricsHook }) => {
 				const registry = promRegistryFactory.create()
 				projectGroupContainerMetricsHook.register(registry)
@@ -194,8 +205,12 @@ export class MasterContainerFactory {
 			})
 			.addService(
 				'projectGroupContainer',
-				({ tenantConfigResolver, projectGroupContainerFactory }) =>
-					projectGroupContainerFactory.create({ slug: undefined, config: tenantConfigResolver(undefined, {}) }),
+				({ tenantConfigResolver, projectGroupContainerFactory, projectGroupContainerTelemetryHook }) => {
+					projectGroupContainerTelemetryHook.register()
+					const container = projectGroupContainerFactory.create({ slug: undefined, config: tenantConfigResolver(undefined, {}) })
+					projectGroupContainerTelemetryHook.registerContainer(container)
+					return container
+				},
 			)
 			.addService('projectGroupResolver', ({ serverConfig, projectGroupContainerResolver }): ProjectGroupResolver => {
 				const encryptionKey = serverConfig.projectGroup?.configEncryptionKey
@@ -268,18 +283,23 @@ export class MasterContainerFactory {
 			// Replaced by the panel plugin when it serves the panel; see `PanelApiMount`. Declared here so
 			// a plugin can mount its API into the panel without depending on the panel package.
 			.addService('panelApiMount', (): PanelApiMount => new DisabledPanelApiMount())
-			.addService('application', ({ projectGroupResolver, serverConfig, logger, debugMode, version, promRegistry }) => {
-				const app = new Application(
-					projectGroupResolver,
-					serverConfig,
-					debugMode,
-					version,
-					logger,
-				)
-				app.addMiddleware(createColllectHttpMetricsMiddleware(promRegistry))
+			.addService(
+				'application',
+				({ projectGroupResolver, serverConfig, logger, debugMode, version, promRegistry, tracer, projectGroupContainerTelemetryHook }) => {
+					const app = new Application(
+						projectGroupResolver,
+						serverConfig,
+						debugMode,
+						version,
+						logger,
+						tracer,
+					)
+					app.addMiddleware(createColllectHttpMetricsMiddleware(promRegistry))
+					projectGroupContainerTelemetryHook.register()
 
-				return app
-			})
+					return app
+				},
+			)
 			.setupService(
 				'application',
 				(
@@ -327,7 +347,10 @@ export class MasterContainerFactory {
 				},
 			)
 			.addService('initializer', ({ projectGroupContainer }) => new Initializer(projectGroupContainer))
-			.addService('applicationWorkers', () => new ApplicationWorkerManager())
+			.addService('applicationWorkers', ({ projectGroupContainerTelemetryHook }) => {
+				projectGroupContainerTelemetryHook.register()
+				return new ApplicationWorkerManager()
+			})
 			.setupService('executionContainerFactory', (it, { plugins }) => {
 				for (const plugin of plugins) {
 					if (plugin.getExecutionContainerHook) {

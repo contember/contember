@@ -1,0 +1,114 @@
+---
+title: Telemetry and distributed tracing
+description: Request, GraphQL and SQL spans exported over OTLP, W3C traceparent propagation from clients and into webhooks, and trace ids in logs and Sentry errors.
+---
+
+The engine can record every API request as a distributed trace: a server span per request, child spans for authorization, membership fetching and each GraphQL field, and a client span for every SQL query and outgoing Actions webhook. Traces are exported over **OTLP/HTTP (JSON)**, so any OpenTelemetry-compatible backend works — an OpenTelemetry Collector, Grafana Tempo, Jaeger, or a SaaS endpoint. Contember implements the wire protocol itself and does not bundle the OpenTelemetry SDK.
+
+:::note[Available since 2.2]
+:::
+
+Tracing is **off by default**. The minimal configuration:
+
+```yaml
+server:
+  telemetry:
+    traces:
+      enabled: true
+      exporter:
+        endpoint: http://collector:4318
+```
+
+## What gets traced
+
+- **HTTP requests** — one server span per matched route, named by the route mask (`HTTP POST /content/:projectSlug/:stageSlug`), with the module, project group, project, authenticated identity and response status as attributes. Unmatched (404) and internal monitoring requests are not traced.
+- **GraphQL execution** — each query/mutation field of the content, tenant, system and actions APIs becomes a child span (`GraphQL.query.listArticle`), along with authorization and membership resolution.
+- **SQL** — every query runs as a `client` span with `db.system: postgresql`, the Contember module/project, and the driver-measured execution time. The query text is **not** included unless you opt in.
+- **Actions** — each processed webhook batch is a `consumer` span with the target name and result counts; the webhook HTTP call is a `client` span. Idle queue polls produce no spans.
+- Log lines emitted during a request carry `traceId` and `spanId` attributes, and Sentry error events (when `logging.sentry.dsn` is configured) get a `trace` context — so logs, errors and traces join on the same id. When the server runs in debug mode (or `traceIdResponseHeader` is on), responses include `x-contember-trace-id`.
+
+## Full configuration
+
+```yaml
+server:
+  telemetry:
+    resource:
+      serviceName: contember-engine        # or OTEL_SERVICE_NAME
+      attributes: { deployment.environment: production }
+    traces:
+      enabled: true
+      exporter:
+        type: otlp-http                    # otlp-http | console
+        endpoint: http://collector:4318    # or OTEL_EXPORTER_OTLP_TRACES_ENDPOINT / OTEL_EXPORTER_OTLP_ENDPOINT
+        headers: { authorization: 'Bearer …' }
+        timeoutMs: 10000
+      sampler: parentRatio                 # always | never | ratio | parentRatio
+      samplerRatio: 1.0
+      acceptIncoming: trusted-proxies      # none | trusted-proxies | all
+      propagateToWebhooks: true
+      traceIdResponseHeader: false
+      maxSpansPerRequest: 1000
+      sql:
+        enabled: true
+        includeQueryText: false            # parameter values are never exported
+        minDurationMs: 0                   # drop successful SQL spans faster than this
+      batch:
+        maxQueueSize: 2048
+        maxBatchSize: 512
+        delayMs: 5000
+```
+
+`/v1/traces` is appended to the endpoint automatically. The `console` exporter prints spans to the log instead — useful in development.
+
+### Environment variables
+
+Everything above can be set without a config file. Each option maps to a `CONTEMBER_TELEMETRY_*` variable, and the standard OpenTelemetry variables fill the exporter-related gaps; a value in the config file wins over the environment.
+
+| Variable | Option |
+|---|---|
+| `CONTEMBER_TELEMETRY_TRACES_ENABLED` | `traces.enabled` |
+| `CONTEMBER_TELEMETRY_EXPORTER_TYPE` | `traces.exporter.type` |
+| `CONTEMBER_TELEMETRY_OTLP_ENDPOINT` | `traces.exporter.endpoint` |
+| `CONTEMBER_TELEMETRY_OTLP_TIMEOUT_MS` | `traces.exporter.timeoutMs` |
+| `CONTEMBER_TELEMETRY_SAMPLER` / `_SAMPLER_RATIO` | `traces.sampler` / `samplerRatio` |
+| `CONTEMBER_TELEMETRY_ACCEPT_INCOMING` | `traces.acceptIncoming` |
+| `CONTEMBER_TELEMETRY_PROPAGATE_TO_WEBHOOKS` | `traces.propagateToWebhooks` |
+| `CONTEMBER_TELEMETRY_TRACE_ID_RESPONSE_HEADER` | `traces.traceIdResponseHeader` |
+| `CONTEMBER_TELEMETRY_MAX_SPANS_PER_REQUEST` | `traces.maxSpansPerRequest` |
+| `CONTEMBER_TELEMETRY_SQL_ENABLED` / `_SQL_INCLUDE_QUERY_TEXT` / `_SQL_MIN_DURATION_MS` | `traces.sql.*` |
+| `OTEL_EXPORTER_OTLP_TRACES_ENDPOINT`, `OTEL_EXPORTER_OTLP_ENDPOINT` | exporter endpoint fallback |
+| `OTEL_EXPORTER_OTLP_TRACES_HEADERS`, `OTEL_EXPORTER_OTLP_HEADERS` | exporter headers fallback (`key=value,key2=value2`, values may be percent-encoded) |
+| `OTEL_SERVICE_NAME` | `resource.serviceName` fallback |
+
+The minimal env-only setup:
+
+```bash
+CONTEMBER_TELEMETRY_TRACES_ENABLED=true
+CONTEMBER_TELEMETRY_OTLP_ENDPOINT=http://collector:4318
+```
+
+### Sampling
+
+The decision is made at the root span, deterministically from the trace id, so the same trace samples identically across services:
+
+| Sampler | Behavior |
+|---|---|
+| `parentRatio` (default) | Follow the caller's sampling decision when a trusted `traceparent` arrives; sample own roots at `samplerRatio`. |
+| `ratio` | Sample every root at `samplerRatio`, ignoring the caller's decision. |
+| `always` / `never` | Sample everything / nothing. |
+
+Requests above `maxSpansPerRequest` recorded spans keep the trace but stop recording further spans; the root span then carries a `contember.spans_dropped` count. For high-traffic deployments, prefer head-sampling with a modest ratio here and tail-sampling in an OpenTelemetry Collector.
+
+## Distributed tracing
+
+**Incoming:** when a request carries a W3C `traceparent` header, the request span can join the caller's trace. Whether the header is honored is controlled by `acceptIncoming`:
+
+- `trusted-proxies` (default) — only when the connection's *immediate peer* is listed in `http.trustedProxies` (`CONTEMBER_HTTP_TRUSTED_PROXIES`). Unlike [`X-Forwarded-For` resolution](/reference/engine/tenant/proxy-trust), private networks are **not** implicitly trusted here — anything running in the same network could otherwise attach its spans to your traces. List your gateway explicitly.
+- `all` — honor the header from anyone. Use only when the API is not publicly reachable, since any client can then dictate your trace ids and sampling decisions.
+- `none` — always start a fresh trace.
+
+**Outgoing:** [Actions webhooks](/reference/engine/actions/invocation) include a `traceparent` header pointing at the webhook span, so the receiving service can continue the trace in its own telemetry. Disable with `propagateToWebhooks: false`; a header of the same name configured on the webhook target always wins.
+
+## Overhead and delivery guarantees
+
+With tracing disabled there is no measurable overhead. When enabled, spans are batched in a bounded in-memory queue and exported in the background: a full queue drops the oldest spans, a failing exporter logs a rate-limited warning and drops the batch — telemetry never blocks or fails a request. Pending spans are flushed on graceful shutdown.

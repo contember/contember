@@ -1,6 +1,6 @@
 import { Connection } from './Connection.js'
 import { EventManager } from './EventManager.js'
-import { Mutex } from '../utils/index.js'
+import { Mutex, MutexDeadlockError } from '../utils/index.js'
 import { executeTransaction, Transaction } from './Transaction.js'
 import { ClientErrorCodes } from './errorCodes.js'
 import {
@@ -49,53 +49,60 @@ export class AcquiredConnection implements Connection.AcquiredConnectionLike {
 		parameters: any[] = [],
 		meta: Record<string, any> = {},
 	): Promise<Connection.Result<Row>> {
-		return await this.mutex.execute(async () => {
-			try {
-				this.eventManager.fire(EventManager.Event.queryStart, { sql, parameters, meta })
+		const query: Connection.Query = { sql, parameters, meta }
 
-				let result: Connection.Result<Row>
+		try {
+			this.eventManager.fire(EventManager.Event.queryStart, query)
+
+			const result = await this.mutex.execute(async (): Promise<Connection.Result<Row>> => {
 				const startHrTime = process.hrtime.bigint()
 
-				result = await this.pgClient.query(prepareSql(sql), parameters)
+				const pgResult = await this.pgClient.query(prepareSql(sql), parameters)
 
 				const endHrTime = process.hrtime.bigint()
 				const durationUs = Math.floor(Number(endHrTime - startHrTime) / 1000)
-				result = {
-					...result,
+
+				return {
+					...pgResult,
 					timing: {
 						selfDuration: durationUs,
 						totalDuration: durationUs,
 					},
 				}
+			})
 
-				this.eventManager.fire(EventManager.Event.queryEnd, { sql, parameters, meta }, result)
+			this.eventManager.fire(EventManager.Event.queryEnd, query, result)
 
-				return result
-			} catch (error) {
-				if (!(error instanceof Error)) {
-					throw error
-				}
-				this.eventManager.fire(EventManager.Event.queryError, { sql, parameters, meta }, error)
-
-				switch ((error as any).code) {
-					case ClientErrorCodes.NOT_NULL_VIOLATION:
-						throw new NotNullViolationError(sql, parameters, error)
-					case ClientErrorCodes.FOREIGN_KEY_VIOLATION:
-						throw new ForeignKeyViolationError(sql, parameters, error)
-					case ClientErrorCodes.UNIQUE_VIOLATION:
-						throw new UniqueViolationError(sql, parameters, error)
-					case ClientErrorCodes.T_R_SERIALIZATION_FAILURE:
-						throw new SerializationFailureError(sql, parameters, error)
-					case ClientErrorCodes.INVALID_TEXT_REPRESENTATION:
-					case ClientErrorCodes.DATETIME_FIELD_OVERFLOW:
-						throw new InvalidDataError(sql, parameters, error)
-					case ClientErrorCodes.IN_FAILED_SQL_TRANSACTION:
-						throw new TransactionAbortedError(sql, parameters, error)
-					default:
-						throw new QueryError(sql, parameters, error)
-				}
+			return result
+		} catch (error) {
+			if (!(error instanceof Error)) {
+				throw error
 			}
-		})
+			this.eventManager.fire(EventManager.Event.queryError, query, error)
+
+			// a mutex deadlock is not a postgres failure, keep it untranslated
+			if (error instanceof MutexDeadlockError) {
+				throw error
+			}
+
+			switch ((error as any).code) {
+				case ClientErrorCodes.NOT_NULL_VIOLATION:
+					throw new NotNullViolationError(sql, parameters, error)
+				case ClientErrorCodes.FOREIGN_KEY_VIOLATION:
+					throw new ForeignKeyViolationError(sql, parameters, error)
+				case ClientErrorCodes.UNIQUE_VIOLATION:
+					throw new UniqueViolationError(sql, parameters, error)
+				case ClientErrorCodes.T_R_SERIALIZATION_FAILURE:
+					throw new SerializationFailureError(sql, parameters, error)
+				case ClientErrorCodes.INVALID_TEXT_REPRESENTATION:
+				case ClientErrorCodes.DATETIME_FIELD_OVERFLOW:
+					throw new InvalidDataError(sql, parameters, error)
+				case ClientErrorCodes.IN_FAILED_SQL_TRANSACTION:
+					throw new TransactionAbortedError(sql, parameters, error)
+				default:
+					throw new QueryError(sql, parameters, error)
+			}
+		}
 	}
 
 	on(event: 'end' | 'notification' | 'error', cb: (() => void) | ((notification: Notification) => void) | ((error: any) => void)) {

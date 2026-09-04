@@ -21,7 +21,7 @@ function isPrivate(ip: string): boolean {
 		|| r === 'linkLocal' // IPv6 fe80::/10
 }
 
-function isInCIDR(ip: string, cidrs: string[]): boolean {
+export function isInCIDR(ip: string, cidrs: readonly string[]): boolean {
 	if (!cidrs || cidrs.length === 0) {
 		return false
 	}
@@ -34,7 +34,14 @@ function isInCIDR(ip: string, cidrs: string[]): boolean {
 	}
 	return cidrs.some(c => {
 		try {
-			return addr.match(ipaddr.parseCIDR(c))
+			const cidr = ipaddr.parseCIDR(c)
+			if (addr.kind() === cidr[0].kind()) {
+				return addr.match(cidr)
+			}
+			if (addr instanceof ipaddr.IPv6 && addr.isIPv4MappedAddress() && cidr[0] instanceof ipaddr.IPv4) {
+				return addr.toIPv4Address().match(cidr)
+			}
+			return false
 		} catch {
 			return false
 		}

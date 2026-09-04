@@ -5,6 +5,8 @@ const createDbConfigTemplate = (prefix: string) => {
 		statementTimeoutMs: `%?${prefix}_STATEMENT_TIMEOUT_MS::number%`,
 		lockTimeoutMs: `%?${prefix}_LOCK_TIMEOUT_MS::number%`,
 		connectionTimeoutMs: `%?${prefix}_CONNECTION_TIMEOUT_MS::number%`,
+		keepAlive: `%?${prefix}_KEEP_ALIVE::bool%`,
+		keepAliveInitialDelayMs: `%?${prefix}_KEEP_ALIVE_INITIAL_DELAY_MS::number%`,
 		maxConnectionsPerRequest: `%?${prefix}_MAX_CONNECTIONS_PER_REQUEST::number%`,
 		pool: {
 			maxConnections: `%?${prefix}_POOL_MAX_CONNECTIONS::number%`,

@@ -42,6 +42,24 @@ These map directly onto PostgreSQL / `node-postgres` settings and are applied to
 `statement_timeout` and `lock_timeout` are **disabled by default in PostgreSQL** (a value of `0` means "no limit"). Setting `statementTimeoutMs` / `lockTimeoutMs` is a good way to bound worst-case query and lock-wait time. Contember explicitly disables both (`SET LOCAL statement_timeout = 0`, `lock_timeout = 0`) for long-running data [export/import](/reference/engine/content/transfer) operations, so those are never killed by your configured limits.
 :::
 
+## TCP keep-alive
+
+:::note[Available since 2.2]
+:::
+
+Off by default. When enabled, the OS periodically probes the connection's socket, so a connection the peer silently dropped — a connection pooler, a load balancer, or a NAT idle timeout — surfaces as an error instead of failing the next query that uses it.
+
+| Option | Maps to | Description | Default |
+|---|---|---|---|
+| `keepAlive` | `keepAlive` | Enable TCP keep-alive on the connection socket. | `false` |
+| `keepAliveInitialDelayMs` | `keepAliveInitialDelayMillis` | Idle time before the first probe. Only applies when `keepAlive` is on. | `0` (OS default idle) |
+
+The probe interval and count after the first probe are OS-level settings (`net.ipv4.tcp_keepalive_intvl` / `_probes` on Linux), not Contember ones — on stock Linux that is another ~11 minutes before the socket is declared dead.
+
+:::note
+Idle **pooled** connections are already disposed after `pool.idleTimeoutMs` (default `10000`), which is far shorter than the OS probe cycle, so keep-alive rarely changes anything for them. It matters for connections that stay checked out while quiet — most notably the `LISTEN` connection the [actions](/reference/engine/actions/overview) dispatcher holds open — or when you have raised `pool.idleTimeoutMs` substantially.
+:::
+
 ## Connection pool
 
 Contember manages its own connection pool. All pool options are optional and live under `pool`.
@@ -142,6 +160,8 @@ Replace `<PREFIX>` below with `DEFAULT`, `TENANT`, or a project slug (`<PROJECT>
 | `queryTimeoutMs` | `<PREFIX>_DB_QUERY_TIMEOUT_MS` | number |
 | `statementTimeoutMs` | `<PREFIX>_DB_STATEMENT_TIMEOUT_MS` | number |
 | `lockTimeoutMs` | `<PREFIX>_DB_LOCK_TIMEOUT_MS` | number |
+| `keepAlive` | `<PREFIX>_DB_KEEP_ALIVE` | bool |
+| `keepAliveInitialDelayMs` | `<PREFIX>_DB_KEEP_ALIVE_INITIAL_DELAY_MS` | number |
 | `pool.maxConnections` | `<PREFIX>_DB_POOL_MAX_CONNECTIONS` | number |
 | `pool.maxConnecting` | `<PREFIX>_DB_POOL_MAX_CONNECTING` | number |
 | `pool.maxIdle` | `<PREFIX>_DB_POOL_MAX_IDLE` | number |
@@ -165,6 +185,8 @@ The read replica uses the same names with a `READ_` segment, for both the connec
 | `read.ssl` | `<PREFIX>_DB_READ_SSL` |
 | `read.statementTimeoutMs` | `<PREFIX>_DB_READ_STATEMENT_TIMEOUT_MS` |
 | `read.lockTimeoutMs` | `<PREFIX>_DB_READ_LOCK_TIMEOUT_MS` |
+| `read.keepAlive` | `<PREFIX>_DB_READ_KEEP_ALIVE` |
+| `read.keepAliveInitialDelayMs` | `<PREFIX>_DB_READ_KEEP_ALIVE_INITIAL_DELAY_MS` |
 | `read.pool.maxConnections` | `<PREFIX>_DB_READ_POOL_MAX_CONNECTIONS` |
 | … | … and the rest, following the same pattern |
 
@@ -192,7 +214,7 @@ BLOG_DB_POOL_MAX_CONNECTIONS=20
 BLOG_DB_READ_HOST=replica.db.example.com
 ```
 
-Boolean variables (`*_SSL`) accept `true`, `on`, or `1` as truthy; anything else is falsy.
+Boolean variables (`*_SSL`, `*_KEEP_ALIVE`) accept `true`, `on`, or `1` as truthy; anything else is falsy.
 
 ## See also
 

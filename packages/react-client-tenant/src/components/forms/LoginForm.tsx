@@ -113,5 +113,7 @@ const errorToField: Record<TenantApi.SignInErrorCode, keyof LoginFormValues | un
 	'RATE_LIMIT_EXCEEDED': 'password',
 	'OTP_REQUIRED': undefined,
 	'MFA_ENROLLMENT_REQUIRED': undefined,
+	// Form-level, not a field: it is the account that cannot use a local credential.
+	'IDP_REQUIRED': undefined,
 	'EMAIL_NOT_VERIFIED': 'email',
 }

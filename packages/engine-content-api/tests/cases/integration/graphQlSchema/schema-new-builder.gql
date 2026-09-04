@@ -457,6 +457,8 @@ input AuthorUpdatePostsEntityRelationInput {
   connectOrCreate: AuthorConnectOrCreatePostsRelationInput
   disconnect: PostUniqueWhere
   delete: PostUniqueWhere
+  set: [AuthorSetPostsItemRelationInput!]
+  orphanStrategy: OrphanRemovalStrategy
   alias: String
 }
 
@@ -481,6 +483,8 @@ input PostUpdateCategoriesEntityRelationInput {
   connectOrCreate: PostConnectOrCreateCategoriesRelationInput
   disconnect: CategoryUniqueWhere
   delete: CategoryUniqueWhere
+  set: [PostSetCategoriesItemRelationInput!]
+  orphanStrategy: OrphanRemovalStrategy
   alias: String
 }
 
@@ -500,6 +504,20 @@ input PostUpsertCategoriesRelationInput {
   create: CategoryWithoutPostsCreateInput!
 }
 
+input PostSetCategoriesItemRelationInput {
+  create: CategoryWithoutPostsCreateInput
+  connect: CategoryUniqueWhere
+  connectOrCreate: PostConnectOrCreateCategoriesRelationInput
+  update: PostUpdateCategoriesRelationInput
+  upsert: PostUpsertCategoriesRelationInput
+  alias: String
+}
+
+enum OrphanRemovalStrategy {
+  disconnect
+  delete
+}
+
 input PostUpdateLocalesEntityRelationInput {
   create: PostLocaleWithoutPostCreateInput
   update: PostUpdateLocalesRelationInput
@@ -508,6 +526,8 @@ input PostUpdateLocalesEntityRelationInput {
   connectOrCreate: PostConnectOrCreateLocalesRelationInput
   disconnect: PostLocaleUniqueWhere
   delete: PostLocaleUniqueWhere
+  set: [PostSetLocalesItemRelationInput!]
+  orphanStrategy: OrphanRemovalStrategy
   alias: String
 }
 
@@ -528,10 +548,28 @@ input PostUpsertLocalesRelationInput {
   create: PostLocaleWithoutPostCreateInput!
 }
 
+input PostSetLocalesItemRelationInput {
+  create: PostLocaleWithoutPostCreateInput
+  connect: PostLocaleUniqueWhere
+  connectOrCreate: PostConnectOrCreateLocalesRelationInput
+  update: PostUpdateLocalesRelationInput
+  upsert: PostUpsertLocalesRelationInput
+  alias: String
+}
+
 input AuthorUpsertPostsRelationInput {
   by: PostUniqueWhere!
   update: PostWithoutAuthorUpdateInput!
   create: PostWithoutAuthorCreateInput!
+}
+
+input AuthorSetPostsItemRelationInput {
+  create: PostWithoutAuthorCreateInput
+  connect: PostUniqueWhere
+  connectOrCreate: AuthorConnectOrCreatePostsRelationInput
+  update: AuthorUpdatePostsRelationInput
+  upsert: AuthorUpsertPostsRelationInput
+  alias: String
 }
 
 input CategoryCreateInput {
@@ -590,6 +628,8 @@ input CategoryUpdatePostsEntityRelationInput {
   connectOrCreate: CategoryConnectOrCreatePostsRelationInput
   disconnect: PostUniqueWhere
   delete: PostUniqueWhere
+  set: [CategorySetPostsItemRelationInput!]
+  orphanStrategy: OrphanRemovalStrategy
   alias: String
 }
 
@@ -630,6 +670,15 @@ input CategoryUpsertPostsRelationInput {
   by: PostUniqueWhere!
   update: PostWithoutCategoriesUpdateInput!
   create: PostWithoutCategoriesCreateInput!
+}
+
+input CategorySetPostsItemRelationInput {
+  create: PostWithoutCategoriesCreateInput
+  connect: PostUniqueWhere
+  connectOrCreate: CategoryConnectOrCreatePostsRelationInput
+  update: CategoryUpdatePostsRelationInput
+  upsert: CategoryUpsertPostsRelationInput
+  alias: String
 }
 
 input PostCreateInput {

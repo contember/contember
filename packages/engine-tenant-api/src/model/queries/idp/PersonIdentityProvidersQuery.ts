@@ -7,6 +7,7 @@ export interface PersonIdentityProviderRow {
 	readonly identityProviderSlug: string
 	readonly identityProviderType: string
 	readonly identityProviderDisabledAt: Date | null
+	readonly identityProviderDisableLocalAuthentication: boolean
 }
 
 /**
@@ -29,6 +30,7 @@ export class PersonIdentityProvidersQuery extends DatabaseQuery<PersonIdentityPr
 			.select(['identity_provider', 'slug'], 'identityProviderSlug')
 			.select(['identity_provider', 'type'], 'identityProviderType')
 			.select(['identity_provider', 'disabled_at'], 'identityProviderDisabledAt')
+			.select(['identity_provider', 'disable_local_authentication'], 'identityProviderDisableLocalAuthentication')
 			.from('person_identity_provider')
 			.join(
 				'identity_provider',

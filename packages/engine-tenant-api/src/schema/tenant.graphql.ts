@@ -872,6 +872,11 @@ const schema: DocumentNode = gql`
 		NOT_A_PERSON
 		""" The person is not allowed to disconnect their last remaining sign-in method. """
 		LAST_AUTH_METHOD
+		"""
+		The provider has \`disableLocalAuthentication\`, so this connection is the only way
+		the person may sign in and cannot be removed by them — not even while the provider is disabled.
+		"""
+		IDP_REQUIRED
 	}
 
 	type IdentityProvider {

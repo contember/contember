@@ -759,6 +759,7 @@ export const dict = {
 				'NOT_FOUND': 'This identity provider connection no longer exists',
 				'NOT_A_PERSON': 'Only a signed-in person can disconnect identity providers',
 				'LAST_AUTH_METHOD': 'You cannot disconnect your last remaining sign-in method',
+				'IDP_REQUIRED': 'This identity provider is the only way you can sign in, so it cannot be disconnected',
 				'UNKNOWN_ERROR': 'Something went wrong. Please try again later',
 			} satisfies Record<DisconnectIDPErrorCode | 'UNKNOWN_ERROR', string>,
 		},

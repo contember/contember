@@ -948,6 +948,11 @@ export type DisconnectIdpError = {
 }
 
 export type DisconnectIdpErrorCode =
+	/**
+	 * The provider has `disableLocalAuthentication`, so this connection is the only way
+	 * the person may sign in and cannot be removed by them — not even while the provider is disabled.
+	 */
+	| 'IDP_REQUIRED'
 	/**  The person is not allowed to disconnect their last remaining sign-in method.  */
 	| 'LAST_AUTH_METHOD'
 	/**  The caller is not a person (e.g. an API key) and so has no IdP connections to disconnect.  */

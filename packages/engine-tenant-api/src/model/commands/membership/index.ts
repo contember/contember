@@ -1,4 +1,5 @@
 export * from './AddProjectMemberCommand.js'
+export * from './ClearMembershipLeasesByProviderCommand.js'
 export * from './CreateOrUpdateProjectMembershipCommand.js'
 export * from './PurgeExpiredMembershipLeasesCommand.js'
 export * from './RemoveProjectMemberCommand.js'

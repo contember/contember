@@ -13,6 +13,7 @@ import { ProjectSchemaResolver } from '../../type/index.js'
 import { DisableIdpCommand } from '../../commands/idp/DisableIdpCommand.js'
 import { EnableIdpCommand } from '../../commands/idp/EnableIdpCommand.js'
 import { UpdateIdpCommand, UpdateIdpData } from '../../commands/idp/UpdateIdpCommand.js'
+import { ClearMembershipLeasesByProviderCommand } from '../../commands/membership/ClearMembershipLeasesByProviderCommand.js'
 import { IdentityProviderDto } from '../../queries/idp/types.js'
 
 export class IDPManager {
@@ -104,6 +105,12 @@ export class IDPManager {
 					configuration: data.configuration ? newConfiguration : undefined,
 				}),
 			)
+
+			// Turning the lease off must reach the rows it already stamped — nothing else clears a stored
+			// expiry for someone who never signs in again.
+			if (readMembershipLease(existing.configuration) !== undefined && readMembershipLease(newConfiguration) === undefined) {
+				await db.commandBus.execute(new ClearMembershipLeasesByProviderCommand(existing.id))
+			}
 
 			return new ResponseOk(null)
 		})
@@ -235,6 +242,15 @@ const deepMergeConfiguration = (base: Record<string, unknown>, updates: Record<s
 		}
 	}
 	return result
+}
+
+/**
+ * Raw `claimMapping.membershipLease`, unparsed so a stored config predating validation cannot make an update throw.
+ * Only a removal changes it: {@link deepMergeConfiguration} keeps a key the merge does not mention, and deletes an explicit `null`.
+ */
+const readMembershipLease = (configuration: Record<string, unknown>): unknown => {
+	const claimMapping = configuration.claimMapping
+	return isRecord(claimMapping) ? claimMapping.membershipLease : undefined
 }
 
 export type RegisterIDPResponse = Response<null, AddIdpErrorCode>

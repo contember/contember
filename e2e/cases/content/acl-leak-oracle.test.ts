@@ -488,3 +488,81 @@ test('CLASS 6 — _meta.readable through a relation: consistent with the returne
 		locales: [{ title: 'hello', _meta: { title: { readable: true } } }],
 	}])
 })
+
+// =============================================================================================
+// CLASS 7: NOT over a relation hop — a present-but-unreadable to-one target must look absent
+// =============================================================================================
+namespace C7 {
+	export const reader = acl.createRole('reader')
+	export const companyVar = acl.createEntityVariable('company', 'Company', reader)
+
+	@acl.allow(reader, { read: ['id', 'name'], when: { id: companyVar } })
+	export class Company {
+		name = def.stringColumn()
+		articles = def.oneHasMany(Article, 'company')
+		authors = def.oneHasMany(Author, 'company')
+	}
+
+	@acl.allow(reader, { read: ['id', 'title', 'company', 'author'], when: { company: { id: companyVar } } })
+	export class Article {
+		title = def.stringColumn()
+		company = def.manyHasOne(Company, 'articles').notNull()
+		author = def.manyHasOne(Author, 'articles')
+	}
+
+	// Author row readable only when visible=yes → a visible=no author is a present-but-unreadable target.
+	@acl.allow(reader, { read: ['id', 'name', 'company', 'articles'], when: { company: { id: companyVar }, visible: { eq: 'yes' } } })
+	export class Author {
+		name = def.stringColumn()
+		visible = def.stringColumn()
+		company = def.manyHasOne(Company, 'authors').notNull()
+		articles = def.oneHasMany(Article, 'author')
+	}
+}
+
+test('CLASS 7 — NOT over a to-one hop: present-but-unreadable author looks absent under any negation shape', async () => {
+	const { restrictedA, teethA, teethB } = await assertLeakOracle({
+		schema: createSchema(C7),
+		role: 'reader',
+		setupA: async t => {
+			const company = await create(t, 'Company', { name: 'Acme' })
+			const visible = await create(t, 'Author', { name: 'vis', visible: 'yes', company: connect(company) })
+			const hidden = await create(t, 'Author', { name: 'hid', visible: 'no', company: connect(company) })
+			await create(t, 'Article', { title: 'a1', company: connect(company), author: connect(visible) })
+			const a2 = await create(t, 'Article', { title: 'a2', company: connect(company), author: connect(hidden) })
+			await create(t, 'Article', { title: 'a3', company: connect(company) })
+			return { variables: [{ name: 'company', values: [company] }], ctx: { a2 } }
+		},
+		// A: a2 points at the UNREADABLE author; B: a2 has no author. The role sees `author: null` either way.
+		mutateToB: async (t, ctx) => {
+			await update(t, 'Article', ctx.a2, { author: { disconnect: true } })
+		},
+		restrictedQueries: [
+			// `not` inside the hop, `not` above the hop and the negated operator: NULL for absent AND unreadable
+			{ query: gql`query { listArticle(filter: { author: { not: { name: { eq: "vis" } } } }, orderBy: [{ title: asc }]) { title } }` },
+			{ query: gql`query { listArticle(filter: { not: { author: { name: { eq: "vis" } } } }, orderBy: [{ title: asc }]) { title } }` },
+			{ query: gql`query { listArticle(filter: { author: { name: { notEq: "vis" } } }, orderBy: [{ title: asc }]) { title } }` },
+			// non-vacuous: the same negation matches through a READABLE author
+			{ query: gql`query { listArticle(filter: { author: { not: { name: { eq: "zzz" } } } }, orderBy: [{ title: asc }]) { title } }` },
+			{
+				query:
+					gql`query { listArticle(filter: { or: [{ author: { name: { eq: "vis" } } }, { title: { eq: "a3" } }] }, orderBy: [{ title: asc }]) { title } }`,
+			},
+			{ query: gql`query { listArticle(filter: { author: { id: { isNull: true } } }, orderBy: [{ title: asc }]) { title } }` },
+		],
+		// teeth: root reads the hidden author, so its negated name matches a2 only while a2 has that author
+		teethQueries: [{ query: gql`query { listArticle(filter: { not: { author: { name: { eq: "vis" } } } }, orderBy: [{ title: asc }]) { title } }` }],
+	})
+
+	const titles = (i: number) => restrictedA[i].listArticle.map((a: any) => a.title)
+	// `not(name = vis)` is false for a1 and NULL for a2 (unreadable) and a3 (absent) — nothing matches
+	expect(titles(0)).toStrictEqual([])
+	expect(titles(1)).toStrictEqual([])
+	expect(titles(2)).toStrictEqual([])
+	expect(titles(3)).toStrictEqual(['a1'])
+	expect(titles(4)).toStrictEqual(['a1', 'a3'])
+	// an unreadable author is indistinguishable from no author
+	expect(titles(5)).toStrictEqual(['a2', 'a3'])
+	expect(teethA[0].listArticle.map((a: any) => a.title)).toStrictEqual(['a2'])
+	expect(teethB[0].listArticle).toStrictEqual([])
+})

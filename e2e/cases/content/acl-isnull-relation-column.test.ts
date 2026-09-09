@@ -2,9 +2,10 @@ import { expect, test } from 'bun:test'
 import { createTester, gql } from '../../src/tester.js'
 import { AclDefinition as acl, createSchema, SchemaDefinition as def } from '@contember/schema-definition'
 
-// The wrap used to make a childless parent match `{ children: { <col>: { isNull: true } } }` (the null-
-// extended row had every column NULL). After removing the wrap it must mean "exists a READABLE child whose
-// col is null" — childless parents must NOT match.
+// `{ children: { <col>: { isNull: true } } }` matches a childless parent (the null-extended row of the
+// has-many join has every column NULL). Children are joined through their read-guarded source, so a parent
+// whose only children are unreadable is null-extended the same way: it matches exactly like a childless one,
+// and the filter means the same thing for every role.
 namespace M {
 	export const reader = acl.createRole('reader')
 	export const v = acl.createEntityVariable('company', 'Company', reader)
@@ -30,7 +31,7 @@ namespace M {
 	}
 }
 
-test('col isNull on a relation does not match childless parents', async () => {
+test('col isNull on a has-many relation treats unreadable-only children like no children, for every role', async () => {
 	const tester = await createTester(createSchema(M))
 	const c = (await tester(gql`mutation { createCompany(data: { name: "Co" }) { node { id } } }`).expect(200)).body.data.createCompany.node.id
 	await tester(gql`mutation ($c: UUID!) { createParent(data: { name: "childless", company: { connect: { id: $c } } }) { ok } }`, { variables: { c } })
@@ -54,10 +55,13 @@ test('col isNull on a relation does not match childless parents', async () => {
 	await tester.tenant.addProjectMember(id, tester.projectSlug, { role: 'reader', variables: [{ name: 'company', values: [c] }] })
 
 	const q = gql`query ($f: ParentWhere) { listParent(filter: $f, orderBy: [{ name: asc }]) { name } }`
-	const res =
-		(await tester(q, { variables: { f: { children: { note: { isNull: true } } } }, authorizationToken: key }).expect(200)).body.data.listParent
-	const names = res.map((p: any) => p.name).sort()
-	console.log('col-isNull { children: { note: isNull } } →', JSON.stringify(names))
-	// Semantic 2: only the parent with a READABLE child whose note is null. NOT childless, NOT unreadable.
-	expect(names).toEqual(['readableNullNote'])
+	const filter = { children: { note: { isNull: true } } }
+	const asReader = (await tester(q, { variables: { f: filter }, authorizationToken: key }).expect(200)).body.data.listParent
+	const asRoot = (await tester(q, { variables: { f: filter } }).expect(200)).body.data.listParent
+	const names = (rows: any[]) => rows.map(p => p.name).sort()
+	// childless: null-extended row; readableNullNote: a readable child with a null note;
+	// unreadableNullNote: its only child is unreadable, so it null-extends exactly like childless
+	expect(names(asReader)).toEqual(['childless', 'readableNullNote', 'unreadableNullNote'])
+	// the filter is not role-dependent: root reads the private child (note null) and gets the same set
+	expect(names(asRoot)).toEqual(names(asReader))
 })

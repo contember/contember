@@ -63,9 +63,9 @@ test('owner predicate with isNull', async () => {
 				sql: SQL`select "root_"."id" as "root_id"  from "public"."item" as "root_"
     left join  "public"."resource" as "root_resource" on  "root_"."resource_id" = "root_resource"."id"
     left join  "public"."person" as "root_resource_owner" on  "root_resource"."owner_id" = "root_resource_owner"."id"
-	where not(exists (select 1  from "public"."resource" as "root_resource"
-    left join  "public"."person" as "root_resource_owner" on  "root_resource"."owner_id" = "root_resource_owner"."id"
-	where "root_"."resource_id" = "root_resource"."id" and "root_resource_owner"."person_id" = ?)) and "root_resource_owner"."person_id" = ?`,
+	where not(exists (select 1  from "public"."resource" as "root_resource$"
+    left join  "public"."person" as "root_resource$_owner" on  "root_resource$"."owner_id" = "root_resource$_owner"."id"
+	where "root_"."resource_id" = "root_resource$"."id" and "root_resource$_owner"."person_id" = ?)) and "root_resource_owner"."person_id" = ?`,
 				response: {
 					rows: [],
 				},

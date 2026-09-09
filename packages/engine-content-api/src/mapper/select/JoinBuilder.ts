@@ -2,8 +2,7 @@ import { Path } from './Path.js'
 import { acceptRelationTypeVisitor, getTargetEntity } from '@contember/schema-utils'
 import { Model } from '@contember/schema'
 import { JoinVisitor } from './JoinVisitor.js'
-import { Operator } from '@contember/database'
-import { SelectBuilder } from '@contember/database'
+import { Literal, Operator, SelectBuilder } from '@contember/database'
 
 export class JoinBuilder {
 	constructor(private readonly schema: Model.Schema) {}
@@ -13,6 +12,7 @@ export class JoinBuilder {
 		path: Path,
 		entity: Model.Entity,
 		relationName: string,
+		targetSource?: Literal,
 	): SelectBuilder<R> {
 		const targetEntity = getTargetEntity(this.schema, entity, relationName)
 		if (!targetEntity) {
@@ -28,8 +28,10 @@ export class JoinBuilder {
 			}
 			const sourceAlias = join.sourceAlias || path.back().alias
 
+			// The relation target may be a guarded source (a derived table restricted to readable rows).
+			const source = targetSource !== undefined && targetAlias === path.alias ? targetSource : join.tableName
 			return qb.leftJoin(
-				join.tableName,
+				source,
 				targetAlias,
 				clause => clause.compareColumns([sourceAlias, join.sourceColumn], Operator.eq, [targetAlias, join.targetColumn]),
 			)

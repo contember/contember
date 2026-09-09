@@ -108,7 +108,7 @@ const relationPermissions: Acl.Permissions = {
 	},
 }
 
-test('order by a relation target column guards the order key with the target read predicate', async () => {
+test('order by a relation target column joins the target through its read-guarded source', async () => {
 	await execute({
 		schema: relationSchema,
 		permissions: relationPermissions,
@@ -124,8 +124,9 @@ test('order by a relation target column guards the order key with the target rea
 				sql: SQL`
 					select "root_"."id" as "root_id"
 					from "public"."post" as "root_"
-					left join "public"."author" as "root_author" on "root_"."author_id" = "root_author"."id"
-					order by case when "root_author"."is_active" = ? then "root_author"."name" end asc, "root_"."id" asc
+					left join (select "root_author$".* from "public"."author" as "root_author$" where "root_author$"."is_active" = ?) as "root_author$"
+						on "root_"."author_id" = "root_author$"."id"
+					order by "root_author$"."name" asc, "root_"."id" asc
 				`,
 				parameters: [true],
 				response: {
@@ -272,7 +273,7 @@ const hopAndTargetPermissions: Acl.Permissions = {
 	},
 }
 
-test('order by through a relation combines the hop and target read predicates in the order-key guard', async () => {
+test('order by through a relation guards the order key with the hop predicate and joins the guarded target', async () => {
 	await execute({
 		schema: hopSchema,
 		permissions: hopAndTargetPermissions,
@@ -288,8 +289,9 @@ test('order by through a relation combines the hop and target read predicates in
 				sql: SQL`
 					select "root_"."id" as "root_id"
 					from "public"."post" as "root_"
-					left join "public"."author" as "root_author" on "root_"."author_id" = "root_author"."id"
-					order by case when ("root_"."is_published" = ?) and ("root_author"."is_active" = ?) then "root_author"."name" end asc, "root_"."id" asc
+					left join (select "root_author$".* from "public"."author" as "root_author$" where "root_author$"."is_active" = ?) as "root_author$"
+						on "root_"."author_id" = "root_author$"."id"
+					order by case when "root_"."is_published" = ? then "root_author$"."name" end asc, "root_"."id" asc
 				`,
 				parameters: [true, true],
 				response: {

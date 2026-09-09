@@ -1,4 +1,4 @@
-import { PermissionFactory, PredicateFactory, PredicatesInjector, VariableInjector } from '../../../src/acl/index.js'
+import { PermissionFactory, PredicateFactory, PredicatesInjector, READ_GUARD_KEY, VariableInjector } from '../../../src/acl/index.js'
 import { AclDefinition as acl, createSchema, PermissionsBuilder, SchemaBuilder, SchemaDefinition as def } from '@contember/schema-definition'
 import { Acl, Model } from '@contember/schema'
 import { describe, it } from 'bun:test'
@@ -188,17 +188,15 @@ describe('predicates injector elimination', () => {
 
 		// SECURITY: `articles` (ImageUse -> oneHasMany Article) is a TO-MANY back-hop, so the user
 		// filter reaches sibling Articles that are NOT guaranteed readable — their row predicate
-		// { isPublished: true } MUST be kept (previously wrongly dropped to { id: always }).
+		// { isPublished: true } MUST be kept as the hop's read guard (previously wrongly dropped to { id: always }).
 		// ImageUse's own predicate reduces to an already-verified ancestor witness, so that
 		// ACL-derived back-reference can still be eliminated without inspecting a sibling.
 		assert.deepStrictEqual(injected, {
 			and: [
 				{
 					articles: {
-						and: [
-							{ id: { in: [testUuid(1)] } },
-							{ isPublished: { eq: true } },
-						],
+						id: { in: [testUuid(1)] },
+						[READ_GUARD_KEY]: { isPublished: { eq: true } },
 					},
 				},
 				{
@@ -292,7 +290,7 @@ describe('predicates injector - self referencing relations', () => {
 			and: [
 				{
 					or: [
-						{ parent: { and: [{ name: { eq: 'Root' } }, { id: { always: true } }] } },
+						{ parent: { name: { eq: 'Root' } } },
 						{ name: { eq: 'Special' } },
 					],
 				},
@@ -320,7 +318,7 @@ describe('predicates injector - self referencing relations', () => {
 			and: [
 				{
 					and: [
-						{ parent: { and: [{ name: { eq: 'Root' } }, { id: { always: true } }] } },
+						{ parent: { name: { eq: 'Root' } } },
 						{ name: { contains: 'test' } },
 					],
 				},
@@ -344,7 +342,7 @@ describe('predicates injector - self referencing relations', () => {
 		assert.deepStrictEqual(injected, {
 			and: [
 				{
-					not: { parent: { and: [{ name: { eq: 'Excluded' } }, { id: { always: true } }] } },
+					not: { parent: { name: { eq: 'Excluded' } } },
 				},
 				{ isActive: { eq: true } },
 			],
@@ -367,8 +365,8 @@ describe('predicates injector - self referencing relations', () => {
 		assert.deepStrictEqual(injected, {
 			and: [
 				{
-					parent: { and: [{ name: { eq: 'Root' } }, { id: { always: true } }] },
-					children: { and: [{ name: { eq: 'Grandchild' } }, { isActive: { eq: true } }] },
+					parent: { name: { eq: 'Root' } },
+					children: { name: { eq: 'Grandchild' }, [READ_GUARD_KEY]: { isActive: { eq: true } } },
 				},
 				{ isActive: { eq: true } },
 			],
@@ -411,7 +409,7 @@ describe('predicates injector - self referencing relations', () => {
 		assert.deepStrictEqual(injected, {
 			and: [
 				{
-					children: { and: [{ name: { eq: 'Grandchild' } }, { isActive: { eq: true } }] },
+					children: { name: { eq: 'Grandchild' }, [READ_GUARD_KEY]: { isActive: { eq: true } } },
 				},
 				{ isActive: { eq: true } },
 			],
@@ -459,12 +457,7 @@ describe('predicates injector - self referencing relations', () => {
 		assert.deepStrictEqual(injected, {
 			and: [
 				{
-					parent: {
-						and: [
-							{ id: { in: [testUuid(1)] } },
-							{ id: { always: true } },
-						],
-					},
+					parent: { id: { in: [testUuid(1)] } },
 				},
 				{ isActive: { eq: true } },
 			],
@@ -506,12 +499,7 @@ describe('predicates injector - multiple relations between entities', () => {
 		assert.deepStrictEqual(injected, {
 			and: [
 				{
-					editor: {
-						and: [
-							{ name: { eq: 'John' } },
-							{ isActive: { eq: true } },
-						],
-					},
+					editor: { name: { eq: 'John' }, [READ_GUARD_KEY]: { isActive: { eq: true } } },
 				},
 				{ isPublished: { eq: true } },
 			],
@@ -543,12 +531,7 @@ describe('predicates injector - multiple relations between entities', () => {
 		assert.deepStrictEqual(injected, {
 			and: [
 				{
-					author: {
-						and: [
-							{ name: { eq: 'John' } },
-							{ id: { always: true } },
-						],
-					},
+					author: { name: { eq: 'John' } },
 				},
 				{ isPublished: { eq: true } },
 			],
@@ -589,12 +572,7 @@ describe('predicates injector - non back-reference filter', () => {
 		assert.deepStrictEqual(injected, {
 			and: [
 				{
-					image: {
-						and: [
-							{ url: { eq: 'test.jpg' } },
-							{ uses: { id: { always: true } } },
-						],
-					},
+					image: { url: { eq: 'test.jpg' }, [READ_GUARD_KEY]: { uses: { id: { always: true } } } },
 				},
 				{ articles: { id: { always: true } } },
 			],
@@ -765,12 +743,7 @@ describe('predicates injector - multi-level back-reference', () => {
 		assert.deepStrictEqual(injected, {
 			and: [
 				{
-					employees: {
-						and: [
-							{ name: { eq: 'Alice' } },
-							{ department: { id: { always: true } } },
-						],
-					},
+					employees: { name: { eq: 'Alice' }, [READ_GUARD_KEY]: { department: { id: { always: true } } } },
 				},
 				{ company: { id: { always: true } } },
 			],
@@ -926,12 +899,7 @@ describe('predicates injector - subsidiary edge case', () => {
 		assert.deepStrictEqual(injected, {
 			and: [
 				{
-					parent: {
-						and: [
-							{ name: { eq: 'Root Co' } },
-							{ id: { always: true } }, // Parent Company predicate simplified
-						],
-					},
+					parent: { name: { eq: 'Root Co' } }, // Parent Company predicate simplified
 				},
 				{ isActive: { eq: true } }, // Subsidiary's own predicate still applied
 			],
@@ -1063,12 +1031,7 @@ describe('predicates injector - SECURITY: inconsistent predicates must NOT be si
 		assert.deepStrictEqual(injected, {
 			and: [
 				{
-					company: {
-						and: [
-							{ name: { eq: 'Test' } },
-							{ id: { always: true } }, // Company predicate simplified - already verified
-						],
-					},
+					company: { name: { eq: 'Test' } }, // Company predicate simplified - already verified
 				},
 				{
 					company: { id: { always: true } }, // Department predicate simplified (duplicates optimized away)
@@ -1164,16 +1127,11 @@ describe('predicates injector - many-to-many relations', () => {
 
 		// SECURITY: Tag.posts is a TO-MANY (manyHasManyInverse) back-hop. It reaches sibling Posts
 		// sharing the tag, which are NOT guaranteed readable, so Post's row predicate
-		// { isPublished: true } MUST be kept (previously wrongly dropped to { id: always }).
+		// { isPublished: true } MUST be kept as the hop's read guard (previously wrongly dropped to { id: always }).
 		assert.deepStrictEqual(injected, {
 			and: [
 				{
-					posts: {
-						and: [
-							{ title: { eq: 'Hello' } },
-							{ isPublished: { eq: true } },
-						],
-					},
+					posts: { title: { eq: 'Hello' }, [READ_GUARD_KEY]: { isPublished: { eq: true } } },
 				},
 				{ isActive: { eq: true } },
 			],
@@ -1194,16 +1152,11 @@ describe('predicates injector - many-to-many relations', () => {
 
 		// SECURITY: Post.tags is a TO-MANY (manyHasManyOwning) back-hop. It reaches sibling Tags
 		// shared across posts, which are NOT guaranteed readable, so Tag's row predicate
-		// { isActive: true } MUST be kept (previously wrongly dropped to { id: always }).
+		// { isActive: true } MUST be kept as the hop's read guard (previously wrongly dropped to { id: always }).
 		assert.deepStrictEqual(injected, {
 			and: [
 				{
-					tags: {
-						and: [
-							{ name: { eq: 'featured' } },
-							{ isActive: { eq: true } },
-						],
-					},
+					tags: { name: { eq: 'featured' }, [READ_GUARD_KEY]: { isActive: { eq: true } } },
 				},
 				{ isPublished: { eq: true } },
 			],
@@ -1319,7 +1272,7 @@ describe('predicates injector - SECURITY: cell-level predicates on back-referenc
 		})
 	})
 
-	it('still simplifies to { id: always } when filtering on the primary only', () => {
+	it('still drops the row predicate when filtering on the primary only', () => {
 		const { relation, ancestorPath } = getChildrenContext()
 
 		const injected = injector.inject(
@@ -1336,7 +1289,7 @@ describe('predicates injector - SECURITY: cell-level predicates on back-referenc
 			and: [
 				{
 					and: [
-						{ parent: { and: [{ id: { in: [testUuid(1)] } }, { id: { always: true } }] } },
+						{ parent: { id: { in: [testUuid(1)] } } },
 						{ isPublished: { eq: true } },
 					],
 				},
@@ -1364,6 +1317,7 @@ describe('predicates injector - SECURITY: cell-level predicates on back-referenc
 									{ parent: { and: [{ secret: { eq: 'X' } }, { secretVisible: { eq: true } }] } },
 									{ isPublished: { eq: true } },
 								],
+								[READ_GUARD_KEY]: { or: [{ isPublished: { eq: true } }, { secretVisible: { eq: true } }] },
 							},
 						},
 						{ isPublished: { eq: true } },
@@ -1548,13 +1502,18 @@ describe('predicates injector - SECURITY: cell-level predicates on many-to-many 
 			ancestorPath,
 		)
 
-		// Post's row-level predicate is simplified away, but the cell-level guard
-		// of `internalNote` must stay
+		// Post's row-level predicate becomes the hop's read guard, and the cell-level guard
+		// of `internalNote` must stay next to the condition
 		assert.deepStrictEqual(injected, {
 			and: [
 				{
 					and: [
-						{ posts: { and: [{ internalNote: { eq: 'X' } }, { internalVisible: { eq: true } }] } },
+						{
+							posts: {
+								and: [{ internalNote: { eq: 'X' } }, { internalVisible: { eq: true } }],
+								[READ_GUARD_KEY]: { or: [{ isPublished: { eq: true } }, { internalVisible: { eq: true } }] },
+							},
+						},
 						{ isActive: { eq: true } },
 					],
 				},
@@ -1579,7 +1538,12 @@ describe('predicates injector - SECURITY: cell-level predicates on many-to-many 
 			and: [
 				{
 					and: [
-						{ tags: { and: [{ secret: { eq: 'X' } }, { secretVisible: { eq: true } }] } },
+						{
+							tags: {
+								and: [{ secret: { eq: 'X' } }, { secretVisible: { eq: true } }],
+								[READ_GUARD_KEY]: { or: [{ isActive: { eq: true } }, { secretVisible: { eq: true } }] },
+							},
+						},
 						{ isPublished: { eq: true } },
 					],
 				},
@@ -1818,6 +1782,7 @@ describe('predicates injector - SECURITY: cell-level decision uses the through c
 							},
 							{ or: [{ isEditor: { eq: true } }, { isViewer: { eq: true } }] },
 						],
+						[READ_GUARD_KEY]: { or: [{ isEditor: { eq: true } }, { or: [{ isEditor: { eq: true } }, { isViewer: { eq: true } }] }] },
 					},
 				},
 				{ isEditor: { eq: true } },
@@ -1991,10 +1956,8 @@ describe('predicates injector - SECURITY: to-many back-reference keeps sibling r
 			and: [
 				{
 					coverPhoto: {
-						and: [
-							{ articles: { and: [{ secret: { eq: 'X' } }, { isPublished: { eq: true } }] } },
-							{ isVisible: { eq: true } },
-						],
+						articles: { secret: { eq: 'X' }, [READ_GUARD_KEY]: { isPublished: { eq: true } } },
+						[READ_GUARD_KEY]: { isVisible: { eq: true } },
 					},
 				},
 				{ isPublished: { eq: true } },
@@ -2023,7 +1986,7 @@ describe('predicates injector - SECURITY: to-many back-reference keeps sibling r
 
 		assert.deepStrictEqual(injected, {
 			and: [
-				{ coverPhoto: { and: [{ url: { eq: 'x.jpg' } }, { id: { always: true } }] } },
+				{ coverPhoto: { url: { eq: 'x.jpg' } } },
 				{ isPublished: { eq: true } },
 			],
 		})
@@ -2046,7 +2009,7 @@ describe('predicates injector - SECURITY: to-many back-reference keeps sibling r
 
 		assert.deepStrictEqual(injected, {
 			and: [
-				{ tags: { posts: { and: [{ secret: { eq: 'X' } }, { isPublished: { eq: true } }] } } },
+				{ tags: { posts: { secret: { eq: 'X' }, [READ_GUARD_KEY]: { isPublished: { eq: true } } } } },
 				{ isPublished: { eq: true } },
 			],
 		})
@@ -2071,7 +2034,10 @@ describe('predicates injector - SECURITY: to-many back-reference keeps sibling r
 			[coverPhotoRelation],
 		)
 		assert.deepStrictEqual(injectedSecret, {
-			articles: { and: [{ secret: { eq: 'X' } }, { isSecretVisible: { eq: true } }] },
+			articles: {
+				and: [{ secret: { eq: 'X' } }, { isSecretVisible: { eq: true } }],
+				[READ_GUARD_KEY]: { or: [{ isPublished: { eq: true } }, { isSecretVisible: { eq: true } }] },
+			},
 		})
 
 		// Filtering on a row-shared field keeps the row predicate { isPublished: true }.
@@ -2082,7 +2048,10 @@ describe('predicates injector - SECURITY: to-many back-reference keeps sibling r
 			[coverPhotoRelation],
 		)
 		assert.deepStrictEqual(injectedTitle, {
-			articles: { and: [{ title: { eq: 'T' } }, { isPublished: { eq: true } }] },
+			articles: {
+				and: [{ title: { eq: 'T' } }, { isPublished: { eq: true } }],
+				[READ_GUARD_KEY]: { or: [{ isPublished: { eq: true } }, { isSecretVisible: { eq: true } }] },
+			},
 		})
 	})
 

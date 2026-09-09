@@ -1,10 +1,10 @@
 import { Acl, Input, Model } from '@contember/schema'
-import { Path } from './Path.js'
+import { hopPathSegment, Path } from './Path.js'
 import { JoinBuilder } from './JoinBuilder.js'
 import { CaseStatement, Literal, QueryBuilder, SelectBuilder, wrapIdentifier } from '@contember/database'
 import { acceptFieldVisitor, getColumnName, getTargetEntity } from '@contember/schema-utils'
 import { UserError } from '../../exception.js'
-import { PredicateFactory } from '../../acl/index.js'
+import { PredicateFactory, PredicatesInjector } from '../../acl/index.js'
 import { WhereBuilder } from './WhereBuilder.js'
 
 const orderByMapping = {
@@ -21,7 +21,6 @@ interface OrderByHopGuard {
 	path: Path
 	predicate: Acl.PredicateReference | false
 	relationPath: Model.AnyRelationContext[]
-	isAclFiltered: boolean
 }
 
 export class OrderByBuilder {
@@ -29,6 +28,7 @@ export class OrderByBuilder {
 		private readonly schema: Model.Schema,
 		private readonly joinBuilder: JoinBuilder,
 		private readonly predicateFactory: PredicateFactory,
+		private readonly predicatesInjector: PredicatesInjector,
 		private readonly whereBuilder: WhereBuilder,
 	) {}
 
@@ -41,7 +41,7 @@ export class OrderByBuilder {
 		relationPath: Model.AnyRelationContext[] = [],
 	): [SelectBuilder<SelectBuilder.Result>, Orderable] {
 		return orderBy.reduce<[SelectBuilder<SelectBuilder.Result>, Orderable]>(
-			([qb, orderable], fieldOrderBy) => this.buildOne(qb, orderable, entity, path, fieldOrderBy, relationPath, true, []),
+			([qb, orderable], fieldOrderBy) => this.buildOne(qb, orderable, entity, path, fieldOrderBy, relationPath, []),
 			[qb, orderable],
 		)
 	}
@@ -53,9 +53,6 @@ export class OrderByBuilder {
 		path: Path,
 		orderBy: Input.OrderBy,
 		relationPath: Model.AnyRelationContext[],
-		// True while we are still on the ACL-filtered query entity (its row-level predicate is in the WHERE).
-		// Becomes false once we traverse into a relation, whose join is not ACL-filtered.
-		isAclFiltered: boolean,
 		hopGuards: OrderByHopGuard[],
 	): [SelectBuilder<SelectBuilder.Result>, Orderable] {
 		const entries = Object.entries(orderBy)
@@ -85,43 +82,44 @@ export class OrderByBuilder {
 
 		if (typeof value === 'string') {
 			const columnName = getColumnName(this.schema, entity, fieldName)
-			return this.buildColumnOrder(qb, orderable, entity, path, fieldName, columnName, orderByMapping[value], relationPath, isAclFiltered, hopGuards)
+			return this.buildColumnOrder(qb, orderable, entity, path, fieldName, columnName, orderByMapping[value], relationPath, hopGuards)
 		} else {
 			const targetEntity = getTargetEntity(this.schema, entity, fieldName)
 			if (!targetEntity) {
 				throw new Error(`OrderByBuilder: target entity for relation ${entity.name}::${fieldName} not found`)
 			}
-			const newPath = path.for(fieldName)
-			const joined = this.joinBuilder.join(qb, newPath, entity, fieldName)
 			const relationContext = acceptFieldVisitor<Model.AnyRelationContext>(this.schema, entity, fieldName, {
 				visitColumn: () => {
 					throw new Error(`OrderByBuilder: ${entity.name}::${fieldName} is not a relation`)
 				},
 				visitRelation: context => context,
 			})
+			// The hop joins the target's read-guarded source (same guard and alias as a filter through this
+			// relation), so every joined target row is readable and only cell-level predicates remain to guard.
+			const guard = this.predicatesInjector.createReadGuard(relationContext, relationPath)
+			const guarded = Object.keys(guard).length > 0
+			const newPath = path.for(hopPathSegment(fieldName, guarded))
+			const targetSource = guarded ? this.whereBuilder.buildGuardedSource(targetEntity, newPath, guard) : undefined
+			const joined = this.joinBuilder.join(qb, newPath, entity, fieldName, targetSource)
 
 			// The relation field itself has a read predicate: a row where the relation is cell-masked must not
 			// order by the hidden target's value (projection masks the nested object via the same predicate).
 			const hopPredicate = this.predicateFactory.getFieldReadPredicate(entity, fieldName, relationPath)
-			const hopGuard = isAclFiltered && hopPredicate.isSameAsPrimary ? true : hopPredicate.predicate
+			const hopGuard = hopPredicate.isSameAsPrimary ? true : hopPredicate.predicate
 			const nextHopGuards = hopGuard === true
 				? hopGuards
-				: [...hopGuards, { entity, path, predicate: hopGuard, relationPath, isAclFiltered }]
+				: [...hopGuards, { entity, path, predicate: hopGuard, relationPath }]
 
-			return this.buildOne(joined, orderable, targetEntity, newPath, value, [...relationPath, relationContext], false, nextHopGuards)
+			return this.buildOne(joined, orderable, targetEntity, newPath, value, [...relationPath, relationContext], nextHopGuards)
 		}
 	}
 
 	/**
-	 * Orders by a column, guarding the order key with the field's read predicate — ANDed with the read
-	 * predicates of every relation hop traversed to reach it — so that ordering can never leak a value the
-	 * role cannot read. A row failing any of the predicates sorts as NULL (`CASE WHEN <predicates> THEN
-	 * <column> END`), mirroring how projection masks the same value / relation to NULL.
-	 *
-	 * On the ACL-filtered query entity only cell-level fields (a read predicate stricter than the row-level
-	 * predicate) need guarding — the row-level predicate is already enforced in the WHERE. When ordering
-	 * THROUGH a relation the join is not ACL-filtered, so the order key is guarded by the full field read
-	 * predicate (which also implies row-level readability) unconditionally.
+	 * Orders by a column, guarding the order key with the field's cell-level read predicate — ANDed with the
+	 * cell-level predicates of every relation field traversed to reach it — so that ordering can never leak a
+	 * value the role cannot read. A row failing any of the predicates sorts as NULL (`CASE WHEN <predicates>
+	 * THEN <column> END`), mirroring how projection masks the same value / relation to NULL. Row-level
+	 * readability needs no guard: the query entity is filtered in the WHERE and every hop joins a guarded source.
 	 */
 	private buildColumnOrder<Orderable extends QueryBuilder.Orderable<any> | null>(
 		qb: SelectBuilder<SelectBuilder.Result>,
@@ -132,7 +130,6 @@ export class OrderByBuilder {
 		columnName: string,
 		direction: typeof orderByMapping[keyof typeof orderByMapping],
 		relationPath: Model.AnyRelationContext[],
-		isAclFiltered: boolean,
 		hopGuards: OrderByHopGuard[],
 	): [SelectBuilder<SelectBuilder.Result>, Orderable] {
 		const orderColumn: QueryBuilder.ColumnIdentifier = [path.alias, columnName]
@@ -140,13 +137,11 @@ export class OrderByBuilder {
 
 		const fieldPredicate = this.predicateFactory.getFieldReadPredicate(entity, fieldName, relationPath)
 
-		// On the ACL-filtered entity a field whose read predicate equals the row-level predicate is readable
-		// for every returned row, so no guard is needed. Through a relation we always guard.
-		const guardPredicate = isAclFiltered && fieldPredicate.isSameAsPrimary ? true : fieldPredicate.predicate
+		const guardPredicate = fieldPredicate.isSameAsPrimary ? true : fieldPredicate.predicate
 
 		const allGuards: OrderByHopGuard[] = guardPredicate === true
 			? hopGuards
-			: [...hopGuards, { entity, path, predicate: guardPredicate, relationPath, isAclFiltered }]
+			: [...hopGuards, { entity, path, predicate: guardPredicate, relationPath }]
 
 		let neverReadable = false
 		const guards: (OrderByHopGuard & { predicate: Acl.PredicateReference })[] = []
@@ -179,11 +174,9 @@ export class OrderByBuilder {
 		const conditions: Literal[] = []
 		for (const guard of guards) {
 			const predicateWhere = this.predicateFactory.buildReadPredicates(guard.entity, [guard.predicate], guard.relationPath)
-			// The row-level predicate is already guaranteed in the WHERE of the ACL-filtered entity, so let the
-			// optimizer simplify it out of the cell-level predicate (mirrors SelectBuilder's predicate column).
-			const evaluatedPredicates = guard.isAclFiltered
-				? [this.predicateFactory.createReadPredicate(guard.entity, undefined, guard.relationPath)]
-				: []
+			// The row-level predicate already holds for every row (WHERE / guarded source), so let the optimizer
+			// simplify it out of the cell-level predicate (mirrors SelectBuilder's predicate column).
+			const evaluatedPredicates = [this.predicateFactory.createReadPredicate(guard.entity, undefined, guard.relationPath)]
 			const { qb: guardedQb, condition } = this.whereBuilder.buildConditionLiteral(
 				qb,
 				guard.entity,

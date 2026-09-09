@@ -1,5 +1,12 @@
 const MAX_IDENTIFIER_LENGTH = 63
 
+/**
+ * Path segment of a relation hop. A hop whose target source is read-guarded gets its own alias, because the
+ * same relation may also be traversed unguarded (as-definer) by an ACL predicate in the same query and the
+ * two must not share a join. `$` cannot occur in a field name, so the alias can never collide with a field.
+ */
+export const hopPathSegment = (fieldName: string, guarded: boolean): string => guarded ? `${fieldName}$` : fieldName
+
 export class AliasContext {
 	private aliasIndex = new Map<string, number>()
 

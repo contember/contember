@@ -161,7 +161,8 @@ export class ExecutionContainerFactory {
 				))
 			.addService(
 				'orderByBuilder',
-				({ joinBuilder, predicateFactory, whereBuilder, schema }) => new OrderByBuilder(schema.model, joinBuilder, predicateFactory, whereBuilder),
+				({ joinBuilder, predicateFactory, predicatesInjector, whereBuilder, schema }) =>
+					new OrderByBuilder(schema.model, joinBuilder, predicateFactory, predicatesInjector, whereBuilder),
 			)
 			.addService(
 				'relationFetcher',

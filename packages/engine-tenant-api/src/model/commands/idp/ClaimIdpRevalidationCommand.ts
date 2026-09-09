@@ -1,3 +1,4 @@
+import { UpdateBuilder } from '@contember/database'
 import { Command } from '../Command.js'
 
 /**
@@ -17,12 +18,12 @@ export class ClaimIdpRevalidationCommand implements Command<boolean> {
 	}
 
 	async execute({ db }: Command.Args): Promise<boolean> {
-		const result = await db.query(
-			`UPDATE "idp_session"
-			 SET "last_validated_at" = now()
-			 WHERE "id" = ? AND "last_validated_at" <= now() - ?::interval`,
-			[this.id, this.interval],
-		)
-		return (result.rowCount ?? 0) > 0
+		const qb = UpdateBuilder.create()
+			.table('idp_session')
+			.where({ id: this.id })
+			.where(expr => expr.raw('"last_validated_at" <= now() - ?::interval', this.interval))
+			.values({ last_validated_at: expr => expr.raw('now()') })
+
+		return (await qb.execute(db)) > 0
 	}
 }

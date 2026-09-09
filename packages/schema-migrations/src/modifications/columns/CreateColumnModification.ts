@@ -6,6 +6,7 @@ import { isColumn } from '@contember/schema-utils'
 import { createFields } from '../utils/diffUtils'
 import { getColumnSqlType } from '../utils/columnUtils'
 import { fillSeed, formatSeedExpression } from './columnUtils'
+import { wrapIdentifier } from '../../utils/dbHelpers'
 
 export class CreateColumnModificationHandler implements ModificationHandler<CreateColumnModificationData> {
 	constructor(private readonly data: CreateColumnModificationData, private readonly schema: Schema) {}
@@ -32,7 +33,7 @@ export class CreateColumnModificationHandler implements ModificationHandler<Crea
 				type: columnType,
 				notNull: !column.nullable && seedExpression === null,
 				sequenceGenerated: column.sequence,
-				collation: column.collation,
+				collation: column.collation !== undefined ? wrapIdentifier(column.collation) : undefined,
 			},
 		})
 

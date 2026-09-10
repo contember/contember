@@ -213,6 +213,43 @@ const hopPermissions: Acl.Permissions = {
 	},
 }
 
+test('order by through a relation field the role cannot read emits no order key', async () => {
+	// The OrderBy input exposes `author` because Author is readable; the relation field itself is not.
+	const unreadableHopPermissions: Acl.Permissions = {
+		Post: { predicates: {}, operations: { read: { id: true } } },
+		Author: { predicates: {}, operations: { read: { id: true, name: true, isActive: true } } },
+	}
+	await execute({
+		schema: relationSchema,
+		permissions: unreadableHopPermissions,
+		variables: {},
+		query: GQL`
+        query {
+          listPost(orderBy: [{author: {name: asc}}]) {
+            id
+          }
+        }`,
+		executes: [
+			{
+				sql: SQL`
+					select "root_"."id" as "root_id"
+					from "public"."post" as "root_"
+					order by "root_"."id" asc
+				`,
+				parameters: [],
+				response: {
+					rows: [{ root_id: testUuid(1) }],
+				},
+			},
+		],
+		return: {
+			data: {
+				listPost: [{ id: testUuid(1) }],
+			},
+		},
+	})
+})
+
 test('order by through a relation guards the order key with the relation-field (hop) read predicate', async () => {
 	// `Post.author` is cell-masked for unpublished posts, so their order key must not reflect the hidden
 	// author's name even though `Author.name` itself is public.

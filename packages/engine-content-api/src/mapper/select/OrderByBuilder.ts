@@ -15,11 +15,11 @@ const orderByMapping = {
 } as const
 
 // A read predicate collected while traversing an order-by relation hop (e.g. `Post.author` in
-// `orderBy: {author: {name: asc}}`), to be ANDed into the order-key guard. `false` = never readable.
+// `orderBy: {author: {name: asc}}`), to be ANDed into the order-key guard.
 interface OrderByHopGuard {
 	entity: Model.Entity
 	path: Path
-	predicate: Acl.PredicateReference | false
+	predicate: Acl.PredicateReference
 	relationPath: Model.AnyRelationContext[]
 }
 
@@ -94,6 +94,17 @@ export class OrderByBuilder {
 				},
 				visitRelation: context => context,
 			})
+			// The relation field itself has a read predicate: a row where the relation is cell-masked must not
+			// order by the hidden target's value (projection masks the nested object via the same predicate).
+			const hopPredicate = this.predicateFactory.getFieldReadPredicate(entity, fieldName, relationPath)
+			const hopGuard = hopPredicate.isSameAsPrimary ? true : hopPredicate.predicate
+			if (hopGuard === false) {
+				return this.skipUnreadableKey(qb, orderable)
+			}
+			const nextHopGuards = hopGuard === true
+				? hopGuards
+				: [...hopGuards, { entity, path, predicate: hopGuard, relationPath }]
+
 			// The hop joins the target's read-guarded source (same guard and alias as a filter through this
 			// relation), so every joined target row is readable and only cell-level predicates remain to guard.
 			const guard = this.predicatesInjector.createReadGuard(relationContext, relationPath)
@@ -101,14 +112,6 @@ export class OrderByBuilder {
 			const newPath = path.for(hopPathSegment(fieldName, guarded))
 			const targetSource = guarded ? this.whereBuilder.buildGuardedSource(targetEntity, newPath, guard) : undefined
 			const joined = this.joinBuilder.join(qb, newPath, entity, fieldName, targetSource)
-
-			// The relation field itself has a read predicate: a row where the relation is cell-masked must not
-			// order by the hidden target's value (projection masks the nested object via the same predicate).
-			const hopPredicate = this.predicateFactory.getFieldReadPredicate(entity, fieldName, relationPath)
-			const hopGuard = hopPredicate.isSameAsPrimary ? true : hopPredicate.predicate
-			const nextHopGuards = hopGuard === true
-				? hopGuards
-				: [...hopGuards, { entity, path, predicate: hopGuard, relationPath }]
 
 			return this.buildOne(joined, orderable, targetEntity, newPath, value, [...relationPath, relationContext], nextHopGuards)
 		}
@@ -138,30 +141,14 @@ export class OrderByBuilder {
 		const fieldPredicate = this.predicateFactory.getFieldReadPredicate(entity, fieldName, relationPath)
 
 		const guardPredicate = fieldPredicate.isSameAsPrimary ? true : fieldPredicate.predicate
+		if (guardPredicate === false) {
+			return this.skipUnreadableKey(qb, orderable)
+		}
 
-		const allGuards: OrderByHopGuard[] = guardPredicate === true
+		const guards: OrderByHopGuard[] = guardPredicate === true
 			? hopGuards
 			: [...hopGuards, { entity, path, predicate: guardPredicate, relationPath }]
 
-		let neverReadable = false
-		const guards: (OrderByHopGuard & { predicate: Acl.PredicateReference })[] = []
-		for (const guard of allGuards) {
-			if (guard.predicate === false) {
-				neverReadable = true
-			} else {
-				guards.push({ ...guard, predicate: guard.predicate })
-			}
-		}
-
-		if (neverReadable) {
-			// The field, or a relation on the path to it, is never readable: the order key is unconditionally NULL.
-			const nullLiteral = new Literal('null')
-			qb = qb.orderBy(nullLiteral, direction)
-			if (orderable !== null) {
-				orderable = orderable.orderBy(nullLiteral, direction)
-			}
-			return [qb, orderable]
-		}
 		if (guards.length === 0) {
 			qb = applyPlain(qb)
 			if (orderable !== null) {
@@ -195,6 +182,15 @@ export class OrderByBuilder {
 		if (orderable !== null) {
 			orderable = orderable.orderBy(orderLiteral, direction)
 		}
+		return [qb, orderable]
+	}
+
+	// A field (or a hop to it) the role can never read: the key would be NULL on every row, and PostgreSQL
+	// rejects a bare constant in ORDER BY, so it is left out. Same order, no join, no leak.
+	private skipUnreadableKey<Orderable extends QueryBuilder.Orderable<any> | null>(
+		qb: SelectBuilder<SelectBuilder.Result>,
+		orderable: Orderable,
+	): [SelectBuilder<SelectBuilder.Result>, Orderable] {
 		return [qb, orderable]
 	}
 }

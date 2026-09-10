@@ -323,6 +323,8 @@ input FrontPageUpdateInHouseVideosEntityRelationInput {
   connectOrCreate: FrontPageConnectOrCreateInHouseVideosRelationInput
   disconnect: VideoUniqueWhere
   delete: VideoUniqueWhere
+  set: [FrontPageSetInHouseVideosItemRelationInput!]
+  orphanStrategy: OrphanRemovalStrategy
   alias: String
 }
 
@@ -341,6 +343,20 @@ input FrontPageUpsertInHouseVideosRelationInput {
   by: VideoUniqueWhere!
   update: VideoWithoutFrontPageUpdateInput!
   create: VideoWithoutFrontPageCreateInput!
+}
+
+input FrontPageSetInHouseVideosItemRelationInput {
+  create: VideoWithoutFrontPageCreateInput
+  connect: VideoUniqueWhere
+  connectOrCreate: FrontPageConnectOrCreateInHouseVideosRelationInput
+  update: FrontPageUpdateInHouseVideosRelationInput
+  upsert: FrontPageUpsertInHouseVideosRelationInput
+  alias: String
+}
+
+enum OrphanRemovalStrategy {
+  disconnect
+  delete
 }
 
 input VideoUpsertFrontPageForIntroRelationInput {

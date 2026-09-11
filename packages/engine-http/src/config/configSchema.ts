@@ -218,6 +218,8 @@ export const serverConfigSchema = Typesafe.partial({
 	monitoringPort: Typesafe.number,
 	workerCount: Typesafe.union(Typesafe.number, Typesafe.string),
 	applicationWorker: Typesafe.string,
+	// How long the engine keeps serving after SIGTERM before it shuts down; unset means at once.
+	shutdownDelayMs: Typesafe.number,
 	test: Typesafe.partial({
 		transactions: Typesafe.boolean,
 		transactionTtlSeconds: Typesafe.number,

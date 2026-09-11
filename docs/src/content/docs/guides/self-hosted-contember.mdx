@@ -76,6 +76,16 @@ TENANT_MAILER_FROM: "noreply@example.com"
 
 HTTP server should start on the specified port. You can add a load-balancer in front of the app. The container is stateless and therefore horizontally scalable.
 
+#### Graceful shutdown
+
+On `SIGTERM`, the engine stops taking requests and exits as soon as the ones in flight have finished — usually within milliseconds. A load balancer or an orchestrator typically stops routing to a container only some time after it sends that signal, so requests still on their way are refused. Set `CONTEMBER_SHUTDOWN_DELAY_MS` to keep serving normally for that long after `SIGTERM` before shutting down:
+
+```yaml
+CONTEMBER_SHUTDOWN_DELAY_MS: "5000"
+```
+
+This is the in-process equivalent of a Kubernetes `preStop` sleep hook; a few seconds covers endpoint propagation there. Keep it well below `terminationGracePeriodSeconds`, which counts the delay too. `SIGINT` (Ctrl+C) never waits.
+
 After the server is running, use Contember CLI to set up other API tokens and invite users. Deploy the
 `blog` project to this instance with `CONTEMBER_API_URL` and `CONTEMBER_API_TOKEN` set:
 

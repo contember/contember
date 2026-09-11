@@ -60,7 +60,10 @@ process.on('warning', message => {
 
 	let initializedProjects: string[] = []
 	const terminationJobs: TerminationJob[] = []
-	listenOnProcessTermination(terminationJobs, logger)
+	// A cluster worker is signalled by the master, which has already served the delay.
+	listenOnProcessTermination(terminationJobs, logger, {
+		sigtermDelayMs: processType === 'clusterWorker' ? 0 : serverConfig.shutdownDelayMs,
+	})
 
 	if (cluster.isMaster) {
 		const monitoringPort = serverConfig.monitoringPort

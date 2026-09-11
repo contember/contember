@@ -1,4 +1,5 @@
 import { expect, test } from 'bun:test'
+import { readConfig } from '../../../src/config/config.js'
 import { serverConfigSchema } from '../../../src/config/configSchema.js'
 
 const trustedProxies = (val: unknown): unknown => serverConfigSchema({ http: { trustedProxies: val } }).http?.trustedProxies
@@ -67,4 +68,19 @@ test('geoCountryHeader: a string passes through unchanged', () => {
 test('geoCountryHeader: a non-string value throws (fail-fast on misconfiguration)', () => {
 	expect(() => geoCountryHeader(123)).toThrow()
 	expect(() => geoCountryHeader({})).toThrow()
+})
+
+test('shutdownDelayMs: read from CONTEMBER_SHUTDOWN_DELAY_MS', async () => {
+	process.env.CONTEMBER_SHUTDOWN_DELAY_MS = '5000'
+	try {
+		const { serverConfig } = await readConfig()
+		expect(serverConfig.shutdownDelayMs).toBe(5000)
+	} finally {
+		delete process.env.CONTEMBER_SHUTDOWN_DELAY_MS
+	}
+})
+
+test('shutdownDelayMs: undefined when the variable is unset', async () => {
+	const { serverConfig } = await readConfig()
+	expect(serverConfig.shutdownDelayMs).toBeUndefined()
 })

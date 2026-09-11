@@ -87,6 +87,7 @@ export const configTemplate: any = {
 		monitoringPort: '%?env.CONTEMBER_MONITORING_PORT::number%',
 		workerCount: '%?env.CONTEMBER_WORKER_COUNT::string%',
 		applicationWorker: '%?env.CONTEMBER_APPLICATION_WORKER::string%',
+		shutdownDelayMs: '%?env.CONTEMBER_SHUTDOWN_DELAY_MS::number%',
 		http: {
 			requestBodySize: '%?env.CONTEMBER_HTTP_REQUEST_BODY_SIZE::string%',
 			suppressAccessLog: '%?env.CONTEMBER_HTTP_SUPPRESS_ACCESS_LOG::string%',

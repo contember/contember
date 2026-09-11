@@ -34,7 +34,9 @@ export class PersonQueryResolver implements QueryResolvers {
 			identityId: args.filter?.identityId,
 		}
 
-		// SUPER_ADMIN (global wildcard) may list every person.
+		// SUPER_ADMIN and PROJECT_ADMIN hold person:list and see every person; so does
+		// a custom role granted it. The check carries no scope, so a *global* project_admin
+		// lists the whole tenant, not just their projects' members.
 		if (await context.isAllowed({ action: PermissionActions.PERSON_LIST })) {
 			const rows = await this.personManager.listPersons(context.db, filter, args.limit, args.offset)
 			return rows.map(row => PersonResponseFactory.createPersonResponse(row))

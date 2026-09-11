@@ -11,12 +11,14 @@ import { GraphQLResolveInfo } from 'graphql'
 import { TenantResolverContext } from '../../TenantResolverContext.js'
 import {
 	ConfigurationQuery,
+	createPersonPermissionTarget,
 	EmailChangeManager,
 	IdentityScope,
 	PermissionActions,
 	PermissionContextFactory,
 	PersonManager,
 	PersonQuery,
+	ProfileField,
 } from '../../../model/index.js'
 import { createErrorResponse } from '../../errorUtils.js'
 import { normalizeEmail } from '../../../model/utils/email.js'
@@ -42,9 +44,13 @@ export class ChangeProfileMutationResolver implements Pick<MutationResolvers, 'c
 			return createErrorResponse('INVALID_EMAIL_FORMAT', 'E-mail address cannot be null.')
 		}
 
+		const fields: ProfileField[] = [
+			...(args.name !== undefined ? ['name' as const] : []),
+			...(args.email !== undefined ? ['email' as const] : []),
+		]
 		await context.requireAccess({
 			scope: new IdentityScope(person.identity_id),
-			action: PermissionActions.PERSON_CHANGE_PROFILE(person.roles),
+			action: PermissionActions.PERSON_CHANGE_PROFILE(await createPersonPermissionTarget(context.db, person), fields),
 			message: 'You are not allowed to change a profile',
 		})
 		const result = await this.personManager.changeProfile(context.db, person, {
@@ -105,10 +111,10 @@ export class ChangeProfileMutationResolver implements Pick<MutationResolvers, 'c
 		// via the direct path and inherit the old verified status, defeating the sign-in
 		// gate. signup verification ⇒ change verification, regardless of the change flag.
 		if (emailChanging && (config.emailChange.requireVerification || person.email_verification_required)) {
-			const permissionContext = await this.permissionContextFactory.create(context.db, {
+			const permissionContext = this.permissionContextFactory.create(context.db, {
 				id: person.identity_id,
 				roles: person.roles,
-			})
+			}, context.permissionContext.authorizator)
 			const result = await this.emailChangeManager.requestEmailChange(
 				context.db,
 				permissionContext,

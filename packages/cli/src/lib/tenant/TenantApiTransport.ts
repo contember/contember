@@ -1,5 +1,5 @@
 import { CliError, ExitCode } from '@contember/cli-common'
-import { GraphQlClient } from '@contember/graphql-client'
+import { GraphQlClient, GraphQlClientVariables } from '@contember/graphql-client'
 import { Fetcher, TextWriter, util } from 'graphql-ts-client-api'
 import { toTransportError } from '../errors/TransportError.js'
 
@@ -60,6 +60,15 @@ export class TenantApiTransport {
 	): Promise<TData> {
 		try {
 			return await this.apiClient.execute<TData>(buildRequestDocument(fetcher), { variables })
+		} catch (e) {
+			throw toTenantApiError(e)
+		}
+	}
+
+	/** Runs a hand-written operation document — only for what a fetcher cannot express, such as an explicit `null` root argument. */
+	public async execDocument<TData extends object>(document: string, variables: GraphQlClientVariables): Promise<TData> {
+		try {
+			return await this.apiClient.execute<TData>(document, { variables })
 		} catch (e) {
 			throw toTenantApiError(e)
 		}

@@ -6,7 +6,14 @@ import {
 	SignInResponse,
 } from '../../../schema/index.js'
 import { TenantResolverContext } from '../../TenantResolverContext.js'
-import { ConfigurationQuery, PermissionActions, PersonUniqueIdentifier, RateLimiter, SignInManager } from '../../../model/index.js'
+import {
+	ConfigurationQuery,
+	createPersonPermissionTarget,
+	PermissionActions,
+	PersonUniqueIdentifier,
+	RateLimiter,
+	SignInManager,
+} from '../../../model/index.js'
 import { createErrorResponse } from '../../errorUtils.js'
 import { SignInResponseFactory } from '../../responseHelpers/SignInResponseFactory.js'
 import { UserInputError } from '@contember/graphql-utils'
@@ -136,7 +143,7 @@ export class SignInMutationResolver implements MutationResolvers {
 
 	async createSessionToken(parent: any, args: MutationCreateSessionTokenArgs, context: TenantResolverContext): Promise<CreateSessionTokenResponse> {
 		await context.requireAccess({
-			action: PermissionActions.PERSON_CREATE_SESSION_KEY(),
+			action: PermissionActions.PERSON_CREATE_SESSION_KEY({ phase: 'preflight' }),
 			message: 'You are not allowed to create a session key',
 		})
 		let identifier: PersonUniqueIdentifier
@@ -148,17 +155,23 @@ export class SignInMutationResolver implements MutationResolvers {
 			throw new UserInputError(`Please provide either email or personId`)
 		}
 
+		const trustForwardedClientInfo = args.options?.trustForwardedClientInfo === true && context.trustForwardedInfo
 		const response = await this.signInManager.createSessionToken(
 			context.db,
 			identifier,
 			args.expiration || undefined,
 			async person =>
 				await context.requireAccess({
-					action: PermissionActions.PERSON_CREATE_SESSION_KEY(person.roles),
+					action: PermissionActions.PERSON_CREATE_SESSION_KEY({
+						phase: 'target',
+						target: await createPersonPermissionTarget(context.db, person) ?? undefined,
+						requestedExpirationMinutes: args.expiration ?? null,
+						trustForwardedClientInfo,
+					}),
 					message: 'You are not allowed to create a session key for this person.',
 				}),
 			context.httpInfo,
-			args.options?.trustForwardedClientInfo === true && context.trustForwardedInfo,
+			trustForwardedClientInfo,
 		)
 		await context.logAuthAction({
 			type: 'create_session_token',

@@ -96,7 +96,7 @@ export class ProjectTypeResolver implements ProjectResolvers {
 				isAllowed(PermissionActions.PROJECT_REMOVE_MEMBER([])),
 				isAllowed(PermissionActions.PROJECT_VIEW_SECRETS),
 				isAllowed(PermissionActions.PROJECT_SET_SECRET),
-				isAllowed(PermissionActions.API_KEY_CREATE),
+				isAllowed(PermissionActions.API_KEY_CREATE()),
 				isAllowed(PermissionActions.PROJECT_UPDATE),
 			])
 

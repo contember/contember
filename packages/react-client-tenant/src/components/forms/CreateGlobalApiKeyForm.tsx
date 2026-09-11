@@ -59,6 +59,7 @@ export const CreateGlobalApiKeyForm = ({ children, onSuccess, initialRoles }: Cr
 }
 
 const errorToField: Record<CreateApiKeyErrorCode, keyof CreateGlobalApiKeyFormValues | undefined> = {
+	INVALID_ROLE: 'roles',
 	INVALID_MEMBERSHIP: undefined,
 	PROJECT_NOT_FOUND: undefined,
 	ROLE_NOT_FOUND: 'roles',

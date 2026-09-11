@@ -66,7 +66,7 @@ export class SelectBuilder {
 				[path.alias, groupByColumn],
 				(orderable, qb) => {
 					if (orderBy.length > 0) {
-						;[qb, orderable] = this.orderByBuilder.build(qb, orderable, entity, this.pathFactory.create([]), orderBy)
+						;[qb, orderable] = this.orderByBuilder.build(qb, orderable, entity, this.pathFactory.create([]), orderBy, this.relationPath)
 					}
 					return [orderable, qb]
 				},
@@ -75,7 +75,7 @@ export class SelectBuilder {
 			)
 		} else {
 			if (orderBy.length > 0) {
-				;[this.qb] = this.orderByBuilder.build(this.qb, null, entity, path, orderBy)
+				;[this.qb] = this.orderByBuilder.build(this.qb, null, entity, path, orderBy, this.relationPath)
 			}
 			this.qb = this.qb.limit(input.args.limit, input.args.offset)
 		}
@@ -87,34 +87,33 @@ export class SelectBuilder {
 		}
 
 		const fetchedPredicates = new Set()
-		const addPredicate = (predicate: Acl.Predicate): ColumnValueGetter<boolean> => {
+		const addPredicate = (predicate: Acl.Predicate, options?: { rootOnly?: boolean }): ColumnValueGetter<boolean> => {
 			if (typeof predicate === 'boolean') {
 				return () => predicate
 			}
-			const predicatePath = path.for('__predicate').for(predicate)
+			// A root-resolved name may denote a different definition than the same name in the `all` set, so the
+			// two must not share a column. Only the override gets a suffix, keeping every other alias unchanged.
+			const rootOnly = options?.rootOnly === true && this.relationPath.length > 0
+			const predicateKey = rootOnly ? `${predicate}__rootPerms` : predicate
+			const predicatePath = path.for('__predicate').for(predicateKey)
 
-			if (!fetchedPredicates.has(predicate)) {
-				const relationContext = this.relationPath[this.relationPath.length - 1]
+			if (!fetchedPredicates.has(predicateKey)) {
+				const primaryPredicate = this.predicateFactory.createReadPredicate(entity, undefined, this.relationPath)
+				const fieldPredicate = rootOnly
+					// No relation context: `optimizePredicates` would eliminate parts against the root set, but the
+					// parent rows were filtered with the `all` set — an unsound elimination. Skip it instead.
+					? this.predicateFactory.buildPredicates(entity, [predicate], undefined, true)
+					: this.predicateFactory.buildReadPredicates(entity, [predicate], this.relationPath)
 
-				const primaryPredicate = this.predicateFactory.create(entity, Acl.Operation.read, undefined, relationContext)
-				const fieldPredicate = this.predicateFactory.buildPredicates(entity, [predicate], relationContext)
-
-				this.qb = this.whereBuilder.buildAdvanced(
+				const { qb, condition } = this.whereBuilder.buildConditionLiteral(
+					this.qb,
 					entity,
 					path.back(),
 					fieldPredicate,
-					apply =>
-						this.qb.select(expr =>
-							expr.selectCondition(condition => {
-								condition = apply(condition)
-								if (condition.isEmpty()) {
-									return condition.raw('true')
-								}
-								return condition
-							}), predicatePath.alias),
 					{ relationPath: this.relationPath, evaluatedPredicates: [primaryPredicate] },
 				)
-				fetchedPredicates.add(predicate)
+				this.qb = qb.select(condition, predicatePath.alias)
+				fetchedPredicates.add(predicateKey)
 			}
 			return row => row[predicatePath.alias] === true
 		}

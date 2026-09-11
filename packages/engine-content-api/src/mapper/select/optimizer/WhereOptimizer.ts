@@ -3,6 +3,7 @@ import { ConditionOptimizer } from './ConditionOptimizer.js'
 import { acceptFieldVisitor } from '@contember/schema-utils'
 import { optimizeAnd, optimizeNot, optimizeOr } from './helpers.js'
 import { replaceWhere } from './WhereReplacer.js'
+import { READ_GUARD_KEY, splitReadGuard } from '../../../acl/PredicatesInjector.js'
 
 type ExtendedRelationContext = {
 	context: Model.AnyRelationContext
@@ -71,6 +72,27 @@ export class WhereOptimizer {
 	}
 
 	private optimizeWhere(where: Input.OptionalWhere, entity: Model.Entity, relationPath: ExtendedRelationContext[]): Input.OptionalWhere | boolean {
+		const { guard, where: rest } = splitReadGuard(where ?? {})
+		const optimizedRest = this.optimizeWhereOperands(rest, entity, relationPath)
+		if (Object.keys(guard).length === 0 || typeof optimizedRest === 'boolean') {
+			// A hop without any remaining condition is a no-op whatever its guard (an empty relation filter).
+			return optimizedRest
+		}
+		// The guard is a where over the same target rows, but it is compiled into the hop's table source
+		// rather than its condition, so it is optimized on its own and kept out of the AND above.
+		const optimizedGuard = this.optimizeWhereOperands(guard, entity, relationPath)
+		if (optimizedGuard === true) {
+			return optimizedRest
+		}
+		const guardWhere = optimizedGuard === false ? { [entity.primary]: { never: true } } : optimizedGuard
+		return { ...optimizedRest, [READ_GUARD_KEY]: guardWhere }
+	}
+
+	private optimizeWhereOperands(
+		where: Input.OptionalWhere,
+		entity: Model.Entity,
+		relationPath: ExtendedRelationContext[],
+	): Input.OptionalWhere | boolean {
 		const operands: OptimizedOperand[] = []
 
 		for (const key in where) {

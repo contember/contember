@@ -229,3 +229,31 @@ describe('create numeric column', () =>
 		],
 		sql: SQL`ALTER TABLE "author" ADD "balance" numeric(20, 9);`,
 	}))
+
+describe('create a column with a collation', () =>
+	testMigrations({
+		original: createSchema({
+			Author: class Author {
+			},
+		}),
+		updated: createSchema({
+			Author: class Author {
+				name = def.stringColumn().collation('und-x-icu')
+			},
+		}),
+		diff: [
+			{
+				modification: 'createColumn',
+				entityName: 'Author',
+				field: {
+					columnName: 'name',
+					name: 'name',
+					nullable: true,
+					type: Model.ColumnType.String,
+					columnType: 'text',
+					collation: 'und-x-icu',
+				},
+			},
+		],
+		sql: SQL`ALTER TABLE "author" ADD "name" text COLLATE "und-x-icu";`,
+	}))

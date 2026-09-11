@@ -83,7 +83,7 @@ export const tenantConfigSchema = Typesafe.intersection(
 	}),
 )
 
-export const serverConfigSchema = Typesafe.object({
+export const serverConfigSchema = Typesafe.intersection(Typesafe.object({
 	port: Typesafe.number,
 	http: Typesafe.partial({
 		requestBodySize: Typesafe.string,
@@ -114,7 +114,10 @@ export const serverConfigSchema = Typesafe.object({
 			}),
 		}),
 	),
-})
+}), Typesafe.partial({
+	// How long the engine keeps serving after SIGTERM before it shuts down; unset means at once.
+	shutdownDelayMs: Typesafe.number,
+}))
 
 export const stageConfig = Typesafe.record(
 	Typesafe.string,

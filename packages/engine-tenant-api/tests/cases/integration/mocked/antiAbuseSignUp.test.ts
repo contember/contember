@@ -10,8 +10,8 @@ const password = '123456'
 // Mirrors RateLimitCountQuery — whitespace/case are normalised by the matcher.
 const rateLimitCountSql = (args: { scope: string; keyHash: Buffer; count: number }): ExpectedQuery => ({
 	sql: `select count(*)::text as count from "tenant"."rate_limit_event"
-		where "scope" = ? and "key_hash" = ? and "occurred_at" >= ?`,
-	parameters: [args.scope, args.keyHash, (val: unknown) => val instanceof Date],
+		where "scope" = ? and "key_hash" = ? and occurred_at >= NOW() - make_interval(secs => ?)`,
+	parameters: [args.scope, args.keyHash, (val: unknown) => typeof val === 'number'],
 	response: { rows: [{ count: String(args.count) }] },
 })
 

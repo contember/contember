@@ -44,10 +44,10 @@ export class EmailVerificationManager {
 		// Per-email exponential backoff on outbound mails, so a resend button
 		// (or an attacker poking the endpoint) can't be used to flood the
 		// mailbox. Reuses the login_* backoff config against person_auth_log.
-		const nextAllowed = await dbContext.queryHandler.fetch(
+		const retryAfter = await dbContext.queryHandler.fetch(
 			new NextMailAttemptQuery(person.email, 'email_verify_init', 'email_verify_complete'),
 		)
-		if (nextAllowed > dbContext.providers.now()) {
+		if (retryAfter > 0) {
 			return false
 		}
 
@@ -73,7 +73,7 @@ export class EmailVerificationManager {
 
 	public async verifyEmail(dbContext: DatabaseContext, token: string): Promise<VerifyEmailResponse> {
 		const tokenRow = await dbContext.queryHandler.fetch(PersonTokenQuery.byToken(token, 'email_verification'))
-		const validation = validateToken({ entry: tokenRow, token, now: dbContext.providers.now(), validationType: 'token' })
+		const validation = validateToken({ entry: tokenRow, token, validationType: 'token' })
 		if (!validation.ok) {
 			// Carry whatever we know about the subject so the audit log can tie the
 			// failure to a person/token even on an invalid/expired token (matches

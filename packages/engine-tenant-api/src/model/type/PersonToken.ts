@@ -17,6 +17,8 @@ export namespace PersonToken {
 		token_hash: string
 		used_at: null | Date
 		expires_at: Date
+		/** `expires_at <= now()` computed on the DB clock — the authoritative expiry gate. */
+		is_expired: boolean
 		person_id: string
 		otp_hash: string | null
 		otp_attempts: number

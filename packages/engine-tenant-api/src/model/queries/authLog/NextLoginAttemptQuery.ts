@@ -1,13 +1,13 @@
 import { DatabaseQuery, DatabaseQueryable, Literal, SelectBuilder } from '@contember/database'
 
-export class NextLoginAttemptQuery extends DatabaseQuery<Date> {
+export class NextLoginAttemptQuery extends DatabaseQuery<number> {
 	constructor(
 		private readonly email: string,
 	) {
 		super()
 	}
 
-	async fetch({ db }: DatabaseQueryable): Promise<Date> {
+	async fetch({ db }: DatabaseQueryable): Promise<number> {
 		const qb = SelectBuilder.create()
 			.with('cfg', it => it.from('config'))
 			.with('last_successful_reset', it =>
@@ -25,7 +25,7 @@ export class NextLoginAttemptQuery extends DatabaseQuery<Date> {
 					.select(
 						new Literal(`
 					GREATEST(
-						COALESCE(last_successful_reset.created_at, NOW() - cfg.login_attempt_window), 
+						COALESCE(last_successful_reset.created_at, NOW() - cfg.login_attempt_window),
 						NOW() - cfg.login_attempt_window
 					)`),
 						'start_time',
@@ -46,21 +46,23 @@ export class NextLoginAttemptQuery extends DatabaseQuery<Date> {
 					.where(new Literal('person_auth_log.created_at >= window_start.start_time')))
 			.select(
 				new Literal(`
-				CASE WHEN failed_logins.fails = 0 
-				THEN NOW() 
-				ELSE LEAST(
-					failed_logins.last_fail + cfg.login_max_backoff, 
-					failed_logins.last_fail + cfg.login_base_backoff * (POWER(2, failed_logins.fails - 1))
-				) END`),
-				'next_allowed_login',
+				CASE WHEN failed_logins.fails = 0
+				THEN 0
+				ELSE GREATEST(0, CEIL(EXTRACT(EPOCH FROM (
+					LEAST(
+						failed_logins.last_fail + cfg.login_max_backoff,
+						failed_logins.last_fail + cfg.login_base_backoff * (POWER(2, failed_logins.fails - 1))
+					) - NOW()
+				)))) END`),
+				'retry_after_seconds',
 			)
 			.from('failed_logins')
 			.from('cfg')
 
 		const result = await qb.getResult(db)
 		if (result.length === 0) {
-			return new Date()
+			return 0
 		}
-		return result[0].next_allowed_login
+		return Number(result[0].retry_after_seconds)
 	}
 }

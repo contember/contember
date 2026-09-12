@@ -34,8 +34,8 @@ const configWith = (limit: number, window = '01:00:00'): Config =>
 	}) as unknown as Config
 
 const COUNT_SQL = `select count(*)::text as count from "tenant"."rate_limit_event"
-	where "scope" = ? and "key_hash" = ? and "occurred_at" >= ?`
-const INSERT_SQL = `insert into "tenant"."rate_limit_event" ("id", "scope", "key_hash", "occurred_at") values (?, ?, ?, ?)`
+	where "scope" = ? and "key_hash" = ? and occurred_at >= NOW() - make_interval(secs => ?)`
+const INSERT_SQL = `insert into "tenant"."rate_limit_event" ("id", "scope", "key_hash") values (?, ?, ?)`
 
 const expectedHash = Buffer.from('sha256:1.2.3.4')
 
@@ -75,7 +75,7 @@ describe('RateLimiter', () => {
 			queries: [
 				{
 					sql: INSERT_SQL,
-					parameters: ['rate-limit-event-id', 'sign_up_per_ip', expectedHash, NOW],
+					parameters: ['rate-limit-event-id', 'sign_up_per_ip', expectedHash],
 					response: { rowCount: 1 },
 				},
 			],
@@ -90,12 +90,12 @@ describe('RateLimiter', () => {
 				{
 					sql: COUNT_SQL,
 					// window of 1h → occurred_at >= NOW - 3600s
-					parameters: ['sign_up_per_ip', expectedHash, new Date('2026-05-20T11:00:00.000Z')],
+					parameters: ['sign_up_per_ip', expectedHash, 3600],
 					response: { rows: [{ count: '2' }] },
 				},
 				{
 					sql: INSERT_SQL,
-					parameters: ['rate-limit-event-id', 'sign_up_per_ip', expectedHash, NOW],
+					parameters: ['rate-limit-event-id', 'sign_up_per_ip', expectedHash],
 					response: { rowCount: 1 },
 				},
 			],
@@ -109,7 +109,7 @@ describe('RateLimiter', () => {
 			queries: [
 				{
 					sql: COUNT_SQL,
-					parameters: ['sign_up_per_ip', expectedHash, new Date('2026-05-20T11:00:00.000Z')],
+					parameters: ['sign_up_per_ip', expectedHash, 3600],
 					response: { rows: [{ count: '3' }] },
 				},
 				// no INSERT — a denied attempt must not extend the window
@@ -124,7 +124,7 @@ describe('RateLimiter', () => {
 			queries: [
 				{
 					sql: COUNT_SQL,
-					parameters: ['sign_up_per_ip', expectedHash, new Date('2026-05-20T11:00:00.000Z')],
+					parameters: ['sign_up_per_ip', expectedHash, 3600],
 					response: { rows: [{ count: '9' }] },
 				},
 			],

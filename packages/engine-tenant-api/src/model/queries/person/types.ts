@@ -15,6 +15,8 @@ export interface PersonRow {
 	readonly disabled_at: Date | null
 	readonly passwordless_enabled: boolean | null
 	readonly mfa_grace_until: Date | null
+	/** `mfa_grace_until > now()` computed on the DB clock — the authoritative grace-window gate. */
+	readonly is_in_grace: boolean
 	readonly email_verified_at: Date | null
 	readonly email_verification_required: boolean
 }

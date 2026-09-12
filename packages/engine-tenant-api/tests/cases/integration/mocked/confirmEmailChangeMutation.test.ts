@@ -26,7 +26,7 @@ test('confirmEmailChange - swaps the email, verifies it and signs out sessions',
 		query: confirmEmailChangeMutation({ token }),
 		executes: [
 			{
-				sql: SQL`SELECT * FROM "tenant"."person_token" WHERE "token_hash" = ? AND "type" = ?`,
+				sql: SQL`SELECT *, "expires_at" <= now() as "is_expired" FROM "tenant"."person_token" WHERE "token_hash" = ? AND "type" = ?`,
 				parameters: [anyString, 'email_change'],
 				response: {
 					rows: [
@@ -36,6 +36,7 @@ test('confirmEmailChange - swaps the email, verifies it and signs out sessions',
 							person_id: personId,
 							created_at: now,
 							expires_at: new Date(now.getTime() + 24 * 60 * 60 * 1000),
+							is_expired: false,
 							used_at: null,
 							otp_hash: null,
 							otp_attempts: 0,
@@ -109,7 +110,7 @@ test('confirmEmailChange - new email taken in the meantime', async () => {
 		query: confirmEmailChangeMutation({ token }),
 		executes: [
 			{
-				sql: SQL`SELECT * FROM "tenant"."person_token" WHERE "token_hash" = ? AND "type" = ?`,
+				sql: SQL`SELECT *, "expires_at" <= now() as "is_expired" FROM "tenant"."person_token" WHERE "token_hash" = ? AND "type" = ?`,
 				parameters: [anyString, 'email_change'],
 				response: {
 					rows: [
@@ -119,6 +120,7 @@ test('confirmEmailChange - new email taken in the meantime', async () => {
 							person_id: personId,
 							created_at: now,
 							expires_at: new Date(now.getTime() + 24 * 60 * 60 * 1000),
+							is_expired: false,
 							used_at: null,
 							otp_hash: null,
 							otp_attempts: 0,

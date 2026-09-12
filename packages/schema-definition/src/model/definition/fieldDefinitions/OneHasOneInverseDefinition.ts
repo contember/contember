@@ -1,16 +1,24 @@
 import { Model } from '@contember/schema'
-import { EntityConstructor } from '../types.js'
+import { EntityConstructor, RelationTarget } from '../types.js'
 import { CreateFieldContext, FieldDefinition } from './FieldDefinition.js'
-import { RelationTarget } from '../types.js'
+import { DEFAULT_FIELD_DEPRECATION_REASON } from '@contember/schema-utils'
 
 export class OneHasOneInverseDefinition extends FieldDefinition<OneHasOneInverseDefinitionOptions> {
 	type = 'OneHasOneInverseDefinition' as const
 
-	notNull() {
+	public notNull() {
 		return this.withOption('nullable', false)
 	}
 
-	createField({ name, conventions, entityRegistry }: CreateFieldContext): Model.AnyField {
+	public deprecated(deprecationReason?: string): OneHasOneInverseDefinition {
+		return this.withOption('deprecationReason', deprecationReason || DEFAULT_FIELD_DEPRECATION_REASON)
+	}
+
+	public description(description: string): OneHasOneInverseDefinition {
+		return this.withOption('description', description)
+	}
+
+	public createField({ name, conventions, entityRegistry }: CreateFieldContext): Model.AnyField {
 		const options = this.options
 		return {
 			name: name,
@@ -18,6 +26,8 @@ export class OneHasOneInverseDefinition extends FieldDefinition<OneHasOneInverse
 			target: entityRegistry.getName(options.target),
 			type: Model.RelationType.OneHasOne,
 			nullable: options.nullable === undefined ? true : options.nullable,
+			...(options.deprecationReason !== undefined ? { deprecationReason: options.deprecationReason } : {}),
+			...(options.description !== undefined ? { description: options.description } : {}),
 		}
 	}
 
@@ -38,4 +48,6 @@ export type OneHasOneInverseDefinitionOptions = {
 	target: RelationTarget
 	ownedBy: string
 	nullable?: boolean
+	deprecationReason?: string
+	description?: string
 }

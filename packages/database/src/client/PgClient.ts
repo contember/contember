@@ -1,7 +1,9 @@
-import { Notification, QueryConfig, QueryResult, QueryResultRow } from 'pg'
+import { Notification, QueryConfig, QueryResult, QueryResultRow, Submittable } from 'pg'
 
 export interface PgClient {
 	connect(): Promise<void>
+
+	query<T extends Submittable>(query: T): T
 
 	query<R extends QueryResultRow = any, I extends any[] = any[]>(
 		queryTextOrConfig: string | QueryConfig<I>,

@@ -73,7 +73,7 @@ export class Mapper<ConnectionType extends Connection.ConnectionLike = Connectio
 		relationPath: Model.AnyRelationContext[],
 		indexBy: string,
 	): Promise<SelectIndexedResultObjects> {
-		const hydrator = new SelectHydrator()
+		const hydrator = new SelectHydrator(this.db.eventManager.memoryBudget)
 		const path = this.pathFactory.create([])
 		const indexByAlias: string = path.for(indexBy).alias
 		const qb: SelectBuilder = SelectBuilder.create()
@@ -87,7 +87,7 @@ export class Mapper<ConnectionType extends Connection.ConnectionLike = Connectio
 		input: ObjectNode<Input.ListQueryInput>,
 		relationPath: Model.AnyRelationContext[],
 	): Promise<SelectResultObject[]> {
-		const hydrator = new SelectHydrator()
+		const hydrator = new SelectHydrator(this.db.eventManager.memoryBudget)
 		const qb: SelectBuilder<SelectBuilder.Result> = SelectBuilder.create()
 
 		const rows = await this.selectRows(hydrator, qb, entity, input, relationPath)
@@ -115,7 +115,7 @@ export class Mapper<ConnectionType extends Connection.ConnectionLike = Connectio
 		relation: Model.JoiningColumnRelation & Model.AnyRelation,
 		relationPath: Model.AnyRelationContext[],
 	): Promise<SelectGroupedObjects> {
-		const hydrator = new SelectHydrator()
+		const hydrator = new SelectHydrator(this.db.eventManager.memoryBudget)
 		const path = this.pathFactory.create([])
 		const groupingKey = '__grouping_key'
 		const qb: SelectBuilder = SelectBuilder.create()

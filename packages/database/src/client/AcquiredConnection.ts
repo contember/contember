@@ -13,7 +13,8 @@ import {
 	UniqueViolationError,
 } from './errors.js'
 import { PgClient } from './PgClient.js'
-import { Notification } from 'pg'
+import { Notification, Query, QueryResult, QueryResultRow } from 'pg'
+import { RequestMemoryBudget, RequestMemoryBudgetExceededError } from './RequestMemoryBudget.js'
 
 export class AcquiredConnection implements Connection.AcquiredConnectionLike {
 	private mutex = new Mutex()
@@ -56,7 +57,10 @@ export class AcquiredConnection implements Connection.AcquiredConnectionLike {
 				let result: Connection.Result<Row>
 				const startHrTime = process.hrtime.bigint()
 
-				result = await this.pgClient.query(prepareSql(sql), parameters)
+				const memoryBudget = this.eventManager.memoryBudget
+				result = memoryBudget
+					? await this.queryWithMemoryBudget<Row>(prepareSql(sql), parameters, memoryBudget)
+					: await this.pgClient.query(prepareSql(sql), parameters)
 
 				const endHrTime = process.hrtime.bigint()
 				const durationUs = Math.floor(Number(endHrTime - startHrTime) / 1000)
@@ -76,6 +80,9 @@ export class AcquiredConnection implements Connection.AcquiredConnectionLike {
 					throw error
 				}
 				this.eventManager.fire(EventManager.Event.queryError, { sql, parameters, meta }, error)
+				if (error instanceof RequestMemoryBudgetExceededError) {
+					throw error
+				}
 
 				switch ((error as any).code) {
 					case ClientErrorCodes.NOT_NULL_VIOLATION:
@@ -94,6 +101,68 @@ export class AcquiredConnection implements Connection.AcquiredConnectionLike {
 					default:
 						throw new QueryError(sql, parameters, error)
 				}
+			}
+		})
+	}
+
+	private async queryWithMemoryBudget<Row extends QueryResultRow>(
+		sql: string,
+		parameters: unknown[],
+		budget: RequestMemoryBudget,
+	): Promise<Connection.Result<Row>> {
+		budget.check()
+		return await new Promise<Connection.Result<Row>>((resolve, reject) => {
+			let rows: Row[] | undefined
+			let failure: Error | undefined
+			const cleanup = () => budget.signal.removeEventListener('abort', abort)
+			const stop = (error: Error) => {
+				failure = error
+				if (rows) {
+					rows.length = 0
+				}
+				cleanup()
+				// A budget failure invalidates this connection; the enclosing pool scope disposes it.
+				void this.pgClient.end().catch(reject)
+				reject(error)
+			}
+			const abort = () => stop(new RequestMemoryBudgetExceededError())
+			const config = {
+				text: sql,
+				values: parameters,
+				callback: (error: Error | null, result?: QueryResult<Row>) => {
+					cleanup()
+					if (failure || error) {
+						reject(failure || error)
+					} else if (result) {
+						resolve(result)
+					} else {
+						reject(new Error('PostgreSQL query completed without a result'))
+					}
+				},
+			}
+			const query = new Query<Row>(config)
+			budget.signal.addEventListener('abort', abort, { once: true })
+			query.on('row', (row, result) => {
+				rows = result?.rows
+				if (failure) {
+					if (rows) {
+						rows.length = 0
+					}
+					return
+				}
+				try {
+					budget.addDatabaseRow(row)
+				} catch (error) {
+					if (!failure) {
+						stop(error instanceof Error ? error : new Error('Failed to account for database row', { cause: error }))
+					}
+				}
+			})
+			try {
+				this.pgClient.query(query)
+			} catch (error) {
+				cleanup()
+				reject(error)
 			}
 		})
 	}

@@ -2,6 +2,7 @@ import { Path } from './Path.js'
 import { Value } from '@contember/schema'
 import { getFulfilledValues, getRejections } from '../../utils/index.js'
 import { logger } from '@contember/logger'
+import { RequestMemoryBudget } from '@contember/database'
 
 type DataPromises = {
 	path: Path
@@ -27,6 +28,8 @@ type Column = {
 export class SelectHydrator {
 	private columns: Column[] = []
 	private promises: DataPromises[] = []
+
+	constructor(private readonly memoryBudget?: RequestMemoryBudget) {}
 
 	public addColumn(path: Path, getValue: ColumnValueGetter) {
 		this.columns.push({ path, getValue })
@@ -77,13 +80,15 @@ export class SelectHydrator {
 	}
 
 	private hydrateRow(row: SelectRow, resolvedData: ResolvedData[]): SelectResultObject {
+		this.memoryBudget?.addHydrationBytes(40)
 		const result: SelectResultObject = {}
 
 		for (let columnPath of this.columns) {
 			const path = [...columnPath.path.path]
 			const last: string = path.pop() as string
-			const currentObject = path.reduce<any>((obj, part) => (obj[part] = obj[part] || {}), result)
+			const currentObject = path.reduce<any>((obj, part) => (obj[part] = obj[part] || this.createNestedObject()), result)
 
+			this.memoryBudget?.addHydrationBytes(16)
 			currentObject[last] = this.formatValue(columnPath.getValue(row))
 		}
 
@@ -93,6 +98,7 @@ export class SelectHydrator {
 			const currentObject = pathTmp.reduce<any>((obj, part) => (obj?.[part]) || undefined, result)
 			const parentValue = getParentValue(row)
 			if (currentObject) {
+				this.memoryBudget?.addHydrationBytes(16)
 				currentObject[last] = (parentValue ? data[parentValue] : undefined) || defaultValue
 			}
 		}
@@ -120,9 +126,15 @@ export class SelectHydrator {
 
 	private formatValue(value: any) {
 		if (value instanceof Date) {
+			this.memoryBudget?.addHydrationBytes(72)
 			return value.toISOString()
 		}
 		return value
+	}
+
+	private createNestedObject() {
+		this.memoryBudget?.addHydrationBytes(48)
+		return {}
 	}
 }
 

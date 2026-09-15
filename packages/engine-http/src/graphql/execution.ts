@@ -16,6 +16,7 @@ import { Request, Response } from 'koa'
 import { logger } from '@contember/logger'
 import { ForbiddenError } from '@contember/graphql-utils'
 import { UserError } from '@contember/engine-content-api'
+import { RequestMemoryBudget, RequestMemoryBudgetExceededError } from '@contember/database'
 
 export interface GraphQLListener<Context> {
 	onStart?: (ctx: {}) => Omit<GraphQLListener<Context>, 'onStart'> | void
@@ -36,10 +37,11 @@ export interface GraphQLListener<Context> {
 interface FactoryArgs<Context> {
 	schema: GraphQLSchema
 	listeners: GraphQLListener<Context>[]
+	getMemoryBudget?: (context: Context) => RequestMemoryBudget | undefined
 }
 
 export type GraphQLQueryHandler<Context> = (
-	args: { request: Request; response: Response; createContext: ({}: { operation: OperationTypeNode }) => Context },
+	args: { request: Request; response: Response; createContext: ({}: { operation: OperationTypeNode; queryHash: string }) => Context },
 ) => any
 
 const hitCacheMaxAgeSeconds = 10 * 60
@@ -51,6 +53,7 @@ const hitCacheMax = documentCacheMax * 2
 export const createGraphQLQueryHandler = <Context>({
 	schema,
 	listeners,
+	getMemoryBudget,
 }: FactoryArgs<Context>): GraphQLQueryHandler<Context> => {
 	let schemaValidated = false
 	const hitCache = new LRUCache<string, true>({
@@ -117,7 +120,7 @@ export const createGraphQLQueryHandler = <Context>({
 			const operationName = resolvedRequest.operationName ?? null
 			const operation = resolveOperationType(document, operationName)
 
-			const context = createContext({ operation })
+			const context = createContext({ operation, queryHash })
 			listenersQueue.forEach(it => {
 				it.onExecute && listenersQueue.push(it.onExecute({ context, document, operation }) || {})
 			})
@@ -128,6 +131,7 @@ export const createGraphQLQueryHandler = <Context>({
 				variableValues: resolvedRequest.variables,
 				contextValue: context,
 			})
+			getMemoryBudget?.(context)?.prepareResponse(response.data)
 			listenersQueue.forEach(it => {
 				it.onResponse && listenersQueue.push(it.onResponse({ context, response }) || {})
 			})
@@ -138,6 +142,9 @@ export const createGraphQLQueryHandler = <Context>({
 				respond(200, response)
 			}
 		} catch (e) {
+			if (e instanceof RequestMemoryBudgetExceededError) {
+				return respond(503, { errors: [{ message: e.message, extensions: { code: 'RESOURCE_EXHAUSTED' } }] })
+			}
 			if (e instanceof GraphQLError) {
 				return respond(e instanceof ForbiddenError ? 403 : 400, { errors: [e] })
 			}

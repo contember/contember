@@ -108,6 +108,19 @@ export const tenantConfigSchema = Typesafe.intersection(
 export const serverConfigSchema = Typesafe.partial({
 	port: Typesafe.number,
 	http: Typesafe.partial({
+		requestMemoryBudget: Typesafe.transform(
+			Typesafe.object({ warnBytes: Typesafe.number, maxBytes: Typesafe.number }),
+			options => {
+				if (
+					!Number.isSafeInteger(options.warnBytes) || options.warnBytes <= 0
+					|| !Number.isSafeInteger(options.maxBytes) || options.maxBytes <= 0
+					|| options.warnBytes > options.maxBytes
+				) {
+					return Typesafe.fail([])
+				}
+				return options
+			},
+		),
 		requestBodySize: Typesafe.string,
 		// Allows clients to opt in (via the X-Contember-Force-Ok request header) to receiving HTTP 200
 		// for GraphQL API responses, keeping error info in the JSON body. Defaults to enabled; set to

@@ -1,6 +1,6 @@
 import { createAclVariables, ExecutionContainerFactory } from '@contember/engine-content-api'
 import { StageBySlugQuery } from '@contember/engine-system-api'
-import { Client } from '@contember/database'
+import { Client, RequestMemoryBudget, RequestMemoryBudgetOptions } from '@contember/database'
 import { GraphQLSchema } from 'graphql'
 import { HttpController } from '../application/index.js'
 import { HttpErrorResponse, HttpResponse } from '../common/index.js'
@@ -25,6 +25,7 @@ export class ContentApiControllerFactory {
 		private readonly graphQlSchemaFactory: GraphQlSchemaFactory,
 		private readonly testTransactionService: TestTransactionService,
 		private readonly forcePrimaryHeaderEnabled: boolean,
+		private readonly memoryBudgetOptions?: RequestMemoryBudgetOptions,
 	) {
 	}
 
@@ -138,7 +139,7 @@ export class ContentApiControllerFactory {
 					handler({
 						request: koa.request,
 						response: koa.response,
-						createContext: ({ operation }) => {
+						createContext: ({ operation, queryHash }) => {
 							// Clients open a primary read window only on this marker, so it must not be sent while the header is ignored.
 							if (operation === 'mutation' && markMutations) {
 								koa.response.set('X-Contember-Mutation', '1')
@@ -156,7 +157,23 @@ export class ContentApiControllerFactory {
 							const connection = maxConnectionsPerRequest !== undefined
 								? baseConnection.withMaxConnections(maxConnectionsPerRequest)
 								: baseConnection
-							const contentDatabase = testContentDatabase ?? connection.createClient(stage.schema, { module: 'content' })
+							const memoryBudget = this.memoryBudgetOptions
+								? new RequestMemoryBudget(this.memoryBudgetOptions)
+								: undefined
+							const baseDatabase = testContentDatabase ?? connection.createClient(stage.schema, { module: 'content' })
+							const contentDatabase = memoryBudget ? baseDatabase.withMemoryBudget(memoryBudget) : baseDatabase
+							if (memoryBudget) {
+								const logMemory = () => {
+									koa.res.off('finish', logMemory)
+									koa.res.off('close', logMemory)
+									const memory = memoryBudget.snapshot()
+									if (memory.warningThresholdExceeded) {
+										logger.warn('Content request memory usage', { operation, queryHash, ...memory })
+									}
+								}
+								koa.res.once('finish', logMemory)
+								koa.res.once('close', logMemory)
+							}
 
 							const identityVariables = createAclVariables(schema.acl, memberships)
 							let identityId = authResult.identityId

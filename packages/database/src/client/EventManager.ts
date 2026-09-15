@@ -1,4 +1,5 @@
 import { Connection } from './Connection.js'
+import { RequestMemoryBudget } from './RequestMemoryBudget.js'
 
 class EventManager {
 	private readonly listeners = {
@@ -9,6 +10,7 @@ class EventManager {
 
 	constructor(
 		public readonly parent: EventManager | null = null,
+		public readonly memoryBudget: RequestMemoryBudget | undefined = parent?.memoryBudget,
 	) {}
 
 	on<Event extends keyof EventManager.ListenerTypes>(event: Event, cb: EventManager.ListenerTypes[Event]): void {

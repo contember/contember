@@ -4,6 +4,7 @@ import { Connection } from './Connection.js'
 import { EventManager } from './EventManager.js'
 import { QueryHandler } from '@contember/queryable'
 import { withDatabaseAdvisoryLock, wrapIdentifier } from '../utils/index.js'
+import { RequestMemoryBudget } from './RequestMemoryBudget.js'
 
 class Client<ConnectionType extends Connection.ConnectionLike = Connection.ConnectionLike> implements Connection.Queryable {
 	constructor(
@@ -15,8 +16,12 @@ class Client<ConnectionType extends Connection.ConnectionLike = Connection.Conne
 	}
 
 	public forSchema(schema: string): Client<ConnectionType> {
-		const eventManager = new EventManager(this.eventManager.parent)
+		const eventManager = new EventManager(this.eventManager.parent, this.eventManager.memoryBudget)
 		return new Client<ConnectionType>(this.connection, schema, this.queryMeta, eventManager)
+	}
+
+	public withMemoryBudget(memoryBudget: RequestMemoryBudget): Client<ConnectionType> {
+		return new Client(this.connection, this.schema, this.queryMeta, new EventManager(this.eventManager, memoryBudget))
 	}
 
 	async scope<T>(callback: (wrapper: Client<ConnectionType & Connection.AcquiredConnectionLike>) => Promise<T> | T): Promise<T> {
@@ -74,6 +79,7 @@ class Client<ConnectionType extends Connection.ConnectionLike = Connection.Conne
 		parameters: readonly any[] = [],
 		meta: Record<string, any> = {},
 	): Promise<Connection.Result<Row>> {
+		this.eventManager.memoryBudget?.check()
 		return this.connection.scope(
 			connection => connection.query(sql, parameters, { ...this.queryMeta, ...meta }),
 			{ eventManager: this.eventManager },

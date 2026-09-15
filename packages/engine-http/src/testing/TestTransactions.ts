@@ -56,7 +56,7 @@ interface TestSession {
  * Implemented on top of the callback-scoped `connection.transaction()` API by holding the
  * callback at an internal gate until rollback is requested.
  */
-const openParkedTransaction = (connection: Connection): Promise<ParkedTransaction> => {
+const openParkedTransaction = (connection: Connection, onEnd: () => void): Promise<ParkedTransaction> => {
 	return new Promise<ParkedTransaction>((resolveHandle, rejectHandle) => {
 		let releaseGate: () => void = () => {}
 		const gate = new Promise<void>(resolve => {
@@ -64,16 +64,24 @@ const openParkedTransaction = (connection: Connection): Promise<ParkedTransactio
 		})
 
 		const done = connection.transaction(async transaction => {
-			resolveHandle({
-				transaction,
-				rollback: async () => {
-					releaseGate()
-					await done
-				},
+			const removeEndListener = transaction.on('end', () => {
+				releaseGate()
+				onEnd()
 			})
-			await gate
-			if (!transaction.isClosed) {
-				await transaction.rollback()
+			try {
+				resolveHandle({
+					transaction,
+					rollback: async () => {
+						releaseGate()
+						await done
+					},
+				})
+				await gate
+				if (!transaction.isClosed) {
+					await transaction.rollback()
+				}
+			} finally {
+				removeEndListener()
 			}
 		})
 
@@ -228,7 +236,9 @@ export class TestTransactionService {
 		session.lastActiveAt = Date.now()
 		let parked = session.transactions.get(projectSlug)
 		if (!parked) {
-			parked = openParkedTransaction(writeConnection)
+			parked = openParkedTransaction(writeConnection, () => {
+				void this.rollback(token)
+			})
 			session.transactions.set(projectSlug, parked)
 		}
 		const transaction = new IsolationFilteringTransaction((await parked).transaction)

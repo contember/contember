@@ -1,8 +1,10 @@
-import { memo, useCallback, useMemo, useState } from 'react'
+import { memo, useCallback, useMemo, useRef, useState } from 'react'
+import { PrimaryReadWindow } from '@contember/graphql-client'
 import {
 	ApiBaseUrlContext,
 	GraphQlClientFactoryContext,
 	LoginTokenContext,
+	PrimaryReadWindowsContext,
 	ProjectSlugContext,
 	SessionTokenContext,
 	SetSessionTokenContext,
@@ -17,6 +19,8 @@ export interface ContemberClientProps {
 	project?: string
 	stage?: string
 	graphqlClientFactory?: GraphQlClientFactory
+	/** Read from the primary for this many milliseconds after a Content API mutation. Default: 1000. Zero disables it. */
+	primaryReadWindowMs?: number
 }
 
 const sessionTokenKey = 'contember_session_token'
@@ -32,6 +36,7 @@ export const ContemberClient = memo<ContemberClientProps & { children: React.Rea
 	sessionToken,
 	stage,
 	graphqlClientFactory,
+	primaryReadWindowMs = 1000,
 }) {
 	const [localStorageSessionToken, setLocalStorageSessionToken] = useLocalStorageSessionToken()
 
@@ -41,6 +46,28 @@ export const ContemberClient = memo<ContemberClientProps & { children: React.Rea
 		source: localStorageSessionToken ? 'localstorage' : (sessionToken ? 'props' : undefined),
 	}), [localStorageSessionToken, sessionToken])
 
+	const windowsRef = useRef<
+		{
+			token: string | undefined
+			apiBaseUrl: string
+			durationMs: number
+			windows: Map<string, PrimaryReadWindow>
+		} | null
+	>(null)
+	if (
+		windowsRef.current === null
+		|| windowsRef.current.token !== sessionTokenContextValue.token
+		|| windowsRef.current.apiBaseUrl !== apiBaseUrl
+		|| windowsRef.current.durationMs !== primaryReadWindowMs
+	) {
+		windowsRef.current = {
+			token: sessionTokenContextValue.token,
+			apiBaseUrl,
+			durationMs: primaryReadWindowMs,
+			windows: new Map(),
+		}
+	}
+
 	return (
 		<ApiBaseUrlContext.Provider value={apiBaseUrl}>
 			<LoginTokenContext.Provider value={loginToken}>
@@ -49,7 +76,9 @@ export const ContemberClient = memo<ContemberClientProps & { children: React.Rea
 						<ProjectSlugContext.Provider value={project}>
 							<StageSlugContext.Provider value={stage}>
 								<GraphQlClientFactoryContext.Provider value={graphqlClientFactory}>
-									{children}
+									<PrimaryReadWindowsContext.Provider value={windowsRef.current}>
+										{children}
+									</PrimaryReadWindowsContext.Provider>
 								</GraphQlClientFactoryContext.Provider>
 							</StageSlugContext.Provider>
 						</ProjectSlugContext.Provider>

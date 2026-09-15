@@ -13,6 +13,7 @@ import { TestTransactionService } from '../testing/index.js'
 
 const debugHeader = 'x-contember-debug'
 const testSessionHeader = 'x-contember-test-session'
+const forcePrimaryHeader = 'x-contember-force-primary'
 
 export class ContentApiControllerFactory {
 	constructor(
@@ -38,7 +39,8 @@ export class ContentApiControllerFactory {
 				project: project.slug,
 			})
 
-			const systemDatabase = projectContainer.systemReadDatabaseContext
+			const forcePrimary = koa.request.get(forcePrimaryHeader) === '1'
+			const systemDatabase = forcePrimary ? projectContainer.systemDatabaseContext : projectContainer.systemReadDatabaseContext
 			const stage = await systemDatabase.queryHandler.fetch(new StageBySlugQuery(params.stageSlug))
 			if (!stage) {
 				return new HttpErrorResponse(404, `Stage ${params.stageSlug} NOT found`)
@@ -133,11 +135,14 @@ export class ContentApiControllerFactory {
 						request: koa.request,
 						response: koa.response,
 						createContext: ({ operation }) => {
+							if (operation === 'mutation') {
+								koa.response.set('X-Contember-Mutation', '1')
+							}
 							;(koa.state as GraphQLKoaState).graphql = {
 								operationName: operation,
 							}
 
-							const baseConnection = operation === 'query' ? projectContainer.readConnection : projectContainer.connection
+							const baseConnection = operation === 'query' && !forcePrimary ? projectContainer.readConnection : projectContainer.connection
 							const maxConnectionsPerRequest = 'maxConnectionsPerRequest' in project.db
 								? project.db.maxConnectionsPerRequest
 								: undefined

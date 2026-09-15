@@ -8,6 +8,7 @@ import { Context } from 'react';
 import { GraphQlClient } from '@contember/graphql-client';
 import { GraphQlClientOptions } from '@contember/graphql-client';
 import { NamedExoticComponent } from 'react';
+import { PrimaryReadWindow } from '@contember/graphql-client';
 
 // @public (undocumented)
 export const ApiBaseUrlContext: Context<string>;
@@ -29,6 +30,7 @@ export interface ContemberClientProps {
     graphqlClientFactory?: GraphQlClientFactory;
     // (undocumented)
     loginToken?: string;
+    primaryReadWindowMs?: number;
     // (undocumented)
     project?: string;
     // (undocumented)
@@ -45,6 +47,12 @@ export const GraphQlClientFactoryContext: Context<GraphQlClientFactory | undefin
 
 // @public (undocumented)
 export const LoginTokenContext: Context<string | undefined>;
+
+// @public (undocumented)
+export const PrimaryReadWindowsContext: Context<    {
+durationMs: number;
+windows: Map<string, PrimaryReadWindow>;
+} | undefined>;
 
 // @public (undocumented)
 export const ProjectSlugContext: Context<string | undefined>;
@@ -87,13 +95,21 @@ export const useCurrentContentGraphQlClient: () => GraphQlClient;
 export const useCurrentSystemGraphQlClient: () => GraphQlClient;
 
 // @public (undocumented)
-export const useGraphQlClient: (path: string) => GraphQlClient;
+export const useGraphQlClient: (path: string, options?: {
+    primaryReadWindow?: boolean;
+}) => GraphQlClient;
 
 // @public (undocumented)
 export const useGraphQlClientFactory: () => GraphQlClientFactory | undefined;
 
 // @public (undocumented)
 export const useLoginToken: () => string | undefined;
+
+// @public (undocumented)
+export const usePrimaryReadWindows: () => {
+    durationMs: number;
+    windows: Map<string, PrimaryReadWindow>;
+} | undefined;
 
 // @public (undocumented)
 export const useProjectSlug: () => string | undefined;

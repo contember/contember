@@ -1,5 +1,6 @@
 import { GraphQlClientError, GraphQlErrorType } from './GraphQlClientError.js'
-import { GraphQlClientOptions, GraphQlClientRequestOptions } from './GraphQlClientRequestOptions.js'
+import { GraphQlClientBaseOptions, GraphQlClientOptions, GraphQlClientRequestOptions } from './GraphQlClientRequestOptions.js'
+import { PrimaryReadWindow } from './PrimaryReadWindow.js'
 
 export class GraphQlClient {
 	constructor(
@@ -41,6 +42,8 @@ ${query}`
 
 		try {
 			response = await this.doExecute(query, options)
+			// A later mutation field can fail after an earlier one committed; capture before checking the body or calling user hooks.
+			this.resolvePrimaryReadWindow(options)?.captureResponse(response)
 			this.options?.onResponse?.(response)
 			options?.onResponse?.(response)
 
@@ -86,12 +89,16 @@ ${query}`
 
 	protected async doExecute(
 		query: string,
-		{ apiToken, signal, variables, headers }: GraphQlClientRequestOptions = {},
+		options: GraphQlClientRequestOptions = {},
 	): Promise<Response> {
+		const { apiToken, signal, variables, headers } = options
 		const resolvedHeaders: Record<string, string> = {
 			'Content-Type': 'application/json',
 			...this.options.headers,
 			...headers,
+		}
+		if (!Object.keys(resolvedHeaders).some(name => name.toLowerCase() === 'x-contember-force-primary')) {
+			Object.assign(resolvedHeaders, this.resolvePrimaryReadWindow(options)?.requestHeaders())
 		}
 		const resolvedToken = apiToken ?? this.options.apiToken
 
@@ -105,6 +112,10 @@ ${query}`
 			signal,
 			body: JSON.stringify({ query, variables }),
 		})
+	}
+
+	private resolvePrimaryReadWindow(options: GraphQlClientBaseOptions): PrimaryReadWindow | undefined {
+		return (options.primaryReadWindow ?? this.options.primaryReadWindow) || undefined
 	}
 }
 

@@ -73,6 +73,60 @@ databaseTest('row observation preserves pg query timeouts and row accumulation',
 	}
 })
 
+databaseTest('hydration budget exhaustion rolls back a transaction without closing its enclosing scope', async () => {
+	const connection = createConnection()
+	try {
+		await connection.createClient('public', {}).scope(async base => {
+			await base.query('CREATE TEMP TABLE memory_budget_hydration (value integer)')
+			const budget = new RequestMemoryBudget({ warnBytes: 512, maxBytes: 1024 })
+			await expect(
+				base.withMemoryBudget(budget).transaction(async transaction => {
+					await transaction.query('INSERT INTO memory_budget_hydration VALUES (42)')
+					budget.addHydrationBytes(1024)
+				}),
+			).rejects.toBeInstanceOf(RequestMemoryBudgetExceededError)
+			expect((await base.query('SELECT * FROM memory_budget_hydration')).rows).toEqual([])
+		})
+	} finally {
+		await connection.end()
+	}
+})
+
+databaseTest('budgets stay request-local and cannot cancel a connection reused by another request', async () => {
+	const connection = createConnection()
+	try {
+		const base = connection.createClient('public', {})
+		const failedBudget = new RequestMemoryBudget({ warnBytes: 512, maxBytes: 1024 })
+		const healthyBudget = new RequestMemoryBudget({ warnBytes: 512, maxBytes: 32768 })
+		const [, healthyPid] = await Promise.all([
+			expect(base.withMemoryBudget(failedBudget).query("SELECT repeat('x', 2048)"))
+				.rejects.toBeInstanceOf(RequestMemoryBudgetExceededError),
+			base.withMemoryBudget(healthyBudget).scope(async scoped => {
+				expect(scoped.eventManager.memoryBudget).toBe(healthyBudget)
+				expect(scoped.forSchema('public').eventManager.memoryBudget).toBe(healthyBudget)
+				await scoped.transaction(async transaction => {
+					expect(transaction.eventManager.memoryBudget).toBe(healthyBudget)
+					await transaction.transaction(async savepoint => {
+						expect(savepoint.eventManager.memoryBudget).toBe(healthyBudget)
+						expect((await savepoint.query('SELECT 42 AS value')).rows).toEqual([{ value: 42 }])
+					})
+				})
+				return (await scoped.query<{ pid: number }>('SELECT pg_backend_pid() AS pid')).rows[0].pid
+			}),
+		])
+		expect(healthyBudget.signal.aborted).toBe(false)
+		expect(base.eventManager.memoryBudget).toBeUndefined()
+		expect(connection.eventManager.memoryBudget).toBeUndefined()
+		await base.scope(async reused => {
+			expect((await reused.query('SELECT pg_backend_pid() AS pid')).rows).toEqual([{ pid: healthyPid }])
+			expect(() => healthyBudget.addHydrationBytes(32768)).toThrow(RequestMemoryBudgetExceededError)
+			expect((await reused.query('SELECT 42 AS value')).rows).toEqual([{ value: 42 }])
+		})
+	} finally {
+		await connection.end()
+	}
+})
+
 databaseTest.each([false, true])('reads exceeding the budget roll back writes without retrying (savepoint: %s)', async savepoint => {
 	const connection = createConnection()
 	const base = connection.createClient('public', {})

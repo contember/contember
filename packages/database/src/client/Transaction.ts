@@ -3,6 +3,7 @@ import { EventManager } from './EventManager.js'
 import { wrapIdentifier } from '../utils/index.js'
 import { Notification } from 'pg'
 import { CannotCommitError, DatabaseError } from './errors.js'
+import { RequestMemoryBudgetExceededError } from './RequestMemoryBudget.js'
 
 export class Transaction implements Connection.TransactionLike {
 	public get isClosed(): boolean {
@@ -55,7 +56,7 @@ export class Transaction implements Connection.TransactionLike {
 	}
 
 	async rollback(): Promise<void> {
-		await this.close('ROLLBACK')
+		await this.close('ROLLBACK', new EventManager(this.eventManager, null))
 	}
 
 	async commit(): Promise<void> {
@@ -65,8 +66,8 @@ export class Transaction implements Connection.TransactionLike {
 		}
 	}
 
-	private async close(command: string) {
-		const result = await this.query(command)
+	private async close(command: string, eventManager = this.eventManager) {
+		const result = await this.scope(connection => connection.query(command), { eventManager })
 		this.state.close()
 		return result
 	}
@@ -124,15 +125,15 @@ class SavePoint implements Connection.TransactionLike {
 	}
 
 	async rollback(): Promise<void> {
-		await this.close(`ROLLBACK TO SAVEPOINT ${wrapIdentifier(this.savepointName)}`)
+		await this.close(`ROLLBACK TO SAVEPOINT ${wrapIdentifier(this.savepointName)}`, new EventManager(this.eventManager, null))
 	}
 
 	async commit(): Promise<void> {
 		await this.close(`RELEASE SAVEPOINT ${wrapIdentifier(this.savepointName)}`)
 	}
 
-	private async close(sql: string) {
-		await this.query(sql)
+	private async close(sql: string, eventManager = this.eventManager) {
+		await this.scope(connection => connection.query(sql), { eventManager })
 		this.state.close()
 	}
 }
@@ -176,7 +177,14 @@ export const executeTransaction = async <Result>(
 		return result
 	} catch (e) {
 		if (!transaction.isClosed) {
-			await transaction.rollback()
+			try {
+				await transaction.rollback()
+			} catch (rollbackError) {
+				// Budget cancellation may have already closed the physical connection.
+				if (!(e instanceof RequestMemoryBudgetExceededError)) {
+					throw rollbackError
+				}
+			}
 		}
 		throw e
 	}

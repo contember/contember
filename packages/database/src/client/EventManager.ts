@@ -2,6 +2,8 @@ import { Connection } from './Connection.js'
 import { RequestMemoryBudget } from './RequestMemoryBudget.js'
 
 class EventManager {
+	public readonly memoryBudget: RequestMemoryBudget | undefined
+
 	private readonly listeners = {
 		[EventManager.Event.queryStart]: [] as EventManager.QueryStartCallback[],
 		[EventManager.Event.queryEnd]: [] as EventManager.QueryEndCallback[],
@@ -10,8 +12,10 @@ class EventManager {
 
 	constructor(
 		public readonly parent: EventManager | null = null,
-		public readonly memoryBudget: RequestMemoryBudget | undefined = parent?.memoryBudget,
-	) {}
+		memoryBudget: RequestMemoryBudget | null | undefined = parent?.memoryBudget,
+	) {
+		this.memoryBudget = memoryBudget ?? undefined
+	}
 
 	on<Event extends keyof EventManager.ListenerTypes>(event: Event, cb: EventManager.ListenerTypes[Event]): void {
 		;(this.listeners[event] as EventManager.ListenerTypes[Event][]).push(cb)

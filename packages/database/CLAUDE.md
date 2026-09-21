@@ -36,7 +36,8 @@ This is invisible to a mapper unit test; cover a new raw jsonb write with an e2e
 `client.withMemoryBudget(budget)` attaches a `RequestMemoryBudget` to the client's `EventManager`, because that is the only object every `scope`/`transaction`/savepoint already propagates. `AcquiredConnection.query` reads it from there and accounts rows as they arrive.
 
 - An `EventManager` inherits its parent's budget by default. Passing `null` explicitly **detaches** it — `rollback()` does this so cleanup still runs after the budget is exhausted. Listeners keep firing through the parent chain either way.
-- Exhaustion ends the physical connection of every in-flight query of that request. The enclosing `Connection.scope` disposes it because the scope throws; swallowing `RequestMemoryBudgetExceededError` inside a scope would release a dead connection to the pool.
+- Exhaustion ends the physical connection of every in-flight query of that request and marks it terminated. `AcquiredConnection.query` then refuses further queries with `TerminatedConnectionError` **before** firing any event, and `executeTransaction` swallows exactly that error from its rollback (PostgreSQL already rolled back). Any other rollback failure still propagates. The enclosing `Connection.scope` disposes the connection because the scope throws; swallowing `RequestMemoryBudgetExceededError` inside a scope would release a dead connection to the pool.
+- The Content API attaches the budget only to `Mapper.selectionDb` (selection fetches), never to the request client — internal mutation queries are garbage right after use and must not be charged. See `packages/engine-content-api/CLAUDE.md`.
 - The live-DB tests in `tests/cases/integration/` skip without `MEMORY_TEST_DATABASE_URL`; CI runs them in the `test-db` job.
 
 ## Pool Configuration

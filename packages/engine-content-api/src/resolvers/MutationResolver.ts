@@ -17,7 +17,7 @@ import { ValidationResolver } from './ValidationResolver.js'
 import { GraphQLResolveInfo } from 'graphql'
 import { GraphQlQueryAstFactory } from './GraphQlQueryAstFactory.js'
 import { ImplementationException } from '../exception.js'
-import { DatabaseMetadata, retryTransaction } from '@contember/database'
+import { DatabaseMetadata, RequestMemoryBudgetExceededError, retryTransaction } from '@contember/database'
 import { Operation, readOperationMeta } from '../schema/index.js'
 import { assertNever } from '../utils/index.js'
 import { InputPreValidator } from '../input-validation/index.js'
@@ -26,6 +26,13 @@ import { executeReadOperations } from './ReadHelpers.js'
 import { logger } from '@contember/logger'
 
 type WithoutNode<T extends { node: any }> = Pick<T, Exclude<keyof T, 'node'>>
+
+type MemoryBudgetFailure = {
+	ok: false
+	validation: Result.ValidationResult
+	errors: Result.ExecutionError[]
+	errorMessage: string
+}
 
 type TransactionOptions = {
 	deferForeignKeyConstraints?: boolean
@@ -466,43 +473,52 @@ export class MutationResolver {
 
 	private async transaction<R extends { ok: boolean }>(
 		cb: (mapper: Mapper) => Promise<R>,
-	): Promise<R> {
-		return await retryTransaction(
-			async () => {
-				return await this.mapperFactory.transaction(async mapper => {
-					logger.debug('MutationResolver: Starting mutation transaction')
-					const result = await cb(mapper)
-					if (!result.ok) {
-						logger.debug('MutationResolver: Transaction failed, rolling back', { result })
-						await mapper.db.connection.rollback()
-					} else {
-						try {
-							await mapper.eventManager.fire(new BeforeCommitEvent())
-							logger.debug('MutationResolver: Transaction ok, committing')
-							await mapper.db.connection.commit()
-							await mapper.eventManager.fire(new AfterCommitEvent())
-						} catch (e) {
+	): Promise<R | MemoryBudgetFailure> {
+		try {
+			return await retryTransaction(
+				async () => {
+					return await this.mapperFactory.transaction(async mapper => {
+						logger.debug('MutationResolver: Starting mutation transaction')
+						const result = await cb(mapper)
+						if (!result.ok) {
+							logger.debug('MutationResolver: Transaction failed, rolling back', { result })
+							await mapper.db.connection.rollback()
+						} else {
 							try {
-								await mapper.db.connection.rollback()
-							} catch {}
-							const err = convertError(this.schema, this.schemaDatabaseMetadata, e)
-							const errorResponse = this.createErrorResponse([err])
-							if (!errorResponse) {
-								throw new ImplementationException()
+								await mapper.eventManager.fire(new BeforeCommitEvent())
+								logger.debug('MutationResolver: Transaction ok, committing')
+								await mapper.db.connection.commit()
+								await mapper.eventManager.fire(new AfterCommitEvent())
+							} catch (e) {
+								try {
+									await mapper.db.connection.rollback()
+								} catch {}
+								const err = convertError(this.schema, this.schemaDatabaseMetadata, e)
+								const errorResponse = this.createErrorResponse([err])
+								if (!errorResponse) {
+									throw new ImplementationException()
+								}
+								return { ...result, ...errorResponse }
 							}
-							return { ...result, ...errorResponse }
 						}
-					}
-					return result
-				})
-			},
-			message => logger.warn(message),
-			{
-				maxAttempts: 15,
-				minTimeout: 10,
-				maxTimeout: 1000,
-			},
-		)
+						return result
+					})
+				},
+				message => logger.warn(message),
+				{
+					maxAttempts: 15,
+					minTimeout: 10,
+					maxTimeout: 1000,
+				},
+			)
+		} catch (e) {
+			if (!(e instanceof RequestMemoryBudgetExceededError)) {
+				throw e
+			}
+			// Already rolled back. Reported in data like any failed mutation, so results of sibling mutations survive.
+			const errors = [{ path: [], paths: [], type: Result.ExecutionErrorType.ResourceExhausted, message: e.message }]
+			return { ok: false, validation: { valid: true, errors: [] }, errors, errorMessage: e.message }
+		}
 	}
 
 	private createErrorResponse(result: MutationResultList) {

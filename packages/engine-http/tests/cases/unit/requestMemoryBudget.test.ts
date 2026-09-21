@@ -2,13 +2,14 @@ import { expect, test } from 'bun:test'
 import { fetch } from 'bun'
 import { once } from 'node:events'
 import Koa from 'koa'
-import { GraphQLObjectType, GraphQLSchema, GraphQLString } from 'graphql'
+import { GraphQLNonNull, GraphQLObjectType, GraphQLSchema, GraphQLString } from 'graphql'
 import { RequestMemoryBudget } from '@contember/database'
 import { createLogger, TestLoggerHandler, withLogger } from '@contember/logger'
 import { createGraphQLQueryHandler } from '../../../src/graphql/execution.js'
 import { serverConfigSchema } from '../../../src/config/configSchema.js'
+import { readConfig } from '../../../src/config/config.js'
 
-async function request(maxBytes: number, chargeInResolver: boolean) {
+async function request(maxBytes: number, chargeInResolver: boolean, query = '{ body }') {
 	const budget = new RequestMemoryBudget({ warnBytes: 512, maxBytes })
 	const handler = createGraphQLQueryHandler<{ budget: RequestMemoryBudget }>({
 		schema: new GraphQLSchema({
@@ -23,6 +24,29 @@ async function request(maxBytes: number, chargeInResolver: boolean) {
 								return null
 							}
 							return 'x'.repeat(4096)
+						},
+					},
+				},
+			}),
+			mutation: new GraphQLObjectType<unknown, { budget: RequestMemoryBudget }>({
+				name: 'Mutation',
+				fields: {
+					write: {
+						type: new GraphQLNonNull(GraphQLString),
+						resolve: (_, args, context) => {
+							context.budget.addDatabaseRow({ body: 'x'.repeat(4096) })
+							return 'written'
+						},
+					},
+					report: {
+						type: new GraphQLNonNull(GraphQLString),
+						resolve: (_, args, context) => {
+							try {
+								context.budget.addDatabaseRow({ body: 'x'.repeat(4096) })
+							} catch {
+								return 'exhausted'
+							}
+							return 'written'
 						},
 					},
 				},
@@ -45,7 +69,7 @@ async function request(maxBytes: number, chargeInResolver: boolean) {
 		if (!address || typeof address === 'string') {
 			throw new Error('Expected a TCP listener')
 		}
-		const response = await fetch(`http://127.0.0.1:${address.port}/?query=${encodeURIComponent('{ body }')}`)
+		const response = await fetch(`http://127.0.0.1:${address.port}/?query=${encodeURIComponent(query)}`)
 		return { status: response.status, body: await response.json() }
 	} finally {
 		await new Promise<void>((resolve, reject) => {
@@ -63,6 +87,19 @@ test('budget failure inside a nullable resolver returns one resource error witho
 	})
 })
 
+test('a mutation that reports budget exhaustion in its own result keeps its data', async () => {
+	expect(await request(1024, true, 'mutation { report }')).toEqual({ status: 200, body: { data: { report: 'exhausted' } } })
+})
+
+test('budget failure thrown by a mutation field is a resource error with its path, not an internal error', async () => {
+	const response = await request(1024, true, 'mutation { write }')
+	expect(response.status).toBe(422)
+	expect(response.body.data).toBeNull()
+	expect(response.body.errors).toEqual([
+		expect.objectContaining({ message: 'Request memory budget exceeded', path: ['write'], extensions: { code: 'RESOURCE_EXHAUSTED' } }),
+	])
+})
+
 test('response of a request within its budget is preserved', async () => {
 	expect(await request(32768, false)).toEqual({ status: 200, body: { data: { body: 'x'.repeat(4096) } } })
 })
@@ -76,4 +113,36 @@ test('memory budget configuration rejects invalid or reversed thresholds', () =>
 	expect(serverConfigSchema({ http: { requestMemoryBudget: { warnBytes: 1024, maxBytes: 2048 } } }).http?.requestMemoryBudget)
 		.toEqual({ warnBytes: 1024, maxBytes: 2048 })
 	expect(serverConfigSchema({}).http?.requestMemoryBudget).toBeUndefined()
+})
+
+test('memory budget configuration names the failing option', () => {
+	expect(() => serverConfigSchema({ http: { requestMemoryBudget: { warnBytes: 2048, maxBytes: 1024 } } }))
+		.toThrow(/http.*requestMemoryBudget.*warnBytes must not exceed maxBytes/)
+	expect(() => serverConfigSchema({ http: { requestMemoryBudget: { maxBytes: 1024 } } }))
+		.toThrow('warnBytes and maxBytes must be set together')
+})
+
+test('memory budget stays disabled when its environment variables are unset', () => {
+	expect(serverConfigSchema({ http: { requestMemoryBudget: { warnBytes: undefined, maxBytes: undefined } } }).http?.requestMemoryBudget)
+		.toBeUndefined()
+})
+
+test('memory budget is configurable through environment variables alone', async () => {
+	const names = ['CONTEMBER_HTTP_REQUEST_MEMORY_BUDGET_WARN_BYTES', 'CONTEMBER_HTTP_REQUEST_MEMORY_BUDGET_MAX_BYTES']
+	const original = names.map(name => process.env[name])
+	try {
+		names.forEach(name => delete process.env[name])
+		expect((await readConfig()).serverConfig.http?.requestMemoryBudget).toBeUndefined()
+		process.env[names[0]] = '1024'
+		process.env[names[1]] = '2048'
+		expect((await readConfig()).serverConfig.http?.requestMemoryBudget).toEqual({ warnBytes: 1024, maxBytes: 2048 })
+	} finally {
+		names.forEach((name, index) => {
+			if (original[index] === undefined) {
+				delete process.env[name]
+			} else {
+				process.env[name] = original[index]
+			}
+		})
+	}
 })

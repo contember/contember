@@ -783,6 +783,7 @@ enum _MutationErrorType {
   NonUniqueWhereInput
   InvalidDataInput
   SqlError
+  ResourceExhausted
 }
 
 type AuthorDeleteResult implements MutationResult {

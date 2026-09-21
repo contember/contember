@@ -59,6 +59,7 @@ export namespace Result {
 		NonUniqueWhereInput = 'NonUniqueWhereInput',
 		InvalidDataInput = 'InvalidDataInput',
 		SqlError = 'SqlError',
+		ResourceExhausted = 'ResourceExhausted',
 	}
 
 	export interface ExecutionError {

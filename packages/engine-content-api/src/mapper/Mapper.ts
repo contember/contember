@@ -10,7 +10,7 @@ import {
 	SelectResultObject,
 	WhereBuilder,
 } from './select/index.js'
-import { Client, Connection, ConstraintHelper, DatabaseMetadata, SelectBuilder } from '@contember/database'
+import { Client, Connection, ConstraintHelper, DatabaseMetadata, RequestMemoryBudget, SelectBuilder } from '@contember/database'
 import { PredicatesInjector } from '../acl/index.js'
 import { JunctionTableManager } from './JunctionTableManager.js'
 import { DeletedEntitiesStorage, DeleteExecutor } from './delete/index.js'
@@ -30,6 +30,8 @@ export class Mapper<ConnectionType extends Connection.ConnectionLike = Connectio
 	public readonly deletedEntities = new DeletedEntitiesStorage()
 	public readonly mutex = new Mutex()
 	public readonly constraintHelper: ConstraintHelper
+	/** Charges the request memory budget; only selection results use it, internal mutation queries stay on `db`. */
+	public readonly selectionDb: Client<ConnectionType>
 
 	public readonly eventManager: EventManager
 
@@ -48,8 +50,10 @@ export class Mapper<ConnectionType extends Connection.ConnectionLike = Connectio
 		private readonly updater: Updater,
 		private readonly inserter: Inserter,
 		private readonly pathFactory: PathFactory,
+		private readonly memoryBudget?: RequestMemoryBudget,
 	) {
 		this.constraintHelper = new ConstraintHelper(db, this.schemaDatabaseMetadata)
+		this.selectionDb = memoryBudget ? db.withMemoryBudget(memoryBudget) : db
 		this.eventManager = new EventManager(this)
 	}
 
@@ -73,7 +77,7 @@ export class Mapper<ConnectionType extends Connection.ConnectionLike = Connectio
 		relationPath: Model.AnyRelationContext[],
 		indexBy: string,
 	): Promise<SelectIndexedResultObjects> {
-		const hydrator = new SelectHydrator(this.db.eventManager.memoryBudget)
+		const hydrator = new SelectHydrator(this.memoryBudget)
 		const path = this.pathFactory.create([])
 		const indexByAlias: string = path.for(indexBy).alias
 		const qb: SelectBuilder = SelectBuilder.create()
@@ -87,7 +91,7 @@ export class Mapper<ConnectionType extends Connection.ConnectionLike = Connectio
 		input: ObjectNode<Input.ListQueryInput>,
 		relationPath: Model.AnyRelationContext[],
 	): Promise<SelectResultObject[]> {
-		const hydrator = new SelectHydrator(this.db.eventManager.memoryBudget)
+		const hydrator = new SelectHydrator(this.memoryBudget)
 		const qb: SelectBuilder<SelectBuilder.Result> = SelectBuilder.create()
 
 		const rows = await this.selectRows(hydrator, qb, entity, input, relationPath)
@@ -115,7 +119,7 @@ export class Mapper<ConnectionType extends Connection.ConnectionLike = Connectio
 		relation: Model.JoiningColumnRelation & Model.AnyRelation,
 		relationPath: Model.AnyRelationContext[],
 	): Promise<SelectGroupedObjects> {
-		const hydrator = new SelectHydrator(this.db.eventManager.memoryBudget)
+		const hydrator = new SelectHydrator(this.memoryBudget)
 		const path = this.pathFactory.create([])
 		const groupingKey = '__grouping_key'
 		const qb: SelectBuilder = SelectBuilder.create()
@@ -147,7 +151,7 @@ export class Mapper<ConnectionType extends Connection.ConnectionLike = Connectio
 		)
 		const inputWithPredicates = inputWithOrder.withArg('filter', filterWithPredicates)
 		selector.select(this, entity, inputWithPredicates, path, groupBy)
-		return await selector.execute(this.db)
+		return await selector.execute(this.selectionDb)
 	}
 
 	public async count(entity: Model.Entity, filter: Input.OptionalWhere) {

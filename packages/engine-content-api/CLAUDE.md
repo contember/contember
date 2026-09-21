@@ -28,6 +28,12 @@ GraphQL mutation → MutationResolver.resolveTransaction
   → REPEATABLE_READ transaction with deadlock retry (up to 15 attempts)
 ```
 
+## Request Memory Budget
+
+- `Mapper.selectionDb` is `db` with the request's `RequestMemoryBudget` attached; `Mapper.db` is never budgeted. Route a query through `selectionDb` only when its rows end up in the response (`selectRows`, the many-has-many junction fetch). `SelectHydrator` charges the hydrated objects once per result.
+- The budget is sticky: once exceeded, every further selection throws `RequestMemoryBudgetExceededError`, and `MapperFactory.transaction` refuses to start (writes run unbudgeted, so nothing else would stop them).
+- `MutationResolver.transaction` turns that error into `ok: false` with `ExecutionErrorType.ResourceExhausted`, after the rollback. A query is instead rejected as a whole by `engine-http` (`graphql/execution.ts`), because partial data of a read is worthless.
+
 ## ACL Enforcement
 
 Row-level and field-level security via predicate injection into every SQL operation:

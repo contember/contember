@@ -189,6 +189,7 @@ enum _MutationErrorType {
   NonUniqueWhereInput
   InvalidDataInput
   SqlError
+  ResourceExhausted
 }
 
 type CategoryCreateResult implements MutationResult {

@@ -1,5 +1,6 @@
 import * as Typesafe from '@contember/typesafe'
 import { MailerOptions } from '@contember/engine-tenant-api'
+import { validateRequestMemoryBudgetOptions } from '@contember/database'
 import { upperCaseFirst } from '../utils/strings.js'
 import ipaddr from 'ipaddr.js'
 
@@ -108,19 +109,18 @@ export const tenantConfigSchema = Typesafe.intersection(
 export const serverConfigSchema = Typesafe.partial({
 	port: Typesafe.number,
 	http: Typesafe.partial({
-		requestMemoryBudget: Typesafe.transform(
-			Typesafe.object({ warnBytes: Typesafe.number, maxBytes: Typesafe.number }),
-			options => {
-				if (
-					!Number.isSafeInteger(options.warnBytes) || options.warnBytes <= 0
-					|| !Number.isSafeInteger(options.maxBytes) || options.maxBytes <= 0
-					|| options.warnBytes > options.maxBytes
-				) {
-					return Typesafe.fail([])
-				}
-				return options
-			},
-		),
+		// Both thresholds come from separate environment variables, so an empty object means "disabled".
+		requestMemoryBudget: (input: unknown, path: PropertyKey[] = []): { warnBytes: number; maxBytes: number } | undefined => {
+			const { warnBytes, maxBytes } = Typesafe.partial({ warnBytes: Typesafe.integer, maxBytes: Typesafe.integer })(input, path)
+			if (warnBytes === undefined && maxBytes === undefined) {
+				return undefined
+			}
+			if (warnBytes === undefined || maxBytes === undefined) {
+				return Typesafe.fail(path, 'warnBytes and maxBytes must be set together')
+			}
+			const optionsError = validateRequestMemoryBudgetOptions({ warnBytes, maxBytes })
+			return optionsError ? Typesafe.fail(path, optionsError) : { warnBytes, maxBytes }
+		},
 		requestBodySize: Typesafe.string,
 		// Allows clients to opt in (via the X-Contember-Force-Ok request header) to receiving HTTP 200
 		// for GraphQL API responses, keeping error info in the JSON body. Defaults to enabled; set to

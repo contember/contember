@@ -94,6 +94,10 @@ export const configTemplate: any = {
 			trustedProxies: '%?env.CONTEMBER_HTTP_TRUSTED_PROXIES::string%',
 			responseStatusHeader: '%?env.CONTEMBER_HTTP_RESPONSE_STATUS_HEADER::string%',
 			geoCountryHeader: '%?env.CONTEMBER_HTTP_GEO_COUNTRY_HEADER::string%',
+			requestMemoryBudget: {
+				warnBytes: '%?env.CONTEMBER_HTTP_REQUEST_MEMORY_BUDGET_WARN_BYTES::number%',
+				maxBytes: '%?env.CONTEMBER_HTTP_REQUEST_MEMORY_BUDGET_MAX_BYTES::number%',
+			},
 		},
 		panel: {
 			enabled: '%?env.CONTEMBER_PANEL_ENABLED::bool%',

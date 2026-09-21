@@ -9,6 +9,19 @@ const rowCompletionOverheadBytes = 256
 const maximumRecursiveEstimateDepth = 64
 const isBun = process.versions.bun !== undefined
 
+export const validateRequestMemoryBudgetOptions = ({ warnBytes, maxBytes }: RequestMemoryBudgetOptions): string | undefined => {
+	if (!Number.isSafeInteger(warnBytes) || warnBytes <= 0) {
+		return 'warnBytes must be a positive safe integer'
+	}
+	if (!Number.isSafeInteger(maxBytes) || maxBytes <= 0) {
+		return 'maxBytes must be a positive safe integer'
+	}
+	if (warnBytes > maxBytes) {
+		return 'warnBytes must not exceed maxBytes'
+	}
+	return undefined
+}
+
 export class RequestMemoryBudgetExceededError extends Error {
 	constructor() {
 		super('Request memory budget exceeded')
@@ -27,12 +40,9 @@ export class RequestMemoryBudget {
 	private readonly abortController = new AbortController()
 
 	constructor(private readonly options: RequestMemoryBudgetOptions) {
-		if (
-			!Number.isSafeInteger(options.warnBytes) || options.warnBytes <= 0
-			|| !Number.isSafeInteger(options.maxBytes) || options.maxBytes <= 0
-			|| options.warnBytes > options.maxBytes
-		) {
-			throw new Error('Request memory thresholds must be positive safe integers with warnBytes <= maxBytes')
+		const optionsError = validateRequestMemoryBudgetOptions(options)
+		if (optionsError) {
+			throw new Error(`Invalid request memory budget: ${optionsError}`)
 		}
 	}
 

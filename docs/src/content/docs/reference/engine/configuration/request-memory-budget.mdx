@@ -1,0 +1,65 @@
+---
+title: Request memory budget
+---
+
+:::note[Available since 2.2]
+:::
+
+One Content API request that selects a very large result can exhaust the memory of the whole Engine process. The request memory budget estimates how much memory the result of a single request retains and stops the request before it grows past a limit.
+
+The budget is disabled by default.
+
+## Configuration
+
+Set both thresholds, in bytes:
+
+```bash
+CONTEMBER_HTTP_REQUEST_MEMORY_BUDGET_WARN_BYTES=67108864
+CONTEMBER_HTTP_REQUEST_MEMORY_BUDGET_MAX_BYTES=268435456
+```
+
+or in the server config:
+
+```yaml
+server:
+  http:
+    requestMemoryBudget:
+      warnBytes: 67108864
+      maxBytes: 268435456
+```
+
+| Option | Meaning |
+|---|---|
+| `warnBytes` | A request whose estimate exceeds this value is logged as a warning (`Content request memory usage`) with the estimate breakdown. The request continues. |
+| `maxBytes` | A request whose estimate exceeds this value is stopped. |
+
+Both options must be positive integers, they must be set together, and `warnBytes` must not exceed `maxBytes`. The Engine refuses to start otherwise.
+
+## What is counted
+
+Only the data a request **selects** is counted: rows fetched for queries, for relations, and for the `node` of a mutation result, plus the objects built from them and a reserve for serializing the response. Internal queries of a mutation (unique lookups, `RETURNING` rows) are not counted, so a large import is not limited by the number of its operations.
+
+The value is an estimate, not a measurement of the process heap. Start with `warnBytes` only set low and `maxBytes` high, watch the warnings, and then pick the limit.
+
+## What the client receives
+
+A **query** that exceeds `maxBytes` fails as a whole with HTTP `422`:
+
+```json
+{ "errors": [{ "message": "Request memory budget exceeded", "extensions": { "code": "RESOURCE_EXHAUSTED" } }] }
+```
+
+A **mutation** that exceeds `maxBytes` is rolled back and reports the failure in its own result, like any other failed mutation. Mutations that were committed earlier in the same request keep their results:
+
+```json
+{
+	"data": {
+		"first": { "ok": true, "errors": [] },
+		"second": { "ok": false, "errors": [{ "type": "ResourceExhausted", "message": "Request memory budget exceeded" }] }
+	}
+}
+```
+
+Once a request exceeds its budget, its remaining mutations are not started and report the same error. Retrying the same request does not help; select less data (add `limit`, narrow the selection) or wrap dependent mutations in a `transaction` so that they succeed or fail together.
+
+Exceeding the budget is not counted as an SQL error in the Engine metrics.

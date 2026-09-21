@@ -19,7 +19,7 @@ server:
 - Above `maxBytes`, the request is aborted. It also emits the warning with `maxBytesExceeded: true`.
 - Both thresholds are positive integer byte counts, with `warnBytes <= maxBytes`. Both apply to the estimate including its completion reservation.
 - The same budget applies to Content API **queries and mutations**, including reads during validation, relation processing, and result hydration. All nested DB scopes and transactions share the request's account.
-- An exhausted budget produces HTTP 503 with GraphQL error code `RESOURCE_EXHAUSTED` and no partial data. The existing force-HTTP-OK option can still change the HTTP status.
+- An exhausted budget produces HTTP 422 with GraphQL error code `RESOURCE_EXHAUSTED` and no partial data. The existing force-HTTP-OK option can still change the HTTP status.
 
 Above the warning threshold, the request logger emits `Content request memory usage` at warning level when the HTTP response finishes or closes. Its fields include `operation`, `queryHash`, `databaseRows`, `databaseBytes`, `hydrationBytes`, `estimatedRetainedBytes`, `reservedCompletionBytes`, `estimatedPeakBytes`, `warningThresholdExceeded`, and `maxBytesExceeded`. The hash identifies the query text without logging its contents or variables.
 

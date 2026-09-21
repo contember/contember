@@ -2,7 +2,7 @@ import { Path } from './Path.js'
 import { Value } from '@contember/schema'
 import { getFulfilledValues, getRejections } from '../../utils/index.js'
 import { logger } from '@contember/logger'
-import { RequestMemoryBudget } from '@contember/database'
+import { RequestMemoryBudget, RequestMemoryBudgetExceededError } from '@contember/database'
 
 type DataPromises = {
 	path: Path
@@ -114,9 +114,10 @@ export class SelectHydrator {
 		})))
 		const failures = getRejections(results)
 		if (failures.length > 0) {
-			if (failures.length > 1) {
-				failures.slice(1).map(e => logger.error(e, { loc: 'SelectHydrator' }))
-			}
+			// Budget exhaustion aborts every in-flight sibling query; those rejections are expected.
+			failures.slice(1)
+				.filter(e => !(e instanceof RequestMemoryBudgetExceededError))
+				.forEach(e => logger.error(e, { loc: 'SelectHydrator' }))
 			throw failures[0]
 		}
 

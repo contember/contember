@@ -144,7 +144,7 @@ export const createGraphQLQueryHandler = <Context>({
 			}
 		} catch (e) {
 			if (e instanceof RequestMemoryBudgetExceededError) {
-				return respond(503, { errors: [{ message: e.message, extensions: { code: 'RESOURCE_EXHAUSTED' } }] })
+				return respond(422, { errors: [{ message: e.message, extensions: { code: 'RESOURCE_EXHAUSTED' } }] })
 			}
 			if (e instanceof GraphQLError) {
 				return respond(e instanceof ForbiddenError ? 403 : 400, { errors: [e] })

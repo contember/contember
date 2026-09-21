@@ -58,7 +58,7 @@ async function request(maxBytes: number, chargeInResolver: boolean) {
 test('budget failure inside a nullable resolver returns one resource error without partial data', async () => {
 	const response = await request(1024, true)
 	expect(response).toEqual({
-		status: 503,
+		status: 422,
 		body: { errors: [{ message: 'Request memory budget exceeded', extensions: { code: 'RESOURCE_EXHAUSTED' } }] },
 	})
 })

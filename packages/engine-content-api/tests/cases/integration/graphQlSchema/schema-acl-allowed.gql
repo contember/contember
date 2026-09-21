@@ -351,6 +351,7 @@ enum _MutationErrorType {
   NonUniqueWhereInput
   InvalidDataInput
   SqlError
+  ResourceExhausted
 }
 
 type OneHasManyEntityDeleteResult implements MutationResult {

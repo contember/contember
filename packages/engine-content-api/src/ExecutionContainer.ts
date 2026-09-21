@@ -27,7 +27,7 @@ import {
 } from './mapper/index.js'
 import { Builder } from '@contember/dic'
 import { Acl, Model, Schema } from '@contember/schema'
-import { Client, DatabaseMetadata, SelectBuilder as DbSelectBuilder } from '@contember/database'
+import { Client, DatabaseMetadata, RequestMemoryBudget, SelectBuilder as DbSelectBuilder } from '@contember/database'
 import { ParsedMembership, Providers } from '@contember/schema-utils'
 import { PaginatedHasManyExecutionHandler } from './extensions/paginatedHasMany/PaginatedHasManyExecutionHandler.js'
 import { PaginatedHasManyFieldProvider } from './extensions/paginatedHasMany/PaginatedHasManyFieldProvider.js'
@@ -75,6 +75,7 @@ export type ExecutionContainerArgs = {
 	schemaMeta: { id?: number }
 	schemaDatabaseMetadata: DatabaseMetadata
 	db: Client
+	memoryBudget?: RequestMemoryBudget
 	identityId: string
 	identityVariables: Acl.VariablesMap
 	permissions: Acl.Permissions
@@ -117,6 +118,7 @@ export class ExecutionContainerFactory {
 			identityVariables,
 			identityId,
 			db,
+			memoryBudget,
 			schema,
 			schemaMeta,
 			systemSchema,
@@ -262,6 +264,7 @@ export class ExecutionContainerFactory {
 						inserter,
 						pathFactory,
 						providers,
+						memoryBudget,
 					)
 				},
 			)

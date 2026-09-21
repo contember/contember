@@ -16,7 +16,7 @@ export class ContentQueryHandlerFactory {
 		return createGraphQLQueryHandler<ContentGraphqlContext>({
 			schema: graphQlSchema,
 			listeners,
-			getMemoryBudget: context => context.db.eventManager.memoryBudget,
+			getMemoryBudget: context => context.memoryBudget,
 		})
 	}
 }

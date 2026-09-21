@@ -120,9 +120,10 @@ try {
 			maxBytes: mode === 'enforce' ? 8 * 1024 * 1024 : 1024 * 1024 * 1024,
 		})
 	const createContextValue = (budget: RequestMemoryBudget | undefined) => {
-		const db = budget ? setup.withMemoryBudget(budget) : setup
+		const db = setup
 		const executionContainer = factory.create({
 			db,
+			memoryBudget: budget,
 			schema: { ...emptySchema, model },
 			schemaMeta: {},
 			schemaDatabaseMetadata: emptyDatabaseMetadata,

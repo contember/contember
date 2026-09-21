@@ -44,6 +44,8 @@ export type GraphQLQueryHandler<Context> = (
 	args: { request: Request; response: Response; createContext: ({}: { operation: OperationTypeNode; queryHash: string }) => Context },
 ) => any
 
+const memoryBudgetErrorCode = 'RESOURCE_EXHAUSTED'
+
 const hitCacheMaxAgeSeconds = 10 * 60
 const documentCacheMaxAgeSeconds = hitCacheMaxAgeSeconds * 10
 const pruneIntervalSeconds = documentCacheMaxAgeSeconds / 2
@@ -132,7 +134,10 @@ export const createGraphQLQueryHandler = <Context>({
 				contextValue: context,
 			})
 			// GraphQL turns a budget failure inside a nullable resolver into partial data; reject the whole response instead.
-			getMemoryBudget?.(context)?.check()
+			// A mutation reports it in its own result, because sibling mutations may already be committed.
+			if (operation === 'query') {
+				getMemoryBudget?.(context)?.check()
+			}
 			listenersQueue.forEach(it => {
 				it.onResponse && listenersQueue.push(it.onResponse({ context, response }) || {})
 			})
@@ -144,7 +149,7 @@ export const createGraphQLQueryHandler = <Context>({
 			}
 		} catch (e) {
 			if (e instanceof RequestMemoryBudgetExceededError) {
-				return respond(422, { errors: [{ message: e.message, extensions: { code: 'RESOURCE_EXHAUSTED' } }] })
+				return respond(422, { errors: [{ message: e.message, extensions: { code: memoryBudgetErrorCode } }] })
 			}
 			if (e instanceof GraphQLError) {
 				return respond(e instanceof ForbiddenError ? 403 : 400, { errors: [e] })
@@ -170,6 +175,7 @@ const processErrors = (errors: readonly any[]): [number | null, any[]] => {
 	let has400 = false
 	let has403 = false
 	let has500 = false
+	let hasExhaustedMemoryBudget = false
 	for (const error of errors) {
 		const originalError = extractOriginalError(error)
 		if (originalError instanceof GraphQLError) {
@@ -178,6 +184,9 @@ const processErrors = (errors: readonly any[]): [number | null, any[]] => {
 		} else if (originalError instanceof ForbiddenError) {
 			resultErrors.push(error)
 			has403 = true
+		} else if (originalError instanceof RequestMemoryBudgetExceededError) {
+			resultErrors.push({ message: error.message, locations: error.locations, path: error.path, extensions: { code: memoryBudgetErrorCode } })
+			hasExhaustedMemoryBudget = true
 		} else if (originalError instanceof UserError) {
 			resultErrors.push({ message: error.message, locations: error.locations, path: error.path })
 			has400 = true
@@ -187,7 +196,7 @@ const processErrors = (errors: readonly any[]): [number | null, any[]] => {
 			has500 = true
 		}
 	}
-	return [has500 ? 500 : has400 ? 400 : has403 ? 403 : null, resultErrors]
+	return [has500 ? 500 : hasExhaustedMemoryBudget ? 422 : has400 ? 400 : has403 ? 403 : null, resultErrors]
 }
 
 const resolveOperationType = (document: DocumentNode, operationName: string | null): OperationTypeNode => {

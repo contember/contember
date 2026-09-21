@@ -160,8 +160,7 @@ export class ContentApiControllerFactory {
 							const memoryBudget = this.memoryBudgetOptions
 								? new RequestMemoryBudget(this.memoryBudgetOptions)
 								: undefined
-							const baseDatabase = testContentDatabase ?? connection.createClient(stage.schema, { module: 'content' })
-							const contentDatabase = memoryBudget ? baseDatabase.withMemoryBudget(memoryBudget) : baseDatabase
+							const contentDatabase = testContentDatabase ?? connection.createClient(stage.schema, { module: 'content' })
 							if (memoryBudget) {
 								const logMemory = () => {
 									koa.res.off('finish', logMemory)
@@ -186,6 +185,7 @@ export class ContentApiControllerFactory {
 
 							const executionContainer = this.executionContainerFactory.create({
 								db: contentDatabase,
+								memoryBudget,
 								identityVariables,
 								identityId,
 								schema,
@@ -204,6 +204,7 @@ export class ContentApiControllerFactory {
 
 							return {
 								db: contentDatabase,
+								memoryBudget,
 								identityVariables,
 								identityId,
 								executionContainer,

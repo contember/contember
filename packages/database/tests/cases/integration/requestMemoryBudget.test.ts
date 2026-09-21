@@ -1,6 +1,6 @@
 import { expect, test } from 'bun:test'
 import { randomUUID } from 'node:crypto'
-import { Connection, RequestMemoryBudget, RequestMemoryBudgetExceededError, retryTransaction } from '../../../src/index.js'
+import { Connection, EventManager, RequestMemoryBudget, RequestMemoryBudgetExceededError, retryTransaction } from '../../../src/index.js'
 
 const databaseUrl = process.env.MEMORY_TEST_DATABASE_URL
 const databaseTest = test.skipIf(!databaseUrl)
@@ -161,5 +161,46 @@ databaseTest.each([false, true])('reads exceeding the budget roll back writes wi
 		} finally {
 			await connection.end()
 		}
+	}
+})
+
+databaseTest.each([false, true])('a budget-terminated transaction reports one budget error and no SQL error (savepoint: %s)', async savepoint => {
+	const connection = createConnection()
+	try {
+		const queryErrors: Error[] = []
+		connection.eventManager.on(EventManager.Event.queryError, (query, error) => {
+			queryErrors.push(error)
+		})
+		const budget = new RequestMemoryBudget({ warnBytes: 128 * 1024, maxBytes: 256 * 1024 })
+		const db = connection.createClient('public', {}).withMemoryBudget(budget)
+		const sql = "SELECT repeat('x', 1024) AS body FROM generate_series(1, 100000)"
+		await expect(db.transaction(async transaction => {
+			if (savepoint) {
+				await transaction.transaction(inner => inner.query(sql))
+			} else {
+				await transaction.query(sql)
+			}
+		})).rejects.toBeInstanceOf(RequestMemoryBudgetExceededError)
+		expect(queryErrors).toHaveLength(1)
+		expect(queryErrors[0]).toBeInstanceOf(RequestMemoryBudgetExceededError)
+	} finally {
+		await connection.end()
+	}
+})
+
+databaseTest('a failed rollback is reported when the budget left the connection alive', async () => {
+	const connection = createConnection()
+	try {
+		const budget = new RequestMemoryBudget({ warnBytes: 512, maxBytes: 1024 })
+		const db = connection.createClient('public', {}).withMemoryBudget(budget)
+		await expect(db.transaction(async transaction => {
+			await transaction.transaction(async inner => {
+				// Releasing the savepoint behind its back makes the following ROLLBACK TO SAVEPOINT fail.
+				await inner.query('RELEASE SAVEPOINT "savepoint_1"')
+				budget.addHydrationBytes(1024)
+			})
+		})).rejects.toThrow('savepoint "savepoint_1" does not exist')
+	} finally {
+		await connection.end()
 	}
 })

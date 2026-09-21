@@ -63,11 +63,7 @@ test('budget failure inside a nullable resolver returns one resource error witho
 	})
 })
 
-test('oversized completed response is rejected before serialization', async () => {
-	expect((await request(1024, false)).status).toBe(503)
-})
-
-test('response above the warning threshold and below the maximum is preserved', async () => {
+test('response of a request within its budget is preserved', async () => {
 	expect(await request(32768, false)).toEqual({ status: 200, body: { data: { body: 'x'.repeat(4096) } } })
 })
 

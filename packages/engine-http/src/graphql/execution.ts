@@ -131,7 +131,8 @@ export const createGraphQLQueryHandler = <Context>({
 				variableValues: resolvedRequest.variables,
 				contextValue: context,
 			})
-			getMemoryBudget?.(context)?.prepareResponse(response.data)
+			// GraphQL turns a budget failure inside a nullable resolver into partial data; reject the whole response instead.
+			getMemoryBudget?.(context)?.check()
 			listenersQueue.forEach(it => {
 				it.onResponse && listenersQueue.push(it.onResponse({ context, response }) || {})
 			})

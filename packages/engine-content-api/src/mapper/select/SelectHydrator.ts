@@ -80,7 +80,7 @@ export class SelectHydrator {
 	}
 
 	private hydrateRow(row: SelectRow, resolvedData: ResolvedData[]): SelectResultObject {
-		this.memoryBudget?.addHydrationBytes(40)
+		this.memoryBudget?.addHydrationBytes(40 + this.columns.length * 16)
 		const result: SelectResultObject = {}
 
 		for (let columnPath of this.columns) {
@@ -88,7 +88,6 @@ export class SelectHydrator {
 			const last: string = path.pop() as string
 			const currentObject = path.reduce<any>((obj, part) => (obj[part] = obj[part] || this.createNestedObject()), result)
 
-			this.memoryBudget?.addHydrationBytes(16)
 			currentObject[last] = this.formatValue(columnPath.getValue(row))
 		}
 

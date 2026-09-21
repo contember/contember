@@ -142,6 +142,11 @@ jobs:
           bun install --frozen-lockfile
       - name: build
         run: bun run pre-build
+      - name: "Run database integration tests"
+        # These skip without MEMORY_TEST_DATABASE_URL, so the `check` test job (no PostgreSQL) never runs them.
+        run: bun test --conditions=typescript packages/database/tests/cases/integration packages/engine-http/tests/cases/integration
+        env:
+          MEMORY_TEST_DATABASE_URL: postgres://postgres:postgres@127.0.0.1:5432/postgres
       - name: "Build server"
         run: ./scripts/server-build/run.sh
 

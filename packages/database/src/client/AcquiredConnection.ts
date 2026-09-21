@@ -9,6 +9,7 @@ import {
 	NotNullViolationError,
 	QueryError,
 	SerializationFailureError,
+	TerminatedConnectionError,
 	TransactionAbortedError,
 	UniqueViolationError,
 } from './errors.js'
@@ -22,6 +23,7 @@ export class AcquiredConnection implements Connection.AcquiredConnectionLike {
 	constructor(
 		private readonly pgClient: PgClient,
 		public readonly eventManager: EventManager,
+		private readonly physicalConnection = { terminated: false },
 	) {
 	}
 
@@ -30,7 +32,7 @@ export class AcquiredConnection implements Connection.AcquiredConnectionLike {
 		options: { eventManager?: EventManager } = {},
 	): Promise<Result> {
 		return await this.mutex.execute(async () => {
-			return await callback(new AcquiredConnection(this.pgClient, options.eventManager ?? this.eventManager))
+			return await callback(new AcquiredConnection(this.pgClient, options.eventManager ?? this.eventManager, this.physicalConnection))
 		})
 	}
 
@@ -51,6 +53,10 @@ export class AcquiredConnection implements Connection.AcquiredConnectionLike {
 		meta: Record<string, any> = {},
 	): Promise<Connection.Result<Row>> {
 		return await this.mutex.execute(async () => {
+			// Refused before any event fires, so cleanup on a terminated connection stays out of query error metrics.
+			if (this.physicalConnection.terminated) {
+				throw new TerminatedConnectionError()
+			}
 			try {
 				this.eventManager.fire(EventManager.Event.queryStart, { sql, parameters, meta })
 
@@ -122,6 +128,7 @@ export class AcquiredConnection implements Connection.AcquiredConnectionLike {
 				}
 				cleanup()
 				// A budget failure invalidates this connection; the enclosing pool scope disposes it.
+				this.physicalConnection.terminated = true
 				void this.pgClient.end().catch(reject)
 				reject(error)
 			}

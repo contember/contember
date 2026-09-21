@@ -2,8 +2,7 @@ import { Connection } from './Connection.js'
 import { EventManager } from './EventManager.js'
 import { wrapIdentifier } from '../utils/index.js'
 import { Notification } from 'pg'
-import { CannotCommitError, DatabaseError } from './errors.js'
-import { RequestMemoryBudgetExceededError } from './RequestMemoryBudget.js'
+import { CannotCommitError, DatabaseError, TerminatedConnectionError } from './errors.js'
 
 export class Transaction implements Connection.TransactionLike {
 	public get isClosed(): boolean {
@@ -186,8 +185,8 @@ export const executeTransaction = async <Result>(
 			try {
 				await transaction.rollback()
 			} catch (rollbackError) {
-				// Budget cancellation may have already closed the physical connection.
-				if (!(e instanceof RequestMemoryBudgetExceededError)) {
+				// PostgreSQL already rolled back the transaction of a terminated connection.
+				if (!(rollbackError instanceof TerminatedConnectionError)) {
 					throw rollbackError
 				}
 			}

@@ -147,3 +147,35 @@ it('detects deadlock', async () => {
 	await expect(connection.scope(async c1 => c1.scope(async () => await c1.query('SELECT 1')))).rejects.toThrow(MutexDeadlockError)
 	end()
 })
+
+it('rejects closing a transaction twice', async () => {
+	const [connection, end] = createConnectionMockAlt(
+		[{ sql: 'BEGIN' }, { sql: 'ROLLBACK' }],
+	)
+
+	await connection.transaction(async trx => {
+		await trx.rollback()
+		await expect(trx.rollback()).rejects.toThrow('Transaction is already closed')
+		await expect(trx.commit()).rejects.toThrow('Transaction is already closed')
+	})
+	end()
+})
+
+it('rejects closing a savepoint twice', async () => {
+	const [connection, end] = createConnectionMockAlt(
+		[
+			{ sql: 'BEGIN' },
+			{ sql: 'SAVEPOINT "savepoint_1"' },
+			{ sql: 'RELEASE SAVEPOINT "savepoint_1"' },
+			{ sql: 'COMMIT', result: { command: 'COMMIT' } },
+		],
+	)
+
+	await connection.transaction(async trx => {
+		await trx.transaction(async savepoint => {
+			await savepoint.commit()
+			await expect(savepoint.rollback()).rejects.toThrow('Savepoint savepoint_1 is already closed.')
+		})
+	})
+	end()
+})

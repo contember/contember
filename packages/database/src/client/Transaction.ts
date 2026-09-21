@@ -67,6 +67,9 @@ export class Transaction implements Connection.TransactionLike {
 	}
 
 	private async close(command: string, eventManager = this.eventManager) {
+		if (this.isClosed) {
+			throw new Error('Transaction is already closed')
+		}
 		const result = await this.scope(connection => connection.query(command), { eventManager })
 		this.state.close()
 		return result
@@ -133,6 +136,9 @@ class SavePoint implements Connection.TransactionLike {
 	}
 
 	private async close(sql: string, eventManager = this.eventManager) {
+		if (this.isClosed) {
+			throw new Error(`Savepoint ${this.savepointName} is already closed.`)
+		}
 		await this.scope(connection => connection.query(sql), { eventManager })
 		this.state.close()
 	}

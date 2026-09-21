@@ -14,27 +14,54 @@ if (!databaseUrl) {
 const url = new URL(databaseUrl)
 const scenario = process.argv[2] ?? 'small-rows'
 const mode = process.argv[3] ?? 'observe'
+const measurement = process.argv[4] ?? 'sampled'
+if (measurement !== 'sampled' && measurement !== 'retained') {
+	throw new Error('Measurement must be sampled or retained')
+}
+const jsc = typeof Bun === 'undefined' ? undefined : await import('bun:jsc')
+const readHeap = jsc ? () => jsc.heapSize() : () => process.memoryUsage().heapUsed
 if (mode !== 'observe' && mode !== 'enforce' && mode !== 'off') {
 	throw new Error('Mode must be observe, enforce, or off')
 }
-const scenarios = {
+interface Fixture {
+	rows: number
+	text: number
+	json: boolean
+	nested: boolean
+	aliases: boolean
+	unicode: boolean
+	// Repeats the request in one process with a fresh budget each time; a single small request is below timer resolution.
+	iterations?: number
+}
+const scenarios: Record<string, Fixture> = {
 	'small-rows': { rows: 100_000, text: 16, json: false, nested: false, aliases: false, unicode: false },
 	'long-text': { rows: 4000, text: 16_384, json: false, nested: false, aliases: false, unicode: false },
+	'latin1': { rows: 4000, text: 8192, json: false, nested: false, aliases: false, unicode: false },
+	'mixed-text': { rows: 4000, text: 16_384, json: false, nested: false, aliases: false, unicode: false },
+	'escaped-text': { rows: 4000, text: 4096, json: false, nested: false, aliases: false, unicode: false },
 	'unicode': { rows: 4000, text: 8192, json: false, nested: false, aliases: false, unicode: true },
 	'json': { rows: 10_000, text: 128, json: true, nested: false, aliases: false, unicode: false },
 	'nested': { rows: 1000, text: 512, json: false, nested: true, aliases: false, unicode: false },
 	'aliases': { rows: 10_000, text: 512, json: false, nested: false, aliases: true, unicode: false },
 	'single-value': { rows: 1, text: 16 * 1024 * 1024, json: false, nested: false, aliases: false, unicode: false },
+	'medium-rows': { rows: 20_000, text: 256, json: false, nested: false, aliases: false, unicode: false },
+	'few-large-rows': { rows: 128, text: 65_536, json: false, nested: false, aliases: false, unicode: false },
+	'small-json': { rows: 1000, text: 256, json: true, nested: false, aliases: false, unicode: false },
+	'field-aliases': { rows: 4000, text: 16_384, json: false, nested: false, aliases: false, unicode: false },
+	'heterogeneous-json': { rows: 2000, text: 128, json: true, nested: false, aliases: false, unicode: false },
+	'typical-detail': { rows: 1, text: 256, json: false, nested: false, aliases: false, unicode: false, iterations: 5000 },
+	'typical-list': { rows: 50, text: 256, json: false, nested: false, aliases: false, unicode: false, iterations: 2000 },
+	'typical-json': { rows: 50, text: 256, json: true, nested: false, aliases: false, unicode: false, iterations: 1000 },
+	'typical-nested': { rows: 10, text: 256, json: false, nested: true, aliases: false, unicode: false, iterations: 1000 },
 }
-function getScenario(name: string) {
-	for (const [key, value] of Object.entries(scenarios)) {
-		if (key === name) {
-			return value
-		}
+function getScenario(name: string): Fixture {
+	if (!Object.hasOwn(scenarios, name)) {
+		throw new Error(`Unknown scenario: ${name}`)
 	}
-	throw new Error(`Unknown scenario: ${name}`)
+	return scenarios[name]
 }
 const fixture = getScenario(scenario)
+const text = scenario === 'latin1' ? 'éñ' : scenario === 'escaped-text' ? '\u0001\n"\\' : fixture.unicode ? 'ž漢' : 'x'
 const connection = Connection.create({
 	host: url.hostname,
 	port: Number(url.port || 5432),
@@ -66,10 +93,12 @@ try {
 	await setup.query(`CREATE TABLE "${schemaName}".child (id uuid PRIMARY KEY, body text, item_id uuid)`)
 	await setup.query(
 		`INSERT INTO "${schemaName}".item
-		SELECT md5(i::text)::uuid, repeat(?, ?),
-		CASE WHEN ? THEN jsonb_build_object('values', (SELECT jsonb_agg(jsonb_build_object('index', n, 'text', repeat('j', 128))) FROM generate_series(1, 20) n)) ELSE NULL END,
+		SELECT md5(i::text)::uuid, repeat(?, ?) || CASE WHEN ? AND i = 1 THEN '漢' ELSE '' END,
+		CASE WHEN ? THEN CASE WHEN ? AND i > ?
+		THEN jsonb_build_object('values', (SELECT jsonb_agg(0) FROM generate_series(1, 1500)))
+		ELSE jsonb_build_object('values', (SELECT jsonb_agg(jsonb_build_object('index', n, 'text', repeat('j', 128))) FROM generate_series(1, 20) n)) END ELSE NULL END,
 		i FROM generate_series(1, ?) i`,
-		[fixture.unicode ? 'ž漢' : 'x', fixture.text, fixture.json, fixture.rows],
+		[text, fixture.text, scenario === 'mixed-text', fixture.json, scenario === 'heterogeneous-json', Math.floor(fixture.rows / 2), fixture.rows],
 	)
 	if (fixture.nested) {
 		await setup.query(
@@ -79,96 +108,158 @@ try {
 			[fixture.rows],
 		)
 	}
-	const selection = `id position body ${fixture.json ? 'payload' : ''} ${fixture.nested ? 'children { id body }' : ''}`
+	const selection = `id position body ${scenario === 'field-aliases' ? 'copy1: body copy2: body' : ''} ${fixture.json ? 'payload' : ''} ${
+		fixture.nested ? 'children { id body }' : ''
+	}`
 	const source = fixture.aliases
 		? `{ first: listItem { ${selection} } second: listItem { ${selection} } third: listItem { ${selection} } }`
 		: `{ listItem { ${selection} } }`
-	const budget = mode === 'off' ? undefined : new RequestMemoryBudget({
-		warnBytes: 4 * 1024 * 1024,
-		maxBytes: mode === 'enforce' ? 8 * 1024 * 1024 : 1024 * 1024 * 1024,
-	})
-	const db = budget ? setup.withMemoryBudget(budget) : setup
-	const executionContainer = factory.create({
-		db,
-		schema: { ...emptySchema, model },
-		schemaMeta: {},
-		schemaDatabaseMetadata: emptyDatabaseMetadata,
-		identityId: randomUUID(),
-		identityVariables: {},
-		permissions,
-		systemSchema: schemaName,
-		project: { slug: 'memory-benchmark' },
-		stage: { id: randomUUID(), slug: 'live' },
-		userInfo: { ipAddress: null, userAgent: null },
-	})
-	const contextValue = { db, executionContainer, identityVariables: {}, timer: <T>(label: string, callback: () => T) => callback() }
-	await graphql({ schema: gqlSchema, source: '{ listItem(limit: 1) { id } }', contextValue })
-	if (!globalThis.gc) {
-		throw new Error('Run with --expose-gc')
+	const createBudget = () =>
+		mode === 'off' ? undefined : new RequestMemoryBudget({
+			warnBytes: 4 * 1024 * 1024,
+			maxBytes: mode === 'enforce' ? 8 * 1024 * 1024 : 1024 * 1024 * 1024,
+		})
+	const createContextValue = (budget: RequestMemoryBudget | undefined) => {
+		const db = budget ? setup.withMemoryBudget(budget) : setup
+		const executionContainer = factory.create({
+			db,
+			schema: { ...emptySchema, model },
+			schemaMeta: {},
+			schemaDatabaseMetadata: emptyDatabaseMetadata,
+			identityId: randomUUID(),
+			identityVariables: {},
+			permissions,
+			systemSchema: schemaName,
+			project: { slug: 'memory-benchmark' },
+			stage: { id: randomUUID(), slug: 'live' },
+			userInfo: { ipAddress: null, userAgent: null },
+		})
+		return { db, executionContainer, identityVariables: {}, timer: <T>(label: string, callback: () => T) => callback() }
 	}
-	globalThis.gc()
-	const baseline = process.memoryUsage()
-	let sampledHeapPeak = baseline.heapUsed
-	let sampledRssPeak = baseline.rss
-	const sample = () => {
-		const memory = process.memoryUsage()
-		sampledHeapPeak = Math.max(sampledHeapPeak, memory.heapUsed)
-		sampledRssPeak = Math.max(sampledRssPeak, memory.rss)
-	}
-	db.eventManager.on(EventManager.Event.queryEnd, sample)
-	const sampling = setInterval(sample, 5)
-	const start = performance.now()
-	try {
-		const response = await graphql({ schema: gqlSchema, source, contextValue })
-		const executionMs = performance.now() - start
-		sample()
-		const accountingStart = performance.now()
-		budget?.prepareResponse(response.data)
-		const completionAccountingMs = performance.now() - accountingStart
-		sample()
-		if (response.errors) {
-			throw response.errors[0]
+	if (fixture.iterations !== undefined) {
+		if (mode === 'enforce') {
+			throw new Error('Repeated scenarios measure overhead only; use observe or off')
 		}
-		const afterExecution = process.memoryUsage().heapUsed - baseline.heapUsed
-		const serializationStart = performance.now()
-		const json = JSON.stringify(response)
-		const serializationMs = performance.now() - serializationStart
-		sample()
-		const afterSerialization = process.memoryUsage().heapUsed - baseline.heapUsed
+		const runRequest = async () => {
+			const budget = createBudget()
+			const response = await graphql({ schema: gqlSchema, source, contextValue: createContextValue(budget) })
+			budget?.check()
+			if (response.errors) {
+				throw response.errors[0]
+			}
+			return { responseBytes: Buffer.byteLength(JSON.stringify(response)), budget }
+		}
+		for (let i = 0; i < fixture.iterations / 10; i++) {
+			await runRequest()
+		}
+		const start = performance.now()
+		const cpuStart = process.cpuUsage()
+		let last = await runRequest()
+		for (let i = 1; i < fixture.iterations; i++) {
+			last = await runRequest()
+		}
 		const durationMs = performance.now() - start
-		globalThis.gc()
-		const retainedWithResponse = process.memoryUsage().heapUsed - baseline.heapUsed
+		const cpu = process.cpuUsage(cpuStart)
 		console.log(JSON.stringify({
 			scenario,
 			mode,
-			runtime: process.version,
+			runtime: typeof Bun === 'undefined' ? `node ${process.version}` : `bun ${Bun.version}`,
 			rows: fixture.rows,
-			responseBytes: Buffer.byteLength(json),
-			heapAfterExecution: afterExecution,
-			heapAfterSerialization: afterSerialization,
-			heapRetainedWithResponse: retainedWithResponse,
-			sampledHeapPeakDelta: sampledHeapPeak - baseline.heapUsed,
-			sampledRssPeakDelta: sampledRssPeak - baseline.rss,
-			executionMs,
-			completionAccountingMs,
-			serializationMs,
+			iterations: fixture.iterations,
+			responseBytes: last.responseBytes,
 			durationMs,
-			budget: budget?.snapshot(),
+			cpuMs: (cpu.user + cpu.system) / 1000,
+			budget: last.budget?.snapshot(),
 		}))
-	} catch (error) {
-		if (!(error instanceof RequestMemoryBudgetExceededError)) {
-			throw error
+	} else {
+		const budget = createBudget()
+		const contextValue = createContextValue(budget)
+		const db = contextValue.db
+		await graphql({ schema: gqlSchema, source: '{ listItem(limit: 1) { id } }', contextValue })
+		if (!globalThis.gc) {
+			throw new Error('Run with --expose-gc')
 		}
-		sample()
-		console.log(
-			JSON.stringify({ scenario, mode, aborted: true, sampledHeapPeakDelta: sampledHeapPeak - baseline.heapUsed, budget: budget?.snapshot() }),
-		)
-		const healthy = await setup.query<{ value: number }>('SELECT 1 AS value')
-		if (healthy.rows[0]?.value !== 1) {
-			throw new Error('Pool did not recover after budget cancellation')
+		const collectGarbage = jsc ? () => jsc.gcAndSweep() : globalThis.gc
+		collectGarbage()
+		const baseline = process.memoryUsage()
+		const baselineHeap = readHeap()
+		let sampledHeapPeak = baselineHeap
+		let sampledRssPeak = baseline.rss
+		const sample = () => {
+			if (measurement === 'retained') {
+				collectGarbage()
+			}
+			const memory = process.memoryUsage()
+			sampledHeapPeak = Math.max(sampledHeapPeak, readHeap())
+			sampledRssPeak = Math.max(sampledRssPeak, memory.rss)
 		}
-	} finally {
-		clearInterval(sampling)
+		db.eventManager.on(EventManager.Event.queryEnd, sample)
+		const sampling = measurement === 'sampled' ? setInterval(sample, 5) : undefined
+		const start = performance.now()
+		const cpuStart = process.cpuUsage()
+		try {
+			const response = await graphql({ schema: gqlSchema, source, contextValue })
+			const executionMs = performance.now() - start
+			sample()
+			budget?.check()
+			if (response.errors) {
+				throw response.errors[0]
+			}
+			const afterExecution = readHeap() - baselineHeap
+			const serializationStart = performance.now()
+			const json = JSON.stringify(response)
+			const serializationMs = performance.now() - serializationStart
+			sample()
+			const afterSerialization = readHeap() - baselineHeap
+			const durationMs = performance.now() - start
+			const cpu = process.cpuUsage(cpuStart)
+			collectGarbage()
+			const retainedWithResponse = readHeap() - baselineHeap
+			sampledHeapPeak = Math.max(sampledHeapPeak, baselineHeap + retainedWithResponse)
+			console.log(JSON.stringify({
+				scenario,
+				mode,
+				measurement,
+				heapSource: jsc ? 'bun:jsc.heapSize' : 'process.memoryUsage.heapUsed',
+				runtime: typeof Bun === 'undefined' ? `node ${process.version}` : `bun ${Bun.version}`,
+				rows: fixture.rows,
+				responseBytes: Buffer.byteLength(json),
+				serializedHeapBytes: jsc?.estimateShallowMemoryUsageOf(json),
+				responseRootFields: Object.keys(response.data ?? {}),
+				heapAfterExecution: afterExecution,
+				heapAfterSerialization: afterSerialization,
+				heapRetainedWithResponse: retainedWithResponse,
+				sampledHeapPeakDelta: sampledHeapPeak - baselineHeap,
+				sampledRssPeakDelta: sampledRssPeak - baseline.rss,
+				executionMs,
+				serializationMs,
+				durationMs,
+				cpuMs: (cpu.user + cpu.system) / 1000,
+				budget: budget?.snapshot(),
+			}))
+		} catch (error) {
+			if (!(error instanceof RequestMemoryBudgetExceededError)) {
+				throw error
+			}
+			sample()
+			console.log(
+				JSON.stringify({
+					scenario,
+					mode,
+					measurement,
+					runtime: typeof Bun === 'undefined' ? `node ${process.version}` : `bun ${Bun.version}`,
+					aborted: true,
+					sampledHeapPeakDelta: sampledHeapPeak - baselineHeap,
+					budget: budget?.snapshot(),
+				}),
+			)
+			const healthy = await setup.query<{ value: number }>('SELECT 1 AS value')
+			if (healthy.rows[0]?.value !== 1) {
+				throw new Error('Pool did not recover after budget cancellation')
+			}
+		} finally {
+			clearInterval(sampling)
+		}
 	}
 } finally {
 	await setup.query(`DROP SCHEMA IF EXISTS "${schemaName}" CASCADE`)

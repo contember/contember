@@ -31,6 +31,14 @@ This is invisible to a mapper unit test; cover a new raw jsonb write with an e2e
 - `client.transaction(callback)` — REPEATABLE_READ isolation, nested via SAVEPOINTs
 - `client.locked(lockNumber, callback)` — PostgreSQL advisory locks
 
+## Request Memory Budget
+
+`client.withMemoryBudget(budget)` attaches a `RequestMemoryBudget` to the client's `EventManager`, because that is the only object every `scope`/`transaction`/savepoint already propagates. `AcquiredConnection.query` reads it from there and accounts rows as they arrive.
+
+- An `EventManager` inherits its parent's budget by default. Passing `null` explicitly **detaches** it — `rollback()` does this so cleanup still runs after the budget is exhausted. Listeners keep firing through the parent chain either way.
+- Exhaustion ends the physical connection of every in-flight query of that request. The enclosing `Connection.scope` disposes it because the scope throws; swallowing `RequestMemoryBudgetExceededError` inside a scope would release a dead connection to the pool.
+- The live-DB tests in `tests/cases/integration/` skip without `MEMORY_TEST_DATABASE_URL`; CI runs them in the `test-db` job.
+
 ## Pool Configuration
 
 `maxConnections`, `maxIdle`, `idleTimeoutMs`, `acquireTimeoutMs`, `reconnectIntervalMs`, `rateLimitCount/PeriodMs`, `maxUses`, `maxAgeMs`

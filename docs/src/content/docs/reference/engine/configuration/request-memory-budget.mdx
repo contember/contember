@@ -43,10 +43,19 @@ The value is an estimate, not a measurement of the process heap. Start with `war
 
 ## What the client receives
 
-A **query** that exceeds `maxBytes` fails as a whole with HTTP `422`:
+A **query** that exceeds `maxBytes` fails as a whole with HTTP `422`. The error names the root field that exceeded the budget:
 
 ```json
-{ "errors": [{ "message": "Request memory budget exceeded", "extensions": { "code": "RESOURCE_EXHAUSTED" } }] }
+{
+	"data": null,
+	"errors": [
+		{
+			"message": "Request memory budget exceeded",
+			"path": ["listArticle"],
+			"extensions": { "code": "RESOURCE_EXHAUSTED" }
+		}
+	]
+}
 ```
 
 A **mutation** that exceeds `maxBytes` is rolled back and reports the failure in its own result, like any other failed mutation. Mutations that were committed earlier in the same request keep their results:
@@ -60,6 +69,6 @@ A **mutation** that exceeds `maxBytes` is rolled back and reports the failure in
 }
 ```
 
-Once a request exceeds its budget, its remaining mutations are not started and report the same error. Retrying the same request does not help; select less data (add `limit`, narrow the selection) or wrap dependent mutations in a `transaction` so that they succeed or fail together.
+Once a request exceeds its budget, its remaining mutations are not started and report the same error. Inside a `transaction`, the transaction and every mutation field in it report the failure. Retrying the same request does not help; select less data (add `limit`, narrow the selection) or wrap dependent mutations in a `transaction` so that they succeed or fail together.
 
 Exceeding the budget is not counted as an SQL error in the Engine metrics.

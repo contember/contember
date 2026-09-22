@@ -126,7 +126,7 @@ export const createGraphQLQueryHandler = <Context>({
 			listenersQueue.forEach(it => {
 				it.onExecute && listenersQueue.push(it.onExecute({ context, document, operation }) || {})
 			})
-			const response = await execute({
+			const executionResult = await execute({
 				schema,
 				document,
 				operationName: operationName,
@@ -135,9 +135,9 @@ export const createGraphQLQueryHandler = <Context>({
 			})
 			// GraphQL turns a budget failure inside a nullable resolver into partial data; reject the whole response instead.
 			// A mutation reports it in its own result, because sibling mutations may already be committed.
-			if (operation === 'query') {
-				getMemoryBudget?.(context)?.check()
-			}
+			const response = operation === 'query' && getMemoryBudget?.(context)?.exceeded
+				? { data: null, errors: withMemoryBudgetError(executionResult.errors) }
+				: executionResult
 			listenersQueue.forEach(it => {
 				it.onResponse && listenersQueue.push(it.onResponse({ context, response }) || {})
 			})
@@ -148,9 +148,6 @@ export const createGraphQLQueryHandler = <Context>({
 				respond(200, response)
 			}
 		} catch (e) {
-			if (e instanceof RequestMemoryBudgetExceededError) {
-				return respond(422, { errors: [{ message: e.message, extensions: { code: memoryBudgetErrorCode } }] })
-			}
 			if (e instanceof GraphQLError) {
 				return respond(e instanceof ForbiddenError ? 403 : 400, { errors: [e] })
 			}
@@ -168,6 +165,15 @@ export const extractOriginalError = (e: Error): Error => {
 		return extractOriginalError((e as any).errors[0])
 	}
 	return e
+}
+
+const withMemoryBudgetError = (errors: readonly GraphQLError[] = []): readonly GraphQLError[] => {
+	if (errors.some(it => extractOriginalError(it) instanceof RequestMemoryBudgetExceededError)) {
+		return errors
+	}
+	// The resolver that hit the budget did not report it (its error was swallowed); the response still must not pass as valid.
+	const originalError = new RequestMemoryBudgetExceededError()
+	return [...errors, new GraphQLError(originalError.message, { originalError })]
 }
 
 const processErrors = (errors: readonly any[]): [number | null, any[]] => {

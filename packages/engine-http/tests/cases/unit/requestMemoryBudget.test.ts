@@ -11,6 +11,7 @@ import { readConfig } from '../../../src/config/config.js'
 
 async function request(maxBytes: number, chargeInResolver: boolean, query = '{ body }') {
 	const budget = new RequestMemoryBudget({ warnBytes: 512, maxBytes })
+	const responses: unknown[] = []
 	const handler = createGraphQLQueryHandler<{ budget: RequestMemoryBudget }>({
 		schema: new GraphQLSchema({
 			query: new GraphQLObjectType<unknown, { budget: RequestMemoryBudget }>({
@@ -24,6 +25,15 @@ async function request(maxBytes: number, chargeInResolver: boolean, query = '{ b
 								return null
 							}
 							return 'x'.repeat(4096)
+						},
+					},
+					swallowed: {
+						type: GraphQLString,
+						resolve: (_, args, context) => {
+							try {
+								context.budget.addDatabaseRow({ body: 'x'.repeat(4096) })
+							} catch {}
+							return 'partial'
 						},
 					},
 				},
@@ -52,7 +62,7 @@ async function request(maxBytes: number, chargeInResolver: boolean, query = '{ b
 				},
 			}),
 		}),
-		listeners: [],
+		listeners: [{ onResponse: ({ response }) => void responses.push(response) }],
 		getMemoryBudget: context => context.budget,
 	})
 	const app = new Koa()
@@ -70,7 +80,7 @@ async function request(maxBytes: number, chargeInResolver: boolean, query = '{ b
 			throw new Error('Expected a TCP listener')
 		}
 		const response = await fetch(`http://127.0.0.1:${address.port}/?query=${encodeURIComponent(query)}`)
-		return { status: response.status, body: await response.json() }
+		return { status: response.status, body: await response.json(), responses }
 	} finally {
 		await new Promise<void>((resolve, reject) => {
 			server.close(error => error ? reject(error) : resolve())
@@ -79,16 +89,29 @@ async function request(maxBytes: number, chargeInResolver: boolean, query = '{ b
 	}
 }
 
-test('budget failure inside a nullable resolver returns one resource error without partial data', async () => {
-	const response = await request(1024, true)
-	expect(response).toEqual({
-		status: 422,
-		body: { errors: [{ message: 'Request memory budget exceeded', extensions: { code: 'RESOURCE_EXHAUSTED' } }] },
+test('budget failure inside a nullable resolver returns one resource error with its path and no partial data', async () => {
+	const { status, body, responses } = await request(1024, true)
+	expect(status).toBe(422)
+	expect(body.data).toBeNull()
+	expect(body.errors).toEqual([
+		expect.objectContaining({ message: 'Request memory budget exceeded', path: ['body'], extensions: { code: 'RESOURCE_EXHAUSTED' } }),
+	])
+	// Response listeners (debug query log, triggered actions) see the rejected response.
+	expect(responses).toEqual([expect.objectContaining({ data: null })])
+})
+
+test('a query whose resolver swallowed the budget failure is still rejected as a whole', async () => {
+	const { status, body } = await request(1024, true, '{ swallowed }')
+	expect(status).toBe(422)
+	expect(body).toEqual({
+		data: null,
+		errors: [{ message: 'Request memory budget exceeded', extensions: { code: 'RESOURCE_EXHAUSTED' } }],
 	})
 })
 
 test('a mutation that reports budget exhaustion in its own result keeps its data', async () => {
-	expect(await request(1024, true, 'mutation { report }')).toEqual({ status: 200, body: { data: { report: 'exhausted' } } })
+	const { status, body } = await request(1024, true, 'mutation { report }')
+	expect({ status, body }).toEqual({ status: 200, body: { data: { report: 'exhausted' } } })
 })
 
 test('budget failure thrown by a mutation field is a resource error with its path, not an internal error', async () => {
@@ -101,7 +124,8 @@ test('budget failure thrown by a mutation field is a resource error with its pat
 })
 
 test('response of a request within its budget is preserved', async () => {
-	expect(await request(32768, false)).toEqual({ status: 200, body: { data: { body: 'x'.repeat(4096) } } })
+	const { status, body } = await request(32768, false)
+	expect({ status, body }).toEqual({ status: 200, body: { data: { body: 'x'.repeat(4096) } } })
 })
 
 test('memory budget configuration rejects invalid or reversed thresholds', () => {

@@ -25,6 +25,44 @@ const selectAuthor = (id: string) => ({
 	response: { rows: [{ root_id: id }] },
 })
 
+test('an exhausted memory budget fails every field of a mutation transaction', async () => {
+	const exhausted = {
+		ok: false,
+		errors: [{ type: 'ResourceExhausted', message: 'Request memory budget exceeded' }],
+		validation: { valid: true, errors: [] },
+	}
+	await execute({
+		schema: new SchemaBuilder()
+			.entity('Author', entity => entity.column('name', c => c.type(Model.ColumnType.String)))
+			.buildSchema(),
+		memoryBudget: new RequestMemoryBudget({ warnBytes: 200, maxBytes: 200 }),
+		query: GQL`
+			mutation {
+				transaction {
+					ok
+					errorMessage
+					errors { type message }
+					validation { valid errors { message { text } } }
+					first: createAuthor(data: {name: "John"}) { ok errors { type message } validation { valid errors { message { text } } } node { id } }
+					second: createAuthor(data: {name: "John"}) { ok errors { type message } validation { valid errors { message { text } } } node { id } }
+				}
+			}`,
+		executes: [
+			...failedTransaction([insertAuthor(testUuid(1)), selectAuthor(testUuid(1)), insertAuthor(testUuid(2)), selectAuthor(testUuid(2))]),
+		],
+		return: {
+			data: {
+				transaction: {
+					...exhausted,
+					errorMessage: 'Request memory budget exceeded',
+					first: { ...exhausted, node: null },
+					second: { ...exhausted, node: null },
+				},
+			},
+		},
+	})
+})
+
 test('an exhausted memory budget fails its own mutation and keeps the committed sibling', async () => {
 	const exhausted = {
 		ok: false,

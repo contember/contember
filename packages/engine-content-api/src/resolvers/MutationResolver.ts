@@ -59,6 +59,7 @@ export class MutationResolver {
 			)
 		})
 		const fields = GraphQlQueryAstFactory.resolveObjectType(info.returnType).getFields()
+		const mutationFields = queryAst.fields.filter(field => field.name !== 'query' && field.name !== '__typename')
 
 		const prefixErrors = <T extends { path: Result.PathFragment[]; paths?: Result.PathFragment[][] }>(
 			errors: T[],
@@ -218,7 +219,12 @@ export class MutationResolver {
 				validation: { valid: true, errors: [] },
 				...trxResult,
 			}
-		})
+		}, failure => ({
+			__typename: 'MutationTransaction',
+			...failure,
+			// Every mutation field of the transaction is non-null; each one reports the failure of the whole.
+			...Object.fromEntries(mutationFields.map(field => [field.alias, { ...failure, node: null }])),
+		}))
 	}
 
 	public async resolveUpdate(
@@ -473,6 +479,7 @@ export class MutationResolver {
 
 	private async transaction<R extends { ok: boolean }>(
 		cb: (mapper: Mapper) => Promise<R>,
+		onMemoryBudgetExceeded: (failure: MemoryBudgetFailure) => R | MemoryBudgetFailure = failure => failure,
 	): Promise<R | MemoryBudgetFailure> {
 		try {
 			return await retryTransaction(
@@ -517,7 +524,7 @@ export class MutationResolver {
 			}
 			// Already rolled back. Reported in data like any failed mutation, so results of sibling mutations survive.
 			const errors = [{ path: [], paths: [], type: Result.ExecutionErrorType.ResourceExhausted, message: e.message }]
-			return { ok: false, validation: { valid: true, errors: [] }, errors, errorMessage: e.message }
+			return onMemoryBudgetExceeded({ ok: false, validation: { valid: true, errors: [] }, errors, errorMessage: e.message })
 		}
 	}
 

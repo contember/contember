@@ -114,7 +114,7 @@ databaseTest('budgets stay request-local and cannot cancel a connection reused b
 				return (await scoped.query<{ pid: number }>('SELECT pg_backend_pid() AS pid')).rows[0].pid
 			}),
 		])
-		expect(healthyBudget.signal.aborted).toBe(false)
+		expect(healthyBudget.exceeded).toBe(false)
 		expect(base.eventManager.memoryBudget).toBeUndefined()
 		expect(connection.eventManager.memoryBudget).toBeUndefined()
 		await base.scope(async reused => {
@@ -183,6 +183,33 @@ databaseTest.each([false, true])('a budget-terminated transaction reports one bu
 		})).rejects.toBeInstanceOf(RequestMemoryBudgetExceededError)
 		expect(queryErrors).toHaveLength(1)
 		expect(queryErrors[0]).toBeInstanceOf(RequestMemoryBudgetExceededError)
+	} finally {
+		await connection.end()
+	}
+})
+
+databaseTest('queries queued behind the one that exhausted the budget report the budget, not the terminated connection', async () => {
+	const connection = createConnection()
+	try {
+		const budget = new RequestMemoryBudget({ warnBytes: 128 * 1024, maxBytes: 256 * 1024 })
+		const bound = connection.createClient('public', {}).withMemoryBudget(budget, { chargeRows: false })
+		let results: PromiseSettledResult<unknown>[] = []
+		// The commit of the terminated connection fails with the budget error as well.
+		await expect(bound.transaction(async transaction => {
+			const charged = transaction.withMemoryBudget(budget, { chargeRows: true })
+			results = await Promise.allSettled([
+				charged.query("SELECT repeat('x', 1024) AS body FROM generate_series(1, 100000)"),
+				transaction.query('SELECT 1'),
+				charged.query('SELECT 2'),
+			])
+		})).rejects.toBeInstanceOf(RequestMemoryBudgetExceededError)
+		expect(results).toHaveLength(3)
+		for (const result of results) {
+			expect(result.status).toBe('rejected')
+			if (result.status === 'rejected') {
+				expect(result.reason).toBeInstanceOf(RequestMemoryBudgetExceededError)
+			}
+		}
 	} finally {
 		await connection.end()
 	}

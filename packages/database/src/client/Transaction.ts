@@ -185,7 +185,7 @@ export const executeTransaction = async <Result>(
 			try {
 				await transaction.rollback()
 			} catch (rollbackError) {
-				// PostgreSQL already rolled back the transaction of a terminated connection.
+				// PostgreSQL already rolled back the transaction of a terminated connection, whatever terminated it.
 				if (!(rollbackError instanceof TerminatedConnectionError)) {
 					throw rollbackError
 				}

@@ -1,9 +1,18 @@
-import { Connection, Pool } from '../../../src/index.js'
+import { Connection, Pool, PoolConfig } from '../../../src/index.js'
 import { PgClient } from '../../../src/client/PgClient.js'
 import EventEmitter from 'node:events'
 import { expect } from 'bun:test'
 
-export const createConnectionMockAlt = (...queries: { sql: string; timeout?: number; result?: any }[][]): [Connection, () => void] => {
+type MockQuery = { sql: string; timeout?: number; result?: any }
+
+export const createConnectionMockAlt = (...queries: MockQuery[][]): [Connection, () => void] => {
+	return createConnectionMockAltWithPool({}, ...queries)
+}
+
+export const createConnectionMockAltWithPool = (
+	poolConfig: Partial<Omit<PoolConfig, 'logError'>>,
+	...queries: MockQuery[][]
+): [Connection, () => void] => {
 	const connectionMocks: (PgClient & { assertEmpty: () => void })[] = []
 	for (const queriesSet of queries) {
 		connectionMocks.push(
@@ -36,7 +45,7 @@ export const createConnectionMockAlt = (...queries: { sql: string; timeout?: num
 		return connectionMocks.shift() ?? (() => {
 			throw new Error('No connection')
 		})()
-	}, { logError: () => null })
+	}, { ...poolConfig, logError: () => null })
 	return [
 		new Connection(pool),
 		() => {

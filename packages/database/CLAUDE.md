@@ -33,11 +33,15 @@ This is invisible to a mapper unit test; cover a new raw jsonb write with an e2e
 
 ## Request Memory Budget
 
-`client.withMemoryBudget(budget)` attaches a `RequestMemoryBudget` to the client's `EventManager`, because that is the only object every `scope`/`transaction`/savepoint already propagates. `AcquiredConnection.query` reads it from there and accounts rows as they arrive.
+`client.withMemoryBudget(budget, { chargeRows })` binds a `RequestMemoryBudget` to the client's `EventManager`, because that is the only object every `scope`/`transaction`/savepoint already propagates. Binding has two levels:
 
-- An `EventManager` inherits its parent's budget by default. Passing `null` explicitly **detaches** it — `rollback()` does this so cleanup still runs after the budget is exhausted. Listeners keep firing through the parent chain either way.
-- Exhaustion ends the physical connection of every in-flight query of that request and marks it terminated. `AcquiredConnection.query` then refuses further queries with `TerminatedConnectionError` **before** firing any event, and `executeTransaction` swallows exactly that error from its rollback (PostgreSQL already rolled back). Any other rollback failure still propagates. The enclosing `Connection.scope` disposes the connection because the scope throws; swallowing `RequestMemoryBudgetExceededError` inside a scope would release a dead connection to the pool.
-- The Content API attaches the budget only to `Mapper.selectionDb` (selection fetches), never to the request client — internal mutation queries are garbage right after use and must not be charged. See `packages/engine-content-api/CLAUDE.md`.
+- **Bound** (any `chargeRows`): every query of the client is refused with `RequestMemoryBudgetExceededError` once the budget is exhausted — in `Client.query`, in `Connection.scope` before and after `pool.acquire()` (a budget exhausted while waiting releases the healthy connection instead of disposing it), and in `AcquiredConnection.query`.
+- **Charged** (`chargeRows: true`, the default): `AcquiredConnection.query` additionally accounts rows as they arrive and subscribes to `budget.onExceeded` so a sibling query still waiting for its first row is cancelled too.
+
+- An `EventManager` inherits its parent's budget and charging by default. Passing `null` explicitly **detaches** it — `rollback()` does this so cleanup still runs after the budget is exhausted. Listeners keep firing through the parent chain either way.
+- Exhaustion ends the physical connection of every in-flight charged query of that request and marks it terminated. `AcquiredConnection.query` checks the budget **before** the terminated flag, so a query queued behind the one that exhausted it reports the budget; only the detached rollback sees `TerminatedConnectionError`, which `executeTransaction` swallows (PostgreSQL already rolled back, whatever terminated the connection). Both refusals precede any event, so they stay out of query error metrics. The enclosing `Connection.scope` disposes the connection because the scope throws; swallowing `RequestMemoryBudgetExceededError` inside a scope would release a dead connection to the pool.
+- The Content API binds the request client without charging and charges only `Mapper.selectionDb` (selection fetches) — internal mutation queries are garbage right after use and must not be charged. See `packages/engine-content-api/CLAUDE.md`.
+- `budget.onExceeded(listener)` is a plain listener set, not an `AbortSignal`: every in-flight query of a request subscribes, and Node 20 warns above ten listeners on one signal.
 - The live-DB tests in `tests/cases/integration/` skip without `MEMORY_TEST_DATABASE_URL`; CI runs them in the `test-db` job.
 
 ## Pool Configuration

@@ -37,7 +37,8 @@ export class RequestMemoryBudget {
 	private largestDatabaseRowBytes = 0
 	private readonly databaseStrings = new StringMemoryEstimate()
 	private failure: RequestMemoryBudgetExceededError | undefined
-	private readonly abortController = new AbortController()
+	// A plain set rather than an AbortSignal: every in-flight query of the request listens, and Node 20 warns above ten signal listeners.
+	private readonly exceededListeners = new Set<(failure: RequestMemoryBudgetExceededError) => void>()
 
 	constructor(private readonly options: RequestMemoryBudgetOptions) {
 		const optionsError = validateRequestMemoryBudgetOptions(options)
@@ -46,14 +47,24 @@ export class RequestMemoryBudget {
 		}
 	}
 
-	get signal(): AbortSignal {
-		return this.abortController.signal
+	get exceeded(): boolean {
+		return this.failure !== undefined
 	}
 
 	check(): void {
 		if (this.failure) {
 			throw this.failure
 		}
+	}
+
+	/** Calls the listener once the budget is exceeded, immediately when it already is. Returns the unsubscribe. */
+	onExceeded(listener: (failure: RequestMemoryBudgetExceededError) => void): () => void {
+		if (this.failure) {
+			listener(this.failure)
+			return () => {}
+		}
+		this.exceededListeners.add(listener)
+		return () => this.exceededListeners.delete(listener)
 	}
 
 	addDatabaseRow(row: Record<string, unknown>): void {
@@ -106,9 +117,12 @@ export class RequestMemoryBudget {
 		const estimatedBytes = this.databaseBytes + this.hydrationBytes + this.getCompletionBytes()
 		this.peakBytes = Math.max(this.peakBytes, estimatedBytes)
 		if (estimatedBytes > this.options.maxBytes) {
-			this.failure = new RequestMemoryBudgetExceededError()
-			this.abortController.abort()
-			throw this.failure
+			const failure = new RequestMemoryBudgetExceededError()
+			this.failure = failure
+			const listeners = [...this.exceededListeners]
+			this.exceededListeners.clear()
+			listeners.forEach(listener => listener(failure))
+			throw failure
 		}
 	}
 }

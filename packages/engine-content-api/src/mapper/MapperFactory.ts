@@ -39,7 +39,7 @@ export class MapperFactory {
 	}
 
 	public async transaction<T>(cb: (mapper: Mapper<Connection.TransactionLike>) => Promise<T>): Promise<T> {
-		// Writes run outside the budget, so an exhausted request must be stopped before it starts another transaction.
+		// Refused here as well as by the bound `db`, so an exhausted request stops before it queues for a pool connection.
 		this.memoryBudget?.check()
 		return await this.db.transaction(async trx => {
 			await trx.connection.query(Connection.REPEATABLE_READ)

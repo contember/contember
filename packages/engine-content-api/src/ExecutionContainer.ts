@@ -130,7 +130,8 @@ export class ExecutionContainerFactory {
 	) {
 		return new Builder({})
 			.addService('systemSchema', () => systemSchema)
-			.addService('db', () => db)
+			// Every query of the request is refused once the budget is exhausted; only selections charge it (Mapper.selectionDb).
+			.addService('db', () => memoryBudget ? db.withMemoryBudget(memoryBudget, { chargeRows: false }) : db)
 			.addService('project', () => project)
 			.addService('stage', () => stage)
 			.addService('triggeredActionsCollector', (): TriggeredActionsCollector | undefined =>
@@ -248,6 +249,7 @@ export class ExecutionContainerFactory {
 					providers,
 					schema,
 					schemaDatabaseMetadata,
+					db,
 				}) => {
 					return new MapperFactory(
 						db,

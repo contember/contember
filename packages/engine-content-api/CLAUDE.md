@@ -30,9 +30,9 @@ GraphQL mutation → MutationResolver.resolveTransaction
 
 ## Request Memory Budget
 
-- `Mapper.selectionDb` is `db` with the request's `RequestMemoryBudget` attached; `Mapper.db` is never budgeted. Route a query through `selectionDb` only when its rows end up in the response (`selectRows`, the many-has-many junction fetch). `SelectHydrator` charges the hydrated objects once per result.
-- The budget is sticky: once exceeded, every further selection throws `RequestMemoryBudgetExceededError`, and `MapperFactory.transaction` refuses to start (writes run unbudgeted, so nothing else would stop them).
-- `MutationResolver.transaction` turns that error into `ok: false` with `ExecutionErrorType.ResourceExhausted`, after the rollback. A query is instead rejected as a whole by `engine-http` (`graphql/execution.ts`), because partial data of a read is worthless.
+- The `db` service of the execution container is the request client **bound** to the `RequestMemoryBudget` without charging (`withMemoryBudget(budget, { chargeRows: false })`): every query of the request is refused once the budget is exhausted, none of them accounts rows. `Mapper.selectionDb` is the same client **charged** — route a query through it only when its rows end up in the response (`selectRows`, the many-has-many junction fetch). `SelectHydrator` charges the hydrated objects once per result.
+- The budget is sticky: once exceeded, every further query throws `RequestMemoryBudgetExceededError` — a `totalCount` or unique lookup queued behind the selection that exhausted it fails with the same error, never with a connection error. `MapperFactory.transaction` also checks before it queues for a pool connection.
+- `MutationResolver.transaction` turns that error into `ok: false` with `ExecutionErrorType.ResourceExhausted`, after the rollback. For `mutation { transaction { … } }` every mutation field of the transaction gets that result too, because those fields are non-null. A query is instead rejected as a whole by `engine-http` (`graphql/execution.ts`), because partial data of a read is worthless.
 
 ## ACL Enforcement
 

@@ -1,5 +1,6 @@
 import { expect, test } from 'bun:test'
 import { Client, Connection, RequestMemoryBudget, RequestMemoryBudgetExceededError } from '../../../src/index.js'
+import { createConnectionMockAlt, createConnectionMockAltWithPool } from './createConnectionMockAlt.js'
 
 test('thresholds are exceeded only above their configured values', () => {
 	const budget = new RequestMemoryBudget({ warnBytes: 100, maxBytes: 200 })
@@ -27,16 +28,24 @@ test('warning threshold records oversize rows without interrupting execution', (
 	budget.addDatabaseRow({ text: 'x'.repeat(2048) })
 	expect(budget.snapshot().warningThresholdExceeded).toBe(true)
 	expect(budget.snapshot().maxBytesExceeded).toBe(false)
-	expect(budget.signal.aborted).toBe(false)
+	expect(budget.exceeded).toBe(false)
 	expect(() => budget.check()).not.toThrow()
 })
 
 test('one large value aborts the shared budget and all subsequent work', () => {
 	const budget = new RequestMemoryBudget({ warnBytes: 512, maxBytes: 1024 })
-	let aborted = false
-	budget.signal.addEventListener('abort', () => aborted = true)
+	const reported: Error[] = []
+	const unsubscribed: Error[] = []
+	budget.onExceeded(failure => reported.push(failure))
+	budget.onExceeded(failure => unsubscribed.push(failure))()
 	expect(() => budget.addDatabaseRow({ text: 'x'.repeat(2048) })).toThrow(RequestMemoryBudgetExceededError)
-	expect(aborted).toBe(true)
+	expect(reported).toEqual([expect.any(RequestMemoryBudgetExceededError)])
+	expect(unsubscribed).toEqual([])
+	expect(budget.exceeded).toBe(true)
+	// A late subscriber is called right away.
+	budget.onExceeded(failure => reported.push(failure))
+	expect(reported).toHaveLength(2)
+	expect(reported[1]).toBe(reported[0])
 	expect(() => budget.addHydrationBytes(1)).toThrow(RequestMemoryBudgetExceededError)
 	expect(() => budget.check()).toThrow(RequestMemoryBudgetExceededError)
 })
@@ -158,4 +167,42 @@ test('request budget does not leak to another client on the same pool', async ()
 	expect(() => budget.addDatabaseRow({ text: 'x'.repeat(1024) })).toThrow(RequestMemoryBudgetExceededError)
 	await expect(scoped.query('SELECT 1')).rejects.toBeInstanceOf(RequestMemoryBudgetExceededError)
 	expect(connection.getPoolStatus().stats.connection_started_count).toBe(0)
+})
+
+test('a client bound without charging refuses queries once the budget is exhausted but accounts no rows', async () => {
+	const [connection, end] = createConnectionMockAlt([{ sql: 'SELECT 1', result: { rows: [{ value: 1 }] } }])
+	const budget = new RequestMemoryBudget({ warnBytes: 512, maxBytes: 1024 })
+	const bound = new Client(connection, 'public', {}).withMemoryBudget(budget, { chargeRows: false })
+	expect(bound.eventManager.chargesMemoryBudget).toBe(false)
+	expect(bound.forSchema('other').eventManager.chargesMemoryBudget).toBe(false)
+	expect(bound.withMemoryBudget(budget).eventManager.chargesMemoryBudget).toBe(true)
+
+	await bound.query('SELECT 1')
+	expect(budget.snapshot().databaseRows).toBe(0)
+	expect(() => budget.addHydrationBytes(2048)).toThrow(RequestMemoryBudgetExceededError)
+	await expect(bound.query('SELECT 2')).rejects.toBeInstanceOf(RequestMemoryBudgetExceededError)
+	await expect(bound.transaction(() => Promise.resolve())).rejects.toBeInstanceOf(RequestMemoryBudgetExceededError)
+	end()
+})
+
+test('a budget exhausted while waiting for the pool releases the acquired connection instead of disposing it', async () => {
+	const [connection, end] = createConnectionMockAltWithPool({ maxConnections: 1 }, [{ sql: 'SELECT 1', timeout: 5 }, { sql: 'SELECT 2' }])
+	const budget = new RequestMemoryBudget({ warnBytes: 512, maxBytes: 1024 })
+	const base = new Client(connection, 'public', {})
+	const bound = base.withMemoryBudget(budget)
+
+	const results = await Promise.allSettled([
+		base.scope(async client => {
+			await client.query('SELECT 1')
+			expect(() => budget.addHydrationBytes(2048)).toThrow(RequestMemoryBudgetExceededError)
+		}),
+		bound.query('SELECT 3'),
+	])
+	expect(results[0].status).toBe('fulfilled')
+	expect(results[1].status).toBe('rejected')
+	expect((results[1] as PromiseRejectedResult).reason).toBeInstanceOf(RequestMemoryBudgetExceededError)
+	// The only pooled connection survived the refused scope.
+	await base.query('SELECT 2')
+	expect(connection.getPoolStatus().stats.connection_disposed_manual_count).toBe(0)
+	end()
 })

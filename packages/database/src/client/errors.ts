@@ -59,6 +59,6 @@ export class CannotCommitError extends DatabaseError {}
 
 export class TerminatedConnectionError extends DatabaseError {
 	constructor() {
-		super('Database connection was terminated by the request memory budget')
+		super('Database connection was terminated')
 	}
 }

@@ -53,7 +53,10 @@ export class AcquiredConnection implements Connection.AcquiredConnectionLike {
 		meta: Record<string, any> = {},
 	): Promise<Connection.Result<Row>> {
 		return await this.mutex.execute(async () => {
-			// Refused before any event fires, so cleanup on a terminated connection stays out of query error metrics.
+			// Both refusals precede any event, so they stay out of query error metrics. The budget goes first: a query
+			// queued behind the one that exhausted it reports the budget, not the connection the budget terminated.
+			const memoryBudget = this.eventManager.memoryBudget
+			memoryBudget?.check()
 			if (this.physicalConnection.terminated) {
 				throw new TerminatedConnectionError()
 			}
@@ -63,8 +66,7 @@ export class AcquiredConnection implements Connection.AcquiredConnectionLike {
 				let result: Connection.Result<Row>
 				const startHrTime = process.hrtime.bigint()
 
-				const memoryBudget = this.eventManager.memoryBudget
-				result = memoryBudget
+				result = memoryBudget && this.eventManager.chargesMemoryBudget
 					? await this.queryWithMemoryBudget<Row>(prepareSql(sql), parameters, memoryBudget)
 					: await this.pgClient.query(prepareSql(sql), parameters)
 
@@ -116,11 +118,10 @@ export class AcquiredConnection implements Connection.AcquiredConnectionLike {
 		parameters: unknown[],
 		budget: RequestMemoryBudget,
 	): Promise<Connection.Result<Row>> {
-		budget.check()
 		return await new Promise<Connection.Result<Row>>((resolve, reject) => {
 			let rows: Row[] | undefined
 			let failure: Error | undefined
-			const cleanup = () => budget.signal.removeEventListener('abort', abort)
+			let cleanup = () => {}
 			const stop = (error: Error) => {
 				failure = error
 				if (rows) {
@@ -132,7 +133,6 @@ export class AcquiredConnection implements Connection.AcquiredConnectionLike {
 				void this.pgClient.end().catch(reject)
 				reject(error)
 			}
-			const abort = () => stop(new RequestMemoryBudgetExceededError())
 			const config = {
 				text: sql,
 				values: parameters,
@@ -148,7 +148,8 @@ export class AcquiredConnection implements Connection.AcquiredConnectionLike {
 				},
 			}
 			const query = new Query<Row>(config)
-			budget.signal.addEventListener('abort', abort, { once: true })
+			// A sibling query of the request may exhaust the budget while this one still waits for its first row.
+			cleanup = budget.onExceeded(stop)
 			query.on('row', (row, result) => {
 				rows = result?.rows
 				if (failure) {

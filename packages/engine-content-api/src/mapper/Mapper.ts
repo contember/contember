@@ -53,7 +53,7 @@ export class Mapper<ConnectionType extends Connection.ConnectionLike = Connectio
 		private readonly memoryBudget?: RequestMemoryBudget,
 	) {
 		this.constraintHelper = new ConstraintHelper(db, this.schemaDatabaseMetadata)
-		this.selectionDb = memoryBudget ? db.withMemoryBudget(memoryBudget) : db
+		this.selectionDb = memoryBudget ? db.withMemoryBudget(memoryBudget, { chargeRows: true }) : db
 		this.eventManager = new EventManager(this)
 	}
 

@@ -147,7 +147,7 @@ export class RelationFetcher {
 		const objectNode = OrderByHelper.appendDefaultOrderBy(relationContext.targetEntity, field, defaultOrderBy)
 		const { targetEntity, entity } = relationContext
 		const junctionValues = await this.fetchJunction(
-			mapper.db,
+			mapper.selectionDb,
 			owningRelation,
 			ids,
 			joiningColumns,

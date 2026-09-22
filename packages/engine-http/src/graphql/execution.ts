@@ -16,6 +16,7 @@ import { Request, Response } from 'koa'
 import { logger } from '@contember/logger'
 import { ForbiddenError } from '@contember/graphql-utils'
 import { UserError } from '@contember/engine-content-api'
+import { RequestMemoryBudget, RequestMemoryBudgetExceededError } from '@contember/database'
 
 export interface GraphQLListener<Context> {
 	onStart?: (ctx: {}) => Omit<GraphQLListener<Context>, 'onStart'> | void
@@ -36,11 +37,14 @@ export interface GraphQLListener<Context> {
 interface FactoryArgs<Context> {
 	schema: GraphQLSchema
 	listeners: GraphQLListener<Context>[]
+	getMemoryBudget?: (context: Context) => RequestMemoryBudget | undefined
 }
 
 export type GraphQLQueryHandler<Context> = (
-	args: { request: Request; response: Response; createContext: ({}: { operation: OperationTypeNode }) => Context },
+	args: { request: Request; response: Response; createContext: ({}: { operation: OperationTypeNode; queryHash: string }) => Context },
 ) => any
+
+const memoryBudgetErrorCode = 'RESOURCE_EXHAUSTED'
 
 const hitCacheMaxAgeSeconds = 10 * 60
 const documentCacheMaxAgeSeconds = hitCacheMaxAgeSeconds * 10
@@ -51,6 +55,7 @@ const hitCacheMax = documentCacheMax * 2
 export const createGraphQLQueryHandler = <Context>({
 	schema,
 	listeners,
+	getMemoryBudget,
 }: FactoryArgs<Context>): GraphQLQueryHandler<Context> => {
 	let schemaValidated = false
 	const hitCache = new LRUCache<string, true>({
@@ -117,17 +122,22 @@ export const createGraphQLQueryHandler = <Context>({
 			const operationName = resolvedRequest.operationName ?? null
 			const operation = resolveOperationType(document, operationName)
 
-			const context = createContext({ operation })
+			const context = createContext({ operation, queryHash })
 			listenersQueue.forEach(it => {
 				it.onExecute && listenersQueue.push(it.onExecute({ context, document, operation }) || {})
 			})
-			const response = await execute({
+			const executionResult = await execute({
 				schema,
 				document,
 				operationName: operationName,
 				variableValues: resolvedRequest.variables,
 				contextValue: context,
 			})
+			// GraphQL turns a budget failure inside a nullable resolver into partial data; reject the whole response instead.
+			// A mutation reports it in its own result, because sibling mutations may already be committed.
+			const response = operation === 'query' && getMemoryBudget?.(context)?.exceeded
+				? { data: null, errors: withMemoryBudgetError(executionResult.errors) }
+				: executionResult
 			listenersQueue.forEach(it => {
 				it.onResponse && listenersQueue.push(it.onResponse({ context, response }) || {})
 			})
@@ -157,11 +167,21 @@ export const extractOriginalError = (e: Error): Error => {
 	return e
 }
 
+const withMemoryBudgetError = (errors: readonly GraphQLError[] = []): readonly GraphQLError[] => {
+	if (errors.some(it => extractOriginalError(it) instanceof RequestMemoryBudgetExceededError)) {
+		return errors
+	}
+	// The resolver that hit the budget did not report it (its error was swallowed); the response still must not pass as valid.
+	const originalError = new RequestMemoryBudgetExceededError()
+	return [...errors, new GraphQLError(originalError.message, { originalError })]
+}
+
 const processErrors = (errors: readonly any[]): [number | null, any[]] => {
 	const resultErrors = []
 	let has400 = false
 	let has403 = false
 	let has500 = false
+	let hasExhaustedMemoryBudget = false
 	for (const error of errors) {
 		const originalError = extractOriginalError(error)
 		if (originalError instanceof GraphQLError) {
@@ -170,6 +190,9 @@ const processErrors = (errors: readonly any[]): [number | null, any[]] => {
 		} else if (originalError instanceof ForbiddenError) {
 			resultErrors.push(error)
 			has403 = true
+		} else if (originalError instanceof RequestMemoryBudgetExceededError) {
+			resultErrors.push({ message: error.message, locations: error.locations, path: error.path, extensions: { code: memoryBudgetErrorCode } })
+			hasExhaustedMemoryBudget = true
 		} else if (originalError instanceof UserError) {
 			resultErrors.push({ message: error.message, locations: error.locations, path: error.path })
 			has400 = true
@@ -179,7 +202,7 @@ const processErrors = (errors: readonly any[]): [number | null, any[]] => {
 			has500 = true
 		}
 	}
-	return [has500 ? 500 : has400 ? 400 : has403 ? 403 : null, resultErrors]
+	return [has500 ? 500 : hasExhaustedMemoryBudget ? 422 : has400 ? 400 : has403 ? 403 : null, resultErrors]
 }
 
 const resolveOperationType = (document: DocumentNode, operationName: string | null): OperationTypeNode => {

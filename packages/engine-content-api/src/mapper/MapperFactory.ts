@@ -6,7 +6,7 @@ import { DeleteExecutor } from './delete/index.js'
 import { Updater } from './update/index.js'
 import { Inserter } from './insert/index.js'
 import { Model } from '@contember/schema'
-import { Client, Connection, DatabaseMetadata } from '@contember/database'
+import { Client, Connection, DatabaseMetadata, RequestMemoryBudget } from '@contember/database'
 import { Mapper } from './Mapper.js'
 import { Providers } from '@contember/schema-utils'
 
@@ -30,6 +30,7 @@ export class MapperFactory {
 		private readonly inserter: Inserter,
 		private readonly pathFactory: PathFactory,
 		private readonly providers: Providers,
+		private readonly memoryBudget?: RequestMemoryBudget,
 	) {
 	}
 
@@ -37,8 +38,10 @@ export class MapperFactory {
 		return this.createInternal(this.db)
 	}
 
-	public transaction<T>(cb: (mapper: Mapper<Connection.TransactionLike>) => Promise<T>): Promise<T> {
-		return this.db.transaction(async trx => {
+	public async transaction<T>(cb: (mapper: Mapper<Connection.TransactionLike>) => Promise<T>): Promise<T> {
+		// Refused here as well as by the bound `db`, so an exhausted request stops before it queues for a pool connection.
+		this.memoryBudget?.check()
+		return await this.db.transaction(async trx => {
 			await trx.connection.query(Connection.REPEATABLE_READ)
 			const mapper = this.createInternal(trx)
 			return await cb(mapper)
@@ -61,6 +64,7 @@ export class MapperFactory {
 			this.updater,
 			this.inserter,
 			this.pathFactory,
+			this.memoryBudget,
 		)
 		this.hooks.forEach(it => it(mapper))
 		return mapper

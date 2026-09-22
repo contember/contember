@@ -2,7 +2,7 @@ import { Acl, Model, Schema, Settings, Validation } from '@contember/schema'
 import { Authorizator, ExecutionContainerFactory, GraphQlSchemaBuilderFactory } from '../../src/index.js'
 import { AllowAllPermissionFactory, emptySchema } from '@contember/schema-utils'
 import { executeGraphQlTest } from './testGraphql.js'
-import { Client, emptyDatabaseMetadata } from '@contember/database'
+import { Client, emptyDatabaseMetadata, RequestMemoryBudget } from '@contember/database'
 import { createConnectionMock } from '@contember/database-tester'
 import { createUuidGenerator, testUuid } from './testUuid.js'
 
@@ -20,6 +20,7 @@ export interface Test {
 	variables?: Acl.VariablesMap
 	query: string
 	queryVariables?: Record<string, any>
+	memoryBudget?: RequestMemoryBudget
 	executes: SqlQuery[]
 	return: object
 }
@@ -108,6 +109,7 @@ export const execute = async (test: Test) => {
 						id: 1,
 					},
 					db,
+					memoryBudget: test.memoryBudget,
 					identityVariables: test.variables || {},
 					identityId: '00000000-0000-0000-0000-000000000000',
 					systemSchema: 'system',

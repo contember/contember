@@ -1,6 +1,6 @@
 /// <reference path="../../types/prom-client/index.d.ts" />
 import prom from 'prom-client'
-import { Connection, EventManager, PoolStats, poolStatsDescription } from '@contember/database'
+import { Connection, EventManager, PoolStats, poolStatsDescription, RequestMemoryBudgetExceededError } from '@contember/database'
 import { CustomMetric } from './CustomMetric.js'
 
 const labelNames = ['contember_project' as const, 'contember_module' as const, 'contember_project_group' as const, 'database_instance']
@@ -136,7 +136,10 @@ const createSqlMetricsRegistrar = (registry: prom.Registry): SqlMetricsRegistrar
 				timing ? Math.round(timing.selfDuration / 1000) : 0,
 			)
 		}
-		const queryErrorCallback: EventManager.ListenerTypes[EventManager.Event.queryError] = ({ meta }) => {
+		const queryErrorCallback: EventManager.ListenerTypes[EventManager.Event.queryError] = ({ meta }, error) => {
+			if (error instanceof RequestMemoryBudgetExceededError) {
+				return
+			}
 			sqlErrorRate.inc({
 				...labels,
 				contember_module: meta.module || labels.contember_module,

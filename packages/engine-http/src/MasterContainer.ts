@@ -226,6 +226,7 @@ export class MasterContainerFactory {
 						contentQueryHandlerFactory,
 						graphQlSchemaFactory,
 						testTransactionService,
+						serverConfig,
 					},
 				) =>
 					new ContentApiControllerFactory(
@@ -235,6 +236,7 @@ export class MasterContainerFactory {
 						projectContextResolver,
 						graphQlSchemaFactory,
 						testTransactionService,
+						serverConfig.http?.requestMemoryBudget,
 					),
 			)
 			.addService('tenantApiMiddlewareFactory', () => new TenantApiMiddlewareFactory())

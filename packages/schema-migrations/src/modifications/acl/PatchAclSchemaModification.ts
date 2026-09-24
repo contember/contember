@@ -1,7 +1,7 @@
 import { SchemaUpdater } from '../utils/schemaUpdateUtils.js'
 import { createModificationType, ModificationHandler } from '../ModificationHandler.js'
 import { applyPatch, Operation } from 'rfc6902'
-import deepCopy from '../../utils/deepCopy.js'
+import { copyPatchedPaths } from '../../utils/copyPatchedPaths.js'
 
 export class PatchAclSchemaModificationHandler implements ModificationHandler<PatchAclSchemaModificationData> {
 	constructor(private readonly data: PatchAclSchemaModificationData) {}
@@ -10,7 +10,7 @@ export class PatchAclSchemaModificationHandler implements ModificationHandler<Pa
 
 	public getSchemaUpdater(): SchemaUpdater {
 		return ({ schema }) => {
-			const acl = deepCopy(schema.acl)
+			const acl = copyPatchedPaths(schema.acl, this.data.patch)
 			const result = applyPatch(acl, this.data.patch).filter(it => it !== null)
 			if (result.length > 0) {
 				throw result[0]

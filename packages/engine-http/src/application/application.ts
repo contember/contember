@@ -95,7 +95,7 @@ export class Application {
 		koa.use(bodyParser({
 			jsonLimit: this.serverConfig.http?.requestBodySize || '1mb',
 		}))
-		koa.use(corsMiddleware())
+		koa.use(corsMiddleware({ exposeHeaders: ['X-Contember-Mutation'] }))
 		const versionMatch = this.version?.match(/^(0\.\d+|\d+)/)
 		const versionSimplified = versionMatch?.[1] ?? 'unknown'
 		koa.use(async ctx => {

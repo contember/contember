@@ -29,6 +29,7 @@ export interface ContemberClientProps {
     graphqlClientFactory?: GraphQlClientFactory;
     // (undocumented)
     loginToken?: string;
+    primaryReadWindowMs?: number;
     // (undocumented)
     project?: string;
     // (undocumented)
@@ -87,7 +88,9 @@ export const useCurrentContentGraphQlClient: () => GraphQlClient;
 export const useCurrentSystemGraphQlClient: () => GraphQlClient;
 
 // @public (undocumented)
-export const useGraphQlClient: (path: string) => GraphQlClient;
+export const useGraphQlClient: (path: string, options?: {
+    primaryReadWindow?: boolean;
+}) => GraphQlClient;
 
 // @public (undocumented)
 export const useGraphQlClientFactory: () => GraphQlClientFactory | undefined;

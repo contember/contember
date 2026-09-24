@@ -1,5 +1,6 @@
 import { GraphQlClientError, GraphQlErrorType } from './GraphQlClientError.js'
-import { GraphQlClientOptions, GraphQlClientRequestOptions } from './GraphQlClientRequestOptions.js'
+import { GraphQlClientBaseOptions, GraphQlClientOptions, GraphQlClientRequestOptions } from './GraphQlClientRequestOptions.js'
+import { PrimaryReadWindow } from './PrimaryReadWindow.js'
 
 export class GraphQlClient {
 	constructor(
@@ -48,6 +49,11 @@ ${query}`
 		} catch (e) {
 			const aborted = typeof e === 'object' && e !== null && (e as { name?: unknown }).name === 'AbortError'
 			throw createError(aborted ? 'aborted' : 'network error', undefined, e)
+		} finally {
+			// Start once the body has arrived, and even if reading it or a user hook failed: an earlier mutation field may have committed.
+			if (response !== null) {
+				this.resolvePrimaryReadWindow(options)?.captureResponse(response)
+			}
 		}
 
 		let data: any
@@ -86,12 +92,16 @@ ${query}`
 
 	protected async doExecute(
 		query: string,
-		{ apiToken, signal, variables, headers }: GraphQlClientRequestOptions = {},
+		options: GraphQlClientRequestOptions = {},
 	): Promise<Response> {
+		const { apiToken, signal, variables, headers } = options
 		const resolvedHeaders: Record<string, string> = {
 			'Content-Type': 'application/json',
 			...this.options.headers,
 			...headers,
+		}
+		if (!new Headers(resolvedHeaders).has('X-Contember-Force-Primary')) {
+			Object.assign(resolvedHeaders, this.resolvePrimaryReadWindow(options)?.requestHeaders())
 		}
 		const resolvedToken = apiToken ?? this.options.apiToken
 
@@ -105,6 +115,10 @@ ${query}`
 			signal,
 			body: JSON.stringify({ query, variables }),
 		})
+	}
+
+	private resolvePrimaryReadWindow(options: GraphQlClientBaseOptions): PrimaryReadWindow | undefined {
+		return (options.primaryReadWindow ?? this.options.primaryReadWindow) || undefined
 	}
 }
 

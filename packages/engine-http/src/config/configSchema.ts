@@ -183,6 +183,7 @@ export const serverConfigSchema = Typesafe.partial({
 	}),
 	contentApi: Typesafe.partial({
 		schemaCacheTtlSeconds: Typesafe.integer,
+		forcePrimaryHeader: Typesafe.boolean,
 		whereOptimizer: Typesafe.partial({
 			disable: Typesafe.boolean,
 			maxCrossOptimizationInput: Typesafe.number,

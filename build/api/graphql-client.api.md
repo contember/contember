@@ -10,7 +10,7 @@ export class GraphQlClient {
     // (undocumented)
     get apiUrl(): string;
     // (undocumented)
-    protected doExecute(query: string, input?: GraphQlClientRequestOptions): Promise<Response>;
+    protected doExecute(query: string, options?: GraphQlClientRequestOptions): Promise<Response>;
     // (undocumented)
     execute<T = unknown>(query: string, options?: GraphQlClientRequestOptions): Promise<T>;
     // (undocumented)
@@ -32,6 +32,7 @@ export interface GraphQlClientBaseOptions {
     readonly onData?: (json: unknown) => void;
     // (undocumented)
     readonly onResponse?: (response: Response) => void;
+    readonly primaryReadWindow?: PrimaryReadWindow | false;
 }
 
 // @public (undocumented)
@@ -78,6 +79,22 @@ export type GraphQlErrorRequest = {
 
 // @public (undocumented)
 export type GraphQlErrorType = 'aborted' | 'network error' | 'invalid response body' | 'bad request' | 'unauthorized' | 'forbidden' | 'server error' | 'response errors';
+
+// @public
+export class PrimaryReadWindow {
+    constructor(input?: PrimaryReadWindowOptions);
+    // (undocumented)
+    captureResponse(response: Response): void;
+    // (undocumented)
+    requestHeaders(): Record<string, string>;
+}
+
+// @public (undocumented)
+export interface PrimaryReadWindowOptions {
+    readonly durationMs?: number;
+    // (undocumented)
+    readonly now?: () => number;
+}
 
 // (No @packageDocumentation comment for this package)
 

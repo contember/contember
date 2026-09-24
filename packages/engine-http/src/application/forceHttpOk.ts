@@ -1,4 +1,5 @@
 import { IncomingMessage } from 'node:http'
+import { isTruthyHeader } from '../utils/truthyHeader.js'
 
 /**
  * Opt-in mechanism to coerce the HTTP status of a GraphQL API response to 200.
@@ -17,16 +18,7 @@ export const forceHttpOkHeader = 'x-contember-force-ok'
 
 const graphqlModules = new Set(['content', 'tenant', 'system'])
 
-const truthyValues = new Set(['1', 'true', 'on', 'yes'])
-
-export const isForceHttpOkRequested = (request: IncomingMessage): boolean => {
-	const raw = request.headers[forceHttpOkHeader]
-	const value = Array.isArray(raw) ? raw[0] : raw
-	if (value === undefined) {
-		return false
-	}
-	return truthyValues.has(value.trim().toLowerCase())
-}
+export const isForceHttpOkRequested = (request: IncomingMessage): boolean => isTruthyHeader(request, forceHttpOkHeader)
 
 export const isGraphqlModule = (module: string | undefined): boolean => module !== undefined && graphqlModules.has(module)
 

@@ -93,6 +93,80 @@ tenant:
       host: replica.db.example.com
 ```
 
+### Reading from the primary after a mutation
+
+:::note[Available since 2.2]
+:::
+
+Replication is asynchronous. A query sent immediately after a mutation can read stale data from a replica. When enabled, the Content API accepts **`X-Contember-Force-Primary: 1`** to route a request's project database reads to the primary, including stage lookup, schema and database metadata resolution, and the `X-Contember-Ref` cache check. Normal authentication and permissions still apply. Without this header, queries use the read replica as before.
+
+This works with a single replica or a reader endpoint that distributes connections across several replicas, including an Aurora reader endpoint. It uses the configured primary connection directly and does not depend on replication-status functions or replica identities. Tenant database reads, such as API key verification and membership lookup, still use the tenant read replica.
+
+The header is disabled by default. Once enabled, it is available to every authenticated caller of every project, including API keys embedded in public websites. Forced reads share the primary connection pool with all mutations, so heavy forced queries can delay writes. Enable it for all projects:
+
+```bash
+CONTEMBER_CONTENT_API_FORCE_PRIMARY_HEADER=true
+```
+
+or in the server config:
+
+```yaml
+server:
+  contentApi:
+    forcePrimaryHeader: true
+```
+
+While it is disabled, the engine ignores the header and does not mark mutation responses, so clients never open a primary read window. The engine also does not mark mutation responses of projects without a read replica. The header accepts the same values as `X-Contember-Force-Ok`: `1`, `true`, `on` or `yes`.
+
+You can use the header independently of the JavaScript clients:
+
+```http
+POST /content/my-project/live
+X-Contember-Force-Primary: 1
+Authorization: Bearer ...
+Content-Type: application/json
+
+{ "query": "{ listArticle { title } }" }
+```
+
+#### React clients
+
+When the engine has the header enabled, `ContemberClient` automatically forces primary reads for **1000 ms after receiving a Content API mutation response**. Another mutation response restarts the window. Queries do not extend it. Configure the duration with `primaryReadWindowMs`, or set it to `0` to disable the window:
+
+```tsx
+<ContemberClient apiBaseUrl={apiBaseUrl} project="my-project" stage="live" primaryReadWindowMs={1000}>
+  {children}
+</ContemberClient>
+```
+
+Content clients within the provider share a window when they use the same Content API URL and session token, including clients under a nested `ApiBaseUrlContext` or `SessionTokenContext` provider. Changing the window duration resets the windows. Tenant and System API clients do not use them. A custom `graphqlClientFactory` must pass the `primaryReadWindow` option on to the client it creates.
+
+#### Other JavaScript clients
+
+`GraphQlClient` has no automatic window unless one is supplied. Share a `PrimaryReadWindow` across clients for the same Content API endpoint and identity:
+
+```ts
+import { GraphQlClient, PrimaryReadWindow } from '@contember/graphql-client'
+
+const client = new GraphQlClient({
+  url: 'https://api.example.com/content/my-project/live',
+  apiToken,
+  primaryReadWindow: new PrimaryReadWindow({ durationMs: 1000 }),
+})
+```
+
+The `primaryReadWindow` option is also accepted per request. Passing `false` disables both sending the window's header and updating the window for that request. Explicit request headers take precedence over the window's header. `withOptions()` retains the same window, so pass a new window when you change `url` or `apiToken`.
+
+When the header is enabled and the project has a read replica, the engine marks Content API mutation responses with **`X-Contember-Mutation: 1`**. The window starts once the client has read the response body. It also starts when the body contains GraphQL errors or a response callback throws, so a mutation that partially committed still opens the window. The marker identifies an executed mutation operation, not a confirmed database write: write-free or failed mutations can also open a window. Responses without the marker do not open one, including responses from older engines. A lost mutation response cannot open a window.
+
+For cross-origin browser requests, the engine exposes the mutation marker through CORS and permits the primary-read header through preflight. Any proxy that filters headers must pass both headers through.
+
+#### Consistency boundary
+
+During the window, primary reads can see the client's completed writes. **The duration is not a bound on replication lag.** Once it expires, the client returns to eventually consistent replica reads, which can still be stale during prolonged lag. Set `X-Contember-Force-Primary: 1` explicitly for reads that must use the primary regardless of elapsed time.
+
+The window is local to the client instance or React provider; it is not shared across tabs or devices. For server-side rendering, create windows per user request rather than sharing a global window across users. An application can also carry its own deadline across requests and send the primary-read header while that deadline is active.
+
 ## Config file
 
 Database options can be set declaratively in the config file. The tenant database lives under `tenant.db`, and per-project databases under `projects.<slug>.db` (or `projectDefaults.db` for defaults shared by all projects). A project may also set `useTenantDb: true` to share the tenant connection instead of using its own.

@@ -10,9 +10,11 @@ import { ContentQueryHandler, ContentQueryHandlerFactory } from './ContentQueryH
 import { GraphQlSchemaFactory } from './GraphQlSchemaFactory.js'
 import { NotModifiedChecker } from './NotModifiedChecker.js'
 import { TestTransactionService } from '../testing/index.js'
+import { isTruthyHeader } from '../utils/truthyHeader.js'
 
 const debugHeader = 'x-contember-debug'
 const testSessionHeader = 'x-contember-test-session'
+const forcePrimaryHeader = 'x-contember-force-primary'
 
 export class ContentApiControllerFactory {
 	constructor(
@@ -22,6 +24,7 @@ export class ContentApiControllerFactory {
 		private readonly projectContextResolver: ProjectContextResolver,
 		private readonly graphQlSchemaFactory: GraphQlSchemaFactory,
 		private readonly testTransactionService: TestTransactionService,
+		private readonly forcePrimaryHeaderEnabled: boolean,
 	) {
 	}
 
@@ -38,7 +41,10 @@ export class ContentApiControllerFactory {
 				project: project.slug,
 			})
 
-			const systemDatabase = projectContainer.systemReadDatabaseContext
+			const forcePrimary = this.forcePrimaryHeaderEnabled && isTruthyHeader(request, forcePrimaryHeader)
+			// Without a replica, forced reads change nothing, so clients need not open a window.
+			const markMutations = this.forcePrimaryHeaderEnabled && projectContainer.readConnection !== projectContainer.connection
+			const systemDatabase = forcePrimary ? projectContainer.systemDatabaseContext : projectContainer.systemReadDatabaseContext
 			const stage = await systemDatabase.queryHandler.fetch(new StageBySlugQuery(params.stageSlug))
 			if (!stage) {
 				return new HttpErrorResponse(404, `Stage ${params.stageSlug} NOT found`)
@@ -133,11 +139,15 @@ export class ContentApiControllerFactory {
 						request: koa.request,
 						response: koa.response,
 						createContext: ({ operation }) => {
+							// Clients open a primary read window only on this marker, so it must not be sent while the header is ignored.
+							if (operation === 'mutation' && markMutations) {
+								koa.response.set('X-Contember-Mutation', '1')
+							}
 							;(koa.state as GraphQLKoaState).graphql = {
 								operationName: operation,
 							}
 
-							const baseConnection = operation === 'query' ? projectContainer.readConnection : projectContainer.connection
+							const baseConnection = operation === 'query' && !forcePrimary ? projectContainer.readConnection : projectContainer.connection
 							const maxConnectionsPerRequest = 'maxConnectionsPerRequest' in project.db
 								? project.db.maxConnectionsPerRequest
 								: undefined

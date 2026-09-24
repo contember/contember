@@ -8,6 +8,7 @@ import {
 	SetSessionTokenContext,
 	StageSlugContext,
 } from '../contexts.js'
+import { PrimaryReadWindows, PrimaryReadWindowsContext } from '../primaryReadWindows.js'
 import { GraphQlClientFactory, SessionTokenContextValue } from '../types/index.js'
 
 export interface ContemberClientProps {
@@ -17,6 +18,8 @@ export interface ContemberClientProps {
 	project?: string
 	stage?: string
 	graphqlClientFactory?: GraphQlClientFactory
+	/** Read from the primary for this many milliseconds after a Content API mutation. Default: 1000. Zero disables it. */
+	primaryReadWindowMs?: number
 }
 
 const sessionTokenKey = 'contember_session_token'
@@ -32,6 +35,7 @@ export const ContemberClient = memo<ContemberClientProps & { children: React.Rea
 	sessionToken,
 	stage,
 	graphqlClientFactory,
+	primaryReadWindowMs = 1000,
 }) {
 	const [localStorageSessionToken, setLocalStorageSessionToken] = useLocalStorageSessionToken()
 
@@ -41,6 +45,11 @@ export const ContemberClient = memo<ContemberClientProps & { children: React.Rea
 		source: localStorageSessionToken ? 'localstorage' : (sessionToken ? 'props' : undefined),
 	}), [localStorageSessionToken, sessionToken])
 
+	const primaryReadWindows = useMemo(
+		() => primaryReadWindowMs === 0 ? undefined : new PrimaryReadWindows(primaryReadWindowMs),
+		[primaryReadWindowMs],
+	)
+
 	return (
 		<ApiBaseUrlContext.Provider value={apiBaseUrl}>
 			<LoginTokenContext.Provider value={loginToken}>
@@ -49,7 +58,9 @@ export const ContemberClient = memo<ContemberClientProps & { children: React.Rea
 						<ProjectSlugContext.Provider value={project}>
 							<StageSlugContext.Provider value={stage}>
 								<GraphQlClientFactoryContext.Provider value={graphqlClientFactory}>
-									{children}
+									<PrimaryReadWindowsContext.Provider value={primaryReadWindows}>
+										{children}
+									</PrimaryReadWindowsContext.Provider>
 								</GraphQlClientFactoryContext.Provider>
 							</StageSlugContext.Provider>
 						</ProjectSlugContext.Provider>

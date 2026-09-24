@@ -42,6 +42,8 @@ export class ContentApiControllerFactory {
 			})
 
 			const forcePrimary = this.forcePrimaryHeaderEnabled && isTruthyHeader(request, forcePrimaryHeader)
+			// Without a replica, forced reads change nothing, so clients need not open a window.
+			const markMutations = this.forcePrimaryHeaderEnabled && projectContainer.readConnection !== projectContainer.connection
 			const systemDatabase = forcePrimary ? projectContainer.systemDatabaseContext : projectContainer.systemReadDatabaseContext
 			const stage = await systemDatabase.queryHandler.fetch(new StageBySlugQuery(params.stageSlug))
 			if (!stage) {
@@ -138,7 +140,7 @@ export class ContentApiControllerFactory {
 						response: koa.response,
 						createContext: ({ operation }) => {
 							// Clients open a primary read window only on this marker, so it must not be sent while the header is ignored.
-							if (operation === 'mutation' && this.forcePrimaryHeaderEnabled) {
+							if (operation === 'mutation' && markMutations) {
 								koa.response.set('X-Contember-Mutation', '1')
 							}
 							;(koa.state as GraphQLKoaState).graphql = {

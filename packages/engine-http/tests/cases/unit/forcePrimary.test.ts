@@ -31,7 +31,7 @@ const unavailable = (): never => {
 }
 const stage = { id: 'a4c9b8f2-6a1e-4a3f-9a4b-1f2e3d4c5b6a', name: 'Live', slug: 'live', schema: 'stage_live' }
 
-const createHarness = ({ forcePrimaryHeader = true }: { forcePrimaryHeader?: boolean } = {}) => {
+const createHarness = ({ forcePrimaryHeader = true, withReplica = true }: { forcePrimaryHeader?: boolean; withReplica?: boolean } = {}) => {
 	const statements: { side: string; sql: string }[] = []
 	const preparation: DatabaseContext[] = []
 	let replicaAvailable = true
@@ -57,7 +57,7 @@ const createHarness = ({ forcePrimaryHeader = true }: { forcePrimaryHeader?: boo
 		return new Connection(new Pool(() => client, { maxConnections: 1, logError: () => {} }), events)
 	}
 	const primary = database('primary')
-	const replica = database('replica')
+	const replica = withReplica ? database('replica') : primary
 	const providers = createProviders()
 	const logger = createLogger(new TestLoggerHandler())
 	const systemDatabaseContextFactory = new DatabaseContextFactory('system', providers)
@@ -156,12 +156,15 @@ const createHarness = ({ forcePrimaryHeader = true }: { forcePrimaryHeader?: boo
 		statements,
 		preparation,
 		primarySystem: projectContainer.systemDatabaseContext,
+		replicaSystem: projectContainer.systemReadDatabaseContext,
 		setReplicaUnavailable: () => {
 			replicaAvailable = false
 		},
 		close: async () => {
 			await primary.end()
-			await replica.end()
+			if (replica !== primary) {
+				await replica.end()
+			}
 		},
 		request: async (query: string, headers: Record<string, string> = {}) => {
 			const message = new IncomingMessage(new Socket())
@@ -219,6 +222,19 @@ test('a forced primary read can return 304 from the primary reference', async ()
 	}
 })
 
+test('without the header, preparation, cache validation and content read the replica', async () => {
+	const harness = createHarness()
+	try {
+		const { koa } = await harness.request('{ marker }', { 'x-contember-ref': 'new-ref' })
+		expect(koa.body).toBe('{"data":{"marker":"replica"}}')
+		expect(harness.statements.every(it => it.side === 'replica')).toBe(true)
+		expect(harness.statements.some(it => it.sql.includes('"stage_transaction"'))).toBe(true)
+		expect(harness.preparation).toEqual([harness.replicaSystem, harness.replicaSystem])
+	} finally {
+		await harness.close()
+	}
+})
+
 test('the header accepts the same truthy values as X-Contember-Force-Ok; ordinary queries still read the replica', async () => {
 	const harness = createHarness()
 	try {
@@ -241,6 +257,8 @@ test('without the config opt-in the header is ignored and mutations are not mark
 	try {
 		const query = await harness.request('{ marker }', { 'x-contember-force-primary': '1' })
 		expect(query.koa.body).toBe('{"data":{"marker":"replica"}}')
+		expect(harness.statements.every(it => it.side === 'replica')).toBe(true)
+		expect(harness.preparation).toEqual([harness.replicaSystem, harness.replicaSystem])
 		const mutation = await harness.request('mutation { marker }')
 		expect(mutation.koa.body).toBe('{"data":{"marker":"primary"}}')
 		expect(mutation.koa.response.get('X-Contember-Mutation')).toBe('')
@@ -258,6 +276,17 @@ test('mutations run on primary and are marked even when a later root fails', asy
 		expect(koa.body).toContain('Mutation failed')
 		const invalid = await harness.request('mutation { unknown }')
 		expect(invalid.koa.response.get('X-Contember-Mutation')).toBe('')
+	} finally {
+		await harness.close()
+	}
+})
+
+test('a project without a read replica does not mark mutations', async () => {
+	const harness = createHarness({ withReplica: false })
+	try {
+		const { koa } = await harness.request('mutation { marker }')
+		expect(koa.body).toBe('{"data":{"marker":"primary"}}')
+		expect(koa.response.get('X-Contember-Mutation')).toBe('')
 	} finally {
 		await harness.close()
 	}

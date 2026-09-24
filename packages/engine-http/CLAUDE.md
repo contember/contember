@@ -43,7 +43,7 @@ Two resolution modes:
 - `application/application.ts` — Koa app, route registration, request lifecycle
 - `application/forceHttpOk.ts` — opt-in `X-Contember-Force-Ok` header that coerces GraphQL API responses to HTTP 200 (errors stay in the JSON body); gated by `http.responseStatusHeader` config
 - `MasterContainer.ts` — DI container factory with all service definitions
-- `content/ContentApiControllerFactory.ts` — Content API: schema resolution, membership check, GraphQL execution; honours `X-Contember-Force-Primary` and marks mutations only when `contentApi.forcePrimaryHeader` is enabled
+- `content/ContentApiControllerFactory.ts` — Content API: schema resolution, membership check, GraphQL execution; honours `X-Contember-Force-Primary` only when `contentApi.forcePrimaryHeader` is enabled, and then marks mutations of projects with a read replica
 - `projectGroup/ProjectGroupResolver.ts` — Tenant resolution
 - `common/Authorizator.ts` — Token verification
 - `config/configSchema.ts` — Server config validation schema

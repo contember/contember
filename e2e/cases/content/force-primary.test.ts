@@ -9,7 +9,7 @@ namespace PrimaryReadModel {
 	}
 }
 
-test('Content API exposes the mutation marker and accepts forced primary reads', async () => {
+test('Content API accepts forced primary reads and exposes the mutation marker through CORS', async () => {
 	const tester = await createTester(createSchema(PrimaryReadModel))
 	const mutation = await tester(gql`
 		mutation {
@@ -17,7 +17,8 @@ test('Content API exposes the mutation marker and accepts forced primary reads',
 		}
 	`).set('Origin', 'https://admin.example.com').expect(200)
 	expect(mutation.body.data).toEqual({ createArticle: { ok: true } })
-	expect(mutation.get('X-Contember-Mutation')).toBe('1')
+	// The e2e engine has no read replica, so mutations are not marked; the engine-http unit test covers the marker.
+	expect(mutation.get('X-Contember-Mutation')).toBeUndefined()
 	expect(mutation.get('Access-Control-Expose-Headers')?.toLowerCase()).toContain('x-contember-mutation')
 
 	const query = await tester(gql`

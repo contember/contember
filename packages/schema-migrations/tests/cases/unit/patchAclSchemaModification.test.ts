@@ -1,6 +1,7 @@
 import { describe, expect, test } from 'bun:test'
 import { Acl, Schema } from '@contember/schema'
 import { emptySchema } from '@contember/schema-utils'
+import { createPatch } from 'rfc6902'
 import { ModificationHandlerFactory, SchemaMigrator } from '../../../src/index.js'
 
 const schemaMigrator = new SchemaMigrator(new ModificationHandlerFactory(ModificationHandlerFactory.defaultFactoryMap))
@@ -70,5 +71,74 @@ describe('patchAclSchema', () => {
 
 		expect(value).toStrictEqual(role(['Article']))
 		expect(first.acl.roles.writer.entities).toStrictEqual(role(['Article']).entities)
+	})
+
+	test('follows array indices that earlier operations of the patch shifted', () => {
+		const withPredicate = (predicate: Acl.PredicateDefinition): Schema => ({
+			...emptySchema,
+			acl: { roles: { editor: { ...role(['Article']), entities: { Article: { predicates: { p: predicate }, operations: {} } } } } },
+		})
+		const schema = withPredicate({ or: [{ a: { eq: 1 } }, { b: { eq: 2 } }, { c: { eq: 3, isNull: false } }] })
+		const target = withPredicate({ or: [{ b: { eq: 2 } }, { c: { eq: 3 } }] })
+		const snapshot = structuredClone(schema)
+
+		const result = schemaMigrator.applyModifications(schema, [{
+			modification: 'patchAclSchema',
+			patch: createPatch(schema.acl, target.acl),
+		}], 6)
+
+		expect(schema).toStrictEqual(snapshot)
+		expect(result.acl).toStrictEqual(target.acl)
+	})
+
+	test('copies a moved subtree before writing into it', () => {
+		const schema = schemaWithAcl()
+		const snapshot = structuredClone(schema)
+
+		const result = schemaMigrator.applyModifications(schema, [{
+			modification: 'patchAclSchema',
+			patch: [
+				{ op: 'move', from: '/roles/editor', path: '/roles/writer' },
+				{ op: 'remove', path: '/roles/writer/entities/Tag' },
+			],
+		}], 6)
+
+		expect(schema).toStrictEqual(snapshot)
+		expect(Object.keys(result.acl.roles.writer.entities)).toStrictEqual(['Article'])
+	})
+
+	test('replaying the same migrations twice gives the same schema', () => {
+		const modifications = [
+			{ modification: 'updateAclSchema', schema: { roles: { editor: role(['Article', 'Tag']) } } },
+			{
+				modification: 'patchAclSchema',
+				patch: [
+					{ op: 'move', from: '/roles/editor', path: '/roles/writer' },
+					{ op: 'remove', path: '/roles/writer/entities/Tag' },
+				],
+			},
+		]
+
+		const first = schemaMigrator.applyModifications(emptySchema, modifications, 6)
+		const second = schemaMigrator.applyModifications(emptySchema, modifications, 6)
+
+		expect(second).toStrictEqual(first)
+	})
+
+	test('skips the tokens rfc6902 skips when copying', () => {
+		const schema = schemaWithAcl()
+		const snapshot = structuredClone(schema)
+
+		schemaMigrator.applyModifications(schema, [{
+			modification: 'patchAclSchema',
+			patch: [
+				{ op: 'replace', path: '/roles/editor/__proto__/entities/Article/operations/read/id', value: false },
+				{ op: 'add', path: '/roles/constructor/reader/entities/Tag', value: {} },
+				{ op: 'add', path: '/roles/reader/__proto__', value: { injected: true } },
+			],
+		}], 6)
+
+		expect(schema).toStrictEqual(snapshot)
+		expect(Object.getPrototypeOf(schema.acl.roles.reader)).toBe(Object.prototype)
 	})
 })

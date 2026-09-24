@@ -45,7 +45,7 @@ export class ApiKeyManager {
 			return new ResponseOk(unpersistedResult)
 		}
 
-		const apiKeyRow = await readDbContext.queryHandler.fetch(new ApiKeyByTokenQuery(token))
+		const apiKeyRow = await this.fetchApiKeyByToken(dbContext, readDbContext, token)
 		if (apiKeyRow === null) {
 			return new ResponseError(VerifyErrorCode.NOT_FOUND, 'API key was not found')
 		}
@@ -156,6 +156,16 @@ export class ApiKeyManager {
 				apiKeyRow.trust_forwarded_info,
 			),
 		)
+	}
+
+	private async fetchApiKeyByToken(dbContext: DatabaseContext, readDbContext: DatabaseContext, token: string): Promise<ApiKeyRow | null> {
+		const query = new ApiKeyByTokenQuery(token)
+		const replicaRow = await readDbContext.queryHandler.fetch(query)
+		if (replicaRow !== null || readDbContext.client.connection === dbContext.client.connection) {
+			return replicaRow
+		}
+		// A token issued moments ago (sign-in, createSessionToken) may not have reached the read replica yet.
+		return await dbContext.queryHandler.fetch(query)
 	}
 
 	async createSessionApiKey(

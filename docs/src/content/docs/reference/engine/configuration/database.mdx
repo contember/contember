@@ -93,6 +93,8 @@ tenant:
       host: replica.db.example.com
 ```
 
+API key verification reads from the tenant replica. A key issued moments ago may not be there yet, so when the replica has no matching key, the engine looks it up on the primary. A token therefore works immediately after sign-in, and a request with an unknown or invalid token costs one extra lookup on the primary. This fallback is always on and does not depend on the header described below. Other tenant reads, such as project membership lookup, use only the replica.
+
 ### Reading from the primary after a mutation
 
 :::note[Available since 2.2]
@@ -100,7 +102,7 @@ tenant:
 
 Replication is asynchronous. A query sent immediately after a mutation can read stale data from a replica. When enabled, the Content API accepts **`X-Contember-Force-Primary: 1`** to route a request's project database reads to the primary, including stage lookup, schema and database metadata resolution, and the `X-Contember-Ref` cache check. Normal authentication and permissions still apply. Without this header, queries use the read replica as before.
 
-This works with a single replica or a reader endpoint that distributes connections across several replicas, including an Aurora reader endpoint. It uses the configured primary connection directly and does not depend on replication-status functions or replica identities. Tenant database reads, such as API key verification and membership lookup, still use the tenant read replica. When API key verification does not find the key on the replica, it looks it up on the primary, so a token can be used immediately after sign-in.
+This works with a single replica or a reader endpoint that distributes connections across several replicas, including an Aurora reader endpoint. It uses the configured primary connection directly and does not depend on replication-status functions or replica identities. Tenant database reads, such as API key verification and membership lookup, still use the tenant read replica.
 
 The header is disabled by default. Once enabled, it is available to every authenticated caller of every project, including API keys embedded in public websites. Forced reads share the primary connection pool with all mutations, so heavy forced queries can delay writes. Enable it for all projects:
 

@@ -4,9 +4,11 @@ import { ApiKeyHelper } from './ApiKeyHelper.js'
 import { QueryBuilder, UpdateBuilder } from '@contember/database'
 
 /**
- * Tracking writes (`last_used_at`) are throttled to at most once per this window, so
- * an idle check must add this slack to avoid prematurely expiring an active session
- * whose `last_used_at` is intentionally stale (see {@link ApiKeyManager.verifyAndProlong}).
+ * Tracking writes (`last_ip`, `last_user_agent`, `last_used_at`) are throttled to at most once per
+ * this window, even when the IP or User-Agent changes: a key shared by several service replicas
+ * alternates between their addresses, and writing every change makes its row a lock hotspot.
+ * An idle check must add this slack to avoid prematurely expiring an active session whose
+ * `last_used_at` is intentionally stale (see {@link ApiKeyManager.verifyAndProlong}).
  */
 export const PROLONG_THROTTLE_MS = 60_000
 
@@ -51,7 +53,7 @@ export class ProlongApiKeyCommand implements Command<void> {
 
 		const requestIp = this.requestInfo?.ip || null
 		const requestUserAgent = this.requestInfo?.userAgent || null
-		const updateTracking = this.shouldUpdateTracking(now, requestIp, requestUserAgent)
+		const updateTracking = this.shouldUpdateTracking(now)
 
 		if (!updateExpiration && !updateTracking) {
 			return
@@ -74,17 +76,14 @@ export class ProlongApiKeyCommand implements Command<void> {
 		await qb.execute(db)
 	}
 
-	private shouldUpdateTracking(now: Date, requestIp: string | null, requestUserAgent: string | null): boolean {
+	private shouldUpdateTracking(now: Date): boolean {
 		if (!this.requestInfo) {
 			return false
 		}
-		const last = this.tracking
-		if (!last || last.lastUsedAt === null) {
+		const lastUsedAt = this.tracking?.lastUsedAt
+		if (!lastUsedAt) {
 			return true
 		}
-		if (requestIp !== last.lastIp || requestUserAgent !== last.lastUserAgent) {
-			return true
-		}
-		return now.getTime() - last.lastUsedAt.getTime() >= PROLONG_THROTTLE_MS
+		return now.getTime() - lastUsedAt.getTime() >= PROLONG_THROTTLE_MS
 	}
 }

@@ -43,7 +43,7 @@ query {
 | `createdAt` | When the session was minted. |
 | `expiresAt` | Current expiration. Each authenticated request extends this, throttled to once per 60 seconds. |
 | `lastUsedAt` | Timestamp of the most recent request on this session. |
-| `lastIp`, `lastUserAgent` | Client info from the most recent request. Updated immediately on IP or User-Agent change, otherwise throttled to once per 60 s. |
+| `lastIp`, `lastUserAgent` | Client info from a recent request. Written at most once per 60 s, so a change of IP or User-Agent shows up within a minute. |
 | `createdIp`, `createdUserAgent` | Client info captured at sign-in time. |
 | `isCurrent` | `true` for the session that signed the current request. |
 
@@ -112,8 +112,8 @@ Note: `forceSignOutPerson` disables permanent keys too. If your operator needs t
    create api_key            verify token, extend          revokeSession (self)
    - createdIp/UA            expires_at (60 s throttle)    signOut(all)
    - identity_id             update last_ip/UA/used_at     forceSignOutPerson (admin)
-   - expires_at              (immediately if IP/UA         api_key.disabled_at = now()
-                              changed, else throttled)     expiration window passes
+   - expires_at              (60 s throttle)               api_key.disabled_at = now()
+                                                           expiration window passes
 ```
 
 ## Per-key trust-forwarded-info

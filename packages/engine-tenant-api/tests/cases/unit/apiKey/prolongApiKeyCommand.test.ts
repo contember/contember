@@ -99,7 +99,7 @@ test('throttles last_* within window for same IP+UA', async () => {
 	})
 })
 
-test('bypasses throttle when IP changes', async () => {
+test('throttles last_* within window when IP changes', async () => {
 	const now = new Date('2026-05-12T12:00:00Z')
 	const currentExpiration = new Date('2026-05-12T12:29:30Z')
 	await exec({
@@ -110,6 +110,22 @@ test('bypasses throttle when IP changes', async () => {
 			lastIp: '203.0.113.5',
 			lastUserAgent: 'curl',
 			lastUsedAt: new Date('2026-05-12T11:59:50Z'),
+		},
+		expectedQueries: [],
+	})
+})
+
+test('writes changed IP once the window has passed', async () => {
+	const now = new Date('2026-05-12T12:00:00Z')
+	const currentExpiration = new Date('2026-05-12T12:29:30Z')
+	await exec({
+		now,
+		currentExpiration,
+		requestInfo: { ip: '198.51.100.7', userAgent: 'curl' },
+		tracking: {
+			lastIp: '203.0.113.5',
+			lastUserAgent: 'curl',
+			lastUsedAt: new Date('2026-05-12T11:58:59Z'),
 		},
 		expectedQueries: [
 			{
@@ -157,7 +173,7 @@ test('A19: unaffected when max_expires_at is null (today behavior)', async () =>
 	})
 })
 
-test('bypasses throttle when User-Agent changes', async () => {
+test('throttles last_* within window when User-Agent changes', async () => {
 	const now = new Date('2026-05-12T12:00:00Z')
 	const currentExpiration = new Date('2026-05-12T12:29:30Z')
 	await exec({
@@ -169,12 +185,6 @@ test('bypasses throttle when User-Agent changes', async () => {
 			lastUserAgent: 'curl',
 			lastUsedAt: new Date('2026-05-12T11:59:50Z'),
 		},
-		expectedQueries: [
-			{
-				sql: `update "tenant"."api_key" set "last_ip" = ?, "last_user_agent" = ?, "last_used_at" = ? where "id" = ?`,
-				parameters: ['203.0.113.5', 'browser/2', now, 'api-key-id'],
-				response: { rowCount: 1 },
-			},
-		],
+		expectedQueries: [],
 	})
 })

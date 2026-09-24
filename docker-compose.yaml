@@ -50,6 +50,8 @@ services:
       # `bun run --filter=@contember/engine-panel build:assets`, otherwise the engine logs that the
       # panel is enabled but unbuilt and serves nothing.
       CONTEMBER_PANEL_ENABLED: 'true'
+      # Off by default; e2e/cases/content/force-primary.test.ts needs it.
+      CONTEMBER_CONTENT_API_FORCE_PRIMARY_HEADER: 'true'
       DEFAULT_DB_STATEMENT_TIMEOUT_MS: 3000
       DEFAULT_DB_QUERY_TIMEOUT_MS: 3000
       DEFAULT_DB_HOST: 'postgres'

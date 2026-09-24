@@ -10,6 +10,7 @@ import { ContentQueryHandler, ContentQueryHandlerFactory } from './ContentQueryH
 import { GraphQlSchemaFactory } from './GraphQlSchemaFactory.js'
 import { NotModifiedChecker } from './NotModifiedChecker.js'
 import { TestTransactionService } from '../testing/index.js'
+import { isTruthyHeader } from '../utils/truthyHeader.js'
 
 const debugHeader = 'x-contember-debug'
 const testSessionHeader = 'x-contember-test-session'
@@ -23,6 +24,7 @@ export class ContentApiControllerFactory {
 		private readonly projectContextResolver: ProjectContextResolver,
 		private readonly graphQlSchemaFactory: GraphQlSchemaFactory,
 		private readonly testTransactionService: TestTransactionService,
+		private readonly forcePrimaryHeaderEnabled: boolean,
 	) {
 	}
 
@@ -39,7 +41,7 @@ export class ContentApiControllerFactory {
 				project: project.slug,
 			})
 
-			const forcePrimary = koa.request.get(forcePrimaryHeader) === '1'
+			const forcePrimary = this.forcePrimaryHeaderEnabled && isTruthyHeader(request, forcePrimaryHeader)
 			const systemDatabase = forcePrimary ? projectContainer.systemDatabaseContext : projectContainer.systemReadDatabaseContext
 			const stage = await systemDatabase.queryHandler.fetch(new StageBySlugQuery(params.stageSlug))
 			if (!stage) {
@@ -135,7 +137,8 @@ export class ContentApiControllerFactory {
 						request: koa.request,
 						response: koa.response,
 						createContext: ({ operation }) => {
-							if (operation === 'mutation') {
+							// Clients open a primary read window only on this marker, so it must not be sent while the header is ignored.
+							if (operation === 'mutation' && this.forcePrimaryHeaderEnabled) {
 								koa.response.set('X-Contember-Mutation', '1')
 							}
 							;(koa.state as GraphQLKoaState).graphql = {

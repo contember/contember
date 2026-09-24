@@ -29,7 +29,7 @@ test('Content API exposes the mutation marker and accepts forced primary reads',
 	expect(query.get('X-Contember-Mutation')).toBeUndefined()
 
 	const preflight = await supertest(apiUrl)
-		.options('/content/test/live')
+		.options(`/content/${tester.projectSlug}/live`)
 		.set('Origin', 'https://admin.example.com')
 		.set('Access-Control-Request-Method', 'POST')
 		.set('Access-Control-Request-Headers', 'content-type,authorization,x-contember-force-primary')

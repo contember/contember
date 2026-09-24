@@ -98,9 +98,25 @@ tenant:
 :::note[Available since 2.2]
 :::
 
-Replication is asynchronous. A query sent immediately after a mutation can read stale data from a replica. The Content API accepts **`X-Contember-Force-Primary: 1`** to route a request's project database reads to the primary, including stage lookup, schema and database metadata resolution, and the `X-Contember-Ref` cache check. Normal authentication and permissions still apply. Without this header, queries use the read replica as before.
+Replication is asynchronous. A query sent immediately after a mutation can read stale data from a replica. When enabled, the Content API accepts **`X-Contember-Force-Primary: 1`** to route a request's project database reads to the primary, including stage lookup, schema and database metadata resolution, and the `X-Contember-Ref` cache check. Normal authentication and permissions still apply. Without this header, queries use the read replica as before.
 
-This works with a single replica or a reader endpoint that distributes connections across several replicas, including an Aurora reader endpoint. It uses the configured primary connection directly and does not depend on replication-status functions or replica identities. No additional server configuration is required.
+This works with a single replica or a reader endpoint that distributes connections across several replicas, including an Aurora reader endpoint. It uses the configured primary connection directly and does not depend on replication-status functions or replica identities.
+
+The header is disabled by default, because any authenticated caller could use it to move its reads to the primary. Enable it for all projects:
+
+```bash
+CONTEMBER_CONTENT_API_FORCE_PRIMARY_HEADER=true
+```
+
+or in the server config:
+
+```yaml
+server:
+  contentApi:
+    forcePrimaryHeader: true
+```
+
+While it is disabled, the engine ignores the header and does not mark mutation responses, so clients never open a primary read window. The header accepts the same values as `X-Contember-Force-Ok`: `1`, `true`, `on` or `yes`.
 
 You can use the header independently of the JavaScript clients:
 
@@ -115,7 +131,7 @@ Content-Type: application/json
 
 #### React clients
 
-`ContemberClient` automatically forces primary reads for **1000 ms after receiving a Content API mutation response**. Another mutation response restarts the window. Queries do not extend it. Configure the duration with `primaryReadWindowMs`, or set it to `0` to disable the window:
+When the engine has the header enabled, `ContemberClient` automatically forces primary reads for **1000 ms after receiving a Content API mutation response**. Another mutation response restarts the window. Queries do not extend it. Configure the duration with `primaryReadWindowMs`, or set it to `0` to disable the window:
 
 ```tsx
 <ContemberClient apiBaseUrl={apiBaseUrl} project="my-project" stage="live" primaryReadWindowMs={1000}>

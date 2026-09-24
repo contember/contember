@@ -31,7 +31,7 @@ const unavailable = (): never => {
 }
 const stage = { id: 'a4c9b8f2-6a1e-4a3f-9a4b-1f2e3d4c5b6a', name: 'Live', slug: 'live', schema: 'stage_live' }
 
-const createHarness = () => {
+const createHarness = ({ forcePrimaryHeader = true }: { forcePrimaryHeader?: boolean } = {}) => {
 	const statements: { side: string; sql: string }[] = []
 	const preparation: DatabaseContext[] = []
 	let replicaAvailable = true
@@ -121,6 +121,7 @@ const createHarness = () => {
 		createMock<ProjectContextResolver>({ resolve: async () => ({ projectContainer, project }) }),
 		createMock<GraphQlSchemaFactory>({ create: () => ({ schema, permissions: {}, allPermissions: {} }) }),
 		new TestTransactionService(false),
+		forcePrimaryHeader,
 	).create()
 	const projectGroup: ProjectGroupContainer = {
 		slug: undefined,
@@ -218,14 +219,31 @@ test('a forced primary read can return 304 from the primary reference', async ()
 	}
 })
 
-test('only the exact value 1 forces primary; ordinary queries still read the replica', async () => {
+test('the header accepts the same truthy values as X-Contember-Force-Ok; ordinary queries still read the replica', async () => {
 	const harness = createHarness()
 	try {
-		const headerCases: Record<string, string>[] = [{}, { 'x-contember-force-primary': '0' }, { 'x-contember-force-primary': 'true' }]
+		for (const value of ['1', 'true', ' ON ', 'yes']) {
+			const { koa } = await harness.request('{ marker }', { 'x-contember-force-primary': value })
+			expect(koa.body).toBe('{"data":{"marker":"primary"}}')
+		}
+		const headerCases: Record<string, string>[] = [{}, { 'x-contember-force-primary': '0' }, { 'x-contember-force-primary': 'false' }]
 		for (const headers of headerCases) {
 			const { koa } = await harness.request('{ marker }', headers)
 			expect(koa.body).toBe('{"data":{"marker":"replica"}}')
 		}
+	} finally {
+		await harness.close()
+	}
+})
+
+test('without the config opt-in the header is ignored and mutations are not marked', async () => {
+	const harness = createHarness({ forcePrimaryHeader: false })
+	try {
+		const query = await harness.request('{ marker }', { 'x-contember-force-primary': '1' })
+		expect(query.koa.body).toBe('{"data":{"marker":"replica"}}')
+		const mutation = await harness.request('mutation { marker }')
+		expect(mutation.koa.body).toBe('{"data":{"marker":"primary"}}')
+		expect(mutation.koa.response.get('X-Contember-Mutation')).toBe('')
 	} finally {
 		await harness.close()
 	}

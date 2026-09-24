@@ -1,17 +1,16 @@
 import { afterEach, beforeEach, expect, test } from 'bun:test'
-import { cleanup, renderHook } from '@testing-library/react'
+import { cleanup, render, renderHook } from '@testing-library/react'
 import { ReactNode } from 'react'
 import { GraphQlClient, GraphQlClientOptions } from '@contember/graphql-client'
 import { ContemberClient } from '../src/components/ContemberClient.js'
+import { ApiBaseUrlContext, SessionTokenContext } from '../src/contexts.js'
 import { useContentGraphQlClient } from '../src/hooks/useContentGraphQlClient.js'
 import { useTenantGraphQlClient } from '../src/hooks/useTenantGraphQlClient.js'
 
 afterEach(cleanup)
 beforeEach(() => localStorage.clear())
 
-test('shares windows by content path and isolates identities, API origins, and other APIs', async () => {
-	let sessionToken = 'first'
-	let apiBaseUrl = 'https://api.example.com'
+const createRecordingFactory = () => {
 	const requests: { url: string; primary: string | null }[] = []
 	const factory = (options: GraphQlClientOptions) =>
 		new GraphQlClient({
@@ -23,6 +22,13 @@ test('shares windows by content path and isolates identities, API origins, and o
 				})
 			},
 		})
+	return { requests, factory }
+}
+
+test('shares windows by content path and isolates identities, API origins, and other APIs', async () => {
+	let sessionToken = 'first'
+	let apiBaseUrl = 'https://api.example.com'
+	const { requests, factory } = createRecordingFactory()
 	const wrapper = ({ children }: { children: ReactNode }) => (
 		<ContemberClient apiBaseUrl={apiBaseUrl} sessionToken={sessionToken} graphqlClientFactory={factory}>{children}</ContemberClient>
 	)
@@ -50,6 +56,31 @@ test('shares windows by content path and isolates identities, API origins, and o
 	rerender()
 	await result.current.reader.execute('{ marker }')
 	expect(requests.at(-1)?.primary).toBeNull()
+})
+
+test('nested providers with another identity or origin do not share the outer window', async () => {
+	const { requests, factory } = createRecordingFactory()
+	const clients = new Map<string, GraphQlClient>()
+	const Capture = ({ name }: { name: string }) => {
+		clients.set(name, useContentGraphQlClient('test', 'live'))
+		return null
+	}
+	render(
+		<ContemberClient apiBaseUrl="https://api.example.com" sessionToken="outer" graphqlClientFactory={factory}>
+			<Capture name="outer" />
+			<SessionTokenContext.Provider value={{ token: 'nested', propsToken: 'nested', source: 'props' }}>
+				<Capture name="otherIdentity" />
+			</SessionTokenContext.Provider>
+			<ApiBaseUrlContext.Provider value="https://other.example.com">
+				<Capture name="otherOrigin" />
+			</ApiBaseUrlContext.Provider>
+		</ContemberClient>,
+	)
+	await clients.get('outer')?.execute('mutation { touch }')
+	await clients.get('otherIdentity')?.execute('{ marker }')
+	await clients.get('otherOrigin')?.execute('{ marker }')
+	await clients.get('outer')?.execute('{ marker }')
+	expect(requests.map(it => it.primary)).toEqual([null, null, null, '1'])
 })
 
 test('zero disables the default content window', async () => {

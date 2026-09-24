@@ -8,7 +8,6 @@ import { Context } from 'react';
 import { GraphQlClient } from '@contember/graphql-client';
 import { GraphQlClientOptions } from '@contember/graphql-client';
 import { NamedExoticComponent } from 'react';
-import { PrimaryReadWindow } from '@contember/graphql-client';
 
 // @public (undocumented)
 export const ApiBaseUrlContext: Context<string>;
@@ -47,12 +46,6 @@ export const GraphQlClientFactoryContext: Context<GraphQlClientFactory | undefin
 
 // @public (undocumented)
 export const LoginTokenContext: Context<string | undefined>;
-
-// @public (undocumented)
-export const PrimaryReadWindowsContext: Context<    {
-durationMs: number;
-windows: Map<string, PrimaryReadWindow>;
-} | undefined>;
 
 // @public (undocumented)
 export const ProjectSlugContext: Context<string | undefined>;
@@ -104,12 +97,6 @@ export const useGraphQlClientFactory: () => GraphQlClientFactory | undefined;
 
 // @public (undocumented)
 export const useLoginToken: () => string | undefined;
-
-// @public (undocumented)
-export const usePrimaryReadWindows: () => {
-    durationMs: number;
-    windows: Map<string, PrimaryReadWindow>;
-} | undefined;
 
 // @public (undocumented)
 export const useProjectSlug: () => string | undefined;

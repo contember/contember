@@ -1,6 +1,5 @@
 import { createContext, createRequiredContext } from '@contember/react-utils'
 import { GraphQlClientFactory, SessionTokenContextValue } from './types/index.js'
-import { PrimaryReadWindow } from '@contember/graphql-client'
 
 const SessionTokenContext_ = createContext<SessionTokenContextValue>('SessionTokenContext', {
 	propsToken: undefined,
@@ -41,13 +40,3 @@ const GraphQlClientFactoryContext_ = createContext<GraphQlClientFactory | undefi
 
 export const GraphQlClientFactoryContext = GraphQlClientFactoryContext_[0]
 export const useGraphQlClientFactory = GraphQlClientFactoryContext_[1]
-
-const PrimaryReadWindowsContext_ = createContext<
-	{
-		durationMs: number
-		windows: Map<string, PrimaryReadWindow>
-	} | undefined
->('PrimaryReadWindowsContext', undefined)
-
-export const PrimaryReadWindowsContext = PrimaryReadWindowsContext_[0]
-export const usePrimaryReadWindows = PrimaryReadWindowsContext_[1]

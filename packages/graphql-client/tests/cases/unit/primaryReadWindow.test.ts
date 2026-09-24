@@ -64,16 +64,45 @@ describe('GraphQlClient primary reads', () => {
 		expect(headers.map(it => it.get('X-Contember-Force-Primary'))).toEqual([null, '1', '1', null, '0', '0'])
 	})
 
-	test('captures mutation responses with GraphQL errors before user callbacks', async () => {
+	test('captures mutation responses with GraphQL errors or a failing user callback', async () => {
 		const { client, window } = setup(() =>
 			new Response(JSON.stringify({ data: { first: { ok: true } }, errors: [{ message: 'second failed' }] }), {
 				headers: { 'X-Contember-Mutation': '1' },
 			})
 		)
-		await expect(client.execute('mutation { first { ok } second { ok } }', {
-			onResponse: () => expect(window.requestHeaders()).toEqual({ 'X-Contember-Force-Primary': '1' }),
-		})).rejects.toMatchObject({ type: 'response errors' })
+		await expect(client.execute('mutation { first { ok } second { ok } }')).rejects.toMatchObject({ type: 'response errors' })
 		expect(window.requestHeaders()).toEqual({ 'X-Contember-Force-Primary': '1' })
+
+		const other = new PrimaryReadWindow()
+		await expect(client.execute('mutation { first { ok } }', {
+			primaryReadWindow: other,
+			onResponse: () => {
+				throw new Error('hook failed')
+			},
+		})).rejects.toMatchObject({ type: 'network error' })
+		expect(other.requestHeaders()).toEqual({ 'X-Contember-Force-Primary': '1' })
+	})
+
+	test('the window starts after the response body has been read', async () => {
+		let now = 0
+		const window = new PrimaryReadWindow({ now: () => now })
+		const body = new ReadableStream<Uint8Array>({
+			pull: controller => {
+				now = 500
+				controller.enqueue(new TextEncoder().encode('{"data":{}}'))
+				controller.close()
+			},
+		}, { highWaterMark: 0 })
+		const client = new GraphQlClient({
+			url: 'https://api.example.com/content/test/live',
+			primaryReadWindow: window,
+			fetcher: async () => new Response(body, { headers: { 'X-Contember-Mutation': '1' } }),
+		})
+		await client.execute('mutation { touch }')
+		now = 1499
+		expect(window.requestHeaders()).toEqual({ 'X-Contember-Force-Primary': '1' })
+		now = 1500
+		expect(window.requestHeaders()).toEqual({})
 	})
 
 	test('unmarked responses do not start a window, regardless of query text', async () => {

@@ -1,15 +1,14 @@
-import { memo, useCallback, useMemo, useRef, useState } from 'react'
-import { PrimaryReadWindow } from '@contember/graphql-client'
+import { memo, useCallback, useMemo, useState } from 'react'
 import {
 	ApiBaseUrlContext,
 	GraphQlClientFactoryContext,
 	LoginTokenContext,
-	PrimaryReadWindowsContext,
 	ProjectSlugContext,
 	SessionTokenContext,
 	SetSessionTokenContext,
 	StageSlugContext,
 } from '../contexts.js'
+import { PrimaryReadWindows, PrimaryReadWindowsContext } from '../primaryReadWindows.js'
 import { GraphQlClientFactory, SessionTokenContextValue } from '../types/index.js'
 
 export interface ContemberClientProps {
@@ -46,27 +45,10 @@ export const ContemberClient = memo<ContemberClientProps & { children: React.Rea
 		source: localStorageSessionToken ? 'localstorage' : (sessionToken ? 'props' : undefined),
 	}), [localStorageSessionToken, sessionToken])
 
-	const windowsRef = useRef<
-		{
-			token: string | undefined
-			apiBaseUrl: string
-			durationMs: number
-			windows: Map<string, PrimaryReadWindow>
-		} | null
-	>(null)
-	if (
-		windowsRef.current === null
-		|| windowsRef.current.token !== sessionTokenContextValue.token
-		|| windowsRef.current.apiBaseUrl !== apiBaseUrl
-		|| windowsRef.current.durationMs !== primaryReadWindowMs
-	) {
-		windowsRef.current = {
-			token: sessionTokenContextValue.token,
-			apiBaseUrl,
-			durationMs: primaryReadWindowMs,
-			windows: new Map(),
-		}
-	}
+	const primaryReadWindows = useMemo(
+		() => primaryReadWindowMs === 0 ? undefined : new PrimaryReadWindows(primaryReadWindowMs),
+		[primaryReadWindowMs],
+	)
 
 	return (
 		<ApiBaseUrlContext.Provider value={apiBaseUrl}>
@@ -76,7 +58,7 @@ export const ContemberClient = memo<ContemberClientProps & { children: React.Rea
 						<ProjectSlugContext.Provider value={project}>
 							<StageSlugContext.Provider value={stage}>
 								<GraphQlClientFactoryContext.Provider value={graphqlClientFactory}>
-									<PrimaryReadWindowsContext.Provider value={windowsRef.current}>
+									<PrimaryReadWindowsContext.Provider value={primaryReadWindows}>
 										{children}
 									</PrimaryReadWindowsContext.Provider>
 								</GraphQlClientFactoryContext.Provider>

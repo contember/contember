@@ -42,8 +42,6 @@ ${query}`
 
 		try {
 			response = await this.doExecute(query, options)
-			// A later mutation field can fail after an earlier one committed; capture before checking the body or calling user hooks.
-			this.resolvePrimaryReadWindow(options)?.captureResponse(response)
 			this.options?.onResponse?.(response)
 			options?.onResponse?.(response)
 
@@ -51,6 +49,11 @@ ${query}`
 		} catch (e) {
 			const aborted = typeof e === 'object' && e !== null && (e as { name?: unknown }).name === 'AbortError'
 			throw createError(aborted ? 'aborted' : 'network error', undefined, e)
+		} finally {
+			// Start once the body has arrived, and even if reading it or a user hook failed: an earlier mutation field may have committed.
+			if (response !== null) {
+				this.resolvePrimaryReadWindow(options)?.captureResponse(response)
+			}
 		}
 
 		let data: any
@@ -97,7 +100,7 @@ ${query}`
 			...this.options.headers,
 			...headers,
 		}
-		if (!Object.keys(resolvedHeaders).some(name => name.toLowerCase() === 'x-contember-force-primary')) {
+		if (!new Headers(resolvedHeaders).has('X-Contember-Force-Primary')) {
 			Object.assign(resolvedHeaders, this.resolvePrimaryReadWindow(options)?.requestHeaders())
 		}
 		const resolvedToken = apiToken ?? this.options.apiToken

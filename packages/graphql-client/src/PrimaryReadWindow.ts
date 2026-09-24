@@ -10,7 +10,8 @@ export class PrimaryReadWindow {
 	private readonly now: () => number
 	private expiresAt = 0
 
-	constructor({ durationMs = 1000, now = Date.now }: PrimaryReadWindowOptions = {}) {
+	// A monotonic clock, so a system clock change cannot stretch or cut the window.
+	constructor({ durationMs = 1000, now = () => performance.now() }: PrimaryReadWindowOptions = {}) {
 		if (!Number.isFinite(durationMs) || durationMs < 0) {
 			throw new Error('Primary read window duration must be a finite non-negative number')
 		}

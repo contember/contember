@@ -139,7 +139,7 @@ When the engine has the header enabled, `ContemberClient` automatically forces p
 </ContemberClient>
 ```
 
-Content clients within the provider share a window for the same project and stage. Changing the session token, API base URL, or window duration resets the windows. Tenant and System API clients do not use them.
+Content clients within the provider share a window when they use the same Content API URL and session token, including clients under a nested `ApiBaseUrlContext` or `SessionTokenContext` provider. Changing the window duration resets the windows. Tenant and System API clients do not use them.
 
 #### Other JavaScript clients
 
@@ -155,9 +155,9 @@ const client = new GraphQlClient({
 })
 ```
 
-The `primaryReadWindow` option is also accepted per request. Passing `false` disables both sending the window's header and updating the window for that request. Explicit request headers take precedence over the window's header. `withOptions()` retains the same window unless you replace or disable it.
+The `primaryReadWindow` option is also accepted per request. Passing `false` disables both sending the window's header and updating the window for that request. Explicit request headers take precedence over the window's header. `withOptions()` retains the same window, so pass a new window when you change `url` or `apiToken`.
 
-The engine marks Content API mutation responses with **`X-Contember-Mutation: 1`**. The client reads this header before processing the response body or invoking response callbacks, so a mutation that partially committed and then returned GraphQL errors still opens the window. The marker identifies an executed mutation operation, not a confirmed database write: write-free or failed mutations can also open a window. Responses without the marker do not open one, including responses from older engines. A lost mutation response cannot open a window.
+When the header is enabled, the engine marks Content API mutation responses with **`X-Contember-Mutation: 1`**. The window starts once the client has read the response body. It also starts when the body contains GraphQL errors or a response callback throws, so a mutation that partially committed still opens the window. The marker identifies an executed mutation operation, not a confirmed database write: write-free or failed mutations can also open a window. Responses without the marker do not open one, including responses from older engines. A lost mutation response cannot open a window.
 
 For cross-origin browser requests, the engine exposes the mutation marker through CORS and permits the primary-read header through preflight. Any proxy that filters headers must pass both headers through.
 

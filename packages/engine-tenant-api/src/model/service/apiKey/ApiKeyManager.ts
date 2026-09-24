@@ -27,7 +27,7 @@ export class ApiKeyManager {
 		readDbContext: DatabaseContext,
 		token: string,
 	): Promise<VerifyResponse> {
-		const apiKeyRow = await readDbContext.queryHandler.fetch(new ApiKeyByTokenQuery(token))
+		const apiKeyRow = await this.fetchApiKeyByToken(dbContext, readDbContext, token)
 		if (apiKeyRow === null) {
 			return new ResponseError(VerifyErrorCode.NOT_FOUND, 'API key was not found')
 		}
@@ -58,6 +58,16 @@ export class ApiKeyManager {
 		})
 
 		return new ResponseOk(new VerifyResult(apiKeyRow.identity_id, apiKeyRow.id, apiKeyRow.roles, apiKeyRow.person_id))
+	}
+
+	private async fetchApiKeyByToken(dbContext: DatabaseContext, readDbContext: DatabaseContext, token: string): Promise<ApiKeyRow | null> {
+		const query = new ApiKeyByTokenQuery(token)
+		const replicaRow = await readDbContext.queryHandler.fetch(query)
+		if (replicaRow !== null || readDbContext.client.connection === dbContext.client.connection) {
+			return replicaRow
+		}
+		// A token issued moments ago (sign-in, createSessionToken) may not have reached the read replica yet.
+		return await dbContext.queryHandler.fetch(query)
 	}
 
 	async createSessionApiKey(dbContext: DatabaseContext, identityId: string, expiration?: number): Promise<string> {

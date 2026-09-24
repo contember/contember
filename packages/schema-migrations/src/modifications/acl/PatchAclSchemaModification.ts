@@ -1,7 +1,7 @@
 import { SchemaUpdater } from '../utils/schemaUpdateUtils'
 import { createModificationType, ModificationHandler } from '../ModificationHandler'
-import { applyPatch, Operation } from 'rfc6902'
-import { copyPatchedPaths } from '../../utils/copyPatchedPaths'
+import { Operation } from 'rfc6902'
+import { applyPatchCopyOnWrite } from '../../utils/applyPatchCopyOnWrite'
 
 export class PatchAclSchemaModificationHandler implements ModificationHandler<PatchAclSchemaModificationData> {
 	constructor(private readonly data: PatchAclSchemaModificationData) {}
@@ -10,10 +10,9 @@ export class PatchAclSchemaModificationHandler implements ModificationHandler<Pa
 
 	public getSchemaUpdater(): SchemaUpdater {
 		return ({ schema }) => {
-			const acl = copyPatchedPaths(schema.acl, this.data.patch)
-			const result = applyPatch(acl, this.data.patch).filter(it => it !== null)
-			if (result.length > 0) {
-				throw result[0]
+			const { result: acl, errors } = applyPatchCopyOnWrite(schema.acl, this.data.patch)
+			if (errors.length > 0) {
+				throw errors[0]
 			}
 
 			return {

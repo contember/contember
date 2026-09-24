@@ -83,6 +83,24 @@ describe('GraphQlClient primary reads', () => {
 		expect(other.requestHeaders()).toEqual({ 'X-Contember-Force-Primary': '1' })
 	})
 
+	test('a failed body read still opens the window; a failed request does not', async () => {
+		const brokenBody = new ReadableStream<Uint8Array>({
+			pull: controller => controller.error(new Error('connection reset')),
+		}, { highWaterMark: 0 })
+		const { client, window } = setup(() => new Response(brokenBody, { headers: { 'X-Contember-Mutation': '1' } }))
+		await expect(client.execute('mutation { touch }')).rejects.toMatchObject({ type: 'network error' })
+		expect(window.requestHeaders()).toEqual({ 'X-Contember-Force-Primary': '1' })
+
+		const rejectedWindow = new PrimaryReadWindow()
+		const rejecting = new GraphQlClient({
+			url: 'https://api.example.com/content/test/live',
+			primaryReadWindow: rejectedWindow,
+			fetcher: () => Promise.reject(new TypeError('Failed to fetch')),
+		})
+		await expect(rejecting.execute('mutation { touch }')).rejects.toMatchObject({ type: 'network error' })
+		expect(rejectedWindow.requestHeaders()).toEqual({})
+	})
+
 	test('the window starts after the response body has been read', async () => {
 		let now = 0
 		const window = new PrimaryReadWindow({ now: () => now })

@@ -93,6 +93,8 @@ tenant:
       host: replica.db.example.com
 ```
 
+API key verification reads from the tenant replica. A key issued moments ago may not be there yet, so when the replica has no matching key, the engine looks it up on the primary. A token therefore works immediately after sign-in, and a request with an unknown or invalid token costs one extra lookup on the primary. This fallback is always on and does not depend on the header described below. Other tenant reads, such as project membership lookup, use only the replica.
+
 ### Reading from the primary after a mutation
 
 :::note[Available since 2.2]

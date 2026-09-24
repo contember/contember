@@ -42,6 +42,7 @@ namespace CreateAuthLogEntryCommand {
 		invokedById?: string
 		personInputIdentifier?: string
 		personId?: string
+		/** A `person_token` id (password reset, e-mail verification, passwordless). FK-checked, so never an `api_key` id: put that in `eventData`. */
 		personTokenId?: string
 		success: boolean
 		errorCode?: string

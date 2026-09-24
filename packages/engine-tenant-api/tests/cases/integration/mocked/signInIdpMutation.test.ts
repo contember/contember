@@ -2,7 +2,8 @@ import { executeTenantTest } from '../../../src/testTenant.js'
 import { testUuid } from '../../../src/testUuid.js'
 import { expect, test } from 'bun:test'
 import { signInIDP } from './gql/signInIdp.js'
-import { sqlTransaction } from './sql/sqlTransaction.js'
+import { sqlNestedTransaction, sqlTransaction } from './sql/sqlTransaction.js'
+import { SQL } from '../../../src/tags.js'
 import { getIdpBySlugSql } from './sql/getIdpBySlugSql.js'
 import { getPersonByIdpSql } from './sql/getPersonByIdpSql.js'
 import { createSessionKeySql } from './sql/createSessionKeySql.js'
@@ -90,6 +91,104 @@ test('signs in idp with existing identity', async () => {
 					},
 				},
 			},
+		},
+		expectedAuthLog: {
+			type: 'idp_login',
+			response: expect.objectContaining({
+				ok: true,
+			}),
+		},
+	})
+})
+
+// Re-validation on, tokens returned, no encryption key: the token-bearing session is not stored and the
+// downgrade is audited. The entry must not carry the api_key id in person_token_id (FK to person_token,
+// #964); it goes to event_data. The insert runs in its own savepoint so a failure cannot abort sign-in.
+test('signs in idp without an encryption key and audits encryption_disabled without person_token_id', async () => {
+	const externalIdentifier = 'abcd'
+	const email = 'john@doe.com'
+	const identityId = testUuid(2)
+	const personId = testUuid(7)
+	const projectId = testUuid(10)
+	const apiKeyId = testUuid(1)
+	const idpId = testUuid(20)
+	await executeTenantTest({
+		query: signInIDP({
+			identityProvider: 'mock',
+			idpResponse: {
+				url: 'test',
+			},
+			redirectUrl: 'test',
+			sessionData: {},
+		}),
+		executes: [
+			...sqlTransaction(
+				getIdpBySlugSql({
+					slug: 'mock',
+					response: {
+						id: idpId,
+						autoSignUp: false,
+						exclusive: false,
+						configuration: {
+							externalIdentifier,
+							idpSession: { tokens: { refresh_token: 'r' } },
+						},
+						disabledAt: null,
+						initReturnsConfig: false,
+						requireVerifiedEmail: false,
+						assumeEmailVerified: false,
+						disableLocalAuthentication: false,
+						slug: 'mock',
+						type: 'mock',
+					},
+				}),
+				getPersonByIdpSql({
+					externalIdentifier,
+					identityProviderId: idpId,
+					response: {
+						email,
+						password: '123',
+						identityId,
+						personId,
+						roles: [],
+					},
+				}),
+				getConfigSql(),
+				getIdentityByIdSql({ identityId }),
+				getAuthPoliciesSql(),
+				createSessionKeySql({
+					apiKeyId,
+					identityId,
+				}),
+				...sqlNestedTransaction({
+					sql:
+						SQL`insert into "tenant"."person_auth_log" ("id", "invoked_by_id", "person_id", "type", "success", "error_code", "ip_address", "identity_provider_id", "metadata", "event_data")
+						values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+					parameters: [
+						() => true,
+						identityId,
+						personId,
+						'idp_session_revalidation_failed',
+						true,
+						'encryption_disabled',
+						'',
+						idpId,
+						() => true,
+						{ apiKeyId },
+					],
+					response: { rowCount: 1 },
+				}),
+			),
+			getIdentityProjectsSql({ identityId: identityId, projectId: projectId }),
+			selectMembershipsSql({
+				identityId: identityId,
+				projectId,
+				membershipsResponse: [],
+			}),
+		],
+		return: (response: any) => {
+			expect(response.data.signInIDP.ok).toBe(true)
+			expect(response.data.signInIDP.result.token).toBe('0000000000000000000000000000000000000000')
 		},
 		expectedAuthLog: {
 			type: 'idp_login',

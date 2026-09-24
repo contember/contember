@@ -17,6 +17,8 @@ export class IdPMock implements IdentityProviderHandler<any> {
 			// mirroring how real providers spread raw OIDC claims into the IDPResponse — lets tests
 			// drive claim-mapping (A09). `claimMapping` itself lives on the IdP config, not here.
 			...(configuration.claims ?? {}),
+			// Lets tests drive the federated-session branch of sign-in (re-validation state).
+			...(configuration.idpSession ? { idpSession: configuration.idpSession } : {}),
 		})
 	}
 

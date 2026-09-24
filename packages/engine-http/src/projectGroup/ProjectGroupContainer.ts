@@ -104,31 +104,35 @@ export class ProjectGroupContainerFactory {
 			})
 			.addService('projectSchemaResolver', () => new ProjectSchemaResolverProxy())
 			.addService('projectInitializer', () => new ProjectInitializerProxy())
-			.addService('tenantContainer', ({ tenantConnection, tenantReadConnection, tenantDbCredentials, projectSchemaResolver, projectInitializer }) => {
-				const encryptionKey = config.secrets.encryptionKey
-					? createSecretKey(Buffer.from(config.secrets.encryptionKey, 'hex'))
-					: undefined
+			.addService(
+				'tenantContainer',
+				({ tenantConnection, tenantReadConnection, tenantDbCredentials, projectSchemaResolver, projectInitializer, logger }) => {
+					const encryptionKey = config.secrets.encryptionKey
+						? createSecretKey(Buffer.from(config.secrets.encryptionKey, 'hex'))
+						: undefined
 
-				const cryptoWrapper = new CryptoWrapper(encryptionKey)
-				return this.tenantContainerFactory.create({
-					connection: tenantConnection,
-					readConnection: tenantReadConnection,
-					dbCredentials: tenantDbCredentials,
-					mailOptions: config.mailer,
-					tenantCredentials: {
-						...config.credentials,
-						rootTokens: normalizeTokenList(config.credentials.rootTokens),
-						rootTokenHashes: normalizeTokenList(config.credentials.rootTokenHashes),
-					},
-					projectInitializer,
-					projectSchemaResolver,
-					cryptoProviders: {
-						decrypt: cryptoWrapper.decrypt.bind(cryptoWrapper),
-						encrypt: cryptoWrapper.encrypt.bind(cryptoWrapper),
-						encryptionEnabled: cryptoWrapper.enabled,
-					},
-				})
-			})
+					const cryptoWrapper = new CryptoWrapper(encryptionKey)
+					return this.tenantContainerFactory.create({
+						connection: tenantConnection,
+						readConnection: tenantReadConnection,
+						dbCredentials: tenantDbCredentials,
+						mailOptions: config.mailer,
+						tenantCredentials: {
+							...config.credentials,
+							rootTokens: normalizeTokenList(config.credentials.rootTokens),
+							rootTokenHashes: normalizeTokenList(config.credentials.rootTokenHashes),
+						},
+						projectInitializer,
+						projectSchemaResolver,
+						logger,
+						cryptoProviders: {
+							decrypt: cryptoWrapper.decrypt.bind(cryptoWrapper),
+							encrypt: cryptoWrapper.encrypt.bind(cryptoWrapper),
+							encryptionEnabled: cryptoWrapper.enabled,
+						},
+					})
+				},
+			)
 			.addService('tenantDatabase', ({ tenantContainer }) => tenantContainer.databaseContext)
 			.addService('tenantReadDatabase', ({ tenantContainer }) => tenantContainer.readDatabaseContext)
 			.addService('identityFetcher', ({ tenantContainer: { identityFetcher } }) => identityFetcher)

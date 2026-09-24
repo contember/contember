@@ -1,3 +1,4 @@
+import { Logger } from '@contember/logger'
 import { AccessEvaluator, Authorizator } from '@contember/authorization'
 import { Connection, DatabaseConfig } from '@contember/database'
 import { Builder } from '@contember/dic'
@@ -148,6 +149,7 @@ export interface TenantContainerArgs {
 	projectInitializer: ProjectInitializer
 	tenantCredentials: TenantCredentials
 	cryptoProviders: Pick<Providers, 'encrypt' | 'decrypt' | 'encryptionEnabled'>
+	logger: Logger
 }
 
 export class TenantContainerFactory {
@@ -199,7 +201,10 @@ export class TenantContainerFactory {
 				return idpRegistry
 			})
 			.addService('idpClaimSyncService', ({ projectSchemaResolver }) => new IDPClaimSyncService(projectSchemaResolver))
-			.addService('idpSessionRevalidator', ({ idpRegistry, idpClaimSyncService }) => new IdpSessionRevalidator(idpRegistry, idpClaimSyncService))
+			.addService(
+				'idpSessionRevalidator',
+				({ idpRegistry, idpClaimSyncService }) => new IdpSessionRevalidator(idpRegistry, idpClaimSyncService, args.logger),
+			)
 			.addService('backchannelLogoutManager', ({ idpRegistry }) => new BackchannelLogoutManager(idpRegistry))
 			.addService('unpersistedApiKeyManager', () =>
 				UnpersistedApiKeyManager.createForRootTokens({
@@ -255,7 +260,7 @@ export class TenantContainerFactory {
 			)
 			.addService(
 				'idpSignInManager',
-				({ apiKeyManager, idpRegistry, idpClaimSyncService }) => new IDPSignInManager(apiKeyManager, idpRegistry, idpClaimSyncService),
+				({ apiKeyManager, idpRegistry, idpClaimSyncService }) => new IDPSignInManager(apiKeyManager, idpRegistry, idpClaimSyncService, args.logger),
 			)
 			.addService('idpManager', ({ idpRegistry, projectSchemaResolver }) => new IDPManager(idpRegistry, projectSchemaResolver))
 			.addService('personIdentityProviderManager', () => new PersonIdentityProviderManager())

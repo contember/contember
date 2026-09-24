@@ -89,7 +89,7 @@ ${expected.sql}`
 		const transaction = new ConnectionMock(this.queries, this.counter, new EventManager(options.eventManager ?? this.eventManager))
 		const result = await trx(transaction)
 		if (!transaction.isClosed) {
-			await this.commit()
+			await transaction.commit()
 		}
 		return result
 	}

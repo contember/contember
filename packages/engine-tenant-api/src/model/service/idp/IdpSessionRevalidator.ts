@@ -10,6 +10,7 @@ import { CreateAuthLogEntryCommand } from '../../commands/authLog/CreateAuthLogE
 import { REVALIDATION_DEFAULT_FALLBACK_INTERVAL, REVALIDATION_DEFAULT_MIN_INTERVAL, REVALIDATION_DEFAULT_SOFT_THRESHOLD } from './IDPRevalidation.js'
 import { IdentityProviderHandler, RevalidationResult } from './IdentityProviderHandler.js'
 import { IDPClaimSyncService } from './IDPClaimSyncService.js'
+import { Logger } from '@contember/logger'
 import { parseClaimMapping } from './ClaimMapping.js'
 import { JSONValue } from '@contember/schema'
 
@@ -46,6 +47,7 @@ export class IdpSessionRevalidator {
 	constructor(
 		private readonly idpRegistry: IDPHandlerRegistry,
 		private readonly claimSyncService: IDPClaimSyncService,
+		private readonly logger: Logger,
 	) {
 	}
 
@@ -88,7 +90,8 @@ export class IdpSessionRevalidator {
 		let claimed: boolean
 		try {
 			claimed = await dbContext.commandBus.execute(new ClaimIdpRevalidationCommand(row.id, decision.claimInterval))
-		} catch {
+		} catch (e) {
+			this.logger.warn(e, { message: 'IdP session revalidation: claim failed', idpSessionId: row.id })
 			// invalid interval string or transient DB error — fail open, retry next request
 			return 'valid'
 		}
@@ -106,7 +109,9 @@ export class IdpSessionRevalidator {
 		// here; otherwise it becomes an unhandledRejection and can take the worker down. The
 		// session is simply kept and re-tried on a later request (the claim floor throttles).
 		setImmediate(() => {
-			this.runRevalidation(dbContext, handler, row, apiKeyRow, requestInfo).catch(() => {})
+			this.runRevalidation(dbContext, handler, row, apiKeyRow, requestInfo).catch(e => {
+				this.logger.error(e, { message: 'IdP session revalidation: background run failed', idpSessionId: row.id })
+			})
 		})
 		return 'valid'
 	}
@@ -146,7 +151,8 @@ export class IdpSessionRevalidator {
 		let config: {}
 		try {
 			config = handler.validateConfiguration(row.providerConfiguration)
-		} catch {
+		} catch (e) {
+			this.logger.warn(e, { message: 'IdP session revalidation: stored configuration is invalid', idpSessionId: row.id })
 			// corrupt stored config — must NOT revoke; keep the session and retry later. Audit
 			// it so the operator can tell "vouched for" apart from "silently broken" (without an
 			// entry, a config typo disables re-validation invisibly for the life of every session).
@@ -157,7 +163,8 @@ export class IdpSessionRevalidator {
 		let result: RevalidationResult
 		try {
 			result = await handler.revalidate!(config, row.session)
-		} catch {
+		} catch (e) {
+			this.logger.warn(e, { message: 'IdP session revalidation: identity provider call failed', idpSessionId: row.id })
 			// transient failure (network / IdP down) — must NOT revoke; keep the session and retry
 			// on a later request (the claim floor prevents hammering the IdP). Audited (throttled
 			// to one entry per claim window) so a prolonged IdP outage is visible rather than a
@@ -185,7 +192,8 @@ export class IdpSessionRevalidator {
 			try {
 				await dbContext.commandBus.execute(new UpdateIdpSessionCommand(row.id, result.idpSession))
 				await this.logRevalidated(dbContext, apiKeyRow, row, requestInfo)
-			} catch {
+			} catch (e) {
+				this.logger.error(e, { message: 'IdP session revalidation: persisting the rotated session failed', idpSessionId: row.id })
 				// fall through — session stays valid, persist retried on a later request
 			}
 		}
@@ -240,7 +248,8 @@ export class IdpSessionRevalidator {
 			if (droppedUnsafeRules) {
 				await this.logRoleMapping(dbContext, apiKeyRow, row, 'idp_role_mapping_failed', undefined, requestInfo)
 			}
-		} catch {
+		} catch (e) {
+			this.logger.warn(e, { message: 'IdP session revalidation: claim mapping sync failed', idpSessionId: row.id })
 			// Strictly fail-open: a malformed mapping or a transient apply error must never revoke or
 			// fail an already-vouched-for session. The transaction rolls back any partial apply.
 			await this.logRoleMapping(dbContext, apiKeyRow, row, 'idp_role_mapping_failed', undefined, requestInfo)
@@ -266,14 +275,14 @@ export class IdpSessionRevalidator {
 					// (consistent with the project_membership_* audit events).
 					targetPersonId: apiKeyRow.person_id ?? undefined,
 					identityProviderId: row.identityProviderId,
-					personTokenId: apiKeyRow.id,
 					success: true,
 					eventData,
 					ipAddress: requestInfo?.ip,
 					userAgent: requestInfo?.userAgent,
 				}),
 			)
-		} catch {
+		} catch (e) {
+			this.logger.error(e, { message: `IdP session revalidation: writing the ${type} audit entry failed`, idpSessionId: row.id })
 			// best-effort audit — never fail the request because the audit write failed
 		}
 	}
@@ -285,10 +294,10 @@ export class IdpSessionRevalidator {
 				invokedById: apiKeyRow.identity_id,
 				personId: apiKeyRow.person_id ?? undefined,
 				identityProviderId: row.identityProviderId,
-				personTokenId: apiKeyRow.id,
 				success: true,
 				ipAddress: requestInfo?.ip,
 				userAgent: requestInfo?.userAgent,
+				eventData: { apiKeyId: apiKeyRow.id },
 			}),
 		)
 	}
@@ -314,16 +323,17 @@ export class IdpSessionRevalidator {
 					invokedById: apiKeyRow.identity_id,
 					personId: apiKeyRow.person_id ?? undefined,
 					identityProviderId: row.identityProviderId,
-					personTokenId: apiKeyRow.id,
 					// not a security failure (the session is kept) — a fail-open marker the operator
 					// can alert on. `success: true` keeps it out of the failed-login funnels.
 					success: true,
 					errorCode,
 					ipAddress: requestInfo?.ip,
 					userAgent: requestInfo?.userAgent,
+					eventData: { apiKeyId: apiKeyRow.id },
 				}),
 			)
-		} catch {
+		} catch (e) {
+			this.logger.error(e, { message: 'IdP session revalidation: writing the idp_session_revalidation_failed audit entry failed', idpSessionId: row.id })
 			// best-effort observability — never fail the request because the audit write failed
 		}
 	}
@@ -336,23 +346,28 @@ export class IdpSessionRevalidator {
 		requestInfo?: ApiKeyRequestInfo,
 	): Promise<void> {
 		await dbContext.commandBus.execute(new DisableApiKeyCommand(apiKeyRow.id))
-		await dbContext.commandBus.execute(
-			new CreateAuthLogEntryCommand({
-				type: 'idp_session_revoked',
-				invokedById: apiKeyRow.identity_id,
-				personId: apiKeyRow.person_id ?? undefined,
-				identityProviderId: row.identityProviderId,
-				personTokenId: apiKeyRow.id,
-				success: false,
-				errorCode: reason,
-				ipAddress: requestInfo?.ip,
-				userAgent: requestInfo?.userAgent,
-				// the action payload belongs in `event_data` (where every other audit event puts
-				// it and where the admin UI / AuthLogQueryResolver reads it); `metadata` is for
-				// transport context (forwarder IP/UA).
-				eventData: { reason },
-			}),
-		)
+		try {
+			await dbContext.commandBus.execute(
+				new CreateAuthLogEntryCommand({
+					type: 'idp_session_revoked',
+					invokedById: apiKeyRow.identity_id,
+					personId: apiKeyRow.person_id ?? undefined,
+					identityProviderId: row.identityProviderId,
+					success: false,
+					errorCode: reason,
+					ipAddress: requestInfo?.ip,
+					userAgent: requestInfo?.userAgent,
+					// the action payload belongs in `event_data` (where every other audit event puts
+					// it and where the admin UI / AuthLogQueryResolver reads it); `metadata` is for
+					// transport context (forwarder IP/UA).
+					eventData: { reason, apiKeyId: apiKeyRow.id },
+				}),
+			)
+		} catch (e) {
+			this.logger.error(e, { message: 'IdP session revalidation: writing the idp_session_revoked audit entry failed', idpSessionId: row.id })
+			// best-effort audit: the key is already disabled, so the request must still be answered
+			// as revoked rather than fail on the audit write
+		}
 	}
 
 	private resolveConfig(configuration: Record<string, unknown>): ResolvedRevalidationConfig {

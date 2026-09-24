@@ -45,10 +45,11 @@ export class ApiKeyManager {
 			return new ResponseOk(unpersistedResult)
 		}
 
-		const apiKeyRow = await this.fetchApiKeyByToken(dbContext, readDbContext, token)
-		if (apiKeyRow === null) {
+		const fetchedApiKey = await this.fetchApiKeyByToken(dbContext, readDbContext, token)
+		if (fetchedApiKey === null) {
 			return new ResponseError(VerifyErrorCode.NOT_FOUND, 'API key was not found')
 		}
+		const apiKeyRow = fetchedApiKey.row
 
 		if (apiKeyRow.disabled_at !== null) {
 			return new ResponseError(
@@ -120,8 +121,9 @@ export class ApiKeyManager {
 		// response (revocation lands on the next request); in `blocking` mode it can revoke
 		// the current request. No-op for password sessions and IdPs without revalidation.
 		// `effectiveInfo` is passed so the audit entries record the originating request's IP/UA.
+		// The idp_session row is written together with the api_key, so it is read from where the key was found.
 		if (this.idpSessionRevalidator) {
-			const outcome = await this.idpSessionRevalidator.revalidate(dbContext, readDbContext, apiKeyRow, effectiveInfo)
+			const outcome = await this.idpSessionRevalidator.revalidate(dbContext, fetchedApiKey.sourceDbContext, apiKeyRow, effectiveInfo)
 			if (outcome === 'revoked') {
 				return new ResponseError(VerifyErrorCode.DISABLED, 'IdP session was revoked')
 			}
@@ -158,14 +160,18 @@ export class ApiKeyManager {
 		)
 	}
 
-	private async fetchApiKeyByToken(dbContext: DatabaseContext, readDbContext: DatabaseContext, token: string): Promise<ApiKeyRow | null> {
+	private async fetchApiKeyByToken(dbContext: DatabaseContext, readDbContext: DatabaseContext, token: string): Promise<FetchedApiKey | null> {
 		const query = new ApiKeyByTokenQuery(token)
 		const replicaRow = await readDbContext.queryHandler.fetch(query)
-		if (replicaRow !== null || readDbContext.client.connection === dbContext.client.connection) {
-			return replicaRow
+		if (replicaRow !== null) {
+			return { row: replicaRow, sourceDbContext: readDbContext }
+		}
+		if (readDbContext.client.connection === dbContext.client.connection) {
+			return null
 		}
 		// A token issued moments ago (sign-in, createSessionToken) may not have reached the read replica yet.
-		return await dbContext.queryHandler.fetch(query)
+		const primaryRow = await dbContext.queryHandler.fetch(query)
+		return primaryRow !== null ? { row: primaryRow, sourceDbContext: dbContext } : null
 	}
 
 	async createSessionApiKey(
@@ -306,6 +312,11 @@ export class ApiKeyManager {
 			return await this.apiKeyService.createProjectPermanentApiKey(db, projectId, memberships, description, tokenHash, trustForwardedInfo)
 		})
 	}
+}
+
+type FetchedApiKey = {
+	row: ApiKeyRow
+	sourceDbContext: DatabaseContext
 }
 
 export type VerifyResponse = Response<VerifyResult, VerifyErrorCode>

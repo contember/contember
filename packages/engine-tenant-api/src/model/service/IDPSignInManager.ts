@@ -13,12 +13,14 @@ import { IdentityProviderRow } from '../queries/idp/types.js'
 import { AuthLogService } from './AuthLogService.js'
 import { ClaimMappingAudit, IDPClaimSyncService } from './idp/IDPClaimSyncService.js'
 import { ClaimMapping, parseClaimMapping } from './idp/ClaimMapping.js'
+import { Logger } from '@contember/logger'
 
 class IDPSignInManager {
 	constructor(
 		private readonly apiKeyManager: ApiKeyManager,
 		private readonly idpRegistry: IDPHandlerRegistry,
 		private readonly claimSyncService: IDPClaimSyncService,
+		private readonly logger: Logger,
 	) {}
 
 	async signInIDP(
@@ -101,7 +103,8 @@ class IDPSignInManager {
 			let claimMappingFailed = false
 			try {
 				mapping = parseClaimMapping(provider.configuration)
-			} catch {
+			} catch (e) {
+				this.logger.warn(e, { message: 'IdP sign-in: claim mapping configuration is invalid', identityProviderId: provider.id })
 				claimMappingFailed = true
 			}
 			let claimMappingAudit: ClaimMappingAudit | null = null
@@ -146,19 +149,28 @@ class IDPSignInManager {
 					// non-revalidated session. Audit the downgrade (errorCode `encryption_disabled`)
 					// so the operator can see that a session they expected to be continuously
 					// re-validated is in fact not protected, instead of failing closed at sign-in.
-					await db.commandBus.execute(
-						new CreateAuthLogEntryCommand({
-							type: 'idp_session_revalidation_failed',
-							invokedById: personRow.identity_id,
-							personId: personRow.id,
-							identityProviderId: provider.id,
-							personTokenId: apiKeyId,
-							success: true,
-							errorCode: 'encryption_disabled',
-							ipAddress: requestInfo?.ip,
-							userAgent: requestInfo?.userAgent,
-						}),
-					)
+					// Best-effort, in a savepoint: a failed insert would otherwise abort the whole
+					// sign-in transaction, and a lost audit row must not block the sign-in.
+					try {
+						await db.commandBus.transaction(bus =>
+							bus.execute(
+								new CreateAuthLogEntryCommand({
+									type: 'idp_session_revalidation_failed',
+									invokedById: personRow.identity_id,
+									personId: personRow.id,
+									identityProviderId: provider.id,
+									success: true,
+									errorCode: 'encryption_disabled',
+									ipAddress: requestInfo?.ip,
+									userAgent: requestInfo?.userAgent,
+									eventData: { apiKeyId },
+								}),
+							)
+						)
+					} catch (e) {
+						this.logger.error(e, { message: 'IdP sign-in: writing the encryption_disabled audit entry failed', identityProviderId: provider.id })
+						// the savepoint is rolled back, the sign-in transaction stays usable
+					}
 				}
 			}
 

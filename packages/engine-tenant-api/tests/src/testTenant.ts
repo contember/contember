@@ -143,6 +143,7 @@ export const executeTenantTest = async (test: Test) => {
 			connection,
 			readConnection: connection,
 			cryptoProviders: providers,
+			logger: createLogger(new JsonStreamLoggerHandler(process.stderr)),
 		})
 		.replaceService('mailer', () => mailer)
 		.setupService('idpRegistry', reg => {

@@ -9,6 +9,7 @@ import { CreateAuthLogEntryCommand } from '../../../../src/model/commands/authLo
 import { ProjectBySlugQuery, ProjectMembershipByIdentityQuery } from '../../../../src/model/queries/index.js'
 import { Schema } from '@contember/schema'
 import { emptySchema } from '@contember/schema-utils'
+import { createLogger, Logger, TestLoggerHandler } from '@contember/logger'
 
 const NOW = new Date('2026-05-26T12:00:00Z')
 const t = (iso: string) => new Date(`2026-05-26T${iso}Z`)
@@ -20,8 +21,8 @@ const t = (iso: string) => new Date(`2026-05-26T${iso}Z`)
 // happy-path claim tests below grant the plain `editor` role on the existing `demo` project, so they need a
 // resolvable schema that defines that role (otherwise the apply-time backstop would drop the grant).
 const claimSyncSchema: Schema = { ...emptySchema, acl: { roles: { editor: { stages: '*', entities: {}, variables: {} } } } }
-const makeRevalidator = (registry: IDPHandlerRegistry) =>
-	new IdpSessionRevalidator(registry, new IDPClaimSyncService({ getSchema: () => Promise.resolve(claimSyncSchema) }))
+const makeRevalidator = (registry: IDPHandlerRegistry, logger: Logger = createLogger(new TestLoggerHandler())) =>
+	new IdpSessionRevalidator(registry, new IDPClaimSyncService({ getSchema: () => Promise.resolve(claimSyncSchema) }), logger)
 
 const apiKeyRow: any = {
 	id: 'api-key-1',
@@ -48,13 +49,16 @@ const baseRow = (overrides: Partial<IdpSessionRow> = {}): IdpSessionRow => ({
 	...overrides,
 })
 
-const createHarness = (row: IdpSessionRow | null, opts: { claim?: boolean } = {}) => {
+const createHarness = (row: IdpSessionRow | null, opts: { claim?: boolean; failAudit?: boolean } = {}) => {
 	const executed: any[] = []
 	const commandBus = {
 		execute: async (command: any) => {
 			executed.push(command)
 			if (command instanceof ClaimIdpRevalidationCommand) {
 				return opts.claim ?? true
+			}
+			if (opts.failAudit && command instanceof CreateAuthLogEntryCommand) {
+				throw new Error('audit insert failed')
 			}
 			if (command instanceof DisableApiKeyCommand) {
 				return true
@@ -155,7 +159,7 @@ describe('IdpSessionRevalidator — lifetime-driven phases', () => {
 		expect((log as any).data.success).toBe(false)
 		expect((log as any).data.errorCode).toBe('invalid_grant')
 		// the reason is the action payload → event_data (where the rest of the audit system reads it)
-		expect((log as any).data.eventData).toEqual({ reason: 'invalid_grant' })
+		expect((log as any).data.eventData).toEqual({ reason: 'invalid_grant', apiKeyId: 'api-key-1' })
 		expect((log as any).data.metadata).toBeUndefined()
 	})
 
@@ -269,6 +273,8 @@ describe('IdpSessionRevalidator — audit logging', () => {
 		expect(log).toBeDefined()
 		expect((log as any).data.type).toBe('idp_session_revalidated')
 		expect((log as any).data.success).toBe(true)
+		expect((log as any).data.personTokenId).toBeUndefined()
+		expect((log as any).data.eventData).toEqual({ apiKeyId: 'api-key-1' })
 	})
 
 	test('records the originating request IP / user agent on both revoke and revalidated entries', async () => {
@@ -280,6 +286,8 @@ describe('IdpSessionRevalidator — audit logging', () => {
 		const revokeLog = revoked.executed.find(c => c instanceof CreateAuthLogEntryCommand) as any
 		expect(revokeLog.data.ipAddress).toBe('203.0.113.7')
 		expect(revokeLog.data.userAgent).toBe('Mozilla/5.0 test')
+		expect(revokeLog.data.personTokenId).toBeUndefined()
+		expect(revokeLog.data.eventData).toEqual({ reason: 'invalid_grant', apiKeyId: 'api-key-1' })
 
 		const rotated = createHarness(baseRow({ session: { tokens: { refresh_token: 'r' }, expiresAt: t('11:30:00') } }))
 		await makeRevalidator(
@@ -304,6 +312,8 @@ describe('IdpSessionRevalidator — audit logging', () => {
 		expect(log.data.errorCode).toBe('revalidation_error')
 		expect(log.data.success).toBe(true) // fail-open marker, not a security failure
 		expect(log.data.ipAddress).toBe('203.0.113.7')
+		expect(log.data.personTokenId).toBeUndefined()
+		expect(log.data.eventData).toEqual({ apiKeyId: 'api-key-1' })
 	})
 
 	test('corrupt stored config (fail open) is audited as idp_session_revalidation_failed / config_invalid', async () => {
@@ -351,6 +361,27 @@ describe('IdpSessionRevalidator — audit logging', () => {
 		})).revalidate(ctx, ctx, apiKeyRow)
 		expect(out).toBe('valid')
 	})
+
+	// person_auth_log.person_token_id references person_token(id), so an api_key id there fails the FK
+	// and the insert throws. The key is already disabled at that point: the request must still be
+	// answered as revoked, not surface the audit failure (#964).
+	for (
+		const [name, row] of [
+			['blocking revocation', baseRow({ session: { tokens: { refresh_token: 'r' }, expiresAt: t('11:30:00') } })],
+			['disabled provider', baseRow({ providerDisabledAt: t('11:30:00') })],
+		] as const
+	) {
+		test(`a failing audit write on ${name} still returns revoked and logs the error`, async () => {
+			const h = createHarness(row, { failAudit: true })
+			const logs = new TestLoggerHandler()
+			const out = await makeRevalidator(registryWith(async () => ({ status: 'revoked', reason: 'invalid_grant' })), createLogger(logs))
+				.revalidate(h.dbContext, h.readDbContext, apiKeyRow)
+			expect(out).toBe('revoked')
+			expect(h.executed.some(c => c instanceof DisableApiKeyCommand)).toBe(true)
+			expect(h.executed.some(c => c instanceof CreateAuthLogEntryCommand && (c as any).data.type === 'idp_session_revoked')).toBe(true)
+			expect(logs.messages.some(m => m.level.name === 'error' && m.error instanceof Error && m.error.message === 'audit insert failed')).toBe(true)
+		})
+	}
 
 	test('a no-op probe (valid, no rotated session) is NOT logged', async () => {
 		// userinfo / introspection return valid without an idpSession; logging every such tick
@@ -461,6 +492,7 @@ describe('IdpSessionRevalidator — A09 claim mapping on refresh', () => {
 		expect(log).toBeDefined()
 		expect(log.data.success).toBe(true)
 		expect(log.data.eventData.after.memberships).toEqual([{ project: 'demo', role: 'editor', variables: [] }])
+		expect(log.data.personTokenId).toBeUndefined()
 	})
 
 	test('sticky mapping is skipped on refresh (always-only) — no membership write, no audit', async () => {
@@ -484,6 +516,7 @@ describe('IdpSessionRevalidator — A09 claim mapping on refresh', () => {
 		const log = h.executed.find(c => c instanceof CreateAuthLogEntryCommand && (c as any).data.type === 'idp_role_mapping_failed') as any
 		expect(log).toBeDefined()
 		expect(log.data.success).toBe(true)
+		expect(log.data.personTokenId).toBeUndefined()
 	})
 
 	test('refresh without fresh claims does not run claim sync', async () => {

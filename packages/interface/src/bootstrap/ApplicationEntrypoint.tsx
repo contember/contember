@@ -42,6 +42,8 @@ export const ApplicationEntrypoint = (props: ApplicationEntrypointProps) => {
 					loginToken={props.loginToken}
 					project={props.project}
 					stage={props.stage}
+					graphqlClientFactory={props.graphqlClientFactory}
+					primaryReadWindowMs={props.primaryReadWindowMs}
 				>
 					<EnvironmentExtensionProvider extension={projectEnvironmentExtension} state={props.project ?? null}>
 						<DataViewPageNameKeyProvider>

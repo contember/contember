@@ -1,13 +1,18 @@
 import { Input, Model } from '@contember/schema'
 import { isIt } from '../../utils/index.js'
-import { acceptFieldVisitor } from '@contember/schema-utils'
-import { SelectExecutionHandler, SelectExecutionHandlerContext } from '../../mapper/index.js'
+import { acceptFieldVisitor, getField } from '@contember/schema-utils'
+import { getFieldReadPredicate, SelectExecutionHandler, SelectExecutionHandlerContext } from '../../mapper/index.js'
 import { ImplementationException } from '../../exception.js'
 import { UniqueWhereExpander } from '../../inputProcessing/index.js'
 import { HasManyToHasOneReducerExtension } from './HasManyToHasOneReducer.js'
+import { PredicateFactory } from '../../acl/index.js'
 
 export class HasManyToHasOneReducerExecutionHandler implements SelectExecutionHandler<Input.UniqueQueryInput, HasManyToHasOneReducerExtension> {
-	constructor(private readonly schema: Model.Schema, private readonly uniqueWhereExpander: UniqueWhereExpander) {}
+	constructor(
+		private readonly schema: Model.Schema,
+		private readonly uniqueWhereExpander: UniqueWhereExpander,
+		private readonly predicateFactory: PredicateFactory,
+	) {}
 
 	process(context: SelectExecutionHandlerContext<Input.UniqueQueryInput, HasManyToHasOneReducerExtension>): void {
 		const { addData, entity, objectNode } = context
@@ -47,6 +52,12 @@ export class HasManyToHasOneReducerExecutionHandler implements SelectExecutionHa
 				], targetRelation.name)
 			},
 			defaultValue: null,
+			predicate: getFieldReadPredicate(
+				this.predicateFactory,
+				entity,
+				getField(entity, objectNode.extensions.relationName),
+				context.relationPath,
+			),
 		})
 	}
 }

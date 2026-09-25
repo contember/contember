@@ -159,7 +159,11 @@ export class ExecutionContainerFactory {
 					whereOptimized,
 					(schema.settings.content?.useExistsInHasManyFilter ?? schema.settings.useExistsInHasManyFilter) === true,
 				))
-			.addService('orderByBuilder', ({ joinBuilder, schema }) => new OrderByBuilder(schema.model, joinBuilder))
+			.addService(
+				'orderByBuilder',
+				({ joinBuilder, predicateFactory, predicatesInjector, whereBuilder, schema }) =>
+					new OrderByBuilder(schema.model, joinBuilder, predicateFactory, predicatesInjector, whereBuilder),
+			)
 			.addService(
 				'relationFetcher',
 				({ whereBuilder, orderByBuilder, predicatesInjector, pathFactory }) =>
@@ -174,11 +178,12 @@ export class ExecutionContainerFactory {
 			.addService('uniqueWhereExpander', ({ schema }) => new UniqueWhereExpander(schema.model))
 			.addService(
 				'hasManyToHasOneReducer',
-				({ uniqueWhereExpander, schema }) => new HasManyToHasOneReducerExecutionHandler(schema.model, uniqueWhereExpander),
+				({ uniqueWhereExpander, schema, predicateFactory }) =>
+					new HasManyToHasOneReducerExecutionHandler(schema.model, uniqueWhereExpander, predicateFactory),
 			)
 			.addService(
 				'paginatedHasManyExecutionHandler',
-				({ relationFetcher, schema }) => new PaginatedHasManyExecutionHandler(schema.model, relationFetcher),
+				({ relationFetcher, schema, predicateFactory }) => new PaginatedHasManyExecutionHandler(schema.model, relationFetcher, predicateFactory),
 			)
 			.addService('selectHandlers', ({ hasManyToHasOneReducer, paginatedHasManyExecutionHandler }) => ({
 				[HasManyToHasOneReducer.extensionName]: hasManyToHasOneReducer,

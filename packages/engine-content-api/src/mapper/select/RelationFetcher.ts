@@ -235,12 +235,15 @@ export class RelationFetcher {
 			['junction_', column.sourceColumn.columnName],
 			(orderable, qb) => {
 				if (object.args.orderBy) {
+					// relationPath must be passed so the order-by read-predicate guard consults the same
+					// through (`all`) permission set the junction WHERE was filtered with (see PR #900).
 					;[qb, orderable] = this.orderBuilder.build(
 						qb,
 						orderable,
 						targetEntity,
 						this.pathFactory.create([]),
 						object.args.orderBy,
+						relationPath,
 					)
 				}
 				return [orderable, qb]

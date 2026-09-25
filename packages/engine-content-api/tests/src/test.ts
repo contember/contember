@@ -17,6 +17,7 @@ export interface Test {
 	settings?: Settings.Schema
 	validation?: Validation.Schema
 	permissions?: Acl.Permissions
+	allPermissions?: Acl.Permissions
 	variables?: Acl.VariablesMap
 	query: string
 	queryVariables?: Record<string, any>
@@ -76,7 +77,9 @@ export const failedTransaction = (executes: SqlQuery[]): SqlQuery[] => {
 
 export const execute = async (test: Test) => {
 	const permissions: Acl.Permissions = test.permissions || new AllowAllPermissionFactory().create(test.schema)
-	const authorizator = new Authorizator(permissions, false, false)
+	// Mirror production (GraphQlSchemaFactory): the GraphQL schema is built from the through-inclusive `all` set,
+	// so fields granted only through a relation are still exposed.
+	const authorizator = new Authorizator(test.allPermissions ?? permissions, false, false)
 	const builder = new GraphQlSchemaBuilderFactory().create(test.schema, authorizator)
 	const graphQLSchema = builder.build()
 
@@ -103,6 +106,7 @@ export const execute = async (test: Test) => {
 			executionContainer: executionContainerFactory
 				.create({
 					permissions,
+					allPermissions: test.allPermissions,
 					schema,
 					schemaMeta: {
 						id: 1,

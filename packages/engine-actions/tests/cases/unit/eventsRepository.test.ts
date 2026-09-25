@@ -9,12 +9,13 @@ import { testUuid } from '../../src/uuid.js'
 
 /**
  * Answers statements from a script, then with an empty result, so what is under test is the
- * repository's own bookkeeping rather than any SQL.
+ * repository's own bookkeeping rather than any SQL. Every statement is recorded in `queries`.
  */
-const createStubClient = (responses: Connection.Result[] = []): Client => {
+const createStubClient = (responses: Connection.Result[] = [], queries: { sql: string; parameters: readonly any[] }[] = []): Client => {
 	const remaining = [...responses]
 	const eventManager = new EventManager()
-	const query = async <Row extends Record<string, any>>(): Promise<Connection.Result<Row>> => {
+	const query = async <Row extends Record<string, any>>(sql: string, parameters: readonly any[] = []): Promise<Connection.Result<Row>> => {
+		queries.push({ sql, parameters })
 		const next = remaining.shift() ?? { rowCount: 0, rows: [] }
 		return { rowCount: next.rowCount, rows: next.rows as Row[] }
 	}
@@ -132,5 +133,26 @@ describe('fetchBatch', () => {
 
 		expect(result).toEqual({ ok: true, events: [eventRow], target, unknownTargetFailed: 0 })
 		expect(testLoggerHandler.messages).toStrictEqual([])
+	})
+
+	test("fills a batch only with events of the primary event's target", async () => {
+		const queries: { sql: string; parameters: readonly any[] }[] = []
+		const batchTarget: Actions.WebhookTarget = { ...target, batchSize: 3 }
+		const client = createStubClient([
+			{ rowCount: 1, rows: [eventRow] },
+			{ rowCount: 0, rows: [] },
+		], queries)
+
+		const result = await new EventsRepository().fetchBatch(
+			{ triggers: {}, targets: { test_target: batchTarget } },
+			client,
+			createLogger(new TestLoggerHandler()),
+		)
+
+		expect(result).toEqual({ ok: true, events: [eventRow], target: batchTarget, unknownTargetFailed: 0 })
+		expect(queries).toHaveLength(2)
+		// the rest of the batch goes to the same webhook — it must not pick up events of other targets
+		expect(queries[1].sql).toContain('"target" = ?')
+		expect(queries[1].parameters).toContain('test_target')
 	})
 })

@@ -239,6 +239,34 @@ describe('GraphQL schema builder', () => {
 		})
 	})
 
+	// `set` diffs the current members against the input, so a role that cannot read the target
+	// could only ever add to the collection - the operation is not offered at all.
+	it('ACL with relations - restricted read hides set', async () => {
+		await testSchema({
+			schema: oneHasManySchema,
+			permissions: () => ({
+				Root: {
+					predicates: {},
+					operations: {
+						create: { id: true },
+						update: { id: true },
+						read: { id: true },
+						delete: true,
+					},
+				},
+				OneHasManyEntity: {
+					predicates: {},
+					operations: {
+						create: { id: true, a: true, r2: true },
+						update: { id: true, a: true, r2: true },
+						delete: true,
+					},
+				},
+			}),
+			graphQlSchemaFile: 'schema-acl-restricted-read.gql',
+		})
+	})
+
 	it('ACL with relations - restricted update', async () => {
 		await testSchema({
 			schema: oneHasManySchema,

@@ -162,6 +162,15 @@ export namespace ContentClientInput {
         readonly first?: number;
     };
     // (undocumented)
+    export interface SetManyRelationInput<TEntity extends EntityTypeLike> {
+        // (undocumented)
+        readonly orphanStrategy?: `${Input.OrphanRemovalStrategy}`;
+        // (undocumented)
+        readonly set: ReadonlyArray<SetManyRelationInputItem<TEntity>>;
+    }
+    // (undocumented)
+    export type SetManyRelationInputItem<TEntity extends EntityTypeLike> = CreateRelationInput<TEntity> | ConnectRelationInput<TEntity> | ConnectOrCreateRelationInput<TEntity> | UpdateSpecifiedRelationInput<TEntity> | UpsertSpecifiedRelationInput<TEntity>;
+    // (undocumented)
     export type UniqueQueryInput<TEntity extends EntityTypeLike> = {
         readonly __typeGuard?: TEntity['name'];
         readonly by: UniqueWhere<TEntity>;
@@ -189,7 +198,7 @@ export namespace ContentClientInput {
         readonly data: UpdateDataInput<TEntity>;
     };
     // (undocumented)
-    export type UpdateManyRelationInput<TEntity extends EntityTypeLike> = Array<UpdateManyRelationInputItem<TEntity>>;
+    export type UpdateManyRelationInput<TEntity extends EntityTypeLike> = Array<UpdateManyRelationInputItem<TEntity> | SetManyRelationInput<TEntity>>;
     // (undocumented)
     export type UpdateManyRelationInputItem<TEntity extends EntityTypeLike> = CreateRelationInput<TEntity> | ConnectRelationInput<TEntity> | ConnectOrCreateRelationInput<TEntity> | DeleteSpecifiedRelationInput<TEntity> | DisconnectSpecifiedRelationInput<TEntity> | UpdateSpecifiedRelationInput<TEntity> | UpsertSpecifiedRelationInput<TEntity>;
     // (undocumented)

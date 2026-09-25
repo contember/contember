@@ -15,6 +15,20 @@ export const hasManyProcessor = <Context extends { relation: Model.AnyRelation; 
 	}
 }
 
+export const relationFieldProcessor = <Context extends { relation: Model.AnyRelation }, Args>(
+	innerProcessor: (context: Context) => Promise<MutationResultList | ((args: Args) => Promise<MutationResultList>)>,
+) => {
+	return async (context: Context): Promise<MutationResultList | ((args: Args) => Promise<MutationResultList>)> => {
+		const { relation } = context
+		const path = [{ field: relation.name }]
+		const innerResult = await innerProcessor(context)
+		if (typeof innerResult === 'function') {
+			return async (it: Args) => prependPath(path, await innerResult(it))
+		}
+		return prependPath(path, innerResult)
+	}
+}
+
 export const hasOneProcessor = <Context extends { relation: Model.AnyRelation }, Args>(
 	innerProcessor: (context: Context) => Promise<MutationResultList | ((args: Args) => Promise<MutationResultList>)>,
 ) => {

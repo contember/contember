@@ -26,6 +26,10 @@ namespace UpdateInputProcessor {
 		update: MapperInput.UpdateDataInput
 		create: MapperInput.CreateDataInput
 	}
+	export type SetManyInput = {
+		items: ReadonlyArray<MapperInput.SetManyRelationInputItem>
+		orphanStrategy: Input.OrphanRemovalStrategy
+	}
 
 	export interface HasOneRelationInputProcessor<Context, Result> {
 		connect(context: Context & { input: Input.UniqueWhere | CheckedPrimary }): Promise<Result>
@@ -57,6 +61,8 @@ namespace UpdateInputProcessor {
 		disconnect(context: Context & { input: Input.UniqueWhere; index: number; alias?: string }): Promise<Result>
 
 		delete(context: Context & { input: Input.UniqueWhere; index: number; alias?: string }): Promise<Result>
+
+		set(context: Context & { input: UpdateInputProcessor.SetManyInput }): Promise<Result>
 	}
 }
 

@@ -42,7 +42,7 @@ class LimitByGroupWrapper {
 				wrapperQb = wrapperQb.where(expr => expr.compare(['data', 'rowNumber_'], Operator.lte, start + limit))
 			}
 
-			return await wrapperQb.getResult(db)
+			return await wrapperQb.orderBy(['data', 'rowNumber_']).getResult(db)
 		} else if (this.orderByCallback) {
 			return await this.orderByCallback(null, qb)[1].getResult(db)
 		}

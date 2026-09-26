@@ -221,7 +221,7 @@ test('Posts with paginated comments (one has many)', async () => {
     					where "root_"."deleted_at" is null
     					      and "root_"."post_id" in (?, ?)
     					order by "root_"."id" asc)
-					select "data".*  from "data"   where "data"."rowNumber_" <= ?`,
+					select "data".*  from "data"   where "data"."rowNumber_" <= ? order by "data"."rowNumber_" asc`,
 				parameters: [testUuid(1), testUuid(2), 1],
 				response: {
 					rows: [
@@ -375,7 +375,7 @@ test('Posts with paginated comments without count (one has many)', async () => {
     					where "root_"."deleted_at" is null
     					      and "root_"."post_id" in (?, ?)
     					order by "root_"."id" asc)
-					select "data".*  from "data"   where "data"."rowNumber_" <= ?`,
+					select "data".*  from "data"   where "data"."rowNumber_" <= ? order by "data"."rowNumber_" asc`,
 				parameters: [testUuid(1), testUuid(2), 1],
 				response: {
 					rows: [
@@ -471,7 +471,7 @@ test('Posts with paginated comments (one has many)', async () => {
     					where "root_"."deleted_at" is null
     					      and "root_"."post_id" in (?)
     					order by "root_"."id" asc)
-					select "data".*  from "data"   where "data"."rowNumber_" <= ?`,
+					select "data".*  from "data"   where "data"."rowNumber_" <= ? order by "data"."rowNumber_" asc`,
 				parameters: [testUuid(1), 1],
 				response: {
 					rows: [

@@ -2,6 +2,7 @@ import { QueryBuilder } from './QueryBuilder.js'
 import { Literal } from '../Literal.js'
 import { columnExpressionToLiteral } from './utils.js'
 import { formatColumnIdentifier } from '../utils/index.js'
+import type { SelectBuilder } from './SelectBuilder.js'
 
 class WindowFunction<HasFunction extends boolean> implements QueryBuilder.Orderable<WindowFunction<HasFunction>> {
 	private constructor(
@@ -30,12 +31,12 @@ class WindowFunction<HasFunction extends boolean> implements QueryBuilder.Ordera
 
 	orderBy(
 		expression: QueryBuilder.ColumnIdentifier | Literal,
-		direction: 'asc' | 'desc' = 'asc',
+		direction: SelectBuilder.OrderByDirection = 'asc',
 	): WindowFunction<HasFunction> {
 		const raw = expression instanceof Literal ? expression : new Literal(formatColumnIdentifier(expression))
 		return new WindowFunction(this.windowFunction, this.partitionByExpr, [
 			...this.orderByColumns,
-			raw.appendString(direction === 'asc' ? ' asc' : ' desc'),
+			raw.appendString(` ${direction}`),
 		])
 	}
 

@@ -162,9 +162,7 @@ export class RelationFetcher {
 
 		const primaryField = new FieldNode(targetEntity.primary, targetEntity.primary, {})
 		const inverseJoiningColumn = joiningColumns.targetColumn.columnName
-		const inverseIds = junctionValues
-			.map(it => it[inverseJoiningColumn])
-			.filter((it, index, arr) => arr.indexOf(it) === index)
+		const inverseIds = [...new Set(junctionValues.map(it => it[inverseJoiningColumn]))]
 
 		const queryWithWhere = objectNode
 			.withArgs({

@@ -73,6 +73,8 @@ drifts across restarts and ignores manual retry/stop — query `actions_event` f
 
 The `ProjectDispatcher` idle wait is capped at `MAX_IDLE_SLEEP_MS` (30s) even when the queue is empty,
 so a lost `pg_notify` self-heals and the heartbeat keeps refreshing while idle.
+On shutdown, `end()` waits at most `END_TIMEOUT_MS` (10s) for an in-flight batch; events it abandons
+stay in processing and are delivered again after the ACK timeout.
 
 ### Log
 

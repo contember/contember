@@ -13,6 +13,17 @@ import { ActionsMetrics, ProjectActionsMetrics } from '../ActionsMetrics.js'
  */
 const MAX_IDLE_SLEEP_MS = 30_000
 
+/**
+ * How long `end()` waits for an in-flight batch. A webhook may take its full target timeout, which would
+ * outlive a typical shutdown grace period. Events of an abandoned batch stay in processing and are
+ * delivered again once their ACK timeout expires.
+ */
+const END_TIMEOUT_MS = 10_000
+
+export interface ProjectDispatcherOptions {
+	readonly endTimeoutMs?: number
+}
+
 export class ProjectDispatcherFactory {
 	constructor(
 		private readonly dispatcher: EventDispatcher,
@@ -34,7 +45,22 @@ export class ProjectDispatcher implements Runnable {
 		private readonly contentSchemaResolver: ContentSchemaResolver,
 		private readonly projectSlug: string,
 		private readonly metrics: ProjectActionsMetrics,
+		private readonly options: ProjectDispatcherOptions = {},
 	) {
+	}
+
+	private async waitForDispatchToFinish(dispatchFinished: Promise<void>): Promise<boolean> {
+		let timer: ReturnType<typeof setTimeout> | undefined
+		try {
+			return await Promise.race([
+				dispatchFinished.then(() => true),
+				new Promise<boolean>(resolve => {
+					timer = setTimeout(() => resolve(false), this.options.endTimeoutMs ?? END_TIMEOUT_MS)
+				}),
+			])
+		} finally {
+			clearTimeout(timer)
+		}
 	}
 
 	public async run({ logger, onError, onClose }: RunnableArgs): Promise<Running> {
@@ -74,7 +100,10 @@ export class ProjectDispatcher implements Runnable {
 							endPromise ??= (async () => {
 								aborted = true
 								resolvePendingRef()
-								await dispatchFinished
+								const finished = await this.waitForDispatchToFinish(dispatchFinished)
+								if (!finished) {
+									logger.warn('Worker did not finish its batch in time, events still in processing will be delivered again')
+								}
 								this.metrics.dispose()
 								logger.info('Worker terminated', {
 									succeed: succeedTotal,

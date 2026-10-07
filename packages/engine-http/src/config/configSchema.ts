@@ -105,6 +105,16 @@ export const tenantConfigSchema = Typesafe.intersection(
 	}),
 )
 
+const positiveInteger = Typesafe.transform(
+	Typesafe.integer,
+	(value, input, path) => value > 0 ? value : Typesafe.fail(path, `must be a positive integer, ${value} given`),
+)
+
+const nonNegativeInteger = Typesafe.transform(
+	Typesafe.integer,
+	(value, input, path) => value >= 0 ? value : Typesafe.fail(path, `must be a non-negative integer, ${value} given`),
+)
+
 export const serverConfigSchema = Typesafe.partial({
 	port: Typesafe.number,
 	http: Typesafe.partial({
@@ -183,9 +193,10 @@ export const serverConfigSchema = Typesafe.partial({
 	}),
 	systemApi: Typesafe.partial({
 		// Opt-in: unset, a migration waits for its locks as long as PostgreSQL lets it and is never retried.
-		migrationLockTimeoutMs: Typesafe.integer,
-		migrationMaxAttempts: Typesafe.integer,
-		migrationRetryDelayMs: Typesafe.integer,
+		// Zero is rejected rather than passed on: PostgreSQL reads `lock_timeout = 0` as no limit.
+		migrationLockTimeoutMs: positiveInteger,
+		migrationMaxAttempts: positiveInteger,
+		migrationRetryDelayMs: nonNegativeInteger,
 	}),
 	contentApi: Typesafe.partial({
 		schemaCacheTtlSeconds: Typesafe.integer,

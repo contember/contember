@@ -105,3 +105,10 @@ test('migration lock options: retry settings apply only with a lock timeout', as
 		delete process.env.CONTEMBER_SYSTEM_API_MIGRATION_MAX_ATTEMPTS
 	}
 })
+
+test('migration lock options: zero and negative values are rejected', () => {
+	expect(() => serverConfigSchema({ systemApi: { migrationLockTimeoutMs: 0 } })).toThrow()
+	expect(() => serverConfigSchema({ systemApi: { migrationMaxAttempts: -1 } })).toThrow()
+	expect(() => serverConfigSchema({ systemApi: { migrationRetryDelayMs: -1 } })).toThrow()
+	expect(serverConfigSchema({ systemApi: { migrationRetryDelayMs: 0 } }).systemApi?.migrationRetryDelayMs).toBe(0)
+})

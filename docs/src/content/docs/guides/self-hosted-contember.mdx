@@ -96,7 +96,9 @@ CONTEMBER_SYSTEM_API_MIGRATION_MAX_ATTEMPTS: "5"     # default 5
 CONTEMBER_SYSTEM_API_MIGRATION_RETRY_DELAY_MS: "1000" # default 1000
 ```
 
-A lock timeout or a deadlock retries the whole migration transaction. When the attempts run out, the migration fails as before and nothing is applied. The timeout applies only to the migration transaction and overrides the [database `lockTimeoutMs`](/reference/engine/configuration/database#timeouts) there. Unset, a migration waits for its locks as long as PostgreSQL lets it.
+When an SQL statement of a schema migration hits the lock timeout or a deadlock, the whole migration transaction rolls back and runs again. When the attempts run out, the migration fails as before and nothing is applied. A content migration that hits the timeout is not retried: it fails at once. The timeout applies only to the migration transaction and overrides the [database `lockTimeoutMs`](/reference/engine/configuration/database#timeouts) there. Applying a snapshot to an empty project is not affected. Unset, a migration waits for its locks as long as PostgreSQL lets it.
+
+All values must be positive integers (the retry delay may be `0`). The engine refuses to start otherwise, because PostgreSQL reads a `lock_timeout` of `0` as no limit.
 
 After the server is running, use Contember CLI to set up other API tokens and invite users. Deploy the
 `blog` project to this instance with `CONTEMBER_API_URL` and `CONTEMBER_API_TOKEN` set:

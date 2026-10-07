@@ -132,8 +132,8 @@ export class UpdateColumnDefinitionModificationHandler implements ModificationHa
 }
 
 // Avoids `SET DATA TYPE … USING`, which rewrites the table and its indexes under an ACCESS EXCLUSIVE lock.
-// Empty rows are numbered from the start in primary key order; the sequence then continues after the
-// highest value at or above its start, so it never hands out a number a row already holds.
+// Empty rows are numbered from the start in primary key order, as `nextval` did, so they can still collide
+// with existing values in that range; later inserts continue after the highest value at or above the start.
 const addSequenceInPlace = ({ builder, entity, column, sequence, notNull }: {
 	builder: MigrationBuilder
 	entity: Model.Entity

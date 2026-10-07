@@ -22,7 +22,11 @@ export class CreateEntityInputFieldVisitor
 			return undefined
 		}
 		const [type] = this.columnTypeResolver.getType(column)
-		return { type }
+		return {
+			type,
+			deprecationReason: column.deprecationReason,
+			description: column.description,
+		}
 	}
 
 	public visitHasOne({ entity, relation }: Model.AnyHasOneRelationContext): GraphQLInputFieldConfig | undefined {
@@ -30,7 +34,11 @@ export class CreateEntityInputFieldVisitor
 		if (type === undefined) {
 			return undefined
 		}
-		return { type }
+		return {
+			type,
+			deprecationReason: relation.deprecationReason,
+			description: relation.description,
+		}
 	}
 
 	public visitHasMany({ entity, relation }: Model.AnyHasManyRelationContext): GraphQLInputFieldConfig | undefined {
@@ -40,6 +48,8 @@ export class CreateEntityInputFieldVisitor
 		}
 		return {
 			type: new GraphQLList(new GraphQLNonNull(type)),
+			deprecationReason: relation.deprecationReason,
+			description: relation.description,
 		}
 	}
 }

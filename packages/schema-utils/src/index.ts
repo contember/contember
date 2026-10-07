@@ -14,6 +14,7 @@ export * from './validation/index.js'
 export * from './schemaNormalizer.js'
 export * from './schemaFilter.js'
 export * from './schemaChecksum.js'
+export * from './constants.js'
 export { compareArraysIgnoreOrder, deepCompare } from './utils/index.js'
 
 export const emptySchema: Schema = {

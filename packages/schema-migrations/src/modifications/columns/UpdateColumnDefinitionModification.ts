@@ -45,7 +45,9 @@ export class UpdateColumnDefinitionModificationHandler implements ModificationHa
 		const migrateWithUsing = hasSeed && this.data.valueMigrationStrategy === 'using'
 		const migrateWithUpdate = hasSeed && this.data.valueMigrationStrategy !== 'using'
 
-		if (hasNewSequence && !hasNewType && !hasNewCollation && !hasSeed) {
+		// Opt-in: unlike the rewrite, filling the empty rows goes through the event log and the triggers.
+		const addSequenceWithUpdate = hasNewSequence && !hasNewType && !hasNewCollation && !hasSeed && this.data.valueMigrationStrategy === 'update'
+		if (addSequenceWithUpdate) {
 			addSequenceInPlace({
 				builder,
 				entity,

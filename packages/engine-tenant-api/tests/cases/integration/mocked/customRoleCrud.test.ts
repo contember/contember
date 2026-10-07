@@ -20,6 +20,12 @@ const customRoleRow = (
 	updated_at: now,
 })
 
+const identitiesHoldingRoleQuery = (role: string, count: number) => ({
+	sql: SQL`select count(*)::int as "count"  from "tenant"."identity" where roles \\? ?`,
+	parameters: [role],
+	response: { rows: [{ count }] },
+})
+
 test('createCustomRole stores canonical grants and audits the full role state', async () => {
 	await executeTenantTest({
 		query: {
@@ -35,6 +41,7 @@ test('createCustomRole stores canonical grants and audits the full role state', 
 					parameters: ['support'],
 					response: { rows: [] },
 				},
+				identitiesHoldingRoleQuery('support', 0),
 				{
 					sql: SQL`insert into  "tenant"."custom_role" ("id", "slug", "description", "grants", "created_at", "updated_at")
 						values  (?, ?, ?, ?, ?, ?)`,
@@ -127,6 +134,35 @@ test('createCustomRole rejects nonexistent role references', async () => {
 				createCustomRole: {
 					ok: false,
 					error: { code: 'INVALID_PERMISSION_CONFIGURATION' },
+				},
+			},
+		},
+	})
+})
+
+test('createCustomRole refuses a slug that identities already hold as a free-form role string', async () => {
+	await executeTenantTest({
+		query: {
+			query: GQL`mutation($slug: String!, $grants: [CustomRoleGrantInput!]!) {
+				createCustomRole(slug: $slug, grants: $grants) { ok error { code } }
+			}`,
+			variables: { slug: 'deployer', grants: listGrantInput },
+		},
+		executes: [
+			...sqlReadCommittedTransaction(
+				{
+					sql: SQL`select *  from "tenant"."custom_role" where "slug" in (?)  order by "slug" asc`,
+					parameters: ['deployer'],
+					response: { rows: [] },
+				},
+				identitiesHoldingRoleQuery('deployer', 2),
+			),
+		],
+		return: {
+			data: {
+				createCustomRole: {
+					ok: false,
+					error: { code: 'SLUG_ALREADY_ASSIGNED' },
 				},
 			},
 		},

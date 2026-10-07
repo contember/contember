@@ -1,7 +1,7 @@
 import { LockType, UniqueViolationError } from '@contember/database'
 import { DatabaseContext } from '../utils/index.js'
 import { Response, ResponseError, ResponseOk } from '../utils/Response.js'
-import { CustomRolesQuery, ProjectsQuery } from '../queries/index.js'
+import { CustomRolesQuery, IdentitiesHoldingRoleCountQuery, ProjectsQuery } from '../queries/index.js'
 import { CreateCustomRoleCommand, DeleteCustomRoleCommand, RemoveCustomRoleAssignmentsCommand, UpdateCustomRoleCommand } from '../commands/index.js'
 import { CustomRoleRow } from '../type/index.js'
 import {
@@ -73,6 +73,15 @@ export class CustomRoleManager {
 		const existing = await db.queryHandler.fetch(new CustomRolesQuery({ slugs: [input.slug] }))
 		if (existing.length > 0) {
 			return new ResponseError('SLUG_ALREADY_EXISTS', `Custom role ${input.slug} already exists`)
+		}
+		// Only legacy rows can match: every assignment path rejects a slug with no custom_role row,
+		// so no concurrent writer can add one before this insert commits.
+		const holders = await db.queryHandler.fetch(new IdentitiesHoldingRoleCountQuery(input.slug))
+		if (holders > 0) {
+			return new ResponseError(
+				'SLUG_ALREADY_ASSIGNED',
+				`Role string ${input.slug} is already held by ${holders} identities; remove it from them before defining the role`,
+			)
 		}
 		// A racing INSERT aborts the transaction, so UniqueViolationError cannot be mapped
 		// here — the caller catches it outside, once the transaction has rolled back.

@@ -777,6 +777,7 @@ export type CreateCustomRoleErrorCode =
 	| 'DUPLICATE_PERMISSION'
 	| 'INVALID_PERMISSION_CONFIGURATION'
 	| 'INVALID_SLUG'
+	| 'SLUG_ALREADY_ASSIGNED'
 	| 'SLUG_ALREADY_EXISTS'
 	| 'UNKNOWN_PERMISSION'
 
@@ -921,6 +922,11 @@ export type DeleteCustomRoleError = {
 
 export type DeleteCustomRoleErrorCode =
 	| 'NOT_FOUND'
+	/**
+	 * Another custom role's grant configuration references this one. Remove the reference first —
+	 * deleting would leave that role un-resubmittable, and recreating this slug would silently
+	 * re-bind the reference to a different definition.
+	 */
 	| 'ROLE_IN_USE'
 
 export type DeleteCustomRoleResponse = {

@@ -47,8 +47,16 @@ Configuration is validated strictly. Unknown fields, invalid types, duplicate pe
 nonexistent custom roles or projects are rejected. Updates replace the complete `grants` array when it is supplied; omitting it leaves the grants
 unchanged.
 
-Errors include `INVALID_SLUG`, `SLUG_ALREADY_EXISTS`, `UNKNOWN_PERMISSION`, `DUPLICATE_PERMISSION`, and
+Errors include `INVALID_SLUG`, `SLUG_ALREADY_EXISTS`, `SLUG_ALREADY_ASSIGNED`, `UNKNOWN_PERMISSION`, `DUPLICATE_PERMISSION`, and
 `INVALID_PERMISSION_CONFIGURATION`.
+
+Assigning a global role that is neither built in nor defined as a custom role is rejected. Older engine versions accepted any string in
+`identity.roles` (through `addGlobalIdentityRoles`, `signUp(roles:)`, or `createGlobalApiKey(roles:)`), so such strings can still exist. Creating
+a custom role whose slug some identity already holds would silently grant the new definition to every such identity — including old API keys.
+`createCustomRole` therefore refuses that slug with `SLUG_ALREADY_ASSIGNED`; the developer message reports how many identities hold it. To
+resolve it, find those identities (their `identity.roles`, e.g. through `persons` and `globalApiKeys`), remove the string with
+`removeGlobalIdentityRoles`, then create the role and assign it explicitly to the identities that should have it. Alternatively, pick a different
+slug.
 
 Deleting a role removes its definition and strips the slug from every identity in the same transaction, so no assignment outlives the role. The slug
 becomes available again; the `custom_role_change` audit entry records what it used to grant, and the id of every identity the slug was stripped from —
@@ -58,9 +66,7 @@ A role that another role's grant configuration references cannot be deleted: the
 reference first. Otherwise the referring role would become un-resubmittable — `tenant:apply` re-sends every configured role's full grants on every
 run — and recreating the slug would silently re-bind that reference to a different definition.
 
-Note that a slug carries no meaning of its own — recreating a deleted slug grants the new definition to anyone who is assigned it afterwards, and to
-anyone who already carries that string in `identity.roles` for unrelated reasons. Pick slugs that cannot collide with role names your deployment
-already uses.
+Note that a slug carries no meaning of its own — recreating a deleted slug grants the new definition to anyone who is assigned it afterwards.
 
 For repeatable provisioning, define roles in a typed `tenant.config.ts`:
 

@@ -80,6 +80,8 @@ Input breakdown:
 
 - **Global vs. Project-specific Templates**: By default, templates are global. To create a project-specific template, include the `projectSlug`. Such project-specific templates will always have precedence over global ones.
 
+  The one exception: password reset, passwordless sign-in, e-mail verification and e-mail change mails to a person holding the `super_admin` or `project_creator` global role always use the global template, and `{{project}}` / `{{projectSlug}}` stay empty. A project admin must not be able to read such a person's token through a template they wrote.
+
 - **Template Variants**: Especially relevant for projects serving diverse audiences, Contember supports the creation of variant templates. Whether for different languages or thematic designs, variants ensure your emails are contextually apt. To use a variant, include the `variant` parameter in a mutaiton.
 
 - **Custom Layout**: For those seeking granular control over design, use the `useLayout: false` flag. This means your template won't inherit the standard layout (white centered box on light gray background), granting you carte blanche on the HTML structure.

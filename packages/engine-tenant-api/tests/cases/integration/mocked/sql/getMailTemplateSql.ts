@@ -1,8 +1,25 @@
 import { ExpectedQuery } from '@contember/database-tester'
 
+/** `storedSubject` makes the lookup find a stored template with that subject; otherwise it finds none. */
 export const getMailTemplateSql = (
-	args: { type: string; projectId: string | null },
-): ExpectedQuery =>
+	args: { type: string; projectId: string | null; storedSubject?: string },
+): ExpectedQuery => ({
+	...getMailTemplateQuery(args),
+	response: {
+		rows: args.storedSubject === undefined ? [] : [{
+			id: 'stored-template',
+			subject: args.storedSubject,
+			content: 'Stored template {{token}}',
+			useLayout: false,
+			replyTo: null,
+			projectId: args.projectId,
+			type: args.type,
+			variant: '',
+		}],
+	},
+})
+
+const getMailTemplateQuery = (args: { type: string; projectId: string | null }): Omit<ExpectedQuery, 'response'> =>
 	args.projectId
 		? {
 			sql:
@@ -12,9 +29,6 @@ export const getMailTemplateSql = (
 				AND "mail_type" = ?
 				AND "variant" = ?`,
 			parameters: [args.projectId, args.type, ''],
-			response: {
-				rows: [],
-			},
 		}
 		: {
 			sql:
@@ -24,7 +38,4 @@ export const getMailTemplateSql = (
 				AND "mail_type" = ?
 				AND "variant" = ?`,
 			parameters: [args.type, ''],
-			response: {
-				rows: [],
-			},
 		}

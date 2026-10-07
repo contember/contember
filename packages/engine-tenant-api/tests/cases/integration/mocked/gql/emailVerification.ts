@@ -11,9 +11,11 @@ export const verifyEmailMutation = (variables: { token: string }): GraphQLTestQu
 	variables,
 })
 
-export const requestEmailVerificationMutation = (variables: { email: string; captchaToken?: string }): GraphQLTestQuery => ({
-	query: GQL`mutation($email: String!, $captchaToken: String) {
-		requestEmailVerification(email: $email, captchaToken: $captchaToken) {
+export const requestEmailVerificationMutation = (
+	variables: { email: string; captchaToken?: string; mailProject?: string },
+): GraphQLTestQuery => ({
+	query: GQL`mutation($email: String!, $captchaToken: String, $mailProject: String) {
+		requestEmailVerification(email: $email, captchaToken: $captchaToken, options: { mailProject: $mailProject }) {
 			ok
 			error { code }
 		}

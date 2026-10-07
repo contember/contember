@@ -5,7 +5,7 @@ import { PermissionContext } from '../authorization/index.js'
 import { ProjectManager } from './ProjectManager.js'
 import { DatabaseContext } from '../utils/index.js'
 import { ImplementationException } from '../../exceptions.js'
-import { getPreferredProject } from './helpers/getPreferredProject.js'
+import { getMailProject } from './helpers/getMailProject.js'
 import { CreatePersonTokenCommand, ResetPasswordCommand } from '../commands/personToken/index.js'
 import { PasswordStrengthValidator } from './PasswordStrengthValidator.js'
 import { ResetPasswordErrorCode, WeakPasswordReason } from '../../schema/index.js'
@@ -54,8 +54,13 @@ export class PasswordResetManager {
 		}
 
 		const result = await dbContext.commandBus.execute(CreatePersonTokenCommand.createPasswordResetRequest(person.id))
-		const projects = await this.projectManager.getProjectsByIdentity(dbContext, person.identity_id, permissionContext)
-		const project = getPreferredProject(projects, mailOptions.project ?? null)
+		const project = await getMailProject({
+			projectManager: this.projectManager,
+			dbContext,
+			permissionContext,
+			person,
+			preferredProjectSlug: mailOptions.project ?? null,
+		})
 
 		await this.mailer.sendPasswordResetEmail(
 			dbContext,

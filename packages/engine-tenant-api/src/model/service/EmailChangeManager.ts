@@ -7,7 +7,7 @@ import { ApiKeyManager } from './apiKey/index.js'
 import { EmailValidator, EmailValidatorError } from './EmailValidator.js'
 import { DatabaseContext } from '../utils/index.js'
 import { ImplementationException } from '../../exceptions.js'
-import { getPreferredProject } from './helpers/getPreferredProject.js'
+import { getMailProject } from './helpers/getMailProject.js'
 import { CreatePersonTokenCommand, InvalidateTokenCommand, MarkEmailVerifiedCommand } from '../commands/index.js'
 import { PersonTokenQuery } from '../queries/personToken/PersonTokenQuery.js'
 import { NextMailAttemptQuery } from '../queries/authLog/NextMailAttemptQuery.js'
@@ -64,8 +64,13 @@ export class EmailChangeManager {
 			return new ResponseError('RATE_LIMIT_EXCEEDED', 'Too many e-mail change requests for this address.')
 		}
 
-		const projects = await this.projectManager.getProjectsByIdentity(dbContext, person.identity_id, permissionContext)
-		const project = getPreferredProject(projects, mailOptions.project ?? null)
+		const project = await getMailProject({
+			projectManager: this.projectManager,
+			dbContext,
+			permissionContext,
+			person,
+			preferredProjectSlug: mailOptions.project ?? null,
+		})
 
 		await dbContext.transaction(async db => {
 			if (applyWithinTransaction) {
@@ -159,8 +164,13 @@ export class EmailChangeManager {
 				id: person.identity_id,
 				roles: person.roles,
 			})
-			const projects = await this.projectManager.getProjectsByIdentity(dbContext, person.identity_id, permissionContext)
-			const project = getPreferredProject(projects, null)
+			const project = await getMailProject({
+				projectManager: this.projectManager,
+				dbContext,
+				permissionContext,
+				person,
+				preferredProjectSlug: null,
+			})
 			await this.mailer.sendEmailChangeNotifyEmail(
 				dbContext,
 				{ email: oldEmail, newEmail, project: project?.name, projectSlug: project?.slug },

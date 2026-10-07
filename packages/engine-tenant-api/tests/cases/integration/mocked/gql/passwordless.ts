@@ -22,9 +22,9 @@ export const signInPasswordlessMutation = (
 	variables,
 })
 
-export const initSignInPasswordlessMutation = (variables: { email: string }): GraphQLTestQuery => ({
-	query: GQL`mutation($email: String!) {
-		initSignInPasswordless(email: $email) {
+export const initSignInPasswordlessMutation = (variables: { email: string; mailProject?: string }): GraphQLTestQuery => ({
+	query: GQL`mutation($email: String!, $mailProject: String) {
+		initSignInPasswordless(email: $email, options: { mailProject: $mailProject }) {
 			ok
 			error { code }
 		}

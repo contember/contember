@@ -17,7 +17,7 @@ import {
 	InvalidateTokenCommand,
 	MarkEmailVerifiedCommand,
 } from '../commands/index.js'
-import { getPreferredProject } from './helpers/getPreferredProject.js'
+import { getMailProject } from './helpers/getMailProject.js'
 import { isPasswordlessEnabled } from './helpers/isPasswordlessEnabled.js'
 import { ProjectManager } from './ProjectManager.js'
 import { PermissionContext } from '../authorization/index.js'
@@ -109,8 +109,13 @@ class PasswordlessSignInManager {
 
 			const url = this.formatUrl(configuration.passwordless.url ?? null, result.token, result.id, email) ?? undefined
 
-			const projects = await this.projectManager.getProjectsByIdentity(db, person.identity_id, permissionContext)
-			const project = getPreferredProject(projects, mailProject ?? null)
+			const project = await getMailProject({
+				projectManager: this.projectManager,
+				dbContext: db,
+				permissionContext,
+				person,
+				preferredProjectSlug: mailProject ?? null,
+			})
 
 			await this.mailer.sendPasswordlessEmail(db, {
 				email,

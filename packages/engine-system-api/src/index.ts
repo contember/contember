@@ -14,6 +14,7 @@ export {
 	getJunctionTables,
 	Identity,
 	LatestTransactionIdByStageQuery,
+	type MigrationLockOptions,
 	ProjectInitializer,
 	ProjectMigrator,
 	type SchemaMeta,

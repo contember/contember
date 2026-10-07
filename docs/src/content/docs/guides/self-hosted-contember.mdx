@@ -86,6 +86,18 @@ CONTEMBER_SHUTDOWN_DELAY_MS: "5000"
 
 This is the in-process equivalent of a Kubernetes `preStop` sleep hook; a few seconds covers endpoint propagation there. Keep it well below `terminationGracePeriodSeconds`, which counts the delay too. `SIGINT` (Ctrl+C) never waits.
 
+#### Lock waits during migrations
+
+A schema migration often needs an `ACCESS EXCLUSIVE` lock on a table. While it waits for a long-running query to release the table, PostgreSQL queues every later query on that table behind it, so the application stops responding even before the migration starts its work. Set `CONTEMBER_SYSTEM_API_MIGRATION_LOCK_TIMEOUT_MS` to let a migration give up waiting after that long, roll back, and try again:
+
+```yaml
+CONTEMBER_SYSTEM_API_MIGRATION_LOCK_TIMEOUT_MS: "2000"
+CONTEMBER_SYSTEM_API_MIGRATION_MAX_ATTEMPTS: "5"     # default 5
+CONTEMBER_SYSTEM_API_MIGRATION_RETRY_DELAY_MS: "1000" # default 1000
+```
+
+A lock timeout or a deadlock retries the whole migration transaction. When the attempts run out, the migration fails as before and nothing is applied. The timeout applies only to the migration transaction and overrides the [database `lockTimeoutMs`](/reference/engine/configuration/database#timeouts) there. Unset, a migration waits for its locks as long as PostgreSQL lets it.
+
 After the server is running, use Contember CLI to set up other API tokens and invite users. Deploy the
 `blog` project to this instance with `CONTEMBER_API_URL` and `CONTEMBER_API_TOKEN` set:
 

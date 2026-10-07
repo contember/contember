@@ -257,6 +257,12 @@ removing the creator's custom role does not revoke the key. Disable the key or c
 `global` controls global templates, `projects` contains exact canonical project slugs, and `types` contains exact mail types. Mixed template lists
 are filtered row by row. Globs, patterns, and arbitrary resource expressions are not supported.
 
+:::caution[Token-bearing mail types]
+A role that may edit the template of a mail type carrying a token or code (`RESET_PASSWORD_REQUEST`, `PASSWORDLESS_SIGN_IN`, …) controls
+that credential for every recipient of the template, including `super_admin` persons. The forbidden-target guard does not apply here. See
+[Mail templates](/reference/engine/tenant/mail-templates).
+:::
+
 ## Grantable surface
 
 The configuration-free grants are `person:view`, `person:list`, `identity:viewPermissions`, `system:viewConfig`, `system:viewAuthLog`, `apiKey:list`,

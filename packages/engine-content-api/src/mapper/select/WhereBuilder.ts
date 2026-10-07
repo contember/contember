@@ -17,9 +17,12 @@ import { WhereOptimizationHints, WhereOptimizer } from './optimizer/WhereOptimiz
 import { splitReadGuard } from '../../acl/PredicatesInjector.js'
 
 // Row expressions share one target row; set expressions combine correlated relation queries.
+// `absent` is "no readable related row, and `where` holds on the null-extended row", the LEFT JOIN meaning of a
+// relation `isNull` with sibling conditions. `where` never reaches the related rows, so an unreadable row stays
+// indistinguishable from an absent one.
 type RelationRowExpression = { kind: 'row'; where: Input.OptionalWhere }
 type RelationSetExpression =
-	| { kind: 'exists' | 'notExists'; where: Input.OptionalWhere }
+	| { kind: 'exists' | 'notExists' | 'absent'; where: Input.OptionalWhere }
 	| { kind: 'and' | 'or'; operands: readonly RelationSetExpression[] }
 	| { kind: 'not'; operand: RelationSetExpression }
 type RelationExpression = RelationRowExpression | RelationSetExpression
@@ -453,7 +456,7 @@ export class WhereBuilder {
 		}
 		// Bare absence on an owning to-one without a guard is just `fk IS NULL` — leave it to the row path.
 		if (
-			expression.kind === 'notExists'
+			expression.kind === 'absent'
 			&& Object.keys(expression.where).length === 0
 			&& Object.keys(guard).length === 0
 			&& isIt<Model.JoiningColumnRelation>(context.relation, 'joiningColumn')
@@ -503,7 +506,7 @@ export class WhereBuilder {
 			return this.negateRelationExpression(this.parsePrimaryCondition(primary, condition.not))
 		}
 		if (condition.isNull === true || condition.null === true) {
-			return { kind: 'notExists', where: {} }
+			return { kind: 'absent', where: {} }
 		}
 		if (condition.isNull === false || condition.null === false) {
 			return { kind: 'exists', where: {} }
@@ -557,9 +560,11 @@ export class WhereBuilder {
 			case 'row':
 				return { kind: 'row', where: { not: expression.where } }
 			case 'exists':
-				return { kind: 'notExists', where: expression.where }
+				return Object.keys(expression.where).length === 0 ? { kind: 'absent', where: {} } : { kind: 'notExists', where: expression.where }
 			case 'notExists':
 				return { kind: 'exists', where: expression.where }
+			case 'absent':
+				return Object.keys(expression.where).length === 0 ? { kind: 'exists', where: {} } : { kind: 'not', operand: expression }
 			case 'not':
 				return expression.operand
 			case 'and':
@@ -574,14 +579,20 @@ export class WhereBuilder {
 		}
 		switch (expression.kind) {
 			case 'exists':
-			case 'notExists':
+			case 'absent':
 				return { kind: expression.kind, where: this.combineWhereAnd([expression.where, context]) }
 			case 'and':
 			case 'or':
 				return { kind: expression.kind, operands: expression.operands.map(it => this.applyRelationRowContext(it, context)) }
+			case 'notExists':
 			case 'not':
-				return { kind: 'not', operand: this.applyRelationRowContext(expression.operand, context) }
+				// Pushing the context under a negation would negate it too; it has to hold on the row itself.
+				return { kind: 'and', operands: [expression, this.rowContextAsSet(context)] }
 		}
+	}
+
+	private rowContextAsSet(context: Input.OptionalWhere): RelationSetExpression {
+		return { kind: 'or', operands: [{ kind: 'exists', where: context }, { kind: 'absent', where: context }] }
 	}
 
 	private combineWhereAnd(wheres: readonly Input.OptionalWhere[]): Input.OptionalWhere {
@@ -612,6 +623,17 @@ export class WhereBuilder {
 						this.buildRelationSubquery(context, expression.where, guard, parentTableName, parentEntity, targetPath),
 					)
 				)
+			case 'absent': {
+				const absent = conditionBuilder.not(clause =>
+					clause.exists(
+						this.buildRelationSubquery(context, {}, guard, parentTableName, parentEntity, targetPath),
+					)
+				)
+				if (Object.keys(expression.where).length === 0) {
+					return absent
+				}
+				return absent.with(this.buildNullRowCondition(context.targetEntity, expression.where, targetPath))
+			}
 			case 'and':
 				return conditionBuilder.and(clause => expression.operands.reduce((builder, operand) => apply(builder, operand), clause))
 			case 'or':
@@ -619,6 +641,22 @@ export class WhereBuilder {
 			case 'not':
 				return conditionBuilder.not(clause => apply(clause, expression.operand))
 		}
+	}
+
+	/**
+	 * `where` evaluated on the null-extended target row, as a LEFT JOIN of an absent relation would. A scalar
+	 * subquery keeps SQL three-valued logic (`name = 'x'` on the null row is NULL, not false, also under NOT),
+	 * and the join `on false` guarantees that no related row's values are read.
+	 */
+	private buildNullRowCondition(targetEntity: Model.Entity, where: Input.OptionalWhere, targetPath: Path): Literal {
+		const qb = SelectBuilder.create()
+			.from(new Literal('(select 1)'), targetPath.for('null_').alias)
+			.leftJoin(targetEntity.tableName, targetPath.alias, clause => clause.raw('false'))
+		const { qb: nullRowQb, condition } = this.buildConditionLiteral(qb, targetEntity, targetPath, where)
+		const query = nullRowQb
+			.select(expr => expr.raw(condition.sql, ...condition.parameters))
+			.createQuery(new Compiler.Context(Compiler.SCHEMA_PLACEHOLDER, new Set()))
+		return new Literal(`(${query.sql})`, query.parameters)
 	}
 
 	private isInputCondition(value: unknown): value is Input.Condition {

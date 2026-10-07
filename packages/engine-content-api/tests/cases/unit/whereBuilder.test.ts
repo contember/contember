@@ -101,9 +101,9 @@ describe('where builder', () => {
 		)
 	})
 
-	it('absence on to-one relation with a readable remainder lowers to NOT EXISTS', () => {
-		// `{ author: { id: { isNull: true }, name: { eq } } }`: the primary-isNull conjunct is the absence test,
-		// the sibling `name` becomes the readable remainder -> NOT EXISTS(present row matching remainder). Null-safe.
+	it('absence on to-one relation evaluates a sibling condition on the null-extended row', () => {
+		// `{ author: { id: { isNull: true }, name: { eq } } }`: the primary-isNull conjunct is the absence test;
+		// the sibling `name` holds on the null-extended row, not inside the NOT EXISTS.
 		const schema = createSchema(WhereBuilderModel)
 		const where = createWhere(schema, {
 			author: {
@@ -115,11 +115,13 @@ describe('where builder', () => {
 			where,
 			`where not(exists (select 1
 				from "__SCHEMA__"."author" as "root_author"
-				where "root_"."author_id" = "root_author"."id" and "root_author"."name" = ?))`,
+				where "root_"."author_id" = "root_author"."id"))
+				and (select "root_author"."name" = ?
+				from (select 1) as "root_author_null_" left join "__SCHEMA__"."author" as "root_author" on false)`,
 		)
 	})
 
-	it('absence on has-many relation with a readable remainder lowers to NOT EXISTS', () => {
+	it('absence on has-many relation evaluates a sibling condition on the null-extended row', () => {
 		const schema = createSchema(WhereBuilderModel)
 		const where = createWhere(schema, {
 			articles: {
@@ -131,7 +133,9 @@ describe('where builder', () => {
 			where,
 			`where not(exists (select 1
 				from "__SCHEMA__"."article" as "root_articles"
-				where "root_"."id" = "root_articles"."author_id" and "root_articles"."title" = ?))`,
+				where "root_"."id" = "root_articles"."author_id"))
+				and (select "root_articles"."title" = ?
+				from (select 1) as "root_articles_null_" left join "__SCHEMA__"."article" as "root_articles" on false)`,
 		)
 	})
 
@@ -150,7 +154,7 @@ describe('where builder', () => {
 		)
 	})
 
-	it('absence on many-has-many with a readable remainder lowers to NOT EXISTS', () => {
+	it('absence on many-has-many evaluates a sibling condition on the null-extended row', () => {
 		const schema = createSchema(WhereBuilderModel)
 		const where = createWhere(schema, {
 			tags: {
@@ -162,8 +166,9 @@ describe('where builder', () => {
 			where,
 			`where not(exists (select 1
 				from "__SCHEMA__"."article_tags" as "root_tags_junction_"
-				inner join "__SCHEMA__"."tag" as "root_tags" on "root_tags_junction_"."tag_id" = "root_tags"."id"
-				where "root_"."id" = "root_tags_junction_"."article_id" and "root_tags"."name" = ?))`,
+				where "root_"."id" = "root_tags_junction_"."article_id"))
+				and (select "root_tags"."name" = ?
+				from (select 1) as "root_tags_null_" left join "__SCHEMA__"."tag" as "root_tags" on false)`,
 		)
 	})
 
@@ -175,7 +180,7 @@ describe('where builder', () => {
 		assert.equal(createWhere(schema, { articles: { id: { null: true } } }), expected)
 	})
 
-	it('condition-level De Morgan absence lowers to NOT EXISTS', () => {
+	it('condition-level De Morgan absence lowers to NOT EXISTS with the sibling on the null-extended row', () => {
 		const schema = createSchema(WhereBuilderModel)
 		const where = createWhere(schema, {
 			author: {
@@ -187,7 +192,9 @@ describe('where builder', () => {
 			where,
 			`where not(exists (select 1
 				from "__SCHEMA__"."author" as "root_author"
-				where "root_"."author_id" = "root_author"."id" and "root_author"."name" = ?))`,
+				where "root_"."author_id" = "root_author"."id"))
+				and (select "root_author"."name" = ?
+				from (select 1) as "root_author_null_" left join "__SCHEMA__"."author" as "root_author" on false)`,
 		)
 	})
 
@@ -255,7 +262,9 @@ describe('where builder', () => {
 		)
 	})
 
-	it('negates a conjunctive relation absence expression', () => {
+	it('negates a conjunctive relation absence expression without turning the sibling into a presence test', () => {
+		// main's LEFT JOIN: `not(author.id is null and author.name = ?)` keeps every article with an author and
+		// drops the authorless ones (NULL); `exists(author.name = ?)` would keep only the authors named John.
 		const schema = createSchema(WhereBuilderModel)
 		const where = createWhere(schema, {
 			author: {
@@ -269,9 +278,44 @@ describe('where builder', () => {
 		}, 'Article')
 		compareWhere(
 			where,
-			`where exists (select 1
+			`where not(not(exists (select 1
 				from "__SCHEMA__"."author" as "root_author"
-				where "root_"."author_id" = "root_author"."id" and "root_author"."name" = ?)`,
+				where "root_"."author_id" = "root_author"."id"))
+				and (select "root_author"."name" = ?
+				from (select 1) as "root_author_null_" left join "__SCHEMA__"."author" as "root_author" on false))`,
+		)
+	})
+
+	it('keeps a sibling next to a negated relation set expression out of the negation', () => {
+		// `not(X and isPublic)` would also match a present author that fails `isPublic`.
+		const schema = createSchema(WhereBuilderModel)
+		const where = createWhere(schema, {
+			author: {
+				not: {
+					or: [
+						{ id: { isNull: true } },
+						{ name: { eq: 'John' } },
+					],
+				},
+				isPublic: { eq: true },
+			},
+		}, 'Article')
+		compareWhere(
+			where,
+			`where not((not(exists (select 1
+				from "__SCHEMA__"."author" as "root_author"
+				where "root_"."author_id" = "root_author"."id"))
+				or exists (select 1
+				from "__SCHEMA__"."author" as "root_author"
+				where "root_"."author_id" = "root_author"."id" and "root_author"."name" = ?)))
+				and (exists (select 1
+				from "__SCHEMA__"."author" as "root_author"
+				where "root_"."author_id" = "root_author"."id" and "root_author"."is_public" = ?)
+				or not(exists (select 1
+				from "__SCHEMA__"."author" as "root_author"
+				where "root_"."author_id" = "root_author"."id"))
+				and (select "root_author"."is_public" = ?
+				from (select 1) as "root_author_null_" left join "__SCHEMA__"."author" as "root_author" on false))`,
 		)
 	})
 

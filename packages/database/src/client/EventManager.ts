@@ -1,6 +1,11 @@
 import { Connection } from './Connection.js'
+import { RequestMemoryBudget } from './RequestMemoryBudget.js'
 
 class EventManager {
+	/** Every query bound to a budget is refused once it is exhausted; only queries that also charge it account their rows. */
+	public readonly memoryBudget: RequestMemoryBudget | undefined
+	public readonly chargesMemoryBudget: boolean
+
 	private readonly listeners = {
 		[EventManager.Event.queryStart]: [] as EventManager.QueryStartCallback[],
 		[EventManager.Event.queryEnd]: [] as EventManager.QueryEndCallback[],
@@ -9,7 +14,12 @@ class EventManager {
 
 	constructor(
 		public readonly parent: EventManager | null = null,
-	) {}
+		memoryBudget: RequestMemoryBudget | null | undefined = parent?.memoryBudget,
+		chargesMemoryBudget: boolean = parent?.chargesMemoryBudget ?? false,
+	) {
+		this.memoryBudget = memoryBudget ?? undefined
+		this.chargesMemoryBudget = this.memoryBudget !== undefined && chargesMemoryBudget
+	}
 
 	on<Event extends keyof EventManager.ListenerTypes>(event: Event, cb: EventManager.ListenerTypes[Event]): void {
 		;(this.listeners[event] as EventManager.ListenerTypes[Event][]).push(cb)

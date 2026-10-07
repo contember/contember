@@ -111,6 +111,8 @@ export const nav: NavItem[] = [
 				items: [
 					doc('reference/engine/configuration/database'),
 					doc('reference/engine/configuration/management-panel'),
+					doc('reference/engine/configuration/request-memory-budget'),
+					doc('reference/engine/configuration/telemetry'),
 				],
 			},
 			{

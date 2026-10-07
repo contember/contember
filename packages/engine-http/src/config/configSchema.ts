@@ -1,5 +1,6 @@
 import * as Typesafe from '@contember/typesafe'
 import { MailerOptions } from '@contember/engine-tenant-api'
+import { validateRequestMemoryBudgetOptions } from '@contember/database'
 import { upperCaseFirst } from '../utils/strings.js'
 import ipaddr from 'ipaddr.js'
 
@@ -105,9 +106,60 @@ export const tenantConfigSchema = Typesafe.intersection(
 	}),
 )
 
+const positiveInteger: Typesafe.Type<number> = (input, path = []) => {
+	const value = Typesafe.integer(input, path)
+	return value > 0 ? value : Typesafe.fail(path, 'must be a positive integer')
+}
+
+export const telemetryConfigSchema = Typesafe.partial({
+	resource: Typesafe.partial({
+		serviceName: Typesafe.string,
+		attributes: Typesafe.record(Typesafe.string, Typesafe.string),
+	}),
+	traces: Typesafe.partial({
+		enabled: Typesafe.boolean,
+		exporter: Typesafe.partial({
+			type: Typesafe.enumeration('otlp-http', 'console'),
+			endpoint: Typesafe.string,
+			headers: Typesafe.record(Typesafe.string, Typesafe.string),
+			timeoutMs: Typesafe.number,
+		}),
+		sampler: Typesafe.enumeration('always', 'never', 'ratio', 'parentRatio'),
+		samplerRatio: Typesafe.number,
+		// Whether a client-supplied traceparent may become the parent of the request span.
+		acceptIncoming: Typesafe.enumeration('none', 'trusted-proxies', 'all'),
+		// Whether outgoing Actions webhooks carry a traceparent header. Enabled when absent.
+		propagateToWebhooks: Typesafe.boolean,
+		traceIdResponseHeader: Typesafe.boolean,
+		maxSpansPerRequest: Typesafe.number,
+		sql: Typesafe.partial({
+			enabled: Typesafe.boolean,
+			includeQueryText: Typesafe.boolean,
+			minDurationMs: Typesafe.number,
+		}),
+		batch: Typesafe.partial({
+			maxQueueSize: positiveInteger,
+			maxBatchSize: positiveInteger,
+			delayMs: positiveInteger,
+		}),
+	}),
+})
+
 export const serverConfigSchema = Typesafe.partial({
 	port: Typesafe.number,
 	http: Typesafe.partial({
+		// Both thresholds come from separate environment variables, so an empty object means "disabled".
+		requestMemoryBudget: (input: unknown, path: PropertyKey[] = []): { warnBytes: number; maxBytes: number } | undefined => {
+			const { warnBytes, maxBytes } = Typesafe.partial({ warnBytes: Typesafe.integer, maxBytes: Typesafe.integer })(input, path)
+			if (warnBytes === undefined && maxBytes === undefined) {
+				return undefined
+			}
+			if (warnBytes === undefined || maxBytes === undefined) {
+				return Typesafe.fail(path, 'warnBytes and maxBytes must be set together')
+			}
+			const optionsError = validateRequestMemoryBudgetOptions({ warnBytes, maxBytes })
+			return optionsError ? Typesafe.fail(path, optionsError) : { warnBytes, maxBytes }
+		},
 		requestBodySize: Typesafe.string,
 		// Allows clients to opt in (via the X-Contember-Force-Ok request header) to receiving HTTP 200
 		// for GraphQL API responses, keeping error info in the JSON body. Defaults to enabled; set to
@@ -197,6 +249,7 @@ export const serverConfigSchema = Typesafe.partial({
 			}),
 		}),
 	),
+	telemetry: telemetryConfigSchema,
 	projectGroup: (val: unknown, path: PropertyKey[] = []) =>
 		Typesafe.valueAt(val, ['domainMapping']) === undefined
 			? undefined

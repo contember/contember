@@ -94,6 +94,10 @@ export const configTemplate: any = {
 			trustedProxies: '%?env.CONTEMBER_HTTP_TRUSTED_PROXIES::string%',
 			responseStatusHeader: '%?env.CONTEMBER_HTTP_RESPONSE_STATUS_HEADER::string%',
 			geoCountryHeader: '%?env.CONTEMBER_HTTP_GEO_COUNTRY_HEADER::string%',
+			requestMemoryBudget: {
+				warnBytes: '%?env.CONTEMBER_HTTP_REQUEST_MEMORY_BUDGET_WARN_BYTES::number%',
+				maxBytes: '%?env.CONTEMBER_HTTP_REQUEST_MEMORY_BUDGET_MAX_BYTES::number%',
+			},
 		},
 		panel: {
 			enabled: '%?env.CONTEMBER_PANEL_ENABLED::bool%',
@@ -115,6 +119,27 @@ export const configTemplate: any = {
 		logging: {
 			sentry: {
 				dsn: '%?env.SENTRY_DSN%',
+			},
+		},
+		telemetry: {
+			traces: {
+				enabled: '%?env.CONTEMBER_TELEMETRY_TRACES_ENABLED::bool%',
+				exporter: {
+					type: '%?env.CONTEMBER_TELEMETRY_EXPORTER_TYPE%',
+					endpoint: '%?env.CONTEMBER_TELEMETRY_OTLP_ENDPOINT%',
+					timeoutMs: '%?env.CONTEMBER_TELEMETRY_OTLP_TIMEOUT_MS::number%',
+				},
+				sampler: '%?env.CONTEMBER_TELEMETRY_SAMPLER%',
+				samplerRatio: '%?env.CONTEMBER_TELEMETRY_SAMPLER_RATIO::number%',
+				acceptIncoming: '%?env.CONTEMBER_TELEMETRY_ACCEPT_INCOMING%',
+				propagateToWebhooks: '%?env.CONTEMBER_TELEMETRY_PROPAGATE_TO_WEBHOOKS::bool%',
+				traceIdResponseHeader: '%?env.CONTEMBER_TELEMETRY_TRACE_ID_RESPONSE_HEADER::bool%',
+				maxSpansPerRequest: '%?env.CONTEMBER_TELEMETRY_MAX_SPANS_PER_REQUEST::number%',
+				sql: {
+					enabled: '%?env.CONTEMBER_TELEMETRY_SQL_ENABLED::bool%',
+					includeQueryText: '%?env.CONTEMBER_TELEMETRY_SQL_INCLUDE_QUERY_TEXT::bool%',
+					minDurationMs: '%?env.CONTEMBER_TELEMETRY_SQL_MIN_DURATION_MS::number%',
+				},
 			},
 		},
 		test: {

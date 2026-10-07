@@ -2,6 +2,7 @@ import { Path } from './Path.js'
 import { Value } from '@contember/schema'
 import { getFulfilledValues, getRejections } from '../../utils/index.js'
 import { logger } from '@contember/logger'
+import { RequestMemoryBudget, RequestMemoryBudgetExceededError } from '@contember/database'
 
 type DataPromises = {
 	path: Path
@@ -27,6 +28,9 @@ type Column = {
 export class SelectHydrator {
 	private columns: Column[] = []
 	private promises: DataPromises[] = []
+	private formattedDates = 0
+
+	constructor(private readonly memoryBudget?: RequestMemoryBudget) {}
 
 	public addColumn(path: Path, getValue: ColumnValueGetter) {
 		this.columns.push({ path, getValue })
@@ -42,15 +46,15 @@ export class SelectHydrator {
 	}
 
 	public async hydrateGroups(rows: SelectRow[], groupBy: string): Promise<SelectGroupedObjects> {
-		const resolved = await this.resolveDataPromises()
+		const hydrated = await this.hydrateRows(rows)
 		const result: SelectGroupedObjects = {}
-		for (let row of rows) {
+		rows.forEach((row, index) => {
 			const key = row[groupBy] as Value.PrimaryValue
 			if (!result[key]) {
 				result[key] = []
 			}
-			result[key].push(this.hydrateRow(row, resolved))
-		}
+			result[key].push(hydrated[index])
+		})
 		return result
 	}
 
@@ -61,19 +65,25 @@ export class SelectHydrator {
 		rows: SelectRow[],
 		indexBy?: string,
 	): Promise<SelectResultObject[] | SelectIndexedResultObjects> {
-		const resolved = await this.resolveDataPromises()
+		const hydrated = await this.hydrateRows(rows)
 		if (indexBy) {
 			const result: SelectIndexedResultObjects = {}
-			for (let row of rows) {
-				result[row[indexBy] as Value.PrimaryValue] = this.hydrateRow(row, resolved)
-			}
+			rows.forEach((row, index) => {
+				result[row[indexBy] as Value.PrimaryValue] = hydrated[index]
+			})
 			return result
 		}
-		const result: SelectResultObject[] = []
-		for (const row of rows) {
-			result.push(this.hydrateRow(row, resolved))
-		}
-		return result
+		return hydrated
+	}
+
+	private async hydrateRows(rows: SelectRow[]): Promise<SelectResultObject[]> {
+		const resolved = await this.resolveDataPromises()
+		this.chargeRows(rows.length, resolved.length)
+		this.formattedDates = 0
+		const hydrated = rows.map(row => this.hydrateRow(row, resolved))
+		// A formatted Date is a new string; their count is known only after the rows are built.
+		this.memoryBudget?.addHydrationBytes(this.formattedDates * 72)
+		return hydrated
 	}
 
 	private hydrateRow(row: SelectRow, resolvedData: ResolvedData[]): SelectResultObject {
@@ -109,9 +119,10 @@ export class SelectHydrator {
 		})))
 		const failures = getRejections(results)
 		if (failures.length > 0) {
-			if (failures.length > 1) {
-				failures.slice(1).map(e => logger.error(e, { loc: 'SelectHydrator' }))
-			}
+			// Budget exhaustion aborts every in-flight sibling query; those rejections are expected.
+			failures.slice(1)
+				.filter(e => !(e instanceof RequestMemoryBudgetExceededError))
+				.forEach(e => logger.error(e, { loc: 'SelectHydrator' }))
 			throw failures[0]
 		}
 
@@ -120,9 +131,25 @@ export class SelectHydrator {
 
 	private formatValue(value: any) {
 		if (value instanceof Date) {
+			this.formattedDates++
 			return value.toISOString()
 		}
 		return value
+	}
+
+	// The row shape is fixed by the columns, so all rows are charged at once, before any of them is allocated.
+	private chargeRows(rowCount: number, relationCount: number): void {
+		if (!this.memoryBudget || rowCount === 0) {
+			return
+		}
+		const nestedObjects = new Set<string>()
+		for (const { path } of this.columns) {
+			for (let depth = 1; depth < path.path.length; depth++) {
+				nestedObjects.add(path.path.slice(0, depth).join('.'))
+			}
+		}
+		const rowBytes = 40 + this.columns.length * 16 + nestedObjects.size * 48 + relationCount * 16
+		this.memoryBudget.addHydrationBytes(rowCount * rowBytes)
 	}
 }
 

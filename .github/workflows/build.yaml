@@ -66,7 +66,15 @@ jobs:
     # fast-path) and diffs their schemas. Fails if snapshot.ts drifted —
     # regenerate with ./scripts/create-migrations-snapshot/run.sh <tenant|system>.
     needs: [ ]
-    runs-on: ubuntu-latest
+    # The ubuntu-26.04 leg is a non-blocking canary. The name expression gives
+    # the 24.04 leg the plain check name, so required checks match it.
+    runs-on: ${{ matrix.os }}
+    name: ${{ matrix.os == 'ubuntu-26.04' && 'snapshot (ubuntu-26.04 canary)' || 'snapshot' }}
+    continue-on-error: ${{ matrix.os == 'ubuntu-26.04' }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-24.04, ubuntu-26.04]
     services:
       postgres:
         image: postgres:16
@@ -142,6 +150,11 @@ jobs:
           bun install --frozen-lockfile
       - name: build
         run: bun run pre-build
+      - name: "Run database integration tests"
+        # These skip without MEMORY_TEST_DATABASE_URL, so the `check` test job (no PostgreSQL) never runs them.
+        run: bun test --conditions=typescript packages/database/tests/cases/integration packages/engine-http/tests/cases/integration
+        env:
+          MEMORY_TEST_DATABASE_URL: postgres://postgres:postgres@127.0.0.1:5432/postgres
       - name: "Build server"
         run: ./scripts/server-build/run.sh
 
@@ -165,6 +178,14 @@ jobs:
           TENANT_MAILER_HOST: 'localhost'
           TENANT_MAILER_PORT: '1025'
           TENANT_MAILER_FROM: 'contember@localhost'
+      - name: "Run tenant database integration tests"
+        run: bun test --conditions=typescript packages/engine-tenant-api/tests/cases/integration/database --no-file-parallelism
+        env:
+          TEST_DB_HOST: 127.0.0.1
+          TEST_DB_PORT: 5432
+          TEST_DB_USER: postgres
+          TEST_DB_PASSWORD: postgres
+          TEST_DB_NAME: test_tenant
       - name: "Run E2E tests"
         # No parallelism flag needed: bun runs test files sequentially unless --parallel is given.
         run: bun run test:e2e

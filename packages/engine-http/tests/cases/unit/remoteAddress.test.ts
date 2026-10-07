@@ -1,6 +1,6 @@
 import { expect, test } from 'bun:test'
 import { IncomingMessage } from 'node:http'
-import { getClientIP } from '../../../src/utils/remoteAddress.js'
+import { getClientIP, isInCIDR } from '../../../src/utils/remoteAddress.js'
 
 const req = (remoteAddress: string | undefined, xff?: string | string[]): IncomingMessage => ({
 	socket: { remoteAddress },
@@ -78,6 +78,18 @@ test('missing socket remote address: returns empty string', () => {
 
 test('trustedProxies: public proxy in CIDR is trusted and X-Forwarded-For is honored', () => {
 	expect(getClientIP(req('203.0.113.1', PUBLIC_2), ['203.0.113.0/24'])).toBe(PUBLIC_2)
+})
+
+test('trustedProxies: IPv4-mapped IPv6 proxy matches an IPv4 CIDR', () => {
+	expect(getClientIP(req('::ffff:203.0.113.1', PUBLIC_2), ['203.0.113.0/24'])).toBe(PUBLIC_2)
+})
+
+test('trustedProxies: IPv4-mapped IPv6 proxy still matches an explicit IPv6 CIDR', () => {
+	expect(isInCIDR('::ffff:203.0.113.1', ['::ffff:203.0.113.0/120'])).toBe(true)
+})
+
+test('trustedProxies: native IPv4 peer does not match an IPv4-mapped IPv6 CIDR', () => {
+	expect(isInCIDR('203.0.113.1', ['::ffff:203.0.113.0/120'])).toBe(false)
 })
 
 test('trustedProxies: entries in the CIDR are skipped while scanning the chain', () => {

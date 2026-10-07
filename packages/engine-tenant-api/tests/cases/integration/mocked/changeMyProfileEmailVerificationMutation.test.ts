@@ -36,18 +36,18 @@ test('changeMyProfile - email change is deferred when verification is required',
 			...sqlTransaction(
 				{
 					sql: SQL`INSERT INTO "tenant"."person_token" ("id", "token_hash", "person_id", "expires_at", "created_at", "used_at", "type", "meta")
-					         VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+					         VALUES (?, ?, ?, now() + make_interval(secs => ?), ?, ?, ?, ?) RETURNING "expires_at"`,
 					parameters: [
 						anyString,
 						anyString,
 						personId,
-						isDate,
+						(val: any) => typeof val === 'number',
 						isDate,
 						null,
 						'email_change',
 						(val: any) => !!val && val.email === newEmail,
 					],
-					response: { rowCount: 1 },
+					response: { rows: [{ expires_at: now }] },
 				},
 				getMailTemplateSql({ type: 'emailChangeVerify', projectId }),
 				getMailTemplateSql({ type: 'emailChangeVerify', projectId: null }),
@@ -108,18 +108,18 @@ test('changeMyProfile - email change is deferred for a verification-required acc
 			...sqlTransaction(
 				{
 					sql: SQL`INSERT INTO "tenant"."person_token" ("id", "token_hash", "person_id", "expires_at", "created_at", "used_at", "type", "meta")
-					         VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+					         VALUES (?, ?, ?, now() + make_interval(secs => ?), ?, ?, ?, ?) RETURNING "expires_at"`,
 					parameters: [
 						anyString,
 						anyString,
 						personId,
-						isDate,
+						(val: any) => typeof val === 'number',
 						isDate,
 						null,
 						'email_change',
 						(val: any) => !!val && val.email === newEmail,
 					],
-					response: { rowCount: 1 },
+					response: { rows: [{ expires_at: now }] },
 				},
 				getMailTemplateSql({ type: 'emailChangeVerify', projectId }),
 				getMailTemplateSql({ type: 'emailChangeVerify', projectId: null }),
@@ -152,7 +152,6 @@ test('changeMyProfile - email change is rate-limited per recipient', async () =>
 	const personId = testUuid(1)
 	const identityId = authenticatedIdentityId
 	const newEmail = 'jane@doe.com'
-	const future = new Date(now.getTime() + 60 * 1000)
 	await executeTenantTest({
 		query: changeMyProfileMutation({ email: newEmail }),
 		executes: [
@@ -166,7 +165,7 @@ test('changeMyProfile - email change is rate-limited per recipient', async () =>
 				email: newEmail,
 				initType: 'email_change_init',
 				completionType: 'email_change_complete',
-				response: { rows: [{ next_allowed_attempt: future }] },
+				response: { rows: [{ retry_after_seconds: 60 }] },
 			}),
 		],
 		return: {
@@ -211,18 +210,18 @@ test('changeMyProfile - name change is applied atomically within the email-chang
 				updatePersonProfileNameSql({ personId, name: newName }),
 				{
 					sql: SQL`INSERT INTO "tenant"."person_token" ("id", "token_hash", "person_id", "expires_at", "created_at", "used_at", "type", "meta")
-					         VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+					         VALUES (?, ?, ?, now() + make_interval(secs => ?), ?, ?, ?, ?) RETURNING "expires_at"`,
 					parameters: [
 						anyString,
 						anyString,
 						personId,
-						isDate,
+						(val: any) => typeof val === 'number',
 						isDate,
 						null,
 						'email_change',
 						(val: any) => !!val && val.email === newEmail,
 					],
-					response: { rowCount: 1 },
+					response: { rows: [{ expires_at: now }] },
 				},
 				getMailTemplateSql({ type: 'emailChangeVerify', projectId }),
 				getMailTemplateSql({ type: 'emailChangeVerify', projectId: null }),

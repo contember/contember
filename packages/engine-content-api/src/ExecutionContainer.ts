@@ -27,7 +27,7 @@ import {
 } from './mapper/index.js'
 import { Builder } from '@contember/dic'
 import { Acl, Model, Schema } from '@contember/schema'
-import { Client, DatabaseMetadata, SelectBuilder as DbSelectBuilder } from '@contember/database'
+import { Client, DatabaseMetadata, RequestMemoryBudget, SelectBuilder as DbSelectBuilder } from '@contember/database'
 import { ParsedMembership, Providers } from '@contember/schema-utils'
 import { PaginatedHasManyExecutionHandler } from './extensions/paginatedHasMany/PaginatedHasManyExecutionHandler.js'
 import { PaginatedHasManyFieldProvider } from './extensions/paginatedHasMany/PaginatedHasManyFieldProvider.js'
@@ -75,6 +75,7 @@ export type ExecutionContainerArgs = {
 	schemaMeta: { id?: number }
 	schemaDatabaseMetadata: DatabaseMetadata
 	db: Client
+	memoryBudget?: RequestMemoryBudget
 	identityId: string
 	identityVariables: Acl.VariablesMap
 	permissions: Acl.Permissions
@@ -117,6 +118,7 @@ export class ExecutionContainerFactory {
 			identityVariables,
 			identityId,
 			db,
+			memoryBudget,
 			schema,
 			schemaMeta,
 			systemSchema,
@@ -128,7 +130,8 @@ export class ExecutionContainerFactory {
 	) {
 		return new Builder({})
 			.addService('systemSchema', () => systemSchema)
-			.addService('db', () => db)
+			// Every query of the request is refused once the budget is exhausted; only selections charge it (Mapper.selectionDb).
+			.addService('db', () => memoryBudget ? db.withMemoryBudget(memoryBudget, { chargeRows: false }) : db)
 			.addService('project', () => project)
 			.addService('stage', () => stage)
 			.addService('triggeredActionsCollector', (): TriggeredActionsCollector | undefined =>
@@ -246,6 +249,7 @@ export class ExecutionContainerFactory {
 					providers,
 					schema,
 					schemaDatabaseMetadata,
+					db,
 				}) => {
 					return new MapperFactory(
 						db,
@@ -262,6 +266,7 @@ export class ExecutionContainerFactory {
 						inserter,
 						pathFactory,
 						providers,
+						memoryBudget,
 					)
 				},
 			)

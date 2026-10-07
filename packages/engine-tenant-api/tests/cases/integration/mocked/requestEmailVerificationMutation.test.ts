@@ -1,4 +1,4 @@
-import { executeTenantTest } from '../../../src/testTenant.js'
+import { executeTenantTest, now } from '../../../src/testTenant.js'
 import { SQL } from '../../../src/tags.js'
 import { testUuid } from '../../../src/testUuid.js'
 import { expect, test } from 'bun:test'
@@ -16,8 +16,8 @@ const isDate = (val: unknown) => val instanceof Date
 // Mirrors RateLimitCountQuery — whitespace/case are normalised by the matcher.
 const rateLimitCountSql = (args: { scope: string; keyHash: Buffer; count: number }): ExpectedQuery => ({
 	sql: `select count(*)::text as count from "tenant"."rate_limit_event"
-		where "scope" = ? and "key_hash" = ? and "occurred_at" >= ?`,
-	parameters: [args.scope, args.keyHash, (val: unknown) => val instanceof Date],
+		where "scope" = ? and "key_hash" = ? and occurred_at >= NOW() - make_interval(secs => ?)`,
+	parameters: [args.scope, args.keyHash, (val: unknown) => typeof val === 'number'],
 	response: { rows: [{ count: String(args.count) }] },
 })
 
@@ -62,9 +62,18 @@ test('requestEmailVerification - sends a verification mail for an unverified per
 			getNextMailAttemptSql({ email, initType: 'email_verify_init', completionType: 'email_verify_complete' }),
 			{
 				sql: SQL`INSERT INTO "tenant"."person_token" ("id", "token_hash", "person_id", "expires_at", "created_at", "used_at", "type", "meta")
-				         VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
-				parameters: [anyString, anyString, personId, isDate, isDate, null, 'email_verification', (val: any) => !!val && val.email === email],
-				response: { rowCount: 1 },
+				         VALUES (?, ?, ?, now() + make_interval(secs => ?), ?, ?, ?, ?) RETURNING "expires_at"`,
+				parameters: [
+					anyString,
+					anyString,
+					personId,
+					(val: any) => typeof val === 'number',
+					isDate,
+					null,
+					'email_verification',
+					(val: any) => !!val && val.email === email,
+				],
+				response: { rows: [{ expires_at: now }] },
 			},
 			getIdentityProjectsSql({ identityId, projectId }),
 			getMailTemplateSql({ type: 'emailVerification', projectId }),

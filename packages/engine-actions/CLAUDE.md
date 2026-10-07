@@ -73,6 +73,8 @@ drifts across restarts and ignores manual retry/stop — query `actions_event` f
 
 The `ProjectDispatcher` idle wait is capped at `MAX_IDLE_SLEEP_MS` (30s) even when the queue is empty,
 so a lost `pg_notify` self-heals and the heartbeat keeps refreshing while idle.
+On shutdown, `end()` waits at most `END_TIMEOUT_MS` (10s) for an in-flight batch; events it abandons
+stay in processing and are delivered again after the ACK timeout.
 
 ### Log
 
@@ -96,6 +98,15 @@ interpolated variables, which is where tokens live. The request body, the respon
 parser message (which quotes the payload) stay out too; they are already kept per event in
 `actions_event.log`. The unit tests assert the log attributes with an exact match precisely so a
 later edit cannot quietly add one of these back.
+
+### Traces
+
+When telemetry is enabled (`telemetry.traces` in server config), each processed batch runs as an
+`actions.dispatch` consumer span (project, target name, batch id, event count, result counts) with a
+`webhook` client span around the HTTP call — idle queue polls emit no spans. The outgoing webhook
+request carries a W3C `traceparent` header pointing at the webhook span (`propagateToWebhooks`
+config, default on; a target-configured header of any letter case wins). The same credential rule
+applies to spans: target `name` and status code only, never the resolved URL or headers.
 
 ## Plugin Integration
 

@@ -47,8 +47,16 @@ class Connection implements Connection.ConnectionLike, Connection.ClientFactory,
 		callback: (connection: Connection.AcquiredConnectionLike) => Promise<Result> | Result,
 		options: { eventManager?: EventManager } = {},
 	): Promise<Result> {
-		const acquired = await this.pool.acquire()
 		const eventManager = new EventManager(options.eventManager ?? this.eventManager)
+		eventManager.memoryBudget?.check()
+		const acquired = await this.pool.acquire()
+		// A budget exhausted while waiting for the pool must not cost a healthy connection.
+		try {
+			eventManager.memoryBudget?.check()
+		} catch (e) {
+			this.pool.release(acquired)
+			throw e
+		}
 		try {
 			const connection = new AcquiredConnection(acquired.client, eventManager)
 			const result = await callback(connection)

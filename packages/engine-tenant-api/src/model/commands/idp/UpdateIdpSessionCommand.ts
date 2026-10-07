@@ -1,5 +1,5 @@
 import { Command } from '../Command.js'
-import { QueryBuilder, UpdateBuilder } from '@contember/database'
+import { Literal, QueryBuilder, UpdateBuilder } from '@contember/database'
 import type { IDPSessionState } from '../../service/idp/index.js'
 
 /**
@@ -16,7 +16,8 @@ export class UpdateIdpSessionCommand implements Command<void> {
 
 	async execute({ db, providers }: Command.Args): Promise<void> {
 		const values: QueryBuilder.Values = {
-			last_validated_at: providers.now(),
+			// DB clock, matching ClaimIdpRevalidationCommand's throttle comparison. See CLAUDE.md.
+			last_validated_at: new Literal('now()'),
 		}
 
 		if (this.session) {

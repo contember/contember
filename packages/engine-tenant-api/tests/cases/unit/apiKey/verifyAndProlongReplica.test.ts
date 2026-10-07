@@ -53,19 +53,22 @@ const apiKeyRow = {
 	issued_at: null,
 	idle_timeout: null,
 	max_expires_at: null,
+	is_expired: false,
+	is_max_expired: false,
+	is_idle_expired: false,
 }
 
 const selectByToken = (rows: (typeof apiKeyRow)[]): ExpectedQuery => ({
 	sql:
-		`select "api_key"."id", "api_key"."type", "api_key"."identity_id", "api_key"."disabled_at", "api_key"."expires_at", "identity"."roles", "api_key"."expiration", "person"."id" as "person_id", "api_key"."last_ip", "api_key"."last_user_agent", "api_key"."last_used_at", "api_key"."trust_forwarded_info", "api_key"."issued_at", "api_key"."idle_timeout", "api_key"."max_expires_at" from "tenant"."api_key" inner join "tenant"."identity" as "identity" on "api_key"."identity_id" = "identity"."id" left join "tenant"."person" as "person" on "person"."identity_id" = "identity"."id" where "token_hash" = ?`,
-	parameters: [computeTokenHash(TOKEN)],
+		`select "api_key"."id", "api_key"."type", "api_key"."identity_id", "api_key"."disabled_at", "api_key"."expires_at", "identity"."roles", "api_key"."expiration", "person"."id" as "person_id", "api_key"."last_ip", "api_key"."last_user_agent", "api_key"."last_used_at", "api_key"."trust_forwarded_info", "api_key"."issued_at", "api_key"."idle_timeout", "api_key"."max_expires_at", "api_key"."expires_at" is not null and "api_key"."expires_at" <= now() as "is_expired", "api_key"."max_expires_at" is not null and "api_key"."max_expires_at" <= now() as "is_max_expired", "api_key"."idle_timeout" is not null and "api_key"."last_used_at" is not null and "api_key"."last_used_at" < now() - "api_key"."idle_timeout" - make_interval(secs => ?) as "is_idle_expired" from "tenant"."api_key" inner join "tenant"."identity" as "identity" on "api_key"."identity_id" = "identity"."id" left join "tenant"."person" as "person" on "person"."identity_id" = "identity"."id" where "token_hash" = ?`,
+	parameters: [60, computeTokenHash(TOKEN)],
 	response: { rows },
 })
 
 // The prolong UPDATE runs detached on the primary once a key is accepted.
 const prolongUpdate: ExpectedQuery = {
-	sql: `update "tenant"."api_key" set "expires_at" = ? where "id" = ?`,
-	parameters: [(val: unknown) => val instanceof Date, 'api-key-id'],
+	sql: `update "tenant"."api_key" set "expires_at" = LEAST(now() + make_interval(secs => ?), "max_expires_at") where "id" = ?`,
+	parameters: [(val: unknown) => typeof val === 'number', 'api-key-id'],
 	response: { rowCount: 1 },
 }
 

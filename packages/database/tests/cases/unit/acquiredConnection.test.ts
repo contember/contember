@@ -1,6 +1,6 @@
 import { expect, it } from 'bun:test'
 import EventEmitter from 'node:events'
-import { Connection, EventManager, QueryError } from '../../../src/index.js'
+import { Connection, EventManager, QueryError, RequestMemoryBudget, RequestMemoryBudgetExceededError } from '../../../src/index.js'
 import { AcquiredConnection } from '../../../src/client/AcquiredConnection.js'
 import { PgClient } from '../../../src/client/PgClient.js'
 import { MutexDeadlockError } from '../../../src/utils/index.js'
@@ -133,4 +133,22 @@ it('fires queryError when the mutex deadlocks', async () => {
 	expect(recorded.log).toStrictEqual(['start SELECT 1', 'error SELECT 1'])
 	expect(recorded.errors[0]).toBe(recorded.starts[0])
 	expect(recorded.ends).toStrictEqual([])
+})
+
+it('refuses a query of an exhausted budget before firing any event', async () => {
+	const budget = new RequestMemoryBudget({ warnBytes: 512, maxBytes: 1024 })
+	const eventManager = new EventManager(null, budget, false)
+	const recorded = recordEvents(eventManager)
+	const connection = new AcquiredConnection(
+		createPgClientMock(async () => {
+			recorded.log.push('execute')
+			return { rows: [], rowCount: 0 }
+		}),
+		eventManager,
+	)
+	expect(() => budget.addHydrationBytes(2048)).toThrow(RequestMemoryBudgetExceededError)
+
+	await expect(connection.query('SELECT 1')).rejects.toBeInstanceOf(RequestMemoryBudgetExceededError)
+
+	expect(recorded.log).toStrictEqual([])
 })

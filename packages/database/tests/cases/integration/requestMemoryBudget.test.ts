@@ -260,3 +260,37 @@ databaseTest('a failed rollback is reported when the budget left the connection 
 		await connection.end()
 	}
 })
+
+databaseTest('a charged query fires paired query events, also when it exceeds the budget', async () => {
+	const connection = createConnection()
+	try {
+		const log: string[] = []
+		const starts: Connection.Query[] = []
+		const pairs: Connection.Query[] = []
+		connection.eventManager.on(EventManager.Event.queryStart, query => {
+			log.push(`start ${query.sql}`)
+			starts.push(query)
+		})
+		connection.eventManager.on(EventManager.Event.queryEnd, query => {
+			log.push(`end ${query.sql}`)
+			pairs.push(query)
+		})
+		connection.eventManager.on(EventManager.Event.queryError, (query, error) => {
+			log.push(`error ${query.sql} ${error.constructor.name}`)
+			pairs.push(query)
+		})
+		const budget = new RequestMemoryBudget({ warnBytes: 128 * 1024, maxBytes: 256 * 1024 })
+		const db = connection.createClient('public', {}).withMemoryBudget(budget)
+		const small = 'SELECT 1 AS value'
+		const large = "SELECT repeat('x', 1024) AS body FROM generate_series(1, 100000)"
+
+		await db.query(small)
+		await expect(db.query(large)).rejects.toBeInstanceOf(RequestMemoryBudgetExceededError)
+
+		expect(log).toEqual([`start ${small}`, `end ${small}`, `start ${large}`, `error ${large} RequestMemoryBudgetExceededError`])
+		expect(pairs[0]).toBe(starts[0])
+		expect(pairs[1]).toBe(starts[1])
+	} finally {
+		await connection.end()
+	}
+})

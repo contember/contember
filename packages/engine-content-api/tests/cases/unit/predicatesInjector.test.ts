@@ -2078,3 +2078,103 @@ describe('predicates injector - SECURITY: to-many back-reference keeps sibling r
 		})
 	})
 })
+
+// Author -> posts -> category -> posts -> author: the inner `author` hop is the inverse of the outer
+// `Author.posts`, but it starts from a sibling post of the category, so it reaches arbitrary authors.
+namespace NonAdjacentBackReferenceModel {
+	export const readerRole = acl.createRole('reader')
+
+	@acl.allow(readerRole, {
+		when: { isPublic: { eq: true } },
+		read: true,
+	})
+	export class Author {
+		name = def.stringColumn()
+		isPublic = def.boolColumn()
+		posts = def.oneHasMany(Post, 'author')
+	}
+
+	@acl.allow(readerRole, {
+		read: true,
+	})
+	export class Post {
+		title = def.stringColumn()
+		author = def.manyHasOne(Author, 'posts')
+		category = def.manyHasOne(Category, 'posts')
+	}
+
+	@acl.allow(readerRole, {
+		read: true,
+	})
+	export class Category {
+		name = def.stringColumn()
+		posts = def.oneHasMany(Post, 'category')
+	}
+}
+
+describe('predicates injector - SECURITY: back-reference simplification applies only to the immediate parent', () => {
+	const schema = createSchema(NonAdjacentBackReferenceModel)
+	const permissions = new PermissionFactory().create(schema, ['reader'])
+	const injector = new PredicatesInjector(
+		schema.model,
+		new PredicateFactory(permissions, schema.model, new VariableInjector(schema.model, {})),
+	)
+	const relationOf = (entity: string, field: string) =>
+		acceptFieldVisitor(schema.model, schema.model.entities[entity], field, {
+			visitColumn: () => {
+				throw new Error()
+			},
+			visitRelation: ctx => ctx,
+		})
+	const authorPosts = relationOf('Author', 'posts')
+	const postCategory = relationOf('Post', 'category')
+	const categoryPosts = relationOf('Category', 'posts')
+	const postAuthor = relationOf('Post', 'author')
+	const authorGuard = { isPublic: { eq: true } }
+
+	it('root filter keeps the guard of a back-reference to a non-adjacent ancestor', () => {
+		const injected = injector.inject(schema.model.entities.Author, {
+			posts: { category: { posts: { author: { name: { eq: 'x' } } } } },
+		})
+
+		assert.deepStrictEqual(injected, {
+			and: [
+				{
+					posts: {
+						category: {
+							posts: {
+								author: { name: { eq: 'x' }, [READ_GUARD_KEY]: authorGuard },
+							},
+						},
+					},
+				},
+				authorGuard,
+			],
+		})
+	})
+
+	it('relation fetch filter keeps the guard of a back-reference to a non-adjacent ancestor', () => {
+		const injected = injector.inject(
+			schema.model.entities.Post,
+			{ author: { name: { eq: 'x' } } },
+			categoryPosts,
+			[authorPosts, postCategory, categoryPosts],
+		)
+
+		assert.deepStrictEqual(injected, {
+			author: { name: { eq: 'x' }, [READ_GUARD_KEY]: authorGuard },
+		})
+	})
+
+	it('order-by read guard of a back-reference to a non-adjacent ancestor is kept', () => {
+		assert.deepStrictEqual(injector.createReadGuard(postAuthor, [authorPosts, postCategory, categoryPosts]), authorGuard)
+	})
+
+	it('CONTROL: a back-reference to the immediate parent still simplifies', () => {
+		assert.deepStrictEqual(injector.createReadGuard(postAuthor, [authorPosts]), {})
+		assert.deepStrictEqual(
+			injector.inject(schema.model.entities.Post, { author: { name: { eq: 'x' } } }, authorPosts, [authorPosts]),
+			{ author: { name: { eq: 'x' } } },
+		)
+	})
+})

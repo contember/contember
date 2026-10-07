@@ -60,32 +60,17 @@ export class PredicatesInjector {
 	}
 
 	/**
-	 * Finds an ancestor in the path that matches the given relation as a back-reference.
-	 * A match occurs when:
-	 * 1. The relation we're traversing has the same name as the inverse (targetRelation) of a relation in the ancestor path
-	 * 2. AND the entity where our relation is defined matches the targetEntity in the path
-	 *    (to prevent false positives when different entities have relations with the same name)
+	 * A hop is a back-reference when it is the inverse of the hop that reached its source entity. Only the
+	 * immediate parent counts: an earlier ancestor of the same entity is generally a different row.
 	 */
-	private findBackReferencedAncestor(
-		ancestorPath: readonly Model.AnyRelationContext[],
-		relationName: string,
-		relationSourceEntityName: string,
-	): Model.AnyRelationContext | undefined {
-		return ancestorPath.find(ctx =>
-			ctx.targetRelation?.name === relationName
-			&& ctx.targetEntity.name === relationSourceEntityName
-		)
-	}
-
 	private canSimplifyBackReference(
 		ancestorPath: readonly Model.AnyRelationContext[],
 		relationContext: Model.AnyRelationContext,
 	): boolean {
-		const isBackReference = this.findBackReferencedAncestor(
-			ancestorPath,
-			relationContext.relation.name,
-			relationContext.entity.name,
-		) !== undefined
+		const parent = ancestorPath[ancestorPath.length - 1]
+		const isBackReference = parent !== undefined
+			&& parent.targetRelation?.name === relationContext.relation.name
+			&& parent.targetEntity.name === relationContext.entity.name
 		return isBackReference && PredicatesInjector.toOneBackReferenceTypes.has(relationContext.type)
 	}
 

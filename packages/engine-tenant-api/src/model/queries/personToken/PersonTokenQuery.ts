@@ -30,6 +30,10 @@ export class PersonTokenQuery extends DatabaseQuery<PersonToken.Row | null> {
 		let qb = SelectBuilder.create<PersonToken.Row>()
 			.from('person_token')
 			.select(new Literal('*'))
+			// Evaluate expiry on the DATABASE clock so the gate (validateToken's
+			// `is_expired` check) cannot be weakened by app/DB clock skew. The
+			// `expires_at` column itself is written on the DB clock too. See CLAUDE.md.
+			.select(new Literal('"expires_at" <= now()'), 'is_expired')
 			.where({
 				[this.identifierType]: this.identifier,
 				type: this.type,

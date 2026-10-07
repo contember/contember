@@ -9,6 +9,7 @@ import { DatabaseContext, DatabaseContextFactory } from '@contember/engine-syste
 import { ExecutionContainerFactory } from '@contember/engine-content-api'
 import { emptySchema } from '@contember/schema-utils'
 import { createLogger, TestLoggerHandler } from '@contember/logger'
+import { noopTracer } from '@contember/telemetry'
 import { createMock } from '../../utils.js'
 import { ContentApiControllerFactory } from '../../../src/content/ContentApiControllerFactory.js'
 import { ContentGraphqlContext } from '../../../src/content/ContentGraphqlContext.js'
@@ -185,6 +186,7 @@ const createHarness = ({ forcePrimaryHeader = true, withReplica = true }: { forc
 				url: new URL('http://localhost/content/test/live'),
 				clientIp: '127.0.0.1',
 				timer: (_event, callback) => callback(),
+				tracer: noopTracer,
 				requestDebugMode: false,
 				authResult: { valid: true, identityId: 'identity', apiKeyId: 'key', roles: [], personId: null, trustForwardedInfo: false },
 				params: { projectSlug: 'test', stageSlug: 'live' },

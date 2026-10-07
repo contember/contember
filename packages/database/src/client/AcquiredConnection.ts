@@ -1,6 +1,6 @@
 import { Connection } from './Connection.js'
 import { EventManager } from './EventManager.js'
-import { Mutex } from '../utils/index.js'
+import { Mutex, MutexDeadlockError } from '../utils/index.js'
 import { executeTransaction, Transaction } from './Transaction.js'
 import { ClientErrorCodes } from './errorCodes.js'
 import {
@@ -53,65 +53,76 @@ export class AcquiredConnection implements Connection.AcquiredConnectionLike {
 		parameters: any[] = [],
 		meta: Record<string, any> = {},
 	): Promise<Connection.Result<Row>> {
-		return await this.mutex.execute(async () => {
-			// Both refusals precede any event, so they stay out of query error metrics. The budget goes first: a query
-			// queued behind the one that exhausted it reports the budget, not the connection the budget terminated.
-			const memoryBudget = this.eventManager.memoryBudget
-			memoryBudget?.check()
-			if (this.physicalConnection.terminated) {
-				throw new TerminatedConnectionError()
-			}
-			try {
-				this.eventManager.fire(EventManager.Event.queryStart, { sql, parameters, meta })
+		// A refusal before queryStart fires no event, so cleanup on a terminated connection stays out of query error metrics.
+		this.refuseExhaustedOrTerminated()
 
-				let result: Connection.Result<Row>
+		const query: Connection.Query = { sql, parameters, meta }
+
+		try {
+			this.eventManager.fire(EventManager.Event.queryStart, query)
+
+			const result = await this.mutex.execute(async (): Promise<Connection.Result<Row>> => {
+				// A query queued behind the one that exhausted the budget reports the budget, not the terminated connection.
+				this.refuseExhaustedOrTerminated()
+				const memoryBudget = this.eventManager.memoryBudget
 				const startHrTime = process.hrtime.bigint()
 
-				result = memoryBudget && this.eventManager.chargesMemoryBudget
+				const pgResult = memoryBudget && this.eventManager.chargesMemoryBudget
 					? await this.queryWithMemoryBudget<Row>(prepareSql(sql), parameters, memoryBudget)
 					: await this.pgClient.query(prepareSql(sql), parameters)
 
 				const endHrTime = process.hrtime.bigint()
 				const durationUs = Math.floor(Number(endHrTime - startHrTime) / 1000)
-				result = {
-					...result,
+
+				return {
+					...pgResult,
 					timing: {
 						selfDuration: durationUs,
 						totalDuration: durationUs,
 					},
 				}
+			})
 
-				this.eventManager.fire(EventManager.Event.queryEnd, { sql, parameters, meta }, result)
+			this.eventManager.fire(EventManager.Event.queryEnd, query, result)
 
-				return result
-			} catch (error) {
-				if (!(error instanceof Error)) {
-					throw error
-				}
-				this.eventManager.fire(EventManager.Event.queryError, { sql, parameters, meta }, error)
-				if (error instanceof RequestMemoryBudgetExceededError) {
-					throw error
-				}
-
-				switch ((error as any).code) {
-					case ClientErrorCodes.NOT_NULL_VIOLATION:
-						throw new NotNullViolationError(sql, parameters, error)
-					case ClientErrorCodes.FOREIGN_KEY_VIOLATION:
-						throw new ForeignKeyViolationError(sql, parameters, error)
-					case ClientErrorCodes.UNIQUE_VIOLATION:
-						throw new UniqueViolationError(sql, parameters, error)
-					case ClientErrorCodes.T_R_SERIALIZATION_FAILURE:
-						throw new SerializationFailureError(sql, parameters, error)
-					case ClientErrorCodes.INVALID_TEXT_REPRESENTATION:
-					case ClientErrorCodes.DATETIME_FIELD_OVERFLOW:
-						throw new InvalidDataError(sql, parameters, error)
-					case ClientErrorCodes.IN_FAILED_SQL_TRANSACTION:
-						throw new TransactionAbortedError(sql, parameters, error)
-					default:
-						throw new QueryError(sql, parameters, error)
-				}
+			return result
+		} catch (error) {
+			if (!(error instanceof Error)) {
+				throw error
 			}
-		})
+			this.eventManager.fire(EventManager.Event.queryError, query, error)
+
+			// neither a mutex deadlock nor a budget refusal is a postgres failure, keep them untranslated
+			if (error instanceof MutexDeadlockError || error instanceof RequestMemoryBudgetExceededError || error instanceof TerminatedConnectionError) {
+				throw error
+			}
+
+			switch ((error as any).code) {
+				case ClientErrorCodes.NOT_NULL_VIOLATION:
+					throw new NotNullViolationError(sql, parameters, error)
+				case ClientErrorCodes.FOREIGN_KEY_VIOLATION:
+					throw new ForeignKeyViolationError(sql, parameters, error)
+				case ClientErrorCodes.UNIQUE_VIOLATION:
+					throw new UniqueViolationError(sql, parameters, error)
+				case ClientErrorCodes.T_R_SERIALIZATION_FAILURE:
+					throw new SerializationFailureError(sql, parameters, error)
+				case ClientErrorCodes.INVALID_TEXT_REPRESENTATION:
+				case ClientErrorCodes.DATETIME_FIELD_OVERFLOW:
+					throw new InvalidDataError(sql, parameters, error)
+				case ClientErrorCodes.IN_FAILED_SQL_TRANSACTION:
+					throw new TransactionAbortedError(sql, parameters, error)
+				default:
+					throw new QueryError(sql, parameters, error)
+			}
+		}
+	}
+
+	private refuseExhaustedOrTerminated(): void {
+		// The budget goes first: a connection the budget terminated reports the budget to every query still bound to it.
+		this.eventManager.memoryBudget?.check()
+		if (this.physicalConnection.terminated) {
+			throw new TerminatedConnectionError()
+		}
 	}
 
 	private async queryWithMemoryBudget<Row extends QueryResultRow>(

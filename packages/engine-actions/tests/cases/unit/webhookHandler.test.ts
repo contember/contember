@@ -1,6 +1,7 @@
 import { describe, expect, test } from 'bun:test'
 import { WebhookTargetHandler } from '../../../src/dispatch/WebhookTargetHandler.js'
-import { FetcherResponse } from '../../../src/dispatch/WebhookFetcher.js'
+import { FetcherResponse, WebhookFetcher } from '../../../src/dispatch/WebhookFetcher.js'
+import { noopTracer } from '@contember/telemetry'
 import { createLogger, Logger, TestLoggerHandler } from '@contember/logger'
 import { Actions } from '@contember/schema'
 import { HandledEvent } from '../../../src/dispatch/types.js'
@@ -12,6 +13,8 @@ const assert = {
 	deepStrictEqual: (a: any, b: any) => expect(a).toStrictEqual(b),
 }
 const now = testEventTime
+
+const createHandler = (fetcher: WebhookFetcher) => new WebhookTargetHandler(fetcher, noopTracer, { propagateToWebhooks: true })
 
 const dropDuration = (events: HandledEvent[]): HandledEvent[] => {
 	return events.map(it => ({ ...it, result: { ...it.result, durationMs: -1 } }))
@@ -28,7 +31,7 @@ const okResponse = Promise.resolve({
 describe('webhook request', () => {
 	test('default request', async () => {
 		let fetchCalled = false
-		const webhookHandler = new WebhookTargetHandler({
+		const webhookHandler = createHandler({
 			fetch(url: string, init: RequestInit): Promise<FetcherResponse> {
 				fetchCalled = true
 				assert.equal(url, 'http://localhost')
@@ -79,7 +82,7 @@ describe('webhook request', () => {
 
 	test('custom body', async () => {
 		let fetchCalled = false
-		const webhookHandler = new WebhookTargetHandler({
+		const webhookHandler = createHandler({
 			fetch(url: string, init: RequestInit): Promise<FetcherResponse> {
 				fetchCalled = true
 				assert.equal(url, 'http://localhost')
@@ -143,7 +146,7 @@ describe('webhook response', () => {
 		const logger = createLogger(testLoggerHandler)
 
 		let fetchCalled = false
-		const webhookHandler = new WebhookTargetHandler({
+		const webhookHandler = createHandler({
 			fetch(url: string, init: RequestInit): Promise<FetcherResponse> {
 				fetchCalled = true
 				assert.equal(url, 'http://localhost')
@@ -195,7 +198,7 @@ describe('webhook response', () => {
 		const logger = createLogger(testLoggerHandler)
 
 		let fetchCalled = false
-		const webhookHandler = new WebhookTargetHandler({
+		const webhookHandler = createHandler({
 			fetch(url: string, init: RequestInit): Promise<FetcherResponse> {
 				fetchCalled = true
 				assert.equal(url, 'http://localhost')
@@ -267,7 +270,7 @@ describe('webhook response', () => {
 		const logger = createLogger(testLoggerHandler)
 
 		let fetchCalled = false
-		const webhookHandler = new WebhookTargetHandler({
+		const webhookHandler = createHandler({
 			fetch(url: string, init: RequestInit): Promise<FetcherResponse> {
 				fetchCalled = true
 				assert.equal(url, 'http://localhost')
@@ -337,7 +340,7 @@ describe('webhook response', () => {
 		const testLoggerHandler = new TestLoggerHandler()
 		const logger = createLogger(testLoggerHandler)
 
-		const webhookHandler = new WebhookTargetHandler({
+		const webhookHandler = createHandler({
 			fetch(): Promise<FetcherResponse> {
 				return Promise.resolve({
 					ok: true,
@@ -382,7 +385,7 @@ describe('webhook response', () => {
 		const logger = createLogger(testLoggerHandler)
 
 		let fetchCalled = false
-		const webhookHandler = new WebhookTargetHandler({
+		const webhookHandler = createHandler({
 			fetch(url: string, init: RequestInit): Promise<FetcherResponse> {
 				fetchCalled = true
 				assert.equal(url, 'http://localhost')
@@ -440,7 +443,7 @@ describe('webhook response', () => {
 		const logger = createLogger(testLoggerHandler)
 
 		let fetchCalled = false
-		const webhookHandler = new WebhookTargetHandler({
+		const webhookHandler = createHandler({
 			fetch(url: string, init: RequestInit): Promise<FetcherResponse> {
 				fetchCalled = true
 				assert.equal(url, 'http://localhost')

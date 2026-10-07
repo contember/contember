@@ -4,6 +4,7 @@ import { VariablesMap } from '../model/VariablesManager.js'
 import * as Typesafe from '@contember/typesafe'
 import { FetcherResponse, WebhookFetcher } from './WebhookFetcher.js'
 import { Logger } from '@contember/logger'
+import { formatTraceparent, INVALID_TRACE_ID, Tracer } from '@contember/telemetry'
 
 const DEFAULT_TIMEOUT_MS = 30_000 // 30 seconds
 
@@ -22,9 +23,44 @@ const ResponseType = Typesafe.noExtraProps(Typesafe.object({
 
 type EventResponseFactory = (eventRow: EventRow) => { ok: boolean; code?: number; response?: string; errorMessage?: string; durationMs?: number }
 
+class WebhookRequestError extends Error {
+	public readonly code?: string | number
+
+	constructor(error: unknown) {
+		super('Webhook request failed')
+		try {
+			if (error instanceof Error) {
+				this.name = error.name
+			}
+		} catch {
+		}
+		const seen = new Set<object>()
+		let current = error
+		while (typeof current === 'object' && current !== null && !seen.has(current)) {
+			seen.add(current)
+			try {
+				const code = 'code' in current ? current.code : undefined
+				if (typeof code === 'string' || typeof code === 'number') {
+					this.code = code
+					break
+				}
+				current = 'cause' in current ? current.cause : undefined
+			} catch {
+				break
+			}
+		}
+	}
+}
+
+export type WebhookTargetHandlerOptions = {
+	propagateToWebhooks: boolean
+}
+
 export class WebhookTargetHandler implements InvokeHandler<Actions.WebhookTarget> {
 	constructor(
 		private readonly fetcher: WebhookFetcher,
+		private readonly tracer: Tracer,
+		private readonly options: WebhookTargetHandlerOptions,
 	) {
 	}
 
@@ -36,7 +72,30 @@ export class WebhookTargetHandler implements InvokeHandler<Actions.WebhookTarget
 
 		let eventResponseFactory: EventResponseFactory
 		try {
-			const response = await this.fetch(timeoutMs ?? DEFAULT_TIMEOUT_MS, target, variables, events)
+			// The target is identified by name only: its URL and headers may carry credentials.
+			const span = this.tracer.startSpan('webhook', {
+				kind: 'client',
+				attributes: {
+					'contember.actions.target': target.name,
+					'contember.actions.events': events.length,
+				},
+			})
+			const response = await this.tracer.withSpan(span, async () => {
+				try {
+					const response = await this.fetch(timeoutMs ?? DEFAULT_TIMEOUT_MS, target, variables, events)
+					span.setAttribute('http.response.status_code', response.status)
+					if (!response.ok) {
+						span.setStatus('error')
+					}
+					return response
+				} catch (error) {
+					span.recordException(new WebhookRequestError(error))
+					span.setStatus('error', 'Webhook request failed')
+					throw error
+				} finally {
+					span.end()
+				}
+			})
 
 			eventResponseFactory = this.createResponseFactory({
 				response: response,
@@ -190,12 +249,32 @@ export class WebhookTargetHandler implements InvokeHandler<Actions.WebhookTarget
 			method: 'POST',
 			headers: {
 				['User-Agent']: 'Contember Actions',
+				...this.createTraceHeaders(resolvedHeaders),
 				...resolvedHeaders,
 				['Content-type']: 'application/json',
 			},
 			signal: abortController.signal,
 			body: this.formatBody(events, target),
 		})
+	}
+
+	private createTraceHeaders(resolvedHeaders: Record<string, string>): Record<string, string> {
+		if (this.options.propagateToWebhooks === false) {
+			return {}
+		}
+		const activeContext = this.tracer.activeSpanContext()
+		if (activeContext === undefined || activeContext.traceId === INVALID_TRACE_ID) {
+			return {}
+		}
+		// A target-configured header wins, in whatever case it was written.
+		if (Object.keys(resolvedHeaders).some(it => it.toLowerCase() === 'traceparent')) {
+			return {}
+		}
+		const traceState = activeContext.traceState
+		return {
+			traceparent: formatTraceparent(activeContext),
+			...(traceState !== undefined ? { tracestate: traceState } : {}),
+		}
 	}
 
 	private formatBody(events: EventRow[], target: Actions.WebhookTarget): string {

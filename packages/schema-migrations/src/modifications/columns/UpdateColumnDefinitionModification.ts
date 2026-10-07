@@ -45,6 +45,17 @@ export class UpdateColumnDefinitionModificationHandler implements ModificationHa
 		const migrateWithUsing = hasSeed && this.data.valueMigrationStrategy === 'using'
 		const migrateWithUpdate = hasSeed && this.data.valueMigrationStrategy !== 'using'
 
+		if (hasNewSequence && !hasNewType && !hasNewCollation && !hasSeed) {
+			addSequenceInPlace({
+				builder,
+				entity,
+				column: oldColumn,
+				sequence: hasNewSequence,
+				notNull: hasNullableChanged ? !newColumn.nullable : undefined,
+			})
+			return
+		}
+
 		builder.alterColumn(entity.tableName, oldColumn.columnName, {
 			collation: hasNewCollation ? wrapIdentifier(newColumn.collation || 'default') : undefined,
 			type: hasNewCollation || hasNewSequence || hasNewType || migrateWithUsing ? columnType : undefined,
@@ -118,6 +129,46 @@ export class UpdateColumnDefinitionModificationHandler implements ModificationHa
 			failureWarning,
 		}
 	}
+}
+
+// Avoids `SET DATA TYPE … USING`, which rewrites the table and its indexes under an ACCESS EXCLUSIVE lock.
+// Empty rows are numbered from the start in primary key order; the sequence then continues after the
+// highest value at or above its start, so it never hands out a number a row already holds.
+const addSequenceInPlace = ({ builder, entity, column, sequence, notNull }: {
+	builder: MigrationBuilder
+	entity: Model.Entity
+	column: Model.AnyColumn
+	sequence: NonNullable<Model.AnyColumn['sequence']>
+	notNull: boolean | undefined
+}) => {
+	const table = wrapIdentifier(entity.tableName)
+	const columnName = wrapIdentifier(column.columnName)
+	const primary = wrapIdentifier(entity.primaryColumn)
+	const start = sequence.start ?? 1
+
+	if (column.nullable) {
+		builder.sql(`UPDATE ${table}
+			SET ${columnName} = numbered.value
+			FROM (
+				SELECT ${primary}, ${start - 1} + ROW_NUMBER() OVER (ORDER BY ${primary}) AS value
+				FROM ${table}
+				WHERE ${columnName} IS NULL
+			) AS numbered
+			WHERE ${table}.${primary} = numbered.${primary}`)
+
+		// event log uses deferred constraint triggers, we need to fire them before ALTER
+		builder.sql(`SET CONSTRAINTS ALL IMMEDIATE`)
+		builder.sql(`SET CONSTRAINTS ALL DEFERRED`)
+	}
+
+	builder.alterColumn(entity.tableName, column.columnName, {
+		notNull,
+		sequenceGenerated: sequence,
+	})
+
+	builder.sql(`SELECT SETVAL(PG_GET_SERIAL_SEQUENCE(${escapeValue(entity.tableName)}, ${escapeValue(column.columnName)}), MAX(${columnName}))
+		FROM ${table}
+		WHERE ${columnName} >= ${start}`)
 }
 
 type SequenceDefinitionAlter =

@@ -60,6 +60,35 @@ databaseTest('budget aborts a sibling query still waiting for its first row', as
 	}
 })
 
+databaseTest('budget cancels a sibling statement on the server, not only its socket', async () => {
+	const connection = createConnection()
+	try {
+		const base = connection.createClient('public', {})
+		const budget = new RequestMemoryBudget({ warnBytes: 128 * 1024, maxBytes: 256 * 1024 })
+		const db = base.withMemoryBudget(budget)
+		const marker = `memory_budget_${randomUUID().replaceAll('-', '')}`
+		const results = await Promise.allSettled([
+			db.query(`SELECT pg_sleep(30) AS ${marker}`),
+			db.query('SELECT repeat(?, 1024) AS body FROM generate_series(1, 100000)', ['x']),
+		])
+		expect(results.map(it => it.status)).toEqual(['rejected', 'rejected'])
+
+		const deadline = Date.now() + 2000
+		let running = 1
+		while (running > 0 && Date.now() < deadline) {
+			await new Promise(resolve => setTimeout(resolve, 50))
+			const activity = await base.query<{ count: number }>(
+				'SELECT count(*)::int AS count FROM pg_stat_activity WHERE query LIKE ? AND pid <> pg_backend_pid()',
+				[`%${marker}%`],
+			)
+			running = activity.rows[0].count
+		}
+		expect(running).toBe(0)
+	} finally {
+		await connection.end()
+	}
+})
+
 databaseTest('row observation preserves pg query timeouts and row accumulation', async () => {
 	const connection = createConnection(100)
 	try {

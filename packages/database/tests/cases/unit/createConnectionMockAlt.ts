@@ -17,6 +17,11 @@ export const createConnectionMockAltWithPool = (
 	for (const queriesSet of queries) {
 		connectionMocks.push(
 			new class extends EventEmitter {
+				readonly host = 'unused'
+				readonly port = 5432
+				readonly processID = null
+				readonly secretKey = null
+
 				connect() {
 					return Promise.resolve()
 				}

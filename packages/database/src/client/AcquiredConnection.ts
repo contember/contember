@@ -14,6 +14,7 @@ import {
 	UniqueViolationError,
 } from './errors.js'
 import { PgClient } from './PgClient.js'
+import { cancelRunningStatement } from './cancelRunningStatement.js'
 import { Notification, Query, QueryResult, QueryResultRow } from 'pg'
 import { RequestMemoryBudget, RequestMemoryBudgetExceededError } from './RequestMemoryBudget.js'
 
@@ -130,6 +131,9 @@ export class AcquiredConnection implements Connection.AcquiredConnectionLike {
 				cleanup()
 				// A budget failure invalidates this connection; the enclosing pool scope disposes it.
 				this.physicalConnection.terminated = true
+				// Ending the socket alone leaves a statement still waiting for its first row running on the server.
+				// Cancelling is best effort and must not mask the budget error.
+				void cancelRunningStatement(this.pgClient).catch(() => {})
 				void this.pgClient.end().catch(reject)
 				reject(error)
 			}

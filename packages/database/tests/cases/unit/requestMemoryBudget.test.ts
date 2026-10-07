@@ -1,5 +1,9 @@
 import { expect, test } from 'bun:test'
-import { Client, Connection, RequestMemoryBudget, RequestMemoryBudgetExceededError } from '../../../src/index.js'
+import EventEmitter from 'node:events'
+import { createServer, Server } from 'node:net'
+import { Submittable } from 'pg'
+import { Client, Connection, Pool, RequestMemoryBudget, RequestMemoryBudgetExceededError } from '../../../src/index.js'
+import { PgClient } from '../../../src/client/PgClient.js'
 import { createConnectionMockAlt, createConnectionMockAltWithPool } from './createConnectionMockAlt.js'
 
 test('thresholds are exceeded only above their configured values', () => {
@@ -205,4 +209,79 @@ test('a budget exhausted while waiting for the pool releases the acquired connec
 	await base.query('SELECT 2')
 	expect(connection.getPoolStatus().stats.connection_disposed_manual_count).toBe(0)
 	end()
+})
+
+class StatementRunningPgClient extends EventEmitter implements PgClient {
+	readonly processID = 4242
+	readonly secretKey = -7
+	ended = false
+	private readonly submitted = Promise.withResolvers<void>()
+
+	constructor(readonly host: string, readonly port: number) {
+		super()
+	}
+
+	connect() {
+		return Promise.resolve()
+	}
+
+	query<T extends Submittable>(query: T): T {
+		this.submitted.resolve()
+		return query
+	}
+
+	end() {
+		this.ended = true
+		return Promise.resolve()
+	}
+
+	statementSubmitted() {
+		return this.submitted.promise
+	}
+}
+
+const interruptRunningStatement = async (pgClient: StatementRunningPgClient) => {
+	const connection = new Connection(new Pool(() => pgClient, { logError: () => null }))
+	const budget = new RequestMemoryBudget({ warnBytes: 512, maxBytes: 1024 })
+	const query = new Client(connection, 'public', {}).withMemoryBudget(budget).query('SELECT pg_sleep(60)')
+	await pgClient.statementSubmitted()
+	expect(() => budget.addHydrationBytes(2048)).toThrow(RequestMemoryBudgetExceededError)
+	await expect(query).rejects.toBeInstanceOf(RequestMemoryBudgetExceededError)
+	expect(pgClient.ended).toBe(true)
+}
+
+const listenOnFreePort = async (server: Server): Promise<number> => {
+	await new Promise<void>(resolve => server.listen(0, '127.0.0.1', resolve))
+	const address = server.address()
+	if (address === null || typeof address === 'string') {
+		throw new Error('Expected a TCP address')
+	}
+	return address.port
+}
+
+test('budget exhaustion sends a CancelRequest for the statement running on the server', async () => {
+	const received = Promise.withResolvers<Buffer>()
+	const server = createServer(socket => {
+		const chunks: Buffer[] = []
+		socket.on('data', chunk => chunks.push(chunk))
+		socket.on('end', () => {
+			received.resolve(Buffer.concat(chunks))
+			socket.end()
+		})
+	})
+	try {
+		await interruptRunningStatement(new StatementRunningPgClient('127.0.0.1', await listenOnFreePort(server)))
+		const message = await received.promise
+		expect([message.readInt32BE(0), message.readInt32BE(4), message.readInt32BE(8), message.readInt32BE(12)])
+			.toEqual([16, 80877102, 4242, -7])
+	} finally {
+		server.close()
+	}
+})
+
+test('a failed CancelRequest does not mask the budget error', async () => {
+	const server = createServer()
+	const closedPort = await listenOnFreePort(server)
+	await new Promise(resolve => server.close(resolve))
+	await interruptRunningStatement(new StatementRunningPgClient('127.0.0.1', closedPort))
 })

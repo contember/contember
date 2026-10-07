@@ -96,7 +96,7 @@ process.on('warning', message => {
 		})
 		finalTerminationJobs.push(async () => {
 			await spanProcessor.shutdown()
-			logger.info('Telemetry spans flushed')
+			logger.info('Telemetry shut down')
 		})
 	}
 

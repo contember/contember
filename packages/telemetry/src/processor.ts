@@ -9,7 +9,23 @@ export interface BatchSpanProcessorOptions {
 	maxQueueSize?: number
 	maxBatchSize?: number
 	delayMs?: number
+	/** How long shutdown may keep exporting before it drops the remaining spans, so termination stays within a grace period. */
+	shutdownTimeoutMs?: number
 	onError?: (error: unknown) => void
+}
+
+const settlesWithin = async (promise: Promise<void>, timeoutMs: number): Promise<boolean> => {
+	let timer: ReturnType<typeof setTimeout> | undefined
+	try {
+		return await Promise.race([
+			promise.then(() => true),
+			new Promise<boolean>(resolve => {
+				timer = setTimeout(() => resolve(false), timeoutMs)
+			}),
+		])
+	} finally {
+		clearTimeout(timer)
+	}
 }
 
 export const createBatchSpanProcessor = (
@@ -18,13 +34,16 @@ export const createBatchSpanProcessor = (
 		maxQueueSize: configuredMaxQueueSize = 2048,
 		maxBatchSize: configuredMaxBatchSize = 512,
 		delayMs: configuredDelayMs = 5000,
+		shutdownTimeoutMs: configuredShutdownTimeoutMs = 5000,
 		onError,
 	}: BatchSpanProcessorOptions,
 ): SpanProcessor => {
 	const maxQueueSize = normalizePositiveInteger(configuredMaxQueueSize, 2048)
 	const maxBatchSize = normalizePositiveInteger(configuredMaxBatchSize, 512)
 	const delayMs = normalizePositiveInteger(configuredDelayMs, 5000)
+	const shutdownTimeoutMs = normalizePositiveInteger(configuredShutdownTimeoutMs, 5000)
 	const queue: ReadableSpan[] = []
+	let exportingSpanCount = 0
 	let droppedSpanCount = 0
 	let exporting: Promise<void> | undefined
 	let shutdownPromise: Promise<void> | undefined
@@ -42,10 +61,13 @@ export const createBatchSpanProcessor = (
 	const drain = async (): Promise<void> => {
 		while (queue.length > 0) {
 			const batch = queue.splice(0, maxBatchSize)
+			exportingSpanCount = batch.length
 			try {
 				await exporter.export(batch)
 			} catch (error) {
 				reportError(() => error)
+			} finally {
+				exportingSpanCount = 0
 			}
 		}
 	}
@@ -85,11 +107,19 @@ export const createBatchSpanProcessor = (
 		shutdown: () => {
 			shutdownPromise ??= (async () => {
 				clearInterval(timer)
-				await flushAll()
-				try {
-					await exporter.shutdown()
-				} catch (error) {
-					reportError(() => error)
+				const closeExporter = async () => {
+					await flushAll()
+					try {
+						await exporter.shutdown()
+					} catch (error) {
+						reportError(() => error)
+					}
+				}
+				if (!(await settlesWithin(closeExporter(), shutdownTimeoutMs))) {
+					const droppedOnShutdown = queue.length + exportingSpanCount
+					queue.length = 0
+					// Reported directly: the rate limit must not hide the final data loss.
+					onError?.(new Error(`Telemetry shutdown timed out after ${shutdownTimeoutMs} ms, dropped ${droppedOnShutdown} spans.`))
 				}
 			})()
 			return shutdownPromise

@@ -160,3 +160,53 @@ test('flushes periodically on the delay timer', async () => {
 	expect(exporter.spans.map(it => it.name)).toEqual(['a'])
 	await processor.shutdown()
 })
+
+const errorMessages = (errors: readonly unknown[]): string[] => errors.map(it => it instanceof Error ? it.message : String(it))
+
+test('shutdown gives up on a hanging exporter after the timeout and reports the dropped spans', async () => {
+	const errors: unknown[] = []
+	const exported: string[] = []
+	const processor = createBatchSpanProcessor({
+		exporter: {
+			export: spans => {
+				exported.push(...spans.map(it => it.name))
+				return new Promise<void>(() => {})
+			},
+			shutdown: async () => {},
+		},
+		maxBatchSize: 2,
+		delayMs: 60_000,
+		shutdownTimeoutMs: 50,
+		onError: error => errors.push(error),
+	})
+	for (const name of ['a', 'b', 'c']) {
+		processor.onEnd(createSpan(name))
+	}
+	const startedAt = Date.now()
+	await processor.shutdown()
+	expect(Date.now() - startedAt).toBeLessThan(1000)
+	expect(exported).toEqual(['a', 'b'])
+	expect(errorMessages(errors)).toEqual(['Telemetry shutdown timed out after 50 ms, dropped 3 spans.'])
+})
+
+test('shutdown reports the dropped spans even right after a rate-limited export error', async () => {
+	const errors: unknown[] = []
+	let exportCount = 0
+	const processor = createBatchSpanProcessor({
+		exporter: {
+			export: () => {
+				exportCount++
+				return exportCount === 1 ? Promise.reject(new Error('offline')) : new Promise<void>(() => {})
+			},
+			shutdown: async () => {},
+		},
+		delayMs: 60_000,
+		shutdownTimeoutMs: 50,
+		onError: error => errors.push(error),
+	})
+	processor.onEnd(createSpan('a'))
+	await processor.forceFlush()
+	processor.onEnd(createSpan('b'))
+	await processor.shutdown()
+	expect(errorMessages(errors)).toEqual(['offline', 'Telemetry shutdown timed out after 50 ms, dropped 1 spans.'])
+})

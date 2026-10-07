@@ -339,6 +339,27 @@ test('query builder: constructs window function', async () => {
 	})
 })
 
+test('query builder: preserves null placement in window ordering', async () => {
+	await execute({
+		query: async wrapper => {
+			const qb = wrapper
+				.selectBuilder()
+				.select(expr =>
+					expr.window(window =>
+						window
+							.rowNumber()
+							.orderBy(['foo', 'first'], 'asc nulls first')
+							.orderBy(['foo', 'second'], 'desc nulls last')
+					)
+				)
+
+			await qb.getResult(wrapper)
+		},
+		sql: SQL`select row_number() over(order by "foo"."first" asc nulls first, "foo"."second" desc nulls last)`,
+		parameters: [],
+	})
+})
+
 test('query builder: applies limit by group', async () => {
 	await execute({
 		query: async wrapper => {
@@ -360,7 +381,7 @@ test('query builder: applies limit by group', async () => {
 			(select "foo"."bar",
 				 row_number() over(partition by "foo"."lorem" order by "foo"."ipsum" asc) as "rowNumber_"
 			 from "public"."foo" order by "foo"."ipsum" asc)
-			select "data".* from "data" where "data"."rowNumber_" > ? and "data"."rowNumber_" <= ?`,
+			select "data".* from "data" where "data"."rowNumber_" > ? and "data"."rowNumber_" <= ? order by "data"."rowNumber_" asc`,
 		parameters: [1, 4],
 	})
 })

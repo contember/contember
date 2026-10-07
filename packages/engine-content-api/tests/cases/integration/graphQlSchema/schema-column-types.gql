@@ -380,6 +380,7 @@ enum _MutationErrorType {
   NonUniqueWhereInput
   InvalidDataInput
   SqlError
+  ResourceExhausted
 }
 
 type ColumnsDeleteResult implements MutationResult {

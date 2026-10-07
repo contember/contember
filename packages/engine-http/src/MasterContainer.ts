@@ -237,6 +237,7 @@ export class MasterContainerFactory {
 						graphQlSchemaFactory,
 						testTransactionService,
 						serverConfig.contentApi?.forcePrimaryHeader ?? false,
+						serverConfig.http?.requestMemoryBudget,
 					),
 			)
 			.addService('tenantApiMiddlewareFactory', () => new TenantApiMiddlewareFactory())

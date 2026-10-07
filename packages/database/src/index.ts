@@ -25,3 +25,4 @@ export {
 	withDatabaseAdvisoryLock,
 	wrapIdentifier,
 } from './utils/index.js'
+export * from './client/RequestMemoryBudget.js'

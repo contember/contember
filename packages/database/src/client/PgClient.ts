@@ -1,7 +1,22 @@
-import { Notification, QueryConfig, QueryResult, QueryResultRow } from 'pg'
+import { Notification, QueryConfig, QueryResult, QueryResultRow, Submittable } from 'pg'
+
+declare module 'pg' {
+	interface Client {
+		// Set by pg from the server's BackendKeyData message once connected; missing from @types/pg.
+		readonly processID: number | null
+		readonly secretKey: number | null
+	}
+}
 
 export interface PgClient {
+	readonly host: string
+	readonly port: number
+	readonly processID: number | null
+	readonly secretKey: number | null
+
 	connect(): Promise<void>
+
+	query<T extends Submittable>(query: T): T
 
 	query<R extends QueryResultRow = any, I extends any[] = any[]>(
 		queryTextOrConfig: string | QueryConfig<I>,

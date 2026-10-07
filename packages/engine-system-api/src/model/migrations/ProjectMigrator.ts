@@ -361,7 +361,7 @@ export class ProjectMigrator {
 		} catch (e) {
 			if (e instanceof QueryError) {
 				logger.error(e, { message: 'Migration failed' })
-				throw new MigrationFailedError(migrationVersion, e.message)
+				throw new MigrationFailedError(migrationVersion, e.message, e)
 			}
 			throw e
 		}
@@ -386,6 +386,10 @@ export class AlreadyExecutedMigrationError extends MigrationError {
 
 export class MigrationFailedError extends MigrationError {
 	code = MigrateErrorCode.MigrationFailed
+
+	constructor(version: string, migrationError: string, public readonly previous?: QueryError) {
+		super(version, migrationError)
+	}
 }
 
 export class InvalidSchemaError extends MigrationError {

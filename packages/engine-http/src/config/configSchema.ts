@@ -111,6 +111,11 @@ const positiveInteger: Typesafe.Type<number> = (input, path = []) => {
 	return value > 0 ? value : Typesafe.fail(path, 'must be a positive integer')
 }
 
+const nonNegativeInteger: Typesafe.Type<number> = (input, path = []) => {
+	const value = Typesafe.integer(input, path)
+	return value >= 0 ? value : Typesafe.fail(path, 'must be a non-negative integer')
+}
+
 export const telemetryConfigSchema = Typesafe.partial({
 	resource: Typesafe.partial({
 		serviceName: Typesafe.string,
@@ -235,9 +240,10 @@ export const serverConfigSchema = Typesafe.partial({
 	}),
 	systemApi: Typesafe.partial({
 		// Opt-in: unset, a migration waits for its locks as long as PostgreSQL lets it and is never retried.
-		migrationLockTimeoutMs: Typesafe.integer,
-		migrationMaxAttempts: Typesafe.integer,
-		migrationRetryDelayMs: Typesafe.integer,
+		// Zero is rejected rather than passed on: PostgreSQL reads `lock_timeout = 0` as no limit.
+		migrationLockTimeoutMs: positiveInteger,
+		migrationMaxAttempts: positiveInteger,
+		migrationRetryDelayMs: nonNegativeInteger,
 	}),
 	contentApi: Typesafe.partial({
 		schemaCacheTtlSeconds: Typesafe.integer,

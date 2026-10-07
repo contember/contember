@@ -107,6 +107,10 @@ Requests above `maxSpansPerRequest` recorded spans keep the trace but stop recor
 - `all` — honor the header from anyone. Use only when the API is not publicly reachable, since any client can then dictate your trace ids and sampling decisions.
 - `none` — always start a fresh trace.
 
+:::warning[Strip `traceparent` at the edge gateway]
+Trusting the gateway means trusting every `traceparent` it forwards, and most gateways pass the client's headers through unchanged. A public client can then pick its own trace ids and set the sampled flag, which the default `parentRatio` sampler follows — forcing 100 % sampling of its requests regardless of `samplerRatio`. Configure the gateway to remove `traceparent` and `tracestate` from inbound requests, or to replace them with its own when it is itself traced.
+:::
+
 **Outgoing:** [Actions webhooks](/reference/engine/actions/invocation) include a `traceparent` header pointing at the webhook span, so the receiving service can continue the trace in its own telemetry. Disable with `propagateToWebhooks: false`; a header of the same name configured on the webhook target always wins.
 
 ## Overhead and delivery guarantees

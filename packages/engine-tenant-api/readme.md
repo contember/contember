@@ -43,7 +43,7 @@ Configured grant kinds:
 - `CREATE_SESSION_TOKEN` — the target selector plus
   `{ "session": { "maxExpirationMinutes": number, "allowTrustForwardedClientInfo": boolean } }`.
 - `ROLE_MUTATION` (`identity:addGlobalRoles`, `identity:removeGlobalRoles`) — requested-role constraint, target selector, and `allowSelf`.
-- `GLOBAL_API_KEY` (`apiKey:createGlobal`) — requested-role constraint and `allowTrustForwardedClientInfo`.
+- `GLOBAL_API_KEY` (`apiKey:createGlobal`) — requested-role constraint and `allowTrustForwardedClientInfo`, which must be `false` (as for `project_admin`).
 - `MAIL_TEMPLATE_SCOPE` (`mailTemplate:add`, `mailTemplate:remove`, `mailTemplate:list`) —
   `{ "global": boolean, "projects": ["exact-slug"], "types": ["FORCED_SIGN_OUT", "..."] }`.
 - `NONE` — exact tenant-global actions with no configuration: `person:view`, `person:list`, `identity:viewPermissions`, `system:viewConfig`,

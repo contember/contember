@@ -273,9 +273,15 @@ const globalApiKeyDefinition = (): CustomRolePermissionDefinition => ({
 	decode: (raw, path) => {
 		const config = GlobalApiKeyConfigSchema(raw, path)
 		const roles = canonicalizeRoleConstraint(config.roles, [...path, 'roles'])
-		const allowTrustForwardedClientInfo = config.allowTrustForwardedClientInfo
+		// project_admin may not mint a trusted-forwarding key either, and custom roles stay within its surface
+		if (config.allowTrustForwardedClientInfo) {
+			throw new Typesafe.ParseError(
+				[...path, 'allowTrustForwardedClientInfo'],
+				'must be false; custom roles cannot create keys trusted to forward client info',
+			)
+		}
 		return {
-			canonicalConfig: { roles, allowTrustForwardedClientInfo },
+			canonicalConfig: { roles, allowTrustForwardedClientInfo: false },
 			referencedRoles: getReferencedRoles(roles),
 			referencedProjects: [],
 			install: (permissions, role) =>
@@ -284,7 +290,7 @@ const globalApiKeyDefinition = (): CustomRolePermissionDefinition => ({
 					PermissionActions.API_KEY_CREATE_GLOBAL(),
 					meta =>
 						meta !== undefined
-						&& (!meta.trustForwardedClientInfo || allowTrustForwardedClientInfo)
+						&& meta.trustForwardedClientInfo !== true
 						&& matchesRoles(meta.requestedRoles, roles),
 				),
 		}

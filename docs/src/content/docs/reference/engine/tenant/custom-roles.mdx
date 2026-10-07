@@ -245,6 +245,9 @@ a privilege-capped token: later changes to the target's global roles or project 
 }
 ```
 
+`allowTrustForwardedClientInfo` must be `false`: like a `project_admin`, a custom role cannot create a key trusted to forward client info, because
+such a key decides what lands in the audit log and what per-IP rate limits key on. Only `super_admin` can create one.
+
 The role allowlist covers the complete explicit role set assigned to the new API-key identity. The result is a separate permanent credential:
 removing the creator's custom role does not revoke the key. Disable the key or change/delete its assigned custom role explicitly.
 

@@ -95,7 +95,8 @@ export interface TenantCustomRoleMutationConfig extends TenantCustomRoleRoleInpu
 }
 
 export interface TenantCustomRoleGlobalApiKeyConfig extends TenantCustomRoleRoleInputConfig {
-	readonly allowTrustForwardedClientInfo: boolean
+	/** Custom roles may not create keys trusted to forward client info. */
+	readonly allowTrustForwardedClientInfo: false
 }
 
 export interface TenantCustomRoleChangeProfileConfig extends TenantCustomRoleTargetConfig {

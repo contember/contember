@@ -134,6 +134,28 @@ describe('explicit grantable permission catalog', () => {
 		}
 	})
 
+	test('cannot create a global API key trusted to forward client info, like project admin', () => {
+		const trusted = PermissionActions.API_KEY_CREATE_GLOBAL({ requestedRoles: [], trustForwardedClientInfo: true })
+		const projectAdmin = new PermissionsFactory().create()
+		expect(projectAdmin.isAllowed(TenantRole.PROJECT_ADMIN, trusted.resource, trusted.privilege, trusted.meta)).toBe(false)
+
+		expect(() =>
+			parseCustomRoleGrants([{
+				permission: 'apiKey:createGlobal',
+				config: { roles: { allowed: [] }, allowTrustForwardedClientInfo: true },
+			}])
+		).toThrow(CustomRoleGrantValidationError)
+
+		// a row persisted with the flag on is inert rather than a way past the write-time check
+		const persisted = buildCustomRolePermissions([
+			customRoleRow('integration_manager', [{
+				permission: 'apiKey:createGlobal',
+				config: { roles: { allowed: [] }, allowTrustForwardedClientInfo: true },
+			}]),
+		])
+		expect(persisted.isAllowed('integration_manager', trusted.resource, trusted.privilege, trusted.meta)).toBe(false)
+	})
+
 	test('keeps protected roles and protected targets outside the project admin surface', () => {
 		// The companion test above only asserts the ALLOW direction, so it gets *greener* as a
 		// guard is weakened. This is the other half: every parameterized grant, in a shape

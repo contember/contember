@@ -450,17 +450,17 @@ export class WhereBuilder {
 		parentEntity: Model.Entity,
 		targetPath: Path,
 	): SqlConditionBuilder | null {
-		const expression = this.parseRelationWhere(where, context.targetEntity.primary)
-		if (expression.kind === 'row' || (expression.kind === 'exists' && Object.keys(expression.where).length === 0)) {
+		// Without a guard, an owning to-one condition on the primary alone is a condition on the FK column
+		// (`fk IS NULL`, `fk IN (…)`) — leave it to the row path, which keeps the FK index usable.
+		if (
+			Object.keys(guard).length === 0
+			&& isIt<Model.JoiningColumnRelation>(context.relation, 'joiningColumn')
+			&& this.transformWhereToPrimaryCondition(where, context.targetEntity.primary) !== null
+		) {
 			return null
 		}
-		// Bare absence on an owning to-one without a guard is just `fk IS NULL` — leave it to the row path.
-		if (
-			expression.kind === 'absent'
-			&& Object.keys(expression.where).length === 0
-			&& Object.keys(guard).length === 0
-			&& isIt<Model.JoiningColumnRelation>(context.relation, 'joiningColumn')
-		) {
+		const expression = this.parseRelationWhere(where, context.targetEntity.primary)
+		if (expression.kind === 'row' || (expression.kind === 'exists' && Object.keys(expression.where).length === 0)) {
 			return null
 		}
 		return this.applyRelationSetExpression(conditionBuilder, expression, context, guard, parentTableName, parentEntity, targetPath)

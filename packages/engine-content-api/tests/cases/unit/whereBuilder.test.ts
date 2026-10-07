@@ -198,7 +198,7 @@ describe('where builder', () => {
 		)
 	})
 
-	it('compound primary presence remains a valid relation filter', () => {
+	it('compound primary presence stays on the FK column', () => {
 		const schema = createSchema(WhereBuilderModel)
 		const where = createWhere(schema, {
 			author: {
@@ -212,9 +212,7 @@ describe('where builder', () => {
 		}, 'Article')
 		compareWhere(
 			where,
-			`where exists (select 1
-				from "__SCHEMA__"."author" as "root_author"
-				where "root_"."author_id" = "root_author"."id" and "root_author"."id" = ?)`,
+			`where not("root_"."author_id" is null) and "root_"."author_id" = ?`,
 		)
 	})
 
@@ -319,7 +317,7 @@ describe('where builder', () => {
 		)
 	})
 
-	it('composes condition-level relation absence inside OR', () => {
+	it('condition-level relation absence inside OR stays on the FK column', () => {
 		const schema = createSchema(WhereBuilderModel)
 		const where = createWhere(schema, {
 			author: {
@@ -333,12 +331,7 @@ describe('where builder', () => {
 		}, 'Article')
 		compareWhere(
 			where,
-			`where (not(exists (select 1
-				from "__SCHEMA__"."author" as "root_author"
-				where "root_"."author_id" = "root_author"."id"))
-				or exists (select 1
-				from "__SCHEMA__"."author" as "root_author"
-				where "root_"."author_id" = "root_author"."id" and "root_author"."id" = ?))`,
+			`where ("root_"."author_id" is null or "root_"."author_id" = ?)`,
 		)
 	})
 

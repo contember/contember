@@ -36,6 +36,7 @@ import { ProjectGroupContainerMetricsHook } from './prometheus/ProjectGroupConta
 import { PrometheusRegistryFactory } from './prometheus/PrometheusRegistryFactory.js'
 import { createProviders, Providers } from './providers.js'
 import { SystemApiMiddlewareFactory, SystemGraphQLContextFactory, SystemGraphQLHandlerFactory } from './system/index.js'
+import { createMigrationLockOptions } from './system/migrationLockOptions.js'
 import { ContentQueryExecutorImpl } from './system/ContentQueryExecutor.js'
 import { OidcBackchannelLogoutMiddlewareFactory, TenantApiMiddlewareFactory, TenantGraphQLHandlerFactory } from './tenant/index.js'
 import {
@@ -123,8 +124,8 @@ export class MasterContainerFactory {
 			)
 			.addService(
 				'systemContainerFactory',
-				({ providers, modificationHandlerFactory, contentQueryExecutor }) =>
-					new SystemContainerFactory(providers, modificationHandlerFactory, contentQueryExecutor),
+				({ providers, modificationHandlerFactory, contentQueryExecutor, serverConfig }) =>
+					new SystemContainerFactory(providers, modificationHandlerFactory, contentQueryExecutor, createMigrationLockOptions(serverConfig.systemApi)),
 			)
 			.addService('contentPermissionFactory', ({}) => new PermissionFactory())
 			.addService('databaseMetadataResolver', () => new DatabaseMetadataResolver())

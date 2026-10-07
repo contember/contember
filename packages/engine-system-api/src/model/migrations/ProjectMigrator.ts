@@ -14,6 +14,7 @@ import { ContentQueryExecutor } from '../dependencies/index.js'
 import { SchemaProvider } from './SchemaProvider.js'
 import { SaveSchemaCommand } from '../commands/schema/SaveSchemaCommand.js'
 import { ImplementationException } from '../../utils/index.js'
+import { isLockConflict } from './lockConflict.js'
 
 type MigrationVariables = {
 	system_schema: string
@@ -360,8 +361,11 @@ export class ProjectMigrator {
 			await db.query(sql)
 		} catch (e) {
 			if (e instanceof QueryError) {
-				logger.error(e, { message: 'Migration failed' })
-				throw new MigrationFailedError(migrationVersion, e.message)
+				// A lock conflict may still be retried; MigrationLockRetry logs it once the outcome is known.
+				if (!isLockConflict(e)) {
+					logger.error(e, { message: 'Migration failed' })
+				}
+				throw new MigrationFailedError(migrationVersion, e.message, e)
 			}
 			throw e
 		}
@@ -386,6 +390,10 @@ export class AlreadyExecutedMigrationError extends MigrationError {
 
 export class MigrationFailedError extends MigrationError {
 	code = MigrateErrorCode.MigrationFailed
+
+	constructor(version: string, migrationError: string, public readonly previous?: QueryError) {
+		super(version, migrationError)
+	}
 }
 
 export class InvalidSchemaError extends MigrationError {

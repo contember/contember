@@ -431,7 +431,7 @@ test('order by on a many-has-many junction fetch guards the order key against th
 					inner join "public"."tag" as "root_" on "junction_"."tag_id" = "root_"."id"
 					where "junction_"."post_id" in (?) and ("root_"."is_deleted" = ? or "root_"."is_public" = ?)
 					order by case when "root_"."is_deleted" = ? then "root_"."name" end asc, "root_"."id" asc)
-					select "data".* from "data" where "data"."rowNumber_" <= ?`,
+					select "data".* from "data" where "data"."rowNumber_" <= ? order by "data"."rowNumber_" asc`,
 				parameters: [false, testUuid(1), false, true, false, 1],
 				response: {
 					rows: [{ post_id: testUuid(1), tag_id: testUuid(10) }],
@@ -492,7 +492,7 @@ test('order by a cell-level field guards the order key in the window-function (l
 					from "public"."post" as "root_"
 					where "root_"."author_id" in (?)
 					order by case when "root_"."is_published" = ? then "root_"."title" end asc, "root_"."id" asc)
-					select "data".* from "data" where "data"."rowNumber_" <= ?`,
+					select "data".* from "data" where "data"."rowNumber_" <= ? order by "data"."rowNumber_" asc`,
 				parameters: [true, testUuid(1), true, 1],
 				response: {
 					rows: [{ __grouping_key: testUuid(1), root_id: testUuid(10) }],

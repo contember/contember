@@ -3,7 +3,7 @@ import { SystemResolverContext } from '../SystemResolverContext.js'
 import { MutationResolver } from '../Resolver.js'
 import { MigrateResponse, MigrationType, MutationMigrateArgs, MutationMigrateFromSnapshotArgs } from '../../schema/index.js'
 import { Migration } from '@contember/schema-migrations'
-import { AuthorizationActions, MigrationError, ProjectMigrator, StagesQuery } from '../../model/index.js'
+import { AuthorizationActions, MigrationError, MigrationLockRetry, ProjectMigrator, StagesQuery } from '../../model/index.js'
 import { MigrationInput } from '../../model/migrations/MigrationInput.js'
 import { UserInputError } from '@contember/graphql-utils'
 import { SchemaValidatorSkippedErrors } from '@contember/schema-utils'
@@ -12,7 +12,10 @@ import { assertNever } from '../../utils/index.js'
 const pg_lock_id = 1597474138739147
 
 export class MigrateMutationResolver implements MutationResolver<'migrate'> {
-	constructor(private readonly projectMigrator: ProjectMigrator) {}
+	constructor(
+		private readonly projectMigrator: ProjectMigrator,
+		private readonly migrationLockRetry: MigrationLockRetry,
+	) {}
 
 	async migrateForce(
 		parent: any,
@@ -33,13 +36,13 @@ export class MigrateMutationResolver implements MutationResolver<'migrate'> {
 		const migrations = this.parseMigrationInput(args)
 		const schemaState = args.schemaState ?? undefined
 
-		return context.db.locked(pg_lock_id, db =>
-			db.transaction(async trx => {
-				const stages = await trx.queryHandler.fetch(new StagesQuery())
-				for (const stage of stages) {
-					await context.requireAccess(AuthorizationActions.PROJECT_MIGRATE, stage.slug)
-				}
-				try {
+		return context.db.locked(pg_lock_id, async db => {
+			try {
+				await this.migrationLockRetry.run(db, async trx => {
+					const stages = await trx.queryHandler.fetch(new StagesQuery())
+					for (const stage of stages) {
+						await context.requireAccess(AuthorizationActions.PROJECT_MIGRATE, stage.slug)
+					}
 					await this.projectMigrator.migrate({
 						db: trx,
 						project: context.project,
@@ -52,28 +55,27 @@ export class MigrateMutationResolver implements MutationResolver<'migrate'> {
 							skipExecuted: true,
 						},
 					})
-				} catch (e) {
-					if (e instanceof MigrationError) {
-						await trx.client.connection.rollback()
-						const error = {
-							code: e.code,
-							migration: e.version,
-							developerMessage: e.message,
-						}
-						return {
-							ok: false,
-							errors: [error],
-							error,
-						}
-					} else {
-						throw e
+				})
+			} catch (e) {
+				if (e instanceof MigrationError) {
+					const error = {
+						code: e.code,
+						migration: e.version,
+						developerMessage: e.message,
+					}
+					return {
+						ok: false,
+						errors: [error],
+						error,
 					}
 				}
-				return {
-					ok: true,
-					errors: [],
-				}
-			}))
+				throw e
+			}
+			return {
+				ok: true,
+				errors: [],
+			}
+		})
 	}
 
 	async migrateFromSnapshot(

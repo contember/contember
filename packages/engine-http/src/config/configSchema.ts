@@ -233,6 +233,12 @@ export const serverConfigSchema = Typesafe.partial({
 			return Typesafe.fail([])
 		},
 	}),
+	systemApi: Typesafe.partial({
+		// Opt-in: unset, a migration waits for its locks as long as PostgreSQL lets it and is never retried.
+		migrationLockTimeoutMs: Typesafe.integer,
+		migrationMaxAttempts: Typesafe.integer,
+		migrationRetryDelayMs: Typesafe.integer,
+	}),
 	contentApi: Typesafe.partial({
 		schemaCacheTtlSeconds: Typesafe.integer,
 		schemaCacheMaxEntries: (input: unknown, path: PropertyKey[] = []): number | undefined => {

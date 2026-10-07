@@ -1,6 +1,7 @@
 import { expect, test } from 'bun:test'
 import { readConfig } from '../../../src/config/config.js'
 import { serverConfigSchema } from '../../../src/config/configSchema.js'
+import { createMigrationLockOptions } from '../../../src/system/migrationLockOptions.js'
 
 const trustedProxies = (val: unknown): unknown => serverConfigSchema({ http: { trustedProxies: val } }).http?.trustedProxies
 
@@ -102,4 +103,24 @@ test('schemaCacheMaxEntries: undefined when the variable is unset', async () => 
 
 test('schemaCacheMaxEntries: zero is refused', () => {
 	expect(() => serverConfigSchema({ contentApi: { schemaCacheMaxEntries: 0 } })).toThrow()
+})
+
+test('migration lock options: read from CONTEMBER_SYSTEM_API_MIGRATION_* with defaults for the retry', async () => {
+	process.env.CONTEMBER_SYSTEM_API_MIGRATION_LOCK_TIMEOUT_MS = '2000'
+	try {
+		const { serverConfig } = await readConfig()
+		expect(createMigrationLockOptions(serverConfig.systemApi)).toStrictEqual({ lockTimeoutMs: 2000, maxAttempts: 5, retryDelayMs: 1000 })
+	} finally {
+		delete process.env.CONTEMBER_SYSTEM_API_MIGRATION_LOCK_TIMEOUT_MS
+	}
+})
+
+test('migration lock options: retry settings apply only with a lock timeout', async () => {
+	process.env.CONTEMBER_SYSTEM_API_MIGRATION_MAX_ATTEMPTS = '3'
+	try {
+		const { serverConfig } = await readConfig()
+		expect(createMigrationLockOptions(serverConfig.systemApi)).toBeUndefined()
+	} finally {
+		delete process.env.CONTEMBER_SYSTEM_API_MIGRATION_MAX_ATTEMPTS
+	}
 })

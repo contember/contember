@@ -2,7 +2,16 @@
 title: Mail templates
 ---
 
-Mail templates in Contember enable tailored communication for emails dispatched by the Tenant API. Via the `/tenant` path and with either the `SUPER_ADMIN` or `PROJECT_ADMIN` global roles, users can create and manage these templates seamlessly.
+Mail templates in Contember enable tailored communication for emails dispatched by the Tenant API. Via the `/tenant` path, users with the
+appropriate built-in permission can create and manage templates. A [custom role](/reference/engine/tenant/custom-roles) can also receive separately
+configured `mailTemplate:add`, `mailTemplate:remove`, and `mailTemplate:list` grants, limited to exact global/project scopes and mail types.
+
+:::caution[Editing a template is control over the tokens it carries]
+`RESET_PASSWORD_REQUEST`, `PASSWORDLESS_SIGN_IN`, `NEW_USER_INVITED`, `EMAIL_VERIFICATION`, and `EMAIL_CHANGE_VERIFY` carry a token or code.
+Whoever may edit such a template can make the mail send that credential anywhere — for example in the URL of a remote image that the mail
+client loads on open. A project template is used for every recipient it applies to, including persons with the `super_admin` role who reach
+the project through their global role. Grant template editing only to people you would trust with those accounts.
+:::
 
 ## Mail Types
 

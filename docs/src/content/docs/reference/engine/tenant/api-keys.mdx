@@ -45,7 +45,7 @@ This returns three identifiers:
 mutation {
   createGlobalApiKey(
     description: "Global API key description",
-    roles: ["super_admin", "monitor"]
+    roles: ["super_admin"]
   ) {
     ok
     error {
@@ -65,6 +65,18 @@ mutation {
 ```
 
 This also returns three identifiers similar to creating a project-specific API key.
+
+Every entry in `roles` must be a role the tenant actually knows, otherwise the mutation fails with `INVALID_ROLE`. The assignable vocabulary is:
+
+- the globally assignable built-in roles — `super_admin`, `project_creator`, `project_admin`, `entrypoint_deployer`, `login`, `person`
+  (`self` and `project_member` are derived per request and cannot be assigned);
+- any [custom role](/reference/engine/tenant/custom-roles) that currently exists.
+
+:::caution[Upgrading]
+Earlier versions accepted arbitrary strings here and stored them verbatim, and the same now applies to `signUp` and `addGlobalIdentityRoles`. If your
+provisioning assigns a free-form global role — including one used only as an `auth_policy` target — create it with `createCustomRole` first, or the
+call will now return `INVALID_ROLE`.
+:::
 
 ### Custom Token Generation
 
@@ -131,7 +143,8 @@ query {
 }
 ```
 
-Global permanent keys (those created via `createGlobalApiKey` — their identity carries global roles and no project membership) are read through the top-level query, gated by the `apiKey:list` permission (granted only to `SUPER_ADMIN` by default):
+Global permanent keys (those created via `createGlobalApiKey` — their identity carries global roles and no project membership) are read through the
+top-level query, gated by the `apiKey:list` permission (granted to `PROJECT_ADMIN` and `SUPER_ADMIN` by default):
 
 ```graphql
 query {

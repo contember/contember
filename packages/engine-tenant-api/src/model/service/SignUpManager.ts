@@ -9,6 +9,7 @@ import { EmailValidator } from './EmailValidator.js'
 import { PasswordStrengthValidator } from './PasswordStrengthValidator.js'
 import { validateEmail as isEmailFormatValid } from '../utils/email.js'
 import { Config } from '../type/Config.js'
+import { GlobalRoleValidator } from './GlobalRoleValidator.js'
 
 type SignUpUser = {
 	email: string
@@ -22,6 +23,7 @@ export class SignUpManager {
 	constructor(
 		private readonly emailValidator: EmailValidator,
 		private readonly passwordStrengthValidator: PasswordStrengthValidator,
+		private readonly globalRoleValidator: GlobalRoleValidator = new GlobalRoleValidator(),
 	) {
 	}
 
@@ -59,11 +61,17 @@ export class SignUpManager {
 		// were created while verification was optional.
 		const emailVerificationRequired = config.signup.requireEmailVerification
 
-		const person = await dbContext.transaction(async db => {
+		// Validating inside the transaction holds the FOR SHARE lock on the custom roles until the
+		// identity is written, so a concurrent deleteCustomRole cannot leave it a dangling slug.
+		return await dbContext.transaction(async (db): Promise<SignUpResponse> => {
+			const invalidRole = await this.globalRoleValidator.findInvalidRole(db, roles)
+			if (invalidRole !== null) {
+				return new ResponseError('INVALID_ROLE', `Role ${invalidRole} is not valid or globally assignable`)
+			}
 			const identityId = await db.commandBus.execute(new CreateIdentityCommand([...roles, TenantRole.PERSON]))
-			return await db.commandBus.execute(new CreatePersonCommand({ identityId, email, password, emailVerificationRequired }))
-		})
-		return new ResponseOk(new SignUpResult(person, emailVerificationRequired))
+			const person = await db.commandBus.execute(new CreatePersonCommand({ identityId, email, password, emailVerificationRequired }))
+			return new ResponseOk(new SignUpResult(person, emailVerificationRequired))
+		}, { isolation: 'readCommitted' })
 	}
 }
 

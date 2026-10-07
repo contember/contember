@@ -1,6 +1,7 @@
 import { executeTenantTest } from '../../../src/testTenant.js'
 import { GQL, SQL } from '../../../src/tags.js'
 import { testUuid } from '../../../src/testUuid.js'
+import { getIdentityProjectMembershipPresenceSql } from './sql/getIdentityProjectMembershipPresenceSql.js'
 import { getPersonByIdSql } from './sql/getPersonByIdSql.js'
 import { expect, test } from 'bun:test'
 
@@ -25,6 +26,7 @@ test('enablePerson clears the disabled flag', async () => {
 				personId,
 				response: { personId, identityId, password: '123', roles: [], email: 'jane@doe.com', disabledAt: new Date('2019-09-04 12:00') },
 			}),
+			getIdentityProjectMembershipPresenceSql(identityId),
 			{
 				sql: SQL`update "tenant"."person" set "disabled_at" = ? where "id" = ?`,
 				parameters: [null, personId],
@@ -56,7 +58,11 @@ test('enablePerson checks permission against the target roles', async () => {
 		},
 		authorizator: {
 			isAllowed: async (identity, scope, action) => {
-				expect(action).toEqual({ resource: 'person', privilege: 'disable', meta: { roles: targetRoles } })
+				expect(action).toEqual({
+					resource: 'person',
+					privilege: 'disable',
+					meta: { target: { id: identityId, globalRoles: targetRoles, hasProjectMemberships: true } },
+				})
 				return false
 			},
 		},
@@ -115,6 +121,7 @@ test('enablePerson returns PERSON_ALREADY_ENABLED', async () => {
 				personId,
 				response: { personId, identityId, password: '123', roles: [], email: 'jane@doe.com', disabledAt: null },
 			}),
+			getIdentityProjectMembershipPresenceSql(identityId),
 		],
 		return: {
 			data: {

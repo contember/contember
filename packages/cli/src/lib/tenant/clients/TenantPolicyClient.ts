@@ -11,6 +11,9 @@ import {
 	createAuthPolicyError$$,
 	createAuthPolicyResponse$$,
 	createAuthPolicyResult$$,
+	createCustomRoleError$$,
+	createCustomRoleResponse$$,
+	customRole$,
 	deleteAuthPolicyError$$,
 	deleteAuthPolicyResponse$$,
 	mailTemplateData$$,
@@ -22,10 +25,12 @@ import {
 	removeMailTemplateResponse$$,
 	updateAuthPolicyError$$,
 	updateAuthPolicyResponse$$,
+	updateCustomRoleError$$,
+	updateCustomRoleResponse$$,
 } from '@contember/graphql-client-tenant'
 import { describeAuthPolicy } from '../authPolicy.js'
-import { TenantApiTransport } from '../TenantApiTransport.js'
-import { TenantMailTemplate } from '../tenantConfig.js'
+import { TenantApiTransport, TenantMutationResult } from '../TenantApiTransport.js'
+import { TenantCustomRoleConfig, TenantMailTemplate } from '../tenantConfig.js'
 
 /** A policy as it exists server-side. The config-side counterpart is `TenantAuthPolicy` in `tenantConfig.ts`. */
 export interface RemoteAuthPolicy {
@@ -82,6 +87,14 @@ export interface ReadAuthLogArgs {
 	offset?: number
 }
 
+export interface RemoteCustomRole {
+	slug: string
+}
+
+interface UpdateCustomRoleResult {
+	updateCustomRole?: TenantMutationResult
+}
+
 // Fetchers are immutable and reusable, so they are built once at module load.
 const authPoliciesFetcher = query$.authPolicies(authPolicy$$)
 const createAuthPolicyFetcher = mutation$.createAuthPolicy(
@@ -93,8 +106,22 @@ const mailTemplatesFetcher = query$.mailTemplates(mailTemplateData$$)
 const addMailTemplateFetcher = mutation$.addMailTemplate(addMailTemplateResponse$$.error(addMailTemplateError$$))
 const removeMailTemplateFetcher = mutation$.removeMailTemplate(removeMailTemplateResponse$$.error(removeMailTemplateError$$))
 const authLogFetcher = query$.authLog(authLogPage$.hasMore.entries(authLogEntry$$))
+const customRolesFetcher = query$.customRoles(customRole$.slug)
+const createCustomRoleFetcher = mutation$.createCustomRole(createCustomRoleResponse$$.error(createCustomRoleError$$))
+const updateCustomRoleFetcher = mutation$.updateCustomRole(updateCustomRoleResponse$$.error(updateCustomRoleError$$))
+const clearCustomRoleDescriptionMutation = `
+	mutation updateCustomRoleDescription($slug: String!, $grants: [CustomRoleGrantInput!]) {
+		updateCustomRole(slug: $slug, grants: $grants, description: null) {
+			ok
+			error {
+				code
+				developerMessage
+			}
+		}
+	}
+`
 
-/** Auth policies, mail templates and the auth log. */
+/** Auth policies, mail templates, custom roles and the auth log. */
 export class TenantPolicyClient {
 	constructor(
 		private readonly transport: TenantApiTransport,
@@ -164,6 +191,31 @@ export class TenantPolicyClient {
 	public async removeMailTemplate(templateIdentifier: MailTemplateIdentifier): Promise<void> {
 		const result = await this.transport.exec(removeMailTemplateFetcher, { templateIdentifier })
 		this.transport.assertOk(result.removeMailTemplate, `removeMailTemplate(${templateIdentifier.type}/${templateIdentifier.variant ?? ''})`)
+	}
+
+	public async listCustomRoles(): Promise<RemoteCustomRole[]> {
+		const result = await this.transport.exec(customRolesFetcher, {})
+		return result.customRoles.map(role => ({ slug: role.slug }))
+	}
+
+	public async createCustomRole(slug: string, role: TenantCustomRoleConfig): Promise<void> {
+		const result = await this.transport.exec(createCustomRoleFetcher, {
+			slug,
+			description: role.description ?? undefined,
+			grants: role.grants,
+		})
+		this.transport.assertOk(result.createCustomRole, `createCustomRole(${slug})`)
+	}
+
+	public async updateCustomRole(slug: string, role: TenantCustomRoleConfig): Promise<void> {
+		const result = role.description === null
+			? await this.transport.execDocument<UpdateCustomRoleResult>(clearCustomRoleDescriptionMutation, { slug, grants: role.grants })
+			: await this.transport.exec(updateCustomRoleFetcher, {
+				slug,
+				description: role.description,
+				grants: role.grants,
+			})
+		this.transport.assertOk(result.updateCustomRole, `updateCustomRole(${slug})`)
 	}
 
 	public async readAuthLog({ filter, limit, offset }: ReadAuthLogArgs = {}): Promise<TenantAuthLogPage> {

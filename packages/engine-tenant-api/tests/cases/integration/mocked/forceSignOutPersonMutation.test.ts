@@ -4,6 +4,7 @@ import { testUuid } from '../../../src/testUuid.js'
 import { getPersonByIdSql } from './sql/getPersonByIdSql.js'
 import { getMailTemplateSql } from './sql/getMailTemplateSql.js'
 import { expect, test } from 'bun:test'
+import { getIdentityProjectMembershipPresenceSql } from './sql/getIdentityProjectMembershipPresenceSql.js'
 
 const disableIdentityApiKeysSql = (identityId: string) => ({
 	sql: SQL`update "tenant"."api_key" set "disabled_at" = ? where "identity_id" = ?`,
@@ -30,6 +31,7 @@ test('force sign-out – success with reason and mail', async () => {
 				personId,
 				response: { personId, identityId, password: '123', roles: [], email: 'jane@doe.com' },
 			}),
+			getIdentityProjectMembershipPresenceSql(identityId),
 			disableIdentityApiKeysSql(identityId),
 			getMailTemplateSql({ type: 'forcedSignOut', projectId: null }),
 			getMailTemplateSql({ type: 'forcedSignOut', projectId: null }),

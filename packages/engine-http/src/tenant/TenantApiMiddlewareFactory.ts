@@ -12,6 +12,20 @@ export class TenantApiMiddlewareFactory {
 			const tenantContainer = projectGroup.tenantContainer
 			await logger.scope(async logger => {
 				logger.debug('Tenant query processing started')
+				// built before the handler so any custom-role lookup happens here, not inside
+				// a resolver transaction where it would need a second pooled connection
+				const context = await tenantContainer.resolverContextFactory.create(
+					authResult,
+					{
+						ip: clientIp,
+						userAgent: authResult.clientUserAgent,
+						forwarderIp: authResult.forwarderIp,
+						forwarderUserAgent: authResult.forwarderUserAgent,
+						geoCountry: authResult.geoCountry,
+					},
+					tenantContainer.databaseContext,
+					logger,
+				)
 				await timer('GraphQL', () =>
 					projectGroup.tenantGraphQLHandler({
 						request: koa.request,
@@ -20,20 +34,6 @@ export class TenantApiMiddlewareFactory {
 							;(koa.state as GraphQLKoaState).graphql = {
 								operationName: operation,
 							}
-							const resolverContextFactory = tenantContainer.resolverContextFactory
-							const db = tenantContainer.databaseContext
-							const context = resolverContextFactory.create(
-								authResult,
-								{
-									ip: clientIp,
-									userAgent: authResult.clientUserAgent,
-									forwarderIp: authResult.forwarderIp,
-									forwarderUserAgent: authResult.forwarderUserAgent,
-									geoCountry: authResult.geoCountry,
-								},
-								db,
-								logger,
-							)
 
 							return {
 								...context,

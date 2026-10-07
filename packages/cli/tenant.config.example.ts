@@ -61,4 +61,32 @@ export default defineTenantConfig({
 			content: 'Klikněte na odkaz pro obnovení hesla: {{link}}',
 		},
 	],
+
+	customRoles: {
+		support: {
+			description: 'Support team',
+			grants: [
+				{ permission: 'person:list' },
+				{ permission: 'person:view' },
+				{
+					permission: 'person:changeProfile',
+					config: {
+						target: {
+							globalRoles: { allowed: ['person', 'support'] },
+							projectMemberships: 'none',
+						},
+						fields: { allowed: ['name'] },
+					},
+				},
+				{
+					permission: 'mailTemplate:list',
+					config: {
+						global: false,
+						projects: ['my-project'],
+						types: ['FORCED_SIGN_OUT'],
+					},
+				},
+			],
+		},
+	},
 })

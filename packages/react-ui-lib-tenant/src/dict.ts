@@ -94,6 +94,7 @@ export const dict = {
 			errorMessages: {
 				'FIELD_REQUIRED': 'This field is required',
 				'UNKNOWN_ERROR': 'Something went wrong. Please try again later',
+				'INVALID_ROLE': 'Invalid role',
 				'INVALID_MEMBERSHIP': 'Invalid membership',
 				'PROJECT_NOT_FOUND': 'Project not found',
 				'ROLE_NOT_FOUND': 'Role not found',
@@ -247,6 +248,7 @@ export const dict = {
 			errorMessages: {
 				'FIELD_REQUIRED': 'This field is required',
 				'UNKNOWN_ERROR': 'Something went wrong. Please try again later',
+				'INVALID_ROLE': 'Invalid role',
 				'INVALID_MEMBERSHIP': 'Invalid membership',
 				'PROJECT_NOT_FOUND': 'Project not found',
 				'ROLE_NOT_FOUND': 'Role not found',
@@ -448,6 +450,7 @@ export const dict = {
 				'TOO_WEAK': 'Password is too weak',
 				'INVALID_CAPTCHA': 'Captcha verification failed',
 				'RATE_LIMIT_EXCEEDED': 'Too many attempts. Please try again later',
+				'INVALID_ROLE': 'Invalid role',
 			} satisfies Record<SignUpFormErrorCode, string>,
 			title: 'Create an account',
 		},

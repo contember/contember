@@ -22,13 +22,13 @@ export class TenantResolverContextFactory {
 		private readonly loginRiskAnalyzer: LoginRiskAnalyzer,
 	) {}
 
-	public create(
+	public async create(
 		authContext: { apiKeyId: string; identityId: string; roles: string[]; trustForwardedInfo?: boolean },
 		httpInfo: { ip: string; userAgent?: string; forwarderIp?: string; forwarderUserAgent?: string; geoCountry?: string },
 		db: DatabaseContext,
 		logger: Logger,
-	): TenantResolverContext {
-		const permissionContext = this.permissionContextFactory.create(db, {
+	): Promise<TenantResolverContext> {
+		const permissionContext = await this.permissionContextFactory.createPreloaded(db, {
 			id: authContext.identityId,
 			roles: authContext.roles,
 		})
@@ -37,8 +37,8 @@ export class TenantResolverContextFactory {
 		const deviceFingerprint = this.loginRiskAnalyzer.fingerprint(httpInfo.userAgent) ?? undefined
 		return {
 			...createResolverContext(permissionContext, authContext.apiKeyId, authContext.trustForwardedInfo ?? false),
-			logAuthAction: async data => {
-				await this.authLogService.logAuthAction(db, {
+			logAuthAction: async (data, transaction) => {
+				await this.authLogService.logAuthAction(transaction ?? db, {
 					identityId: authContext.identityId,
 					userAgent: httpInfo.userAgent,
 					clientIp: httpInfo.ip,

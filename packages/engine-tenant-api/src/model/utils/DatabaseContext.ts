@@ -13,6 +13,7 @@ export interface TransactionOptions {
 	 * one (InviteManager, EmailChangeManager, PasswordlessSignInManager) and a retry would send it twice.
 	 */
 	retry?: { logger: Logger }
+	readonly isolation?: 'repeatableRead' | 'readCommitted'
 }
 
 export class DatabaseContext<Conn extends Connection.ConnectionLike = Connection.ConnectionLike> {
@@ -38,7 +39,9 @@ export class DatabaseContext<Conn extends Connection.ConnectionLike = Connection
 	): Promise<T> {
 		const run = async () =>
 			await this.client.transaction(async db => {
-				await db.query(Connection.REPEATABLE_READ)
+				if (options.isolation !== 'readCommitted') {
+					await db.query(Connection.REPEATABLE_READ)
+				}
 				return await cb(new DatabaseContext(db, this.providers))
 			})
 		const retry = options.retry

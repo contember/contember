@@ -48,6 +48,14 @@ describe('where optimized', () => {
 		)
 	})
 
+	it('keeps a masked cell guard that is never satisfied', () => {
+		// Dropping it would test the hidden value instead of reading the cell as NULL.
+		assert.deepStrictEqual(
+			whereOptimizer.optimize({ [MASKED_CELL_KEY]: [{ guard: { isPublic: { never: true } }, where: { title: { eq: 'y' } } }] }, model.entities.Article),
+			{ [MASKED_CELL_KEY]: [{ guard: { id: { never: true } }, where: { title: { eq: 'y' } } }] },
+		)
+	})
+
 	it('simplifies guards with a condition known to hold on the same row', () => {
 		assert.deepStrictEqual(
 			whereOptimizer.optimize({

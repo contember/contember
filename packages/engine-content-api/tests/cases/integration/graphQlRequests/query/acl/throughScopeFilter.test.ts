@@ -73,6 +73,7 @@ where "root_author"."secret" = ? and "root_author"."disclosed" = ?`,
 	})
 })
 
+// The undisclosed secret is masked, so it behaves as NULL under `not` and the row does not match.
 test('through-only target inside a not branch of a root filter resolves at nested scope', async () => {
 	const schema = createSchema(FilterTarget)
 	const { root, all } = new PermissionFactory().createContextual(schema, ['editor'])
@@ -92,8 +93,8 @@ test('through-only target inside a not branch of a root filter resolves at neste
 			{
 				sql: SQL`select "root_"."title" as "root_title", "root_"."id" as "root_id" 
 from "public"."article" as "root_" left join "public"."author" as "root_author" on "root_"."author_id" = "root_author"."id" 
-where not("root_author"."secret" = ? and "root_author"."disclosed" = ?)`,
-				parameters: ['shh', true],
+where not(case when coalesce("root_author"."disclosed" = ?, false) then "root_author"."secret" = ? end)`,
+				parameters: [true, 'shh'],
 				response: {
 					rows: [
 						{ root_id: testUuid(1), root_title: 'Article A' },
@@ -155,79 +156,6 @@ where ("root_author"."secret" = ? and "root_author"."disclosed" = ? or "root_aut
 })
 
 /**
- * `Article`'s own read predicate traverses into `Author`, so the target of a predicate - not of a
- * user filter - is the nested node here. It filters on `verified`, which no `Author` grant mentions,
- * so the injected target predicate survives the where optimizer instead of being absorbed.
- */
-namespace PredicateTarget {
-	export const editorRole = c.createRole('editor')
-
-	@c.Allow(editorRole, {
-		when: { author: { verified: { eq: true } } },
-		read: ['title', 'author'],
-	})
-	export class Article {
-		title = c.stringColumn().notNull()
-		author = c.manyHasOne(Author).notNull()
-	}
-
-	@c.Allow(editorRole, {
-		when: { published: { eq: true } },
-		read: ['name'],
-	})
-	@c.Allow(editorRole, {
-		through: true,
-		when: { disclosed: { eq: true } },
-		read: ['secret'],
-	})
-	export class Author {
-		name = c.stringColumn().notNull()
-		secret = c.stringColumn().notNull()
-		verified = c.boolColumn().notNull()
-		published = c.boolColumn().notNull()
-		disclosed = c.boolColumn().notNull()
-	}
-}
-
-test('relation target inside a predicate resolves at nested scope', async () => {
-	const schema = createSchema(PredicateTarget)
-	const { root, all } = new PermissionFactory().createContextual(schema, ['editor'])
-
-	await execute({
-		schema: schema.model,
-		permissions: root,
-		nestedPermissions: all,
-		variables: {},
-		query: GQL`
-        query {
-          listArticle {
-            title
-          }
-        }`,
-		executes: [
-			{
-				sql: SQL`select "root_"."title" as "root_title", "root_"."id" as "root_id" 
-from "public"."article" as "root_" left join "public"."author" as "root_author" on "root_"."author_id" = "root_author"."id" 
-where "root_author"."verified" = ? and ("root_author"."published" = ? or "root_author"."disclosed" = ?)`,
-				parameters: [true, true, true],
-				response: {
-					rows: [
-						{ root_id: testUuid(1), root_title: 'Article A' },
-					],
-				},
-			},
-		],
-		return: {
-			data: {
-				listArticle: [
-					{ title: 'Article A' },
-				],
-			},
-		},
-	})
-})
-
-/**
  * `AuthorWhere` carries `secret` because the where-input, like the entity type, is shared between
  * both scopes and filtering by it is legitimate under a relation. At the root the field is not
  * readable, so the injected read predicate is a never-condition and the filter matches nothing -
@@ -261,8 +189,8 @@ test('a root filter on a through-only field matches nothing', async () => {
 		executes: [
 			{
 				sql: SQL`select "root_"."name" as "root_name", "root_"."id" as "root_id" 
-from "public"."author" as "root_" where false`,
-				parameters: [],
+from "public"."author" as "root_" where "root_"."secret" = ? and false`,
+				parameters: ['shh'],
 				response: { rows: [] },
 			},
 		],

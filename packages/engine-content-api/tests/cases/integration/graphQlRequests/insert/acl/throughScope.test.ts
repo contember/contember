@@ -1,6 +1,6 @@
 import { test } from 'bun:test'
 import { execute, failedTransaction, sqlTransaction } from '../../../../../src/test.js'
-import { c, createSchema } from '@contember/schema-definition'
+import { c, createSchema, ManyHasManyInverseDefinition, OneHasManyDefinition } from '@contember/schema-definition'
 import { PermissionFactory } from '../../../../../../src/index.js'
 import { GQL, SQL } from '../../../../../src/tags.js'
 import { testUuid } from '../../../../../src/testUuid.js'
@@ -430,7 +430,7 @@ namespace RootCreateWithThroughJunction {
 
 	@c.Allow(editorRole, { read: ['id', 'contents'], create: ['contents'], update: ['contents'] })
 	export class Page {
-		contents: c.OneHasManyDefinition = c.oneHasMany(Content, 'page')
+		contents: OneHasManyDefinition = c.oneHasMany(Content, 'page')
 	}
 
 	// `create` on the relation field is granted at the root, so the insert itself passes and the
@@ -445,7 +445,7 @@ namespace RootCreateWithThroughJunction {
 
 	@c.Allow(editorRole, { read: ['id'], update: ['contents'] })
 	export class Category {
-		contents: c.ManyHasManyInverse<Content> = c.manyHasManyInverse(Content, 'categories')
+		contents: ManyHasManyInverseDefinition = c.manyHasManyInverse(Content, 'categories')
 	}
 }
 

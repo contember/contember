@@ -3,6 +3,7 @@ import { describe, expect, test } from 'bun:test'
 import { ContentClientInput } from '../../../src/index.js'
 import { ContemberClientEntities, FragmentOf, FragmentType, PostStatus, queryBuilder } from '../../client/index.js'
 import { expectTypeOf } from 'expect-type'
+import { Input, JSONValue, Value } from '@contember/schema'
 
 const qb = queryBuilder
 describe('ts types', () => {
@@ -145,5 +146,13 @@ describe('ts types', () => {
 		const fragment = qb.fragment('Post', it => it.$$().omit('publishedAt'))
 		type fragmentType = FragmentType<typeof fragment>
 		expectTypeOf<fragmentType>().toEqualTypeOf<{ id: string; status: PostStatus | null }>()
+	})
+
+	test('includes condition', async () => {
+		expectTypeOf<Input.Condition<string[]>['includes']>().toEqualTypeOf<string | undefined>()
+		expectTypeOf<Input.Condition<readonly string[]>['includes']>().toEqualTypeOf<string | undefined>()
+		expectTypeOf<Input.Condition<JSONValue | null>['includes']>().toEqualTypeOf<JSONValue | undefined>()
+		expectTypeOf<Input.Condition['includes']>().toEqualTypeOf<Value.FieldValue | undefined>()
+		expectTypeOf<Input.Condition<string>['includes']>().toEqualTypeOf<undefined>()
 	})
 })

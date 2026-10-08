@@ -235,6 +235,13 @@ export const serverConfigSchema = Typesafe.partial({
 	}),
 	contentApi: Typesafe.partial({
 		schemaCacheTtlSeconds: Typesafe.integer,
+		schemaCacheMaxEntries: (input: unknown, path: PropertyKey[] = []): number | undefined => {
+			if (input === undefined) {
+				return undefined
+			}
+			const maxEntries = Typesafe.integer(input, path)
+			return maxEntries > 0 ? maxEntries : Typesafe.fail(path, 'must be a positive integer')
+		},
 		forcePrimaryHeader: Typesafe.boolean,
 		whereOptimizer: Typesafe.partial({
 			disable: Typesafe.boolean,

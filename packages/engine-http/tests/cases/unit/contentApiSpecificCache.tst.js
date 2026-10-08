@@ -57,6 +57,28 @@ import { ContentApiSpecificCache } from '../../../dist/production/content/Conten
 	await (async () => {
 		let value = { a: 1 }
 		const valueRef = new WeakRef(value)
+
+		let objectKey = {}
+		const cache = new ContentApiSpecificCache({ maxEntries: 10 })
+
+		;(() => {
+			assert.ok(cache.fetch(objectKey, '', () => value) === value)
+		})()
+
+		value = { a: 2 }
+		objectKey = {} // the recency order must not keep the value alive
+
+		await new Promise(resolve => setImmediate(resolve))
+
+		global.gc?.()
+
+		assert.ok(valueRef.deref() === undefined)
+		console.log('weakmap clear with maxEntries OK')
+	})()
+
+	await (async () => {
+		let value = { a: 1 }
+		const valueRef = new WeakRef(value)
 		const objectKey = {}
 		const cache = new ContentApiSpecificCache({
 			ttlSeconds: 1,

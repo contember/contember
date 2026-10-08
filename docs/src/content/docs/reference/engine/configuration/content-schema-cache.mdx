@@ -1,0 +1,35 @@
+---
+title: Content API schema cache
+---
+
+The Engine builds a GraphQL schema of the Content API for each project schema and each combination of roles that a request carries. A schema of a large project can take tens of megabytes. The Engine caches the built schemas, so a request with an already seen combination of roles does not build its schema again.
+
+By default, a cached schema stays in memory until the project schema changes. An Engine that serves many projects, or projects whose users hold many different combinations of roles, can therefore keep a large part of its heap in this cache.
+
+## Configuration
+
+```bash
+CONTEMBER_CONTENT_API_SCHEMA_CACHE_TTL_SECONDS=1800
+CONTEMBER_CONTENT_API_SCHEMA_CACHE_MAX_ENTRIES=100
+```
+
+or in the server config:
+
+```yaml
+server:
+  contentApi:
+    schemaCacheTtlSeconds: 1800
+    schemaCacheMaxEntries: 100
+```
+
+| Option | Meaning |
+|---|---|
+| `schemaCacheTtlSeconds` | A schema that no request used for this number of seconds is removed. Every use restarts the period. |
+| `schemaCacheMaxEntries` | The maximum number of schemas in the cache, counted across all projects. When the cache is full, the schema used least recently is removed. Must be a positive integer. |
+
+Both options are disabled by default, and they can be combined.
+
+:::note[Available since 2.2: `schemaCacheMaxEntries`]
+:::
+
+A request whose schema was removed builds it again. This costs CPU time and adds latency to that request, so set the limits high enough for the combinations of roles that are in active use.

@@ -105,6 +105,7 @@ export const configTemplate: any = {
 		},
 		contentApi: {
 			schemaCacheTtlSeconds: '%?env.CONTEMBER_CONTENT_API_SCHEMA_CACHE_TTL_SECONDS::number%',
+			schemaCacheMaxEntries: '%?env.CONTEMBER_CONTENT_API_SCHEMA_CACHE_MAX_ENTRIES::number%',
 			forcePrimaryHeader: '%?env.CONTEMBER_CONTENT_API_FORCE_PRIMARY_HEADER::bool%',
 			whereOptimizer: {
 				disable: '%?env.CONTEMBER_CONTENT_API_WHERE_OPTIMIZER_DISABLE::bool%',

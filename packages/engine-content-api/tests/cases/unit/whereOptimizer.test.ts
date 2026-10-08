@@ -4,6 +4,7 @@ import { SchemaDefinition as def } from '@contember/schema-definition'
 import { WhereOptimizer } from '../../../src/mapper/select/optimizer/WhereOptimizer.js'
 import { acceptFieldVisitor } from '@contember/schema-utils'
 import { assert } from '../../src/assert.js'
+import { FIELD_GUARD_KEY, MASKED_CELL_KEY } from '../../../src/acl/index.js'
 
 namespace TestModel {
 	export class Author {
@@ -32,6 +33,67 @@ describe('where optimized', () => {
 	const conditionOptimizer = new ConditionOptimizer()
 	const model = def.createModel(TestModel)
 	const whereOptimizer = new WhereOptimizer(model, conditionOptimizer)
+
+	it('keeps a relation field guard that is never satisfied', () => {
+		assert.deepStrictEqual(
+			whereOptimizer.optimize({ image: { url: { eq: 'x' }, [FIELD_GUARD_KEY]: { id: { never: true } } } }, model.entities.Article),
+			{ image: { url: { eq: 'x' }, [FIELD_GUARD_KEY]: { id: { never: true } } } },
+		)
+	})
+
+	it('drops a relation field guard that always holds', () => {
+		assert.deepStrictEqual(
+			whereOptimizer.optimize({ image: { url: { eq: 'x' }, [FIELD_GUARD_KEY]: { id: { always: true } } } }, model.entities.Article),
+			{ image: { url: { eq: 'x' } } },
+		)
+	})
+
+	it('keeps a masked cell guard that is never satisfied', () => {
+		// Dropping it would test the hidden value instead of reading the cell as NULL.
+		assert.deepStrictEqual(
+			whereOptimizer.optimize({ [MASKED_CELL_KEY]: [{ guard: { isPublic: { never: true } }, where: { title: { eq: 'y' } } }] }, model.entities.Article),
+			{ [MASKED_CELL_KEY]: [{ guard: { id: { never: true } }, where: { title: { eq: 'y' } } }] },
+		)
+	})
+
+	it('simplifies guards with a condition known to hold on the same row', () => {
+		assert.deepStrictEqual(
+			whereOptimizer.optimize({
+				and: [
+					{ image: { url: { eq: 'x' }, [FIELD_GUARD_KEY]: { isPublic: { eq: true } } } },
+					{ [MASKED_CELL_KEY]: [{ guard: { isPublic: { eq: true } }, where: { title: { eq: 'y' } } }] },
+					{ isPublic: { eq: true } },
+				],
+			}, model.entities.Article),
+			{
+				and: [
+					{ image: { url: { eq: 'x' } } },
+					{ [MASKED_CELL_KEY]: [{ guard: { id: { always: true } }, where: { title: { eq: 'y' } } }] },
+					{ isPublic: { eq: true } },
+				],
+			},
+		)
+	})
+
+	it('keeps guards when the condition is a sibling under a negation', () => {
+		// With `isPublic` NULL the sibling is not TRUE, and the masked cell must stay masked.
+		const where = {
+			not: {
+				and: [{ isPublic: { eq: true } }, { [MASKED_CELL_KEY]: [{ guard: { isPublic: { eq: true } }, where: { title: { eq: 'y' } } }] }],
+			},
+		}
+		assert.deepStrictEqual(whereOptimizer.optimize(where, model.entities.Article), where)
+	})
+
+	it('keeps guards when the condition is only an alternative', () => {
+		const where = {
+			or: [
+				{ image: { url: { eq: 'x' }, [FIELD_GUARD_KEY]: { isPublic: { eq: true } } } },
+				{ isPublic: { eq: true } },
+			],
+		}
+		assert.deepStrictEqual(whereOptimizer.optimize(where, model.entities.Article), where)
+	})
 
 	it('removes unnecessary condition', () => {
 		assert.deepStrictEqual(

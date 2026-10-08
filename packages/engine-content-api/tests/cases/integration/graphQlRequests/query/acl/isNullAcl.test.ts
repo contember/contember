@@ -55,10 +55,16 @@ test('owner predicate with isNull', async () => {
         }`,
 		executes: [
 			{
-				sql: SQL`select "root_"."id" as "root_id"  from "public"."item" as "root_" 
-    left join  "public"."resource" as "root_resource" on  "root_"."resource_id" = "root_resource"."id" 
-    left join  "public"."person" as "root_resource_owner" on  "root_resource"."owner_id" = "root_resource_owner"."id"  
-	where "root_resource"."id" is null and "root_resource_owner"."person_id" = ? and "root_resource_owner"."person_id" = ?`,
+				// `{ resource: { id: { isNull: true } } }` means "no READABLE resource": the resource read predicate is
+				// compiled into the joined source, so a present-but-unreadable resource null-extends like an absent one.
+				// The trailing `person_id = ?` is the Item root read predicate.
+				sql: SQL`select "root_"."id" as "root_id"  from "public"."item" as "root_"
+    left join  (select "root_resource$".*  from "public"."resource" as "root_resource$"
+    left join  "public"."person" as "root_resource$_owner" on  "root_resource$"."owner_id" = "root_resource$_owner"."id"
+	where "root_resource$_owner"."person_id" = ?) as "root_resource$" on  "root_"."resource_id" = "root_resource$"."id"
+    left join  "public"."resource" as "root_resource" on  "root_"."resource_id" = "root_resource"."id"
+    left join  "public"."person" as "root_resource_owner" on  "root_resource"."owner_id" = "root_resource_owner"."id"
+	where "root_resource$"."id" is null and "root_resource_owner"."person_id" = ?`,
 				response: {
 					rows: [],
 				},

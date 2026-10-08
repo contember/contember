@@ -1,15 +1,17 @@
 import { Input, Model } from '@contember/schema'
-import { RelationFetcher, SelectExecutionHandler, SelectExecutionHandlerContext } from '../../mapper/index.js'
+import { getFieldReadPredicate, RelationFetcher, SelectExecutionHandler, SelectExecutionHandlerContext } from '../../mapper/index.js'
 import { PaginatedHasManyFieldProviderExtension } from './PaginatedHasManyFieldProvider.js'
-import { acceptFieldVisitor } from '@contember/schema-utils'
+import { acceptFieldVisitor, getField } from '@contember/schema-utils'
 import { createPaginationHelper } from '../../utils/index.js'
 import { PaginatedHasManyCountVisitor } from './PaginatedHasManyCountVisitor.js'
 import { PaginatedHasManyNodesVisitor } from './PaginatedHasManyNodesVisitor.js'
+import { PredicateFactory } from '../../acl/index.js'
 
 export class PaginatedHasManyExecutionHandler implements SelectExecutionHandler<Input.PaginationQueryInput, PaginatedHasManyFieldProviderExtension> {
 	constructor(
 		private readonly schema: Model.Schema,
 		private readonly relationFetcher: RelationFetcher,
+		private readonly predicateFactory: PredicateFactory,
 	) {}
 
 	process(
@@ -47,6 +49,12 @@ export class PaginatedHasManyExecutionHandler implements SelectExecutionHandler<
 				return Object.fromEntries(result)
 			},
 			defaultValue: pagination.createResponse(0, []),
+			predicate: getFieldReadPredicate(
+				this.predicateFactory,
+				entity,
+				getField(entity, objectNode.extensions.relationName),
+				context.relationPath,
+			),
 		})
 	}
 }

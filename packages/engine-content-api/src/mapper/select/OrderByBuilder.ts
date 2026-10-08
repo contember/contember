@@ -6,6 +6,7 @@ import { acceptFieldVisitor, getColumnName, getTargetEntity } from '@contember/s
 import { UserError } from '../../exception.js'
 import { PredicateFactory, PredicatesInjector } from '../../acl/index.js'
 import { WhereBuilder } from './WhereBuilder.js'
+import { WhereOptimizer } from './optimizer/WhereOptimizer.js'
 
 const orderByMapping = {
 	asc: 'asc',
@@ -30,6 +31,7 @@ export class OrderByBuilder {
 		private readonly predicateFactory: PredicateFactory,
 		private readonly predicatesInjector: PredicatesInjector,
 		private readonly whereBuilder: WhereBuilder,
+		private readonly whereOptimizer: WhereOptimizer,
 	) {}
 
 	public build<Orderable extends QueryBuilder.Orderable<any> | null>(
@@ -40,8 +42,10 @@ export class OrderByBuilder {
 		orderBy: Input.OrderBy[],
 		relationPath: Model.AnyRelationContext[] = [],
 	): [SelectBuilder<SelectBuilder.Result>, Orderable] {
+		// The WHERE keeps only rows satisfying the entity's read predicate.
+		const facts = [this.predicateFactory.createReadPredicate(entity, undefined, relationPath)]
 		return orderBy.reduce<[SelectBuilder<SelectBuilder.Result>, Orderable]>(
-			([qb, orderable], fieldOrderBy) => this.buildOne(qb, orderable, entity, path, fieldOrderBy, relationPath, []),
+			([qb, orderable], fieldOrderBy) => this.buildOne(qb, orderable, entity, path, fieldOrderBy, relationPath, [], facts),
 			[qb, orderable],
 		)
 	}
@@ -54,6 +58,7 @@ export class OrderByBuilder {
 		orderBy: Input.OrderBy,
 		relationPath: Model.AnyRelationContext[],
 		hopGuards: OrderByHopGuard[],
+		facts: readonly Input.OptionalWhere[],
 	): [SelectBuilder<SelectBuilder.Result>, Orderable] {
 		const entries = Object.entries(orderBy)
 		if (entries.length !== 1) {
@@ -107,13 +112,16 @@ export class OrderByBuilder {
 
 			// The hop joins the target's read-guarded source (same guard and alias as a filter through this
 			// relation), so every joined target row is readable and only cell-level predicates remain to guard.
-			const guard = this.predicatesInjector.createReadGuard(relationContext, relationPath)
-			const guarded = Object.keys(guard).length > 0
+			// A guard implied by the facts about the joined row is left out, so the hop shares the plain join of an
+			// ACL predicate through the same relation.
+			const readGuard = this.predicatesInjector.createReadGuard(relationContext, relationPath)
+			const targetFacts = this.whereOptimizer.factsThroughRelation(facts, entity, fieldName)
+			const guarded = Object.keys(readGuard).length > 0 && !this.whereOptimizer.isImpliedByFacts(readGuard, targetEntity, targetFacts)
 			const newPath = path.for(hopPathSegment(fieldName, { row: guarded, field: false }))
-			const targetSource = guarded ? this.whereBuilder.buildGuardedSource(targetEntity, newPath, guard) : undefined
+			const targetSource = guarded ? this.whereBuilder.buildGuardedSource(targetEntity, newPath, readGuard) : undefined
 			const joined = this.joinBuilder.join(qb, newPath, entity, fieldName, targetSource)
 
-			return this.buildOne(joined, orderable, targetEntity, newPath, value, [...relationPath, relationContext], nextHopGuards)
+			return this.buildOne(joined, orderable, targetEntity, newPath, value, [...relationPath, relationContext], nextHopGuards, targetFacts)
 		}
 	}
 

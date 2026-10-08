@@ -136,6 +136,7 @@ export class MasterContainerFactory {
 			.addService('graphqlSchemaCache', ({ serverConfig }) =>
 				new ContentApiSpecificCache<Schema, GraphQLSchemaFactoryResult>({
 					ttlSeconds: serverConfig.contentApi?.schemaCacheTtlSeconds,
+					maxEntries: serverConfig.contentApi?.schemaCacheMaxEntries,
 				}))
 			.addService('graphQlSchemaFactory', ({ plugins, providers, graphqlSchemaCache, contentPermissionFactory, graphQlSchemaBuilderFactory }) => {
 				const contributors = plugins

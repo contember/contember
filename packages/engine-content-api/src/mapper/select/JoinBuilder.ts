@@ -13,6 +13,7 @@ export class JoinBuilder {
 		entity: Model.Entity,
 		relationName: string,
 		targetSource?: Literal,
+		joinCondition?: Literal,
 	): SelectBuilder<R> {
 		const targetEntity = getTargetEntity(this.schema, entity, relationName)
 		if (!targetEntity) {
@@ -29,10 +30,14 @@ export class JoinBuilder {
 			}
 			const sourceAlias = join.sourceAlias || path.back().alias
 
+			// An extra condition (a masked relation field) restricts the first join, so the whole relation reads empty.
 			return qb.leftJoin(
 				sources[index] ?? join.tableName,
 				targetAlias,
-				clause => clause.compareColumns([sourceAlias, join.sourceColumn], Operator.eq, [targetAlias, join.targetColumn]),
+				clause =>
+					clause.compareColumns([sourceAlias, join.sourceColumn], Operator.eq, [targetAlias, join.targetColumn]).with(
+						index === 0 ? joinCondition : undefined,
+					),
 			)
 		}, qb)
 	}

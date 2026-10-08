@@ -3,7 +3,15 @@ import { ConditionOptimizer } from './ConditionOptimizer.js'
 import { acceptFieldVisitor } from '@contember/schema-utils'
 import { optimizeAnd, optimizeNot, optimizeOr } from './helpers.js'
 import { replaceWhere } from './WhereReplacer.js'
-import { READ_GUARD_KEY, splitReadGuard } from '../../../acl/PredicatesInjector.js'
+import {
+	FIELD_GUARD_KEY,
+	MASKED_CELL_KEY,
+	MaskedCell,
+	parseMaskedCells,
+	READ_GUARD_KEY,
+	splitFieldGuard,
+	splitReadGuard,
+} from '../../../acl/PredicatesInjector.js'
 
 type ExtendedRelationContext = {
 	context: Model.AnyRelationContext
@@ -125,6 +133,8 @@ export class WhereOptimizer {
 				}
 			} else if (key === 'not') {
 				operand = optimizeNot(this.optimizeWhere(value as Input.OptionalWhere, entity, relationPath))
+			} else if (key === MASKED_CELL_KEY) {
+				operand = this.optimizeAnd(parseMaskedCells(value).map(cell => this.optimizeMaskedCell(cell, entity, relationPath)), entity, relationPath)
 			} else {
 				operand = this.resolveFieldValue(entity, key, value, relationPath)
 			}
@@ -136,6 +146,16 @@ export class WhereOptimizer {
 			}
 		}
 		return this.optimizeAnd(operands, entity, relationPath)
+	}
+
+	/** Guard and condition are optimized apart: the masked form depends on the condition alone. */
+	private optimizeMaskedCell(masked: MaskedCell, entity: Model.Entity, relationPath: ExtendedRelationContext[]): Input.OptionalWhere | boolean {
+		const where = this.optimizeWhere(masked.where, entity, relationPath)
+		const guard = this.optimizeWhere(masked.guard, entity, relationPath)
+		if (typeof where === 'boolean' || guard === true || (typeof guard !== 'boolean' && Object.keys(guard).length === 0)) {
+			return where
+		}
+		return { [MASKED_CELL_KEY]: [{ guard: guard === false ? { [entity.primary]: { never: true } } : guard, where }] }
 	}
 
 	private optimizeOr(
@@ -212,7 +232,10 @@ export class WhereOptimizer {
 				return { [key]: optimizedCondition }
 			},
 			visitRelation: context => {
-				let where = value as Input.OptionalWhere
+				// The field guard is a where over this (source) entity, so it is optimized here, not with the target.
+				const { fieldGuard: rawFieldGuard, where: relationWhere } = splitFieldGuard(value as Input.OptionalWhere)
+				const fieldGuard = rawFieldGuard === undefined ? true : this.optimizeWhere(rawFieldGuard, entity, relationPath)
+				let where: Input.OptionalWhere = relationWhere
 				const newRelationPath: ExtendedRelationContext[] = [...relationPath]
 				const length = relationPath.length
 				if (length > 0 && relationPath[length - 1].context.targetRelation?.name === context.relation.name) {
@@ -232,8 +255,11 @@ export class WhereOptimizer {
 				if (typeof optimizedWhere === 'boolean') {
 					return optimizedWhere
 				}
-
-				return { [key]: optimizedWhere }
+				if (fieldGuard === true || (fieldGuard !== false && Object.keys(fieldGuard).length === 0)) {
+					return { [key]: optimizedWhere }
+				}
+				const fieldGuardWhere = fieldGuard === false ? { [entity.primary]: { never: true } } : fieldGuard
+				return { [key]: { ...optimizedWhere, [FIELD_GUARD_KEY]: fieldGuardWhere } }
 			},
 		})
 	}

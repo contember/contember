@@ -1,5 +1,5 @@
 import { Acl, Input, Model, Writable } from '@contember/schema'
-import { acceptFieldVisitor } from '@contember/schema-utils'
+import { acceptFieldVisitor, isColumn } from '@contember/schema-utils'
 import { PredicateFactory } from './PredicateFactory.js'
 
 /**
@@ -10,13 +10,50 @@ import { PredicateFactory } from './PredicateFactory.js'
  */
 export const READ_GUARD_KEY = '$readGuard'
 
+/**
+ * Internal where key on a relation hop carrying the read predicate of the relation FIELD when it is stricter than
+ * the source row's (a cell-level relation). It is a where over the SOURCE entity. The WhereBuilder makes the hop
+ * read empty where the predicate does not hold, so a masked relation behaves exactly like an empty one.
+ */
+export const FIELD_GUARD_KEY = '$fieldGuard'
+
+/**
+ * Internal where key carrying, for each cell-level column of a where level, its condition (`where`, a single-field
+ * where) together with the column's read predicate (`guard`). The WhereBuilder compiles each so that a masked cell
+ * behaves exactly like a NULL value: the condition holds on a masked cell iff it holds on NULL. The cells sit next
+ * to the other keys of the level, so the level keeps the shape the user wrote.
+ */
+export const MASKED_CELL_KEY = '$maskedCell'
+
 const isWhere = (value: Input.OptionalWhere[string]): value is Input.OptionalWhere =>
 	value !== null && value !== undefined && typeof value === 'object' && !Array.isArray(value)
 
-/** Separates the hop's read guard from the user-authored remainder; the guard is empty when absent. */
-export const splitReadGuard = (where: Input.OptionalWhere): { guard: Input.OptionalWhere; where: Input.OptionalWhere } => {
-	const { [READ_GUARD_KEY]: guard, ...rest } = where
-	return { guard: isWhere(guard) ? guard : {}, where: rest }
+export type MaskedCell = { guard: Input.OptionalWhere; where: Input.OptionalWhere }
+
+export const parseMaskedCells = (value: Input.OptionalWhere[string]): MaskedCell[] => {
+	if (!Array.isArray(value)) {
+		throw new Error(`${MASKED_CELL_KEY} expects a list of masked cells`)
+	}
+	return value.map(cell => {
+		if (!isWhere(cell) || !isWhere(cell.guard) || !isWhere(cell.where)) {
+			throw new Error(`${MASKED_CELL_KEY} expects a guard and a where`)
+		}
+		return { guard: cell.guard, where: cell.where }
+	})
+}
+
+/** Separates the field guard of a relation hop; undefined when the relation field is not cell-level. */
+export const splitFieldGuard = (where: Input.OptionalWhere): { fieldGuard: Input.OptionalWhere | undefined; where: Input.OptionalWhere } => {
+	const { [FIELD_GUARD_KEY]: fieldGuard, ...rest } = where
+	return { fieldGuard: isWhere(fieldGuard) ? fieldGuard : undefined, where: rest }
+}
+
+export type HopGuards = { guard: Input.OptionalWhere; fieldGuard: Input.OptionalWhere; where: Input.OptionalWhere }
+
+/** Separates the hop's read guards from the user-authored remainder; a guard is empty when absent. */
+export const splitReadGuard = (where: Input.OptionalWhere): HopGuards => {
+	const { [READ_GUARD_KEY]: guard, [FIELD_GUARD_KEY]: fieldGuard, ...rest } = where
+	return { guard: isWhere(guard) ? guard : {}, fieldGuard: isWhere(fieldGuard) ? fieldGuard : {}, where: rest }
 }
 
 export class PredicatesInjector {
@@ -43,7 +80,7 @@ export class PredicatesInjector {
 	): Input.OptionalWhere {
 		const isQueryRoot = !relationContext && (!ancestorPath || ancestorPath.length === 0)
 		const restrictedWhere = this.injectToWhere(where, entity, true, relationContext, ancestorPath ?? [], isQueryRoot)
-		return this.createWhere(entity, undefined, restrictedWhere, relationContext, isQueryRoot)
+		return this.createWhere(entity, restrictedWhere, relationContext, isQueryRoot)
 	}
 
 	/**
@@ -75,20 +112,16 @@ export class PredicatesInjector {
 	}
 
 	/**
-	 * ANDs the read predicates of `fieldNames` (cell-level guards) onto `where`. With `fieldNames`
-	 * undefined this is the row-level predicate of the injection root — the only place the row predicate
+	 * ANDs the row-level read predicate of the injection root onto `where` — the only place the row predicate
 	 * lands in the WHERE; relation targets carry theirs in `READ_GUARD_KEY` instead.
 	 */
 	private createWhere(
 		entity: Model.Entity,
-		fieldNames: string[] | undefined,
 		where: Input.OptionalWhere,
 		relationContext: Model.AnyRelationContext | undefined,
 		isQueryRoot: boolean | undefined,
 	): Input.OptionalWhere {
-		// A nested relation target is reached THROUGH a relation, so it consults the `all` permission set
-		// (`isRoot = false`). `isQueryRoot === undefined` (callers not tracking it) is preserved as-is.
-		const predicatesWhere = this.predicateFactory.create(entity, Acl.Operation.read, fieldNames, relationContext, isQueryRoot)
+		const predicatesWhere = this.predicateFactory.create(entity, Acl.Operation.read, undefined, relationContext, isQueryRoot)
 
 		const and = [where, predicatesWhere].filter(it => Object.keys(it).length > 0)
 		if (and.length === 0) {
@@ -128,6 +161,13 @@ export class PredicatesInjector {
 		if (fields.length === 0) {
 			return resultWhere
 		}
+		// Only cell-level fields (a read predicate stricter than the row-level one) need a guard of their own; the
+		// row-level predicate is enforced once — in the WHERE of the injection root, or in the guarded source of a
+		// relation hop. An empty column condition reads nothing, so a guard there would only filter by readability;
+		// an empty relation condition can still test presence (`EXISTS`), so a relation keeps its guard.
+		const predicateContext = isRoot ? isQueryRoot : false
+		const isCellLevel = (field: string) => this.predicateFactory.shouldApplyCellLevelPredicate(entity, Acl.Operation.read, field, predicateContext)
+		const fieldGuard = (field: string) => this.predicateFactory.create(entity, Acl.Operation.read, [field], relationContext, predicateContext)
 		for (let field of fields) {
 			resultWhere[field] = acceptFieldVisitor(this.schema, entity, field, {
 				visitColumn: () => where[field],
@@ -139,20 +179,26 @@ export class PredicatesInjector {
 					const nestedAncestorPath: Model.AnyRelationContext[] = [...ancestorPath, context]
 					const nestedWhere = this.injectToWhere(relationWhere, context.targetEntity, false, context, nestedAncestorPath, false)
 					const guard = this.createReadGuard(context, ancestorPath)
-					if (Object.keys(guard).length === 0) {
-						return nestedWhere
+					return {
+						...nestedWhere,
+						...(Object.keys(guard).length > 0 ? { [READ_GUARD_KEY]: guard } : {}),
+						...(isCellLevel(field) ? { [FIELD_GUARD_KEY]: fieldGuard(field) } : {}),
 					}
-					return { ...nestedWhere, [READ_GUARD_KEY]: guard }
 				},
 			})
 		}
-		// Only cell-level fields (a read predicate stricter than the row-level one) need a guard next to their
-		// condition; the row-level predicate is enforced once — in the WHERE of the injection root, or in the
-		// guarded join of a relation hop.
-		const fieldsForPredicate = fields.filter(it =>
-			this.predicateFactory.shouldApplyCellLevelPredicate(entity, Acl.Operation.read, it, isRoot ? isQueryRoot : false)
-		)
+		const maskedColumns = fields.filter(it => isColumn(entity.fields[it]) && !this.isEmptyCondition(where[it]) && isCellLevel(it))
+		if (maskedColumns.length === 0) {
+			return resultWhere
+		}
+		resultWhere[MASKED_CELL_KEY] = maskedColumns.map(field => ({ guard: fieldGuard(field), where: { [field]: resultWhere[field] } }))
+		for (const field of maskedColumns) {
+			delete resultWhere[field]
+		}
+		return resultWhere
+	}
 
-		return this.createWhere(entity, fieldsForPredicate, resultWhere, relationContext, isRoot ? isQueryRoot : false)
+	private isEmptyCondition(value: Input.OptionalWhere[string]): boolean {
+		return isWhere(value) && Object.keys(value).length === 0
 	}
 }

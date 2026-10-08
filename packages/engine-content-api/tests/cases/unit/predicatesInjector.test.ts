@@ -1,12 +1,22 @@
-import { PermissionFactory, PredicateFactory, PredicatesInjector, READ_GUARD_KEY, VariableInjector } from '../../../src/acl/index.js'
+import {
+	FIELD_GUARD_KEY,
+	MASKED_CELL_KEY,
+	PermissionFactory,
+	PredicateFactory,
+	PredicatesInjector,
+	READ_GUARD_KEY,
+	VariableInjector,
+} from '../../../src/acl/index.js'
 import { AclDefinition as acl, createSchema, PermissionsBuilder, SchemaBuilder, SchemaDefinition as def } from '@contember/schema-definition'
-import { Acl, Model } from '@contember/schema'
+import { Acl, Input, Model } from '@contember/schema'
 import { describe, it } from 'bun:test'
 import { WhereOptimizer } from '../../../src/mapper/select/optimizer/WhereOptimizer.js'
 import { ConditionOptimizer } from '../../../src/mapper/select/optimizer/ConditionOptimizer.js'
 import { acceptFieldVisitor, AllowAllPermissionFactory } from '@contember/schema-utils'
 import { testUuid } from '../../src/testUuid.js'
 import { assert } from '../../src/assert.js'
+
+const maskedCell = (where: Input.OptionalWhere, guard: Input.OptionalWhere): Input.OptionalWhere => ({ guard, where })
 
 const schema = new SchemaBuilder()
 	.enum('locale', ['cs', 'en'])
@@ -91,21 +101,20 @@ describe('Predicates injector', () => {
 		const result = injector.inject(schema.entities['PostLocale'], { title: { eq: 'abc' } })
 
 		assert.deepStrictEqual(result, {
-			and: [
-				{
-					and: [
-						{
-							title: { eq: 'abc' },
-						},
-						{
-							locale: { in: ['cs'] },
-						},
-					],
-				},
-				{
-					locale: { in: ['cs'] },
-				},
-			],
+			and: [{ [MASKED_CELL_KEY]: [maskedCell({ title: { eq: 'abc' } }, { locale: { in: ['cs'] } })] }, { locale: { in: ['cs'] } }],
+		})
+	})
+
+	it('adds no cell guard to an empty field condition', () => {
+		const injector = new PredicatesInjector(
+			schema,
+			new PredicateFactory(permissions, schema, new VariableInjector(schema, variables)),
+		)
+
+		const result = injector.inject(schema.entities['PostLocale'], { title: {} })
+
+		assert.deepStrictEqual(result, {
+			and: [{ title: {} }, { locale: { in: ['cs'] } }],
 		})
 	})
 })
@@ -1226,15 +1235,12 @@ describe('predicates injector - SECURITY: cell-level predicates on back-referenc
 		// but the cell-level predicate of `secret` must stay — without it, the filter
 		// would leak the value of an unreadable field through row presence
 		assert.deepStrictEqual(injected, {
-			and: [
-				{
-					and: [
-						{ parent: { and: [{ secret: { eq: 'X' } }, { secretVisible: { eq: true } }] } },
-						{ isPublished: { eq: true } },
-					],
+			and: [{
+				parent: {
+					[MASKED_CELL_KEY]: [maskedCell({ secret: { eq: 'X' } }, { secretVisible: { eq: true } })],
+					[FIELD_GUARD_KEY]: { isPublished: { eq: true } },
 				},
-				{ or: [{ isPublished: { eq: true } }, { secretVisible: { eq: true } }] },
-			],
+			}, { or: [{ isPublished: { eq: true } }, { secretVisible: { eq: true } }] }],
 		})
 	})
 
@@ -1253,22 +1259,15 @@ describe('predicates injector - SECURITY: cell-level predicates on back-referenc
 		// Both `name` and `secret` have predicates stricter than the row union,
 		// so both cell-level predicates are enforced
 		assert.deepStrictEqual(injected, {
-			and: [
-				{
-					and: [
-						{
-							parent: {
-								and: [
-									{ name: { eq: 'A' }, secret: { eq: 'X' } },
-									{ and: [{ isPublished: { eq: true } }, { secretVisible: { eq: true } }] },
-								],
-							},
-						},
-						{ isPublished: { eq: true } },
+			and: [{
+				parent: {
+					[MASKED_CELL_KEY]: [
+						maskedCell({ name: { eq: 'A' } }, { isPublished: { eq: true } }),
+						maskedCell({ secret: { eq: 'X' } }, { secretVisible: { eq: true } }),
 					],
+					[FIELD_GUARD_KEY]: { isPublished: { eq: true } },
 				},
-				{ or: [{ isPublished: { eq: true } }, { secretVisible: { eq: true } }] },
-			],
+			}, { or: [{ isPublished: { eq: true } }, { secretVisible: { eq: true } }] }],
 		})
 	})
 
@@ -1286,15 +1285,9 @@ describe('predicates injector - SECURITY: cell-level predicates on back-referenc
 
 		// The primary's predicate IS the row-level predicate, already verified upstream
 		assert.deepStrictEqual(injected, {
-			and: [
-				{
-					and: [
-						{ parent: { id: { in: [testUuid(1)] } } },
-						{ isPublished: { eq: true } },
-					],
-				},
-				{ or: [{ isPublished: { eq: true } }, { secretVisible: { eq: true } }] },
-			],
+			and: [{ parent: { id: { in: [testUuid(1)] }, [FIELD_GUARD_KEY]: { isPublished: { eq: true } } } }, {
+				or: [{ isPublished: { eq: true } }, { secretVisible: { eq: true } }],
+			}],
 		})
 	})
 
@@ -1308,23 +1301,16 @@ describe('predicates injector - SECURITY: cell-level predicates on back-referenc
 		)
 
 		assert.deepStrictEqual(injected, {
-			and: [
-				{
-					and: [
-						{
-							children: {
-								and: [
-									{ parent: { and: [{ secret: { eq: 'X' } }, { secretVisible: { eq: true } }] } },
-									{ isPublished: { eq: true } },
-								],
-								[READ_GUARD_KEY]: { or: [{ isPublished: { eq: true } }, { secretVisible: { eq: true } }] },
-							},
-						},
-						{ isPublished: { eq: true } },
-					],
+			and: [{
+				children: {
+					parent: {
+						[MASKED_CELL_KEY]: [maskedCell({ secret: { eq: 'X' } }, { secretVisible: { eq: true } })],
+						[FIELD_GUARD_KEY]: { isPublished: { eq: true } },
+					},
+					[READ_GUARD_KEY]: { or: [{ isPublished: { eq: true } }, { secretVisible: { eq: true } }] },
+					[FIELD_GUARD_KEY]: { isPublished: { eq: true } },
 				},
-				{ or: [{ isPublished: { eq: true } }, { secretVisible: { eq: true } }] },
-			],
+			}, { or: [{ isPublished: { eq: true } }, { secretVisible: { eq: true } }] }],
 		})
 	})
 
@@ -1345,25 +1331,14 @@ describe('predicates injector - SECURITY: cell-level predicates on back-referenc
 
 		// The guard of `secret` must be preserved inside the or branch as well
 		assert.deepStrictEqual(injected, {
-			and: [
-				{
-					or: [
-						{
-							and: [
-								{ parent: { and: [{ secret: { eq: 'X' } }, { secretVisible: { eq: true } }] } },
-								{ isPublished: { eq: true } },
-							],
-						},
-						{
-							and: [
-								{ name: { eq: 'A' } },
-								{ isPublished: { eq: true } },
-							],
-						},
-					],
-				},
-				{ or: [{ isPublished: { eq: true } }, { secretVisible: { eq: true } }] },
-			],
+			and: [{
+				or: [{
+					parent: {
+						[MASKED_CELL_KEY]: [maskedCell({ secret: { eq: 'X' } }, { secretVisible: { eq: true } })],
+						[FIELD_GUARD_KEY]: { isPublished: { eq: true } },
+					},
+				}, { [MASKED_CELL_KEY]: [maskedCell({ name: { eq: 'A' } }, { isPublished: { eq: true } })] }],
+			}, { or: [{ isPublished: { eq: true } }, { secretVisible: { eq: true } }] }],
 		})
 	})
 
@@ -1380,17 +1355,14 @@ describe('predicates injector - SECURITY: cell-level predicates on back-referenc
 		)
 
 		assert.deepStrictEqual(injected, {
-			and: [
-				{
-					not: {
-						and: [
-							{ parent: { and: [{ secret: { eq: 'X' } }, { secretVisible: { eq: true } }] } },
-							{ isPublished: { eq: true } },
-						],
+			and: [{
+				not: {
+					parent: {
+						[MASKED_CELL_KEY]: [maskedCell({ secret: { eq: 'X' } }, { secretVisible: { eq: true } })],
+						[FIELD_GUARD_KEY]: { isPublished: { eq: true } },
 					},
 				},
-				{ or: [{ isPublished: { eq: true } }, { secretVisible: { eq: true } }] },
-			],
+			}, { or: [{ isPublished: { eq: true } }, { secretVisible: { eq: true } }] }],
 		})
 	})
 
@@ -1409,15 +1381,13 @@ describe('predicates injector - SECURITY: cell-level predicates on back-referenc
 		// `id` carries the row-level predicate (already verified upstream) and is filtered out,
 		// `secret` is stricter and its cell-level guard must be enforced
 		assert.deepStrictEqual(injected, {
-			and: [
-				{
-					and: [
-						{ parent: { and: [{ id: { in: [testUuid(1)] }, secret: { eq: 'X' } }, { secretVisible: { eq: true } }] } },
-						{ isPublished: { eq: true } },
-					],
+			and: [{
+				parent: {
+					id: { in: [testUuid(1)] },
+					[MASKED_CELL_KEY]: [maskedCell({ secret: { eq: 'X' } }, { secretVisible: { eq: true } })],
+					[FIELD_GUARD_KEY]: { isPublished: { eq: true } },
 				},
-				{ or: [{ isPublished: { eq: true } }, { secretVisible: { eq: true } }] },
-			],
+			}, { or: [{ isPublished: { eq: true } }, { secretVisible: { eq: true } }] }],
 		})
 	})
 })
@@ -1505,20 +1475,13 @@ describe('predicates injector - SECURITY: cell-level predicates on many-to-many 
 		// Post's row-level predicate becomes the hop's read guard, and the cell-level guard
 		// of `internalNote` must stay next to the condition
 		assert.deepStrictEqual(injected, {
-			and: [
-				{
-					and: [
-						{
-							posts: {
-								and: [{ internalNote: { eq: 'X' } }, { internalVisible: { eq: true } }],
-								[READ_GUARD_KEY]: { or: [{ isPublished: { eq: true } }, { internalVisible: { eq: true } }] },
-							},
-						},
-						{ isActive: { eq: true } },
-					],
+			and: [{
+				posts: {
+					[MASKED_CELL_KEY]: [maskedCell({ internalNote: { eq: 'X' } }, { internalVisible: { eq: true } })],
+					[READ_GUARD_KEY]: { or: [{ isPublished: { eq: true } }, { internalVisible: { eq: true } }] },
+					[FIELD_GUARD_KEY]: { isActive: { eq: true } },
 				},
-				{ or: [{ isActive: { eq: true } }, { secretVisible: { eq: true } }] },
-			],
+			}, { or: [{ isActive: { eq: true } }, { secretVisible: { eq: true } }] }],
 		})
 	})
 
@@ -1535,20 +1498,13 @@ describe('predicates injector - SECURITY: cell-level predicates on many-to-many 
 		)
 
 		assert.deepStrictEqual(injected, {
-			and: [
-				{
-					and: [
-						{
-							tags: {
-								and: [{ secret: { eq: 'X' } }, { secretVisible: { eq: true } }],
-								[READ_GUARD_KEY]: { or: [{ isActive: { eq: true } }, { secretVisible: { eq: true } }] },
-							},
-						},
-						{ isPublished: { eq: true } },
-					],
+			and: [{
+				tags: {
+					[MASKED_CELL_KEY]: [maskedCell({ secret: { eq: 'X' } }, { secretVisible: { eq: true } })],
+					[READ_GUARD_KEY]: { or: [{ isActive: { eq: true } }, { secretVisible: { eq: true } }] },
+					[FIELD_GUARD_KEY]: { isPublished: { eq: true } },
 				},
-				{ or: [{ isPublished: { eq: true } }, { internalVisible: { eq: true } }] },
-			],
+			}, { or: [{ isPublished: { eq: true } }, { internalVisible: { eq: true } }] }],
 		})
 	})
 })
@@ -1622,27 +1578,12 @@ describe('predicates injector - SECURITY: relation-traversing cell-level predica
 		// The retained guard of `secret` traverses `meta`; the guard is the author's
 		// rule and is applied verbatim — ArticleMeta's own predicate is NOT re-applied inside it
 		assert.deepStrictEqual(injected, {
-			and: [
-				{
-					and: [
-						{
-							parent: {
-								and: [
-									{ secret: { eq: 'X' } },
-									{ meta: { secretVisible: { eq: true } } },
-								],
-							},
-						},
-						{ isPublished: { eq: true } },
-					],
+			and: [{
+				parent: {
+					[MASKED_CELL_KEY]: [maskedCell({ secret: { eq: 'X' } }, { meta: { secretVisible: { eq: true } } })],
+					[FIELD_GUARD_KEY]: { isPublished: { eq: true } },
 				},
-				{
-					or: [
-						{ isPublished: { eq: true } },
-						{ meta: { secretVisible: { eq: true } } },
-					],
-				},
-			],
+			}, { or: [{ isPublished: { eq: true } }, { meta: { secretVisible: { eq: true } } }] }],
 		})
 	})
 })
@@ -1768,25 +1709,15 @@ describe('predicates injector - SECURITY: cell-level decision uses the through c
 		// decision made against the root set, `secret` would look row-level there, be dropped, and the filter
 		// would leak `secret` for viewer-only-readable rows.
 		assert.deepStrictEqual(injected, {
-			and: [
-				{
-					children: {
-						and: [
-							{
-								parent: {
-									and: [
-										{ secret: { eq: 'X' } },
-										{ isEditor: { eq: true } },
-									],
-								},
-							},
-							{ or: [{ isEditor: { eq: true } }, { isViewer: { eq: true } }] },
-						],
-						[READ_GUARD_KEY]: { or: [{ isEditor: { eq: true } }, { or: [{ isEditor: { eq: true } }, { isViewer: { eq: true } }] }] },
+			and: [{
+				children: {
+					parent: {
+						[MASKED_CELL_KEY]: [maskedCell({ secret: { eq: 'X' } }, { isEditor: { eq: true } })],
+						[FIELD_GUARD_KEY]: { or: [{ isEditor: { eq: true } }, { isViewer: { eq: true } }] },
 					},
+					[READ_GUARD_KEY]: { or: [{ isEditor: { eq: true } }, { or: [{ isEditor: { eq: true } }, { isViewer: { eq: true } }] }] },
 				},
-				{ isEditor: { eq: true } },
-			],
+			}, { isEditor: { eq: true } }],
 		})
 	})
 })
@@ -2035,7 +1966,7 @@ describe('predicates injector - SECURITY: to-many back-reference keeps sibling r
 		)
 		assert.deepStrictEqual(injectedSecret, {
 			articles: {
-				and: [{ secret: { eq: 'X' } }, { isSecretVisible: { eq: true } }],
+				[MASKED_CELL_KEY]: [maskedCell({ secret: { eq: 'X' } }, { isSecretVisible: { eq: true } })],
 				[READ_GUARD_KEY]: { or: [{ isPublished: { eq: true } }, { isSecretVisible: { eq: true } }] },
 			},
 		})
@@ -2049,7 +1980,7 @@ describe('predicates injector - SECURITY: to-many back-reference keeps sibling r
 		)
 		assert.deepStrictEqual(injectedTitle, {
 			articles: {
-				and: [{ title: { eq: 'T' } }, { isPublished: { eq: true } }],
+				[MASKED_CELL_KEY]: [maskedCell({ title: { eq: 'T' } }, { isPublished: { eq: true } })],
 				[READ_GUARD_KEY]: { or: [{ isPublished: { eq: true } }, { isSecretVisible: { eq: true } }] },
 			},
 		})

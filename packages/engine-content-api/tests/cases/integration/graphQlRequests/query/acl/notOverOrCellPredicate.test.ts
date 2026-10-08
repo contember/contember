@@ -5,21 +5,10 @@ import { execute } from '../../../../../src/test.js'
 import { GQL, SQL } from '../../../../../src/tags.js'
 import { testUuid } from '../../../../../src/testUuid.js'
 
-// A guarded cell condition is lowered as `cond AND guard`, with the AND placed INSIDE any surrounding `not`,
-// next to the field condition:
-//     not( (secret_a = X AND visible_a) OR (secret_b = Y AND visible_b) )
-// These tests pin that lowering at the SQL level for the `NOT(A OR B)` and single-field `NOT` shapes.
-//
-// KNOWN LIMITATION — this lowering is value-safe only while the guard evaluates to FALSE, not NULL:
-//   guard FALSE: `secret_a = X AND false` is a value-INDEPENDENT constant false, so negating it cannot turn the
-//                unreadable value into a row-inclusion signal.
-//   guard NULL:  SQL three-valued logic makes it value-DEPENDENT — verified on PG 16,
-//                `not('X'='X' and null)` is NULL (row excluded) while `not('Y'='X' and null)` is TRUE (included),
-//                so `NOT` over a nullable guard column is a bisection oracle over the masked cell.
-// A guard is NULL whenever its column is nullable (as `visibleA`/`visibleB` are below) or whenever a to-one hop
-// it traverses is absent. Closing this needs the guard lowered as `<guard> IS TRUE`, which is a SQL-shape change
-// across every consumer — it belongs to the readable-view follow-up, not here. Declaring guard columns `notNull`
-// avoids it in the meantime.
+// A condition on a guarded cell holds on a masked cell iff it holds on NULL. Under a negation an `eq` on a masked
+// cell must stay NULL like on a real NULL, so it compiles to `case when coalesce(guard, false) then cond end`:
+// neither the masked value nor a NULL guard (a nullable guard column, or an absent to-one hop it traverses) can
+// turn into a row-inclusion signal. Outside a negation it stays `cond AND guard`, which keeps it sargable.
 
 const schema = new SchemaBuilder()
 	.entity('Author', e =>
@@ -65,9 +54,9 @@ test('NOT(A OR B) over two differently-guarded cells keeps each guard beside its
 				sql: SQL`
 					select "root_"."id" as "root_id"
 					from "public"."author" as "root_"
-					where not(("root_"."secret_a" = ? and "root_"."visible_a" = ? or "root_"."secret_b" = ? and "root_"."visible_b" = ?))
+					where not((case when coalesce("root_"."visible_a" = ?, false) then "root_"."secret_a" = ? end or case when coalesce("root_"."visible_b" = ?, false) then "root_"."secret_b" = ? end))
 				`,
-				parameters: ['X', true, 'Y', true],
+				parameters: [true, 'X', true, 'Y'],
 				response: { rows: [{ root_id: testUuid(1) }] },
 			},
 		],
@@ -95,15 +84,72 @@ test('single-field NOT over a guarded cell keeps the guard inside the negation',
 				sql: SQL`
 					select "root_"."id" as "root_id"
 					from "public"."author" as "root_"
-					where not("root_"."secret_a" = ? and "root_"."visible_a" = ?)
+					where not(case when coalesce("root_"."visible_a" = ?, false) then "root_"."secret_a" = ? end)
 				`,
-				parameters: ['X', true],
+				parameters: [true, 'X'],
 				response: { rows: [{ root_id: testUuid(1) }] },
 			},
 		],
 		return: {
 			data: {
 				listAuthor: [{ id: testUuid(1) }],
+			},
+		},
+	})
+})
+
+test('isNull on a guarded cell matches a masked cell like a NULL', async () => {
+	await execute({
+		schema,
+		permissions,
+		variables: {},
+		query: GQL`
+        query {
+          listAuthor(filter: { secretA: { isNull: true } }) {
+            id
+          }
+        }`,
+		executes: [
+			{
+				sql: SQL`
+					select "root_"."id" as "root_id"
+					from "public"."author" as "root_"
+					where ("root_"."secret_a" is null or not coalesce("root_"."visible_a" = ?, false))
+				`,
+				parameters: [true],
+				response: { rows: [{ root_id: testUuid(1) }] },
+			},
+		],
+		return: {
+			data: {
+				listAuthor: [{ id: testUuid(1) }],
+			},
+		},
+	})
+})
+
+test('a guarded cell condition keeps the optimization of its sibling conditions', async () => {
+	// `{ and: [], not: { or: [] } }` optimizes to FALSE on its own; the masked atom must not change that.
+	await execute({
+		schema,
+		permissions,
+		variables: {},
+		query: GQL`
+        query {
+          listAuthor(filter: { and: [], secretA: { eq: "X" }, not: { or: [] } }) {
+            id
+          }
+        }`,
+		executes: [
+			{
+				sql: SQL`select "root_"."id" as "root_id" from "public"."author" as "root_" where false`,
+				parameters: [],
+				response: { rows: [] },
+			},
+		],
+		return: {
+			data: {
+				listAuthor: [],
 			},
 		},
 	})

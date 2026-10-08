@@ -4,6 +4,7 @@ import { SchemaDefinition as def } from '@contember/schema-definition'
 import { WhereOptimizer } from '../../../src/mapper/select/optimizer/WhereOptimizer.js'
 import { acceptFieldVisitor } from '@contember/schema-utils'
 import { assert } from '../../src/assert.js'
+import { FIELD_GUARD_KEY } from '../../../src/acl/index.js'
 
 namespace TestModel {
 	export class Author {
@@ -32,6 +33,20 @@ describe('where optimized', () => {
 	const conditionOptimizer = new ConditionOptimizer()
 	const model = def.createModel(TestModel)
 	const whereOptimizer = new WhereOptimizer(model, conditionOptimizer)
+
+	it('keeps a relation field guard that is never satisfied', () => {
+		assert.deepStrictEqual(
+			whereOptimizer.optimize({ image: { url: { eq: 'x' }, [FIELD_GUARD_KEY]: { id: { never: true } } } }, model.entities.Article),
+			{ image: { url: { eq: 'x' }, [FIELD_GUARD_KEY]: { id: { never: true } } } },
+		)
+	})
+
+	it('drops a relation field guard that always holds', () => {
+		assert.deepStrictEqual(
+			whereOptimizer.optimize({ image: { url: { eq: 'x' }, [FIELD_GUARD_KEY]: { id: { always: true } } } }, model.entities.Article),
+			{ image: { url: { eq: 'x' } } },
+		)
+	})
 
 	it('removes unnecessary condition', () => {
 		assert.deepStrictEqual(

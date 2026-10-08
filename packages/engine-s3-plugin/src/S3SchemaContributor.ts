@@ -81,7 +81,8 @@ export class S3SchemaContributor implements GraphQLSchemaContributor {
 		if (!project.s3) {
 			return undefined
 		}
-		const rules = identity.projectRoles.flatMap(it => Object.entries((schema.acl.roles[it]?.s3 as S3SchemaAcl) || {}))
+		// sorted, so getCacheKey does not depend on the order of memberships
+		const rules = [...identity.projectRoles].sort().flatMap(it => Object.entries((schema.acl.roles[it]?.s3 as S3SchemaAcl) || {}))
 
 		const uploadRules = rules.filter(([, it]) => it.upload).map(([it, val]) => ({
 			pattern: it,

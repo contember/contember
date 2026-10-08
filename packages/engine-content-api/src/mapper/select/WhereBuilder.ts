@@ -16,17 +16,6 @@ import {
 import { WhereOptimizationHints, WhereOptimizer } from './optimizer/WhereOptimizer.js'
 import { splitReadGuard } from '../../acl/PredicatesInjector.js'
 
-// Row expressions share one target row; set expressions combine correlated relation queries.
-// `absent` is "no readable related row, and `where` holds on the null-extended row", the LEFT JOIN meaning of a
-// relation `isNull` with sibling conditions. `where` never reaches the related rows, so an unreadable row stays
-// indistinguishable from an absent one.
-type RelationRowExpression = { kind: 'row'; where: Input.OptionalWhere }
-type RelationSetExpression =
-	| { kind: 'exists' | 'notExists' | 'absent'; where: Input.OptionalWhere }
-	| { kind: 'and' | 'or'; operands: readonly RelationSetExpression[] }
-	| { kind: 'not'; operand: RelationSetExpression }
-type RelationExpression = RelationRowExpression | RelationSetExpression
-
 /**
  * A user-authored relation hop: the remaining condition on the target rows and the target's row-level read
  * guard (see `READ_GUARD_KEY`). The guard is compiled into the hop's table source, never into its condition,
@@ -248,10 +237,6 @@ export class WhereBuilder {
 				if (Object.keys(relationWhere).length === 0) {
 					return conditionBuilder
 				}
-				const relationSetCondition = this.buildRelationSetCondition(conditionBuilder, context, relationWhere, guard, tableName, entity, targetPath)
-				if (relationSetCondition !== null) {
-					return relationSetCondition
-				}
 				// The FK shortcut skips the join, so it is only valid while every target row is readable.
 				if (isIt<Model.JoiningColumnRelation>(relation, 'joiningColumn') && Object.keys(guard).length === 0) {
 					const primaryCondition = this.transformWhereToPrimaryCondition(relationWhere, targetEntity.primary)
@@ -283,19 +268,6 @@ export class WhereBuilder {
 				})
 			}
 
-			const buildSetCondition = (context: Model.AnyRelationContext) => {
-				const { guard, where: relationWhere, path: targetPath } = hop()
-				return this.buildRelationSetCondition(
-					conditionBuilder,
-					context,
-					relationWhere,
-					guard,
-					tableName,
-					entity,
-					targetPath,
-				)
-			}
-
 			conditionBuilder = acceptFieldVisitor<SqlConditionBuilder>(this.schema, entity, fieldName, {
 				visitColumn: ({ entity, column }) => {
 					return this.conditionBuilder.build(conditionBuilder, tableName, column.columnName, column, fieldWhere as Input.Condition<Input.ColumnValue>)
@@ -304,10 +276,6 @@ export class WhereBuilder {
 				visitOneHasOneOwning: joinedWhere,
 				visitManyHasOne: joinedWhere,
 				visitManyHasManyInverse: context => {
-					const setCondition = buildSetCondition(context)
-					if (setCondition !== null) {
-						return setCondition
-					}
 					if (allowManyJoin && !this.useExistsInHasManyFilter) {
 						return joinedWhere(context)
 					}
@@ -326,10 +294,6 @@ export class WhereBuilder {
 					)
 				},
 				visitManyHasManyOwning: context => {
-					const setCondition = buildSetCondition(context)
-					if (setCondition !== null) {
-						return setCondition
-					}
 					if (allowManyJoin && !this.useExistsInHasManyFilter) {
 						return joinedWhere(context)
 					}
@@ -348,10 +312,6 @@ export class WhereBuilder {
 					)
 				},
 				visitOneHasMany: context => {
-					const setCondition = buildSetCondition(context)
-					if (setCondition !== null) {
-						return setCondition
-					}
 					if (allowManyJoin && !this.useExistsInHasManyFilter) {
 						return joinedWhere(context)
 					}
@@ -441,160 +401,6 @@ export class WhereBuilder {
 		})
 	}
 
-	private buildRelationSetCondition(
-		conditionBuilder: SqlConditionBuilder,
-		context: Model.AnyRelationContext,
-		where: Input.OptionalWhere,
-		guard: Input.OptionalWhere,
-		parentTableName: string,
-		parentEntity: Model.Entity,
-		targetPath: Path,
-	): SqlConditionBuilder | null {
-		// Without a guard, an owning to-one condition on the primary alone is a condition on the FK column
-		// (`fk IS NULL`, `fk IN (…)`) — leave it to the row path, which keeps the FK index usable.
-		if (
-			Object.keys(guard).length === 0
-			&& isIt<Model.JoiningColumnRelation>(context.relation, 'joiningColumn')
-			&& this.transformWhereToPrimaryCondition(where, context.targetEntity.primary) !== null
-		) {
-			return null
-		}
-		const expression = this.parseRelationWhere(where, context.targetEntity.primary)
-		if (expression.kind === 'row' || (expression.kind === 'exists' && Object.keys(expression.where).length === 0)) {
-			return null
-		}
-		return this.applyRelationSetExpression(conditionBuilder, expression, context, guard, parentTableName, parentEntity, targetPath)
-	}
-
-	private parseRelationWhere(where: Input.OptionalWhere, primary: string): RelationExpression {
-		const operands: RelationExpression[] = []
-		if (where.and) {
-			operands.push(...where.and.filter((it): it is Input.Where => !!it).map(it => this.parseRelationWhere(it, primary)))
-		}
-		if (where.or) {
-			const branches = where.or.filter((it): it is Input.Where => !!it).map(it => this.parseRelationWhere(it, primary))
-			operands.push(this.combineRelationOr(branches, primary))
-		}
-		if (where.not) {
-			operands.push(this.negateRelationExpression(this.parseRelationWhere(where.not, primary)))
-		}
-		for (const key of Object.keys(where)) {
-			if (key === 'and' || key === 'or' || key === 'not') {
-				continue
-			}
-			const value = where[key]
-			if (value === null || value === undefined) {
-				continue
-			}
-			operands.push(
-				key === primary && this.isInputCondition(value)
-					? this.parsePrimaryCondition(primary, value)
-					: { kind: 'row', where: { [key]: value } },
-			)
-		}
-		return this.combineRelationAnd(operands)
-	}
-
-	private parsePrimaryCondition(primary: string, condition: Input.Condition): RelationExpression {
-		if (condition.and) {
-			return this.combineRelationAnd(condition.and.map(it => this.parsePrimaryCondition(primary, it)))
-		}
-		if (condition.or) {
-			return this.combineRelationOr(condition.or.map(it => this.parsePrimaryCondition(primary, it)), primary)
-		}
-		if (condition.not) {
-			return this.negateRelationExpression(this.parsePrimaryCondition(primary, condition.not))
-		}
-		if (condition.isNull === true || condition.null === true) {
-			return { kind: 'absent', where: {} }
-		}
-		if (condition.isNull === false || condition.null === false) {
-			return { kind: 'exists', where: {} }
-		}
-		return { kind: 'row', where: { [primary]: condition } }
-	}
-
-	private combineRelationAnd(operands: readonly RelationExpression[]): RelationExpression {
-		const rowWheres: Input.OptionalWhere[] = []
-		const setOperands: RelationSetExpression[] = []
-		for (const operand of operands) {
-			if (operand.kind === 'row') {
-				if (Object.keys(operand.where).length > 0) {
-					rowWheres.push(operand.where)
-				}
-			} else {
-				setOperands.push(operand)
-			}
-		}
-		const rowWhere = this.combineWhereAnd(rowWheres)
-		if (setOperands.length === 0) {
-			return { kind: 'row', where: rowWhere }
-		}
-		const contextualized = setOperands.map(it => this.applyRelationRowContext(it, rowWhere))
-		return contextualized.length === 1 ? contextualized[0] : { kind: 'and', operands: contextualized }
-	}
-
-	private combineRelationOr(operands: readonly RelationExpression[], primary: string): RelationExpression {
-		if (operands.length === 0) {
-			return { kind: 'row', where: { [primary]: { never: true } } }
-		}
-		// An unconstrained branch (`{}`, `{and: []}`) makes the whole disjunction unconstrained. Promoting it via
-		// `toRelationSetExpression` would turn it into a bare `EXISTS(<any related row>)` with no read predicate,
-		// which leaks the presence of an unreadable row. Stay on the legacy row path, as before the set lowering.
-		if (operands.some(it => it.kind === 'row' && Object.keys(it.where).length === 0)) {
-			return { kind: 'row', where: {} }
-		}
-		if (operands.every((it): it is RelationRowExpression => it.kind === 'row')) {
-			return { kind: 'row', where: { or: operands.map(it => it.where) } }
-		}
-		const setOperands = operands.map(it => this.toRelationSetExpression(it))
-		return setOperands.length === 1 ? setOperands[0] : { kind: 'or', operands: setOperands }
-	}
-
-	private toRelationSetExpression(expression: RelationExpression): RelationSetExpression {
-		return expression.kind === 'row' ? { kind: 'exists', where: expression.where } : expression
-	}
-
-	private negateRelationExpression(expression: RelationExpression): RelationExpression {
-		switch (expression.kind) {
-			case 'row':
-				return { kind: 'row', where: { not: expression.where } }
-			case 'exists':
-				return Object.keys(expression.where).length === 0 ? { kind: 'absent', where: {} } : { kind: 'notExists', where: expression.where }
-			case 'notExists':
-				return { kind: 'exists', where: expression.where }
-			case 'absent':
-				return Object.keys(expression.where).length === 0 ? { kind: 'exists', where: {} } : { kind: 'not', operand: expression }
-			case 'not':
-				return expression.operand
-			case 'and':
-			case 'or':
-				return { kind: 'not', operand: expression }
-		}
-	}
-
-	private applyRelationRowContext(expression: RelationSetExpression, context: Input.OptionalWhere): RelationSetExpression {
-		if (Object.keys(context).length === 0) {
-			return expression
-		}
-		switch (expression.kind) {
-			case 'exists':
-			case 'absent':
-				return { kind: expression.kind, where: this.combineWhereAnd([expression.where, context]) }
-			case 'and':
-			case 'or':
-				return { kind: expression.kind, operands: expression.operands.map(it => this.applyRelationRowContext(it, context)) }
-			case 'notExists':
-			case 'not':
-				// Pushing the context under a negation would negate it too; it has to hold on the row itself.
-				return { kind: 'and', operands: [expression, this.rowContextAsSet(context)] }
-		}
-	}
-
-	private rowContextAsSet(context: Input.OptionalWhere): RelationSetExpression {
-		return { kind: 'or', operands: [{ kind: 'exists', where: context }, { kind: 'absent', where: context }] }
-	}
-
 	private combineWhereAnd(wheres: readonly Input.OptionalWhere[]): Input.OptionalWhere {
 		const nonEmpty = wheres.filter(it => Object.keys(it).length > 0)
 		if (nonEmpty.length === 0) {
@@ -603,153 +409,12 @@ export class WhereBuilder {
 		return nonEmpty.length === 1 ? nonEmpty[0] : { and: nonEmpty }
 	}
 
-	private applyRelationSetExpression(
-		conditionBuilder: SqlConditionBuilder,
-		expression: RelationSetExpression,
-		context: Model.AnyRelationContext,
-		guard: Input.OptionalWhere,
-		parentTableName: string,
-		parentEntity: Model.Entity,
-		targetPath: Path,
-	): SqlConditionBuilder {
-		const apply = (builder: SqlConditionBuilder, operand: RelationSetExpression) =>
-			this.applyRelationSetExpression(builder, operand, context, guard, parentTableName, parentEntity, targetPath)
-		switch (expression.kind) {
-			case 'exists':
-				return conditionBuilder.exists(this.buildRelationSubquery(context, expression.where, guard, parentTableName, parentEntity, targetPath))
-			case 'notExists':
-				return conditionBuilder.not(clause =>
-					clause.exists(
-						this.buildRelationSubquery(context, expression.where, guard, parentTableName, parentEntity, targetPath),
-					)
-				)
-			case 'absent': {
-				const absent = conditionBuilder.not(clause =>
-					clause.exists(
-						this.buildRelationSubquery(context, {}, guard, parentTableName, parentEntity, targetPath),
-					)
-				)
-				if (Object.keys(expression.where).length === 0) {
-					return absent
-				}
-				return absent.with(this.buildNullRowCondition(context.targetEntity, expression.where, targetPath))
-			}
-			case 'and':
-				return conditionBuilder.and(clause => expression.operands.reduce((builder, operand) => apply(builder, operand), clause))
-			case 'or':
-				return conditionBuilder.or(clause => expression.operands.reduce((builder, operand) => builder.and(inner => apply(inner, operand)), clause))
-			case 'not':
-				return conditionBuilder.not(clause => apply(clause, expression.operand))
-		}
-	}
-
-	/**
-	 * `where` evaluated on the null-extended target row, as a LEFT JOIN of an absent relation would. A scalar
-	 * subquery keeps SQL three-valued logic (`name = 'x'` on the null row is NULL, not false, also under NOT),
-	 * and the join `on false` guarantees that no related row's values are read.
-	 */
-	private buildNullRowCondition(targetEntity: Model.Entity, where: Input.OptionalWhere, targetPath: Path): Literal {
-		const qb = SelectBuilder.create()
-			.from(new Literal('(select 1)'), targetPath.for('null_').alias)
-			.leftJoin(targetEntity.tableName, targetPath.alias, clause => clause.raw('false'))
-		const { qb: nullRowQb, condition } = this.buildConditionLiteral(qb, targetEntity, targetPath, where)
-		const query = nullRowQb
-			.select(expr => expr.raw(condition.sql, ...condition.parameters))
-			.createQuery(new Compiler.Context(Compiler.SCHEMA_PLACEHOLDER, new Set()))
-		return new Literal(`(${query.sql})`, query.parameters)
-	}
-
 	private isInputCondition(value: unknown): value is Input.Condition {
 		return value !== null && typeof value === 'object' && !Array.isArray(value)
 	}
 
 	private isOptionalWhere(value: unknown): value is Input.OptionalWhere {
 		return value !== null && value !== undefined && typeof value === 'object' && !Array.isArray(value)
-	}
-
-	/** Builds a correlated subquery for a matching related row. Inside EXISTS the guard is a plain filter. */
-	private buildRelationSubquery(
-		context: Model.AnyRelationContext,
-		remainder: Input.OptionalWhere,
-		guard: Input.OptionalWhere,
-		parentTableName: string,
-		parentEntity: Model.Entity,
-		targetPath: Path,
-	): SelectBuilder<SelectBuilder.Result> {
-		const { relation, targetRelation, targetEntity } = context
-
-		// many-has-many: a readable row reachable through the junction
-		if (isIt<Model.JoiningTableRelation>(relation, 'joiningTable')) {
-			return this.buildManyHasManySubquery(
-				[parentTableName, parentEntity.primaryColumn],
-				remainder,
-				guard,
-				targetEntity,
-				relation.joiningTable,
-				'owning',
-				targetPath,
-			)
-		}
-		if (targetRelation !== null && isIt<Model.JoiningTableRelation>(targetRelation, 'joiningTable')) {
-			return this.buildManyHasManySubquery(
-				[parentTableName, parentEntity.primaryColumn],
-				remainder,
-				guard,
-				targetEntity,
-				targetRelation.joiningTable,
-				'inverse',
-				targetPath,
-			)
-		}
-
-		const qb = SelectBuilder.create<SelectBuilder.Result>()
-			.select(it => it.raw('1'))
-			.from(targetEntity.tableName, targetPath.alias)
-
-		let correlated: SelectBuilder<SelectBuilder.Result>
-		if (isIt<Model.JoiningColumnRelation>(relation, 'joiningColumn')) {
-			// owning to-one: the FK lives on the parent and points at the target primary
-			correlated = qb.where(it => it.columnsEq([parentTableName, relation.joiningColumn.columnName], [targetPath.alias, targetEntity.primaryColumn]))
-		} else if (targetRelation !== null && isIt<Model.JoiningColumnRelation>(targetRelation, 'joiningColumn')) {
-			// inverse to-one / has-many: the FK lives on the target and points at the parent primary
-			correlated = qb.where(it =>
-				it.columnsEq([parentTableName, parentEntity.primaryColumn], [targetPath.alias, targetRelation.joiningColumn.columnName])
-			)
-		} else {
-			correlated = qb
-		}
-
-		const where = this.combineWhereAnd([remainder, guard])
-		if (Object.keys(where).length === 0) {
-			return correlated
-		}
-		return this.buildInternal({
-			entity: targetEntity,
-			path: targetPath,
-			where,
-			callback: cb => correlated.where(clause => cb(clause)),
-			allowManyJoin: true,
-		})
-	}
-
-	private buildManyHasManySubquery(
-		outerColumn: QueryBuilder.ColumnIdentifier,
-		remainder: Input.OptionalWhere,
-		guard: Input.OptionalWhere,
-		targetEntity: Model.Entity,
-		joiningTable: Model.JoiningTable,
-		fromSide: 'owning' | 'inverse',
-		path: Path,
-	): SelectBuilder<SelectBuilder.Result> {
-		if (Object.keys(remainder).length === 0 && Object.keys(guard).length === 0) {
-			const fromColumn = fromSide === 'owning' ? joiningTable.joiningColumn.columnName : joiningTable.inverseJoiningColumn.columnName
-			const junctionPath = path.for('junction_')
-			return SelectBuilder.create<SelectBuilder.Result>()
-				.from(joiningTable.tableName, junctionPath.alias)
-				.select(it => it.raw('1'))
-				.where(it => it.columnsEq(outerColumn, [junctionPath.alias, fromColumn]))
-		}
-		return this.createManyHasManySubquery(outerColumn, remainder, guard, targetEntity, joiningTable, fromSide, path)
 	}
 
 	private transformWhereToPrimaryCondition(where: Input.OptionalWhere, primaryField: string): Input.Condition<never> | null {

@@ -19,20 +19,14 @@ namespace WhereBuilderModel {
 		isPublic = def.boolColumn().notNull()
 		author = def.manyHasOne(Author, 'articles')
 		tags = def.manyHasMany(Tag)
-		comments = def.oneHasMany(Comment, 'article')
 	}
 
 	export class Tag {
 		name = def.stringColumn()
 	}
-
-	export class Comment {
-		content = def.stringColumn()
-		article = def.manyHasOne(Article, 'comments')
-	}
 }
 
-const createWhere = (schema: Schema, where: Input.OptionalWhere, entityName: 'Author' | 'Article' = 'Author') => {
+const createWhere = (schema: Schema, where: Input.OptionalWhere) => {
 	const pathFactory = new PathFactory()
 	const joinBuilder = new JoinBuilder(schema.model)
 	const conditionBuilder = new ConditionBuilder()
@@ -46,11 +40,10 @@ const createWhere = (schema: Schema, where: Input.OptionalWhere, entityName: 'Au
 		schema.settings.useExistsInHasManyFilter === true,
 	)
 
-	const entity = schema.model.entities[entityName]
 	const qb = SelectBuilder.create()
-		.from(entity.tableName, 'root_')
+		.from('author', 'root_')
 
-	return whereBuilder.build(qb, entity, pathFactory.create([]), where).options.where.compile().sql
+	return whereBuilder.build(qb, schema.model.entities.Author, pathFactory.create([]), where).options.where.compile().sql
 }
 
 describe('where builder', () => {
@@ -97,261 +90,7 @@ describe('where builder', () => {
 		})
 		assert.equal(
 			where,
-			' where not(exists (select 1  from "__SCHEMA__"."article" as "root_articles"  where "root_"."id" = "root_articles"."author_id"))',
-		)
-	})
-
-	it('absence on to-one relation evaluates a sibling condition on the null-extended row', () => {
-		// `{ author: { id: { isNull: true }, name: { eq } } }`: the primary-isNull conjunct is the absence test;
-		// the sibling `name` holds on the null-extended row, not inside the NOT EXISTS.
-		const schema = createSchema(WhereBuilderModel)
-		const where = createWhere(schema, {
-			author: {
-				id: { isNull: true },
-				name: { eq: 'John' },
-			},
-		}, 'Article')
-		compareWhere(
-			where,
-			`where not(exists (select 1
-				from "__SCHEMA__"."author" as "root_author"
-				where "root_"."author_id" = "root_author"."id"))
-				and (select "root_author"."name" = ?
-				from (select 1) as "root_author_null_" left join "__SCHEMA__"."author" as "root_author" on false)`,
-		)
-	})
-
-	it('absence on has-many relation evaluates a sibling condition on the null-extended row', () => {
-		const schema = createSchema(WhereBuilderModel)
-		const where = createWhere(schema, {
-			articles: {
-				id: { isNull: true },
-				title: { eq: 'Hello' },
-			},
-		})
-		compareWhere(
-			where,
-			`where not(exists (select 1
-				from "__SCHEMA__"."article" as "root_articles"
-				where "root_"."id" = "root_articles"."author_id"))
-				and (select "root_articles"."title" = ?
-				from (select 1) as "root_articles_null_" left join "__SCHEMA__"."article" as "root_articles" on false)`,
-		)
-	})
-
-	it('absence on many-has-many lowers to NOT EXISTS (bare idiom, no remainder)', () => {
-		const schema = createSchema(WhereBuilderModel)
-		const where = createWhere(schema, {
-			tags: {
-				id: { isNull: true },
-			},
-		}, 'Article')
-		compareWhere(
-			where,
-			`where not(exists (select 1
-				from "__SCHEMA__"."article_tags" as "root_tags_junction_"
-				where "root_"."id" = "root_tags_junction_"."article_id"))`,
-		)
-	})
-
-	it('absence on many-has-many evaluates a sibling condition on the null-extended row', () => {
-		const schema = createSchema(WhereBuilderModel)
-		const where = createWhere(schema, {
-			tags: {
-				id: { isNull: true },
-				name: { eq: 'red' },
-			},
-		}, 'Article')
-		compareWhere(
-			where,
-			`where not(exists (select 1
-				from "__SCHEMA__"."article_tags" as "root_tags_junction_"
-				where "root_"."id" = "root_tags_junction_"."article_id"))
-				and (select "root_tags"."name" = ?
-				from (select 1) as "root_tags_null_" left join "__SCHEMA__"."tag" as "root_tags" on false)`,
-		)
-	})
-
-	it('equivalent absence spellings (and-wrapper, De Morgan, null alias) all lower to NOT EXISTS', () => {
-		const schema = createSchema(WhereBuilderModel)
-		const expected = ' where not(exists (select 1  from "__SCHEMA__"."article" as "root_articles"  where "root_"."id" = "root_articles"."author_id"))'
-		assert.equal(createWhere(schema, { articles: { and: [{ id: { isNull: true } }] } }), expected)
-		assert.equal(createWhere(schema, { articles: { not: { id: { isNull: false } } } }), expected)
-		assert.equal(createWhere(schema, { articles: { id: { null: true } } }), expected)
-	})
-
-	it('condition-level De Morgan absence lowers to NOT EXISTS with the sibling on the null-extended row', () => {
-		const schema = createSchema(WhereBuilderModel)
-		const where = createWhere(schema, {
-			author: {
-				id: { not: { isNull: false } },
-				name: { eq: 'John' },
-			},
-		}, 'Article')
-		compareWhere(
-			where,
-			`where not(exists (select 1
-				from "__SCHEMA__"."author" as "root_author"
-				where "root_"."author_id" = "root_author"."id"))
-				and (select "root_author"."name" = ?
-				from (select 1) as "root_author_null_" left join "__SCHEMA__"."author" as "root_author" on false)`,
-		)
-	})
-
-	it('compound primary presence stays on the FK column', () => {
-		const schema = createSchema(WhereBuilderModel)
-		const where = createWhere(schema, {
-			author: {
-				id: {
-					and: [
-						{ isNull: false },
-						{ eq: '123e4567-e89b-12d3-a456-426614174000' },
-					],
-				},
-			},
-		}, 'Article')
-		compareWhere(
-			where,
-			`where not("root_"."author_id" is null) and "root_"."author_id" = ?`,
-		)
-	})
-
-	it('composes relation absence inside a multi-branch OR', () => {
-		const schema = createSchema(WhereBuilderModel)
-		const where = createWhere(schema, {
-			author: {
-				or: [
-					{ id: { isNull: true } },
-					{ name: { eq: 'John' } },
-				],
-			},
-		}, 'Article')
-		compareWhere(
-			where,
-			`where (not(exists (select 1
-				from "__SCHEMA__"."author" as "root_author"
-				where "root_"."author_id" = "root_author"."id"))
-				or exists (select 1
-				from "__SCHEMA__"."author" as "root_author"
-				where "root_"."author_id" = "root_author"."id" and "root_author"."name" = ?))`,
-		)
-	})
-
-	it('negates a mixed relation absence expression as a set expression', () => {
-		const schema = createSchema(WhereBuilderModel)
-		const where = createWhere(schema, {
-			author: {
-				not: {
-					or: [
-						{ id: { isNull: true } },
-						{ name: { eq: 'John' } },
-					],
-				},
-			},
-		}, 'Article')
-		compareWhere(
-			where,
-			`where not((not(exists (select 1
-				from "__SCHEMA__"."author" as "root_author"
-				where "root_"."author_id" = "root_author"."id"))
-				or exists (select 1
-				from "__SCHEMA__"."author" as "root_author"
-				where "root_"."author_id" = "root_author"."id" and "root_author"."name" = ?)))`,
-		)
-	})
-
-	it('negates a conjunctive relation absence expression without turning the sibling into a presence test', () => {
-		// main's LEFT JOIN: `not(author.id is null and author.name = ?)` keeps every article with an author and
-		// drops the authorless ones (NULL); `exists(author.name = ?)` would keep only the authors named John.
-		const schema = createSchema(WhereBuilderModel)
-		const where = createWhere(schema, {
-			author: {
-				not: {
-					and: [
-						{ id: { isNull: true } },
-						{ name: { eq: 'John' } },
-					],
-				},
-			},
-		}, 'Article')
-		compareWhere(
-			where,
-			`where not(not(exists (select 1
-				from "__SCHEMA__"."author" as "root_author"
-				where "root_"."author_id" = "root_author"."id"))
-				and (select "root_author"."name" = ?
-				from (select 1) as "root_author_null_" left join "__SCHEMA__"."author" as "root_author" on false))`,
-		)
-	})
-
-	it('keeps a sibling next to a negated relation set expression out of the negation', () => {
-		// `not(X and isPublic)` would also match a present author that fails `isPublic`.
-		const schema = createSchema(WhereBuilderModel)
-		const where = createWhere(schema, {
-			author: {
-				not: {
-					or: [
-						{ id: { isNull: true } },
-						{ name: { eq: 'John' } },
-					],
-				},
-				isPublic: { eq: true },
-			},
-		}, 'Article')
-		compareWhere(
-			where,
-			`where not((not(exists (select 1
-				from "__SCHEMA__"."author" as "root_author"
-				where "root_"."author_id" = "root_author"."id"))
-				or exists (select 1
-				from "__SCHEMA__"."author" as "root_author"
-				where "root_"."author_id" = "root_author"."id" and "root_author"."name" = ?)))
-				and (exists (select 1
-				from "__SCHEMA__"."author" as "root_author"
-				where "root_"."author_id" = "root_author"."id" and "root_author"."is_public" = ?)
-				or not(exists (select 1
-				from "__SCHEMA__"."author" as "root_author"
-				where "root_"."author_id" = "root_author"."id"))
-				and (select "root_author"."is_public" = ?
-				from (select 1) as "root_author_null_" left join "__SCHEMA__"."author" as "root_author" on false))`,
-		)
-	})
-
-	it('condition-level relation absence inside OR stays on the FK column', () => {
-		const schema = createSchema(WhereBuilderModel)
-		const where = createWhere(schema, {
-			author: {
-				id: {
-					or: [
-						{ isNull: true },
-						{ eq: '123e4567-e89b-12d3-a456-426614174000' },
-					],
-				},
-			},
-		}, 'Article')
-		compareWhere(
-			where,
-			`where ("root_"."author_id" is null or "root_"."author_id" = ?)`,
-		)
-	})
-
-	it('nested has-many absence is forced to NOT EXISTS even in legacy join mode', () => {
-		// COR-3: a has-many absence nested inside another relation must use a correlated NOT EXISTS, never the
-		// per-joined-row LEFT JOIN form (which would mis-evaluate `not` for a parent with mixed readable rows).
-		const schema = createSchema(WhereBuilderModel) // useExistsInHasManyFilter defaults to false (legacy)
-		const where = createWhere(schema, {
-			articles: {
-				comments: { id: { isNull: true } },
-			},
-		})
-		compareWhere(
-			where,
-			`where exists (select 1
-				from "__SCHEMA__"."article" as "root_articles"
-				where "root_"."id" = "root_articles"."author_id"
-					and not(exists (select 1
-						from "__SCHEMA__"."comment" as "root_articles_comments"
-						where "root_articles"."id" = "root_articles_comments"."article_id")))`,
+			' where exists (select 1  from (select "root_"."id") as "root_articles_tmp_" left join  "__SCHEMA__"."article" as "root_articles" on  "root_articles_tmp_"."id" = "root_articles"."author_id"  where "root_articles"."id" is null)',
 		)
 	})
 
@@ -417,42 +156,6 @@ describe('where builder', () => {
 		compareWhere(
 			where,
 			`where exists (select 1 from "__SCHEMA__"."article" as "root_articles" where "root_"."id" = "root_articles"."author_id")`,
-		)
-	})
-
-	it('SECURITY: an unconstrained OR branch does not become an unguarded EXISTS', () => {
-		// `{ or: [ {}, … ] }` is reachable from any client filter, and `PredicatesInjector` attaches no read
-		// predicate to an empty branch. Promoting it to a set expression would emit a bare `EXISTS(<any related
-		// row>)` that swallows the guarded branch, turning the filter into a presence oracle over unreadable rows.
-		const schema = createSchema(WhereBuilderModel)
-		const where = createWhere(schema, {
-			author: {
-				or: [
-					{},
-					// what the injector produces for `{ id: { isNull: false } }` + `Author.read`
-					{ and: [{ id: { isNull: false } }, { isPublic: { eq: true } }] },
-				],
-			},
-		}, 'Article')
-		compareWhere(
-			where,
-			`where (not("root_author"."id" is null) and "root_author"."is_public" = ?)`,
-		)
-	})
-
-	it('SECURITY: an empty and-array branch in an OR is treated the same', () => {
-		const schema = createSchema(WhereBuilderModel)
-		const where = createWhere(schema, {
-			author: {
-				or: [
-					{ and: [] },
-					{ and: [{ id: { isNull: false } }, { isPublic: { eq: true } }] },
-				],
-			},
-		}, 'Article')
-		compareWhere(
-			where,
-			`where (not("root_author"."id" is null) and "root_author"."is_public" = ?)`,
 		)
 	})
 })

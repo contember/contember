@@ -249,7 +249,7 @@ test('relation absence without a read predicate keeps the FK shortcut', async ()
 	})
 })
 
-test('relation absence with a read predicate lowers to NOT EXISTS over readable rows', async () => {
+test('relation absence with a read predicate is a null-extended row of the guarded join', async () => {
 	await execute({
 		schema,
 		permissions,
@@ -264,9 +264,8 @@ test('relation absence with a read predicate lowers to NOT EXISTS over readable 
 			{
 				sql: SQL`
 					select "root_"."id" as "root_id"
-					from "public"."article" as "root_"
-					where not(exists (select 1 from "public"."author" as "root_author$"
-						where "root_"."author_id" = "root_author$"."id" and "root_author$"."is_public" = ?))
+					from "public"."article" as "root_" ${guardedAuthorJoin}
+					where "root_author$"."id" is null
 				`,
 				parameters: [true],
 				response: { rows: [{ root_id: testUuid(1) }] },

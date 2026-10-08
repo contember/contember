@@ -12,9 +12,11 @@ import { AclDefinition as acl, createSchema, SchemaDefinition as def } from '@co
 
 const names = (rows: any[]) => rows.map(r => r.name).sort()
 
-type RunArgs = { label: string; relField: string; schema: any; setup: (t: any) => Promise<{ company: string }> }
+// A many-has-many `id: { isNull: true }` keeps its pre-existing meaning for every role: it tests the joined target
+// row, which never has a NULL id, so it never matches ('never'). Only the other relation kinds read absence.
+type RunArgs = { label: string; relField: string; schema: any; setup: (t: any) => Promise<{ company: string }>; absence?: 'readableView' | 'never' }
 
-async function runMatrix({ label, relField, schema, setup }: RunArgs) {
+async function runMatrix({ label, relField, schema, setup, absence = 'readableView' }: RunArgs) {
 	const tester = await createTester(schema)
 	const { company } = await setup(tester)
 	const email = `reader${label.replace(/[^a-z0-9]/gi, '')}${Date.now()}@doe.com`
@@ -52,14 +54,21 @@ async function runMatrix({ label, relField, schema, setup }: RunArgs) {
 	console.log(`  isNull:true=[${isNullTrue}]  isNull:false=[${isNullFalse}]  not(isNull)=[${notIsNull}]  label=x=[${positive}]`)
 
 	// Semantic 2: relation filters operate on the readable view of the relation.
-	expect(isNullTrue, `${label} isNull:true must equal readsEmpty`).toEqual(readsEmpty)
 	expect(isNullFalse, `${label} isNull:false must equal hasReadable`).toEqual(hasReadable)
-	expect(notIsNull, `${label} not(isNull) must equal hasReadable`).toEqual(hasReadable)
 	expect(positive, `${label} label=x must equal hasReadable`).toEqual(hasReadable)
+	expect(notAbsenceAndPositive, `${label} NOT(absence AND positive) must equal hasReadable`).toEqual(hasReadable)
+	expect(notAbsenceOrPositive, `${label} NOT(absence OR positive) must be empty`).toEqual([])
+	if (absence === 'never') {
+		expect(isNullTrue, `${label} isNull:true never matches`).toEqual([])
+		expect(notIsNull, `${label} not(isNull) matches every parent`).toEqual(allParentNames)
+		expect(absenceOrPositive, `${label} absence OR positive must equal hasReadable`).toEqual(hasReadable)
+		expect(absenceOrNoMatch, `${label} absence OR no-match never matches`).toEqual([])
+		return
+	}
+	expect(isNullTrue, `${label} isNull:true must equal readsEmpty`).toEqual(readsEmpty)
+	expect(notIsNull, `${label} not(isNull) must equal hasReadable`).toEqual(hasReadable)
 	expect(absenceOrPositive, `${label} absence OR positive must cover the readable view`).toEqual(allParentNames)
 	expect(absenceOrNoMatch, `${label} absence OR no-match must equal readsEmpty`).toEqual(readsEmpty)
-	expect(notAbsenceOrPositive, `${label} NOT(absence OR positive) must be empty`).toEqual([])
-	expect(notAbsenceAndPositive, `${label} NOT(absence AND positive) must equal hasReadable`).toEqual(hasReadable)
 	// excluded middle: isNull:true and isNull:false partition all parents
 	expect([...isNullTrue, ...isNullFalse].sort(), `${label} isNull true/false must partition`).toEqual(allParentNames)
 }
@@ -339,6 +348,7 @@ test('MATRIX: manyHasMany self-contained', async () => {
 		label: 'm2m/self',
 		relField: 'child',
 		schema: createSchema(M2M),
+		absence: 'never',
 		setup: async t => {
 			const company = await mkCompany(t, 'Co')
 			await t(gql`mutation ($c: UUID!) { createParent(data: { name: "absent", company: { connect: { id: $c } } }) { ok } }`, {
@@ -383,11 +393,17 @@ test('MATRIX: oneHasOne inverse', async () => {
 	await runMatrix({ label: 'oneHasOne/inverse', relField: 'child', schema: createSchema(OneHasOneInverse), setup: stdVisibilitySetup })
 })
 test('MATRIX: manyHasMany inverse', async () => {
-	await runMatrix({ label: 'm2m/inverse', relField: 'child', schema: createSchema(ManyHasManyInverse), setup: stdVisibilitySetup })
+	await runMatrix({ label: 'm2m/inverse', relField: 'child', schema: createSchema(ManyHasManyInverse), setup: stdVisibilitySetup, absence: 'never' })
 })
 test('MATRIX: oneHasMany self (useExistsInHasManyFilter=true)', async () => {
 	await runMatrix({ label: 'oneHasMany/self/exists', relField: 'child', schema: withExistsMode(createSchema(ManySelf)), setup: stdVisibilitySetup })
 })
 test('MATRIX: manyHasMany self (useExistsInHasManyFilter=true)', async () => {
-	await runMatrix({ label: 'm2m/self/exists', relField: 'child', schema: withExistsMode(createSchema(M2M)), setup: stdVisibilitySetup })
+	await runMatrix({
+		label: 'm2m/self/exists',
+		relField: 'child',
+		schema: withExistsMode(createSchema(M2M)),
+		setup: stdVisibilitySetup,
+		absence: 'never',
+	})
 })

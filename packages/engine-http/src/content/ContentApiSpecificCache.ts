@@ -15,7 +15,8 @@ type Entry<V> = {
 export class ContentApiSpecificCache<ObjectKey extends object, Value> {
 	private cache = new WeakMap<ObjectKey, Map<string, Entry<Value>>>()
 
-	// Least recently used first. A token whose Map was garbage-collected stays counted until it is evicted as the oldest.
+	// Least recently used first, tracked only with maxEntries: nothing else removes a token whose Map was garbage-collected.
+	// With maxEntries, such a token stays counted until it is evicted as the oldest.
 	private recency = new Set<RecencyToken<Value>>()
 
 	constructor(
@@ -57,8 +58,10 @@ export class ContentApiSpecificCache<ObjectKey extends object, Value> {
 			const token = entry.recency
 			entry.timer = setTimeout(() => this.remove(token), this.options.ttlSeconds * 1000)
 		}
-		this.recency.delete(entry.recency)
-		this.recency.add(entry.recency)
+		if (this.options.maxEntries) {
+			this.recency.delete(entry.recency)
+			this.recency.add(entry.recency)
+		}
 	}
 
 	private evictOverLimit(): void {

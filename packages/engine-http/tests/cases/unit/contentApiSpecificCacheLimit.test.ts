@@ -40,6 +40,15 @@ test('without maxEntries nothing is evicted', () => {
 	expect(cache.fetch(objectKey, '0', notCalled)).toBe(0)
 })
 
+test('without maxEntries the recency order stays empty, so entries of collected object keys leave nothing behind', () => {
+	const cache = new ContentApiSpecificCache<object, number>({ ttlSeconds: 60 })
+	for (let i = 0; i < 100; i++) {
+		cache.fetch({}, 'a', () => i)
+	}
+
+	expect(cache['recency'].size).toBe(0)
+})
+
 test('an entry expired by ttl frees its slot', async () => {
 	const objectKey = {}
 	const cache = new ContentApiSpecificCache<object, string>({ maxEntries: 2, ttlSeconds: 0.05 })

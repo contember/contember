@@ -22,20 +22,12 @@ export class VimeoSchemaContributor implements GraphQLSchemaContributor {
 		private readonly vimeoServiceFactory: VimeoServiceFactory,
 	) {}
 
-	getCacheKey?(context: GraphQLSchemaContributorContext): string {
-		return context.project.vimeo ? 'yes' : 'no'
+	getCacheKey(context: GraphQLSchemaContributorContext): string {
+		return this.isUploadAllowed(context) ? 'yes' : 'no'
 	}
 
 	createSchema(context: GraphQLSchemaContributorContext): GraphQLSchemaConfig | undefined {
-		if (!context.project.vimeo) {
-			return undefined
-		}
-
-		if (
-			!context.identity.projectRoles.find(
-				role => (context.schema.acl.roles[role]?.vimeo as VimeoAcl | undefined)?.upload,
-			)
-		) {
+		if (!this.isUploadAllowed(context)) {
 			return undefined
 		}
 
@@ -57,6 +49,10 @@ export class VimeoSchemaContributor implements GraphQLSchemaContributor {
 				}),
 			}),
 		}
+	}
+
+	private isUploadAllowed({ project, schema, identity }: GraphQLSchemaContributorContext): boolean {
+		return !!project.vimeo && identity.projectRoles.some(role => (schema.acl.roles[role]?.vimeo as VimeoAcl | undefined)?.upload)
 	}
 
 	private createMutation(): GraphQLFieldConfig<any, any, any> {

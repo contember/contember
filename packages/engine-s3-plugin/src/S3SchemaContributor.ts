@@ -40,32 +40,18 @@ export class S3SchemaContributor implements GraphQLSchemaContributor {
 		private readonly providers: Providers,
 	) {}
 
-	getCacheKey?({ project }: GraphQLSchemaContributorContext): string {
-		return project.s3 ? 'yes' : 'no'
+	getCacheKey(context: GraphQLSchemaContributorContext): string {
+		const rules = this.resolveRules(context)
+		return rules ? JSON.stringify(rules) : 'no'
 	}
 
 	createSchema(context: GraphQLSchemaContributorContext): GraphQLSchemaConfig | undefined {
-		if (!context.project.s3) {
-			return undefined
-		}
-		const rules = context.identity.projectRoles.flatMap(it => Object.entries((context.schema.acl.roles[it]?.s3 as S3SchemaAcl) || {}))
-
-		const uploadRules = rules.filter(([, it]) => it.upload).map(([it, val]) => ({
-			pattern: it,
-			...(typeof val.upload !== 'boolean' ? val.upload : {}),
-		}))
-		const readRules = rules.filter(([, it]) => it.read).map(([it]) => ({
-			pattern: it,
-		}))
-		const deleteRules = rules.filter(([, it]) => it.delete).map(([it]) => ({
-			pattern: it,
-		}))
-
-		if (uploadRules.length === 0 && readRules.length === 0 && deleteRules.length === 0) {
+		const rules = this.resolveRules(context)
+		if (!rules) {
 			return undefined
 		}
 
-		const authorizator = new S3ObjectAuthorizator(uploadRules, readRules, deleteRules)
+		const authorizator = new S3ObjectAuthorizator(rules.uploadRules, rules.readRules, rules.deleteRules)
 		const uploadMutation = this.createUploadMutation(authorizator)
 		const readMutation = this.createReadMutation(authorizator)
 		const deleteMutation = this.createDeleteMutation(authorizator)
@@ -89,6 +75,29 @@ export class S3SchemaContributor implements GraphQLSchemaContributor {
 				}),
 			}),
 		}
+	}
+
+	private resolveRules({ project, schema, identity }: GraphQLSchemaContributorContext) {
+		if (!project.s3) {
+			return undefined
+		}
+		const rules = identity.projectRoles.flatMap(it => Object.entries((schema.acl.roles[it]?.s3 as S3SchemaAcl) || {}))
+
+		const uploadRules = rules.filter(([, it]) => it.upload).map(([it, val]) => ({
+			pattern: it,
+			...(typeof val.upload !== 'boolean' ? val.upload : {}),
+		}))
+		const readRules = rules.filter(([, it]) => it.read).map(([it]) => ({
+			pattern: it,
+		}))
+		const deleteRules = rules.filter(([, it]) => it.delete).map(([it]) => ({
+			pattern: it,
+		}))
+
+		if (uploadRules.length === 0 && readRules.length === 0 && deleteRules.length === 0) {
+			return undefined
+		}
+		return { uploadRules, readRules, deleteRules }
 	}
 
 	private createReadMutation(authorizator: S3ObjectAuthorizator): GraphQLFieldConfig<any, { project: Project3Config }, any> {

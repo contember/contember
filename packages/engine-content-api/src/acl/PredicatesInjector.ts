@@ -25,7 +25,7 @@ export const FIELD_GUARD_KEY = '$fieldGuard'
  */
 export const MASKED_CELL_KEY = '$maskedCell'
 
-const isWhere = (value: Input.OptionalWhere[string]): value is Input.OptionalWhere =>
+export const isWhere = (value: Input.OptionalWhere[string]): value is Input.OptionalWhere =>
 	value !== null && value !== undefined && typeof value === 'object' && !Array.isArray(value)
 
 export type MaskedCell = { guard: Input.OptionalWhere; where: Input.OptionalWhere }

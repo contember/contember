@@ -1,10 +1,11 @@
-import { Input, Model } from '@contember/schema'
+import { Input, Model, Writable } from '@contember/schema'
 import { ConditionOptimizer } from './ConditionOptimizer.js'
 import { acceptFieldVisitor } from '@contember/schema-utils'
 import { optimizeAnd, optimizeNot, optimizeOr } from './helpers.js'
 import { replaceWhere } from './WhereReplacer.js'
 import {
 	FIELD_GUARD_KEY,
+	isWhere,
 	MASKED_CELL_KEY,
 	MaskedCell,
 	parseMaskedCells,
@@ -64,8 +65,10 @@ export class WhereOptimizer {
 			return { [entity.primary]: { [result ? 'always' : 'never']: true } }
 		}
 		let changed = false
+		const facts: Input.OptionalWhere[] = []
 		for (const evaluated of evaluatedPredicates) {
 			const evaluatedPredicate = this.optimize(evaluated, entity)
+			facts.push(evaluatedPredicate)
 			const newResult = replaceWhere(result, evaluatedPredicate, { [entity.primary]: { always: true } })
 			if (newResult !== result) {
 				result = newResult
@@ -73,10 +76,32 @@ export class WhereOptimizer {
 			}
 		}
 		if (changed) {
-			return this.optimize(result, entity)
+			result = this.optimize(result, entity)
 		}
+		return this.simplifyGuardsWithFacts(result, facts, entity, processedRelationPath)
+	}
 
-		return result
+	/**
+	 * Guards may only be simplified with facts that hold on every row the query can select: the evaluated
+	 * predicates and the operands of the top-level AND. Deeper, a sibling can be NULL under a `not`, and assuming
+	 * it TRUE inside a guard would unmask a cell.
+	 */
+	private simplifyGuardsWithFacts(
+		where: Input.OptionalWhere,
+		facts: readonly Input.OptionalWhere[],
+		entity: Model.Entity,
+		relationPath: ExtendedRelationContext[],
+	): Input.OptionalWhere {
+		const simplified = facts.reduce((it, fact) => this.simplifyGuards(it, fact, entity, relationPath), where)
+		const operands = simplified.and
+		if (!Array.isArray(operands)) {
+			return simplified
+		}
+		const topLevel: readonly Input.OptionalWhere[] = operands
+		const simplifiedOperands = topLevel.map((operand, index) =>
+			topLevel.reduce((it, fact, factIndex) => factIndex === index ? it : this.simplifyGuards(it, fact, entity, relationPath), operand)
+		)
+		return simplifiedOperands.some((it, index) => it !== topLevel[index]) ? { ...simplified, and: simplifiedOperands } : simplified
 	}
 
 	private optimizeWhere(where: Input.OptionalWhere, entity: Model.Entity, relationPath: ExtendedRelationContext[]): Input.OptionalWhere | boolean {
@@ -146,6 +171,65 @@ export class WhereOptimizer {
 			}
 		}
 		return this.optimizeAnd(operands, entity, relationPath)
+	}
+
+	/**
+	 * Replaces `fact`, known to hold on the row, inside the read guards of `where` (field guards of its relations
+	 * and masked-cell guards; a guard reads the same row). Only the guards are re-optimized, so the user's
+	 * condition keeps the shape it was optimized into.
+	 */
+	private simplifyGuards(
+		where: Input.OptionalWhere,
+		fact: Input.OptionalWhere,
+		entity: Model.Entity,
+		relationPath: ExtendedRelationContext[],
+	): Input.OptionalWhere {
+		const simplifyGuard = (guard: Input.OptionalWhere): Input.OptionalWhere | boolean | undefined => {
+			const replaced = replaceWhere(guard, fact, { [entity.primary]: { always: true } })
+			return replaced === guard ? undefined : this.optimizeWhere(replaced, entity, relationPath)
+		}
+		const asWhere = (guard: Input.OptionalWhere | boolean): Input.OptionalWhere =>
+			typeof guard === 'boolean' ? { [entity.primary]: { [guard ? 'always' : 'never']: true } } : guard
+		let result: Writable<Input.OptionalWhere> = where
+		const write = (key: string, value: Input.OptionalWhere[string]) => {
+			if (result === where) {
+				result = { ...where }
+			}
+			result[key] = value
+		}
+		for (const key in where) {
+			const value = where[key]
+			if ((key === 'and' || key === 'or') && Array.isArray(value)) {
+				const operands: readonly Input.OptionalWhere[] = value
+				const simplified = operands.map(it => this.simplifyGuards(it, fact, entity, relationPath))
+				if (simplified.some((it, index) => it !== operands[index])) {
+					write(key, simplified)
+				}
+			} else if (key === 'not' && isWhere(value)) {
+				const simplified = this.simplifyGuards(value, fact, entity, relationPath)
+				if (simplified !== value) {
+					write(key, simplified)
+				}
+			} else if (key === MASKED_CELL_KEY) {
+				const cells = parseMaskedCells(value)
+				const simplified = cells.map(cell => {
+					const guard = simplifyGuard(cell.guard)
+					return guard === undefined ? cell : { guard: asWhere(guard), where: cell.where }
+				})
+				if (simplified.some((it, index) => it !== cells[index])) {
+					write(key, simplified)
+				}
+			} else if (isWhere(value)) {
+				const { fieldGuard, where: relationWhere } = splitFieldGuard(value)
+				const guard = fieldGuard === undefined ? undefined : simplifyGuard(fieldGuard)
+				if (guard === true) {
+					write(key, relationWhere)
+				} else if (guard !== undefined) {
+					write(key, { ...relationWhere, [FIELD_GUARD_KEY]: asWhere(guard) })
+				}
+			}
+		}
+		return result
 	}
 
 	/** Guard and condition are optimized apart: the masked form depends on the condition alone. */

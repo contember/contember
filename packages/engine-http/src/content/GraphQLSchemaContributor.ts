@@ -10,6 +10,10 @@ export type GraphQLSchemaContributorContext = {
 }
 
 export interface GraphQLSchemaContributor {
+	/**
+	 * Must change whenever the output of createSchema can change, including everything it derives from the identity.
+	 * The cache does not key the GraphQL schema by roles; role combinations with identical content permissions share it.
+	 */
 	getCacheKey?: (context: GraphQLSchemaContributorContext) => string
 	createSchema(context: GraphQLSchemaContributorContext): undefined | GraphQLSchema | GraphQLSchemaConfig
 }

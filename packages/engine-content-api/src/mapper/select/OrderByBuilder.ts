@@ -109,7 +109,7 @@ export class OrderByBuilder {
 			// relation), so every joined target row is readable and only cell-level predicates remain to guard.
 			const guard = this.predicatesInjector.createReadGuard(relationContext, relationPath)
 			const guarded = Object.keys(guard).length > 0
-			const newPath = path.for(hopPathSegment(fieldName, guarded))
+			const newPath = path.for(hopPathSegment(fieldName, { row: guarded, field: false }))
 			const targetSource = guarded ? this.whereBuilder.buildGuardedSource(targetEntity, newPath, guard) : undefined
 			const joined = this.joinBuilder.join(qb, newPath, entity, fieldName, targetSource)
 

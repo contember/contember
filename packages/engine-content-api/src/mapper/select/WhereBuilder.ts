@@ -243,8 +243,8 @@ export class WhereBuilder {
 					throw new Error(`WhereBuilder: ${entity.name}::${fieldName} expects a relation where`)
 				}
 				const { guard, fieldGuard, where: relationWhere } = splitReadGuard(fieldWhere)
-				const guarded = Object.keys(guard).length > 0 || Object.keys(fieldGuard).length > 0
-				return { guard, fieldGuard, where: relationWhere, path: guarded ? path.for(hopPathSegment(fieldName, true)) : targetPath }
+				const guards = { row: Object.keys(guard).length > 0, field: Object.keys(fieldGuard).length > 0 }
+				return { guard, fieldGuard, where: relationWhere, path: guards.row || guards.field ? path.for(hopPathSegment(fieldName, guards)) : targetPath }
 			}
 			// A masked relation field reads empty: the hop sees no related row where its field guard does not hold.
 			const fieldGuardCondition = (fieldGuard: Input.OptionalWhere): Literal | undefined => {

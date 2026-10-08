@@ -1,11 +1,15 @@
 const MAX_IDENTIFIER_LENGTH = 63
 
+export type HopGuards = { readonly row: boolean; readonly field: boolean }
+
 /**
- * Path segment of a relation hop. A hop whose target source is read-guarded gets its own alias, because the
- * same relation may also be traversed unguarded (as-definer) by an ACL predicate in the same query and the
- * two must not share a join. `$` cannot occur in a field name, so the alias can never collide with a field.
+ * Path segment of a relation hop. JoinBuilder reuses a join by alias, so hops whose joins differ must differ in
+ * alias: a read-guarded target source must not be shared with the same relation traversed unguarded (as-definer)
+ * by an ACL predicate, and a join restricted by the relation field's guard must not be shared with an order-by
+ * hop, which masks that field with CASE instead. `$` cannot occur in a field name, so no alias collides with a field.
  */
-export const hopPathSegment = (fieldName: string, guarded: boolean): string => guarded ? `${fieldName}$` : fieldName
+export const hopPathSegment = (fieldName: string, guards: HopGuards): string =>
+	guards.field ? `${fieldName}$$` : guards.row ? `${fieldName}$` : fieldName
 
 export class AliasContext {
 	private aliasIndex = new Map<string, number>()

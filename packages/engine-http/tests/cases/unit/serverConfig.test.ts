@@ -84,3 +84,22 @@ test('shutdownDelayMs: undefined when the variable is unset', async () => {
 	const { serverConfig } = await readConfig()
 	expect(serverConfig.shutdownDelayMs).toBeUndefined()
 })
+
+test('schemaCacheMaxEntries: read from CONTEMBER_CONTENT_API_SCHEMA_CACHE_MAX_ENTRIES', async () => {
+	process.env.CONTEMBER_CONTENT_API_SCHEMA_CACHE_MAX_ENTRIES = '100'
+	try {
+		const { serverConfig } = await readConfig()
+		expect(serverConfig.contentApi?.schemaCacheMaxEntries).toBe(100)
+	} finally {
+		delete process.env.CONTEMBER_CONTENT_API_SCHEMA_CACHE_MAX_ENTRIES
+	}
+})
+
+test('schemaCacheMaxEntries: undefined when the variable is unset', async () => {
+	const { serverConfig } = await readConfig()
+	expect(serverConfig.contentApi?.schemaCacheMaxEntries).toBeUndefined()
+})
+
+test('schemaCacheMaxEntries: zero is refused', () => {
+	expect(() => serverConfigSchema({ contentApi: { schemaCacheMaxEntries: 0 } })).toThrow()
+})

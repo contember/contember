@@ -109,6 +109,7 @@ export const nav: NavItem[] = [
 				label: 'Configuration',
 				collapsed: true,
 				items: [
+					doc('reference/engine/configuration/content-schema-cache'),
 					doc('reference/engine/configuration/database'),
 					doc('reference/engine/configuration/management-panel'),
 					doc('reference/engine/configuration/request-memory-budget'),

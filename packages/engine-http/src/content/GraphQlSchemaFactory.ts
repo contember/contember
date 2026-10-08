@@ -1,6 +1,7 @@
 import {
 	Authorizator,
 	Context,
+	ContextualPermissions,
 	EntityRulesResolver,
 	GraphQlSchemaBuilderFactory,
 	IntrospectionSchemaDefinitionFactory,
@@ -32,12 +33,12 @@ export class GraphQlSchemaFactory {
 	) {}
 
 	public create(schema: Schema, identity: Identity, project: ProjectConfig): GraphQLSchemaFactoryResult {
-		const permissionsKey = this.getPermissionsKey(schema, identity.projectRoles)
+		const { permissionsKey, computedPermissions } = this.getPermissionsKey(schema, identity.projectRoles)
 		const contributorsKey = this.schemaContributors.map(it => it.getCacheKey?.({ schema, identity, project }) ?? '').join('\xff')
 		const cacheKey = `${permissionsKey}\xff\xff${contributorsKey}`
 
 		return this.cache.fetch(schema, cacheKey, () => {
-			const { root: permissions, all: allPermissions } = this.permissionFactory.createContextual(schema, identity.projectRoles)
+			const { root: permissions, all: allPermissions } = computedPermissions ?? this.permissionFactory.createContextual(schema, identity.projectRoles)
 
 			const authorizator = new Authorizator(
 				allPermissions,
@@ -93,7 +94,10 @@ export class GraphQlSchemaFactory {
 
 	// Role combinations with identical permissions share one GraphQL schema. The key is memoized per combination,
 	// so a request does not rebuild the permissions only to find its schema.
-	private getPermissionsKey(schema: Schema, roles: readonly string[]): string {
+	private getPermissionsKey(
+		schema: Schema,
+		roles: readonly string[],
+	): { permissionsKey: string; computedPermissions?: ContextualPermissions } {
 		let keysByRoles = this.permissionsKeys.get(schema)
 		if (!keysByRoles) {
 			keysByRoles = new Map()
@@ -102,11 +106,11 @@ export class GraphQlSchemaFactory {
 		const rolesKey = [...roles].sort().join('\xff')
 		const cachedKey = keysByRoles.get(rolesKey)
 		if (cachedKey !== undefined) {
-			return cachedKey
+			return { permissionsKey: cachedKey }
 		}
-		const { root, all } = this.permissionFactory.createContextual(schema, roles)
-		const permissionsKey = createHash('sha256').update(JSON.stringify([root, all])).digest('hex')
+		const computedPermissions = this.permissionFactory.createContextual(schema, roles)
+		const permissionsKey = createHash('sha256').update(JSON.stringify([computedPermissions.root, computedPermissions.all])).digest('hex')
 		keysByRoles.set(rolesKey, permissionsKey)
-		return permissionsKey
+		return { permissionsKey, computedPermissions }
 	}
 }

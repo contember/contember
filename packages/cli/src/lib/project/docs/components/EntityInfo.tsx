@@ -1,9 +1,8 @@
 import { Model, Schema } from '@contember/schema'
 import { ReferencesMap } from '../../../schema/collectReferences.js'
 import { formatEntityAnchor, formatFieldAnchor } from './utils.js'
-import { SinglePermission } from './SinglePermission.js'
 import { FieldType } from './FieldType.js'
-import { FieldPermissions } from './FieldPermissions.js'
+import { DeletePermission, FieldPermissions } from './FieldPermissions.js'
 import { OnDelete } from './OnDelete.js'
 import { Fragment, h } from 'preact'
 
@@ -40,7 +39,7 @@ export const EntityInfo = ({ entity, schema, references }: EntityInfoProps) => (
 						<td></td>
 						{Object.entries(schema.acl.roles).map(([name, role]) => (
 							<td class={'px-2'} key={name}>
-								<SinglePermission value={'D'} predicate={role.entities[entity.name]?.operations.delete} />
+								<DeletePermission entityPermissions={role.entities[entity.name]} />
 							</td>
 						))}
 					</tr>

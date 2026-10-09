@@ -446,7 +446,7 @@ namespace C6 {
 		locales = def.oneHasMany(PostLocale, 'post')
 	}
 
-	// PostLocale is readable ONLY through a relation (through:true → noRoot read): the root set denies it,
+	// PostLocale is readable ONLY through a relation (a `through: true` read grant): the root set denies it,
 	// the `all` set grants it. Reached via Post.locales, its fields (incl. title) are readable. The fix makes
 	// _meta.readable follow the SAME (through/all) context as the returned value. Row readable when visible=yes,
 	// so a visible=no locale is an unreadable sibling row.

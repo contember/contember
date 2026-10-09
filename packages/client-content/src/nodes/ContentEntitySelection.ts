@@ -133,7 +133,7 @@ export class ContentEntitySelection {
 				...metaField?.selectionSet ?? [],
 				new GraphQlField(null, field, undefined, flagFields),
 			]),
-		])
+		], this.transformFn)
 	}
 
 	transform(transform: (value: any, context: ContentTransformContext) => any): ContentEntitySelection {

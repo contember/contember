@@ -86,6 +86,7 @@ test('root m:n connect is denied when the owning grant is through-only', async (
             data: {categories: [{connect: {id: "${categoryId}"}}]}
           ) {
           ok
+          errorMessage
         }
       }`,
 		executes: [
@@ -132,6 +133,7 @@ test('root m:n connect is denied when the owning grant is through-only', async (
 			data: {
 				updateContent: {
 					ok: false,
+					errorMessage: `Execution has failed:\ncategories.0: NotFoundOrDenied (for input {"id":"${contentId}","categories":{"id":"${categoryId}"}})`,
 				},
 			},
 		},

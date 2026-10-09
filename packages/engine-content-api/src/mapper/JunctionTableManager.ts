@@ -16,6 +16,7 @@ import { AfterJunctionUpdateEvent, BeforeJunctionUpdateEvent } from './EventMana
 import { Mapper } from './Mapper.js'
 
 type OkResultFactory = () => MutationJunctionUpdateOk
+type NoResultFactory = () => MutationNoResultError
 
 type JunctionMutationResult =
 	| MutationJunctionUpdateOk
@@ -134,6 +135,8 @@ export class JunctionTableManager {
 		const hasNoPredicates = Object.keys(owningPredicate).length === 0 && Object.keys(inversePredicate).length === 0
 
 		const okResultFactory = () => new MutationJunctionUpdateOk([], owningEntity, relation, owningPrimary, inversePrimary)
+		const junctionInput = { [owningEntity.primary]: owningPrimary, [relation.name]: { [inverseEntity.primary]: inversePrimary } }
+		const noResultFactory = () => new MutationNoResultError([], 'for input ' + JSON.stringify(junctionInput))
 		if (hasNoPredicates) {
 			return await handler.executeSimple({ db, joiningTable, owningPrimary, inversePrimary, okResultFactory })
 		} else {
@@ -161,7 +164,7 @@ export class JunctionTableManager {
 				return qb
 			}
 
-			return await handler.executeComplex({ db, joiningTable, dataCallback, okResultFactory })
+			return await handler.executeComplex({ db, joiningTable, dataCallback, okResultFactory, noResultFactory })
 		}
 	}
 }
@@ -179,6 +182,7 @@ interface JunctionComplexExecutionArgs {
 	joiningTable: Model.JoiningTable
 	dataCallback: SelectBuilder.Callback
 	okResultFactory: OkResultFactory
+	noResultFactory: NoResultFactory
 }
 
 interface JunctionHandler {
@@ -214,6 +218,7 @@ export class JunctionConnectHandler implements JunctionHandler {
 		joiningTable,
 		dataCallback,
 		okResultFactory,
+		noResultFactory,
 	}: JunctionComplexExecutionArgs): Promise<JunctionMutationResult> {
 		const insert = InsertBuilder.create()
 			.into(joiningTable.tableName)
@@ -236,7 +241,7 @@ export class JunctionConnectHandler implements JunctionHandler {
 
 		const result = await qb.getResult(db)
 		if (result[0]['selected'] === false) {
-			return new MutationNoResultError([])
+			return noResultFactory()
 		}
 		if (result[0]['inserted'] === false) {
 			return new MutationNothingToDo([], NothingToDoReason.alreadyExists)
@@ -270,6 +275,7 @@ export class JunctionDisconnectHandler implements JunctionHandler {
 		joiningTable,
 		dataCallback,
 		okResultFactory,
+		noResultFactory,
 	}: JunctionComplexExecutionArgs): Promise<JunctionMutationResult> {
 		const deleteQb = DeleteBuilder.create()
 			.from(joiningTable.tableName)
@@ -299,7 +305,7 @@ export class JunctionDisconnectHandler implements JunctionHandler {
 
 		const result = await qb.getResult(db)
 		if (result[0]['selected'] === false) {
-			return new MutationNoResultError([])
+			return noResultFactory()
 		}
 		if (result[0]['inserted'] === false) {
 			return new MutationNothingToDo([], NothingToDoReason.alreadyExists)

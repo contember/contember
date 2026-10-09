@@ -62,25 +62,52 @@ export class AclFactory {
 	}
 
 	/**
-	 * A `through: true` grant lands in its own bucket instead of flipping a per-operation flag, so
-	 * root and through grants on the same entity and operation compose instead of conflicting.
+	 * An operation granted only through a relation keeps the legacy `noRoot` form, so a schema without a root
+	 * and a through grant on the same operation stays unchanged: no ACL migration, and older engines and
+	 * tools that read `noRoot` keep working. Only such a combination needs the `through` bucket, where the
+	 * through grants compose with the root ones instead of conflicting.
 	 */
 	private createPermissionsFromAllow(rolePermissions: PermissionsByEntity, entity: Model.Entity): Acl.EntityPermissions {
 		const predicatesResolver = EntityPredicatesResolver.create(rolePermissions, this.model, entity)
 		const definitions = rolePermissions.get(entity.name)?.definitions ?? []
+		const rootDefinitions = definitions.filter(it => it.through !== true)
+		const throughDefinitions = definitions.filter(it => it.through === true)
 
-		const entityOperations: Writable<Acl.EntityOperations> = {
-			...this.createOperations(entity, predicatesResolver, definitions.filter(it => it.through !== true)),
+		const rootOperations = this.createOperations(entity, predicatesResolver, rootDefinitions)
+		const throughOperations = this.createOperations(entity, predicatesResolver, throughDefinitions)
+		const noRoot = this.getOperationNames(rootDefinitions, throughDefinitions)
+
+		const operations: Writable<Acl.EntityOperations> = noRoot.length > 0 ? { noRoot } : {}
+		const composedThroughOperations: Writable<Acl.ThroughOperations> = {}
+		const assign = <Op extends OperationName>(op: Op) => {
+			const isThroughOnly = noRoot.includes(op)
+			const grant = isThroughOnly ? throughOperations[op] : rootOperations[op]
+			if (grant !== undefined) {
+				operations[op] = grant
+			}
+			const throughGrant = throughOperations[op]
+			if (!isThroughOnly && throughGrant !== undefined) {
+				composedThroughOperations[op] = throughGrant
+			}
 		}
-		const throughOperations = this.createOperations(entity, predicatesResolver, definitions.filter(it => it.through === true))
-		if (Object.keys(throughOperations).length > 0) {
-			entityOperations.through = throughOperations
+		for (const op of ['create', 'update', 'read', 'delete'] as const) {
+			assign(op)
+		}
+		if (Object.keys(composedThroughOperations).length > 0) {
+			operations.through = composedThroughOperations
 		}
 
 		return {
 			predicates: predicatesResolver.getUsedPredicates(),
-			operations: entityOperations,
+			operations,
 		}
+	}
+
+	private getOperationNames(rootDefinitions: AllowDefinition<any>[], throughDefinitions: AllowDefinition<any>[]): OperationName[] {
+		const operations = ['create', 'read', 'update', 'delete'] as const
+		const rootOperations = new Set(operations.filter(op => rootDefinitions.some(it => it[op])))
+		const throughOnly = throughDefinitions.flatMap(definition => operations.filter(op => definition[op] && !rootOperations.has(op)))
+		return [...new Set(throughOnly)]
 	}
 
 	private createOperations(
@@ -145,6 +172,8 @@ export class AclFactory {
 		return groupedPermissions
 	}
 }
+
+type OperationName = keyof Acl.ThroughOperations
 
 export type EntityPermissions = { definitions: AllowDefinition<any>[] }
 export type PermissionsByEntity = Map<string, EntityPermissions>

@@ -353,7 +353,12 @@ export class ContentEntitySelection {
 	}
 
 	private withFieldTransform(alias: string, transform: ContentTransform) {
-		const fieldTransforms = new Map(this.fieldTransforms).set(alias, transform)
+		// A relation selected twice under one alias is merged by the server, so both nested transforms apply.
+		const previousTransform = this.fieldTransforms.get(alias)
+		const fieldTransform: ContentTransform = !previousTransform ? transform : (value, ctx) => {
+			return previousTransform(transform(value, ctx), ctx)
+		}
+		const fieldTransforms = new Map(this.fieldTransforms).set(alias, fieldTransform)
 		return new ContentEntitySelection(this.context, this.selectionSet, this.valueTransform, fieldTransforms)
 	}
 }

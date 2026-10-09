@@ -44,7 +44,7 @@ Row-level and field-level security via predicate injection into every SQL operat
 
 ### Read-path guarding
 
-- Every `PredicateFactory` entry point takes a required `AclScope` (`'root' | 'nested'`). `nested` resolves against the set that adds the `through` grants; `root` against the root grants only. Derive it from the relation path with `aclScopeFromPath` (or the `*Read*` helpers taking `relationPath`), never by hand. Writes follow the same rule: `MutationResolver` passes `root`, the relation processors pass `nested`.
+- Every `PredicateFactory` entry point takes a required `AclScope` (`'root' | 'nested'`). `nested` resolves against the set that adds the `through` grants; `root` against the root grants only. Derive it from the relation path with `aclScopeFromPath` (or the `*Read*` helpers taking `relationPath`), never by hand. Writes follow the same rule: `MutationResolver` passes `root`, the relation processors pass `nested` - including their by-unique lookups (`Mapper.getPrimaryValue`, `Mapper.selectField`), which otherwise miss rows readable only via `through`.
 - Projection cell-masking happens during JS hydration (`SelectBuilder` maps `row => predicateGetter(row) ? row[alias] : null`), not in SQL. The predicate boolean column is also consumed by relation fetching (`getColumnValues`) and by the hydrator, so moving the mask into the SQL expression is not a local change.
 - **`WhereOptimizer`'s `isLast` handling is deliberately conservative.** The obvious one-line "fix" (`Number(i) === relationPath.length` → `- 1`) drops the has-many `EXISTS` requirement, collapsing `{ articles: { author: { id: { isNull: false } } } }` to `{ id: { always: true } }` — an over-match. Verified empirically; it needs a real optimizer change, not a tweak.
 

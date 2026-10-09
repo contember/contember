@@ -85,7 +85,7 @@ export class Updater {
 						},
 					],
 				}
-				const count = await mapper.count(entity, where)
+				const count = await mapper.count(entity, where, scope)
 				if (!count) {
 					return [new MutationEntryNotFoundError([], where)]
 				}

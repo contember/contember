@@ -17,7 +17,7 @@ export class OneHasOneInverseCreateInputProcessor implements CreateInputProcesso
 	public async connect(context: Context & { input: Input.UniqueWhere | CheckedPrimary }) {
 		return async ({ primary }: { primary: Input.PrimaryValue }) => {
 			const { targetEntity, input } = context
-			const [owner, err] = await this.mapper.getPrimaryValue(targetEntity, input)
+			const [owner, err] = await this.mapper.getPrimaryValue(targetEntity, input, 'nested')
 			if (err) return [err]
 
 			return await this.connectInternal({ ...context, input: new CheckedPrimary(owner) }, primary)
@@ -39,7 +39,7 @@ export class OneHasOneInverseCreateInputProcessor implements CreateInputProcesso
 		{ input, ...context }: Context & { input: MapperInput.ConnectOrCreateInput },
 	) {
 		return async ({ primary }: { primary: Input.PrimaryValue }) => {
-			const [owner] = await this.mapper.getPrimaryValue(context.targetEntity, input.connect)
+			const [owner] = await this.mapper.getPrimaryValue(context.targetEntity, input.connect, 'nested')
 			if (owner) {
 				return await this.connectInternal({ ...context, input: new CheckedPrimary(owner) }, primary)
 			}
@@ -52,7 +52,7 @@ export class OneHasOneInverseCreateInputProcessor implements CreateInputProcesso
 		{ entity, targetEntity, targetRelation, relation, input }: Context & { input: CheckedPrimary },
 		primary: Input.PrimaryValue,
 	) {
-		const currentInverseSideOfOwner = await this.mapper.selectField(targetEntity, input, targetRelation.name)
+		const currentInverseSideOfOwner = await this.mapper.selectField(targetEntity, input, targetRelation.name, 'nested')
 		const orphanResult: MutationResultList = []
 		if (currentInverseSideOfOwner) {
 			if (targetRelation.orphanRemoval) {

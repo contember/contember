@@ -18,7 +18,7 @@ export class ManyHasOneCreateInputProcessor implements CreateInputProcessor.HasM
 	public async connect(
 		{ targetEntity, relation, input }: Context & { input: Input.UniqueWhere | CheckedPrimary },
 	) {
-		const [value, err] = await this.mapper.getPrimaryValue(targetEntity, input)
+		const [value, err] = await this.mapper.getPrimaryValue(targetEntity, input, 'nested')
 		if (err) return [err]
 		this.insertBuilder.addFieldValue(relation.name, value)
 		return []
@@ -39,7 +39,7 @@ export class ManyHasOneCreateInputProcessor implements CreateInputProcessor.HasM
 	public async connectOrCreate(
 		{ input: { connect, create }, relation, targetEntity }: Context & { input: MapperInput.ConnectOrCreateInput },
 	) {
-		const [value] = await this.mapper.getPrimaryValue(targetEntity, connect)
+		const [value] = await this.mapper.getPrimaryValue(targetEntity, connect, 'nested')
 		if (value) {
 			this.insertBuilder.addFieldValue(relation.name, value)
 		} else {

@@ -11,7 +11,7 @@ import {
 	WhereBuilder,
 } from './select/index.js'
 import { Client, Connection, ConstraintHelper, DatabaseMetadata, RequestMemoryBudget, SelectBuilder } from '@contember/database'
-import { AclScope, PredicatesInjector } from '../acl/index.js'
+import { AclScope, aclScopeFromPath, PredicatesInjector } from '../acl/index.js'
 import { JunctionTableManager } from './JunctionTableManager.js'
 import { DeletedEntitiesStorage, DeleteExecutor } from './delete/index.js'
 import { MutationEntryNotFoundError, MutationResultList } from './Result.js'
@@ -57,14 +57,14 @@ export class Mapper<ConnectionType extends Connection.ConnectionLike = Connectio
 		this.eventManager = new EventManager(this)
 	}
 
-	public async selectField(entity: Model.Entity, where: Input.UniqueWhere | CheckedPrimary, fieldName: string) {
+	public async selectField(entity: Model.Entity, where: Input.UniqueWhere | CheckedPrimary, fieldName: string, scope: AclScope) {
 		const columnName = getColumnName(this.schema, entity, fieldName)
 
 		const qb = SelectBuilder.create() //
 			.from(entity.tableName, 'root_')
 			.select(['root_', columnName])
 		const expandedWhere = this.uniqueWhereExpander.expand(entity, where)
-		const withPredicates = this.predicatesInjector.inject(entity, expandedWhere)
+		const withPredicates = this.predicatesInjector.inject(entity, expandedWhere, scope)
 		const builtQb = this.whereBuilder.build(qb, entity, this.pathFactory.create([]), withPredicates)
 		const result = await builtQb.getResult(this.db)
 
@@ -146,6 +146,7 @@ export class Mapper<ConnectionType extends Connection.ConnectionLike = Connectio
 		const filterWithPredicates = this.predicatesInjector.inject(
 			entity,
 			inputWithOrder.args.filter || {},
+			aclScopeFromPath(relationPath),
 			relationPath[relationPath.length - 1],
 			relationPath,
 		)
@@ -154,12 +155,12 @@ export class Mapper<ConnectionType extends Connection.ConnectionLike = Connectio
 		return await selector.execute(this.selectionDb)
 	}
 
-	public async count(entity: Model.Entity, filter: Input.OptionalWhere) {
+	public async count(entity: Model.Entity, filter: Input.OptionalWhere, scope: AclScope) {
 		const path = this.pathFactory.create([])
 		const qb = SelectBuilder.create()
 			.from(entity.tableName, path.alias)
 			.select(expr => expr.raw('count(*)'), 'row_count')
-		const withPredicates = this.predicatesInjector.inject(entity, filter)
+		const withPredicates = this.predicatesInjector.inject(entity, filter, scope)
 		const qbWithWhere = this.whereBuilder.build(qb, entity, path, withPredicates)
 		const result = await qbWithWhere.getResult(this.db)
 		return result[0].row_count
@@ -177,7 +178,13 @@ export class Mapper<ConnectionType extends Connection.ConnectionLike = Connectio
 			.select(expr => expr.raw('count(*)'), 'row_count')
 			.select([path.alias, relation.joiningColumn.columnName])
 			.groupBy([path.alias, relation.joiningColumn.columnName])
-		const withPredicates = this.predicatesInjector.inject(entity, filter, relationPath[relationPath.length - 1], relationPath)
+		const withPredicates = this.predicatesInjector.inject(
+			entity,
+			filter,
+			aclScopeFromPath(relationPath),
+			relationPath[relationPath.length - 1],
+			relationPath,
+		)
 		const qbWithWhere = this.whereBuilder.build(qb, entity, path, withPredicates, { relationPath })
 		const rows = await qbWithWhere.getResult(this.db)
 		const result = new Map<string, number>()
@@ -212,7 +219,7 @@ export class Mapper<ConnectionType extends Connection.ConnectionLike = Connectio
 		}
 		await this.setupSystemVariables()
 		return tryMutation(this.schema, this.schemaDatabaseMetadata, async () => {
-			const [primaryValue, err] = await this.getPrimaryValue(entity, by)
+			const [primaryValue, err] = await this.getPrimaryValue(entity, by, scope)
 			if (err) return [err]
 
 			return await this.updater.update(this, entity, primaryValue, data, scope, filter)
@@ -230,7 +237,7 @@ export class Mapper<ConnectionType extends Connection.ConnectionLike = Connectio
 		}
 		await this.setupSystemVariables()
 		return tryMutation(this.schema, this.schemaDatabaseMetadata, async () => {
-			const [primaryValue, err] = await this.getPrimaryValue(entity, by)
+			const [primaryValue, err] = await this.getPrimaryValue(entity, by, scope)
 			if (err) return [err]
 
 			return await this.updater.updateCb(this, entity, primaryValue, builderCb, scope)
@@ -249,7 +256,7 @@ export class Mapper<ConnectionType extends Connection.ConnectionLike = Connectio
 		}
 		await this.setupSystemVariables()
 		return tryMutation(this.schema, this.schemaDatabaseMetadata, async () => {
-			const [primaryValue] = await this.getPrimaryValue(entity, by)
+			const [primaryValue] = await this.getPrimaryValue(entity, by, scope)
 			if (primaryValue === undefined) {
 				return await this.insertInternal(entity, create, scope)
 			}
@@ -361,11 +368,12 @@ export class Mapper<ConnectionType extends Connection.ConnectionLike = Connectio
 	public async getPrimaryValue(
 		entity: Model.Entity,
 		where: Input.UniqueWhere | CheckedPrimary,
+		scope: AclScope,
 	): Promise<[Input.PrimaryValue, undefined] | [undefined, MutationEntryNotFoundError]> {
 		if (where instanceof CheckedPrimary) {
 			return [where.primaryValue, undefined]
 		}
-		const result = await this.selectField(entity, where, entity.primary)
+		const result = await this.selectField(entity, where, entity.primary, scope)
 		return result ? [result, undefined] : [undefined, new MutationEntryNotFoundError([], where)]
 	}
 

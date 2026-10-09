@@ -74,16 +74,16 @@ export class PredicatesInjector {
 	constructor(private readonly schema: Model.Schema, private readonly predicateFactory: PredicateFactory) {}
 
 	/**
-	 * The entry entity resolves against the root grants only when it is the query root; anything reached over
-	 * a relation - including a relation fetch that passes only its `relationContext` - picks up `through` grants.
+	 * `scope` is the scope of the entry entity. Relations traversed by `where` are always nested. A lookup
+	 * without a relation context (a by-unique lookup of a mutation) states the scope of the row it looks for.
 	 */
 	public inject(
 		entity: Model.Entity,
 		where: Input.OptionalWhere,
+		scope: AclScope,
 		relationContext?: Model.AnyRelationContext,
 		ancestorPath?: readonly Model.AnyRelationContext[],
 	): Input.OptionalWhere {
-		const scope: AclScope = !relationContext && (!ancestorPath || ancestorPath.length === 0) ? 'root' : 'nested'
 		const restrictedWhere = this.injectToWhere(where, entity, true, relationContext, ancestorPath ?? [], scope)
 		return this.createWhere(entity, restrictedWhere, relationContext, scope)
 	}

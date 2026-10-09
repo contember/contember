@@ -24,7 +24,7 @@ export class ManyHasManyUpdateInputProcessor implements UpdateInputProcessor.Has
 	) {
 		this.updateBuilder.markPredicateCheckedElsewhere(relation.name)
 		return async ({ primary }: { primary: Input.PrimaryValue }) => {
-			const [otherPrimary, err] = await this.mapper.getPrimaryValue(targetEntity, input)
+			const [otherPrimary, err] = await this.mapper.getPrimaryValue(targetEntity, input, 'nested')
 			if (err) return [err]
 			return await this.mapper.connectJunction(entity, relation, primary, otherPrimary, this.scope)
 		}
@@ -52,7 +52,7 @@ export class ManyHasManyUpdateInputProcessor implements UpdateInputProcessor.Has
 	) {
 		this.updateBuilder.markPredicateCheckedElsewhere(context.relation.name)
 		return async ({ primary }: { primary: Input.PrimaryValue }) => {
-			let [otherPrimary] = await this.mapper.getPrimaryValue(context.targetEntity, context.input.connect)
+			let [otherPrimary] = await this.mapper.getPrimaryValue(context.targetEntity, context.input.connect, 'nested')
 			if (!otherPrimary) {
 				const insertResult = await this.mapper.insert(context.targetEntity, context.input.create, 'nested')
 				otherPrimary = getInsertPrimary(insertResult)
@@ -69,7 +69,7 @@ export class ManyHasManyUpdateInputProcessor implements UpdateInputProcessor.Has
 	) {
 		this.updateBuilder.markPredicateCheckedElsewhere(relation.name)
 		return async ({ primary }: { primary: Input.PrimaryValue }) => {
-			const [otherPrimary, err] = await this.mapper.getPrimaryValue(targetEntity, where)
+			const [otherPrimary, err] = await this.mapper.getPrimaryValue(targetEntity, where, 'nested')
 			if (err) return [err]
 			return [
 				...(await this.mapper.update(targetEntity, new CheckedPrimary(otherPrimary), data, 'nested')),
@@ -83,7 +83,7 @@ export class ManyHasManyUpdateInputProcessor implements UpdateInputProcessor.Has
 	) {
 		this.updateBuilder.markPredicateCheckedElsewhere(relation.name)
 		return async ({ primary }: { primary: Input.PrimaryValue }) => {
-			const [otherPrimary] = await this.mapper.getPrimaryValue(targetEntity, where)
+			const [otherPrimary] = await this.mapper.getPrimaryValue(targetEntity, where, 'nested')
 			if (otherPrimary) {
 				const updateResult = await this.mapper.update(targetEntity, new CheckedPrimary(otherPrimary), update, 'nested')
 				const connectResult = await this.mapper.connectJunction(entity, relation, primary, otherPrimary, this.scope)
@@ -106,7 +106,7 @@ export class ManyHasManyUpdateInputProcessor implements UpdateInputProcessor.Has
 	) {
 		this.updateBuilder.markPredicateCheckedElsewhere(relation.name)
 		return async ({ primary }: { primary: Input.PrimaryValue }) => {
-			const [otherPrimary, err] = await this.mapper.getPrimaryValue(targetEntity, input)
+			const [otherPrimary, err] = await this.mapper.getPrimaryValue(targetEntity, input, 'nested')
 			if (err) return [err]
 
 			return await this.mapper.disconnectJunction(entity, relation, primary, otherPrimary, this.scope)

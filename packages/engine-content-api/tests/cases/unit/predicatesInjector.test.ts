@@ -66,7 +66,7 @@ describe('Predicates injector', () => {
 			schema,
 			new PredicateFactory(permissions, schema, new VariableInjector(schema, variables)),
 		)
-		const result = injector.inject(schema.entities['PostLocale'], {})
+		const result = injector.inject(schema.entities['PostLocale'], {}, 'root')
 
 		assert.deepStrictEqual(result, {
 			locale: { in: ['cs'] },
@@ -78,7 +78,7 @@ describe('Predicates injector', () => {
 			schema,
 			new PredicateFactory(permissions, schema, new VariableInjector(schema, variables)),
 		)
-		const result = injector.inject(schema.entities['PostLocale'], { id: { in: [1, 2] } })
+		const result = injector.inject(schema.entities['PostLocale'], { id: { in: [1, 2] } }, 'root')
 
 		assert.deepStrictEqual(result, {
 			and: [
@@ -98,7 +98,7 @@ describe('Predicates injector', () => {
 			new PredicateFactory(permissions, schema, new VariableInjector(schema, variables)),
 		)
 
-		const result = injector.inject(schema.entities['PostLocale'], { title: { eq: 'abc' } })
+		const result = injector.inject(schema.entities['PostLocale'], { title: { eq: 'abc' } }, 'root')
 
 		assert.deepStrictEqual(result, {
 			and: [{ [MASKED_CELL_KEY]: [maskedCell({ title: { eq: 'abc' } }, { locale: { in: ['cs'] } })] }, { locale: { in: ['cs'] } }],
@@ -111,7 +111,7 @@ describe('Predicates injector', () => {
 			new PredicateFactory(permissions, schema, new VariableInjector(schema, variables)),
 		)
 
-		const result = injector.inject(schema.entities['PostLocale'], { title: {} })
+		const result = injector.inject(schema.entities['PostLocale'], { title: {} }, 'root')
 
 		assert.deepStrictEqual(result, {
 			and: [{ title: {} }, { locale: { in: ['cs'] } }],
@@ -170,7 +170,7 @@ describe('predicates injector elimination', () => {
 	it('eliminates predicates in where', () => {
 		const injected = injector.inject(schema.model.entities.Article, {
 			coverPhoto: { image: { tags: { label: { eq: 'foo' } } } },
-		})
+		}, 'root')
 		const optimizer = new WhereOptimizer(schema.model, new ConditionOptimizer())
 		const result = optimizer.optimize(injected, schema.model.entities.Article)
 
@@ -191,6 +191,7 @@ describe('predicates injector elimination', () => {
 			{
 				articles: { id: { in: [testUuid(1)] } },
 			},
+			'nested',
 			relation,
 			ancestorPath,
 		)
@@ -291,6 +292,7 @@ describe('predicates injector - self referencing relations', () => {
 					{ name: { eq: 'Special' } },
 				],
 			},
+			'nested',
 			relation,
 			ancestorPath,
 		)
@@ -319,6 +321,7 @@ describe('predicates injector - self referencing relations', () => {
 					{ name: { contains: 'test' } },
 				],
 			},
+			'nested',
 			relation,
 			ancestorPath,
 		)
@@ -344,6 +347,7 @@ describe('predicates injector - self referencing relations', () => {
 			{
 				not: { parent: { name: { eq: 'Excluded' } } },
 			},
+			'nested',
 			relation,
 			ancestorPath,
 		)
@@ -367,6 +371,7 @@ describe('predicates injector - self referencing relations', () => {
 				parent: { name: { eq: 'Root' } },
 				children: { name: { eq: 'Grandchild' } },
 			},
+			'nested',
 			relation,
 			ancestorPath,
 		)
@@ -390,6 +395,7 @@ describe('predicates injector - self referencing relations', () => {
 			{
 				parent: {},
 			},
+			'nested',
 			relation,
 			ancestorPath,
 		)
@@ -411,6 +417,7 @@ describe('predicates injector - self referencing relations', () => {
 			{
 				children: { name: { eq: 'Grandchild' } },
 			},
+			'nested',
 			relation,
 			ancestorPath,
 		)
@@ -434,6 +441,7 @@ describe('predicates injector - self referencing relations', () => {
 			{
 				name: { eq: 'test' },
 			},
+			'nested',
 			relation,
 			ancestorPath,
 		)
@@ -457,6 +465,7 @@ describe('predicates injector - self referencing relations', () => {
 			{
 				parent: { id: { in: [testUuid(1)] } },
 			},
+			'nested',
 			relation,
 			ancestorPath,
 		)
@@ -499,6 +508,7 @@ describe('predicates injector - multiple relations between entities', () => {
 			{
 				editor: { name: { eq: 'John' } },
 			},
+			'nested',
 			relation,
 			ancestorPath,
 		)
@@ -531,6 +541,7 @@ describe('predicates injector - multiple relations between entities', () => {
 			{
 				author: { name: { eq: 'John' } },
 			},
+			'nested',
 			relation,
 			ancestorPath,
 		)
@@ -573,6 +584,7 @@ describe('predicates injector - non back-reference filter', () => {
 			{
 				image: { url: { eq: 'test.jpg' } },
 			},
+			'nested',
 			relation,
 			ancestorPath,
 		)
@@ -657,7 +669,7 @@ describe('predicates injector - multi-level back-reference', () => {
 		// Employee has predicate: { department: { company: { isActive: true } } }
 		const { relation, ancestorPath } = buildEmployeePath()
 
-		const injected = injector.inject(schema.model.entities.Employee, {}, relation, ancestorPath)
+		const injected = injector.inject(schema.model.entities.Employee, {}, 'nested', relation, ancestorPath)
 
 		// The predicate { department: { company: { isActive: true } } } is simplified because:
 		// 1. department is back-reference (we came from Department via employees)
@@ -681,7 +693,7 @@ describe('predicates injector - multi-level back-reference', () => {
 		})
 		const ancestorPath = [relation]
 
-		const injected = injector.inject(schema.model.entities.Department, {}, relation, ancestorPath)
+		const injected = injector.inject(schema.model.entities.Department, {}, 'nested', relation, ancestorPath)
 
 		// company is back-reference matching Company->departments in path -> simplify
 		assert.deepStrictEqual(injected, {
@@ -694,7 +706,7 @@ describe('predicates injector - multi-level back-reference', () => {
 		// the predicate should NOT be simplified — it is applied verbatim.
 		// Relation hops inside the predicate are the author's rule (as-definer semantics),
 		// so Department's/Company's own read predicates are NOT re-applied inside it.
-		const injected = injector.inject(schema.model.entities.Employee, {})
+		const injected = injector.inject(schema.model.entities.Employee, {}, 'root')
 
 		assert.deepStrictEqual(injected, {
 			department: { company: { isActive: { eq: true } } },
@@ -709,6 +721,7 @@ describe('predicates injector - multi-level back-reference', () => {
 			{
 				name: { eq: 'Alice' },
 			},
+			'nested',
 			relation,
 			ancestorPath,
 		)
@@ -739,6 +752,7 @@ describe('predicates injector - multi-level back-reference', () => {
 			{
 				employees: { name: { eq: 'Alice' } },
 			},
+			'nested',
 			relation,
 			ancestorPath,
 		)
@@ -820,7 +834,7 @@ describe('predicates injector - subsidiary edge case', () => {
 		// Path represents: root Company -> subsidiaries (to subsidiary Company) -> departments (to Department)
 		const ancestorPath = [companySubsidiariesRelation, companyDepartmentsRelation]
 
-		const injected = injector.inject(schema.model.entities.Department, {}, companyDepartmentsRelation, ancestorPath)
+		const injected = injector.inject(schema.model.entities.Department, {}, 'nested', companyDepartmentsRelation, ancestorPath)
 
 		// Department's predicate { company: { isActive: true } }:
 		// - "company" relation points to Company[subsidiary]
@@ -839,7 +853,7 @@ describe('predicates injector - subsidiary edge case', () => {
 		// Since we didn't traverse through Company, the predicate MUST be fully applied —
 		// verbatim, without re-applying Company's own predicate inside it (as-definer semantics)
 
-		const injected = injector.inject(schema.model.entities.Department, {})
+		const injected = injector.inject(schema.model.entities.Department, {}, 'root')
 
 		assert.deepStrictEqual(injected, {
 			company: { isActive: { eq: true } },
@@ -866,6 +880,7 @@ describe('predicates injector - subsidiary edge case', () => {
 			{
 				name: { eq: 'Sub Co' },
 			},
+			'nested',
 			companySubsidiariesRelation,
 			ancestorPath,
 		)
@@ -899,6 +914,7 @@ describe('predicates injector - subsidiary edge case', () => {
 			{
 				parent: { name: { eq: 'Root Co' } },
 			},
+			'nested',
 			companySubsidiariesRelation,
 			ancestorPath,
 		)
@@ -989,7 +1005,7 @@ describe('predicates injector - SECURITY: inconsistent predicates must NOT be si
 
 		const ancestorPath = [companyDepartmentsRelation, departmentEmployeesRelation]
 
-		const injected = injector.inject(schema.model.entities.Employee, {}, departmentEmployeesRelation, ancestorPath)
+		const injected = injector.inject(schema.model.entities.Employee, {}, 'nested', departmentEmployeesRelation, ancestorPath)
 
 		assert.deepStrictEqual(injected, {
 			department: { company: { name: { eq: 'Acme' } } },
@@ -1001,7 +1017,7 @@ describe('predicates injector - SECURITY: inconsistent predicates must NOT be si
 		// The predicate is the author's rule: its relation hops are NOT additionally
 		// guarded by Department's/Company's own read predicates (as-definer semantics).
 
-		const injected = injector.inject(schema.model.entities.Employee, {})
+		const injected = injector.inject(schema.model.entities.Employee, {}, 'root')
 
 		assert.deepStrictEqual(injected, {
 			department: { company: { name: { eq: 'Acme' } } },
@@ -1030,6 +1046,7 @@ describe('predicates injector - SECURITY: inconsistent predicates must NOT be si
 			{
 				company: { name: { eq: 'Test' } },
 			},
+			'nested',
 			relation,
 			ancestorPath,
 		)
@@ -1106,7 +1123,7 @@ describe('predicates injector - many-to-many relations', () => {
 
 	it('should apply Tag predicate when traversing Post -> tags (owning side)', () => {
 		const { relation, ancestorPath } = getOwningContext()
-		const injected = injector.inject(schema.model.entities.Tag, {}, relation, ancestorPath)
+		const injected = injector.inject(schema.model.entities.Tag, {}, 'nested', relation, ancestorPath)
 
 		assert.deepStrictEqual(injected, {
 			isActive: { eq: true },
@@ -1115,7 +1132,7 @@ describe('predicates injector - many-to-many relations', () => {
 
 	it('should apply Post predicate when traversing Tag -> posts (inverse side)', () => {
 		const { relation, ancestorPath } = getInverseContext()
-		const injected = injector.inject(schema.model.entities.Post, {}, relation, ancestorPath)
+		const injected = injector.inject(schema.model.entities.Post, {}, 'nested', relation, ancestorPath)
 
 		assert.deepStrictEqual(injected, {
 			isPublished: { eq: true },
@@ -1130,6 +1147,7 @@ describe('predicates injector - many-to-many relations', () => {
 			{
 				posts: { title: { eq: 'Hello' } },
 			},
+			'nested',
 			relation,
 			ancestorPath,
 		)
@@ -1155,6 +1173,7 @@ describe('predicates injector - many-to-many relations', () => {
 			{
 				tags: { name: { eq: 'featured' } },
 			},
+			'nested',
 			relation,
 			ancestorPath,
 		)
@@ -1227,6 +1246,7 @@ describe('predicates injector - SECURITY: cell-level predicates on back-referenc
 			{
 				parent: { secret: { eq: 'X' } },
 			},
+			'nested',
 			relation,
 			ancestorPath,
 		)
@@ -1252,6 +1272,7 @@ describe('predicates injector - SECURITY: cell-level predicates on back-referenc
 			{
 				parent: { name: { eq: 'A' }, secret: { eq: 'X' } },
 			},
+			'nested',
 			relation,
 			ancestorPath,
 		)
@@ -1279,6 +1300,7 @@ describe('predicates injector - SECURITY: cell-level predicates on back-referenc
 			{
 				parent: { id: { in: [testUuid(1)] } },
 			},
+			'nested',
 			relation,
 			ancestorPath,
 		)
@@ -1298,6 +1320,7 @@ describe('predicates injector - SECURITY: cell-level predicates on back-referenc
 			{
 				children: { parent: { secret: { eq: 'X' } } },
 			},
+			'root',
 		)
 
 		assert.deepStrictEqual(injected, {
@@ -1325,6 +1348,7 @@ describe('predicates injector - SECURITY: cell-level predicates on back-referenc
 					{ name: { eq: 'A' } },
 				],
 			},
+			'nested',
 			relation,
 			ancestorPath,
 		)
@@ -1350,6 +1374,7 @@ describe('predicates injector - SECURITY: cell-level predicates on back-referenc
 			{
 				not: { parent: { secret: { eq: 'X' } } },
 			},
+			'nested',
 			relation,
 			ancestorPath,
 		)
@@ -1374,6 +1399,7 @@ describe('predicates injector - SECURITY: cell-level predicates on back-referenc
 			{
 				parent: { id: { in: [testUuid(1)] }, secret: { eq: 'X' } },
 			},
+			'nested',
 			relation,
 			ancestorPath,
 		)
@@ -1468,6 +1494,7 @@ describe('predicates injector - SECURITY: cell-level predicates on many-to-many 
 			{
 				posts: { internalNote: { eq: 'X' } },
 			},
+			'nested',
 			relation,
 			ancestorPath,
 		)
@@ -1493,6 +1520,7 @@ describe('predicates injector - SECURITY: cell-level predicates on many-to-many 
 			{
 				tags: { secret: { eq: 'X' } },
 			},
+			'nested',
 			relation,
 			ancestorPath,
 		)
@@ -1571,6 +1599,7 @@ describe('predicates injector - SECURITY: relation-traversing cell-level predica
 			{
 				parent: { secret: { eq: 'X' } },
 			},
+			'nested',
 			relation,
 			ancestorPath,
 		)
@@ -1632,7 +1661,7 @@ describe('predicates injector - root vs through (noRoot) relation target permiss
 	it('resolves a nested relation target predicate against the `all` permission set', () => {
 		const injected = injector.inject(schema.model.entities.Document, {
 			secret: { label: { eq: 'x' } },
-		})
+		}, 'root')
 
 		// Secret is reached through Document.secret, so the through (viewer) permission applies: any row is
 		// readable, no predicate. Before the fix the nested target consulted the root set and the editor's
@@ -1645,7 +1674,7 @@ describe('predicates injector - root vs through (noRoot) relation target permiss
 	it('still resolves a query-root entity against the root permission set (unchanged)', () => {
 		const injected = injector.inject(schema.model.entities.Secret, {
 			label: { eq: 'x' },
-		})
+		}, 'root')
 
 		// As a root entry point only the editor's root permission applies, so the `isVisible` predicate is enforced.
 		assert.deepStrictEqual(injected, {
@@ -1703,7 +1732,7 @@ describe('predicates injector - SECURITY: cell-level decision uses the through c
 		// Node, reached through `children`, so it is through-access and `secret` is cell-level under `all`.
 		const injected = injector.inject(schema.model.entities.Node, {
 			children: { parent: { secret: { eq: 'X' } } },
-		})
+		}, 'root')
 
 		// `secret`'s read predicate (isEditor) must survive the back-reference simplification. Were the cell-level
 		// decision made against the root set, `secret` would look row-level there, be dropped, and the filter
@@ -1742,7 +1771,7 @@ describe('predicate injector input handling', () => {
 				not: null,
 				or: null,
 			},
-		})
+		}, 'root')
 	})
 })
 
@@ -1881,7 +1910,7 @@ describe('predicates injector - SECURITY: to-many back-reference keeps sibling r
 		// { isPublished: true } MUST be kept so unreadable siblings cannot be probed via `secret`.
 		const injected = injector.inject(schema.model.entities.Article, {
 			coverPhoto: { articles: { secret: { eq: 'X' } } },
-		})
+		}, 'root')
 
 		assert.deepStrictEqual(injected, {
 			and: [
@@ -1911,6 +1940,7 @@ describe('predicates injector - SECURITY: to-many back-reference keeps sibling r
 		const injected = injector.inject(
 			schema.model.entities.Article,
 			{ coverPhoto: { url: { eq: 'x.jpg' } } },
+			'nested',
 			articlesRelation,
 			[articlesRelation],
 		)
@@ -1936,7 +1966,7 @@ describe('predicates injector - SECURITY: to-many back-reference keeps sibling r
 		// { isPublished: true } MUST be kept.
 		const injected = injector.inject(schema.model.entities.Post, {
 			tags: { posts: { secret: { eq: 'X' } } },
-		})
+		}, 'root')
 
 		assert.deepStrictEqual(injected, {
 			and: [
@@ -1961,6 +1991,7 @@ describe('predicates injector - SECURITY: to-many back-reference keeps sibling r
 		const injectedSecret = injector.inject(
 			schema.model.entities.Image,
 			{ articles: { secret: { eq: 'X' } } },
+			'nested',
 			coverPhotoRelation,
 			[coverPhotoRelation],
 		)
@@ -1975,6 +2006,7 @@ describe('predicates injector - SECURITY: to-many back-reference keeps sibling r
 		const injectedTitle = injector.inject(
 			schema.model.entities.Image,
 			{ articles: { title: { eq: 'T' } } },
+			'nested',
 			coverPhotoRelation,
 			[coverPhotoRelation],
 		)
@@ -1998,6 +2030,7 @@ describe('predicates injector - SECURITY: to-many back-reference keeps sibling r
 		const injected = injector.inject(
 			schema.model.entities.Tag,
 			{},
+			'nested',
 			tagsRelation,
 			[tagsRelation],
 		)
@@ -2066,7 +2099,7 @@ describe('predicates injector - SECURITY: back-reference simplification applies 
 	it('root filter keeps the guard of a back-reference to a non-adjacent ancestor', () => {
 		const injected = injector.inject(schema.model.entities.Author, {
 			posts: { category: { posts: { author: { name: { eq: 'x' } } } } },
-		})
+		}, 'root')
 
 		assert.deepStrictEqual(injected, {
 			and: [
@@ -2088,6 +2121,7 @@ describe('predicates injector - SECURITY: back-reference simplification applies 
 		const injected = injector.inject(
 			schema.model.entities.Post,
 			{ author: { name: { eq: 'x' } } },
+			'nested',
 			categoryPosts,
 			[authorPosts, postCategory, categoryPosts],
 		)
@@ -2104,7 +2138,7 @@ describe('predicates injector - SECURITY: back-reference simplification applies 
 	it('CONTROL: a back-reference to the immediate parent still simplifies', () => {
 		assert.deepStrictEqual(injector.createReadGuard(postAuthor, [authorPosts]), {})
 		assert.deepStrictEqual(
-			injector.inject(schema.model.entities.Post, { author: { name: { eq: 'x' } } }, authorPosts, [authorPosts]),
+			injector.inject(schema.model.entities.Post, { author: { name: { eq: 'x' } } }, 'nested', authorPosts, [authorPosts]),
 			{ author: { name: { eq: 'x' } } },
 		)
 	})

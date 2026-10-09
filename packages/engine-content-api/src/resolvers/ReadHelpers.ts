@@ -13,7 +13,7 @@ export const paginate = async (
 ) => {
 	const paginationHelper = createPaginationHelper(queryAst)
 	const totalCount = paginationHelper.requiresTotalCount
-		? await mapper.count(entity, queryAst.args.filter || {})
+		? await mapper.count(entity, queryAst.args.filter || {}, 'root')
 		: undefined
 	const nodes = paginationHelper.nodeField ? await mapper.select(entity, paginationHelper.nodeField, []) : undefined
 

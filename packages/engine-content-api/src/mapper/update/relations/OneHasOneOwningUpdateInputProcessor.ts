@@ -30,7 +30,7 @@ export class OneHasOneOwningUpdateInputProcessor
 
 	public async connect(context: Model.OneHasOneOwningContext & { input: Input.UniqueWhere | CheckedPrimary }) {
 		const { entity, relation, targetEntity, targetRelation, input } = context
-		const [newInverseSide, err] = await this.mapper.getPrimaryValue(targetEntity, input)
+		const [newInverseSide, err] = await this.mapper.getPrimaryValue(targetEntity, input, 'nested')
 		if (err) return [err]
 		const currentInverseSide = await this.getCurrentInverseSide(targetRelation, relation, entity)
 		const currentOwnerResult = await this.handleStateBeforeConnect(context, currentInverseSide, newInverseSide)
@@ -74,7 +74,7 @@ export class OneHasOneOwningUpdateInputProcessor
 	) {
 		const { relation, targetRelation, targetEntity, entity } = context
 		const currentInverseSide = await this.getCurrentInverseSide(targetRelation, relation, entity)
-		const [newInverseSide] = await this.mapper.getPrimaryValue(targetEntity, connect)
+		const [newInverseSide] = await this.mapper.getPrimaryValue(targetEntity, connect, 'nested')
 
 		if (newInverseSide) {
 			const currentOwnerResult = await this.handleStateBeforeConnect(context, currentInverseSide, newInverseSide)
@@ -113,6 +113,7 @@ export class OneHasOneOwningUpdateInputProcessor
 				entity,
 				{ [entity.primary]: this.primaryValue },
 				relation.name,
+				'nested',
 			)
 			if (!inversePrimary) {
 				return [new MutationNothingToDo([], NothingToDoReason.emptyRelation)]
@@ -124,7 +125,7 @@ export class OneHasOneOwningUpdateInputProcessor
 	public async upsert(
 		{ entity, relation, targetEntity, input: { create, update } }: Model.OneHasOneOwningContext & { input: UpdateInputProcessor.UpsertInput },
 	) {
-		const primary = await this.mapper.selectField(entity, { [entity.primary]: this.primaryValue }, relation.name)
+		const primary = await this.mapper.selectField(entity, { [entity.primary]: this.primaryValue }, relation.name, 'nested')
 		if (!primary) {
 			const insertResult = await this.mapper.insert(targetEntity, create, 'nested')
 			const insertPrimary = getInsertPrimary(insertResult)
@@ -146,7 +147,7 @@ export class OneHasOneOwningUpdateInputProcessor
 		}
 
 		const inversePrimary = (targetRelation && !targetRelation.nullable) || relation.orphanRemoval
-			? await this.mapper.selectField(entity, { [entity.primary]: this.primaryValue }, relation.name)
+			? await this.mapper.selectField(entity, { [entity.primary]: this.primaryValue }, relation.name, 'nested')
 			: undefined
 		if (inversePrimary && targetRelation && !targetRelation.nullable && !relation.orphanRemoval) {
 			return [new MutationConstraintViolationError([], ConstraintType.notNull)]
@@ -172,6 +173,7 @@ export class OneHasOneOwningUpdateInputProcessor
 				entity,
 				{ [entity.primary]: this.primaryValue },
 				relation.name,
+				'nested',
 			)
 			if (!targetPrimary) {
 				return [new MutationNothingToDo([], NothingToDoReason.emptyRelation)]
@@ -197,7 +199,7 @@ export class OneHasOneOwningUpdateInputProcessor
 		entity: Model.Entity,
 	) {
 		if ((targetRelation && !targetRelation.nullable) || relation.orphanRemoval) {
-			return this.mapper.selectField(entity, { [entity.primary]: this.primaryValue }, relation.name)
+			return this.mapper.selectField(entity, { [entity.primary]: this.primaryValue }, relation.name, 'nested')
 		}
 		return undefined
 	}
@@ -224,7 +226,7 @@ export class OneHasOneOwningUpdateInputProcessor
 
 		const [currentOwnerOfNewInverseSide] = await this.mapper.getPrimaryValue(entity, {
 			[relation.name]: { [targetEntity.primary]: newInverseSide },
-		})
+		}, 'nested')
 
 		if (currentOwnerOfNewInverseSide === this.primaryValue) {
 			return [new MutationNothingToDo([], NothingToDoReason.alreadyExists)]

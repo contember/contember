@@ -51,7 +51,7 @@ export class DeleteExecutor {
 		filter?: Input.OptionalWhere,
 	): Promise<MutationResultList> {
 		return mapper.mutex.execute(async () => {
-			const [primaryValue, err] = await mapper.getPrimaryValue(entity, by)
+			const [primaryValue, err] = await mapper.getPrimaryValue(entity, by, scope)
 			if (err) return [err]
 
 			if (mapper.deletedEntities.isDeleted(entity.name, primaryValue)) {

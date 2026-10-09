@@ -26,7 +26,7 @@ export class OneHasOneInverseUpdateInputProcessor
 
 	public async connect({ input, ...ctx }: Model.OneHasOneInverseContext & { input: Input.UniqueWhere | CheckedPrimary }) {
 		return async () => {
-			const [newOwner, err] = await this.mapper.getPrimaryValue(ctx.targetEntity, input)
+			const [newOwner, err] = await this.mapper.getPrimaryValue(ctx.targetEntity, input, 'nested')
 			if (err) return [err]
 			return await this.connectInternal(ctx, newOwner)
 		}
@@ -36,7 +36,7 @@ export class OneHasOneInverseUpdateInputProcessor
 		{ input, ...ctx }: Model.OneHasOneInverseContext & { input: MapperInput.ConnectOrCreateInput },
 	) {
 		return async () => {
-			const [newOwner] = await this.mapper.getPrimaryValue(ctx.targetEntity, input.connect)
+			const [newOwner] = await this.mapper.getPrimaryValue(ctx.targetEntity, input.connect, 'nested')
 			if (newOwner) {
 				return await this.connectInternal(ctx, newOwner)
 			}
@@ -87,7 +87,7 @@ export class OneHasOneInverseUpdateInputProcessor
 			}
 			const [currentOwner] = await this.mapper.getPrimaryValue(targetEntity, {
 				[targetRelation.name]: { [entity.primary]: this.primaryValue },
-			})
+			}, 'nested')
 			if (!currentOwner) {
 				return [new MutationNothingToDo([], NothingToDoReason.emptyRelation)]
 			}
@@ -127,7 +127,7 @@ export class OneHasOneInverseUpdateInputProcessor
 	) {
 		const [currentOwner] = await this.mapper.getPrimaryValue(targetEntity, {
 			[targetRelation.name]: { [entity.primary]: this.primaryValue },
-		})
+		}, 'nested')
 		if (newOwner === currentOwner) {
 			return [new MutationNothingToDo([], NothingToDoReason.alreadyExists)]
 		}
@@ -144,7 +144,7 @@ export class OneHasOneInverseUpdateInputProcessor
 			result.push(...disconnectFromCurrentOwner)
 		}
 		const orphanedInverseSide = targetRelation.orphanRemoval
-			? await this.mapper.selectField(targetEntity, { [targetEntity.primary]: newOwner }, targetRelation.name)
+			? await this.mapper.selectField(targetEntity, { [targetEntity.primary]: newOwner }, targetRelation.name, 'nested')
 			: null
 
 		const connectToNewOwner = await this.mapper.updateInternal(targetEntity, new CheckedPrimary(newOwner), builder => {
@@ -165,7 +165,7 @@ export class OneHasOneInverseUpdateInputProcessor
 	) {
 		const [currentOwner] = await this.mapper.getPrimaryValue(targetEntity, {
 			[targetRelation.name]: { [entity.primary]: this.primaryValue },
-		})
+		}, 'nested')
 		if (currentOwner && !targetRelation.nullable) {
 			// todo cascade delete support?
 			return [new MutationConstraintViolationError([], ConstraintType.notNull)]

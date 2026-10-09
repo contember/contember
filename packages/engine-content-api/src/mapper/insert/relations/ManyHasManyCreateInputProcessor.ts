@@ -21,7 +21,7 @@ export class ManyHasManyCreateInputProcessor implements CreateInputProcessor.Has
 		{ entity, targetEntity, relation, targetRelation, input }: Context & { input: Input.UniqueWhere | CheckedPrimary },
 	): Promise<SqlCreateInputProcessorResult> {
 		return async ({ primary }) => {
-			const [otherPrimary, err] = await this.mapper.getPrimaryValue(targetEntity, input)
+			const [otherPrimary, err] = await this.mapper.getPrimaryValue(targetEntity, input, 'nested')
 			if (err) return [err]
 			return await this.mapper.connectJunction(entity, relation, primary, otherPrimary, this.scope)
 		}
@@ -47,7 +47,7 @@ export class ManyHasManyCreateInputProcessor implements CreateInputProcessor.Has
 		context: Context & { input: MapperInput.ConnectOrCreateInput },
 	) {
 		return async ({ primary }: { primary: Input.PrimaryValue }) => {
-			let [otherPrimary] = await this.mapper.getPrimaryValue(context.targetEntity, context.input.connect)
+			let [otherPrimary] = await this.mapper.getPrimaryValue(context.targetEntity, context.input.connect, 'nested')
 			if (!otherPrimary) {
 				const insertResult = await this.mapper.insert(context.targetEntity, context.input.create, 'nested')
 				otherPrimary = getInsertPrimary(insertResult)

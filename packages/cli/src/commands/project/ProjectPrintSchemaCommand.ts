@@ -69,13 +69,13 @@ export class ProjectPrintSchemaCommand extends Command<Args, Options> {
 		const permissionFactory = new PermissionFactory()
 		const inputRoles = input.getOption('role')
 		const schemaNormalized = input.getOption('normalize') ? normalizeSchema(filteredSchema) : filteredSchema
-		const permissions = permissionFactory.create(schemaNormalized, inputRoles || ['admin'])
+		// Built the way the engine builds it: types and introspection from the nested set, root fields from the root set.
+		const { root: rootPermissions, all: permissions } = permissionFactory.createContextual(schemaNormalized, inputRoles || ['admin'])
 		const schemaBuilderFactory = new GraphQlSchemaBuilderFactory()
-		const authorizator = new Authorizator(
-			permissions,
-			schemaNormalized.acl.customPrimary ?? false,
-			Object.values(schemaNormalized.acl.roles).some(it => it.content?.refreshMaterializedView),
-		)
+		const customPrimary = schemaNormalized.acl.customPrimary ?? false
+		const refreshMaterializedView = Object.values(schemaNormalized.acl.roles).some(it => it.content?.refreshMaterializedView)
+		const authorizator = new Authorizator(permissions, customPrimary, refreshMaterializedView)
+		const rootAuthorizator = new Authorizator(rootPermissions, customPrimary, refreshMaterializedView)
 		const introspection = new IntrospectionSchemaFactory(
 			schemaNormalized.model,
 			new EntityRulesResolver(schemaNormalized.validation, schemaNormalized.model),
@@ -97,7 +97,7 @@ export class ProjectPrintSchemaCommand extends Command<Args, Options> {
 				quiet: value => JSON.stringify(value),
 			})
 		} else if (format === 'graphql') {
-			const contentSchema = schemaBuilderFactory.create(schemaNormalized.model, authorizator).build()
+			const contentSchema = schemaBuilderFactory.create(schemaNormalized.model, authorizator, rootAuthorizator).build()
 			const introspectionSchemaFactory = new IntrospectionSchemaDefinitionFactory(introspection)
 			const introspectionSchema = introspectionSchemaFactory.create()
 			const gqlSchema = mergeSchemas({

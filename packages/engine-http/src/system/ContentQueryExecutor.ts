@@ -24,7 +24,7 @@ export class ContentQueryExecutorImpl implements ContentQueryExecutor {
 	): Promise<ContentQueryExecutorResult> {
 		const permissions = new AllowAllPermissionFactory().create(schema.model, true)
 		const authorizator = new Authorizator(permissions, true, false)
-		const dataSchemaBuilder = this.graphqlSchemaBuilderFactory.create(schema.model, authorizator)
+		const dataSchemaBuilder = this.graphqlSchemaBuilderFactory.create(schema.model, authorizator, authorizator)
 		const dataSchema = dataSchemaBuilder.build()
 
 		const identityId = identity.id

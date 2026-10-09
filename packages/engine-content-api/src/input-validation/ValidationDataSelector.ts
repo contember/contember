@@ -2,12 +2,13 @@ import { QueryAstFactory } from './QueryAstFactory.js'
 import { Mapper } from '../mapper/index.js'
 import { Dependencies } from './dependencies/index.js'
 import { Input, Model, Value } from '@contember/schema'
+import { AclScope } from '../acl/index.js'
 
 export class ValidationDataSelector {
 	constructor(private readonly model: Model.Schema, private readonly queryAstFactory: QueryAstFactory) {}
 
-	public async getPrimaryValue(mapper: Mapper, entity: Model.Entity, where: Input.UniqueWhere) {
-		return mapper.getPrimaryValue(entity, where)
+	public async getPrimaryValue(mapper: Mapper, entity: Model.Entity, where: Input.UniqueWhere, scope: AclScope) {
+		return mapper.getPrimaryValue(entity, where, scope)
 	}
 
 	public async select(

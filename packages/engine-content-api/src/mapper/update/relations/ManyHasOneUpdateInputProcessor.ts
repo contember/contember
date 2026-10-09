@@ -27,7 +27,7 @@ export class ManyHasOneUpdateInputProcessor implements UpdateInputProcessor.HasO
 	public async connect(
 		{ targetEntity, relation, input }: Context & { input: Input.UniqueWhere | CheckedPrimary },
 	) {
-		const [value, err] = await this.mapper.getPrimaryValue(targetEntity, input)
+		const [value, err] = await this.mapper.getPrimaryValue(targetEntity, input, 'nested')
 		if (err) return [err]
 		this.builder.addFieldValue(relation.name, value)
 		return []
@@ -36,7 +36,7 @@ export class ManyHasOneUpdateInputProcessor implements UpdateInputProcessor.HasO
 	public async create(
 		{ relation, targetEntity, input }: Context & { input: MapperInput.CreateDataInput },
 	) {
-		const insertResult = await this.mapper.insert(targetEntity, input)
+		const insertResult = await this.mapper.insert(targetEntity, input, 'nested')
 		const value = getInsertPrimary(insertResult)
 		if (!value) {
 			return insertResult
@@ -48,11 +48,11 @@ export class ManyHasOneUpdateInputProcessor implements UpdateInputProcessor.HasO
 	public async connectOrCreate(
 		{ input: { connect, create }, relation, targetEntity }: Context & { input: MapperInput.ConnectOrCreateInput },
 	) {
-		const [value] = await this.mapper.getPrimaryValue(targetEntity, connect)
+		const [value] = await this.mapper.getPrimaryValue(targetEntity, connect, 'nested')
 		if (value) {
 			this.builder.addFieldValue(relation.name, value)
 		} else {
-			const insertResult = await this.mapper.insert(targetEntity, create)
+			const insertResult = await this.mapper.insert(targetEntity, create, 'nested')
 			const primary = getInsertPrimary(insertResult)
 			if (!primary) {
 				return insertResult
@@ -71,20 +71,21 @@ export class ManyHasOneUpdateInputProcessor implements UpdateInputProcessor.HasO
 				entity,
 				{ [entity.primary]: primary },
 				relation.name,
+				'nested',
 			)
 			if (!inversePrimary) {
 				return [new MutationNothingToDo([], NothingToDoReason.emptyRelation)]
 			}
-			return await this.mapper.update(targetEntity, new CheckedPrimary(inversePrimary), input)
+			return await this.mapper.update(targetEntity, new CheckedPrimary(inversePrimary), input, 'nested')
 		}
 	}
 
 	public async upsert(
 		{ entity, relation, targetEntity, input: { create, update } }: Context & { input: UpdateInputProcessor.UpsertInput },
 	) {
-		const inversePrimary = await this.mapper.selectField(entity, { [entity.primary]: this.primary }, relation.name)
+		const inversePrimary = await this.mapper.selectField(entity, { [entity.primary]: this.primary }, relation.name, 'nested')
 		if (!inversePrimary) {
-			const insertResult = await this.mapper.insert(targetEntity, create)
+			const insertResult = await this.mapper.insert(targetEntity, create, 'nested')
 			const insertPrimary = getInsertPrimary(insertResult)
 			if (insertPrimary) {
 				this.builder.addFieldValue(relation.name, insertPrimary)
@@ -92,7 +93,7 @@ export class ManyHasOneUpdateInputProcessor implements UpdateInputProcessor.HasO
 			return insertResult
 		}
 
-		return async () => await this.mapper.update(targetEntity, new CheckedPrimary(inversePrimary), update)
+		return async () => await this.mapper.update(targetEntity, new CheckedPrimary(inversePrimary), update, 'nested')
 	}
 
 	public async disconnect(
@@ -116,8 +117,9 @@ export class ManyHasOneUpdateInputProcessor implements UpdateInputProcessor.HasO
 				entity,
 				{ [entity.primary]: primary },
 				relation.name,
+				'nested',
 			)
-			return await this.mapper.delete(targetEntity, { [targetEntity.primary]: inversePrimary })
+			return await this.mapper.delete(targetEntity, { [targetEntity.primary]: inversePrimary }, 'nested')
 		}
 	}
 }

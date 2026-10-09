@@ -1,3 +1,4 @@
+export * from './AclScope.js'
 export * from './Authorizator.js'
 export * from './PermissionFactory.js'
 export * from './PredicateFactory.js'

@@ -100,7 +100,7 @@ describe('Predicates factory', () => {
 		const predicateFactory = new PredicateFactory(permissions, schema, new VariableInjector(schema, {}))
 		const image = schema.entities['Image']
 		const authorRelation = image.fields['authors'] as Model.OneHasManyRelation
-		const predicate = predicateFactory.create(image, Acl.Operation.read, undefined, {
+		const predicate = predicateFactory.create(image, Acl.Operation.read, 'root', undefined, {
 			type: 'manyHasOne',
 			entity: schema.entities.Author,
 			relation: schema.entities.Author.fields.image as Model.ManyHasOneRelation,
@@ -123,25 +123,16 @@ describe('Predicates factory', () => {
 		})
 	})
 
-	it('uses root permissions when isRoot is true', () => {
+	it('uses root permissions in the root scope', () => {
 		const predicateFactory = new PredicateFactory(permissions, schema, new VariableInjector(schema, {}), throughPermissions)
 		const author = schema.entities['Author']
-		const predicate = predicateFactory.create(author, Acl.Operation.read, ['name'], undefined, true)
+		const predicate = predicateFactory.create(author, Acl.Operation.read, 'root', ['name'])
 		assert.deepStrictEqual(predicate, {
 			isPublic: { eq: true },
 		})
 	})
 
-	it('uses root permissions when isRoot is undefined', () => {
-		const predicateFactory = new PredicateFactory(permissions, schema, new VariableInjector(schema, {}), throughPermissions)
-		const author = schema.entities['Author']
-		const predicate = predicateFactory.create(author, Acl.Operation.read, ['name'], undefined, undefined)
-		assert.deepStrictEqual(predicate, {
-			isPublic: { eq: true },
-		})
-	})
-
-	it('uses allPermissions when isRoot is false', () => {
+	it('uses the nested permission set in the nested scope', () => {
 		const allPerms: Acl.Permissions = {
 			...permissions,
 			Author: {
@@ -161,16 +152,16 @@ describe('Predicates factory', () => {
 		}
 		const predicateFactory = new PredicateFactory(permissions, schema, new VariableInjector(schema, {}), allPerms)
 		const author = schema.entities['Author']
-		const predicate = predicateFactory.create(author, Acl.Operation.read, ['name'], undefined, false)
+		const predicate = predicateFactory.create(author, Acl.Operation.read, 'nested', ['name'])
 		assert.deepStrictEqual(predicate, {
 			name: { eq: 'all' },
 		})
 	})
 
-	it('falls back to root permissions when allPermissions is not provided', () => {
+	it('falls back to root permissions in the nested scope when no nested set is provided', () => {
 		const predicateFactory = new PredicateFactory(permissions, schema, new VariableInjector(schema, {}))
 		const author = schema.entities['Author']
-		const predicate = predicateFactory.create(author, Acl.Operation.read, ['name'], undefined, false)
+		const predicate = predicateFactory.create(author, Acl.Operation.read, 'nested', ['name'])
 		assert.deepStrictEqual(predicate, {
 			isPublic: { eq: true },
 		})

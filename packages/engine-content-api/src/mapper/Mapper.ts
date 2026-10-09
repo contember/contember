@@ -11,7 +11,7 @@ import {
 	WhereBuilder,
 } from './select/index.js'
 import { Client, Connection, ConstraintHelper, DatabaseMetadata, RequestMemoryBudget, SelectBuilder } from '@contember/database'
-import { PredicatesInjector } from '../acl/index.js'
+import { AclScope, aclScopeFromPath, PredicatesInjector, ROW_LOOKUP_SCOPE } from '../acl/index.js'
 import { JunctionTableManager } from './JunctionTableManager.js'
 import { DeletedEntitiesStorage, DeleteExecutor } from './delete/index.js'
 import { MutationEntryNotFoundError, MutationResultList } from './Result.js'
@@ -57,14 +57,14 @@ export class Mapper<ConnectionType extends Connection.ConnectionLike = Connectio
 		this.eventManager = new EventManager(this)
 	}
 
-	public async selectField(entity: Model.Entity, where: Input.UniqueWhere | CheckedPrimary, fieldName: string) {
+	public async selectField(entity: Model.Entity, where: Input.UniqueWhere | CheckedPrimary, fieldName: string, scope: AclScope) {
 		const columnName = getColumnName(this.schema, entity, fieldName)
 
 		const qb = SelectBuilder.create() //
 			.from(entity.tableName, 'root_')
 			.select(['root_', columnName])
 		const expandedWhere = this.uniqueWhereExpander.expand(entity, where)
-		const withPredicates = this.predicatesInjector.inject(entity, expandedWhere)
+		const withPredicates = this.predicatesInjector.inject(entity, expandedWhere, scope)
 		const builtQb = this.whereBuilder.build(qb, entity, this.pathFactory.create([]), withPredicates)
 		const result = await builtQb.getResult(this.db)
 
@@ -146,6 +146,7 @@ export class Mapper<ConnectionType extends Connection.ConnectionLike = Connectio
 		const filterWithPredicates = this.predicatesInjector.inject(
 			entity,
 			inputWithOrder.args.filter || {},
+			aclScopeFromPath(relationPath),
 			relationPath[relationPath.length - 1],
 			relationPath,
 		)
@@ -154,12 +155,12 @@ export class Mapper<ConnectionType extends Connection.ConnectionLike = Connectio
 		return await selector.execute(this.selectionDb)
 	}
 
-	public async count(entity: Model.Entity, filter: Input.OptionalWhere) {
+	public async count(entity: Model.Entity, filter: Input.OptionalWhere, scope: AclScope) {
 		const path = this.pathFactory.create([])
 		const qb = SelectBuilder.create()
 			.from(entity.tableName, path.alias)
 			.select(expr => expr.raw('count(*)'), 'row_count')
-		const withPredicates = this.predicatesInjector.inject(entity, filter)
+		const withPredicates = this.predicatesInjector.inject(entity, filter, scope)
 		const qbWithWhere = this.whereBuilder.build(qb, entity, path, withPredicates)
 		const result = await qbWithWhere.getResult(this.db)
 		return result[0].row_count
@@ -177,7 +178,13 @@ export class Mapper<ConnectionType extends Connection.ConnectionLike = Connectio
 			.select(expr => expr.raw('count(*)'), 'row_count')
 			.select([path.alias, relation.joiningColumn.columnName])
 			.groupBy([path.alias, relation.joiningColumn.columnName])
-		const withPredicates = this.predicatesInjector.inject(entity, filter, relationPath[relationPath.length - 1], relationPath)
+		const withPredicates = this.predicatesInjector.inject(
+			entity,
+			filter,
+			aclScopeFromPath(relationPath),
+			relationPath[relationPath.length - 1],
+			relationPath,
+		)
 		const qbWithWhere = this.whereBuilder.build(qb, entity, path, withPredicates, { relationPath })
 		const rows = await qbWithWhere.getResult(this.db)
 		const result = new Map<string, number>()
@@ -190,19 +197,21 @@ export class Mapper<ConnectionType extends Connection.ConnectionLike = Connectio
 	public async insert(
 		entity: Model.Entity,
 		data: MapperInput.CreateDataInput,
+		scope: AclScope,
 		builderCb: (builder: InsertBuilder) => void = () => {},
 	): Promise<MutationResultList> {
 		if (entity.view) {
 			throw new ImplementationException()
 		}
 		await this.setupSystemVariables()
-		return tryMutation(this.schema, this.schemaDatabaseMetadata, () => this.insertInternal(entity, data, builderCb))
+		return tryMutation(this.schema, this.schemaDatabaseMetadata, () => this.insertInternal(entity, data, scope, builderCb))
 	}
 
 	public async update(
 		entity: Model.Entity,
 		by: Input.UniqueWhere | CheckedPrimary,
 		data: MapperInput.UpdateDataInput,
+		scope: AclScope,
 		filter?: Input.OptionalWhere,
 	): Promise<MutationResultList> {
 		if (entity.view) {
@@ -210,10 +219,10 @@ export class Mapper<ConnectionType extends Connection.ConnectionLike = Connectio
 		}
 		await this.setupSystemVariables()
 		return tryMutation(this.schema, this.schemaDatabaseMetadata, async () => {
-			const [primaryValue, err] = await this.getPrimaryValue(entity, by)
+			const [primaryValue, err] = await this.getPrimaryValue(entity, by, ROW_LOOKUP_SCOPE)
 			if (err) return [err]
 
-			return await this.updater.update(this, entity, primaryValue, data, filter)
+			return await this.updater.update(this, entity, primaryValue, data, scope, filter)
 		})
 	}
 
@@ -221,16 +230,17 @@ export class Mapper<ConnectionType extends Connection.ConnectionLike = Connectio
 		entity: Model.Entity,
 		by: Input.UniqueWhere | CheckedPrimary,
 		builderCb: (builder: UpdateBuilder) => void,
+		scope: AclScope,
 	): Promise<MutationResultList> {
 		if (entity.view) {
 			throw new ImplementationException()
 		}
 		await this.setupSystemVariables()
 		return tryMutation(this.schema, this.schemaDatabaseMetadata, async () => {
-			const [primaryValue, err] = await this.getPrimaryValue(entity, by)
+			const [primaryValue, err] = await this.getPrimaryValue(entity, by, ROW_LOOKUP_SCOPE)
 			if (err) return [err]
 
-			return await this.updater.updateCb(this, entity, primaryValue, builderCb)
+			return await this.updater.updateCb(this, entity, primaryValue, builderCb, scope)
 		})
 	}
 	public async upsert(
@@ -238,6 +248,7 @@ export class Mapper<ConnectionType extends Connection.ConnectionLike = Connectio
 		by: Input.UniqueWhere | CheckedPrimary,
 		update: MapperInput.UpdateDataInput,
 		create: MapperInput.CreateDataInput,
+		scope: AclScope,
 		filter?: Input.OptionalWhere,
 	): Promise<MutationResultList> {
 		if (entity.view) {
@@ -245,22 +256,35 @@ export class Mapper<ConnectionType extends Connection.ConnectionLike = Connectio
 		}
 		await this.setupSystemVariables()
 		return tryMutation(this.schema, this.schemaDatabaseMetadata, async () => {
-			const [primaryValue] = await this.getPrimaryValue(entity, by)
+			const [primaryValue] = await this.getPrimaryValue(entity, by, ROW_LOOKUP_SCOPE)
 			if (primaryValue === undefined) {
-				return await this.insertInternal(entity, create)
+				return await this.insertInternal(entity, create, scope)
 			}
-			return await this.updater.update(this, entity, primaryValue, update, filter)
+			return await this.updater.update(this, entity, primaryValue, update, scope, filter)
 		})
 	}
 
-	private insertInternal(entity: Model.Entity, data: MapperInput.CreateDataInput, builderCb: (builder: InsertBuilder) => void = () => {}) {
-		return this.inserter.insert(this, entity, data, id => {
-		}, builderCb)
+	private insertInternal(
+		entity: Model.Entity,
+		data: MapperInput.CreateDataInput,
+		scope: AclScope,
+		builderCb: (builder: InsertBuilder) => void = () => {},
+	) {
+		return this.inserter.insert(
+			this,
+			entity,
+			data,
+			id => {
+			},
+			builderCb,
+			scope,
+		)
 	}
 
 	public async delete(
 		entity: Model.Entity,
 		by: Input.UniqueWhere | CheckedPrimary,
+		scope: AclScope,
 		filter?: Input.OptionalWhere,
 	): Promise<MutationResultList> {
 		if (entity.view) {
@@ -268,15 +292,20 @@ export class Mapper<ConnectionType extends Connection.ConnectionLike = Connectio
 		}
 		await this.setupSystemVariables()
 		return tryMutation(this.schema, this.schemaDatabaseMetadata, () => {
-			return this.deleteExecutor.execute(this, entity, by, filter)
+			return this.deleteExecutor.execute(this, entity, by, scope, filter)
 		})
 	}
 
+	/**
+	 * `scope` belongs to `entity` - the side the caller named. The other side of the junction is
+	 * reached over the relation, so it always resolves as nested.
+	 */
 	public async connectJunction(
 		entity: Model.Entity,
 		relation: Model.ManyHasManyOwningRelation | Model.ManyHasManyInverseRelation,
 		thisPrimary: Input.PrimaryValue,
 		otherPrimary: Input.PrimaryValue,
+		scope: AclScope,
 	): Promise<MutationResultList> {
 		await this.setupSystemVariables()
 		const err = () => {
@@ -284,10 +313,16 @@ export class Mapper<ConnectionType extends Connection.ConnectionLike = Connectio
 		}
 		return await acceptFieldVisitor(this.schema, entity, relation, {
 			visitManyHasManyOwning: ({ entity, relation }) => {
-				return this.junctionTableManager.connectJunction(this, entity, relation, thisPrimary, otherPrimary)
+				return this.junctionTableManager.connectJunction(this, entity, relation, thisPrimary, otherPrimary, {
+					owning: scope,
+					inverse: 'nested',
+				})
 			},
 			visitManyHasManyInverse: ({ targetEntity, targetRelation }) => {
-				return this.junctionTableManager.connectJunction(this, targetEntity, targetRelation, otherPrimary, thisPrimary)
+				return this.junctionTableManager.connectJunction(this, targetEntity, targetRelation, otherPrimary, thisPrimary, {
+					owning: 'nested',
+					inverse: scope,
+				})
 			},
 			visitColumn: err,
 			visitOneHasMany: err,
@@ -297,11 +332,13 @@ export class Mapper<ConnectionType extends Connection.ConnectionLike = Connectio
 		})
 	}
 
+	/** See {@link connectJunction} for how `scope` maps onto the two sides. */
 	public async disconnectJunction(
 		entity: Model.Entity,
 		relation: Model.ManyHasManyOwningRelation | Model.ManyHasManyInverseRelation,
 		thisPrimary: Input.PrimaryValue,
 		otherPrimary: Input.PrimaryValue,
+		scope: AclScope,
 	): Promise<MutationResultList> {
 		await this.setupSystemVariables()
 		const err = () => {
@@ -309,10 +346,16 @@ export class Mapper<ConnectionType extends Connection.ConnectionLike = Connectio
 		}
 		return await acceptFieldVisitor(this.schema, entity, relation, {
 			visitManyHasManyOwning: ({ entity, relation }) => {
-				return this.junctionTableManager.disconnectJunction(this, entity, relation, thisPrimary, otherPrimary)
+				return this.junctionTableManager.disconnectJunction(this, entity, relation, thisPrimary, otherPrimary, {
+					owning: scope,
+					inverse: 'nested',
+				})
 			},
 			visitManyHasManyInverse: ({ targetEntity, targetRelation }) => {
-				return this.junctionTableManager.disconnectJunction(this, targetEntity, targetRelation, otherPrimary, thisPrimary)
+				return this.junctionTableManager.disconnectJunction(this, targetEntity, targetRelation, otherPrimary, thisPrimary, {
+					owning: 'nested',
+					inverse: scope,
+				})
 			},
 			visitColumn: err,
 			visitOneHasMany: err,
@@ -325,11 +368,12 @@ export class Mapper<ConnectionType extends Connection.ConnectionLike = Connectio
 	public async getPrimaryValue(
 		entity: Model.Entity,
 		where: Input.UniqueWhere | CheckedPrimary,
+		scope: AclScope,
 	): Promise<[Input.PrimaryValue, undefined] | [undefined, MutationEntryNotFoundError]> {
 		if (where instanceof CheckedPrimary) {
 			return [where.primaryValue, undefined]
 		}
-		const result = await this.selectField(entity, where, entity.primary)
+		const result = await this.selectField(entity, where, entity.primary, scope)
 		return result ? [result, undefined] : [undefined, new MutationEntryNotFoundError([], where)]
 	}
 

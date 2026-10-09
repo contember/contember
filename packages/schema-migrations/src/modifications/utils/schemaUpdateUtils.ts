@@ -92,29 +92,35 @@ type EntityAclFieldPermissionsUpdater = (
 	entityName: string,
 	operation: Acl.Operation,
 ) => Acl.FieldPermissions
-type EntityOperationHandler = {
-	[K in keyof Required<Acl.EntityOperations>]: (
-		value: Exclude<Acl.EntityOperations[K], undefined>,
-	) => Acl.EntityOperations[K]
-}
-
 export const updateAclFieldPermissions =
 	(updater: EntityAclFieldPermissionsUpdater): AclEntityPermissionsUpdater => ({ entityPermissions, entityName }) => {
-		const operations: Writable<Acl.EntityOperations> = {}
-		const handlers: EntityOperationHandler = {
-			create: value => updater(value, entityName, Acl.Operation.create),
-			update: value => updater(value, entityName, Acl.Operation.update),
-			read: value => updater(value, entityName, Acl.Operation.read),
-			delete: value => value,
-			customPrimary: value => value,
-			refreshMaterializedView: value => value,
-			noRoot: value => value,
+		const source = entityPermissions.operations
+		const updateFields = (value: Acl.FieldPermissions, operation: Acl.Operation) => updater(value, entityName, operation)
+		// Carry every key over untouched by default, then rewrite the ones holding field names. An
+		// operation key that is not handled here must survive rather than disappear - the previous
+		// allow-list shape silently dropped `refreshMaterializedView` on every field rename.
+		const operations: Writable<Acl.EntityOperations> = { ...source }
+		if (source.create !== undefined) {
+			operations.create = updateFields(source.create, Acl.Operation.create)
 		}
-		const types: (keyof Acl.EntityOperations)[] = ['create', 'update', 'read', 'delete', 'customPrimary', 'noRoot']
-		for (const key of types) {
-			if (key in entityPermissions.operations) {
-				operations[key] = handlers[key](entityPermissions.operations[key] as any) as any
+		if (source.update !== undefined) {
+			operations.update = updateFields(source.update, Acl.Operation.update)
+		}
+		if (source.read !== undefined) {
+			operations.read = updateFields(source.read, Acl.Operation.read)
+		}
+		if (source.through !== undefined) {
+			const through: Writable<Acl.ThroughOperations> = { ...source.through }
+			if (source.through.create !== undefined) {
+				through.create = updateFields(source.through.create, Acl.Operation.create)
 			}
+			if (source.through.update !== undefined) {
+				through.update = updateFields(source.through.update, Acl.Operation.update)
+			}
+			if (source.through.read !== undefined) {
+				through.read = updateFields(source.through.read, Acl.Operation.read)
+			}
+			operations.through = through
 		}
 
 		return {

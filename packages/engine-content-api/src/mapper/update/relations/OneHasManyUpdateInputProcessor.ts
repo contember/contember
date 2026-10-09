@@ -20,7 +20,7 @@ export class OneHasManyUpdateInputProcessor implements UpdateInputProcessor.HasM
 		return async ({ primary }: { primary: Input.PrimaryValue }) => {
 			return await this.mapper.update(targetEntity, input, {
 				[targetRelation.name]: { connect: new CheckedPrimary(primary) },
-			})
+			}, 'nested')
 		}
 	}
 
@@ -31,7 +31,7 @@ export class OneHasManyUpdateInputProcessor implements UpdateInputProcessor.HasM
 			return await this.mapper.insert(targetEntity, {
 				...input,
 				[targetRelation.name]: { connect: new CheckedPrimary(primary) },
-			})
+			}, 'nested')
 		}
 	}
 
@@ -47,7 +47,7 @@ export class OneHasManyUpdateInputProcessor implements UpdateInputProcessor.HasM
 			return await this.mapper.upsert(targetEntity, connect, connectData, {
 				...create,
 				...connectData,
-			})
+			}, 'nested')
 		}
 	}
 
@@ -62,6 +62,7 @@ export class OneHasManyUpdateInputProcessor implements UpdateInputProcessor.HasM
 					...data,
 					// [targetRelation.name]: {connect: thisPrimary}
 				},
+				'nested',
 			)
 		}
 	}
@@ -77,12 +78,13 @@ export class OneHasManyUpdateInputProcessor implements UpdateInputProcessor.HasM
 					...update,
 					// [targetRelation.name]: {connect: thisPrimary}
 				},
+				'nested',
 			)
 			if (result[0].result === MutationResultType.notFoundError) {
 				return await this.mapper.insert(targetEntity, {
 					...create,
 					[targetRelation.name]: { connect: new CheckedPrimary(primary) },
-				})
+				}, 'nested')
 			}
 			return result
 		}
@@ -96,6 +98,7 @@ export class OneHasManyUpdateInputProcessor implements UpdateInputProcessor.HasM
 				targetEntity,
 				{ ...input, [targetRelation.name]: { [entity.primary]: primary } },
 				{ [targetRelation.name]: { disconnect: true } },
+				'nested',
 			)
 		}
 	}
@@ -107,7 +110,7 @@ export class OneHasManyUpdateInputProcessor implements UpdateInputProcessor.HasM
 			return await this.mapper.delete(targetEntity, {
 				...input,
 				[targetRelation.name]: { [entity.primary]: primary },
-			})
+			}, 'nested')
 		}
 	}
 }

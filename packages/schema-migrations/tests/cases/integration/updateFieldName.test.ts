@@ -264,3 +264,71 @@ describe('rename a field carrying per-column index options', () =>
 		sql: SQL``,
 		noDiff: true,
 	}))
+
+// A field rename has to reach into the `through` bucket as well, and must not drop operation keys it
+// does not rewrite - the previous allow-list shape silently discarded `refreshMaterializedView`.
+describe('rename a field referenced by a through grant', () =>
+	testMigrations({
+		original: {
+			model: new SchemaBuilder()
+				.entity('Post', e => e.column('title'))
+				.buildSchema(),
+			acl: {
+				roles: {
+					editor: {
+						variables: {},
+						stages: '*',
+						entities: {
+							Post: {
+								predicates: {},
+								operations: {
+									read: { title: true },
+									refreshMaterializedView: true,
+									through: {
+										read: { title: true },
+										update: { title: true },
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+		updated: {
+			model: new SchemaBuilder()
+				.entity('Post', e => e.column('heading', c => c.type(Model.ColumnType.String).columnName('title')))
+				.buildSchema(),
+			acl: {
+				roles: {
+					editor: {
+						variables: {},
+						stages: '*',
+						entities: {
+							Post: {
+								predicates: {},
+								operations: {
+									read: { heading: true },
+									refreshMaterializedView: true,
+									through: {
+										read: { heading: true },
+										update: { heading: true },
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+		diff: [
+			{
+				modification: 'updateFieldName',
+				entityName: 'Post',
+				fieldName: 'title',
+				newFieldName: 'heading',
+			},
+		],
+		sql: SQL``,
+		noDiff: true,
+	}))

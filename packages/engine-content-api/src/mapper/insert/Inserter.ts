@@ -2,6 +2,7 @@ import { MutationCreateOk, MutationNoResultError, MutationResultList } from '../
 import { CreateInputVisitor } from '../../inputProcessing/index.js'
 import { SqlCreateInputProcessor, SqlCreateInputProcessorResult } from './SqlCreateInputProcessor.js'
 import { Mapper } from '../Mapper.js'
+import { AclScope } from '../../acl/index.js'
 import { Model } from '@contember/schema'
 import { acceptFieldVisitor, Providers } from '@contember/schema-utils'
 import { InsertBuilderFactory } from './InsertBuilderFactory.js'
@@ -25,13 +26,14 @@ export class Inserter {
 		data: MapperInput.CreateDataInput,
 		insertIdCallback: (id: string) => void,
 		builderCb: (builder: InsertBuilder) => void,
+		scope: AclScope,
 	): Promise<MutationResultList> {
-		const insertBuilder = this.insertBuilderFactory.create(entity)
+		const insertBuilder = this.insertBuilderFactory.create(entity, scope)
 
 		insertBuilder.addPredicates(Object.keys(data))
 
 		const visitor = new CreateInputVisitor<SqlCreateInputProcessorResult>(
-			new SqlCreateInputProcessor(insertBuilder, mapper, this.providers, this.options),
+			new SqlCreateInputProcessor(insertBuilder, mapper, this.providers, scope, this.options),
 			this.schema,
 			data,
 		)

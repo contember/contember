@@ -10,6 +10,7 @@ import { OneHasOneOwningCreateInputProcessor } from './relations/OneHasOneOwning
 import { OneHasManyCreateInputProcessor } from './relations/OneHasManyCreateInputProcessor.js'
 import { ManyHasOneCreateInputProcessor } from './relations/ManyHasOneCreateInputProcessor.js'
 import { ManyHasManyCreateInputProcessor } from './relations/ManyHasManyCreateInputProcessor.js'
+import { AclScope } from '../../acl/index.js'
 
 export type SqlCreateInputProcessorResult = MutationResultList | ((ctx: { primary: Input.PrimaryValue }) => Promise<MutationResultList>)
 export class SqlCreateInputProcessor implements CreateInputProcessor<SqlCreateInputProcessorResult> {
@@ -23,13 +24,15 @@ export class SqlCreateInputProcessor implements CreateInputProcessor<SqlCreateIn
 		private readonly insertBuilder: InsertBuilder,
 		private readonly mapper: Mapper,
 		private readonly providers: Providers,
+		/** Scope of the entity being created; relation targets are always reached over a relation and stay nested. */
+		private readonly scope: AclScope,
 		private readonly options: { uuidVersion?: 4 | 7 } = {},
 	) {
 		this.oneHasOneInverseCreateInputProcessor = new OneHasOneInverseCreateInputProcessor(this.mapper)
 		this.oneHasOneOwningCreateInputProcessor = new OneHasOneOwningCreateInputProcessor(this.mapper, this.insertBuilder)
 		this.oneHasManyCreateInputProcessor = new OneHasManyCreateInputProcessor(this.mapper)
 		this.manyHasOneCreateInputProcessor = new ManyHasOneCreateInputProcessor(this.mapper, this.insertBuilder)
-		this.manyHasManyCreateInputProcessor = new ManyHasManyCreateInputProcessor(this.mapper)
+		this.manyHasManyCreateInputProcessor = new ManyHasManyCreateInputProcessor(this.mapper, this.scope)
 	}
 
 	public async column(context: Model.ColumnContext & { input: Input.ColumnValue | undefined }): Promise<SqlCreateInputProcessorResult> {

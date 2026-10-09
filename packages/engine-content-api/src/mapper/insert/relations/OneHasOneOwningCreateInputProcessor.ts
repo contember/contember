@@ -18,7 +18,7 @@ export class OneHasOneOwningCreateInputProcessor implements CreateInputProcessor
 
 	public async connect(context: Context & { input: Input.UniqueWhere | CheckedPrimary }) {
 		const { input, relation, targetEntity } = context
-		const [inverseSide, err] = await this.mapper.getPrimaryValue(targetEntity, input)
+		const [inverseSide, err] = await this.mapper.getPrimaryValue(targetEntity, input, 'nested')
 		if (err) return [err]
 		const disconnectResult = await this.disconnectCurrentOwner({ ...context, input: inverseSide })
 		if (disconnectResult.some(it => it.error)) {
@@ -29,7 +29,7 @@ export class OneHasOneOwningCreateInputProcessor implements CreateInputProcessor
 	}
 
 	public async create(context: Context & { input: MapperInput.CreateDataInput }) {
-		const insertResult = await this.mapper.insert(context.targetEntity, context.input)
+		const insertResult = await this.mapper.insert(context.targetEntity, context.input, 'nested')
 		const primary = getInsertPrimary(insertResult)
 		if (!primary) {
 			return insertResult
@@ -39,7 +39,7 @@ export class OneHasOneOwningCreateInputProcessor implements CreateInputProcessor
 	}
 
 	public async connectOrCreate({ input, ...context }: Context & { input: MapperInput.ConnectOrCreateInput }) {
-		const [inverseSide] = await this.mapper.getPrimaryValue(context.targetEntity, input.connect)
+		const [inverseSide] = await this.mapper.getPrimaryValue(context.targetEntity, input.connect, 'nested')
 		if (inverseSide) {
 			this.insertBuilder.addFieldValue(context.relation.name, inverseSide)
 			const disconnectResult = await this.disconnectCurrentOwner({ ...context, input: inverseSide })
@@ -48,7 +48,7 @@ export class OneHasOneOwningCreateInputProcessor implements CreateInputProcessor
 			}
 			return []
 		} else {
-			const insertResult = await this.mapper.insert(context.targetEntity, input.create)
+			const insertResult = await this.mapper.insert(context.targetEntity, input.create, 'nested')
 			const primary = getInsertPrimary(insertResult)
 			if (primary) {
 				this.insertBuilder.addFieldValue(context.relation.name, primary)
@@ -62,7 +62,7 @@ export class OneHasOneOwningCreateInputProcessor implements CreateInputProcessor
 	): Promise<MutationResultList> {
 		const [currentOwnerOfInverseSide] = await this.mapper.getPrimaryValue(entity, {
 			[relation.name]: { [targetEntity.primary]: input },
-		})
+		}, 'nested')
 		if (!currentOwnerOfInverseSide) {
 			return []
 		}
@@ -75,6 +75,6 @@ export class OneHasOneOwningCreateInputProcessor implements CreateInputProcessor
 		return await this.mapper.updateInternal(entity, currentOwnerUnique, builder => {
 			builder.addPredicates([relation.name])
 			builder.addFieldValue(relation.name, null)
-		})
+		}, 'nested')
 	}
 }

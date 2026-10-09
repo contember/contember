@@ -3,7 +3,7 @@ import { InsertBuilder as DbInsertBuilder, QueryBuilder, Value as DbValue } from
 import { PathFactory, WhereBuilder } from '../select/index.js'
 import { getColumnName, getColumnType } from '@contember/schema-utils'
 import { ColumnValue, normalizeDbValue } from '../ColumnValue.js'
-import { PredicateFactory } from '../../acl/index.js'
+import { AclScope, PredicateFactory } from '../../acl/index.js'
 import { AfterInsertEvent, BeforeInsertEvent } from '../EventManager.js'
 import { Mapper } from '../Mapper.js'
 
@@ -23,6 +23,7 @@ export class InsertBuilder {
 		private readonly whereBuilder: WhereBuilder,
 		private readonly pathFactory: PathFactory,
 		private readonly predicateFactory: PredicateFactory,
+		private readonly scope: AclScope,
 	) {}
 
 	public addFieldValue(
@@ -38,7 +39,7 @@ export class InsertBuilder {
 	}
 
 	public addPredicates(fields: string[]): void {
-		const where = this.predicateFactory.create(this.entity, Acl.Operation.create, fields)
+		const where = this.predicateFactory.create(this.entity, Acl.Operation.create, this.scope, fields)
 		this.addWhere(where)
 	}
 

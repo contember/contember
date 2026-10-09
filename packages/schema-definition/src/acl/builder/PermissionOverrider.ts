@@ -1,4 +1,4 @@
-import { Acl } from '@contember/schema'
+import { Acl, Writable } from '@contember/schema'
 import { tuple } from '../../utils/index.js'
 
 export default class PermissionOverrider {
@@ -33,6 +33,14 @@ export default class PermissionOverrider {
 					: {
 						customPrimary: overrides.operations.customPrimary ?? original.operations.customPrimary,
 					}),
+				...(original.operations.through || overrides.operations.through
+					? {
+						through: this.overrideThroughOperations(
+							original.operations.through ?? {},
+							overrides.operations.through ?? {},
+						),
+					}
+					: {}),
 				...(original.operations.noRoot || overrides.operations.noRoot
 					? {
 						noRoot: [
@@ -43,5 +51,26 @@ export default class PermissionOverrider {
 					: {}),
 			},
 		}
+	}
+
+	/**
+	 * An operation neither side declares stays absent - an empty map would read as "the through bucket
+	 * already grants this operation" and shadow a legacy `noRoot` grant in `splitEntityPermissions`.
+	 */
+	private overrideThroughOperations(
+		original: Acl.ThroughOperations,
+		overrides: Acl.ThroughOperations,
+	): Acl.ThroughOperations {
+		const result: Writable<Acl.ThroughOperations> = {}
+		for (const operation of ['create', 'read', 'update'] as const) {
+			if (original[operation] === undefined && overrides[operation] === undefined) {
+				continue
+			}
+			result[operation] = { ...(original[operation] || {}), ...(overrides[operation] || {}) }
+		}
+		if (original.delete !== undefined || overrides.delete !== undefined) {
+			result.delete = overrides.delete ?? original.delete
+		}
+		return result
 	}
 }

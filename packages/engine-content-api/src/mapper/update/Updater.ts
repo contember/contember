@@ -15,6 +15,7 @@ import {
 import { UpdateBuilder } from './UpdateBuilder.js'
 import { rowDataToFieldValues } from '../ColumnValue.js'
 import { MapperInput } from '../types.js'
+import { AclScope, ROW_LOOKUP_SCOPE } from '../../acl/index.js'
 
 export class Updater {
 	constructor(
@@ -27,9 +28,10 @@ export class Updater {
 		entity: Model.Entity,
 		primaryValue: Input.PrimaryValue,
 		data: MapperInput.UpdateDataInput,
+		scope: AclScope,
 		filter?: Input.OptionalWhere,
 	): Promise<MutationResultList> {
-		const updateBuilder = this.updateBuilderFactory.create(entity, primaryValue)
+		const updateBuilder = this.updateBuilderFactory.create(entity, primaryValue, scope)
 
 		const predicateFields = Object.keys(data)
 		updateBuilder.addPredicates(predicateFields)
@@ -38,7 +40,7 @@ export class Updater {
 		}
 
 		const visitor = new UpdateInputVisitor<SqlUpdateInputProcessorResult>(
-			new SqlUpdateInputProcessor(primaryValue, data, updateBuilder, mapper),
+			new SqlUpdateInputProcessor(primaryValue, data, updateBuilder, mapper, scope),
 			this.schema,
 			data,
 		)
@@ -69,6 +71,10 @@ export class Updater {
 		const result = await updateBuilder.execute(mapper)
 
 		if (!result.executed) {
+			// direct update was not invoked, so its predicates never reached the database
+			if (!(await updateBuilder.verifyPredicates(mapper))) {
+				return [new MutationNoResultError([], 'for input ' + JSON.stringify({ [entity.primary]: primaryValue }))]
+			}
 			if (filter && Object.keys(filter).length > 0) {
 				// direct update was not invoked, but we still need to check if the row matches the filter
 				const where: Input.OptionalWhere = {
@@ -79,7 +85,7 @@ export class Updater {
 						},
 					],
 				}
-				const count = await mapper.count(entity, where)
+				const count = await mapper.count(entity, where, ROW_LOOKUP_SCOPE)
 				if (!count) {
 					return [new MutationEntryNotFoundError([], where)]
 				}
@@ -110,8 +116,9 @@ export class Updater {
 		entity: Model.Entity,
 		primaryValue: Input.PrimaryValue,
 		builderCb: (builder: UpdateBuilder) => void,
+		scope: AclScope,
 	): Promise<MutationResultList> {
-		const updateBuilder = this.updateBuilderFactory.create(entity, primaryValue)
+		const updateBuilder = this.updateBuilderFactory.create(entity, primaryValue, scope)
 
 		builderCb(updateBuilder)
 

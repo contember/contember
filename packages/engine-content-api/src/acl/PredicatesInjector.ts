@@ -1,6 +1,7 @@
 import { Acl, Input, Model, Writable } from '@contember/schema'
 import { acceptFieldVisitor, isColumn } from '@contember/schema-utils'
 import { PredicateFactory } from './PredicateFactory.js'
+import { AclScope } from './AclScope.js'
 
 /**
  * Internal where key carrying the row-level read predicate of a relation target. The injector attaches it
@@ -72,19 +73,23 @@ export class PredicatesInjector {
 
 	constructor(private readonly schema: Model.Schema, private readonly predicateFactory: PredicateFactory) {}
 
+	/**
+	 * `scope` is the scope of the entry entity. Relations traversed by `where` are always nested. A lookup
+	 * without a relation context (a by-unique lookup of a mutation) states the scope of the row it looks for.
+	 */
 	public inject(
 		entity: Model.Entity,
 		where: Input.OptionalWhere,
+		scope: AclScope,
 		relationContext?: Model.AnyRelationContext,
 		ancestorPath?: readonly Model.AnyRelationContext[],
 	): Input.OptionalWhere {
-		const isQueryRoot = !relationContext && (!ancestorPath || ancestorPath.length === 0)
-		const restrictedWhere = this.injectToWhere(where, entity, true, relationContext, ancestorPath ?? [], isQueryRoot)
-		return this.createWhere(entity, restrictedWhere, relationContext, isQueryRoot)
+		const restrictedWhere = this.injectToWhere(where, entity, true, relationContext, ancestorPath ?? [], scope)
+		return this.createWhere(entity, restrictedWhere, relationContext, scope)
 	}
 
 	/**
-	 * Row-level read predicate guarding a relation hop's target (the `all` permission set, since the target
+	 * Row-level read predicate guarding a relation hop's target (the nested scope, since the target
 	 * is reached through a relation). Empty when the target is freely readable, or when the hop is a to-one
 	 * back-reference to an ancestor row that is already verified readable. Shared by the filter injection
 	 * and the order-by join so both guard the same hop identically (they share the join alias).
@@ -93,7 +98,7 @@ export class PredicatesInjector {
 		if (this.canSimplifyBackReference(ancestorPath, relationContext)) {
 			return {}
 		}
-		return this.predicateFactory.create(relationContext.targetEntity, Acl.Operation.read, undefined, relationContext, false)
+		return this.predicateFactory.create(relationContext.targetEntity, Acl.Operation.read, 'nested', undefined, relationContext)
 	}
 
 	/**
@@ -119,9 +124,9 @@ export class PredicatesInjector {
 		entity: Model.Entity,
 		where: Input.OptionalWhere,
 		relationContext: Model.AnyRelationContext | undefined,
-		isQueryRoot: boolean | undefined,
+		scope: AclScope,
 	): Input.OptionalWhere {
-		const predicatesWhere = this.predicateFactory.create(entity, Acl.Operation.read, undefined, relationContext, isQueryRoot)
+		const predicatesWhere = this.predicateFactory.create(entity, Acl.Operation.read, scope, undefined, relationContext)
 
 		const and = [where, predicatesWhere].filter(it => Object.keys(it).length > 0)
 		if (and.length === 0) {
@@ -139,21 +144,21 @@ export class PredicatesInjector {
 		isRoot: boolean,
 		relationContext: Model.AnyRelationContext | undefined,
 		ancestorPath: readonly Model.AnyRelationContext[],
-		isQueryRoot: boolean | undefined,
+		scope: AclScope,
 	): Input.OptionalWhere {
 		const resultWhere: Writable<Input.OptionalWhere> = {}
 		if (where.and) {
 			resultWhere.and = where.and.filter((it): it is Input.Where => !!it).map(it =>
-				this.injectToWhere(it, entity, isRoot, relationContext, ancestorPath, isQueryRoot)
+				this.injectToWhere(it, entity, isRoot, relationContext, ancestorPath, scope)
 			)
 		}
 		if (where.or) {
 			resultWhere.or = where.or.filter((it): it is Input.Where => !!it).map(it =>
-				this.injectToWhere(it, entity, isRoot, relationContext, ancestorPath, isQueryRoot)
+				this.injectToWhere(it, entity, isRoot, relationContext, ancestorPath, scope)
 			)
 		}
 		if (where.not) {
-			resultWhere.not = this.injectToWhere(where.not, entity, isRoot, relationContext, ancestorPath, isQueryRoot)
+			resultWhere.not = this.injectToWhere(where.not, entity, isRoot, relationContext, ancestorPath, scope)
 		}
 
 		const fields = Object.keys(where).filter(it => !['and', 'or', 'not'].includes(it))
@@ -165,9 +170,8 @@ export class PredicatesInjector {
 		// row-level predicate is enforced once — in the WHERE of the injection root, or in the guarded source of a
 		// relation hop. An empty column condition reads nothing, so a guard there would only filter by readability;
 		// an empty relation condition can still test presence (`EXISTS`), so a relation keeps its guard.
-		const predicateContext = isRoot ? isQueryRoot : false
-		const isCellLevel = (field: string) => this.predicateFactory.shouldApplyCellLevelPredicate(entity, Acl.Operation.read, field, predicateContext)
-		const fieldGuard = (field: string) => this.predicateFactory.create(entity, Acl.Operation.read, [field], relationContext, predicateContext)
+		const isCellLevel = (field: string) => this.predicateFactory.shouldApplyCellLevelPredicate(entity, Acl.Operation.read, field, scope)
+		const fieldGuard = (field: string) => this.predicateFactory.create(entity, Acl.Operation.read, scope, [field], relationContext)
 		for (let field of fields) {
 			resultWhere[field] = acceptFieldVisitor(this.schema, entity, field, {
 				visitColumn: () => where[field],
@@ -177,7 +181,7 @@ export class PredicatesInjector {
 						return null
 					}
 					const nestedAncestorPath: Model.AnyRelationContext[] = [...ancestorPath, context]
-					const nestedWhere = this.injectToWhere(relationWhere, context.targetEntity, false, context, nestedAncestorPath, false)
+					const nestedWhere = this.injectToWhere(relationWhere, context.targetEntity, false, context, nestedAncestorPath, 'nested')
 					const guard = this.createReadGuard(context, ancestorPath)
 					return {
 						...nestedWhere,

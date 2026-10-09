@@ -43,6 +43,7 @@ export class EntityTypeProvider {
 	constructor(
 		private readonly schema: Model.Schema,
 		private readonly authorizator: Authorizator,
+		private readonly rootAuthorizator: Authorizator,
 		private readonly columnTypeResolver: ColumnTypeResolver,
 		private readonly whereTypeProvider: WhereTypeProvider,
 		private readonly orderByTypeProvider: OrderByTypeProvider,
@@ -99,7 +100,7 @@ export class EntityTypeProvider {
 		}
 
 		for (const field of accessibleFields) {
-			const fieldTypeVisitor = new FieldTypeVisitor(this.columnTypeResolver, this, this.authorizator)
+			const fieldTypeVisitor = new FieldTypeVisitor(this.columnTypeResolver, this, this.authorizator, this.rootAuthorizator)
 			const type: GraphQLOutputType = acceptFieldVisitor(this.schema, entity, field.name, fieldTypeVisitor)
 
 			const fieldArgsVisitor = new FieldArgsVisitor(this.whereTypeProvider, this.orderByTypeProvider)

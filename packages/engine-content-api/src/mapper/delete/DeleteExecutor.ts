@@ -43,6 +43,10 @@ export class DeleteExecutor {
 	) {
 	}
 
+	/**
+	 * `scope` belongs to `entity` - the row the caller named. Rows reached by cascade, orphan removal or
+	 * set null are reached over a relation, so they always resolve as nested.
+	 */
 	public async execute(
 		mapper: Mapper,
 		entity: Model.Entity,
@@ -60,8 +64,8 @@ export class DeleteExecutor {
 
 			const primaryWhere = { [entity.primary]: { eq: primaryValue } }
 			const where = filter ? { and: [primaryWhere, filter] } : primaryWhere
-			const state = new DeleteState(mapper.deletedEntities, scope)
-			const deletePrimary = await this.collectDeleteInfo(state, mapper, entity, where)
+			const state = new DeleteState(mapper.deletedEntities)
+			const deletePrimary = await this.collectDeleteInfo(state, mapper, entity, where, scope)
 
 			const deleteQueue: DeleteQueue = [[entity, deletePrimary]]
 			await this.collectOrphanRemovals(state, mapper, deleteQueue)
@@ -129,8 +133,9 @@ export class DeleteExecutor {
 		mapper: Mapper,
 		entity: Model.Entity,
 		where: Input.OptionalWhere,
+		scope: AclScope,
 	): Promise<Input.PrimaryValue[]> {
-		const predicate = this.predicateFactory.createDeletePredicate(entity, state.scope)
+		const predicate = this.predicateFactory.createDeletePredicate(entity, scope)
 		const orphanRemovals = findRelationsWithOrphanRemoval(this.schema, entity)
 
 		const qb = SelectBuilder.create<DeleteInfoRow>()
@@ -188,7 +193,7 @@ export class DeleteExecutor {
 		relation: Model.ManyHasOneRelation | Model.OneHasOneOwningRelation,
 		values: Input.PrimaryValue[],
 	): Promise<void> {
-		const predicate = this.predicateFactory.createDeletePredicate(entity, state.scope)
+		const predicate = this.predicateFactory.createDeletePredicate(entity, 'nested')
 		const orphanRemovals = findRelationsWithOrphanRemoval(this.schema, entity)
 
 		const qb = this.createFetchByIdQueryBuilder(entity, relation, values)
@@ -217,7 +222,7 @@ export class DeleteExecutor {
 		relation: Model.ManyHasOneRelation | Model.OneHasOneOwningRelation,
 		values: Input.PrimaryValue[],
 	): Promise<void> {
-		const predicate = this.predicateFactory.create(entity, Acl.Operation.update, state.scope, [relation.name])
+		const predicate = this.predicateFactory.create(entity, Acl.Operation.update, 'nested', [relation.name])
 
 		const qb = this.createFetchByIdQueryBuilder(entity, relation, values)
 		const qbWithAllowed = this.qbWithAllowed(entity, predicate, qb)
@@ -274,7 +279,7 @@ export class DeleteExecutor {
 			}
 
 			const entity = getEntity(this.schema, orphanRemoval[0])
-			const orphanResult = await this.collectDeleteInfo(state, mapper, entity, { [entity.primary]: { in: orphanRemoval[1] } })
+			const orphanResult = await this.collectDeleteInfo(state, mapper, entity, { [entity.primary]: { in: orphanRemoval[1] } }, 'nested')
 			deleteQueue.push([entity, orphanResult])
 		} while (true)
 	}

@@ -110,11 +110,12 @@ test('a through-only delete grant opens no root delete mutation', async () => {
 })
 
 /**
- * A cascade keeps the scope of the delete that started it. `Item` may be deleted only through a
- * relation, so a root `deleteCategory` cascading into it stays denied - the cascade must not
- * escalate to the nested set as it descends.
+ * Rows reached by a delete's side effects - cascade, orphan removal, set null - are reached over a
+ * relation, so they resolve in the nested scope even when the delete itself is a root one. Every
+ * child entity below may be deleted or unlinked only through a relation; the predicates make the
+ * nested scope visible in the SQL.
  */
-namespace CascadeScope {
+namespace DeleteSideEffects {
 	export const editor = c.createRole('editor')
 
 	@c.Allow(editor, {
@@ -123,6 +124,7 @@ namespace CascadeScope {
 	})
 	export class Category {
 		title = c.stringColumn()
+		cover = c.oneHasOne(Cover).removeOrphan()
 	}
 
 	@c.Allow(editor, {
@@ -130,21 +132,48 @@ namespace CascadeScope {
 	})
 	@c.Allow(editor, {
 		through: true,
+		when: { locked: { eq: false } },
 		delete: true,
 	})
 	export class Item {
+		locked = c.boolColumn().notNull()
 		category = c.manyHasOne(Category).cascadeOnDelete()
+	}
+
+	@c.Allow(editor, {
+		read: ['id'],
+	})
+	@c.Allow(editor, {
+		through: true,
+		when: { locked: { eq: false } },
+		delete: true,
+	})
+	export class Cover {
+		locked = c.boolColumn().notNull()
+	}
+
+	@c.Allow(editor, {
+		read: ['id', 'category'],
+	})
+	@c.Allow(editor, {
+		through: true,
+		when: { locked: { eq: false } },
+		update: ['category'],
+	})
+	export class Note {
+		locked = c.boolColumn().notNull()
+		category = c.manyHasOne(Category).setNullOnDelete()
 	}
 }
 
-const cascadeScopeSchema = createSchema(CascadeScope)
-const cascadeScopePermissions = new PermissionFactory().createContextual(cascadeScopeSchema, ['editor'])
+const sideEffectsSchema = createSchema(DeleteSideEffects)
+const sideEffectsPermissions = new PermissionFactory().createContextual(sideEffectsSchema, ['editor'])
 
-test('a cascade of a root delete stays at root scope and does not pick up a through grant', async () => {
+test('cascade, orphan removal and set null of a root delete resolve in the nested scope', async () => {
 	await execute({
-		schema: cascadeScopeSchema.model,
-		permissions: cascadeScopePermissions.root,
-		nestedPermissions: cascadeScopePermissions.all,
+		schema: sideEffectsSchema.model,
+		permissions: sideEffectsPermissions.root,
+		nestedPermissions: sideEffectsPermissions.all,
 		query: GQL`mutation {
         deleteCategory(by: {id: "${testUuid(1)}"}) {
           ok
@@ -152,34 +181,61 @@ test('a cascade of a root delete stays at root scope and does not pick up a thro
         }
       }`,
 		executes: [
-			...failedTransaction([
+			...sqlTransaction([
 				{
 					sql: SQL`select "root_"."id" from "public"."category" as "root_" where "root_"."id" = ?`,
 					parameters: [testUuid(1)],
 					response: { rows: [{ id: testUuid(1) }] },
 				},
 				{
-					sql: SQL`select "root_"."id" as "id", true as "allowed" from "public"."category" as "root_" where "root_"."id" = ?`,
+					// the deleted row itself stays at root scope, where Category has an unconditional delete grant
+					sql:
+						SQL`select "root_"."id" as "id", "root_"."cover_id" as "_cover_id", true as "allowed" from "public"."category" as "root_" where "root_"."id" = ?`,
 					parameters: [testUuid(1)],
-					response: { rows: [{ id: testUuid(1), allowed: true }] },
+					response: { rows: [{ id: testUuid(1), _cover_id: testUuid(3), allowed: true }] },
 				},
 				{
-					// `false as "allowed"`: the cascade still evaluates Item at root scope, where it has no delete grant
+					// cascade: the through delete grant of Item; at root scope it would be `false as "allowed"`
 					sql:
-						SQL`select "root_"."id" as "id", "root_"."category_id" as "ref", false as "allowed" from "public"."item" as "root_" where "root_"."category_id" in (?)`,
+						SQL`select "root_"."id" as "id", "root_"."category_id" as "ref", "root_"."locked" = ? as "allowed" from "public"."item" as "root_" where "root_"."category_id" in (?)`,
+					parameters: [false, testUuid(1)],
+					response: { rows: [{ id: testUuid(2), ref: testUuid(1), allowed: true }] },
+				},
+				{
+					// set null: the through update grant of Note.category
+					sql:
+						SQL`select "root_"."id" as "id", "root_"."category_id" as "ref", "root_"."locked" = ? as "allowed" from "public"."note" as "root_" where "root_"."category_id" in (?)`,
+					parameters: [false, testUuid(1)],
+					response: { rows: [{ id: testUuid(4), ref: testUuid(1), allowed: true }] },
+				},
+				{
+					// orphan removal: the through delete grant of Cover
+					sql: SQL`select "root_"."id" as "id", "root_"."locked" = ? as "allowed" from "public"."cover" as "root_" where "root_"."id" in (?)`,
+					parameters: [false, testUuid(3)],
+					response: { rows: [{ id: testUuid(3), allowed: true }] },
+				},
+				{
+					sql: SQL`select "root_"."id" as "id", "root_"."cover_id" as "ref" from "public"."category" as "root_" where "root_"."cover_id" in (?)`,
+					parameters: [testUuid(3)],
+					response: { rows: [{ id: testUuid(1), ref: testUuid(3) }] },
+				},
+				{
+					sql: SQL`delete from "public"."category" where "id" in (?)`,
 					parameters: [testUuid(1)],
-					response: { rows: [{ id: testUuid(2), ref: testUuid(1), allowed: false }] },
+					response: {},
+				},
+				{
+					sql: SQL`delete from "public"."cover" where "id" in (?)`,
+					parameters: [testUuid(3)],
+					response: {},
 				},
 			]),
 		],
 		return: {
 			data: {
 				deleteCategory: {
-					ok: false,
-					errorMessage: 'Execution has failed:\n'
-						+ 'unknown field: ForeignKeyConstraintViolation (Cannot delete 123e4567-e89b-12d3-a456-000000000001 row(s) of entity Category, '
-						+ 'because it is still referenced from 123e4567-e89b-12d3-a456-000000000002 row(s) of entity Item in relation category. '
-						+ 'OnDelete behaviour of this relation is set to "cascade". This is possibly caused by ACL denial.)',
+					ok: true,
+					errorMessage: null,
 				},
 			},
 		},

@@ -264,8 +264,7 @@ export class ContentEntitySelection {
     // @internal
     constructor(
     context: ContentEntitySelectionContext<string>,
-    selectionSet: GraphQlSelectionSet,
-    transformFn?: ((value: any, ctx: ContentTransformContext) => any) | undefined);
+    selectionSet: GraphQlSelectionSet, valueTransform?: ContentTransform | undefined, fieldTransforms?: ReadonlyMap<string, ContentTransform>);
     // @internal (undocumented)
     readonly context: ContentEntitySelectionContext<string>;
     // (undocumented)
@@ -275,9 +274,9 @@ export class ContentEntitySelection {
     // @internal (undocumented)
     readonly selectionSet: GraphQlSelectionSet;
     // (undocumented)
-    transform(transform: (value: any, context: ContentTransformContext) => any): ContentEntitySelection;
+    transform(transform: ContentTransform): ContentEntitySelection;
     // @internal (undocumented)
-    readonly transformFn?: ((value: any, ctx: ContentTransformContext) => any) | undefined;
+    readonly transformFn?: ContentTransform;
 }
 
 // @public (undocumented)
@@ -341,6 +340,9 @@ export class ContentQueryBuilder {
     // (undocumented)
     upsert(name: string, args: Input.UpsertInput, fields?: EntitySelectionOrCallback): ContentMutation<MutationResult>;
 }
+
+// @public (undocumented)
+export type ContentTransform = (value: any, ctx: ContentTransformContext) => any;
 
 // @public (undocumented)
 export type ContentTransformContext = {

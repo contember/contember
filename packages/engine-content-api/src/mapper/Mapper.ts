@@ -11,7 +11,7 @@ import {
 	WhereBuilder,
 } from './select/index.js'
 import { Client, Connection, ConstraintHelper, DatabaseMetadata, RequestMemoryBudget, SelectBuilder } from '@contember/database'
-import { AclScope, aclScopeFromPath, PredicatesInjector } from '../acl/index.js'
+import { AclScope, aclScopeFromPath, PredicatesInjector, ROW_LOOKUP_SCOPE } from '../acl/index.js'
 import { JunctionTableManager } from './JunctionTableManager.js'
 import { DeletedEntitiesStorage, DeleteExecutor } from './delete/index.js'
 import { MutationEntryNotFoundError, MutationResultList } from './Result.js'
@@ -219,7 +219,7 @@ export class Mapper<ConnectionType extends Connection.ConnectionLike = Connectio
 		}
 		await this.setupSystemVariables()
 		return tryMutation(this.schema, this.schemaDatabaseMetadata, async () => {
-			const [primaryValue, err] = await this.getPrimaryValue(entity, by, scope)
+			const [primaryValue, err] = await this.getPrimaryValue(entity, by, ROW_LOOKUP_SCOPE)
 			if (err) return [err]
 
 			return await this.updater.update(this, entity, primaryValue, data, scope, filter)
@@ -237,7 +237,7 @@ export class Mapper<ConnectionType extends Connection.ConnectionLike = Connectio
 		}
 		await this.setupSystemVariables()
 		return tryMutation(this.schema, this.schemaDatabaseMetadata, async () => {
-			const [primaryValue, err] = await this.getPrimaryValue(entity, by, scope)
+			const [primaryValue, err] = await this.getPrimaryValue(entity, by, ROW_LOOKUP_SCOPE)
 			if (err) return [err]
 
 			return await this.updater.updateCb(this, entity, primaryValue, builderCb, scope)
@@ -256,7 +256,7 @@ export class Mapper<ConnectionType extends Connection.ConnectionLike = Connectio
 		}
 		await this.setupSystemVariables()
 		return tryMutation(this.schema, this.schemaDatabaseMetadata, async () => {
-			const [primaryValue] = await this.getPrimaryValue(entity, by, scope)
+			const [primaryValue] = await this.getPrimaryValue(entity, by, ROW_LOOKUP_SCOPE)
 			if (primaryValue === undefined) {
 				return await this.insertInternal(entity, create, scope)
 			}

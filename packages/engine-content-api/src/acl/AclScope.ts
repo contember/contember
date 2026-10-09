@@ -20,3 +20,10 @@ export type AclScope = 'root' | 'nested'
  */
 export const aclScopeFromPath = (path: readonly Model.AnyRelationContext[] | undefined): AclScope =>
 	path === undefined || path.length === 0 ? 'root' : 'nested'
+
+/**
+ * Scope in which an update, delete or upsert locates the row it names - by its unique where and filter.
+ * It is `nested` (root ∪ through) even for a root mutation, as before the scope split: the lookup only
+ * finds the row, while the write predicates and the returned node keep the mutation's own scope.
+ */
+export const ROW_LOOKUP_SCOPE: AclScope = 'nested'

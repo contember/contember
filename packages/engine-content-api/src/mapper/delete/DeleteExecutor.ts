@@ -2,7 +2,7 @@ import { Acl, Input, Model } from '@contember/schema'
 import { assertNever } from '../../utils/index.js'
 import { Client, DeleteBuilder, Literal, SelectBuilder } from '@contember/database'
 import { PathFactory, WhereBuilder } from '../select/index.js'
-import { AclScope, PredicateFactory } from '../../acl/index.js'
+import { AclScope, PredicateFactory, ROW_LOOKUP_SCOPE } from '../../acl/index.js'
 import { UpdateBuilderFactory } from '../update/index.js'
 import {
 	ConstraintType,
@@ -55,7 +55,7 @@ export class DeleteExecutor {
 		filter?: Input.OptionalWhere,
 	): Promise<MutationResultList> {
 		return mapper.mutex.execute(async () => {
-			const [primaryValue, err] = await mapper.getPrimaryValue(entity, by, scope)
+			const [primaryValue, err] = await mapper.getPrimaryValue(entity, by, ROW_LOOKUP_SCOPE)
 			if (err) return [err]
 
 			if (mapper.deletedEntities.isDeleted(entity.name, primaryValue)) {

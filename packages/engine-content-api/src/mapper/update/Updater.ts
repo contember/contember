@@ -15,7 +15,7 @@ import {
 import { UpdateBuilder } from './UpdateBuilder.js'
 import { rowDataToFieldValues } from '../ColumnValue.js'
 import { MapperInput } from '../types.js'
-import { AclScope } from '../../acl/index.js'
+import { AclScope, ROW_LOOKUP_SCOPE } from '../../acl/index.js'
 
 export class Updater {
 	constructor(
@@ -85,7 +85,7 @@ export class Updater {
 						},
 					],
 				}
-				const count = await mapper.count(entity, where, scope)
+				const count = await mapper.count(entity, where, ROW_LOOKUP_SCOPE)
 				if (!count) {
 					return [new MutationEntryNotFoundError([], where)]
 				}

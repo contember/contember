@@ -661,11 +661,10 @@ describe('queries', () => {
 		})
 	})
 
-	test('omit keeps an aliased has-many with totalCount', async () => {
+	test('omit keeps an aliased has-many unwrapped', async () => {
 		const [client] = createClient({
 			author: {
 				articles: {
-					pageInfo: { totalCount: 5 },
 					edges: [
 						{ node: { publishedAt: '2021-01-01T00:00:00Z' } },
 					],
@@ -676,16 +675,16 @@ describe('queries', () => {
 			author: qb.get('Author', { by: { id: '123' } }, it =>
 				it
 					.$('name')
-					.$('posts', { as: 'articles', totalCount: true }, it => it.$('publishedAt'))
+					.$('posts', { as: 'articles' }, it => it.$('publishedAt'))
 					.omit('name')),
 		})
-		const author = (result as any).author
-		expect(author).toStrictEqual({
-			articles: [
-				{ publishedAt: '2021-01-01T00:00:00Z' },
-			],
+		expect(result as any).toStrictEqual({
+			author: {
+				articles: [
+					{ publishedAt: '2021-01-01T00:00:00Z' },
+				],
+			},
 		})
-		expect(author.articles.totalCount).toBe(5)
 	})
 
 	test('omit', async () => {

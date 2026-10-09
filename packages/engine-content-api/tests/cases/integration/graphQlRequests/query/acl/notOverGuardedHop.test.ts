@@ -178,13 +178,13 @@ test('not inside a has-many hop keeps the target read predicate outside the nega
 })
 
 test('a predicate hop and a filter hop through the same relation do not share the join', async () => {
-	// Article readable only through its author's flag (as-definer, plain join); the user filter on the same
+	// Article readable only through its author's name (as-definer, plain join); the user filter on the same
 	// relation reads through the guarded source. Sharing one guarded join would apply the reader's Author
 	// guard to the definer's rule.
 	const definerPermissions: Acl.Permissions = {
 		...permissions,
 		Article: {
-			predicates: { viaAuthor: { author: { isPublic: { eq: true } } } },
+			predicates: { viaAuthor: { author: { name: { notEq: 'secret' } } } },
 			operations: { read: { id: 'viaAuthor', title: 'viaAuthor', author: 'viaAuthor' } },
 		},
 	}
@@ -205,9 +205,49 @@ test('a predicate hop and a filter hop through the same relation do not share th
 					from "public"."article" as "root_"
 					${guardedAuthorJoin}
 					left join "public"."author" as "root_author" on "root_"."author_id" = "root_author"."id"
-					where "root_author$"."name" = ? and "root_author"."is_public" = ?
+					where "root_author$"."name" = ? and "root_author"."name" != ?
 				`,
-				parameters: [true, 'zzz', true],
+				parameters: [true, 'zzz', 'secret'],
+				response: { rows: [{ root_id: testUuid(1) }] },
+			},
+		],
+		return: {
+			data: {
+				listArticle: [{ id: testUuid(1) }],
+			},
+		},
+	})
+})
+
+test('a filter hop whose read guard the row predicate implies shares the predicate join', async () => {
+	// The Article read predicate makes every returned article's author public, so the author read guard holds on
+	// every author the filter can reach and the hop reads the plain table the predicate already joins.
+	const definerPermissions: Acl.Permissions = {
+		...permissions,
+		Article: {
+			predicates: { viaAuthor: { author: { isPublic: { eq: true } } } },
+			operations: { read: { id: 'viaAuthor', title: 'viaAuthor', author: 'viaAuthor' } },
+		},
+	}
+	await execute({
+		schema,
+		permissions: definerPermissions,
+		variables: {},
+		query: GQL`
+        query {
+          listArticle(filter: { author: { not: { name: { eq: "zzz" } } } }) {
+            id
+          }
+        }`,
+		executes: [
+			{
+				sql: SQL`
+					select "root_"."id" as "root_id"
+					from "public"."article" as "root_"
+					left join "public"."author" as "root_author" on "root_"."author_id" = "root_author"."id"
+					where not("root_author"."name" = ?) and "root_author"."is_public" = ?
+				`,
+				parameters: ['zzz', true],
 				response: { rows: [{ root_id: testUuid(1) }] },
 			},
 		],

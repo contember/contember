@@ -68,7 +68,7 @@ describe('where optimized', () => {
 			{
 				and: [
 					{ image: { url: { eq: 'x' } } },
-					{ [MASKED_CELL_KEY]: [{ guard: { id: { always: true } }, where: { title: { eq: 'y' } } }] },
+					{ title: { eq: 'y' } },
 					{ isPublic: { eq: true } },
 				],
 			},

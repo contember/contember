@@ -73,7 +73,7 @@ export class Updater {
 		if (!result.executed) {
 			// direct update was not invoked, so its predicates never reached the database
 			if (!(await updateBuilder.verifyPredicates(mapper))) {
-				return [new MutationNoResultError([])]
+				return [new MutationNoResultError([], 'for input ' + JSON.stringify({ [entity.primary]: primaryValue }))]
 			}
 			if (filter && Object.keys(filter).length > 0) {
 				// direct update was not invoked, but we still need to check if the row matches the filter

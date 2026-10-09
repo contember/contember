@@ -308,6 +308,7 @@ test('root 1:N nested update is denied when the relation grant is through-only',
             data: {locales: [{update: {by: {id: "${localeId}"}, data: {title: "Hello"}}}]}
           ) {
           ok
+          errorMessage
         }
       }`,
 		executes: [
@@ -329,6 +330,7 @@ test('root 1:N nested update is denied when the relation grant is through-only',
 			data: {
 				updatePost: {
 					ok: false,
+					errorMessage: `Execution has failed:\nunknown field: NotFoundOrDenied (for input {"id":"${postId}"})`,
 				},
 			},
 		},

@@ -36,7 +36,12 @@ export type ContentTransformContext = {
 	rootValue: unknown
 }
 
+export type ContentTransform = (value: any, ctx: ContentTransformContext) => any
+
 export class ContentEntitySelection {
+	/** @internal */
+	public readonly transformFn?: ContentTransform
+
 	/**
 	 * @internal
 	 */
@@ -45,9 +50,10 @@ export class ContentEntitySelection {
 		public readonly context: ContentEntitySelectionContext<string>,
 		/** @internal */
 		public readonly selectionSet: GraphQlSelectionSet,
-		/** @internal */
-		public readonly transformFn?: (value: any, ctx: ContentTransformContext) => any,
+		private readonly valueTransform?: ContentTransform,
+		private readonly fieldTransforms: ReadonlyMap<string, ContentTransform> = new Map(),
 	) {
+		this.transformFn = composeTransform(fieldTransforms, valueTransform)
 	}
 
 	$(field: string, args?: EntitySelectionColumnArgs): ContentEntitySelection
@@ -102,10 +108,14 @@ export class ContentEntitySelection {
 			...this.selectionSet,
 			...columns.map(col => new GraphQlField(null, col)),
 		]
-		return new ContentEntitySelection(this.context, nodes)
+		return new ContentEntitySelection(this.context, nodes, this.valueTransform, this.fieldTransforms)
 	}
 
 	omit(...fields: string[]): ContentEntitySelection {
+		const fieldTransforms = new Map(this.fieldTransforms)
+		for (const field of fields) {
+			fieldTransforms.delete(field)
+		}
 		return new ContentEntitySelection(
 			this.context,
 			this.selectionSet.filter(it => {
@@ -115,6 +125,8 @@ export class ContentEntitySelection {
 				const alias = it.alias ?? it.name
 				return !fields.includes(alias)
 			}),
+			this.valueTransform,
+			fieldTransforms,
 		)
 	}
 
@@ -127,22 +139,29 @@ export class ContentEntitySelection {
 			flagFields.push(new GraphQlField(null, flag))
 		}
 
-		return new ContentEntitySelection(this.context, [
-			...selectionWithoutMeta,
-			new GraphQlField(null, '_meta', undefined, [
-				...metaField?.selectionSet ?? [],
-				new GraphQlField(null, field, undefined, flagFields),
-			]),
-		], this.transformFn)
+		return new ContentEntitySelection(
+			this.context,
+			[
+				...selectionWithoutMeta,
+				new GraphQlField(null, '_meta', undefined, [
+					...metaField?.selectionSet ?? [],
+					new GraphQlField(null, field, undefined, flagFields),
+				]),
+			],
+			this.valueTransform,
+			this.fieldTransforms,
+		)
 	}
 
-	transform(transform: (value: any, context: ContentTransformContext) => any): ContentEntitySelection {
+	transform(transform: ContentTransform): ContentEntitySelection {
+		const previousTransform = this.valueTransform
 		return new ContentEntitySelection(
 			this.context,
 			this.selectionSet,
-			!this.transformFn ? transform : (value, ctx) => {
-				return transform(this.transformFn!(value, ctx), ctx)
+			!previousTransform ? transform : (value, ctx) => {
+				return transform(previousTransform(value, ctx), ctx)
 			},
+			this.fieldTransforms,
 		)
 	}
 
@@ -322,20 +341,36 @@ export class ContentEntitySelection {
 	}
 
 	private withField(field: GraphQlField) {
-		return new ContentEntitySelection(this.context, [
-			...this.selectionSet,
-			field,
-		], this.transformFn)
+		return new ContentEntitySelection(
+			this.context,
+			[
+				...this.selectionSet,
+				field,
+			],
+			this.valueTransform,
+			this.fieldTransforms,
+		)
 	}
 
-	private withFieldTransform(alias: string, transform: (value: any, ctx: ContentTransformContext) => any) {
-		return new ContentEntitySelection(this.context, this.selectionSet, (value, ctx) => {
-			const transformedValue = transform(value[alias], ctx)
-			const newValue = {
-				...value,
-				[alias]: transformedValue,
-			}
-			return this.transformFn ? this.transformFn(newValue, ctx) : newValue
-		})
+	private withFieldTransform(alias: string, transform: ContentTransform) {
+		const fieldTransforms = new Map(this.fieldTransforms).set(alias, transform)
+		return new ContentEntitySelection(this.context, this.selectionSet, this.valueTransform, fieldTransforms)
+	}
+}
+
+// Field transforms see the raw response; transforms from .transform() run after all of them.
+const composeTransform = (
+	fieldTransforms: ReadonlyMap<string, ContentTransform>,
+	valueTransform: ContentTransform | undefined,
+): ContentTransform | undefined => {
+	if (fieldTransforms.size === 0) {
+		return valueTransform
+	}
+	return (value, ctx) => {
+		const newValue = { ...value }
+		for (const [alias, transform] of fieldTransforms) {
+			newValue[alias] = transform(value[alias], ctx)
+		}
+		return valueTransform ? valueTransform(newValue, ctx) : newValue
 	}
 }

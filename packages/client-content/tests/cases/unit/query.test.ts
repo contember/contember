@@ -555,6 +555,139 @@ describe('queries', () => {
 		})
 	})
 
+	test('has-one selected twice keeps both nested transforms', async () => {
+		const [client] = createClient({
+			post: {
+				author: {
+					name: 'John',
+					posts: {
+						edges: [
+							{ node: { publishedAt: '2021-01-01T00:00:00Z' } },
+						],
+					},
+				},
+			},
+		})
+		const result = await client.query({
+			post: qb.get('Post', { by: { id: '123' } }, it =>
+				it
+					.$('author', {}, it => it.$('posts', {}, it => it.$('publishedAt')))
+					.$('author', {}, it =>
+						it.$('name').transform(it => ({
+							...it,
+							label: `by ${it.name}`,
+						})))),
+		})
+		expect(result as any).toStrictEqual({
+			post: {
+				author: {
+					name: 'John',
+					label: 'by John',
+					posts: [
+						{ publishedAt: '2021-01-01T00:00:00Z' },
+					],
+				},
+			},
+		})
+	})
+
+	test('transforms around meta and omit are kept', async () => {
+		const [client] = createClient({
+			author: {
+				name: 'John',
+				_meta: {
+					name: { readable: true },
+				},
+			},
+		})
+		const result = await client.query({
+			author: qb.get('Author', { by: { id: '123' } }, it =>
+				it
+					.$('name')
+					.$('email')
+					.transform(it => ({ ...it, before: true }))
+					.meta('name', ['readable'])
+					.omit('email')
+					.transform(it => ({ ...it, after: true }))),
+		})
+		expect(result as any).toStrictEqual({
+			author: {
+				name: 'John',
+				_meta: {
+					name: { readable: true },
+				},
+				before: true,
+				after: true,
+			},
+		})
+	})
+
+	test('omit inside a nested has-many keeps the inner connection unwrapped', async () => {
+		const [client] = createClient({
+			author: {
+				posts: {
+					edges: [
+						{
+							node: {
+								tags: {
+									edges: [
+										{ node: { name: 'news' } },
+									],
+								},
+							},
+						},
+					],
+				},
+			},
+		})
+		const result = await client.query({
+			author: qb.get('Author', { by: { id: '123' } }, it =>
+				it.$('posts', {}, it =>
+					it
+						.$('publishedAt')
+						.$('tags', {}, it => it.$('name'))
+						.omit('publishedAt'))),
+		})
+		expect(result as any).toStrictEqual({
+			author: {
+				posts: [
+					{
+						tags: [
+							{ name: 'news' },
+						],
+					},
+				],
+			},
+		})
+	})
+
+	test('omit keeps an aliased has-many with totalCount', async () => {
+		const [client] = createClient({
+			author: {
+				articles: {
+					pageInfo: { totalCount: 5 },
+					edges: [
+						{ node: { publishedAt: '2021-01-01T00:00:00Z' } },
+					],
+				},
+			},
+		})
+		const result = await client.query({
+			author: qb.get('Author', { by: { id: '123' } }, it =>
+				it
+					.$('name')
+					.$('posts', { as: 'articles', totalCount: true }, it => it.$('publishedAt'))
+					.omit('name')),
+		})
+		const author = (result as any).author
+		expect(author).toStrictEqual({
+			articles: [
+				{ publishedAt: '2021-01-01T00:00:00Z' },
+			],
+		})
+		expect(author.articles.totalCount).toBe(5)
+	})
+
 	test('omit', async () => {
 		const [client, calls] = createClient({
 			authors: [

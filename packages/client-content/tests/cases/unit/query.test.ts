@@ -479,6 +479,82 @@ describe('queries', () => {
 		expect(calls).toHaveLength(1)
 	})
 
+	test('omit after has-many keeps the connection unwrapped', async () => {
+		const [client] = createClient({
+			author: {
+				posts: {
+					edges: [
+						{ node: { publishedAt: '2021-01-01T00:00:00Z' } },
+					],
+				},
+			},
+		})
+		const result = await client.query({
+			author: qb.get('Author', { by: { id: '123' } }, it =>
+				it
+					.$('name')
+					.$('posts', {}, it => it.$('publishedAt'))
+					.omit('name')),
+		})
+		expect(result as any).toStrictEqual({
+			author: {
+				posts: [
+					{ publishedAt: '2021-01-01T00:00:00Z' },
+				],
+			},
+		})
+	})
+
+	test('omit of has-many drops its transform', async () => {
+		const [client, calls] = createClient({
+			author: {
+				name: 'John',
+			},
+		})
+		const result = await client.query({
+			author: qb.get('Author', { by: { id: '123' } }, it =>
+				it
+					.$('name')
+					.$('posts', {}, it => it.$('publishedAt'))
+					.omit('posts')),
+		})
+		expect(result as any).toStrictEqual({
+			author: {
+				name: 'John',
+			},
+		})
+		expect(calls[0].query).not.toContain('paginatePosts')
+	})
+
+	test('$$ after has-many keeps the connection unwrapped', async () => {
+		const [client] = createClient({
+			author: {
+				name: 'John',
+				email: 'foo@localhost',
+				posts: {
+					edges: [
+						{ node: { publishedAt: '2021-01-01T00:00:00Z' } },
+					],
+				},
+			},
+		})
+		const result = await client.query({
+			author: qb.get('Author', { by: { id: '123' } }, it =>
+				it
+					.$('posts', {}, it => it.$('publishedAt'))
+					.$$()),
+		})
+		expect(result as any).toStrictEqual({
+			author: {
+				name: 'John',
+				email: 'foo@localhost',
+				posts: [
+					{ publishedAt: '2021-01-01T00:00:00Z' },
+				],
+			},
+		})
+	})
+
 	test('omit', async () => {
 		const [client, calls] = createClient({
 			authors: [

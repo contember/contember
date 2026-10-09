@@ -580,17 +580,17 @@ namespace NoRoot {
 	}
 }
 
+// An operation granted only through a relation keeps the legacy `noRoot` form, so existing schemas do not change.
 test('no root - valid', () => {
 	const schema = createSchema(NoRoot)
 	expect(schema.acl.roles.public.entities.Book).toStrictEqual({
 		operations: {
+			noRoot: [Acl.Operation.update],
 			read: {
 				id: true,
 			},
-			through: {
-				update: {
-					id: 'or_foo_eq_1_foo_eq_2',
-				},
+			update: {
+				id: 'or_foo_eq_1_foo_eq_2',
 			},
 		},
 		predicates: {
@@ -657,6 +657,45 @@ test('root and through grants on the same operation', () => {
 				},
 			},
 		},
+	})
+})
+
+namespace ThroughOnlyAndCombined {
+	export const publicRole = c.createRole('public')
+
+	@c.Allow(publicRole, {
+		read: ['id', 'title'],
+	})
+	@c.Allow(publicRole, {
+		through: true,
+		read: ['foo'],
+		update: ['title'],
+	})
+	export class Book {
+		title = c.stringColumn()
+		foo = c.intColumn()
+	}
+}
+
+test('through-only operation next to an operation combining root and through grants', () => {
+	const schema = createSchema(ThroughOnlyAndCombined)
+	expect(schema.acl.roles.public.entities.Book).toStrictEqual({
+		operations: {
+			noRoot: [Acl.Operation.update],
+			update: {
+				title: true,
+			},
+			read: {
+				id: true,
+				title: true,
+			},
+			through: {
+				read: {
+					foo: true,
+				},
+			},
+		},
+		predicates: {},
 	})
 })
 

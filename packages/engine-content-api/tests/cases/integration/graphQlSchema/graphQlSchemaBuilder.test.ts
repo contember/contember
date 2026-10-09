@@ -421,15 +421,16 @@ describe('GraphQL schema builder', () => {
 		})
 	})
 
-	it('root writes that locate a row need a root read grant', async () => {
-		const schema = createSchema(RootWriteWithoutRootRead)
+	it('root writes that locate a row need a read grant in the nested set', async () => {
+		const schema = createSchema(RootWriteLookupRead)
 		const { root, all } = new PermissionFactory().createContextual(schema, ['editor'])
 		const graphQlSchema = new GraphQlSchemaBuilderFactory()
 			.create(schema.model, new Authorizator(all, false, false), new Authorizator(root, false, false))
 			.build()
 
-		const mutations = Object.keys(graphQlSchema.getMutationType()?.getFields() ?? {}).filter(it => it.endsWith('Comment'))
-		expect(mutations).toStrictEqual(['createComment'])
+		const mutationNames = Object.keys(graphQlSchema.getMutationType()?.getFields() ?? {})
+		expect(mutationNames.filter(it => it.endsWith('Comment'))).toStrictEqual(['createComment', 'deleteComment', 'updateComment', 'upsertComment'])
+		expect(mutationNames.filter(it => it.endsWith('Note'))).toStrictEqual(['createNote'])
 	})
 
 	it('array', async () => {
@@ -514,10 +515,10 @@ namespace NotNullRootAndThrough {
 }
 
 /**
- * `Comment` carries root write grants but is readable only through a relation. A root update, delete or
- * upsert could never locate its row, so only `createComment` is exposed.
+ * Both entities carry root write grants. `Comment` is readable only through a relation, which is enough for the
+ * lookup of a root update, delete or upsert. `Note` is not readable at all, so only `createNote` is exposed.
  */
-namespace RootWriteWithoutRootRead {
+namespace RootWriteLookupRead {
 	export const editorRole = c.createRole('editor')
 
 	@c.Allow(editorRole, {
@@ -527,6 +528,15 @@ namespace RootWriteWithoutRootRead {
 	})
 	@c.Allow(editorRole, { through: true, read: true })
 	export class Comment {
+		text = c.stringColumn()
+	}
+
+	@c.Allow(editorRole, {
+		create: true,
+		update: true,
+		delete: true,
+	})
+	export class Note {
 		text = c.stringColumn()
 	}
 }

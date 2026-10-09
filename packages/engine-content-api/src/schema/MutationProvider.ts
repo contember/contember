@@ -35,11 +35,11 @@ export class MutationProvider {
 	}
 
 	/**
-	 * Root update, delete and upsert locate their row by a unique lookup in the root scope, which needs a root
-	 * read grant. Without one the lookup never finds a row, so the mutation would always fail.
+	 * Root update, delete and upsert locate their row by a unique lookup that reads in the nested set (root ∪ through).
+	 * Without any read grant there the lookup never finds a row, so the mutation would always fail.
 	 */
-	private isRootLookupReadable(entity: Model.Entity): boolean {
-		return this.rootAuthorizator.getEntityPermission(Acl.Operation.read, entity.name) !== 'no'
+	private isLookupReadable(entity: Model.Entity): boolean {
+		return this.authorizator.getEntityPermission(Acl.Operation.read, entity.name) !== 'no'
 	}
 
 	protected getCreateMutation(entity: Model.Entity): FieldConfig<Input.CreateInput> | undefined {
@@ -75,7 +75,7 @@ export class MutationProvider {
 		if (entity.view) {
 			return undefined
 		}
-		if (!this.isRootLookupReadable(entity) || this.rootAuthorizator.getEntityPermission(Acl.Operation.delete, entityName) === 'no') {
+		if (!this.isLookupReadable(entity) || this.rootAuthorizator.getEntityPermission(Acl.Operation.delete, entityName) === 'no') {
 			return undefined
 		}
 		const uniqueWhere = this.whereTypeProvider.getEntityUniqueWhereType(entityName)
@@ -105,7 +105,7 @@ export class MutationProvider {
 	}
 
 	protected getUpdateMutation(entity: Model.Entity): FieldConfig<Input.UpdateInput> | undefined {
-		if (!this.isRootLookupReadable(entity) || this.rootAuthorizator.getEntityPermission(Acl.Operation.update, entity.name) === 'no') {
+		if (!this.isLookupReadable(entity) || this.rootAuthorizator.getEntityPermission(Acl.Operation.update, entity.name) === 'no') {
 			return undefined
 		}
 		const entityName = entity.name
@@ -143,7 +143,7 @@ export class MutationProvider {
 
 	private getUpsertMutation(entity: Model.Entity): FieldConfig<Input.UpsertInput> | undefined {
 		if (
-			!this.isRootLookupReadable(entity)
+			!this.isLookupReadable(entity)
 			|| this.rootAuthorizator.getEntityPermission(Acl.Operation.update, entity.name) === 'no'
 			|| this.rootAuthorizator.getEntityPermission(Acl.Operation.create, entity.name) === 'no'
 		) {

@@ -3,7 +3,7 @@ import * as fs from 'node:fs/promises'
 import * as os from 'node:os'
 import * as path from 'node:path'
 import chalk from 'chalk'
-import { Schema } from '@contember/schema'
+import { Model, Schema } from '@contember/schema'
 import { emptySchema } from '@contember/schema-utils'
 import {
 	JsonLoader,
@@ -219,5 +219,57 @@ describe('project print-schema — --format and --json are orthogonal', () => {
 		expect(exitCode).toBe(ExitCode.InputError)
 		expect(stdout).toBe('')
 		expect(JSON.parse(stderr).error.code).toBe('UNKNOWN_FORMAT')
+	})
+})
+
+const uuidEntity = (name: string, tableName: string): Model.Entity => ({
+	name,
+	primary: 'id',
+	primaryColumn: 'id',
+	tableName,
+	fields: {
+		id: { name: 'id', columnName: 'id', type: Model.ColumnType.Uuid, columnType: 'uuid', nullable: false },
+	},
+	unique: [],
+	indexes: [],
+	eventLog: { enabled: true },
+})
+
+// `Tag` is readable only via a `through` grant, so it must not get root query fields.
+const schemaWithThroughOnlyEntity: Schema = {
+	...emptySchema,
+	model: {
+		enums: {},
+		entities: {
+			Post: uuidEntity('Post', 'post'),
+			Tag: uuidEntity('Tag', 'tag'),
+		},
+	},
+	acl: {
+		roles: {
+			reader: {
+				variables: {},
+				stages: '*',
+				entities: {
+					Post: { predicates: {}, operations: { read: { id: true } } },
+					Tag: { predicates: {}, operations: { through: { read: { id: true } } } },
+				},
+			},
+		},
+	},
+}
+
+describe('project print-schema — root fields', () => {
+	test('--format graphql gates root fields on the root grants only', async () => {
+		const { printSchemaCommand } = await buildProjectCommands(schemaWithThroughOnlyEntity)
+		const { exitCode, stdout } = await runApplication(
+			['project', 'print-schema', '--role', 'reader'],
+			{ ['project print-schema']: () => printSchemaCommand },
+		)
+
+		expect(exitCode).toBe(ExitCode.Success)
+		expect(stdout).toContain('getPost(')
+		expect(stdout).not.toContain('getTag(')
+		expect(stdout).not.toContain('listTag(')
 	})
 })

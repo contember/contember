@@ -35,14 +35,14 @@ export class GraphQlSchemaBuilderFactory {
 	/**
 	 * `authorizator` shapes the types - it must carry the nested permission set, so a field granted
 	 * only via `through` still exists on the shared type. `rootAuthorizator` gates the root query and
-	 * mutation fields and therefore must carry the root grants only. Callers with a single flat
-	 * permission set can omit it.
+	 * mutation fields and therefore must carry the root grants only. A caller with a single flat
+	 * permission set, which has no `through` grants, passes the same authorizator twice.
 	 */
-	public create(schema: Model.Schema, authorizator: Authorizator, rootAuthorizator?: Authorizator): GraphQlSchemaBuilder {
+	public create(schema: Model.Schema, authorizator: Authorizator, rootAuthorizator: Authorizator): GraphQlSchemaBuilder {
 		return this.createContainerBuilder(schema, authorizator, rootAuthorizator).build().graphQlSchemaBuilder
 	}
 
-	public createContainerBuilder(schema: Model.Schema, authorizator: Authorizator, rootAuthorizator: Authorizator = authorizator) {
+	public createContainerBuilder(schema: Model.Schema, authorizator: Authorizator, rootAuthorizator: Authorizator) {
 		return new Builder({})
 			.addService('schema', () => schema)
 			.addService('authorizator', () => authorizator)

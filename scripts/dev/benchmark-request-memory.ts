@@ -84,7 +84,8 @@ const model = new SchemaBuilder()
 			.manyHasOne('item', relation => relation.target('Item').inversedBy('children')))
 	.buildSchema()
 const permissions = new AllowAllPermissionFactory().create(model)
-const gqlSchema = new GraphQlSchemaBuilderFactory().create(model, new Authorizator(permissions, false, false)).build()
+const authorizator = new Authorizator(permissions, false, false)
+const gqlSchema = new GraphQlSchemaBuilderFactory().create(model, authorizator, authorizator).build()
 const factory = new ExecutionContainerFactory({ uuid: () => randomUUID(), now: () => new Date() })
 
 try {

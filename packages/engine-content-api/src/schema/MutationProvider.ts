@@ -34,6 +34,14 @@ export class MutationProvider {
 		return filterObject(mutations, (key, value): value is FieldConfig<any> => value !== undefined)
 	}
 
+	/**
+	 * Root update, delete and upsert locate their row by a unique lookup in the root scope, which needs a root
+	 * read grant. Without one the lookup never finds a row, so the mutation would always fail.
+	 */
+	private isRootLookupReadable(entity: Model.Entity): boolean {
+		return this.rootAuthorizator.getEntityPermission(Acl.Operation.read, entity.name) !== 'no'
+	}
+
 	protected getCreateMutation(entity: Model.Entity): FieldConfig<Input.CreateInput> | undefined {
 		// Root entry points are gated on the root grants alone - a `through` grant must not open one.
 		if (this.rootAuthorizator.getEntityPermission(Acl.Operation.create, entity.name) === 'no') {
@@ -67,7 +75,7 @@ export class MutationProvider {
 		if (entity.view) {
 			return undefined
 		}
-		if (this.rootAuthorizator.getEntityPermission(Acl.Operation.delete, entityName) === 'no') {
+		if (!this.isRootLookupReadable(entity) || this.rootAuthorizator.getEntityPermission(Acl.Operation.delete, entityName) === 'no') {
 			return undefined
 		}
 		const uniqueWhere = this.whereTypeProvider.getEntityUniqueWhereType(entityName)
@@ -97,7 +105,7 @@ export class MutationProvider {
 	}
 
 	protected getUpdateMutation(entity: Model.Entity): FieldConfig<Input.UpdateInput> | undefined {
-		if (this.rootAuthorizator.getEntityPermission(Acl.Operation.update, entity.name) === 'no') {
+		if (!this.isRootLookupReadable(entity) || this.rootAuthorizator.getEntityPermission(Acl.Operation.update, entity.name) === 'no') {
 			return undefined
 		}
 		const entityName = entity.name
@@ -135,7 +143,8 @@ export class MutationProvider {
 
 	private getUpsertMutation(entity: Model.Entity): FieldConfig<Input.UpsertInput> | undefined {
 		if (
-			this.rootAuthorizator.getEntityPermission(Acl.Operation.update, entity.name) === 'no'
+			!this.isRootLookupReadable(entity)
+			|| this.rootAuthorizator.getEntityPermission(Acl.Operation.update, entity.name) === 'no'
 			|| this.rootAuthorizator.getEntityPermission(Acl.Operation.create, entity.name) === 'no'
 		) {
 			return undefined

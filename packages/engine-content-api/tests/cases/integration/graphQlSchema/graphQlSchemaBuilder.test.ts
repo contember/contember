@@ -421,6 +421,17 @@ describe('GraphQL schema builder', () => {
 		})
 	})
 
+	it('root writes that locate a row need a root read grant', async () => {
+		const schema = createSchema(RootWriteWithoutRootRead)
+		const { root, all } = new PermissionFactory().createContextual(schema, ['editor'])
+		const graphQlSchema = new GraphQlSchemaBuilderFactory()
+			.create(schema.model, new Authorizator(all, false, false), new Authorizator(root, false, false))
+			.build()
+
+		const mutations = Object.keys(graphQlSchema.getMutationType()?.getFields() ?? {}).filter(it => it.endsWith('Comment'))
+		expect(mutations).toStrictEqual(['createComment'])
+	})
+
 	it('array', async () => {
 		const schema = createSchema({
 			Foo: class Foo {
@@ -499,6 +510,24 @@ namespace NotNullRootAndThrough {
 	@c.Allow(editorRole, { through: true, read: ['url'] })
 	export class Image {
 		url = c.stringColumn().notNull()
+	}
+}
+
+/**
+ * `Comment` carries root write grants but is readable only through a relation. A root update, delete or
+ * upsert could never locate its row, so only `createComment` is exposed.
+ */
+namespace RootWriteWithoutRootRead {
+	export const editorRole = c.createRole('editor')
+
+	@c.Allow(editorRole, {
+		create: true,
+		update: true,
+		delete: true,
+	})
+	@c.Allow(editorRole, { through: true, read: true })
+	export class Comment {
+		text = c.stringColumn()
 	}
 }
 

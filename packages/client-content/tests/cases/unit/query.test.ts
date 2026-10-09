@@ -444,6 +444,41 @@ describe('queries', () => {
 		expect(calls).toHaveLength(1)
 	})
 
+	test('meta after has-many keeps the connection unwrapped', async () => {
+		const [client, calls] = createClient({
+			author: {
+				name: 'John',
+				posts: {
+					edges: [
+						{ node: { publishedAt: '2021-01-01T00:00:00Z' } },
+					],
+				},
+				_meta: {
+					name: { readable: true, updatable: false },
+				},
+			},
+		})
+		const result = await client.query({
+			author: qb.get('Author', { by: { id: '123' } }, it =>
+				it
+					.$('name')
+					.$('posts', {}, it => it.$('publishedAt'))
+					.meta('name', ['readable', 'updatable'])),
+		})
+		expect(result as any).toStrictEqual({
+			author: {
+				name: 'John',
+				posts: [
+					{ publishedAt: '2021-01-01T00:00:00Z' },
+				],
+				_meta: {
+					name: { readable: true, updatable: false },
+				},
+			},
+		})
+		expect(calls).toHaveLength(1)
+	})
+
 	test('omit', async () => {
 		const [client, calls] = createClient({
 			authors: [

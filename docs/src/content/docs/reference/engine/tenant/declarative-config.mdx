@@ -197,11 +197,11 @@ Being allowed into the panel grants no rights. Everything done inside it goes th
 
 ## Permissions
 
-The underlying mutations require the `CONFIGURE`, `IDP_*`, `MAIL_TEMPLATE_*`, and (for auth policies) `system:configure` tenant permissions, held by `SUPER_ADMIN` and `PROJECT_ADMIN`. Custom-role provisioning specifically requires `customRole:view` and `customRole:manage`; management is deliberately not grantable to custom roles and is held by `SUPER_ADMIN`.
+The underlying mutations require the `CONFIGURE`, `IDP_*`, `MAIL_TEMPLATE_*`, and (for auth policies) `system:configure` tenant permissions, held by `SUPER_ADMIN` and `PROJECT_ADMIN`. Custom-role provisioning specifically requires `customRole:view` and `customRole:manage`; management is deliberately not grantable to custom roles and is held by `SUPER_ADMIN` and `PROJECT_ADMIN`. A `PROJECT_ADMIN` cannot update a role that an identity holding `super_admin` or `project_creator` also holds.
 
 :::caution[A deploy-only token is not enough]
 An `ENTRYPOINT_DEPLOYER` (deploy) token can run `deploy` but **cannot** configure the tenant. Use a token carrying every permission required by the
-configured sections. A config containing `customRoles` requires `SUPER_ADMIN`; use a dedicated CI API key.
+configured sections. A config containing `customRoles` requires `SUPER_ADMIN` or `PROJECT_ADMIN`; use a dedicated CI API key.
 :::
 
 ## In CI

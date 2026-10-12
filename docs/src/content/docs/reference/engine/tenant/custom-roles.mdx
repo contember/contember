@@ -50,6 +50,21 @@ unchanged.
 Errors include `INVALID_SLUG`, `SLUG_ALREADY_EXISTS`, `SLUG_ALREADY_ASSIGNED`, `UNKNOWN_PERMISSION`, `DUPLICATE_PERMISSION`, and
 `INVALID_PERMISSION_CONFIGURATION`.
 
+### Who may manage roles
+
+`createCustomRole`, `updateCustomRole` and `deleteCustomRole` require `customRole:manage`. A `super_admin` holds it through the wildcard grant, and
+a global `project_admin` holds it as well. A project `admin` membership alone does not grant it.
+
+Defining roles gives a `project_admin` nothing it does not already have. Every grantable permission, in any configuration, is a subset of what a
+`project_admin` may do directly, and a `project_admin` may already assign custom roles. An application can therefore define and hand out a narrow
+role — for example an API key that only reads the auth log through `system:viewAuthLog` — without a `super_admin` token.
+
+A `project_admin` cannot update or delete a role while any identity holding it also holds `super_admin` or `project_creator`. Changing or deleting
+the role would change what that identity may do, and a `project_admin` cannot change the roles of such an identity directly either. The mutation
+fails with "You are not allowed to manage this custom role"; a `super_admin` has to make that change.
+
+`customRole:manage` itself is not grantable, so a custom role can never edit its own definition or define a wider one.
+
 Assigning a global role that is neither built in nor defined as a custom role is rejected. Older engine versions accepted any string in
 `identity.roles` (through `addGlobalIdentityRoles`, `signUp(roles:)`, or `createGlobalApiKey(roles:)`), so such strings can still exist. Creating
 a custom role whose slug some identity already holds would silently grant the new definition to every such identity — including old API keys.

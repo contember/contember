@@ -67,6 +67,8 @@ import _20260803120000personenableauthlog from './2026-08-03-120000-person-enabl
 import _20260804120000configpanel from './2026-08-04-120000-config-panel.js'
 import _20260904120000idpdisablelocalauthentication from './2026-09-04-120000-idp-disable-local-authentication.js'
 import _20260911120000customrole from './2026-09-11-120000-custom-role.js'
+import _20261012120000signoutauthlog from './2026-10-12-120000-sign-out-auth-log.js'
+import _20261012120010authlogcreatedatindex from './2026-10-12-120010-auth-log-created-at-index.js'
 import snapshot from './snapshot.js'
 import { computeTokenHash, Providers } from '../model/index.js'
 import { Logger } from '@contember/logger'
@@ -157,6 +159,8 @@ const migrations = {
 	'2026-08-04-120000-config-panel': _20260804120000configpanel,
 	'2026-09-04-120000-idp-disable-local-authentication': _20260904120000idpdisablelocalauthentication,
 	'2026-09-11-120000-custom-role': _20260911120000customrole,
+	'2026-10-12-120000-sign-out-auth-log': _20261012120000signoutauthlog,
+	'2026-10-12-120010-auth-log-created-at-index': _20261012120010authlogcreatedatindex,
 }
 
 export class TenantMigrationsRunner {

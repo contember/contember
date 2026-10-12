@@ -13,26 +13,36 @@ export class SignOutMutationResolver implements MutationResolvers {
 			message: 'You are not allowed to sign out',
 		})
 
+		const all = args.all ?? false
 		const response = await this.signOutManager.signOut(
 			context.db,
 			context.identity.id,
 			context.apiKeyId,
-			args.all ?? false,
+			all,
 		)
+
+		// Audit at the resolver layer (the manager only returns what happened).
+		await context.logAuthAction({
+			type: 'sign_out',
+			response: response.ok ? new ResponseOk(null) : response,
+			personId: response.ok ? response.result.personId : undefined,
+			identityProviderId: response.ok ? response.result.identityProviderId ?? undefined : undefined,
+			metadata: { sessionId: context.apiKeyId },
+			eventData: { all },
+		})
 
 		if (!response.ok) {
 			return createErrorResponse(response.error, response.errorMessage)
 		}
 
-		// Audit at the resolver layer (the manager only returns what happened). Only emit when the
-		// session was federated and the IdP actually produced an RP-initiated logout URL — i.e. a
-		// real Single Logout was initiated, not a plain local sign-out.
+		// Additionally record a Single Logout only when the session was federated and the IdP actually produced an
+		// RP-initiated logout URL.
 		if (response.result.logoutUrl) {
 			await context.logAuthAction({
 				type: 'idp_logout_initiated',
 				response: new ResponseOk(null),
 				identityProviderId: response.result.identityProviderId ?? undefined,
-				eventData: { all: args.all ?? false },
+				eventData: { all },
 			})
 		}
 

@@ -70,6 +70,9 @@ For dynamic values use GraphQL variables via the tester's `{ variables }` option
 
 Cover DB-serialization concerns here rather than in unit tests — a mapper unit test cannot see how a value lands in PostgreSQL.
 
-## Known flake
+## Known flakes
 
-`cases/tenant/disablePerson.test.ts` → `disablePerson blocks future signIn with PERSON_DISABLED` fails intermittently on a **single** `test-db` shard while the others pass on identical code. The assertion prints only `body.data`, so the underlying GraphQL error is invisible. Re-run before investigating (`gh run rerun <runId> --failed`). If it ever fails on several shards at once that is real — dump `body.errors` at the assertion; the test signs in during setup, so a sign-in rate limit is the first suspect.
+Each of these fails intermittently on a **single** `test-db` shard while the others pass on identical code. Re-run before investigating (`gh run rerun <runId> --failed`). A failure on several shards at once is real.
+
+- `cases/tenant/disablePerson.test.ts` → `disablePerson blocks future signIn with PERSON_DISABLED`. The assertion prints only `body.data`, so the underlying GraphQL error is invisible. If it fails for real, dump `body.errors` at the assertion; the test signs in during setup, so a sign-in rate limit is the first suspect.
+- `cases/tenant/mfaEnforcement.test.ts` → `project-scoped MFA policy forces enrollment, completes via TOTP, resets, and leaves un-roled persons unaffected` hits the default 5 s test timeout.

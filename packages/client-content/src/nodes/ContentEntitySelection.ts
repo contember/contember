@@ -102,7 +102,7 @@ export class ContentEntitySelection {
 			...this.selectionSet,
 			...columns.map(col => new GraphQlField(null, col)),
 		]
-		return new ContentEntitySelection(this.context, nodes)
+		return new ContentEntitySelection(this.context, nodes, this.transformFn)
 	}
 
 	omit(...fields: string[]): ContentEntitySelection {
@@ -133,7 +133,7 @@ export class ContentEntitySelection {
 				...metaField?.selectionSet ?? [],
 				new GraphQlField(null, field, undefined, flagFields),
 			]),
-		])
+		], this.transformFn)
 	}
 
 	transform(transform: (value: any, context: ContentTransformContext) => any): ContentEntitySelection {

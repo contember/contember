@@ -324,6 +324,34 @@ describe('queries', () => {
 		expect(calls).toMatchSnapshot()
 	})
 
+	test('meta() and $$() after a has-many keep its unwrap transform', async () => {
+		const [client] = createClient({
+			author: {
+				name: 'John',
+				_meta: { name: { readable: true } },
+				posts: {
+					edges: [
+						{ node: { publishedAt: '2021-01-01T00:00:00Z' } },
+					],
+				},
+			},
+		})
+		const result = await client.query({
+			author: qb.get('Author', { by: { id: '123' } }, it =>
+				it
+					.$('posts', {}, it => it.$('publishedAt'))
+					.$$()
+					.meta('name', ['readable'])),
+		})
+		expect(result as any).toStrictEqual({
+			author: {
+				name: 'John',
+				_meta: { name: { readable: true } },
+				posts: [{ publishedAt: '2021-01-01T00:00:00Z' }],
+			},
+		})
+	})
+
 	test('nested has-one transform', async () => {
 		const [client, calls] = createClient({
 			post: {

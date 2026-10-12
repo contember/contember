@@ -401,6 +401,7 @@ CREATE INDEX "idp_session_sid" ON "idp_session" USING "btree" ("identity_provide
 CREATE UNIQUE INDEX "mail_template_identifier" ON "mail_template" USING "btree" ("project_id", "mail_type", "variant") WHERE ("project_id" IS NOT NULL);
 CREATE UNIQUE INDEX "mail_template_identifier_global" ON "mail_template" USING "btree" ("mail_type", "variant") WHERE ("project_id" IS NULL);
 CREATE INDEX "mail_template_project_index" ON "mail_template" USING "btree" ("project_id");
+CREATE INDEX "person_auth_log_created_at_id_idx" ON "person_auth_log" USING "btree" ("created_at" DESC, "id" DESC);
 CREATE INDEX "person_auth_log_person_id_created_at_idx" ON "person_auth_log" USING "btree" ("person_id", "created_at" DESC);
 CREATE INDEX "person_auth_log_person_input_identifier_created_at_idx" ON "person_auth_log" USING "btree" ("person_input_identifier", "created_at" DESC) WHERE (("type" = 'login'::"auth_log_type") AND ("success" = false));
 CREATE INDEX "person_auth_log_target_person_id_created_at_idx" ON "person_auth_log" USING "btree" ("target_person_id", "created_at" DESC);

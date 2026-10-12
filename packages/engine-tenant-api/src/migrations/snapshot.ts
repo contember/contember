@@ -60,7 +60,8 @@ CREATE TYPE "auth_log_type" AS ENUM (
     'idp_role_mapped',
     'idp_role_mapping_failed',
     'person_enable',
-    'custom_role_change'
+    'custom_role_change',
+    'sign_out'
 );
 CREATE TYPE "config_policy" AS ENUM (
     'always',

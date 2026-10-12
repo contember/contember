@@ -42,6 +42,14 @@ test('sign out', async () => {
 				},
 			},
 		},
+		expectedAuthLog: expect.objectContaining({
+			type: 'sign_out',
+			response: expect.objectContaining({ ok: true }),
+			personId: personId,
+			identityProviderId: undefined,
+			metadata: { sessionId: authenticatedApiKeyId },
+			eventData: { all: false },
+		}),
 	})
 })
 
@@ -83,6 +91,14 @@ test('sign out all', async () => {
 				},
 			},
 		},
+		expectedAuthLog: expect.objectContaining({
+			type: 'sign_out',
+			response: expect.objectContaining({ ok: true }),
+			personId: personId,
+			identityProviderId: undefined,
+			metadata: { sessionId: authenticatedApiKeyId },
+			eventData: { all: true },
+		}),
 	})
 })
 
@@ -124,6 +140,14 @@ test('sign out - permanent api key', async () => {
 				},
 			},
 		},
+		expectedAuthLog: expect.objectContaining({
+			type: 'sign_out',
+			response: expect.objectContaining({ ok: false, error: 'NOT_POSSIBLE_SIGN_OUT_WITH_PERMANENT_API_KEY' }),
+			personId: undefined,
+			identityProviderId: undefined,
+			metadata: { sessionId: authenticatedApiKeyId },
+			eventData: { all: true },
+		}),
 	})
 })
 
@@ -155,6 +179,14 @@ test('sign out - not a person', async () => {
 				},
 			},
 		},
+		expectedAuthLog: expect.objectContaining({
+			type: 'sign_out',
+			response: expect.objectContaining({ ok: false, error: 'NOT_A_PERSON' }),
+			personId: undefined,
+			identityProviderId: undefined,
+			metadata: { sessionId: authenticatedApiKeyId },
+			eventData: { all: true },
+		}),
 	})
 })
 
@@ -203,11 +235,21 @@ test('sign out - OIDC RP-initiated logout returns logoutUrl', async () => {
 				},
 			},
 		},
-		expectedAuthLog: expect.objectContaining({
-			type: 'idp_logout_initiated',
-			identityProviderId,
-			eventData: { all: false },
-		}),
+		expectedAuthLog: [
+			expect.objectContaining({
+				type: 'sign_out',
+				response: expect.objectContaining({ ok: true }),
+				personId: personId,
+				identityProviderId: identityProviderId,
+				metadata: { sessionId: authenticatedApiKeyId },
+				eventData: { all: false },
+			}),
+			expect.objectContaining({
+				type: 'idp_logout_initiated',
+				identityProviderId,
+				eventData: { all: false },
+			}),
+		],
 	})
 })
 
@@ -260,11 +302,21 @@ test('sign out all - OIDC RP-initiated logout returns logoutUrl and audits all:t
 				},
 			},
 		},
-		expectedAuthLog: expect.objectContaining({
-			type: 'idp_logout_initiated',
-			identityProviderId,
-			eventData: { all: true },
-		}),
+		expectedAuthLog: [
+			expect.objectContaining({
+				type: 'sign_out',
+				response: expect.objectContaining({ ok: true }),
+				personId: personId,
+				identityProviderId: identityProviderId,
+				metadata: { sessionId: authenticatedApiKeyId },
+				eventData: { all: true },
+			}),
+			expect.objectContaining({
+				type: 'idp_logout_initiated',
+				identityProviderId,
+				eventData: { all: true },
+			}),
+		],
 	})
 })
 
@@ -313,5 +365,13 @@ test('sign out - federated IdP without end_session_endpoint falls back to local 
 				},
 			},
 		},
+		expectedAuthLog: expect.objectContaining({
+			type: 'sign_out',
+			response: expect.objectContaining({ ok: true }),
+			personId: personId,
+			identityProviderId: identityProviderId,
+			metadata: { sessionId: authenticatedApiKeyId },
+			eventData: { all: false },
+		}),
 	})
 })

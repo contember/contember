@@ -9,6 +9,7 @@ import { Response, ResponseError, ResponseOk } from '../utils/Response.js'
 export type SignOutErrorCode = 'NOT_A_PERSON' | 'NOT_POSSIBLE_SIGN_OUT_WITH_PERMANENT_API_KEY'
 
 export type SignOutResult = {
+	readonly personId: string
 	/** Set when the session was federated via an OIDC IdP that exposes RP-initiated logout. */
 	readonly logoutUrl: string | null
 	/** The IdP this session belonged to, for auditing. Null for plain (password) sessions. */
@@ -64,6 +65,7 @@ export class SignOutManager {
 		}
 
 		return new ResponseOk({
+			personId: person.id,
 			logoutUrl: logout?.logoutUrl ?? null,
 			identityProviderId: logout?.identityProviderId ?? null,
 		})

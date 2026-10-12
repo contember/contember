@@ -62,6 +62,7 @@ A few auth events carry extra context so security-relevant outcomes stay disting
 
 | Type | When | `target_person_id` | `event_data` / `metadata` |
 |---|---|---|---|
+| `sign_out` *(since 2.2)* | `signOut`, on success and failure | — | `metadata.sessionId` (the calling session), `event_data.all`; `identity_provider_id` for a federated session |
 | `session_revoked_by_user` | `revokeSession` | — | `metadata.sessionId` |
 | `forced_sign_out` | `forceSignOutPerson` | target person | `metadata.reason` (if supplied) |
 | `person_disable` | `disablePerson` | target person | — |

@@ -3,6 +3,7 @@ import {
 	ApiKeyPermissionMeta,
 	ChangeProfilePermissionMeta,
 	CreateSessionTokenPermissionMeta,
+	CustomRoleManagePermissionMeta,
 	GlobalApiKeyPermissionMeta,
 	GlobalRoleMutationPermissionMeta,
 	PermissionActions,
@@ -39,6 +40,13 @@ const projectAdminMayTarget = (meta: TargetIdentityPermissionMeta) =>
 
 const projectAdminMayCreateSession = (meta: CreateSessionTokenPermissionMeta) =>
 	meta.phase === 'preflight' || meta.target?.globalRoles.every(role => !NON_DELEGABLE_TENANT_ROLES.has(role)) === true
+
+/**
+ * Changing or deleting a role changes what every holder may do, so a role held by a protected
+ * identity is out of reach — just as removing a role from that identity directly would be.
+ */
+const projectAdminMayManageCustomRole = (meta: CustomRoleManagePermissionMeta | undefined) =>
+	meta === undefined || meta.holderGlobalRoles.every(role => !NON_DELEGABLE_TENANT_ROLES.has(role))
 
 class PermissionsFactory {
 	public create(): Permissions {
@@ -110,6 +118,7 @@ class PermissionsFactory {
 
 		permissions.allow(TenantRole.PROJECT_ADMIN, PermissionActions.AUTH_LOG_VIEW)
 		permissions.allow(TenantRole.PROJECT_ADMIN, PermissionActions.CUSTOM_ROLE_VIEW)
+		permissions.allow(TenantRole.PROJECT_ADMIN, PermissionActions.CUSTOM_ROLE_MANAGE(), projectAdminMayManageCustomRole)
 		permissions.allow(TenantRole.PROJECT_ADMIN, PermissionActions.ENTRYPOINT_DEPLOY)
 		permissions.allow(TenantRole.PROJECT_ADMIN, PermissionActions.CONFIGURE)
 		permissions.allow(TenantRole.PROJECT_ADMIN, PermissionActions.CONFIG_VIEW)

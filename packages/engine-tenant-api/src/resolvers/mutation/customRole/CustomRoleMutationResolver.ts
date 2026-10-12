@@ -8,14 +8,13 @@ import {
 	UpdateCustomRoleResponse,
 } from '../../../schema/index.js'
 import { TenantResolverContext } from '../../TenantResolverContext.js'
-import { CustomRoleManager, PermissionActions } from '../../../model/index.js'
+import { CustomRoleManager, GlobalRolesOfRoleHoldersQuery, PermissionActions } from '../../../model/index.js'
 import { createErrorResponse } from '../../errorUtils.js'
 import { ResponseOk } from '../../../model/utils/Response.js'
 
 /**
- * CRUD over `custom_role` (runtime-defined global roles). Gated by `customRole:manage`,
- * which is deliberately NOT grantable to a custom role — by default only SUPER_ADMIN
- * (via the wildcard grant) can manage role definitions.
+ * CRUD over `custom_role` (runtime-defined global roles). Gated by `customRole:manage`, held by
+ * SUPER_ADMIN and PROJECT_ADMIN and deliberately NOT grantable to a custom role.
  */
 export class CustomRoleMutationResolver implements Pick<MutationResolvers, 'createCustomRole' | 'updateCustomRole' | 'deleteCustomRole'> {
 	constructor(
@@ -24,7 +23,7 @@ export class CustomRoleMutationResolver implements Pick<MutationResolvers, 'crea
 
 	async createCustomRole(parent: any, args: MutationCreateCustomRoleArgs, context: TenantResolverContext): Promise<CreateCustomRoleResponse> {
 		await context.requireAccess({
-			action: PermissionActions.CUSTOM_ROLE_MANAGE,
+			action: PermissionActions.CUSTOM_ROLE_MANAGE(),
 			message: 'You are not allowed to manage custom roles',
 		})
 
@@ -64,10 +63,7 @@ export class CustomRoleMutationResolver implements Pick<MutationResolvers, 'crea
 	}
 
 	async updateCustomRole(parent: any, args: MutationUpdateCustomRoleArgs, context: TenantResolverContext): Promise<UpdateCustomRoleResponse> {
-		await context.requireAccess({
-			action: PermissionActions.CUSTOM_ROLE_MANAGE,
-			message: 'You are not allowed to manage custom roles',
-		})
+		await this.requireAccessToRole(context, args.slug)
 
 		const result = await context.db.transaction(async db => {
 			const result = await this.customRoleManager.updateRole(db, args.slug, {
@@ -95,10 +91,7 @@ export class CustomRoleMutationResolver implements Pick<MutationResolvers, 'crea
 	}
 
 	async deleteCustomRole(parent: any, args: MutationDeleteCustomRoleArgs, context: TenantResolverContext): Promise<DeleteCustomRoleResponse> {
-		await context.requireAccess({
-			action: PermissionActions.CUSTOM_ROLE_MANAGE,
-			message: 'You are not allowed to manage custom roles',
-		})
+		await this.requireAccessToRole(context, args.slug)
 
 		const result = await context.db.transaction(async db => {
 			const result = await this.customRoleManager.deleteRole(db, args.slug)
@@ -121,5 +114,19 @@ export class CustomRoleMutationResolver implements Pick<MutationResolvers, 'crea
 		}
 
 		return { ok: true }
+	}
+
+	private async requireAccessToRole(context: TenantResolverContext, slug: string): Promise<void> {
+		// cheap gate first, so a caller holding the permission in no form touches no data
+		await context.requireAccess({
+			action: PermissionActions.CUSTOM_ROLE_MANAGE(),
+			message: 'You are not allowed to manage custom roles',
+		})
+		await context.requireAccess({
+			action: PermissionActions.CUSTOM_ROLE_MANAGE({
+				holderGlobalRoles: await context.db.queryHandler.fetch(new GlobalRolesOfRoleHoldersQuery(slug)),
+			}),
+			message: 'You are not allowed to manage this custom role',
+		})
 	}
 }

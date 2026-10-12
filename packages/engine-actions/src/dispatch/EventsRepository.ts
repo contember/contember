@@ -31,7 +31,8 @@ export class EventsRepository {
 			return await this.fetchBatch(actions, db)
 		}
 		const batchSize = (target.batchSize ?? DEFAULT_BATCH_SIZE) - 1
-		const batch = batchSize > 0 ? await this.fetchInternal(db, batchSize) : []
+		// A batch is delivered to the primary event's target, so it may only take events of that target.
+		const batch = batchSize > 0 ? await this.fetchInternal(db, batchSize, primaryEvent.target) : []
 		return { ok: true, events: [primaryEvent, ...batch], target }
 	}
 

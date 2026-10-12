@@ -1,4 +1,5 @@
 import { expect, test } from 'bun:test'
+import { ExpectedQuery } from '@contember/database-tester'
 import { executeTenantTest, now } from '../../../src/testTenant.js'
 import { GQL, SQL } from '../../../src/tags.js'
 import { testUuid } from '../../../src/testUuid.js'
@@ -24,6 +25,12 @@ const identitiesHoldingRoleQuery = (role: string, count: number) => ({
 	sql: SQL`select count(*)::int as "count"  from "tenant"."identity" where roles \\? ?`,
 	parameters: [role],
 	response: { rows: [{ count }] },
+})
+
+const holderGlobalRolesQuery = (role: string, holderRoles: readonly string[]) => ({
+	sql: SQL`select distinct jsonb_array_elements_text(roles) as "role"  from "tenant"."identity" where roles \\? ?`,
+	parameters: [role],
+	response: { rows: holderRoles.map(holderRole => ({ role: holderRole })) },
 })
 
 test('createCustomRole stores canonical grants and audits the full role state', async () => {
@@ -213,6 +220,7 @@ test('updateCustomRole stores canonical grants and audits before and after state
 			variables: { slug: 'support', grants: forceSignOutGrant },
 		},
 		executes: [
+			holderGlobalRolesQuery('support', ['person', 'support']),
 			...sqlReadCommittedTransaction(
 				{
 					sql: SQL`select *  from "tenant"."custom_role" where "slug" in (?)  order by "slug" asc for update`,
@@ -250,6 +258,7 @@ test('updateCustomRole rejects an explicit null grants value', async () => {
 			variables: { slug: 'support', grants: null },
 		},
 		executes: [
+			holderGlobalRolesQuery('support', ['person', 'support']),
 			...sqlReadCommittedTransaction({
 				sql: SQL`select *  from "tenant"."custom_role" where "slug" in (?)  order by "slug" asc for update`,
 				parameters: ['support'],
@@ -276,6 +285,7 @@ test('deleteCustomRole removes the role and every stale assignment atomically', 
 			variables: { slug: 'support' },
 		},
 		executes: [
+			holderGlobalRolesQuery('support', ['person', 'support']),
 			...sqlReadCommittedTransaction(
 				{
 					sql: SQL`select *  from "tenant"."custom_role" where "slug" in (?)  order by "slug" asc for update`,
@@ -333,6 +343,7 @@ test('deleteCustomRole refuses a role another role references and leaves both in
 			variables: { slug: 'support' },
 		},
 		executes: [
+			holderGlobalRolesQuery('support', ['person', 'support']),
 			...sqlReadCommittedTransaction(
 				{
 					sql: SQL`select *  from "tenant"."custom_role" where "slug" in (?)  order by "slug" asc for update`,
@@ -417,26 +428,115 @@ test('customRoles reports a persisted-invalid role as inert', async () => {
 
 // `customRole:manage` is the single rail stopping a delegated principal from writing its own
 // permission bundle. These run through the REAL authorization stack (`identityRoles`), so
-// dropping any of the three `requireAccess` calls in CustomRoleMutationResolver turns them red.
-test.each([
-	[
-		'createCustomRole',
-		GQL`mutation { createCustomRole(slug: "escalated", grants: [{ permission: "person:list" }]) { ok } }`,
-	],
-	[
-		'updateCustomRole',
-		GQL`mutation { updateCustomRole(slug: "support", grants: [{ permission: "person:list" }]) { ok } }`,
-	],
-	['deleteCustomRole', GQL`mutation { deleteCustomRole(slug: "support") { ok } }`],
-])('%s is refused to project_admin and touches no data', async (field, query) => {
+// dropping any of the `requireAccess` calls in CustomRoleMutationResolver turns them red.
+const createQuery = GQL`mutation { createCustomRole(slug: "support", grants: [{ permission: "person:list" }]) { ok error { code } } }`
+const updateQuery = GQL`mutation { updateCustomRole(slug: "support", grants: [{ permission: "person:list" }]) { ok error { code } } }`
+const deleteQuery = GQL`mutation { deleteCustomRole(slug: "support") { ok error { code } } }`
+
+test('createCustomRole is allowed to project_admin', async () => {
 	await executeTenantTest({
 		identityRoles: ['project_admin'],
-		query,
-		// project_admin is builtin-only, so the request-scoped custom_role preload is skipped too
-		executes: [],
+		query: createQuery,
+		executes: [
+			...sqlReadCommittedTransaction(
+				{
+					sql: SQL`select *  from "tenant"."custom_role" where "slug" in (?)  order by "slug" asc`,
+					parameters: ['support'],
+					response: { rows: [] },
+				},
+				identitiesHoldingRoleQuery('support', 0),
+				{
+					sql: SQL`insert into  "tenant"."custom_role" ("id", "slug", "description", "grants", "created_at", "updated_at")
+						values  (?, ?, ?, ?, ?, ?)`,
+					parameters: [testUuid(1), 'support', null, JSON.stringify(listGrant), now, now],
+					response: { rowCount: 1 },
+				},
+			),
+		],
 		return: {
-			data: { [field]: null },
-			errors: [{ message: 'You are not allowed to manage custom roles' }],
+			data: { createCustomRole: { ok: true, error: null } },
+		},
+		expectedAuthLog: {
+			type: 'custom_role_change',
+			response: { ok: true, result: null },
+			eventData: {
+				operation: 'create',
+				after: { slug: 'support', description: null, grants: listGrant },
+			},
 		},
 	})
 })
+
+// the role does not exist, so reaching the manager's NOT_FOUND proves both checks passed
+test.each([
+	['updateCustomRole', updateQuery],
+	['deleteCustomRole', deleteQuery],
+])('%s is allowed to project_admin when no holder of the role is protected', async (field, query) => {
+	await executeTenantTest({
+		identityRoles: ['project_admin'],
+		query,
+		executes: [
+			holderGlobalRolesQuery('support', ['person', 'project_admin', 'support']),
+			...sqlReadCommittedTransaction({
+				sql: SQL`select *  from "tenant"."custom_role" where "slug" in (?)  order by "slug" asc for update`,
+				parameters: ['support'],
+				response: { rows: [] },
+			}),
+		],
+		return: {
+			data: { [field]: { ok: false, error: { code: 'NOT_FOUND' } } },
+		},
+	})
+})
+
+// project_admin may not remove a role from a super_admin or project_creator directly,
+// so it may not change or strip one through the definition either
+test.each([
+	['updateCustomRole', 'super_admin', updateQuery],
+	['updateCustomRole', 'project_creator', updateQuery],
+	['deleteCustomRole', 'super_admin', deleteQuery],
+	['deleteCustomRole', 'project_creator', deleteQuery],
+])('%s is refused to project_admin when a holder of the role is %s', async (field, protectedRole, query) => {
+	await executeTenantTest({
+		identityRoles: ['project_admin'],
+		query,
+		executes: [holderGlobalRolesQuery('support', ['person', protectedRole, 'support'])],
+		return: {
+			data: { [field]: null },
+			errors: [{ message: 'You are not allowed to manage this custom role' }],
+		},
+	})
+})
+
+const refusedCallers: { readonly name: string; readonly identityRoles: string[]; readonly executes: ExpectedQuery[] }[] = [
+	{ name: 'a plain person', identityRoles: ['person'], executes: [] },
+	{
+		name: 'a custom role holder',
+		identityRoles: ['person', 'support'],
+		// the definitions are preloaded for the request, nothing else is read
+		executes: [{
+			sql: SQL`select *  from "tenant"."custom_role" order by "slug" asc`,
+			parameters: [],
+			response: { rows: [customRoleRow('support', [{ permission: 'customRole:view', config: null }])] },
+		}],
+	},
+]
+
+for (const caller of refusedCallers) {
+	test.each([
+		['createCustomRole', createQuery],
+		['updateCustomRole', updateQuery],
+		['deleteCustomRole', deleteQuery],
+	])(`%s is refused to ${caller.name} and touches no data`, async (field, query) => {
+		await executeTenantTest({
+			identityRoles: caller.identityRoles,
+			query,
+			// the harness consumes the list, so every case gets its own copy
+			executes: [...caller.executes],
+			return: {
+				data: { [field]: null },
+				errors: [{ message: 'You are not allowed to manage custom roles' }],
+			},
+		})
+	})
+}

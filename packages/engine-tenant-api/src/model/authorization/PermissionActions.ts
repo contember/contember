@@ -39,6 +39,11 @@ export type ApiKeyPermissionMeta = {
 	readonly trustForwardedClientInfo: boolean
 }
 
+export type CustomRoleManagePermissionMeta = {
+	/** Every global role held by any identity that currently holds the custom role being changed. */
+	readonly holderGlobalRoles: readonly string[]
+}
+
 export type MailTemplatePermissionMeta = {
 	readonly kind: 'global' | 'project'
 	readonly projectSlug: string | null
@@ -138,7 +143,7 @@ namespace PermissionActions {
 	export const IDP_ENABLE = Authorizator.createAction(Resources.idp, 'enable')
 	export const IDP_LIST = Authorizator.createAction(Resources.idp, 'list')
 
-	export const CUSTOM_ROLE_MANAGE = Authorizator.createAction(Resources.customRole, 'manage')
+	export const CUSTOM_ROLE_MANAGE = (meta?: CustomRoleManagePermissionMeta) => Authorizator.createAction(Resources.customRole, 'manage', meta)
 	export const CUSTOM_ROLE_VIEW = Authorizator.createAction(Resources.customRole, 'view')
 }
 

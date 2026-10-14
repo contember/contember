@@ -3,7 +3,7 @@ import { PgClient } from '../../../src/client/PgClient.js'
 import EventEmitter from 'node:events'
 import { expect } from 'bun:test'
 
-type MockQuery = { sql: string; timeout?: number; result?: any }
+type MockQuery = { sql: string; timeout?: number; result?: any; error?: Error }
 
 export const createConnectionMockAlt = (...queries: MockQuery[][]): [Connection, () => void] => {
 	return createConnectionMockAltWithPool({}, ...queries)
@@ -35,6 +35,9 @@ export const createConnectionMockAltWithPool = (
 					expect(query).toBeDefined()
 					expect(sql).toEqual(query?.sql as string)
 					await new Promise<void>(resolve => setTimeout(resolve, query?.timeout ?? 1))
+					if (query?.error !== undefined) {
+						throw query.error
+					}
 
 					return query?.result
 				}

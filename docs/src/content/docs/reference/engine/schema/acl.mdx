@@ -63,7 +63,8 @@ Creates a named role in your schema. You use the `roleName` in the [Tenant API f
     - `tenant`: permissions in the Tenant API (like `invite`, `manage`, etc.)
     - `system`: permissions in the System API (like `history`)
     - `stages`: by default `'*'`, meaning all stages
-    - `debug`: allows debugging GraphQL queries 
+    - `implicit`: assigns the role to every identity that calls the Content API, also without a project membership (not when the request assumes a membership). Its variables are resolved like those of an explicit membership with no stored values: predefined variables from the identity, other variables from their `fallback`, or they match nothing.
+    - `debug`: allows debugging GraphQL queries
     - `s3`, see [S3 ACL](/reference/engine/content/s3)
 
 - **Example**:

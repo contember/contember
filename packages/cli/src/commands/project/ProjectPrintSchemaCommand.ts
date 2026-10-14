@@ -70,10 +70,11 @@ export class ProjectPrintSchemaCommand extends Command<Args, Options> {
 		const inputRoles = input.getOption('role')
 		const schemaNormalized = input.getOption('normalize') ? normalizeSchema(filteredSchema) : filteredSchema
 		// Built the way the engine builds it: types and introspection from the nested set, root fields from the root set.
-		const { root: rootPermissions, all: permissions } = permissionFactory.createContextual(schemaNormalized, inputRoles || ['admin'])
+		const roles = inputRoles || ['admin']
+		const { root: rootPermissions, all: permissions } = permissionFactory.createContextual(schemaNormalized, roles)
 		const schemaBuilderFactory = new GraphQlSchemaBuilderFactory()
 		const customPrimary = schemaNormalized.acl.customPrimary ?? false
-		const refreshMaterializedView = Object.values(schemaNormalized.acl.roles).some(it => it.content?.refreshMaterializedView)
+		const refreshMaterializedView = permissionFactory.isRefreshMaterializedViewAllowed(schemaNormalized, roles)
 		const authorizator = new Authorizator(permissions, customPrimary, refreshMaterializedView)
 		const rootAuthorizator = new Authorizator(rootPermissions, customPrimary, refreshMaterializedView)
 		const introspection = new IntrospectionSchemaFactory(

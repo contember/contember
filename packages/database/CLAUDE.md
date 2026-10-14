@@ -32,6 +32,8 @@ Builders compile to `Literal` objects (SQL string + parameters array). The `Comp
 
 PostgreSQL error codes are mapped to typed errors: `NotNullViolationError`, `ForeignKeyViolationError`, `UniqueViolationError`, `SerializationFailureError`, `InvalidDataError`, `TransactionAbortedError`
 
+A deadlock (`40P01`) maps to `SerializationFailureError` like a serialization failure (`40001`): both abort the transaction, and `retryTransaction` retries only that class.
+
 ## Key Files
 
 - `client/Connection.ts` — pool manager, connection factory

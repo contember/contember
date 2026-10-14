@@ -81,6 +81,50 @@ test('read membership with predefined variable', () => {
 	])
 })
 
+test('uses the fallback of a predefined person variable when the identity has no person', () => {
+	const acl: Acl.Schema = {
+		roles: {
+			editor: {
+				variables: {
+					person: { type: Acl.VariableType.predefined, value: 'personID', fallback: { eq: id2 } },
+				},
+				entities: {},
+			},
+		},
+	}
+	const withoutPerson = new MembershipResolver().resolve(acl, [{ role: 'editor', variables: [] }], { identityId: id1 }, false)
+	expect(withoutPerson.errors).toStrictEqual([])
+	expect(withoutPerson.memberships).toStrictEqual([
+		{ role: 'editor', variables: [{ name: 'person', condition: { eq: id2 } }] },
+	])
+
+	const withPerson = new MembershipResolver().resolve(acl, [{ role: 'editor', variables: [] }], { identityId: id1, personId: id1 }, false)
+	expect(withPerson.memberships).toStrictEqual([
+		{ role: 'editor', variables: [{ name: 'person', condition: { in: [id1] } }] },
+	])
+})
+
+test('matches no person when a predefined person variable has no fallback', () => {
+	const result = new MembershipResolver().resolve(
+		{
+			roles: {
+				editor: {
+					variables: {
+						person: { type: Acl.VariableType.predefined, value: 'personID' },
+					},
+					entities: {},
+				},
+			},
+		},
+		[{ role: 'editor', variables: [] }],
+		{ identityId: id1 },
+		false,
+	)
+	expect(result.memberships).toStrictEqual([
+		{ role: 'editor', variables: [{ name: 'person', condition: { in: [] } }] },
+	])
+})
+
 test('read membership with condition variable', () => {
 	const reader = new MembershipResolver()
 	const result = reader.resolve(

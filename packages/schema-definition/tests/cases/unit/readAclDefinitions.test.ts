@@ -524,6 +524,30 @@ test('definition with predefined variables', () => {
 	})
 })
 
+namespace ModelWithPredefinedVariableFallback {
+	export const customerRole = c.createRole('customer')
+	export const personId = c.createPredefinedVariable('person', 'personID', customerRole, { never: true })
+
+	@c.Allow(customerRole, {
+		when: { personId: personId },
+		read: true,
+	})
+	export class Order {
+		personId = c.uuidColumn().notNull()
+	}
+}
+
+test('definition with a predefined variable fallback', () => {
+	const schema = createSchema(ModelWithPredefinedVariableFallback)
+	expect(schema.acl.roles.customer.variables).toStrictEqual({
+		'person': {
+			'type': Acl.VariableType.predefined,
+			'value': 'personID',
+			'fallback': { never: true },
+		},
+	})
+})
+
 namespace InvalidModel {
 	export const publicRole = c.createRole('public')
 

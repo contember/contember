@@ -8,7 +8,7 @@ const id = '00000000-0000-0000-0000-000000000000'
 namespace MaterializedViewTest {
 	export const reader = acl.createRole('reader')
 
-	@acl.allow(reader, { read: true })
+	@acl.allow(reader, { read: true, create: true })
 	export class Value {
 		value = c.intColumn()
 	}

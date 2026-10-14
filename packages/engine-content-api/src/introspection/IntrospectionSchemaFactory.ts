@@ -154,12 +154,19 @@ export class IntrospectionSchemaFactory {
 	public create(): ContentSchema._Schema {
 		const entities = Object.values(this.model.entities)
 			.filter(it => this.authorizator.getEntityPermission(Acl.Operation.read, it.name) !== 'no')
-			.map(entity => ({
-				name: entity.name,
-				customPrimaryAllowed: this.authorizator.isCustomPrimaryAllowed(entity.name),
-				fields: this.createFieldsSchema(entity.name),
-				unique: Object.values(entity.unique).map(({ fields }) => ({ fields })),
-			}))
+			.map(entity => {
+				const fields = this.createFieldsSchema(entity.name)
+				const readableFields = new Set(fields.map(it => it.name))
+				return {
+					name: entity.name,
+					customPrimaryAllowed: this.authorizator.isCustomPrimaryAllowed(entity.name),
+					fields,
+					// a constraint over an unreadable field would disclose that field's name
+					unique: Object.values(entity.unique)
+						.filter(({ fields }) => fields.every(it => readableFields.has(it)))
+						.map(({ fields }) => ({ fields })),
+				}
+			})
 		const usedEnums = new Set(
 			entities
 				.flatMap(it => it.fields)

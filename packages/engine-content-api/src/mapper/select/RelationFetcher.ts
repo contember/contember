@@ -269,10 +269,7 @@ export class RelationFetcher {
 
 		const where = this.predicateInjector.inject(targetEntity, objectArgs.filter || {}, relationPath[relationPath.length - 1])
 		const hasWhere = where && Object.keys(where).length > 0
-		const hasFieldOrderBy = objectArgs.orderBy
-			&& objectArgs.orderBy.length > 0
-			&& !objectArgs.orderBy[0]._random
-			&& objectArgs.orderBy[0]._randomSeeded === undefined
+		const hasFieldOrderBy = objectArgs.orderBy?.some(it => !OrderByHelper.isRandomOrder(it)) ?? false
 
 		if (hasWhere || hasFieldOrderBy) {
 			const path = this.pathFactory.create([])

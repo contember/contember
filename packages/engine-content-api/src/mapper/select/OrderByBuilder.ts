@@ -4,6 +4,7 @@ import { JoinBuilder } from './JoinBuilder'
 import { Literal, QueryBuilder, SelectBuilder } from '@contember/database'
 import { getColumnName, getTargetEntity } from '@contember/schema-utils'
 import { UserError } from '../../exception'
+import { OrderByHelper } from './OrderByHelper'
 
 const orderByMapping = {
 	asc: 'asc',
@@ -40,8 +41,8 @@ export class OrderByBuilder {
 			const fields = entries.map(it => it[0]).join(', ')
 			throw new UserError('Order by: only one field is expected in each item of order by clause, got: ' + fields)
 		}
-		if (orderBy._random || orderBy._randomSeeded) {
-			if (orderBy._randomSeeded) {
+		if (OrderByHelper.isRandomOrder(orderBy)) {
+			if (orderBy._randomSeeded !== undefined) {
 				const seed = orderBy._randomSeeded / Math.pow(2, 31)
 				if (seed < -1 || seed > 1) {
 					throw new UserError(`Order by: random seed must be in range of 32bit signed integer`)

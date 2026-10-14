@@ -18,6 +18,22 @@ namespace ActionsModel {
 	}
 }
 
+namespace DeferredUniqueActionsModel {
+	@actions.watch({
+		name: 'article_watch',
+		watch: `
+			title
+		`,
+		webhook: 'http://foobar',
+		selection: `
+			title
+		`,
+	})
+	export class Article {
+		title = def.stringColumn().unique({ timing: 'deferred' })
+	}
+}
+
 test('triggers: return ids in response extensions when enabled', async () => {
 	const schema = createSchema(ActionsModel, schema => ({
 		...schema,
@@ -89,4 +105,31 @@ test('triggers: return ids disabled by default', async () => {
 	).expect(200)
 
 	expect(res.body.extensions?.triggeredActions).toBeUndefined()
+})
+
+test('triggers: return no ids of a mutation that fails at commit', async () => {
+	const schema = createSchema(DeferredUniqueActionsModel, schema => ({
+		...schema,
+		settings: {
+			...schema.settings,
+			actions: { returnTriggeredActions: true },
+		},
+	}))
+	const tester = await createTester(schema)
+	const createArticle = gql`
+		mutation {
+			createArticle(data: { title: "Hello world" }) {
+				ok
+			}
+		}
+	`
+
+	const first = await tester(createArticle, { keepExtensions: true }).expect(200)
+	expect(first.body.data.createArticle.ok).toBe(true)
+	expect(first.body.extensions?.triggeredActions?.events).toBeArrayOfSize(1)
+
+	// The deferred unique constraint fails at COMMIT, after the action event was written in the transaction.
+	const duplicate = await tester(createArticle, { keepExtensions: true }).expect(200)
+	expect(duplicate.body.data.createArticle.ok).toBe(false)
+	expect(duplicate.body.extensions?.triggeredActions).toBeUndefined()
 })

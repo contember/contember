@@ -2,7 +2,17 @@ import { TriggerHandler, TriggerIndirectChangesFetcher, TriggerPayloadManager } 
 import { ListenerStoreProvider } from './ListenerStoreProvider'
 import { TriggerPayloadBuilder } from './triggers/TriggerPayloadBuilder'
 import { TriggerPayloadPersister } from './triggers/TriggerPayloadPersister'
-import { ExecutionContainerHook } from '@contember/engine-content-api'
+import { ExecutionContainerHook, InMemoryTriggeredActionsCollector, Mapper, TriggeredActionsCollector } from '@contember/engine-content-api'
+
+// Each transaction attempt has its own mapper. Its action IDs reach the request collector only once the attempt
+// commits, so a rolled-back or retried attempt reports no event that was never stored.
+const collectAfterCommit = (mapper: Mapper, requestCollector: TriggeredActionsCollector): TriggeredActionsCollector => {
+	const attemptCollector = new InMemoryTriggeredActionsCollector()
+	mapper.eventManager.listen('AfterCommitEvent', async () => {
+		requestCollector.add(attemptCollector.getEvents())
+	})
+	return attemptCollector
+}
 
 export class ActionsExecutionContainerHookFactory {
 	constructor(
@@ -19,6 +29,7 @@ export class ActionsExecutionContainerHookFactory {
 					{ whereBuilder, schema, pathFactory, systemSchema, providers, stage, project, schemaMeta, joinBuilder, userInfo, triggeredActionsCollector },
 				) => {
 					mapperFactory.hooks.push(mapper => {
+						const attemptCollector = triggeredActionsCollector ? collectAfterCommit(mapper, triggeredActionsCollector) : undefined
 						const triggerPayloadPersister = new TriggerPayloadPersister(
 							mapper,
 							mapper.db.forSchema(systemSchema),
@@ -28,7 +39,7 @@ export class ActionsExecutionContainerHookFactory {
 							schemaMeta.id,
 							mapper.identityId,
 							userInfo,
-							triggeredActionsCollector,
+							attemptCollector,
 						)
 						const triggerPayloadBuilder = new TriggerPayloadBuilder(mapper)
 						const payloadManager = new TriggerPayloadManager(triggerPayloadBuilder, triggerPayloadPersister)

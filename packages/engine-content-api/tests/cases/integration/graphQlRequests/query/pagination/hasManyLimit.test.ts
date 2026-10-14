@@ -55,7 +55,8 @@ test('many has many with where, limit and orderBy', async () => {
             "data".*
           from "data"
           where
-            "data"."rowNumber_" > ? and "data"."rowNumber_" <= ?`,
+             "data"."rowNumber_" > ? and "data"."rowNumber_" <= ?
+           order by "data"."rowNumber_" asc`,
 				parameters: [testUuid(1), testUuid(2), 'cs', 1, 3],
 				response: {
 					rows: [
@@ -173,7 +174,8 @@ test('one has many with where, limit and orderBy', async () => {
            order by "root_"."title" asc, "root_"."id" asc)
           select "data".*
           from "data"
-          where "data"."rowNumber_" > ? and "data"."rowNumber_" <= ?`,
+           where "data"."rowNumber_" > ? and "data"."rowNumber_" <= ?
+           order by "data"."rowNumber_" asc`,
 				parameters: ['cs', testUuid(1), testUuid(2), 1, 3],
 				response: {
 					rows: [
@@ -212,6 +214,50 @@ test('one has many with where, limit and orderBy', async () => {
 						name: 'Jack',
 					},
 				],
+			},
+		},
+	})
+})
+
+test('one has many with nulls first in a limited page', async () => {
+	await execute({
+		schema: new SchemaBuilder()
+			.entity('Author', entity => entity.oneHasMany('posts', relation => relation.target('Post', entity => entity.column('title')).ownedBy('author')))
+			.buildSchema(),
+		query: GQL`
+        query {
+          listAuthor {
+            posts(orderBy: [{title: ascNullsFirst}], limit: 1) {
+              id
+              title
+            }
+          }
+        }`,
+		executes: [
+			{
+				sql: SQL`select "root_"."id" as "root_id", "root_"."id" as "root_id" from "public"."author" as "root_"`,
+				response: { rows: [{ root_id: testUuid(1) }] },
+			},
+			{
+				sql: SQL`with "data" as
+          (select "root_"."author_id" as "__grouping_key",
+                  "root_"."id" as "root_id",
+                  "root_"."title" as "root_title",
+                  row_number() over(partition by "root_"."author_id"
+                    order by "root_"."title" asc nulls first, "root_"."id" asc) as "rowNumber_"
+           from "public"."post" as "root_"
+           where "root_"."author_id" in (?)
+           order by "root_"."title" asc nulls first, "root_"."id" asc)
+          select "data".* from "data"
+          where "data"."rowNumber_" <= ?
+          order by "data"."rowNumber_" asc`,
+				parameters: [testUuid(1), 1],
+				response: { rows: [{ __grouping_key: testUuid(1), root_id: testUuid(2), root_title: null }] },
+			},
+		],
+		return: {
+			data: {
+				listAuthor: [{ posts: [{ id: testUuid(2), title: null }] }],
 			},
 		},
 	})

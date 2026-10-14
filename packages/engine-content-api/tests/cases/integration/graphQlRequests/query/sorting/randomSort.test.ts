@@ -136,7 +136,7 @@ test('sorts posts by random on has many relation', async () => {
 									inner join "rand_seed" on true
 								where "junction_"."category_id" in (?, ?)
 								order by random() asc)
-							select "data".* from "data" where "data"."rownumber_" <= ?`,
+							select "data".* from "data" where "data"."rownumber_" <= ? order by "data"."rownumber_" asc`,
 				parameters: [4555 / Math.pow(2, 31), testUuid(1), testUuid(2), 1],
 				response: {
 					rows: [

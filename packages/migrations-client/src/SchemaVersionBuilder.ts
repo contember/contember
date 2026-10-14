@@ -1,9 +1,11 @@
 import { Schema } from '@contember/schema'
 import { emptySchema } from '@contember/schema-utils'
-import { SchemaMigrator } from '@contember/schema-migrations'
+import { Migration, SchemaMigrator } from '@contember/schema-migrations'
 import { MigrationsResolver } from './MigrationsResolver'
 
 export class SchemaVersionBuilder {
+	private lastBuildUntil: { migrations: Migration[]; schema: Schema } | null = null
+
 	constructor(
 		private readonly migrationsResolver: MigrationsResolver,
 		private readonly schemaMigrator: SchemaMigrator,
@@ -13,8 +15,21 @@ export class SchemaVersionBuilder {
 		return this.buildSchemaAdvanced(emptySchema, version => !targetVersion || version <= targetVersion)
 	}
 
+	/**
+	 * Content migrations call this once each, with ascending versions. Continuing from the previous
+	 * build keeps a run linear instead of replaying every schema migration from scratch each time.
+	 */
 	async buildSchemaUntil(targetVersion: string): Promise<Schema> {
-		return this.buildSchemaAdvanced(emptySchema, version => version < targetVersion)
+		const migrations = (await this.migrationsResolver.getSchemaMigrations()).filter(({ version }) => version < targetVersion)
+		const previous = this.lastBuildUntil
+		const canContinue = previous !== null
+			&& previous.migrations.length <= migrations.length
+			&& previous.migrations.every((migration, index) => migration === migrations[index])
+		const start = canContinue ? previous : { migrations: [], schema: emptySchema }
+
+		const schema = this.applyMigrations(start.schema, migrations.slice(start.migrations.length))
+		this.lastBuildUntil = { migrations, schema }
+		return schema
 	}
 
 	async continue(schema: Schema, previousVersion: string | null, targetVersion: string): Promise<Schema> {
@@ -22,11 +37,14 @@ export class SchemaVersionBuilder {
 	}
 
 	public async buildSchemaAdvanced(initialSchema: Schema, condition: (version: string) => boolean): Promise<Schema> {
-		return (await this.migrationsResolver.getSchemaMigrations())
-			.filter(({ version }) => condition(version))
-			.reduce<Schema>(
-				(schema, { modifications, formatVersion }) => this.schemaMigrator.applyModifications(schema, modifications, formatVersion),
-				initialSchema,
-			)
+		const migrations = (await this.migrationsResolver.getSchemaMigrations()).filter(({ version }) => condition(version))
+		return this.applyMigrations(initialSchema, migrations)
+	}
+
+	private applyMigrations(initialSchema: Schema, migrations: Migration[]): Schema {
+		return migrations.reduce<Schema>(
+			(schema, { modifications, formatVersion }) => this.schemaMigrator.applyModifications(schema, modifications, formatVersion),
+			initialSchema,
+		)
 	}
 }

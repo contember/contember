@@ -85,3 +85,46 @@ test('a contributor cache key separates role combinations with identical permiss
 
 	expect(create(factory, ['editor'])).not.toBe(create(factory, ['admin']))
 })
+
+const stats: Model.Entity = {
+	name: 'Stats',
+	primary: 'id',
+	primaryColumn: 'id',
+	tableName: 'stats',
+	unique: [],
+	indexes: [],
+	eventLog: { enabled: false },
+	view: { sql: 'SELECT 1', materialized: true },
+	fields: {
+		id: { name: 'id', columnName: 'id', type: Model.ColumnType.Uuid, columnType: 'uuid', nullable: false },
+	},
+}
+
+const readStats: Acl.Permissions = { Stats: { predicates: {}, operations: { read: { id: true } } } }
+
+const materializedViewSchema: Schema = {
+	...emptySchema,
+	model: { entities: { Stats: stats }, enums: {} },
+	acl: {
+		roles: {
+			reader: role(readStats),
+			refresher: { ...role(readStats), content: { refreshMaterializedView: true } },
+			inheritedRefresher: { ...role(readStats), inherits: ['refresher'] },
+		},
+	},
+}
+
+const hasRefreshMutation = (factory: GraphQlSchemaFactory, projectRoles: string[]) =>
+	factory.create(materializedViewSchema, { projectRoles }, project).schema.getMutationType()?.getFields().refreshMaterializedView !== undefined
+
+test('a role without the refresh permission cannot refresh a materialized view another role may refresh', () => {
+	const factory = createFactory()
+
+	expect(hasRefreshMutation(factory, ['reader'])).toBe(false)
+	expect(hasRefreshMutation(factory, ['refresher'])).toBe(true)
+	expect(hasRefreshMutation(factory, ['reader'])).toBe(false)
+})
+
+test('the refresh permission is inherited', () => {
+	expect(hasRefreshMutation(createFactory(), ['inheritedRefresher'])).toBe(true)
+})

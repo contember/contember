@@ -41,7 +41,7 @@ export class GraphQlSchemaFactory {
 			const { root: permissions, all: allPermissions } = computedPermissions ?? this.permissionFactory.createContextual(schema, identity.projectRoles)
 
 			const customPrimary = schema.acl.customPrimary ?? false
-			const refreshMaterializedView = Object.values(schema.acl.roles).some(it => it.content?.refreshMaterializedView)
+			const refreshMaterializedView = this.permissionFactory.isRefreshMaterializedViewAllowed(schema, identity.projectRoles)
 			// Types are shaped by the nested set, so a field granted only through a relation still exists
 			// on the shared type; the root query and mutation fields are gated on the root set alone.
 			const authorizator = new Authorizator(allPermissions, customPrimary, refreshMaterializedView)
@@ -110,7 +110,10 @@ export class GraphQlSchemaFactory {
 			return { permissionsKey: cachedKey }
 		}
 		const computedPermissions = this.permissionFactory.createContextual(schema, roles)
-		const permissionsKey = createHash('sha256').update(JSON.stringify([computedPermissions.root, computedPermissions.all])).digest('hex')
+		const refreshMaterializedView = this.permissionFactory.isRefreshMaterializedViewAllowed(schema, roles)
+		const permissionsKey = createHash('sha256')
+			.update(JSON.stringify([computedPermissions.root, computedPermissions.all, refreshMaterializedView]))
+			.digest('hex')
 		keysByRoles.set(rolesKey, permissionsKey)
 		return { permissionsKey, computedPermissions }
 	}

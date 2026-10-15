@@ -3,7 +3,15 @@ import { HttpErrorResponse } from '../common/index.js'
 import { fromBuffer } from './CommandStream.js'
 import { ImportError, ImportExecutor } from './ImportExecutor.js'
 import { createGunzip } from 'node:zlib'
+import { pipeline, Readable } from 'node:stream'
 import { ProjectGroupResolver } from '../projectGroup/ProjectGroupResolver.js'
+import { Command } from './Command.js'
+
+export const readImportCommands = (body: Readable, isGzip: boolean): AsyncIterable<Command> => {
+	// pipe() would not pass on an aborted request, and the import would wait for the rest of the body forever;
+	// pipeline() destroys the gunzip with the error, which rejects the read. The callback only satisfies the API.
+	return fromBuffer(isGzip ? pipeline(body, createGunzip(), () => {}) : body)
+}
 
 export class ImportApiMiddlewareFactory {
 	constructor(
@@ -32,7 +40,7 @@ export class ImportApiMiddlewareFactory {
 
 			try {
 				const isGzip = request.headers['content-encoding'] === 'gzip'
-				const commands = fromBuffer(isGzip ? request.req.pipe(createGunzip()) : request.req)
+				const commands = readImportCommands(request.req, isGzip)
 				await this.importExecutor.import(projectGroup, authResult, commands)
 				response.status = 200
 				response.body = { ok: true }

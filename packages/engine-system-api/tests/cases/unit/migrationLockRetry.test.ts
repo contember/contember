@@ -41,13 +41,13 @@ const run = async (options: MigrationLockOptions | undefined, errors: Error[]) =
 }
 
 describe('migration lock retry', () => {
-	test('without options runs the transaction once, sets no lock timeout and logs the lock conflict as an error', async () => {
+	test('without options runs the transaction once, sets no lock timeout and leaves logging the failure to the caller', async () => {
 		const lockConflict = migrationFailed(ClientErrorCodes.LOCK_NOT_AVAILABLE)
 		const { error, transactions, logLevels } = await run(undefined, [lockConflict])
 
 		expect(error).toBe(lockConflict)
 		expect(transactions).toEqual([[]])
-		expect(logLevels).toEqual(['error'])
+		expect(logLevels).toEqual([])
 	})
 
 	test('sets the lock timeout and retries a lock timeout and a deadlock, logging warnings only', async () => {
@@ -80,14 +80,14 @@ describe('migration lock retry', () => {
 		expect(transactions).toHaveLength(1)
 	})
 
-	test('reports the lock conflict as an error once the attempts run out', async () => {
+	test('throws the last lock conflict once the attempts run out, logging only the retries', async () => {
 		const errors = [1, 2, 3].map(() => migrationFailed(ClientErrorCodes.LOCK_NOT_AVAILABLE))
 		const last = errors[2]
 		const { error, transactions, logLevels } = await run(options, errors)
 
 		expect(error).toBe(last)
 		expect(transactions).toHaveLength(3)
-		expect(logLevels).toEqual(['warn', 'warn', 'error'])
+		expect(logLevels).toEqual(['warn', 'warn'])
 	})
 
 	test('does not retry other failures', async () => {

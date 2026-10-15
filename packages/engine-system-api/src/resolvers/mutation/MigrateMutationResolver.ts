@@ -3,13 +3,31 @@ import { SystemResolverContext } from '../SystemResolverContext.js'
 import { MutationResolver } from '../Resolver.js'
 import { MigrateResponse, MigrationType, MutationMigrateArgs, MutationMigrateFromSnapshotArgs } from '../../schema/index.js'
 import { Migration } from '@contember/schema-migrations'
-import { AuthorizationActions, MigrationError, MigrationLockRetry, ProjectMigrator, StagesQuery } from '../../model/index.js'
+import { AuthorizationActions, MigrationError, MigrationFailedError, MigrationLockRetry, ProjectMigrator, StagesQuery } from '../../model/index.js'
 import { MigrationInput } from '../../model/migrations/MigrationInput.js'
 import { UserInputError } from '@contember/graphql-utils'
 import { SchemaValidatorSkippedErrors } from '@contember/schema-utils'
 import { assertNever } from '../../utils/index.js'
+import { logger } from '@contember/logger'
 
 const pg_lock_id = 1597474138739147
+
+/** Logs a failed SQL statement once, after any retry has given up, for both `migrate` and `migrateFromSnapshot`. */
+export const createMigrationErrorResponse = (e: MigrationError): MigrateResponse => {
+	if (e instanceof MigrationFailedError) {
+		logger.error(e.previous ?? e, { message: 'Migration failed' })
+	}
+	const error = {
+		code: e.code,
+		migration: e.version,
+		developerMessage: e.message,
+	}
+	return {
+		ok: false,
+		errors: [error],
+		error,
+	}
+}
 
 export class MigrateMutationResolver implements MutationResolver<'migrate'> {
 	constructor(
@@ -58,16 +76,7 @@ export class MigrateMutationResolver implements MutationResolver<'migrate'> {
 				})
 			} catch (e) {
 				if (e instanceof MigrationError) {
-					const error = {
-						code: e.code,
-						migration: e.version,
-						developerMessage: e.message,
-					}
-					return {
-						ok: false,
-						errors: [error],
-						error,
-					}
+					return createMigrationErrorResponse(e)
 				}
 				throw e
 			}
@@ -108,16 +117,7 @@ export class MigrateMutationResolver implements MutationResolver<'migrate'> {
 				} catch (e) {
 					if (e instanceof MigrationError) {
 						await trx.client.connection.rollback()
-						const error = {
-							code: e.code,
-							migration: e.version,
-							developerMessage: e.message,
-						}
-						return {
-							ok: false,
-							errors: [error],
-							error,
-						}
+						return createMigrationErrorResponse(e)
 					} else {
 						throw e
 					}

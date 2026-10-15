@@ -100,6 +100,8 @@ When an SQL statement of a schema migration hits the lock timeout, a deadlock, o
 
 All values must be positive integers (the retry delay may be `0`). The engine refuses to start otherwise, because PostgreSQL reads a `lock_timeout` of `0` as no limit.
 
+To add a sequence to an existing column without rewriting the table, see [Adding a sequence without rewriting the table](/reference/engine/migrations/advanced/writing-schema-migrations#adding-a-sequence-without-rewriting-the-table).
+
 After the server is running, use Contember CLI to set up other API tokens and invite users. Deploy the
 `blog` project to this instance with `CONTEMBER_API_URL` and `CONTEMBER_API_TOKEN` set:
 

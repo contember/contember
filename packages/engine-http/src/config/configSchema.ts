@@ -238,13 +238,25 @@ export const serverConfigSchema = Typesafe.partial({
 			return Typesafe.fail([])
 		},
 	}),
-	systemApi: Typesafe.partial({
-		// Opt-in: unset, a migration waits for its locks as long as PostgreSQL lets it and is never retried.
-		// Zero is rejected rather than passed on: PostgreSQL reads `lock_timeout = 0` as no limit.
-		migrationLockTimeoutMs: positiveInteger,
-		migrationMaxAttempts: positiveInteger,
-		migrationRetryDelayMs: nonNegativeInteger,
-	}),
+	systemApi: Typesafe.transform(
+		Typesafe.partial({
+			// Opt-in: unset, a migration waits for its locks as long as PostgreSQL lets it and is never retried.
+			// Zero is rejected rather than passed on: PostgreSQL reads `lock_timeout = 0` as no limit.
+			migrationLockTimeoutMs: positiveInteger,
+			migrationMaxAttempts: positiveInteger,
+			migrationRetryDelayMs: nonNegativeInteger,
+		}),
+		(value, input, path) => {
+			const hasRetrySettings = value.migrationMaxAttempts !== undefined || value.migrationRetryDelayMs !== undefined
+			if (hasRetrySettings && value.migrationLockTimeoutMs === undefined) {
+				return Typesafe.fail(
+					path,
+					'migrationMaxAttempts and migrationRetryDelayMs require migrationLockTimeoutMs (CONTEMBER_SYSTEM_API_MIGRATION_LOCK_TIMEOUT_MS), without it migrations are not retried',
+				)
+			}
+			return value
+		},
+	),
 	contentApi: Typesafe.partial({
 		schemaCacheTtlSeconds: Typesafe.integer,
 		schemaCacheMaxEntries: (input: unknown, path: PropertyKey[] = []): number | undefined => {

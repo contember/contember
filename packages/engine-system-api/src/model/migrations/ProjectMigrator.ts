@@ -7,14 +7,12 @@ import { DatabaseContext } from '../database/index.js'
 import { ExecutedMigrationsResolver } from './ExecutedMigrationsResolver.js'
 import { MigrateErrorCode } from '../../schema/index.js'
 import { calculateSchemaChecksum, emptySchema, SchemaValidator, SchemaValidatorSkippedErrors } from '@contember/schema-utils'
-import { logger } from '@contember/logger'
 import { MigrationsDatabaseMetadataResolverStoreFactory, SchemaDatabaseMetadataResolverStore } from '../metadata/index.js'
 import { ContentMigrationQuery, MigrationInput, SchemaStateInput } from './MigrationInput.js'
 import { ContentQueryExecutor } from '../dependencies/index.js'
 import { SchemaProvider } from './SchemaProvider.js'
 import { SaveSchemaCommand } from '../commands/schema/SaveSchemaCommand.js'
 import { ImplementationException } from '../../utils/index.js'
-import { isConcurrencyConflict } from './concurrencyConflict.js'
 
 type MigrationVariables = {
 	system_schema: string
@@ -360,11 +358,8 @@ export class ProjectMigrator {
 		try {
 			await db.query(sql)
 		} catch (e) {
+			// Not logged here: the statement may still be retried. The resolver logs the migration's final failure.
 			if (e instanceof QueryError) {
-				// A concurrency conflict may still be retried; MigrationLockRetry logs it once the outcome is known.
-				if (!isConcurrencyConflict(e)) {
-					logger.error(e, { message: 'Migration failed' })
-				}
 				throw new MigrationFailedError(migrationVersion, e.message, e)
 			}
 			throw e

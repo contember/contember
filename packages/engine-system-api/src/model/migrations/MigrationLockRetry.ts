@@ -47,11 +47,7 @@ export class MigrationLockRetry {
 				})
 			} catch (e) {
 				const conflict = findConcurrencyConflict(e)
-				if (!conflict) {
-					throw e
-				}
-				if (!options || attempt >= options.maxAttempts) {
-					logger.error(conflict, { message: 'Migration failed' })
+				if (!conflict || !options || attempt >= options.maxAttempts) {
 					throw e
 				}
 				logger.warn(

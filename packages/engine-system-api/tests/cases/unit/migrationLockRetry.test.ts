@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test'
-import { ClientErrorCodes, QueryError } from '@contember/database'
+import { ClientErrorCodes, QueryError, SerializationFailureError } from '@contember/database'
 import { createLogger, TestLoggerHandler, withLogger } from '@contember/logger'
 import { MigrationFailedError, MigrationLockOptions, MigrationLockRetry } from '../../../src/model/index.js'
 
@@ -7,6 +7,9 @@ const options: MigrationLockOptions = { lockTimeoutMs: 1500, maxAttempts: 3, ret
 
 const queryError = (code: string) => new QueryError('ALTER TABLE "author" …', [], { message: 'conflict', code })
 const migrationFailed = (code: string) => new MigrationFailedError('2026-01-01-000000', 'conflict', queryError(code))
+// AcquiredConnection throws 40001 as this subclass of QueryError.
+const serializationFailure = () =>
+	new SerializationFailureError('UPDATE "author" …', [], { message: 'could not serialize access due to concurrent update', code: '40001' })
 
 // Records the queries each transaction runs; the migration callback itself never touches the database.
 const createDb = () => {
@@ -56,6 +59,25 @@ describe('migration lock retry', () => {
 		expect(result).toBe('done')
 		expect(transactions).toEqual(Array(3).fill([`SELECT set_config('lock_timeout', ?, true) 1500ms`]))
 		expect(logLevels).toEqual(['warn', 'warn'])
+	})
+
+	test('retries a serialization failure, wrapped in the migration error or not', async () => {
+		const { result, transactions, logLevels } = await run(options, [
+			new MigrationFailedError('2026-01-01-000000', 'conflict', serializationFailure()),
+			serializationFailure(),
+		])
+
+		expect(result).toBe('done')
+		expect(transactions).toHaveLength(3)
+		expect(logLevels).toEqual(['warn', 'warn'])
+	})
+
+	test('without options does not retry a serialization failure', async () => {
+		const conflict = new MigrationFailedError('2026-01-01-000000', 'conflict', serializationFailure())
+		const { error, transactions } = await run(undefined, [conflict])
+
+		expect(error).toBe(conflict)
+		expect(transactions).toHaveLength(1)
 	})
 
 	test('reports the lock conflict as an error once the attempts run out', async () => {

@@ -63,6 +63,44 @@ The `updateColumnDefinition` modification allows you to modify the definition of
 
 In this example, the value from an existing column named "existingColumn" will be copied to the modified column "isPublished" during the migration run.
 
+#### Adding a sequence without rewriting the table
+
+:::note[Available since 2.2]
+:::
+
+When `updateColumnDefinition` adds a `sequence` to an existing column, the migration converts the column with `SET DATA TYPE … USING`. PostgreSQL then rewrites the whole table and rebuilds all of its indexes under an `ACCESS EXCLUSIVE` lock. On a large table, the application cannot read or write the table until the migration commits.
+
+To convert the column in place, add `valueMigrationStrategy: "update"` to the modification by hand. The differ never emits it. It has an effect only when the column type and collation do not change and the modification has no `fillValue` or `copyValue`. In all other cases the table is rewritten as before.
+
+```json5
+{
+	"modification": "updateColumnDefinition",
+	"entityName": "Task",
+	"fieldName": "counter",
+	"definition": {
+		"type": "Integer",
+		"columnType": "integer",
+		"nullable": false,
+		"sequence": { "precedence": "BY DEFAULT", "start": 1000 }
+	},
+	/* highlight-start */
+	"valueMigrationStrategy": "update"
+	/* highlight-end */
+}
+```
+
+The migration then:
+
+1. Fills the empty rows with an `UPDATE`, numbered from the sequence start in primary key order. This step runs only if the column was nullable. The updates go through the event log like any other update, so each filled row writes one event.
+2. Sets the column `NOT NULL` and adds the identity.
+3. Moves the sequence after the highest value at or above the start, so later inserts do not get a value that a row already holds.
+
+This is cheaper than the rewrite, but not free. Setting `NOT NULL` and finding the highest value each scan the table while the migration holds the `ACCESS EXCLUSIVE` lock, and queries on the table wait for them. Filled rows can still collide with existing values at or above the start, as with the rewrite.
+
+:::caution[Concurrent writes]
+If the application inserts a row with an empty value in this column, or updates a row whose value is still empty, while the migration runs, the migration fails and rolls back without changing anything. Setting `NOT NULL` fails with `23502` (not-null violation), filling the rows fails with `40001` (serialization failure). A `40001` is retried when the [migration lock timeout](/guides/self-hosted-contember#lock-waits-during-migrations) is set. A `23502` is not retried: run the deploy again, or deploy when the application does not write to the table.
+:::
+
 ### Renaming Entities
 
 In Contember, renaming an entity involves creating a migration that drops the old entity and creates a new one. However, with the `updateEntityName` modification, you can instruct Contember to simply rename an existing entity without recreating it.

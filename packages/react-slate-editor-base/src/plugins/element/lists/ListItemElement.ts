@@ -33,7 +33,7 @@ export const listItemElementPlugin = ({ render }: { render: ElementRenderer<List
 			})
 			return preventDefault()
 		}
-		if (element.children.every(it => isListItemElement(it))) {
+		if (element.children.length > 0 && element.children.every(it => isListItemElement(it))) {
 			Transforms.unwrapNodes(editor, {
 				at: path,
 			})

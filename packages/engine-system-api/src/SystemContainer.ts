@@ -7,6 +7,8 @@ import {
 	ExecutedMigrationsResolver,
 	IdentityFetcher,
 	MigrationAlterer,
+	MigrationLockOptions,
+	MigrationLockRetry,
 	MigrationsDatabaseMetadataResolverStoreFactory,
 	PermissionsFactory,
 	ProjectMigrator,
@@ -44,6 +46,7 @@ export class SystemContainerFactory {
 		private readonly providers: UuidProvider,
 		private readonly modificationHandlerFactory: ModificationHandlerFactory,
 		private readonly contentQueryExecutor: ContentQueryExecutor,
+		private readonly migrationLockOptions?: MigrationLockOptions,
 	) {
 	}
 
@@ -89,7 +92,11 @@ export class SystemContainerFactory {
 			.addService('eventResponseBuilder', ({ identityFetcher }) => new EventResponseBuilder(identityFetcher))
 			.addService('stagesQueryResolver', () => new StagesQueryResolver())
 			.addService('executedMigrationsQueryResolver', () => new ExecutedMigrationsQueryResolver())
-			.addService('migrateMutationResolver', ({ projectMigrator }) => new MigrateMutationResolver(projectMigrator))
+			.addService('migrationLockRetry', () => new MigrationLockRetry(this.migrationLockOptions))
+			.addService(
+				'migrateMutationResolver',
+				({ projectMigrator, migrationLockRetry }) => new MigrateMutationResolver(projectMigrator, migrationLockRetry),
+			)
 			.addService('truncateMutationResolver', ({ projectTruncateExecutor }) => new TruncateMutationResolver(projectTruncateExecutor))
 			.addService('migrationAlterMutationResolver', ({ migrationAlterer }) => new MigrationAlterMutationResolver(migrationAlterer))
 			.addService('eventsQueryResolver', ({ eventResponseBuilder }) => new EventsQueryResolver(eventResponseBuilder))

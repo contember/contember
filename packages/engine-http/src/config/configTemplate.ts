@@ -103,6 +103,11 @@ export const configTemplate: any = {
 			enabled: '%?env.CONTEMBER_PANEL_ENABLED::bool%',
 			path: '%?env.CONTEMBER_PANEL_PATH%',
 		},
+		systemApi: {
+			migrationLockTimeoutMs: '%?env.CONTEMBER_SYSTEM_API_MIGRATION_LOCK_TIMEOUT_MS::number%',
+			migrationMaxAttempts: '%?env.CONTEMBER_SYSTEM_API_MIGRATION_MAX_ATTEMPTS::number%',
+			migrationRetryDelayMs: '%?env.CONTEMBER_SYSTEM_API_MIGRATION_RETRY_DELAY_MS::number%',
+		},
 		contentApi: {
 			schemaCacheTtlSeconds: '%?env.CONTEMBER_CONTENT_API_SCHEMA_CACHE_TTL_SECONDS::number%',
 			schemaCacheMaxEntries: '%?env.CONTEMBER_CONTENT_API_SCHEMA_CACHE_MAX_ENTRIES::number%',

@@ -201,6 +201,12 @@ export const createEditorWithEssentials = ({ defaultElementType }: { defaultElem
 				normalizeNode([node, path])
 				return
 			}
+			if (node.children.length === 0) {
+				// Element plugins assume at least one child (e.g. `[].every()` is vacuously true and unwrapping
+				// a node without text throws), so fix it the same way Slate core does before dispatching to them.
+				Transforms.insertNodes(editor, { text: '' }, { at: [...path, 0], voids: true })
+				return
+			}
 			let defaultPrevented = false
 			elements.get(node.type)?.normalizeNode?.({
 				element: node,

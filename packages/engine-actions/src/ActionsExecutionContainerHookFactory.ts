@@ -2,8 +2,18 @@ import { TriggerHandler, TriggerIndirectChangesFetcher, TriggerPayloadManager } 
 import { ListenerStoreProvider } from './ListenerStoreProvider.js'
 import { TriggerPayloadBuilder } from './triggers/TriggerPayloadBuilder.js'
 import { TriggerPayloadPersister } from './triggers/TriggerPayloadPersister.js'
-import { ExecutionContainerHook } from '@contember/engine-content-api'
+import { ExecutionContainerHook, InMemoryTriggeredActionsCollector, Mapper, TriggeredActionsCollector } from '@contember/engine-content-api'
 import { ActionsMetrics } from './ActionsMetrics.js'
+
+// Each transaction attempt has its own mapper. Its action IDs reach the request collector only once the attempt
+// commits, so a rolled-back or retried attempt reports no event that was never stored.
+const collectAfterCommit = (mapper: Mapper, requestCollector: TriggeredActionsCollector): TriggeredActionsCollector => {
+	const attemptCollector = new InMemoryTriggeredActionsCollector()
+	mapper.eventManager.listen('AfterCommitEvent', async () => {
+		requestCollector.add(attemptCollector.getEvents())
+	})
+	return attemptCollector
+}
 
 export class ActionsExecutionContainerHookFactory {
 	constructor(
@@ -24,6 +34,7 @@ export class ActionsExecutionContainerHookFactory {
 				) => {
 					const projectMetrics = this.metricsProvider()?.forProject(project.slug)
 					mapperFactory.hooks.push(mapper => {
+						const attemptCollector = triggeredActionsCollector ? collectAfterCommit(mapper, triggeredActionsCollector) : undefined
 						const triggerPayloadPersister = new TriggerPayloadPersister(
 							mapper,
 							mapper.db.forSchema(systemSchema),
@@ -33,7 +44,7 @@ export class ActionsExecutionContainerHookFactory {
 							schemaMeta.id,
 							mapper.identityId,
 							userInfo,
-							triggeredActionsCollector,
+							attemptCollector,
 							projectMetrics,
 						)
 						const triggerPayloadBuilder = new TriggerPayloadBuilder(mapper)

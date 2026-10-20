@@ -146,6 +146,28 @@ test('definition generator keeps a legacy noRoot grant out of the root scope', (
 	expect(generated).toContain(`@c.Allow(editorRole, {\n\tupdate: ['fileName'],\n})\n@c.Allow(editorRole, {\n\tthrough: true,\n\tread: true,\n})\n`)
 })
 
+namespace VariableFallbackModel {
+	export const customerRole = c.createRole('customer')
+	export const personVariable = c.createPredefinedVariable('person', 'personID', customerRole, { never: true })
+	export const categoryVariable = c.createEntityVariable('category', 'Category', customerRole, { eq: 'none' })
+
+	@c.Allow(customerRole, { when: { personId: personVariable, category: { id: categoryVariable } }, read: true })
+	export class Order {
+		personId = c.uuidColumn()
+		category = c.manyHasOne(Category)
+	}
+
+	export class Category {
+		name = c.stringColumn()
+	}
+}
+
+test('definition generator keeps variable fallbacks', () => {
+	const generated = new DefinitionCodeGenerator().generate(createSchema(VariableFallbackModel))
+	expect(generated).toContain(`c.createPredefinedVariable('person', 'personID', customerRole, { never: true })`)
+	expect(generated).toContain(`c.createEntityVariable('category', 'Category', customerRole, { eq: 'none' })`)
+})
+
 const legacyMixedAcl: Acl.Schema = {
 	roles: {
 		editor: {

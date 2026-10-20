@@ -7,7 +7,6 @@ import { DatabaseContext } from '../database/index.js'
 import { ExecutedMigrationsResolver } from './ExecutedMigrationsResolver.js'
 import { MigrateErrorCode } from '../../schema/index.js'
 import { calculateSchemaChecksum, emptySchema, SchemaValidator, SchemaValidatorSkippedErrors } from '@contember/schema-utils'
-import { logger } from '@contember/logger'
 import { MigrationsDatabaseMetadataResolverStoreFactory, SchemaDatabaseMetadataResolverStore } from '../metadata/index.js'
 import { ContentMigrationQuery, MigrationInput, SchemaStateInput } from './MigrationInput.js'
 import { ContentQueryExecutor } from '../dependencies/index.js'
@@ -359,9 +358,9 @@ export class ProjectMigrator {
 		try {
 			await db.query(sql)
 		} catch (e) {
+			// Not logged here: the statement may still be retried. The resolver logs the migration's final failure.
 			if (e instanceof QueryError) {
-				logger.error(e, { message: 'Migration failed' })
-				throw new MigrationFailedError(migrationVersion, e.message)
+				throw new MigrationFailedError(migrationVersion, e.message, e)
 			}
 			throw e
 		}
@@ -386,6 +385,10 @@ export class AlreadyExecutedMigrationError extends MigrationError {
 
 export class MigrationFailedError extends MigrationError {
 	code = MigrateErrorCode.MigrationFailed
+
+	constructor(version: string, migrationError: string, public readonly previous?: QueryError) {
+		super(version, migrationError)
+	}
 }
 
 export class InvalidSchemaError extends MigrationError {

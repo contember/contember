@@ -15,7 +15,7 @@ const unavailable = (): never => {
 }
 
 const createTestApplication = (
-	authenticate: Authenticator['authenticate'] = async () => new VerifyResult('identity', 'api-key', ['member'], null),
+	authenticate: Authenticator['authenticate'] = async () => new VerifyResult('identity', { type: 'api_key', id: 'api-key' }, ['member'], null),
 ) => {
 	const logger = createLogger(new TestLoggerHandler())
 	const authenticator = createMock<Authenticator>({ authenticate })
@@ -124,7 +124,7 @@ test('rejects a WebSocket upgrade whose authentication finishes during shutdown'
 	const application = createTestApplication(async () => {
 		authenticationStarted()
 		await authenticationReleased
-		return new VerifyResult('identity', 'api-key', ['member'], null)
+		return new VerifyResult('identity', { type: 'api_key', id: 'api-key' }, ['member'], null)
 	})
 	let controllerCalled = false
 	application.addWebsocketRoute('actions', '/actions', () => {

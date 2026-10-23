@@ -109,7 +109,7 @@ test('a key not yet replicated is found on the primary', async () => {
 	const response = await verify(primary, replica)
 	expect(response.ok).toBe(true)
 	if (response.ok) {
-		expect(response.result.apiKeyId).toBe('api-key-id')
+		expect(response.result.credential).toEqual({ type: 'api_key', id: 'api-key-id' })
 	}
 })
 

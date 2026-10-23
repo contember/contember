@@ -184,7 +184,7 @@ export const executeTenantTest = async (test: Test) => {
 	const context: TenantResolverContext = {
 		...createResolverContext(
 			permissionContext,
-			authenticatedApiKeyId,
+			{ type: 'api_key', id: authenticatedApiKeyId },
 			test.callerTrustForwardedInfo ?? false,
 		),
 		logger: createLogger(new JsonStreamLoggerHandler(process.stderr)),

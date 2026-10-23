@@ -1,11 +1,11 @@
 import { TenantResolverContext } from './TenantResolverContext.js'
-import { DatabaseContext, LoginRiskAnalyzer, PermissionContext, PermissionContextFactory } from '../model/index.js'
+import { AuthCredential, DatabaseContext, LoginRiskAnalyzer, PermissionContext, PermissionContextFactory } from '../model/index.js'
 import { Logger } from '@contember/logger'
 import { AuthLogService } from '../model/service/AuthLogService.js'
 
-export const createResolverContext = (permissionContext: PermissionContext, apiKeyId: string, trustForwardedInfo = false) => {
+export const createResolverContext = (permissionContext: PermissionContext, credential: AuthCredential, trustForwardedInfo = false) => {
 	return {
-		apiKeyId: apiKeyId,
+		credential,
 		trustForwardedInfo,
 		permissionContext,
 		identity: permissionContext.identity,
@@ -23,7 +23,7 @@ export class TenantResolverContextFactory {
 	) {}
 
 	public async create(
-		authContext: { apiKeyId: string; identityId: string; roles: string[]; trustForwardedInfo?: boolean },
+		authContext: { credential: AuthCredential; identityId: string; roles: string[]; trustForwardedInfo?: boolean },
 		httpInfo: { ip: string; userAgent?: string; forwarderIp?: string; forwarderUserAgent?: string; geoCountry?: string },
 		db: DatabaseContext,
 		logger: Logger,
@@ -36,7 +36,7 @@ export class TenantResolverContextFactory {
 		// and a UA fingerprint, so the next sign-in's anomaly check has a baseline.
 		const deviceFingerprint = this.loginRiskAnalyzer.fingerprint(httpInfo.userAgent) ?? undefined
 		return {
-			...createResolverContext(permissionContext, authContext.apiKeyId, authContext.trustForwardedInfo ?? false),
+			...createResolverContext(permissionContext, authContext.credential, authContext.trustForwardedInfo ?? false),
 			logAuthAction: async (data, transaction) => {
 				await this.authLogService.logAuthAction(transaction ?? db, {
 					identityId: authContext.identityId,

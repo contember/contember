@@ -12,7 +12,7 @@ const makeAuthenticator = (trust: boolean, geoHeader?: string) => {
 			result: {
 				valid: true,
 				identityId: 'identity-1',
-				apiKeyId: 'api-key-1',
+				credential: { type: 'api_key', id: 'api-key-1' },
 				roles: [],
 				personId: null,
 				trustForwardedInfo: trust,

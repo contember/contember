@@ -32,7 +32,7 @@ export const isUnpersistedIdentityId = (identityId: string | undefined): boolean
  * from the database.
  */
 export const createUnpersistedLoginVerifyResult = (): VerifyResult =>
-	new VerifyResult(UNPERSISTED_LOGIN_IDENTITY_ID, UNPERSISTED_LOGIN_IDENTITY_ID, [TenantRole.LOGIN], null, false)
+	new VerifyResult(UNPERSISTED_LOGIN_IDENTITY_ID, { type: 'unpersisted' }, [TenantRole.LOGIN], null, false)
 
 export interface UnpersistedApiKey {
 	readonly tokenHash: TokenHash
@@ -77,8 +77,7 @@ export class UnpersistedApiKeyManager {
 		}
 		return new VerifyResult(
 			matched.identityId,
-			// There is no persisted api_key row, so there is no api key id.
-			matched.identityId,
+			{ type: 'unpersisted' },
 			[...matched.roles],
 			null,
 			false,

@@ -204,7 +204,7 @@ export class IdentityTypeResolver implements IdentityResolvers {
 			lastUserAgent: row.last_user_agent,
 			createdIp: row.created_ip,
 			createdUserAgent: row.created_user_agent,
-			isCurrent: row.id === context.apiKeyId,
+			isCurrent: context.credential.type === 'api_key' && row.id === context.credential.id,
 			trustForwardedClientInfo: row.trust_forwarded_info,
 		}))
 	}

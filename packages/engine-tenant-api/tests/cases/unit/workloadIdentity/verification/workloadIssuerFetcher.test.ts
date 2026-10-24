@@ -147,10 +147,15 @@ describe('fetcher', () => {
 	})
 
 	test('the egress allowlist lets the connection through, by hostname or by network', async () => {
-		for (const allowlist of [['localhost'], ['127.0.0.0/8']]) {
+		// By network with an IP literal: `localhost` may also resolve to ::1, which the network does not cover.
+		const cases: { allowlist: string[]; host: string }[] = [{ allowlist: ['localhost'], host: 'localhost' }, {
+			allowlist: ['127.0.0.0/8'],
+			host: '127.0.0.1',
+		}]
+		for (const { allowlist, host } of cases) {
 			const before = server.connections
 			// The test server speaks plain http, so TLS fails — but only after the connection was allowed.
-			const message = await fetchError(new WorkloadIssuerFetcher(config({ egressAllowlist: allowlist })), `https://localhost:${server.port}/doc`)
+			const message = await fetchError(new WorkloadIssuerFetcher(config({ egressAllowlist: allowlist })), `https://${host}:${server.port}/doc`)
 			expect(message).not.toContain('non-public')
 			expect(server.connections).toBe(before + 1)
 		}

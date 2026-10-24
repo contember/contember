@@ -47,6 +47,6 @@ export class TenantClientProvider {
 
 	public transport(): TenantApiTransport {
 		const connection = this.connectionSource.get()
-		return TenantApiTransport.create(connection.endpoint, connection.token)
+		return TenantApiTransport.create(connection.endpoint, connection.credentials)
 	}
 }

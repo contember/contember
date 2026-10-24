@@ -33,7 +33,8 @@ Run `pre-build` before process tests; generated GraphQL client barrels are requi
 - Tenant commands use `TenantClientProvider` and domain clients over `TenantApiTransport`.
 - Read `lib/tenant/clients/README.md` before adding a tenant client method.
 - Reuse `lib/tenant/input/` for explicit input sources and GraphQL pagination bounds.
-- `tenant apply` loads `tenant.config.ts` and applies additions/updates without pruning.
+- `tenant apply` loads `tenant.config.ts` and applies additions/updates without pruning — except a present `workloadIdentities` block, which is authoritative (unlisted trusts are disabled; an absent key leaves trusts unmanaged).
+- Every request path authenticates through the one `ApiCredentialsResolver` (`lib/credentials/`): GraphQL clients get `credentials`, raw `fetch` goes through `fetchWithCredentials`. Never read `CONTEMBER_API_TOKEN` or the DSN password elsewhere.
 - Tenant commands except `tenant apply` use `CONTEMBER_*`; their `--project` selects a tenant project, not the connection.
 - Migration snapshots live at `{migrationsDir}/snapshot.json`; commit them and verify with `migrations verify-snapshot`.
 

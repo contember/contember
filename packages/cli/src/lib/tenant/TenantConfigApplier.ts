@@ -1,7 +1,9 @@
-import { Output } from '@contember/cli-common'
+import { CliError, ExitCode, Output } from '@contember/cli-common'
 import { authPolicyKey, describeAuthPolicy } from './authPolicy.js'
 import { type RemoteAuthPolicy, TenantPolicyClient, TenantProjectClient } from './clients/index.js'
 import { TenantConfig } from './tenantConfig.js'
+import type { WorkloadEnvelopeClosure } from './workloadIdentity/model.js'
+import { planWorkloadIdentities, type WorkloadIdentityChange, type WorkloadIdentityPlan } from './workloadIdentity/plan.js'
 
 export interface TenantConfigApplyOptions {
 	dryRun?: boolean
@@ -9,7 +11,18 @@ export interface TenantConfigApplyOptions {
 
 /** The slice of the domain clients the applier drives — structural, so a test can pass a fake. */
 export interface TenantConfigApplierClients {
-	readonly project: Pick<TenantProjectClient, 'configure' | 'listIdentityProviders' | 'addIdp' | 'updateIdp' | 'enableIdp' | 'disableIdp'>
+	readonly project: Pick<
+		TenantProjectClient,
+		| 'configure'
+		| 'listIdentityProviders'
+		| 'addIdp'
+		| 'updateIdp'
+		| 'enableIdp'
+		| 'disableIdp'
+		| 'listWorkloadIdentityTrusts'
+		| 'applyWorkloadIdentityTrust'
+		| 'disableWorkloadIdentityTrust'
+	>
 	readonly policy: Pick<
 		TenantPolicyClient,
 		'addMailTemplate' | 'listAuthPolicies' | 'createAuthPolicy' | 'updateAuthPolicy' | 'listCustomRoles' | 'createCustomRole' | 'updateCustomRole'
@@ -27,6 +40,9 @@ export type TenantConfigActionType =
 	| 'updateAuthPolicy'
 	| 'createCustomRole'
 	| 'updateCustomRole'
+	| 'createWorkloadIdentity'
+	| 'updateWorkloadIdentity'
+	| 'disableWorkloadIdentity'
 
 /** One step of the apply plan. In a dry run it is what would be done, otherwise what was done. */
 export interface TenantConfigAction {
@@ -34,7 +50,11 @@ export interface TenantConfigAction {
 	target: string | null
 }
 
-export type TenantConfigWarningCode = 'UNMANAGED_AUTH_POLICY'
+export type TenantConfigWarningCode =
+	| 'UNMANAGED_AUTH_POLICY'
+	| 'WORKLOAD_IDENTITY_REJECTS_EARLIER_TOKENS'
+	| 'WORKLOAD_IDENTITY_RENAMED'
+	| 'WORKLOAD_IDENTITY_SENSITIVE_ROLE'
 
 /** Server-side state the config does not cover. Nothing is pruned, so it stays in effect. */
 export interface TenantConfigWarning {
@@ -50,6 +70,24 @@ export interface TenantConfigWarning {
 export interface TenantConfigPlan {
 	actions: TenantConfigAction[]
 	warnings: TenantConfigWarning[]
+	/** One entry per trust, unchanged ones included; `null` when the config leaves workload identities unmanaged. */
+	workloadIdentities: TenantWorkloadIdentityOutcome[] | null
+}
+
+export interface TenantWorkloadIdentityOutcome {
+	slug: string
+	change: WorkloadIdentityChange
+	/** Planned: the apply moves `tokensValidAfter`, so tokens issued before it are rejected. */
+	rejectsEarlierTokens: boolean
+	/** The server's answer after an apply; `null` in a dry run and for disables and unchanged trusts. */
+	tokensValidAfterBumped: boolean | null
+	envelopeClosure: WorkloadEnvelopeClosure | null
+}
+
+const workloadIdentityActions: Readonly<Record<Exclude<WorkloadIdentityChange, 'unchanged'>, TenantConfigActionType>> = {
+	create: 'createWorkloadIdentity',
+	update: 'updateWorkloadIdentity',
+	disable: 'disableWorkloadIdentity',
 }
 
 /**
@@ -62,8 +100,10 @@ export interface TenantConfigPlan {
  *   project, role set) and created or updated accordingly; every policy the
  *   config does not cover is warned about, including when the config lists none.
  * - custom roles are created or updated by slug.
+ * - workload identity trusts are reconciled against the listed trusts (see {@link planWorkloadIdentities}).
  *
- * Nothing is ever removed — entries missing from the config are left untouched.
+ * Nothing is ever removed — entries missing from the config are left untouched. The one exception is a
+ * present `workloadIdentities` block, which is authoritative: trusts it does not name are disabled.
  *
  * Returns the plan as data; the caller prints it. The applier itself only reports each action on stderr.
  */
@@ -100,6 +140,9 @@ export class TenantConfigApplier {
 		assertDistinctAuthPolicies(config.authPolicies)
 		const existingAuthPolicies = config.authPolicies === undefined ? undefined : await clients.policy.listAuthPolicies()
 		assertDistinctExistingAuthPolicies(existingAuthPolicies)
+		const workloadIdentityPlan = config.workloadIdentities === undefined
+			? undefined
+			: planWorkloadIdentities(config.workloadIdentities, await clients.project.listWorkloadIdentityTrusts())
 
 		if (config.config && hasEffectiveConfigValue(config.config)) {
 			const globalConfig = config.config
@@ -184,8 +227,104 @@ export class TenantConfigApplier {
 			}
 		}
 
-		return { actions, warnings }
+		const workloadIdentities = workloadIdentityPlan === undefined
+			? null
+			: await this.applyWorkloadIdentities(clients, workloadIdentityPlan, run, warn)
+
+		return { actions, warnings, workloadIdentities }
 	}
+
+	private async applyWorkloadIdentities(
+		clients: TenantConfigApplierClients,
+		plan: WorkloadIdentityPlan,
+		run: (action: TenantConfigActionType, target: string | null, execute: () => Promise<void>) => Promise<void>,
+		warn: (code: TenantConfigWarningCode, target: string, message: string) => void,
+	): Promise<TenantWorkloadIdentityOutcome[]> {
+		for (const { from, to } of plan.renames) {
+			warn(
+				'WORKLOAD_IDENTITY_RENAMED',
+				to,
+				`Workload identity ${to} replaces ${from} with the same issuer and audience. It is a new identity: its identity id in audit and event logs changes.`,
+			)
+		}
+		for (const step of plan.steps) {
+			if (step.rejectsEarlierTokens) {
+				warn(
+					'WORKLOAD_IDENTITY_REJECTS_EARLIER_TOKENS',
+					step.slug,
+					`Workload identity ${step.slug}: tokens issued before this apply will be rejected (who the trust admits changes).`,
+				)
+			}
+		}
+
+		const pendingSlugs = plan.steps.filter(it => it.mutation !== null).map(it => it.slug)
+		const outcomes: TenantWorkloadIdentityOutcome[] = []
+		for (const step of plan.steps) {
+			const outcome: TenantWorkloadIdentityOutcome = {
+				slug: step.slug,
+				change: step.change,
+				rejectsEarlierTokens: step.rejectsEarlierTokens,
+				tokensValidAfterBumped: null,
+				envelopeClosure: null,
+			}
+			outcomes.push(outcome)
+			const mutation = step.mutation
+			if (mutation === null || step.change === 'unchanged') {
+				continue
+			}
+			await run(workloadIdentityActions[step.change], step.slug, async () => {
+				try {
+					if (mutation.type === 'disable') {
+						await clients.project.disableWorkloadIdentityTrust(step.slug)
+						return
+					}
+					const result = await clients.project.applyWorkloadIdentityTrust(step.slug, mutation.input)
+					outcome.tokensValidAfterBumped = result.tokensValidAfterBumped
+					outcome.envelopeClosure = result.envelopeClosure
+				} catch (error) {
+					if (error instanceof CliError && error.code === 'WORKLOAD_CREDENTIAL_FORBIDDEN') {
+						throw workloadCredentialForbidden(pendingSlugs, error)
+					}
+					throw error
+				}
+			})
+			for (const target of sensitiveEnvelopeTargets(outcome.envelopeClosure)) {
+				warn(
+					'WORKLOAD_IDENTITY_SENSITIVE_ROLE',
+					step.slug,
+					`Workload identity ${step.slug}: the envelope of ${target.source} may assume role ${target.role}, which carries system.${
+						target.flags.join(', system.')
+					}.`,
+				)
+			}
+		}
+		return outcomes
+	}
+}
+
+const workloadCredentialForbidden = (pendingSlugs: readonly string[], cause: CliError): CliError =>
+	new CliError(
+		`The workloadIdentities block changed (${
+			pendingSlugs.join(', ')
+		}), and the current credential is a workload identity trust, which may not manage trusts. `
+			+ 'Apply the workloadIdentities block with a person or API key credential.',
+		{
+			code: 'WORKLOAD_CREDENTIAL_FORBIDDEN',
+			exitCode: ExitCode.Forbidden,
+			details: { trusts: pendingSlugs },
+			cause,
+		},
+	)
+
+const sensitiveEnvelopeTargets = (closure: WorkloadEnvelopeClosure | null): { source: string; role: string; flags: readonly string[] }[] => {
+	if (closure === null || !('entries' in closure)) {
+		return []
+	}
+	return closure.entries.flatMap(entry =>
+		entry.targets
+			.filter(target => target.sensitiveSystemFlags.length > 0)
+			.map(target => ({ source: `${entry.project}/${entry.role}`, role: target.role, flags: target.sensitiveSystemFlags }))
+	)
 }
 
 const assertDistinctExistingAuthPolicies = (policies: readonly RemoteAuthPolicy[] | undefined): void => {

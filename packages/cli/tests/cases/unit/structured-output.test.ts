@@ -30,6 +30,7 @@ import { RemoteProjectProvider } from '../../../src/lib/project/RemoteProjectPro
 import { SchemaLoader } from '../../../src/lib/schema/SchemaLoader.js'
 import { TenantClientProvider } from '../../../src/lib/TenantClientProvider.js'
 import { createTestOutput } from '../../../../cli-common/tests/lib/testOutput.js'
+import { staticTokenCredentials } from '../../../src/lib/credentials/ApiCredentials.js'
 
 const API_URL = 'http://tenant.test'
 const temporaryDirectories: string[] = []
@@ -57,7 +58,7 @@ afterAll(() => {
 
 const createTenantClientProvider = (): TenantClientProvider => {
 	const remoteProjectProvider = new RemoteProjectProvider()
-	remoteProjectProvider.setRemoteProject(new RemoteProject('blog', API_URL, 'token'))
+	remoteProjectProvider.setRemoteProject(new RemoteProject('blog', API_URL, staticTokenCredentials('token')))
 	return new TenantClientProvider(remoteProjectProvider)
 }
 

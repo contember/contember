@@ -5,6 +5,7 @@ import { SystemClient } from '@contember/migrations-client'
 import { SystemClientProvider } from '../../../src/lib/SystemClientProvider.js'
 import { RemoteProject } from '../../../src/lib/project/RemoteProject.js'
 import { RemoteProjectProvider } from '../../../src/lib/project/RemoteProjectProvider.js'
+import { staticTokenCredentials } from '../../../src/lib/credentials/ApiCredentials.js'
 
 class FailingSystemClient extends SystemClient {
 	constructor(private readonly failure: unknown) {
@@ -45,7 +46,7 @@ class FailingSystemClient extends SystemClient {
 const createProvider = (failure: unknown): SystemClientProvider => {
 	const remoteProjectProvider = new RemoteProjectProvider()
 	remoteProjectProvider.setRemoteProject(
-		new RemoteProject('project', 'https://user:password@example.com/api/?token=secret#fragment', 'api-token'),
+		new RemoteProject('project', 'https://user:password@example.com/api/?token=secret#fragment', staticTokenCredentials('api-token')),
 	)
 	return new SystemClientProvider(remoteProjectProvider, () => new FailingSystemClient(failure))
 }

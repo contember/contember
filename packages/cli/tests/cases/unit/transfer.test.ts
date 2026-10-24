@@ -16,6 +16,7 @@ import { tmpdir } from 'node:os'
 import { mkdtemp, rm } from 'node:fs/promises'
 import prompts from 'prompts'
 import { confirmImport } from '../../../src/commands/transfer/utils.js'
+import { staticTokenCredentials } from '../../../src/lib/credentials/ApiCredentials.js'
 
 const cliEnv = (overrides: Partial<CliEnv> = {}): CliEnv => ({
 	apiUrl: 'https://api.example.test',
@@ -133,7 +134,7 @@ describe('DataTransferClient transport errors', () => {
 			})
 		const client = new DataTransferClient()
 		const promise = client.dataExport({
-			project: new RemoteProject('blog', 'https://api.example.test', 'distinctive-token-value'),
+			project: new RemoteProject('blog', 'https://api.example.test', staticTokenCredentials('distinctive-token-value')),
 			includeSystem: false,
 			gzip: false,
 		})
@@ -161,7 +162,7 @@ describe('DataTransferClient transport errors', () => {
 
 		const promise = client.dataImport({
 			stream: source,
-			project: new RemoteProject('blog', 'https://api.example.test', 'distinctive-token-value'),
+			project: new RemoteProject('blog', 'https://api.example.test', staticTokenCredentials('distinctive-token-value')),
 			printProgress: () => undefined,
 			gzip: false,
 		})
@@ -187,7 +188,7 @@ describe('DataTransferClient transport errors', () => {
 
 		const promise = client.dataImport({
 			stream: Readable.from(['distinctive-invalid-transfer-line\n']),
-			project: new RemoteProject('blog', 'https://api.example.test', 'distinctive-token-value'),
+			project: new RemoteProject('blog', 'https://api.example.test', staticTokenCredentials('distinctive-token-value')),
 			printProgress: () => undefined,
 			gzip: false,
 		})
@@ -209,7 +210,7 @@ describe('DataTransferClient transport errors', () => {
 		const client = new DataTransferClient()
 		const promise = client.dataImport({
 			stream: Readable.from([JSON.stringify([command, { distinctive: 'line-secret' }]) + '\n']),
-			project: new RemoteProject('blog', 'https://api.example.test', 'distinctive-token-value'),
+			project: new RemoteProject('blog', 'https://api.example.test', staticTokenCredentials('distinctive-token-value')),
 			printProgress: () => undefined,
 			gzip: false,
 		})
@@ -248,7 +249,7 @@ describe('DataTransferClient transport errors', () => {
 				`${lines[1].slice(12)}\n${lines[2]}\n`,
 				`${lines[3]}\n`,
 			]),
-			project: new RemoteProject('blog', 'https://api.example.test', 'distinctive-token-value'),
+			project: new RemoteProject('blog', 'https://api.example.test', staticTokenCredentials('distinctive-token-value')),
 			printProgress: () => undefined,
 			gzip: false,
 		})
@@ -263,7 +264,7 @@ describe('DataTransferClient transport errors', () => {
 		const client = new DataTransferClient()
 		const promise = client.dataImport({
 			stream: Readable.from(['["insertEnd"]\n']),
-			project: new RemoteProject('blog', 'https://api.example.test', 'distinctive-token-value'),
+			project: new RemoteProject('blog', 'https://api.example.test', staticTokenCredentials('distinctive-token-value')),
 			printProgress: () => undefined,
 			gzip: false,
 		})
@@ -285,7 +286,7 @@ describe('DataTransferClient transport errors', () => {
 
 		await expect(client.dataImport({
 			stream: source,
-			project: new RemoteProject('blog', 'https://api.example.test', 'distinctive-token-value'),
+			project: new RemoteProject('blog', 'https://api.example.test', staticTokenCredentials('distinctive-token-value')),
 			printProgress: () => undefined,
 			gzip: false,
 		})).rejects.toMatchObject({

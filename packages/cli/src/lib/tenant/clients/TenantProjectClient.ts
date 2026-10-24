@@ -2,6 +2,9 @@ import {
 	addIDPError$$,
 	addIDPResponse$$,
 	apiKeyWithToken$$,
+	applyWorkloadIdentityTrustError$$,
+	applyWorkloadIdentityTrustResponse$$,
+	applyWorkloadIdentityTrustResult$$,
 	type CaptchaProvider,
 	config$,
 	configCaptcha$$,
@@ -22,6 +25,8 @@ import {
 	createProjectResult$,
 	disableIDPError$$,
 	disableIDPResponse$$,
+	disableWorkloadIdentityTrustError$$,
+	disableWorkloadIdentityTrustResponse$$,
 	enableIDPError$$,
 	enableIDPResponse$$,
 	identity$$,
@@ -44,11 +49,28 @@ import {
 	updateIDPResponse$$,
 	updateProjectError$$,
 	updateProjectResponse$$,
+	variableEntry$$,
+	workloadIdentityTokenCheck$$,
+	workloadIdentityTokenCheckFailure$$,
+	workloadIdentityTrust$,
+	workloadIdentityTrust$$,
+	type WorkloadIdentityTrustInput,
+	workloadIdentityTrustMembership$$,
 } from '@contember/graphql-client-tenant'
 import { CliError, ExitCode } from '@contember/cli-common'
 import type { ModelType } from 'graphql-ts-client-api'
 import { TenantApiTransport } from '../TenantApiTransport.js'
 import { TenantGlobalConfig, TenantIdpOptions } from '../tenantConfig.js'
+import {
+	fromApiWorkloadProfile,
+	parseEnvelopeClosure,
+	parseJsonScalar,
+	parseMembershipMatchRule,
+	type RemoteWorkloadIdentityTrust,
+	toJsonValue,
+	type WorkloadIdentityApplyResult,
+	type WorkloadIdentityTokenCheck,
+} from '../workloadIdentity/model.js'
 
 export interface RemoteIdentityProvider {
 	slug: string
@@ -241,9 +263,52 @@ const meFetcher = query$.me(
 		.projects(identityProjectRelation$.project(project$.slug.name).memberships(membership$$)),
 )
 
+const workloadIdentityTrustsFetcher = query$.workloadIdentityTrusts(
+	workloadIdentityTrust$$.memberships(workloadIdentityTrustMembership$$.variables(variableEntry$$)),
+)
+const applyWorkloadIdentityTrustFetcher = mutation$.applyWorkloadIdentityTrust(
+	applyWorkloadIdentityTrustResponse$$.error(applyWorkloadIdentityTrustError$$).result(applyWorkloadIdentityTrustResult$$),
+)
+const disableWorkloadIdentityTrustFetcher = mutation$.disableWorkloadIdentityTrust(
+	disableWorkloadIdentityTrustResponse$$.error(disableWorkloadIdentityTrustError$$),
+)
+const checkWorkloadIdentityTokenFetcher = query$.checkWorkloadIdentityToken(
+	workloadIdentityTokenCheck$$
+		.trust(workloadIdentityTrust$.slug.profile.issuer.audience.disabled)
+		.failure(workloadIdentityTokenCheckFailure$$),
+)
+
+const toRemoteWorkloadIdentityTrust = (
+	trust: ModelType<typeof workloadIdentityTrustsFetcher>['workloadIdentityTrusts'][number],
+): RemoteWorkloadIdentityTrust => ({
+	id: trust.id,
+	slug: trust.slug,
+	profile: fromApiWorkloadProfile(trust.profile),
+	issuer: trust.issuer,
+	audience: trust.audience,
+	jwksUri: trust.jwksUri ?? null,
+	signingAlgs: trust.signingAlgs,
+	acceptedTyp: trust.acceptedTyp.map(it => it ?? null),
+	acceptAudienceArray: trust.acceptAudienceArray,
+	requireDpop: trust.requireDpop,
+	conditions: parseJsonScalar(trust.conditions, `trust ${trust.slug} conditions`),
+	maxTokenLifetime: trust.maxTokenLifetime,
+	trustForwardedInfo: trust.trustForwardedInfo,
+	description: trust.description ?? null,
+	disabled: trust.disabled,
+	tokensValidAfter: trust.tokensValidAfter,
+	roles: trust.roles,
+	memberships: trust.memberships.map(membership => ({
+		project: membership.project,
+		role: membership.role,
+		variables: membership.variables.map(it => ({ name: it.name, values: it.values })),
+		assumeMembership: parseMembershipMatchRule(membership.assumeMembership),
+	})),
+})
+
 const toRateLimitWindow = (it: { limit: number; window: string }): TenantRateLimitWindowState => ({ limit: it.limit, window: it.window })
 
-/** Projects, project secrets, global tenant configuration, identity providers and `me`. */
+/** Projects, project secrets, global tenant configuration, identity providers, workload identities and `me`. */
 export class TenantProjectClient {
 	constructor(
 		private readonly transport: TenantApiTransport,
@@ -403,6 +468,62 @@ export class TenantProjectClient {
 	public async disableIdp(slug: string): Promise<void> {
 		const result = await this.transport.exec(disableIdpFetcher, { identityProvider: slug })
 		this.transport.assertOk(result.disableIDP, `disableIDP(${slug})`)
+	}
+
+	/** Enabled and disabled trusts; requires `workloadIdentity:list`. */
+	public async listWorkloadIdentityTrusts(): Promise<RemoteWorkloadIdentityTrust[]> {
+		const result = await this.transport.exec(workloadIdentityTrustsFetcher, {})
+		return result.workloadIdentityTrusts.map(toRemoteWorkloadIdentityTrust)
+	}
+
+	public async applyWorkloadIdentityTrust(slug: string, trust: WorkloadIdentityTrustInput): Promise<WorkloadIdentityApplyResult> {
+		const result = await this.transport.exec(applyWorkloadIdentityTrustFetcher, { slug, trust })
+		const response = result.applyWorkloadIdentityTrust
+		this.transport.assertOk(response, `applyWorkloadIdentityTrust(${slug})`)
+		if (!response.result) {
+			throw new CliError(`Tenant API returned no result for applyWorkloadIdentityTrust(${slug}).`, {
+				code: 'TENANT_API_INVALID_RESPONSE',
+				exitCode: ExitCode.InternalError,
+			})
+		}
+		return {
+			created: response.result.created,
+			tokensValidAfterBumped: response.result.tokensValidAfterBumped,
+			envelopeClosure: parseEnvelopeClosure(response.result.envelopeClosure),
+		}
+	}
+
+	public async disableWorkloadIdentityTrust(slug: string): Promise<void> {
+		const result = await this.transport.exec(disableWorkloadIdentityTrustFetcher, { slug })
+		this.transport.assertOk(result.disableWorkloadIdentityTrust, `disableWorkloadIdentityTrust(${slug})`)
+	}
+
+	/** Runs the server-side token verification without DPoP and without an auth log write. */
+	public async checkWorkloadIdentityToken(token: string): Promise<WorkloadIdentityTokenCheck> {
+		const result = await this.transport.exec(checkWorkloadIdentityTokenFetcher, { token })
+		const check = result.checkWorkloadIdentityToken
+		return {
+			ok: check.ok,
+			trust: check.trust
+				? {
+					slug: check.trust.slug,
+					profile: fromApiWorkloadProfile(check.trust.profile),
+					issuer: check.trust.issuer,
+					audience: check.trust.audience,
+					disabled: check.trust.disabled,
+				}
+				: null,
+			failure: check.failure
+				? {
+					step: check.failure.step,
+					message: check.failure.message,
+					conditionIndex: check.failure.conditionIndex ?? null,
+					actualValue: toJsonValue(check.failure.actualValue) ?? null,
+				}
+				: null,
+			claims: check.claims === undefined ? null : parseJsonScalar(check.claims, 'claims'),
+			requiresDpop: check.requiresDpop ?? null,
+		}
 	}
 
 	public async whoAmI(): Promise<TenantWhoAmI> {

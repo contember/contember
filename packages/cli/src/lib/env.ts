@@ -1,5 +1,9 @@
 export interface CliEnv {
 	apiToken?: string
+	/** `github-actions` or `kubernetes:<path>`; replaces `apiToken` and the DSN password. */
+	apiTokenSource?: string
+	/** The trust audience requested from a `github-actions` token source. */
+	apiTokenAudience?: string
 	loginToken?: string
 	apiUrl?: string
 	projectName?: string
@@ -15,6 +19,8 @@ export const readCliEnv = (): CliEnv => {
 	return {
 		dir: process.env.CONTEMBER_DIR,
 		apiToken: process.env.CONTEMBER_API_TOKEN,
+		apiTokenSource: process.env.CONTEMBER_API_TOKEN_SOURCE,
+		apiTokenAudience: process.env.CONTEMBER_API_TOKEN_AUDIENCE,
 		loginToken: process.env.CONTEMBER_LOGIN_TOKEN,
 		apiUrl: process.env.CONTEMBER_API_URL ?? process.env.CONTEMBER_INSTANCE,
 		projectName: process.env.CONTEMBER_PROJECT_NAME,

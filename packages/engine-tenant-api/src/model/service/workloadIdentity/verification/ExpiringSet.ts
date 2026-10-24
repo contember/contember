@@ -31,11 +31,14 @@ export class ExpiringSet {
 		return 'added'
 	}
 
+	// Drops expired entries from the oldest end only, so a full set costs amortised O(1) per add instead of a scan.
+	// Exact for a fixed TTL; with mixed TTLs an expired entry behind a live one waits until it reaches the front.
 	private purgeExpired(now: number): void {
 		for (const [key, expiresAt] of this.entries) {
-			if (expiresAt <= now) {
-				this.entries.delete(key)
+			if (expiresAt > now) {
+				return
 			}
+			this.entries.delete(key)
 		}
 	}
 }

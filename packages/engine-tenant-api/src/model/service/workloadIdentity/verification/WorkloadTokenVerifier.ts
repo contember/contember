@@ -1,5 +1,5 @@
 import { createHash } from 'node:crypto'
-import { decodeJwt, errors, JWTPayload, jwtVerify, JWTVerifyResult } from 'jose'
+import { decodeJwt, errors, JWTPayload, jwtVerify, JWTVerifyOptions, JWTVerifyResult } from 'jose'
 import { JSONValue } from '@contember/schema'
 import { DatabaseContext } from '../../../utils/index.js'
 import { Response, ResponseError, ResponseOk } from '../../../utils/Response.js'
@@ -281,7 +281,7 @@ export class WorkloadTokenVerifier {
 
 		let verified: JWTVerifyResult
 		try {
-			verified = await jwtVerify(token, this.jwksRegistry.getKeyResolver(trust), {
+			verified = await this.verifySignature(token, trust, {
 				issuer: trust.issuer,
 				audience: trust.audience,
 				algorithms: trust.signingAlgs.filter(it => ASYMMETRIC_SIGNING_ALGS.includes(it)),
@@ -320,6 +320,27 @@ export class WorkloadTokenVerifier {
 		}
 
 		return { ok: true, trust, claims, tokenRef: tokenReference(token, claims.jti), exp, unverified }
+	}
+
+	private async verifySignature(token: string, trust: WorkloadIdentity.TrustRow, options: JWTVerifyOptions): Promise<JWTVerifyResult> {
+		try {
+			return await jwtVerify(token, this.jwksRegistry.getKeyResolver(trust), options)
+		} catch (e) {
+			if (!(e instanceof errors.JWKSMultipleMatchingKeys)) {
+				throw e
+			}
+			// A token without `kid` matches every key of its type while the issuer overlaps a rotation; try each of them.
+			for await (const key of e) {
+				try {
+					return await jwtVerify(token, key, options)
+				} catch (keyError) {
+					if (!(keyError instanceof errors.JWSSignatureVerificationFailed)) {
+						throw keyError
+					}
+				}
+			}
+			throw new errors.JWSSignatureVerificationFailed()
+		}
 	}
 
 	private selectTrust(
@@ -438,7 +459,8 @@ export class WorkloadTokenVerifier {
 	private logSuccess(db: DatabaseContext, evaluation: Extract<Evaluation, { ok: true }>, httpInfo: WorkloadAuthHttpInfo, now: Date): void {
 		const { trust, claims, tokenRef, exp } = evaluation
 		// Only the first sighting of a token writes; the unique index keeps a fleet at one row per token.
-		if (this.loggedTokens.add(`${trust.id}\n${tokenRef}`, exp * 1000, now.getTime()) !== 'added') {
+		// The entry outlives `exp` by the tolerance jose still accepts the token for.
+		if (this.loggedTokens.add(`${trust.id}\n${tokenRef}`, (exp + CLOCK_TOLERANCE_SECONDS) * 1000, now.getTime()) !== 'added') {
 			return
 		}
 		const cnf = claims.cnf

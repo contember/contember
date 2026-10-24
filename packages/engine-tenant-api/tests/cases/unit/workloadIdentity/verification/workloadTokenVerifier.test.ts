@@ -3,7 +3,7 @@ import { createHash } from 'node:crypto'
 import { base64url, calculateJwkThumbprint, CryptoKey, exportJWK, generateKeyPair, JWK, JWTPayload, SignJWT } from 'jose'
 import { JSONValue } from '@contember/schema'
 import { AuthLogService, DatabaseContext, WorkloadAuthRequest, WorkloadJwksRegistry, WorkloadTokenVerifier } from '../../../../../src/index.js'
-import { createDb, instanceConfig, TestIssuer, TrustDbRow, trustLookup } from './testIssuer.js'
+import { createDb, createIssuerKey, instanceConfig, TestIssuer, TrustDbRow, trustLookup } from './testIssuer.js'
 
 const AUDIENCE = 'contember:test:web-backend'
 const URL_ = 'https://api.example.com/content/website/live'
@@ -163,6 +163,26 @@ describe('token profile', () => {
 		const token = await new SignJWT(claims()).setProtectedHeader({ alg: 'RS256', kid: 'key-1', typ: 'JWT' }).sign(privateKey)
 		expect(await failedStep(token)).toBe('signature')
 	})
+
+	test('a token without kid verifies against each key of a rotation overlap', async () => {
+		const rotating = await TestIssuer.start()
+		try {
+			const keys = [await createIssuerKey('old'), await createIssuerKey('new')]
+			rotating.keys = keys.map(key => ({ ...key, publicJwk: { ...key.publicJwk, kid: undefined } }))
+			const sign = (privateKey: CryptoKey) =>
+				new SignJWT(claims({ iss: rotating.issuer })).setProtectedHeader({ alg: 'RS256', typ: 'JWT' }).sign(privateKey)
+			const stepOf = async (token: string) => {
+				const queries = [trustLookup(rotating.issuer, [AUDIENCE], [trustRow({ issuer: rotating.issuer })])]
+				const result = await createVerifier().verifier.check(createDb(queries, NOW), token)
+				return result.ok ? 'ok' : result.failure.step
+			}
+
+			expect(await stepOf(await sign(keys[1].privateKey))).toBe('ok')
+			expect(await stepOf(await sign((await generateKeyPair('RS256')).privateKey))).toBe('signature')
+		} finally {
+			await rotating.stop()
+		}
+	})
 })
 
 describe('freshness', () => {
@@ -251,6 +271,15 @@ describe('authenticate', () => {
 			eventData: { trustSlug: 'web-backend', iss: issuer.issuer, sub: 'web-backend', jti: 'token-1' },
 		})
 		expect(ctx.outcomes).toEqual(['success', 'success'])
+	})
+
+	test('a token past exp but inside the clock tolerance is still logged only once', async () => {
+		const ctx = createVerifier()
+		const token = await issuer.sign(claims({ iat: NOW_S - 300, exp: NOW_S - 10 }))
+		expect((await authenticate(ctx, bearer(token))).ok).toBe(true)
+		expect((await authenticate(ctx, bearer(token))).ok).toBe(true)
+		await settle()
+		expect(ctx.authLog.entries).toHaveLength(1)
 	})
 
 	test('a token without jti gets a sha256 token reference', async () => {

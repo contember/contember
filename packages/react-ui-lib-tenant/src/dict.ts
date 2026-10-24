@@ -680,6 +680,7 @@ export const dict = {
 				'VARIABLE_EMPTY': 'Variable empty',
 				'VARIABLE_NOT_FOUND': 'Variable not found',
 				'NOT_MEMBER': 'Not a member',
+				'WORKLOAD_IDENTITY_MANAGED': 'This identity belongs to a workload identity trust; change it in tenant.config.ts',
 			} satisfies Record<UpdateProjectMemberFormErrorCode, string>,
 		},
 		personActions: {
@@ -737,6 +738,7 @@ export const dict = {
 			errorMessages: {
 				'IDENTITY_NOT_FOUND': 'This identity no longer exists',
 				'INVALID_ROLE': 'This role is not defined in the tenant configuration',
+				'WORKLOAD_IDENTITY_MANAGED': 'This identity belongs to a workload identity trust; change it in tenant.config.ts',
 				'UNKNOWN_ERROR': 'Something went wrong. Please try again later',
 			} satisfies Record<AddGlobalIdentityRolesErrorCode | RemoveGlobalIdentityRolesErrorCode | 'UNKNOWN_ERROR', string>,
 		},
@@ -790,6 +792,7 @@ export const dict = {
 				'ROLE_NOT_FOUND': 'Role not found',
 				'VARIABLE_EMPTY': 'Variable empty',
 				'VARIABLE_NOT_FOUND': 'Variable not found',
+				'WORKLOAD_IDENTITY_MANAGED': 'This identity belongs to a workload identity trust; change it in tenant.config.ts',
 			} satisfies Record<AddProjectMemberFormErrorCode, string>,
 		},
 		authLog: {

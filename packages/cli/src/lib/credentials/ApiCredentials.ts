@@ -71,8 +71,24 @@ const describeSource = (source: ApiTokenSource): string => {
 	}
 }
 
-const sourceCredentials = (source: ApiTokenSource, provider: CredentialsProvider): ApiCredentials => {
+const sourceFailed = (description: string, error: unknown): CliError =>
+	error instanceof CliError
+		? error
+		: new CliError(`Obtaining a token from the ${description} failed: ${error instanceof Error ? error.message : String(error)}`, {
+			code: 'API_TOKEN_SOURCE_FAILED',
+			exitCode: ExitCode.InputError,
+			cause: error,
+		})
+
+const sourceCredentials = (source: ApiTokenSource, sourceFactory: ApiTokenSourceFactory): ApiCredentials => {
 	const description = describeSource(source)
+	let provider: CredentialsProvider
+	try {
+		// a source checks its environment when built (e.g. githubActions without `id-token: write`)
+		provider = sourceFactory(source)
+	} catch (error) {
+		throw sourceFailed(description, error)
+	}
 	return {
 		description,
 		staticToken: null,
@@ -80,14 +96,7 @@ const sourceCredentials = (source: ApiTokenSource, provider: CredentialsProvider
 			try {
 				return await provider.authenticate(request)
 			} catch (error) {
-				if (error instanceof CliError) {
-					throw error
-				}
-				throw new CliError(`Obtaining a token from the ${description} failed: ${error instanceof Error ? error.message : String(error)}`, {
-					code: 'API_TOKEN_SOURCE_FAILED',
-					exitCode: ExitCode.InputError,
-					cause: error,
-				})
+				throw sourceFailed(description, error)
 			}
 		},
 	}
@@ -122,7 +131,7 @@ export class ApiCredentialsResolver {
 		if (dsnPassword) {
 			throw tokenSourceConflict('a DSN password')
 		}
-		this.sourceCredentials ??= sourceCredentials(source, this.sourceFactory(source))
+		this.sourceCredentials ??= sourceCredentials(source, this.sourceFactory)
 		return this.sourceCredentials
 	}
 }

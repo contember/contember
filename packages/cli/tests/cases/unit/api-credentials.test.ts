@@ -122,6 +122,17 @@ describe('API credentials resolution', () => {
 		})
 	})
 
+	test('a source that cannot be built becomes a typed CLI error', () => {
+		const resolver = new ApiCredentialsResolver(
+			{ apiTokenSource: 'github-actions', apiTokenAudience: 'contember:test:deploy' },
+			() => {
+				throw new Error('ACTIONS_ID_TOKEN_REQUEST_URL is not set')
+			},
+		)
+
+		expectCliError(() => resolver.resolve(undefined), 'API_TOKEN_SOURCE_FAILED')
+	})
+
 	test('the env project resolves on first access, so a credential conflict fails only the commands that connect', () => {
 		const env: CliEnv = { apiUrl: 'https://api.example.test', projectName: 'blog', apiToken: 'env-token', apiTokenSource: 'kubernetes:/token' }
 		const resolver = new RemoteProjectResolver(env)

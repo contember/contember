@@ -91,6 +91,12 @@ describe('workload identity reconciliation plan', () => {
 		expect(summary(planWorkloadIdentities({ 'web-backend': webBackend }, [explicit]))).toEqual(['unchanged:web-backend'])
 	})
 
+	test('turning on acceptAudienceArray rejects earlier tokens', () => {
+		const plan = planWorkloadIdentities({ 'web-backend': { ...webBackend, acceptAudienceArray: true } }, [stored('web-backend', webBackend)])
+
+		expect(summary(plan)).toEqual(['update:web-backend:bump:apply'])
+	})
+
 	test('a missing trust is created with the whole definition, defaults filled in', () => {
 		const plan = planWorkloadIdentities({ 'web-backend': webBackend }, [])
 		const step = plan.steps[0]

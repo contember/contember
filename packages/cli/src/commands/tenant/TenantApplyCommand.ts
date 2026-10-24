@@ -117,7 +117,7 @@ const renderEnvelopeClosure = (closure: WorkloadEnvelopeClosure | null): string[
 			const variables = Object.entries(target.variables)
 				.map(([name, values]) => `${name}=${values === '*' ? '*' : `[${values.join(', ')}]`}`)
 				.join(', ')
-			const sensitive = target.sensitiveSystemFlags.length > 0 ? `  ! sensitive system flags: ${target.sensitiveSystemFlags.join(', ')}` : ''
+			const sensitive = target.sensitiveSystemFlags.length > 0 ? `  ! sensitive flags: ${target.sensitiveSystemFlags.join(', ')}` : ''
 			return humanText(`    envelope ${entry.project}/${entry.role} -> ${target.role}(${variables})${sensitive}`)
 		})
 	)

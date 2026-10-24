@@ -39,7 +39,7 @@ export interface WorkloadEnvelopeClosureTarget {
 	readonly role: string
 	/** Concrete values, or `'*'` for an unbounded variable. */
 	readonly variables: Readonly<Record<string, readonly string[] | '*'>>
-	/** The target role's sensitive `system` flags (`assumeIdentity`, `history`, `migrate`, `debug`). */
+	/** The target role's sensitive flags: `system.assumeIdentity`, `system.history`, `system.migrate` and the top-level `debug`. */
 	readonly sensitiveSystemFlags: readonly string[]
 }
 

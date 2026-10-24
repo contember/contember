@@ -36,7 +36,16 @@ export interface CanonicalWorkloadTrust {
 }
 
 /** Fields that select *who* the trust admits; changing one (or re-enabling) rejects every earlier token (§10.9). */
-const principalSelectionFields = ['profile', 'issuer', 'audience', 'jwksUri', 'signingAlgs', 'acceptedTyp', 'conditions'] as const
+const principalSelectionFields = [
+	'profile',
+	'issuer',
+	'audience',
+	'jwksUri',
+	'signingAlgs',
+	'acceptedTyp',
+	'acceptAudienceArray',
+	'conditions',
+] as const
 
 export type WorkloadIdentityChange = 'create' | 'update' | 'disable' | 'unchanged'
 

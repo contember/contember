@@ -292,8 +292,8 @@ export class TenantConfigApplier {
 				warn(
 					'WORKLOAD_IDENTITY_SENSITIVE_ROLE',
 					step.slug,
-					`Workload identity ${step.slug}: the envelope of ${target.source} may assume role ${target.role}, which carries system.${
-						target.flags.join(', system.')
+					`Workload identity ${step.slug}: the envelope of ${target.source} may assume role ${target.role}, which carries ${
+						target.flags.map(it => it === 'debug' ? 'debug' : `system.${it}`).join(', ')
 					}.`,
 				)
 			}

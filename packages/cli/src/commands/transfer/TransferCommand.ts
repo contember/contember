@@ -1,6 +1,5 @@
 import { CliError, Command, CommandConfiguration, escapeTerminalText, ExitCode, Input, Output } from '@contember/cli-common'
 import { confirmImport } from './utils.js'
-import { maskToken } from '../../lib/maskToken.js'
 import { createProgressReporter } from '../../lib/transfer/stdio.js'
 import { RemoteProjectResolver } from '../../lib/project/RemoteProjectResolver.js'
 import { DataTransferClient, toDataExportStream } from '../../lib/transfer/DataTransferClient.js'
@@ -96,11 +95,11 @@ export class TransferCommand extends Command<Args, Options> {
 							'',
 							`Source project name: ${escapeTerminalText(it.source.project)}`,
 							`Source API URL: ${escapeTerminalText(it.source.endpoint)}`,
-							`Source token: ${escapeTerminalText(maskToken(sourceProject.token))}`,
+							`Source token: ${escapeTerminalText(sourceProject.credentials.description)}`,
 							'',
 							`Target project name: ${escapeTerminalText(it.target.project)}`,
 							`Target API URL: ${escapeTerminalText(it.target.endpoint)}`,
-							`Target token: ${escapeTerminalText(maskToken(targetProject.token))}`,
+							`Target token: ${escapeTerminalText(targetProject.credentials.description)}`,
 							'',
 							'This would completely wipe the target project.',
 							'No data was transferred.',
@@ -116,11 +115,11 @@ export class TransferCommand extends Command<Args, Options> {
 		output.info('')
 		output.info(`Source project name: ${sourceProject.name}`)
 		output.info(`Source API URL: ${sourceProject.endpoint}`)
-		output.info(`Source token: ${maskToken(sourceProject.token)}`)
+		output.info(`Source token: ${sourceProject.credentials.description}`)
 		output.info('')
 		output.info(`Target project name: ${targetProject.name}`)
 		output.info(`Target API URL: ${targetProject.endpoint}`)
-		output.info(`Target token: ${maskToken(targetProject.token)}`)
+		output.info(`Target token: ${targetProject.credentials.description}`)
 		output.info('')
 		if (!await confirmImport(input, output)) {
 			return ExitCode.InputError

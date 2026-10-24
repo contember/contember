@@ -42,6 +42,18 @@ const schema: DocumentNode = gql`
 
 		identityProviders: [IdentityProvider!]!
 
+		"""
+		Workload identity trusts, enabled and disabled. Requires \`workloadIdentity:list\`
+		(PROJECT_ADMIN by default). \`tenant apply\` diffs the config against this list.
+		"""
+		workloadIdentityTrusts: [WorkloadIdentityTrust!]!
+
+		"""
+		Run the workload token verification (without DPoP and without an auth log write) and report the
+		first failing step. Requires \`workloadIdentity:list\`. The token is neither stored nor logged.
+		"""
+		checkWorkloadIdentityToken(token: String!): WorkloadIdentityTokenCheck!
+
 		mailTemplates: [MailTemplateData!]!
 
 		configuration: Config!
@@ -116,6 +128,15 @@ const schema: DocumentNode = gql`
 		updateIDP(identityProvider: String!, type: String, configuration: Json, options: IDPOptions, mergeConfiguration: Boolean): UpdateIDPResponse
 		disableIDP(identityProvider: String!): DisableIDPResponse
 		enableIDP(identityProvider: String!): EnableIDPResponse
+
+		"""
+		Create or update a workload identity trust in one transaction: the trust, its identity's
+		roles and memberships, and the envelope rules. Requires \`workloadIdentity:add\` or
+		\`workloadIdentity:update\`, and is refused when the caller itself authenticated through a trust.
+		"""
+		applyWorkloadIdentityTrust(slug: String!, trust: WorkloadIdentityTrustInput!): ApplyWorkloadIdentityTrustResponse!
+		""" Disable a trust; re-enable is an apply with \`disabled: false\`. """
+		disableWorkloadIdentityTrust(slug: String!): DisableWorkloadIdentityTrustResponse!
 
 		"""
 		Disconnect one of the authenticated person's own external IdP connections,
@@ -801,6 +822,159 @@ const schema: DocumentNode = gql`
 		idpResponse: Json
 	}
 
+	enum WorkloadIdentityProfile {
+		oidc
+		github_actions
+	}
+
+	type WorkloadIdentityTrust {
+		id: String!
+		slug: String!
+		profile: WorkloadIdentityProfile!
+		issuer: String!
+		audience: String!
+		jwksUri: String
+		signingAlgs: [String!]!
+		""" Accepted JWT \`typ\` header values; \`null\` accepts a token without the header. """
+		acceptedTyp: [String]!
+		acceptAudienceArray: Boolean!
+		requireDpop: Boolean!
+		""" The condition list exactly as applied (see \`WorkloadIdentityTrustInput.conditions\`). """
+		conditions: Json!
+		maxTokenLifetime: Int!
+		trustForwardedInfo: Boolean!
+		description: String
+		disabled: Boolean!
+		tokensValidAfter: DateTime!
+		roles: [String!]!
+		memberships: [WorkloadIdentityTrustMembership!]!
+		identity: Identity!
+		createdAt: DateTime!
+		updatedAt: DateTime!
+	}
+
+	type WorkloadIdentityTrustMembership {
+		project: String!
+		role: String!
+		variables: [VariableEntry!]!
+		""" The envelope rule (\`Acl.MembershipMatchRule\`) bound to this membership, if any. """
+		assumeMembership: Json
+	}
+
+	input WorkloadIdentityTrustInput {
+		profile: WorkloadIdentityProfile!
+		issuer: String!
+		audience: String!
+		"""
+		Non-empty list; each item is \`{ claim: string }\` or \`{ path: string[] }\` plus exactly one of
+		\`equals\`, \`in\`, \`startsWith\`, \`arrayContains\`.
+		"""
+		conditions: Json!
+		jwksUri: String
+		signingAlgs: [String!]
+		acceptedTyp: [String]
+		acceptAudienceArray: Boolean
+		requireDpop: Boolean
+		""" Seconds; defaults to 3600, capped at 86400. """
+		maxTokenLifetime: Int
+		trustForwardedInfo: Boolean
+		description: String
+		roles: [String!]
+		memberships: [WorkloadIdentityTrustMembershipInput!]
+		disabled: Boolean
+	}
+
+	input WorkloadIdentityTrustMembershipInput {
+		project: String!
+		role: String!
+		variables: [VariableEntryInput!]
+		""" Envelope rule in the \`Acl.MembershipMatchRule\` shape. """
+		assumeMembership: Json
+	}
+
+	type ApplyWorkloadIdentityTrustResponse {
+		ok: Boolean!
+		error: ApplyWorkloadIdentityTrustError
+		result: ApplyWorkloadIdentityTrustResult
+	}
+
+	type ApplyWorkloadIdentityTrustResult {
+		trust: WorkloadIdentityTrust!
+		created: Boolean!
+		""" Whether this apply moved \`tokensValidAfter\`, rejecting every earlier token. """
+		tokensValidAfterBumped: Boolean!
+		""" The authorized envelope closure per membership, for the apply plan. """
+		envelopeClosure: Json!
+	}
+
+	type ApplyWorkloadIdentityTrustError {
+		code: ApplyWorkloadIdentityTrustErrorCode!
+		developerMessage: String!
+		""" Per-condition, per-membership or per-rule detail, when the code has any. """
+		details: Json
+	}
+
+	enum ApplyWorkloadIdentityTrustErrorCode {
+		INVALID_DEFINITION
+		INVALID_CONDITIONS
+		ISSUER_NOT_ALLOWED
+		AUDIENCE_IN_USE
+		ROLE_NOT_ALLOWED
+		IMPLICIT_MEMBERSHIP_CONFLICT
+		PROJECT_NOT_FOUND
+		INVALID_MEMBERSHIP
+		INVALID_ENVELOPE
+		ENVELOPE_NOT_AUTHORIZED
+		WORKLOAD_CREDENTIAL_FORBIDDEN
+		CONFLICT
+	}
+
+	type DisableWorkloadIdentityTrustResponse {
+		ok: Boolean!
+		error: DisableWorkloadIdentityTrustError
+	}
+
+	type DisableWorkloadIdentityTrustError {
+		code: DisableWorkloadIdentityTrustErrorCode!
+		developerMessage: String!
+	}
+
+	enum DisableWorkloadIdentityTrustErrorCode {
+		NOT_FOUND
+		WORKLOAD_CREDENTIAL_FORBIDDEN
+	}
+
+	type WorkloadIdentityTokenCheck {
+		ok: Boolean!
+		""" The trust matched by \`(iss, aud)\`, also when a later step failed. """
+		trust: WorkloadIdentityTrust
+		failure: WorkloadIdentityTokenCheckFailure
+		""" The verified claims; only when \`ok\`. """
+		claims: Json
+		requiresDpop: Boolean
+	}
+
+	type WorkloadIdentityTokenCheckFailure {
+		step: WorkloadIdentityTokenCheckStep!
+		message: String!
+		""" For \`condition\`: the index of the first failing condition and the claim's actual value. """
+		conditionIndex: Int
+		actualValue: Json
+	}
+
+	enum WorkloadIdentityTokenCheckStep {
+		malformed
+		trust_not_found
+		jwks
+		signature
+		typ
+		audience
+		profile
+		lifetime
+		tokens_valid_after
+		condition
+	}
+
 	type AddIDPResponse {
 		error: AddIDPError
 		ok: Boolean!
@@ -1111,6 +1285,8 @@ const schema: DocumentNode = gql`
 	}
 
 	enum AddProjectMemberErrorCode {
+		""" The identity belongs to a workload identity trust; change it with \`applyWorkloadIdentityTrust\`. """
+		WORKLOAD_IDENTITY_MANAGED
 		PROJECT_NOT_FOUND
 		IDENTITY_NOT_FOUND
 		ALREADY_MEMBER
@@ -1137,6 +1313,8 @@ const schema: DocumentNode = gql`
 	}
 
 	enum UpdateProjectMemberErrorCode {
+		""" The identity belongs to a workload identity trust; change it with \`applyWorkloadIdentityTrust\`. """
+		WORKLOAD_IDENTITY_MANAGED
 		PROJECT_NOT_FOUND
 		NOT_MEMBER
 		INVALID_MEMBERSHIP
@@ -1161,6 +1339,8 @@ const schema: DocumentNode = gql`
 	}
 
 	enum RemoveProjectMemberErrorCode {
+		""" The identity belongs to a workload identity trust; change it with \`applyWorkloadIdentityTrust\`. """
+		WORKLOAD_IDENTITY_MANAGED
 		NOT_MEMBER
 		PROJECT_NOT_FOUND
 	}
@@ -1240,6 +1420,8 @@ const schema: DocumentNode = gql`
 	}
 
 	enum AddGlobalIdentityRolesErrorCode {
+		""" The identity belongs to a workload identity trust; change it with \`applyWorkloadIdentityTrust\`. """
+		WORKLOAD_IDENTITY_MANAGED
 		IDENTITY_NOT_FOUND
 		INVALID_ROLE
 	}
@@ -1263,6 +1445,8 @@ const schema: DocumentNode = gql`
 	}
 
 	enum RemoveGlobalIdentityRolesErrorCode {
+		""" The identity belongs to a workload identity trust; change it with \`applyWorkloadIdentityTrust\`. """
+		WORKLOAD_IDENTITY_MANAGED
 		IDENTITY_NOT_FOUND
 		INVALID_ROLE
 	}
@@ -1390,9 +1574,19 @@ const schema: DocumentNode = gql`
 
 	# === identity ===
 
+	enum IdentityKind {
+		PERSON
+		API_KEY
+		WORKLOAD
+	}
+
 	type Identity {
 		id: String!
 		description: String
+		""" Always resolved; nullable only so a parent object need not know it up front. """
+		kind: IdentityKind
+		""" The trust this identity belongs to, for a WORKLOAD identity the caller may list trusts for. """
+		workloadIdentityTrust: WorkloadIdentityTrust
 		person: Person
 		apiKey: ApiKey
 		projects: [IdentityProjectRelation!]!
@@ -1427,6 +1621,8 @@ const schema: DocumentNode = gql`
 		canViewConfiguration: Boolean!
 		""" Read \`identityProviders\`. """
 		canListIdentityProviders: Boolean!
+		""" Read \`workloadIdentityTrusts\` and run \`checkWorkloadIdentityToken\`. """
+		canListWorkloadIdentities: Boolean!
 		""" Read \`mailTemplates\`. """
 		canListMailTemplates: Boolean!
 		"""
@@ -1526,6 +1722,7 @@ const schema: DocumentNode = gql`
 	enum MemberType {
 		API_KEY
 		PERSON
+		WORKLOAD
 	}
 
 	type ProjectIdentityRelation {
@@ -2256,6 +2453,8 @@ const schema: DocumentNode = gql`
 		ipAddress: String
 		userAgent: String
 		identityProviderId: String
+		""" The workload identity trust of a \`workload_*\` entry. """
+		workloadIdentityTrustId: String
 		"""
 		JSONB — forensic context. Common keys: \`forwarderIp\`,
 		\`forwarderUserAgent\`, \`sessionId\`, \`reason\`.

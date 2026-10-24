@@ -11,6 +11,7 @@ describe('membership resolver', () => {
 				fetchMemberships(): Promise<readonly Acl.Membership[]> {
 					return Promise.resolve([])
 				},
+				fetchWorkloadAssumeRules: () => Promise.resolve([]),
 			}),
 		)
 		const resolvedMembership = await membershipResolver.resolveMemberships({
@@ -22,6 +23,7 @@ describe('membership resolver', () => {
 			identity: {
 				identityId: 'd4141336-6512-41ef-a25a-374de35a2806',
 				roles: [],
+				credential: { type: 'api_key', id: 'c2a0f1d4-0b5e-4f6a-9d3c-7e8f9a0b1c2d' },
 			},
 			acl: {
 				roles: {
@@ -43,6 +45,7 @@ describe('membership resolver', () => {
 				fetchMemberships(): Promise<readonly Acl.Membership[]> {
 					return Promise.resolve([{ role: 'test', variables: [] }])
 				},
+				fetchWorkloadAssumeRules: () => Promise.resolve([]),
 			}),
 		)
 		const resolvedMembership = await membershipResolver.resolveMemberships({
@@ -54,6 +57,7 @@ describe('membership resolver', () => {
 			identity: {
 				identityId: 'd4141336-6512-41ef-a25a-374de35a2806',
 				roles: [],
+				credential: { type: 'api_key', id: 'c2a0f1d4-0b5e-4f6a-9d3c-7e8f9a0b1c2d' },
 			},
 			acl: {
 				roles: {
@@ -74,6 +78,7 @@ describe('membership resolver', () => {
 				fetchMemberships(): Promise<readonly Acl.Membership[]> {
 					return Promise.resolve([{ role: 'admin', variables: [] }])
 				},
+				fetchWorkloadAssumeRules: () => Promise.resolve([]),
 			}),
 		)
 		const resolvedMembership = await membershipResolver.resolveMemberships({
@@ -88,6 +93,7 @@ describe('membership resolver', () => {
 			identity: {
 				identityId: 'd4141336-6512-41ef-a25a-374de35a2806',
 				roles: [],
+				credential: { type: 'api_key', id: 'c2a0f1d4-0b5e-4f6a-9d3c-7e8f9a0b1c2d' },
 			},
 			acl: {
 				roles: {
@@ -123,6 +129,7 @@ describe('membership resolver', () => {
 				fetchMemberships(): Promise<readonly Acl.Membership[]> {
 					return Promise.resolve([{ role: 'admin', variables: [] }])
 				},
+				fetchWorkloadAssumeRules: () => Promise.resolve([]),
 			}),
 		)
 		const resolvedMembership = await membershipResolver.resolveMemberships({
@@ -141,6 +148,7 @@ describe('membership resolver', () => {
 			identity: {
 				identityId: 'd4141336-6512-41ef-a25a-374de35a2806',
 				roles: [],
+				credential: { type: 'api_key', id: 'c2a0f1d4-0b5e-4f6a-9d3c-7e8f9a0b1c2d' },
 			},
 			acl: {
 				roles: {

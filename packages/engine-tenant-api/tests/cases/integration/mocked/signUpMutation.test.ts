@@ -52,6 +52,48 @@ test('signs up a new user', async () => {
 	})
 })
 
+// The panel's pre-sign-in caller has no api_key row, so there is no one-off key to disable.
+test('signs up a new user with an unpersisted credential without disabling any api key', async () => {
+	const email = 'john@doe.com'
+	const password = 'Ab1Cd23456'
+	const identityId = testUuid(1)
+	const personId = testUuid(2)
+	await executeTenantTest({
+		query: signUpMutation({ email, password }),
+		callerCredential: { type: 'unpersisted' },
+		executes: [
+			getConfigSql(),
+			getPersonByEmailSql({ email, response: null }),
+			...sqlReadCommittedTransaction(
+				createIdentitySql({ identityId, roles: ['person'] }),
+				createPersonSql({ personId, email, password, identityId }),
+			),
+			{
+				sql: SQL`select "id", "description", "roles"  from "tenant"."identity"  where "id" in (?)`,
+				parameters: [testUuid(1)],
+				response: { rows: [{ id: testUuid(1), description: '', roles: ['person'] }] },
+			},
+		],
+		return: {
+			data: {
+				signUp: {
+					ok: true,
+					errors: [],
+					result: {
+						person: {
+							id: personId,
+							identity: {
+								id: identityId,
+								roles: ['person'],
+							},
+						},
+					},
+				},
+			},
+		},
+	})
+})
+
 const signUpWithRolesMutation = (variables: { email: string; password: string; roles: string[] }) => ({
 	query: GQL`mutation($email: String!, $password: String!, $roles: [String!]) {
 		signUp(email: $email, password: $password, roles: $roles) {

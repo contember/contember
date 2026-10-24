@@ -1,0 +1,74 @@
+---
+title: CLI
+description: Run the Contember CLI with a workload identity token and diagnose rejected tokens.
+---
+
+The [Contember CLI](/reference/cli) can obtain its token from a workload identity source instead of `CONTEMBER_API_TOKEN` or the DSN password, so a pipeline needs no stored Contember secret.
+
+:::note[Available since 2.2]
+:::
+
+## Token sources
+
+| Variable | Meaning |
+| --- | --- |
+| `CONTEMBER_API_TOKEN_SOURCE` | `github-actions`, or `kubernetes:<path>` for a projected token file. |
+| `CONTEMBER_API_TOKEN_AUDIENCE` | The trust's audience. Required for `github-actions`; ignored for `kubernetes:`, where the audience is set in the pod spec. |
+
+A token source replaces `CONTEMBER_API_TOKEN` and the DSN password — setting either of them together with a source is an error. The DSN keeps the project and the endpoint and drops the password:
+
+```yaml title=".github/workflows/deploy.yml"
+- run: npx contember deploy --yes
+  env:
+    CONTEMBER_DSN: contember://website@api.example.com   # no password
+    CONTEMBER_API_TOKEN_SOURCE: github-actions
+    CONTEMBER_API_TOKEN_AUDIENCE: contember:my-instance:deploy
+```
+
+The job needs `permissions: id-token: write`. See the [GitHub Actions](/guides/workload-identity/github-actions#running-the-cli) and [Kubernetes](/guides/workload-identity/kubernetes#4-use-the-token) guides for the matching trusts.
+
+| Error code | Cause |
+| --- | --- |
+| `API_TOKEN_SOURCE_CONFLICT` | `CONTEMBER_API_TOKEN_SOURCE` is set together with `CONTEMBER_API_TOKEN` or a DSN password. |
+| `API_TOKEN_AUDIENCE_MISSING` | `github-actions` without `CONTEMBER_API_TOKEN_AUDIENCE`. |
+| `API_TOKEN_SOURCE_INVALID` | Neither `github-actions` nor `kubernetes:<path>`. |
+| `API_TOKEN_SOURCE_FAILED` | The source could not produce a token: the GitHub OIDC token request failed, or the token file is missing, empty or not a JWT. |
+| `CONTENT_MIGRATION_REQUIRES_API_TOKEN` | A migration to execute is a content migration factory. Factories receive a plain token, which a token source does not have; run such migrations with `CONTEMBER_API_TOKEN`. |
+
+All of them exit with code `1`.
+
+Every request the CLI sends — tenant, system, migrations, actions, project resolution, data export, import and transfer — authenticates right before it is sent. A long `data transfer` made of many requests therefore picks up fresh tokens as they rotate. A request rejected with `401` is retried once with a fresh token, except a streamed import body, which cannot be replayed: a rejected import fails with `TRANSFER_IMPORT_UNAUTHORIZED`.
+
+For an issuer without a built-in source, such as [GitLab CI](/guides/workload-identity/gitlab-ci#running-the-cli), pass the JWT as `CONTEMBER_API_TOKEN`. It is then used as is, without refresh.
+
+## Running `tenant apply` with a workload identity
+
+A pipeline authenticated by a trust can run `tenant apply` for identity providers, mail templates, policies and the rest of the config. It cannot create, change or disable trusts: the `workloadIdentities` block must be applied with a person or API-key credential. Because the CLI sends no mutation for unchanged trusts, such a run fails only when the block changed. It fails with `WORKLOAD_CREDENTIAL_FORBIDDEN` (exit code `6`) and names the changed trusts in the message and in `details.trusts`. Reading the current trusts still needs `workloadIdentity:list`, so the trust must hold `project_admin` or `super_admin` whenever the config has a `workloadIdentities` block.
+
+## Envelope coverage warning
+
+`contember deploy` and `contember migrations execute` compare the trusts' [envelope rules](/guides/workload-identity/assume-membership) with the schema they are about to deploy. A rule whose target role gains an `entity` or `condition` variable the rule does not name — or whose role disappears — is listed as a warning before the migrations run; requests assuming that role would get `403` afterwards. The check needs `workloadIdentity:list`; without it the CLI says it was skipped. It never fails the deploy, and it runs only when there are migrations to execute.
+
+With `--json`, both commands report it in `envelopeCoverage`:
+
+| Value | Meaning |
+| --- | --- |
+| `null` | No migration step ran the check. |
+| `{ "status": "skipped", "reason": … }` | The trusts could not be listed. |
+| `{ "status": "checked", "issues": [...] }` | Each issue has `trust`, `project`, `membershipRole` (the membership the rule is bound to), `targetRole` and `kind`: `role-missing`, or `variables-uncovered` with the missing `variables`. |
+
+## Checking a token
+
+Every rejected workload token gets the same `401`, by design. To find out why, check the token with an admin credential:
+
+```bash
+echo "$TOKEN" | contember workload-identity check --token-stdin
+```
+
+The command runs the verification without writing to the audit log and prints the matched trust and either the verified claims and whether the trust requires DPoP, or the first failing step — for a condition, its index and the claim's actual value. The token is read from stdin only, so it does not end up in shell history or process listings, and it is never printed. It requires `workloadIdentity:list`.
+
+It exits with `0` when the token is accepted and with `6` when it is rejected. `--quiet` prints `ok` or the failing step. `--json` prints `ok`, `trust` (`slug`, `profile`, `issuer`, `audience`, `disabled`), `failure` (`step`, `message`, `conditionIndex`, `actualValue`), `claims` and `requiresDpop`.
+
+The same check is available as the [`checkWorkloadIdentityToken`](/reference/engine/tenant/workload-identities#checking-a-token) query and as a form on the panel's Configuration page.
+
+To get a token for checking from a GitHub Actions run, request it as in the [workflow example](/guides/workload-identity/github-actions#3-request-and-use-the-token-in-one-step) and pipe it to the check in the same step, using an admin DSN stored as a secret. Do not print it.

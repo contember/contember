@@ -3,7 +3,8 @@ import { TenantResolverContext } from '../../TenantResolverContext.js'
 import { MembershipValidator, PermissionActions, ProjectManager, ProjectMemberManager } from '../../../model/index.js'
 import { createMembershipValidationErrorResult } from '../../membershipUtils.js'
 import { createErrorResponse, createProjectNotFoundResponse } from '../../errorUtils.js'
-import { logProjectMembershipChange } from './audit.js'
+import { logProjectMembershipChange, workloadIdentityManagedMessage } from './audit.js'
+import { isWorkloadIdentity } from '../../../model/queries/workloadIdentity/IdentityKindQuery.js'
 
 export class AddProjectMemberMutationResolver implements MutationResolvers {
 	constructor(
@@ -25,6 +26,9 @@ export class AddProjectMemberMutationResolver implements MutationResolvers {
 		})
 		if (!project) {
 			return createProjectNotFoundResponse('PROJECT_NOT_FOUND', projectSlug)
+		}
+		if (await isWorkloadIdentity(context.db, identityId)) {
+			return createErrorResponse('WORKLOAD_IDENTITY_MANAGED', workloadIdentityManagedMessage(identityId))
 		}
 		const validationResult = await this.membershipValidator.validate(project.slug, memberships)
 		if (validationResult.length > 0) {

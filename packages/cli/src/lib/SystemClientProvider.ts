@@ -1,23 +1,23 @@
 import { RemoteProjectProvider } from './project/RemoteProjectProvider.js'
 import { SystemClient } from '@contember/migrations-client'
-import { GraphQlClient, GraphQlClientError } from '@contember/graphql-client'
+import { CredentialsProvider, GraphQlClient, GraphQlClientError } from '@contember/graphql-client'
 import { toTransportError, TransportErrorContext } from './errors/TransportError.js'
 
-type SystemClientFactory = (baseUrl: string, projectName: string, apiToken: string) => SystemClient
+type SystemClientFactory = (apiUrl: string, credentials: CredentialsProvider) => SystemClient
+
+const createSystemClient: SystemClientFactory = (url, credentials) => new SystemClient(new GraphQlClient({ url, credentials }))
 
 export class SystemClientProvider {
 	constructor(
 		private readonly remoteProjectProvider: RemoteProjectProvider,
-		private readonly systemClientFactory: SystemClientFactory = SystemClient.create,
+		private readonly systemClientFactory: SystemClientFactory = createSystemClient,
 	) {
 	}
 
 	public get(): SystemClient {
 		const project = this.remoteProjectProvider.get()
-		return new TransportSystemClient(
-			this.systemClientFactory(project.endpoint, project.name, project.token),
-			createSystemApiUrl(project.endpoint, project.name),
-		)
+		const apiUrl = createSystemApiUrl(project.endpoint, project.name)
+		return new TransportSystemClient(this.systemClientFactory(apiUrl, project.credentials), apiUrl)
 	}
 }
 

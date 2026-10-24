@@ -5,6 +5,8 @@ import {
 	ProjectSchemaResolver as ProjectSchemaResolverInterface,
 	TenantContainer,
 	TenantContainerFactory,
+	WorkloadIdentityMetrics,
+	WorkloadJwksRegistry,
 } from '@contember/engine-tenant-api'
 import { TenantConfig } from '../config/config.js'
 import {
@@ -75,6 +77,9 @@ export class ProjectGroupContainerFactory {
 		private readonly tenantGraphQLHandlerFactory: TenantGraphQLHandlerFactory,
 		private readonly systemGraphQLHandlerFactory: SystemGraphQLHandlerFactory,
 		private readonly logger: Logger,
+		private readonly trustedProxies: readonly string[],
+		/** Process-wide: one key cache and one metrics sink for every project group. */
+		private readonly workloadIdentity: { readonly jwksRegistry: WorkloadJwksRegistry; readonly metrics: WorkloadIdentityMetrics },
 		/** A03: configured trusted geo-country header name, or undefined when off. */
 		private readonly geoCountryHeader?: string,
 	) {}
@@ -130,6 +135,7 @@ export class ProjectGroupContainerFactory {
 							encrypt: cryptoWrapper.encrypt.bind(cryptoWrapper),
 							encryptionEnabled: cryptoWrapper.enabled,
 						},
+						workloadIdentity: this.workloadIdentity,
 					})
 				},
 			)
@@ -160,12 +166,22 @@ export class ProjectGroupContainerFactory {
 			.addService(
 				'authenticator',
 				({ tenantDatabase, tenantReadDatabase, tenantContainer }) =>
-					new Authenticator(tenantDatabase, tenantReadDatabase, tenantContainer.apiKeyManager, this.geoCountryHeader),
+					new Authenticator(
+						tenantDatabase,
+						tenantReadDatabase,
+						tenantContainer.apiKeyManager,
+						tenantContainer.workloadTokenVerifier,
+						this.trustedProxies,
+						this.geoCountryHeader,
+					),
 			)
 			.addService(
 				'projectMembershipResolver',
-				({ tenantProjectMemberManager, tenantReadDatabase }) =>
-					new ProjectMembershipResolver(this.debug, new ProjectMembershipFetcher(tenantProjectMemberManager, tenantReadDatabase)),
+				({ tenantProjectMemberManager, tenantReadDatabase, tenantContainer }) =>
+					new ProjectMembershipResolver(
+						this.debug,
+						new ProjectMembershipFetcher(tenantProjectMemberManager, tenantContainer.workloadIdentityManager, tenantReadDatabase),
+					),
 			)
 			.build()
 			.pick(

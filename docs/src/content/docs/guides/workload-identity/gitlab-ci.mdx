@@ -1,0 +1,80 @@
+---
+title: GitLab CI
+description: Call Contember from GitLab CI jobs with the job's ID token.
+---
+
+GitLab CI jobs can request OIDC ID tokens with a custom audience. A trust with the generic `oidc` profile accepts them.
+
+:::note[Available since 2.2]
+:::
+
+## 1. Declare the trust
+
+```ts title="tenant.config.ts"
+workloadIdentities: {
+  'gitlab-sync': {
+    profile: 'oidc',
+    issuer: 'https://gitlab.com',
+    audience: 'contember:my-instance:gitlab-sync',
+    conditions: [
+      { claim: 'sub', equals: 'project_path:my-group/sites:ref_type:branch:ref:main' },
+      { claim: 'project_id', equals: '4242' },
+      { claim: 'namespace_id', equals: '1717' },
+      { claim: 'ref_protected', equals: 'true' },
+    ],
+    memberships: [{ project: 'sites', role: 'sync' }],
+    maxTokenLifetime: 3600,
+  },
+},
+```
+
+| Condition | Why |
+|---|---|
+| `sub` | Required by the `oidc` profile. GitLab's default is `project_path:<group>/<project>:ref_type:<type>:ref:<ref>`; a project can switch to an id-based `sub`. |
+| `project_id`, `namespace_id` | Immutable; paths in `sub` follow renames and transfers. |
+| `ref_protected` or `environment_protected` | Limits the trust to protected branches or protected environments, so a feature branch cannot authenticate. |
+
+GitLab sends ids and the `*_protected` flags as **strings** (`"4242"`, `"true"`). The `oidc` profile does not know GitLab's claim types, so apply cannot catch `equals: 4242` or `equals: true` — such a condition simply never matches. The [token check](/guides/workload-identity/cli#checking-a-token) shows the claim's actual value.
+
+For a self-managed GitLab, the issuer is the instance URL, for example `https://gitlab.example.com`.
+
+## 2. Request the token in the job
+
+```yaml title=".gitlab-ci.yml"
+sync:
+  id_tokens:
+    CONTEMBER_ID_TOKEN:
+      aud: contember:my-instance:gitlab-sync
+  script:
+    - |
+      curl -sf https://api.example.com/content/sites/live \
+        -H "Authorization: Bearer $CONTEMBER_ID_TOKEN" \
+        -H 'Content-Type: application/json' \
+        -d @query.json
+  rules:
+    - if: $CI_COMMIT_BRANCH == "main"
+```
+
+GitLab exposes the token as a job variable named after the `id_tokens` key. Do not write it to files or artifacts, and do not pass it on to other jobs.
+
+## Token lifetime
+
+GitLab sets the token's expiry to the job's timeout, or to 5 minutes when no timeout is set. `maxTokenLifetime` must be at least that, or every token fails the lifetime check — for a job with the default one-hour timeout, `3600`.
+
+## Running the CLI
+
+The CLI has no built-in GitLab token source. The ID token is a plain bearer token, so pass it as the API token; it stays valid for the whole job:
+
+```yaml title=".gitlab-ci.yml"
+deploy:
+  id_tokens:
+    CONTEMBER_ID_TOKEN:
+      aud: contember:my-instance:gitlab-deploy
+  variables:
+    CONTEMBER_API_URL: https://api.example.com
+    CONTEMBER_PROJECT_NAME: website
+  script:
+    - CONTEMBER_API_TOKEN="$CONTEMBER_ID_TOKEN" npx contember deploy --yes
+```
+
+The trust `gitlab-deploy` would carry only `roles: ['entrypoint_deployer']`. See [CLI](/guides/workload-identity/cli).

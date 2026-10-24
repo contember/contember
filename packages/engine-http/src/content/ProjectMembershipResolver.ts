@@ -1,9 +1,9 @@
-import { MembershipMatcher } from '@contember/engine-tenant-api'
+import { AuthCredential, MembershipMatcher, MembershipWithSubMembershipMatchRules } from '@contember/engine-tenant-api'
 import * as Typesafe from '@contember/typesafe'
 import { Acl } from '@contember/schema'
 import { HttpErrorResponse } from '../common/index.js'
 import { ProjectMembershipFetcher } from './ProjectMembershipFetcher.js'
-import { MembershipResolver, ParsedMembership } from '@contember/schema-utils'
+import { getRoleVariables, MembershipResolver, ParsedMembership } from '@contember/schema-utils'
 
 const assumeMembershipHeader = 'x-contember-assume-membership'
 
@@ -23,7 +23,7 @@ export class ProjectMembershipResolver {
 		acl: Acl.Schema
 		request: HttpRequest
 		projectSlug: string
-		identity: { identityId: string; personId?: string; roles?: readonly string[] }
+		identity: { identityId: string; personId?: string; roles?: readonly string[]; credential: AuthCredential }
 	}): Promise<{ effective: readonly ParsedMembership[]; fetched: readonly Acl.Membership[] }> {
 		const explicitMemberships = await this.projectMembershipFetcher.fetchMemberships(projectSlug, {
 			id: identity.identityId,
@@ -51,6 +51,10 @@ export class ProjectMembershipResolver {
 				throwNotAllowed()
 			}
 
+			// §7a: the envelope answers first, so any assumption it does not cover is a 403, whatever else is wrong with it.
+			if (identity.credential.type === 'workload_trust') {
+				await this.verifyWorkloadAssumedRoles(identity.credential.trustId, projectSlug, acl, assumedMemberships)
+			}
 			const parsedMemberships = membershipResolver.resolve(acl, assumedMemberships, identity, true)
 			if (parsedMemberships.errors.length > 0) {
 				throw new HttpErrorResponse(
@@ -59,7 +63,9 @@ export class ProjectMembershipResolver {
 						+ parsedMemberships.errors.map(it => JSON.stringify(it)).join('\n'),
 				)
 			}
-			this.verifyAssumedRoles(explicitMemberships, acl, assumedMemberships)
+			if (identity.credential.type !== 'workload_trust') {
+				this.verifyAssumedRoles(explicitMemberships, acl, assumedMemberships)
+			}
 
 			return { effective: parsedMemberships.memberships, fetched: explicitMemberships }
 		}
@@ -98,17 +104,84 @@ export class ProjectMembershipResolver {
 	}
 
 	private verifyAssumedRoles(explicitMemberships: readonly Acl.Membership[], acl: Acl.Schema, assumedMemberships: readonly Acl.Membership[]) {
-		const membershipMatcher = new MembershipMatcher(explicitMemberships.map(it => ({
-			...it,
-			matchRule: acl.roles[it.role].content?.assumeMembership ?? {},
-		})))
+		const membershipMatcher = new MembershipMatcher(explicitMemberships.flatMap(it => {
+			const role = findRole(acl, it.role)
+			return role ? [{ ...it, matchRule: role.content?.assumeMembership ?? {} }] : []
+		}))
 
 		for (const assumed of assumedMemberships) {
 			if (!membershipMatcher.matches(assumed)) {
-				throw new HttpErrorResponse(403, `You are not allow to assume membership ${JSON.stringify(assumed)}`)
+				throw createAssumeForbiddenError(assumed)
 			}
 		}
 	}
+
+	/**
+	 * §7a: the trust's envelope is the only assumption authority. Each source membership carries only its own rule,
+	 * and the matching rule must cover every non-predefined variable of the assumed role with caller-supplied values.
+	 */
+	private async verifyWorkloadAssumedRoles(trustId: string, projectSlug: string, acl: Acl.Schema, assumedMemberships: readonly Acl.Membership[]) {
+		const rules = await this.projectMembershipFetcher.fetchWorkloadAssumeRules(projectSlug, trustId)
+		const sources: MembershipWithSubMembershipMatchRules[] = rules
+			.filter(it => findRole(acl, it.membership.role) !== undefined)
+			.map(it => ({ ...it.membership, matchRule: it.rule }))
+
+		for (const assumed of assumedMemberships) {
+			const allowed = sources.some(source => new MembershipMatcher([source]).matches(assumed) && coversRoleVariables(source.matchRule, assumed, acl))
+			if (!allowed) {
+				throw createAssumeForbiddenError(assumed)
+			}
+		}
+	}
+}
+
+const findRole = (acl: Acl.Schema, role: string): Acl.RolePermissions | undefined =>
+	Object.prototype.hasOwnProperty.call(acl.roles, role) ? acl.roles[role] : undefined
+
+const createAssumeForbiddenError = (assumed: Acl.Membership) =>
+	new HttpErrorResponse(403, `You are not allow to assume membership ${JSON.stringify(assumed)}`)
+
+/** The variables a rule names for a target role: `true` names every variable (unbounded), `undefined` none. */
+const getNamedVariables = (
+	matchRule: Acl.MembershipMatchRule,
+	role: string,
+): true | Readonly<Record<string, Acl.MembershipVariableMatchRule>> | undefined => {
+	if (matchRule === true) {
+		return true
+	}
+	if (matchRule === false || !Object.prototype.hasOwnProperty.call(matchRule, role)) {
+		return undefined
+	}
+	const roleRule = matchRule[role]
+	if (roleRule === true || roleRule.variables === true) {
+		return true
+	}
+	return roleRule.variables ?? {}
+}
+
+/**
+ * Without this, an omitted variable passes the matcher vacuously and the schema fallback widens it, also for a
+ * variable added to the role after the rule was written. Predefined variables always derive from the trust identity.
+ */
+const coversRoleVariables = (matchRule: Acl.MembershipMatchRule, assumed: Acl.Membership, acl: Acl.Schema): boolean => {
+	const namedVariables = getNamedVariables(matchRule, assumed.role)
+	if (namedVariables === undefined) {
+		return false
+	}
+	for (const [name, variable] of Object.entries(getRoleVariables(assumed.role, acl))) {
+		const supplied = assumed.variables.find(it => it.name === name)
+		if (variable.type === Acl.VariableType.predefined) {
+			if (supplied !== undefined) {
+				return false
+			}
+			continue
+		}
+		const named = namedVariables === true || (Object.prototype.hasOwnProperty.call(namedVariables, name) && !!namedVariables[name])
+		if (!named || supplied === undefined || supplied.values.length === 0) {
+			return false
+		}
+	}
+	return true
 }
 
 const assumeMembershipValueType = Typesafe.object({

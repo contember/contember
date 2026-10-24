@@ -74,4 +74,5 @@ const errorToField: Record<UpdateProjectMemberErrorCode, keyof UpdateProjectMemb
 	VARIABLE_EMPTY: 'memberships',
 	VARIABLE_NOT_FOUND: 'memberships',
 	NOT_MEMBER: undefined,
+	WORKLOAD_IDENTITY_MANAGED: undefined,
 }

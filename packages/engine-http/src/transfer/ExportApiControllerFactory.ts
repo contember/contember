@@ -55,6 +55,7 @@ export class ExportApiControllerFactory {
 						identity: {
 							identityId: authResult.identityId,
 							roles: authResult.roles,
+							credential: authResult.credential,
 						},
 					}))
 

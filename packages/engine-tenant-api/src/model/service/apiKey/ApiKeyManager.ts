@@ -148,7 +148,7 @@ export class ApiKeyManager {
 		return new ResponseOk(
 			new VerifyResult(
 				apiKeyRow.identity_id,
-				apiKeyRow.id,
+				{ type: 'api_key', id: apiKeyRow.id },
 				apiKeyRow.roles,
 				apiKeyRow.person_id,
 				apiKeyRow.trust_forwarded_info,
@@ -320,12 +320,19 @@ type FetchedApiKey = {
 
 export type VerifyResponse = Response<VerifyResult, VerifyErrorCode>
 
+/** What authenticated the request. Only an `api_key` credential has a row that sign-out or session listing can act on. */
+export type AuthCredential =
+	| { readonly type: 'api_key'; readonly id: string }
+	| { readonly type: 'unpersisted' }
+	/** A JWT admitted by a workload identity trust; `tokenRef` is its `jti`, or `sha256:` + the token hash. */
+	| { readonly type: 'workload_trust'; readonly trustId: string; readonly trustSlug: string; readonly tokenRef: string }
+
 export class VerifyResult {
 	readonly valid = true
 
 	constructor(
 		public readonly identityId: string,
-		public readonly apiKeyId: string,
+		public readonly credential: AuthCredential,
 		public readonly roles: string[],
 		public readonly personId: string | null,
 		public readonly trustForwardedInfo: boolean = false,

@@ -10,6 +10,7 @@ import { TenantMemberUpdateCommand } from '../../../src/commands/tenant/member/T
 import { RemoteProject } from '../../../src/lib/project/RemoteProject.js'
 import { RemoteProjectProvider } from '../../../src/lib/project/RemoteProjectProvider.js'
 import { TenantClientProvider } from '../../../src/lib/TenantClientProvider.js'
+import { staticTokenCredentials } from '../../../src/lib/credentials/ApiCredentials.js'
 
 interface CapturedRequest {
 	query: string
@@ -46,7 +47,7 @@ beforeEach(() => {
 
 const clientProvider = (): TenantClientProvider => {
 	const remoteProjectProvider = new RemoteProjectProvider()
-	remoteProjectProvider.setRemoteProject(new RemoteProject('blog', API_URL, 'token'))
+	remoteProjectProvider.setRemoteProject(new RemoteProject('blog', API_URL, staticTokenCredentials('token')))
 	return new TenantClientProvider(remoteProjectProvider)
 }
 

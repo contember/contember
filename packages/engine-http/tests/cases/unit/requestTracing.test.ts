@@ -30,7 +30,8 @@ const createTestApplication = () => {
 	const tracer = createTracer({ processor })
 	const logger = createLogger(new TestLoggerHandler())
 	const authenticator = createMock<Authenticator>({
-		authenticate: async ({ timer }) => await timer('Auth', async () => new VerifyResult('identity', 'api-key', ['member'], null)),
+		authenticate: async ({ timer }) =>
+			await timer('Auth', async () => new VerifyResult('identity', { type: 'api_key', id: 'api-key' }, ['member'], null)),
 	})
 	const groupContainer: ProjectGroupContainer = {
 		slug: 'group',

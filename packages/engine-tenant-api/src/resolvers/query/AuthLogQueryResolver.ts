@@ -57,6 +57,7 @@ export class AuthLogQueryResolver implements Pick<QueryResolvers, 'authLog'> {
 				identityProviderId: row.identity_provider_id,
 				metadata: row.metadata,
 				eventData: row.event_data,
+				workloadIdentityTrustId: row.trust_id,
 			})),
 		}
 	}

@@ -1,0 +1,62 @@
+---
+title: Vercel
+description: Call Contember from Vercel functions with the deployment's OIDC token.
+---
+
+Vercel issues an OIDC token to builds and functions of a project that has OIDC federation enabled. A trust with the generic `oidc` profile accepts it.
+
+:::note[Available since 2.2]
+:::
+
+## 1. Declare the trust
+
+Use Vercel's **team** issuer mode (in the project's OIDC federation settings), which gives each team its own issuer, `https://oidc.vercel.com/<team>`. The global mode issuer `https://oidc.vercel.com` works too, but is shared by every Vercel team, so the conditions alone separate you from them:
+
+```ts title="tenant.config.ts"
+workloadIdentities: {
+  'vercel-web': {
+    profile: 'oidc',
+    issuer: 'https://oidc.vercel.com/acme',
+    audience: 'contember:my-instance:vercel-web',
+    conditions: [
+      { claim: 'sub', equals: 'owner:acme:project:website:environment:production' },
+      { claim: 'owner_id', equals: 'team_7Gw5ZMzpQA8h90F832KGp7nwbuh3' },
+      { claim: 'project_id', equals: 'prj_7Gw5ZMBpQA8h9GF832KGp7nwbuh3' },
+    ],
+    memberships: [{ project: 'website', role: 'reader' }],
+    maxTokenLifetime: 7200,
+  },
+},
+```
+
+| Condition | Why |
+|---|---|
+| `sub` | Required by the `oidc` profile: `owner:<team>:project:<project>:environment:<environment>`. Pinning the environment keeps preview deployments — which run code from any branch — out of a production trust. |
+| `owner_id`, `project_id` | Immutable ids. Team and project names in `sub` change when you rename them; update `sub` then, or the trust stops matching. |
+
+Vercel's function tokens for `preview` and `production` live two hours, so `maxTokenLifetime` must be at least `7200`. `development` tokens live 12 hours; give local development its own trust if you need it, rather than raising the production limit. Vercel tokens carry no `jti`; the audit log deduplicates them by token hash.
+
+## 2. Use the token
+
+Request the token with the trust's audience. `@vercel/oidc` reads it from the current request, so fetch it per request and do not cache it — a small custom credentials provider does exactly that:
+
+```ts title="contember.ts"
+import { GraphQlClient } from '@contember/graphql-client'
+import type { CredentialsProvider } from '@contember/workload-identity'
+import { getVercelOidcToken } from '@vercel/oidc'
+
+const vercelOidc: CredentialsProvider = {
+  authenticate: async () => ({
+    Authorization: `Bearer ${await getVercelOidcToken({ audience: 'contember:my-instance:vercel-web' })}`,
+  }),
+}
+
+export const client = new GraphQlClient({
+  url: 'https://api.example.com/content/website/live',
+  credentials: vercelOidc,
+})
+```
+
+Call the client inside a request handler, not at module level: in Vercel functions the token is only available while a request is being handled.
+
+Vercel cannot bind its tokens for DPoP, so `requireDpop` cannot be used with this issuer.

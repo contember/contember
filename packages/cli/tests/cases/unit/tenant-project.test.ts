@@ -12,6 +12,7 @@ import { TenantProjectSecretSetCommand } from '../../../src/commands/tenant/proj
 import { TenantProjectShowCommand } from '../../../src/commands/tenant/project/TenantProjectShowCommand.js'
 import { TenantProjectUpdateCommand } from '../../../src/commands/tenant/project/TenantProjectUpdateCommand.js'
 import { TenantWhoAmICommand } from '../../../src/commands/tenant/project/TenantWhoAmICommand.js'
+import { staticTokenCredentials } from '../../../src/lib/credentials/ApiCredentials.js'
 
 const API_URL = 'http://tenant.test'
 const GENERATED_TOKEN = 'a'.repeat(40)
@@ -51,7 +52,7 @@ beforeEach(() => {
 
 const createTenantClientProvider = (): TenantClientProvider => {
 	const remoteProjectProvider = new RemoteProjectProvider()
-	remoteProjectProvider.setRemoteProject(new RemoteProject('blog', API_URL, 'token'))
+	remoteProjectProvider.setRemoteProject(new RemoteProject('blog', API_URL, staticTokenCredentials('token')))
 	return new TenantClientProvider(remoteProjectProvider)
 }
 

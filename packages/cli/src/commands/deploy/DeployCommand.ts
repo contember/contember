@@ -1,5 +1,4 @@
 import { CliError, Command, CommandConfiguration, escapeTerminalText, ExitCode, Input, Output } from '@contember/cli-common'
-import { maskToken } from '../../lib/maskToken.js'
 import { MigrationExecutionFacade } from '../../lib/migrations/MigrationExecutionFacade.js'
 import { AdminDeployer } from '../../lib/admin/AdminDeployer.js'
 import { FileSystem } from '../../lib/fs/FileSystem.js'
@@ -8,6 +7,7 @@ import { Workspace } from '../../lib/workspace/Workspace.js'
 import { RemoteProjectProvider } from '../../lib/project/RemoteProjectProvider.js'
 import { RemoteProjectResolver } from '../../lib/project/RemoteProjectResolver.js'
 import { promptConfirm } from '../../lib/prompt/index.js'
+import type { EnvelopeCoverageResult } from '../../lib/tenant/workloadIdentity/envelopeCoverage.js'
 
 type Args = {
 	dsn?: string
@@ -29,6 +29,8 @@ export interface DeployResult {
 	adminUrl: string | null
 	migrationsDeployed: boolean
 	adminDeployed: boolean
+	/** Workload envelope rules the deployed schema leaves uncovered; `null` when no migration step ran the check. */
+	envelopeCoverage: EnvelopeCoverageResult | null
 }
 
 export class DeployCommand extends Command<Args, Options> {
@@ -85,7 +87,7 @@ export class DeployCommand extends Command<Args, Options> {
 		output.info(`Target project name: ${remoteProject.name}`)
 		output.info(`API URL: ${remoteProject.endpoint}`)
 		output.info(`Admin URL: ${remoteProject.adminEndpoint ?? 'none'}`)
-		output.info(`Deploy token: ${maskToken(remoteProject.token)}`)
+		output.info(`Deploy token: ${remoteProject.credentials.description}`)
 		output.info('')
 
 		if (deployAdmin && !(await this.fs.pathExists(`${projectAdminDistDir}/index.html`))) {
@@ -98,6 +100,7 @@ export class DeployCommand extends Command<Args, Options> {
 
 		let migrationsConfirmed = false
 		let migrationsDeployed = false
+		let envelopeCoverage: EnvelopeCoverageResult | null = null
 		if (deployMigration) {
 			migrationsDeployed = await this.migrationExecutionFacade.execute({
 				force: false,
@@ -106,6 +109,9 @@ export class DeployCommand extends Command<Args, Options> {
 				useSnapshot: input.getOption('snapshot') === true,
 				onConfirmed: () => {
 					migrationsConfirmed = true
+				},
+				onEnvelopeCoverage: result => {
+					envelopeCoverage = result
 				},
 			})
 		}
@@ -142,6 +148,7 @@ export class DeployCommand extends Command<Args, Options> {
 			adminUrl: remoteProject.adminEndpoint ?? null,
 			migrationsDeployed,
 			adminDeployed,
+			envelopeCoverage,
 		}
 		output.data(
 			deployResult,

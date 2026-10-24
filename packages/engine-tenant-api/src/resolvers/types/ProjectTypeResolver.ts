@@ -56,6 +56,9 @@ export class ProjectTypeResolver implements ProjectResolvers {
 		if (args.input?.filter?.personId && args.input.filter.memberType === 'API_KEY') {
 			throw new UserInputError(`Cannot use personId  filter for ApiKey member type.`)
 		}
+		if ((args.input?.filter?.email || args.input?.filter?.personId) && args.input.filter.memberType === 'WORKLOAD') {
+			throw new UserInputError(`Cannot use email or personId filter for Workload member type.`)
+		}
 		if (args.memberType && args.input) {
 			throw new UserInputError(`Cannot use both deprecated memberType parameter and new input parameter`)
 		}

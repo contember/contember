@@ -56,7 +56,7 @@ By default `aud` must be a string or a single-element array equal to the trust's
 
 ## Who can change trusts
 
-Trusts carry real permissions, so changing them is an administrative act: `PROJECT_ADMIN` or `SUPER_ADMIN`, with tenant roles limited like `createGlobalApiKey` — for the roles a trust already holds as well as the new ones — and every membership and envelope authorized like `addProjectMember`. A caller authenticated by a workload trust cannot change trusts at all, so a compromised workflow cannot create a new trust for itself or disable everyone else's. Every apply and disable is recorded in the audit log.
+Trusts carry real permissions, so changing them is an administrative act: `PROJECT_ADMIN` or `SUPER_ADMIN`, with tenant roles limited like `createGlobalApiKey` — for the roles a trust already holds as well as the new ones — and every membership and envelope authorized like `addProjectMember`. A caller authenticated by a workload trust cannot apply or disable trusts directly. This is not a privilege boundary: a trust that holds `PROJECT_ADMIN` can still call `createGlobalApiKey` or `addGlobalIdentityRoles` like any other caller with that role, and change trusts with the resulting credential. A pipeline with provisioning rights is as powerful as an API key with the same roles, so give each trust the narrowest role its job needs (for a deploy, `entrypoint_deployer` rather than `PROJECT_ADMIN`). Every apply and disable is recorded in the audit log.
 
 ## Diagnosing a rejected token
 

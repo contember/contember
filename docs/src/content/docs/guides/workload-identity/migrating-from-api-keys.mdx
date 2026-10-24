@@ -1,0 +1,83 @@
+---
+title: Migrating from API keys
+description: Replace a permanent API key with a workload identity trust without downtime.
+---
+
+A trust can replace a permanent [API key](/reference/engine/tenant/api-keys) one caller at a time. Both work side by side, so the switch needs no downtime.
+
+:::note[Available since 2.2]
+:::
+
+## 1. Write down what the key may do
+
+```bash
+contember tenant api-key list --project website
+```
+
+Note the key's memberships with their variables, its global roles (for a global key), and whether it has `trustForwardedInfo`.
+
+## 2. Declare an equivalent trust
+
+Pick the issuer for the caller — its [own](/guides/workload-identity/self-hosted-issuer), [Kubernetes](/guides/workload-identity/kubernetes), [GitHub Actions](/guides/workload-identity/github-actions), [GitLab CI](/guides/workload-identity/gitlab-ci) or [Vercel](/guides/workload-identity/vercel) — and copy the grants:
+
+| API key | Trust |
+|---|---|
+| Memberships (`createApiKey(memberships: …)`) | `memberships: [{ project, role, variables }]` |
+| Global roles (`createGlobalApiKey(roles: …)`) | `roles` |
+| `trustForwardedInfo` | `trustForwardedInfo` |
+| `description` | `description` |
+
+Differences to keep in mind:
+
+- A trust cannot combine `project_admin` / `super_admin` with memberships. A global admin key used for both deploys and content becomes two trusts.
+- Membership changes go through `tenant apply` only; `addProjectMember` and the other identity mutations refuse trust identities.
+- A trust is a new identity. Rows it creates show a different `created_by` than the key's.
+
+## 3. Re-declare assume-membership rules as an envelope
+
+An API key may assume memberships according to the schema's `content.assumeMembership` rules on its roles. **A trust ignores those rules** — its only assumption authority is its envelope. If the caller sends `X-Contember-Assume-Membership`, translate the rules it relies on.
+
+A schema rule like:
+
+```ts
+export const syncRole = c.createRole('sync', {
+  content: {
+    assumeMembership: { editor: { variables: { site: 'site' } } },
+  },
+})
+```
+
+becomes, on the membership that carries the `sync` role:
+
+```ts title="tenant.config.ts"
+memberships: [{
+  project: 'sites',
+  role: 'sync',
+  variables: [{ name: 'site', values: ['blog', 'shop'] }],
+  assumeMembership: {
+    editor: { variables: { site: 'site' } },
+  },
+}],
+```
+
+Envelopes are stricter than schema rules:
+
+- A rule must name **every** `entity` and `condition` variable of the target role. Where the schema rule left a variable out, decide explicitly: a reference to the source membership's variable, or `true` for any value.
+- The caller must send every variable of the assumed role with at least one value; nothing falls back to the role's defaults.
+- Predefined variables (`identityID`, `personID`) cannot be assumed at all; they always come from the trust's identity.
+- A rule cannot borrow values from another membership of the same caller.
+
+Check the caller's assume requests against these rules before the switch — a request that worked with the key may now get `403`. See [the envelope](/guides/workload-identity/assume-membership).
+
+## 4. Apply and switch the caller
+
+1. Apply the trust with a person or API-key credential: `contember tenant apply`.
+2. Change the caller to the new credentials (`credentials:` in `GraphQlClient`, `CONTEMBER_API_TOKEN_SOURCE` for the CLI) and deploy it.
+3. Watch the [audit log](/reference/engine/tenant/audit-log#workload-identity-events-since-22) for `workload_auth_success` entries of the trust and for `workload_auth_failure`. Use the [token check](/guides/workload-identity/cli#checking-a-token) for any failure.
+4. When the key is no longer used, disable it:
+
+```bash
+contember tenant api-key disable <api-key-id>
+```
+
+If you run read replicas, a trust used immediately after the apply that created it may see `401` until the replica catches up; the caller's single retry usually covers it, otherwise retry the deploy.

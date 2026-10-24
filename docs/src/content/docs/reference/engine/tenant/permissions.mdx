@@ -42,6 +42,7 @@ query {
       canDeployEntrypoint
       canViewConfiguration
       canListIdentityProviders
+      canListWorkloadIdentities
       canListMailTemplates
       canManageConfiguration
       canViewAuthLog
@@ -59,6 +60,7 @@ query {
 | `canDeployEntrypoint` | `entrypoint:deployEntrypoint` | deploy |
 | `canViewConfiguration` | `system:viewConfig` | `configuration` |
 | `canListIdentityProviders` | `idp:list` | `identityProviders` |
+| `canListWorkloadIdentities` | `workloadIdentity:list` | `workloadIdentityTrusts`, `checkWorkloadIdentityToken` |
 | `canListMailTemplates` | `mailTemplate:list` | `mailTemplates` |
 | `canManageConfiguration` | `system:configure` | `configure`, auth-policy mutations, and `authPolicies` |
 | `canViewAuthLog` | `system:viewAuthLog` | `authLog` |

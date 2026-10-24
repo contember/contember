@@ -1,0 +1,82 @@
+---
+title: Security notes
+description: What workload identity protects against, what it does not, and where to diagnose rejected tokens.
+---
+
+:::note[Available since 2.2]
+:::
+
+## Conditions are the security boundary
+
+`issuer` + `audience` alone admit anyone who can ask that issuer for a token with your audience — on GitHub, GitLab or Vercel, that is anyone with a repository or a project. The conditions are what pin your workload. Prefer immutable identifiers (`repository_id`, `project_id`, a service account uid) over names, exact matches over prefixes, and add a protected environment or branch where the platform offers one.
+
+The audience is chosen by the caller and is not a secret. A workload eligible for two trusts on the same issuer can request either audience, so privilege separation between those trusts must come from their conditions.
+
+## `tokensValidAfter`
+
+Because the audience is public, a future principal could obtain a token with your audience before you re-point a trust at it. Each trust therefore has a `tokensValidAfter` boundary, and tokens issued (`iat`) before it are rejected. An apply moves it to the current time when it changes who the trust admits — issuer, audience, profile, `typ`, signing algorithms, `jwksUri` or conditions — and when it re-enables the trust. The comparison allows 30 seconds of clock skew between the issuer and the engine.
+
+Grant changes do not move it. Grants are read on every request, so a narrowing applies to the next request, while a widening also reaches tokens that are still valid for the rest of their lifetime. That is accepted: a leaked valid token already compromises the trust for that time.
+
+After a bump every earlier token fails, including tokens held by running callers. The client libraries mint or fetch a fresh token on `401` and retry once; Kubernetes pods wait for the kubelet to rotate their token (see [Kubernetes](/guides/workload-identity/kubernetes#changing-the-trust-later)).
+
+## Replay window
+
+A bearer token can be replayed by anyone who obtains it until it expires. Keep it short and keep it out of places it can leak from:
+
+- Set `maxTokenLifetime` to what the caller needs — minutes for a backend that mints its own tokens.
+- In CI, request and use the token in one step. Never export it to `$GITHUB_ENV` or similar job-wide environment, where every later step, including third-party actions, can read it. Mask it (`::add-mask::`).
+- The engine does not log request headers.
+
+There is no per-token revocation list. To cut off access immediately, disable the trust; it stops authenticating on the next request (after read-replica lag, if you use replicas). For more than a short lifetime, use DPoP.
+
+## DPoP
+
+With `requireDpop: true` on an `oidc` trust, a token must be bound to a key of the caller (`cnf.jkt`) and every request must carry a fresh proof signed with that key (`Authorization: DPoP <token>` plus one `DPoP` header). A token leaked from a log, a proxy or an APM tool is useless without the key. A token that carries `cnf` is never accepted without a valid proof, on any trust and under any scheme.
+
+Only issuers that bind tokens can be used: a [self-hosted issuer](/guides/workload-identity/self-hosted-issuer#dpop) with `selfIssued({ dpop: true })`, or an identity provider that implements RFC 9449. GitHub, GitLab, Kubernetes and Vercel do not bind their tokens.
+
+Limits:
+
+- **The body is not covered.** GraphQL serves every operation from one URL, so a proof binds the method, the URL and the token, not the query. Someone who captures headers in real time can send a different query within the proof's window.
+- **Proofs are accepted for ±60 seconds**, and a proof's `jti` is remembered per engine worker only. A captured proof can be replayed against another worker or instance within that window.
+- **The URL must match what the client signed.** The engine reconstructs the client-facing URL from `Host` and the connection, or from `X-Forwarded-Proto` / `X-Forwarded-Host` when the request comes from a proxy listed in `CONTEMBER_HTTP_TRUSTED_PROXIES` (see [proxy trust](/reference/engine/tenant/proxy-trust)). A proxy that rewrites the request path breaks the check; such deployments cannot use DPoP.
+
+## Audience arrays
+
+By default `aud` must be a string or a single-element array equal to the trust's audience. Some identity providers always add extra audiences; `acceptAudienceArray: true` (`oidc` only) then accepts any array that contains the trust's audience. The cost: every other service in that array receives a token that it can replay to Contember. Prefer configuring the provider to issue a token for your audience alone.
+
+## Issuer keys and fetching
+
+- The engine fetches discovery and keys only for issuers of configured trusts, only over `https://`, never from loopback, private, link-local or reserved addresses unless the host is listed in the server's [`egressAllowlist`](/reference/engine/configuration/workload-identity), with bounded redirects, response sizes and timeouts. The discovery document's `issuer` must equal the configured issuer exactly.
+- Keys are refreshed in the background. When the issuer is unreachable, the last known keys stay accepted for up to [`jwksMaxStaleness`](/reference/engine/configuration/workload-identity) (6 hours by default), then verification fails closed. A key removed from the issuer's JWKS can therefore keep working for up to that long — disable the trust for an immediate cutoff.
+- Only asymmetric algorithms are accepted; `HS*` and `none` are rejected regardless of the JWKS.
+
+## Who can change trusts
+
+Trusts carry real permissions, so changing them is an administrative act: `PROJECT_ADMIN` or `SUPER_ADMIN`, with tenant roles limited like `createGlobalApiKey` and every membership and envelope authorized like `addProjectMember`. A caller authenticated by a workload trust cannot change trusts at all, so a compromised workflow cannot create a new trust for itself or disable everyone else's. Every apply and disable is recorded in the audit log.
+
+## Diagnosing a rejected token
+
+Every rejected workload token — unknown trust, bad signature, wrong profile, failed condition, bad proof — gets the same response, so a caller cannot probe your configuration:
+
+```http
+HTTP/1.1 401 Unauthorized
+WWW-Authenticate: Bearer error="invalid_token"
+
+{"errors":[{"code":401,"message":"Authorization failure: invalid token"}]}
+```
+
+(`WWW-Authenticate: DPoP error="invalid_token"` for `DPoP` requests.) The detail is available to administrators:
+
+| Where | What |
+|---|---|
+| [`contember workload-identity check`](/guides/workload-identity/cli#checking-a-token), the `checkWorkloadIdentityToken` query, the panel's Configuration page | The first failing step for a token you hold, with the condition index and the claim's actual value. |
+| [Audit log](/reference/engine/tenant/audit-log#workload-identity-events-since-22) (`workload_auth_failure`) | The failure category of tokens callers actually sent. Failure entries are rate-limited per trust. |
+| Engine metrics | Verification outcomes by category, issuer key fetch failures and unknown key ids. |
+
+If you run read replicas: a trust used right after the apply that created or re-enabled it may see `401` until the replica has caught up.
+
+## Audit log growth
+
+A successful authentication writes one audit log entry per token (not per request). The audit log has no automatic retention; with many short-lived tokens, plan a cleanup of old `person_auth_log` rows.

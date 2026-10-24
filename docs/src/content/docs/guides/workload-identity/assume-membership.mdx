@@ -1,0 +1,74 @@
+---
+title: Assume-membership envelope
+description: Let a workload narrow or reshape its memberships per request, within bounds declared on the trust.
+---
+
+A trust's memberships are fixed. Often a caller should act with less — one site out of three, a reader instead of an editor — or with a different role per request. The [assume-membership](/reference/engine/content/advanced/assume-membership) channel (`X-Contember-Assume-Membership` header or `assumeMembership` in the body) does that. For a request authenticated by a workload trust, what may be assumed is declared on the trust itself, in an **envelope**.
+
+:::note[Available since 2.2]
+:::
+
+## Declaring an envelope
+
+The envelope is set per membership, with `assumeMembership`:
+
+```ts title="tenant.config.ts"
+memberships: [{
+  project: 'sites',
+  role: 'sync',
+  variables: [{ name: 'site', values: ['blog', 'shop', 'landing'] }],
+  assumeMembership: {
+    sync:   { variables: { site: 'site' } },
+    editor: { variables: { site: 'site' } },
+  },
+}],
+```
+
+Each key is a role the caller may assume; the value says where the assumed role's variables may come from:
+
+| Rule | Allows |
+|---|---|
+| `editor: { variables: { site: 'site' } }` | `editor` with `site` values taken from **this membership's** `site` values (`blog`, `shop`, `landing`) — any non-empty subset. |
+| `editor: { variables: { site: true } }` | `editor` with any `site` values. |
+| `editor: true` | `editor` with any values of all its variables. |
+
+A request may then send:
+
+```http
+X-Contember-Assume-Membership: {"memberships":[{"role":"editor","variables":[{"name":"site","values":["blog"]}]}]}
+```
+
+As with any assume, the assumed memberships **replace** the trust's memberships for that request.
+
+## Rules at request time
+
+- **The envelope is the only authority.** For a workload-authenticated request the schema's `content.assumeMembership` rules are not consulted. Everything a trust may assume is visible in `tenant.config.ts`.
+- **Default deny.** Without an envelope, any assume header is answered with `403`.
+- **Each rule binds to its own membership.** A rule can use only the variable values of the membership it is declared on, never those of a sibling membership.
+- **Full variable coverage.** Every `entity` and `condition` variable that the assumed role defines in the current schema must be named by the rule and sent by the caller with at least one value. Otherwise `403`. Omitting a variable never means "all values".
+- **Predefined variables** (`identityID`, `personID`) are never taken from the caller. They always come from the trust's identity, so an envelope cannot be used to impersonate another identity.
+- **Static access is the anchor.** The trust needs a membership in the project at all; an envelope only works where it has one.
+
+When a schema migration adds a variable to a role that an envelope rule does not name, requests assuming that role fail with `403` until the rule is updated — schema changes never silently widen an envelope. `contember deploy` and `contember migrations execute` list the envelope rules the new schema leaves uncovered before they run (this needs `workloadIdentity:list`; without it they say the check was skipped).
+
+## What apply checks
+
+An envelope is a grant, so `tenant apply` authorizes it like one. The tenant API expands every rule into its **closure** — the roles and variable values it can produce — and requires that the applier could grant exactly that with `addProjectMember`:
+
+- A rule must name every non-predefined variable of the target role; a variable reference (`'site'`) must exist on the source membership with values.
+- A rule naming a role missing from the project schema, or naming a predefined variable, is rejected.
+- Unbounded rules (`true`, `variables: { v: true }`) require the right to grant that role with any values.
+
+The closure is printed after apply and recorded in the [audit log](/reference/engine/tenant/audit-log#workload-identity-events-since-22).
+
+:::caution[Roles carry their `system` flags]
+Granting a role grants everything it carries, including `system.assumeIdentity`, `history`, `migrate` and `debug`. Because identity assumption is checked against the effective — assumed — memberships, an envelope whose target role has `system.assumeIdentity` also lets the caller [assume identities](/reference/engine/content/advanced/assume-identity). The CLI highlights such target roles.
+:::
+
+## Assuming identities
+
+A trust whose role carries `system.assumeIdentity` can act on behalf of end users with `X-Contember-Assume-Identity`, exactly like an API key. Combined with `trustForwardedInfo`, this is the [trusted proxy pattern](/reference/engine/tenant/proxy-trust): a backend proxying users records their identity in `created_by` and their IP and user agent in the audit log — without a permanent secret. The trust cannot grant the flag on its own; the project schema role must carry it.
+
+## Tenant roles do not combine with memberships
+
+A trust with the `project_admin` or `super_admin` tenant role is implicitly admin in every project, so stored memberships and envelopes would be ignored. Apply rejects that combination. Use one trust with tenant roles for deploys and another with memberships for content.

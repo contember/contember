@@ -1,0 +1,150 @@
+---
+title: GitHub Actions
+description: Call Contember from GitHub Actions workflows with the job's OIDC token.
+---
+
+Every GitHub Actions job can request a short-lived OIDC token from GitHub. A trust with the `github-actions` profile accepts it, so the workflow needs no Contember secret.
+
+:::note[Available since 2.2]
+:::
+
+## 1. Find the immutable ids
+
+Repository and owner **names** survive deletion and transfer — someone else can create a repository with the same name later. Pin the trust to the numeric ids instead:
+
+```bash
+gh api repos/my-org/sites --jq .id          # repository_id
+gh api users/my-org --jq .id                # repository_owner_id
+```
+
+## 2. Declare the trust
+
+```ts title="tenant.config.ts"
+workloadIdentities: {
+  'sites-sync': {
+    profile: 'github-actions',
+    issuer: 'https://token.actions.githubusercontent.com',
+    audience: 'contember:my-instance:sites-sync',
+    conditions: [
+      { claim: 'repository_id', equals: '123456789' },
+      { claim: 'repository_owner_id', equals: '9876543' },
+      { claim: 'environment', equals: 'production' },
+    ],
+    memberships: [{
+      project: 'sites',
+      role: 'sync',
+      variables: [{ name: 'site', values: ['blog', 'shop', 'landing'] }],
+      assumeMembership: {
+        sync: { variables: { site: 'site' } },
+      },
+    }],
+    maxTokenLifetime: 600,
+  },
+},
+```
+
+Recommended conditions:
+
+| Condition | Why |
+|---|---|
+| `repository_id`, `repository_owner_id` | Immutable. GitHub sends them as **strings** — `equals: '123456789'`, not `123456789`. Apply rejects a number. |
+| `environment` | Restricts the trust to jobs running in a deployment environment. Meaningful **only** with environment protection rules (required reviewers, branch restrictions) — without them any workflow in the repository can enter the environment. |
+| `ref`, `job_workflow_ref` | Restrict to a branch or to one reusable workflow, e.g. `{ claim: 'job_workflow_ref', startsWith: 'my-org/sites/.github/workflows/sync.yml@' }`. |
+
+Avoid conditions on `sub` and on repository names, and avoid prefixes such as `startsWith: 'repo:my-org/'`: they admit every branch, pull request and new repository that matches. The `sub` format also differs between repositories — newer ones get an id-based default — so the audit log shows both forms.
+
+`requireDpop` and `acceptAudienceArray` are not available on this profile: GitHub cannot bind its tokens and always sends a single audience.
+
+## 3. Request and use the token in one step
+
+```yaml title=".github/workflows/sync.yml"
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    environment: production
+    permissions:
+      id-token: write
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - name: Sync one site
+        # the token is requested AND consumed in one step — never exported to $GITHUB_ENV
+        run: |
+          TOKEN=$(curl -sf -H "Authorization: bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" \
+            "$ACTIONS_ID_TOKEN_REQUEST_URL&audience=contember:my-instance:sites-sync" | jq -r .value)
+          echo "::add-mask::$TOKEN"
+          curl -sf https://api.example.com/content/sites/live \
+            -H "Authorization: Bearer $TOKEN" \
+            -H 'Content-Type: application/json' \
+            -H 'X-Contember-Assume-Membership: {"memberships":[{"role":"sync","variables":[{"name":"site","values":["blog"]}]}]}' \
+            -d @query.json
+```
+
+- `permissions: id-token: write` is what makes GitHub provide `ACTIONS_ID_TOKEN_REQUEST_URL` and `ACTIONS_ID_TOKEN_REQUEST_TOKEN`.
+- **Never write the token to `$GITHUB_ENV` or `$GITHUB_OUTPUT`.** Everything there is handed to every later step of the job, including third-party actions. Request the token in the step that uses it.
+- `::add-mask::` keeps the token out of the job log if a command echoes it.
+- The assume header narrows the request to one site within the trust's [envelope](/guides/workload-identity/assume-membership). It can also travel in the JSON body as `assumeMembership`, which avoids shell quoting.
+
+With this trust, only jobs of repository `123456789` owned by `9876543` running in the protected `production` environment authenticate, the token lives minutes, and the [audit log](/reference/engine/tenant/audit-log#workload-identity-events-since-22) records repository, run, attempt and ref per token.
+
+### From Node
+
+In a script run by the workflow, `githubActions` fetches and refreshes the token for you and never writes it to the environment or disk:
+
+```ts
+import { GraphQlClient } from '@contember/graphql-client'
+import { githubActions } from '@contember/workload-identity'
+
+const client = new GraphQlClient({
+  url: 'https://api.example.com/content/sites/live',
+  credentials: githubActions({ audience: 'contember:my-instance:sites-sync' }),
+})
+```
+
+## Running the CLI
+
+The CLI fetches the token itself — use a separate trust for deploys, with only the tenant roles a deploy needs:
+
+```ts title="tenant.config.ts"
+workloadIdentities: {
+  'deploy': {
+    profile: 'github-actions',
+    issuer: 'https://token.actions.githubusercontent.com',
+    audience: 'contember:my-instance:deploy',
+    conditions: [
+      { claim: 'repository_id', equals: '123456789' },
+      { claim: 'repository_owner_id', equals: '9876543' },
+      { claim: 'environment', equals: 'production' },
+    ],
+    roles: ['entrypoint_deployer'],
+  },
+},
+```
+
+```yaml title=".github/workflows/deploy.yml"
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: production
+    permissions:
+      id-token: write
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - run: npm ci
+      - run: npx contember deploy --yes
+        env:
+          CONTEMBER_DSN: contember://website@api.example.com   # no password
+          CONTEMBER_API_TOKEN_SOURCE: github-actions
+          CONTEMBER_API_TOKEN_AUDIENCE: contember:my-instance:deploy
+```
+
+See [CLI](/guides/workload-identity/cli) for the variables and for running `tenant apply` this way.
+
+## GitHub Enterprise Server
+
+Use the `github-actions` profile with your instance's issuer, typically `https://HOSTNAME/_services/token`. Check the `issuer` in `https://HOSTNAME/_services/token/.well-known/openid-configuration`. If the instance is on a private network, list its host in the engine's [`egressAllowlist`](/reference/engine/configuration/workload-identity).
+
+## Troubleshooting
+
+Every rejected token gets the same `401`. To see why, run the [token check](/guides/workload-identity/cli#checking-a-token) with a token from a test run, or read the `workload_auth_failure` entries in the [audit log](/reference/engine/tenant/audit-log#workload-identity-events-since-22). The most common causes are a job that does not declare the expected `environment`, a token requested for a different audience, and a run from a branch or workflow the conditions do not admit.

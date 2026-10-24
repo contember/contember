@@ -1,0 +1,75 @@
+---
+title: Local development
+description: Use workload identity with a local issuer and in tests.
+---
+
+In production, issuers must be `https://` and must not resolve to loopback or private addresses. A local issuer — your app on `http://localhost:3000` — breaks both rules, so the engine relaxes them per host through server configuration. Tenant configuration can never relax them.
+
+:::note[Available since 2.2]
+:::
+
+## Allow your local issuer
+
+```bash
+CONTEMBER_WORKLOAD_IDENTITY_INSECURE_ISSUERS=localhost,host.docker.internal
+```
+
+Hosts listed in [`insecureIssuers`](/reference/engine/configuration/workload-identity) may be fetched over `http://`, loopback included. The engine logs a warning at startup while the list is set. The `docker-compose.yaml` of the Contember repository and of new projects created with [`@contember/create`](/intro/installation) already sets it to `localhost,host.docker.internal`.
+
+Apply-time validation reads the same server setting, so the same `tenant.config.ts` applied to a production engine without it still rejects an `http://` issuer.
+
+## Docker networking
+
+Your app signs tokens with `iss: http://localhost:3000`, but the engine in a container reaches your machine as `host.docker.internal`, not `localhost`. Set `jwksUri` so the engine fetches keys from the address it can reach; with `jwksUri` set, `issuer` is only compared, never fetched:
+
+```ts title="tenant.config.ts"
+workloadIdentities: {
+  'web-backend': {
+    profile: 'oidc',
+    issuer: 'http://localhost:3000',
+    jwksUri: 'http://host.docker.internal:3000/.well-known/jwks.json',
+    audience: 'contember:local:web-backend',
+    conditions: [{ claim: 'sub', equals: 'web-backend' }],
+    memberships: [{ project: 'app', role: 'admin' }],
+  },
+},
+```
+
+On Linux, `host.docker.internal` is not defined by default; add it to the engine service:
+
+```yaml title="docker-compose.yaml"
+services:
+  contember-engine:
+    extra_hosts:
+      - 'host.docker.internal:host-gateway'
+```
+
+Keep local trusts in a separate config file (or behind an environment check) so they never reach a production `tenant apply`.
+
+## Tests
+
+`@contember/workload-identity/testing` starts a real issuer on a random loopback port — discovery, JWKS and a signing key — so tests need no external issuer:
+
+```ts
+import { createTestIssuer } from '@contember/workload-identity/testing'
+
+const issuer = await createTestIssuer()            // RS256; { alg: 'ES256' } for EC
+
+// apply a trust with issuer.issuer (and issuer.jwksUri if the engine runs in Docker), then:
+const client = new GraphQlClient({
+  url: 'http://localhost:1481/content/app/live',
+  credentials: issuer.credentials({ subject: 'web-backend', audience: 'contember:local:web-backend' }),
+})
+
+// craft invalid tokens: mint() signs exactly the given claims and adds nothing
+const now = Math.floor(Date.now() / 1000)
+const expired = await issuer.mint({
+  iss: issuer.issuer, sub: 'web-backend', aud: 'contember:local:web-backend', iat: now - 7200, exp: now - 3600,
+})
+const noTyp = await issuer.mint({ /* … */ }, { header: { typ: undefined } })
+const foreign = await issuer.mint({ /* … */ }, { foreignKey: true })   // key not in the JWKS
+
+await issuer.close()
+```
+
+`issuer.issuer` is `http://localhost:<port>` (set `hostname` to change the host part), so the engine under test needs that host in `insecureIssuers`. `credentials({ …, dpop: true })` returns a DPoP-binding provider for testing `requireDpop` trusts.

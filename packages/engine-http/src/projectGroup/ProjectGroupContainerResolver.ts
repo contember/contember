@@ -45,6 +45,10 @@ export class ProjectGroupContainerResolver implements EventEmitter<ProjectGroupC
 			})
 
 			await container.tenantContainer.migrationsRunner.run(container.logger.child())
+			// §11: after the migrations, so a fresh tenant DB already has the trust table. Detached; never fails creation.
+			container.tenantContainer.workloadTokenVerifier
+				.prewarm(container.tenantContainer.readDatabaseContext)
+				.catch(e => container.logger.error(e, { message: 'Workload identity key prewarm failed' }))
 			return { container, inputConfig: config, cleanups }
 		})).container
 	}

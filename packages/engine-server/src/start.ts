@@ -42,6 +42,11 @@ process.on('warning', message => {
 
 	const telemetry = createTelemetry({ config: serverConfig.telemetry, logger, env })
 
+	const insecureIssuers = serverConfig.workloadIdentity?.insecureIssuers ?? []
+	if (insecureIssuers.length > 0) {
+		logger.warn(`Workload identity issuers on ${insecureIssuers.join(', ')} are allowed over plain http — NEVER USE this in production`)
+	}
+
 	const workerConfig = serverConfig.workerCount || 1
 
 	const workerCount = workerConfig === 'auto' ? os.cpus().length : Number(workerConfig)
@@ -69,6 +74,10 @@ process.on('warning', message => {
 	listenOnProcessTermination(terminationJobs, logger, {
 		sigtermDelayMs: processType === 'clusterWorker' ? 0 : serverConfig.shutdownDelayMs,
 		finalJobs: finalTerminationJobs,
+	})
+
+	finalTerminationJobs.push(async () => {
+		container.workloadJwksRegistry.dispose()
 	})
 
 	const spanProcessor = telemetry.processor

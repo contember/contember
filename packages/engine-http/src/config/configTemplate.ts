@@ -143,6 +143,12 @@ export const configTemplate: any = {
 				},
 			},
 		},
+		workloadIdentity: {
+			egressAllowlist: '%?env.CONTEMBER_WORKLOAD_IDENTITY_EGRESS_ALLOWLIST::string%',
+			insecureIssuers: '%?env.CONTEMBER_WORKLOAD_IDENTITY_INSECURE_ISSUERS::string%',
+			caCertificates: '%?env.CONTEMBER_WORKLOAD_IDENTITY_CA_CERTIFICATES::string%',
+			jwksMaxStaleness: '%?env.CONTEMBER_WORKLOAD_IDENTITY_JWKS_MAX_STALENESS::string%',
+		},
 		test: {
 			transactions: '%?env.CONTEMBER_TEST_TRANSACTIONS::bool%',
 			transactionTtlSeconds: '%?env.CONTEMBER_TEST_TRANSACTION_TTL_SECONDS::number%',

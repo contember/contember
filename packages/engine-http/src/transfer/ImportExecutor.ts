@@ -304,6 +304,7 @@ export class ImportExecutor {
 			identity: {
 				identityId: authResult.identityId,
 				roles: authResult.roles,
+				credential: authResult.credential,
 			},
 		})
 

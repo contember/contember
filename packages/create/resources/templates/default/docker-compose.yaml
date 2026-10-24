@@ -11,6 +11,8 @@ services:
       CONTEMBER_ROOT_TOKEN: '0000000000000000000000000000000000000000' # openssl rand -hex 20
       CONTEMBER_LOGIN_TOKEN: '1111111111111111111111111111111111111111' # openssl rand -hex 20
       CONTEMBER_ENCRYPTION_KEY: '2222222222222222222222222222222222222222222222222222222222222222' # openssl rand -hex 32
+      # Development only: lets your app act as a workload identity issuer over plain http.
+      CONTEMBER_WORKLOAD_IDENTITY_INSECURE_ISSUERS: 'localhost,host.docker.internal'
 
       DEFAULT_DB_HOST: 'postgres'
       DEFAULT_DB_PORT: '5432'

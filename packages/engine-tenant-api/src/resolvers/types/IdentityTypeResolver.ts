@@ -26,6 +26,9 @@ import { notEmpty } from '../../utils/array.js'
 import { batchLoader } from '../../utils/batchQuery.js'
 import { PersonResponseFactory } from '../responseHelpers/PersonResponseFactory.js'
 import { ProjectResponseFactory } from '../responseHelpers/ProjectResponseFactory.js'
+import { IdentityKindQuery, IdentityKindValue } from '../../model/queries/workloadIdentity/IdentityKindQuery.js'
+import { fetchWorkloadTrustStates, WorkloadTrustState } from '../../model/service/workloadIdentity/apply/workloadTrustStates.js'
+import { createWorkloadIdentityTrustResponse } from '../mutation/workloadIdentity/workloadIdentityTrustResponse.js'
 
 export class IdentityTypeResolver implements IdentityResolvers {
 	private personLoader = batchLoader<string, Record<string, PersonRow>, PersonRow>(
@@ -41,6 +44,18 @@ export class IdentityTypeResolver implements IdentityResolvers {
 			return Object.fromEntries(identities.map(it => [it.id, it.roles]))
 		},
 		(id, result) => result[id] ?? [],
+	)
+
+	private kindLoader = batchLoader<string, ReadonlyMap<string, IdentityKindValue>, IdentityKindValue | undefined>(
+		async (ids, db) => await db.queryHandler.fetch(new IdentityKindQuery(ids)),
+		(id, result) => result.get(id),
+	)
+	private workloadTrustLoader = batchLoader<string, ReadonlyMap<string, WorkloadTrustState>, WorkloadTrustState | undefined>(
+		async (ids, db) => {
+			const states = await fetchWorkloadTrustStates(db, { identityIds: ids })
+			return new Map(states.map(it => [it.trust.identityId, it]))
+		},
+		(id, result) => result.get(id),
 	)
 
 	constructor(
@@ -186,11 +201,16 @@ export class IdentityTypeResolver implements IdentityResolvers {
 	}
 
 	async kind(parent: Identity, args: unknown, context: TenantResolverContext): Promise<IdentityKind> {
-		throw new Error('not implemented')
+		const kind = await context.db.batchLoad(this.kindLoader, parent.id)
+		return kind === 'workload' ? 'WORKLOAD' : kind === 'person' ? 'PERSON' : 'API_KEY'
 	}
 
 	async workloadIdentityTrust(parent: Identity, args: unknown, context: TenantResolverContext): Promise<Maybe<WorkloadIdentityTrust>> {
-		throw new Error('not implemented')
+		if (!(await context.permissionContext.isAllowed({ action: PermissionActions.WORKLOAD_IDENTITY_LIST }))) {
+			return null
+		}
+		const trust = await context.db.batchLoad(this.workloadTrustLoader, parent.id)
+		return trust ? createWorkloadIdentityTrustResponse(trust) : null
 	}
 
 	async sessions(

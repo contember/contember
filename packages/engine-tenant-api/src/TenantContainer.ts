@@ -220,7 +220,6 @@ export class TenantContainerFactory {
 			.addService('authLogService', () => new AuthLogService())
 			.addService('workloadJwksRegistry', () => args.workloadIdentity?.jwksRegistry ?? new WorkloadJwksRegistry(WorkloadIdentity.defaultInstanceConfig))
 			.addService('workloadIdentityMetrics', () => args.workloadIdentity?.metrics ?? noopWorkloadIdentityMetrics)
-			.addService('workloadIdentityManager', () => new WorkloadIdentityManager())
 			.addService(
 				'workloadTokenVerifier',
 				({ workloadJwksRegistry, workloadIdentityMetrics, authLogService, providers }) =>
@@ -331,6 +330,11 @@ export class TenantContainerFactory {
 			.addService('inviteManager', ({ providers, userMailer, projectSchemaResolver }) => new InviteManager(providers, userMailer, projectSchemaResolver))
 			.addService('mailTemplateManager', () => new MailTemplateManager())
 			.addService('rolesManager', ({ globalRoleValidator }) => new RolesManager(globalRoleValidator))
+			.addService(
+				'workloadIdentityManager',
+				({ projectSchemaResolver, globalRoleValidator, workloadJwksRegistry }) =>
+					new WorkloadIdentityManager(projectSchemaResolver, globalRoleValidator, workloadJwksRegistry.config),
+			)
 			.addService('configurationManager', () => new ConfigurationManager())
 			.addService(
 				'passwordlessSignInManager',
@@ -358,8 +362,14 @@ export class TenantContainerFactory {
 				({ personManager, projectManager, projectMemberManager }) => new PersonQueryResolver(personManager, projectManager, projectMemberManager),
 			)
 			.addService('idpQueryResolver', ({ idpManager }) => new IDPQueryResolver(idpManager))
-			.addService('workloadIdentityQueryResolver', () => new WorkloadIdentityQueryResolver())
-			.addService('workloadIdentityMutationResolver', () => new WorkloadIdentityMutationResolver())
+			.addService(
+				'workloadIdentityQueryResolver',
+				({ workloadIdentityManager, workloadTokenVerifier }) => new WorkloadIdentityQueryResolver(workloadIdentityManager, workloadTokenVerifier),
+			)
+			.addService(
+				'workloadIdentityMutationResolver',
+				({ workloadIdentityManager }) => new WorkloadIdentityMutationResolver(workloadIdentityManager),
+			)
 			.addService('projectQueryResolver', ({ projectManager }) => new ProjectQueryResolver(projectManager))
 			.addService(
 				'projectMembersQueryResolver',

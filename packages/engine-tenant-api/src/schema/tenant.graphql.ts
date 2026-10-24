@@ -1284,6 +1284,8 @@ const schema: DocumentNode = gql`
 	}
 
 	enum AddProjectMemberErrorCode {
+		""" The identity belongs to a workload identity trust; change it with \`applyWorkloadIdentityTrust\`. """
+		WORKLOAD_IDENTITY_MANAGED
 		PROJECT_NOT_FOUND
 		IDENTITY_NOT_FOUND
 		ALREADY_MEMBER
@@ -1310,6 +1312,8 @@ const schema: DocumentNode = gql`
 	}
 
 	enum UpdateProjectMemberErrorCode {
+		""" The identity belongs to a workload identity trust; change it with \`applyWorkloadIdentityTrust\`. """
+		WORKLOAD_IDENTITY_MANAGED
 		PROJECT_NOT_FOUND
 		NOT_MEMBER
 		INVALID_MEMBERSHIP
@@ -1334,6 +1338,8 @@ const schema: DocumentNode = gql`
 	}
 
 	enum RemoveProjectMemberErrorCode {
+		""" The identity belongs to a workload identity trust; change it with \`applyWorkloadIdentityTrust\`. """
+		WORKLOAD_IDENTITY_MANAGED
 		NOT_MEMBER
 		PROJECT_NOT_FOUND
 	}
@@ -1413,6 +1419,8 @@ const schema: DocumentNode = gql`
 	}
 
 	enum AddGlobalIdentityRolesErrorCode {
+		""" The identity belongs to a workload identity trust; change it with \`applyWorkloadIdentityTrust\`. """
+		WORKLOAD_IDENTITY_MANAGED
 		IDENTITY_NOT_FOUND
 		INVALID_ROLE
 	}
@@ -1436,6 +1444,8 @@ const schema: DocumentNode = gql`
 	}
 
 	enum RemoveGlobalIdentityRolesErrorCode {
+		""" The identity belongs to a workload identity trust; change it with \`applyWorkloadIdentityTrust\`. """
+		WORKLOAD_IDENTITY_MANAGED
 		IDENTITY_NOT_FOUND
 		INVALID_ROLE
 	}

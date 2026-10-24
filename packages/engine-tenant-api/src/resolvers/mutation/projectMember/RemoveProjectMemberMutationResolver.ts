@@ -8,7 +8,8 @@ import { TenantResolverContext } from '../../TenantResolverContext.js'
 import { PermissionActions, ProjectManager, ProjectMemberManager } from '../../../model/index.js'
 import { createErrorResponse, createProjectNotFoundResponse } from '../../errorUtils.js'
 import { ProjectMembershipByIdentityQuery } from '../../../model/queries/index.js'
-import { logProjectMembershipChange } from './audit.js'
+import { logProjectMembershipChange, workloadIdentityManagedMessage } from './audit.js'
+import { isWorkloadIdentity } from '../../../model/queries/workloadIdentity/IdentityKindQuery.js'
 
 export class RemoveProjectMemberMutationResolver implements MutationResolvers {
 	constructor(
@@ -42,6 +43,9 @@ export class RemoveProjectMemberMutationResolver implements MutationResolvers {
 			action: PermissionActions.PROJECT_REMOVE_MEMBER(memberships),
 			message: 'You are not allowed to remove a project member',
 		})
+		if (await isWorkloadIdentity(context.db, identityId)) {
+			return createErrorResponse('WORKLOAD_IDENTITY_MANAGED', workloadIdentityManagedMessage(identityId))
+		}
 
 		const before = await context.db.queryHandler.fetch(new ProjectMembershipByIdentityQuery({ id: project.id }, [identityId]))
 		const result = await this.projectMemberManager.removeProjectMember(context.db, project.id, identityId)

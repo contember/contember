@@ -1,3 +1,7 @@
 export * from './trustRow.js'
 export * from './EnabledWorkloadTrustKeySourcesQuery.js'
 export * from './WorkloadTrustLookupQuery.js'
+export * from './IdentityKindQuery.js'
+export * from './WorkloadAssumeRulesQuery.js'
+export * from './WorkloadIdentityMembershipsQuery.js'
+export * from './WorkloadTrustDetailQuery.js'

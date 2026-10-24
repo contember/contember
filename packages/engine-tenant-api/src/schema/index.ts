@@ -47,6 +47,8 @@ export type AddGlobalIdentityRolesError = {
 export type AddGlobalIdentityRolesErrorCode =
 	| 'IDENTITY_NOT_FOUND'
 	| 'INVALID_ROLE'
+	/**  The identity belongs to a workload identity trust; change it with `applyWorkloadIdentityTrust`.  */
+	| 'WORKLOAD_IDENTITY_MANAGED'
 
 export type AddGlobalIdentityRolesResponse = {
 	readonly __typename?: 'AddGlobalIdentityRolesResponse'
@@ -115,6 +117,8 @@ export type AddProjectMemberErrorCode =
 	| 'ROLE_NOT_FOUND'
 	| 'VARIABLE_EMPTY'
 	| 'VARIABLE_NOT_FOUND'
+	/**  The identity belongs to a workload identity trust; change it with `applyWorkloadIdentityTrust`.  */
+	| 'WORKLOAD_IDENTITY_MANAGED'
 
 export type AddProjectMemberResponse = {
 	readonly __typename?: 'AddProjectMemberResponse'
@@ -2179,6 +2183,8 @@ export type RemoveGlobalIdentityRolesError = {
 export type RemoveGlobalIdentityRolesErrorCode =
 	| 'IDENTITY_NOT_FOUND'
 	| 'INVALID_ROLE'
+	/**  The identity belongs to a workload identity trust; change it with `applyWorkloadIdentityTrust`.  */
+	| 'WORKLOAD_IDENTITY_MANAGED'
 
 export type RemoveGlobalIdentityRolesResponse = {
 	readonly __typename?: 'RemoveGlobalIdentityRolesResponse'
@@ -2222,6 +2228,8 @@ export type RemoveProjectMemberError = {
 export type RemoveProjectMemberErrorCode =
 	| 'NOT_MEMBER'
 	| 'PROJECT_NOT_FOUND'
+	/**  The identity belongs to a workload identity trust; change it with `applyWorkloadIdentityTrust`.  */
+	| 'WORKLOAD_IDENTITY_MANAGED'
 
 export type RemoveProjectMemberResponse = {
 	readonly __typename?: 'RemoveProjectMemberResponse'
@@ -2659,6 +2667,8 @@ export type UpdateProjectMemberErrorCode =
 	| 'ROLE_NOT_FOUND'
 	| 'VARIABLE_EMPTY'
 	| 'VARIABLE_NOT_FOUND'
+	/**  The identity belongs to a workload identity trust; change it with `applyWorkloadIdentityTrust`.  */
+	| 'WORKLOAD_IDENTITY_MANAGED'
 
 export type UpdateProjectMemberResponse = {
 	readonly __typename?: 'UpdateProjectMemberResponse'

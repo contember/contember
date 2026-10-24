@@ -70,6 +70,7 @@ class AuthLogService {
 				eventData: data.eventData ?? authData?.data?.eventData,
 				geoCountry: ctx.geoCountry,
 				deviceFingerprint: ctx.deviceFingerprint,
+				trustId: data.trustId ?? authData?.data?.trustId,
 			}),
 		)
 	}
@@ -154,6 +155,8 @@ namespace AuthLogService {
 		targetPersonId?: string
 		metadata?: JSONValue
 		eventData?: JSONValue
+		/** The workload identity trust the entry is about. */
+		trustId?: string
 	}
 
 	export type LogArgs = {

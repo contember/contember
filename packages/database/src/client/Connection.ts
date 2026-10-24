@@ -6,19 +6,23 @@ import { DatabaseConfig } from '../types.js'
 import { AcquiredConnection } from './AcquiredConnection.js'
 import { ScopeLimitedConnection } from './ScopeLimitedConnection.js'
 import { Notification } from 'pg'
+import { DatabaseError } from './errors.js'
+import { ClientErrorCodes } from './errorCodes.js'
 
 class Connection implements Connection.ConnectionLike, Connection.ClientFactory, Connection.PoolStatusProvider {
 	constructor(
 		private readonly pool: Pool,
 		public readonly eventManager: EventManager = new EventManager(null),
+		private readonly options: Connection.Options = {},
 	) {
 	}
 
 	public static create(
 		{ pool = {}, ...config }: DatabaseConfig & { pool?: Omit<PoolConfig, 'logError'> },
 		logError: (error: Error) => void,
+		options: Connection.Options = {},
 	): Connection {
-		return new Connection(new Pool(createPgClientFactory(config), { ...pool, logError }))
+		return new Connection(new Pool(createPgClientFactory(config), { ...pool, logError }), new EventManager(null), options)
 	}
 
 	public static createSingle(
@@ -49,6 +53,19 @@ class Connection implements Connection.ConnectionLike, Connection.ClientFactory,
 	): Promise<Result> {
 		const eventManager = new EventManager(options.eventManager ?? this.eventManager)
 		eventManager.memoryBudget?.check()
+		// Each retry disposes the stale connection it got, so the loop ends once the idle connections are used up.
+		while (true) {
+			const attempt = await this.scopeOnce(callback, eventManager)
+			if (!attempt.stale) {
+				return attempt.result
+			}
+		}
+	}
+
+	private async scopeOnce<Result>(
+		callback: (connection: Connection.AcquiredConnectionLike) => Promise<Result> | Result,
+		eventManager: EventManager,
+	): Promise<{ stale: false; result: Result } | { stale: true }> {
 		const acquired = await this.pool.acquire()
 		// A budget exhausted while waiting for the pool must not cost a healthy connection.
 		try {
@@ -57,15 +74,34 @@ class Connection implements Connection.ConnectionLike, Connection.ClientFactory,
 			this.pool.release(acquired)
 			throw e
 		}
+		const reused = acquired.uses > 1
+		// pg emits `error` only for a connection lost unexpectedly, not for its own end(), e.g. after an exhausted budget.
+		let lost = false
+		let answered = false
+		const onError = () => {
+			lost = true
+		}
+		const onAnswer = () => {
+			answered = true
+		}
+		acquired.client.on('error', onError)
+		eventManager.on(EventManager.Event.queryEnd, onAnswer)
 		try {
 			const connection = new AcquiredConnection(acquired.client, eventManager)
 			const result = await callback(connection)
 			this.pool.release(acquired)
 
-			return result
+			return { stale: false, result }
 		} catch (e) {
 			this.pool.dispose(acquired)
+			// The server closed a pooled connection before answering anything, e.g. a pooler or replica restart.
+			if (this.options.retryStaleConnection && reused && !answered && (lost || isConnectionLoss(e))) {
+				return { stale: true }
+			}
 			throw e
+		} finally {
+			acquired.client.off('error', onError)
+			eventManager.removeListener(EventManager.Event.queryEnd, onAnswer)
 		}
 	}
 
@@ -101,7 +137,26 @@ class Connection implements Connection.ConnectionLike, Connection.ClientFactory,
 	}
 }
 
+const connectionLossCodes = new Set<string>([
+	ClientErrorCodes.CONNECTION_EXCEPTION,
+	ClientErrorCodes.CONNECTION_DOES_NOT_EXIST,
+	ClientErrorCodes.CONNECTION_FAILURE,
+	ClientErrorCodes.ADMIN_SHUTDOWN,
+	ClientErrorCodes.CRASH_SHUTDOWN,
+])
+
+const isConnectionLoss = (error: unknown): boolean =>
+	error instanceof DatabaseError && error.code !== undefined && connectionLossCodes.has(error.code)
+
 namespace Connection {
+	export interface Options {
+		/**
+		 * Runs a scope again on another connection when a connection taken from the pool turns out to be closed by
+		 * the server before it answered anything. Only for connections whose scopes may run twice, such as a read replica.
+		 */
+		retryStaleConnection?: boolean
+	}
+
 	export interface Queryable {
 		readonly eventManager: EventManager
 

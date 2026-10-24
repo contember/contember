@@ -12,6 +12,7 @@ import { ApplyResponse, createApplyError } from '../../../model/service/workload
 import { closureTargetToMembership } from '../../../model/service/workloadIdentity/apply/envelope.js'
 import { isUnpersistedIdentityId } from '../../../model/service/apiKey/UnpersistedApiKeyManager.js'
 import { ResponseOk } from '../../../model/utils/Response.js'
+import { WorkloadIdentity } from '../../../model/type/index.js'
 import { ImplementationException } from '../../../exceptions.js'
 import { createErrorResponse } from '../../errorUtils.js'
 import { parseWorkloadIdentityTrustInput } from './parseWorkloadIdentityTrustInput.js'
@@ -48,13 +49,13 @@ export class WorkloadIdentityMutationResolver implements MutationResolvers {
 		if (!plan.ok) {
 			return createErrorResponse(plan)
 		}
-		const authorization = await this.authorizePlan(context, plan.result)
+		const authorization = await this.authorizePlan(context, plan.result, existing)
 		if (!authorization.ok) {
 			return createErrorResponse(authorization)
 		}
 
 		const createdBy = isUnpersistedIdentityId(context.identity.id) ? null : context.identity.id
-		const result = await this.workloadIdentityManager.apply(context.db, slug, plan.result, createdBy)
+		const result = await this.workloadIdentityManager.apply(context.db, slug, plan.result, createdBy, existing)
 		if (!result.ok) {
 			return createErrorResponse(result)
 		}
@@ -120,8 +121,22 @@ export class WorkloadIdentityMutationResolver implements MutationResolvers {
 	 * Tenant roles reuse the `createGlobalApiKey` gate; memberships and bounded envelope targets are direct grants
 	 * checked in the project scope like `addProjectMember`; an unbounded target needs global authority to add members (§6a, §7b).
 	 */
-	private async authorizePlan(context: TenantResolverContext, plan: WorkloadTrustApplyPlan): Promise<ApplyResponse<null>> {
+	private async authorizePlan(
+		context: TenantResolverContext,
+		plan: WorkloadTrustApplyPlan,
+		existing: WorkloadIdentity.TrustRow | null,
+	): Promise<ApplyResponse<null>> {
 		const { definition } = plan
+		// Rewriting a trust re-points its identity, so the caller must be one who could have granted what it holds now.
+		const existingAllowed = existing === null || existing.roles.length === 0 || await context.isAllowed({
+			action: PermissionActions.API_KEY_CREATE_GLOBAL({ requestedRoles: existing.roles, trustForwardedClientInfo: false }),
+		})
+		if (!existingAllowed) {
+			return createApplyError(
+				'ROLE_NOT_ALLOWED',
+				`You are not allowed to change a workload identity trust holding tenant roles ${existing.roles.join(', ')}`,
+			)
+		}
 		const grantsGlobalCapability = definition.roles.length > 0 || definition.trustForwardedInfo
 		const rolesAllowed = !grantsGlobalCapability || await context.isAllowed({
 			action: PermissionActions.API_KEY_CREATE_GLOBAL({

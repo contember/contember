@@ -15,8 +15,8 @@ export interface WorkloadProfileDefinition {
 	readonly maxLifetimeSeconds: number
 	readonly allowsDpop: boolean
 	readonly allowsAudienceArray: boolean
-	/** `oidc` requires at least one `sub` condition with `equals` or `in`. */
-	readonly requiresExactSubCondition: boolean
+	/** At least one condition must pin one of these claims with `equals` or `in`, so the conditions select a principal. */
+	readonly anchorClaims: readonly string[]
 }
 
 export const ASYMMETRIC_SIGNING_ALGS: readonly string[] = ['RS256', 'RS384', 'RS512', 'PS256', 'PS384', 'PS512', 'ES256', 'ES384', 'ES512', 'EdDSA']
@@ -44,7 +44,7 @@ export const workloadProfiles: Readonly<Record<WorkloadIdentity.Profile, Workloa
 		maxLifetimeSeconds: 86_400,
 		allowsDpop: true,
 		allowsAudienceArray: true,
-		requiresExactSubCondition: true,
+		anchorClaims: ['sub'],
 	},
 	'github-actions': {
 		fixedSigningAlgs: ['RS256'],
@@ -67,7 +67,8 @@ export const workloadProfiles: Readonly<Record<WorkloadIdentity.Profile, Workloa
 		maxLifetimeSeconds: 86_400,
 		allowsDpop: false,
 		allowsAudienceArray: false,
-		requiresExactSubCondition: false,
+		// the issuer serves every repository on GitHub; the immutable ids are what pins one of them
+		anchorClaims: ['repository_id', 'repository_owner_id'],
 	},
 }
 

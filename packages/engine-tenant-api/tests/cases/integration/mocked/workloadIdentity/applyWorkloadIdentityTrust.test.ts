@@ -349,6 +349,29 @@ describe('applyWorkloadIdentityTrust', () => {
 		})
 	})
 
+	test('a project_admin applier cannot rewrite a trust holding super_admin', async () => {
+		await executeTenantTest({
+			query: applyMutation(slug, baseInput),
+			identityRoles: ['project_admin'],
+			executes: [trustBySlugSql(slug, [trustDbRow({ id: trustId, slug, identity_id: identityId, roles: ['super_admin'] })])],
+			return: { data: { applyWorkloadIdentityTrust: { ok: false, error: expect.objectContaining({ code: 'ROLE_NOT_ALLOWED' }), result: null } } },
+		})
+	})
+
+	test('a trust created after the caller was authorized for a create answers CONFLICT', async () => {
+		await executeTenantTest({
+			query: applyMutation(slug, baseInput),
+			executes: [
+				trustBySlugSql(slug, []),
+				...sqlTransaction(
+					trustBySlugSql(slug, [trustDbRow({ id: trustId, slug, identity_id: identityId, roles: ['super_admin'] })]),
+					trustMembershipsSql([identityId], []),
+				),
+			],
+			return: { data: { applyWorkloadIdentityTrust: { ok: false, error: expect.objectContaining({ code: 'CONFLICT' }), result: null } } },
+		})
+	})
+
 	test('login is refused on a trust, even for a super_admin', async () => {
 		await executeTenantTest({
 			query: applyMutation(slug, { ...baseInput, roles: ['login'] }),

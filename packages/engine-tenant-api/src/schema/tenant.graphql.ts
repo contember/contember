@@ -926,6 +926,7 @@ const schema: DocumentNode = gql`
 		INVALID_ENVELOPE
 		ENVELOPE_NOT_AUTHORIZED
 		WORKLOAD_CREDENTIAL_FORBIDDEN
+		CONFLICT
 	}
 
 	type DisableWorkloadIdentityTrustResponse {

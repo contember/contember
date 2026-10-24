@@ -1,5 +1,5 @@
 import { Acl } from '@contember/schema'
-import { Connection, UniqueViolationError } from '@contember/database'
+import { Connection, SerializationFailureError, UniqueViolationError } from '@contember/database'
 import { MembershipResolver } from '@contember/schema-utils'
 import { DatabaseContext } from '../../../utils/index.js'
 import { Project, ProjectSchemaResolver, WorkloadIdentity } from '../../../type/index.js'
@@ -52,6 +52,11 @@ export interface WorkloadTrustApplyResult {
 }
 
 const ENABLED_ISSUER_AUDIENCE_INDEX = 'workload_identity_trust_enabled_issuer_audience_idx'
+const SLUG_KEY = 'workload_identity_trust_slug_key'
+
+const sameRoles = (a: readonly string[], b: readonly string[]) => a.length === b.length && a.every(it => b.includes(it))
+
+const conflictError = (slug: string) => createApplyError('CONFLICT', `Workload identity trust ${slug} was changed concurrently; apply it again`)
 
 const sameMembershipVariables = (a: readonly Acl.MembershipVariable[], b: readonly Acl.MembershipVariable[]) =>
 	a.length === b.length
@@ -177,11 +182,16 @@ export class WorkloadIdentityManager {
 	 * declared set and the envelope rules bound to them. `tokens_valid_after` moves only when the principal selection
 	 * changed or the trust is re-enabled (§6).
 	 */
+	/**
+	 * `authorizedAgainst` is the trust the caller was authorized against (`null` for a create); a trust created or
+	 * re-roled since then answers CONFLICT rather than being rewritten under a stale authorization.
+	 */
 	public async apply(
 		db: DatabaseContext,
 		slug: string,
 		plan: WorkloadTrustApplyPlan,
 		createdBy: string | null,
+		authorizedAgainst: WorkloadIdentity.TrustRow | null,
 	): Promise<ApplyResponse<WorkloadTrustApplyResult>> {
 		const definition = plan.definition
 		try {
@@ -193,6 +203,12 @@ export class WorkloadIdentityManager {
 					return createApplyError('INVALID_DEFINITION', `Role ${invalidRole} is not valid or globally assignable`)
 				}
 				const [existing] = await this.getTrustStates(trx, { slug })
+				if (
+					(existing === undefined) !== (authorizedAgainst === null)
+					|| (existing !== undefined && authorizedAgainst !== null && !sameRoles(existing.trust.roles, authorizedAgainst.roles))
+				) {
+					return conflictError(slug)
+				}
 
 				let trustId: string
 				let identityId: string
@@ -219,6 +235,9 @@ export class WorkloadIdentityManager {
 					'AUDIENCE_IN_USE',
 					`Another enabled trust already admits issuer ${definition.issuer} with audience ${definition.audience}`,
 				)
+			}
+			if ((e instanceof UniqueViolationError && e.constraint === SLUG_KEY) || e instanceof SerializationFailureError) {
+				return conflictError(slug)
 			}
 			throw e
 		}

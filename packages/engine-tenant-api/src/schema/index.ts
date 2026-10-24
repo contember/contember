@@ -163,6 +163,7 @@ export type ApplyWorkloadIdentityTrustError = {
 
 export type ApplyWorkloadIdentityTrustErrorCode =
 	| 'AUDIENCE_IN_USE'
+	| 'CONFLICT'
 	| 'ENVELOPE_NOT_AUTHORIZED'
 	| 'IMPLICIT_MEMBERSHIP_CONFLICT'
 	| 'INVALID_CONDITIONS'

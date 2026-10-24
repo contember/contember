@@ -39,6 +39,9 @@ const parseOperator = (value: Record<string, unknown>): WorkloadIdentity.Conditi
 	switch (operator) {
 		case 'equals': {
 			const operand = value.equals
+			if (operand === '') {
+				return '`equals` must not be an empty string'
+			}
 			return typeof operand === 'string' || typeof operand === 'number' || typeof operand === 'boolean'
 				? { equals: operand }
 				: '`equals` must be a string, a number or a boolean'
@@ -62,7 +65,9 @@ const parseOperator = (value: Record<string, unknown>): WorkloadIdentity.Conditi
 				? { startsWith: value.startsWith }
 				: '`startsWith` must be a non-empty string'
 		case 'arrayContains':
-			return typeof value.arrayContains === 'string' ? { arrayContains: value.arrayContains } : '`arrayContains` must be a string'
+			return typeof value.arrayContains === 'string' && value.arrayContains !== ''
+				? { arrayContains: value.arrayContains }
+				: '`arrayContains` must be a non-empty string'
 	}
 }
 
@@ -104,19 +109,30 @@ const operandTypes = (condition: WorkloadIdentity.ConditionOperator): readonly s
 	return []
 }
 
+/** Claims verification itself checks or that differ per token; a condition on them selects no principal. */
+const VERIFIED_CLAIMS: readonly string[] = ['iss', 'aud', 'iat', 'exp', 'nbf', 'jti', 'cnf']
+
+const topLevelClaim = (condition: WorkloadIdentity.ConditionTarget): string | undefined =>
+	'claim' in condition ? condition.claim : condition.path.length === 1 ? condition.path[0] : undefined
+
 const declaredClaimType = (profile: WorkloadIdentity.Profile, condition: WorkloadIdentity.ConditionTarget): ClaimType | undefined => {
 	const claimTypes = workloadProfiles[profile].claimTypes
-	const name = 'claim' in condition ? condition.claim : condition.path.length === 1 ? condition.path[0] : undefined
+	const name = topLevelClaim(condition)
 	return name !== undefined && Object.prototype.hasOwnProperty.call(claimTypes, name) ? claimTypes[name] : undefined
 }
 
-/** The profile rules of §9 / §9b: declared claim types and the mandatory exact `sub` condition. */
+/** The profile rules of §9: no conditions on verified claims, declared claim types and the mandatory anchor condition. */
 export const validateConditionsForProfile = (
 	profile: WorkloadIdentity.Profile,
 	conditions: readonly WorkloadIdentity.Condition[],
 ): readonly ConditionError[] => {
 	const errors: ConditionError[] = []
 	conditions.forEach((condition, index) => {
+		const claim = topLevelClaim(condition)
+		if (claim !== undefined && VERIFIED_CLAIMS.includes(claim)) {
+			errors.push({ index, message: `\`${claim}\` is checked by token verification itself; a condition on it selects no principal` })
+			return
+		}
 		const declared = declaredClaimType(profile, condition)
 		if (declared === undefined) {
 			return
@@ -134,10 +150,15 @@ export const validateConditionsForProfile = (
 			errors.push({ index, message: `claim is declared as a ${declared}, an operand of type ${mismatched.join(', ')} can never match it` })
 		}
 	})
-	if (workloadProfiles[profile].requiresExactSubCondition) {
-		const hasExactSub = conditions.some(it => 'claim' in it && it.claim === 'sub' && ('equals' in it || 'in' in it))
-		if (!hasExactSub) {
-			errors.push({ index: null, message: `the ${profile} profile requires a condition on \`sub\` with \`equals\` or \`in\`` })
+	const { anchorClaims } = workloadProfiles[profile]
+	if (anchorClaims.length > 0) {
+		const anchored = conditions.some(it => {
+			const claim = topLevelClaim(it)
+			return claim !== undefined && anchorClaims.includes(claim) && ('equals' in it || 'in' in it)
+		})
+		if (!anchored) {
+			const names = anchorClaims.map(it => `\`${it}\``).join(' or ')
+			errors.push({ index: null, message: `the ${profile} profile requires a condition on ${names} with \`equals\` or \`in\`` })
 		}
 	}
 	return errors

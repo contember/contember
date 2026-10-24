@@ -1,6 +1,7 @@
 import { describe, expect, test } from 'bun:test'
 import { WorkloadIdentity } from '../../../../../src/model/type/index.js'
 import { principalSelectionKey, validateTrustDefinition } from '../../../../../src/model/service/workloadIdentity/apply/trustDefinition.js'
+import { parseConditions } from '../../../../../src/model/service/workloadIdentity/conditions.js'
 
 const instanceConfig: WorkloadIdentity.InstanceConfig = { ...WorkloadIdentity.defaultInstanceConfig, insecureIssuers: ['localhost'] }
 
@@ -71,9 +72,33 @@ describe('validateTrustDefinition', () => {
 		expect(error.details).toEqual([{ index: 0, message: 'claim is declared as a string, an operand of type number can never match it' }])
 	})
 
+	test('github-actions requires a repository_id or repository_owner_id condition with equals or in', () => {
+		const error = errorOf(githubDefinition({ conditions: [{ claim: 'environment', equals: 'production' }] }))
+		expect(error.code).toBe('INVALID_CONDITIONS')
+		expect(error.details).toEqual([
+			{ index: null, message: 'the github-actions profile requires a condition on `repository_id` or `repository_owner_id` with `equals` or `in`' },
+		])
+		expect(validateTrustDefinition(githubDefinition({ conditions: [{ claim: 'repository_owner_id', in: ['1', '2'] }] }), instanceConfig).ok).toBe(true)
+	})
+
+	test('a condition on a claim verification already checks is rejected', () => {
+		const error = errorOf(githubDefinition({
+			conditions: [{ claim: 'repository_id', equals: '123' }, { claim: 'aud', equals: 'contember:test:deploy' }, {
+				path: ['iss'],
+				startsWith: 'https://',
+			}],
+		}))
+		expect(error.code).toBe('INVALID_CONDITIONS')
+		expect(error.details).toEqual([
+			{ index: 1, message: '`aud` is checked by token verification itself; a condition on it selects no principal' },
+			{ index: 2, message: '`iss` is checked by token verification itself; a condition on it selects no principal' },
+		])
+	})
+
 	test('oidc refuses an issuer with a dedicated profile', () => {
 		expect(errorOf(oidcDefinition({ issuer: 'https://token.actions.githubusercontent.com' })).code).toBe('ISSUER_NOT_ALLOWED')
 		expect(errorOf(oidcDefinition({ issuer: 'https://token.actions.githubusercontent.com/' })).message).toContain('github-actions profile')
+		expect(errorOf(oidcDefinition({ issuer: 'https://token.actions.githubusercontent.com/acme' })).code).toBe('ISSUER_NOT_ALLOWED')
 	})
 
 	test('http issuer and jwks uri are refused unless the host is an insecure issuer of the instance', () => {
@@ -124,6 +149,18 @@ describe('validateTrustDefinition', () => {
 		expect(errorOf(oidcDefinition({ memberships: [{ ...membership, variables: [{ name: 'language', values: [] }] }] })).code).toBe(
 			'INVALID_MEMBERSHIP',
 		)
+	})
+})
+
+describe('parseConditions', () => {
+	test('empty operands are rejected', () => {
+		expect(parseConditions([{ claim: 'sub', equals: '' }, { claim: 'groups', arrayContains: '' }])).toEqual({
+			ok: false,
+			errors: [
+				{ index: 0, message: '`equals` must not be an empty string' },
+				{ index: 1, message: '`arrayContains` must be a non-empty string' },
+			],
+		})
 	})
 })
 

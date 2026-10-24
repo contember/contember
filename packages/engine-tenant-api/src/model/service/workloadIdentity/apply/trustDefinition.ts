@@ -128,7 +128,9 @@ export const validateTrustDefinition = (
 		}
 	}
 	if (definition.profile === 'oidc') {
-		const dedicated = Object.entries(DEDICATED_PROFILE_ISSUERS).find(([issuer]) => issuer === definition.issuer.replace(/\/+$/, ''))
+		// by host, so a per-enterprise issuer path on the same host is refused too
+		const issuerHost = new URL(definition.issuer).host
+		const dedicated = Object.entries(DEDICATED_PROFILE_ISSUERS).find(([issuer]) => new URL(issuer).host === issuerHost)
 		if (dedicated) {
 			return createApplyError(
 				'ISSUER_NOT_ALLOWED',

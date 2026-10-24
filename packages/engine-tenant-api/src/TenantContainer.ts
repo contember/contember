@@ -220,8 +220,12 @@ export class TenantContainerFactory {
 			.addService('authLogService', () => new AuthLogService())
 			.addService('workloadJwksRegistry', () => args.workloadIdentity?.jwksRegistry ?? new WorkloadJwksRegistry(WorkloadIdentity.defaultInstanceConfig))
 			.addService('workloadIdentityMetrics', () => args.workloadIdentity?.metrics ?? noopWorkloadIdentityMetrics)
-			.addService('workloadTokenVerifier', ({ workloadJwksRegistry }) => new WorkloadTokenVerifier(workloadJwksRegistry))
 			.addService('workloadIdentityManager', () => new WorkloadIdentityManager())
+			.addService(
+				'workloadTokenVerifier',
+				({ workloadJwksRegistry, workloadIdentityMetrics, authLogService, providers }) =>
+					new WorkloadTokenVerifier(workloadJwksRegistry, workloadIdentityMetrics, authLogService, providers),
+			)
 			.addService('globalRoleValidator', () => new GlobalRoleValidator())
 			.addService('loginRiskAnalyzer', ({ providers }) => new LoginRiskAnalyzer(providers.hash))
 			.addService('idpRegistry', () => {

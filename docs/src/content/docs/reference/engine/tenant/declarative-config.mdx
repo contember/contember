@@ -251,16 +251,16 @@ workloadIdentities: {
 | Field | Required | Description |
 |---|---|---|
 | `profile` | yes | `'oidc'` (any OIDC-compliant issuer) or `'github-actions'` (a stricter preset for GitHub's issuer). See [profiles](/guides/workload-identity/overview#profiles). |
-| `issuer` | yes | The token's `iss`, compared exactly. Must be `https://` unless the host is listed in the server's [`insecureIssuers`](/reference/engine/configuration/workload-identity). The `oidc` profile refuses issuers that have a dedicated profile (`https://token.actions.githubusercontent.com`). |
+| `issuer` | yes | The token's `iss`, compared exactly. Must be `https://` unless the host is listed in the server's [`insecureIssuers`](/reference/engine/configuration/workload-identity). The `oidc` profile refuses issuers on the host of a dedicated profile (`token.actions.githubusercontent.com`, whatever the path). |
 | `audience` | yes | The token's `aud`, compared exactly. Recommended convention: `contember:<instance>:<trust-slug>`. Two enabled trusts cannot share the same `issuer` + `audience`. |
-| `conditions` | yes | A non-empty list of claim conditions; all must match. `oidc` requires at least one condition on `sub` with `equals` or `in`. See [conditions](#conditions). |
+| `conditions` | yes | A non-empty list of claim conditions; all must match. `oidc` requires at least one condition on `sub` with `equals` or `in`, `github-actions` one on `repository_id` or `repository_owner_id` with `equals` or `in`. See [conditions](#conditions). |
 | `jwksUri` | no | Fetch keys from this URL instead of OIDC discovery (`<issuer>/.well-known/openid-configuration`). With `jwksUri` set, `issuer` is only compared, never fetched. |
 | `signingAlgs` | no | Accepted JWS algorithms, asymmetric only (`RS*`, `PS*`, `ES*`, `EdDSA`). `oidc` default: `['RS256', 'ES256']`. Fixed to `['RS256']` on `github-actions`. |
 | `typ` | no | Accepted `typ` header values, exact match; `null` accepts a token without the header. `oidc` default: `['JWT', null]`. Fixed to `['JWT']` on `github-actions`. |
 | `acceptAudienceArray` | no | `oidc` only. Accept an `aud` array that contains `audience`. Without it, only a string or a single-element array is accepted. Every other audience in the array can then replay the token to Contember — see [security notes](/guides/workload-identity/security#audience-arrays). |
-| `requireDpop` | no | `oidc` only. Reject tokens that are not bound to a key with [DPoP](/guides/workload-identity/security#dpop). Default `false`. |
+| `requireDpop` | no | `oidc` only. Reject tokens that are not bound to a key with [DPoP](/guides/workload-identity/security#dpop). Default `false`. The algorithm of the DPoP proofs must be in `signingAlgs` too. |
 | `maxTokenLifetime` | no | Maximum `exp − iat` in seconds. Default `3600`, at most `86400`. |
-| `trustForwardedInfo` | no | Same contract as on an [API key](/reference/engine/tenant/proxy-trust). Default `false`. |
+| `trustForwardedInfo` | no | Same contract as on an [API key](/reference/engine/tenant/proxy-trust). Default `false`. Setting it needs a `SUPER_ADMIN` applier. |
 | `description` | no | Shown in the members listing and the panel. |
 | `roles` | no | Global tenant roles of the trust's identity. See [restrictions](#who-may-apply-trusts). |
 | `memberships` | no | Project memberships: `project`, `role`, optional `variables` (`[{ name, values }]`) and an optional [`assumeMembership` envelope](/guides/workload-identity/assume-membership). |
@@ -280,10 +280,12 @@ Each condition names one claim and exactly one operator:
 
 | Operator | Matches |
 |---|---|
-| `equals` | A scalar claim strictly equal to the operand (a string, a number or a boolean; `'1'` does not equal `1`). |
+| `equals` | A scalar claim strictly equal to the operand (a non-empty string, a number or a boolean; `'1'` does not equal `1`). |
 | `in` | A scalar claim equal to one of the listed strings or numbers. The list must not be empty. |
 | `startsWith` | A string claim starting with the operand. The operand must not be empty. |
-| `arrayContains` | An array claim containing the operand as an element. |
+| `arrayContains` | An array claim containing the operand, a non-empty string, as an element. |
+
+Conditions on `iss`, `aud`, `iat`, `exp`, `nbf`, `jti` and `cnf` (as `claim` or a single-segment `path`) are rejected: token verification checks them itself, and they select no principal.
 
 There is no substring operator and no dot-path shorthand: `claim: 'a.b'` names a claim literally called `a.b`; use `path` for nesting. A claim of the wrong type never matches. Where a profile declares a claim's type, apply rejects an operand that cannot match it — for example a number for GitHub's `repository_id`, which GitHub sends as a string. For claims the profile does not declare, a wrong type shows only as a rejected token; [`workload-identity check`](/guides/workload-identity/cli#checking-a-token) tells you which condition failed and the claim's actual value.
 
@@ -307,10 +309,10 @@ Renaming a slug disables the old trust and creates a new one with a new identity
 
 Every trust has a `tokensValidAfter` boundary. Tokens issued (`iat`) before it are rejected. An apply moves it to the current time only when the change affects **who** the trust admits:
 
-- `issuer`, `audience`, `profile`, `typ`, `signingAlgs`, `jwksUri` or `conditions` changed, or
+- `issuer`, `audience`, `profile`, `typ`, `signingAlgs`, `jwksUri`, `acceptAudienceArray` or `conditions` changed, or
 - the trust is re-enabled.
 
-Grant changes (`roles`, `memberships`, envelope) and `maxTokenLifetime`, `description` or `trustForwardedInfo` changes do not move it. Grants are read on every request, so a narrowing applies to the next request; a widening also reaches tokens that are still valid.
+Grant changes (`roles`, `memberships`, envelope) and `requireDpop`, `maxTokenLifetime`, `description` or `trustForwardedInfo` changes do not move it. Grants are read on every request, so a narrowing applies to the next request; a widening also reaches tokens that are still valid.
 
 A bump rejects every earlier token — including the rest of a CI job that ran the apply with that same trust. Callers using the [client libraries](/guides/workload-identity/self-hosted-issuer#4-calling-contember) fetch a fresh token on a 401 and retry once. A Kubernetes projected token is only refreshed by the kubelet, so re-pointing a trust used by pods means 401s until the kubelet rotates the token; prefer a new trust there. See [security notes](/guides/workload-identity/security#tokensvalidafter).
 
@@ -321,17 +323,30 @@ A bump rejects every earlier token — including the rest of a CI job that ran t
 - flags each trust whose earlier tokens will be rejected,
 - warns about slug renames (a disabled trust plus a new one with the same `issuer` + `audience`).
 
-After applying, the CLI prints the authorized [envelope closure](/guides/workload-identity/assume-membership#what-apply-checks) of each trust and highlights target roles that carry sensitive `system` flags (`assumeIdentity`, `history`, `migrate`, `debug`). A refused trust is reported with its error `code`, message and per-condition or per-rule details.
+After applying, the CLI prints the authorized [envelope closure](/guides/workload-identity/assume-membership#what-apply-checks) of each trust and highlights target roles that carry sensitive flags (`system.assumeIdentity`, `system.history`, `system.migrate`, `debug`). A refused trust is reported with its error `code`, message and per-condition or per-rule details, and stops the apply.
+
+With `--json`, the result document has a `workloadIdentities` field — `null` when the config has no `workloadIdentities` block, otherwise one entry per trust, unchanged ones included:
+
+| Field | Meaning |
+|---|---|
+| `slug` | The trust slug. |
+| `change` | `create`, `update`, `disable` or `unchanged`. |
+| `rejectsEarlierTokens` | The plan expects this apply to reject earlier tokens. |
+| `tokensValidAfterBumped` | The server's answer after an apply; `null` in a dry run and when no apply was sent (a plain disable, an unchanged trust). |
+| `envelopeClosure` | The authorized closure returned by the apply, `null` otherwise: per source membership (`project`, `role`), the `targets` with their `role`, `variables` (a value list, or `'*'` for any value) and `sensitiveSystemFlags`. |
+
+The flags and the rename are also in `warnings`, as `WORKLOAD_IDENTITY_REJECTS_EARLIER_TOKENS`, `WORKLOAD_IDENTITY_RENAMED` and `WORKLOAD_IDENTITY_SENSITIVE_ROLE`.
 
 ### Who may apply trusts
 
 - Applying needs the `workloadIdentity:add`, `workloadIdentity:update`, `workloadIdentity:disable` and `workloadIdentity:list` permissions, held by `SUPER_ADMIN` and `PROJECT_ADMIN`.
-- Tenant `roles` on a trust follow the `createGlobalApiKey` rules: a `PROJECT_ADMIN` may grant only `project_admin` and `entrypoint_deployer`; `super_admin` and `project_creator` need a `SUPER_ADMIN` applier. `login` is refused — it has no meaning for a workload.
+- Tenant `roles` and `trustForwardedInfo` on a trust follow the `createGlobalApiKey` rules: a `PROJECT_ADMIN` may grant any globally assignable role except `super_admin` and `project_creator`, and may not set `trustForwardedInfo`; those need a `SUPER_ADMIN` applier. `login` is refused — it has no meaning for a workload.
+- Updating a trust that already holds tenant roles also requires that the applier may grant those current roles, so a `PROJECT_ADMIN` cannot rewrite a `super_admin` trust (`ROLE_NOT_ALLOWED`).
 - A trust with `project_admin` or `super_admin` is implicitly admin in every project, so combining such a role with `memberships` is rejected. Use two trusts: a deploy trust with tenant roles only, and a content trust with memberships only.
-- Every membership and envelope closure is authorized like `addProjectMember` in its project.
+- Every membership and every bounded envelope target is authorized like `addProjectMember` in its project. A target with unbounded values (`true`, `variables: { v: true }`) needs the right to add members in every project, which `PROJECT_ADMIN` and `SUPER_ADMIN` have and a project-level member manager does not.
 - **A caller authenticated by a workload trust cannot create, change or disable trusts** (`WORKLOAD_CREDENTIAL_FORBIDDEN`). A pipeline that runs `tenant:apply` with a trust still applies the rest of the config, and an unchanged `workloadIdentities` block issues no mutation — it fails only when the block changed, and that change must be applied with a person or API-key credential.
 
-All of these checks run in the tenant API; the CLI only plans and sends the mutations.
+All of these checks run in the tenant API; the CLI only plans and sends the mutations. A trust created, re-roled or applied by someone else between the check and the write answers `CONFLICT`; run the apply again.
 
 ## Panel access
 

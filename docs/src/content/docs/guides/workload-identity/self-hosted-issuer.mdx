@@ -44,7 +44,7 @@ export const handleIssuer = issuerHandler({
 })
 ```
 
-Mount `handleIssuer` so that `https://auth.example.com/.well-known/*` reaches it — any server or framework that works with WHATWG `Request` / `Response` (Node 18+, Bun, edge runtimes) can call it directly. `issuerHandler` refuses private key members, so the private key cannot be published by mistake.
+Mount `handleIssuer` so that `https://auth.example.com/.well-known/*` reaches it — any server or framework that works with WHATWG `Request` / `Response` (Node 18+, Bun, edge runtimes) can call it directly. `issuerHandler` throws at construction when a key has private members, so the private key cannot be published by mistake, and when a key lacks `kty`, `kid` or `alg`.
 
 Requirements on the issuer URL:
 
@@ -136,7 +136,7 @@ A token that leaks from a log or a proxy is useless without the in-memory key, a
 ## Rotating the key
 
 1. Generate the next key and publish **both** public keys in `issuerHandler`'s `keys`.
-2. Wait until every engine has picked up the new JWKS. An unknown `kid` triggers a refetch, but refetches are rate-limited, so give it a few minutes.
+2. Wait until every engine has picked up the new JWKS. Engines refresh keys every 5 minutes; an unknown `kid` triggers a refetch, but at most once every 30 seconds per issuer, so give it at least 5 minutes.
 3. Switch `selfIssued` to the new key and `kid`.
 4. Wait at least `maxTokenLifetime`, so every token signed with the old key has expired.
 5. Remove the old public key.

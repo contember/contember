@@ -47,7 +47,7 @@ Recommended conditions:
 
 | Condition | Why |
 |---|---|
-| `repository_id`, `repository_owner_id` | Immutable. GitHub sends them as **strings** — `equals: '123456789'`, not `123456789`. Apply rejects a number. |
+| `repository_id`, `repository_owner_id` | Immutable. The profile requires a condition on at least one of them with `equals` or `in`: GitHub's issuer serves every repository. GitHub sends them as **strings** — `equals: '123456789'`, not `123456789`. Apply rejects a number. |
 | `environment` | Restricts the trust to jobs running in a deployment environment. Meaningful **only** with environment protection rules (required reviewers, branch restrictions) — without them any workflow in the repository can enter the environment. |
 | `ref`, `job_workflow_ref` | Restrict to a branch or to one reusable workflow, e.g. `{ claim: 'job_workflow_ref', startsWith: 'my-org/sites/.github/workflows/sync.yml@' }`. |
 

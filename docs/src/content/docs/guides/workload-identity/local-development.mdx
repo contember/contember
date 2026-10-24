@@ -55,7 +55,7 @@ import { createTestIssuer } from '@contember/workload-identity/testing'
 
 const issuer = await createTestIssuer()            // RS256; { alg: 'ES256' } for EC
 
-// apply a trust with issuer.issuer (and issuer.jwksUri if the engine runs in Docker), then:
+// apply a trust with issuer.issuer, then:
 const client = new GraphQlClient({
   url: 'http://localhost:1481/content/app/live',
   credentials: issuer.credentials({ subject: 'web-backend', audience: 'contember:local:web-backend' }),
@@ -67,9 +67,11 @@ const expired = await issuer.mint({
   iss: issuer.issuer, sub: 'web-backend', aud: 'contember:local:web-backend', iat: now - 7200, exp: now - 3600,
 })
 const noTyp = await issuer.mint({ /* … */ }, { header: { typ: undefined } })
-const foreign = await issuer.mint({ /* … */ }, { foreignKey: true })   // key not in the JWKS
+const foreign = await issuer.mint({ /* … */ }, { foreignKey: true })   // unpublished key, same kid: fails the signature
 
 await issuer.close()
 ```
 
-`issuer.issuer` is `http://localhost:<port>` (set `hostname` to change the host part), so the engine under test needs that host in `insecureIssuers`. `credentials({ …, dpop: true })` returns a DPoP-binding provider for testing `requireDpop` trusts.
+`issuer.issuer` is `http://localhost:<port>` (set `hostname` to change the host part), so the engine under test needs that host in `insecureIssuers`. The issuer listens on `127.0.0.1` only, so the engine must reach the host's loopback: run it on the same machine, not in a container on a bridge network. `issuer.jwksUri` is `<issuer>/.well-known/jwks.json`.
+
+`credentials({ …, dpop: true })` returns a DPoP-binding provider for testing `requireDpop` trusts. Its proofs are signed with `ES256`, so the trust's `signingAlgs` must include `ES256` — with the default `RS256` issuer, `['RS256', 'ES256']`.

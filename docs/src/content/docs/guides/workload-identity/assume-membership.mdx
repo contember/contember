@@ -46,7 +46,7 @@ As with any assume, the assumed memberships **replace** the trust's memberships 
 - **Default deny.** Without an envelope, any assume header is answered with `403`.
 - **Each rule binds to its own membership.** A rule can use only the variable values of the membership it is declared on, never those of a sibling membership.
 - **Full variable coverage.** Every `entity` and `condition` variable that the assumed role defines in the current schema must be named by the rule and sent by the caller with at least one value. Otherwise `403`. Omitting a variable never means "all values".
-- **Predefined variables** (`identityID`, `personID`) are never taken from the caller. They always come from the trust's identity, so an envelope cannot be used to impersonate another identity.
+- **Predefined variables** (`identityID`, `personID`) are never taken from the caller. They always come from the trust's identity, so an envelope cannot be used to impersonate another identity. An assume that sends one is answered with `403`.
 - **Static access is the anchor.** The trust needs a membership in the project at all; an envelope only works where it has one.
 
 When a schema migration adds a variable to a role that an envelope rule does not name, requests assuming that role fail with `403` until the rule is updated — schema changes never silently widen an envelope. `contember deploy` and `contember migrations execute` list the envelope rules the new schema leaves uncovered before they run (this needs `workloadIdentity:list`; without it they say the check was skipped).
@@ -55,9 +55,10 @@ When a schema migration adds a variable to a role that an envelope rule does not
 
 An envelope is a grant, so `tenant apply` authorizes it like one. The tenant API expands every rule into its **closure** — the roles and variable values it can produce — and requires that the applier could grant exactly that with `addProjectMember`:
 
+- The envelope must name its target roles; `assumeMembership: true` as a whole is rejected, because it would also admit roles added to the schema later.
 - A rule must name every non-predefined variable of the target role; a variable reference (`'site'`) must exist on the source membership with values.
-- A rule naming a role missing from the project schema, or naming a predefined variable, is rejected.
-- Unbounded rules (`true`, `variables: { v: true }`) require the right to grant that role with any values.
+- A rule naming a role missing from the project schema, a variable the role does not have, or a predefined variable, is rejected.
+- Unbounded rules (`editor: true`, `variables: { v: true }`) require the right to add members in every project — `PROJECT_ADMIN` or `SUPER_ADMIN`, not a project-level member manager.
 
 The closure is printed after apply and recorded in the [audit log](/reference/engine/tenant/audit-log#workload-identity-events-since-22).
 

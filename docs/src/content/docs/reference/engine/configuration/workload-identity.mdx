@@ -7,7 +7,7 @@ title: Workload identity
 
 [Workload identity trusts](/guides/workload-identity/overview) are declared in tenant configuration, but how the engine may reach their issuers is an instance-level decision. These settings live in the server configuration only, so a tenant configuration cannot widen them. Apply-time validation in the tenant API reads the same settings.
 
-By default the engine fetches issuer discovery documents and keys only over `https://`, only from public addresses, and trusts only the system's CA certificates. All settings are optional.
+By default the engine fetches issuer discovery documents and keys only over `https://`, only from public addresses, and trusts only the root CA certificates bundled with Node.js. All settings are optional.
 
 ## Configuration
 
@@ -31,16 +31,16 @@ server:
 
 | Option | Environment variable | Meaning |
 |---|---|---|
-| `egressAllowlist` | `CONTEMBER_WORKLOAD_IDENTITY_EGRESS_ALLOWLIST` | Hostnames or CIDR ranges exempt from the ban on loopback, private, link-local and reserved addresses — for issuers on internal networks (GitHub Enterprise Server, an internal Keycloak, a private Kubernetes API). Still `https://` only. Comma-separated in the environment variable. |
-| `insecureIssuers` | `CONTEMBER_WORKLOAD_IDENTITY_INSECURE_ISSUERS` | Hostnames whose issuer and keys may be fetched over `http://`, loopback included. **Development only**; the engine logs a warning at startup while it is set. Comma-separated in the environment variable. |
-| `caCertificates` | `CONTEMBER_WORKLOAD_IDENTITY_CA_CERTIFICATES` | Path to a PEM bundle of extra CA certificates, trusted for issuer fetches only — for issuers behind a private CA. |
-| `jwksMaxStaleness` | `CONTEMBER_WORKLOAD_IDENTITY_JWKS_MAX_STALENESS` | How long the last known keys of an issuer stay accepted while the issuer is unreachable. Default `6h`. |
+| `egressAllowlist` | `CONTEMBER_WORKLOAD_IDENTITY_EGRESS_ALLOWLIST` | Hostnames, IP addresses or CIDR ranges exempt from the ban on loopback, private, link-local and reserved addresses — for issuers on internal networks (GitHub Enterprise Server, an internal Keycloak, a private Kubernetes API). Still `https://` only. A list in the config file, comma-separated in the environment variable. |
+| `insecureIssuers` | `CONTEMBER_WORKLOAD_IDENTITY_INSECURE_ISSUERS` | Hostnames or IP addresses whose issuer and keys may be fetched over `http://`. They are also exempt from the address ban, loopback included. **Development only**; the engine logs a warning at startup while it is set. A list in the config file, comma-separated in the environment variable. |
+| `caCertificates` | `CONTEMBER_WORKLOAD_IDENTITY_CA_CERTIFICATES` | Path to a PEM bundle of extra CA certificates, trusted for issuer fetches only — for issuers behind a private CA. The file is read at startup; an unreadable file or one without a valid certificate stops the engine from starting. |
+| `jwksMaxStaleness` | `CONTEMBER_WORKLOAD_IDENTITY_JWKS_MAX_STALENESS` | How long the last known keys of an issuer stay accepted while the issuer is unreachable. Seconds, or a number with an `s`, `m`, `h` or `d` suffix (`90s`, `30m`, `6h`, `1d`). Default `6h`. |
 
 ## Fetch policy
 
-The engine fetches discovery (`<issuer>/.well-known/openid-configuration`, or the trust's `jwksUri` instead) and keys only for configured trusts — an unknown issuer in a token causes no request. Each connection's resolved address is checked, so DNS rebinding cannot reach an internal address. Redirects are limited and re-checked, and responses are limited in size, key count and time. The discovery document's `issuer` must equal the configured issuer exactly.
+The engine fetches discovery (`<issuer>/.well-known/openid-configuration`, or the trust's `jwksUri` instead) and keys only for configured trusts — an unknown issuer in a token causes no request. Every address a host resolves to is checked on each connection, so DNS rebinding cannot reach an internal address. At most 3 redirects are followed, each re-checked; a fetch is limited to 5 seconds and 256 KiB, and a JWKS to 50 keys. The discovery document's `issuer` must equal the configured issuer exactly.
 
-Keys of enabled trusts are prefetched when the engine first serves a project group, fetched on first use for a trust created later, and refreshed in the background. A token with an unknown key id triggers a refetch, rate-limited across trusts. When a refresh fails, the last known keys stay accepted for up to `jwksMaxStaleness`, then verification fails closed. Failed fetches and unknown key ids are exported in the engine metrics from the first failure.
+Keys of enabled trusts are prefetched when the engine first serves a project group, fetched on first use for a trust created later, and refreshed in the background every 5 minutes. A token with an unknown key id triggers a refetch; after a refetch or a failed fetch, the same key source is not fetched again for 30 seconds, whichever trust uses it. When a refresh fails, the last known keys stay accepted for up to `jwksMaxStaleness`, then verification fails closed. Failed fetches and unknown key ids are counted from the first failure in the `contember_workload_identity_jwks_fetch_failures_total` and `contember_workload_identity_unknown_kid_total` metrics (see [metrics](/reference/engine/tenant/workload-identities#audit)).
 
 Issuers are expected to keep a rotated key published for at least the token lifetime; all major providers do. The keys are public, so they are shared across tenants of one engine process; nothing identity-bearing is.
 

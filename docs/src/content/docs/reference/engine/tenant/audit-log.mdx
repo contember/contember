@@ -25,7 +25,7 @@ Every entry carries:
 | `person_input_identifier` | Free-form input string (the email submitted on a failed login, etc.) |
 | `error_code` | The `code` returned to the caller on failure |
 | `trust_id` | *(since 2.2)* The [workload identity trust](/reference/engine/tenant/workload-identities) of a `workload_*` entry |
-| `token_ref` | *(since 2.2)* On `workload_auth_*` entries: the token's `jti`, or `sha256:` + a hash of the token when it has no `jti`. Never the token itself |
+| `token_ref` | *(since 2.2)* On `workload_auth_success` entries: the token's `jti`, or `sha256:` + a hash of the token when it has no `jti`. Never the token itself |
 | `metadata` | JSONB — forensic context (forwarder IP/UA, `sessionId`, `reason`, `invokedByUnpersistedIdentityId`, …) |
 | `event_data` | JSONB — domain payload: `{before, after}` snapshots, creation snapshots, redacted inputs |
 
@@ -108,10 +108,12 @@ Entries for [workload identity trusts](/guides/workload-identity/overview) carry
 
 | Type | When | Notes |
 |---|---|---|
-| `workload_auth_success` | A request authenticated with a workload token | Written **once per token**, not per request: deduplicated by `trust_id` + `token_ref`, also across engine instances. `identity_id` is the trust's identity. Carries the trust slug, the token's `iss`, `sub` and `jti`, the key thumbprint for a DPoP-bound token, and for `github-actions` the `repository_id`, `run_id`, `run_attempt`, `ref`, `job_workflow_ref` and `environment` claims. |
-| `workload_auth_failure` | A workload token was rejected | `error_code` is the failure category (`trust_not_found`, `signature`, `typ`, `audience`, `profile`, `lifetime`, `tokens_valid_after`, `condition`, `jwks`, `malformed`, or `dpop_missing`, `dpop_invalid`, `dpop_binding`, `dpop_replay`). Claims of the unverified token appear only in bounded `unverified_*` fields. Rate-limited per trust, so a flood of bad tokens does not flood the log; every failure is still counted in the engine metrics. |
-| `workload_identity_apply` | `applyWorkloadIdentityTrust` (success) | `{before, after}` — the trust definitions, including the authorized envelope closure |
-| `workload_identity_disable` | `disableWorkloadIdentityTrust` (success), including trusts disabled by a `tenant apply` | the disabled trust in `trust_id` |
+| `workload_auth_success` | A request authenticated with a workload token | Written **once per token**, not per request: deduplicated by `trust_id` + `token_ref`, also across engine instances. `identity_id` is the trust's identity, `metadata` carries `trustSlug`. `event_data` carries `trustSlug`, the token's `iss`, `sub` and `jti`, `cnfJkt` (the key thumbprint) for a DPoP-bound token, and under `claims`, for `github-actions`, the `repository_id`, `run_id`, `run_attempt`, `ref`, `job_workflow_ref` and `environment` claims. |
+| `workload_auth_failure` | A workload token was rejected | `error_code` is the failure category (`trust_not_found`, `signature`, `typ`, `audience`, `profile`, `lifetime`, `tokens_valid_after`, `condition`, `jwks`, `malformed`, or `dpop_missing`, `dpop_invalid`, `dpop_binding`, `dpop_replay`), `error_message` the reason. `trust_id` is set when a trust matched. Claims of the unverified token appear only in `metadata`, as `unverified_iss`, `unverified_aud`, `unverified_sub` and `unverified_jti` (bounded in length), next to `trustSlug`. No `token_ref`. Rate-limited per trust and engine worker (a burst of 10, then one entry per 6 seconds; tokens matching no trust share one limit), so a flood of bad tokens does not flood the log; every failure is still counted in the engine metrics. |
+| `workload_identity_apply` | `applyWorkloadIdentityTrust` (success) | `{slug, trustId, created, tokensValidAfterBumped, before, after}` — `before` and `after` are the trust definitions (`before` is `null` on create), `after` also carries the authorized `envelopeClosure` |
+| `workload_identity_disable` | `disableWorkloadIdentityTrust` (success), including trusts a `tenant apply` disables — left out of the block, or set to `disabled: true` with no other change | `{slug, trustId}`. A `tenant apply` that disables a trust and changes its definition in one go sends an apply, recorded as `workload_identity_apply` |
+
+On `workload_auth_*` entries, `client_ip` and `user_agent` are those of the connection; forwarded client info is not applied.
 
 The caller of every rejected token gets the same `401`; these entries — together with the [token check](/guides/workload-identity/cli#checking-a-token) — are where an operator finds out why.
 

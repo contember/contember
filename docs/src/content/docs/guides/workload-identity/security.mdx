@@ -14,7 +14,7 @@ The audience is chosen by the caller and is not a secret. A workload eligible fo
 
 ## `tokensValidAfter`
 
-Because the audience is public, a future principal could obtain a token with your audience before you re-point a trust at it. Each trust therefore has a `tokensValidAfter` boundary, and tokens issued (`iat`) before it are rejected. An apply moves it to the current time when it changes who the trust admits — issuer, audience, profile, `typ`, signing algorithms, `jwksUri` or conditions — and when it re-enables the trust. The comparison allows 30 seconds of clock skew between the issuer and the engine.
+Because the audience is public, a future principal could obtain a token with your audience before you re-point a trust at it. Each trust therefore has a `tokensValidAfter` boundary, and tokens issued (`iat`) before it are rejected. An apply moves it to the current time when it changes who the trust admits — issuer, audience, profile, `typ`, signing algorithms, `jwksUri`, `acceptAudienceArray` or conditions — and when it re-enables the trust. The comparison allows 30 seconds of clock skew between the issuer and the engine.
 
 Grant changes do not move it. Grants are read on every request, so a narrowing applies to the next request, while a widening also reaches tokens that are still valid for the rest of their lifetime. That is accepted: a leaked valid token already compromises the trust for that time.
 
@@ -36,6 +36,8 @@ With `requireDpop: true` on an `oidc` trust, a token must be bound to a key of t
 
 Only issuers that bind tokens can be used: a [self-hosted issuer](/guides/workload-identity/self-hosted-issuer#dpop) with `selfIssued({ dpop: true })`, or an identity provider that implements RFC 9449. GitHub, GitLab, Kubernetes and Vercel do not bind their tokens.
 
+The proof's algorithm must be in the trust's `signingAlgs`, like the token's. `selfIssued` signs its proofs with `ES256`, so a trust whose tokens are signed with `RS256` needs `signingAlgs: ['RS256', 'ES256']`.
+
 Limits:
 
 - **The body is not covered.** GraphQL serves every operation from one URL, so a proof binds the method, the URL and the token, not the query. Someone who captures headers in real time can send a different query within the proof's window.
@@ -48,13 +50,13 @@ By default `aud` must be a string or a single-element array equal to the trust's
 
 ## Issuer keys and fetching
 
-- The engine fetches discovery and keys only for issuers of configured trusts, only over `https://`, never from loopback, private, link-local or reserved addresses unless the host is listed in the server's [`egressAllowlist`](/reference/engine/configuration/workload-identity), with bounded redirects, response sizes and timeouts. The discovery document's `issuer` must equal the configured issuer exactly.
-- Keys are refreshed in the background. When the issuer is unreachable, the last known keys stay accepted for up to [`jwksMaxStaleness`](/reference/engine/configuration/workload-identity) (6 hours by default), then verification fails closed. A key removed from the issuer's JWKS can therefore keep working for up to that long — disable the trust for an immediate cutoff.
+- The engine fetches discovery and keys only for issuers of configured trusts, only over `https://`, never from loopback, private, link-local or reserved addresses unless the host is listed in the server's [`egressAllowlist`](/reference/engine/configuration/workload-identity) (or, for development, in `insecureIssuers`), with bounded redirects, response sizes and timeouts. The discovery document's `issuer` must equal the configured issuer exactly.
+- Keys are refreshed in the background every 5 minutes, so a key removed from the issuer's JWKS keeps working until the next refresh. When the issuer is unreachable, the last known keys stay accepted for up to [`jwksMaxStaleness`](/reference/engine/configuration/workload-identity) (6 hours by default), then verification fails closed; a removed key can then keep working that long. Disable the trust for an immediate cutoff.
 - Only asymmetric algorithms are accepted; `HS*` and `none` are rejected regardless of the JWKS.
 
 ## Who can change trusts
 
-Trusts carry real permissions, so changing them is an administrative act: `PROJECT_ADMIN` or `SUPER_ADMIN`, with tenant roles limited like `createGlobalApiKey` and every membership and envelope authorized like `addProjectMember`. A caller authenticated by a workload trust cannot change trusts at all, so a compromised workflow cannot create a new trust for itself or disable everyone else's. Every apply and disable is recorded in the audit log.
+Trusts carry real permissions, so changing them is an administrative act: `PROJECT_ADMIN` or `SUPER_ADMIN`, with tenant roles limited like `createGlobalApiKey` — for the roles a trust already holds as well as the new ones — and every membership and envelope authorized like `addProjectMember`. A caller authenticated by a workload trust cannot change trusts at all, so a compromised workflow cannot create a new trust for itself or disable everyone else's. Every apply and disable is recorded in the audit log.
 
 ## Diagnosing a rejected token
 
@@ -73,7 +75,7 @@ WWW-Authenticate: Bearer error="invalid_token"
 |---|---|
 | [`contember workload-identity check`](/guides/workload-identity/cli#checking-a-token), the `checkWorkloadIdentityToken` query, the panel's Configuration page | The first failing step for a token you hold, with the condition index and the claim's actual value. |
 | [Audit log](/reference/engine/tenant/audit-log#workload-identity-events-since-22) (`workload_auth_failure`) | The failure category of tokens callers actually sent. Failure entries are rate-limited per trust. |
-| Engine metrics | Verification outcomes by category, issuer key fetch failures and unknown key ids. |
+| [Engine metrics](/reference/engine/tenant/workload-identities#audit) | Verification outcomes by category (`contember_workload_identity_verifications_total`), issuer key fetch failures and unknown key ids. |
 
 If you run read replicas: a trust used right after the apply that created or re-enabled it may see `401` until the replica has caught up.
 

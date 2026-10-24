@@ -38,7 +38,7 @@ A request carrying `Authorization: Bearer <jwt>` is accepted when all of these h
 | Lifetime and `tokensValidAfter` | The token is short-lived and was issued after the trust last changed who it admits. |
 | DPoP proof (opt-in) | The request comes from the holder of the key the token is bound to. |
 
-Trusts are declared in `tenant.config.ts` and applied with [`contember tenant apply`](/reference/engine/tenant/declarative-config#workload-identities). There is no other write path.
+Trusts are declared in `tenant.config.ts` and applied with [`contember tenant apply`](/reference/engine/tenant/declarative-config#workload-identities). The panel only lists them.
 
 ### Claims select, grants live on the trust
 
@@ -59,7 +59,7 @@ Recommended convention: `contember:<instance>:<trust-slug>`.
 | Profile | Use for | Notes |
 |---|---|---|
 | `oidc` | Any OIDC-compliant issuer: your own backend, Kubernetes, GitLab CI, Vercel, Keycloak, cloud workload identities | Requires a condition on `sub` with `equals` or `in`. Algorithms, `typ`, audience arrays and DPoP are configurable. |
-| `github-actions` | GitHub Actions (github.com or GitHub Enterprise Server) | Fixed `RS256` and `typ: JWT`; requires GitHub's claims (`repository_id`, `repository_owner_id`, `run_id`, `jti`) and knows their types. The `oidc` profile refuses GitHub's issuer. |
+| `github-actions` | GitHub Actions (github.com or GitHub Enterprise Server) | Requires a condition on `repository_id` or `repository_owner_id` with `equals` or `in`. Fixed `RS256` and `typ: JWT`; requires GitHub's claims (`repository_id`, `repository_owner_id`, `run_id`, `jti`) and knows their types. The `oidc` profile refuses any issuer on GitHub's token host. |
 
 Both cap the token lifetime at 86 400 seconds; the default per trust is 3 600.
 

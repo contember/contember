@@ -25,6 +25,7 @@ This is invisible to a mapper unit test; cover a new raw jsonb write with an e2e
 ## Connection Management
 
 - `Connection.create(config)` — pool-based (default 10 connections)
+  - `retryStaleConnection` option: a scope whose connection, taken from the pool, was lost before the server answered anything (pooler or replica restart) runs again on another connection. Only for connections whose scopes may run twice; engine-http enables it for read replicas.
 - `Connection.createSingle(config)` — single connection
 - `connection.createClient(schema, queryMeta)` — creates `Client` with schema context
 - `connection.withMaxConnections(n)` — returns a `ScopeLimitedConnection` view that caps how many pool connections may be acquired concurrently through it (one per top-level `scope`; nested scopes reuse the held connection and are not counted). Used per HTTP request so a single request cannot starve the shared pool.

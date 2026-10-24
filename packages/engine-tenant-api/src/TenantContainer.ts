@@ -125,6 +125,16 @@ import { PasswordlessSignInManager } from './model/service/PasswordlessSignInMan
 import { TogglePasswordlessMutationResolver } from './resolvers/mutation/person/TogglePasswordlessMutationResolver.js'
 import { PasswordStrengthValidator } from './model/service/PasswordStrengthValidator.js'
 import { AuthLogService } from './model/service/AuthLogService.js'
+import {
+	noopWorkloadIdentityMetrics,
+	WorkloadIdentityManager,
+	WorkloadIdentityMetrics,
+	WorkloadJwksRegistry,
+	WorkloadTokenVerifier,
+} from './model/service/workloadIdentity/index.js'
+import { WorkloadIdentity } from './model/type/index.js'
+import { WorkloadIdentityQueryResolver } from './resolvers/query/WorkloadIdentityQueryResolver.js'
+import { WorkloadIdentityMutationResolver } from './resolvers/mutation/workloadIdentity/WorkloadIdentityMutationResolver.js'
 
 export interface TenantContainer {
 	projectMemberManager: ProjectMemberManager
@@ -133,6 +143,8 @@ export interface TenantContainer {
 	signUpManager: SignUpManager
 	projectManager: ProjectManager
 	panelAccessResolver: PanelAccessResolver
+	workloadTokenVerifier: WorkloadTokenVerifier
+	workloadIdentityManager: WorkloadIdentityManager
 	resolvers: Schema.Resolvers
 	resolverContextFactory: TenantResolverContextFactory
 	authorizator: Authorizator<Identity>
@@ -155,6 +167,11 @@ export interface TenantContainerArgs {
 	tenantCredentials: TenantCredentials
 	cryptoProviders: Pick<Providers, 'encrypt' | 'decrypt' | 'encryptionEnabled'>
 	logger: Logger
+	/** Process-wide; a fresh registry with the default policy when omitted (tests, single-tenant tools). */
+	workloadIdentity?: {
+		readonly jwksRegistry: WorkloadJwksRegistry
+		readonly metrics: WorkloadIdentityMetrics
+	}
 }
 
 export class TenantContainerFactory {
@@ -171,6 +188,8 @@ export class TenantContainerFactory {
 				'projectMemberManager',
 				'projectManager',
 				'panelAccessResolver',
+				'workloadTokenVerifier',
+				'workloadIdentityManager',
 				'signUpManager',
 				'resolvers',
 				'authorizator',
@@ -199,6 +218,10 @@ export class TenantContainerFactory {
 			.addService('authPolicyResolver', () => new AuthPolicyResolver())
 			.addService('panelAccessResolver', ({ providers }) => new PanelAccessResolver(providers))
 			.addService('authLogService', () => new AuthLogService())
+			.addService('workloadJwksRegistry', () => args.workloadIdentity?.jwksRegistry ?? new WorkloadJwksRegistry(WorkloadIdentity.defaultInstanceConfig))
+			.addService('workloadIdentityMetrics', () => args.workloadIdentity?.metrics ?? noopWorkloadIdentityMetrics)
+			.addService('workloadTokenVerifier', ({ workloadJwksRegistry }) => new WorkloadTokenVerifier(workloadJwksRegistry))
+			.addService('workloadIdentityManager', () => new WorkloadIdentityManager())
 			.addService('globalRoleValidator', () => new GlobalRoleValidator())
 			.addService('loginRiskAnalyzer', ({ providers }) => new LoginRiskAnalyzer(providers.hash))
 			.addService('idpRegistry', () => {
@@ -331,6 +354,8 @@ export class TenantContainerFactory {
 				({ personManager, projectManager, projectMemberManager }) => new PersonQueryResolver(personManager, projectManager, projectMemberManager),
 			)
 			.addService('idpQueryResolver', ({ idpManager }) => new IDPQueryResolver(idpManager))
+			.addService('workloadIdentityQueryResolver', () => new WorkloadIdentityQueryResolver())
+			.addService('workloadIdentityMutationResolver', () => new WorkloadIdentityMutationResolver())
 			.addService('projectQueryResolver', ({ projectManager }) => new ProjectQueryResolver(projectManager))
 			.addService(
 				'projectMembersQueryResolver',

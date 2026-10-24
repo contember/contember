@@ -1,0 +1,56 @@
+{
+	"name": "@contember/workload-identity",
+	"license": "Apache-2.0",
+	"version": "2.2.0-alpha.12",
+	"type": "module",
+	"sideEffects": false,
+	"main": "./dist/production/index.js",
+	"exports": {
+		".": {
+			"import": {
+				"types": "./dist/types/index.d.ts",
+				"development": "./dist/development/index.js",
+				"production": "./dist/production/index.js",
+				"typescript": "./src/index.ts",
+				"default": "./dist/production/index.js"
+			},
+			"require": {
+				"types": "./dist/types/index.d.ts",
+				"development": "./dist/development/index.cjs",
+				"production": "./dist/production/index.cjs",
+				"typescript": "./src/index.ts",
+				"default": "./dist/production/index.cjs"
+			}
+		},
+		"./testing": {
+			"import": {
+				"types": "./dist/types/testing.d.ts",
+				"development": "./dist/development/testing.js",
+				"production": "./dist/production/testing.js",
+				"typescript": "./src/testing.ts",
+				"default": "./dist/production/testing.js"
+			},
+			"require": {
+				"types": "./dist/types/testing.d.ts",
+				"development": "./dist/development/testing.cjs",
+				"production": "./dist/production/testing.cjs",
+				"typescript": "./src/testing.ts",
+				"default": "./dist/production/testing.cjs"
+			}
+		}
+	},
+	"typings": "./dist/types/index.d.ts",
+	"scripts": {
+		"ae:build": "api-extractor run --local",
+		"ae:test": "api-extractor run"
+	},
+	"dependencies": {
+		"@contember/graphql-client": "workspace:*",
+		"jose": "catalog:"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/contember/contember.git",
+		"directory": "packages/workload-identity"
+	}
+}

@@ -324,6 +324,8 @@ export type VerifyResponse = Response<VerifyResult, VerifyErrorCode>
 export type AuthCredential =
 	| { readonly type: 'api_key'; readonly id: string }
 	| { readonly type: 'unpersisted' }
+	/** A JWT admitted by a workload identity trust; `tokenRef` is its `jti`, or `sha256:` + the token hash. */
+	| { readonly type: 'workload_trust'; readonly trustId: string; readonly trustSlug: string; readonly tokenRef: string }
 
 export class VerifyResult {
 	readonly valid = true

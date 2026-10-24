@@ -149,6 +149,44 @@ export type ApiKeyWithToken = {
 	readonly token?: Maybe<Scalars['String']['output']>
 }
 
+export type ApplyWorkloadIdentityTrustError = {
+	readonly __typename?: 'ApplyWorkloadIdentityTrustError'
+	readonly code: ApplyWorkloadIdentityTrustErrorCode
+	/**  Per-condition, per-membership or per-rule detail, when the code has any.  */
+	readonly details?: Maybe<Scalars['Json']['output']>
+	readonly developerMessage: Scalars['String']['output']
+}
+
+export type ApplyWorkloadIdentityTrustErrorCode =
+	| 'AUDIENCE_IN_USE'
+	| 'ENVELOPE_NOT_AUTHORIZED'
+	| 'IMPLICIT_MEMBERSHIP_CONFLICT'
+	| 'INVALID_CONDITIONS'
+	| 'INVALID_DEFINITION'
+	| 'INVALID_ENVELOPE'
+	| 'INVALID_MEMBERSHIP'
+	| 'ISSUER_NOT_ALLOWED'
+	| 'PROJECT_NOT_FOUND'
+	| 'ROLE_NOT_ALLOWED'
+	| 'WORKLOAD_CREDENTIAL_FORBIDDEN'
+
+export type ApplyWorkloadIdentityTrustResponse = {
+	readonly __typename?: 'ApplyWorkloadIdentityTrustResponse'
+	readonly error?: Maybe<ApplyWorkloadIdentityTrustError>
+	readonly ok: Scalars['Boolean']['output']
+	readonly result?: Maybe<ApplyWorkloadIdentityTrustResult>
+}
+
+export type ApplyWorkloadIdentityTrustResult = {
+	readonly __typename?: 'ApplyWorkloadIdentityTrustResult'
+	readonly created: Scalars['Boolean']['output']
+	/**  The authorized envelope closure per membership, for the apply plan.  */
+	readonly envelopeClosure: Scalars['Json']['output']
+	/**  Whether this apply moved `tokensValidAfter`, rejecting every earlier token.  */
+	readonly tokensValidAfterBumped: Scalars['Boolean']['output']
+	readonly trust: WorkloadIdentityTrust
+}
+
 /**
  * A single `person_auth_log` row. Mirrors the columns described in
  * docs/.../audit-log.md.
@@ -206,6 +244,8 @@ export type AuthLogEntry = {
 	 */
 	readonly type: Scalars['String']['output']
 	readonly userAgent?: Maybe<Scalars['String']['output']>
+	/**  The workload identity trust of a `workload_*` entry.  */
+	readonly workloadIdentityTrustId?: Maybe<Scalars['String']['output']>
 }
 
 /** All fields are AND-combined. Omitted fields are unconstrained. */
@@ -1019,6 +1059,22 @@ export type DisablePersonResponse = {
 	readonly ok: Scalars['Boolean']['output']
 }
 
+export type DisableWorkloadIdentityTrustError = {
+	readonly __typename?: 'DisableWorkloadIdentityTrustError'
+	readonly code: DisableWorkloadIdentityTrustErrorCode
+	readonly developerMessage: Scalars['String']['output']
+}
+
+export type DisableWorkloadIdentityTrustErrorCode =
+	| 'NOT_FOUND'
+	| 'WORKLOAD_CREDENTIAL_FORBIDDEN'
+
+export type DisableWorkloadIdentityTrustResponse = {
+	readonly __typename?: 'DisableWorkloadIdentityTrustResponse'
+	readonly error?: Maybe<DisableWorkloadIdentityTrustError>
+	readonly ok: Scalars['Boolean']['output']
+}
+
 export type DisconnectIdpError = {
 	readonly __typename?: 'DisconnectIDPError'
 	readonly code: DisconnectIdpErrorCode
@@ -1137,6 +1193,8 @@ export type Identity = {
 	readonly apiKey?: Maybe<ApiKey>
 	readonly description?: Maybe<Scalars['String']['output']>
 	readonly id: Scalars['String']['output']
+	/**  Always resolved; nullable only so a parent object need not know it up front.  */
+	readonly kind?: Maybe<IdentityKind>
 	readonly permissions?: Maybe<IdentityGlobalPermissions>
 	readonly person?: Maybe<Person>
 	readonly projects: ReadonlyArray<IdentityProjectRelation>
@@ -1152,6 +1210,8 @@ export type Identity = {
 	 * batched identity queries do not abort on a single forbidden target.
 	 */
 	readonly sessions: ReadonlyArray<SessionInfo>
+	/**  The trust this identity belongs to, for a WORKLOAD identity the caller may list trusts for.  */
+	readonly workloadIdentityTrust?: Maybe<WorkloadIdentityTrust>
 }
 
 /**
@@ -1179,6 +1239,8 @@ export type IdentityGlobalPermissions = {
 	 * of the projects the caller administers — so this marks a full listing, not access to one.
 	 */
 	readonly canListPersons: Scalars['Boolean']['output']
+	/**  Read `workloadIdentityTrusts` and run `checkWorkloadIdentityToken`.  */
+	readonly canListWorkloadIdentities: Scalars['Boolean']['output']
 	/** Write the tenant configuration (`configure`) and read `authPolicies`. The CLI is the usual write path. */
 	readonly canManageConfiguration: Scalars['Boolean']['output']
 	/**  Read `authLog`, which throws otherwise.  */
@@ -1186,6 +1248,11 @@ export type IdentityGlobalPermissions = {
 	/**  Read `configuration`, which throws otherwise. The other configuration queries gate on their own actions.  */
 	readonly canViewConfiguration: Scalars['Boolean']['output']
 }
+
+export type IdentityKind =
+	| 'API_KEY'
+	| 'PERSON'
+	| 'WORKLOAD'
 
 export type IdentityProjectRelation = {
 	readonly __typename?: 'IdentityProjectRelation'
@@ -1375,6 +1442,7 @@ export type MailType =
 export type MemberType =
 	| 'API_KEY'
 	| 'PERSON'
+	| 'WORKLOAD'
 
 export type Membership = {
 	readonly __typename?: 'Membership'
@@ -1415,6 +1483,12 @@ export type Mutation = {
 	/** @deprecated use addMailTemplate */
 	readonly addProjectMailTemplate?: Maybe<AddMailTemplateResponse>
 	readonly addProjectMember?: Maybe<AddProjectMemberResponse>
+	/**
+	 * Create or update a workload identity trust in one transaction: the trust, its identity's
+	 * roles and memberships, and the envelope rules. Requires `workloadIdentity:add` or
+	 * `workloadIdentity:update`, and is refused when the caller itself authenticated through a trust.
+	 */
+	readonly applyWorkloadIdentityTrust: ApplyWorkloadIdentityTrustResponse
 	readonly changeMyPassword?: Maybe<ChangeMyPasswordResponse>
 	readonly changeMyProfile?: Maybe<ChangeMyProfileResponse>
 	readonly changePassword?: Maybe<ChangePasswordResponse>
@@ -1444,6 +1518,8 @@ export type Mutation = {
 	readonly disableMyPasswordless?: Maybe<ToggleMyPasswordlessResponse>
 	readonly disableOtp?: Maybe<DisableOtpResponse>
 	readonly disablePerson?: Maybe<DisablePersonResponse>
+	/**  Disable a trust; re-enable is an apply with `disabled: false`.  */
+	readonly disableWorkloadIdentityTrust: DisableWorkloadIdentityTrustResponse
 	/**
 	 * Disconnect one of the authenticated person's own external IdP connections,
 	 * addressed by the connection id (see PersonIdentityProvider.id) so a specific
@@ -1519,6 +1595,11 @@ export type MutationAddProjectMemberArgs = {
 	identityId: Scalars['String']['input']
 	memberships: ReadonlyArray<MembershipInput>
 	projectSlug: Scalars['String']['input']
+}
+
+export type MutationApplyWorkloadIdentityTrustArgs = {
+	slug: Scalars['String']['input']
+	trust: WorkloadIdentityTrustInput
 }
 
 export type MutationChangeMyPasswordArgs = {
@@ -1623,6 +1704,10 @@ export type MutationDisableIdpArgs = {
 
 export type MutationDisablePersonArgs = {
 	personId: Scalars['String']['input']
+}
+
+export type MutationDisableWorkloadIdentityTrustArgs = {
+	slug: Scalars['String']['input']
 }
 
 export type MutationDisconnectMyIdentityProviderArgs = {
@@ -1980,6 +2065,11 @@ export type Query = {
 	 */
 	readonly authPolicies: ReadonlyArray<AuthPolicy>
 	readonly checkResetPasswordToken: CheckResetPasswordTokenCode
+	/**
+	 * Run the workload token verification (without DPoP and without an auth log write) and report the
+	 * first failing step. Requires `workloadIdentity:list`. The token is neither stored nor logged.
+	 */
+	readonly checkWorkloadIdentityToken: WorkloadIdentityTokenCheck
 	readonly configuration: Config
 	/**
 	 * List exact permission definitions grantable to a custom role. Requires
@@ -2019,6 +2109,11 @@ export type Query = {
 	readonly projectBySlug?: Maybe<Project>
 	readonly projectMemberships: ReadonlyArray<Membership>
 	readonly projects: ReadonlyArray<Project>
+	/**
+	 * Workload identity trusts, enabled and disabled. Requires `workloadIdentity:list`
+	 * (PROJECT_ADMIN by default). `tenant apply` diffs the config against this list.
+	 */
+	readonly workloadIdentityTrusts: ReadonlyArray<WorkloadIdentityTrust>
 }
 
 export type QueryAuthLogArgs = {
@@ -2029,6 +2124,10 @@ export type QueryAuthLogArgs = {
 
 export type QueryCheckResetPasswordTokenArgs = {
 	requestId: Scalars['String']['input']
+	token: Scalars['String']['input']
+}
+
+export type QueryCheckWorkloadIdentityTokenArgs = {
 	token: Scalars['String']['input']
 }
 
@@ -2614,6 +2713,109 @@ export type WeakPasswordReason =
 	| 'MISSING_UPPERCASE'
 	| 'TOO_SHORT'
 
+export type WorkloadIdentityProfile =
+	| 'github_actions'
+	| 'oidc'
+
+export type WorkloadIdentityTokenCheck = {
+	readonly __typename?: 'WorkloadIdentityTokenCheck'
+	/**  The verified claims; only when `ok`.  */
+	readonly claims?: Maybe<Scalars['Json']['output']>
+	readonly failure?: Maybe<WorkloadIdentityTokenCheckFailure>
+	readonly ok: Scalars['Boolean']['output']
+	readonly requiresDpop?: Maybe<Scalars['Boolean']['output']>
+	/**  The trust matched by `(iss, aud)`, also when a later step failed.  */
+	readonly trust?: Maybe<WorkloadIdentityTrust>
+}
+
+export type WorkloadIdentityTokenCheckFailure = {
+	readonly __typename?: 'WorkloadIdentityTokenCheckFailure'
+	readonly actualValue?: Maybe<Scalars['Json']['output']>
+	/**  For `condition`: the index of the first failing condition and the claim's actual value.  */
+	readonly conditionIndex?: Maybe<Scalars['Int']['output']>
+	readonly message: Scalars['String']['output']
+	readonly step: WorkloadIdentityTokenCheckStep
+}
+
+export type WorkloadIdentityTokenCheckStep =
+	| 'audience'
+	| 'condition'
+	| 'jwks'
+	| 'lifetime'
+	| 'malformed'
+	| 'profile'
+	| 'signature'
+	| 'tokens_valid_after'
+	| 'trust_not_found'
+	| 'typ'
+
+export type WorkloadIdentityTrust = {
+	readonly __typename?: 'WorkloadIdentityTrust'
+	readonly acceptAudienceArray: Scalars['Boolean']['output']
+	/**  Accepted JWT `typ` header values; `null` accepts a token without the header.  */
+	readonly acceptedTyp: ReadonlyArray<Maybe<Scalars['String']['output']>>
+	readonly audience: Scalars['String']['output']
+	/**  The condition list exactly as applied (see `WorkloadIdentityTrustInput.conditions`).  */
+	readonly conditions: Scalars['Json']['output']
+	readonly createdAt: Scalars['DateTime']['output']
+	readonly description?: Maybe<Scalars['String']['output']>
+	readonly disabled: Scalars['Boolean']['output']
+	readonly id: Scalars['String']['output']
+	readonly identity: Identity
+	readonly issuer: Scalars['String']['output']
+	readonly jwksUri?: Maybe<Scalars['String']['output']>
+	readonly maxTokenLifetime: Scalars['Int']['output']
+	readonly memberships: ReadonlyArray<WorkloadIdentityTrustMembership>
+	readonly profile: WorkloadIdentityProfile
+	readonly requireDpop: Scalars['Boolean']['output']
+	readonly roles: ReadonlyArray<Scalars['String']['output']>
+	readonly signingAlgs: ReadonlyArray<Scalars['String']['output']>
+	readonly slug: Scalars['String']['output']
+	readonly tokensValidAfter: Scalars['DateTime']['output']
+	readonly trustForwardedInfo: Scalars['Boolean']['output']
+	readonly updatedAt: Scalars['DateTime']['output']
+}
+
+export type WorkloadIdentityTrustInput = {
+	readonly acceptAudienceArray?: InputMaybe<Scalars['Boolean']['input']>
+	readonly acceptedTyp?: InputMaybe<ReadonlyArray<InputMaybe<Scalars['String']['input']>>>
+	readonly audience: Scalars['String']['input']
+	/**
+	 * Non-empty list; each item is `{ claim: string }` or `{ path: string[] }` plus exactly one of
+	 * `equals`, `in`, `startsWith`, `arrayContains`.
+	 */
+	readonly conditions: Scalars['Json']['input']
+	readonly description?: InputMaybe<Scalars['String']['input']>
+	readonly disabled?: InputMaybe<Scalars['Boolean']['input']>
+	readonly issuer: Scalars['String']['input']
+	readonly jwksUri?: InputMaybe<Scalars['String']['input']>
+	/**  Seconds; defaults to 3600, capped at 86400.  */
+	readonly maxTokenLifetime?: InputMaybe<Scalars['Int']['input']>
+	readonly memberships?: InputMaybe<ReadonlyArray<WorkloadIdentityTrustMembershipInput>>
+	readonly profile: WorkloadIdentityProfile
+	readonly requireDpop?: InputMaybe<Scalars['Boolean']['input']>
+	readonly roles?: InputMaybe<ReadonlyArray<Scalars['String']['input']>>
+	readonly signingAlgs?: InputMaybe<ReadonlyArray<Scalars['String']['input']>>
+	readonly trustForwardedInfo?: InputMaybe<Scalars['Boolean']['input']>
+}
+
+export type WorkloadIdentityTrustMembership = {
+	readonly __typename?: 'WorkloadIdentityTrustMembership'
+	/**  The envelope rule (`Acl.MembershipMatchRule`) bound to this membership, if any.  */
+	readonly assumeMembership?: Maybe<Scalars['Json']['output']>
+	readonly project: Scalars['String']['output']
+	readonly role: Scalars['String']['output']
+	readonly variables: ReadonlyArray<VariableEntry>
+}
+
+export type WorkloadIdentityTrustMembershipInput = {
+	/**  Envelope rule in the `Acl.MembershipMatchRule` shape.  */
+	readonly assumeMembership?: InputMaybe<Scalars['Json']['input']>
+	readonly project: Scalars['String']['input']
+	readonly role: Scalars['String']['input']
+	readonly variables?: InputMaybe<ReadonlyArray<VariableEntryInput>>
+}
+
 export type ResolverTypeWrapper<T> = Promise<T> | T
 
 export type ResolverWithResolve<TResult, TParent, TContext, TArgs> = {
@@ -2731,6 +2933,14 @@ export type ResolversTypes = {
 	ApiKey: ResolverTypeWrapper<Omit<ApiKey, 'identity'> & { identity: ResolversTypes['Identity'] }>
 	ApiKeyType: ApiKeyType
 	ApiKeyWithToken: ResolverTypeWrapper<Omit<ApiKeyWithToken, 'identity'> & { identity: ResolversTypes['Identity'] }>
+	ApplyWorkloadIdentityTrustError: ResolverTypeWrapper<ApplyWorkloadIdentityTrustError>
+	ApplyWorkloadIdentityTrustErrorCode: ApplyWorkloadIdentityTrustErrorCode
+	ApplyWorkloadIdentityTrustResponse: ResolverTypeWrapper<
+		Omit<ApplyWorkloadIdentityTrustResponse, 'result'> & { result?: Maybe<ResolversTypes['ApplyWorkloadIdentityTrustResult']> }
+	>
+	ApplyWorkloadIdentityTrustResult: ResolverTypeWrapper<
+		Omit<ApplyWorkloadIdentityTrustResult, 'trust'> & { trust: ResolversTypes['WorkloadIdentityTrust'] }
+	>
 	AuthLogEntry: ResolverTypeWrapper<AuthLogEntry>
 	AuthLogFilter: AuthLogFilter
 	AuthLogPage: ResolverTypeWrapper<AuthLogPage>
@@ -2845,6 +3055,9 @@ export type ResolversTypes = {
 	DisablePersonError: ResolverTypeWrapper<DisablePersonError>
 	DisablePersonErrorCode: DisablePersonErrorCode
 	DisablePersonResponse: ResolverTypeWrapper<DisablePersonResponse>
+	DisableWorkloadIdentityTrustError: ResolverTypeWrapper<DisableWorkloadIdentityTrustError>
+	DisableWorkloadIdentityTrustErrorCode: DisableWorkloadIdentityTrustErrorCode
+	DisableWorkloadIdentityTrustResponse: ResolverTypeWrapper<DisableWorkloadIdentityTrustResponse>
 	DisconnectIDPError: ResolverTypeWrapper<DisconnectIdpError>
 	DisconnectIDPErrorCode: DisconnectIdpErrorCode
 	DisconnectIDPResponse: ResolverTypeWrapper<DisconnectIdpResponse>
@@ -2863,12 +3076,14 @@ export type ResolversTypes = {
 	IDPOptionsOutput: ResolverTypeWrapper<IdpOptionsOutput>
 	IDPResponseInput: IdpResponseInput
 	Identity: ResolverTypeWrapper<
-		Omit<Identity, 'apiKey' | 'projects'> & {
+		Omit<Identity, 'apiKey' | 'projects' | 'workloadIdentityTrust'> & {
 			apiKey?: Maybe<ResolversTypes['ApiKey']>
 			projects: ReadonlyArray<ResolversTypes['IdentityProjectRelation']>
+			workloadIdentityTrust?: Maybe<ResolversTypes['WorkloadIdentityTrust']>
 		}
 	>
 	IdentityGlobalPermissions: ResolverTypeWrapper<IdentityGlobalPermissions>
+	IdentityKind: IdentityKind
 	IdentityProjectRelation: ResolverTypeWrapper<Omit<IdentityProjectRelation, 'project'> & { project: ResolversTypes['Project'] }>
 	IdentityProvider: ResolverTypeWrapper<IdentityProvider>
 	IdentityProviderListItem: ResolverTypeWrapper<IdentityProviderListItem>
@@ -3008,6 +3223,16 @@ export type ResolversTypes = {
 	VerifyEmailErrorCode: VerifyEmailErrorCode
 	VerifyEmailResponse: ResolverTypeWrapper<VerifyEmailResponse>
 	WeakPasswordReason: WeakPasswordReason
+	WorkloadIdentityProfile: WorkloadIdentityProfile
+	WorkloadIdentityTokenCheck: ResolverTypeWrapper<
+		Omit<WorkloadIdentityTokenCheck, 'trust'> & { trust?: Maybe<ResolversTypes['WorkloadIdentityTrust']> }
+	>
+	WorkloadIdentityTokenCheckFailure: ResolverTypeWrapper<WorkloadIdentityTokenCheckFailure>
+	WorkloadIdentityTokenCheckStep: WorkloadIdentityTokenCheckStep
+	WorkloadIdentityTrust: ResolverTypeWrapper<Omit<WorkloadIdentityTrust, 'identity'> & { identity: ResolversTypes['Identity'] }>
+	WorkloadIdentityTrustInput: WorkloadIdentityTrustInput
+	WorkloadIdentityTrustMembership: ResolverTypeWrapper<WorkloadIdentityTrustMembership>
+	WorkloadIdentityTrustMembershipInput: WorkloadIdentityTrustMembershipInput
 }
 
 /** Mapping between all available schema types and the resolvers parents */
@@ -3027,6 +3252,11 @@ export type ResolversParentTypes = {
 	AddProjectMemberResponse: AddProjectMemberResponse
 	ApiKey: Omit<ApiKey, 'identity'> & { identity: ResolversParentTypes['Identity'] }
 	ApiKeyWithToken: Omit<ApiKeyWithToken, 'identity'> & { identity: ResolversParentTypes['Identity'] }
+	ApplyWorkloadIdentityTrustError: ApplyWorkloadIdentityTrustError
+	ApplyWorkloadIdentityTrustResponse: Omit<ApplyWorkloadIdentityTrustResponse, 'result'> & {
+		result?: Maybe<ResolversParentTypes['ApplyWorkloadIdentityTrustResult']>
+	}
+	ApplyWorkloadIdentityTrustResult: Omit<ApplyWorkloadIdentityTrustResult, 'trust'> & { trust: ResolversParentTypes['WorkloadIdentityTrust'] }
 	AuthLogEntry: AuthLogEntry
 	AuthLogFilter: AuthLogFilter
 	AuthLogPage: AuthLogPage
@@ -3115,6 +3345,8 @@ export type ResolversParentTypes = {
 	DisableOtpResponse: DisableOtpResponse
 	DisablePersonError: DisablePersonError
 	DisablePersonResponse: DisablePersonResponse
+	DisableWorkloadIdentityTrustError: DisableWorkloadIdentityTrustError
+	DisableWorkloadIdentityTrustResponse: DisableWorkloadIdentityTrustResponse
 	DisconnectIDPError: DisconnectIdpError
 	DisconnectIDPResponse: DisconnectIdpResponse
 	EmailVerificationOptions: EmailVerificationOptions
@@ -3128,9 +3360,10 @@ export type ResolversParentTypes = {
 	IDPOptions: IdpOptions
 	IDPOptionsOutput: IdpOptionsOutput
 	IDPResponseInput: IdpResponseInput
-	Identity: Omit<Identity, 'apiKey' | 'projects'> & {
+	Identity: Omit<Identity, 'apiKey' | 'projects' | 'workloadIdentityTrust'> & {
 		apiKey?: Maybe<ResolversParentTypes['ApiKey']>
 		projects: ReadonlyArray<ResolversParentTypes['IdentityProjectRelation']>
+		workloadIdentityTrust?: Maybe<ResolversParentTypes['WorkloadIdentityTrust']>
 	}
 	IdentityGlobalPermissions: IdentityGlobalPermissions
 	IdentityProjectRelation: Omit<IdentityProjectRelation, 'project'> & { project: ResolversParentTypes['Project'] }
@@ -3238,6 +3471,12 @@ export type ResolversParentTypes = {
 	VariableEntryInput: VariableEntryInput
 	VerifyEmailError: VerifyEmailError
 	VerifyEmailResponse: VerifyEmailResponse
+	WorkloadIdentityTokenCheck: Omit<WorkloadIdentityTokenCheck, 'trust'> & { trust?: Maybe<ResolversParentTypes['WorkloadIdentityTrust']> }
+	WorkloadIdentityTokenCheckFailure: WorkloadIdentityTokenCheckFailure
+	WorkloadIdentityTrust: Omit<WorkloadIdentityTrust, 'identity'> & { identity: ResolversParentTypes['Identity'] }
+	WorkloadIdentityTrustInput: WorkloadIdentityTrustInput
+	WorkloadIdentityTrustMembership: WorkloadIdentityTrustMembership
+	WorkloadIdentityTrustMembershipInput: WorkloadIdentityTrustMembershipInput
 }
 
 export type ActivatePasswordlessOtpErrorResolvers<
@@ -3350,6 +3589,34 @@ export type ApiKeyWithTokenResolvers<
 	token?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>
 }
 
+export type ApplyWorkloadIdentityTrustErrorResolvers<
+	ContextType = any,
+	ParentType extends ResolversParentTypes['ApplyWorkloadIdentityTrustError'] = ResolversParentTypes['ApplyWorkloadIdentityTrustError'],
+> = {
+	code?: Resolver<ResolversTypes['ApplyWorkloadIdentityTrustErrorCode'], ParentType, ContextType>
+	details?: Resolver<Maybe<ResolversTypes['Json']>, ParentType, ContextType>
+	developerMessage?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+}
+
+export type ApplyWorkloadIdentityTrustResponseResolvers<
+	ContextType = any,
+	ParentType extends ResolversParentTypes['ApplyWorkloadIdentityTrustResponse'] = ResolversParentTypes['ApplyWorkloadIdentityTrustResponse'],
+> = {
+	error?: Resolver<Maybe<ResolversTypes['ApplyWorkloadIdentityTrustError']>, ParentType, ContextType>
+	ok?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
+	result?: Resolver<Maybe<ResolversTypes['ApplyWorkloadIdentityTrustResult']>, ParentType, ContextType>
+}
+
+export type ApplyWorkloadIdentityTrustResultResolvers<
+	ContextType = any,
+	ParentType extends ResolversParentTypes['ApplyWorkloadIdentityTrustResult'] = ResolversParentTypes['ApplyWorkloadIdentityTrustResult'],
+> = {
+	created?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
+	envelopeClosure?: Resolver<ResolversTypes['Json'], ParentType, ContextType>
+	tokensValidAfterBumped?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
+	trust?: Resolver<ResolversTypes['WorkloadIdentityTrust'], ParentType, ContextType>
+}
+
 export type AuthLogEntryResolvers<ContextType = any, ParentType extends ResolversParentTypes['AuthLogEntry'] = ResolversParentTypes['AuthLogEntry']> =
 	{
 		createdAt?: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>
@@ -3367,6 +3634,7 @@ export type AuthLogEntryResolvers<ContextType = any, ParentType extends Resolver
 		targetPersonId?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>
 		type?: Resolver<ResolversTypes['String'], ParentType, ContextType>
 		userAgent?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>
+		workloadIdentityTrustId?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>
 	}
 
 export type AuthLogPageResolvers<ContextType = any, ParentType extends ResolversParentTypes['AuthLogPage'] = ResolversParentTypes['AuthLogPage']> = {
@@ -3941,6 +4209,22 @@ export type DisablePersonResponseResolvers<
 	ok?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
 }
 
+export type DisableWorkloadIdentityTrustErrorResolvers<
+	ContextType = any,
+	ParentType extends ResolversParentTypes['DisableWorkloadIdentityTrustError'] = ResolversParentTypes['DisableWorkloadIdentityTrustError'],
+> = {
+	code?: Resolver<ResolversTypes['DisableWorkloadIdentityTrustErrorCode'], ParentType, ContextType>
+	developerMessage?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+}
+
+export type DisableWorkloadIdentityTrustResponseResolvers<
+	ContextType = any,
+	ParentType extends ResolversParentTypes['DisableWorkloadIdentityTrustResponse'] = ResolversParentTypes['DisableWorkloadIdentityTrustResponse'],
+> = {
+	error?: Resolver<Maybe<ResolversTypes['DisableWorkloadIdentityTrustError']>, ParentType, ContextType>
+	ok?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
+}
+
 export type DisconnectIdpErrorResolvers<
 	ContextType = any,
 	ParentType extends ResolversParentTypes['DisconnectIDPError'] = ResolversParentTypes['DisconnectIDPError'],
@@ -4021,11 +4305,13 @@ export type IdentityResolvers<ContextType = any, ParentType extends ResolversPar
 	apiKey?: Resolver<Maybe<ResolversTypes['ApiKey']>, ParentType, ContextType>
 	description?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>
 	id?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+	kind?: Resolver<Maybe<ResolversTypes['IdentityKind']>, ParentType, ContextType>
 	permissions?: Resolver<Maybe<ResolversTypes['IdentityGlobalPermissions']>, ParentType, ContextType>
 	person?: Resolver<Maybe<ResolversTypes['Person']>, ParentType, ContextType>
 	projects?: Resolver<ReadonlyArray<ResolversTypes['IdentityProjectRelation']>, ParentType, ContextType>
 	roles?: Resolver<Maybe<ReadonlyArray<ResolversTypes['String']>>, ParentType, ContextType>
 	sessions?: Resolver<ReadonlyArray<ResolversTypes['SessionInfo']>, ParentType, ContextType>
+	workloadIdentityTrust?: Resolver<Maybe<ResolversTypes['WorkloadIdentityTrust']>, ParentType, ContextType>
 }
 
 export type IdentityGlobalPermissionsResolvers<
@@ -4039,6 +4325,7 @@ export type IdentityGlobalPermissionsResolvers<
 	canListIdentityProviders?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
 	canListMailTemplates?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
 	canListPersons?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
+	canListWorkloadIdentities?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
 	canManageConfiguration?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
 	canViewAuthLog?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
 	canViewConfiguration?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
@@ -4244,6 +4531,12 @@ export type MutationResolvers<ContextType = any, ParentType extends ResolversPar
 		ContextType,
 		RequireFields<MutationAddProjectMemberArgs, 'identityId' | 'memberships' | 'projectSlug'>
 	>
+	applyWorkloadIdentityTrust?: Resolver<
+		ResolversTypes['ApplyWorkloadIdentityTrustResponse'],
+		ParentType,
+		ContextType,
+		RequireFields<MutationApplyWorkloadIdentityTrustArgs, 'slug' | 'trust'>
+	>
 	changeMyPassword?: Resolver<
 		Maybe<ResolversTypes['ChangeMyPasswordResponse']>,
 		ParentType,
@@ -4341,6 +4634,12 @@ export type MutationResolvers<ContextType = any, ParentType extends ResolversPar
 		ParentType,
 		ContextType,
 		RequireFields<MutationDisablePersonArgs, 'personId'>
+	>
+	disableWorkloadIdentityTrust?: Resolver<
+		ResolversTypes['DisableWorkloadIdentityTrustResponse'],
+		ParentType,
+		ContextType,
+		RequireFields<MutationDisableWorkloadIdentityTrustArgs, 'slug'>
 	>
 	disconnectMyIdentityProvider?: Resolver<
 		Maybe<ResolversTypes['DisconnectIDPResponse']>,
@@ -4569,6 +4868,12 @@ export type QueryResolvers<ContextType = any, ParentType extends ResolversParent
 		ContextType,
 		RequireFields<QueryCheckResetPasswordTokenArgs, 'requestId' | 'token'>
 	>
+	checkWorkloadIdentityToken?: Resolver<
+		ResolversTypes['WorkloadIdentityTokenCheck'],
+		ParentType,
+		ContextType,
+		RequireFields<QueryCheckWorkloadIdentityTokenArgs, 'token'>
+	>
 	configuration?: Resolver<ResolversTypes['Config'], ParentType, ContextType>
 	customRolePermissions?: Resolver<ReadonlyArray<ResolversTypes['CustomRolePermissionDefinition']>, ParentType, ContextType>
 	customRoles?: Resolver<ReadonlyArray<ResolversTypes['CustomRole']>, ParentType, ContextType>
@@ -4586,6 +4891,7 @@ export type QueryResolvers<ContextType = any, ParentType extends ResolversParent
 		RequireFields<QueryProjectMembershipsArgs, 'identityId' | 'projectSlug'>
 	>
 	projects?: Resolver<ReadonlyArray<ResolversTypes['Project']>, ParentType, ContextType>
+	workloadIdentityTrusts?: Resolver<ReadonlyArray<ResolversTypes['WorkloadIdentityTrust']>, ParentType, ContextType>
 }
 
 export type RegenerateBackupCodesErrorResolvers<
@@ -5057,6 +5363,64 @@ export type VerifyEmailResponseResolvers<
 	ok?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
 }
 
+export type WorkloadIdentityTokenCheckResolvers<
+	ContextType = any,
+	ParentType extends ResolversParentTypes['WorkloadIdentityTokenCheck'] = ResolversParentTypes['WorkloadIdentityTokenCheck'],
+> = {
+	claims?: Resolver<Maybe<ResolversTypes['Json']>, ParentType, ContextType>
+	failure?: Resolver<Maybe<ResolversTypes['WorkloadIdentityTokenCheckFailure']>, ParentType, ContextType>
+	ok?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
+	requiresDpop?: Resolver<Maybe<ResolversTypes['Boolean']>, ParentType, ContextType>
+	trust?: Resolver<Maybe<ResolversTypes['WorkloadIdentityTrust']>, ParentType, ContextType>
+}
+
+export type WorkloadIdentityTokenCheckFailureResolvers<
+	ContextType = any,
+	ParentType extends ResolversParentTypes['WorkloadIdentityTokenCheckFailure'] = ResolversParentTypes['WorkloadIdentityTokenCheckFailure'],
+> = {
+	actualValue?: Resolver<Maybe<ResolversTypes['Json']>, ParentType, ContextType>
+	conditionIndex?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>
+	message?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+	step?: Resolver<ResolversTypes['WorkloadIdentityTokenCheckStep'], ParentType, ContextType>
+}
+
+export type WorkloadIdentityTrustResolvers<
+	ContextType = any,
+	ParentType extends ResolversParentTypes['WorkloadIdentityTrust'] = ResolversParentTypes['WorkloadIdentityTrust'],
+> = {
+	acceptAudienceArray?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
+	acceptedTyp?: Resolver<ReadonlyArray<Maybe<ResolversTypes['String']>>, ParentType, ContextType>
+	audience?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+	conditions?: Resolver<ResolversTypes['Json'], ParentType, ContextType>
+	createdAt?: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>
+	description?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>
+	disabled?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
+	id?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+	identity?: Resolver<ResolversTypes['Identity'], ParentType, ContextType>
+	issuer?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+	jwksUri?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>
+	maxTokenLifetime?: Resolver<ResolversTypes['Int'], ParentType, ContextType>
+	memberships?: Resolver<ReadonlyArray<ResolversTypes['WorkloadIdentityTrustMembership']>, ParentType, ContextType>
+	profile?: Resolver<ResolversTypes['WorkloadIdentityProfile'], ParentType, ContextType>
+	requireDpop?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
+	roles?: Resolver<ReadonlyArray<ResolversTypes['String']>, ParentType, ContextType>
+	signingAlgs?: Resolver<ReadonlyArray<ResolversTypes['String']>, ParentType, ContextType>
+	slug?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+	tokensValidAfter?: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>
+	trustForwardedInfo?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
+	updatedAt?: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>
+}
+
+export type WorkloadIdentityTrustMembershipResolvers<
+	ContextType = any,
+	ParentType extends ResolversParentTypes['WorkloadIdentityTrustMembership'] = ResolversParentTypes['WorkloadIdentityTrustMembership'],
+> = {
+	assumeMembership?: Resolver<Maybe<ResolversTypes['Json']>, ParentType, ContextType>
+	project?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+	role?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+	variables?: Resolver<ReadonlyArray<ResolversTypes['VariableEntry']>, ParentType, ContextType>
+}
+
 export type Resolvers<ContextType = any> = {
 	ActivatePasswordlessOtpError?: ActivatePasswordlessOtpErrorResolvers<ContextType>
 	ActivatePasswordlessOtpResponse?: ActivatePasswordlessOtpResponseResolvers<ContextType>
@@ -5071,6 +5435,9 @@ export type Resolvers<ContextType = any> = {
 	AddProjectMemberResponse?: AddProjectMemberResponseResolvers<ContextType>
 	ApiKey?: ApiKeyResolvers<ContextType>
 	ApiKeyWithToken?: ApiKeyWithTokenResolvers<ContextType>
+	ApplyWorkloadIdentityTrustError?: ApplyWorkloadIdentityTrustErrorResolvers<ContextType>
+	ApplyWorkloadIdentityTrustResponse?: ApplyWorkloadIdentityTrustResponseResolvers<ContextType>
+	ApplyWorkloadIdentityTrustResult?: ApplyWorkloadIdentityTrustResultResolvers<ContextType>
 	AuthLogEntry?: AuthLogEntryResolvers<ContextType>
 	AuthLogPage?: AuthLogPageResolvers<ContextType>
 	AuthPolicy?: AuthPolicyResolvers<ContextType>
@@ -5140,6 +5507,8 @@ export type Resolvers<ContextType = any> = {
 	DisableOtpResponse?: DisableOtpResponseResolvers<ContextType>
 	DisablePersonError?: DisablePersonErrorResolvers<ContextType>
 	DisablePersonResponse?: DisablePersonResponseResolvers<ContextType>
+	DisableWorkloadIdentityTrustError?: DisableWorkloadIdentityTrustErrorResolvers<ContextType>
+	DisableWorkloadIdentityTrustResponse?: DisableWorkloadIdentityTrustResponseResolvers<ContextType>
 	DisconnectIDPError?: DisconnectIdpErrorResolvers<ContextType>
 	DisconnectIDPResponse?: DisconnectIdpResponseResolvers<ContextType>
 	EnableIDPError?: EnableIdpErrorResolvers<ContextType>
@@ -5236,4 +5605,8 @@ export type Resolvers<ContextType = any> = {
 	VariableEntry?: VariableEntryResolvers<ContextType>
 	VerifyEmailError?: VerifyEmailErrorResolvers<ContextType>
 	VerifyEmailResponse?: VerifyEmailResponseResolvers<ContextType>
+	WorkloadIdentityTokenCheck?: WorkloadIdentityTokenCheckResolvers<ContextType>
+	WorkloadIdentityTokenCheckFailure?: WorkloadIdentityTokenCheckFailureResolvers<ContextType>
+	WorkloadIdentityTrust?: WorkloadIdentityTrustResolvers<ContextType>
+	WorkloadIdentityTrustMembership?: WorkloadIdentityTrustMembershipResolvers<ContextType>
 }

@@ -1,4 +1,5 @@
 export * from './GraphQlClient.js'
+export * from './CredentialsProvider.js'
 export * from './GraphQlClientRequestOptions.js'
 export * from './GraphQlClientError.js'
 export * from './PrimaryReadWindow.js'

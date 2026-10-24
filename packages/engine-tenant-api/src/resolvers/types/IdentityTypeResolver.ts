@@ -1,4 +1,14 @@
-import { Identity, IdentityGlobalPermissions, IdentityProjectRelation, IdentityResolvers, Maybe, Person, SessionInfo } from '../../schema/index.js'
+import {
+	Identity,
+	IdentityGlobalPermissions,
+	IdentityKind,
+	IdentityProjectRelation,
+	IdentityResolvers,
+	Maybe,
+	Person,
+	SessionInfo,
+	WorkloadIdentityTrust,
+} from '../../schema/index.js'
 import {
 	createTargetIdentityPermissionTarget,
 	IdentityQuery,
@@ -145,6 +155,7 @@ export class IdentityTypeResolver implements IdentityResolvers {
 			canListPersons,
 			canListGlobalApiKeys,
 			canCreateGlobalApiKey,
+			canListWorkloadIdentities,
 		] = await Promise.all([
 			permissionsContext.isAllowed({ action: PermissionActions.PROJECT_CREATE }),
 			permissionsContext.isAllowed({ action: PermissionActions.ENTRYPOINT_DEPLOY }),
@@ -156,6 +167,7 @@ export class IdentityTypeResolver implements IdentityResolvers {
 			permissionsContext.isAllowed({ action: PermissionActions.PERSON_LIST }),
 			permissionsContext.isAllowed({ action: PermissionActions.API_KEY_LIST }),
 			permissionsContext.isAllowed({ action: PermissionActions.API_KEY_CREATE_GLOBAL() }),
+			permissionsContext.isAllowed({ action: PermissionActions.WORKLOAD_IDENTITY_LIST }),
 		])
 
 		return {
@@ -169,7 +181,16 @@ export class IdentityTypeResolver implements IdentityResolvers {
 			canListPersons,
 			canListGlobalApiKeys,
 			canCreateGlobalApiKey,
+			canListWorkloadIdentities,
 		}
+	}
+
+	async kind(parent: Identity, args: unknown, context: TenantResolverContext): Promise<IdentityKind> {
+		throw new Error('not implemented')
+	}
+
+	async workloadIdentityTrust(parent: Identity, args: unknown, context: TenantResolverContext): Promise<Maybe<WorkloadIdentityTrust>> {
+		throw new Error('not implemented')
 	}
 
 	async sessions(

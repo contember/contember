@@ -111,7 +111,7 @@ export class ProjectContainerFactory {
 						...project.db.pool,
 						...project.db.read.pool,
 					},
-				}, err => logger.error(err))
+				}, err => logger.error(err), { retryStaleConnection: true })
 			})
 
 			.addService('graphqlSchemaCache', () =>

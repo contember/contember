@@ -12,7 +12,7 @@ import { GraphQLError } from 'graphql'
 import type { Schema, Type } from '../../types/schema.js'
 import { isAbstractType, isInterfaceType, isObjectType, T } from '../../types/schema.js'
 import type { ValidationContext } from '../ValidationContext.js'
-import { didYouMean, suggestionList } from '../helpers.js'
+import { didYouMean, naturalCompare, suggestionList } from '../helpers.js'
 
 export function FieldsOnCorrectTypeRule(context: ValidationContext): ASTVisitor {
 	return {
@@ -27,11 +27,11 @@ export function FieldsOnCorrectTypeRule(context: ValidationContext): ASTVisitor 
 					const typeName = context.getParentTypeName() ?? '(unknown)'
 
 					// First determine if there are any suggested types to condition on.
-					let suggestion = getSuggestedTypeNames(schema, type, fieldName)
+					let suggestion = didYouMean('to use an inline fragment on', getSuggestedTypeNames(schema, type, fieldName))
 
 					// If there are no suggested types, then perhaps this was a typo?
 					if (suggestion === '') {
-						suggestion = getSuggestedFieldNames(type, fieldName)
+						suggestion = didYouMean(getSuggestedFieldNames(type, fieldName))
 					}
 
 					// Report an error, including helpful suggestions.
@@ -49,53 +49,78 @@ export function FieldsOnCorrectTypeRule(context: ValidationContext): ASTVisitor 
 
 /**
  * Go through all of the implementations of type, as well as the interfaces that
- * they implement. If any of those types include the provided field, suggest them.
+ * they implement. If any of those types include the provided field, suggest them,
+ * sorted by how often the type is referenced.
  */
-function getSuggestedTypeNames(
-	schema: Schema,
-	type: Type,
-	fieldName: string,
-): string {
+function getSuggestedTypeNames(schema: Schema, type: Type, fieldName: string): string[] {
 	if (!isAbstractType(type)) {
-		// Must be an Object type, which does not have possible fields from other types.
-		return ''
+		// Must be an Object type, which does not have possible fields.
+		return []
 	}
 
-	const suggestedTypes: string[] = []
-	const possibleTypes = T.possibleTypes(type)
+	const suggestedTypes = new Set<string>()
+	const usageCount = new Map<string, number>()
 
-	for (const possibleTypeName of possibleTypes) {
+	for (const possibleTypeName of T.possibleTypes(type)) {
 		const possibleType = schema.t[possibleTypeName]
-		if (possibleType && (isObjectType(possibleType) || isInterfaceType(possibleType))) {
-			// ObjectType/InterfaceType: [kind, fields, ...]
-			const fields = possibleType[1]
-			if (fields[fieldName]) {
-				suggestedTypes.push(possibleTypeName)
+		// graphql-js possible types are the object types only
+		if (!possibleType || !isObjectType(possibleType) || !possibleType[1][fieldName]) {
+			continue
+		}
+
+		// This object type defines this field.
+		suggestedTypes.add(possibleTypeName)
+		usageCount.set(possibleTypeName, 1)
+
+		for (const interfaceName of possibleType[2]) {
+			const possibleInterface = schema.t[interfaceName]
+			if (!possibleInterface || !isInterfaceType(possibleInterface) || !possibleInterface[1][fieldName]) {
+				continue
 			}
+
+			// This interface type defines this field.
+			suggestedTypes.add(interfaceName)
+			usageCount.set(interfaceName, (usageCount.get(interfaceName) ?? 0) + 1)
 		}
 	}
 
-	if (suggestedTypes.length > 0) {
-		return didYouMean(suggestedTypes.map((t) => `"${t}"`)).replace(/"/g, '')
-	}
+	return [...suggestedTypes].sort((typeA, typeB) => {
+		// Suggest both interface and object types based on how common they are.
+		const usageCountDiff = (usageCount.get(typeB) ?? 0) - (usageCount.get(typeA) ?? 0)
+		if (usageCountDiff !== 0) {
+			return usageCountDiff
+		}
 
-	return ''
+		// Suggest super types first followed by subtypes
+		if (isSuperInterface(schema, typeA, typeB)) {
+			return -1
+		}
+		if (isSuperInterface(schema, typeB, typeA)) {
+			return 1
+		}
+
+		return naturalCompare(typeA, typeB)
+	})
+}
+
+/**
+ * Whether `superType` is an interface that `subType` implements (graphql-js `isSubType` of an interface)
+ */
+function isSuperInterface(schema: Schema, superType: string, subType: string): boolean {
+	const superTypeDef = schema.t[superType]
+	const subTypeDef = schema.t[subType]
+	return superTypeDef !== undefined && isInterfaceType(superTypeDef) && subTypeDef !== undefined
+		&& (isObjectType(subTypeDef) || isInterfaceType(subTypeDef)) && subTypeDef[2].includes(superType)
 }
 
 /**
  * For the field name provided, determine if there are any similar field names
  * that may be the result of a typo.
  */
-function getSuggestedFieldNames(
-	type: Type,
-	fieldName: string,
-): string {
+function getSuggestedFieldNames(type: Type, fieldName: string): string[] {
 	if (isObjectType(type) || isInterfaceType(type)) {
-		// ObjectType/InterfaceType: [kind, fields, ...]
-		const possibleFieldNames = Object.keys(type[1])
-		const suggestions = suggestionList(fieldName, possibleFieldNames)
-		return didYouMean(suggestions)
+		return suggestionList(fieldName, Object.keys(type[1]))
 	}
 	// Otherwise, must be a Union type, which does not define fields.
-	return ''
+	return []
 }

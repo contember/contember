@@ -139,71 +139,203 @@ export function areTypesEqual(type1: TypeRef, type2: TypeRef): boolean {
 	return type1[0] === type2[0] && type1[1] === type2[1]
 }
 
+const MAX_SUGGESTIONS = 5
+
 /**
- * Creates a suggestion list message for "Did you mean X?"
- * Simplified version - for full implementation, use suggestionList from graphql-js
+ * Given [ A, B, C ] return ' Did you mean A, B, or C?', as graphql-js `didYouMean` does
  */
-export function didYouMean(suggestions: readonly string[]): string {
-	if (suggestions.length === 0) {
-		return ''
+export function didYouMean(suggestions: readonly string[]): string
+export function didYouMean(subMessage: string, suggestions: readonly string[]): string
+export function didYouMean(firstArg: string | readonly string[], secondArg?: readonly string[]): string {
+	const subMessage = typeof firstArg === 'string' ? firstArg : undefined
+	const suggestionsArg = typeof firstArg === 'string' ? secondArg ?? [] : firstArg
+
+	let message = ' Did you mean '
+	if (subMessage) {
+		message += subMessage + ' '
 	}
 
-	if (suggestions.length === 1) {
-		return ` Did you mean "${suggestions[0]}"?`
+	const suggestions = suggestionsArg.map(x => `"${x}"`)
+	switch (suggestions.length) {
+		case 0:
+			return ''
+		case 1:
+			return message + suggestions[0] + '?'
+		case 2:
+			return message + suggestions[0] + ' or ' + suggestions[1] + '?'
 	}
 
-	const quoted = suggestions.map((s) => `"${s}"`)
-	const lastSuggestion = quoted.pop()
-	return ` Did you mean ${quoted.join(', ')} or ${lastSuggestion}?`
+	const selected = suggestions.slice(0, MAX_SUGGESTIONS)
+	const lastItem = selected.pop()
+	return message + selected.join(', ') + ', or ' + lastItem + '?'
 }
 
 /**
- * Simple Levenshtein distance for string similarity
- */
-function levenshteinDistance(a: string, b: string): number {
-	const matrix: number[][] = []
-
-	for (let i = 0; i <= b.length; i++) {
-		matrix[i] = [i]
-	}
-	for (let j = 0; j <= a.length; j++) {
-		matrix[0][j] = j
-	}
-
-	for (let i = 1; i <= b.length; i++) {
-		for (let j = 1; j <= a.length; j++) {
-			if (b.charAt(i - 1) === a.charAt(j - 1)) {
-				matrix[i][j] = matrix[i - 1][j - 1]
-			} else {
-				matrix[i][j] = Math.min(
-					matrix[i - 1][j - 1] + 1, // substitution
-					matrix[i][j - 1] + 1, // insertion
-					matrix[i - 1][j] + 1, // deletion
-				)
-			}
-		}
-	}
-
-	return matrix[b.length][a.length]
-}
-
-/**
- * Get suggestions for a string from a list of options
- * Returns options that are similar to input, sorted by similarity
+ * Given an invalid input string and a list of valid options, returns a filtered list of valid options sorted based on
+ * their similarity with the input, as graphql-js `suggestionList` does
  */
 export function suggestionList(input: string, options: readonly string[]): string[] {
-	const optionsByDistance: Map<string, number> = new Map()
+	const optionsByDistance = new Map<string, number>()
+	const lexicalDistance = new LexicalDistance(input)
 	const threshold = Math.floor(input.length * 0.4) + 1
 
 	for (const option of options) {
-		const distance = levenshteinDistance(input, option)
-
-		if (distance <= threshold || option.toLowerCase().includes(input.toLowerCase())) {
+		const distance = lexicalDistance.measure(option, threshold)
+		if (distance !== undefined) {
 			optionsByDistance.set(option, distance)
 		}
 	}
 
-	return [...optionsByDistance.entries()]
-		.sort((a, b) => a[1] - b[1])
-		.map(([option]) => option)
+	return [...optionsByDistance.keys()].sort((a, b) => {
+		const distanceDiff = (optionsByDistance.get(a) ?? 0) - (optionsByDistance.get(b) ?? 0)
+		return distanceDiff !== 0 ? distanceDiff : naturalCompare(a, b)
+	})
+}
+
+/**
+ * Damerau-Levenshtein distance that counts a case change as a single edit (graphql-js `LexicalDistance`)
+ */
+class LexicalDistance {
+	private readonly inputLowerCase: string
+	private readonly inputArray: number[]
+	private readonly rows: [number[], number[], number[]]
+
+	constructor(private readonly input: string) {
+		this.inputLowerCase = input.toLowerCase()
+		this.inputArray = stringToArray(this.inputLowerCase)
+		this.rows = [new Array(input.length + 1).fill(0), new Array(input.length + 1).fill(0), new Array(input.length + 1).fill(0)]
+	}
+
+	measure(option: string, threshold: number): number | undefined {
+		if (this.input === option) {
+			return 0
+		}
+
+		const optionLowerCase = option.toLowerCase()
+
+		// Any case change counts as a single edit
+		if (this.inputLowerCase === optionLowerCase) {
+			return 1
+		}
+
+		let a = stringToArray(optionLowerCase)
+		let b = this.inputArray
+
+		if (a.length < b.length) {
+			const tmp = a
+			a = b
+			b = tmp
+		}
+		const aLength = a.length
+		const bLength = b.length
+
+		if (aLength - bLength > threshold) {
+			return undefined
+		}
+
+		const rows = this.rows
+		for (let j = 0; j <= bLength; j++) {
+			rows[0][j] = j
+		}
+
+		for (let i = 1; i <= aLength; i++) {
+			const upRow = rows[(i - 1) % 3]
+			const currentRow = rows[i % 3]
+
+			let smallestCell = (currentRow[0] = i)
+			for (let j = 1; j <= bLength; j++) {
+				const cost = a[i - 1] === b[j - 1] ? 0 : 1
+
+				let currentCell = Math.min(
+					upRow[j] + 1, // delete
+					currentRow[j - 1] + 1, // insert
+					upRow[j - 1] + cost, // substitute
+				)
+
+				if (i > 1 && j > 1 && a[i - 1] === b[j - 2] && a[i - 2] === b[j - 1]) {
+					// transposition
+					const doubleDiagonalCell = rows[(i - 2) % 3][j - 2]
+					currentCell = Math.min(currentCell, doubleDiagonalCell + 1)
+				}
+
+				if (currentCell < smallestCell) {
+					smallestCell = currentCell
+				}
+
+				currentRow[j] = currentCell
+			}
+
+			// Early exit, since distance can't go smaller than smallest element of the previous row.
+			if (smallestCell > threshold) {
+				return undefined
+			}
+		}
+
+		const distance = rows[aLength % 3][bLength]
+		return distance <= threshold ? distance : undefined
+	}
+}
+
+function stringToArray(str: string): number[] {
+	const strLength = str.length
+	const array = new Array<number>(strLength)
+	for (let i = 0; i < strLength; ++i) {
+		array[i] = str.charCodeAt(i)
+	}
+	return array
+}
+
+const DIGIT_0 = 48
+const DIGIT_9 = 57
+
+function isDigit(code: number): boolean {
+	return !Number.isNaN(code) && DIGIT_0 <= code && code <= DIGIT_9
+}
+
+/**
+ * Compares strings with embedded numbers by their numeric value, as graphql-js `naturalCompare` does
+ */
+export function naturalCompare(aStr: string, bStr: string): number {
+	let aIndex = 0
+	let bIndex = 0
+
+	while (aIndex < aStr.length && bIndex < bStr.length) {
+		let aChar = aStr.charCodeAt(aIndex)
+		let bChar = bStr.charCodeAt(bIndex)
+
+		if (isDigit(aChar) && isDigit(bChar)) {
+			let aNum = 0
+			do {
+				++aIndex
+				aNum = aNum * 10 + aChar - DIGIT_0
+				aChar = aStr.charCodeAt(aIndex)
+			} while (isDigit(aChar) && aNum > 0)
+
+			let bNum = 0
+			do {
+				++bIndex
+				bNum = bNum * 10 + bChar - DIGIT_0
+				bChar = bStr.charCodeAt(bIndex)
+			} while (isDigit(bChar) && bNum > 0)
+
+			if (aNum < bNum) {
+				return -1
+			}
+
+			if (aNum > bNum) {
+				return 1
+			}
+		} else {
+			if (aChar < bChar) {
+				return -1
+			}
+			if (aChar > bChar) {
+				return 1
+			}
+			++aIndex
+			++bIndex
+		}
+	}
+
+	return aStr.length - bStr.length
 }

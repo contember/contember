@@ -104,11 +104,12 @@ export type ScalarMap = {
 /**
  * Default field resolver
  */
-export const defaultFieldResolver: ResolverFn = (source, _args, _context, info) => {
+export const defaultFieldResolver: ResolverFn = (source, args, context, info) => {
 	if (isObjectLike(source)) {
 		const value = source[info.fieldName]
+		// a method is called on its source with the field arguments, as in graphql-js
 		if (typeof value === 'function') {
-			return value()
+			return value.call(source, args, context, info)
 		}
 		return value
 	}

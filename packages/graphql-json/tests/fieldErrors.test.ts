@@ -126,3 +126,21 @@ describe('field errors match graphql-js', () => {
 		expect(actual.errors?.map(error => error.originalError)).toEqual([graphqlError, plainError])
 	})
 })
+
+describe('default field resolver', () => {
+	test('calls a method on its source with the arguments, context and info', async () => {
+		const source = {
+			prefix: 'Hello',
+			greet(this: { prefix: string }, args: { name: string }, context: { suffix: string }, info: { fieldName: string }) {
+				return `${this.prefix} ${args.name}${context.suffix} (${info.fieldName})`
+			},
+		}
+		const result = await execute({
+			schema: buildSchema('type Query { greet(name: String!): String }'),
+			document: parse('{ greet(name: "World") }'),
+			rootValue: source,
+			contextValue: { suffix: '!' },
+		})
+		expect(result).toEqual({ data: { greet: 'Hello World! (greet)' } })
+	})
+})

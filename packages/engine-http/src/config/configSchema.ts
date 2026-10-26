@@ -166,6 +166,8 @@ const parseHost = (entry: string, path: PropertyKey[]): string => {
 	return hostnamePattern.test(host) || isIpLiteral(host) ? host : Typesafe.fail([...path, entry], 'must be a hostname or an IP address')
 }
 
+const MIN_JWKS_MAX_STALENESS_SECONDS = 600
+
 const durationUnits: Record<string, number> = { s: 1, m: 60, h: 3600, d: 86400 }
 
 /** Seconds, or a string like `90s`, `30m`, `6h`, `1d` (a bare number is seconds). */
@@ -226,8 +228,14 @@ export const workloadIdentityConfigSchema = Typesafe.partial({
 		return hosts.length > 0 ? hosts : undefined
 	},
 	caCertificates: (val: unknown, path: PropertyKey[] = []): string[] | undefined => val === '' ? undefined : pemCertificateBundle(val, path),
-	// Parsed to seconds.
-	jwksMaxStaleness: (val: unknown, path: PropertyKey[] = []): number | undefined => val === '' ? undefined : durationSeconds(val, path),
+	// Parsed to seconds. Below two key refresh intervals (5 minutes each), keys would go stale between refreshes.
+	jwksMaxStaleness: (val: unknown, path: PropertyKey[] = []): number | undefined => {
+		if (val === '') {
+			return undefined
+		}
+		const seconds = durationSeconds(val, path)
+		return seconds >= MIN_JWKS_MAX_STALENESS_SECONDS ? seconds : Typesafe.fail(path, 'must be at least 10m')
+	},
 })
 
 export const serverConfigSchema = Typesafe.partial({

@@ -58,10 +58,17 @@ describe('server.workloadIdentity', () => {
 	test('jwksMaxStaleness: a duration is parsed to seconds', () => {
 		expect(parse({ jwksMaxStaleness: '6h' })?.jwksMaxStaleness).toBe(21600)
 		expect(parse({ jwksMaxStaleness: '30m' })?.jwksMaxStaleness).toBe(1800)
-		expect(parse({ jwksMaxStaleness: '90s' })?.jwksMaxStaleness).toBe(90)
+		expect(parse({ jwksMaxStaleness: '900s' })?.jwksMaxStaleness).toBe(900)
 		expect(parse({ jwksMaxStaleness: '1d' })?.jwksMaxStaleness).toBe(86400)
 		expect(parse({ jwksMaxStaleness: '600' })?.jwksMaxStaleness).toBe(600)
-		expect(parse({ jwksMaxStaleness: 120 })?.jwksMaxStaleness).toBe(120)
+		expect(parse({ jwksMaxStaleness: 1200 })?.jwksMaxStaleness).toBe(1200)
+	})
+
+	test('jwksMaxStaleness: less than two key refresh intervals is refused', () => {
+		expect(() => parse({ jwksMaxStaleness: 0 })).toThrow()
+		expect(() => parse({ jwksMaxStaleness: '0s' })).toThrow()
+		expect(() => parse({ jwksMaxStaleness: '599' })).toThrow()
+		expect(() => parse({ jwksMaxStaleness: '5m' })).toThrow()
 	})
 
 	test('jwksMaxStaleness: an unknown unit or a negative number is refused', () => {

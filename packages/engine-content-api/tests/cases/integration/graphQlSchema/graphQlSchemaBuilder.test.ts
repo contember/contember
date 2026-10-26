@@ -4,7 +4,7 @@ import * as fs from 'node:fs/promises'
 import * as path from 'node:path'
 import { AllowAllPermissionFactory, c, createSchema, SchemaBuilder, SchemaDefinition, SchemaDefinition as def } from '@contember/schema-definition'
 import { Authorizator, GraphQlSchemaBuilderFactory, JsonContentSchemaBuilder, PermissionFactory } from '../../../../src/index.js'
-import { printSortedSchema, toGraphQLJsSchema } from '../../../src/printJsonSchema.js'
+import { toGraphQLJsSchema } from '../../../src/printJsonSchema.js'
 import * as model from './model.js'
 import { describe, expect, it } from 'bun:test'
 import { dirname } from 'node:path'
@@ -61,7 +61,7 @@ const testSchema = async (test: Test) => {
 
 	// the JSON builder must produce the same schema
 	const jsonSchema = new JsonContentSchemaBuilder(schemaWithAcl, authorizator, rootAuthorizator).build()
-	expect(printSortedSchema(toGraphQLJsSchema(jsonSchema.schema))).toStrictEqual(printSortedSchema(graphQlSchema))
+	expect(printSchema(toGraphQLJsSchema(jsonSchema.schema)) + '\n').toStrictEqual(textSchema)
 }
 describe('GraphQL schema builder', () => {
 	it('column types', async () => {

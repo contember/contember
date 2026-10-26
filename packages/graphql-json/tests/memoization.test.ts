@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'bun:test'
 import { parse } from 'graphql'
-import { execute, executeSync, TypeKind, TypePattern, validate } from '../src/index.js'
+import { execute, executeSync, KnownTypeNamesRule, TypeKind, TypePattern, validate } from '../src/index.js'
 import type { ResolveInfo, ResolverMap, Schema } from '../src/index.js'
 
 const createSchema = (): Schema => ({
@@ -72,8 +72,8 @@ describe('per-schema memoization', () => {
 	it('suggests known type names only for unknown types', () => {
 		const schema = createSchema()
 
-		expect(validate(schema, parse('query ($a: String) { hello }'))).toEqual([])
-		expect(validate(schema, parse('query ($a: Strin) { hello }')).map(it => it.message)).toEqual([
+		expect(validate(schema, parse('query ($a: String) { hello }'), { rules: [KnownTypeNamesRule] })).toEqual([])
+		expect(validate(schema, parse('query ($a: Strin) { hello }'), { rules: [KnownTypeNamesRule] }).map(it => it.message)).toEqual([
 			'Unknown type "Strin". Did you mean "String"?',
 		])
 	})

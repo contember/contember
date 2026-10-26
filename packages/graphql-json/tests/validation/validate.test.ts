@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'bun:test'
 import { parse } from 'graphql'
-import { type Schema, TypeKind, TypePattern, validate } from '../../src/index.js'
+import { KnownTypeNamesRule, type Schema, TypeKind, TypePattern, validate, VariablesAreInputTypesRule } from '../../src/index.js'
 
 // Test schema using compact format
 const schema: Schema = {
@@ -417,7 +417,7 @@ describe('VariablesAreInputTypesRule', () => {
       }
     `)
 
-		const errors = validate(schema, document)
+		const errors = validate(schema, document, { rules: [VariablesAreInputTypesRule] })
 		expect(errors).toHaveLength(1)
 		expect(errors[0].message).toContain('cannot be non-input type')
 	})
@@ -433,7 +433,7 @@ describe('KnownTypeNamesRule', () => {
       }
     `)
 
-		const errors = validate(schema, document)
+		const errors = validate(schema, document, { rules: [KnownTypeNamesRule] })
 		expect(errors).toHaveLength(1)
 		expect(errors[0].message).toContain('Unknown type "UnknownType"')
 	})

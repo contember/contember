@@ -34,6 +34,7 @@
     "@contember/engine-content-api": "workspace:*",
     "@contember/engine-system-api": "workspace:*",
     "@contember/engine-tenant-api": "workspace:*",
+    "@contember/graphql-json": "workspace:*",
     "@contember/graphql-utils": "workspace:*",
     "@contember/logger": "workspace:*",
     "@contember/schema": "workspace:*",

@@ -1,6 +1,6 @@
 import { makeExecutableSchema } from '@graphql-tools/schema'
 import { Schema, TenantResolverContext, typeDefs } from '@contember/engine-tenant-api'
-import { createGraphQLQueryHandler, GraphQLQueryHandler } from '../graphql/index.js'
+import { createGraphQLJsExecutor, createGraphQLQueryHandler, GraphQLQueryHandler } from '../graphql/index.js'
 
 export type TenantGraphQLContext = TenantResolverContext & { identityId: string }
 
@@ -14,7 +14,7 @@ export class TenantGraphQLHandlerFactory {
 			resolverValidationOptions: { requireResolversForResolveType: 'ignore' },
 		})
 		return createGraphQLQueryHandler<TenantGraphQLContext>({
-			schema,
+			executor: createGraphQLJsExecutor(schema),
 			listeners: [],
 		})
 	}

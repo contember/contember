@@ -6,6 +6,7 @@ import { suggestionList as graphqlJsSuggestionList } from 'graphql/jsutils/sugge
 import { buildSchema, didYouMean, suggestionList, type ValidationRule } from '../../src/index.js'
 import { validate } from '../../src/validation/validate.js'
 import { FieldsOnCorrectTypeRule } from '../../src/validation/rules/FieldsOnCorrectTypeRule.js'
+import { ValuesOfCorrectTypeRule } from '../../src/validation/rules/ValuesOfCorrectTypeRule.js'
 
 const sdl = `
 	interface Node { id: ID! }
@@ -15,6 +16,11 @@ const sdl = `
 	type Item2 implements Node { id: ID! label: String }
 	type Item10 implements Node { id: ID! label: String }
 	union Thing = Person | Robot | Item2 | Item10
+	enum Color { RED GREEN BLUE }
+	input Point { x: Int! y: Int = 0 }
+	input Filter { name: String color: Color point: Point points: [Point!] }
+	input Choice @oneOf { a: Int b: String }
+	scalar Json
 	type Query {
 		node: Node
 		named: Named
@@ -28,6 +34,7 @@ const sdl = `
 		listArticles: String
 		listArticle2: String
 		listArticle10: String
+		values(int: Int, ints: [Int], float: Float, str: String, bool: Boolean, id: ID, color: Color, filter: Filter, choice: Choice, json: Json): String
 	}
 `
 
@@ -75,6 +82,30 @@ describe('suggestion helpers match graphql-js', () => {
 		test(`didYouMean with ${count} suggestions`, () => {
 			expect(didYouMean(suggestions)).toBe(graphqlJsDidYouMean(suggestions))
 			expect(didYouMean('the enum value', suggestions)).toBe(graphqlJsDidYouMean('the enum value', suggestions))
+		})
+	}
+})
+
+describe('ValuesOfCorrectTypeRule matches graphql-js', () => {
+	const cases: Record<string, string> = {
+		'a scalar parser error is reported as is': '{ values(int: "x", str: 1, bool: 1, id: true) }',
+		'out of range and fractional numbers': '{ values(int: 2147483648, float: "1") }',
+		'a string for an enum': '{ values(color: "RED") }',
+		'an unknown enum value with a suggestion': '{ values(color: REDD) }',
+		'a list for a non-list position is not traversed': '{ values(color: [RED, nope], int: [1]) }',
+		'list items': '{ values(ints: [1, "x", null]) }',
+		'a single value for a list': '{ values(ints: "x", filter: { points: { x: 1 } }) }',
+		'missing required fields before unknown fields': '{ values(filter: { nme: "x", point: { z: 1 } }) }',
+		'a scalar for an input object': '{ values(filter: 1) }',
+		'null in a non-null position': '{ values(filter: { point: { x: null } }) }',
+		'oneOf with two keys': '{ values(choice: { a: 1, b: "x" }) }',
+		'oneOf with a null value': '{ values(choice: { a: null }) }',
+		'a scalar without parsers accepts any literal': '{ values(json: { a: [1, B, null], b: "x" }) }',
+		'a variable is not checked here': 'query($v: Int) { values(int: $v, filter: { name: $v }) }',
+	}
+	for (const [name, query] of Object.entries(cases)) {
+		test(name, () => {
+			expectSameErrors(ValuesOfCorrectTypeRule, graphqlJs.ValuesOfCorrectTypeRule, query)
 		})
 	}
 })

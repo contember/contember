@@ -6,336 +6,152 @@
  *
  * See https://spec.graphql.org/draft/#sec-Values-of-Correct-Type
  */
-import type { ASTVisitor, ListValueNode, ObjectValueNode, ValueNode } from 'graphql'
-import { GraphQLError, Kind } from 'graphql'
+import type { ASTVisitor, ObjectFieldNode, ObjectValueNode, ValueNode } from 'graphql'
+import { GraphQLError, Kind, print } from 'graphql'
 
-import type { Type, TypeRef } from '../../types/schema.js'
-import { IF, isEnumType, isInputObjectType, isScalarType } from '../../types/schema.js'
-import { formatTypeRef, getTypeName, isListType, isNonNullType, unwrapNonNull } from '../../utils/typeRef.js'
+import type { TypeRef } from '../../types/schema.js'
+import { isEnumType, isInputObjectType, isLeafType } from '../../types/schema.js'
+import { formatTypeRef, getTypeName, isListType, isNonNullType } from '../../utils/typeRef.js'
+import { parseEnumLiteral } from '../../utils/enumValues.js'
 import { didYouMean, suggestionList } from '../helpers.js'
 import type { ValidationContext } from '../ValidationContext.js'
 
 export function ValuesOfCorrectTypeRule(context: ValidationContext): ASTVisitor {
+	const getNamedInputType = (typeRef: TypeRef | null | undefined) => (typeRef ? context.getSchema().t[getTypeName(typeRef)] : undefined)
+
 	return {
-		NullValue(node) {
-			const typeRef = context.getInputType()
-			if (typeRef && isNonNullType(typeRef[0])) {
-				context.reportError(
-					new GraphQLError(
-						`Expected value of type "${formatTypeRef(typeRef)}", found null.`,
-						{ nodes: node },
-					),
-				)
-			}
-		},
-
-		ListValue(node: ListValueNode) {
-			// Note: TypeInfo will push the item type as the current input type,
-			// so we need to get the parent type to check if it's a list
-			const parentType = context.getParentInputType()
-			if (parentType) {
-				const nullable = getNullableType(parentType)
-				if (nullable && !isListType(nullable[0])) {
-					isValidValueNode(context, node)
-				}
-			}
-		},
-
-		ObjectValue(node: ObjectValueNode) {
-			const typeRef = context.getInputType()
-			if (!typeRef) {
-				return undefined
-			}
-
-			const typeName = getTypeName(typeRef)
-			const type = context.getSchema().t[typeName]
-
-			if (!type || !isInputObjectType(type)) {
+		ListValue(node) {
+			// Note: TypeInfo will traverse into a list's item type, so look to the parent input type to check if it is a list.
+			const type = context.getParentInputType()
+			if (!type || !isListType(type[0])) {
 				isValidValueNode(context, node)
-				return false // Don't visit children - we already reported the error
+				return false // Don't traverse further.
 			}
+			return undefined
+		},
 
-			// InputObjectType: [kind, fields, isOneOf?, description?]
-			const fields = type[1]
-			const isOneOf = type[2]
+		ObjectValue(node) {
+			const typeRef = context.getInputType()
+			const type = getNamedInputType(typeRef)
+			if (!typeRef || !type || !isInputObjectType(type)) {
+				isValidValueNode(context, node)
+				return false // Don't traverse further.
+			}
+			const typeName = getTypeName(typeRef)
 
-			// Check for unknown fields
-			const fieldNames = Object.keys(fields)
-			for (const fieldNode of node.fields) {
-				const fieldName = fieldNode.name.value
-				if (!fields[fieldName]) {
-					const suggestions = suggestionList(fieldName, fieldNames)
+			// Ensure every required field exists.
+			const fieldNodeMap = new Map<string, ObjectFieldNode>()
+			for (const field of node.fields) {
+				fieldNodeMap.set(field.name.value, field)
+			}
+			const fieldDefs = type[1]
+			for (const fieldName in fieldDefs) {
+				const fieldDef = fieldDefs[fieldName]
+				if (!fieldNodeMap.has(fieldName) && isNonNullType(fieldDef[0][0]) && fieldDef[1] === undefined) {
 					context.reportError(
-						new GraphQLError(
-							`Field "${fieldName}" is not defined by type "${typeName}".${didYouMean(suggestions)}`,
-							{ nodes: fieldNode },
-						),
+						new GraphQLError(`Field "${typeName}.${fieldName}" of required type "${formatTypeRef(fieldDef[0])}" was not provided.`, { nodes: node }),
 					)
 				}
 			}
 
-			// Check for missing required fields
-			const providedFields = new Set(node.fields.map((f) => f.name.value))
-			for (const [fieldName, fieldDef] of Object.entries(fields)) {
-				// InputField: [typeRef, defaultValue?, description?]
-				const fieldTypeRef = IF.type(fieldDef)
-				const defaultValue = IF.defaultValue(fieldDef)
-				// Required = NonNull without default value
-				if (
-					isNonNullType(fieldTypeRef[0])
-					&& defaultValue === undefined
-					&& !providedFields.has(fieldName)
-				) {
-					context.reportError(
-						new GraphQLError(
-							`Field "${typeName}.${fieldName}" of required type "${formatTypeRef(fieldTypeRef)}" was not provided.`,
-							{ nodes: node },
-						),
-					)
-				}
+			if (type[2]) {
+				validateOneOfInputObject(context, node, typeName, fieldNodeMap)
 			}
-
-			// Check OneOf constraint
-			if (isOneOf) {
-				if (node.fields.length !== 1) {
-					context.reportError(
-						new GraphQLError(
-							`Exactly one field must be provided for OneOf type "${typeName}".`,
-							{ nodes: node },
-						),
-					)
-				} else {
-					const field = node.fields[0]
-					if (field.value.kind === Kind.NULL) {
-						context.reportError(
-							new GraphQLError(
-								`Field "${typeName}.${field.name.value}" must be non-null.`,
-								{ nodes: field },
-							),
-						)
-					}
-				}
-			}
-
 			return undefined
 		},
 
 		ObjectField(node) {
-			const parentType = context.getParentInputType()
-			if (!parentType) {
-				return
-			}
-
-			const parentTypeName = getTypeName(parentType)
-			const parentTypeObj = context.getSchema().t[parentTypeName]
-
-			if (!parentTypeObj || !isInputObjectType(parentTypeObj)) {
-				return
-			}
-
-			// InputObjectType: [kind, fields, isOneOf?, description?]
-			const fields = parentTypeObj[1]
-			const fieldDef = fields[node.name.value]
-			if (!fieldDef) {
-				return // Already reported by ObjectValue
-			}
-
-			// TypeInfo will push the field type, but we need to check it here for scalars/enums
-		},
-
-		EnumValue(node) {
-			const typeRef = context.getInputType()
-			if (!typeRef) {
-				return
-			}
-
-			const typeName = getTypeName(typeRef)
-			const type = context.getSchema().t[typeName]
-
-			if (!type || !isEnumType(type)) {
-				isValidValueNode(context, node)
-				return
-			}
-
-			// EnumType: [kind, values, description?]
-			const values = type[1]
-			// Check if enum value exists
-			if (!values[node.value]) {
-				const suggestions = suggestionList(node.value, Object.keys(values))
+			const parentTypeRef = context.getParentInputType()
+			const parentType = getNamedInputType(parentTypeRef)
+			const fieldType = context.getInputType()
+			if (!fieldType && parentTypeRef && parentType && isInputObjectType(parentType)) {
+				const suggestions = suggestionList(node.name.value, Object.keys(parentType[1]))
 				context.reportError(
-					new GraphQLError(
-						`Value "${node.value}" does not exist in "${typeName}" enum.${didYouMean(suggestions)}`,
-						{ nodes: node },
-					),
+					new GraphQLError(`Field "${node.name.value}" is not defined by type "${getTypeName(parentTypeRef)}".` + didYouMean(suggestions), {
+						nodes: node,
+					}),
 				)
 			}
 		},
 
-		IntValue(node) {
-			isValidValueNode(context, node)
+		NullValue(node) {
+			const type = context.getInputType()
+			if (type && isNonNullType(type[0])) {
+				context.reportError(new GraphQLError(`Expected value of type "${formatTypeRef(type)}", found ${print(node)}.`, { nodes: node }))
+			}
 		},
 
-		FloatValue(node) {
-			isValidValueNode(context, node)
-		},
-
-		StringValue(node) {
-			isValidValueNode(context, node)
-		},
-
-		BooleanValue(node) {
-			isValidValueNode(context, node)
-		},
+		EnumValue: node => isValidValueNode(context, node),
+		IntValue: node => isValidValueNode(context, node),
+		FloatValue: node => isValidValueNode(context, node),
+		StringValue: node => isValidValueNode(context, node),
+		BooleanValue: node => isValidValueNode(context, node),
 	}
 }
 
 /**
- * Check if a value node is valid for the current input type.
- * Reports error if not.
+ * Any value literal may be a valid representation of a Scalar, depending on that scalar type.
  */
 function isValidValueNode(context: ValidationContext, node: ValueNode): void {
-	const typeRef = context.getInputType()
-	if (!typeRef) {
+	// Report any error at the full type expected by the location.
+	const locationType = context.getInputType()
+	if (!locationType) {
 		return
 	}
 
-	const typeName = getTypeName(typeRef)
+	const typeName = getTypeName(locationType)
 	const type = context.getSchema().t[typeName]
-
 	if (!type) {
-		// Unknown type - already handled by KnownTypeNamesRule
 		return
 	}
 
-	// Check type compatibility
-	const error = checkValueTypeCompatibility(type, typeName, typeRef, node, context)
-	if (error) {
-		context.reportError(error)
+	if (!isLeafType(type)) {
+		context.reportError(new GraphQLError(`Expected value of type "${formatTypeRef(locationType)}", found ${print(node)}.`, { nodes: node }))
+		return
+	}
+
+	// Scalars and Enums determine if a literal value is valid via parseLiteral(), which may throw or return an invalid value to indicate failure.
+	try {
+		let parseResult: unknown
+		if (isEnumType(type)) {
+			parseResult = parseEnumLiteral(typeName, type, node)
+		} else {
+			const scalar = context.getScalars()[typeName]
+			// a scalar without an implementation accepts any literal, as a graphql-js scalar without parsers does
+			parseResult = scalar ? scalar.parseLiteral(node, undefined) : true
+		}
+		if (parseResult === undefined) {
+			context.reportError(new GraphQLError(`Expected value of type "${formatTypeRef(locationType)}", found ${print(node)}.`, { nodes: node }))
+		}
+	} catch (error) {
+		if (error instanceof GraphQLError) {
+			context.reportError(error)
+		} else {
+			const message: unknown = typeof error === 'object' && error !== null && 'message' in error ? error.message : undefined
+			context.reportError(
+				new GraphQLError(`Expected value of type "${formatTypeRef(locationType)}", found ${print(node)}; ` + String(message), {
+					nodes: node,
+					originalError: error instanceof Error ? error : undefined,
+				}),
+			)
+		}
 	}
 }
 
-/**
- * Check if a value node is compatible with a type.
- */
-function checkValueTypeCompatibility(
-	type: Type,
-	typeName: string,
-	typeRef: TypeRef,
-	node: ValueNode,
+function validateOneOfInputObject(
 	context: ValidationContext,
-): GraphQLError | null {
-	// Handle scalars using parseLiteral
-	if (isScalarType(type)) {
-		const scalars = context.getScalars()
-		const scalar = scalars[typeName]
-
-		if (scalar?.parseLiteral) {
-			try {
-				// as in graphql-js, a parser signals an invalid literal by returning undefined
-				if (scalar.parseLiteral(node) === undefined) {
-					return new GraphQLError(`Expected value of type "${formatTypeRef(typeRef)}", found ${print(node)}.`, { nodes: node })
-				}
-				return null
-			} catch (e) {
-				const message = e instanceof Error ? e.message : String(e)
-				return new GraphQLError(
-					`Expected value of type "${formatTypeRef(typeRef)}", found ${print(node)}; ${message}`,
-					{ nodes: node },
-				)
-			}
-		}
-
-		// Fallback: check AST kind
-		const validKinds = getValidASTKindsForScalar(typeName)
-		if (!validKinds.includes(node.kind)) {
-			return new GraphQLError(
-				`Expected value of type "${formatTypeRef(typeRef)}", found ${print(node)}.`,
-				{ nodes: node },
-			)
-		}
-
-		return null
+	node: ObjectValueNode,
+	typeName: string,
+	fieldNodeMap: ReadonlyMap<string, ObjectFieldNode>,
+): void {
+	const keys = [...fieldNodeMap.keys()]
+	if (keys.length !== 1) {
+		context.reportError(new GraphQLError(`OneOf Input Object "${typeName}" must specify exactly one key.`, { nodes: [node] }))
+		return
 	}
 
-	// Handle enums
-	if (isEnumType(type)) {
-		if (node.kind !== Kind.ENUM && node.kind !== Kind.STRING) {
-			return new GraphQLError(
-				`Expected value of type "${formatTypeRef(typeRef)}", found ${print(node)}.`,
-				{ nodes: node },
-			)
-		}
-		return null
-	}
-
-	// Handle input objects
-	if (isInputObjectType(type)) {
-		if (node.kind !== Kind.OBJECT) {
-			return new GraphQLError(
-				`Expected value of type "${formatTypeRef(typeRef)}", found ${print(node)}.`,
-				{ nodes: node },
-			)
-		}
-		return null
-	}
-
-	return null
-}
-
-/**
- * Get valid AST node kinds for a scalar type
- */
-function getValidASTKindsForScalar(scalarName: string): string[] {
-	switch (scalarName) {
-		case 'Int':
-			return [Kind.INT]
-		case 'Float':
-			return [Kind.INT, Kind.FLOAT]
-		case 'String':
-			return [Kind.STRING]
-		case 'Boolean':
-			return [Kind.BOOLEAN]
-		case 'ID':
-			return [Kind.STRING, Kind.INT]
-		default:
-			// Custom scalar - accept any literal
-			return [Kind.INT, Kind.FLOAT, Kind.STRING, Kind.BOOLEAN]
-	}
-}
-
-/**
- * Get nullable type (unwrap NonNull if present)
- */
-function getNullableType(typeRef: TypeRef): TypeRef {
-	if (isNonNullType(typeRef[0])) {
-		return [unwrapNonNull(typeRef[0]), typeRef[1]]
-	}
-	return typeRef
-}
-
-/**
- * Simple print function for value nodes
- */
-function print(node: ValueNode): string {
-	switch (node.kind) {
-		case Kind.NULL:
-			return 'null'
-		case Kind.INT:
-		case Kind.FLOAT:
-			return node.value
-		case Kind.STRING:
-			return JSON.stringify(node.value)
-		case Kind.BOOLEAN:
-			return node.value ? 'true' : 'false'
-		case Kind.ENUM:
-			return node.value
-		case Kind.LIST:
-			return `[${node.values.map(print).join(', ')}]`
-		case Kind.OBJECT:
-			return `{${node.fields.map((f) => `${f.name.value}: ${print(f.value)}`).join(', ')}}`
-		case Kind.VARIABLE:
-			return `$${node.name.value}`
-		default:
-			return '(unknown)'
+	const value = fieldNodeMap.get(keys[0])?.value
+	if (!value || value.kind === Kind.NULL) {
+		context.reportError(new GraphQLError(`Field "${typeName}.${keys[0]}" must be non-null.`, { nodes: [node] }))
 	}
 }

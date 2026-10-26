@@ -1,10 +1,10 @@
 import {
 	DocumentNode,
 	execute,
+	ExecutionResult,
 	GraphQLError,
 	GraphQLSchema,
 	Kind,
-	OperationDefinitionNode,
 	OperationTypeNode,
 	parse,
 	validate,
@@ -34,8 +34,26 @@ export interface GraphQLListener<Context> {
 	}) => Omit<GraphQLListener<Context>, 'onStart' | 'onExecute' | 'onResponse' | 'onShutdown'> | void
 }
 
+/** The GraphQL engine a handler runs on. */
+export interface GraphQLExecutor<Context> {
+	validateSchema(): readonly GraphQLError[]
+	validate(document: DocumentNode): readonly GraphQLError[]
+	execute(args: {
+		document: DocumentNode
+		operationName: string | null
+		variableValues: Record<string, unknown> | undefined
+		contextValue: Context
+	}): Promise<Pick<ExecutionResult, 'data' | 'errors'>>
+}
+
+export const createGraphQLJsExecutor = <Context>(schema: GraphQLSchema): GraphQLExecutor<Context> => ({
+	validateSchema: () => validateSchema(schema),
+	validate: document => validate(schema, document),
+	execute: async args => await execute({ schema, ...args }),
+})
+
 interface FactoryArgs<Context> {
-	schema: GraphQLSchema
+	executor: GraphQLExecutor<Context>
 	listeners: GraphQLListener<Context>[]
 	getMemoryBudget?: (context: Context) => RequestMemoryBudget | undefined
 }
@@ -53,7 +71,7 @@ const documentCacheMax = 100
 const hitCacheMax = documentCacheMax * 2
 
 export const createGraphQLQueryHandler = <Context>({
-	schema,
+	executor,
 	listeners,
 	getMemoryBudget,
 }: FactoryArgs<Context>): GraphQLQueryHandler<Context> => {
@@ -91,7 +109,7 @@ export const createGraphQLQueryHandler = <Context>({
 		}
 		try {
 			if (!schemaValidated) {
-				const validationResult = validateSchema(schema)
+				const validationResult = executor.validateSchema()
 				if (validationResult.length) {
 					return respond(400, {
 						errors: validationResult,
@@ -109,7 +127,7 @@ export const createGraphQLQueryHandler = <Context>({
 			let doc = documentCache.get(queryHash)
 			if (!doc) {
 				doc = parse(resolvedRequest.query)
-				const validationResult = validate(schema, doc)
+				const validationResult = executor.validate(doc)
 				if (validationResult.length) {
 					return respond(400, { errors: validationResult })
 				}
@@ -126,8 +144,7 @@ export const createGraphQLQueryHandler = <Context>({
 			listenersQueue.forEach(it => {
 				it.onExecute && listenersQueue.push(it.onExecute({ context, document, operation }) || {})
 			})
-			const executionResult = await execute({
-				schema,
+			const executionResult = await executor.execute({
 				document,
 				operationName: operationName,
 				variableValues: resolvedRequest.variables,

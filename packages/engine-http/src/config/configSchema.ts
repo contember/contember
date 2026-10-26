@@ -267,6 +267,8 @@ export const serverConfigSchema = Typesafe.partial({
 			return maxEntries > 0 ? maxEntries : Typesafe.fail(path, 'must be a positive integer')
 		},
 		forcePrimaryHeader: Typesafe.boolean,
+		// experimental: `graphql-json` runs the content API without building a graphql-js schema
+		graphqlEngine: Typesafe.enumeration('graphql-js', 'graphql-json'),
 		whereOptimizer: Typesafe.partial({
 			disable: Typesafe.boolean,
 			maxCrossOptimizationInput: Typesafe.number,

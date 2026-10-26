@@ -1,13 +1,12 @@
 import { createAclVariables, ExecutionContainerFactory } from '@contember/engine-content-api'
 import { StageBySlugQuery } from '@contember/engine-system-api'
 import { Client, RequestMemoryBudget, RequestMemoryBudgetOptions } from '@contember/database'
-import { GraphQLSchema } from 'graphql'
 import { HttpController } from '../application/index.js'
 import { HttpErrorResponse, HttpResponse } from '../common/index.js'
 import { GraphQLKoaState } from '../graphql/index.js'
 import { ProjectContextResolver } from '../project-common/index.js'
 import { ContentQueryHandler, ContentQueryHandlerFactory } from './ContentQueryHandlerFactory.js'
-import { GraphQlSchemaFactory } from './GraphQlSchemaFactory.js'
+import { ContentGraphQLSchema, GraphQlSchemaFactory } from './GraphQlSchemaFactory.js'
 import { NotModifiedChecker } from './NotModifiedChecker.js'
 import { TestTransactionService } from '../testing/index.js'
 import { isTruthyHeader } from '../utils/truthyHeader.js'
@@ -30,7 +29,7 @@ export class ContentApiControllerFactory {
 	}
 
 	create(): HttpController {
-		const handlerCache = new WeakMap<GraphQLSchema, ContentQueryHandler>()
+		const handlerCache = new WeakMap<ContentGraphQLSchema, ContentQueryHandler>()
 		return async context => {
 			const { params, timer, projectGroup, authResult, request, koa, clientIp } = context
 			if (!authResult) {

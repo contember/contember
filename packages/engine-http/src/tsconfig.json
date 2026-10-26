@@ -13,6 +13,7 @@
 		{ "path": "../../engine-tenant-api/src" },
 		{ "path": "../../engine-system-api/src" },
 		{ "path": "../../engine-content-api/src" },
+		{ "path": "../../graphql-json/src" },
 		{ "path": "../../graphql-utils/src" },
 		{ "path": "../../logger/src" },
 		{ "path": "../../schema/src" },

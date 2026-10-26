@@ -112,6 +112,7 @@ export const configTemplate: any = {
 			schemaCacheTtlSeconds: '%?env.CONTEMBER_CONTENT_API_SCHEMA_CACHE_TTL_SECONDS::number%',
 			schemaCacheMaxEntries: '%?env.CONTEMBER_CONTENT_API_SCHEMA_CACHE_MAX_ENTRIES::number%',
 			forcePrimaryHeader: '%?env.CONTEMBER_CONTENT_API_FORCE_PRIMARY_HEADER::bool%',
+			graphqlEngine: '%?env.CONTEMBER_CONTENT_API_GRAPHQL_ENGINE%',
 			whereOptimizer: {
 				disable: '%?env.CONTEMBER_CONTENT_API_WHERE_OPTIMIZER_DISABLE::bool%',
 				maxCrossOptimizationInput: '%?env.CONTEMBER_CONTENT_API_MAX_CROSS_OPTIMIZATION_INPUT::number%',

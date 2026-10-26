@@ -1,9 +1,11 @@
 import { expect, test } from 'bun:test'
+import { GraphQLSchema, parse } from 'graphql'
+import { validate } from '@contember/graphql-json'
 import { GraphQlSchemaBuilderFactory, PermissionFactory } from '@contember/engine-content-api'
 import { Acl, Model, Schema } from '@contember/schema'
 import { emptySchema } from '@contember/schema-utils'
 import { ContentApiSpecificCache } from '../../../src/content/ContentApiSpecificCache.js'
-import { GraphQlSchemaFactory, GraphQLSchemaFactoryResult } from '../../../src/content/GraphQlSchemaFactory.js'
+import { ContentGraphQLEngine, GraphQlSchemaFactory, GraphQLSchemaFactoryResult } from '../../../src/content/GraphQlSchemaFactory.js'
 import { GraphQLSchemaContributor } from '../../../src/content/GraphQLSchemaContributor.js'
 import { ProjectConfig } from '../../../src/project/config.js'
 
@@ -18,10 +20,11 @@ const article: Model.Entity = {
 	fields: {
 		id: { name: 'id', columnName: 'id', type: Model.ColumnType.Uuid, columnType: 'uuid', nullable: false },
 		title: { name: 'title', columnName: 'title', type: Model.ColumnType.String, columnType: 'text', nullable: true },
+		data: { name: 'data', columnName: 'data', type: Model.ColumnType.Json, columnType: 'jsonb', nullable: true },
 	},
 }
 
-const allFields: Acl.FieldPermissions = { id: true, title: true }
+const allFields: Acl.FieldPermissions = { id: true, title: true, data: true }
 
 const role = (entities: Acl.Permissions): Acl.RolePermissions => ({ variables: {}, entities })
 
@@ -45,15 +48,23 @@ const project: ProjectConfig = {
 	db: { host: 'localhost', port: 5432, user: 'test', password: 'test', database: 'test' },
 }
 
-const createFactory = (contributors: GraphQLSchemaContributor[] = []) =>
+const createFactory = (contributors: GraphQLSchemaContributor[] = [], engine: ContentGraphQLEngine = 'graphql-js') =>
 	new GraphQlSchemaFactory(
 		new ContentApiSpecificCache<Schema, GraphQLSchemaFactoryResult>({}),
 		new GraphQlSchemaBuilderFactory(),
 		new PermissionFactory(),
 		contributors,
+		engine,
 	)
 
 const create = (factory: GraphQlSchemaFactory, projectRoles: string[]) => factory.create(schema, { projectRoles }, project)
+
+const graphQlJsSchema = ({ schema }: GraphQLSchemaFactoryResult): GraphQLSchema => {
+	if (schema.engine !== 'graphql-js') {
+		throw new Error('Expected a graphql-js schema')
+	}
+	return schema.schema
+}
 
 test('role combinations with identical permissions share one schema', () => {
 	const factory = createFactory()
@@ -73,8 +84,8 @@ test('role combinations with different permissions get their own schema', () => 
 	const reader = create(factory, ['reader'])
 
 	expect(reader).not.toBe(admin)
-	expect(admin.schema.getMutationType()?.getFields().createArticle).toBeDefined()
-	expect(reader.schema.getMutationType()?.getFields().createArticle).toBeUndefined()
+	expect(graphQlJsSchema(admin).getMutationType()?.getFields().createArticle).toBeDefined()
+	expect(graphQlJsSchema(reader).getMutationType()?.getFields().createArticle).toBeUndefined()
 })
 
 test('a contributor cache key separates role combinations with identical permissions', () => {
@@ -115,7 +126,8 @@ const materializedViewSchema: Schema = {
 }
 
 const hasRefreshMutation = (factory: GraphQlSchemaFactory, projectRoles: string[]) =>
-	factory.create(materializedViewSchema, { projectRoles }, project).schema.getMutationType()?.getFields().refreshMaterializedView !== undefined
+	graphQlJsSchema(factory.create(materializedViewSchema, { projectRoles }, project)).getMutationType()?.getFields().refreshMaterializedView
+		!== undefined
 
 test('a role without the refresh permission cannot refresh a materialized view another role may refresh', () => {
 	const factory = createFactory()
@@ -127,4 +139,13 @@ test('a role without the refresh permission cannot refresh a materialized view a
 
 test('the refresh permission is inherited', () => {
 	expect(hasRefreshMutation(createFactory(), ['inheritedRefresher'])).toBe(true)
+})
+
+test('graphql-json: a Json column accepts an object literal next to the introspection schema', () => {
+	const { schema: result } = create(createFactory([], 'graphql-json'), ['admin'])
+	if (result.engine !== 'graphql-json') {
+		throw new Error('Expected a graphql-json schema')
+	}
+	const document = parse('mutation { createArticle(data: { data: { message: "hello", tags: ["a"] } }) { ok } }')
+	expect(validate(result.schema.schema, document, { scalars: result.schema.scalars }).map(it => it.message)).toEqual([])
 })

@@ -10,7 +10,7 @@ import { F, TypeKind, TypePattern } from '../types/schema.js'
 import type { ResolveInfo, ResolverFn } from '../types/resolvers.js'
 import type { Path } from '../utils/path.js'
 import { addPath, pathToArray } from '../utils/path.js'
-import { getOwn, isPromise, promiseForObject } from '../utils/helpers.js'
+import { getOwn, isPromise, promiseForObject, setOwn } from '../utils/helpers.js'
 import { isNonNullType } from '../utils/typeRef.js'
 import { completeValue } from './complete.js'
 import { getArgumentValues } from './values.js'
@@ -45,7 +45,7 @@ export function executeFields<TContext>(
 		)
 
 		if (result !== undefined) {
-			results[responseName] = result
+			setOwn(results, responseName, result)
 			if (isPromise(result)) {
 				containsPromise = true
 			}

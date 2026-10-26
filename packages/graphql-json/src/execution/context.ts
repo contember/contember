@@ -9,6 +9,7 @@ import { defaultFieldResolver } from '../types/resolvers.js'
 import { withBuiltInScalars } from '../scalars/builtIn.js'
 import { coerceVariableValues } from './values.js'
 import { getSchemaWithIntrospection } from '../introspection/types.js'
+import { setOwn } from '../utils/helpers.js'
 
 /**
  * Type guard for checking if result is errors array; the other variant `T` is never an array
@@ -54,7 +55,7 @@ export function buildExecutionContext<TContext>(
 				operation = definition
 			}
 		} else if (definition.kind === Kind.FRAGMENT_DEFINITION) {
-			fragments[definition.name.value] = definition
+			setOwn(fragments, definition.name.value, definition)
 		}
 	}
 

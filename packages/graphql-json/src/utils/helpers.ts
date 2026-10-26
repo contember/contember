@@ -14,6 +14,17 @@ export function getOwn<V>(record: Readonly<Record<string, V>>, key: string): V |
 }
 
 /**
+ * Adds the key as an own property; a plain assignment would replace the prototype when the key is `__proto__`, e.g. an alias
+ */
+export function setOwn<V>(record: Record<string, V>, key: string, value: V): void {
+	if (key === '__proto__') {
+		Object.defineProperty(record, key, { value, enumerable: true, configurable: true, writable: true })
+	} else {
+		record[key] = value
+	}
+}
+
+/**
  * Check if value is an object-like (not null, is object)
  */
 export function isObjectLike(value: unknown): value is ObjectLike {
@@ -132,7 +143,7 @@ export async function promiseForObject<T>(
 
 	const result: Record<string, T> = {}
 	for (let i = 0; i < keys.length; i++) {
-		result[keys[i]] = values[i]
+		setOwn(result, keys[i], values[i])
 	}
 	return result
 }

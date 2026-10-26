@@ -10,15 +10,19 @@ const sdl = `
 	input Order { title: Dir }
 	type Article { title: String }
 	union Result = Article
+	scalar Json
 	type Query {
 		list(filter: Filter, orderBy: [Order!], dir: Dir): [Article!]!
 		hello: String
+		asyncHello: String
 		echo(value: String): String
 		echoList(values: [String]): [String]
 		echoFilter(filter: Filter): String
 		badDir: Dir
 		result: Result
+		echoJson(value: Json): String
 	}
+	type Subscription { a: String b: String }
 `
 
 const schema = buildSchema(sdl)
@@ -28,11 +32,13 @@ const article = { title: 'a' }
 const fields = {
 	list: () => [article],
 	hello: () => 'h',
+	asyncHello: () => Promise.resolve('async'),
 	echo: (args: Record<string, unknown>) => args.value,
 	echoList: (args: Record<string, unknown>) => args.values,
 	echoFilter: (args: Record<string, unknown>) => JSON.stringify(args.filter),
 	badDir: () => 'toString',
 	result: () => ({ __typename: 'constructor' }),
+	echoJson: (args: Record<string, unknown>) => JSON.stringify(args.value),
 }
 const resolvers: ResolverMap = {
 	Query: Object.fromEntries(Object.entries(fields).map(([name, resolve]) => [name, (_source, args) => resolve(args)])),
@@ -67,6 +73,7 @@ describe('validation reports prototype member names as graphql-js does', () => {
 		'a variable type': 'query($v: constructor) { echo(value: $v) }',
 		'a fragment type condition': '{ ... on toString { hello } ...F } fragment F on valueOf { hello }',
 		'an undefined fragment': '{ ...toString }',
+		'a subscription fragment named __proto__': 'subscription { ...__proto__ } fragment __proto__ on Subscription { a b }',
 	}
 	for (const [name, query] of Object.entries(cases)) {
 		test(name, () => {
@@ -81,6 +88,10 @@ describe('execution of a valid document treats prototype member names as graphql
 	const cases: Record<string, [query: string, variables?: Record<string, unknown>]> = {
 		'__type of a prototype member name': ['{ a: __type(name: "constructor") { name } b: __type(name: "toString") { name } }'],
 		'__type with the name in a variable': ['query($n: String!) { __type(name: $n) { name } }', { n: 'hasOwnProperty' }],
+		'aliases': ['{ __proto__: hello constructor: echo(value: "x") list { __proto__: title } }'],
+		'an alias of an async field': ['{ __proto__: asyncHello }'],
+		'an object literal of a scalar without a parser': ['{ echoJson(value: { __proto__: 1, constructor: 2 }) }'],
+		'fragment names': ['{ ...__proto__ ...constructor } fragment __proto__ on Query { hello } fragment constructor on Query { echo(value: "c") }'],
 		'variables without a value': ['query($toString: String) { echo(value: $toString) echoFilter(filter: { title: $toString }) }'],
 		'input object variable keys': ['query($f: Filter) { echoFilter(filter: $f) }', { f: { constructor: 'x', and: [{ toString: 'y' }] } }],
 		'an own __proto__ key of a variable': ['query($f: Filter) { echoFilter(filter: $f) }', JSON.parse('{"f":{"__proto__":{"title":"x"}}}')],

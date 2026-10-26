@@ -93,14 +93,18 @@ export class ProjectGroupContainerFactory {
 				if (!tenantDbCredentials.read) {
 					return tenantConnection
 				}
-				return Connection.create({
-					...tenantDbCredentials,
-					...tenantDbCredentials.read,
-					pool: {
-						...tenantDbCredentials.pool,
-						...tenantDbCredentials.read.pool,
+				return Connection.create(
+					{
+						...tenantDbCredentials,
+						...tenantDbCredentials.read,
+						pool: {
+							...tenantDbCredentials.pool,
+							...tenantDbCredentials.read.pool,
+						},
 					},
-				}, err => logger.error(err))
+					err => logger.error(err),
+					{ retryStaleConnection: true },
+				)
 			})
 			.addService('projectSchemaResolver', () => new ProjectSchemaResolverProxy())
 			.addService('projectInitializer', () => new ProjectInitializerProxy())

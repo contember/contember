@@ -88,14 +88,18 @@ export class ProjectContainerFactory {
 				if (!project.db.read) {
 					return connection
 				}
-				return Connection.create({
-					...project.db,
-					...project.db.read,
-					pool: {
-						...project.db.pool,
-						...project.db.read.pool,
+				return Connection.create(
+					{
+						...project.db,
+						...project.db.read,
+						pool: {
+							...project.db.pool,
+							...project.db.read.pool,
+						},
 					},
-				}, err => logger.error(err))
+					err => logger.error(err),
+					{ retryStaleConnection: true },
+				)
 			})
 			.addService('contentSchemaResolver', () => new ContentSchemaResolver(this.schemaProvider))
 			.addService('systemSchemaName', ({ project }) => project.db.systemSchema ?? 'system')

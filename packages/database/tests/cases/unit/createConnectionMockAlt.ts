@@ -3,7 +3,8 @@ import { PgClient } from '../../../src/client/PgClient.js'
 import EventEmitter from 'node:events'
 import { expect } from 'bun:test'
 
-type MockQuery = { sql: string; timeout?: number; result?: any }
+// `error` rejects the query; with `lost`, the client first emits `error` as pg does when the server closes the connection.
+type MockQuery = { sql: string; timeout?: number; result?: any; error?: Error; lost?: boolean }
 
 export const createConnectionMockAlt = (...queries: MockQuery[][]): [Connection, () => void] => {
 	return createConnectionMockAltWithPool({}, ...queries)
@@ -11,6 +12,16 @@ export const createConnectionMockAlt = (...queries: MockQuery[][]): [Connection,
 
 export const createConnectionMockAltWithPool = (
 	poolConfig: Partial<Omit<PoolConfig, 'logError'>>,
+	...queries: MockQuery[][]
+): [Connection, () => void] => {
+	return createConnectionMockAltWithOptions({ pool: poolConfig }, ...queries)
+}
+
+export const createConnectionMockAltWithOptions = (
+	{ pool: poolConfig = {}, connection: connectionOptions = {} }: {
+		pool?: Partial<Omit<PoolConfig, 'logError'>>
+		connection?: Connection.Options
+	},
 	...queries: MockQuery[][]
 ): [Connection, () => void] => {
 	const connectionMocks: (PgClient & { assertEmpty: () => void })[] = []
@@ -35,6 +46,12 @@ export const createConnectionMockAltWithPool = (
 					expect(query).toBeDefined()
 					expect(sql).toEqual(query?.sql as string)
 					await new Promise<void>(resolve => setTimeout(resolve, query?.timeout ?? 1))
+					if (query?.lost) {
+						this.emit('error', query.error)
+					}
+					if (query?.error) {
+						throw query.error
+					}
 
 					return query?.result
 				}
@@ -52,7 +69,7 @@ export const createConnectionMockAltWithPool = (
 		})()
 	}, { ...poolConfig, logError: () => null })
 	return [
-		new Connection(pool),
+		new Connection(pool, undefined, connectionOptions),
 		() => {
 			allMocks.forEach(it => it.assertEmpty())
 		},

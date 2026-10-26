@@ -10,6 +10,7 @@ import { A, D, IF, isCompositeType, isEnumType, isInputObjectType, isInterfaceTy
 import { getListItemType, getTypeName, isListType, isNonNullType, unwrapNonNull } from '../utils/typeRef.js'
 import { typeFromAST } from './typeFromAST.js'
 import { getSchemaDirectives } from '../introspection/types.js'
+import { getOwn } from '../utils/helpers.js'
 
 type Maybe<T> = T | null | undefined
 
@@ -93,7 +94,7 @@ export class TypeInfo {
 		switch (node.kind) {
 			case Kind.SELECTION_SET: {
 				const namedTypeName = this._getNamedTypeFromTypeRef(this.getType())
-				const namedType = namedTypeName ? schema.t[namedTypeName] : undefined
+				const namedType = namedTypeName ? getOwn(schema.t, namedTypeName) : undefined
 				const compositeType = namedType && isCompositeType(namedType) ? namedType : undefined
 				this._parentTypeStack.push(compositeType)
 				this._parentTypeNameStack.push(compositeType ? namedTypeName : undefined)
@@ -131,7 +132,7 @@ export class TypeInfo {
 						break
 				}
 				// TypeRef: [pattern, typeName]
-				const typeRef: Maybe<TypeRef> = rootTypeName && schema.t[rootTypeName]
+				const typeRef: Maybe<TypeRef> = rootTypeName && getOwn(schema.t, rootTypeName)
 					? [TypePattern.T, rootTypeName]
 					: undefined
 				this._typeStack.push(typeRef)
@@ -168,12 +169,11 @@ export class TypeInfo {
 
 				if (directive) {
 					// Directive: [args, locations, isRepeatable?, description?]
-					const args = D.args(directive)
-					argDef = args?.[node.name.value]
+					argDef = getOwn(D.args(directive), node.name.value)
 				} else if (fieldDef) {
 					// Field: [typeRef, args, description?, deprecationReason?]
 					const args = fieldDef[1]
-					argDef = args?.[node.name.value]
+					argDef = args ? getOwn(args, node.name.value) : undefined
 				}
 
 				if (argDef) {
@@ -205,14 +205,13 @@ export class TypeInfo {
 
 			case Kind.OBJECT_FIELD: {
 				const objectTypeName = this._getNamedTypeFromTypeRef(this.getInputType())
-				const objectType = objectTypeName ? schema.t[objectTypeName] : undefined
+				const objectType = objectTypeName ? getOwn(schema.t, objectTypeName) : undefined
 				let inputFieldDef: Maybe<InputField>
 				let inputFieldTypeRef: Maybe<TypeRef>
 
 				if (objectType && isInputObjectType(objectType)) {
 					// InputObjectType: [kind, fields, isOneOf?, description?]
-					const fields = objectType[1]
-					inputFieldDef = fields[node.name.value]
+					inputFieldDef = getOwn(objectType[1], node.name.value)
 					if (inputFieldDef) {
 						// InputField: [typeRef, defaultValue?, description?]
 						inputFieldTypeRef = IF.type(inputFieldDef)
@@ -225,13 +224,12 @@ export class TypeInfo {
 
 			case Kind.ENUM: {
 				const enumTypeName = this._getNamedTypeFromTypeRef(this.getInputType())
-				const enumType = enumTypeName ? schema.t[enumTypeName] : undefined
+				const enumType = enumTypeName ? getOwn(schema.t, enumTypeName) : undefined
 				let enumValue: Maybe<EnumValue>
 
 				if (enumType && isEnumType(enumType)) {
 					// EnumType: [kind, values, description?]
-					const values = enumType[1]
-					enumValue = values[node.value]
+					enumValue = getOwn(enumType[1], node.value)
 				}
 				this._enumValue = enumValue
 				break
@@ -239,8 +237,7 @@ export class TypeInfo {
 
 			case Kind.DIRECTIVE: {
 				const directiveName = node.name.value
-				const directives = getSchemaDirectives(schema)
-				this._directive = Object.prototype.hasOwnProperty.call(directives, directiveName) ? directives[directiveName] : null
+				this._directive = getOwn(getSchemaDirectives(schema), directiveName) ?? null
 				break
 			}
 		}
@@ -319,8 +316,7 @@ export class TypeInfo {
 		if (isObjectType(parentType) || isInterfaceType(parentType)) {
 			// ObjectType: [kind, fields, interfaces, description?]
 			// InterfaceType: [kind, fields, interfaces, possibleTypes, description?]
-			const fields = parentType[1]
-			return fields[fieldName]
+			return getOwn(parentType[1], fieldName)
 		}
 
 		return undefined

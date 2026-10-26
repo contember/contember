@@ -27,6 +27,7 @@ import {
 } from 'graphql'
 import { Argument, Field, Schema, TypeKind, TypeRef } from '../types/schema.js'
 import { getListItemType, isListType, isNonNullType, unwrapNonNull } from './typeRef.js'
+import { getOwn } from './helpers.js'
 
 const builtInScalars: Record<string, GraphQLScalarType> = {
 	Int: GraphQLInt,
@@ -41,7 +42,7 @@ export const toGraphQLJsSchema = (schema: Schema): GraphQLSchema => {
 	const named = new Map<string, GraphQLNamedType>()
 
 	const getNamed = (name: string): GraphQLNamedType => {
-		const existing = named.get(name) ?? builtInScalars[name]
+		const existing = named.get(name) ?? getOwn(builtInScalars, name)
 		if (existing) {
 			return existing
 		}
@@ -109,7 +110,7 @@ export const toGraphQLJsSchema = (schema: Schema): GraphQLSchema => {
 	}
 
 	const createNamed = (name: string): GraphQLNamedType => {
-		const type = schema.t[name]
+		const type = getOwn(schema.t, name)
 		if (!type) {
 			throw new Error(`Unknown type ${name}`)
 		}

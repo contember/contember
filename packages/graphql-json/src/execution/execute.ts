@@ -8,7 +8,7 @@ import type { ExecuteArgs, ExecuteArgsWithContext, ExecutionContext, ExecutionRe
 import { buildExecutionContext, getOperationRootTypeName, isExecutionContextErrors } from './context.js'
 import { collectFields } from './collectFields.js'
 import { addError, executeFields } from './fields.js'
-import { isPromise, promiseReduce } from '../utils/helpers.js'
+import { getOwn, isPromise, promiseReduce } from '../utils/helpers.js'
 
 /**
  * Execute a GraphQL query. Resolvers typed for a context must be given a `contextValue`.
@@ -110,7 +110,7 @@ function executeOperation<TContext>(
 		return null
 	}
 
-	const rootType = schema.t[rootTypeName]
+	const rootType = getOwn(schema.t, rootTypeName)
 	if (!rootType || rootType[0] !== 1 /* TypeKind.OBJECT */) {
 		const error = new GraphQLError(
 			`Schema root type "${rootTypeName}" is not an object type.`,

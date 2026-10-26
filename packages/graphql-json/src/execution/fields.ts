@@ -10,7 +10,7 @@ import { F, TypeKind, TypePattern } from '../types/schema.js'
 import type { ResolveInfo, ResolverFn } from '../types/resolvers.js'
 import type { Path } from '../utils/path.js'
 import { addPath, pathToArray } from '../utils/path.js'
-import { isPromise, promiseForObject } from '../utils/helpers.js'
+import { getOwn, isPromise, promiseForObject } from '../utils/helpers.js'
 import { isNonNullType } from '../utils/typeRef.js'
 import { completeValue } from './complete.js'
 import { getArgumentValues } from './values.js'
@@ -73,14 +73,13 @@ function executeField<TContext>(
 	const fieldName = fieldNode.name.value
 
 	// Get field definition
-	const parentType = exeContext.schema.t[parentTypeName]
+	const parentType = getOwn(exeContext.schema.t, parentTypeName)
 	if (!parentType || parentType[0] !== TypeKind.OBJECT) {
 		return undefined
 	}
 
 	// ObjectType: [kind, fields, interfaces, description?]
-	const fields = parentType[1]
-	const fieldDef = fields[fieldName]
+	const fieldDef = getOwn(parentType[1], fieldName)
 	if (!fieldDef) {
 		// Handle __typename meta-field
 		if (fieldName === '__typename') {
@@ -102,7 +101,7 @@ function executeField<TContext>(
 			if (nameArg && nameArg.value.kind === 'StringValue') {
 				typeName = nameArg.value.value
 			} else if (nameArg && nameArg.value.kind === 'Variable') {
-				const variableValue = exeContext.variableValues[nameArg.value.name.value]
+				const variableValue = getOwn(exeContext.variableValues, nameArg.value.name.value)
 				// a validated document passes a String! variable here; anything else finds no type
 				typeName = typeof variableValue === 'string' ? variableValue : null
 			}
@@ -163,9 +162,10 @@ function getFieldResolver<TContext>(
 	fieldName: string,
 ): ResolverFn<unknown, TContext> {
 	// introspection resolvers take precedence for the reserved __ types
-	const typeResolvers = (isIntrospectionType(typeName) ? introspectionResolvers[typeName] : undefined) ?? exeContext.resolvers[typeName]
+	const typeResolvers = (isIntrospectionType(typeName) ? getOwn(introspectionResolvers, typeName) : undefined)
+		?? getOwn(exeContext.resolvers, typeName)
 	if (typeResolvers) {
-		const fieldResolver = typeResolvers[fieldName]
+		const fieldResolver = getOwn(typeResolvers, fieldName)
 		if (fieldResolver) {
 			return fieldResolver
 		}

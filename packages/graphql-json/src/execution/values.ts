@@ -8,16 +8,12 @@ import type { Field, Schema } from '../types/schema.js'
 import { TypeKind } from '../types/schema.js'
 import type { ScalarMap } from '../types/resolvers.js'
 import { formatTypeRef, getListItemType, isListType, isNonNullType, typeRefFromAST, unwrapNonNull } from '../utils/typeRef.js'
-import { inspect, isIterableObject, isObjectLike } from '../utils/helpers.js'
+import { getOwn, inspect, isIterableObject, isObjectLike } from '../utils/helpers.js'
 import { addPath, type Path, pathToArray } from '../utils/path.js'
 import { enumLiteralValue, parseEnumValue } from '../utils/enumValues.js'
 import { didYouMean, isInputType, suggestionList } from '../validation/helpers.js'
 
 const MAX_VARIABLE_COERCION_ERRORS = 50
-
-function hasOwnProperty(object: object, key: string): boolean {
-	return Object.prototype.hasOwnProperty.call(object, key)
-}
 
 /** The last node of the name, as graphql-js `keyMap` keeps it */
 function findLastByName<T extends ArgumentNode | ObjectFieldNode>(nodes: readonly T[], name: string): T | undefined {
@@ -67,7 +63,7 @@ export function getArgumentValues(
 
 		if (valueNode.kind === Kind.VARIABLE) {
 			const variableName = valueNode.name.value
-			if (!hasOwnProperty(variableValues, variableName)) {
+			if (!Object.hasOwn(variableValues, variableName)) {
 				if (defaultValue !== undefined) {
 					coercedValues[name] = defaultValue
 				} else if (isNonNullType(argType[0])) {
@@ -99,7 +95,7 @@ export function getArgumentValues(
 
 /** A variable the variables do not provide a value for */
 function isMissingVariable(valueNode: ValueNode, variables: Record<string, unknown> | undefined): boolean {
-	return valueNode.kind === Kind.VARIABLE && (variables === undefined || variables[valueNode.name.value] === undefined)
+	return valueNode.kind === Kind.VARIABLE && (variables === undefined || getOwn(variables, valueNode.name.value) === undefined)
 }
 
 /**
@@ -114,7 +110,7 @@ function valueFromAST(
 	variables: Record<string, unknown> | undefined,
 ): unknown {
 	if (valueNode.kind === Kind.VARIABLE) {
-		const variableValue = variables?.[valueNode.name.value]
+		const variableValue = variables ? getOwn(variables, valueNode.name.value) : undefined
 		if (variableValue === undefined) {
 			return undefined
 		}
@@ -163,7 +159,7 @@ function valueFromAST(
 		return [coercedValue]
 	}
 
-	const type = schema.t[typeName]
+	const type = getOwn(schema.t, typeName)
 	if (!type) {
 		// a type the schema does not know is not coerced
 		return valueFromASTUntyped(valueNode, variables)
@@ -209,7 +205,7 @@ function valueFromAST(
 			return enumLiteralValue(type, valueNode)
 
 		case TypeKind.SCALAR: {
-			const scalar = scalars[typeName]
+			const scalar = getOwn(scalars, typeName)
 			try {
 				// a parser signals an invalid literal by throwing or returning undefined
 				return scalar ? scalar.parseLiteral(valueNode, variables) : valueFromASTUntyped(valueNode, variables)
@@ -248,7 +244,7 @@ function valueFromASTUntyped(valueNode: ValueNode, variables: Record<string, unk
 			return obj
 		}
 		case Kind.VARIABLE:
-			return variables?.[valueNode.name.value]
+			return variables ? getOwn(variables, valueNode.name.value) : undefined
 	}
 }
 
@@ -293,7 +289,7 @@ function coerceVariableDefinitions(
 	for (const varDefNode of varDefNodes) {
 		const varName = varDefNode.variable.name.value
 		const varType = typeRefFromAST(varDefNode.type)
-		const namedType = schema.t[varType[1]]
+		const namedType = getOwn(schema.t, varType[1])
 
 		if (!namedType || !isInputType(namedType)) {
 			// Must use input types for variables. This should be caught during validation, however is checked again here for safety.
@@ -305,7 +301,7 @@ function coerceVariableDefinitions(
 			continue
 		}
 
-		if (!hasOwnProperty(inputs, varName)) {
+		if (!Object.hasOwn(inputs, varName)) {
 			if (varDefNode.defaultValue) {
 				coercedValues[varName] = valueFromAST(schema, scalars, varDefNode.defaultValue, varType[0], varType[1], undefined)
 			} else if (isNonNullType(varType[0])) {
@@ -375,7 +371,7 @@ function coerceInputValue(
 		return [coerceInputValue(schema, scalars, inputValue, itemPattern, typeName, path, onError)]
 	}
 
-	const type = schema.t[typeName]
+	const type = getOwn(schema.t, typeName)
 	if (!type) {
 		// a type the schema does not know is not coerced
 		return inputValue
@@ -393,7 +389,7 @@ function coerceInputValue(
 
 			for (const fieldName in fieldDefs) {
 				const fieldDef = fieldDefs[fieldName]
-				const fieldValue = inputValue[fieldName]
+				const fieldValue = getOwn(inputValue, fieldName)
 				if (fieldValue === undefined) {
 					if (fieldDef[1] !== undefined) {
 						coercedValue[fieldName] = fieldDef[1]
@@ -419,7 +415,7 @@ function coerceInputValue(
 
 			// Ensure every provided field is defined.
 			for (const fieldName of Object.keys(inputValue)) {
-				if (!hasOwnProperty(fieldDefs, fieldName)) {
+				if (!Object.hasOwn(fieldDefs, fieldName)) {
 					const suggestions = suggestionList(fieldName, Object.keys(fieldDefs))
 					onError(
 						pathToArray(path),
@@ -452,7 +448,7 @@ function coerceInputValue(
 				if (type[0] === TypeKind.ENUM) {
 					parseResult = parseEnumValue(typeName, type, inputValue)
 				} else {
-					const scalar = scalars[typeName]
+					const scalar = getOwn(scalars, typeName)
 					parseResult = scalar ? scalar.parseValue(inputValue) : inputValue
 				}
 			} catch (error) {

@@ -6,11 +6,7 @@ import { GraphQLError, Kind, print } from 'graphql'
 import type { ValueNode } from 'graphql'
 import type { EnumType, EnumValue } from '../types/schema.js'
 import { didYouMean, suggestionList } from '../validation/helpers.js'
-import { inspect } from './helpers.js'
-
-function getEnumValue(type: EnumType, name: string): EnumValue | undefined {
-	return Object.prototype.hasOwnProperty.call(type[1], name) ? type[1][name] : undefined
-}
+import { getOwn, inspect } from './helpers.js'
 
 /** The internal value of an enum value; an enum value without one stands for its name */
 function internalValue(enumValue: EnumValue, name: string): unknown {
@@ -29,7 +25,7 @@ export function parseEnumValue(typeName: string, type: EnumType, inputValue: unk
 		const valueStr = inspect(inputValue)
 		throw new GraphQLError(`Enum "${typeName}" cannot represent non-string value: ${valueStr}.` + didYouMeanEnumValue(type, valueStr))
 	}
-	const enumValue = getEnumValue(type, inputValue)
+	const enumValue = getOwn(type[1], inputValue)
 	if (enumValue === undefined) {
 		throw new GraphQLError(`Value "${inputValue}" does not exist in "${typeName}" enum.` + didYouMeanEnumValue(type, inputValue))
 	}
@@ -46,7 +42,7 @@ export function parseEnumLiteral(typeName: string, type: EnumType, valueNode: Va
 			nodes: valueNode,
 		})
 	}
-	const enumValue = getEnumValue(type, valueNode.value)
+	const enumValue = getOwn(type[1], valueNode.value)
 	if (enumValue === undefined) {
 		const valueStr = print(valueNode)
 		throw new GraphQLError(`Value "${valueStr}" does not exist in "${typeName}" enum.` + didYouMeanEnumValue(type, valueStr), {
@@ -63,6 +59,6 @@ export function enumLiteralValue(type: EnumType, valueNode: ValueNode): unknown 
 	if (valueNode.kind !== Kind.ENUM) {
 		return undefined
 	}
-	const enumValue = getEnumValue(type, valueNode.value)
+	const enumValue = getOwn(type[1], valueNode.value)
 	return enumValue === undefined ? undefined : internalValue(enumValue, valueNode.value)
 }

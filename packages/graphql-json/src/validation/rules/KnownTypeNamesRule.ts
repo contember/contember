@@ -10,6 +10,7 @@ import type { ASTVisitor, NamedTypeNode } from 'graphql'
 import { GraphQLError } from 'graphql'
 
 import type { ValidationContext } from '../ValidationContext.js'
+import { getOwn } from '../../utils/helpers.js'
 import { didYouMean, suggestionList } from '../helpers.js'
 
 // Built-in introspection types that should always be valid
@@ -36,7 +37,7 @@ export function KnownTypeNamesRule(context: ValidationContext): ASTVisitor {
 			}
 
 			// Check if type exists in schema
-			if (!schema.t[typeName]) {
+			if (!getOwn(schema.t, typeName)) {
 				const suggestions = suggestionList(typeName, Object.keys(schema.t))
 				context.reportError(
 					new GraphQLError(

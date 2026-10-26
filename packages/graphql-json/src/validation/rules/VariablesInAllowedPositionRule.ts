@@ -11,6 +11,7 @@ import { GraphQLError, Kind } from 'graphql'
 import type { Schema, TypeRef } from '../../types/schema.js'
 import { isInputObjectType } from '../../types/schema.js'
 import { formatTypeRef, isNonNullType, unwrapNonNull } from '../../utils/typeRef.js'
+import { getOwn } from '../../utils/helpers.js'
 import { isTypeSubTypeOf } from '../helpers.js'
 import { typeFromAST } from '../typeFromAST.js'
 import type { ValidationContext } from '../ValidationContext.js'
@@ -38,7 +39,7 @@ export function VariablesInAllowedPositionRule(context: ValidationContext): ASTV
 						// If both are list types, the variable item type can be more strict than the expected item type (contravariant).
 						const varType = typeFromAST(varDef.type)
 						// an unknown variable type is reported by KnownTypeNamesRule
-						const isKnownVarType = schema.t[varType[1]] !== undefined
+						const isKnownVarType = getOwn(schema.t, varType[1]) !== undefined
 
 						if (isKnownVarType && !allowedVariableUsage(schema, varType, varDef.defaultValue, type, defaultValue)) {
 							context.reportError(
@@ -49,7 +50,7 @@ export function VariablesInAllowedPositionRule(context: ValidationContext): ASTV
 							)
 						}
 
-						const parentInputType = parentType ? schema.t[parentType[1]] : undefined
+						const parentInputType = parentType ? getOwn(schema.t, parentType[1]) : undefined
 						if (parentType && parentInputType && isInputObjectType(parentInputType) && parentInputType[2] && !isNonNullType(varType[0])) {
 							context.reportError(
 								new GraphQLError(

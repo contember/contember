@@ -9,6 +9,7 @@ import type { Argument, Directive, EnumValue, Field, InputField, Schema, TypeRef
 import { A, D, EV, F, isEnumType, isInputObjectType, isInterfaceType, isObjectType, isUnionType, T, TypeKind } from '../types/schema.js'
 import { getSchemaDirectives, IntrospectionTypeKind } from './types.js'
 import type { IntrospectionTypeKindValue } from './types.js'
+import { getOwn } from '../utils/helpers.js'
 
 /**
  * Introspection type wrapper - represents a type in introspection
@@ -169,7 +170,7 @@ function unwrapNonNullPattern(pattern: number): number {
  * Create a wrapper for a named type
  */
 function createNamedTypeWrapper(typeName: string, schema: Schema): TypeWrapper {
-	const type = schema.t[typeName]
+	const type = getOwn(schema.t, typeName)
 	const kind = type ? typeKindToIntrospection(T.kind(type)) : IntrospectionTypeKind.SCALAR
 
 	return new TypeWrapper(kind, typeName, null, schema, typeName)
@@ -236,7 +237,7 @@ export function resolveSchema(schema: Schema): SchemaIntrospectionData {
 // =============================================================================
 
 export function resolveType(schema: Schema, name: string): TypeIntrospectionData | null {
-	if (!schema.t[name]) {
+	if (!getOwn(schema.t, name)) {
 		return null
 	}
 	return new TypeIntrospectionData(schema, name)
@@ -293,7 +294,7 @@ export const TypeResolvers = {
 		if (data instanceof TypeWrapper) {
 			return data.kind
 		}
-		const type = data._schema.t[data._typeName]
+		const type = getOwn(data._schema.t, data._typeName)
 		return type ? typeKindToIntrospection(T.kind(type)) : IntrospectionTypeKind.SCALAR
 	},
 
@@ -307,7 +308,7 @@ export const TypeResolvers = {
 	description: (data: TypeIntrospectionData | TypeWrapper): string | null => {
 		const typeData = getTypeData(data)
 		if (!typeData) return null
-		const type = typeData._schema.t[typeData._typeName]
+		const type = getOwn(typeData._schema.t, typeData._typeName)
 		return type ? T.description(type) ?? null : null
 	},
 
@@ -323,7 +324,7 @@ export const TypeResolvers = {
 		const typeData = getTypeData(data)
 		if (!typeData) return null
 
-		const type = typeData._schema.t[typeData._typeName]
+		const type = getOwn(typeData._schema.t, typeData._typeName)
 		if (!type || (!isObjectType(type) && !isInterfaceType(type))) {
 			return null
 		}
@@ -344,7 +345,7 @@ export const TypeResolvers = {
 		const typeData = getTypeData(data)
 		if (!typeData) return null
 
-		const type = typeData._schema.t[typeData._typeName]
+		const type = getOwn(typeData._schema.t, typeData._typeName)
 		if (!type || (!isObjectType(type) && !isInterfaceType(type))) {
 			return null
 		}
@@ -357,7 +358,7 @@ export const TypeResolvers = {
 		const typeData = getTypeData(data)
 		if (!typeData) return null
 
-		const type = typeData._schema.t[typeData._typeName]
+		const type = getOwn(typeData._schema.t, typeData._typeName)
 		if (!type || (!isInterfaceType(type) && !isUnionType(type))) {
 			return null
 		}
@@ -383,7 +384,7 @@ export const TypeResolvers = {
 		const typeData = getTypeData(data)
 		if (!typeData) return null
 
-		const type = typeData._schema.t[typeData._typeName]
+		const type = getOwn(typeData._schema.t, typeData._typeName)
 		if (!type || !isEnumType(type)) {
 			return null
 		}
@@ -407,7 +408,7 @@ export const TypeResolvers = {
 		const typeData = getTypeData(data)
 		if (!typeData) return null
 
-		const type = typeData._schema.t[typeData._typeName]
+		const type = getOwn(typeData._schema.t, typeData._typeName)
 		if (!type || !isInputObjectType(type)) {
 			return null
 		}
@@ -426,7 +427,7 @@ export const TypeResolvers = {
 		const typeData = getTypeData(data)
 		if (!typeData) return null
 
-		const type = typeData._schema.t[typeData._typeName]
+		const type = getOwn(typeData._schema.t, typeData._typeName)
 		if (!type || !isInputObjectType(type)) {
 			return null
 		}

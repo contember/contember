@@ -11,6 +11,7 @@ import { GraphQLError } from 'graphql'
 
 import { isLeafType } from '../../types/schema.js'
 import { formatTypeRef, getNamedType } from '../../utils/typeRef.js'
+import { getOwn } from '../../utils/helpers.js'
 import type { ValidationContext } from '../ValidationContext.js'
 
 export function ScalarLeafsRule(context: ValidationContext): ASTVisitor {
@@ -22,7 +23,7 @@ export function ScalarLeafsRule(context: ValidationContext): ASTVisitor {
 			if (typeRef) {
 				const schema = context.getSchema()
 				const typeName = getNamedType(typeRef)
-				const type = schema.t[typeName]
+				const type = getOwn(schema.t, typeName)
 
 				if (type) {
 					if (isLeafType(type)) {

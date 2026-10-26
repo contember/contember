@@ -4,6 +4,8 @@
  * Array-based format optimized for small JSON size and fast parsing.
  */
 
+import { getOwn } from '../utils/helpers.js'
+
 // =============================================================================
 // TypeRef - Pattern-based encoding
 // =============================================================================
@@ -334,7 +336,7 @@ export const S = {
 	subscriptionType: (s: Schema): string | null => s.s,
 	types: (s: Schema): Record<string, Type> => s.t,
 	directives: (s: Schema): Record<string, Directive> | undefined => s.d,
-	getType: (s: Schema, name: string): Type | undefined => s.t[name],
+	getType: (s: Schema, name: string): Type | undefined => getOwn(s.t, name),
 } as const
 
 // TypeRef accessors

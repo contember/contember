@@ -17,7 +17,7 @@ import {
 import { FieldNode, ObjectNode } from '../inputProcessing/index.js'
 import { isDeepStrictEqual } from 'node:util'
 
-type NodeFilter = (node: GraphQlFieldNode, path: string[]) => boolean
+export type NodeFilter = (node: GraphQlFieldNode, path: string[]) => boolean
 type AnyNode = ObjectNode | FieldNode
 
 export class GraphQlQueryAstFactory {

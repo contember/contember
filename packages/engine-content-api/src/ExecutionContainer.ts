@@ -87,6 +87,7 @@ export type ExecutionContainerArgs = {
 }
 
 export interface ExecutionContainer {
+	queryAstFactory: GraphQlQueryAstFactory
 	readResolver: ReadResolver
 	mutationResolver: MutationResolver
 	validationResolver: ValidationResolver
@@ -276,7 +277,7 @@ export class ExecutionContainerFactory {
 				},
 			)
 			.addService('queryAstFactory', () => new GraphQlQueryAstFactory())
-			.addService('readResolver', ({ mapperFactory, queryAstFactory }) => new ReadResolver(mapperFactory, queryAstFactory))
+			.addService('readResolver', ({ mapperFactory }) => new ReadResolver(mapperFactory))
 			.addService('validationDependencyCollector', () => new DependencyCollector())
 			.addService('validationQueryAstFactory', ({ schema }) => new QueryAstFactory(schema.model))
 			.addService('dataSelector', ({ validationQueryAstFactory, schema }) => new ValidationDataSelector(schema.model, validationQueryAstFactory))
@@ -289,8 +290,8 @@ export class ExecutionContainerFactory {
 			)
 			.addService(
 				'mutationResolver',
-				({ mapperFactory, inputPreValidator, queryAstFactory, schema, schemaDatabaseMetadata }) =>
-					new MutationResolver(schema.model, mapperFactory, inputPreValidator, queryAstFactory, schemaDatabaseMetadata),
+				({ mapperFactory, inputPreValidator, schema, schemaDatabaseMetadata }) =>
+					new MutationResolver(schema.model, mapperFactory, inputPreValidator, schemaDatabaseMetadata),
 			)
 			.addService('validationResolver', ({ inputPreValidator, mapperFactory }) => new ValidationResolver(mapperFactory, inputPreValidator))
 			.addService('refreshViewResolver', ({ schema, mapperFactory }) => new RefreshViewResolver(schema, mapperFactory))
@@ -298,6 +299,7 @@ export class ExecutionContainerFactory {
 
 	public create(args: ExecutionContainerArgs): ExecutionContainer {
 		return this.createBuilder(args).build().pick(
+			'queryAstFactory',
 			'validationResolver',
 			'readResolver',
 			'mutationResolver',

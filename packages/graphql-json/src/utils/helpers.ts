@@ -26,42 +26,91 @@ export function isIterableObject(value: unknown): value is Iterable<unknown> {
 	return isObjectLike(value) && typeof value[Symbol.iterator] === 'function'
 }
 
+const MAX_ARRAY_LENGTH = 10
+const MAX_RECURSIVE_DEPTH = 2
+
 /**
- * Inspect a value for error messages
+ * Format a value for error messages exactly as graphql-js `inspect` does
  */
 export function inspect(value: unknown): string {
+	return formatValue(value, [])
+}
+
+function formatValue(value: unknown, seenValues: readonly unknown[]): string {
+	switch (typeof value) {
+		case 'string':
+			return JSON.stringify(value)
+		case 'function':
+			return value.name ? `[function ${value.name}]` : '[function]'
+		case 'object':
+			return formatObjectValue(value, seenValues)
+		default:
+			return String(value)
+	}
+}
+
+function formatObjectValue(value: object | null, previouslySeenValues: readonly unknown[]): string {
 	if (value === null) {
 		return 'null'
 	}
-	if (value === undefined) {
-		return 'undefined'
+	if (previouslySeenValues.includes(value)) {
+		return '[Circular]'
 	}
-	if (typeof value === 'string') {
-		return JSON.stringify(value)
-	}
-	if (typeof value === 'number' || typeof value === 'boolean') {
-		return String(value)
-	}
-	if (typeof value === 'function') {
-		return value.name ? `[function ${value.name}]` : '[function]'
-	}
-	if (Array.isArray(value)) {
-		return `[${value.map(inspect).join(', ')}]`
-	}
-	if (typeof value === 'object') {
-		const name = value.constructor?.name
-		if (name && name !== 'Object') {
-			return `[${name}]`
+	const seenValues = [...previouslySeenValues, value]
+	if ('toJSON' in value && typeof value.toJSON === 'function') {
+		const jsonValue: unknown = value.toJSON()
+		// check for infinite recursion
+		if (jsonValue !== value) {
+			return typeof jsonValue === 'string' ? jsonValue : formatValue(jsonValue, seenValues)
 		}
-		const entries = Object.entries(value)
-			.slice(0, 3)
-			.map(([k, v]) => `${k}: ${inspect(v)}`)
-		if (Object.keys(value).length > 3) {
-			entries.push('...')
-		}
-		return `{ ${entries.join(', ')} }`
+	} else if (Array.isArray(value)) {
+		return formatArray(value, seenValues)
 	}
-	return String(value)
+	return formatObject(value, seenValues)
+}
+
+function formatObject(object: object, seenValues: readonly unknown[]): string {
+	const entries = Object.entries(object)
+	if (entries.length === 0) {
+		return '{}'
+	}
+	if (seenValues.length > MAX_RECURSIVE_DEPTH) {
+		return '[' + getObjectTag(object) + ']'
+	}
+	const properties = entries.map(([key, value]) => key + ': ' + formatValue(value, seenValues))
+	return '{ ' + properties.join(', ') + ' }'
+}
+
+function formatArray(array: readonly unknown[], seenValues: readonly unknown[]): string {
+	if (array.length === 0) {
+		return '[]'
+	}
+	if (seenValues.length > MAX_RECURSIVE_DEPTH) {
+		return '[Array]'
+	}
+	const len = Math.min(MAX_ARRAY_LENGTH, array.length)
+	const remaining = array.length - len
+	const items: string[] = []
+	for (let i = 0; i < len; ++i) {
+		items.push(formatValue(array[i], seenValues))
+	}
+	if (remaining === 1) {
+		items.push('... 1 more item')
+	} else if (remaining > 1) {
+		items.push(`... ${remaining} more items`)
+	}
+	return '[' + items.join(', ') + ']'
+}
+
+function getObjectTag(object: object): string {
+	const tag = Object.prototype.toString.call(object).replace(/^\[object /, '').replace(/]$/, '')
+	if (tag === 'Object' && typeof object.constructor === 'function') {
+		const name = object.constructor.name
+		if (typeof name === 'string' && name !== '') {
+			return name
+		}
+	}
+	return tag
 }
 
 /**

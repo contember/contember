@@ -131,7 +131,7 @@ export class ContentRetentionExecutor {
 		let deleted = 0
 		for (const row of rows) {
 			const id = row[entity.primaryColumn]
-			const result = await mapper.delete(entity, new CheckedPrimary(id))
+			const result = await mapper.delete(entity, new CheckedPrimary(id), 'root')
 			if (interpretContentDeleteResult(result, entity, id)) {
 				deleted++
 			}

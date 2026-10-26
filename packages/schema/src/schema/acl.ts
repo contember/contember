@@ -49,10 +49,10 @@ export namespace Acl {
 	export type PredicateVariable = string // { name: string }
 
 	/**
-	 * Marker keys usable inside an update predicate to constrain the stored ("old")
-	 * vs the incoming ("new") value of the row being updated. The wrapped sub-predicate
-	 * is evaluated only against the respective state. Outside of an update operation
-	 * (read/create/delete) both markers collapse to the single available state.
+	 * Marker keys of an update predicate. `_old: X` holds when the stored row satisfies X, `_new: Y` when
+	 * the proposed row satisfies Y; a marker-free part of the predicate must hold for both rows. Markers
+	 * combine through `and`/`or`/`not`, but not under a relation or inside another marker. Operations
+	 * with a single state (read/create/delete) evaluate both markers against that one row.
 	 *
 	 * Example - allow moving a record from state A to state B, but not back:
 	 * ```
@@ -65,13 +65,16 @@ export namespace Acl {
 	export const PredicateOldStateMarker = '_old'
 	export const PredicateNewStateMarker = '_new'
 
-	export type PredicateState = 'old' | 'new'
+	export type StatelessPredicateDefinition<E = never> = Input.Where<PredicateVariable | Input.Condition | E>
 
 	export type PredicateDefinition<E = never> =
-		& Input.Where<PredicateVariable | Input.Condition | E>
+		& Input.FieldWhere<PredicateVariable | Input.Condition | E>
 		& {
-			readonly [PredicateOldStateMarker]?: PredicateDefinition<E>
-			readonly [PredicateNewStateMarker]?: PredicateDefinition<E>
+			readonly and?: readonly PredicateDefinition<E>[]
+			readonly or?: readonly PredicateDefinition<E>[]
+			readonly not?: PredicateDefinition<E>
+			readonly [PredicateOldStateMarker]?: StatelessPredicateDefinition<E>
+			readonly [PredicateNewStateMarker]?: StatelessPredicateDefinition<E>
 		}
 
 	export type PredicateMap = { readonly [name: string]: PredicateDefinition }

@@ -30,6 +30,7 @@ class PredicateDefinitionProcessor {
 			} else if (key === 'and' || key === 'or') {
 				result[key] = (value as Acl.PredicateDefinition[]).map(it => this.processInternal(entity, it, handler, [...path, key]))
 			} else if (key === Acl.PredicateOldStateMarker || key === Acl.PredicateNewStateMarker) {
+				handler.handleStateMarker?.({ entity, marker: key, path })
 				result[key] = this.processInternal(
 					entity,
 					value as Acl.PredicateDefinition<PredicateExtension>,
@@ -106,6 +107,12 @@ namespace PredicateDefinitionProcessor {
 			targetEntity: Model.Entity
 			path: string[]
 		}): R | Input.Where | undefined | [string, R | Input.Where]
+
+		handleStateMarker?(ctx: {
+			entity: Model.Entity
+			marker: typeof Acl.PredicateOldStateMarker | typeof Acl.PredicateNewStateMarker
+			path: string[]
+		}): void
 
 		handleUndefinedField?(ctx: {
 			entity: Model.Entity

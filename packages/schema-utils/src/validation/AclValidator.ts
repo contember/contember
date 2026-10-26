@@ -4,6 +4,9 @@ import { getEntity } from '../model/index.js'
 import { ErrorBuilder, ValidationError } from './errors.js'
 import { conditionSchema } from '../type-schema/index.js'
 
+const isStateMarker = (key: string) => key === Acl.PredicateOldStateMarker || key === Acl.PredicateNewStateMarker
+const booleanOperators = ['and', 'or', 'not']
+
 export class AclValidator {
 	constructor(private readonly model: Model.Schema) {}
 
@@ -124,8 +127,6 @@ export class AclValidator {
 		variables: Acl.Variables,
 		errorBuilder: ErrorBuilder,
 	): void {
-		this.validateStateMarkers(predicate, errorBuilder, false, false)
-
 		const processor = new PredicateDefinitionProcessor(this.model)
 		processor.process(entity, predicate, {
 			handleColumn: ctx => {
@@ -148,50 +149,21 @@ export class AclValidator {
 				}
 				return ctx.value
 			},
+			handleStateMarker: ({ marker, path }) => {
+				if (path.some(isStateMarker)) {
+					errorBuilder.for(...path, marker).add('ACL_INVALID_STATE_MARKER', `Marker "${marker}" cannot be nested inside another "_old"/"_new" marker.`)
+				} else if (path.some(it => !booleanOperators.includes(it))) {
+					errorBuilder.for(...path, marker).add(
+						'ACL_INVALID_STATE_MARKER',
+						`Marker "${marker}" cannot be used under a relation, it applies only to the updated row. A canX() reference to a predicate with markers ends up here too.`,
+					)
+				}
+			},
 			handleUndefinedField: ctx => {
 				errorBuilder.for(...ctx.path).add('ACL_UNDEFINED_FIELD', `Undefined field ${ctx.name} on entity ${ctx.entity.name}`)
 				return ctx.value
 			},
 		})
-	}
-
-	/**
-	 * The `_old`/`_new` update-state markers are only supported at the top level and inside `and`
-	 * chains. Inside `or`/`not` their meaning would depend on the evaluated state and is rejected.
-	 * Nesting a marker inside another marker is likewise meaningless.
-	 */
-	private validateStateMarkers(
-		predicate: Acl.PredicateDefinition,
-		errorBuilder: ErrorBuilder,
-		insideBranching: boolean,
-		insideMarker: boolean,
-	): void {
-		for (const [key, value] of Object.entries(predicate)) {
-			if (value === undefined) {
-				continue
-			}
-			if (key === Acl.PredicateOldStateMarker || key === Acl.PredicateNewStateMarker) {
-				if (insideBranching) {
-					errorBuilder.for(key).add(
-						'ACL_INVALID_STATE_MARKER',
-						`Update-state marker "${key}" cannot be used inside "or"/"not"; use it at the top level or within "and".`,
-					)
-				}
-				if (insideMarker) {
-					errorBuilder.for(key).add(
-						'ACL_INVALID_STATE_MARKER',
-						`Update-state marker "${key}" cannot be nested inside another "_old"/"_new" marker.`,
-					)
-				}
-				this.validateStateMarkers(value as Acl.PredicateDefinition, errorBuilder.for(key), insideBranching, true)
-			} else if (key === 'and') {
-				;(value as Acl.PredicateDefinition[]).forEach(it => this.validateStateMarkers(it, errorBuilder.for(key), insideBranching, insideMarker))
-			} else if (key === 'or') {
-				;(value as Acl.PredicateDefinition[]).forEach(it => this.validateStateMarkers(it, errorBuilder.for(key), true, insideMarker))
-			} else if (key === 'not') {
-				this.validateStateMarkers(value as Acl.PredicateDefinition, errorBuilder.for(key), true, insideMarker)
-			}
-		}
 	}
 
 	private validateOperations(

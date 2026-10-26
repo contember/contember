@@ -147,6 +147,11 @@ test('operation flags and legacy noRoot are not mistaken for grants', () => {
 namespace TransitionModel {
 	export class Article {
 		state = c.stringColumn().notNull()
+		author = c.manyHasOne(Author)
+	}
+
+	export class Author {
+		name = c.stringColumn()
 	}
 }
 
@@ -168,45 +173,65 @@ const buildAcl = (predicate: Acl.PredicateDefinition): Acl.Schema => ({
 	},
 })
 
+const validateTransition = (predicate: Acl.PredicateDefinition) => new AclValidator(model).validate(buildAcl(predicate))
+
+const transitionPath = ['acl', 'editor', 'entities', 'Article', 'predicates', 'transition']
+
 test('accepts old/new markers at the top level', () => {
-	const errors = new AclValidator(model).validate(buildAcl({
-		_old: { state: { eq: 'A' } },
-		_new: { state: { eq: 'B' } },
-	} as unknown as Acl.PredicateDefinition))
-	expect(errors).toEqual([])
+	expect(validateTransition({ _old: { state: { eq: 'A' } }, _new: { state: { eq: 'B' } } })).toEqual([])
 })
 
-test('accepts old/new markers inside and', () => {
-	const errors = new AclValidator(model).validate(buildAcl({
-		and: [{ _new: { state: { eq: 'B' } } }],
-	} as unknown as Acl.PredicateDefinition))
-	expect(errors).toEqual([])
-})
-
-test('rejects old/new markers inside or', () => {
-	const errors = new AclValidator(model).validate(buildAcl({
-		or: [{ _new: { state: { eq: 'B' } } }],
-	} as unknown as Acl.PredicateDefinition))
-	expect(errors.map(it => it.code)).toContain('ACL_INVALID_STATE_MARKER')
-})
-
-test('rejects old/new markers inside not', () => {
-	const errors = new AclValidator(model).validate(buildAcl({
-		not: { _old: { state: { eq: 'A' } } },
-	} as unknown as Acl.PredicateDefinition))
-	expect(errors.map(it => it.code)).toContain('ACL_INVALID_STATE_MARKER')
+test('accepts old/new markers inside and, or and not', () => {
+	expect(validateTransition({
+		or: [
+			{ _old: { state: { eq: 'A' } }, _new: { state: { eq: 'B' } } },
+			{ and: [{ _old: { state: { eq: 'B' } } }, { not: { _new: { state: { eq: 'A' } } } }] },
+		],
+	})).toEqual([])
 })
 
 test('rejects nested markers', () => {
-	const errors = new AclValidator(model).validate(buildAcl({
-		_old: { _new: { state: { eq: 'A' } } },
-	} as unknown as Acl.PredicateDefinition))
-	expect(errors.map(it => it.code)).toContain('ACL_INVALID_STATE_MARKER')
+	expect(validateTransition({ _old: { _new: { state: { eq: 'A' } } } })).toStrictEqual([{
+		code: 'ACL_INVALID_STATE_MARKER',
+		message: 'Marker "_new" cannot be nested inside another "_old"/"_new" marker.',
+		path: [...transitionPath, '_old', '_new'],
+	}])
+})
+
+test('rejects a marker under a relation', () => {
+	expect(validateTransition({ or: [{ author: { _old: {} } }] })).toStrictEqual([{
+		code: 'ACL_INVALID_STATE_MARKER',
+		message:
+			'Marker "_old" cannot be used under a relation, it applies only to the updated row. A canX() reference to a predicate with markers ends up here too.',
+		path: [...transitionPath, 'or', 'author', '_old'],
+	}])
 })
 
 test('validates fields inside markers', () => {
-	const errors = new AclValidator(model).validate(buildAcl({
-		_new: { unknownField: { eq: 'B' } },
-	} as unknown as Acl.PredicateDefinition))
-	expect(errors.map(it => it.code)).toContain('ACL_UNDEFINED_FIELD')
+	expect(validateTransition({ _new: { unknownField: { eq: 'B' } } }).map(it => it.code)).toEqual(['ACL_UNDEFINED_FIELD'])
+})
+
+namespace CanUpdateModel {
+	export const editorRole = c.createRole('editor')
+
+	@c.Allow(editorRole, { when: { _old: { state: { eq: 'draft' } }, _new: { state: { eq: 'published' } } }, update: ['state'] })
+	export class Article {
+		state = c.stringColumn().notNull()
+		comments = c.oneHasMany(Comment, 'article')
+	}
+
+	@c.Allow(editorRole, { when: { article: c.canUpdate('state') }, update: ['text'] })
+	export class Comment {
+		text = c.stringColumn()
+		article = c.manyHasOne(Article, 'comments').notNull()
+	}
+}
+
+test('rejects markers reached through a canUpdate() reference', () => {
+	const canUpdateSchema = createSchema(CanUpdateModel)
+	const errors = new AclValidator(canUpdateSchema.model).validate(canUpdateSchema.acl)
+	expect(errors.map(it => [it.code, it.path.join('.')])).toEqual([
+		['ACL_INVALID_STATE_MARKER', 'acl.editor.entities.Comment.predicates.article_old_state_eq_draft_ne.article._old'],
+		['ACL_INVALID_STATE_MARKER', 'acl.editor.entities.Comment.predicates.article_old_state_eq_draft_ne.article._new'],
+	])
 })

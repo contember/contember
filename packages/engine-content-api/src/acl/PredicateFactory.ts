@@ -1,9 +1,23 @@
 import { Acl, Input, Model } from '@contember/schema'
+import {
+	hasStateMarkers,
+	mapStatePredicate,
+	parseStatePredicate,
+	resolveOldStateProjection,
+	resolveSingleStatePredicate,
+	StatePredicate,
+} from '@contember/schema-utils'
 import { VariableInjector } from './VariableInjector.js'
 import { EvaluatedPredicateReplacer } from './EvaluatedPredicateReplacer.js'
 import { AclScope, aclScopeFromPath } from './AclScope.js'
 
 const getRowLevelPredicatePseudoField = (entity: Model.Entity) => entity.primary
+
+/**
+ * How `_old`/`_new` markers resolve outside a real update: `single` for an operation that sees one row,
+ * `old` for the old-state projection behind `_meta.<field>.updatable`.
+ */
+export type PredicateStateView = 'single' | 'old'
 
 export interface FieldRequiredPredicate {
 	predicate: Acl.Predicate
@@ -20,6 +34,7 @@ export class PredicateFactory {
 	// the context resolves to) via JSON so no two distinct inputs can collide onto one entry.
 	private readonly createCache = new Map<string, Input.OptionalWhere>()
 	private readonly buildCache = new Map<string, Input.OptionalWhere>()
+	private readonly updateStateCache = new Map<string, StatePredicate<Input.OptionalWhere>>()
 	constructor(
 		private readonly permissions: Acl.Permissions,
 		private readonly model: Model.Schema,
@@ -112,6 +127,25 @@ export class PredicateFactory {
 		)
 	}
 
+	/** The predicate behind `_meta.<field>.updatable`: whether the stored row admits some update (see {@link PredicateStateView}). */
+	public buildUpdatablePredicates(
+		entity: Model.Entity,
+		predicates: readonly Acl.PredicateReference[],
+		relationPath: readonly Model.AnyRelationContext[],
+	): Input.OptionalWhere {
+		return this.buildPredicates(
+			entity,
+			predicates,
+			aclScopeFromPath(relationPath),
+			relationPath[relationPath.length - 1],
+			'old',
+		)
+	}
+
+	public hasStateMarkers(entity: Model.Entity, predicate: Acl.PredicateReference, relationPath: readonly Model.AnyRelationContext[]): boolean {
+		return hasStateMarkers(this.getPredicateDefinition(entity, predicate, aclScopeFromPath(relationPath)))
+	}
+
 	public shouldApplyCellLevelPredicate(
 		entity: Model.Entity,
 		operation: Acl.Operation.read,
@@ -146,7 +180,6 @@ export class PredicateFactory {
 		scope: AclScope,
 		fieldNames: readonly string[] = [getRowLevelPredicatePseudoField(entity)],
 		relationContext?: Model.AnyRelationContext,
-		predicateState?: Acl.PredicateState,
 	): Input.OptionalWhere {
 		const cacheKey = JSON.stringify([
 			entity.name,
@@ -154,13 +187,12 @@ export class PredicateFactory {
 			fieldNames,
 			this.relationContextKey(relationContext),
 			this.permissionSetKey(scope),
-			predicateState ?? null,
 		])
 		const cached = this.createCache.get(cacheKey)
 		if (cached !== undefined) {
 			return cached
 		}
-		const result = this.createInternal(entity, operation, scope, fieldNames, relationContext, predicateState)
+		const result = this.createInternal(entity, operation, scope, fieldNames, relationContext)
 		this.createCache.set(cacheKey, result)
 		return result
 	}
@@ -171,29 +203,63 @@ export class PredicateFactory {
 		scope: AclScope,
 		fieldNames: readonly string[] = [getRowLevelPredicatePseudoField(entity)],
 		relationContext?: Model.AnyRelationContext,
-		predicateState?: Acl.PredicateState,
 	): Input.OptionalWhere {
-		const perms = this.permissionsFor(scope)
-		const entityPermissions: Acl.EntityPermissions = perms[entity.name]
-		const neverCondition: Input.Where = { [entity.primary]: { never: true } }
-
-		if (!entityPermissions) {
-			return neverCondition
-		}
-
-		if (fieldNames === undefined) {
-			fieldNames = [getRowLevelPredicatePseudoField(entity)]
-		}
-		const fieldPermissions = entityPermissions.operations[operation]
-		if (fieldPermissions === undefined) {
-			return neverCondition
-		}
-		const operationPredicates = this.getRequiredPredicates(fieldNames, fieldPermissions)
+		const operationPredicates = this.getOperationPredicates(entity, operation, scope, fieldNames)
 		if (operationPredicates === false) {
-			return neverCondition
+			return { [entity.primary]: { never: true } }
 		}
 
-		return this.buildPredicates(entity, operationPredicates, scope, relationContext, predicateState)
+		return this.buildPredicates(entity, operationPredicates, scope, relationContext)
+	}
+
+	/**
+	 * The update predicate of `fieldNames` over the stored and the proposed row. Without `_old`/`_new` markers it
+	 * is a single `both` node holding exactly what {@link create} returns.
+	 */
+	public createUpdateStatePredicate(entity: Model.Entity, scope: AclScope, fieldNames: readonly string[]): StatePredicate<Input.OptionalWhere> {
+		const cacheKey = JSON.stringify([entity.name, fieldNames, this.permissionSetKey(scope)])
+		const cached = this.updateStateCache.get(cacheKey)
+		if (cached !== undefined) {
+			return cached
+		}
+		const result = this.createUpdateStatePredicateInternal(entity, scope, fieldNames)
+		this.updateStateCache.set(cacheKey, result)
+		return result
+	}
+
+	private createUpdateStatePredicateInternal(
+		entity: Model.Entity,
+		scope: AclScope,
+		fieldNames: readonly string[],
+	): StatePredicate<Input.OptionalWhere> {
+		const operationPredicates = this.getOperationPredicates(entity, Acl.Operation.update, scope, fieldNames)
+		const definitions = operationPredicates === false ? [] : operationPredicates.map(it => this.getPredicateDefinition(entity, it, scope))
+		if (!definitions.some(hasStateMarkers)) {
+			return { type: 'both', predicate: this.create(entity, Acl.Operation.update, scope, fieldNames) }
+		}
+		const operands = definitions.map(definition => mapStatePredicate(parseStatePredicate(definition), it => this.variableInjector.inject(entity, it)))
+		return operands.length === 1 ? operands[0] : { type: 'and', operands }
+	}
+
+	private getOperationPredicates(
+		entity: Model.Entity,
+		operation: Acl.Operation.update | Acl.Operation.read | Acl.Operation.create,
+		scope: AclScope,
+		fieldNames: readonly string[],
+	): Acl.PredicateReference[] | false {
+		const fieldPermissions = this.permissionsFor(scope)[entity.name]?.operations[operation]
+		if (fieldPermissions === undefined) {
+			return false
+		}
+		return this.getRequiredPredicates(fieldNames, fieldPermissions)
+	}
+
+	private getPredicateDefinition(entity: Model.Entity, name: Acl.PredicateReference, scope: AclScope): Acl.PredicateDefinition {
+		const definition = this.permissionsFor(scope)[entity.name]?.predicates[name]
+		if (!definition) {
+			throw new Error(`${entity.name}: Undefined predicate ${name}`)
+		}
+		return definition
 	}
 
 	public buildPredicates(
@@ -201,20 +267,20 @@ export class PredicateFactory {
 		predicates: readonly Acl.PredicateReference[],
 		scope: AclScope,
 		relationContext?: Model.AnyRelationContext,
-		predicateState?: Acl.PredicateState,
+		view: PredicateStateView = 'single',
 	): Input.OptionalWhere {
 		const cacheKey = JSON.stringify([
 			entity.name,
 			predicates,
 			this.relationContextKey(relationContext),
 			this.permissionSetKey(scope),
-			predicateState ?? null,
+			view,
 		])
 		const cached = this.buildCache.get(cacheKey)
 		if (cached !== undefined) {
 			return cached
 		}
-		const result = this.buildPredicatesInternal(entity, predicates, scope, relationContext, predicateState)
+		const result = this.buildPredicatesInternal(entity, predicates, scope, view, relationContext)
 		this.buildCache.set(cacheKey, result)
 		return result
 	}
@@ -223,21 +289,12 @@ export class PredicateFactory {
 		entity: Model.Entity,
 		predicates: readonly Acl.PredicateReference[],
 		scope: AclScope,
+		view: PredicateStateView,
 		relationContext?: Model.AnyRelationContext,
-		predicateState?: Acl.PredicateState,
 	): Input.OptionalWhere {
-		const perms = this.permissionsFor(scope)
-		const entityPermissions: Acl.EntityPermissions = perms[entity.name] ?? {}
-
-		const predicatesWhere: Input.Where[] = predicates.reduce(
-			(result: Input.Where[], name: Acl.PredicateReference): Input.Where[] => {
-				if (!entityPermissions.predicates[name]) {
-					throw new Error(`${entity.name}: Undefined predicate ${name}`)
-				}
-				const predicateWhere: Input.Where = this.variableInjector.inject(entity, entityPermissions.predicates[name], predicateState)
-				return [...result, predicateWhere]
-			},
-			[],
+		const resolveStates = view === 'single' ? resolveSingleStatePredicate : resolveOldStateProjection
+		const predicatesWhere: Input.Where[] = predicates.map(name =>
+			this.variableInjector.inject(entity, resolveStates(this.getPredicateDefinition(entity, name, scope)))
 		)
 		if (predicatesWhere.length === 0) {
 			return {}

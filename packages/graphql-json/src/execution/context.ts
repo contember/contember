@@ -92,6 +92,7 @@ export function buildExecutionContext<TContext>(
 		scalars: mergedScalars,
 		fieldResolver: fieldResolver ?? defaultFieldResolver,
 		errors: [],
+		errorPositions: new Set(),
 	}
 }
 

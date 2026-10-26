@@ -2,12 +2,12 @@
  * Main execute function
  */
 
-import { GraphQLError } from 'graphql'
+import { GraphQLError, locatedError } from 'graphql'
 import type { FieldNode } from 'graphql'
 import type { ExecuteArgs, ExecuteArgsWithContext, ExecutionContext, ExecutionResult } from '../types/execution.js'
 import { buildExecutionContext, getOperationRootTypeName, isExecutionContextErrors } from './context.js'
 import { collectFields } from './collectFields.js'
-import { executeFields } from './fields.js'
+import { addError, executeFields } from './fields.js'
 import { isPromise, promiseReduce } from '../utils/helpers.js'
 
 /**
@@ -54,29 +54,26 @@ function executeWithContext<TContext>(args: ExecuteArgsWithContext<TContext>): E
 		const result = executeOperation(exeContext)
 
 		if (isPromise(result)) {
-			return result
-				.then((data) => buildResponse(exeContext, data))
-				.catch((error) => {
-					// Handle errors that propagate from non-null fields
-					if (error instanceof GraphQLError) {
-						exeContext.errors.push(error)
-					} else {
-						exeContext.errors.push(new GraphQLError(error.message, { originalError: error }))
-					}
+			return result.then(
+				(data) => buildResponse(exeContext, data),
+				(error) => {
+					addError(exeContext, toGraphQLError(error), undefined)
 					return buildResponse(exeContext, null)
-				})
+				},
+			)
 		}
 
 		return buildResponse(exeContext, result)
 	} catch (error) {
-		// Handle errors that propagate from non-null fields
-		if (error instanceof GraphQLError) {
-			exeContext.errors.push(error)
-		} else if (error instanceof Error) {
-			exeContext.errors.push(new GraphQLError(error.message, { originalError: error }))
-		}
+		// an error propagated from a non-null root field nulls the whole data
+		addError(exeContext, toGraphQLError(error), undefined)
 		return buildResponse(exeContext, null)
 	}
+}
+
+/** Errors propagated to the root are located field errors; anything else is wrapped so it still reaches the response */
+function toGraphQLError(error: unknown): GraphQLError {
+	return error instanceof GraphQLError ? error : locatedError(error, undefined, undefined)
 }
 
 /**

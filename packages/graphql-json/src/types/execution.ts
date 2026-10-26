@@ -4,6 +4,7 @@
 
 import type { DocumentNode, FragmentDefinitionNode, OperationDefinitionNode } from 'graphql'
 import type { Schema } from './schema.js'
+import type { Path } from '../utils/path.js'
 import type { IsTypeOfResolverMap, ResolverFn, ResolverMap, ScalarMap, TypeResolverMap } from './resolvers.js'
 import type { GraphQLError } from 'graphql'
 
@@ -29,6 +30,8 @@ export interface ExecutionContext<TContext = unknown> {
 
 	// Error collection
 	errors: GraphQLError[]
+	// Positions nulled by an error; `undefined` stands for the whole response data
+	errorPositions: Set<Path | undefined>
 }
 
 /**

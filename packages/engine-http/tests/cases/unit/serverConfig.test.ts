@@ -1,6 +1,7 @@
 import { expect, test } from 'bun:test'
 import { readConfig } from '../../../src/config/config.js'
 import { serverConfigSchema } from '../../../src/config/configSchema.js'
+import { createMigrationLockOptions } from '../../../src/system/migrationLockOptions.js'
 
 const trustedProxies = (val: unknown): unknown => serverConfigSchema({ http: { trustedProxies: val } }).http?.trustedProxies
 
@@ -102,4 +103,40 @@ test('schemaCacheMaxEntries: undefined when the variable is unset', async () => 
 
 test('schemaCacheMaxEntries: zero is refused', () => {
 	expect(() => serverConfigSchema({ contentApi: { schemaCacheMaxEntries: 0 } })).toThrow()
+})
+
+test('migration lock options: read from CONTEMBER_SYSTEM_API_MIGRATION_* with defaults for the retry', async () => {
+	process.env.CONTEMBER_SYSTEM_API_MIGRATION_LOCK_TIMEOUT_MS = '2000'
+	try {
+		const { serverConfig } = await readConfig()
+		expect(createMigrationLockOptions(serverConfig.systemApi)).toStrictEqual({ lockTimeoutMs: 2000, maxAttempts: 5, retryDelayMs: 1000 })
+	} finally {
+		delete process.env.CONTEMBER_SYSTEM_API_MIGRATION_LOCK_TIMEOUT_MS
+	}
+})
+
+test('migration lock options: unset when no variable is set', async () => {
+	const { serverConfig } = await readConfig()
+	expect(createMigrationLockOptions(serverConfig.systemApi)).toBeUndefined()
+})
+
+test('migration lock options: retry settings without a lock timeout are refused', async () => {
+	process.env.CONTEMBER_SYSTEM_API_MIGRATION_MAX_ATTEMPTS = '3'
+	try {
+		await expect(readConfig()).rejects.toThrow('require migrationLockTimeoutMs')
+	} finally {
+		delete process.env.CONTEMBER_SYSTEM_API_MIGRATION_MAX_ATTEMPTS
+	}
+	expect(() => serverConfigSchema({ systemApi: { migrationRetryDelayMs: 0 } })).toThrow('require migrationLockTimeoutMs')
+})
+
+test('migration lock options: retry settings with a lock timeout are accepted', () => {
+	const config = serverConfigSchema({ systemApi: { migrationLockTimeoutMs: 500, migrationMaxAttempts: 3, migrationRetryDelayMs: 0 } })
+	expect(createMigrationLockOptions(config.systemApi)).toStrictEqual({ lockTimeoutMs: 500, maxAttempts: 3, retryDelayMs: 0 })
+})
+
+test('migration lock options: zero and negative values are rejected', () => {
+	expect(() => serverConfigSchema({ systemApi: { migrationLockTimeoutMs: 0 } })).toThrow('must be a positive integer')
+	expect(() => serverConfigSchema({ systemApi: { migrationLockTimeoutMs: 500, migrationMaxAttempts: -1 } })).toThrow('must be a positive integer')
+	expect(() => serverConfigSchema({ systemApi: { migrationLockTimeoutMs: 500, migrationRetryDelayMs: -1 } })).toThrow('must be a non-negative integer')
 })

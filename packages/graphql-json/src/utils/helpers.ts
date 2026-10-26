@@ -34,7 +34,7 @@ export function isObjectLike(value: unknown): value is ObjectLike {
 /**
  * Check if value is a Promise (any thenable object, as in graphql-js)
  */
-export function isPromise(value: unknown): value is Promise<unknown> {
+export function isPromise<T>(value: T | Promise<T>): value is Promise<T> {
 	return isObjectLike(value) && typeof value.then === 'function'
 }
 
@@ -149,18 +149,20 @@ export async function promiseForObject<T>(
 }
 
 /**
- * Sequential promise reduce
+ * Reduces the values in order, waiting only for a callback that returns a promise (graphql-js `promiseReduce`)
  */
-export async function promiseReduce<T, U>(
-	values: readonly T[],
-	callbackFn: (acc: U, value: T) => U | Promise<U>,
+export function promiseReduce<T, U>(
+	values: Iterable<T>,
+	callbackFn: (accumulator: U, value: T) => U | Promise<U>,
 	initialValue: U,
-): Promise<U> {
-	let acc = initialValue
+): U | Promise<U> {
+	let accumulator: U | Promise<U> = initialValue
 	for (const value of values) {
-		acc = await callbackFn(acc, value)
+		accumulator = isPromise(accumulator)
+			? accumulator.then(resolved => callbackFn(resolved, value))
+			: callbackFn(accumulator, value)
 	}
-	return acc
+	return accumulator
 }
 
 /**

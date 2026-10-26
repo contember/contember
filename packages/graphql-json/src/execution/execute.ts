@@ -7,8 +7,10 @@ import type { FieldNode } from 'graphql'
 import type { ExecuteArgs, ExecuteArgsWithContext, ExecutionContext, ExecutionResult } from '../types/execution.js'
 import { buildExecutionContext, getOperationRootTypeName, isExecutionContextErrors } from './context.js'
 import { collectFields } from './collectFields.js'
-import { addError, executeFields } from './fields.js'
-import { getOwn, isPromise, promiseReduce } from '../utils/helpers.js'
+import { addError, executeField, executeFields } from './fields.js'
+import type { GroupedFieldSet } from './collectFields.js'
+import { getOwn, isPromise, promiseReduce, setOwn } from '../utils/helpers.js'
+import { addPath } from '../utils/path.js'
 
 /**
  * Execute a GraphQL query. Resolvers typed for a context must be given a `contextValue`.
@@ -153,32 +155,31 @@ function executeOperation<TContext>(
 }
 
 /**
- * Execute fields serially (for mutations)
+ * Execute fields serially (for mutations), synchronously while the fields resolve synchronously
  */
 function executeFieldsSerially<TContext>(
 	exeContext: ExecutionContext<TContext>,
 	parentTypeName: string,
 	sourceValue: unknown,
 	path: undefined,
-	groupedFieldSet: Map<string, readonly FieldNode[]>,
+	groupedFieldSet: GroupedFieldSet,
 ): Record<string, unknown> | Promise<Record<string, unknown>> {
-	const entries = Array.from(groupedFieldSet.entries())
-
 	return promiseReduce<[string, readonly FieldNode[]], Record<string, unknown>>(
-		entries,
-		async (results, [responseName, fieldNodes]) => {
-			// Create a single-field grouped set
-			const singleFieldSet = new Map([[responseName, fieldNodes]])
-			const fieldResults = executeFields(
-				exeContext,
-				parentTypeName,
-				sourceValue,
-				path,
-				singleFieldSet,
-			)
-
-			const resolved = isPromise(fieldResults) ? await fieldResults : fieldResults
-			return { ...results, ...resolved }
+		groupedFieldSet,
+		(results, [responseName, fieldNodes]) => {
+			const fieldPath = addPath(path, responseName, parentTypeName)
+			const result = executeField(exeContext, parentTypeName, sourceValue, fieldNodes, fieldPath)
+			if (result === undefined) {
+				return results
+			}
+			if (isPromise(result)) {
+				return result.then(resolved => {
+					setOwn(results, responseName, resolved)
+					return results
+				})
+			}
+			setOwn(results, responseName, result)
+			return results
 		},
 		{},
 	)

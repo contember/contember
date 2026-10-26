@@ -1327,6 +1327,87 @@ describe('execute', () => {
 			})
 			expect(order).toEqual(['start:First', 'end:First', 'start:Second', 'end:Second'])
 		})
+
+		it('executes synchronous mutations synchronously', () => {
+			const order: string[] = []
+			const result = executeSync({
+				schema,
+				document: parse(`
+          mutation {
+            first: createUser(name: "First") { name }
+            second: createUser(name: "Second") { name }
+          }
+        `),
+				resolvers: {
+					Mutation: {
+						createUser: (_source, { name }) => {
+							order.push(`run:${name}`)
+							return { name }
+						},
+					},
+				},
+			})
+
+			expect(result).toEqual({ data: { first: { name: 'First' }, second: { name: 'Second' } } })
+			expect(order).toEqual(['run:First', 'run:Second'])
+		})
+
+		it('runs a synchronous mutation only after the previous asynchronous one', async () => {
+			const order: string[] = []
+			const result = await execute({
+				schema,
+				document: parse(`
+          mutation {
+            first: createUser(name: "First") { name }
+            second: createUser(name: "Second") { name }
+            third: createUser(name: "Third") { name }
+          }
+        `),
+				resolvers: {
+					Mutation: {
+						createUser: (_source, { name }) => {
+							order.push(`start:${name}`)
+							if (name !== 'Second') {
+								order.push(`end:${name}`)
+								return { name }
+							}
+							return new Promise(resolve => setTimeout(resolve, 10)).then(() => {
+								order.push(`end:${name}`)
+								return { name }
+							})
+						},
+					},
+				},
+			})
+
+			expect(result.data).toEqual({ first: { name: 'First' }, second: { name: 'Second' }, third: { name: 'Third' } })
+			expect(order).toEqual(['start:First', 'end:First', 'start:Second', 'end:Second', 'start:Third', 'end:Third'])
+		})
+
+		it('stops at a mutation whose non-null field fails, as graphql-js does', () => {
+			const order: string[] = []
+			const result = executeSync({
+				schema,
+				document: parse(`
+          mutation {
+            first: createUser(name: "First") { name }
+            second: createUser(name: "Second") { name }
+          }
+        `),
+				resolvers: {
+					Mutation: {
+						createUser: (_source, { name }) => {
+							order.push(`run:${name}`)
+							throw new Error(`failed ${name}`)
+						},
+					},
+				},
+			})
+
+			expect(result.data).toBeNull()
+			expect(result.errors?.map(error => error.message)).toEqual(['failed First'])
+			expect(order).toEqual(['run:First'])
+		})
 	})
 
 	describe('default field resolver', () => {

@@ -13,7 +13,6 @@ import type { Schema, Type } from '../../types/schema.js'
 import { isAbstractType, isInterfaceType, isObjectType, T } from '../../types/schema.js'
 import type { ValidationContext } from '../ValidationContext.js'
 import { didYouMean, suggestionList } from '../helpers.js'
-import { findTypeName } from '../../utils/findTypeName.js'
 
 export function FieldsOnCorrectTypeRule(context: ValidationContext): ASTVisitor {
 	return {
@@ -25,7 +24,7 @@ export function FieldsOnCorrectTypeRule(context: ValidationContext): ASTVisitor 
 					// This field doesn't exist, lets look for suggestions.
 					const schema = context.getSchema()
 					const fieldName = node.name.value
-					const typeName = findTypeName(schema, type) ?? '(unknown)'
+					const typeName = context.getParentTypeName() ?? '(unknown)'
 
 					// First determine if there are any suggested types to condition on.
 					let suggestion = getSuggestedTypeNames(schema, type, fieldName)

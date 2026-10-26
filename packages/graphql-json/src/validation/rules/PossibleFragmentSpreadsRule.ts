@@ -14,7 +14,6 @@ import type { Schema, Type } from '../../types/schema.js'
 import { isAbstractType, isCompositeType, isObjectType, T } from '../../types/schema.js'
 import { getNamedType } from '../../utils/typeRef.js'
 import type { ValidationContext } from '../ValidationContext.js'
-import { findTypeName } from '../../utils/findTypeName.js'
 
 export function PossibleFragmentSpreadsRule(context: ValidationContext): ASTVisitor {
 	return {
@@ -26,7 +25,7 @@ export function PossibleFragmentSpreadsRule(context: ValidationContext): ASTVisi
 				const schema = context.getSchema()
 				const fragTypeName = getNamedType(fragType)
 				const fragTypeObj = schema.t[fragTypeName]
-				const parentTypeName = findTypeName(schema, parentType) ?? '(unknown)'
+				const parentTypeName = context.getParentTypeName() ?? '(unknown)'
 
 				if (
 					fragTypeObj
@@ -53,7 +52,7 @@ export function PossibleFragmentSpreadsRule(context: ValidationContext): ASTVisi
 				const schema = context.getSchema()
 				const fragTypeName = fragDef.typeCondition.name.value
 				const fragType = schema.t[fragTypeName]
-				const parentTypeName = findTypeName(schema, parentType) ?? '(unknown)'
+				const parentTypeName = context.getParentTypeName() ?? '(unknown)'
 
 				if (
 					fragType

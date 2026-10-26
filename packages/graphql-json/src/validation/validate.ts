@@ -10,6 +10,7 @@ import { GraphQLError, visit, visitInParallel } from 'graphql'
 import type { Schema } from '../types/schema.js'
 import type { ScalarMap } from '../types/resolvers.js'
 import { withBuiltInScalars } from '../scalars/builtIn.js'
+import { getSchemaWithIntrospection } from '../introspection/types.js'
 
 import { TypeInfo, visitWithTypeInfo } from './TypeInfo.js'
 import { ValidationContext, type ValidationRule } from './ValidationContext.js'
@@ -61,8 +62,10 @@ export function validate(
 	const abortObj = Object.freeze({})
 	const errors: GraphQLError[] = []
 
-	const typeInfo = new TypeInfo(schema)
-	const context = new ValidationContext(schema, document, typeInfo, scalars, (error) => {
+	// selections below __schema and __type are validated against the introspection types
+	const schemaWithIntrospection = getSchemaWithIntrospection(schema)
+	const typeInfo = new TypeInfo(schemaWithIntrospection)
+	const context = new ValidationContext(schemaWithIntrospection, document, typeInfo, scalars, (error) => {
 		if (errors.length >= maxErrors) {
 			errors.push(
 				new GraphQLError(

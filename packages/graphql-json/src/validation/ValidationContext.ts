@@ -200,6 +200,10 @@ export class ValidationContext {
 		return this._typeInfo.getParentType()
 	}
 
+	getParentTypeName(): Maybe<string> {
+		return this._typeInfo.getParentTypeName()
+	}
+
 	getInputType(): Maybe<TypeRef> {
 		return this._typeInfo.getInputType()
 	}

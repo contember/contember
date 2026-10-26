@@ -12,7 +12,6 @@ import { GraphQLError, Kind } from 'graphql'
 import { F } from '../../types/schema.js'
 import type { ValidationContext } from '../ValidationContext.js'
 import { didYouMean, suggestionList } from '../helpers.js'
-import { findTypeName } from '../../utils/findTypeName.js'
 
 export function KnownArgumentNamesRule(context: ValidationContext): ASTVisitor {
 	return {
@@ -33,9 +32,7 @@ export function KnownArgumentNamesRule(context: ValidationContext): ASTVisitor {
 					? (fieldNode as FieldNode).name.value
 					: '(unknown)'
 
-				// Get parent type name from schema
-				const schema = context.getSchema()
-				const parentTypeName = findTypeName(schema, parentType) ?? '(unknown)'
+				const parentTypeName = context.getParentTypeName() ?? '(unknown)'
 
 				context.reportError(
 					new GraphQLError(

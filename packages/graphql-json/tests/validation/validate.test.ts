@@ -871,3 +871,34 @@ describe('UniqueDirectivesPerLocationRule', () => {
 		expect(errors).toHaveLength(0)
 	})
 })
+
+describe('introspection selections', () => {
+	test('reports an unknown field below __schema', () => {
+		const errors = validate(schema, parse('{ __schema { types { name } nope } }'))
+		expect(errors.map(it => it.message)).toEqual(['Cannot query field "nope" on type "__Schema".'])
+	})
+
+	test('reports an unknown field below __type', () => {
+		const errors = validate(schema, parse('{ __type(name: "User") { name xyz } }'))
+		expect(errors.map(it => it.message)).toEqual(['Cannot query field "xyz" on type "__Type".'])
+	})
+})
+
+describe('type names', () => {
+	test('names the parent type by reference, not by its definition', () => {
+		const shared: Schema['t'][string] = [TypeKind.OBJECT, { x: [[TypePattern.T, 'Int'], null] }, []]
+		const aliased: Schema = {
+			q: 'Query',
+			m: null,
+			s: null,
+			t: {
+				Query: [TypeKind.OBJECT, { a: [[TypePattern.T, 'A'], null], b: [[TypePattern.T, 'B'], null] }, []],
+				A: shared,
+				B: shared,
+				Int: [TypeKind.SCALAR],
+			},
+		}
+		const errors = validate(aliased, parse('{ b { nope } }'))
+		expect(errors.map(it => it.message)).toEqual(['Cannot query field "nope" on type "B".'])
+	})
+})

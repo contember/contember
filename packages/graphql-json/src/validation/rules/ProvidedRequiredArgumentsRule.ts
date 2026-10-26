@@ -12,7 +12,6 @@ import { GraphQLError } from 'graphql'
 import { A } from '../../types/schema.js'
 import { formatTypeRef, isNonNullType } from '../../utils/typeRef.js'
 import type { ValidationContext } from '../ValidationContext.js'
-import { findTypeName } from '../../utils/findTypeName.js'
 
 export function ProvidedRequiredArgumentsRule(context: ValidationContext): ASTVisitor {
 	return {
@@ -43,8 +42,7 @@ export function ProvidedRequiredArgumentsRule(context: ValidationContext): ASTVi
 						&& argDefaultValue === undefined
 						&& !providedArgs.has(argName)
 					) {
-						const parentType = context.getParentType()
-						const parentTypeName = parentType ? findTypeName(context.getSchema(), parentType) : undefined
+						const parentTypeName = context.getParentTypeName()
 						const fieldName = fieldNode.name.value
 						context.reportError(
 							new GraphQLError(

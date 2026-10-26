@@ -1,4 +1,4 @@
-import { test } from 'bun:test'
+import { expect, test } from 'bun:test'
 import { execute } from '../../../../../src/test.js'
 import { SchemaBuilder } from '@contember/schema-definition'
 import { Model } from '@contember/schema'
@@ -117,4 +117,42 @@ test('aliases', async () => {
 			},
 		},
 	})
+})
+
+test('aliases named like Object.prototype members', async () => {
+	await execute({
+		schema: new SchemaBuilder()
+			.entity('Post', entity => entity.column('title', column => column.type(Model.ColumnType.String)))
+			.buildSchema(),
+		query: GQL`
+        query {
+          getPost(by: {id: "${testUuid(1)}"}) {
+            toString: title
+            constructor: title
+            __proto__: _meta {
+              title {
+                readable
+              }
+            }
+          }
+        }`,
+		executes: [
+			{
+				sql: SQL`select
+                       "root_"."title" as "root_toString",
+                       "root_"."title" as "root_constructor",
+                       "root_"."id" as "root_id"
+                     from "public"."post" as "root_"
+                     where "root_"."id" = ?`,
+				response: { rows: [{ root_toString: 'Hello', root_constructor: 'World' }] },
+				parameters: [testUuid(1)],
+			},
+		],
+		return: {
+			data: {
+				getPost: JSON.parse('{"toString":"Hello","constructor":"World","__proto__":{"title":{"readable":true}}}'),
+			},
+		},
+	})
+	expect(Object.hasOwn(Object.prototype, 'title')).toBe(false)
 })

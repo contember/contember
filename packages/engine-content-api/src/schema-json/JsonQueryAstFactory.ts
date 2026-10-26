@@ -102,12 +102,13 @@ export class JsonQueryAstFactory {
 }
 
 const mergeFieldList = (nodes: AnyNode[]): AnyNode[] => {
-	const result: Record<string, AnyNode> = {}
+	// a Map, so aliases such as `toString` or `__proto__` do not hit Object.prototype
+	const result = new Map<string, AnyNode>()
 	for (const node of nodes) {
-		const existing = result[node.alias]
-		result[node.alias] = existing ? mergeFields(existing, node) : node
+		const existing = result.get(node.alias)
+		result.set(node.alias, existing ? mergeFields(existing, node) : node)
 	}
-	return Object.values(result)
+	return [...result.values()]
 }
 
 const mergeFields = (left: AnyNode, right: AnyNode): AnyNode => {

@@ -62,7 +62,7 @@ export function executeFields<TContext>(
 /**
  * Execute a single field
  */
-function executeField<TContext>(
+export function executeField<TContext>(
 	exeContext: ExecutionContext<TContext>,
 	parentTypeName: string,
 	sourceValue: unknown,

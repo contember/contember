@@ -2,33 +2,28 @@
  * General utility helpers
  */
 
-/**
- * Check if value is a Promise
- */
-export function isPromise<T>(value: unknown): value is Promise<T> {
-	return (
-		typeof value === 'object'
-		&& value !== null
-		&& typeof (value as Promise<T>).then === 'function'
-	)
-}
+/** A non-null object; any property read from it is an unknown value */
+export type ObjectLike = { readonly [key: PropertyKey]: unknown }
 
 /**
  * Check if value is an object-like (not null, is object)
  */
-export function isObjectLike(value: unknown): value is Record<string, unknown> {
+export function isObjectLike(value: unknown): value is ObjectLike {
 	return typeof value === 'object' && value !== null
+}
+
+/**
+ * Check if value is a Promise (any thenable object, as in graphql-js)
+ */
+export function isPromise(value: unknown): value is Promise<unknown> {
+	return isObjectLike(value) && typeof value.then === 'function'
 }
 
 /**
  * Check if value is iterable (array-like)
  */
 export function isIterableObject(value: unknown): value is Iterable<unknown> {
-	return (
-		typeof value === 'object'
-		&& value !== null
-		&& typeof (value as Iterable<unknown>)[Symbol.iterator] === 'function'
-	)
+	return isObjectLike(value) && typeof value[Symbol.iterator] === 'function'
 }
 
 /**
@@ -54,14 +49,14 @@ export function inspect(value: unknown): string {
 		return `[${value.map(inspect).join(', ')}]`
 	}
 	if (typeof value === 'object') {
-		const name = (value as object).constructor?.name
+		const name = value.constructor?.name
 		if (name && name !== 'Object') {
 			return `[${name}]`
 		}
-		const entries = Object.entries(value as object)
+		const entries = Object.entries(value)
 			.slice(0, 3)
 			.map(([k, v]) => `${k}: ${inspect(v)}`)
-		if (Object.keys(value as object).length > 3) {
+		if (Object.keys(value).length > 3) {
 			entries.push('...')
 		}
 		return `{ ${entries.join(', ')} }`

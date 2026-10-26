@@ -314,6 +314,8 @@
         "ws": "catalog:",
       },
       "devDependencies": {
+        "@contember/database-tester": "workspace:*",
+        "@contember/schema-definition": "workspace:*",
         "@types/koa": "catalog:",
         "@types/node": "catalog:",
         "@types/ws": "catalog:",

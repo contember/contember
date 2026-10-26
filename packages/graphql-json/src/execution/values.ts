@@ -4,7 +4,7 @@
 
 import { GraphQLError, Kind, print } from 'graphql'
 import type { ArgumentNode, FieldNode, OperationDefinitionNode, ValueNode } from 'graphql'
-import type { EnumType, Field, InputObjectType, Schema, TypeRef } from '../types/schema.js'
+import type { Field, Schema, TypeRef } from '../types/schema.js'
 import { A, EV, IF, TypeKind } from '../types/schema.js'
 import type { ScalarMap } from '../types/resolvers.js'
 import { formatTypeRef, getListItemType, isListType, isNonNullType, unwrapNonNull } from '../utils/typeRef.js'
@@ -170,9 +170,7 @@ function coerceInputValue(
 		return valueFromASTUntyped(valueNode, variableValues)
 	}
 
-	const typeKind = type[0]
-
-	switch (typeKind) {
+	switch (type[0]) {
 		case TypeKind.SCALAR: {
 			const scalar = scalars[typeName]
 			if (scalar) {
@@ -188,9 +186,7 @@ function coerceInputValue(
 
 		case TypeKind.ENUM: {
 			if (valueNode.kind === Kind.ENUM) {
-				// EnumType: [kind, values, description?]
-				const enumType = type as EnumType
-				const values = enumType[1]
+				const values = type[1]
 				const enumValue = values[valueNode.value]
 				if (enumValue) {
 					// EnumValue: [value?, description?, deprecationReason?]
@@ -207,9 +203,7 @@ function coerceInputValue(
 				return undefined
 			}
 
-			// InputObjectType: [kind, fields, isOneOf?, description?]
-			const inputType = type as InputObjectType
-			const fields = inputType[1]
+			const fields = type[1]
 
 			const obj: Record<string, unknown> = {}
 			const fieldNodes = new Map<string, ValueNode>()
@@ -414,7 +408,7 @@ function coerceInputValueFromVariable(
 
 		if (isIterableObject(value) && typeof value !== 'string') {
 			return Array.from(
-				value as Iterable<unknown>,
+				value,
 				(item, index) => coerceInputValueFromVariable(schema, innerTypeRef, item, scalars, [...path, index], onError),
 			)
 		}
@@ -431,9 +425,7 @@ function coerceInputValueFromVariable(
 		return value
 	}
 
-	const typeKind = type[0]
-
-	switch (typeKind) {
+	switch (type[0]) {
 		case TypeKind.SCALAR: {
 			const scalar = scalars[typeName]
 			if (!scalar) {
@@ -455,9 +447,7 @@ function coerceInputValueFromVariable(
 		}
 
 		case TypeKind.ENUM: {
-			// EnumType: [kind, values, description?]
-			const enumType = type as EnumType
-			const values = enumType[1]
+			const values = type[1]
 			if (typeof value !== 'string') {
 				onError(invalidVariableValue(path, value, `Enum "${typeName}" cannot represent non-string value.`))
 				return undefined
@@ -474,10 +464,8 @@ function coerceInputValueFromVariable(
 		}
 
 		case TypeKind.INPUT_OBJECT: {
-			// InputObjectType: [kind, fields, isOneOf?, description?]
-			const inputType = type as InputObjectType
-			const fields = inputType[1]
-			const isOneOf = inputType[2]
+			const fields = type[1]
+			const isOneOf = type[2]
 
 			if (!isObjectLike(value) || Array.isArray(value)) {
 				onError(invalidVariableValue(path, value, `Expected type "${typeName}" to be an object.`))
@@ -485,11 +473,10 @@ function coerceInputValueFromVariable(
 			}
 
 			const coercedObj: Record<string, unknown> = {}
-			const inputValue = value as Record<string, unknown>
 
 			// Process defined fields
 			for (const [fieldName, fieldDef] of Object.entries(fields)) {
-				const fieldValue = inputValue[fieldName]
+				const fieldValue = value[fieldName]
 				const fieldPath: VariablePath = [...path, fieldName]
 				// InputField: [typeRef, defaultValue?, description?]
 				const fieldTypeRef = IF.type(fieldDef)
@@ -499,7 +486,7 @@ function coerceInputValueFromVariable(
 					if (fieldDefaultValue !== undefined) {
 						coercedObj[fieldName] = fieldDefaultValue
 					} else if (isNonNullType(fieldTypeRef[0])) {
-						onError(invalidVariableValue(path, inputValue, `Field "${fieldName}" of required type "${formatTypeRef(fieldTypeRef)}" was not provided.`))
+						onError(invalidVariableValue(path, value, `Field "${fieldName}" of required type "${formatTypeRef(fieldTypeRef)}" was not provided.`))
 					}
 					continue
 				}
@@ -515,19 +502,19 @@ function coerceInputValueFromVariable(
 			}
 
 			// Check for unknown fields
-			for (const fieldName of Object.keys(inputValue)) {
+			for (const fieldName of Object.keys(value)) {
 				if (!(fieldName in fields)) {
-					onError(invalidVariableValue(path, inputValue, `Field "${fieldName}" is not defined by type "${typeName}".`))
+					onError(invalidVariableValue(path, value, `Field "${fieldName}" is not defined by type "${typeName}".`))
 				}
 			}
 
 			// Handle OneOf input objects
 			if (isOneOf) {
-				const providedKeys = Object.keys(inputValue)
+				const providedKeys = Object.keys(value)
 				if (providedKeys.length !== 1) {
-					onError(invalidVariableValue(path, inputValue, `Exactly one key must be specified for OneOf type "${typeName}".`))
-				} else if (inputValue[providedKeys[0]] === null) {
-					onError(invalidVariableValue(path, inputValue, `Field "${providedKeys[0]}" must be non-null for OneOf type "${typeName}".`))
+					onError(invalidVariableValue(path, value, `Exactly one key must be specified for OneOf type "${typeName}".`))
+				} else if (value[providedKeys[0]] === null) {
+					onError(invalidVariableValue(path, value, `Field "${providedKeys[0]}" must be non-null for OneOf type "${typeName}".`))
 				}
 			}
 

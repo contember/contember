@@ -11,10 +11,10 @@ import { coerceVariableValues } from './values.js'
 import { getSchemaWithIntrospection } from '../introspection/types.js'
 
 /**
- * Type guard for checking if result is errors array
+ * Type guard for checking if result is errors array; the other variant `T` is never an array
  */
-export function isExecutionContextErrors<TContext>(
-	result: ExecutionContext<TContext> | readonly GraphQLError[],
+export function isExecutionContextErrors<T>(
+	result: T | readonly GraphQLError[],
 ): result is readonly GraphQLError[] {
 	return Array.isArray(result)
 }
@@ -83,7 +83,7 @@ export function buildExecutionContext<TContext>(
 		mergedScalars,
 	)
 
-	if (Array.isArray(coercedVariableValues)) {
+	if (isExecutionContextErrors(coercedVariableValues)) {
 		return coercedVariableValues
 	}
 
@@ -93,7 +93,7 @@ export function buildExecutionContext<TContext>(
 		rootValue,
 		contextValue,
 		operation,
-		variableValues: coercedVariableValues as Record<string, unknown>,
+		variableValues: coercedVariableValues,
 		resolvers: resolvers ?? {},
 		typeResolvers: typeResolvers ?? {},
 		isTypeOfResolvers: isTypeOfResolvers ?? {},

@@ -5,8 +5,8 @@
 import { GraphQLError } from 'graphql'
 import type { FieldNode } from 'graphql'
 import type { ExecutionContext } from '../types/execution.js'
-import type { Field, ObjectType } from '../types/schema.js'
-import { F, TypeKind } from '../types/schema.js'
+import type { Field } from '../types/schema.js'
+import { F, TypeKind, TypePattern } from '../types/schema.js'
 import type { ResolveInfo, ResolverFn } from '../types/resolvers.js'
 import type { Path } from '../utils/path.js'
 import { addPath, pathToArray } from '../utils/path.js'
@@ -17,6 +17,9 @@ import { getArgumentValues } from './values.js'
 import type { GroupedFieldSet } from './collectFields.js'
 import { introspectionResolvers, resolveSchema, resolveType } from './introspectionResolvers.js'
 import { isIntrospectionType } from '../introspection/types.js'
+
+const schemaMetaField: Field = [[TypePattern.T_NN, '__Schema'], null]
+const typeMetaField: Field = [[TypePattern.T, '__Type'], { name: [[TypePattern.T_NN, 'String']] }]
 
 /**
  * Execute collected fields
@@ -70,7 +73,7 @@ function executeField<TContext>(
 	const fieldName = fieldNode.name.value
 
 	// Get field definition
-	const parentType = exeContext.schema.t[parentTypeName] as ObjectType | undefined
+	const parentType = exeContext.schema.t[parentTypeName]
 	if (!parentType || parentType[0] !== TypeKind.OBJECT) {
 		return undefined
 	}
@@ -87,16 +90,8 @@ function executeField<TContext>(
 		// Handle __schema meta-field (only on root Query type)
 		if (fieldName === '__schema' && parentTypeName === exeContext.schema.q) {
 			const schemaData = resolveSchema(exeContext.schema)
-			const schemaTypeRef: [number, string] = [1, '__Schema'] // __Schema! (NonNull)
-			const info = buildResolveInfo(
-				exeContext,
-				fieldName,
-				[[1, '__Schema'], null] as Field,
-				fieldNodes,
-				parentTypeName,
-				path,
-			)
-			return completeValue(exeContext, schemaTypeRef, fieldNodes, info, path, schemaData)
+			const info = buildResolveInfo(exeContext, fieldName, schemaMetaField, fieldNodes, parentTypeName, path)
+			return completeValue(exeContext, F.type(schemaMetaField), fieldNodes, info, path, schemaData)
 		}
 
 		// Handle __type(name: String!) meta-field (only on root Query type)
@@ -107,20 +102,14 @@ function executeField<TContext>(
 			if (nameArg && nameArg.value.kind === 'StringValue') {
 				typeName = nameArg.value.value
 			} else if (nameArg && nameArg.value.kind === 'Variable') {
-				typeName = exeContext.variableValues[nameArg.value.name.value] as string
+				const variableValue = exeContext.variableValues[nameArg.value.name.value]
+				// a validated document passes a String! variable here; anything else finds no type
+				typeName = typeof variableValue === 'string' ? variableValue : null
 			}
 
 			const typeData = typeName ? resolveType(exeContext.schema, typeName) : null
-			const typeTypeRef: [number, string] = [0, '__Type'] // __Type (nullable)
-			const info = buildResolveInfo(
-				exeContext,
-				fieldName,
-				[[0, '__Type'], { name: [[1, 'String']] }] as Field,
-				fieldNodes,
-				parentTypeName,
-				path,
-			)
-			return completeValue(exeContext, typeTypeRef, fieldNodes, info, path, typeData)
+			const info = buildResolveInfo(exeContext, fieldName, typeMetaField, fieldNodes, parentTypeName, path)
+			return completeValue(exeContext, F.type(typeMetaField), fieldNodes, info, path, typeData)
 		}
 
 		return undefined

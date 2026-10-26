@@ -4,7 +4,7 @@
 
 import { Kind } from 'graphql'
 import type { FieldNode, FragmentDefinitionNode, FragmentSpreadNode, InlineFragmentNode, SelectionSetNode } from 'graphql'
-import type { InterfaceType, ObjectType, Schema, UnionType } from '../types/schema.js'
+import type { InterfaceType, Schema, UnionType } from '../types/schema.js'
 import { isAbstractType, isObjectType, TypeKind } from '../types/schema.js'
 import { getDirectiveValues } from './directives.js'
 
@@ -118,9 +118,9 @@ function getPossibleTypes(type: InterfaceType | UnionType): string[] {
 	// InterfaceType: [kind, fields, interfaces, possibleTypes, description?]
 	// UnionType: [kind, possibleTypes, description?]
 	if (type[0] === TypeKind.INTERFACE) {
-		return (type as InterfaceType)[3]
+		return type[3]
 	}
-	return (type as UnionType)[1]
+	return type[1]
 }
 
 /**
@@ -175,14 +175,14 @@ function doesFragmentConditionMatch(
 
 	// Check if conditional type is abstract and runtime type is possible type
 	if (isAbstractType(conditionalType)) {
-		return getPossibleTypes(conditionalType as InterfaceType | UnionType).includes(runtimeTypeName)
+		return getPossibleTypes(conditionalType).includes(runtimeTypeName)
 	}
 
 	// Check if runtime type implements conditional interface
 	const runtimeType = schema.t[runtimeTypeName]
 	if (runtimeType && isObjectType(runtimeType)) {
 		// ObjectType: [kind, fields, interfaces, description?]
-		return (runtimeType as ObjectType)[2].includes(conditionalTypeName)
+		return runtimeType[2].includes(conditionalTypeName)
 	}
 
 	return false

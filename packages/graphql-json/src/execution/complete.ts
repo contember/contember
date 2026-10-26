@@ -5,12 +5,12 @@
 import { GraphQLError } from 'graphql'
 import type { FieldNode } from 'graphql'
 import type { ExecutionContext } from '../types/execution.js'
-import type { EnumType, InterfaceType, Type, TypeRef, UnionType } from '../types/schema.js'
-import { EV, isAbstractType, isEnumType, isLeafType, isObjectType, isScalarType, T } from '../types/schema.js'
+import type { EnumType, InterfaceType, ScalarType, TypeRef, UnionType } from '../types/schema.js'
+import { EV, isAbstractType, isLeafType, isObjectType, isScalarType, T } from '../types/schema.js'
 import type { ResolveInfo } from '../types/resolvers.js'
 import type { Path } from '../utils/path.js'
 import { addPath, pathToArray } from '../utils/path.js'
-import { inspect, isIterableObject, isPromise } from '../utils/helpers.js'
+import { inspect, isIterableObject, isObjectLike, isPromise } from '../utils/helpers.js'
 import { getListItemType, isListType, isNonNullType, unwrapNonNull } from '../utils/typeRef.js'
 import { collectSubfields, type GroupedFieldSet } from './collectFields.js'
 import { executeFields, handleFieldError } from './fields.js'
@@ -274,7 +274,7 @@ function handleListItemError<TContext>(
 function completeLeafValue<TContext>(
 	exeContext: ExecutionContext<TContext>,
 	typeName: string,
-	type: Type,
+	type: ScalarType | EnumType,
 	result: unknown,
 ): unknown {
 	if (isScalarType(type)) {
@@ -286,11 +286,7 @@ function completeLeafValue<TContext>(
 		return result
 	}
 
-	if (isEnumType(type)) {
-		return serializeEnum(typeName, type, result)
-	}
-
-	throw new GraphQLError(`Cannot serialize value of type "${TYPE_KIND_NAMES[type[0]] ?? 'unknown'}".`)
+	return serializeEnum(typeName, type, result)
 }
 
 /**
@@ -325,7 +321,7 @@ function serializeEnum(typeName: string, type: EnumType, result: unknown): strin
 function completeAbstractValue<TContext>(
 	exeContext: ExecutionContext<TContext>,
 	abstractTypeName: string,
-	abstractType: Type,
+	abstractType: InterfaceType | UnionType,
 	fieldNodes: readonly FieldNode[],
 	info: ResolveInfo,
 	path: Path,
@@ -345,7 +341,7 @@ function completeAbstractValue<TContext>(
 
 			// If no __typename, try isTypeOf
 			if (runtimeTypeName === null) {
-				const possibleTypes = T.possibleTypes(abstractType as InterfaceType | UnionType)
+				const possibleTypes = T.possibleTypes(abstractType)
 				runtimeTypeName = resolveTypeWithIsTypeOf(exeContext, possibleTypes, result, info)
 			}
 		}
@@ -484,8 +480,11 @@ function defaultTypeResolver(
 	_info: ResolveInfo,
 	_abstractType: { name: string; kind: number },
 ): string | null {
-	if (value && typeof value === 'object' && '__typename' in value) {
-		return (value as { __typename: string }).__typename
+	if (isObjectLike(value)) {
+		const typename = value.__typename
+		if (typeof typename === 'string') {
+			return typename
+		}
 	}
 	return null
 }

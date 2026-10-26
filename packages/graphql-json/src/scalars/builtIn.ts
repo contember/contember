@@ -5,7 +5,7 @@
 import { Kind } from 'graphql'
 import type { ValueNode } from 'graphql'
 import type { ScalarImplementation, ScalarMap } from '../types/resolvers.js'
-import { inspect } from '../utils/helpers.js'
+import { inspect, isObjectLike } from '../utils/helpers.js'
 
 function literalText(valueNode: ValueNode): string {
 	return 'value' in valueNode ? String(valueNode.value) : valueNode.kind
@@ -19,15 +19,17 @@ const GRAPHQL_MIN_INT = -2147483648
  * Serialize object value (handles valueOf)
  */
 function serializeObject(outputValue: unknown): unknown {
-	if (typeof outputValue === 'object' && outputValue !== null) {
-		if (typeof (outputValue as { valueOf: () => unknown }).valueOf === 'function') {
-			const valueOfResult = (outputValue as { valueOf: () => unknown }).valueOf()
+	if (isObjectLike(outputValue)) {
+		const valueOf = outputValue.valueOf
+		if (typeof valueOf === 'function') {
+			const valueOfResult: unknown = valueOf.call(outputValue)
 			if (typeof valueOfResult !== 'object') {
 				return valueOfResult
 			}
 		}
-		if (typeof (outputValue as { toJSON: () => unknown }).toJSON === 'function') {
-			return (outputValue as { toJSON: () => unknown }).toJSON()
+		const toJSON = outputValue.toJSON
+		if (typeof toJSON === 'function') {
+			return toJSON.call(outputValue)
 		}
 	}
 	return outputValue

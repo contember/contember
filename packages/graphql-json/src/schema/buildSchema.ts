@@ -280,7 +280,7 @@ function getDeprecationReason(
 ): string {
 	const reasonArg = directive.arguments?.find((a) => a.name.value === 'reason')
 	if (reasonArg?.value && typeof reasonArg.value === 'object' && 'value' in reasonArg.value) {
-		return String((reasonArg.value as { value: unknown }).value)
+		return String(reasonArg.value.value)
 	}
 	return 'No longer supported'
 }

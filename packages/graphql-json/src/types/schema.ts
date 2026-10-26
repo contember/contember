@@ -285,7 +285,7 @@ export const EV = {
 export const T = {
 	kind: (t: Type): TypeKind => t[0],
 	// ObjectType/InterfaceType
-	fields: (t: ObjectType | InterfaceType | InputObjectType): Record<string, Field> | Record<string, InputField> => t[1] as Record<string, Field>,
+	fields: (t: ObjectType | InterfaceType | InputObjectType): Record<string, Field> | Record<string, InputField> => t[1],
 	interfaces: (t: ObjectType | InterfaceType): string[] => t[2],
 	// InterfaceType/UnionType
 	possibleTypes: (t: InterfaceType | UnionType): string[] => {

@@ -5,6 +5,7 @@
 import type { FieldNode, FragmentDefinitionNode, OperationDefinitionNode, ValueNode } from 'graphql'
 import type { Schema, TypeRef } from './schema.js'
 import type { Path } from '../utils/path.js'
+import { isObjectLike } from '../utils/helpers.js'
 
 /**
  * Resolve info passed to resolvers
@@ -104,8 +105,8 @@ export type ScalarMap = {
  * Default field resolver
  */
 export const defaultFieldResolver: ResolverFn = (source, _args, _context, info) => {
-	if (source && typeof source === 'object') {
-		const value = (source as Record<string, unknown>)[info.fieldName]
+	if (isObjectLike(source)) {
+		const value = source[info.fieldName]
 		if (typeof value === 'function') {
 			return value()
 		}

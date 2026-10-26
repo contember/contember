@@ -59,6 +59,7 @@ export const createGraphQLJsBridge = (contribution: GraphQLSchema | GraphQLSchem
 
 	return {
 		types,
+		includedTypes: contribution instanceof GraphQLSchema ? [] : (contribution.types ?? []).map(it => it.name),
 		resolvers,
 		scalars: getCustomScalars(schema),
 		queries: rootFields(schema.getQueryType(), OperationTypeNode.QUERY),

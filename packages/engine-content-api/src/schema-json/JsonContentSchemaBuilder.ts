@@ -26,6 +26,8 @@ import {
 /** Fields and types merged into the content schema, e.g. the `schema` introspection query. */
 export interface JsonSchemaExtension {
 	types: Record<string, Type>
+	/** Types the schema includes even when no field reaches them, e.g. interface implementations (graphql-js `types`). */
+	includedTypes?: readonly string[]
 	queries?: Record<string, JsonOutputField>
 	mutations?: Record<string, JsonOutputField>
 	resolvers?: ResolverMap<Context>
@@ -237,13 +239,15 @@ export class JsonContentSchemaBuilder {
 			registry.object('Mutation', () => mutations)
 		}
 
-		const roots = ['Query', 'Mutation', 'String', 'Boolean', ...extensions.flatMap(it => Object.keys(it.types))]
+		const includedTypes = extensions.flatMap(it => it.includedTypes ?? [])
+		// after the root types, graphql-js collects the argument types of the specified directives and introspection
+		const roots = ['Query', 'Mutation', 'Boolean', 'String', '__Schema']
 		const schema = this.shared.interner.intern({
 			q: 'Query',
 			m: registry.has('Mutation') ? 'Mutation' : null,
 			s: null,
 			// with the introspection types in place, graphql-json uses the schema as is instead of a merged copy
-			t: { ...registry.getReachableTypes(roots), ...introspectionTypes },
+			t: registry.getReachableTypes(includedTypes, roots, introspectionTypes),
 		})
 		const resolvers: ResolverMap<Context> = { ...this.shared.resolvers }
 		for (const [typeName, typeResolvers] of Object.entries(extensionResolvers)) {

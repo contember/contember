@@ -24,8 +24,6 @@ import {
 	isInterfaceType,
 	isObjectType,
 	isOutputType,
-	lexicographicSortSchema,
-	printSchema,
 } from 'graphql'
 import { Argument, Field, getListItemType, isListType, isNonNullType, Schema, TypeKind, TypeRef, unwrapNonNull } from '@contember/graphql-json'
 
@@ -158,5 +156,3 @@ export const toGraphQLJsSchema = (schema: Schema): GraphQLSchema => {
 		types: Object.keys(schema.t).filter(name => !name.startsWith('__')).map(getNamed),
 	})
 }
-
-export const printSortedSchema = (schema: GraphQLSchema): string => printSchema(lexicographicSortSchema(schema))

@@ -1,6 +1,6 @@
 import { printSchema } from 'graphql'
 import { buildSchema, Schema, TypeKind } from '@contember/graphql-json'
-import introspectionSchema from '../introspection/introspection.schema.js'
+import introspectionSchema, { createSchemaConfig } from '../introspection/introspection.schema.js'
 import { IntrospectionSchemaFactory } from '../introspection/index.js'
 import { JsonSchemaExtension } from './JsonContentSchemaBuilder.js'
 import { getCustomScalars } from './GraphQLJsBridge.js'
@@ -25,6 +25,7 @@ export const createJsonIntrospectionExtension = (introspectionSchemaFactory: Int
 	const types = Object.fromEntries(Object.entries(allTypes).filter(([name]) => name !== queryTypeName))
 	return {
 		types,
+		includedTypes: (createSchemaConfig().types ?? []).map(it => it.name),
 		scalars: getCustomScalars(introspectionSchema),
 		queries: {
 			schema: {

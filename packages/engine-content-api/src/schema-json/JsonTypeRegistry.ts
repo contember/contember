@@ -102,66 +102,65 @@ export class JsonTypeRegistry {
 	}
 
 	/**
-	 * The types some root reaches. Providers create some types speculatively (e.g. an input that the allowed
-	 * operations then filter out); graphql-js never sees those because it collects types by reachability.
+	 * The types the schema consists of, collected the way graphql-js collects them (`GraphQLSchema` constructor):
+	 * `includedTypes` first, then everything `roots` reach, depth-first. The order is what introspection and the
+	 * printed schema list, so it stays the order graphql-js produced. Providers create some types speculatively
+	 * (e.g. an input that the allowed operations then filter out); unreachable ones are left out.
 	 * Returns a new record: deleting from a large object would turn it into a slow dictionary.
 	 */
-	public getReachableTypes(roots: readonly string[]): Record<string, Type> {
-		const reachable = new Set<string>()
-		const queue = [...roots]
-		const visit = (name: string) => {
-			if (!reachable.has(name)) {
-				queue.push(name)
+	public getReachableTypes(includedTypes: readonly string[], roots: readonly string[], otherTypes: Record<string, Type>): Record<string, Type> {
+		const reachable = new Set<string>(includedTypes)
+		const collect = (name: string): void => {
+			if (reachable.has(name)) {
+				return
 			}
-		}
-		while (queue.length > 0) {
-			const name = queue.pop()
-			if (name === undefined || reachable.has(name)) {
-				continue
-			}
-			const type = this.types[name]
+			const type = this.types[name] ?? otherTypes[name]
 			if (!type) {
-				continue
+				return
 			}
 			reachable.add(name)
 			switch (type[0]) {
 				case TypeKind.OBJECT:
 				case TypeKind.INTERFACE:
+					type[2].forEach(collect)
 					for (const fieldName in type[1]) {
 						const field = type[1][fieldName]
 						if (!field) {
 							continue
 						}
-						visit(field[0][1])
+						collect(field[0][1])
 						for (const argName in field[1]) {
 							const arg = field[1][argName]
 							if (arg) {
-								visit(arg[0][1])
+								collect(arg[0][1])
 							}
 						}
 					}
-					type[2].forEach(visit)
-					if (type[0] === TypeKind.INTERFACE) {
-						type[3].forEach(visit)
-					}
 					break
 				case TypeKind.UNION:
-					type[1].forEach(visit)
+					type[1].forEach(collect)
 					break
 				case TypeKind.INPUT_OBJECT:
 					for (const fieldName in type[1]) {
 						const field = type[1][fieldName]
 						if (field) {
-							visit(field[0][1])
+							collect(field[0][1])
 						}
 					}
 					break
 			}
 		}
+		// graphql-js seeds the set with the included types and re-adds each one, which moves it to the end
+		for (const name of includedTypes) {
+			reachable.delete(name)
+			collect(name)
+		}
+		roots.forEach(collect)
+
 		const types: Record<string, Type> = {}
-		for (const name in this.types) {
-			const type = this.types[name]
-			if (!type || !reachable.has(name)) {
+		for (const name of reachable) {
+			const type = this.types[name] ?? otherTypes[name]
+			if (!type) {
 				continue
 			}
 			// replaced, not mutated: extension types are shared between schemas

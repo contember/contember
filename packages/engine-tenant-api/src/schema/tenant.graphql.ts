@@ -133,8 +133,10 @@ const schema: DocumentNode = gql`
 		Create or update a workload identity trust in one transaction: the trust, its identity's
 		roles and memberships, and the envelope rules. Requires \`workloadIdentity:add\` or
 		\`workloadIdentity:update\`, and is refused when the caller itself authenticated through a trust.
+		With \`dryRun\`, every check and write runs and is rolled back: the result is what the apply would produce,
+		and nothing is stored or audited.
 		"""
-		applyWorkloadIdentityTrust(slug: String!, trust: WorkloadIdentityTrustInput!): ApplyWorkloadIdentityTrustResponse!
+		applyWorkloadIdentityTrust(slug: String!, trust: WorkloadIdentityTrustInput!, dryRun: Boolean): ApplyWorkloadIdentityTrustResponse!
 		""" Disable a trust; re-enable is an apply with \`disabled: false\`. """
 		disableWorkloadIdentityTrust(slug: String!): DisableWorkloadIdentityTrustResponse!
 

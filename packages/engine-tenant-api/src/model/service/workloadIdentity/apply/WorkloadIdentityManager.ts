@@ -49,6 +49,7 @@ export interface WorkloadTrustApplyResult {
 	readonly created: boolean
 	readonly tokensValidAfterBumped: boolean
 	readonly before: WorkloadTrustState | null
+	readonly after: WorkloadTrustState
 }
 
 const ENABLED_ISSUER_AUDIENCE_INDEX = 'workload_identity_trust_enabled_issuer_audience_idx'
@@ -185,6 +186,8 @@ export class WorkloadIdentityManager {
 	/**
 	 * `authorizedAgainst` is the trust the caller was authorized against (`null` for a create); a trust created or
 	 * re-roled since then answers CONFLICT rather than being rewritten under a stale authorization.
+	 *
+	 * A `dryRun` performs every write and rolls them back, so it fails exactly where the apply would.
 	 */
 	public async apply(
 		db: DatabaseContext,
@@ -192,6 +195,7 @@ export class WorkloadIdentityManager {
 		plan: WorkloadTrustApplyPlan,
 		createdBy: string | null,
 		authorizedAgainst: WorkloadIdentity.TrustRow | null,
+		dryRun: boolean,
 	): Promise<ApplyResponse<WorkloadTrustApplyResult>> {
 		const definition = plan.definition
 		try {
@@ -226,7 +230,14 @@ export class WorkloadIdentityManager {
 
 				await this.reconcileMemberships(trx, trustId, identityId, plan, existing?.memberships ?? [])
 
-				return new ResponseOk({ trustId, created: !existing, tokensValidAfterBumped: bumped, before: existing ?? null })
+				const [after] = await this.getTrustStates(trx, { id: trustId })
+				if (!after) {
+					throw new ImplementationException(`Applied workload identity trust ${slug} not found`)
+				}
+				if (dryRun) {
+					await trx.client.connection.rollback()
+				}
+				return new ResponseOk({ trustId, created: !existing, tokensValidAfterBumped: bumped, before: existing ?? null, after })
 			})
 		} catch (e) {
 			// A unique violation aborts the transaction, so it is mapped once the transaction has rolled back.

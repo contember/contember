@@ -1492,6 +1492,8 @@ export type Mutation = {
 	 * Create or update a workload identity trust in one transaction: the trust, its identity's
 	 * roles and memberships, and the envelope rules. Requires `workloadIdentity:add` or
 	 * `workloadIdentity:update`, and is refused when the caller itself authenticated through a trust.
+	 * With `dryRun`, every check and write runs and is rolled back: the result is what the apply would produce,
+	 * and nothing is stored or audited.
 	 */
 	readonly applyWorkloadIdentityTrust: ApplyWorkloadIdentityTrustResponse
 	readonly changeMyPassword?: Maybe<ChangeMyPasswordResponse>
@@ -1603,6 +1605,7 @@ export type MutationAddProjectMemberArgs = {
 }
 
 export type MutationApplyWorkloadIdentityTrustArgs = {
+	dryRun?: InputMaybe<Scalars['Boolean']['input']>
 	slug: Scalars['String']['input']
 	trust: WorkloadIdentityTrustInput
 }

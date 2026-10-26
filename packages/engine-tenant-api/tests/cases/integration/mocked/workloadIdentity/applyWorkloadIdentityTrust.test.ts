@@ -2,7 +2,7 @@ import { describe, expect, test } from 'bun:test'
 import { AuthorizationScope } from '@contember/authorization'
 import { authenticatedIdentityId, executeTenantTest } from '../../../../src/testTenant.js'
 import { testUuid } from '../../../../src/testUuid.js'
-import { GQL } from '../../../../src/tags.js'
+import { GQL, SQL } from '../../../../src/tags.js'
 import { getProjectBySlugSql } from '../sql/getProjectBySlugSql.js'
 import { sqlTransaction } from '../sql/sqlTransaction.js'
 import { createIdentitySql } from '../sql/createIdentitySql.js'
@@ -125,11 +125,11 @@ describe('applyWorkloadIdentityTrust', () => {
 					trustMembershipsSql([createdIdentityId], [{ ...storedMembership, rule: null }]),
 					deleteAssumeRulesSql(createdTrustId),
 					insertAssumeRuleSql({ id: testUuid(5), trustId: createdTrustId, membershipId: createdMembershipId, rule }),
+					trustByIdSql(createdTrustId, [
+						trustDbRow({ id: createdTrustId, slug, identity_id: createdIdentityId, description: 'Website backend' }),
+					]),
+					trustMembershipsSql([createdIdentityId], [{ ...storedMembership, rule }]),
 				),
-				trustByIdSql(createdTrustId, [
-					trustDbRow({ id: createdTrustId, slug, identity_id: createdIdentityId, description: 'Website backend' }),
-				]),
-				trustMembershipsSql([createdIdentityId], [{ ...storedMembership, rule }]),
 			],
 			return: {
 				data: {
@@ -194,9 +194,9 @@ describe('applyWorkloadIdentityTrust', () => {
 					updateTrustSql({ id: trustId, bump: false }),
 					deleteAssumeRulesSql(trustId),
 					insertAssumeRuleSql({ id: testUuid(1), trustId, membershipId, rule }),
+					trustByIdSql(trustId, [row]),
+					trustMembershipsSql([identityId], [stored]),
 				),
-				trustByIdSql(trustId, [row]),
-				trustMembershipsSql([identityId], [stored]),
 			],
 			return: {
 				data: {
@@ -262,9 +262,9 @@ describe('applyWorkloadIdentityTrust', () => {
 					trustMembershipsSql([identityId], []),
 					updateIdentitySql({ identityId, roles: args.roles, description: null }),
 					updateTrustSql({ id: trustId, bump: args.bump, columns: args.columns }),
+					trustByIdSql(trustId, [args.afterRow]),
+					trustMembershipsSql([identityId], []),
 				),
-				trustByIdSql(trustId, [args.afterRow]),
-				trustMembershipsSql([identityId], []),
 			],
 			return: {
 				data: {
@@ -298,6 +298,39 @@ describe('applyWorkloadIdentityTrust', () => {
 			roles: [],
 			bump: true,
 			afterRow: trustDbRow({ id: trustId, slug, identity_id: identityId, conditions }),
+		})
+	})
+
+	test('a dry run performs the apply, rolls it back and writes no audit row', async () => {
+		const conditions = [{ claim: 'sub', equals: 'web-backend' }, { claim: 'env', equals: 'prod' }]
+		const row = trustDbRow({ id: trustId, slug, identity_id: identityId })
+		await executeTenantTest({
+			query: {
+				query: GQL`mutation($slug: String!, $trust: WorkloadIdentityTrustInput!) {
+					applyWorkloadIdentityTrust(slug: $slug, trust: $trust, dryRun: true) {
+						ok
+						result { created tokensValidAfterBumped trust { slug } }
+					}
+				}`,
+				variables: { slug, trust: { ...baseInput, conditions } },
+			},
+			executes: [
+				trustBySlugSql(slug, [row]),
+				{ sql: SQL`BEGIN;`, response: { rowCount: 1 } },
+				{ sql: SQL`SET TRANSACTION ISOLATION LEVEL REPEATABLE READ`, response: { rowCount: 1 } },
+				trustBySlugSql(slug, [row]),
+				trustMembershipsSql([identityId], []),
+				updateIdentitySql({ identityId, roles: [], description: null }),
+				updateTrustSql({ id: trustId, bump: true, columns: { ...defaultTrustColumns, conditions } }),
+				trustByIdSql(trustId, [trustDbRow({ id: trustId, slug, identity_id: identityId, conditions })]),
+				trustMembershipsSql([identityId], []),
+				{ sql: SQL`ROLLBACK;`, response: { rowCount: 1 } },
+			],
+			return: {
+				data: {
+					applyWorkloadIdentityTrust: { ok: true, result: { created: false, tokensValidAfterBumped: true, trust: { slug } } },
+				},
+			},
 		})
 	})
 

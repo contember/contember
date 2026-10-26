@@ -28,7 +28,7 @@ export class WorkloadIdentityMutationResolver implements MutationResolvers {
 
 	async applyWorkloadIdentityTrust(
 		parent: unknown,
-		{ slug, trust }: MutationApplyWorkloadIdentityTrustArgs,
+		{ slug, trust, dryRun }: MutationApplyWorkloadIdentityTrustArgs,
 		context: TenantResolverContext,
 	): Promise<ApplyWorkloadIdentityTrustResponse> {
 		// a trust managing trusts would let whoever controls one workload re-point or create the others (§6a)
@@ -55,15 +55,24 @@ export class WorkloadIdentityMutationResolver implements MutationResolvers {
 		}
 
 		const createdBy = isUnpersistedIdentityId(context.identity.id) ? null : context.identity.id
-		const result = await this.workloadIdentityManager.apply(context.db, slug, plan.result, createdBy, existing)
+		const result = await this.workloadIdentityManager.apply(context.db, slug, plan.result, createdBy, existing, dryRun === true)
 		if (!result.ok) {
 			return createErrorResponse(result)
 		}
-		const [after] = await this.workloadIdentityManager.getTrustStates(context.db, { id: result.result.trustId })
-		if (!after) {
-			throw new ImplementationException(`Applied workload identity trust ${slug} not found`)
-		}
+		const after = result.result.after
 		const envelopeClosure = envelopeClosureToJson(plan.result.closure)
+		const applied = {
+			ok: true,
+			result: {
+				trust: createWorkloadIdentityTrustResponse(after),
+				created: result.result.created,
+				tokensValidAfterBumped: result.result.tokensValidAfterBumped,
+				envelopeClosure,
+			},
+		}
+		if (dryRun === true) {
+			return applied
+		}
 
 		await context.logAuthAction({
 			type: 'workload_identity_apply',
@@ -79,15 +88,7 @@ export class WorkloadIdentityMutationResolver implements MutationResolvers {
 			},
 		})
 
-		return {
-			ok: true,
-			result: {
-				trust: createWorkloadIdentityTrustResponse(after),
-				created: result.result.created,
-				tokensValidAfterBumped: result.result.tokensValidAfterBumped,
-				envelopeClosure,
-			},
-		}
+		return applied
 	}
 
 	async disableWorkloadIdentityTrust(

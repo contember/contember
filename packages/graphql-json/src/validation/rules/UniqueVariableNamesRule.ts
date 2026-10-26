@@ -5,7 +5,7 @@
  *
  * See https://spec.graphql.org/draft/#sec-Variable-Uniqueness
  */
-import type { ASTVisitor, OperationDefinitionNode, VariableDefinitionNode } from 'graphql'
+import type { ASTVisitor, NameNode, OperationDefinitionNode } from 'graphql'
 import { GraphQLError } from 'graphql'
 
 import type { ValidationContext } from '../ValidationContext.js'
@@ -13,21 +13,20 @@ import type { ValidationContext } from '../ValidationContext.js'
 export function UniqueVariableNamesRule(context: ValidationContext): ASTVisitor {
 	return {
 		OperationDefinition(operationNode: OperationDefinitionNode) {
-			const seenVariableDefinitions = new Map<string, VariableDefinitionNode>()
-
+			const seenVariableNames = new Map<string, NameNode[]>()
 			for (const varDef of operationNode.variableDefinitions ?? []) {
-				const variableName = varDef.variable.name.value
-				const firstSeenDef = seenVariableDefinitions.get(variableName)
-
-				if (firstSeenDef) {
-					context.reportError(
-						new GraphQLError(
-							`There can be only one variable named "$${variableName}".`,
-							{ nodes: [firstSeenDef.variable, varDef.variable] },
-						),
-					)
+				const name = varDef.variable.name
+				const names = seenVariableNames.get(name.value)
+				if (names) {
+					names.push(name)
 				} else {
-					seenVariableDefinitions.set(variableName, varDef)
+					seenVariableNames.set(name.value, [name])
+				}
+			}
+
+			for (const [variableName, names] of seenVariableNames) {
+				if (names.length > 1) {
+					context.reportError(new GraphQLError(`There can be only one variable named "$${variableName}".`, { nodes: names }))
 				}
 			}
 

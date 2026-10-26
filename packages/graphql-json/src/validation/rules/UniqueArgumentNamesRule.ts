@@ -26,20 +26,22 @@ function checkArgUniqueness(
 	context: ValidationContext,
 	args: readonly ArgumentNode[],
 ): void {
-	const seenArgs = new Map<string, NameNode>()
-
+	if (args.length < 2) {
+		return
+	}
+	const seenArgs = new Map<string, NameNode[]>()
 	for (const arg of args) {
-		const argName = arg.name.value
-		const seenArg = seenArgs.get(argName)
-		if (seenArg) {
-			context.reportError(
-				new GraphQLError(
-					`There can be only one argument named "${argName}".`,
-					{ nodes: [seenArg, arg.name] },
-				),
-			)
+		const argNames = seenArgs.get(arg.name.value)
+		if (argNames) {
+			argNames.push(arg.name)
 		} else {
-			seenArgs.set(argName, arg.name)
+			seenArgs.set(arg.name.value, [arg.name])
+		}
+	}
+
+	for (const [argName, argNames] of seenArgs) {
+		if (argNames.length > 1) {
+			context.reportError(new GraphQLError(`There can be only one argument named "${argName}".`, { nodes: argNames }))
 		}
 	}
 }

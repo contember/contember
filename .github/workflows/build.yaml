@@ -113,7 +113,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        postgres: [ 12, 13, 14, 15, 16 ]
+        postgres: [ 14, 15, 16, 17, 18 ]
     services:
       mailhog:
         image: mailhog/mailhog

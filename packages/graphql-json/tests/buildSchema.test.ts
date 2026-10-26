@@ -1,7 +1,7 @@
 import { describe, expect, test } from 'bun:test'
 import { buildSchema } from '../src/schema/buildSchema.js'
 import { execute, executeSync } from '../src/execution/execute.js'
-import { parse } from 'graphql'
+import { GraphQLBoolean, GraphQLFloat, GraphQLID, GraphQLInt, GraphQLString, parse } from 'graphql'
 import { A, D, EV, F, IF, isEnumType, isInputObjectType, isInterfaceType, isObjectType, isUnionType, T, TypeKind, TypePattern } from '../src/index.js'
 
 describe('buildSchema', () => {
@@ -364,5 +364,14 @@ describe('buildSchema', () => {
 			],
 			user: { name: 'Alice' },
 		})
+	})
+})
+
+describe('specified scalars', () => {
+	test('carry the graphql-js descriptions, even when the SDL redefines them', () => {
+		const schema = buildSchema('"Custom" scalar String type Query { a: String b: Int c: Float d: Boolean e: ID }')
+		for (const scalar of [GraphQLString, GraphQLInt, GraphQLFloat, GraphQLBoolean, GraphQLID]) {
+			expect(schema.t[scalar.name]).toEqual([TypeKind.SCALAR, scalar.description ?? undefined])
+		}
 	})
 })

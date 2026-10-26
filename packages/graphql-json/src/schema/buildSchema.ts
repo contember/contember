@@ -14,6 +14,7 @@ import type {
 import type { Argument, Directive, EnumValue, Field, InputField, Schema, Type } from '../types/schema.js'
 import { TypeKind } from '../types/schema.js'
 import { typeRefFromAST } from '../utils/typeRef.js'
+import { isSpecifiedScalarTypeName, specifiedScalarTypes } from '../scalars/builtIn.js'
 
 /**
  * Build a Schema from a GraphQL SDL string
@@ -52,8 +53,9 @@ export function buildSchemaFromAST(document: DocumentNode): Schema {
 				}
 			}
 		} else if (isTypeDefinitionNode(definition)) {
-			const [name, type] = buildType(definition)
-			types[name] = type
+			const name = definition.name.value
+			// as in graphql-js, a definition of a specified scalar does not replace it
+			types[name] = isSpecifiedScalarTypeName(name) ? specifiedScalarTypes[name] : buildType(definition)
 		} else if (definition.kind === Kind.DIRECTIVE_DEFINITION) {
 			const [name, directive] = buildDirective(definition)
 			directives[name] = directive
@@ -61,10 +63,9 @@ export function buildSchemaFromAST(document: DocumentNode): Schema {
 	}
 
 	// Add built-in scalars if not defined
-	const builtInScalars = ['String', 'Int', 'Float', 'Boolean', 'ID']
-	for (const scalar of builtInScalars) {
-		if (!types[scalar]) {
-			types[scalar] = [TypeKind.SCALAR]
+	for (const [name, scalar] of Object.entries(specifiedScalarTypes)) {
+		if (!types[name]) {
+			types[name] = scalar
 		}
 	}
 
@@ -106,16 +107,15 @@ function isTypeDefinitionNode(node: { kind: string }): node is TypeDefinitionNod
 	)
 }
 
-function buildType(node: TypeDefinitionNode): [string, Type] {
-	const name = node.name.value
+function buildType(node: TypeDefinitionNode): Type {
 	const description = node.description?.value
 
 	switch (node.kind) {
 		case Kind.SCALAR_TYPE_DEFINITION:
 			if (description) {
-				return [name, [TypeKind.SCALAR, description]]
+				return [TypeKind.SCALAR, description]
 			}
-			return [name, [TypeKind.SCALAR]]
+			return [TypeKind.SCALAR]
 
 		case Kind.OBJECT_TYPE_DEFINITION: {
 			const fields: Record<string, Field> = {}
@@ -124,9 +124,9 @@ function buildType(node: TypeDefinitionNode): [string, Type] {
 			}
 			const interfaces = node.interfaces?.map((i) => i.name.value) ?? []
 			if (description) {
-				return [name, [TypeKind.OBJECT, fields, interfaces, description]]
+				return [TypeKind.OBJECT, fields, interfaces, description]
 			}
-			return [name, [TypeKind.OBJECT, fields, interfaces]]
+			return [TypeKind.OBJECT, fields, interfaces]
 		}
 
 		case Kind.INTERFACE_TYPE_DEFINITION: {
@@ -137,17 +137,17 @@ function buildType(node: TypeDefinitionNode): [string, Type] {
 			const interfaces = node.interfaces?.map((i) => i.name.value) ?? []
 			const possibleTypes: string[] = [] // Will be filled in second pass
 			if (description) {
-				return [name, [TypeKind.INTERFACE, fields, interfaces, possibleTypes, description]]
+				return [TypeKind.INTERFACE, fields, interfaces, possibleTypes, description]
 			}
-			return [name, [TypeKind.INTERFACE, fields, interfaces, possibleTypes]]
+			return [TypeKind.INTERFACE, fields, interfaces, possibleTypes]
 		}
 
 		case Kind.UNION_TYPE_DEFINITION: {
 			const possibleTypes = node.types?.map((t) => t.name.value) ?? []
 			if (description) {
-				return [name, [TypeKind.UNION, possibleTypes, description]]
+				return [TypeKind.UNION, possibleTypes, description]
 			}
-			return [name, [TypeKind.UNION, possibleTypes]]
+			return [TypeKind.UNION, possibleTypes]
 		}
 
 		case Kind.ENUM_TYPE_DEFINITION: {
@@ -156,9 +156,9 @@ function buildType(node: TypeDefinitionNode): [string, Type] {
 				values[value.name.value] = buildEnumValue(value)
 			}
 			if (description) {
-				return [name, [TypeKind.ENUM, values, description]]
+				return [TypeKind.ENUM, values, description]
 			}
-			return [name, [TypeKind.ENUM, values]]
+			return [TypeKind.ENUM, values]
 		}
 
 		case Kind.INPUT_OBJECT_TYPE_DEFINITION: {
@@ -168,12 +168,12 @@ function buildType(node: TypeDefinitionNode): [string, Type] {
 			}
 			const isOneOf = node.directives?.some((d) => d.name.value === 'oneOf') ?? false
 			if (description) {
-				return [name, [TypeKind.INPUT_OBJECT, fields, isOneOf || undefined, description]]
+				return [TypeKind.INPUT_OBJECT, fields, isOneOf || undefined, description]
 			}
 			if (isOneOf) {
-				return [name, [TypeKind.INPUT_OBJECT, fields, true]]
+				return [TypeKind.INPUT_OBJECT, fields, true]
 			}
-			return [name, [TypeKind.INPUT_OBJECT, fields]]
+			return [TypeKind.INPUT_OBJECT, fields]
 		}
 	}
 }

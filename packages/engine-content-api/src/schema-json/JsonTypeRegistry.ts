@@ -3,9 +3,11 @@ import {
 	EnumValue,
 	Field,
 	InputField,
+	isSpecifiedScalarTypeName,
 	ResolverFn,
 	ResolverMap,
 	ScalarImplementation,
+	specifiedScalarTypes,
 	Type,
 	TypeKind,
 	TypeRef,
@@ -93,7 +95,11 @@ export class JsonTypeRegistry {
 
 	public scalar(name: string, implementation: ScalarImplementation | undefined, description?: string): string {
 		if (!this.types[name]) {
-			this.types[name] = description !== undefined ? [TypeKind.SCALAR, description] : [TypeKind.SCALAR]
+			this.types[name] = isSpecifiedScalarTypeName(name)
+				? specifiedScalarTypes[name]
+				: description !== undefined
+				? [TypeKind.SCALAR, description]
+				: [TypeKind.SCALAR]
 		}
 		if (implementation) {
 			this.scalars[name] ??= implementation

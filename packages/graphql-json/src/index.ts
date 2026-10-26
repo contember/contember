@@ -75,6 +75,8 @@ export {
 	GraphQLIDScalar,
 	GraphQLIntScalar,
 	GraphQLStringScalar,
+	isSpecifiedScalarTypeName,
+	specifiedScalarTypes,
 	withBuiltInScalars,
 } from './scalars/builtIn.js'
 

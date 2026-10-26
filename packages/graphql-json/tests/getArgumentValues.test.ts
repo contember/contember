@@ -95,7 +95,7 @@ describe('getArgumentValues', () => {
 	it('rejects an invalid built-in scalar literal', () => {
 		const node = fieldNode('{ users(filter: {}, limit: "ten") }')
 
-		expect(() => getArgumentValues(schema, usersField(), node, {}, scalars)).toThrow('Int cannot represent non-integer value: ten')
+		expect(() => getArgumentValues(schema, usersField(), node, {}, scalars)).toThrow('Int cannot represent non-integer value: "ten"')
 	})
 
 	it('memoizes the merged scalar map per custom scalars object', () => {

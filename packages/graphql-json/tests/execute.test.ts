@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'bun:test'
-import { parse } from 'graphql'
+import { Kind, parse } from 'graphql'
 import { execute, executeSync, TypeKind, TypePattern } from '../src/index.js'
 import type { ObjectType, ResolverMap, Schema } from '../src/index.js'
 
@@ -773,7 +773,7 @@ describe('execute', () => {
 		const dateScalar: ScalarImplementation = {
 			serialize: (value) => (value as Date).toISOString(),
 			parseValue: (value) => new Date(value as string),
-			parseLiteral: (ast: any) => new Date(ast.value),
+			parseLiteral: (ast) => (ast.kind === Kind.STRING ? new Date(ast.value) : undefined),
 		}
 
 		it('uses custom scalar serialization', () => {

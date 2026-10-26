@@ -2,7 +2,7 @@
  * Argument value extraction from AST and variable coercion
  */
 
-import { GraphQLError, Kind } from 'graphql'
+import { GraphQLError, Kind, print } from 'graphql'
 import type { ArgumentNode, FieldNode, OperationDefinitionNode, ValueNode } from 'graphql'
 import type { EnumType, Field, InputObjectType, Schema, TypeRef } from '../types/schema.js'
 import { A, EV, IF, TypeKind } from '../types/schema.js'
@@ -103,11 +103,21 @@ export function getArgumentValues(
 		}
 
 		// Coerce literal value
-		coercedValues[argName] = coerceInputValue(schema, argTypeRef, valueNode, variableValues, scalars)
+		try {
+			coercedValues[argName] = coerceInputValue(schema, argTypeRef, valueNode, variableValues, scalars)
+		} catch (error) {
+			if (error instanceof InvalidLiteralError) {
+				throw new GraphQLError(`Argument "${argName}" has invalid value ${print(valueNode)}.`, { nodes: valueNode })
+			}
+			throw error
+		}
 	}
 
 	return coercedValues
 }
+
+/** Thrown from within literal coercion and reported as an invalid argument by getArgumentValues */
+class InvalidLiteralError extends Error {}
 
 /**
  * Coerce input value from AST
@@ -166,7 +176,12 @@ function coerceInputValue(
 		case TypeKind.SCALAR: {
 			const scalar = scalars[typeName]
 			if (scalar) {
-				return scalar.parseLiteral(valueNode, variableValues)
+				const parsed = scalar.parseLiteral(valueNode, variableValues)
+				// as in graphql-js valueFromAST, a parser signals an invalid literal by returning undefined
+				if (parsed === undefined) {
+					throw new InvalidLiteralError()
+				}
+				return parsed
 			}
 			return valueFromASTUntyped(valueNode, variableValues)
 		}
@@ -334,7 +349,7 @@ export function coerceVariableValues(
 			varTypeRef,
 			value,
 			scalars,
-			[`$${varName}`],
+			[varName],
 			(error) => errors.push(error),
 		)
 
@@ -350,6 +365,18 @@ export function coerceVariableValues(
 	return coercedValues
 }
 
+/** Variable name followed by the field names and list indices leading to a nested value */
+type VariablePath = readonly [variableName: string, ...keys: (string | number)[]]
+
+/**
+ * Variable coercion error in the graphql-js format
+ */
+function invalidVariableValue(path: VariablePath, value: unknown, message: string): GraphQLError {
+	const [variableName, ...keys] = path
+	const location = keys.length > 0 ? ` at "${variableName}${keys.map(key => (typeof key === 'number' ? `[${key}]` : `.${key}`)).join('')}"` : ''
+	return new GraphQLError(`Variable "$${variableName}" got invalid value ${inspect(value)}${location}; ${message}`)
+}
+
 /**
  * Coerce an input value from a runtime JavaScript value (not AST)
  */
@@ -358,7 +385,7 @@ function coerceInputValueFromVariable(
 	typeRef: TypeRef,
 	value: unknown,
 	scalars: ScalarMap,
-	path: readonly string[],
+	path: VariablePath,
 	onError: (error: GraphQLError) => void,
 ): unknown {
 	const pattern = typeRef[0]
@@ -367,11 +394,7 @@ function coerceInputValueFromVariable(
 	// Handle NonNull
 	if (isNonNullType(pattern)) {
 		if (value === null || value === undefined) {
-			onError(
-				new GraphQLError(
-					`Expected non-nullable type "${formatTypeRef(typeRef)}" not to be null at "${path.join('.')}".`,
-				),
-			)
+			onError(invalidVariableValue(path, value, `Expected non-nullable type "${formatTypeRef(typeRef)}" not to be null.`))
 			return undefined
 		}
 		const innerPattern = unwrapNonNull(pattern)
@@ -392,7 +415,7 @@ function coerceInputValueFromVariable(
 		if (isIterableObject(value) && typeof value !== 'string') {
 			return Array.from(
 				value as Iterable<unknown>,
-				(item, index) => coerceInputValueFromVariable(schema, innerTypeRef, item, scalars, [...path, String(index)], onError),
+				(item, index) => coerceInputValueFromVariable(schema, innerTypeRef, item, scalars, [...path, index], onError),
 			)
 		}
 
@@ -417,17 +440,18 @@ function coerceInputValueFromVariable(
 				// No scalar implementation - pass through
 				return value
 			}
+			let parsed: unknown
 			try {
-				return scalar.parseValue(value)
+				parsed = scalar.parseValue(value)
 			} catch (error) {
-				onError(
-					new GraphQLError(
-						`Variable "${path[0]}" got invalid value ${inspect(value)} at "${path.join('.')}"; `
-							+ `Expected type "${typeName}". ${(error as Error).message}`,
-					),
-				)
+				onError(invalidVariableValue(path, value, `Expected type "${typeName}". ${error instanceof Error ? error.message : String(error)}`))
 				return undefined
 			}
+			// as in graphql-js, a parser signals an invalid value by returning undefined
+			if (parsed === undefined) {
+				onError(invalidVariableValue(path, value, `Expected type "${typeName}".`))
+			}
+			return parsed
 		}
 
 		case TypeKind.ENUM: {
@@ -435,23 +459,13 @@ function coerceInputValueFromVariable(
 			const enumType = type as EnumType
 			const values = enumType[1]
 			if (typeof value !== 'string') {
-				onError(
-					new GraphQLError(
-						`Variable "${path[0]}" got invalid value ${inspect(value)} at "${path.join('.')}"; `
-							+ `Enum "${typeName}" cannot represent non-string value.`,
-					),
-				)
+				onError(invalidVariableValue(path, value, `Enum "${typeName}" cannot represent non-string value.`))
 				return undefined
 			}
 			const enumValue = values[value]
 			if (!enumValue) {
 				const validValues = Object.keys(values).join(', ')
-				onError(
-					new GraphQLError(
-						`Variable "${path[0]}" got invalid value ${inspect(value)} at "${path.join('.')}"; `
-							+ `Value "${value}" does not exist in "${typeName}" enum. Valid values: ${validValues}.`,
-					),
-				)
+				onError(invalidVariableValue(path, value, `Value "${value}" does not exist in "${typeName}" enum. Valid values: ${validValues}.`))
 				return undefined
 			}
 			// Return internal value if defined, otherwise the enum name
@@ -466,12 +480,7 @@ function coerceInputValueFromVariable(
 			const isOneOf = inputType[2]
 
 			if (!isObjectLike(value) || Array.isArray(value)) {
-				onError(
-					new GraphQLError(
-						`Variable "${path[0]}" got invalid value ${inspect(value)} at "${path.join('.')}"; `
-							+ `Expected type "${typeName}" to be an object.`,
-					),
-				)
+				onError(invalidVariableValue(path, value, `Expected type "${typeName}" to be an object.`))
 				return undefined
 			}
 
@@ -481,7 +490,7 @@ function coerceInputValueFromVariable(
 			// Process defined fields
 			for (const [fieldName, fieldDef] of Object.entries(fields)) {
 				const fieldValue = inputValue[fieldName]
-				const fieldPath = [...path, fieldName]
+				const fieldPath: VariablePath = [...path, fieldName]
 				// InputField: [typeRef, defaultValue?, description?]
 				const fieldTypeRef = IF.type(fieldDef)
 				const fieldDefaultValue = IF.defaultValue(fieldDef)
@@ -490,12 +499,7 @@ function coerceInputValueFromVariable(
 					if (fieldDefaultValue !== undefined) {
 						coercedObj[fieldName] = fieldDefaultValue
 					} else if (isNonNullType(fieldTypeRef[0])) {
-						onError(
-							new GraphQLError(
-								`Variable "${path[0]}" got invalid value at "${path.join('.')}"; `
-									+ `Field "${fieldName}" of required type "${formatTypeRef(fieldTypeRef)}" was not provided.`,
-							),
-						)
+						onError(invalidVariableValue(path, inputValue, `Field "${fieldName}" of required type "${formatTypeRef(fieldTypeRef)}" was not provided.`))
 					}
 					continue
 				}
@@ -513,12 +517,7 @@ function coerceInputValueFromVariable(
 			// Check for unknown fields
 			for (const fieldName of Object.keys(inputValue)) {
 				if (!(fieldName in fields)) {
-					onError(
-						new GraphQLError(
-							`Variable "${path[0]}" got invalid value at "${path.join('.')}"; `
-								+ `Field "${fieldName}" is not defined by type "${typeName}".`,
-						),
-					)
+					onError(invalidVariableValue(path, inputValue, `Field "${fieldName}" is not defined by type "${typeName}".`))
 				}
 			}
 
@@ -526,19 +525,9 @@ function coerceInputValueFromVariable(
 			if (isOneOf) {
 				const providedKeys = Object.keys(inputValue)
 				if (providedKeys.length !== 1) {
-					onError(
-						new GraphQLError(
-							`Variable "${path[0]}" got invalid value at "${path.join('.')}"; `
-								+ `Exactly one key must be specified for OneOf type "${typeName}".`,
-						),
-					)
+					onError(invalidVariableValue(path, inputValue, `Exactly one key must be specified for OneOf type "${typeName}".`))
 				} else if (inputValue[providedKeys[0]] === null) {
-					onError(
-						new GraphQLError(
-							`Variable "${path[0]}" got invalid value at "${path.join('.')}"; `
-								+ `Field "${providedKeys[0]}" must be non-null for OneOf type "${typeName}".`,
-						),
-					)
+					onError(invalidVariableValue(path, inputValue, `Field "${providedKeys[0]}" must be non-null for OneOf type "${typeName}".`))
 				}
 			}
 

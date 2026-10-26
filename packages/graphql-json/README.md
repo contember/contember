@@ -37,6 +37,10 @@ const result = await execute({
 
 `execute` also accepts `rootValue`, `variableValues`, `operationName`, `scalars` (custom scalar implementations), `typeResolvers` (per abstract type), `isTypeOfResolvers` (per object type) and `fieldResolver` (fallback, defaults to a property lookup). `executeSync` throws when a resolver returns a promise.
 
+The context type flows from `contextValue` to `resolvers`, `typeResolvers`, `isTypeOfResolvers` and `fieldResolver`: pass a `ResolverMap<MyContext>` together with `contextValue: MyContext`. Resolvers typed for a context cannot be passed without a `contextValue`.
+
+Custom scalars follow the graphql-js contract, so a `GraphQLScalarType` can be passed as a `ScalarImplementation` directly. As in graphql-js, `parseValue` or `parseLiteral` signals an invalid value by throwing or by returning `undefined`.
+
 `getArgumentValues(schema, fieldDef, fieldNode, variableValues, scalars)` coerces the AST arguments of a single field outside execution. Pass `withBuiltInScalars(customScalars)` as `scalars`. Variable values are taken as given, so they must already be coerced.
 
 The schema, `resolvers` and `scalars` objects are treated as immutable: derived data (the schema merged with introspection types, merged resolvers and scalars, a reverse type-name index) is memoized per object.

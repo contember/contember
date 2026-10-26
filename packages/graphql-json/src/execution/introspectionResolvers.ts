@@ -88,20 +88,3 @@ export const introspectionResolvers: ResolverMap = {
 }
 
 export { resolveSchema, resolveType }
-
-const resolversWithIntrospectionCache = new WeakMap<ResolverMap, ResolverMap>()
-
-/**
- * User resolvers merged with introspection resolvers, memoized per `resolvers` object.
- */
-export function getResolversWithIntrospection(resolvers: ResolverMap | undefined): ResolverMap {
-	if (!resolvers) {
-		return introspectionResolvers
-	}
-	let merged = resolversWithIntrospectionCache.get(resolvers)
-	if (!merged) {
-		merged = { ...resolvers, ...introspectionResolvers }
-		resolversWithIntrospectionCache.set(resolvers, merged)
-	}
-	return merged
-}

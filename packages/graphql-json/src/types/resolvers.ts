@@ -2,7 +2,7 @@
  * Resolver type definitions
  */
 
-import type { FieldNode, FragmentDefinitionNode, OperationDefinitionNode } from 'graphql'
+import type { FieldNode, FragmentDefinitionNode, OperationDefinitionNode, ValueNode } from 'graphql'
 import type { Schema, TypeRef } from './schema.js'
 import type { Path } from '../utils/path.js'
 
@@ -89,7 +89,7 @@ export type IsTypeOfResolverMap<TContext = unknown> = {
 export interface ScalarImplementation {
 	serialize: (value: unknown) => unknown
 	parseValue: (value: unknown) => unknown
-	parseLiteral: (ast: unknown, variables?: Record<string, unknown>) => unknown
+	parseLiteral: (valueNode: ValueNode, variables?: Record<string, unknown> | null) => unknown
 }
 
 /**

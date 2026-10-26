@@ -4,18 +4,17 @@
 
 import { GraphQLError, Kind } from 'graphql'
 import type { FragmentDefinitionNode, OperationDefinitionNode } from 'graphql'
-import type { ExecuteArgs, ExecutionContext } from '../types/execution.js'
+import type { ExecuteArgsWithContext, ExecutionContext } from '../types/execution.js'
 import { defaultFieldResolver } from '../types/resolvers.js'
 import { withBuiltInScalars } from '../scalars/builtIn.js'
 import { coerceVariableValues } from './values.js'
 import { getSchemaWithIntrospection } from '../introspection/types.js'
-import { getResolversWithIntrospection } from './introspectionResolvers.js'
 
 /**
  * Type guard for checking if result is errors array
  */
-export function isExecutionContextErrors(
-	result: ExecutionContext | readonly GraphQLError[],
+export function isExecutionContextErrors<TContext>(
+	result: ExecutionContext<TContext> | readonly GraphQLError[],
 ): result is readonly GraphQLError[] {
 	return Array.isArray(result)
 }
@@ -23,9 +22,9 @@ export function isExecutionContextErrors(
 /**
  * Build execution context from arguments
  */
-export function buildExecutionContext(
-	args: ExecuteArgs,
-): ExecutionContext | readonly GraphQLError[] {
+export function buildExecutionContext<TContext>(
+	args: ExecuteArgsWithContext<TContext>,
+): ExecutionContext<TContext> | readonly GraphQLError[] {
 	const {
 		schema,
 		document,
@@ -95,7 +94,7 @@ export function buildExecutionContext(
 		contextValue,
 		operation,
 		variableValues: coercedVariableValues as Record<string, unknown>,
-		resolvers: getResolversWithIntrospection(resolvers),
+		resolvers: resolvers ?? {},
 		typeResolvers: typeResolvers ?? {},
 		isTypeOfResolvers: isTypeOfResolvers ?? {},
 		scalars: mergedScalars,

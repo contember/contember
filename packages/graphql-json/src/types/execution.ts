@@ -10,22 +10,22 @@ import type { GraphQLError } from 'graphql'
 /**
  * Execution context - data available during query execution
  */
-export interface ExecutionContext {
+export interface ExecutionContext<TContext = unknown> {
 	schema: Schema
 	fragments: Record<string, FragmentDefinitionNode>
 	rootValue: unknown
-	contextValue: unknown
+	contextValue: TContext
 	operation: OperationDefinitionNode
 	variableValues: Record<string, unknown>
 
 	// External configuration
-	resolvers: ResolverMap
-	typeResolvers: TypeResolverMap
-	isTypeOfResolvers: IsTypeOfResolverMap
+	resolvers: ResolverMap<TContext>
+	typeResolvers: TypeResolverMap<TContext>
+	isTypeOfResolvers: IsTypeOfResolverMap<TContext>
 	scalars: ScalarMap
 
 	// Fallback resolver
-	fieldResolver: ResolverFn
+	fieldResolver: ResolverFn<unknown, TContext>
 
 	// Error collection
 	errors: GraphQLError[]
@@ -34,16 +34,16 @@ export interface ExecutionContext {
 /**
  * Arguments for execute function
  */
-export interface ExecuteArgs {
+export interface ExecuteArgs<TContext = unknown> {
 	schema: Schema
 	document: DocumentNode
 
 	// External resolvers; types without an entry fall back to fieldResolver
-	resolvers?: ResolverMap
+	resolvers?: ResolverMap<TContext>
 
 	// Optional
 	rootValue?: unknown
-	contextValue?: unknown
+	contextValue?: TContext
 	variableValues?: Record<string, unknown>
 	operationName?: string
 
@@ -51,13 +51,20 @@ export interface ExecuteArgs {
 	scalars?: ScalarMap
 
 	// Type resolvers for Union/Interface
-	typeResolvers?: TypeResolverMap
+	typeResolvers?: TypeResolverMap<TContext>
 
 	// isTypeOf resolvers for concrete types
-	isTypeOfResolvers?: IsTypeOfResolverMap
+	isTypeOfResolvers?: IsTypeOfResolverMap<TContext>
 
 	// Fallback resolver
-	fieldResolver?: ResolverFn
+	fieldResolver?: ResolverFn<unknown, TContext>
+}
+
+/**
+ * Execute arguments whose context value is present, so resolvers typed for `TContext` never receive `undefined`
+ */
+export interface ExecuteArgsWithContext<TContext> extends ExecuteArgs<TContext> {
+	contextValue: TContext
 }
 
 /**

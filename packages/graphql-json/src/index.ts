@@ -65,7 +65,7 @@ export type {
 export { defaultFieldResolver } from './types/resolvers.js'
 
 // Types - Execution
-export type { ExecuteArgs, ExecutionContext, ExecutionResult, FormattedExecutionResult } from './types/execution.js'
+export type { ExecuteArgs, ExecuteArgsWithContext, ExecutionContext, ExecutionResult, FormattedExecutionResult } from './types/execution.js'
 
 // Built-in scalars
 export {

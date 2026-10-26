@@ -4,16 +4,41 @@
 
 import { GraphQLError } from 'graphql'
 import type { FieldNode } from 'graphql'
-import type { ExecuteArgs, ExecutionContext, ExecutionResult } from '../types/execution.js'
+import type { ExecuteArgs, ExecuteArgsWithContext, ExecutionContext, ExecutionResult } from '../types/execution.js'
 import { buildExecutionContext, getOperationRootTypeName, isExecutionContextErrors } from './context.js'
 import { collectFields } from './collectFields.js'
 import { executeFields } from './fields.js'
 import { isPromise, promiseReduce } from '../utils/helpers.js'
 
 /**
- * Execute a GraphQL query
+ * Execute a GraphQL query. Resolvers typed for a context must be given a `contextValue`.
  */
-export function execute(args: ExecuteArgs): ExecutionResult | Promise<ExecutionResult> {
+export function execute(args: ExecuteArgs<undefined>): ExecutionResult | Promise<ExecutionResult>
+export function execute<TContext>(args: ExecuteArgsWithContext<TContext>): ExecutionResult | Promise<ExecutionResult>
+export function execute<TContext>(
+	args: ExecuteArgsWithContext<TContext> | ExecuteArgs<undefined>,
+): ExecutionResult | Promise<ExecutionResult> {
+	return executeEither(args)
+}
+
+function executeEither<TContext>(
+	args: ExecuteArgsWithContext<TContext> | ExecuteArgs<undefined>,
+): ExecutionResult | Promise<ExecutionResult> {
+	if (hasContextValue(args)) {
+		return executeWithContext(args)
+	}
+	return executeWithContext({ ...args, contextValue: undefined })
+}
+
+// Only ExecuteArgsWithContext can carry a defined contextValue. An undefined one taken as ExecuteArgs<undefined> is
+// still passed correctly: if it came from ExecuteArgsWithContext<TContext>, then TContext admits undefined.
+function hasContextValue<TContext>(
+	args: ExecuteArgsWithContext<TContext> | ExecuteArgs<undefined>,
+): args is ExecuteArgsWithContext<TContext> {
+	return args.contextValue !== undefined
+}
+
+function executeWithContext<TContext>(args: ExecuteArgsWithContext<TContext>): ExecutionResult | Promise<ExecutionResult> {
 	// Build execution context
 	const contextOrErrors = buildExecutionContext(args)
 
@@ -57,8 +82,10 @@ export function execute(args: ExecuteArgs): ExecutionResult | Promise<ExecutionR
 /**
  * Execute synchronously (throws if async resolvers encountered)
  */
-export function executeSync(args: ExecuteArgs): ExecutionResult {
-	const result = execute(args)
+export function executeSync(args: ExecuteArgs<undefined>): ExecutionResult
+export function executeSync<TContext>(args: ExecuteArgsWithContext<TContext>): ExecutionResult
+export function executeSync<TContext>(args: ExecuteArgsWithContext<TContext> | ExecuteArgs<undefined>): ExecutionResult {
+	const result = executeEither(args)
 
 	if (isPromise(result)) {
 		throw new Error('GraphQL execution failed to complete synchronously.')
@@ -70,8 +97,8 @@ export function executeSync(args: ExecuteArgs): ExecutionResult {
 /**
  * Execute the operation
  */
-function executeOperation(
-	exeContext: ExecutionContext,
+function executeOperation<TContext>(
+	exeContext: ExecutionContext<TContext>,
 ): Record<string, unknown> | Promise<Record<string, unknown>> | null {
 	const { schema, operation, rootValue } = exeContext
 
@@ -131,8 +158,8 @@ function executeOperation(
 /**
  * Execute fields serially (for mutations)
  */
-function executeFieldsSerially(
-	exeContext: ExecutionContext,
+function executeFieldsSerially<TContext>(
+	exeContext: ExecutionContext<TContext>,
 	parentTypeName: string,
 	sourceValue: unknown,
 	path: undefined,
@@ -163,8 +190,8 @@ function executeFieldsSerially(
 /**
  * Build final response
  */
-function buildResponse(
-	exeContext: ExecutionContext,
+function buildResponse<TContext>(
+	exeContext: ExecutionContext<TContext>,
 	data: Record<string, unknown> | null,
 ): ExecutionResult {
 	const result: ExecutionResult = {}

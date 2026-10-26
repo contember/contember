@@ -106,13 +106,14 @@ export class ValidationContext {
 	getFragmentSpreads(selectionSet: SelectionSetNode): ReadonlyArray<FragmentSpreadNode> {
 		let spreads = this._fragmentSpreads.get(selectionSet)
 		if (!spreads) {
-			spreads = []
+			const collected: FragmentSpreadNode[] = []
+			spreads = collected
 			const setsToVisit: SelectionSetNode[] = [selectionSet]
 			let set: SelectionSetNode | undefined
 			while ((set = setsToVisit.pop())) {
 				for (const selection of set.selections) {
 					if (selection.kind === Kind.FRAGMENT_SPREAD) {
-						;(spreads as FragmentSpreadNode[]).push(selection)
+						collected.push(selection)
 					} else if (selection.selectionSet) {
 						setsToVisit.push(selection.selectionSet)
 					}
@@ -128,7 +129,8 @@ export class ValidationContext {
 	): ReadonlyArray<FragmentDefinitionNode> {
 		let fragments = this._recursivelyReferencedFragments.get(operation)
 		if (!fragments) {
-			fragments = []
+			const collected: FragmentDefinitionNode[] = []
+			fragments = collected
 			const collectedNames = new Set<string>()
 			const nodesToVisit: SelectionSetNode[] = [operation.selectionSet]
 			let node: SelectionSetNode | undefined
@@ -139,7 +141,7 @@ export class ValidationContext {
 						collectedNames.add(fragName)
 						const fragment = this.getFragment(fragName)
 						if (fragment) {
-							;(fragments as FragmentDefinitionNode[]).push(fragment)
+							collected.push(fragment)
 							nodesToVisit.push(fragment.selectionSet)
 						}
 					}

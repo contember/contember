@@ -2,35 +2,10 @@
  * TypeInfo - tracks type information during AST traversal
  * Adapted from graphql-js for compact Schema
  */
-import type {
-	ArgumentNode,
-	ASTNode,
-	ASTVisitor,
-	DirectiveNode,
-	EnumValueNode,
-	FieldNode,
-	FragmentDefinitionNode,
-	InlineFragmentNode,
-	ObjectFieldNode,
-	OperationDefinitionNode,
-	VariableDefinitionNode,
-} from 'graphql'
-import { Kind } from 'graphql'
+import type { ASTNode, ASTVisitor } from 'graphql'
+import { getEnterLeaveForKind, Kind } from 'graphql'
 
-import type {
-	Argument,
-	Directive,
-	EnumType,
-	EnumValue,
-	Field,
-	InputField,
-	InputObjectType,
-	InterfaceType,
-	ObjectType,
-	Schema,
-	Type,
-	TypeRef,
-} from '../types/schema.js'
+import type { Argument, Directive, EnumValue, Field, InputField, Schema, Type, TypeRef } from '../types/schema.js'
 import { A, D, IF, isCompositeType, isEnumType, isInputObjectType, isInterfaceType, isObjectType, TypePattern } from '../types/schema.js'
 import { getListItemType, getTypeName, isListType, isNonNullType, unwrapNonNull } from '../utils/typeRef.js'
 import { typeFromAST } from './typeFromAST.js'
@@ -151,7 +126,7 @@ export class TypeInfo {
 				let fieldTypeRef: Maybe<TypeRef>
 
 				if (parentType) {
-					fieldDef = this._getFieldDef(parentType, this.getParentTypeName(), (node as FieldNode).name.value)
+					fieldDef = this._getFieldDef(parentType, this.getParentTypeName(), node.name.value)
 					if (fieldDef) {
 						// Field: [typeRef, args, description?, deprecationReason?]
 						fieldTypeRef = fieldDef[0]
@@ -163,9 +138,8 @@ export class TypeInfo {
 			}
 
 			case Kind.OPERATION_DEFINITION: {
-				const operationNode = node as OperationDefinitionNode
 				let rootTypeName: string | null = null
-				switch (operationNode.operation) {
+				switch (node.operation) {
 					case 'query':
 						rootTypeName = schema.q
 						break
@@ -176,10 +150,9 @@ export class TypeInfo {
 						rootTypeName = schema.s
 						break
 				}
-				const rootType = rootTypeName ? schema.t[rootTypeName] : undefined
 				// TypeRef: [pattern, typeName]
-				const typeRef: Maybe<TypeRef> = rootType
-					? [TypePattern.T, rootTypeName!]
+				const typeRef: Maybe<TypeRef> = rootTypeName && schema.t[rootTypeName]
+					? [TypePattern.T, rootTypeName]
 					: undefined
 				this._typeStack.push(typeRef)
 				break
@@ -187,8 +160,7 @@ export class TypeInfo {
 
 			case Kind.INLINE_FRAGMENT:
 			case Kind.FRAGMENT_DEFINITION: {
-				const fragmentNode = node as InlineFragmentNode | FragmentDefinitionNode
-				const typeConditionAST = fragmentNode.typeCondition
+				const typeConditionAST = node.typeCondition
 				let outputTypeRef: Maybe<TypeRef>
 
 				if (typeConditionAST) {
@@ -202,14 +174,12 @@ export class TypeInfo {
 			}
 
 			case Kind.VARIABLE_DEFINITION: {
-				const varDefNode = node as VariableDefinitionNode
-				const inputTypeRef = typeFromAST(varDefNode.type)
+				const inputTypeRef = typeFromAST(node.type)
 				this._inputTypeStack.push(inputTypeRef)
 				break
 			}
 
 			case Kind.ARGUMENT: {
-				const argNode = node as ArgumentNode
 				let argDef: Maybe<Argument>
 				let argTypeRef: Maybe<TypeRef>
 
@@ -219,11 +189,11 @@ export class TypeInfo {
 				if (directive) {
 					// Directive: [args, locations, isRepeatable?, description?]
 					const args = D.args(directive)
-					argDef = args?.[argNode.name.value]
+					argDef = args?.[node.name.value]
 				} else if (fieldDef) {
 					// Field: [typeRef, args, description?, deprecationReason?]
 					const args = fieldDef[1]
-					argDef = args?.[argNode.name.value]
+					argDef = args?.[node.name.value]
 				}
 
 				if (argDef) {
@@ -252,7 +222,6 @@ export class TypeInfo {
 			}
 
 			case Kind.OBJECT_FIELD: {
-				const objectFieldNode = node as ObjectFieldNode
 				const objectTypeName = this._getNamedTypeFromTypeRef(this.getInputType())
 				const objectType = objectTypeName ? schema.t[objectTypeName] : undefined
 				let inputFieldDef: Maybe<InputField>
@@ -260,8 +229,8 @@ export class TypeInfo {
 
 				if (objectType && isInputObjectType(objectType)) {
 					// InputObjectType: [kind, fields, isOneOf?, description?]
-					const fields = (objectType as InputObjectType)[1]
-					inputFieldDef = fields[objectFieldNode.name.value]
+					const fields = objectType[1]
+					inputFieldDef = fields[node.name.value]
 					if (inputFieldDef) {
 						// InputField: [typeRef, defaultValue?, description?]
 						inputFieldTypeRef = IF.type(inputFieldDef)
@@ -273,23 +242,21 @@ export class TypeInfo {
 			}
 
 			case Kind.ENUM: {
-				const enumNode = node as EnumValueNode
 				const enumTypeName = this._getNamedTypeFromTypeRef(this.getInputType())
 				const enumType = enumTypeName ? schema.t[enumTypeName] : undefined
 				let enumValue: Maybe<EnumValue>
 
 				if (enumType && isEnumType(enumType)) {
 					// EnumType: [kind, values, description?]
-					const values = (enumType as EnumType)[1]
-					enumValue = values[enumNode.value]
+					const values = enumType[1]
+					enumValue = values[node.value]
 				}
 				this._enumValue = enumValue
 				break
 			}
 
 			case Kind.DIRECTIVE: {
-				const directiveNode = node as DirectiveNode
-				const directiveName = directiveNode.name.value
+				const directiveName = node.name.value
 				// Check schema directives first, then fall back to built-in directives
 				const directive = schema.d?.[directiveName] ?? BUILT_IN_DIRECTIVES[directiveName]
 				this._directive = directive ?? null
@@ -371,7 +338,7 @@ export class TypeInfo {
 		if (isObjectType(parentType) || isInterfaceType(parentType)) {
 			// ObjectType: [kind, fields, interfaces, description?]
 			// InterfaceType: [kind, fields, interfaces, possibleTypes, description?]
-			const fields = (parentType as ObjectType | InterfaceType)[1]
+			const fields = parentType[1]
 			return fields[fieldName]
 		}
 
@@ -435,27 +402,6 @@ export function visitWithTypeInfo(typeInfo: TypeInfo, visitor: ASTVisitor): ASTV
 			typeInfo.leave(node)
 			return result
 		},
-	}
-}
-
-/**
- * Get enter/leave functions for a given node kind
- */
-function getEnterLeaveForKind(
-	visitor: ASTVisitor,
-	kind: string,
-): { enter?: (...args: unknown[]) => unknown; leave?: (...args: unknown[]) => unknown } {
-	const kindVisitor = (visitor as Record<string, unknown>)[kind]
-
-	if (typeof kindVisitor === 'object' && kindVisitor !== null) {
-		return kindVisitor as { enter?: (...args: unknown[]) => unknown; leave?: (...args: unknown[]) => unknown }
-	} else if (typeof kindVisitor === 'function') {
-		return { enter: kindVisitor as (...args: unknown[]) => unknown }
-	}
-
-	return {
-		enter: (visitor as { enter?: (...args: unknown[]) => unknown }).enter,
-		leave: (visitor as { leave?: (...args: unknown[]) => unknown }).leave,
 	}
 }
 

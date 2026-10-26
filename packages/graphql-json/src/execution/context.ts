@@ -39,38 +39,30 @@ export function buildExecutionContext<TContext>(
 		fieldResolver,
 	} = args
 
-	// Extract fragments and operations from document
+	// Extract fragments and select the operation the same way graphql-js does
 	const fragments: Record<string, FragmentDefinitionNode> = {}
-	const operations: OperationDefinitionNode[] = []
+	let operation: OperationDefinitionNode | undefined
 
 	for (const definition of document.definitions) {
 		if (definition.kind === Kind.OPERATION_DEFINITION) {
-			operations.push(definition)
+			if (operationName == null) {
+				if (operation !== undefined) {
+					return [new GraphQLError('Must provide operation name if query contains multiple operations.')]
+				}
+				operation = definition
+			} else if (definition.name?.value === operationName) {
+				operation = definition
+			}
 		} else if (definition.kind === Kind.FRAGMENT_DEFINITION) {
 			fragments[definition.name.value] = definition
 		}
 	}
 
-	// Select operation
-	let operation: OperationDefinitionNode | undefined
-
-	if (operationName) {
-		operation = operations.find((op) => op.name?.value === operationName)
-		if (!operation) {
-			return [
-				new GraphQLError(`Unknown operation named "${operationName}".`),
-			]
+	if (!operation) {
+		if (operationName != null) {
+			return [new GraphQLError(`Unknown operation named "${operationName}".`)]
 		}
-	} else if (operations.length === 1) {
-		operation = operations[0]
-	} else if (operations.length === 0) {
 		return [new GraphQLError('Must provide an operation.')]
-	} else {
-		return [
-			new GraphQLError(
-				'Must provide operation name if query contains multiple operations.',
-			),
-		]
 	}
 
 	const mergedScalars = withBuiltInScalars(scalars)

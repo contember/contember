@@ -38,6 +38,10 @@ const addProjectMemberMutation = `mutation($projectSlug: String!, $identityId: S
 	addProjectMember(projectSlug: $projectSlug, identityId: $identityId, memberships: $memberships) { ok error { code } }
 }`
 
+const createProjectMutation = `mutation($projectSlug: String!) {
+	createProject(projectSlug: $projectSlug) { ok error { code } result { deployerApiKey { token } } }
+}`
+
 const fetchSuccessRows = async (identityId: string) => {
 	const response = await executeGraphql('/tenant', authLogQuery, {
 		variables: { filter: { types: ['workload_auth_success'], invokedByIdentityId: identityId } },
@@ -253,6 +257,35 @@ test('workload identity: no side channel to the trust identity and no trust mana
 		// the refused disable left the trust working
 		await tester(listArticles, { authorizationToken: workloadToken })
 			.expect(200)
+	} finally {
+		await disableTrust(slug)
+		await issuer.close()
+	}
+})
+
+test('workload identity: a project created through a trust adds no membership to the trust identity', async () => {
+	const { issuer, jwksUri, mintToken } = await startTestIssuer()
+	const slug = `e2e-${rand()}`
+	const audience = `contember:e2e:${slug}`
+	const subject = `creator-${rand()}`
+	const projectSlug = `e2e_wi_${rand()}`
+	try {
+		await applyTrust(slug, {
+			profile: 'oidc',
+			issuer: issuer.issuer,
+			audience,
+			jwksUri,
+			conditions: [{ claim: 'sub', equals: subject }],
+			roles: ['project_creator'],
+		})
+		const workloadToken = await mintToken({ sub: subject, aud: audience })
+
+		const created = await executeGraphql('/tenant', createProjectMutation, { authorizationToken: workloadToken, variables: { projectSlug } })
+		expect(created.body.data.createProject.ok).toBe(true)
+		expect(created.body.data.createProject.result.deployerApiKey.token).toEqual(expect.any(String))
+
+		const me = await executeGraphql('/tenant', `query { me { projects { project { slug } } } }`, { authorizationToken: workloadToken })
+		expect(me.body.data.me.projects).toStrictEqual([])
 	} finally {
 		await disableTrust(slug)
 		await issuer.close()

@@ -41,7 +41,8 @@ export class CreateProjectMutationResolver implements MutationResolvers {
 				secrets: Object.fromEntries((secrets || []).map(it => [it.key, it.value])),
 			},
 			{
-				ownerIdentityId: isSuperAdmin ? undefined : context.identity.id,
+				// a trust's memberships come only from its applied definition (§6a); it deploys with the returned key
+				ownerIdentityId: isSuperAdmin || context.credential.type === 'workload_trust' ? undefined : context.identity.id,
 				deployTokenHash,
 				noDeployToken: options?.noDeployToken ?? false,
 			},

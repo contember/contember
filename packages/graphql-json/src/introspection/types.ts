@@ -272,11 +272,17 @@ export function isIntrospectionType(typeName: string): boolean {
 
 const schemaWithIntrospectionCache = new WeakMap<Schema, Schema>()
 
+const includesIntrospectionTypes = (schema: Schema): boolean => Object.entries(introspectionTypes).every(([name, type]) => schema.t[name] === type)
+
 /**
  * Get the schema with introspection types merged in, memoized per `schema` object.
+ * A schema that already holds them is returned as is, so it needs no per-schema copy of its type map.
  * The schema is treated as immutable once passed in.
  */
 export function getSchemaWithIntrospection(schema: Schema): Schema {
+	if (includesIntrospectionTypes(schema)) {
+		return schema
+	}
 	let merged = schemaWithIntrospectionCache.get(schema)
 	if (!merged) {
 		merged = {

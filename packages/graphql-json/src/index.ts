@@ -96,6 +96,7 @@ export {
 } from './utils/typeRef.js'
 
 export { addPath, type Path, pathToArray } from './utils/path.js'
+export { SchemaInterner } from './utils/schemaInterner.js'
 
 // Validation
 export { validate, type ValidateOptions } from './validation/validate.js'

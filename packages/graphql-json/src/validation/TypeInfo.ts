@@ -214,8 +214,10 @@ export class TypeInfo {
 					// Get inner type pattern
 					const innerPattern = getListItemType(listTypeRef[0])
 					itemTypeRef = [innerPattern, listTypeRef[1]]
+				} else {
+					// as in graphql-js, items of a list in a non-list position are typed as the position itself
+					itemTypeRef = listTypeRef
 				}
-				// List is semantically correct if item type is undefined
 				this._defaultValueStack.push(undefined)
 				this._inputTypeStack.push(itemTypeRef)
 				break

@@ -4,10 +4,15 @@ import { acceptFieldVisitor, getField } from '@contember/schema-utils'
 import { getFieldReadPredicate, SelectExecutionHandler, SelectExecutionHandlerContext } from '../../mapper/index.js'
 import { ImplementationException } from '../../exception.js'
 import { UniqueWhereExpander } from '../../inputProcessing/index.js'
-import { HasManyToHasOneReducerExtension } from './HasManyToHasOneReducer.js'
 import { PredicateFactory } from '../../acl/index.js'
 
+export interface HasManyToHasOneReducerExtension {
+	relationName: string
+}
+
 export class HasManyToHasOneReducerExecutionHandler implements SelectExecutionHandler<Input.UniqueQueryInput, HasManyToHasOneReducerExtension> {
+	static extensionName: string = 'HasManyToHasOneReducer'
+
 	constructor(
 		private readonly schema: Model.Schema,
 		private readonly uniqueWhereExpander: UniqueWhereExpander,

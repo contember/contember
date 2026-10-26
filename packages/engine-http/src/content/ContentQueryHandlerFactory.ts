@@ -1,14 +1,7 @@
 import { execute, validate } from '@contember/graphql-json'
-import {
-	createDbQueriesListener,
-	createGraphQLJsExecutor,
-	createGraphQLQueryHandler,
-	GraphQLExecutor,
-	GraphQLListener,
-	GraphQLQueryHandler,
-} from '../graphql/index.js'
+import { JsonContentSchema } from '@contember/engine-content-api'
+import { createDbQueriesListener, createGraphQLQueryHandler, GraphQLExecutor, GraphQLListener, GraphQLQueryHandler } from '../graphql/index.js'
 import { ContentGraphqlContext } from './ContentGraphqlContext.js'
-import { ContentGraphQLSchema } from './GraphQlSchemaFactory.js'
 import { createTriggeredActionsListener } from './triggeredActionsListener.js'
 
 export type ContentQueryHandler = GraphQLQueryHandler<ContentGraphqlContext>
@@ -16,7 +9,7 @@ export type ContentQueryHandler = GraphQLQueryHandler<ContentGraphqlContext>
 export class ContentQueryHandlerFactory {
 	constructor(private readonly debug: boolean) {}
 
-	public create(graphQlSchema: ContentGraphQLSchema): ContentQueryHandler {
+	public create(graphQlSchema: JsonContentSchema): ContentQueryHandler {
 		const listeners: GraphQLListener<ContentGraphqlContext>[] = []
 		listeners.push(createDbQueriesListener(context => context.db, this.debug))
 		listeners.push(createTriggeredActionsListener())
@@ -28,13 +21,9 @@ export class ContentQueryHandlerFactory {
 		})
 	}
 
-	private createExecutor(graphQlSchema: ContentGraphQLSchema): GraphQLExecutor<ContentGraphqlContext> {
-		if (graphQlSchema.engine === 'graphql-js') {
-			return createGraphQLJsExecutor(graphQlSchema.schema)
-		}
-		const { schema, resolvers, scalars } = graphQlSchema.schema
+	private createExecutor({ schema, resolvers, scalars }: JsonContentSchema): GraphQLExecutor<ContentGraphqlContext> {
 		return {
-			// the JSON builder is checked against the graphql-js one in tests; there is no runtime schema validation
+			// the builder output is validated as a graphql-js schema in tests; there is no runtime schema validation
 			validateSchema: () => [],
 			validate: document => validate(schema, document, { scalars }),
 			execute: async ({ document, operationName, variableValues, contextValue }) =>

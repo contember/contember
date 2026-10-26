@@ -1,15 +1,17 @@
 import { FieldNode as GraphQlFieldNode, Kind, SelectionSetNode } from 'graphql'
 import { getArgumentValues, InterfaceType, ObjectType, ResolveInfo, ScalarMap, Schema, TypeKind } from '@contember/graphql-json'
 import { FieldNode, ObjectNode } from '../inputProcessing/index.js'
-import { GraphQlQueryAstFactory, NodeFilter } from '../resolvers/GraphQlQueryAstFactory.js'
+import { isDeepStrictEqual } from 'node:util'
 import { ResolveInfoUtils } from '../utils/index.js'
 import { FieldExtensions } from './JsonTypeRegistry.js'
 
 type AnyNode = ObjectNode | FieldNode
 
+export type NodeFilter = (node: GraphQlFieldNode, path: string[]) => boolean
+
 /**
- * JSON-schema counterpart of `GraphQlQueryAstFactory`: turns the resolved field into Contember's query tree.
- * The schema comes from the resolve info, so one factory serves every role schema of a model.
+ * Turns the resolved field into Contember's query tree. The schema comes from the resolve info, so one factory
+ * serves every role schema of a model.
  */
 export class JsonQueryAstFactory {
 	constructor(
@@ -87,7 +89,7 @@ export class JsonQueryAstFactory {
 				throw new Error('InlineFragment are not supported yet')
 			}
 		}
-		return GraphQlQueryAstFactory.mergeFieldList(fields)
+		return mergeFieldList(fields)
 	}
 
 	private getCompositeType(schema: Schema, typeName: string): ObjectType | InterfaceType {
@@ -97,4 +99,30 @@ export class JsonQueryAstFactory {
 		}
 		return type
 	}
+}
+
+const mergeFieldList = (nodes: AnyNode[]): AnyNode[] => {
+	const result: Record<string, AnyNode> = {}
+	for (const node of nodes) {
+		const existing = result[node.alias]
+		result[node.alias] = existing ? mergeFields(existing, node) : node
+	}
+	return Object.values(result)
+}
+
+const mergeFields = (left: AnyNode, right: AnyNode): AnyNode => {
+	if (left.constructor !== right.constructor) {
+		throw new Error(`JsonQueryAstFactory: cannot merge ${left.constructor.name} and ${right.constructor.name}`)
+	}
+	if (left.name !== right.name) {
+		throw new Error(`JsonQueryAstFactory: incompatible fields ${left.name} and ${right.name}`)
+	}
+	if (left instanceof ObjectNode && right instanceof ObjectNode) {
+		if (!isDeepStrictEqual(left.args, right.args)) {
+			throw new Error(`JsonQueryAstFactory: incompatible args`)
+		}
+		const fields = mergeFieldList([...left.fields, ...right.fields])
+		return new ObjectNode(left.name, left.alias, fields, left.args, left.extensions, left.path)
+	}
+	return left
 }

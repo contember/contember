@@ -9,6 +9,7 @@ import { filterObject } from '../utils/index.js'
 import { aliasAwareResolver, GqlTypeName } from './utils.js'
 import { ResultSchemaTypeProvider } from './ResultSchemaTypeProvider.js'
 import { ExtensionKey, Operation, OperationMeta } from './OperationExtension.js'
+import { mutationResultQueryAstFilter } from '../resolvers/MutationResolver.js'
 
 type FieldConfig<TArgs> = GraphQLFieldConfig<any, Context, TArgs>
 
@@ -64,7 +65,10 @@ export class MutationProvider {
 					if (parent && info.path) {
 						return parent[info.path.key]
 					}
-					return context.executionContainer.mutationResolver.resolveCreate(entity, info)
+					return context.executionContainer.mutationResolver.resolveCreate(
+						entity,
+						context.executionContainer.queryAstFactory.create(info, mutationResultQueryAstFilter),
+					)
 				})
 			},
 		}
@@ -98,7 +102,10 @@ export class MutationProvider {
 					if (parent && info.path) {
 						return parent[info.path.key]
 					}
-					return context.executionContainer.mutationResolver.resolveDelete(entity, info)
+					return context.executionContainer.mutationResolver.resolveDelete(
+						entity,
+						context.executionContainer.queryAstFactory.create(info, mutationResultQueryAstFilter),
+					)
 				})
 			},
 		}
@@ -135,7 +142,10 @@ export class MutationProvider {
 					if (parent && info.path) {
 						return parent[info.path.key]
 					}
-					return context.executionContainer.mutationResolver.resolveUpdate(entity, info)
+					return context.executionContainer.mutationResolver.resolveUpdate(
+						entity,
+						context.executionContainer.queryAstFactory.create(info, mutationResultQueryAstFilter),
+					)
 				})
 			},
 		}
@@ -181,7 +191,10 @@ export class MutationProvider {
 					if (parent && info.path) {
 						return parent[info.path.key]
 					}
-					return context.executionContainer.mutationResolver.resolveUpsert(entity, info)
+					return context.executionContainer.mutationResolver.resolveUpsert(
+						entity,
+						context.executionContainer.queryAstFactory.create(info, mutationResultQueryAstFilter),
+					)
 				})
 			},
 		}

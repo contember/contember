@@ -4,7 +4,6 @@ import { ObjectNode } from '../inputProcessing/index.js'
 import { assertNever, createPaginationHelper } from '../utils/index.js'
 import { ImplementationException } from '../exception.js'
 import { Operation, readOperationMeta } from '../schema/index.js'
-import { GraphQLFieldMap } from 'graphql'
 
 export const paginate = async (
 	mapper: Mapper,
@@ -22,7 +21,6 @@ export const paginate = async (
 
 export const executeReadOperations = async (
 	queryAst: ObjectNode,
-	fields: GraphQLFieldMap<any, any>,
 	mapper: Mapper,
 ): Promise<Record<string, any>> => {
 	const trxResult: Record<string, any> = {}
@@ -32,8 +30,7 @@ export const executeReadOperations = async (
 		if (!(field instanceof ObjectNode)) {
 			throw new ImplementationException()
 		}
-		const fieldConfig = fields[field.name]
-		const meta = readOperationMeta(fieldConfig.extensions)
+		const meta = readOperationMeta(field.extensions)
 		trxResult[field.alias] = await (() => {
 			switch (meta.operation) {
 				case Operation.get:

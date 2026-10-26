@@ -14,8 +14,7 @@ import {
 	tryMutation,
 } from '../mapper/index.js'
 import { ValidationResolver } from './ValidationResolver.js'
-import { GraphQLResolveInfo } from 'graphql'
-import { GraphQlQueryAstFactory } from './GraphQlQueryAstFactory.js'
+import { FieldNode as GraphQlFieldNode } from 'graphql'
 import { ImplementationException } from '../exception.js'
 import { DatabaseMetadata, RequestMemoryBudgetExceededError, retryTransaction } from '@contember/database'
 import { Operation, readOperationMeta } from '../schema/index.js'
@@ -34,7 +33,18 @@ type MemoryBudgetFailure = {
 	errorMessage: string
 }
 
-type TransactionOptions = {
+/** Selects the fields of `mutation { transaction { … } }` that are resolved from the database. */
+export const transactionQueryAstFilter = (node: GraphQlFieldNode, path: string[]): boolean =>
+	(path.length === 1 && !['ok', 'validation', 'errorMessage', 'errors'].includes(node.name.value))
+	|| (path.length === 2 && node.name.value === 'node')
+	|| path.length > 2
+	|| path.length === 0
+	|| (path.length > 1 && path[1] === 'query')
+
+/** Selects the fields of a single mutation result that are resolved from the database. */
+export const mutationResultQueryAstFilter = (node: GraphQlFieldNode, path: string[]): boolean => path.length !== 1 || node.name.value === 'node'
+
+export type TransactionOptions = {
 	deferForeignKeyConstraints?: boolean
 	deferUniqueConstraints?: boolean
 }
@@ -44,21 +54,11 @@ export class MutationResolver {
 		private readonly schema: Model.Schema,
 		private readonly mapperFactory: MapperFactory,
 		private readonly inputValidator: InputPreValidator,
-		private readonly graphqlQueryAstFactory: GraphQlQueryAstFactory,
 		private readonly schemaDatabaseMetadata: DatabaseMetadata,
 	) {}
 
-	public async resolveTransaction(info: GraphQLResolveInfo, options: TransactionOptions): Promise<Result.TransactionResult> {
-		const queryAst = this.graphqlQueryAstFactory.create(info, (node, path) => {
-			return (
-				(path.length === 1 && !['ok', 'validation', 'errorMessage', 'errors'].includes(node.name.value))
-				|| (path.length === 2 && node.name.value === 'node')
-				|| path.length > 2
-				|| path.length === 0
-				|| (path.length > 1 && path[1] === 'query')
-			)
-		})
-		const fields = GraphQlQueryAstFactory.resolveObjectType(info.returnType).getFields()
+	/** `queryAst` must be created with `transactionQueryAstFilter`. */
+	public async resolveTransaction(queryAst: ObjectNode, options: TransactionOptions): Promise<Result.TransactionResult> {
 		const mutationFields = queryAst.fields.filter(field => field.name !== 'query' && field.name !== '__typename')
 
 		const prefixErrors = <T extends { path: Result.PathFragment[]; paths?: Result.PathFragment[][] }>(
@@ -91,11 +91,7 @@ export class MutationResolver {
 				if (!(field instanceof ObjectNode)) {
 					throw new ImplementationException()
 				}
-				const fieldConfig = fields[field.name]
-				if (!fieldConfig) {
-					throw new ImplementationException()
-				}
-				const meta = readOperationMeta(fieldConfig.extensions)
+				const meta = readOperationMeta(field.extensions)
 
 				const result: Result.ValidationResult | null = await (() => {
 					switch (meta.operation) {
@@ -149,20 +145,12 @@ export class MutationResolver {
 				if (!(field instanceof ObjectNode)) {
 					throw new ImplementationException()
 				}
-				const fieldConfig = fields[field.name]
-				if (!fieldConfig) {
-					throw new ImplementationException()
-				}
 				if (field.name === 'query') {
-					trxResult[field.alias] = await executeReadOperations(
-						field,
-						GraphQlQueryAstFactory.resolveObjectType(fieldConfig.type).getFields(),
-						mapper,
-					)
+					trxResult[field.alias] = await executeReadOperations(field, mapper)
 					continue
 				}
 
-				const meta = readOperationMeta(fieldConfig.extensions)
+				const meta = readOperationMeta(field.extensions)
 				logger.debug('MutationResolver: Resolving a field', { field: field.alias })
 				const result: {
 					ok: boolean
@@ -229,9 +217,8 @@ export class MutationResolver {
 
 	public async resolveUpdate(
 		entity: Model.Entity,
-		info: GraphQLResolveInfo,
+		queryAst: ObjectNode,
 	): Promise<WithoutNode<Result.UpdateResult>> {
-		const queryAst = this.createQueryAst(info)
 		return this.transaction(async mapper => {
 			const validation = await this.validateUpdate(mapper, entity, queryAst)
 			if (validation !== null) {
@@ -286,9 +273,8 @@ export class MutationResolver {
 
 	public async resolveCreate(
 		entity: Model.Entity,
-		info: GraphQLResolveInfo,
+		queryAst: ObjectNode,
 	): Promise<WithoutNode<Result.CreateResult>> {
-		const queryAst = this.createQueryAst(info)
 		return this.transaction(async mapper => {
 			const validation = await this.validateCreate(mapper, entity, queryAst)
 			if (validation !== null) {
@@ -347,9 +333,8 @@ export class MutationResolver {
 
 	public async resolveUpsert(
 		entity: Model.Entity,
-		info: GraphQLResolveInfo,
+		queryAst: ObjectNode,
 	): Promise<WithoutNode<Result.UpsertResult>> {
-		const queryAst = this.createQueryAst(info)
 		return this.transaction(async mapper => {
 			const validation = await this.validateUpsert(mapper, entity, queryAst)
 			if (validation !== null) {
@@ -423,9 +408,8 @@ export class MutationResolver {
 
 	public async resolveDelete(
 		entity: Model.Entity,
-		info: GraphQLResolveInfo,
+		queryAst: ObjectNode,
 	): Promise<WithoutNode<Result.DeleteResult>> {
-		const queryAst = this.createQueryAst(info)
 		return this.transaction(async mapper => {
 			return await this.resolveDeleteInternal(mapper, entity, queryAst)
 		})
@@ -450,13 +434,6 @@ export class MutationResolver {
 			const errors = this.convertResultToErrors(result)
 			return { ok: false, errors, errorMessage: this.stringifyExecutionErrors(errors) }
 		}
-	}
-
-	private createQueryAst(info: GraphQLResolveInfo) {
-		const queryAst = this.graphqlQueryAstFactory.create(info, (node, path) => {
-			return path.length !== 1 || node.name.value === 'node'
-		})
-		return queryAst
 	}
 
 	private async resolveResultNodes(

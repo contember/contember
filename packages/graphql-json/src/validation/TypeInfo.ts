@@ -34,7 +34,6 @@ import type {
 import { A, D, IF, isCompositeType, isEnumType, isInputObjectType, isInterfaceType, isObjectType, TypePattern } from '../types/schema.js'
 import { getListItemType, getTypeName, isListType, isNonNullType, unwrapNonNull } from '../utils/typeRef.js'
 import { typeFromAST } from './typeFromAST.js'
-import { findTypeName } from '../utils/findTypeName.js'
 
 type Maybe<T> = T | null | undefined
 
@@ -67,6 +66,7 @@ export class TypeInfo {
 	private _schema: Schema
 	private _typeStack: Array<Maybe<TypeRef>>
 	private _parentTypeStack: Array<Maybe<Type>>
+	private _parentTypeNameStack: Array<Maybe<string>>
 	private _inputTypeStack: Array<Maybe<TypeRef>>
 	private _fieldDefStack: Array<Maybe<Field>>
 	private _defaultValueStack: Array<Maybe<unknown>>
@@ -78,6 +78,7 @@ export class TypeInfo {
 		this._schema = schema
 		this._typeStack = initialType ? [initialType] : []
 		this._parentTypeStack = []
+		this._parentTypeNameStack = []
 		this._inputTypeStack = []
 		this._fieldDefStack = []
 		this._defaultValueStack = []
@@ -96,6 +97,11 @@ export class TypeInfo {
 
 	getParentType(): Maybe<Type> {
 		return this._parentTypeStack[this._parentTypeStack.length - 1]
+	}
+
+	/** Types are referenced by name, so the name is tracked instead of looked up from the definition. */
+	getParentTypeName(): Maybe<string> {
+		return this._parentTypeNameStack[this._parentTypeNameStack.length - 1]
 	}
 
 	getInputType(): Maybe<TypeRef> {
@@ -135,6 +141,7 @@ export class TypeInfo {
 				const namedType = namedTypeName ? schema.t[namedTypeName] : undefined
 				const compositeType = namedType && isCompositeType(namedType) ? namedType : undefined
 				this._parentTypeStack.push(compositeType)
+				this._parentTypeNameStack.push(compositeType ? namedTypeName : undefined)
 				break
 			}
 
@@ -144,7 +151,7 @@ export class TypeInfo {
 				let fieldTypeRef: Maybe<TypeRef>
 
 				if (parentType) {
-					fieldDef = this._getFieldDef(parentType, (node as FieldNode).name.value)
+					fieldDef = this._getFieldDef(parentType, this.getParentTypeName(), (node as FieldNode).name.value)
 					if (fieldDef) {
 						// Field: [typeRef, args, description?, deprecationReason?]
 						fieldTypeRef = fieldDef[0]
@@ -295,6 +302,7 @@ export class TypeInfo {
 		switch (node.kind) {
 			case Kind.SELECTION_SET:
 				this._parentTypeStack.pop()
+				this._parentTypeNameStack.pop()
 				break
 
 			case Kind.FIELD:
@@ -337,7 +345,7 @@ export class TypeInfo {
 	/**
 	 * Get field definition from a composite type, including meta-fields
 	 */
-	private _getFieldDef(parentType: Type, fieldName: string): Maybe<Field> {
+	private _getFieldDef(parentType: Type, parentTypeName: Maybe<string>, fieldName: string): Maybe<Field> {
 		// Handle meta-fields
 		if (fieldName === '__typename') {
 			// Field: [typeRef, args, description?, deprecationReason?]
@@ -346,9 +354,6 @@ export class TypeInfo {
 
 		// __schema and __type are only on Query type
 		if (isObjectType(parentType)) {
-			// We need to get the type name from schema to check if it's Query
-			// Since ObjectType doesn't have name anymore, we find it by checking against schema.q
-			const parentTypeName = findTypeName(this._schema, parentType)
 			if (parentTypeName === this._schema.q) {
 				if (fieldName === '__schema') {
 					return [[TypePattern.T_NN, '__Schema'], null]

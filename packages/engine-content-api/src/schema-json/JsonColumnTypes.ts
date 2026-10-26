@@ -1,5 +1,5 @@
 import { Model } from '@contember/schema'
-import { builtInScalars, ScalarImplementation, TypeRef } from '@contember/graphql-json'
+import { ScalarImplementation, TypeRef } from '@contember/graphql-json'
 import { GraphQLScalarType } from 'graphql'
 import { CustomTypesProvider } from '../schema/CustomTypesProvider.js'
 import { capitalizeFirstLetter } from '../utils/index.js'
@@ -106,7 +106,7 @@ export class JsonColumnTypes {
 		this.aliasBaseTypes.set(name, baseType)
 		const baseName = this.getScalar(baseType)
 		// An alias of a built-in scalar inherits the built-in coercion.
-		const implementation = this.registry.scalars[baseName] ?? builtInScalars[baseName]
+		const implementation = this.registry.scalars[baseName]
 		return this.registry.scalar(name, implementation)
 	}
 

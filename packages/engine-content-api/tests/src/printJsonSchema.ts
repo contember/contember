@@ -154,7 +154,8 @@ export const toGraphQLJsSchema = (schema: Schema): GraphQLSchema => {
 	return new GraphQLSchema({
 		query: objectType(schema.q),
 		mutation: schema.m ? objectType(schema.m) : undefined,
-		types: Object.keys(schema.t).map(getNamed),
+		// graphql-js adds its own introspection types
+		types: Object.keys(schema.t).filter(name => !name.startsWith('__')).map(getNamed),
 	})
 }
 

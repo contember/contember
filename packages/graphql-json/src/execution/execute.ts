@@ -167,7 +167,7 @@ function executeFieldsSerially<TContext>(
 ): Record<string, unknown> | Promise<Record<string, unknown>> {
 	const entries = Array.from(groupedFieldSet.entries())
 
-	return promiseReduce(
+	return promiseReduce<[string, readonly FieldNode[]], Record<string, unknown>>(
 		entries,
 		async (results, [responseName, fieldNodes]) => {
 			// Create a single-field grouped set
@@ -183,7 +183,7 @@ function executeFieldsSerially<TContext>(
 			const resolved = isPromise(fieldResults) ? await fieldResults : fieldResults
 			return { ...results, ...resolved }
 		},
-		{} as Record<string, unknown>,
+		{},
 	)
 }
 

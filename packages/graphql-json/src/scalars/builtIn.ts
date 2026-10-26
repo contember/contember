@@ -7,6 +7,10 @@ import type { ValueNode } from 'graphql'
 import type { ScalarImplementation, ScalarMap } from '../types/resolvers.js'
 import { inspect } from '../utils/helpers.js'
 
+function literalText(valueNode: ValueNode): string {
+	return 'value' in valueNode ? String(valueNode.value) : valueNode.kind
+}
+
 // GraphQL Int limits (32-bit signed integer)
 const GRAPHQL_MAX_INT = 2147483647
 const GRAPHQL_MIN_INT = -2147483648
@@ -72,11 +76,10 @@ export const GraphQLIntScalar: ScalarImplementation = {
 		return inputValue
 	},
 
-	parseLiteral(ast: unknown): number {
-		const valueNode = ast as ValueNode
+	parseLiteral(valueNode: ValueNode): number {
 		if (valueNode.kind !== Kind.INT) {
 			throw new Error(
-				`Int cannot represent non-integer value: ${(valueNode as { value?: string }).value ?? valueNode.kind}`,
+				`Int cannot represent non-integer value: ${literalText(valueNode)}`,
 			)
 		}
 		const num = parseInt(valueNode.value, 10)
@@ -122,14 +125,13 @@ export const GraphQLFloatScalar: ScalarImplementation = {
 		return inputValue
 	},
 
-	parseLiteral(ast: unknown): number {
-		const valueNode = ast as ValueNode
+	parseLiteral(valueNode: ValueNode): number {
 		if (valueNode.kind !== Kind.FLOAT && valueNode.kind !== Kind.INT) {
 			throw new Error(
-				`Float cannot represent non numeric value: ${(valueNode as { value?: string }).value ?? valueNode.kind}`,
+				`Float cannot represent non numeric value: ${literalText(valueNode)}`,
 			)
 		}
-		return parseFloat((valueNode as { value: string }).value)
+		return parseFloat(valueNode.value)
 	},
 }
 
@@ -163,11 +165,10 @@ export const GraphQLStringScalar: ScalarImplementation = {
 		return inputValue
 	},
 
-	parseLiteral(ast: unknown): string {
-		const valueNode = ast as ValueNode
+	parseLiteral(valueNode: ValueNode): string {
 		if (valueNode.kind !== Kind.STRING) {
 			throw new Error(
-				`String cannot represent a non string value: ${(valueNode as { value?: string }).value ?? valueNode.kind}`,
+				`String cannot represent a non string value: ${literalText(valueNode)}`,
 			)
 		}
 		return valueNode.value
@@ -201,11 +202,10 @@ export const GraphQLBooleanScalar: ScalarImplementation = {
 		return inputValue
 	},
 
-	parseLiteral(ast: unknown): boolean {
-		const valueNode = ast as ValueNode
+	parseLiteral(valueNode: ValueNode): boolean {
 		if (valueNode.kind !== Kind.BOOLEAN) {
 			throw new Error(
-				`Boolean cannot represent a non boolean value: ${(valueNode as { value?: string }).value ?? valueNode.kind}`,
+				`Boolean cannot represent a non boolean value: ${literalText(valueNode)}`,
 			)
 		}
 		return valueNode.value
@@ -242,14 +242,13 @@ export const GraphQLIDScalar: ScalarImplementation = {
 		)
 	},
 
-	parseLiteral(ast: unknown): string {
-		const valueNode = ast as ValueNode
+	parseLiteral(valueNode: ValueNode): string {
 		if (valueNode.kind !== Kind.STRING && valueNode.kind !== Kind.INT) {
 			throw new Error(
 				`ID cannot represent a non-string and non-integer value: ${valueNode.kind}`,
 			)
 		}
-		return (valueNode as { value: string }).value
+		return valueNode.value
 	},
 }
 

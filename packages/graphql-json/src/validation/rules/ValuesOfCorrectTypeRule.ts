@@ -232,8 +232,11 @@ function checkValueTypeCompatibility(
 
 		if (scalar?.parseLiteral) {
 			try {
-				scalar.parseLiteral(node)
-				return null // Valid
+				// as in graphql-js, a parser signals an invalid literal by returning undefined
+				if (scalar.parseLiteral(node) === undefined) {
+					return new GraphQLError(`Expected value of type "${formatTypeRef(typeRef)}", found ${print(node)}.`, { nodes: node })
+				}
+				return null
 			} catch (e) {
 				const message = e instanceof Error ? e.message : String(e)
 				return new GraphQLError(

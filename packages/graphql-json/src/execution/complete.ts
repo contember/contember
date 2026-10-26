@@ -23,12 +23,12 @@ const TYPE_KIND_NAMES = ['SCALAR', 'OBJECT', 'INTERFACE', 'UNION', 'ENUM', 'INPU
  * Uses a composite key: exeContext + typeName + fieldNodes
  */
 const subfieldCache = new WeakMap<
-	ExecutionContext,
+	object,
 	Map<string, WeakMap<readonly FieldNode[], GroupedFieldSet>>
 >()
 
-function collectSubfieldsMemoized(
-	exeContext: ExecutionContext,
+function collectSubfieldsMemoized<TContext>(
+	exeContext: ExecutionContext<TContext>,
 	returnTypeName: string,
 	fieldNodes: readonly FieldNode[],
 ): GroupedFieldSet {
@@ -62,8 +62,8 @@ function collectSubfieldsMemoized(
 /**
  * Complete a value based on its type
  */
-export function completeValue(
-	exeContext: ExecutionContext,
+export function completeValue<TContext>(
+	exeContext: ExecutionContext<TContext>,
 	returnTypeRef: TypeRef,
 	fieldNodes: readonly FieldNode[],
 	info: ResolveInfo,
@@ -182,8 +182,8 @@ export function completeValue(
 /**
  * Complete a list value
  */
-function completeListValue(
-	exeContext: ExecutionContext,
+function completeListValue<TContext>(
+	exeContext: ExecutionContext<TContext>,
 	returnTypeRef: TypeRef,
 	fieldNodes: readonly FieldNode[],
 	info: ResolveInfo,
@@ -244,12 +244,12 @@ function completeListValue(
 /**
  * Handle error for a list item - throws for non-null items, returns null for nullable
  */
-function handleListItemError(
+function handleListItemError<TContext>(
 	rawError: unknown,
 	itemTypeRef: TypeRef,
 	fieldNodes: readonly FieldNode[],
 	itemPath: Path,
-	exeContext: ExecutionContext,
+	exeContext: ExecutionContext<TContext>,
 ): null {
 	const error = rawError instanceof GraphQLError
 		? rawError
@@ -271,8 +271,8 @@ function handleListItemError(
 /**
  * Complete a leaf value (Scalar or Enum)
  */
-function completeLeafValue(
-	exeContext: ExecutionContext,
+function completeLeafValue<TContext>(
+	exeContext: ExecutionContext<TContext>,
 	typeName: string,
 	type: Type,
 	result: unknown,
@@ -322,8 +322,8 @@ function serializeEnum(typeName: string, type: EnumType, result: unknown): strin
 /**
  * Complete an abstract value (Interface or Union)
  */
-function completeAbstractValue(
-	exeContext: ExecutionContext,
+function completeAbstractValue<TContext>(
+	exeContext: ExecutionContext<TContext>,
 	abstractTypeName: string,
 	abstractType: Type,
 	fieldNodes: readonly FieldNode[],
@@ -391,8 +391,8 @@ function completeAbstractValue(
 /**
  * Resolve type using isTypeOf functions
  */
-function resolveTypeWithIsTypeOf(
-	exeContext: ExecutionContext,
+function resolveTypeWithIsTypeOf<TContext>(
+	exeContext: ExecutionContext<TContext>,
 	possibleTypes: string[],
 	result: unknown,
 	info: ResolveInfo,
@@ -436,8 +436,8 @@ function resolveTypeWithIsTypeOf(
 /**
  * Validate and complete with the runtime type
  */
-function ensureValidRuntimeType(
-	exeContext: ExecutionContext,
+function ensureValidRuntimeType<TContext>(
+	exeContext: ExecutionContext<TContext>,
 	runtimeTypeName: string | null | undefined,
 	abstractTypeName: string,
 	fieldNodes: readonly FieldNode[],
@@ -493,8 +493,8 @@ function defaultTypeResolver(
 /**
  * Complete an object value
  */
-function completeObjectValue(
-	exeContext: ExecutionContext,
+function completeObjectValue<TContext>(
+	exeContext: ExecutionContext<TContext>,
 	typeName: string,
 	fieldNodes: readonly FieldNode[],
 	_info: ResolveInfo,

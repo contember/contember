@@ -8,10 +8,10 @@ const dateScalar: ScalarImplementation = {
 	serialize: value => value,
 	parseValue: value => value,
 	parseLiteral: ast => {
-		if (typeof ast !== 'object' || ast === null || !('kind' in ast) || ast.kind !== Kind.STRING || !('value' in ast)) {
+		if (ast.kind !== Kind.STRING) {
 			throw new Error('Date must be a string')
 		}
-		return new Date(String(ast.value))
+		return new Date(ast.value)
 	},
 }
 

@@ -16,7 +16,7 @@ import {
 	TypePattern,
 	type TypeResolverMap,
 } from '../../src/index.js'
-import { type DocumentNode, parse } from 'graphql'
+import { type DocumentNode, parse, type ValueNode } from 'graphql'
 
 // Type helpers
 type Maybe<T> = T | null | undefined
@@ -68,13 +68,13 @@ export interface GraphQLScalarTypeConfig<TInternal, TExternal> {
 	description?: Maybe<string>
 	serialize?: (value: unknown) => TExternal
 	parseValue?: (value: unknown) => TInternal
-	parseLiteral?: (ast: unknown) => TInternal
+	parseLiteral?: (valueNode: ValueNode, variables?: Record<string, unknown> | null) => TInternal
 }
 
 export class GraphQLScalarType<TInternal = unknown, TExternal = TInternal> extends GraphQLNamedType {
 	serialize?: (value: unknown) => TExternal
 	parseValue?: (value: unknown) => TInternal
-	parseLiteral?: (ast: unknown) => TInternal
+	parseLiteral?: (valueNode: ValueNode, variables?: Record<string, unknown> | null) => TInternal
 
 	constructor(config: GraphQLScalarTypeConfig<TInternal, TExternal>) {
 		super(config.name, config.description)

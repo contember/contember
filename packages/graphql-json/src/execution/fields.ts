@@ -15,13 +15,14 @@ import { isNonNullType } from '../utils/typeRef.js'
 import { completeValue } from './complete.js'
 import { getArgumentValues } from './values.js'
 import type { GroupedFieldSet } from './collectFields.js'
-import { resolveSchema, resolveType } from './introspectionResolvers.js'
+import { introspectionResolvers, resolveSchema, resolveType } from './introspectionResolvers.js'
+import { isIntrospectionType } from '../introspection/types.js'
 
 /**
  * Execute collected fields
  */
-export function executeFields(
-	exeContext: ExecutionContext,
+export function executeFields<TContext>(
+	exeContext: ExecutionContext<TContext>,
 	parentTypeName: string,
 	sourceValue: unknown,
 	path: Path | undefined,
@@ -58,8 +59,8 @@ export function executeFields(
 /**
  * Execute a single field
  */
-function executeField(
-	exeContext: ExecutionContext,
+function executeField<TContext>(
+	exeContext: ExecutionContext<TContext>,
 	parentTypeName: string,
 	sourceValue: unknown,
 	fieldNodes: readonly FieldNode[],
@@ -171,12 +172,13 @@ function executeField(
 /**
  * Get resolver for a field
  */
-function getFieldResolver(
-	exeContext: ExecutionContext,
+function getFieldResolver<TContext>(
+	exeContext: ExecutionContext<TContext>,
 	typeName: string,
 	fieldName: string,
-): ResolverFn {
-	const typeResolvers = exeContext.resolvers[typeName]
+): ResolverFn<unknown, TContext> {
+	// introspection resolvers take precedence for the reserved __ types
+	const typeResolvers = (isIntrospectionType(typeName) ? introspectionResolvers[typeName] : undefined) ?? exeContext.resolvers[typeName]
 	if (typeResolvers) {
 		const fieldResolver = typeResolvers[fieldName]
 		if (fieldResolver) {
@@ -189,8 +191,8 @@ function getFieldResolver(
 /**
  * Build ResolveInfo object
  */
-function buildResolveInfo(
-	exeContext: ExecutionContext,
+function buildResolveInfo<TContext>(
+	exeContext: ExecutionContext<TContext>,
 	fieldName: string,
 	fieldDef: Field,
 	fieldNodes: readonly FieldNode[],
@@ -215,9 +217,9 @@ function buildResolveInfo(
  * Resolve field value (call resolver) - does not catch errors
  * Errors are caught at the executeField level for proper null propagation
  */
-function resolveFieldValueSafe(
-	exeContext: ExecutionContext,
-	resolver: ResolverFn,
+function resolveFieldValueSafe<TContext>(
+	exeContext: ExecutionContext<TContext>,
+	resolver: ResolverFn<unknown, TContext>,
 	source: unknown,
 	args: Record<string, unknown>,
 	info: ResolveInfo,
@@ -229,12 +231,12 @@ function resolveFieldValueSafe(
  * Handle field error - either propagate (for non-null) or collect (for nullable)
  * Returns null for nullable types, throws for non-null types
  */
-export function handleFieldError(
+export function handleFieldError<TContext>(
 	rawError: Error,
 	returnTypeRef: [number, string],
 	fieldNodes: readonly FieldNode[],
 	path: Path,
-	exeContext: ExecutionContext,
+	exeContext: ExecutionContext<TContext>,
 ): null {
 	// Create or enhance the GraphQLError with proper path
 	let error: GraphQLError

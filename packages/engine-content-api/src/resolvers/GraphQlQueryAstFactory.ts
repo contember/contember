@@ -119,7 +119,7 @@ export class GraphQlQueryAstFactory {
 		return typeof val + ' is not supported'
 	}
 
-	private static mergeFieldList(nodes: AnyNode[]): AnyNode[] {
+	public static mergeFieldList(nodes: AnyNode[]): AnyNode[] {
 		const result: Record<string, AnyNode> = {}
 		for (const node of nodes) {
 			result[node.alias] = result[node.alias] ? GraphQlQueryAstFactory.mergeFields(result[node.alias], node) : node

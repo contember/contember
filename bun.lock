@@ -286,6 +286,7 @@
       "dependencies": {
         "@contember/database": "workspace:*",
         "@contember/dic": "workspace:*",
+        "@contember/graphql-json": "workspace:*",
         "@contember/graphql-utils": "workspace:*",
         "@contember/logger": "workspace:*",
         "@contember/schema": "workspace:*",

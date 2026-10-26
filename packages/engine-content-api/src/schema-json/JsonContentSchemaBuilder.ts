@@ -1,5 +1,5 @@
 import { Acl, Input, Model, Result } from '@contember/schema'
-import { ResolveInfo, ResolverFn, ResolverMap, ScalarMap, Schema, Type, withBuiltInScalars } from '@contember/graphql-json'
+import { introspectionTypes, ResolveInfo, ResolverFn, ResolverMap, ScalarMap, Schema, Type } from '@contember/graphql-json'
 import { Authorizator } from '../acl/index.js'
 import { Context } from '../types.js'
 import { GqlTypeName } from '../schema/utils.js'
@@ -7,6 +7,7 @@ import { EntityInputType } from '../schema/mutations/index.js'
 import { ExtensionKey, Operation, OperationMeta } from '../schema/OperationExtension.js'
 import { mutationResultQueryAstFilter, TransactionOptions, transactionQueryAstFilter } from '../resolvers/MutationResolver.js'
 import { ImplementationException } from '../exception.js'
+import { JsonContentSchemaShared } from './JsonContentSchemaShared.js'
 import { JsonColumnTypes } from './JsonColumnTypes.js'
 import { JsonFilterTypes } from './JsonFilterTypes.js'
 import { aliasAwareResolver, JsonEntityTypes } from './JsonEntityTypes.js'
@@ -40,23 +41,115 @@ export interface JsonContentSchema {
 	scalars: ScalarMap
 }
 
+type RootResolve = (context: Context, info: ResolveInfo) => Promise<unknown>
+
+// Resolvers are created by module-level functions, so they retain only the model and the shared AST factory,
+// never a builder with its per-role state.
+
+/** Root fields are also nested in `transaction`, where the parent already holds the result. */
+const createRootResolver = (timerPrefix: string, resolve: RootResolve): ResolverFn<unknown, Context> => (parent, args, context, info) =>
+	context.timer(`${timerPrefix}.${info.fieldName}`, () => {
+		if (parent) {
+			return aliasAwareResolver(parent, args, context, info)
+		}
+		return resolve(context, info)
+	})
+
+const createQueryResolvers = (entity: Model.Entity, astFactory: JsonQueryAstFactory) => ({
+	get: createRootResolver(
+		'GraphQL.query',
+		(context, info) => context.executionContainer.readResolver.resolveGetQuery(entity, astFactory.create(info)),
+	),
+	list: createRootResolver(
+		'GraphQL.query',
+		(context, info) => context.executionContainer.readResolver.resolveListQuery(entity, astFactory.create(info)),
+	),
+	paginate: createRootResolver(
+		'GraphQL.query',
+		(context, info) => context.executionContainer.readResolver.resolvePaginationQuery(entity, astFactory.create(info)),
+	),
+})
+
+const createValidationResolvers = (
+	entity: Model.Entity,
+	astFactory: JsonQueryAstFactory,
+): Record<'create' | 'update', ResolverFn<unknown, Context>> => ({
+	create: (parent, args, context, info) =>
+		context.timer(
+			`GraphQL.query.${info.fieldName}`,
+			() => context.executionContainer.validationResolver.validateCreate(entity, astFactory.create<Input.CreateInput>(info, argumentsOnly).args),
+		),
+	update: (parent, args, context, info) =>
+		context.timer(
+			`GraphQL.query.${info.fieldName}`,
+			() => context.executionContainer.validationResolver.validateUpdate(entity, astFactory.create<Input.UpdateInput>(info, argumentsOnly).args),
+		),
+})
+
+const createMutationResolvers = (entity: Model.Entity, astFactory: JsonQueryAstFactory) => {
+	const createAst = (info: ResolveInfo) => astFactory.create(info, mutationResultQueryAstFilter)
+	return {
+		create: createRootResolver(
+			'GraphQL.mutation',
+			(context, info) => context.executionContainer.mutationResolver.resolveCreate(entity, createAst(info)),
+		),
+		delete: createRootResolver(
+			'GraphQL.mutation',
+			(context, info) => context.executionContainer.mutationResolver.resolveDelete(entity, createAst(info)),
+		),
+		update: createRootResolver(
+			'GraphQL.mutation',
+			(context, info) => context.executionContainer.mutationResolver.resolveUpdate(entity, createAst(info)),
+		),
+		upsert: createRootResolver(
+			'GraphQL.mutation',
+			(context, info) => context.executionContainer.mutationResolver.resolveUpsert(entity, createAst(info)),
+		),
+	}
+}
+
+const createSchemaResolvers = (
+	astFactory: JsonQueryAstFactory,
+): Record<'queryTransaction' | 'mutationTransaction' | 'mutationQuery' | 'refreshView' | 'info', ResolverFn<unknown, Context>> => ({
+	queryTransaction: (parent, args, context, info) =>
+		context.timer(`GraphQL.query.${info.fieldName}`, () => context.executionContainer.readResolver.resolveTransaction(astFactory.create(info))),
+	mutationTransaction: (parent, args, context, info) =>
+		context.timer(`GraphQL.mutation.${info.fieldName}`, () => {
+			const queryAst = astFactory.create<{ options?: TransactionOptions }>(info, transactionQueryAstFilter)
+			return context.executionContainer.mutationResolver.resolveTransaction(queryAst, {
+				deferForeignKeyConstraints: queryAst.args.options?.deferForeignKeyConstraints ?? false,
+				deferUniqueConstraints: queryAst.args.options?.deferUniqueConstraints ?? false,
+			})
+		}),
+	mutationQuery: (parent, args, context, info) => context.executionContainer.readResolver.resolveQuery(astFactory.create(info)),
+	refreshView: (parent, args, context, info) => {
+		const ast = astFactory.create<{ name: string; options?: { concurrently?: boolean } }>(info, argumentsOnly)
+		return context.executionContainer.refreshViewResolver.resolve(ast.args.name, ast.args.options)
+	},
+	info: () => ({ description: 'TODO' }),
+})
+
 /**
  * Builds the content schema as plain JSON for `@contember/graphql-json`, without graphql-js type instances.
  * Mirrors `GraphQlSchemaBuilder` and its providers; `graphQlSchemaJson.test.ts` keeps the two in sync.
  */
 export class JsonContentSchemaBuilder {
-	private readonly registry = new JsonTypeRegistry()
+	private readonly registry: JsonTypeRegistry
 	private readonly columnTypes: JsonColumnTypes
 	private readonly filterTypes: JsonFilterTypes
 	private readonly entityTypes: JsonEntityTypes
 	private readonly inputTypes: JsonInputTypes
-	private queryAstFactory: JsonQueryAstFactory | undefined
+	private readonly schemaResolvers: ReturnType<typeof createSchemaResolvers>
 
+	/** `shared` is the state of the model; pass the same instance to every role's builder. */
 	constructor(
 		private readonly schema: Model.Schema,
 		private readonly authorizator: Authorizator,
 		private readonly rootAuthorizator: Authorizator,
+		private readonly shared: JsonContentSchemaShared = new JsonContentSchemaShared(),
 	) {
+		this.registry = new JsonTypeRegistry(shared.resolvers, shared.extensions, shared.scalars)
+		this.schemaResolvers = createSchemaResolvers(shared.queryAstFactory)
 		this.columnTypes = new JsonColumnTypes(schema, this.registry)
 		this.filterTypes = new JsonFilterTypes(schema, authorizator, this.registry, this.columnTypes)
 		this.entityTypes = new JsonEntityTypes(schema, authorizator, rootAuthorizator, this.registry, this.columnTypes, this.filterTypes)
@@ -71,13 +164,27 @@ export class JsonContentSchemaBuilder {
 
 		const queries: Record<string, JsonOutputField> = {}
 		const mutations: Record<string, JsonOutputField> = {}
+		// Extensions differ per schema (introspection depends on permissions, contributors on the identity), so their
+		// resolvers and scalars stay out of the shared maps.
+		const extensionResolvers: ResolverMap<Context> = {}
+		const extensionScalars: ScalarMap = {}
+		const addExtensionFields = (target: Record<string, JsonOutputField>, fields: Record<string, JsonOutputField>, typeNames: string[]) => {
+			for (const [name, { resolve, ...field }] of Object.entries(fields)) {
+				target[name] = field
+				if (resolve) {
+					for (const typeName of typeNames) {
+						;(extensionResolvers[typeName] ??= {})[name] = resolve
+					}
+				}
+			}
+		}
 		for (const extension of extensions) {
 			Object.assign(registry.types, extension.types)
-			Object.assign(queries, extension.queries)
-			Object.assign(mutations, extension.mutations)
-			Object.assign(registry.scalars, extension.scalars)
+			addExtensionFields(queries, extension.queries ?? {}, ['Query', 'QueryTransaction'])
+			addExtensionFields(mutations, extension.mutations ?? {}, ['Mutation', 'MutationTransaction'])
+			Object.assign(extensionScalars, extension.scalars)
 			for (const [typeName, typeResolvers] of Object.entries(extension.resolvers ?? {})) {
-				registry.resolvers[typeName] = { ...registry.resolvers[typeName], ...typeResolvers }
+				extensionResolvers[typeName] = { ...extensionResolvers[typeName], ...typeResolvers }
 			}
 		}
 
@@ -92,14 +199,7 @@ export class JsonContentSchemaBuilder {
 
 		if (Object.keys(queries).length > 0) {
 			const queryTransaction = registry.object('QueryTransaction', () => ({ ...queries }))
-			queries.transaction = {
-				type: namedRef(queryTransaction),
-				resolve: (parent, args, context, info) =>
-					context.timer(
-						`GraphQL.query.${info.fieldName}`,
-						() => context.executionContainer.readResolver.resolveTransaction(this.getQueryAstFactory().create(info)),
-					),
-			}
+			queries.transaction = { type: namedRef(queryTransaction), resolve: this.schemaResolvers.queryTransaction }
 		}
 		const hasMutations = Object.keys(mutations).length > 0
 		if (hasMutations) {
@@ -119,19 +219,9 @@ export class JsonContentSchemaBuilder {
 			mutations.transaction = {
 				type: nonNullRef(mutationTransaction),
 				args: { options: [namedRef(options)] },
-				resolve: (parent, args, context, info) =>
-					context.timer(`GraphQL.mutation.${info.fieldName}`, () => {
-						const queryAst = this.getQueryAstFactory().create<{ options?: TransactionOptions }>(info, transactionQueryAstFilter)
-						return context.executionContainer.mutationResolver.resolveTransaction(queryAst, {
-							deferForeignKeyConstraints: queryAst.args.options?.deferForeignKeyConstraints ?? false,
-							deferUniqueConstraints: queryAst.args.options?.deferUniqueConstraints ?? false,
-						})
-					}),
+				resolve: this.schemaResolvers.mutationTransaction,
 			}
-			mutations.query = {
-				type: nonNullRef('Query'),
-				resolve: (parent, args, context, info) => context.executionContainer.readResolver.resolveQuery(this.getQueryAstFactory().create(info)),
-			}
+			mutations.query = { type: nonNullRef('Query'), resolve: this.schemaResolvers.mutationQuery }
 		}
 
 		const refreshViewMutation = this.getRefreshViewMutation()
@@ -140,7 +230,7 @@ export class JsonContentSchemaBuilder {
 		}
 
 		const info = registry.object('Info', () => ({ description: { type: string } }))
-		queries._info = { type: namedRef(info), resolve: () => ({ description: 'TODO' }) }
+		queries._info = { type: namedRef(info), resolve: this.schemaResolvers.info }
 
 		registry.object('Query', () => queries)
 		if (hasMutations || refreshViewMutation) {
@@ -148,24 +238,18 @@ export class JsonContentSchemaBuilder {
 		}
 
 		const roots = ['Query', 'Mutation', 'String', 'Boolean', ...extensions.flatMap(it => Object.keys(it.types))]
-		registry.pruneUnreachable(roots)
-
-		const schema: Schema = {
+		const schema = this.shared.interner.intern({
 			q: 'Query',
 			m: registry.has('Mutation') ? 'Mutation' : null,
 			s: null,
-			t: registry.types,
+			// with the introspection types in place, graphql-json uses the schema as is instead of a merged copy
+			t: { ...registry.getReachableTypes(roots), ...introspectionTypes },
+		})
+		const resolvers: ResolverMap<Context> = { ...this.shared.resolvers }
+		for (const [typeName, typeResolvers] of Object.entries(extensionResolvers)) {
+			resolvers[typeName] = { ...this.shared.resolvers[typeName], ...typeResolvers }
 		}
-		const scalars = withBuiltInScalars(registry.scalars)
-		this.queryAstFactory = new JsonQueryAstFactory(schema, scalars, registry.extensions)
-		return { schema, resolvers: registry.resolvers, scalars }
-	}
-
-	private getQueryAstFactory(): JsonQueryAstFactory {
-		if (!this.queryAstFactory) {
-			throw new ImplementationException('JsonContentSchemaBuilder: schema is not built')
-		}
-		return this.queryAstFactory
+		return { schema, resolvers, scalars: { ...this.shared.scalars, ...extensionScalars } }
 	}
 
 	private getQueries(entity: Model.Entity): Record<string, JsonOutputField> {
@@ -181,15 +265,13 @@ export class JsonContentSchemaBuilder {
 		}
 		const where = namedRef(this.filterTypes.getEntityWhereType(entityName))
 		const int = namedRef(this.columnTypes.getScalar(Model.ColumnType.Int))
+		const resolvers = createQueryResolvers(entity, this.shared.queryAstFactory)
 		return {
 			['get' + entityName]: {
 				type: namedRef(entityType),
 				args: { by: [nonNullRef(uniqueWhere)], filter: [where] },
 				extensions: { [ExtensionKey]: new OperationMeta(Operation.get, entity) },
-				resolve: this.createRootResolver(
-					'GraphQL.query',
-					(context, info) => context.executionContainer.readResolver.resolveGetQuery(entity, this.getQueryAstFactory().create(info)),
-				),
+				resolve: resolvers.get,
 			},
 			['list' + entityName]: {
 				type: nonNullListOfNonNullRef(entityType),
@@ -200,18 +282,12 @@ export class JsonContentSchemaBuilder {
 					limit: [int],
 				},
 				extensions: { [ExtensionKey]: new OperationMeta(Operation.list, entity) },
-				resolve: this.createRootResolver(
-					'GraphQL.query',
-					(context, info) => context.executionContainer.readResolver.resolveListQuery(entity, this.getQueryAstFactory().create(info)),
-				),
+				resolve: resolvers.list,
 			},
 			['paginate' + entityName]: {
 				...this.entityTypes.createPaginatedField(entityName),
 				extensions: { [ExtensionKey]: new OperationMeta(Operation.paginate, entity) },
-				resolve: this.createRootResolver(
-					'GraphQL.query',
-					(context, info) => context.executionContainer.readResolver.resolvePaginationQuery(entity, this.getQueryAstFactory().create(info)),
-				),
+				resolve: resolvers.paginate,
 			},
 		}
 	}
@@ -220,19 +296,12 @@ export class JsonContentSchemaBuilder {
 		const fields: Record<string, JsonOutputField> = {}
 		const createInput = this.inputTypes.getInput(EntityInputType.create, entity.name)
 		const validationResult = nonNullRef(this.getValidationResultType())
+		const resolvers = createValidationResolvers(entity, this.shared.queryAstFactory)
 		if (createInput !== undefined) {
 			fields[`validateCreate${entity.name}`] = {
 				type: validationResult,
 				args: { data: [nonNullRef(createInput)] },
-				resolve: (parent, args, context, info) =>
-					context.timer(
-						`GraphQL.query.${info.fieldName}`,
-						() =>
-							context.executionContainer.validationResolver.validateCreate(
-								entity,
-								this.getQueryAstFactory().create<Input.CreateInput>(info, argumentsOnly).args,
-							),
-					),
+				resolve: resolvers.create,
 			}
 		}
 		const updateInput = this.inputTypes.getInput(EntityInputType.update, entity.name)
@@ -241,15 +310,7 @@ export class JsonContentSchemaBuilder {
 			fields[`validateUpdate${entity.name}`] = {
 				type: validationResult,
 				args: { by: [nonNullRef(uniqueWhere)], data: [nonNullRef(updateInput)] },
-				resolve: (parent, args, context, info) =>
-					context.timer(
-						`GraphQL.query.${info.fieldName}`,
-						() =>
-							context.executionContainer.validationResolver.validateUpdate(
-								entity,
-								this.getQueryAstFactory().create<Input.UpdateInput>(info, argumentsOnly).args,
-							),
-					),
+				resolve: resolvers.update,
 			}
 		}
 		return fields
@@ -261,9 +322,7 @@ export class JsonContentSchemaBuilder {
 		const mutations: Record<string, JsonOutputField> = {}
 		const isLookupReadable = this.authorizator.getEntityPermission(Acl.Operation.read, entityName) !== 'no'
 		const rootAllows = (operation: Acl.Operation) => this.rootAuthorizator.getEntityPermission(operation, entityName) !== 'no'
-		const createMutationResolver = (resolve: (context: Context, info: ResolveInfo) => Promise<unknown>) =>
-			this.createRootResolver('GraphQL.mutation', resolve)
-		const createAst = (info: ResolveInfo) => this.getQueryAstFactory().create(info, mutationResultQueryAstFilter)
+		const resolvers = createMutationResolvers(entity, this.shared.queryAstFactory)
 
 		if (rootAllows(Acl.Operation.create)) {
 			const dataType = this.inputTypes.getInput(EntityInputType.create, entityName)
@@ -272,7 +331,7 @@ export class JsonContentSchemaBuilder {
 					type: nonNullRef(this.createResultType(entityName, 'create')),
 					args: { data: [nonNullRef(dataType)] },
 					extensions: { [ExtensionKey]: new OperationMeta(Operation.create, entity) },
-					resolve: createMutationResolver((context, info) => context.executionContainer.mutationResolver.resolveCreate(entity, createAst(info))),
+					resolve: resolvers.create,
 				}
 			}
 		}
@@ -286,7 +345,7 @@ export class JsonContentSchemaBuilder {
 					filter: [namedRef(this.filterTypes.getEntityWhereType(entityName))],
 				},
 				extensions: { [ExtensionKey]: new OperationMeta(Operation.delete, entity) },
-				resolve: createMutationResolver((context, info) => context.executionContainer.mutationResolver.resolveDelete(entity, createAst(info))),
+				resolve: resolvers.delete,
 			}
 		}
 
@@ -303,7 +362,7 @@ export class JsonContentSchemaBuilder {
 							data: [nonNullRef(dataType)],
 						},
 						extensions: { [ExtensionKey]: new OperationMeta(Operation.update, entity) },
-						resolve: createMutationResolver((context, info) => context.executionContainer.mutationResolver.resolveUpdate(entity, createAst(info))),
+						resolve: resolvers.update,
 					}
 				}
 			}
@@ -324,23 +383,12 @@ export class JsonContentSchemaBuilder {
 							create: [nonNullRef(createInput)],
 						},
 						extensions: { [ExtensionKey]: new OperationMeta(Operation.upsert, entity) },
-						resolve: createMutationResolver((context, info) => context.executionContainer.mutationResolver.resolveUpsert(entity, createAst(info))),
+						resolve: resolvers.upsert,
 					}
 				}
 			}
 		}
 		return mutations
-	}
-
-	/** Root fields are also nested in `transaction`, where the parent already holds the result. */
-	private createRootResolver(timerPrefix: string, resolve: (context: Context, info: ResolveInfo) => Promise<unknown>): ResolverFn<unknown, Context> {
-		return (parent, args, context, info) =>
-			context.timer(`${timerPrefix}.${info.fieldName}`, () => {
-				if (parent) {
-					return aliasAwareResolver(parent, args, context, info)
-				}
-				return resolve(context, info)
-			})
 	}
 
 	private createResultType(entityName: string, operation: 'create' | 'update' | 'delete' | 'upsert'): string {
@@ -418,10 +466,7 @@ export class JsonContentSchemaBuilder {
 				name: [namedRef(this.registry.enum('_MaterializedView', materializedViews.map(it => it.name)))],
 				options: [namedRef(this.registry.inputObject('RefreshMaterializedViewOptions', () => ({ concurrently: [boolean] })))],
 			},
-			resolve: (parent, args, context, info) => {
-				const ast = this.getQueryAstFactory().create<{ name: string; options?: { concurrently?: boolean } }>(info, argumentsOnly)
-				return context.executionContainer.refreshViewResolver.resolve(ast.args.name, ast.args.options)
-			},
+			resolve: this.schemaResolvers.refreshView,
 		}
 	}
 }

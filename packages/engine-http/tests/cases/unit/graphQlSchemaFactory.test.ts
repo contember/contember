@@ -149,3 +149,21 @@ test('graphql-json: a Json column accepts an object literal next to the introspe
 	const document = parse('mutation { createArticle(data: { data: { message: "hello", tags: ["a"] } }) { ok } }')
 	expect(validate(result.schema.schema, document, { scalars: result.schema.scalars }).map(it => it.message)).toEqual([])
 })
+
+test('graphql-json: role schemas of one project schema share the types their permissions do not change', () => {
+	const factory = createFactory([], 'graphql-json')
+	const jsonSchema = (roles: string[]) => {
+		const { schema: result } = create(factory, roles)
+		if (result.engine !== 'graphql-json') {
+			throw new Error('Expected a graphql-json schema')
+		}
+		return result.schema.schema
+	}
+	const admin = jsonSchema(['admin'])
+	const reader = jsonSchema(['reader'])
+
+	expect(reader.t.Article).toBe(admin.t.Article)
+	expect(reader.t.ArticleWhere).toBe(admin.t.ArticleWhere)
+	expect(reader.t.Query).not.toBe(admin.t.Query)
+	expect(reader.m).toBeNull()
+})

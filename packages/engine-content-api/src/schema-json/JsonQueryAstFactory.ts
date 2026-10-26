@@ -7,10 +7,12 @@ import { FieldExtensions } from './JsonTypeRegistry.js'
 
 type AnyNode = ObjectNode | FieldNode
 
-/** JSON-schema counterpart of `GraphQlQueryAstFactory`: turns the resolved field into Contember's query tree. */
+/**
+ * JSON-schema counterpart of `GraphQlQueryAstFactory`: turns the resolved field into Contember's query tree.
+ * The schema comes from the resolve info, so one factory serves every role schema of a model.
+ */
 export class JsonQueryAstFactory {
 	constructor(
-		private readonly schema: Schema,
 		private readonly scalars: ScalarMap,
 		private readonly extensions: Record<string, Record<string, FieldExtensions>>,
 	) {}
@@ -39,12 +41,12 @@ export class JsonQueryAstFactory {
 		if (!node.selectionSet) {
 			return new FieldNode(name, alias, {})
 		}
-		const field = this.getCompositeType(parentTypeName)[1][name]
+		const field = this.getCompositeType(info.schema, parentTypeName)[1][name]
 		if (!field) {
 			throw new Error(`JsonQueryAstFactory: unknown field ${parentTypeName}.${name}`)
 		}
 		const fieldTypeName = field[0][1]
-		const fieldType = this.schema.t[fieldTypeName]
+		const fieldType = info.schema.t[fieldTypeName]
 		if (!fieldType || fieldType[0] !== TypeKind.OBJECT) {
 			throw new Error(`JsonQueryAstFactory: ${fieldTypeName} is not an object type`)
 		}
@@ -53,7 +55,7 @@ export class JsonQueryAstFactory {
 			name,
 			alias,
 			fields,
-			getArgumentValues(this.schema, field, node, info.variableValues, this.scalars),
+			getArgumentValues(info.schema, field, node, info.variableValues, this.scalars),
 			this.extensions[parentTypeName]?.[name] ?? {},
 			path,
 		)
@@ -79,7 +81,7 @@ export class JsonQueryAstFactory {
 					throw new Error(`JsonQueryAstFactory: Fragment definition ${subNode.name.value} not found`)
 				}
 				const typeName = fragmentDefinition.typeCondition.name.value
-				this.getCompositeType(typeName)
+				this.getCompositeType(info.schema, typeName)
 				fields.push(...this.processSelectionSet(info, typeName, fragmentDefinition.selectionSet, path, filter))
 			} else {
 				throw new Error('InlineFragment are not supported yet')
@@ -88,8 +90,8 @@ export class JsonQueryAstFactory {
 		return GraphQlQueryAstFactory.mergeFieldList(fields)
 	}
 
-	private getCompositeType(typeName: string): ObjectType | InterfaceType {
-		const type = this.schema.t[typeName]
+	private getCompositeType(schema: Schema, typeName: string): ObjectType | InterfaceType {
+		const type = schema.t[typeName]
 		if (!type || (type[0] !== TypeKind.OBJECT && type[0] !== TypeKind.INTERFACE)) {
 			throw new Error('JsonQueryAstFactory: subfield is expected to be an object or interface type')
 		}

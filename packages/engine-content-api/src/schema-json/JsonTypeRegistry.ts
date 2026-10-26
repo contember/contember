@@ -25,12 +25,16 @@ export interface JsonOutputField {
 /**
  * Collects the JSON types of one content schema. Types are referenced by name, so a type is registered before its
  * fields are created - a recursive reference (e.g. `Where.and`) then only resolves the name.
+ * Resolvers, field extensions and scalars go to maps shared by all schemas of the model; the first registration wins.
  */
 export class JsonTypeRegistry {
 	public readonly types: Record<string, Type> = {}
-	public readonly resolvers: ResolverMap<Context> = {}
-	public readonly extensions: Record<string, Record<string, FieldExtensions>> = {}
-	public readonly scalars: Record<string, ScalarImplementation> = {}
+
+	constructor(
+		public readonly resolvers: ResolverMap<Context>,
+		public readonly extensions: Record<string, Record<string, FieldExtensions>>,
+		public readonly scalars: Record<string, ScalarImplementation>,
+	) {}
 
 	public has(name: string): boolean {
 		return name in this.types
@@ -90,18 +94,19 @@ export class JsonTypeRegistry {
 	public scalar(name: string, implementation: ScalarImplementation | undefined, description?: string): string {
 		if (!this.types[name]) {
 			this.types[name] = description !== undefined ? [TypeKind.SCALAR, description] : [TypeKind.SCALAR]
-			if (implementation) {
-				this.scalars[name] = implementation
-			}
+		}
+		if (implementation) {
+			this.scalars[name] ??= implementation
 		}
 		return name
 	}
 
 	/**
-	 * Drops the types no root field reaches. Providers create some types speculatively (e.g. an input that the allowed
+	 * The types some root reaches. Providers create some types speculatively (e.g. an input that the allowed
 	 * operations then filter out); graphql-js never sees those because it collects types by reachability.
+	 * Returns a new record: deleting from a large object would turn it into a slow dictionary.
 	 */
-	public pruneUnreachable(roots: readonly string[]): void {
+	public getReachableTypes(roots: readonly string[]): Record<string, Type> {
 		const reachable = new Set<string>()
 		const queue = [...roots]
 		const visit = (name: string) => {
@@ -122,10 +127,17 @@ export class JsonTypeRegistry {
 			switch (type[0]) {
 				case TypeKind.OBJECT:
 				case TypeKind.INTERFACE:
-					for (const field of Object.values(type[1])) {
+					for (const fieldName in type[1]) {
+						const field = type[1][fieldName]
+						if (!field) {
+							continue
+						}
 						visit(field[0][1])
-						for (const arg of Object.values(field[1] ?? {})) {
-							visit(arg[0][1])
+						for (const argName in field[1]) {
+							const arg = field[1][argName]
+							if (arg) {
+								visit(arg[0][1])
+							}
 						}
 					}
 					type[2].forEach(visit)
@@ -137,24 +149,32 @@ export class JsonTypeRegistry {
 					type[1].forEach(visit)
 					break
 				case TypeKind.INPUT_OBJECT:
-					for (const field of Object.values(type[1])) {
-						visit(field[0][1])
+					for (const fieldName in type[1]) {
+						const field = type[1][fieldName]
+						if (field) {
+							visit(field[0][1])
+						}
 					}
 					break
 			}
 		}
-		for (const name of Object.keys(this.types)) {
-			if (!reachable.has(name)) {
-				delete this.types[name]
-				delete this.resolvers[name]
-				delete this.extensions[name]
+		const types: Record<string, Type> = {}
+		for (const name in this.types) {
+			const type = this.types[name]
+			if (!type || !reachable.has(name)) {
+				continue
+			}
+			// replaced, not mutated: extension types are shared between schemas
+			if (type[0] === TypeKind.INTERFACE && type[3].some(it => !reachable.has(it))) {
+				const possibleTypes = type[3].filter(it => reachable.has(it))
+				types[name] = type[4] !== undefined
+					? [TypeKind.INTERFACE, type[1], type[2], possibleTypes, type[4]]
+					: [TypeKind.INTERFACE, type[1], type[2], possibleTypes]
+			} else {
+				types[name] = type
 			}
 		}
-		for (const type of Object.values(this.types)) {
-			if (type[0] === TypeKind.INTERFACE) {
-				type[3] = type[3].filter(it => reachable.has(it))
-			}
-		}
+		return types
 	}
 
 	private addPossibleType(interfaceName: string, typeName: string): void {
@@ -171,10 +191,10 @@ export class JsonTypeRegistry {
 				? [field.type, field.args ?? null, undefined, field.deprecationReason]
 				: [field.type, field.args ?? null]
 			if (field.resolve) {
-				;(this.resolvers[typeName] ??= {})[fieldName] = field.resolve
+				;(this.resolvers[typeName] ??= {})[fieldName] ??= field.resolve
 			}
 			if (field.extensions) {
-				;(this.extensions[typeName] ??= {})[fieldName] = field.extensions
+				;(this.extensions[typeName] ??= {})[fieldName] ??= field.extensions
 			}
 		}
 	}

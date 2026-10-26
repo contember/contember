@@ -10,6 +10,7 @@ import {
 	IntrospectionSchemaFactory,
 	JsonContentSchema,
 	JsonContentSchemaBuilder,
+	JsonContentSchemaShared,
 	PermissionFactory,
 } from '@contember/engine-content-api'
 import { Acl, Schema } from '@contember/schema'
@@ -34,6 +35,7 @@ export interface GraphQLSchemaFactoryResult {
 
 export class GraphQlSchemaFactory {
 	private readonly permissionsKeys = new WeakMap<Schema, Map<string, string>>()
+	private readonly jsonShared = new WeakMap<Schema, JsonContentSchemaShared>()
 
 	constructor(
 		private readonly cache: ContentApiSpecificCache<Schema, GraphQLSchemaFactoryResult>,
@@ -68,7 +70,7 @@ export class GraphQlSchemaFactory {
 				.filter(<T>(it: T | undefined): it is T => it !== undefined)
 
 			if (this.engine === 'graphql-json') {
-				const jsonSchema = new JsonContentSchemaBuilder(schema.model, authorizator, rootAuthorizator).build([
+				const jsonSchema = new JsonContentSchemaBuilder(schema.model, authorizator, rootAuthorizator, this.getJsonShared(schema)).build([
 					createJsonIntrospectionExtension(introspectionSchemaFactory),
 					...otherSchemas.map(createGraphQLJsBridge),
 				])
@@ -108,6 +110,15 @@ export class GraphQlSchemaFactory {
 
 			return { schema: { engine: 'graphql-js', schema: graphQlSchema }, permissions, allPermissions }
 		})
+	}
+
+	private getJsonShared(schema: Schema): JsonContentSchemaShared {
+		let shared = this.jsonShared.get(schema)
+		if (!shared) {
+			shared = new JsonContentSchemaShared()
+			this.jsonShared.set(schema, shared)
+		}
+		return shared
 	}
 
 	// Role combinations with identical permissions share one GraphQL schema. The key is memoized per combination,

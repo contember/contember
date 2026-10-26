@@ -1,3 +1,4 @@
+import { Logger } from '@contember/logger'
 import { createLocalJWKSet, CryptoKey, errors, FlattenedJWSInput, JSONWebKeySet, JWK, JWTHeaderParameters } from 'jose'
 import { WorkloadIdentity } from '../../../type/index.js'
 import { noopWorkloadIdentityMetrics, WorkloadIdentityMetrics } from './WorkloadIdentityMetrics.js'
@@ -13,6 +14,8 @@ export type WorkloadKeyResolver = (protectedHeader: JWTHeaderParameters, token: 
 
 export interface WorkloadJwksRegistryOptions {
 	readonly metrics?: WorkloadIdentityMetrics
+	/** Receives the cause of every failed fetch; callers only ever see a fixed message. */
+	readonly logger?: Logger
 	readonly fetcher?: WorkloadIssuerFetcher
 	/** Milliseconds; the cache's own clock (key ages, cooldowns), never compared with stored timestamps. */
 	readonly now?: () => number
@@ -85,6 +88,7 @@ const discoveryUrl = (issuer: string): string => `${issuer.replace(/\/$/, '')}/.
 export class WorkloadJwksRegistry {
 	private readonly entries = new Map<string, KeySourceEntry>()
 	private readonly metrics: WorkloadIdentityMetrics
+	private readonly logger: Logger | null
 	private readonly fetcher: WorkloadIssuerFetcher
 	private readonly now: () => number
 	private readonly refreshIntervalMs: number
@@ -98,6 +102,7 @@ export class WorkloadJwksRegistry {
 		options: WorkloadJwksRegistryOptions = {},
 	) {
 		this.metrics = options.metrics ?? noopWorkloadIdentityMetrics
+		this.logger = options.logger ?? null
 		this.fetcher = options.fetcher ?? new WorkloadIssuerFetcher(config)
 		this.now = options.now ?? Date.now
 		this.refreshIntervalMs = (options.refreshIntervalSeconds ?? DEFAULT_REFRESH_INTERVAL_SECONDS) * 1000
@@ -209,7 +214,8 @@ export class WorkloadJwksRegistry {
 		try {
 			await this.refresh(entry)
 		} catch (e) {
-			throw new WorkloadJwksUnavailableError(`Fetching keys of ${this.describe(entry.source)} failed: ${e instanceof Error ? e.message : String(e)}`)
+			// The cause names resolved addresses and socket errors; returned to a tenant admin it would map the engine's network.
+			throw new WorkloadJwksUnavailableError(`Fetching keys of ${this.describe(entry.source)} failed; the engine log has the cause`, { cause: e })
 		}
 	}
 
@@ -231,6 +237,7 @@ export class WorkloadJwksRegistry {
 			} catch (e) {
 				entry.lastFailureAt = this.now()
 				this.metrics.jwksFetchFailure()
+				this.logger?.warn(e, { message: `Fetching workload identity keys of ${this.describe(entry.source)} failed` })
 				throw e
 			} finally {
 				entry.pending = null

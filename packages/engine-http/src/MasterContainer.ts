@@ -176,7 +176,8 @@ export class MasterContainerFactory {
 			.addService('workloadIdentityMetrics', ({ promRegistry }) => createWorkloadIdentityMetrics(promRegistry))
 			.addService(
 				'workloadJwksRegistry',
-				({ workloadIdentityConfig, workloadIdentityMetrics }) => new WorkloadJwksRegistry(workloadIdentityConfig, { metrics: workloadIdentityMetrics }),
+				({ workloadIdentityConfig, workloadIdentityMetrics, logger }) =>
+					new WorkloadJwksRegistry(workloadIdentityConfig, { metrics: workloadIdentityMetrics, logger }),
 			)
 			.addService(
 				'projectGroupContainerFactory',

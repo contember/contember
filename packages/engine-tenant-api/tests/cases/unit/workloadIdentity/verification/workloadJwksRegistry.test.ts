@@ -1,4 +1,5 @@
 import { afterEach, beforeEach, describe, expect, test } from 'bun:test'
+import { createLogger, TestLoggerHandler } from '@contember/logger'
 import { FlattenedJWSInput, JWTHeaderParameters } from 'jose'
 import {
 	WorkloadJwksRegistry,
@@ -101,6 +102,23 @@ describe('fetch policy', () => {
 			handler(req, res)
 		}
 		expect(await resolve('key-1')).toBe('unavailable')
+	})
+
+	test('a refused fetch reaches the caller as a fixed message and the log with its cause', async () => {
+		const handler = new TestLoggerHandler()
+		const logged = new WorkloadJwksRegistry(instanceConfig, { now: () => now, logger: createLogger(handler) })
+		try {
+			await logged.getKeyResolver({ issuer: issuer.issuer, jwksUri: 'https://10.1.2.3/jwks.json' })(header('key-1'), token)
+			throw new Error('resolved')
+		} catch (e) {
+			expect(e).toBeInstanceOf(WorkloadJwksUnavailableError)
+			expect(e instanceof Error ? e.message : '').toBe('Fetching keys of https://10.1.2.3/jwks.json failed; the engine log has the cause')
+		} finally {
+			logged.dispose()
+		}
+		expect(handler.messages.map(it => it.error instanceof Error ? it.error.message : null)).toEqual([
+			expect.stringContaining('non-public address 10.1.2.3'),
+		])
 	})
 
 	test('a configured jwksUri skips discovery', async () => {

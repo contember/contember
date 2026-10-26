@@ -9,29 +9,9 @@ import type { Argument, Directive, EnumValue, Field, InputField, Schema, Type, T
 import { A, D, IF, isCompositeType, isEnumType, isInputObjectType, isInterfaceType, isObjectType, TypePattern } from '../types/schema.js'
 import { getListItemType, getTypeName, isListType, isNonNullType, unwrapNonNull } from '../utils/typeRef.js'
 import { typeFromAST } from './typeFromAST.js'
+import { getSchemaDirectives } from '../introspection/types.js'
 
 type Maybe<T> = T | null | undefined
-
-// Built-in directive definitions for when schema doesn't define them
-// Using compact Directive format: [args, locations, isRepeatable?, description?]
-const BUILT_IN_DIRECTIVES: Record<string, Directive> = {
-	skip: [
-		{ if: [[TypePattern.T_NN, 'Boolean']] }, // args: { if: [[1, 'Boolean']] }
-		['FIELD', 'FRAGMENT_SPREAD', 'INLINE_FRAGMENT'],
-	],
-	include: [
-		{ if: [[TypePattern.T_NN, 'Boolean']] },
-		['FIELD', 'FRAGMENT_SPREAD', 'INLINE_FRAGMENT'],
-	],
-	deprecated: [
-		{ reason: [[TypePattern.T, 'String'], 'No longer supported'] }, // Argument with default value
-		['FIELD_DEFINITION', 'ENUM_VALUE', 'ARGUMENT_DEFINITION', 'INPUT_FIELD_DEFINITION'],
-	],
-	specifiedBy: [
-		{ url: [[TypePattern.T_NN, 'String']] },
-		['SCALAR'],
-	],
-}
 
 /**
  * TypeInfo tracks the current type context during AST traversal.
@@ -259,9 +239,8 @@ export class TypeInfo {
 
 			case Kind.DIRECTIVE: {
 				const directiveName = node.name.value
-				// Check schema directives first, then fall back to built-in directives
-				const directive = schema.d?.[directiveName] ?? BUILT_IN_DIRECTIVES[directiveName]
-				this._directive = directive ?? null
+				const directives = getSchemaDirectives(schema)
+				this._directive = Object.prototype.hasOwnProperty.call(directives, directiveName) ? directives[directiveName] : null
 				break
 			}
 		}

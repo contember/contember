@@ -7,9 +7,9 @@
  * See https://spec.graphql.org/draft/#sec-Variables-Are-Input-Types
  */
 import type { ASTVisitor, VariableDefinitionNode } from 'graphql'
-import { GraphQLError } from 'graphql'
+import { GraphQLError, print } from 'graphql'
 
-import { formatTypeRef, getNamedType } from '../../utils/typeRef.js'
+import { getNamedType } from '../../utils/typeRef.js'
 import { isInputType } from '../helpers.js'
 import type { ValidationContext } from '../ValidationContext.js'
 
@@ -27,7 +27,7 @@ export function VariablesAreInputTypesRule(context: ValidationContext): ASTVisit
 					const varName = node.variable.name.value
 					context.reportError(
 						new GraphQLError(
-							`Variable "$${varName}" cannot be non-input type "${formatTypeRef(typeRef)}".`,
+							`Variable "$${varName}" cannot be non-input type "${print(node.type)}".`,
 							{ nodes: node.type },
 						),
 					)

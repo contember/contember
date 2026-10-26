@@ -97,6 +97,7 @@ export {
 
 export { addPath, type Path, pathToArray } from './utils/path.js'
 export { SchemaInterner } from './utils/schemaInterner.js'
+export { toGraphQLJsSchema } from './utils/toGraphQLJsSchema.js'
 
 // Validation
 export { validate, type ValidateOptions } from './validation/validate.js'

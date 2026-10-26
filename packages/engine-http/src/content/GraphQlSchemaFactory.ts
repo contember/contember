@@ -1,12 +1,9 @@
 import {
 	Authorizator,
-	Context,
 	ContextualPermissions,
 	createGraphQLJsBridge,
 	createJsonIntrospectionExtension,
 	EntityRulesResolver,
-	GraphQlSchemaBuilderFactory,
-	IntrospectionSchemaDefinitionFactory,
 	IntrospectionSchemaFactory,
 	JsonContentSchema,
 	JsonContentSchemaBuilder,
@@ -14,23 +11,16 @@ import {
 	PermissionFactory,
 } from '@contember/engine-content-api'
 import { Acl, Schema } from '@contember/schema'
-import { GraphQLFieldConfig, GraphQLNamedType, GraphQLSchema } from 'graphql'
 import { createHash } from 'node:crypto'
 import { GraphQLSchemaContributor } from './GraphQLSchemaContributor.js'
 import { Identity } from './Identity.js'
 import { ContentApiSpecificCache } from './ContentApiSpecificCache.js'
 import { ProjectConfig } from '../project/config.js'
 
-export type ContentGraphQLEngine = 'graphql-js' | 'graphql-json'
-
-export type ContentGraphQLSchema =
-	| { engine: 'graphql-js'; schema: GraphQLSchema }
-	| { engine: 'graphql-json'; schema: JsonContentSchema }
-
 export interface GraphQLSchemaFactoryResult {
 	permissions: Acl.Permissions
 	allPermissions?: Acl.Permissions
-	schema: ContentGraphQLSchema
+	schema: JsonContentSchema
 }
 
 export class GraphQlSchemaFactory {
@@ -39,10 +29,8 @@ export class GraphQlSchemaFactory {
 
 	constructor(
 		private readonly cache: ContentApiSpecificCache<Schema, GraphQLSchemaFactoryResult>,
-		private readonly graphqlSchemaBuilderFactory: GraphQlSchemaBuilderFactory,
 		private readonly permissionFactory: PermissionFactory,
 		private readonly schemaContributors: GraphQLSchemaContributor[],
-		private readonly engine: ContentGraphQLEngine = 'graphql-js',
 	) {}
 
 	public create(schema: Schema, identity: Identity, project: ProjectConfig): GraphQLSchemaFactoryResult {
@@ -59,7 +47,6 @@ export class GraphQlSchemaFactory {
 			// on the shared type; the root query and mutation fields are gated on the root set alone.
 			const authorizator = new Authorizator(allPermissions, customPrimary, refreshMaterializedView)
 			const rootAuthorizator = new Authorizator(permissions, customPrimary, refreshMaterializedView)
-			const dataSchemaBuilder = this.graphqlSchemaBuilderFactory.create(schema.model, authorizator, rootAuthorizator)
 			const introspectionSchemaFactory = new IntrospectionSchemaFactory(
 				schema.model,
 				new EntityRulesResolver(schema.validation, schema.model),
@@ -69,46 +56,11 @@ export class GraphQlSchemaFactory {
 				.map(it => it.createSchema({ schema, identity, project }))
 				.filter(<T>(it: T | undefined): it is T => it !== undefined)
 
-			if (this.engine === 'graphql-json') {
-				const jsonSchema = new JsonContentSchemaBuilder(schema.model, authorizator, rootAuthorizator, this.getJsonShared(schema)).build([
-					createJsonIntrospectionExtension(introspectionSchemaFactory),
-					...otherSchemas.map(createGraphQLJsBridge),
-				])
-				return { schema: { engine: 'graphql-json', schema: jsonSchema }, permissions, allPermissions }
-			}
-
-			const introspectionSchema = new IntrospectionSchemaDefinitionFactory(introspectionSchemaFactory).createConfig()
-
-			const queries = new Map<string, GraphQLFieldConfig<any, Context, any>>()
-			const mutations = new Map<string, GraphQLFieldConfig<any, Context, any>>()
-			const types: GraphQLNamedType[] = []
-
-			for (const schema of [introspectionSchema, ...otherSchemas]) {
-				if (schema instanceof GraphQLSchema) {
-					for (const [field, config] of Object.entries(schema.getQueryType()?.toConfig().fields ?? {})) {
-						queries.set(field, config)
-					}
-					for (const [field, config] of Object.entries(schema.getQueryType()?.toConfig().fields ?? {})) {
-						mutations.set(field, config)
-					}
-				} else {
-					for (const [field, config] of Object.entries(schema.query?.toConfig().fields ?? {})) {
-						queries.set(field, config)
-					}
-					for (const [field, config] of Object.entries(schema.mutation?.toConfig().fields ?? {})) {
-						mutations.set(field, config)
-					}
-					types.push(...(schema.types ?? []))
-				}
-			}
-
-			const graphQlSchema = dataSchemaBuilder.build({
-				mutations,
-				queries,
-				types,
-			})
-
-			return { schema: { engine: 'graphql-js', schema: graphQlSchema }, permissions, allPermissions }
+			const jsonSchema = new JsonContentSchemaBuilder(schema.model, authorizator, rootAuthorizator, this.getJsonShared(schema)).build([
+				createJsonIntrospectionExtension(introspectionSchemaFactory),
+				...otherSchemas.map(createGraphQLJsBridge),
+			])
+			return { schema: jsonSchema, permissions, allPermissions }
 		})
 	}
 

@@ -133,7 +133,7 @@ const createSchemaResolvers = (
 
 /**
  * Builds the content schema as plain JSON for `@contember/graphql-json`, without graphql-js type instances.
- * Mirrors `GraphQlSchemaBuilder` and its providers; `graphQlSchemaJson.test.ts` keeps the two in sync.
+ * The printed schema must stay stable for clients; `graphQlSchemaBuilder.test.ts` compares it with recorded SDL.
  */
 export class JsonContentSchemaBuilder {
 	private readonly registry: JsonTypeRegistry
@@ -320,7 +320,6 @@ export class JsonContentSchemaBuilder {
 		return fields
 	}
 
-	/** Mirrors `MutationProvider`. */
 	private getMutations(entity: Model.Entity): Record<string, JsonOutputField> {
 		const entityName = entity.name
 		const mutations: Record<string, JsonOutputField> = {}
@@ -413,7 +412,6 @@ export class JsonContentSchemaBuilder {
 		}, [mutationResult])
 	}
 
-	/** Mirrors `ResultSchemaTypeProvider`. */
 	private getPathFragmentType(): string {
 		const string = namedRef(this.registry.scalar('String', undefined))
 		const int = this.columnTypes.getScalar(Model.ColumnType.Int)
@@ -455,7 +453,6 @@ export class JsonContentSchemaBuilder {
 		}))
 	}
 
-	/** Mirrors `RefreshViewMutationProvider`. */
 	private getRefreshViewMutation(): JsonOutputField | undefined {
 		const materializedViews = Object.values(this.schema.entities)
 			.filter(it => it.view?.materialized)

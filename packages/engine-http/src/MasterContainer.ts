@@ -6,7 +6,7 @@ import { Initializer } from './bootstrap/index.js'
 import { Env, ServerConfig } from './config/config.js'
 
 import { DatabaseMetadataResolver } from '@contember/database'
-import { ExecutionContainerFactory, GraphQlSchemaBuilderFactory, PermissionFactory } from '@contember/engine-content-api'
+import { ExecutionContainerFactory, PermissionFactory } from '@contember/engine-content-api'
 import { Logger } from '@contember/logger'
 import { noopTracer, Tracer } from '@contember/telemetry'
 import { Schema } from '@contember/schema'
@@ -121,12 +121,7 @@ export class MasterContainerFactory {
 				'executionContainerFactory',
 				({ providers, serverConfig }) => new ExecutionContainerFactory(providers, serverConfig.contentApi?.whereOptimizer),
 			)
-			.addService('graphQlSchemaBuilderFactory', () => new GraphQlSchemaBuilderFactory())
-			.addService(
-				'contentQueryExecutor',
-				({ executionContainerFactory, graphQlSchemaBuilderFactory }) =>
-					new ContentQueryExecutorImpl(executionContainerFactory, graphQlSchemaBuilderFactory),
-			)
+			.addService('contentQueryExecutor', ({ executionContainerFactory }) => new ContentQueryExecutorImpl(executionContainerFactory))
 			.addService(
 				'systemContainerFactory',
 				({ providers, modificationHandlerFactory, contentQueryExecutor, serverConfig }) =>
@@ -141,18 +136,12 @@ export class MasterContainerFactory {
 				}))
 			.addService(
 				'graphQlSchemaFactory',
-				({ plugins, providers, graphqlSchemaCache, contentPermissionFactory, graphQlSchemaBuilderFactory, serverConfig }) => {
+				({ plugins, providers, graphqlSchemaCache, contentPermissionFactory }) => {
 					const contributors = plugins
 						.map(it => (it.getSchemaContributor ? it.getSchemaContributor({ providers }) : null))
 						.filter((it): it is GraphQLSchemaContributor => !!it)
 
-					return new GraphQlSchemaFactory(
-						graphqlSchemaCache,
-						graphQlSchemaBuilderFactory,
-						contentPermissionFactory,
-						contributors,
-						serverConfig.contentApi?.graphqlEngine,
-					)
+					return new GraphQlSchemaFactory(graphqlSchemaCache, contentPermissionFactory, contributors)
 				},
 			)
 			.addService(

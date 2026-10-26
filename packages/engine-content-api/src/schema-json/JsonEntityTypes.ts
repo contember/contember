@@ -6,8 +6,8 @@ import { FieldAccessVisitor } from '../schema/FieldAccessVisitor.js'
 import { GqlTypeName } from '../schema/utils.js'
 import { capitalizeFirstLetter, getFieldsForUniqueWhere } from '../utils/index.js'
 import { ImplementationException } from '../exception.js'
-import { HasManyToHasOneReducer } from '../extensions/hasManyToHasOneReducer/HasManyToHasOneReducer.js'
-import { PaginatedHasManyFieldProvider } from '../extensions/paginatedHasMany/PaginatedHasManyFieldProvider.js'
+import { HasManyToHasOneReducerExecutionHandler } from '../extensions/hasManyToHasOneReducer/HasManyToHasOneReducerExecutionHandler.js'
+import { PaginatedHasManyExecutionHandler } from '../extensions/paginatedHasMany/PaginatedHasManyExecutionHandler.js'
 import { JsonColumnTypes } from './JsonColumnTypes.js'
 import { JsonFilterTypes } from './JsonFilterTypes.js'
 import { JsonOutputField, JsonTypeRegistry, listOfNonNullRef, namedRef, nonNullListOfNonNullRef, nonNullRef, toNonNull } from './JsonTypeRegistry.js'
@@ -102,7 +102,7 @@ export class JsonEntityTypes {
 				resolve: aliasAwareResolver,
 			}
 		}
-		// same order as the registered EntityFieldsProviders of GraphQlSchemaBuilderFactory
+		// the field order is part of the published schema: columns and relations, reducers, then paginated relations
 		for (const field of accessibleFields) {
 			if (field.type === Model.RelationType.OneHasMany) {
 				Object.assign(fields, this.getHasManyToHasOneFields(entity, field.name))
@@ -132,7 +132,6 @@ export class JsonEntityTypes {
 		})
 	}
 
-	/** Mirrors `FieldTypeVisitor.isAlwaysReadable`. */
 	private isAlwaysReadable(authorizator: Authorizator, entity: Model.Entity, column: Model.AnyColumn): boolean {
 		if (authorizator.getEntityPermission(Acl.Operation.read, entity.name) === 'no') {
 			return true
@@ -159,7 +158,6 @@ export class JsonEntityTypes {
 		})
 	}
 
-	/** Mirrors `HasManyToHasOneRelationReducerFieldVisitor.visitOneHasMany`. */
 	private getHasManyToHasOneFields(entity: Model.Entity, relationName: string): Record<string, JsonOutputField> {
 		const relation = entity.fields[relationName]
 		if (relation.type !== Model.RelationType.OneHasMany) {
@@ -179,7 +177,7 @@ export class JsonEntityTypes {
 			.filter(uniqueKey => uniqueKey.every(isReadable))
 
 		const entityType = this.getEntity(targetEntity.name)
-		const extensions = { relationName: relation.name, extensionKey: HasManyToHasOneReducer.extensionName }
+		const extensions = { relationName: relation.name, extensionKey: HasManyToHasOneReducerExecutionHandler.extensionName }
 		const createField = (uniqueWhereName: string, keys: (readonly string[])[]): JsonOutputField => ({
 			type: namedRef(entityType),
 			extensions,
@@ -214,7 +212,6 @@ export class JsonEntityTypes {
 		return fields
 	}
 
-	/** Mirrors `PaginatedHasManyFieldProviderVisitor`. */
 	private getPaginatedHasManyFields(entity: Model.Entity, fieldName: string): Record<string, JsonOutputField> {
 		const field = entity.fields[fieldName]
 		if (field.type !== Model.RelationType.OneHasMany && field.type !== Model.RelationType.ManyHasMany) {
@@ -223,7 +220,7 @@ export class JsonEntityTypes {
 		return {
 			[`paginate${capitalizeFirstLetter(field.name)}`]: {
 				...this.createPaginatedField(field.target),
-				extensions: { relationName: field.name, extensionKey: PaginatedHasManyFieldProvider.extensionName },
+				extensions: { relationName: field.name, extensionKey: PaginatedHasManyExecutionHandler.extensionName },
 				resolve: aliasAwareResolver,
 			},
 		}

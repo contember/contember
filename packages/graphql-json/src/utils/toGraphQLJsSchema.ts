@@ -25,7 +25,8 @@ import {
 	isObjectType,
 	isOutputType,
 } from 'graphql'
-import { Argument, Field, getListItemType, isListType, isNonNullType, Schema, TypeKind, TypeRef, unwrapNonNull } from '@contember/graphql-json'
+import { Argument, Field, Schema, TypeKind, TypeRef } from '../types/schema.js'
+import { getListItemType, isListType, isNonNullType, unwrapNonNull } from './typeRef.js'
 
 const builtInScalars: Record<string, GraphQLScalarType> = {
 	Int: GraphQLInt,
@@ -35,7 +36,7 @@ const builtInScalars: Record<string, GraphQLScalarType> = {
 	ID: GraphQLID,
 }
 
-/** Rebuilds a graphql-js schema from a JSON schema, so the two builders can be compared as printed SDL. */
+/** Rebuilds a graphql-js schema from a JSON schema, e.g. to print it as SDL or to validate it with graphql-js. */
 export const toGraphQLJsSchema = (schema: Schema): GraphQLSchema => {
 	const named = new Map<string, GraphQLNamedType>()
 

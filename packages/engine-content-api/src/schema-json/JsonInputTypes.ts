@@ -102,7 +102,6 @@ export class JsonInputTypes {
 		})
 	}
 
-	/** Mirrors `CreateEntityRelationInputFieldVisitor.createInputObject`. */
 	private getCreateRelationInput(
 		{ entity, relation, targetEntity, targetRelation }: Model.AnyRelationContext,
 		withAliasField: boolean,
@@ -130,7 +129,6 @@ export class JsonInputTypes {
 		return this.registry.inputObject(GqlTypeName`${entity.name}Create${relation.name}EntityRelationInput`, () => fields)
 	}
 
-	/** Mirrors `UpdateEntityRelationInputFieldVisitor.visitHasOne`. */
 	private getUpdateHasOneRelationInput({ targetRelation, targetEntity, relation, entity }: Model.AnyHasOneRelationContext): string | undefined {
 		const withoutRelation = targetRelation ? targetRelation.name : undefined
 		const whereInput = this.getUniqueWhereInput(targetEntity)
@@ -160,7 +158,6 @@ export class JsonInputTypes {
 		return this.registry.inputObject(GqlTypeName`${entity.name}Update${relation.name}EntityRelationInput`, () => fields)
 	}
 
-	/** Mirrors `UpdateEntityRelationInputFieldVisitor.visitHasMany`. */
 	private getUpdateHasManyRelationInput({ entity, relation, targetEntity, targetRelation }: Model.AnyHasManyRelationContext): string | undefined {
 		const withoutRelation = targetRelation ? targetRelation.name : undefined
 		const whereInput = this.getUniqueWhereInput(targetEntity)
@@ -196,7 +193,6 @@ export class JsonInputTypes {
 		return this.registry.inputObject(GqlTypeName`${entity.name}Update${relation.name}EntityRelationInput`, () => fields)
 	}
 
-	/** Mirrors `ConnectOrCreateRelationInputProvider`. */
 	private getConnectOrCreateInput(entity: Model.Entity, relationName: string): string {
 		return acceptFieldVisitor<string>(this.schema, entity, relationName, {
 			visitColumn: () => {

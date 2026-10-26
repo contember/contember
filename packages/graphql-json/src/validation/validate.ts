@@ -5,7 +5,7 @@
  * Validates a GraphQL document against a schema and returns any errors.
  */
 import type { DocumentNode } from 'graphql'
-import { GraphQLError, visit, visitInParallel } from 'graphql'
+import { getEnterLeaveForKind, GraphQLError, visit, visitInParallel } from 'graphql'
 
 import type { Schema } from '../types/schema.js'
 import type { ScalarMap } from '../types/resolvers.js'
@@ -82,10 +82,21 @@ export function validate(
 	const visitors = rules.map((rule) => rule(context))
 
 	// Visit the whole document with all rules in parallel
-	const visitor = visitInParallel(visitors)
+	const visitor = visitWithTypeInfo(typeInfo, visitInParallel(visitors))
 
 	try {
-		visit(document, visitWithTypeInfo(typeInfo, visitor))
+		visit(document, {
+			// Descriptions must not affect validation, see https://spec.graphql.org/draft/#sec-Descriptions
+			enter(node, key, parent, path, ancestors) {
+				if (key === 'description') {
+					return false
+				}
+				return getEnterLeaveForKind(visitor, node.kind).enter?.call(visitor, node, key, parent, path, ancestors)
+			},
+			leave(node, key, parent, path, ancestors) {
+				return getEnterLeaveForKind(visitor, node.kind).leave?.call(visitor, node, key, parent, path, ancestors)
+			},
+		})
 	} catch (e) {
 		if (e !== abortObj) {
 			throw e

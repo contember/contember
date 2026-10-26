@@ -88,9 +88,10 @@ const compareCanonical = (a: string | null, b: string | null): number => {
 	return a < b ? -1 : 1
 }
 
-const sortedStrings = (values: readonly string[]): string[] => [...values].sort(compareCanonical)
+// The server de-duplicates set-like lists before storing them (`validateTrustDefinition`), so the plan must too.
+const sortedStrings = (values: readonly string[]): string[] => [...new Set(values)].sort(compareCanonical)
 
-const sortedNullableStrings = (values: readonly (string | null)[]): (string | null)[] => [...values].sort(compareCanonical)
+const sortedNullableStrings = (values: readonly (string | null)[]): (string | null)[] => [...new Set(values)].sort(compareCanonical)
 
 /** JSON with sorted object keys. */
 const canonicalJson = (value: JsonValue): string => {
@@ -109,14 +110,15 @@ const canonicalCondition = (condition: JsonValue): string => {
 	if (condition !== null && typeof condition === 'object' && !Array.isArray(condition)) {
 		const operand = condition.in
 		if (Array.isArray(operand)) {
-			return canonicalJson({ ...condition, in: [...operand].sort((a, b) => compareCanonical(canonicalJson(a), canonicalJson(b))) })
+			const operands = [...new Map(operand.map(it => [canonicalJson(it), it])).entries()]
+			return canonicalJson({ ...condition, in: operands.sort(([a], [b]) => compareCanonical(a, b)).map(([, it]) => it) })
 		}
 	}
 	return canonicalJson(condition)
 }
 
 const canonicalConditions = (conditions: JsonValue): string[] =>
-	Array.isArray(conditions) ? conditions.map(canonicalCondition).sort() : [canonicalJson(conditions)]
+	Array.isArray(conditions) ? sortedStrings(conditions.map(canonicalCondition)) : [canonicalJson(conditions)]
 
 interface MembershipLike {
 	readonly project: string
@@ -151,7 +153,8 @@ export const canonicalizeConfig = (config: TenantWorkloadIdentityConfig): Canoni
 		requireDpop: config.requireDpop ?? false,
 		maxTokenLifetime: config.maxTokenLifetime ?? DEFAULT_MAX_TOKEN_LIFETIME,
 		trustForwardedInfo: config.trustForwardedInfo ?? false,
-		description: config.description ?? null,
+		// the server stores an empty description as null
+		description: config.description === undefined || config.description === '' ? null : config.description,
 		roles: sortedStrings(config.roles ?? []),
 		memberships: (config.memberships ?? []).map(canonicalMembership).sort(),
 		disabled: config.disabled ?? false,

@@ -476,8 +476,13 @@ export class TenantProjectClient {
 		return result.workloadIdentityTrusts.map(toRemoteWorkloadIdentityTrust)
 	}
 
-	public async applyWorkloadIdentityTrust(slug: string, trust: WorkloadIdentityTrustInput): Promise<WorkloadIdentityApplyResult> {
-		const result = await this.transport.exec(applyWorkloadIdentityTrustFetcher, { slug, trust })
+	/** With `dryRun`, the server runs every check and write of the apply and rolls them back. */
+	public async applyWorkloadIdentityTrust(
+		slug: string,
+		trust: WorkloadIdentityTrustInput,
+		options: { readonly dryRun?: boolean } = {},
+	): Promise<WorkloadIdentityApplyResult> {
+		const result = await this.transport.exec(applyWorkloadIdentityTrustFetcher, { slug, trust, dryRun: options.dryRun ?? false })
 		const response = result.applyWorkloadIdentityTrust
 		this.transport.assertOk(response, `applyWorkloadIdentityTrust(${slug})`)
 		if (!response.result) {

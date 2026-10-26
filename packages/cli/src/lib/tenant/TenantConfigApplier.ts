@@ -81,6 +81,7 @@ export interface TenantWorkloadIdentityOutcome {
 	rejectsEarlierTokens: boolean
 	/** The server's answer after an apply; `null` in a dry run and for disables and unchanged trusts. */
 	tokensValidAfterBumped: boolean | null
+	/** The authorized envelope closure the server computed, in a dry run too; `null` for disables and unchanged trusts. */
 	envelopeClosure: WorkloadEnvelopeClosure | null
 }
 
@@ -143,6 +144,9 @@ export class TenantConfigApplier {
 		const workloadIdentityPlan = config.workloadIdentities === undefined
 			? undefined
 			: planWorkloadIdentities(config.workloadIdentities, await clients.project.listWorkloadIdentityTrusts())
+		const workloadIdentityClosures = workloadIdentityPlan === undefined
+			? new Map<string, WorkloadEnvelopeClosure>()
+			: await this.validateWorkloadIdentities(clients, workloadIdentityPlan)
 
 		if (config.config && hasEffectiveConfigValue(config.config)) {
 			const globalConfig = config.config
@@ -229,14 +233,44 @@ export class TenantConfigApplier {
 
 		const workloadIdentities = workloadIdentityPlan === undefined
 			? null
-			: await this.applyWorkloadIdentities(clients, workloadIdentityPlan, run, warn)
+			: await this.applyWorkloadIdentities(clients, workloadIdentityPlan, workloadIdentityClosures, run, warn)
 
 		return { actions, warnings, workloadIdentities }
+	}
+
+	/**
+	 * Every create and update goes to the server as a dry run before anything is written, so a definition the server
+	 * refuses fails the whole apply up front instead of after the disables ran (a renamed trust would be left with none).
+	 * It is sent disabled: an enabled one could collide with an (issuer, audience) that a disable in this plan frees.
+	 * The block is authoritative and checked for distinct addresses, so no other enabled trust can hold one.
+	 */
+	private async validateWorkloadIdentities(
+		clients: TenantConfigApplierClients,
+		plan: WorkloadIdentityPlan,
+	): Promise<Map<string, WorkloadEnvelopeClosure>> {
+		const pendingSlugs = plan.steps.filter(it => it.mutation !== null).map(it => it.slug)
+		const closures = new Map<string, WorkloadEnvelopeClosure>()
+		for (const step of plan.steps) {
+			if (step.mutation?.type !== 'apply') {
+				continue
+			}
+			try {
+				const result = await clients.project.applyWorkloadIdentityTrust(step.slug, { ...step.mutation.input, disabled: true }, { dryRun: true })
+				closures.set(step.slug, result.envelopeClosure)
+			} catch (error) {
+				if (error instanceof CliError && error.code === 'WORKLOAD_CREDENTIAL_FORBIDDEN') {
+					throw workloadCredentialForbidden(pendingSlugs, error)
+				}
+				throw error
+			}
+		}
+		return closures
 	}
 
 	private async applyWorkloadIdentities(
 		clients: TenantConfigApplierClients,
 		plan: WorkloadIdentityPlan,
+		closures: ReadonlyMap<string, WorkloadEnvelopeClosure>,
 		run: (action: TenantConfigActionType, target: string | null, execute: () => Promise<void>) => Promise<void>,
 		warn: (code: TenantConfigWarningCode, target: string, message: string) => void,
 	): Promise<TenantWorkloadIdentityOutcome[]> {
@@ -265,7 +299,7 @@ export class TenantConfigApplier {
 				change: step.change,
 				rejectsEarlierTokens: step.rejectsEarlierTokens,
 				tokensValidAfterBumped: null,
-				envelopeClosure: null,
+				envelopeClosure: closures.get(step.slug) ?? null,
 			}
 			outcomes.push(outcome)
 			const mutation = step.mutation

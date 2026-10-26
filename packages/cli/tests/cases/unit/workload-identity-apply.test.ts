@@ -243,7 +243,9 @@ const createClients = (existing: RemoteWorkloadIdentityTrust[], failApplyWith?: 
 	const calls: string[] = []
 	const clients: TenantConfigApplierClients = {
 		project: {
-			configure: async () => undefined,
+			configure: async () => {
+				calls.push('configure')
+			},
 			listIdentityProviders: async () => [],
 			addIdp: async () => undefined,
 			updateIdp: async () => undefined,
@@ -253,8 +255,8 @@ const createClients = (existing: RemoteWorkloadIdentityTrust[], failApplyWith?: 
 				calls.push('list')
 				return existing
 			},
-			applyWorkloadIdentityTrust: async (slug: string) => {
-				calls.push(`apply:${slug}`)
+			applyWorkloadIdentityTrust: async (slug: string, trust: WorkloadIdentityTrustInput, options = {}) => {
+				calls.push(`${options.dryRun === true ? 'validate' : 'apply'}:${slug}${trust.disabled === true ? ' (disabled)' : ''}`)
 				if (failApplyWith) {
 					throw failApplyWith
 				}
@@ -277,6 +279,30 @@ const createClients = (existing: RemoteWorkloadIdentityTrust[], failApplyWith?: 
 	return { clients, calls }
 }
 
+describe("planWorkloadIdentities compares in the server's canonical form", () => {
+	test('duplicates and an empty description match what the server stored', () => {
+		const config: TenantWorkloadIdentityConfig = {
+			...webBackend,
+			description: '',
+			signingAlgs: ['RS256', 'ES256', 'RS256'],
+			typ: ['JWT', null, 'JWT'],
+			roles: [],
+			conditions: [{ claim: 'sub', equals: 'web-backend' }, { claim: 'sub', equals: 'web-backend' }],
+		}
+		const remote = stored('web-backend', { ...webBackend, signingAlgs: ['ES256', 'RS256'], typ: ['JWT', null] })
+
+		expect(remote.description).toBeNull()
+		expect(planWorkloadIdentities({ 'web-backend': config }, [remote]).steps.map(it => it.change)).toEqual(['unchanged'])
+	})
+
+	test('a repeated in operand is no change of who the trust admits', () => {
+		const remote = stored('web-backend', { ...webBackend, conditions: [{ claim: 'sub', in: ['a', 'b'] }] })
+		const config: TenantWorkloadIdentityConfig = { ...webBackend, conditions: [{ claim: 'sub', in: ['b', 'a', 'b'] }] }
+
+		expect(planWorkloadIdentities({ 'web-backend': config }, [remote]).steps.map(it => it.change)).toEqual(['unchanged'])
+	})
+})
+
 describe('TenantConfigApplier with workloadIdentities', () => {
 	test('an absent block leaves trusts unmanaged and does not even list them', async () => {
 		const { clients, calls } = createClients([stored('web-backend', webBackend)])
@@ -296,12 +322,12 @@ describe('TenantConfigApplier with workloadIdentities', () => {
 			{ dryRun: true },
 		)
 
-		expect(calls).toEqual(['list'])
+		expect(calls).toEqual(['list', 'validate:web-backend (disabled)'])
 		expect(plan.actions).toEqual([{ action: 'updateWorkloadIdentity', target: 'web-backend' }])
 		expect(plan.workloadIdentities).toEqual([
-			{ slug: 'web-backend', change: 'update', rejectsEarlierTokens: true, tokensValidAfterBumped: null, envelopeClosure: null },
+			{ slug: 'web-backend', change: 'update', rejectsEarlierTokens: true, tokensValidAfterBumped: null, envelopeClosure: closureWithAdmin },
 		])
-		expect(plan.warnings.map(it => it.code)).toEqual(['WORKLOAD_IDENTITY_REJECTS_EARLIER_TOKENS'])
+		expect(plan.warnings.map(it => it.code)).toEqual(['WORKLOAD_IDENTITY_REJECTS_EARLIER_TOKENS', 'WORKLOAD_IDENTITY_SENSITIVE_ROLE'])
 	})
 
 	test('applies disables before upserts and reports the closure with its sensitive roles', async () => {
@@ -310,7 +336,7 @@ describe('TenantConfigApplier with workloadIdentities', () => {
 
 		const plan = await new TenantConfigApplier(output).apply(clients, { workloadIdentities: { 'sites-sync': sitesSync } })
 
-		expect(calls).toEqual(['list', 'disable:old-sync', 'apply:sites-sync'])
+		expect(calls).toEqual(['list', 'validate:sites-sync (disabled)', 'disable:old-sync', 'apply:sites-sync'])
 		expect(plan.workloadIdentities?.find(it => it.slug === 'sites-sync')?.envelopeClosure).toEqual(closureWithAdmin)
 		expect(plan.warnings).toEqual([{
 			code: 'WORKLOAD_IDENTITY_SENSITIVE_ROLE',
@@ -325,9 +351,10 @@ describe('TenantConfigApplier with workloadIdentities', () => {
 			code: 'WORKLOAD_CREDENTIAL_FORBIDDEN',
 			exitCode: ExitCode.Forbidden,
 		})
-		const { clients } = createClients([stored('web-backend', webBackend)], refusal)
+		const { clients, calls } = createClients([stored('web-backend', webBackend)], refusal)
 
 		const promise = new TenantConfigApplier(createTestOutput().output).apply(clients, {
+			config: { password: { minLength: 12 } },
 			workloadIdentities: { 'sites-sync': sitesSync, 'web-backend': webBackend },
 		})
 
@@ -337,6 +364,8 @@ describe('TenantConfigApplier with workloadIdentities', () => {
 			details: { trusts: ['sites-sync'] },
 		})
 		await expect(promise).rejects.toThrow(/person or API key credential/)
+		// refused by the up-front dry run, before the config section or any trust was written
+		expect(calls).toEqual(['list', 'validate:sites-sync (disabled)'])
 	})
 
 	test('an unchanged block applied by a workload credential issues no mutation at all', async () => {

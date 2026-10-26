@@ -548,6 +548,17 @@
         "graphql-ts-client-codegen": "catalog:",
       },
     },
+    "packages/graphql-json": {
+      "name": "@contember/graphql-json",
+      "version": "2.2.0-alpha.13",
+      "devDependencies": {
+        "@types/node": "catalog:",
+        "graphql": "catalog:",
+      },
+      "peerDependencies": {
+        "graphql": "catalog:",
+      },
+    },
     "packages/graphql-utils": {
       "name": "@contember/graphql-utils",
       "version": "2.2.0-alpha.13",
@@ -1534,6 +1545,8 @@
     "@contember/graphql-client-system": ["@contember/graphql-client-system@workspace:packages/graphql-client-system"],
 
     "@contember/graphql-client-tenant": ["@contember/graphql-client-tenant@workspace:packages/graphql-client-tenant"],
+
+    "@contember/graphql-json": ["@contember/graphql-json@workspace:packages/graphql-json"],
 
     "@contember/graphql-utils": ["@contember/graphql-utils@workspace:packages/graphql-utils"],
 

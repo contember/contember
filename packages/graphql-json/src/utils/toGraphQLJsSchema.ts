@@ -81,7 +81,11 @@ export const toGraphQLJsSchema = (schema: Schema): GraphQLSchema => {
 		return type
 	}
 	const args = (args: Record<string, Argument> | null): GraphQLFieldConfigArgumentMap =>
-		Object.fromEntries(Object.entries(args ?? {}).map(([name, arg]) => [name, { type: inputType(arg[0]), defaultValue: arg[1], description: arg[2] }]))
+		Object.fromEntries(
+			Object.entries(args ?? {}).map((
+				[name, arg],
+			) => [name, { type: inputType(arg[0]), defaultValue: arg[1], description: arg[2], deprecationReason: arg[3] }]),
+		)
 	const fields = (fields: Record<string, Field>) => (): GraphQLFieldConfigMap<unknown, unknown> =>
 		Object.fromEntries(
 			Object.entries(fields).map(([name, field]) => [
@@ -143,7 +147,7 @@ export const toGraphQLJsSchema = (schema: Schema): GraphQLSchema => {
 						Object.fromEntries(
 							Object.entries(type[1]).map(([fieldName, field]) => [
 								fieldName,
-								{ type: inputType(field[0]), defaultValue: field[1], description: field[2] },
+								{ type: inputType(field[0]), defaultValue: field[1], description: field[2], deprecationReason: field[3] },
 							]),
 						),
 				})

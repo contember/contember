@@ -71,21 +71,23 @@ export type TypeKind = typeof TypeKind[keyof typeof TypeKind]
 // =============================================================================
 
 /**
- * Argument: [typeRef, defaultValue?, description?]
+ * Argument: [typeRef, defaultValue?, description?, deprecationReason?]
  */
 export type Argument = [
 	type: TypeRef,
 	defaultValue?: unknown,
 	description?: string,
+	deprecationReason?: string,
 ]
 
 /**
- * InputField: [typeRef, defaultValue?, description?]
+ * InputField: [typeRef, defaultValue?, description?, deprecationReason?]
  */
 export type InputField = [
 	type: TypeRef,
 	defaultValue?: unknown,
 	description?: string,
+	deprecationReason?: string,
 ]
 
 /**
@@ -269,6 +271,7 @@ export const A = {
 	type: (a: Argument): TypeRef => a[0],
 	defaultValue: (a: Argument): unknown => a[1],
 	description: (a: Argument): string | undefined => a[2],
+	deprecationReason: (a: Argument): string | undefined => a[3],
 } as const
 
 // InputField accessors (same as Argument)

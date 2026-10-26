@@ -1,6 +1,17 @@
 import { describe, expect, test } from 'bun:test'
 import { getIntrospectionQuery, parse } from 'graphql'
-import { buildSchema, executeSync, getSchemaWithIntrospection, introspectionTypes, SchemaInterner, validate } from '../src/index.js'
+import {
+	buildSchema,
+	executeSync,
+	getSchemaWithIntrospection,
+	introspectionTypes,
+	isObjectType,
+	type Schema,
+	SchemaInterner,
+	TypeKind,
+	TypePattern,
+	validate,
+} from '../src/index.js'
 
 const sdl = (extraField: string) => `
 	"""A directive"""
@@ -11,7 +22,7 @@ const sdl = (extraField: string) => `
 	"""A user"""
 	type User implements Node {
 		id: ID!
-		name(format: String = "short", upper: Boolean): String @deprecated(reason: "use label")
+		name(format: String = "short", upper: Boolean @deprecated(reason: "always upper")): String @deprecated(reason: "use label")
 		label: String
 		role: Role
 		${extraField}
@@ -25,7 +36,7 @@ const sdl = (extraField: string) => `
 
 	input UserFilter @oneOf { id: ID, name: String }
 
-	input Paging { limit: Int = 10, offset: Int }
+	input Paging { limit: Int = 10, offset: Int @deprecated }
 
 	scalar DateTime
 
@@ -76,5 +87,31 @@ describe('SchemaInterner', () => {
 		expect(interned.t.__Schema).toBe(introspectionTypes.__Schema)
 		expect(getSchemaWithIntrospection(interned)).toBe(interned)
 		expect(introspect(interned)).toEqual(introspect(schema))
+	})
+
+	test('keeps arguments apart by their deprecation and drops trailing absent elements', () => {
+		const argumentOf = (schema: Schema) => {
+			const query = schema.t.Query
+			if (!query || !isObjectType(query)) {
+				throw new Error('Query must be an object type')
+			}
+			return query[1].a?.[1]?.x
+		}
+		const withArgument = (argument: NonNullable<ReturnType<typeof argumentOf>>): Schema => ({
+			q: 'Query',
+			m: null,
+			s: null,
+			t: { Query: [TypeKind.OBJECT, { a: [[TypePattern.T, 'Int'], { x: argument }] }, []], Int: [TypeKind.SCALAR] },
+		})
+		const interner = new SchemaInterner()
+		const deprecated = argumentOf(interner.intern(withArgument([[TypePattern.T, 'Int'], undefined, undefined, 'old'])))
+		const other = argumentOf(interner.intern(withArgument([[TypePattern.T, 'Int'], undefined, undefined, 'older'])))
+		const current = argumentOf(interner.intern(withArgument([[TypePattern.T, 'Int'], undefined, undefined, undefined])))
+
+		expect(deprecated).toEqual([[TypePattern.T, 'Int'], undefined, undefined, 'old'])
+		expect(argumentOf(interner.intern(withArgument([[TypePattern.T, 'Int'], undefined, undefined, 'old'])))).toBe(deprecated)
+		expect(other).not.toBe(deprecated)
+		expect(current).toEqual([[TypePattern.T, 'Int']])
+		expect(current).toHaveLength(1)
 	})
 })

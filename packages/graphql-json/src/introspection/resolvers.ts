@@ -194,12 +194,25 @@ export class FieldIntrospectionData {
 }
 
 export class InputValueIntrospectionData {
-	constructor(
-		readonly _schema: Schema,
-		readonly _name: string,
-		readonly _arg: Argument | InputField,
-		readonly _deprecationReason?: string,
-	) {}
+	constructor(readonly _schema: Schema, readonly _name: string, readonly _arg: Argument | InputField) {}
+}
+
+/**
+ * The arguments or input fields, without the deprecated ones unless `includeDeprecated`, as graphql-js lists them
+ */
+function inputValues(
+	schema: Schema,
+	values: Record<string, Argument | InputField>,
+	includeDeprecated: boolean | undefined,
+): InputValueIntrospectionData[] {
+	const result: InputValueIntrospectionData[] = []
+	for (const [name, value] of Object.entries(values)) {
+		if (!includeDeprecated && A.deprecationReason(value) != null) {
+			continue
+		}
+		result.push(new InputValueIntrospectionData(schema, name, value))
+	}
+	return result
 }
 
 export class EnumValueIntrospectionData {
@@ -389,7 +402,7 @@ export const TypeResolvers = {
 
 	inputFields: (
 		data: TypeIntrospectionData | TypeWrapper,
-		_args: { includeDeprecated?: boolean },
+		args: { includeDeprecated?: boolean },
 	): InputValueIntrospectionData[] | null => {
 		const typeData = getTypeData(data)
 		if (!typeData) return null
@@ -399,14 +412,7 @@ export const TypeResolvers = {
 			return null
 		}
 
-		const fields = T.inputFields(type)
-		const result: InputValueIntrospectionData[] = []
-
-		for (const [name, field] of Object.entries(fields)) {
-			// Input fields don't have deprecation in our format, but we include the check for compatibility
-			result.push(new InputValueIntrospectionData(typeData._schema, name, field))
-		}
-		return result
+		return inputValues(typeData._schema, T.inputFields(type), args.includeDeprecated)
 	},
 
 	ofType: (data: TypeIntrospectionData | TypeWrapper): TypeWrapper | null => {
@@ -456,17 +462,11 @@ export const FieldResolvers = {
 
 	args: (
 		data: FieldIntrospectionData,
-		_args: { includeDeprecated?: boolean },
+		args: { includeDeprecated?: boolean },
 	): InputValueIntrospectionData[] => {
 		const fieldArgs = F.args(data._field)
 		if (!fieldArgs) return []
-
-		const result: InputValueIntrospectionData[] = []
-		for (const [name, arg] of Object.entries(fieldArgs)) {
-			// Arguments don't have deprecation in our format
-			result.push(new InputValueIntrospectionData(data._schema, name, arg))
-		}
-		return result
+		return inputValues(data._schema, fieldArgs, args.includeDeprecated)
 	},
 
 	type: (data: FieldIntrospectionData): TypeWrapper => {
@@ -507,11 +507,11 @@ export const InputValueResolvers = {
 	},
 
 	isDeprecated: (data: InputValueIntrospectionData): boolean => {
-		return data._deprecationReason !== undefined
+		return A.deprecationReason(data._arg) != null
 	},
 
 	deprecationReason: (data: InputValueIntrospectionData): string | null => {
-		return data._deprecationReason ?? null
+		return A.deprecationReason(data._arg) ?? null
 	},
 }
 
@@ -583,15 +583,8 @@ export const DirectiveResolvers = {
 
 	args: (
 		data: DirectiveIntrospectionData,
-		_args: { includeDeprecated?: boolean },
+		args: { includeDeprecated?: boolean },
 	): InputValueIntrospectionData[] => {
-		const directiveArgs = D.args(data._directive)
-		if (!directiveArgs) return []
-
-		const result: InputValueIntrospectionData[] = []
-		for (const [name, arg] of Object.entries(directiveArgs)) {
-			result.push(new InputValueIntrospectionData(data._schema, name, arg))
-		}
-		return result
+		return inputValues(data._schema, D.args(data._directive), args.includeDeprecated)
 	},
 }

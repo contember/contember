@@ -375,3 +375,24 @@ describe('specified scalars', () => {
 		}
 	})
 })
+
+describe('deprecated arguments and input fields', () => {
+	test('carry the reason of @deprecated as the fourth element', () => {
+		const schema = buildSchema(`
+			input Filter { old: Int @deprecated(reason: "gone") plain: Int @deprecated empty: Int @deprecated(reason: "") kept: Int @deprecated(reason: null) }
+			type Query { a(x: Int @deprecated(reason: "use y"), y: Int, filter: Filter): Int }
+		`)
+		const query = schema.t.Query
+		const filter = schema.t.Filter
+		if (!query || !isObjectType(query) || !filter || !isInputObjectType(filter)) {
+			throw new Error('unexpected schema')
+		}
+		const args = F.args(query[1].a) ?? {}
+		expect(A.deprecationReason(args.x)).toBe('use y')
+		expect(args.y).toEqual([[TypePattern.T, 'Int']])
+		expect(IF.deprecationReason(filter[1].old)).toBe('gone')
+		expect(IF.deprecationReason(filter[1].plain)).toBe('No longer supported')
+		expect(IF.deprecationReason(filter[1].empty)).toBe('')
+		expect(filter[1].kept).toEqual([[TypePattern.T, 'Int']])
+	})
+})

@@ -5,6 +5,7 @@
 import { Kind, parse, valueFromASTUntyped } from 'graphql'
 import type {
 	DirectiveDefinitionNode,
+	DirectiveNode,
 	DocumentNode,
 	EnumValueDefinitionNode,
 	FieldDefinitionNode,
@@ -189,14 +190,10 @@ function buildField(node: FieldDefinitionNode): Field {
 		: null
 
 	const description = node.description?.value
-
-	const deprecatedDirective = node.directives?.find((d) => d.name.value === 'deprecated')
-	const deprecationReason = deprecatedDirective
-		? getDeprecationReason(deprecatedDirective)
-		: undefined
+	const deprecationReason = getDeprecationReason(node)
 
 	// Build field array, omitting trailing undefined values
-	if (deprecationReason) {
+	if (deprecationReason !== undefined) {
 		return [typeRef, args, description, deprecationReason]
 	}
 	if (description) {
@@ -206,14 +203,18 @@ function buildField(node: FieldDefinitionNode): Field {
 }
 
 /**
- * Build Argument: [typeRef, defaultValue?, description?]
+ * Build Argument: [typeRef, defaultValue?, description?, deprecationReason?]
  */
 function buildArgument(node: InputValueDefinitionNode): Argument {
 	const typeRef = typeRefFromAST(node.type)
 	const defaultValue = node.defaultValue ? valueFromASTUntyped(node.defaultValue) : undefined
 	const description = node.description?.value
+	const deprecationReason = getDeprecationReason(node)
 
 	// Build argument array, omitting trailing undefined values
+	if (deprecationReason !== undefined) {
+		return [typeRef, defaultValue, description, deprecationReason]
+	}
 	if (description) {
 		return [typeRef, defaultValue, description]
 	}
@@ -224,7 +225,7 @@ function buildArgument(node: InputValueDefinitionNode): Argument {
 }
 
 /**
- * Build InputField: [typeRef, defaultValue?, description?]
+ * Build InputField: [typeRef, defaultValue?, description?, deprecationReason?]
  */
 function buildInputField(node: InputValueDefinitionNode): InputField {
 	return buildArgument(node) // Same structure as Argument
@@ -235,14 +236,10 @@ function buildInputField(node: InputValueDefinitionNode): InputField {
  */
 function buildEnumValue(node: EnumValueDefinitionNode): EnumValue {
 	const description = node.description?.value
-
-	const deprecatedDirective = node.directives?.find((d) => d.name.value === 'deprecated')
-	const deprecationReason = deprecatedDirective
-		? getDeprecationReason(deprecatedDirective)
-		: undefined
+	const deprecationReason = getDeprecationReason(node)
 
 	// Build enum value array, omitting trailing undefined values
-	if (deprecationReason) {
+	if (deprecationReason !== undefined) {
 		return [undefined, description, deprecationReason]
 	}
 	if (description) {
@@ -275,14 +272,19 @@ function buildDirective(node: DirectiveDefinitionNode): [string, Directive] {
 	return [name, [args, locations]]
 }
 
-function getDeprecationReason(
-	directive: { arguments?: readonly { name: { value: string }; value: unknown }[] },
-): string {
-	const reasonArg = directive.arguments?.find((a) => a.name.value === 'reason')
-	if (reasonArg?.value && typeof reasonArg.value === 'object' && 'value' in reasonArg.value) {
-		return String(reasonArg.value.value)
+/**
+ * The reason of the @deprecated directive on the node, as graphql-js reads it (an explicit null reason is not deprecated)
+ */
+function getDeprecationReason(node: { readonly directives?: readonly DirectiveNode[] }): string | undefined {
+	const deprecated = node.directives?.find(directive => directive.name.value === 'deprecated')
+	if (!deprecated) {
+		return undefined
 	}
-	return 'No longer supported'
+	const reason = deprecated.arguments?.find(arg => arg.name.value === 'reason')?.value
+	if (!reason) {
+		return 'No longer supported'
+	}
+	return reason.kind === Kind.STRING ? reason.value : undefined
 }
 
 function resolveInterfaceImplementations(types: Record<string, Type>): void {

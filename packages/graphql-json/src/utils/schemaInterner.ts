@@ -181,8 +181,10 @@ export class SchemaInterner {
 		}
 		const type = this.internTypeRef(argument[0])
 		const defaultValue = this.internValue(argument[1])
-		const description = argument[2]
-		const copy: Argument = description !== undefined
+		const [, , description, deprecationReason] = argument
+		const copy: Argument = deprecationReason !== undefined
+			? [type, defaultValue, description, deprecationReason]
+			: description !== undefined
 			? [type, defaultValue, description]
 			: defaultValue !== undefined
 			? [type, defaultValue]

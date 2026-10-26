@@ -25,6 +25,25 @@ type Column = {
 	getValue: ColumnValueGetter
 }
 
+/** Keys are field aliases, i.e. chosen by the client. */
+type RowLayout = Map<string, RowLayoutEntry>
+
+type RowLayoutEntry =
+	| { readonly type: 'column'; readonly getValue: ColumnValueGetter }
+	| { readonly type: 'object'; readonly layout: RowLayout }
+	| { readonly type: 'relation'; readonly relation: ResolvedData }
+
+type HydratedObject = { [key: string]: Value.FieldValue }
+
+/** An alias may be `__proto__`, which a plain assignment would turn into a prototype change. */
+const setOwnValue = (object: HydratedObject, key: string, value: Value.FieldValue): void => {
+	if (key === '__proto__') {
+		Object.defineProperty(object, key, { value, enumerable: true, configurable: true, writable: true })
+	} else {
+		object[key] = value
+	}
+}
+
 export class SelectHydrator {
 	private columns: Column[] = []
 	private promises: DataPromises[] = []
@@ -80,34 +99,70 @@ export class SelectHydrator {
 		const resolved = await this.resolveDataPromises()
 		this.chargeRows(rows.length, resolved.length)
 		this.formattedDates = 0
-		const hydrated = rows.map(row => this.hydrateRow(row, resolved))
+		const layout = this.createRowLayout(resolved)
+		const hydrated = rows.map(row => this.hydrateObject(row, layout))
 		// A formatted Date is a new string; their count is known only after the rows are built.
 		this.memoryBudget?.addHydrationBytes(this.formattedDates * 72)
 		return hydrated
 	}
 
-	private hydrateRow(row: SelectRow, resolvedData: ResolvedData[]): SelectResultObject {
-		const result: SelectResultObject = {}
+	/** Every row has the same shape, so the paths are resolved once instead of per row and column. */
+	private createRowLayout(resolvedData: ResolvedData[]): RowLayout {
+		const layout: RowLayout = new Map()
 
-		for (let columnPath of this.columns) {
-			const path = [...columnPath.path.path]
-			const last: string = path.pop() as string
-			const currentObject = path.reduce<any>((obj, part) => (obj[part] = obj[part] || {}), result)
-
-			currentObject[last] = this.formatValue(columnPath.getValue(row))
+		for (const { path, getValue } of this.columns) {
+			const parts = path.path
+			let current = layout
+			for (const part of parts.slice(0, -1)) {
+				const existing = current.get(part)
+				if (existing?.type === 'object') {
+					current = existing.layout
+				} else {
+					const nested: RowLayout = new Map()
+					current.set(part, { type: 'object', layout: nested })
+					current = nested
+				}
+			}
+			current.set(parts[parts.length - 1], { type: 'column', getValue })
 		}
 
-		for (let { path, getParentValue, data, defaultValue } of resolvedData) {
-			const pathTmp = [...path.path]
-			const last = pathTmp.pop() as string
-			const currentObject = pathTmp.reduce<any>((obj, part) => (obj?.[part]) || undefined, result)
-			const parentValue = getParentValue(row)
-			if (currentObject) {
-				currentObject[last] = (parentValue ? data[parentValue] : undefined) || defaultValue
+		// a relation lands only in an object the columns created
+		for (const relation of resolvedData) {
+			const parts = relation.path.path
+			let current: RowLayout | undefined = layout
+			for (const part of parts.slice(0, -1)) {
+				const existing: RowLayoutEntry | undefined = current.get(part)
+				current = existing?.type === 'object' ? existing.layout : undefined
+				if (!current) {
+					break
+				}
+			}
+			current?.set(parts[parts.length - 1], { type: 'relation', relation })
+		}
+
+		return layout
+	}
+
+	private hydrateObject(row: SelectRow, layout: RowLayout): SelectResultObject {
+		const result: HydratedObject = {}
+		for (const [key, entry] of layout) {
+			setOwnValue(result, key, this.hydrateEntry(row, entry))
+		}
+		return result
+	}
+
+	private hydrateEntry(row: SelectRow, entry: RowLayoutEntry): Value.FieldValue {
+		switch (entry.type) {
+			case 'column':
+				return this.formatValue(entry.getValue(row))
+			case 'object':
+				return this.hydrateObject(row, entry.layout)
+			case 'relation': {
+				const { getParentValue, data, defaultValue } = entry.relation
+				const parentValue = getParentValue(row)
+				return (parentValue && Object.hasOwn(data, parentValue) ? data[parentValue] : undefined) || defaultValue
 			}
 		}
-
-		return result
 	}
 
 	private async resolveDataPromises(): Promise<ResolvedData[]> {

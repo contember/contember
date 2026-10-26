@@ -1,7 +1,7 @@
-import { FieldNode as GraphQlFieldNode, GraphQLResolveInfo, SelectionSetNode } from 'graphql'
+import { FieldNode as GraphQlFieldNode, SelectionSetNode } from 'graphql'
 
 export class ResolveInfoUtils {
-	public static extractFieldNode(info: GraphQLResolveInfo): GraphQlFieldNode {
+	public static extractFieldNode(info: { readonly fieldNodes: readonly GraphQlFieldNode[] }): GraphQlFieldNode {
 		const newGraphQlFieldNodes = [...info.fieldNodes]
 		while (newGraphQlFieldNodes.length > 1) {
 			newGraphQlFieldNodes.push(

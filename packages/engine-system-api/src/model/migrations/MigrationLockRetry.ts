@@ -1,5 +1,6 @@
-import { ClientErrorCodes, QueryError } from '@contember/database'
+import { QueryError } from '@contember/database'
 import { logger } from '@contember/logger'
+import { isLockConflict } from './lockConflict.js'
 import { MigrationFailedError } from './ProjectMigrator.js'
 
 export interface MigrationLockOptions {
@@ -9,8 +10,6 @@ export interface MigrationLockOptions {
 	maxAttempts: number
 	retryDelayMs: number
 }
-
-const lockConflictCodes = new Set<string | undefined>([ClientErrorCodes.LOCK_NOT_AVAILABLE, ClientErrorCodes.T_R_DEADLOCK_DETECTED])
 
 interface MigrationTransaction {
 	client: {
@@ -22,9 +21,9 @@ interface TransactionRunner<Transaction extends MigrationTransaction> {
 	transaction: <T>(cb: (trx: Transaction) => Promise<T>) => Promise<T>
 }
 
-const isLockConflict = (error: unknown): boolean => {
+const findLockConflict = (error: unknown): QueryError | undefined => {
 	const queryError = error instanceof MigrationFailedError ? error.previous : error
-	return queryError instanceof QueryError && lockConflictCodes.has(queryError.code)
+	return queryError instanceof QueryError && isLockConflict(queryError) ? queryError : undefined
 }
 
 export class MigrationLockRetry {
@@ -37,21 +36,25 @@ export class MigrationLockRetry {
 	 */
 	async run<Transaction extends MigrationTransaction, T>(db: TransactionRunner<Transaction>, migrate: (trx: Transaction) => Promise<T>): Promise<T> {
 		const options = this.options
-		if (!options) {
-			return await db.transaction(migrate)
-		}
 		for (let attempt = 1;; attempt++) {
 			try {
 				return await db.transaction(async trx => {
-					await trx.client.query(`SELECT set_config('lock_timeout', ?, true)`, [`${options.lockTimeoutMs}ms`])
+					if (options) {
+						await trx.client.query(`SELECT set_config('lock_timeout', ?, true)`, [`${options.lockTimeoutMs}ms`])
+					}
 					return await migrate(trx)
 				})
 			} catch (e) {
-				if (attempt >= options.maxAttempts || !isLockConflict(e)) {
+				const lockConflict = findLockConflict(e)
+				if (!lockConflict) {
+					throw e
+				}
+				if (!options || attempt >= options.maxAttempts) {
+					logger.error(lockConflict, { message: 'Migration failed' })
 					throw e
 				}
 				logger.warn(`Migration hit a lock conflict (attempt ${attempt} of ${options.maxAttempts}), retrying in ${options.retryDelayMs} ms`, {
-					error: e instanceof Error ? e.message : String(e),
+					error: lockConflict.message,
 				})
 				await new Promise(resolve => setTimeout(resolve, options.retryDelayMs))
 			}

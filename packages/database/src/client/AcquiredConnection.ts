@@ -104,7 +104,9 @@ export class AcquiredConnection implements Connection.AcquiredConnectionLike {
 					throw new ForeignKeyViolationError(sql, parameters, error)
 				case ClientErrorCodes.UNIQUE_VIOLATION:
 					throw new UniqueViolationError(sql, parameters, error)
+				// both abort the transaction and succeed on a retry, so `retryTransaction` handles them alike
 				case ClientErrorCodes.T_R_SERIALIZATION_FAILURE:
+				case ClientErrorCodes.T_R_DEADLOCK_DETECTED:
 					throw new SerializationFailureError(sql, parameters, error)
 				case ClientErrorCodes.INVALID_TEXT_REPRESENTATION:
 				case ClientErrorCodes.DATETIME_FIELD_OVERFLOW:

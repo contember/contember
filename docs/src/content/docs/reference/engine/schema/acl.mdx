@@ -42,7 +42,7 @@ A variable is defined for a certain *role* and is injected into a predicate at e
 
 - Represent more complex [column conditions](/reference/engine/content/queries#comparison-operators) that can be injected at runtime (e.g., a date range).
 
-All variable values are managed via the [Tenant API Memberships](/reference/engine/tenant/memberships) or the “Assume Membership” feature.
+Entity and condition variable values are managed via the [Tenant API Memberships](/reference/engine/tenant/memberships) or the “Assume Membership” feature. Predefined variables take their value from the signed-in identity; an assumed membership may supply them explicitly.
 
 :::note
 After changing ACL definitions, remember to create and apply a migration.
@@ -89,7 +89,7 @@ Defines an **entity variable** that will hold an ID or a list of IDs referencing
   - `variableName`: unique identifier for the variable (within the same role)
   - `entityName`: the entity name (e.g., `"Category"`)
   - `roleOrRoles`: either a single role or an array of roles
-  - `fallback?`: optional fallback condition (e.g., `"never"` or a condition like `{ id: { eq: SOME_ID } }`) if no variable is supplied
+  - `fallback?`: optional condition used when no variable value is supplied, e.g. `{ never: true }` or `{ eq: SOME_ID }`. The condition applies to the referenced entity's primary key, so it is not wrapped in `{ id: ... }`.
 
 - **Example**:
 
@@ -113,7 +113,7 @@ Defines a variable referencing a **built-in** value (`identityID` or `personID`)
   - `variableName`: unique identifier for the variable (within the same role)
   - `value`: must be `"identityID"` or `"personID"`
   - `roleOrRoles`: the target role(s)
-  - `fallback?`: optional fallback if no predefined variable is available
+  - `fallback?`: optional condition used for a `personID` variable when the identity has no person, e.g. `{ never: true }` or `{ eq: SOME_ID }`
 
 - **Example**:
 
@@ -129,6 +129,20 @@ Defines a variable referencing a **built-in** value (`identityID` or `personID`)
     readerRole,
   )
   ```
+
+A predefined variable resolves to the first available value:
+
+1. A value supplied by an authorized [assumed membership](/reference/engine/content/advanced/assume-membership).
+2. The signed-in identity's `identityID`, or its `personID` when the identity has a person.
+3. For `personID` only: the `fallback`. Without a fallback, the variable matches no row.
+
+:::note[Available since 2.2]
+The `fallback` of a predefined variable. Before 2.2 it was accepted but ignored.
+:::
+
+:::caution
+A fallback such as `{ always: true }` grants every identity without a person whatever the predicate allows. Prefer `{ never: true }` or a narrow condition.
+:::
 
 ### `createConditionVariable(variableName, roleOrRoles[, fallback])`
 
@@ -304,7 +318,7 @@ export class Product {
 
 ## `@c.AllowCustomPrimary`
 
-The `@c.AllowCustomPrimary` decorator allows client-generated IDs to be used as primary keys when creating or updating entities. This is particularly useful for use cases like synchronizing data between external systems or generating unique identifiers outside of Contember.
+The `@c.AllowCustomPrimary` decorator allows client-generated IDs to be used as primary keys when creating entities. The primary key of an existing row cannot be changed. This is particularly useful for use cases like synchronizing data between external systems or generating unique identifiers outside of Contember.
 
 - Unlike `@c.Allow`, this decorator must be applied directly to the entity class without specifying roles or conditions.
 
@@ -321,7 +335,7 @@ export class Order {
 }
 ```
 
-- This example enables the client to specify the `id` of an `Order` when creating or updating it.
+- This example enables the client to specify the `id` of an `Order` when creating it, including the create branch of an upsert.
 - No additional ACL rules are required to allow this behavior.
 
 

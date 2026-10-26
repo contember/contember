@@ -7,24 +7,33 @@ export class OrderByHelper {
 		objectNode: ObjectNode<Input.ListQueryInput>,
 		relationOrderBy: readonly Model.OrderBy[] | undefined,
 	): ObjectNode<Input.ListQueryInput> {
-		const inputOrder = objectNode.args.orderBy || []
+		const requestedOrder = objectNode.args.orderBy || []
+		const inputOrder = requestedOrder.filter(it => !this.isEmptyRandomOrder(it))
+		const inputNode = inputOrder.length === requestedOrder.length ? objectNode : objectNode.withArg('orderBy', inputOrder)
 		const hasOrderBy = inputOrder.length > 0
 		const defaultOrderBy = relationOrderBy ?? entity.orderBy ?? []
 		if (!hasOrderBy && defaultOrderBy.length > 0) {
 			const defaultOrderByWithPrimary = [...defaultOrderBy, ...this.getPrimaryOrderBy(inputOrder, entity)]
-			return objectNode.withArg('orderBy', this.buildOrderBy(defaultOrderByWithPrimary))
+			return inputNode.withArg('orderBy', this.buildOrderBy(defaultOrderByWithPrimary))
 		}
-		const hasLimit = typeof objectNode.args.limit === 'number'
-		const hasOffset = typeof objectNode.args.offset === 'number'
-		if (
-			(!hasLimit && !hasOffset && !hasOrderBy)
-			|| (hasOrderBy && (inputOrder[0]._random || inputOrder[0]._randomSeeded !== undefined))
-		) {
-			return objectNode
+		const hasLimit = typeof inputNode.args.limit === 'number'
+		const hasOffset = typeof inputNode.args.offset === 'number'
+		if ((!hasLimit && !hasOffset && !hasOrderBy) || (hasOrderBy && this.isRandomOrder(inputOrder[0]))) {
+			return inputNode
 		}
 
 		const orderBy = this.buildOrderBy(this.getPrimaryOrderBy(inputOrder, entity))
-		return objectNode.withArg('orderBy', [...(inputOrder || []), ...orderBy])
+		return inputNode.withArg('orderBy', [...inputOrder, ...orderBy])
+	}
+
+	public static isRandomOrder(orderBy: Input.OrderBy): boolean {
+		return orderBy._random === true || typeof orderBy._randomSeeded === 'number'
+	}
+
+	// GraphQL passes `{ _random: null }`, `{ _random: false }` and `{ _randomSeeded: null }` through; they order nothing.
+	private static isEmptyRandomOrder(orderBy: Input.OrderBy): boolean {
+		const keys = Object.keys(orderBy)
+		return keys.length === 1 && (keys[0] === '_random' || keys[0] === '_randomSeeded') && !this.isRandomOrder(orderBy)
 	}
 
 	private static buildOrderBy(defaultOrderBy: readonly Model.OrderBy[]): Input.OrderByFields[] {

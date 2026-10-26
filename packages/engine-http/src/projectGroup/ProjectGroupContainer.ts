@@ -87,7 +87,7 @@ export class ProjectGroupContainerFactory {
 						...tenantDbCredentials.pool,
 						...tenantDbCredentials.read.pool,
 					},
-				}, err => logger.error(err))
+				}, err => logger.error(err), { retryStaleConnection: true })
 			})
 			.addService('projectSchemaResolver', () =>
 				new ProjectSchemaResolverProxy())

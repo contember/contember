@@ -10,7 +10,7 @@ import { EV, isAbstractType, isLeafType, isObjectType, isScalarType, T, TypeKind
 import type { ResolveInfo } from '../types/resolvers.js'
 import type { Path } from '../utils/path.js'
 import { addPath } from '../utils/path.js'
-import { inspect, isIterableObject, isObjectLike, isPromise } from '../utils/helpers.js'
+import { getOwn, inspect, isIterableObject, isObjectLike, isPromise } from '../utils/helpers.js'
 import { getListItemType, isListType, isNonNullType, unwrapNonNull } from '../utils/typeRef.js'
 import { collectSubfields, type GroupedFieldSet } from './collectFields.js'
 import { executeFields, handleFieldError } from './fields.js'
@@ -134,7 +134,7 @@ export function completeValue<TContext>(
 	}
 
 	// Handle named type (pattern 0 = nullable named type)
-	const type = exeContext.schema.t[typeName]
+	const type = getOwn(exeContext.schema.t, typeName)
 
 	if (!type) {
 		throw new GraphQLError(`Unknown type "${typeName}".`)
@@ -242,7 +242,7 @@ function completeLeafValue<TContext>(
 	result: unknown,
 ): unknown {
 	if (isScalarType(type)) {
-		const scalar = exeContext.scalars[typeName]
+		const scalar = getOwn(exeContext.scalars, typeName)
 		if (scalar) {
 			const serializedResult = scalar.serialize(result)
 			if (serializedResult == null) {
@@ -267,7 +267,7 @@ function serializeEnum(typeName: string, type: EnumType, result: unknown): strin
 	const values = type[1]
 
 	// If result is a string that matches an enum value name
-	if (typeof result === 'string' && result in values) {
+	if (typeof result === 'string' && Object.hasOwn(values, result)) {
 		return result
 	}
 
@@ -297,7 +297,7 @@ function completeAbstractValue<TContext>(
 	path: Path,
 	result: unknown,
 ): unknown {
-	const resolveTypeFn = exeContext.typeResolvers[abstractTypeName]
+	const resolveTypeFn = getOwn(exeContext.typeResolvers, abstractTypeName)
 	const abstractTypeInfo = { name: abstractTypeName, kind: abstractType[0] }
 
 	let runtimeTypeName: string | null | undefined | Promise<string | null | undefined>
@@ -355,7 +355,7 @@ function resolveTypeWithIsTypeOf<TContext>(
 	const promiseResults: Array<{ typeName: string; isTypeOfResult: Promise<boolean> }> = []
 
 	for (const typeName of possibleTypes) {
-		const isTypeOfFn = exeContext.isTypeOfResolvers[typeName]
+		const isTypeOfFn = getOwn(exeContext.isTypeOfResolvers, typeName)
 		if (isTypeOfFn) {
 			const isTypeOfResult = isTypeOfFn(result, exeContext.contextValue, info)
 
@@ -409,7 +409,7 @@ function ensureValidRuntimeType<TContext>(
 		)
 	}
 
-	const runtimeType = exeContext.schema.t[runtimeTypeName]
+	const runtimeType = getOwn(exeContext.schema.t, runtimeTypeName)
 	if (!runtimeType) {
 		throw new GraphQLError(
 			`Abstract type "${abstractTypeName}" was resolved to a type "${runtimeTypeName}" that does not exist inside the schema.`,

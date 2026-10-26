@@ -16,6 +16,7 @@ import { GraphQLError, Kind, print } from 'graphql'
 import type { Field, Schema, Type, TypeRef } from '../../types/schema.js'
 import { isInterfaceType, isLeafType, isObjectType } from '../../types/schema.js'
 import { formatTypeRef } from '../../utils/typeRef.js'
+import { getOwn } from '../../utils/helpers.js'
 import { sortValueNode } from '../sortValueNode.js'
 import type { ValidationContext } from '../ValidationContext.js'
 
@@ -405,7 +406,7 @@ function collectFieldsAndFragmentNames(
 				const parentType = getType(schema, parentTypeName)
 				let fieldDef: Maybe<Field>
 				if (parentType && (isObjectType(parentType) || isInterfaceType(parentType))) {
-					fieldDef = Object.hasOwn(parentType[1], fieldName) ? parentType[1][fieldName] : undefined
+					fieldDef = getOwn(parentType[1], fieldName)
 				}
 				const responseName = selection.alias ? selection.alias.value : fieldName
 				const fields = nodeAndDefs.get(responseName)
@@ -448,7 +449,7 @@ function subfieldConflicts(
 }
 
 function getType(schema: Schema, typeName: Maybe<string>): Type | undefined {
-	return typeName != null && Object.hasOwn(schema.t, typeName) ? schema.t[typeName] : undefined
+	return typeName != null ? getOwn(schema.t, typeName) : undefined
 }
 
 // Mirrors graphql-js `typeFromAST`, which yields no type for a name the schema does not define.

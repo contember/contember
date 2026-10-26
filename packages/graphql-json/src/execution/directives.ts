@@ -4,6 +4,7 @@
 
 import { Kind } from 'graphql'
 import type { FieldNode, FragmentSpreadNode, InlineFragmentNode, ValueNode } from 'graphql'
+import { getOwn } from '../utils/helpers.js'
 
 /**
  * Get directive values from a node
@@ -67,7 +68,7 @@ function valueFromAST(
 		}
 
 		case Kind.VARIABLE:
-			return variableValues[valueNode.name.value]
+			return getOwn(variableValues, valueNode.name.value)
 
 		default:
 			return undefined

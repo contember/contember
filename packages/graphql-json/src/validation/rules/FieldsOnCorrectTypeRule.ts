@@ -12,6 +12,7 @@ import { GraphQLError } from 'graphql'
 import type { Schema, Type } from '../../types/schema.js'
 import { isAbstractType, isInterfaceType, isObjectType, T } from '../../types/schema.js'
 import type { ValidationContext } from '../ValidationContext.js'
+import { getOwn } from '../../utils/helpers.js'
 import { didYouMean, naturalCompare, suggestionList } from '../helpers.js'
 
 export function FieldsOnCorrectTypeRule(context: ValidationContext): ASTVisitor {
@@ -62,9 +63,9 @@ function getSuggestedTypeNames(schema: Schema, type: Type, fieldName: string): s
 	const usageCount = new Map<string, number>()
 
 	for (const possibleTypeName of T.possibleTypes(type)) {
-		const possibleType = schema.t[possibleTypeName]
+		const possibleType = getOwn(schema.t, possibleTypeName)
 		// graphql-js possible types are the object types only
-		if (!possibleType || !isObjectType(possibleType) || !possibleType[1][fieldName]) {
+		if (!possibleType || !isObjectType(possibleType) || !getOwn(possibleType[1], fieldName)) {
 			continue
 		}
 
@@ -73,8 +74,8 @@ function getSuggestedTypeNames(schema: Schema, type: Type, fieldName: string): s
 		usageCount.set(possibleTypeName, 1)
 
 		for (const interfaceName of possibleType[2]) {
-			const possibleInterface = schema.t[interfaceName]
-			if (!possibleInterface || !isInterfaceType(possibleInterface) || !possibleInterface[1][fieldName]) {
+			const possibleInterface = getOwn(schema.t, interfaceName)
+			if (!possibleInterface || !isInterfaceType(possibleInterface) || !getOwn(possibleInterface[1], fieldName)) {
 				continue
 			}
 
@@ -107,8 +108,8 @@ function getSuggestedTypeNames(schema: Schema, type: Type, fieldName: string): s
  * Whether `superType` is an interface that `subType` implements (graphql-js `isSubType` of an interface)
  */
 function isSuperInterface(schema: Schema, superType: string, subType: string): boolean {
-	const superTypeDef = schema.t[superType]
-	const subTypeDef = schema.t[subType]
+	const superTypeDef = getOwn(schema.t, superType)
+	const subTypeDef = getOwn(schema.t, subType)
 	return superTypeDef !== undefined && isInterfaceType(superTypeDef) && subTypeDef !== undefined
 		&& (isObjectType(subTypeDef) || isInterfaceType(subTypeDef)) && subTypeDef[2].includes(superType)
 }

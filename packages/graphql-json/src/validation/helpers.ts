@@ -5,6 +5,7 @@ import type { ASTNode } from 'graphql'
 import type { Schema, Type, TypeRef } from '../types/schema.js'
 import { TypeKind } from '../types/schema.js'
 import { getListItemType, getTypeName, isListType, isNonNullType, unwrapNonNull } from '../utils/typeRef.js'
+import { getOwn } from '../utils/helpers.js'
 
 /**
  * Check if a visitor ancestor is a node rather than an array of nodes
@@ -44,8 +45,7 @@ export function getNamedTypeFromRef(
 	schema: Schema,
 	typeRef: TypeRef,
 ): Type | undefined {
-	const typeName = getTypeName(typeRef)
-	return schema.t[typeName]
+	return getOwn(schema.t, getTypeName(typeRef))
 }
 
 /**
@@ -105,8 +105,8 @@ export function isTypeSubTypeOf(
 	}
 
 	// Check if maybeSubType is an implementation of superType (interface/union)
-	const superTypeObj = schema.t[superTypeName]
-	const maybeSubTypeObj = schema.t[maybeSubTypeName]
+	const superTypeObj = getOwn(schema.t, superTypeName)
+	const maybeSubTypeObj = getOwn(schema.t, maybeSubTypeName)
 
 	if (!superTypeObj || !maybeSubTypeObj) {
 		return false

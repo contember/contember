@@ -6,6 +6,7 @@ import { Kind } from 'graphql'
 import type { FieldNode, FragmentDefinitionNode, FragmentSpreadNode, InlineFragmentNode, SelectionSetNode } from 'graphql'
 import type { InterfaceType, Schema, UnionType } from '../types/schema.js'
 import { isAbstractType, isObjectType, TypeKind } from '../types/schema.js'
+import { getOwn } from '../utils/helpers.js'
 import { getDirectiveValues } from './directives.js'
 
 export type FieldGroup = readonly FieldNode[]
@@ -91,7 +92,7 @@ function collectFieldsImpl(
 				}
 				visitedFragmentNames.add(fragmentName)
 
-				const fragment = Object.hasOwn(fragments, fragmentName) ? fragments[fragmentName] : undefined
+				const fragment = getOwn(fragments, fragmentName)
 				if (!fragment || !doesFragmentConditionMatch(schema, fragment, runtimeTypeName)) {
 					continue
 				}
@@ -168,7 +169,7 @@ function doesFragmentConditionMatch(
 		return true
 	}
 
-	const conditionalType = schema.t[conditionalTypeName]
+	const conditionalType = getOwn(schema.t, conditionalTypeName)
 	if (!conditionalType) {
 		return false
 	}
@@ -179,7 +180,7 @@ function doesFragmentConditionMatch(
 	}
 
 	// Check if runtime type implements conditional interface
-	const runtimeType = schema.t[runtimeTypeName]
+	const runtimeType = getOwn(schema.t, runtimeTypeName)
 	if (runtimeType && isObjectType(runtimeType)) {
 		// ObjectType: [kind, fields, interfaces, description?]
 		return runtimeType[2].includes(conditionalTypeName)

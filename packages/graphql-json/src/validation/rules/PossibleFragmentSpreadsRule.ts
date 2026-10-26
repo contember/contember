@@ -13,6 +13,7 @@ import { GraphQLError } from 'graphql'
 import type { Schema, Type } from '../../types/schema.js'
 import { isAbstractType, isCompositeType, isObjectType, T } from '../../types/schema.js'
 import { getNamedType } from '../../utils/typeRef.js'
+import { getOwn } from '../../utils/helpers.js'
 import type { ValidationContext } from '../ValidationContext.js'
 
 export function PossibleFragmentSpreadsRule(context: ValidationContext): ASTVisitor {
@@ -24,7 +25,7 @@ export function PossibleFragmentSpreadsRule(context: ValidationContext): ASTVisi
 			if (fragType && parentType) {
 				const schema = context.getSchema()
 				const fragTypeName = getNamedType(fragType)
-				const fragTypeObj = schema.t[fragTypeName]
+				const fragTypeObj = getOwn(schema.t, fragTypeName)
 				const parentTypeName = context.getParentTypeName() ?? '(unknown)'
 
 				if (
@@ -51,7 +52,7 @@ export function PossibleFragmentSpreadsRule(context: ValidationContext): ASTVisi
 			if (fragDef && parentType) {
 				const schema = context.getSchema()
 				const fragTypeName = fragDef.typeCondition.name.value
-				const fragType = schema.t[fragTypeName]
+				const fragType = getOwn(schema.t, fragTypeName)
 				const parentTypeName = context.getParentTypeName() ?? '(unknown)'
 
 				if (

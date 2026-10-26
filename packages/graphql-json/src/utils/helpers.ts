@@ -6,6 +6,14 @@
 export type ObjectLike = { readonly [key: PropertyKey]: unknown }
 
 /**
+ * The record's own value under the key. Schema records, resolver maps, variables and inputs are plain objects, so a bare
+ * index with a name from a document or a request would also find Object.prototype members such as `constructor`.
+ */
+export function getOwn<V>(record: Readonly<Record<string, V>>, key: string): V | undefined {
+	return Object.hasOwn(record, key) ? record[key] : undefined
+}
+
+/**
  * Check if value is an object-like (not null, is object)
  */
 export function isObjectLike(value: unknown): value is ObjectLike {

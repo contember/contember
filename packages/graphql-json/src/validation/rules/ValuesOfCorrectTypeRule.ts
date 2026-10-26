@@ -13,11 +13,12 @@ import type { TypeRef } from '../../types/schema.js'
 import { isEnumType, isInputObjectType, isLeafType } from '../../types/schema.js'
 import { formatTypeRef, getTypeName, isListType, isNonNullType } from '../../utils/typeRef.js'
 import { parseEnumLiteral } from '../../utils/enumValues.js'
+import { getOwn } from '../../utils/helpers.js'
 import { didYouMean, suggestionList } from '../helpers.js'
 import type { ValidationContext } from '../ValidationContext.js'
 
 export function ValuesOfCorrectTypeRule(context: ValidationContext): ASTVisitor {
-	const getNamedInputType = (typeRef: TypeRef | null | undefined) => (typeRef ? context.getSchema().t[getTypeName(typeRef)] : undefined)
+	const getNamedInputType = (typeRef: TypeRef | null | undefined) => (typeRef ? getOwn(context.getSchema().t, getTypeName(typeRef)) : undefined)
 
 	return {
 		ListValue(node) {
@@ -100,7 +101,7 @@ function isValidValueNode(context: ValidationContext, node: ValueNode): void {
 	}
 
 	const typeName = getTypeName(locationType)
-	const type = context.getSchema().t[typeName]
+	const type = getOwn(context.getSchema().t, typeName)
 	if (!type) {
 		return
 	}
@@ -116,7 +117,7 @@ function isValidValueNode(context: ValidationContext, node: ValueNode): void {
 		if (isEnumType(type)) {
 			parseResult = parseEnumLiteral(typeName, type, node)
 		} else {
-			const scalar = context.getScalars()[typeName]
+			const scalar = getOwn(context.getScalars(), typeName)
 			// a scalar without an implementation accepts any literal, as a graphql-js scalar without parsers does
 			parseResult = scalar ? scalar.parseLiteral(node, undefined) : true
 		}

@@ -12,6 +12,7 @@ import { GraphQLError } from 'graphql'
 
 import { isCompositeType, type Schema } from '../../types/schema.js'
 import type { ValidationContext } from '../ValidationContext.js'
+import { getOwn } from '../../utils/helpers.js'
 
 export function FragmentsOnCompositeTypesRule(context: ValidationContext): ASTVisitor {
 	return {
@@ -44,5 +45,5 @@ export function FragmentsOnCompositeTypesRule(context: ValidationContext): ASTVi
 }
 
 function getTypeFromCondition(schema: Schema, typeCondition: NamedTypeNode) {
-	return schema.t[typeCondition.name.value]
+	return getOwn(schema.t, typeCondition.name.value)
 }

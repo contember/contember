@@ -10,6 +10,7 @@ import type { ASTVisitor, VariableDefinitionNode } from 'graphql'
 import { GraphQLError, print } from 'graphql'
 
 import { getNamedType } from '../../utils/typeRef.js'
+import { getOwn } from '../../utils/helpers.js'
 import { isInputType } from '../helpers.js'
 import type { ValidationContext } from '../ValidationContext.js'
 
@@ -21,7 +22,7 @@ export function VariablesAreInputTypesRule(context: ValidationContext): ASTVisit
 			if (typeRef) {
 				const schema = context.getSchema()
 				const typeName = getNamedType(typeRef)
-				const type = schema.t[typeName]
+				const type = getOwn(schema.t, typeName)
 
 				if (type && !isInputType(type)) {
 					const varName = node.variable.name.value

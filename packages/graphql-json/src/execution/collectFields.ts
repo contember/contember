@@ -91,7 +91,7 @@ function collectFieldsImpl(
 				}
 				visitedFragmentNames.add(fragmentName)
 
-				const fragment = fragments[fragmentName]
+				const fragment = Object.hasOwn(fragments, fragmentName) ? fragments[fragmentName] : undefined
 				if (!fragment || !doesFragmentConditionMatch(schema, fragment, runtimeTypeName)) {
 					continue
 				}

@@ -1,9 +1,17 @@
 /**
  * Validation helper functions
  */
-import type { InterfaceType, ObjectType, Schema, Type, TypeRef, UnionType } from '../types/schema.js'
+import type { ASTNode } from 'graphql'
+import type { Schema, Type, TypeRef } from '../types/schema.js'
 import { TypeKind } from '../types/schema.js'
 import { getListItemType, getTypeName, isListType, isNonNullType, unwrapNonNull } from '../utils/typeRef.js'
+
+/**
+ * Check if a visitor ancestor is a node rather than an array of nodes
+ */
+export function isASTNode(ancestor: ASTNode | readonly ASTNode[]): ancestor is ASTNode {
+	return !Array.isArray(ancestor)
+}
 
 /**
  * Check if a type is an input type (can be used for arguments/variables)
@@ -105,20 +113,19 @@ export function isTypeSubTypeOf(
 	}
 
 	// If superType is an abstract type, check if maybeSubType is a possible type
-	const superKind = superTypeObj[0]
-	if (superKind === TypeKind.INTERFACE) {
+	if (superTypeObj[0] === TypeKind.INTERFACE) {
 		// InterfaceType: [kind, fields, interfaces, possibleTypes, description?]
-		return (superTypeObj as InterfaceType)[3].includes(maybeSubTypeName)
+		return superTypeObj[3].includes(maybeSubTypeName)
 	}
-	if (superKind === TypeKind.UNION) {
+	if (superTypeObj[0] === TypeKind.UNION) {
 		// UnionType: [kind, possibleTypes, description?]
-		return (superTypeObj as UnionType)[1].includes(maybeSubTypeName)
+		return superTypeObj[1].includes(maybeSubTypeName)
 	}
 
 	// If maybeSubType is an object that implements superType interface
 	if (maybeSubTypeObj[0] === TypeKind.OBJECT) {
 		// ObjectType: [kind, fields, interfaces, description?]
-		return (maybeSubTypeObj as ObjectType)[2].includes(superTypeName)
+		return maybeSubTypeObj[2].includes(superTypeName)
 	}
 
 	return false

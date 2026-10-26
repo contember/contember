@@ -7,7 +7,7 @@
  *
  * See https://spec.graphql.org/draft/#sec-Fragment-spreads-must-not-form-cycles
  */
-import type { ASTVisitor, FragmentDefinitionNode, FragmentSpreadNode } from 'graphql'
+import type { ASTVisitor, FragmentDefinitionNode, FragmentSpreadNode, SelectionSetNode } from 'graphql'
 import { GraphQLError, Kind } from 'graphql'
 
 import type { ValidationContext } from '../ValidationContext.js'
@@ -80,17 +80,15 @@ export function NoFragmentCyclesRule(context: ValidationContext): ASTVisitor {
 
 	function getFragmentSpreads(fragment: FragmentDefinitionNode): FragmentSpreadNode[] {
 		const spreads: FragmentSpreadNode[] = []
-		const setsToVisit: Array<{ selections: readonly { kind: string; selectionSet?: unknown }[] }> = [
-			fragment.selectionSet,
-		]
+		const setsToVisit: SelectionSetNode[] = [fragment.selectionSet]
 
 		let set
 		while ((set = setsToVisit.pop())) {
 			for (const selection of set.selections) {
 				if (selection.kind === Kind.FRAGMENT_SPREAD) {
-					spreads.push(selection as FragmentSpreadNode)
+					spreads.push(selection)
 				} else if (selection.selectionSet) {
-					setsToVisit.push(selection.selectionSet as typeof set)
+					setsToVisit.push(selection.selectionSet)
 				}
 			}
 		}

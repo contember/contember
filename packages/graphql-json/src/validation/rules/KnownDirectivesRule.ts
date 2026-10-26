@@ -11,7 +11,7 @@ import { GraphQLError, Kind } from 'graphql'
 
 import { D } from '../../types/schema.js'
 import type { ValidationContext } from '../ValidationContext.js'
-import { didYouMean, suggestionList } from '../helpers.js'
+import { didYouMean, isASTNode, suggestionList } from '../helpers.js'
 
 // Built-in directives with their allowed locations
 const BUILT_IN_DIRECTIVES: Record<string, readonly string[]> = {
@@ -74,10 +74,10 @@ function getDirectiveLocationForASTPath(
 ): string | undefined {
 	const appliedTo = ancestors[ancestors.length - 1]
 
-	if (!Array.isArray(appliedTo)) {
-		switch ((appliedTo as ASTNode).kind) {
+	if (isASTNode(appliedTo)) {
+		switch (appliedTo.kind) {
 			case Kind.OPERATION_DEFINITION:
-				return getOperationLocation((appliedTo as { operation: string }).operation)
+				return getOperationLocation(appliedTo.operation)
 			case Kind.FIELD:
 				return 'FIELD'
 			case Kind.FRAGMENT_SPREAD:
@@ -116,9 +116,9 @@ function getDirectiveLocationForASTPath(
 				return 'INPUT_OBJECT'
 			case Kind.INPUT_VALUE_DEFINITION: {
 				// Could be ARGUMENT_DEFINITION or INPUT_FIELD_DEFINITION depending on parent
-				const parentNode = ancestors[ancestors.length - 3] as ASTNode | undefined
-				return parentNode?.kind === Kind.INPUT_OBJECT_TYPE_DEFINITION
-						|| parentNode?.kind === Kind.INPUT_OBJECT_TYPE_EXTENSION
+				const parentNode = ancestors[ancestors.length - 3]
+				return parentNode && isASTNode(parentNode)
+						&& (parentNode.kind === Kind.INPUT_OBJECT_TYPE_DEFINITION || parentNode.kind === Kind.INPUT_OBJECT_TYPE_EXTENSION)
 					? 'INPUT_FIELD_DEFINITION'
 					: 'ARGUMENT_DEFINITION'
 			}

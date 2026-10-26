@@ -6,12 +6,12 @@
  *
  * See https://spec.graphql.org/draft/#sec-Argument-Names
  */
-import type { ArgumentNode, ASTVisitor, FieldNode } from 'graphql'
+import type { ArgumentNode, ASTVisitor } from 'graphql'
 import { GraphQLError, Kind } from 'graphql'
 
 import { F } from '../../types/schema.js'
 import type { ValidationContext } from '../ValidationContext.js'
-import { didYouMean, suggestionList } from '../helpers.js'
+import { didYouMean, isASTNode, suggestionList } from '../helpers.js'
 
 export function KnownArgumentNamesRule(context: ValidationContext): ASTVisitor {
 	return {
@@ -28,8 +28,8 @@ export function KnownArgumentNamesRule(context: ValidationContext): ASTVisitor {
 
 				// Get field name from AST ancestors
 				const fieldNode = ancestors[ancestors.length - 1]
-				const fieldName = fieldNode && (fieldNode as FieldNode).kind === Kind.FIELD
-					? (fieldNode as FieldNode).name.value
+				const fieldName = fieldNode && isASTNode(fieldNode) && fieldNode.kind === Kind.FIELD
+					? fieldNode.name.value
 					: '(unknown)'
 
 				const parentTypeName = context.getParentTypeName() ?? '(unknown)'

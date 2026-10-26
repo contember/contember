@@ -9,7 +9,7 @@
 import type { ASTVisitor, ListValueNode, ObjectValueNode, ValueNode } from 'graphql'
 import { GraphQLError, Kind } from 'graphql'
 
-import type { EnumType, InputObjectType, Type, TypeRef } from '../../types/schema.js'
+import type { Type, TypeRef } from '../../types/schema.js'
 import { IF, isEnumType, isInputObjectType, isScalarType } from '../../types/schema.js'
 import { formatTypeRef, getTypeName, isListType, isNonNullType, unwrapNonNull } from '../../utils/typeRef.js'
 import { didYouMean, suggestionList } from '../helpers.js'
@@ -56,9 +56,8 @@ export function ValuesOfCorrectTypeRule(context: ValidationContext): ASTVisitor 
 			}
 
 			// InputObjectType: [kind, fields, isOneOf?, description?]
-			const inputType = type as InputObjectType
-			const fields = inputType[1]
-			const isOneOf = inputType[2]
+			const fields = type[1]
+			const isOneOf = type[2]
 
 			// Check for unknown fields
 			const fieldNames = Object.keys(fields)
@@ -135,7 +134,7 @@ export function ValuesOfCorrectTypeRule(context: ValidationContext): ASTVisitor 
 			}
 
 			// InputObjectType: [kind, fields, isOneOf?, description?]
-			const fields = (parentTypeObj as InputObjectType)[1]
+			const fields = parentTypeObj[1]
 			const fieldDef = fields[node.name.value]
 			if (!fieldDef) {
 				return // Already reported by ObjectValue
@@ -159,7 +158,7 @@ export function ValuesOfCorrectTypeRule(context: ValidationContext): ASTVisitor 
 			}
 
 			// EnumType: [kind, values, description?]
-			const values = (type as EnumType)[1]
+			const values = type[1]
 			// Check if enum value exists
 			if (!values[node.value]) {
 				const suggestions = suggestionList(node.value, Object.keys(values))

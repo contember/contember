@@ -50,7 +50,7 @@ export function UniqueDirectivesPerLocationRule(context: ValidationContext): AST
 
 			const seenDirectives = new Map<string, DirectiveNode>()
 
-			for (const directive of node.directives as readonly DirectiveNode[]) {
+			for (const directive of node.directives) {
 				const directiveName = directive.name.value
 
 				if (!isRepeatable(directiveName)) {

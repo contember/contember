@@ -72,4 +72,4 @@ A trust whose role carries `system.assumeIdentity` can act on behalf of end user
 
 ## Tenant roles do not combine with memberships
 
-A trust with the `project_admin` or `super_admin` tenant role is implicitly admin in every project, so stored memberships and envelopes would be ignored. Apply rejects that combination. Use one trust with tenant roles for deploys and another with memberships for content.
+A trust with the `project_admin` or `super_admin` tenant role is implicitly admin in every project, so stored memberships and envelopes would be ignored. Apply rejects that combination. Use one trust with tenant roles for tenant administration and another with memberships for content; a deploy trust needs only a `deployer` membership.

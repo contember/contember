@@ -43,7 +43,7 @@ For an issuer without a built-in source, such as [GitLab CI](/guides/workload-id
 
 ## Running `tenant apply` with a workload identity
 
-A pipeline authenticated by a trust can run `tenant apply` for identity providers, mail templates, policies and the rest of the config. It cannot create, change or disable trusts: the `workloadIdentities` block must be applied with a person or API-key credential. Because the CLI sends no mutation for unchanged trusts, such a run fails only when the block changed. It fails with `WORKLOAD_CREDENTIAL_FORBIDDEN` (exit code `6`) and names the changed trusts in the message and in `details.trusts`. Reading the current trusts still needs `workloadIdentity:list`, so the trust must hold `project_admin` or `super_admin` whenever the config has a `workloadIdentities` block.
+A pipeline authenticated by a trust can run `tenant apply` for identity providers, mail templates, policies and the rest of the config. It cannot create, change or disable trusts: the `workloadIdentities` block must be applied with a person or API-key credential. Because the CLI sends no mutation for unchanged trusts, such a run fails only when the block changed, and then before anything is written. It fails with `WORKLOAD_CREDENTIAL_FORBIDDEN` (exit code `6`) and names the changed trusts in the message and in `details.trusts`. Reading the current trusts still needs `workloadIdentity:list`, so the trust must hold `project_admin` or `super_admin` whenever the config has a `workloadIdentities` block.
 
 ## Envelope coverage warning
 

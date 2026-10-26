@@ -77,4 +77,4 @@ deploy:
     - CONTEMBER_API_TOKEN="$CONTEMBER_ID_TOKEN" npx contember deploy --yes
 ```
 
-The trust `gitlab-deploy` would carry only `roles: ['entrypoint_deployer']`. See [CLI](/guides/workload-identity/cli).
+The trust `gitlab-deploy` would carry only `memberships: [{ project: 'website', role: 'deployer' }]`. See [CLI](/guides/workload-identity/cli).

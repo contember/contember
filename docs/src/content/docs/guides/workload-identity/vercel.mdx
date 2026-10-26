@@ -17,7 +17,7 @@ workloadIdentities: {
   'vercel-web': {
     profile: 'oidc',
     issuer: 'https://oidc.vercel.com/acme',
-    audience: 'contember:my-instance:vercel-web',
+    audience: 'https://vercel.com/acme',
     conditions: [
       { claim: 'sub', equals: 'owner:acme:project:website:environment:production' },
       { claim: 'owner_id', equals: 'team_7Gw5ZMzpQA8h90F832KGp7nwbuh3' },
@@ -34,11 +34,13 @@ workloadIdentities: {
 | `sub` | Required by the `oidc` profile: `owner:<team>:project:<project>:environment:<environment>`. Pinning the environment keeps preview deployments — which run code from any branch — out of a production trust. |
 | `owner_id`, `project_id` | Immutable ids. Team and project names in `sub` change when you rename them; update `sub` then, or the trust stops matching. |
 
-Vercel's function tokens for `preview` and `production` live two hours, so `maxTokenLifetime` must be at least `7200`. `development` tokens live 12 hours; give local development its own trust if you need it, rather than raising the production limit. Vercel tokens carry no `jti`; the audit log deduplicates them by token hash.
+Vercel sets the audience itself, to `https://vercel.com/<team>`, and does not let a function request another one. Enabled trusts must differ in issuer and audience, so **one Vercel team gets one trust** per Contember instance: every project and environment of the team that should reach Contember is admitted by that trust's conditions (an `in` list on `sub`) and shares its grants. Keep production and preview apart by giving only the production environment a trust.
+
+Vercel's function tokens for `preview` and `production` live two hours, so `maxTokenLifetime` must be at least `7200`. `development` tokens live 12 hours and come from the same issuer and audience, so they cannot get a trust of their own; use one of the approaches in [local development](/guides/workload-identity/local-development) instead of raising the production limit. Vercel tokens carry no `jti`; the audit log deduplicates them by token hash.
 
 ## 2. Use the token
 
-Request the token with the trust's audience. `@vercel/oidc` reads it from the current request, so fetch it per request and do not cache it — a small custom credentials provider does exactly that:
+`@vercel/oidc` reads the token from the current request, so fetch it per request and do not cache it — a small custom credentials provider does exactly that:
 
 ```ts title="contember.ts"
 import { GraphQlClient } from '@contember/graphql-client'
@@ -47,7 +49,7 @@ import { getVercelOidcToken } from '@vercel/oidc'
 
 const vercelOidc: CredentialsProvider = {
   authenticate: async () => ({
-    Authorization: `Bearer ${await getVercelOidcToken({ audience: 'contember:my-instance:vercel-web' })}`,
+    Authorization: `Bearer ${await getVercelOidcToken()}`,
   }),
 }
 

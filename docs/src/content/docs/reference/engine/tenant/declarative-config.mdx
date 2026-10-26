@@ -323,7 +323,9 @@ A bump rejects every earlier token — including the rest of a CI job that ran t
 - flags each trust whose earlier tokens will be rejected,
 - warns about slug renames (a disabled trust plus a new one with the same `issuer` + `audience`).
 
-After applying, the CLI prints the authorized [envelope closure](/guides/workload-identity/assume-membership#what-apply-checks) of each trust and highlights target roles that carry sensitive flags (`system.assumeIdentity`, `system.history`, `system.migrate`, `debug`). A refused trust is reported with its error `code`, message and per-condition or per-rule details, and stops the apply.
+Before anything is written — the other sections of the config included — every created or updated trust goes to the server as a [dry run](/reference/engine/tenant/workload-identities#applying-a-trust). It is sent disabled, so a renamed trust does not collide with the `issuer` + `audience` its predecessor still holds. A refused trust is reported with its error `code`, message and per-condition or per-rule details, and stops the apply before its first change, so a failed rename cannot leave the old trust disabled without its replacement.
+
+The dry run returns the authorized [envelope closure](/guides/workload-identity/assume-membership#what-apply-checks) of each trust, so `--dry-run` prints it too, and highlights target roles that carry sensitive flags (`system.assumeIdentity`, `system.history`, `system.migrate`, `debug`).
 
 With `--json`, the result document has a `workloadIdentities` field — `null` when the config has no `workloadIdentities` block, otherwise one entry per trust, unchanged ones included:
 
@@ -333,7 +335,7 @@ With `--json`, the result document has a `workloadIdentities` field — `null` w
 | `change` | `create`, `update`, `disable` or `unchanged`. |
 | `rejectsEarlierTokens` | The plan expects this apply to reject earlier tokens. |
 | `tokensValidAfterBumped` | The server's answer after an apply; `null` in a dry run and when no apply was sent (a plain disable, an unchanged trust). |
-| `envelopeClosure` | The authorized closure returned by the apply, `null` otherwise: per source membership (`project`, `role`), the `targets` with their `role`, `variables` (a value list, or `'*'` for any value) and `sensitiveSystemFlags`. |
+| `envelopeClosure` | The authorized closure the server computed, in a dry run too; `null` for a plain disable and an unchanged trust. Per source membership (`project`, `role`), the `targets` with their `role`, `variables` (a value list, or `'*'` for any value) and `sensitiveSystemFlags`. |
 
 The flags and the rename are also in `warnings`, as `WORKLOAD_IDENTITY_REJECTS_EARLIER_TOKENS`, `WORKLOAD_IDENTITY_RENAMED` and `WORKLOAD_IDENTITY_SENSITIVE_ROLE`.
 
@@ -342,9 +344,9 @@ The flags and the rename are also in `warnings`, as `WORKLOAD_IDENTITY_REJECTS_E
 - Applying needs the `workloadIdentity:add`, `workloadIdentity:update`, `workloadIdentity:disable` and `workloadIdentity:list` permissions, held by `SUPER_ADMIN` and `PROJECT_ADMIN`.
 - Tenant `roles` and `trustForwardedInfo` on a trust follow the `createGlobalApiKey` rules: a `PROJECT_ADMIN` may grant any globally assignable role except `super_admin` and `project_creator`, and may not set `trustForwardedInfo`; those need a `SUPER_ADMIN` applier. `login` is refused — it has no meaning for a workload.
 - Updating a trust that already holds tenant roles also requires that the applier may grant those current roles, so a `PROJECT_ADMIN` cannot rewrite a `super_admin` trust (`ROLE_NOT_ALLOWED`).
-- A trust with `project_admin` or `super_admin` is implicitly admin in every project, so combining such a role with `memberships` is rejected. Use two trusts: a deploy trust with tenant roles only, and a content trust with memberships only.
+- A trust with `project_admin` or `super_admin` is implicitly admin in every project, so combining such a role with `memberships` is rejected. Use two trusts: one with tenant roles only, and one with memberships only.
 - Every membership and every bounded envelope target is authorized like `addProjectMember` in its project. A target with unbounded values (`true`, `variables: { v: true }`) needs the right to add members in every project, which `PROJECT_ADMIN` and `SUPER_ADMIN` have and a project-level member manager does not.
-- **A caller authenticated by a workload trust cannot create, change or disable trusts** (`WORKLOAD_CREDENTIAL_FORBIDDEN`). A pipeline that runs `tenant:apply` with a trust still applies the rest of the config, and an unchanged `workloadIdentities` block issues no mutation — it fails only when the block changed, and that change must be applied with a person or API-key credential.
+- **A caller authenticated by a workload trust cannot create, change or disable trusts** (`WORKLOAD_CREDENTIAL_FORBIDDEN`). A pipeline that runs `tenant:apply` with a trust can apply the rest of the config, because an unchanged `workloadIdentities` block issues no mutation. When the block changed, the dry run is refused and the whole apply stops before anything is written; that change must be applied with a person or API-key credential.
 
 All of these checks run in the tenant API; the CLI only plans and sends the mutations. A trust created, re-roled or applied by someone else between the check and the write answers `CONFLICT`; run the apply again.
 

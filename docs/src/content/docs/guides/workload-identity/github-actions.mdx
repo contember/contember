@@ -103,7 +103,7 @@ const client = new GraphQlClient({
 
 ## Running the CLI
 
-The CLI fetches the token itself — use a separate trust for deploys, with only the tenant roles a deploy needs:
+The CLI fetches the token itself — use a separate trust for deploys, holding only the project `deployer` role. Migrations are run by the system API of the project, so a deploy trust needs that membership; a tenant role alone does not give access to the project:
 
 ```ts title="tenant.config.ts"
 workloadIdentities: {
@@ -116,7 +116,7 @@ workloadIdentities: {
       { claim: 'repository_owner_id', equals: '9876543' },
       { claim: 'environment', equals: 'production' },
     ],
-    roles: ['entrypoint_deployer'],
+    memberships: [{ project: 'sites', role: 'deployer' }],
   },
 },
 ```

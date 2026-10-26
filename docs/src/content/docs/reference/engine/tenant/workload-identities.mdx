@@ -81,7 +81,7 @@ It requires `workloadIdentity:list`. The check does not verify a DPoP proof, wri
 |---|---|
 | `malformed` | Not a compact JWT, larger than 8 KiB, `iss` missing or not a non-empty string, or `aud` missing, not a string or string array, longer than 2048 characters, or an array of more than 10 values. |
 | `trust_not_found` | No enabled trust for this `iss` and any of the `aud` values. |
-| `jwks` | The issuer's keys are unavailable: discovery or the JWKS fetch failed or was refused by the fetch policy, and no last known keys younger than `jwksMaxStaleness` exist. |
+| `jwks` | The issuer's keys are unavailable: discovery or the JWKS fetch failed or was refused by the fetch policy, and no last known keys younger than `jwksMaxStaleness` exist. The message does not say why a fetch failed — resolved addresses and connection errors would describe the engine's network to a tenant admin; the cause is in the engine log at `warn` level. |
 | `signature` | Bad signature, a `kid` missing from the issuer's keys (also after the refetch it triggers), or an algorithm outside `signingAlgs`. |
 | `typ` | The `typ` header is not in `acceptedTyp`. |
 | `audience` | `aud` is an empty array, or a multi-valued array that no matching trust accepts with `acceptAudienceArray` (or that more than one such trust accepts). |
@@ -97,8 +97,8 @@ The [CLI](/guides/workload-identity/cli#checking-a-token) and the panel's Config
 `applyWorkloadIdentityTrust` creates or updates one trust in a single transaction: the trust, its identity's roles, its memberships and the envelope rules. `tenant apply` calls it once per changed trust; you rarely call it directly.
 
 ```graphql
-mutation($trust: WorkloadIdentityTrustInput!) {
-  applyWorkloadIdentityTrust(slug: "web-backend", trust: $trust) {
+mutation($trust: WorkloadIdentityTrustInput!, $dryRun: Boolean) {
+  applyWorkloadIdentityTrust(slug: "web-backend", trust: $trust, dryRun: $dryRun) {
     ok
     error { code developerMessage details }
     result {
@@ -112,6 +112,8 @@ mutation($trust: WorkloadIdentityTrustInput!) {
 ```
 
 `WorkloadIdentityTrustInput` carries the fields described in [trust fields](/reference/engine/tenant/declarative-config#trust-fields); `typ` is called `acceptedTyp` and `profile` takes the enum value (`oidc`, `github_actions`). Omitted optional fields take their defaults, so an apply always sets the whole definition. `tokensValidAfterBumped` says whether this apply rejected every earlier token, and `envelopeClosure` lists what each membership's envelope authorizes.
+
+With `dryRun: true`, the mutation runs every check and every write of the apply and rolls them back: it fails with the same error code the apply would, and on success returns the result the apply would produce. Nothing is stored and nothing is audited. `tenant apply` dry-runs every changed trust before it writes anything.
 
 It requires `workloadIdentity:add` for a new slug or `workloadIdentity:update` for an existing one, plus the role and membership authorization described in [who may apply trusts](/reference/engine/tenant/declarative-config#who-may-apply-trusts).
 
@@ -151,7 +153,8 @@ Each trust owns an ordinary `identity` row, so it appears in project member list
 
 - `Identity.kind` is `WORKLOAD` for a trust identity (`PERSON` and `API_KEY` for the others), and `Identity.workloadIdentityTrust` returns the trust when the caller holds `workloadIdentity:list`.
 - `Project.members` accepts `filter: { memberType: WORKLOAD }`; `API_KEY` no longer includes trust identities.
-- A trust identity is managed only through apply. `addProjectMember`, `updateProjectMember`, `removeProjectMember`, `addGlobalIdentityRoles` and `removeGlobalIdentityRoles` refuse it, and no API key or person can be attached to it. Out-of-band grant changes would skip the authorization and the `tokensValidAfter` handling of apply.
+- A trust identity is managed only through apply. `addProjectMember`, `updateProjectMember`, `removeProjectMember`, `addGlobalIdentityRoles` and `removeGlobalIdentityRoles` refuse it with `WORKLOAD_IDENTITY_MANAGED`, and no API key or person can be attached to it. Out-of-band grant changes would skip the authorization and the `tokensValidAfter` handling of apply.
+- `createProject` called by a trust holding `project_creator` creates the project without making the trust its admin; the pipeline uses the deploy key the mutation returns, and any lasting membership is declared in the trust.
 - `signOut` with a workload credential is refused; a trust identity is not a person and has no session to end.
 
 ## Audit

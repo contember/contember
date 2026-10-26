@@ -22,6 +22,17 @@ export interface IntrospectionTypeWrapper {
 	_typeName?: string
 }
 
+/** The wrapper the introspection resolvers produce, so a `__Type` source can be recognized */
+export class TypeWrapper implements IntrospectionTypeWrapper {
+	constructor(
+		readonly kind: IntrospectionTypeKindValue,
+		readonly name: string | null,
+		readonly ofType: TypeWrapper | null,
+		readonly _schema?: Schema,
+		readonly _typeName?: string,
+	) {}
+}
+
 /**
  * Pattern metadata for each pattern ID
  * [isOuterNonNull, isOuterList, innerPattern or -1 if named]
@@ -95,12 +106,12 @@ function typeKindToIntrospection(kind: TypeKind): IntrospectionTypeKindValue {
  *   }
  * }
  */
-export function typeRefToWrapper(typeRef: TypeRef, schema: Schema): IntrospectionTypeWrapper {
+export function typeRefToWrapper(typeRef: TypeRef, schema: Schema): TypeWrapper {
 	const [pattern, typeName] = typeRef
 	return buildWrapper(pattern, typeName, schema)
 }
 
-function buildWrapper(pattern: number, typeName: string, schema: Schema): IntrospectionTypeWrapper {
+function buildWrapper(pattern: number, typeName: string, schema: Schema): TypeWrapper {
 	const meta = PATTERN_META[pattern]
 	if (!meta) {
 		// Fallback to named type
@@ -118,20 +129,12 @@ function buildWrapper(pattern: number, typeName: string, schema: Schema): Intros
 	if (isNonNull) {
 		// Unwrap non-null and recurse
 		const innerWithoutNonNull = unwrapNonNullPattern(pattern)
-		return {
-			kind: IntrospectionTypeKind.NON_NULL,
-			name: null,
-			ofType: buildWrapper(innerWithoutNonNull, typeName, schema),
-		}
+		return new TypeWrapper(IntrospectionTypeKind.NON_NULL, null, buildWrapper(innerWithoutNonNull, typeName, schema))
 	}
 
 	// List wrapper
 	if (isList) {
-		return {
-			kind: IntrospectionTypeKind.LIST,
-			name: null,
-			ofType: buildWrapper(innerPattern, typeName, schema),
-		}
+		return new TypeWrapper(IntrospectionTypeKind.LIST, null, buildWrapper(innerPattern, typeName, schema))
 	}
 
 	// Fallback
@@ -165,54 +168,46 @@ function unwrapNonNullPattern(pattern: number): number {
 /**
  * Create a wrapper for a named type
  */
-function createNamedTypeWrapper(typeName: string, schema: Schema): IntrospectionTypeWrapper {
+function createNamedTypeWrapper(typeName: string, schema: Schema): TypeWrapper {
 	const type = schema.t[typeName]
 	const kind = type ? typeKindToIntrospection(T.kind(type)) : IntrospectionTypeKind.SCALAR
 
-	return {
-		kind,
-		name: typeName,
-		ofType: null,
-		_schema: schema,
-		_typeName: typeName,
-	}
+	return new TypeWrapper(kind, typeName, null, schema, typeName)
 }
 
 // =============================================================================
 // Schema Introspection Data
 // =============================================================================
 
-export interface SchemaIntrospectionData {
-	_schema: Schema
+// Classes rather than plain objects, so the introspection resolvers can recognize their sources with instanceof
+
+export class SchemaIntrospectionData {
+	constructor(readonly _schema: Schema) {}
 }
 
-export interface TypeIntrospectionData {
-	_schema: Schema
-	_typeName: string
+export class TypeIntrospectionData {
+	constructor(readonly _schema: Schema, readonly _typeName: string) {}
 }
 
-export interface FieldIntrospectionData {
-	_schema: Schema
-	_fieldName: string
-	_field: Field
+export class FieldIntrospectionData {
+	constructor(readonly _schema: Schema, readonly _fieldName: string, readonly _field: Field) {}
 }
 
-export interface InputValueIntrospectionData {
-	_schema: Schema
-	_name: string
-	_arg: Argument | InputField
-	_deprecationReason?: string
+export class InputValueIntrospectionData {
+	constructor(
+		readonly _schema: Schema,
+		readonly _name: string,
+		readonly _arg: Argument | InputField,
+		readonly _deprecationReason?: string,
+	) {}
 }
 
-export interface EnumValueIntrospectionData {
-	_name: string
-	_enumValue: EnumValue
+export class EnumValueIntrospectionData {
+	constructor(readonly _name: string, readonly _enumValue: EnumValue) {}
 }
 
-export interface DirectiveIntrospectionData {
-	_schema: Schema
-	_name: string
-	_directive: Directive
+export class DirectiveIntrospectionData {
+	constructor(readonly _schema: Schema, readonly _name: string, readonly _directive: Directive) {}
 }
 
 // =============================================================================
@@ -220,7 +215,7 @@ export interface DirectiveIntrospectionData {
 // =============================================================================
 
 export function resolveSchema(schema: Schema): SchemaIntrospectionData {
-	return { _schema: schema }
+	return new SchemaIntrospectionData(schema)
 }
 
 // =============================================================================
@@ -231,7 +226,7 @@ export function resolveType(schema: Schema, name: string): TypeIntrospectionData
 	if (!schema.t[name]) {
 		return null
 	}
-	return { _schema: schema, _typeName: name }
+	return new TypeIntrospectionData(schema, name)
 }
 
 // =============================================================================
@@ -248,7 +243,7 @@ export const SchemaResolvers = {
 		const types: TypeIntrospectionData[] = []
 
 		for (const typeName of Object.keys(schema.t)) {
-			types.push({ _schema: schema, _typeName: typeName })
+			types.push(new TypeIntrospectionData(schema, typeName))
 		}
 
 		// Sort alphabetically for consistent output
@@ -258,19 +253,19 @@ export const SchemaResolvers = {
 	},
 
 	queryType: (data: SchemaIntrospectionData): TypeIntrospectionData => {
-		return { _schema: data._schema, _typeName: data._schema.q }
+		return new TypeIntrospectionData(data._schema, data._schema.q)
 	},
 
 	mutationType: (data: SchemaIntrospectionData): TypeIntrospectionData | null => {
 		const mutationType = data._schema.m
 		if (!mutationType) return null
-		return { _schema: data._schema, _typeName: mutationType }
+		return new TypeIntrospectionData(data._schema, mutationType)
 	},
 
 	subscriptionType: (data: SchemaIntrospectionData): TypeIntrospectionData | null => {
 		const subscriptionType = data._schema.s
 		if (!subscriptionType) return null
-		return { _schema: data._schema, _typeName: subscriptionType }
+		return new TypeIntrospectionData(data._schema, subscriptionType)
 	},
 
 	directives: (data: SchemaIntrospectionData): DirectiveIntrospectionData[] => {
@@ -279,11 +274,7 @@ export const SchemaResolvers = {
 
 		// Add built-in directives
 		for (const [name, directive] of Object.entries(builtInDirectives)) {
-			directives.push({
-				_schema: schema,
-				_name: name,
-				_directive: directive as unknown as Directive,
-			})
+			directives.push(new DirectiveIntrospectionData(schema, name, directive))
 		}
 
 		// Add schema-defined directives
@@ -291,11 +282,7 @@ export const SchemaResolvers = {
 			for (const [name, directive] of Object.entries(schema.d)) {
 				// Skip if already added as built-in
 				if (name in builtInDirectives) continue
-				directives.push({
-					_schema: schema,
-					_name: name,
-					_directive: directive,
-				})
+				directives.push(new DirectiveIntrospectionData(schema, name, directive))
 			}
 		}
 
@@ -308,36 +295,35 @@ export const SchemaResolvers = {
 // =============================================================================
 
 export const TypeResolvers = {
-	kind: (data: TypeIntrospectionData | IntrospectionTypeWrapper): IntrospectionTypeKindValue => {
-		if ('kind' in data && typeof data.kind === 'string') {
+	kind: (data: TypeIntrospectionData | TypeWrapper): IntrospectionTypeKindValue => {
+		if (data instanceof TypeWrapper) {
 			return data.kind
 		}
-		const typeData = data as TypeIntrospectionData
-		const type = typeData._schema.t[typeData._typeName]
+		const type = data._schema.t[data._typeName]
 		return type ? typeKindToIntrospection(T.kind(type)) : IntrospectionTypeKind.SCALAR
 	},
 
-	name: (data: TypeIntrospectionData | IntrospectionTypeWrapper): string | null => {
-		if ('kind' in data && typeof data.kind === 'string') {
+	name: (data: TypeIntrospectionData | TypeWrapper): string | null => {
+		if (data instanceof TypeWrapper) {
 			return data.name
 		}
-		return (data as TypeIntrospectionData)._typeName
+		return data._typeName
 	},
 
-	description: (data: TypeIntrospectionData | IntrospectionTypeWrapper): string | null => {
+	description: (data: TypeIntrospectionData | TypeWrapper): string | null => {
 		const typeData = getTypeData(data)
 		if (!typeData) return null
 		const type = typeData._schema.t[typeData._typeName]
 		return type ? T.description(type) ?? null : null
 	},
 
-	specifiedByURL: (_data: TypeIntrospectionData | IntrospectionTypeWrapper): string | null => {
+	specifiedByURL: (_data: TypeIntrospectionData | TypeWrapper): string | null => {
 		// Not implemented in our schema format
 		return null
 	},
 
 	fields: (
-		data: TypeIntrospectionData | IntrospectionTypeWrapper,
+		data: TypeIntrospectionData | TypeWrapper,
 		args: { includeDeprecated?: boolean },
 	): FieldIntrospectionData[] | null => {
 		const typeData = getTypeData(data)
@@ -348,7 +334,7 @@ export const TypeResolvers = {
 			return null
 		}
 
-		const fields = type[1] as Record<string, Field>
+		const fields = type[1]
 		const result: FieldIntrospectionData[] = []
 
 		for (const [fieldName, field] of Object.entries(fields)) {
@@ -356,11 +342,7 @@ export const TypeResolvers = {
 			if (!args.includeDeprecated && deprecationReason !== undefined) {
 				continue
 			}
-			result.push({
-				_schema: typeData._schema,
-				_fieldName: fieldName,
-				_field: field,
-			})
+			result.push(new FieldIntrospectionData(typeData._schema, fieldName, field))
 		}
 
 		// Sort alphabetically
@@ -369,7 +351,7 @@ export const TypeResolvers = {
 		return result
 	},
 
-	interfaces: (data: TypeIntrospectionData | IntrospectionTypeWrapper): TypeIntrospectionData[] | null => {
+	interfaces: (data: TypeIntrospectionData | TypeWrapper): TypeIntrospectionData[] | null => {
 		const typeData = getTypeData(data)
 		if (!typeData) return null
 
@@ -378,11 +360,11 @@ export const TypeResolvers = {
 			return null
 		}
 
-		const interfaces = T.interfaces(type as any)
-		return interfaces.map(name => ({ _schema: typeData._schema, _typeName: name }))
+		const interfaces = T.interfaces(type)
+		return interfaces.map(name => new TypeIntrospectionData(typeData._schema, name))
 	},
 
-	possibleTypes: (data: TypeIntrospectionData | IntrospectionTypeWrapper): TypeIntrospectionData[] | null => {
+	possibleTypes: (data: TypeIntrospectionData | TypeWrapper): TypeIntrospectionData[] | null => {
 		const typeData = getTypeData(data)
 		if (!typeData) return null
 
@@ -391,12 +373,12 @@ export const TypeResolvers = {
 			return null
 		}
 
-		const possibleTypes = T.possibleTypes(type as any)
-		return possibleTypes.map(name => ({ _schema: typeData._schema, _typeName: name }))
+		const possibleTypes = T.possibleTypes(type)
+		return possibleTypes.map(name => new TypeIntrospectionData(typeData._schema, name))
 	},
 
 	enumValues: (
-		data: TypeIntrospectionData | IntrospectionTypeWrapper,
+		data: TypeIntrospectionData | TypeWrapper,
 		args: { includeDeprecated?: boolean },
 	): EnumValueIntrospectionData[] | null => {
 		const typeData = getTypeData(data)
@@ -415,7 +397,7 @@ export const TypeResolvers = {
 			if (!args.includeDeprecated && deprecationReason !== undefined) {
 				continue
 			}
-			result.push({ _name: name, _enumValue: value })
+			result.push(new EnumValueIntrospectionData(name, value))
 		}
 
 		// Sort alphabetically
@@ -425,7 +407,7 @@ export const TypeResolvers = {
 	},
 
 	inputFields: (
-		data: TypeIntrospectionData | IntrospectionTypeWrapper,
+		data: TypeIntrospectionData | TypeWrapper,
 		_args: { includeDeprecated?: boolean },
 	): InputValueIntrospectionData[] | null => {
 		const typeData = getTypeData(data)
@@ -441,11 +423,7 @@ export const TypeResolvers = {
 
 		for (const [name, field] of Object.entries(fields)) {
 			// Input fields don't have deprecation in our format, but we include the check for compatibility
-			result.push({
-				_schema: typeData._schema,
-				_name: name,
-				_arg: field,
-			})
+			result.push(new InputValueIntrospectionData(typeData._schema, name, field))
 		}
 
 		// Sort alphabetically
@@ -454,14 +432,14 @@ export const TypeResolvers = {
 		return result
 	},
 
-	ofType: (data: TypeIntrospectionData | IntrospectionTypeWrapper): IntrospectionTypeWrapper | null => {
-		if ('ofType' in data) {
+	ofType: (data: TypeIntrospectionData | TypeWrapper): TypeWrapper | null => {
+		if (data instanceof TypeWrapper) {
 			return data.ofType
 		}
 		return null
 	},
 
-	isOneOf: (data: TypeIntrospectionData | IntrospectionTypeWrapper): boolean | null => {
+	isOneOf: (data: TypeIntrospectionData | TypeWrapper): boolean | null => {
 		const typeData = getTypeData(data)
 		if (!typeData) return null
 
@@ -474,13 +452,13 @@ export const TypeResolvers = {
 	},
 }
 
-function getTypeData(data: TypeIntrospectionData | IntrospectionTypeWrapper): TypeIntrospectionData | null {
-	if ('_typeName' in data && '_schema' in data && data._typeName) {
-		return data as TypeIntrospectionData
+function getTypeData(data: TypeIntrospectionData | TypeWrapper): TypeIntrospectionData | null {
+	if (data instanceof TypeIntrospectionData) {
+		return data
 	}
-	// Handle wrapper types
-	if ('_schema' in data && data._schema && 'name' in data && data.name) {
-		return { _schema: data._schema, _typeName: data.name }
+	// Only a named wrapper carries a schema
+	if (data._schema && data.name) {
+		return new TypeIntrospectionData(data._schema, data.name)
 	}
 	return null
 }
@@ -508,11 +486,7 @@ export const FieldResolvers = {
 		const result: InputValueIntrospectionData[] = []
 		for (const [name, arg] of Object.entries(fieldArgs)) {
 			// Arguments don't have deprecation in our format
-			result.push({
-				_schema: data._schema,
-				_name: name,
-				_arg: arg,
-			})
+			result.push(new InputValueIntrospectionData(data._schema, name, arg))
 		}
 
 		// Sort alphabetically
@@ -521,7 +495,7 @@ export const FieldResolvers = {
 		return result
 	},
 
-	type: (data: FieldIntrospectionData): IntrospectionTypeWrapper => {
+	type: (data: FieldIntrospectionData): TypeWrapper => {
 		return typeRefToWrapper(F.type(data._field), data._schema)
 	},
 
@@ -547,7 +521,7 @@ export const InputValueResolvers = {
 		return A.description(data._arg) ?? null
 	},
 
-	type: (data: InputValueIntrospectionData): IntrospectionTypeWrapper => {
+	type: (data: InputValueIntrospectionData): TypeWrapper => {
 		return typeRefToWrapper(A.type(data._arg), data._schema)
 	},
 
@@ -584,7 +558,7 @@ function formatValueAsGraphQL(value: unknown): string {
 		return '[' + value.map(formatValueAsGraphQL).join(', ') + ']'
 	}
 	if (typeof value === 'object') {
-		const entries = Object.entries(value as Record<string, unknown>)
+		const entries = Object.entries(value)
 		return '{' + entries.map(([k, v]) => `${k}: ${formatValueAsGraphQL(v)}`).join(', ') + '}'
 	}
 	return String(value)
@@ -642,11 +616,7 @@ export const DirectiveResolvers = {
 
 		const result: InputValueIntrospectionData[] = []
 		for (const [name, arg] of Object.entries(directiveArgs)) {
-			result.push({
-				_schema: data._schema,
-				_name: name,
-				_arg: arg,
-			})
+			result.push(new InputValueIntrospectionData(data._schema, name, arg))
 		}
 
 		// Sort alphabetically

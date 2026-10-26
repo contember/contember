@@ -5,7 +5,7 @@
  * are detected (__schema or __type meta-fields).
  */
 
-import { type Schema, type Type, TypeKind, TypePattern } from '../types/schema.js'
+import { type Directive, type Schema, type Type, TypeKind, TypePattern } from '../types/schema.js'
 
 /**
  * __TypeKind enum values as defined by the GraphQL spec
@@ -224,7 +224,7 @@ export const introspectionTypes: Record<string, Type> = {
 /**
  * Built-in directives that are always available
  */
-export const builtInDirectives = {
+export const builtInDirectives: Record<'skip' | 'include' | 'deprecated' | 'specifiedBy' | 'oneOf', Directive> = {
 	skip: [
 		{ if: [[TypePattern.T_NN, 'Boolean'], undefined, 'Skipped when true.'] },
 		['FIELD', 'FRAGMENT_SPREAD', 'INLINE_FRAGMENT'],
@@ -261,7 +261,7 @@ export const builtInDirectives = {
 		false,
 		'Indicates exactly one field must be supplied and this field must not be `null`.',
 	],
-} as const
+}
 
 /**
  * Check if a type name is an introspection type

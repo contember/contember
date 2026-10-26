@@ -7,7 +7,7 @@
 
 import type { Argument, Directive, EnumValue, Field, InputField, Schema, TypeRef } from '../types/schema.js'
 import { A, D, EV, F, isEnumType, isInputObjectType, isInterfaceType, isObjectType, isUnionType, T, TypeKind } from '../types/schema.js'
-import { builtInDirectives, IntrospectionTypeKind } from './types.js'
+import { getSchemaDirectives, IntrospectionTypeKind } from './types.js'
 import type { IntrospectionTypeKindValue } from './types.js'
 
 /**
@@ -242,13 +242,10 @@ export const SchemaResolvers = {
 		const schema = data._schema
 		const types: TypeIntrospectionData[] = []
 
+		// in the schema order, as graphql-js lists its type map
 		for (const typeName of Object.keys(schema.t)) {
 			types.push(new TypeIntrospectionData(schema, typeName))
 		}
-
-		// Sort alphabetically for consistent output
-		types.sort((a, b) => a._typeName.localeCompare(b._typeName))
-
 		return types
 	},
 
@@ -270,23 +267,7 @@ export const SchemaResolvers = {
 
 	directives: (data: SchemaIntrospectionData): DirectiveIntrospectionData[] => {
 		const schema = data._schema
-		const directives: DirectiveIntrospectionData[] = []
-
-		// Add built-in directives
-		for (const [name, directive] of Object.entries(builtInDirectives)) {
-			directives.push(new DirectiveIntrospectionData(schema, name, directive))
-		}
-
-		// Add schema-defined directives
-		if (schema.d) {
-			for (const [name, directive] of Object.entries(schema.d)) {
-				// Skip if already added as built-in
-				if (name in builtInDirectives) continue
-				directives.push(new DirectiveIntrospectionData(schema, name, directive))
-			}
-		}
-
-		return directives
+		return Object.entries(getSchemaDirectives(schema)).map(([name, directive]) => new DirectiveIntrospectionData(schema, name, directive))
 	},
 }
 
@@ -338,16 +319,11 @@ export const TypeResolvers = {
 		const result: FieldIntrospectionData[] = []
 
 		for (const [fieldName, field] of Object.entries(fields)) {
-			const deprecationReason = F.deprecationReason(field)
-			if (!args.includeDeprecated && deprecationReason !== undefined) {
+			if (!args.includeDeprecated && F.deprecationReason(field) != null) {
 				continue
 			}
 			result.push(new FieldIntrospectionData(typeData._schema, fieldName, field))
 		}
-
-		// Sort alphabetically
-		result.sort((a, b) => a._fieldName.localeCompare(b._fieldName))
-
 		return result
 	},
 
@@ -373,8 +349,18 @@ export const TypeResolvers = {
 			return null
 		}
 
-		const possibleTypes = T.possibleTypes(type)
-		return possibleTypes.map(name => new TypeIntrospectionData(typeData._schema, name))
+		const schema = typeData._schema
+		if (isUnionType(type)) {
+			return type[1].map(name => new TypeIntrospectionData(schema, name))
+		}
+		// as graphql-js getPossibleTypes: the object types implementing the interface, in the schema order
+		const possibleTypes: TypeIntrospectionData[] = []
+		for (const [name, candidate] of Object.entries(schema.t)) {
+			if (isObjectType(candidate) && candidate[2].includes(typeData._typeName)) {
+				possibleTypes.push(new TypeIntrospectionData(schema, name))
+			}
+		}
+		return possibleTypes
 	},
 
 	enumValues: (
@@ -393,16 +379,11 @@ export const TypeResolvers = {
 		const result: EnumValueIntrospectionData[] = []
 
 		for (const [name, value] of Object.entries(values)) {
-			const deprecationReason = EV.deprecationReason(value)
-			if (!args.includeDeprecated && deprecationReason !== undefined) {
+			if (!args.includeDeprecated && EV.deprecationReason(value) != null) {
 				continue
 			}
 			result.push(new EnumValueIntrospectionData(name, value))
 		}
-
-		// Sort alphabetically
-		result.sort((a, b) => a._name.localeCompare(b._name))
-
 		return result
 	},
 
@@ -425,10 +406,6 @@ export const TypeResolvers = {
 			// Input fields don't have deprecation in our format, but we include the check for compatibility
 			result.push(new InputValueIntrospectionData(typeData._schema, name, field))
 		}
-
-		// Sort alphabetically
-		result.sort((a, b) => a._name.localeCompare(b._name))
-
 		return result
 	},
 
@@ -448,7 +425,8 @@ export const TypeResolvers = {
 			return null
 		}
 
-		return T.isOneOf(type) ?? null
+		// a graphql-js input object is never undefined about it
+		return T.isOneOf(type) ?? false
 	},
 }
 
@@ -488,10 +466,6 @@ export const FieldResolvers = {
 			// Arguments don't have deprecation in our format
 			result.push(new InputValueIntrospectionData(data._schema, name, arg))
 		}
-
-		// Sort alphabetically
-		result.sort((a, b) => a._name.localeCompare(b._name))
-
 		return result
 	},
 
@@ -618,10 +592,6 @@ export const DirectiveResolvers = {
 		for (const [name, arg] of Object.entries(directiveArgs)) {
 			result.push(new InputValueIntrospectionData(data._schema, name, arg))
 		}
-
-		// Sort alphabetically
-		result.sort((a, b) => a._name.localeCompare(b._name))
-
 		return result
 	},
 }

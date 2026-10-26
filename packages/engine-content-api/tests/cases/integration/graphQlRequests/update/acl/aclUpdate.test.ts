@@ -79,11 +79,11 @@ test('update with old/new transition predicate', async () => {
 		permissions: {
 			Article: {
 				predicates: {
-					// allow moving draft -> published, but the predicate also constrains the old state
+					// allow moving draft -> published, but not back
 					transition_predicate: {
 						_old: { state: { eq: 'draft' } },
 						_new: { state: { eq: 'published' } },
-					} as any,
+					},
 				},
 				operations: {
 					update: {

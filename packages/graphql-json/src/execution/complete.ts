@@ -6,10 +6,10 @@ import { GraphQLError } from 'graphql'
 import type { FieldNode } from 'graphql'
 import type { ExecutionContext } from '../types/execution.js'
 import type { EnumType, InterfaceType, ScalarType, TypeRef, UnionType } from '../types/schema.js'
-import { EV, isAbstractType, isLeafType, isObjectType, isScalarType, T } from '../types/schema.js'
+import { EV, isAbstractType, isLeafType, isObjectType, isScalarType, T, TypeKind } from '../types/schema.js'
 import type { ResolveInfo } from '../types/resolvers.js'
 import type { Path } from '../utils/path.js'
-import { addPath, pathToArray } from '../utils/path.js'
+import { addPath } from '../utils/path.js'
 import { inspect, isIterableObject, isObjectLike, isPromise } from '../utils/helpers.js'
 import { getListItemType, isListType, isNonNullType, unwrapNonNull } from '../utils/typeRef.js'
 import { collectSubfields, type GroupedFieldSet } from './collectFields.js'
@@ -75,15 +75,14 @@ export function completeValue<TContext>(
 
 	// Handle promise
 	if (isPromise(result)) {
-		return result.then((resolved) => completeValue(exeContext, returnTypeRef, fieldNodes, info, path, resolved)).catch((rawError) => {
-			const error = rawError instanceof Error ? rawError : new Error(String(rawError))
-			return handleFieldError(error, returnTypeRef, fieldNodes, path, exeContext)
-		})
+		return result.then((resolved) => completeValue(exeContext, returnTypeRef, fieldNodes, info, path, resolved)).catch((rawError) =>
+			handleFieldError(rawError, returnTypeRef, fieldNodes, path, exeContext)
+		)
 	}
 
-	// Handle errors thrown during resolution
+	// a returned error is a field error, located by the caller as graphql-js does
 	if (result instanceof Error) {
-		return handleFieldError(result, returnTypeRef, fieldNodes, path, exeContext)
+		throw result
 	}
 
 	// Handle NonNull
@@ -100,20 +99,15 @@ export function completeValue<TContext>(
 			result,
 		)
 
+		// a plain Error as in graphql-js, so the located error carries it as originalError
 		if (completed === null) {
-			throw new GraphQLError(
-				`Cannot return null for non-nullable field ${info.parentType}.${info.fieldName}.`,
-				{ nodes: fieldNodes, path: pathToArray(path) },
-			)
+			throw new Error(`Cannot return null for non-nullable field ${info.parentType}.${info.fieldName}.`)
 		}
 
 		if (isPromise(completed)) {
 			return completed.then((resolved) => {
 				if (resolved === null) {
-					throw new GraphQLError(
-						`Cannot return null for non-nullable field ${info.parentType}.${info.fieldName}.`,
-						{ nodes: fieldNodes, path: pathToArray(path) },
-					)
+					throw new Error(`Cannot return null for non-nullable field ${info.parentType}.${info.fieldName}.`)
 				}
 				return resolved
 			})
@@ -191,10 +185,7 @@ function completeListValue<TContext>(
 	result: unknown,
 ): unknown[] | Promise<unknown[]> {
 	if (!isIterableObject(result)) {
-		throw new GraphQLError(
-			`Expected Iterable, but did not find one for field "${info.parentType}.${info.fieldName}".`,
-			{ nodes: fieldNodes, path: pathToArray(path) },
-		)
+		throw new GraphQLError(`Expected Iterable, but did not find one for field "${info.parentType}.${info.fieldName}".`)
 	}
 
 	// Get inner type pattern
@@ -220,7 +211,7 @@ function completeListValue<TContext>(
 			if (isPromise(completed)) {
 				// Handle async completion with error catching
 				const wrappedPromise = completed.then(undefined, (rawError) => {
-					return handleListItemError(rawError, innerTypeRef, fieldNodes, itemPath, exeContext)
+					return handleFieldError(rawError, innerTypeRef, fieldNodes, itemPath, exeContext)
 				})
 				completedResults.push(wrappedPromise)
 				containsPromise = true
@@ -228,7 +219,7 @@ function completeListValue<TContext>(
 				completedResults.push(completed)
 			}
 		} catch (rawError) {
-			const result = handleListItemError(rawError, innerTypeRef, fieldNodes, itemPath, exeContext)
+			const result = handleFieldError(rawError, innerTypeRef, fieldNodes, itemPath, exeContext)
 			completedResults.push(result)
 		}
 		index++
@@ -239,33 +230,6 @@ function completeListValue<TContext>(
 	}
 
 	return completedResults
-}
-
-/**
- * Handle error for a list item - throws for non-null items, returns null for nullable
- */
-function handleListItemError<TContext>(
-	rawError: unknown,
-	itemTypeRef: TypeRef,
-	fieldNodes: readonly FieldNode[],
-	itemPath: Path,
-	exeContext: ExecutionContext<TContext>,
-): null {
-	const error = rawError instanceof GraphQLError
-		? rawError
-		: new GraphQLError(
-			rawError instanceof Error ? rawError.message : String(rawError),
-			{ nodes: fieldNodes, path: pathToArray(itemPath), originalError: rawError instanceof Error ? rawError : undefined },
-		)
-
-	// If item type is non-null, error propagates up
-	if (isNonNullType(itemTypeRef[0])) {
-		throw error
-	}
-
-	// Otherwise, collect error and return null
-	exeContext.errors.push(error)
-	return null
 }
 
 /**
@@ -280,7 +244,13 @@ function completeLeafValue<TContext>(
 	if (isScalarType(type)) {
 		const scalar = exeContext.scalars[typeName]
 		if (scalar) {
-			return scalar.serialize(result)
+			const serializedResult = scalar.serialize(result)
+			if (serializedResult == null) {
+				throw new Error(
+					`Expected \`${typeName}.serialize(${inspect(result)})\` to return non-nullable value, returned: ${inspect(serializedResult)}`,
+				)
+			}
+			return serializedResult
 		}
 		// No custom serializer - return as is
 		return result
@@ -332,44 +302,32 @@ function completeAbstractValue<TContext>(
 
 	let runtimeTypeName: string | null | undefined | Promise<string | null | undefined>
 
-	try {
-		if (resolveTypeFn) {
-			runtimeTypeName = resolveTypeFn(result, exeContext.contextValue, info, abstractTypeInfo)
-		} else {
-			// Try __typename first
-			runtimeTypeName = defaultTypeResolver(result, exeContext.contextValue, info, abstractTypeInfo)
+	// a throwing type resolver fails the field with its own error, as in graphql-js
+	if (resolveTypeFn) {
+		runtimeTypeName = resolveTypeFn(result, exeContext.contextValue, info, abstractTypeInfo)
+	} else {
+		// Try __typename first
+		runtimeTypeName = defaultTypeResolver(result, exeContext.contextValue, info, abstractTypeInfo)
 
-			// If no __typename, try isTypeOf
-			if (runtimeTypeName === null) {
-				const possibleTypes = T.possibleTypes(abstractType)
-				runtimeTypeName = resolveTypeWithIsTypeOf(exeContext, possibleTypes, result, info)
-			}
+		// If no __typename, try isTypeOf
+		if (runtimeTypeName === null) {
+			const possibleTypes = T.possibleTypes(abstractType)
+			runtimeTypeName = resolveTypeWithIsTypeOf(exeContext, possibleTypes, result, info)
 		}
-	} catch (error) {
-		throw new GraphQLError(
-			`Abstract type "${abstractTypeName}" resolver threw: ${error instanceof Error ? error.message : String(error)}`,
-			{ nodes: fieldNodes, path: pathToArray(path), originalError: error instanceof Error ? error : undefined },
-		)
 	}
 
 	if (isPromise(runtimeTypeName)) {
-		return runtimeTypeName.then(
-			(resolvedTypeName) =>
-				ensureValidRuntimeType(
-					exeContext,
-					resolvedTypeName,
-					abstractTypeName,
-					fieldNodes,
-					info,
-					path,
-					result,
-				),
-			(error) => {
-				throw new GraphQLError(
-					`Abstract type "${abstractTypeName}" resolver threw: ${error instanceof Error ? error.message : String(error)}`,
-					{ nodes: fieldNodes, path: pathToArray(path), originalError: error instanceof Error ? error : undefined },
-				)
-			},
+		return runtimeTypeName.then((resolvedTypeName) =>
+			ensureValidRuntimeType(
+				exeContext,
+				resolvedTypeName,
+				abstractTypeName,
+				abstractType,
+				fieldNodes,
+				info,
+				path,
+				result,
+			)
 		)
 	}
 
@@ -377,6 +335,7 @@ function completeAbstractValue<TContext>(
 		exeContext,
 		runtimeTypeName,
 		abstractTypeName,
+		abstractType,
 		fieldNodes,
 		info,
 		path,
@@ -436,30 +395,34 @@ function ensureValidRuntimeType<TContext>(
 	exeContext: ExecutionContext<TContext>,
 	runtimeTypeName: string | null | undefined,
 	abstractTypeName: string,
+	abstractType: InterfaceType | UnionType,
 	fieldNodes: readonly FieldNode[],
 	info: ResolveInfo,
 	path: Path,
 	result: unknown,
 ): Record<string, unknown> | Promise<Record<string, unknown>> {
-	if (!runtimeTypeName) {
+	if (runtimeTypeName == null) {
 		throw new GraphQLError(
 			`Abstract type "${abstractTypeName}" must resolve to an Object type at runtime for field "${info.parentType}.${info.fieldName}". `
 				+ `Either the "${abstractTypeName}" type should provide a "resolveType" function or each possible type should provide an "isTypeOf" function.`,
-			{ nodes: fieldNodes, path: pathToArray(path) },
+			{ nodes: fieldNodes },
 		)
 	}
 
-	// Validate that the runtime type exists and is an object type
 	const runtimeType = exeContext.schema.t[runtimeTypeName]
-	if (!runtimeType || !isObjectType(runtimeType)) {
+	if (!runtimeType) {
 		throw new GraphQLError(
-			`Abstract type "${abstractTypeName}" was resolved to a non-object type "${runtimeTypeName}".`,
-			{ nodes: fieldNodes, path: pathToArray(path) },
+			`Abstract type "${abstractTypeName}" was resolved to a type "${runtimeTypeName}" that does not exist inside the schema.`,
+			{ nodes: fieldNodes },
 		)
 	}
-
-	// TODO: Validate that runtimeTypeName is a possible type of the abstract type
-	// This would require checking if the type implements the interface or is part of the union
+	if (!isObjectType(runtimeType)) {
+		throw new GraphQLError(`Abstract type "${abstractTypeName}" was resolved to a non-object type "${runtimeTypeName}".`, { nodes: fieldNodes })
+	}
+	const isPossibleType = abstractType[0] === TypeKind.UNION ? abstractType[1].includes(runtimeTypeName) : runtimeType[2].includes(abstractTypeName)
+	if (!isPossibleType) {
+		throw new GraphQLError(`Runtime Object type "${runtimeTypeName}" is not a possible type for "${abstractTypeName}".`, { nodes: fieldNodes })
+	}
 
 	return completeObjectValue(
 		exeContext,

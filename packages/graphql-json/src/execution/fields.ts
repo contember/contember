@@ -2,10 +2,10 @@
  * Field execution
  */
 
-import { GraphQLError } from 'graphql'
+import { type GraphQLError, locatedError } from 'graphql'
 import type { FieldNode } from 'graphql'
 import type { ExecutionContext } from '../types/execution.js'
-import type { Field } from '../types/schema.js'
+import type { Field, TypeRef } from '../types/schema.js'
 import { F, TypeKind, TypePattern } from '../types/schema.js'
 import type { ResolveInfo, ResolverFn } from '../types/resolvers.js'
 import type { Path } from '../utils/path.js'
@@ -145,16 +145,12 @@ function executeField<TContext>(
 		}
 
 		if (isPromise(completed)) {
-			return completed.then(undefined, (rawError) => {
-				const error = rawError instanceof Error ? rawError : new Error(String(rawError))
-				return handleFieldError(error, returnTypeRef, fieldNodes, path, exeContext)
-			})
+			return completed.then(undefined, (rawError) => handleFieldError(rawError, returnTypeRef, fieldNodes, path, exeContext))
 		}
 
 		return completed
 	} catch (rawError) {
-		const error = rawError instanceof Error ? rawError : new Error(String(rawError))
-		return handleFieldError(error, returnTypeRef, fieldNodes, path, exeContext)
+		return handleFieldError(rawError, returnTypeRef, fieldNodes, path, exeContext)
 	}
 }
 
@@ -217,44 +213,40 @@ function resolveFieldValueSafe<TContext>(
 }
 
 /**
- * Handle field error - either propagate (for non-null) or collect (for nullable)
- * Returns null for nullable types, throws for non-null types
+ * Locate the error at the field as graphql-js does, then propagate it (non-null) or collect it and return null (nullable)
  */
 export function handleFieldError<TContext>(
-	rawError: Error,
-	returnTypeRef: [number, string],
+	rawError: unknown,
+	returnTypeRef: TypeRef,
 	fieldNodes: readonly FieldNode[],
 	path: Path,
 	exeContext: ExecutionContext<TContext>,
 ): null {
-	// Create or enhance the GraphQLError with proper path
-	let error: GraphQLError
-	if (rawError instanceof GraphQLError) {
-		// If the error already has a path, preserve it; otherwise add the current path
-		if (rawError.path) {
-			error = rawError
-		} else {
-			// Create a new error with the path
-			error = new GraphQLError(rawError.message, {
-				nodes: rawError.nodes ?? fieldNodes,
-				path: pathToArray(path),
-				originalError: rawError.originalError ?? undefined,
-			})
-		}
-	} else {
-		error = new GraphQLError(rawError.message, {
-			nodes: fieldNodes,
-			path: pathToArray(path),
-			originalError: rawError,
-		})
-	}
+	const error = locatedError(rawError, fieldNodes, pathToArray(path))
 
-	// If the field type is non-null, then error propagates up
 	if (isNonNullType(returnTypeRef[0])) {
 		throw error
 	}
 
-	// Otherwise, error protection is applied - log error and return null
-	exeContext.errors.push(error)
+	addError(exeContext, error, path)
 	return null
+}
+
+/**
+ * Collect an error unless its position or an ancestor was already nulled by another error, as graphql-js does
+ */
+export function addError<TContext>(exeContext: ExecutionContext<TContext>, error: GraphQLError, path: Path | undefined): void {
+	const errorPositions = exeContext.errorPositions
+	let current = path
+	while (current !== undefined) {
+		if (errorPositions.has(current)) {
+			return
+		}
+		current = current.prev
+	}
+	if (errorPositions.has(undefined)) {
+		return
+	}
+	errorPositions.add(path)
+	exeContext.errors.push(error)
 }

@@ -8,7 +8,7 @@ import type { Field, Schema } from '../types/schema.js'
 import { TypeKind } from '../types/schema.js'
 import type { ScalarMap } from '../types/resolvers.js'
 import { formatTypeRef, getListItemType, isListType, isNonNullType, typeRefFromAST, unwrapNonNull } from '../utils/typeRef.js'
-import { getOwn, inspect, isIterableObject, isObjectLike } from '../utils/helpers.js'
+import { getOwn, inspect, isIterableObject, isObjectLike, setOwn } from '../utils/helpers.js'
 import { addPath, type Path, pathToArray } from '../utils/path.js'
 import { enumLiteralValue, parseEnumValue } from '../utils/enumValues.js'
 import { didYouMean, isInputType, suggestionList } from '../validation/helpers.js'
@@ -239,7 +239,7 @@ function valueFromASTUntyped(valueNode: ValueNode, variables: Record<string, unk
 		case Kind.OBJECT: {
 			const obj: Record<string, unknown> = {}
 			for (const field of valueNode.fields) {
-				obj[field.name.value] = valueFromASTUntyped(field.value, variables)
+				setOwn(obj, field.name.value, valueFromASTUntyped(field.value, variables))
 			}
 			return obj
 		}

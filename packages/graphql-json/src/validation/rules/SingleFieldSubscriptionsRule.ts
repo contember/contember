@@ -10,6 +10,7 @@ import type { ASTVisitor, FragmentDefinitionNode } from 'graphql'
 import { GraphQLError, Kind } from 'graphql'
 
 import { collectFields } from '../../execution/collectFields.js'
+import { setOwn } from '../../utils/helpers.js'
 import type { ValidationContext } from '../ValidationContext.js'
 
 export function SingleFieldSubscriptionsRule(context: ValidationContext): ASTVisitor {
@@ -24,7 +25,7 @@ export function SingleFieldSubscriptionsRule(context: ValidationContext): ASTVis
 					const fragments: Record<string, FragmentDefinitionNode> = {}
 					for (const definition of document.definitions) {
 						if (definition.kind === Kind.FRAGMENT_DEFINITION) {
-							fragments[definition.name.value] = definition
+							setOwn(fragments, definition.name.value, definition)
 						}
 					}
 					// No variable values exist yet: @skip/@include conditions on variables count as included.

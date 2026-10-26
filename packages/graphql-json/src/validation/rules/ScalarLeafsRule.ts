@@ -43,6 +43,12 @@ export function ScalarLeafsRule(context: ValidationContext): ASTVisitor {
 								{ nodes: node },
 							),
 						)
+					} else if (selectionSet.selections.length === 0) {
+						context.reportError(
+							new GraphQLError(`Field "${node.name.value}" of type "${formatTypeRef(typeRef)}" must have at least one field selected.`, {
+								nodes: node,
+							}),
+						)
 					}
 				}
 			}

@@ -11,31 +11,17 @@ import { GraphQLError, Kind } from 'graphql'
 
 import { D } from '../../types/schema.js'
 import type { ValidationContext } from '../ValidationContext.js'
-import { didYouMean, isASTNode, suggestionList } from '../helpers.js'
-
-// Built-in directives with their allowed locations
-const BUILT_IN_DIRECTIVES: Record<string, readonly string[]> = {
-	skip: ['FIELD', 'FRAGMENT_SPREAD', 'INLINE_FRAGMENT'],
-	include: ['FIELD', 'FRAGMENT_SPREAD', 'INLINE_FRAGMENT'],
-	deprecated: ['FIELD_DEFINITION', 'ARGUMENT_DEFINITION', 'INPUT_FIELD_DEFINITION', 'ENUM_VALUE'],
-	specifiedBy: ['SCALAR'],
-}
+import { isASTNode } from '../helpers.js'
+import { getSchemaDirectives } from '../../introspection/types.js'
 
 export function KnownDirectivesRule(context: ValidationContext): ASTVisitor {
-	const schema = context.getSchema()
-
-	// Build locations map from schema directives or use built-ins
 	const locationsMap = new Map<string, readonly string[]>()
-
-	if (schema.d) {
-		for (const [name, directive] of Object.entries(schema.d)) {
-			// Directive: [args, locations, isRepeatable?, description?]
-			locationsMap.set(name, D.locations(directive))
-		}
-	} else {
-		// Use built-in directives if schema doesn't define any
-		for (const [name, locations] of Object.entries(BUILT_IN_DIRECTIVES)) {
-			locationsMap.set(name, locations)
+	for (const [name, directive] of Object.entries(getSchemaDirectives(context.getSchema()))) {
+		locationsMap.set(name, D.locations(directive))
+	}
+	for (const def of context.getDocument().definitions) {
+		if (def.kind === Kind.DIRECTIVE_DEFINITION) {
+			locationsMap.set(def.name.value, def.locations.map(name => name.value))
 		}
 	}
 
@@ -45,14 +31,7 @@ export function KnownDirectivesRule(context: ValidationContext): ASTVisitor {
 			const locations = locationsMap.get(name)
 
 			if (!locations) {
-				const allDirectiveNames = Array.from(locationsMap.keys())
-				const suggestions = suggestionList(name, allDirectiveNames)
-				context.reportError(
-					new GraphQLError(
-						`Unknown directive "@${name}".${didYouMean(suggestions)}`,
-						{ nodes: node },
-					),
-				)
+				context.reportError(new GraphQLError(`Unknown directive "@${name}".`, { nodes: node }))
 				return
 			}
 

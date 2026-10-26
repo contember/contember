@@ -222,20 +222,20 @@ export const introspectionTypes: Record<string, Type> = {
 }
 
 /**
- * Built-in directives that are always available
+ * The directives graphql-js specifies, in its `specifiedDirectives` order
  */
-export const builtInDirectives: Record<'skip' | 'include' | 'deprecated' | 'specifiedBy' | 'oneOf', Directive> = {
-	skip: [
-		{ if: [[TypePattern.T_NN, 'Boolean'], undefined, 'Skipped when true.'] },
-		['FIELD', 'FRAGMENT_SPREAD', 'INLINE_FRAGMENT'],
-		false,
-		'Directs the executor to skip this field or fragment when the `if` argument is true.',
-	],
+export const builtInDirectives: Record<'include' | 'skip' | 'deprecated' | 'specifiedBy' | 'oneOf', Directive> = {
 	include: [
 		{ if: [[TypePattern.T_NN, 'Boolean'], undefined, 'Included when true.'] },
 		['FIELD', 'FRAGMENT_SPREAD', 'INLINE_FRAGMENT'],
 		false,
 		'Directs the executor to include this field or fragment only when the `if` argument is true.',
+	],
+	skip: [
+		{ if: [[TypePattern.T_NN, 'Boolean'], undefined, 'Skipped when true.'] },
+		['FIELD', 'FRAGMENT_SPREAD', 'INLINE_FRAGMENT'],
+		false,
+		'Directs the executor to skip this field or fragment when the `if` argument is true.',
 	],
 	deprecated: [
 		{
@@ -261,6 +261,30 @@ export const builtInDirectives: Record<'skip' | 'include' | 'deprecated' | 'spec
 		false,
 		'Indicates exactly one field must be supplied and this field must not be `null`.',
 	],
+}
+
+const schemaDirectivesCache = new WeakMap<Schema, Record<string, Directive>>()
+
+/**
+ * The directives of a schema in graphql-js order: those the schema defines, then the specified ones it does not redefine.
+ * Memoized per `schema` object.
+ */
+export function getSchemaDirectives(schema: Schema): Record<string, Directive> {
+	const schemaDirectives = schema.d
+	if (!schemaDirectives) {
+		return builtInDirectives
+	}
+	let directives = schemaDirectivesCache.get(schema)
+	if (!directives) {
+		directives = { ...schemaDirectives }
+		for (const [name, directive] of Object.entries(builtInDirectives)) {
+			if (!Object.prototype.hasOwnProperty.call(schemaDirectives, name)) {
+				directives[name] = directive
+			}
+		}
+		schemaDirectivesCache.set(schema, directives)
+	}
+	return directives
 }
 
 /**

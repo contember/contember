@@ -23,6 +23,7 @@ interface VariableUsage {
 	readonly node: VariableNode
 	readonly type: Maybe<TypeRef>
 	readonly defaultValue: Maybe<unknown>
+	readonly parentType: Maybe<TypeRef>
 }
 
 type NodeWithSelectionSet = OperationDefinitionNode | FragmentDefinitionNode
@@ -168,6 +169,7 @@ export class ValidationContext {
 							node: variable,
 							type: typeInfo.getInputType(),
 							defaultValue: typeInfo.getDefaultValue(),
+							parentType: typeInfo.getParentInputType(),
 						})
 					},
 				}),

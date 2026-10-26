@@ -11,6 +11,8 @@ import { KnownArgumentNamesRule } from '../../src/validation/rules/KnownArgument
 import { KnownDirectivesRule } from '../../src/validation/rules/KnownDirectivesRule.js'
 import { ProvidedRequiredArgumentsRule } from '../../src/validation/rules/ProvidedRequiredArgumentsRule.js'
 import { ScalarLeafsRule } from '../../src/validation/rules/ScalarLeafsRule.js'
+import { UniqueArgumentNamesRule } from '../../src/validation/rules/UniqueArgumentNamesRule.js'
+import { UniqueVariableNamesRule } from '../../src/validation/rules/UniqueVariableNamesRule.js'
 import { VariablesAreInputTypesRule } from '../../src/validation/rules/VariablesAreInputTypesRule.js'
 import { VariablesInAllowedPositionRule } from '../../src/validation/rules/VariablesInAllowedPositionRule.js'
 
@@ -136,6 +138,13 @@ const ruleCases: [name: string, rule: ValidationRule, graphqlJsRule: graphqlJs.V
 	['ScalarLeafsRule', ScalarLeafsRule, graphqlJs.ScalarLeafsRule, {
 		'a selection on a scalar': '{ listTag { x } }',
 		'a missing selection': '{ person }',
+	}],
+	['UniqueArgumentNamesRule', UniqueArgumentNamesRule, graphqlJs.UniqueArgumentNamesRule, {
+		'all duplicates of a name in one error, names in first occurrence order': '{ required(list: [], by: 1, by: 2, list: [], by: 3) }',
+		'directive arguments': '{ person @skip(if: true, if: false) { id } }',
+	}],
+	['UniqueVariableNamesRule', UniqueVariableNamesRule, graphqlJs.UniqueVariableNamesRule, {
+		'located at the variable names': 'query($a: Int, $b: Int, $a: Int, $b: Int, $a: String) { listTag }',
 	}],
 	['VariablesAreInputTypesRule', VariablesAreInputTypesRule, graphqlJs.VariablesAreInputTypesRule, {
 		'an output type variable': 'query($a: [Person!]!, $b: Thing) { listTag }',

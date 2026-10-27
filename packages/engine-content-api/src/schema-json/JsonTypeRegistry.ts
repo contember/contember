@@ -137,19 +137,23 @@ export class JsonTypeRegistry {
 		const getType = (name: string): Type | undefined => this.types[name] ?? otherTypes[name]
 		// an explicit stack instead of recursion keeps the pre-order of a recursive walk and can pause after any type
 		const collect = function*(name: string): Generator<void, void> {
-			const stack: Iterator<string>[] = [[name].values()]
-			while (stack.length > 0) {
-				const next = stack[stack.length - 1].next()
-				if (next.done) {
-					stack.pop()
+			const names: (readonly string[])[] = [[name]]
+			const positions: number[] = [0]
+			while (names.length > 0) {
+				const top = names.length - 1
+				const next = names[top][positions[top]++]
+				if (next === undefined) {
+					names.pop()
+					positions.pop()
 					continue
 				}
-				const type = reachable.has(next.value) ? undefined : getType(next.value)
+				const type = reachable.has(next) ? undefined : getType(next)
 				if (!type) {
 					continue
 				}
-				reachable.add(next.value)
-				stack.push(referencedTypes(type))
+				reachable.add(next)
+				names.push(getReferencedTypes(type))
+				positions.push(0)
 				yield
 			}
 		}
@@ -205,37 +209,39 @@ export class JsonTypeRegistry {
 }
 
 /** The names a type refers to, in the order graphql-js visits them: interfaces, then each field's type and arguments. */
-function* referencedTypes(type: Type): Generator<string, void> {
+const getReferencedTypes = (type: Type): string[] => {
+	const names: string[] = []
 	switch (type[0]) {
 		case TypeKind.OBJECT:
 		case TypeKind.INTERFACE:
-			yield* type[2]
+			names.push(...type[2])
 			for (const fieldName in type[1]) {
 				const field = type[1][fieldName]
 				if (!field) {
 					continue
 				}
-				yield field[0][1]
+				names.push(field[0][1])
 				for (const argName in field[1]) {
 					const arg = field[1][argName]
 					if (arg) {
-						yield arg[0][1]
+						names.push(arg[0][1])
 					}
 				}
 			}
 			break
 		case TypeKind.UNION:
-			yield* type[1]
+			names.push(...type[1])
 			break
 		case TypeKind.INPUT_OBJECT:
 			for (const fieldName in type[1]) {
 				const field = type[1][fieldName]
 				if (field) {
-					yield field[0][1]
+					names.push(field[0][1])
 				}
 			}
 			break
 	}
+	return names
 }
 
 /** Wrap patterns of graphql-json `TypeRef`, named after the SDL they produce. */

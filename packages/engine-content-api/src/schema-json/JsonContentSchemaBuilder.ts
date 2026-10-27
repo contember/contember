@@ -159,6 +159,20 @@ export class JsonContentSchemaBuilder {
 	}
 
 	public build(extensions: readonly JsonSchemaExtension[] = []): JsonContentSchema {
+		const steps = this.buildSteps(extensions)
+		for (;;) {
+			const step = steps.next()
+			if (step.done) {
+				return step.value
+			}
+		}
+	}
+
+	/**
+	 * `build` in steps of bounded size, so that a caller can pause in between and keep serving other requests: the
+	 * schema of a large model with permissive roles takes seconds. Each builder runs it at most once.
+	 */
+	public *buildSteps(extensions: readonly JsonSchemaExtension[] = []): Generator<void, JsonContentSchema> {
 		const registry = this.registry
 		// graphql-js always includes these two, introspection depends on them
 		registry.scalar('String', undefined)
@@ -194,13 +208,16 @@ export class JsonContentSchemaBuilder {
 			Object.assign(queries, this.getQueries(entity))
 			Object.assign(queries, this.getValidationQueries(entity))
 			Object.assign(mutations, this.getMutations(entity))
+			yield
 		}
 
 		const boolean = namedRef(registry.scalar('Boolean', undefined))
 		const string = namedRef(registry.scalar('String', undefined))
 
 		if (Object.keys(queries).length > 0) {
-			const queryTransaction = registry.object('QueryTransaction', () => ({ ...queries }))
+			// copied now: the fields are created after `transaction` and `_info` are added to `queries`
+			const transactionQueries = { ...queries }
+			const queryTransaction = registry.object('QueryTransaction', () => transactionQueries)
 			queries.transaction = { type: namedRef(queryTransaction), resolve: this.schemaResolvers.queryTransaction }
 		}
 		const hasMutations = Object.keys(mutations).length > 0
@@ -239,15 +256,18 @@ export class JsonContentSchemaBuilder {
 			registry.object('Mutation', () => mutations)
 		}
 
+		yield* registry.fillPending()
+
 		const includedTypes = extensions.flatMap(it => it.includedTypes ?? [])
 		// after the root types, graphql-js collects the argument types of the specified directives and introspection
 		const roots = ['Query', 'Mutation', 'Boolean', 'String', '__Schema']
-		const schema = this.shared.interner.intern({
+		// with the introspection types in place, graphql-json uses the schema as is instead of a merged copy
+		const types = yield* registry.collectReachableTypes(includedTypes, roots, introspectionTypes)
+		const schema = yield* this.shared.interner.internSteps({
 			q: 'Query',
 			m: registry.has('Mutation') ? 'Mutation' : null,
 			s: null,
-			// with the introspection types in place, graphql-json uses the schema as is instead of a merged copy
-			t: registry.getReachableTypes(includedTypes, roots, introspectionTypes),
+			t: types,
 		})
 		const resolvers: ResolverMap<Context> = { ...this.shared.resolvers }
 		for (const [typeName, typeResolvers] of Object.entries(extensionResolvers)) {

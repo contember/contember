@@ -69,6 +69,21 @@ describe('SchemaInterner', () => {
 		expect(second.d).toBe(first.d)
 	})
 
+	test('interning in steps yields once per type and returns what intern returns', () => {
+		const interner = new SchemaInterner()
+		const schema = buildSchema(sdl(''))
+		const steps = interner.internSteps(buildSchema(sdl('')))
+		let stepCount = 0
+		let step = steps.next()
+		while (!step.done) {
+			stepCount++
+			step = steps.next()
+		}
+
+		expect(stepCount).toBe(Object.keys(schema.t).length)
+		expect(step.value).toBe(interner.intern(schema))
+	})
+
 	test('returns the same schema object for identical schemas', () => {
 		const interner = new SchemaInterner()
 		expect(interner.intern(buildSchema(sdl('')))).toBe(interner.intern(buildSchema(sdl(''))))

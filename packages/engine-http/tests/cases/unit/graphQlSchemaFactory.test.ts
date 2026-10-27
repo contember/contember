@@ -58,35 +58,35 @@ const mutationFields = ({ schema }: GraphQLSchemaFactoryResult): Record<string, 
 	return mutation?.[0] === TypeKind.OBJECT ? mutation[1] : {}
 }
 
-test('role combinations with identical permissions share one schema', () => {
+test('role combinations with identical permissions share one schema', async () => {
 	const factory = createFactory()
 
-	expect(create(factory, ['editor'])).toBe(create(factory, ['admin']))
+	expect(await create(factory, ['editor'])).toBe(await create(factory, ['admin']))
 })
 
-test('a role without content permissions does not split the cache', () => {
+test('a role without content permissions does not split the cache', async () => {
 	const factory = createFactory()
 
-	expect(create(factory, ['admin', 'newsletter'])).toBe(create(factory, ['admin']))
+	expect(await create(factory, ['admin', 'newsletter'])).toBe(await create(factory, ['admin']))
 })
 
-test('role combinations with different permissions get their own schema', () => {
+test('role combinations with different permissions get their own schema', async () => {
 	const factory = createFactory()
-	const admin = create(factory, ['admin'])
-	const reader = create(factory, ['reader'])
+	const admin = await create(factory, ['admin'])
+	const reader = await create(factory, ['reader'])
 
 	expect(reader).not.toBe(admin)
 	expect(mutationFields(admin).createArticle).toBeDefined()
 	expect(mutationFields(reader).createArticle).toBeUndefined()
 })
 
-test('a contributor cache key separates role combinations with identical permissions', () => {
+test('a contributor cache key separates role combinations with identical permissions', async () => {
 	const factory = createFactory([{
 		getCacheKey: ({ identity }) => identity.projectRoles.includes('editor') ? 'editor' : 'other',
 		createSchema: () => undefined,
 	}])
 
-	expect(create(factory, ['editor'])).not.toBe(create(factory, ['admin']))
+	expect(await create(factory, ['editor'])).not.toBe(await create(factory, ['admin']))
 })
 
 const stats: Model.Entity = {
@@ -117,32 +117,32 @@ const materializedViewSchema: Schema = {
 	},
 }
 
-const hasRefreshMutation = (factory: GraphQlSchemaFactory, projectRoles: string[]) =>
-	mutationFields(factory.create(materializedViewSchema, { projectRoles }, project)).refreshMaterializedView !== undefined
+const hasRefreshMutation = async (factory: GraphQlSchemaFactory, projectRoles: string[]) =>
+	mutationFields(await factory.create(materializedViewSchema, { projectRoles }, project)).refreshMaterializedView !== undefined
 
-test('a role without the refresh permission cannot refresh a materialized view another role may refresh', () => {
+test('a role without the refresh permission cannot refresh a materialized view another role may refresh', async () => {
 	const factory = createFactory()
 
-	expect(hasRefreshMutation(factory, ['reader'])).toBe(false)
-	expect(hasRefreshMutation(factory, ['refresher'])).toBe(true)
-	expect(hasRefreshMutation(factory, ['reader'])).toBe(false)
+	expect(await hasRefreshMutation(factory, ['reader'])).toBe(false)
+	expect(await hasRefreshMutation(factory, ['refresher'])).toBe(true)
+	expect(await hasRefreshMutation(factory, ['reader'])).toBe(false)
 })
 
-test('the refresh permission is inherited', () => {
-	expect(hasRefreshMutation(createFactory(), ['inheritedRefresher'])).toBe(true)
+test('the refresh permission is inherited', async () => {
+	expect(await hasRefreshMutation(createFactory(), ['inheritedRefresher'])).toBe(true)
 })
 
-test('a Json column accepts an object literal next to the introspection schema', () => {
-	const { schema: result } = create(createFactory(), ['admin'])
+test('a Json column accepts an object literal next to the introspection schema', async () => {
+	const { schema: result } = await create(createFactory(), ['admin'])
 	const document = parse('mutation { createArticle(data: { data: { message: "hello", tags: ["a"] } }) { ok } }')
 	expect(validate(result.schema, document, { scalars: result.scalars }).map(it => it.message)).toEqual([])
 })
 
-test('role schemas of one project schema share the types their permissions do not change', () => {
+test('role schemas of one project schema share the types their permissions do not change', async () => {
 	const factory = createFactory()
-	const jsonSchema = (roles: string[]) => create(factory, roles).schema.schema
-	const admin = jsonSchema(['admin'])
-	const reader = jsonSchema(['reader'])
+	const jsonSchema = async (roles: string[]) => (await create(factory, roles)).schema.schema
+	const admin = await jsonSchema(['admin'])
+	const reader = await jsonSchema(['reader'])
 
 	expect(reader.t.Article).toBe(admin.t.Article)
 	expect(reader.t.ArticleWhere).toBe(admin.t.ArticleWhere)
@@ -180,8 +180,8 @@ const manyRolesSchema: Schema = {
 }
 
 /** Keeps one interned type and only a weak reference to the cached schema, so the cache alone decides its lifetime. */
-const buildAndForget = (factory: GraphQlSchemaFactory, schema: Schema, role: string, typeName: string) => {
-	const { schema: built } = factory.create(schema, { projectRoles: [role] }, project)
+const buildAndForget = async (factory: GraphQlSchemaFactory, schema: Schema, role: string, typeName: string) => {
+	const { schema: built } = await factory.create(schema, { projectRoles: [role] }, project)
 	return { built: new WeakRef(built), type: built.schema.t[typeName] }
 }
 
@@ -191,12 +191,12 @@ test('once every schema of a project schema is evicted, the data they shared is 
 		new PermissionFactory(),
 		[],
 	)
-	const evicted = buildAndForget(factory, schema, 'admin', 'Article')
+	const evicted = await buildAndForget(factory, schema, 'admin', 'Article')
 	await new Promise(resolve => setTimeout(resolve, 50))
 	expect(await isCollected(evicted.built)).toBe(true)
 
 	// the interner of the evicted schema is gone, so the rebuilt schema does not reuse its types
-	expect(factory.create(schema, { projectRoles: ['admin'] }, project).schema.schema.t.Article).not.toBe(evicted.type)
+	expect((await factory.create(schema, { projectRoles: ['admin'] }, project)).schema.schema.t.Article).not.toBe(evicted.type)
 })
 
 test('once most schemas of a generation are evicted, new schemas no longer share its interned data', async () => {
@@ -205,14 +205,75 @@ test('once most schemas of a generation are evicted, new schemas no longer share
 		new PermissionFactory(),
 		[],
 	)
-	const first = buildAndForget(factory, manyRolesSchema, 'role0', 'Article0')
-	buildAndForget(factory, manyRolesSchema, 'role1', 'Article1')
+	const first = await buildAndForget(factory, manyRolesSchema, 'role0', 'Article0')
+	await buildAndForget(factory, manyRolesSchema, 'role1', 'Article1')
 	expect(await isCollected(first.built)).toBe(true)
 	// 16 evictions start a new generation; the extra roles leave room for a schema the collector keeps for a while
 	for (let i = 2; i < 20; i++) {
-		buildAndForget(factory, manyRolesSchema, `role${i}`, `Article${i}`)
+		await buildAndForget(factory, manyRolesSchema, `role${i}`, `Article${i}`)
 		await collectGarbage()
 	}
 
-	expect(factory.create(manyRolesSchema, { projectRoles: ['role0'] }, project).schema.schema.t.Article0).not.toBe(first.type)
+	expect((await factory.create(manyRolesSchema, { projectRoles: ['role0'] }, project)).schema.schema.t.Article0).not.toBe(first.type)
+})
+
+test('concurrent requests of one role combination build it once', async () => {
+	const factory = createFactory()
+	const [editor, admin] = await Promise.all([create(factory, ['editor']), create(factory, ['admin'])])
+
+	expect(editor).toBe(admin)
+})
+
+test('a failed build is not cached', async () => {
+	let fail = true
+	const factory = createFactory([{
+		createSchema: () => {
+			if (fail) {
+				throw new Error('contributor failed')
+			}
+			return undefined
+		},
+	}])
+
+	await expect(create(factory, ['admin'])).rejects.toThrow('contributor failed')
+	fail = false
+	expect(mutationFields(await create(factory, ['admin'])).createArticle).toBeDefined()
+})
+
+const chainedEntities = (count: number): Model.Schema['entities'] =>
+	Object.fromEntries(Array.from({ length: count }, (_, i): [string, Model.Entity] => [`Node${i}`, {
+		...article,
+		name: `Node${i}`,
+		tableName: `node${i}`,
+		fields: {
+			...article.fields,
+			next: {
+				name: 'next',
+				type: Model.RelationType.ManyHasOne,
+				target: `Node${(i + 1) % count}`,
+				joiningColumn: { columnName: 'next_id', onDelete: Model.OnDelete.restrict },
+				nullable: true,
+			},
+		},
+	}]))
+
+test('a large schema is built in slices, between which the event loop runs I/O callbacks', async () => {
+	const entities = chainedEntities(150)
+	const allOperations = {
+		read: { ...allFields, next: true },
+		create: { ...allFields, next: true },
+		update: { ...allFields, next: true },
+		delete: true,
+	}
+	const largeSchema: Schema = {
+		...emptySchema,
+		model: { entities, enums: {} },
+		acl: { roles: { admin: role(Object.fromEntries(Object.keys(entities).map(name => [name, { predicates: {}, operations: allOperations }]))) } },
+	}
+	const events: string[] = []
+	setImmediate(() => events.push('io'))
+	await createFactory().create(largeSchema, { projectRoles: ['admin'] }, project)
+	events.push('built')
+
+	expect(events).toEqual(['io', 'built'])
 })

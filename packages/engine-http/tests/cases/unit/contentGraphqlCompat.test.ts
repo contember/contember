@@ -161,7 +161,7 @@ const createContext = (role: string): ContentGraphqlContext => {
 }
 
 const request = async (role: string, query: string, variables?: Record<string, unknown>, operationName?: string) => {
-	const result = schemaFactory.create(schema, { projectRoles: [role] }, project)
+	const result = await schemaFactory.create(schema, { projectRoles: [role] }, project)
 	const handler = new ContentQueryHandlerFactory(false).create(result.schema)
 	const app = new Koa()
 	app.use(bodyParser())

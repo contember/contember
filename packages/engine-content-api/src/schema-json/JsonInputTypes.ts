@@ -17,6 +17,12 @@ import { JsonTypeRegistry, listOfNonNullRef, namedRef, nonNullRef } from './Json
 export class JsonInputTypes {
 	private readonly createAllowedOperationsVisitor: CreateEntityRelationAllowedOperationsVisitor
 	private readonly updateAllowedOperationsVisitor: UpdateEntityRelationAllowedOperationsVisitor
+	/**
+	 * Inputs by their arguments. Every `Without<relation>` variant of an input asks again for the relation inputs of
+	 * its fields, and every relation input for the inputs of its target; on real models that repeated work dominated.
+	 */
+	private readonly inputs = new Map<string, string | undefined>()
+	private readonly relationInputs = new Map<string, string | undefined>()
 
 	constructor(
 		private readonly schema: Model.Schema,
@@ -30,6 +36,16 @@ export class JsonInputTypes {
 	}
 
 	public getInput(operation: EntityInputType, entityName: string, withoutRelation?: string): string | undefined {
+		const key = `${operation}\0${entityName}\0${withoutRelation ?? ''}`
+		if (this.inputs.has(key)) {
+			return this.inputs.get(key)
+		}
+		const input = this.createInput(operation, entityName, withoutRelation)
+		this.inputs.set(key, input)
+		return input
+	}
+
+	private createInput(operation: EntityInputType, entityName: string, withoutRelation: string | undefined): string | undefined {
 		const entity = getEntity(this.schema, entityName)
 		if (entity.view) {
 			return undefined
@@ -70,11 +86,11 @@ export class JsonInputTypes {
 				return [this.columnTypes.getType(column).type]
 			},
 			visitHasOne: context => {
-				const type = this.getCreateRelationInput(context, false)
+				const type = this.memoizeRelationInput('create', context, () => this.getCreateRelationInput(context, false))
 				return type === undefined ? undefined : [namedRef(type)]
 			},
 			visitHasMany: context => {
-				const type = this.getCreateRelationInput(context, true)
+				const type = this.memoizeRelationInput('create', context, () => this.getCreateRelationInput(context, true))
 				return type === undefined ? undefined : [listOfNonNullRef(type)]
 			},
 		})
@@ -92,14 +108,28 @@ export class JsonInputTypes {
 				return [this.columnTypes.getType(column).type]
 			},
 			visitHasOne: context => {
-				const type = this.getUpdateHasOneRelationInput(context)
+				const type = this.memoizeRelationInput('update', context, () => this.getUpdateHasOneRelationInput(context))
 				return type === undefined ? undefined : [namedRef(type)]
 			},
 			visitHasMany: context => {
-				const type = this.getUpdateHasManyRelationInput(context)
+				const type = this.memoizeRelationInput('update', context, () => this.getUpdateHasManyRelationInput(context))
 				return type === undefined ? undefined : [listOfNonNullRef(type)]
 			},
 		})
+	}
+
+	private memoizeRelationInput(
+		operation: 'create' | 'update',
+		{ entity, relation }: Model.AnyRelationContext,
+		create: () => string | undefined,
+	): string | undefined {
+		const key = `${operation}\0${entity.name}\0${relation.name}`
+		if (this.relationInputs.has(key)) {
+			return this.relationInputs.get(key)
+		}
+		const input = create()
+		this.relationInputs.set(key, input)
+		return input
 	}
 
 	private getCreateRelationInput(

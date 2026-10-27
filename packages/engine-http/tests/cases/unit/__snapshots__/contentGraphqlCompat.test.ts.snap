@@ -1037,6 +1037,43 @@ exports[`content GraphQL responses match graphql-js introspection 1`] = `
                     "deprecationReason": null,
                     "description": null,
                     "isDeprecated": false,
+                    "name": "since",
+                    "type": {
+                      "kind": "SCALAR",
+                      "name": "Stamp",
+                      "ofType": null,
+                    },
+                  },
+                  {
+                    "defaultValue": null,
+                    "deprecationReason": null,
+                    "description": null,
+                    "isDeprecated": false,
+                    "name": "input",
+                    "type": {
+                      "kind": "INPUT_OBJECT",
+                      "name": "ReportInput",
+                      "ofType": null,
+                    },
+                  },
+                ],
+                "deprecationReason": null,
+                "description": null,
+                "isDeprecated": false,
+                "name": "report",
+                "type": {
+                  "kind": "OBJECT",
+                  "name": "Report",
+                  "ofType": null,
+                },
+              },
+              {
+                "args": [
+                  {
+                    "defaultValue": null,
+                    "deprecationReason": null,
+                    "description": null,
+                    "isDeprecated": false,
                     "name": "by",
                     "type": {
                       "kind": "NON_NULL",
@@ -2130,6 +2167,189 @@ exports[`content GraphQL responses match graphql-js introspection 1`] = `
             "interfaces": [],
             "kind": "OBJECT",
             "name": "_UniqueConstraint",
+            "possibleTypes": null,
+            "specifiedByURL": null,
+          },
+          {
+            "description": null,
+            "enumValues": null,
+            "fields": [
+              {
+                "args": [],
+                "deprecationReason": null,
+                "description": null,
+                "isDeprecated": false,
+                "name": "at",
+                "type": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "SCALAR",
+                    "name": "Stamp",
+                    "ofType": null,
+                  },
+                },
+              },
+              {
+                "args": [],
+                "deprecationReason": null,
+                "description": null,
+                "isDeprecated": false,
+                "name": "lines",
+                "type": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "LIST",
+                    "name": null,
+                    "ofType": {
+                      "kind": "NON_NULL",
+                      "name": null,
+                      "ofType": {
+                        "kind": "OBJECT",
+                        "name": "ReportLine",
+                        "ofType": null,
+                      },
+                    },
+                  },
+                },
+              },
+              {
+                "args": [],
+                "deprecationReason": null,
+                "description": null,
+                "isDeprecated": false,
+                "name": "maybeLines",
+                "type": {
+                  "kind": "LIST",
+                  "name": null,
+                  "ofType": {
+                    "kind": "OBJECT",
+                    "name": "ReportLine",
+                    "ofType": null,
+                  },
+                },
+              },
+              {
+                "args": [],
+                "deprecationReason": null,
+                "description": null,
+                "isDeprecated": false,
+                "name": "nested",
+                "type": {
+                  "kind": "OBJECT",
+                  "name": "ReportLine",
+                  "ofType": null,
+                },
+              },
+            ],
+            "inputFields": null,
+            "interfaces": [],
+            "kind": "OBJECT",
+            "name": "Report",
+            "possibleTypes": null,
+            "specifiedByURL": null,
+          },
+          {
+            "description": null,
+            "enumValues": null,
+            "fields": null,
+            "inputFields": null,
+            "interfaces": null,
+            "kind": "SCALAR",
+            "name": "Stamp",
+            "possibleTypes": null,
+            "specifiedByURL": null,
+          },
+          {
+            "description": null,
+            "enumValues": null,
+            "fields": [
+              {
+                "args": [],
+                "deprecationReason": null,
+                "description": null,
+                "isDeprecated": false,
+                "name": "label",
+                "type": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "SCALAR",
+                    "name": "String",
+                    "ofType": null,
+                  },
+                },
+              },
+              {
+                "args": [],
+                "deprecationReason": null,
+                "description": null,
+                "isDeprecated": false,
+                "name": "failing",
+                "type": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null,
+                },
+              },
+              {
+                "args": [],
+                "deprecationReason": null,
+                "description": null,
+                "isDeprecated": false,
+                "name": "strict",
+                "type": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "SCALAR",
+                    "name": "String",
+                    "ofType": null,
+                  },
+                },
+              },
+            ],
+            "inputFields": null,
+            "interfaces": [],
+            "kind": "OBJECT",
+            "name": "ReportLine",
+            "possibleTypes": null,
+            "specifiedByURL": null,
+          },
+          {
+            "description": null,
+            "enumValues": null,
+            "fields": null,
+            "inputFields": [
+              {
+                "defaultValue": null,
+                "deprecationReason": null,
+                "description": null,
+                "isDeprecated": false,
+                "name": "since",
+                "type": {
+                  "kind": "SCALAR",
+                  "name": "Stamp",
+                  "ofType": null,
+                },
+              },
+              {
+                "defaultValue": "2",
+                "deprecationReason": null,
+                "description": null,
+                "isDeprecated": false,
+                "name": "limit",
+                "type": {
+                  "kind": "SCALAR",
+                  "name": "Int",
+                  "ofType": null,
+                },
+              },
+            ],
+            "interfaces": null,
+            "kind": "INPUT_OBJECT",
+            "name": "ReportInput",
             "possibleTypes": null,
             "specifiedByURL": null,
           },
@@ -6647,6 +6867,43 @@ exports[`content GraphQL responses match graphql-js introspection 1`] = `
                     "deprecationReason": null,
                     "description": null,
                     "isDeprecated": false,
+                    "name": "since",
+                    "type": {
+                      "kind": "SCALAR",
+                      "name": "Stamp",
+                      "ofType": null,
+                    },
+                  },
+                  {
+                    "defaultValue": null,
+                    "deprecationReason": null,
+                    "description": null,
+                    "isDeprecated": false,
+                    "name": "input",
+                    "type": {
+                      "kind": "INPUT_OBJECT",
+                      "name": "ReportInput",
+                      "ofType": null,
+                    },
+                  },
+                ],
+                "deprecationReason": null,
+                "description": null,
+                "isDeprecated": false,
+                "name": "report",
+                "type": {
+                  "kind": "OBJECT",
+                  "name": "Report",
+                  "ofType": null,
+                },
+              },
+              {
+                "args": [
+                  {
+                    "defaultValue": null,
+                    "deprecationReason": null,
+                    "description": null,
+                    "isDeprecated": false,
                     "name": "by",
                     "type": {
                       "kind": "NON_NULL",
@@ -7546,6 +7803,18 @@ exports[`content GraphQL responses match graphql-js introspection 1`] = `
                     "name": "UploadUrl",
                     "ofType": null,
                   },
+                },
+              },
+              {
+                "args": [],
+                "deprecationReason": null,
+                "description": null,
+                "isDeprecated": false,
+                "name": "touchReport",
+                "type": {
+                  "kind": "OBJECT",
+                  "name": "Report",
+                  "ofType": null,
                 },
               },
               {
@@ -9913,6 +10182,18 @@ exports[`content GraphQL responses match graphql-js introspection 1`] = `
                     "name": "UploadUrl",
                     "ofType": null,
                   },
+                },
+              },
+              {
+                "args": [],
+                "deprecationReason": null,
+                "description": null,
+                "isDeprecated": false,
+                "name": "touchReport",
+                "type": {
+                  "kind": "OBJECT",
+                  "name": "Report",
+                  "ofType": null,
                 },
               },
               {
@@ -12352,6 +12633,308 @@ exports[`content GraphQL responses match graphql-js admin: contribution unexpect
 }
 `;
 
+exports[`content GraphQL responses match graphql-js admin: contribution custom scalar output 1`] = `
+{
+  "body": {
+    "data": {
+      "report": {
+        "at": "2020-01-01T00:00:00.000Z",
+      },
+    },
+  },
+  "status": 200,
+}
+`;
+
+exports[`content GraphQL responses match graphql-js admin: contribution custom scalar variable 1`] = `
+{
+  "body": {
+    "data": {
+      "report": {
+        "at": "2021-05-05T00:00:00.000Z",
+      },
+    },
+  },
+  "status": 200,
+}
+`;
+
+exports[`content GraphQL responses match graphql-js admin: contribution custom scalar in an input variable 1`] = `
+{
+  "body": {
+    "data": {
+      "report": {
+        "at": "2021-05-05T00:00:00.000Z",
+      },
+    },
+  },
+  "status": 200,
+}
+`;
+
+exports[`content GraphQL responses match graphql-js admin: contribution custom scalar literal 1`] = `
+{
+  "body": {
+    "data": {
+      "report": {
+        "at": "2021-05-05T00:00:00.000Z",
+      },
+    },
+  },
+  "status": 200,
+}
+`;
+
+exports[`content GraphQL responses match graphql-js admin: contribution invalid custom scalar variable 1`] = `
+{
+  "body": {
+    "errors": [
+      {
+        "message": "Internal server error",
+      },
+    ],
+  },
+  "status": 500,
+}
+`;
+
+exports[`content GraphQL responses match graphql-js admin: contribution nested nullable error 1`] = `
+{
+  "body": {
+    "data": {
+      "report": {
+        "lines": [
+          {
+            "failing": null,
+            "label": "a",
+          },
+          {
+            "failing": null,
+            "label": "b",
+          },
+        ],
+      },
+    },
+    "errors": [
+      {
+        "message": "Internal server error",
+      },
+      {
+        "message": "Internal server error",
+      },
+    ],
+  },
+  "status": 200,
+}
+`;
+
+exports[`content GraphQL responses match graphql-js admin: contribution non-null error bubbling to a nullable list item 1`] = `
+{
+  "body": {
+    "data": {
+      "report": {
+        "maybeLines": [
+          null,
+          null,
+        ],
+      },
+    },
+    "errors": [
+      {
+        "extensions": {
+          "code": "STRICT",
+        },
+        "locations": [
+          {
+            "column": 31,
+            "line": 1,
+          },
+        ],
+        "message": "strict failed",
+        "path": [
+          "report",
+          "maybeLines",
+          0,
+          "strict",
+        ],
+      },
+      {
+        "extensions": {
+          "code": "STRICT",
+        },
+        "locations": [
+          {
+            "column": 31,
+            "line": 1,
+          },
+        ],
+        "message": "strict failed",
+        "path": [
+          "report",
+          "maybeLines",
+          1,
+          "strict",
+        ],
+      },
+    ],
+  },
+  "status": 200,
+}
+`;
+
+exports[`content GraphQL responses match graphql-js admin: contribution non-null error bubbling through a non-null list 1`] = `
+{
+  "body": {
+    "data": {
+      "report": null,
+    },
+    "errors": [
+      {
+        "extensions": {
+          "code": "STRICT",
+        },
+        "locations": [
+          {
+            "column": 29,
+            "line": 1,
+          },
+        ],
+        "message": "strict failed",
+        "path": [
+          "report",
+          "lines",
+          0,
+          "strict",
+        ],
+      },
+    ],
+  },
+  "status": 200,
+}
+`;
+
+exports[`content GraphQL responses match graphql-js admin: contribution several errors 1`] = `
+{
+  "body": {
+    "data": {
+      "report": {
+        "lines": [
+          {
+            "failing": null,
+          },
+          {
+            "failing": null,
+          },
+        ],
+        "nested": {
+          "failing": null,
+        },
+      },
+    },
+    "errors": [
+      {
+        "message": "Internal server error",
+      },
+      {
+        "message": "Internal server error",
+      },
+      {
+        "message": "Internal server error",
+      },
+    ],
+  },
+  "status": 200,
+}
+`;
+
+exports[`content GraphQL responses match graphql-js admin: contribution error next to other fields 1`] = `
+{
+  "body": {
+    "data": {
+      "__typename": "Query",
+      "r": {
+        "nested": {
+          "failing": null,
+          "label": "n",
+        },
+      },
+      "uploadDummyQuery": null,
+    },
+    "errors": [
+      {
+        "message": "Internal server error",
+      },
+    ],
+  },
+  "status": 200,
+}
+`;
+
+exports[`content GraphQL responses match graphql-js admin: contribution under the mutation query field 1`] = `
+{
+  "body": {
+    "data": null,
+    "errors": [
+      {
+        "message": "Internal server error",
+      },
+    ],
+  },
+  "status": 500,
+}
+`;
+
+exports[`content GraphQL responses match graphql-js admin: contribution mutation 1`] = `
+{
+  "body": {
+    "data": {
+      "touchReport": {
+        "at": "2020-01-01T00:00:00.000Z",
+        "nested": {
+          "failing": null,
+        },
+      },
+    },
+    "errors": [
+      {
+        "message": "Internal server error",
+      },
+    ],
+  },
+  "status": 200,
+}
+`;
+
+exports[`content GraphQL responses match graphql-js admin: contribution in a query transaction 1`] = `
+{
+  "body": {
+    "data": {
+      "transaction": null,
+    },
+    "errors": [
+      {
+        "message": "Internal server error",
+      },
+    ],
+  },
+  "status": 200,
+}
+`;
+
+exports[`content GraphQL responses match graphql-js admin: contribution in a mutation transaction 1`] = `
+{
+  "body": {
+    "data": null,
+    "errors": [
+      {
+        "message": "Internal server error",
+      },
+    ],
+  },
+  "status": 500,
+}
+`;
+
 exports[`content GraphQL responses match graphql-js reader: unknown field with suggestions 1`] = `
 {
   "body": {
@@ -13134,6 +13717,308 @@ exports[`content GraphQL responses match graphql-js reader: contribution error w
 `;
 
 exports[`content GraphQL responses match graphql-js reader: contribution unexpected error 1`] = `
+{
+  "body": {
+    "data": null,
+    "errors": [
+      {
+        "message": "Internal server error",
+      },
+    ],
+  },
+  "status": 500,
+}
+`;
+
+exports[`content GraphQL responses match graphql-js reader: contribution custom scalar output 1`] = `
+{
+  "body": {
+    "data": {
+      "report": {
+        "at": "2020-01-01T00:00:00.000Z",
+      },
+    },
+  },
+  "status": 200,
+}
+`;
+
+exports[`content GraphQL responses match graphql-js reader: contribution custom scalar variable 1`] = `
+{
+  "body": {
+    "data": {
+      "report": {
+        "at": "2021-05-05T00:00:00.000Z",
+      },
+    },
+  },
+  "status": 200,
+}
+`;
+
+exports[`content GraphQL responses match graphql-js reader: contribution custom scalar in an input variable 1`] = `
+{
+  "body": {
+    "data": {
+      "report": {
+        "at": "2021-05-05T00:00:00.000Z",
+      },
+    },
+  },
+  "status": 200,
+}
+`;
+
+exports[`content GraphQL responses match graphql-js reader: contribution custom scalar literal 1`] = `
+{
+  "body": {
+    "data": {
+      "report": {
+        "at": "2021-05-05T00:00:00.000Z",
+      },
+    },
+  },
+  "status": 200,
+}
+`;
+
+exports[`content GraphQL responses match graphql-js reader: contribution invalid custom scalar variable 1`] = `
+{
+  "body": {
+    "errors": [
+      {
+        "message": "Internal server error",
+      },
+    ],
+  },
+  "status": 500,
+}
+`;
+
+exports[`content GraphQL responses match graphql-js reader: contribution nested nullable error 1`] = `
+{
+  "body": {
+    "data": {
+      "report": {
+        "lines": [
+          {
+            "failing": null,
+            "label": "a",
+          },
+          {
+            "failing": null,
+            "label": "b",
+          },
+        ],
+      },
+    },
+    "errors": [
+      {
+        "message": "Internal server error",
+      },
+      {
+        "message": "Internal server error",
+      },
+    ],
+  },
+  "status": 200,
+}
+`;
+
+exports[`content GraphQL responses match graphql-js reader: contribution non-null error bubbling to a nullable list item 1`] = `
+{
+  "body": {
+    "data": {
+      "report": {
+        "maybeLines": [
+          null,
+          null,
+        ],
+      },
+    },
+    "errors": [
+      {
+        "extensions": {
+          "code": "STRICT",
+        },
+        "locations": [
+          {
+            "column": 31,
+            "line": 1,
+          },
+        ],
+        "message": "strict failed",
+        "path": [
+          "report",
+          "maybeLines",
+          0,
+          "strict",
+        ],
+      },
+      {
+        "extensions": {
+          "code": "STRICT",
+        },
+        "locations": [
+          {
+            "column": 31,
+            "line": 1,
+          },
+        ],
+        "message": "strict failed",
+        "path": [
+          "report",
+          "maybeLines",
+          1,
+          "strict",
+        ],
+      },
+    ],
+  },
+  "status": 200,
+}
+`;
+
+exports[`content GraphQL responses match graphql-js reader: contribution non-null error bubbling through a non-null list 1`] = `
+{
+  "body": {
+    "data": {
+      "report": null,
+    },
+    "errors": [
+      {
+        "extensions": {
+          "code": "STRICT",
+        },
+        "locations": [
+          {
+            "column": 29,
+            "line": 1,
+          },
+        ],
+        "message": "strict failed",
+        "path": [
+          "report",
+          "lines",
+          0,
+          "strict",
+        ],
+      },
+    ],
+  },
+  "status": 200,
+}
+`;
+
+exports[`content GraphQL responses match graphql-js reader: contribution several errors 1`] = `
+{
+  "body": {
+    "data": {
+      "report": {
+        "lines": [
+          {
+            "failing": null,
+          },
+          {
+            "failing": null,
+          },
+        ],
+        "nested": {
+          "failing": null,
+        },
+      },
+    },
+    "errors": [
+      {
+        "message": "Internal server error",
+      },
+      {
+        "message": "Internal server error",
+      },
+      {
+        "message": "Internal server error",
+      },
+    ],
+  },
+  "status": 200,
+}
+`;
+
+exports[`content GraphQL responses match graphql-js reader: contribution error next to other fields 1`] = `
+{
+  "body": {
+    "data": {
+      "__typename": "Query",
+      "r": {
+        "nested": {
+          "failing": null,
+          "label": "n",
+        },
+      },
+      "uploadDummyQuery": null,
+    },
+    "errors": [
+      {
+        "message": "Internal server error",
+      },
+    ],
+  },
+  "status": 200,
+}
+`;
+
+exports[`content GraphQL responses match graphql-js reader: contribution under the mutation query field 1`] = `
+{
+  "body": {
+    "data": null,
+    "errors": [
+      {
+        "message": "Internal server error",
+      },
+    ],
+  },
+  "status": 500,
+}
+`;
+
+exports[`content GraphQL responses match graphql-js reader: contribution mutation 1`] = `
+{
+  "body": {
+    "data": {
+      "touchReport": {
+        "at": "2020-01-01T00:00:00.000Z",
+        "nested": {
+          "failing": null,
+        },
+      },
+    },
+    "errors": [
+      {
+        "message": "Internal server error",
+      },
+    ],
+  },
+  "status": 200,
+}
+`;
+
+exports[`content GraphQL responses match graphql-js reader: contribution in a query transaction 1`] = `
+{
+  "body": {
+    "data": {
+      "transaction": null,
+    },
+    "errors": [
+      {
+        "message": "Internal server error",
+      },
+    ],
+  },
+  "status": 200,
+}
+`;
+
+exports[`content GraphQL responses match graphql-js reader: contribution in a mutation transaction 1`] = `
 {
   "body": {
     "data": null,

@@ -11,8 +11,10 @@ import {
 	GraphQLList,
 	GraphQLNonNull,
 	GraphQLObjectType,
+	GraphQLScalarType,
 	GraphQLSchemaConfig,
 	GraphQLString,
+	Kind,
 } from 'graphql'
 import { ExecutionContainerFactory, PermissionFactory } from '@contember/engine-content-api'
 import { Client, emptyDatabaseMetadata } from '@contember/database'
@@ -128,8 +130,83 @@ const uploadContributor: GraphQLSchemaContributor = {
 	}),
 }
 
+// serializes and parses asymmetrically, so applying either twice fails
+const stamp = new GraphQLScalarType<Date, string>({
+	name: 'Stamp',
+	serialize: value => {
+		if (!(value instanceof Date)) {
+			throw new TypeError(`Stamp cannot serialize ${typeof value}`)
+		}
+		return value.toISOString()
+	},
+	parseValue: value => {
+		if (typeof value !== 'string' || Number.isNaN(Date.parse(value))) {
+			throw new TypeError('Stamp expects an ISO date string')
+		}
+		return new Date(value)
+	},
+	parseLiteral: ast => {
+		if (ast.kind !== Kind.STRING || Number.isNaN(Date.parse(ast.value))) {
+			throw new TypeError('Stamp expects an ISO date string')
+		}
+		return new Date(ast.value)
+	},
+})
+const reportLine = new GraphQLObjectType({
+	name: 'ReportLine',
+	fields: {
+		label: { type: new GraphQLNonNull(GraphQLString) },
+		failing: {
+			type: GraphQLString,
+			resolve: () => {
+				throw new Error('line failed')
+			},
+		},
+		strict: {
+			type: new GraphQLNonNull(GraphQLString),
+			resolve: () => {
+				throw new GraphQLError('strict failed', { extensions: { code: 'STRICT' } })
+			},
+		},
+	},
+})
+const report = new GraphQLObjectType({
+	name: 'Report',
+	fields: {
+		at: { type: new GraphQLNonNull(stamp) },
+		lines: { type: new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(reportLine))) },
+		maybeLines: { type: new GraphQLList(reportLine) },
+		nested: { type: reportLine },
+	},
+})
+const reportInput = new GraphQLInputObjectType({
+	name: 'ReportInput',
+	fields: { since: { type: stamp }, limit: { type: GraphQLInt, defaultValue: 2 } },
+})
+const resolveReport = (parent: unknown, args: { since?: unknown; input?: { since?: unknown } }) => {
+	const since = args.input?.since ?? args.since
+	if (since !== undefined && !(since instanceof Date)) {
+		throw new Error('since is not a Date')
+	}
+	const lines = [{ label: 'a' }, { label: 'b' }]
+	return { at: since ?? new Date('2020-01-01'), lines, maybeLines: lines, nested: { label: 'n' } }
+}
+
+// output types with nested resolvers, a custom scalar and errors below the root field
+const reportContributor: GraphQLSchemaContributor = {
+	getCacheKey: () => 'report',
+	createSchema: (): GraphQLSchemaConfig => ({
+		query: new GraphQLObjectType({
+			name: 'Query',
+			fields: { report: { type: report, args: { since: { type: stamp }, input: { type: reportInput } }, resolve: resolveReport } },
+		}),
+		mutation: new GraphQLObjectType({ name: 'Mutation', fields: { touchReport: { type: report, resolve: resolveReport } } }),
+	}),
+}
+
 const schemaFactory = new GraphQlSchemaFactory(new ContentApiSpecificCache<Schema, GraphQLSchemaFactoryResult>({}), new PermissionFactory(), [
 	uploadContributor,
+	reportContributor,
 ])
 
 const createContext = (role: string): ContentGraphqlContext => {
@@ -245,6 +322,22 @@ const cases: Record<string, [query: string, variables?: Record<string, unknown>,
 	'contribution forbidden error': ['mutation { generateUpload(contentType: "forbidden") { url } }'],
 	'contribution error with extensions': ['mutation { generateUpload(contentType: "invalid") { url } }'],
 	'contribution unexpected error': ['mutation { generateUpload(contentType: "crash") { url } }'],
+	'contribution custom scalar output': ['{ report { at } }'],
+	'contribution custom scalar variable': ['query($s: Stamp) { report(since: $s) { at } }', { s: '2021-05-05T00:00:00.000Z' }],
+	'contribution custom scalar in an input variable': ['query($i: ReportInput) { report(input: $i) { at } }', {
+		i: { since: '2021-05-05T00:00:00.000Z' },
+	}],
+	'contribution custom scalar literal': ['{ report(since: "2021-05-05T00:00:00.000Z") { at } }'],
+	'contribution invalid custom scalar variable': ['query($s: Stamp) { report(since: $s) { at } }', { s: 'nope' }],
+	'contribution nested nullable error': ['{ report { lines { label failing } } }'],
+	'contribution non-null error bubbling to a nullable list item': ['{ report { maybeLines { label strict } } }'],
+	'contribution non-null error bubbling through a non-null list': ['{ report { at lines { label strict } } }'],
+	'contribution several errors': ['{ report { lines { failing } nested { failing } } }'],
+	'contribution error next to other fields': ['{ __typename r: report { nested { label failing } } uploadDummyQuery }'],
+	'contribution under the mutation query field': ['mutation { query { report { at } } }'],
+	'contribution mutation': ['mutation { touchReport { at nested { failing } } }'],
+	'contribution in a query transaction': ['{ transaction { report { at } } }'],
+	'contribution in a mutation transaction': ['mutation { transaction { ok touchReport { at } } }'],
 }
 
 describe('content GraphQL responses match graphql-js', () => {

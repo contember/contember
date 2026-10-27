@@ -87,6 +87,7 @@ export function buildExecutionContext<TContext>(
 		contextValue,
 		operation,
 		variableValues: coercedVariableValues,
+		rawVariableValues: variableValues ?? {},
 		resolvers: resolvers ?? {},
 		typeResolvers: typeResolvers ?? {},
 		isTypeOfResolvers: isTypeOfResolvers ?? {},

@@ -195,6 +195,7 @@ function buildResolveInfo<TContext>(
 		rootValue: exeContext.rootValue,
 		operation: exeContext.operation,
 		variableValues: exeContext.variableValues,
+		rawVariableValues: exeContext.rawVariableValues,
 	}
 }
 

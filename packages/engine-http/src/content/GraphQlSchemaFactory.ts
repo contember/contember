@@ -23,9 +23,23 @@ export interface GraphQLSchemaFactoryResult {
 	schema: JsonContentSchema
 }
 
+/**
+ * Schemas of one model built against one shared state. Its interner keeps everything it interned, also the data of
+ * schemas the cache has evicted, so the state is replaced once evictions dominate and freed when none is in use.
+ */
+interface SharedGeneration {
+	readonly shared: JsonContentSchemaShared
+	readonly built: WeakRef<JsonContentSchema>[]
+}
+
+// A new generation interns the role-independent part again, which costs about as much as the unique data of ~10 roles.
+const MIN_EVICTED_FOR_NEW_GENERATION = 16
+
 export class GraphQlSchemaFactory {
 	private readonly permissionsKeys = new WeakMap<Schema, Map<string, string>>()
-	private readonly jsonShared = new WeakMap<Schema, JsonContentSchemaShared>()
+	/** Weak, so that only the cached schemas keep their generation alive (via `generationOf`). */
+	private readonly generations = new WeakMap<Schema, WeakRef<SharedGeneration>>()
+	private readonly generationOf = new WeakMap<JsonContentSchema, SharedGeneration>()
 
 	constructor(
 		private readonly cache: ContentApiSpecificCache<Schema, GraphQLSchemaFactoryResult>,
@@ -56,21 +70,28 @@ export class GraphQlSchemaFactory {
 				.map(it => it.createSchema({ schema, identity, project }))
 				.filter(<T>(it: T | undefined): it is T => it !== undefined)
 
-			const jsonSchema = new JsonContentSchemaBuilder(schema.model, authorizator, rootAuthorizator, this.getJsonShared(schema)).build([
+			const generation = this.getGeneration(schema)
+			const jsonSchema = new JsonContentSchemaBuilder(schema.model, authorizator, rootAuthorizator, generation.shared).build([
 				createJsonIntrospectionExtension(introspectionSchemaFactory),
 				...otherSchemas.map(createGraphQLJsBridge),
 			])
+			generation.built.push(new WeakRef(jsonSchema))
+			this.generationOf.set(jsonSchema, generation)
 			return { schema: jsonSchema, permissions, allPermissions }
 		})
 	}
 
-	private getJsonShared(schema: Schema): JsonContentSchemaShared {
-		let shared = this.jsonShared.get(schema)
-		if (!shared) {
-			shared = new JsonContentSchemaShared()
-			this.jsonShared.set(schema, shared)
+	private getGeneration(schema: Schema): SharedGeneration {
+		const current = this.generations.get(schema)?.deref()
+		if (current) {
+			const evicted = current.built.filter(it => it.deref() === undefined).length
+			if (evicted < MIN_EVICTED_FOR_NEW_GENERATION || evicted < current.built.length - evicted) {
+				return current
+			}
 		}
-		return shared
+		const generation: SharedGeneration = { shared: new JsonContentSchemaShared(), built: [] }
+		this.generations.set(schema, new WeakRef(generation))
+		return generation
 	}
 
 	// Role combinations with identical permissions share one GraphQL schema. The key is memoized per combination,

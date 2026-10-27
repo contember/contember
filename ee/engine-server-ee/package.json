@@ -18,7 +18,7 @@
     "@contember/engine-vimeo-plugin": "workspace:*",
     "@contember/typesafe": "workspace:*",
     "graphql": "^16.8.1",
-    "pg": "^8.11.3",
+    "pg": "^8.20.0",
     "prom-client": "^12.0.0",
     "uuid": "^9.0.1"
   },

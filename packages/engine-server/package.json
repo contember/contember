@@ -13,7 +13,7 @@
     "@contember/engine-s3-plugin": "workspace:*",
     "@contember/engine-vimeo-plugin": "workspace:*",
     "graphql": "^16.8.1",
-    "pg": "^8.11.3",
+    "pg": "^8.20.0",
     "uuid": "^9.0.1"
   },
   "devDependencies": {

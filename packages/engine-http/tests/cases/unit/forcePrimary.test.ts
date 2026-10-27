@@ -115,7 +115,7 @@ const createHarness = ({ forcePrimaryHeader = true, withReplica = true }: { forc
 		new ExecutionContainerFactory(providers),
 		new ContentQueryHandlerFactory(false),
 		createMock<ProjectContextResolver>({ resolve: async () => ({ projectContainer, project }) }),
-		createMock<GraphQlSchemaFactory>({ create: () => ({ schema, permissions: {}, allPermissions: {} }) }),
+		createMock<GraphQlSchemaFactory>({ create: async () => ({ schema, permissions: {}, allPermissions: {} }) }),
 		new TestTransactionService(false),
 		forcePrimaryHeader,
 	).create()

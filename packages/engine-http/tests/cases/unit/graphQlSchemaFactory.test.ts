@@ -149,3 +149,70 @@ test('role schemas of one project schema share the types their permissions do no
 	expect(reader.t.Query).not.toBe(admin.t.Query)
 	expect(reader.m).toBeNull()
 })
+
+const collectGarbage = async () => {
+	// a WeakRef target stays alive until the current job ends
+	await new Promise(resolve => setTimeout(resolve, 0))
+	Bun.gc(true)
+	await new Promise(resolve => setTimeout(resolve, 0))
+}
+
+/** The collector scans the stack conservatively, so a single pass may keep a dead object; retry a few times. */
+const isCollected = async (ref: WeakRef<object>): Promise<boolean> => {
+	for (let attempt = 0; attempt < 10 && ref.deref() !== undefined; attempt++) {
+		await new Promise(resolve => setTimeout(resolve, 20))
+		await collectGarbage()
+	}
+	return ref.deref() === undefined
+}
+
+const manyRolesSchema: Schema = {
+	...emptySchema,
+	model: {
+		entities: Object.fromEntries(Array.from({ length: 20 }, (_, i) => [`Article${i}`, { ...article, name: `Article${i}`, tableName: `article${i}` }])),
+		enums: {},
+	},
+	acl: {
+		roles: Object.fromEntries(
+			Array.from({ length: 20 }, (_, i) => [`role${i}`, role({ [`Article${i}`]: { predicates: {}, operations: { read: allFields } } })]),
+		),
+	},
+}
+
+/** Keeps one interned type and only a weak reference to the cached schema, so the cache alone decides its lifetime. */
+const buildAndForget = (factory: GraphQlSchemaFactory, schema: Schema, role: string, typeName: string) => {
+	const { schema: built } = factory.create(schema, { projectRoles: [role] }, project)
+	return { built: new WeakRef(built), type: built.schema.t[typeName] }
+}
+
+test('once every schema of a project schema is evicted, the data they shared is not retained', async () => {
+	const factory = new GraphQlSchemaFactory(
+		new ContentApiSpecificCache<Schema, GraphQLSchemaFactoryResult>({ ttlSeconds: 0.01 }),
+		new PermissionFactory(),
+		[],
+	)
+	const evicted = buildAndForget(factory, schema, 'admin', 'Article')
+	await new Promise(resolve => setTimeout(resolve, 50))
+	expect(await isCollected(evicted.built)).toBe(true)
+
+	// the interner of the evicted schema is gone, so the rebuilt schema does not reuse its types
+	expect(factory.create(schema, { projectRoles: ['admin'] }, project).schema.schema.t.Article).not.toBe(evicted.type)
+})
+
+test('once most schemas of a generation are evicted, new schemas no longer share its interned data', async () => {
+	const factory = new GraphQlSchemaFactory(
+		new ContentApiSpecificCache<Schema, GraphQLSchemaFactoryResult>({ maxEntries: 1 }),
+		new PermissionFactory(),
+		[],
+	)
+	const first = buildAndForget(factory, manyRolesSchema, 'role0', 'Article0')
+	buildAndForget(factory, manyRolesSchema, 'role1', 'Article1')
+	expect(await isCollected(first.built)).toBe(true)
+	// 16 evictions start a new generation; the extra roles leave room for a schema the collector keeps for a while
+	for (let i = 2; i < 20; i++) {
+		buildAndForget(factory, manyRolesSchema, `role${i}`, `Article${i}`)
+		await collectGarbage()
+	}
+
+	expect(factory.create(manyRolesSchema, { projectRoles: ['role0'] }, project).schema.schema.t.Article0).not.toBe(first.type)
+})

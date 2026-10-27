@@ -27,10 +27,13 @@ export interface JsonOutputField {
 /**
  * Collects the JSON types of one content schema. Types are referenced by name, so a type is registered before its
  * fields are created - a recursive reference (e.g. `Where.and`) then only resolves the name.
+ * Fields are created later, by `fillPending`: one type at a time, so that a build can pause between them instead of
+ * running the whole graph a single entity reaches in one go.
  * Resolvers, field extensions and scalars go to maps shared by all schemas of the model; the first registration wins.
  */
 export class JsonTypeRegistry {
 	public readonly types: Record<string, Type> = {}
+	private readonly pending: (() => void)[] = []
 
 	constructor(
 		public readonly resolvers: ResolverMap<Context>,
@@ -51,7 +54,7 @@ export class JsonTypeRegistry {
 		for (const interfaceName of interfaces) {
 			this.addPossibleType(interfaceName, name)
 		}
-		this.addOutputFields(name, fields, createFields())
+		this.pending.push(() => this.addOutputFields(name, fields, createFields()))
 		return name
 	}
 
@@ -61,7 +64,7 @@ export class JsonTypeRegistry {
 		}
 		const fields: Record<string, Field> = {}
 		this.types[name] = [TypeKind.INTERFACE, fields, [], []]
-		this.addOutputFields(name, fields, createFields())
+		this.pending.push(() => this.addOutputFields(name, fields, createFields()))
 		return name
 	}
 
@@ -78,7 +81,7 @@ export class JsonTypeRegistry {
 		}
 		const fields: Record<string, InputField> = {}
 		this.types[name] = [TypeKind.INPUT_OBJECT, fields]
-		Object.assign(fields, createFields())
+		this.pending.push(() => Object.assign(fields, createFields()))
 		return name
 	}
 
@@ -107,65 +110,61 @@ export class JsonTypeRegistry {
 		return name
 	}
 
+	/** Creates the fields of the registered types, including the types that creates; yields after each type. */
+	public *fillPending(): Generator<void, void> {
+		// the queue grows while it is processed
+		for (let i = 0; i < this.pending.length; i++) {
+			this.pending[i]()
+			yield
+		}
+		this.pending.length = 0
+	}
+
 	/**
 	 * The types the schema consists of, collected the way graphql-js collects them (`GraphQLSchema` constructor):
 	 * `includedTypes` first, then everything `roots` reach, depth-first. The order is what introspection and the
 	 * printed schema list, so it stays the order graphql-js produced. Providers create some types speculatively
 	 * (e.g. an input that the allowed operations then filter out); unreachable ones are left out.
 	 * Returns a new record: deleting from a large object would turn it into a slow dictionary.
+	 * Yields after each collected type.
 	 */
-	public getReachableTypes(includedTypes: readonly string[], roots: readonly string[], otherTypes: Record<string, Type>): Record<string, Type> {
+	public *collectReachableTypes(
+		includedTypes: readonly string[],
+		roots: readonly string[],
+		otherTypes: Record<string, Type>,
+	): Generator<void, Record<string, Type>> {
 		const reachable = new Set<string>(includedTypes)
-		const collect = (name: string): void => {
-			if (reachable.has(name)) {
-				return
-			}
-			const type = this.types[name] ?? otherTypes[name]
-			if (!type) {
-				return
-			}
-			reachable.add(name)
-			switch (type[0]) {
-				case TypeKind.OBJECT:
-				case TypeKind.INTERFACE:
-					type[2].forEach(collect)
-					for (const fieldName in type[1]) {
-						const field = type[1][fieldName]
-						if (!field) {
-							continue
-						}
-						collect(field[0][1])
-						for (const argName in field[1]) {
-							const arg = field[1][argName]
-							if (arg) {
-								collect(arg[0][1])
-							}
-						}
-					}
-					break
-				case TypeKind.UNION:
-					type[1].forEach(collect)
-					break
-				case TypeKind.INPUT_OBJECT:
-					for (const fieldName in type[1]) {
-						const field = type[1][fieldName]
-						if (field) {
-							collect(field[0][1])
-						}
-					}
-					break
+		const getType = (name: string): Type | undefined => this.types[name] ?? otherTypes[name]
+		// an explicit stack instead of recursion keeps the pre-order of a recursive walk and can pause after any type
+		const collect = function*(name: string): Generator<void, void> {
+			const stack: Iterator<string>[] = [[name].values()]
+			while (stack.length > 0) {
+				const next = stack[stack.length - 1].next()
+				if (next.done) {
+					stack.pop()
+					continue
+				}
+				const type = reachable.has(next.value) ? undefined : getType(next.value)
+				if (!type) {
+					continue
+				}
+				reachable.add(next.value)
+				stack.push(referencedTypes(type))
+				yield
 			}
 		}
 		// graphql-js seeds the set with the included types and re-adds each one, which moves it to the end
 		for (const name of includedTypes) {
 			reachable.delete(name)
-			collect(name)
+			yield* collect(name)
 		}
-		roots.forEach(collect)
+		for (const root of roots) {
+			yield* collect(root)
+		}
 
 		const types: Record<string, Type> = {}
 		for (const name of reachable) {
-			const type = this.types[name] ?? otherTypes[name]
+			const type = getType(name)
 			if (!type) {
 				continue
 			}
@@ -202,6 +201,40 @@ export class JsonTypeRegistry {
 				;(this.extensions[typeName] ??= {})[fieldName] ??= field.extensions
 			}
 		}
+	}
+}
+
+/** The names a type refers to, in the order graphql-js visits them: interfaces, then each field's type and arguments. */
+function* referencedTypes(type: Type): Generator<string, void> {
+	switch (type[0]) {
+		case TypeKind.OBJECT:
+		case TypeKind.INTERFACE:
+			yield* type[2]
+			for (const fieldName in type[1]) {
+				const field = type[1][fieldName]
+				if (!field) {
+					continue
+				}
+				yield field[0][1]
+				for (const argName in field[1]) {
+					const arg = field[1][argName]
+					if (arg) {
+						yield arg[0][1]
+					}
+				}
+			}
+			break
+		case TypeKind.UNION:
+			yield* type[1]
+			break
+		case TypeKind.INPUT_OBJECT:
+			for (const fieldName in type[1]) {
+				const field = type[1][fieldName]
+				if (field) {
+					yield field[0][1]
+				}
+			}
+			break
 	}
 }
 

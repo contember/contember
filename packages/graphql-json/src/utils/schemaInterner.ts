@@ -105,6 +105,20 @@ export class SchemaInterner {
 		)
 	}
 
+	/** `intern` in steps: yields after each type, so a caller can pause in between. */
+	public *internSteps(schema: Schema): Generator<void, Schema> {
+		const types: Record<string, Type> = {}
+		for (const name in schema.t) {
+			const type = schema.t[name]
+			if (type !== undefined) {
+				types[name] = this.internType(name, type)
+				yield
+			}
+		}
+		// the types are canonical now, so this only looks them up
+		return this.intern({ ...schema, t: types })
+	}
+
 	private internType(name: string, type: Type): Type {
 		const variants = this.typesByName.get(name) ?? []
 		if (variants.includes(type)) {

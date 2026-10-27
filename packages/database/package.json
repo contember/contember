@@ -28,7 +28,7 @@
   "devDependencies": {
     "@contember/database-tester": "workspace:*",
     "@types/node": "^20.16.11",
-    "pg": "^8.12.0"
+    "pg": "^8.20.0"
   },
   "peerDependencies": {
     "pg": "^8.9.0"

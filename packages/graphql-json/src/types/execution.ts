@@ -18,6 +18,7 @@ export interface ExecutionContext<TContext = unknown> {
 	contextValue: TContext
 	operation: OperationDefinitionNode
 	variableValues: Record<string, unknown>
+	rawVariableValues: Record<string, unknown>
 
 	// External configuration
 	resolvers: ResolverMap<TContext>

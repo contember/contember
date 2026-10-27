@@ -4,6 +4,7 @@
 
 // Main execute functions
 export { execute, executeSync } from './execution/execute.js'
+export { CompletedResult } from './execution/complete.js'
 
 // Schema building
 export { buildSchema, buildSchemaFromAST } from './schema/buildSchema.js'

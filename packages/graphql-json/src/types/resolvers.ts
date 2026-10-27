@@ -21,6 +21,8 @@ export interface ResolveInfo {
 	rootValue: unknown
 	operation: OperationDefinitionNode
 	variableValues: Record<string, unknown>
+	/** The variables as the request gave them, before coercion; for delegating the field to another executor */
+	rawVariableValues: Record<string, unknown>
 }
 
 /**

@@ -9,11 +9,11 @@ import type { EnumType, InterfaceType, ScalarType, TypeRef, UnionType } from '..
 import { EV, isAbstractType, isLeafType, isObjectType, isScalarType, T, TypeKind } from '../types/schema.js'
 import type { ResolveInfo } from '../types/resolvers.js'
 import type { Path } from '../utils/path.js'
-import { addPath } from '../utils/path.js'
+import { addPath, pathToArray } from '../utils/path.js'
 import { getOwn, inspect, isIterableObject, isObjectLike, isPromise } from '../utils/helpers.js'
 import { getListItemType, isListType, isNonNullType, unwrapNonNull } from '../utils/typeRef.js'
 import { collectSubfields, type GroupedFieldSet } from './collectFields.js'
-import { executeFields, handleFieldError } from './fields.js'
+import { addError, executeFields, handleFieldError } from './fields.js'
 
 // TypeKind name by its numeric value
 const TYPE_KIND_NAMES = ['SCALAR', 'OBJECT', 'INTERFACE', 'UNION', 'ENUM', 'INPUT_OBJECT'] as const
@@ -60,6 +60,18 @@ function collectSubfieldsMemoized<TContext>(
 }
 
 /**
+ * A resolver result another executor already completed, e.g. a field delegated to graphql-js. Its data goes into the
+ * response as is. Its errors are located as in a response to an operation selecting only this field, so each path
+ * starts with the field's response name; they are moved under the field's path.
+ */
+export class CompletedResult {
+	constructor(
+		public readonly data: unknown,
+		public readonly errors: readonly GraphQLError[],
+	) {}
+}
+
+/**
  * Complete a value based on its type
  */
 export function completeValue<TContext>(
@@ -78,6 +90,10 @@ export function completeValue<TContext>(
 		return result.then((resolved) => completeValue(exeContext, returnTypeRef, fieldNodes, info, path, resolved)).catch((rawError) =>
 			handleFieldError(rawError, returnTypeRef, fieldNodes, path, exeContext)
 		)
+	}
+
+	if (result instanceof CompletedResult) {
+		return insertCompletedResult(exeContext, returnTypeRef, info, path, result)
 	}
 
 	// a returned error is a field error, located by the caller as graphql-js does
@@ -171,6 +187,43 @@ export function completeValue<TContext>(
 	}
 
 	throw new GraphQLError(`Cannot complete value of type "${TYPE_KIND_NAMES[type[0]] ?? 'unknown'}".`)
+}
+
+function insertCompletedResult<TContext>(
+	exeContext: ExecutionContext<TContext>,
+	returnTypeRef: TypeRef,
+	info: ResolveInfo,
+	path: Path,
+	result: CompletedResult,
+): unknown {
+	const errors = result.errors.map(error => {
+		let position = path
+		for (const key of error.path?.slice(1) ?? []) {
+			position = addPath(position, key, undefined)
+		}
+		const relocated = new GraphQLError(error.message, {
+			nodes: error.nodes,
+			source: error.source,
+			positions: error.positions,
+			path: pathToArray(position),
+			originalError: error.originalError,
+			extensions: error.extensions,
+		})
+		return { error: relocated, position }
+	})
+	const data = result.data ?? null
+	if (data === null && isNonNullType(returnTypeRef[0])) {
+		// the null propagates with the error that caused it, the last one the executor collected
+		const propagated = errors.pop()
+		for (const { error, position } of errors) {
+			addError(exeContext, error, position)
+		}
+		throw propagated?.error ?? new Error(`Cannot return null for non-nullable field ${info.parentType}.${info.fieldName}.`)
+	}
+	for (const { error, position } of errors) {
+		addError(exeContext, error, position)
+	}
+	return data
 }
 
 /**

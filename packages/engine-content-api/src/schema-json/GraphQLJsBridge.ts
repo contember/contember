@@ -16,7 +16,7 @@ import {
 	SelectionSetNode,
 	visit,
 } from 'graphql'
-import { buildSchema, ResolveInfo, ResolverFn, ResolverMap, ScalarImplementation, TypeKind } from '@contember/graphql-json'
+import { buildSchema, CompletedResult, ResolveInfo, ResolverFn, ScalarImplementation, TypeKind } from '@contember/graphql-json'
 import { Context } from '../types.js'
 import { JsonSchemaExtension } from './JsonContentSchemaBuilder.js'
 import { aliasAwareResolver } from './JsonEntityTypes.js'
@@ -24,23 +24,18 @@ import { JsonOutputField } from './JsonTypeRegistry.js'
 
 /**
  * Merges a graphql-js schema contribution (plugins) into a JSON content schema. Its root fields are delegated to
- * graphql-js on the contributor's own small schema, so the contributor's resolvers keep receiving graphql-js `info`.
+ * graphql-js on the contributor's own small schema, so the contributor's resolvers keep receiving graphql-js `info`, and
+ * its response is inserted as is.
  */
 export const createGraphQLJsBridge = (contribution: GraphQLSchema | GraphQLSchemaConfig): JsonSchemaExtension => {
 	const schema = contribution instanceof GraphQLSchema ? contribution : new GraphQLSchema(contribution)
 	const json = buildSchema(printSchema(schema))
 	const rootTypes = new Set([schema.getQueryType()?.name, schema.getMutationType()?.name])
 
-	const resolvers: ResolverMap<Context> = {}
 	const types: JsonSchemaExtension['types'] = {}
 	for (const [name, type] of Object.entries(json.t)) {
-		if (rootTypes.has(name)) {
-			continue
-		}
-		types[name] = type
-		if (type[0] === TypeKind.OBJECT) {
-			// graphql-js already produced the response, keyed by response names
-			resolvers[name] = Object.fromEntries(Object.keys(type[1]).map(field => [field, aliasAwareResolver]))
+		if (!rootTypes.has(name)) {
+			types[name] = type
 		}
 	}
 
@@ -60,7 +55,6 @@ export const createGraphQLJsBridge = (contribution: GraphQLSchema | GraphQLSchem
 	return {
 		types,
 		includedTypes: contribution instanceof GraphQLSchema ? [] : (contribution.types ?? []).map(it => it.name),
-		resolvers,
 		scalars: getCustomScalars(schema),
 		queries: rootFields(schema.getQueryType(), OperationTypeNode.QUERY),
 		mutations: rootFields(schema.getMutationType(), OperationTypeNode.MUTATION),
@@ -90,17 +84,14 @@ const createDelegatingResolver =
 		const result = await execute({
 			schema,
 			document: createDelegatedDocument(info, operation),
-			variableValues: info.variableValues,
+			// graphql-js coerces them itself; the coerced values would be coerced twice
+			variableValues: info.rawVariableValues,
 			contextValue: context,
 		})
-		const error = result.errors?.[0]
-		if (error) {
-			throw error.originalError ?? error
-		}
-		return result.data?.[info.path.key]
+		return new CompletedResult(result.data?.[info.path.key], result.errors ?? [])
 	}
 
-/** The resolved field as a standalone operation; `__typename` is selected everywhere so abstract types resolve. */
+/** The resolved field as a standalone operation. */
 const createDelegatedDocument = (info: ResolveInfo, operation: OperationTypeNode): DocumentNode => {
 	const fragments = collectFragments(info.fieldNodes, info.fragments)
 	const usedVariables = new Set<string>()
@@ -112,7 +103,7 @@ const createDelegatedDocument = (info: ResolveInfo, operation: OperationTypeNode
 		})
 	}
 	const selectionSet: SelectionSetNode = { kind: Kind.SELECTION_SET, selections: info.fieldNodes }
-	return withTypename({
+	return {
 		kind: Kind.DOCUMENT,
 		definitions: [
 			{
@@ -123,7 +114,7 @@ const createDelegatedDocument = (info: ResolveInfo, operation: OperationTypeNode
 			},
 			...fragments,
 		],
-	})
+	}
 }
 
 const collectFragments = (
@@ -149,13 +140,3 @@ const collectFragments = (
 	}
 	return [...collected.values()]
 }
-
-const withTypename = (document: DocumentNode): DocumentNode =>
-	visit(document, {
-		SelectionSet: {
-			leave: (node): SelectionSetNode => ({
-				...node,
-				selections: [...node.selections, { kind: Kind.FIELD, name: { kind: Kind.NAME, value: '__typename' } }],
-			}),
-		},
-	})

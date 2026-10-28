@@ -3,6 +3,9 @@ on:
   push:
     tags:
       - '**'
+permissions:
+  id-token: write
+  contents: read
 jobs:
   publish-node:
     runs-on: ubuntu-latest
@@ -14,6 +17,7 @@ jobs:
         with:
           node-version: 20
           cache: 'yarn'
+          registry-url: 'https://registry.npmjs.org'
 
       - name: "Install yarn deps"
         run: yarn install
@@ -27,10 +31,13 @@ jobs:
       - name: "Build app"
         run: yarn run build
 
+      # Trusted publishing needs npm 11.5.1 or newer; Node 20 ships npm 10.
+      - name: "Install npm with trusted publishing"
+        run: npm install -g npm@^11.5.1
+
       - name: "Publish NPM"
         run: bash ./scripts/npm/publish.sh
         env:
-          NPM_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
           NPM_TAG: ${{ steps.versions.outputs.npmTag }}
 
   publish-docker:

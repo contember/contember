@@ -17,5 +17,10 @@
   },
   "dependencies": {
     "js-yaml": "^4.1.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/contember/contember.git",
+    "directory": "packages/config-loader"
   }
 }

@@ -21,5 +21,10 @@
   },
   "peerDependencies": {
     "graphql": ">= 14.6.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/contember/contember.git",
+    "directory": "packages/schema-definition"
   }
 }

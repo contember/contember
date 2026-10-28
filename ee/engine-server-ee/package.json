@@ -29,5 +29,10 @@
     "@contember/engine-api-tester": "workspace:*",
     "@types/koa": "^2.13.11",
     "@types/node": "^20.9.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/contember/contember.git",
+    "directory": "ee/engine-server-ee"
   }
 }

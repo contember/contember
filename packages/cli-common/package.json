@@ -20,5 +20,10 @@
     "chalk": "^4.1.2",
     "fast-glob": "^3.3.2",
     "js-yaml": "^4.1.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/contember/contember.git",
+    "directory": "packages/cli-common"
   }
 }

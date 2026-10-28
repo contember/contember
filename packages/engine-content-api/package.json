@@ -37,5 +37,10 @@
   "peerDependencies": {
     "graphql": ">= 14.6.0",
     "pg": "^8.9.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/contember/contember.git",
+    "directory": "packages/engine-content-api"
   }
 }

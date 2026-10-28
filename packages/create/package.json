@@ -15,5 +15,10 @@
     "js-yaml": "^4.1.0",
     "npm-package-arg": "^11.0.1",
     "registry-info": "^1.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/contember/contember.git",
+    "directory": "packages/create"
   }
 }

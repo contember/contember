@@ -9,7 +9,7 @@ import {
 	WhereBuilder,
 } from './mapper/select/index.js'
 import { UniqueWhereExpander } from './inputProcessing/index.js'
-import { HasManyToHasOneReducer, HasManyToHasOneReducerExecutionHandler } from './extensions/index.js'
+import { HasManyToHasOneReducerExecutionHandler } from './extensions/index.js'
 import {
 	DeleteExecutor,
 	InsertBuilderFactory,
@@ -30,10 +30,9 @@ import { Acl, Model, Schema } from '@contember/schema'
 import { Client, DatabaseMetadata, RequestMemoryBudget, SelectBuilder as DbSelectBuilder } from '@contember/database'
 import { ParsedMembership, Providers } from '@contember/schema-utils'
 import { PaginatedHasManyExecutionHandler } from './extensions/paginatedHasMany/PaginatedHasManyExecutionHandler.js'
-import { PaginatedHasManyFieldProvider } from './extensions/paginatedHasMany/PaginatedHasManyFieldProvider.js'
 import { WhereOptimizer, WhereOptimizerOptions } from './mapper/select/optimizer/WhereOptimizer.js'
 import { ConditionOptimizer } from './mapper/select/optimizer/ConditionOptimizer.js'
-import { GraphQlQueryAstFactory, MutationResolver, ReadResolver, ValidationResolver } from './resolvers/index.js'
+import { MutationResolver, ReadResolver, ValidationResolver } from './resolvers/index.js'
 import {
 	ColumnValueResolver,
 	DependencyCollector,
@@ -189,8 +188,8 @@ export class ExecutionContainerFactory {
 				({ relationFetcher, schema, predicateFactory }) => new PaginatedHasManyExecutionHandler(schema.model, relationFetcher, predicateFactory),
 			)
 			.addService('selectHandlers', ({ hasManyToHasOneReducer, paginatedHasManyExecutionHandler }) => ({
-				[HasManyToHasOneReducer.extensionName]: hasManyToHasOneReducer,
-				[PaginatedHasManyFieldProvider.extensionName]: paginatedHasManyExecutionHandler,
+				[HasManyToHasOneReducerExecutionHandler.extensionName]: hasManyToHasOneReducer,
+				[PaginatedHasManyExecutionHandler.extensionName]: paginatedHasManyExecutionHandler,
 			}))
 			.addService(
 				'selectBuilderFactory',
@@ -275,8 +274,7 @@ export class ExecutionContainerFactory {
 					)
 				},
 			)
-			.addService('queryAstFactory', () => new GraphQlQueryAstFactory())
-			.addService('readResolver', ({ mapperFactory, queryAstFactory }) => new ReadResolver(mapperFactory, queryAstFactory))
+			.addService('readResolver', ({ mapperFactory }) => new ReadResolver(mapperFactory))
 			.addService('validationDependencyCollector', () => new DependencyCollector())
 			.addService('validationQueryAstFactory', ({ schema }) => new QueryAstFactory(schema.model))
 			.addService('dataSelector', ({ validationQueryAstFactory, schema }) => new ValidationDataSelector(schema.model, validationQueryAstFactory))
@@ -289,8 +287,8 @@ export class ExecutionContainerFactory {
 			)
 			.addService(
 				'mutationResolver',
-				({ mapperFactory, inputPreValidator, queryAstFactory, schema, schemaDatabaseMetadata }) =>
-					new MutationResolver(schema.model, mapperFactory, inputPreValidator, queryAstFactory, schemaDatabaseMetadata),
+				({ mapperFactory, inputPreValidator, schema, schemaDatabaseMetadata }) =>
+					new MutationResolver(schema.model, mapperFactory, inputPreValidator, schemaDatabaseMetadata),
 			)
 			.addService('validationResolver', ({ inputPreValidator, mapperFactory }) => new ValidationResolver(mapperFactory, inputPreValidator))
 			.addService('refreshViewResolver', ({ schema, mapperFactory }) => new RefreshViewResolver(schema, mapperFactory))

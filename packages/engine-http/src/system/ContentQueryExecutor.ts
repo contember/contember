@@ -1,4 +1,5 @@
-import { Authorizator, ExecutionContainerFactory, GraphQlSchemaBuilderFactory } from '@contember/engine-content-api'
+import { Authorizator, ExecutionContainerFactory, JsonContentSchemaBuilder } from '@contember/engine-content-api'
+import { execute, validate } from '@contember/graphql-json'
 import {
 	ContentQueryExecutor,
 	ContentQueryExecutorContext,
@@ -7,16 +8,12 @@ import {
 } from '@contember/engine-system-api'
 import { logger } from '@contember/logger'
 import { AllowAllPermissionFactory } from '@contember/schema-utils'
-import { graphql, GraphQLError } from 'graphql'
+import { GraphQLError, parse } from 'graphql'
 import { ContentGraphqlContext } from '../content/ContentGraphqlContext.js'
 import { extractOriginalError } from '../graphql/index.js'
 
 export class ContentQueryExecutorImpl implements ContentQueryExecutor {
-	constructor(
-		private readonly executionContainerFactory: ExecutionContainerFactory,
-		private readonly graphqlSchemaBuilderFactory: GraphQlSchemaBuilderFactory,
-	) {
-	}
+	constructor(private readonly executionContainerFactory: ExecutionContainerFactory) {}
 
 	public async execute(
 		{ db, schema, schemaMeta, databaseMetadata, stage, project, identity }: ContentQueryExecutorContext,
@@ -24,8 +21,7 @@ export class ContentQueryExecutorImpl implements ContentQueryExecutor {
 	): Promise<ContentQueryExecutorResult> {
 		const permissions = new AllowAllPermissionFactory().create(schema.model, true)
 		const authorizator = new Authorizator(permissions, true, false)
-		const dataSchemaBuilder = this.graphqlSchemaBuilderFactory.create(schema.model, authorizator, authorizator)
-		const dataSchema = dataSchemaBuilder.build()
+		const dataSchema = new JsonContentSchemaBuilder(schema.model, authorizator, authorizator).build()
 
 		const identityId = identity.id
 
@@ -57,9 +53,16 @@ export class ContentQueryExecutorImpl implements ContentQueryExecutor {
 		}
 
 		try {
-			const result = await graphql({
-				schema: dataSchema,
-				source: query,
+			const document = parse(query)
+			const validationErrors = validate(dataSchema.schema, document, { scalars: dataSchema.scalars })
+			if (validationErrors.length) {
+				return { ok: false, errors: validationErrors.map(formatErrorMessage) }
+			}
+			const result = await execute({
+				schema: dataSchema.schema,
+				document,
+				resolvers: dataSchema.resolvers,
+				scalars: dataSchema.scalars,
 				variableValues: variables,
 				contextValue: ctx,
 			})

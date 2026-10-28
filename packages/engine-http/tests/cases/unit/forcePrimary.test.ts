@@ -3,16 +3,16 @@ import { Client as PgClient } from 'pg'
 import Koa from 'koa'
 import { IncomingMessage, ServerResponse } from 'node:http'
 import { Socket } from 'node:net'
-import { GraphQLError, GraphQLObjectType, GraphQLSchema, GraphQLString } from 'graphql'
+import { GraphQLError } from 'graphql'
+import { buildSchema, builtInScalars, ResolverFn } from '@contember/graphql-json'
 import { Connection, emptyDatabaseMetadata, EventManager, Pool } from '@contember/database'
 import { DatabaseContext, DatabaseContextFactory } from '@contember/engine-system-api'
-import { ExecutionContainerFactory } from '@contember/engine-content-api'
+import { Context, ExecutionContainerFactory, JsonContentSchema } from '@contember/engine-content-api'
 import { emptySchema } from '@contember/schema-utils'
 import { createLogger, TestLoggerHandler } from '@contember/logger'
 import { noopTracer } from '@contember/telemetry'
 import { createMock } from '../../utils.js'
 import { ContentApiControllerFactory } from '../../../src/content/ContentApiControllerFactory.js'
-import { ContentGraphqlContext } from '../../../src/content/ContentGraphqlContext.js'
 import { ContentQueryHandlerFactory } from '../../../src/content/ContentQueryHandlerFactory.js'
 import { ContentSchemaResolver } from '../../../src/content/ContentSchemaResolver.js'
 import { GraphQlSchemaFactory } from '../../../src/content/GraphQlSchemaFactory.js'
@@ -93,34 +93,29 @@ const createHarness = ({ forcePrimaryHeader = true, withReplica = true }: { forc
 			return unavailable()
 		},
 	}
-	const marker = {
-		type: GraphQLString,
-		resolve: async (_source: unknown, _args: unknown, context: ContentGraphqlContext) => {
-			const result = await context.db.query<{ marker: string }>('SELECT marker')
-			return result.rows[0].marker
-		},
+	const marker: ResolverFn<unknown, Context> = async (_source, _args, context) => {
+		const result = await context.db.query<{ marker: string }>('SELECT marker')
+		return result.rows[0].marker
 	}
-	const schema = new GraphQLSchema({
-		query: new GraphQLObjectType({ name: 'Query', fields: { marker } }),
-		mutation: new GraphQLObjectType({
-			name: 'Mutation',
-			fields: {
+	const schema: JsonContentSchema = {
+		schema: buildSchema('type Query { marker: String } type Mutation { marker: String fail: String }'),
+		resolvers: [{
+			Query: { marker },
+			Mutation: {
 				marker,
-				fail: {
-					type: GraphQLString,
-					resolve: () => {
-						throw new GraphQLError('Mutation failed')
-					},
+				fail: () => {
+					throw new GraphQLError('Mutation failed')
 				},
 			},
-		}),
-	})
+		}],
+		scalars: builtInScalars,
+	}
 	const controller = new ContentApiControllerFactory(
 		new NotModifiedChecker(),
 		new ExecutionContainerFactory(providers),
 		new ContentQueryHandlerFactory(false),
 		createMock<ProjectContextResolver>({ resolve: async () => ({ projectContainer, project }) }),
-		createMock<GraphQlSchemaFactory>({ create: () => ({ schema, permissions: {}, allPermissions: {} }) }),
+		createMock<GraphQlSchemaFactory>({ create: async () => ({ schema, permissions: {}, allPermissions: {} }) }),
 		new TestTransactionService(false),
 		forcePrimaryHeader,
 	).create()

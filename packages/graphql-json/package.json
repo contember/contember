@@ -1,0 +1,39 @@
+{
+  "name": "@contember/graphql-json",
+  "version": "2.2.0-alpha.13",
+  "license": "Apache-2.0",
+  "main": "./dist/production/index.js",
+  "typings": "./dist/types/index.d.ts",
+  "sideEffects": false,
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/types/index.d.ts",
+        "development": "./dist/development/index.js",
+        "production": "./dist/production/index.js",
+        "typescript": "./src/index.ts",
+        "default": "./dist/production/index.js"
+      },
+      "require": {
+        "types": "./dist/types/index.d.ts",
+        "development": "./dist/development/index.cjs",
+        "production": "./dist/production/index.cjs",
+        "typescript": "./src/index.ts",
+        "default": "./dist/production/index.cjs"
+      }
+    }
+  },
+  "devDependencies": {
+    "@types/node": "catalog:",
+    "graphql": "catalog:"
+  },
+  "peerDependencies": {
+    "graphql": "catalog:"
+  },
+  "type": "module",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/contember/contember.git",
+    "directory": "packages/graphql-json"
+  }
+}

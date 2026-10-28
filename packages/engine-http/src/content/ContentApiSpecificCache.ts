@@ -28,21 +28,36 @@ export class ContentApiSpecificCache<ObjectKey extends object, Value> {
 	}
 
 	public fetch(objectKey: ObjectKey, scalarKey: string, createValue: () => Value): Value {
-		let cacheMap = this.cache.get(objectKey)
+		const entry = this.cache.get(objectKey)?.get(scalarKey)
+		if (entry) {
+			this.markUsed(entry)
+			return entry.value
+		}
+		return this.set(objectKey, scalarKey, createValue())
+	}
 
+	public get(objectKey: ObjectKey, scalarKey: string): Value | undefined {
+		const entry = this.cache.get(objectKey)?.get(scalarKey)
+		if (!entry) {
+			return undefined
+		}
+		this.markUsed(entry)
+		return entry.value
+	}
+
+	public set(objectKey: ObjectKey, scalarKey: string, value: Value): Value {
+		let cacheMap = this.cache.get(objectKey)
 		if (!cacheMap) {
 			cacheMap = new Map()
 			this.cache.set(objectKey, cacheMap)
 		}
-
-		const cacheValue = cacheMap.get(scalarKey)
-		if (cacheValue) {
-			this.markUsed(cacheValue)
-			return cacheValue.value
+		const existing = cacheMap.get(scalarKey)
+		if (existing) {
+			this.remove(existing.recency)
 		}
 
 		const entry: Entry<Value> = {
-			value: createValue(),
+			value,
 			recency: { cacheMapRef: new WeakRef(cacheMap), scalarKey },
 		}
 		cacheMap.set(scalarKey, entry)

@@ -99,6 +99,9 @@
 			"path": "./packages/graphql-client-tenant"
 		},
 		{
+			"path": "./packages/graphql-json"
+		},
+		{
 			"path": "./packages/graphql-utils"
 		},
 		{

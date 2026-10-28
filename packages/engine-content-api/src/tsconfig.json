@@ -7,6 +7,7 @@
 	"references": [
 		{ "path": "../../database/src" },
 		{ "path": "../../dic/src" },
+		{ "path": "../../graphql-json/src" },
 		{ "path": "../../graphql-utils/src" },
 		{ "path": "../../logger/src" },
 		{ "path": "../../schema/src" },

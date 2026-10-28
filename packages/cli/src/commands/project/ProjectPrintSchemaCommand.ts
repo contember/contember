@@ -1,14 +1,14 @@
 import { CliError, Command, CommandConfiguration, ExitCode, Input, Output } from '@contember/cli-common'
 import {
 	Authorizator,
+	createJsonIntrospectionExtension,
 	EntityRulesResolver,
-	GraphQlSchemaBuilderFactory,
-	IntrospectionSchemaDefinitionFactory,
 	IntrospectionSchemaFactory,
+	JsonContentSchemaBuilder,
 	PermissionFactory,
 } from '@contember/engine-content-api'
+import { toGraphQLJsSchema } from '@contember/graphql-json'
 import { printSchema } from 'graphql'
-import { mergeSchemas } from '@graphql-tools/schema'
 import { emptySchema, normalizeSchema } from '@contember/schema-utils'
 import { SchemaLoader } from '../../lib/schema/SchemaLoader.js'
 import { SchemaVersionBuilder } from '@contember/migrations-client'
@@ -72,7 +72,6 @@ export class ProjectPrintSchemaCommand extends Command<Args, Options> {
 		// Built the way the engine builds it: types and introspection from the nested set, root fields from the root set.
 		const roles = inputRoles || ['admin']
 		const { root: rootPermissions, all: permissions } = permissionFactory.createContextual(schemaNormalized, roles)
-		const schemaBuilderFactory = new GraphQlSchemaBuilderFactory()
 		const customPrimary = schemaNormalized.acl.customPrimary ?? false
 		const refreshMaterializedView = permissionFactory.isRefreshMaterializedViewAllowed(schemaNormalized, roles)
 		const authorizator = new Authorizator(permissions, customPrimary, refreshMaterializedView)
@@ -98,12 +97,9 @@ export class ProjectPrintSchemaCommand extends Command<Args, Options> {
 				quiet: value => JSON.stringify(value),
 			})
 		} else if (format === 'graphql') {
-			const contentSchema = schemaBuilderFactory.create(schemaNormalized.model, authorizator, rootAuthorizator).build()
-			const introspectionSchemaFactory = new IntrospectionSchemaDefinitionFactory(introspection)
-			const introspectionSchema = introspectionSchemaFactory.create()
-			const gqlSchema = mergeSchemas({
-				schemas: [contentSchema, introspectionSchema],
-			})
+			const contentSchema = new JsonContentSchemaBuilder(schemaNormalized.model, authorizator, rootAuthorizator)
+				.build([createJsonIntrospectionExtension(introspection)])
+			const gqlSchema = toGraphQLJsSchema(contentSchema.schema)
 			gqlSchema.description = '' // this enforces schema definition print
 			const printedSchema = printSchema(gqlSchema).replace('""""""\n', '') // remove empty comment
 			output.data(printedSchema, {

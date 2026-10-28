@@ -123,25 +123,19 @@ export const acceptFieldVisitor = <T>(
 	}
 
 	if (isIt<Model.ColumnVisitor<T> & Model.RelationVisitor<T>>(visitor, 'visitRelation')) {
-		return acceptRelationTypeVisitor(schema, entityObj, fieldObj, {
-			visitManyHasManyInverse: visitor.visitRelation.bind(visitor),
-			visitManyHasManyOwning: visitor.visitRelation.bind(visitor),
-			visitOneHasMany: visitor.visitRelation.bind(visitor),
-			visitOneHasOneInverse: visitor.visitRelation.bind(visitor),
-			visitOneHasOneOwning: visitor.visitRelation.bind(visitor),
-			visitManyHasOne: visitor.visitRelation.bind(visitor),
-		})
+		return visitor.visitRelation(getRelationContext(schema, entityObj, fieldObj))
 	}
 
 	if (isIt<Model.ColumnVisitor<T> & Model.RelationByGenericTypeVisitor<T>>(visitor, 'visitHasMany')) {
-		return acceptRelationTypeVisitor(schema, entityObj, fieldObj, {
-			visitManyHasManyInverse: visitor.visitHasMany.bind(visitor),
-			visitManyHasManyOwning: visitor.visitHasMany.bind(visitor),
-			visitOneHasMany: visitor.visitHasMany.bind(visitor),
-			visitOneHasOneInverse: visitor.visitHasOne.bind(visitor),
-			visitOneHasOneOwning: visitor.visitHasOne.bind(visitor),
-			visitManyHasOne: visitor.visitHasOne.bind(visitor),
-		})
+		const context = getRelationContext(schema, entityObj, fieldObj)
+		switch (context.type) {
+			case 'manyHasManyInverse':
+			case 'manyHasManyOwning':
+			case 'oneHasMany':
+				return visitor.visitHasMany(context)
+			default:
+				return visitor.visitHasOne(context)
+		}
 	}
 
 	if (isIt<Model.ColumnVisitor<T> & Model.RelationByTypeVisitor<T>>(visitor, 'visitManyHasManyInverse')) {
@@ -164,6 +158,26 @@ export const acceptRelationTypeVisitor = <T>(
 		throw createFieldNotFoundError(entityObj.name, typeof relation === 'string' ? relation : 'unknown')
 	}
 
+	const context = getRelationContext(schema, entityObj, relationObj)
+	switch (context.type) {
+		case 'manyHasManyInverse':
+			return visitor.visitManyHasManyInverse(context)
+		case 'manyHasManyOwning':
+			return visitor.visitManyHasManyOwning(context)
+		case 'oneHasMany':
+			return visitor.visitOneHasMany(context)
+		case 'oneHasOneInverse':
+			return visitor.visitOneHasOneInverse(context)
+		case 'oneHasOneOwning':
+			return visitor.visitOneHasOneOwning(context)
+		case 'manyHasOne':
+			return visitor.visitManyHasOne(context)
+		default:
+			return assertNever(context)
+	}
+}
+
+const getRelationContext = (schema: Model.Schema, entityObj: Model.Entity, relationObj: Model.AnyField): Model.AnyRelationContext => {
 	if (!isRelation(relationObj)) {
 		throw new ModelError(
 			ModelErrorCode.NOT_RELATION,
@@ -177,29 +191,29 @@ export const acceptRelationTypeVisitor = <T>(
 		const targetRelation = targetEntity.fields[relationObj.ownedBy]
 		switch (relationObj.type) {
 			case Model.RelationType.ManyHasMany:
-				return visitor.visitManyHasManyInverse({
+				return {
 					type: 'manyHasManyInverse',
 					entity: entityObj,
 					relation: relationObj,
 					targetEntity: targetEntity,
 					targetRelation: targetRelation as Model.ManyHasManyOwningRelation,
-				})
+				}
 			case Model.RelationType.OneHasOne:
-				return visitor.visitOneHasOneInverse({
+				return {
 					type: 'oneHasOneInverse',
 					entity: entityObj,
 					relation: relationObj,
 					targetEntity: targetEntity,
 					targetRelation: targetRelation as Model.OneHasOneOwningRelation,
-				})
+				}
 			case Model.RelationType.OneHasMany:
-				return visitor.visitOneHasMany({
+				return {
 					type: 'oneHasMany',
 					entity: entityObj,
 					relation: relationObj,
 					targetEntity: targetEntity,
 					targetRelation: targetRelation as Model.ManyHasOneRelation,
-				})
+				}
 			default:
 				return assertNever(relationObj)
 		}
@@ -208,29 +222,29 @@ export const acceptRelationTypeVisitor = <T>(
 
 		switch (relationObj.type) {
 			case Model.RelationType.ManyHasMany:
-				return visitor.visitManyHasManyOwning({
+				return {
 					type: 'manyHasManyOwning',
 					entity: entityObj,
 					relation: relationObj,
 					targetEntity: targetEntity,
 					targetRelation: targetRelation as Model.ManyHasManyInverseRelation,
-				})
+				}
 			case Model.RelationType.OneHasOne:
-				return visitor.visitOneHasOneOwning({
+				return {
 					type: 'oneHasOneOwning',
 					entity: entityObj,
 					relation: relationObj,
 					targetEntity: targetEntity,
 					targetRelation: targetRelation as Model.OneHasOneInverseRelation,
-				})
+				}
 			case Model.RelationType.ManyHasOne:
-				return visitor.visitManyHasOne({
+				return {
 					type: 'manyHasOne',
-					entity: entityObj, //
+					entity: entityObj,
 					relation: relationObj,
 					targetEntity: targetEntity,
 					targetRelation: targetRelation as Model.OneHasManyRelation,
-				})
+				}
 			default:
 				return assertNever(relationObj)
 		}

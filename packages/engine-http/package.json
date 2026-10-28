@@ -34,6 +34,7 @@
     "@contember/engine-content-api": "workspace:*",
     "@contember/engine-system-api": "workspace:*",
     "@contember/engine-tenant-api": "workspace:*",
+    "@contember/graphql-json": "workspace:*",
     "@contember/graphql-utils": "workspace:*",
     "@contember/logger": "workspace:*",
     "@contember/schema": "workspace:*",
@@ -57,6 +58,8 @@
     "ws": "catalog:"
   },
   "devDependencies": {
+    "@contember/database-tester": "workspace:*",
+    "@contember/schema-definition": "workspace:*",
     "@types/koa": "catalog:",
     "@types/koa-bodyparser": "catalog:",
     "@types/koa__cors": "catalog:",

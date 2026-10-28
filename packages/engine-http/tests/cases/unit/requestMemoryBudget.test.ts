@@ -5,7 +5,7 @@ import Koa from 'koa'
 import { GraphQLNonNull, GraphQLObjectType, GraphQLSchema, GraphQLString } from 'graphql'
 import { RequestMemoryBudget } from '@contember/database'
 import { createLogger, TestLoggerHandler, withLogger } from '@contember/logger'
-import { createGraphQLQueryHandler } from '../../../src/graphql/execution.js'
+import { createGraphQLJsExecutor, createGraphQLQueryHandler } from '../../../src/graphql/execution.js'
 import { serverConfigSchema } from '../../../src/config/configSchema.js'
 import { readConfig } from '../../../src/config/config.js'
 
@@ -13,55 +13,57 @@ async function request(maxBytes: number, chargeInResolver: boolean, query = '{ b
 	const budget = new RequestMemoryBudget({ warnBytes: 512, maxBytes })
 	const responses: unknown[] = []
 	const handler = createGraphQLQueryHandler<{ budget: RequestMemoryBudget }>({
-		schema: new GraphQLSchema({
-			query: new GraphQLObjectType<unknown, { budget: RequestMemoryBudget }>({
-				name: 'Query',
-				fields: {
-					body: {
-						type: GraphQLString,
-						resolve: (_, args, context) => {
-							if (chargeInResolver) {
-								context.budget.addDatabaseRow({ body: 'x'.repeat(4096) })
-								return null
-							}
-							return 'x'.repeat(4096)
+		executor: createGraphQLJsExecutor(
+			new GraphQLSchema({
+				query: new GraphQLObjectType<unknown, { budget: RequestMemoryBudget }>({
+					name: 'Query',
+					fields: {
+						body: {
+							type: GraphQLString,
+							resolve: (_, args, context) => {
+								if (chargeInResolver) {
+									context.budget.addDatabaseRow({ body: 'x'.repeat(4096) })
+									return null
+								}
+								return 'x'.repeat(4096)
+							},
+						},
+						swallowed: {
+							type: GraphQLString,
+							resolve: (_, args, context) => {
+								try {
+									context.budget.addDatabaseRow({ body: 'x'.repeat(4096) })
+								} catch {}
+								return 'partial'
+							},
 						},
 					},
-					swallowed: {
-						type: GraphQLString,
-						resolve: (_, args, context) => {
-							try {
+				}),
+				mutation: new GraphQLObjectType<unknown, { budget: RequestMemoryBudget }>({
+					name: 'Mutation',
+					fields: {
+						write: {
+							type: new GraphQLNonNull(GraphQLString),
+							resolve: (_, args, context) => {
 								context.budget.addDatabaseRow({ body: 'x'.repeat(4096) })
-							} catch {}
-							return 'partial'
+								return 'written'
+							},
+						},
+						report: {
+							type: new GraphQLNonNull(GraphQLString),
+							resolve: (_, args, context) => {
+								try {
+									context.budget.addDatabaseRow({ body: 'x'.repeat(4096) })
+								} catch {
+									return 'exhausted'
+								}
+								return 'written'
+							},
 						},
 					},
-				},
+				}),
 			}),
-			mutation: new GraphQLObjectType<unknown, { budget: RequestMemoryBudget }>({
-				name: 'Mutation',
-				fields: {
-					write: {
-						type: new GraphQLNonNull(GraphQLString),
-						resolve: (_, args, context) => {
-							context.budget.addDatabaseRow({ body: 'x'.repeat(4096) })
-							return 'written'
-						},
-					},
-					report: {
-						type: new GraphQLNonNull(GraphQLString),
-						resolve: (_, args, context) => {
-							try {
-								context.budget.addDatabaseRow({ body: 'x'.repeat(4096) })
-							} catch {
-								return 'exhausted'
-							}
-							return 'written'
-						},
-					},
-				},
-			}),
-		}),
+		),
 		listeners: [{ onResponse: ({ response }) => void responses.push(response) }],
 		getMemoryBudget: context => context.budget,
 	})

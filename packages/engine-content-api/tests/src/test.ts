@@ -1,5 +1,5 @@
 import { Acl, Model, Schema, Settings, Validation } from '@contember/schema'
-import { Authorizator, ExecutionContainerFactory, GraphQlSchemaBuilderFactory } from '../../src/index.js'
+import { Authorizator, ExecutionContainerFactory, JsonContentSchemaBuilder } from '../../src/index.js'
 import { AllowAllPermissionFactory, emptySchema } from '@contember/schema-utils'
 import { executeGraphQlTest } from './testGraphql.js'
 import { Client, emptyDatabaseMetadata, RequestMemoryBudget } from '@contember/database'
@@ -83,8 +83,7 @@ export const execute = async (test: Test) => {
 	const nestedPermissions: Acl.Permissions = test.nestedPermissions ?? permissions
 	const authorizator = new Authorizator(nestedPermissions, false, false)
 	const rootAuthorizator = new Authorizator(permissions, false, false)
-	const builder = new GraphQlSchemaBuilderFactory().create(test.schema, authorizator, rootAuthorizator)
-	const graphQLSchema = builder.build()
+	const graphQLSchema = new JsonContentSchemaBuilder(test.schema, authorizator, rootAuthorizator).build()
 
 	const connection = createConnectionMock(test.executes)
 

@@ -6,6 +6,7 @@
 	},
 	"references": [
 		{ "path": "../src" },
+		{ "path": "../../graphql-json/src" },
 		{ "path": "../../schema-definition/src" }
 	]
 }

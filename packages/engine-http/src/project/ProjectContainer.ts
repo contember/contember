@@ -8,7 +8,7 @@ import {
 	StageCreator,
 	SystemMigrationsRunner,
 } from '@contember/engine-system-api'
-import { GraphQlSchemaBuilderFactory, PermissionFactory } from '@contember/engine-content-api'
+import { PermissionFactory } from '@contember/engine-content-api'
 import { Logger } from '@contember/logger'
 import { ProjectConfig } from './config.js'
 import { ContentSchemaResolver } from '../content/index.js'

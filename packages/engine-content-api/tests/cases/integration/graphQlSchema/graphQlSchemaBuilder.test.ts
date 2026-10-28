@@ -1,9 +1,10 @@
-import { graphql, printSchema } from 'graphql'
+import { printSchema, validateSchema } from 'graphql'
 import { Acl, Model } from '@contember/schema'
 import * as fs from 'node:fs/promises'
 import * as path from 'node:path'
 import { AllowAllPermissionFactory, c, createSchema, SchemaBuilder, SchemaDefinition, SchemaDefinition as def } from '@contember/schema-definition'
-import { Authorizator, GraphQlSchemaBuilderFactory, PermissionFactory } from '../../../../src/index.js'
+import { Authorizator, JsonContentSchemaBuilder, PermissionFactory } from '../../../../src/index.js'
+import { toGraphQLJsSchema } from '@contember/graphql-json'
 import * as model from './model.js'
 import { describe, expect, it } from 'bun:test'
 import { dirname } from 'node:path'
@@ -21,29 +22,17 @@ interface Test {
 const testSchema = async (test: Test) => {
 	const schemaResult = test.schema(new SchemaBuilder())
 
-	const schemaFactory = new GraphQlSchemaBuilderFactory()
 	const schema = schemaResult instanceof SchemaBuilder ? schemaResult.buildSchema() : schemaResult
 	const schemaWithAcl = { ...schema, acl: { roles: {}, variables: {} } }
 	const permissions = test.permissions(schemaWithAcl)
 	const rootPermissions = test.rootPermissions ? test.rootPermissions(schemaWithAcl) : permissions
 	const authorizator = new Authorizator(permissions, false, false)
 	const rootAuthorizator = new Authorizator(rootPermissions, false, false)
-	const graphQlSchemaBuilder = schemaFactory.create(schemaWithAcl, authorizator, rootAuthorizator)
-	const graphQlSchema = graphQlSchemaBuilder.build()
+	const jsonSchema = new JsonContentSchemaBuilder(schemaWithAcl, authorizator, rootAuthorizator).build()
+	const graphQlSchema = toGraphQLJsSchema(jsonSchema.schema)
+	expect(validateSchema(graphQlSchema).map(it => it.message)).toStrictEqual([])
 
-	const result = await graphql({
-		schema: graphQlSchema,
-		source: `
-			{
-				_info {
-					description
-				}
-			}
-		`,
-	})
-	const errors = (result.errors || []).map(it => it.message)
-	expect(errors).toStrictEqual([])
-
+	// the files were recorded on the graphql-js builder; clients see this exact SDL and order
 	const textSchema = printSchema(graphQlSchema) + '\n'
 
 	const filename = path.join(dirname(fileURLToPath(import.meta.url)), test.graphQlSchemaFile)
@@ -54,9 +43,7 @@ const testSchema = async (test: Test) => {
 		await fs.writeFile(filename, textSchema, { encoding: 'utf8' })
 		throw new Error(`Schema file ${filename} not found, creating with current schema`)
 	}
-	if (expectedSchema) {
-		expect(textSchema).toStrictEqual(expectedSchema)
-	}
+	expect(textSchema).toStrictEqual(expectedSchema)
 }
 describe('GraphQL schema builder', () => {
 	it('column types', async () => {
@@ -424,9 +411,9 @@ describe('GraphQL schema builder', () => {
 	it('root writes that locate a row need a read grant in the nested set', async () => {
 		const schema = createSchema(RootWriteLookupRead)
 		const { root, all } = new PermissionFactory().createContextual(schema, ['editor'])
-		const graphQlSchema = new GraphQlSchemaBuilderFactory()
-			.create(schema.model, new Authorizator(all, false, false), new Authorizator(root, false, false))
-			.build()
+		const graphQlSchema = toGraphQLJsSchema(
+			new JsonContentSchemaBuilder(schema.model, new Authorizator(all, false, false), new Authorizator(root, false, false)).build().schema,
+		)
 
 		const mutationNames = Object.keys(graphQlSchema.getMutationType()?.getFields() ?? {})
 		expect(mutationNames.filter(it => it.endsWith('Comment'))).toStrictEqual(['createComment', 'deleteComment', 'updateComment', 'upsertComment'])

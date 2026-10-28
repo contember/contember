@@ -1,7 +1,6 @@
-import { createAclVariables, ExecutionContainerFactory } from '@contember/engine-content-api'
+import { createAclVariables, ExecutionContainerFactory, JsonContentSchema } from '@contember/engine-content-api'
 import { StageBySlugQuery } from '@contember/engine-system-api'
 import { Client, RequestMemoryBudget, RequestMemoryBudgetOptions } from '@contember/database'
-import { GraphQLSchema } from 'graphql'
 import { HttpController } from '../application/index.js'
 import { HttpErrorResponse, HttpResponse } from '../common/index.js'
 import { GraphQLKoaState } from '../graphql/index.js'
@@ -30,7 +29,7 @@ export class ContentApiControllerFactory {
 	}
 
 	create(): HttpController {
-		const handlerCache = new WeakMap<GraphQLSchema, ContentQueryHandler>()
+		const handlerCache = new WeakMap<JsonContentSchema, ContentQueryHandler>()
 		return async context => {
 			const { params, timer, projectGroup, authResult, request, koa, clientIp } = context
 			if (!authResult) {

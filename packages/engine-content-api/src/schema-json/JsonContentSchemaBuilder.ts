@@ -39,7 +39,8 @@ const argumentsOnly = (node: unknown, path: string[]): boolean => path.length ==
 
 export interface JsonContentSchema {
 	schema: Schema
-	resolvers: ResolverMap<Context>
+	/** Looked up in order: the resolvers of this schema's extensions, then the ones all schemas of the model share. */
+	resolvers: readonly ResolverMap<Context>[]
 	scalars: ScalarMap
 }
 
@@ -269,10 +270,8 @@ export class JsonContentSchemaBuilder {
 			s: null,
 			t: types,
 		})
-		const resolvers: ResolverMap<Context> = { ...this.shared.resolvers }
-		for (const [typeName, typeResolvers] of Object.entries(extensionResolvers)) {
-			resolvers[typeName] = { ...this.shared.resolvers[typeName], ...typeResolvers }
-		}
+		// not merged into a copy of the shared map: on a large model that copy costs ~0.2 MB per role
+		const resolvers = Object.keys(extensionResolvers).length > 0 ? [extensionResolvers, this.shared.resolvers] : [this.shared.resolvers]
 		return { schema, resolvers, scalars: { ...this.shared.scalars, ...extensionScalars } }
 	}
 

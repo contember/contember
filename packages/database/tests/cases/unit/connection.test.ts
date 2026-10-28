@@ -1,6 +1,14 @@
 import { expect, it } from 'bun:test'
-import { MutexDeadlockError } from '../../../src/utils'
+import { MutexDeadlockError, retryTransaction } from '../../../src/utils'
+import { SerializationFailureError } from '../../../src/client'
+import { ClientErrorCodes } from '../../../src/client/errorCodes'
 import { createConnectionMockAlt } from './createConnectionMockAlt'
+
+class PgError extends Error {
+	constructor(public readonly code: string) {
+		super(`PostgreSQL error ${code}`)
+	}
+}
 
 it('support nested scope', async () => {
 	const [connection, end] = createConnectionMockAlt(
@@ -145,5 +153,41 @@ it('detects deadlock', async () => {
 	const [connection, end] = createConnectionMockAlt([])
 
 	await expect(connection.scope(async c1 => c1.scope(async () => await c1.query('SELECT 1')))).rejects.toThrow(MutexDeadlockError)
+	end()
+})
+
+it('maps a PostgreSQL deadlock to a serialization failure', async () => {
+	const [connection, end] = createConnectionMockAlt([{ sql: 'SELECT 1', error: new PgError(ClientErrorCodes.T_R_DEADLOCK_DETECTED) }])
+
+	await expect(connection.query('SELECT 1')).rejects.toBeInstanceOf(SerializationFailureError)
+	end()
+})
+
+it('retries a transaction aborted by a PostgreSQL deadlock', async () => {
+	// a scope that throws disposes its connection, so the retry runs on a new one
+	const [connection, end] = createConnectionMockAlt(
+		[
+			{ sql: 'BEGIN' },
+			{ sql: 'UPDATE t SET v = 1', error: new PgError(ClientErrorCodes.T_R_DEADLOCK_DETECTED) },
+			{ sql: 'ROLLBACK' },
+		],
+		[
+			{ sql: 'BEGIN' },
+			{ sql: 'UPDATE t SET v = 1', result: { rowCount: 1 } },
+			{ sql: 'COMMIT', result: { command: 'COMMIT' } },
+		],
+	)
+
+	let attempts = 0
+	await retryTransaction(
+		() =>
+			connection.transaction(async trx => {
+				attempts++
+				await trx.query('UPDATE t SET v = 1')
+			}),
+		() => {},
+		{ minTimeout: 0, maxTimeout: 0 },
+	)
+	expect(attempts).toBe(2)
 	end()
 })

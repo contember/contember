@@ -17,6 +17,15 @@ export class PermissionFactory {
 		return this.createInternal(schema, roles, false, prefix)
 	}
 
+	/** The role-level `content.refreshMaterializedView` of the given roles, including the roles they inherit. */
+	public isRefreshMaterializedViewAllowed(schema: Schema, roles: readonly string[]): boolean {
+		return roles.some(role => {
+			const roleDefinition = schema.acl.roles[role]
+			return roleDefinition?.content?.refreshMaterializedView === true
+				|| this.isRefreshMaterializedViewAllowed(schema, roleDefinition?.inherits ?? [])
+		})
+	}
+
 	public createContextual(schema: Schema, roles: readonly string[]): ContextualPermissions {
 		return {
 			root: this.createInternal(schema, roles, false),

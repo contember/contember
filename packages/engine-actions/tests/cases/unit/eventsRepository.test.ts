@@ -1,8 +1,11 @@
 import { describe, expect, test } from 'bun:test'
 import { Client, Connection, EventManager } from '@contember/database'
+import { createLogger, TestLoggerHandler } from '@contember/logger'
 import { Actions } from '@contember/schema'
 import { EventsRepository } from '../../../src/dispatch/EventsRepository'
+import { HandledEvent } from '../../../src/dispatch/types'
 import { EventRow } from '../../../src/model/types'
+import { createTestEvent } from '../../src/event'
 import { testUuid } from '../../src/uuid'
 
 /**
@@ -74,12 +77,112 @@ describe('fetchBatch', () => {
 			{ rowCount: 0, rows: [] },
 		], queries)
 
-		const result = await new EventsRepository().fetchBatch({ triggers: {}, targets: { test_target: target } }, client)
+		const result = await new EventsRepository().fetchBatch(
+			{ triggers: {}, targets: { test_target: target } },
+			client,
+			createLogger(new TestLoggerHandler()),
+		)
 
 		expect(result).toEqual({ ok: true, events: [eventRow], target })
 		expect(queries).toHaveLength(2)
 		// the rest of the batch goes to the same webhook — it must not pick up events of other targets
 		expect(queries[1].sql).toContain('"target" = ?')
 		expect(queries[1].parameters).toContain('test_target')
+	})
+})
+
+const webhookTarget: Actions.WebhookTarget = {
+	name: 'test_target',
+	type: 'webhook',
+	url: 'http://localhost',
+	maxAttempts: 3,
+}
+
+const createFailedEvent = (numRetries: number): HandledEvent => ({
+	row: createTestEvent(0, { num_retries: numRetries, state: 'processing' }),
+	target: webhookTarget,
+	result: { ok: false, code: 401, errorMessage: 'Unauthorized' },
+})
+
+const errorsOf = (handler: TestLoggerHandler) => handler.messages.filter(it => it.level.name === 'error')
+
+describe('persistProcessed', () => {
+	test('logs an error when the last attempt fails', async () => {
+		const testLoggerHandler = new TestLoggerHandler()
+
+		const result = await new EventsRepository().persistProcessed(
+			createStubClient(),
+			[createFailedEvent(2)],
+			createLogger(testLoggerHandler),
+		)
+
+		expect(result).toEqual([0, 1])
+		const errors = errorsOf(testLoggerHandler)
+		expect(errors).toHaveLength(1)
+		expect(errors[0].message).toBe('Action event failed permanently, no attempts left')
+		// exact match: neither the target URL nor its headers may end up in the log
+		expect(errors[0].ownAttributes).toStrictEqual({
+			eventId: testUuid(1),
+			target: 'test_target',
+			trigger: 'test',
+			attempts: 3,
+			code: 401,
+			errorMessage: 'Unauthorized',
+		})
+	})
+
+	test('stays quiet while attempts remain', async () => {
+		const testLoggerHandler = new TestLoggerHandler()
+
+		const result = await new EventsRepository().persistProcessed(
+			createStubClient(),
+			[createFailedEvent(0)],
+			createLogger(testLoggerHandler),
+		)
+
+		expect(result).toEqual([0, 1])
+		expect(errorsOf(testLoggerHandler)).toHaveLength(0)
+	})
+})
+
+describe('fetchBatch log', () => {
+	test('logs an error when the event names a target the schema does not have', async () => {
+		const testLoggerHandler = new TestLoggerHandler()
+		const client = createStubClient([
+			{ rowCount: 1, rows: [eventRow] },
+			{ rowCount: 1, rows: [] },
+		])
+
+		const result = await new EventsRepository().fetchBatch(
+			{ triggers: {}, targets: {} },
+			client,
+			createLogger(testLoggerHandler),
+		)
+
+		expect(result).toEqual({ ok: false, backoffMs: undefined })
+		const errors = errorsOf(testLoggerHandler)
+		expect(errors).toHaveLength(1)
+		expect(errors[0].message).toBe('Action event failed permanently, its target is not in the schema')
+		expect(errors[0].ownAttributes).toStrictEqual({
+			eventId: testUuid(1),
+			target: 'test_target',
+			trigger: 'test',
+		})
+	})
+
+	test('stays quiet when the target is in the schema', async () => {
+		const testLoggerHandler = new TestLoggerHandler()
+		const client = createStubClient([
+			{ rowCount: 1, rows: [eventRow] },
+		])
+
+		const result = await new EventsRepository().fetchBatch(
+			{ triggers: {}, targets: { test_target: webhookTarget } },
+			client,
+			createLogger(testLoggerHandler),
+		)
+
+		expect(result).toEqual({ ok: true, events: [eventRow], target: webhookTarget })
+		expect(testLoggerHandler.messages).toStrictEqual([])
 	})
 })

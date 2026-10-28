@@ -21,6 +21,8 @@ export const normalizeSchema = <S extends Schema>(schema: S): S => {
 							read: true,
 						},
 					},
+					debug: true,
+					...adminRoleDefinition,
 					content: {
 						export: true,
 						import: true,
@@ -32,8 +34,6 @@ export const normalizeSchema = <S extends Schema>(schema: S): S => {
 						import: true,
 						...adminRoleDefinition.system,
 					},
-					debug: true,
-					...adminRoleDefinition,
 				},
 				[ProjectRole.CONTENT_ADMIN]: {
 					stages: '*',
@@ -45,6 +45,7 @@ export const normalizeSchema = <S extends Schema>(schema: S): S => {
 							read: true,
 						},
 					},
+					...contentAdminRoleDefinition,
 					content: {
 						export: true,
 						import: true,
@@ -57,7 +58,6 @@ export const normalizeSchema = <S extends Schema>(schema: S): S => {
 						import: true,
 						...contentAdminRoleDefinition.system,
 					},
-					...contentAdminRoleDefinition,
 				},
 				[ProjectRole.DEPLOYER]: {
 					stages: '*',

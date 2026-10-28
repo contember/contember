@@ -39,7 +39,7 @@ export class GraphQlSchemaFactory {
 			const authorizator = new Authorizator(
 				allPermissions,
 				schema.acl.customPrimary ?? false,
-				Object.values(schema.acl.roles).some(it => it.content?.refreshMaterializedView),
+				this.permissionFactory.isRefreshMaterializedViewAllowed(schema, identity.projectRoles),
 			)
 			const dataSchemaBuilder = this.graphqlSchemaBuilderFactory.create(schema.model, authorizator)
 			const introspectionSchemaFactory = new IntrospectionSchemaDefinitionFactory(

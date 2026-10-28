@@ -74,7 +74,7 @@ export class ProjectPrintSchemaCommand extends Command<Args, Options> {
 		const authorizator = new Authorizator(
 			permissions,
 			schemaNormalized.acl.customPrimary ?? false,
-			Object.values(schemaNormalized.acl.roles).some(it => it.content?.refreshMaterializedView),
+			permissionFactory.isRefreshMaterializedViewAllowed(schemaNormalized, inputRoles || ['admin']),
 		)
 		const introspection = new IntrospectionSchemaFactory(
 			schemaNormalized.model,

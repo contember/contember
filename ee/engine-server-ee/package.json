@@ -4,6 +4,9 @@
   "license": "proprietary",
   "main": "dist/src/index.js",
   "typings": "dist/src/index.d.ts",
+  "scripts": {
+    "test": "vitest --dir ./tests/cases"
+  },
   "exports": {
     "typescript": "./src/index.ts",
     "default": "./dist/src/index.js"

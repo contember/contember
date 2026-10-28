@@ -55,8 +55,12 @@ if [[ -z "$1" || "$1" == "cli" ]]; then
 
 	REPO="contember/cli"
 
+	# `latest` follows npm: only the newest stable release of the newest major takes it.
+	IS_LATEST=$([[ "${NPM_TAG-}" == "latest" ]] && echo 1 || echo "")
+
 	TAGS=""
 	for VERSION in "${ALL_VERSIONS[@]}"; do TAGS="$TAGS -t $REPO:$VERSION"; done
+	if [[ -n "$IS_LATEST" ]]; then TAGS="$TAGS -t $REPO:latest"; fi
 
 	docker buildx build \
 	  --platform linux/amd64,linux/arm64 \
@@ -66,6 +70,7 @@ if [[ -z "$1" || "$1" == "cli" ]]; then
 
 	TAGS=""
   for VERSION in "${ALL_VERSIONS[@]}"; do TAGS="$TAGS -t $REPO:$VERSION-node"; done
+  if [[ -n "$IS_LATEST" ]]; then TAGS="$TAGS -t $REPO:latest-node"; fi
 
   docker buildx build \
     --platform linux/amd64,linux/arm64 \

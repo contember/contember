@@ -1,3 +1,4 @@
+import { Logger } from '@contember/logger'
 import { PersonQuery } from '../queries'
 import { DatabaseContext } from '../utils'
 import { DisablePersonCommand } from '../commands/person/DisablePersonCommand'
@@ -9,7 +10,9 @@ class PersonAccessManager {
 
 	constructor(private readonly apiKeyManager: ApiKeyManager) {}
 
-	async disablePerson(dbContext: DatabaseContext, personId: string): Promise<PersonDisableAccessResponse> {
+	async disablePerson(dbContext: DatabaseContext, personId: string, logger: Logger): Promise<PersonDisableAccessResponse> {
+		// Retried: the api_key update races the target's own background session tracking and loses with a 40001,
+		// which would otherwise leave the person enabled behind an internal error. Nothing here escapes the transaction.
 		const result = await dbContext.transaction(async trx => {
 			const personRow = await trx.queryHandler.fetch(
 				PersonQuery.byId(personId),
@@ -28,7 +31,7 @@ class PersonAccessManager {
 			await this.disableIdentityApiKeys(trx, personRow.identity_id)
 
 			return null
-		})
+		}, { retry: { logger } })
 
 		switch (result) {
 			case null:

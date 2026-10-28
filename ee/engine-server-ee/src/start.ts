@@ -4,7 +4,7 @@ import { createContainer } from './index'
 import loadPlugins from './loadPlugins'
 import os from 'node:os'
 import cluster from 'node:cluster'
-import { getClusterProcessType, notifyWorkerStarted, timeout, WorkerManager } from './utils'
+import { getClusterProcessType, notifyWorkerStarted, ProcessType, timeout, WorkerManager } from './utils'
 import {
 	createDefaultLogger, createSentryLoggerHandler,
 	getServerVersion,
@@ -55,7 +55,10 @@ const logger = createDefaultLogger()
 
 	let initializedProjects: string[] = []
 	const terminationJobs: TerminationJob[] = []
-	listenOnProcessTermination(terminationJobs, logger)
+	// A cluster worker is signalled by the master, which has already served the delay.
+	listenOnProcessTermination(terminationJobs, logger, {
+		sigtermDelayMs: processType === ProcessType.clusterWorker ? 0 : serverConfig.shutdownDelayMs,
+	})
 
 	if (cluster.isMaster) {
 		const monitoringPort = serverConfig.monitoringPort

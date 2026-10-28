@@ -35,7 +35,7 @@ export class DisablePersonMutationResolver implements MutationResolvers {
 			message: 'You are not allowed to disable person account',
 		})
 
-		const result = await this.personAccessManager.disablePerson(context.db, args.personId)
+		const result = await this.personAccessManager.disablePerson(context.db, args.personId, context.logger)
 
 		if (!result.ok) {
 			return createErrorResponse(result.error, result.errorMessage)

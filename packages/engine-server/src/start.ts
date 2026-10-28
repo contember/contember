@@ -16,8 +16,6 @@ process.on('warning', message => {
 })
 ;(async () => {
 	const isDebug = isDebugMode()
-	const terminationJobs: TerminationJob[] = []
-	listenOnProcessTermination(terminationJobs, logger)
 
 	const version = getServerVersion()
 	printStartInfo({ version, isDebug }, logger)
@@ -26,6 +24,8 @@ process.on('warning', message => {
 		plugins,
 		serverConfigSchema,
 	})
+	const terminationJobs: TerminationJob[] = []
+	listenOnProcessTermination(terminationJobs, logger, { sigtermDelayMs: serverConfig.shutdownDelayMs })
 
 	const sentryTransport = createSentryLoggerHandler(serverConfig.logging.sentry?.dsn)
 	if (sentryTransport !== null) {

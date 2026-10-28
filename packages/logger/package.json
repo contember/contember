@@ -1,6 +1,6 @@
 {
   "name": "@contember/logger",
-  "version": "2.2.0-alpha.13",
+  "version": "2.2.0-alpha.14",
   "license": "Apache-2.0",
   "sideEffects": false,
   "main": "./dist/production/index.js",

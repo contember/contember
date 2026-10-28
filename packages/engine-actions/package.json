@@ -49,7 +49,7 @@
     "pg": "^8.5.0"
   },
   "type": "module",
-  "version": "2.0.9",
+  "version": "2.0.10",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/contember/contember.git",

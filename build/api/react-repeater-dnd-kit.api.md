@@ -25,23 +25,23 @@ import { UniqueIdentifier } from '@dnd-kit/core';
 export const RepeaterActiveEntityContext: Context<EntityAccessor | undefined>;
 
 // @public
-export const RepeaterSortable: ({ children, onDragStart, onDragEnd: onDragEndIn, onDragCancel: onDragCancelIn, ...props }: {
+export const RepeaterSortable: (input: {
     children: ReactNode;
 } & DndContextProps) => JSX_2.Element;
 
 // @public
-export const RepeaterSortableDragOverlay: ({ children }: {
+export const RepeaterSortableDragOverlay: (input: {
     children: ReactNode;
 }) => JSX_2.Element | null;
 
 // @public
-export const RepeaterSortableDropIndicator: ({ children, position }: {
+export const RepeaterSortableDropIndicator: (input: {
     children: ReactNode;
     position: "before" | "after";
 }) => JSX_2.Element | null;
 
 // @public
-export const RepeaterSortableEachItem: ({ children }: {
+export const RepeaterSortableEachItem: (input: {
     children: ReactNode;
 }) => JSX_2.Element;
 
@@ -78,7 +78,7 @@ transition: string | undefined;
 }>;
 
 // @public
-export const RepeaterSortableItemNode: ({ children }: {
+export const RepeaterSortableItemNode: (input: {
     children: ReactElement;
 }) => JSX_2.Element;
 

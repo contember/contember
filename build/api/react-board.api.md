@@ -24,7 +24,7 @@ export type BoardAddColumnMethod = (index: number | undefined, preprocess?: Enti
 export type BoardAddItemMethod<ColumnValue extends BoardColumnValue> = (column: ColumnValue | null, index: number | undefined, preprocess?: EntityAccessor.BatchUpdatesHandler) => void;
 
 // @public (undocumented)
-export const BoardColumn: ({}: {
+export const BoardColumn: (input: {
     children: ReactNode;
 }) => null;
 
@@ -69,27 +69,27 @@ export type BoardDynamicColumnsBindingProps = {
 
 // @public (undocumented)
 export const BoardEachColumn: {
-    ({ children }: {
+    (input: {
         children: ReactNode;
     }): JSX_2.Element;
-    staticRender({ children }: {
+    staticRender(input: {
         children: ReactNode;
     }): JSX_2.Element;
 };
 
 // @public (undocumented)
 export const BoardEachItem: {
-    ({ children }: {
+    (input: {
         children: ReactNode;
     }): JSX_2.Element;
-    staticRender({ children }: {
+    staticRender(input: {
         children: ReactNode;
     }): JSX_2.Element;
 };
 
 // @public (undocumented)
 export const BoardItem: {
-    ({}: {
+    (input: {
         children: ReactNode;
     }): null;
     staticRender(): null;
@@ -122,7 +122,7 @@ export type BoardMoveColumnMethod = (entity: EntityAccessor, index: number) => v
 export type BoardMoveItemMethod<ColumnValue extends BoardColumnValue> = (entity: EntityAccessor, column: ColumnValue | null, index: number) => void;
 
 // @public (undocumented)
-export const BoardNullColumn: ({ children, hideEmpty }: BoardNullColumnProps) => JSX_2.Element | null;
+export const BoardNullColumn: (input: BoardNullColumnProps) => JSX_2.Element | null;
 
 // @public (undocumented)
 export const BoardNullColumnPlaceholder = "__null_column";

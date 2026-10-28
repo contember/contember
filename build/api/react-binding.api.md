@@ -53,7 +53,7 @@ export function AccessorProvider(props: EntityProviderProps): JSX_2.Element;
 
 // @public (undocumented)
 export const AccessorTree: {
-    ({ state, children }: AccessorTreeProps): JSX_2.Element;
+    (input: AccessorTreeProps): JSX_2.Element;
     displayName: string;
 };
 
@@ -163,7 +163,7 @@ export interface DeferredSubTreesProps {
 }
 
 // @public
-export const DeleteEntityTrigger: ({ immediatePersist, onPersistError, onPersistSuccess, ...props }: DeleteEntityTriggerProps) => JSX_2.Element;
+export const DeleteEntityTrigger: (input: DeleteEntityTriggerProps) => JSX_2.Element;
 
 // @public (undocumented)
 export interface DeleteEntityTriggerProps {
@@ -479,7 +479,7 @@ export type LabelMiddleware = (label: ReactNode, environment: Environment) => Re
 export const LabelMiddlewareContext: React.Context<LabelMiddleware>;
 
 // @public (undocumented)
-export const LabelMiddlewareProvider: ({ value, children }: {
+export const LabelMiddlewareProvider: (input: {
     value: LabelMiddleware;
     children: ReactNode;
 }) => JSX_2.Element;
@@ -533,7 +533,7 @@ export type PersistOnHasOneChangeProps = {
 };
 
 // @public
-export const PersistOnKey: ({ onPersistSuccess, onPersistError, isHotkey, }: PersistOnKeyProps) => null;
+export const PersistOnKey: (input: PersistOnKeyProps) => null;
 
 // @public (undocumented)
 export type PersistOnKeyProps = {
@@ -543,7 +543,7 @@ export type PersistOnKeyProps = {
 };
 
 // @public
-export const PersistTrigger: ({ onPersistError, onPersistSuccess, ...props }: PersistTriggerProps) => JSX_2.Element;
+export const PersistTrigger: (input: PersistTriggerProps) => JSX_2.Element;
 
 // @public (undocumented)
 export interface PersistTriggerAttributes {
@@ -685,7 +685,7 @@ export const useAccessorUpdateSubscription: <Accessor extends {
 export const useBindingOperations: () => BindingOperations<ReactNode>;
 
 // @public (undocumented)
-export const useDataBinding: ({ children, refreshOnPersist, skipStateUpdateAfterPersist, }: {
+export const useDataBinding: (input: {
     children?: ReactNode;
     refreshOnPersist?: boolean;
     skipStateUpdateAfterPersist?: boolean;
@@ -944,7 +944,7 @@ export const usePersist: () => Persist;
 export const useTreeRootId: () => TreeRootId | undefined;
 
 // @public (undocumented)
-export const Variable: React.MemoExoticComponent<({ name, format }: VariableProps) => ReactElement>;
+export const Variable: React.MemoExoticComponent<(input: VariableProps) => ReactElement>;
 
 // @public (undocumented)
 export interface VariableProps {

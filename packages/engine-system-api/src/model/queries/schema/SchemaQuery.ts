@@ -6,6 +6,7 @@ export class SchemaQuery extends DatabaseQuery<SchemaWithMeta | null> {
 
 	constructor(
 		private readonly currentHash?: string,
+		private readonly currentVersion?: string,
 	) {
 		super()
 	}
@@ -27,6 +28,9 @@ export class SchemaQuery extends DatabaseQuery<SchemaWithMeta | null> {
 			.match(it => {
 				if (!this.currentHash) {
 					return it
+				}
+				if (this.currentVersion) {
+					return it.where(it => it.raw('(checksum != ? OR version != ?)', this.currentHash, this.currentVersion))
 				}
 				return it.where(it => it.raw('checksum != ?', this.currentHash))
 			})

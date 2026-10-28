@@ -53,7 +53,7 @@ export type SelectDataViewProps = Omit<DataViewProps, 'entities'> & {
 };
 
 // @public (undocumented)
-export const SelectEachValue: ({ children }: {
+export const SelectEachValue: (input: {
     children: ReactNode;
 }) => JSX_2.Element[];
 
@@ -85,7 +85,7 @@ export type SelectItemTriggerProps = {
 };
 
 // @public (undocumented)
-export const SelectNewItem: ({ children }: {
+export const SelectNewItem: (input: {
     children: ReactNode;
 }) => JSX_2.Element | null;
 
@@ -106,7 +106,7 @@ entityName: EntityName;
 }>;
 
 // @public (undocumented)
-export const SelectPlaceholder: ({ children }: {
+export const SelectPlaceholder: (input: {
     children: ReactNode;
 }) => JSX_2.Element | null;
 

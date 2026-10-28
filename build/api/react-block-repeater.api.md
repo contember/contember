@@ -29,7 +29,7 @@ export interface BlockProps {
 export const BlockRepeater: NamedExoticComponent<BlockRepeaterProps>;
 
 // @public
-export const BlockRepeaterAddItemTrigger: ({ preprocess, index, type, ...props }: BlockRepeaterAddItemTriggerProps) => JSX_2.Element;
+export const BlockRepeaterAddItemTrigger: (input: BlockRepeaterAddItemTriggerProps) => JSX_2.Element;
 
 // @public
 export interface BlockRepeaterAddItemTriggerProps {

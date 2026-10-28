@@ -15,6 +15,8 @@ import { ProjectGroupResolver } from '../projectGroup/ProjectGroupResolver'
 import { ProjectGroupContainer } from '../projectGroup/ProjectGroupContainer'
 import { URL } from 'node:url'
 
+const websocketCloseTimeoutMs = 5_000
+
 type Route<C> = { match: RequestMatcher; controller: C; module: string }
 export class Application {
 
@@ -68,6 +70,15 @@ export class Application {
 	async listen(): Promise<RunningApplication> {
 		const koa = new Koa()
 		const wss = new WebSocketServer({ noServer: true })
+		let closing = false
+		koa.use(async (ctx, next) => {
+			if (closing) {
+				ctx.status = 503
+				ctx.set('Connection', 'close')
+				return
+			}
+			await next()
+		})
 		for (const middleware of this.middlewares) {
 			koa.use(middleware)
 		}
@@ -85,12 +96,37 @@ export class Application {
 			await this.handleHttpRequest(ctx)
 		})
 
-		const server = http.createServer(koa.callback())
+		const activeHttpRequests = new Set<Promise<void>>()
+		const handleHttpRequest = koa.callback()
+		const server = http.createServer((request, response) => {
+			if (closing) {
+				handleHttpRequest(request, response)
+				return
+			}
+			let resolveRequest = () => {}
+			const completed = new Promise<void>(resolve => {
+				resolveRequest = resolve
+			})
+			activeHttpRequests.add(completed)
+			const complete = () => {
+				response.off('finish', complete)
+				response.off('close', complete)
+				activeHttpRequests.delete(completed)
+				resolveRequest()
+			}
+			response.once('finish', complete)
+			response.once('close', complete)
+			handleHttpRequest(request, response)
+		})
 		const abortController = new AbortController()
 
 		const wsRequests: (Promise<void>)[] = []
 		server.on('upgrade', (req, socket, head) => {
-			 wsRequests.push(this.handleWebsocketRequest(wss, abortController.signal, req, socket, head))
+			if (closing) {
+				this.sendRawHttpResponse(socket, new HttpErrorResponse(503, 'Server is shutting down'))
+				return
+			}
+			wsRequests.push(this.handleWebsocketRequest(wss, abortController.signal, req, socket, head))
 		})
 		await new Promise<void>(resolve => {
 			server.listen(this.serverConfig.port, () => resolve())
@@ -99,9 +135,25 @@ export class Application {
 		return {
 			server,
 			close: async () => {
+				closing = true
 				abortController.abort()
-				await Promise.all(wsRequests)
-				await new Promise(resolve => server.close(resolve))
+				await Promise.all([...wsRequests, ...activeHttpRequests])
+				if (process.versions.bun !== undefined) {
+					// Bun does not finish server.close() after a WebSocket upgrade unless all connections are closed first.
+					server.closeAllConnections()
+				} else {
+					server.closeIdleConnections()
+				}
+				if (server.listening) {
+					await new Promise<void>(resolve =>
+						server.close(error => {
+							if (error) {
+								this.logger.error(error)
+							}
+							resolve()
+						}),
+					)
+				}
 			},
 		}
 	}
@@ -136,10 +188,23 @@ export class Application {
 				user: authResult?.identityId,
 			})
 
+			if (abortSignal.aborted) {
+				throw new HttpErrorResponse(503, 'Server is shutting down')
+			}
 			const ws = await new Promise<WebSocket>(resolve => wss.handleUpgrade(req, socket, head, (ws, request) => {
 				resolve(ws)
 			}))
 			const wsEstablished = new Date().getTime()
+			ws.on('error', e => {
+				requestLogger.error(e, {
+					websocketOpenMs: new Date().getTime() - wsEstablished,
+				})
+			})
+			if (abortSignal.aborted) {
+				await this.closeWebsocket(ws)
+				return
+			}
+			const pendingWork: Promise<void>[] = []
 			webSocketContext = {
 				ws,
 				abortSignal,
@@ -150,23 +215,25 @@ export class Application {
 				authResult,
 				params: matchedRequest.params,
 				projectGroup: groupContainer,
+				waitUntil: promise => pendingWork.push(promise),
 			}
 			await matchedRequest.controller(webSocketContext)
+			if (abortSignal.aborted && ws.readyState === WebSocket.OPEN) {
+				ws.close(1012)
+			}
 			requestLogger.debug('Websocket connection established')
-			ws.on('error', e => {
-				requestLogger.error(e, {
-					websocketOpenMs: new Date().getTime() - wsEstablished,
-				})
-			})
 
-			return new Promise<void>(resolve => {
-				ws.on('close', () => {
-					requestLogger.debug('Websocket connection closed', {
-						websocketOpenMs: new Date().getTime() - wsEstablished,
+			if (ws.readyState !== WebSocket.CLOSED) {
+				await new Promise<void>(resolve => {
+					ws.on('close', () => {
+						requestLogger.debug('Websocket connection closed', {
+							websocketOpenMs: new Date().getTime() - wsEstablished,
+						})
+						resolve()
 					})
-					resolve()
 				})
-			})
+			}
+			await Promise.allSettled(pendingWork)
 		} catch (e) {
 			if (e instanceof HttpResponse) {
 				this.sendRawHttpResponse(socket, e)
@@ -296,6 +363,24 @@ export class Application {
 		if (response.body !== undefined) {
 			ctx.body = response.body
 		}
+	}
+
+	private async closeWebsocket(ws: WebSocket): Promise<void> {
+		if (ws.readyState === WebSocket.CLOSED) {
+			return
+		}
+		ws.close(1012) // Service Restart
+		await new Promise<void>(resolve => {
+			// ws only gives up on the close handshake after 30 s, which outlives a typical shutdown grace period
+			const timeout = setTimeout(() => {
+				ws.terminate()
+				resolve()
+			}, websocketCloseTimeoutMs)
+			ws.once('close', () => {
+				clearTimeout(timeout)
+				resolve()
+			})
+		})
 	}
 
 	private sendRawHttpResponse(socket: Duplex, response: HttpResponse) {
@@ -445,6 +530,7 @@ export type WebSocketContext =
 	& {
 		ws: WebSocket
 		abortSignal: AbortSignal
+		waitUntil(promise: Promise<void>): void
 	}
 
 export type HttpControllerResponse = Promise<HttpErrorResponse | undefined | void> | HttpErrorResponse | undefined | void

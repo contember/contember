@@ -9,7 +9,7 @@ import { JSX as JSX_2 } from 'react/jsx-runtime';
 import { ReactNode } from 'react';
 
 // @public (undocumented)
-export const UploaderDropzoneArea: ({ children }: {
+export const UploaderDropzoneArea: (input: {
     children: ReactNode;
 }) => JSX_2.Element;
 
@@ -17,7 +17,7 @@ export const UploaderDropzoneArea: ({ children }: {
 export const UploaderDropzoneInput: () => JSX_2.Element;
 
 // @public (undocumented)
-export const UploaderDropzoneRoot: ({ children, noInput }: {
+export const UploaderDropzoneRoot: (input: {
     children: ReactNode;
     noInput?: boolean;
 }) => JSX_2.Element;

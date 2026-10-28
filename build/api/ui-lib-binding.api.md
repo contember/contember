@@ -14,7 +14,7 @@ import { RoutingLinkTarget } from '@contember/interface';
 import { SuccessfulPersistResult } from '@contember/interface';
 
 // @public (undocumented)
-export const Binding: ({ children }: {
+export const Binding: (input: {
     children: ReactNode;
 }) => JSX_2.Element;
 
@@ -37,12 +37,12 @@ export type DeleteEntityDialogProps = {
 };
 
 // @public (undocumented)
-export const IdentityLoader: ({ children }: {
+export const IdentityLoader: (input: {
     children: React.ReactNode;
 }) => JSX_2.Element;
 
 // @public (undocumented)
-export const PersistButton: ({ label }: {
+export const PersistButton: (input: {
     label?: ReactNode;
 }) => JSX_2.Element;
 

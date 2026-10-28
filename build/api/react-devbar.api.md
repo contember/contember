@@ -15,7 +15,7 @@ import { ReactNode } from 'react';
 export const createErrorHandler: (renderer: ErrorReactRenderer) => TryRun;
 
 // @public (undocumented)
-export const DevBar: ({ breakpoint, children, }: PropsWithChildren<{
+export const DevBar: (input: PropsWithChildren<{
     breakpoint?: number;
 }>) => JSX_2.Element;
 
@@ -23,7 +23,7 @@ export const DevBar: ({ breakpoint, children, }: PropsWithChildren<{
 export function DevError(props: DevErrorProps): JSX_2.Element;
 
 // @public (undocumented)
-export function DevErrorBadge({ errorCount, onOpen, onClear }: DevErrorBadgeProps): JSX_2.Element;
+export function DevErrorBadge(input: DevErrorBadgeProps): JSX_2.Element;
 
 // @public (undocumented)
 export interface DevErrorBadgeProps {
@@ -36,7 +36,7 @@ export interface DevErrorBadgeProps {
 }
 
 // @public (undocumented)
-export function DevErrorList({ currentError, currentErrorIndex, currentErrorSource, errorCount, onClose, onNext, onPrevious, onClear, }: DevErrorListProps): JSX_2.Element;
+export function DevErrorList(input: DevErrorListProps): JSX_2.Element;
 
 // @public (undocumented)
 export interface DevErrorListProps {
@@ -69,7 +69,7 @@ export interface DevErrorProps extends DevErrorInnerProps {
 // Warning: (ae-forgotten-export) The symbol "DevPanelProps" needs to be exported by the entry point index.d.ts
 //
 // @public (undocumented)
-export const DevPanel: ({ heading, icon, children, preview }: DevPanelProps) => JSX_2.Element;
+export const DevPanel: (input: DevPanelProps) => JSX_2.Element;
 
 // @public (undocumented)
 export type ErrorReactRenderer = (domElement: Element, reactElement: ReactElement, onRecoverableError: (e: any) => void) => void;

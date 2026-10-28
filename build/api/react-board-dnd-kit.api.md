@@ -29,59 +29,59 @@ column: BoardColumnNode;
 }) | undefined>;
 
 // @public (undocumented)
-export const BoardSortable: ({ children }: {
+export const BoardSortable: (input: {
     children: ReactNode;
 }) => JSX_2.Element;
 
 // @public (undocumented)
-export const BoardSortableActivator: ({ children }: {
+export const BoardSortableActivator: (input: {
     children: ReactNode;
 }) => JSX_2.Element;
 
 // @public (undocumented)
-export const BoardSortableColumnDragOverlay: ({ children }: {
+export const BoardSortableColumnDragOverlay: (input: {
     children: ReactNode;
 }) => JSX_2.Element | null;
 
 // @public (undocumented)
-export const BoardSortableColumnDropIndicator: ({ children, position }: {
+export const BoardSortableColumnDropIndicator: (input: {
     children: ReactNode;
     position: "before" | "after";
 }) => JSX_2.Element | null;
 
 // @public (undocumented)
 export const BoardSortableEachColumn: {
-    ({ children }: {
+    (input: {
         children: ReactNode;
     }): JSX_2.Element;
-    staticRender({ children }: {
+    staticRender(input: {
         children: ReactNode;
     }): JSX_2.Element;
 };
 
 // @public (undocumented)
 export const BoardSortableEachItem: {
-    ({ children }: {
+    (input: {
         children: ReactNode;
     }): JSX_2.Element;
-    staticRender({ children }: {
+    staticRender(input: {
         children: ReactNode;
     }): JSX_2.Element;
 };
 
 // @public (undocumented)
-export const BoardSortableItemDragOverlay: ({ children }: {
+export const BoardSortableItemDragOverlay: (input: {
     children: ReactNode;
 }) => JSX_2.Element | null;
 
 // @public (undocumented)
-export const BoardSortableItemDropIndicator: ({ children, position }: {
+export const BoardSortableItemDropIndicator: (input: {
     children: ReactNode;
     position: "before" | "after";
 }) => JSX_2.Element | null;
 
 // @public (undocumented)
-export const BoardSortableNode: ({ children }: {
+export const BoardSortableNode: (input: {
     children: ReactNode;
 }) => JSX_2.Element;
 
@@ -113,7 +113,7 @@ transition: string | undefined;
 }>;
 
 // @public (undocumented)
-export const BoardSortableNullColumn: ({ children }: BoardNullColumnProps) => JSX_2.Element;
+export const BoardSortableNullColumn: (input: BoardNullColumnProps) => JSX_2.Element;
 
 // @public (undocumented)
 export const useBoardActiveColumn: () => BoardColumnNode | undefined;

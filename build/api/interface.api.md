@@ -53,7 +53,7 @@ export interface ClearFieldTriggerProps {
 export { createErrorHandler }
 
 // @public (undocumented)
-export const DisconnectEntityTrigger: ({ immediatePersist, onPersistError, onPersistSuccess, field, ...props }: DisconnectEntityTriggerProps) => JSX_2.Element;
+export const DisconnectEntityTrigger: (input: DisconnectEntityTriggerProps) => JSX_2.Element;
 
 // @public (undocumented)
 export interface DisconnectEntityTriggerProps {
@@ -70,12 +70,12 @@ export interface DisconnectEntityTriggerProps {
 }
 
 // @public (undocumented)
-export const EntityBeforePersist: ({ listener }: {
+export const EntityBeforePersist: (input: {
     listener: EntityAccessor.EntityEventListenerMap["beforePersist"];
 }) => null;
 
 // @public (undocumented)
-export const RedirectOnPersist: ({ to, parameters }: {
+export const RedirectOnPersist: (input: {
     to: RoutingLinkTarget;
     parameters?: RequestParameters;
 }) => null;
@@ -87,7 +87,7 @@ export const useBlockNavigationOnDirtyState: (handler: () => Promise<BlockNaviga
 }) => void;
 
 // @public (undocumented)
-export const useIsApplicationOutdated: ({ checkIntervalMs }?: {
+export const useIsApplicationOutdated: (input?: {
     checkIntervalMs?: number;
 }) => boolean;
 

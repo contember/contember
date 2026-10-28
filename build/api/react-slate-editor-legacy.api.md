@@ -133,7 +133,7 @@ export type EditorReferenceBlocks = NormalizedDiscriminatedData<EditorReferenceB
 export const EditorReferenceBlocksContext: Context<EditorReferenceBlocks>;
 
 // @public (undocumented)
-export const EditorReferenceTrigger: ({ referenceType, ...props }: EditorReferenceTriggerProps) => JSX_2.Element;
+export const EditorReferenceTrigger: (input: EditorReferenceTriggerProps) => JSX_2.Element;
 
 // @public (undocumented)
 export interface EditorReferenceTriggerProps {
@@ -189,7 +189,7 @@ export const getDiscriminatedBlock: (blocks: NormalizedBlocks, field: FieldAcces
 export const getDiscriminatedDatum: <Datum>(data: NormalizedDiscriminatedData<Datum>, discriminant: FieldAccessor | FieldValue) => ResolvedDiscriminatedDatum<Datum> | undefined;
 
 // @public (undocumented)
-export const initBlockEditor: ({ editor, ...options }: InitEditorOptions & {
+export const initBlockEditor: (input: InitEditorOptions & {
     editor: Editor;
 }) => void;
 
@@ -318,7 +318,7 @@ export const SortedBlocksContext: Context<EntityAccessor[]>;
 export type SugaredDiscriminateBy = OptionallyVariableFieldValue;
 
 // @public (undocumented)
-export const useBlockEditorSlateNodes: ({ editor, blockElementCache, blockElementPathRefs, blockContentField, topLevelBlocks, }: UseBlockEditorSlateNodesOptions) => Descendant[];
+export const useBlockEditorSlateNodes: (input: UseBlockEditorSlateNodesOptions) => Descendant[];
 
 // @public (undocumented)
 export interface UseBlockEditorSlateNodesOptions {

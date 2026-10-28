@@ -15,7 +15,7 @@ export interface CommentProps extends PropsWithChildren {
 export const LoginWithEmail: () => JSX_2.Element;
 
 // @public (undocumented)
-export const Todo: ({ children }: CommentProps) => JSX_2.Element | null;
+export const Todo: (input: CommentProps) => JSX_2.Element | null;
 
 // (No @packageDocumentation comment for this package)
 

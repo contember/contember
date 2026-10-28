@@ -99,7 +99,7 @@ const createHarness = ({ forcePrimaryHeader = true, withReplica = true }: { forc
 	}
 	const schema: JsonContentSchema = {
 		schema: buildSchema('type Query { marker: String } type Mutation { marker: String fail: String }'),
-		resolvers: {
+		resolvers: [{
 			Query: { marker },
 			Mutation: {
 				marker,
@@ -107,7 +107,7 @@ const createHarness = ({ forcePrimaryHeader = true, withReplica = true }: { forc
 					throw new GraphQLError('Mutation failed')
 				},
 			},
-		},
+		}],
 		scalars: builtInScalars,
 	}
 	const controller = new ContentApiControllerFactory(

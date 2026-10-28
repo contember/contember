@@ -21,7 +21,7 @@ export interface ExecutionContext<TContext = unknown> {
 	rawVariableValues: Record<string, unknown>
 
 	// External configuration
-	resolvers: ResolverMap<TContext>
+	resolvers: readonly ResolverMap<TContext>[]
 	typeResolvers: TypeResolverMap<TContext>
 	isTypeOfResolvers: IsTypeOfResolverMap<TContext>
 	scalars: ScalarMap
@@ -42,8 +42,9 @@ export interface ExecuteArgs<TContext = unknown> {
 	schema: Schema
 	document: DocumentNode
 
-	// External resolvers; types without an entry fall back to fieldResolver
-	resolvers?: ResolverMap<TContext>
+	// External resolvers; types without an entry fall back to fieldResolver. Several maps are looked up in order,
+	// field by field, so that schemas can share a large map and add their own few resolvers in front of it.
+	resolvers?: ResolverMap<TContext> | readonly ResolverMap<TContext>[]
 
 	// Optional
 	rootValue?: unknown

@@ -5,7 +5,7 @@
 import { GraphQLError, Kind } from 'graphql'
 import type { FragmentDefinitionNode, OperationDefinitionNode } from 'graphql'
 import type { ExecuteArgsWithContext, ExecutionContext } from '../types/execution.js'
-import { defaultFieldResolver } from '../types/resolvers.js'
+import { defaultFieldResolver, type ResolverMap } from '../types/resolvers.js'
 import { withBuiltInScalars } from '../scalars/builtIn.js'
 import { coerceVariableValues } from './values.js'
 import { getSchemaWithIntrospection } from '../introspection/types.js'
@@ -88,7 +88,7 @@ export function buildExecutionContext<TContext>(
 		operation,
 		variableValues: coercedVariableValues,
 		rawVariableValues: variableValues ?? {},
-		resolvers: resolvers ?? {},
+		resolvers: resolvers === undefined ? [] : isResolverMapList(resolvers) ? resolvers : [resolvers],
 		typeResolvers: typeResolvers ?? {},
 		isTypeOfResolvers: isTypeOfResolvers ?? {},
 		scalars: mergedScalars,
@@ -115,4 +115,10 @@ export function getOperationRootTypeName(
 		default:
 			return null
 	}
+}
+
+function isResolverMapList<TContext>(
+	resolvers: ResolverMap<TContext> | readonly ResolverMap<TContext>[],
+): resolvers is readonly ResolverMap<TContext>[] {
+	return Array.isArray(resolvers)
 }

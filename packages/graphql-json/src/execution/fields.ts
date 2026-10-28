@@ -162,10 +162,13 @@ function getFieldResolver<TContext>(
 	fieldName: string,
 ): ResolverFn<unknown, TContext> {
 	// introspection resolvers take precedence for the reserved __ types
-	const typeResolvers = (isIntrospectionType(typeName) ? getOwn(introspectionResolvers, typeName) : undefined)
-		?? getOwn(exeContext.resolvers, typeName)
-	if (typeResolvers) {
-		const fieldResolver = getOwn(typeResolvers, fieldName)
+	const introspectionTypeResolvers = isIntrospectionType(typeName) ? getOwn(introspectionResolvers, typeName) : undefined
+	if (introspectionTypeResolvers) {
+		return getOwn(introspectionTypeResolvers, fieldName) ?? exeContext.fieldResolver
+	}
+	for (const resolvers of exeContext.resolvers) {
+		const typeResolvers = getOwn(resolvers, typeName)
+		const fieldResolver = typeResolvers ? getOwn(typeResolvers, fieldName) : undefined
 		if (fieldResolver) {
 			return fieldResolver
 		}

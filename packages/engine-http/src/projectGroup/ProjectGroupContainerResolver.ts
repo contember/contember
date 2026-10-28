@@ -40,10 +40,7 @@ export class ProjectGroupContainerResolver implements EventEmitter<ProjectGroupC
 				slug,
 			})
 			const cleanups = this.eventManager.fire('create', { container, slug }).map(it => it ?? (() => null))
-
-			container.projectContainerResolver.on('create', ({ container: projectContainer }) => {
-				cleanups.push(() => container.projectContainerResolver.destroyContainer(projectContainer.project.slug))
-			})
+			cleanups.push(() => container.projectContainerResolver.dispose())
 
 			await container.tenantContainer.migrationsRunner.run(container.logger.child())
 			return { container, inputConfig: config, cleanups }

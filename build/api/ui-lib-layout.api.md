@@ -13,12 +13,12 @@ import { SlotTargetComponent } from '@contember/react-slots';
 
 // @public (undocumented)
 export const LayoutBoxedComponent: {
-    ({ children, ...rest }: PropsWithChildren<{}>): JSX_2.Element;
+    (input: PropsWithChildren<{}>): JSX_2.Element;
     displayName: string;
 };
 
 // @public (undocumented)
-export const LayoutComponent: ({ children }: PropsWithChildren) => JSX_2.Element;
+export const LayoutComponent: (input: PropsWithChildren) => JSX_2.Element;
 
 // @public (undocumented)
 export const Slots: Readonly<{

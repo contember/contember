@@ -52,7 +52,7 @@ export type BlockEditorFieldProps = BlockEditorProps & {
 };
 
 // @public (undocumented)
-export const BlockEditorInner: ({ children, placeholder }: {
+export const BlockEditorInner: (input: {
     placeholder?: string;
     children: ReactNode;
 }) => JSX_2.Element;
@@ -92,7 +92,7 @@ export interface EditorBlockProps {
 }
 
 // @public (undocumented)
-export const EditorBlockToolbar: MemoExoticComponent<({ children }: EditorBlockToolbarProps) => JSX_2.Element>;
+export const EditorBlockToolbar: MemoExoticComponent<(input: EditorBlockToolbarProps) => JSX_2.Element>;
 
 // @public (undocumented)
 export interface EditorBlockToolbarProps {
@@ -128,7 +128,7 @@ export interface EditorEditableCanvasProps extends EditableProps {
 }
 
 // @public (undocumented)
-export const EditorInlineToolbar: MemoExoticComponent<({ children }: EditorInlineToolbarProps) => JSX_2.Element>;
+export const EditorInlineToolbar: MemoExoticComponent<(input: EditorInlineToolbarProps) => JSX_2.Element>;
 
 // @public (undocumented)
 export interface EditorInlineToolbarProps {

@@ -25,13 +25,13 @@ export type DefaultRepeaterProps = {
 } & RepeaterProps;
 
 // @public (undocumented)
-export const RepeaterAddItemButton: ({ children, index }: {
+export const RepeaterAddItemButton: (input: {
     children?: React.ReactNode;
     index?: RepeaterAddItemIndex;
 }) => JSX_2.Element;
 
 // @public (undocumented)
-export const RepeaterDropIndicator: ({ position }: {
+export const RepeaterDropIndicator: (input: {
     position: "before" | "after";
 }) => JSX_2.Element;
 
@@ -43,7 +43,7 @@ className?: string;
 }, "ref"> & RefAttributes<HTMLDivElement>>;
 
 // @public
-export const RepeaterRemoveItemButton: ({ children }: {
+export const RepeaterRemoveItemButton: (input: {
     children?: React.ReactNode;
 }) => JSX_2.Element;
 

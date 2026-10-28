@@ -98,7 +98,7 @@ className?: string;
 }, "ref"> & RefAttributes<HTMLDivElement>>;
 
 // @public (undocumented)
-export const ColumnDropIndicator: ({ position }: {
+export const ColumnDropIndicator: (input: {
     position: "before" | "after";
 }) => JSX_2.Element;
 
@@ -114,7 +114,7 @@ export type DefaultBoardProps = {
 } & BoardProps;
 
 // @public (undocumented)
-export const ItemDropIndicator: ({ position }: {
+export const ItemDropIndicator: (input: {
     position: "before" | "after";
 }) => JSX_2.Element;
 

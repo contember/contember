@@ -10,7 +10,7 @@ export class GraphQlClient {
     // (undocumented)
     get apiUrl(): string;
     // (undocumented)
-    protected doExecute(query: string, { apiToken, signal, variables, headers }?: GraphQlClientRequestOptions): Promise<Response>;
+    protected doExecute(query: string, input?: GraphQlClientRequestOptions): Promise<Response>;
     // (undocumented)
     execute<T = unknown>(query: string, options?: GraphQlClientRequestOptions): Promise<T>;
     // (undocumented)

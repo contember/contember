@@ -21,12 +21,12 @@ export const ApiKeyList: (props: {
 export const ChangeMyPasswordFormFields: () => JSX_2.Element;
 
 // @public (undocumented)
-export const CreateApiKeyFormFields: ({ projectSlug }: {
+export const CreateApiKeyFormFields: (input: {
     projectSlug: string;
 }) => JSX_2.Element;
 
 // @public (undocumented)
-export const InviteFormFields: ({ projectSlug, roles }: {
+export const InviteFormFields: (input: {
     projectSlug: string;
     roles?: RolesConfig;
 }) => JSX_2.Element;
@@ -35,7 +35,7 @@ export const InviteFormFields: ({ projectSlug, roles }: {
 export const LoginFormFields: () => JSX_2.Element;
 
 // @public (undocumented)
-export const MemberDeleteDialog: ({ onError, title, identityId, onSuccess, projectSlug }: MemberDeleteProps) => JSX_2.Element;
+export const MemberDeleteDialog: (input: MemberDeleteProps) => JSX_2.Element;
 
 // @public (undocumented)
 export interface MemberDeleteProps {
@@ -52,7 +52,7 @@ export interface MemberDeleteProps {
 }
 
 // @public (undocumented)
-export const MemberList: ({ filter, labels, tableColumns, controller, tableHeaders, roles }: MemberListProps) => JSX_2.Element;
+export const MemberList: (input: MemberListProps) => JSX_2.Element;
 
 // @public (undocumented)
 export interface MemberListController {
@@ -83,7 +83,7 @@ export interface MemberListProps {
 }
 
 // @public (undocumented)
-export const MembershipsControl: ({ setMemberships, memberships, roles }: MembershipsControlProps) => JSX_2.Element;
+export const MembershipsControl: (input: MembershipsControlProps) => JSX_2.Element;
 
 // @public (undocumented)
 export interface MembershipsControlProps {
@@ -105,7 +105,7 @@ export const OtpPrepareFormFields: () => JSX_2.Element;
 export const OtpSetup: () => JSX_2.Element | null;
 
 // @public (undocumented)
-export const PasswordResetFormFields: ({ hasToken }: {
+export const PasswordResetFormFields: (input: {
     hasToken?: boolean;
 }) => JSX_2.Element;
 
@@ -134,7 +134,7 @@ export type RolesConfig = {
 };
 
 // @public (undocumented)
-export const UpdateProjectMemberFormFields: ({ projectSlug, roles }: {
+export const UpdateProjectMemberFormFields: (input: {
     projectSlug: string;
     roles?: RolesConfig;
 }) => JSX_2.Element;

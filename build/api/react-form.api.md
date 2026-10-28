@@ -34,14 +34,14 @@ export interface FormCheckboxProps {
 }
 
 // @public (undocumented)
-export const FormError: ({ children, formatter }: {
+export const FormError: (input: {
     formatter: (errors: ErrorAccessor.Error[]) => ReactNode[];
     children: ReactElement;
 }) => ReactElement<any, string | JSXElementConstructor<any>>[];
 
 // @public @deprecated (undocumented)
 export const FormErrorContext: {
-    Provider: ({ children, value }: {
+    Provider: (input: {
         children: React.ReactNode;
         value: ErrorAccessor.Error[];
     }) => JSX_2.Element;
@@ -49,14 +49,14 @@ export const FormErrorContext: {
 
 // @public @deprecated (undocumented)
 export const FormFieldIdContext: {
-    Provider: ({ children, value }: {
+    Provider: (input: {
         children: React.ReactNode;
         value: string;
     }) => JSX_2.Element;
 };
 
 // @public (undocumented)
-export const FormFieldScope: ({ field, children, required }: FormFieldScopeProps) => JSX_2.Element;
+export const FormFieldScope: (input: FormFieldScopeProps) => JSX_2.Element;
 
 // @public (undocumented)
 export type FormFieldScopeProps = {
@@ -87,10 +87,10 @@ export type FormFieldStateProvider = Partial<FormFieldState> & {
 };
 
 // @public (undocumented)
-export const FormFieldStateProvider: ({ children, required, errors, dirty, htmlId, field }: FormFieldStateProvider) => JSX_2.Element;
+export const FormFieldStateProvider: (input: FormFieldStateProvider) => JSX_2.Element;
 
 // @public (undocumented)
-export const FormHasManyRelationScope: ({ children, required, ...props }: FormHasManyRelationScopeProps) => JSX_2.Element;
+export const FormHasManyRelationScope: (input: FormHasManyRelationScopeProps) => JSX_2.Element;
 
 // @public (undocumented)
 export type FormHasManyRelationScopeProps = {
@@ -103,7 +103,7 @@ export type FormHasManyRelationScopeProps = {
 };
 
 // @public (undocumented)
-export const FormHasOneRelationScope: ({ field, children, required }: FormHasOneRelationScopeProps) => JSX_2.Element;
+export const FormHasOneRelationScope: (input: FormHasOneRelationScopeProps) => JSX_2.Element;
 
 // @public (undocumented)
 export type FormHasOneRelationScopeProps = {

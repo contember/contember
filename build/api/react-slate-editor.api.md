@@ -48,7 +48,7 @@ export interface BlockProps {
     // (undocumented)
     name: string;
     // (undocumented)
-    render: ({}: BlockRendererProps) => ReactNode;
+    render: (input: BlockRendererProps) => ReactNode;
 }
 
 // @public (undocumented)
@@ -97,7 +97,7 @@ export interface EditorReferenceMethods {
 export const EditorReferenceMethodsContext: Context<EditorReferenceMethods>;
 
 // @public (undocumented)
-export const EditorReferenceTrigger: ({ referenceType, initialize, ...props }: EditorReferenceTriggerProps) => JSX_2.Element;
+export const EditorReferenceTrigger: (input: EditorReferenceTriggerProps) => JSX_2.Element;
 
 // @public (undocumented)
 export interface EditorReferenceTriggerProps {
@@ -146,7 +146,7 @@ export const useEditorReferenceMethods: () => EditorReferenceMethods;
 export const withReferences: (args: ReferencesPluginArgs) => EditorPlugin;
 
 // @public (undocumented)
-export const withSortable: ({ render: Sortable }: {
+export const withSortable: (input: {
     render: (props: {
         element: EditorElement;
         children: ReactNode;

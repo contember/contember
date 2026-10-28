@@ -36,7 +36,7 @@ export const DataGridActionColumn: React_2.NamedExoticComponent<{
 }>;
 
 // @public
-export const DataGridAutoExport: ({ fields }: {
+export const DataGridAutoExport: (input: {
     fields?: ReactNode;
 }) => JSX_2.Element;
 
@@ -139,7 +139,7 @@ export type DataGridEnumColumnProps = {
 };
 
 // @public
-export const DataGridEnumFieldTooltip: ({ children, actions, value, ...props }: DataGridEnumFieldTooltipProps & {
+export const DataGridEnumFieldTooltip: (input: DataGridEnumFieldTooltipProps & {
     children: ReactNode;
     value: string;
     actions?: ReactNode;
@@ -277,7 +277,7 @@ export type DataGridIsDefinedFilterProps = Omit<DataViewBooleanFilterProps, 'chi
 export const DataGridLayoutSwitcher: () => JSX_2.Element;
 
 // @public
-export const DataGridLoader: ({ children }: {
+export const DataGridLoader: (input: {
     children: ReactNode;
 }) => JSX_2.Element;
 

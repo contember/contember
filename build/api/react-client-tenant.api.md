@@ -62,7 +62,7 @@ export const addProjectMemberMutation: TenantApi.MutationFetcher<{
 export type AddProjectMemberMutationVariables = Parameters<ReturnType<typeof useAddProjectMemberMutation>>[0];
 
 // @public (undocumented)
-export const ChangeMyPasswordForm: ({ children, onSuccess }: ChangeMyPasswordFormProps) => JSX_2.Element;
+export const ChangeMyPasswordForm: (input: ChangeMyPasswordFormProps) => JSX_2.Element;
 
 // @public (undocumented)
 export type ChangeMyPasswordFormContextValue = FormContextValue<ChangeMyPasswordFormValues, ChangeMyPasswordFormErrorCode>;
@@ -170,7 +170,7 @@ export const confirmOtpMutation: TenantApi.MutationFetcher<{
 export type ConfirmOtpMutationVariables = Parameters<ReturnType<typeof useConfirmOtpMutation>>[0];
 
 // @public (undocumented)
-export const CreateApiKeyForm: ({ children, onSuccess, projectSlug, initialMemberships }: CreateApiKeyFormProps) => JSX_2.Element;
+export const CreateApiKeyForm: (input: CreateApiKeyFormProps) => JSX_2.Element;
 
 // @public (undocumented)
 export type CreateApiKeyFormContextValue = FormContextValue<CreateApiKeyFormValues, CreateApiKeyFormErrorCode>;
@@ -321,7 +321,7 @@ export const createResetPasswordRequestMutation: TenantApi.MutationFetcher<{
 export type CreateResetPasswordRequestMutationVariables = Parameters<ReturnType<typeof useCreateResetPasswordRequestMutation>>[0];
 
 // @public (undocumented)
-export const CreateSessionTokenForm: ({ children, onSuccess, expiration, apiToken }: CreateSessionTokenFormProps) => JSX_2.Element;
+export const CreateSessionTokenForm: (input: CreateSessionTokenFormProps) => JSX_2.Element;
 
 // @public (undocumented)
 export type CreateSessionTokenFormContextValue = FormContextValue<CreateSessionTokenFormValues, CreateSessionTokenFormErrorCode>;
@@ -392,7 +392,7 @@ export type CreateSessionTokenMutationResult = ModelType<typeof createSessionTok
 export type CreateSessionTokenMutationVariables = Parameters<ReturnType<typeof useCreateSessionTokenMutation>>[0];
 
 // @public (undocumented)
-export const createTenantMutation: <TResult, TError extends string = never, TVariables extends object = {}>(fetcher: MutationFetcher<TenantMutation<TResult, TError>, TVariables>, defaultOptions?: TenantApiOptions) => ({ headers, apiToken }?: TenantApiOptions) => (variables: TVariables) => Promise<TenantMutationResponse<TResult, TError>>;
+export const createTenantMutation: <TResult, TError extends string = never, TVariables extends object = {}>(fetcher: MutationFetcher<TenantMutation<TResult, TError>, TVariables>, defaultOptions?: TenantApiOptions) => (input?: TenantApiOptions) => (variables: TVariables) => Promise<TenantMutationResponse<TResult, TError>>;
 
 // @public (undocumented)
 export const disableApiKeyMutation: TenantApi.MutationFetcher<{
@@ -433,7 +433,7 @@ export const disableOtpMutation: TenantApi.MutationFetcher<{
 export type DisableOtpMutationVariables = Parameters<ReturnType<typeof useDisableOtpMutation>>[0];
 
 // @public (undocumented)
-export const DisableOtpTrigger: ({ onSuccess, ...props }: DisableOtpTriggerProps) => JSX_2.Element;
+export const DisableOtpTrigger: (input: DisableOtpTriggerProps) => JSX_2.Element;
 
 // @public (undocumented)
 export interface DisableOtpTriggerProps {
@@ -527,7 +527,7 @@ export interface IdentityProviderProps {
 }
 
 // @public (undocumented)
-export const IdentityState: ({ state, children }: IdentityStateProps) => JSX_2.Element | null;
+export const IdentityState: (input: IdentityStateProps) => JSX_2.Element | null;
 
 // @internal (undocumented)
 export const IdentityStateContext: Context<IdentityStateValue>;
@@ -544,13 +544,13 @@ export interface IdentityStateProps {
 export type IdentityStateValue = 'none' | 'loading' | 'failed' | 'cleared' | 'success';
 
 // @public (undocumented)
-export const IDP: ({ children, onResponseError, onInitError, onLogin }: IDPProps) => JSX_2.Element;
+export const IDP: (input: IDPProps) => JSX_2.Element;
 
 // @public (undocumented)
 export type IDPInitError = InitSignInIDPErrorCode | 'UNKNOWN_ERROR';
 
 // @public (undocumented)
-export const IDPInitTrigger: ({ identityProvider, ...props }: IDPInitTriggerProps) => JSX_2.Element;
+export const IDPInitTrigger: (input: IDPInitTriggerProps) => JSX_2.Element;
 
 // @public (undocumented)
 export interface IDPInitTriggerProps {
@@ -591,7 +591,7 @@ export interface IDPProps {
 export type IDPResponseError = SignInIDPErrorCode | 'INVALID_LOCAL_STATE' | 'UNKNOWN_ERROR';
 
 // @public (undocumented)
-export const IDPState: ({ state, children }: IDPStateProps) => JSX_2.Element | null;
+export const IDPState: (input: IDPStateProps) => JSX_2.Element | null;
 
 // @internal (undocumented)
 export const IDPStateContextProvider: Context<IDPStateValue>;
@@ -646,7 +646,7 @@ export type InitSignInPasswordlessMutationResult = ModelType<typeof InitSignInPa
 export type InitSignInPasswordlessMutationVariables = Parameters<ReturnType<typeof useInitSignInPasswordlessMutation>>[0];
 
 // @public (undocumented)
-export const InviteForm: ({ children, onSuccess, projectSlug, initialMemberships, inviteOptions }: InviteFormProps) => JSX_2.Element;
+export const InviteForm: (input: InviteFormProps) => JSX_2.Element;
 
 // @public (undocumented)
 export type InviteFormContextValue = FormContextValue<InviteFormValues, InviteFormErrorCode>;
@@ -741,7 +741,7 @@ export type InviteMutationResult = ModelType<typeof inviteMutationResult>;
 export type InviteMutationVariables = Parameters<ReturnType<typeof useInviteMutation>>[0];
 
 // @public (undocumented)
-export const LoginForm: ({ children, expiration, onSuccess }: LoginFormProps) => JSX_2.Element;
+export const LoginForm: (input: LoginFormProps) => JSX_2.Element;
 
 // @public (undocumented)
 export type LoginFormContextValue = FormContextValue<LoginFormValues, LoginFormErrorCode, LoginFormState>;
@@ -776,7 +776,7 @@ export type LoginFormValues = {
 export const LoginToken: unique symbol;
 
 // @public (undocumented)
-export const LogoutTrigger: ({ children }: {
+export const LogoutTrigger: (input: {
     children: ReactNode;
 }) => JSX_2.Element;
 
@@ -788,7 +788,7 @@ export type MeQueryData = ModelType<typeof identityFragment>;
 export { ModelType }
 
 // @public (undocumented)
-export const OtpConfirmForm: ({ children, onSuccess }: OtpConfirmFormProps) => JSX_2.Element;
+export const OtpConfirmForm: (input: OtpConfirmFormProps) => JSX_2.Element;
 
 // @public (undocumented)
 export type OtpConfirmFormContextValue = FormContextValue<OtpConfirmFormValues, OtpConfirmFormErrorCode>;
@@ -816,7 +816,7 @@ export type OtpConfirmFormValues = {
 };
 
 // @public (undocumented)
-export const OtpPrepareForm: ({ children, onSuccess }: OtpPrepareFormProps) => JSX_2.Element;
+export const OtpPrepareForm: (input: OtpPrepareFormProps) => JSX_2.Element;
 
 // @public (undocumented)
 export type OtpPrepareFormContextValue = FormContextValue<OtpPrepareFormValues, OtpPrepareFormErrorCode>;
@@ -861,7 +861,7 @@ export type PasswordlessResponseHandlerState = {
 };
 
 // @public (undocumented)
-export const PasswordlessSignInForm: ({ children, onSuccess, requestId, validationType, token, expiration }: PasswordlessSignInFormProps) => JSX_2.Element;
+export const PasswordlessSignInForm: (input: PasswordlessSignInFormProps) => JSX_2.Element;
 
 // @public (undocumented)
 export type PasswordlessSignInFormContextValue = FormContextValue<PasswordlessSignInFormValues, PasswordlessSignInFormErrorCode, PasswordlessSignInFormState>;
@@ -898,7 +898,7 @@ export type PasswordlessSignInFormValues = {
 };
 
 // @public (undocumented)
-export const PasswordlessSignInInitForm: ({ children, onSuccess }: PasswordlessSignInInitFormProps) => JSX_2.Element;
+export const PasswordlessSignInInitForm: (input: PasswordlessSignInInitFormProps) => JSX_2.Element;
 
 // @public (undocumented)
 export type PasswordlessSignInInitFormContextValue = FormContextValue<PasswordlessSignInInitFormValues, PasswordlessSignInInitFormErrorCode>;
@@ -928,7 +928,7 @@ export type PasswordlessSignInInitFormValues = {
 };
 
 // @public (undocumented)
-export const PasswordResetForm: ({ children, onSuccess, token }: PasswordResetFormProps) => JSX_2.Element;
+export const PasswordResetForm: (input: PasswordResetFormProps) => JSX_2.Element;
 
 // @public (undocumented)
 export type PasswordResetFormContextValue = FormContextValue<PasswordResetFormValues, PasswordResetFormErrorCode>;
@@ -960,7 +960,7 @@ export type PasswordResetFormValues = {
 };
 
 // @public (undocumented)
-export const PasswordResetRequestForm: ({ children, onSuccess }: PasswordResetRequestFormProps) => JSX_2.Element;
+export const PasswordResetRequestForm: (input: PasswordResetRequestFormProps) => JSX_2.Element;
 
 // @public (undocumented)
 export type PasswordResetRequestFormContextValue = FormContextValue<PasswordResetRequestFormValues, PasswordResetRequestFormErrorCode>;
@@ -1075,7 +1075,7 @@ export const removeProjectMemberMutation: TenantApi.MutationFetcher<{
 export type RemoveProjectMemberMutationVariables = Parameters<ReturnType<typeof useRemoveProjectMemberMutation>>[0];
 
 // @public (undocumented)
-export const RemoveProjectMemberTrigger: ({ identityId, projectSlug, ...props }: RemoveProjectMemberTriggerProps) => JSX_2.Element;
+export const RemoveProjectMemberTrigger: (input: RemoveProjectMemberTriggerProps) => JSX_2.Element;
 
 // @public (undocumented)
 export type RemoveProjectMemberTriggerProps = RemoveProjectMemberMutationVariables & {
@@ -1281,7 +1281,7 @@ export type TenantQueryLoaderState<Result> = {
 };
 
 // @public (undocumented)
-export const UpdateProjectMemberForm: ({ children, onSuccess, identityId, projectSlug }: UpdateProjectMemberFormProps) => JSX_2.Element;
+export const UpdateProjectMemberForm: (input: UpdateProjectMemberFormProps) => JSX_2.Element;
 
 // @public (undocumented)
 export type UpdateProjectMemberFormContextValue = FormContextValue<UpdateProjectMemberFormValues, UpdateProjectMemberFormErrorCode>;
@@ -1343,14 +1343,14 @@ export const updateProjectMemberMutation: TenantApi.MutationFetcher<{
 export type UpdateProjectMemberMutationVariables = Parameters<ReturnType<typeof useUpdateProjectMemberMutation>>[0];
 
 // @public (undocumented)
-export const useActivatePasswordlessOtpMutation: ({ headers, apiToken }?: TenantApiOptions) => (variables: {
+export const useActivatePasswordlessOtpMutation: (input?: TenantApiOptions) => (variables: {
     readonly requestId: string;
     readonly token: string;
     readonly otpHash: string;
 }) => Promise<TenantMutationResponse<unknown, TenantApi.ActivatePasswordlessOtpErrorCode>>;
 
 // @public (undocumented)
-export const useAddProjectMemberMutation: ({ headers, apiToken }?: TenantApiOptions) => (variables: {
+export const useAddProjectMemberMutation: (input?: TenantApiOptions) => (variables: {
     readonly projectSlug: string;
     readonly identityId: string;
     readonly memberships: ReadonlyArray<TenantApi.MembershipInput>;
@@ -1360,26 +1360,26 @@ export const useAddProjectMemberMutation: ({ headers, apiToken }?: TenantApiOpti
 export const useChangeMyPasswordForm: () => ChangeMyPasswordFormContextValue;
 
 // @public (undocumented)
-export const useChangeMyPasswordMutation: ({ headers, apiToken }?: TenantApiOptions) => (variables: {
+export const useChangeMyPasswordMutation: (input?: TenantApiOptions) => (variables: {
     readonly currentPassword: string;
     readonly newPassword: string;
 }) => Promise<TenantMutationResponse<unknown, TenantApi.ChangeMyPasswordErrorCode>>;
 
 // @public (undocumented)
-export const useChangeMyProfileMutation: ({ headers, apiToken }?: TenantApiOptions) => (variables: {
+export const useChangeMyProfileMutation: (input?: TenantApiOptions) => (variables: {
     readonly email?: string;
     readonly name?: string;
 }) => Promise<TenantMutationResponse<unknown, TenantApi.ChangeMyProfileErrorCode>>;
 
 // @public (undocumented)
-export const useChangeProfileMutation: ({ headers, apiToken }?: TenantApiOptions) => (variables: {
+export const useChangeProfileMutation: (input?: TenantApiOptions) => (variables: {
     readonly personId: string;
     readonly email?: string;
     readonly name?: string;
 }) => Promise<TenantMutationResponse<unknown, TenantApi.ChangeProfileErrorCode>>;
 
 // @public (undocumented)
-export const useConfirmOtpMutation: ({ headers, apiToken }?: TenantApiOptions) => (variables: {
+export const useConfirmOtpMutation: (input?: TenantApiOptions) => (variables: {
     readonly otpToken: string;
 }) => Promise<TenantMutationResponse<unknown, TenantApi.ConfirmOtpErrorCode>>;
 
@@ -1387,7 +1387,7 @@ export const useConfirmOtpMutation: ({ headers, apiToken }?: TenantApiOptions) =
 export const useCreateApiKeyForm: () => CreateApiKeyFormContextValue;
 
 // @public (undocumented)
-export const useCreateApiKeyMutation: ({ headers, apiToken }?: TenantApiOptions) => (variables: {
+export const useCreateApiKeyMutation: (input?: TenantApiOptions) => (variables: {
     readonly projectSlug: string;
     readonly memberships: ReadonlyArray<TenantApi.MembershipInput>;
     readonly description: string;
@@ -1409,7 +1409,7 @@ readonly roles?: ReadonlyArray<string>;
 }, TenantApi.CreateApiKeyErrorCode>>;
 
 // @public (undocumented)
-export const useCreateGlobalApiKeyMutation: ({ headers, apiToken }?: TenantApiOptions) => (variables: {
+export const useCreateGlobalApiKeyMutation: (input?: TenantApiOptions) => (variables: {
     readonly description: string;
     readonly roles?: ReadonlyArray<string>;
     readonly tokenHash?: string;
@@ -1430,7 +1430,7 @@ readonly roles?: ReadonlyArray<string>;
 }, TenantApi.CreateApiKeyErrorCode>>;
 
 // @public (undocumented)
-export const useCreateResetPasswordRequestMutation: ({ headers, apiToken }?: TenantApiOptions) => (variables: {
+export const useCreateResetPasswordRequestMutation: (input?: TenantApiOptions) => (variables: {
     readonly email: string;
     readonly options?: TenantApi.CreateResetPasswordRequestOptions;
 }) => Promise<TenantMutationResponse<unknown, "PERSON_NOT_FOUND">>;
@@ -1439,7 +1439,7 @@ export const useCreateResetPasswordRequestMutation: ({ headers, apiToken }?: Ten
 export const useCreateSessionTokenForm: () => CreateSessionTokenFormContextValue;
 
 // @public (undocumented)
-export const useCreateSessionTokenMutation: ({ headers, apiToken }?: TenantApiOptions) => (variables: {
+export const useCreateSessionTokenMutation: (input?: TenantApiOptions) => (variables: {
     readonly email?: string;
     readonly personId?: string;
     readonly expiration?: number;
@@ -1456,18 +1456,18 @@ readonly name?: string;
 }, TenantApi.CreateSessionTokenErrorCode>>;
 
 // @public (undocumented)
-export const useDisableApiKeyMutation: ({ headers, apiToken }?: TenantApiOptions) => (variables: {
+export const useDisableApiKeyMutation: (input?: TenantApiOptions) => (variables: {
     readonly id: string;
 }) => Promise<TenantMutationResponse<unknown, "KEY_NOT_FOUND">>;
 
 // @public (undocumented)
-export const useDisableMyPasswordlessMutation: ({ headers, apiToken }?: TenantApiOptions) => (variables: {}) => Promise<TenantMutationResponse<unknown, TenantApi.ToggleMyPasswordlessErrorCode>>;
+export const useDisableMyPasswordlessMutation: (input?: TenantApiOptions) => (variables: {}) => Promise<TenantMutationResponse<unknown, TenantApi.ToggleMyPasswordlessErrorCode>>;
 
 // @public (undocumented)
-export const useDisableOtpMutation: ({ headers, apiToken }?: TenantApiOptions) => (variables: {}) => Promise<TenantMutationResponse<unknown, "OTP_NOT_ACTIVE">>;
+export const useDisableOtpMutation: (input?: TenantApiOptions) => (variables: {}) => Promise<TenantMutationResponse<unknown, "OTP_NOT_ACTIVE">>;
 
 // @public (undocumented)
-export const useEnableMyPasswordlessMutation: ({ headers, apiToken }?: TenantApiOptions) => (variables: {}) => Promise<TenantMutationResponse<unknown, TenantApi.ToggleMyPasswordlessErrorCode>>;
+export const useEnableMyPasswordlessMutation: (input?: TenantApiOptions) => (variables: {}) => Promise<TenantMutationResponse<unknown, TenantApi.ToggleMyPasswordlessErrorCode>>;
 
 // @public (undocumented)
 export const useFetchIdentity: () => [{
@@ -1494,7 +1494,7 @@ export const useIDPMethods: () => IDPMethods;
 export const useIDPState: () => IDPStateValue;
 
 // @public (undocumented)
-export const useInitSignInIDPMutation: ({ headers, apiToken }?: TenantApiOptions) => (variables: InitSignInIDPMutationVariables) => Promise<TenantMutationResponse<    {
+export const useInitSignInIDPMutation: (input?: TenantApiOptions) => (variables: InitSignInIDPMutationVariables) => Promise<TenantMutationResponse<    {
 readonly authUrl: string;
 } & {
 readonly sessionData: unknown;
@@ -1503,7 +1503,7 @@ readonly idpConfiguration?: unknown;
 }, TenantApi.InitSignInIDPErrorCode>>;
 
 // @public (undocumented)
-export const useInitSignInPasswordlessMutation: ({ headers, apiToken }?: TenantApiOptions) => (variables: {
+export const useInitSignInPasswordlessMutation: (input?: TenantApiOptions) => (variables: {
     readonly email: string;
     readonly options?: TenantApi.InitSignInPasswordlessOptions;
 }) => Promise<TenantMutationResponse<    {
@@ -1516,7 +1516,7 @@ readonly expiresAt: string;
 export const useInviteForm: () => InviteFormContextValue;
 
 // @public (undocumented)
-export const useInviteMutation: ({ headers, apiToken }?: TenantApiOptions) => (variables: {
+export const useInviteMutation: (input?: TenantApiOptions) => (variables: {
     readonly email: string;
     readonly name?: string;
     readonly projectSlug: string;
@@ -1546,12 +1546,12 @@ readonly roles?: ReadonlyArray<string>;
 export const useLoginForm: () => LoginFormContextValue;
 
 // @public (undocumented)
-export const useLogout: () => ({ noRedirect }?: {
+export const useLogout: () => (input?: {
     noRedirect?: boolean;
 }) => Promise<void>;
 
 // @public (undocumented)
-export const useMeQuery: (options?: TenantApiOptions) => ({}: {}) => Promise<MeQueryData>;
+export const useMeQuery: (options?: TenantApiOptions) => (input: {}) => Promise<MeQueryData>;
 
 // @public (undocumented)
 export const useOtpConfirmForm: () => OtpConfirmFormContextValue;
@@ -1560,7 +1560,7 @@ export const useOtpConfirmForm: () => OtpConfirmFormContextValue;
 export const useOtpPrepareForm: () => OtpPrepareFormContextValue;
 
 // @public (undocumented)
-export const usePasswordlessOtpActivator: ({ otpLength, otpChars }?: {
+export const usePasswordlessOtpActivator: (input?: {
     otpLength?: number;
     otpChars?: string;
 }) => PasswordlessResponseHandlerState;
@@ -1578,7 +1578,7 @@ export const usePasswordResetForm: () => PasswordResetFormContextValue;
 export const usePasswordResetRequestForm: () => PasswordResetRequestFormContextValue;
 
 // @public (undocumented)
-export const usePrepareOtpMutation: ({ headers, apiToken }?: TenantApiOptions) => (variables: {
+export const usePrepareOtpMutation: (input?: TenantApiOptions) => (variables: {
     readonly label?: string;
 }) => Promise<TenantMutationResponse<    {
 readonly otpUri: string;
@@ -1590,25 +1590,25 @@ readonly otpSecret: string;
 export const useProjectMembershipsQuery: (options?: TenantApiOptions) => (input: ProjectMembershipsQueryVariables) => Promise<ProjectMembershipsQueryResult>;
 
 // @public (undocumented)
-export const useProjectMembersQuery: ({ headers, apiToken }?: TenantApiOptions) => ({ projectSlug, ...membersInput }: ProjectMembersQueryVariables) => Promise<ProjectMembersQueryResult>;
+export const useProjectMembersQuery: (input?: TenantApiOptions) => (input: ProjectMembersQueryVariables) => Promise<ProjectMembersQueryResult>;
 
 // @public (undocumented)
-export const useProjectRolesDefinitionQuery: ({ headers, apiToken }?: TenantApiOptions) => (variables: ProjectRolesDefinitionQueryVariables) => Promise<ProjectRolesDefinitionQueryResult>;
+export const useProjectRolesDefinitionQuery: (input?: TenantApiOptions) => (variables: ProjectRolesDefinitionQueryVariables) => Promise<ProjectRolesDefinitionQueryResult>;
 
 // @public (undocumented)
-export const useRemoveProjectMemberMutation: ({ headers, apiToken }?: TenantApiOptions) => (variables: {
+export const useRemoveProjectMemberMutation: (input?: TenantApiOptions) => (variables: {
     readonly projectSlug: string;
     readonly identityId: string;
 }) => Promise<TenantMutationResponse<unknown, TenantApi.RemoveProjectMemberErrorCode>>;
 
 // @public (undocumented)
-export const useResetPasswordMutation: ({ headers, apiToken }?: TenantApiOptions) => (variables: {
+export const useResetPasswordMutation: (input?: TenantApiOptions) => (variables: {
     readonly token: string;
     readonly password: string;
 }) => Promise<TenantMutationResponse<unknown, TenantApi.ResetPasswordErrorCode>>;
 
 // @public (undocumented)
-export const useSignInIDPMutation: ({ headers, apiToken }?: TenantApiOptions) => (variables: SignInIDPMutationVariables) => Promise<TenantMutationResponse<    {
+export const useSignInIDPMutation: (input?: TenantApiOptions) => (variables: SignInIDPMutationVariables) => Promise<TenantMutationResponse<    {
 readonly token: string;
 } & {
 readonly idpResponse?: unknown;
@@ -1623,7 +1623,7 @@ readonly name?: string;
 }, TenantApi.SignInIDPErrorCode>>;
 
 // @public (undocumented)
-export const useSignInMutation: ({ headers, apiToken }?: TenantApiOptions) => (variables: {
+export const useSignInMutation: (input?: TenantApiOptions) => (variables: {
     readonly email: string;
     readonly password: string;
     readonly expiration?: number;
@@ -1641,7 +1641,7 @@ readonly name?: string;
 }, TenantApi.SignInErrorCode>>;
 
 // @public (undocumented)
-export const useSignInPasswordlessMutation: ({ headers, apiToken }?: TenantApiOptions) => (variables: {
+export const useSignInPasswordlessMutation: (input?: TenantApiOptions) => (variables: {
     readonly requestId: string;
     readonly validationType: TenantApi.PasswordlessValidationType;
     readonly token: string;
@@ -1660,19 +1660,19 @@ readonly name?: string;
 }, TenantApi.SignInPasswordlessErrorCode>>;
 
 // @public (undocumented)
-export const useSignOutMutation: ({ headers, apiToken }?: TenantApiOptions) => (variables: {
+export const useSignOutMutation: (input?: TenantApiOptions) => (variables: {
     readonly all?: boolean;
 }) => Promise<TenantMutationResponse<unknown, TenantApi.SignOutErrorCode>>;
 
 // @public (undocumented)
-export const useTenantApi: ({ headers, apiToken }?: TenantApiOptions) => <TData extends object, TVariables extends object>(fetcher: Fetcher<"Query" | "Mutation", TData, TVariables>, options?: {
+export const useTenantApi: (input?: TenantApiOptions) => <TData extends object, TVariables extends object>(fetcher: Fetcher<"Query" | "Mutation", TData, TVariables>, options?: {
     readonly variables?: TVariables;
     readonly headers?: Record<string, string>;
     readonly apiToken?: string | typeof LoginToken;
 }) => Promise<TData>;
 
 // @public (undocumented)
-export const useTenantMutation: <TResult, TError extends string = never, TVariables extends object = {}>(fetcher: MutationFetcher<TenantMutation<TResult, TError>, TVariables>, { headers, apiToken }?: TenantApiOptions) => (variables: TVariables) => Promise<TenantMutationResponse<TResult, TError>>;
+export const useTenantMutation: <TResult, TError extends string = never, TVariables extends object = {}>(fetcher: MutationFetcher<TenantMutation<TResult, TError>, TVariables>, input?: TenantApiOptions) => (variables: TVariables) => Promise<TenantMutationResponse<TResult, TError>>;
 
 // @public (undocumented)
 export const useTenantQueryLoader: <TVariables extends object, Result>(fetcher: (variables: TVariables) => Promise<Result>, variables: TVariables) => [TenantQueryLoaderState<Result>, TenantQueryLoaderMethods];
@@ -1681,7 +1681,7 @@ export const useTenantQueryLoader: <TVariables extends object, Result>(fetcher: 
 export const useUpdateProjectMemberForm: () => UpdateProjectMemberFormContextValue;
 
 // @public (undocumented)
-export const useUpdateProjectMemberMutation: ({ headers, apiToken }?: TenantApiOptions) => (variables: {
+export const useUpdateProjectMemberMutation: (input?: TenantApiOptions) => (variables: {
     readonly projectSlug: string;
     readonly identityId: string;
     readonly memberships: ReadonlyArray<TenantApi.MembershipInput>;

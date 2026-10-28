@@ -14,13 +14,14 @@ export type ProjectContainerResolverEvents = {
 export class ProjectContainerResolver implements EventEmitter<ProjectContainerResolverEvents> {
 	private projectContainers = new ProjectContainerStore()
 	private eventManager = new EventManager<ProjectContainerResolverEvents>()
+	private disposed = false
 
 	public readonly on = this.eventManager.on.bind(this.eventManager)
 
 	constructor(
 		private readonly projectContainerFactory: ProjectContainerFactory,
 		private readonly projectConfigResolver: ProjectConfigResolver,
-		private readonly projectManager: ProjectManager,
+		private readonly projectManager: Pick<ProjectManager, 'getProjectState' | 'getProjectWithSecretsBySlug'>,
 		private readonly tenantDatabase: DatabaseContext,
 		private readonly tenantConfig: TenantConfig,
 	) {}
@@ -30,7 +31,7 @@ export class ProjectContainerResolver implements EventEmitter<ProjectContainerRe
 		if (realSlug) {
 			slug = realSlug
 		}
-		const existing = this.projectContainers.getContainer(slug)
+		const existing = this.disposed ? undefined : this.projectContainers.getContainer(slug)
 		if (existing) {
 			const existingAwaited = await existing
 			const state = await this.projectManager.getProjectState(this.tenantDatabase, slug, existingAwaited.timestamp)
@@ -47,19 +48,19 @@ export class ProjectContainerResolver implements EventEmitter<ProjectContainerRe
 			return undefined
 		}
 		const container = await this.createProjectContainer(project)
-		if (slug !== project.slug) {
+		if (slug !== project.slug && !this.disposed) {
 			this.projectContainers.setAlias(project.slug, slug)
 		}
 		return container
 	}
 
 	public async createProjectContainer(project: ProjectWithSecrets, logger?: Logger): Promise<ProjectContainer> {
-		const projectConfig = this.projectConfigResolver(project.slug, project.config, project.secrets, this.tenantConfig)
-		return (await this.projectContainers.fetchContainer(project.slug, async slug => {
-			const projectContainer = this.projectContainerFactory.createContainer({
-				project: projectConfig,
-			})
-			await projectContainer.projectInitializer.initialize(logger ?? projectContainer.logger)
+		if (this.disposed) {
+			// A request that still holds the disposed group gets a container nobody tracks; its pool closes on idle timeout.
+			return await this.initializeContainer(project, logger)
+		}
+		return (await this.projectContainers.fetchContainer(project.slug, async () => {
+			const projectContainer = await this.initializeContainer(project, logger)
 
 			const cleanups = this.eventManager.fire('create', { container: projectContainer }).map(it => it ?? (() => null))
 			return {
@@ -68,6 +69,23 @@ export class ProjectContainerResolver implements EventEmitter<ProjectContainerRe
 				timestamp: project.updatedAt,
 			}
 		})).container
+	}
+
+	/**
+	 * Destroys all cached containers. Containers requested afterwards are neither cached nor announced to 'create' listeners.
+	 */
+	public async dispose(): Promise<void> {
+		this.disposed = true
+		await Promise.allSettled(this.projectContainers.getSlugs().map(slug => this.destroyContainer(slug)))
+	}
+
+	private async initializeContainer(project: ProjectWithSecrets, logger?: Logger): Promise<ProjectContainer> {
+		const projectConfig = this.projectConfigResolver(project.slug, project.config, project.secrets, this.tenantConfig)
+		const projectContainer = this.projectContainerFactory.createContainer({
+			project: projectConfig,
+		})
+		await projectContainer.projectInitializer.initialize(logger ?? projectContainer.logger)
+		return projectContainer
 	}
 
 	public async destroyContainer(slug: string): Promise<void> {

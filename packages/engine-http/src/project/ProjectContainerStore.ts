@@ -27,6 +27,10 @@ export class ProjectContainerStore {
 		return await this.containers.fetch(slug, factory)
 	}
 
+	public getSlugs(): string[] {
+		return Array.from(this.containers.keys())
+	}
+
 	public removeContainer(slug: string): void {
 		this.containers.delete(slug)
 	}

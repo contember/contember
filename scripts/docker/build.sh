@@ -59,7 +59,8 @@ fi
 
 if [[ -z "$1" || "$1" == "cli" ]]; then
 	REPO="contember/cli"
-	TAGS="-t $REPO:latest"
+	# `latest` belongs to the newest major; a 1.x release must not take it from 2.x.
+	TAGS=""
 	for VERSION in "${ALL_VERSIONS[@]}"; do TAGS="$TAGS -t $REPO:$VERSION"; done
 	docker buildx build --platform linux/amd64,linux/arm64 --push $TAGS -f ./packages/cli/Dockerfile .
 fi

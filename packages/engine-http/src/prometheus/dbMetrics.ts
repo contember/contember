@@ -92,7 +92,7 @@ const createDbPoolMetricsCollector = (registry: prom.Registry) => {
 			const labels = entry.labels
 			const poolInfo = db.getPoolStatus()
 			if (!poolInfo) {
-				return
+				continue
 			}
 			totalCount.set(labels, poolInfo.active + poolInfo.idle + poolInfo.connecting)
 			idleCount.set(labels, poolInfo.idle)

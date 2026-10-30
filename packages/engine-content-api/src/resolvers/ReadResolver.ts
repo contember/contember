@@ -48,7 +48,8 @@ export class ReadResolver {
 	}
 }
 
-// A filter value PostgreSQL cannot parse is a client input error, as it is for mutations (see convertError).
+// A filter value PostgreSQL cannot parse is a client input error, as convertError reports it for mutations.
+// Reads issued inside a mutation (its result nodes, `transaction { query }`) do not pass through here.
 const withInvalidDataAsUserError = async <T>(cb: () => Promise<T>): Promise<T> => {
 	try {
 		return await cb()

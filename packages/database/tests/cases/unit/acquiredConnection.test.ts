@@ -1,6 +1,6 @@
 import { expect, it } from 'bun:test'
 import EventEmitter from 'node:events'
-import { Connection, EventManager, QueryError, RequestMemoryBudget, RequestMemoryBudgetExceededError } from '../../../src/index.js'
+import { Connection, EventManager, InvalidDataError, QueryError, RequestMemoryBudget, RequestMemoryBudgetExceededError } from '../../../src/index.js'
 import { AcquiredConnection } from '../../../src/client/AcquiredConnection.js'
 import { PgClient } from '../../../src/client/PgClient.js'
 import { MutexDeadlockError } from '../../../src/utils/index.js'
@@ -152,3 +152,18 @@ it('refuses a query of an exhausted budget before firing any event', async () =>
 
 	expect(recorded.log).toStrictEqual([])
 })
+
+for (
+	const [code, description] of [['22P02', 'invalid text representation'], ['22007', 'invalid datetime format'], ['22008', 'datetime field overflow']]
+) {
+	it(`translates ${description} (${code}) to InvalidDataError`, async () => {
+		const connection = new AcquiredConnection(
+			createPgClientMock(async () => {
+				throw Object.assign(new Error('invalid input'), { code })
+			}),
+			new EventManager(),
+		)
+
+		await expect(connection.query('SELECT 1')).rejects.toThrow(InvalidDataError)
+	})
+}

@@ -1111,6 +1111,8 @@ export type UseDataViewDateFilterInputProps = {
 // @public (undocumented)
 export interface UseDataViewDateFilterInputResult {
     // (undocumented)
+    onBlur: () => void;
+    // (undocumented)
     onChange: (e: ChangeEvent<HTMLInputElement>) => void;
     // (undocumented)
     value: string;

@@ -1,5 +1,6 @@
 import { Input } from '@contember/client'
 import { createFieldFilterHandler } from './createFilterHandler.js'
+import { isCompleteDate } from '../internal/helpers/isCompleteDate.js'
 
 export type DateRangeFilterArtifacts = {
 	start?: string
@@ -36,9 +37,12 @@ export const createDateFilter = createFieldFilterHandler<DateRangeFilterArtifact
 		const inclusion: Input.Condition[] = []
 		const exclusion: Input.Condition[] = []
 
-		if (filter.start || filter.end) {
-			const normalizedStart = filter.start ? new Date(filter.start + 'T00:00:00') : undefined
-			const normalizedEnd = filter.end ? new Date(filter.end + 'T00:00:00') : undefined
+		// a bound from stored state or a predefined range may still be incomplete
+		const start = filter.start && isCompleteDate(filter.start) ? filter.start : undefined
+		const end = filter.end && isCompleteDate(filter.end) ? filter.end : undefined
+		if (start || end) {
+			const normalizedStart = start ? new Date(start + 'T00:00:00') : undefined
+			const normalizedEnd = end ? new Date(end + 'T00:00:00') : undefined
 			normalizedEnd?.setDate(normalizedEnd.getDate() + 1)
 
 			inclusion.push({

@@ -42,14 +42,15 @@ export interface RemoveCheckConstraintModificationData {
 	checkName: string
 }
 
-// Physical columns of the entity's table, keyed by the field that owns them.
+// Physical columns of the entity's table, keyed by the field that owns them. The key holds every property whose
+// change makes RemoveChangedFieldDiffer drop and re-add the column (field kind, relation target), so keep them in sync.
 const getTableColumns = (entity: Model.Entity): Set<string> =>
 	new Set(
 		Object.values(entity.fields).flatMap(field => {
 			if (isColumn(field)) {
 				return [`column:${field.name}:${field.columnName}`]
 			}
-			return 'joiningColumn' in field ? [`relation:${field.name}:${field.joiningColumn.columnName}`] : []
+			return 'joiningColumn' in field ? [`relation:${field.name}:${field.target}:${field.joiningColumn.columnName}`] : []
 		}),
 	)
 

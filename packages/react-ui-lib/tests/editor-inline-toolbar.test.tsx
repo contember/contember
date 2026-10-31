@@ -27,6 +27,7 @@ const renderToolbar = () => {
 	return { editor, toolbar }
 }
 
+// happy-dom has no layout or scrolling, so the focus/scroll effect is asserted through the style that prevents it.
 test('parked toolbar is hidden so its controls cannot take focus', () => {
 	const { toolbar } = renderToolbar()
 

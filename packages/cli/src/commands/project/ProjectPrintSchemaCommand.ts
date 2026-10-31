@@ -59,6 +59,7 @@ export class ProjectPrintSchemaCommand extends Command<Args, Options> {
 			acl: input.getOption('omit-acl') ? emptySchema.acl : schema.acl,
 			validation: input.getOption('omit-validation') ? emptySchema.validation : schema.validation,
 			actions: input.getOption('omit-actions') ? emptySchema.actions : schema.actions,
+			retention: schema.retention,
 			settings: input.getOption('omit-settings') ? emptySchema.settings : schema.settings,
 		}
 

@@ -28,9 +28,10 @@ export class DefinitionCodeGenerator {
 	public generateEntity({ entity, schema }: { entity: Model.Entity; schema: Schema }): string {
 		const uniqueConstraints = Object.values(entity.unique).map(constraint => this.generateUniqueConstraint({ entity, constraint }))
 		const indexes = Object.values(entity.indexes).map(index => this.generateIndex({ entity, index }))
+		const checks = (entity.checks ?? []).map(check => `@c.Check(${printJsValue({ name: check.name, expression: check.expression })})`)
 		const views = this.generateView({ entity })
 
-		const decorators = [...uniqueConstraints, ...indexes, views].filter(it => !!it).map(it => `${it}\n`).join('')
+		const decorators = [...uniqueConstraints, ...indexes, ...checks, views].filter(it => !!it).map(it => `${it}\n`).join('')
 		const acl = this.aclGenerator.generateEntityAcl({ entity, schema })
 
 		return `\n${decorators}${acl}export class ${this.formatIdentifier(entity.name)} {

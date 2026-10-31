@@ -5,6 +5,9 @@ import { collectUnsupportedJsonSchemaKeywords, SUPPORTED_JSON_SCHEMA_KEYWORDS } 
 
 const IDENTIFIER_PATTERN = /^[_a-zA-Z][_a-zA-Z0-9]*$/
 // An index operator class is an identifier, optionally schema-qualified (e.g. "public.gin_trgm_ops").
+// lowercase ASCII so the quoted DDL name equals the unquoted spelling, and length equals byte length
+const CHECK_NAME_PATTERN = /^[a-z_][a-z0-9_]*$/
+const POSTGRES_IDENTIFIER_MAX_BYTES = 63
 const INDEX_OPCLASS_PATTERN = /^[_a-zA-Z][_a-zA-Z0-9$]*(\.[_a-zA-Z][_a-zA-Z0-9$]*)?$/
 const RESERVED_WORDS = ['and', 'or', 'not']
 
@@ -61,7 +64,39 @@ export class ModelValidator {
 			entity,
 			errors.for('indexes'),
 		)
+		this.validateCheckConstraints(
+			entity,
+			errors.for('checks'),
+		)
 		this.validateColumnNamesCollision(entity, errors)
+	}
+
+	private validateCheckConstraints(entity: Model.Entity, errors: ErrorBuilder): void {
+		const checks = entity.checks ?? []
+		if (checks.length > 0 && entity.view) {
+			errors.add('MODEL_INVALID_CHECK', 'Check constraints are not supported on views.')
+		}
+		const seenNames = new Set<string>()
+		for (const check of checks) {
+			if (!CHECK_NAME_PATTERN.test(check.name)) {
+				errors.add(
+					'MODEL_INVALID_CHECK',
+					`Invalid check constraint name "${check.name}": expected lowercase letters, digits and underscores, not starting with a digit.`,
+				)
+			} else if (check.name.length > POSTGRES_IDENTIFIER_MAX_BYTES) {
+				errors.add('MODEL_INVALID_CHECK', `Check constraint name "${check.name}" is longer than ${POSTGRES_IDENTIFIER_MAX_BYTES} bytes.`)
+			}
+			if (seenNames.has(check.name)) {
+				errors.add('MODEL_INVALID_CHECK', `Check constraint name "${check.name}" is used more than once on this entity.`)
+			}
+			seenNames.add(check.name)
+			// The expression is raw SQL embedded verbatim into ALTER TABLE; same footgun checks as an index `where`.
+			if (check.expression.trim() === '') {
+				errors.add('MODEL_INVALID_CHECK', `Check constraint "${check.name}" expression must not be empty.`)
+			} else if (check.expression.includes(';')) {
+				errors.add('MODEL_INVALID_CHECK', `Check constraint "${check.name}" expression must not contain ";".`)
+			}
+		}
 	}
 
 	private validateIndexes(entity: Model.Entity, errors: ErrorBuilder): void {

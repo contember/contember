@@ -51,7 +51,7 @@ This is invisible to a mapper unit test; cover a new raw jsonb write with an e2e
 
 ## Error Translation
 
-PostgreSQL error codes are mapped to typed errors: `NotNullViolationError`, `ForeignKeyViolationError`, `UniqueViolationError`, `SerializationFailureError`, `InvalidDataError`, `TransactionAbortedError`
+PostgreSQL error codes are mapped to typed errors: `NotNullViolationError`, `ForeignKeyViolationError`, `UniqueViolationError`, `CheckViolationError` (`23514`, also raised by DOMAIN checks such as enums), `SerializationFailureError`, `InvalidDataError`, `TransactionAbortedError`
 
 A deadlock (`40P01`) maps to `SerializationFailureError` like a serialization failure (`40001`): both abort the transaction, and `retryTransaction` retries only that class.
 

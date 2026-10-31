@@ -8,6 +8,7 @@ import { DefaultNamingConventions } from '@contember/schema-utils'
 import { StrictDefinitionValidator, StrictOptions } from '../../strict.js'
 
 export * from './fieldDefinitions/index.js'
+export * from './CheckDefinition.js'
 export * from './EventLogDefinition.js'
 export * from './IndexDefinition.js'
 export * from './OrderByDefinition.js'

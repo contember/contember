@@ -1098,6 +1098,9 @@
         "slate": "catalog:",
         "slate-react": "catalog:",
       },
+      "devDependencies": {
+        "@testing-library/react": "catalog:",
+      },
     },
     "packages/react-ui-lib-base": {
       "name": "@contember/react-ui-lib-base",

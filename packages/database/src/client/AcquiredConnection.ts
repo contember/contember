@@ -109,6 +109,7 @@ export class AcquiredConnection implements Connection.AcquiredConnectionLike {
 				case ClientErrorCodes.T_R_DEADLOCK_DETECTED:
 					throw new SerializationFailureError(sql, parameters, error)
 				case ClientErrorCodes.INVALID_TEXT_REPRESENTATION:
+				case ClientErrorCodes.INVALID_DATETIME_FORMAT:
 				case ClientErrorCodes.DATETIME_FIELD_OVERFLOW:
 					throw new InvalidDataError(sql, parameters, error)
 				case ClientErrorCodes.IN_FAILED_SQL_TRANSACTION:

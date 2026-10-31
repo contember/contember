@@ -1,0 +1,58 @@
+import { MigrationBuilder } from '@contember/database-migrations'
+import { Schema } from '@contember/schema'
+import deepEqual from 'fast-deep-equal'
+import { SchemaUpdater, updateEntity, updateModel } from '../utils/schemaUpdateUtils.js'
+import { createModificationType, Differ, ModificationHandler, ModificationHandlerCreateSqlOptions } from '../ModificationHandler.js'
+import { wrapIdentifier } from '../../utils/dbHelpers.js'
+
+export class RemoveCheckConstraintModificationHandler implements ModificationHandler<RemoveCheckConstraintModificationData> {
+	constructor(private readonly data: RemoveCheckConstraintModificationData, private readonly schema: Schema) {}
+
+	public createSql(builder: MigrationBuilder, { invalidateDatabaseMetadata }: ModificationHandlerCreateSqlOptions): void {
+		const entity = this.schema.model.entities[this.data.entityName]
+		builder.sql(`ALTER TABLE ${wrapIdentifier(entity.tableName)} DROP CONSTRAINT ${wrapIdentifier(this.data.checkName)}`)
+		invalidateDatabaseMetadata()
+	}
+
+	public getSchemaUpdater(): SchemaUpdater {
+		return updateModel(
+			updateEntity(this.data.entityName, ({ entity }) => {
+				const { checks, ...rest } = entity
+				const remaining = (checks ?? []).filter(it => it.name !== this.data.checkName)
+				// an entity without checks carries no `checks` key, same as one built by the schema definition
+				return remaining.length > 0 ? { ...rest, checks: remaining } : rest
+			}),
+		)
+	}
+
+	describe() {
+		return { message: `Remove check constraint ${this.data.checkName} on entity ${this.data.entityName}` }
+	}
+}
+
+export const removeCheckConstraintModification = createModificationType({
+	id: 'removeCheckConstraint',
+	handler: RemoveCheckConstraintModificationHandler,
+})
+
+export interface RemoveCheckConstraintModificationData {
+	entityName: string
+	checkName: string
+}
+
+export class RemoveCheckConstraintDiffer implements Differ {
+	createDiff(originalSchema: Schema, updatedSchema: Schema) {
+		return Object.values(originalSchema.model.entities).flatMap(entity => {
+			const updatedEntity = updatedSchema.model.entities[entity.name]
+			// a removed entity drops its table, and the constraints with it
+			if (!updatedEntity) {
+				return []
+			}
+			const updatedChecks = updatedEntity.checks ?? []
+			// a check whose expression changed is removed here and recreated by CreateCheckConstraintDiffer
+			return (entity.checks ?? [])
+				.filter(check => !updatedChecks.some(it => deepEqual(it, check)))
+				.map(check => removeCheckConstraintModification.createModification({ entityName: entity.name, checkName: check.name }))
+		})
+	}
+}

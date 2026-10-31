@@ -379,3 +379,25 @@ test('rejects fields named after the _old/_new state markers', () => {
 	expect(errors.map(it => it.message)).toContain('_old is reserved word')
 	expect(errors.map(it => it.message)).toContain('_new is reserved word')
 })
+
+test('allows _old/_new as enum values', () => {
+	const model: Model.Schema = {
+		enums: { state: ['_old', '_new'] },
+		entities: {
+			Foo: {
+				fields: {
+					id: { columnName: 'id', name: 'id', nullable: false, type: Model.ColumnType.Uuid, columnType: 'uuid' },
+					state: { columnName: 'state', name: 'state', nullable: true, type: Model.ColumnType.Enum, columnType: 'state' },
+				},
+				name: 'Foo',
+				primary: 'id',
+				primaryColumn: 'id',
+				tableName: 'foo',
+				unique: [],
+				eventLog: { enabled: true },
+				indexes: [],
+			},
+		},
+	}
+	expect(new ModelValidator(model).validate()).toEqual([])
+})

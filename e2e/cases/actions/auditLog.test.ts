@@ -75,6 +75,27 @@ namespace DecoratorAuditModel {
 	}
 }
 
+namespace AsyncRootRelationAuditModel {
+	@actions.auditLog({ watch: `title`, entity: () => ArticleAuditLog, synchronous: false, rootRelation: 'article' })
+	export class Article {
+		title = def.stringColumn().unique()
+	}
+
+	export class ArticleAuditLog extends actions.AuditLogEntity {
+		article = def.manyHasOne(Article).setNullOnDelete()
+	}
+}
+
+const listArticleAuditLogQuery = gql`
+	query {
+		listArticleAuditLog(orderBy: [{ eventNo: asc }]) {
+			rootId
+			data
+			article { id }
+		}
+	}
+`
+
 const listAuditLogQuery = gql`
 	query {
 		listAuditLog(orderBy: [{ createdAt: asc }]) {
@@ -232,4 +253,44 @@ test('audit log: @AuditLog writes to an explicit sink entity end-to-end', async 
 		mutation { deleteArticleAuditLog(by: { id: "x" }) { ok } }
 	`).expect(400)
 	expect(destroy.body.errors[0].message).toContain('deleteArticleAuditLog')
+	// Deleting the root records a delete row; the root relation is left null because the
+	// root row is already gone, and rootId keeps the identity.
+	const deleted = await tester(gql`
+		mutation { deleteArticle(by: { title: "Hello world" }) { ok errorMessage } }
+	`).expect(200)
+	expect(deleted.body.data.deleteArticle).toStrictEqual({ ok: true, errorMessage: null })
+
+	const afterDelete = (await tester(listArticleAuditLogQuery).expect(200)).body.data.listArticleAuditLog
+	expect(afterDelete).toBeArrayOfSize(2)
+	expect(afterDelete[0].article).toBeNull()
+	expect(afterDelete[1].article).toBeNull()
+	expect(afterDelete[1].rootId).toBe(articleId)
+	expect(afterDelete[1].data.events[0].operation).toBe('delete')
+})
+
+test('audit log: asynchronous rootRelation rows survive a root deleted before dispatch', async () => {
+	const schema = createSchema(AsyncRootRelationAuditModel)
+	const tester = await createTester(schema)
+
+	const res = await tester(gql`
+		mutation { createArticle(data: { title: "Hello world" }) { ok node { id } } }
+	`).expect(200)
+	const articleId = res.body.data.createArticle.node.id
+	const deleted = await tester(gql`
+		mutation { deleteArticle(by: { title: "Hello world" }) { ok } }
+	`).expect(200)
+	expect(deleted.body.data.deleteArticle.ok).toBe(true)
+
+	let rows: { readonly rootId: string; readonly article: null | { readonly id: string }; readonly data: AuditLogListRow['data'] }[] = []
+	for (let i = 0; i < 30; i++) {
+		await tester(gql`mutation { processBatch { ok } }`, { path: '/actions/' + tester.projectSlug }).expect(200)
+		rows = (await tester(listArticleAuditLogQuery).expect(200)).body.data.listArticleAuditLog
+		if (rows.length >= 2) {
+			break
+		}
+		await new Promise(resolve => setTimeout(resolve, 100))
+	}
+
+	expect(rows.map(it => it.data.events[0].operation)).toStrictEqual(['create', 'delete'])
+	expect(rows.every(it => it.rootId === articleId && it.article === null)).toBe(true)
 })

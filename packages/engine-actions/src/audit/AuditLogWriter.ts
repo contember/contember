@@ -1,4 +1,4 @@
-import { Client, ConflictActionType, InsertBuilder, QueryBuilder } from '@contember/database'
+import { Client, ConflictActionType, InsertBuilder, Literal, QueryBuilder, wrapIdentifier } from '@contember/database'
 import { ActionsPayload, JSONValue, Schema } from '@contember/schema'
 import { acceptFieldVisitor, isColumn, Providers } from '@contember/schema-utils'
 
@@ -112,8 +112,12 @@ export class AuditLogWriter {
 			}
 			acceptFieldVisitor(schema.model, entity, options.rootRelation, {
 				visitColumn: invalidRootRelation,
-				visitManyHasOne: ({ relation }) => {
-					values[relation.joiningColumn.columnName] = row.rootId
+				visitManyHasOne: ({ relation, targetEntity }) => {
+					// The root row may already be gone (a delete event, or a later delete before
+					// async dispatch); referencing it would violate the immediate foreign key.
+					const table = `${wrapIdentifier(client.schema)}.${wrapIdentifier(targetEntity.tableName)}`
+					const primary = wrapIdentifier(targetEntity.primaryColumn)
+					values[relation.joiningColumn.columnName] = new Literal(`(SELECT ${primary} FROM ${table} WHERE ${primary} = ?)`, [row.rootId])
 				},
 				visitOneHasOneOwning: invalidRootRelation,
 				visitOneHasMany: invalidRootRelation,

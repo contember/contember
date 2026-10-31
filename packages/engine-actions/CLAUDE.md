@@ -65,7 +65,8 @@ external-worker → content-mutation round-trip that projects used to hand-build
   fields/indexes or define a compatible entity by hand for custom ACL/indexes.
 - **Append-only by construction, not by ACL:** `c.AuditLogEntity` applies `@Immutable()`
   (Content API generates no create/update/delete mutations — enforced in content-api
-  `EntityInputProvider`/`MutationProvider`, independent of ACL, so not even built-in
+  `EntityInputProvider`/`MutationProvider`, the relation-operation visitors and the `Mapper`
+  write guards, independent of ACL, so not even built-in
   `admin`/`content_admin` can forge/tamper/destroy) and `@DisableEventLog()` (the audit
   rows *are* the log). Retention is DB-level only (no delete mutation). A hand-written
   sink should add `@c.Immutable()` itself.
@@ -83,6 +84,10 @@ external-worker → content-mutation round-trip that projects used to hand-build
   `createdAt`, `transactionId`, `identityId`, `rootEntity`, `rootId`, `trigger`,
   `data` (full payload), `nodes` (deduped touched-node list); missing ones are skipped.
   JSON columns are `JSON.stringify`-ed (pg serializes JS arrays as array literals, not jsonb).
+- `rootRelation`'s foreign key is filled with `(SELECT id FROM <root> WHERE id = rootId)`, not
+  `rootId` itself: the root row is already gone for a delete event (payloads are persisted on
+  `BeforeCommitEvent`) and FKs are checked immediately, so a plain value fails the delete.
+  The validator therefore requires the relation nullable and not `cascade`.
 - **Timing is configurable** via `synchronous`:
   - `true` → written in the audited change's own transaction (`TriggerPayloadPersister`
     short-circuits before enqueue). Atomic, no queue, no dispatch.

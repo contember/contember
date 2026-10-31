@@ -220,6 +220,12 @@ const uniqueIndex = Typesafe.intersection(
 const uniqueConstraintCheck: Typesafe.Equals<Model.UniqueConstraint, ReturnType<typeof uniqueConstraint>> = true
 const uniqueIndexCheck: Typesafe.Equals<Model.UniqueIndex, ReturnType<typeof uniqueIndex>> = true
 
+const checkConstraintSchema = Typesafe.object({
+	name: Typesafe.string,
+	expression: Typesafe.string,
+})
+const checkConstraintCheck: Typesafe.Equals<Model.CheckConstraint, ReturnType<typeof checkConstraintSchema>> = true
+
 const entitySchema = Typesafe.intersection(
 	Typesafe.object({
 		name: Typesafe.string,
@@ -235,6 +241,7 @@ const entitySchema = Typesafe.intersection(
 		eventLog: eventLogSchema,
 	}),
 	Typesafe.partial({
+		checks: Typesafe.array(checkConstraintSchema),
 		view: viewSchema,
 		orderBy: orderBySchema,
 	}),

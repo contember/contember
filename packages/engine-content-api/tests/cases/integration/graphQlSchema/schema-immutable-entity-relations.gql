@@ -17,8 +17,14 @@ type Article {
   title: String
   auditLogs(filter: AuditLogWhere, orderBy: [AuditLogOrderBy!], offset: Int, limit: Int): [AuditLog!]!
   pinnedLog(filter: AuditLogWhere): AuditLog
+  featuredLog(filter: AuditLogWhere): AuditLog
+  relatedLogs(filter: AuditLogWhere, orderBy: [AuditLogOrderBy!], offset: Int, limit: Int): [AuditLog!]!
+  taggingLogs(filter: AuditLogWhere, orderBy: [AuditLogOrderBy!], offset: Int, limit: Int): [AuditLog!]!
+  auditLogsByFeaturedArticle(by: ArticleAuditLogsByFeaturedArticleUniqueWhere!, filter: AuditLogWhere): AuditLog
   auditLogsBy(by: AuditLogsOfArticleByUniqueWhere!, filter: AuditLogWhere): AuditLog
   paginateAuditLogs(filter: AuditLogWhere, orderBy: [AuditLogOrderBy!], skip: Int, first: Int): AuditLogConnection!
+  paginateRelatedLogs(filter: AuditLogWhere, orderBy: [AuditLogOrderBy!], skip: Int, first: Int): AuditLogConnection!
+  paginateTaggingLogs(filter: AuditLogWhere, orderBy: [AuditLogOrderBy!], skip: Int, first: Int): AuditLogConnection!
 }
 
 type ArticleMeta {
@@ -26,6 +32,9 @@ type ArticleMeta {
   title: FieldMeta
   auditLogs: FieldMeta
   pinnedLog: FieldMeta
+  featuredLog: FieldMeta
+  relatedLogs: FieldMeta
+  taggingLogs: FieldMeta
 }
 
 type FieldMeta {
@@ -40,12 +49,20 @@ type AuditLog {
   id: UUID!
   message: String
   article(filter: ArticleWhere): Article
+  featuredArticle(filter: ArticleWhere): Article
+  relatedArticles(filter: ArticleWhere, orderBy: [ArticleOrderBy!], offset: Int, limit: Int): [Article!]!
+  taggedArticles(filter: ArticleWhere, orderBy: [ArticleOrderBy!], offset: Int, limit: Int): [Article!]!
+  paginateRelatedArticles(filter: ArticleWhere, orderBy: [ArticleOrderBy!], skip: Int, first: Int): ArticleConnection!
+  paginateTaggedArticles(filter: ArticleWhere, orderBy: [ArticleOrderBy!], skip: Int, first: Int): ArticleConnection!
 }
 
 type AuditLogMeta {
   id: FieldMeta
   message: FieldMeta
   article: FieldMeta
+  featuredArticle: FieldMeta
+  relatedArticles: FieldMeta
+  taggedArticles: FieldMeta
 }
 
 input ArticleWhere {
@@ -53,6 +70,9 @@ input ArticleWhere {
   title: StringCondition
   auditLogs: AuditLogWhere
   pinnedLog: AuditLogWhere
+  featuredLog: AuditLogWhere
+  relatedLogs: AuditLogWhere
+  taggingLogs: AuditLogWhere
   and: [ArticleWhere]
   or: [ArticleWhere]
   not: ArticleWhere
@@ -102,17 +122,21 @@ input AuditLogWhere {
   id: UUIDCondition
   message: StringCondition
   article: ArticleWhere
+  featuredArticle: ArticleWhere
+  relatedArticles: ArticleWhere
+  taggedArticles: ArticleWhere
   and: [AuditLogWhere]
   or: [AuditLogWhere]
   not: AuditLogWhere
 }
 
-input AuditLogOrderBy {
+input ArticleOrderBy {
   _random: Boolean
   _randomSeeded: Int
   id: OrderDirection
-  message: OrderDirection
-  article: ArticleOrderBy
+  title: OrderDirection
+  pinnedLog: AuditLogOrderBy
+  featuredLog: AuditLogOrderBy
 }
 
 enum OrderDirection {
@@ -122,38 +146,13 @@ enum OrderDirection {
   descNullsLast
 }
 
-input ArticleOrderBy {
+input AuditLogOrderBy {
   _random: Boolean
   _randomSeeded: Int
   id: OrderDirection
-  title: OrderDirection
-  pinnedLog: AuditLogOrderBy
-}
-
-input AuditLogsOfArticleByUniqueWhere {
-  id: UUID
-}
-
-type AuditLogConnection {
-  pageInfo: PageInfo!
-  edges: [AuditLogEdge!]!
-}
-
-type PageInfo {
-  totalCount: Int!
-}
-
-type AuditLogEdge {
-  node: AuditLog!
-}
-
-input ArticleUniqueWhere {
-  id: UUID
-  auditLogs: AuditLogUniqueWhere
-}
-
-input AuditLogUniqueWhere {
-  id: UUID
+  message: OrderDirection
+  article: ArticleOrderBy
+  featuredArticle: ArticleOrderBy
 }
 
 type ArticleConnection {
@@ -161,8 +160,41 @@ type ArticleConnection {
   edges: [ArticleEdge!]!
 }
 
+type PageInfo {
+  totalCount: Int!
+}
+
 type ArticleEdge {
   node: Article!
+}
+
+input ArticleAuditLogsByFeaturedArticleUniqueWhere {
+  featuredArticle: ArticleUniqueWhere
+}
+
+input ArticleUniqueWhere {
+  id: UUID
+  auditLogs: AuditLogUniqueWhere
+  featuredLog: AuditLogUniqueWhere
+}
+
+input AuditLogUniqueWhere {
+  id: UUID
+  featuredArticle: ArticleUniqueWhere
+}
+
+input AuditLogsOfArticleByUniqueWhere {
+  id: UUID
+  featuredArticle: ArticleUniqueWhere
+}
+
+type AuditLogConnection {
+  pageInfo: PageInfo!
+  edges: [AuditLogEdge!]!
+}
+
+type AuditLogEdge {
+  node: AuditLog!
 }
 
 type _ValidationResult {
@@ -193,6 +225,7 @@ type _ValidationMessage {
 input ArticleCreateInput {
   title: String
   pinnedLog: ArticleCreatePinnedLogEntityRelationInput
+  relatedLogs: [ArticleCreateRelatedLogsEntityRelationInput!]
   _dummy_field_: Boolean
 }
 
@@ -200,15 +233,27 @@ input ArticleCreatePinnedLogEntityRelationInput {
   connect: AuditLogUniqueWhere
 }
 
+input ArticleCreateRelatedLogsEntityRelationInput {
+  connect: AuditLogUniqueWhere
+  alias: String
+}
+
 input ArticleUpdateInput {
   title: String
   pinnedLog: ArticleUpdatePinnedLogEntityRelationInput
+  relatedLogs: [ArticleUpdateRelatedLogsEntityRelationInput!]
   _dummy_field_: Boolean
 }
 
 input ArticleUpdatePinnedLogEntityRelationInput {
   connect: AuditLogUniqueWhere
   disconnect: Boolean
+}
+
+input ArticleUpdateRelatedLogsEntityRelationInput {
+  connect: AuditLogUniqueWhere
+  disconnect: AuditLogUniqueWhere
+  alias: String
 }
 
 type QueryTransaction {

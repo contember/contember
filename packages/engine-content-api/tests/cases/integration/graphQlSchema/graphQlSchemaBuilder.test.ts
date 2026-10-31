@@ -572,12 +572,18 @@ namespace ImmutableEntityRelations {
 		title = def.stringColumn()
 		auditLogs = def.oneHasMany(AuditLog, 'article')
 		pinnedLog = def.manyHasOne(AuditLog)
+		featuredLog = def.oneHasOneInverse(AuditLog, 'featuredArticle')
+		relatedLogs = def.manyHasMany(AuditLog, 'relatedArticles')
+		taggingLogs = def.manyHasManyInverse(AuditLog, 'taggedArticles')
 	}
 
 	@c.Immutable()
 	export class AuditLog {
 		message = def.stringColumn()
 		article = def.manyHasOne(Article, 'auditLogs').setNullOnDelete()
+		featuredArticle = def.oneHasOne(Article, 'featuredLog').setNullOnDelete()
+		relatedArticles = def.manyHasManyInverse(Article, 'relatedLogs')
+		taggedArticles = def.manyHasMany(Article, 'taggingLogs')
 	}
 }
 

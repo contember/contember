@@ -119,6 +119,29 @@ test('index DSL with where and include', () => {
 	]))
 })
 
+namespace CheckModel {
+	@c.Check({ name: 'price_non_negative', expression: 'price >= 0' })
+	@c.Check({ name: 'discount_below_price', expression: 'discount <= price' })
+	export class Product {
+		price = c.intColumn()
+		discount = c.intColumn()
+	}
+
+	export class Category {
+		name = c.stringColumn()
+	}
+}
+
+test('check DSL', () => {
+	const schema = createSchema(CheckModel)
+	expect(schema.model.entities.Product.checks).toEqual(expect.arrayContaining([
+		{ name: 'price_non_negative', expression: 'price >= 0' },
+		{ name: 'discount_below_price', expression: 'discount <= price' },
+	]))
+	expect(schema.model.entities.Product.checks).toHaveLength(2)
+	expect(schema.model.entities.Category).not.toHaveProperty('checks')
+})
+
 namespace IndexColumnOptionsModel {
 	@c.Index({ fields: ['title', { field: 'rank', order: 'desc', nulls: 'last' }] })
 	@c.Index({ fields: [{ field: 'title', opClass: 'text_pattern_ops' }] })

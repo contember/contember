@@ -7,8 +7,8 @@ export type SupervisorOptions = {
 	minBackoff?: number
 	maxBackoff?: number
 	exponentiationBase?: number
-	/** A restarted run must stay up this long before the backoff resets; a run that crashes sooner counts as a failed restart. */
-	stableAfterMs?: number
+	/** Uptime (ms, default 60 000) after which a run counts as stable and the backoff resets; a run that crashes sooner counts as a failed restart. */
+	stableAfter?: number
 }
 
 export class Supervisor implements Runnable {
@@ -26,7 +26,7 @@ export class Supervisor implements Runnable {
 		let wasHealthy = false
 		let startedAt: number | undefined
 		const endRun = () => {
-			if (startedAt !== undefined && Date.now() - startedAt >= (this.options.stableAfterMs ?? 60_000)) {
+			if (startedAt !== undefined && Date.now() - startedAt >= (this.options.stableAfter ?? 60_000)) {
 				restartCount = 0
 			}
 			startedAt = undefined
@@ -34,18 +34,28 @@ export class Supervisor implements Runnable {
 
 		await new Promise<void>(async (resolve, reject) => {
 			while (!abortController.signal.aborted) {
+				let runEnded = false
 				try {
 					await new Promise<void>(async (resolveRunning, rejectRunning) => {
 						try {
 							innerRunning = await this.runnable.run({
-								onClose: resolveRunning,
-								onError: rejectRunning,
+								onClose: () => {
+									runEnded = true
+									resolveRunning()
+								},
+								onError: e => {
+									runEnded = true
+									rejectRunning(e)
+								},
 								logger: logger.child({ runningId: Math.random().toString().substring(2) }),
 							})
-							if (!wasHealthy) {
-								restartCount = 0
+							// a run that ended before run() returned was already handled as a crash; recording it as started would count the backoff as uptime
+							if (!runEnded) {
+								if (!wasHealthy) {
+									restartCount = 0
+								}
+								startedAt = Date.now()
 							}
-							startedAt = Date.now()
 							resolve()
 							wasHealthy = true
 						} catch (e) {

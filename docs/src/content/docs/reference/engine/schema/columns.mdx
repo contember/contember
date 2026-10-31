@@ -324,6 +324,37 @@ CREATE EXTENSION IF NOT EXISTS pg_trgm;
 Qualify the operator class with the schema the extension lives in (`public.gin_trgm_ops`). Migrations run with `search_path` set to the stage schema only, so an unqualified extension operator class would not be found — built-in classes (in `pg_catalog`, e.g. `text_pattern_ops`) resolve without a qualifier.
 :::
 
+### Check constraints
+
+:::note[Available since 2.2]
+:::
+
+Use `@c.Check` to add a PostgreSQL [`CHECK` constraint](https://www.postgresql.org/docs/current/ddl-constraints.html#DDL-CONSTRAINTS-CHECK-CONSTRAINTS) to an entity. The database then rejects every insert or update that violates it, including writes that do not go through the Content API:
+
+```typescript
+@c.Check({ name: 'price_non_negative', expression: 'price >= 0' })
+@c.Check({ name: 'discount_below_price', expression: 'discount <= price' })
+export class Product {
+	price = c.intColumn().notNull()
+	discount = c.intColumn().notNull()
+}
+```
+
+This generates `ALTER TABLE "product" ADD CONSTRAINT "price_non_negative" CHECK (price >= 0)`.
+
+- `name`: required, unique within the entity. It identifies the constraint in migrations and is used as the database constraint name, so it must consist of lowercase letters, digits and underscores (at most 63 bytes).
+- `expression`: SQL boolean expression. Like a partial index `where`, it references **database column names** (e.g. `published_at`), not schema field names.
+
+A mutation that violates a check returns `ok: false` with a `CheckConstraintViolation` error naming the constraint and the entity.
+
+Migrations identify a check by its `name`: a new name creates the constraint, a removed name drops it, and a changed expression drops and recreates it. Adding a check to an existing table validates all existing rows, so the migration fails if any row violates it. Check constraints are not supported on views.
+
+:::caution[`expression` is raw SQL]
+The expression is written verbatim into the generated `ALTER TABLE` statement (wrapped in parentheses). It is a developer-authored predicate, like the body of a [`@c.View`](/reference/engine/schema/views), and must never contain end-user input. It is validated only for being non-empty and free of a `;` statement terminator; an otherwise invalid expression fails when the migration runs.
+
+Because Contember does not parse the expression, it does not follow column changes. When you rename a column, PostgreSQL updates the stored constraint, but the expression in your schema keeps the old name until you edit it. When you remove a column, PostgreSQL drops every check that references it, so remove or update such checks in the same change.
+:::
+
 ### Changing column name
 
 To change the name of a column in a database, you can use the `columnName` method on the column definition. By default, Contember will use the "snake case" version of the property name as the column name in the database.

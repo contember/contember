@@ -399,7 +399,7 @@ test('invalid check constraints', () => {
 			code: 'MODEL_INVALID_CHECK',
 			path,
 			message:
-				'Check constraint name "product_price_key" must not end with _pkey, _key, _fkey or _excl, which PostgreSQL uses for generated constraint names.',
+				'Check constraint name "product_price_key" must not end with _pkey, _key, _fkey, _excl or _not_null, which PostgreSQL uses for generated constraint names.',
 		},
 	]))
 })

@@ -276,8 +276,9 @@ is allowed, but then a root that has any audit row cannot be deleted at all.
 The `setNull` runs under the deleting role's ACL, so a role that deletes the root also needs
 `update` on the relation field of the sink, e.g.
 `@c.Allow(editor, { update: ['article'] })`. That grant cannot be used for anything else: the
-sink has no update mutation, and nested relation inputs never write its rows. Because a many-has-one targets a single entity type,
-`rootRelation` suits a **dedicated** sink; a [shared sink](#sharing-a-sink-across-entities)
+sink has no update mutation, and nested relation inputs never write its rows.
+
+Because a many-has-one targets a single entity type, `rootRelation` suits a **dedicated** sink; a [shared sink](#sharing-a-sink-across-entities)
 mixing several root entities should rely on `rootEntity` / `rootId`.
 :::
 
@@ -384,9 +385,11 @@ A sink extending `c.AuditLogEntity` is marked **immutable**: the Content API gen
 [`@c.View`](/reference/engine/schema/entities) entity is non-mutable, but backed by a real
 table. Nested relation inputs of other entities cannot write it either: there is no nested
 `create`, `update`, `upsert` or `delete` of its rows, and no `connect` / `disconnect` on a
-relation the sink owns. This holds regardless of ACL — not even the built-in `admin` /
-`content_admin` roles can write to the sink through the API. Rows are written **only** by the engine's audit-log
-target, so the trail cannot be forged, edited or deleted by any application role.
+relation the sink owns. The schema also rejects the two ways a delete elsewhere could remove its
+rows: a `cascade` relation owned by the sink, and orphan removal targeting it. This holds
+regardless of ACL — not even the built-in `admin` / `content_admin` roles can write to the sink
+through the API. Rows are written **only** by the engine's audit-log target, so the trail cannot
+be forged, edited or deleted by any application role.
 
 That is what makes the table genuinely append-only, rather than "append-only as long as
 the ACL is set up correctly". The trade-off: with no `delete` mutation either, you cannot
@@ -417,8 +420,9 @@ query {
 
 Read access follows regular [ACL](/reference/engine/schema/acl). The sink is
 [immutable](#immutability), so the Content API exposes no create/update/delete for it —
-there is nothing to grant beyond `read` (and, with a [`rootRelation`](#linking-to-the-audited-entity),
-`update` on that relation for roles that delete the root). Grant it to the roles that should be able to
+there is nothing to grant beyond `read` (and, with a
+[`rootRelation`](#linking-to-the-audited-entity), `update` on that relation for roles that
+delete the root). Grant it to the roles that should be able to
 inspect the trail:
 
 ```typescript

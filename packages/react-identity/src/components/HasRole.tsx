@@ -9,34 +9,33 @@ import { identityEnvironmentExtension, projectEnvironmentExtension } from '../en
  * #### Example: Single role
  * ```ts
  * 'admin'
- *```
+ * ```
  *
  * #### Example: Multiple roles (OR logic) - user needs ANY of these roles
  * ```ts
  * ['admin', 'developer', 'lead']
- *```
+ * ```
  *
  * #### Example: Explicit OR logic
  * ```ts
  * { any: ['admin', 'developer'] }
- *```
+ * ```
  *
  * #### Example: AND logic - user needs ALL of these roles
  * ```ts
  * { all: ['admin', 'developer'] }
- *```
+ * ```
  *
  * #### Example: Exclude roles - user must NOT have these roles
  * ```ts
  * { not: 'guest' }
  * { not: ['guest', 'banned'] }
- *```
+ * ```
  *
  * #### Example: Custom function for complex logic
  * ```ts
  * (roles) => roles.has('admin') && roles.size > 1
- *```
- *
+ * ```
  */
 export type RoleCondition =
 	| string
@@ -60,21 +59,21 @@ export type RoleCondition =
  * #### Example: Check if user has admin role
  * ```ts
  * evaluateRoleCondition('admin', userRoles)
- *```
+ * ```
  * #### Example: Check if user has any of the specified roles
  * ```ts
  * evaluateRoleCondition(['admin', 'editor'], userRoles)
- *```
+ * ```
  *
  * #### Example: Check if user has all of the specified roles
  * ```ts
  * evaluateRoleCondition({ all: ['admin', 'developer'] }, userRoles)
- *```
+ * ```
  *
  * #### Example: Check if user does not have any of the specified roles
  * ```ts
  * evaluateRoleCondition({ not: ['admin', 'editor'] }, userRoles)
- *```
+ * ```
  */
 export const evaluateRoleCondition = (condition: RoleCondition, roles: Set<string>): boolean => {
 	if (typeof condition === 'string') {
@@ -108,7 +107,8 @@ export const evaluateRoleCondition = (condition: RoleCondition, roles: Set<strin
 		}
 	}
 
-	return false
+	// Unreachable for typed callers; fail loudly instead of silently hiding (or showing) content.
+	throw new Error(`Unsupported role condition: ${JSON.stringify(condition)}`)
 }
 
 export interface HasRoleProps {

@@ -354,3 +354,47 @@ test('json schema reports unsupported keyword inside a combinator', () => {
 	expect(errors[0].message).toContain('unsupported keyword "patternProperties"')
 	expect(errors[0].message).toContain('at "/anyOf/1"')
 })
+
+namespace ImmutableCascade {
+	export class Article {
+		title = c.stringColumn()
+	}
+
+	@c.Immutable()
+	export class AuditLog {
+		article = c.manyHasOne(Article).cascadeOnDelete()
+	}
+}
+
+test('relation of an immutable entity must not cascade on delete', () => {
+	const validator = new ModelValidator(createSchema(ImmutableCascade).model)
+	expect(validator.validate()).toStrictEqual([
+		{
+			code: 'MODEL_INVALID_IMMUTABLE_USAGE',
+			message: 'Relation of an immutable entity must not cascade on delete.',
+			path: ['entities', 'AuditLog', 'article'],
+		},
+	])
+})
+
+namespace ImmutableOrphanRemoval {
+	export class Article {
+		log = c.oneHasOne(AuditLog).removeOrphan()
+	}
+
+	@c.Immutable()
+	export class AuditLog {
+		message = c.stringColumn()
+	}
+}
+
+test('orphan removal must not target an immutable entity', () => {
+	const validator = new ModelValidator(createSchema(ImmutableOrphanRemoval).model)
+	expect(validator.validate()).toStrictEqual([
+		{
+			code: 'MODEL_INVALID_IMMUTABLE_USAGE',
+			message: 'Orphan removal must not target an immutable entity.',
+			path: ['entities', 'Article', 'log'],
+		},
+	])
+})

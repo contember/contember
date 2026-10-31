@@ -226,7 +226,7 @@ const checkConstraintSchema = Typesafe.object({
 })
 const checkConstraintCheck: Typesafe.Equals<Model.CheckConstraint, ReturnType<typeof checkConstraintSchema>> = true
 
-const entitySchema = Typesafe.intersection(
+const entitySchemaBase = Typesafe.intersection(
 	Typesafe.object({
 		name: Typesafe.string,
 		primary: Typesafe.string,
@@ -245,6 +245,12 @@ const entitySchema = Typesafe.intersection(
 		view: viewSchema,
 		orderBy: orderBySchema,
 	}),
+)
+
+// an entity without checks carries no `checks` key, which is also what the migrations produce
+const entitySchema = Typesafe.transform(
+	entitySchemaBase,
+	({ checks, ...entity }): ReturnType<typeof entitySchemaBase> => checks?.length ? { ...entity, checks } : entity,
 )
 
 const entitySchemaCheck: Typesafe.Equals<Model.Entity, ReturnType<typeof entitySchema>> = true

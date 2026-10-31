@@ -236,7 +236,10 @@ export class UpdateBuilder {
 			switch (node.type) {
 				case 'both':
 				case 'old':
-					columns.set(node, `old_predicate_${columns.size}__`)
+					// a shared (cached) leaf keeps its first column
+					if (!columns.has(node)) {
+						columns.set(node, `old_predicate_${columns.size}__`)
+					}
 					return
 				case 'new':
 					return

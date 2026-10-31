@@ -142,7 +142,7 @@ export class MigrationSnapshotFacade {
 		// already has a relation), so a raw checksum (JSON.stringify) would report false mismatches
 		// on schemas that are in fact deeply equal.
 		const differences = deepCompare(replaySchema, snapshotSchema, [], path => {
-			if (path[0] === 'model' && path[1] === 'entities' && (path[3] === 'unique' || path[3] === 'index')) {
+			if (path[0] === 'model' && path[1] === 'entities' && (path[3] === 'unique' || path[3] === 'index' || path[3] === 'checks')) {
 				return (a, b) => compareArraysIgnoreOrder(a, b, path)
 			}
 			return null

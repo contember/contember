@@ -86,3 +86,33 @@ describe('model schema', () => {
 		})
 	}
 })
+
+describe('model schema check constraints', () => {
+	const createModel = (checks?: Model.CheckConstraints): Model.Schema => ({
+		entities: {
+			Test: {
+				tableName: 'test',
+				primary: 'id',
+				primaryColumn: 'id',
+				unique: [],
+				indexes: [],
+				...(checks ? { checks } : {}),
+				eventLog: { enabled: true },
+				name: 'Test',
+				fields: {
+					id: { type: Model.ColumnType.Uuid, columnType: 'uuid', columnName: 'id', name: 'id', nullable: false },
+				},
+			},
+		},
+		enums: {},
+	})
+
+	test('keeps checks', () => {
+		const model = createModel([{ name: 'id_not_nil', expression: "id <> '00000000-0000-0000-0000-000000000000'" }])
+		expect(modelSchema(model)).toStrictEqual(model)
+	})
+
+	test('normalizes empty checks to an absent key', () => {
+		expect(modelSchema(createModel([]))).toStrictEqual(createModel())
+	})
+})

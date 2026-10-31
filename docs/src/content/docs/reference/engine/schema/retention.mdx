@@ -146,8 +146,9 @@ policy uses the engine's configured default schedule (see [Configuration](#confi
 `raw` issues a **batched SQL `DELETE`** directly against the table. It is engine-internal, so:
 
 - It **bypasses content ACL** and the [immutability](/reference/engine/actions/audit-log#immutability)
-  gate — the same trust model as the audit-log writer. This is what lets it prune otherwise
-  append-only entities.
+  gate — the same trust model as the audit-log writer. (The `content` strategy can prune
+  immutable entities too, because it runs with full permissions and immutability only
+  removes the API's mutations.)
 - **Database-level foreign-key actions still fire**, because they are Postgres constraints, not
   application logic: `onDelete` **cascade** / **set-null** and junction-row cleanup all happen
   at the DB level exactly as they would for any delete.
@@ -163,8 +164,7 @@ is for.
 
 Deletion is batched: each run deletes up to `batchSize` rows at a time and loops until a batch
 comes back short (nothing left) or `maxPerRun` is reached, keeping any single transaction bounded
-on large tables. `maxPerRun` counts only rows of the policy's entity: rows that a database
-`ON DELETE CASCADE` removes in other tables are not counted and not capped.
+on large tables.
 
 ### `content`
 
@@ -174,6 +174,9 @@ one in a single content transaction, so Actions delete triggers (including synch
 rows), application-level `removeOrphan` and the engine's `onDelete` handling all run, at the
 cost of extra work per row. A failed delete (e.g. a `restrict` relation with existing rows)
 rolls the batch back and the run is recorded as failed.
+
+In both strategies `maxPerRun` counts only rows of the policy's entity: rows that a cascade
+removes in other tables are not counted and not capped.
 
 ## Validation
 

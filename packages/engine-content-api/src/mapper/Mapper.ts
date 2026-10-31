@@ -200,7 +200,7 @@ export class Mapper<ConnectionType extends Connection.ConnectionLike = Connectio
 		scope: AclScope,
 		builderCb: (builder: InsertBuilder) => void = () => {},
 	): Promise<MutationResultList> {
-		if (entity.view) {
+		if (entity.view || entity.immutable) {
 			throw new ImplementationException()
 		}
 		await this.setupSystemVariables()
@@ -214,7 +214,7 @@ export class Mapper<ConnectionType extends Connection.ConnectionLike = Connectio
 		scope: AclScope,
 		filter?: Input.OptionalWhere,
 	): Promise<MutationResultList> {
-		if (entity.view) {
+		if (entity.view || entity.immutable) {
 			throw new ImplementationException()
 		}
 		await this.setupSystemVariables()
@@ -232,7 +232,7 @@ export class Mapper<ConnectionType extends Connection.ConnectionLike = Connectio
 		builderCb: (builder: UpdateBuilder) => void,
 		scope: AclScope,
 	): Promise<MutationResultList> {
-		if (entity.view) {
+		if (entity.view || entity.immutable) {
 			throw new ImplementationException()
 		}
 		await this.setupSystemVariables()
@@ -251,7 +251,7 @@ export class Mapper<ConnectionType extends Connection.ConnectionLike = Connectio
 		scope: AclScope,
 		filter?: Input.OptionalWhere,
 	): Promise<MutationResultList> {
-		if (entity.view) {
+		if (entity.view || entity.immutable) {
 			throw new ImplementationException()
 		}
 		await this.setupSystemVariables()

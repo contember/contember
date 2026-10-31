@@ -393,6 +393,14 @@ describe('GraphQL schema builder', () => {
 		})
 	})
 
+	it('relations to an immutable entity', async () => {
+		await testSchema({
+			schema: () => SchemaDefinition.createModel(ImmutableEntityRelations),
+			permissions: schema => new AllowAllPermissionFactory().create(schema),
+			graphQlSchemaFile: 'schema-immutable-entity-relations.gql',
+		})
+	})
+
 	it('no root ops', async () => {
 		const schema = createSchema(NoRootOperation)
 		const { root, all } = new PermissionFactory().createContextual(schema, ['editor'])
@@ -554,6 +562,22 @@ namespace ImmutableEntity {
 	@c.Immutable()
 	export class AuditLog {
 		message = def.stringColumn()
+	}
+}
+
+namespace ImmutableEntityRelations {
+	// Nested inputs must not write an immutable row: no create/update/upsert/delete of it,
+	// and no connect/disconnect where it owns the relation (that rewrites its joining column).
+	export class Article {
+		title = def.stringColumn()
+		auditLogs = def.oneHasMany(AuditLog, 'article')
+		pinnedLog = def.manyHasOne(AuditLog)
+	}
+
+	@c.Immutable()
+	export class AuditLog {
+		message = def.stringColumn()
+		article = def.manyHasOne(Article, 'auditLogs').setNullOnDelete()
 	}
 }
 

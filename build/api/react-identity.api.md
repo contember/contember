@@ -46,12 +46,12 @@ export const projectEnvironmentExtension: Environment.Extension<string | null, {
 export type ProjectUserRoles = Set<string>;
 
 // @public
-export type RoleCondition = string | string[] | {
-    any: string[];
+export type RoleCondition = string | readonly string[] | {
+    any: readonly string[];
 } | {
-    all: string[];
+    all: readonly string[];
 } | {
-    not: string | string[];
+    not: string | readonly string[];
 } | ((roles: Set<string>) => boolean);
 
 // @public (undocumented)

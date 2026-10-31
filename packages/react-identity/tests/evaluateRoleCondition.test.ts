@@ -15,6 +15,13 @@ describe('evaluateRoleCondition', () => {
 		expect(evaluateRoleCondition([], roles)).toBe(false)
 	})
 
+	test('accepts readonly arrays', () => {
+		const editors = ['editor', 'lead'] as const
+		expect(evaluateRoleCondition(editors, roles)).toBe(true)
+		expect(evaluateRoleCondition({ all: editors }, roles)).toBe(false)
+		expect(evaluateRoleCondition({ not: editors }, roles)).toBe(false)
+	})
+
 	test('any requires at least one of the roles', () => {
 		expect(evaluateRoleCondition({ any: ['guest', 'admin'] }, roles)).toBe(true)
 		expect(evaluateRoleCondition({ any: ['guest'] }, roles)).toBe(false)
@@ -49,9 +56,15 @@ describe('evaluateRoleCondition', () => {
 		expect(evaluateRoleCondition({ all: ['admin'] }, none)).toBe(false)
 	})
 
+	// Invalid shapes only reach the function from untyped input, so they come from JSON.parse here.
 	test('throws on an object matching none of the keys', () => {
 		const parsed: RoleCondition = JSON.parse('{"some": ["admin"]}')
 		expect(() => evaluateRoleCondition(parsed, roles)).toThrow('Unsupported role condition: {"some":["admin"]}')
+	})
+
+	test('throws on an object with more than one key', () => {
+		const parsed: RoleCondition = JSON.parse('{"any": ["admin"], "not": "admin"}')
+		expect(() => evaluateRoleCondition(parsed, roles)).toThrow('Unsupported role condition')
 	})
 
 	test('throws on a not condition of an unsupported type', () => {

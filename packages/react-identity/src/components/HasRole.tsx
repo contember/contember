@@ -39,10 +39,10 @@ import { identityEnvironmentExtension, projectEnvironmentExtension } from '../en
  */
 export type RoleCondition =
 	| string
-	| string[]
-	| { any: string[] }
-	| { all: string[] }
-	| { not: string | string[] }
+	| readonly string[]
+	| { any: readonly string[] }
+	| { all: readonly string[] }
+	| { not: string | readonly string[] }
 	| ((roles: Set<string>) => boolean)
 
 /**
@@ -88,7 +88,8 @@ export const evaluateRoleCondition = (condition: RoleCondition, roles: Set<strin
 		return condition(roles)
 	}
 
-	if (typeof condition === 'object' && condition !== null) {
+	// A second key would be silently ignored by the first matching branch below.
+	if (typeof condition === 'object' && condition !== null && Object.keys(condition).length === 1) {
 		if ('any' in condition) {
 			return condition.any.some(role => roles.has(role))
 		}

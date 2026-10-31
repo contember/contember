@@ -375,16 +375,18 @@ export class Mapper<ConnectionType extends Connection.ConnectionLike = Connectio
 	): Promise<Input.PrimaryValue[]> {
 		if (context.type === 'oneHasMany') {
 			const { targetEntity, targetRelation } = context
-			const where: Input.OptionalWhere = {
-				[targetRelation.name]: { [context.entity.primary]: { eq: ownerPrimary } },
-			}
-			const withPredicates = this.predicatesInjector.inject(targetEntity, where, 'nested')
+			// Compare the FK column directly: filtering through the back-reference relation would also apply
+			// the owner's and the relation field's read predicates, unlike the many-has-many junction read.
+			const readPredicate = this.predicatesInjector.inject(targetEntity, {}, 'nested')
 			const path = this.pathFactory.create([])
-			const qb = SelectBuilder.create()
+			let qb = SelectBuilder.create()
 				.from(targetEntity.tableName, path.alias)
 				.select([path.alias, targetEntity.primaryColumn], 'primary_')
-			const built = this.whereBuilder.build(qb, targetEntity, path, withPredicates)
-			const rows = await built.getResult(this.db)
+				.where(cond => cond.compare([path.alias, targetRelation.joiningColumn.columnName], Operator.eq, ownerPrimary))
+			if (Object.keys(readPredicate).length > 0) {
+				qb = this.whereBuilder.build(qb, targetEntity, path, readPredicate)
+			}
+			const rows = await qb.getResult(this.db)
 			return rows.map(it => it.primary_ as Input.PrimaryValue)
 		}
 

@@ -1,4 +1,5 @@
 import { test } from 'bun:test'
+import { Acl } from '@contember/schema'
 import { execute, failedTransaction, sqlTransaction } from '../../../../../src/test.js'
 import { GQL, SQL } from '../../../../../src/tags.js'
 import { testUuid } from '../../../../../src/testUuid.js'
@@ -795,9 +796,9 @@ test('set strips null-valued operation keys from an item', async () => {
 	})
 })
 
-// `set: null` is schema-valid (the field is a nullable list). It must be treated as "not provided",
-// like every other null in a relation input, rather than routed into the set path.
-test('set: null is treated as no operation', async () => {
+// `set: null` is schema-valid (the field is a nullable list). It must be rejected with a user error
+// rather than routed into the set path, where it would clear the collection.
+test('set: null is rejected as a missing operation', async () => {
 	let error: unknown
 	try {
 		await execute({
@@ -873,6 +874,66 @@ test('set resolves a partial composite unique `by` within the collection', async
 						update  "public"."post_locale" set  "title" =  "newData_"."title"   from "newData_"  where "post_locale"."id" = "newData_"."id"  returning "title_old__"`,
 					parameters: ['Hello', testUuid(1)],
 					response: { rows: [{ title_old__: 'Hi' }] },
+				},
+			]),
+		],
+		return: {
+			data: {
+				updatePost: {
+					ok: true,
+				},
+			},
+		},
+	})
+})
+
+// Orphans are found by the FK column and the target's read predicate only, like the many-has-many
+// junction read. The owner's read predicate must not hide members from the diff.
+const restrictedReadPermissions: Acl.Permissions = {
+	Post: {
+		predicates: {
+			post_read_predicate: { id: { eq: testUuid(2) } },
+		},
+		operations: {
+			read: { id: 'post_read_predicate' },
+			update: { id: true, locales: true },
+		},
+	},
+	PostLocale: {
+		predicates: {
+			locale_read_predicate: { locale: { eq: 'cs' } },
+		},
+		operations: {
+			read: { id: 'locale_read_predicate', post: true, locale: 'locale_read_predicate' },
+			update: { post: true },
+		},
+	},
+}
+
+test('set applies only the target read predicate when computing orphans', async () => {
+	await execute({
+		schema: postWithNullableLocale,
+		permissions: restrictedReadPermissions,
+		variables: {},
+		query: GQL`mutation {
+        updatePost(
+            by: {id: "${testUuid(2)}"},
+            data: {locales: {set: []}}
+          ) {
+          ok
+        }
+      }`,
+		executes: [
+			...sqlTransaction([
+				{
+					sql: SQL`select "root_"."id" from "public"."post" as "root_" where "root_"."id" = ?`,
+					parameters: [testUuid(2)],
+					response: { rows: [{ id: testUuid(2) }] },
+				},
+				{
+					sql: SQL`select "root_"."id" as "primary_" from "public"."post_locale" as "root_" where "root_"."post_id" = ? and "root_"."locale" = ?`,
+					parameters: [testUuid(2), 'cs'],
+					response: { rows: [] },
 				},
 			]),
 		],

@@ -5,9 +5,13 @@ const intervalPart = /^(\d+)[ \t]*(second|minute|hour|day|week|month|year)s?$/i
 
 // Keeps every part far below the 32-bit interval fields; Postgres 14 wraps an overflow silently into a negative interval.
 const maxIntervalCount = 1_000_000
+// `now() - interval` fails with "timestamp out of range" for spans of a few thousand years.
+const maxIntervalDays = 1000 * 366
+const approximateDays: Record<string, number> = { second: 1 / 86400, minute: 1 / 1440, hour: 1 / 24, day: 1, week: 7, month: 31, year: 366 }
 
 /**
- * A retention interval is one or more `<positive count> <unit>` parts, e.g. `30 days` or `1 day 12 hours`, each unit at most once.
+ * A retention interval is one or more `<count> <unit>` parts, e.g. `30 days` or `1 day 12 hours`, each unit at most once,
+ * positive in total and at most about 1000 years.
  * Narrower than Postgres on purpose: a bare number (`30` = 30 seconds) or a zero, negative or
  * overflowing interval would move the cutoff to now or into the future and match every row.
  */
@@ -15,6 +19,7 @@ export const isValidRetentionInterval = (interval: string): boolean => {
 	const parts = interval.replace(/^[ \t]+|[ \t]+$/g, '').split(/[ \t]+(?=\d)/)
 	const units = new Set<string>()
 	let positive = false
+	let days = 0
 	for (const part of parts) {
 		const match = intervalPart.exec(part)
 		if (!match) {
@@ -27,8 +32,9 @@ export const isValidRetentionInterval = (interval: string): boolean => {
 		}
 		units.add(unit)
 		positive ||= count > 0
+		days += count * approximateDays[unit]
 	}
-	return positive
+	return positive && days <= maxIntervalDays
 }
 
 /**
@@ -81,7 +87,13 @@ const foldWhere = (model: Model.Schema, entity: Model.Entity, where: unknown): F
 				return foldCondition(value)
 			}
 			const target = model.entities[field.target]
-			return target === undefined ? undefined : foldWhere(model, target, value)
+			if (target === undefined) {
+				return undefined
+			}
+			const nested = foldWhere(model, target, value)
+			// A to-many filter compiles to EXISTS: a true nested filter still requires a related row.
+			const isToMany = field.type === Model.RelationType.OneHasMany || field.type === Model.RelationType.ManyHasMany
+			return isToMany && nested === true ? undefined : nested
 		}),
 	)
 }
@@ -90,7 +102,8 @@ const foldCondition = (condition: unknown): Folded => {
 	if (!isRecord(condition)) {
 		return undefined
 	}
-	if (condition.never) {
+	// ConditionBuilder emits false for `never` whatever its value.
+	if (condition.never !== undefined && condition.never !== null) {
 		return false
 	}
 	return foldAnd(

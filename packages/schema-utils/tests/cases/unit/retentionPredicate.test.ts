@@ -4,9 +4,12 @@ import { SchemaBuilder } from '@contember/schema-definition'
 import { isUnboundedWhere, isValidRetentionInterval } from '../../../src/index.js'
 
 describe('isValidRetentionInterval', () => {
-	test.each(['30 days', '1 day', '1 day 12 hours', '90 Days', '2 weeks', '1 year 0 months'])('accepts %p', interval => {
-		expect(isValidRetentionInterval(interval)).toBe(true)
-	})
+	test.each(['30 days', '1 day', '1 day 12 hours', '90 Days', '2 weeks', '1 year 0 months', '1000 years', '1000000 seconds'])(
+		'accepts %p',
+		interval => {
+			expect(isValidRetentionInterval(interval)).toBe(true)
+		},
+	)
 	test.each([
 		'',
 		'30',
@@ -21,6 +24,8 @@ describe('isValidRetentionInterval', () => {
 		'1 day 1 day',
 		'1 day 2 Days',
 		'30\u00A0days',
+		'1001 years',
+		'1000000 weeks',
 	])('rejects %p', interval => {
 		expect(isValidRetentionInterval(interval)).toBe(false)
 	})
@@ -28,7 +33,7 @@ describe('isValidRetentionInterval', () => {
 
 describe('isUnboundedWhere', () => {
 	const model: Model.Schema = new SchemaBuilder()
-		.entity('Token', e => e.column('used', c => c.type(Model.ColumnType.Bool)).manyHasOne('owner', r => r.target('Owner')))
+		.entity('Token', e => e.column('used', c => c.type(Model.ColumnType.Bool)).manyHasOne('owner', r => r.target('Owner').inversedBy('tokens')))
 		.entity('Owner', e => e.column('name'))
 		.buildSchema()
 	const entity = model.entities.Token
@@ -68,5 +73,14 @@ describe('isUnboundedWhere', () => {
 	]
 	test.each(restrictive)('%p is restrictive', where => {
 		expect(isUnboundedWhere(model, entity, where)).toBe(false)
+	})
+
+	test('an empty to-many filter compiles to EXISTS and is restrictive', () => {
+		const owner = model.entities.Owner
+		expect(owner.fields.tokens?.type).toBe(Model.RelationType.OneHasMany)
+		expect(isUnboundedWhere(model, owner, { tokens: { used: { always: true } } })).toBe(false)
+		expect(isUnboundedWhere(model, owner, { tokens: {} })).toBe(false)
+		expect(isUnboundedWhere(model, owner, { not: { tokens: {} } })).toBe(false)
+		expect(isUnboundedWhere(model, owner, { tokens: { used: { never: true } } })).toBe(false)
 	})
 })

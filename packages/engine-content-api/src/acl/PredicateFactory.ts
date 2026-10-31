@@ -259,6 +259,13 @@ export class PredicateFactory {
 		if (!definition) {
 			throw new Error(`${entity.name}: Undefined predicate ${name}`)
 		}
+		// schemas deployed before the markers existed may have such a field; refuse instead of reading it as a marker
+		const shadowedField = [Acl.PredicateOldStateMarker, Acl.PredicateNewStateMarker].find(it => entity.fields[it] !== undefined)
+		if (shadowedField !== undefined && hasStateMarkers(definition)) {
+			throw new Error(
+				`${entity.name}: predicate ${name} cannot be evaluated, field "${shadowedField}" collides with an ACL state marker. Rename the field.`,
+			)
+		}
 		return definition
 	}
 

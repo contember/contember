@@ -1,7 +1,7 @@
 import { PredicateFactory, VariableInjector } from '../../../src/acl/index.js'
 import { SchemaDefinition as def } from '@contember/schema-definition'
 import { Acl, Model } from '@contember/schema'
-import { describe, it } from 'bun:test'
+import { describe, expect, it } from 'bun:test'
 import { assert } from '../../src/assert.js'
 
 namespace TestModel {
@@ -165,5 +165,34 @@ describe('Predicates factory', () => {
 		assert.deepStrictEqual(predicate, {
 			isPublic: { eq: true },
 		})
+	})
+})
+
+namespace ShadowedMarkerModel {
+	export class Author {
+		isPublic = def.boolColumn().notNull()
+	}
+
+	export class Article {
+		isPublic = def.boolColumn().notNull()
+		_new = def.manyHasOne(Author)
+	}
+}
+
+describe('Predicates factory with a field named like a state marker', () => {
+	const schema = def.createModel(ShadowedMarkerModel)
+	const shadowedPermissions: Acl.Permissions = {
+		Article: {
+			predicates: { viaAuthor: { _new: { isPublic: { eq: true } } } },
+			operations: { read: { id: 'viaAuthor' }, update: { id: 'viaAuthor' } },
+		},
+	}
+	const predicateFactory = new PredicateFactory(shadowedPermissions, schema, new VariableInjector(schema, {}))
+
+	it('refuses to read the field as a marker', () => {
+		expect(() => predicateFactory.create(schema.entities.Article, Acl.Operation.read, 'root')).toThrow('field "_new" collides with an ACL state marker')
+		expect(() => predicateFactory.createUpdateStatePredicate(schema.entities.Article, 'root', ['id'])).toThrow(
+			'field "_new" collides with an ACL state marker',
+		)
 	})
 })

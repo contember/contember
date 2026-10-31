@@ -9,6 +9,7 @@ import {
 	removeCheckConstraintModification,
 	SchemaDiffer,
 	SchemaMigrator,
+	VERSION_LATEST,
 } from '../../../src/index.js'
 
 namespace WithoutCheck {
@@ -39,6 +40,45 @@ namespace WithTwoChecks {
 	@c.Check({ name: 'discount_below_price', expression: 'discount <= price' })
 	export class Product {
 		price = c.intColumn()
+		discount = c.intColumn()
+	}
+}
+
+namespace WithEmptyChecks {
+	@c.ExtendEntity(({ entity }) => ({ ...entity, checks: [] }))
+	export class Product {
+		price = c.intColumn()
+		discount = c.intColumn()
+	}
+}
+
+namespace WithCheckOnRemovedField {
+	@c.Check({ name: 'discount_below_price', expression: 'discount <= price' })
+	export class Product {
+		price = c.intColumn()
+		discount = c.intColumn()
+	}
+}
+
+namespace WithoutDiscount {
+	export class Product {
+		price = c.intColumn()
+	}
+}
+
+namespace WithCheckOnNewColumn {
+	@c.Check({ name: 'tax_non_negative', expression: 'tax >= 0' })
+	export class Product {
+		price = c.intColumn()
+		discount = c.intColumn()
+		tax = c.intColumn()
+	}
+}
+
+namespace WithDoubleCheck {
+	@c.Check({ name: 'price_non_negative', expression: 'price >= 0.5' })
+	export class Product {
+		price = c.doubleColumn()
 		discount = c.intColumn()
 	}
 }
@@ -90,7 +130,7 @@ describe('remove check constraint', () =>
 				checkName: 'price_non_negative',
 			}),
 		],
-		sql: SQL`ALTER TABLE "product" DROP CONSTRAINT "price_non_negative";`,
+		sql: SQL`ALTER TABLE "product" DROP CONSTRAINT IF EXISTS "price_non_negative";`,
 	}))
 
 describe('change check constraint expression', () =>
@@ -107,7 +147,7 @@ describe('change check constraint expression', () =>
 				check: { name: 'price_non_negative', expression: 'price >= 10' },
 			}),
 		],
-		sql: SQL`ALTER TABLE "product" DROP CONSTRAINT "price_non_negative";
+		sql: SQL`ALTER TABLE "product" DROP CONSTRAINT IF EXISTS "price_non_negative";
 		ALTER TABLE "product" ADD CONSTRAINT "price_non_negative" CHECK (price >= 10);`,
 	}))
 
@@ -121,7 +161,7 @@ describe('remove one of two check constraints', () =>
 				checkName: 'discount_below_price',
 			}),
 		],
-		sql: SQL`ALTER TABLE "product" DROP CONSTRAINT "discount_below_price";`,
+		sql: SQL`ALTER TABLE "product" DROP CONSTRAINT IF EXISTS "discount_below_price";`,
 	}))
 
 describe('check constraint on a new entity', () => {
@@ -149,5 +189,70 @@ describe('removing an entity with a check constraint', () => {
 describe('reordering check constraints', () => {
 	test('produces no diff', () => {
 		expect(differ.diffSchemas(createSchema(WithTwoChecks), createSchema(WithReorderedChecks))).toEqual([])
+	})
+})
+
+const modificationIds = (diff: { modification: string }[]) => diff.map(it => it.modification)
+
+describe('check constraint ordering', () => {
+	test('a check is removed before the field it references', () => {
+		const ids = modificationIds(differ.diffSchemas(createSchema(WithCheckOnRemovedField), createSchema(WithoutDiscount)))
+		expect(ids).toEqual(['removeCheckConstraint', 'removeField'])
+	})
+
+	test('a check is created after the column it references', () => {
+		const ids = modificationIds(differ.diffSchemas(createSchema(WithoutCheck), createSchema(WithCheckOnNewColumn)))
+		expect(ids).toEqual(['createColumn', 'createCheckConstraint'])
+	})
+
+	test('a check is recreated around a column type change', () => {
+		const ids = modificationIds(differ.diffSchemas(createSchema(WithCheck), createSchema(WithDoubleCheck)))
+		expect(ids).toEqual(['removeCheckConstraint', 'updateColumnDefinition', 'createCheckConstraint'])
+	})
+})
+
+describe('empty checks', () => {
+	test('the schema definition omits an empty checks list', () => {
+		expect(createSchema(WithEmptyChecks).model.entities.Product).not.toHaveProperty('checks')
+	})
+
+	test('removing the last check recreates a schema without checks', () => {
+		const diff = differ.diffSchemas(createSchema(WithCheck), createSchema(WithEmptyChecks))
+		expect(modificationIds(diff)).toEqual(['removeCheckConstraint'])
+	})
+})
+
+describe('hand-written createEntity with checks', () => {
+	test('does not record checks it never creates', () => {
+		const migrator = new SchemaMigrator(new ModificationHandlerFactory(ModificationHandlerFactory.defaultFactoryMap))
+		const product = createSchema(WithCheck).model.entities.Product
+		const schema = migrator.applyModifications(emptySchema, [
+			{ modification: 'createEntity', entity: { ...product, fields: { id: product.fields.id } } },
+		], VERSION_LATEST)
+		expect(schema.model.entities.Product).not.toHaveProperty('checks')
+	})
+})
+
+describe('check constraint failure warnings', () => {
+	const factory = new ModificationHandlerFactory(ModificationHandlerFactory.defaultFactoryMap)
+	const schema = createSchema(WithCheck)
+
+	test('removing a field of an entity with checks warns', () => {
+		const handler = factory.create('removeField', { entityName: 'Product', fieldName: 'discount' }, schema, { formatVersion: VERSION_LATEST })
+		expect(handler.describe({ createdEntities: [] }).failureWarning).toContain('check constraints')
+	})
+
+	test('renaming a column of an entity with checks warns', () => {
+		const handler = factory.create('updateColumnName', { entityName: 'Product', fieldName: 'price', columnName: 'amount' }, schema, {
+			formatVersion: VERSION_LATEST,
+		})
+		expect(handler.describe({ createdEntities: [] }).failureWarning).toContain('check constraints')
+	})
+
+	test('an entity without checks gets no warning', () => {
+		const handler = factory.create('removeField', { entityName: 'Product', fieldName: 'discount' }, createSchema(WithoutCheck), {
+			formatVersion: VERSION_LATEST,
+		})
+		expect(handler.describe({ createdEntities: [] }).failureWarning).toBeUndefined()
 	})
 })

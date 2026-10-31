@@ -23,13 +23,15 @@ export class CreateViewModificationHandler implements ModificationHandler<Create
 	}
 
 	public getSchemaUpdater(): SchemaUpdater {
+		// views cannot carry check constraints
+		const { checks, ...entity } = this.data.entity
 		return updateModel(({ model }) => ({
 			...model,
 			entities: {
 				...model.entities,
 				[this.data.entity.name]: {
 					eventLog: { enabled: true }, // not relevant here...
-					...this.data.entity,
+					...entity,
 					unique: Object.values(this.data.entity.unique),
 					indexes: Object.values(this.data.entity.indexes ?? []),
 				},

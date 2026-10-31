@@ -10,7 +10,8 @@ export class RemoveCheckConstraintModificationHandler implements ModificationHan
 
 	public createSql(builder: MigrationBuilder, { invalidateDatabaseMetadata }: ModificationHandlerCreateSqlOptions): void {
 		const entity = this.schema.model.entities[this.data.entityName]
-		builder.sql(`ALTER TABLE ${wrapIdentifier(entity.tableName)} DROP CONSTRAINT ${wrapIdentifier(this.data.checkName)}`)
+		// IF EXISTS: PostgreSQL already dropped the check if a column it referenced was removed
+		builder.sql(`ALTER TABLE ${wrapIdentifier(entity.tableName)} DROP CONSTRAINT IF EXISTS ${wrapIdentifier(this.data.checkName)}`)
 		invalidateDatabaseMetadata()
 	}
 

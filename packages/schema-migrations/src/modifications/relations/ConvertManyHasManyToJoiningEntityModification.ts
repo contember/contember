@@ -89,7 +89,8 @@ export class ConvertManyHasManyToJoiningEntityModificationHandler implements Mod
 	public getSchemaUpdater(): SchemaUpdater {
 		const { entity, relation } = this.getRelation()
 		const version = this.options.formatVersion ?? VERSION_LATEST
-		const joiningEntity = this.data.joiningEntity
+		// createSql emits no CHECK, so checks are only ever added by createCheckConstraint
+		const { checks, ...joiningEntity } = this.data.joiningEntity
 		const joinUniqueConstraint = this.getJoinUniqueConstraint()
 
 		return updateSchema(

@@ -1,5 +1,6 @@
 import { Command, CommandConfiguration, Input, Output } from '@contember/cli-common'
 import { MigrationExecutionFacade } from '../../lib/migrations/MigrationExecutionFacade.js'
+import type { EnvelopeCoverageResult } from '../../lib/tenant/workloadIdentity/envelopeCoverage.js'
 
 type Args = {}
 
@@ -39,13 +40,17 @@ export class MigrationExecuteCommand extends Command<Args, Options> {
 		const force = input.getOption('force')
 		const until = input.getOption('until')
 
+		let envelopeCoverage: EnvelopeCoverageResult | null = null
 		const changed = await this.migrationExecutorFacade.execute({
 			force,
 			until,
 			requireConfirmation: !input.getOption('yes'),
 			useSnapshot: input.getOption('no-snapshot') !== true,
+			onEnvelopeCoverage: result => {
+				envelopeCoverage = result
+			},
 		})
-		const result = { status: changed ? 'completed' : 'noop', until: until ?? null }
+		const result = { status: changed ? 'completed' : 'noop', until: until ?? null, envelopeCoverage }
 		output.data(result, {
 			human: value => value.status === 'completed' ? 'Migrations executed' : 'No migrations to execute',
 			quiet: value => value.status,

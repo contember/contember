@@ -1,3 +1,4 @@
+import { identityKindSql } from './workloadIdentity/workloadIdentitySql.js'
 import { testUuid } from '../../../src/testUuid.js'
 import { executeTenantTest } from '../../../src/testTenant.js'
 import { selectMembershipsSql } from './sql/selectMembershipsSql.js'
@@ -37,6 +38,7 @@ test('update project member', async () => {
 				projectId: projectId,
 				membershipsResponse: [{ role, variables: [{ name: variableName, values: [languageId2] }] }],
 			}),
+			identityKindSql(identityId, 'person'),
 			selectMembershipsSql({
 				identityId: identityId,
 				projectId: projectId,

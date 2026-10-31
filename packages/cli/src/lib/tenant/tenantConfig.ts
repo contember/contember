@@ -11,6 +11,7 @@ import type {
 	MailTemplate,
 	MailType,
 } from '@contember/graphql-client-tenant'
+import type { Acl } from '@contember/schema'
 
 // These aliases keep tenant config authoring aligned with the GraphQL schema.
 // The generator preserves nullable input fields, including explicit `null`.
@@ -192,6 +193,60 @@ export interface TenantCustomRoleConfig {
 	readonly grants: readonly TenantCustomRoleGrant[]
 }
 
+export type TenantWorkloadIdentityProfile = 'oidc' | 'github-actions'
+
+/** A literal claim key XOR explicit path segments — never a dot-path fallback. */
+export type TenantWorkloadIdentityConditionTarget =
+	| { readonly claim: string; readonly path?: never }
+	| { readonly path: readonly string[]; readonly claim?: never }
+
+/** Exactly one operator; empty operands are rejected by the server. */
+export type TenantWorkloadIdentityConditionOperator =
+	| { readonly equals: string | number | boolean }
+	| { readonly in: readonly (string | number)[] }
+	| { readonly startsWith: string }
+	| { readonly arrayContains: string }
+
+export type TenantWorkloadIdentityCondition = TenantWorkloadIdentityConditionTarget & TenantWorkloadIdentityConditionOperator
+
+export interface TenantWorkloadIdentityMembership {
+	readonly project: string
+	readonly role: string
+	readonly variables?: readonly { readonly name: string; readonly values: readonly string[] }[]
+	/** The assume-membership envelope (`Acl.MembershipMatchRule`): the only assumption authority for this trust. */
+	readonly assumeMembership?: Acl.MembershipMatchRule
+}
+
+/**
+ * A workload identity trust: tokens of `issuer` minted for `audience` that satisfy every condition
+ * authenticate as this trust's own identity. The record key is the trust slug.
+ */
+export interface TenantWorkloadIdentityConfig {
+	readonly profile: TenantWorkloadIdentityProfile
+	readonly issuer: string
+	readonly audience: string
+	readonly conditions: readonly TenantWorkloadIdentityCondition[]
+	/** Accepted JWT `typ` header values; `null` accepts a token without the header. Fixed on `github-actions`. */
+	readonly typ?: readonly (string | null)[]
+	/** Asymmetric algorithm allowlist. Fixed on `github-actions`; `oidc` defaults to `RS256`, `ES256`. */
+	readonly signingAlgs?: readonly string[]
+	/** Overrides OIDC discovery. */
+	readonly jwksUri?: string
+	/** `oidc` only: accept an `aud` array containing the audience. Every other listed audience can then replay the token. */
+	readonly acceptAudienceArray?: boolean
+	/** `oidc` only: require a DPoP-bound token and a proof per request. */
+	readonly requireDpop?: boolean
+	/** Seconds; default 3600, at most 86400. */
+	readonly maxTokenLifetime?: number
+	readonly trustForwardedInfo?: boolean
+	readonly description?: string
+	/** Tenant roles of the trust identity. */
+	readonly roles?: readonly string[]
+	readonly memberships?: readonly TenantWorkloadIdentityMembership[]
+	/** A tombstone: keeps the definition, disables the trust. */
+	readonly disabled?: boolean
+}
+
 /**
  * Declarative tenant configuration. Applied idempotently by
  * `contember tenant:apply`.
@@ -204,6 +259,12 @@ export interface TenantConfig {
 	authPolicies?: TenantAuthPolicy[]
 	/** Custom roles keyed by slug. Missing roles are created; existing roles are replaced. */
 	customRoles?: Record<string, TenantCustomRoleConfig>
+	/**
+	 * Workload identity trusts keyed by slug. Unlike the other sections this one is authoritative:
+	 * a trust missing from a present block is disabled, and `{}` disables every trust. Leave the key
+	 * out to keep the trusts unmanaged.
+	 */
+	workloadIdentities?: Record<string, TenantWorkloadIdentityConfig>
 }
 
 /**

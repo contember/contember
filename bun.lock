@@ -88,6 +88,7 @@
         "@contember/schema-migrations": "workspace:*",
         "@contember/schema-utils": "workspace:*",
         "@contember/typesafe": "workspace:*",
+        "@contember/workload-identity": "workspace:*",
         "@graphql-tools/schema": "catalog:",
         "chalk": "catalog:",
         "chalk-table": "catalog:",
@@ -1286,6 +1287,14 @@
         "vite": "catalog:",
       },
     },
+    "packages/workload-identity": {
+      "name": "@contember/workload-identity",
+      "version": "2.2.0-alpha.12",
+      "dependencies": {
+        "@contember/graphql-client": "workspace:*",
+        "jose": "catalog:",
+      },
+    },
   },
   "patchedDependencies": {
     "graphql-ts-client-codegen@3.1.17": "patches/graphql-ts-client-codegen@3.1.17.patch",
@@ -1618,6 +1627,8 @@
     "@contember/utilities": ["@contember/utilities@workspace:packages/utilities"],
 
     "@contember/vite-plugin": ["@contember/vite-plugin@workspace:packages/vite-plugin"],
+
+    "@contember/workload-identity": ["@contember/workload-identity@workspace:packages/workload-identity"],
 
     "@dnd-kit/accessibility": ["@dnd-kit/accessibility@3.1.1", "", { "dependencies": { "tslib": "^2.0.0" }, "peerDependencies": { "react": ">=16.8.0" } }, "sha512-2P+YgaXF+gRsIihwwY1gCsQSYnu9Zyj2py8kY5fFvUM1qm2WA2u639R6YNVfU4GWr+ZM5mqEsfHZZLoRONbemw=="],
 

@@ -9,6 +9,7 @@ import {
 	TenantMutationResult,
 } from '../../../src/lib/tenant/TenantApiTransport.js'
 import { inspect } from 'node:util'
+import { staticTokenCredentials } from '../../../src/lib/credentials/ApiCredentials.js'
 
 const identityProvidersFetcher = query$.identityProviders(identityProvider$.slug.type)
 const disableIdpFetcher = mutation$.disableIDP(disableIDPResponse$$)
@@ -80,7 +81,7 @@ describe('createTenantApiUrl', () => {
 	})
 
 	test('is used when constructing a transport', () => {
-		expect(TenantApiTransport.create('http://localhost:1480', 'token').apiUrl).toBe('http://localhost:1480/tenant')
+		expect(TenantApiTransport.create('http://localhost:1480', staticTokenCredentials('token')).apiUrl).toBe('http://localhost:1480/tenant')
 	})
 })
 
@@ -220,7 +221,7 @@ describe('TenantApiTransport error normalization', () => {
 })
 
 describe('TenantApiTransport.assertOk', () => {
-	const transport = TenantApiTransport.create('http://localhost:1481', 'token')
+	const transport = TenantApiTransport.create('http://localhost:1481', staticTokenCredentials('token'))
 
 	const assertFails = (result: TenantMutationResult | null) =>
 		catchCliError(async () => {

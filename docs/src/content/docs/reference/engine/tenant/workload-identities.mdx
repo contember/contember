@@ -1,0 +1,170 @@
+---
+title: Workload identities
+---
+
+A workload identity trust lets a machine caller — an application backend, a CI job, a pod — authenticate with a short-lived JWT from an OIDC issuer instead of a permanent [API key](/reference/engine/tenant/api-keys). The concepts and setup guides are in [Workload identity federation](/guides/workload-identity/overview); this page is the tenant API reference.
+
+:::note[Available since 2.2]
+:::
+
+Trusts are managed through [`tenant apply`](/reference/engine/tenant/declarative-config#workload-identities). The tenant API exposes exactly what `tenant apply` and diagnostics need: a list query, a check query, one transactional upsert and one disable.
+
+## Listing trusts
+
+```graphql
+query {
+  workloadIdentityTrusts {
+    id
+    slug
+    profile
+    issuer
+    audience
+    conditions
+    disabled
+    tokensValidAfter
+    roles
+    memberships {
+      project
+      role
+      variables { name values }
+      assumeMembership
+    }
+    identity { id }
+  }
+}
+```
+
+The list contains enabled and disabled trusts. It requires the `workloadIdentity:list` permission (`PROJECT_ADMIN` and `SUPER_ADMIN`); a caller without it gets an error, not an empty list. `me.permissions.canListWorkloadIdentities` tells a client in advance.
+
+### `WorkloadIdentityTrust` fields
+
+| Field | Notes |
+|---|---|
+| `id`, `slug` | The slug is the key in `tenant.config.ts`. |
+| `profile` | `oidc` or `github_actions` (`'github-actions'` in `tenant.config.ts`). |
+| `issuer`, `audience` | Matched exactly against `iss` and `aud`. |
+| `jwksUri` | Explicit key URL, or `null` for OIDC discovery. |
+| `signingAlgs` | Accepted JWS algorithms. |
+| `acceptedTyp` | Accepted `typ` header values; a `null` element accepts a token without the header. |
+| `acceptAudienceArray` | Whether an `aud` array containing the audience is accepted. |
+| `requireDpop` | Whether tokens must be DPoP-bound. |
+| `conditions` | The condition list as applied. |
+| `maxTokenLifetime` | Maximum `exp − iat` in seconds. |
+| `trustForwardedInfo` | See [proxy trust](/reference/engine/tenant/proxy-trust). |
+| `description` | |
+| `disabled` | |
+| `tokensValidAfter` | Tokens with an earlier `iat` are rejected. Moved by an apply that changes who the trust admits (see [when earlier tokens stop working](/reference/engine/tenant/declarative-config#when-earlier-tokens-stop-working)), and on re-enable. |
+| `roles` | Global tenant roles of the trust's identity. |
+| `memberships` | Project memberships with their variables and the [envelope rule](/guides/workload-identity/assume-membership) (`assumeMembership`) bound to each. |
+| `identity` | The identity requests authenticated by this trust act as. |
+| `createdAt`, `updatedAt` | |
+
+## Checking a token
+
+`checkWorkloadIdentityToken` runs the verification of a token you hold and reports the first step that fails. Use it when a caller gets `401` — the HTTP response is deliberately the same for every failure.
+
+```graphql
+query($token: String!) {
+  checkWorkloadIdentityToken(token: $token) {
+    ok
+    trust { slug }
+    failure { step message conditionIndex actualValue }
+    claims
+    requiresDpop
+  }
+}
+```
+
+It requires `workloadIdentity:list`. The check does not verify a DPoP proof, writes no auth log entry, and neither stores nor logs the token. `trust` is set as soon as `iss` + `aud` match an enabled trust, also when a later step fails; `claims` is set only when `ok`. `requiresDpop` is the matched trust's `requireDpop`, so an `ok` check of an unbound token for such a trust still fails at request time.
+
+| `failure.step` | Meaning |
+|---|---|
+| `malformed` | Not a compact JWT, larger than 8 KiB, `iss` missing or not a non-empty string, or `aud` missing, not a string or string array, longer than 2048 characters, or an array of more than 10 values. |
+| `trust_not_found` | No enabled trust for this `iss` and any of the `aud` values. |
+| `jwks` | The issuer's keys are unavailable: discovery or the JWKS fetch failed or was refused by the fetch policy, and no last known keys younger than `jwksMaxStaleness` exist. The message does not say why a fetch failed — resolved addresses and connection errors would describe the engine's network to a tenant admin; the cause is in the engine log at `warn` level. |
+| `signature` | Bad signature, a `kid` missing from the issuer's keys (also after the refetch it triggers), or an algorithm outside `signingAlgs`. |
+| `typ` | The `typ` header is not in `acceptedTyp`. |
+| `audience` | `aud` is an empty array, or a multi-valued array that no matching trust accepts with `acceptAudienceArray` (or that more than one such trust accepts). |
+| `profile` | A claim the profile requires is missing: `sub`, `iat` or `exp`, and on `github-actions` also `jti`, `repository_id`, `repository_owner_id` or `run_id`. |
+| `lifetime` | `iat` or `exp` not a number, `iat` or `nbf` in the future, `exp` not after `iat`, the token expired, or `exp − iat` exceeds `maxTokenLifetime`. Clock skew of 30 seconds is allowed. |
+| `tokens_valid_after` | The token was issued before the trust's `tokensValidAfter`. |
+| `condition` | A condition did not match. `conditionIndex` is its position in `conditions`, `actualValue` the claim's value in the token. |
+
+The [CLI](/guides/workload-identity/cli#checking-a-token) and the panel's Configuration page offer the same check. The Configuration page also lists the trusts — slug, profile, issuer, audience, status, DPoP and, per trust, the conditions, roles, memberships with their envelopes, `maxTokenLifetime` and `tokensValidAfter` — for callers with `workloadIdentity:list`. It is read-only.
+
+## Applying a trust
+
+`applyWorkloadIdentityTrust` creates or updates one trust in a single transaction: the trust, its identity's roles, its memberships and the envelope rules. `tenant apply` calls it once per changed trust; you rarely call it directly.
+
+```graphql
+mutation($trust: WorkloadIdentityTrustInput!, $dryRun: Boolean) {
+  applyWorkloadIdentityTrust(slug: "web-backend", trust: $trust, dryRun: $dryRun) {
+    ok
+    error { code developerMessage details }
+    result {
+      created
+      tokensValidAfterBumped
+      envelopeClosure
+      trust { id tokensValidAfter }
+    }
+  }
+}
+```
+
+`WorkloadIdentityTrustInput` carries the fields described in [trust fields](/reference/engine/tenant/declarative-config#trust-fields); `typ` is called `acceptedTyp` and `profile` takes the enum value (`oidc`, `github_actions`). Omitted optional fields take their defaults, so an apply always sets the whole definition. `tokensValidAfterBumped` says whether this apply rejected every earlier token, and `envelopeClosure` lists what each membership's envelope authorizes.
+
+With `dryRun: true`, the mutation runs every check and every write of the apply and rolls them back: it fails with the same error code the apply would, and on success returns the result the apply would produce. Nothing is stored and nothing is audited. `tenant apply` dry-runs every changed trust before it writes anything.
+
+It requires `workloadIdentity:add` for a new slug or `workloadIdentity:update` for an existing one, plus the role and membership authorization described in [who may apply trusts](/reference/engine/tenant/declarative-config#who-may-apply-trusts).
+
+| Error code | Meaning |
+|---|---|
+| `INVALID_DEFINITION` | A field is invalid: `issuer` or `jwksUri` not a URL or carrying credentials, an empty audience, `signingAlgs` or `acceptedTyp` different from the fixed `github-actions` value, an empty list or a symmetric algorithm on `oidc`, `requireDpop` / `acceptAudienceArray` on `github-actions`, a lifetime outside 1–86400 seconds, or a tenant role that does not exist or cannot be assigned globally. |
+| `INVALID_CONDITIONS` | Not a non-empty list, a condition without exactly one of `claim` / `path`, more or fewer than one operator, an unknown property, an empty or mistyped operand, a condition on a claim that verification checks itself (`iss`, `aud`, `iat`, `exp`, `nbf`, `jti`, `cnf`), an operand of the wrong type for a claim the profile declares, or a missing anchor condition: on `sub` with `equals` or `in` for `oidc`, on `repository_id` or `repository_owner_id` with `equals` or `in` for `github-actions`. `details` lists each failing condition. |
+| `ISSUER_NOT_ALLOWED` | `http://` issuer or `jwksUri` on a host not listed in the server's `insecureIssuers`, or an issuer on the host of a dedicated profile (`token.actions.githubusercontent.com`, any path) used with `oidc`. |
+| `AUDIENCE_IN_USE` | Another enabled trust has the same `issuer` + `audience`. |
+| `ROLE_NOT_ALLOWED` | The tenant role is `login`, the caller may not grant the tenant `roles` or set `trustForwardedInfo` (the `createGlobalApiKey` rules), or the caller updates a trust whose current tenant roles it may not grant — a `PROJECT_ADMIN` cannot rewrite a `super_admin` trust. |
+| `IMPLICIT_MEMBERSHIP_CONFLICT` | `project_admin` or `super_admin` combined with memberships. |
+| `PROJECT_NOT_FOUND` | A membership names an unknown project. |
+| `INVALID_MEMBERSHIP` | A membership does not validate against the project's ACL, its role is declared twice for the project, or a variable is declared twice or has no values. `details` lists each membership. |
+| `INVALID_ENVELOPE` | An envelope rule is not a `MembershipMatchRule`, is `true` as a whole instead of naming roles, names a role missing from the project schema or a variable the role does not have, omits a variable of the target role, names a predefined variable, or references a variable the source membership does not have. `details` lists each rule. |
+| `ENVELOPE_NOT_AUTHORIZED` | The caller may not grant what an envelope rule opens. |
+| `WORKLOAD_CREDENTIAL_FORBIDDEN` | The caller itself authenticated through a workload trust. |
+| `CONFLICT` | The trust was changed concurrently: created, or given different tenant roles, between authorization and the write, or applied by another request at the same time. Apply again. |
+
+A caller without `workloadIdentity:add` / `workloadIdentity:update`, or one that may not add the declared memberships in a project, gets a permission error instead of an error code, as with other tenant mutations.
+
+## Disabling a trust
+
+```graphql
+mutation {
+  disableWorkloadIdentityTrust(slug: "old-importer") {
+    ok
+    error { code developerMessage }
+  }
+}
+```
+
+Requires `workloadIdentity:disable`. Fails with `NOT_FOUND` for an unknown slug and `WORKLOAD_CREDENTIAL_FORBIDDEN` when the caller is a workload trust. A disabled trust stops authenticating on the next request (after read-replica lag, if you use replicas). Re-enabling is an apply with `disabled: false`, which also rejects every token issued before it.
+
+## Trust identities
+
+Each trust owns an ordinary `identity` row, so it appears in project member listings and in `created_by`:
+
+- `Identity.kind` is `WORKLOAD` for a trust identity (`PERSON` and `API_KEY` for the others), and `Identity.workloadIdentityTrust` returns the trust when the caller holds `workloadIdentity:list`.
+- `Project.members` accepts `filter: { memberType: WORKLOAD }`; `API_KEY` no longer includes trust identities.
+- A trust identity is managed only through apply. `addProjectMember`, `updateProjectMember`, `removeProjectMember`, `addGlobalIdentityRoles` and `removeGlobalIdentityRoles` refuse it with `WORKLOAD_IDENTITY_MANAGED`, and no API key or person can be attached to it. Out-of-band grant changes would skip the authorization and the `tokensValidAfter` handling of apply.
+- `createProject` called by a trust holding `project_creator` creates the project without making the trust its admin; the pipeline uses the deploy key the mutation returns, and any lasting membership is declared in the trust.
+- `signOut` with a workload credential is refused; a trust identity is not a person and has no session to end.
+
+## Audit
+
+Authentication and management are recorded in the [audit log](/reference/engine/tenant/audit-log#workload-identity-events-since-22) as `workload_auth_success`, `workload_auth_failure`, `workload_identity_apply` and `workload_identity_disable`, with the trust in `workloadIdentityTrustId`.
+
+The engine exports these Prometheus counters:
+
+| Metric | Counts |
+|---|---|
+| `contember_workload_identity_verifications_total` | Verifications, labelled `outcome`: `success` or the failure category (the `failure.step` values above, plus `dpop_missing`, `dpop_invalid`, `dpop_binding`, `dpop_replay`). |
+| `contember_workload_identity_jwks_fetch_failures_total` | Failed discovery or JWKS fetches. |
+| `contember_workload_identity_unknown_kid_total` | Tokens signed with a key id missing from the cached keys. |

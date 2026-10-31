@@ -61,7 +61,11 @@ CREATE TYPE "auth_log_type" AS ENUM (
     'idp_role_mapping_failed',
     'person_enable',
     'custom_role_change',
-    'sign_out'
+    'sign_out',
+    'workload_auth_success',
+    'workload_auth_failure',
+    'workload_identity_apply',
+    'workload_identity_disable'
 );
 CREATE TYPE "config_policy" AS ENUM (
     'always',
@@ -272,7 +276,9 @@ CREATE TABLE "person_auth_log" (
     "target_person_id" "uuid",
     "event_data" "jsonb",
     "geo_country" "text",
-    "device_fingerprint" "text"
+    "device_fingerprint" "text",
+    "trust_id" "uuid",
+    "token_ref" "text"
 );
 CREATE TABLE "person_backup_code" (
     "id" "uuid" NOT NULL,
@@ -344,6 +350,35 @@ CREATE TABLE "rate_limit_event" (
     "key_hash" "bytea" NOT NULL,
     "occurred_at" timestamp with time zone DEFAULT "now"() NOT NULL
 );
+CREATE TABLE "workload_identity_assume_rule" (
+    "id" "uuid" NOT NULL,
+    "trust_id" "uuid" NOT NULL,
+    "membership_id" "uuid" NOT NULL,
+    "rule" "jsonb" NOT NULL
+);
+CREATE TABLE "workload_identity_trust" (
+    "id" "uuid" NOT NULL,
+    "slug" "text" NOT NULL,
+    "identity_id" "uuid" NOT NULL,
+    "issuer" "text" NOT NULL,
+    "audience" "text" NOT NULL,
+    "profile" "text" NOT NULL,
+    "jwks_uri" "text",
+    "signing_algs" "text"[] NOT NULL,
+    "accepted_typ" "text"[] NOT NULL,
+    "accept_audience_array" boolean DEFAULT false NOT NULL,
+    "require_dpop" boolean DEFAULT false NOT NULL,
+    "conditions" "jsonb" NOT NULL,
+    "max_token_lifetime_seconds" integer NOT NULL,
+    "tokens_valid_after" timestamp with time zone DEFAULT "now"() NOT NULL,
+    "trust_forwarded_info" boolean DEFAULT false NOT NULL,
+    "disabled_at" timestamp with time zone,
+    "created_at" timestamp with time zone DEFAULT "now"() NOT NULL,
+    "created_by" "uuid",
+    "updated_at" timestamp with time zone DEFAULT "now"() NOT NULL,
+    CONSTRAINT "workload_identity_trust_max_token_lifetime_seconds_check" CHECK ((("max_token_lifetime_seconds" > 0) AND ("max_token_lifetime_seconds" <= 86400))),
+    CONSTRAINT "workload_identity_trust_profile_check" CHECK (("profile" = ANY (ARRAY['oidc'::"text", 'github-actions'::"text"])))
+);
 ALTER TABLE ONLY "api_key"
     ADD CONSTRAINT "api_key_id" PRIMARY KEY ("id");
 ALTER TABLE ONLY "auth_policy"
@@ -392,6 +427,16 @@ ALTER TABLE ONLY "project_secret"
     ADD CONSTRAINT "project_secret_pkey" PRIMARY KEY ("id");
 ALTER TABLE ONLY "rate_limit_event"
     ADD CONSTRAINT "rate_limit_event_pkey" PRIMARY KEY ("id");
+ALTER TABLE ONLY "workload_identity_assume_rule"
+    ADD CONSTRAINT "workload_identity_assume_rule_membership_id_key" UNIQUE ("membership_id");
+ALTER TABLE ONLY "workload_identity_assume_rule"
+    ADD CONSTRAINT "workload_identity_assume_rule_pkey" PRIMARY KEY ("id");
+ALTER TABLE ONLY "workload_identity_trust"
+    ADD CONSTRAINT "workload_identity_trust_identity_id_key" UNIQUE ("identity_id");
+ALTER TABLE ONLY "workload_identity_trust"
+    ADD CONSTRAINT "workload_identity_trust_pkey" PRIMARY KEY ("id");
+ALTER TABLE ONLY "workload_identity_trust"
+    ADD CONSTRAINT "workload_identity_trust_slug_key" UNIQUE ("slug");
 CREATE INDEX "api_key_identity_id" ON "api_key" USING "btree" ("identity_id");
 CREATE UNIQUE INDEX "api_key_token_hash" ON "api_key" USING "btree" ("token_hash");
 CREATE INDEX "auth_policy_project_id_idx" ON "auth_policy" USING "btree" ("project_id");
@@ -405,6 +450,7 @@ CREATE INDEX "person_auth_log_created_at_id_idx" ON "person_auth_log" USING "btr
 CREATE INDEX "person_auth_log_person_id_created_at_idx" ON "person_auth_log" USING "btree" ("person_id", "created_at" DESC);
 CREATE INDEX "person_auth_log_person_input_identifier_created_at_idx" ON "person_auth_log" USING "btree" ("person_input_identifier", "created_at" DESC) WHERE (("type" = 'login'::"auth_log_type") AND ("success" = false));
 CREATE INDEX "person_auth_log_target_person_id_created_at_idx" ON "person_auth_log" USING "btree" ("target_person_id", "created_at" DESC);
+CREATE UNIQUE INDEX "person_auth_log_workload_token_ref_idx" ON "person_auth_log" USING "btree" ("trust_id", "token_ref") WHERE ("success" AND ("token_ref" IS NOT NULL));
 CREATE INDEX "person_backup_code_person_id_idx" ON "person_backup_code" USING "btree" ("person_id");
 CREATE INDEX "person_identity_id" ON "person" USING "btree" ("identity_id");
 CREATE UNIQUE INDEX "person_identity_provider_identifier" ON "person_identity_provider" USING "btree" ("identity_provider_id", "external_identifier");
@@ -418,6 +464,8 @@ CREATE UNIQUE INDEX "project_secret_unique" ON "project_secret" USING "btree" ("
 CREATE UNIQUE INDEX "project_slug" ON "project" USING "btree" ("slug");
 CREATE INDEX "rate_limit_event_lookup" ON "rate_limit_event" USING "btree" ("scope", "key_hash", "occurred_at" DESC);
 CREATE INDEX "rate_limit_event_occurred_at_brin" ON "rate_limit_event" USING "brin" ("occurred_at");
+CREATE INDEX "workload_identity_assume_rule_trust_id_idx" ON "workload_identity_assume_rule" USING "btree" ("trust_id");
+CREATE UNIQUE INDEX "workload_identity_trust_enabled_issuer_audience_idx" ON "workload_identity_trust" USING "btree" ("issuer", "audience") WHERE ("disabled_at" IS NULL);
 CREATE TRIGGER "project_deleted" AFTER DELETE ON "project" FOR EACH ROW EXECUTE FUNCTION "project_deleted"();
 CREATE TRIGGER "project_secret_updated" AFTER INSERT OR DELETE OR UPDATE ON "project_secret" FOR EACH ROW EXECUTE FUNCTION "project_secret_updated"();
 CREATE TRIGGER "project_updated" BEFORE INSERT OR UPDATE OF "name", "slug", "config" ON "project" FOR EACH ROW EXECUTE FUNCTION "project_updated"();
@@ -443,6 +491,8 @@ ALTER TABLE ONLY "person_auth_log"
     ADD CONSTRAINT "person_auth_log_person_token_id_fkey" FOREIGN KEY ("person_token_id") REFERENCES "person_token"("id") ON DELETE SET NULL;
 ALTER TABLE ONLY "person_auth_log"
     ADD CONSTRAINT "person_auth_log_target_person_id_fkey" FOREIGN KEY ("target_person_id") REFERENCES "person"("id") ON DELETE SET NULL;
+ALTER TABLE ONLY "person_auth_log"
+    ADD CONSTRAINT "person_auth_log_trust_id_fkey" FOREIGN KEY ("trust_id") REFERENCES "workload_identity_trust"("id") ON DELETE SET NULL;
 ALTER TABLE ONLY "person_backup_code"
     ADD CONSTRAINT "person_backup_code_person_id_fkey" FOREIGN KEY ("person_id") REFERENCES "person"("id") ON DELETE CASCADE;
 ALTER TABLE ONLY "person"
@@ -463,6 +513,14 @@ ALTER TABLE ONLY "project_membership_variable"
     ADD CONSTRAINT "project_membership_variable_membership" FOREIGN KEY ("membership_id") REFERENCES "project_membership"("id") ON DELETE CASCADE;
 ALTER TABLE ONLY "project_secret"
     ADD CONSTRAINT "project_secret_project" FOREIGN KEY ("project_id") REFERENCES "project"("id") ON DELETE CASCADE;
+ALTER TABLE ONLY "workload_identity_assume_rule"
+    ADD CONSTRAINT "workload_identity_assume_rule_membership_id_fkey" FOREIGN KEY ("membership_id") REFERENCES "project_membership"("id") ON DELETE CASCADE;
+ALTER TABLE ONLY "workload_identity_assume_rule"
+    ADD CONSTRAINT "workload_identity_assume_rule_trust_id_fkey" FOREIGN KEY ("trust_id") REFERENCES "workload_identity_trust"("id") ON DELETE CASCADE;
+ALTER TABLE ONLY "workload_identity_trust"
+    ADD CONSTRAINT "workload_identity_trust_created_by_fkey" FOREIGN KEY ("created_by") REFERENCES "identity"("id") ON DELETE SET NULL;
+ALTER TABLE ONLY "workload_identity_trust"
+    ADD CONSTRAINT "workload_identity_trust_identity_id_fkey" FOREIGN KEY ("identity_id") REFERENCES "identity"("id") ON DELETE RESTRICT;
 INSERT INTO "config" (id)
 VALUES (DEFAULT);
 

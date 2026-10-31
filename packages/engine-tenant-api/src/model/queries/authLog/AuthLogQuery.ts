@@ -18,6 +18,7 @@ export type AuthLogEntryRow = {
 	readonly identity_provider_id: string | null
 	readonly metadata: JSONValue | null
 	readonly event_data: JSONValue | null
+	readonly trust_id: string | null
 }
 
 export type AuthLogFilter = {
@@ -68,6 +69,7 @@ export class AuthLogQuery extends DatabaseQuery<readonly AuthLogEntryRow[]> {
 			.select(['person_auth_log', 'identity_provider_id'])
 			.select(['person_auth_log', 'metadata'])
 			.select(['person_auth_log', 'event_data'])
+			.select(['person_auth_log', 'trust_id'])
 			.from('person_auth_log')
 			.orderBy(['person_auth_log', 'created_at'], 'desc')
 			.orderBy(['person_auth_log', 'id'], 'desc')

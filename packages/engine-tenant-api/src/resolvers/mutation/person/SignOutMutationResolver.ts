@@ -17,7 +17,7 @@ export class SignOutMutationResolver implements MutationResolvers {
 		const response = await this.signOutManager.signOut(
 			context.db,
 			context.identity.id,
-			context.apiKeyId,
+			context.credential,
 			all,
 		)
 
@@ -27,7 +27,7 @@ export class SignOutMutationResolver implements MutationResolvers {
 			response: response.ok ? new ResponseOk(null) : response,
 			personId: response.ok ? response.result.personId : undefined,
 			identityProviderId: response.ok ? response.result.identityProviderId ?? undefined : undefined,
-			metadata: { sessionId: context.apiKeyId },
+			metadata: { sessionId: context.credential.type === 'api_key' ? context.credential.id : undefined },
 			eventData: { all },
 		})
 

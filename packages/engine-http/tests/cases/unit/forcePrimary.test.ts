@@ -188,7 +188,14 @@ const createHarness = ({ forcePrimaryHeader = true, withReplica = true }: { forc
 				timer: (_event, callback) => callback(),
 				tracer: noopTracer,
 				requestDebugMode: false,
-				authResult: { valid: true, identityId: 'identity', apiKeyId: 'key', roles: [], personId: null, trustForwardedInfo: false },
+				authResult: {
+					valid: true,
+					identityId: 'identity',
+					credential: { type: 'api_key', id: 'key' },
+					roles: [],
+					personId: null,
+					trustForwardedInfo: false,
+				},
 				params: { projectSlug: 'test', stageSlug: 'live' },
 			})
 			return { koa, result }

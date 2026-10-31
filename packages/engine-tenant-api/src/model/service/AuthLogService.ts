@@ -70,6 +70,7 @@ class AuthLogService {
 				eventData: data.eventData ?? authData?.data?.eventData,
 				geoCountry: ctx.geoCountry,
 				deviceFingerprint: ctx.deviceFingerprint,
+				trustId: data.trustId ?? authData?.data?.trustId,
 			}),
 		)
 	}
@@ -105,6 +106,43 @@ class AuthLogService {
 			}),
 		)
 	}
+
+	/**
+	 * A workload token authentication (§8.7), emitted by `WorkloadTokenVerifier` off the request path. A success row
+	 * carries `tokenRef` and is inserted at most once per token; failure rows carry no claim outside `unverified_*` metadata.
+	 */
+	async logWorkloadAuth(
+		db: DatabaseContext,
+		entry: {
+			success: boolean
+			trustId: string | null
+			/** The trust identity of an admitted token. */
+			identityId?: string
+			tokenRef?: string
+			errorCode?: string
+			errorMessage?: string
+			ipAddress?: string
+			userAgent?: string
+			metadata: Record<string, JSONValue>
+			eventData?: JSONValue
+		},
+	): Promise<void> {
+		await db.commandBus.execute(
+			new CreateAuthLogEntryCommand({
+				type: entry.success ? 'workload_auth_success' : 'workload_auth_failure',
+				success: entry.success,
+				invokedById: entry.identityId,
+				trustId: entry.trustId ?? undefined,
+				tokenRef: entry.tokenRef,
+				errorCode: entry.errorCode,
+				errorMessage: entry.errorMessage,
+				ipAddress: entry.ipAddress,
+				userAgent: entry.userAgent,
+				metadata: entry.metadata,
+				eventData: entry.eventData,
+			}),
+		)
+	}
 }
 
 namespace AuthLogService {
@@ -117,6 +155,8 @@ namespace AuthLogService {
 		targetPersonId?: string
 		metadata?: JSONValue
 		eventData?: JSONValue
+		/** The workload identity trust the entry is about. */
+		trustId?: string
 	}
 
 	export type LogArgs = {

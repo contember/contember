@@ -3,7 +3,7 @@ import type { PanelAccessCheck } from './PanelApiController.js'
 import { TtlCache } from './TtlCache.js'
 
 /**
- * Evaluates the tenant-configured panel policy, memoized per api key so a page of parallel requests
+ * Evaluates the tenant-configured panel policy, memoized per identity so a page of parallel requests
  * costs one lookup rather than one per request. The TTL is deliberately short: revoking someone's
  * access should take effect in seconds, not on their next sign-in.
  */
@@ -17,7 +17,7 @@ export class ConfiguredPanelAccessCheck implements PanelAccessCheck {
 	public async isAllowed({ projectGroup, authResult }: { projectGroup: ProjectGroupContainer; authResult: AuthResult }): Promise<boolean> {
 		const { panelAccessResolver, databaseContext } = projectGroup.tenantContainer
 		return await this.cache.resolve(
-			`${projectGroup.slug ?? ''}:${authResult.apiKeyId}`,
+			`${projectGroup.slug ?? ''}:${authResult.identityId}`,
 			() => panelAccessResolver.isAllowed(databaseContext, authResult.identityId, authResult.roles),
 		)
 	}

@@ -41,6 +41,10 @@ import { TenantApiTransport } from '../../../src/lib/tenant/TenantApiTransport.j
 import { TenantCreateProjectDetails, TenantCreateProjectResult, TenantProjectClient } from '../../../src/lib/tenant/clients/TenantProjectClient.js'
 import { createTestOutput } from '../../../../cli-common/tests/lib/testOutput.js'
 import prompts from 'prompts'
+import { staticTokenCredentials } from '../../../src/lib/credentials/ApiCredentials.js'
+import type { EnvelopeCoverageResult } from '../../../src/lib/tenant/workloadIdentity/envelopeCoverage.js'
+import type { RemoteWorkloadIdentityTrust } from '../../../src/lib/tenant/workloadIdentity/model.js'
+import { Acl } from '@contember/schema'
 
 type Event =
 	| { type: 'create-project'; details: TenantCreateProjectDetails | undefined }
@@ -89,8 +93,17 @@ class RecordingSystemClientProvider extends SystemClientProvider {
 }
 
 class RecordingTenantProjectClient extends TenantProjectClient {
+	public workloadTrusts: RemoteWorkloadIdentityTrust[] | CliError = []
+
 	constructor(private readonly events: Event[]) {
 		super(new TenantApiTransport(new GraphQlClient({ url: 'http://tenant.test', apiToken: 'token' })))
+	}
+
+	override async listWorkloadIdentityTrusts(): Promise<RemoteWorkloadIdentityTrust[]> {
+		if (this.workloadTrusts instanceof CliError) {
+			throw this.workloadTrusts
+		}
+		return this.workloadTrusts
 	}
 
 	override async createProject(
@@ -220,9 +233,10 @@ const createHarness = async (
 	}
 	const systemClient = new RecordingSystemClient(events, executedMigrations, remoteMissing)
 	const systemProvider = new RecordingSystemClientProvider(systemClient)
-	const tenantProvider = new RecordingTenantClientProvider(new RecordingTenantProjectClient(events))
+	const tenantClient = new RecordingTenantProjectClient(events)
+	const tenantProvider = new RecordingTenantClientProvider(tenantClient)
 	const projectProvider = new RemoteProjectProvider()
-	projectProvider.setRemoteProject(new RemoteProject('project', 'http://api.test', 'token'))
+	projectProvider.setRemoteProject(new RemoteProject('project', 'http://api.test', staticTokenCredentials('token')))
 	const migrationPrinter = new MigrationPrinter(new MigrationDescriber(modificationFactory), io.output)
 	const statusFacade = new MigrationsStatusFacade(
 		systemProvider,
@@ -243,7 +257,7 @@ const createHarness = async (
 		snapshotFacade,
 		io.output,
 	)
-	return { events, facade, io }
+	return { events, facade, io, tenantClient, stateManager }
 }
 
 test('non-interactive state-only execution refuses before any mutation or request', async () => {
@@ -365,4 +379,83 @@ test('notifies confirmation once after interactive execution is accepted', async
 	})
 
 	expect(confirmations).toBe(1)
+})
+
+const syncTrust: RemoteWorkloadIdentityTrust = {
+	id: 'trust-id',
+	slug: 'sites-sync',
+	profile: 'github-actions',
+	issuer: 'https://token.actions.githubusercontent.com',
+	audience: 'contember:test:sites-sync',
+	jwksUri: null,
+	signingAlgs: ['RS256'],
+	acceptedTyp: ['JWT'],
+	acceptAudienceArray: false,
+	requireDpop: false,
+	conditions: [{ claim: 'repository_id', equals: '1' }],
+	maxTokenLifetime: 600,
+	trustForwardedInfo: false,
+	description: null,
+	disabled: false,
+	tokensValidAfter: '2026-10-01T00:00:00.000Z',
+	roles: [],
+	memberships: [{
+		project: 'project',
+		role: 'sync',
+		variables: [{ name: 'site', values: ['blog'] }],
+		assumeMembership: { sync: { variables: { site: 'site' } } },
+	}],
+}
+
+/** The new schema adds a `locale` condition variable that the envelope rule predates. */
+const schemaWithLocale = {
+	...emptySchema,
+	acl: {
+		roles: {
+			sync: {
+				variables: {
+					site: { type: Acl.VariableType.entity, entityName: 'Site' },
+					locale: { type: Acl.VariableType.condition },
+					identity: { type: Acl.VariableType.predefined, value: 'identityID' },
+				},
+				entities: {},
+			},
+		},
+	},
+} satisfies typeof emptySchema
+
+test('warns before execution about envelope rules the new schema leaves uncovered', async () => {
+	const { facade, io, tenantClient, stateManager, events } = await createHarness({ state: true })
+	await stateManager.extractState(schemaWithLocale)
+	tenantClient.workloadTrusts = [syncTrust]
+	const results: EnvelopeCoverageResult[] = []
+
+	await facade.execute({ requireConfirmation: false, onEnvelopeCoverage: result => results.push(result) })
+
+	expect(results).toStrictEqual([{
+		status: 'checked',
+		issues: [{
+			trust: 'sites-sync',
+			project: 'project',
+			membershipRole: 'sync',
+			targetRole: 'sync',
+			kind: 'variables-uncovered',
+			variables: ['locale'],
+		}],
+	}])
+	expect(io.stderr.text).toContain('does not name variable(s) locale')
+	// a warning, never a failure
+	expect(events.some(event => event.type === 'execute-migrations')).toBe(true)
+})
+
+test('reports the coverage check as skipped when the credential may not list workload identities', async () => {
+	const { facade, io, tenantClient, events } = await createHarness({ state: true })
+	tenantClient.workloadTrusts = new CliError('Tenant API request failed', { code: 'TENANT_API_FORBIDDEN', exitCode: ExitCode.Forbidden })
+	const results: EnvelopeCoverageResult[] = []
+
+	await facade.execute({ requireConfirmation: false, onEnvelopeCoverage: result => results.push(result) })
+
+	expect(results).toStrictEqual([{ status: 'skipped', reason: 'the credential may not list workload identities (workloadIdentity:list)' }])
+	expect(io.stderr.text).toContain('envelope coverage check skipped')
+	expect(events.some(event => event.type === 'execute-migrations')).toBe(true)
 })

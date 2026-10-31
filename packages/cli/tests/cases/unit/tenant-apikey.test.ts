@@ -10,6 +10,7 @@ import { TenantApiKeyCreateCommand } from '../../../src/commands/tenant/apikey/T
 import { TenantApiKeyDisableCommand } from '../../../src/commands/tenant/apikey/TenantApiKeyDisableCommand.js'
 import { TenantApiKeyListCommand } from '../../../src/commands/tenant/apikey/TenantApiKeyListCommand.js'
 import { createTestOutput } from '../../../../cli-common/tests/lib/testOutput.js'
+import { staticTokenCredentials } from '../../../src/lib/credentials/ApiCredentials.js'
 
 interface CapturedRequest {
 	query: string
@@ -235,7 +236,7 @@ describe('tenant api-key commands', () => {
 
 	const createProvider = () => {
 		const remoteProjectProvider = new RemoteProjectProvider()
-		remoteProjectProvider.setRemoteProject(new RemoteProject('blog', API_URL, 'test-token'))
+		remoteProjectProvider.setRemoteProject(new RemoteProject('blog', API_URL, staticTokenCredentials('test-token')))
 		return new TenantClientProvider(remoteProjectProvider)
 	}
 

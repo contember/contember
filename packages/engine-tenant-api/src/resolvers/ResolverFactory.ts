@@ -38,6 +38,8 @@ import { DisconnectMyIdentityProviderMutationResolver } from './mutation/idp/ind
 import { IdentityTypeResolver, PersonTypeResolver, ProjectTypeResolver } from './types/index.js'
 import { DateTimeType, IntervalType, JSONType } from '@contember/graphql-utils'
 import { IDPQueryResolver } from './query/IDPQueryResolver.js'
+import { WorkloadIdentityQueryResolver } from './query/WorkloadIdentityQueryResolver.js'
+import { WorkloadIdentityMutationResolver } from './mutation/workloadIdentity/WorkloadIdentityMutationResolver.js'
 import { UpdateIDPMutationResolver } from './mutation/idp/UpdateIDPMutationResolver.js'
 import { DisablePersonMutationResolver } from './mutation/person/DisablePersonMutationResolver.js'
 import { EnablePersonMutationResolver } from './mutation/person/EnablePersonMutationResolver.js'
@@ -121,6 +123,8 @@ class ResolverFactory {
 
 			authLogQueryResolver: AuthLogQueryResolver
 			apiKeyQueryResolver: ApiKeyQueryResolver
+			workloadIdentityQueryResolver: WorkloadIdentityQueryResolver
+			workloadIdentityMutationResolver: WorkloadIdentityMutationResolver
 
 			togglePasswordlessMutationResolver: TogglePasswordlessMutationResolver
 		},
@@ -137,6 +141,8 @@ class ResolverFactory {
 				roles: this.resolvers.identityTypeResolver.roles.bind(this.resolvers.identityTypeResolver),
 				permissions: this.resolvers.identityTypeResolver.permissions.bind(this.resolvers.identityTypeResolver),
 				sessions: this.resolvers.identityTypeResolver.sessions.bind(this.resolvers.identityTypeResolver),
+				kind: this.resolvers.identityTypeResolver.kind.bind(this.resolvers.identityTypeResolver),
+				workloadIdentityTrust: this.resolvers.identityTypeResolver.workloadIdentityTrust.bind(this.resolvers.identityTypeResolver),
 			},
 			Person: {
 				identityProviders: this.resolvers.personTypeResolver.identityProviders.bind(this.resolvers.personTypeResolver),
@@ -159,6 +165,10 @@ class ResolverFactory {
 				projects: this.resolvers.projectQueryResolver.projects.bind(this.resolvers.projectQueryResolver),
 				projectMemberships: this.resolvers.projectMembersQueryResolver.projectMemberships.bind(this.resolvers.projectMembersQueryResolver),
 				identityProviders: this.resolvers.idpQueryResolver.identityProviders.bind(this.resolvers.idpQueryResolver),
+				workloadIdentityTrusts: this.resolvers.workloadIdentityQueryResolver.workloadIdentityTrusts.bind(this.resolvers.workloadIdentityQueryResolver),
+				checkWorkloadIdentityToken: this.resolvers.workloadIdentityQueryResolver.checkWorkloadIdentityToken.bind(
+					this.resolvers.workloadIdentityQueryResolver,
+				),
 				mailTemplates: this.resolvers.mailTemplateQueryResolver.mailTemplates.bind(this.resolvers.mailTemplateQueryResolver),
 				configuration: this.resolvers.configurationQueryResolver.configuration.bind(this.resolvers.configurationQueryResolver),
 				authPolicies: this.resolvers.authPolicyQueryResolver.authPolicies.bind(this.resolvers.authPolicyQueryResolver),
@@ -196,6 +206,12 @@ class ResolverFactory {
 				disableIDP: this.resolvers.disableIdpMutationResolver.disableIDP.bind(this.resolvers.disableIdpMutationResolver),
 				enableIDP: this.resolvers.enableIdpMutationResolver.enableIDP.bind(this.resolvers.enableIdpMutationResolver),
 				updateIDP: this.resolvers.updateIdpMutationResolver.updateIDP.bind(this.resolvers.updateIdpMutationResolver),
+				applyWorkloadIdentityTrust: this.resolvers.workloadIdentityMutationResolver.applyWorkloadIdentityTrust.bind(
+					this.resolvers.workloadIdentityMutationResolver,
+				),
+				disableWorkloadIdentityTrust: this.resolvers.workloadIdentityMutationResolver.disableWorkloadIdentityTrust.bind(
+					this.resolvers.workloadIdentityMutationResolver,
+				),
 				disconnectMyIdentityProvider: this.resolvers.disconnectMyIdentityProviderMutationResolver.disconnectMyIdentityProvider.bind(
 					this.resolvers.disconnectMyIdentityProviderMutationResolver,
 				),

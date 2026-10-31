@@ -1,6 +1,5 @@
 import { CliError, Command, CommandConfiguration, escapeTerminalText, ExitCode, Input, Output } from '@contember/cli-common'
 import { createWriteStream } from 'node:fs'
-import { maskToken } from '../../lib/maskToken.js'
 import { pipeline } from 'node:stream/promises'
 import { createProgressReporter } from '../../lib/transfer/stdio.js'
 import { createGzip } from 'node:zlib'
@@ -59,7 +58,7 @@ export class ExportCommand extends Command<Args, Options> {
 		output.info('')
 		output.info(`Project name: ${project.name}`)
 		output.info(`API URL: ${project.endpoint}`)
-		output.info(`Token: ${maskToken(project.token)}`)
+		output.info(`Token: ${project.credentials.description}`)
 
 		const gzipOutput = !input.getOption('no-gzip-output') && !input.getOption('no-gzip')
 		const gzipTransfer = !input.getOption('no-gzip-transfer')

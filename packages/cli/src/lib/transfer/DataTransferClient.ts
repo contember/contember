@@ -5,6 +5,7 @@ import { pipeline } from 'node:stream/promises'
 import { createGzip } from 'node:zlib'
 import { RemoteProject } from '../project/RemoteProject.js'
 import { toHttpTransportError, toTransportError } from '../errors/TransportError.js'
+import { fetchWithCredentials } from '../credentials/fetchWithCredentials.js'
 
 const transferContext = (action: 'Import' | 'Export', endpoint: string) => ({
 	service: `Data ${action.toLowerCase()}`,
@@ -277,15 +278,18 @@ export class DataTransferClient {
 			}
 			return line
 		})
+		const context = transferContext('Import', project.endpoint)
+		const importUrl = `${project.endpoint}/import`
+		// a streamed body cannot be replayed, so a 401 is surfaced instead of retried with a refreshed token
+		const authHeaders = await project.credentials.authenticate({ url: importUrl, method: 'POST', refresh: false })
 		const uploadStream = new PassThrough()
 		const abortController = new AbortController()
 		const rawPump = gzip
 			? pipeline(stream, transformedStream, createGzip(), uploadStream)
 			: pipeline(stream, transformedStream, uploadStream)
-		const context = transferContext('Import', project.endpoint)
 		const requestInit: StreamingRequestInit = {
 			headers: {
-				'Authorization': `Bearer ${project.token}`,
+				...authHeaders,
 				'Content-type': 'application/x-ndjson',
 				...(gzip ? { 'Content-Encoding': 'gzip' } : {}),
 			},
@@ -294,7 +298,7 @@ export class DataTransferClient {
 			duplex: 'half',
 			signal: abortController.signal,
 		}
-		const rawRequest = fetch(`${project.endpoint}/import`, requestInit)
+		const rawRequest = fetch(importUrl, requestInit)
 		const pump: Promise<ImportPumpOutcome> = rawPump.then(
 			() => ({ type: 'pump-complete' }),
 			cause => {
@@ -342,7 +346,7 @@ export class DataTransferClient {
 		await assertImportResult(response)
 	}
 
-	dataExport = async ({ project: { name: project, token, endpoint: baseUrl }, gzip, includeSystem, excludeTables }: {
+	dataExport = async ({ project: { name: project, credentials, endpoint: baseUrl }, gzip, includeSystem, excludeTables }: {
 		project: RemoteProject
 		excludeTables?: string[]
 		includeSystem: boolean
@@ -351,9 +355,8 @@ export class DataTransferClient {
 		const context = transferContext('Export', baseUrl)
 		let response: Response
 		try {
-			response = await fetch(`${baseUrl}/export`, {
+			response = await fetchWithCredentials(credentials, `${baseUrl}/export`, {
 				headers: {
-					'Authorization': `Bearer ${token}`,
 					'Accept-Encoding': gzip ? 'gzip' : 'identity',
 					'Content-type': 'application/json',
 				},

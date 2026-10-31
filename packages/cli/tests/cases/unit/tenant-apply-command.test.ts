@@ -101,7 +101,13 @@ describe('TenantApplyCommand', () => {
 
 		await command.run(['--dry-run', '--json'], output)
 
-		expect(JSON.parse(stdout.text)).toEqual({ configPath: 'tenant.config.ts', dryRun: true, actions: expectedPlan, warnings: [] })
+		expect(JSON.parse(stdout.text)).toEqual({
+			configPath: 'tenant.config.ts',
+			dryRun: true,
+			actions: expectedPlan,
+			warnings: [],
+			workloadIdentities: null,
+		})
 		expect(stderr.text).toBe('')
 	})
 
@@ -164,7 +170,13 @@ describe('TenantApplyCommand', () => {
 
 		await command.run(['--json'], output)
 
-		expect(JSON.parse(stdout.text)).toEqual({ configPath: 'tenant.config.ts', dryRun: false, actions: expectedPlan, warnings: [] })
+		expect(JSON.parse(stdout.text)).toEqual({
+			configPath: 'tenant.config.ts',
+			dryRun: false,
+			actions: expectedPlan,
+			warnings: [],
+			workloadIdentities: null,
+		})
 		expect(stderr.text).toBe('')
 	})
 
@@ -227,7 +239,7 @@ describe('TenantApplyCommand', () => {
 		await command.run(['--json'], output)
 
 		expect(requestedUrls).toEqual([])
-		expect(JSON.parse(stdout.text)).toEqual({ configPath: 'tenant.config.ts', dryRun: false, actions: [], warnings: [] })
+		expect(JSON.parse(stdout.text)).toEqual({ configPath: 'tenant.config.ts', dryRun: false, actions: [], warnings: [], workloadIdentities: null })
 	})
 
 	test('an unresolvable project is a typed input error', async () => {

@@ -19,5 +19,6 @@ export const configurationModule: PanelModule = {
 		identity.permissions.canViewConfiguration
 		|| identity.permissions.canManageConfiguration
 		|| identity.permissions.canListIdentityProviders
+		|| identity.permissions.canListWorkloadIdentities
 		|| identity.permissions.canListMailTemplates,
 }

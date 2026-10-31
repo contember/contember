@@ -1,5 +1,5 @@
 import type { JsonValue } from '@contember/cli-common'
-import { GraphQlClient, GraphQlClientVariables } from '@contember/graphql-client'
+import { CredentialsProvider, GraphQlClient, GraphQlClientVariables } from '@contember/graphql-client'
 import { toTransportError } from '../errors/TransportError.js'
 
 const createActionsApiUrl = (url: string, project: string) => {
@@ -13,8 +13,8 @@ export class ActionsClient {
 	constructor(private readonly apiClient: GraphQlClient) {
 	}
 
-	public static create(url: string, project: string, apiToken: string): ActionsClient {
-		const graphqlClient = new GraphQlClient({ url: createActionsApiUrl(url, project), apiToken })
+	public static create(url: string, project: string, credentials: CredentialsProvider): ActionsClient {
+		const graphqlClient = new GraphQlClient({ url: createActionsApiUrl(url, project), credentials })
 		return new ActionsClient(graphqlClient)
 	}
 

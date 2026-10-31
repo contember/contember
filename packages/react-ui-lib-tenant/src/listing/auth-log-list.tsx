@@ -156,7 +156,15 @@ export const AuthLogList = ({ controller }: AuthLogListProps) => {
 											? dict.tenant.authLog.ok
 											: <span className="text-destructive">{dict.tenant.authLog.failed}</span>}
 									</TableCell>
-									<TableCell>{entry.personInputIdentifier}</TableCell>
+									<TableCell>
+										{entry.personInputIdentifier}
+										{entry.workloadIdentityTrustId && (
+											<span className="flex flex-col">
+												<span className="text-xs text-gray-500">{dict.tenant.authLog.workloadIdentityTrust}</span>
+												<span className="font-mono text-xs break-all">{entry.workloadIdentityTrustId}</span>
+											</span>
+										)}
+									</TableCell>
 									<TableCell className="whitespace-nowrap">{entry.ipAddress}</TableCell>
 									<TableCell className="font-mono text-xs" title={entry.errorMessage}>{entry.errorCode}</TableCell>
 								</TableRow>

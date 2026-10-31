@@ -12,7 +12,7 @@ const makeAuthenticator = (trust: boolean, geoHeader?: string) => {
 			result: {
 				valid: true,
 				identityId: 'identity-1',
-				apiKeyId: 'api-key-1',
+				credential: { type: 'api_key', id: 'api-key-1' },
 				roles: [],
 				personId: null,
 				trustForwardedInfo: trust,
@@ -20,7 +20,10 @@ const makeAuthenticator = (trust: boolean, geoHeader?: string) => {
 		}),
 	} as unknown as ApiKeyManager
 	const db = {} as DatabaseContext
-	return new Authenticator(db, db, apiKeyManager, geoHeader)
+	const workloadTokenVerifier = {
+		authenticate: () => Promise.reject(new Error('An opaque token never reaches the workload verifier')),
+	}
+	return new Authenticator(db, db, apiKeyManager, workloadTokenVerifier, [], geoHeader)
 }
 
 const req = (headers: Record<string, string>): IncomingMessage => ({

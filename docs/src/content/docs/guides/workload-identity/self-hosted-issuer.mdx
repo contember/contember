@@ -1,0 +1,148 @@
+---
+title: Self-hosted issuer
+description: A backend that signs its own short-lived tokens for Contember, optionally bound with DPoP.
+---
+
+The most common machine caller is an application backend — a website server reading and writing content. If it does not run on a platform that already issues tokens (see [Kubernetes](/guides/workload-identity/kubernetes) and [Vercel](/guides/workload-identity/vercel)), it can be its own issuer: it publishes an OIDC discovery document and its public keys, and signs short-lived tokens with its private key.
+
+:::note[Available since 2.2]
+:::
+
+The `@contember/workload-identity` package does both halves: `issuerHandler` serves the discovery document and the keys, `selfIssued` mints tokens for `@contember/graphql-client`.
+
+```bash
+npm install @contember/workload-identity @contember/graphql-client
+```
+
+## 1. Create a signing key
+
+Generate an ES256 key pair once and keep the private key wherever the backend keeps secrets — ideally a KMS or HSM, where it cannot be exported:
+
+```bash
+openssl genpkey -algorithm EC -pkeyopt ec_paramgen_curve:P-256 -out issuer-key.pem
+openssl pkey -in issuer-key.pem -pubout -out issuer-key.pub.pem
+```
+
+Every instance of the backend signs with the same key, so they all publish the same JWKS.
+
+## 2. Publish the discovery document and the keys
+
+Contember fetches `<issuer>/.well-known/openid-configuration` and the JWKS it points to. `issuerHandler` is a fetch-style `Request → Response` handler serving both (`/.well-known/openid-configuration` and `/.well-known/jwks.json` under the issuer URL) and answering `404` for anything else:
+
+```ts title="issuer.ts"
+import { importSPKI, exportJWK } from 'jose'
+import { issuerHandler } from '@contember/workload-identity'
+
+const publicKey = await importSPKI(process.env.ISSUER_PUBLIC_KEY!, 'ES256', { extractable: true })
+
+export const issuerKid = 'issuer-2026-10'
+export const issuerPublicJwk = { ...(await exportJWK(publicKey)), kid: issuerKid, alg: 'ES256', use: 'sig' }
+
+export const handleIssuer = issuerHandler({
+  issuer: 'https://auth.example.com',
+  keys: [issuerPublicJwk],
+})
+```
+
+Mount `handleIssuer` so that `https://auth.example.com/.well-known/*` reaches it — any server or framework that works with WHATWG `Request` / `Response` (Node 18+, Bun, edge runtimes) can call it directly. `issuerHandler` throws at construction when a key has private members, so the private key cannot be published by mistake, and when a key lacks `kty`, `kid` or `alg`.
+
+Requirements on the issuer URL:
+
+- `https://`, with a certificate the engine trusts (a private CA can be added with [`caCertificates`](/reference/engine/configuration/workload-identity)).
+- Reachable from the engine at a public address. Hosts on private networks need an entry in the server's [`egressAllowlist`](/reference/engine/configuration/workload-identity).
+- The `issuer` in the discovery document must equal the configured issuer exactly — `issuerHandler` writes the one you pass.
+
+If the engine cannot reach the issuer URL but can reach the keys elsewhere, set `jwksUri` on the trust. The issuer is then only compared, never fetched.
+
+## 3. Declare the trust
+
+```ts title="tenant.config.ts"
+workloadIdentities: {
+  'web-backend': {
+    profile: 'oidc',
+    issuer: 'https://auth.example.com',
+    audience: 'contember:my-instance:web-backend',
+    conditions: [{ claim: 'sub', equals: 'web-backend' }],
+    signingAlgs: ['ES256'],
+    requireDpop: true,
+    memberships: [{ project: 'website', role: 'reader' }],
+    maxTokenLifetime: 300,
+  },
+},
+```
+
+Apply it with a person or API-key credential:
+
+```bash
+contember tenant apply
+```
+
+`sub` is whatever your backend puts in its tokens. Use a distinct subject — and a distinct trust — for each backend that needs different grants.
+
+## 4. Calling Contember
+
+```ts title="contember.ts"
+import { importPKCS8 } from 'jose'
+import { GraphQlClient } from '@contember/graphql-client'
+import { selfIssued } from '@contember/workload-identity'
+import { issuerKid } from './issuer.js'
+
+const issuerKey = await importPKCS8(process.env.ISSUER_PRIVATE_KEY!, 'ES256')
+
+export const client = new GraphQlClient({
+  url: 'https://api.example.com/content/website/live',
+  credentials: selfIssued({
+    issuer: 'https://auth.example.com',
+    subject: 'web-backend',
+    audience: 'contember:my-instance:web-backend',
+    signer: issuerKey,
+    alg: 'ES256',
+    kid: issuerKid,
+    lifetime: 300,
+    dpop: true,
+  }),
+})
+```
+
+`credentials` replaces `apiToken`; setting both is an error. For every request the client asks the provider for headers. `selfIssued` caches a token until 80 % of its lifetime and then mints a new one. When a request is answered with `401`, the client asks for a fresh token and retries once — safe for mutations too, because the engine authenticates a request before it runs any of it. A second `401` surfaces as the usual unauthorized error; a `403` is never retried.
+
+`client-content` and generated clients get this through `GraphQlClient`.
+
+### Signing with a KMS or HSM
+
+`signer` is either a `CryptoKey` or a function that signs the JWS signing input and returns the signature:
+
+```ts
+const signer = async (signingInput: Uint8Array): Promise<Uint8Array> => {
+  return await kms.sign(signingInput) // your KMS client
+}
+
+selfIssued({ /* … */ signer, alg: 'ES256', kid: issuerKid })
+```
+
+`alg` is required with a function signer. For ECDSA the function must return the raw `r‖s` signature (64 bytes for ES256), not the DER encoding most KMS APIs return — convert it first.
+
+## DPoP
+
+With `dpop: true`, `selfIssued` generates an ephemeral, non-extractable key pair in memory, puts its thumbprint in the token (`cnf.jkt`), and sends a fresh proof signed with that key on every request:
+
+```http
+Authorization: DPoP eyJ…
+DPoP: eyJ…
+```
+
+A token that leaks from a log or a proxy is useless without the in-memory key, and a captured proof is bound to that token, method and URL and expires within a minute. Set `requireDpop: true` on the trust so an unbound token is never accepted. Read the [DPoP limits](/guides/workload-identity/security#dpop) before relying on it: it does not cover the request body, and a proxy that rewrites the request path breaks it.
+
+## Rotating the key
+
+1. Generate the next key and publish **both** public keys in `issuerHandler`'s `keys`.
+2. Wait until every engine has picked up the new JWKS. Engines refresh keys every 5 minutes; an unknown `kid` triggers a refetch, but at most once every 30 seconds per issuer, so give it at least 5 minutes.
+3. Switch `selfIssued` to the new key and `kid`.
+4. Wait at least `maxTokenLifetime`, so every token signed with the old key has expired.
+5. Remove the old public key.
+
+Rotation needs no apply and no change in Contember. If the old key is compromised, disable the trust instead of waiting: engines keep last-known-good keys for up to [`jwksMaxStaleness`](/reference/engine/configuration/workload-identity) while the issuer is unreachable, but a disabled trust stops authenticating on the next request.
+
+## Testing
+
+`@contember/workload-identity/testing` starts a throwaway issuer on a loopback port — see [local development](/guides/workload-identity/local-development#tests).

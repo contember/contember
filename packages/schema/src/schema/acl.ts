@@ -47,7 +47,35 @@ export namespace Acl {
 	// }
 
 	export type PredicateVariable = string // { name: string }
-	export type PredicateDefinition<E = never> = Input.Where<PredicateVariable | Input.Condition | E>
+
+	/**
+	 * Marker keys of an update predicate. `_old: X` holds when the stored row satisfies X, `_new: Y` when
+	 * the proposed row satisfies Y; a marker-free part of the predicate must hold for both rows. Markers
+	 * combine through `and`/`or`/`not`, but not under a relation or inside another marker. Operations
+	 * with a single state (read/create/delete) evaluate both markers against that one row.
+	 *
+	 * Example - allow moving a record from state A to state B, but not back:
+	 * ```
+	 * {
+	 *   _old: { state: { eq: 'A' } },
+	 *   _new: { state: { eq: 'B' } },
+	 * }
+	 * ```
+	 */
+	export const PredicateOldStateMarker = '_old'
+	export const PredicateNewStateMarker = '_new'
+
+	export type StatelessPredicateDefinition<E = never> = Input.Where<PredicateVariable | Input.Condition | E>
+
+	export type PredicateDefinition<E = never> =
+		& Input.FieldWhere<PredicateVariable | Input.Condition | E>
+		& {
+			readonly and?: readonly PredicateDefinition<E>[]
+			readonly or?: readonly PredicateDefinition<E>[]
+			readonly not?: PredicateDefinition<E>
+			readonly [PredicateOldStateMarker]?: StatelessPredicateDefinition<E>
+			readonly [PredicateNewStateMarker]?: StatelessPredicateDefinition<E>
+		}
 
 	export type PredicateMap = { readonly [name: string]: PredicateDefinition }
 

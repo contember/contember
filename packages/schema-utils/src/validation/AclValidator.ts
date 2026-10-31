@@ -1,8 +1,11 @@
 import { Acl, Model } from '@contember/schema'
-import { PredicateDefinitionProcessor } from '../acl/index.js'
+import { isStateMarkerContent, PredicateDefinitionProcessor } from '../acl/index.js'
 import { getEntity } from '../model/index.js'
 import { ErrorBuilder, ValidationError } from './errors.js'
 import { conditionSchema } from '../type-schema/index.js'
+
+const isStateMarker = (key: string) => key === Acl.PredicateOldStateMarker || key === Acl.PredicateNewStateMarker
+const booleanOperators = ['and', 'or', 'not']
 
 export class AclValidator {
 	constructor(private readonly model: Model.Schema) {}
@@ -145,6 +148,18 @@ export class AclValidator {
 					errorBuilder.for(...ctx.path).add('ACL_UNDEFINED_VARIABLE', `Undefined variable ${ctx.value}`)
 				}
 				return ctx.value
+			},
+			handleStateMarker: ({ marker, value, path }) => {
+				if (!isStateMarkerContent(value)) {
+					errorBuilder.for(...path, marker).add('ACL_INVALID_STATE_MARKER', `Marker "${marker}" must contain a predicate object.`)
+				} else if (path.some(isStateMarker)) {
+					errorBuilder.for(...path, marker).add('ACL_INVALID_STATE_MARKER', `Marker "${marker}" cannot be nested inside another "_old"/"_new" marker.`)
+				} else if (path.some(it => !booleanOperators.includes(it))) {
+					errorBuilder.for(...path, marker).add(
+						'ACL_INVALID_STATE_MARKER',
+						`Marker "${marker}" cannot be used under a relation, it applies only to the updated row. A canX() reference to a predicate with markers ends up here too.`,
+					)
+				}
 			},
 			handleUndefinedField: ctx => {
 				errorBuilder.for(...ctx.path).add('ACL_UNDEFINED_FIELD', `Undefined field ${ctx.name} on entity ${ctx.entity.name}`)

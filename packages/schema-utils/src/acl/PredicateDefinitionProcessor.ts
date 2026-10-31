@@ -1,5 +1,6 @@
 import { acceptFieldVisitor } from '../model/index.js'
 import { Acl, Input, Model, Writable } from '@contember/schema'
+import { isStateMarkerContent } from './statePredicate.js'
 
 class PredicateDefinitionProcessor {
 	constructor(private readonly schema: Model.Schema) {}
@@ -29,6 +30,11 @@ class PredicateDefinitionProcessor {
 				])
 			} else if (key === 'and' || key === 'or') {
 				result[key] = (value as Acl.PredicateDefinition[]).map(it => this.processInternal(entity, it, handler, [...path, key]))
+			} else if (key === Acl.PredicateOldStateMarker || key === Acl.PredicateNewStateMarker) {
+				handler.handleStateMarker?.({ entity, marker: key, value, path })
+				// an invalid marker is kept as is: it cannot be resolved and is refused when the predicate is used
+				result[key] =
+					(isStateMarkerContent(value) ? this.processInternal(entity, value, handler, [...path, key]) : value) as (typeof result)[keyof typeof result]
 			} else if (!entity.fields[key] && handler.handleUndefinedField) {
 				const undefinedResult = handler.handleUndefinedField({ entity, name: key, value, path })
 				if (undefinedResult !== undefined) {
@@ -99,6 +105,13 @@ namespace PredicateDefinitionProcessor {
 			targetEntity: Model.Entity
 			path: string[]
 		}): R | Input.Where | undefined | [string, R | Input.Where]
+
+		handleStateMarker?(ctx: {
+			entity: Model.Entity
+			marker: typeof Acl.PredicateOldStateMarker | typeof Acl.PredicateNewStateMarker
+			value: unknown
+			path: string[]
+		}): void
 
 		handleUndefinedField?(ctx: {
 			entity: Model.Entity

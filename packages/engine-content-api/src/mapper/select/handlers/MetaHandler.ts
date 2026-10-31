@@ -41,7 +41,8 @@ export class MetaHandler implements SelectExecutionHandler<{}> {
 		const fieldPredicate = this.predicateFactory.getFieldPredicate(entity, operation, fieldName, aclScopeFromPath(relationPath))
 		context.addColumn({
 			path: metaPath,
-			valueGetter: context.addPredicate(fieldPredicate.predicate),
+			// `updatable` asks whether the stored row admits some update, so `_new` parts do not restrict it
+			valueGetter: context.addPredicate(fieldPredicate.predicate, operation === Acl.Operation.update ? 'old' : 'single'),
 		})
 	}
 }

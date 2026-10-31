@@ -1,8 +1,16 @@
 import { tuple } from '../../utils/index.js'
 import { Acl, Input, Model, Value } from '@contember/schema'
-import { acceptEveryFieldVisitor, getColumnName, getColumnType } from '@contember/schema-utils'
-import { Operator, QueryBuilder, SelectBuilder, UpdateBuilder as DbUpdateBuilder, Value as DbValue } from '@contember/database'
-import { PathFactory, WhereBuilder } from '../select/index.js'
+import { acceptEveryFieldVisitor, getColumnName, getColumnType, StatePredicate } from '@contember/schema-utils'
+import {
+	Literal,
+	Operator,
+	QueryBuilder,
+	SelectBuilder,
+	UpdateBuilder as DbUpdateBuilder,
+	Value as DbValue,
+	wrapIdentifier,
+} from '@contember/database'
+import { Path, PathFactory, WhereBuilder } from '../select/index.js'
 import { ColumnValue, normalizeDbValue } from '../ColumnValue.js'
 import { AclScope, PredicateFactory } from '../../acl/index.js'
 import { AfterUpdateEvent, BeforeUpdateEvent } from '../EventManager.js'
@@ -14,11 +22,18 @@ export interface UpdateResult {
 	affectedRows: number | null
 }
 
+type UpdateStatePredicate = StatePredicate<Input.OptionalWhere>
+type StatePredicateLeaf = Extract<UpdateStatePredicate, { readonly predicate: Input.OptionalWhere }>
+
+const joinConditions = (operator: 'and' | 'or', conditions: Literal[]): Literal => new Literal('').appendAll(conditions, ` ${operator} `, ['(', ')'])
+
 export class UpdateBuilder {
 	private rowData: Map<string, ColumnValue> = new Map()
 
 	private newWhere: { and: Input.OptionalWhere[] } = { and: [] }
 	private oldWhere: { and: Input.OptionalWhere[] } = { and: [] }
+	/** Predicates that relate the stored and the proposed row, e.g. `or` of several `_old`/`_new` transitions. */
+	private statePredicates: UpdateStatePredicate[] = []
 	private predicateFields: string[] = []
 	private fieldsCheckedElsewhere = new Set<string>()
 
@@ -54,10 +69,31 @@ export class UpdateBuilder {
 	}
 
 	public addPredicates(fields: string[]): void {
-		const predicate = this.predicateFactory.create(this.entity, Acl.Operation.update, this.scope, fields)
+		const predicate = this.predicateFactory.createUpdateStatePredicate(this.entity, this.scope, fields)
 		this.predicateFields.push(...fields)
-		this.addNewWhere(predicate)
-		this.addOldWhere(predicate)
+		this.addStatePredicate(predicate)
+	}
+
+	/** Conjuncts that constrain one row go to that row's where; the rest is evaluated over both rows in {@link execute}. */
+	private addStatePredicate(predicate: UpdateStatePredicate): void {
+		switch (predicate.type) {
+			case 'both':
+				this.addNewWhere(predicate.predicate)
+				this.addOldWhere(predicate.predicate)
+				return
+			case 'old':
+				this.addOldWhere(predicate.predicate)
+				return
+			case 'new':
+				this.addNewWhere(predicate.predicate)
+				return
+			case 'and':
+				predicate.operands.forEach(it => this.addStatePredicate(it))
+				return
+			case 'or':
+			case 'not':
+				this.statePredicates.push(predicate)
+		}
 	}
 
 	/**
@@ -100,6 +136,9 @@ export class UpdateBuilder {
 			return { values: [], affectedRows: null, executed: false }
 		}
 		const oldColSuffix = '_old__'
+		const rootPath = this.pathFactory.create([])
+		const newDataPath = this.pathFactory.create([], 'newData_')
+		const oldStateColumns = this.collectOldStateColumns()
 
 		const qb = DbUpdateBuilder.create()
 			.with('newData_', qb => {
@@ -135,11 +174,16 @@ export class UpdateBuilder {
 
 				qb = remainingColumns.reduce((qb, columnName) => qb.select(['root_', columnName]), qb)
 
-				qb = this.whereBuilder.build(qb, this.entity, this.pathFactory.create([]), {
+				qb = this.whereBuilder.build(qb, this.entity, rootPath, {
 					and: [{
 						[this.entity.primary]: { eq: this.primary },
 					}, this.oldWhere],
 				})
+
+				for (const [node, column] of oldStateColumns) {
+					const { qb: conditionQb, condition } = this.whereBuilder.buildConditionLiteral(qb, this.entity, rootPath, node.predicate)
+					qb = conditionQb.select(condition, column)
+				}
 
 				return qb
 			})
@@ -159,7 +203,11 @@ export class UpdateBuilder {
 				const col1 = tuple(this.entity.tableName, this.entity.primaryColumn)
 				const col2 = tuple('newData_', this.entity.primaryColumn)
 				qb = qb.where(expr => expr.compareColumns(col1, Operator.eq, col2))
-				qb = this.whereBuilder.build(qb, this.entity, this.pathFactory.create([], 'newData_'), this.newWhere)
+				qb = this.whereBuilder.build(qb, this.entity, newDataPath, this.newWhere)
+				for (const predicate of this.statePredicates) {
+					const { qb: conditionQb, condition } = this.buildStateCondition(qb, predicate, oldStateColumns, newDataPath)
+					qb = conditionQb.where(clause => clause.with(condition))
+				}
 				return qb
 			})
 
@@ -179,5 +227,74 @@ export class UpdateBuilder {
 		}
 
 		return { values: resolvedData, affectedRows: result.length, executed: true }
+	}
+
+	/** Every old-state operand of {@link statePredicates} becomes a boolean column of `newData_`, evaluated against the stored row. */
+	private collectOldStateColumns(): Map<StatePredicateLeaf, string> {
+		const columns = new Map<StatePredicateLeaf, string>()
+		const visit = (node: UpdateStatePredicate): void => {
+			switch (node.type) {
+				case 'both':
+				case 'old':
+					// a shared (cached) leaf keeps its first column
+					if (!columns.has(node)) {
+						columns.set(node, `old_predicate_${columns.size}__`)
+					}
+					return
+				case 'new':
+					return
+				case 'and':
+				case 'or':
+					node.operands.forEach(visit)
+					return
+				case 'not':
+					visit(node.operand)
+			}
+		}
+		this.statePredicates.forEach(visit)
+		return columns
+	}
+
+	private buildStateCondition<R extends SelectBuilder.Result>(
+		qb: SelectBuilder<R>,
+		node: UpdateStatePredicate,
+		oldStateColumns: Map<StatePredicateLeaf, string>,
+		newDataPath: Path,
+	): { qb: SelectBuilder<R>; condition: Literal } {
+		const oldState = (leaf: StatePredicateLeaf): Literal => {
+			const column = oldStateColumns.get(leaf)
+			if (column === undefined) {
+				throw new Error('UpdateBuilder: missing old-state column')
+			}
+			return new Literal(`${wrapIdentifier('newData_')}.${wrapIdentifier(column)}`)
+		}
+		const newState = (where: Input.OptionalWhere) => {
+			const result = this.whereBuilder.buildConditionLiteral(qb, this.entity, newDataPath, where)
+			return { qb: result.qb, condition: joinConditions('and', [result.condition]) }
+		}
+		switch (node.type) {
+			case 'old':
+				return { qb, condition: oldState(node) }
+			case 'new':
+				return newState(node.predicate)
+			case 'both': {
+				const result = newState(node.predicate)
+				return { qb: result.qb, condition: joinConditions('and', [oldState(node), result.condition]) }
+			}
+			case 'and':
+			case 'or': {
+				const conditions: Literal[] = []
+				for (const operand of node.operands) {
+					const result = this.buildStateCondition(qb, operand, oldStateColumns, newDataPath)
+					qb = result.qb
+					conditions.push(result.condition)
+				}
+				return { qb, condition: joinConditions(node.type, conditions) }
+			}
+			case 'not': {
+				const result = this.buildStateCondition(qb, node.operand, oldStateColumns, newDataPath)
+				return { qb: result.qb, condition: new Literal('not ').appendAll([result.condition], '') }
+			}
+		}
 	}
 }

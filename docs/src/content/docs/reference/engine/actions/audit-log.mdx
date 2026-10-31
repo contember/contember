@@ -278,8 +278,9 @@ The `setNull` runs under the deleting role's ACL, so a role that deletes the roo
 `@c.Allow(editor, { update: ['article'] })`. That grant cannot be used for anything else: the
 sink has no update mutation, and nested relation inputs never write its rows.
 
-Because a many-has-one targets a single entity type, `rootRelation` suits a **dedicated** sink; a [shared sink](#sharing-a-sink-across-entities)
-mixing several root entities should rely on `rootEntity` / `rootId`.
+Because a many-has-one targets a single entity type, `rootRelation` suits a **dedicated** sink;
+a [shared sink](#sharing-a-sink-across-entities) mixing several root entities should rely on
+`rootEntity` / `rootId`.
 :::
 
 ## Synchronous vs. asynchronous
@@ -386,7 +387,7 @@ A sink extending `c.AuditLogEntity` is marked **immutable**: the Content API gen
 table. Nested relation inputs of other entities cannot write it either: there is no nested
 `create`, `update`, `upsert` or `delete` of its rows, and no `connect` / `disconnect` on a
 relation the sink owns. The schema also rejects the two ways a delete elsewhere could remove its
-rows: a `cascade` relation owned by the sink, and orphan removal targeting it. This holds
+rows: a `cascade` relation from the sink to a mutable entity, and orphan removal targeting it. This holds
 regardless of ACL — not even the built-in `admin` / `content_admin` roles can write to the sink
 through the API. Rows are written **only** by the engine's audit-log target, so the trail cannot
 be forged, edited or deleted by any application role.

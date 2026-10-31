@@ -366,15 +366,32 @@ namespace ImmutableCascade {
 	}
 }
 
-test('relation of an immutable entity must not cascade on delete', () => {
+test('relation of an immutable entity to a mutable entity must not cascade on delete', () => {
 	const validator = new ModelValidator(createSchema(ImmutableCascade).model)
 	expect(validator.validate()).toStrictEqual([
 		{
 			code: 'MODEL_INVALID_IMMUTABLE_USAGE',
-			message: 'Relation of an immutable entity must not cascade on delete.',
+			message: 'Relation of an immutable entity to a mutable entity must not cascade on delete.',
 			path: ['entities', 'AuditLog', 'article'],
 		},
 	])
+})
+
+namespace ImmutableCascadeToImmutable {
+	@c.Immutable()
+	export class AuditBatch {
+		label = c.stringColumn()
+	}
+
+	@c.Immutable()
+	export class AuditEntry {
+		batch = c.manyHasOne(AuditBatch).cascadeOnDelete()
+	}
+}
+
+test('relation between two immutable entities may cascade on delete', () => {
+	const validator = new ModelValidator(createSchema(ImmutableCascadeToImmutable).model)
+	expect(validator.validate()).toStrictEqual([])
 })
 
 namespace ImmutableOrphanRemoval {

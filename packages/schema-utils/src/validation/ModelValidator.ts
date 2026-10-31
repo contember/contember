@@ -8,8 +8,8 @@ const IDENTIFIER_PATTERN = /^[_a-zA-Z][_a-zA-Z0-9]*$/
 // lowercase ASCII so the quoted DDL name equals the unquoted spelling, and length equals byte length
 const CHECK_NAME_PATTERN = /^[a-z_][a-z0-9_]*$/
 const POSTGRES_IDENTIFIER_MAX_BYTES = 63
-// suffixes of the names PostgreSQL generates for primary, unique, foreign key and exclusion constraints
-const RESERVED_CHECK_NAME_SUFFIX = /_(pkey|key|fkey|excl)$/
+// suffixes of the names PostgreSQL generates for primary, unique, foreign key, exclusion and (since 18) not-null constraints
+const RESERVED_CHECK_NAME_SUFFIX = /_(pkey|key|fkey|excl|not_null)$/
 const INDEX_OPCLASS_PATTERN = /^[_a-zA-Z][_a-zA-Z0-9$]*(\.[_a-zA-Z][_a-zA-Z0-9$]*)?$/
 const RESERVED_WORDS = ['and', 'or', 'not']
 
@@ -90,7 +90,7 @@ export class ModelValidator {
 			} else if (RESERVED_CHECK_NAME_SUFFIX.test(check.name)) {
 				errors.add(
 					'MODEL_INVALID_CHECK',
-					`Check constraint name "${check.name}" must not end with _pkey, _key, _fkey or _excl, which PostgreSQL uses for generated constraint names.`,
+					`Check constraint name "${check.name}" must not end with _pkey, _key, _fkey, _excl or _not_null, which PostgreSQL uses for generated constraint names.`,
 				)
 			}
 			if (seenNames.has(check.name)) {

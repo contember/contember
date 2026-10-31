@@ -342,7 +342,7 @@ export class Product {
 
 This generates `ALTER TABLE "product" ADD CONSTRAINT "price_non_negative" CHECK (price >= 0)`.
 
-- `name`: required, unique within the entity. It identifies the constraint in migrations and is used as the database constraint name, so it must consist of lowercase letters, digits and underscores (at most 63 bytes), and must not end with `_pkey`, `_key`, `_fkey` or `_excl`, which PostgreSQL uses for the names it generates.
+- `name`: required, unique within the entity. It identifies the constraint in migrations and is used as the database constraint name, so it must consist of lowercase letters, digits and underscores (at most 63 bytes), and must not end with `_pkey`, `_key`, `_fkey`, `_excl` or `_not_null`, which PostgreSQL uses for the names it generates.
 - `expression`: SQL boolean expression. Like a partial index `where`, it references **database column names** (e.g. `published_at`), not schema field names.
 
 A mutation that violates a check returns `ok: false` with a `CheckConstraintViolation` error naming the constraint and the entity.
@@ -358,7 +358,7 @@ The expression is written verbatim into the generated `ALTER TABLE` statement (w
 :::warning[Update checks together with the columns they reference]
 Contember does not parse the expression, so it cannot follow column changes. **When you rename or remove a column, update or remove every check that references it in the same change.**
 
-PostgreSQL drops a check together with a column it references. A generated migration therefore drops and recreates all checks of an entity whenever one of its columns is removed, renamed or replaced, so the constraints always match your schema. A check still referencing the old column name then fails the migration with a "column does not exist" error instead of silently disappearing.
+PostgreSQL drops a check together with a column it references. A generated migration therefore drops and recreates all checks of an entity whenever one of its columns is removed, renamed or replaced (including a relation whose target entity changes), so the constraints always match your schema. A check still referencing the old column name then fails the migration with a "column does not exist" error instead of silently disappearing.
 :::
 
 ### Changing column name

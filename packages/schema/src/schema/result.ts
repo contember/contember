@@ -55,6 +55,7 @@ export namespace Result {
 		NotNullConstraintViolation = 'NotNullConstraintViolation',
 		UniqueConstraintViolation = 'UniqueConstraintViolation',
 		ForeignKeyConstraintViolation = 'ForeignKeyConstraintViolation',
+		CheckConstraintViolation = 'CheckConstraintViolation',
 		NotFoundOrDenied = 'NotFoundOrDenied',
 		NonUniqueWhereInput = 'NonUniqueWhereInput',
 		InvalidDataInput = 'InvalidDataInput',

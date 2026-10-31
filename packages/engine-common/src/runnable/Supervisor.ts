@@ -7,6 +7,8 @@ export type SupervisorOptions = {
 	minBackoff?: number
 	maxBackoff?: number
 	exponentiationBase?: number
+	/** Uptime (ms, default 60 000) after which a run counts as stable and the backoff resets; a run that crashes sooner counts as a failed restart. */
+	stableAfter?: number
 }
 
 export class Supervisor implements Runnable {
@@ -22,29 +24,51 @@ export class Supervisor implements Runnable {
 		const abortController = new AbortController()
 		let innerRunning: Running | undefined
 		let wasHealthy = false
+		let startedAt: number | undefined
+		const endRun = () => {
+			if (startedAt !== undefined && Date.now() - startedAt >= (this.options.stableAfter ?? 60_000)) {
+				restartCount = 0
+			}
+			startedAt = undefined
+		}
 
 		await new Promise<void>(async (resolve, reject) => {
 			while (!abortController.signal.aborted) {
+				let runEnded = false
 				try {
 					await new Promise<void>(async (resolveRunning, rejectRunning) => {
 						try {
 							innerRunning = await this.runnable.run({
-								onClose: resolveRunning,
-								onError: rejectRunning,
+								onClose: () => {
+									runEnded = true
+									resolveRunning()
+								},
+								onError: e => {
+									runEnded = true
+									rejectRunning(e)
+								},
 								logger: logger.child({ runningId: Math.random().toString().substring(2) }),
 							})
-							restartCount = 0
+							// a run that ended before run() returned was already handled as a crash; recording it as started would count the backoff as uptime
+							if (!runEnded) {
+								if (!wasHealthy) {
+									restartCount = 0
+								}
+								startedAt = Date.now()
+							}
 							resolve()
 							wasHealthy = true
 						} catch (e) {
 							rejectRunning(e)
 						}
 					})
+					endRun()
 				} catch (e) {
 					innerRunning = undefined
-					const shouldRestart = wasHealthy
-						? (this.options.max === undefined || restartCount++ < this.options.max)
-						: (restartCount++ < (this.options.startupMax ?? 10))
+					endRun()
+					restartCount++
+					const restartLimit = wasHealthy ? this.options.max : (this.options.startupMax ?? 10)
+					const shouldRestart = restartLimit === undefined || restartCount <= restartLimit
 					if (shouldRestart) {
 						const timeoutMs = Math.ceil(Math.min(
 							Math.pow(this.options.exponentiationBase ?? 2, restartCount - 1) * (this.options.minBackoff ?? 1_000),

@@ -24,6 +24,7 @@ Relation methods: `.inversedBy()`, `.joiningColumn()`, `.onDelete()` / `.cascade
 
 - `@Index({ fields, method? })` — database index
 - `@Unique({ fields, timing?, nulls? })` — unique constraint
+- `@Check({ name, expression })` — CHECK constraint (raw SQL over column names)
 - `@View(sql, { dependencies?, idSource?, materialized? })` — database view
 - `@OrderBy(field, direction)` — default ordering
 - `@DisableEventLog()` — disable audit triggers

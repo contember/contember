@@ -48,13 +48,15 @@ export class CreateEntityModificationHandler implements ModificationHandler<Crea
 	}
 
 	public getSchemaUpdater(): SchemaUpdater {
+		// createSql emits no CHECK, so checks are only ever added by createCheckConstraint
+		const { checks, ...entity } = this.data.entity
 		return updateModel(({ model }) => ({
 			...model,
 			entities: {
 				...model.entities,
 				[this.data.entity.name]: {
 					eventLog: { enabled: true },
-					...this.data.entity,
+					...entity,
 					unique: Object.values(this.data.entity.unique),
 					indexes: Object.values(this.data.entity.indexes ?? []),
 				},
@@ -77,7 +79,8 @@ export class CreateEntityDiffer implements Differ {
 		return Object.values(updatedSchema.model.entities)
 			.filter(it => !originalSchema.model.entities[it.name])
 			.filter(it => !it.view)
-			.map(entity =>
+			// checks are added by CreateCheckConstraintDiffer once all columns exist
+			.map(({ checks, ...entity }) =>
 				createEntityModification.createModification({
 					entity: {
 						...entity,

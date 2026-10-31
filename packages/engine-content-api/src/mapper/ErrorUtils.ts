@@ -130,6 +130,17 @@ export const convertError = (
 		const paths = constraint ? constraint.fields.map(it => [{ field: it }]) : []
 		return new MutationConstraintViolationError(paths, ConstraintType.uniqueKey, message, [MutationResultHint.sqlError])
 	}
+	if (e instanceof Database.CheckViolationError) {
+		const entity = e.table ? getEntityByTableName(schema, e.table) : undefined
+		const check = entity && e.constraint ? entity.checks?.find(it => it.name === e.constraint) : undefined
+		if (entity && check) {
+			const message = `Check constraint "${check.name}" on entity ${entity.name} violated`
+			return new MutationConstraintViolationError([], ConstraintType.check, message, [MutationResultHint.sqlError])
+		}
+		// a DOMAIN check (enum or custom column type) or a check created outside the schema
+		logger.warn(e, { loc: 'convertError' })
+		return new MutationConstraintViolationError([], ConstraintType.check, e.originalMessage, [MutationResultHint.sqlError])
+	}
 	if (e instanceof UniqueWhereError) {
 		return new MutationInputError([], InputErrorKind.nonUniqueWhere, e.message)
 	}

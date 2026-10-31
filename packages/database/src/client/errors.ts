@@ -49,6 +49,8 @@ export class ForeignKeyViolationError extends QueryError {}
 
 export class UniqueViolationError extends QueryError {}
 
+export class CheckViolationError extends QueryError {}
+
 export class SerializationFailureError extends QueryError {}
 
 export class InvalidDataError extends QueryError {}

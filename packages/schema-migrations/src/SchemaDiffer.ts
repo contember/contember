@@ -45,6 +45,7 @@ import {
 } from './modifications/index.js'
 import { RemoveChangedFieldDiffer, RemoveViewDiffer, UpdateViewDiffer } from './modifications/differs/index.js'
 import { CreateIndexDiffer, RemoveIndexDiffer } from './modifications/indexes/index.js'
+import { CreateCheckConstraintDiffer, RemoveCheckConstraintDiffer } from './modifications/checks/index.js'
 import { CreateTriggerDiffer, RemoveTriggerDiffer, UpdateTriggerDiffer } from './modifications/actions/index.js'
 import { UpdateTargetDiffer } from './modifications/actions/UpdateTargetModification.js'
 import { CreateTargetDiffer } from './modifications/actions/CreateTargetModification.js'
@@ -94,6 +95,8 @@ export class SchemaDiffer {
 		const differs: Differ[] = [
 			new RemoveIndexNamesDiffer(),
 			...skipNonModelDiffers ? [] : [new UpdateSettingsDiffer()],
+			// before the relation conversions, which may drop a column under a check
+			new RemoveCheckConstraintDiffer(),
 			new ConvertOneToManyRelationDiffer(),
 			new ConvertOneHasManyToManyHasManyRelationDiffer(),
 			new ConvertOneHasManyToOneHasOneRelationDiffer(),
@@ -125,6 +128,7 @@ export class SchemaDiffer {
 			new CreateRelationInverseSideDiffer(),
 			new CreateUniqueConstraintDiffer(),
 			new CreateIndexDiffer(),
+			new CreateCheckConstraintDiffer(),
 			new RemoveEnumDiffer(),
 			...skipNonModelDiffers ? [] : [
 				new UpdateAclSchemaDiffer(this.options),
@@ -160,7 +164,7 @@ export class SchemaDiffer {
 				}
 				: updatedSchema
 			const errors = deepCompare(targetForCompare, appliedDiffsSchema, [], path => {
-				if (path[0] === 'model' && path[1] === 'entities' && (path[3] === 'unique' || path[3] === 'index')) {
+				if (path[0] === 'model' && path[1] === 'entities' && (path[3] === 'unique' || path[3] === 'index' || path[3] === 'checks')) {
 					return (a, b) => {
 						return compareArraysIgnoreOrder(a, b, path)
 					}

@@ -354,3 +354,66 @@ test('json schema reports unsupported keyword inside a combinator', () => {
 	expect(errors[0].message).toContain('unsupported keyword "patternProperties"')
 	expect(errors[0].message).toContain('at "/anyOf/1"')
 })
+
+namespace ValidChecks {
+	@c.Check({ name: 'price_non_negative', expression: 'price >= 0' })
+	@c.Check({ name: 'discount_below_price', expression: 'discount <= price' })
+	export class Product {
+		price = c.intColumn()
+		discount = c.intColumn()
+	}
+}
+
+test('valid check constraints', () => {
+	expect(new ModelValidator(createSchema(ValidChecks).model).validate()).toStrictEqual([])
+})
+
+namespace InvalidChecks {
+	@c.Check({ name: 'Price-Check', expression: 'price >= 0' })
+	@c.Check({ name: 'dup', expression: 'price >= 0' })
+	@c.Check({ name: 'dup', expression: 'price >= 1' })
+	@c.Check({ name: 'empty', expression: '  ' })
+	@c.Check({ name: 'terminated', expression: 'true); DROP TABLE product; --' })
+	@c.Check({ name: 'a'.repeat(64), expression: 'price >= 0' })
+	@c.Check({ name: 'product_price_key', expression: 'price >= 0' })
+	export class Product {
+		price = c.intColumn()
+	}
+}
+
+test('invalid check constraints', () => {
+	const errors = new ModelValidator(createSchema(InvalidChecks).model).validate()
+	const path = ['entities', 'Product', 'checks']
+	expect(errors).toHaveLength(6)
+	expect(errors).toEqual(expect.arrayContaining([
+		{
+			code: 'MODEL_INVALID_CHECK',
+			path,
+			message: 'Invalid check constraint name "Price-Check": expected lowercase letters, digits and underscores, not starting with a digit.',
+		},
+		{ code: 'MODEL_INVALID_CHECK', path, message: 'Check constraint name "dup" is used more than once on this entity.' },
+		{ code: 'MODEL_INVALID_CHECK', path, message: 'Check constraint "empty" expression must not be empty.' },
+		{ code: 'MODEL_INVALID_CHECK', path, message: 'Check constraint "terminated" expression must not contain ";".' },
+		{ code: 'MODEL_INVALID_CHECK', path, message: `Check constraint name "${'a'.repeat(64)}" is longer than 63 bytes.` },
+		{
+			code: 'MODEL_INVALID_CHECK',
+			path,
+			message:
+				'Check constraint name "product_price_key" must not end with _pkey, _key, _fkey, _excl or _not_null, which PostgreSQL uses for generated constraint names.',
+		},
+	]))
+})
+
+namespace CheckOnView {
+	@c.View('SELECT 1 AS id, 1 AS price')
+	@c.Check({ name: 'price_non_negative', expression: 'price >= 0' })
+	export class ProductView {
+		price = c.intColumn()
+	}
+}
+
+test('check constraint on a view', () => {
+	expect(new ModelValidator(createSchema(CheckOnView).model).validate()).toStrictEqual([
+		{ code: 'MODEL_INVALID_CHECK', path: ['entities', 'ProductView', 'checks'], message: 'Check constraints are not supported on views.' },
+	])
+})

@@ -8,6 +8,8 @@ const IDENTIFIER_PATTERN = /^[_a-zA-Z][_a-zA-Z0-9]*$/
 // lowercase ASCII so the quoted DDL name equals the unquoted spelling, and length equals byte length
 const CHECK_NAME_PATTERN = /^[a-z_][a-z0-9_]*$/
 const POSTGRES_IDENTIFIER_MAX_BYTES = 63
+// suffixes of the names PostgreSQL generates for primary, unique, foreign key and exclusion constraints
+const RESERVED_CHECK_NAME_SUFFIX = /_(pkey|key|fkey|excl)$/
 const INDEX_OPCLASS_PATTERN = /^[_a-zA-Z][_a-zA-Z0-9$]*(\.[_a-zA-Z][_a-zA-Z0-9$]*)?$/
 const RESERVED_WORDS = ['and', 'or', 'not']
 
@@ -85,6 +87,11 @@ export class ModelValidator {
 				)
 			} else if (check.name.length > POSTGRES_IDENTIFIER_MAX_BYTES) {
 				errors.add('MODEL_INVALID_CHECK', `Check constraint name "${check.name}" is longer than ${POSTGRES_IDENTIFIER_MAX_BYTES} bytes.`)
+			} else if (RESERVED_CHECK_NAME_SUFFIX.test(check.name)) {
+				errors.add(
+					'MODEL_INVALID_CHECK',
+					`Check constraint name "${check.name}" must not end with _pkey, _key, _fkey or _excl, which PostgreSQL uses for generated constraint names.`,
+				)
 			}
 			if (seenNames.has(check.name)) {
 				errors.add('MODEL_INVALID_CHECK', `Check constraint name "${check.name}" is used more than once on this entity.`)

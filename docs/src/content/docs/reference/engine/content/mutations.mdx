@@ -113,6 +113,9 @@ mutation {
 
 ### Declaratively setting a collection with `set`
 
+:::note[Available since 2.2]
+:::
+
 For "has many" relations (both *one has many* and *many has many*) you can declaratively set
 the whole collection so that it ends up containing exactly the records you describe, without
 having to fetch and `disconnect`/`delete` the existing ones yourself.
@@ -124,6 +127,12 @@ not part of the provided list is an *orphan* and is removed according to `orphan
 - `disconnect` (default) - the orphan stays in the database, only the relation is removed. This
   is the safest option and is used when `orphanStrategy` is omitted.
 - `delete` - the orphan record is deleted entirely.
+
+:::caution
+On a *many has many* relation, `delete` removes the record itself, not just the link, so it also
+disappears from every other owner. In the example below, a tag dropped from this post is deleted
+for all posts that use it.
+:::
 
 Orphans are removed *before* the listed records are established. That ordering matters for a
 unique key that includes the owner - `unique(['locale', 'post'])`, the "replace all translations"

@@ -1,4 +1,5 @@
 export * from './acl/index.js'
+export * from './checks/index.js'
 export * from './columns/index.js'
 export * from './constraints/index.js'
 export * from './entities/index.js'

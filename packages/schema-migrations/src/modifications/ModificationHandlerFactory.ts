@@ -2,6 +2,7 @@ import { Schema } from '@contember/schema'
 import { ModificationHandler, ModificationHandlerOptions, ModificationType } from './ModificationHandler.js'
 import { patchAclSchemaModification, updateAclSchemaModification } from './acl/index.js'
 import { createColumnModification, updateColumnDefinitionModification, updateColumnNameModification } from './columns/index.js'
+import { createCheckConstraintModification, removeCheckConstraintModification } from './checks/index.js'
 import { createUniqueConstraintModification, removeUniqueConstraintModification } from './constraints/index.js'
 import {
 	createEntityModification,
@@ -65,6 +66,8 @@ namespace ModificationHandlerFactory {
 		removeUniqueConstraintModification,
 		createIndexModification,
 		removeIndexModification,
+		createCheckConstraintModification,
+		removeCheckConstraintModification,
 		createEntityModification,
 		removeEntityModification,
 		updateEntityNameModification,

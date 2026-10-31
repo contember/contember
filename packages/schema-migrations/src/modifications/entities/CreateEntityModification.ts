@@ -77,7 +77,8 @@ export class CreateEntityDiffer implements Differ {
 		return Object.values(updatedSchema.model.entities)
 			.filter(it => !originalSchema.model.entities[it.name])
 			.filter(it => !it.view)
-			.map(entity =>
+			// checks are added by CreateCheckConstraintDiffer once all columns exist
+			.map(({ checks, ...entity }) =>
 				createEntityModification.createModification({
 					entity: {
 						...entity,

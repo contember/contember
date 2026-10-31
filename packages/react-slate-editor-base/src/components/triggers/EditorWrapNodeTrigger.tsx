@@ -16,20 +16,19 @@ export interface EditorWrapNodeTriggerProps {
 export const EditorWrapNodeTrigger = ({ elementType, suchThat, selection, ...props }: EditorWrapNodeTriggerProps) => {
 	const editor = useSlate()
 	const onClick = () => {
-		const currentSelection = selection || editor.selection
-
-		if (currentSelection) {
-			EditorTransforms.select(editor, currentSelection)
-			EditorTransforms.wrapNodes(
-				editor,
-				{
-					type: elementType,
-					children: [{ text: '' }],
-					...suchThat,
-				},
-				{ split: true },
-			)
+		if (selection) {
+			EditorTransforms.select(editor, selection)
 		}
+		EditorTransforms.wrapNodes(
+			editor,
+			{
+				type: elementType,
+				children: [{ text: '' }],
+				...suchThat,
+			},
+			{ split: true },
+		)
+		EditorTransforms.collapse(editor, { edge: 'end' })
 	}
 
 	return <Slot {...props} onClick={composeEventHandlers(props.onClick, onClick)} />

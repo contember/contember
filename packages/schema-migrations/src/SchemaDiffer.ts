@@ -95,12 +95,13 @@ export class SchemaDiffer {
 		const differs: Differ[] = [
 			new RemoveIndexNamesDiffer(),
 			...skipNonModelDiffers ? [] : [new UpdateSettingsDiffer()],
+			// before the relation conversions, which may drop a column under a check
+			new RemoveCheckConstraintDiffer(),
 			new ConvertOneToManyRelationDiffer(),
 			new ConvertOneHasManyToManyHasManyRelationDiffer(),
 			new ConvertOneHasManyToOneHasOneRelationDiffer(),
 			new RemoveUniqueConstraintDiffer(),
 			new RemoveIndexDiffer(),
-			new RemoveCheckConstraintDiffer(),
 			new RemoveViewDiffer(recreateViews),
 			new RemoveEntityDiffer(),
 			new RemoveFieldDiffer(),

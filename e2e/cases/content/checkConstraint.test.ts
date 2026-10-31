@@ -26,6 +26,14 @@ namespace CheckModelRemoved {
 	}
 }
 
+namespace CheckModelReplacedField {
+	@c.Check({ name: 'price_non_negative', expression: 'price >= 0' })
+	export class Product {
+		code = c.stringColumn().unique().notNull()
+		cost = c.intColumn().columnName('price')
+	}
+}
+
 const differ = new SchemaDiffer(new SchemaMigrator(new ModificationHandlerFactory(ModificationHandlerFactory.defaultFactoryMap)))
 
 const violationMessage =
@@ -100,4 +108,21 @@ test('changing and removing a check constraint migrates the database', async () 
 		.expect(response => {
 			expect(response.body.data.createProduct.ok).toBe(true)
 		})
+})
+
+test('a check survives its column being dropped and re-added in one migration', async () => {
+	const original = createSchema(CheckModel)
+	const updated = createSchema(CheckModelReplacedField)
+	const tester = await createTester(original)
+
+	await tester.migrate(differ.diffSchemas(original, updated), '2024-08-01-120000-replace-field')
+
+	await tester(gql`mutation {
+		createProduct(data: {code: "a", cost: -1}) {
+			ok
+			errorMessage
+		}
+	}`)
+		.expect(200)
+		.expect({ data: { createProduct: { ok: false, errorMessage: violationMessage } } })
 })

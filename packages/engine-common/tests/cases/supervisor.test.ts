@@ -195,3 +195,43 @@ test('supervisor: failed to restart', async () => {
 		'Runnable crashed, stopping: failed to restart',
 	])
 })
+
+test('supervisor: backs off restarts after a healthy run without max', async () => {
+	const { logger, testLogger } = createTestLogger()
+	const lastAttempt = 7
+	let attempt = 0
+	let reachedLastAttempt: () => void = () => {}
+	const lastAttemptPromise = new Promise<void>(resolve => {
+		reachedLastAttempt = resolve
+	})
+	const runnable = new class FailingRunnable implements Runnable {
+		async run(args: RunnableArgs): Promise<Running> {
+			const thisAttempt = ++attempt
+			if (thisAttempt === 1) {
+				setTimeout(() => args.onError(new Error('crashed')), 1)
+				return { end: async () => {} }
+			}
+			if (thisAttempt === lastAttempt) {
+				reachedLastAttempt()
+				return { end: async () => {} }
+			}
+			throw new Error('dependency unavailable')
+		}
+	}()
+
+	const supervisor = new Supervisor(runnable, { minBackoff: 1, maxBackoff: 16 })
+	const running = await supervisor.run({
+		logger,
+		onError: shouldNotHappenCallback,
+	})
+	await lastAttemptPromise
+	await running.end()
+	expect(testLogger.messages.map(it => it.message).filter(it => it.startsWith('Runnable crashed'))).toStrictEqual([
+		'Runnable crashed, restarting in 1 ms ...: crashed',
+		'Runnable crashed, restarting in 2 ms ...: dependency unavailable',
+		'Runnable crashed, restarting in 4 ms ...: dependency unavailable',
+		'Runnable crashed, restarting in 8 ms ...: dependency unavailable',
+		'Runnable crashed, restarting in 16 ms ...: dependency unavailable',
+		'Runnable crashed, restarting in 16 ms ...: dependency unavailable',
+	])
+})

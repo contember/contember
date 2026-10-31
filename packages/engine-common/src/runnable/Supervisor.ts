@@ -42,9 +42,9 @@ export class Supervisor implements Runnable {
 					})
 				} catch (e) {
 					innerRunning = undefined
-					const shouldRestart = wasHealthy
-						? (this.options.max === undefined || restartCount++ < this.options.max)
-						: (restartCount++ < (this.options.startupMax ?? 10))
+					restartCount++
+					const restartLimit = wasHealthy ? this.options.max : (this.options.startupMax ?? 10)
+					const shouldRestart = restartLimit === undefined || restartCount <= restartLimit
 					if (shouldRestart) {
 						const timeoutMs = Math.ceil(Math.min(
 							Math.pow(this.options.exponentiationBase ?? 2, restartCount - 1) * (this.options.minBackoff ?? 1_000),

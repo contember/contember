@@ -157,6 +157,7 @@ export enum ConstraintType {
 	notNull = 'notNull',
 	uniqueKey = 'uniqueKey',
 	foreignKey = 'foreignKey',
+	check = 'check',
 }
 
 export class MutationConstraintViolationError implements MutationResultInterface {

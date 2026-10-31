@@ -83,6 +83,64 @@ namespace WithDoubleCheck {
 	}
 }
 
+namespace WithReplacedPriceField {
+	@c.Check({ name: 'price_non_negative', expression: 'price >= 0' })
+	export class Product {
+		cost = c.intColumn().columnName('price')
+		discount = c.intColumn()
+	}
+}
+
+namespace WithRenamedPriceColumn {
+	@c.Check({ name: 'price_non_negative', expression: 'amount >= 0' })
+	export class Product {
+		price = c.intColumn().columnName('amount')
+		discount = c.intColumn()
+	}
+}
+
+namespace WithStalePriceColumn {
+	@c.Check({ name: 'price_non_negative', expression: 'price >= 0' })
+	export class Product {
+		price = c.intColumn().columnName('amount')
+		discount = c.intColumn()
+	}
+}
+
+namespace WithCheckAndCategories {
+	@c.Check({ name: 'price_non_negative', expression: 'price >= 0' })
+	export class Product {
+		price = c.intColumn()
+		discount = c.intColumn()
+		categories = c.oneHasMany(Category, 'product')
+	}
+
+	export class Category {
+		product = c.manyHasOne(Product, 'categories')
+	}
+}
+
+namespace WithCheckWithoutCategories {
+	@c.Check({ name: 'price_non_negative', expression: 'price >= 0' })
+	export class Product {
+		price = c.intColumn()
+		discount = c.intColumn()
+	}
+
+	export class Category {
+		name = c.stringColumn()
+	}
+}
+
+namespace WithCheckAndTax {
+	@c.Check({ name: 'price_non_negative', expression: 'price >= 0' })
+	export class Product {
+		price = c.intColumn()
+		discount = c.intColumn()
+		tax = c.intColumn()
+	}
+}
+
 namespace WithReorderedChecks {
 	@c.Check({ name: 'discount_below_price', expression: 'discount <= price' })
 	@c.Check({ name: 'price_non_negative', expression: 'price >= 0' })
@@ -254,5 +312,39 @@ describe('check constraint failure warnings', () => {
 			formatVersion: VERSION_LATEST,
 		})
 		expect(handler.describe({ createdEntities: [] }).failureWarning).toBeUndefined()
+	})
+})
+
+describe('checks of an entity whose columns change', () => {
+	test('are recreated when a column is dropped and re-added under the same name', () => {
+		const ids = modificationIds(differ.diffSchemas(createSchema(WithCheck), createSchema(WithReplacedPriceField)))
+		expect(ids).toEqual(['removeCheckConstraint', 'removeField', 'createColumn', 'createCheckConstraint'])
+	})
+
+	test('are recreated with the updated expression around a column rename', () => {
+		const diff = differ.diffSchemas(createSchema(WithCheck), createSchema(WithRenamedPriceColumn))
+		expect(diff).toEqual([
+			removeCheckConstraintModification.createModification({ entityName: 'Product', checkName: 'price_non_negative' }),
+			{ modification: 'updateColumnName', entityName: 'Product', fieldName: 'price', columnName: 'amount' },
+			createCheckConstraintModification.createModification({
+				entityName: 'Product',
+				check: { name: 'price_non_negative', expression: 'amount >= 0' },
+			}),
+		])
+	})
+
+	test('are recreated even with an unchanged expression, so a stale one fails at migration time', () => {
+		const ids = modificationIds(differ.diffSchemas(createSchema(WithCheck), createSchema(WithStalePriceColumn)))
+		expect(ids).toEqual(['removeCheckConstraint', 'updateColumnName', 'createCheckConstraint'])
+	})
+
+	test('are kept when a field without a column on the table is removed', () => {
+		const ids = modificationIds(differ.diffSchemas(createSchema(WithCheckAndCategories), createSchema(WithCheckWithoutCategories)))
+		expect(ids).not.toContain('removeCheckConstraint')
+	})
+
+	test('are kept when a column is added', () => {
+		const ids = modificationIds(differ.diffSchemas(createSchema(WithCheck), createSchema(WithCheckAndTax)))
+		expect(ids).toEqual(['createColumn'])
 	})
 })

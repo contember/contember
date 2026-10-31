@@ -1,5 +1,6 @@
 import { MigrationBuilder } from '@contember/database-migrations'
-import { Schema } from '@contember/schema'
+import { Model, Schema } from '@contember/schema'
+import { isColumn } from '@contember/schema-utils'
 import deepEqual from 'fast-deep-equal'
 import { SchemaUpdater, updateEntity, updateModel } from '../utils/schemaUpdateUtils.js'
 import { createModificationType, Differ, ModificationHandler, ModificationHandlerCreateSqlOptions } from '../ModificationHandler.js'
@@ -41,6 +42,17 @@ export interface RemoveCheckConstraintModificationData {
 	checkName: string
 }
 
+// Physical columns of the entity's table, keyed by the field that owns them.
+const getTableColumns = (entity: Model.Entity): Set<string> =>
+	new Set(
+		Object.values(entity.fields).flatMap(field => {
+			if (isColumn(field)) {
+				return [`column:${field.name}:${field.columnName}`]
+			}
+			return 'joiningColumn' in field ? [`relation:${field.name}:${field.joiningColumn.columnName}`] : []
+		}),
+	)
+
 export class RemoveCheckConstraintDiffer implements Differ {
 	createDiff(originalSchema: Schema, updatedSchema: Schema) {
 		return Object.values(originalSchema.model.entities).flatMap(entity => {
@@ -49,10 +61,14 @@ export class RemoveCheckConstraintDiffer implements Differ {
 			if (!updatedEntity) {
 				return []
 			}
+			// PostgreSQL drops a check together with a column it references and rewrites it on a column rename;
+			// the expression is not parsed, so every check of an entity losing or renaming a column is recreated
+			const updatedColumns = getTableColumns(updatedEntity)
+			const columnsChanged = [...getTableColumns(entity)].some(it => !updatedColumns.has(it))
 			const updatedChecks = updatedEntity.checks ?? []
-			// a check whose expression changed is removed here and recreated by CreateCheckConstraintDiffer
+			// a removed check is recreated by CreateCheckConstraintDiffer when it is still in the updated schema
 			return (entity.checks ?? [])
-				.filter(check => !updatedChecks.some(it => deepEqual(it, check)))
+				.filter(check => columnsChanged || !updatedChecks.some(it => deepEqual(it, check)))
 				.map(check => removeCheckConstraintModification.createModification({ entityName: entity.name, checkName: check.name }))
 		})
 	}

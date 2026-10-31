@@ -1,4 +1,4 @@
-import { acceptFieldVisitor, isInverseRelation, isRelation } from '@contember/schema-utils'
+import { acceptFieldVisitor, isColumn, isInverseRelation, isRelation } from '@contember/schema-utils'
 import { MigrationBuilder } from '@contember/database-migrations'
 import { Schema } from '@contember/schema'
 import { removeField, SchemaUpdater } from '../utils/schemaUpdateUtils.js'
@@ -11,6 +11,12 @@ export class RemoveFieldModificationHandler implements ModificationHandler<Remov
 		private readonly schema: Schema,
 		private readonly options: ModificationHandlerOptions,
 	) {}
+
+	private dropsColumnUnderChecks(): boolean {
+		const entity = this.schema.model.entities[this.data.entityName]
+		const field = entity?.fields[this.data.fieldName]
+		return !!entity?.checks?.length && !!field && (isColumn(field) || 'joiningColumn' in field)
+	}
 
 	public createSql(builder: MigrationBuilder): void {
 		const entity = this.schema.model.entities[this.data.entityName]
@@ -44,8 +50,8 @@ export class RemoveFieldModificationHandler implements ModificationHandler<Remov
 		return {
 			message: `Remove field ${this.data.entityName}.${this.data.fieldName}`,
 			isDestructive: true,
-			failureWarning: this.schema.model.entities[this.data.entityName]?.checks?.length
-				? `Entity ${this.data.entityName} has check constraints. PostgreSQL drops every check referencing the removed column, so remove or update such checks in the same migration.`
+			failureWarning: this.dropsColumnUnderChecks()
+				? `Entity ${this.data.entityName} has check constraints. PostgreSQL drops those referencing the removed column; a generated migration recreates the entity's checks, a hand-written one must do so itself.`
 				: undefined,
 		}
 	}

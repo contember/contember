@@ -350,9 +350,13 @@ A mutation that violates a check returns `ok: false` with a `CheckConstraintViol
 Migrations identify a check by its `name`: a new name creates the constraint, a removed name drops it, and a changed expression drops and recreates it. Adding a check to an existing table validates all existing rows, so the migration fails if any row violates it. Check constraints are not supported on views.
 
 :::caution[`expression` is raw SQL]
-The expression is written verbatim into the generated `ALTER TABLE` statement (wrapped in parentheses). It is a developer-authored predicate, like the body of a [`@c.View`](/reference/engine/schema/views), and must never contain end-user input. It is validated only for being non-empty and free of a `;` statement terminator; an otherwise invalid expression fails when the migration runs.
+The expression is written verbatim into the generated `ALTER TABLE` statement (wrapped in parentheses). It is a developer-authored predicate, like the body of a [`@c.View`](/reference/engine/schema/views), and must never contain end-user input. Contember only rejects an empty expression or one containing `;` to catch mistakes early; this is not a sanitizer, and an otherwise invalid expression fails when the migration runs.
+:::
 
-Because Contember does not parse the expression, it does not follow column changes. When you rename a column, PostgreSQL updates the stored constraint, but the expression in your schema keeps the old name until you edit it. When you remove a column, PostgreSQL drops every check that references it, so remove or update such checks in the same change.
+:::warning[Update checks together with the columns they reference]
+Contember does not parse the expression, so it cannot follow column changes. **When you rename or remove a column, update or remove every check that references it in the same change.**
+
+PostgreSQL itself rewrites a stored constraint on a column rename and drops it on a column removal, so the existing database keeps working. A check left with the old column name in your schema, however, is emitted as written whenever a migration is generated from an empty schema, such as a [migration snapshot](/reference/engine/migrations/advanced/migration-snapshots), and a database created from that migration then fails to migrate. The migration description warns when a renamed or removed column belongs to an entity with checks.
 :::
 
 ### Changing column name

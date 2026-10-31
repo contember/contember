@@ -213,7 +213,19 @@ export namespace ContentClientInput {
 		| UpdateSpecifiedRelationInput<TEntity>
 		| UpsertSpecifiedRelationInput<TEntity>
 
-	export type UpdateManyRelationInput<TEntity extends EntityTypeLike> = Array<UpdateManyRelationInputItem<TEntity>>
+	export type SetManyRelationInputItem<TEntity extends EntityTypeLike> =
+		| CreateRelationInput<TEntity>
+		| ConnectRelationInput<TEntity>
+		| ConnectOrCreateRelationInput<TEntity>
+		| UpdateSpecifiedRelationInput<TEntity>
+		| UpsertSpecifiedRelationInput<TEntity>
+
+	export interface SetManyRelationInput<TEntity extends EntityTypeLike> {
+		readonly set: ReadonlyArray<SetManyRelationInputItem<TEntity>>
+		readonly orphanStrategy?: `${Input.OrphanRemovalStrategy}`
+	}
+
+	export type UpdateManyRelationInput<TEntity extends EntityTypeLike> = Array<UpdateManyRelationInputItem<TEntity> | SetManyRelationInput<TEntity>>
 
 	export type FieldOrderBy<TEntity extends EntityTypeLike> =
 		& {

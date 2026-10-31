@@ -114,5 +114,20 @@ export namespace MapperInput {
 			| UpsertSpecifiedRelationInput
 		)
 
-	export type UpdateManyRelationInput = Array<UpdateManyRelationInputItem>
+	export type SetManyRelationInputItem =
+		& { alias?: string }
+		& (
+			| CreateRelationInput
+			| ConnectRelationInput
+			| ConnectOrCreateRelationInput
+			| UpdateSpecifiedRelationInput
+			| UpsertSpecifiedRelationInput
+		)
+
+	export interface SetManyRelationInput {
+		set: Array<SetManyRelationInputItem>
+		orphanStrategy?: Input.OrphanRemovalStrategy
+	}
+
+	export type UpdateManyRelationInput = Array<UpdateManyRelationInputItem | SetManyRelationInput>
 }

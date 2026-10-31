@@ -7,6 +7,7 @@ import { CheckedPrimary } from '../../CheckedPrimary.js'
 import { MapperInput } from '../../types.js'
 import { AclScope } from '../../../acl/index.js'
 import { UpdateBuilder } from '../UpdateBuilder.js'
+import { processSetManyRelationInput } from './SetManyRelationHelper.js'
 
 type Context = Model.ManyHasManyOwningContext | Model.ManyHasManyInverseContext
 
@@ -17,6 +18,14 @@ export class ManyHasManyUpdateInputProcessor implements UpdateInputProcessor.Has
 		private readonly scope: AclScope,
 		private readonly updateBuilder: UpdateBuilder,
 	) {
+	}
+
+	public async set(
+		context: Context & { input: UpdateInputProcessor.SetManyInput },
+	) {
+		return async ({ primary }: { primary: Input.PrimaryValue }) => {
+			return await processSetManyRelationInput(this.mapper, context, primary, this, context.input)
+		}
 	}
 
 	public async connect(

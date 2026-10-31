@@ -12,6 +12,12 @@ export namespace Input {
 		update = 'update',
 		upsert = 'upsert',
 		delete = 'delete',
+		set = 'set',
+	}
+
+	export enum OrphanRemovalStrategy {
+		disconnect = 'disconnect',
+		delete = 'delete',
 	}
 
 	export enum CreateRelationOperation {
@@ -152,7 +158,33 @@ export namespace Input {
 			| UpsertSpecifiedRelationInput<E>
 		)
 
-	export type UpdateManyRelationInput<E = never> = Array<UpdateManyRelationInputItem<E>>
+	/**
+	 * Items allowed inside a `set` operation. Unlike {@link UpdateManyRelationInputItem},
+	 * `delete`/`disconnect` are not allowed here - the desired collection is described
+	 * positively and orphans are handled via {@link SetManyRelationInput.orphanStrategy}.
+	 */
+	export type SetManyRelationInputItem<E = never> =
+		& { alias?: string }
+		& (
+			| CreateRelationInput<E>
+			| ConnectRelationInput<E>
+			| ConnectOrCreateRelationInput<E>
+			| UpdateSpecifiedRelationInput<E>
+			| UpsertSpecifiedRelationInput<E>
+		)
+
+	export interface SetManyRelationInput<E = never> {
+		set: Array<SetManyRelationInputItem<E>>
+		orphanStrategy?: OrphanRemovalStrategy
+	}
+
+	/**
+	 * A has-many relation input is a list of per-item operations. A single declarative
+	 * `set` (with optional `orphanStrategy`) may also appear; when present it must be the
+	 * only item. Thanks to GraphQL list input coercion, `{ set: [...] }` is accepted as
+	 * shorthand for `[{ set: [...] }]`.
+	 */
+	export type UpdateManyRelationInput<E = never> = Array<UpdateManyRelationInputItem<E> | SetManyRelationInput<E>>
 
 	export enum OrderDirection {
 		asc = 'asc',

@@ -111,9 +111,18 @@ export class UpdateInputVisitor<Result> implements Model.ColumnVisitor<Promise<R
 		if (input === undefined || input === null) {
 			return Promise.resolve([])
 		}
+		// GraphQL coerces a single object into a single-element list, so a bare `{ set: ... }` arrives here as `[{ set: ... }]`.
+		const elements = Array.isArray(input) ? input : [input]
+		const hasSet = elements.some(it => it && (it as MapperInput.SetManyRelationInput).set != null)
+		if (hasSet) {
+			if (elements.length !== 1) {
+				throw new UserError('A "set" operation must be the only item of a has-many relation input.')
+			}
+			return this.processSetRelationInput(processor, context, elements[0] as MapperInput.SetManyRelationInput)
+		}
 		const results: Array<Result> = []
 		let i = 0
-		for (let element of input) {
+		for (let element of elements as MapperInput.UpdateManyRelationInputItem[]) {
 			const alias = element.alias
 			element = filterObject(element, (k, v) => v !== null && v !== undefined)
 			this.verifyOperations(element)
@@ -157,13 +166,66 @@ export class UpdateInputVisitor<Result> implements Model.ColumnVisitor<Promise<R
 		return results
 	}
 
+	private async processSetRelationInput<Context>(
+		processor: UpdateInputProcessor.HasManyRelationInputProcessor<Context, Result>,
+		context: Context,
+		input: MapperInput.SetManyRelationInput,
+	): Promise<Result[]> {
+		const keys = Object.keys(filterObject(input, (k, v) => v !== null && v !== undefined))
+		const allowedKeys = ['set', 'orphanStrategy', 'alias']
+		const unexpected = keys.filter(it => !allowedKeys.includes(it))
+		if (unexpected.length > 0) {
+			throw new UserError(
+				`Unexpected key(s) ${unexpected.join(', ')} alongside "set". Only "orphanStrategy" and "alias" are allowed.`,
+			)
+		}
+		const orphanStrategy = input.orphanStrategy ?? Input.OrphanRemovalStrategy.disconnect
+		if (!Object.values(Input.OrphanRemovalStrategy).includes(orphanStrategy)) {
+			throw new UserError(
+				`Invalid orphanStrategy "${orphanStrategy}". Expected one of: ${Object.values(Input.OrphanRemovalStrategy).join(', ')}.`,
+			)
+		}
+		// Strip null-valued keys before dispatching, exactly as the per-item path does: nullable
+		// GraphQL variables are the reason `filterObject` exists, and both the pre-validator and
+		// the mapper dispatch on key presence, so a `null` operation key would pick its branch.
+		const items = input.set.map(it => filterObject(it, (k, v) => v !== null && v !== undefined))
+		for (const item of items) {
+			this.verifySetItemOperations(item)
+		}
+		return [
+			await processor.set({
+				...context,
+				input: { items, orphanStrategy },
+			}),
+		]
+	}
+
 	private verifyOperations(input: object) {
 		const keys = Object.keys(input).filter(it => it !== 'alias')
-		const ops = Object.values(Input.UpdateRelationOperation) as string[]
+		// `set` lives in the same enum but is not a per-item operation - accepting it here would
+		// fall through to an ImplementationException (a 500) instead of a UserError.
+		const ops = (Object.values(Input.UpdateRelationOperation) as string[]).filter(it => it !== Input.UpdateRelationOperation.set)
 		if (keys.length !== 1 || !ops.includes(keys[0])) {
 			const found = keys.length === 0 ? 'none' : keys.join(', ')
 			throw new UserError(
 				`Expected exactly one of: ${ops.join(', ')}. ${found} found.`,
+			)
+		}
+	}
+
+	private verifySetItemOperations(input: object) {
+		const keys = Object.keys(filterObject(input, (k, v) => v !== null && v !== undefined)).filter(it => it !== 'alias')
+		const ops: string[] = [
+			Input.UpdateRelationOperation.create,
+			Input.UpdateRelationOperation.connect,
+			Input.UpdateRelationOperation.connectOrCreate,
+			Input.UpdateRelationOperation.update,
+			Input.UpdateRelationOperation.upsert,
+		]
+		if (keys.length !== 1 || !ops.includes(keys[0])) {
+			const found = keys.length === 0 ? 'none' : keys.join(', ')
+			throw new UserError(
+				`Expected exactly one of: ${ops.join(', ')} in a "set" item. ${found} found.`,
 			)
 		}
 	}

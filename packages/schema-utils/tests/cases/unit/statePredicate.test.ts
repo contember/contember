@@ -50,6 +50,11 @@ describe('parseStatePredicate', () => {
 	test('throws on a nested marker', () => {
 		expect(() => parseStatePredicate({ _old: { _new: draft } })).toThrow('cannot be nested')
 	})
+
+	test('throws on a marker that does not hold a predicate object', () => {
+		const stored: Acl.PredicateDefinition = JSON.parse('{ "_new": null }')
+		expect(() => parseStatePredicate(stored)).toThrow('"_new" marker must contain a predicate object')
+	})
 })
 
 describe('resolveSingleStatePredicate', () => {

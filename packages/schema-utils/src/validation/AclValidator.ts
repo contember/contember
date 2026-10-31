@@ -1,5 +1,5 @@
 import { Acl, Model } from '@contember/schema'
-import { PredicateDefinitionProcessor } from '../acl/index.js'
+import { isStateMarkerContent, PredicateDefinitionProcessor } from '../acl/index.js'
 import { getEntity } from '../model/index.js'
 import { ErrorBuilder, ValidationError } from './errors.js'
 import { conditionSchema } from '../type-schema/index.js'
@@ -149,8 +149,10 @@ export class AclValidator {
 				}
 				return ctx.value
 			},
-			handleStateMarker: ({ marker, path }) => {
-				if (path.some(isStateMarker)) {
+			handleStateMarker: ({ marker, value, path }) => {
+				if (!isStateMarkerContent(value)) {
+					errorBuilder.for(...path, marker).add('ACL_INVALID_STATE_MARKER', `Marker "${marker}" must contain a predicate object.`)
+				} else if (path.some(isStateMarker)) {
 					errorBuilder.for(...path, marker).add('ACL_INVALID_STATE_MARKER', `Marker "${marker}" cannot be nested inside another "_old"/"_new" marker.`)
 				} else if (path.some(it => !booleanOperators.includes(it))) {
 					errorBuilder.for(...path, marker).add(

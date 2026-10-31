@@ -47,10 +47,10 @@ export const parseStatePredicate = (definition: Acl.PredicateDefinition): StateP
 		}
 	}
 	if (oldState !== undefined) {
-		operands.push({ type: 'old', predicate: assertStateless(oldState) })
+		operands.push({ type: 'old', predicate: assertMarkerContent(Acl.PredicateOldStateMarker, oldState) })
 	}
 	if (newState !== undefined) {
-		operands.push({ type: 'new', predicate: assertStateless(newState) })
+		operands.push({ type: 'new', predicate: assertMarkerContent(Acl.PredicateNewStateMarker, newState) })
 	}
 	if (Object.keys(stateless).length > 0) {
 		operands.unshift({ type: 'both', predicate: stateless })
@@ -58,8 +58,15 @@ export const parseStatePredicate = (definition: Acl.PredicateDefinition): StateP
 	return operands.length === 1 ? operands[0] : { type: 'and', operands }
 }
 
-const assertStateless = (definition: Acl.PredicateDefinition): Acl.PredicateDefinition => {
-	// rejected by AclValidator; checked again so a nested marker can never reach the query as a field name
+/** Whether a marker holds a predicate object (rejected otherwise by AclValidator). */
+export const isStateMarkerContent = (value: unknown): value is Acl.PredicateDefinition =>
+	typeof value === 'object' && value !== null && !Array.isArray(value)
+
+const assertMarkerContent = (marker: string, definition: unknown): Acl.PredicateDefinition => {
+	// rejected by AclValidator; checked again so an invalid marker can never reach the query
+	if (!isStateMarkerContent(definition)) {
+		throw new Error(`ACL predicate: the "${marker}" marker must contain a predicate object.`)
+	}
 	if (hasStateMarkers(definition)) {
 		throw new Error('ACL predicate: an "_old"/"_new" marker cannot be nested inside another marker.')
 	}

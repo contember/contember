@@ -207,6 +207,17 @@ test('rejects a marker under a relation', () => {
 	}])
 })
 
+test('rejects a marker that does not hold a predicate object', () => {
+	const markerOf = (value: unknown): Acl.PredicateDefinition => JSON.parse(JSON.stringify({ _old: value }))
+	for (const value of [null, 'variable', [{ state: { eq: 'A' } }]]) {
+		expect(validateTransition(markerOf(value))).toStrictEqual([{
+			code: 'ACL_INVALID_STATE_MARKER',
+			message: 'Marker "_old" must contain a predicate object.',
+			path: [...transitionPath, '_old'],
+		}])
+	}
+})
+
 test('validates fields inside markers', () => {
 	expect(validateTransition({ _new: { unknownField: { eq: 'B' } } }).map(it => it.code)).toEqual(['ACL_UNDEFINED_FIELD'])
 })

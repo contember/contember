@@ -202,6 +202,9 @@ envelope with the actor and request context.
 }
 ```
 
+`meta.eventId` is set only for asynchronous rows (the id of the queued event); synchronous
+rows never enter the queue and have none.
+
 The shape of each entry in `events` is the same as the
 [watch event payload](/reference/engine/actions/invocation#watch-event-payload) sent
 to webhooks.
@@ -247,8 +250,9 @@ export class ArticleAuditLog extends c.AuditLogEntity {
 }
 ```
 
-`rootRelation` is validated at build time: it must be a **many-has-one** on the sink whose
-target is exactly the watched entity, or it is a schema error. On write, the engine fills that
+`rootRelation` is validated at build time: it must be a **nullable many-has-one** on the
+sink whose target is exactly the watched entity and whose `onDelete` is not `cascade`, or it
+is a schema error. On write, the engine fills that
 relation's foreign-key column from `rootId` — you never set it yourself. With it in place you
 can join to the (current) root entity when reading:
 
@@ -262,9 +266,17 @@ query {
 ```
 
 :::note
-Give the relation `.setNullOnDelete()` (or a cascade): an audit row for a *delete* — or any
-row whose root entity is later removed — must not block the delete, and `rootEntity` / `rootId`
-still record the identity afterwards. Because a many-has-one targets a single entity type,
+Give the relation `.setNullOnDelete()`. When the root row no longer exists at write time (the
+audit row of a *delete*, or an asynchronous row dispatched after the root was removed), the
+engine leaves the relation null; when the root is deleted later, `setNull` clears it on the
+existing rows. Either way `rootEntity` / `rootId` still record the identity. A `cascade` is
+rejected, because it would delete the trail of every deleted root. The default `restrict`
+is allowed, but then a root that has any audit row cannot be deleted at all.
+
+The `setNull` runs under the deleting role's ACL, so a role that deletes the root also needs
+`update` on the relation field of the sink, e.g.
+`@c.Allow(editor, { update: ['article'] })`. That grant cannot be used for anything else: the
+sink has no update mutation, and nested relation inputs never write its rows. Because a many-has-one targets a single entity type,
 `rootRelation` suits a **dedicated** sink; a [shared sink](#sharing-a-sink-across-entities)
 mixing several root entities should rely on `rootEntity` / `rootId`.
 :::
@@ -281,8 +293,9 @@ The `synchronous` flag controls *when* the row is written:
   later by the dispatch worker, reusing the queue's retry and backoff. This keeps the
   audited mutation's transaction shorter, at the cost of a small delay and a dependency
   on the [Actions worker](/reference/engine/actions/overview#local-development). Tune the
-  retry and batching with `maxAttempts`, `initialRepeatIntervalMs` and `batchSize` on the
-  target — the same knobs a webhook target takes. They are ignored under
+  retry and batching with `maxAttempts`, `initialRepeatIntervalMs` and `batchSize` on a
+  target created with `c.createAuditLogTarget` — the same knobs a webhook target takes;
+  `@c.AuditLog` does not accept them. They are ignored under
   `synchronous: true`, which never touches the queue.
 
 ```typescript
@@ -369,8 +382,10 @@ All referencing targets validate against the same explicit sink entity.
 A sink extending `c.AuditLogEntity` is marked **immutable**: the Content API generates
 **no `create`, `update` or `delete` mutations** for it — the same way a
 [`@c.View`](/reference/engine/schema/entities) entity is non-mutable, but backed by a real
-table. This holds regardless of ACL — not even the built-in `admin` / `content_admin` roles
-can write to the sink through the API. Rows are written **only** by the engine's audit-log
+table. Nested relation inputs of other entities cannot write it either: there is no nested
+`create`, `update`, `upsert` or `delete` of its rows, and no `connect` / `disconnect` on a
+relation the sink owns. This holds regardless of ACL — not even the built-in `admin` /
+`content_admin` roles can write to the sink through the API. Rows are written **only** by the engine's audit-log
 target, so the trail cannot be forged, edited or deleted by any application role.
 
 That is what makes the table genuinely append-only, rather than "append-only as long as
@@ -402,7 +417,8 @@ query {
 
 Read access follows regular [ACL](/reference/engine/schema/acl). The sink is
 [immutable](#immutability), so the Content API exposes no create/update/delete for it —
-there is nothing to grant beyond `read`. Grant it to the roles that should be able to
+there is nothing to grant beyond `read` (and, with a [`rootRelation`](#linking-to-the-audited-entity),
+`update` on that relation for roles that delete the root). Grant it to the roles that should be able to
 inspect the trail:
 
 ```typescript

@@ -83,8 +83,16 @@ name).
 
 A policy needs at least one predicate — `olderThan`, `where`, or both. **A predicate-less
 policy is a schema error**, because it would delete every row of the table. A `where` that
-matches every row (`{}`, `{ and: [] }`, `{ field: {} }`, `{ field: { always: true } }`) counts
-as no predicate.
+matches every row counts as no predicate: `{}`, `{ and: [] }`, `{ field: {} }`,
+`{ field: { always: true } }`, `{ field: { notIn: [] } }`, a `not` of a condition that never
+matches, or an empty filter on a to-one relation. An empty filter on a **to-many** relation is
+a real condition (`{ tags: {} }` means "has at least one tag", `{ not: { tags: {} } }` "has
+none") and is allowed.
+
+The engine checks the `where` again before each run, after the same simplification the Content
+API applies to filters. A `where` that only simplifies to "every row" there (for example
+`{ or: [A, { not: A }] }`) passes schema validation, but the run refuses to delete and is
+recorded as failed.
 
 ### `olderThan`
 
@@ -93,7 +101,8 @@ as no predicate.
 - `field` must be a **`DateTime` column** of the entity.
 - `interval` is one or more `<count> <unit>` parts — `'30 days'`, `'6 months'`,
   `'1 day 12 hours'` — with the units `second`, `minute`, `hour`, `day`, `week`, `month` and
-  `year`. It must be positive. Other Postgres interval forms are rejected on purpose: a bare
+  `year`, each unit at most once and each count at most 1,000,000. It must be positive and at
+  most about 1000 years. Other Postgres interval forms are rejected on purpose: a bare
   `'30'` means 30 seconds, and a zero or negative interval moves the cutoff to now or into the
   future, so every row would match. The value is bound as a parameter and cast to `interval`
   in SQL.
@@ -185,7 +194,7 @@ Policies are checked at schema build time. It is an error to:
 - reference an entity that does not exist, or reuse a policy `name`;
 - declare **no predicate** (`olderThan` absent and `where` absent or matching every row);
 - point `olderThan.field` at a missing field or a non-`DateTime` column, or give an interval
-  that is not a positive `<count> <unit>` interval;
+  that breaks the rules above;
 - give an invalid `where` for the entity, or an invalid / non-positive `schedule`;
 - set a non-positive `batchSize` or `maxPerRun`.
 

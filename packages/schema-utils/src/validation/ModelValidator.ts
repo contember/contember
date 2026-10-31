@@ -237,6 +237,15 @@ export class ModelValidator {
 				return errors.add('MODEL_INVALID_VIEW_USAGE', 'One-has-one relation fields on views must be owning or point to a view entity.')
 			}
 		}
+		// Rows of an immutable entity are written only by the engine; the content API must not delete them
+		// as a side effect of another entity's delete or relation update either. An immutable target cannot be
+		// deleted through the API, so a cascade between two immutable entities stays engine-only.
+		if (partialEntity.immutable && !targetEntity.immutable && 'joiningColumn' in field && field.joiningColumn.onDelete === Model.OnDelete.cascade) {
+			return errors.add('MODEL_INVALID_IMMUTABLE_USAGE', 'Relation of an immutable entity to a mutable entity must not cascade on delete.')
+		}
+		if (targetEntity.immutable && 'orphanRemoval' in field && field.orphanRemoval) {
+			return errors.add('MODEL_INVALID_IMMUTABLE_USAGE', 'Orphan removal must not target an immutable entity.')
+		}
 		if (isInverseRelation(field)) {
 			const ownedBy = field.ownedBy
 			const targetField = targetEntity.fields[ownedBy]

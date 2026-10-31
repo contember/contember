@@ -1,0 +1,353 @@
+type Query {
+  getArticle(by: ArticleUniqueWhere!, filter: ArticleWhere): Article
+  listArticle(filter: ArticleWhere, orderBy: [ArticleOrderBy!], offset: Int, limit: Int): [Article!]!
+  paginateArticle(filter: ArticleWhere, orderBy: [ArticleOrderBy!], skip: Int, first: Int): ArticleConnection!
+  validateCreateArticle(data: ArticleCreateInput!): _ValidationResult!
+  validateUpdateArticle(by: ArticleUniqueWhere!, data: ArticleUpdateInput!): _ValidationResult!
+  getAuditLog(by: AuditLogUniqueWhere!, filter: AuditLogWhere): AuditLog
+  listAuditLog(filter: AuditLogWhere, orderBy: [AuditLogOrderBy!], offset: Int, limit: Int): [AuditLog!]!
+  paginateAuditLog(filter: AuditLogWhere, orderBy: [AuditLogOrderBy!], skip: Int, first: Int): AuditLogConnection!
+  transaction: QueryTransaction
+  _info: Info
+}
+
+type Article {
+  _meta: ArticleMeta
+  id: UUID!
+  title: String
+  auditLogs(filter: AuditLogWhere, orderBy: [AuditLogOrderBy!], offset: Int, limit: Int): [AuditLog!]!
+  pinnedLog(filter: AuditLogWhere): AuditLog
+  featuredLog(filter: AuditLogWhere): AuditLog
+  relatedLogs(filter: AuditLogWhere, orderBy: [AuditLogOrderBy!], offset: Int, limit: Int): [AuditLog!]!
+  taggingLogs(filter: AuditLogWhere, orderBy: [AuditLogOrderBy!], offset: Int, limit: Int): [AuditLog!]!
+  auditLogsByFeaturedArticle(by: ArticleAuditLogsByFeaturedArticleUniqueWhere!, filter: AuditLogWhere): AuditLog
+  auditLogsBy(by: AuditLogsOfArticleByUniqueWhere!, filter: AuditLogWhere): AuditLog
+  paginateAuditLogs(filter: AuditLogWhere, orderBy: [AuditLogOrderBy!], skip: Int, first: Int): AuditLogConnection!
+  paginateRelatedLogs(filter: AuditLogWhere, orderBy: [AuditLogOrderBy!], skip: Int, first: Int): AuditLogConnection!
+  paginateTaggingLogs(filter: AuditLogWhere, orderBy: [AuditLogOrderBy!], skip: Int, first: Int): AuditLogConnection!
+}
+
+type ArticleMeta {
+  id: FieldMeta
+  title: FieldMeta
+  auditLogs: FieldMeta
+  pinnedLog: FieldMeta
+  featuredLog: FieldMeta
+  relatedLogs: FieldMeta
+  taggingLogs: FieldMeta
+}
+
+type FieldMeta {
+  readable: Boolean
+  updatable: Boolean
+}
+
+scalar UUID
+
+type AuditLog {
+  _meta: AuditLogMeta
+  id: UUID!
+  message: String
+  article(filter: ArticleWhere): Article
+  featuredArticle(filter: ArticleWhere): Article
+  relatedArticles(filter: ArticleWhere, orderBy: [ArticleOrderBy!], offset: Int, limit: Int): [Article!]!
+  taggedArticles(filter: ArticleWhere, orderBy: [ArticleOrderBy!], offset: Int, limit: Int): [Article!]!
+  paginateRelatedArticles(filter: ArticleWhere, orderBy: [ArticleOrderBy!], skip: Int, first: Int): ArticleConnection!
+  paginateTaggedArticles(filter: ArticleWhere, orderBy: [ArticleOrderBy!], skip: Int, first: Int): ArticleConnection!
+}
+
+type AuditLogMeta {
+  id: FieldMeta
+  message: FieldMeta
+  article: FieldMeta
+  featuredArticle: FieldMeta
+  relatedArticles: FieldMeta
+  taggedArticles: FieldMeta
+}
+
+input ArticleWhere {
+  id: UUIDCondition
+  title: StringCondition
+  auditLogs: AuditLogWhere
+  pinnedLog: AuditLogWhere
+  featuredLog: AuditLogWhere
+  relatedLogs: AuditLogWhere
+  taggingLogs: AuditLogWhere
+  and: [ArticleWhere]
+  or: [ArticleWhere]
+  not: ArticleWhere
+}
+
+input UUIDCondition {
+  and: [UUIDCondition!]
+  or: [UUIDCondition!]
+  not: UUIDCondition
+  null: Boolean
+  isNull: Boolean
+  eq: UUID
+  notEq: UUID
+  in: [UUID!]
+  notIn: [UUID!]
+  lt: UUID
+  lte: UUID
+  gt: UUID
+  gte: UUID
+}
+
+input StringCondition {
+  and: [StringCondition!]
+  or: [StringCondition!]
+  not: StringCondition
+  null: Boolean
+  isNull: Boolean
+  eq: String
+  notEq: String
+  in: [String!]
+  notIn: [String!]
+  lt: String
+  lte: String
+  gt: String
+  gte: String
+  contains: String
+  startsWith: String
+  endsWith: String
+  containsCI: String
+  startsWithCI: String
+  endsWithCI: String
+  similar: String
+  wordSimilar: String
+}
+
+input AuditLogWhere {
+  id: UUIDCondition
+  message: StringCondition
+  article: ArticleWhere
+  featuredArticle: ArticleWhere
+  relatedArticles: ArticleWhere
+  taggedArticles: ArticleWhere
+  and: [AuditLogWhere]
+  or: [AuditLogWhere]
+  not: AuditLogWhere
+}
+
+input ArticleOrderBy {
+  _random: Boolean
+  _randomSeeded: Int
+  id: OrderDirection
+  title: OrderDirection
+  pinnedLog: AuditLogOrderBy
+  featuredLog: AuditLogOrderBy
+}
+
+enum OrderDirection {
+  asc
+  desc
+  ascNullsFirst
+  descNullsLast
+}
+
+input AuditLogOrderBy {
+  _random: Boolean
+  _randomSeeded: Int
+  id: OrderDirection
+  message: OrderDirection
+  article: ArticleOrderBy
+  featuredArticle: ArticleOrderBy
+}
+
+type ArticleConnection {
+  pageInfo: PageInfo!
+  edges: [ArticleEdge!]!
+}
+
+type PageInfo {
+  totalCount: Int!
+}
+
+type ArticleEdge {
+  node: Article!
+}
+
+input ArticleAuditLogsByFeaturedArticleUniqueWhere {
+  featuredArticle: ArticleUniqueWhere
+}
+
+input ArticleUniqueWhere {
+  id: UUID
+  auditLogs: AuditLogUniqueWhere
+  featuredLog: AuditLogUniqueWhere
+}
+
+input AuditLogUniqueWhere {
+  id: UUID
+  featuredArticle: ArticleUniqueWhere
+}
+
+input AuditLogsOfArticleByUniqueWhere {
+  id: UUID
+  featuredArticle: ArticleUniqueWhere
+}
+
+type AuditLogConnection {
+  pageInfo: PageInfo!
+  edges: [AuditLogEdge!]!
+}
+
+type AuditLogEdge {
+  node: AuditLog!
+}
+
+type _ValidationResult {
+  valid: Boolean!
+  errors: [_ValidationError!]!
+}
+
+type _ValidationError {
+  path: [_PathFragment!]!
+  message: _ValidationMessage!
+}
+
+union _PathFragment = _FieldPathFragment | _IndexPathFragment
+
+type _FieldPathFragment {
+  field: String!
+}
+
+type _IndexPathFragment {
+  index: Int!
+  alias: String
+}
+
+type _ValidationMessage {
+  text: String!
+}
+
+input ArticleCreateInput {
+  title: String
+  pinnedLog: ArticleCreatePinnedLogEntityRelationInput
+  relatedLogs: [ArticleCreateRelatedLogsEntityRelationInput!]
+  _dummy_field_: Boolean
+}
+
+input ArticleCreatePinnedLogEntityRelationInput {
+  connect: AuditLogUniqueWhere
+}
+
+input ArticleCreateRelatedLogsEntityRelationInput {
+  connect: AuditLogUniqueWhere
+  alias: String
+}
+
+input ArticleUpdateInput {
+  title: String
+  pinnedLog: ArticleUpdatePinnedLogEntityRelationInput
+  relatedLogs: [ArticleUpdateRelatedLogsEntityRelationInput!]
+  _dummy_field_: Boolean
+}
+
+input ArticleUpdatePinnedLogEntityRelationInput {
+  connect: AuditLogUniqueWhere
+  disconnect: Boolean
+}
+
+input ArticleUpdateRelatedLogsEntityRelationInput {
+  connect: AuditLogUniqueWhere
+  disconnect: AuditLogUniqueWhere
+  alias: String
+}
+
+type QueryTransaction {
+  getArticle(by: ArticleUniqueWhere!, filter: ArticleWhere): Article
+  listArticle(filter: ArticleWhere, orderBy: [ArticleOrderBy!], offset: Int, limit: Int): [Article!]!
+  paginateArticle(filter: ArticleWhere, orderBy: [ArticleOrderBy!], skip: Int, first: Int): ArticleConnection!
+  validateCreateArticle(data: ArticleCreateInput!): _ValidationResult!
+  validateUpdateArticle(by: ArticleUniqueWhere!, data: ArticleUpdateInput!): _ValidationResult!
+  getAuditLog(by: AuditLogUniqueWhere!, filter: AuditLogWhere): AuditLog
+  listAuditLog(filter: AuditLogWhere, orderBy: [AuditLogOrderBy!], offset: Int, limit: Int): [AuditLog!]!
+  paginateAuditLog(filter: AuditLogWhere, orderBy: [AuditLogOrderBy!], skip: Int, first: Int): AuditLogConnection!
+}
+
+type Info {
+  description: String
+}
+
+type Mutation {
+  createArticle(data: ArticleCreateInput!): ArticleCreateResult!
+  deleteArticle(by: ArticleUniqueWhere!, filter: ArticleWhere): ArticleDeleteResult!
+  updateArticle(by: ArticleUniqueWhere!, filter: ArticleWhere, data: ArticleUpdateInput!): ArticleUpdateResult!
+  upsertArticle(by: ArticleUniqueWhere!, filter: ArticleWhere, update: ArticleUpdateInput!, create: ArticleCreateInput!): ArticleUpsertResult!
+  transaction(options: MutationTransactionOptions): MutationTransaction!
+  query: Query!
+}
+
+type ArticleCreateResult implements MutationResult {
+  ok: Boolean!
+  errorMessage: String
+  errors: [_MutationError!]!
+  node: Article
+  validation: _ValidationResult!
+}
+
+interface MutationResult {
+  ok: Boolean!
+  errorMessage: String
+  errors: [_MutationError!]!
+}
+
+type _MutationError {
+  path: [_PathFragment!]! @deprecated(reason: "Use `paths`.")
+  paths: [[_PathFragment!]!]!
+  type: _MutationErrorType!
+  message: String
+}
+
+enum _MutationErrorType {
+  NotNullConstraintViolation
+  UniqueConstraintViolation
+  ForeignKeyConstraintViolation
+  NotFoundOrDenied
+  NonUniqueWhereInput
+  InvalidDataInput
+  SqlError
+  ResourceExhausted
+}
+
+type ArticleDeleteResult implements MutationResult {
+  ok: Boolean!
+  errorMessage: String
+  errors: [_MutationError!]!
+  node: Article
+}
+
+type ArticleUpdateResult implements MutationResult {
+  ok: Boolean!
+  errorMessage: String
+  errors: [_MutationError!]!
+  node: Article
+  validation: _ValidationResult!
+}
+
+type ArticleUpsertResult implements MutationResult {
+  ok: Boolean!
+  errorMessage: String
+  errors: [_MutationError!]!
+  node: Article
+  validation: _ValidationResult!
+}
+
+type MutationTransaction {
+  ok: Boolean!
+  errorMessage: String
+  errors: [_MutationError!]!
+  validation: _ValidationResult!
+  createArticle(data: ArticleCreateInput!): ArticleCreateResult!
+  deleteArticle(by: ArticleUniqueWhere!, filter: ArticleWhere): ArticleDeleteResult!
+  updateArticle(by: ArticleUniqueWhere!, filter: ArticleWhere, data: ArticleUpdateInput!): ArticleUpdateResult!
+  upsertArticle(by: ArticleUniqueWhere!, filter: ArticleWhere, update: ArticleUpdateInput!, create: ArticleCreateInput!): ArticleUpsertResult!
+  query: Query
+}
+
+input MutationTransactionOptions {
+  deferForeignKeyConstraints: Boolean
+  deferUniqueConstraints: Boolean
+}

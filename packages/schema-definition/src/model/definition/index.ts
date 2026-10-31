@@ -9,6 +9,7 @@ import { StrictDefinitionValidator, StrictOptions } from '../../strict.js'
 
 export * from './fieldDefinitions/index.js'
 export * from './EventLogDefinition.js'
+export * from './ImmutableDefinition.js'
 export * from './IndexDefinition.js'
 export * from './OrderByDefinition.js'
 export * from './EnumDefinition.js'

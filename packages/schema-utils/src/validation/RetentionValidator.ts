@@ -3,6 +3,7 @@ import { acceptEveryFieldVisitor, isColumn } from '../model/index.js'
 import { ErrorBuilder, ValidationError } from './errors.js'
 import { assertNever } from '../utils/index.js'
 import { whereSchema } from '../type-schema/where.js'
+import { isUnboundedWhere, isValidRetentionInterval } from '../retention/index.js'
 
 export class RetentionValidator {
 	constructor(private readonly model: Model.Schema) {}
@@ -27,10 +28,10 @@ export class RetentionValidator {
 		}
 
 		// A policy with no predicate would prune every row of the table — require a bound.
-		if (policy.olderThan === undefined && policy.where === undefined) {
+		if (policy.olderThan === undefined && (policy.where === undefined || isUnboundedWhere(this.model, entity, policy.where))) {
 			errorBuilder.add(
 				'RETENTION_EMPTY_PREDICATE',
-				`Retention policy ${policy.name} on ${entity.name} must set olderThan and/or where; a predicate-less policy would delete every row.`,
+				`Retention policy ${policy.name} on ${entity.name} must set olderThan and/or a restrictive where; a policy matching every row would delete the whole table.`,
 			)
 		}
 
@@ -69,8 +70,11 @@ export class RetentionValidator {
 		} else if (!isColumn(field) || field.type !== Model.ColumnType.DateTime) {
 			errorBuilder.add('RETENTION_INVALID_FIELD', `Field ${entity.name}.${olderThan.field} must be a DateTime column.`)
 		}
-		if (olderThan.interval.trim() === '') {
-			errorBuilder.add('RETENTION_INVALID_INTERVAL', `Retention policy interval must be a non-empty Postgres interval string.`)
+		if (!isValidRetentionInterval(olderThan.interval)) {
+			errorBuilder.add(
+				'RETENTION_INVALID_INTERVAL',
+				`Retention policy interval "${olderThan.interval}" must be a positive "<count> <unit>" interval (second, minute, hour, day, week, month, year), e.g. "30 days".`,
+			)
 		}
 	}
 

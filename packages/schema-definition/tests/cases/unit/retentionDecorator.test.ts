@@ -161,3 +161,41 @@ test('@Retention: a policy must set olderThan and/or where', () => {
 	const schema = createSchema(EmptyPredicateModel)
 	expect(SchemaValidator.validate(schema).map(it => it.code)).toContain('RETENTION_EMPTY_PREDICATE')
 })
+
+namespace AlwaysTrueWhereModel {
+	@c.Retention({ where: { and: [] } })
+	export class Article {
+		createdAt = c.dateTimeColumn()
+		published = c.boolColumn()
+	}
+}
+
+test('@Retention: a where that matches every row counts as no predicate', () => {
+	const schema = createSchema(AlwaysTrueWhereModel)
+	expect(SchemaValidator.validate(schema).map(it => it.code)).toContain('RETENTION_EMPTY_PREDICATE')
+})
+
+namespace FilteringWhereModel {
+	@c.Retention({ where: { published: { eq: false } } })
+	export class Article {
+		createdAt = c.dateTimeColumn()
+		published = c.boolColumn()
+	}
+}
+
+test('@Retention: a restrictive where alone is a valid predicate', () => {
+	const schema = createSchema(FilteringWhereModel)
+	expect(SchemaValidator.validate(schema).filter(it => it.code.startsWith('RETENTION'))).toStrictEqual([])
+})
+
+namespace BadIntervalModel {
+	@c.Retention({ olderThan: { field: 'createdAt', interval: '30' } })
+	export class Article {
+		createdAt = c.dateTimeColumn()
+	}
+}
+
+test('@Retention: an interval without a unit is rejected', () => {
+	const schema = createSchema(BadIntervalModel)
+	expect(SchemaValidator.validate(schema).map(it => it.code)).toContain('RETENTION_INVALID_INTERVAL')
+})

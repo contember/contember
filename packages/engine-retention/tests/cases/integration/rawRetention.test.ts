@@ -47,7 +47,7 @@ describe.skipIf(!hasDb)('raw retention against a live database', () => {
 	let maintenance: Connection
 	let connection: Connection
 	let client: Client
-	const executor = new RawRetentionExecutor(createWhereBuilder(model), new PathFactory())
+	const executor = new RawRetentionExecutor(model, createWhereBuilder(model), new PathFactory())
 
 	const count = async (): Promise<number> => {
 		const res = await client.query<{ c: number }>(

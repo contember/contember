@@ -69,6 +69,7 @@ export const interpretContentDeleteResult = (
 export class ContentRetentionExecutor {
 	constructor(
 		private readonly executionContainerFactory: ExecutionContainerFactory,
+		private readonly model: Model.Schema,
 		private readonly whereBuilder: WhereBuilder,
 		private readonly pathFactory: PathFactory,
 	) {
@@ -125,7 +126,7 @@ export class ContentRetentionExecutor {
 		batchSize: number,
 	): Promise<{ ok: true; selected: number; deleted: number }> {
 		// Select inside the transaction so the ids are guaranteed present in the same snapshot the deletes read.
-		const select = buildRetentionSelect(this.whereBuilder, this.pathFactory, entity, policy, batchSize)
+		const select = buildRetentionSelect(this.model, this.whereBuilder, this.pathFactory, entity, policy, batchSize)
 		const rows: Record<string, Input.PrimaryValue>[] = await select.getResult(mapper.db)
 
 		let deleted = 0

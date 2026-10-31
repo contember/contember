@@ -53,10 +53,10 @@ export class RetentionJob implements ScheduledJob {
 			(schema.settings.content?.useExistsInHasManyFilter ?? schema.settings.useExistsInHasManyFilter) === true,
 		)
 		const pathFactory = new PathFactory()
-		const rawExecutor = new RawRetentionExecutor(whereBuilder, pathFactory)
+		const rawExecutor = new RawRetentionExecutor(schema.model, whereBuilder, pathFactory)
 		const executionContainerFactory = this.getExecutionContainerFactory()
 		const contentExecutor = executionContainerFactory !== undefined
-			? new ContentRetentionExecutor(executionContainerFactory, whereBuilder, pathFactory)
+			? new ContentRetentionExecutor(executionContainerFactory, schema.model, whereBuilder, pathFactory)
 			: undefined
 		const metrics = this.getMetrics()?.forProject(ctx.projectSlug)
 

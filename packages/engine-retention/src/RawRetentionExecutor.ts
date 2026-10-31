@@ -1,5 +1,5 @@
 import { Model, Retention } from '@contember/schema'
-import { isColumn } from '@contember/schema-utils'
+import { isColumn, isUnboundedWhere, isValidRetentionInterval } from '@contember/schema-utils'
 import { Client, DeleteBuilder, SelectBuilder, wrapIdentifier } from '@contember/database'
 import { PathFactory, WhereBuilder } from '@contember/engine-content-api'
 
@@ -36,16 +36,20 @@ const resolveOlderThanColumn = (entity: Model.Entity, policy: Retention.Policy):
  * a predicate-less policy would delete the whole table, so this throws instead.
  */
 export const buildRetentionSelect = (
+	model: Model.Schema,
 	whereBuilder: WhereBuilder,
 	pathFactory: PathFactory,
 	entity: Model.Entity,
 	policy: Retention.Policy,
 	batchSize: number,
 ): SelectBuilder<SelectBuilder.Result> => {
-	if (policy.olderThan === undefined && policy.where === undefined) {
+	if (policy.olderThan === undefined && (policy.where === undefined || isUnboundedWhere(model, entity, policy.where))) {
 		throw new Error(
-			`Retention policy "${policy.name}" on "${entity.name}" has neither "olderThan" nor "where"; refusing to delete the entire table.`,
+			`Retention policy "${policy.name}" on "${entity.name}" has neither "olderThan" nor a restrictive "where"; refusing to delete the entire table.`,
 		)
+	}
+	if (policy.olderThan !== undefined && !isValidRetentionInterval(policy.olderThan.interval)) {
+		throw new Error(`Retention policy "${policy.name}" has an invalid interval "${policy.olderThan.interval}"; refusing to run it.`)
 	}
 
 	let qb: SelectBuilder<SelectBuilder.Result> = SelectBuilder.create()
@@ -102,6 +106,7 @@ export const runRetentionBatches = async (
  */
 export class RawRetentionExecutor {
 	constructor(
+		private readonly model: Model.Schema,
 		private readonly whereBuilder: WhereBuilder,
 		private readonly pathFactory: PathFactory,
 	) {
@@ -114,7 +119,7 @@ export class RawRetentionExecutor {
 	 */
 	public async execute(client: Client, entity: Model.Entity, policy: Retention.Policy, limits: RetentionLimits): Promise<number> {
 		return runRetentionBatches(limits, batchSize => {
-			const select = buildRetentionSelect(this.whereBuilder, this.pathFactory, entity, policy, batchSize)
+			const select = buildRetentionSelect(this.model, this.whereBuilder, this.pathFactory, entity, policy, batchSize)
 			return buildRetentionDelete(entity, select).execute(client)
 		})
 	}

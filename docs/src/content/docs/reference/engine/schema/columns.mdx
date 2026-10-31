@@ -359,6 +359,8 @@ The expression is written verbatim into the generated `ALTER TABLE` statement (w
 Contember does not parse the expression, so it cannot follow column changes. **When you rename or remove a column, update or remove every check that references it in the same change.**
 
 PostgreSQL drops a check together with a column it references. A generated migration therefore drops and recreates all checks of an entity whenever one of its columns is removed, renamed or replaced (including a relation whose target entity changes), so the constraints always match your schema. A check still referencing the old column name then fails the migration with a "column does not exist" error instead of silently disappearing.
+
+Recreating a check validates every row of the table under an exclusive lock, once per check. On a large table, a column rename or removal on an entity with checks therefore takes longer than without them.
 :::
 
 ### Changing column name

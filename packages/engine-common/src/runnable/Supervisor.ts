@@ -7,6 +7,8 @@ export type SupervisorOptions = {
 	minBackoff?: number
 	maxBackoff?: number
 	exponentiationBase?: number
+	/** A restarted run must stay up this long before the backoff resets; a run that crashes sooner counts as a failed restart. */
+	stableAfterMs?: number
 }
 
 export class Supervisor implements Runnable {
@@ -22,6 +24,13 @@ export class Supervisor implements Runnable {
 		const abortController = new AbortController()
 		let innerRunning: Running | undefined
 		let wasHealthy = false
+		let startedAt: number | undefined
+		const endRun = () => {
+			if (startedAt !== undefined && Date.now() - startedAt >= (this.options.stableAfterMs ?? 60_000)) {
+				restartCount = 0
+			}
+			startedAt = undefined
+		}
 
 		await new Promise<void>(async (resolve, reject) => {
 			while (!abortController.signal.aborted) {
@@ -33,15 +42,20 @@ export class Supervisor implements Runnable {
 								onError: rejectRunning,
 								logger: logger.child({ runningId: Math.random().toString().substring(2) }),
 							})
-							restartCount = 0
+							if (!wasHealthy) {
+								restartCount = 0
+							}
+							startedAt = Date.now()
 							resolve()
 							wasHealthy = true
 						} catch (e) {
 							rejectRunning(e)
 						}
 					})
+					endRun()
 				} catch (e) {
 					innerRunning = undefined
+					endRun()
 					restartCount++
 					const restartLimit = wasHealthy ? this.options.max : (this.options.startupMax ?? 10)
 					const shouldRestart = restartLimit === undefined || restartCount <= restartLimit

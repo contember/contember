@@ -235,3 +235,53 @@ test('supervisor: backs off restarts after a healthy run without max', async () 
 		'Runnable crashed, restarting in 16 ms ...: dependency unavailable',
 	])
 })
+
+const runFlappingRunnable = async (options: { stableAfterMs?: number; uptimeMs: (attempt: number) => number; attempts: number }) => {
+	const { logger, testLogger } = createTestLogger()
+	let attempt = 0
+	let reachedLastAttempt: () => void = () => {}
+	const lastAttemptPromise = new Promise<void>(resolve => {
+		reachedLastAttempt = resolve
+	})
+	const runnable = new class FlappingRunnable implements Runnable {
+		async run(args: RunnableArgs): Promise<Running> {
+			const thisAttempt = ++attempt
+			if (thisAttempt === options.attempts) {
+				reachedLastAttempt()
+			} else {
+				setTimeout(() => args.onError(new Error(`crashed #${thisAttempt}`)), options.uptimeMs(thisAttempt))
+			}
+			return { end: async () => {} }
+		}
+	}()
+
+	const supervisor = new Supervisor(runnable, { minBackoff: 1, maxBackoff: 16, stableAfterMs: options.stableAfterMs })
+	const running = await supervisor.run({
+		logger,
+		onError: shouldNotHappenCallback,
+	})
+	await lastAttemptPromise
+	await running.end()
+	return testLogger.messages.map(it => it.message).filter(it => it.startsWith('Runnable crashed'))
+}
+
+test('supervisor: backs off a runnable that crashes right after every start', async () => {
+	expect(await runFlappingRunnable({ uptimeMs: () => 1, attempts: 7 })).toStrictEqual([
+		'Runnable crashed, restarting in 1 ms ...: crashed #1',
+		'Runnable crashed, restarting in 2 ms ...: crashed #2',
+		'Runnable crashed, restarting in 4 ms ...: crashed #3',
+		'Runnable crashed, restarting in 8 ms ...: crashed #4',
+		'Runnable crashed, restarting in 16 ms ...: crashed #5',
+		'Runnable crashed, restarting in 16 ms ...: crashed #6',
+	])
+})
+
+test('supervisor: resets the backoff after a run stays up for stableAfterMs', async () => {
+	expect(await runFlappingRunnable({ stableAfterMs: 30, uptimeMs: attempt => attempt === 4 ? 50 : 1, attempts: 6 })).toStrictEqual([
+		'Runnable crashed, restarting in 1 ms ...: crashed #1',
+		'Runnable crashed, restarting in 2 ms ...: crashed #2',
+		'Runnable crashed, restarting in 4 ms ...: crashed #3',
+		'Runnable crashed, restarting in 1 ms ...: crashed #4',
+		'Runnable crashed, restarting in 2 ms ...: crashed #5',
+	])
+})

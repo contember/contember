@@ -87,7 +87,12 @@ export class UpdateColumnNameModificationHandler implements ModificationHandler<
 	}
 
 	describe() {
-		return { message: `Change column name of field ${this.data.entityName}.${this.data.fieldName}` }
+		return {
+			message: `Change column name of field ${this.data.entityName}.${this.data.fieldName}`,
+			failureWarning: this.schema.model.entities[this.data.entityName]?.checks?.length
+				? `Entity ${this.data.entityName} has check constraints. Their expressions are raw SQL and are not rewritten, so update every check referencing the old column name in the same migration.`
+				: undefined,
+		}
 	}
 }
 

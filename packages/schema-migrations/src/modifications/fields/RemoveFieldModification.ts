@@ -41,7 +41,13 @@ export class RemoveFieldModificationHandler implements ModificationHandler<Remov
 	}
 
 	describe() {
-		return { message: `Remove field ${this.data.entityName}.${this.data.fieldName}`, isDestructive: true }
+		return {
+			message: `Remove field ${this.data.entityName}.${this.data.fieldName}`,
+			isDestructive: true,
+			failureWarning: this.schema.model.entities[this.data.entityName]?.checks?.length
+				? `Entity ${this.data.entityName} has check constraints. PostgreSQL drops every check referencing the removed column, so remove or update such checks in the same migration.`
+				: undefined,
+		}
 	}
 }
 

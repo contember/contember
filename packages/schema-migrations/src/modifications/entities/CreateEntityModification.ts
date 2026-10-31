@@ -48,13 +48,15 @@ export class CreateEntityModificationHandler implements ModificationHandler<Crea
 	}
 
 	public getSchemaUpdater(): SchemaUpdater {
+		// createSql emits no CHECK, so checks are only ever added by createCheckConstraint
+		const { checks, ...entity } = this.data.entity
 		return updateModel(({ model }) => ({
 			...model,
 			entities: {
 				...model.entities,
 				[this.data.entity.name]: {
 					eventLog: { enabled: true },
-					...this.data.entity,
+					...entity,
 					unique: Object.values(this.data.entity.unique),
 					indexes: Object.values(this.data.entity.indexes ?? []),
 				},

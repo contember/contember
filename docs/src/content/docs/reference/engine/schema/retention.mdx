@@ -82,16 +82,21 @@ name).
 ## Predicate
 
 A policy needs at least one predicate — `olderThan`, `where`, or both. **A predicate-less
-policy is a schema error**, because it would delete every row of the table.
+policy is a schema error**, because it would delete every row of the table. A `where` that
+matches every row (`{}`, `{ and: [] }`, `{ field: {} }`, `{ field: { always: true } }`) counts
+as no predicate.
 
 ### `olderThan`
 
 `olderThan` is sugar for `field < now() - interval`:
 
 - `field` must be a **`DateTime` column** of the entity.
-- `interval` is a **Postgres interval string** — `'30 days'`, `'6 months'`, `'1 hour'`, etc.
-  It is bound as a parameter and cast to `interval` in SQL, so it is not vulnerable to
-  injection.
+- `interval` is one or more `<count> <unit>` parts — `'30 days'`, `'6 months'`,
+  `'1 day 12 hours'` — with the units `second`, `minute`, `hour`, `day`, `week`, `month` and
+  `year`. It must be positive. Other Postgres interval forms are rejected on purpose: a bare
+  `'30'` means 30 seconds, and a zero or negative interval moves the cutoff to now or into the
+  future, so every row would match. The value is bound as a parameter and cast to `interval`
+  in SQL.
 
 ```typescript
 @c.Retention({
@@ -158,27 +163,26 @@ is for.
 
 Deletion is batched: each run deletes up to `batchSize` rows at a time and loops until a batch
 comes back short (nothing left) or `maxPerRun` is reached, keeping any single transaction bounded
-on large tables.
+on large tables. `maxPerRun` counts only rows of the policy's entity: rows that a database
+`ON DELETE CASCADE` removes in other tables are not counted and not capped.
 
-### `content` (planned)
+### `content`
 
-:::note[Not yet available]
-`strategy: 'content'` is **not implemented yet**. Declaring it is accepted by the schema, but a
-policy that runs with it currently fails at execution with a "not yet implemented" error. Use
-`raw` for now.
-:::
-
-The planned `content` strategy will delete through the full content pipeline (with a privileged
-system identity), so that Actions delete triggers, application-level `removeOrphan` and ACL-aware
-cascade traversal all run — at the cost of the extra work per row.
+The `content` strategy deletes through the content delete pipeline, under a system identity
+with full permissions. Each batch selects up to `batchSize` matching ids and deletes them one by
+one in a single content transaction, so Actions delete triggers (including synchronous audit-log
+rows), application-level `removeOrphan` and the engine's `onDelete` handling all run, at the
+cost of extra work per row. A failed delete (e.g. a `restrict` relation with existing rows)
+rolls the batch back and the run is recorded as failed.
 
 ## Validation
 
 Policies are checked at schema build time. It is an error to:
 
 - reference an entity that does not exist, or reuse a policy `name`;
-- declare **no predicate** (`olderThan` and `where` both absent);
-- point `olderThan.field` at a missing field or a non-`DateTime` column, or give an empty interval;
+- declare **no predicate** (`olderThan` absent and `where` absent or matching every row);
+- point `olderThan.field` at a missing field or a non-`DateTime` column, or give an interval
+  that is not a positive `<count> <unit>` interval;
 - give an invalid `where` for the entity, or an invalid / non-positive `schedule`;
 - set a non-positive `batchSize` or `maxPerRun`.
 
@@ -186,7 +190,8 @@ There is also a `raw`-specific check: if a **`restrict` foreign key points *at* 
 entity**, a `raw` delete would fail at runtime as soon as a referencing row exists. This is
 flagged as a schema error — switch that relation's
 [`onDelete`](/reference/engine/schema/relationships) to cascade / set-null, or use the `content`
-strategy once available.
+strategy. Only relations pointing directly at the pruned entity are checked; a `restrict`
+further down a cascade chain still fails at runtime.
 
 ## The scheduler
 

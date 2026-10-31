@@ -262,3 +262,57 @@ test('audit-log eventNo must be backed by a sequence when present', () => {
 	const errors = SchemaValidator.validate(schema)
 	expect(errors.map(it => it.code)).toContain('ACTIONS_AUDIT_LOG_INVALID_COLUMN')
 })
+
+namespace NotNullRootRelationAuditModel {
+	@c.AuditLog({ watch: `title`, entity: () => ArticleAuditLog, rootRelation: 'article' })
+	export class Article {
+		title = c.stringColumn()
+	}
+
+	export class ArticleAuditLog extends c.AuditLogEntity {
+		article = c.manyHasOne(Article).notNull()
+	}
+}
+
+test('audit-log root relation must be nullable', () => {
+	const errors = SchemaValidator.validate(createSchema(NotNullRootRelationAuditModel))
+	expect(errors.map(it => it.message)).toContain('Audit-log root relation ArticleAuditLog.article must be nullable.')
+})
+
+namespace CascadeRootRelationAuditModel {
+	@c.AuditLog({ watch: `title`, entity: () => ArticleAuditLog, rootRelation: 'article' })
+	export class Article {
+		title = c.stringColumn()
+	}
+
+	export class ArticleAuditLog extends c.AuditLogEntity {
+		article = c.manyHasOne(Article).cascadeOnDelete()
+	}
+}
+
+test('audit-log root relation must not cascade on delete', () => {
+	const errors = SchemaValidator.validate(createSchema(CascadeRootRelationAuditModel))
+	expect(errors.map(it => it.code)).toContain('ACTIONS_AUDIT_LOG_INVALID_ROOT_RELATION')
+	expect(errors.map(it => it.message).some(it => it.includes('must not cascade on delete'))).toBe(true)
+})
+
+namespace NotNullIdentityAuditModel {
+	@c.AuditLog({ watch: `title`, entity: () => AuditLog })
+	export class Article {
+		title = c.stringColumn()
+	}
+
+	@c.Immutable()
+	export class AuditLog {
+		transactionId = c.uuidColumn().notNull()
+		identityId = c.uuidColumn().notNull()
+		rootEntity = c.stringColumn().notNull()
+		rootId = c.stringColumn().notNull()
+		data = c.jsonColumn().notNull()
+	}
+}
+
+test('audit-log identityId must be nullable', () => {
+	const errors = SchemaValidator.validate(createSchema(NotNullIdentityAuditModel))
+	expect(errors.map(it => it.message).some(it => it.includes('identityId must be nullable'))).toBe(true)
+})

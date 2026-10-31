@@ -67,6 +67,11 @@ export class ActionsValidator {
 					'ACTIONS_AUDIT_LOG_INVALID_COLUMN',
 					`Audit-log entity ${target.entity} column ${column.name} must be backed by a sequence.`,
 				)
+			} else if (column.name === 'identityId' && !field.nullable) {
+				errorBuilder.add(
+					'ACTIONS_AUDIT_LOG_INVALID_COLUMN',
+					`Audit-log entity ${target.entity} column ${column.name} must be nullable, changes made without an identity have none.`,
+				)
 			}
 		}
 		if (target.rootRelation !== undefined) {
@@ -84,6 +89,20 @@ export class ActionsValidator {
 			errorBuilder.add(
 				'ACTIONS_AUDIT_LOG_INVALID_ROOT_RELATION',
 				`Audit-log root relation ${entity.name}.${relationName} must be a many-has-one relation.`,
+			)
+			return
+		}
+		// The writer leaves the column null once the root row is gone (delete events).
+		if (!relation.nullable) {
+			errorBuilder.add(
+				'ACTIONS_AUDIT_LOG_INVALID_ROOT_RELATION',
+				`Audit-log root relation ${entity.name}.${relationName} must be nullable.`,
+			)
+		}
+		if (relation.joiningColumn.onDelete === Model.OnDelete.cascade) {
+			errorBuilder.add(
+				'ACTIONS_AUDIT_LOG_INVALID_ROOT_RELATION',
+				`Audit-log root relation ${entity.name}.${relationName} must not cascade on delete, it would delete the audit trail of a deleted root.`,
 			)
 		}
 	}

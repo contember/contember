@@ -141,6 +141,38 @@ namespace WithCheckAndTax {
 	}
 }
 
+namespace WithAuthorRelation {
+	@c.Check({ name: 'author_set', expression: 'author_id IS NOT NULL OR price > 0' })
+	export class Product {
+		price = c.intColumn()
+		author = c.manyHasOne(Author)
+	}
+
+	export class Author {
+		name = c.stringColumn()
+	}
+
+	export class Person {
+		name = c.stringColumn()
+	}
+}
+
+namespace WithPersonRelation {
+	@c.Check({ name: 'author_set', expression: 'author_id IS NOT NULL OR price > 0' })
+	export class Product {
+		price = c.intColumn()
+		author = c.manyHasOne(Person).joiningColumn('author_id')
+	}
+
+	export class Author {
+		name = c.stringColumn()
+	}
+
+	export class Person {
+		name = c.stringColumn()
+	}
+}
+
 namespace WithReorderedChecks {
 	@c.Check({ name: 'discount_below_price', expression: 'discount <= price' })
 	@c.Check({ name: 'price_non_negative', expression: 'price >= 0' })
@@ -336,6 +368,11 @@ describe('checks of an entity whose columns change', () => {
 	test('are recreated even with an unchanged expression, so a stale one fails at migration time', () => {
 		const ids = modificationIds(differ.diffSchemas(createSchema(WithCheck), createSchema(WithStalePriceColumn)))
 		expect(ids).toEqual(['removeCheckConstraint', 'updateColumnName', 'createCheckConstraint'])
+	})
+
+	test('are recreated when a relation target changes under the same joining column', () => {
+		const ids = modificationIds(differ.diffSchemas(createSchema(WithAuthorRelation), createSchema(WithPersonRelation)))
+		expect(ids).toEqual(['removeCheckConstraint', 'removeField', 'createRelation', 'createCheckConstraint'])
 	})
 
 	test('are kept when a field without a column on the table is removed', () => {

@@ -19,6 +19,7 @@ export {
 	BeforeJunctionUpdateEvent,
 	BeforeUpdateEvent,
 	createWhereBuilder,
+	createWhereOptimizer,
 	type DataModificationEvent,
 	EventManager,
 	type ExecutionContainer,
@@ -35,4 +36,5 @@ export {
 	type WhereBuilder,
 } from './mapper/index.js'
 export { CheckedPrimary } from './mapper/CheckedPrimary.js'
+export type { WhereOptimizer } from './mapper/select/optimizer/WhereOptimizer.js'
 export * from './utils/uniqueWhereFields.js'

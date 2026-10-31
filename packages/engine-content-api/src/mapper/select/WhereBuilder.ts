@@ -669,6 +669,9 @@ export const createWhereBuilder = (
 		new JoinBuilder(model),
 		new ConditionBuilder(),
 		new PathFactory(),
-		new WhereOptimizer(model, new ConditionOptimizer(), optimizerOptions),
+		createWhereOptimizer(model, optimizerOptions),
 		useExistsInHasManyFilter,
 	)
+
+export const createWhereOptimizer = (model: Model.Schema, optimizerOptions?: WhereOptimizerOptions): WhereOptimizer =>
+	new WhereOptimizer(model, new ConditionOptimizer(), optimizerOptions)

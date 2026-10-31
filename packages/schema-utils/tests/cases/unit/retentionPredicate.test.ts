@@ -7,7 +7,21 @@ describe('isValidRetentionInterval', () => {
 	test.each(['30 days', '1 day', '1 day 12 hours', '90 Days', '2 weeks', '1 year 0 months'])('accepts %p', interval => {
 		expect(isValidRetentionInterval(interval)).toBe(true)
 	})
-	test.each(['', '30', '0 days', '0 days 0 hours', '-10 years', '30 dayz', 'P30D', "30 days'); drop table x; --"])('rejects %p', interval => {
+	test.each([
+		'',
+		'30',
+		'0 days',
+		'0 days 0 hours',
+		'-10 years',
+		'30 dayz',
+		'P30D',
+		"30 days'); drop table x; --",
+		'613566756 weeks',
+		'1000001 days',
+		'1 day 1 day',
+		'1 day 2 Days',
+		'30\u00A0days',
+	])('rejects %p', interval => {
 		expect(isValidRetentionInterval(interval)).toBe(false)
 	})
 })
@@ -28,6 +42,15 @@ describe('isUnboundedWhere', () => {
 		{ used: { and: [{}] } },
 		{ owner: {} },
 		{ or: [{ used: { eq: true } }, {}] },
+		{ used: { notIn: [] } },
+		{ owner: { id: { notIn: [] } } },
+		{ not: { used: { never: true } } },
+		{ not: { used: { in: [] } } },
+		{ used: { not: { never: true } } },
+		{ not: { not: {} } },
+		{ used: { eq: null } },
+		{ not: {} },
+		{ not: { used: { always: true } } },
 	]
 	test.each(unbounded)('%p is unbounded', where => {
 		expect(isUnboundedWhere(model, entity, where)).toBe(true)
@@ -39,6 +62,9 @@ describe('isUnboundedWhere', () => {
 		{ owner: { name: { eq: 'x' } } },
 		{ not: { used: { eq: true } } },
 		{ used: { never: true } },
+		{ used: { in: [] } },
+		{ used: { isNull: false } },
+		{ or: [{ used: { never: true } }, { used: { eq: true } }] },
 	]
 	test.each(restrictive)('%p is restrictive', where => {
 		expect(isUnboundedWhere(model, entity, where)).toBe(false)

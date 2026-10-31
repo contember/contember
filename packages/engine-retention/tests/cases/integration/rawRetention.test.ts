@@ -2,7 +2,7 @@ import { afterAll, beforeAll, beforeEach, describe, expect, test } from 'bun:tes
 import { Client, Connection, wrapIdentifier } from '@contember/database'
 import { c, createSchema } from '@contember/schema-definition'
 import { getEntity } from '@contember/schema-utils'
-import { createWhereBuilder, PathFactory } from '@contember/engine-content-api'
+import { createWhereBuilder, createWhereOptimizer, PathFactory } from '@contember/engine-content-api'
 import { Retention } from '@contember/schema'
 import { RawRetentionExecutor } from '../../../src/RawRetentionExecutor.js'
 
@@ -47,7 +47,7 @@ describe.skipIf(!hasDb)('raw retention against a live database', () => {
 	let maintenance: Connection
 	let connection: Connection
 	let client: Client
-	const executor = new RawRetentionExecutor(model, createWhereBuilder(model), new PathFactory())
+	const executor = new RawRetentionExecutor(model, createWhereOptimizer(model), createWhereBuilder(model), new PathFactory())
 
 	const count = async (): Promise<number> => {
 		const res = await client.query<{ c: number }>(

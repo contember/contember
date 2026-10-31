@@ -1,7 +1,7 @@
 import { Model, Retention, Schema } from '@contember/schema'
 import { getEntity } from '@contember/schema-utils'
 import { Stage, StagesQuery } from '@contember/engine-system-api'
-import { createWhereBuilder, ExecutionContainerFactory, PathFactory } from '@contember/engine-content-api'
+import { createWhereBuilder, createWhereOptimizer, ExecutionContainerFactory, PathFactory } from '@contember/engine-content-api'
 import { DatabaseMetadataResolver } from '@contember/database'
 import { isScheduleDue, ScheduledJob, ScheduledJobContext } from '@contember/engine-scheduler'
 import { RawRetentionExecutor, RetentionLimits } from './RawRetentionExecutor.js'
@@ -52,11 +52,12 @@ export class RetentionJob implements ScheduledJob {
 			schema.model,
 			(schema.settings.content?.useExistsInHasManyFilter ?? schema.settings.useExistsInHasManyFilter) === true,
 		)
+		const whereOptimizer = createWhereOptimizer(schema.model)
 		const pathFactory = new PathFactory()
-		const rawExecutor = new RawRetentionExecutor(schema.model, whereBuilder, pathFactory)
+		const rawExecutor = new RawRetentionExecutor(schema.model, whereOptimizer, whereBuilder, pathFactory)
 		const executionContainerFactory = this.getExecutionContainerFactory()
 		const contentExecutor = executionContainerFactory !== undefined
-			? new ContentRetentionExecutor(executionContainerFactory, schema.model, whereBuilder, pathFactory)
+			? new ContentRetentionExecutor(executionContainerFactory, schema.model, whereOptimizer, whereBuilder, pathFactory)
 			: undefined
 		const metrics = this.getMetrics()?.forProject(ctx.projectSlug)
 

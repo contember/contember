@@ -2,7 +2,7 @@ import { describe, expect, test } from 'bun:test'
 import { c, createSchema } from '@contember/schema-definition'
 import { getEntity } from '@contember/schema-utils'
 import { Compiler } from '@contember/database'
-import { createWhereBuilder, PathFactory } from '@contember/engine-content-api'
+import { createWhereBuilder, createWhereOptimizer, PathFactory } from '@contember/engine-content-api'
 import { Input, Retention } from '@contember/schema'
 import { buildRetentionDelete, buildRetentionSelect } from '../../../src/RawRetentionExecutor.js'
 
@@ -25,9 +25,10 @@ const schema = createSchema(RetentionModel)
 const model = schema.model
 const entity = getEntity(model, 'Token')
 const whereBuilder = createWhereBuilder(model)
+const whereOptimizer = createWhereOptimizer(model)
 
 const compileDelete = (policy: Retention.Policy, batchSize: number) => {
-	const select = buildRetentionSelect(model, whereBuilder, new PathFactory(), entity, policy, batchSize)
+	const select = buildRetentionSelect(model, whereOptimizer, whereBuilder, new PathFactory(), entity, policy, batchSize)
 	return buildRetentionDelete(entity, select).createQuery(new Compiler.Context('stage_test', new Set()))
 }
 
@@ -60,12 +61,27 @@ describe('raw retention SQL', () => {
 		expect(() => compileDelete(injectingPolicy, 1000)).toThrow(/invalid interval/)
 	})
 
-	test.each(['30', '0 days', '-10 years', '30 dayz'])('interval %p that would match every row or not parse refuses to build', interval => {
-		const policy: Retention.Policy = { name: 'bad', entity: 'Token', strategy: 'raw', olderThan: { field: 'expiresAt', interval } }
-		expect(() => compileDelete(policy, 1000)).toThrow(/invalid interval/)
-	})
+	test.each(['30', '0 days', '-10 years', '30 dayz', '613566756 weeks', '1 day 1 day'])(
+		'interval %p that would match every row or not parse refuses to build',
+		interval => {
+			const policy: Retention.Policy = { name: 'bad', entity: 'Token', strategy: 'raw', olderThan: { field: 'expiresAt', interval } }
+			expect(() => compileDelete(policy, 1000)).toThrow(/invalid interval/)
+		},
+	)
 
-	const alwaysTrue: Input.Where[] = [{}, { and: [] }, { used: {} }, { used: { always: true } }, { or: [{ used: { eq: true } }, {}] }]
+	const alwaysTrue: Input.Where[] = [
+		{},
+		{ and: [] },
+		{ used: {} },
+		{ used: { always: true } },
+		{ or: [{ used: { eq: true } }, {}] },
+		{ used: { notIn: [] } },
+		{ not: { used: { never: true } } },
+		{ not: { used: { in: [] } } },
+		{ used: { not: { never: true } } },
+		{ not: {} },
+		{ not: { not: {} } },
+	]
 	test.each(alwaysTrue)(
 		'an always-true where %p refuses to build',
 		where => {
@@ -90,7 +106,9 @@ describe('raw retention SQL', () => {
 
 	test('a predicate-less policy refuses to build (would delete the whole table)', () => {
 		const emptyPolicy: Retention.Policy = { name: 'nuke', entity: 'Token', strategy: 'raw' }
-		expect(() => buildRetentionSelect(model, whereBuilder, new PathFactory(), entity, emptyPolicy, 100)).toThrow(/refusing to delete the entire table/)
+		expect(() => buildRetentionSelect(model, whereOptimizer, whereBuilder, new PathFactory(), entity, emptyPolicy, 100)).toThrow(
+			/refusing to delete the entire table/,
+		)
 	})
 
 	test('olderThan.field must be a DateTime column', () => {
@@ -100,6 +118,8 @@ describe('raw retention SQL', () => {
 			strategy: 'raw',
 			olderThan: { field: 'value', interval: '1 day' },
 		}
-		expect(() => buildRetentionSelect(model, whereBuilder, new PathFactory(), entity, badPolicy, 100)).toThrow(/must be a DateTime column/)
+		expect(() => buildRetentionSelect(model, whereOptimizer, whereBuilder, new PathFactory(), entity, badPolicy, 100)).toThrow(
+			/must be a DateTime column/,
+		)
 	})
 })

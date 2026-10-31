@@ -52,8 +52,10 @@ describe('parseStatePredicate', () => {
 	})
 
 	test('throws on a marker that does not hold a predicate object', () => {
-		const stored: Acl.PredicateDefinition = JSON.parse('{ "_new": null }')
-		expect(() => parseStatePredicate(stored)).toThrow('"_new" marker must contain a predicate object')
+		for (const json of ['{ "_new": null }', '{ "and": [{ "_new": null }] }', '{ "or": [{ "_new": null }] }', '{ "not": { "_new": null } }']) {
+			const stored: Acl.PredicateDefinition = JSON.parse(json)
+			expect(() => parseStatePredicate(stored)).toThrow('"_new" marker must contain a predicate object')
+		}
 	})
 })
 

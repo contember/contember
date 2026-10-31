@@ -196,3 +196,21 @@ describe('Predicates factory with a field named like a state marker', () => {
 		)
 	})
 })
+
+describe('Predicates factory with a marker that cannot be resolved', () => {
+	const schema = def.createModel(TestModel)
+	const markerUnderRelation = (value: unknown): Acl.Permissions => ({
+		Article: {
+			predicates: { viaImage: JSON.parse(JSON.stringify({ image: { _old: value } })) },
+			operations: { read: { id: 'viaImage' }, update: { id: 'viaImage' } },
+		},
+	})
+
+	it('refuses a marker under a relation instead of dropping it', () => {
+		for (const value of [null, { url: { eq: 'x' } }]) {
+			const predicateFactory = new PredicateFactory(markerUnderRelation(value), schema, new VariableInjector(schema, {}))
+			expect(() => predicateFactory.create(schema.entities.Article, Acl.Operation.read, 'root')).toThrow('unresolvable "_old" marker at "image._old"')
+			expect(() => predicateFactory.createUpdateStatePredicate(schema.entities.Article, 'root', ['id'])).toThrow('unresolvable "_old" marker')
+		}
+	})
+})

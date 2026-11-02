@@ -1,3 +1,4 @@
+import { identityKindSql } from './workloadIdentity/workloadIdentitySql.js'
 import { GQL, SQL } from '../../../src/tags.js'
 import { testUuid } from '../../../src/testUuid.js'
 import { executeTenantTest } from '../../../src/testTenant.js'
@@ -29,6 +30,7 @@ test('removes a project member', async () => {
 				projectId,
 				membershipsResponse: beforeMemberships,
 			}),
+			identityKindSql(identityId, 'person'),
 			selectMembershipsSql({
 				identityId,
 				projectId,

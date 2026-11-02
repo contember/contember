@@ -11,5 +11,5 @@ export const resolveActionsClient: ActionsClientResolver = async (remoteProjectR
 	if (!project) {
 		throw new CliError('Project not defined', { code: 'PROJECT_NOT_DEFINED' })
 	}
-	return ActionsClient.create(project.endpoint, project.name, project.token)
+	return ActionsClient.create(project.endpoint, project.name, project.credentials)
 }

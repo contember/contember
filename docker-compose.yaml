@@ -52,6 +52,8 @@ services:
       CONTEMBER_PANEL_ENABLED: 'true'
       # Off by default; e2e/cases/content/force-primary.test.ts needs it.
       CONTEMBER_CONTENT_API_FORCE_PRIMARY_HEADER: 'true'
+      # Development only: lets a workload identity issuer run on the host over plain http.
+      CONTEMBER_WORKLOAD_IDENTITY_INSECURE_ISSUERS: 'localhost,host.docker.internal'
       DEFAULT_DB_STATEMENT_TIMEOUT_MS: 3000
       DEFAULT_DB_QUERY_TIMEOUT_MS: 3000
       DEFAULT_DB_HOST: 'postgres'

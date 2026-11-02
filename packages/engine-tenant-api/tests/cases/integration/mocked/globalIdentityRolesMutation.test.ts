@@ -1,3 +1,4 @@
+import { identityKindSql } from './workloadIdentity/workloadIdentitySql.js'
 import { GQL, SQL } from '../../../src/tags.js'
 import { testUuid } from '../../../src/testUuid.js'
 import { executeTenantTest } from '../../../src/testTenant.js'
@@ -44,6 +45,7 @@ test('adds a global identity role', async () => {
 		executes: [
 			selectIdentitySql({ identityId, roles: [] }),
 			getIdentityProjectMembershipPresenceSql(identityId),
+			identityKindSql(identityId, 'person'),
 			...sqlReadCommittedTransaction(
 				patchIdentityRolesSql({ identityId, add: [role], remove: [] }),
 			),
@@ -87,6 +89,7 @@ test('removes a global identity role', async () => {
 		executes: [
 			// a super_admin target short-circuits the membership-presence lookup
 			selectIdentitySql({ identityId, roles: [role] }),
+			identityKindSql(identityId, 'person'),
 			patchIdentityRolesSql({ identityId, add: [], remove: [role] }),
 			selectIdentitySql({ identityId, roles: [] }),
 			getPersonsByIdentitySql({
@@ -128,6 +131,7 @@ test('removes a global identity role from an unprivileged target', async () => {
 		executes: [
 			selectIdentitySql({ identityId, roles: [role] }),
 			getIdentityProjectMembershipPresenceSql(identityId),
+			identityKindSql(identityId, 'person'),
 			patchIdentityRolesSql({ identityId, add: [], remove: [role] }),
 			selectIdentitySql({ identityId, roles: [] }),
 			getPersonsByIdentitySql({
@@ -169,6 +173,7 @@ test('adds a defined custom role', async () => {
 		executes: [
 			selectIdentitySql({ identityId, roles: [] }),
 			getIdentityProjectMembershipPresenceSql(identityId),
+			identityKindSql(identityId, 'person'),
 			...sqlReadCommittedTransaction(
 				getCustomRolesForValidationSql({
 					slugs: [role],
@@ -221,6 +226,7 @@ test('rejects an undefined custom role', async () => {
 		executes: [
 			selectIdentitySql({ identityId, roles: [] }),
 			getIdentityProjectMembershipPresenceSql(identityId),
+			identityKindSql(identityId, 'person'),
 			...sqlReadCommittedTransaction(
 				getCustomRolesForValidationSql({ slugs: ['ghost'] }),
 			),
@@ -246,6 +252,7 @@ test('removes a dangling custom role slug without validation', async () => {
 		executes: [
 			selectIdentitySql({ identityId, roles: [role] }),
 			getIdentityProjectMembershipPresenceSql(identityId),
+			identityKindSql(identityId, 'person'),
 			patchIdentityRolesSql({ identityId, add: [], remove: [role] }),
 			selectIdentitySql({ identityId, roles: [] }),
 			getPersonsByIdentitySql({

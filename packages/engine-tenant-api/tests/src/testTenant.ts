@@ -2,6 +2,7 @@ import { GraphQLTestQuery } from '../cases/integration/mocked/gql/types.js'
 import { testUuid } from './testUuid.js'
 import {
 	AclSchemaAccessNodeFactory,
+	AuthCredential,
 	createResolverContext,
 	Identity,
 	PermissionContext,
@@ -35,6 +36,8 @@ export interface Test {
 	/** A single expected auth log, or a sequence of them when the mutation emits more than one. */
 	expectedAuthLog?: AuthLogService.LogArgs | AuthLogService.LogArgs[]
 	callerTrustForwardedInfo?: boolean
+	/** Credential of the caller (default: the api key {@link authenticatedApiKeyId}). */
+	callerCredential?: AuthCredential
 	httpInfo?: { ip?: string; userAgent?: string; geoCountry?: string }
 	/** Override individual providers (e.g. a working `decrypt` to enable captcha). */
 	providers?: Partial<Providers>
@@ -184,7 +187,7 @@ export const executeTenantTest = async (test: Test) => {
 	const context: TenantResolverContext = {
 		...createResolverContext(
 			permissionContext,
-			authenticatedApiKeyId,
+			test.callerCredential ?? { type: 'api_key', id: authenticatedApiKeyId },
 			test.callerTrustForwardedInfo ?? false,
 		),
 		logger: createLogger(new JsonStreamLoggerHandler(process.stderr)),

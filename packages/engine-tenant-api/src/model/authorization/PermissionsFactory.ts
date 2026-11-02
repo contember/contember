@@ -116,6 +116,11 @@ class PermissionsFactory {
 		permissions.allow(TenantRole.PROJECT_ADMIN, PermissionActions.IDP_ENABLE)
 		permissions.allow(TenantRole.PROJECT_ADMIN, PermissionActions.IDP_LIST)
 
+		permissions.allow(TenantRole.PROJECT_ADMIN, PermissionActions.WORKLOAD_IDENTITY_ADD)
+		permissions.allow(TenantRole.PROJECT_ADMIN, PermissionActions.WORKLOAD_IDENTITY_UPDATE)
+		permissions.allow(TenantRole.PROJECT_ADMIN, PermissionActions.WORKLOAD_IDENTITY_DISABLE)
+		permissions.allow(TenantRole.PROJECT_ADMIN, PermissionActions.WORKLOAD_IDENTITY_LIST)
+
 		permissions.allow(TenantRole.PROJECT_ADMIN, PermissionActions.AUTH_LOG_VIEW)
 		permissions.allow(TenantRole.PROJECT_ADMIN, PermissionActions.CUSTOM_ROLE_VIEW)
 		permissions.allow(TenantRole.PROJECT_ADMIN, PermissionActions.CUSTOM_ROLE_MANAGE(), projectAdminMayManageCustomRole)

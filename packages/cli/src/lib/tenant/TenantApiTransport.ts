@@ -1,5 +1,5 @@
 import { CliError, ExitCode } from '@contember/cli-common'
-import { GraphQlClient, GraphQlClientVariables } from '@contember/graphql-client'
+import { CredentialsProvider, GraphQlClient, GraphQlClientVariables } from '@contember/graphql-client'
 import { Fetcher, TextWriter, util } from 'graphql-ts-client-api'
 import { toTransportError } from '../errors/TransportError.js'
 
@@ -22,6 +22,8 @@ export interface TenantMutationResult {
 		readonly developerMessage?: string | null
 		readonly weakPasswordReasons?: readonly unknown[] | null
 		readonly recommendedAction?: unknown
+		/** Structured per-item detail (e.g. per condition or per envelope rule), when the error code has any. */
+		readonly details?: unknown
 	} | null
 }
 
@@ -45,8 +47,8 @@ export class TenantApiTransport {
 	) {
 	}
 
-	public static create(url: string, apiToken: string): TenantApiTransport {
-		return new TenantApiTransport(new GraphQlClient({ url: createTenantApiUrl(url), apiToken }))
+	public static create(url: string, credentials: CredentialsProvider): TenantApiTransport {
+		return new TenantApiTransport(new GraphQlClient({ url: createTenantApiUrl(url), credentials }))
 	}
 
 	public get apiUrl(): string {
@@ -112,7 +114,14 @@ export const tenantMutationError = (result: TenantMutationResult | null | undefi
 	if (isSignUpRecommendedAction(recommendedAction)) {
 		details.recommendedAction = recommendedAction
 	}
-	return new CliError(`${operation} failed: ${code}${developerMessage ? ` — ${developerMessage}` : ''}`, {
+	const errorDetails = result?.error?.details
+	const hasErrorDetails = errorDetails !== undefined && errorDetails !== null
+	if (hasErrorDetails) {
+		details.errorDetails = errorDetails
+	}
+	// human output prints only the message, so structured detail has to be part of it
+	const detailSuffix = hasErrorDetails ? `\n${JSON.stringify(errorDetails, null, 2)}` : ''
+	return new CliError(`${operation} failed: ${code}${developerMessage ? ` — ${developerMessage}` : ''}${detailSuffix}`, {
 		code,
 		exitCode: tenantErrorCodeToExitCode(code),
 		details,
@@ -145,6 +154,7 @@ const tenantErrorCodeExitCodes = new Map<string, ExitCode>([
 	['EMAIL_ALREADY_EXISTS', ExitCode.Conflict],
 	['PERSON_ALREADY_EXISTS', ExitCode.Conflict],
 	['PERSON_ALREADY_DISABLED', ExitCode.Conflict],
+	['AUDIENCE_IN_USE', ExitCode.Conflict],
 
 	// not found
 	['NOT_FOUND', ExitCode.NotFound],
@@ -172,6 +182,9 @@ const tenantErrorCodeExitCodes = new Map<string, ExitCode>([
 	['INVALID_OTP_TOKEN', ExitCode.Forbidden],
 	['PASSWORDLESS_DISABLED', ExitCode.Forbidden],
 	['NOT_POSSIBLE_SIGN_OUT_WITH_PERMANENT_API_KEY', ExitCode.Forbidden],
+	['WORKLOAD_CREDENTIAL_FORBIDDEN', ExitCode.Forbidden],
+	['ROLE_NOT_ALLOWED', ExitCode.Forbidden],
+	['ENVELOPE_NOT_AUTHORIZED', ExitCode.Forbidden],
 
 	// retryable
 	['RATE_LIMITED', ExitCode.Transient],

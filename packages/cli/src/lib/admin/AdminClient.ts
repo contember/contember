@@ -1,6 +1,7 @@
 import { CliError, ExitCode } from '@contember/cli-common'
 import { toHttpTransportError, toTransportError } from '../errors/TransportError.js'
 import { RemoteProjectProvider } from '../project/RemoteProjectProvider.js'
+import { fetchWithCredentials } from '../credentials/fetchWithCredentials.js'
 
 export type AdminFiles = Array<{ path: string; data: string }>
 interface AdminDeployRequest {
@@ -39,9 +40,9 @@ export class AdminClient {
 			})
 		}
 		try {
-			return await fetch(`${project.adminEndpoint}/${path}`, {
+			return await fetchWithCredentials(project.credentials, `${project.adminEndpoint}/${path}`, {
 				method,
-				headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${project.token}` },
+				headers: { 'Content-Type': 'application/json' },
 				body: JSON.stringify(body),
 			})
 		} catch (error) {

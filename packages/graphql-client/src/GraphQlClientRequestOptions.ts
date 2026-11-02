@@ -1,4 +1,5 @@
 import { PrimaryReadWindow } from './PrimaryReadWindow.js'
+import { CredentialsProvider } from './CredentialsProvider.js'
 
 export interface GraphQlClientBaseOptions {
 	readonly apiToken?: string
@@ -12,6 +13,8 @@ export interface GraphQlClientBaseOptions {
 
 export interface GraphQlClientOptions extends GraphQlClientBaseOptions {
 	readonly url: string
+	/** Per-request credentials, e.g. a workload identity token source; setting it together with `apiToken` is an error. */
+	readonly credentials?: CredentialsProvider
 	readonly fetcher?: (input: RequestInfo, init?: RequestInit) => Promise<Response>
 }
 

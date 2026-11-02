@@ -129,7 +129,7 @@ test('TenantResolverContextFactory stamps device_fingerprint = analyzer.fingerpr
 	const captured: { geo?: unknown; fp?: unknown } = {}
 	await runWithQuery(insertCapturing(captured), async db => {
 		const context = await factory.create(
-			{ apiKeyId: 'api-key-1', identityId: 'identity-1', roles: [] },
+			{ credential: { type: 'api_key', id: 'api-key-1' }, identityId: 'identity-1', roles: [] },
 			{ ip: '203.0.113.5', userAgent: UA, geoCountry: 'US' },
 			db,
 			logger,

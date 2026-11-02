@@ -30,7 +30,7 @@ export class ProjectMembersQuery extends DatabaseQuery<ProjectMembersQueryResult
 			})
 			.match(qb => {
 				const { email, memberType, personId } = this.projectMemberInput.filter ?? {}
-				if ((email || personId) && memberType === 'API_KEY') {
+				if ((email || personId) && (memberType === 'API_KEY' || memberType === 'WORKLOAD')) {
 					throw new ImplementationException()
 				}
 
@@ -44,8 +44,19 @@ export class ProjectMembersQuery extends DatabaseQuery<ProjectMembersQueryResult
 					return qb.where(it => it.exists(personQuery))
 				}
 
+				// a workload identity is marked by the trust referencing it, not by a column on `identity`
+				const workloadTrustQuery = SelectBuilder.create()
+					.from('workload_identity_trust')
+					.where(expr => expr.columnsEq(['workload_identity_trust', 'identity_id'], ['identity', 'id']))
+
+				if (memberType === 'WORKLOAD') {
+					return qb.where(it => it.exists(workloadTrustQuery))
+				}
+
 				if (memberType === 'API_KEY') {
-					return qb.where(it => it.not(it => it.exists(personQuery)))
+					return qb
+						.where(it => it.not(it => it.exists(personQuery)))
+						.where(it => it.not(it => it.exists(workloadTrustQuery)))
 				}
 
 				return qb

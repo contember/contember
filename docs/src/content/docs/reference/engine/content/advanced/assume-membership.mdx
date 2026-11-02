@@ -66,6 +66,10 @@ export const authorRole = c.createRole('author', {
 ```
 This would allow identities with the `author` role to assume the `reader` role.
 
+:::note[Workload identities]
+For requests authenticated by a [workload identity trust](/guides/workload-identity/overview), these schema rules are not consulted. What such a caller may assume is declared on the trust as an [envelope](/guides/workload-identity/assume-membership).
+:::
+
 ### Memberships validity
 
 It's important to note that when a user assumes a membership, their existing memberships are replaced with the assumed memberships. This means that the user will only have the permissions of the assumed role while the membership is assumed. Assumed memberships are only valid for the single request where the x-contember-assume-membership header is present.

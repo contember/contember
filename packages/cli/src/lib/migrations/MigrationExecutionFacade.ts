@@ -18,6 +18,13 @@ import { RemoteProjectProvider } from '../project/RemoteProjectProvider.js'
 import { CliError, ExitCode, Output } from '@contember/cli-common'
 import { GraphQlClientError } from '@contember/graphql-client'
 import { promptSelect } from '../prompt/index.js'
+import type { ApiCredentials } from '../credentials/ApiCredentials.js'
+import {
+	describeEnvelopeCoverageIssue,
+	type EnvelopeCoverageResult,
+	findUncoveredEnvelopeRules,
+} from '../tenant/workloadIdentity/envelopeCoverage.js'
+import type { RemoteWorkloadIdentityTrust } from '../tenant/workloadIdentity/model.js'
 
 export class MigrationExecutionFacade {
 	constructor(
@@ -41,6 +48,7 @@ export class MigrationExecutionFacade {
 		additionalMessage,
 		useSnapshot = true,
 		onConfirmed,
+		onEnvelopeCoverage,
 	}: {
 		requireConfirmation: boolean | ((migrations: MigrationToExecuteOkStatus[]) => boolean)
 		force?: boolean
@@ -48,6 +56,8 @@ export class MigrationExecutionFacade {
 		additionalMessage?: string
 		useSnapshot?: boolean
 		onConfirmed?: () => void
+		/** Receives the workload envelope coverage check, so a command can put it into its `--json` payload. */
+		onEnvelopeCoverage?: (result: EnvelopeCoverageResult) => void
 	}): Promise<boolean> => {
 		const project = this.projectProvider.get()
 		const stateMode = await this.schemaStateManager.isStateMode()
@@ -89,6 +99,7 @@ export class MigrationExecutionFacade {
 		if (additionalMessage) {
 			this.output.info(additionalMessage)
 		}
+		onEnvelopeCoverage?.(await this.checkEnvelopeCoverage(project.name, until))
 
 		if (typeof requireConfirmation === 'function' ? requireConfirmation(migrationsToConfirm) : requireConfirmation) {
 			if (!this.output.canPrompt()) {
@@ -154,13 +165,14 @@ export class MigrationExecutionFacade {
 				: status.migrationsToExecute
 		}
 
+		const apiToken = await resolveContentMigrationToken(project.credentials, migrations)
 		try {
 			await this.migrationExecutor.executeMigrations({
 				client: this.systemClientProvider.get(),
 				migrations,
 				schemaState,
 				contentMigrationFactoryArgs: {
-					apiToken: project.token,
+					apiToken,
 					apiBaseUrl: project.endpoint,
 					projectName: project.name,
 					schemaVersionBuilder: this.schemaVersionBuilder,
@@ -180,6 +192,36 @@ export class MigrationExecutionFacade {
 			throw e
 		}
 		return true
+	}
+
+	/**
+	 * Warns about workload envelope rules the schema about to be deployed leaves uncovered (§7a.2). Advisory
+	 * only: a caller without `workloadIdentity:list`, or a server without workload identities, skips it.
+	 */
+	private async checkEnvelopeCoverage(projectName: string, until: string | undefined): Promise<EnvelopeCoverageResult> {
+		let trusts: RemoteWorkloadIdentityTrust[]
+		try {
+			trusts = await this.tenantClientProvider.get().listWorkloadIdentityTrusts()
+		} catch (error) {
+			if (!(error instanceof CliError)) {
+				throw error
+			}
+			const reason = error.code === 'TENANT_API_FORBIDDEN' || error.code === 'TENANT_API_UNAUTHORIZED'
+				? 'the credential may not list workload identities (workloadIdentity:list)'
+				: `listing workload identities failed (${error.code})`
+			this.output.warn(`Workload identity envelope coverage check skipped: ${reason}.`)
+			return { status: 'skipped', reason }
+		}
+		const relevant = trusts.filter(trust => trust.memberships.some(it => it.project === projectName && it.assumeMembership !== null))
+		if (relevant.length === 0) {
+			return { status: 'checked', issues: [] }
+		}
+		const schema = await this.schemaVersionBuilder.buildSchema(until ? MigrationVersionHelper.extractVersion(until) : undefined)
+		const issues = findUncoveredEnvelopeRules(relevant, projectName, schema.acl)
+		for (const issue of issues) {
+			this.output.warn(describeEnvelopeCoverageIssue(issue))
+		}
+		return { status: 'checked', issues }
 	}
 
 	private async resolvePreflightStatus({ force }: { force?: boolean }) {
@@ -231,6 +273,25 @@ export class MigrationExecutionFacade {
 		}
 		this.output.info('Snapshot applied')
 	}
+}
+
+/**
+ * Content migration factories receive a plain token (`ContentMigrationFactoryArgs.apiToken`), which a token
+ * source does not have. Refuse up front rather than hand a factory a token that may expire mid-run.
+ */
+const resolveContentMigrationToken = async (credentials: ApiCredentials, migrations: readonly MigrationToExecuteOkStatus[]): Promise<string> => {
+	if (credentials.staticToken !== null) {
+		return credentials.staticToken
+	}
+	for (const migration of migrations) {
+		if ((await migration.localMigration.getContent()).type === 'factory') {
+			throw new CliError(
+				`Migration ${migration.name} is a content migration factory, which needs a static API token; it cannot run with CONTEMBER_API_TOKEN_SOURCE.`,
+				{ code: 'CONTENT_MIGRATION_REQUIRES_API_TOKEN', exitCode: ExitCode.InputError },
+			)
+		}
+	}
+	return ''
 }
 
 const isProjectNotEmptyError = (e: unknown): boolean => Array.isArray(e) && e.some(it => hasCode(it, MigrateErrorCode.ProjectNotEmpty))

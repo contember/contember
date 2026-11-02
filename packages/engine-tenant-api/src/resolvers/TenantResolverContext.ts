@@ -1,4 +1,4 @@
-import { DatabaseContext, Identity, PermissionContext } from '../model/index.js'
+import { AuthCredential, DatabaseContext, Identity, PermissionContext } from '../model/index.js'
 import { Logger } from '@contember/logger'
 import { AuthLogService } from '../model/service/AuthLogService.js'
 
@@ -10,7 +10,7 @@ export interface TenantResolverHttpInfo {
 }
 
 export interface TenantResolverContext {
-	readonly apiKeyId: string
+	readonly credential: AuthCredential
 	readonly trustForwardedInfo: boolean
 	readonly permissionContext: PermissionContext
 	readonly identity: Identity

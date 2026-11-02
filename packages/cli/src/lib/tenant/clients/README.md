@@ -6,7 +6,7 @@ never a raw `GraphQlClient`.
 
 | Client                 | Owns                                                          |
 | ---------------------- | ------------------------------------------------------------- |
-| `TenantProjectClient`  | projects, project secrets, global config, identity providers, `me` |
+| `TenantProjectClient`  | projects, project secrets, global config, identity providers, workload identities, `me` |
 | `TenantPersonClient`   | persons, global identity roles, sessions                       |
 | `TenantMemberClient`   | project memberships, invites                                   |
 | `TenantApiKeyClient`   | api keys                                                       |
@@ -81,4 +81,5 @@ in a client or a command.
 
 - In a command wired through DI: `TenantClientProvider` (`../../TenantClientProvider.ts`) exposes
   `project()`, `person()`, `member()`, `apiKey()` and `policy()`.
-- From an explicit endpoint and token: `createTenantClients(TenantApiTransport.create(url, token))`.
+- From an explicit endpoint and credentials: `createTenantClients(TenantApiTransport.create(url, credentials))`, where
+  `credentials` comes from `ApiCredentialsResolver` (`../../credentials/ApiCredentials.ts`) or `staticTokenCredentials(token)`.

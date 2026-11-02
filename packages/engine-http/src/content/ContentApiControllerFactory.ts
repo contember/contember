@@ -74,6 +74,7 @@ export class ContentApiControllerFactory {
 							identityId: authResult.identityId,
 							personId: authResult.personId ?? undefined,
 							roles: authResult.roles,
+							credential: authResult.credential,
 						},
 					}),
 			)

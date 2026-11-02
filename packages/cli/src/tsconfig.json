@@ -14,6 +14,7 @@
 		{ "path": "../../dic/src" },
 		{ "path": "../../graphql-client/src" },
 		{ "path": "../../graphql-client-tenant/src" },
+		{ "path": "../../workload-identity/src" },
 		{ "path": "../../engine-content-api/src" },
 		{ "path": "../../engine-common/src" },
 		{ "path": "../../schema/src" },

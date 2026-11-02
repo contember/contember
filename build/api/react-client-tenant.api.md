@@ -70,6 +70,8 @@ export const addGlobalIdentityRolesMutation: TenantApi.MutationFetcher<{
             } & {
                 readonly description?: string;
             } & {
+                readonly kind?: TenantApi.IdentityKind;
+            } & {
                 readonly roles?: ReadonlyArray<string>;
             };
         } | undefined;
@@ -373,6 +375,16 @@ export type ChangeProfileFormValues = {
 // @public (undocumented)
 export type ChangeProfileMutationVariables = Parameters<ReturnType<typeof useChangeProfileMutation>>[0];
 
+// Warning: (ae-forgotten-export) The symbol "tokenCheckFragment" needs to be exported by the entry point index.d.ts
+//
+// @public (undocumented)
+export type CheckWorkloadIdentityTokenQueryResult = ModelType<typeof tokenCheckFragment>;
+
+// @public (undocumented)
+export type CheckWorkloadIdentityTokenQueryVariables = {
+    token: string;
+};
+
 // Warning: (ae-forgotten-export) The symbol "configFragment" needs to be exported by the entry point index.d.ts
 //
 // @public (undocumented)
@@ -540,6 +552,8 @@ export const createApiKeyMutation: TenantApi.MutationFetcher<{
                 } & {
                     readonly description?: string;
                 } & {
+                    readonly kind?: TenantApi.IdentityKind;
+                } & {
                     readonly roles?: ReadonlyArray<string>;
                 };
             };
@@ -617,6 +631,8 @@ export const createGlobalApiKeyMutation: TenantApi.MutationFetcher<{
                     readonly id: string;
                 } & {
                     readonly description?: string;
+                } & {
+                    readonly kind?: TenantApi.IdentityKind;
                 } & {
                     readonly roles?: ReadonlyArray<string>;
                 };
@@ -1042,6 +1058,7 @@ export interface IdentityGlobalPermissions {
     // (undocumented)
     readonly canListMailTemplates: boolean;
     readonly canListPersons: boolean;
+    readonly canListWorkloadIdentities: boolean;
     // (undocumented)
     readonly canManageConfiguration: boolean;
     // (undocumented)
@@ -1314,6 +1331,8 @@ export const inviteMutation: TenantApi.MutationFetcher<{
                     readonly id: string;
                 } & {
                     readonly description?: string;
+                } & {
+                    readonly kind?: TenantApi.IdentityKind;
                 } & {
                     readonly roles?: ReadonlyArray<string>;
                 };
@@ -1804,6 +1823,8 @@ export const removeGlobalIdentityRolesMutation: TenantApi.MutationFetcher<{
             } & {
                 readonly description?: string;
             } & {
+                readonly kind?: TenantApi.IdentityKind;
+            } & {
                 readonly roles?: ReadonlyArray<string>;
             };
         } | undefined;
@@ -2225,6 +2246,8 @@ export const signUpMutation: TenantApi.MutationFetcher<{
                 } & {
                     readonly description?: string;
                 } & {
+                    readonly kind?: TenantApi.IdentityKind;
+                } & {
                     readonly roles?: ReadonlyArray<string>;
                 };
             };
@@ -2371,6 +2394,8 @@ export const unmanagedInviteMutation: TenantApi.MutationFetcher<{
                 } & {
                     readonly description?: string;
                 } & {
+                    readonly kind?: TenantApi.IdentityKind;
+                } & {
                     readonly roles?: ReadonlyArray<string>;
                 };
             };
@@ -2472,6 +2497,8 @@ readonly id: string;
 } & {
 readonly description?: string;
 } & {
+readonly kind?: TenantApi.IdentityKind;
+} & {
 readonly roles?: ReadonlyArray<string>;
 };
 }, TenantApi.AddGlobalIdentityRolesErrorCode>>;
@@ -2530,6 +2557,9 @@ export const useChangeProfileMutation: (input?: TenantApiOptions) => (variables:
 }) => Promise<TenantMutationResponse<unknown, TenantApi.ChangeProfileErrorCode>>;
 
 // @public
+export const useCheckWorkloadIdentityTokenQuery: (options?: TenantApiOptions) => (input: CheckWorkloadIdentityTokenQueryVariables) => Promise<CheckWorkloadIdentityTokenQueryResult>;
+
+// @public
 export const useConfigurationQuery: (options?: TenantApiOptions) => (input?: {}) => Promise<ConfigurationQueryResult>;
 
 // @public (undocumented)
@@ -2573,6 +2603,8 @@ readonly id: string;
 } & {
 readonly description?: string;
 } & {
+readonly kind?: TenantApi.IdentityKind;
+} & {
 readonly roles?: ReadonlyArray<string>;
 };
 };
@@ -2597,6 +2629,8 @@ readonly identity: {
 readonly id: string;
 } & {
 readonly description?: string;
+} & {
+readonly kind?: TenantApi.IdentityKind;
 } & {
 readonly roles?: ReadonlyArray<string>;
 };
@@ -2750,6 +2784,8 @@ readonly id: string;
 } & {
 readonly description?: string;
 } & {
+readonly kind?: TenantApi.IdentityKind;
+} & {
 readonly roles?: ReadonlyArray<string>;
 };
 };
@@ -2847,6 +2883,8 @@ readonly identity: {
 readonly id: string;
 } & {
 readonly description?: string;
+} & {
+readonly kind?: TenantApi.IdentityKind;
 } & {
 readonly roles?: ReadonlyArray<string>;
 };
@@ -2981,6 +3019,8 @@ readonly id: string;
 } & {
 readonly description?: string;
 } & {
+readonly kind?: TenantApi.IdentityKind;
+} & {
 readonly roles?: ReadonlyArray<string>;
 };
 };
@@ -3022,6 +3062,8 @@ readonly id: string;
 } & {
 readonly description?: string;
 } & {
+readonly kind?: TenantApi.IdentityKind;
+} & {
 readonly roles?: ReadonlyArray<string>;
 };
 };
@@ -3044,6 +3086,9 @@ export const useVerifyEmailForm: () => VerifyEmailFormContextValue;
 export const useVerifyEmailMutation: (input?: TenantApiOptions) => (variables: {
     readonly token: string;
 }) => Promise<TenantMutationResponse<unknown, TenantApi.VerifyEmailErrorCode>>;
+
+// @public
+export const useWorkloadIdentityTrustsQuery: (options?: TenantApiOptions) => (input?: {}) => Promise<WorkloadIdentityTrustsQueryResult>;
 
 // @public (undocumented)
 export const VerifyEmailForm: (input: VerifyEmailFormProps) => JSX.Element;
@@ -3092,6 +3137,11 @@ export const verifyEmailMutation: TenantApi.MutationFetcher<{
 
 // @public (undocumented)
 export type VerifyEmailMutationVariables = Parameters<ReturnType<typeof useVerifyEmailMutation>>[0];
+
+// Warning: (ae-forgotten-export) The symbol "workloadIdentityTrustFragment" needs to be exported by the entry point index.d.ts
+//
+// @public (undocumented)
+export type WorkloadIdentityTrustsQueryResult = readonly ModelType<typeof workloadIdentityTrustFragment>[];
 
 // (No @packageDocumentation comment for this package)
 

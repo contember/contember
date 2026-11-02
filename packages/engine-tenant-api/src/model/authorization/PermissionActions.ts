@@ -60,6 +60,7 @@ namespace PermissionActions {
 		apiKey = 'apiKey',
 		mailTemplate = 'mailTemplate',
 		idp = 'idp',
+		workloadIdentity = 'workloadIdentity',
 		customRole = 'customRole',
 	}
 
@@ -142,6 +143,11 @@ namespace PermissionActions {
 	export const IDP_DISABLE = Authorizator.createAction(Resources.idp, 'disable')
 	export const IDP_ENABLE = Authorizator.createAction(Resources.idp, 'enable')
 	export const IDP_LIST = Authorizator.createAction(Resources.idp, 'list')
+
+	export const WORKLOAD_IDENTITY_ADD = Authorizator.createAction(Resources.workloadIdentity, 'add')
+	export const WORKLOAD_IDENTITY_UPDATE = Authorizator.createAction(Resources.workloadIdentity, 'update')
+	export const WORKLOAD_IDENTITY_DISABLE = Authorizator.createAction(Resources.workloadIdentity, 'disable')
+	export const WORKLOAD_IDENTITY_LIST = Authorizator.createAction(Resources.workloadIdentity, 'list')
 
 	export const CUSTOM_ROLE_MANAGE = (meta?: CustomRoleManagePermissionMeta) => Authorizator.createAction(Resources.customRole, 'manage', meta)
 	export const CUSTOM_ROLE_VIEW = Authorizator.createAction(Resources.customRole, 'view')

@@ -4,6 +4,7 @@ import { emptySchema } from '@contember/schema-utils'
 import { TenantConfigApplier } from '../../../packages/cli/src/lib/tenant/TenantConfigApplier.js'
 import { TenantApiTransport } from '../../../packages/cli/src/lib/tenant/TenantApiTransport.js'
 import { createTenantClients } from '../../../packages/cli/src/lib/tenant/clients/index.js'
+import { staticTokenCredentials } from '../../../packages/cli/src/lib/credentials/ApiCredentials.js'
 
 const meQuery = `query { me { id } }`
 const meRolesQuery = `query { me { roles } }`
@@ -38,7 +39,7 @@ const removeRolesMutation = `mutation($identityId: String!, $roles: [String!]!) 
 test('tenant config applier provisions typed custom roles', async () => {
 	const managerRole = `provisioned_manager_${rand()}`
 	const workerRole = `provisioned_worker_${rand()}`
-	const clients = createTenantClients(TenantApiTransport.create(apiUrl, rootToken))
+	const clients = createTenantClients(TenantApiTransport.create(apiUrl, staticTokenCredentials(rootToken)))
 	const applier = new TenantConfigApplier()
 
 	await applier.apply(clients, {

@@ -18,6 +18,7 @@ export interface AuthLogRow {
 	identity_provider_id: string | null
 	metadata: JSONValue | null
 	event_data: JSONValue | null
+	trust_id?: string | null
 }
 
 export const authLogPlainSql = (args: {
@@ -39,7 +40,8 @@ export const authLogPlainSql = (args: {
 			       "person_auth_log"."user_agent",
 			       "person_auth_log"."identity_provider_id",
 			       "person_auth_log"."metadata",
-			       "person_auth_log"."event_data"
+			       "person_auth_log"."event_data",
+			       "person_auth_log"."trust_id"
 			from "tenant"."person_auth_log"
 			order by "person_auth_log"."created_at" desc, "person_auth_log"."id" desc
 			limit ${String(args.limit + 1)} offset ${String(args.offset)}`,
@@ -68,7 +70,8 @@ export const authLogFilteredSql = (args: {
 			       "person_auth_log"."user_agent",
 			       "person_auth_log"."identity_provider_id",
 			       "person_auth_log"."metadata",
-			       "person_auth_log"."event_data"
+			       "person_auth_log"."event_data",
+			       "person_auth_log"."trust_id"
 			from "tenant"."person_auth_log"
 			where "person_auth_log"."type" in (?, ?) and "person_auth_log"."target_person_id" = ?
 			order by "person_auth_log"."created_at" desc, "person_auth_log"."id" desc

@@ -9,6 +9,7 @@ const deniedGlobalPermissions: IdentityGlobalPermissions = {
 	canDeployEntrypoint: false,
 	canViewConfiguration: false,
 	canListIdentityProviders: false,
+	canListWorkloadIdentities: false,
 	canListMailTemplates: false,
 	canManageConfiguration: false,
 	canViewAuthLog: false,

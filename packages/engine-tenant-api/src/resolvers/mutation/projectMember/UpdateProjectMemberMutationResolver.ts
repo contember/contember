@@ -11,7 +11,8 @@ import { createMembershipModification } from '../../../model/service/membershipU
 import { createErrorResponse, createProjectNotFoundResponse } from '../../errorUtils.js'
 import { Acl } from '@contember/schema'
 import { ProjectMembershipByIdentityQuery } from '../../../model/queries/index.js'
-import { logProjectMembershipChange } from './audit.js'
+import { logProjectMembershipChange, workloadIdentityManagedMessage } from './audit.js'
+import { isWorkloadIdentity } from '../../../model/queries/workloadIdentity/IdentityKindQuery.js'
 
 export class UpdateProjectMemberMutationResolver implements MutationResolvers {
 	constructor(
@@ -56,6 +57,9 @@ export class UpdateProjectMemberMutationResolver implements MutationResolvers {
 			action: PermissionActions.PROJECT_UPDATE_MEMBER(aclMemberships),
 			message: 'You are not allowed to update project member variables',
 		})
+		if (await isWorkloadIdentity(context.db, identityId)) {
+			return createErrorResponse('WORKLOAD_IDENTITY_MANAGED', workloadIdentityManagedMessage(identityId))
+		}
 
 		const validationResult = (await this.membershipValidator.validate(project.slug, memberships)).filter(
 			it => it.error !== MembershipValidationErrorType.VARIABLE_EMPTY,

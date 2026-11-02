@@ -1,4 +1,4 @@
-import { ApiKeyManager } from './apiKey/index.js'
+import { ApiKeyManager, AuthCredential } from './apiKey/index.js'
 import { DatabaseContext } from '../utils/index.js'
 import { ApiKey } from '../type/index.js'
 import { PersonQuery } from '../queries/index.js'
@@ -38,13 +38,20 @@ export class SignOutManager {
 	async signOut(
 		db: DatabaseContext,
 		identityId: string,
-		apiKeyId: string,
+		credential: AuthCredential,
 		all: boolean,
 	): Promise<SignOutResponse> {
 		const person = await db.queryHandler.fetch(PersonQuery.byIdentity(identityId))
 		if (!person) {
 			return new ResponseError('NOT_A_PERSON', 'Only a person can sign out')
 		}
+		if (credential.type !== 'api_key') {
+			return new ResponseError(
+				'NOT_POSSIBLE_SIGN_OUT_WITH_PERMANENT_API_KEY',
+				'Only session API keys can be used for person sign out.',
+			)
+		}
+		const apiKeyId = credential.id
 
 		const personApiKey = await this.apiKeyManager.findApiKey(db, apiKeyId)
 		if (personApiKey?.type === ApiKey.Type.PERMANENT) {

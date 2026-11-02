@@ -1,0 +1,90 @@
+---
+title: Workload identity federation
+description: Authenticate backends, CI jobs and pods with short-lived OIDC tokens instead of permanent API keys.
+---
+
+A permanent [API key](/reference/engine/tenant/api-keys) is a long-lived shared secret: it has to be generated, distributed, rotated by hand, and a leaked key works until someone disables it. Many machine callers already run next to an OIDC issuer that mints short-lived, signed JWTs — GitHub Actions, GitLab CI, Kubernetes, Vercel — or can run one themselves. Workload identity federation lets Contember trust such an issuer directly: the caller sends a JWT minted for it a few minutes ago, and Contember stores no secret at all.
+
+:::note[Available since 2.2]
+:::
+
+It is an **addition** to API keys, not a replacement. Callers that have no issuer and do not want to run one keep using API keys.
+
+## How it works
+
+A **trust** binds an issuer and an audience to a Contember identity and lists the conditions a token must meet:
+
+```ts title="tenant.config.ts"
+workloadIdentities: {
+  'web-backend': {
+    profile: 'oidc',
+    issuer: 'https://auth.example.com',          // who signs the token
+    audience: 'contember:my-instance:web-backend', // whom the token is for
+    conditions: [{ claim: 'sub', equals: 'web-backend' }], // which principal of that issuer
+    memberships: [{ project: 'website', role: 'reader' }], // what it may do
+    maxTokenLifetime: 300,
+  },
+},
+```
+
+A request carrying `Authorization: Bearer <jwt>` is accepted when all of these hold:
+
+| Check | Proves |
+|---|---|
+| Signature against the issuer's published keys, and `iss` | The issuer really minted the token. |
+| Token profile (`typ` header, required claims) | It is the kind of token the trust expects, not another JWT the same issuer mints. |
+| `aud` equals the trust's audience | The token was minted for this trust, not for another service. |
+| Every condition matches | The token belongs to **your** workload, not to anyone else who can get tokens from the same issuer. |
+| Lifetime and `tokensValidAfter` | The token is short-lived and was issued after the trust last changed who it admits. |
+| DPoP proof (opt-in) | The request comes from the holder of the key the token is bound to. |
+
+Trusts are declared in `tenant.config.ts` and applied with [`contember tenant apply`](/reference/engine/tenant/declarative-config#workload-identities). The panel only lists them.
+
+### Claims select, grants live on the trust
+
+The issuer knows nothing about Contember roles, and on a shared issuer anyone can obtain a token. A self-hosted issuer mints whatever claims it wants. So claims do exactly one thing: **select which principal is this trust**. They never carry roles, memberships or membership variables.
+
+What the caller may do is decided by the trust: its tenant `roles` and project `memberships`, materialized on the trust's own identity. Per request, the caller may narrow or reshape its memberships within an [assume-membership envelope](/guides/workload-identity/assume-membership) declared on the trust — and only within it.
+
+Because conditions pick the principal, **editing a condition re-points all of the trust's permissions** at a different principal. Treat condition changes like grant changes.
+
+### The audience is an address, not a secret
+
+The caller chooses the audience when it requests a token, and anyone eligible for tokens from the issuer can request any audience. The audience routes a token to one trust and keeps tokens minted for other services out; it does not protect anything. Separation between trusts on the same issuer must come from their conditions — for GitHub, for example, a protected environment.
+
+Recommended convention: `contember:<instance>:<trust-slug>`.
+
+## Profiles
+
+| Profile | Use for | Notes |
+|---|---|---|
+| `oidc` | Any OIDC-compliant issuer: your own backend, Kubernetes, GitLab CI, Vercel, Keycloak, cloud workload identities | Requires a condition on `sub` with `equals` or `in`. Algorithms, `typ`, audience arrays and DPoP are configurable. |
+| `github-actions` | GitHub Actions (github.com or GitHub Enterprise Server) | Requires a condition on `repository_id` or `repository_owner_id` with `equals` or `in`. Fixed `RS256` and `typ: JWT`; requires GitHub's claims (`repository_id`, `repository_owner_id`, `run_id`, `jti`) and knows their types. The `oidc` profile refuses any issuer on GitHub's token host. |
+
+Both cap the token lifetime at 86 400 seconds; the default per trust is 3 600.
+
+## Choosing a setup
+
+| Caller | Guide |
+|---|---|
+| A backend that signs its own tokens | [Self-hosted issuer](/guides/workload-identity/self-hosted-issuer) |
+| A pod in a Kubernetes cluster | [Kubernetes](/guides/workload-identity/kubernetes) |
+| A GitHub Actions workflow | [GitHub Actions](/guides/workload-identity/github-actions) |
+| A GitLab CI job | [GitLab CI](/guides/workload-identity/gitlab-ci) |
+| A Vercel deployment | [Vercel](/guides/workload-identity/vercel) |
+| The Contember CLI in CI | [CLI](/guides/workload-identity/cli) |
+| Replacing an existing API key | [Migrating from API keys](/guides/workload-identity/migrating-from-api-keys) |
+| Developing against a local issuer | [Local development](/guides/workload-identity/local-development) |
+
+Before going to production, read the [security notes](/guides/workload-identity/security).
+
+## What you get
+
+- **No stored secret** in Contember, and for platform issuers (GitHub, GitLab, Kubernetes, Vercel) none on the caller's side either.
+- **Short-lived tokens.** A leaked token works for minutes, and with [DPoP](/guides/workload-identity/security#dpop) not at all without the caller's key.
+- **Per-run attribution.** The [audit log](/reference/engine/tenant/audit-log#workload-identity-events-since-22) records the trust and the token's `sub`, `jti` and, for GitHub, repository, run and ref.
+- **Instant revocation of the whole trust** by disabling it.
+
+A self-hosted issuer still has a long-lived signing key on the caller's side. Compared to an API key, that key never travels, can be non-exportable (KMS, HSM), and rotating it means publishing a new public key.
+
+It works the same for the content, system and tenant APIs: the token is accepted wherever an API key is.

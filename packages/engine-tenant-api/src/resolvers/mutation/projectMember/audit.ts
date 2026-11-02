@@ -33,3 +33,7 @@ const membershipToJson = ({ role, variables }: Acl.Membership): JSONValue => ({
 	role,
 	variables: variables.map(({ name, values }) => ({ name, values: [...values] })),
 })
+
+/** §6a: trust identities are managed exclusively through apply, where closure authorization and the bump live. */
+export const workloadIdentityManagedMessage = (identityId: string): string =>
+	`Identity ${identityId} belongs to a workload identity trust; its grants change only through applyWorkloadIdentityTrust`

@@ -1,0 +1,49 @@
+---
+title: Workload identity
+---
+
+:::note[Available since 2.2]
+:::
+
+[Workload identity trusts](/guides/workload-identity/overview) are declared in tenant configuration, but how the engine may reach their issuers is an instance-level decision. These settings live in the server configuration only, so a tenant configuration cannot widen them. Apply-time validation in the tenant API reads the same settings.
+
+By default the engine fetches issuer discovery documents and keys only over `https://`, only from public addresses, and trusts only the root CA certificates bundled with Node.js. All settings are optional.
+
+## Configuration
+
+```bash
+CONTEMBER_WORKLOAD_IDENTITY_EGRESS_ALLOWLIST=keycloak.internal,10.20.0.0/16
+CONTEMBER_WORKLOAD_IDENTITY_INSECURE_ISSUERS=localhost,host.docker.internal
+CONTEMBER_WORKLOAD_IDENTITY_CA_CERTIFICATES=/etc/contember/issuer-ca.pem
+CONTEMBER_WORKLOAD_IDENTITY_JWKS_MAX_STALENESS=6h
+```
+
+or in the server config:
+
+```yaml
+server:
+  workloadIdentity:
+    egressAllowlist: ['keycloak.internal', '10.20.0.0/16']
+    insecureIssuers: ['localhost', 'host.docker.internal']
+    caCertificates: /etc/contember/issuer-ca.pem
+    jwksMaxStaleness: 6h
+```
+
+| Option | Environment variable | Meaning |
+|---|---|---|
+| `egressAllowlist` | `CONTEMBER_WORKLOAD_IDENTITY_EGRESS_ALLOWLIST` | Hostnames, IP addresses or CIDR ranges exempt from the ban on loopback, private, link-local and reserved addresses — for issuers on internal networks (GitHub Enterprise Server, an internal Keycloak, a private Kubernetes API). Still `https://` only. A list in the config file, comma-separated in the environment variable. |
+| `insecureIssuers` | `CONTEMBER_WORKLOAD_IDENTITY_INSECURE_ISSUERS` | Hostnames or IP addresses whose issuer and keys may be fetched over `http://`. They are also exempt from the address ban, loopback included. **Development only**; the engine logs a warning at startup while it is set. A list in the config file, comma-separated in the environment variable. |
+| `caCertificates` | `CONTEMBER_WORKLOAD_IDENTITY_CA_CERTIFICATES` | Path to a PEM bundle of extra CA certificates, trusted for issuer fetches only — for issuers behind a private CA. The file is read at startup; an unreadable file or one without a valid certificate stops the engine from starting. |
+| `jwksMaxStaleness` | `CONTEMBER_WORKLOAD_IDENTITY_JWKS_MAX_STALENESS` | How long the last known keys of an issuer stay accepted while the issuer is unreachable. Seconds, or a number with an `s`, `m`, `h` or `d` suffix (`900s`, `30m`, `6h`, `1d`). At least `10m`, two key refresh intervals. Default `6h`. |
+
+## Fetch policy
+
+The engine fetches discovery (`<issuer>/.well-known/openid-configuration`, or the trust's `jwksUri` instead) and keys only for configured trusts — an unknown issuer in a token causes no request. Every address a host resolves to is checked on each connection, so DNS rebinding cannot reach an internal address. At most 3 redirects are followed, each re-checked; a fetch is limited to 5 seconds and 256 KiB, and a JWKS to 50 keys. The discovery document's `issuer` must equal the configured issuer exactly.
+
+Keys of enabled trusts are prefetched when the engine first serves a project group, fetched on first use for a trust created later, and refreshed in the background every 5 minutes. A token with an unknown key id triggers a refetch; after a refetch or a failed fetch, the same key source is not fetched again for 30 seconds, whichever trust uses it. When a refresh fails, the last known keys stay accepted until `jwksMaxStaleness` has passed since they were fetched, then verification fails closed. Every failed fetch is logged at `warn` level with its cause; the tenant API only reports that the keys are unavailable. Failed fetches and unknown key ids are counted from the first failure in the `contember_workload_identity_jwks_fetch_failures_total` and `contember_workload_identity_unknown_kid_total` metrics (see [metrics](/reference/engine/tenant/workload-identities#audit)).
+
+Issuers are expected to keep a rotated key published for at least the token lifetime; all major providers do. The keys are public, so they are shared across tenants of one engine process; nothing identity-bearing is.
+
+## Local development
+
+The `docker-compose.yaml` of the Contember repository and of the project template sets `CONTEMBER_WORKLOAD_IDENTITY_INSECURE_ISSUERS` to `localhost,host.docker.internal`. Never set it in production. See [local development](/guides/workload-identity/local-development).

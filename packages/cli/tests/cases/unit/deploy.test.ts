@@ -16,6 +16,7 @@ import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { emptySchema } from '@contember/schema-utils'
 import { SchemaStateManager } from '@contember/migrations-client'
+import { staticTokenCredentials } from '../../../src/lib/credentials/ApiCredentials.js'
 
 // Mirrors packages/cli-common/tests/lib/testOutput.ts — that helper isn't part of the package's
 // public exports, so it can't be imported across the package boundary.
@@ -139,7 +140,9 @@ describe('DeployCommand', () => {
 				authorization: new Headers(init?.headers).get('authorization'),
 			})
 			const query = JSON.parse(String(init?.body)).query
-			const data = url.endsWith('/tenant')
+			const data = query.includes('workloadIdentityTrusts')
+				? { workloadIdentityTrusts: [] }
+				: url.endsWith('/tenant')
 				? { createProject: { ok: true, result: { deployerApiKey: null } } }
 				: query.includes('executedMigrations')
 				? { executedMigrations: [] }
@@ -169,6 +172,8 @@ describe('DeployCommand', () => {
 
 			expect(exitCode).toBe(0)
 			expect(requests.map(request => request.url)).toStrictEqual([
+				// the workload envelope coverage check, then project creation
+				'https://deploy.example.test/tenant',
 				'https://deploy.example.test/tenant',
 				'https://deploy.example.test/system/blog',
 				'https://deploy.example.test/system/blog',
@@ -190,7 +195,9 @@ describe('DeployCommand', () => {
 				authorization: new Headers(init?.headers).get('authorization'),
 			})
 			const query = JSON.parse(String(init?.body)).query
-			const data = query.includes('createProject')
+			const data = query.includes('workloadIdentityTrusts')
+				? { workloadIdentityTrusts: [] }
+				: query.includes('createProject')
 				? { createProject: { ok: true, result: { deployerApiKey: null } } }
 				: query.includes('executedMigrations')
 				? { executedMigrations: [] }
@@ -222,12 +229,12 @@ describe('DeployCommand', () => {
 			await dic.tenantClientProvider.project().listProjects()
 
 			expect(
-				requests.slice(0, 3).every(request =>
+				requests.slice(0, 4).every(request =>
 					request.url.startsWith('https://deploy.example.test/')
 					&& request.authorization === `Bearer ${deployToken}`
 				),
 			).toBe(true)
-			expect(requests[3]).toStrictEqual({
+			expect(requests[4]).toStrictEqual({
 				url: 'https://environment.example.test/tenant',
 				authorization: `Bearer ${environmentToken}`,
 			})
@@ -254,6 +261,7 @@ describe('DeployCommand', () => {
 			adminUrl: 'https://admin.example.com',
 			migrationsDeployed: true,
 			adminDeployed: true,
+			envelopeCoverage: null,
 		})
 		expect(stdout.text).not.toContain(TOKEN)
 		expect(stderr.text).not.toContain(TOKEN)
@@ -296,6 +304,7 @@ describe('DeployCommand', () => {
 			adminUrl: 'https://admin.example.com',
 			migrationsDeployed: false,
 			adminDeployed: true,
+			envelopeCoverage: null,
 		})
 	})
 
@@ -314,6 +323,7 @@ describe('DeployCommand', () => {
 			adminUrl: null,
 			migrationsDeployed: false,
 			adminDeployed: false,
+			envelopeCoverage: null,
 		})
 	})
 
@@ -460,7 +470,7 @@ describe('AdminClient transport errors', () => {
 			new RemoteProject(
 				'blog',
 				'https://api.example.test',
-				'distinctive-admin-token',
+				staticTokenCredentials('distinctive-admin-token'),
 				'https://admin.example.test',
 			),
 		)

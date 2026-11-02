@@ -44,6 +44,7 @@
     "@contember/engine-content-api": "workspace:*",
     "@contember/graphql-client": "workspace:*",
     "@contember/graphql-client-tenant": "workspace:*",
+    "@contember/workload-identity": "workspace:*",
     "@contember/migrations-client": "workspace:*",
     "@contember/schema": "workspace:*",
     "@contember/schema-migrations": "workspace:*",

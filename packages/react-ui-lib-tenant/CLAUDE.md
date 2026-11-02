@@ -9,7 +9,7 @@ Ready-made admin UI for **tenant management** — a full tenant dashboard: sign-
 - `PersonsList` — tenant-wide person listing (`usePersonsQuery`) with an email filter, pagination, roles, MFA column, a disabled-state column, row actions (`person-actions.tsx`), and an `onSelectPerson` callback for opening `PersonDetail`.
 - `PersonDetail` — admin view of a single person: profile, password, MFA state + reset, global roles, sessions, connected identity providers. The host app owns the surrounding layout (e.g. a dialog opened from `PersonsList`'s `onSelectPerson`).
 - `person-actions.tsx` — `DisablePersonAction`, `EnablePersonAction`, `ForceSignOutPersonAction`, `ResetPersonMfaAction`: confirm-dialog buttons, each wrapping the matching `react-client-tenant` trigger.
-- `AuthLogList` — the authentication audit log (`useAuthLogQuery`): type/success/person filters, pagination.
+- `AuthLogList` — the authentication audit log (`useAuthLogQuery`): type/success/person filters, pagination; `workload_*` rows show their trust id in the person column.
 - `GlobalApiKeyList` — global permanent keys (`useGlobalApiKeysQuery`) with a disable action.
 - `ProjectSecretList` — secret keys + timestamps (`useProjectSecretsQuery`); never values.
 - `MemberDeleteDialog`, `MfaBadges` — shared building blocks (`MfaBadges` renders the TOTP / email-OTP state).
@@ -30,7 +30,7 @@ Field components read their form state via a `useXForm()` hook — the **provide
 
 ## Configuration, read-only (`config/`)
 
-`TenantConfigView`, `AuthPolicyList`, `IdentityProviderList`, `MailTemplateList` — display-only views over the four configuration queries. There is no editing counterpart by design; `ManagedByCliNote` points at `contember tenant:apply` instead.
+`TenantConfigView`, `AuthPolicyList`, `IdentityProviderList`, `WorkloadIdentityTrustList`, `MailTemplateList` — display-only views over the configuration queries. `WorkloadIdentityTokenCheck` runs `checkWorkloadIdentityToken` on a pasted token; the token stays in component state (no `name`, no URL, no storage, no error logging). There is no editing counterpart by design; `ManagedByCliNote` points at `contember tenant:apply` instead.
 
 Two things differ from the listings:
 

@@ -18,6 +18,7 @@ import {
 import { RemoteProject } from '../../../src/lib/project/RemoteProject.js'
 import { RemoteProjectProvider } from '../../../src/lib/project/RemoteProjectProvider.js'
 import { TenantClientProvider } from '../../../src/lib/TenantClientProvider.js'
+import { staticTokenCredentials } from '../../../src/lib/credentials/ApiCredentials.js'
 
 const API_URL = 'http://tenant.test'
 
@@ -57,7 +58,7 @@ const answerWith = (data: unknown): void => {
 
 const createProvider = (): TenantClientProvider => {
 	const remoteProjectProvider = new RemoteProjectProvider()
-	remoteProjectProvider.setRemoteProject(new RemoteProject('blog', API_URL, 'token'))
+	remoteProjectProvider.setRemoteProject(new RemoteProject('blog', API_URL, staticTokenCredentials('token')))
 	return new TenantClientProvider(remoteProjectProvider)
 }
 

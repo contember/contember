@@ -4,13 +4,28 @@
 
 ```ts
 
+// @public
+export interface CredentialsProvider {
+    // (undocumented)
+    authenticate(request: CredentialsRequest): Promise<Record<string, string>>;
+}
+
+// @public (undocumented)
+export interface CredentialsRequest {
+    // (undocumented)
+    readonly method: string;
+    readonly refresh: boolean;
+    // (undocumented)
+    readonly url: string;
+}
+
 // @public (undocumented)
 export class GraphQlClient {
     constructor(options: GraphQlClientOptions);
     // (undocumented)
     get apiUrl(): string;
     // (undocumented)
-    protected doExecute(query: string, options?: GraphQlClientRequestOptions): Promise<Response>;
+    protected doExecute(query: string, options?: GraphQlClientRequestOptions, credentialHeaders?: Record<string, string>): Promise<Response>;
     // (undocumented)
     execute<T = unknown>(query: string, options?: GraphQlClientRequestOptions): Promise<T>;
     // (undocumented)
@@ -50,6 +65,7 @@ export class GraphQlClientError extends Error {
 
 // @public (undocumented)
 export interface GraphQlClientOptions extends GraphQlClientBaseOptions {
+    readonly credentials?: CredentialsProvider;
     // (undocumented)
     readonly fetcher?: (input: RequestInfo, init?: RequestInit) => Promise<Response>;
     // (undocumented)

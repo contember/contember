@@ -28,7 +28,7 @@ const listen = async (createWorker: () => Runnable) => {
 	const loggerHandler = new TestLoggerHandler()
 	const logger = createLogger(loggerHandler)
 	const authenticator = createMock<Authenticator>({
-		authenticate: async () => new VerifyResult('identity', 'api-key', [TenantRole.SUPER_ADMIN], null),
+		authenticate: async () => new VerifyResult('identity', { type: 'api_key', id: 'api-key' }, [TenantRole.SUPER_ADMIN], null),
 	})
 	const projectGroup: ProjectGroupContainer = {
 		slug: undefined,

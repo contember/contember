@@ -10,6 +10,8 @@ export interface IdentityGlobalPermissions {
 	/** Read `configuration`, which throws rather than answering an empty value. */
 	readonly canViewConfiguration: boolean
 	readonly canListIdentityProviders: boolean
+	/** Read `workloadIdentityTrusts` and run `checkWorkloadIdentityToken`. */
+	readonly canListWorkloadIdentities: boolean
 	readonly canListMailTemplates: boolean
 	readonly canManageConfiguration: boolean
 	readonly canViewAuthLog: boolean

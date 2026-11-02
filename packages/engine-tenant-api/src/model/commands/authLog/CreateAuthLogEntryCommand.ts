@@ -1,6 +1,6 @@
 import { Command } from '../Command.js'
 import { AuthActionType } from '../../type/AuthLog.js'
-import { InsertBuilder } from '@contember/database'
+import { ConflictActionType, InsertBuilder } from '@contember/database'
 import { JSONValue } from '@contember/schema'
 
 export class CreateAuthLogEntryCommand implements Command<void> {
@@ -10,7 +10,7 @@ export class CreateAuthLogEntryCommand implements Command<void> {
 	}
 
 	async execute({ db, providers }: Command.Args): Promise<void> {
-		await InsertBuilder.create()
+		const insert = InsertBuilder.create()
 			.into('person_auth_log')
 			.values({
 				id: providers.uuid(),
@@ -30,8 +30,11 @@ export class CreateAuthLogEntryCommand implements Command<void> {
 				event_data: this.data.eventData,
 				geo_country: this.data.geoCountry,
 				device_fingerprint: this.data.deviceFingerprint,
+				trust_id: this.data.trustId,
+				token_ref: this.data.tokenRef,
 			})
-			.execute(db)
+		// A token's success row is unique per (trust_id, token_ref); a repeat sighting from another worker is ignored.
+		await (this.data.tokenRef !== undefined ? insert.onConflict(ConflictActionType.doNothing) : insert).execute(db)
 	}
 }
 
@@ -57,5 +60,9 @@ namespace CreateAuthLogEntryCommand {
 		geoCountry?: string
 		/** A03: hash of the client user-agent (never the raw UA). */
 		deviceFingerprint?: string
+		/** The workload identity trust of a `workload_*` entry. */
+		trustId?: string
+		/** The `jti` of an admitted workload token, or `sha256:` + its hash; makes the insert ignore a duplicate. */
+		tokenRef?: string
 	}
 }

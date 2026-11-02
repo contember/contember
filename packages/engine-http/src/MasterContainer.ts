@@ -1,6 +1,6 @@
 import { Builder } from '@contember/dic'
 import { SystemContainerFactory } from '@contember/engine-system-api'
-import { TenantContainerFactory } from '@contember/engine-tenant-api'
+import { TenantContainerFactory, WorkloadIdentity, WorkloadJwksRegistry } from '@contember/engine-tenant-api'
 import { ModificationHandlerFactory } from '@contember/schema-migrations'
 import { Initializer } from './bootstrap/index.js'
 import { Env, ServerConfig } from './config/config.js'
@@ -35,6 +35,7 @@ import { ProjectGroupResolver } from './projectGroup/ProjectGroupResolver.js'
 import { createColllectHttpMetricsMiddleware, createShowMetricsMiddleware } from './prometheus/index.js'
 import { ProjectGroupContainerMetricsHook } from './prometheus/ProjectGroupContainerMetricsHook.js'
 import { PrometheusRegistryFactory } from './prometheus/PrometheusRegistryFactory.js'
+import { createWorkloadIdentityMetrics } from './prometheus/workloadIdentityMetrics.js'
 import { ProjectGroupContainerTelemetryHook } from './telemetry/ProjectGroupContainerTelemetryHook.js'
 import { createProviders, Providers } from './providers.js'
 import { SystemApiMiddlewareFactory, SystemGraphQLContextFactory, SystemGraphQLHandlerFactory } from './system/index.js'
@@ -64,6 +65,8 @@ export interface MasterContainer {
 	providers: Providers
 	applicationWorkers: ApplicationWorkerManager
 	monitoringKoa: Koa
+	/** Process-wide workload identity key cache; dispose it on shutdown. */
+	workloadJwksRegistry: WorkloadJwksRegistry
 }
 
 export interface MasterContainerArgs {
@@ -159,6 +162,24 @@ export class MasterContainerFactory {
 			.addService('systemGraphQLHandlerFactory', ({ debugMode }) => new SystemGraphQLHandlerFactory(debugMode))
 			.addService('logger', () => logger)
 			.addService('tracer', (): Tracer => tracer ?? noopTracer)
+			.addService('promRegistryFactory', ({ processType, version }) => new PrometheusRegistryFactory(processType, { version }))
+			.addService('promRegistry', ({ promRegistryFactory }) => promRegistryFactory.create())
+			.addService('workloadIdentityConfig', ({ serverConfig }): WorkloadIdentity.InstanceConfig => {
+				const config = serverConfig.workloadIdentity
+				const defaults = WorkloadIdentity.defaultInstanceConfig
+				return {
+					egressAllowlist: config?.egressAllowlist ?? defaults.egressAllowlist,
+					insecureIssuers: config?.insecureIssuers ?? defaults.insecureIssuers,
+					caCertificates: config?.caCertificates ?? defaults.caCertificates,
+					jwksMaxStalenessSeconds: config?.jwksMaxStaleness ?? defaults.jwksMaxStalenessSeconds,
+				}
+			})
+			.addService('workloadIdentityMetrics', ({ promRegistry }) => createWorkloadIdentityMetrics(promRegistry))
+			.addService(
+				'workloadJwksRegistry',
+				({ workloadIdentityConfig, workloadIdentityMetrics, logger }) =>
+					new WorkloadJwksRegistry(workloadIdentityConfig, { metrics: workloadIdentityMetrics, logger }),
+			)
 			.addService(
 				'projectGroupContainerFactory',
 				({
@@ -172,6 +193,8 @@ export class MasterContainerFactory {
 					systemGraphQLHandlerFactory,
 					logger,
 					serverConfig,
+					workloadJwksRegistry,
+					workloadIdentityMetrics,
 				}) =>
 					new ProjectGroupContainerFactory(
 						debugMode,
@@ -183,6 +206,8 @@ export class MasterContainerFactory {
 						tenantGraphQLHandlerFactory,
 						systemGraphQLHandlerFactory,
 						logger,
+						serverConfig.http?.trustedProxies ?? [],
+						{ jwksRegistry: workloadJwksRegistry, metrics: workloadIdentityMetrics },
 						serverConfig.http?.geoCountryHeader,
 					),
 			)
@@ -190,7 +215,6 @@ export class MasterContainerFactory {
 				'projectGroupContainerResolver',
 				({ tenantConfigResolver, projectGroupContainerFactory }) => new ProjectGroupContainerResolver(tenantConfigResolver, projectGroupContainerFactory),
 			)
-			.addService('promRegistryFactory', ({ processType, version }) => new PrometheusRegistryFactory(processType, { version }))
 			.addService(
 				'projectGroupContainerMetricsHook',
 				({ projectGroupContainerResolver }) => new ProjectGroupContainerMetricsHook(projectGroupContainerResolver),
@@ -200,10 +224,9 @@ export class MasterContainerFactory {
 				({ projectGroupContainerResolver, tracer, serverConfig }) =>
 					new ProjectGroupContainerTelemetryHook(projectGroupContainerResolver, tracer, serverConfig.telemetry?.traces?.sql),
 			)
-			.addService('promRegistry', ({ promRegistryFactory, projectGroupContainerMetricsHook }) => {
-				const registry = promRegistryFactory.create()
+			// A setup, not a factory dependency: the hook reaches the project group containers, which use the registry themselves.
+			.setupService('promRegistry', (registry, { projectGroupContainerMetricsHook }) => {
 				projectGroupContainerMetricsHook.register(registry)
-				return registry
 			})
 			.addService(
 				'projectGroupContainer',
@@ -374,6 +397,6 @@ export class MasterContainerFactory {
 
 	create(args: MasterContainerArgs): MasterContainer {
 		const container = this.createBuilder(args).build()
-		return container.pick('initializer', 'application', 'providers', 'applicationWorkers', 'monitoringKoa')
+		return container.pick('initializer', 'application', 'providers', 'applicationWorkers', 'monitoringKoa', 'workloadJwksRegistry')
 	}
 }

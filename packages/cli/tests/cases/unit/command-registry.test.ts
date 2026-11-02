@@ -106,6 +106,7 @@ const expectedCommandCatalog: readonly ExpectedCommand[] = [
 	{ name: 'tenant mail-template list', aliases: ['tenant:mail-template:list'] },
 	{ name: 'tenant mail-template add', aliases: ['tenant:mail-template:add'] },
 	{ name: 'tenant mail-template remove', aliases: ['tenant:mail-template:remove'] },
+	{ name: 'workload-identity check', aliases: ['workload-identity:check'] },
 ]
 
 const expectedTenantCommands = expectedCommandCatalog.map(it => it.name).filter(it => it.startsWith('tenant '))

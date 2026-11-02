@@ -57,3 +57,7 @@ export type AuthActionType =
 	| 'custom_role_change'
 	| 'unusual_login_detected'
 	| 'step_up_required'
+	| 'workload_auth_success'
+	| 'workload_auth_failure'
+	| 'workload_identity_apply'
+	| 'workload_identity_disable'

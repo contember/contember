@@ -3,6 +3,8 @@ import { MailerOptions } from '@contember/engine-tenant-api'
 import { validateRequestMemoryBudgetOptions } from '@contember/database'
 import { upperCaseFirst } from '../utils/strings.js'
 import ipaddr from 'ipaddr.js'
+import { readFileSync } from 'node:fs'
+import { X509Certificate } from 'node:crypto'
 
 const dbConfigRequired = {
 	host: Typesafe.string,
@@ -150,6 +152,97 @@ export const telemetryConfigSchema = Typesafe.partial({
 	}),
 })
 
+/** A JSON array, or a comma-separated string from an environment variable. */
+const readStringList = (val: unknown, path: PropertyKey[]): string[] => {
+	if (!Array.isArray(val) && typeof val !== 'string') {
+		return Typesafe.fail(path, 'must be an array or a comma-separated string')
+	}
+	return (Array.isArray(val) ? val : val.split(','))
+		.map((it, index) => Typesafe.string(it, [...path, index]).trim())
+		.filter(it => it.length > 0)
+}
+
+const hostnamePattern = /^(?=.{1,253}$)[a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?(\.[a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?)*$/
+
+const isIpLiteral = (value: string): boolean => ipaddr.IPv4.isValidFourPartDecimal(value) || ipaddr.IPv6.isValid(value)
+
+const parseHost = (entry: string, path: PropertyKey[]): string => {
+	const host = entry.toLowerCase()
+	return hostnamePattern.test(host) || isIpLiteral(host) ? host : Typesafe.fail([...path, entry], 'must be a hostname or an IP address')
+}
+
+const MIN_JWKS_MAX_STALENESS_SECONDS = 600
+
+const durationUnits: Record<string, number> = { s: 1, m: 60, h: 3600, d: 86400 }
+
+/** Seconds, or a string like `90s`, `30m`, `6h`, `1d` (a bare number is seconds). */
+const durationSeconds = (val: unknown, path: PropertyKey[] = []): number => {
+	if (typeof val === 'number' && Number.isInteger(val) && val >= 0) {
+		return val
+	}
+	const match = typeof val === 'string' ? val.trim().match(/^(\d+)([smhd]?)$/) : null
+	if (match === null) {
+		return Typesafe.fail(path, 'must be a duration like 6h, 30m, 90s or 1d')
+	}
+	return Number(match[1]) * (match[2] === '' ? 1 : durationUnits[match[2]])
+}
+
+/** A path to a PEM bundle; read and split at startup so a broken bundle fails the boot, not the first issuer fetch. */
+const pemCertificateBundle = (val: unknown, path: PropertyKey[] = []): string[] => {
+	const file = Typesafe.string(val, path)
+	let content: string
+	try {
+		content = readFileSync(file, 'utf8')
+	} catch (e) {
+		return Typesafe.fail(path, `cannot read ${file}: ${e instanceof Error ? e.message : String(e)}`)
+	}
+	const certificates = content.match(/-----BEGIN CERTIFICATE-----[\s\S]+?-----END CERTIFICATE-----/g) ?? []
+	if (certificates.length === 0) {
+		return Typesafe.fail(path, `${file} contains no PEM certificate`)
+	}
+	for (const [index, certificate] of certificates.entries()) {
+		try {
+			new X509Certificate(certificate)
+		} catch {
+			return Typesafe.fail(path, `certificate #${index + 1} in ${file} is invalid`)
+		}
+	}
+	return certificates
+}
+
+/** §16: instance-level relaxations of the workload identity issuer fetch policy — never tenant config. */
+export const workloadIdentityConfigSchema = Typesafe.partial({
+	// Hostnames or CIDRs exempt from the private-range ban; a bare IP becomes a single-address CIDR.
+	egressAllowlist: (val: unknown, path: PropertyKey[] = []): string[] | undefined => {
+		const entries = readStringList(val, path).map(entry => {
+			if (entry.includes('/')) {
+				return ipaddr.IPv4.isValidCIDRFourPartDecimal(entry) || ipaddr.IPv6.isValidCIDR(entry)
+					? entry
+					: Typesafe.fail([...path, entry], 'must be a CIDR, an IP address or a hostname')
+			}
+			if (isIpLiteral(entry)) {
+				return `${entry}/${ipaddr.IPv6.isValid(entry) ? 128 : 32}`
+			}
+			return parseHost(entry, path)
+		})
+		return entries.length > 0 ? entries : undefined
+	},
+	// Issuer and JWKS hosts allowed over plain http, loopback included — development only.
+	insecureIssuers: (val: unknown, path: PropertyKey[] = []): string[] | undefined => {
+		const hosts = readStringList(val, path).map(entry => parseHost(entry, path))
+		return hosts.length > 0 ? hosts : undefined
+	},
+	caCertificates: (val: unknown, path: PropertyKey[] = []): string[] | undefined => val === '' ? undefined : pemCertificateBundle(val, path),
+	// Parsed to seconds. Below two key refresh intervals (5 minutes each), keys would go stale between refreshes.
+	jwksMaxStaleness: (val: unknown, path: PropertyKey[] = []): number | undefined => {
+		if (val === '') {
+			return undefined
+		}
+		const seconds = durationSeconds(val, path)
+		return seconds >= MIN_JWKS_MAX_STALENESS_SECONDS ? seconds : Typesafe.fail(path, 'must be at least 10m')
+	},
+})
+
 export const serverConfigSchema = Typesafe.partial({
 	port: Typesafe.number,
 	http: Typesafe.partial({
@@ -281,6 +374,7 @@ export const serverConfigSchema = Typesafe.partial({
 		}),
 	),
 	telemetry: telemetryConfigSchema,
+	workloadIdentity: workloadIdentityConfigSchema,
 	projectGroup: (val: unknown, path: PropertyKey[] = []) =>
 		Typesafe.valueAt(val, ['domainMapping']) === undefined
 			? undefined

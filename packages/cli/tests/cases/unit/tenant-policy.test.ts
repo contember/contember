@@ -16,6 +16,7 @@ import { RemoteProjectProvider } from '../../../src/lib/project/RemoteProjectPro
 import { TenantClientProvider } from '../../../src/lib/TenantClientProvider.js'
 import { TenantApiTransport } from '../../../src/lib/tenant/TenantApiTransport.js'
 import { createTenantClients } from '../../../src/lib/tenant/clients/index.js'
+import { staticTokenCredentials } from '../../../src/lib/credentials/ApiCredentials.js'
 
 const API_URL = 'http://tenant.test'
 
@@ -216,7 +217,7 @@ beforeEach(() => {
 
 const createProvider = (): TenantClientProvider => {
 	const remoteProjectProvider = new RemoteProjectProvider()
-	remoteProjectProvider.setRemoteProject(new RemoteProject('blog', API_URL, 'token'))
+	remoteProjectProvider.setRemoteProject(new RemoteProject('blog', API_URL, staticTokenCredentials('token')))
 	return new TenantClientProvider(remoteProjectProvider)
 }
 

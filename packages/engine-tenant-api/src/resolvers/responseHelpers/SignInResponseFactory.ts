@@ -24,7 +24,7 @@ export class SignInResponseFactory {
 			{},
 			{
 				...context,
-				...createResolverContext(permissionContext, context.apiKeyId),
+				...createResolverContext(permissionContext, context.credential),
 			},
 		)
 		return {

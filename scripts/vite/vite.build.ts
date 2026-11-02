@@ -9,6 +9,7 @@ const extraEntrypoints = {
 	'cli': ['run', 'index'],
 	'create': ['run'],
 	'client-content-generator': ['generate', 'index'],
+	'workload-identity': ['index', 'testing'],
 	playground: [],
 	// Vite apps, not libraries — they have their own build. Listed with no entrypoints so the
 	// library build skips them while `tsc --build` still typechecks them.

@@ -23,6 +23,7 @@ import { EvalExecutor } from './lib/js/EvalExecutor.js'
 import { AdminDeployer } from './lib/admin/AdminDeployer.js'
 import { RemoteProjectResolver } from './lib/project/RemoteProjectResolver.js'
 import { CliEnv } from './lib/env.js'
+import { ApiCredentialsResolver } from './lib/credentials/ApiCredentials.js'
 import { AdminClient } from './lib/admin/AdminClient.js'
 import { FileSystem } from './lib/fs/FileSystem.js'
 import { WorkspaceResolver } from './lib/workspace/WorkspaceResolver.js'
@@ -44,6 +45,7 @@ import {
 	ProjectPrintSchemaCommand,
 	ProjectValidateCommand,
 	VersionCommand,
+	WorkloadIdentityCheckCommand,
 	WorkspaceUpdateApiCommand,
 } from './commands/index.js'
 import { MigrationExecutionFacade } from './lib/migrations/MigrationExecutionFacade.js'
@@ -156,17 +158,11 @@ export const createContainer = ({ env, version, runtime, workspace, output }: {
 		.addService('jsBuilder', () => new EsBuildBuilder())
 		.addService('jsCodeRunner', ({ jsExecutor, jsBuilder }) => new JsCodeRunner(jsBuilder, jsExecutor))
 		.addService('workspaceResolver', ({ yamlHandler }) => new WorkspaceResolver(yamlHandler))
-		.addService('remoteProjectResolver', ({ env }) => new RemoteProjectResolver(env))
-		.addService('tenantConnectionResolver', ({ env }) => new TenantConnectionResolver(env))
+		.addService('apiCredentialsResolver', ({ env }) => new ApiCredentialsResolver(env))
+		.addService('remoteProjectResolver', ({ env, apiCredentialsResolver }) => new RemoteProjectResolver(env, apiCredentialsResolver))
+		.addService('tenantConnectionResolver', ({ env, apiCredentialsResolver }) => new TenantConnectionResolver(env, apiCredentialsResolver))
 		.addService('tenantConnectionProvider', ({ tenantConnectionResolver }) => new TenantConnectionProvider(tenantConnectionResolver))
-		.addService('remoteProjectProvider', ({ remoteProjectResolver }) => {
-			const provider = new RemoteProjectProvider()
-			const remoteProject = remoteProjectResolver.resolve()
-			if (remoteProject) {
-				provider.setRemoteProject(remoteProject)
-			}
-			return provider
-		})
+		.addService('remoteProjectProvider', ({ remoteProjectResolver }) => new RemoteProjectProvider(() => remoteProjectResolver.resolve()))
 		.addService('systemClientProvider', ({ remoteProjectProvider }) => new SystemClientProvider(remoteProjectProvider))
 		.addService('tenantClientProvider', ({ tenantConnectionProvider }) => new TenantClientProvider(tenantConnectionProvider))
 		.addService('migrationTenantClientProvider', ({ remoteProjectProvider }) => new TenantClientProvider(remoteProjectProvider))
@@ -430,6 +426,7 @@ export const createContainer = ({ env, version, runtime, workspace, output }: {
 		.addService('tenantMailTemplateAddCommand', ({ tenantClientProvider }) => new TenantMailTemplateAddCommand(tenantClientProvider))
 		.addService('tenantMailTemplateRemoveCommand', ({ tenantClientProvider }) => new TenantMailTemplateRemoveCommand(tenantClientProvider))
 		.addService('tenantAuthLogCommand', ({ tenantClientProvider }) => new TenantAuthLogCommand(tenantClientProvider))
+		.addService('workloadIdentityCheckCommand', ({ tenantClientProvider }) => new WorkloadIdentityCheckCommand(tenantClientProvider))
 		.addService('commandsCommand', () => new CommandsCommand())
 		.addService('commandList', dic => {
 			const commands: CommandFactoryList = {}
@@ -505,6 +502,7 @@ export const createContainer = ({ env, version, runtime, workspace, output }: {
 			register('tenant mail-template list', () => dic.tenantMailTemplateListCommand)
 			register('tenant mail-template add', () => dic.tenantMailTemplateAddCommand)
 			register('tenant mail-template remove', () => dic.tenantMailTemplateRemoveCommand)
+			register('workload-identity check', () => dic.workloadIdentityCheckCommand)
 			return commands
 		})
 		.addService('commandManager', ({ commandList, commandsCommand }) => {
@@ -524,9 +522,10 @@ export const createContainer = ({ env, version, runtime, workspace, output }: {
 				output,
 				{
 					beforeRun: async ({ name }) => {
-						// the tenant commands only talk to a remote API — they must run outside a Contember workspace too
+						// the tenant and workload-identity commands only talk to a remote API — they must run outside a Contember workspace too
 						const skipped = ['deploy', 'version', 'commands', 'data export', 'data import', 'data transfer']
-						if (!process.env.CONTEMBER_SKIP_VERSION_CHECK && !skipped.includes(name) && !name.startsWith('tenant ')) {
+						const remoteOnly = name.startsWith('tenant ') || name.startsWith('workload-identity ')
+						if (!process.env.CONTEMBER_SKIP_VERSION_CHECK && !skipped.includes(name) && !remoteOnly) {
 							await versionChecker.checkVersions()
 						}
 					},

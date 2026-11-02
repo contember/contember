@@ -12,6 +12,8 @@ import { createErrorResponse } from '../../errorUtils.js'
 import { IdentityQuery } from '../../../model/queries/identity/IdentityQuery.js'
 import { PersonByIdentityBatchQuery } from '../../../model/queries/person/PersonByIdentityBatchQuery.js'
 import { ResponseOk } from '../../../model/utils/Response.js'
+import { isWorkloadIdentity } from '../../../model/queries/workloadIdentity/IdentityKindQuery.js'
+import { workloadIdentityManagedMessage } from '../projectMember/audit.js'
 
 export class IdentityGlobalRolesMutationResolver implements MutationResolvers {
 	constructor(
@@ -43,6 +45,9 @@ export class IdentityGlobalRolesMutationResolver implements MutationResolvers {
 			}),
 			message: 'You are not allowed to add these global roles',
 		})
+		if (await isWorkloadIdentity(context.db, identityId)) {
+			return createErrorResponse('WORKLOAD_IDENTITY_MANAGED', workloadIdentityManagedMessage(identityId))
+		}
 
 		const result = await this.rolesManager.addGlobalRoles(context.db, identityId, roles)
 		if (!result.ok) {
@@ -82,6 +87,9 @@ export class IdentityGlobalRolesMutationResolver implements MutationResolvers {
 			}),
 			message: 'You are not allowed to remove these global roles',
 		})
+		if (await isWorkloadIdentity(context.db, identityId)) {
+			return createErrorResponse('WORKLOAD_IDENTITY_MANAGED', workloadIdentityManagedMessage(identityId))
+		}
 
 		const result = await this.rolesManager.removeGlobalRoles(context.db, identityId, roles)
 		if (!result.ok) {

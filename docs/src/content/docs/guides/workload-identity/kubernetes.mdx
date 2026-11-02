@@ -1,0 +1,104 @@
+---
+title: Kubernetes
+description: Authenticate pods with projected service account tokens.
+---
+
+A Kubernetes cluster is an OIDC issuer: the kubelet can project a short-lived service account token with a custom audience into a pod. A trust with the `oidc` profile accepts it, so the pod needs no stored Contember secret.
+
+:::note[Available since 2.2]
+:::
+
+## 1. Find the cluster's issuer
+
+```bash
+kubectl get --raw /.well-known/openid-configuration | jq -r .issuer
+```
+
+Managed clusters typically publish a public `https://` issuer URL with discovery and JWKS. If yours is only reachable inside a private network, either list the host in the engine's [`egressAllowlist`](/reference/engine/configuration/workload-identity), or publish the JWKS somewhere the engine can reach and set `jwksUri` on the trust. On a self-managed cluster, the JWKS endpoint (`/openid/v1/jwks`) is served by the API server and may need unauthenticated access for the `system:service-account-issuer-discovery` role.
+
+## 2. Project a token with your audience
+
+Do not use the pod's default service account token: its audience is the API server, so it matches no trust. Add a projected volume with the trust's audience:
+
+```yaml title="deployment.yaml"
+spec:
+  template:
+    spec:
+      serviceAccountName: web-backend
+      containers:
+        - name: app
+          volumeMounts:
+            - name: contember-token
+              mountPath: /var/run/secrets/contember
+              readOnly: true
+      volumes:
+        - name: contember-token
+          projected:
+            sources:
+              - serviceAccountToken:
+                  path: token
+                  audience: contember:my-instance:k8s-web
+                  expirationSeconds: 3600
+```
+
+The kubelet refreshes the file at 80 % of the token's lifetime. The workload cannot force a refresh.
+
+## 3. Declare the trust
+
+```ts title="tenant.config.ts"
+workloadIdentities: {
+  'k8s-web': {
+    profile: 'oidc',
+    issuer: 'https://oidc.cluster.example.com',
+    audience: 'contember:my-instance:k8s-web',
+    conditions: [
+      { claim: 'sub', equals: 'system:serviceaccount:web:web-backend' },
+      // the service account's uid: a re-created account with the same name does not match
+      { path: ['kubernetes.io', 'serviceaccount', 'uid'], equals: '6f1c2a54-0b9e-4c8e-9d0e-2f4b7a1c3d5e' },
+    ],
+    memberships: [{ project: 'website', role: 'reader' }],
+    maxTokenLifetime: 3600,
+  },
+},
+```
+
+- `sub` is `system:serviceaccount:<namespace>:<name>`.
+- Nested claims under `kubernetes.io` are reached with `path`; the uid comes from `kubectl get serviceaccount web-backend -n web -o jsonpath='{.metadata.uid}'`.
+- `maxTokenLifetime` must be at least `expirationSeconds`, or every token fails the lifetime check.
+- Kubernetes sends `aud` as a single-element array; that is accepted without `acceptAudienceArray`.
+
+## 4. Use the token
+
+From application code:
+
+```ts
+import { GraphQlClient } from '@contember/graphql-client'
+import { kubernetes } from '@contember/workload-identity'
+
+const client = new GraphQlClient({
+  url: 'https://api.example.com/content/website/live',
+  credentials: kubernetes({ path: '/var/run/secrets/contember/token' }),
+})
+```
+
+The provider reads the file, caches the token until 80 % of its lifetime and re-reads it when a request is rejected with `401`.
+
+From the CLI (for example in a migration job):
+
+```yaml
+env:
+  - name: CONTEMBER_API_URL
+    value: https://api.example.com
+  - name: CONTEMBER_PROJECT_NAME
+    value: website
+  - name: CONTEMBER_API_TOKEN_SOURCE
+    value: kubernetes:/var/run/secrets/contember/token
+```
+
+See [CLI](/guides/workload-identity/cli).
+
+## Changing the trust later
+
+An apply that changes who the trust admits — issuer, audience, conditions and so on — rejects every token issued before it. Pods only get a new token when the kubelet rotates it, so they receive `401` for up to 80 % of `expirationSeconds`. To re-point a trust used by running pods, create a new trust with a new audience, roll the pods onto it, then remove the old one. Grant changes (memberships, roles) take effect on the next request and need none of this.
+
+Kubernetes cannot bind its tokens for DPoP, so `requireDpop` cannot be used with this issuer.

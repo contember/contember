@@ -69,6 +69,8 @@ import _20260904120000idpdisablelocalauthentication from './2026-09-04-120000-id
 import _20260911120000customrole from './2026-09-11-120000-custom-role.js'
 import _20261012120000signoutauthlog from './2026-10-12-120000-sign-out-auth-log.js'
 import _20261012120010authlogcreatedatindex from './2026-10-12-120010-auth-log-created-at-index.js'
+import _20261024120000workloadidentity from './2026-10-24-120000-workload-identity.js'
+import _20261024120010workloadidentityauthlogtypes from './2026-10-24-120010-workload-identity-auth-log-types.js'
 import snapshot from './snapshot.js'
 import { computeTokenHash, Providers } from '../model/index.js'
 import { Logger } from '@contember/logger'
@@ -161,6 +163,8 @@ const migrations = {
 	'2026-09-11-120000-custom-role': _20260911120000customrole,
 	'2026-10-12-120000-sign-out-auth-log': _20261012120000signoutauthlog,
 	'2026-10-12-120010-auth-log-created-at-index': _20261012120010authlogcreatedatindex,
+	'2026-10-24-120000-workload-identity': _20261024120000workloadidentity,
+	'2026-10-24-120010-workload-identity-auth-log-types': _20261024120010workloadidentityauthlogtypes,
 }
 
 export class TenantMigrationsRunner {

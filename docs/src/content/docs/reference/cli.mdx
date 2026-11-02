@@ -179,6 +179,8 @@ The CLI reads the connection from environment variables:
 | `CONTEMBER_DSN` | Full DSN, `contember://project:token@endpoint`. Takes precedence over the variables below. |
 | `CONTEMBER_API_URL` | API endpoint. `CONTEMBER_INSTANCE` is accepted as an alias. |
 | `CONTEMBER_API_TOKEN` | API token. |
+| `CONTEMBER_API_TOKEN_SOURCE` | *(since 2.2)* Obtain the token from a [workload identity](/guides/workload-identity/cli#token-sources) source instead: `github-actions` or `kubernetes:<path>`. Setting it together with `CONTEMBER_API_TOKEN` or a DSN password is an error (`API_TOKEN_SOURCE_CONFLICT`). |
+| `CONTEMBER_API_TOKEN_AUDIENCE` | *(since 2.2)* The trust's audience, required with `CONTEMBER_API_TOKEN_SOURCE=github-actions` and ignored for `kubernetes:`. |
 | `CONTEMBER_PROJECT_NAME` | Project name. |
 | `CONTEMBER_DIR` | Workspace directory. Defaults to the current directory. |
 
@@ -389,6 +391,16 @@ directly to the built-in template.
 `tenant auth-log --limit` must be a positive GraphQL Int (at most `2147483647`); the server defaults
 to 100 and caps the returned page at 500. `--offset` must be a non-negative GraphQL Int. JSON output
 includes `hasMore` and `nextOffset` for paging.
+
+### workload-identity
+
+See [workload identity federation](/guides/workload-identity/overview).
+
+| Command | Description |
+| --- | --- |
+| `workload-identity check --token-stdin` | Check a workload identity token read from stdin and print the matched trust and the first failing step, or the verified claims. Exits with `6` when the token is rejected. Requires `workloadIdentity:list`. See [checking a token](/guides/workload-identity/cli#checking-a-token). |
+
+In JSON output, `deploy` and `migrations execute` report the envelope check in `envelopeCoverage`, and `tenant apply` reports the trusts in `workloadIdentities`; see the [envelope coverage warning](/guides/workload-identity/cli#envelope-coverage-warning) and the [plan output](/reference/engine/tenant/declarative-config#plan-output).
 
 ### workspace
 

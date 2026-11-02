@@ -71,4 +71,5 @@ const errorToField: Record<AddProjectMemberErrorCode, keyof AddProjectMemberForm
 	ROLE_NOT_FOUND: 'memberships',
 	VARIABLE_EMPTY: 'memberships',
 	VARIABLE_NOT_FOUND: 'memberships',
+	WORKLOAD_IDENTITY_MANAGED: undefined,
 }

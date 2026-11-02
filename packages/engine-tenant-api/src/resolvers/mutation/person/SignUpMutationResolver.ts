@@ -82,7 +82,9 @@ export class SignUpMutationResolver implements MutationResolvers {
 			return createErrorResponse(response)
 		}
 		const result = response.result
-		await this.apiKeyManager.disableOneOffApiKey(context.db, context.apiKeyId)
+		if (context.credential.type === 'api_key') {
+			await this.apiKeyManager.disableOneOffApiKey(context.db, context.credential.id)
+		}
 
 		if (result.emailVerificationRequired) {
 			// Re-fetch to get the identity roles needed for the project lookup

@@ -4,7 +4,6 @@ import { createGunzip } from 'node:zlib'
 import { PassThrough, Readable } from 'node:stream'
 import { pipeline } from 'node:stream/promises'
 import { confirmImport } from './utils.js'
-import { maskToken } from '../../lib/maskToken.js'
 import { createProgressReporter } from '../../lib/transfer/stdio.js'
 import { RemoteProjectResolver } from '../../lib/project/RemoteProjectResolver.js'
 import { DataTransferClient, toDataTransferStreamError } from '../../lib/transfer/DataTransferClient.js'
@@ -69,7 +68,7 @@ export class ImportCommand extends Command<Args, Options> {
 							`Source file: ${escapeTerminalText(it.source)}`,
 							`Project name: ${escapeTerminalText(it.target.project)}`,
 							`API URL: ${escapeTerminalText(it.target.endpoint)}`,
-							`Token: ${escapeTerminalText(maskToken(project.token))}`,
+							`Token: ${escapeTerminalText(project.credentials.description)}`,
 							'',
 							'This would completely wipe the target project.',
 							'No data was imported.',
@@ -85,7 +84,7 @@ export class ImportCommand extends Command<Args, Options> {
 		output.info('')
 		output.info(`Project name: ${project.name}`)
 		output.info(`API URL: ${project.endpoint}`)
-		output.info(`Token: ${maskToken(project.token)}`)
+		output.info(`Token: ${project.credentials.description}`)
 		output.info('')
 		if (!await confirmImport(input, output)) {
 			return ExitCode.InputError

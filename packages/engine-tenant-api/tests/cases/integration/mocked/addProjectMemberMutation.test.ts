@@ -1,3 +1,4 @@
+import { identityKindSql } from './workloadIdentity/workloadIdentitySql.js'
 import { authenticatedIdentityId, executeTenantTest } from '../../../src/testTenant.js'
 import { testUuid } from '../../../src/testUuid.js'
 import { addProjectMemberMutation } from './gql/addProjectMember.js'
@@ -29,6 +30,7 @@ test('add project member', async () => {
 		}),
 		executes: [
 			getProjectBySlugSql({ projectSlug, response: { id: projectId, name: 'Blog', slug: projectSlug, config: {} } }),
+			identityKindSql(identityId, 'person'),
 			...sqlTransaction(
 				getProjectMembershipSql({ identityId, projectId }),
 				createMembershipSql({ membershipId, projectId, identityId, role }),

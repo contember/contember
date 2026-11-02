@@ -1,4 +1,14 @@
-import { Identity, IdentityGlobalPermissions, IdentityProjectRelation, IdentityResolvers, Maybe, Person, SessionInfo } from '../../schema/index.js'
+import {
+	Identity,
+	IdentityGlobalPermissions,
+	IdentityKind,
+	IdentityProjectRelation,
+	IdentityResolvers,
+	Maybe,
+	Person,
+	SessionInfo,
+	WorkloadIdentityTrust,
+} from '../../schema/index.js'
 import {
 	createTargetIdentityPermissionTarget,
 	IdentityQuery,
@@ -16,6 +26,9 @@ import { notEmpty } from '../../utils/array.js'
 import { batchLoader } from '../../utils/batchQuery.js'
 import { PersonResponseFactory } from '../responseHelpers/PersonResponseFactory.js'
 import { ProjectResponseFactory } from '../responseHelpers/ProjectResponseFactory.js'
+import { IdentityKindQuery, IdentityKindValue } from '../../model/queries/workloadIdentity/IdentityKindQuery.js'
+import { fetchWorkloadTrustStates, WorkloadTrustState } from '../../model/service/workloadIdentity/apply/workloadTrustStates.js'
+import { createWorkloadIdentityTrustResponse } from '../mutation/workloadIdentity/workloadIdentityTrustResponse.js'
 
 export class IdentityTypeResolver implements IdentityResolvers {
 	private personLoader = batchLoader<string, Record<string, PersonRow>, PersonRow>(
@@ -31,6 +44,18 @@ export class IdentityTypeResolver implements IdentityResolvers {
 			return Object.fromEntries(identities.map(it => [it.id, it.roles]))
 		},
 		(id, result) => result[id] ?? [],
+	)
+
+	private kindLoader = batchLoader<string, ReadonlyMap<string, IdentityKindValue>, IdentityKindValue | undefined>(
+		async (ids, db) => await db.queryHandler.fetch(new IdentityKindQuery(ids)),
+		(id, result) => result.get(id),
+	)
+	private workloadTrustLoader = batchLoader<string, ReadonlyMap<string, WorkloadTrustState>, WorkloadTrustState | undefined>(
+		async (ids, db) => {
+			const states = await fetchWorkloadTrustStates(db, { identityIds: ids })
+			return new Map(states.map(it => [it.trust.identityId, it]))
+		},
+		(id, result) => result.get(id),
 	)
 
 	constructor(
@@ -145,6 +170,7 @@ export class IdentityTypeResolver implements IdentityResolvers {
 			canListPersons,
 			canListGlobalApiKeys,
 			canCreateGlobalApiKey,
+			canListWorkloadIdentities,
 		] = await Promise.all([
 			permissionsContext.isAllowed({ action: PermissionActions.PROJECT_CREATE }),
 			permissionsContext.isAllowed({ action: PermissionActions.ENTRYPOINT_DEPLOY }),
@@ -156,6 +182,7 @@ export class IdentityTypeResolver implements IdentityResolvers {
 			permissionsContext.isAllowed({ action: PermissionActions.PERSON_LIST }),
 			permissionsContext.isAllowed({ action: PermissionActions.API_KEY_LIST }),
 			permissionsContext.isAllowed({ action: PermissionActions.API_KEY_CREATE_GLOBAL() }),
+			permissionsContext.isAllowed({ action: PermissionActions.WORKLOAD_IDENTITY_LIST }),
 		])
 
 		return {
@@ -169,7 +196,21 @@ export class IdentityTypeResolver implements IdentityResolvers {
 			canListPersons,
 			canListGlobalApiKeys,
 			canCreateGlobalApiKey,
+			canListWorkloadIdentities,
 		}
+	}
+
+	async kind(parent: Identity, args: unknown, context: TenantResolverContext): Promise<IdentityKind> {
+		const kind = await context.db.batchLoad(this.kindLoader, parent.id)
+		return kind === 'workload' ? 'WORKLOAD' : kind === 'person' ? 'PERSON' : 'API_KEY'
+	}
+
+	async workloadIdentityTrust(parent: Identity, args: unknown, context: TenantResolverContext): Promise<Maybe<WorkloadIdentityTrust>> {
+		if (!(await context.permissionContext.isAllowed({ action: PermissionActions.WORKLOAD_IDENTITY_LIST }))) {
+			return null
+		}
+		const trust = await context.db.batchLoad(this.workloadTrustLoader, parent.id)
+		return trust ? createWorkloadIdentityTrustResponse(trust) : null
 	}
 
 	async sessions(
@@ -204,7 +245,7 @@ export class IdentityTypeResolver implements IdentityResolvers {
 			lastUserAgent: row.last_user_agent,
 			createdIp: row.created_ip,
 			createdUserAgent: row.created_user_agent,
-			isCurrent: row.id === context.apiKeyId,
+			isCurrent: context.credential.type === 'api_key' && row.id === context.credential.id,
 			trustForwardedClientInfo: row.trust_forwarded_info,
 		}))
 	}

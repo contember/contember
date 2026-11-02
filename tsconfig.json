@@ -223,6 +223,9 @@
 		},
 		{
 			"path": "./packages/vite-plugin"
+		},
+		{
+			"path": "./packages/workload-identity"
 		}
 	]
 }

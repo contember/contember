@@ -24,6 +24,8 @@ Every entry carries:
 | `user_agent` | The effective client User-Agent |
 | `person_input_identifier` | Free-form input string (the email submitted on a failed login, etc.) |
 | `error_code` | The `code` returned to the caller on failure |
+| `trust_id` | *(since 2.2)* The [workload identity trust](/reference/engine/tenant/workload-identities) of a `workload_*` entry |
+| `token_ref` | *(since 2.2)* On `workload_auth_success` entries: the token's `jti`, or `sha256:` + a hash of the token when it has no `jti`. Never the token itself |
 | `metadata` | JSONB — forensic context (forwarder IP/UA, `sessionId`, `reason`, `invokedByUnpersistedIdentityId`, …) |
 | `event_data` | JSONB — domain payload: `{before, after}` snapshots, creation snapshots, redacted inputs |
 
@@ -100,6 +102,21 @@ A few auth events carry extra context so security-relevant outcomes stay disting
 | `tenant_config_change` | `configure` | `{input}` — full ConfigInput with `captcha.secret` redacted to `***` |
 | `person_invite` | `invite`, `unmanagedInvite` | `{projectSlug, email, isNew, memberships}` |
 
+### Workload identity events (since 2.2)
+
+Entries for [workload identity trusts](/guides/workload-identity/overview) carry the trust in the `trust_id` column (`workloadIdentityTrustId` in GraphQL).
+
+| Type | When | Notes |
+|---|---|---|
+| `workload_auth_success` | A request authenticated with a workload token | Written **once per token**, not per request: deduplicated by `trust_id` + `token_ref`, also across engine instances. `identity_id` is the trust's identity, `metadata` carries `trustSlug`. `event_data` carries `trustSlug`, the token's `iss`, `sub` and `jti`, `cnfJkt` (the key thumbprint) for a DPoP-bound token, and under `claims`, for `github-actions`, the `repository_id`, `run_id`, `run_attempt`, `ref`, `job_workflow_ref` and `environment` claims. |
+| `workload_auth_failure` | A workload token was rejected | `error_code` is the failure category (`trust_not_found`, `signature`, `typ`, `audience`, `profile`, `lifetime`, `tokens_valid_after`, `condition`, `jwks`, `malformed`, or `dpop_missing`, `dpop_invalid`, `dpop_binding`, `dpop_replay`), `error_message` the reason. `trust_id` is set when a trust matched. Claims of the unverified token appear only in `metadata`, as `unverified_iss`, `unverified_aud`, `unverified_sub` and `unverified_jti` (bounded in length), next to `trustSlug`. No `token_ref`. Rate-limited per trust and engine worker (a burst of 10, then one entry per 6 seconds; tokens matching no trust share one limit), so a flood of bad tokens does not flood the log; every failure is still counted in the engine metrics. |
+| `workload_identity_apply` | `applyWorkloadIdentityTrust` (success) | `{slug, trustId, created, tokensValidAfterBumped, before, after}` — `before` and `after` are the trust definitions (`before` is `null` on create), `after` also carries the authorized `envelopeClosure` |
+| `workload_identity_disable` | `disableWorkloadIdentityTrust` (success), including trusts a `tenant apply` disables — left out of the block, or set to `disabled: true` with no other change | `{slug, trustId}`. A `tenant apply` that disables a trust and changes its definition in one go sends an apply, recorded as `workload_identity_apply` |
+
+On `workload_auth_*` entries, `client_ip` and `user_agent` are those of the connection; forwarded client info is not applied.
+
+The caller of every rejected token gets the same `401`; these entries — together with the [token check](/guides/workload-identity/cli#checking-a-token) — are where an operator finds out why.
+
 ## Reading the log
 
 ### GraphQL
@@ -144,6 +161,8 @@ All fields are AND-combined; omitted fields are unconstrained.
 | `createdAfter` | Inclusive lower bound (`created_at >= createdAfter`). |
 | `createdBefore` | Exclusive upper bound (`created_at < createdBefore`). |
 
+`AuthLogEntry.workloadIdentityTrustId` *(since 2.2)* returns the trust of a `workload_*` entry. There is no filter on it; select the entries with `types: ["workload_auth_success", "workload_auth_failure"]` and filter by trust in SQL (`trust_id`) when you need one trust only.
+
 ### Direct SQL
 
 You can also query `person_auth_log` directly via the tenant database — useful for ad-hoc analytics that don't map cleanly onto the `AuthLogFilter` input:
@@ -160,6 +179,6 @@ ORDER BY created_at DESC;
 
 - Both success and failure are recorded for authentication events. The success flag distinguishes them.
 - Admin events are recorded only on success — a denied permission check throws before the action runs, so there is nothing to audit at the resolver level (the permission failure is observable from the HTTP error response itself).
-- Secret-bearing inputs are redacted before they hit the log: captcha secret becomes `***`, IDP configuration is collapsed to a sorted list of keys, project secrets log only their key name, API keys log only their id and identity.
+- Secret-bearing inputs are redacted before they hit the log: captcha secret becomes `***`, IDP configuration is collapsed to a sorted list of keys, project secrets log only their key name, API keys log only their id and identity, workload tokens only their `token_ref`.
 - The forwarder's socket IP/UA are preserved in `metadata.forwarderIp` / `metadata.forwarderUserAgent` when [trust-forwarded-info](/reference/engine/tenant/proxy-trust) is in effect, so the trail still has a path back to the proxy.
 - Actions performed with an [unpersisted root token](/reference/engine/tenant/overview#unpersisted-root-tokens) have a `NULL` `identity_id` and carry the virtual identity id in `metadata.invokedByUnpersistedIdentityId` — that identity has no `identity` row, so recording it as `identity_id` would point at a foreign key that does not exist. Filter those with `metadata->>'invokedByUnpersistedIdentityId' IS NOT NULL`; the `invokedByIdentityId` GraphQL filter cannot reach them.

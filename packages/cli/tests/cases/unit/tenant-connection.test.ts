@@ -17,7 +17,7 @@ describe('tenant connection', () => {
 		}).resolve()
 
 		expect(connection?.endpoint).toBe('https://team.contember.cloud/_api')
-		expect(connection?.token.length).toBeGreaterThan(0)
+		expect(connection?.credentials.staticToken).toBe(token)
 	})
 
 	test('resolves a DSN without requiring its project username', () => {
@@ -26,7 +26,7 @@ describe('tenant connection', () => {
 		}).resolve()
 
 		expect(connection?.endpoint).toBe('https://tenant.example.test')
-		expect(connection?.token.length).toBeGreaterThan(0)
+		expect(connection?.credentials.staticToken).toBe(token)
 	})
 
 	test('reports a typed input error when endpoint or token is missing at provider access', () => {

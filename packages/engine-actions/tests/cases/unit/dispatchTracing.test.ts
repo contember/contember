@@ -6,6 +6,8 @@ import { createLogger, TestLoggerHandler } from '@contember/logger'
 import { Actions } from '@contember/schema'
 import { emptySchema } from '@contember/schema-utils'
 import { noopTracer, ReadableSpan } from '@contember/telemetry'
+import { AuditLogWriter } from '../../../src/audit/AuditLogWriter.js'
+import { AuditLogTargetHandler } from '../../../src/dispatch/AuditLogTargetHandler.js'
 import { EventDispatcher } from '../../../src/dispatch/EventDispatcher.js'
 import { EventsRepository, FetchBatchResult, PersistProcessedResult } from '../../../src/dispatch/EventsRepository.js'
 import { TargetHandlerResolver } from '../../../src/dispatch/TargetHandlerResolver.js'
@@ -63,13 +65,15 @@ class StubTargetHandlerResolver extends TargetHandlerResolver {
 	constructor(
 		private readonly handleEvents: (args: InvokeHandlerArgs<Actions.AnyTarget>) => Promise<HandledEvent[]>,
 	) {
-		super(new WebhookTargetHandler(unusedFetcher, noopTracer, { propagateToWebhooks: false }))
+		super(new WebhookTargetHandler(unusedFetcher, noopTracer, { propagateToWebhooks: false }), unusedAuditLogHandler)
 	}
 
 	override resolveHandler<T extends Actions.AnyTarget>(): InvokeHandler<T> {
 		return { handle: this.handleEvents }
 	}
 }
+
+const unusedAuditLogHandler = new AuditLogTargetHandler(new AuditLogWriter({ uuid: () => testUuid(2) }))
 
 const unusedFetcher: WebhookFetcher = {
 	fetch: async () => {
@@ -190,7 +194,7 @@ test('dispatch: the webhook span nests under the dispatch span', async () => {
 		},
 	}
 	const repository = new StubEventsRepository(okBatch, { succeeded: 2, retried: 0, failed: 0 })
-	const resolver = new TargetHandlerResolver(new WebhookTargetHandler(fetcher, tracer, { propagateToWebhooks: true }))
+	const resolver = new TargetHandlerResolver(new WebhookTargetHandler(fetcher, tracer, { propagateToWebhooks: true }), unusedAuditLogHandler)
 	const dispatcher = new EventDispatcher(repository, new StubVariablesManager(), resolver, tracer)
 
 	await processBatch(dispatcher)

@@ -1,8 +1,8 @@
-import { assertNever, filterEntityDefinition } from '../../../utils/index.js'
+import { assertNever, EntityConstructor, filterEntityDefinition, isEntityConstructor } from '../../../utils/index.js'
 import { Actions } from '@contember/schema'
 import { triggersStore } from './store.js'
 import { BasicTriggerDefinition, TargetDefinition, WatchTriggerDefinition } from '../triggers.js'
-import { ActionsTarget } from '../targets.js'
+import { ActionsTarget, AnyTargetDefinition, EntityReference } from '../targets.js'
 import { Kind, parse, SelectionNode, ValueNode } from 'graphql'
 
 export class ActionsFactory {
@@ -11,7 +11,21 @@ export class ActionsFactory {
 	): Actions.Schema {
 		const entityLikeDefinition = filterEntityDefinition(exportedDefinitions)
 
-		const targetsRegistry = new ActionsTargetRegistry()
+		// Resolve a sink-entity reference (class or `() => class`) to its registered name,
+		// keyed by the exported name — matching how the model registers entities.
+		const entityNameByConstructor = new Map<EntityConstructor, string>(
+			entityLikeDefinition.map(([name, entity]) => [entity, name]),
+		)
+		const resolveEntityReference = (ref: EntityReference): string => {
+			const entity = isEntityConstructor(ref) ? ref : ref()
+			const name = entityNameByConstructor.get(entity)
+			if (!name) {
+				throw `Audit-log target references entity ${entity?.name ?? String(entity)} which is not a registered entity. Have you exported it?`
+			}
+			return name
+		}
+
+		const targetsRegistry = new ActionsTargetRegistry(resolveEntityReference)
 		for (const [exportedAs, def] of Object.entries(exportedDefinitions)) {
 			if (!(def instanceof ActionsTarget)) {
 				continue
@@ -146,17 +160,34 @@ export class ActionsFactory {
 
 class ActionsTargetRegistry {
 	private targets: Record<string, Actions.AnyTarget> = {}
-	private targetsInverseMap = new Map<Omit<Actions.AnyTarget, 'name'>, string>()
+	private targetsInverseMap = new Map<AnyTargetDefinition, string>()
 
-	public register(name: string, target: Omit<Actions.AnyTarget, 'name'> & { name?: string }): void {
+	constructor(
+		private readonly resolveEntityReference: (ref: EntityReference) => string,
+	) {
+	}
+
+	public register(name: string, target: AnyTargetDefinition & { name?: string }): void {
 		if (this.targets[name]) {
 			throw `Duplicate trigger target name ${name}`
 		}
-		this.targets[name] = { name, ...target }
+		// Switch narrows the discriminated union so the per-member fields (webhook `url`,
+		// audit-log `entity`) are preserved when re-attaching the name; the audit-log sink
+		// reference is resolved to its entity name here.
+		switch (target.type) {
+			case 'webhook':
+				this.targets[name] = { ...target, name }
+				break
+			case 'auditLog':
+				this.targets[name] = { ...target, name, entity: this.resolveEntityReference(target.entity) }
+				break
+			default:
+				return assertNever(target)
+		}
 		this.targetsInverseMap.set(target, name)
 	}
 
-	public getName(target: Omit<Actions.AnyTarget, 'name'>): string | undefined {
+	public getName(target: AnyTargetDefinition): string | undefined {
 		return this.targetsInverseMap.get(target)
 	}
 

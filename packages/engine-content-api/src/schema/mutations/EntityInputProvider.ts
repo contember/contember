@@ -27,7 +27,7 @@ export class EntityInputProvider<Operation extends EntityInputType> {
 	}
 
 	protected createInput(entity: Model.Entity, withoutRelation?: string): GraphQLInputObjectType | undefined {
-		if (entity.view) {
+		if (entity.view || entity.immutable) {
 			return undefined
 		}
 		const entityName = entity.name

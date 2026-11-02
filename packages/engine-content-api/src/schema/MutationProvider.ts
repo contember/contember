@@ -72,7 +72,7 @@ export class MutationProvider {
 
 	protected getDeleteMutation(entity: Model.Entity): FieldConfig<Input.DeleteInput> | undefined {
 		const entityName = entity.name
-		if (entity.view) {
+		if (entity.view || entity.immutable) {
 			return undefined
 		}
 		if (!this.isLookupReadable(entity) || this.rootAuthorizator.getEntityPermission(Acl.Operation.delete, entityName) === 'no') {

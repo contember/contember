@@ -59,6 +59,11 @@ export class UpdateEntityRelationAllowedOperationsVisitor
 		owningEntity: Model.Entity,
 		owningRelation: Model.Relation,
 	): Input.UpdateRelationOperation[] {
+		// Immutable rows are written only by the engine: no joining-column writes on an
+		// immutable owning side and no nested delete of an immutable target.
+		if (owningEntity.immutable) {
+			return []
+		}
 		const result: Input.UpdateRelationOperation[] = []
 
 		const canReadTargetEntity = this.authorizator.getEntityPermission(Acl.Operation.read, targetEntity.name) !== 'no'
@@ -80,7 +85,7 @@ export class UpdateEntityRelationAllowedOperationsVisitor
 		if (canCreateTargetEntity && canUpdateTargetEntity && canUpdateOwningRelation) {
 			result.push(Input.UpdateRelationOperation.upsert)
 		}
-		if (canDeleteTargetEntity && canUpdateOwningRelation) {
+		if (canDeleteTargetEntity && canUpdateOwningRelation && !targetEntity.immutable) {
 			result.push(Input.UpdateRelationOperation.delete)
 		}
 		if (canReadTargetEntity && canUpdateOwningRelation && canCreateTargetEntity) {

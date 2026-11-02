@@ -48,6 +48,10 @@ export class CreateEntityRelationAllowedOperationsVisitor
 		owningEntity: Model.Entity,
 		owningRelation: Model.Relation,
 	): Input.CreateRelationOperation[] {
+		// An immutable owning side would have its joining column written by connect.
+		if (owningEntity.immutable) {
+			return []
+		}
 		const result: Input.CreateRelationOperation[] = []
 
 		const canReadTargetEntity = this.authorizator.getEntityPermission(Acl.Operation.read, targetEntity.name) !== 'no'

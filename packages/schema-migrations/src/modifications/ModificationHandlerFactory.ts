@@ -36,6 +36,7 @@ import { createTargetModification } from './actions/CreateTargetModification.js'
 import { removeTargetModification } from './actions/RemoveTargetModification.js'
 import { updateTargetModification } from './actions/UpdateTargetModification.js'
 import { updateEntityOrderByModification } from './entities/UpdateEntityOrderByModification.js'
+import { toggleEntityImmutableModification } from './entities/ToggleEntityImmutableModification.js'
 import { removeIndexNamesModification } from './upgrade/RemoveIndexNamesModification.js'
 import { convertOneHasManyToOneHasOneRelationModification } from './relations/ConvertOneHasManyToOneHasOneRelationModification.js'
 
@@ -93,6 +94,7 @@ namespace ModificationHandlerFactory {
 		convertOneHasManyToManyHasManyRelationModification,
 		convertManyHasManyToJoiningEntityModification,
 		updateEntityOrderByModification,
+		toggleEntityImmutableModification,
 		createTriggerModification,
 		updateTriggerModification,
 		patchTriggerModification,

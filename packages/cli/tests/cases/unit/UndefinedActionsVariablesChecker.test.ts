@@ -33,11 +33,12 @@ test('warns about each target with variables the engine does not define', async 
 
 	await checker.check(
 		project,
-		createActions({
-			defined: { url: 'https://{{HOST}}/hook', headers: { Authorization: 'Bearer {{TOKEN}}' } },
-			partly: { url: 'https://{{HOST}}/{{MISSING}}', headers: { 'X-Empty': '{{EMPTY}}', 'X-Again': '{{MISSING}}' } },
-			plain: { url: 'https://example.com/hook' },
-		}),
+		async () =>
+			createActions({
+				defined: { url: 'https://{{HOST}}/hook', headers: { Authorization: 'Bearer {{TOKEN}}' } },
+				partly: { url: 'https://{{HOST}}/{{MISSING}}', headers: { 'X-Empty': '{{EMPTY}}', 'X-Again': '{{MISSING}}' } },
+				plain: { url: 'https://example.com/hook' },
+			}),
 	)
 
 	expect(io.stderr.lines).toStrictEqual([
@@ -49,7 +50,7 @@ test('warns about each target with variables the engine does not define', async 
 test('makes no request when no target references a variable', async () => {
 	const { checker, io, requests } = createChecker(async () => [])
 
-	await checker.check(project, createActions({ plain: { url: 'https://example.com/hook' } }))
+	await checker.check(project, async () => createActions({ plain: { url: 'https://example.com/hook' } }))
 
 	expect(requests()).toBe(0)
 	expect(io.stderr.lines).toStrictEqual([])
@@ -60,7 +61,18 @@ test('a failed variables request is a warning, not a failure', async () => {
 		throw new Error('Forbidden')
 	})
 
-	await checker.check(project, createActions({ target: { url: 'https://{{HOST}}/hook' } }))
+	await checker.check(project, async () => createActions({ target: { url: 'https://{{HOST}}/hook' } }))
 
 	expect(io.stderr.lines).toStrictEqual(['Warning: could not check the variables webhook targets reference: Forbidden'])
+})
+
+test('a schema that cannot be built is a warning, not a failure', async () => {
+	const { checker, io, requests } = createChecker(async () => [])
+
+	await checker.check(project, async () => {
+		throw new Error('Unknown modification')
+	})
+
+	expect(requests()).toBe(0)
+	expect(io.stderr.lines).toStrictEqual(['Warning: could not check the variables webhook targets reference: Unknown modification'])
 })

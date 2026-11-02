@@ -19,16 +19,17 @@ export class UndefinedActionsVariablesChecker {
 	) {
 	}
 
-	public async check(project: RemoteProject, actions: Actions.Schema): Promise<void> {
-		const referencing = Object.entries(actions.targets)
-			.map(([name, target]) => ({ name, variables: getWebhookTargetVariableNames(target) }))
-			.filter(it => it.variables.length > 0)
-		if (referencing.length === 0) {
-			return
-		}
-
+	/** `loadActions` builds the migrated schema's actions; a failure there is reported like a failed lookup. */
+	public async check(project: RemoteProject, loadActions: () => Promise<Actions.Schema>): Promise<void> {
+		let referencing: { name: string; variables: string[] }[]
 		let defined: Set<string>
 		try {
+			referencing = Object.entries((await loadActions()).targets)
+				.map(([name, target]) => ({ name, variables: getWebhookTargetVariableNames(target) }))
+				.filter(it => it.variables.length > 0)
+			if (referencing.length === 0) {
+				return
+			}
 			const variables = await this.createClient(project).listVariables()
 			// the engine treats an empty value as unset; an environment value is not returned at all (null)
 			defined = new Set(variables.filter(it => it.value !== '').map(it => it.name))

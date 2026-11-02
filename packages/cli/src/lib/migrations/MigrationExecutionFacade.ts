@@ -181,8 +181,10 @@ export class MigrationExecutionFacade {
 			}
 			throw e
 		}
-		const schema = await this.schemaVersionBuilder.buildSchema(until ? MigrationVersionHelper.extractVersion(until) : undefined)
-		await this.undefinedActionsVariablesChecker.check(project, schema.actions)
+		await this.undefinedActionsVariablesChecker.check(
+			project,
+			async () => (await this.schemaVersionBuilder.buildSchema(until ? MigrationVersionHelper.extractVersion(until) : undefined)).actions,
+		)
 		return true
 	}
 

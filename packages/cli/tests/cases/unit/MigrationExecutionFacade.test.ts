@@ -41,6 +41,8 @@ import { TenantApiTransport } from '../../../src/lib/tenant/TenantApiTransport.j
 import { TenantCreateProjectDetails, TenantCreateProjectResult, TenantProjectClient } from '../../../src/lib/tenant/clients/TenantProjectClient.js'
 import { createTestOutput } from '../../../../cli-common/tests/lib/testOutput.js'
 import prompts from 'prompts'
+import { Actions, Schema } from '@contember/schema'
+import { UndefinedActionsVariablesChecker } from '../../../src/lib/actions/UndefinedActionsVariablesChecker.js'
 
 type Event =
 	| { type: 'create-project'; details: TenantCreateProjectDetails | undefined }
@@ -49,6 +51,7 @@ type Event =
 	| { type: 'snapshot-build' }
 	| { type: 'snapshot-apply' }
 	| { type: 'execute-migrations'; schemaState: SchemaState | undefined }
+	| { type: 'list-variables' }
 
 class RecordingSystemClient extends SystemClient {
 	constructor(
@@ -164,8 +167,21 @@ afterEach(async () => {
 	await fs.rm(workDir, { recursive: true, force: true })
 })
 
+const withTargets = (schema: Schema, targets: Actions.Schema['targets']): Schema => ({
+	...schema,
+	actions: { ...schema.actions, targets: { ...schema.actions.targets, ...targets } },
+})
+
 const createHarness = async (
-	{ state = false, migration = false, snapshot = false, remoteExecuted = false, remoteMissing = false, stdinTty = false } = {},
+	{ state = false, migration = false, snapshot = false, remoteExecuted = false, remoteMissing = false, stdinTty = false, targets = {} }: {
+		state?: boolean
+		migration?: boolean
+		snapshot?: boolean
+		remoteExecuted?: boolean
+		remoteMissing?: boolean
+		stdinTty?: boolean
+		targets?: Actions.Schema['targets']
+	} = {},
 ) => {
 	const events: Event[] = []
 	const migrationsDir = path.join(workDir, 'migrations')
@@ -176,7 +192,10 @@ const createHarness = async (
 	if (migration) {
 		await filesManager.createDirIfNotExist()
 		await filesManager.createFile(
-			JSON.stringify({ formatVersion: VERSION_LATEST, modifications: schemaDiffer.diffSchemas(emptySchema, createSchema(ExecutionModel)) }),
+			JSON.stringify({
+				formatVersion: VERSION_LATEST,
+				modifications: schemaDiffer.diffSchemas(emptySchema, withTargets(createSchema(ExecutionModel), targets)),
+			}),
 			'2024-01-01-120000-init',
 		)
 	}
@@ -241,6 +260,12 @@ const createHarness = async (
 		statusFacade,
 		stateManager,
 		snapshotFacade,
+		new UndefinedActionsVariablesChecker(io.output, () => ({
+			listVariables: async () => {
+				events.push({ type: 'list-variables' })
+				return []
+			},
+		})),
 		io.output,
 	)
 	return { events, facade, io }
@@ -365,4 +390,21 @@ test('notifies confirmation once after interactive execution is accepted', async
 	})
 
 	expect(confirmations).toBe(1)
+})
+
+test('warns after executing migrations whose webhook target references an undefined variable', async () => {
+	const { facade, events, io } = await createHarness({
+		migration: true,
+		targets: { hook: { type: 'webhook', name: 'hook', url: 'https://example.com/{{TOKEN}}' } },
+	})
+
+	const result = await facade.execute({ requireConfirmation: false })
+
+	expect(result).toBe(true)
+	const types = events.map(event => event.type)
+	expect(types.indexOf('list-variables')).toBeGreaterThan(types.indexOf('execute-migrations'))
+	expect(io.stderr.lines).toContain(
+		'Warning: webhook target hook references undefined variables: TOKEN. '
+			+ 'Its events wait until they are set (actions set-variables, or the engine environment).',
+	)
 })

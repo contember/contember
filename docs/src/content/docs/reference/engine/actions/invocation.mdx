@@ -21,6 +21,16 @@ The worker identifies events ready for processing based on their visibility, sel
 In the webhook URL and header values, variables can be used using double curly braces (`{{variableName}}`). These variables are replaced with their corresponding values at the time of webhook invocation. It provides flexibility and customization by allowing dynamic content based on the context of the
 event.
 
+### Undefined variables
+
+:::note[Available since 2.2]
+Before 2.2, each event spent its delivery attempts on an undefined variable and ended `failed`.
+:::
+
+A variable without a value, or with an empty one, makes the request impossible, so Contember does not send it and does not count it as a delivery attempt. Instead, every queued event of that webhook waits: the event log records `Undefined variable <names>` with an `undefinedVariables` field, and the engine logs one warning per webhook naming the missing variables. Setting variables through `setVariables` releases the waiting events at once. A variable supplied from the environment, or a webhook definition that no longer uses the variable, takes effect at the next check, which happens every 10 minutes.
+
+`contember migrations execute` and `contember deploy` warn after executing migrations when a webhook references a variable the engine does not define. The migration still runs.
+
 By default, Contember appends the following headers to the webhook request:
 
 - `User-Agent: Contember Actions`

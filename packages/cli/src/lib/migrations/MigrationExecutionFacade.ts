@@ -18,6 +18,7 @@ import { RemoteProjectProvider } from '../project/RemoteProjectProvider.js'
 import { CliError, ExitCode, Output } from '@contember/cli-common'
 import { GraphQlClientError } from '@contember/graphql-client'
 import { promptSelect } from '../prompt/index.js'
+import { UndefinedActionsVariablesChecker } from '../actions/UndefinedActionsVariablesChecker.js'
 
 export class MigrationExecutionFacade {
 	constructor(
@@ -30,6 +31,7 @@ export class MigrationExecutionFacade {
 		private readonly migrationStatusFacade: MigrationsStatusFacade,
 		private readonly schemaStateManager: SchemaStateManager,
 		private readonly migrationSnapshotFacade: MigrationSnapshotFacade,
+		private readonly undefinedActionsVariablesChecker: UndefinedActionsVariablesChecker,
 		private readonly output: Output = new Output(),
 	) {
 	}
@@ -179,6 +181,8 @@ export class MigrationExecutionFacade {
 			}
 			throw e
 		}
+		const schema = await this.schemaVersionBuilder.buildSchema(until ? MigrationVersionHelper.extractVersion(until) : undefined)
+		await this.undefinedActionsVariablesChecker.check(project, schema.actions)
 		return true
 	}
 

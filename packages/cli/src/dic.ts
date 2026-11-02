@@ -47,6 +47,7 @@ import {
 	WorkspaceUpdateApiCommand,
 } from './commands/index.js'
 import { MigrationExecutionFacade } from './lib/migrations/MigrationExecutionFacade.js'
+import { UndefinedActionsVariablesChecker } from './lib/actions/UndefinedActionsVariablesChecker.js'
 import { MigrationPrinter } from './lib/migrations/MigrationPrinter.js'
 import { MigrationSnapshotFacade } from './lib/migrations/MigrationSnapshotFacade.js'
 import { MigrationsStatusFacade } from './lib/migrations/MigrationsStatusFacade.js'
@@ -258,6 +259,7 @@ export const createContainer = ({ env, version, runtime, workspace, output }: {
 					migrationsStatusFacade,
 					schemaStateManager,
 					migrationSnapshotFacade,
+					new UndefinedActionsVariablesChecker(output),
 					output,
 				),
 		)

@@ -86,18 +86,28 @@ export class SelectBuilder {
 			input = input.withField(new FieldNode(entity.primary, entity.primary, {}))
 		}
 
-		const fetchedPredicates = new Set()
-		const addPredicate = (predicate: Acl.Predicate): ColumnValueGetter<boolean> => {
+		const fetchedPredicates = new Set<string>()
+		const addPredicate = (predicate: Acl.Predicate, options?: { rootOnly?: boolean }): ColumnValueGetter<boolean> => {
 			if (typeof predicate === 'boolean') {
 				return () => predicate
 			}
-			const predicatePath = path.for('__predicate').for(predicate)
+			const isRoot = this.relationPath.length === 0
+			// A root-resolved name may denote a different definition than the same name in the `all` set, so the
+			// two must not share a column. The override gets its own path segment, keeping every other alias unchanged.
+			const rootOnly = options?.rootOnly === true && !isRoot
+			const predicatePath = path.for(rootOnly ? '__predicateRoot' : '__predicate').for(predicate)
+			// Keyed by the column, so two definitions can never be served from one column.
+			const predicateKey = predicatePath.fullAlias
 
-			if (!fetchedPredicates.has(predicate)) {
+			if (!fetchedPredicates.has(predicateKey)) {
 				const relationContext = this.relationPath[this.relationPath.length - 1]
 
-				const primaryPredicate = this.predicateFactory.create(entity, Acl.Operation.read, undefined, relationContext)
-				const fieldPredicate = this.predicateFactory.buildPredicates(entity, [predicate], relationContext)
+				const primaryPredicate = this.predicateFactory.create(entity, Acl.Operation.read, undefined, relationContext, isRoot)
+				const fieldPredicate = rootOnly
+					// No relation context: `optimizePredicates` would eliminate parts against the root set, but the
+					// parent rows may have been filtered with the `all` set — an unsound elimination. Skip it instead.
+					? this.predicateFactory.buildPredicates(entity, [predicate], undefined, true)
+					: this.predicateFactory.buildPredicates(entity, [predicate], relationContext, isRoot)
 
 				this.qb = this.whereBuilder.buildAdvanced(
 					entity,
@@ -114,7 +124,7 @@ export class SelectBuilder {
 							}), predicatePath.alias),
 					{ relationPath: this.relationPath, evaluatedPredicates: [primaryPredicate] },
 				)
-				fetchedPredicates.add(predicate)
+				fetchedPredicates.add(predicateKey)
 			}
 			return row => row[predicatePath.alias] === true
 		}

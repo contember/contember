@@ -32,14 +32,19 @@ export class MetaHandler implements SelectExecutionHandler<{}> {
 		metaPath: Path,
 		operation: Acl.Operation.read | Acl.Operation.update,
 	): void {
-		const { entity } = context
+		const { entity, relationPath } = context
 		if (entity.primary === fieldName) {
 			return
 		}
-		const fieldPredicate = this.predicateFactory.getFieldPredicate(entity, operation, fieldName)
+		// `readable` mirrors value masking in FieldsVisitor (context-aware). `updatable` stays root-only because
+		// update enforcement is not context-aware; the predicate name and its definition must come from the same set.
+		const isRead = operation === Acl.Operation.read
+		const fieldPredicate = isRead
+			? this.predicateFactory.getFieldPredicate(entity, operation, fieldName, relationPath.length === 0)
+			: this.predicateFactory.getFieldPredicate(entity, operation, fieldName)
 		context.addColumn({
 			path: metaPath,
-			valueGetter: context.addPredicate(fieldPredicate.predicate),
+			valueGetter: context.addPredicate(fieldPredicate.predicate, { rootOnly: !isRead }),
 		})
 	}
 }

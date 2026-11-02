@@ -4,7 +4,7 @@ import { HandledEvent } from './types.js'
 import { Logger } from '@contember/logger'
 import { ContentSchemaResolver } from '@contember/engine-http'
 import { DatabaseContext } from '@contember/engine-system-api'
-import { VariablesManager } from '../model/VariablesManager.js'
+import { resolveVariable, VariablesManager } from '../model/VariablesManager.js'
 import { Tracer } from '@contember/telemetry'
 import { UndefinedVariableError } from './WebhookTargetHandler.js'
 
@@ -78,18 +78,25 @@ export class EventDispatcher {
 				}
 			} catch (e) {
 				if (e instanceof UndefinedVariableError) {
-					// Every queued event of the target waits, so one line covers them all instead of one per attempt.
-					const held = await this.eventsRepository.holdForUndefinedVariables(db.client, {
+					const { held, joined } = await this.eventsRepository.holdForUndefinedVariables(db.client, {
 						target: target.name,
 						batch: events.map(it => it.id),
 						variables: e.variables,
 					})
-					batchLogger.warn('Webhook target references an undefined variable, its events wait until it is set', {
-						target: target.name,
-						variables: e.variables,
-						events: held,
-					})
+					const message = 'Webhook target references an undefined variable, its events wait until it is set'
+					const attributes = { target: target.name, variables: e.variables, events: held }
+					// One warning per target and re-check; an event arriving meanwhile only joins the hold.
+					if (joined) {
+						batchLogger.debug(message, attributes)
+					} else {
+						batchLogger.warn(message, attributes)
+					}
 					span.setAttribute('contember.actions.held', held)
+					// setVariables may have committed after the variables were read and before the hold, when it had nothing to release yet.
+					const current = await this.variablesManager.fetchVariables(db, project.slug)
+					if (e.variables.every(name => resolveVariable(current, name) !== undefined)) {
+						await this.eventsRepository.resumeHeldForUndefinedVariables(db.client)
+					}
 					return {
 						succeeded: 0,
 						retried: 0,

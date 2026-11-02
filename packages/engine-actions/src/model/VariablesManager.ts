@@ -8,6 +8,12 @@ import { UserInputError } from '@contember/graphql-utils'
 
 export type VariablesMap = Record<string, string>
 
+/** A variable's value for interpolation; an empty value counts as unset, and only own entries count at all. */
+export const resolveVariable = (variables: VariablesMap, name: string): string | undefined => {
+	const value = Object.hasOwn(variables, name) ? variables[name] : ''
+	return value === '' ? undefined : value
+}
+
 /** Between the project (or DEFAULT) prefix and the variable name: `MY_PROJECT_ACTIONS_VARIABLE_API_KEY`. */
 const ENV_NAME_INFIX = '_ACTIONS_VARIABLE_'
 

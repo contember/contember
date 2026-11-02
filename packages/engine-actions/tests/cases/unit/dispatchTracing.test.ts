@@ -7,7 +7,7 @@ import { Actions } from '@contember/schema'
 import { emptySchema } from '@contember/schema-utils'
 import { noopTracer, ReadableSpan } from '@contember/telemetry'
 import { EventDispatcher } from '../../../src/dispatch/EventDispatcher.js'
-import { EventsRepository, FetchBatchResult, PersistProcessedResult } from '../../../src/dispatch/EventsRepository.js'
+import { EventsRepository, FetchBatchResult, HoldResult, PersistProcessedResult } from '../../../src/dispatch/EventsRepository.js'
 import { TargetHandlerResolver } from '../../../src/dispatch/TargetHandlerResolver.js'
 import { HandledEvent, InvokeHandler, InvokeHandlerArgs } from '../../../src/dispatch/types.js'
 import { FetcherResponse, WebhookFetcher } from '../../../src/dispatch/WebhookFetcher.js'
@@ -32,10 +32,12 @@ const idleBatch: FetchBatchResult = { ok: false, backoffMs: 100, unknownTargetFa
 class StubEventsRepository extends EventsRepository {
 	public readonly persisted: HandledEvent[][] = []
 	public readonly held: Parameters<EventsRepository['holdForUndefinedVariables']>[1][] = []
+	public resumed = 0
 
 	constructor(
 		private readonly batch: FetchBatchResult,
 		private readonly result: PersistProcessedResult,
+		private readonly holdResult: HoldResult = { held: 5, joined: false },
 	) {
 		super()
 	}
@@ -49,19 +51,25 @@ class StubEventsRepository extends EventsRepository {
 		return this.result
 	}
 
-	override async holdForUndefinedVariables(db: Client, args: Parameters<EventsRepository['holdForUndefinedVariables']>[1]): Promise<number> {
+	override async holdForUndefinedVariables(db: Client, args: Parameters<EventsRepository['holdForUndefinedVariables']>[1]): Promise<HoldResult> {
 		this.held.push(args)
-		return 5
+		return this.holdResult
+	}
+
+	override async resumeHeldForUndefinedVariables(): Promise<number> {
+		this.resumed++
+		return 1
 	}
 }
 
 class StubVariablesManager extends VariablesManager {
-	constructor() {
+	constructor(private readonly variables: VariablesMap[] = [{}]) {
 		super({})
 	}
 
+	/** Answers with the given maps in turn, the last one from then on. */
 	override async fetchVariables(): Promise<VariablesMap> {
-		return {}
+		return (this.variables.length > 1 ? this.variables.shift() : this.variables[0]) ?? {}
 	}
 }
 
@@ -235,4 +243,35 @@ test('dispatch: an undefined variable holds the whole target back with one warni
 	const span = dispatchSpanOf(exporter.spans)
 	expect(span.status.code).toBe('unset')
 	expect(span.attributes['contember.actions.held']).toBe(5)
+	expect(repository.resumed).toBe(0)
+})
+
+const undefinedTokenResolver = () =>
+	new StubTargetHandlerResolver(async () => {
+		throw new UndefinedVariableError(['TOKEN'])
+	})
+
+test('dispatch: an event joining a held target is logged at debug level only', async () => {
+	const loggerHandler = new TestLoggerHandler()
+	const repository = new StubEventsRepository(okBatch, { succeeded: 0, retried: 0, failed: 0 }, { held: 1, joined: true })
+	const dispatcher = new EventDispatcher(repository, new StubVariablesManager(), undefinedTokenResolver(), createRecordingTracer().tracer)
+
+	await processBatch(dispatcher, loggerHandler)
+
+	expect(repository.held).toHaveLength(1)
+	expect(loggerHandler.messages.filter(it => it.level.name !== 'debug')).toStrictEqual([])
+	const joined = loggerHandler.messages.find(it => it.message === 'Webhook target references an undefined variable, its events wait until it is set')
+	expect(joined?.ownAttributes).toStrictEqual({ target: 'test_target', variables: ['TOKEN'], events: 1 })
+})
+
+test('dispatch: a variable set while the batch was being held releases the hold at once', async () => {
+	const repository = new StubEventsRepository(okBatch, { succeeded: 0, retried: 0, failed: 0 })
+	// read once for the request, then again after the hold, by when setVariables has committed
+	const variablesManager = new StubVariablesManager([{}, { TOKEN: 'secret' }])
+	const dispatcher = new EventDispatcher(repository, variablesManager, undefinedTokenResolver(), createRecordingTracer().tracer)
+
+	await processBatch(dispatcher)
+
+	expect(repository.held).toHaveLength(1)
+	expect(repository.resumed).toBe(1)
 })

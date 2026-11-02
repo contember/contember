@@ -26,9 +26,12 @@ States: `created` → `processing` → `succeed` | `retrying` → `failed` | `st
 - Exponential backoff: 5s initial, 2x multiplier, max 10 attempts
 - Pessimistic locking with `FOR NO KEY UPDATE SKIP LOCKED` for concurrent dispatch
 - An undefined variable (`UndefinedVariableError` from `WebhookTargetHandler`) is no delivery attempt: the dispatcher
-  holds every queued event of the target back for 10 minutes (`EventsRepository.holdForUndefinedVariables`, state and
-  `num_retries` unchanged, one deduplicated log entry carrying `undefinedVariables`). `setVariables` releases them at once
-  (`resumeHeldForUndefinedVariables` + `pg_notify`); env and schema changes are picked up at the next re-check.
+  holds the target's due events back for 10 minutes (`EventsRepository.holdForUndefinedVariables`, state and
+  `num_retries` unchanged, one deduplicated log entry carrying `undefinedVariables`). An event arriving meanwhile joins
+  the existing hold (same `visible_at`, logged at debug), so held rows are rewritten and warned about once per interval,
+  not per new event. `setVariables` releases them at once (`resumeHeldForUndefinedVariables` + `pg_notify`); the dispatcher
+  re-reads variables after holding, so a `setVariables` racing the hold still releases it. Env and schema changes are
+  picked up at the next re-check.
 
 ## Webhook Target
 
@@ -94,7 +97,7 @@ level splits on whether an operator has to act: `error` for a terminal state not
 | `warn` | `Webhook target reported failed events` | per-event `failures` in a 2xx response |
 | `warn` | `Webhook target reported failures for event ids outside the batch` | `failures` naming unknown ids |
 | `warn` | `Webhook target returned a malformed response` | body is not the documented JSON shape |
-| `warn` | `Webhook target references an undefined variable, its events wait until it is set` | `EventDispatcher`, once per target per check, names only |
+| `warn` | `Webhook target references an undefined variable, its events wait until it is set` | `EventDispatcher`, once per target per re-check (debug for an event joining the hold), names only |
 | `error` | `Action event failed permanently, no attempts left` | `EventsRepository.persistProcessed` |
 | `error` | `Action event failed permanently, its target is not in the schema` | `EventsRepository.fetchBatch` |
 

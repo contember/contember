@@ -1,6 +1,6 @@
 import { Actions, ActionsPayload } from '@contember/schema'
 import { EventRow, HandledEvent, InvokeHandler, InvokeHandlerArgs } from './types.js'
-import { VariablesMap } from '../model/VariablesManager.js'
+import { resolveVariable, VariablesMap } from '../model/VariablesManager.js'
 import * as Typesafe from '@contember/typesafe'
 import { FetcherResponse, WebhookFetcher } from './WebhookFetcher.js'
 import { Logger } from '@contember/logger'
@@ -322,9 +322,10 @@ export class WebhookTargetHandler implements InvokeHandler<Actions.WebhookTarget
 		const undefinedVariables = new Set<string>()
 		const resolve = (subject: string) =>
 			replaceActionsVariables(subject, name => {
-				const value = Object.hasOwn(variables, name) ? variables[name] : ''
-				if (value === '') {
+				const value = resolveVariable(variables, name)
+				if (value === undefined) {
 					undefinedVariables.add(name)
+					return ''
 				}
 				return value
 			})

@@ -11,6 +11,8 @@ const DEFAULT_MAX_ATTEMPTS = 10
 const DEFAULT_BATCH_SIZE = 1
 /** How long a target with an undefined variable is held back before it is checked again without a variable change. */
 const UNDEFINED_VARIABLE_RECHECK_MS = 1_000 * 60 * 10 // 10 minutes
+/** The last log entry of an event held by {@link EventsRepository.holdForUndefinedVariables}. */
+const heldMarkerCondition = `log -> -1 -> 'undefinedVariables' IS NOT NULL`
 
 export class EventsRepository {
 	public async fetchBatch(actions: Actions.Schema, db: Client, logger: Logger): Promise<FetchBatchResult> {
@@ -109,20 +111,35 @@ export class EventsRepository {
 	}
 
 	/**
-	 * Holds back every queued event of a target that interpolates an undefined variable, the given batch included,
-	 * without spending an attempt. {@link resumeHeldForUndefinedVariables} releases them once variables change;
-	 * otherwise they are checked again after a while. Returns how many events wait.
+	 * Holds back the due events of a target that interpolates an undefined variable, the given batch included,
+	 * without spending an attempt. Events arriving while the target is held join that hold, so a target is checked
+	 * again once per interval and each check rewrites only what came due. {@link resumeHeldForUndefinedVariables}
+	 * releases them all once variables change.
 	 */
 	public async holdForUndefinedVariables(db: Client, { target, batch, variables }: {
 		target: string
 		batch: string[]
 		variables: readonly string[]
-	}): Promise<number> {
-		const until = new Date(Date.now() + UNDEFINED_VARIABLE_RECHECK_MS)
+	}): Promise<HoldResult> {
+		const now = new Date()
 		const entry = JSON.stringify({ ok: false, errorMessage: `Undefined variable ${variables.join(', ')}`, undefinedVariables: variables })
 		return await db.transaction(async trx => {
+			const current = await SelectBuilder.create<{ visible_at: Date }>()
+				.from('actions_event')
+				.select('visible_at')
+				.where(it =>
+					it
+						.in('state', ['created', 'retrying'])
+						.compare('target', Operator.eq, target)
+						.compare('visible_at', Operator.gt, now)
+						.raw(heldMarkerCondition)
+				)
+				.orderBy('visible_at')
+				.limit(1)
+				.getResult(trx)
+			const until = current[0]?.visible_at ?? new Date(now.getTime() + UNDEFINED_VARIABLE_RECHECK_MS)
 			await this.requeue(trx, batch, until)
-			return await UpdateBuilder.create()
+			const held = await UpdateBuilder.create()
 				.table('actions_event')
 				.values<EventRow>({
 					visible_at: until,
@@ -133,9 +150,10 @@ export class EventsRepository {
 					it
 						.in('state', ['created', 'retrying'])
 						.compare('target', Operator.eq, target)
-						.compare('visible_at', Operator.lte, until)
+						.or(it => it.in('id', batch).compare('visible_at', Operator.lte, now))
 				)
 				.execute(trx)
+			return { held, joined: current.length > 0 }
 		})
 	}
 
@@ -151,7 +169,7 @@ export class EventsRepository {
 				it
 					.in('state', ['created', 'retrying'])
 					.compare('visible_at', Operator.gt, now)
-					.raw(`log -> -1 -> 'undefinedVariables' IS NOT NULL`)
+					.raw(heldMarkerCondition)
 			)
 			.execute(db)
 	}
@@ -267,6 +285,13 @@ export class EventsRepository {
 export type FetchBatchResult =
 	| { ok: true; events: EventRow[]; target: Actions.AnyTarget; unknownTargetFailed: number }
 	| { ok: false; backoffMs?: number; unknownTargetFailed: number }
+
+export type HoldResult = {
+	/** Events held by this call. */
+	held: number
+	/** The target was already held, these events joined that hold. */
+	joined: boolean
+}
 
 export type PersistProcessedResult = {
 	/** Events delivered successfully (terminal). */

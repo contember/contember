@@ -4,6 +4,7 @@ import { ColumnValueGetter, SelectNestedData, SelectNestedDefaultValue, SelectRo
 import { SelectBuilder } from '@contember/database'
 import { Mapper } from '../Mapper.js'
 import { FieldNode, ObjectNode } from '../../inputProcessing/index.js'
+import { PredicateStateView } from '../../acl/index.js'
 
 export interface SelectExecutionHandler<
 	FieldArgs = unknown,
@@ -28,7 +29,7 @@ export type SelectExecutionHandlerContext<
 		 * must come from the permission set the query path implies (see `aclScopeFromPath`), since that is the
 		 * set its definition is resolved against.
 		 */
-		addPredicate: (predicate: Acl.Predicate) => (row: SelectRow) => boolean
+		addPredicate: (predicate: Acl.Predicate, view?: PredicateStateView) => (row: SelectRow) => boolean
 		addColumn: (args: {
 			predicate?: Acl.Predicate
 			query?: (qb: SelectBuilder<SelectBuilder.Result>) => SelectBuilder<SelectBuilder.Result>

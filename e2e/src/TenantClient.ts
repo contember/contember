@@ -129,6 +129,10 @@ export class TenantClient {
 	}
 
 	addProjectMember = async (identityId: string, projectSlug: string, membership: Acl.Membership = { role: 'admin', variables: [] }) => {
+		await this.addProjectMemberships(identityId, projectSlug, [membership])
+	}
+
+	addProjectMemberships = async (identityId: string, projectSlug: string, memberships: readonly Acl.Membership[]) => {
 		const response = await this.send(
 			TenantApi.mutation$
 				.addProjectMember(TenantApi
@@ -137,7 +141,7 @@ export class TenantClient {
 			{
 				identityId,
 				projectSlug,
-				memberships: [membership],
+				memberships,
 			},
 		)
 		expect(response).toMatchObject({

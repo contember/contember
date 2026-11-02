@@ -27,6 +27,10 @@ export class VariableInjector {
 				}
 				return value
 			},
+			handleStateMarker: ({ entity, marker, path }) => {
+				// PredicateFactory resolves markers before injecting, so one reaching here is misplaced or invalid
+				throw new Error(`${entity.name}: ACL predicate has an unresolvable "${marker}" marker at "${[...path, marker].join('.')}".`)
+			},
 		})
 		if (entityCache) {
 			entityCache.set(entity.name, resultWhere)

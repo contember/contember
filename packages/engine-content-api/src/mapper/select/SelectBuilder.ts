@@ -11,7 +11,7 @@ import { MetaHandler } from './handlers/index.js'
 import { Mapper } from '../Mapper.js'
 import { FieldNode, ObjectNode } from '../../inputProcessing/index.js'
 import { assertNever } from '../../utils/index.js'
-import { PredicateFactory } from '../../acl/index.js'
+import { PredicateFactory, PredicateStateView } from '../../acl/index.js'
 
 export class SelectBuilder {
 	private resolver: (value: SelectRow[]) => void = () => {
@@ -86,16 +86,20 @@ export class SelectBuilder {
 			input = input.withField(new FieldNode(entity.primary, entity.primary, {}))
 		}
 
-		const fetchedPredicates = new Set()
-		const addPredicate = (predicate: Acl.Predicate): ColumnValueGetter<boolean> => {
+		const fetchedPredicates = new Set<string>()
+		const addPredicate = (predicate: Acl.Predicate, view: PredicateStateView = 'single'): ColumnValueGetter<boolean> => {
 			if (typeof predicate === 'boolean') {
 				return () => predicate
 			}
-			const predicatePath = path.for('__predicate').for(predicate)
+			// a marker-free predicate reads the same in both views, so it shares one column
+			const oldStateView = view === 'old' && this.predicateFactory.hasStateMarkers(entity, predicate, this.relationPath)
+			const predicatePath = path.for(oldStateView ? '__predicate_old' : '__predicate').for(predicate)
 
-			if (!fetchedPredicates.has(predicate)) {
+			if (!fetchedPredicates.has(predicatePath.alias)) {
 				const primaryPredicate = this.predicateFactory.createReadPredicate(entity, undefined, this.relationPath)
-				const fieldPredicate = this.predicateFactory.buildReadPredicates(entity, [predicate], this.relationPath)
+				const fieldPredicate = oldStateView
+					? this.predicateFactory.buildUpdatablePredicates(entity, [predicate], this.relationPath)
+					: this.predicateFactory.buildReadPredicates(entity, [predicate], this.relationPath)
 
 				const { qb, condition } = this.whereBuilder.buildConditionLiteral(
 					this.qb,
@@ -105,7 +109,7 @@ export class SelectBuilder {
 					{ relationPath: this.relationPath, evaluatedPredicates: [primaryPredicate] },
 				)
 				this.qb = qb.select(condition, predicatePath.alias)
-				fetchedPredicates.add(predicate)
+				fetchedPredicates.add(predicatePath.alias)
 			}
 			return row => row[predicatePath.alias] === true
 		}

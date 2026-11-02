@@ -46,10 +46,13 @@ export const EditorInlineToolbar = memo(({ children }: EditorInlineToolbarProps)
 			toolbar.style.left = `${left}px`
 
 			toolbar.style.maxWidth = `${document.documentElement.clientWidth}px`
+			toolbar.style.visibility = ''
 		} else {
 			toolbar.style.top = '-1000vh'
 			toolbar.style.left = '-1000vw'
 			toolbar.style.maxWidth = 'unset'
+			// Parked off-screen it must not be focusable: a popover closing from the toolbar returns focus to its trigger and would scroll the editor to it.
+			toolbar.style.visibility = 'hidden'
 		}
 	}, [editor, selection])
 

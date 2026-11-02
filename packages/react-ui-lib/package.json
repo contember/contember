@@ -34,6 +34,9 @@
     "url": "https://github.com/contember/interface.git",
     "directory": "packages/react-ui-lib"
   },
+  "devDependencies": {
+    "@testing-library/react": "catalog:"
+  },
   "dependencies": {
     "@contember/interface": "workspace:*",
     "@contember/react-block-repeater": "workspace:*",

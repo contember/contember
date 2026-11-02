@@ -223,7 +223,7 @@ test('nested _meta resolves readable against the through set and updatable again
 					select "root_"."post_id" as "__grouping_key",
 					       "root_"."id" as "root_id",
 					       "root_"."locale" = ? as "root___predicate_throughReadable",
-					       "root_"."visible" = ? as "root___predicate_rootUpdatable__rootPerms"
+					       "root_"."visible" = ? as "root___predicateRoot_rootUpdatable"
 					from "public"."post_locale" as "root_" where "root_"."post_id" in (?)`,
 				parameters: ['cs', true, testUuid(1)],
 				response: {
@@ -232,7 +232,7 @@ test('nested _meta resolves readable against the through set and updatable again
 							__grouping_key: testUuid(1),
 							root_id: testUuid(2),
 							root___predicate_throughReadable: true,
-							root___predicate_rootUpdatable__rootPerms: false,
+							root___predicateRoot_rootUpdatable: false,
 						},
 					],
 				},
@@ -251,3 +251,95 @@ test('nested _meta resolves readable against the through set and updatable again
 		},
 	})
 })
+
+// The value mask and `readable` use the read predicate from the through set; `updatable` uses the update predicate
+// from the root set. Each must get its own column whatever the names are and whichever field is selected first.
+const rootOnlyColumnCases: { name: string; readPredicate: string; allPermissions: Acl.Permissions }[] = [
+	{
+		name: 'the same name with a different definition in each set',
+		readPredicate: 'check',
+		allPermissions: {
+			Post: postPermissions,
+			PostLocale: {
+				predicates: { check: { locale: { eq: 'cs' } } },
+				operations: {
+					read: { id: true, post: true, title: 'check' },
+					update: { id: true, post: true, title: 'check' },
+				},
+			},
+		},
+	},
+	{
+		name: 'a read predicate name that ends like a root-only key',
+		readPredicate: 'check__rootPerms',
+		allPermissions: {
+			Post: postPermissions,
+			PostLocale: {
+				predicates: { check__rootPerms: { locale: { eq: 'cs' } } },
+				operations: {
+					read: { id: true, post: true, title: 'check__rootPerms' },
+					update: { id: true, post: true, title: 'check__rootPerms' },
+				},
+			},
+		},
+	},
+]
+
+const rootOnlyColumnPermissions: Acl.Permissions = {
+	Post: postPermissions,
+	PostLocale: {
+		predicates: { check: { visible: { eq: true } } },
+		operations: {
+			read: { id: true, post: true, title: false },
+			update: { id: true, post: true, title: 'check' },
+		},
+	},
+}
+
+for (const { name, readPredicate, allPermissions } of rootOnlyColumnCases) {
+	for (const metaFirst of [false, true]) {
+		test(`nested root-only _meta.updatable gets its own column: ${name}, ${metaFirst ? '_meta' : 'value'} selected first`, async () => {
+			const readAlias = `root___predicate_${readPredicate}`
+			const updateAlias = 'root___predicateRoot_check'
+			const readColumn = `"root_"."locale" = ? as "${readAlias}"`
+			const updateColumn = `"root_"."visible" = ? as "${updateAlias}"`
+			const columns = metaFirst
+				? [readColumn, updateColumn, '"root_"."title" as "root_title"']
+				: [readColumn, '"root_"."title" as "root_title"', updateColumn]
+			const meta = '_meta { title { readable updatable } }'
+			await execute({
+				schema,
+				permissions: rootOnlyColumnPermissions,
+				allPermissions,
+				query: `query { listPost { locales { id ${metaFirst ? `${meta} title` : `title ${meta}`} } } }`,
+				executes: [
+					listPostQuery,
+					{
+						sql: SQL`
+							select "root_"."post_id" as "__grouping_key", "root_"."id" as "root_id", ${columns.join(', ')}
+							from "public"."post_locale" as "root_" where "root_"."post_id" in (?)`,
+						parameters: ['cs', true, testUuid(1)],
+						response: {
+							rows: [
+								{ __grouping_key: testUuid(1), root_id: testUuid(2), root_title: 'foo', [readAlias]: true, [updateAlias]: false },
+								{ __grouping_key: testUuid(1), root_id: testUuid(3), root_title: 'bar', [readAlias]: false, [updateAlias]: true },
+							],
+						},
+					},
+				],
+				return: {
+					data: {
+						listPost: [
+							{
+								locales: [
+									{ id: testUuid(2), title: 'foo', _meta: { title: { readable: true, updatable: false } } },
+									{ id: testUuid(3), title: null, _meta: { title: { readable: false, updatable: true } } },
+								],
+							},
+						],
+					},
+				},
+			})
+		})
+	}
+}

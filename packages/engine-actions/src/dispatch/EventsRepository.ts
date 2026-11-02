@@ -9,6 +9,8 @@ const ACK_TIMEOUT_MS = 1_000 * 60 * 10 // 10 minutes
 const DEFAULT_REPEAT_INTERVAL_MS = 5_000 // 5 seconds
 const DEFAULT_MAX_ATTEMPTS = 10
 const DEFAULT_BATCH_SIZE = 1
+/** How long a target with an undefined variable is held back before it is checked again without a variable change. */
+const UNDEFINED_VARIABLE_RECHECK_MS = 1_000 * 60 * 10 // 10 minutes
 
 export class EventsRepository {
 	public async fetchBatch(actions: Actions.Schema, db: Client, logger: Logger): Promise<FetchBatchResult> {
@@ -106,7 +108,55 @@ export class EventsRepository {
 		})
 	}
 
-	public async requeue(db: Client, events: string[]): Promise<void> {
+	/**
+	 * Holds back every queued event of a target that interpolates an undefined variable, the given batch included,
+	 * without spending an attempt. {@link resumeHeldForUndefinedVariables} releases them once variables change;
+	 * otherwise they are checked again after a while. Returns how many events wait.
+	 */
+	public async holdForUndefinedVariables(db: Client, { target, batch, variables }: {
+		target: string
+		batch: string[]
+		variables: readonly string[]
+	}): Promise<number> {
+		const until = new Date(Date.now() + UNDEFINED_VARIABLE_RECHECK_MS)
+		const entry = JSON.stringify({ ok: false, errorMessage: `Undefined variable ${variables.join(', ')}`, undefinedVariables: variables })
+		return await db.transaction(async trx => {
+			await this.requeue(trx, batch, until)
+			return await UpdateBuilder.create()
+				.table('actions_event')
+				.values<EventRow>({
+					visible_at: until,
+					// a re-check that finds the same variables missing does not grow the log
+					log: it => it.raw('CASE WHEN log -> -1 = ?::jsonb THEN log ELSE log || ?::jsonb END', entry, entry),
+				})
+				.where(it =>
+					it
+						.in('state', ['created', 'retrying'])
+						.compare('target', Operator.eq, target)
+						.compare('visible_at', Operator.lte, until)
+				)
+				.execute(trx)
+		})
+	}
+
+	/** Makes events held by {@link holdForUndefinedVariables} due now. Returns how many were released. */
+	public async resumeHeldForUndefinedVariables(db: Client): Promise<number> {
+		const now = new Date()
+		return await UpdateBuilder.create()
+			.table('actions_event')
+			.values<EventRow>({
+				visible_at: now,
+			})
+			.where(it =>
+				it
+					.in('state', ['created', 'retrying'])
+					.compare('visible_at', Operator.gt, now)
+					.raw(`log -> -1 -> 'undefinedVariables' IS NOT NULL`)
+			)
+			.execute(db)
+	}
+
+	public async requeue(db: Client, events: string[], visibleAt: Date = new Date()): Promise<void> {
 		await UpdateBuilder.create()
 			.table('actions_event')
 			.values<EventRow>({
@@ -123,7 +173,7 @@ export class EventsRepository {
 						'retrying',
 					),
 				last_state_change: new Date(),
-				visible_at: new Date(),
+				visible_at: visibleAt,
 			})
 			.where(it => it.in('id', events))
 			.execute(db)

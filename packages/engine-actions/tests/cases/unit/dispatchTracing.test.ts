@@ -11,7 +11,7 @@ import { EventsRepository, FetchBatchResult, PersistProcessedResult } from '../.
 import { TargetHandlerResolver } from '../../../src/dispatch/TargetHandlerResolver.js'
 import { HandledEvent, InvokeHandler, InvokeHandlerArgs } from '../../../src/dispatch/types.js'
 import { FetcherResponse, WebhookFetcher } from '../../../src/dispatch/WebhookFetcher.js'
-import { WebhookTargetHandler } from '../../../src/dispatch/WebhookTargetHandler.js'
+import { UndefinedVariableError, WebhookTargetHandler } from '../../../src/dispatch/WebhookTargetHandler.js'
 import { VariablesManager, VariablesMap } from '../../../src/model/VariablesManager.js'
 import { createTestEvent } from '../../src/event.js'
 import { createRecordingTracer } from '../../src/tracer.js'
@@ -31,6 +31,7 @@ const idleBatch: FetchBatchResult = { ok: false, backoffMs: 100, unknownTargetFa
 
 class StubEventsRepository extends EventsRepository {
 	public readonly persisted: HandledEvent[][] = []
+	public readonly held: Parameters<EventsRepository['holdForUndefinedVariables']>[1][] = []
 
 	constructor(
 		private readonly batch: FetchBatchResult,
@@ -46,6 +47,11 @@ class StubEventsRepository extends EventsRepository {
 	override async persistProcessed(db: Client, handled: HandledEvent[]): Promise<PersistProcessedResult> {
 		this.persisted.push(handled)
 		return this.result
+	}
+
+	override async holdForUndefinedVariables(db: Client, args: Parameters<EventsRepository['holdForUndefinedVariables']>[1]): Promise<number> {
+		this.held.push(args)
+		return 5
 	}
 }
 
@@ -106,11 +112,11 @@ const contentSchemaResolver = createMock<ContentSchemaResolver>({
 	getSchema: async () => ({ schema: emptySchema, meta: {} }),
 })
 
-const processBatch = async (dispatcher: EventDispatcher) =>
+const processBatch = async (dispatcher: EventDispatcher, loggerHandler = new TestLoggerHandler()) =>
 	await dispatcher.processBatch({
 		db: createDatabaseContext(),
 		contentSchemaResolver,
-		logger: createLogger(new TestLoggerHandler()),
+		logger: createLogger(loggerHandler),
 		project: { slug: 'blog' },
 	})
 
@@ -201,4 +207,32 @@ test('dispatch: the webhook span nests under the dispatch span', async () => {
 	expect(webhookSpan?.parentSpanId).toBe(dispatchSpan.context.spanId)
 	expect(webhookSpan?.context.traceId).toBe(dispatchSpan.context.traceId)
 	expect(requests[0].get('traceparent')).toContain(dispatchSpan.context.traceId)
+})
+
+test('dispatch: an undefined variable holds the whole target back with one warning and no spent attempt', async () => {
+	const { exporter, tracer, flush } = createRecordingTracer()
+	const loggerHandler = new TestLoggerHandler()
+	const repository = new StubEventsRepository(okBatch, { succeeded: 0, retried: 0, failed: 0 })
+	const resolver = new StubTargetHandlerResolver(async () => {
+		throw new UndefinedVariableError(['TOKEN'])
+	})
+	const dispatcher = new EventDispatcher(repository, new StubVariablesManager(), resolver, tracer)
+
+	const result = await processBatch(dispatcher, loggerHandler)
+	await flush()
+
+	expect(result).toStrictEqual({ succeeded: 0, retried: 0, failedAfterAttempt: 0, failedUnknownTarget: 0, backoffMs: 0 })
+	expect(repository.persisted).toStrictEqual([])
+	expect(repository.held).toStrictEqual([{ target: 'test_target', batch: events.map(it => it.id), variables: ['TOKEN'] }])
+	const reported = loggerHandler.messages.filter(it => it.level.name !== 'debug')
+	expect(reported).toHaveLength(1)
+	const [warning] = reported
+	expect(warning.level.name).toBe('warn')
+	expect(warning.message).toBe('Webhook target references an undefined variable, its events wait until it is set')
+	expect(warning.loggerAttributes.project).toBe('blog')
+	// exact match: the variable names only, never a value
+	expect(warning.ownAttributes).toStrictEqual({ target: 'test_target', variables: ['TOKEN'], events: 5 })
+	const span = dispatchSpanOf(exporter.spans)
+	expect(span.status.code).toBe('unset')
+	expect(span.attributes['contember.actions.held']).toBe(5)
 })

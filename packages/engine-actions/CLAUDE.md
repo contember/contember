@@ -25,6 +25,10 @@ States: `created` → `processing` → `succeed` | `retrying` → `failed` | `st
 - 10-minute ACK timeout on processing
 - Exponential backoff: 5s initial, 2x multiplier, max 10 attempts
 - Pessimistic locking with `FOR NO KEY UPDATE SKIP LOCKED` for concurrent dispatch
+- An undefined variable (`UndefinedVariableError` from `WebhookTargetHandler`) is no delivery attempt: the dispatcher
+  holds every queued event of the target back for 10 minutes (`EventsRepository.holdForUndefinedVariables`, state and
+  `num_retries` unchanged, one deduplicated log entry carrying `undefinedVariables`). `setVariables` releases them at once
+  (`resumeHeldForUndefinedVariables` + `pg_notify`); env and schema changes are picked up at the next re-check.
 
 ## Webhook Target
 
@@ -90,6 +94,7 @@ level splits on whether an operator has to act: `error` for a terminal state not
 | `warn` | `Webhook target reported failed events` | per-event `failures` in a 2xx response |
 | `warn` | `Webhook target reported failures for event ids outside the batch` | `failures` naming unknown ids |
 | `warn` | `Webhook target returned a malformed response` | body is not the documented JSON shape |
+| `warn` | `Webhook target references an undefined variable, its events wait until it is set` | `EventDispatcher`, once per target per check, names only |
 | `error` | `Action event failed permanently, no attempts left` | `EventsRepository.persistProcessed` |
 | `error` | `Action event failed permanently, its target is not in the schema` | `EventsRepository.fetchBatch` |
 
@@ -102,7 +107,7 @@ later edit cannot quietly add one of these back.
 ### Traces
 
 When telemetry is enabled (`telemetry.traces` in server config), each processed batch runs as an
-`actions.dispatch` consumer span (project, target name, batch id, event count, result counts) with a
+`actions.dispatch` consumer span (project, target name, batch id, event count, result counts, `held` when an undefined variable holds the target back) with a
 `webhook` client span around the HTTP call — idle queue polls emit no spans. The outgoing webhook
 request carries a W3C `traceparent` header pointing at the webhook span (`propagateToWebhooks`
 config, default on; a target-configured header of any letter case wins). The same credential rule

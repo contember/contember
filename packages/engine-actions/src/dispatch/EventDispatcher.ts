@@ -6,6 +6,7 @@ import { ContentSchemaResolver } from '@contember/engine-http'
 import { DatabaseContext } from '@contember/engine-system-api'
 import { VariablesManager } from '../model/VariablesManager.js'
 import { Tracer } from '@contember/telemetry'
+import { UndefinedVariableError } from './WebhookTargetHandler.js'
 
 type ProcessBatchArgs = {
 	db: DatabaseContext
@@ -38,7 +39,7 @@ export class EventDispatcher {
 	async processBatch({ db, contentSchemaResolver, logger, project }: ProcessBatchArgs): Promise<ProcessBatchResult> {
 		const schema = (await contentSchemaResolver.getSchema({ db, normalize: true })).schema
 		const batchId = Math.random().toString().substring(2)
-		const batchLogger = logger.child({ loc: 'Actions.EventDispatcher', batchId })
+		const batchLogger = logger.child({ loc: 'Actions.EventDispatcher', project: project.slug, batchId })
 		const batch = await this.eventsRepository.fetchBatch(schema.actions, db.client, batchLogger)
 		if (!batch.ok) {
 			batchLogger.debug('Nothing to process', {
@@ -76,9 +77,30 @@ export class EventDispatcher {
 					backoffMs: 0,
 				}
 			} catch (e) {
+				if (e instanceof UndefinedVariableError) {
+					// Every queued event of the target waits, so one line covers them all instead of one per attempt.
+					const held = await this.eventsRepository.holdForUndefinedVariables(db.client, {
+						target: target.name,
+						batch: events.map(it => it.id),
+						variables: e.variables,
+					})
+					batchLogger.warn('Webhook target references an undefined variable, its events wait until it is set', {
+						target: target.name,
+						variables: e.variables,
+						events: held,
+					})
+					span.setAttribute('contember.actions.held', held)
+					return {
+						succeeded: 0,
+						retried: 0,
+						failedAfterAttempt: 0,
+						failedUnknownTarget: batch.unknownTargetFailed,
+						backoffMs: 0,
+					}
+				}
 				span.recordException(e)
 				span.setStatus('error')
-				logger.error(e, { loc: 'EventDispatcher', batchId })
+				batchLogger.error(e)
 				const failedEvents = events.map((it): HandledEvent => ({
 					row: it,
 					result: { ok: false, errorMessage: `Internal error` },

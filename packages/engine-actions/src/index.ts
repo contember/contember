@@ -107,7 +107,7 @@ export default class ActionsPlugin implements Plugin {
 						const eventsQueryResolver = new EventsQueryResolver()
 						const processBatchMutationResolver = new ProcessBatchMutationResolver(actions_eventDispatcher)
 						const variablesQueryResolver = new VariablesQueryResolver(actions_variableManager)
-						const setVariablesMutationResolver = new SetVariablesMutationResolver(actions_variableManager)
+						const setVariablesMutationResolver = new SetVariablesMutationResolver(actions_variableManager, actions_eventRepository)
 						const resolversFactory = new ResolversFactory(
 							eventsQueryResolver,
 							processBatchMutationResolver,

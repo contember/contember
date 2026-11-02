@@ -28,7 +28,8 @@ const createTestApplication = () => {
 		shutdown: async () => {},
 	}
 	const tracer = createTracer({ processor })
-	const logger = createLogger(new TestLoggerHandler())
+	const loggerHandler = new TestLoggerHandler()
+	const logger = createLogger(loggerHandler)
 	const authenticator = createMock<Authenticator>({
 		authenticate: async ({ timer }) => await timer('Auth', async () => new VerifyResult('identity', 'api-key', ['member'], null)),
 	})
@@ -68,7 +69,7 @@ const createTestApplication = () => {
 		port: 0,
 		telemetry: { traces: { acceptIncoming: 'all', traceIdResponseHeader: true } },
 	})
-	return { application: new Application(projectGroupResolver, config, false, undefined, logger, tracer), spans }
+	return { application: new Application(projectGroupResolver, config, false, undefined, logger, tracer), spans, loggerHandler }
 }
 
 const listen = async (application: Application): Promise<{ running: RunningApplication; httpUrl: string; wsUrl: string }> => {
@@ -120,6 +121,22 @@ test('records a matched HTTP request with its context and excludes an unmatched 
 		const spanCount = spans.length
 		expect((await fetch(`${httpUrl}/missing`)).status).toBe(404)
 		expect(spans).toHaveLength(spanCount)
+	} finally {
+		await running.close()
+	}
+})
+
+test('the request logger names the project group and the project, so error reporting can tag both', async () => {
+	const { application, loggerHandler } = createTestApplication()
+	application.addRoute('actions', '/actions/:projectSlug', ({ logger }) => {
+		logger.warn('from the controller')
+		return new HttpResponse(200, 'ok')
+	})
+	const { running, httpUrl } = await listen(application)
+	try {
+		expect((await fetch(`${httpUrl}/actions/article`)).status).toBe(200)
+		const entry = loggerHandler.messages.find(it => it.message === 'from the controller')
+		expect(entry?.loggerAttributes).toMatchObject({ projectGroup: 'group', project: 'article' })
 	} finally {
 		await running.close()
 	}

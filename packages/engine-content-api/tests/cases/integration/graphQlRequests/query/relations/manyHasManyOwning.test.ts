@@ -24,10 +24,10 @@ test('Posts with filtered tags', async () => {
 		executes: [
 			{
 				sql: SQL`select "root_"."id" as "root_id",
-					         "root_"."id" as "root_id"
+					         "root_"."id" as "root_$key_id"
 				         from "public"."post" as "root_"`,
 				response: {
-					rows: [{ root_id: testUuid(1) }, { root_id: testUuid(2) }],
+					rows: [{ root_id: testUuid(1), root_$key_id: testUuid(1) }, { root_id: testUuid(2), root_$key_id: testUuid(2) }],
 				},
 			},
 			{
@@ -107,10 +107,10 @@ test('Posts with paginated tags (many has many owning)', async () => {
 		executes: [
 			{
 				sql: SQL`select "root_"."id" as "root_id",
-					         "root_"."id" as "root_id"
+					         "root_"."id" as "root_$key_id"
 				         from "public"."post" as "root_"`,
 				response: {
-					rows: [{ root_id: testUuid(1) }, { root_id: testUuid(2) }],
+					rows: [{ root_id: testUuid(1), root_$key_id: testUuid(1) }, { root_id: testUuid(2), root_$key_id: testUuid(2) }],
 				},
 			},
 			{

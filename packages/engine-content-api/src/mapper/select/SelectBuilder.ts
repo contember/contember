@@ -91,7 +91,7 @@ export class SelectBuilder {
 			if (typeof predicate === 'boolean') {
 				return () => predicate
 			}
-			const predicatePath = path.for('__predicate').for(predicate)
+			const predicatePath = path.forInternal('predicate').for(predicate)
 
 			if (!fetchedPredicates.has(predicate)) {
 				const relationContext = this.relationPath[this.relationPath.length - 1]
@@ -137,16 +137,17 @@ export class SelectBuilder {
 				mapper,
 				relationPath: this.relationPath,
 				addData: async ({ field, dataProvider, defaultValue, predicate }) => {
+					const parentValuePath = path.forInternal('key').for(field)
 					if (predicate === false) {
-						this.hydrator.addPromise(fieldPath, path.for(field), Promise.resolve({}), defaultValue ?? null)
+						this.hydrator.addPromise(fieldPath, parentValuePath, Promise.resolve({}), defaultValue ?? null)
 						return
 					}
 					const predicateGetter = predicate !== undefined && predicate !== true ? addPredicate(predicate) : null
 					const columnName = getColumnName(this.schema, entity, field)
-					let ids = await this.getColumnValues(path.for(field), columnName, predicateGetter)
+					let ids = await this.getColumnValues(path, parentValuePath, columnName, predicateGetter)
 
 					const data = ids.length > 0 ? dataProvider(ids) : Promise.resolve({})
-					this.hydrator.addPromise(fieldPath, path.for(field), data, defaultValue ?? null)
+					this.hydrator.addPromise(fieldPath, parentValuePath, data, defaultValue ?? null)
 				},
 				addColumn: ({ path = fieldPath, predicate, query, valueGetter }) => {
 					if (predicate === false) {
@@ -192,8 +193,13 @@ export class SelectBuilder {
 		}
 	}
 
-	private async getColumnValues(columnPath: Path, columnName: string, predicateGetter: null | ColumnValueGetter<boolean>): Promise<Input.PrimaryValue[]> {
-		this.qb = this.qb.select([columnPath.back().alias, columnName], columnPath.alias)
+	private async getColumnValues(
+		tablePath: Path,
+		columnPath: Path,
+		columnName: string,
+		predicateGetter: null | ColumnValueGetter<boolean>,
+	): Promise<Input.PrimaryValue[]> {
+		this.qb = this.qb.select([tablePath.alias, columnName], columnPath.alias)
 		const rows = await this.rows
 		const filteredRows = predicateGetter === null ? rows : rows.filter(predicateGetter)
 		const columnAlias = columnPath.alias

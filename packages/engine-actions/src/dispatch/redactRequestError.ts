@@ -18,7 +18,9 @@ const urlParts = (value: string): string[] => {
 	if (url.protocol !== 'http:' && url.protocol !== 'https:') {
 		return []
 	}
-	return [url.pathname + url.search, url.pathname, url.search, url.search.slice(1)].filter(it => it.length > 1)
+	// the query without its ? only as key=value pairs, so a bare-word query does not redact that word everywhere
+	const query = url.search.includes('=') ? [url.search.slice(1)] : []
+	return [url.pathname + url.search, url.pathname, url.search, ...query, ...url.searchParams.values()].filter(it => it.length > 1)
 }
 
 const percentEncode = (value: string): string[] => {
@@ -39,7 +41,7 @@ const variantsOf = (secret: string): string[] => {
 /**
  * Removes what may carry a credential from a message about a failed webhook request, or from a target's error response:
  * every occurrence of the given secrets, also with surrounding HTTP whitespace stripped, percent-encoded or with escaped slashes,
- * the path and query of a secret URL on their own, and then the userinfo, path, query and fragment of every URL still quoted.
+ * the path, query and query values of a secret URL on their own, and then the userinfo, path, query and fragment of every URL still quoted.
  * The scheme, host and port of such a URL stay for diagnostics.
  */
 export const redactRequestError = (message: string, secrets: Iterable<string>): string => {

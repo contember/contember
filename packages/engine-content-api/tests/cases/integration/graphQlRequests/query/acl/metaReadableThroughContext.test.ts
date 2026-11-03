@@ -91,12 +91,12 @@ test('_meta.readable and _meta.updatable follow the nested permission set throug
 			}`,
 		executes: [
 			{
-				sql: SQL`select "root_"."id" as "root_id", "root_"."id" as "root_id" from "public"."post" as "root_"`,
+				sql: SQL`select "root_"."id" as "root_$key_id", "root_"."id" as "root_id" from "public"."post" as "root_"`,
 				parameters: [],
 				response: {
 					rows: [
-						{ root_id: testUuid(1) },
-						{ root_id: testUuid(2) },
+						{ root_id: testUuid(1), 'root_$key_id': testUuid(1) },
+						{ root_id: testUuid(2), 'root_$key_id': testUuid(2) },
 					],
 				},
 			},
@@ -196,12 +196,12 @@ test('_meta.readable compiles a through-only cell predicate against the nested p
 		`,
 		executes: [
 			{
-				sql: SQL`select "root_"."id" as "root_id", "root_"."id" as "root_id" from "public"."post" as "root_"`,
+				sql: SQL`select "root_"."id" as "root_$key_id", "root_"."id" as "root_id" from "public"."post" as "root_"`,
 				parameters: [],
 				response: {
 					rows: [
-						{ root_id: testUuid(1) },
-						{ root_id: testUuid(2) },
+						{ root_id: testUuid(1), 'root_$key_id': testUuid(1) },
+						{ root_id: testUuid(2), 'root_$key_id': testUuid(2) },
 					],
 				},
 			},
@@ -209,14 +209,14 @@ test('_meta.readable compiles a through-only cell predicate against the nested p
 				sql: SQL`
 					select "root_"."post_id" as "__grouping_key",
 					       "root_"."id" as "root_id",
-					       "root_"."visible" = ? as "root___predicate_titleVisible"
+					       "root_"."visible" = ? as "root_$predicate_titleVisible"
 					from "public"."post_locale" as "root_" where "root_"."post_id" in (?, ?)
 				`,
 				parameters: [true, testUuid(1), testUuid(2)],
 				response: {
 					rows: [
-						{ __grouping_key: testUuid(1), root_id: testUuid(3), root___predicate_titleVisible: true },
-						{ __grouping_key: testUuid(2), root_id: testUuid(4), root___predicate_titleVisible: false },
+						{ __grouping_key: testUuid(1), root_id: testUuid(3), 'root_$predicate_titleVisible': true },
+						{ __grouping_key: testUuid(2), root_id: testUuid(4), 'root_$predicate_titleVisible': false },
 					],
 				},
 			},
@@ -277,12 +277,12 @@ test('nested _meta.updatable resolves its predicate against the nested permissio
 		`,
 		executes: [
 			{
-				sql: SQL`select "root_"."id" as "root_id", "root_"."id" as "root_id" from "public"."post" as "root_"`,
+				sql: SQL`select "root_"."id" as "root_$key_id", "root_"."id" as "root_id" from "public"."post" as "root_"`,
 				parameters: [],
 				response: {
 					rows: [
-						{ root_id: testUuid(1) },
-						{ root_id: testUuid(2) },
+						{ root_id: testUuid(1), 'root_$key_id': testUuid(1) },
+						{ root_id: testUuid(2), 'root_$key_id': testUuid(2) },
 					],
 				},
 			},
@@ -291,14 +291,14 @@ test('nested _meta.updatable resolves its predicate against the nested permissio
 				sql: SQL`
 					select "root_"."post_id" as "__grouping_key",
 					       "root_"."id" as "root_id",
-					       "root_"."visible" = ? as "root___predicate_throughUpdatable"
+					       "root_"."visible" = ? as "root_$predicate_throughUpdatable"
 					from "public"."post_locale" as "root_" where "root_"."post_id" in (?, ?)
 				`,
 				parameters: [false, testUuid(1), testUuid(2)],
 				response: {
 					rows: [
-						{ __grouping_key: testUuid(1), root_id: testUuid(3), root___predicate_throughUpdatable: true },
-						{ __grouping_key: testUuid(2), root_id: testUuid(4), root___predicate_throughUpdatable: false },
+						{ __grouping_key: testUuid(1), root_id: testUuid(3), 'root_$predicate_throughUpdatable': true },
+						{ __grouping_key: testUuid(2), root_id: testUuid(4), 'root_$predicate_throughUpdatable': false },
 					],
 				},
 			},

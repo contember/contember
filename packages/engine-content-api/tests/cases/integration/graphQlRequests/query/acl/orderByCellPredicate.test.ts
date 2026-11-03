@@ -43,7 +43,7 @@ test('order by a cell-level field guards the order key with the field read predi
 				sql: SQL`
 					select
 					    "root_"."id" as "root_id",
-					    "root_"."username" = ? as "root___predicate_authorPredicate",
+					    "root_"."username" = ? as "root_$predicate_authorPredicate",
 					    "root_"."username" as "root_username"
 					from "public"."author" as "root_"
 					where not("root_"."username" is null)
@@ -54,7 +54,7 @@ test('order by a cell-level field guards the order key with the field read predi
 					rows: [
 						{
 							root_id: testUuid(1),
-							root___predicate_authorPredicate: true,
+							'root_$predicate_authorPredicate': true,
 							root_username: 'johndoe',
 						},
 					],
@@ -412,10 +412,10 @@ test('order by on a many-has-many junction fetch guards the order key against th
         }`,
 		executes: [
 			{
-				sql: SQL`select "root_"."id" as "root_id", "root_"."id" as "root_id" from "public"."post" as "root_"`,
+				sql: SQL`select "root_"."id" as "root_id", "root_"."id" as "root_$key_id" from "public"."post" as "root_"`,
 				parameters: [],
 				response: {
-					rows: [{ root_id: testUuid(1) }],
+					rows: [{ root_id: testUuid(1), 'root_$key_id': testUuid(1) }],
 				},
 			},
 			{
@@ -476,10 +476,10 @@ test('order by a cell-level field guards the order key in the window-function (l
         }`,
 		executes: [
 			{
-				sql: SQL`select "root_"."id" as "root_id", "root_"."id" as "root_id" from "public"."author" as "root_"`,
+				sql: SQL`select "root_"."id" as "root_id", "root_"."id" as "root_$key_id" from "public"."author" as "root_"`,
 				parameters: [],
 				response: {
-					rows: [{ root_id: testUuid(1) }],
+					rows: [{ root_id: testUuid(1), 'root_$key_id': testUuid(1) }],
 				},
 			},
 			{

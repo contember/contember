@@ -43,7 +43,7 @@ test('different predicate on row and field level', async () => {
 				sql: SQL`
 					select
 					    "root_"."id" as "root_id",
-					    "root_"."username" = ? as "root___predicate_authorPredicate",
+					    "root_"."username" = ? as "root_$predicate_authorPredicate",
 					    "root_"."username" as "root_username"
 					from "public"."author" as "root_" where not("root_"."username" is null)
 				`,
@@ -52,7 +52,7 @@ test('different predicate on row and field level', async () => {
 					rows: [
 						{
 							root_id: testUuid(1),
-							root___predicate_authorPredicate: true,
+							'root_$predicate_authorPredicate': true,
 							root_username: 'johndoe',
 						},
 					],
@@ -89,7 +89,7 @@ test('different predicate on row and field level - false', async () => {
 				sql: SQL`
 					select
 					    "root_"."id" as "root_id",
-					    "root_"."username" = ? as "root___predicate_authorPredicate",
+					    "root_"."username" = ? as "root_$predicate_authorPredicate",
 					    "root_"."username" as "root_username"
 					from "public"."author" as "root_" where not("root_"."username" is null)
 				`,
@@ -98,7 +98,7 @@ test('different predicate on row and field level - false', async () => {
 					rows: [
 						{
 							root_id: testUuid(1),
-							root___predicate_authorPredicate: false,
+							'root_$predicate_authorPredicate': false,
 							root_username: 'johndoe',
 						},
 					],

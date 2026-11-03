@@ -87,7 +87,7 @@ test('predicate with OR', async () => {
         }`,
 		executes: [
 			{
-				sql: SQL`SELECT "root_"."id" AS "root_id", "root_"."image_id" AS "root_image"
+				sql: SQL`SELECT "root_"."id" AS "root_id", "root_"."image_id" as "root_$key_image"
 						 FROM "public"."author" AS "root_"
 						 WHERE "root_"."is_public" = ?`,
 				parameters: [true],
@@ -95,19 +95,20 @@ test('predicate with OR', async () => {
 					rows: [
 						{
 							root_id: testUuid(1),
-							root_image: testUuid(2),
+							'root_$key_image': testUuid(2),
 						},
 					],
 				},
 			},
 			{
 				sql:
-					`select "root_"."id" as "root_id", "root_"."url" as "root_url", "root_"."id" as "root_id"  from "public"."image" as "root_"  where "root_"."id" in (?)`,
+					`select "root_"."id" as "root_$index_id", "root_"."url" as "root_url", "root_"."id" as "root_id"  from "public"."image" as "root_"  where "root_"."id" in (?)`,
 				parameters: [testUuid(2)],
 				response: {
 					rows: [
 						{
 							root_id: testUuid(2),
+							'root_$index_id': testUuid(2),
 							root_url: 'abcd',
 						},
 					],
@@ -189,12 +190,13 @@ test('does apply primary filter even if relation predicate eliminates it', async
 		executes: [
 			{
 				sql:
-					SQL`select "root_"."title" as "root_title", "root_"."id" as "root_id", "root_"."id" as "root_id", "root_"."id" as "root_id"  from "public"."article" as "root_"  where "root_"."id" = ? and "root_"."id" in (?)`,
+					SQL`select "root_"."title" as "root_title", "root_"."id" as "root_$key_id", "root_"."id" as "root_$key_id", "root_"."id" as "root_id"  from "public"."article" as "root_"  where "root_"."id" = ? and "root_"."id" in (?)`,
 				parameters: [testUuid(1), testUuid(1)],
 				response: {
 					rows: [
 						{
 							root_id: testUuid(1),
+							'root_$key_id': testUuid(1),
 							root_title: 'Article A',
 						},
 					],
@@ -210,7 +212,7 @@ test('does apply primary filter even if relation predicate eliminates it', async
 			},
 			{
 				sql:
-					SQL`select "root_"."article_id" as "root_article", "root_"."views" as "root_views", "root_"."id" as "root_id"  from "public"."article_stats" as "root_"  where "root_"."article_id" in (?)`,
+					SQL`select "root_"."article_id" as "root_$index_article", "root_"."views" as "root_views", "root_"."id" as "root_id"  from "public"."article_stats" as "root_"  where "root_"."article_id" in (?)`,
 				parameters: [testUuid(1)],
 				response: {
 					rows: [],
@@ -266,11 +268,11 @@ test('self-referencing: children should have their own predicate applied', async
 			{
 				// Parent categories - must have isActive = true
 				sql:
-					SQL`select "root_"."name" as "root_name", "root_"."id" as "root_id", "root_"."id" as "root_id"  from "public"."category" as "root_"  where "root_"."is_active" = ?`,
+					SQL`select "root_"."name" as "root_name", "root_"."id" as "root_$key_id", "root_"."id" as "root_id"  from "public"."category" as "root_"  where "root_"."is_active" = ?`,
 				parameters: [true],
 				response: {
 					rows: [
-						{ root_id: testUuid(1), root_name: 'Parent Category' },
+						{ root_id: testUuid(1), 'root_$key_id': testUuid(1), root_name: 'Parent Category' },
 					],
 				},
 			},
@@ -350,11 +352,11 @@ test('multiple relations: articles via author should apply article predicate', a
 			{
 				// Persons - must have isActive = true
 				sql:
-					SQL`select "root_"."name" as "root_name", "root_"."id" as "root_id", "root_"."id" as "root_id"  from "public"."person" as "root_"  where "root_"."is_active" = ?`,
+					SQL`select "root_"."name" as "root_name", "root_"."id" as "root_$key_id", "root_"."id" as "root_id"  from "public"."person" as "root_"  where "root_"."is_active" = ?`,
 				parameters: [true],
 				response: {
 					rows: [
-						{ root_id: testUuid(1), root_name: 'John' },
+						{ root_id: testUuid(1), 'root_$key_id': testUuid(1), root_name: 'John' },
 					],
 				},
 			},
@@ -431,11 +433,11 @@ test('back-reference predicate should be eliminated but join filter preserved', 
 			{
 				// Articles - must have isPublished = true
 				sql:
-					SQL`select "root_"."title" as "root_title", "root_"."id" as "root_id", "root_"."id" as "root_id"  from "public"."article" as "root_"  where "root_"."is_published" = ?`,
+					SQL`select "root_"."title" as "root_title", "root_"."id" as "root_$key_id", "root_"."id" as "root_id"  from "public"."article" as "root_"  where "root_"."is_published" = ?`,
 				parameters: [true],
 				response: {
 					rows: [
-						{ root_id: testUuid(1), root_title: 'Published Article' },
+						{ root_id: testUuid(1), 'root_$key_id': testUuid(1), root_title: 'Published Article' },
 					],
 				},
 			},
@@ -526,22 +528,22 @@ test('deep nesting: predicates should be properly eliminated at each level', asy
 			{
 				// Companies - must have isActive = true
 				sql:
-					SQL`select "root_"."name" as "root_name", "root_"."id" as "root_id", "root_"."id" as "root_id"  from "public"."company" as "root_"  where "root_"."is_active" = ?`,
+					SQL`select "root_"."name" as "root_name", "root_"."id" as "root_$key_id", "root_"."id" as "root_id"  from "public"."company" as "root_"  where "root_"."is_active" = ?`,
 				parameters: [true],
 				response: {
 					rows: [
-						{ root_id: testUuid(1), root_name: 'Acme Corp' },
+						{ root_id: testUuid(1), 'root_$key_id': testUuid(1), root_name: 'Acme Corp' },
 					],
 				},
 			},
 			{
 				// Departments - back-reference predicate eliminated, join filter preserved
 				sql:
-					SQL`select "root_"."company_id" as "__grouping_key", "root_"."name" as "root_name", "root_"."id" as "root_id", "root_"."id" as "root_id"  from "public"."department" as "root_"  where "root_"."company_id" in (?)`,
+					SQL`select "root_"."company_id" as "__grouping_key", "root_"."name" as "root_name", "root_"."id" as "root_$key_id", "root_"."id" as "root_id"  from "public"."department" as "root_"  where "root_"."company_id" in (?)`,
 				parameters: [testUuid(1)],
 				response: {
 					rows: [
-						{ __grouping_key: testUuid(1), root_id: testUuid(2), root_name: 'Engineering' },
+						{ __grouping_key: testUuid(1), root_id: testUuid(2), 'root_$key_id': testUuid(2), root_name: 'Engineering' },
 					],
 				},
 			},
@@ -676,11 +678,11 @@ test('multi-level back-reference: predicates should be eliminated at each level'
 			{
 				// Companies - must have isActive = true
 				sql:
-					SQL`select "root_"."name" as "root_name", "root_"."id" as "root_id", "root_"."id" as "root_id"  from "public"."company" as "root_"  where "root_"."is_active" = ?`,
+					SQL`select "root_"."name" as "root_name", "root_"."id" as "root_$key_id", "root_"."id" as "root_id"  from "public"."company" as "root_"  where "root_"."is_active" = ?`,
 				parameters: [true],
 				response: {
 					rows: [
-						{ root_id: testUuid(1), root_name: 'Acme Corp' },
+						{ root_id: testUuid(1), 'root_$key_id': testUuid(1), root_name: 'Acme Corp' },
 					],
 				},
 			},
@@ -688,11 +690,11 @@ test('multi-level back-reference: predicates should be eliminated at each level'
 				// Departments - back-reference predicate (company.isActive) should be eliminated
 				// Only join filter preserved
 				sql:
-					SQL`select "root_"."company_id" as "__grouping_key", "root_"."name" as "root_name", "root_"."id" as "root_id", "root_"."id" as "root_id"  from "public"."department" as "root_"  where "root_"."company_id" in (?)`,
+					SQL`select "root_"."company_id" as "__grouping_key", "root_"."name" as "root_name", "root_"."id" as "root_$key_id", "root_"."id" as "root_id"  from "public"."department" as "root_"  where "root_"."company_id" in (?)`,
 				parameters: [testUuid(1)],
 				response: {
 					rows: [
-						{ __grouping_key: testUuid(1), root_id: testUuid(2), root_name: 'Engineering' },
+						{ __grouping_key: testUuid(1), root_id: testUuid(2), 'root_$key_id': testUuid(2), root_name: 'Engineering' },
 					],
 				},
 			},
@@ -700,11 +702,11 @@ test('multi-level back-reference: predicates should be eliminated at each level'
 				// Employees - multi-level back-reference predicate (department.company.isActive) should be eliminated
 				// Only join filter preserved
 				sql:
-					SQL`select "root_"."department_id" as "__grouping_key", "root_"."name" as "root_name", "root_"."id" as "root_id", "root_"."id" as "root_id"  from "public"."employee" as "root_"  where "root_"."department_id" in (?)`,
+					SQL`select "root_"."department_id" as "__grouping_key", "root_"."name" as "root_name", "root_"."id" as "root_$key_id", "root_"."id" as "root_id"  from "public"."employee" as "root_"  where "root_"."department_id" in (?)`,
 				parameters: [testUuid(2)],
 				response: {
 					rows: [
-						{ __grouping_key: testUuid(2), root_id: testUuid(3), root_name: 'Alice' },
+						{ __grouping_key: testUuid(2), root_id: testUuid(3), 'root_$key_id': testUuid(3), root_name: 'Alice' },
 					],
 				},
 			},
@@ -768,11 +770,11 @@ test('user filter on has-many should be preserved alongside join filter', async 
 		executes: [
 			{
 				sql:
-					SQL`select "root_"."name" as "root_name", "root_"."id" as "root_id", "root_"."id" as "root_id"  from "public"."company" as "root_"  where "root_"."id" in (?)`,
+					SQL`select "root_"."name" as "root_name", "root_"."id" as "root_$key_id", "root_"."id" as "root_id"  from "public"."company" as "root_"  where "root_"."id" in (?)`,
 				parameters: [testUuid(1)],
 				response: {
 					rows: [
-						{ root_id: testUuid(1), root_name: 'Acme Corp' },
+						{ root_id: testUuid(1), 'root_$key_id': testUuid(1), root_name: 'Acme Corp' },
 					],
 				},
 			},

@@ -41,7 +41,7 @@ where "root_author"."name" = ?`,
 				response: { rows: [{ row_count: 10 }] },
 			},
 			{
-				sql: SQL`select "root_"."id" as "root_id", "root_"."title" as "root_title", "root_"."author_id" as "root_author"
+				sql: SQL`select "root_"."id" as "root_id", "root_"."title" as "root_title", "root_"."author_id" as "root_$key_author"
 from "public"."post" as "root_"
     left join "public"."author" as "root_author" on "root_"."author_id" = "root_author"."id"
 where "root_author"."name" = ? order by "root_"."id" asc limit 2 offset 1`,
@@ -50,12 +50,12 @@ where "root_author"."name" = ? order by "root_"."id" asc limit 2 offset 1`,
 						{
 							root_id: testUuid(1),
 							root_title: 'Foo',
-							root_author: testUuid(2),
+							'root_$key_author': testUuid(2),
 						},
 						{
 							root_id: testUuid(3),
 							root_title: 'Bar',
-							root_author: testUuid(2),
+							'root_$key_author': testUuid(2),
 						},
 					],
 				},
@@ -63,7 +63,7 @@ where "root_author"."name" = ? order by "root_"."id" asc limit 2 offset 1`,
 			{
 				sql: SQL`
               select
-                "root_"."id" as "root_id",
+                "root_"."id" as "root_$index_id",
                 "root_"."name" as "root_name",
                 "root_"."id" as "root_id"
               from "public"."author" as "root_"
@@ -74,6 +74,7 @@ where "root_author"."name" = ? order by "root_"."id" asc limit 2 offset 1`,
 					rows: [
 						{
 							root_id: testUuid(2),
+							'root_$index_id': testUuid(2),
 							root_name: 'jack',
 						},
 					],

@@ -90,27 +90,27 @@ test('filter and order by in a nested relation fetch keep the read guard of a no
         }`,
 		executes: [
 			{
-				sql: SQL`select "root_"."id" as "root_id", "root_"."id" as "root_id" from "public"."author" as "root_" where "root_"."is_public" = ?`,
+				sql: SQL`select "root_"."id" as "root_id", "root_"."id" as "root_$key_id" from "public"."author" as "root_" where "root_"."is_public" = ?`,
 				parameters: [true],
 				response: {
-					rows: [{ root_id: testUuid(1) }],
+					rows: [{ root_id: testUuid(1), 'root_$key_id': testUuid(1) }],
 				},
 			},
 			{
-				sql: SQL`select "root_"."author_id" as "__grouping_key", "root_"."id" as "root_id", "root_"."category_id" as "root_category"
+				sql: SQL`select "root_"."author_id" as "__grouping_key", "root_"."id" as "root_id", "root_"."category_id" as "root_$key_category"
 					from "public"."post" as "root_"
 					where "root_"."author_id" in (?)`,
 				parameters: [testUuid(1)],
 				response: {
-					rows: [{ __grouping_key: testUuid(1), root_id: testUuid(10), root_category: testUuid(20) }],
+					rows: [{ __grouping_key: testUuid(1), root_id: testUuid(10), 'root_$key_category': testUuid(20) }],
 				},
 			},
 			{
 				sql:
-					SQL`select "root_"."id" as "root_id", "root_"."id" as "root_id", "root_"."id" as "root_id" from "public"."category" as "root_" where "root_"."id" in (?)`,
+					SQL`select "root_"."id" as "root_$index_id", "root_"."id" as "root_id", "root_"."id" as "root_$key_id" from "public"."category" as "root_" where "root_"."id" in (?)`,
 				parameters: [testUuid(20)],
 				response: {
-					rows: [{ root_id: testUuid(20) }],
+					rows: [{ root_id: testUuid(20), 'root_$key_id': testUuid(20), 'root_$index_id': testUuid(20) }],
 				},
 			},
 			{

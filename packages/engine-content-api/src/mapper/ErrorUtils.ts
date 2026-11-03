@@ -134,12 +134,22 @@ export const convertError = (
 	if (e instanceof Database.TransactionAbortedError) {
 		return new MutationSqlError([], e.originalMessage, [MutationResultHint.subSequentSqlError])
 	}
-	if (e instanceof Database.QueryError || e instanceof Database.CannotCommitError) {
+	if (e instanceof Database.CannotCommitError) {
 		logger.error(e, { loc: 'convertError' })
 		return new MutationSqlError([], e.originalMessage, [MutationResultHint.sqlError])
 	}
+	if (e instanceof Database.QueryError) {
+		logger.error(e, { loc: 'convertError' })
+		const message = hasClientFacingMessage(e.code) ? e.originalMessage : 'Database query failed'
+		return new MutationSqlError([], message, [MutationResultHint.sqlError])
+	}
 	throw e
 }
+
+// Data (22) and integrity (23) errors and project trigger exceptions (P0001) carry messages clients act on. Other
+// messages (e.g. class 42) can quote internal SQL identifiers.
+const hasClientFacingMessage = (code: string | undefined): boolean =>
+	code !== undefined && (code.startsWith('22') || code.startsWith('23') || code === 'P0001')
 
 export const tryMutation = async (schema: Model.Schema, databaseMetadata: DatabaseMetadata, cb: () => Promise<MutationResultList>): Promise<MutationResultList> => {
 	try {

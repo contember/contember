@@ -30,7 +30,7 @@ test('Sites with settings (one-has-one owning)', async () => {
               select
                 "root_"."id" as "root_id",
                 "root_"."name" as "root_name",
-                "root_"."setting_id" as "root_setting"
+                "root_"."setting_id" as "root_$key_setting"
               from "public"."site" as "root_"`,
 
 				response: {
@@ -38,12 +38,12 @@ test('Sites with settings (one-has-one owning)', async () => {
 						{
 							root_id: testUuid(1),
 							root_name: 'Site 1',
-							root_setting: testUuid(2),
+							'root_$key_setting': testUuid(2),
 						},
 						{
 							root_id: testUuid(3),
 							root_name: 'Site 2',
-							root_setting: testUuid(4),
+							'root_$key_setting': testUuid(4),
 						},
 					],
 				},
@@ -51,7 +51,7 @@ test('Sites with settings (one-has-one owning)', async () => {
 			{
 				sql: SQL`
               select
-                "root_"."id" as "root_id",
+                "root_"."id" as "root_$index_id",
                 "root_"."id" as "root_id",
                 "root_"."url" as "root_url"
               from "public"."site_setting" as "root_"
@@ -62,10 +62,12 @@ test('Sites with settings (one-has-one owning)', async () => {
 					rows: [
 						{
 							root_id: testUuid(2),
+							'root_$index_id': testUuid(2),
 							root_url: 'http://site1.cz',
 						},
 						{
 							root_id: testUuid(4),
+							'root_$index_id': testUuid(4),
 							root_url: 'http://site2.cz',
 						},
 					],

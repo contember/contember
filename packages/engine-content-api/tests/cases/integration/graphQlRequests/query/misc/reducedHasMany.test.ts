@@ -31,24 +31,24 @@ test('reduced has many', async () => {
 			{
 				sql: SQL`select
                      "root_"."id" as "root_id",
-                     "root_"."id" as "root_id"
+                     "root_"."id" as "root_$key_id"
                    from "public"."post" as "root_"`,
 				parameters: [],
 				response: {
-					rows: [{ root_id: testUuid(1) }, { root_id: testUuid(2) }],
+					rows: [{ root_id: testUuid(1), 'root_$key_id': testUuid(1) }, { root_id: testUuid(2), 'root_$key_id': testUuid(2) }],
 				},
 			},
 			{
 				sql: SQL`select
-                     "root_"."post_id" as "root_post",
+                     "root_"."post_id" as "root_$index_post",
                      "root_"."id" as "root_id"
                    from "public"."post_locale" as "root_"
                    where "root_"."locale" = ? and "root_"."post_id" in (?, ?)`,
 				parameters: ['cs', testUuid(1), testUuid(2)],
 				response: {
 					rows: [
-						{ root_post: testUuid(1), root_id: testUuid(11) },
-						{ root_post: testUuid(2), root_id: testUuid(12) },
+						{ 'root_$index_post': testUuid(1), root_id: testUuid(11) },
+						{ 'root_$index_post': testUuid(2), root_id: testUuid(12) },
 					],
 				},
 			},
@@ -96,24 +96,24 @@ test('universal reduced has many', async () => {
 			{
 				sql: SQL`select
                      "root_"."id" as "root_id",
-                     "root_"."id" as "root_id"
+                     "root_"."id" as "root_$key_id"
                    from "public"."post" as "root_"`,
 				parameters: [],
 				response: {
-					rows: [{ root_id: testUuid(1) }, { root_id: testUuid(2) }],
+					rows: [{ root_id: testUuid(1), 'root_$key_id': testUuid(1) }, { root_id: testUuid(2), 'root_$key_id': testUuid(2) }],
 				},
 			},
 			{
 				sql: SQL`select
-                     "root_"."post_id" as "root_post",
+                     "root_"."post_id" as "root_$index_post",
                      "root_"."id" as "root_id"
                    from "public"."post_locale" as "root_"
                    where "root_"."locale" = ? and "root_"."post_id" in (?, ?)`,
 				parameters: ['cs', testUuid(1), testUuid(2)],
 				response: {
 					rows: [
-						{ root_post: testUuid(1), root_id: testUuid(11) },
-						{ root_post: testUuid(2), root_id: testUuid(12) },
+						{ 'root_$index_post': testUuid(1), root_id: testUuid(11) },
+						{ 'root_$index_post': testUuid(2), root_id: testUuid(12) },
 					],
 				},
 			},

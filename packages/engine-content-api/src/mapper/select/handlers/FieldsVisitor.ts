@@ -55,7 +55,7 @@ export class FieldsVisitor implements Model.RelationByTypeVisitor<void>, Model.C
 				const aliases: string[] = []
 				for (const source of entity.view.idSource) {
 					const columnName = getColumnName(this.schema, entity, source)
-					const idSrcPath = columnPath.for(source + '__id_src')
+					const idSrcPath = columnPath.forInternal('idSrc').for(source)
 					aliases.push(idSrcPath.alias)
 					this.executionContext.addColumn({
 						query: qb => qb.select([tableAlias, columnName], idSrcPath.alias),

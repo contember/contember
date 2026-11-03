@@ -6,6 +6,7 @@ import { FetcherResponse, WebhookFetcher } from './WebhookFetcher.js'
 import { Logger } from '@contember/logger'
 import { formatTraceparent, INVALID_TRACE_ID, Tracer } from '@contember/telemetry'
 import { replaceActionsVariables } from '@contember/schema-utils'
+import { redactRequestError } from './redactRequestError.js'
 
 const DEFAULT_TIMEOUT_MS = 30_000 // 30 seconds
 
@@ -24,11 +25,12 @@ const ResponseType = Typesafe.noExtraProps(Typesafe.object({
 
 type EventResponseFactory = (eventRow: EventRow) => { ok: boolean; code?: number; response?: string; errorMessage?: string; durationMs?: number }
 
+/** Carries the name and code of a failed request, and a reason only when it was redacted. Never the cause, which may quote credentials. */
 class WebhookRequestError extends Error {
 	public readonly code?: string | number
 
-	constructor(error: unknown) {
-		super('Webhook request failed')
+	constructor(error: unknown, redactedReason?: string) {
+		super(redactedReason === undefined ? 'Webhook request failed' : `Webhook request failed: ${redactedReason}`)
 		try {
 			if (error instanceof Error) {
 				this.name = error.name
@@ -63,6 +65,8 @@ export class UndefinedVariableError extends Error {
 type ResolvedRequest = {
 	url: string
 	headers: Record<string, string>
+	/** The resolved URL, header values and interpolated variable values, which an error message must not quote. */
+	secrets: ReadonlySet<string>
 }
 
 export type WebhookTargetHandlerOptions = {
@@ -119,14 +123,15 @@ export class WebhookTargetHandler implements InvokeHandler<Actions.WebhookTarget
 				logger,
 			})
 		} catch (e) {
-			logger.warn(e)
-			const errorMessages = this.extractErrorMessages(e)
+			// Request errors may quote the resolved URL or a header value, so only a redacted reason is logged and stored.
+			const errorMessages = this.extractErrorMessages(e).map(it => redactRequestError(it, request.secrets))
+			const errorMessage = errorMessages.length ? errorMessages.join('; ') : undefined
+			logger.warn(new WebhookRequestError(e, errorMessage), { target: target.name })
 			const result = {
 				ok: false,
-				errorMessage: errorMessages.length ? errorMessages.join('; ') : undefined,
+				errorMessage,
 				durationMs: getDuration(),
 			}
-			eventResponseFactory = () => ({ ok: false, errorMessage: errorMessages.length ? errorMessages.join('; ') : undefined })
 
 			return events.map(it => ({ target, row: it, result }))
 		}
@@ -320,6 +325,7 @@ export class WebhookTargetHandler implements InvokeHandler<Actions.WebhookTarget
 	/** Throws {@link UndefinedVariableError} naming every variable without a value, an empty one included. */
 	private resolveVariables(target: Actions.WebhookTarget, variables: VariablesMap): ResolvedRequest {
 		const undefinedVariables = new Set<string>()
+		const secrets = new Set<string>()
 		const resolve = (subject: string) =>
 			replaceActionsVariables(subject, name => {
 				const value = resolveVariable(variables, name)
@@ -327,6 +333,7 @@ export class WebhookTargetHandler implements InvokeHandler<Actions.WebhookTarget
 					undefinedVariables.add(name)
 					return ''
 				}
+				secrets.add(value)
 				return value
 			})
 		const url = resolve(target.url)
@@ -334,7 +341,11 @@ export class WebhookTargetHandler implements InvokeHandler<Actions.WebhookTarget
 		if (undefinedVariables.size > 0) {
 			throw new UndefinedVariableError([...undefinedVariables])
 		}
-		return { url, headers }
+		secrets.add(url)
+		for (const value of Object.values(headers)) {
+			secrets.add(value)
+		}
+		return { url, headers, secrets }
 	}
 }
 

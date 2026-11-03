@@ -194,6 +194,51 @@ describe('webhook variables', () => {
 		// the dispatcher reports it once for the whole target, the handler stays quiet
 		assert.deepStrictEqual(testLoggerHandler.messages, [])
 	})
+
+	test('a failed request is logged and stored without the credentials its URL and headers carry', async () => {
+		const testLoggerHandler = new TestLoggerHandler()
+		const webhookHandler = createHandler({
+			async fetch(url: string, init: RequestInit): Promise<FetcherResponse> {
+				const authorization = new Headers(init.headers).get('Authorization')
+				throw Object.assign(new TypeError(`Failed to parse URL from ${url}`), {
+					cause: Object.assign(new TypeError(`Headers.append: "${authorization}" is an invalid header value.`), {
+						cause: Object.assign(new Error('connect ECONNREFUSED 127.0.0.1:443 after sending token-3 and static-header-key'), {
+							code: 'ECONNREFUSED',
+							url,
+						}),
+					}),
+				})
+			},
+		})
+
+		const result = await webhookHandler.handle({
+			logger: createLogger(testLoggerHandler),
+			target: {
+				...target,
+				url: 'https://deliveries:{{PASSWORD}}@example.com:8443/hooks/{{PATH}}?key=static-key#fragment',
+				headers: { Authorization: 'Bearer {{TOKEN}}', 'X-Api-Key': 'static-header-key' },
+			},
+			events: [createTestEvent(0)],
+			variables: { PASSWORD: 'pw-1', PATH: 'path-2', TOKEN: 'token-3' },
+		})
+
+		const reason = 'Failed to parse URL from https://[redacted]@example.com:8443/[redacted]; '
+			+ 'Headers.append: "[redacted]" is an invalid header value.; '
+			+ 'connect ECONNREFUSED 127.0.0.1:443 after sending [redacted] and [redacted]'
+		assert.deepStrictEqual(result.map(it => it.result.errorMessage), [reason])
+		assert.deepStrictEqual(testLoggerHandler.messages.map(it => [it.level.name, it.message, it.ownAttributes]), [
+			['warn', `Webhook request failed: ${reason}`, { target: 'test_target' }],
+		])
+		const error = testLoggerHandler.messages[0].error
+		expect(error).toBeInstanceOf(Error)
+		expect(error).toHaveProperty('name', 'TypeError')
+		expect(error).toHaveProperty('code', 'ECONNREFUSED')
+		expect(error).not.toHaveProperty('cause')
+		const logged = JSON.stringify([error, error instanceof Error ? error.stack : null])
+		for (const secret of ['deliveries', 'pw-1', 'hooks', 'path-2', 'static-key', 'fragment', 'token-3', 'static-header-key']) {
+			expect(logged).not.toContain(secret)
+		}
+	})
 })
 
 describe('webhook response', () => {

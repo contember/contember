@@ -137,6 +137,62 @@ describe('webhook request', () => {
 		assert.equal(fetchCalled, true)
 	})
 })
+describe('webhook variables', () => {
+	test('interpolates variables into the URL and headers', async () => {
+		const requests: { url: string; headers: HeadersInit | undefined }[] = []
+		const webhookHandler = new WebhookTargetHandler({
+			fetch(url: string, init: RequestInit): Promise<FetcherResponse> {
+				requests.push({ url, headers: init.headers })
+				return okResponse
+			},
+		})
+		const target: Actions.AnyTarget = {
+			name: 'test_target',
+			type: 'webhook',
+			url: 'https://hooks.example.com/{{path}}',
+			headers: { Authorization: 'Bearer {{token}}' },
+		}
+
+		await webhookHandler.handle({
+			logger: createLogger(new TestLoggerHandler()),
+			target,
+			events: [createTestEvent(0)],
+			variables: { path: 'p', token: 't' },
+		})
+
+		assert.deepStrictEqual(requests, [{
+			url: 'https://hooks.example.com/p',
+			headers: { ['User-Agent']: 'Contember Actions', Authorization: 'Bearer t', ['Content-type']: 'application/json' },
+		}])
+	})
+
+	test('an undefined variable fails the attempt without a request', async () => {
+		let fetchCalled = false
+		const webhookHandler = new WebhookTargetHandler({
+			fetch(): Promise<FetcherResponse> {
+				fetchCalled = true
+				return okResponse
+			},
+		})
+		const target: Actions.AnyTarget = { name: 'test_target', type: 'webhook', url: 'https://hooks.example.com/{{path}}' }
+		const event = createTestEvent(0)
+
+		const result = await webhookHandler.handle({
+			logger: createLogger(new TestLoggerHandler()),
+			target,
+			events: [event],
+			variables: {},
+		})
+
+		assert.equal(fetchCalled, false)
+		assert.deepStrictEqual(dropDuration(result), [{
+			row: event,
+			target,
+			result: { ok: false, errorMessage: 'Undefined variable path', durationMs: -1 },
+		}])
+	})
+})
+
 describe('webhook response', () => {
 	test('successful response', async () => {
 		const testLoggerHandler = new TestLoggerHandler()
@@ -318,6 +374,58 @@ describe('webhook response', () => {
 		assert.equal(warnings[0].ownAttributes.response, 'Unauthorized: [redacted] for [redacted]')
 	})
 
+	test('an error body quoting the path of a target URL with a static token is logged without it', async () => {
+		const testLoggerHandler = new TestLoggerHandler()
+		const webhookHandler = new WebhookTargetHandler({
+			fetch: () =>
+				Promise.resolve({
+					ok: false,
+					headers: new Headers(),
+					responseText: 'Cannot POST /services/T0/B0/static-token',
+					status: 404,
+					statusText: 'Not Found',
+				}),
+		})
+		const target: Actions.AnyTarget = { name: 'test_target', type: 'webhook', url: 'https://hooks.example.com/services/T0/B0/static-token' }
+
+		await webhookHandler.handle({ logger: createLogger(testLoggerHandler), target, events: [createTestEvent(0)], variables: {} })
+
+		const warnings = testLoggerHandler.messages.filter(it => it.level.name === 'warn')
+		assert.equal(warnings.length, 1)
+		assert.equal(warnings[0].ownAttributes.response, 'Cannot POST [redacted]')
+	})
+
+	test('an error body is redacted before it is cut, so a secret across the cut does not leak in part', async () => {
+		const testLoggerHandler = new TestLoggerHandler()
+		const webhookHandler = new WebhookTargetHandler({
+			fetch: () =>
+				Promise.resolve({
+					ok: false,
+					headers: new Headers(),
+					responseText: `${'x'.repeat(495)}secret-token`,
+					status: 401,
+					statusText: 'Unauthorized',
+				}),
+		})
+		const target: Actions.AnyTarget = {
+			name: 'test_target',
+			type: 'webhook',
+			url: 'https://hooks.example.com',
+			headers: { Authorization: '{{token}}' },
+		}
+
+		await webhookHandler.handle({
+			logger: createLogger(testLoggerHandler),
+			target,
+			events: [createTestEvent(0)],
+			variables: { token: 'secret-token' },
+		})
+
+		const warnings = testLoggerHandler.messages.filter(it => it.level.name === 'warn')
+		assert.equal(warnings.length, 1)
+		assert.equal(warnings[0].ownAttributes.response, `${'x'.repeat(495)}[reda… [truncated, 505 characters in total]`)
+	})
+
 	test('invalid partial response', async () => {
 		const testLoggerHandler = new TestLoggerHandler()
 		const logger = createLogger(testLoggerHandler)
@@ -387,6 +495,31 @@ describe('webhook response', () => {
 			status: 200,
 			events: [event1.id, event2.id],
 		})
+	})
+
+	test('a long malformed response is capped in the stored attempt', async () => {
+		const responseText = `{"failures": ${'x'.repeat(10_000)}`
+		const webhookHandler = new WebhookTargetHandler({
+			fetch: () =>
+				Promise.resolve({
+					ok: true,
+					headers: new Headers([['content-type', 'application/json']]),
+					responseText,
+					status: 200,
+					statusText: 'OK',
+				}),
+		})
+		const target: Actions.AnyTarget = { name: 'test_target', type: 'webhook', url: 'http://localhost' }
+
+		const [handled] = await webhookHandler.handle({
+			logger: createLogger(new TestLoggerHandler()),
+			target,
+			events: [createTestEvent(0)],
+			variables: {},
+		})
+
+		assert.equal(handled.result.ok, false)
+		assert.equal(handled.result.response, `${responseText.slice(0, 4_096)}… [truncated, ${responseText.length} characters in total]`)
 	})
 
 	test('response naming events outside the batch', async () => {

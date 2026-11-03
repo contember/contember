@@ -36,6 +36,23 @@ test('redacts a secret quoted without its surrounding whitespace', () => {
 		.toBe('Headers.append: "[redacted]" is an invalid header value.')
 })
 
+test('redacts the path and query of a secret URL quoted on their own', () => {
+	const url = 'https://hooks.example.com/services/T0/B0/static-token?key=abc'
+	expect(redactRequestError('Cannot POST /services/T0/B0/static-token', [url])).toBe('Cannot POST [redacted]')
+	expect(redactRequestError('{"path":"/services/T0/B0/static-token?key=abc"}', [url])).toBe('{"path":"[redacted]"}')
+	expect(redactRequestError('bad query key=abc', [url])).toBe('bad query [redacted]')
+	// a bare slash would redact every slash in the message
+	expect(redactRequestError('Cannot POST /', ['https://hooks.example.com/'])).toBe('Cannot POST /')
+})
+
+test('redacts a secret quoted with escaped slashes or percent-encoded', () => {
+	const url = 'https://hooks.example.com/p/static-token'
+	expect(redactRequestError('{"url":"https:\\/\\/hooks.example.com\\/p\\/static-token"}', [url])).toBe('{"url":"[redacted]"}')
+	expect(redactRequestError('{"path":"\\/p\\/static-token"}', [url])).toBe('{"path":"[redacted]"}')
+	expect(redactRequestError('redirect=https%3A%2F%2Fhooks.example.com%2Fp%2Fstatic-token', [url])).toBe('redirect=[redacted]')
+	expect(redactRequestError('{"auth":"Bearer a\\/b"}', ['Bearer a/b'])).toBe('{"auth":"[redacted]"}')
+})
+
 test('scans a long message without a URL in linear time', () => {
 	const start = performance.now()
 	expect(redactRequestError('a-'.repeat(100_000), [])).toHaveLength(200_000)

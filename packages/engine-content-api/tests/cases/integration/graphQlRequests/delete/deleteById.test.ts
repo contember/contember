@@ -27,22 +27,22 @@ test('delete post by id', async () => {
 				{
 					sql: SQL`select
                      "root_"."id" as "root_id",
-                      "root_"."author_id" as "root_author"
+                      "root_"."author_id" as "root_$key_author"
                      from "public"."post" as "root_"
                    where "root_"."id" = ?`,
 					parameters: [testUuid(1)],
 					response: {
 						rows: [
 							{
-								root_id: testUuid(1),
-								root_author: testUuid(2),
+								'root_id': testUuid(1),
+								'root_$key_author': testUuid(2),
 							},
 						],
 					},
 				},
 				{
 					sql: SQL`select
-                       "root_"."id" as "root_id",
+                       "root_"."id" as "root_$index_id",
                        "root_"."name" as "root_name",
                        "root_"."id" as "root_id"
                      from "public"."author" as "root_"
@@ -51,8 +51,9 @@ test('delete post by id', async () => {
 					response: {
 						rows: [
 							{
-								root_id: testUuid(2),
-								root_name: 'John',
+								'root_id': testUuid(2),
+								'root_$index_id': testUuid(2),
+								'root_name': 'John',
 							},
 						],
 					},

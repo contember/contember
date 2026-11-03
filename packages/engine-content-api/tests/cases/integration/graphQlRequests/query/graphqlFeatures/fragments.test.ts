@@ -43,11 +43,11 @@ test('fragments', async () => {
 				sql: SQL`select
                      "root_"."id" as "root_id",
                      "root_"."name" as "root_name",
-                     "root_"."id" as "root_id"
+                     "root_"."id" as "root_$key_id"
                    from "public"."author" as "root_"`,
 				parameters: [],
 				response: {
-					rows: [{ root_id: testUuid(1), root_name: 'John' }],
+					rows: [{ 'root_id': testUuid(1), 'root_$key_id': testUuid(1), 'root_name': 'John' }],
 				},
 			},
 			{
@@ -108,21 +108,21 @@ test('fragments merge', async () => {
 				}`,
 		executes: [
 			{
-				sql: `select "root_"."id" as "root_id", "root_"."id" as "root_id"  from "public"."product" as "root_"`,
+				sql: `select "root_"."id" as "root_$key_id", "root_"."id" as "root_id"  from "public"."product" as "root_"`,
 				parameters: [],
-				response: { rows: [{ root_id: testUuid(1) }] },
+				response: { rows: [{ 'root_id': testUuid(1), 'root_$key_id': testUuid(1) }] },
 			},
 			{
-				sql: `select "root_"."product_id" as "__grouping_key", "root_"."name" as "root_name", "root_"."image_id" as "root_image", "root_"."id" as "root_id"  from "public"."product_locale" as "root_"   where "root_"."product_id" in (?)`,
+				sql: `select "root_"."product_id" as "__grouping_key", "root_"."name" as "root_name", "root_"."image_id" as "root_$key_image", "root_"."id" as "root_id"  from "public"."product_locale" as "root_"   where "root_"."product_id" in (?)`,
 				parameters: [testUuid(1)],
 				response: {
-					rows: [{ __grouping_key: testUuid(1), root_name: 'foo', root_id: testUuid(2), root_image: testUuid(3) }],
+					rows: [{ '__grouping_key': testUuid(1), 'root_name': 'foo', 'root_id': testUuid(2), 'root_$key_image': testUuid(3) }],
 				},
 			},
 			{
-				sql: `select "root_"."id" as "root_id", "root_"."url" as "root_url", "root_"."id" as "root_id"  from "public"."image" as "root_"   where "root_"."id" in (?)`,
+				sql: `select "root_"."id" as "root_$index_id", "root_"."url" as "root_url", "root_"."id" as "root_id"  from "public"."image" as "root_"   where "root_"."id" in (?)`,
 				parameters: [testUuid(3)],
-				response: { rows: [{ root_id: testUuid(3), root_url: 'abcd' }] },
+				response: { rows: [{ 'root_id': testUuid(3), 'root_$index_id': testUuid(3), 'root_url': 'abcd' }] },
 			},
 		],
 		return: {

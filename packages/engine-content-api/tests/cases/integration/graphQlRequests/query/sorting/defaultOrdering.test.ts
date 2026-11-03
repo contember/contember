@@ -28,10 +28,10 @@ test('one has many - default ordering', async () => {
         }`,
 		executes: [
 			{
-				sql: SQL`select "root_"."id" as "root_id", "root_"."id" as "root_id" from  "public"."menu" as "root_"`,
+				sql: SQL`select "root_"."id" as "root_id", "root_"."id" as "root_$key_id" from  "public"."menu" as "root_"`,
 				parameters: [],
 				response: {
-					rows: [{ root_id: testUuid(1) }, { root_id: testUuid(2) }],
+					rows: [{ 'root_id': testUuid(1), 'root_$key_id': testUuid(1) }, { 'root_id': testUuid(2), 'root_$key_id': testUuid(2) }],
 				},
 			},
 			{
@@ -96,10 +96,10 @@ test('many has many - default ordering', async () => {
         }`,
 		executes: [
 			{
-				sql: SQL`select "root_"."id" as "root_id", "root_"."id" as "root_id" from  "public"."post" as "root_"`,
+				sql: SQL`select "root_"."id" as "root_id", "root_"."id" as "root_$key_id" from  "public"."post" as "root_"`,
 				parameters: [],
 				response: {
-					rows: [{ root_id: testUuid(1) }, { root_id: testUuid(2) }],
+					rows: [{ 'root_id': testUuid(1), 'root_$key_id': testUuid(1) }, { 'root_id': testUuid(2), 'root_$key_id': testUuid(2) }],
 				},
 			},
 			{

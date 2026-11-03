@@ -55,9 +55,9 @@ test('row level predicate includes main predicate', async () => {
 			{
 				sql: SQL`SELECT
 							 "root_"."id" AS "root_id",
-							 TRUE AS "root___predicate_isPublished_eq_true",
+							 TRUE as "root_$predicate_isPublished_eq_true",
 							 "root_"."title" AS "root_title",
-							 "root_"."is_unlocked" = ? AS "root___predicate_and_isUnlocked_eq_true_isPubl",
+							 "root_"."is_unlocked" = ? as "root_$predicate_and_isUnlocked_eq_true_isPubl",
 							 "root_"."content" AS "root_content"
 						 FROM "public"."article" AS "root_"
 						 WHERE "root_"."is_published" = ?`,
@@ -65,18 +65,18 @@ test('row level predicate includes main predicate', async () => {
 				response: {
 					rows: [
 						{
-							root_id: testUuid(1),
-							root___predicate_isPublished_eq_true: true,
-							root_title: 'Hello',
-							root___predicate_and_isUnlocked_eq_true_isPubl: false,
-							root_content: 'Foo bar',
+							'root_id': testUuid(1),
+							'root_$predicate_isPublished_eq_true': true,
+							'root_title': 'Hello',
+							'root_$predicate_and_isUnlocked_eq_true_isPubl': false,
+							'root_content': 'Foo bar',
 						},
 						{
-							root_id: testUuid(2),
-							root___predicate_isPublished_eq_true: true,
-							root_title: 'Hello 2',
-							root___predicate_and_isUnlocked_eq_true_isPubl: true,
-							root_content: 'Lorem ipsum',
+							'root_id': testUuid(2),
+							'root_$predicate_isPublished_eq_true': true,
+							'root_title': 'Hello 2',
+							'root_$predicate_and_isUnlocked_eq_true_isPubl': true,
+							'root_content': 'Lorem ipsum',
 						},
 					],
 				},

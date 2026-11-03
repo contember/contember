@@ -65,21 +65,21 @@ test('querying id and title', async () => {
 			{
 				sql: SQL`SELECT
 							 "root_"."id" AS "root_id",
-							 "root_"."locale" IN (?) AS "root___predicate_localePredicate",
+							 "root_"."locale" IN (?) as "root_$predicate_localePredicate",
 							 "root_"."title" AS "root_title"
 						 FROM "public"."post_locale" AS "root_"`,
 				parameters: ['cs'],
 				response: {
 					rows: [
 						{
-							root_id: testUuid(1),
-							root_title: null,
-							root___predicate_localePredicate: false,
+							'root_id': testUuid(1),
+							'root_title': null,
+							'root_$predicate_localePredicate': false,
 						},
 						{
-							root_id: testUuid(2),
-							root_title: 'bar',
-							root___predicate_localePredicate: true,
+							'root_id': testUuid(2),
+							'root_title': 'bar',
+							'root_$predicate_localePredicate': true,
 						},
 					],
 				},
@@ -132,7 +132,7 @@ test('querying with extra where', async () => {
 			{
 				sql: SQL`select
 							 "root_"."id" as "root_id",
-							 "root_"."locale" in (?) as "root___predicate_localePredicate",
+							 "root_"."locale" in (?) as "root_$predicate_localePredicate",
 							 "root_"."title" as "root_title"
                        from "public"."post_locale" as "root_"
                        where "root_"."title" = ? and "root_"."locale" in (?)`,
@@ -140,9 +140,9 @@ test('querying with extra where', async () => {
 				response: {
 					rows: [
 						{
-							root_id: testUuid(1),
-							root_title: 'foo',
-							root___predicate_localePredicate: true,
+							'root_id': testUuid(1),
+							'root_title': 'foo',
+							'root_$predicate_localePredicate': true,
 						},
 					],
 				},
@@ -217,7 +217,7 @@ test('not defined acl variable', async () => {
 			{
 				sql: SQL`
 					select "root_"."id" as "root_id",
-					       false as "root___predicate_localePredicate",
+					       false as "root_$predicate_localePredicate",
 					       "root_"."title" as "root_title"
 					from "public"."post_locale" as "root_"`,
 				parameters: [],
@@ -253,17 +253,19 @@ test('querying on nested field', async () => {
 		executes: [
 			{
 				sql: SQL`select
-                         "root_"."id" as "root_id",
+                         "root_"."id" as "root_$key_id",
                          "root_"."id" as "root_id"
                        from "public"."post" as "root_"`,
 				parameters: [],
 				response: {
 					rows: [
 						{
-							root_id: testUuid(1),
+							'root_id': testUuid(1),
+							'root_$key_id': testUuid(1),
 						},
 						{
-							root_id: testUuid(2),
+							'root_id': testUuid(2),
+							'root_$key_id': testUuid(2),
 						},
 					],
 				},
@@ -272,23 +274,23 @@ test('querying on nested field', async () => {
 				sql: SQL`
 					select "root_"."post_id" as "__grouping_key",
 					       "root_"."id" as "root_id",
-					       "root_"."locale" in (?) as "root___predicate_localePredicate",
+					       "root_"."locale" in (?) as "root_$predicate_localePredicate",
 					       "root_"."title" as "root_title"
 					from "public"."post_locale" as "root_" where "root_"."post_id" in (?, ?)`,
 				parameters: ['cs', testUuid(1), testUuid(2)],
 				response: {
 					rows: [
 						{
-							__grouping_key: testUuid(1),
-							root_id: testUuid(3),
-							root___predicate_localePredicate: false,
-							root_title: 'foo',
+							'__grouping_key': testUuid(1),
+							'root_id': testUuid(3),
+							'root_$predicate_localePredicate': false,
+							'root_title': 'foo',
 						},
 						{
-							__grouping_key: testUuid(2),
-							root_id: testUuid(4),
-							root___predicate_localePredicate: true,
-							root_title: 'bar',
+							'__grouping_key': testUuid(2),
+							'root_id': testUuid(4),
+							'root_$predicate_localePredicate': true,
+							'root_title': 'bar',
 						},
 					],
 				},

@@ -30,16 +30,18 @@ test('Settings with sites (one-has-one inverse)', async () => {
 				sql: SQL`select
                        "root_"."id" as "root_id",
                        "root_"."url" as "root_url",
-                       "root_"."id" as "root_id"
+                       "root_"."id" as "root_$key_id"
                      from "public"."site_setting" as "root_"`,
 				response: {
 					rows: [
 						{
 							root_id: testUuid(1),
+							root_$key_id: testUuid(1),
 							root_url: 'http://site1.cz',
 						},
 						{
 							root_id: testUuid(3),
+							root_$key_id: testUuid(3),
 							root_url: 'http://site2.cz',
 						},
 					],
@@ -47,7 +49,7 @@ test('Settings with sites (one-has-one inverse)', async () => {
 			},
 			{
 				sql: SQL`select
-                       "root_"."setting_id" as "root_setting",
+                       "root_"."setting_id" as "root_$index_setting",
                        "root_"."id" as "root_id",
                        "root_"."name" as "root_name"
                      from "public"."site" as "root_"
@@ -57,12 +59,12 @@ test('Settings with sites (one-has-one inverse)', async () => {
 					rows: [
 						{
 							root_id: testUuid(2),
-							root_setting: testUuid(1),
+							root_$index_setting: testUuid(1),
 							root_name: 'Site 1',
 						},
 						{
 							root_id: testUuid(4),
-							root_setting: testUuid(3),
+							root_$index_setting: testUuid(3),
 							root_name: 'Site 2',
 						},
 					],

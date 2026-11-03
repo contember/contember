@@ -1,5 +1,8 @@
 const MAX_IDENTIFIER_LENGTH = 63
 
+const utf8Encoder = new TextEncoder()
+const byteLength = (value: string): number => utf8Encoder.encode(value).length
+
 export class AliasContext {
 	private aliasIndex = new Map<string, number>()
 
@@ -49,14 +52,31 @@ export class Path {
 		return new Path([...this.path, path], this.aliasContext, this.rootAlias)
 	}
 
+	// Segment for a column the engine selects for itself. `$` cannot occur in a GraphQL alias, so these aliases stay
+	// distinct from those of selected fields; `kind` must not contain `_`.
+	public forInternal(kind: string) {
+		return this.for('$' + kind)
+	}
+
+	// PostgreSQL limits identifiers in bytes. Untruncated aliases stay below the limit and truncated ones fill it
+	// exactly (padded when a multi-byte character does not fit), so the two can never coincide.
 	private createAlias(): string {
 		const alias = this.fullAlias
-
-		// intentionally not allowing == MAX_IDENTIFIER_LENGTH
-		if (alias.length < MAX_IDENTIFIER_LENGTH) {
+		if (byteLength(alias) < MAX_IDENTIFIER_LENGTH) {
 			return alias
 		}
-		const index = this.aliasContext.getAliasIndex(alias).toString()
-		return alias.substring(0, MAX_IDENTIFIER_LENGTH - index.length - 1) + '_' + index
+		const suffix = '_' + this.aliasContext.getAliasIndex(alias).toString()
+		const prefixBytes = MAX_IDENTIFIER_LENGTH - suffix.length
+		let prefix = ''
+		let usedBytes = 0
+		for (const char of alias) {
+			const charBytes = byteLength(char)
+			if (usedBytes + charBytes > prefixBytes) {
+				break
+			}
+			prefix += char
+			usedBytes += charBytes
+		}
+		return prefix + '_'.repeat(prefixBytes - usedBytes) + suffix
 	}
 }

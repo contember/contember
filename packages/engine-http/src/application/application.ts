@@ -205,7 +205,7 @@ export class Application {
 					try {
 						requestLogger = this.createRequestLogger(req, undefined, matchedRequest.module, clientIp, span.context)
 						const groupContainer = await this.projectGroupResolver.resolveContainer({ request: req })
-						requestLogger = requestLogger.child({ projectGroup: groupContainer.slug })
+						requestLogger = requestLogger.child({ projectGroup: groupContainer.slug, project: matchedRequest.params.projectSlug })
 						span.setAttribute('contember.project_group', groupContainer.slug ?? 'unknown')
 						if (matchedRequest.params.projectSlug !== undefined) {
 							span.setAttribute('contember.project', matchedRequest.params.projectSlug)
@@ -373,6 +373,7 @@ export class Application {
 			const groupContainer = await this.projectGroupResolver.resolveContainer({ request: ctx.req })
 			requestLogger = requestLogger.child({
 				projectGroup: groupContainer.slug,
+				project: matchedRequest.params.projectSlug,
 			})
 			ctx.state.projectGroup = groupContainer.slug
 			ctx.state.project = matchedRequest.params.projectSlug

@@ -1,10 +1,11 @@
 import { Actions, ActionsPayload } from '@contember/schema'
 import { EventRow, HandledEvent, InvokeHandler, InvokeHandlerArgs } from './types.js'
-import { VariablesMap } from '../model/VariablesManager.js'
+import { resolveVariable, VariablesMap } from '../model/VariablesManager.js'
 import * as Typesafe from '@contember/typesafe'
 import { FetcherResponse, WebhookFetcher } from './WebhookFetcher.js'
 import { Logger } from '@contember/logger'
 import { formatTraceparent, INVALID_TRACE_ID, Tracer } from '@contember/telemetry'
+import { replaceActionsVariables } from '@contember/schema-utils'
 
 const DEFAULT_TIMEOUT_MS = 30_000 // 30 seconds
 
@@ -52,6 +53,18 @@ class WebhookRequestError extends Error {
 	}
 }
 
+/** The target interpolates a variable that has no value, so no request was made. */
+export class UndefinedVariableError extends Error {
+	constructor(public readonly variables: readonly string[]) {
+		super(`Undefined variable ${variables.join(', ')}`)
+	}
+}
+
+type ResolvedRequest = {
+	url: string
+	headers: Record<string, string>
+}
+
 export type WebhookTargetHandlerOptions = {
 	propagateToWebhooks: boolean
 }
@@ -66,6 +79,8 @@ export class WebhookTargetHandler implements InvokeHandler<Actions.WebhookTarget
 
 	public async handle({ target, events, logger, variables }: InvokeHandlerArgs<Actions.WebhookTarget>): Promise<HandledEvent[]> {
 		const timeoutMs = target.timeoutMs
+		// Outside the try below: an undefined variable is no failed delivery, the dispatcher holds the target back instead.
+		const request = this.resolveVariables(target, variables)
 
 		const start = process.hrtime.bigint()
 		const getDuration = () => Math.floor(Number((process.hrtime.bigint() - start) / BigInt(1_000_000)))
@@ -82,7 +97,7 @@ export class WebhookTargetHandler implements InvokeHandler<Actions.WebhookTarget
 			})
 			const response = await this.tracer.withSpan(span, async () => {
 				try {
-					const response = await this.fetch(timeoutMs ?? DEFAULT_TIMEOUT_MS, target, variables, events)
+					const response = await this.fetch(timeoutMs ?? DEFAULT_TIMEOUT_MS, target, request, events)
 					span.setAttribute('http.response.status_code', response.status)
 					if (!response.ok) {
 						span.setStatus('error')
@@ -227,30 +242,24 @@ export class WebhookTargetHandler implements InvokeHandler<Actions.WebhookTarget
 		return errorMessages
 	}
 
-	private async fetch(timeoutMs: number, target: Actions.WebhookTarget, variables: VariablesMap, events: EventRow[]): Promise<FetcherResponse> {
+	private async fetch(timeoutMs: number, target: Actions.WebhookTarget, request: ResolvedRequest, events: EventRow[]): Promise<FetcherResponse> {
 		return await withTimeout(timeoutMs, async abortController => {
-			return await this.doFetch(target, variables, abortController, events)
+			return await this.doFetch(target, request, abortController, events)
 		})
 	}
 
 	private async doFetch(
 		target: Actions.WebhookTarget,
-		variables: VariablesMap,
+		request: ResolvedRequest,
 		abortController: AbortController,
 		events: EventRow[],
 	): Promise<FetcherResponse> {
-		const resolvedUrl = this.resolveVariables(target.url, variables)
-		const resolvedHeaders = Object.fromEntries(
-			Object.entries(target.headers ?? {})
-				.map(([key, value]) => [key, this.resolveVariables(value, variables)]),
-		)
-
-		return await this.fetcher.fetch(resolvedUrl, {
+		return await this.fetcher.fetch(request.url, {
 			method: 'POST',
 			headers: {
 				['User-Agent']: 'Contember Actions',
-				...this.createTraceHeaders(resolvedHeaders),
-				...resolvedHeaders,
+				...this.createTraceHeaders(request.headers),
+				...request.headers,
 				['Content-type']: 'application/json',
 			},
 			signal: abortController.signal,
@@ -308,13 +317,24 @@ export class WebhookTargetHandler implements InvokeHandler<Actions.WebhookTarget
 		}
 	}
 
-	private resolveVariables(subject: string, variables: VariablesMap) {
-		return subject.replace(/\{\{([\w_]+)}}/gm, (_, name) => {
-			if (!variables[name]) {
-				throw new Error(`Undefined variable ${name}`)
-			}
-			return variables[name]
-		})
+	/** Throws {@link UndefinedVariableError} naming every variable without a value, an empty one included. */
+	private resolveVariables(target: Actions.WebhookTarget, variables: VariablesMap): ResolvedRequest {
+		const undefinedVariables = new Set<string>()
+		const resolve = (subject: string) =>
+			replaceActionsVariables(subject, name => {
+				const value = resolveVariable(variables, name)
+				if (value === undefined) {
+					undefinedVariables.add(name)
+					return ''
+				}
+				return value
+			})
+		const url = resolve(target.url)
+		const headers = Object.fromEntries(Object.entries(target.headers ?? {}).map(([key, value]) => [key, resolve(value)]))
+		if (undefinedVariables.size > 0) {
+			throw new UndefinedVariableError([...undefinedVariables])
+		}
+		return { url, headers }
 	}
 }
 

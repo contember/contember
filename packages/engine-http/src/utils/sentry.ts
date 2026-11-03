@@ -26,6 +26,7 @@ export class SentryLoggerHandler implements LoggerHandler {
 		}
 		Sentry.captureException(entry.error, scope => {
 			scope.setTag('project', entry.loggerAttributes.project ?? entry.ownAttributes.project)
+			scope.setTag('projectGroup', entry.loggerAttributes.projectGroup ?? entry.ownAttributes.projectGroup)
 			scope.setTag('module', entry.loggerAttributes.module ?? entry.ownAttributes.module)
 			scope.setLevel(logLevelMapping[entry.level.name])
 			scope.setUser({

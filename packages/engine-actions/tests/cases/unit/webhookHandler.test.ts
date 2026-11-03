@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test'
-import { WebhookTargetHandler } from '../../../src/dispatch/WebhookTargetHandler.js'
+import { UndefinedVariableError, WebhookTargetHandler } from '../../../src/dispatch/WebhookTargetHandler.js'
 import { FetcherResponse, WebhookFetcher } from '../../../src/dispatch/WebhookFetcher.js'
 import { noopTracer } from '@contember/telemetry'
 import { createLogger, Logger, TestLoggerHandler } from '@contember/logger'
@@ -140,6 +140,62 @@ describe('webhook request', () => {
 		assert.equal(fetchCalled, true)
 	})
 })
+describe('webhook variables', () => {
+	const target: Actions.WebhookTarget = {
+		name: 'test_target',
+		type: 'webhook',
+		url: 'http://{{HOST}}/{{PATH}}',
+		headers: { Authorization: 'Bearer {{TOKEN}}', 'X-Path': '{{PATH}}' },
+	}
+
+	test('interpolates variables into the URL and headers', async () => {
+		const requests: { url: string; headers: Headers }[] = []
+		const webhookHandler = createHandler({
+			fetch(url: string, init: RequestInit): Promise<FetcherResponse> {
+				requests.push({ url, headers: new Headers(init.headers) })
+				return okResponse
+			},
+		})
+
+		await webhookHandler.handle({
+			logger: createLogger(new TestLoggerHandler()),
+			target,
+			events: [createTestEvent(0)],
+			variables: { HOST: 'example.com', PATH: 'hook', TOKEN: 'secret' },
+		})
+
+		assert.equal(requests.length, 1)
+		assert.equal(requests[0].url, 'http://example.com/hook')
+		assert.equal(requests[0].headers.get('Authorization'), 'Bearer secret')
+		assert.equal(requests[0].headers.get('X-Path'), 'hook')
+	})
+
+	test('throws a typed error naming every undefined variable before any request', async () => {
+		const testLoggerHandler = new TestLoggerHandler()
+		let fetchCalled = false
+		const webhookHandler = createHandler({
+			fetch(): Promise<FetcherResponse> {
+				fetchCalled = true
+				return okResponse
+			},
+		})
+
+		const error = await webhookHandler.handle({
+			logger: createLogger(testLoggerHandler),
+			target: { ...target, url: 'http://{{HOST}}/{{constructor}}/{{PATH}}' },
+			events: [createTestEvent(0)],
+			// an empty value counts as undefined, and so does a name an object inherits
+			variables: { HOST: 'example.com', PATH: '' },
+		}).then(() => null, (e: unknown) => e)
+
+		expect(error).toBeInstanceOf(UndefinedVariableError)
+		expect(error instanceof UndefinedVariableError ? error.variables : null).toStrictEqual(['constructor', 'PATH', 'TOKEN'])
+		assert.equal(fetchCalled, false)
+		// the dispatcher reports it once for the whole target, the handler stays quiet
+		assert.deepStrictEqual(testLoggerHandler.messages, [])
+	})
+})
+
 describe('webhook response', () => {
 	test('successful response', async () => {
 		const testLoggerHandler = new TestLoggerHandler()

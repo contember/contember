@@ -106,17 +106,22 @@ interpolated variables, which is where tokens live. The request body, a 2xx resp
 parser message (which quotes the payload) stay out too; they are already kept per event in
 `actions_event.log`. The one exception is the body of a non-2xx response, the only place a target says
 why it failed: the error-status line carries it as `response`, run through `redactRequestError` (an
-error page may echo the request) and cut to 500 characters. The unit tests assert the log attributes
-with an exact match precisely so a later edit cannot quietly add anything else.
+error page may echo the request URL or a header) and then cut to 500 characters. Such a body may still
+echo part of the event payload (validation errors often quote their input); that is accepted, bounded
+by the cut. The unit tests assert the log attributes with an exact match precisely so a later edit
+cannot quietly add anything else.
 
 The `response` stored in `actions_event.log` is capped at 4096 characters, so a large error page does
-not grow the row by its full size on every retry. Both cuts are marked with the original length.
+not grow the row by its full size on every retry. Both cuts are marked with the length of the text
+they cut, which for the log is the body after redaction.
 
 A request error may quote the resolved URL or a header value (Node's fetch rejects any URL with
 credentials and quotes it raw), so it is logged as a `WebhookRequestError` without its cause, and both
 the logged and the stored reason go through `redactRequestError`. It first replaces the resolved URL,
 every header value and every interpolated variable value, also in their HTTP-whitespace-trimmed form
-(fetch quotes an invalid header value trimmed). Then any URL still quoted keeps only its scheme, host and
+(fetch quotes an invalid header value trimmed), percent-encoded and with `/` escaped as `\/` (JSON
+encoders), and the path and query of an http(s) URL on their own (a server often quotes only the path,
+where a token written into the target URL lives). Then any URL still quoted keeps only its scheme, host and
 port. Known values go first because a password with `@` or `/` ends a URL's authority early. Every such
 value is replaced, short or static ones included: an over-redacted reason beats a leaked token.
 

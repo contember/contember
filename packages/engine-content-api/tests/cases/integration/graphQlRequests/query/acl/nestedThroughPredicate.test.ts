@@ -26,10 +26,10 @@ const postPermissions: Acl.EntityPermissions = {
 }
 
 const listPostQuery = {
-	sql: SQL`select "root_"."id" as "root_id", "root_"."id" as "root_id" from "public"."post" as "root_"`,
+	sql: SQL`select "root_"."id" as "root_$key_id", "root_"."id" as "root_id" from "public"."post" as "root_"`,
 	parameters: [],
 	response: {
-		rows: [{ root_id: testUuid(1) }],
+		rows: [{ root_id: testUuid(1), 'root_$key_id': testUuid(1) }],
 	},
 }
 
@@ -71,14 +71,14 @@ test('nested cell predicate that exists only in the through set is resolved agai
 				sql: SQL`
 					select "root_"."post_id" as "__grouping_key",
 					       "root_"."id" as "root_id",
-					       "root_"."visible" = ? as "root___predicate___merge__throughTitle",
+					       "root_"."visible" = ? as "root_$predicate___merge__throughTitle",
 					       "root_"."title" as "root_title"
 					from "public"."post_locale" as "root_" where "root_"."post_id" in (?)`,
 				parameters: [true, testUuid(1)],
 				response: {
 					rows: [
-						{ __grouping_key: testUuid(1), root_id: testUuid(2), root_title: 'foo', root___predicate___merge__throughTitle: true },
-						{ __grouping_key: testUuid(1), root_id: testUuid(3), root_title: 'bar', root___predicate___merge__throughTitle: false },
+						{ __grouping_key: testUuid(1), root_id: testUuid(2), root_title: 'foo', 'root_$predicate___merge__throughTitle': true },
+						{ __grouping_key: testUuid(1), root_id: testUuid(3), root_title: 'bar', 'root_$predicate___merge__throughTitle': false },
 					],
 				},
 			},
@@ -145,14 +145,14 @@ test('nested cell predicate is not simplified against the root row predicate', a
 				sql: SQL`
 					select "root_"."post_id" as "__grouping_key",
 					       "root_"."id" as "root_id",
-					       "root_"."visible" = ? as "root___predicate_title",
+					       "root_"."visible" = ? as "root_$predicate_title",
 					       "root_"."title" as "root_title"
 					from "public"."post_locale" as "root_" where "root_"."post_id" in (?) and "root_"."locale" = ?`,
 				parameters: [true, testUuid(1), 'cs'],
 				response: {
 					rows: [
-						{ __grouping_key: testUuid(1), root_id: testUuid(2), root_title: 'foo', root___predicate_title: true },
-						{ __grouping_key: testUuid(1), root_id: testUuid(3), root_title: 'bar', root___predicate_title: false },
+						{ __grouping_key: testUuid(1), root_id: testUuid(2), root_title: 'foo', 'root_$predicate_title': true },
+						{ __grouping_key: testUuid(1), root_id: testUuid(3), root_title: 'bar', 'root_$predicate_title': false },
 					],
 				},
 			},
@@ -222,8 +222,8 @@ test('nested _meta resolves readable against the through set and updatable again
 				sql: SQL`
 					select "root_"."post_id" as "__grouping_key",
 					       "root_"."id" as "root_id",
-					       "root_"."locale" = ? as "root___predicate_throughReadable",
-					       "root_"."visible" = ? as "root___predicateRoot_rootUpdatable"
+					       "root_"."locale" = ? as "root_$predicate_throughReadable",
+					       "root_"."visible" = ? as "root_$predicateRoot_rootUpdatable"
 					from "public"."post_locale" as "root_" where "root_"."post_id" in (?)`,
 				parameters: ['cs', true, testUuid(1)],
 				response: {
@@ -231,8 +231,8 @@ test('nested _meta resolves readable against the through set and updatable again
 						{
 							__grouping_key: testUuid(1),
 							root_id: testUuid(2),
-							root___predicate_throughReadable: true,
-							root___predicateRoot_rootUpdatable: false,
+							'root_$predicate_throughReadable': true,
+							'root_$predicateRoot_rootUpdatable': false,
 						},
 					],
 				},
@@ -299,8 +299,8 @@ const rootOnlyColumnPermissions: Acl.Permissions = {
 for (const { name, readPredicate, allPermissions } of rootOnlyColumnCases) {
 	for (const metaFirst of [false, true]) {
 		test(`nested root-only _meta.updatable gets its own column: ${name}, ${metaFirst ? '_meta' : 'value'} selected first`, async () => {
-			const readAlias = `root___predicate_${readPredicate}`
-			const updateAlias = 'root___predicateRoot_check'
+			const readAlias = `root_$predicate_${readPredicate}`
+			const updateAlias = 'root_$predicateRoot_check'
 			const readColumn = `"root_"."locale" = ? as "${readAlias}"`
 			const updateColumn = `"root_"."visible" = ? as "${updateAlias}"`
 			const columns = metaFirst

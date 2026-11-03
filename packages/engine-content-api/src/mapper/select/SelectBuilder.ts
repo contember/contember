@@ -95,7 +95,7 @@ export class SelectBuilder {
 			// A root-resolved name may denote a different definition than the same name in the `all` set, so the
 			// two must not share a column. The override gets its own path segment, keeping every other alias unchanged.
 			const rootOnly = options?.rootOnly === true && !isRoot
-			const predicatePath = path.for(rootOnly ? '__predicateRoot' : '__predicate').for(predicate)
+			const predicatePath = path.forInternal(rootOnly ? 'predicateRoot' : 'predicate').for(predicate)
 			// Keyed by the column, so two definitions can never be served from one column.
 			const predicateKey = predicatePath.fullAlias
 
@@ -151,8 +151,8 @@ export class SelectBuilder {
 					}
 					const predicateGetter = predicate !== undefined && predicate !== true ? addPredicate(predicate) : null
 					const columnName = getColumnName(this.schema, entity, field)
-					const parentValuePath = path.for(field)
-					let ids = await this.getColumnValues(parentValuePath, columnName, predicateGetter)
+					const parentValuePath = path.forInternal('key').for(field)
+					let ids = await this.getColumnValues(path, parentValuePath, columnName, predicateGetter)
 
 					const data = ids.length > 0 ? dataProvider(ids) : Promise.resolve({})
 					this.hydrator.addPromise(
@@ -207,11 +207,12 @@ export class SelectBuilder {
 	}
 
 	private async getColumnValues(
+		tablePath: Path,
 		columnPath: Path,
 		columnName: string,
 		predicateGetter: null | ColumnValueGetter<boolean>,
 	): Promise<Input.PrimaryValue[]> {
-		this.qb = this.qb.select([columnPath.back().alias, columnName], columnPath.alias)
+		this.qb = this.qb.select([tablePath.alias, columnName], columnPath.alias)
 		const rows = await this.rows
 		const filteredRows = predicateGetter === null ? rows : rows.filter(predicateGetter)
 		const columnAlias = columnPath.alias

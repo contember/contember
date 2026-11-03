@@ -26,18 +26,18 @@ test('Post with author query (many has one)', async () => {
 				sql: SQL`
               select
                 "root_"."id" as "root_id",
-                "root_"."author_id" as "root_author"
+                "root_"."author_id" as "root_$key_author"
               from "public"."post" as "root_"
 						`,
 				response: {
 					rows: [
 						{
 							root_id: testUuid(1),
-							root_author: testUuid(2),
+							'root_$key_author': testUuid(2),
 						},
 						{
 							root_id: testUuid(3),
-							root_author: testUuid(4),
+							'root_$key_author': testUuid(4),
 						},
 					],
 				},
@@ -45,7 +45,7 @@ test('Post with author query (many has one)', async () => {
 			{
 				sql: SQL`
               select
-                "root_"."id" as "root_id",
+                "root_"."id" as "root_$index_id",
                 "root_"."id" as "root_id",
                 "root_"."name" as "root_name"
               from "public"."author" as "root_"
@@ -56,10 +56,12 @@ test('Post with author query (many has one)', async () => {
 					rows: [
 						{
 							root_id: testUuid(2),
+							'root_$index_id': testUuid(2),
 							root_name: 'John',
 						},
 						{
 							root_id: testUuid(4),
+							'root_$index_id': testUuid(4),
 							root_name: 'Jack',
 						},
 					],
@@ -110,7 +112,7 @@ test('Post with author query with no result', async () => {
 				sql: SQL`
               select
                 "root_"."id" as "root_id",
-                "root_"."author_id" as "root_author"
+                "root_"."author_id" as "root_$key_author"
               from "public"."post" as "root_"
 						`,
 				response: {
@@ -145,24 +147,24 @@ test('Post with author filtered by name (where many has one)', async () => {
 			{
 				sql: SQL`select
                        "root_"."id" as "root_id",
-                       "root_"."author_id" as "root_author"
+                       "root_"."author_id" as "root_$key_author"
                      from "public"."post" as "root_"`,
 				response: {
 					rows: [
 						{
 							root_id: testUuid(1),
-							root_author: testUuid(2),
+							'root_$key_author': testUuid(2),
 						},
 						{
 							root_id: testUuid(3),
-							root_author: testUuid(4),
+							'root_$key_author': testUuid(4),
 						},
 					],
 				},
 			},
 			{
 				sql: SQL`select
-                       "root_"."id" as "root_id",
+                       "root_"."id" as "root_$index_id",
                        "root_"."id" as "root_id"
                      from "public"."author" as "root_"
                      where "root_"."id" in (?, ?) and "root_"."name" = ?`,
@@ -171,6 +173,7 @@ test('Post with author filtered by name (where many has one)', async () => {
 					rows: [
 						{
 							root_id: testUuid(2),
+							'root_$index_id': testUuid(2),
 						},
 					],
 				},

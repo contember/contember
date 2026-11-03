@@ -258,8 +258,64 @@ describe('webhook response', () => {
 			target: 'test_target',
 			status: 500,
 			statusText: 'Err',
+			response: 'Failed to something',
 			events: [event1.id, event2.id],
 		})
+	})
+
+	test('a long error body is cut short in the log and in the stored attempt', async () => {
+		const testLoggerHandler = new TestLoggerHandler()
+		const responseText = 'a'.repeat(10_000)
+		const webhookHandler = new WebhookTargetHandler({
+			fetch: () =>
+				Promise.resolve({
+					ok: false,
+					headers: new Headers(),
+					responseText,
+					status: 502,
+					statusText: 'Bad Gateway',
+				}),
+		})
+		const target: Actions.AnyTarget = { name: 'test_target', type: 'webhook', url: 'http://localhost' }
+		const event = createTestEvent(0)
+
+		const [handled] = await webhookHandler.handle({ logger: createLogger(testLoggerHandler), target, events: [event], variables: {} })
+
+		assert.equal(handled.result.response, `${'a'.repeat(4_096)}… [truncated, 10000 characters in total]`)
+		const warnings = testLoggerHandler.messages.filter(it => it.level.name === 'warn')
+		assert.equal(warnings.length, 1)
+		assert.equal(warnings[0].ownAttributes.response, `${'a'.repeat(500)}… [truncated, 10000 characters in total]`)
+	})
+
+	test('an error body echoing the request is logged without its credentials', async () => {
+		const testLoggerHandler = new TestLoggerHandler()
+		const webhookHandler = new WebhookTargetHandler({
+			fetch: () =>
+				Promise.resolve({
+					ok: false,
+					headers: new Headers(),
+					responseText: 'Unauthorized: Bearer secret-token for https://hooks.example.com/p/secret-path',
+					status: 401,
+					statusText: 'Unauthorized',
+				}),
+		})
+		const target: Actions.AnyTarget = {
+			name: 'test_target',
+			type: 'webhook',
+			url: 'https://hooks.example.com/p/{{path}}',
+			headers: { Authorization: 'Bearer {{token}}' },
+		}
+
+		await webhookHandler.handle({
+			logger: createLogger(testLoggerHandler),
+			target,
+			events: [createTestEvent(0)],
+			variables: { path: 'secret-path', token: 'secret-token' },
+		})
+
+		const warnings = testLoggerHandler.messages.filter(it => it.level.name === 'warn')
+		assert.equal(warnings.length, 1)
+		assert.equal(warnings[0].ownAttributes.response, 'Unauthorized: [redacted] for [redacted]')
 	})
 
 	test('invalid partial response', async () => {

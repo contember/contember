@@ -4,8 +4,13 @@ import { VariablesMap } from '../model/VariablesManager'
 import * as Typesafe from '@contember/typesafe'
 import { FetcherResponse, WebhookFetcher } from './WebhookFetcher'
 import { Logger } from '@contember/logger'
+import { redactRequestError } from './redactRequestError'
+import { truncateText } from './truncateText'
 
 const DEFAULT_TIMEOUT_MS = 30_000 // 30 seconds
+const LOGGED_RESPONSE_MAX_LENGTH = 500
+// keeps an HTML error page from bloating actions_event.log, which gains one attempt per retry
+const STORED_RESPONSE_MAX_LENGTH = 4_096
 
 const ResponseType = Typesafe.noExtraProps(Typesafe.object({
 	failures: Typesafe.array(
@@ -22,6 +27,13 @@ const ResponseType = Typesafe.noExtraProps(Typesafe.object({
 
 type EventResponseFactory = (eventRow: EventRow) => { ok: boolean; code?: number; response?: string; errorMessage?: string; durationMs?: number }
 
+type ResolvedRequest = {
+	url: string
+	headers: Record<string, string>
+	/** The resolved URL, header values and interpolated variable values, which a logged response body must not quote. */
+	secrets: ReadonlySet<string>
+}
+
 export class WebhookTargetHandler implements InvokeHandler<Actions.WebhookTarget> {
 	constructor(
 		private readonly fetcher: WebhookFetcher,
@@ -36,13 +48,15 @@ export class WebhookTargetHandler implements InvokeHandler<Actions.WebhookTarget
 
 		let eventResponseFactory: EventResponseFactory
 		try {
-			const response = await this.fetch(timeoutMs ?? DEFAULT_TIMEOUT_MS, target, variables, events)
+			const request = this.resolveRequest(target, variables)
+			const response = await this.fetch(timeoutMs ?? DEFAULT_TIMEOUT_MS, target, request, events)
 
 			eventResponseFactory = this.createResponseFactory({
 				response: response,
 				events,
 				target,
 				logger,
+				secrets: request.secrets,
 			})
 		} catch (e) {
 			logger.warn(e)
@@ -61,24 +75,28 @@ export class WebhookTargetHandler implements InvokeHandler<Actions.WebhookTarget
 		return events.map(it => ({ target, row: it, result: { durationMs, ...eventResponseFactory(it) } }))
 	}
 
-	private createResponseFactory({ response, events, target, logger }: {
+	private createResponseFactory({ response, events, target, logger, secrets }: {
 		response: FetcherResponse
 		events: EventRow[]
 		target: Actions.WebhookTarget
 		logger: Logger
+		secrets: ReadonlySet<string>
 	}): EventResponseFactory {
+		const storedResponse = truncateText(response.responseText, STORED_RESPONSE_MAX_LENGTH)
 		if (!response.ok) {
 			// The target is identified by name only: its URL and headers may carry credentials.
+			// The one target payload that is logged: the error body, redacted (it may echo the request) and then cut short.
 			logger.warn('Webhook target responded with an error status', {
 				target: target.name,
 				status: response.status,
 				statusText: response.statusText,
+				response: truncateText(redactRequestError(response.responseText, secrets), LOGGED_RESPONSE_MAX_LENGTH),
 				events: events.map(it => it.id),
 			})
 			return () => ({
 				ok: false,
 				code: response.status,
-				response: response.responseText,
+				response: storedResponse,
 				errorMessage: response.statusText,
 			})
 		}
@@ -117,14 +135,14 @@ export class WebhookTargetHandler implements InvokeHandler<Actions.WebhookTarget
 				return () => ({
 					ok: false,
 					code: response.status,
-					response: response.responseText,
+					response: storedResponse,
 					errorMessage: 'Invalid response: undefined events IDs: ' + missingEvents.join('; '),
 				})
 			}
 
 			const failedIds = events.filter(it => failedEvents[it.id]).map(it => it.id)
 			if (failedIds.length) {
-				// Per-event errors come from the target's payload and stay in the event log, not here.
+				// Per-event errors come from a 2xx payload, which stays in the event log; only an error-status body is logged.
 				logger.warn('Webhook target reported failed events', {
 					target: target.name,
 					status: response.status,
@@ -143,7 +161,7 @@ export class WebhookTargetHandler implements InvokeHandler<Actions.WebhookTarget
 				}
 			}
 		} catch (e: any) {
-			// The parser message quotes the offending payload, so it stays in the event log only.
+			// The parser message quotes a 2xx payload, so it stays in the event log; only an error-status body is logged.
 			logger.warn('Webhook target returned a malformed response', {
 				target: target.name,
 				status: response.status,
@@ -152,7 +170,7 @@ export class WebhookTargetHandler implements InvokeHandler<Actions.WebhookTarget
 			return () => ({
 				ok: false,
 				code: response.status,
-				response: response.responseText,
+				response: storedResponse,
 				errorMessage: 'Invalid response: ' + e.message,
 			})
 		}
@@ -168,29 +186,23 @@ export class WebhookTargetHandler implements InvokeHandler<Actions.WebhookTarget
 		return errorMessages
 	}
 
-	private async fetch(timeoutMs: number, target: Actions.WebhookTarget, variables: VariablesMap, events: EventRow[]): Promise<FetcherResponse> {
+	private async fetch(timeoutMs: number, target: Actions.WebhookTarget, request: ResolvedRequest, events: EventRow[]): Promise<FetcherResponse> {
 		return await withTimeout(timeoutMs, async abortController => {
-			return await this.doFetch(target, variables, abortController, events)
+			return await this.doFetch(target, request, abortController, events)
 		})
 	}
 
 	private async doFetch(
 		target: Actions.WebhookTarget,
-		variables: VariablesMap,
+		request: ResolvedRequest,
 		abortController: AbortController,
 		events: EventRow[],
 	): Promise<FetcherResponse> {
-		const resolvedUrl = this.resolveVariables(target.url, variables)
-		const resolvedHeaders = Object.fromEntries(
-			Object.entries(target.headers ?? {})
-				.map(([key, value]) => [key, this.resolveVariables(value, variables)]),
-		)
-
-		return await this.fetcher.fetch(resolvedUrl, {
+		return await this.fetcher.fetch(request.url, {
 			method: 'POST',
 			headers: {
 				['User-Agent']: 'Contember Actions',
-				...resolvedHeaders,
+				...request.headers,
 				['Content-type']: 'application/json',
 			},
 			signal: abortController.signal,
@@ -229,13 +241,23 @@ export class WebhookTargetHandler implements InvokeHandler<Actions.WebhookTarget
 		}
 	}
 
-	private resolveVariables(subject: string, variables: VariablesMap) {
-		return subject.replace(/\{\{([\w_]+)}}/gm, (_, name) => {
-			if (!variables[name]) {
-				throw new Error(`Undefined variable ${name}`)
-			}
-			return variables[name]
-		})
+	private resolveRequest(target: Actions.WebhookTarget, variables: VariablesMap): ResolvedRequest {
+		const secrets = new Set<string>()
+		const resolve = (subject: string) =>
+			subject.replace(/\{\{([\w_]+)}}/gm, (_, name) => {
+				if (!variables[name]) {
+					throw new Error(`Undefined variable ${name}`)
+				}
+				secrets.add(variables[name])
+				return variables[name]
+			})
+		const url = resolve(target.url)
+		const headers = Object.fromEntries(Object.entries(target.headers ?? {}).map(([key, value]) => [key, resolve(value)]))
+		secrets.add(url)
+		for (const value of Object.values(headers)) {
+			secrets.add(value)
+		}
+		return { url, headers, secrets }
 	}
 }
 

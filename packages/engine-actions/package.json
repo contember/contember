@@ -52,7 +52,7 @@
     "pg": "catalog:"
   },
   "type": "module",
-  "version": "2.2.0-alpha.16",
+  "version": "2.2.0-alpha.17",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/contember/contember.git",

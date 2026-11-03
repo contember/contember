@@ -7,8 +7,12 @@ import { Logger } from '@contember/logger'
 import { formatTraceparent, INVALID_TRACE_ID, Tracer } from '@contember/telemetry'
 import { replaceActionsVariables } from '@contember/schema-utils'
 import { redactRequestError } from './redactRequestError.js'
+import { truncateText } from './truncateText.js'
 
 const DEFAULT_TIMEOUT_MS = 30_000 // 30 seconds
+const LOGGED_RESPONSE_MAX_LENGTH = 500
+// keeps an HTML error page from bloating actions_event.log, which gains one attempt per retry
+const STORED_RESPONSE_MAX_LENGTH = 4_096
 
 const ResponseType = Typesafe.noExtraProps(Typesafe.object({
 	failures: Typesafe.array(
@@ -121,6 +125,7 @@ export class WebhookTargetHandler implements InvokeHandler<Actions.WebhookTarget
 				events,
 				target,
 				logger,
+				secrets: request.secrets,
 			})
 		} catch (e) {
 			// Request errors may quote the resolved URL or a header value, so only a redacted reason is logged and stored.
@@ -140,24 +145,28 @@ export class WebhookTargetHandler implements InvokeHandler<Actions.WebhookTarget
 		return events.map(it => ({ target, row: it, result: { durationMs, ...eventResponseFactory(it) } }))
 	}
 
-	private createResponseFactory({ response, events, target, logger }: {
+	private createResponseFactory({ response, events, target, logger, secrets }: {
 		response: FetcherResponse
 		events: EventRow[]
 		target: Actions.WebhookTarget
 		logger: Logger
+		secrets: ReadonlySet<string>
 	}): EventResponseFactory {
+		const storedResponse = truncateText(response.responseText, STORED_RESPONSE_MAX_LENGTH)
 		if (!response.ok) {
 			// The target is identified by name only: its URL and headers may carry credentials.
+			// The one target payload that is logged: the error body, redacted (it may echo the request) and then cut short.
 			logger.warn('Webhook target responded with an error status', {
 				target: target.name,
 				status: response.status,
 				statusText: response.statusText,
+				response: truncateText(redactRequestError(response.responseText, secrets), LOGGED_RESPONSE_MAX_LENGTH),
 				events: events.map(it => it.id),
 			})
 			return () => ({
 				ok: false,
 				code: response.status,
-				response: response.responseText,
+				response: storedResponse,
 				errorMessage: response.statusText,
 			})
 		}
@@ -196,14 +205,14 @@ export class WebhookTargetHandler implements InvokeHandler<Actions.WebhookTarget
 				return () => ({
 					ok: false,
 					code: response.status,
-					response: response.responseText,
+					response: storedResponse,
 					errorMessage: 'Invalid response: undefined events IDs: ' + missingEvents.join('; '),
 				})
 			}
 
 			const failedIds = events.filter(it => failedEvents[it.id]).map(it => it.id)
 			if (failedIds.length) {
-				// Per-event errors come from the target's payload and stay in the event log, not here.
+				// Per-event errors come from a 2xx payload, which stays in the event log; only an error-status body is logged.
 				logger.warn('Webhook target reported failed events', {
 					target: target.name,
 					status: response.status,
@@ -222,7 +231,7 @@ export class WebhookTargetHandler implements InvokeHandler<Actions.WebhookTarget
 				}
 			}
 		} catch (e: any) {
-			// The parser message quotes the offending payload, so it stays in the event log only.
+			// The parser message quotes a 2xx payload, so it stays in the event log; only an error-status body is logged.
 			logger.warn('Webhook target returned a malformed response', {
 				target: target.name,
 				status: response.status,
@@ -231,7 +240,7 @@ export class WebhookTargetHandler implements InvokeHandler<Actions.WebhookTarget
 			return () => ({
 				ok: false,
 				code: response.status,
-				response: response.responseText,
+				response: storedResponse,
 				errorMessage: 'Invalid response: ' + e.message,
 			})
 		}

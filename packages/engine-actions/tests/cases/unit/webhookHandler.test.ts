@@ -194,6 +194,53 @@ describe('webhook variables', () => {
 		// the dispatcher reports it once for the whole target, the handler stays quiet
 		assert.deepStrictEqual(testLoggerHandler.messages, [])
 	})
+
+	test('a failed request is logged and stored without the credentials its URL and headers carry', async () => {
+		const testLoggerHandler = new TestLoggerHandler()
+		const webhookHandler = createHandler({
+			async fetch(url: string, init: RequestInit): Promise<FetcherResponse> {
+				// messages as Node's fetch words them: the URL quoted raw, an invalid header value quoted trimmed
+				const authorization = new Headers(init.headers).get('Authorization')?.trim()
+				throw Object.assign(new TypeError(`Request cannot be constructed from a URL that includes credentials: ${url}`), {
+					cause: Object.assign(new TypeError(`Headers.append: "${authorization}" is an invalid header value.`), {
+						cause: Object.assign(new Error('connect ECONNREFUSED 127.0.0.1:443 after sending token-3 to https://example.com:8443/hooks?key=static-key'), {
+							code: 'ECONNREFUSED',
+							url,
+						}),
+					}),
+				})
+			},
+		})
+
+		const result = await webhookHandler.handle({
+			logger: createLogger(testLoggerHandler),
+			target: {
+				...target,
+				url: 'https://deliveries:{{PASSWORD}}@example.com:8443/hooks/{{PATH}}?key=static-key#fragment',
+				headers: { Authorization: 'Bearer {{TOKEN}}', 'X-Api-Key': 'static-header-key' },
+			},
+			events: [createTestEvent(0)],
+			// a password with @ and / ends the URL authority early, a value with an edge newline is quoted trimmed
+			variables: { PASSWORD: 'p@ss/1', PATH: 'path-2', TOKEN: 'token-3\n' },
+		})
+
+		const reason = 'Request cannot be constructed from a URL that includes credentials: [redacted]; '
+			+ 'Headers.append: "[redacted]" is an invalid header value.; '
+			+ 'connect ECONNREFUSED 127.0.0.1:443 after sending [redacted] to https://example.com:8443/[redacted]'
+		assert.deepStrictEqual(result.map(it => it.result.errorMessage), [reason])
+		assert.deepStrictEqual(testLoggerHandler.messages.map(it => [it.level.name, it.message, it.ownAttributes]), [
+			['warn', `Webhook request failed: ${reason}`, { target: 'test_target' }],
+		])
+		const error = testLoggerHandler.messages[0].error
+		expect(error).toBeInstanceOf(Error)
+		expect(error).toHaveProperty('name', 'TypeError')
+		expect(error).toHaveProperty('code', 'ECONNREFUSED')
+		expect(error).not.toHaveProperty('cause')
+		const logged = JSON.stringify([error, error instanceof Error ? error.stack : null])
+		for (const secret of ['deliveries', 'ss/1', 'hooks', 'path-2', 'static-key', 'fragment', 'token-3', 'static-header-key']) {
+			expect(logged).not.toContain(secret)
+		}
+	})
 })
 
 describe('webhook response', () => {

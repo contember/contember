@@ -92,7 +92,7 @@ level splits on whether an operator has to act: `error` for a terminal state not
 
 | Level | Message | Emitted from |
 |---|---|---|
-| `warn` | (the thrown error) — request never completed, e.g. DNS, timeout | `WebhookTargetHandler.handle` |
+| `warn` | `Webhook request failed: <redacted reason>` — request never completed, e.g. DNS, timeout | `WebhookTargetHandler.handle` |
 | `warn` | `Webhook target responded with an error status` | `WebhookTargetHandler` non-2xx branch |
 | `warn` | `Webhook target reported failed events` | per-event `failures` in a 2xx response |
 | `warn` | `Webhook target reported failures for event ids outside the batch` | `failures` naming unknown ids |
@@ -106,6 +106,14 @@ interpolated variables, which is where tokens live. The request body, the respon
 parser message (which quotes the payload) stay out too; they are already kept per event in
 `actions_event.log`. The unit tests assert the log attributes with an exact match precisely so a
 later edit cannot quietly add one of these back.
+
+A request error may quote the resolved URL or a header value (Node's fetch rejects any URL with
+credentials and quotes it raw), so it is logged as a `WebhookRequestError` without its cause, and both
+the logged and the stored reason go through `redactRequestError`. It first replaces the resolved URL,
+every header value and every interpolated variable value, also in their HTTP-whitespace-trimmed form
+(fetch quotes an invalid header value trimmed). Then any URL still quoted keeps only its scheme, host and
+port. Known values go first because a password with `@` or `/` ends a URL's authority early. Every such
+value is replaced, short or static ones included: an over-redacted reason beats a leaked token.
 
 ### Traces
 

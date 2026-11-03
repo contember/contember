@@ -57,26 +57,27 @@ test('reads a through-only field over a relation', async () => {
 		executes: [
 			{
 				sql:
-					SQL`select "root_"."title" as "root_title", "root_"."author_id" as "root_author", "root_"."id" as "root_id" from "public"."article" as "root_"`,
+					SQL`select "root_"."title" as "root_title", "root_"."author_id" as "root_$key_author", "root_"."id" as "root_id" from "public"."article" as "root_"`,
 				parameters: [],
 				response: {
 					rows: [
-						{ root_id: testUuid(1), root_title: 'Article A', root_author: testUuid(10) },
+						{ root_id: testUuid(1), root_title: 'Article A', 'root_$key_author': testUuid(10) },
 					],
 				},
 			},
 			{
 				sql:
-					SQL`select "root_"."id" as "root_id", "root_"."name" as "root_name", "root_"."disclosed" = ? as "root___predicate_disclosed_eq_true", "root_"."secret" as "root_secret", "root_"."id" as "root_id" 
+					SQL`select "root_"."id" as "root_$index_id", "root_"."name" as "root_name", "root_"."disclosed" = ? as "root_$predicate_disclosed_eq_true", "root_"."secret" as "root_secret", "root_"."id" as "root_id" 
 from "public"."author" as "root_" where "root_"."id" in (?)`,
 				parameters: [true, testUuid(10)],
 				response: {
 					rows: [
 						{
 							root_id: testUuid(10),
+							'root_$index_id': testUuid(10),
 							root_name: 'John Doe',
 							root_secret: 'shh',
-							root___predicate_disclosed_eq_true: true,
+							'root_$predicate_disclosed_eq_true': true,
 						},
 					],
 				},
@@ -197,21 +198,21 @@ test('the same entity is readable over a relation', async () => {
         }`,
 		executes: [
 			{
-				sql: SQL`select "root_"."image_id" as "root_image", "root_"."id" as "root_id" from "public"."article" as "root_"`,
+				sql: SQL`select "root_"."image_id" as "root_$key_image", "root_"."id" as "root_id" from "public"."article" as "root_"`,
 				parameters: [],
 				response: {
 					rows: [
-						{ root_id: testUuid(1), root_image: testUuid(20) },
+						{ root_id: testUuid(1), 'root_$key_image': testUuid(20) },
 					],
 				},
 			},
 			{
 				sql:
-					SQL`select "root_"."id" as "root_id", "root_"."url" as "root_url", "root_"."id" as "root_id" from "public"."image" as "root_" where "root_"."id" in (?)`,
+					SQL`select "root_"."id" as "root_$index_id", "root_"."url" as "root_url", "root_"."id" as "root_id" from "public"."image" as "root_" where "root_"."id" in (?)`,
 				parameters: [testUuid(20)],
 				response: {
 					rows: [
-						{ root_id: testUuid(20), root_url: 'https://example.com/a.png' },
+						{ root_id: testUuid(20), 'root_$index_id': testUuid(20), root_url: 'https://example.com/a.png' },
 					],
 				},
 			},
@@ -277,25 +278,26 @@ test('row-level predicate over a relation is the union of the root and through f
         }`,
 		executes: [
 			{
-				sql: SQL`select "root_"."author_id" as "root_author", "root_"."id" as "root_id" from "public"."article" as "root_"`,
+				sql: SQL`select "root_"."author_id" as "root_$key_author", "root_"."id" as "root_id" from "public"."article" as "root_"`,
 				parameters: [],
 				response: {
 					rows: [
-						{ root_id: testUuid(1), root_author: testUuid(10) },
+						{ root_id: testUuid(1), 'root_$key_author': testUuid(10) },
 					],
 				},
 			},
 			{
 				sql:
-					SQL`select "root_"."id" as "root_id", "root_"."disclosed" = ? as "root___predicate_disclosed_eq_true", "root_"."secret" as "root_secret", "root_"."id" as "root_id" 
+					SQL`select "root_"."id" as "root_$index_id", "root_"."disclosed" = ? as "root_$predicate_disclosed_eq_true", "root_"."secret" as "root_secret", "root_"."id" as "root_id" 
 from "public"."author" as "root_" where "root_"."id" in (?) and ("root_"."published" = ? or "root_"."disclosed" = ?)`,
 				parameters: [true, testUuid(10), true, true],
 				response: {
 					rows: [
 						{
 							root_id: testUuid(10),
+							'root_$index_id': testUuid(10),
 							root_secret: 'shh',
-							root___predicate_disclosed_eq_true: true,
+							'root_$predicate_disclosed_eq_true': true,
 						},
 					],
 				},

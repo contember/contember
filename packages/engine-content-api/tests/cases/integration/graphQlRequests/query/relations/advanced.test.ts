@@ -37,15 +37,17 @@ test('Posts with categories and its cz locale (many has many owning + one has ma
 			{
 				sql: SQL`select
                        "root_"."id" as "root_id",
-                       "root_"."id" as "root_id"
+                       "root_"."id" as "root_$key_id"
                      from "public"."post" as "root_"`,
 				response: {
 					rows: [
 						{
 							root_id: testUuid(1),
+							'root_$key_id': testUuid(1),
 						},
 						{
 							root_id: testUuid(2),
+							'root_$key_id': testUuid(2),
 						},
 					],
 				},
@@ -81,7 +83,7 @@ test('Posts with categories and its cz locale (many has many owning + one has ma
 			{
 				sql: SQL`select
                        "root_"."visible" as "root_visible",
-                       "root_"."id" as "root_id",
+                       "root_"."id" as "root_$key_id",
                        "root_"."id" as "root_id"
                      from "public"."category" as "root_"
                      where "root_"."id" in (?, ?, ?)`,
@@ -90,14 +92,17 @@ test('Posts with categories and its cz locale (many has many owning + one has ma
 					rows: [
 						{
 							root_id: testUuid(3),
+							'root_$key_id': testUuid(3),
 							root_visible: true,
 						},
 						{
 							root_id: testUuid(4),
+							'root_$key_id': testUuid(4),
 							root_visible: true,
 						},
 						{
 							root_id: testUuid(5),
+							'root_$key_id': testUuid(5),
 							root_visible: true,
 						},
 					],
@@ -219,15 +224,17 @@ test('Categories with posts and author (many has many inverse + many has one)', 
 			{
 				sql: SQL`select
                        "root_"."id" as "root_id",
-                       "root_"."id" as "root_id"
+                       "root_"."id" as "root_$key_id"
                      from "public"."category" as "root_"`,
 				response: {
 					rows: [
 						{
 							root_id: testUuid(1),
+							'root_$key_id': testUuid(1),
 						},
 						{
 							root_id: testUuid(2),
+							'root_$key_id': testUuid(2),
 						},
 					],
 				},
@@ -262,7 +269,7 @@ test('Categories with posts and author (many has many inverse + many has one)', 
 			},
 			{
 				sql: SQL`select
-                       "root_"."author_id" as "root_author",
+                       "root_"."author_id" as "root_$key_author",
                        "root_"."id" as "root_id"
                      from "public"."post" as "root_"
                      where "root_"."id" in (?, ?, ?)
@@ -272,22 +279,22 @@ test('Categories with posts and author (many has many inverse + many has one)', 
 					rows: [
 						{
 							root_id: testUuid(3),
-							root_author: testUuid(6),
+							'root_$key_author': testUuid(6),
 						},
 						{
 							root_id: testUuid(4),
-							root_author: testUuid(7),
+							'root_$key_author': testUuid(7),
 						},
 						{
 							root_id: testUuid(5),
-							root_author: testUuid(7),
+							'root_$key_author': testUuid(7),
 						},
 					],
 				},
 			},
 			{
 				sql: SQL`select
-                       "root_"."id" as "root_id",
+                       "root_"."id" as "root_$index_id",
                        "root_"."name" as "root_name",
                        "root_"."id" as "root_id"
                      from "public"."author" as "root_"
@@ -298,10 +305,12 @@ test('Categories with posts and author (many has many inverse + many has one)', 
 					rows: [
 						{
 							root_id: testUuid(6),
+							'root_$index_id': testUuid(6),
 							root_name: 'John',
 						},
 						{
 							root_id: testUuid(7),
+							'root_$index_id': testUuid(7),
 							root_name: 'Jack',
 						},
 					],

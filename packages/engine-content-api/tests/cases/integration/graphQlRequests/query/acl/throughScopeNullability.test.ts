@@ -94,21 +94,21 @@ test('the same not-null column is read over a relation', async () => {
 		executes: [
 			{
 				sql:
-					SQL`select "root_"."title" as "root_title", "root_"."author_id" as "root_author", "root_"."id" as "root_id" from "public"."article" as "root_"`,
+					SQL`select "root_"."title" as "root_title", "root_"."author_id" as "root_$key_author", "root_"."id" as "root_id" from "public"."article" as "root_"`,
 				parameters: [],
 				response: {
 					rows: [
-						{ root_id: testUuid(1), root_title: 'Article A', root_author: testUuid(10) },
+						{ root_id: testUuid(1), root_title: 'Article A', 'root_$key_author': testUuid(10) },
 					],
 				},
 			},
 			{
-				sql: SQL`select "root_"."id" as "root_id", "root_"."name" as "root_name", "root_"."secret" as "root_secret", "root_"."id" as "root_id" 
+				sql: SQL`select "root_"."id" as "root_$index_id", "root_"."name" as "root_name", "root_"."secret" as "root_secret", "root_"."id" as "root_id" 
 from "public"."author" as "root_" where "root_"."id" in (?)`,
 				parameters: [testUuid(10)],
 				response: {
 					rows: [
-						{ root_id: testUuid(10), root_name: 'John Doe', root_secret: 'shh' },
+						{ root_id: testUuid(10), 'root_$index_id': testUuid(10), root_name: 'John Doe', root_secret: 'shh' },
 					],
 				},
 			},

@@ -70,26 +70,26 @@ test('querying post + author name', async () => {
 			{
 				sql: SQL`select
                          "root_"."id" as "root_id",
-                         "root_"."author_id" as "root_author"
+                         "root_"."author_id" as "root_$key_author"
                        from "public"."post" as "root_"`,
 				parameters: [],
 				response: {
 					rows: [
 						{
 							root_id: testUuid(1),
-							root_author: testUuid(3),
+							'root_$key_author': testUuid(3),
 						},
 						{
 							root_id: testUuid(2),
-							root_author: testUuid(4),
+							'root_$key_author': testUuid(4),
 						},
 					],
 				},
 			},
 			{
 				sql: SQL`SELECT
-							 "root_"."id" AS "root_id",
-							 "root_country"."name" IN (?) AS "root___predicate_countryPredicate",
+							 "root_"."id" as "root_$index_id",
+							 "root_country"."name" IN (?) as "root_$predicate_countryPredicate",
 							 "root_"."name" AS "root_name",
 							 "root_"."id" AS "root_id"
 						 FROM "public"."author" AS "root_"
@@ -100,7 +100,8 @@ test('querying post + author name', async () => {
 					rows: [
 						{
 							root_id: testUuid(3),
-							root___predicate_countryPredicate: true,
+							'root_$index_id': testUuid(3),
+							'root_$predicate_countryPredicate': true,
 							root_name: 'John',
 						},
 					],

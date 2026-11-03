@@ -50,33 +50,34 @@ test('can read same entity only over relation of some rows - many has one', asyn
 		executes: [
 			{
 				sql:
-					SQL`select "root_"."title" as "root_title", "root_"."disclose_author" = ? as "root___predicate_discloseAuthor_eq_true", "root_"."author_id" as "root_author", "root_"."id" as "root_id" 
+					SQL`select "root_"."title" as "root_title", "root_"."disclose_author" = ? as "root_$predicate_discloseAuthor_eq_true", "root_"."author_id" as "root_$key_author", "root_"."id" as "root_id" 
 from "public"."article" as "root_"`,
 				response: {
 					rows: [
 						{
 							root_id: testUuid(1),
 							root_title: 'Article A',
-							root___predicate_discloseAuthor_eq_true: true,
-							root_author: testUuid(10),
+							'root_$predicate_discloseAuthor_eq_true': true,
+							'root_$key_author': testUuid(10),
 						},
 						{
 							root_id: testUuid(2),
 							root_title: 'Article B',
-							root___predicate_discloseAuthor_eq_true: false,
-							root_author: testUuid(10),
+							'root_$predicate_discloseAuthor_eq_true': false,
+							'root_$key_author': testUuid(10),
 						},
 					],
 				},
 			},
 			{
 				sql:
-					SQL`select "root_"."id" as "root_id", "root_"."name" as "root_name", "root_"."id" as "root_id" from "public"."author" as "root_" where "root_"."id" in (?)`,
+					SQL`select "root_"."id" as "root_$index_id", "root_"."name" as "root_name", "root_"."id" as "root_id" from "public"."author" as "root_" where "root_"."id" in (?)`,
 				parameters: [testUuid(10)],
 				response: {
 					rows: [
 						{
 							root_id: testUuid(10),
+							'root_$index_id': testUuid(10),
 							root_name: 'John doe',
 						},
 					],
@@ -147,19 +148,21 @@ test('can read same entity only over relation of some rows - many has many', asy
 		executes: [
 			{
 				sql:
-					SQL`select "root_"."title" as "root_title", "root_"."disclose_author" = ? as "root___predicate_discloseauthor_eq_true", "root_"."id" as "root_id", "root_"."id" as "root_id" 
+					SQL`select "root_"."title" as "root_title", "root_"."disclose_author" = ? as "root_$predicate_discloseAuthor_eq_true", "root_"."id" as "root_$key_id", "root_"."id" as "root_id" 
 from "public"."article" as "root_"`,
 				response: {
 					rows: [
 						{
 							root_id: testUuid(1),
+							'root_$key_id': testUuid(1),
 							root_title: 'Article A',
-							root___predicate_discloseAuthor_eq_true: true,
+							'root_$predicate_discloseAuthor_eq_true': true,
 						},
 						{
 							root_id: testUuid(2),
+							'root_$key_id': testUuid(2),
 							root_title: 'Article B',
-							root___predicate_discloseAuthor_eq_true: false,
+							'root_$predicate_discloseAuthor_eq_true': false,
 						},
 					],
 				},

@@ -75,7 +75,7 @@ export class Mapper<ConnectionType extends Connection.ConnectionLike = Connectio
 	): Promise<SelectIndexedResultObjects> {
 		const hydrator = new SelectHydrator()
 		const path = this.pathFactory.create([])
-		const indexByAlias: string = path.for(indexBy).alias
+		const indexByAlias: string = path.forInternal('index').for(indexBy).alias
 		const qb: SelectBuilder = SelectBuilder.create()
 			.select([path.alias, getColumnName(this.schema, entity, indexBy)], indexByAlias)
 		const rows = await this.selectRows(hydrator, qb, entity, input, relationPath)

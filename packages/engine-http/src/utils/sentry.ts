@@ -56,15 +56,20 @@ export class SentryLoggerHandler implements LoggerHandler {
 	}
 }
 
+type SentryIntegration = ReturnType<typeof Sentry.getDefaultIntegrations>[number]
+
+// Undici (fetch) would record outgoing request URLs, which may carry a webhook credential in the path or query,
+// in breadcrumbs and spans, and add Sentry trace headers to every webhook request.
+export const filterSentryIntegrations = (integrations: SentryIntegration[]): SentryIntegration[] =>
+	integrations.filter(integration => !['Console', 'Http', 'Undici'].includes(integration.name))
+
 export const createSentryLoggerHandler = (dsn?: string): null | LoggerHandler => {
 	if (!dsn) {
 		return null
 	}
 	Sentry.init({
 		dsn: dsn,
-		integrations: integrations => {
-			return integrations.filter(integration => integration.name !== 'Console' && integration.name !== 'Http')
-		},
+		integrations: filterSentryIntegrations,
 	})
 	return new SentryLoggerHandler(LogLevels.warn)
 }

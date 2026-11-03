@@ -117,13 +117,13 @@ test('sorts posts by random on has many relation', async () => {
 				sql: SQL`select
                      "root_"."id" as "root_id",
                      "root_"."title" as "root_title",
-                     "root_"."id" as "root_id"
+                     "root_"."id" as "root_$key_id"
                    from "public"."category" as "root_"`,
 				parameters: [],
 				response: {
 					rows: [
-						{ root_id: testUuid(1), root_title: 'Hello' },
-						{ root_id: testUuid(2), root_title: 'World' },
+						{ 'root_id': testUuid(1), 'root_$key_id': testUuid(1), 'root_title': 'Hello' },
+						{ 'root_id': testUuid(2), 'root_$key_id': testUuid(2), 'root_title': 'World' },
 					],
 				},
 			},

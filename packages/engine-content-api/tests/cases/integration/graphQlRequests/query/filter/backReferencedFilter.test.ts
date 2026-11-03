@@ -24,15 +24,17 @@ test('Categories with children filtered by back-referenced parent', async () => 
 			{
 				sql: SQL`select
                        "root_"."id" as "root_id",
-                       "root_"."id" as "root_id"
+                       "root_"."id" as "root_$key_id"
                      from "public"."category" as "root_"`,
 				response: {
 					rows: [
 						{
-							root_id: testUuid(1),
+							'root_id': testUuid(1),
+							'root_$key_id': testUuid(1),
 						},
 						{
-							root_id: testUuid(2),
+							'root_id': testUuid(2),
+							'root_$key_id': testUuid(2),
 						},
 					],
 				},

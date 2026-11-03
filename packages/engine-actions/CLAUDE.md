@@ -120,7 +120,7 @@ credentials and quotes it raw), so it is logged as a `WebhookRequestError` witho
 the logged and the stored reason go through `redactRequestError`. It first replaces the resolved URL,
 every header value and every interpolated variable value, also in their HTTP-whitespace-trimmed form
 (fetch quotes an invalid header value trimmed), percent-encoded and with `/` escaped as `\/` (JSON
-encoders), and the path and query of an http(s) URL on their own (a server often quotes only the path,
+encoders), and the path, query and each query value of an http(s) URL on their own (a server often quotes only the path,
 where a token written into the target URL lives). Then any URL still quoted keeps only its scheme, host and
 port. Known values go first because a password with `@` or `/` ends a URL's authority early. Every such
 value is replaced, short or static ones included: an over-redacted reason beats a leaked token.

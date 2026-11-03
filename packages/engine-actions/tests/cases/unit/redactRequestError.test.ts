@@ -41,6 +41,10 @@ test('redacts the path and query of a secret URL quoted on their own', () => {
 	expect(redactRequestError('Cannot POST /services/T0/B0/static-token', [url])).toBe('Cannot POST [redacted]')
 	expect(redactRequestError('{"path":"/services/T0/B0/static-token?key=abc"}', [url])).toBe('{"path":"[redacted]"}')
 	expect(redactRequestError('bad query key=abc', [url])).toBe('bad query [redacted]')
+	expect(redactRequestError('{"error":"invalid apiKey STATICKEY"}', ['https://hooks.example.com/hook?apiKey=STATICKEY&v=2']))
+		.toBe('{"error":"invalid apiKey [redacted]"}')
+	// a bare-word query is no key=value pair, so the word stays elsewhere in the message
+	expect(redactRequestError('invalid header value', ['https://hooks.example.com/hook?id'])).toBe('invalid header value')
 	// a bare slash would redact every slash in the message
 	expect(redactRequestError('Cannot POST /', ['https://hooks.example.com/'])).toBe('Cannot POST /')
 })

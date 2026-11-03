@@ -1,0 +1,66 @@
+import { expect, test } from 'bun:test'
+import { redactRequestError } from '../../../src/dispatch/redactRequestError'
+
+test('keeps a message without a URL or a secret', () => {
+	expect(redactRequestError('getaddrinfo ENOTFOUND example.com', [])).toBe('getaddrinfo ENOTFOUND example.com')
+})
+
+test('keeps only the scheme, host and port of a URL', () => {
+	expect(redactRequestError('Failed to parse URL from https://user:pw@example.com:8443/a/b?c=d#e', []))
+		.toBe('Failed to parse URL from https://[redacted]@example.com:8443/[redacted]')
+	expect(redactRequestError('Invalid URL http://example.com/?token=abc.', [])).toBe('Invalid URL http://example.com/[redacted]')
+	expect(redactRequestError('Unable to connect to http://example.com/ or http://example.org', []))
+		.toBe('Unable to connect to http://example.com/ or http://example.org')
+})
+
+test('redacts every URL, a quoted one included', () => {
+	expect(redactRequestError('Redirect from "https://a.example/x?t=1" to https://b.example/y', []))
+		.toBe('Redirect from "https://a.example/[redacted]" to https://b.example/[redacted]')
+})
+
+test('redacts every occurrence of a secret, the longest first', () => {
+	expect(redactRequestError('expected abc, got abcdef and abc', ['abc', 'abcdef', ''])).toBe('expected [redacted], got [redacted] and [redacted]')
+	expect(redactRequestError('invalid header value "Bearer abc"', ['Bearer abc', 'abc'])).toBe('invalid header value "[redacted]"')
+})
+
+test('redacts a password containing @, / or ?', () => {
+	expect(redactRequestError('Request cannot be constructed from a URL that includes credentials: https://user:p@ss@example.com/hooks', []))
+		.toBe('Request cannot be constructed from a URL that includes credentials: https://[redacted]@example.com/[redacted]')
+	// such a password ends the authority early, so only the known value redacts all of it
+	expect(redactRequestError('Failed to parse URL from https://user:pa/s?s@example.com/hooks', ['pa/s?s']))
+		.toBe('Failed to parse URL from https://[redacted]@example.com/[redacted]')
+})
+
+test('redacts a secret quoted without its surrounding whitespace', () => {
+	expect(redactRequestError('Headers.append: "Bearer abc\ndef" is an invalid header value.', [' Bearer abc\ndef\n', 'abc\ndef\n']))
+		.toBe('Headers.append: "[redacted]" is an invalid header value.')
+})
+
+test('redacts the path and query of a secret URL quoted on their own', () => {
+	const url = 'https://hooks.example.com/services/T0/B0/static-token?key=abc'
+	expect(redactRequestError('Cannot POST /services/T0/B0/static-token', [url])).toBe('Cannot POST [redacted]')
+	expect(redactRequestError('{"path":"/services/T0/B0/static-token?key=abc"}', [url])).toBe('{"path":"[redacted]"}')
+	expect(redactRequestError('bad query key=abc', [url])).toBe('bad query [redacted]')
+	expect(redactRequestError('{"error":"invalid apiKey STATICKEY"}', ['https://hooks.example.com/hook?apiKey=STATICKEY&v=2']))
+		.toBe('{"error":"invalid apiKey [redacted]"}')
+	// a bare-word query is no key=value pair, so the word stays elsewhere in the message
+	expect(redactRequestError('invalid header value', ['https://hooks.example.com/hook?id'])).toBe('invalid header value')
+	// a bare slash would redact every slash in the message
+	expect(redactRequestError('Cannot POST /', ['https://hooks.example.com/'])).toBe('Cannot POST /')
+})
+
+test('redacts a secret quoted with escaped slashes or percent-encoded', () => {
+	const url = 'https://hooks.example.com/p/static-token'
+	expect(redactRequestError('{"url":"https:\\/\\/hooks.example.com\\/p\\/static-token"}', [url])).toBe('{"url":"[redacted]"}')
+	expect(redactRequestError('{"path":"\\/p\\/static-token"}', [url])).toBe('{"path":"[redacted]"}')
+	expect(redactRequestError('redirect=https%3A%2F%2Fhooks.example.com%2Fp%2Fstatic-token', [url])).toBe('redirect=[redacted]')
+	expect(redactRequestError('{"auth":"Bearer a\\/b"}', ['Bearer a/b'])).toBe('{"auth":"[redacted]"}')
+})
+
+test('scans a long message without a URL in linear time', () => {
+	const start = performance.now()
+	expect(redactRequestError('a-'.repeat(100_000), [])).toHaveLength(200_000)
+	expect(redactRequestError('a.'.repeat(100_000), [])).toHaveLength(200_000)
+	// the quadratic scan took seconds on a tenth of this
+	expect(performance.now() - start).toBeLessThan(1_000)
+})

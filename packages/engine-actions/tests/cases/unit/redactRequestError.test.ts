@@ -22,3 +22,24 @@ test('redacts every occurrence of a secret, the longest first', () => {
 	expect(redactRequestError('expected abc, got abcdef and abc', ['abc', 'abcdef', ''])).toBe('expected [redacted], got [redacted] and [redacted]')
 	expect(redactRequestError('invalid header value "Bearer abc"', ['Bearer abc', 'abc'])).toBe('invalid header value "[redacted]"')
 })
+
+test('redacts a password containing @, / or ?', () => {
+	expect(redactRequestError('Request cannot be constructed from a URL that includes credentials: https://user:p@ss@example.com/hooks', []))
+		.toBe('Request cannot be constructed from a URL that includes credentials: https://[redacted]@example.com/[redacted]')
+	// such a password ends the authority early, so only the known value redacts all of it
+	expect(redactRequestError('Failed to parse URL from https://user:pa/s?s@example.com/hooks', ['pa/s?s']))
+		.toBe('Failed to parse URL from https://[redacted]@example.com/[redacted]')
+})
+
+test('redacts a secret quoted without its surrounding whitespace', () => {
+	expect(redactRequestError('Headers.append: "Bearer abc\ndef" is an invalid header value.', [' Bearer abc\ndef\n', 'abc\ndef\n']))
+		.toBe('Headers.append: "[redacted]" is an invalid header value.')
+})
+
+test('scans a long message without a URL in linear time', () => {
+	const start = performance.now()
+	expect(redactRequestError('a-'.repeat(100_000), [])).toHaveLength(200_000)
+	expect(redactRequestError('a.'.repeat(100_000), [])).toHaveLength(200_000)
+	// the quadratic scan took seconds on a tenth of this
+	expect(performance.now() - start).toBeLessThan(1_000)
+})

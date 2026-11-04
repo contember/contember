@@ -1,4 +1,4 @@
-import { Link, type RoleCondition, type RoutingLinkTarget, useCurrentRequest, useProjectUserRoles } from '@contember/interface'
+import { evaluateRoleCondition, Link, type RoleCondition, type RoutingLinkTarget, useCurrentRequest, useProjectUserRoles } from '@contember/interface'
 import { createContext } from '@contember/react-utils'
 import { VariantProps } from 'class-variance-authority'
 import { ChevronRight } from 'lucide-react'
@@ -78,7 +78,7 @@ export const MenuItem = ({ icon, label, to, children, role, expandedByDefault, .
 	const projectRoles = useProjectUserRoles()
 	const { level } = useMenuContext()
 
-	if (role && !(typeof role === 'string' ? projectRoles.has(role) : role(projectRoles))) {
+	if (role && !evaluateRoleCondition(role, projectRoles)) {
 		return null
 	}
 

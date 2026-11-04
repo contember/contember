@@ -4,7 +4,7 @@ Authorization and authentication components for role-based rendering.
 
 ## Core Components
 
-- `HasRole` — conditional rendering based on user roles (string match or custom function)
+- `HasRole` — conditional rendering based on user roles (role name, `any`/`all`/`not` combinations or a custom predicate; see `evaluateRoleCondition`)
 - `IdentityEnvironmentProvider` — provides identity data to binding environment
 
 ## Key Hooks

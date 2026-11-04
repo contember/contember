@@ -36,7 +36,7 @@ Row-level and field-level security via predicate injection into every SQL operat
 - `PredicatesInjector` — ANDs user predicates with ACL predicates on every query
 - `VariableInjector` — replaces variable references with identity-specific values
 
-Select column aliases derive from the GraphQL field aliases (`Path`). A column the engine selects for itself (predicate results, relation keys, index keys, view id sources) takes its segment from `Path.forInternal`, so its alias stays distinct from those of selected fields.
+Select column aliases derive from the client's GraphQL aliases (`Path`), and PostgreSQL keeps the last of duplicate output names. Any column the engine reads back itself (predicate results, relation keys, index keys, view id sources) must take its segment from `Path.forInternal`, which a client alias cannot produce.
 
 ## GraphQL Schema Building
 

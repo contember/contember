@@ -61,8 +61,8 @@ export class Path {
 		return new Path([...this.path, path], this.aliasContext, this.rootAlias)
 	}
 
-	// Segment for a column the engine selects for itself. `$` cannot occur in a GraphQL alias, so these aliases stay
-	// distinct from those of selected fields; `kind` must not contain `_`.
+	// Engine-owned columns share the alias namespace with client GraphQL aliases. `$` is outside the GraphQL Name
+	// grammar, so no client alias (nor `_`-joined aliases) can produce the segment; `kind` must not contain `_`.
 	public forInternal(kind: string) {
 		return this.for('$' + kind)
 	}

@@ -155,7 +155,7 @@ export const convertError = (
 }
 
 // Data (22) and integrity (23) errors and project trigger exceptions (P0001) carry messages clients act on. Other
-// messages (e.g. class 42) can quote internal SQL identifiers.
+// messages (e.g. class 42) can quote internal SQL identifiers, which embed ACL predicate names.
 const hasClientFacingMessage = (code: string | undefined): boolean =>
 	code !== undefined && (code.startsWith('22') || code.startsWith('23') || code === 'P0001')
 

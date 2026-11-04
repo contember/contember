@@ -10,6 +10,7 @@ export namespace Model {
 		readonly fields: { readonly [name in Fields]: AnyField }
 		readonly unique: Uniques
 		readonly indexes: Indexes
+		readonly checks?: CheckConstraints
 		readonly view?: View
 		readonly eventLog: EventLogConfig
 		readonly orderBy?: readonly OrderBy[]
@@ -346,6 +347,15 @@ export namespace Model {
 		readonly include?: readonly string[]
 		// per-key-column options (ASC/DESC, NULLS FIRST/LAST, operator class), keyed by field name
 		readonly columnOptions?: { readonly [field: string]: IndexColumnOptions }
+	}
+
+	export type CheckConstraints = readonly CheckConstraint[]
+
+	export type CheckConstraint = {
+		// identity of the constraint within the entity, used verbatim as the Postgres constraint name
+		readonly name: string
+		// raw SQL boolean expression over column names (ALTER TABLE ... ADD CONSTRAINT <name> CHECK (<expression>))
+		readonly expression: string
 	}
 
 	export interface ColumnContext {

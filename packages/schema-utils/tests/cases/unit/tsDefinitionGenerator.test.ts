@@ -75,6 +75,20 @@ test('definition generator round-trips per-column index options', () => {
 	expect(generated).toContain(`@c.Index({ fields: [{ field: 'title', opClass: 'text_pattern_ops' }] })`)
 })
 
+namespace CheckGenSchema {
+	@c.Check({ name: 'price_non_negative', expression: "price >= 0 AND currency <> ''" })
+	export class Product {
+		price = c.intColumn()
+		currency = c.stringColumn()
+	}
+}
+
+test('definition generator emits check constraints', () => {
+	const generator = new DefinitionCodeGenerator()
+	const generated = generator.generate(createSchema(CheckGenSchema))
+	expect(generated).toContain(`@c.Check({ name: 'price_non_negative', expression: 'price >= 0 AND currency <> \\'\\'' })`)
+})
+
 namespace ExplicitPrimaryReadModel {
 	export const editorRole = c.createRole('editor')
 

@@ -52,6 +52,7 @@ export const c = {
 	// Model
 	// Model entity decorators
 	ExtendEntity: SchemaDefinition.extendEntity,
+	Check: SchemaDefinition.Check,
 	Index: SchemaDefinition.Index,
 	Unique: SchemaDefinition.Unique,
 	View: SchemaDefinition.View,

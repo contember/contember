@@ -10,6 +10,9 @@ import { ColumnDefinition } from '../fieldDefinitions/index.js'
 import { applyEntityExtensions } from '../extensions.js'
 import { StrictDefinitionValidator, StrictOptions } from '../../../strict.js'
 
+// an entity without checks carries no `checks` key, which is also what the migrations produce
+const withoutEmptyChecks = ({ checks, ...entity }: Model.Entity): Model.Entity => checks?.length ? { ...entity, checks } : entity
+
 export class SchemaBuilder {
 	private entityRegistry = new EntityRegistry()
 
@@ -77,7 +80,7 @@ export class SchemaBuilder {
 					enabled: true,
 				},
 			}
-			return applyEntityExtensions(definition, {
+			const extendedEntity = applyEntityExtensions(definition, {
 				entity,
 				definition: definitionInstance,
 				registry: this.entityRegistry,
@@ -87,6 +90,7 @@ export class SchemaBuilder {
 				strictDefinitionValidator: this.strictDefinitionValidator,
 				options: this.options,
 			})
+			return withoutEmptyChecks(extendedEntity)
 		})
 
 		return {

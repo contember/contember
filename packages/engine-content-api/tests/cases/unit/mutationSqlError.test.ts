@@ -16,7 +16,7 @@ const convert = (code: string, message: string) => {
 
 describe('mutation SQL error', () => {
 	it('returns a generic message for an error that can quote internal identifiers, and logs the original', () => {
-		const { message, logged, error } = convert('42702', 'column reference "root_$predicate_rule" is ambiguous')
+		const { message, logged, error } = convert('42702', 'column reference "root_$predicate_secretRule" is ambiguous')
 		expect(message).toBe('Database query failed')
 		expect(logged).toContain(error)
 	})

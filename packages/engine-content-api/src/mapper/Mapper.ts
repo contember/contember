@@ -10,7 +10,7 @@ import {
 	SelectResultObject,
 	WhereBuilder,
 } from './select/index.js'
-import { Client, Connection, ConstraintHelper, DatabaseMetadata, RequestMemoryBudget, SelectBuilder } from '@contember/database'
+import { Client, Connection, ConstraintHelper, DatabaseMetadata, Operator, RequestMemoryBudget, SelectBuilder } from '@contember/database'
 import { AclScope, aclScopeFromPath, PredicatesInjector, ROW_LOOKUP_SCOPE } from '../acl/index.js'
 import { JunctionTableManager } from './JunctionTableManager.js'
 import { DeletedEntitiesStorage, DeleteExecutor } from './delete/index.js'
@@ -363,6 +363,66 @@ export class Mapper<ConnectionType extends Connection.ConnectionLike = Connectio
 			visitOneHasOneOwning: err,
 			visitManyHasOne: err,
 		})
+	}
+
+	/**
+	 * Fetches the primary values of entities currently in a has-many relation of the given owner.
+	 * Used by the declarative `set` operation to compute orphans. Respects ACL read predicates on the target entity.
+	 */
+	public async fetchHasManyPrimaries(
+		context: Model.OneHasManyContext | Model.ManyHasManyOwningContext | Model.ManyHasManyInverseContext,
+		ownerPrimary: Input.PrimaryValue,
+	): Promise<Input.PrimaryValue[]> {
+		if (context.type === 'oneHasMany') {
+			const { targetEntity, targetRelation } = context
+			// Compare the FK column directly: filtering through the back-reference relation would also apply
+			// the owner's and the relation field's read predicates, unlike the many-has-many junction read.
+			const readPredicate = this.predicatesInjector.inject(targetEntity, {}, 'nested')
+			const path = this.pathFactory.create([])
+			let qb = SelectBuilder.create()
+				.from(targetEntity.tableName, path.alias)
+				.select([path.alias, targetEntity.primaryColumn], 'primary_')
+				.where(cond => cond.compare([path.alias, targetRelation.joiningColumn.columnName], Operator.eq, ownerPrimary))
+			if (Object.keys(readPredicate).length > 0) {
+				qb = this.whereBuilder.build(qb, targetEntity, path, readPredicate)
+			}
+			const rows = await qb.getResult(this.db)
+			return rows.map(it => it.primary_ as Input.PrimaryValue)
+		}
+
+		// many-has-many: read from the junction table via the owning side
+		const owningContext = context.type === 'manyHasManyOwning'
+			? { entity: context.entity, relation: context.relation, ownerIsJoining: true }
+			: { entity: context.targetEntity, relation: context.targetRelation, ownerIsJoining: false }
+		const targetEntity = context.targetEntity
+		const joiningTable = owningContext.relation.joiningTable
+		const ownerColumn = owningContext.ownerIsJoining ? joiningTable.joiningColumn.columnName : joiningTable.inverseJoiningColumn.columnName
+		const targetColumn = owningContext.ownerIsJoining ? joiningTable.inverseJoiningColumn.columnName : joiningTable.joiningColumn.columnName
+
+		// Apply the target entity's ACL read predicate so that members the current role cannot read
+		// are excluded from the orphan computation (left untouched), matching the oneHasMany behavior.
+		// `inject` returns an empty where when there is no read predicate, in which case the junction
+		// is read directly with no join, preserving the permissive/no-ACL query unchanged.
+		const readPredicate = this.predicatesInjector.inject(targetEntity, {}, 'nested')
+		const hasReadPredicate = Object.keys(readPredicate).length > 0
+
+		let qb = SelectBuilder.create()
+			.from(joiningTable.tableName, 'junction_')
+			.select(['junction_', targetColumn], 'primary_')
+			.where(cond => cond.compare(['junction_', ownerColumn], Operator.eq, ownerPrimary))
+
+		if (hasReadPredicate) {
+			const path = this.pathFactory.create([])
+			qb = qb.join(
+				targetEntity.tableName,
+				path.alias,
+				clause => clause.compareColumns(['junction_', targetColumn], Operator.eq, [path.alias, targetEntity.primaryColumn]),
+			)
+			qb = this.whereBuilder.build(qb, targetEntity, path, readPredicate)
+		}
+
+		const rows = await qb.getResult(this.db)
+		return rows.map(it => it.primary_ as Input.PrimaryValue)
 	}
 
 	public async getPrimaryValue(

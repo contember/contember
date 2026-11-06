@@ -1,4 +1,4 @@
-import { Maybe, Person, QueryPersonByIdArgs, QueryPersonsArgs, QueryResolvers } from '../../schema/index.js'
+import { Maybe, Person, ProjectMembersFilter, QueryPersonByIdArgs, QueryPersonsArgs, QueryResolvers } from '../../schema/index.js'
 import { TenantResolverContext } from '../TenantResolverContext.js'
 import { PermissionActions, PersonManager, ProjectManager, ProjectMemberManager } from '../../model/index.js'
 import { PersonResponseFactory } from '../responseHelpers/PersonResponseFactory.js'
@@ -19,6 +19,13 @@ export class PersonQueryResolver implements QueryResolvers {
 		if (!person || !(await context.isAllowed({ action: PermissionActions.PERSON_VIEW }))) {
 			return null
 		}
+		// The same visibility as `persons`, so an id does not open a person the listing would not show.
+		if (person.identity_id !== context.identity.id) {
+			const visible = await this.findVisibleIdentityIds(context, { identityId: [person.identity_id] })
+			if (visible !== 'all' && !visible.has(person.identity_id)) {
+				return null
+			}
+		}
 
 		return await PersonResponseFactory.createPersonResponse(person)
 	}
@@ -34,20 +41,32 @@ export class PersonQueryResolver implements QueryResolvers {
 			identityId: args.filter?.identityId,
 		}
 
-		// SUPER_ADMIN and PROJECT_ADMIN hold person:list and see every person; so does
-		// a custom role granted it. The check carries no scope, so a *global* project_admin
-		// lists the whole tenant, not just their projects' members.
-		if (await context.isAllowed({ action: PermissionActions.PERSON_LIST })) {
+		const visible = await this.findVisibleIdentityIds(context, {})
+		if (visible === 'all') {
 			const rows = await this.personManager.listPersons(context.db, filter, args.limit, args.offset)
 			return rows.map(row => PersonResponseFactory.createPersonResponse(row))
 		}
+		if (visible.size === 0) {
+			return []
+		}
 
-		// Otherwise scope to exactly the members the caller may see — the same set
-		// reachable via `project.members`. We resolve visible members per project
-		// through `getProjectMembers`, which applies per-membership-role filtering,
-		// so a caller whose `tenant.view` rule is restricted to some roles only sees
-		// those members (a plain `PROJECT_VIEW_MEMBER([])` gate would leak the whole
-		// membership, incl. admins, regardless of role).
+		const rows = await this.personManager.listPersons(
+			context.db,
+			{ ...filter, identityIds: [...visible] },
+			args.limit,
+			args.offset,
+		)
+		return rows.map(row => PersonResponseFactory.createPersonResponse(row))
+	}
+
+	/**
+	 * The identities whose persons the caller may read, narrowed by `filter`: everyone with person:list (unscoped), otherwise
+	 * exactly the members `project.members` shows the caller, role filtering included.
+	 */
+	private async findVisibleIdentityIds(context: TenantResolverContext, filter: ProjectMembersFilter): Promise<'all' | Set<string>> {
+		if (await context.isAllowed({ action: PermissionActions.PERSON_LIST })) {
+			return 'all'
+		}
 		const projects = await this.projectManager.getProjectsByIdentity(context.db, context.identity.id, context.permissionContext)
 		const visibleIdentityIds = new Set<string>()
 		for (const project of projects) {
@@ -56,21 +75,11 @@ export class PersonQueryResolver implements QueryResolvers {
 			if (!(await verifier(PermissionActions.PROJECT_VIEW_MEMBER([])))) {
 				continue
 			}
-			const members = await this.projectMemberManager.getProjectMembers(context.db, project.id, verifier, { filter: {} })
+			const members = await this.projectMemberManager.getProjectMembers(context.db, project.id, verifier, { filter })
 			for (const member of members) {
 				visibleIdentityIds.add(member.identity.id)
 			}
 		}
-		if (visibleIdentityIds.size === 0) {
-			return []
-		}
-
-		const rows = await this.personManager.listPersons(
-			context.db,
-			{ ...filter, identityIds: [...visibleIdentityIds] },
-			args.limit,
-			args.offset,
-		)
-		return rows.map(row => PersonResponseFactory.createPersonResponse(row))
+		return visibleIdentityIds
 	}
 }

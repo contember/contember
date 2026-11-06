@@ -1,5 +1,5 @@
 import { PersonRow } from '../queries/index.js'
-import { ConfirmOtpCommand, DisableOtpCommand, PrepareOtpCommand, ReEncryptOtpSecretCommand } from '../commands/index.js'
+import { ClaimTotpCounterCommand, ConfirmOtpCommand, DisableOtpCommand, PrepareOtpCommand, ReEncryptOtpSecretCommand } from '../commands/index.js'
 import { DatabaseContext } from '../utils/index.js'
 import { OtpAuthenticator, OtpData } from './OtpAuthenticator.js'
 import { Providers } from '../providers.js'
@@ -51,7 +51,12 @@ export class OtpManager {
 	/** Verifies a token against the person's *active* TOTP secret. */
 	async verifyOtp(dbContext: DatabaseContext, person: PersonRow, token: string): Promise<boolean> {
 		const resolved = await this.resolveSecret(person.otp_secret, person.otp_secret_version)
-		const valid = this.otpAuthenticator.validate(resolved.secretLike, token)
+		const counter = this.otpAuthenticator.matchCounter(resolved.secretLike, token)
+		if (counter === null) {
+			return false
+		}
+		// A code that was already accepted (e.g. observed or intercepted) must not be accepted again.
+		const valid = await dbContext.commandBus.execute(new ClaimTotpCounterCommand(person.id, counter))
 		if (valid && resolved.reEncrypt) {
 			// Best-effort: re-encryption must never affect the verify result and any
 			// failure (encrypt or update) is swallowed so the user still signs in.

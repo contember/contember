@@ -43,9 +43,9 @@ test('disableOtp succeeds with no policy (zero-policy behavior unchanged)', asyn
 			getAuthPoliciesSql([]),
 			{
 				sql: `update "tenant"."person_mfa"
-					set "totp_secret" = ?, "totp_secret_version" = ?, "totp_activated_at" = ?, "totp_pending_secret" = ?, "totp_pending_version" = ?, "totp_pending_created_at" = ?
+					set "totp_secret" = ?, "totp_secret_version" = ?, "totp_activated_at" = ?, "totp_pending_secret" = ?, "totp_pending_version" = ?, "totp_pending_created_at" = ?, "totp_last_counter" = ?
 					where "person_id" = ?`,
-				parameters: [null, null, null, null, null, null, personId],
+				parameters: [null, null, null, null, null, null, null, personId],
 				response: { rowCount: 1 },
 			},
 			{

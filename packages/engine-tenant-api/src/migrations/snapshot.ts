@@ -299,7 +299,8 @@ CREATE TABLE "person_mfa" (
     "totp_pending_secret" "bytea",
     "totp_pending_version" integer,
     "totp_pending_created_at" timestamp with time zone,
-    "email_otp_enabled" boolean DEFAULT false NOT NULL
+    "email_otp_enabled" boolean DEFAULT false NOT NULL,
+    "totp_last_counter" bigint
 );
 CREATE TABLE "person_token" (
     "id" "uuid" NOT NULL,

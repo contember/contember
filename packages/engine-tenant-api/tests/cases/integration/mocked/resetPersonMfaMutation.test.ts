@@ -23,9 +23,9 @@ test('resetPersonMfa clears factors + backup codes and audits mfa_reset', async 
 			getIdentityProjectMembershipPresenceSql(identityId),
 			{
 				sql: SQL`update "tenant"."person_mfa"
-				set "totp_secret" = ?, "totp_secret_version" = ?, "totp_activated_at" = ?, "totp_pending_secret" = ?, "totp_pending_version" = ?, "totp_pending_created_at" = ?, "email_otp_enabled" = ?
+				set "totp_secret" = ?, "totp_secret_version" = ?, "totp_activated_at" = ?, "totp_pending_secret" = ?, "totp_pending_version" = ?, "totp_pending_created_at" = ?, "totp_last_counter" = ?, "email_otp_enabled" = ?
 				where "person_id" = ?`,
-				parameters: [null, null, null, null, null, null, false, personId],
+				parameters: [null, null, null, null, null, null, null, false, personId],
 				response: { rowCount: 1 },
 			},
 			{

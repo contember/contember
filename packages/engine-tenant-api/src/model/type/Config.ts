@@ -9,6 +9,7 @@ export type ConfigRow = {
 	passwordless_enabled: ConfigPolicy
 	passwordless_url: string | null
 	passwordless_expiration: IPostgresInterval
+	passwordless_uniform_response: boolean
 	password_min_length: number
 	password_require_uppercase: number
 	password_require_lowercase: number

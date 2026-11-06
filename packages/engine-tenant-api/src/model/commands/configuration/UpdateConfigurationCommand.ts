@@ -39,6 +39,7 @@ export class UpdateConfigurationCommand implements Command<void> {
 					email_change_require_reauthentication: this.configuration.emailChange?.requireReauthentication ?? undefined,
 					passwordless_url: this.configuration.passwordless?.url,
 					passwordless_expiration: this.configuration.passwordless?.expiration ?? undefined,
+					passwordless_uniform_response: this.configuration.passwordless?.uniformResponse ?? undefined,
 					password_min_length: this.configuration.password?.minLength ?? undefined,
 					password_require_uppercase: this.configuration.password?.requireUppercase ?? undefined,
 					password_require_lowercase: this.configuration.password?.requireLowercase ?? undefined,

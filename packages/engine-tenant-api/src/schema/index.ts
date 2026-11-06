@@ -577,12 +577,21 @@ export type ConfigPasswordless = {
 	readonly __typename?: 'ConfigPasswordless'
 	readonly enabled: ConfigPolicy
 	readonly expiration: Scalars['Interval']['output']
+	/**
+	 * When true, initSignInPasswordless answers an unknown address, a person with
+	 * passwordless sign-in disabled, a person bound to an identity provider and a
+	 * throttled address like a real request (ok with a random requestId), without
+	 * sending a mail. Does not apply while passwordless is globally never.
+	 * Defaults to false.
+	 */
+	readonly uniformResponse: Scalars['Boolean']['output']
 	readonly url?: Maybe<Scalars['String']['output']>
 }
 
 export type ConfigPasswordlessInput = {
 	readonly enabled?: InputMaybe<ConfigPolicy>
 	readonly expiration?: InputMaybe<Scalars['Interval']['input']>
+	readonly uniformResponse?: InputMaybe<Scalars['Boolean']['input']>
 	readonly url?: InputMaybe<Scalars['String']['input']>
 }
 
@@ -3628,6 +3637,7 @@ export type ConfigPasswordlessResolvers<
 > = {
 	enabled?: Resolver<ResolversTypes['ConfigPolicy'], ParentType, ContextType>
 	expiration?: Resolver<ResolversTypes['Interval'], ParentType, ContextType>
+	uniformResponse?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
 	url?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>
 }
 

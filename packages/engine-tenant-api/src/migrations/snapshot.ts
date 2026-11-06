@@ -190,6 +190,7 @@ CREATE TABLE "config" (
     "email_change_require_reauthentication" boolean DEFAULT false NOT NULL,
     "login_mfa_change_require_reauthentication" boolean DEFAULT false NOT NULL,
     "login_anomaly_missing_signal_is_new" boolean DEFAULT false NOT NULL,
+    "passwordless_uniform_response" boolean DEFAULT false NOT NULL,
     CONSTRAINT "config_captcha_complete" CHECK ((("captcha_provider" IS NULL) OR (("captcha_secret" IS NOT NULL) AND ("captcha_secret_version" IS NOT NULL)))),
     CONSTRAINT "config_captcha_provider_check" CHECK ((("captcha_provider" IS NULL) OR ("captcha_provider" = ANY (ARRAY['turnstile'::"text", 'hcaptcha'::"text", 'recaptchaV3'::"text"]))))
 );

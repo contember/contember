@@ -33,6 +33,7 @@ export class ConfigurationQuery extends DatabaseQuery<Config> {
 				enabled: result.passwordless_enabled,
 				url: result.passwordless_url,
 				expiration: result.passwordless_expiration,
+				uniformResponse: result.passwordless_uniform_response,
 			},
 			password: {
 				minLength: result.password_min_length,

@@ -11,6 +11,7 @@ import { getIdentityProjectsSql } from './sql/getIdentityProjectsSql.js'
 import { getMailTemplateSql } from './sql/getMailTemplateSql.js'
 import { getPersonByEmailSql } from './sql/getPersonByEmailSql.js'
 import { getConfigSql } from './sql/getConfigSql.js'
+import { reserveReauthenticationSql } from './sql/reserveReauthenticationSql.js'
 
 test('changes my name', async () => {
 	const personId = testUuid(1)
@@ -245,8 +246,26 @@ test('changes my email - re-authentication with a wrong password', async () => {
 				response: { personId, email: 'john.doe@example.com', name: 'John Doe', roles: [], password: '123456' },
 			}),
 			reauthenticationConfig,
+			...reserveReauthenticationSql({ personId }),
 		],
 		return: { data: { changeMyProfile: { ok: false, error: { code: 'INVALID_PASSWORD' } } } },
+		expectedAuthLog: expect.objectContaining({ type: 'email_change', response: expect.objectContaining({ ok: false }) }),
+	})
+})
+
+test('changes my email - re-authentication is refused after too many attempts, even with the right password', async () => {
+	const personId = testUuid(1)
+	await executeTenantTest({
+		query: changeMyProfileMutation({ email: 'jane@doe.com', currentPassword: '123456' }),
+		executes: [
+			getPersonByIdentity({
+				identityId: authenticatedIdentityId,
+				response: { personId, email: 'john.doe@example.com', name: 'John Doe', roles: [], password: '123456' },
+			}),
+			reauthenticationConfig,
+			...reserveReauthenticationSql({ personId, attempts: 6 }),
+		],
+		return: { data: { changeMyProfile: { ok: false, error: { code: 'RATE_LIMIT_EXCEEDED' } } } },
 		expectedAuthLog: expect.objectContaining({ type: 'email_change', response: expect.objectContaining({ ok: false }) }),
 	})
 })
@@ -262,6 +281,7 @@ test('changes my email - re-authenticated change signs out other sessions and no
 				response: { personId, email: 'john.doe@example.com', name: 'John Doe', roles: [], password: '123456' },
 			}),
 			reauthenticationConfig,
+			...reserveReauthenticationSql({ personId }),
 			...sqlTransaction(
 				getPersonByEmailSql({ email, response: null }),
 				updatePersonProfileEmailSql({ personId, email }),

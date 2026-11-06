@@ -1612,6 +1612,7 @@ const schema: DocumentNode = gql`
 		REAUTHENTICATION_REQUIRED
 		INVALID_PASSWORD
 		INVALID_OTP_TOKEN
+		RATE_LIMIT_EXCEEDED
 	}
 
 	type PrepareOtpResult {
@@ -1659,6 +1660,7 @@ const schema: DocumentNode = gql`
 		REAUTHENTICATION_REQUIRED
 		INVALID_PASSWORD
 		INVALID_OTP_TOKEN
+		RATE_LIMIT_EXCEEDED
 	}
 
 	type RegenerateBackupCodesResponse {
@@ -1677,6 +1679,7 @@ const schema: DocumentNode = gql`
 		REAUTHENTICATION_REQUIRED
 		INVALID_PASSWORD
 		INVALID_OTP_TOKEN
+		RATE_LIMIT_EXCEEDED
 	}
 
 	type RegenerateBackupCodesResult {
@@ -1735,6 +1738,7 @@ const schema: DocumentNode = gql`
 		REAUTHENTICATION_REQUIRED
 		INVALID_PASSWORD
 		INVALID_OTP_TOKEN
+		RATE_LIMIT_EXCEEDED
 	}
 
 	type DisablePersonResponse {

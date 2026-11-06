@@ -152,24 +152,27 @@ export class EmailChangeManager {
 		}
 
 		if (oldEmail) {
-			// Resolve the person's preferred project so a per-project
-			// EMAIL_CHANGE_NOTIFY template (and branding) is honoured, mirroring
-			// requestEmailChange. The token carries no project, so derive it from the
-			// person's own identity.
-			const permissionContext = this.permissionContextFactory.create(dbContext, {
-				id: person.identity_id,
-				roles: person.roles,
-			})
-			const projects = await this.projectManager.getProjectsByIdentity(dbContext, person.identity_id, permissionContext)
-			const project = getPreferredProject(projects, null)
-			await this.mailer.sendEmailChangeNotifyEmail(
-				dbContext,
-				{ email: oldEmail, newEmail, project: project?.name, projectSlug: project?.slug },
-				{ projectId: project?.id ?? null, variant: '', recipientIdentityId: person.identity_id },
-			)
+			await this.notifyOldAddress(dbContext, person, oldEmail, newEmail)
 		}
 
 		return new ResponseOk({ personId: person.id, newEmail, [AuthLogService.Key]: authLogData })
+	}
+
+	/** Tells the previous address that the account now uses another one. */
+	public async notifyOldAddress(dbContext: DatabaseContext, person: PersonRow, oldEmail: string, newEmail: string): Promise<void> {
+		// Resolve the person's preferred project so a per-project EMAIL_CHANGE_NOTIFY template (and branding) is
+		// honoured, mirroring requestEmailChange. No project is given here, so derive it from the person's own identity.
+		const permissionContext = this.permissionContextFactory.create(dbContext, {
+			id: person.identity_id,
+			roles: person.roles,
+		})
+		const projects = await this.projectManager.getProjectsByIdentity(dbContext, person.identity_id, permissionContext)
+		const project = getPreferredProject(projects, null)
+		await this.mailer.sendEmailChangeNotifyEmail(
+			dbContext,
+			{ email: oldEmail, newEmail, project: project?.name, projectSlug: project?.slug },
+			{ projectId: project?.id ?? null, variant: '', recipientIdentityId: person.identity_id },
+		)
 	}
 }
 

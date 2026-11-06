@@ -293,8 +293,11 @@ export type ChangeMyProfileError = {
 export type ChangeMyProfileErrorCode =
 	| 'EMAIL_ALREADY_EXISTS'
 	| 'INVALID_EMAIL_FORMAT'
+	| 'INVALID_OTP_TOKEN'
+	| 'INVALID_PASSWORD'
 	| 'NOT_A_PERSON'
 	| 'RATE_LIMIT_EXCEEDED'
+	| 'REAUTHENTICATION_REQUIRED'
 
 export type ChangeMyProfileResponse = {
 	readonly __typename?: 'ChangeMyProfileResponse'
@@ -414,6 +417,13 @@ export type ConfigCaptchaProtectInput = {
 export type ConfigEmailChange = {
 	readonly __typename?: 'ConfigEmailChange'
 	/**
+	 * When true, a changeMyProfile e-mail change requires the current password or a
+	 * TOTP code (currentPassword / otpToken). A change applied directly also sends a
+	 * notice to the old address and signs out the person's other sessions.
+	 * Defaults to false.
+	 */
+	readonly requireReauthentication: Scalars['Boolean']['output']
+	/**
 	 * When true, a user-initiated changeMyProfile e-mail change does not swap
 	 * the address immediately: it goes through a confirmation flow
 	 * (confirmEmailChange) against a token mailed to the new address, and the
@@ -424,6 +434,7 @@ export type ConfigEmailChange = {
 }
 
 export type ConfigEmailChangeInput = {
+	readonly requireReauthentication?: InputMaybe<Scalars['Boolean']['input']>
 	readonly requireVerification?: InputMaybe<Scalars['Boolean']['input']>
 }
 
@@ -1530,8 +1541,10 @@ export type MutationChangeMyPasswordArgs = {
 }
 
 export type MutationChangeMyProfileArgs = {
+	currentPassword?: InputMaybe<Scalars['String']['input']>
 	email?: InputMaybe<Scalars['String']['input']>
 	name?: InputMaybe<Scalars['String']['input']>
+	otpToken?: InputMaybe<Scalars['String']['input']>
 }
 
 export type MutationChangePasswordArgs = {
@@ -3505,6 +3518,7 @@ export type ConfigEmailChangeResolvers<
 	ContextType = any,
 	ParentType extends ResolversParentTypes['ConfigEmailChange'] = ResolversParentTypes['ConfigEmailChange'],
 > = {
+	requireReauthentication?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
 	requireVerification?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
 }
 

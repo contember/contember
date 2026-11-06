@@ -51,6 +51,7 @@ import {
 	ProjectScopeFactory,
 	Providers,
 	RateLimiter,
+	ReauthenticationVerifier,
 	RecaptchaV3Provider,
 	RolesManager,
 	SecretsManager,
@@ -284,6 +285,7 @@ export class TenantContainerFactory {
 			.addService('personIdentityProviderManager', () => new PersonIdentityProviderManager())
 			.addService('otpAuthenticator', ({ providers }) => new OtpAuthenticator(providers))
 			.addService('otpManager', ({ otpAuthenticator, providers }) => new OtpManager(otpAuthenticator, providers))
+			.addService('reauthenticationVerifier', ({ providers, otpManager }) => new ReauthenticationVerifier(providers, otpManager))
 			.addService('backupCodeManager', ({ providers, userMailer }) => new BackupCodeManager(userMailer, providers))
 			.addService('emailOtpManager', ({ userMailer, providers, rateLimiter }) => new EmailOtpManager(userMailer, providers, rateLimiter))
 			.addService('authPolicyManager', ({ projectManager }) => new AuthPolicyManager(projectManager))
@@ -351,8 +353,8 @@ export class TenantContainerFactory {
 			.addService('signOutMutationResolver', ({ signOutManager }) => new SignOutMutationResolver(signOutManager))
 			.addService(
 				'changeProfileMutationResolver',
-				({ personManager, emailChangeManager, permissionContextFactory }) =>
-					new ChangeProfileMutationResolver(personManager, emailChangeManager, permissionContextFactory),
+				({ personManager, emailChangeManager, permissionContextFactory, reauthenticationVerifier }) =>
+					new ChangeProfileMutationResolver(personManager, emailChangeManager, permissionContextFactory, reauthenticationVerifier),
 			)
 			.addService(
 				'emailVerificationMutationResolver',

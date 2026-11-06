@@ -19,6 +19,8 @@ import {
 	PersonManager,
 	PersonQuery,
 	ProfileField,
+	ReauthenticationVerifier,
+	RevokePersonSessionsCommand,
 } from '../../../model/index.js'
 import { createErrorResponse } from '../../errorUtils.js'
 import { normalizeEmail } from '../../../model/utils/email.js'
@@ -28,6 +30,7 @@ export class ChangeProfileMutationResolver implements Pick<MutationResolvers, 'c
 		private readonly personManager: PersonManager,
 		private readonly emailChangeManager: EmailChangeManager,
 		private readonly permissionContextFactory: PermissionContextFactory,
+		private readonly reauthenticationVerifier: ReauthenticationVerifier,
 	) {}
 
 	async changeProfile(
@@ -96,6 +99,23 @@ export class ChangeProfileMutationResolver implements Pick<MutationResolvers, 'c
 		const normalizedNewEmail = args.email ? normalizeEmail(args.email) : null
 		const emailChanging = normalizedNewEmail !== null && normalizedNewEmail !== person.email
 
+		// Opt-in: a stolen session alone must not be enough to move the account to another address.
+		const requireReauthentication = emailChanging && config.emailChange.requireReauthentication
+		if (requireReauthentication) {
+			const reauthentication = await this.reauthenticationVerifier.verify(context.db, person, {
+				currentPassword: args.currentPassword,
+				otpToken: args.otpToken,
+			})
+			if (!reauthentication.ok) {
+				await context.logAuthAction({
+					type: 'email_change',
+					response: reauthentication,
+					personId: person.id,
+				})
+				return createErrorResponse(reauthentication.error, reauthentication.errorMessage)
+			}
+		}
+
 		// When e-mail-change verification applies, an e-mail change is not
 		// applied immediately: it goes through confirmEmailChange against a token
 		// mailed to the new address (the old address stays active until then). The
@@ -140,10 +160,16 @@ export class ChangeProfileMutationResolver implements Pick<MutationResolvers, 'c
 			return { ok: true }
 		}
 
-		const result = await this.personManager.changeProfile(context.db, person, {
-			email: args.email,
-			name: args.name === '' ? null : args.name,
-		})
+		const profileChange = { email: args.email, name: args.name === '' ? null : args.name }
+		const result = requireReauthentication
+			? await context.db.transaction(async db => {
+				const changed = await this.personManager.changeProfile(db, person, profileChange)
+				if (changed.ok) {
+					await db.commandBus.execute(new RevokePersonSessionsCommand(person.id, context.apiKeyId))
+				}
+				return changed
+			})
+			: await this.personManager.changeProfile(context.db, person, profileChange)
 		if (args.email) {
 			await context.logAuthAction({
 				type: 'email_change',
@@ -154,6 +180,9 @@ export class ChangeProfileMutationResolver implements Pick<MutationResolvers, 'c
 
 		if (!result.ok) {
 			return createErrorResponse(result.error, result.errorMessage)
+		}
+		if (requireReauthentication && person.email !== null && normalizedNewEmail !== null) {
+			await this.emailChangeManager.notifyOldAddress(context.db, person, person.email, normalizedNewEmail)
 		}
 
 		return { ok: true }

@@ -5,6 +5,7 @@ import { Interval } from '../../schema/types.js'
 export type ConfigRow = {
 	signup_require_email_verification: boolean
 	require_email_change_verification: boolean
+	email_change_require_reauthentication: boolean
 	passwordless_enabled: ConfigPolicy
 	passwordless_url: string | null
 	passwordless_expiration: IPostgresInterval

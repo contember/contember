@@ -24,6 +24,7 @@ export const getConfigSql = (overrides: Record<string, unknown> = {}): ExpectedQ
 				password_check_blacklist: true,
 				password_check_hibp: false,
 				password_revoke_sessions_on_change: false,
+				email_change_require_reauthentication: false,
 				login_base_backoff: PostgresInterval('00:00:01'),
 				login_max_backoff: PostgresInterval('00:01:00'),
 				login_attempt_window: PostgresInterval('00:05:00'),

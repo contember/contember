@@ -173,7 +173,9 @@ export class ProjectMigrator {
 			sqlErrors.push(...validateAddedSql(snapshotSchema, next))
 			snapshotSchema = next
 		}
-		this.assertNoSqlErrors(latestVersion, sqlErrors)
+		// A snapshot does not map its modifications to migrations, so any covered migration's skip applies.
+		const coveredSkippedErrors = sortedCovers.flatMap(it => it.type === 'schema' ? it.skippedErrors ?? [] : [])
+		this.assertNoSqlErrors(latestVersion, SchemaValidator.filterSkipped(sqlErrors, coveredSkippedErrors))
 
 		const metadataStore = this.migrationsDatabaseMetadataResolverStoreFactory.create(db)
 		let schema = emptySchema
@@ -295,6 +297,10 @@ export class ProjectMigrator {
 				if (described.length === 0) {
 					continue
 				}
+				skippedErrors = [
+					...skippedErrors.filter(it => it.skipUntil && MigrationVersionHelper.extractVersion(it.skipUntil) >= migration.version),
+					...migration.skippedErrors ?? [],
+				]
 				// Per modification, so a view dropped and recreated within the migration is checked too.
 				const sqlErrors: ValidationError[] = []
 				let previousSchema = schema
@@ -302,13 +308,9 @@ export class ProjectMigrator {
 					sqlErrors.push(...validateAddedSql(previousSchema, next))
 					previousSchema = next
 				}
-				this.assertNoSqlErrors(migration.version, sqlErrors)
+				this.assertNoSqlErrors(migration.version, SchemaValidator.filterSkipped(sqlErrors, skippedErrors))
 				const latestModification = described[described.length - 1]
 				schema = latestModification.schema
-				skippedErrors = [
-					...skippedErrors.filter(it => it.skipUntil && MigrationVersionHelper.extractVersion(it.skipUntil) >= migration.version),
-					...migration.skippedErrors ?? [],
-				]
 				const errors = SchemaValidator.validate(schema, skippedErrors)
 				if (errors.length > 0) {
 					throw new InvalidSchemaError(

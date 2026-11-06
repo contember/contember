@@ -179,3 +179,32 @@ test('a multi-statement view migration about to be executed is rejected before a
 	await expect(result).rejects.toBeInstanceOf(InvalidSchemaError)
 	await expect(result).rejects.toThrow('entities.ArticleView: [MODEL_INVALID_VIEW] View SQL must be a single SQL statement.')
 })
+
+test('a skippedErrors entry lets a fresh database replay a migration with a multi-statement view', async () => {
+	const skipping: SchemaMigrationInput = {
+		...multiStatementViewMigration,
+		skippedErrors: [{ code: 'MODEL_INVALID_VIEW', path: 'entities.ArticleView' }],
+	}
+	expect(calculateMigrationChecksum(skipping)).toBe(calculateMigrationChecksum(multiStatementViewMigration))
+	const savedMigrations = await migrate({ executed: [], migrationsToExecute: [skipping, indexMigration] })
+	expect(savedMigrations).toHaveLength(2)
+})
+
+test('a skippedErrors entry of a covered migration lets a snapshot with a multi-statement view bootstrap', async () => {
+	const bootstrap = (covered: SchemaMigrationInput) => {
+		const connection = new RecordingConnection()
+		const result = createMigrator({ schema: emptySchema, meta: {} }, []).migrateFromSnapshot({
+			db: createDb(connection),
+			project: { slug: 'test', systemSchema: 'system' },
+			stages: [],
+			snapshot: { formatVersion, modifications: [...covered.modifications] },
+			covers: [covered],
+		})
+		return { result, connection }
+	}
+	await expect(bootstrap(multiStatementViewMigration).result).rejects.toBeInstanceOf(InvalidSchemaError)
+
+	const skipping = bootstrap({ ...multiStatementViewMigration, skippedErrors: [{ code: 'MODEL_INVALID_VIEW' }] })
+	await skipping.result
+	expect(savedMigrationsOf(skipping.connection)).toHaveLength(1)
+})

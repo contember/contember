@@ -44,7 +44,7 @@ export class ProjectMemberManager {
 		dbContext: DatabaseContext,
 		projectId: string,
 		identityId: string,
-		roles?: readonly string[],
+		roles: readonly string[],
 	): Promise<RemoveProjectMemberResponse> {
 		return await dbContext.transaction(
 			async db => await db.commandBus.execute(new RemoveProjectMemberCommand(projectId, identityId, roles)),

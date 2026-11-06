@@ -42,6 +42,7 @@ export class ConfigurationQuery extends DatabaseQuery<Config> {
 				pattern: result.password_pattern,
 				checkBlacklist: result.password_check_blacklist,
 				checkHibp: result.password_check_hibp,
+				revokeSessionsOnChange: result.password_revoke_sessions_on_change,
 			},
 			login: {
 				baseBackoff: result.login_base_backoff,

@@ -16,6 +16,7 @@ export type ConfigRow = {
 	password_pattern: string | null
 	password_check_blacklist: boolean
 	password_check_hibp: boolean
+	password_revoke_sessions_on_change: boolean
 	login_base_backoff: IPostgresInterval
 	login_max_backoff: IPostgresInterval
 	login_attempt_window: IPostgresInterval

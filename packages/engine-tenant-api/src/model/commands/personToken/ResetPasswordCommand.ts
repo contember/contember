@@ -1,5 +1,6 @@
 import { Command } from '../Command.js'
 import { ChangePasswordCommand } from '../person/ChangePasswordCommand.js'
+import { RevokePersonSessionsCommand } from '../person/RevokePersonSessionsCommand.js'
 import { Response, ResponseOk } from '../../utils/Response.js'
 import { PersonTokenQuery } from '../../queries/personToken/PersonTokenQuery.js'
 import { InvalidateTokenCommand } from './InvalidateTokenCommand.js'
@@ -7,7 +8,11 @@ import { validateToken } from '../../utils/index.js'
 import { PersonToken } from '../../type/index.js'
 
 export class ResetPasswordCommand implements Command<ResetPasswordCommandResponse> {
-	constructor(private readonly token: string, private readonly password: string) {}
+	constructor(
+		private readonly token: string,
+		private readonly password: string,
+		private readonly revokeSessions: boolean,
+	) {}
 
 	async execute({ db, bus }: Command.Args): Promise<ResetPasswordCommandResponse> {
 		const token = await db.createQueryHandler().fetch(PersonTokenQuery.byToken(this.token, 'password_reset'))
@@ -17,6 +22,9 @@ export class ResetPasswordCommand implements Command<ResetPasswordCommandRespons
 		}
 		await bus.execute(new InvalidateTokenCommand(tokenValidationResult.result.id))
 		await bus.execute(new ChangePasswordCommand(tokenValidationResult.result.person_id, this.password))
+		if (this.revokeSessions) {
+			await bus.execute(new RevokePersonSessionsCommand(tokenValidationResult.result.person_id))
+		}
 
 		return new ResponseOk(null)
 	}

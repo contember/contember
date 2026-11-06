@@ -93,7 +93,9 @@ export class PasswordResetManager {
 				[AuthLogService.Key]: authLogData,
 			})
 		}
-		const resetPasswordResult = await dbContext.commandBus.execute(new ResetPasswordCommand(token, password))
+		const resetPasswordResult = config.password.revokeSessionsOnChange
+			? await dbContext.transaction(db => db.commandBus.execute(new ResetPasswordCommand(token, password, true)))
+			: await dbContext.commandBus.execute(new ResetPasswordCommand(token, password, false))
 		if (!resetPasswordResult.ok) {
 			return new ResponseError(resetPasswordResult.error, resetPasswordResult.errorMessage, {
 				...resetPasswordResult.metadata ?? {},

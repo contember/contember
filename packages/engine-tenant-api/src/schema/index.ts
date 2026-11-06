@@ -532,6 +532,8 @@ export type ConfigPassword = {
 	readonly requireLowercase: Scalars['Int']['output']
 	readonly requireSpecial: Scalars['Int']['output']
 	readonly requireUppercase: Scalars['Int']['output']
+	/** When true, setting a new password disables the person's other sessions and unused tokens. */
+	readonly revokeSessionsOnChange: Scalars['Boolean']['output']
 }
 
 export type ConfigPasswordInput = {
@@ -543,6 +545,7 @@ export type ConfigPasswordInput = {
 	readonly requireLowercase?: InputMaybe<Scalars['Int']['input']>
 	readonly requireSpecial?: InputMaybe<Scalars['Int']['input']>
 	readonly requireUppercase?: InputMaybe<Scalars['Int']['input']>
+	readonly revokeSessionsOnChange?: InputMaybe<Scalars['Boolean']['input']>
 }
 
 export type ConfigPasswordless = {
@@ -3544,6 +3547,7 @@ export type ConfigPasswordResolvers<
 	requireLowercase?: Resolver<ResolversTypes['Int'], ParentType, ContextType>
 	requireSpecial?: Resolver<ResolversTypes['Int'], ParentType, ContextType>
 	requireUppercase?: Resolver<ResolversTypes['Int'], ParentType, ContextType>
+	revokeSessionsOnChange?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
 }
 
 export type ConfigPasswordlessResolvers<

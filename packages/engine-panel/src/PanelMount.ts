@@ -18,8 +18,8 @@ export class PanelMount implements PanelApiMount {
 	) {
 	}
 
-	public mount(application: PanelApiMountTarget, { name, path, controller }: PanelApiMountArgs): void {
-		application.addRoute('panel-api', `${this.basePath}/api/${path}`, this.api.create(controller, { allowAnonymous: false }))
+	public mount(application: PanelApiMountTarget, { name, path, controller, carriesCredentials }: PanelApiMountArgs): void {
+		application.addRoute('panel-api', `${this.basePath}/api/${path}`, this.api.create(controller, { allowAnonymous: false }), { carriesCredentials })
 		this.pluginApiNames.add(name)
 	}
 

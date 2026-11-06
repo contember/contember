@@ -127,7 +127,7 @@ export default class ActionsPlugin implements Plugin {
 							debugMode,
 							actions_dispatchWorkerSupervisorFactory,
 						)
-						it.addRoute('actions', '/actions/:projectSlug', actionsMiddlewareFactory.create())
+						it.addRoute('actions', '/actions/:projectSlug', actionsMiddlewareFactory.create(), { carriesCredentials: true })
 						it.addWebsocketRoute('actions', '/actions/_worker', actionsWebsocketMiddlewareFactory.create())
 						// Does nothing unless the panel is served; when it is, the panel's access gate applies
 						// and the UI learns the actions module has an API to talk to.
@@ -135,6 +135,7 @@ export default class ActionsPlugin implements Plugin {
 							name: 'actions',
 							path: 'actions/:projectSlug',
 							controller: actionsMiddlewareFactory.create(),
+							carriesCredentials: true,
 						})
 					},
 				)

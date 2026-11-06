@@ -20,10 +20,16 @@ import { getClientIP } from '../utils/remoteAddress.js'
 import { isForceHttpOkRequested, shouldForceHttpOk } from './forceHttpOk.js'
 import { INVALID_TRACE_ID, noopTracer, Span, SpanContext, Tracer, withSpanContext } from '@contember/telemetry'
 import { AcceptIncomingTraceMode, resolveIncomingSpanContext } from '../telemetry/incomingTrace.js'
+import { maskRequestBody, maskRequestUri } from './requestBodyMasking.js'
 
 const websocketCloseTimeoutMs = 5_000
 
-type Route<C> = { match: RequestMatcher; controller: C; module: string; mask: string }
+type Route<C> = { match: RequestMatcher; controller: C; module: string; mask: string; carriesCredentials: boolean }
+
+export type RouteOptions = {
+	/** The route receives engine credentials (passwords, OTP codes, tokens), so its body and URI are masked in logs. */
+	readonly carriesCredentials?: boolean
+}
 export class Application {
 	private middlewares: KoaMiddleware<any>[] = []
 
@@ -57,12 +63,13 @@ export class Application {
 		this.middlewares.push(middleware)
 	}
 
-	public addRoute(module: string, mask: string, controller: HttpController): void {
+	public addRoute(module: string, mask: string, controller: HttpController, options: RouteOptions = {}): void {
 		this.routes.push({
 			module,
 			controller,
 			mask,
 			match: createRequestMatcher(mask),
+			carriesCredentials: options.carriesCredentials ?? false,
 		})
 	}
 
@@ -72,6 +79,7 @@ export class Application {
 			controller,
 			mask,
 			match: createRequestMatcher(mask),
+			carriesCredentials: false,
 		})
 	}
 
@@ -81,6 +89,7 @@ export class Application {
 			controller,
 			mask,
 			match: createRequestMatcher(mask),
+			carriesCredentials: false,
 		})
 	}
 
@@ -203,7 +212,7 @@ export class Application {
 				return await this.tracer.withSpan(span, async () => {
 					const pendingWork: Promise<void>[] = []
 					try {
-						requestLogger = this.createRequestLogger(req, undefined, matchedRequest.module, clientIp, span.context)
+						requestLogger = this.createRequestLogger(req, undefined, false, matchedRequest.module, clientIp, span.context)
 						const groupContainer = await this.projectGroupResolver.resolveContainer({ request: req })
 						requestLogger = requestLogger.child({ projectGroup: groupContainer.slug, project: matchedRequest.params.projectSlug })
 						span.setAttribute('contember.project_group', groupContainer.slug ?? 'unknown')
@@ -355,7 +364,9 @@ export class Application {
 	) {
 		let httpContext: HttpContext | null = null
 		const clientIp = getClientIP(ctx.req, this.trustedProxies)
-		let requestLogger = this.createRequestLogger(ctx.req, ctx.request.body, matchedRequest?.module, clientIp, span?.context)
+		const carriesCredentials = matchedRequest?.carriesCredentials ?? false
+		const loggedBody = maskRequestBody(ctx.request.body, carriesCredentials)
+		let requestLogger = this.createRequestLogger(ctx.req, loggedBody, carriesCredentials, matchedRequest?.module, clientIp, span?.context)
 		const { timer, send: sendTimer } = this.createTimer()
 
 		try {
@@ -363,8 +374,8 @@ export class Application {
 				return this.sendHttpResponse(ctx, new HttpErrorResponse(404, 'Route not found'))
 			}
 			requestLogger.debug('Request processing started', {
-				body: ctx.request.body,
-				query: ctx.request.query,
+				body: loggedBody,
+				query: maskRequestBody(ctx.request.query, carriesCredentials),
 			})
 
 			// todo: solve without koa context (required by prom metrics)
@@ -564,18 +575,26 @@ export class Application {
 		)
 	}
 
-	private createRequestLogger(request: IncomingMessage, body: any, module?: string, remoteAddress?: string, spanContext?: SpanContext): Logger {
+	/** `loggedBody` must already be masked (`maskRequestBody`): it reaches logs and error reports. */
+	private createRequestLogger(
+		request: IncomingMessage,
+		loggedBody: unknown,
+		carriesCredentials: boolean,
+		module?: string,
+		remoteAddress?: string,
+		spanContext?: SpanContext,
+	): Logger {
 		const traceAttributes = spanContext === undefined || spanContext.traceId === INVALID_TRACE_ID
 			? {}
 			: { traceId: spanContext.traceId, spanId: spanContext.spanId }
 		return this.logger.child({
 			method: request.method,
-			uri: request.url,
+			uri: maskRequestUri(request.url, carriesCredentials),
 			requestId: Math.random().toString().substring(2),
 			module,
 			remoteAddress,
 			...traceAttributes,
-			[LoggerRequestBody]: body,
+			[LoggerRequestBody]: loggedBody,
 		}, {
 			handler: FingerCrossedLoggerHandler.factory(),
 		})
@@ -638,7 +657,7 @@ export class Application {
 		for (const route of routes) {
 			const params = route.match({ url })
 			if (params !== null) {
-				return { params, controller: route.controller, module: route.module, mask: route.mask }
+				return { params, controller: route.controller, module: route.module, mask: route.mask, carriesCredentials: route.carriesCredentials }
 			}
 		}
 		return null
@@ -690,7 +709,7 @@ const createTracedReadable = (body: Readable, tracer: Tracer, span: Span): Reada
 /** @deprecated use `tracer` from the request context instead */
 export type Timer = <T>(event: string, cb: () => T) => T
 
-export type MatchedRequest<C> = { params: Params; controller: C; module: string; mask: string }
+export type MatchedRequest<C> = { params: Params; controller: C; module: string; mask: string; carriesCredentials: boolean }
 
 export type BaseRequestContext = {
 	logger: Logger

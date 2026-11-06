@@ -198,7 +198,7 @@ const claimAttemptSql = (args: { requestId: string; claimed: boolean }) => ({
 	response: { rowCount: args.claimed ? 1 : 0 },
 })
 
-test('signInPasswordless - a wrong code is counted before it is checked and the token is invalidated at the limit', async () => {
+test('signInPasswordless - a wrong code is counted before it is checked and the token expires at the limit', async () => {
 	const requestId = testUuid(1)
 	const personId = testUuid(2)
 	await executeTenantTest({
@@ -208,7 +208,7 @@ test('signInPasswordless - a wrong code is counted before it is checked and the 
 			claimAttemptSql({ requestId, claimed: true }),
 			...sqlTransaction(otpTokenSql({ requestId, personId, otpAttempts: 3 })),
 			{
-				sql: SQL`UPDATE "tenant"."person_token" SET "used_at" = now() WHERE "id" = ? AND "used_at" IS NULL AND "otp_attempts" >= ?`,
+				sql: SQL`UPDATE "tenant"."person_token" SET "expires_at" = now() WHERE "id" = ? AND "used_at" IS NULL AND "otp_attempts" >= ?`,
 				parameters: [requestId, 3],
 				response: { rowCount: 1 },
 			},
@@ -218,6 +218,54 @@ test('signInPasswordless - a wrong code is counted before it is checked and the 
 				signInPasswordless: {
 					ok: false,
 					error: { code: 'TOKEN_INVALID' },
+					result: null,
+				},
+			},
+		},
+		expectedAuthLog: {
+			type: 'passwordless_login',
+			response: expect.objectContaining({ ok: false }),
+		},
+	})
+})
+
+const personWithTotpSql = (args: { personId: string; identityId: string }) => {
+	const query = getPersonByIdSql({
+		personId: args.personId,
+		response: { personId: args.personId, identityId: args.identityId, password: '123', roles: [], email: 'john@doe.com', emailVerifiedAt: now },
+	})
+	const rows = query.response.rows ?? []
+	return {
+		...query,
+		response: { rows: rows.map(row => ({ ...row, otp_secret: Buffer.from('JBSWY3DPEHPK3PXP'), otp_secret_version: 0, otp_activated_at: now })) },
+	}
+}
+
+test('signInPasswordless - a right code that still needs a TOTP gives its attempt back', async () => {
+	const requestId = testUuid(1)
+	const personId = testUuid(2)
+	const identityId = testUuid(3)
+	await executeTenantTest({
+		query: signInPasswordlessMutation({ requestId, token: OTP_CODE, validationType: 'otp' }),
+		executes: [
+			otpTokenSql({ requestId, personId, otpAttempts: 0 }),
+			claimAttemptSql({ requestId, claimed: true }),
+			...sqlTransaction(
+				otpTokenSql({ requestId, personId, otpAttempts: 1 }),
+				personWithTotpSql({ personId, identityId }),
+				localAuthDisablingIdpsSql({ personId }),
+			),
+			{
+				sql: SQL`UPDATE "tenant"."person_token" SET "otp_attempts" = otp_attempts - 1 WHERE "id" = ? AND "otp_attempts" > ?`,
+				parameters: [requestId, 0],
+				response: { rowCount: 1 },
+			},
+		],
+		return: {
+			data: {
+				signInPasswordless: {
+					ok: false,
+					error: { code: 'OTP_REQUIRED' },
 					result: null,
 				},
 			},

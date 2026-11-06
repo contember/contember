@@ -49,4 +49,19 @@ describe('PasswordStrengthValidator', () => {
 		const result = await validator.verify('correct horse battery staple', { ...passwordConfig, checkHibp: true }, 'WEAK')
 		expect(result.ok).toBe(true)
 	})
+
+	test('accepts a password of exactly 72 bytes', async () => {
+		const validator = new PasswordStrengthValidator(new StubHibp(false))
+		expect((await validator.verify('a'.repeat(72), passwordConfig, 'WEAK')).ok).toBe(true)
+		// 36 two-byte characters
+		expect((await validator.verify('ž'.repeat(36), passwordConfig, 'WEAK')).ok).toBe(true)
+	})
+
+	test('refuses a password longer than 72 bytes, counting UTF-8 bytes, without checking HIBP', async () => {
+		const validator = new PasswordStrengthValidator(new StubHibp(true))
+		for (const password of ['a'.repeat(73), 'ž'.repeat(37)]) {
+			const result = await validator.verify(password, { ...passwordConfig, checkHibp: true }, 'WEAK')
+			expect(result.ok ? null : { error: result.error, reasons: result.metadata?.weakPasswordReasons }).toEqual({ error: 'WEAK', reasons: ['TOO_LONG'] })
+		}
+	})
 })

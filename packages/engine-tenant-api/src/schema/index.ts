@@ -2690,6 +2690,8 @@ export type WeakPasswordReason =
 	| 'MISSING_LOWERCASE'
 	| 'MISSING_SPECIAL'
 	| 'MISSING_UPPERCASE'
+	/** Longer than 72 bytes (UTF-8), the most a password hash covers. Only reported when a password is set. */
+	| 'TOO_LONG'
 	| 'TOO_SHORT'
 
 export type ResolverTypeWrapper<T> = Promise<T> | T

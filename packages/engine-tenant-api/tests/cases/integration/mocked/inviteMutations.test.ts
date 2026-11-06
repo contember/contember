@@ -173,3 +173,17 @@ test('invite a new person with password reset', async () => {
 	})
 })
 
+
+test('invite refuses an address with whitespace inside', async () => {
+	const projectSlug = 'blog'
+	await executeTenantTest({
+		query: inviteMutation({ email: 'big john@doe.com', projectSlug, memberships: [] }),
+		executes: [
+			getProjectBySlugSql({
+				projectSlug,
+				response: { id: testUuid(5), name: projectSlug, slug: projectSlug, config: {} },
+			}),
+		],
+		return: { data: { invite: { ok: false, errors: [{ code: 'INVALID_EMAIL_FORMAT' }], result: null } } },
+	})
+})

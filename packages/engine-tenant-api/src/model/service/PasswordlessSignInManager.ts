@@ -20,6 +20,7 @@ import { ImplementationException } from '../../exceptions'
 import { OtpAuthenticator } from './OtpAuthenticator'
 import { InvalidateTokenCommand } from '../commands/personToken/InvalidateTokenCommand'
 import { PersonToken } from '../type'
+import { EmailAddress } from '../utils/email'
 
 class PasswordlessSignInManager {
 	constructor(
@@ -31,10 +32,12 @@ class PasswordlessSignInManager {
 
 	) {}
 
-	async initSignInPasswordless({ db, permissionContext, mailVariant, mailProject, email }: {
+	async initSignInPasswordless({ db, permissionContext, mailVariant, mailProject, email: emailAddress, emailInput }: {
 		db: DatabaseContext
 		permissionContext: PermissionContext
-		email: string
+		/** Null when the input is not a single address: it names no person. */
+		email: EmailAddress | null
+		emailInput: string
 		mailVariant?: string
 		mailProject?: string
 	}): Promise<PasswordlessSignInManager.InitSignInPasswordlessResponse> {
@@ -44,9 +47,11 @@ class PasswordlessSignInManager {
 				return new ResponseError('PASSWORDLESS_DISABLED', 'Passwordless sign-in is disabled')
 			}
 
-			const person = await db.queryHandler.fetch(PersonQuery.byEmail(email))
-			if (!person) {
-				return new ResponseError('PERSON_NOT_FOUND', `Person ${email} not found`)
+			const person = emailAddress === null ? null : await db.queryHandler.fetch(PersonQuery.byEmail(emailAddress.value))
+			// The link and the mail use the stored address, never the input: the lookup matches variants of it.
+			const email = person?.email ?? null
+			if (!person || email === null) {
+				return new ResponseError('PERSON_NOT_FOUND', `Person ${emailInput} not found`)
 			}
 			if (!this.isEnabled(configuration.passwordless.enabled, person.passwordless_enabled)) {
 				return new ResponseError('PASSWORDLESS_DISABLED', 'Passwordless sign-in is disabled for this person')
@@ -61,8 +66,7 @@ class PasswordlessSignInManager {
 			const projects = await this.projectManager.getProjectsByIdentity(db, person.identity_id, permissionContext)
 			const project = getPreferredProject(projects, mailProject ?? null)
 
-			await this.mailer.sendPasswordlessEmail(db, {
-				email,
+			await this.mailer.sendPasswordlessEmail(db, person, {
 				token: result.token,
 				url,
 				project: project?.name,

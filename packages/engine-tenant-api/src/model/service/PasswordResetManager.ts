@@ -35,8 +35,8 @@ export class PasswordResetManager {
 
 		await this.mailer.sendPasswordResetEmail(
 			dbContext,
+			person,
 			{
-				email: person.email,
 				token: result.token,
 				project: project?.name,
 				projectSlug: project?.slug,

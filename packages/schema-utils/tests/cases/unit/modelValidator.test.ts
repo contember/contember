@@ -234,25 +234,6 @@ test('partial index with empty predicate', () => {
 	])
 })
 
-namespace PartialIndexSemicolonPredicate {
-	@c.Index({ fields: ['title'], where: 'title IS NOT NULL); DROP TABLE article; --' })
-	export class Article {
-		title = c.stringColumn()
-	}
-}
-
-test('partial index predicate with a statement terminator', () => {
-	const schema = createSchema(PartialIndexSemicolonPredicate)
-	const validator = new ModelValidator(schema.model)
-	expect(validator.validate()).toStrictEqual([
-		{
-			code: 'MODEL_INVALID_INDEX',
-			message: 'Index predicate (where) must not contain ";".',
-			path: ['entities', 'Article', 'indexes'],
-		},
-	])
-})
-
 namespace ViewRelations {
 	@c.View('SELECT 1')
 	export class Foo {

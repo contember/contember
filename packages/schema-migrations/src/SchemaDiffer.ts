@@ -47,6 +47,7 @@ import { RemoveChangedFieldDiffer, RemoveViewDiffer, UpdateViewDiffer } from './
 import { CreateIndexDiffer, RemoveIndexDiffer } from './modifications/indexes/index.js'
 import { CreateTriggerDiffer, RemoveTriggerDiffer, UpdateTriggerDiffer } from './modifications/actions/index.js'
 import { UpdateTargetDiffer } from './modifications/actions/UpdateTargetModification.js'
+import { validateAddedSql } from './validateAddedSql.js'
 import { CreateTargetDiffer } from './modifications/actions/CreateTargetModification.js'
 import { RemoveTargetDiffer } from './modifications/actions/RemoveTargetModification.js'
 import { UpdateSettingsDiffer } from './modifications/settings/index.js'
@@ -89,6 +90,10 @@ export class SchemaDiffer {
 		const updatedErrors = SchemaValidator.validate(updatedSchema)
 		if (updatedErrors.length > 0) {
 			throw new InvalidSchemaException('updated schema is not valid', updatedErrors)
+		}
+		const sqlErrors = validateAddedSql(originalSchema, updatedSchema)
+		if (sqlErrors.length > 0) {
+			throw new InvalidSchemaException('updated schema contains invalid SQL', sqlErrors)
 		}
 
 		const differs: Differ[] = [

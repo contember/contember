@@ -60,6 +60,7 @@ export class ConfigurationQuery extends DatabaseQuery<Config> {
 					historySize: result.login_anomaly_history_size,
 					emailThreshold: result.login_anomaly_email_threshold,
 					stepUpThreshold: result.login_anomaly_step_up_threshold,
+					missingSignalIsNew: result.login_anomaly_missing_signal_is_new,
 				},
 			},
 			captcha: {

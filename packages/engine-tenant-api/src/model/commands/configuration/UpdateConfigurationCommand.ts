@@ -61,6 +61,7 @@ export class UpdateConfigurationCommand implements Command<void> {
 					login_anomaly_history_size: this.configuration.login?.anomalyDetection?.historySize ?? undefined,
 					login_anomaly_email_threshold: this.configuration.login?.anomalyDetection?.emailThreshold ?? undefined,
 					login_anomaly_step_up_threshold: this.configuration.login?.anomalyDetection?.stepUpThreshold ?? undefined,
+					login_anomaly_missing_signal_is_new: this.configuration.login?.anomalyDetection?.missingSignalIsNew ?? undefined,
 					captcha_provider: captcha?.provider !== undefined ? captcha.provider : undefined,
 					captcha_secret: captchaSecretCol,
 					captcha_secret_version: captchaSecretVersionCol,

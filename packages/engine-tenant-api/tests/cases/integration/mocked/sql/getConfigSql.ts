@@ -40,6 +40,7 @@ export const getConfigSql = (overrides: Record<string, unknown> = {}): ExpectedQ
 				login_anomaly_history_size: 10,
 				login_anomaly_email_threshold: 1,
 				login_anomaly_step_up_threshold: 3,
+				login_anomaly_missing_signal_is_new: false,
 				captcha_provider: null,
 				captcha_secret: null,
 				captcha_secret_version: null,

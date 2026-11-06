@@ -55,6 +55,7 @@ mutation {
         historySize: 10       # how many recent successful logins to compare against
         emailThreshold: 1     # default: any low signal emails
         stepUpThreshold: 3    # default: a high signal (new country) forces step-up
+        missingSignalIsNew: false  # default: a missing signal is ignored
       }
     }
   }) { ok error { code developerMessage } }
@@ -62,6 +63,10 @@ mutation {
 ```
 
 With the shipped defaults (`emailThreshold: 1`, `stepUpThreshold: 3`): a new IP or device emails the user; a new country forces step-up. Set thresholds higher to suppress quieter signals.
+
+:::note[`missingSignalIsNew` available since 2.2]
+By default a signal missing from the current sign-in (no geo header, no `User-Agent`, no client IP) does not fire, so a client that withholds the `User-Agent` is never scored on the device. With `missingSignalIsNew: true` a missing signal scores like a new value, with the same weight, once the baseline has a value for that signal; the reasons are `missing_country`, `missing_device` and `missing_ip`. Without a baseline for the signal it still stays silent. Turn it on only when every honest client sends the signal: a proxy that drops the geo header or a client without a `User-Agent` would otherwise be scored on every sign-in.
+:::
 
 ## What gets recorded
 

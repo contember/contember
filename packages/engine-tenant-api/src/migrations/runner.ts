@@ -74,6 +74,7 @@ import _20261106120100configpasswordrevokesessions from './2026-11-06-120100-con
 import _20261106120200configemailchangereauthentication from './2026-11-06-120200-config-email-change-reauthentication.js'
 import _20261106120300personmfatotplastcounter from './2026-11-06-120300-person-mfa-totp-last-counter.js'
 import _20261106120400configmfachangereauthentication from './2026-11-06-120400-config-mfa-change-reauthentication.js'
+import _20261106120500configanomalymissingsignal from './2026-11-06-120500-config-anomaly-missing-signal.js'
 import snapshot from './snapshot.js'
 import { computeTokenHash, Providers } from '../model/index.js'
 import { Logger } from '@contember/logger'
@@ -171,6 +172,7 @@ const migrations = {
 	'2026-11-06-120200-config-email-change-reauthentication': _20261106120200configemailchangereauthentication,
 	'2026-11-06-120300-person-mfa-totp-last-counter': _20261106120300personmfatotplastcounter,
 	'2026-11-06-120400-config-mfa-change-reauthentication': _20261106120400configmfachangereauthentication,
+	'2026-11-06-120500-config-anomaly-missing-signal': _20261106120500configanomalymissingsignal,
 }
 
 export class TenantMigrationsRunner {

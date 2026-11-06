@@ -15,6 +15,7 @@ export const getConfigSql = (overrides: Record<string, unknown> = {}): ExpectedQ
 				passwordless_enabled: 'never',
 				passwordless_url: null,
 				passwordless_expiration: PostgresInterval('00:10:00'),
+				passwordless_uniform_response: false,
 				password_min_length: 6,
 				password_require_uppercase: 1,
 				password_require_lowercase: 1,

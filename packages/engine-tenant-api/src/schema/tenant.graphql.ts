@@ -258,6 +258,14 @@ const schema: DocumentNode = gql`
 		enabled: ConfigPolicy!
 		url: String
 		expiration: Interval!
+		"""
+		When true, initSignInPasswordless answers an unknown address, a person with
+		passwordless sign-in disabled, a person bound to an identity provider and a
+		throttled address like a real request (ok with a random requestId), without
+		sending a mail. Does not apply while passwordless is globally never.
+		Defaults to false.
+		"""
+		uniformResponse: Boolean!
 	}
 
 	type ConfigPassword {
@@ -423,6 +431,7 @@ const schema: DocumentNode = gql`
 		enabled: ConfigPolicy
 		url: String
 		expiration: Interval
+		uniformResponse: Boolean
 	}
 
 	input ConfigPasswordInput {

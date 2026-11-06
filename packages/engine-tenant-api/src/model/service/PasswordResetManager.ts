@@ -68,6 +68,7 @@ export class PasswordResetManager {
 			{
 				variant: mailOptions.mailVariant || '',
 				projectId: project?.id ?? null,
+				recipientIdentityId: person.identity_id,
 			},
 		)
 	}

@@ -87,6 +87,7 @@ export class EmailChangeManager {
 				{
 					variant: mailOptions.mailVariant || '',
 					projectId: project?.id ?? null,
+					recipientIdentityId: person.identity_id,
 				},
 			)
 		})
@@ -164,7 +165,7 @@ export class EmailChangeManager {
 			await this.mailer.sendEmailChangeNotifyEmail(
 				dbContext,
 				{ email: oldEmail, newEmail, project: project?.name, projectSlug: project?.slug },
-				{ projectId: project?.id ?? null, variant: '' },
+				{ projectId: project?.id ?? null, variant: '', recipientIdentityId: person.identity_id },
 			)
 		}
 

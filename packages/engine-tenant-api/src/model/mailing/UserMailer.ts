@@ -11,10 +11,18 @@ import EmailChangeVerify from './templates/EmailChangeVerify.mustache.js'
 import EmailChangeNotify from './templates/EmailChangeNotify.mustache.js'
 import UnusualLogin from './templates/UnusualLogin.mustache.js'
 import { MailTemplateData, MailTemplateIdentifier, MailType } from './type.js'
-import { MailTemplateQuery } from '../queries/index.js'
+import { IdentityQuery, MailTemplateQuery } from '../queries/index.js'
+import { holdsGlobalAdminRole } from '../authorization/index.js'
 import Layout from './templates/Layout.mustache.js'
 import { DatabaseContext } from '../utils/index.js'
 import { Acl } from '@contember/schema'
+
+export interface MailTemplateSelection {
+	projectId: string | null
+	variant: string
+	/** The identity the mail is for; without one, project templates are not used. */
+	recipientIdentityId: string | null
+}
 
 export class UserMailer {
 	constructor(
@@ -32,10 +40,10 @@ export class UserMailer {
 			projectSlug: string
 			memberships: readonly Acl.Membership[]
 		},
-		customMailOptions: { projectId: string; variant: string },
+		customMailOptions: MailTemplateSelection,
 	): Promise<void> {
-		const templateId = { type: MailType.newUserInvited, ...customMailOptions }
-		const template = (await this.getCustomTemplate(dbContext, templateId)) || {
+		const templateId = { type: MailType.newUserInvited, projectId: customMailOptions.projectId, variant: customMailOptions.variant }
+		const template = (await this.getCustomTemplate(dbContext, templateId, customMailOptions.recipientIdentityId)) || {
 			subject: 'You have been invited to {{project}}',
 			content: NewUserInvited,
 			replyTo: null,
@@ -46,10 +54,10 @@ export class UserMailer {
 	async sendExistingUserInvitedEmail(
 		dbContext: DatabaseContext,
 		mailArguments: { email: string; project: string; projectSlug: string; memberships: readonly Acl.Membership[] },
-		customMailOptions: { projectId: string; variant: string },
+		customMailOptions: MailTemplateSelection,
 	): Promise<void> {
-		const templateId = { type: MailType.existingUserInvited, ...customMailOptions }
-		const template = (await this.getCustomTemplate(dbContext, templateId)) || {
+		const templateId = { type: MailType.existingUserInvited, projectId: customMailOptions.projectId, variant: customMailOptions.variant }
+		const template = (await this.getCustomTemplate(dbContext, templateId, customMailOptions.recipientIdentityId)) || {
 			subject: 'You have been invited to {{project}}',
 			content: ExistingUserInvited,
 			replyTo: null,
@@ -60,10 +68,10 @@ export class UserMailer {
 	async sendPasswordResetEmail(
 		dbContext: DatabaseContext,
 		mailArguments: { email: string; token: string; project?: string; projectSlug?: string },
-		customMailOptions: { projectId: string | null; variant: string },
+		customMailOptions: MailTemplateSelection,
 	): Promise<void> {
-		const templateId = { type: MailType.passwordReset, ...customMailOptions }
-		const template = (await this.getCustomTemplate(dbContext, templateId)) || {
+		const templateId = { type: MailType.passwordReset, projectId: customMailOptions.projectId, variant: customMailOptions.variant }
+		const template = (await this.getCustomTemplate(dbContext, templateId, customMailOptions.recipientIdentityId)) || {
 			subject: 'Password reset',
 			content: PasswordReset,
 			replyTo: null,
@@ -74,10 +82,10 @@ export class UserMailer {
 	async sendForcedSignOutEmail(
 		dbContext: DatabaseContext,
 		mailArguments: { email: string; reason: string | null },
-		customMailOptions: { projectId: string | null; variant: string },
+		customMailOptions: MailTemplateSelection,
 	): Promise<void> {
-		const templateId = { type: MailType.forcedSignOut, ...customMailOptions }
-		const template = (await this.getCustomTemplate(dbContext, templateId)) || {
+		const templateId = { type: MailType.forcedSignOut, projectId: customMailOptions.projectId, variant: customMailOptions.variant }
+		const template = (await this.getCustomTemplate(dbContext, templateId, customMailOptions.recipientIdentityId)) || {
 			subject: 'Your sessions have been signed out',
 			content: ForcedSignOut,
 			replyTo: null,
@@ -88,10 +96,10 @@ export class UserMailer {
 	async sendEmailVerificationEmail(
 		dbContext: DatabaseContext,
 		mailArguments: { email: string; token: string; project?: string; projectSlug?: string },
-		customMailOptions: { projectId: string | null; variant: string },
+		customMailOptions: MailTemplateSelection,
 	): Promise<void> {
-		const templateId = { type: MailType.emailVerification, ...customMailOptions }
-		const template = (await this.getCustomTemplate(dbContext, templateId)) || {
+		const templateId = { type: MailType.emailVerification, projectId: customMailOptions.projectId, variant: customMailOptions.variant }
+		const template = (await this.getCustomTemplate(dbContext, templateId, customMailOptions.recipientIdentityId)) || {
 			subject: 'Verify your e-mail address',
 			content: EmailVerification,
 			replyTo: null,
@@ -102,10 +110,10 @@ export class UserMailer {
 	async sendEmailChangeVerifyEmail(
 		dbContext: DatabaseContext,
 		mailArguments: { email: string; token: string; project?: string; projectSlug?: string },
-		customMailOptions: { projectId: string | null; variant: string },
+		customMailOptions: MailTemplateSelection,
 	): Promise<void> {
-		const templateId = { type: MailType.emailChangeVerify, ...customMailOptions }
-		const template = (await this.getCustomTemplate(dbContext, templateId)) || {
+		const templateId = { type: MailType.emailChangeVerify, projectId: customMailOptions.projectId, variant: customMailOptions.variant }
+		const template = (await this.getCustomTemplate(dbContext, templateId, customMailOptions.recipientIdentityId)) || {
 			subject: 'Confirm your new e-mail address',
 			content: EmailChangeVerify,
 			replyTo: null,
@@ -116,10 +124,10 @@ export class UserMailer {
 	async sendEmailChangeNotifyEmail(
 		dbContext: DatabaseContext,
 		mailArguments: { email: string; newEmail: string; project?: string; projectSlug?: string },
-		customMailOptions: { projectId: string | null; variant: string },
+		customMailOptions: MailTemplateSelection,
 	): Promise<void> {
-		const templateId = { type: MailType.emailChangeNotify, ...customMailOptions }
-		const template = (await this.getCustomTemplate(dbContext, templateId)) || {
+		const templateId = { type: MailType.emailChangeNotify, projectId: customMailOptions.projectId, variant: customMailOptions.variant }
+		const template = (await this.getCustomTemplate(dbContext, templateId, customMailOptions.recipientIdentityId)) || {
 			subject: 'Your e-mail address was changed',
 			content: EmailChangeNotify,
 			replyTo: null,
@@ -130,10 +138,10 @@ export class UserMailer {
 	async sendPasswordlessEmail(
 		dbContext: DatabaseContext,
 		mailArguments: { email: string; token: string; project?: string; projectSlug?: string; url?: string; requestId: string },
-		customMailOptions: { projectId: string | null; variant: string },
+		customMailOptions: MailTemplateSelection,
 	): Promise<void> {
-		const templateId = { type: MailType.passwordlessSignIn, ...customMailOptions }
-		const template = (await this.getCustomTemplate(dbContext, templateId)) || {
+		const templateId = { type: MailType.passwordlessSignIn, projectId: customMailOptions.projectId, variant: customMailOptions.variant }
+		const template = (await this.getCustomTemplate(dbContext, templateId, customMailOptions.recipientIdentityId)) || {
 			subject: 'Sign in here',
 			content: PasswordlessSignIn,
 			replyTo: null,
@@ -144,10 +152,10 @@ export class UserMailer {
 	async sendEmailOtpEmail(
 		dbContext: DatabaseContext,
 		mailArguments: { email: string; code: string; project?: string; projectSlug?: string },
-		customMailOptions: { projectId: string | null; variant: string },
+		customMailOptions: MailTemplateSelection,
 	): Promise<void> {
-		const templateId = { type: MailType.emailOtp, ...customMailOptions }
-		const template = (await this.getCustomTemplate(dbContext, templateId)) || {
+		const templateId = { type: MailType.emailOtp, projectId: customMailOptions.projectId, variant: customMailOptions.variant }
+		const template = (await this.getCustomTemplate(dbContext, templateId, customMailOptions.recipientIdentityId)) || {
 			subject: 'Your verification code',
 			content: EmailOtp,
 			replyTo: null,
@@ -158,10 +166,10 @@ export class UserMailer {
 	async sendBackupCodesExhaustedEmail(
 		dbContext: DatabaseContext,
 		mailArguments: { email: string },
-		customMailOptions: { projectId: string | null; variant: string },
+		customMailOptions: MailTemplateSelection,
 	): Promise<void> {
-		const templateId = { type: MailType.backupCodesExhausted, ...customMailOptions }
-		const template = (await this.getCustomTemplate(dbContext, templateId)) || {
+		const templateId = { type: MailType.backupCodesExhausted, projectId: customMailOptions.projectId, variant: customMailOptions.variant }
+		const template = (await this.getCustomTemplate(dbContext, templateId, customMailOptions.recipientIdentityId)) || {
 			subject: 'You have no MFA backup codes left',
 			content: BackupCodesExhausted,
 			replyTo: null,
@@ -172,10 +180,10 @@ export class UserMailer {
 	async sendUnusualLoginEmail(
 		dbContext: DatabaseContext,
 		mailArguments: { email: string; geoCountry: string | null; ipAddress: string | null },
-		customMailOptions: { projectId: string | null; variant: string },
+		customMailOptions: MailTemplateSelection,
 	): Promise<void> {
-		const templateId = { type: MailType.unusualLogin, ...customMailOptions }
-		const template = (await this.getCustomTemplate(dbContext, templateId)) || {
+		const templateId = { type: MailType.unusualLogin, projectId: customMailOptions.projectId, variant: customMailOptions.variant }
+		const template = (await this.getCustomTemplate(dbContext, templateId, customMailOptions.recipientIdentityId)) || {
 			subject: 'Unusual sign-in to your account',
 			content: UnusualLogin,
 			replyTo: null,
@@ -206,14 +214,34 @@ export class UserMailer {
 	private async getCustomTemplate(
 		dbContext: DatabaseContext,
 		identifier: MailTemplateIdentifier,
+		recipientIdentityId: string | null,
 	): Promise<Pick<MailTemplateData, 'subject' | 'content' | 'replyTo'> | null> {
-		const customTemplate = (await dbContext.queryHandler.fetch(new MailTemplateQuery(identifier)))
-			?? (await dbContext.queryHandler.fetch(new MailTemplateQuery({ ...identifier, projectId: null })))
+		const template = await dbContext.queryHandler.fetch(new MailTemplateQuery(identifier))
+		const usableTemplate = template !== null
+				&& (identifier.projectId === null || await this.mayUseProjectTemplate(dbContext, template.trusted, recipientIdentityId))
+			? template
+			: null
+		const customTemplate = usableTemplate ?? (await dbContext.queryHandler.fetch(new MailTemplateQuery({ ...identifier, projectId: null })))
 
 		if (!customTemplate) {
 			return null
 		}
 		const content = customTemplate.useLayout ? Layout(customTemplate.content) : customTemplate.content
 		return { content, subject: customTemplate.subject, replyTo: customTemplate.replyTo }
+	}
+
+	/**
+	 * A project template may be written by a project-scoped admin, so it must not reach a global admin
+	 * (whose tokens give access to every project) unless a global admin wrote it.
+	 */
+	private async mayUseProjectTemplate(dbContext: DatabaseContext, trusted: boolean, recipientIdentityId: string | null): Promise<boolean> {
+		if (trusted) {
+			return true
+		}
+		if (recipientIdentityId === null) {
+			return false
+		}
+		const [identity] = await dbContext.queryHandler.fetch(new IdentityQuery([recipientIdentityId]))
+		return identity !== undefined && !holdsGlobalAdminRole(identity.roles)
 	}
 }

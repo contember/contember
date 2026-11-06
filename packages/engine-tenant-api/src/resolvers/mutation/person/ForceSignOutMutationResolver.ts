@@ -53,7 +53,7 @@ export class ForceSignOutMutationResolver implements Pick<MutationResolvers, 'fo
 			await this.userMailer.sendForcedSignOutEmail(
 				context.db,
 				{ email: targetPerson.email, reason },
-				{ projectId: null, variant: '' },
+				{ projectId: null, variant: '', recipientIdentityId: targetPerson.identity_id },
 			)
 		}
 

@@ -122,6 +122,7 @@ class PasswordlessSignInManager {
 			}, {
 				variant: mailVariant || '',
 				projectId: project?.id ?? null,
+				recipientIdentityId: person.identity_id,
 			})
 
 			return new ResponseOk({

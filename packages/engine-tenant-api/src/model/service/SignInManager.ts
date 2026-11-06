@@ -295,7 +295,7 @@ class SignInManager {
 				email: person.email,
 				geoCountry,
 				ipAddress: ip,
-			}, { projectId: null, variant: '' })
+			}, { projectId: null, variant: '', recipientIdentityId: person.identity_id })
 		} catch {
 			// ignore — informational only
 		}

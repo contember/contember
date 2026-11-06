@@ -8,6 +8,7 @@ import {
 } from '../../../schema/index.js'
 import { TenantResolverContext } from '../../TenantResolverContext.js'
 import {
+	holdsGlobalAdminRole,
 	MailTemplateManager,
 	MailTemplatePermissionMeta,
 	mailTypeFromSchemaToDb,
@@ -76,6 +77,8 @@ export class MailTemplateMutationResolver implements MutationResolvers {
 			variant: variant || '',
 			type: mailTypeFromSchemaToDb(type),
 			replyTo: replyTo?.trim() || null,
+			// Re-evaluated on every write, so an edit by a project-scoped writer revokes the trust.
+			trusted: holdsGlobalAdminRole(context.identity.roles),
 		})
 
 		await context.logAuthAction({

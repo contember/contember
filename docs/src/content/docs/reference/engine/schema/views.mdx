@@ -25,6 +25,8 @@ When writing the SQL query for a view, follow these rules:
 
 - **Emit an `id` column**: Every view must return an `id`. If your underlying data doesn't have a natural UUID, use a generated one: `gen_random_uuid() AS id`.
 
+- **Write a single statement**: The SQL must be one query. A migration that adds or changes a view is rejected when its SQL contains a `;` outside string literals, quoted identifiers, dollar-quoted bodies and comments (one trailing `;` is allowed), or leaves one of them unterminated. Views created by migrations that already ran are not re-checked.
+
 - **Use `underscore_case` in SQL**: Column names like `total_count` will map to `camelCase` (`totalCount`) in the Contember schema.
 
 - **Suffix foreign keys with `_id`**: For example, a `category_id` column in SQL maps to a `category` relation in the view entity.

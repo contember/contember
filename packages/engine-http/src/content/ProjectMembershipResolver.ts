@@ -83,23 +83,31 @@ export class ProjectMembershipResolver {
 		}
 		try {
 			return assumeMembershipValueType(value).memberships
-		} catch (e: any) {
-			throw new HttpErrorResponse(400, `Invalid format of "assume membership": ${e.message}`)
+		} catch (e) {
+			throw new HttpErrorResponse(400, `Invalid format of "assume membership": ${e instanceof Error ? e.message : String(e)}`)
 		}
 	}
 
 	private readAssumeMembershipJson(req: HttpRequest): unknown {
 		if (typeof req.body === 'object' && req.body !== null && 'assumeMembership' in req.body) {
-			return (req.body as any).assumeMembership
+			return req.body.assumeMembership
 		}
 		const value = req.get(assumeMembershipHeader).trim()
-		return value !== '' ? JSON.parse(value) : null
+		if (value === '') {
+			return null
+		}
+		try {
+			return JSON.parse(value)
+		} catch {
+			throw new HttpErrorResponse(400, `Invalid JSON in ${assumeMembershipHeader} header`)
+		}
 	}
 
 	private verifyAssumedRoles(explicitMemberships: readonly Acl.Membership[], acl: Acl.Schema, assumedMemberships: readonly Acl.Membership[]) {
+		// A stored membership whose role the ACL no longer defines grants nothing, so it may assume nothing either.
 		const membershipMatcher = new MembershipMatcher(explicitMemberships.map(it => ({
 			...it,
-			matchRule: acl.roles[it.role].content?.assumeMembership ?? {},
+			matchRule: Object.hasOwn(acl.roles, it.role) ? acl.roles[it.role].content?.assumeMembership ?? {} : {},
 		})))
 
 		for (const assumed of assumedMemberships) {

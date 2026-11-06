@@ -88,7 +88,7 @@ The `configuration` object passed to `addIDP` / `updateIDP` is provider-specific
 | `scope` | `openid email` | Space-separated scopes requested at authorization. When [re-validation](#session-re-validation) uses `refresh`, `offline_access` is appended automatically. |
 | `claims` | — | *Deprecated* alias for `scope` — despite the name these are OIDC scopes, not claims. Prefer `scope`. |
 | `responseType` | `code` | OIDC `response_type`. One of `code`, `code id_token`, `code id_token token`, `code token`, `id_token`, `id_token token`, `none`. |
-| `idTokenSignedResponseAlg` | `RS256` | Expected signing algorithm of the ID token. |
+| `idTokenSignedResponseAlg` | `RS256` | Expected signing algorithm of the ID token. `addIDP` and `updateIDP` refuse `none` (an unsigned token); a provider stored with it earlier keeps working until its configuration is next changed. |
 | `tokenEndpointAuthMethod` | `client_secret_basic` | *(since 2.2)* How the client authenticates to the token endpoint. See [Token endpoint authentication](#token-endpoint-authentication). |
 | `fetchUserInfo` | `false` | After the token exchange, also call the userinfo endpoint and merge its claims (userinfo wins over the ID token). Needed when the provider only returns some claims from userinfo. |
 | `returnOIDCResult` | `false` | Expose the provider's raw token-exchange response in `signInIDP`'s `result.idpResponse` (access token, raw claims, …). |

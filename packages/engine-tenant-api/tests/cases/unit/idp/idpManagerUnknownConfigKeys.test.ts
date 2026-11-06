@@ -106,3 +106,48 @@ describe('IDPManager — unknown configuration keys', () => {
 		expect(executed).toHaveLength(1)
 	})
 })
+
+describe('IDPManager — OIDC ID token signing algorithm', () => {
+	test('addIDP rejects an unsigned ID token algorithm', async () => {
+		const { db, executed } = makeDb()
+		const response = await makeManager().addIDP(db, {
+			slug: 'sso',
+			type: 'oidc',
+			configuration: { ...OIDC_BASE, idTokenSignedResponseAlg: 'None' },
+			options: OPTIONS,
+		})
+
+		expect(response.ok === false && response.error).toBe('INVALID_CONFIGURATION')
+		expect(response.ok === false && response.errorMessage).toContain('idTokenSignedResponseAlg')
+		expect(executed).toHaveLength(0)
+	})
+
+	test('updateIDP rejects an unsigned ID token algorithm', async () => {
+		const { db, executed } = makeDb(OIDC_BASE)
+		const response = await makeManager().updateIDP(db, 'sso', { configuration: { idTokenSignedResponseAlg: 'none' } }, true)
+
+		expect(response.ok === false && response.error).toBe('INVALID_CONFIGURATION')
+		expect(executed).toHaveLength(0)
+	})
+
+	test('a signing algorithm passes', async () => {
+		const { db, executed } = makeDb()
+		const response = await makeManager().addIDP(db, {
+			slug: 'sso',
+			type: 'oidc',
+			configuration: { ...OIDC_BASE, idTokenSignedResponseAlg: 'ES256' },
+			options: OPTIONS,
+		})
+
+		expect(response.ok).toBe(true)
+		expect(executed).toHaveLength(1)
+	})
+
+	test('a stored unsigned algorithm is not re-checked by an options-only update', async () => {
+		const { db, executed } = makeDb({ ...OIDC_BASE, idTokenSignedResponseAlg: 'none' })
+		const response = await makeManager().updateIDP(db, 'sso', { options: { autoSignUp: true } }, false)
+
+		expect(response.ok).toBe(true)
+		expect(executed).toHaveLength(1)
+	})
+})

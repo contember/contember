@@ -52,6 +52,7 @@ export class EmailOtpManager {
 		}, {
 			variant: '',
 			projectId: null,
+			recipientIdentityId: person.identity_id,
 		})
 		return decision
 	}

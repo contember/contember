@@ -66,6 +66,7 @@ export class EmailVerificationManager {
 			{
 				variant: mailOptions.mailVariant || '',
 				projectId: project?.id ?? null,
+				recipientIdentityId: person.identity_id,
 			},
 		)
 		return true

@@ -9,9 +9,18 @@ configured `mailTemplate:add`, `mailTemplate:remove`, and `mailTemplate:list` gr
 :::caution[Editing a template is control over the tokens it carries]
 `RESET_PASSWORD_REQUEST`, `PASSWORDLESS_SIGN_IN`, `NEW_USER_INVITED`, `EMAIL_VERIFICATION`, and `EMAIL_CHANGE_VERIFY` carry a token or code.
 Whoever may edit such a template can make the mail send that credential anywhere — for example in the URL of a remote image that the mail
-client loads on open. A project template is used for every recipient it applies to, including persons with the `super_admin` role who reach
-the project through their global role. Grant template editing only to people you would trust with those accounts.
+client loads on open. Grant template editing only to people you would trust with the accounts that receive the mail.
 :::
+
+### Project templates and global admins
+
+:::note[Available since 2.2]
+:::
+
+A project template records whether it is **trusted**: written by an identity holding the global `super_admin` or `project_admin` role.
+Every write sets the flag again, so an edit by a project admin or by a custom role with project template rights makes the template untrusted.
+An untrusted project template is never sent to a recipient holding a global `super_admin` or `project_admin` role; that recipient gets the
+global template (or the built-in default) instead. Templates that existed before this rule was introduced stay trusted until their next edit.
 
 ## Mail Types
 

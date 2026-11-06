@@ -238,7 +238,8 @@ CREATE TABLE "mail_template" (
     "subject" "text" NOT NULL,
     "content" "text" NOT NULL,
     "use_layout" boolean NOT NULL,
-    "reply_to" "text"
+    "reply_to" "text",
+    "trusted" boolean DEFAULT false NOT NULL
 );
 CREATE TABLE "person" (
     "id" "uuid" NOT NULL,

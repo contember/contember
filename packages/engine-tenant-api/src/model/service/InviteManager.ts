@@ -95,6 +95,7 @@ export class InviteManager {
 				const customMailOptions = {
 					projectId: project.id,
 					variant: emailVariant ?? '',
+					recipientIdentityId: person.identity_id,
 				}
 				if (isNew) {
 					await this.mailer.sendNewUserInvitedMail(

@@ -17,6 +17,7 @@ export class AddMailTemplateCommand implements Command<void> {
 				content: this.mailTemplate.content,
 				use_layout: this.mailTemplate.useLayout,
 				reply_to: this.mailTemplate.replyTo,
+				trusted: this.mailTemplate.trusted,
 			})
 			.onConflict(
 				ConflictActionType.update,
@@ -34,6 +35,7 @@ export class AddMailTemplateCommand implements Command<void> {
 					subject: expr => expr.select(['excluded', 'subject']),
 					content: expr => expr.select(['excluded', 'content']),
 					use_layout: expr => expr.select(['excluded', 'use_layout']),
+					trusted: expr => expr.select(['excluded', 'trusted']),
 				},
 			)
 			.execute(db)

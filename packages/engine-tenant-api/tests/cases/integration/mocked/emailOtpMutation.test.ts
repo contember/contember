@@ -21,13 +21,13 @@ test('initEmailOtp sends a code', async () => {
 			...sendEmailOtpSql({ personId, rateLimitEventId: testUuid(1), tokenId: testUuid(2) }),
 			{
 				sql:
-					`select "mail_template"."id", "subject", "content", "use_layout" as "useLayout", "reply_to" as "replyTo", "project_id" as "projectId", "mail_type" as "type", "variant" FROM "tenant"."mail_template" WHERE "project_id" IS NULL AND "mail_type" = ? AND "variant" = ?`,
+					`select "mail_template"."id", "subject", "content", "use_layout" as "useLayout", "reply_to" as "replyTo", "project_id" as "projectId", "mail_type" as "type", "variant", "trusted" FROM "tenant"."mail_template" WHERE "project_id" IS NULL AND "mail_type" = ? AND "variant" = ?`,
 				parameters: ['emailOtp', ''],
 				response: { rows: [] },
 			},
 			{
 				sql:
-					`select "mail_template"."id", "subject", "content", "use_layout" as "useLayout", "reply_to" as "replyTo", "project_id" as "projectId", "mail_type" as "type", "variant" FROM "tenant"."mail_template" WHERE "project_id" IS NULL AND "mail_type" = ? AND "variant" = ?`,
+					`select "mail_template"."id", "subject", "content", "use_layout" as "useLayout", "reply_to" as "replyTo", "project_id" as "projectId", "mail_type" as "type", "variant", "trusted" FROM "tenant"."mail_template" WHERE "project_id" IS NULL AND "mail_type" = ? AND "variant" = ?`,
 				parameters: ['emailOtp', ''],
 				response: { rows: [] },
 			},

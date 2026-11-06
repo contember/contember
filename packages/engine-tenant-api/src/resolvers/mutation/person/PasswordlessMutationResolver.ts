@@ -8,7 +8,9 @@ import {
 	SignInPasswordlessResponse,
 } from '../../../schema/index.js'
 import { TenantResolverContext } from '../../TenantResolverContext.js'
-import { CaptchaValidator, ConfigurationQuery, PermissionActions, RateLimiter } from '../../../model/index.js'
+import { AuthLogService, CaptchaValidator, ConfigurationQuery, PermissionActions, RateLimiter } from '../../../model/index.js'
+import { EmailAddress } from '../../../model/utils/email.js'
+import { ResponseError } from '../../../model/utils/Response.js'
 import { intervalToSeconds } from '../../../model/utils/interval.js'
 import { createErrorResponse } from '../../errorUtils.js'
 import { SignInResponseFactory } from '../../responseHelpers/SignInResponseFactory.js'
@@ -61,13 +63,23 @@ export class PasswordlessMutationResolver
 			}
 		}
 
-		const result = await this.passwordlessSignInManager.initSignInPasswordless({
-			db: context.db,
-			permissionContext: context.permissionContext,
-			email: args.email,
-			mailVariant: args.options?.mailVariant ?? undefined,
-			mailProject: args.options?.mailProject ?? undefined,
-		})
+		const email = EmailAddress.parse(args.email)
+		const result: PasswordlessSignInManager.InitSignInPasswordlessResponse = email === null
+			// Not a single address, so it names no person; answered like any unknown address.
+			? configuration.passwordless.enabled === 'never'
+				? new ResponseError('PASSWORDLESS_DISABLED', 'Passwordless sign-in is disabled', {
+					[AuthLogService.Key]: new AuthLogService.Bag({}),
+				})
+				: new ResponseError('PERSON_NOT_FOUND', 'Person not found', {
+					[AuthLogService.Key]: new AuthLogService.Bag({ personInput: args.email }),
+				})
+			: await this.passwordlessSignInManager.initSignInPasswordless({
+				db: context.db,
+				permissionContext: context.permissionContext,
+				email,
+				mailVariant: args.options?.mailVariant ?? undefined,
+				mailProject: args.options?.mailProject ?? undefined,
+			})
 		await context.logAuthAction({
 			type: 'passwordless_login_init',
 			response: result,

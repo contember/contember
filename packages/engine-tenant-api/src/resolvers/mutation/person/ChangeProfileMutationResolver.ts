@@ -23,7 +23,7 @@ import {
 	RevokePersonSessionsCommand,
 } from '../../../model/index.js'
 import { createErrorResponse } from '../../errorUtils.js'
-import { normalizeEmail } from '../../../model/utils/email.js'
+import { EmailAddress } from '../../../model/utils/email.js'
 
 export class ChangeProfileMutationResolver implements Pick<MutationResolvers, 'changeMyProfile' | 'changeProfile' | 'confirmEmailChange'> {
 	constructor(
@@ -94,10 +94,14 @@ export class ChangeProfileMutationResolver implements Pick<MutationResolvers, 'c
 		})
 
 		const config = await context.db.queryHandler.fetch(new ConfigurationQuery(context.db.providers))
-		// Compare normalized: a resubmit that only differs in casing/whitespace is
-		// not a real change and must not trigger a confirmation mail.
-		const normalizedNewEmail = args.email ? normalizeEmail(args.email) : null
-		const emailChanging = normalizedNewEmail !== null && normalizedNewEmail !== person.email
+		const newEmail = args.email ? EmailAddress.parse(args.email) : null
+		if (args.email && newEmail === null) {
+			return createErrorResponse('INVALID_EMAIL_FORMAT', 'E-mail address is not in a valid format')
+		}
+		// Compare normalized: a resubmit that only differs in casing is not a real change
+		// and must not trigger a confirmation mail.
+		const normalizedNewEmail = newEmail?.normalized() ?? null
+		const emailChanging = normalizedNewEmail !== null && normalizedNewEmail.value !== person.email
 
 		// Opt-in: a stolen session alone must not be enough to move the account to another address.
 		const requireReauthentication = emailChanging && config.emailChange.requireReauthentication
@@ -152,7 +156,7 @@ export class ChangeProfileMutationResolver implements Pick<MutationResolvers, 'c
 				response: result,
 				personId: person.id,
 				// Log the normalized address so it matches the per-recipient backoff key.
-				personInput: normalizedNewEmail,
+				personInput: normalizedNewEmail.value,
 			})
 			if (!result.ok) {
 				return createErrorResponse(result.error, result.errorMessage)
@@ -160,7 +164,7 @@ export class ChangeProfileMutationResolver implements Pick<MutationResolvers, 'c
 			return { ok: true }
 		}
 
-		const profileChange = { email: args.email, name: args.name === '' ? null : args.name }
+		const profileChange = { email: newEmail?.value ?? args.email, name: args.name === '' ? null : args.name }
 		const result = requireReauthentication
 			? await context.db.transaction(async db => {
 				const changed = await this.personManager.changeProfile(db, person, profileChange)
@@ -181,8 +185,8 @@ export class ChangeProfileMutationResolver implements Pick<MutationResolvers, 'c
 		if (!result.ok) {
 			return createErrorResponse(result.error, result.errorMessage)
 		}
-		if (requireReauthentication && person.email !== null && normalizedNewEmail !== null) {
-			await this.emailChangeManager.notifyOldAddress(context.db, person, person.email, normalizedNewEmail)
+		if (requireReauthentication && normalizedNewEmail !== null) {
+			await this.emailChangeManager.notifyOldAddress(context.db, person, normalizedNewEmail.value)
 		}
 
 		return { ok: true }

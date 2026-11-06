@@ -157,7 +157,7 @@ describe('BackupCodeManager', () => {
 		expect(ok).toBe(true)
 		expect(queries).toHaveLength(0)
 		expect(sendBackupCodesExhaustedEmail).toHaveBeenCalledTimes(1)
-		expect(sendBackupCodesExhaustedEmail.mock.calls[0][1]).toEqual({ email: PERSON_EMAIL })
+		expect(sendBackupCodesExhaustedEmail.mock.calls[0][1]).toMatchObject({ email: PERSON_EMAIL })
 		expect(sendBackupCodesExhaustedEmail.mock.calls[0][2]).toEqual({ projectId: null, variant: '', recipientIdentityId: 'identity-1' })
 	})
 

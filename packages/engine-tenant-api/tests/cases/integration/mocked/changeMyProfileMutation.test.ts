@@ -307,3 +307,17 @@ test('changes my email - re-authenticated change signs out other sessions and no
 		expectedAuthLog: expect.objectContaining({ type: 'email_change', response: expect.objectContaining({ ok: true }) }),
 	})
 })
+
+test('refuses a new address with whitespace inside', async () => {
+	await executeTenantTest({
+		query: changeMyProfileMutation({ email: 'big jane@doe.com' }),
+		executes: [
+			getPersonByIdentity({
+				identityId: authenticatedIdentityId,
+				response: { personId: testUuid(1), email: 'john.doe@example.com', name: 'John Doe', roles: [], password: '123456' },
+			}),
+			getConfigSql(),
+		],
+		return: { data: { changeMyProfile: { ok: false, error: { code: 'INVALID_EMAIL_FORMAT' } } } },
+	})
+})

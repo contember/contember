@@ -1,5 +1,5 @@
 import { Client, custom, errors, generators, Issuer, TokenSet } from 'openid-client'
-import { createRemoteJWKSet, jwtVerify } from 'jose'
+import { createRemoteJWKSet, customFetch, FetchImplementation, jwtVerify } from 'jose'
 import { OIDCClaimMapping, OIDCResponseData } from './OIDCTypes.js'
 import { IDPValidationError } from '../IDPValidationError.js'
 import { IDPResponseError } from '../IDPResponseError.js'
@@ -369,21 +369,24 @@ const BACKCHANNEL_LOGOUT_EVENT = 'http://schemas.openid.net/event/backchannel-lo
 const LOGOUT_TOKEN_MAX_AGE_SECONDS = 120
 const LOGOUT_TOKEN_CLOCK_TOLERANCE_SECONDS = 5
 
+export type RemoteJwksResolver = (jwksUri: string) => ReturnType<typeof createRemoteJWKSet>
+
 /**
  * Remote JWKS sets keyed by `jwks_uri`. `createRemoteJWKSet` returns a function with its own internal
  * key cache + fetch cooldown, so it MUST be reused across requests — re-creating it per call (as the
  * unauthenticated back-channel endpoint would otherwise do) defeats the cache and turns every request
  * into a potential outbound JWKS fetch. Keyed by URL, so two providers sharing an IdP share the set.
  */
-const remoteJwksCache = new Map<string, ReturnType<typeof createRemoteJWKSet>>()
-
-const getRemoteJwks = (jwksUri: string): ReturnType<typeof createRemoteJWKSet> => {
-	let jwks = remoteJwksCache.get(jwksUri)
-	if (!jwks) {
-		jwks = createRemoteJWKSet(new URL(jwksUri))
-		remoteJwksCache.set(jwksUri, jwks)
+export const createRemoteJwksResolver = (fetchImpl: FetchImplementation | undefined): RemoteJwksResolver => {
+	const cache = new Map<string, ReturnType<typeof createRemoteJWKSet>>()
+	return jwksUri => {
+		let jwks = cache.get(jwksUri)
+		if (!jwks) {
+			jwks = createRemoteJWKSet(new URL(jwksUri), fetchImpl ? { [customFetch]: fetchImpl } : undefined)
+			cache.set(jwksUri, jwks)
+		}
+		return jwks
 	}
-	return jwks
 }
 
 /**
@@ -398,7 +401,12 @@ const getRemoteJwks = (jwksUri: string): ReturnType<typeof createRemoteJWKSet> =
  *   - it does NOT carry a `nonce` (a `nonce` means it is an ID token being replayed).
  * Throws {@link IDPValidationError} on any failure so the caller can answer 400.
  */
-export const validateOIDCLogoutToken = async (client: Client, issuer: Issuer<Client>, logoutToken: string): Promise<LogoutTokenClaims> => {
+export const validateOIDCLogoutToken = async (
+	client: Client,
+	issuer: Issuer<Client>,
+	logoutToken: string,
+	resolveJwks: RemoteJwksResolver,
+): Promise<LogoutTokenClaims> => {
 	const jwksUri = issuer.metadata.jwks_uri
 	if (!jwksUri) {
 		throw new IDPValidationError('IdP has no jwks_uri; cannot verify logout token')
@@ -413,7 +421,7 @@ export const validateOIDCLogoutToken = async (client: Client, issuer: Issuer<Cli
 	const expectedAlg = typeof client.metadata.id_token_signed_response_alg === 'string'
 		? client.metadata.id_token_signed_response_alg
 		: 'RS256'
-	const jwks = getRemoteJwks(jwksUri)
+	const jwks = resolveJwks(jwksUri)
 	let payload: Record<string, unknown>
 	try {
 		const verified = await jwtVerify(logoutToken, jwks, {

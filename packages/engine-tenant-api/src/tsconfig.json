@@ -10,6 +10,7 @@
 		{ "path": "../../database/src" },
 		{ "path": "../../database-migrations/src" },
 		{ "path": "../../dic/src" },
+		{ "path": "../../engine-common/src" },
 		{ "path": "../../logger/src" },
 		{ "path": "../../graphql-utils/src" },
 		{ "path": "../../schema/src" },

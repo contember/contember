@@ -3,6 +3,7 @@ import { MailerOptions } from '@contember/engine-tenant-api'
 import { validateRequestMemoryBudgetOptions } from '@contember/database'
 import { upperCaseFirst } from '../utils/strings.js'
 import ipaddr from 'ipaddr.js'
+import { EgressError, EgressPolicy } from '@contember/engine-common'
 
 const dbConfigRequired = {
 	host: Typesafe.string,
@@ -150,6 +151,33 @@ export const telemetryConfigSchema = Typesafe.partial({
 	}),
 })
 
+const egressConfigSchema = Typesafe.transform(
+	Typesafe.partial({
+		guard: Typesafe.boolean,
+		allowHttp: Typesafe.boolean,
+		allowlist: (val: unknown, path: PropertyKey[] = []): string[] | undefined => {
+			if (val === undefined || val === null || val === '') {
+				return undefined
+			}
+			const raw = Array.isArray(val) ? val : String(val).split(',')
+			const entries = raw.map(it => String(it).trim()).filter(Boolean)
+			return entries.length > 0 ? entries : undefined
+		},
+	}),
+	(value, input, path) => {
+		try {
+			// Rejects a malformed allowlist at startup rather than at the first outgoing request.
+			new EgressPolicy({ allowHttp: value.allowHttp ?? false, allowlist: value.allowlist ?? [] })
+		} catch (e) {
+			if (e instanceof EgressError) {
+				return Typesafe.fail(path, e.message)
+			}
+			throw e
+		}
+		return value
+	},
+)
+
 export const serverConfigSchema = Typesafe.partial({
 	port: Typesafe.number,
 	http: Typesafe.partial({
@@ -281,6 +309,8 @@ export const serverConfigSchema = Typesafe.partial({
 		}),
 	),
 	telemetry: telemetryConfigSchema,
+	// Restrictions on outgoing requests to tenant-chosen URLs (Actions webhooks, OIDC identity providers). Opt-in.
+	egress: egressConfigSchema,
 	projectGroup: (val: unknown, path: PropertyKey[] = []) =>
 		Typesafe.valueAt(val, ['domainMapping']) === undefined
 			? undefined

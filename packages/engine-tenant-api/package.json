@@ -31,6 +31,7 @@
     "@contember/database": "workspace:*",
     "@contember/database-migrations": "workspace:*",
     "@contember/dic": "workspace:*",
+    "@contember/engine-common": "workspace:*",
     "@contember/graphql-utils": "workspace:*",
     "@contember/logger": "workspace:*",
     "@contember/schema": "workspace:*",

@@ -74,3 +74,19 @@ test('encryption v2: corrupted auth key', async () => {
 	}
 	assert.strictEqual('Unsupported state or unable to authenticate data', err.message)
 })
+
+test('signing is deterministic and bound to its purpose and key', () => {
+	const cryptoWrapper = new CryptoWrapper(encryptionKey)
+	const value = Buffer.from('payload')
+	const signature = cryptoWrapper.sign('first', value)
+	expect(signature).toHaveLength(32)
+	expect(cryptoWrapper.sign('first', value).equals(signature)).toBe(true)
+	expect(cryptoWrapper.sign('second', value).equals(signature)).toBe(false)
+	expect(crypto.createHmac('sha256', encryptionKey).update(value).digest().equals(signature)).toBe(false)
+	const otherKey = crypto.createSecretKey(Buffer.alloc(32, 1))
+	expect(new CryptoWrapper(otherKey).sign('first', value).equals(signature)).toBe(false)
+})
+
+test('signing without an encryption key fails', () => {
+	expect(() => new CryptoWrapper().sign('first', Buffer.from('payload'))).toThrow('encryption key not provided')
+})

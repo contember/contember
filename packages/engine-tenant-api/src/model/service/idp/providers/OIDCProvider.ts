@@ -1,3 +1,4 @@
+import { timingSafeEqual } from 'node:crypto'
 import { Client, custom, CustomHttpOptionsProvider, Issuer } from 'openid-client'
 import { EgressGuard } from '@contember/engine-common'
 import {
@@ -22,9 +23,11 @@ import {
 	validateOIDCLogoutToken,
 } from './OIDCHelpers.js'
 import { IDPValidationError } from '../IDPValidationError.js'
+import { DataSigner } from '../../../providers.js'
 
 const DEFAULT_OIDC_TIMEOUT = 5000
 const OFFLINE_ACCESS_SCOPE = 'offline_access'
+const SESSION_DATA_SIGNING_PURPOSE = 'oidc-session-data'
 
 export class OIDCProvider implements IdentityProviderHandler<OIDCConfiguration> {
 	private issuerCache: Record<string, Issuer<Client>> = {}
@@ -33,7 +36,10 @@ export class OIDCProvider implements IdentityProviderHandler<OIDCConfiguration> 
 	private readonly egressHttpOptions: CustomHttpOptionsProvider | undefined
 	private readonly issuerClass: typeof Issuer<Client>
 
-	constructor(egressGuard: EgressGuard | null) {
+	constructor(
+		egressGuard: EgressGuard | null,
+		private readonly dataSigner: DataSigner | null,
+	) {
 		this.resolveJwks = createRemoteJwksResolver(egressGuard?.fetch)
 		if (egressGuard) {
 			const httpOptions: CustomHttpOptionsProvider = url => egressGuard.httpOptions(url)
@@ -55,24 +61,36 @@ export class OIDCProvider implements IdentityProviderHandler<OIDCConfiguration> 
 		if (configuration.idTokenSignedResponseAlg?.toLowerCase() === 'none') {
 			throw new InvalidIDPConfigurationError('idTokenSignedResponseAlg "none" is not allowed; use a signing algorithm such as RS256')
 		}
+		if (configuration.strictResponseType && !this.dataSigner) {
+			throw new InvalidIDPConfigurationError('strictResponseType requires an encryption key to sign session data; configure CONTEMBER_ENCRYPTION_KEY')
+		}
 	}
 
 	public async initAuth(configuration: OIDCConfiguration, data: unknown): Promise<InitIDPAuthResult> {
 		const initData = catchTypesafe(OIDCInitData, IDPValidationError)(data)
 		const client = await this.createOIDCClient(configuration)
-		return await initOIDCAuth(client, {
+		const result = await initOIDCAuth(client, {
 			scope: this.resolveScope(configuration),
 			...initData,
 		})
+		if (!configuration.strictResponseType) {
+			return result
+		}
+		const { nonce, state } = result.sessionData
+		return { ...result, sessionData: { nonce, state, signature: this.signSessionData(configuration, nonce, state).toString('base64url') } }
 	}
 
 	public async processResponse(configuration: OIDCConfiguration, data: unknown): Promise<IDPResponse> {
-		const responseData = catchTypesafe(OIDCResponseData, IDPValidationError)(data)
+		const { sessionData: { signature, ...sessionData } = {}, ...responseData } = catchTypesafe(OIDCResponseData, IDPValidationError)(data)
+		if (configuration.strictResponseType) {
+			this.verifySessionData(configuration, sessionData.nonce, sessionData.state, signature)
+		}
 		const client = await this.createOIDCClient(configuration)
 		return await handleOIDCResponse(
 			client,
-			responseData,
+			{ ...responseData, sessionData },
 			{
+				expectedResponseType: configuration.strictResponseType ? configuration.responseType || 'code' : undefined,
 				fetchUserInfo: configuration.fetchUserInfo,
 				returnOIDCResult: configuration.returnOIDCResult,
 				captureSession: configuration.revalidation?.enabled === true,
@@ -97,6 +115,31 @@ export class OIDCProvider implements IdentityProviderHandler<OIDCConfiguration> 
 	public async validateLogoutToken(configuration: OIDCConfiguration, logoutToken: string): Promise<LogoutTokenClaims> {
 		const client = await this.createOIDCClient(configuration)
 		return await validateOIDCLogoutToken(client, client.issuer, logoutToken, this.resolveJwks)
+	}
+
+	/** Binds nonce and state to this provider, so a client cannot choose them for the callback. */
+	private signSessionData(configuration: OIDCConfiguration, nonce: string, state: string): Buffer {
+		if (!this.dataSigner) {
+			throw new IDPValidationError('strictResponseType requires an encryption key to sign session data')
+		}
+		const payload = JSON.stringify([configuration.url, configuration.clientId, nonce, state])
+		return this.dataSigner(SESSION_DATA_SIGNING_PURPOSE, Buffer.from(payload, 'utf8'))
+	}
+
+	private verifySessionData(
+		configuration: OIDCConfiguration,
+		nonce: string | undefined,
+		state: string | undefined,
+		signature: string | undefined,
+	): void {
+		if (nonce === undefined || state === undefined || signature === undefined) {
+			throw new IDPValidationError('signed session data is required')
+		}
+		const expected = this.signSessionData(configuration, nonce, state)
+		const actual = Buffer.from(signature, 'base64url')
+		if (actual.length !== expected.length || !timingSafeEqual(actual, expected)) {
+			throw new IDPValidationError('session data signature is invalid')
+		}
 	}
 
 	/**

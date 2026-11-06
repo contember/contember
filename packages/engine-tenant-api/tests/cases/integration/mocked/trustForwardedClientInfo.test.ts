@@ -28,8 +28,8 @@ test('signIn: trustForwardedClientInfo=true is propagated when caller has the fl
 		query: signInMutation({ email, password, options: { trustForwardedClientInfo: true } }),
 		executes: [
 			getConfigSql(),
-			getNextLoginAttemptSql(email),
 			getPersonByEmailSql({ email, response: { personId, identityId, password, roles: [] } }),
+			getNextLoginAttemptSql({ personId }),
 			localAuthDisablingIdpsSql({ personId }),
 			getAuthPoliciesSql(),
 			getConfigSql(),
@@ -68,8 +68,8 @@ test('signIn: trustForwardedClientInfo=true is silently dropped when caller has 
 		query: signInMutation({ email, password, options: { trustForwardedClientInfo: true } }),
 		executes: [
 			getConfigSql(),
-			getNextLoginAttemptSql(email),
 			getPersonByEmailSql({ email, response: { personId, identityId, password, roles: [] } }),
+			getNextLoginAttemptSql({ personId }),
 			localAuthDisablingIdpsSql({ personId }),
 			getAuthPoliciesSql(),
 			getConfigSql(),

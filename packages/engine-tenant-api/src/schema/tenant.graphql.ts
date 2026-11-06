@@ -929,7 +929,7 @@ const schema: DocumentNode = gql`
 		"""
 		When true, a non-exclusive provider may only auto-link to / sign in an
 		existing account by e-mail if the provider asserts the e-mail is verified.
-		Defaults to false.
+		addIDP stores true when the option is omitted.
 		"""
 		requireVerifiedEmail: Boolean!
 		"""

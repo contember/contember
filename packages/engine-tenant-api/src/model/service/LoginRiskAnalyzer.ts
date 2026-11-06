@@ -91,6 +91,9 @@ export class LoginRiskAnalyzer {
 	 * treated as known. This keeps the documented "no baseline to deviate from →
 	 * trusted" rule true per signal, so turning the feature on does not score every
 	 * returning user's first login as anomalous.
+	 *
+	 * A current value that is missing is ignored, unless `missingSignalIsNew` is on: then it scores like a new value
+	 * once a baseline for that signal exists, so a client cannot avoid a signal by withholding it (e.g. the user-agent).
 	 */
 	score(current: LoginSignals, history: readonly PriorLogin[], config: Config['login']['anomalyDetection']): RiskAssessment {
 		const reasons: string[] = []
@@ -100,31 +103,46 @@ export class LoginRiskAnalyzer {
 			return { score: 0, action: 'allow', reasons }
 		}
 
-		if (current.geoCountry !== null) {
-			const baseline = history.filter(h => h.geoCountry !== null)
-			if (baseline.length > 0 && !baseline.some(h => h.geoCountry === current.geoCountry)) {
-				total += RiskWeight.newCountry
-				reasons.push('new_country')
+		const addSignal = (
+			currentValue: string | null,
+			baseline: readonly string[],
+			weight: number,
+			reason: { new: string; missing: string },
+		) => {
+			if (baseline.length === 0) {
+				return
+			}
+			if (currentValue === null) {
+				if (config.missingSignalIsNew) {
+					total += weight
+					reasons.push(reason.missing)
+				}
+				return
+			}
+			if (!baseline.includes(currentValue)) {
+				total += weight
+				reasons.push(reason.new)
 			}
 		}
 
-		const currentFingerprint = current.deviceFingerprint
-		if (currentFingerprint !== null) {
-			const baseline = history.filter(h => h.deviceFingerprint !== null)
-			if (baseline.length > 0 && !baseline.some(h => h.deviceFingerprint === currentFingerprint)) {
-				total += RiskWeight.newDevice
-				reasons.push('new_device')
-			}
-		}
-
-		const currentPrefix = ipPrefix(current.ip)
-		if (currentPrefix !== null) {
-			const baselinePrefixes = history.map(h => ipPrefix(h.ip)).filter((p): p is string => p !== null)
-			if (baselinePrefixes.length > 0 && !baselinePrefixes.includes(currentPrefix)) {
-				total += RiskWeight.newIpPrefix
-				reasons.push('new_ip_prefix')
-			}
-		}
+		addSignal(
+			current.geoCountry,
+			history.map(h => h.geoCountry).filter((it): it is string => it !== null),
+			RiskWeight.newCountry,
+			{ new: 'new_country', missing: 'missing_country' },
+		)
+		addSignal(
+			current.deviceFingerprint,
+			history.map(h => h.deviceFingerprint).filter((it): it is string => it !== null),
+			RiskWeight.newDevice,
+			{ new: 'new_device', missing: 'missing_device' },
+		)
+		addSignal(
+			ipPrefix(current.ip),
+			history.map(h => ipPrefix(h.ip)).filter((it): it is string => it !== null),
+			RiskWeight.newIpPrefix,
+			{ new: 'new_ip_prefix', missing: 'missing_ip' },
+		)
 
 		return { score: total, action: this.decide(total, config), reasons }
 	}

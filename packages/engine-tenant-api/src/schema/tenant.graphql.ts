@@ -315,6 +315,12 @@ const schema: DocumentNode = gql`
 		historySize: Int!
 		emailThreshold: Int!
 		stepUpThreshold: Int!
+		"""
+		When true, a signal missing from the current sign-in (no geo header, no
+		user-agent, no IP) scores as new once the history has a value for it.
+		Defaults to false: a missing signal is ignored.
+		"""
+		missingSignalIsNew: Boolean!
 	}
 
 	"""
@@ -449,6 +455,7 @@ const schema: DocumentNode = gql`
 		historySize: Int
 		emailThreshold: Int
 		stepUpThreshold: Int
+		missingSignalIsNew: Boolean
 	}
 
 	"""

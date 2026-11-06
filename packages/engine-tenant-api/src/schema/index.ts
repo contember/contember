@@ -492,6 +492,12 @@ export type ConfigLoginAnomalyDetection = {
 	readonly emailThreshold: Scalars['Int']['output']
 	readonly enabled: Scalars['Boolean']['output']
 	readonly historySize: Scalars['Int']['output']
+	/**
+	 * When true, a signal missing from the current sign-in (no geo header, no
+	 * user-agent, no IP) scores as new once the history has a value for it.
+	 * Defaults to false: a missing signal is ignored.
+	 */
+	readonly missingSignalIsNew: Scalars['Boolean']['output']
 	readonly stepUpThreshold: Scalars['Int']['output']
 }
 
@@ -499,6 +505,7 @@ export type ConfigLoginAnomalyDetectionInput = {
 	readonly emailThreshold?: InputMaybe<Scalars['Int']['input']>
 	readonly enabled?: InputMaybe<Scalars['Boolean']['input']>
 	readonly historySize?: InputMaybe<Scalars['Int']['input']>
+	readonly missingSignalIsNew?: InputMaybe<Scalars['Boolean']['input']>
 	readonly stepUpThreshold?: InputMaybe<Scalars['Int']['input']>
 }
 
@@ -3591,6 +3598,7 @@ export type ConfigLoginAnomalyDetectionResolvers<
 	emailThreshold?: Resolver<ResolversTypes['Int'], ParentType, ContextType>
 	enabled?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
 	historySize?: Resolver<ResolversTypes['Int'], ParentType, ContextType>
+	missingSignalIsNew?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
 	stepUpThreshold?: Resolver<ResolversTypes['Int'], ParentType, ContextType>
 }
 

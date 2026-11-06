@@ -31,6 +31,7 @@ export type ConfigRow = {
 	login_anomaly_history_size: number
 	login_anomaly_email_threshold: number
 	login_anomaly_step_up_threshold: number
+	login_anomaly_missing_signal_is_new: boolean
 	captcha_provider: CaptchaProvider | null
 	captcha_secret: Buffer | null
 	captcha_secret_version: number | null

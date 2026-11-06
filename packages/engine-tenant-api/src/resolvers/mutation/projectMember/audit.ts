@@ -12,9 +12,7 @@ export const logProjectMembershipChange = async (
 	identityId: string,
 	before: readonly Acl.Membership[],
 ): Promise<void> => {
-	const after = auditType === 'project_membership_remove'
-		? []
-		: await context.db.queryHandler.fetch(new ProjectMembershipByIdentityQuery({ id: projectId }, [identityId]))
+	const after = await context.db.queryHandler.fetch(new ProjectMembershipByIdentityQuery({ id: projectId }, [identityId]))
 	const [targetPerson] = await context.db.queryHandler.fetch(new PersonByIdentityBatchQuery([identityId]))
 	await context.logAuthAction({
 		type: auditType,

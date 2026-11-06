@@ -50,6 +50,13 @@ export class OIDCProvider implements IdentityProviderHandler<OIDCConfiguration> 
 
 	validateConfiguration = catchTypesafe(OIDCConfiguration, InvalidIDPConfigurationError)
 
+	validateWrittenConfiguration(configuration: OIDCConfiguration): void {
+		// An unsigned ID token proves nothing about who signed in.
+		if (configuration.idTokenSignedResponseAlg?.toLowerCase() === 'none') {
+			throw new InvalidIDPConfigurationError('idTokenSignedResponseAlg "none" is not allowed; use a signing algorithm such as RS256')
+		}
+	}
+
 	public async initAuth(configuration: OIDCConfiguration, data: unknown): Promise<InitIDPAuthResult> {
 		const initData = catchTypesafe(OIDCInitData, IDPValidationError)(data)
 		const client = await this.createOIDCClient(configuration)

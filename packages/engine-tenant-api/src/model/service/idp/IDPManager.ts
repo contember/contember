@@ -5,6 +5,7 @@ import { IdentityProviderData } from '../../type/index.js'
 import { IdentityProviderBySlugQuery, IdentityProvidersQuery } from '../../queries/index.js'
 import { CreateIdpCommand } from '../../commands/idp/CreateIdpCommand.js'
 import { IDPHandlerRegistry } from './IDPHandlerRegistry.js'
+import { IdentityProviderHandler } from './IdentityProviderHandler.js'
 import { IdentityProviderNotFoundError } from './IdentityProviderNotFoundError.js'
 import { InvalidIDPConfigurationError } from './InvalidIDPConfigurationError.js'
 import { findClaimMappingShapeErrors, findRemovedRuleKeys, isRecord, parseClaimMapping } from './ClaimMapping.js'
@@ -26,7 +27,7 @@ export class IDPManager {
 		return await db.transaction(async (db): Promise<RegisterIDPResponse> => {
 			try {
 				const providerService = this.idpRegistry.getHandler(idp.type)
-				this.assertNoUnknownConfigurationKeys(providerService.validateConfiguration(idp.configuration), idp.configuration)
+				this.validateWrittenConfiguration(providerService, idp.configuration)
 				await this.assertValidClaimMapping(idp.configuration)
 			} catch (e) {
 				if (e instanceof IdentityProviderNotFoundError) {
@@ -88,7 +89,7 @@ export class IDPManager {
 				const type = data.type ?? existing.type
 				const providerService = this.idpRegistry.getHandler(type)
 				if (data.configuration !== undefined || type !== existing.type) {
-					this.assertNoUnknownConfigurationKeys(providerService.validateConfiguration(newConfiguration), newConfiguration)
+					this.validateWrittenConfiguration(providerService, newConfiguration)
 					await this.assertValidClaimMapping(newConfiguration)
 				}
 			} catch (e) {
@@ -107,6 +108,12 @@ export class IDPManager {
 
 			return new ResponseOk(null)
 		})
+	}
+
+	private validateWrittenConfiguration(providerService: IdentityProviderHandler<{}>, configuration: Record<string, unknown>): void {
+		const parsed = providerService.validateConfiguration(configuration)
+		this.assertNoUnknownConfigurationKeys(parsed, configuration)
+		providerService.validateWrittenConfiguration?.(parsed)
 	}
 
 	/**

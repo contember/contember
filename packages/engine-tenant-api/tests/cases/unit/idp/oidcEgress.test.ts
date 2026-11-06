@@ -1,6 +1,5 @@
 import { afterAll, beforeAll, describe, expect, test } from 'bun:test'
 import http from 'node:http'
-import { AddressInfo } from 'node:net'
 import { createEgressGuard } from '@contember/engine-common'
 import { OIDCProvider } from '../../../../src/model/service/idp/providers/OIDCProvider.js'
 import { OIDCConfiguration } from '../../../../src/model/service/idp/providers/OIDCTypes.js'
@@ -32,7 +31,11 @@ describe('OIDCProvider and the egress guard', () => {
 		})
 		// All interfaces: `localhost` may resolve to ::1 first.
 		await new Promise<void>(resolve => server.listen(0, resolve))
-		port = (server.address() as AddressInfo).port
+		const address = server.address()
+		if (address === null || typeof address === 'string') {
+			throw new Error('expected a TCP address')
+		}
+		port = address.port
 	})
 
 	afterAll(() => {

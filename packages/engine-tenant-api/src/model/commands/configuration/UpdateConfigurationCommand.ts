@@ -46,6 +46,7 @@ export class UpdateConfigurationCommand implements Command<void> {
 					password_pattern: this.configuration.password?.pattern,
 					password_check_blacklist: this.configuration.password?.checkBlacklist ?? undefined,
 					password_check_hibp: this.configuration.password?.checkHibp ?? undefined,
+					password_revoke_sessions_on_change: this.configuration.password?.revokeSessionsOnChange ?? undefined,
 					login_base_backoff: this.configuration.login?.baseBackoff ?? undefined,
 					login_max_backoff: this.configuration.login?.maxBackoff ?? undefined,
 					login_attempt_window: this.configuration.login?.attemptWindow ?? undefined,

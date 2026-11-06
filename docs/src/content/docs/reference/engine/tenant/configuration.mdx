@@ -26,6 +26,7 @@ query {
       pattern
       checkBlacklist
       checkHibp
+      revokeSessionsOnChange
     }
     login {
       revealUserExists
@@ -114,6 +115,7 @@ See [password policy](/reference/engine/tenant/password-policy) for individual f
 | `pattern` | `null` | Optional regex; pattern violations yield `INVALID_PATTERN` |
 | `checkBlacklist` | `true` | 10k-most-common list with leetspeak normalization |
 | `checkHibp` | `false` | HIBP k-anonymity check; opt-in. See [anti-abuse](/reference/engine/tenant/anti-abuse#hibp-password-check). Available since 2.2. |
+| `revokeSessionsOnChange` | `false` | When a password is set (`resetPassword`, `changePassword`, `changeMyPassword`), disable the person's sessions and mark its unused tokens as used, in the same transaction. `changeMyPassword` keeps the session that made the change. Opt-in. Available since 2.2. |
 
 ### `login`
 

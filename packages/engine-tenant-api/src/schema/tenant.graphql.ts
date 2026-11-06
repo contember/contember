@@ -262,6 +262,8 @@ const schema: DocumentNode = gql`
 		pattern: String
 		checkBlacklist: Boolean!
 		checkHibp: Boolean!
+		"When true, setting a new password disables the person's other sessions and unused tokens."
+		revokeSessionsOnChange: Boolean!
     }
 
 	type ConfigLogin {
@@ -412,6 +414,7 @@ const schema: DocumentNode = gql`
 		pattern: String
 		checkBlacklist: Boolean
 		checkHibp: Boolean
+		revokeSessionsOnChange: Boolean
     }
 
 	input ConfigLoginInput {

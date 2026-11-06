@@ -11,6 +11,7 @@ const passwordConfig = {
 	pattern: null,
 	checkBlacklist: false,
 	checkHibp: false,
+	revokeSessionsOnChange: false,
 }
 
 class StubHibp implements HibpChecker {

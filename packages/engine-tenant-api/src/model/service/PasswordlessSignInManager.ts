@@ -14,9 +14,10 @@ import {
 	ApiKeyRequestInfo,
 	ClaimOtpAttemptCommand,
 	CreatePersonTokenCommand,
-	InvalidateExhaustedOtpTokenCommand,
+	ExpireExhaustedOtpTokenCommand,
 	InvalidateTokenCommand,
 	MarkEmailVerifiedCommand,
+	ReleaseOtpAttemptCommand,
 } from '../commands/index.js'
 import { getPreferredProject } from './helpers/getPreferredProject.js'
 import { isPasswordlessEnabled } from './helpers/isPasswordlessEnabled.js'
@@ -186,8 +187,13 @@ class PasswordlessSignInManager {
 			}
 		}
 		const result = await this.verifyAndSignIn({ db, expiration, token, requestId, mfaOtp, backupCode, validationType, requestInfo, trustForwardedInfo })
-		if (claimed && !result.ok && (result.error === 'TOKEN_INVALID' || result.error === 'INVALID_OTP_TOKEN')) {
-			await db.commandBus.execute(new InvalidateExhaustedOtpTokenCommand(requestId, MAX_OTP_ATTEMPTS))
+		if (claimed && !result.ok) {
+			if (result.error === 'TOKEN_INVALID' || result.error === 'INVALID_OTP_TOKEN') {
+				await db.commandBus.execute(new ExpireExhaustedOtpTokenCommand(requestId, MAX_OTP_ATTEMPTS))
+			} else {
+				// Not a wrong code (e.g. a right e-mailed code answered OTP_REQUIRED), so it does not count.
+				await db.commandBus.execute(new ReleaseOtpAttemptCommand(requestId))
+			}
 		}
 		return result
 	}

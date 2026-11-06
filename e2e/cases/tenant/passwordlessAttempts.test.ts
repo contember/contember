@@ -64,7 +64,7 @@ test('wrong MFA codes on a magic link use up its attempts', async () => {
 
 	expect(await signIn({ requestId, token, validationType: 'token', mfaOtp: totp(secret) })).toEqual({
 		ok: false,
-		error: { code: 'TOKEN_USED' },
+		error: { code: 'TOKEN_EXPIRED' },
 	})
 })
 

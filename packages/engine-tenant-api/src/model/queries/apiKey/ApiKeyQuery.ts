@@ -29,6 +29,8 @@ export class ApiKeyByTokenQuery extends DatabaseQuery<null | ApiKeyRow> {
 		const tokenHash = computeTokenHash(this.token)
 		const rows = await apiKeyBaseQuery
 			.where({ token_hash: tokenHash })
+			// A key of a disabled person must not authenticate, even one issued after `disablePerson` cascaded.
+			.where(where => where.isNull(['person', 'disabled_at']))
 			.getResult(db)
 
 		return this.fetchOneOrNull(rows)

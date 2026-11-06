@@ -44,8 +44,8 @@ export class CreateIndexModificationHandler implements ModificationHandler<Creat
 			: ''
 		// `where` is a raw, developer-authored SQL predicate. Its trust boundary is identical to
 		// @c.View's raw body — committed to a migration and gated by code review, not end-user input.
-		// Its shape is validated in ModelValidator (non-empty, no statement terminator); here we only
-		// wrap it in parentheses so it stays a self-contained boolean expression.
+		// ModelValidator rejects an empty one and validateAddedSql a statement terminator when a migration
+		// adds it; here we only wrap it in parentheses so it stays a self-contained boolean expression.
 		const whereClause = index.where ? ` WHERE (${index.where})` : ''
 
 		builder.sql(`CREATE INDEX ON ${tableNameId}${methodClause} (${columnNameIds.join(', ')})${includeClause}${whereClause}`)

@@ -2,6 +2,7 @@ import { describe, expect, it } from 'bun:test'
 import { ProjectMembershipFetcher, ProjectMembershipResolver } from '../../../src/index.js'
 import { createMock } from '../../utils.js'
 import { Acl } from '@contember/schema'
+import { HttpErrorResponse } from '../../../src/common/HttpResponse.js'
 
 describe('membership resolver', () => {
 	it('should return implicit role', async () => {
@@ -214,5 +215,54 @@ describe('membership resolver', () => {
 			role: 'test',
 			variables: [{ name: 'lang', condition: { eq: 'cs' } }],
 		}])
+	})
+
+	const resolveWithAssumeHeader = async (header: string, storedMemberships: readonly Acl.Membership[]): Promise<unknown> => {
+		const membershipResolver = new ProjectMembershipResolver(
+			false,
+			createMock<ProjectMembershipFetcher>({
+				fetchMemberships: () => Promise.resolve(storedMemberships),
+			}),
+		)
+		try {
+			await membershipResolver.resolveMemberships({
+				request: { body: {}, get: name => name === 'x-contember-assume-membership' ? header : '' },
+				projectSlug: 'test',
+				identity: { identityId: 'd4141336-6512-41ef-a25a-374de35a2806', roles: [] },
+				acl: {
+					roles: {
+						editor: { variables: {}, entities: {}, content: { assumeMembership: { viewer: true } } },
+						viewer: { variables: {}, entities: {} },
+					},
+				},
+			})
+			return null
+		} catch (e) {
+			return e
+		}
+	}
+
+	it('answers 400 for an assume-membership header that is not JSON', async () => {
+		const error = await resolveWithAssumeHeader('{not json', [{ role: 'editor', variables: [] }])
+		expect(error).toBeInstanceOf(HttpErrorResponse)
+		expect(error).toMatchObject({ code: 400, message: 'Invalid JSON in x-contember-assume-membership header' })
+	})
+
+	it('answers 400 for an assume-membership header of a wrong shape', async () => {
+		const error = await resolveWithAssumeHeader('{"memberships": "viewer"}', [{ role: 'editor', variables: [] }])
+		expect(error).toBeInstanceOf(HttpErrorResponse)
+		expect(error).toMatchObject({ code: 400 })
+	})
+
+	it('a stored role missing from the ACL may not assume a membership', async () => {
+		const header = JSON.stringify({ memberships: [{ role: 'viewer', variables: [] }] })
+		const error = await resolveWithAssumeHeader(header, [{ role: 'removed', variables: [] }])
+		expect(error).toBeInstanceOf(HttpErrorResponse)
+		expect(error).toMatchObject({ code: 403 })
+	})
+
+	it('a stored role with an assume rule still assumes the allowed membership', async () => {
+		const header = JSON.stringify({ memberships: [{ role: 'viewer', variables: [] }] })
+		expect(await resolveWithAssumeHeader(header, [{ role: 'editor', variables: [] }])).toBeNull()
 	})
 })

@@ -71,6 +71,7 @@ import _20261012120000signoutauthlog from './2026-10-12-120000-sign-out-auth-log
 import _20261012120010authlogcreatedatindex from './2026-10-12-120010-auth-log-created-at-index.js'
 import _20261106120000mailtemplatetrusted from './2026-11-06-120000-mail-template-trusted.js'
 import _20261106120100configpasswordrevokesessions from './2026-11-06-120100-config-password-revoke-sessions.js'
+import _20261106120200configemailchangereauthentication from './2026-11-06-120200-config-email-change-reauthentication.js'
 import snapshot from './snapshot.js'
 import { computeTokenHash, Providers } from '../model/index.js'
 import { Logger } from '@contember/logger'
@@ -165,6 +166,7 @@ const migrations = {
 	'2026-10-12-120010-auth-log-created-at-index': _20261012120010authlogcreatedatindex,
 	'2026-11-06-120000-mail-template-trusted': _20261106120000mailtemplatetrusted,
 	'2026-11-06-120100-config-password-revoke-sessions': _20261106120100configpasswordrevokesessions,
+	'2026-11-06-120200-config-email-change-reauthentication': _20261106120200configemailchangereauthentication,
 }
 
 export class TenantMigrationsRunner {

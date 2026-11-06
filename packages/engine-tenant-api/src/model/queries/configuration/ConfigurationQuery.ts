@@ -27,6 +27,7 @@ export class ConfigurationQuery extends DatabaseQuery<Config> {
 			},
 			emailChange: {
 				requireVerification: result.require_email_change_verification,
+				requireReauthentication: result.email_change_require_reauthentication,
 			},
 			passwordless: {
 				enabled: result.passwordless_enabled,

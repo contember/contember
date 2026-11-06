@@ -232,6 +232,8 @@ export const changeMyProfile: TenantApi.MutationFetcher<{
 }, {
     readonly email?: string;
     readonly name?: string;
+    readonly currentPassword?: string;
+    readonly otpToken?: string;
 }>;
 
 // @public (undocumented)
@@ -2508,6 +2510,8 @@ export const useChangeMyProfileForm: () => ChangeMyProfileFormContextValue;
 export const useChangeMyProfileMutation: (input?: TenantApiOptions) => (variables: {
     readonly email?: string;
     readonly name?: string;
+    readonly currentPassword?: string;
+    readonly otpToken?: string;
 }) => Promise<TenantMutationResponse<unknown, TenantApi.ChangeMyProfileErrorCode>>;
 
 // @public (undocumented)

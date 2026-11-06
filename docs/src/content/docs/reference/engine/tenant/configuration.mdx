@@ -16,6 +16,7 @@ query {
     }
     emailChange {
       requireVerification
+      requireReauthentication
     }
     password {
       minLength
@@ -103,6 +104,7 @@ Prefer keeping configuration in version control? Describe it in a typed `tenant.
 | Field | Default | Notes |
 |---|---|---|
 | `requireVerification` | `false` | Self-service `changeMyProfile` e-mail changes go through `confirmEmailChange` against a token mailed to the new address, instead of swapping immediately. Independent of `signup.requireEmailVerification`. See [e-mail verification](/reference/engine/tenant/email-verification#e-mail-change-verification). |
+| `requireReauthentication` | `false` | Self-service `changeMyProfile` e-mail changes require the current password (`currentPassword`) or a current TOTP code (`otpToken`). A direct change also notifies the old address and disables the person's other sessions. A person with neither a password nor TOTP (e.g. signed up through an identity provider) cannot change its own e-mail while this is on. Opt-in. Available since 2.2. See [profile](/reference/engine/tenant/profile#re-authentication-for-an-e-mail-change). |
 
 ### `password`
 

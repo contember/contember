@@ -84,7 +84,7 @@ const schema: DocumentNode = gql`
 		createSessionToken(email: String, personId: String, expiration: Int, options: SignInOptions): CreateSessionTokenResponse
 		signOut(all: Boolean): SignOutResponse
 		changeProfile(personId: String!, email: String, name: String): ChangeProfileResponse
-		changeMyProfile(email: String, name: String): ChangeMyProfileResponse
+		changeMyProfile(email: String, name: String, currentPassword: String, otpToken: String): ChangeMyProfileResponse
 		changePassword(personId: String!, password: String!): ChangePasswordResponse
 		changeMyPassword(currentPassword: String!, newPassword: String!): ChangeMyPasswordResponse
 
@@ -245,6 +245,13 @@ const schema: DocumentNode = gql`
 		ConfigSignup.requireEmailVerification. Defaults to false.
 		"""
 		requireVerification: Boolean!
+		"""
+		When true, a changeMyProfile e-mail change requires the current password or a
+		TOTP code (currentPassword / otpToken). A change applied directly also sends a
+		notice to the old address and signs out the person's other sessions.
+		Defaults to false.
+		"""
+		requireReauthentication: Boolean!
 	}
 
 	type ConfigPasswordless {
@@ -390,6 +397,7 @@ const schema: DocumentNode = gql`
 
 	input ConfigEmailChangeInput {
 		requireVerification: Boolean
+		requireReauthentication: Boolean
 	}
 
 	enum ConfigPolicy {
@@ -692,6 +700,9 @@ const schema: DocumentNode = gql`
 		INVALID_EMAIL_FORMAT
 		EMAIL_ALREADY_EXISTS
 		RATE_LIMIT_EXCEEDED
+		REAUTHENTICATION_REQUIRED
+		INVALID_PASSWORD
+		INVALID_OTP_TOKEN
 	}
 
 	# === changePassword ===

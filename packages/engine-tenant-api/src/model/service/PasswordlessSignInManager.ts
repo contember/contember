@@ -42,14 +42,15 @@ class PasswordlessSignInManager {
 		private readonly backupCodeManager: BackupCodeManager,
 	) {}
 
-	async initSignInPasswordless({ db, permissionContext, mailVariant, mailProject, email: emailAddress }: {
+	async initSignInPasswordless({ db, permissionContext, mailVariant, mailProject, email: emailAddress, emailInput }: {
 		db: DatabaseContext
 		permissionContext: PermissionContext
-		email: EmailAddress
+		/** Null when the input is not a single address: it names no person. */
+		email: EmailAddress | null
+		emailInput: string
 		mailVariant?: string
 		mailProject?: string
 	}): Promise<PasswordlessSignInManager.InitSignInPasswordlessResponse> {
-		const email = emailAddress.value
 		return db.transaction(async (db): Promise<PasswordlessSignInManager.InitSignInPasswordlessResponse> => {
 			const configuration = await db.queryHandler.fetch(new ConfigurationQuery(db.providers))
 			if (configuration.passwordless.enabled === 'never') {
@@ -58,13 +59,13 @@ class PasswordlessSignInManager {
 				})
 			}
 
-			const person = await db.queryHandler.fetch(PersonQuery.byEmail(email))
-			// The link and the mail go to the stored address, never to the input: the lookup matches variants of it.
-			const recipient = person?.email ?? null
-			if (!person || recipient === null) {
-				return new ResponseError('PERSON_NOT_FOUND', `Person ${email} not found`, {
+			const person = emailAddress === null ? null : await db.queryHandler.fetch(PersonQuery.byEmail(emailAddress.value))
+			// The link, the mail and the backoff use the stored address, never the input: the lookup matches variants of it.
+			const email = person?.email ?? null
+			if (!person || email === null) {
+				return new ResponseError('PERSON_NOT_FOUND', `Person ${emailInput} not found`, {
 					[AuthLogService.Key]: new AuthLogService.Bag({
-						personInput: email,
+						personInput: emailInput,
 					}),
 				})
 			}
@@ -113,7 +114,7 @@ class PasswordlessSignInManager {
 			)
 			const result = await db.commandBus.execute(createTokenCommand)
 
-			const url = this.formatUrl(configuration.passwordless.url ?? null, result.token, result.id, recipient) ?? undefined
+			const url = this.formatUrl(configuration.passwordless.url ?? null, result.token, result.id, email) ?? undefined
 
 			const projects = await this.projectManager.getProjectsByIdentity(db, person.identity_id, permissionContext)
 			const project = getPreferredProject(projects, mailProject ?? null)

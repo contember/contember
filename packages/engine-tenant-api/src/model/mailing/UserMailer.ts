@@ -11,12 +11,11 @@ import EmailChangeVerify from './templates/EmailChangeVerify.mustache.js'
 import EmailChangeNotify from './templates/EmailChangeNotify.mustache.js'
 import UnusualLogin from './templates/UnusualLogin.mustache.js'
 import { MailTemplateData, MailTemplateIdentifier, MailType } from './type.js'
-import { IdentityQuery, MailTemplateQuery } from '../queries/index.js'
+import { IdentityQuery, MailTemplateQuery, PersonRow } from '../queries/index.js'
 import { holdsGlobalAdminRole } from '../authorization/index.js'
 import Layout from './templates/Layout.mustache.js'
 import { DatabaseContext } from '../utils/index.js'
 import { EmailAddress } from '../utils/email.js'
-import { PersonRow } from '../queries/index.js'
 import { Acl } from '@contember/schema'
 
 export interface MailTemplateSelection {
@@ -27,7 +26,7 @@ export interface MailTemplateSelection {
 }
 
 /** A mail to an existing person goes to its stored address; a person without one gets no mail. */
-export type MailPerson = Pick<PersonRow, 'email'>
+export type MailPerson = Pick<PersonRow, 'id' | 'email'>
 
 export class UserMailer {
 	constructor(

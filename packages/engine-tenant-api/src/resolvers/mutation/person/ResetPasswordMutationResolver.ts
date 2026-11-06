@@ -85,7 +85,8 @@ export class ResetPasswordMutationResolver implements MutationResolvers {
 		await context.logAuthAction({
 			type: 'password_reset_init',
 			response: new ResponseOk(null),
-			personInput: args.email,
+			// The stored address: the mail backoff counts by it, and the lookup matches variants of the input.
+			personInput: person.email ?? args.email,
 			personId: person.id,
 		})
 		return { ok: true, errors: [] }

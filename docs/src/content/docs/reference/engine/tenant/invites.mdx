@@ -38,7 +38,7 @@ By default, users with the global roles `super_admin` and `project_admin`, along
 
 If the specified email address already corresponds to a user in the system, that user will simply be added to the designated project. If the user does not yet exist, a new account will be created, and login instructions will be sent to the provided email address.
 
-An existing user is matched regardless of case, and the invitation mail goes to the address stored for them. Whitespace around the address is ignored; an address with whitespace inside is refused with `INVALID_EMAIL_FORMAT`.
+An existing user is matched by the address as entered or in its lowercase form, and the invitation mail goes to the address stored for them. Whitespace around the address is ignored; an address with whitespace inside is refused with `INVALID_EMAIL_FORMAT`.
 
 ### Password handling
 

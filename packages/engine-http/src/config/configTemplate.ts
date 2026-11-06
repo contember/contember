@@ -148,6 +148,11 @@ export const configTemplate: any = {
 				},
 			},
 		},
+		egress: {
+			guard: '%?env.CONTEMBER_EGRESS_GUARD::bool%',
+			allowHttp: '%?env.CONTEMBER_EGRESS_ALLOW_HTTP::bool%',
+			allowlist: '%?env.CONTEMBER_EGRESS_ALLOWLIST::string%',
+		},
 		test: {
 			transactions: '%?env.CONTEMBER_TEST_TRANSACTIONS::bool%',
 			transactionTtlSeconds: '%?env.CONTEMBER_TEST_TRANSACTION_TTL_SECONDS::number%',

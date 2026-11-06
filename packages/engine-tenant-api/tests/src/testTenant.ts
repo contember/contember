@@ -139,7 +139,7 @@ export const executeTenantTest = async (test: Test) => {
 		},
 	}
 	const connection = createConnectionMock(test.executes)
-	const tenantContainer = new TenantContainerFactory(providers)
+	const tenantContainer = new TenantContainerFactory(providers, null)
 		.createBuilder({
 			mailOptions: {},
 			dbCredentials: dbCredentials('xx'),

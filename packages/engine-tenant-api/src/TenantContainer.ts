@@ -2,6 +2,7 @@ import { Logger } from '@contember/logger'
 import { AccessEvaluator, Authorizator } from '@contember/authorization'
 import { Connection, DatabaseConfig } from '@contember/database'
 import { Builder } from '@contember/dic'
+import { EgressGuard } from '@contember/engine-common'
 import {
 	AclSchemaAccessNodeFactory,
 	ApiKeyManager,
@@ -160,6 +161,7 @@ export interface TenantContainerArgs {
 export class TenantContainerFactory {
 	constructor(
 		private readonly providers: Omit<Providers, 'encrypt' | 'decrypt' | 'encryptionEnabled'>,
+		private readonly egressGuard: EgressGuard | null,
 	) {}
 
 	create(args: TenantContainerArgs): TenantContainer {
@@ -203,7 +205,7 @@ export class TenantContainerFactory {
 			.addService('loginRiskAnalyzer', ({ providers }) => new LoginRiskAnalyzer(providers.hash))
 			.addService('idpRegistry', () => {
 				const idpRegistry = new IDPHandlerRegistry()
-				idpRegistry.registerHandler('oidc', new OIDCProvider())
+				idpRegistry.registerHandler('oidc', new OIDCProvider(this.egressGuard))
 				idpRegistry.registerHandler('facebook', new FacebookProvider())
 				idpRegistry.registerHandler('apple', new AppleProvider())
 				return idpRegistry

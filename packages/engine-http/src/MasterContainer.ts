@@ -1,4 +1,5 @@
 import { Builder } from '@contember/dic'
+import { createEgressGuard } from '@contember/engine-common'
 import { SystemContainerFactory } from '@contember/engine-system-api'
 import { TenantContainerFactory } from '@contember/engine-tenant-api'
 import { ModificationHandlerFactory } from '@contember/schema-migrations'
@@ -115,7 +116,8 @@ export class MasterContainerFactory {
 			.addService('tenantConfigResolver', () => tenantConfigResolver)
 			.addService('plugins', () => plugins)
 			.addService('providers', () => createProviders())
-			.addService('tenantContainerFactory', ({ providers }) => new TenantContainerFactory(providers))
+			.addService('egressGuard', ({ serverConfig }) => createEgressGuard(serverConfig.egress))
+			.addService('tenantContainerFactory', ({ providers, egressGuard }) => new TenantContainerFactory(providers, egressGuard))
 			.addService('modificationHandlerFactory', () => new ModificationHandlerFactory(ModificationHandlerFactory.defaultFactoryMap))
 			.addService(
 				'executionContainerFactory',

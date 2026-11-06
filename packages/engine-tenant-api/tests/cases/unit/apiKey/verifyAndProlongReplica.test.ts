@@ -113,11 +113,44 @@ test('a key not yet replicated is found on the primary', async () => {
 	}
 })
 
-test('a key found on the replica does not query the primary', async () => {
-	const primary = createConnectionMock([prolongUpdate])
+const selectRevoked = (rows: { is_revoked: boolean }[]): ExpectedQuery => ({
+	sql:
+		`select "api_key"."disabled_at" is not null or "person"."disabled_at" is not null as "is_revoked" from "tenant"."api_key" left join "tenant"."person" as "person" on "person"."identity_id" = "api_key"."identity_id" where "api_key"."id" = ?`,
+	parameters: ['api-key-id'],
+	response: { rows },
+})
+
+test('a key found on the replica is re-checked on the primary with a narrow query', async () => {
+	const primary = createConnectionMock([selectRevoked([{ is_revoked: false }]), prolongUpdate])
 	const replica = createConnectionMock([selectByToken([apiKeyRow])])
 
 	const response = await verify(primary, replica)
+	expect(response.ok).toBe(true)
+})
+
+test('a key revoked on the primary but still enabled on the replica is rejected', async () => {
+	const primary = createConnectionMock([selectRevoked([{ is_revoked: true }])])
+	const replica = createConnectionMock([selectByToken([apiKeyRow])])
+
+	const response = await verify(primary, replica)
+	expect(response.ok).toBe(false)
+	if (!response.ok) {
+		expect(response.error).toBe(VerifyErrorCode.DISABLED)
+	}
+})
+
+test('a key deleted on the primary but still present on the replica is rejected', async () => {
+	const primary = createConnectionMock([selectRevoked([])])
+	const replica = createConnectionMock([selectByToken([apiKeyRow])])
+
+	const response = await verify(primary, replica)
+	expect(response.ok).toBe(false)
+})
+
+test('without a replica, a found key is not re-checked', async () => {
+	const connection = createConnectionMock([selectByToken([apiKeyRow]), prolongUpdate])
+
+	const response = await verify(connection, connection)
 	expect(response.ok).toBe(true)
 })
 

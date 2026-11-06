@@ -1,7 +1,8 @@
 import { describe, expect, test } from 'bun:test'
 import { Secret, TOTP } from 'otpauth'
 import { createConnectionMock, ExpectedQuery } from '@contember/database-tester'
-import { DatabaseContext, OtpAuthenticator, OtpManager, PersonRow, Providers, ReauthenticationVerifier } from '../../../src/index.js'
+import { DatabaseContext, OtpAuthenticator, OtpManager, PersonRow, Providers, RateLimiter, ReauthenticationVerifier } from '../../../src/index.js'
+import { reserveReauthenticationSql } from '../integration/mocked/sql/reserveReauthenticationSql.js'
 
 const now = new Date('2026-11-06T12:00:00.000Z')
 const SECRET = 'JBSWY3DPEHPK3PXPJBSWY3DPEHPK3PXP'
@@ -55,10 +56,16 @@ const claimCounterSql = (personId: string): ExpectedQuery => {
 	}
 }
 
-const verify = (target: PersonRow, credentials: { currentPassword?: string; otpToken?: string }, queries: ExpectedQuery[] = []) => {
-	const db = new DatabaseContext(createConnectionMock(queries).createClient('tenant', { module: 'tenant' }), providers)
+const verify = (
+	target: PersonRow,
+	credentials: { currentPassword?: string; otpToken?: string },
+	queries: ExpectedQuery[] = [],
+	attempts = 1,
+) => {
+	const reservation = credentials.currentPassword || credentials.otpToken ? reserveReauthenticationSql({ personId: target.id, attempts }) : []
+	const db = new DatabaseContext(createConnectionMock([...reservation, ...queries]).createClient('tenant', { module: 'tenant' }), providers)
 	const otpManager = new OtpManager(new OtpAuthenticator(providers), providers)
-	return new ReauthenticationVerifier(providers, otpManager).verify(db, target, credentials)
+	return new ReauthenticationVerifier(providers, otpManager, new RateLimiter(providers)).verify(db, target, credentials)
 }
 
 describe('ReauthenticationVerifier', () => {
@@ -92,5 +99,12 @@ describe('ReauthenticationVerifier', () => {
 		expect(empty.ok ? null : empty.error).toBe('REAUTHENTICATION_REQUIRED')
 		const withPassword = await verify(person(), { currentPassword: 'anything' })
 		expect(withPassword.ok ? null : withPassword.error).toBe('INVALID_PASSWORD')
+	})
+
+	test('refuses any credential once the attempts in the window exceed the limit', async () => {
+		const target = person({ password_hash: 'hash-of-secret' })
+		expect((await verify(target, { currentPassword: 'secret' }, [], 5)).ok).toBe(true)
+		const refused = await verify(target, { currentPassword: 'secret' }, [], 6)
+		expect(refused.ok ? null : refused.error).toBe('RATE_LIMIT_EXCEEDED')
 	})
 })

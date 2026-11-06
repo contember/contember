@@ -1001,6 +1001,7 @@ export type DisableEmailOtpErrorCode =
 	| 'INVALID_OTP_TOKEN'
 	| 'INVALID_PASSWORD'
 	| 'MFA_REQUIRED'
+	| 'RATE_LIMIT_EXCEEDED'
 	| 'REAUTHENTICATION_REQUIRED'
 
 export type DisableEmailOtpResponse = {
@@ -1036,6 +1037,7 @@ export type DisableOtpErrorCode =
 	| 'INVALID_PASSWORD'
 	| 'MFA_REQUIRED'
 	| 'OTP_NOT_ACTIVE'
+	| 'RATE_LIMIT_EXCEEDED'
 	| 'REAUTHENTICATION_REQUIRED'
 
 export type DisableOtpResponse = {
@@ -1934,6 +1936,7 @@ export type PrepareOtpError = {
 export type PrepareOtpErrorCode =
 	| 'INVALID_OTP_TOKEN'
 	| 'INVALID_PASSWORD'
+	| 'RATE_LIMIT_EXCEEDED'
 	| 'REAUTHENTICATION_REQUIRED'
 
 export type PrepareOtpResponse = {
@@ -2135,6 +2138,7 @@ export type RegenerateBackupCodesErrorCode =
 	| 'INVALID_OTP_TOKEN'
 	| 'INVALID_PASSWORD'
 	| 'OTP_NOT_ACTIVE'
+	| 'RATE_LIMIT_EXCEEDED'
 	| 'REAUTHENTICATION_REQUIRED'
 
 export type RegenerateBackupCodesResponse = {

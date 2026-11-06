@@ -3,7 +3,7 @@ import { Providers } from '../providers.js'
 import { Config } from '../type/Config.js'
 import { RateLimitCountQuery } from '../queries/rateLimit/RateLimitCountQuery.js'
 import { RecordRateLimitEventCommand } from '../commands/rateLimit/RecordRateLimitEventCommand.js'
-import { RateLimitScope } from '../type/RateLimit.js'
+import { ConfiguredRateLimitScope, RateLimitScope } from '../type/RateLimit.js'
 import { intervalToSeconds } from '../utils/interval.js'
 
 export interface RateLimitWindow {
@@ -37,7 +37,7 @@ export class RateLimiter {
 		return this.providers.hash(key, 'sha256')
 	}
 
-	private resolveWindow(scope: RateLimitScope, config: Config): { limit: number; windowSeconds: number } {
+	private resolveWindow(scope: ConfiguredRateLimitScope, config: Config): { limit: number; windowSeconds: number } {
 		const r = config.rateLimits
 		switch (scope) {
 			case 'sign_up_per_ip':
@@ -59,7 +59,7 @@ export class RateLimiter {
 	 * Check whether the next attempt fits within the configured window without
 	 * recording it. Use {@link record} after a successful gating decision.
 	 */
-	async check(db: DatabaseContext, scope: RateLimitScope, key: string, config: Config): Promise<RateLimitDecision> {
+	async check(db: DatabaseContext, scope: ConfiguredRateLimitScope, key: string, config: Config): Promise<RateLimitDecision> {
 		const { limit, windowSeconds } = this.resolveWindow(scope, config)
 		if (limit <= 0 || windowSeconds <= 0) {
 			return { ok: true }
@@ -83,7 +83,7 @@ export class RateLimiter {
 	 * slip through (the window is a soft ceiling). That is acceptable for abuse
 	 * mitigation — do not rely on it as a hard quota.
 	 */
-	async consume(db: DatabaseContext, scope: RateLimitScope, key: string | null | undefined, config: Config): Promise<RateLimitDecision> {
+	async consume(db: DatabaseContext, scope: ConfiguredRateLimitScope, key: string | null | undefined, config: Config): Promise<RateLimitDecision> {
 		if (!key) {
 			return { ok: true }
 		}
@@ -92,5 +92,25 @@ export class RateLimiter {
 			await this.record(db, scope, key)
 		}
 		return decision
+	}
+
+	/**
+	 * Records the attempt first and counts it afterwards, so concurrent attempts cannot get past the limit together.
+	 * Every attempt counts, refused ones included. Call it outside a transaction: an uncommitted reservation is
+	 * invisible to concurrent attempts.
+	 */
+	async reserve(
+		db: DatabaseContext,
+		scope: RateLimitScope,
+		key: string,
+		{ limit, windowSeconds }: { limit: number; windowSeconds: number },
+	): Promise<RateLimitDecision> {
+		const keyHash = this.hashKey(key)
+		await db.commandBus.execute(new RecordRateLimitEventCommand(scope, keyHash))
+		const count = await db.queryHandler.fetch(new RateLimitCountQuery(scope, keyHash, windowSeconds))
+		if (count <= limit) {
+			return { ok: true }
+		}
+		return { ok: false, retryAfterSeconds: windowSeconds }
 	}
 }

@@ -56,6 +56,7 @@ export class UpdateConfigurationCommand implements Command<void> {
 					login_default_token_expiration: this.configuration.login?.defaultTokenExpiration ?? undefined,
 					login_max_token_expiration: this.configuration.login?.maxTokenExpiration,
 					login_mfa_grace_duration: this.configuration.login?.mfaGraceDuration ?? undefined,
+					login_mfa_change_require_reauthentication: this.configuration.login?.mfaChangeRequiresReauthentication ?? undefined,
 					login_anomaly_detection_enabled: this.configuration.login?.anomalyDetection?.enabled ?? undefined,
 					login_anomaly_history_size: this.configuration.login?.anomalyDetection?.historySize ?? undefined,
 					login_anomaly_email_threshold: this.configuration.login?.anomalyDetection?.emailThreshold ?? undefined,

@@ -71,6 +71,38 @@ Errors:
 
 Records `2fa_disable` in the audit log.
 
+## Re-authentication for MFA changes
+
+:::note[Available since 2.2]
+With `login.mfaChangeRequiresReauthentication` enabled (it is **off** by default), a session alone cannot remove or replace a second factor. These mutations then take the current password or a current TOTP code:
+
+```graphql
+mutation {
+  disableOtp(currentPassword: "…") {
+    ok
+    error { code }
+  }
+}
+```
+
+| Mutation | Requires re-authentication |
+|---|---|
+| `disableOtp(currentPassword, otpToken)` | always |
+| `disableEmailOtp(currentPassword, otpToken)` | always |
+| `regenerateBackupCodes(currentPassword, otpToken)` | always |
+| `prepareOtp(label, currentPassword, otpToken)` | only while a TOTP is active (rotation); enrolling the first TOTP does not |
+
+Additional error codes, returned in `error.code` of each mutation:
+
+| Code | Cause |
+|---|---|
+| `REAUTHENTICATION_REQUIRED` | Neither `currentPassword` nor `otpToken` was passed. |
+| `INVALID_PASSWORD` | `currentPassword` does not match. |
+| `INVALID_OTP_TOKEN` | `otpToken` is not a current code of the active TOTP. |
+
+`prepareOtp` gained an `error` field for these codes. A person with neither a password nor an active TOTP (for example signed up through an identity provider, using e-mail OTP only) cannot make these changes while the option is on; an administrator can use `resetPersonMfa`. Failed attempts are recorded in the audit log under the action's type (`2fa_disable`, `2fa_enable`, `backup_code_regenerated`). With the option off the new arguments are ignored.
+:::
+
 ## Sign-in with 2FA enabled
 
 `signIn` and `signInPasswordless` accept an `otpToken` argument. When 2FA is enabled and the token is missing or wrong:

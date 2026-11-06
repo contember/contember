@@ -54,6 +54,7 @@ export class ConfigurationQuery extends DatabaseQuery<Config> {
 				defaultTokenExpiration: result.login_default_token_expiration,
 				maxTokenExpiration: result.login_max_token_expiration,
 				mfaGraceDuration: result.login_mfa_grace_duration,
+				mfaChangeRequiresReauthentication: result.login_mfa_change_require_reauthentication,
 				anomalyDetection: {
 					enabled: result.login_anomaly_detection_enabled,
 					historySize: result.login_anomaly_history_size,

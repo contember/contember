@@ -3,6 +3,7 @@ import {
 	DisableEmailOtpResponse,
 	InitEmailOtpResponse,
 	MutationConfirmEmailOtpArgs,
+	MutationDisableEmailOtpArgs,
 	MutationResolvers,
 } from '../../../schema/index.js'
 import { TenantResolverContext } from '../../TenantResolverContext.js'
@@ -14,6 +15,7 @@ import {
 	PermissionActions,
 	PersonQuery,
 	PersonRow,
+	ReauthenticationVerifier,
 } from '../../../model/index.js'
 import { ImplementationException } from '../../../exceptions.js'
 import { createErrorResponse } from '../../errorUtils.js'
@@ -25,6 +27,7 @@ export class EmailOtpMutationResolver implements Pick<MutationResolvers, 'initEm
 		private readonly emailOtpManager: EmailOtpManager,
 		private readonly backupCodeManager: BackupCodeManager,
 		private readonly authPolicyResolver: AuthPolicyResolver,
+		private readonly reauthenticationVerifier: ReauthenticationVerifier,
 	) {}
 
 	async initEmailOtp(parent: any, args: {}, context: TenantResolverContext): Promise<InitEmailOtpResponse> {
@@ -69,7 +72,7 @@ export class EmailOtpMutationResolver implements Pick<MutationResolvers, 'initEm
 		}
 	}
 
-	async disableEmailOtp(parent: any, args: {}, context: TenantResolverContext): Promise<DisableEmailOtpResponse> {
+	async disableEmailOtp(parent: any, args: MutationDisableEmailOtpArgs, context: TenantResolverContext): Promise<DisableEmailOtpResponse> {
 		const person = await this.getPersonFromContext(context)
 		if (!person.email_otp_enabled) {
 			return createErrorResponse('EMAIL_OTP_NOT_ACTIVE', 'Email OTP is not active, you cannot disable it.')
@@ -81,6 +84,11 @@ export class EmailOtpMutationResolver implements Pick<MutationResolvers, 'initEm
 			if (policy.mfaRequired) {
 				return createErrorResponse('MFA_REQUIRED', 'MFA is required for your role; you cannot disable your only factor.')
 			}
+		}
+		const reauthentication = await this.reauthenticationVerifier.verifyMfaChange(context.db, person, args)
+		if (!reauthentication.ok) {
+			await context.logAuthAction({ type: '2fa_disable', response: reauthentication, personId: person.id })
+			return createErrorResponse(reauthentication)
 		}
 		await context.db.commandBus.execute(new SetEmailOtpEnabledCommand(person.id, false))
 		// If no MFA factor remains (no active TOTP, email OTP now off), drop backup codes.

@@ -4,6 +4,7 @@ import { getPersonByIdentity } from './sql/getPersonByIdentity.js'
 import { getAllProjectRolesByIdentitySql, getAuthPoliciesSql } from './sql/authPolicySql.js'
 import { expect, test } from 'bun:test'
 import { GQL } from '../../../src/tags.js'
+import { getConfigSql } from './sql/getConfigSql.js'
 
 const disableOtpMutation = () => ({
 	query: GQL`mutation { disableOtp { ok error { code } } }`,
@@ -41,6 +42,7 @@ test('disableOtp succeeds with no policy (zero-policy behavior unchanged)', asyn
 				response: { personId, password: '123', roles: ['editor'], email: 'john@doe.com', otpUri },
 			}),
 			getAuthPoliciesSql([]),
+			getConfigSql(),
 			{
 				sql: `update "tenant"."person_mfa"
 					set "totp_secret" = ?, "totp_secret_version" = ?, "totp_activated_at" = ?, "totp_pending_secret" = ?, "totp_pending_version" = ?, "totp_pending_created_at" = ?, "totp_last_counter" = ?

@@ -395,16 +395,17 @@ export class TenantContainerFactory {
 			.addService('disableApiKeyMutationResolver', ({ apiKeyManager }) => new DisableApiKeyMutationResolver(apiKeyManager))
 			.addService(
 				'otpMutationResolver',
-				({ otpManager, backupCodeManager, authPolicyResolver }) => new OtpMutationResolver(otpManager, backupCodeManager, authPolicyResolver),
+				({ otpManager, backupCodeManager, authPolicyResolver, reauthenticationVerifier }) =>
+					new OtpMutationResolver(otpManager, backupCodeManager, authPolicyResolver, reauthenticationVerifier),
 			)
 			.addService(
 				'emailOtpMutationResolver',
-				({ emailOtpManager, backupCodeManager, authPolicyResolver }) =>
-					new EmailOtpMutationResolver(emailOtpManager, backupCodeManager, authPolicyResolver),
+				({ emailOtpManager, backupCodeManager, authPolicyResolver, reauthenticationVerifier }) =>
+					new EmailOtpMutationResolver(emailOtpManager, backupCodeManager, authPolicyResolver, reauthenticationVerifier),
 			)
 			.addService(
 				'regenerateBackupCodesMutationResolver',
-				({ backupCodeManager }) => new RegenerateBackupCodesMutationResolver(backupCodeManager),
+				({ backupCodeManager, reauthenticationVerifier }) => new RegenerateBackupCodesMutationResolver(backupCodeManager, reauthenticationVerifier),
 			)
 			.addService(
 				'mailTemplateMutationResolver',

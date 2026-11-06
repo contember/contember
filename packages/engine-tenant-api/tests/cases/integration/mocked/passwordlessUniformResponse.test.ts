@@ -90,7 +90,7 @@ test('with passwordless globally off, the refusal stays an error', async () => {
 test('an address with whitespace inside is not looked up and gets no mail', async () => {
 	await executeTenantTest({
 		query: { ...initMutation, variables: { email: 'big john@doe.com' } },
-		executes: [config(false)],
+		executes: [config(false), ...sqlTransaction(config(false))],
 		return: { data: { initSignInPasswordless: { ok: false, error: { code: 'PERSON_NOT_FOUND' }, result: null } } },
 		expectedAuthLog: initLog,
 	})
@@ -99,7 +99,7 @@ test('an address with whitespace inside is not looked up and gets no mail', asyn
 test('with passwordless globally off, an address with whitespace inside gets the same refusal', async () => {
 	await executeTenantTest({
 		query: { ...initMutation, variables: { email: 'big john@doe.com' } },
-		executes: [config(false, 'never')],
+		executes: [config(false, 'never'), ...sqlTransaction(config(false, 'never'))],
 		return: { data: { initSignInPasswordless: { ok: false, error: { code: 'PASSWORDLESS_DISABLED' }, result: null } } },
 		expectedAuthLog: initLog,
 	})

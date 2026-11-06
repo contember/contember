@@ -30,8 +30,8 @@ describe('NodeMailer recipient', () => {
 	}
 
 	test('is not parsed as an address list', async () => {
-		expect(await envelopeRecipients('big boss123@gmail.com')).not.toEqual(['boss123@gmail.com'])
-		expect(await envelopeRecipients('someone,boss123@gmail.com')).not.toEqual(['boss123@gmail.com'])
+		expect(await envelopeRecipients('big boss123@gmail.com')).toEqual(['"big boss123"@gmail.com'])
+		expect(await envelopeRecipients('someone,boss123@gmail.com')).toEqual(['someone,boss123@gmail.com'])
 	})
 
 	test('is delivered to as given', async () => {

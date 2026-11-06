@@ -2,6 +2,7 @@ import { Logger } from '@contember/logger'
 import { AccessEvaluator, Authorizator } from '@contember/authorization'
 import { Connection, DatabaseConfig } from '@contember/database'
 import { Builder } from '@contember/dic'
+import { EgressGuard } from '@contember/engine-common'
 import {
 	AclSchemaAccessNodeFactory,
 	ApiKeyManager,
@@ -14,6 +15,7 @@ import {
 	CaptchaValidator,
 	CustomRoleManager,
 	DatabaseContext,
+	DataSigner,
 	EmailChangeManager,
 	EmailOtpManager,
 	EmailValidator,
@@ -50,6 +52,7 @@ import {
 	ProjectScopeFactory,
 	Providers,
 	RateLimiter,
+	ReauthenticationVerifier,
 	RecaptchaV3Provider,
 	RolesManager,
 	SecretsManager,
@@ -154,12 +157,15 @@ export interface TenantContainerArgs {
 	projectInitializer: ProjectInitializer
 	tenantCredentials: TenantCredentials
 	cryptoProviders: Pick<Providers, 'encrypt' | 'decrypt' | 'encryptionEnabled'>
+	/** Null when the server has no encryption key to derive a signing key from. */
+	dataSigner: DataSigner | null
 	logger: Logger
 }
 
 export class TenantContainerFactory {
 	constructor(
 		private readonly providers: Omit<Providers, 'encrypt' | 'decrypt' | 'encryptionEnabled'>,
+		private readonly egressGuard: EgressGuard | null,
 	) {}
 
 	create(args: TenantContainerArgs): TenantContainer {
@@ -203,7 +209,7 @@ export class TenantContainerFactory {
 			.addService('loginRiskAnalyzer', ({ providers }) => new LoginRiskAnalyzer(providers.hash))
 			.addService('idpRegistry', () => {
 				const idpRegistry = new IDPHandlerRegistry()
-				idpRegistry.registerHandler('oidc', new OIDCProvider())
+				idpRegistry.registerHandler('oidc', new OIDCProvider(this.egressGuard, args.dataSigner))
 				idpRegistry.registerHandler('facebook', new FacebookProvider())
 				idpRegistry.registerHandler('apple', new AppleProvider())
 				return idpRegistry
@@ -282,6 +288,10 @@ export class TenantContainerFactory {
 			.addService('personIdentityProviderManager', () => new PersonIdentityProviderManager())
 			.addService('otpAuthenticator', ({ providers }) => new OtpAuthenticator(providers))
 			.addService('otpManager', ({ otpAuthenticator, providers }) => new OtpManager(otpAuthenticator, providers))
+			.addService(
+				'reauthenticationVerifier',
+				({ providers, otpManager, rateLimiter }) => new ReauthenticationVerifier(providers, otpManager, rateLimiter),
+			)
 			.addService('backupCodeManager', ({ providers, userMailer }) => new BackupCodeManager(userMailer, providers))
 			.addService('emailOtpManager', ({ userMailer, providers, rateLimiter }) => new EmailOtpManager(userMailer, providers, rateLimiter))
 			.addService('authPolicyManager', ({ projectManager }) => new AuthPolicyManager(projectManager))
@@ -349,8 +359,8 @@ export class TenantContainerFactory {
 			.addService('signOutMutationResolver', ({ signOutManager }) => new SignOutMutationResolver(signOutManager))
 			.addService(
 				'changeProfileMutationResolver',
-				({ personManager, emailChangeManager, permissionContextFactory }) =>
-					new ChangeProfileMutationResolver(personManager, emailChangeManager, permissionContextFactory),
+				({ personManager, emailChangeManager, permissionContextFactory, reauthenticationVerifier }) =>
+					new ChangeProfileMutationResolver(personManager, emailChangeManager, permissionContextFactory, reauthenticationVerifier),
 			)
 			.addService(
 				'emailVerificationMutationResolver',
@@ -388,16 +398,17 @@ export class TenantContainerFactory {
 			.addService('disableApiKeyMutationResolver', ({ apiKeyManager }) => new DisableApiKeyMutationResolver(apiKeyManager))
 			.addService(
 				'otpMutationResolver',
-				({ otpManager, backupCodeManager, authPolicyResolver }) => new OtpMutationResolver(otpManager, backupCodeManager, authPolicyResolver),
+				({ otpManager, backupCodeManager, authPolicyResolver, reauthenticationVerifier }) =>
+					new OtpMutationResolver(otpManager, backupCodeManager, authPolicyResolver, reauthenticationVerifier),
 			)
 			.addService(
 				'emailOtpMutationResolver',
-				({ emailOtpManager, backupCodeManager, authPolicyResolver }) =>
-					new EmailOtpMutationResolver(emailOtpManager, backupCodeManager, authPolicyResolver),
+				({ emailOtpManager, backupCodeManager, authPolicyResolver, reauthenticationVerifier }) =>
+					new EmailOtpMutationResolver(emailOtpManager, backupCodeManager, authPolicyResolver, reauthenticationVerifier),
 			)
 			.addService(
 				'regenerateBackupCodesMutationResolver',
-				({ backupCodeManager }) => new RegenerateBackupCodesMutationResolver(backupCodeManager),
+				({ backupCodeManager, reauthenticationVerifier }) => new RegenerateBackupCodesMutationResolver(backupCodeManager, reauthenticationVerifier),
 			)
 			.addService(
 				'mailTemplateMutationResolver',

@@ -293,8 +293,11 @@ export type ChangeMyProfileError = {
 export type ChangeMyProfileErrorCode =
 	| 'EMAIL_ALREADY_EXISTS'
 	| 'INVALID_EMAIL_FORMAT'
+	| 'INVALID_OTP_TOKEN'
+	| 'INVALID_PASSWORD'
 	| 'NOT_A_PERSON'
 	| 'RATE_LIMIT_EXCEEDED'
+	| 'REAUTHENTICATION_REQUIRED'
 
 export type ChangeMyProfileResponse = {
 	readonly __typename?: 'ChangeMyProfileResponse'
@@ -414,6 +417,13 @@ export type ConfigCaptchaProtectInput = {
 export type ConfigEmailChange = {
 	readonly __typename?: 'ConfigEmailChange'
 	/**
+	 * When true, a changeMyProfile e-mail change requires the current password or a
+	 * TOTP code (currentPassword / otpToken). A change applied directly also sends a
+	 * notice to the old address and signs out the person's other sessions.
+	 * Defaults to false.
+	 */
+	readonly requireReauthentication: Scalars['Boolean']['output']
+	/**
 	 * When true, a user-initiated changeMyProfile e-mail change does not swap
 	 * the address immediately: it goes through a confirmation flow
 	 * (confirmEmailChange) against a token mailed to the new address, and the
@@ -424,6 +434,7 @@ export type ConfigEmailChange = {
 }
 
 export type ConfigEmailChangeInput = {
+	readonly requireReauthentication?: InputMaybe<Scalars['Boolean']['input']>
 	readonly requireVerification?: InputMaybe<Scalars['Boolean']['input']>
 }
 
@@ -446,6 +457,12 @@ export type ConfigLogin = {
 	readonly defaultTokenExpiration: Scalars['Interval']['output']
 	readonly maxBackoff: Scalars['Interval']['output']
 	readonly maxTokenExpiration?: Maybe<Scalars['Interval']['output']>
+	/**
+	 * When true, disabling TOTP or e-mail OTP, rotating an active TOTP (prepareOtp)
+	 * and regenerating backup codes require the current password or a current TOTP
+	 * code (currentPassword / otpToken). Defaults to false.
+	 */
+	readonly mfaChangeRequiresReauthentication: Scalars['Boolean']['output']
 	readonly mfaGraceDuration: Scalars['Interval']['output']
 	/**
 	 * If false, signIn collapses NO_PASSWORD_SET / INVALID_PASSWORD into a
@@ -475,6 +492,12 @@ export type ConfigLoginAnomalyDetection = {
 	readonly emailThreshold: Scalars['Int']['output']
 	readonly enabled: Scalars['Boolean']['output']
 	readonly historySize: Scalars['Int']['output']
+	/**
+	 * When true, a signal missing from the current sign-in (no geo header, no
+	 * user-agent, no IP) scores as new once the history has a value for it.
+	 * Defaults to false: a missing signal is ignored.
+	 */
+	readonly missingSignalIsNew: Scalars['Boolean']['output']
 	readonly stepUpThreshold: Scalars['Int']['output']
 }
 
@@ -482,6 +505,7 @@ export type ConfigLoginAnomalyDetectionInput = {
 	readonly emailThreshold?: InputMaybe<Scalars['Int']['input']>
 	readonly enabled?: InputMaybe<Scalars['Boolean']['input']>
 	readonly historySize?: InputMaybe<Scalars['Int']['input']>
+	readonly missingSignalIsNew?: InputMaybe<Scalars['Boolean']['input']>
 	readonly stepUpThreshold?: InputMaybe<Scalars['Int']['input']>
 }
 
@@ -492,6 +516,7 @@ export type ConfigLoginInput = {
 	readonly defaultTokenExpiration?: InputMaybe<Scalars['Interval']['input']>
 	readonly maxBackoff?: InputMaybe<Scalars['Interval']['input']>
 	readonly maxTokenExpiration?: InputMaybe<Scalars['Interval']['input']>
+	readonly mfaChangeRequiresReauthentication?: InputMaybe<Scalars['Boolean']['input']>
 	readonly mfaGraceDuration?: InputMaybe<Scalars['Interval']['input']>
 	readonly revealLoginMethod?: InputMaybe<Scalars['Boolean']['input']>
 	readonly revealUserExists?: InputMaybe<Scalars['Boolean']['input']>
@@ -532,6 +557,8 @@ export type ConfigPassword = {
 	readonly requireLowercase: Scalars['Int']['output']
 	readonly requireSpecial: Scalars['Int']['output']
 	readonly requireUppercase: Scalars['Int']['output']
+	/** When true, setting a new password disables the person's other sessions and unused tokens. */
+	readonly revokeSessionsOnChange: Scalars['Boolean']['output']
 }
 
 export type ConfigPasswordInput = {
@@ -543,18 +570,28 @@ export type ConfigPasswordInput = {
 	readonly requireLowercase?: InputMaybe<Scalars['Int']['input']>
 	readonly requireSpecial?: InputMaybe<Scalars['Int']['input']>
 	readonly requireUppercase?: InputMaybe<Scalars['Int']['input']>
+	readonly revokeSessionsOnChange?: InputMaybe<Scalars['Boolean']['input']>
 }
 
 export type ConfigPasswordless = {
 	readonly __typename?: 'ConfigPasswordless'
 	readonly enabled: ConfigPolicy
 	readonly expiration: Scalars['Interval']['output']
+	/**
+	 * When true, initSignInPasswordless answers an unknown address, a person with
+	 * passwordless sign-in disabled, a person bound to an identity provider and a
+	 * throttled address like a real request (ok with a random requestId), without
+	 * sending a mail. Does not apply while passwordless is globally never.
+	 * Defaults to false.
+	 */
+	readonly uniformResponse: Scalars['Boolean']['output']
 	readonly url?: Maybe<Scalars['String']['output']>
 }
 
 export type ConfigPasswordlessInput = {
 	readonly enabled?: InputMaybe<ConfigPolicy>
 	readonly expiration?: InputMaybe<Scalars['Interval']['input']>
+	readonly uniformResponse?: InputMaybe<Scalars['Boolean']['input']>
 	readonly url?: InputMaybe<Scalars['String']['input']>
 }
 
@@ -961,7 +998,11 @@ export type DisableEmailOtpError = {
 
 export type DisableEmailOtpErrorCode =
 	| 'EMAIL_OTP_NOT_ACTIVE'
+	| 'INVALID_OTP_TOKEN'
+	| 'INVALID_PASSWORD'
 	| 'MFA_REQUIRED'
+	| 'RATE_LIMIT_EXCEEDED'
+	| 'REAUTHENTICATION_REQUIRED'
 
 export type DisableEmailOtpResponse = {
 	readonly __typename?: 'DisableEmailOtpResponse'
@@ -992,8 +1033,12 @@ export type DisableOtpError = {
 }
 
 export type DisableOtpErrorCode =
+	| 'INVALID_OTP_TOKEN'
+	| 'INVALID_PASSWORD'
 	| 'MFA_REQUIRED'
 	| 'OTP_NOT_ACTIVE'
+	| 'RATE_LIMIT_EXCEEDED'
+	| 'REAUTHENTICATION_REQUIRED'
 
 export type DisableOtpResponse = {
 	readonly __typename?: 'DisableOtpResponse'
@@ -1123,7 +1168,7 @@ export type IdpOptionsOutput = {
 	/**
 	 * When true, a non-exclusive provider may only auto-link to / sign in an
 	 * existing account by e-mail if the provider asserts the e-mail is verified.
-	 * Defaults to false.
+	 * addIDP stores true when the option is omitted.
 	 */
 	readonly requireVerifiedEmail: Scalars['Boolean']['output']
 }
@@ -1527,8 +1572,10 @@ export type MutationChangeMyPasswordArgs = {
 }
 
 export type MutationChangeMyProfileArgs = {
+	currentPassword?: InputMaybe<Scalars['String']['input']>
 	email?: InputMaybe<Scalars['String']['input']>
 	name?: InputMaybe<Scalars['String']['input']>
+	otpToken?: InputMaybe<Scalars['String']['input']>
 }
 
 export type MutationChangePasswordArgs = {
@@ -1617,8 +1664,18 @@ export type MutationDisableApiKeyArgs = {
 	id: Scalars['String']['input']
 }
 
+export type MutationDisableEmailOtpArgs = {
+	currentPassword?: InputMaybe<Scalars['String']['input']>
+	otpToken?: InputMaybe<Scalars['String']['input']>
+}
+
 export type MutationDisableIdpArgs = {
 	identityProvider: Scalars['String']['input']
+}
+
+export type MutationDisableOtpArgs = {
+	currentPassword?: InputMaybe<Scalars['String']['input']>
+	otpToken?: InputMaybe<Scalars['String']['input']>
 }
 
 export type MutationDisablePersonArgs = {
@@ -1663,7 +1720,14 @@ export type MutationInviteArgs = {
 }
 
 export type MutationPrepareOtpArgs = {
+	currentPassword?: InputMaybe<Scalars['String']['input']>
 	label?: InputMaybe<Scalars['String']['input']>
+	otpToken?: InputMaybe<Scalars['String']['input']>
+}
+
+export type MutationRegenerateBackupCodesArgs = {
+	currentPassword?: InputMaybe<Scalars['String']['input']>
+	otpToken?: InputMaybe<Scalars['String']['input']>
 }
 
 export type MutationRemoveGlobalIdentityRolesArgs = {
@@ -1863,8 +1927,21 @@ export type PersonsFilter = {
 	readonly personId?: InputMaybe<Scalars['String']['input']>
 }
 
+export type PrepareOtpError = {
+	readonly __typename?: 'PrepareOtpError'
+	readonly code: PrepareOtpErrorCode
+	readonly developerMessage: Scalars['String']['output']
+}
+
+export type PrepareOtpErrorCode =
+	| 'INVALID_OTP_TOKEN'
+	| 'INVALID_PASSWORD'
+	| 'RATE_LIMIT_EXCEEDED'
+	| 'REAUTHENTICATION_REQUIRED'
+
 export type PrepareOtpResponse = {
 	readonly __typename?: 'PrepareOtpResponse'
+	readonly error?: Maybe<PrepareOtpError>
 	readonly ok: Scalars['Boolean']['output']
 	readonly result?: Maybe<PrepareOtpResult>
 }
@@ -2057,7 +2134,12 @@ export type RegenerateBackupCodesError = {
 	readonly developerMessage: Scalars['String']['output']
 }
 
-export type RegenerateBackupCodesErrorCode = 'OTP_NOT_ACTIVE'
+export type RegenerateBackupCodesErrorCode =
+	| 'INVALID_OTP_TOKEN'
+	| 'INVALID_PASSWORD'
+	| 'OTP_NOT_ACTIVE'
+	| 'RATE_LIMIT_EXCEEDED'
+	| 'REAUTHENTICATION_REQUIRED'
 
 export type RegenerateBackupCodesResponse = {
 	readonly __typename?: 'RegenerateBackupCodesResponse'
@@ -2612,6 +2694,8 @@ export type WeakPasswordReason =
 	| 'MISSING_LOWERCASE'
 	| 'MISSING_SPECIAL'
 	| 'MISSING_UPPERCASE'
+	/** Longer than 72 bytes (UTF-8), the most a password hash covers. Only reported when a password is set. */
+	| 'TOO_LONG'
 	| 'TOO_SHORT'
 
 export type ResolverTypeWrapper<T> = Promise<T> | T
@@ -2908,6 +2992,8 @@ export type ResolversTypes = {
 	Person: ResolverTypeWrapper<Omit<Person, 'identity'> & { identity: ResolversTypes['Identity'] }>
 	PersonIdentityProvider: ResolverTypeWrapper<PersonIdentityProvider>
 	PersonsFilter: PersonsFilter
+	PrepareOtpError: ResolverTypeWrapper<PrepareOtpError>
+	PrepareOtpErrorCode: PrepareOtpErrorCode
 	PrepareOtpResponse: ResolverTypeWrapper<PrepareOtpResponse>
 	PrepareOtpResult: ResolverTypeWrapper<PrepareOtpResult>
 	Project: ResolverTypeWrapper<
@@ -3163,6 +3249,7 @@ export type ResolversParentTypes = {
 	Person: Omit<Person, 'identity'> & { identity: ResolversParentTypes['Identity'] }
 	PersonIdentityProvider: PersonIdentityProvider
 	PersonsFilter: PersonsFilter
+	PrepareOtpError: PrepareOtpError
 	PrepareOtpResponse: PrepareOtpResponse
 	PrepareOtpResult: PrepareOtpResult
 	Project: Omit<Project, 'apiKeys' | 'members' | 'roles'> & {
@@ -3502,6 +3589,7 @@ export type ConfigEmailChangeResolvers<
 	ContextType = any,
 	ParentType extends ResolversParentTypes['ConfigEmailChange'] = ResolversParentTypes['ConfigEmailChange'],
 > = {
+	requireReauthentication?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
 	requireVerification?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
 }
 
@@ -3512,6 +3600,7 @@ export type ConfigLoginResolvers<ContextType = any, ParentType extends Resolvers
 	defaultTokenExpiration?: Resolver<ResolversTypes['Interval'], ParentType, ContextType>
 	maxBackoff?: Resolver<ResolversTypes['Interval'], ParentType, ContextType>
 	maxTokenExpiration?: Resolver<Maybe<ResolversTypes['Interval']>, ParentType, ContextType>
+	mfaChangeRequiresReauthentication?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
 	mfaGraceDuration?: Resolver<ResolversTypes['Interval'], ParentType, ContextType>
 	revealLoginMethod?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
 	revealUserExists?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
@@ -3524,6 +3613,7 @@ export type ConfigLoginAnomalyDetectionResolvers<
 	emailThreshold?: Resolver<ResolversTypes['Int'], ParentType, ContextType>
 	enabled?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
 	historySize?: Resolver<ResolversTypes['Int'], ParentType, ContextType>
+	missingSignalIsNew?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
 	stepUpThreshold?: Resolver<ResolversTypes['Int'], ParentType, ContextType>
 }
 
@@ -3544,6 +3634,7 @@ export type ConfigPasswordResolvers<
 	requireLowercase?: Resolver<ResolversTypes['Int'], ParentType, ContextType>
 	requireSpecial?: Resolver<ResolversTypes['Int'], ParentType, ContextType>
 	requireUppercase?: Resolver<ResolversTypes['Int'], ParentType, ContextType>
+	revokeSessionsOnChange?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
 }
 
 export type ConfigPasswordlessResolvers<
@@ -3552,6 +3643,7 @@ export type ConfigPasswordlessResolvers<
 > = {
 	enabled?: Resolver<ResolversTypes['ConfigPolicy'], ParentType, ContextType>
 	expiration?: Resolver<ResolversTypes['Interval'], ParentType, ContextType>
+	uniformResponse?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
 	url?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>
 }
 
@@ -4327,7 +4419,7 @@ export type MutationResolvers<ContextType = any, ParentType extends ResolversPar
 		RequireFields<MutationDeleteCustomRoleArgs, 'slug'>
 	>
 	disableApiKey?: Resolver<Maybe<ResolversTypes['DisableApiKeyResponse']>, ParentType, ContextType, RequireFields<MutationDisableApiKeyArgs, 'id'>>
-	disableEmailOtp?: Resolver<Maybe<ResolversTypes['DisableEmailOtpResponse']>, ParentType, ContextType>
+	disableEmailOtp?: Resolver<Maybe<ResolversTypes['DisableEmailOtpResponse']>, ParentType, ContextType, Partial<MutationDisableEmailOtpArgs>>
 	disableIDP?: Resolver<
 		Maybe<ResolversTypes['DisableIDPResponse']>,
 		ParentType,
@@ -4335,7 +4427,7 @@ export type MutationResolvers<ContextType = any, ParentType extends ResolversPar
 		RequireFields<MutationDisableIdpArgs, 'identityProvider'>
 	>
 	disableMyPasswordless?: Resolver<Maybe<ResolversTypes['ToggleMyPasswordlessResponse']>, ParentType, ContextType>
-	disableOtp?: Resolver<Maybe<ResolversTypes['DisableOtpResponse']>, ParentType, ContextType>
+	disableOtp?: Resolver<Maybe<ResolversTypes['DisableOtpResponse']>, ParentType, ContextType, Partial<MutationDisableOtpArgs>>
 	disablePerson?: Resolver<
 		Maybe<ResolversTypes['DisablePersonResponse']>,
 		ParentType,
@@ -4377,7 +4469,12 @@ export type MutationResolvers<ContextType = any, ParentType extends ResolversPar
 		RequireFields<MutationInviteArgs, 'email' | 'memberships' | 'projectSlug'>
 	>
 	prepareOtp?: Resolver<Maybe<ResolversTypes['PrepareOtpResponse']>, ParentType, ContextType, Partial<MutationPrepareOtpArgs>>
-	regenerateBackupCodes?: Resolver<Maybe<ResolversTypes['RegenerateBackupCodesResponse']>, ParentType, ContextType>
+	regenerateBackupCodes?: Resolver<
+		Maybe<ResolversTypes['RegenerateBackupCodesResponse']>,
+		ParentType,
+		ContextType,
+		Partial<MutationRegenerateBackupCodesArgs>
+	>
 	removeGlobalIdentityRoles?: Resolver<
 		Maybe<ResolversTypes['RemoveGlobalIdentityRolesResponse']>,
 		ParentType,
@@ -4501,10 +4598,19 @@ export type PersonIdentityProviderResolvers<
 	identityProvider?: Resolver<ResolversTypes['IdentityProviderListItem'], ParentType, ContextType>
 }
 
+export type PrepareOtpErrorResolvers<
+	ContextType = any,
+	ParentType extends ResolversParentTypes['PrepareOtpError'] = ResolversParentTypes['PrepareOtpError'],
+> = {
+	code?: Resolver<ResolversTypes['PrepareOtpErrorCode'], ParentType, ContextType>
+	developerMessage?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+}
+
 export type PrepareOtpResponseResolvers<
 	ContextType = any,
 	ParentType extends ResolversParentTypes['PrepareOtpResponse'] = ResolversParentTypes['PrepareOtpResponse'],
 > = {
+	error?: Resolver<Maybe<ResolversTypes['PrepareOtpError']>, ParentType, ContextType>
 	ok?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
 	result?: Resolver<Maybe<ResolversTypes['PrepareOtpResult']>, ParentType, ContextType>
 }
@@ -5174,6 +5280,7 @@ export type Resolvers<ContextType = any> = {
 	Mutation?: MutationResolvers<ContextType>
 	Person?: PersonResolvers<ContextType>
 	PersonIdentityProvider?: PersonIdentityProviderResolvers<ContextType>
+	PrepareOtpError?: PrepareOtpErrorResolvers<ContextType>
 	PrepareOtpResponse?: PrepareOtpResponseResolvers<ContextType>
 	PrepareOtpResult?: PrepareOtpResultResolvers<ContextType>
 	Project?: ProjectResolvers<ContextType>

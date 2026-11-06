@@ -69,6 +69,13 @@ import _20260904120000idpdisablelocalauthentication from './2026-09-04-120000-id
 import _20260911120000customrole from './2026-09-11-120000-custom-role.js'
 import _20261012120000signoutauthlog from './2026-10-12-120000-sign-out-auth-log.js'
 import _20261012120010authlogcreatedatindex from './2026-10-12-120010-auth-log-created-at-index.js'
+import _20261106120000mailtemplatetrusted from './2026-11-06-120000-mail-template-trusted.js'
+import _20261106120100configpasswordrevokesessions from './2026-11-06-120100-config-password-revoke-sessions.js'
+import _20261106120200configemailchangereauthentication from './2026-11-06-120200-config-email-change-reauthentication.js'
+import _20261106120300personmfatotplastcounter from './2026-11-06-120300-person-mfa-totp-last-counter.js'
+import _20261106120400configmfachangereauthentication from './2026-11-06-120400-config-mfa-change-reauthentication.js'
+import _20261106120500configanomalymissingsignal from './2026-11-06-120500-config-anomaly-missing-signal.js'
+import _20261106120600configpasswordlessuniformresponse from './2026-11-06-120600-config-passwordless-uniform-response.js'
 import snapshot from './snapshot.js'
 import { computeTokenHash, Providers } from '../model/index.js'
 import { Logger } from '@contember/logger'
@@ -161,6 +168,13 @@ const migrations = {
 	'2026-09-11-120000-custom-role': _20260911120000customrole,
 	'2026-10-12-120000-sign-out-auth-log': _20261012120000signoutauthlog,
 	'2026-10-12-120010-auth-log-created-at-index': _20261012120010authlogcreatedatindex,
+	'2026-11-06-120000-mail-template-trusted': _20261106120000mailtemplatetrusted,
+	'2026-11-06-120100-config-password-revoke-sessions': _20261106120100configpasswordrevokesessions,
+	'2026-11-06-120200-config-email-change-reauthentication': _20261106120200configemailchangereauthentication,
+	'2026-11-06-120300-person-mfa-totp-last-counter': _20261106120300personmfatotplastcounter,
+	'2026-11-06-120400-config-mfa-change-reauthentication': _20261106120400configmfachangereauthentication,
+	'2026-11-06-120500-config-anomaly-missing-signal': _20261106120500configanomalymissingsignal,
+	'2026-11-06-120600-config-passwordless-uniform-response': _20261106120600configpasswordlessuniformresponse,
 }
 
 export class TenantMigrationsRunner {

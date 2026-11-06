@@ -27,7 +27,7 @@ import { VariablesQueryResolver } from './graphql/resolvers/query/VariablesQuery
 import { VariablesManager } from './model/VariablesManager.js'
 import { AccessEvaluator, Authorizator } from '@contember/authorization'
 import { ActionsPermissionsFactory } from './authorization/index.js'
-import { WebhookFetcherNative } from './dispatch/WebhookFetcher.js'
+import { createWebhookFetcher } from './dispatch/WebhookFetcher.js'
 import { ActionsMetrics } from './ActionsMetrics.js'
 
 export {
@@ -74,8 +74,9 @@ export default class ActionsPlugin implements Plugin {
 				.addService('actions_eventRepository', () => {
 					return new EventsRepository()
 				})
-				.addService('actions_eventDispatcher', ({ actions_eventRepository, actions_variableManager, tracer, serverConfig }) => {
-					const webhookTargetHandler = new WebhookTargetHandler(new WebhookFetcherNative(), tracer, {
+				.addService('actions_eventDispatcher', ({ actions_eventRepository, actions_variableManager, tracer, serverConfig, egressGuard }) => {
+					const webhookFetcher = createWebhookFetcher(egressGuard)
+					const webhookTargetHandler = new WebhookTargetHandler(webhookFetcher, tracer, {
 						propagateToWebhooks: serverConfig.telemetry?.traces?.propagateToWebhooks ?? true,
 					})
 					const targetHandlerResolver = new TargetHandlerResolver(webhookTargetHandler)

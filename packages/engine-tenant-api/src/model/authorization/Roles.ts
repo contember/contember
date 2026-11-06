@@ -19,5 +19,13 @@ export const NON_DELEGABLE_TENANT_ROLES: ReadonlySet<string> = new Set([
 	TenantRole.PROJECT_CREATOR,
 ])
 
+/** Global roles that administer the whole tenant, every project included. */
+export const GLOBAL_ADMIN_ROLES: ReadonlySet<string> = new Set([
+	TenantRole.SUPER_ADMIN,
+	TenantRole.PROJECT_ADMIN,
+])
+
+export const holdsGlobalAdminRole = (roles: readonly string[]): boolean => roles.some(role => GLOBAL_ADMIN_ROLES.has(role))
+
 /** Shared by custom-role slug validation and by role references inside grant configuration. */
 export const ROLE_SLUG_PATTERN = /^[a-z][a-z0-9_]*$/

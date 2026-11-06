@@ -1,6 +1,6 @@
 import { afterAll, beforeAll, describe, expect, test } from 'bun:test'
 import { exportJWK, generateKeyPair, SignJWT } from 'jose'
-import { buildOIDCLogoutUrl, validateOIDCLogoutToken } from '../../../../src/model/service/idp/providers/OIDCHelpers.js'
+import { buildOIDCLogoutUrl, createRemoteJwksResolver, validateOIDCLogoutToken } from '../../../../src/model/service/idp/providers/OIDCHelpers.js'
 import { IDPValidationError } from '../../../../src/model/service/idp/IDPValidationError.js'
 
 const clientWith = (endSessionEndpoint: string | undefined) => {
@@ -86,7 +86,8 @@ describe('validateOIDCLogoutToken', () => {
 		return builder.sign(key ?? signingKey)
 	}
 
-	const validate = (token: string, client = clientWithMeta(), issuer = issuerWithMeta()) => validateOIDCLogoutToken(client, issuer, token)
+	const resolveJwks = createRemoteJwksResolver(undefined)
+	const validate = (token: string, client = clientWithMeta(), issuer = issuerWithMeta()) => validateOIDCLogoutToken(client, issuer, token, resolveJwks)
 
 	beforeAll(async () => {
 		const keyPair = await generateKeyPair('RS256')

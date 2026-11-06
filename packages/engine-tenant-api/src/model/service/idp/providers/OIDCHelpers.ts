@@ -1,5 +1,5 @@
 import { Client, custom, errors, generators, Issuer, TokenSet } from 'openid-client'
-import { createRemoteJWKSet, jwtVerify } from 'jose'
+import { createRemoteJWKSet, customFetch, FetchImplementation, jwtVerify } from 'jose'
 import { OIDCClaimMapping, OIDCResponseData } from './OIDCTypes.js'
 import { IDPValidationError } from '../IDPValidationError.js'
 import { IDPResponseError } from '../IDPResponseError.js'
@@ -39,7 +39,7 @@ export const tokenSetToSessionState = (tokenSet: TokenSet, sessionId?: string, p
 export const initOIDCAuth = async (
 	client: Client,
 	{ redirectUrl, scope, responseMode }: { redirectUrl: string; scope?: string; responseMode?: string },
-): Promise<InitIDPAuthResult> => {
+): Promise<InitIDPAuthResult & { sessionData: { nonce: string; state: string } }> => {
 	const nonce = generators.nonce()
 	const state = generators.state()
 	const url = client.authorizationUrl({
@@ -57,6 +57,8 @@ export const initOIDCAuth = async (
 }
 
 export type HandleOIDCResponseOptions = {
+	/** When set, the callback must match this response type exactly (see `strictResponseType`). */
+	expectedResponseType?: string
 	fetchUserInfo?: boolean
 	returnOIDCResult?: boolean
 	captureSession?: boolean
@@ -196,14 +198,27 @@ const resolveName = (source: Record<string, unknown>, claimMapping: OIDCClaimMap
 export const handleOIDCResponse = async (
 	client: Client,
 	{ sessionData, redirectUrl, ...otherData }: OIDCResponseData,
-	{ fetchUserInfo, returnOIDCResult, captureSession, claimMapping }: HandleOIDCResponseOptions = {},
+	{ expectedResponseType, fetchUserInfo, returnOIDCResult, captureSession, claimMapping }: HandleOIDCResponseOptions = {},
 ): Promise<IDPResponse> => {
 	const params = 'parameters' in otherData ? otherData.parameters : client.callbackParams(otherData.url)
 	if (params.state && !sessionData?.state) {
 		throw new IDPValidationError(`state is present in parameters, but missing in session data`)
 	}
+	if (expectedResponseType !== undefined) {
+		const expected = expectedResponseType.split(' ')
+		const unexpected = [
+			...(expected.includes('id_token') ? [] : ['id_token']),
+			...(expected.includes('token') ? [] : ['access_token']),
+			...(expected.includes('code') ? [] : ['code']),
+		].filter(param => params[param] !== undefined)
+		if (unexpected.length > 0) {
+			throw new IDPValidationError(`${unexpected.join(', ')} not expected for response type "${expectedResponseType}"`)
+		}
+	}
 	try {
-		const result = await client.callback(redirectUrl, params, sessionData)
+		// openid-client checks that the parameters `response_type` requires are present.
+		const checks = expectedResponseType !== undefined ? { ...sessionData, response_type: expectedResponseType } : sessionData
+		const result = await client.callback(redirectUrl, params, checks)
 		const claims = result.claims()
 		const { at_hash, c_hash, nonce, ...claimsWithoutHashes } = claims
 		const userInfo = result.access_token && fetchUserInfo ? await client.userinfo(result) : {}
@@ -369,21 +384,24 @@ const BACKCHANNEL_LOGOUT_EVENT = 'http://schemas.openid.net/event/backchannel-lo
 const LOGOUT_TOKEN_MAX_AGE_SECONDS = 120
 const LOGOUT_TOKEN_CLOCK_TOLERANCE_SECONDS = 5
 
+export type RemoteJwksResolver = (jwksUri: string) => ReturnType<typeof createRemoteJWKSet>
+
 /**
  * Remote JWKS sets keyed by `jwks_uri`. `createRemoteJWKSet` returns a function with its own internal
  * key cache + fetch cooldown, so it MUST be reused across requests — re-creating it per call (as the
  * unauthenticated back-channel endpoint would otherwise do) defeats the cache and turns every request
  * into a potential outbound JWKS fetch. Keyed by URL, so two providers sharing an IdP share the set.
  */
-const remoteJwksCache = new Map<string, ReturnType<typeof createRemoteJWKSet>>()
-
-const getRemoteJwks = (jwksUri: string): ReturnType<typeof createRemoteJWKSet> => {
-	let jwks = remoteJwksCache.get(jwksUri)
-	if (!jwks) {
-		jwks = createRemoteJWKSet(new URL(jwksUri))
-		remoteJwksCache.set(jwksUri, jwks)
+export const createRemoteJwksResolver = (fetchImpl: FetchImplementation | undefined): RemoteJwksResolver => {
+	const cache = new Map<string, ReturnType<typeof createRemoteJWKSet>>()
+	return jwksUri => {
+		let jwks = cache.get(jwksUri)
+		if (!jwks) {
+			jwks = createRemoteJWKSet(new URL(jwksUri), fetchImpl ? { [customFetch]: fetchImpl } : undefined)
+			cache.set(jwksUri, jwks)
+		}
+		return jwks
 	}
-	return jwks
 }
 
 /**
@@ -398,7 +416,12 @@ const getRemoteJwks = (jwksUri: string): ReturnType<typeof createRemoteJWKSet> =
  *   - it does NOT carry a `nonce` (a `nonce` means it is an ID token being replayed).
  * Throws {@link IDPValidationError} on any failure so the caller can answer 400.
  */
-export const validateOIDCLogoutToken = async (client: Client, issuer: Issuer<Client>, logoutToken: string): Promise<LogoutTokenClaims> => {
+export const validateOIDCLogoutToken = async (
+	client: Client,
+	issuer: Issuer<Client>,
+	logoutToken: string,
+	resolveJwks: RemoteJwksResolver,
+): Promise<LogoutTokenClaims> => {
 	const jwksUri = issuer.metadata.jwks_uri
 	if (!jwksUri) {
 		throw new IDPValidationError('IdP has no jwks_uri; cannot verify logout token')
@@ -413,7 +436,7 @@ export const validateOIDCLogoutToken = async (client: Client, issuer: Issuer<Cli
 	const expectedAlg = typeof client.metadata.id_token_signed_response_alg === 'string'
 		? client.metadata.id_token_signed_response_alg
 		: 'RS256'
-	const jwks = getRemoteJwks(jwksUri)
+	const jwks = resolveJwks(jwksUri)
 	let payload: Record<string, unknown>
 	try {
 		const verified = await jwtVerify(logoutToken, jwks, {

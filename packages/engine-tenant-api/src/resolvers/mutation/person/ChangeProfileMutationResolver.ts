@@ -19,15 +19,18 @@ import {
 	PersonManager,
 	PersonQuery,
 	ProfileField,
+	ReauthenticationVerifier,
+	RevokePersonSessionsCommand,
 } from '../../../model/index.js'
 import { createErrorResponse } from '../../errorUtils.js'
-import { normalizeEmail } from '../../../model/utils/email.js'
+import { EmailAddress } from '../../../model/utils/email.js'
 
 export class ChangeProfileMutationResolver implements Pick<MutationResolvers, 'changeMyProfile' | 'changeProfile' | 'confirmEmailChange'> {
 	constructor(
 		private readonly personManager: PersonManager,
 		private readonly emailChangeManager: EmailChangeManager,
 		private readonly permissionContextFactory: PermissionContextFactory,
+		private readonly reauthenticationVerifier: ReauthenticationVerifier,
 	) {}
 
 	async changeProfile(
@@ -91,10 +94,31 @@ export class ChangeProfileMutationResolver implements Pick<MutationResolvers, 'c
 		})
 
 		const config = await context.db.queryHandler.fetch(new ConfigurationQuery(context.db.providers))
-		// Compare normalized: a resubmit that only differs in casing/whitespace is
-		// not a real change and must not trigger a confirmation mail.
-		const normalizedNewEmail = args.email ? normalizeEmail(args.email) : null
-		const emailChanging = normalizedNewEmail !== null && normalizedNewEmail !== person.email
+		const newEmail = args.email ? EmailAddress.parse(args.email) : null
+		if (args.email && newEmail === null) {
+			return createErrorResponse('INVALID_EMAIL_FORMAT', 'E-mail address is not in a valid format')
+		}
+		// Compare normalized: a resubmit that only differs in casing is not a real change
+		// and must not trigger a confirmation mail.
+		const normalizedNewEmail = newEmail?.normalized() ?? null
+		const emailChanging = normalizedNewEmail !== null && normalizedNewEmail.value !== person.email
+
+		// Opt-in: a stolen session alone must not be enough to move the account to another address.
+		const requireReauthentication = emailChanging && config.emailChange.requireReauthentication
+		if (requireReauthentication) {
+			const reauthentication = await this.reauthenticationVerifier.verify(context.db, person, {
+				currentPassword: args.currentPassword,
+				otpToken: args.otpToken,
+			})
+			if (!reauthentication.ok) {
+				await context.logAuthAction({
+					type: 'email_change',
+					response: reauthentication,
+					personId: person.id,
+				})
+				return createErrorResponse(reauthentication.error, reauthentication.errorMessage)
+			}
+		}
 
 		// When e-mail-change verification applies, an e-mail change is not
 		// applied immediately: it goes through confirmEmailChange against a token
@@ -132,7 +156,7 @@ export class ChangeProfileMutationResolver implements Pick<MutationResolvers, 'c
 				response: result,
 				personId: person.id,
 				// Log the normalized address so it matches the per-recipient backoff key.
-				personInput: normalizedNewEmail,
+				personInput: normalizedNewEmail.value,
 			})
 			if (!result.ok) {
 				return createErrorResponse(result.error, result.errorMessage)
@@ -140,10 +164,16 @@ export class ChangeProfileMutationResolver implements Pick<MutationResolvers, 'c
 			return { ok: true }
 		}
 
-		const result = await this.personManager.changeProfile(context.db, person, {
-			email: args.email,
-			name: args.name === '' ? null : args.name,
-		})
+		const profileChange = { email: newEmail?.value ?? args.email, name: args.name === '' ? null : args.name }
+		const result = requireReauthentication
+			? await context.db.transaction(async db => {
+				const changed = await this.personManager.changeProfile(db, person, profileChange)
+				if (changed.ok) {
+					await db.commandBus.execute(new RevokePersonSessionsCommand(person.id, context.apiKeyId))
+				}
+				return changed
+			})
+			: await this.personManager.changeProfile(context.db, person, profileChange)
 		if (args.email) {
 			await context.logAuthAction({
 				type: 'email_change',
@@ -154,6 +184,9 @@ export class ChangeProfileMutationResolver implements Pick<MutationResolvers, 'c
 
 		if (!result.ok) {
 			return createErrorResponse(result.error, result.errorMessage)
+		}
+		if (requireReauthentication && normalizedNewEmail !== null) {
+			await this.emailChangeManager.notifyOldAddress(context.db, person, normalizedNewEmail.value)
 		}
 
 		return { ok: true }

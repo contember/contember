@@ -25,8 +25,8 @@ test('signIn - a provider that disables local authentication refuses the passwor
 		query: signInMutation({ email, password }),
 		executes: [
 			getConfigSql(),
-			getNextLoginAttemptSql(email),
 			getPersonByEmailSql({ email, response: { personId, identityId, password, roles: [] } }),
+			getNextLoginAttemptSql({ personId }),
 			localAuthDisablingIdpsSql({ personId, slugs: ['corporateSso'] }),
 		],
 		return: {
@@ -50,8 +50,8 @@ test('signIn - the wrong password is not even consulted, so the answer cannot do
 		query: signInMutation({ email, password: 'not-the-password' }),
 		executes: [
 			getConfigSql(),
-			getNextLoginAttemptSql(email),
 			getPersonByEmailSql({ email, response: { personId, identityId, password, roles: [] } }),
+			getNextLoginAttemptSql({ personId }),
 			localAuthDisablingIdpsSql({ personId, slugs: ['corporateSso'] }),
 		],
 		return: {
@@ -75,8 +75,8 @@ test('signIn - revealLoginMethod off collapses it into INVALID_CREDENTIALS', asy
 		query: signInMutation({ email, password }),
 		executes: [
 			getConfigSql({ login_reveal_login_method: false }),
-			getNextLoginAttemptSql(email),
 			getPersonByEmailSql({ email, response: { personId, identityId, password, roles: [] } }),
+			getNextLoginAttemptSql({ personId }),
 			localAuthDisablingIdpsSql({ personId, slugs: ['corporateSso'] }),
 		],
 		return: {
@@ -102,8 +102,8 @@ test('signIn - a person with no such link signs in as before', async () => {
 		query: signInMutation({ email, password }),
 		executes: [
 			getConfigSql(),
-			getNextLoginAttemptSql(email),
 			getPersonByEmailSql({ email, response: { personId, identityId, password, roles: [] } }),
+			getNextLoginAttemptSql({ personId }),
 			// The asserted SQL carries `disabled_at IS NULL`, so a DISABLED provider never
 			// reaches this list — turning the provider off is the break-glass.
 			localAuthDisablingIdpsSql({ personId }),

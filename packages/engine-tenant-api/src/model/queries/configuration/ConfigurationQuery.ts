@@ -27,11 +27,13 @@ export class ConfigurationQuery extends DatabaseQuery<Config> {
 			},
 			emailChange: {
 				requireVerification: result.require_email_change_verification,
+				requireReauthentication: result.email_change_require_reauthentication,
 			},
 			passwordless: {
 				enabled: result.passwordless_enabled,
 				url: result.passwordless_url,
 				expiration: result.passwordless_expiration,
+				uniformResponse: result.passwordless_uniform_response,
 			},
 			password: {
 				minLength: result.password_min_length,
@@ -42,6 +44,7 @@ export class ConfigurationQuery extends DatabaseQuery<Config> {
 				pattern: result.password_pattern,
 				checkBlacklist: result.password_check_blacklist,
 				checkHibp: result.password_check_hibp,
+				revokeSessionsOnChange: result.password_revoke_sessions_on_change,
 			},
 			login: {
 				baseBackoff: result.login_base_backoff,
@@ -52,11 +55,13 @@ export class ConfigurationQuery extends DatabaseQuery<Config> {
 				defaultTokenExpiration: result.login_default_token_expiration,
 				maxTokenExpiration: result.login_max_token_expiration,
 				mfaGraceDuration: result.login_mfa_grace_duration,
+				mfaChangeRequiresReauthentication: result.login_mfa_change_require_reauthentication,
 				anomalyDetection: {
 					enabled: result.login_anomaly_detection_enabled,
 					historySize: result.login_anomaly_history_size,
 					emailThreshold: result.login_anomaly_email_threshold,
 					stepUpThreshold: result.login_anomaly_step_up_threshold,
+					missingSignalIsNew: result.login_anomaly_missing_signal_is_new,
 				},
 			},
 			captcha: {

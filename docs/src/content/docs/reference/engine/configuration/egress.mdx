@@ -1,0 +1,66 @@
+---
+title: Outgoing request guard
+description: Restrict the requests the engine sends to URLs chosen by project deployers and tenant admins (Actions webhooks, OIDC identity providers) to public HTTPS endpoints.
+---
+
+:::note[Available since 2.2]
+:::
+
+The engine sends HTTP requests to URLs that are not part of its own configuration:
+
+- [Actions](/reference/engine/actions/definition) webhooks, whose URL comes from the project schema;
+- [OIDC identity providers](/reference/engine/tenant/idp): discovery, token, userinfo and JWKS requests to the configured `url` and the endpoints its discovery document names.
+
+On a shared deployment, whoever can deploy a schema or configure an identity provider chooses where these requests go, including addresses that are only reachable from inside the engine's network. The outgoing request guard limits them to public HTTPS endpoints.
+
+The guard is **off by default**: requests go wherever the URL points, as in earlier versions.
+
+## Configuration
+
+```bash
+CONTEMBER_EGRESS_GUARD=true
+# optional
+CONTEMBER_EGRESS_ALLOW_HTTP=true
+CONTEMBER_EGRESS_ALLOWLIST=hooks.internal.example,10.20.0.0/16
+```
+
+or in the server config:
+
+```yaml
+server:
+  egress:
+    guard: true
+    allowHttp: false
+    allowlist:
+      - hooks.internal.example
+      - 10.20.0.0/16
+```
+
+| Option | Env variable | Meaning |
+|---|---|---|
+| `guard` | `CONTEMBER_EGRESS_GUARD` | Enables the guard. Without it, the other options have no effect. |
+| `allowHttp` | `CONTEMBER_EGRESS_ALLOW_HTTP` | Also allows `http://` URLs. Off by default: only `https://` is allowed. |
+| `allowlist` | `CONTEMBER_EGRESS_ALLOWLIST` | Host names, IP addresses and CIDR ranges (comma-separated in the env variable) that are exempt from the address check. A host name entry matches the URL host exactly. |
+
+An invalid allowlist entry stops the engine at startup.
+
+## What the guard refuses
+
+With the guard on, a request is refused when:
+
+- the URL is not `https://` (or `http://` with `allowHttp`), or it carries a user name or password;
+- any address the host resolves to is not public: unspecified, private (`10/8`, `172.16/12`, `192.168/16`), shared (`100.64/10`), loopback, link-local (including cloud metadata endpoints at `169.254.169.254`), multicast, documentation, benchmarking and reserved ranges, and in IPv6 everything outside global unicast (`2000::/3`), including IPv4-mapped, unique-local and link-local addresses.
+
+The address is checked when the connection opens, against the address actually used, so a host name that resolves to a public address at one moment and a private one at the next cannot bypass it. Every redirect is checked again the same way.
+
+A refused webhook is a failed delivery: it is recorded in the event log with the reason and retried like any other failure. A refused identity provider request fails the sign-in or the logout request.
+
+## Local development
+
+Webhooks and identity providers in local development usually run on `localhost` or a Docker host. Leave the guard off there, or turn it on with the local hosts allow-listed:
+
+```bash
+CONTEMBER_EGRESS_GUARD=true
+CONTEMBER_EGRESS_ALLOW_HTTP=true
+CONTEMBER_EGRESS_ALLOWLIST=localhost,host.docker.internal,172.16.0.0/12
+```

@@ -15,13 +15,19 @@ export class OtpAuthenticator {
 	}
 
 	public validate(secret: SecretLike, token: string): boolean {
-		const result = TOTP.validate({
+		return this.matchCounter(secret, token) !== null
+	}
+
+	/** Returns the time-step counter the token belongs to, or null when the token is not valid now. */
+	public matchCounter(secret: SecretLike, token: string): number | null {
+		const timestamp = this.providers.now().getTime()
+		const delta = TOTP.validate({
 			token,
 			digits,
 			secret: getSecret(secret),
-			timestamp: this.providers.now().getTime(),
+			timestamp,
 		})
-		return result !== null
+		return delta === null ? null : TOTP.counter({ timestamp }) + delta
 	}
 
 	public generate(secret: SecretLike): string {

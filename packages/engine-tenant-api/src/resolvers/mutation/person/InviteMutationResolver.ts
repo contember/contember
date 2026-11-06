@@ -6,6 +6,7 @@ import { createErrorResponse, createProjectNotFoundResponse } from '../../errorU
 import { UserInputError } from '@contember/graphql-utils'
 import { PersonResponseFactory } from '../../responseHelpers/PersonResponseFactory.js'
 import { ResponseOk } from '../../../model/utils/Response.js'
+import { EmailAddress } from '../../../model/utils/email.js'
 import { Acl, JSONValue } from '@contember/schema'
 
 export class InviteMutationResolver implements MutationResolvers {
@@ -68,9 +69,13 @@ export class InviteMutationResolver implements MutationResolvers {
 
 	private async doInvite(
 		context: TenantResolverContext,
-		invite: InviteData,
+		{ email: emailInput, ...invite }: Omit<InviteData, 'email'> & { email: string },
 		audit: { unmanaged: boolean },
 	): Promise<InviteResponse> {
+		const email = EmailAddress.parse(emailInput)
+		if (email === null) {
+			return createErrorResponse('INVALID_EMAIL_FORMAT', 'E-mail address is not in a valid format')
+		}
 		const validationResult = await this.membershipValidator.validate(invite.project.slug, invite.memberships)
 		if (validationResult.length > 0) {
 			const errors = createMembershipValidationErrorResult(validationResult)
@@ -80,7 +85,7 @@ export class InviteMutationResolver implements MutationResolvers {
 				error: errors[0],
 			}
 		}
-		const response = await this.inviteManager.invite(context.db, invite)
+		const response = await this.inviteManager.invite(context.db, { ...invite, email })
 
 		if (!response.ok) {
 			return createErrorResponse(response.error, response.errorMessage)
@@ -91,7 +96,7 @@ export class InviteMutationResolver implements MutationResolvers {
 			type: 'person_invite',
 			response: new ResponseOk(null),
 			targetPersonId: result.person.id,
-			personInput: invite.email,
+			personInput: email.value,
 			eventData: {
 				projectSlug: invite.project.slug,
 				isNew: result.isNew,

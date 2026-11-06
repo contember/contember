@@ -10,6 +10,7 @@ import { AuthLogService } from './AuthLogService.js'
 import { UserMailer } from '../mailing/index.js'
 import { ApiKeyRequestInfo, SetMfaGraceUntilCommand } from '../commands/index.js'
 import { intervalToSeconds } from '../utils/interval.js'
+import { normalizeEmail } from '../utils/email.js'
 
 class SignInManager {
 	constructor(
@@ -23,9 +24,20 @@ class SignInManager {
 		private readonly userMailer: UserMailer,
 	) {}
 
+	/** Hashed once at the server's bcrypt cost; see {@link compareWithDummyHash}. */
+	private dummyPasswordHash: Promise<string> | null = null
+
+	/** Spends the time of a password check on a refusal that needs none, so the reply time does not tell whether the account exists. */
+	private async compareWithDummyHash(password: string): Promise<void> {
+		this.dummyPasswordHash ??= this.providers.bcrypt('contember-dummy-password')
+		await this.providers.bcryptCompare(password, await this.dummyPasswordHash)
+	}
+
+	/** @param person the person found by `email`, looked up by the caller to key the sign-in backoff */
 	async signIn(
 		dbContext: DatabaseContext,
 		email: string,
+		person: PersonRow | null,
 		password: string,
 		expiration?: number,
 		otpCode?: string,
@@ -35,12 +47,12 @@ class SignInManager {
 		config?: Config,
 		geoCountry?: string,
 	): Promise<SignInResponse> {
-		const person = await dbContext.queryHandler.fetch(PersonQuery.byEmail(email))
-
 		if (person === null) {
+			await this.compareWithDummyHash(password)
 			return new ResponseError('UNKNOWN_EMAIL', `Person with email ${email} not found`, {
 				[AuthLogService.Key]: new AuthLogService.Bag({
-					personInput: email,
+					// Normalized: the sign-in backoff of an unknown address counts these entries by this value.
+					personInput: normalizeEmail(email),
 				}),
 			})
 		}
@@ -56,14 +68,17 @@ class SignInManager {
 		// credential this tenant accepts, however it got set.
 		const exclusiveIdps = await dbContext.queryHandler.fetch(new LocalAuthDisablingIdpsQuery(person.id))
 		if (exclusiveIdps.length > 0) {
+			await this.compareWithDummyHash(password)
 			return new ResponseError('IDP_REQUIRED', `Sign in using ${exclusiveIdps.join(' or ')}`, authLogData)
 		}
 
 		if (!person.password_hash) {
+			await this.compareWithDummyHash(password)
 			return new ResponseError('NO_PASSWORD_SET', `No password set`, authLogData)
 		}
 
 		if (person.disabled_at !== null) {
+			await this.compareWithDummyHash(password)
 			return new ResponseError('PERSON_DISABLED', `Person is disabled`, authLogData)
 		}
 
@@ -291,11 +306,10 @@ class SignInManager {
 			return
 		}
 		try {
-			await this.userMailer.sendUnusualLoginEmail(dbContext, {
-				email: person.email,
+			await this.userMailer.sendUnusualLoginEmail(dbContext, person, {
 				geoCountry,
 				ipAddress: ip,
-			}, { projectId: null, variant: '' })
+			}, { projectId: null, variant: '', recipientIdentityId: person.identity_id })
 		} catch {
 			// ignore — informational only
 		}

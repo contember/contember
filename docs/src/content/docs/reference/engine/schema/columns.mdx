@@ -284,7 +284,7 @@ export class Article {
 This generates `CREATE INDEX ON "article" ("title") WHERE (deleted_at IS NULL)`. The predicate is plain SQL evaluated by the database, so it references **database column names** (e.g. `deleted_at`), not schema field names.
 
 :::caution[`where` is raw SQL]
-The `where` value is written verbatim into the generated `CREATE INDEX` statement (wrapped in parentheses). It is a developer-authored predicate — like the body of a [`@c.View`](/reference/engine/schema/views) — and is **not** sanitized or templated, so it must never contain end-user input. It is validated only for being non-empty and free of a `;` statement terminator; an otherwise invalid predicate fails when the migration runs.
+The `where` value is written verbatim into the generated `CREATE INDEX` statement (wrapped in parentheses). It is a developer-authored predicate — like the body of a [`@c.View`](/reference/engine/schema/views) — and is **not** sanitized or templated, so it must never contain end-user input. It must be non-empty, and a migration that adds it is rejected when the predicate contains a `;` outside string literals, quoted identifiers and comments, ends with a `--` comment, or leaves a literal or comment unterminated. A migration that already ran is checked again when a new database replays it; skip it with a [`skippedErrors`](/reference/engine/migrations/advanced/skipping-validations) entry with the code `MODEL_INVALID_INDEX`. An otherwise invalid predicate fails when the migration runs.
 :::
 
 #### Covering indexes

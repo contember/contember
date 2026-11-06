@@ -140,3 +140,26 @@ test('migration lock options: zero and negative values are rejected', () => {
 	expect(() => serverConfigSchema({ systemApi: { migrationLockTimeoutMs: 500, migrationMaxAttempts: -1 } })).toThrow('must be a positive integer')
 	expect(() => serverConfigSchema({ systemApi: { migrationLockTimeoutMs: 500, migrationRetryDelayMs: -1 } })).toThrow('must be a non-negative integer')
 })
+
+test('egress: the guard is off when nothing is configured', async () => {
+	const { serverConfig } = await readConfig()
+	expect(serverConfig.egress?.guard).toBeUndefined()
+})
+
+test('egress: read from CONTEMBER_EGRESS_GUARD, _ALLOW_HTTP and _ALLOWLIST', async () => {
+	process.env.CONTEMBER_EGRESS_GUARD = 'true'
+	process.env.CONTEMBER_EGRESS_ALLOW_HTTP = 'true'
+	process.env.CONTEMBER_EGRESS_ALLOWLIST = 'hooks.internal, 10.0.0.0/8'
+	try {
+		const { serverConfig } = await readConfig()
+		expect(serverConfig.egress).toStrictEqual({ guard: true, allowHttp: true, allowlist: ['hooks.internal', '10.0.0.0/8'] })
+	} finally {
+		delete process.env.CONTEMBER_EGRESS_GUARD
+		delete process.env.CONTEMBER_EGRESS_ALLOW_HTTP
+		delete process.env.CONTEMBER_EGRESS_ALLOWLIST
+	}
+})
+
+test('egress: an invalid allowlist entry is refused at startup', () => {
+	expect(() => serverConfigSchema({ egress: { guard: true, allowlist: '10.0.0.0/40' } })).toThrow('Invalid egress allowlist entry')
+})

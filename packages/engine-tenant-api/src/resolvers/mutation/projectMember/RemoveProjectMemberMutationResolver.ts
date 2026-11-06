@@ -7,7 +7,6 @@ import {
 import { TenantResolverContext } from '../../TenantResolverContext.js'
 import { PermissionActions, ProjectManager, ProjectMemberManager } from '../../../model/index.js'
 import { createErrorResponse, createProjectNotFoundResponse } from '../../errorUtils.js'
-import { ProjectMembershipByIdentityQuery } from '../../../model/queries/index.js'
 import { logProjectMembershipChange } from './audit.js'
 
 export class RemoveProjectMemberMutationResolver implements MutationResolvers {
@@ -31,20 +30,23 @@ export class RemoveProjectMemberMutationResolver implements MutationResolvers {
 		if (!project) {
 			return createProjectNotFoundResponse('PROJECT_NOT_FOUND', projectSlug)
 		}
-		const memberships = await this.projectMemberManager.getStoredProjectsMemberships(
-			context.db,
-			{ id: project.id },
-			{ id: identityId },
-			context.permissionContext.createAccessVerifier(projectScope),
-		)
-		await context.requireAccess({
-			scope: projectScope,
-			action: PermissionActions.PROJECT_REMOVE_MEMBER(memberships),
-			message: 'You are not allowed to remove a project member',
-		})
-
-		const before = await context.db.queryHandler.fetch(new ProjectMembershipByIdentityQuery({ id: project.id }, [identityId]))
-		const result = await this.projectMemberManager.removeProjectMember(context.db, project.id, identityId)
+		// Authorized per stored membership: a manager limited to some roles removes only those and leaves the rest.
+		const before = await this.projectMemberManager.getStoredProjectsMemberships(context.db, { id: project.id }, { id: identityId }, undefined)
+		const removableRoles: string[] = []
+		for (const membership of before) {
+			if (await context.isAllowed({ scope: projectScope, action: PermissionActions.PROJECT_REMOVE_MEMBER([membership]) })) {
+				removableRoles.push(membership.role)
+			}
+		}
+		if (before.length > 0 && removableRoles.length === 0) {
+			await context.requireAccess({
+				scope: projectScope,
+				action: PermissionActions.PROJECT_REMOVE_MEMBER(before),
+				message: 'You are not allowed to remove a project member',
+			})
+		}
+		// Always scoped to the checked roles, so a membership added concurrently is not removed unchecked.
+		const result = await this.projectMemberManager.removeProjectMember(context.db, project.id, identityId, removableRoles)
 
 		if (!result.ok) {
 			return createErrorResponse(result.error, result.errorMessage)

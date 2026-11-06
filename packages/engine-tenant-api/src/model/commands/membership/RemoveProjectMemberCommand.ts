@@ -4,16 +4,19 @@ import { DeleteBuilder } from '@contember/database'
 import { Response, ResponseError, ResponseOk } from '../../utils/Response.js'
 
 export class RemoveProjectMemberCommand implements Command<RemoveProjectMemberResponse> {
-	constructor(private readonly projectId: string, private readonly identityId: string) {}
+	/** @param roles only memberships with these roles are removed */
+	constructor(private readonly projectId: string, private readonly identityId: string, private readonly roles: readonly string[]) {}
 
 	async execute({ db, bus }: Command.Args): Promise<RemoveProjectMemberResponse> {
 		const memberWhere = {
 			project_id: this.projectId,
 			identity_id: this.identityId,
 		}
+		const roles = this.roles
 		const result = await DeleteBuilder.create() //
 			.from('project_membership')
 			.where(memberWhere)
+			.where(where => where.in('role', roles))
 			.execute(db)
 
 		if (result === 0) {

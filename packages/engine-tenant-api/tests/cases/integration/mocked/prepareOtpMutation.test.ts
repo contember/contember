@@ -2,6 +2,7 @@ import { authenticatedIdentityId, executeTenantTest, now } from '../../../src/te
 import { testUuid } from '../../../src/testUuid.js'
 import { prepareOtpMutation } from './gql/prepareOtp.js'
 import { getPersonByIdentity } from './sql/getPersonByIdentity.js'
+import { getConfigSql } from './sql/getConfigSql.js'
 import { expect, test } from 'bun:test'
 import { Buffer } from 'buffer'
 
@@ -71,6 +72,7 @@ test('prepare otp does not disable an existing active secret (rollover)', async 
 					otpUri: activeUri,
 				},
 			}),
+			getConfigSql(),
 			{
 				// Only the pending slot is written; the active secret is never touched.
 				sql: `insert into "tenant"."person_mfa" ("person_id", "totp_pending_secret", "totp_pending_version", "totp_pending_created_at")

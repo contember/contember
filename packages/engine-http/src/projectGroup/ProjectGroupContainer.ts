@@ -134,6 +134,7 @@ export class ProjectGroupContainerFactory {
 							encrypt: cryptoWrapper.encrypt.bind(cryptoWrapper),
 							encryptionEnabled: cryptoWrapper.enabled,
 						},
+						dataSigner: cryptoWrapper.enabled ? (purpose, value) => cryptoWrapper.sign(purpose, value) : null,
 					})
 				},
 			)

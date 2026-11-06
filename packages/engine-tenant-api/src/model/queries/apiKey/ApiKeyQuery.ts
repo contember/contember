@@ -29,9 +29,29 @@ export class ApiKeyByTokenQuery extends DatabaseQuery<null | ApiKeyRow> {
 		const tokenHash = computeTokenHash(this.token)
 		const rows = await apiKeyBaseQuery
 			.where({ token_hash: tokenHash })
+			// A key of a disabled person must not authenticate, even one issued after `disablePerson` cascaded.
+			.where(where => where.isNull(['person', 'disabled_at']))
 			.getResult(db)
 
 		return this.fetchOneOrNull(rows)
+	}
+}
+
+/** Whether the key or its person is disabled, or the key no longer exists; a narrow re-check on the primary. */
+export class ApiKeyRevokedQuery extends DatabaseQuery<boolean> {
+	constructor(private readonly apiKeyId: string) {
+		super()
+	}
+
+	async fetch({ db }: DatabaseQueryable): Promise<boolean> {
+		const rows = await SelectBuilder.create<{ is_revoked: boolean }>()
+			.select(new Literal('"api_key"."disabled_at" is not null or "person"."disabled_at" is not null'), 'is_revoked')
+			.from('api_key')
+			.leftJoin('person', 'person', on => on.compareColumns(['person', 'identity_id'], Operator.eq, ['api_key', 'identity_id']))
+			.where(where => where.compare(['api_key', 'id'], Operator.eq, this.apiKeyId))
+			.getResult(db)
+
+		return rows.length === 0 || rows[0].is_revoked
 	}
 }
 

@@ -47,9 +47,11 @@ export class NodeMailer implements Mailer {
 
 	public async send({ variables, template, ...message }: MailMessage): Promise<SentInfo> {
 		try {
-			return await this.transport.sendMail({ ...message, from: message.from || this.from })
+			// An address object is not parsed: as a string, `big boss@example.com` would go to `boss@example.com`.
+			return await this.transport.sendMail({ ...message, to: { name: '', address: message.to }, from: message.from || this.from })
 		} catch (e) {
-			logger.error(e, { message: 'Mail sending failed', mail: message })
+			// The rendered mail carries tokens and links, so only the template is logged.
+			logger.error(e, { message: 'Mail sending failed', template })
 			return { error: e }
 		}
 	}
@@ -73,7 +75,7 @@ export class WebhookMailer implements Mailer {
 			},
 		})
 		if (!response.ok) {
-			logger.error('Mail sending failed', { mail: message, response })
+			logger.error('Mail sending failed', { template: message.template, status: response.status })
 			return { error: response.statusText }
 		}
 		await response.text()

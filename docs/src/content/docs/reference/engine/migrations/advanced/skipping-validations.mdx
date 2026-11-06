@@ -29,6 +29,12 @@ It is important to note that only individual migrations can have skipped errors,
 
 In this example, the `ACL_INVALID_CONDITION` error will be ignored for the test predicate in the ContentReference entity for the reader role.
 
+Adding `skippedErrors` to a migration that already ran does not change its checksum, so existing databases keep accepting it.
+
+:::note[Available since 2.2]
+`skippedErrors` also covers the SQL checks of a view (`MODEL_INVALID_VIEW`) and of a partial index predicate (`MODEL_INVALID_INDEX`). Those checks run only for migrations that are not executed yet, which includes every migration when a new database is set up, and an entry skips them for that migration regardless of the final state.
+:::
+
 ### <span className="version">Engine 1.3+</span> `skipUntil`
 
 In each error object, you can specify a `skipUntil` allowing to skip given validation until a specificed migration. This feature is useful when more migrations becomes invalid due to changes in the validator or data structure.

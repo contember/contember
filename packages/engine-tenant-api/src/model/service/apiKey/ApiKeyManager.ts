@@ -13,7 +13,7 @@ import { DatabaseContext, TokenHash } from '../../utils/index.js'
 import { ApiKeyService, CreateApiKeyResponse } from './ApiKeyService.js'
 import assert from 'node:assert'
 import { Acl } from '@contember/schema'
-import { ApiKeyByIdQuery, ApiKeyByTokenQuery, ApiKeyRow, ConfigurationQuery, IdentityQuery } from '../../queries/index.js'
+import { ApiKeyByIdQuery, ApiKeyByTokenQuery, ApiKeyRevokedQuery, ApiKeyRow, ConfigurationQuery, IdentityQuery } from '../../queries/index.js'
 import PostgresInterval from 'postgres-interval'
 import { Config } from '../../type/Config.js'
 import { intervalToPostgres, intervalToSeconds } from '../../utils/interval.js'
@@ -58,6 +58,12 @@ export class ApiKeyManager {
 				VerifyErrorCode.DISABLED,
 				`API key was disabled at ${apiKeyRow.disabled_at.toISOString()}`,
 			)
+		}
+
+		// A revocation (sign-out, disabled key or person) may not have reached the replica yet.
+		const foundOnReplica = fetchedApiKey.sourceDbContext.client.connection !== dbContext.client.connection
+		if (foundOnReplica && await dbContext.queryHandler.fetch(new ApiKeyRevokedQuery(apiKeyRow.id))) {
+			return new ResponseError(VerifyErrorCode.DISABLED, 'API key was disabled')
 		}
 
 		// A19 time gates are computed on the DATABASE clock by ApiKeyByTokenQuery

@@ -16,11 +16,11 @@ import { Response, ResponseError, ResponseOk } from '../utils/Response.js'
 import { DatabaseContext, TokenHash } from '../utils/index.js'
 import { NoPassword, PasswordPlain } from '../dtos/index.js'
 import { Acl } from '@contember/schema'
-import { validateEmail } from '../utils/email.js'
+import { EmailAddress, validateEmail } from '../utils/email.js'
 import { INVITATION_RESET_TOKEN_EXPIRATION_MINUTES } from '../consts/expirations.js'
 
 export interface InviteData {
-	email: string
+	email: EmailAddress
 	name?: string
 	project: Project
 	memberships: readonly Acl.Membership[]
@@ -52,12 +52,12 @@ export class InviteManager {
 			passwordResetTokenHash,
 		}: InviteData,
 	): Promise<InviteResponse> {
-		if (!validateEmail(email.trim())) {
+		if (!validateEmail(email.value)) {
 			return new ResponseError('INVALID_EMAIL_FORMAT', 'E-mail address is not in a valid format')
 		}
 
 		return await dbContext.transaction(async trx => {
-			let person: Omit<PersonRow, 'roles'> | null = await trx.queryHandler.fetch(PersonQuery.byEmail(email))
+			let person: Omit<PersonRow, 'roles'> | null = await trx.queryHandler.fetch(PersonQuery.byEmail(email.value))
 			const isNew = !person
 			let generatedPassword: string | null = null
 			let resetToken: string | null = null
@@ -71,7 +71,7 @@ export class InviteManager {
 				person = await trx.commandBus.execute(
 					new CreatePersonCommand({
 						identityId,
-						email,
+						email: email.value,
 						name,
 						password: passwordWrapper,
 					}),
@@ -95,15 +95,24 @@ export class InviteManager {
 				const customMailOptions = {
 					projectId: project.id,
 					variant: emailVariant ?? '',
+					recipientIdentityId: person.identity_id,
 				}
 				if (isNew) {
 					await this.mailer.sendNewUserInvitedMail(
 						trx,
-						{ email, project: project.name, projectSlug: project.slug, password: generatedPassword, token: resetToken, memberships },
+						// The address the person was just created with.
+						email.normalized(),
+						{ project: project.name, projectSlug: project.slug, password: generatedPassword, token: resetToken, memberships },
 						customMailOptions,
 					)
 				} else {
-					await this.mailer.sendExistingUserInvitedEmail(trx, { email, project: project.name, projectSlug: project.slug, memberships }, customMailOptions)
+					// The stored address, not the input: the lookup also matches variants of it.
+					await this.mailer.sendExistingUserInvitedEmail(
+						trx,
+						person,
+						{ project: project.name, projectSlug: project.slug, memberships },
+						customMailOptions,
+					)
 				}
 			}
 			return new ResponseOk(new InviteResult(person, isNew))

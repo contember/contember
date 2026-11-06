@@ -155,6 +155,12 @@ When `revealUserExists: false` and `revealLoginMethod: false` (recommended for p
 
 The two flags can be mixed independently. `revealUserExists: false` alone still distinguishes `INVALID_PASSWORD` vs `NO_PASSWORD_SET`; `revealLoginMethod: false` alone still distinguishes `UNKNOWN_EMAIL` vs `INVALID_CREDENTIALS`.
 
+`initSignInPasswordless` still answers `ok: true` only for an address that gets a link. To make that reply uniform too, enable `passwordless.uniformResponse` *(since 2.2)*; see [passwordless](/reference/engine/tenant/passwordless#initiating-sign-in).
+
+:::note[Available since 2.2]
+`signIn` spends the time of a password check on every refusal, including an unknown e-mail, a disabled person, a person without a password and a person bound to an identity provider, so the response time does not reveal which case applies.
+:::
+
 ### Sign-up enumeration
 
 `signUp` is the one flow where `revealUserExists` does **not** mask existence — `EMAIL_ALREADY_EXISTS` is returned regardless. An earlier silent-success branch was tried and removed because `result === null` vs `result !== null` is trivially distinguishable, so it didn't actually close the oracle. For tenants that need to fully suppress sign-up enumeration the recommendation is to take `signUp` off the public login token and run the public flow through [invites](/reference/engine/tenant/invites) or [password reset](/reference/engine/tenant/password-reset). See [sign-up](/reference/engine/tenant/sign-up) for details.

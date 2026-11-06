@@ -186,6 +186,11 @@ CREATE TABLE "config" (
     "login_anomaly_step_up_threshold" integer DEFAULT 3 NOT NULL,
     "panel_global_roles" "text"[] DEFAULT '{super_admin,project_admin}'::"text"[] NOT NULL,
     "panel_project_roles" "text"[] DEFAULT '{admin}'::"text"[] NOT NULL,
+    "password_revoke_sessions_on_change" boolean DEFAULT false NOT NULL,
+    "email_change_require_reauthentication" boolean DEFAULT false NOT NULL,
+    "login_mfa_change_require_reauthentication" boolean DEFAULT false NOT NULL,
+    "login_anomaly_missing_signal_is_new" boolean DEFAULT false NOT NULL,
+    "passwordless_uniform_response" boolean DEFAULT false NOT NULL,
     CONSTRAINT "config_captcha_complete" CHECK ((("captcha_provider" IS NULL) OR (("captcha_secret" IS NOT NULL) AND ("captcha_secret_version" IS NOT NULL)))),
     CONSTRAINT "config_captcha_provider_check" CHECK ((("captcha_provider" IS NULL) OR ("captcha_provider" = ANY (ARRAY['turnstile'::"text", 'hcaptcha'::"text", 'recaptchaV3'::"text"]))))
 );
@@ -238,7 +243,8 @@ CREATE TABLE "mail_template" (
     "subject" "text" NOT NULL,
     "content" "text" NOT NULL,
     "use_layout" boolean NOT NULL,
-    "reply_to" "text"
+    "reply_to" "text",
+    "trusted" boolean DEFAULT false NOT NULL
 );
 CREATE TABLE "person" (
     "id" "uuid" NOT NULL,
@@ -296,7 +302,8 @@ CREATE TABLE "person_mfa" (
     "totp_pending_secret" "bytea",
     "totp_pending_version" integer,
     "totp_pending_created_at" timestamp with time zone,
-    "email_otp_enabled" boolean DEFAULT false NOT NULL
+    "email_otp_enabled" boolean DEFAULT false NOT NULL,
+    "totp_last_counter" bigint
 );
 CREATE TABLE "person_token" (
     "id" "uuid" NOT NULL,

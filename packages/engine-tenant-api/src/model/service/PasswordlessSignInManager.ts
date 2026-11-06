@@ -7,15 +7,17 @@ import {
 	InitSignInPasswordlessResult,
 	SignInPasswordlessErrorCode,
 } from '../../schema/index.js'
-import { DatabaseContext, validateToken } from '../utils/index.js'
+import { DatabaseContext, MAX_OTP_ATTEMPTS, validateToken } from '../utils/index.js'
 import { UserMailer } from '../mailing/index.js'
 import {
 	ActivateOtpCommand,
 	ApiKeyRequestInfo,
+	ClaimOtpAttemptCommand,
 	CreatePersonTokenCommand,
-	IncreaseOtpAttemptCommand,
+	ExpireExhaustedOtpTokenCommand,
 	InvalidateTokenCommand,
 	MarkEmailVerifiedCommand,
+	ReleaseOtpAttemptCommand,
 } from '../commands/index.js'
 import { getPreferredProject } from './helpers/getPreferredProject.js'
 import { isPasswordlessEnabled } from './helpers/isPasswordlessEnabled.js'
@@ -29,6 +31,7 @@ import { PersonToken } from '../type/index.js'
 import { AuthLogService } from './AuthLogService.js'
 import { intervalToSeconds } from '../utils/interval.js'
 import { NextMailAttemptQuery } from '../queries/authLog/NextMailAttemptQuery.js'
+import { EmailAddress } from '../utils/email.js'
 
 class PasswordlessSignInManager {
 	constructor(
@@ -39,10 +42,12 @@ class PasswordlessSignInManager {
 		private readonly backupCodeManager: BackupCodeManager,
 	) {}
 
-	async initSignInPasswordless({ db, permissionContext, mailVariant, mailProject, email }: {
+	async initSignInPasswordless({ db, permissionContext, mailVariant, mailProject, email: emailAddress, emailInput }: {
 		db: DatabaseContext
 		permissionContext: PermissionContext
-		email: string
+		/** Null when the input is not a single address: it names no person. */
+		email: EmailAddress | null
+		emailInput: string
 		mailVariant?: string
 		mailProject?: string
 	}): Promise<PasswordlessSignInManager.InitSignInPasswordlessResponse> {
@@ -54,11 +59,13 @@ class PasswordlessSignInManager {
 				})
 			}
 
-			const person = await db.queryHandler.fetch(PersonQuery.byEmail(email))
-			if (!person) {
-				return new ResponseError('PERSON_NOT_FOUND', `Person ${email} not found`, {
+			const person = emailAddress === null ? null : await db.queryHandler.fetch(PersonQuery.byEmail(emailAddress.value))
+			// The link, the mail and the backoff use the stored address, never the input: the lookup matches variants of it.
+			const email = person?.email ?? null
+			if (!person || email === null) {
+				return new ResponseError('PERSON_NOT_FOUND', `Person ${emailInput} not found`, {
 					[AuthLogService.Key]: new AuthLogService.Bag({
-						personInput: email,
+						personInput: emailInput,
 					}),
 				})
 			}
@@ -112,8 +119,7 @@ class PasswordlessSignInManager {
 			const projects = await this.projectManager.getProjectsByIdentity(db, person.identity_id, permissionContext)
 			const project = getPreferredProject(projects, mailProject ?? null)
 
-			await this.mailer.sendPasswordlessEmail(db, {
-				email,
+			await this.mailer.sendPasswordlessEmail(db, person, {
 				token: result.token,
 				url,
 				project: project?.name,
@@ -122,6 +128,7 @@ class PasswordlessSignInManager {
 			}, {
 				variant: mailVariant || '',
 				projectId: project?.id ?? null,
+				recipientIdentityId: person.identity_id,
 			})
 
 			return new ResponseOk({
@@ -159,6 +166,53 @@ class PasswordlessSignInManager {
 		requestInfo?: ApiKeyRequestInfo
 		trustForwardedInfo?: boolean
 	}): Promise<PasswordlessSignInManager.SignInPasswordlessResponse> {
+		// Every request that checks a guessable code (the e-mailed OTP, a TOTP or a backup code) reserves one attempt
+		// on the token first. The claim runs outside the sign-in transaction, so it is counted even when that
+		// transaction fails, and its conditional UPDATE keeps parallel guesses within the limit. With a magic link,
+		// only a request carrying the valid link token may spend an attempt.
+		let claimed = false
+		if (validationType === 'otp' || mfaOtp !== undefined || backupCode !== undefined) {
+			const claimTarget = await db.queryHandler.fetch(PersonTokenQuery.byId(requestId, 'passwordless'))
+			const mayClaim = claimTarget !== null && (validationType === 'otp' || validateToken({ entry: claimTarget, token, validationType }).ok)
+			if (mayClaim) {
+				claimed = await db.commandBus.execute(new ClaimOtpAttemptCommand(claimTarget.id, MAX_OTP_ATTEMPTS))
+				if (!claimed) {
+					return new ResponseError(
+						claimTarget.used_at ? 'TOKEN_USED' : 'TOKEN_EXPIRED',
+						claimTarget.used_at ? 'Token used' : 'OTP attempts exceeded',
+						{
+							[AuthLogService.Key]: new AuthLogService.Bag({
+								personId: claimTarget.person_id,
+								tokenId: claimTarget.id,
+							}),
+						},
+					)
+				}
+			}
+		}
+		const result = await this.verifyAndSignIn({ db, expiration, token, requestId, mfaOtp, backupCode, validationType, requestInfo, trustForwardedInfo })
+		if (claimed && !result.ok) {
+			if (result.error === 'TOKEN_INVALID' || result.error === 'INVALID_OTP_TOKEN') {
+				await db.commandBus.execute(new ExpireExhaustedOtpTokenCommand(requestId, MAX_OTP_ATTEMPTS))
+			} else {
+				// Not a wrong code (e.g. a right e-mailed code answered OTP_REQUIRED), so it does not count.
+				await db.commandBus.execute(new ReleaseOtpAttemptCommand(requestId))
+			}
+		}
+		return result
+	}
+
+	private async verifyAndSignIn({ db, expiration, token, requestId, mfaOtp, backupCode, validationType, requestInfo, trustForwardedInfo }: {
+		db: DatabaseContext
+		validationType: PersonToken.ValidationType
+		requestId: string
+		token: string
+		mfaOtp?: string
+		backupCode?: string
+		expiration?: number
+		requestInfo?: ApiKeyRequestInfo
+		trustForwardedInfo?: boolean
+	}): Promise<PasswordlessSignInManager.SignInPasswordlessResponse> {
 		return db.transaction(async (db): Promise<PasswordlessSignInManager.SignInPasswordlessResponse> => {
 			const tokenResult = await db.queryHandler.fetch(PersonTokenQuery.byId(requestId, 'passwordless'))
 			const tokenValidationResult = validateToken({
@@ -167,9 +221,6 @@ class PasswordlessSignInManager {
 				validationType,
 			})
 			if (!tokenValidationResult.ok) {
-				if (tokenValidationResult.error === 'TOKEN_INVALID' && validationType === 'otp') {
-					await db.commandBus.execute(new IncreaseOtpAttemptCommand(tokenResult!.id))
-				}
 				return new ResponseError(tokenValidationResult.error, tokenValidationResult.errorMessage, {
 					...tokenValidationResult.metadata ?? {},
 					[AuthLogService.Key]: new AuthLogService.Bag({

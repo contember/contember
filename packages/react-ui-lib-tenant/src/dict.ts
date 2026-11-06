@@ -340,6 +340,9 @@ export const dict = {
 				'INVALID_EMAIL_FORMAT': 'Invalid email format',
 				'EMAIL_ALREADY_EXISTS': 'This e-mail address is already in use',
 				'RATE_LIMIT_EXCEEDED': 'Too many requests, please try again later',
+				'REAUTHENTICATION_REQUIRED': 'Changing the e-mail address requires your current password',
+				'INVALID_PASSWORD': 'Invalid password',
+				'INVALID_OTP_TOKEN': 'Invalid OTP token',
 			} satisfies Record<ChangeMyProfileFormErrorCode | 'UNKNOWN_ERROR', string>,
 		},
 		emailOtpSetup: {

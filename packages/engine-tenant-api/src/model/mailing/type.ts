@@ -59,4 +59,7 @@ export interface MailTemplateData {
 	replyTo: string | null
 }
 
-export interface MailTemplate extends MailTemplateIdentifier, MailTemplateData {}
+export interface MailTemplate extends MailTemplateIdentifier, MailTemplateData {
+	/** Written by a global admin. Only a trusted project template is sent to a global admin. */
+	trusted: boolean
+}

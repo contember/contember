@@ -1,5 +1,8 @@
 import { BinaryLike } from 'node:crypto'
 
+/** Signs `value` with a server key bound to `purpose`. */
+export type DataSigner = (purpose: string, value: Buffer) => Buffer
+
 export interface Providers {
 	uuid: () => string
 	now: () => Date

@@ -18,6 +18,7 @@ import { claimEmailOtpAttemptSql, consumeEmailOtpTokenSql, EMAIL_OTP_CODE, getLa
 import { getMailTemplateSql } from './sql/getMailTemplateSql.js'
 import { getAuthPoliciesSql } from './sql/authPolicySql.js'
 import { getIdentityByIdSql } from './sql/getIdentityByIdSql.js'
+import { claimTotpCounterSql } from './sql/claimTotpCounterSql.js'
 
 test('signs in', async () => {
 	const email = 'john@doe.com'
@@ -30,8 +31,8 @@ test('signs in', async () => {
 		query: signInMutation({ email, password }, { withData: true }),
 		executes: [
 			getConfigSql(),
-			getNextLoginAttemptSql(email),
 			getPersonByEmailSql({ email, response: { personId, identityId, password, roles: [] } }),
+			getNextLoginAttemptSql({ personId }),
 			localAuthDisablingIdpsSql({ personId }),
 			getAuthPoliciesSql(),
 			getConfigSql(),
@@ -93,9 +94,9 @@ test('signs in - normalize email', async () => {
 		query: signInMutation({ email, password }),
 		executes: [
 			getConfigSql(),
-			getNextLoginAttemptSql(email),
 			getPersonByEmailSql({ email, response: null }),
 			getPersonByEmailSql({ email: 'john@doe.com', response: { personId, identityId, password, roles: [] } }),
+			getNextLoginAttemptSql({ personId }),
 			localAuthDisablingIdpsSql({ personId }),
 			getAuthPoliciesSql(),
 			getConfigSql(),
@@ -138,8 +139,8 @@ test('sign in - invalid password', async () => {
 		query: signInMutation({ email, password: 'abcd' }),
 		executes: [
 			getConfigSql(),
-			getNextLoginAttemptSql(email),
 			getPersonByEmailSql({ email, response: { personId, identityId, password, roles: [] } }),
+			getNextLoginAttemptSql({ personId }),
 			localAuthDisablingIdpsSql({ personId }),
 		],
 		return: {
@@ -169,11 +170,11 @@ test('sign in - email not verified', async () => {
 		query: signInMutation({ email, password }),
 		executes: [
 			getConfigSql(),
-			getNextLoginAttemptSql(email),
 			getPersonByEmailSql({
 				email,
 				response: { personId, identityId, password, roles: [], emailVerificationRequired: true, emailVerifiedAt: null },
 			}),
+			getNextLoginAttemptSql({ personId }),
 			localAuthDisablingIdpsSql({ personId }),
 		],
 		return: {
@@ -205,11 +206,11 @@ test('sign in - email verification required but already verified', async () => {
 		query: signInMutation({ email, password }),
 		executes: [
 			getConfigSql(),
-			getNextLoginAttemptSql(email),
 			getPersonByEmailSql({
 				email,
 				response: { personId, identityId, password, roles: [], emailVerificationRequired: true, emailVerifiedAt: now },
 			}),
+			getNextLoginAttemptSql({ personId }),
 			localAuthDisablingIdpsSql({ personId }),
 			getAuthPoliciesSql(),
 			getConfigSql(),
@@ -248,7 +249,6 @@ test('otp token not provided', async () => {
 		query: signInMutation({ email, password }),
 		executes: [
 			getConfigSql(),
-			getNextLoginAttemptSql(email),
 			getPersonByEmailSql({
 				email,
 				response: {
@@ -259,6 +259,7 @@ test('otp token not provided', async () => {
 					otpUri: 'otpauth://totp/contember:john?secret=ABCDEFG&period=30&digits=6&algorithm=SHA1&issuer=contember',
 				},
 			}),
+			getNextLoginAttemptSql({ personId }),
 			localAuthDisablingIdpsSql({ personId }),
 		],
 		return: {
@@ -295,9 +296,47 @@ test('sign in - invalid otp token', async () => {
 		query: signInMutation({ email, password, otpToken: '123456' }),
 		executes: [
 			getConfigSql(),
-			getNextLoginAttemptSql(email),
 			getPersonByEmailSql({ email, response: { personId, identityId, password, roles: [], otpUri: otp.uri } }),
+			getNextLoginAttemptSql({ personId }),
 			localAuthDisablingIdpsSql({ personId }),
+		],
+		return: {
+			data: {
+				signIn: {
+					ok: false,
+					errors: [{ code: 'INVALID_OTP_TOKEN' }],
+					result: null,
+				},
+			},
+		},
+		expectedAuthLog: {
+			type: 'login',
+			response: expect.objectContaining({
+				ok: false,
+			}),
+		},
+	})
+})
+
+test('sign in - a replayed otp token is refused', async () => {
+	const email = 'john@doe.com'
+	const password = '123'
+	const identityId = testUuid(2)
+	const personId = testUuid(7)
+	const otpAuth = new OtpAuthenticator({
+		now: () => now,
+		randomBytes: () => Promise.resolve(Buffer.alloc(20)),
+	})
+	const otp = await otpAuth.create('john', 'contember')
+
+	await executeTenantTest({
+		query: signInMutation({ email, password, otpToken: otpAuth.generate(otp) }),
+		executes: [
+			getConfigSql(),
+			getPersonByEmailSql({ email, response: { personId, identityId, password, roles: [], otpUri: otp.uri } }),
+			getNextLoginAttemptSql({ personId }),
+			localAuthDisablingIdpsSql({ personId }),
+			claimTotpCounterSql({ personId, now, accepted: false }),
 		],
 		return: {
 			data: {
@@ -333,9 +372,10 @@ test('sign in - valid otp token', async () => {
 		query: signInMutation({ email, password, otpToken: otpAuth.generate(otp) }),
 		executes: [
 			getConfigSql(),
-			getNextLoginAttemptSql(email),
 			getPersonByEmailSql({ email, response: { personId, identityId, password, roles: [], otpUri: otp.uri } }),
+			getNextLoginAttemptSql({ personId }),
 			localAuthDisablingIdpsSql({ personId }),
+			claimTotpCounterSql({ personId, now }),
 			getConfigSql(),
 			getIdentityByIdSql({ identityId }),
 			getAuthPoliciesSql(),
@@ -387,8 +427,8 @@ test('sign in - valid backup code (when OTP is required)', async () => {
 		query: signInMutation({ email, password, backupCode: BACKUP_CODE }),
 		executes: [
 			getConfigSql(),
-			getNextLoginAttemptSql(email),
 			getPersonByEmailSql({ email, response: { personId, identityId, password, roles: [], otpUri: otp.uri } }),
+			getNextLoginAttemptSql({ personId }),
 			localAuthDisablingIdpsSql({ personId }),
 			consumeBackupCodeSql({ personId, codeHash: BACKUP_CODE_HASH, consumed: true }),
 			countUnusedBackupCodesSql({ personId, count: 4 }),
@@ -440,8 +480,8 @@ test('sign in - email OTP enabled, no code provided: dispatches a code and retur
 		query: signInMutation({ email, password }),
 		executes: [
 			getConfigSql(),
-			getNextLoginAttemptSql(email),
 			getPersonByEmailSql({ email, response: { personId, identityId, password, roles: [], emailOtpEnabled: true } }),
+			getNextLoginAttemptSql({ personId }),
 			localAuthDisablingIdpsSql({ personId }),
 			// signIn lazily re-fetches the config to resolve the email-OTP send rate limit.
 			getConfigSql(),
@@ -484,8 +524,8 @@ test('sign in - email OTP enabled, valid code: signs in', async () => {
 		query: signInMutation({ email, password, otpToken: EMAIL_OTP_CODE }),
 		executes: [
 			getConfigSql(),
-			getNextLoginAttemptSql(email),
 			getPersonByEmailSql({ email, response: { personId, identityId, password, roles: [], emailOtpEnabled: true } }),
+			getNextLoginAttemptSql({ personId }),
 			localAuthDisablingIdpsSql({ personId }),
 			getLatestEmailOtpTokenSql({ personId, tokenId }),
 			claimEmailOtpAttemptSql({ tokenId }),
@@ -525,8 +565,8 @@ test('sign in - email OTP enabled, invalid code: INVALID_OTP_TOKEN', async () =>
 		query: signInMutation({ email, password, otpToken: '111111' }),
 		executes: [
 			getConfigSql(),
-			getNextLoginAttemptSql(email),
 			getPersonByEmailSql({ email, response: { personId, identityId, password, roles: [], emailOtpEnabled: true } }),
+			getNextLoginAttemptSql({ personId }),
 			localAuthDisablingIdpsSql({ personId }),
 			getLatestEmailOtpTokenSql({ personId, tokenId }),
 			claimEmailOtpAttemptSql({ tokenId }),
@@ -561,8 +601,8 @@ test('sign in - already-used backup code is rejected', async () => {
 		query: signInMutation({ email, password, backupCode: BACKUP_CODE }),
 		executes: [
 			getConfigSql(),
-			getNextLoginAttemptSql(email),
 			getPersonByEmailSql({ email, response: { personId, identityId, password, roles: [], otpUri: otp.uri } }),
+			getNextLoginAttemptSql({ personId }),
 			localAuthDisablingIdpsSql({ personId }),
 			consumeBackupCodeSql({ personId, codeHash: BACKUP_CODE_HASH, consumed: false }),
 		],

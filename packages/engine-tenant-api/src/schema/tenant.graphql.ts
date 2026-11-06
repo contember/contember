@@ -124,14 +124,14 @@ const schema: DocumentNode = gql`
 		"""
 		disconnectMyIdentityProvider(id: String!): DisconnectIDPResponse
 
-		prepareOtp(label: String): PrepareOtpResponse
+		prepareOtp(label: String, currentPassword: String, otpToken: String): PrepareOtpResponse
 		confirmOtp(otpToken: String!): ConfirmOtpResponse
-		disableOtp: DisableOtpResponse
-		regenerateBackupCodes: RegenerateBackupCodesResponse
+		disableOtp(currentPassword: String, otpToken: String): DisableOtpResponse
+		regenerateBackupCodes(currentPassword: String, otpToken: String): RegenerateBackupCodesResponse
 
 		initEmailOtp: InitEmailOtpResponse
 		confirmEmailOtp(otpToken: String!): ConfirmEmailOtpResponse
-		disableEmailOtp: DisableEmailOtpResponse
+		disableEmailOtp(currentPassword: String, otpToken: String): DisableEmailOtpResponse
 
 		disablePerson(personId: String!): DisablePersonResponse
 		enablePerson(personId: String!): EnablePersonResponse
@@ -289,6 +289,12 @@ const schema: DocumentNode = gql`
 		defaultTokenExpiration: Interval!
 		maxTokenExpiration: Interval
 		mfaGraceDuration: Interval!
+		"""
+		When true, disabling TOTP or e-mail OTP, rotating an active TOTP (prepareOtp)
+		and regenerating backup codes require the current password or a current TOTP
+		code (currentPassword / otpToken). Defaults to false.
+		"""
+		mfaChangeRequiresReauthentication: Boolean!
 		anomalyDetection: ConfigLoginAnomalyDetection!
     }
 
@@ -434,6 +440,7 @@ const schema: DocumentNode = gql`
 		defaultTokenExpiration: Interval
 		maxTokenExpiration: Interval
 		mfaGraceDuration: Interval
+		mfaChangeRequiresReauthentication: Boolean
 		anomalyDetection: ConfigLoginAnomalyDetectionInput
     }
 
@@ -1574,7 +1581,19 @@ const schema: DocumentNode = gql`
 
 	type PrepareOtpResponse {
 		ok: Boolean!
+		error: PrepareOtpError
 		result: PrepareOtpResult
+	}
+
+	type PrepareOtpError {
+		code: PrepareOtpErrorCode!
+		developerMessage: String!
+	}
+
+	enum PrepareOtpErrorCode {
+		REAUTHENTICATION_REQUIRED
+		INVALID_PASSWORD
+		INVALID_OTP_TOKEN
 	}
 
 	type PrepareOtpResult {
@@ -1619,6 +1638,9 @@ const schema: DocumentNode = gql`
 	enum DisableOtpErrorCode {
 		OTP_NOT_ACTIVE
 		MFA_REQUIRED
+		REAUTHENTICATION_REQUIRED
+		INVALID_PASSWORD
+		INVALID_OTP_TOKEN
 	}
 
 	type RegenerateBackupCodesResponse {
@@ -1634,6 +1656,9 @@ const schema: DocumentNode = gql`
 
 	enum RegenerateBackupCodesErrorCode {
 		OTP_NOT_ACTIVE
+		REAUTHENTICATION_REQUIRED
+		INVALID_PASSWORD
+		INVALID_OTP_TOKEN
 	}
 
 	type RegenerateBackupCodesResult {
@@ -1689,6 +1714,9 @@ const schema: DocumentNode = gql`
 	enum DisableEmailOtpErrorCode {
 		EMAIL_OTP_NOT_ACTIVE
 		MFA_REQUIRED
+		REAUTHENTICATION_REQUIRED
+		INVALID_PASSWORD
+		INVALID_OTP_TOKEN
 	}
 
 	type DisablePersonResponse {

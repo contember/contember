@@ -26,6 +26,7 @@ export type ConfigRow = {
 	login_default_token_expiration: IPostgresInterval
 	login_max_token_expiration: IPostgresInterval | null
 	login_mfa_grace_duration: IPostgresInterval
+	login_mfa_change_require_reauthentication: boolean
 	login_anomaly_detection_enabled: boolean
 	login_anomaly_history_size: number
 	login_anomaly_email_threshold: number

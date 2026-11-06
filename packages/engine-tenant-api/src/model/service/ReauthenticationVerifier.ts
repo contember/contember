@@ -1,4 +1,4 @@
-import { PersonRow } from '../queries/index.js'
+import { ConfigurationQuery, PersonRow } from '../queries/index.js'
 import { Providers } from '../providers.js'
 import { DatabaseContext } from '../utils/index.js'
 import { Response, ResponseError, ResponseOk } from '../utils/Response.js'
@@ -39,5 +39,18 @@ export class ReauthenticationVerifier {
 			return new ResponseOk(null)
 		}
 		return new ResponseError('REAUTHENTICATION_REQUIRED', 'The current password or an OTP token is required')
+	}
+
+	/** Re-authentication for removing or replacing an MFA factor or backup codes; opt-in via `login.mfaChangeRequiresReauthentication`. */
+	async verifyMfaChange(
+		dbContext: DatabaseContext,
+		person: PersonRow,
+		credentials: ReauthenticationCredentials,
+	): Promise<Response<null, ReauthenticationErrorCode>> {
+		const config = await dbContext.queryHandler.fetch(new ConfigurationQuery(dbContext.providers))
+		if (!config.login.mfaChangeRequiresReauthentication) {
+			return new ResponseOk(null)
+		}
+		return await this.verify(dbContext, person, credentials)
 	}
 }

@@ -67,7 +67,7 @@ export class BackupCodeManager {
 			// Best-effort: notify the person they have no backup codes left. A failed
 			// email must never block or fail sign-in, so swallow any error.
 			try {
-				await this.mailer.sendBackupCodesExhaustedEmail(dbContext, { email: person.email ?? '' }, {
+				await this.mailer.sendBackupCodesExhaustedEmail(dbContext, person, {
 					projectId: null,
 					variant: '',
 					recipientIdentityId: person.identity_id,

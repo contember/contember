@@ -31,6 +31,7 @@ import { PersonToken } from '../type/index.js'
 import { AuthLogService } from './AuthLogService.js'
 import { intervalToSeconds } from '../utils/interval.js'
 import { NextMailAttemptQuery } from '../queries/authLog/NextMailAttemptQuery.js'
+import { EmailAddress } from '../utils/email.js'
 
 class PasswordlessSignInManager {
 	constructor(
@@ -41,13 +42,14 @@ class PasswordlessSignInManager {
 		private readonly backupCodeManager: BackupCodeManager,
 	) {}
 
-	async initSignInPasswordless({ db, permissionContext, mailVariant, mailProject, email }: {
+	async initSignInPasswordless({ db, permissionContext, mailVariant, mailProject, email: emailAddress }: {
 		db: DatabaseContext
 		permissionContext: PermissionContext
-		email: string
+		email: EmailAddress
 		mailVariant?: string
 		mailProject?: string
 	}): Promise<PasswordlessSignInManager.InitSignInPasswordlessResponse> {
+		const email = emailAddress.value
 		return db.transaction(async (db): Promise<PasswordlessSignInManager.InitSignInPasswordlessResponse> => {
 			const configuration = await db.queryHandler.fetch(new ConfigurationQuery(db.providers))
 			if (configuration.passwordless.enabled === 'never') {
@@ -57,7 +59,9 @@ class PasswordlessSignInManager {
 			}
 
 			const person = await db.queryHandler.fetch(PersonQuery.byEmail(email))
-			if (!person) {
+			// The link and the mail go to the stored address, never to the input: the lookup matches variants of it.
+			const recipient = person?.email ?? null
+			if (!person || recipient === null) {
 				return new ResponseError('PERSON_NOT_FOUND', `Person ${email} not found`, {
 					[AuthLogService.Key]: new AuthLogService.Bag({
 						personInput: email,
@@ -109,13 +113,12 @@ class PasswordlessSignInManager {
 			)
 			const result = await db.commandBus.execute(createTokenCommand)
 
-			const url = this.formatUrl(configuration.passwordless.url ?? null, result.token, result.id, email) ?? undefined
+			const url = this.formatUrl(configuration.passwordless.url ?? null, result.token, result.id, recipient) ?? undefined
 
 			const projects = await this.projectManager.getProjectsByIdentity(db, person.identity_id, permissionContext)
 			const project = getPreferredProject(projects, mailProject ?? null)
 
-			await this.mailer.sendPasswordlessEmail(db, {
-				email,
+			await this.mailer.sendPasswordlessEmail(db, person, {
 				token: result.token,
 				url,
 				project: project?.name,

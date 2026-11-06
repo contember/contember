@@ -76,7 +76,8 @@ export class NodeMailer implements Mailer {
 
 	public async send({ variables, template, ...message }: MailMessage): Promise<SentInfo> {
 		try {
-			return await this.transport.sendMail({ ...message, from: message.from || this.from })
+			// An address object is not parsed: as a string, `big boss@example.com` would go to `boss@example.com`.
+			return await this.transport.sendMail({ ...message, to: { name: '', address: message.to }, from: message.from || this.from })
 		} catch (e) {
 			logger.error(e, { message: 'Mail sending failed', mail: maskMailMessage({ ...message, variables, template }) })
 			return { error: e }

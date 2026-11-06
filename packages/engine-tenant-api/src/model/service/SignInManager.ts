@@ -306,8 +306,7 @@ class SignInManager {
 			return
 		}
 		try {
-			await this.userMailer.sendUnusualLoginEmail(dbContext, {
-				email: person.email,
+			await this.userMailer.sendUnusualLoginEmail(dbContext, person, {
 				geoCountry,
 				ipAddress: ip,
 			}, { projectId: null, variant: '', recipientIdentityId: person.identity_id })

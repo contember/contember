@@ -60,7 +60,8 @@ const sendPasswordReset = async (queries: ExpectedQuery[], recipientIdentityId: 
 	const mailer = createMockedMailer()
 	await new UserMailer(mailer, new TemplateRenderer()).sendPasswordResetEmail(
 		db,
-		{ email: 'john@doe.com', token: 'abc' },
+		{ email: 'john@doe.com' },
+		{ token: 'abc' },
 		{ projectId: PROJECT_ID, variant: '', recipientIdentityId },
 	)
 	const message = mailer.expectMessage({ subject: expect.any(String) })

@@ -49,13 +49,12 @@ export class ForceSignOutMutationResolver implements Pick<MutationResolvers, 'fo
 			metadata: reason !== null ? { reason } : undefined,
 		})
 
-		if (targetPerson.email) {
-			await this.userMailer.sendForcedSignOutEmail(
-				context.db,
-				{ email: targetPerson.email, reason },
-				{ projectId: null, variant: '', recipientIdentityId: targetPerson.identity_id },
-			)
-		}
+		await this.userMailer.sendForcedSignOutEmail(
+			context.db,
+			targetPerson,
+			{ reason },
+			{ projectId: null, variant: '', recipientIdentityId: targetPerson.identity_id },
+		)
 
 		return { ok: true }
 	}

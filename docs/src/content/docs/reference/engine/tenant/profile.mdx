@@ -58,7 +58,7 @@ Errors:
 | Code | Cause |
 |---|---|
 | `NOT_A_PERSON` | Caller is authenticated via a permanent API key, not a person. |
-| `INVALID_EMAIL_FORMAT` | Email failed format validation. |
+| `INVALID_EMAIL_FORMAT` | Email failed format validation or has whitespace inside (whitespace around it is ignored). |
 | `EMAIL_ALREADY_EXISTS` | Email is already used by another person. |
 | `RATE_LIMIT_EXCEEDED` | *(since 2.2)* Per-recipient backoff on confirmation mails for a verified e-mail change, or more than 5 re-authentication attempts of the person within 15 minutes. |
 | `REAUTHENTICATION_REQUIRED` | *(since 2.2)* `emailChange.requireReauthentication` is on and neither `currentPassword` nor `otpToken` was passed. |

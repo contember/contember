@@ -46,8 +46,7 @@ export class EmailOtpManager {
 		// Only the latest emailed code may ever verify.
 		await dbContext.commandBus.execute(new InvalidateEmailOtpTokensCommand(person.id))
 		await dbContext.commandBus.execute(new SaveEmailOtpTokenCommand(person.id, code, EMAIL_OTP_EXPIRATION_MINUTES))
-		await this.mailer.sendEmailOtpEmail(dbContext, {
-			email: person.email ?? '',
+		await this.mailer.sendEmailOtpEmail(dbContext, person, {
 			code,
 		}, {
 			variant: '',

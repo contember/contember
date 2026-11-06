@@ -34,8 +34,8 @@ test('removes a project member', async () => {
 			...sqlTransaction({
 				sql: SQL`DELETE
 						         FROM "tenant"."project_membership"
-						         WHERE "project_id" = ? AND "identity_id" = ?`,
-				parameters: [projectId, identityId],
+						         WHERE "project_id" = ? AND "identity_id" = ? AND "role" in (?)`,
+				parameters: [projectId, identityId, role],
 				response: {
 					rowCount: 1,
 				},

@@ -45,12 +45,8 @@ export class RemoveProjectMemberMutationResolver implements MutationResolvers {
 				message: 'You are not allowed to remove a project member',
 			})
 		}
-		const result = await this.projectMemberManager.removeProjectMember(
-			context.db,
-			project.id,
-			identityId,
-			removableRoles.length === before.length ? undefined : removableRoles,
-		)
+		// Always scoped to the checked roles, so a membership added concurrently is not removed unchecked.
+		const result = await this.projectMemberManager.removeProjectMember(context.db, project.id, identityId, removableRoles)
 
 		if (!result.ok) {
 			return createErrorResponse(result.error, result.errorMessage)

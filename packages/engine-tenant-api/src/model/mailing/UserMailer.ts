@@ -4,9 +4,13 @@ import ExistingUserInvited from './templates/ExistingUserInvited.mustache'
 import PasswordReset from './templates/PasswordReset.mustache'
 import PasswordlessSignIn from './templates/PasswordlessSignIn.mustache'
 import { MailTemplateData, MailTemplateIdentifier, MailType } from './type'
-import { MailTemplateQuery } from '../queries'
+import { MailTemplateQuery, PersonRow } from '../queries'
 import Layout from './templates/Layout.mustache'
 import { DatabaseContext } from '../utils'
+import { EmailAddress } from '../utils/email'
+
+/** A mail to an existing person goes to its stored address; a person without one gets no mail. */
+export type MailPerson = Pick<PersonRow, 'id' | 'email'>
 
 export class UserMailer {
 	constructor(
@@ -16,7 +20,8 @@ export class UserMailer {
 
 	async sendNewUserInvitedMail(
 		dbContext: DatabaseContext,
-		mailArguments: { email: string; password: string | null; token: string | null; project: string; projectSlug: string },
+		recipient: EmailAddress,
+		mailArguments: { password: string | null; token: string | null; project: string; projectSlug: string },
 		customMailOptions: { projectId: string; variant: string },
 	): Promise<void> {
 		const template = (await this.getCustomTemplate(dbContext, { type: MailType.newUserInvited, ...customMailOptions })) || {
@@ -24,12 +29,13 @@ export class UserMailer {
 			content: NewUserInvited,
 			replyTo: null,
 		}
-		await this.sendTemplate(template, mailArguments)
+		await this.sendTemplate(template, recipient.value, mailArguments)
 	}
 
 	async sendExistingUserInvitedEmail(
 		dbContext: DatabaseContext,
-		mailArguments: { email: string; project: string; projectSlug: string },
+		person: MailPerson,
+		mailArguments: { project: string; projectSlug: string },
 		customMailOptions: { projectId: string; variant: string },
 	): Promise<void> {
 		const template = (await this.getCustomTemplate(dbContext, { type: MailType.existingUserInvited, ...customMailOptions })) || {
@@ -37,12 +43,13 @@ export class UserMailer {
 			content: ExistingUserInvited,
 			replyTo: null,
 		}
-		await this.sendTemplate(template, mailArguments)
+		await this.sendTemplate(template, person.email, mailArguments)
 	}
 
 	async sendPasswordResetEmail(
 		dbContext: DatabaseContext,
-		mailArguments: { email: string; token: string; project?: string; projectSlug?: string },
+		person: MailPerson,
+		mailArguments: { token: string; project?: string; projectSlug?: string },
 		customMailOptions: { projectId: string | null; variant: string },
 	): Promise<void> {
 		const template = (await this.getCustomTemplate(dbContext, { type: MailType.passwordReset, ...customMailOptions })) || {
@@ -50,12 +57,13 @@ export class UserMailer {
 			content: PasswordReset,
 			replyTo: null,
 		}
-		await this.sendTemplate(template, mailArguments)
+		await this.sendTemplate(template, person.email, mailArguments)
 	}
 
 	async sendPasswordlessEmail(
 		dbContext: DatabaseContext,
-		mailArguments: { email: string; token: string; project?: string; projectSlug?: string; url?: string },
+		person: MailPerson,
+		mailArguments: { token: string; project?: string; projectSlug?: string; url?: string },
 		customMailOptions: { projectId: string | null; variant: string },
 	): Promise<void> {
 		const template = (await this.getCustomTemplate(dbContext, { type: MailType.passwordlessSignIn, ...customMailOptions })) || {
@@ -63,17 +71,23 @@ export class UserMailer {
 			content: PasswordlessSignIn,
 			replyTo: null,
 		}
-		await this.sendTemplate(template, mailArguments)
+		await this.sendTemplate(template, person.email, mailArguments)
 	}
 
 	private async sendTemplate(
 		template: Pick<MailTemplateData, 'subject' | 'content' | 'replyTo'>,
+		recipient: string | null,
 		mailArguments: Record<string, any>,
 	) {
-		const html = await this.templateRenderer.render(template.content, mailArguments)
+		if (recipient === null) {
+			return
+		}
+		// Templates read the recipient as `{{email}}`.
+		const variables = { ...mailArguments, email: recipient }
+		const html = await this.templateRenderer.render(template.content, variables)
 		await this.mailer.send({
-			to: mailArguments.email,
-			subject: await this.templateRenderer.render(template.subject, mailArguments),
+			to: recipient,
+			subject: await this.templateRenderer.render(template.subject, variables),
 			html,
 			...(template.replyTo ? {
 				replyTo: template.replyTo,

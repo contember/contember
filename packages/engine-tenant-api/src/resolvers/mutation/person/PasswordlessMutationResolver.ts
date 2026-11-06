@@ -11,6 +11,7 @@ import { PermissionActions } from '../../../model'
 import { createErrorResponse } from '../../errorUtils'
 import { SignInResponseFactory } from '../../responseHelpers/SignInResponseFactory'
 import { PasswordlessSignInManager } from '../../../model/service/PasswordlessSignInManager'
+import { EmailAddress } from '../../../model/utils/email'
 
 export class PasswordlessMutationResolver implements Pick<MutationResolvers, 'initSignInPasswordless' | 'signInPasswordless' | 'activatePasswordlessOtp'> {
 	constructor(
@@ -30,7 +31,8 @@ export class PasswordlessMutationResolver implements Pick<MutationResolvers, 'in
 		const result = await this.passwordlessSignInManager.initSignInPasswordless({
 			db: context.db,
 			permissionContext: context.permissionContext,
-			email: args.email,
+			email: EmailAddress.parse(args.email),
+			emailInput: args.email,
 			mailVariant: args.options?.mailVariant ?? undefined,
 			mailProject: args.options?.mailProject ?? undefined,
 		})

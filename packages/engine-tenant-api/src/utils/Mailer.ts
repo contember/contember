@@ -32,7 +32,9 @@ export class NodeMailer implements Mailer {
 
 	public async send(message: MailMessage): Promise<SentInfo> {
 		try {
-			return await this.transport.sendMail({ ...message, from: message.from || this.from })
+			// An address object is not parsed: as a string, `big boss@example.com` would go to `boss@example.com`.
+			const to = typeof message.to === 'string' ? { name: '', address: message.to } : message.to
+			return await this.transport.sendMail({ ...message, to, from: message.from || this.from })
 		} catch (e) {
 			logger.error(e, { message: 'Mail sending failed', mail: message })
 			return { error: e }

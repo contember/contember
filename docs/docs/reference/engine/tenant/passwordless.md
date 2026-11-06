@@ -17,6 +17,7 @@ process.
 
 - The user begins the sign-in process by entering their email address.
 - The system sends a magic link to the user's email, which contains a unique token with a default expiration of 5 minutes.
+- The mail and the link's `email` parameter use the address stored for the person, not the entered one (which may differ in case). Whitespace around the input is ignored; an input with whitespace inside names no person and is answered like an unknown address.
 - The user is prompted to check their inbox for the magic link.
 
 3. **Handling the Magic Link**:

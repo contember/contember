@@ -10,10 +10,12 @@ import {
 	ConfigurationQuery,
 	createPersonPermissionTarget,
 	PermissionActions,
+	PersonQuery,
 	PersonUniqueIdentifier,
 	RateLimiter,
 	SignInManager,
 } from '../../../model/index.js'
+import { normalizeEmail } from '../../../model/utils/email.js'
 import { createErrorResponse } from '../../errorUtils.js'
 import { SignInResponseFactory } from '../../responseHelpers/SignInResponseFactory.js'
 import { UserInputError } from '@contember/graphql-utils'
@@ -44,7 +46,10 @@ export class SignInMutationResolver implements MutationResolvers {
 			)
 		}
 
-		const retryAfterSignIn = await context.db.queryHandler.fetch(new NextLoginAttemptQuery(args.email))
+		const person = await context.db.queryHandler.fetch(PersonQuery.byEmail(args.email))
+		const retryAfterSignIn = await context.db.queryHandler.fetch(
+			new NextLoginAttemptQuery(person ? { personId: person.id } : { normalizedEmail: normalizeEmail(args.email) }),
+		)
 		if (retryAfterSignIn > 0) {
 			return createErrorResponse(
 				new ResponseError('RATE_LIMIT_EXCEEDED', `Too many attempts, please try again later.`, {
@@ -56,6 +61,7 @@ export class SignInMutationResolver implements MutationResolvers {
 		const response = await this.signInManager.signIn(
 			context.db,
 			args.email,
+			person,
 			args.password,
 			args.expiration || undefined,
 			args.otpToken || undefined,

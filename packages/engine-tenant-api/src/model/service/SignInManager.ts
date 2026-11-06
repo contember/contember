@@ -10,6 +10,7 @@ import { AuthLogService } from './AuthLogService.js'
 import { UserMailer } from '../mailing/index.js'
 import { ApiKeyRequestInfo, SetMfaGraceUntilCommand } from '../commands/index.js'
 import { intervalToSeconds } from '../utils/interval.js'
+import { normalizeEmail } from '../utils/email.js'
 
 class SignInManager {
 	constructor(
@@ -23,9 +24,11 @@ class SignInManager {
 		private readonly userMailer: UserMailer,
 	) {}
 
+	/** @param person the person found by `email`, looked up by the caller to key the sign-in backoff */
 	async signIn(
 		dbContext: DatabaseContext,
 		email: string,
+		person: PersonRow | null,
 		password: string,
 		expiration?: number,
 		otpCode?: string,
@@ -35,12 +38,11 @@ class SignInManager {
 		config?: Config,
 		geoCountry?: string,
 	): Promise<SignInResponse> {
-		const person = await dbContext.queryHandler.fetch(PersonQuery.byEmail(email))
-
 		if (person === null) {
 			return new ResponseError('UNKNOWN_EMAIL', `Person with email ${email} not found`, {
 				[AuthLogService.Key]: new AuthLogService.Bag({
-					personInput: email,
+					// Normalized: the sign-in backoff of an unknown address counts these entries by this value.
+					personInput: normalizeEmail(email),
 				}),
 			})
 		}

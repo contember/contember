@@ -9,7 +9,7 @@ const baseConfig = {
 }
 
 describe('OIDCProvider.validateConfiguration', () => {
-	const provider = new OIDCProvider(null)
+	const provider = new OIDCProvider(null, null)
 
 	test('accepts tokenEndpointAuthMethod', () => {
 		const config = provider.validateConfiguration({ ...baseConfig, tokenEndpointAuthMethod: 'client_secret_post' })

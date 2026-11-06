@@ -15,6 +15,7 @@ import {
 	CaptchaValidator,
 	CustomRoleManager,
 	DatabaseContext,
+	DataSigner,
 	EmailChangeManager,
 	EmailOtpManager,
 	EmailValidator,
@@ -156,6 +157,8 @@ export interface TenantContainerArgs {
 	projectInitializer: ProjectInitializer
 	tenantCredentials: TenantCredentials
 	cryptoProviders: Pick<Providers, 'encrypt' | 'decrypt' | 'encryptionEnabled'>
+	/** Null when the server has no encryption key to derive a signing key from. */
+	dataSigner: DataSigner | null
 	logger: Logger
 }
 
@@ -206,7 +209,7 @@ export class TenantContainerFactory {
 			.addService('loginRiskAnalyzer', ({ providers }) => new LoginRiskAnalyzer(providers.hash))
 			.addService('idpRegistry', () => {
 				const idpRegistry = new IDPHandlerRegistry()
-				idpRegistry.registerHandler('oidc', new OIDCProvider(this.egressGuard))
+				idpRegistry.registerHandler('oidc', new OIDCProvider(this.egressGuard, args.dataSigner))
 				idpRegistry.registerHandler('facebook', new FacebookProvider())
 				idpRegistry.registerHandler('apple', new AppleProvider())
 				return idpRegistry

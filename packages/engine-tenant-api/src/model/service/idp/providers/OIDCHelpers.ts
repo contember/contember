@@ -39,7 +39,7 @@ export const tokenSetToSessionState = (tokenSet: TokenSet, sessionId?: string, p
 export const initOIDCAuth = async (
 	client: Client,
 	{ redirectUrl, scope, responseMode }: { redirectUrl: string; scope?: string; responseMode?: string },
-): Promise<InitIDPAuthResult> => {
+): Promise<InitIDPAuthResult & { sessionData: { nonce: string; state: string } }> => {
 	const nonce = generators.nonce()
 	const state = generators.state()
 	const url = client.authorizationUrl({
@@ -57,6 +57,8 @@ export const initOIDCAuth = async (
 }
 
 export type HandleOIDCResponseOptions = {
+	/** When set, the callback must match this response type exactly (see `strictResponseType`). */
+	expectedResponseType?: string
 	fetchUserInfo?: boolean
 	returnOIDCResult?: boolean
 	captureSession?: boolean
@@ -196,14 +198,27 @@ const resolveName = (source: Record<string, unknown>, claimMapping: OIDCClaimMap
 export const handleOIDCResponse = async (
 	client: Client,
 	{ sessionData, redirectUrl, ...otherData }: OIDCResponseData,
-	{ fetchUserInfo, returnOIDCResult, captureSession, claimMapping }: HandleOIDCResponseOptions = {},
+	{ expectedResponseType, fetchUserInfo, returnOIDCResult, captureSession, claimMapping }: HandleOIDCResponseOptions = {},
 ): Promise<IDPResponse> => {
 	const params = 'parameters' in otherData ? otherData.parameters : client.callbackParams(otherData.url)
 	if (params.state && !sessionData?.state) {
 		throw new IDPValidationError(`state is present in parameters, but missing in session data`)
 	}
+	if (expectedResponseType !== undefined) {
+		const expected = expectedResponseType.split(' ')
+		const unexpected = [
+			...(expected.includes('id_token') ? [] : ['id_token']),
+			...(expected.includes('token') ? [] : ['access_token']),
+			...(expected.includes('code') ? [] : ['code']),
+		].filter(param => params[param] !== undefined)
+		if (unexpected.length > 0) {
+			throw new IDPValidationError(`${unexpected.join(', ')} not expected for response type "${expectedResponseType}"`)
+		}
+	}
 	try {
-		const result = await client.callback(redirectUrl, params, sessionData)
+		// openid-client checks that the parameters `response_type` requires are present.
+		const checks = expectedResponseType !== undefined ? { ...sessionData, response_type: expectedResponseType } : sessionData
+		const result = await client.callback(redirectUrl, params, checks)
 		const claims = result.claims()
 		const { at_hash, c_hash, nonce, ...claimsWithoutHashes } = claims
 		const userInfo = result.access_token && fetchUserInfo ? await client.userinfo(result) : {}

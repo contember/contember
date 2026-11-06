@@ -47,6 +47,7 @@ export const createDatabaseTenant = () => {
 			connection,
 			readConnection: connection,
 			cryptoProviders: providers,
+			dataSigner: null,
 			logger,
 		})
 		.replaceService('mailer', () => createMockedMailer())

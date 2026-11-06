@@ -21,7 +21,7 @@ const OPTIONS = {
 
 const makeManager = () => {
 	const registry = new IDPHandlerRegistry()
-	registry.registerHandler('oidc', new OIDCProvider(null))
+	registry.registerHandler('oidc', new OIDCProvider(null, null))
 	return new IDPManager(registry, { getSchema: () => Promise.resolve(undefined) })
 }
 

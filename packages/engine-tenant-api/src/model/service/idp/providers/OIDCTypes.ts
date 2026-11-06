@@ -51,6 +51,11 @@ export const OIDCConfigurationOptions = Typesafe.partial({
 	additionalAuthorizedParties: Typesafe.array(Typesafe.string),
 	idTokenSignedResponseAlg: Typesafe.string,
 	/**
+	 * Accept only a callback of the configured `responseType`: the parameters it requires must be present and tokens
+	 * it does not return must be absent, so a client cannot finish a `code` flow with a bare `id_token`. Default false.
+	 */
+	strictResponseType: Typesafe.boolean,
+	/**
 	 * How the client authenticates to the token endpoint. `openid-client` defaults to
 	 * `client_secret_basic`; set `client_secret_post` for providers (e.g. some Apereo CAS
 	 * registrations) that only accept the secret in the request body.
@@ -108,6 +113,8 @@ export const OIDCResponseData = Typesafe.intersection(
 		sessionData: Typesafe.partial({
 			nonce: Typesafe.string,
 			state: Typesafe.string,
+			/** Present when the provider has `strictResponseType` on; see `OIDCProvider`. */
+			signature: Typesafe.string,
 		}),
 	}),
 )

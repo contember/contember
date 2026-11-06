@@ -21,6 +21,7 @@ export class ResetPersonMfaCommand implements Command<void> {
 				totp_pending_secret: null,
 				totp_pending_version: null,
 				totp_pending_created_at: null,
+				totp_last_counter: null,
 				email_otp_enabled: false,
 			})
 			.execute(db)

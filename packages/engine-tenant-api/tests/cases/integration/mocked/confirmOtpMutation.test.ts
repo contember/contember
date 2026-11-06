@@ -29,9 +29,9 @@ test('confirm otp mutation with valid code', async () => {
 			}),
 			{
 				sql: `update "tenant"."person_mfa"
-					set "totp_secret" = "totp_pending_secret", "totp_secret_version" = "totp_pending_version", "totp_activated_at" = ?, "totp_pending_secret" = ?, "totp_pending_version" = ?, "totp_pending_created_at" = ?
+					set "totp_secret" = "totp_pending_secret", "totp_secret_version" = "totp_pending_version", "totp_activated_at" = ?, "totp_pending_secret" = ?, "totp_pending_version" = ?, "totp_pending_created_at" = ?, "totp_last_counter" = ?
 					where "person_id" = ? and "totp_pending_secret" is not null`,
-				parameters: [now, null, null, null, personId],
+				parameters: [now, null, null, null, null, personId],
 				response: {
 					rowCount: 1,
 				},

@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'bun:test'
 import { Secret, TOTP } from 'otpauth'
-import { createConnectionMock } from '@contember/database-tester'
+import { createConnectionMock, ExpectedQuery } from '@contember/database-tester'
 import { DatabaseContext, OtpAuthenticator, OtpManager, PersonRow, Providers, ReauthenticationVerifier } from '../../../src/index.js'
 
 const now = new Date('2026-11-06T12:00:00.000Z')
@@ -46,8 +46,17 @@ const withTotp = (overrides: Partial<PersonRow> = {}): PersonRow =>
 
 const currentCode = () => new TOTP({ secret: Secret.fromBase32(SECRET), digits: 6 }).generate({ timestamp: now.getTime() })
 
-const verify = (target: PersonRow, credentials: { currentPassword?: string; otpToken?: string }) => {
-	const db = new DatabaseContext(createConnectionMock([]).createClient('tenant', { module: 'tenant' }), providers)
+const claimCounterSql = (personId: string): ExpectedQuery => {
+	const counter = TOTP.counter({ timestamp: now.getTime() })
+	return {
+		sql: 'update "tenant"."person_mfa" set "totp_last_counter" = ? where "person_id" = ? and ("totp_last_counter" is null or "totp_last_counter" < ?)',
+		parameters: [counter, personId, counter],
+		response: { rowCount: 1 },
+	}
+}
+
+const verify = (target: PersonRow, credentials: { currentPassword?: string; otpToken?: string }, queries: ExpectedQuery[] = []) => {
+	const db = new DatabaseContext(createConnectionMock(queries).createClient('tenant', { module: 'tenant' }), providers)
 	const otpManager = new OtpManager(new OtpAuthenticator(providers), providers)
 	return new ReauthenticationVerifier(providers, otpManager).verify(db, target, credentials)
 }
@@ -63,7 +72,8 @@ describe('ReauthenticationVerifier', () => {
 	})
 
 	test('accepts a current TOTP code', async () => {
-		expect((await verify(withTotp(), { otpToken: currentCode() })).ok).toBe(true)
+		const target = withTotp()
+		expect((await verify(target, { otpToken: currentCode() }, [claimCounterSql(target.id)])).ok).toBe(true)
 	})
 
 	test('refuses a wrong TOTP code', async () => {

@@ -17,6 +17,7 @@ import { getLoginHistorySql } from './sql/loginHistorySql.js'
 import { getMailTemplateSql } from './sql/getMailTemplateSql.js'
 import { claimEmailOtpAttemptSql, consumeEmailOtpTokenSql, EMAIL_OTP_CODE, getLatestEmailOtpTokenSql, sendEmailOtpSql } from './sql/emailOtpSql.js'
 import { ExpectedQuery } from '@contember/database-tester'
+import { claimTotpCounterSql } from './sql/claimTotpCounterSql.js'
 
 // Enabled anomaly policy (default thresholds): email >= 1, step-up >= 3.
 const anomalyConfig = getConfigSql({ login_anomaly_detection_enabled: true })
@@ -296,6 +297,7 @@ test('anomaly on, step-up scored for a user who already cleared TOTP this reques
 			getPersonByEmailSql({ email, response: { personId, identityId, password, roles: [], otpUri: otp.uri } }),
 			getNextLoginAttemptSql({ personId }),
 			localAuthDisablingIdpsSql({ personId }),
+			claimTotpCounterSql({ personId, now }),
 			// active TOTP + valid token → verified here (no SQL); mfaSatisfiedThisRequest = true.
 			// applyRiskPolicy: US is a new country (high, 3 → stepUp) BUT MFA already satisfied
 			// this request → NO email-OTP challenge (no sendEmailOtpSql/getLatestEmailOtpTokenSql

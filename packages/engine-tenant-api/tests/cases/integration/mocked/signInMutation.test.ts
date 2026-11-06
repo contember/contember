@@ -18,6 +18,7 @@ import { claimEmailOtpAttemptSql, consumeEmailOtpTokenSql, EMAIL_OTP_CODE, getLa
 import { getMailTemplateSql } from './sql/getMailTemplateSql.js'
 import { getAuthPoliciesSql } from './sql/authPolicySql.js'
 import { getIdentityByIdSql } from './sql/getIdentityByIdSql.js'
+import { claimTotpCounterSql } from './sql/claimTotpCounterSql.js'
 
 test('signs in', async () => {
 	const email = 'john@doe.com'
@@ -317,6 +318,44 @@ test('sign in - invalid otp token', async () => {
 	})
 })
 
+test('sign in - a replayed otp token is refused', async () => {
+	const email = 'john@doe.com'
+	const password = '123'
+	const identityId = testUuid(2)
+	const personId = testUuid(7)
+	const otpAuth = new OtpAuthenticator({
+		now: () => now,
+		randomBytes: () => Promise.resolve(Buffer.alloc(20)),
+	})
+	const otp = await otpAuth.create('john', 'contember')
+
+	await executeTenantTest({
+		query: signInMutation({ email, password, otpToken: otpAuth.generate(otp) }),
+		executes: [
+			getConfigSql(),
+			getPersonByEmailSql({ email, response: { personId, identityId, password, roles: [], otpUri: otp.uri } }),
+			getNextLoginAttemptSql({ personId }),
+			localAuthDisablingIdpsSql({ personId }),
+			claimTotpCounterSql({ personId, now, accepted: false }),
+		],
+		return: {
+			data: {
+				signIn: {
+					ok: false,
+					errors: [{ code: 'INVALID_OTP_TOKEN' }],
+					result: null,
+				},
+			},
+		},
+		expectedAuthLog: {
+			type: 'login',
+			response: expect.objectContaining({
+				ok: false,
+			}),
+		},
+	})
+})
+
 test('sign in - valid otp token', async () => {
 	const email = 'john@doe.com'
 	const password = '123'
@@ -336,6 +375,7 @@ test('sign in - valid otp token', async () => {
 			getPersonByEmailSql({ email, response: { personId, identityId, password, roles: [], otpUri: otp.uri } }),
 			getNextLoginAttemptSql({ personId }),
 			localAuthDisablingIdpsSql({ personId }),
+			claimTotpCounterSql({ personId, now }),
 			getConfigSql(),
 			getIdentityByIdSql({ identityId }),
 			getAuthPoliciesSql(),

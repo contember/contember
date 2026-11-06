@@ -1,5 +1,6 @@
 import { describe, expect, test } from 'bun:test'
 import { Buffer } from 'buffer'
+import { TOTP } from 'otpauth'
 import { createConnectionMock, ExpectedQuery } from '@contember/database-tester'
 import { DatabaseContext, OtpAuthenticator, OtpError, OtpManager, PersonRow, Providers } from '../../../src/index.js'
 
@@ -25,6 +26,15 @@ const encrypt = (value: Buffer) => Promise.resolve({ value: Buffer.from(ENC_PREF
 
 const REENCRYPT_SQL =
 	`update "tenant"."person_mfa" set "totp_secret" = ?, "totp_secret_version" = ? where "person_id" = ? and "totp_secret_version" = ?`
+
+const CLAIM_SQL =
+	`update "tenant"."person_mfa" set "totp_last_counter" = ? where "person_id" = ? and ("totp_last_counter" is null or "totp_last_counter" < ?)`
+const currentCounter = TOTP.counter({ timestamp: now.getTime() })
+const claimQuery = (personId: string, accepted = true): ExpectedQuery => ({
+	sql: CLAIM_SQL,
+	parameters: [currentCounter, personId, currentCounter],
+	response: { rowCount: accepted ? 1 : 0 },
+})
 
 const baseProviders = (overrides: Partial<Providers> = {}): Providers => ({
 	bcrypt: () => Promise.resolve('x'),
@@ -81,7 +91,7 @@ describe('OtpManager.verifyOtp', () => {
 
 		// Successful verify re-encrypts: base32 of the URI, encrypted (version>=1),
 		// guarded on the old version 0.
-		const queries: ExpectedQuery[] = [{
+		const queries: ExpectedQuery[] = [claimQuery(person.id), {
 			sql: REENCRYPT_SQL,
 			parameters: [Buffer.from(ENC_PREFIX + otp.secret), 2, person.id, 0],
 			response: { rowCount: 1 },
@@ -117,10 +127,26 @@ describe('OtpManager.verifyOtp', () => {
 			otp_activated_at: now,
 		}
 		const token = otpAuthenticator.generate(otp)
-		const db = makeDb([], providers)
+		const db = makeDb([claimQuery(person.id)], providers)
 		const manager = new OtpManager(otpAuthenticator, providers)
 		expect(await manager.verifyOtp(db, person, token)).toBe(true)
 		expect(await manager.verifyOtp(db, person, '000000')).toBe(false)
+	})
+
+	test('refuses a code whose time step was already accepted, without re-encrypting', async () => {
+		const providers = baseProviders()
+		const otp = await otpAuthenticator.create('john', 'contember')
+		const person: PersonRow = {
+			...basePerson,
+			otp_secret: Buffer.from(otp.uri, 'utf8'),
+			otp_secret_version: 0,
+			otp_activated_at: now,
+		}
+		const queries = [claimQuery(person.id, false)]
+		const db = makeDb(queries, providers)
+		const manager = new OtpManager(otpAuthenticator, providers)
+		expect(await manager.verifyOtp(db, person, otpAuthenticator.generate(otp))).toBe(false)
+		expect(queries).toHaveLength(0)
 	})
 
 	test('re-encrypts a version>=1 secret when decrypt signals needsReEncrypt', async () => {
@@ -135,7 +161,7 @@ describe('OtpManager.verifyOtp', () => {
 		}
 		const token = otpAuthenticator.generate(otp)
 
-		const queries: ExpectedQuery[] = [{
+		const queries: ExpectedQuery[] = [claimQuery(person.id), {
 			sql: REENCRYPT_SQL,
 			parameters: [Buffer.from(ENC_PREFIX + otp.secret), 2, person.id, encrypted.version],
 			response: { rowCount: 1 },
@@ -158,7 +184,7 @@ describe('OtpManager.verifyOtp', () => {
 			otp_activated_at: now,
 		}
 		const token = otpAuthenticator.generate(otp)
-		const db = makeDb([], providers)
+		const db = makeDb([claimQuery(person.id)], providers)
 		const manager = new OtpManager(otpAuthenticator, providers)
 		expect(await manager.verifyOtp(db, person, token)).toBe(true)
 	})

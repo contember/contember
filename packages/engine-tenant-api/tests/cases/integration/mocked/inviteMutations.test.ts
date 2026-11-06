@@ -165,3 +165,36 @@ test('invite refuses an address with whitespace inside', async () => {
 		return: { data: { invite: { ok: false, errors: [{ code: 'INVALID_EMAIL_FORMAT' }], result: null } } },
 	})
 })
+
+test('invite of an existing person entered in another spelling mails the stored address', async () => {
+	const email = 'john@doe.com'
+	const identityId = testUuid(1)
+	const personId = testUuid(2)
+	const projectId = testUuid(5)
+	const projectSlug = 'blog'
+	await executeTenantTest({
+		query: inviteMutation({ email: 'JOHN@Doe.com', projectSlug, memberships: [] }),
+		executes: [
+			getProjectBySlugSql({
+				projectSlug,
+				response: { id: projectId, name: projectSlug, slug: projectSlug, config: {} },
+			}),
+			...sqlTransaction(
+				getPersonByEmailSql({ email: 'JOHN@Doe.com', response: null }),
+				getPersonByEmailSql({ email, response: { personId, identityId, password: '123', roles: [] } }),
+				getMailTemplateSql({ projectId, type: 'existingUserInvited' }),
+				getMailTemplateSql({ projectId: null, type: 'existingUserInvited' }),
+			),
+		],
+		sentMails: [{ subject: 'You have been invited to blog', to: email }],
+		return: {
+			data: {
+				invite: {
+					ok: true,
+					errors: [],
+					result: { person: { id: personId, identity: { id: identityId } } },
+				},
+			},
+		},
+	})
+})

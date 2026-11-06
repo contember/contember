@@ -21,6 +21,7 @@ export const computeTokenHash = (token: string): TokenHash => {
 
 export const isTokenHash = (token: string): token is TokenHash => isFixedLengthHexString(token, 64)
 
+/** Guesses allowed per token; callers reserve each one with `ClaimOtpAttemptCommand` before verifying. */
 export const MAX_OTP_ATTEMPTS = 3
 
 /**
@@ -44,9 +45,6 @@ export const validateToken = ({ entry, validationType, token }: {
 }): Response<PersonToken.Row, PersonToken.TokenValidationError> => {
 	if (!entry) {
 		return new ResponseError('TOKEN_NOT_FOUND', 'Token not found')
-	}
-	if (validationType === 'otp' && entry.otp_attempts >= MAX_OTP_ATTEMPTS) {
-		return new ResponseError('TOKEN_EXPIRED', 'OTP attempts exceeded')
 	}
 	switch (validationType) {
 		case 'token':

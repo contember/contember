@@ -181,3 +181,100 @@ test('signInPasswordless - a link created while the magic link was in flight sti
 		},
 	})
 })
+
+const OTP_CODE = '123456'
+
+const otpTokenSql = (args: { requestId: string; personId: string; otpAttempts: number }) => {
+	const query = personTokenByIdSql({ requestId: args.requestId, personId: args.personId, token: 'passwordless-token' })
+	return {
+		...query,
+		response: { rows: query.response.rows.map(row => ({ ...row, otp_hash: computeTokenHash(OTP_CODE), otp_attempts: args.otpAttempts })) },
+	}
+}
+
+const claimAttemptSql = (args: { requestId: string; claimed: boolean }) => ({
+	sql: SQL`UPDATE "tenant"."person_token" SET "otp_attempts" = otp_attempts + 1 WHERE "id" = ? AND "used_at" IS NULL AND "otp_attempts" < ?`,
+	parameters: [args.requestId, 3],
+	response: { rowCount: args.claimed ? 1 : 0 },
+})
+
+test('signInPasswordless - a wrong code is counted before it is checked and the token is invalidated at the limit', async () => {
+	const requestId = testUuid(1)
+	const personId = testUuid(2)
+	await executeTenantTest({
+		query: signInPasswordlessMutation({ requestId, token: '000000', validationType: 'otp' }),
+		executes: [
+			otpTokenSql({ requestId, personId, otpAttempts: 2 }),
+			claimAttemptSql({ requestId, claimed: true }),
+			...sqlTransaction(otpTokenSql({ requestId, personId, otpAttempts: 3 })),
+			{
+				sql: SQL`UPDATE "tenant"."person_token" SET "used_at" = now() WHERE "id" = ? AND "used_at" IS NULL AND "otp_attempts" >= ?`,
+				parameters: [requestId, 3],
+				response: { rowCount: 1 },
+			},
+		],
+		return: {
+			data: {
+				signInPasswordless: {
+					ok: false,
+					error: { code: 'TOKEN_INVALID' },
+					result: null,
+				},
+			},
+		},
+		expectedAuthLog: {
+			type: 'passwordless_login',
+			response: expect.objectContaining({ ok: false }),
+		},
+	})
+})
+
+test('signInPasswordless - a code is not checked once the attempts are used up', async () => {
+	const requestId = testUuid(1)
+	const personId = testUuid(2)
+	await executeTenantTest({
+		query: signInPasswordlessMutation({ requestId, token: OTP_CODE, validationType: 'otp' }),
+		executes: [
+			otpTokenSql({ requestId, personId, otpAttempts: 3 }),
+			claimAttemptSql({ requestId, claimed: false }),
+		],
+		return: {
+			data: {
+				signInPasswordless: {
+					ok: false,
+					error: { code: 'TOKEN_EXPIRED' },
+					result: null,
+				},
+			},
+		},
+		expectedAuthLog: {
+			type: 'passwordless_login',
+			response: expect.objectContaining({ ok: false }),
+		},
+	})
+})
+
+test('signInPasswordless - an MFA code with a wrong link token spends no attempt', async () => {
+	const requestId = testUuid(1)
+	const personId = testUuid(2)
+	await executeTenantTest({
+		query: signInPasswordlessMutation({ requestId, token: 'wrong-link-token', validationType: 'token', mfaOtp: OTP_CODE }),
+		executes: [
+			personTokenByIdSql({ requestId, personId, token: 'passwordless-token' }),
+			...sqlTransaction(personTokenByIdSql({ requestId, personId, token: 'passwordless-token' })),
+		],
+		return: {
+			data: {
+				signInPasswordless: {
+					ok: false,
+					error: { code: 'TOKEN_INVALID' },
+					result: null,
+				},
+			},
+		},
+		expectedAuthLog: {
+			type: 'passwordless_login',
+			response: expect.objectContaining({ ok: false }),
+		},
+	})
+})

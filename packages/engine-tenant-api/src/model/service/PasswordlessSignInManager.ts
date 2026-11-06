@@ -7,13 +7,14 @@ import {
 	InitSignInPasswordlessResult,
 	SignInPasswordlessErrorCode,
 } from '../../schema/index.js'
-import { DatabaseContext, validateToken } from '../utils/index.js'
+import { DatabaseContext, MAX_OTP_ATTEMPTS, validateToken } from '../utils/index.js'
 import { UserMailer } from '../mailing/index.js'
 import {
 	ActivateOtpCommand,
 	ApiKeyRequestInfo,
+	ClaimOtpAttemptCommand,
 	CreatePersonTokenCommand,
-	IncreaseOtpAttemptCommand,
+	InvalidateExhaustedOtpTokenCommand,
 	InvalidateTokenCommand,
 	MarkEmailVerifiedCommand,
 } from '../commands/index.js'
@@ -160,6 +161,48 @@ class PasswordlessSignInManager {
 		requestInfo?: ApiKeyRequestInfo
 		trustForwardedInfo?: boolean
 	}): Promise<PasswordlessSignInManager.SignInPasswordlessResponse> {
+		// Every request that checks a guessable code (the e-mailed OTP, a TOTP or a backup code) reserves one attempt
+		// on the token first. The claim runs outside the sign-in transaction, so it is counted even when that
+		// transaction fails, and its conditional UPDATE keeps parallel guesses within the limit. With a magic link,
+		// only a request carrying the valid link token may spend an attempt.
+		let claimed = false
+		if (validationType === 'otp' || mfaOtp !== undefined || backupCode !== undefined) {
+			const claimTarget = await db.queryHandler.fetch(PersonTokenQuery.byId(requestId, 'passwordless'))
+			const mayClaim = claimTarget !== null && (validationType === 'otp' || validateToken({ entry: claimTarget, token, validationType }).ok)
+			if (mayClaim) {
+				claimed = await db.commandBus.execute(new ClaimOtpAttemptCommand(claimTarget.id, MAX_OTP_ATTEMPTS))
+				if (!claimed) {
+					return new ResponseError(
+						claimTarget.used_at ? 'TOKEN_USED' : 'TOKEN_EXPIRED',
+						claimTarget.used_at ? 'Token used' : 'OTP attempts exceeded',
+						{
+							[AuthLogService.Key]: new AuthLogService.Bag({
+								personId: claimTarget.person_id,
+								tokenId: claimTarget.id,
+							}),
+						},
+					)
+				}
+			}
+		}
+		const result = await this.verifyAndSignIn({ db, expiration, token, requestId, mfaOtp, backupCode, validationType, requestInfo, trustForwardedInfo })
+		if (claimed && !result.ok && (result.error === 'TOKEN_INVALID' || result.error === 'INVALID_OTP_TOKEN')) {
+			await db.commandBus.execute(new InvalidateExhaustedOtpTokenCommand(requestId, MAX_OTP_ATTEMPTS))
+		}
+		return result
+	}
+
+	private async verifyAndSignIn({ db, expiration, token, requestId, mfaOtp, backupCode, validationType, requestInfo, trustForwardedInfo }: {
+		db: DatabaseContext
+		validationType: PersonToken.ValidationType
+		requestId: string
+		token: string
+		mfaOtp?: string
+		backupCode?: string
+		expiration?: number
+		requestInfo?: ApiKeyRequestInfo
+		trustForwardedInfo?: boolean
+	}): Promise<PasswordlessSignInManager.SignInPasswordlessResponse> {
 		return db.transaction(async (db): Promise<PasswordlessSignInManager.SignInPasswordlessResponse> => {
 			const tokenResult = await db.queryHandler.fetch(PersonTokenQuery.byId(requestId, 'passwordless'))
 			const tokenValidationResult = validateToken({
@@ -168,9 +211,6 @@ class PasswordlessSignInManager {
 				validationType,
 			})
 			if (!tokenValidationResult.ok) {
-				if (tokenValidationResult.error === 'TOKEN_INVALID' && validationType === 'otp') {
-					await db.commandBus.execute(new IncreaseOtpAttemptCommand(tokenResult!.id))
-				}
 				return new ResponseError(tokenValidationResult.error, tokenValidationResult.errorMessage, {
 					...tokenValidationResult.metadata ?? {},
 					[AuthLogService.Key]: new AuthLogService.Bag({

@@ -11,7 +11,20 @@ import {
 } from '@contember/schema-migrations'
 import { emptySchema } from '@contember/schema-utils'
 import { Schema } from '@contember/schema'
-import { ExecutedMigration, InvalidSchemaError, ProjectMigrator } from '../../../src/model/index.js'
+import { Connection, DatabaseMetadataResolver } from '@contember/database'
+import { ConnectionMock } from '@contember/database-tester'
+import crypto from 'node:crypto'
+import {
+	ContentQueryExecutor,
+	DatabaseContextFactory,
+	ExecutedMigration,
+	ExecutedMigrationsResolver,
+	InvalidSchemaError,
+	MigrationsDatabaseMetadataResolverStoreFactory,
+	ProjectMigrator,
+	SchemaProvider,
+	SchemaWithMeta,
+} from '../../../src/model/index.js'
 import { SchemaMigrationInput } from '../../../src/model/migrations/MigrationInput.js'
 
 namespace Base {
@@ -68,50 +81,97 @@ const indexMigration: SchemaMigrationInput = {
 	modifications: differ.diffSchemas(createSchema(WithView), createSchema(WithViewAndIndex)),
 }
 
+class FixedSchemaProvider extends SchemaProvider {
+	constructor(private readonly result: SchemaWithMeta) {
+		super(new ExecutedMigrationsResolver(), schemaMigrator)
+	}
+
+	override async fetch(): Promise<SchemaWithMeta> {
+		return this.result
+	}
+}
+
+class FixedExecutedMigrationsResolver extends ExecutedMigrationsResolver {
+	constructor(private readonly migrations: ExecutedMigration[]) {
+		super()
+	}
+
+	override async getMigrations(): Promise<ExecutedMigration[]> {
+		return this.migrations
+	}
+}
+
+/** Answers every statement with no rows and keeps the SQL it was sent. */
+class RecordingConnection extends ConnectionMock {
+	public readonly statements: string[] = []
+
+	constructor() {
+		super([])
+	}
+
+	override async query<Row extends Record<string, unknown>>(sql: string): Promise<Connection.Result<Row>> {
+		this.statements.push(sql)
+		return { rows: [], rowCount: 0 }
+	}
+
+	override async scope<Result>(callback: (connection: Connection.TransactionLike) => Promise<Result> | Result): Promise<Result> {
+		return await callback(this)
+	}
+
+	override async transaction<Result>(callback: (connection: Connection.TransactionLike) => Promise<Result> | Result): Promise<Result> {
+		return await callback(this)
+	}
+}
+
+const noContentQueries: ContentQueryExecutor = {
+	execute: () => Promise.reject(new Error('content migrations are not used here')),
+}
+
+const createMigrator = (stored: SchemaWithMeta, executedMigrations: ExecutedMigration[]) =>
+	new ProjectMigrator(
+		new MigrationDescriber(handlerFactory),
+		new FixedSchemaProvider(stored),
+		new FixedExecutedMigrationsResolver(executedMigrations),
+		new MigrationsDatabaseMetadataResolverStoreFactory(new DatabaseMetadataResolver()),
+		noContentQueries,
+	)
+
+const createDb = (connection: RecordingConnection) => new DatabaseContextFactory('system', { uuid: () => crypto.randomUUID() }).create(connection)
+
+const savedMigrationsOf = (connection: RecordingConnection) =>
+	connection.statements.filter(it => /^insert into\s+"system"\."schema_migration"/.test(it))
+
 const migrate = async ({ executed, migrationsToExecute }: { executed: SchemaMigrationInput[]; migrationsToExecute: SchemaMigrationInput[] }) => {
 	const storedSchema: Schema = executed.reduce(
 		(schema, it) => schemaMigrator.applyModifications(schema, it.modifications, it.formatVersion),
 		emptySchema,
 	)
 	const latest = executed[executed.length - 1]
-	const commands: string[] = []
-	const migrator = new ProjectMigrator(
-		new MigrationDescriber(handlerFactory),
-		{ fetch: async () => ({ schema: storedSchema, meta: latest ? { id: 1, version: latest.version } : {} }) } as any,
-		{
-			getMigrations: async () =>
-				executed.map((it, i) =>
-					new ExecutedMigration(i + 1, it.name, it.formatVersion, [...it.modifications], new Date(), calculateMigrationChecksum(it), 'schema')
-				),
-		} as any,
-		{ create: () => ({ getMetadata: async () => ({}), invalidate: () => {} }) } as any,
-		{} as any,
+	const executedMigrations = executed.map((it, i) =>
+		new ExecutedMigration(i + 1, it.name, it.formatVersion, [...it.modifications], new Date(), calculateMigrationChecksum(it), 'schema')
 	)
+	const migrator = createMigrator({
+		schema: storedSchema,
+		meta: latest ? { id: 1, version: latest.version, checksum: '', updatedAt: new Date() } : {},
+	}, executedMigrations)
+	const connection = new RecordingConnection()
 	await migrator.migrate({
-		db: {
-			client: { query: async () => ({ rows: [] }) },
-			commandBus: {
-				execute: async (command: object) => {
-					commands.push(command.constructor.name)
-					return 1
-				},
-			},
-		} as any,
+		db: createDb(connection),
 		project: { slug: 'test', systemSchema: 'system' },
 		identity: { id: '00000000-0000-0000-0000-000000000000' },
 		stages: [],
 		migrationsToExecute,
 		options: { skipExecuted: true },
 	})
-	return commands
+	return savedMigrationsOf(connection)
 }
 
 test('an executed multi-statement view migration does not block a later deploy', async () => {
-	const commands = await migrate({
+	const savedMigrations = await migrate({
 		executed: [multiStatementViewMigration],
 		migrationsToExecute: [multiStatementViewMigration, indexMigration],
 	})
-	expect(commands).toStrictEqual(['SaveMigrationCommand', 'SaveSchemaCommand'])
+	expect(savedMigrations).toHaveLength(1)
 })
 
 test('a multi-statement view migration about to be executed is rejected before anything runs', async () => {

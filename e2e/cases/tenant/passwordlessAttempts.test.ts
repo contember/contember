@@ -40,7 +40,7 @@ const requestMagicLink = async (email: string): Promise<{ requestId: string; tok
 
 const signIn = async (variables: { requestId: string; token: string; validationType: 'token' | 'otp'; mfaOtp?: string }) => {
 	const response = await executeGraphql('/tenant', signInMutation, { authorizationToken: loginToken, variables })
-	return response.body.data.signInPasswordless as { ok: boolean; error: { code: string } | null }
+	return response.body.data.signInPasswordless
 }
 
 test('wrong MFA codes on a magic link use up its attempts', async () => {

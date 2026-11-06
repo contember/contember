@@ -1,6 +1,5 @@
 import { afterAll, beforeAll, describe, expect, test } from 'bun:test'
 import http from 'node:http'
-import { AddressInfo } from 'node:net'
 import { EgressGuard, EgressPolicy } from '../../../src/index.js'
 
 type RecordedRequest = { method: string; url: string; headers: http.IncomingHttpHeaders; body: string }
@@ -16,8 +15,11 @@ const startServer = async (handler: (req: http.IncomingMessage, res: http.Server
 		})
 	})
 	await new Promise<void>(resolve => server.listen(0, '127.0.0.1', resolve))
-	const port = (server.address() as AddressInfo).port
-	return { server, port, requests }
+	const address = server.address()
+	if (address === null || typeof address === 'string') {
+		throw new Error('expected a TCP address')
+	}
+	return { server, port: address.port, requests }
 }
 
 const guardWith = (allowlist: string[]) => new EgressGuard(new EgressPolicy({ allowHttp: true, allowlist }))

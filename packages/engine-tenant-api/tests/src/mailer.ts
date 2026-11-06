@@ -1,7 +1,7 @@
 import { Mailer, MailMessage, SentInfo } from '../../src/utils/index.js'
 import { expect } from 'bun:test'
 
-export type ExpectedMessage = { subject: string }
+export type ExpectedMessage = { subject: string; to?: string }
 
 export type MockedMailer = Mailer & {
 	expectMessage: (message: ExpectedMessage) => MailMessage
@@ -21,6 +21,9 @@ export const createMockedMailer = (): MockedMailer => {
 				throw new Error('No email to consume')
 			}
 			expect(actual.subject).toEqual(expected.subject)
+			if (expected.to !== undefined) {
+				expect(actual.to).toEqual(expected.to)
+			}
 			return actual
 		}
 

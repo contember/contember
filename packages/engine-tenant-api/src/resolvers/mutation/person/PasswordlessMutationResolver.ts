@@ -9,6 +9,7 @@ import {
 } from '../../../schema'
 import { TenantResolverContext } from '../../TenantResolverContext'
 import { ConfigurationQuery, PermissionActions } from '../../../model'
+import { EmailAddress } from '../../../model/utils/email'
 import { createErrorResponse } from '../../errorUtils'
 import { SignInResponseFactory } from '../../responseHelpers/SignInResponseFactory'
 import { PasswordlessSignInManager } from '../../../model/service/PasswordlessSignInManager'
@@ -33,7 +34,8 @@ export class PasswordlessMutationResolver
 		const result = await this.passwordlessSignInManager.initSignInPasswordless({
 			db: context.db,
 			permissionContext: context.permissionContext,
-			email: args.email,
+			email: EmailAddress.parse(args.email),
+			emailInput: args.email,
 			mailVariant: args.options?.mailVariant ?? undefined,
 			mailProject: args.options?.mailProject ?? undefined,
 		})

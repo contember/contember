@@ -20,6 +20,7 @@ import { OtpAuthenticator } from './OtpAuthenticator'
 import { PersonToken } from '../type'
 import { AuthLogService } from './AuthLogService'
 import { intervalToSeconds } from '../utils/interval'
+import { EmailAddress } from '../utils/email'
 
 class PasswordlessSignInManager {
 	constructor(
@@ -29,10 +30,12 @@ class PasswordlessSignInManager {
 		private readonly otpAuthenticator: OtpAuthenticator,
 	) {}
 
-	async initSignInPasswordless({ db, permissionContext, mailVariant, mailProject, email }: {
+	async initSignInPasswordless({ db, permissionContext, mailVariant, mailProject, email: emailAddress, emailInput }: {
 		db: DatabaseContext
 		permissionContext: PermissionContext
-		email: string
+		/** Null when the input is not a single address: it names no person. */
+		email: EmailAddress | null
+		emailInput: string
 		mailVariant?: string
 		mailProject?: string
 	}): Promise<PasswordlessSignInManager.InitSignInPasswordlessResponse> {
@@ -44,18 +47,20 @@ class PasswordlessSignInManager {
 				})
 			}
 
-			const person = await db.queryHandler.fetch(PersonQuery.byEmail(email))
-			if (!person) {
-				return new ResponseError('PERSON_NOT_FOUND', `Person ${email} not found`, {
+			const person = emailAddress === null ? null : await db.queryHandler.fetch(PersonQuery.byEmail(emailAddress.value))
+			// The link and the mail go to the stored address, never to the input: the lookup matches variants of it.
+			const recipient = person?.email ?? null
+			if (!person || recipient === null) {
+				return new ResponseError('PERSON_NOT_FOUND', `Person ${emailInput} not found`, {
 					[AuthLogService.Key]: new AuthLogService.Bag({
-						personInput: email,
+						personInput: emailInput,
 					}),
 				})
 			}
 			if (!this.isEnabled(configuration.passwordless.enabled, person.passwordless_enabled)) {
 				return new ResponseError('PASSWORDLESS_DISABLED', 'Passwordless sign-in is disabled for this person', {
 					[AuthLogService.Key]: new AuthLogService.Bag({
-						personInput: email,
+						personInput: emailInput,
 						personId: person.id,
 					}),
 				})
@@ -67,13 +72,12 @@ class PasswordlessSignInManager {
 			)
 			const result = await db.commandBus.execute(createTokenCommand)
 
-			const url = this.formatUrl(configuration.passwordless.url ?? null, result.token, result.id, email) ?? undefined
+			const url = this.formatUrl(configuration.passwordless.url ?? null, result.token, result.id, recipient) ?? undefined
 
 			const projects = await this.projectManager.getProjectsByIdentity(db, person.identity_id, permissionContext)
 			const project = getPreferredProject(projects, mailProject ?? null)
 
-			await this.mailer.sendPasswordlessEmail(db, {
-				email,
+			await this.mailer.sendPasswordlessEmail(db, person, {
 				token: result.token,
 				url,
 				project: project?.name,
@@ -89,7 +93,7 @@ class PasswordlessSignInManager {
 				expiresAt: result.expiresAt,
 				person,
 				[AuthLogService.Key]: new AuthLogService.Bag({
-					personInput: email,
+					personInput: emailInput,
 					personId: person.id,
 					tokenId: result.id,
 				}),

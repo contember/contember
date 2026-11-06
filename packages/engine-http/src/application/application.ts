@@ -20,6 +20,7 @@ import { getClientIP } from '../utils/remoteAddress.js'
 import { isForceHttpOkRequested, shouldForceHttpOk } from './forceHttpOk.js'
 import { INVALID_TRACE_ID, noopTracer, Span, SpanContext, Tracer, withSpanContext } from '@contember/telemetry'
 import { AcceptIncomingTraceMode, resolveIncomingSpanContext } from '../telemetry/incomingTrace.js'
+import { summarizeRequestBody } from './requestBodySummary.js'
 
 const websocketCloseTimeoutMs = 5_000
 
@@ -363,7 +364,7 @@ export class Application {
 				return this.sendHttpResponse(ctx, new HttpErrorResponse(404, 'Route not found'))
 			}
 			requestLogger.debug('Request processing started', {
-				body: ctx.request.body,
+				body: summarizeRequestBody(ctx.request.body),
 				query: ctx.request.query,
 			})
 
@@ -564,7 +565,7 @@ export class Application {
 		)
 	}
 
-	private createRequestLogger(request: IncomingMessage, body: any, module?: string, remoteAddress?: string, spanContext?: SpanContext): Logger {
+	private createRequestLogger(request: IncomingMessage, body: unknown, module?: string, remoteAddress?: string, spanContext?: SpanContext): Logger {
 		const traceAttributes = spanContext === undefined || spanContext.traceId === INVALID_TRACE_ID
 			? {}
 			: { traceId: spanContext.traceId, spanId: spanContext.spanId }
@@ -575,7 +576,7 @@ export class Application {
 			module,
 			remoteAddress,
 			...traceAttributes,
-			[LoggerRequestBody]: body,
+			[LoggerRequestBody]: summarizeRequestBody(body),
 		}, {
 			handler: FingerCrossedLoggerHandler.factory(),
 		})

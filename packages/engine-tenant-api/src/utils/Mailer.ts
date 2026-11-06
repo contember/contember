@@ -49,7 +49,8 @@ export class NodeMailer implements Mailer {
 		try {
 			return await this.transport.sendMail({ ...message, from: message.from || this.from })
 		} catch (e) {
-			logger.error(e, { message: 'Mail sending failed', mail: message })
+			// The rendered mail carries tokens and links, so only the template is logged.
+			logger.error(e, { message: 'Mail sending failed', template })
 			return { error: e }
 		}
 	}
@@ -73,7 +74,7 @@ export class WebhookMailer implements Mailer {
 			},
 		})
 		if (!response.ok) {
-			logger.error('Mail sending failed', { mail: message, response })
+			logger.error('Mail sending failed', { template: message.template, status: response.status })
 			return { error: response.statusText }
 		}
 		await response.text()

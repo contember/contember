@@ -750,6 +750,8 @@ const schema: DocumentNode = gql`
 	
 	enum WeakPasswordReason {
 		TOO_SHORT
+		"Longer than 72 bytes (UTF-8), the most a password hash covers. Only reported when a password is set."
+		TOO_LONG
 		MISSING_UPPERCASE
 		MISSING_LOWERCASE
 		MISSING_DIGIT

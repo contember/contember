@@ -1,6 +1,6 @@
 import { ExpectedQuery } from '@contember/database-tester'
 import PostgresInterval from 'postgres-interval'
-export const getConfigSql = (): ExpectedQuery => ({
+export const getConfigSql = (overrides: Record<string, unknown> = {}): ExpectedQuery => ({
 	sql: `select *  from "tenant"."config"`,
 	parameters: [],
 	response: {
@@ -23,6 +23,7 @@ export const getConfigSql = (): ExpectedQuery => ({
 				login_reveal_user_exits: true,
 				login_default_token_expiration: PostgresInterval('00:30:00'),
 				login_max_token_expiration: PostgresInterval('12:00:00'),
+				...overrides,
 			},
 		],
 	},

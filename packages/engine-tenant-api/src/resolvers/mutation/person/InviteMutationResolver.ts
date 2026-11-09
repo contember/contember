@@ -5,6 +5,7 @@ import { createMembershipValidationErrorResult } from '../../membershipUtils'
 import { createErrorResponse, createProjectNotFoundResponse } from '../../errorUtils'
 import { UserInputError } from '@contember/graphql-utils'
 import { PersonResponseFactory } from '../../responseHelpers/PersonResponseFactory'
+import { EmailAddress } from '../../../model/utils/email'
 
 export class InviteMutationResolver implements MutationResolvers {
 	constructor(
@@ -66,8 +67,12 @@ export class InviteMutationResolver implements MutationResolvers {
 
 	private async doInvite(
 		dbContext: DatabaseContext,
-		invite: InviteData,
+		{ email: emailInput, ...invite }: Omit<InviteData, 'email'> & { email: string },
 	): Promise<InviteResponse> {
+		const email = EmailAddress.parse(emailInput)
+		if (email === null) {
+			return createErrorResponse('INVALID_EMAIL_FORMAT', 'E-mail address is not in a valid format')
+		}
 		const validationResult = await this.membershipValidator.validate(invite.project.slug, invite.memberships)
 		if (validationResult.length > 0) {
 			const errors = createMembershipValidationErrorResult(validationResult)
@@ -77,7 +82,7 @@ export class InviteMutationResolver implements MutationResolvers {
 				error: errors[0],
 			}
 		}
-		const response = await this.inviteManager.invite(dbContext, invite)
+		const response = await this.inviteManager.invite(dbContext, { ...invite, email })
 
 		if (!response.ok) {
 			return createErrorResponse(response.error, response.errorMessage)

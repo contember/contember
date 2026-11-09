@@ -38,6 +38,8 @@ By default, users with the global roles `super_admin` and `project_admin`, along
 
 If the specified email address already corresponds to a user in the system, that user will simply be added to the designated project. If the user does not yet exist, a new account will be created, and login instructions will be sent to the provided email address.
 
+An existing user is matched by the address as entered or in its lowercase form, and the invitation mail goes to the address stored for them. Whitespace around the address is ignored; an address with whitespace inside is refused with `INVALID_EMAIL_FORMAT`.
+
 ### Password handling
 
 By default, the invitation process auto-generates a password and sends it via email. However, it's recommended to set the invite method to `RESET_PASSWORD`. This way, a reset token is sent instead of a generated password. Ensure your [mail templates](./mail-templates.md) are appropriately configured to include the password setup link. Note that the default method will transition to `RESET_PASSWORD` in future updates.

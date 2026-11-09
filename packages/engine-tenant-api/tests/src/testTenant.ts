@@ -139,7 +139,7 @@ export const executeTenantTest = async (test: Test) => {
 		},
 	}
 	const connection = createConnectionMock(test.executes)
-	const tenantContainer = new TenantContainerFactory(providers)
+	const tenantContainer = new TenantContainerFactory(providers, null)
 		.createBuilder({
 			mailOptions: {},
 			dbCredentials: dbCredentials('xx'),
@@ -149,6 +149,7 @@ export const executeTenantTest = async (test: Test) => {
 			connection,
 			readConnection: connection,
 			cryptoProviders: providers,
+			dataSigner: null,
 			logger: createLogger(new JsonStreamLoggerHandler(process.stderr)),
 		})
 		.replaceService('mailer', () => mailer)

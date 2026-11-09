@@ -232,6 +232,8 @@ export const changeMyProfile: TenantApi.MutationFetcher<{
 }, {
     readonly email?: string;
     readonly name?: string;
+    readonly currentPassword?: string;
+    readonly otpToken?: string;
 }>;
 
 // @public (undocumented)
@@ -766,7 +768,10 @@ export const disableEmailOtpMutation: TenantApi.MutationFetcher<{
             readonly developerMessage: string;
         }) | undefined;
     }) | undefined;
-}, {}>;
+}, {
+    readonly currentPassword?: string;
+    readonly otpToken?: string;
+}>;
 
 // @public (undocumented)
 export type DisableEmailOtpMutationVariables = Parameters<ReturnType<typeof useDisableEmailOtpMutation>>[0];
@@ -810,7 +815,10 @@ export const disableOtpMutation: TenantApi.MutationFetcher<{
             readonly endUserMessage?: string;
         }) | undefined;
     }) | undefined;
-}, {}>;
+}, {
+    readonly currentPassword?: string;
+    readonly otpToken?: string;
+}>;
 
 // @public (undocumented)
 export type DisableOtpMutationVariables = Parameters<ReturnType<typeof useDisableOtpMutation>>[0];
@@ -1666,6 +1674,8 @@ export const prepareOtpMutation: TenantApi.MutationFetcher<{
     }) | undefined;
 }, {
     readonly label?: string;
+    readonly currentPassword?: string;
+    readonly otpToken?: string;
 }>;
 
 // @public (undocumented)
@@ -1763,7 +1773,10 @@ export const regenerateBackupCodesMutation: TenantApi.MutationFetcher<{
             readonly backupCodes: ReadonlyArray<string>;
         } | undefined;
     }) | undefined;
-}, {}>;
+}, {
+    readonly currentPassword?: string;
+    readonly otpToken?: string;
+}>;
 
 // Warning: (ae-forgotten-export) The symbol "regenerateBackupCodesResult" needs to be exported by the entry point index.d.ts
 //
@@ -2508,6 +2521,8 @@ export const useChangeMyProfileForm: () => ChangeMyProfileFormContextValue;
 export const useChangeMyProfileMutation: (input?: TenantApiOptions) => (variables: {
     readonly email?: string;
     readonly name?: string;
+    readonly currentPassword?: string;
+    readonly otpToken?: string;
 }) => Promise<TenantMutationResponse<unknown, TenantApi.ChangeMyProfileErrorCode>>;
 
 // @public (undocumented)
@@ -2637,13 +2652,19 @@ export const useDisableApiKeyMutation: (input?: TenantApiOptions) => (variables:
 }) => Promise<TenantMutationResponse<unknown, "KEY_NOT_FOUND">>;
 
 // @public (undocumented)
-export const useDisableEmailOtpMutation: (input?: TenantApiOptions) => (variables: {}) => Promise<TenantMutationResponse<unknown, TenantApi.DisableEmailOtpErrorCode>>;
+export const useDisableEmailOtpMutation: (input?: TenantApiOptions) => (variables: {
+    readonly currentPassword?: string;
+    readonly otpToken?: string;
+}) => Promise<TenantMutationResponse<unknown, TenantApi.DisableEmailOtpErrorCode>>;
 
 // @public (undocumented)
 export const useDisableMyPasswordlessMutation: (input?: TenantApiOptions) => (variables: {}) => Promise<TenantMutationResponse<unknown, TenantApi.ToggleMyPasswordlessErrorCode>>;
 
 // @public (undocumented)
-export const useDisableOtpMutation: (input?: TenantApiOptions) => (variables: {}) => Promise<TenantMutationResponse<unknown, TenantApi.DisableOtpErrorCode>>;
+export const useDisableOtpMutation: (input?: TenantApiOptions) => (variables: {
+    readonly currentPassword?: string;
+    readonly otpToken?: string;
+}) => Promise<TenantMutationResponse<unknown, TenantApi.DisableOtpErrorCode>>;
 
 // @public (undocumented)
 export const useDisablePersonMutation: (input?: TenantApiOptions) => (variables: {
@@ -2812,6 +2833,8 @@ export const usePersonsQuery: (options?: TenantApiOptions) => (variables?: Perso
 // @public (undocumented)
 export const usePrepareOtpMutation: (input?: TenantApiOptions) => (variables: {
     readonly label?: string;
+    readonly currentPassword?: string;
+    readonly otpToken?: string;
 }) => Promise<TenantMutationResponse<    {
 readonly otpUri: string;
 } & {
@@ -2834,9 +2857,12 @@ export const useProjectRolesDefinitionQuery: (input?: TenantApiOptions) => (vari
 export const useProjectSecretsQuery: (options?: TenantApiOptions) => (input: ProjectSecretsQueryVariables) => Promise<ProjectSecretsQueryResult>;
 
 // @public (undocumented)
-export const useRegenerateBackupCodesMutation: (input?: TenantApiOptions) => (variables: {}) => Promise<TenantMutationResponse<    {
+export const useRegenerateBackupCodesMutation: (input?: TenantApiOptions) => (variables: {
+    readonly currentPassword?: string;
+    readonly otpToken?: string;
+}) => Promise<TenantMutationResponse<    {
 readonly backupCodes: ReadonlyArray<string>;
-}, "OTP_NOT_ACTIVE">>;
+}, TenantApi.RegenerateBackupCodesErrorCode>>;
 
 // @public (undocumented)
 export const useRemoveGlobalIdentityRolesMutation: (input?: TenantApiOptions) => (variables: {

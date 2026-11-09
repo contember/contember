@@ -12,7 +12,7 @@ import { CreatePersonTokenCommand, InvalidateTokenCommand, MarkEmailVerifiedComm
 import { PersonTokenQuery } from '../queries/personToken/PersonTokenQuery.js'
 import { NextMailAttemptQuery } from '../queries/authLog/NextMailAttemptQuery.js'
 import { validateToken } from '../utils/index.js'
-import { normalizeEmail } from '../utils/email.js'
+import { EmailAddress } from '../utils/email.js'
 import { PersonToken } from '../type/index.js'
 import { UniqueViolationError } from '@contember/database'
 import { AuthLogService } from './AuthLogService.js'
@@ -42,11 +42,12 @@ export class EmailChangeManager {
 		dbContext: DatabaseContext,
 		permissionContext: PermissionContext,
 		person: PersonRow,
-		newEmail: string,
+		newEmail: EmailAddress,
 		mailOptions: MailOptions = {},
 		applyWithinTransaction?: (db: DatabaseContext) => Promise<void>,
 	): Promise<RequestEmailChangeResponse> {
-		const normalizedNewEmail = normalizeEmail(newEmail)
+		const recipient = newEmail.normalized()
+		const normalizedNewEmail = recipient.value
 		const validationError = await this.emailValidator.validateEmail(dbContext, normalizedNewEmail)
 		if (validationError !== null) {
 			return new ResponseError(validationError.error, validationError.errorMessage)
@@ -78,8 +79,8 @@ export class EmailChangeManager {
 			// ownership of the address being switched to, which is the whole point.
 			await this.mailer.sendEmailChangeVerifyEmail(
 				db,
+				recipient,
 				{
-					email: normalizedNewEmail,
 					token: result.token,
 					project: project?.name,
 					projectSlug: project?.slug,
@@ -87,6 +88,7 @@ export class EmailChangeManager {
 				{
 					variant: mailOptions.mailVariant || '',
 					projectId: project?.id ?? null,
+					recipientIdentityId: person.identity_id,
 				},
 			)
 		})
@@ -151,24 +153,28 @@ export class EmailChangeManager {
 		}
 
 		if (oldEmail) {
-			// Resolve the person's preferred project so a per-project
-			// EMAIL_CHANGE_NOTIFY template (and branding) is honoured, mirroring
-			// requestEmailChange. The token carries no project, so derive it from the
-			// person's own identity.
-			const permissionContext = this.permissionContextFactory.create(dbContext, {
-				id: person.identity_id,
-				roles: person.roles,
-			})
-			const projects = await this.projectManager.getProjectsByIdentity(dbContext, person.identity_id, permissionContext)
-			const project = getPreferredProject(projects, null)
-			await this.mailer.sendEmailChangeNotifyEmail(
-				dbContext,
-				{ email: oldEmail, newEmail, project: project?.name, projectSlug: project?.slug },
-				{ projectId: project?.id ?? null, variant: '' },
-			)
+			await this.notifyOldAddress(dbContext, person, newEmail)
 		}
 
 		return new ResponseOk({ personId: person.id, newEmail, [AuthLogService.Key]: authLogData })
+	}
+
+	/** Tells the previous address that the account now uses another one; `person` is the row from before the change. */
+	public async notifyOldAddress(dbContext: DatabaseContext, person: PersonRow, newEmail: string): Promise<void> {
+		// Resolve the person's preferred project so a per-project EMAIL_CHANGE_NOTIFY template (and branding) is
+		// honoured, mirroring requestEmailChange. No project is given here, so derive it from the person's own identity.
+		const permissionContext = this.permissionContextFactory.create(dbContext, {
+			id: person.identity_id,
+			roles: person.roles,
+		})
+		const projects = await this.projectManager.getProjectsByIdentity(dbContext, person.identity_id, permissionContext)
+		const project = getPreferredProject(projects, null)
+		await this.mailer.sendEmailChangeNotifyEmail(
+			dbContext,
+			person,
+			{ newEmail, project: project?.name, projectSlug: project?.slug },
+			{ projectId: project?.id ?? null, variant: '', recipientIdentityId: person.identity_id },
+		)
 	}
 }
 

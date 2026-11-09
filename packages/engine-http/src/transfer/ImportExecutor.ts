@@ -159,6 +159,7 @@ export class ImportExecutor {
 		await this.requireImportAccess(groupContainer, contentSchema.schema, authResult, options.project, 'content')
 		const contentDatabaseClient = projectContainer.connection.createClient(stage.schema, {})
 		const mapping = this.contentSchemaTransferMappingFactory.createContentSchemaMapping(contentSchema.schema)
+		this.requireMappedTables(mapping, options.tables, `content schema of project ${options.project}`)
 
 		return await contentDatabaseClient.transaction(async db => {
 			await this.disableTimeouts(db)
@@ -198,6 +199,7 @@ export class ImportExecutor {
 		await this.requireImportAccess(groupContainer, schema, authResult, options.project, 'system')
 		const systemDatabaseContext = projectContainer.systemDatabaseContext
 		const mapping = this.systemSchemaTransferMappingFactory.build()
+		this.requireMappedTables(mapping, options.tables, `system schema of project ${options.project}`)
 
 		return await systemDatabaseContext.client.transaction(async db => {
 			await this.disableTimeouts(db)
@@ -219,6 +221,9 @@ export class ImportExecutor {
 		it: CommandIterator<'importSequence'>,
 	): Promise<CommandIterator | null> {
 		const [options] = it.commandArgs
+		if (!Object.hasOwn(mapping.tables, options.table) || !Object.hasOwn(mapping.tables[options.table].columns, options.column)) {
+			throw new ImportError(`Unknown column ${options.table}.${options.column}`)
+		}
 
 		await db.query(
 			'SELECT setval(pg_get_serial_sequence(?, ?), ?)',
@@ -314,6 +319,15 @@ export class ImportExecutor {
 		}
 	}
 
+	/** The tables an import truncates must come from the same mapping an export of this schema lists. */
+	private requireMappedTables(mapping: TransferMapping, tableNames: readonly string[], target: string) {
+		for (const tableName of tableNames) {
+			if (!Object.hasOwn(mapping.tables, tableName)) {
+				throw new ImportError(`Table ${tableName} is not part of the ${target}`)
+			}
+		}
+	}
+
 	private async fetchStageBySlug(systemDatabaseContext: DatabaseContext, projectSlug: string, stageSlug: string) {
 		const stage = await systemDatabaseContext.queryHandler.fetch(new StageBySlugQuery(stageSlug))
 
@@ -374,7 +388,7 @@ export class ImportExecutor {
 		tableName: string,
 		columnNames: readonly string[],
 	): Promise<InsertContext> {
-		const tableMapping = mapping.tables[tableName]
+		const tableMapping = Object.hasOwn(mapping.tables, tableName) ? mapping.tables[tableName] : undefined
 		const columns = []
 
 		if (tableMapping === undefined) {
@@ -382,7 +396,7 @@ export class ImportExecutor {
 		}
 
 		for (const columnName of columnNames) {
-			const column = tableMapping.columns[columnName]
+			const column = Object.hasOwn(tableMapping.columns, columnName) ? tableMapping.columns[columnName] : undefined
 
 			if (column === undefined) {
 				throw new ImportError(`Unknown column ${tableName}.${columnName}`)

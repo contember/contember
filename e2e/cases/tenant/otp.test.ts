@@ -60,6 +60,22 @@ test('after confirmOtp, signIn with the matching otpToken succeeds', async () =>
 	expect(resp.body.data.signIn.result.token).toHaveLength(40)
 })
 
+test('a TOTP code that already signed in is refused the second time', async () => {
+	const tester = await createTester(emptySchema)
+	const email = `john-${rand()}@doe.com`
+	const password = 'HWGA51KKpJ4lSW'
+	await tester.tenant.signUp(email, password)
+	const token = await tester.tenant.signIn(email, password)
+	const secret = await enableOtp(token)
+	const otp = generateToken(secret)
+
+	const first = await executeGraphql('/tenant', signInMutation, { authorizationToken: loginToken, variables: { email, password, otp } })
+	expect(first.body.data.signIn.ok).toBe(true)
+
+	const second = await executeGraphql('/tenant', signInMutation, { authorizationToken: loginToken, variables: { email, password, otp } })
+	expect(second.body.data.signIn).toEqual({ ok: false, error: { code: 'INVALID_OTP_TOKEN' }, result: null })
+})
+
 test('disableOtp lifts the otpToken requirement on subsequent signIn', async () => {
 	const tester = await createTester(emptySchema)
 	const email = `john-${rand()}@doe.com`

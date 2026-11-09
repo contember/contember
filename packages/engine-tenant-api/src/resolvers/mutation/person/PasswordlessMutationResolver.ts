@@ -9,9 +9,19 @@ import {
 } from '../../../schema/index.js'
 import { TenantResolverContext } from '../../TenantResolverContext.js'
 import { CaptchaValidator, ConfigurationQuery, PermissionActions, RateLimiter } from '../../../model/index.js'
+import { EmailAddress } from '../../../model/utils/email.js'
+import { intervalToSeconds } from '../../../model/utils/interval.js'
 import { createErrorResponse } from '../../errorUtils.js'
 import { SignInResponseFactory } from '../../responseHelpers/SignInResponseFactory.js'
 import { PasswordlessSignInManager } from '../../../model/service/PasswordlessSignInManager.js'
+
+/** Refusals that depend on the account; with `passwordless.uniformResponse` they answer like a sent link. */
+const ACCOUNT_DEPENDENT_INIT_ERRORS: ReadonlySet<string> = new Set([
+	'PERSON_NOT_FOUND',
+	'PASSWORDLESS_DISABLED',
+	'IDP_REQUIRED',
+	'RATE_LIMIT_EXCEEDED',
+])
 
 export class PasswordlessMutationResolver
 	implements Pick<MutationResolvers, 'initSignInPasswordless' | 'signInPasswordless' | 'activatePasswordlessOtp'>
@@ -55,7 +65,8 @@ export class PasswordlessMutationResolver
 		const result = await this.passwordlessSignInManager.initSignInPasswordless({
 			db: context.db,
 			permissionContext: context.permissionContext,
-			email: args.email,
+			email: EmailAddress.parse(args.email),
+			emailInput: args.email,
 			mailVariant: args.options?.mailVariant ?? undefined,
 			mailProject: args.options?.mailProject ?? undefined,
 		})
@@ -64,6 +75,15 @@ export class PasswordlessMutationResolver
 			response: result,
 		})
 		if (!result.ok) {
+			// With passwordless globally off every address is refused alike, so there is nothing to hide.
+			const uniform = configuration.passwordless.uniformResponse && configuration.passwordless.enabled !== 'never'
+			if (uniform && ACCOUNT_DEPENDENT_INIT_ERRORS.has(result.error)) {
+				const expirationMs = intervalToSeconds(configuration.passwordless.expiration) * 1000
+				return {
+					ok: true,
+					result: { requestId: context.db.providers.uuid(), expiresAt: new Date(context.db.providers.now().getTime() + expirationMs) },
+				}
+			}
 			if (result.error === 'PERSON_NOT_FOUND' && !configuration.login.revealUserExists) {
 				// If the user does not exist, we don't want to reveal that
 				return createErrorResponse('PASSWORDLESS_DISABLED', 'Passwordless sign-in is disabled for this person')

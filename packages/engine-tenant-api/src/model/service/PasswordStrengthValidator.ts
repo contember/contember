@@ -4,6 +4,9 @@ import { WeakPasswordReason } from '../../schema/index.js'
 import { Response, ResponseError, ResponseOk } from '../utils/Response.js'
 import { HibpChecker, NoopHibpChecker } from './HibpChecker.js'
 
+/** bcrypt ignores everything after the first 72 bytes, so a longer password would protect less than its owner assumes. */
+export const MAX_PASSWORD_BYTES = 72
+
 export class PasswordStrengthValidator {
 	constructor(
 		private readonly hibpChecker: HibpChecker = new NoopHibpChecker(),
@@ -19,6 +22,13 @@ export class PasswordStrengthValidator {
 			weakPasswordReasons: WeakPasswordReason[]
 		}>
 	> {
+		// Checked alone and first: the other rules would run on input that cannot be stored as given.
+		if (Buffer.byteLength(password, 'utf8') > MAX_PASSWORD_BYTES) {
+			return new ResponseError(errorCode, `Password is too long. Maximum length is ${MAX_PASSWORD_BYTES} bytes (UTF-8).`, {
+				weakPasswordReasons: ['TOO_LONG'],
+			})
+		}
+
 		const failureReasons: WeakPasswordReason[] = []
 		const developerMessage: string[] = []
 

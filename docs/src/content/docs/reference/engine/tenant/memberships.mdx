@@ -122,6 +122,8 @@ Visibility is enforced per caller and gated by the `person:list` permission:
 - A caller without `person:list` sees **exactly the members reachable via `project.members`** — for each project the caller may view members of, the persons behind the visible memberships, with the same per-role filtering that `project.members` applies.
 - A caller who may not list anyone gets an empty list rather than an error.
 
+`personById` follows the same rule: it answers `null` for a person the `persons` listing would not show the caller. A person always reads itself.
+
 The projection deliberately omits password hashes and TOTP secrets. See [two-factor](/reference/engine/tenant/two-factor) for the `otpEnabled` / `emailOtpEnabled` MFA flags.
 
 ## Global identity roles

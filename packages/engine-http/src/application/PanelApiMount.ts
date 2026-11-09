@@ -6,6 +6,8 @@ export interface PanelApiMountArgs {
 	/** Route mask relative to the panel's API root, e.g. `actions/:projectSlug`. */
 	readonly path: string
 	readonly controller: HttpController
+	/** The API receives credentials, so its logged request bodies are masked; see `RouteOptions`. */
+	readonly carriesCredentials?: boolean
 }
 
 /** What {@link PanelApiMount.mount} needs of the application it registers into. */

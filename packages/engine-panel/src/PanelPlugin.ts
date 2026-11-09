@@ -45,7 +45,9 @@ export class PanelPlugin implements Plugin {
 						// building (`${apiBaseUrl}${path}`) needs no special cases. Only tenant takes anonymous
 						// callers — it is the one the sign-in screen talks to before there is a session.
 						// Content and system have no pre-sign-in consumer.
-						it.addRoute('panel-api', `${basePath}/api/tenant`, api.create(tenantApiMiddlewareFactory.create(), { allowAnonymous: true }))
+						it.addRoute('panel-api', `${basePath}/api/tenant`, api.create(tenantApiMiddlewareFactory.create(), { allowAnonymous: true }), {
+							carriesCredentials: true,
+						})
 						it.addRoute(
 							'panel-api',
 							`${basePath}/api/content/:projectSlug/:stageSlug`,

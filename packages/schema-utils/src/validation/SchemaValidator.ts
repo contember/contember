@@ -26,10 +26,15 @@ export class SchemaValidator {
 		const actionsErrors = actionsValidator.validate(schema.actions)
 
 		const allErrors = [...aclErrors, ...modelErrors, ...validationErrors, ...actionsErrors]
+		return SchemaValidator.filterSkipped(allErrors, skippedErrors)
+	}
+
+	/** Drops the errors a migration's `skippedErrors` declares, matched by code and, when given, by path. */
+	public static filterSkipped(errors: ValidationError[], skippedErrors: readonly SchemaValidatorSkippedErrors[]): ValidationError[] {
 		if (skippedErrors.length === 0) {
-			return allErrors
+			return errors
 		}
-		return allErrors.filter(
+		return errors.filter(
 			err =>
 				!skippedErrors.some(
 					rule =>

@@ -70,4 +70,7 @@ const errorToField: Record<ChangeMyProfileErrorCode, keyof ChangeMyProfileFormVa
 	EMAIL_ALREADY_EXISTS: 'email',
 	NOT_A_PERSON: undefined,
 	RATE_LIMIT_EXCEEDED: undefined,
+	REAUTHENTICATION_REQUIRED: undefined,
+	INVALID_PASSWORD: undefined,
+	INVALID_OTP_TOKEN: undefined,
 }

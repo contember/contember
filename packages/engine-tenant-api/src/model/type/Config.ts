@@ -5,9 +5,11 @@ import { Interval } from '../../schema/types.js'
 export type ConfigRow = {
 	signup_require_email_verification: boolean
 	require_email_change_verification: boolean
+	email_change_require_reauthentication: boolean
 	passwordless_enabled: ConfigPolicy
 	passwordless_url: string | null
 	passwordless_expiration: IPostgresInterval
+	passwordless_uniform_response: boolean
 	password_min_length: number
 	password_require_uppercase: number
 	password_require_lowercase: number
@@ -16,6 +18,7 @@ export type ConfigRow = {
 	password_pattern: string | null
 	password_check_blacklist: boolean
 	password_check_hibp: boolean
+	password_revoke_sessions_on_change: boolean
 	login_base_backoff: IPostgresInterval
 	login_max_backoff: IPostgresInterval
 	login_attempt_window: IPostgresInterval
@@ -24,10 +27,12 @@ export type ConfigRow = {
 	login_default_token_expiration: IPostgresInterval
 	login_max_token_expiration: IPostgresInterval | null
 	login_mfa_grace_duration: IPostgresInterval
+	login_mfa_change_require_reauthentication: boolean
 	login_anomaly_detection_enabled: boolean
 	login_anomaly_history_size: number
 	login_anomaly_email_threshold: number
 	login_anomaly_step_up_threshold: number
+	login_anomaly_missing_signal_is_new: boolean
 	captcha_provider: CaptchaProvider | null
 	captcha_secret: Buffer | null
 	captcha_secret_version: number | null

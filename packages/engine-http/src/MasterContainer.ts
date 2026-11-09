@@ -1,4 +1,5 @@
 import { Builder } from '@contember/dic'
+import { createEgressGuard } from '@contember/engine-common'
 import { SystemContainerFactory } from '@contember/engine-system-api'
 import { TenantContainerFactory } from '@contember/engine-tenant-api'
 import { ModificationHandlerFactory } from '@contember/schema-migrations'
@@ -115,7 +116,8 @@ export class MasterContainerFactory {
 			.addService('tenantConfigResolver', () => tenantConfigResolver)
 			.addService('plugins', () => plugins)
 			.addService('providers', () => createProviders())
-			.addService('tenantContainerFactory', ({ providers }) => new TenantContainerFactory(providers))
+			.addService('egressGuard', ({ serverConfig }) => createEgressGuard(serverConfig.egress))
+			.addService('tenantContainerFactory', ({ providers, egressGuard }) => new TenantContainerFactory(providers, egressGuard))
 			.addService('modificationHandlerFactory', () => new ModificationHandlerFactory(ModificationHandlerFactory.defaultFactoryMap))
 			.addService(
 				'executionContainerFactory',
@@ -320,12 +322,12 @@ export class MasterContainerFactory {
 					},
 				) => {
 					it.addRoute('content', '/content/:projectSlug/:stageSlug', contentApiMiddlewareFactory.create())
-					it.addRoute('tenant', '/tenant', tenantApiMiddlewareFactory.create())
+					it.addRoute('tenant', '/tenant', tenantApiMiddlewareFactory.create(), { carriesCredentials: true })
 					// Register under a dedicated, non-GraphQL module so it is excluded from `forceHttpOk`
 					// status coercion (graphqlModules = content/tenant/system): the OIDC Back-Channel Logout
 					// response is not a GraphQL `{data,errors}` envelope and its HTTP status is part of the
 					// spec contract (the IdP relies on a non-2xx status to detect/retry a failed logout).
-					it.addRoute('oidc', '/oidc/backchannel-logout', oidcBackchannelLogoutMiddlewareFactory.create())
+					it.addRoute('oidc', '/oidc/backchannel-logout', oidcBackchannelLogoutMiddlewareFactory.create(), { carriesCredentials: true })
 					it.addRoute('system', '/system/:projectSlug', systemApiMiddlewareFactory.create())
 					it.addRoute('transfer', '/import', importApiMiddlewareFactory.create())
 					it.addRoute('transfer', '/export', exportApiMiddlewareFactory.create())

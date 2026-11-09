@@ -27,6 +27,18 @@ export class CryptoWrapper {
 		}
 	}
 
+	/**
+	 * HMAC-SHA256 under a key derived (HKDF) from the encryption key for `purpose`, so signatures never use the
+	 * encryption key itself and a signature made for one purpose does not verify for another.
+	 */
+	sign(purpose: string, value: Buffer): Buffer {
+		if (!this.encryptionKey) {
+			throw new Error('encryption key not provided')
+		}
+		const signingKey = Buffer.from(crypto.hkdfSync('sha256', this.encryptionKey, Buffer.alloc(0), `contember-signing:${purpose}`, 32))
+		return crypto.createHmac('sha256', signingKey).update(value).digest()
+	}
+
 	async decrypt(value: Buffer, version: number): Promise<{ value: Buffer; needsReEncrypt: boolean }> {
 		if (!this.encryptionKey) {
 			throw new Error('encryption key not provided')

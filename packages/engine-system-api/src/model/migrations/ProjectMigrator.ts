@@ -1,4 +1,4 @@
-import { calculateMigrationChecksum, Migration, MigrationDescriber, MigrationVersionHelper } from '@contember/schema-migrations'
+import { calculateMigrationChecksum, Migration, MigrationDescriber, MigrationVersionHelper, validateAddedSql } from '@contember/schema-migrations'
 import { Client, DatabaseMetadata, QueryError, wrapIdentifier } from '@contember/database'
 import { Schema } from '@contember/schema'
 import { SaveMigrationCommand } from '../commands/index.js'
@@ -6,7 +6,7 @@ import { Stage } from '../dtos/index.js'
 import { DatabaseContext } from '../database/index.js'
 import { ExecutedMigrationsResolver } from './ExecutedMigrationsResolver.js'
 import { MigrateErrorCode } from '../../schema/index.js'
-import { calculateSchemaChecksum, emptySchema, SchemaValidator, SchemaValidatorSkippedErrors } from '@contember/schema-utils'
+import { calculateSchemaChecksum, emptySchema, SchemaValidator, SchemaValidatorSkippedErrors, ValidationError } from '@contember/schema-utils'
 import { MigrationsDatabaseMetadataResolverStoreFactory, SchemaDatabaseMetadataResolverStore } from '../metadata/index.js'
 import { ContentMigrationQuery, MigrationInput, SchemaStateInput } from './MigrationInput.js'
 import { ContentQueryExecutor } from '../dependencies/index.js'
@@ -166,6 +166,17 @@ export class ProjectMigrator {
 			throw new ProjectNotEmptyError(latestVersion, 'Cannot apply snapshot: project already has executed migrations')
 		}
 
+		let snapshotSchema = emptySchema
+		const sqlErrors: ValidationError[] = []
+		for (const modification of snapshot.modifications) {
+			const { schema: next } = this.migrationDescriber.describeModification(snapshotSchema, modification, { formatVersion: snapshot.formatVersion })
+			sqlErrors.push(...validateAddedSql(snapshotSchema, next))
+			snapshotSchema = next
+		}
+		// A snapshot does not map its modifications to migrations, so any covered migration's skip applies.
+		const coveredSkippedErrors = sortedCovers.flatMap(it => it.type === 'schema' ? it.skippedErrors ?? [] : [])
+		this.assertNoSqlErrors(latestVersion, SchemaValidator.filterSkipped(sqlErrors, coveredSkippedErrors))
+
 		const metadataStore = this.migrationsDatabaseMetadataResolverStoreFactory.create(db)
 		let schema = emptySchema
 		for (const modification of snapshot.modifications) {
@@ -286,12 +297,20 @@ export class ProjectMigrator {
 				if (described.length === 0) {
 					continue
 				}
-				const latestModification = described[described.length - 1]
-				schema = latestModification.schema
 				skippedErrors = [
 					...skippedErrors.filter(it => it.skipUntil && MigrationVersionHelper.extractVersion(it.skipUntil) >= migration.version),
 					...migration.skippedErrors ?? [],
 				]
+				// Per modification, so a view dropped and recreated within the migration is checked too.
+				const sqlErrors: ValidationError[] = []
+				let previousSchema = schema
+				for (const { schema: next } of described) {
+					sqlErrors.push(...validateAddedSql(previousSchema, next))
+					previousSchema = next
+				}
+				this.assertNoSqlErrors(migration.version, SchemaValidator.filterSkipped(sqlErrors, skippedErrors))
+				const latestModification = described[described.length - 1]
+				schema = latestModification.schema
 				const errors = SchemaValidator.validate(schema, skippedErrors)
 				if (errors.length > 0) {
 					throw new InvalidSchemaError(
@@ -314,6 +333,15 @@ export class ProjectMigrator {
 			)
 		}
 		return toExecute
+	}
+
+	private assertNoSqlErrors(version: string, errors: readonly ValidationError[]): void {
+		if (errors.length > 0) {
+			throw new InvalidSchemaError(
+				version,
+				'Migration contains invalid SQL: \n' + errors.map(it => `${it.path.join('.')}: [${it.code}] ${it.message}`).join('\n'),
+			)
+		}
 	}
 
 	private sqlPreprocessor(text: string, variables: MigrationVariables): string {

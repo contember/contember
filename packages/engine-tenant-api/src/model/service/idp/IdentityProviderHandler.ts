@@ -76,6 +76,12 @@ export interface IdentityProviderHandler<Configuration extends {}> {
 
 	validateConfiguration: (config: unknown) => Configuration
 
+	/**
+	 * Checks beyond the parsed shape, run by `addIDP` / `updateIDP` only, so a configuration stored before a check
+	 * existed keeps authenticating. Throws an `InvalidIDPConfigurationError`.
+	 */
+	validateWrittenConfiguration?: (configuration: Configuration) => void
+
 	getPublicConfiguration?: (config: Configuration) => Partial<Configuration>
 
 	/**

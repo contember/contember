@@ -59,7 +59,7 @@ export class ChangePasswordMutationResolver implements MutationResolvers {
 			action: PermissionActions.PERSON_CHANGE_MY_PASSWORD,
 			message: 'You are not allowed to change password',
 		})
-		const response = await this.passwordChangeManager.changeMyPassword(context.db, person, args.currentPassword, args.newPassword)
+		const response = await this.passwordChangeManager.changeMyPassword(context.db, person, args.currentPassword, args.newPassword, context.apiKeyId)
 		await context.logAuthAction({
 			type: 'password_change',
 			response: response,

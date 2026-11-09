@@ -1,25 +1,28 @@
-import { DatabaseQuery, DatabaseQueryable, Literal, SelectBuilder } from '@contember/database'
+import { DatabaseQuery, DatabaseQueryable, Literal, Operator, SelectBuilder } from '@contember/database'
 
+/**
+ * Seconds until the next sign-in attempt is allowed. A known person is keyed by its id, so every spelling of its
+ * address shares one counter; an unknown address is keyed by its normalized form, as recorded for UNKNOWN_EMAIL.
+ */
 export class NextLoginAttemptQuery extends DatabaseQuery<number> {
 	constructor(
-		private readonly email: string,
+		private readonly key: { readonly personId: string } | { readonly normalizedEmail: string },
 	) {
 		super()
 	}
 
 	async fetch({ db }: DatabaseQueryable): Promise<number> {
+		const key = this.key
 		const qb = SelectBuilder.create()
 			.with('cfg', it => it.from('config'))
-			.with('last_successful_reset', it =>
-				it
+			.with('last_successful_reset', it => {
+				const resets = it
 					.select(new Literal('MAX(person_auth_log.created_at)'), 'created_at')
 					.from('person_auth_log')
-					.join('person', 'person', it => it.columnsEq(['person', 'id'], ['person_auth_log', 'person_id']))
-					.where({
-						type: 'password_reset',
-						success: true,
-						email: this.email,
-					}))
+					.where({ type: 'password_reset', success: true })
+				// An unknown address has no person, hence no password reset to restart its window.
+				return 'personId' in key ? resets.where({ person_id: key.personId }) : resets.where(new Literal('false'))
+			})
 			.with('window_start', it =>
 				it
 					.select(
@@ -39,10 +42,14 @@ export class NextLoginAttemptQuery extends DatabaseQuery<number> {
 					.from('person_auth_log')
 					.from('window_start')
 					.where({
-						person_input_identifier: this.email,
 						type: 'login',
 						success: false,
 					})
+					.where(
+						'personId' in key
+							? { person_id: key.personId }
+							: where => where.isNull('person_id').compare('person_input_identifier', Operator.eq, key.normalizedEmail),
+					)
 					.where(new Literal('person_auth_log.created_at >= window_start.start_time')))
 			.select(
 				new Literal(`

@@ -84,7 +84,7 @@ const schema: DocumentNode = gql`
 		createSessionToken(email: String, personId: String, expiration: Int, options: SignInOptions): CreateSessionTokenResponse
 		signOut(all: Boolean): SignOutResponse
 		changeProfile(personId: String!, email: String, name: String): ChangeProfileResponse
-		changeMyProfile(email: String, name: String): ChangeMyProfileResponse
+		changeMyProfile(email: String, name: String, currentPassword: String, otpToken: String): ChangeMyProfileResponse
 		changePassword(personId: String!, password: String!): ChangePasswordResponse
 		changeMyPassword(currentPassword: String!, newPassword: String!): ChangeMyPasswordResponse
 
@@ -124,14 +124,14 @@ const schema: DocumentNode = gql`
 		"""
 		disconnectMyIdentityProvider(id: String!): DisconnectIDPResponse
 
-		prepareOtp(label: String): PrepareOtpResponse
+		prepareOtp(label: String, currentPassword: String, otpToken: String): PrepareOtpResponse
 		confirmOtp(otpToken: String!): ConfirmOtpResponse
-		disableOtp: DisableOtpResponse
-		regenerateBackupCodes: RegenerateBackupCodesResponse
+		disableOtp(currentPassword: String, otpToken: String): DisableOtpResponse
+		regenerateBackupCodes(currentPassword: String, otpToken: String): RegenerateBackupCodesResponse
 
 		initEmailOtp: InitEmailOtpResponse
 		confirmEmailOtp(otpToken: String!): ConfirmEmailOtpResponse
-		disableEmailOtp: DisableEmailOtpResponse
+		disableEmailOtp(currentPassword: String, otpToken: String): DisableEmailOtpResponse
 
 		disablePerson(personId: String!): DisablePersonResponse
 		enablePerson(personId: String!): EnablePersonResponse
@@ -245,12 +245,27 @@ const schema: DocumentNode = gql`
 		ConfigSignup.requireEmailVerification. Defaults to false.
 		"""
 		requireVerification: Boolean!
+		"""
+		When true, a changeMyProfile e-mail change requires the current password or a
+		TOTP code (currentPassword / otpToken). A change applied directly also sends a
+		notice to the old address and signs out the person's other sessions.
+		Defaults to false.
+		"""
+		requireReauthentication: Boolean!
 	}
 
 	type ConfigPasswordless {
 		enabled: ConfigPolicy!
 		url: String
 		expiration: Interval!
+		"""
+		When true, initSignInPasswordless answers an unknown address, a person with
+		passwordless sign-in disabled, a person bound to an identity provider and a
+		throttled address like a real request (ok with a random requestId), without
+		sending a mail. Does not apply while passwordless is globally never.
+		Defaults to false.
+		"""
+		uniformResponse: Boolean!
 	}
 
 	type ConfigPassword {
@@ -262,6 +277,8 @@ const schema: DocumentNode = gql`
 		pattern: String
 		checkBlacklist: Boolean!
 		checkHibp: Boolean!
+		"When true, setting a new password disables the person's other sessions and unused tokens."
+		revokeSessionsOnChange: Boolean!
     }
 
 	type ConfigLogin {
@@ -280,6 +297,12 @@ const schema: DocumentNode = gql`
 		defaultTokenExpiration: Interval!
 		maxTokenExpiration: Interval
 		mfaGraceDuration: Interval!
+		"""
+		When true, disabling TOTP or e-mail OTP, rotating an active TOTP (prepareOtp)
+		and regenerating backup codes require the current password or a current TOTP
+		code (currentPassword / otpToken). Defaults to false.
+		"""
+		mfaChangeRequiresReauthentication: Boolean!
 		anomalyDetection: ConfigLoginAnomalyDetection!
     }
 
@@ -300,6 +323,12 @@ const schema: DocumentNode = gql`
 		historySize: Int!
 		emailThreshold: Int!
 		stepUpThreshold: Int!
+		"""
+		When true, a signal missing from the current sign-in (no geo header, no
+		user-agent, no IP) scores as new once the history has a value for it.
+		Defaults to false: a missing signal is ignored.
+		"""
+		missingSignalIsNew: Boolean!
 	}
 
 	"""
@@ -388,6 +417,7 @@ const schema: DocumentNode = gql`
 
 	input ConfigEmailChangeInput {
 		requireVerification: Boolean
+		requireReauthentication: Boolean
 	}
 
 	enum ConfigPolicy {
@@ -401,6 +431,7 @@ const schema: DocumentNode = gql`
 		enabled: ConfigPolicy
 		url: String
 		expiration: Interval
+		uniformResponse: Boolean
 	}
 
 	input ConfigPasswordInput {
@@ -412,6 +443,7 @@ const schema: DocumentNode = gql`
 		pattern: String
 		checkBlacklist: Boolean
 		checkHibp: Boolean
+		revokeSessionsOnChange: Boolean
     }
 
 	input ConfigLoginInput {
@@ -423,6 +455,7 @@ const schema: DocumentNode = gql`
 		defaultTokenExpiration: Interval
 		maxTokenExpiration: Interval
 		mfaGraceDuration: Interval
+		mfaChangeRequiresReauthentication: Boolean
 		anomalyDetection: ConfigLoginAnomalyDetectionInput
     }
 
@@ -431,6 +464,7 @@ const schema: DocumentNode = gql`
 		historySize: Int
 		emailThreshold: Int
 		stepUpThreshold: Int
+		missingSignalIsNew: Boolean
 	}
 
 	"""
@@ -689,6 +723,9 @@ const schema: DocumentNode = gql`
 		INVALID_EMAIL_FORMAT
 		EMAIL_ALREADY_EXISTS
 		RATE_LIMIT_EXCEEDED
+		REAUTHENTICATION_REQUIRED
+		INVALID_PASSWORD
+		INVALID_OTP_TOKEN
 	}
 
 	# === changePassword ===
@@ -713,6 +750,8 @@ const schema: DocumentNode = gql`
 	
 	enum WeakPasswordReason {
 		TOO_SHORT
+		"Longer than 72 bytes (UTF-8), the most a password hash covers. Only reported when a password is set."
+		TOO_LONG
 		MISSING_UPPERCASE
 		MISSING_LOWERCASE
 		MISSING_DIGIT
@@ -915,7 +954,7 @@ const schema: DocumentNode = gql`
 		"""
 		When true, a non-exclusive provider may only auto-link to / sign in an
 		existing account by e-mail if the provider asserts the e-mail is verified.
-		Defaults to false.
+		addIDP stores true when the option is omitted.
 		"""
 		requireVerifiedEmail: Boolean!
 		"""
@@ -1560,7 +1599,20 @@ const schema: DocumentNode = gql`
 
 	type PrepareOtpResponse {
 		ok: Boolean!
+		error: PrepareOtpError
 		result: PrepareOtpResult
+	}
+
+	type PrepareOtpError {
+		code: PrepareOtpErrorCode!
+		developerMessage: String!
+	}
+
+	enum PrepareOtpErrorCode {
+		REAUTHENTICATION_REQUIRED
+		INVALID_PASSWORD
+		INVALID_OTP_TOKEN
+		RATE_LIMIT_EXCEEDED
 	}
 
 	type PrepareOtpResult {
@@ -1605,6 +1657,10 @@ const schema: DocumentNode = gql`
 	enum DisableOtpErrorCode {
 		OTP_NOT_ACTIVE
 		MFA_REQUIRED
+		REAUTHENTICATION_REQUIRED
+		INVALID_PASSWORD
+		INVALID_OTP_TOKEN
+		RATE_LIMIT_EXCEEDED
 	}
 
 	type RegenerateBackupCodesResponse {
@@ -1620,6 +1676,10 @@ const schema: DocumentNode = gql`
 
 	enum RegenerateBackupCodesErrorCode {
 		OTP_NOT_ACTIVE
+		REAUTHENTICATION_REQUIRED
+		INVALID_PASSWORD
+		INVALID_OTP_TOKEN
+		RATE_LIMIT_EXCEEDED
 	}
 
 	type RegenerateBackupCodesResult {
@@ -1675,6 +1735,10 @@ const schema: DocumentNode = gql`
 	enum DisableEmailOtpErrorCode {
 		EMAIL_OTP_NOT_ACTIVE
 		MFA_REQUIRED
+		REAUTHENTICATION_REQUIRED
+		INVALID_PASSWORD
+		INVALID_OTP_TOKEN
+		RATE_LIMIT_EXCEEDED
 	}
 
 	type DisablePersonResponse {

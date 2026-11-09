@@ -57,8 +57,8 @@ export class EmailVerificationManager {
 
 		await this.mailer.sendEmailVerificationEmail(
 			dbContext,
+			person,
 			{
-				email: person.email,
 				token: result.token,
 				project: project?.name,
 				projectSlug: project?.slug,
@@ -66,6 +66,7 @@ export class EmailVerificationManager {
 			{
 				variant: mailOptions.mailVariant || '',
 				projectId: project?.id ?? null,
+				recipientIdentityId: person.identity_id,
 			},
 		)
 		return true

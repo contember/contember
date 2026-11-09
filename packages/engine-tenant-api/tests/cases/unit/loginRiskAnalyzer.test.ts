@@ -5,11 +5,14 @@ import { ipPrefix, LoginRiskAnalyzer, PriorLogin, RiskWeight } from '../../../sr
 const hash = (value: crypto.BinaryLike, algo: string) => crypto.createHash(algo).update(value).digest()
 const analyzer = new LoginRiskAnalyzer(hash)
 
-const policy = (overrides: Partial<{ enabled: boolean; historySize: number; emailThreshold: number; stepUpThreshold: number }> = {}) => ({
+const policy = (
+	overrides: Partial<{ enabled: boolean; historySize: number; emailThreshold: number; stepUpThreshold: number; missingSignalIsNew: boolean }> = {},
+) => ({
 	enabled: true,
 	historySize: 10,
 	emailThreshold: 1,
 	stepUpThreshold: 3,
+	missingSignalIsNew: false,
 	...overrides,
 })
 
@@ -190,6 +193,21 @@ describe('LoginRiskAnalyzer.score', () => {
 		const result = analyzer.score({ geoCountry: null, deviceFingerprint: 'fp-known', ip: '10.0.0.5' }, history, policy())
 		expect(result.reasons).not.toContain('new_country')
 		expect(result.score).toBe(0)
+	})
+
+	test('with missingSignalIsNew, a withheld signal scores as new once a baseline exists', () => {
+		const history = [prior()]
+		const result = analyzer.score({ geoCountry: null, deviceFingerprint: null, ip: '10.0.0.5' }, history, policy({ missingSignalIsNew: true }))
+		expect(result.reasons).toEqual(['missing_country', 'missing_device'])
+		expect(result.score).toBe(RiskWeight.newCountry + RiskWeight.newDevice)
+		expect(result.action).toBe('stepUp')
+	})
+
+	test('with missingSignalIsNew, a withheld signal without a baseline still does not fire', () => {
+		const history = [prior({ geoCountry: null, deviceFingerprint: null })]
+		const result = analyzer.score({ geoCountry: null, deviceFingerprint: null, ip: null }, history, policy({ missingSignalIsNew: true }))
+		expect(result.reasons).toEqual(['missing_ip'])
+		expect(result.score).toBe(RiskWeight.newIpPrefix)
 	})
 
 	test('thresholds are honored: a higher email threshold suppresses the email action', () => {

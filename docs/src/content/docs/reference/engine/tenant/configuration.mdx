@@ -16,6 +16,7 @@ query {
     }
     emailChange {
       requireVerification
+      requireReauthentication
     }
     password {
       minLength
@@ -26,6 +27,7 @@ query {
       pattern
       checkBlacklist
       checkHibp
+      revokeSessionsOnChange
     }
     login {
       revealUserExists
@@ -35,11 +37,13 @@ query {
       attemptWindow
       defaultTokenExpiration
       maxTokenExpiration
+      mfaChangeRequiresReauthentication
     }
     passwordless {
       enabled
       url
       expiration
+      uniformResponse
     }
     captcha {
       provider
@@ -102,6 +106,7 @@ Prefer keeping configuration in version control? Describe it in a typed `tenant.
 | Field | Default | Notes |
 |---|---|---|
 | `requireVerification` | `false` | Self-service `changeMyProfile` e-mail changes go through `confirmEmailChange` against a token mailed to the new address, instead of swapping immediately. Independent of `signup.requireEmailVerification`. See [e-mail verification](/reference/engine/tenant/email-verification#e-mail-change-verification). |
+| `requireReauthentication` | `false` | Self-service `changeMyProfile` e-mail changes require the current password (`currentPassword`) or a current TOTP code (`otpToken`). A direct change also notifies the old address and disables the person's other sessions. A person with neither a password nor TOTP (e.g. signed up through an identity provider) cannot change its own e-mail while this is on. Opt-in. Available since 2.2. See [profile](/reference/engine/tenant/profile#re-authentication-for-an-e-mail-change). |
 
 ### `password`
 
@@ -114,6 +119,7 @@ See [password policy](/reference/engine/tenant/password-policy) for individual f
 | `pattern` | `null` | Optional regex; pattern violations yield `INVALID_PATTERN` |
 | `checkBlacklist` | `true` | 10k-most-common list with leetspeak normalization |
 | `checkHibp` | `false` | HIBP k-anonymity check; opt-in. See [anti-abuse](/reference/engine/tenant/anti-abuse#hibp-password-check). Available since 2.2. |
+| `revokeSessionsOnChange` | `false` | When a password is set (`resetPassword`, `changePassword`, `changeMyPassword`), disable the person's sessions and mark its unused tokens as used, in the same transaction. `changeMyPassword` keeps the session that made the change. Opt-in. Available since 2.2. |
 
 ### `login`
 
@@ -126,7 +132,8 @@ See [password policy](/reference/engine/tenant/password-policy) for individual f
 | `attemptWindow` | `PT5M` | How long failed attempts are remembered. |
 | `defaultTokenExpiration` | `PT30M` | Session token lifetime when the client omits `expiration`. |
 | `maxTokenExpiration` | `6 months` | Hard cap on client-requested `expiration`. |
-| `anomalyDetection` | *(disabled)* | *(since 2.2)* Sign-in [anomaly detection](/reference/engine/tenant/anomaly-detection) policy: `{ enabled, historySize, emailThreshold, stepUpThreshold }`. Opt-in; off by default. |
+| `mfaChangeRequiresReauthentication` | `false` | *(since 2.2)* `disableOtp`, `disableEmailOtp`, `regenerateBackupCodes` and a `prepareOtp` that rotates an active TOTP require the current password (`currentPassword`) or a current TOTP code (`otpToken`). See [two-factor — re-authentication](/reference/engine/tenant/two-factor#re-authentication-for-mfa-changes). Opt-in. |
+| `anomalyDetection` | *(disabled)* | *(since 2.2)* Sign-in [anomaly detection](/reference/engine/tenant/anomaly-detection) policy: `{ enabled, historySize, emailThreshold, stepUpThreshold, missingSignalIsNew }`. Opt-in; off by default. |
 
 Intervals follow ISO 8601 duration syntax (`PT5M`, `PT1H`, `P1D`, …).
 

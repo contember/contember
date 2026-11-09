@@ -27,7 +27,7 @@ import { VariablesQueryResolver } from './graphql/resolvers/query/VariablesQuery
 import { VariablesManager } from './model/VariablesManager.js'
 import { AccessEvaluator, Authorizator } from '@contember/authorization'
 import { ActionsPermissionsFactory } from './authorization/index.js'
-import { WebhookFetcherNative } from './dispatch/WebhookFetcher.js'
+import { createWebhookFetcher } from './dispatch/WebhookFetcher.js'
 import { ActionsMetrics } from './ActionsMetrics.js'
 
 export {
@@ -74,8 +74,9 @@ export default class ActionsPlugin implements Plugin {
 				.addService('actions_eventRepository', () => {
 					return new EventsRepository()
 				})
-				.addService('actions_eventDispatcher', ({ actions_eventRepository, actions_variableManager, tracer, serverConfig }) => {
-					const webhookTargetHandler = new WebhookTargetHandler(new WebhookFetcherNative(), tracer, {
+				.addService('actions_eventDispatcher', ({ actions_eventRepository, actions_variableManager, tracer, serverConfig, egressGuard }) => {
+					const webhookFetcher = createWebhookFetcher(egressGuard)
+					const webhookTargetHandler = new WebhookTargetHandler(webhookFetcher, tracer, {
 						propagateToWebhooks: serverConfig.telemetry?.traces?.propagateToWebhooks ?? true,
 					})
 					const targetHandlerResolver = new TargetHandlerResolver(webhookTargetHandler)
@@ -127,7 +128,7 @@ export default class ActionsPlugin implements Plugin {
 							debugMode,
 							actions_dispatchWorkerSupervisorFactory,
 						)
-						it.addRoute('actions', '/actions/:projectSlug', actionsMiddlewareFactory.create())
+						it.addRoute('actions', '/actions/:projectSlug', actionsMiddlewareFactory.create(), { carriesCredentials: true })
 						it.addWebsocketRoute('actions', '/actions/_worker', actionsWebsocketMiddlewareFactory.create())
 						// Does nothing unless the panel is served; when it is, the panel's access gate applies
 						// and the UI learns the actions module has an API to talk to.
@@ -135,6 +136,7 @@ export default class ActionsPlugin implements Plugin {
 							name: 'actions',
 							path: 'actions/:projectSlug',
 							controller: actionsMiddlewareFactory.create(),
+							carriesCredentials: true,
 						})
 					},
 				)

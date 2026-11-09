@@ -48,8 +48,8 @@ test('MFA required + no factor + no code → MFA_ENROLLMENT_REQUIRED with pendin
 		query: signInWithMfa({ email, password }),
 		executes: [
 			getConfigSql(),
-			getNextLoginAttemptSql(email),
 			getPersonByEmailSql({ email, response: { personId, identityId, password, roles: ['editor'] } }),
+			getNextLoginAttemptSql({ personId }),
 			localAuthDisablingIdpsSql({ personId }),
 			requiringPolicy(),
 			getAllProjectRolesByIdentitySql({ identityId }),
@@ -114,8 +114,8 @@ test('MFA required + valid pending code → enrolls (pending→active), returns 
 		query: signInWithMfa({ email, password, otpToken: otpAuth.generate(otp) }),
 		executes: [
 			getConfigSql(),
-			getNextLoginAttemptSql(email),
 			getPersonByEmailSql({ email, response: { personId, identityId, password, roles: ['editor'], otpPendingUri: otp.uri } }),
+			getNextLoginAttemptSql({ personId }),
 			localAuthDisablingIdpsSql({ personId }),
 			requiringPolicy(),
 			getAllProjectRolesByIdentitySql({ identityId }),
@@ -124,9 +124,9 @@ test('MFA required + valid pending code → enrolls (pending→active), returns 
 			{
 				// confirmOtp promotes pending → active (only while a pending secret is present).
 				sql: `update "tenant"."person_mfa"
-					set "totp_secret" = "totp_pending_secret", "totp_secret_version" = "totp_pending_version", "totp_activated_at" = ?, "totp_pending_secret" = ?, "totp_pending_version" = ?, "totp_pending_created_at" = ?
+					set "totp_secret" = "totp_pending_secret", "totp_secret_version" = "totp_pending_version", "totp_activated_at" = ?, "totp_pending_secret" = ?, "totp_pending_version" = ?, "totp_pending_created_at" = ?, "totp_last_counter" = ?
 					where "person_id" = ? and "totp_pending_secret" is not null`,
-				parameters: [now, null, null, null, personId],
+				parameters: [now, null, null, null, null, personId],
 				response: { rowCount: 1 },
 			},
 			...generateBackupCodesSql({ personId, firstUuidIndex: 1 }),
@@ -177,8 +177,8 @@ test('MFA required + invalid pending code → INVALID_OTP_TOKEN', async () => {
 		query: signInMutation({ email, password, otpToken: '111111' }),
 		executes: [
 			getConfigSql(),
-			getNextLoginAttemptSql(email),
 			getPersonByEmailSql({ email, response: { personId, identityId, password, roles: ['editor'], otpPendingUri: pendingUri } }),
+			getNextLoginAttemptSql({ personId }),
 			localAuthDisablingIdpsSql({ personId }),
 			requiringPolicy(),
 			getAllProjectRolesByIdentitySql({ identityId }),
@@ -211,8 +211,8 @@ test('active TOTP + requiring policy → existing OTP_REQUIRED path (policy not 
 		query: signInMutation({ email, password }),
 		executes: [
 			getConfigSql(),
-			getNextLoginAttemptSql(email),
 			getPersonByEmailSql({ email, response: { personId, identityId, password, roles: ['editor'], otpUri } }),
+			getNextLoginAttemptSql({ personId }),
 			localAuthDisablingIdpsSql({ personId }),
 		],
 		return: {
@@ -247,8 +247,8 @@ test('MFA required + per-policy grace → opens grace window, sets mfa_grace_unt
 		query: signInWithMfa({ email, password }),
 		executes: [
 			getConfigSql(),
-			getNextLoginAttemptSql(email),
 			getPersonByEmailSql({ email, response: { personId, identityId, password, roles: ['editor'] } }),
+			getNextLoginAttemptSql({ personId }),
 			localAuthDisablingIdpsSql({ personId }),
 			gracePolicy(),
 			getAllProjectRolesByIdentitySql({ identityId }),
@@ -297,8 +297,8 @@ test('MFA required + no policy grace override → global config default opens th
 		query: signInWithMfa({ email, password }),
 		executes: [
 			getConfigSql(),
-			getNextLoginAttemptSql(email),
 			getPersonByEmailSql({ email, response: { personId, identityId, password, roles: ['editor'] } }),
+			getNextLoginAttemptSql({ personId }),
 			localAuthDisablingIdpsSql({ personId }),
 			requiringPolicy(),
 			getAllProjectRolesByIdentitySql({ identityId }),

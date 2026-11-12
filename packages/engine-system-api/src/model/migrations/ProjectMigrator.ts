@@ -14,6 +14,12 @@ import { SchemaProvider } from './SchemaProvider.js'
 import { SaveSchemaCommand } from '../commands/schema/SaveSchemaCommand.js'
 import { ImplementationException } from '../../utils/index.js'
 
+/**
+ * `beforeEachModification` re-reads stale metadata before every modification, so replaying a history keeps producing the DDL it always has.
+ * `onRead` reads the catalog only when a handler reads the metadata; a snapshot holds only creates, which never do.
+ */
+type MetadataLoading = 'beforeEachModification' | 'onRead'
+
 type MigrationVariables = {
 	system_schema: string
 	project_slug: string
@@ -71,6 +77,7 @@ export class ProjectMigrator {
 						migration.version,
 						project,
 						metadataStore,
+						'beforeEachModification',
 					)
 				}
 			} else if (migration.type === 'content') {
@@ -189,6 +196,7 @@ export class ProjectMigrator {
 				latestVersion,
 				project,
 				metadataStore,
+				'onRead',
 			)
 		}
 
@@ -360,19 +368,22 @@ export class ProjectMigrator {
 		migrationVersion: string,
 		project: { slug: string; systemSchema: string },
 		metadataStore: SchemaDatabaseMetadataResolverStore,
+		metadataLoading: MetadataLoading,
 	): Promise<[Schema]> {
 		const {
 			getSql,
 			schema: newSchema,
 		} = this.migrationDescriber.describeModification(schema, modification, { formatVersion })
 		for (const stage of stages) {
-			// Metadata is re-read from the catalog only when this modification reads it, not after every invalidation.
-			const sql = await metadataStore.withMetadata(stage.schema, databaseMetadata =>
+			const createSql = (databaseMetadata: DatabaseMetadata) =>
 				getSql({
 					systemSchema: project.systemSchema,
 					databaseMetadata,
 					invalidateDatabaseMetadata: () => metadataStore.invalidate(stage.schema),
-				}))
+				})
+			const sql = metadataLoading === 'onRead'
+				? await metadataStore.withMetadata(stage.schema, createSql)
+				: createSql(await metadataStore.getMetadata(stage.schema))
 			const processedSql = this.sqlPreprocessor(sql, {
 				project_slug: project.slug,
 				system_schema: project.systemSchema,

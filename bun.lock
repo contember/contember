@@ -791,6 +791,7 @@
         "@contember/react-utils": "workspace:*",
         "@contember/utilities": "workspace:*",
         "buffer": "6.0.3",
+        "stacktracey": "^2.1.8",
       },
       "devDependencies": {
         "@types/react": "^18.3.11",

@@ -44,7 +44,6 @@
     "@contember/utilities": "workspace:*",
     "@graphql-tools/merge": "catalog:",
     "@graphql-tools/schema": "catalog:",
-    "@koa/cors": "catalog:",
     "@sentry/node": "catalog:",
     "bcryptjs": "catalog:",
     "ipaddr.js": "catalog:",
@@ -58,7 +57,6 @@
   "devDependencies": {
     "@types/koa": "catalog:",
     "@types/koa-bodyparser": "catalog:",
-    "@types/koa__cors": "catalog:",
     "@types/node": "catalog:",
     "@types/ws": "catalog:",
     "graphql": "catalog:"

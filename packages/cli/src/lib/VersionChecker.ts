@@ -1,8 +1,8 @@
 import { join, relative } from 'node:path'
-import * as semver from 'semver'
 import { PackageWorkspaceResolver } from '@contember/cli-common'
 import { DockerComposeManager } from './fs/DockerComposeManager.js'
 import { contemberDockerImages } from '../consts.js'
+import { satisfiesVersionRange } from './versionRange.js'
 
 export class VersionChecker {
 	constructor(
@@ -28,7 +28,8 @@ export class VersionChecker {
 					errors.push(`Package ${packageName} defined in ${jsonPath} is not installed.`)
 					continue
 				}
-				if (pckg.defined.version !== 'workspace:*' && !semver.satisfies(pckg.installed.version, pckg.defined.version)) {
+				// A range we cannot parse (tags, aliases, protocols) skips this check quietly; the CLI version check below still runs.
+				if (pckg.defined.version !== 'workspace:*' && satisfiesVersionRange(pckg.installed.version, pckg.defined.version) === false) {
 					errors.push(`Package ${packageName}@${pckg.installed.version} does not match constraint ${pckg.defined.version} defined in ${jsonPath}.`)
 					continue
 				}

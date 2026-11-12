@@ -40,7 +40,6 @@
     "@contember/react-multipass-rendering": "workspace:*",
     "@contember/react-utils": "workspace:*",
     "@contember/utilities": "workspace:*",
-    "@radix-ui/primitive": "catalog:",
     "@radix-ui/react-slot": "catalog:"
   },
   "peerDependencies": {

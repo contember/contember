@@ -3,7 +3,7 @@ import { RepeaterAddItemIndex } from '../../types/RepeaterMethods.js'
 import { useRepeaterMethods } from '../../contexts.js'
 import { Slot } from '@radix-ui/react-slot'
 import { EntityAccessor } from '@contember/react-binding'
-import { composeEventHandlers } from '@radix-ui/primitive'
+import { composeEventHandlers } from '@contember/utilities'
 
 const SlotType = Slot as React.ForwardRefExoticComponent<
 	React.ButtonHTMLAttributes<HTMLButtonElement> & React.RefAttributes<HTMLButtonElement>

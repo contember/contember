@@ -31,7 +31,7 @@
   "dependencies": {
     "@contember/react-binding": "workspace:*",
     "@contember/react-utils": "workspace:*",
-    "@radix-ui/primitive": "catalog:",
+    "@contember/utilities": "workspace:*",
     "@radix-ui/react-slot": "catalog:"
   },
   "peerDependencies": {

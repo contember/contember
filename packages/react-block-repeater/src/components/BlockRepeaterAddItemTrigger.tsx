@@ -3,7 +3,7 @@ import { useBlockRepeaterConfig } from '../contexts.js'
 import React, { ReactElement, useCallback, useMemo } from 'react'
 import { EntityAccessor } from '@contember/react-binding'
 import { RepeaterAddItemIndex, useRepeaterMethods } from '@contember/react-repeater'
-import { composeEventHandlers } from '@radix-ui/primitive'
+import { composeEventHandlers } from '@contember/utilities'
 
 const SlotType = Slot as React.ForwardRefExoticComponent<React.ButtonHTMLAttributes<HTMLButtonElement> & React.RefAttributes<HTMLButtonElement>>
 

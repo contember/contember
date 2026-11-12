@@ -4,7 +4,7 @@ import { Slot } from '@radix-ui/react-slot'
 import { useDataViewFetchAllData } from '../hooks/index.js'
 import { CsvExportFactory, ExportFactory } from '../export/index.js'
 import { useDataViewChildren, useDataViewEntityListProps, useDataViewSelectionState } from '../contexts.js'
-import { composeEventHandlers } from '@radix-ui/primitive'
+import { composeEventHandlers } from '@contember/utilities'
 
 export interface DataViewExportTriggerProps {
 	/**

@@ -1,6 +1,6 @@
 import { Slot } from '@radix-ui/react-slot'
 import { ComponentType, MouseEventHandler, ReactElement, useMemo, useState } from 'react'
-import { composeEventHandlers } from '@radix-ui/primitive'
+import { composeEventHandlers } from '@contember/utilities'
 import { useReferentiallyStableCallback } from '@contember/react-utils'
 import { toFormErrorCode } from '../../types/forbidden.js'
 import { FormErrorCode } from '../../types/forms.js'

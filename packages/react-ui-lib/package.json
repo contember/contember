@@ -63,7 +63,6 @@
     "@dnd-kit/core": "catalog:",
     "@dnd-kit/sortable": "catalog:",
     "@radix-ui/react-dropdown-menu": "catalog:",
-    "@radix-ui/react-portal": "catalog:",
     "lucide-react": "catalog:",
     "react": "catalog:",
     "react-dom": "catalog:",

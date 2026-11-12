@@ -7,7 +7,7 @@ import { Slots } from '~/lib/layout'
 import { DefaultRepeater } from '~/lib/repeater'
 import { AnchorButton } from '~/lib/ui/button'
 import { Component, EntitySubTree, EnvironmentMiddleware, Field, Link, Variable } from '@contember/interface'
-import slugify from '@sindresorhus/slugify'
+import { slugify } from '~/lib-extra/slug-field/slugify'
 
 export default () => (
 	<Binding>

@@ -2,9 +2,8 @@ import * as React from 'react'
 import { forwardRef, ReactElement, useCallback } from 'react'
 import { Slot } from '@radix-ui/react-slot'
 import { useDataViewLoaderState, useDataViewPagingMethods, useDataViewReload } from '../contexts.js'
-import { dataAttribute } from '@contember/utilities'
+import { composeEventHandlers, dataAttribute } from '@contember/utilities'
 import { EntityListSubTreeLoaderState } from '@contember/react-binding'
-import { composeEventHandlers } from '@radix-ui/primitive'
 
 export interface DataViewReloadTriggerAttributes {
 	['data-state']: EntityListSubTreeLoaderState

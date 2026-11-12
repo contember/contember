@@ -39,7 +39,6 @@
     "@contember/react-slate-editor-base": "workspace:*",
     "@contember/react-utils": "workspace:*",
     "@radix-ui/react-slot": "catalog:",
-    "react-error-boundary": "catalog:",
     "slate": "catalog:",
     "slate-react": "catalog:"
   },

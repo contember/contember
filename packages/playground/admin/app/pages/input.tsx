@@ -1,6 +1,6 @@
 import { EntitySubTree, useField } from '@contember/interface'
 import { Component, Field, useEntityBeforePersist, useEnvironment } from '@contember/react-binding'
-import slugify from '@sindresorhus/slugify'
+import { slugify } from '~/lib-extra/slug-field/slugify'
 import { FormInputIcon } from 'lucide-react'
 import { Title } from '~/app/components/title'
 import { ToggleRequired } from '~/app/components/toggle-required'

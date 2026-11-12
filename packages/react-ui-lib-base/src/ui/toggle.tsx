@@ -1,4 +1,6 @@
-import * as TogglePrimitive from '@radix-ui/react-toggle'
+import { composeEventHandlers } from '@contember/utilities'
+import { Slot } from '@radix-ui/react-slot'
+import { ComponentPropsWithoutRef, forwardRef, useState } from 'react'
 import { ConfigVariants, uic, uiconfig } from '../utils/index.js'
 
 export const toggleConfig = uiconfig({
@@ -23,4 +25,41 @@ export const toggleConfig = uiconfig({
 
 export type ToggleProps = ConfigVariants<Exclude<typeof toggleConfig.variants, undefined>>
 
-export const Toggle = uic(TogglePrimitive.Root, toggleConfig)
+type ToggleBaseProps = ComponentPropsWithoutRef<'button'> & {
+	/** Controlled pressed state. */
+	pressed?: boolean
+	defaultPressed?: boolean
+	onPressedChange?: (pressed: boolean) => void
+	asChild?: boolean
+}
+
+const ToggleBase = forwardRef<HTMLButtonElement, ToggleBaseProps>(
+	({ asChild, pressed: pressedProp, defaultPressed, onPressedChange, ...props }, ref) => {
+		const Comp = asChild ? Slot : 'button'
+		const [uncontrolledPressed, setUncontrolledPressed] = useState(defaultPressed ?? false)
+		const isControlled = pressedProp !== undefined
+		const pressed = isControlled ? pressedProp : uncontrolledPressed
+		return (
+			<Comp
+				type="button"
+				aria-pressed={pressed}
+				data-state={pressed ? 'on' : 'off'}
+				data-disabled={props.disabled ? '' : undefined}
+				{...props}
+				ref={ref}
+				onClick={composeEventHandlers(props.onClick, () => {
+					if (props.disabled) {
+						return
+					}
+					if (!isControlled) {
+						setUncontrolledPressed(!pressed)
+					}
+					onPressedChange?.(!pressed)
+				})}
+			/>
+		)
+	},
+)
+ToggleBase.displayName = 'Toggle'
+
+export const Toggle = uic(ToggleBase, toggleConfig)

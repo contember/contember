@@ -45,6 +45,13 @@ export class BijectiveIndexedMap<K, V> implements Map<K, V> {
     values(): MapIterator<V>;
 }
 
+// @public
+export const composeEventHandlers: <E extends {
+    defaultPrevented: boolean;
+}>(originalEventHandler?: (event: E) => void, ourEventHandler?: (event: E) => void, input?: {
+    checkForDefaultPrevented?: boolean;
+}) => (event: E) => void;
+
 // @public (undocumented)
 export function dataAttribute(value: boolean | null | undefined): '' | undefined;
 

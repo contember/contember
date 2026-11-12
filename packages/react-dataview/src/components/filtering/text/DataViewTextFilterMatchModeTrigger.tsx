@@ -2,10 +2,9 @@ import * as React from 'react'
 import { forwardRef, ReactElement } from 'react'
 import { Slot } from '@radix-ui/react-slot'
 import { TextFilterArtifactsMatchMode } from '../../../filterTypes/index.js'
-import { dataAttribute } from '@contember/utilities'
+import { composeEventHandlers, dataAttribute } from '@contember/utilities'
 import { useDataViewTextFilterMatchMode } from '../../../hooks/index.js'
 import { useDataViewFilterName } from '../../../contexts.js'
-import { composeEventHandlers } from '@radix-ui/primitive'
 
 export interface DataViewTextFilterMatchModeTriggerProps {
 	/**

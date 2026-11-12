@@ -1,8 +1,7 @@
 import { forwardRef, ReactElement, SetStateAction, useCallback } from 'react'
 import { useDataViewSelectionMethods, useDataViewSelectionState } from '../../contexts.js'
 import { Slot } from '@radix-ui/react-slot'
-import { dataAttribute } from '@contember/utilities'
-import { composeEventHandlers } from '@radix-ui/primitive'
+import { composeEventHandlers, dataAttribute } from '@contember/utilities'
 
 export interface DataViewVisibilityTriggerAttributes {
 	['data-active']?: ''

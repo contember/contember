@@ -1,7 +1,6 @@
 import { dataAttribute } from '@contember/utilities'
 import { Slot } from '@radix-ui/react-slot'
-import { cva } from 'class-variance-authority'
-import { ClassValue, clsx } from 'clsx'
+import { ClassValue, cva, cx } from './classNames.js'
 import { ComponentType, createElement, forwardRef, ReactNode, useMemo } from 'react'
 import { twMerge } from 'tailwind-merge'
 import { useObjectMemo } from '@contember/react-utils'
@@ -148,7 +147,7 @@ export const uic = <El extends React.ElementType, Variants extends ConfigSchema 
 			}
 		}
 		const style = useMemo(() => config?.style ? { ...config.style, ...(rest.style || {}) } : rest.style, [rest.style])
-		const finalClassName = useMemo(() => twMerge(clsx(cls(variantsMemoized), classNameProp)), [variantsMemoized, classNameProp])
+		const finalClassName = useMemo(() => twMerge(cx(cls(variantsMemoized), classNameProp)), [variantsMemoized, classNameProp])
 
 		let FinalComponent: React.ElementType = Component
 		if (props.asChild && typeof Component === 'string') {

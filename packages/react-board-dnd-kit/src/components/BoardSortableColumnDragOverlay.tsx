@@ -1,5 +1,5 @@
 import React, { ReactNode } from 'react'
-import { Portal } from '@radix-ui/react-portal'
+import { createPortal } from 'react-dom'
 import { DragOverlay } from '@dnd-kit/core'
 import { AccessorTree, Entity, EntityAccessor, isEntityAccessor, useAccessorTreeState } from '@contember/react-binding'
 import { useBoardActiveColumn } from '../contexts.js'
@@ -14,7 +14,7 @@ export const BoardSortableColumnDragOverlay = ({ children }: {
 		return null
 	}
 	return (
-		<Portal>
+		createPortal(
 			<DragOverlay>
 				<BoardCurrentColumnContext.Provider value={activeItem}>
 					<AccessorTree state={accessorTreeState}>
@@ -27,7 +27,8 @@ export const BoardSortableColumnDragOverlay = ({ children }: {
 							: children}
 					</AccessorTree>
 				</BoardCurrentColumnContext.Provider>
-			</DragOverlay>
-		</Portal>
+			</DragOverlay>,
+			document.body,
+		)
 	)
 }

@@ -32,5 +32,6 @@ export const Separator = uic(SeparatorBase, {
 			vertical: 'h-full w-[1px]',
 		},
 	},
+	passVariantProps: ['orientation'],
 	displayName: 'Separator',
 })

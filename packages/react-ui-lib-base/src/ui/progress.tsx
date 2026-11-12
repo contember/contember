@@ -80,7 +80,7 @@ const ProgressIndicator = uic(ProgressIndicatorBase, {
 })
 
 export const Progress = React.forwardRef<HTMLDivElement, ProgressRootProps>(({ className, value, ...props }, ref) => (
-	<ProgressRoot ref={ref} {...props}>
+	<ProgressRoot ref={ref} value={value} {...props}>
 		<ProgressIndicator style={{ transform: `translateX(-${100 - (value || 0)}%)` }} />
 	</ProgressRoot>
 ))

@@ -46,9 +46,12 @@ describe('Separator', () => {
 		expect(el?.className).toBe('shrink-0 bg-border')
 	})
 
-	test('the orientation variant picks the classes', () => {
+	test('a vertical separator gets its classes and exposes its orientation', () => {
 		const { container } = render(<Separator orientation="vertical" />)
-		expect(container.firstElementChild?.className).toBe('shrink-0 bg-border h-full w-[1px]')
+		const el = container.firstElementChild
+		expect(el?.className).toBe('shrink-0 bg-border h-full w-[1px]')
+		expect(el?.getAttribute('data-orientation')).toBe('vertical')
+		expect(el?.getAttribute('aria-orientation')).toBe('vertical')
 	})
 
 	test('decorative separators are hidden from assistive technology', () => {
@@ -64,6 +67,9 @@ describe('Progress', () => {
 		expect(bar.getAttribute('aria-valuemin')).toBe('0')
 		expect(bar.getAttribute('aria-valuemax')).toBe('100')
 		expect(bar.getAttribute('data-max')).toBe('100')
+		expect(bar.getAttribute('aria-valuenow')).toBe('30')
+		expect(bar.getAttribute('aria-valuetext')).toBe('30%')
+		expect(bar.getAttribute('data-state')).toBe('loading')
 		const indicator = bar.firstElementChild
 		expect(indicator instanceof HTMLElement ? indicator.style.transform : undefined).toBe('translateX(-70%)')
 		expect(indicator?.getAttribute('data-max')).toBe('100')
@@ -87,6 +93,26 @@ describe('Progress max validation', () => {
 	test('accepts a valid max', () => {
 		const { getByRole } = render(<Progress max={50} />)
 		expect(getByRole('progressbar').getAttribute('aria-valuemax')).toBe('50')
+	})
+
+	test('a complete bar and an out-of-range value', () => {
+		const consoleError = spyOn(console, 'error').mockImplementation(() => {})
+		try {
+			const { getAllByRole } = render(
+				<>
+					<Progress value={50} max={50} />
+					<Progress value={150} />
+				</>,
+			)
+			const [complete, outOfRange] = getAllByRole('progressbar')
+			expect(complete.getAttribute('data-state')).toBe('complete')
+			expect(complete.getAttribute('aria-valuetext')).toBe('100%')
+			expect(outOfRange.getAttribute('data-state')).toBe('indeterminate')
+			expect(outOfRange.hasAttribute('aria-valuenow')).toBe(false)
+			expect(consoleError).toHaveBeenCalledTimes(1)
+		} finally {
+			consoleError.mockRestore()
+		}
 	})
 })
 

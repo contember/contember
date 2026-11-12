@@ -2,16 +2,16 @@
 import { describe, expect, test } from 'bun:test'
 import { ContentClientInput } from '../../../src/index.js'
 import { ContemberClientEntities, FragmentOf, FragmentType, PostStatus, queryBuilder } from '../../client/index.js'
-import { expectTypeOf } from 'expect-type'
+import { assertType, Equal } from '../../typeAssertions.js'
 import { Input, JSONValue, Value } from '@contember/schema'
 
 const qb = queryBuilder
 describe('ts types', () => {
 	test('fragment - valid', async () => {
-		expectTypeOf(
-			qb.fragment('Post')
-				.$('author', qb.fragment('Author')),
-		).toMatchTypeOf<FragmentOf<'Post'>>()
+		const fragment = qb.fragment('Post')
+			.$('author', qb.fragment('Author'))
+		const asPostFragment: FragmentOf<'Post'> = fragment
+		expect(asPostFragment).toBe(fragment)
 	})
 
 	test('fragment - invalid', async () => {
@@ -76,9 +76,7 @@ describe('ts types', () => {
 	test('has one field on fragment type', async () => {
 		const fragment = qb.fragment('Post', it => it.$('author', it => it.$$().$('posts', it => it.$('id'))))
 		type fragmentType = FragmentType<typeof fragment>
-		expectTypeOf<fragmentType>().toEqualTypeOf<
-			{ author: ({ id: string; name: string | null; email: string | null } & { posts: { id: string }[] }) | null }
-		>()
+		assertType<Equal<fragmentType, { author: ({ id: string; name: string | null; email: string | null } & { posts: { id: string }[] }) | null }>>()
 	})
 
 	test('has one without arg', async () => {
@@ -145,14 +143,14 @@ describe('ts types', () => {
 	test('omit', async () => {
 		const fragment = qb.fragment('Post', it => it.$$().omit('publishedAt'))
 		type fragmentType = FragmentType<typeof fragment>
-		expectTypeOf<fragmentType>().toEqualTypeOf<{ id: string; status: PostStatus | null }>()
+		assertType<Equal<fragmentType, { id: string; status: PostStatus | null }>>()
 	})
 
 	test('includes condition', async () => {
-		expectTypeOf<Input.Condition<string[]>['includes']>().toEqualTypeOf<string | undefined>()
-		expectTypeOf<Input.Condition<readonly string[]>['includes']>().toEqualTypeOf<string | undefined>()
-		expectTypeOf<Input.Condition<JSONValue | null>['includes']>().toEqualTypeOf<JSONValue | undefined>()
-		expectTypeOf<Input.Condition['includes']>().toEqualTypeOf<Value.FieldValue | undefined>()
-		expectTypeOf<Input.Condition<string>['includes']>().toEqualTypeOf<undefined>()
+		assertType<Equal<Input.Condition<string[]>['includes'], string | undefined>>()
+		assertType<Equal<Input.Condition<readonly string[]>['includes'], string | undefined>>()
+		assertType<Equal<Input.Condition<JSONValue | null>['includes'], JSONValue | undefined>>()
+		assertType<Equal<Input.Condition['includes'], Value.FieldValue | undefined>>()
+		assertType<Equal<Input.Condition<string>['includes'], undefined>>()
 	})
 })

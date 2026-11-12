@@ -45,7 +45,6 @@
     "@contember/utilities": "workspace:*",
     "@graphql-tools/merge": "catalog:",
     "@graphql-tools/schema": "catalog:",
-    "@sentry/node": "catalog:",
     "bcryptjs": "catalog:",
     "ipaddr.js": "catalog:",
     "koa": "catalog:",

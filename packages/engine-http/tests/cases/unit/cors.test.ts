@@ -27,6 +27,9 @@ describe('CORS middleware', () => {
 		koa.silent = true
 		koa.use(createCorsMiddleware({ exposeHeaders: ['X-Contember-Mutation'] }))
 		koa.use(async ctx => {
+			if (ctx.path === '/fail-plain') {
+				throw Object.assign(new Error('boom'), { status: 409, expose: true })
+			}
 			if (ctx.path === '/fail') {
 				throw Object.assign(new Error('boom'), { status: 418, expose: true, headers: { 'X-Custom': 'kept', Vary: 'Accept' } })
 			}
@@ -91,5 +94,13 @@ describe('CORS middleware', () => {
 		expect(response.headers['access-control-expose-headers']).toBe('X-Contember-Mutation')
 		expect(response.headers['x-custom']).toBe('kept')
 		expect(response.headers['vary']).toBe('Accept, Origin')
+	})
+
+	test('CORS headers survive a thrown error without own headers', async () => {
+		const response = await send(port, '/fail-plain', 'GET', { Origin: 'https://example.com' })
+		expect(response.status).toBe(409)
+		expect(response.headers['access-control-allow-origin']).toBe('*')
+		expect(response.headers['access-control-expose-headers']).toBe('X-Contember-Mutation')
+		expect(response.headers['vary']).toBe('Origin')
 	})
 })

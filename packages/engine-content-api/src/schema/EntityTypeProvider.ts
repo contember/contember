@@ -72,7 +72,6 @@ export class EntityTypeProvider {
 		const entity = getEntityFromSchema(this.schema, entityName)
 		return new GraphQLObjectType({
 			name: GqlTypeName`${entityName}`,
-			deprecationReason: entity.deprecationReason,
 			description: entity.description,
 			fields: () => this.getEntityFields(entity),
 		} as GraphQLObjectTypeConfig<any, any>)

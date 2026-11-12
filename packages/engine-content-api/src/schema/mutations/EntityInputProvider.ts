@@ -50,7 +50,6 @@ export class EntityInputProvider<Operation extends EntityInputType> {
 
 		return new GraphQLInputObjectType({
 			name: GqlTypeName`${entityName}${withoutSuffix}${this.operation}Input`,
-			description: entity.description,
 			fields: () => this.createEntityFields(entityName, fieldNames),
 		})
 	}

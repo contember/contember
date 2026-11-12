@@ -2,9 +2,11 @@ import { expect, test } from 'bun:test'
 import { c, createSchema } from '@contember/schema-definition'
 import {
 	calculateMigrationChecksum,
+	createCheckConstraintModification,
 	createViewModification,
 	MigrationDescriber,
 	ModificationHandlerFactory,
+	removeCheckConstraintModification,
 	SchemaDiffer,
 	SchemaMigrator,
 	VERSION_CORRECT_PRIMARY_COLUMN_NAME,
@@ -70,6 +72,22 @@ const multiStatementViewMigration: SchemaMigrationInput = {
 	modifications: [
 		...differ.diffSchemas(emptySchema, createSchema(Base)),
 		createViewModification.createModification({ entity: createSchema(WithView).model.entities.ArticleView }),
+	],
+}
+
+// The final schema has no check, so only validating each modification catches the injected statement.
+const createThenRemoveCheckMigration: SchemaMigrationInput = {
+	type: 'schema',
+	version: '2026-01-01-100000',
+	name: '2026-01-01-100000-check',
+	formatVersion,
+	modifications: [
+		...differ.diffSchemas(emptySchema, createSchema(Base)),
+		createCheckConstraintModification.createModification({
+			entityName: 'Article',
+			check: { name: 'terminated', expression: 'true); DELETE FROM article; --' },
+		}),
+		removeCheckConstraintModification.createModification({ entityName: 'Article', checkName: 'terminated' }),
 	],
 }
 
@@ -207,4 +225,10 @@ test('a skippedErrors entry of a covered migration lets a snapshot with a multi-
 	const skipping = bootstrap({ ...multiStatementViewMigration, skippedErrors: [{ code: 'MODEL_INVALID_VIEW' }] })
 	await skipping.result
 	expect(savedMigrationsOf(skipping.connection)).toHaveLength(1)
+})
+
+test('a check expression with a statement terminator is rejected even when the migration removes it again', async () => {
+	const result = migrate({ executed: [], migrationsToExecute: [createThenRemoveCheckMigration] })
+	await expect(result).rejects.toBeInstanceOf(InvalidSchemaError)
+	await expect(result).rejects.toThrow('entities.Article.checks: [MODEL_INVALID_CHECK] Check constraint "terminated" expression must not contain ";".')
 })

@@ -766,6 +766,7 @@ enum _MutationErrorType {
   NotNullConstraintViolation
   UniqueConstraintViolation
   ForeignKeyConstraintViolation
+  CheckConstraintViolation
   NotFoundOrDenied
   NonUniqueWhereInput
   InvalidDataInput

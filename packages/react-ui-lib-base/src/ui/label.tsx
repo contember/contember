@@ -10,7 +10,8 @@ const LabelBase = forwardRef<HTMLLabelElement, ComponentPropsWithoutRef<'label'>
 			ref={ref}
 			onMouseDown={event => {
 				// Clicks on a nested control keep their default; otherwise a double click must not select the label text.
-				if (event.target instanceof Element && event.target.closest('button, input, select, textarea')) {
+				const ElementInRealm = event.currentTarget.ownerDocument.defaultView?.Element ?? Element
+				if (event.target instanceof ElementInRealm && event.target.closest('button, input, select, textarea')) {
 					return
 				}
 				props.onMouseDown?.(event)

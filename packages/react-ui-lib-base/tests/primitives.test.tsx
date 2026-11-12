@@ -1,4 +1,4 @@
-import { afterEach, describe, expect, mock, test } from 'bun:test'
+import { afterEach, describe, expect, mock, spyOn, test } from 'bun:test'
 import { cleanup, fireEvent, render } from '@testing-library/react'
 import { Label } from '../src/ui/label.js'
 import { Progress } from '../src/ui/progress.js'
@@ -67,6 +67,26 @@ describe('Progress', () => {
 		const indicator = bar.firstElementChild
 		expect(indicator instanceof HTMLElement ? indicator.style.transform : undefined).toBe('translateX(-70%)')
 		expect(indicator?.getAttribute('data-max')).toBe('100')
+	})
+})
+
+describe('Progress max validation', () => {
+	test('falls back to 100 and reports an invalid max', () => {
+		const consoleError = spyOn(console, 'error').mockImplementation(() => {})
+		try {
+			const { getByRole } = render(<Progress max={-1} />)
+			const bar = getByRole('progressbar')
+			expect(bar.getAttribute('aria-valuemax')).toBe('100')
+			expect(bar.getAttribute('data-state')).toBe('indeterminate')
+			expect(consoleError).toHaveBeenCalledTimes(1)
+		} finally {
+			consoleError.mockRestore()
+		}
+	})
+
+	test('accepts a valid max', () => {
+		const { getByRole } = render(<Progress max={50} />)
+		expect(getByRole('progressbar').getAttribute('aria-valuemax')).toBe('50')
 	})
 })
 

@@ -1,6 +1,8 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
+import { PassThrough } from 'node:stream'
 import { areColorsEnabled, setColorsEnabled, terminalSupportsColor } from '../../../src/index.js'
 import { escapeTerminalText, Output, OutputStream, OutputTableColumn } from '../../../src/index.js'
+import { LineReader } from '../../../src/application/Output.js'
 import { CapturingStream, createTestOutput } from '../../lib/testOutput.js'
 
 beforeAll(() => {
@@ -333,24 +335,63 @@ describe('Output.canPrompt', () => {
 	})
 })
 
-describe('Output.promptOutput', () => {
-	test('uses the real process stderr by default', () => {
-		const output = new Output()
-		expect(output.promptOutput).toBe(process.stderr)
+describe('Output.prompt', () => {
+	test('writes the question to stderr, clears progress and returns the answer', async () => {
+		const { output, stderr } = createTestOutput({ stdinTty: true, stderrTty: true, answers: ['yes'] })
+		output.progress('working')
+
+		expect(await output.prompt('Continue? ')).toBe('yes')
+		expect(stderr.text).toBe('working\r\u001b[KContinue? ')
 	})
 
-	test('adapts an injected diagnostic stream to a Writable with TTY metadata', async () => {
-		const stderr = new CapturingStream(true, 132)
-		const output = new Output({ stderr })
+	test('refuses to prompt without a TTY or outside human mode', () => {
+		const { output, stderr } = createTestOutput({ stdinTty: false, stderrTty: true, answers: ['yes'] })
+		expect(() => output.prompt('Continue? ')).toThrow(expect.objectContaining({ code: 'TTY_UNAVAILABLE' }))
+		const json = createTestOutput({ stdinTty: true, stderrTty: true, answers: ['yes'] })
+		json.output.setMode('json')
+		expect(() => json.output.prompt('Continue? ')).toThrow(expect.objectContaining({ code: 'TTY_UNAVAILABLE' }))
+		expect(stderr.text).toBe('')
+	})
 
-		expect(output.promptOutput.writable).toBe(true)
-		expect(output.promptOutput.isTTY).toBe(true)
-		expect(output.promptOutput.columns).toBe(132)
+	test('returns undefined when no answer is left', async () => {
+		const { output } = createTestOutput({ stdinTty: true, stderrTty: true, answers: [] })
+		expect(await output.prompt('Continue? ')).toBeUndefined()
+	})
+})
 
-		await new Promise<void>((resolve, reject) => {
-			output.promptOutput.write('prompt text', error => error ? reject(error) : resolve())
-		})
-		expect(stderr.text).toBe('prompt text')
+describe('LineReader', () => {
+	test('reads one line per call and keeps lines that arrived ahead of the next call', async () => {
+		const input = new PassThrough()
+		const reader = new LineReader(input)
+		const first = reader.read()
+		input.write('yes\nno\n')
+		expect(await first).toBe('yes')
+		expect(await reader.read()).toBe('no')
+	})
+
+	test('reads as closed once the input ended, also on later calls', async () => {
+		const input = new PassThrough()
+		const reader = new LineReader(input)
+		const first = reader.read()
+		input.write('last\n')
+		expect(await first).toBe('last')
+		input.end()
+		expect(await reader.read()).toBeUndefined()
+		expect(await reader.read()).toBeUndefined()
+	})
+
+	test('reads as closed when the input ended before the first read', async () => {
+		const input = new PassThrough()
+		input.resume()
+		input.end()
+		await new Promise(resolve => input.once('end', resolve))
+		expect(await new LineReader(input).read()).toBeUndefined()
+	})
+
+	test('refuses a second read while one is pending', () => {
+		const reader = new LineReader(new PassThrough())
+		void reader.read()
+		expect(() => reader.read()).toThrow('already pending')
 	})
 })
 

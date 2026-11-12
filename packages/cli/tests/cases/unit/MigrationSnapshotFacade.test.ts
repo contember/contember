@@ -21,7 +21,6 @@ import { MigrationSnapshotFacade } from '../../../src/lib/migrations/MigrationSn
 import { MigrationSnapshotCommand } from '../../../src/commands/migrations/MigrationSnapshotCommand.js'
 import { CliError, ExitCode } from '@contember/cli-common'
 import { createTestOutput } from '../../../../cli-common/tests/lib/testOutput.js'
-import prompts from 'prompts'
 
 namespace ModelA {
 	export class Author {
@@ -149,8 +148,7 @@ describe('MigrationSnapshotFacade', () => {
 
 	test('declining snapshot creation does not write', async () => {
 		const { command, snapshotManager } = await setup(migrationsDir)
-		const { output } = createTestOutput({ stdinTty: true, stderrTty: true })
-		prompts.inject([false])
+		const { output } = createTestOutput({ stdinTty: true, stderrTty: true, answers: ['n'] })
 
 		const error = await command.run([], output).then(() => null, (reason: unknown) => reason)
 

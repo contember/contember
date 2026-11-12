@@ -2,7 +2,6 @@ import { afterEach, beforeEach, expect, test } from 'bun:test'
 import * as fs from 'node:fs/promises'
 import * as os from 'node:os'
 import * as path from 'node:path'
-import prompts from 'prompts'
 import { Schema } from '@contember/schema'
 import { c, createSchema } from '@contember/schema-definition'
 import { emptySchema } from '@contember/schema-utils'
@@ -128,8 +127,7 @@ const buildCommand = async (schema: Schema, existingMigration = false) => {
 test('declining a diff leaves a new project filesystem untouched', async () => {
 	const { command } = await buildCommand(createSchema(BlogModel))
 	const before = await listTree()
-	const { output } = createTestOutput({ stdinTty: true, stderrTty: true })
-	prompts.inject(['no'])
+	const { output } = createTestOutput({ stdinTty: true, stderrTty: true, answers: ['3'] })
 
 	const error = await command.run(['change'], output).then(() => null, (reason: unknown) => reason)
 
@@ -139,8 +137,7 @@ test('declining a diff leaves a new project filesystem untouched', async () => {
 
 test('executing a new diff requires a second confirmation when older migrations are pending', async () => {
 	const { command, executionConfirmations } = await buildCommand(createSchema(BlogModel), true)
-	const { output } = createTestOutput({ stdinTty: true, stderrTty: true })
-	prompts.inject(['yes'])
+	const { output } = createTestOutput({ stdinTty: true, stderrTty: true, answers: ['1'] })
 
 	await command.run(['change', '--execute'], output)
 
@@ -149,8 +146,7 @@ test('executing a new diff requires a second confirmation when older migrations 
 
 test('executing a new diff does not require a redundant second confirmation when it is the only pending migration', async () => {
 	const { command, executionConfirmations } = await buildCommand(createSchema(BlogModel))
-	const { output } = createTestOutput({ stdinTty: true, stderrTty: true })
-	prompts.inject(['yes'])
+	const { output } = createTestOutput({ stdinTty: true, stderrTty: true, answers: ['1'] })
 
 	await command.run(['change', '--execute'], output)
 

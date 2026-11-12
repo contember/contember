@@ -16,7 +16,7 @@ export type {
 	OutputTableColumn,
 	OutputTableColumns,
 	ParsedCommandInput,
-	PromptOutputStream,
+	PromptLineReader,
 	TableColumn,
 	TextStyle,
 } from './application/index.js'

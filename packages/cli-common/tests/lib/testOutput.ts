@@ -24,12 +24,20 @@ export interface TestOutput {
 	stderr: CapturingStream
 }
 
-export const createTestOutput = ({ stderrTty = false, stdinTty = false }: { stderrTty?: boolean; stdinTty?: boolean } = {}): TestOutput => {
+export interface TestOutputOptions {
+	stderrTty?: boolean
+	stdinTty?: boolean
+	/** Lines answered to prompts, in order; once they run out, the input reads as closed. */
+	answers?: readonly string[]
+}
+
+export const createTestOutput = ({ stderrTty = false, stdinTty = false, answers = [] }: TestOutputOptions = {}): TestOutput => {
 	const stdout = new CapturingStream()
 	const stderr = new CapturingStream(stderrTty)
+	const pending = [...answers]
 	return {
 		stdout,
 		stderr,
-		output: new Output({ stdout, stderr, isStdinTty: () => stdinTty }),
+		output: new Output({ stdout, stderr, isStdinTty: () => stdinTty, readPromptLine: async () => pending.shift() }),
 	}
 }

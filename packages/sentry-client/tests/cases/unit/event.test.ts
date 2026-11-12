@@ -60,6 +60,17 @@ describe('buildException', () => {
 		expect(summary(new Error('outer', { cause: 'just text' }))).toEqual([{ type: 'Error', value: 'outer', mechanism: generic }])
 	})
 
+	test('keeps an error whose stack or message was overwritten with a non-string', () => {
+		const cause = Object.assign(new Error('cause'), { stack: 42 })
+		const error = new Error('outer', { cause })
+		Object.assign(error, { message: { code: 'E1' } })
+		const values = build(error).values
+		expect(values.map(({ value, stacktrace }) => ({ value, hasFrames: stacktrace !== undefined }))).toEqual([
+			{ value: 'cause', hasFrames: false },
+			{ value: '[object Object]', hasFrames: true },
+		])
+	})
+
 	test('truncates messages to 250 characters', () => {
 		expect(build(new Error('x'.repeat(300))).values[0].value).toBe(`${'x'.repeat(250)}...`)
 	})

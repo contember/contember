@@ -6,10 +6,13 @@ import { ExceptionValue, Mechanism } from './types.js'
 const maxLinkedErrors = 5
 
 const exceptionValue = (error: Error, resolveModule: ModuleResolver): ExceptionValue => {
-	const frames = error.stack ? parseStack(error.stack, resolveModule) : []
+	// both can be overwritten with anything; a bad one must not lose the event and its causes
+	const stack: unknown = error.stack
+	const message: unknown = error.message
+	const frames = typeof stack === 'string' ? parseStack(stack, resolveModule) : []
 	return {
 		type: error.name || error.constructor.name,
-		value: error.message,
+		value: typeof message === 'string' ? message : String(message),
 		...(frames.length > 0 ? { stacktrace: { frames } } : {}),
 	}
 }
@@ -50,7 +53,7 @@ export interface BuiltException {
 }
 
 const maxValueLength = 250
-/** Sentry accepts events of up to 200 kB; the serialized value gets half of it. */
+/** @sentry/node 7's `normalizeToSize` limit for the serialized value. */
 const maxSerializedBytes = 100 * 1024
 
 /**

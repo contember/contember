@@ -11,13 +11,13 @@ import { SchemaNames } from '@contember/client-content';
 export class ContemberClientGenerator {
     constructor(nameSchemaGenerator?: NameSchemaGenerator, enumTypeSchemaGenerator?: EnumTypeSchemaGenerator, entityTypeSchemaGenerator?: EntityTypeSchemaGenerator);
     // (undocumented)
-    generate(model: Model.Schema): Record<string, string>;
+    generate(model: Model.Schema, options?: GenerateOptions): Record<string, string>;
 }
 
 // @public (undocumented)
 export class EntityTypeSchemaGenerator {
     // (undocumented)
-    generate(model: Model.Schema): string;
+    generate(model: Model.Schema, options?: GenerateOptions): string;
 }
 
 // @public (undocumented)
@@ -27,9 +27,14 @@ export class EnumTypeSchemaGenerator {
 }
 
 // @public (undocumented)
+export type GenerateOptions = {
+    excludeDeprecated?: boolean;
+};
+
+// @public (undocumented)
 export class NameSchemaGenerator {
     // (undocumented)
-    generate(model: Model.Schema): SchemaNames;
+    generate(model: Model.Schema, options?: GenerateOptions): SchemaNames;
 }
 
 // (No @packageDocumentation comment for this package)

@@ -1,0 +1,953 @@
+type Query {
+  getArticle(by: ArticleUniqueWhere!, filter: ArticleWhere): Article
+  listArticle(filter: ArticleWhere, orderBy: [ArticleOrderBy!], offset: Int, limit: Int): [Article!]!
+  paginateArticle(filter: ArticleWhere, orderBy: [ArticleOrderBy!], skip: Int, first: Int): ArticleConnection!
+  validateCreateArticle(data: ArticleCreateInput!): _ValidationResult!
+  validateUpdateArticle(by: ArticleUniqueWhere!, data: ArticleUpdateInput!): _ValidationResult!
+  getArticleStats(by: ArticleStatsUniqueWhere!, filter: ArticleStatsWhere): ArticleStats
+  listArticleStats(filter: ArticleStatsWhere, orderBy: [ArticleStatsOrderBy!], offset: Int, limit: Int): [ArticleStats!]!
+  paginateArticleStats(filter: ArticleStatsWhere, orderBy: [ArticleStatsOrderBy!], skip: Int, first: Int): ArticleStatsConnection!
+  validateCreateArticleStats(data: ArticleStatsCreateInput!): _ValidationResult!
+  validateUpdateArticleStats(by: ArticleStatsUniqueWhere!, data: ArticleStatsUpdateInput!): _ValidationResult!
+  getCategory(by: CategoryUniqueWhere!, filter: CategoryWhere): Category
+  listCategory(filter: CategoryWhere, orderBy: [CategoryOrderBy!], offset: Int, limit: Int): [Category!]!
+  paginateCategory(filter: CategoryWhere, orderBy: [CategoryOrderBy!], skip: Int, first: Int): CategoryConnection!
+  validateCreateCategory(data: CategoryCreateInput!): _ValidationResult!
+  validateUpdateCategory(by: CategoryUniqueWhere!, data: CategoryUpdateInput!): _ValidationResult!
+  getTag(by: TagUniqueWhere!, filter: TagWhere): Tag
+  listTag(filter: TagWhere, orderBy: [TagOrderBy!], offset: Int, limit: Int): [Tag!]!
+  paginateTag(filter: TagWhere, orderBy: [TagOrderBy!], skip: Int, first: Int): TagConnection!
+  validateCreateTag(data: TagCreateInput!): _ValidationResult!
+  validateUpdateTag(by: TagUniqueWhere!, data: TagUpdateInput!): _ValidationResult!
+  transaction: QueryTransaction
+  _info: Info
+}
+
+"""description of entity Article"""
+type Article {
+  _meta: ArticleMeta
+  id: UUID!
+
+  """description of Article.title"""
+  title: String
+
+  """description of Article.category"""
+  category(filter: CategoryWhere): Category
+
+  """description of Article.tags"""
+  tags(filter: TagWhere, orderBy: [TagOrderBy!], offset: Int, limit: Int): [Tag!]!
+
+  """description of Article.stats"""
+  stats(filter: ArticleStatsWhere): ArticleStats
+
+  """description of Article.tags"""
+  paginateTags(filter: TagWhere, orderBy: [TagOrderBy!], skip: Int, first: Int): TagConnection!
+}
+
+type ArticleMeta {
+  id: FieldMeta
+  title: FieldMeta
+  category: FieldMeta
+  tags: FieldMeta
+  stats: FieldMeta
+}
+
+type FieldMeta {
+  readable: Boolean
+  updatable: Boolean
+}
+
+scalar UUID
+
+"""description of entity Category"""
+type Category {
+  _meta: CategoryMeta
+  id: UUID!
+
+  """description of Category.name"""
+  name: String
+
+  """description of Category.articles"""
+  articles(filter: ArticleWhere, orderBy: [ArticleOrderBy!], offset: Int, limit: Int): [Article!]!
+
+  """description of Category.articles"""
+  articlesByStats(by: CategoryArticlesByStatsUniqueWhere!, filter: ArticleWhere): Article
+  articlesBy(by: ArticlesOfCategoryByUniqueWhere!, filter: ArticleWhere): Article
+
+  """description of Category.articles"""
+  paginateArticles(filter: ArticleWhere, orderBy: [ArticleOrderBy!], skip: Int, first: Int): ArticleConnection!
+}
+
+type CategoryMeta {
+  id: FieldMeta
+  name: FieldMeta
+  articles: FieldMeta
+}
+
+input ArticleWhere {
+  id: UUIDCondition
+
+  """description of Article.title"""
+  title: StringCondition
+
+  """description of Article.category"""
+  category: CategoryWhere
+
+  """description of Article.tags"""
+  tags: TagWhere
+
+  """description of Article.stats"""
+  stats: ArticleStatsWhere
+  and: [ArticleWhere]
+  or: [ArticleWhere]
+  not: ArticleWhere
+}
+
+input UUIDCondition {
+  and: [UUIDCondition!]
+  or: [UUIDCondition!]
+  not: UUIDCondition
+  null: Boolean
+  isNull: Boolean
+  eq: UUID
+  notEq: UUID
+  in: [UUID!]
+  notIn: [UUID!]
+  lt: UUID
+  lte: UUID
+  gt: UUID
+  gte: UUID
+}
+
+input StringCondition {
+  and: [StringCondition!]
+  or: [StringCondition!]
+  not: StringCondition
+  null: Boolean
+  isNull: Boolean
+  eq: String
+  notEq: String
+  in: [String!]
+  notIn: [String!]
+  lt: String
+  lte: String
+  gt: String
+  gte: String
+  contains: String
+  startsWith: String
+  endsWith: String
+  containsCI: String
+  startsWithCI: String
+  endsWithCI: String
+  similar: String
+  wordSimilar: String
+}
+
+input CategoryWhere {
+  id: UUIDCondition
+
+  """description of Category.name"""
+  name: StringCondition
+
+  """description of Category.articles"""
+  articles: ArticleWhere
+  and: [CategoryWhere]
+  or: [CategoryWhere]
+  not: CategoryWhere
+}
+
+input TagWhere {
+  id: UUIDCondition
+
+  """description of Tag.name"""
+  name: StringCondition
+
+  """description of Tag.articles"""
+  articles: ArticleWhere
+  and: [TagWhere]
+  or: [TagWhere]
+  not: TagWhere
+}
+
+input ArticleStatsWhere {
+  id: UUIDCondition
+
+  """description of ArticleStats.article"""
+  article: ArticleWhere
+  and: [ArticleStatsWhere]
+  or: [ArticleStatsWhere]
+  not: ArticleStatsWhere
+}
+
+input ArticleOrderBy {
+  _random: Boolean
+  _randomSeeded: Int
+  id: OrderDirection
+
+  """description of Article.title"""
+  title: OrderDirection
+
+  """description of Article.category"""
+  category: CategoryOrderBy
+
+  """description of Article.stats"""
+  stats: ArticleStatsOrderBy
+}
+
+enum OrderDirection {
+  asc
+  desc
+  ascNullsFirst
+  descNullsLast
+}
+
+input CategoryOrderBy {
+  _random: Boolean
+  _randomSeeded: Int
+  id: OrderDirection
+
+  """description of Category.name"""
+  name: OrderDirection
+}
+
+input ArticleStatsOrderBy {
+  _random: Boolean
+  _randomSeeded: Int
+  id: OrderDirection
+
+  """description of ArticleStats.article"""
+  article: ArticleOrderBy
+}
+
+input CategoryArticlesByStatsUniqueWhere {
+  """description of Article.stats"""
+  stats: ArticleStatsUniqueWhere
+}
+
+input ArticleStatsUniqueWhere {
+  id: UUID
+
+  """description of ArticleStats.article"""
+  article: ArticleUniqueWhere
+}
+
+input ArticleUniqueWhere {
+  id: UUID
+
+  """description of Article.stats"""
+  stats: ArticleStatsUniqueWhere
+}
+
+input ArticlesOfCategoryByUniqueWhere {
+  id: UUID
+
+  """description of Article.stats"""
+  stats: ArticleStatsUniqueWhere
+}
+
+type ArticleConnection {
+  pageInfo: PageInfo!
+  edges: [ArticleEdge!]!
+}
+
+type PageInfo {
+  totalCount: Int!
+}
+
+type ArticleEdge {
+  node: Article!
+}
+
+"""description of entity Tag"""
+type Tag {
+  _meta: TagMeta
+  id: UUID!
+
+  """description of Tag.name"""
+  name: String
+
+  """description of Tag.articles"""
+  articles(filter: ArticleWhere, orderBy: [ArticleOrderBy!], offset: Int, limit: Int): [Article!]!
+
+  """description of Tag.articles"""
+  paginateArticles(filter: ArticleWhere, orderBy: [ArticleOrderBy!], skip: Int, first: Int): ArticleConnection!
+}
+
+type TagMeta {
+  id: FieldMeta
+  name: FieldMeta
+  articles: FieldMeta
+}
+
+input TagOrderBy {
+  _random: Boolean
+  _randomSeeded: Int
+  id: OrderDirection
+
+  """description of Tag.name"""
+  name: OrderDirection
+}
+
+"""description of entity ArticleStats"""
+type ArticleStats {
+  _meta: ArticleStatsMeta
+  id: UUID!
+
+  """description of ArticleStats.article"""
+  article(filter: ArticleWhere): Article
+}
+
+type ArticleStatsMeta {
+  id: FieldMeta
+  article: FieldMeta
+}
+
+type TagConnection {
+  pageInfo: PageInfo!
+  edges: [TagEdge!]!
+}
+
+type TagEdge {
+  node: Tag!
+}
+
+type _ValidationResult {
+  valid: Boolean!
+  errors: [_ValidationError!]!
+}
+
+type _ValidationError {
+  path: [_PathFragment!]!
+  message: _ValidationMessage!
+}
+
+union _PathFragment = _FieldPathFragment | _IndexPathFragment
+
+type _FieldPathFragment {
+  field: String!
+}
+
+type _IndexPathFragment {
+  index: Int!
+  alias: String
+}
+
+type _ValidationMessage {
+  text: String!
+}
+
+input ArticleCreateInput {
+  """description of Article.title"""
+  title: String
+
+  """description of Article.category"""
+  category: ArticleCreateCategoryEntityRelationInput
+
+  """description of Article.tags"""
+  tags: [ArticleCreateTagsEntityRelationInput!]
+
+  """description of Article.stats"""
+  stats: ArticleCreateStatsEntityRelationInput
+  _dummy_field_: Boolean
+}
+
+input ArticleCreateCategoryEntityRelationInput {
+  connect: CategoryUniqueWhere
+  create: CategoryWithoutArticlesCreateInput
+  connectOrCreate: ArticleConnectOrCreateCategoryRelationInput
+}
+
+input CategoryUniqueWhere {
+  id: UUID
+
+  """description of Category.articles"""
+  articles: ArticleUniqueWhere
+}
+
+input CategoryWithoutArticlesCreateInput {
+  """description of Category.name"""
+  name: String
+  _dummy_field_: Boolean
+}
+
+input ArticleConnectOrCreateCategoryRelationInput {
+  connect: CategoryUniqueWhere!
+  create: CategoryWithoutArticlesCreateInput!
+}
+
+input ArticleCreateTagsEntityRelationInput {
+  connect: TagUniqueWhere
+  create: TagWithoutArticlesCreateInput
+  connectOrCreate: ArticleConnectOrCreateTagsRelationInput
+  alias: String
+}
+
+input TagUniqueWhere {
+  id: UUID
+}
+
+input TagWithoutArticlesCreateInput {
+  """description of Tag.name"""
+  name: String
+  _dummy_field_: Boolean
+}
+
+input ArticleConnectOrCreateTagsRelationInput {
+  connect: TagUniqueWhere!
+  create: TagWithoutArticlesCreateInput!
+}
+
+input ArticleCreateStatsEntityRelationInput {
+  connect: ArticleStatsUniqueWhere
+  create: ArticleStatsWithoutArticleCreateInput
+  connectOrCreate: ArticleConnectOrCreateStatsRelationInput
+}
+
+input ArticleStatsWithoutArticleCreateInput {
+  _dummy_field_: Boolean
+}
+
+input ArticleConnectOrCreateStatsRelationInput {
+  connect: ArticleStatsUniqueWhere!
+  create: ArticleStatsWithoutArticleCreateInput!
+}
+
+input ArticleUpdateInput {
+  """description of Article.title"""
+  title: String
+
+  """description of Article.category"""
+  category: ArticleUpdateCategoryEntityRelationInput
+
+  """description of Article.tags"""
+  tags: [ArticleUpdateTagsEntityRelationInput!]
+
+  """description of Article.stats"""
+  stats: ArticleUpdateStatsEntityRelationInput
+  _dummy_field_: Boolean
+}
+
+input ArticleUpdateCategoryEntityRelationInput {
+  connect: CategoryUniqueWhere
+  create: CategoryWithoutArticlesCreateInput
+  connectOrCreate: ArticleConnectOrCreateCategoryRelationInput
+  update: CategoryWithoutArticlesUpdateInput
+  upsert: ArticleUpsertCategoryRelationInput
+  disconnect: Boolean
+  delete: Boolean
+}
+
+input CategoryWithoutArticlesUpdateInput {
+  """description of Category.name"""
+  name: String
+  _dummy_field_: Boolean
+}
+
+input ArticleUpsertCategoryRelationInput {
+  update: CategoryWithoutArticlesUpdateInput!
+  create: CategoryWithoutArticlesCreateInput!
+}
+
+input ArticleUpdateTagsEntityRelationInput {
+  create: TagWithoutArticlesCreateInput
+  update: ArticleUpdateTagsRelationInput
+  upsert: ArticleUpsertTagsRelationInput
+  connect: TagUniqueWhere
+  connectOrCreate: ArticleConnectOrCreateTagsRelationInput
+  disconnect: TagUniqueWhere
+  delete: TagUniqueWhere
+  alias: String
+}
+
+input ArticleUpdateTagsRelationInput {
+  by: TagUniqueWhere!
+  data: TagWithoutArticlesUpdateInput!
+}
+
+input TagWithoutArticlesUpdateInput {
+  """description of Tag.name"""
+  name: String
+  _dummy_field_: Boolean
+}
+
+input ArticleUpsertTagsRelationInput {
+  by: TagUniqueWhere!
+  update: TagWithoutArticlesUpdateInput!
+  create: TagWithoutArticlesCreateInput!
+}
+
+input ArticleUpdateStatsEntityRelationInput {
+  connect: ArticleStatsUniqueWhere
+  create: ArticleStatsWithoutArticleCreateInput
+  connectOrCreate: ArticleConnectOrCreateStatsRelationInput
+  update: ArticleStatsWithoutArticleUpdateInput
+  upsert: ArticleUpsertStatsRelationInput
+  disconnect: Boolean
+  delete: Boolean
+}
+
+input ArticleStatsWithoutArticleUpdateInput {
+  _dummy_field_: Boolean
+}
+
+input ArticleUpsertStatsRelationInput {
+  update: ArticleStatsWithoutArticleUpdateInput!
+  create: ArticleStatsWithoutArticleCreateInput!
+}
+
+type ArticleStatsConnection {
+  pageInfo: PageInfo!
+  edges: [ArticleStatsEdge!]!
+}
+
+type ArticleStatsEdge {
+  node: ArticleStats!
+}
+
+input ArticleStatsCreateInput {
+  """description of ArticleStats.article"""
+  article: ArticleStatsCreateArticleEntityRelationInput
+  _dummy_field_: Boolean
+}
+
+input ArticleStatsCreateArticleEntityRelationInput {
+  connect: ArticleUniqueWhere
+  create: ArticleWithoutStatsCreateInput
+  connectOrCreate: ArticleStatsConnectOrCreateArticleRelationInput
+}
+
+input ArticleWithoutStatsCreateInput {
+  """description of Article.title"""
+  title: String
+
+  """description of Article.category"""
+  category: ArticleCreateCategoryEntityRelationInput
+
+  """description of Article.tags"""
+  tags: [ArticleCreateTagsEntityRelationInput!]
+  _dummy_field_: Boolean
+}
+
+input ArticleStatsConnectOrCreateArticleRelationInput {
+  connect: ArticleUniqueWhere!
+  create: ArticleWithoutStatsCreateInput!
+}
+
+input ArticleStatsUpdateInput {
+  """description of ArticleStats.article"""
+  article: ArticleStatsUpdateArticleEntityRelationInput
+  _dummy_field_: Boolean
+}
+
+input ArticleStatsUpdateArticleEntityRelationInput {
+  connect: ArticleUniqueWhere
+  create: ArticleWithoutStatsCreateInput
+  connectOrCreate: ArticleStatsConnectOrCreateArticleRelationInput
+  update: ArticleWithoutStatsUpdateInput
+  upsert: ArticleStatsUpsertArticleRelationInput
+  disconnect: Boolean
+  delete: Boolean
+}
+
+input ArticleWithoutStatsUpdateInput {
+  """description of Article.title"""
+  title: String
+
+  """description of Article.category"""
+  category: ArticleUpdateCategoryEntityRelationInput
+
+  """description of Article.tags"""
+  tags: [ArticleUpdateTagsEntityRelationInput!]
+  _dummy_field_: Boolean
+}
+
+input ArticleStatsUpsertArticleRelationInput {
+  update: ArticleWithoutStatsUpdateInput!
+  create: ArticleWithoutStatsCreateInput!
+}
+
+type CategoryConnection {
+  pageInfo: PageInfo!
+  edges: [CategoryEdge!]!
+}
+
+type CategoryEdge {
+  node: Category!
+}
+
+input CategoryCreateInput {
+  """description of Category.name"""
+  name: String
+
+  """description of Category.articles"""
+  articles: [CategoryCreateArticlesEntityRelationInput!]
+  _dummy_field_: Boolean
+}
+
+input CategoryCreateArticlesEntityRelationInput {
+  connect: ArticleUniqueWhere
+  create: ArticleWithoutCategoryCreateInput
+  connectOrCreate: CategoryConnectOrCreateArticlesRelationInput
+  alias: String
+}
+
+input ArticleWithoutCategoryCreateInput {
+  """description of Article.title"""
+  title: String
+
+  """description of Article.tags"""
+  tags: [ArticleCreateTagsEntityRelationInput!]
+
+  """description of Article.stats"""
+  stats: ArticleCreateStatsEntityRelationInput
+  _dummy_field_: Boolean
+}
+
+input CategoryConnectOrCreateArticlesRelationInput {
+  connect: ArticleUniqueWhere!
+  create: ArticleWithoutCategoryCreateInput!
+}
+
+input CategoryUpdateInput {
+  """description of Category.name"""
+  name: String
+
+  """description of Category.articles"""
+  articles: [CategoryUpdateArticlesEntityRelationInput!]
+  _dummy_field_: Boolean
+}
+
+input CategoryUpdateArticlesEntityRelationInput {
+  create: ArticleWithoutCategoryCreateInput
+  update: CategoryUpdateArticlesRelationInput
+  upsert: CategoryUpsertArticlesRelationInput
+  connect: ArticleUniqueWhere
+  connectOrCreate: CategoryConnectOrCreateArticlesRelationInput
+  disconnect: ArticleUniqueWhere
+  delete: ArticleUniqueWhere
+  alias: String
+}
+
+input CategoryUpdateArticlesRelationInput {
+  by: ArticleUniqueWhere!
+  data: ArticleWithoutCategoryUpdateInput!
+}
+
+input ArticleWithoutCategoryUpdateInput {
+  """description of Article.title"""
+  title: String
+
+  """description of Article.tags"""
+  tags: [ArticleUpdateTagsEntityRelationInput!]
+
+  """description of Article.stats"""
+  stats: ArticleUpdateStatsEntityRelationInput
+  _dummy_field_: Boolean
+}
+
+input CategoryUpsertArticlesRelationInput {
+  by: ArticleUniqueWhere!
+  update: ArticleWithoutCategoryUpdateInput!
+  create: ArticleWithoutCategoryCreateInput!
+}
+
+input TagCreateInput {
+  """description of Tag.name"""
+  name: String
+
+  """description of Tag.articles"""
+  articles: [TagCreateArticlesEntityRelationInput!]
+  _dummy_field_: Boolean
+}
+
+input TagCreateArticlesEntityRelationInput {
+  connect: ArticleUniqueWhere
+  create: ArticleWithoutTagsCreateInput
+  connectOrCreate: TagConnectOrCreateArticlesRelationInput
+  alias: String
+}
+
+input ArticleWithoutTagsCreateInput {
+  """description of Article.title"""
+  title: String
+
+  """description of Article.category"""
+  category: ArticleCreateCategoryEntityRelationInput
+
+  """description of Article.stats"""
+  stats: ArticleCreateStatsEntityRelationInput
+  _dummy_field_: Boolean
+}
+
+input TagConnectOrCreateArticlesRelationInput {
+  connect: ArticleUniqueWhere!
+  create: ArticleWithoutTagsCreateInput!
+}
+
+input TagUpdateInput {
+  """description of Tag.name"""
+  name: String
+
+  """description of Tag.articles"""
+  articles: [TagUpdateArticlesEntityRelationInput!]
+  _dummy_field_: Boolean
+}
+
+input TagUpdateArticlesEntityRelationInput {
+  create: ArticleWithoutTagsCreateInput
+  update: TagUpdateArticlesRelationInput
+  upsert: TagUpsertArticlesRelationInput
+  connect: ArticleUniqueWhere
+  connectOrCreate: TagConnectOrCreateArticlesRelationInput
+  disconnect: ArticleUniqueWhere
+  delete: ArticleUniqueWhere
+  alias: String
+}
+
+input TagUpdateArticlesRelationInput {
+  by: ArticleUniqueWhere!
+  data: ArticleWithoutTagsUpdateInput!
+}
+
+input ArticleWithoutTagsUpdateInput {
+  """description of Article.title"""
+  title: String
+
+  """description of Article.category"""
+  category: ArticleUpdateCategoryEntityRelationInput
+
+  """description of Article.stats"""
+  stats: ArticleUpdateStatsEntityRelationInput
+  _dummy_field_: Boolean
+}
+
+input TagUpsertArticlesRelationInput {
+  by: ArticleUniqueWhere!
+  update: ArticleWithoutTagsUpdateInput!
+  create: ArticleWithoutTagsCreateInput!
+}
+
+type QueryTransaction {
+  getArticle(by: ArticleUniqueWhere!, filter: ArticleWhere): Article
+  listArticle(filter: ArticleWhere, orderBy: [ArticleOrderBy!], offset: Int, limit: Int): [Article!]!
+  paginateArticle(filter: ArticleWhere, orderBy: [ArticleOrderBy!], skip: Int, first: Int): ArticleConnection!
+  validateCreateArticle(data: ArticleCreateInput!): _ValidationResult!
+  validateUpdateArticle(by: ArticleUniqueWhere!, data: ArticleUpdateInput!): _ValidationResult!
+  getArticleStats(by: ArticleStatsUniqueWhere!, filter: ArticleStatsWhere): ArticleStats
+  listArticleStats(filter: ArticleStatsWhere, orderBy: [ArticleStatsOrderBy!], offset: Int, limit: Int): [ArticleStats!]!
+  paginateArticleStats(filter: ArticleStatsWhere, orderBy: [ArticleStatsOrderBy!], skip: Int, first: Int): ArticleStatsConnection!
+  validateCreateArticleStats(data: ArticleStatsCreateInput!): _ValidationResult!
+  validateUpdateArticleStats(by: ArticleStatsUniqueWhere!, data: ArticleStatsUpdateInput!): _ValidationResult!
+  getCategory(by: CategoryUniqueWhere!, filter: CategoryWhere): Category
+  listCategory(filter: CategoryWhere, orderBy: [CategoryOrderBy!], offset: Int, limit: Int): [Category!]!
+  paginateCategory(filter: CategoryWhere, orderBy: [CategoryOrderBy!], skip: Int, first: Int): CategoryConnection!
+  validateCreateCategory(data: CategoryCreateInput!): _ValidationResult!
+  validateUpdateCategory(by: CategoryUniqueWhere!, data: CategoryUpdateInput!): _ValidationResult!
+  getTag(by: TagUniqueWhere!, filter: TagWhere): Tag
+  listTag(filter: TagWhere, orderBy: [TagOrderBy!], offset: Int, limit: Int): [Tag!]!
+  paginateTag(filter: TagWhere, orderBy: [TagOrderBy!], skip: Int, first: Int): TagConnection!
+  validateCreateTag(data: TagCreateInput!): _ValidationResult!
+  validateUpdateTag(by: TagUniqueWhere!, data: TagUpdateInput!): _ValidationResult!
+}
+
+type Info {
+  description: String
+}
+
+type Mutation {
+  createArticle(data: ArticleCreateInput!): ArticleCreateResult!
+  deleteArticle(by: ArticleUniqueWhere!, filter: ArticleWhere): ArticleDeleteResult!
+  updateArticle(by: ArticleUniqueWhere!, filter: ArticleWhere, data: ArticleUpdateInput!): ArticleUpdateResult!
+  upsertArticle(by: ArticleUniqueWhere!, filter: ArticleWhere, update: ArticleUpdateInput!, create: ArticleCreateInput!): ArticleUpsertResult!
+  createArticleStats(data: ArticleStatsCreateInput!): ArticleStatsCreateResult!
+  deleteArticleStats(by: ArticleStatsUniqueWhere!, filter: ArticleStatsWhere): ArticleStatsDeleteResult!
+  updateArticleStats(by: ArticleStatsUniqueWhere!, filter: ArticleStatsWhere, data: ArticleStatsUpdateInput!): ArticleStatsUpdateResult!
+  upsertArticleStats(by: ArticleStatsUniqueWhere!, filter: ArticleStatsWhere, update: ArticleStatsUpdateInput!, create: ArticleStatsCreateInput!): ArticleStatsUpsertResult!
+  createCategory(data: CategoryCreateInput!): CategoryCreateResult!
+  deleteCategory(by: CategoryUniqueWhere!, filter: CategoryWhere): CategoryDeleteResult!
+  updateCategory(by: CategoryUniqueWhere!, filter: CategoryWhere, data: CategoryUpdateInput!): CategoryUpdateResult!
+  upsertCategory(by: CategoryUniqueWhere!, filter: CategoryWhere, update: CategoryUpdateInput!, create: CategoryCreateInput!): CategoryUpsertResult!
+  createTag(data: TagCreateInput!): TagCreateResult!
+  deleteTag(by: TagUniqueWhere!, filter: TagWhere): TagDeleteResult!
+  updateTag(by: TagUniqueWhere!, filter: TagWhere, data: TagUpdateInput!): TagUpdateResult!
+  upsertTag(by: TagUniqueWhere!, filter: TagWhere, update: TagUpdateInput!, create: TagCreateInput!): TagUpsertResult!
+  transaction(options: MutationTransactionOptions): MutationTransaction!
+  query: Query!
+}
+
+type ArticleCreateResult implements MutationResult {
+  ok: Boolean!
+  errorMessage: String
+  errors: [_MutationError!]!
+  node: Article
+  validation: _ValidationResult!
+}
+
+interface MutationResult {
+  ok: Boolean!
+  errorMessage: String
+  errors: [_MutationError!]!
+}
+
+type _MutationError {
+  path: [_PathFragment!]! @deprecated(reason: "Use `paths`.")
+  paths: [[_PathFragment!]!]!
+  type: _MutationErrorType!
+  message: String
+}
+
+enum _MutationErrorType {
+  NotNullConstraintViolation
+  UniqueConstraintViolation
+  ForeignKeyConstraintViolation
+  NotFoundOrDenied
+  NonUniqueWhereInput
+  InvalidDataInput
+  SqlError
+  ResourceExhausted
+}
+
+type ArticleDeleteResult implements MutationResult {
+  ok: Boolean!
+  errorMessage: String
+  errors: [_MutationError!]!
+  node: Article
+}
+
+type ArticleUpdateResult implements MutationResult {
+  ok: Boolean!
+  errorMessage: String
+  errors: [_MutationError!]!
+  node: Article
+  validation: _ValidationResult!
+}
+
+type ArticleUpsertResult implements MutationResult {
+  ok: Boolean!
+  errorMessage: String
+  errors: [_MutationError!]!
+  node: Article
+  validation: _ValidationResult!
+}
+
+type ArticleStatsCreateResult implements MutationResult {
+  ok: Boolean!
+  errorMessage: String
+  errors: [_MutationError!]!
+  node: ArticleStats
+  validation: _ValidationResult!
+}
+
+type ArticleStatsDeleteResult implements MutationResult {
+  ok: Boolean!
+  errorMessage: String
+  errors: [_MutationError!]!
+  node: ArticleStats
+}
+
+type ArticleStatsUpdateResult implements MutationResult {
+  ok: Boolean!
+  errorMessage: String
+  errors: [_MutationError!]!
+  node: ArticleStats
+  validation: _ValidationResult!
+}
+
+type ArticleStatsUpsertResult implements MutationResult {
+  ok: Boolean!
+  errorMessage: String
+  errors: [_MutationError!]!
+  node: ArticleStats
+  validation: _ValidationResult!
+}
+
+type CategoryCreateResult implements MutationResult {
+  ok: Boolean!
+  errorMessage: String
+  errors: [_MutationError!]!
+  node: Category
+  validation: _ValidationResult!
+}
+
+type CategoryDeleteResult implements MutationResult {
+  ok: Boolean!
+  errorMessage: String
+  errors: [_MutationError!]!
+  node: Category
+}
+
+type CategoryUpdateResult implements MutationResult {
+  ok: Boolean!
+  errorMessage: String
+  errors: [_MutationError!]!
+  node: Category
+  validation: _ValidationResult!
+}
+
+type CategoryUpsertResult implements MutationResult {
+  ok: Boolean!
+  errorMessage: String
+  errors: [_MutationError!]!
+  node: Category
+  validation: _ValidationResult!
+}
+
+type TagCreateResult implements MutationResult {
+  ok: Boolean!
+  errorMessage: String
+  errors: [_MutationError!]!
+  node: Tag
+  validation: _ValidationResult!
+}
+
+type TagDeleteResult implements MutationResult {
+  ok: Boolean!
+  errorMessage: String
+  errors: [_MutationError!]!
+  node: Tag
+}
+
+type TagUpdateResult implements MutationResult {
+  ok: Boolean!
+  errorMessage: String
+  errors: [_MutationError!]!
+  node: Tag
+  validation: _ValidationResult!
+}
+
+type TagUpsertResult implements MutationResult {
+  ok: Boolean!
+  errorMessage: String
+  errors: [_MutationError!]!
+  node: Tag
+  validation: _ValidationResult!
+}
+
+type MutationTransaction {
+  ok: Boolean!
+  errorMessage: String
+  errors: [_MutationError!]!
+  validation: _ValidationResult!
+  createArticle(data: ArticleCreateInput!): ArticleCreateResult!
+  deleteArticle(by: ArticleUniqueWhere!, filter: ArticleWhere): ArticleDeleteResult!
+  updateArticle(by: ArticleUniqueWhere!, filter: ArticleWhere, data: ArticleUpdateInput!): ArticleUpdateResult!
+  upsertArticle(by: ArticleUniqueWhere!, filter: ArticleWhere, update: ArticleUpdateInput!, create: ArticleCreateInput!): ArticleUpsertResult!
+  createArticleStats(data: ArticleStatsCreateInput!): ArticleStatsCreateResult!
+  deleteArticleStats(by: ArticleStatsUniqueWhere!, filter: ArticleStatsWhere): ArticleStatsDeleteResult!
+  updateArticleStats(by: ArticleStatsUniqueWhere!, filter: ArticleStatsWhere, data: ArticleStatsUpdateInput!): ArticleStatsUpdateResult!
+  upsertArticleStats(by: ArticleStatsUniqueWhere!, filter: ArticleStatsWhere, update: ArticleStatsUpdateInput!, create: ArticleStatsCreateInput!): ArticleStatsUpsertResult!
+  createCategory(data: CategoryCreateInput!): CategoryCreateResult!
+  deleteCategory(by: CategoryUniqueWhere!, filter: CategoryWhere): CategoryDeleteResult!
+  updateCategory(by: CategoryUniqueWhere!, filter: CategoryWhere, data: CategoryUpdateInput!): CategoryUpdateResult!
+  upsertCategory(by: CategoryUniqueWhere!, filter: CategoryWhere, update: CategoryUpdateInput!, create: CategoryCreateInput!): CategoryUpsertResult!
+  createTag(data: TagCreateInput!): TagCreateResult!
+  deleteTag(by: TagUniqueWhere!, filter: TagWhere): TagDeleteResult!
+  updateTag(by: TagUniqueWhere!, filter: TagWhere, data: TagUpdateInput!): TagUpdateResult!
+  upsertTag(by: TagUniqueWhere!, filter: TagWhere, update: TagUpdateInput!, create: TagCreateInput!): TagUpsertResult!
+  query: Query
+}
+
+input MutationTransactionOptions {
+  deferForeignKeyConstraints: Boolean
+  deferUniqueConstraints: Boolean
+}

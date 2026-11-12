@@ -1,3 +1,4 @@
+import { DEFAULT_FIELD_DEPRECATION_REASON } from '@contember/schema-utils'
 import { Model } from '@contember/schema'
 import FieldBuilder from './FieldBuilder.js'
 import { AddEntityCallback, EntityConfigurator } from './types.js'
@@ -9,27 +10,35 @@ type PartialOptions<K extends keyof ManyHasManyBuilder.Options> =
 class ManyHasManyBuilder<O extends PartialOptions<never> = PartialOptions<never>> implements FieldBuilder<O> {
 	constructor(private readonly options: O, private readonly addEntity: AddEntityCallback) {}
 
-	target(target: string, configurator?: EntityConfigurator): ManyHasManyBuilder<O & PartialOptions<'target'>> {
+	public target(target: string, configurator?: EntityConfigurator): ManyHasManyBuilder<O & PartialOptions<'target'>> {
 		if (configurator) {
 			this.addEntity(target, configurator)
 		}
 		return this.withOption('target', target)
 	}
 
-	inversedBy(inversedBy: string): ManyHasManyBuilder<O> {
+	public inversedBy(inversedBy: string): ManyHasManyBuilder<O> {
 		return this.withOption('inversedBy', inversedBy)
 	}
 
-	joiningTable(joiningTable: Model.JoiningTable): ManyHasManyBuilder<O> {
+	public joiningTable(joiningTable: Model.JoiningTable): ManyHasManyBuilder<O> {
 		return this.withOption('joiningTable', joiningTable)
 	}
 
-	orderBy(field: string | string[], direction: Model.OrderDirection = Model.OrderDirection.asc): ManyHasManyBuilder<O> {
+	public orderBy(field: string | string[], direction: Model.OrderDirection = Model.OrderDirection.asc): ManyHasManyBuilder<O> {
 		const path = typeof field === 'string' ? [field] : field
 		return this.withOption('orderBy', [...(this.options.orderBy || []), { path, direction }])
 	}
 
-	getOption(): O {
+	public description(description: string): ManyHasManyBuilder<O> {
+		return this.withOption('description', description)
+	}
+
+	public deprecated(deprecationReason?: string): ManyHasManyBuilder<O> {
+		return this.withOption('deprecationReason', deprecationReason || DEFAULT_FIELD_DEPRECATION_REASON)
+	}
+
+	public getOption(): O {
 		return this.options
 	}
 
@@ -47,6 +56,8 @@ namespace ManyHasManyBuilder {
 		inversedBy?: string
 		joiningTable?: Model.JoiningTable
 		orderBy?: Model.OrderBy[]
+		description?: string
+		deprecationReason?: string
 	}
 }
 

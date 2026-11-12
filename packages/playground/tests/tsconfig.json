@@ -5,5 +5,7 @@
 		"emitDeclarationOnly": false
 	},
 	"references": [
+		{ "path": "../api" },
+		{ "path": "../../migrations-client/src" },
 	],
 }

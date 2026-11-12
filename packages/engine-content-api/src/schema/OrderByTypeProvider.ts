@@ -10,7 +10,7 @@ import {
 import { Acl, Model } from '@contember/schema'
 import { acceptFieldVisitor } from '@contember/schema-utils'
 import { singletonFactory } from '../utils/index.js'
-import { GqlTypeName } from './utils.js'
+import { GqlTypeName, inputFieldDescription } from './utils.js'
 import { Authorizator } from '../acl/index.js'
 import { FieldAccessVisitor } from './FieldAccessVisitor.js'
 
@@ -61,9 +61,15 @@ export class OrderByTypeProvider {
 					if (column.list) {
 						return undefined
 					}
-					return ({ type: this.orderDirectionEnum })
+					return {
+						type: this.orderDirectionEnum,
+						description: inputFieldDescription(column),
+					}
 				},
-				visitHasOne: ({ relation }) => ({ type: this.getEntityOrderByType(relation.target) }),
+				visitHasOne: ({ relation }) => ({
+					type: this.getEntityOrderByType(relation.target),
+					description: inputFieldDescription(relation),
+				}),
 				visitHasMany: () => undefined,
 			} as Model.FieldVisitor<GraphQLInputFieldConfig | undefined>)
 

@@ -4,7 +4,7 @@ import { GraphQLInputFieldConfig, GraphQLInputFieldConfigMap, GraphQLInputObject
 import { capitalizeFirstLetter, getFieldsForUniqueWhere, singletonFactory } from '../utils/index.js'
 import { ColumnTypeResolver } from './ColumnTypeResolver.js'
 import { ConditionTypeProvider } from './ConditionTypeProvider.js'
-import { GqlTypeName } from './utils.js'
+import { GqlTypeName, inputFieldDescription } from './utils.js'
 import { Authorizator } from '../acl/index.js'
 import { FieldAccessVisitor } from './FieldAccessVisitor.js'
 import { ImplementationException } from '../exception.js'
@@ -71,7 +71,7 @@ export class WhereTypeProvider {
 					continue
 				}
 				fields[field] = acceptFieldVisitor<GraphQLInputFieldConfig>(this.schema, entity, field, {
-					visitRelation: ({ targetEntity }) => {
+					visitRelation: ({ relation, targetEntity }) => {
 						// if (!isIt<Model.JoiningColumnRelation>(relation, 'joiningColumn')) {
 						// 	throw new Error('Only column or owning relation can be a part of unique key')
 						// }
@@ -79,9 +79,15 @@ export class WhereTypeProvider {
 						if (!uniqueWhere) {
 							throw new ImplementationException()
 						}
-						return { type: uniqueWhere }
+						return {
+							type: uniqueWhere,
+							description: inputFieldDescription(relation),
+						}
 					},
-					visitColumn: ({ column }) => ({ type: this.columnTypeResolver.getType(column)[0] }),
+					visitColumn: ({ column }) => ({
+						type: this.columnTypeResolver.getType(column)[0],
+						description: inputFieldDescription(column),
+					}),
 				})
 			}
 		}
@@ -101,8 +107,14 @@ export class WhereTypeProvider {
 				continue
 			}
 			fields[fieldName] = acceptFieldVisitor(this.schema, name, fieldName, {
-				visitColumn: ({ column }) => ({ type: this.conditionTypeProvider.getCondition(column) }),
-				visitRelation: ({ relation }) => ({ type: this.getEntityWhereType(relation.target) }),
+				visitColumn: ({ column }) => ({
+					type: this.conditionTypeProvider.getCondition(column),
+					description: inputFieldDescription(column),
+				}),
+				visitRelation: ({ relation }) => ({
+					type: this.getEntityWhereType(relation.target),
+					description: inputFieldDescription(relation),
+				}),
 			} as Model.FieldVisitor<GraphQLInputFieldConfig>)
 		}
 

@@ -354,7 +354,6 @@ namespace InvalidChecks {
 	@c.Check({ name: 'dup', expression: 'price >= 0' })
 	@c.Check({ name: 'dup', expression: 'price >= 1' })
 	@c.Check({ name: 'empty', expression: '  ' })
-	@c.Check({ name: 'terminated', expression: 'true); DROP TABLE product; --' })
 	@c.Check({ name: 'a'.repeat(64), expression: 'price >= 0' })
 	@c.Check({ name: 'product_price_key', expression: 'price >= 0' })
 	export class Product {
@@ -365,7 +364,7 @@ namespace InvalidChecks {
 test('invalid check constraints', () => {
 	const errors = new ModelValidator(createSchema(InvalidChecks).model).validate()
 	const path = ['entities', 'Product', 'checks']
-	expect(errors).toHaveLength(6)
+	expect(errors).toHaveLength(5)
 	expect(errors).toEqual(expect.arrayContaining([
 		{
 			code: 'MODEL_INVALID_CHECK',
@@ -374,7 +373,6 @@ test('invalid check constraints', () => {
 		},
 		{ code: 'MODEL_INVALID_CHECK', path, message: 'Check constraint name "dup" is used more than once on this entity.' },
 		{ code: 'MODEL_INVALID_CHECK', path, message: 'Check constraint "empty" expression must not be empty.' },
-		{ code: 'MODEL_INVALID_CHECK', path, message: 'Check constraint "terminated" expression must not contain ";".' },
 		{ code: 'MODEL_INVALID_CHECK', path, message: `Check constraint name "${'a'.repeat(64)}" is longer than 63 bytes.` },
 		{
 			code: 'MODEL_INVALID_CHECK',

@@ -49,6 +49,20 @@ namespace TerminatedIndexPredicate {
 	}
 }
 
+namespace TerminatedCheck {
+	@c.Check({ name: 'terminated', expression: 'true); DELETE FROM article; --' })
+	export class Article {
+		title = c.stringColumn()
+	}
+}
+
+namespace QuotedSemicolonCheck {
+	@c.Check({ name: 'no_semicolon', expression: "title <> ';'" })
+	export class Article {
+		title = c.stringColumn()
+	}
+}
+
 const base = createSchema(Base)
 const multiStatementView = createSchema(MultiStatementView)
 
@@ -70,6 +84,18 @@ test('a new index predicate with a statement terminator is rejected', () => {
 	expect(validateAddedSql(base, createSchema(TerminatedIndexPredicate))).toStrictEqual([
 		{ code: 'MODEL_INVALID_INDEX', path: ['entities', 'Article', 'indexes'], message: 'Index predicate (where) must not contain ";".' },
 	])
+})
+
+test('a new check expression with a statement terminator is rejected', () => {
+	expect(validateAddedSql(base, createSchema(TerminatedCheck))).toStrictEqual([
+		{ code: 'MODEL_INVALID_CHECK', path: ['entities', 'Article', 'checks'], message: 'Check constraint "terminated" expression must not contain ";".' },
+	])
+})
+
+test('an unchanged check is not checked again and a quoted semicolon is accepted', () => {
+	const terminated = createSchema(TerminatedCheck)
+	expect(validateAddedSql(terminated, terminated)).toStrictEqual([])
+	expect(validateAddedSql(base, createSchema(QuotedSemicolonCheck))).toStrictEqual([])
 })
 
 test('the differ rejects added invalid SQL but keeps diffing a schema that already contains it', () => {

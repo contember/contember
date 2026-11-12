@@ -97,11 +97,10 @@ export class ModelValidator {
 				errors.add('MODEL_INVALID_CHECK', `Check constraint name "${check.name}" is used more than once on this entity.`)
 			}
 			seenNames.add(check.name)
-			// The expression is raw SQL embedded verbatim into ALTER TABLE; same footgun checks as an index `where`.
+			// The expression is raw SQL embedded verbatim into ALTER TABLE. Like an index `where`, its statement shape
+			// is checked only for migrations about to be executed (validateAddedSql in schema-migrations).
 			if (check.expression.trim() === '') {
 				errors.add('MODEL_INVALID_CHECK', `Check constraint "${check.name}" expression must not be empty.`)
-			} else if (check.expression.includes(';')) {
-				errors.add('MODEL_INVALID_CHECK', `Check constraint "${check.name}" expression must not contain ";".`)
 			}
 		}
 	}

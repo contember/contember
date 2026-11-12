@@ -12,8 +12,6 @@ export const schema = new Schema(SchemaPreprocessor.processRawSchema({
 					defaultValue: null,
 					type: 'Uuid',
 					enumName: null,
-					deprecationReason: null,
-					description: null,
 				},
 				{
 					__typename: '_Column',
@@ -22,8 +20,6 @@ export const schema = new Schema(SchemaPreprocessor.processRawSchema({
 					defaultValue: null,
 					type: 'String',
 					enumName: null,
-					deprecationReason: null,
-					description: null,
 				},
 				{
 					__typename: '_Relation',
@@ -36,8 +32,6 @@ export const schema = new Schema(SchemaPreprocessor.processRawSchema({
 					orderBy: null,
 					onDelete: null,
 					orphanRemoval: null,
-					deprecationReason: null,
-					description: null,
 				},
 			],
 			customPrimaryAllowed: false,
@@ -53,8 +47,6 @@ export const schema = new Schema(SchemaPreprocessor.processRawSchema({
 					defaultValue: null,
 					type: 'Uuid',
 					enumName: null,
-					deprecationReason: null,
-					description: null,
 				},
 				{
 					__typename: '_Column',
@@ -63,8 +55,6 @@ export const schema = new Schema(SchemaPreprocessor.processRawSchema({
 					defaultValue: null,
 					type: 'String',
 					enumName: null,
-					deprecationReason: null,
-					description: null,
 				},
 				{
 					__typename: '_Column',
@@ -73,8 +63,6 @@ export const schema = new Schema(SchemaPreprocessor.processRawSchema({
 					defaultValue: null,
 					type: 'Boolean',
 					enumName: null,
-					deprecationReason: null,
-					description: null,
 				},
 				{
 					__typename: '_Relation',
@@ -87,8 +75,6 @@ export const schema = new Schema(SchemaPreprocessor.processRawSchema({
 					orderBy: null,
 					onDelete: null,
 					orphanRemoval: null,
-					deprecationReason: null,
-					description: null,
 				},
 			],
 			customPrimaryAllowed: false,

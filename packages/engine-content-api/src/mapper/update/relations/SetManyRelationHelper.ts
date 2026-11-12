@@ -1,7 +1,7 @@
 import { Input, Model } from '@contember/schema'
 import { Mapper } from '../../Mapper.js'
 import { UpdateInputProcessor } from '../../../inputProcessing/index.js'
-import { InputErrorKind, MutationInputError, MutationResult, MutationResultList, prependPath } from '../../Result.js'
+import { InputErrorKind, MutationDeleteOk, MutationInputError, MutationResult, MutationResultList, prependPath } from '../../Result.js'
 import { CheckedPrimary } from '../../CheckedPrimary.js'
 import { MapperInput } from '../../types.js'
 import { SqlUpdateInputProcessorResult } from '../SqlUpdateInputProcessor.js'
@@ -119,10 +119,12 @@ export const processSetManyRelationInput = async <Context extends HasManyContext
 		}
 	}
 
-	// Phase 2 - remove the members the input does not name.
+	// Phase 2 - remove the members the input does not name. Only deletes made by these removals count:
+	// the transaction-wide deletion history keeps rows that were deleted and recreated with the same id.
+	const removedTargets = new Set<string>()
 	for (const current of currentPrimaries) {
 		// already gone through the cascade of an earlier removal
-		if (desiredPrimaries.has(String(current)) || mapper.deletedEntities.isDeleted(targetEntity.name, current)) {
+		if (desiredPrimaries.has(String(current)) || removedTargets.has(String(current))) {
 			continue
 		}
 		const where: Input.UniqueWhere = { [targetEntity.primary]: current }
@@ -133,12 +135,17 @@ export const processSetManyRelationInput = async <Context extends HasManyContext
 		if (orphanResult.some(it => it.error)) {
 			return results
 		}
+		for (const entry of orphanResult) {
+			if (entry instanceof MutationDeleteOk && entry.entity.name === targetEntity.name) {
+				removedTargets.add(String(entry.primary))
+			}
+		}
 	}
 
 	// A removal can cascade into a target the input names. Establishing it now would fail (connect,
 	// update) or silently create a new row in its place (upsert, connectOrCreate), so refuse instead.
 	for (const { primary, index, alias } of desiredPrimaries.values()) {
-		if (mapper.deletedEntities.isDeleted(targetEntity.name, primary)) {
+		if (removedTargets.has(String(primary))) {
 			return fail(
 				index,
 				alias,

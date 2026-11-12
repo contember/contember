@@ -430,3 +430,43 @@ test('Content API: set refuses to recreate a member deleted by a cascade of an o
 		})
 		.expect(200)
 })
+
+test('Content API: set treats a member deleted and recreated earlier in the transaction as live', async () => {
+	const tester = await createTester(createSchema(OneHasManyModel, schema => ({ ...schema, acl: { ...schema.acl, customPrimary: true } })))
+
+	const created = await tester(gql`mutation {
+		createPost(data: {slug: "post", locales: [{create: {title: "a"}}, {create: {title: "b"}}]}) {
+			ok
+			node { id locales(orderBy: [{title: asc}]) { id } }
+		}
+	}`).expect(200)
+	const post = created.body.data.createPost.node
+	const [localeA, localeB] = post.locales
+
+	// both members are deleted and recreated with their ids, then "a" is kept and "b" must still be detached
+	await tester(
+		gql`mutation($post: UUID!, $a: UUID!, $b: UUID!) {
+			transaction {
+				deleteA: deletePostLocale(by: {id: $a}) { ok }
+				deleteB: deletePostLocale(by: {id: $b}) { ok }
+				createA: createPostLocale(data: {id: $a, title: "a2", post: {connect: {id: $post}}}) { ok }
+				createB: createPostLocale(data: {id: $b, title: "b2", post: {connect: {id: $post}}}) { ok }
+				updatePost(by: {id: $post}, data: {locales: {set: [{connect: {id: $a}}]}}) { ok errorMessage }
+			}
+		}`,
+		{ variables: { post: post.id, a: localeA.id, b: localeB.id } },
+	)
+		.expect(response => {
+			expect(response.body.data.transaction.updatePost).toStrictEqual({ ok: true, errorMessage: null })
+		})
+		.expect(200)
+
+	await tester(gql`query { listPostLocale(orderBy: [{title: asc}]) { id title post { slug } } }`)
+		.expect(response => {
+			expect(response.body.data.listPostLocale).toStrictEqual([
+				{ id: localeA.id, title: 'a2', post: { slug: 'post' } },
+				{ id: localeB.id, title: 'b2', post: null },
+			])
+		})
+		.expect(200)
+})

@@ -6,8 +6,8 @@ import * as http from 'node:http'
 import { IncomingMessage, Server, ServerResponse } from 'node:http'
 import { WebSocket, WebSocketServer } from 'ws'
 import { FingerCrossedLoggerHandler, Logger } from '@contember/logger'
-import koaCompress from 'koa-compress'
 import { ServerConfig } from '../config/config.js'
+import { createCompressionMiddleware } from './compression.js'
 import { createCorsMiddleware } from './cors.js'
 import { createRequestBodyMiddleware, defaultFormBodyLimit, defaultJsonBodyLimit } from './requestBody.js'
 import stream, { Duplex, Readable } from 'node:stream'
@@ -108,9 +108,7 @@ export class Application {
 		for (const middleware of this.middlewares) {
 			koa.use(middleware)
 		}
-		koa.use(koaCompress({
-			br: false,
-		}))
+		koa.use(createCompressionMiddleware())
 		koa.use(createRequestBodyMiddleware({
 			json: this.serverConfig.http?.requestBodySize ?? defaultJsonBodyLimit,
 			form: defaultFormBodyLimit,

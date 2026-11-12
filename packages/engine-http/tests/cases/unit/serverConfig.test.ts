@@ -163,3 +163,22 @@ test('egress: read from CONTEMBER_EGRESS_GUARD, _ALLOW_HTTP and _ALLOWLIST', asy
 test('egress: an invalid allowlist entry is refused at startup', () => {
 	expect(() => serverConfigSchema({ egress: { guard: true, allowlist: '10.0.0.0/40' } })).toThrow('Invalid egress allowlist entry')
 })
+
+const requestBodySize = (val: unknown): unknown => serverConfigSchema({ http: { requestBodySize: val } }).http?.requestBodySize
+
+test('requestBodySize: parsed into bytes with binary units', () => {
+	expect(requestBodySize('1048576')).toBe(1048576)
+	expect(requestBodySize('512kb')).toBe(512 * 1024)
+	expect(requestBodySize('10MB')).toBe(10 * 1024 * 1024)
+	expect(requestBodySize('1.5 mb')).toBe(1572864)
+})
+
+test('requestBodySize: empty means the default', () => {
+	expect(requestBodySize('')).toBeUndefined()
+})
+
+test('requestBodySize: a malformed size fails instead of disabling the limit', () => {
+	for (const value of ['abc', '10 megabytes', '-1mb', '1e6', 'mb']) {
+		expect(() => requestBodySize(value)).toThrow()
+	}
+})

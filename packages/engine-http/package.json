@@ -48,15 +48,12 @@
     "bcryptjs": "catalog:",
     "ipaddr.js": "catalog:",
     "koa": "catalog:",
-    "koa-bodyparser": "catalog:",
-    "koa-compress": "catalog:",
     "path-to-regexp": "catalog:",
     "prom-client": "catalog:",
     "ws": "catalog:"
   },
   "devDependencies": {
     "@types/koa": "catalog:",
-    "@types/koa-bodyparser": "catalog:",
     "@types/node": "catalog:",
     "@types/ws": "catalog:",
     "graphql": "catalog:"

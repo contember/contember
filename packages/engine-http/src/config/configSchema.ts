@@ -4,6 +4,7 @@ import { validateRequestMemoryBudgetOptions } from '@contember/database'
 import { upperCaseFirst } from '../utils/strings.js'
 import ipaddr from 'ipaddr.js'
 import { EgressError, EgressPolicy } from '@contember/engine-common'
+import { parseByteSize } from '../application/requestBody.js'
 
 const dbConfigRequired = {
 	host: Typesafe.string,
@@ -193,7 +194,13 @@ export const serverConfigSchema = Typesafe.partial({
 			const optionsError = validateRequestMemoryBudgetOptions({ warnBytes, maxBytes })
 			return optionsError ? Typesafe.fail(path, optionsError) : { warnBytes, maxBytes }
 		},
-		requestBodySize: Typesafe.string,
+		requestBodySize: (input: unknown, path: PropertyKey[] = []): number | undefined => {
+			const value = Typesafe.string(input, path)
+			if (value === '') {
+				return undefined
+			}
+			return parseByteSize(value) ?? Typesafe.fail(path, 'expected a size such as 1048576, 512kb or 10mb')
+		},
 		// Allows clients to opt in (via the X-Contember-Force-Ok request header) to receiving HTTP 200
 		// for GraphQL API responses, keeping error info in the JSON body. Defaults to enabled; set to
 		// false to forbid the header entirely. Accepts boolean-ish strings ('true'/'1'/'on'/...).

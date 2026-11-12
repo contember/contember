@@ -35,7 +35,7 @@ describe('SentryLoggerHandler', () => {
 			module: 'content',
 			requestId: 'r1',
 			user: 'identity-1',
-			url: '/content/blog/live',
+			uri: '/content/blog/live',
 			traceId: '0af7651916cd43dd8448eb211c80319c',
 			spanId: 'b7ad6b7169203331',
 			[LoggerRequestBody]: { query: '{ listArticle { id } }', variables: { password: '***' } },
@@ -53,6 +53,14 @@ describe('SentryLoggerHandler', () => {
 			contexts: { trace: { trace_id: '0af7651916cd43dd8448eb211c80319c', span_id: 'b7ad6b7169203331' } },
 		})
 		expect(events[0].exception?.values.at(-1)).toMatchObject({ type: 'TypeError', value: 'Query failed' })
+	})
+
+	test('reports the request URI the request logger set', async () => {
+		const { logger, events, flush } = setup()
+		logger.child({ uri: '/tenant?token=********' }).error(new Error('Sign-in failed'))
+		await flush()
+
+		expect(events[0].request?.url).toBe('/tenant?token=********')
 	})
 
 	test('maps the log level', async () => {

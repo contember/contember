@@ -35,7 +35,8 @@ export class SentryLoggerHandler implements LoggerHandler {
 			tags: { project: attribute('project'), projectGroup: attribute('projectGroup'), module: attribute('module') },
 			user: { id: attribute('user') },
 			extra: { requestId: entry.loggerAttributes.requestId },
-			request: { url: attribute('url'), data: entry.loggerAttributes[LoggerRequestBody] },
+			// the request logger sets `uri`, already masked by maskRequestUri
+			request: { url: attribute('uri'), data: entry.loggerAttributes[LoggerRequestBody] },
 			...(traceId !== undefined && spanId !== undefined ? { contexts: { trace: { trace_id: traceId, span_id: spanId } } } : {}),
 		})
 	}

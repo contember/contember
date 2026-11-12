@@ -4,7 +4,7 @@ import { useSortable } from '@dnd-kit/sortable'
 import { uic } from '@contember/react-ui-lib-base'
 import { GripVerticalIcon } from 'lucide-react'
 import { DropIndicator } from '@contember/react-ui-lib-base'
-import { Portal } from '@radix-ui/react-portal'
+import { createPortal } from 'react-dom'
 import { DragOverlay } from '@dnd-kit/core'
 
 /**
@@ -72,7 +72,7 @@ export const SortableBlock = ({ children, element }: { children: ReactNode; elem
 				</div>
 			</div>
 			{isActive && contentRef.current && (
-				<Portal>
+				createPortal(
 					<DragOverlay>
 						<div className="opacity-80 flex">
 							<div
@@ -81,8 +81,9 @@ export const SortableBlock = ({ children, element }: { children: ReactNode; elem
 								dangerouslySetInnerHTML={{ __html: contentRef.current.innerHTML }}
 							/>
 						</div>
-					</DragOverlay>
-				</Portal>
+					</DragOverlay>,
+					document.body,
+				)
 			)}
 		</>
 	)

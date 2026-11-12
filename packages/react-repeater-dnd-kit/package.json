@@ -34,7 +34,6 @@
     "@contember/react-utils": "workspace:*",
     "@dnd-kit/core": "catalog:",
     "@dnd-kit/sortable": "catalog:",
-    "@radix-ui/react-portal": "catalog:",
     "@radix-ui/react-slot": "catalog:"
   },
   "peerDependencies": {

@@ -1,6 +1,6 @@
 import React, { ReactNode } from 'react'
 import { RepeaterSortableItemContext, useRepeaterActiveEntity } from '../contexts.js'
-import { Portal } from '@radix-ui/react-portal'
+import { createPortal } from 'react-dom'
 import { DragOverlay } from '@dnd-kit/core'
 import { useSortable } from '@dnd-kit/sortable'
 import { AccessorTree, Entity, EntityAccessor, useAccessorTreeState } from '@contember/react-binding'
@@ -18,7 +18,7 @@ export const RepeaterSortableDragOverlay = ({ children }: {
 		return null
 	}
 	return (
-		<Portal>
+		createPortal(
 			<DragOverlay>
 				<AccessorTree state={accessorTreeState}>
 					<Entity accessor={activeItem}>
@@ -29,8 +29,9 @@ export const RepeaterSortableDragOverlay = ({ children }: {
 						</RepeaterCurrentEntityContext.Provider>
 					</Entity>
 				</AccessorTree>
-			</DragOverlay>
-		</Portal>
+			</DragOverlay>,
+			document.body,
+		)
 	)
 }
 

@@ -14,6 +14,16 @@ const TITLES: Record<string, string> = {
 	important: 'Important',
 }
 
+/** Pre-order walk; children are read after the visitor runs, so nodes it inserts are visited too. */
+const walk = (node: Nodes, visitor: (node: Nodes) => void): void => {
+	visitor(node)
+	if ('children' in node) {
+		for (const child of node.children) {
+			walk(child, visitor)
+		}
+	}
+}
+
 /**
  * Remark plugin that turns container directives (`:::note`, `:::tip[Title]`, …)
  * into plain admonition markup:
@@ -32,16 +42,6 @@ const TITLES: Record<string, string> = {
  * remark-directive; the migration step rewrites it to `:::note[Some Title]` so
  * the label is parsed here.
  */
-/** Pre-order walk; children are read after the visitor runs, so nodes it inserts are visited too. */
-const walk = (node: Nodes, visitor: (node: Nodes) => void): void => {
-	visitor(node)
-	if ('children' in node) {
-		for (const child of node.children) {
-			walk(child, visitor)
-		}
-	}
-}
-
 export default function remarkAdmonitions() {
 	return (tree: Root) => {
 		walk(tree, (node: any) => {

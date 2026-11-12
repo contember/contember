@@ -52,7 +52,7 @@ export interface SentryLoggerHandlerOptions {
 
 /**
  * Reports logged errors (warn and up) and uncaught exceptions and unhandled rejections of the process.
- * Release and environment come from SENTRY_RELEASE and SENTRY_ENVIRONMENT. Nothing instruments outgoing requests, whose
+ * Release, environment and server name come from SENTRY_RELEASE, SENTRY_ENVIRONMENT and SENTRY_NAME (default: the host name). Nothing instruments outgoing requests, whose
  * URLs may carry a webhook credential.
  */
 export const createSentryLoggerHandler = (dsn?: string, options: SentryLoggerHandlerOptions = {}): null | LoggerHandler => {
@@ -65,6 +65,7 @@ export const createSentryLoggerHandler = (dsn?: string, options: SentryLoggerHan
 			dsn,
 			release: process.env.SENTRY_RELEASE || undefined,
 			environment: process.env.SENTRY_ENVIRONMENT || undefined,
+			serverName: process.env.SENTRY_NAME || undefined,
 			version: options.version,
 		})
 	} catch (error) {

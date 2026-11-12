@@ -27,13 +27,9 @@ export class FileSystem {
 		}
 		const literals = new Set(include.filter(it => !globCharacters.test(it)))
 		const bases = new Set(include.filter(it => globCharacters.test(it)).map(getGlobBase).filter(it => !literals.has(it)))
-		const excluded = new Set(exclude.length > 0 ? await globPaths(dir, exclude) : [])
-		for (const it of exclude) {
-			// `dir/**` also matches `dir` itself; Node's glob agrees, Bun's does not.
-			if (it.endsWith('/**')) {
-				excluded.add(it.slice(0, -3))
-			}
-		}
+		// `x/**` also matches `x` itself; Node's glob agrees, Bun's does not, so glob the prefix too.
+		const excludePatterns = [...exclude, ...exclude.filter(it => it.endsWith('/**')).map(it => it.slice(0, -3))]
+		const excluded = new Set(exclude.length > 0 ? await globPaths(dir, excludePatterns) : [])
 		const result = new Set<string>()
 		for (const path of await globPaths(dir, include)) {
 			if (bases.has(path) || excluded.has(path) || result.has(path)) {

@@ -158,3 +158,21 @@ test('bucket with dot', () => {
 		'https://s3.eu-central-1.amazonaws.com/test.foo/foo.jpg?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=test%2F20210702%2Feu-central-1%2Fs3%2Faws4_request&X-Amz-Date=20210702T172200Z&X-Amz-Expires=3600&X-Amz-Signature=811a809196e60413e0e54e51d3dd91ab73ad1482b61e5371864d25d43ba642ff&X-Amz-SignedHeaders=host',
 	)
 })
+
+test('sign upload - query values are RFC 3986 encoded', () => {
+	const service = createS3Service('test')
+	const signed = service.getSignedUploadUrl({
+		contentType: `application/x-test; name="a b!'()*~-_.ž/+=&?#%"`,
+		acl: 'PRIVATE',
+		expiration: null,
+		contentDisposition: null,
+		extension: 'bin',
+		fileName: null,
+		prefix: null,
+		suffix: null,
+		size: null,
+	})
+	expect(signed.url).toEqual(
+		'https://test.s3.eu-central-1.amazonaws.com/9fce3907-ff2b-45bb-b4ce-eff5527dd315.bin?Cache-Control=immutable&Content-Type=application%2Fx-test%3B%20name%3D%22a%20b%21%27%28%29%2A~-_.%C5%BE%2F%2B%3D%26%3F%23%25%22&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=test%2F20210702%2Feu-central-1%2Fs3%2Faws4_request&X-Amz-Date=20210702T172200Z&X-Amz-Expires=3600&X-Amz-Signature=9e1cfdb2217c8707980d6ecc264b752c2526696845ab257c7dab555c31268ebc&X-Amz-SignedHeaders=cache-control%3Bhost%3Bx-amz-acl&x-amz-acl=private',
+	)
+})

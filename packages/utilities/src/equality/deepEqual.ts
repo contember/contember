@@ -1,8 +1,23 @@
 /**
- * Structural equality of plain data: arrays, plain objects, Map, Set, RegExp, typed arrays (byte-wise),
- * and objects with a custom `valueOf` or `toString` (e.g. Date). Both sides must share a constructor.
+ * Structural equality of plain data: arrays, plain objects, Map, Set, RegExp, typed arrays (element-wise),
+ * DataView (byte-wise), and objects with a custom `valueOf` or `toString` (e.g. Date). Both sides must share a constructor.
  * NaN equals NaN. Only own enumerable string keys of objects are compared.
  */
+type TypedArray =
+	| Int8Array
+	| Uint8Array
+	| Uint8ClampedArray
+	| Int16Array
+	| Uint16Array
+	| Int32Array
+	| Uint32Array
+	| Float32Array
+	| Float64Array
+	| BigInt64Array
+	| BigUint64Array
+
+const isTypedArray = (value: object): value is TypedArray => ArrayBuffer.isView(value) && !(value instanceof DataView)
+
 export const deepEqual = (a: unknown, b: unknown): boolean => {
 	if (a === b) {
 		return true
@@ -51,7 +66,18 @@ export const deepEqual = (a: unknown, b: unknown): boolean => {
 		}
 		return true
 	}
-	if (ArrayBuffer.isView(a) && ArrayBuffer.isView(b)) {
+	if (isTypedArray(a) && isTypedArray(b)) {
+		if (a.length !== b.length) {
+			return false
+		}
+		for (let i = 0; i < a.length; i++) {
+			if (a[i] !== b[i]) {
+				return false
+			}
+		}
+		return true
+	}
+	if (a instanceof DataView && b instanceof DataView) {
 		const left = new Uint8Array(a.buffer, a.byteOffset, a.byteLength)
 		const right = new Uint8Array(b.buffer, b.byteOffset, b.byteLength)
 		if (left.length !== right.length) {

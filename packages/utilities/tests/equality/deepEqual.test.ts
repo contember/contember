@@ -17,6 +17,8 @@ describe('deepEqual', () => {
 		['maps', new Map<string, unknown>([['a', { x: 1 }]]), new Map<string, unknown>([['a', { x: 1 }]])],
 		['sets', new Set([1, 'a']), new Set(['a', 1])],
 		['typed arrays', new Uint8Array([1, 2, 3]), new Uint8Array([1, 2, 3])],
+		['float arrays compare element-wise, 0 equals -0', new Float64Array([0]), new Float64Array([-0])],
+		['data views', new DataView(new Uint8Array([1, 2]).buffer), new DataView(new Uint8Array([1, 2]).buffer)],
 		['class instances', new Point(1, 2), new Point(1, 2)],
 	])('equal: %s', (_, a, b) => {
 		expect(deepEqual(a, b)).toBe(true)
@@ -41,6 +43,9 @@ describe('deepEqual', () => {
 		['map keys', new Map([['a', 1]]), new Map([['b', 1]])],
 		['sets', new Set([1]), new Set([2])],
 		['typed arrays', new Uint8Array([1, 2]), new Uint8Array([1, 3])],
+		['float arrays compare element-wise, NaN is not NaN', new Float64Array([Number.NaN]), new Float64Array([Number.NaN])],
+		['typed arrays of different length', new Uint8Array([1]), new Uint8Array([1, 0])],
+		['data views', new DataView(new Uint8Array([1, 2]).buffer), new DataView(new Uint8Array([1, 3]).buffer)],
 		['different constructors', new Point(1, 2), { x: 1, y: 2 }],
 		['object vs Map', {}, new Map()],
 	])('not equal: %s', (_, a, b) => {

@@ -1,7 +1,7 @@
 import { join } from 'node:path'
-import degit from 'degit'
 import jsyaml from 'js-yaml'
 import { FileSystem } from './FileSystem.js'
+import { downloadTemplate } from './remoteTemplate.js'
 
 interface TemplateInstallerOutput {
 	warn(message: string): void
@@ -9,10 +9,7 @@ interface TemplateInstallerOutput {
 
 type CloneTemplate = (source: string, target: string) => Promise<void>
 
-const cloneTemplate: CloneTemplate = async (source, target) => {
-	const emitter = degit(source, { cache: false, force: true, verbose: true })
-	await emitter.clone(target)
-}
+const cloneTemplate: CloneTemplate = (source, target) => downloadTemplate(source, target)
 
 export class TemplateInstaller {
 	private localTemplates: Record<string, string>

@@ -1,6 +1,7 @@
 import * as fs from 'node:fs/promises'
 import { access } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
+import { join } from 'node:path'
 
 export class FileSystem {
 	readFile = fs.readFile
@@ -20,6 +21,7 @@ export class FileSystem {
 		}
 	}
 	createTempDir = async () => {
-		return await fs.mkdtemp(tmpdir())
+		// mkdtemp appends random characters to the prefix, so without a separator it would create `/tmpXXXXXX`
+		return await fs.mkdtemp(join(tmpdir(), 'contember-template-'))
 	}
 }

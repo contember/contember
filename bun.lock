@@ -167,11 +167,7 @@
       "bin": "dist/production/run.js",
       "dependencies": {
         "@contember/cli-common": "workspace:*",
-        "degit": "catalog:",
         "js-yaml": "catalog:",
-      },
-      "devDependencies": {
-        "@types/degit": "catalog:",
       },
     },
     "packages/database": {
@@ -1269,7 +1265,6 @@
     "@tailwindcss/vite": "^4.2.1",
     "@testing-library/react": "^16.3.2",
     "@types/bun": "^1.3.10",
-    "@types/degit": "^2.8.6",
     "@types/is-hotkey": "^0.1.10",
     "@types/js-yaml": "^4.0.9",
     "@types/koa": "^2.15.0",
@@ -1285,7 +1280,6 @@
     "bcryptjs": "^3.0.3",
     "buffer": "6.0.3",
     "chevrotain": "6.5.0",
-    "degit": "^2.8.4",
     "esbuild": "*",
     "graphql": "^16.13.1",
     "graphql-ts-client-api": "^3.1.17",
@@ -1841,8 +1835,6 @@
 
     "@types/cookies": ["@types/cookies@0.9.0", "", { "dependencies": { "@types/connect": "*", "@types/express": "*", "@types/keygrip": "*", "@types/node": "*" } }, "sha512-40Zk8qR147RABiQ7NQnBzWzDcjKzNrntB5BAmeGCb2p/MIyOE+4BVvc17wumsUqUw00bJYqoXFHYygQnEFh4/Q=="],
 
-    "@types/degit": ["@types/degit@2.8.6", "", {}, "sha512-y0M7sqzsnHB6cvAeTCBPrCQNQiZe8U4qdzf8uBVmOWYap5MMTN/gB2iEqrIqFiYcsyvP74GnGD5tgsHttielFw=="],
-
     "@types/estree": ["@types/estree@1.0.8", "", {}, "sha512-dWHzHa2WqEXI/O1E9OjrocMTKJl2mSrEolh1Iomrv6U+JuNwaHXsXx9bLu5gG7BUWFIN0skIQJQ/L1rIex4X6w=="],
 
     "@types/express": ["@types/express@5.0.0", "", { "dependencies": { "@types/body-parser": "*", "@types/express-serve-static-core": "^5.0.0", "@types/qs": "*", "@types/serve-static": "*" } }, "sha512-DvZriSMehGHL1ZNLzi6MidnsDhUZM/x2pRdDIKdwbUNqqwHxMlRdkxtn6/EPKyqKpHqTl/4nRZsRNLpZxZRpPQ=="],
@@ -2028,8 +2020,6 @@
     "decamelize": ["decamelize@5.0.1", "", {}, "sha512-VfxadyCECXgQlkoEAjeghAr5gY3Hf+IKjKb+X8tGVDtveCjN+USwprd2q3QXBR9T1+x2DG0XZF5/w+7HAtSaXA=="],
 
     "deep-equal": ["deep-equal@1.0.1", "", {}, "sha512-bHtC0iYvWhyaTzvV3CZgPeZQqCOBGyGsVV7v4eevpdkLHfiSrXUdBG+qAuSz4RI70sszvjQ1QSZ98An1yNwpSw=="],
-
-    "degit": ["degit@2.8.4", "", { "bin": { "degit": "degit" } }, "sha512-vqYuzmSA5I50J882jd+AbAhQtgK6bdKUJIex1JNfEUPENCgYsxugzKVZlFyMwV4i06MmnV47/Iqi5Io86zf3Ng=="],
 
     "delayed-stream": ["delayed-stream@1.0.0", "", {}, "sha512-ZySD7Nf91aLB0RxL4KGrKHBXl7Eds1DAmEdcoVawXnLD7SDhpNgtuII2aAkg7a7QS41jxPSZ17p4VdGnMHk3MQ=="],
 

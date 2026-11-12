@@ -7,9 +7,9 @@ import { IncomingMessage, Server, ServerResponse } from 'node:http'
 import { WebSocket, WebSocketServer } from 'ws'
 import { FingerCrossedLoggerHandler, Logger } from '@contember/logger'
 import koaCompress from 'koa-compress'
-import bodyParser from 'koa-bodyparser'
 import { ServerConfig } from '../config/config.js'
 import { createCorsMiddleware } from './cors.js'
+import { createRequestBodyMiddleware, defaultFormBodyLimit, defaultJsonBodyLimit } from './requestBody.js'
 import stream, { Duplex, Readable } from 'node:stream'
 import { ProjectGroupResolver } from '../projectGroup/ProjectGroupResolver.js'
 import { ProjectGroupContainer } from '../projectGroup/ProjectGroupContainer.js'
@@ -111,8 +111,9 @@ export class Application {
 		koa.use(koaCompress({
 			br: false,
 		}))
-		koa.use(bodyParser({
-			jsonLimit: this.serverConfig.http?.requestBodySize || '1mb',
+		koa.use(createRequestBodyMiddleware({
+			json: this.serverConfig.http?.requestBodySize ?? defaultJsonBodyLimit,
+			form: defaultFormBodyLimit,
 		}))
 		koa.use(createCorsMiddleware({ exposeHeaders: ['X-Contember-Mutation'] }))
 		const versionMatch = this.version?.match(/^(0\.\d+|\d+)/)

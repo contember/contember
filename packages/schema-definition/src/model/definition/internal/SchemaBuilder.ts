@@ -1,6 +1,5 @@
 import { Model } from '@contember/schema'
 import { NamingConventions } from '@contember/schema-utils'
-import 'reflect-metadata'
 import { tuple } from '../../../utils/index.js'
 import { EntityConstructor, FieldsDefinition } from '../types.js'
 import { EnumDefinition } from '../EnumDefinition.js'

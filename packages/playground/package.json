@@ -30,7 +30,6 @@
     "react": "catalog:",
     "react-dom": "catalog:",
     "tailwindcss": "catalog:",
-    "tailwindcss-animate": "catalog:",
     "vite": "catalog:",
     "vite-tsconfig-paths": "catalog:"
   },

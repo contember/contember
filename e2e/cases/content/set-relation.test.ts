@@ -40,6 +40,19 @@ namespace ManyHasManyModel {
 	}
 }
 
+namespace CascadingMembersModel {
+	export class Post {
+		slug = c.stringColumn().unique()
+		locales = c.oneHasMany(PostLocale, 'post')
+	}
+
+	export class PostLocale {
+		post = c.manyHasOne(Post, 'locales')
+		parent = c.manyHasOne(PostLocale).cascadeOnDelete()
+		title = c.stringColumn()
+	}
+}
+
 test('Content API: set on oneHasMany', async () => {
 	const tester = await createTester(createSchema(OneHasManyModel))
 
@@ -352,6 +365,68 @@ test('Content API: set handles null-valued input the way the per-item form does'
 	)
 		.expect(response => {
 			expect(response.body.data.getPost.locales).toStrictEqual([{ title: 'created' }])
+		})
+		.expect(200)
+})
+
+test('Content API: set refuses to recreate a member deleted by a cascade of an orphan', async () => {
+	const tester = await createTester(createSchema(CascadingMembersModel))
+
+	const created = await tester(gql`mutation {
+		createPost(data: {slug: "post", locales: [{create: {title: "parent"}}]}) { ok node { id locales { id } } }
+	}`).expect(200)
+	const post = created.body.data.createPost.node
+	const parent = post.locales[0].id
+	const child = await tester(
+		gql`mutation($post: UUID!, $parent: UUID!) {
+			createPostLocale(data: {title: "child", post: {connect: {id: $post}}, parent: {connect: {id: $parent}}}) { ok node { id } }
+		}`,
+		{ variables: { post: post.id, parent } },
+	).expect(200)
+	const childId = child.body.data.createPostLocale.node.id
+
+	// deleting the orphan "parent" cascades into "child", which the upsert would then quietly recreate
+	await tester(
+		gql`mutation($post: UUID!, $child: UUID!) {
+			updatePost(by: {id: $post}, data: {locales: {orphanStrategy: delete, set: [
+				{upsert: {by: {id: $child}, update: {title: "updated"}, create: {title: "recreated"}}}
+			]}}) {
+				ok
+				errorMessage
+			}
+		}`,
+		{ variables: { post: post.id, child: childId } },
+	)
+		.expect(response => {
+			expect(response.body.data.updatePost.ok).toBe(false)
+			expect(response.body.data.updatePost.errorMessage).toContain('was deleted by a cascade of removing an orphan')
+		})
+		.expect(200)
+
+	await tester(gql`query { listPostLocale(orderBy: [{title: asc}]) { id title } }`)
+		.expect(response => {
+			expect(response.body.data.listPostLocale).toStrictEqual([
+				{ id: childId, title: 'child' },
+				{ id: parent, title: 'parent' },
+			])
+		})
+		.expect(200)
+
+	// clearing both succeeds whichever of them is removed first
+	await tester(
+		gql`mutation($post: UUID!) {
+			updatePost(by: {id: $post}, data: {locales: {orphanStrategy: delete, set: []}}) { ok errorMessage }
+		}`,
+		{ variables: { post: post.id } },
+	)
+		.expect(response => {
+			expect(response.body.data.updatePost).toStrictEqual({ ok: true, errorMessage: null })
+		})
+		.expect(200)
+
+	await tester(gql`query { listPostLocale { id } }`)
+		.expect(response => {
+			expect(response.body.data.listPostLocale).toStrictEqual([])
 		})
 		.expect(200)
 })

@@ -1,7 +1,7 @@
 import { Input, Model } from '@contember/schema'
 import { Mapper } from '../../Mapper.js'
 import { UpdateInputProcessor } from '../../../inputProcessing/index.js'
-import { MutationResult, MutationResultList, prependPath } from '../../Result.js'
+import { InputErrorKind, MutationInputError, MutationResult, MutationResultList, prependPath } from '../../Result.js'
 import { CheckedPrimary } from '../../CheckedPrimary.js'
 import { MapperInput } from '../../types.js'
 import { SqlUpdateInputProcessorResult } from '../SqlUpdateInputProcessor.js'
@@ -75,11 +75,12 @@ export const processSetManyRelationInput = async <Context extends HasManyContext
 ): Promise<MutationResultList> => {
 	const { targetEntity } = context
 	const results: MutationResultList = []
-	const desiredPrimaries = new Set<string>()
+	// primary of an existing target the input names -> the first item naming it
+	const desiredPrimaries = new Map<string, { primary: Input.PrimaryValue; index: number; alias?: string }>()
 
-	const markDesired = (primary: Input.PrimaryValue | undefined) => {
-		if (primary !== undefined && primary !== null) {
-			desiredPrimaries.add(String(primary))
+	const markDesired = (primary: Input.PrimaryValue | undefined, index: number, alias?: string) => {
+		if (primary !== undefined && primary !== null && !desiredPrimaries.has(String(primary))) {
+			desiredPrimaries.set(String(primary), { primary, index, alias })
 		}
 	}
 	const itemPath = (index: number, alias?: string) => [{ index, alias }]
@@ -99,20 +100,20 @@ export const processSetManyRelationInput = async <Context extends HasManyContext
 				return fail(index, item.alias, err)
 			}
 			connectTargets[index] = new CheckedPrimary(primary)
-			markDesired(primary)
+			markDesired(primary, index, item.alias)
 		} else if ('update' in item) {
 			const [primary, err] = await mapper.getPrimaryValue(targetEntity, scopeToOwner(context, ownerPrimary, item.update.by), 'nested')
 			if (err) {
 				return fail(index, item.alias, err)
 			}
-			markDesired(primary)
+			markDesired(primary, index, item.alias)
 		} else if ('upsert' in item) {
 			// A missing target is not an error here - the processor falls back to creating it.
 			const [primary] = await mapper.getPrimaryValue(targetEntity, scopeToOwner(context, ownerPrimary, item.upsert.by), 'nested')
-			markDesired(primary)
+			markDesired(primary, index, item.alias)
 		} else if ('connectOrCreate' in item) {
 			const [primary] = await mapper.getPrimaryValue(targetEntity, item.connectOrCreate.connect, 'nested')
-			markDesired(primary)
+			markDesired(primary, index, item.alias)
 		} else if (!('create' in item)) {
 			throw new ImplementationException('Unknown "set" item operation; the input visitor should have rejected it.')
 		}
@@ -120,7 +121,8 @@ export const processSetManyRelationInput = async <Context extends HasManyContext
 
 	// Phase 2 - remove the members the input does not name.
 	for (const current of currentPrimaries) {
-		if (desiredPrimaries.has(String(current))) {
+		// already gone through the cascade of an earlier removal
+		if (desiredPrimaries.has(String(current)) || mapper.deletedEntities.isDeleted(targetEntity.name, current)) {
 			continue
 		}
 		const where: Input.UniqueWhere = { [targetEntity.primary]: current }
@@ -130,6 +132,22 @@ export const processSetManyRelationInput = async <Context extends HasManyContext
 		results.push(...orphanResult)
 		if (orphanResult.some(it => it.error)) {
 			return results
+		}
+	}
+
+	// A removal can cascade into a target the input names. Establishing it now would fail (connect,
+	// update) or silently create a new row in its place (upsert, connectOrCreate), so refuse instead.
+	for (const { primary, index, alias } of desiredPrimaries.values()) {
+		if (mapper.deletedEntities.isDeleted(targetEntity.name, primary)) {
+			return fail(
+				index,
+				alias,
+				new MutationInputError(
+					[],
+					InputErrorKind.invalidData,
+					`${targetEntity.name} "${String(primary)}" named by "set" was deleted by a cascade of removing an orphan.`,
+				),
+			)
 		}
 	}
 

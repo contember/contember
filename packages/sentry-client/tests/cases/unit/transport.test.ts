@@ -82,6 +82,34 @@ describe('fetch transport', () => {
 		expect(calls.map(it => it.init.body)).toEqual(['a', 'c'])
 	})
 
+	test('honours Retry-After on any status', async () => {
+		const { transport, calls, advance } = setup(() => Promise.resolve(new Response('', { status: 503, headers: { 'Retry-After': '5' } })))
+		transport.send('a', 'error')
+		await transport.flush(1000)
+		transport.send('b', 'error')
+		advance(5_000)
+		transport.send('c', 'error')
+		await transport.flush(1000)
+		expect(calls.map(it => it.init.body)).toEqual(['a', 'c'])
+	})
+
+	test('logs a response that cannot be read', async () => {
+		const broken = () => {
+			const response = new Response('{}')
+			// an own property: the test preload's Response keeps `headers` as a field, not a prototype getter
+			Object.defineProperty(response, 'headers', {
+				get: () => {
+					throw new Error('broken response')
+				},
+			})
+			return response
+		}
+		const { transport, logs } = setup(() => Promise.resolve(broken()))
+		transport.send('a', 'error')
+		expect(await transport.flush(1000)).toBe(true)
+		expect(logs).toEqual(['Sentry: could not process a delivery: broken response'])
+	})
+
 	test('applies X-Sentry-Rate-Limits per category, also on a successful response', async () => {
 		const { transport, calls, advance } = setup(() =>
 			Promise.resolve(new Response('{}', { headers: { 'X-Sentry-Rate-Limits': '30:error;default:organization, 5:transaction:project' } }))

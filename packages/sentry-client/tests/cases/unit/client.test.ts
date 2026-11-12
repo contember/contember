@@ -153,6 +153,25 @@ describe('sentry client', () => {
 			expect(ingest.received.map(it => it.event.message)).toEqual(['keep'])
 		})
 
+		test('gets the captured value', async () => {
+			const seen: unknown[] = []
+			const { client, ingest } = await setup({
+				beforeSend: (event, { originalException }) => {
+					seen.push(originalException)
+					return originalException instanceof RangeError ? null : event
+				},
+			})
+			const error = new RangeError('dropped by class')
+			client.captureException(error)
+			client.captureMessage('a message')
+			await client.flush(2000)
+			// in either order: the exception waits for its source lines
+			expect(seen).toHaveLength(2)
+			expect(seen).toContain(error)
+			expect(seen).toContain(undefined)
+			expect(ingest.received.map(it => it.event.message)).toEqual(['a message'])
+		})
+
 		test('drops the event and logs when it throws', async () => {
 			const { client, ingest, logs } = await setup({
 				beforeSend: () => {
@@ -200,6 +219,31 @@ describe('sentry client', () => {
 		for (const channel of ['undici:request:create', 'undici:request:headers', 'http.client.request.start']) {
 			expect(hasSubscribers(channel)).toBe(false)
 		}
+	})
+
+	test('logs instead of throwing when the event cannot be built', async () => {
+		const { client, ingest, logs } = await setup()
+		const hostile = new Error('hostile')
+		Object.defineProperty(hostile, 'stack', {
+			get: () => {
+				throw new Error('no stack for you')
+			},
+		})
+		expect(client.captureException(hostile)).toBeUndefined()
+		await client.flush(2000)
+		expect(ingest.received).toHaveLength(0)
+		expect(logs).toEqual(['Sentry: could not report an exception: no stack for you'])
+	})
+
+	test('keeps delivering when the logger throws', async () => {
+		const { client, ingest } = await setup({
+			logger: () => {
+				throw new Error('logger broke')
+			},
+		}, () => ({ status: 500 }))
+		client.captureException(new Error('x'))
+		expect(await client.flush(2000)).toBe(true)
+		expect(ingest.received).toHaveLength(1)
 	})
 
 	test('rejects an invalid DSN when created', () => {

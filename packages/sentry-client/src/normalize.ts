@@ -95,6 +95,14 @@ export const normalize = (value: unknown, depth: number, breadth: number): unkno
 	}
 }
 
+/** Like `normalize`, one level shallower at a time until its JSON fits `maxBytes`, as @sentry/node 7 did for `__serialized__`. */
+export const normalizeToSize = (value: unknown, depth: number, breadth: number, maxBytes: number): unknown => {
+	const normalized = normalize(value, depth, breadth)
+	return depth > 0 && Buffer.byteLength(JSON.stringify(normalized) ?? '') > maxBytes
+		? normalizeToSize(value, depth - 1, breadth, maxBytes)
+		: normalized
+}
+
 /** Like `normalize`, for a value that must stay a record (`extra`, `contexts`, `user`). */
 export const normalizeRecord = (value: Readonly<Record<string, unknown>>, depth: number, breadth: number): Record<string, unknown> => {
 	const normalized = normalize(value, depth, breadth)

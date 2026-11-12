@@ -1,5 +1,5 @@
 export { createSentryClient } from './client.js'
-export type { BeforeSend, CaptureOptions, SentryClient, SentryClientOptions } from './client.js'
+export type { BeforeSend, BeforeSendHint, CaptureOptions, SentryClient, SentryClientOptions } from './client.js'
 export { parseDsn } from './dsn.js'
 export type { Dsn } from './dsn.js'
 export { captureConsoleErrors, installProcessHandlers } from './process.js'

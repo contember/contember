@@ -1,4 +1,4 @@
-import { normalize, truncate } from './normalize.js'
+import { normalizeToSize, truncate } from './normalize.js'
 import { ModuleResolver, parseStack } from './stack.js'
 import { ExceptionValue, Mechanism } from './types.js'
 
@@ -50,10 +50,13 @@ export interface BuiltException {
 }
 
 const maxValueLength = 250
+/** Sentry accepts events of up to 200 kB; the serialized value gets half of it. */
+const maxSerializedBytes = 100 * 1024
 
 /**
- * Adds the causes and `AggregateError.errors` of `error`, depth first, in front of `chain`, as @sentry/node 7 did: at
- * most 5 besides the error itself, each linked to its parent by `exception_id` and `parent_id`.
+ * Adds the causes and `AggregateError.errors` of `error`, depth first, in front of `chain`, as @sentry/node 7 did, each
+ * linked to its parent by `exception_id` and `parent_id`. At most 5 besides the error itself: v7 let all members of
+ * an AggregateError through, so a large one made an event Sentry rejected.
  */
 const addLinkedErrors = (
 	error: Error,
@@ -79,6 +82,9 @@ const addLinkedErrors = (
 	}
 	let result = chain
 	for (const [source, child] of linked) {
+		if (result.length >= maxLinkedErrors + 1) {
+			break
+		}
 		parent.mechanism = {
 			...(parent.mechanism ?? { type: 'generic', handled: true }),
 			...(parent.type === 'AggregateError' ? { is_exception_group: true } : {}),
@@ -111,7 +117,7 @@ export const buildException = (
 		const value = { ...exceptionValue(syntheticError, resolveModule), type: 'Error', mechanism: { ...mechanism, synthetic: true } }
 		return {
 			values: [{ ...value, value: truncate(value.value, maxValueLength) }],
-			serialized: isPlainObject ? normalize(error, normalizeDepth, normalizeBreadth) : undefined,
+			serialized: isPlainObject ? normalizeToSize(error, normalizeDepth, normalizeBreadth, maxSerializedBytes) : undefined,
 		}
 	}
 	const root: ExceptionValue = { ...exceptionValue(error, resolveModule), mechanism: { ...mechanism } }

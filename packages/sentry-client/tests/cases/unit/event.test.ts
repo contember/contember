@@ -47,6 +47,15 @@ describe('buildException', () => {
 		])
 	})
 
+	test('reports at most 5 members of a large AggregateError', () => {
+		const error = new AggregateError(Array.from({ length: 200 }, (_, i) => new Error(`m${i}`)), 'many')
+		expect(summary(error).map(it => it.value)).toEqual(['m4', 'm3', 'm2', 'm1', 'm0', 'many'])
+	})
+
+	test('serializes a plain object one level shallower at a time until it fits 100 kB', () => {
+		expect(build({ a: { b: 'x'.repeat(200_000) }, c: 1 }).serialized).toEqual({ a: '[Object]', c: 1 })
+	})
+
 	test('ignores a cause that is not an Error', () => {
 		expect(summary(new Error('outer', { cause: 'just text' }))).toEqual([{ type: 'Error', value: 'outer', mechanism: generic }])
 	})

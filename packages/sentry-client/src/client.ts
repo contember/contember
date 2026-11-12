@@ -9,7 +9,12 @@ import { createModuleResolver } from './stack.js'
 import { createFetchTransport, Fetch, Transport, TransportLogger } from './transport.js'
 import { Mechanism, Scope, SentryEvent, SeverityLevel } from './types.js'
 
-export type BeforeSend = (event: SentryEvent) => SentryEvent | null | Promise<SentryEvent | null>
+export interface BeforeSendHint {
+	/** The value passed to `captureException`; `undefined` for a message. */
+	readonly originalException: unknown
+}
+
+export type BeforeSend = (event: SentryEvent, hint: BeforeSendHint) => SentryEvent | null | Promise<SentryEvent | null>
 
 export interface SentryClientOptions {
 	readonly dsn: string
@@ -39,9 +44,13 @@ export interface CaptureOptions {
 }
 
 export interface SentryClient {
-	/** Reports `error` (an Error or any value) and returns the event id, or `undefined` when it is not sent. */
+	/**
+	 * Reports `error` (an Error or any value) and returns the event id, or `undefined` when nothing is reported: the
+	 * client is closed, the error object was reported already, or building the event failed (which is logged). Never
+	 * throws. `beforeSend` or a rate limit can still drop an event that has an id.
+	 */
 	captureException(error: unknown, scope?: Scope, options?: CaptureOptions): string | undefined
-	/** Reports a message, e.g. a `console.error` call. */
+	/** Reports a message, e.g. a `console.error` call; returns as `captureException` does. */
 	captureMessage(message: string, scope?: Scope): string | undefined
 	/** Waits for events being prepared and delivered; `false` when `timeoutMs` ran out first. */
 	flush(timeoutMs: number): Promise<boolean>
@@ -60,7 +69,15 @@ const withoutUndefined = (record: Readonly<Record<string, string | undefined>>):
 export const createSentryClient = (options: SentryClientOptions): SentryClient => {
 	const dsn = parseDsn(options.dsn)
 	const sdk = { name: sdkName, version: options.version ?? 'unknown' }
-	const logger = options.logger ?? ((message: string) => console.warn(message))
+	const configuredLogger = options.logger ?? ((message: string) => console.warn(message))
+	// a failing logger must not break delivery or turn into an unhandled rejection
+	const logger = (message: string) => {
+		try {
+			configuredLogger(message)
+		} catch {
+			// nowhere left to report it
+		}
+	}
 	const transport: Transport = createFetchTransport({
 		url: envelopeEndpoint(dsn),
 		auth: authHeader(dsn, `${sdk.name}/${sdk.version}`),
@@ -109,14 +126,14 @@ export const createSentryClient = (options: SentryClientOptions): SentryClient =
 		sdk,
 	})
 
-	const deliver = async (event: SentryEvent): Promise<void> => {
+	const deliver = async (event: SentryEvent, hint: BeforeSendHint): Promise<void> => {
 		for (const value of event.exception?.values ?? []) {
 			await addContextLines(value.stacktrace?.frames ?? [], contextLines)
 		}
 		let final: SentryEvent | null = event
 		if (options.beforeSend) {
 			try {
-				final = await options.beforeSend(event)
+				final = await options.beforeSend(event, hint)
 			} catch (error) {
 				logger(`Sentry: beforeSend failed, the event was dropped: ${error instanceof Error ? error.message : String(error)}`)
 				return
@@ -129,8 +146,8 @@ export const createSentryClient = (options: SentryClientOptions): SentryClient =
 		transport.send(`${JSON.stringify(header)}\n${JSON.stringify({ type: 'event' })}\n${JSON.stringify(final)}`, 'error')
 	}
 
-	const enqueue = (event: SentryEvent): string => {
-		const preparation = deliver(event)
+	const enqueue = (event: SentryEvent, hint: BeforeSendHint): string => {
+		const preparation = deliver(event, hint)
 			.catch(error => logger(`Sentry: could not prepare an event: ${error instanceof Error ? error.message : String(error)}`))
 			.finally(() => preparing.delete(preparation))
 		preparing.add(preparation)
@@ -156,19 +173,29 @@ export const createSentryClient = (options: SentryClientOptions): SentryClient =
 			if (closed || (typeof error === 'object' && error !== null && captured.has(error))) {
 				return undefined
 			}
-			if (typeof error === 'object' && error !== null) {
-				captured.add(error)
+			try {
+				if (typeof error === 'object' && error !== null) {
+					captured.add(error)
+				}
+				const exception = buildException(error, new Error('Sentry syntheticException'), mechanism, resolveModule, normalizeDepth, normalizeBreadth)
+				// normalized with the rest of `extra`, so it is cut one level deeper than the value itself, as before
+				const extra = exception.serialized !== undefined ? { ...scope.extra, __serialized__: exception.serialized } : scope.extra
+				return enqueue({ ...baseEvent('error', { ...scope, extra }), exception: { values: exception.values } }, { originalException: error })
+			} catch (buildError) {
+				logger(`Sentry: could not report an exception: ${buildError instanceof Error ? buildError.message : String(buildError)}`)
+				return undefined
 			}
-			const exception = buildException(error, new Error('Sentry syntheticException'), mechanism, resolveModule, normalizeDepth, normalizeBreadth)
-			// normalized with the rest of `extra`, so it is cut one level deeper than the value itself, as before
-			const extra = exception.serialized !== undefined ? { ...scope.extra, __serialized__: exception.serialized } : scope.extra
-			return enqueue({ ...baseEvent('error', { ...scope, extra }), exception: { values: exception.values } })
 		},
 		captureMessage(message, scope = {}) {
 			if (closed) {
 				return undefined
 			}
-			return enqueue({ ...baseEvent('info', scope), message: truncate(message, maxValueLength) })
+			try {
+				return enqueue({ ...baseEvent('info', scope), message: truncate(message, maxValueLength) }, { originalException: undefined })
+			} catch (buildError) {
+				logger(`Sentry: could not report a message: ${buildError instanceof Error ? buildError.message : String(buildError)}`)
+				return undefined
+			}
 		},
 		flush,
 		async close(timeoutMs) {

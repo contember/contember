@@ -71,16 +71,26 @@ export const createFetchTransport = ({ url, auth, fetch, logger, timeoutMs, maxI
 	const updateRateLimits = (response: Response) => {
 		const time = now()
 		const header = response.headers.get('x-sentry-rate-limits')
+		const retryAfter = response.headers.get('retry-after')
 		if (header) {
 			for (const [category, until] of parseRateLimits(header, time)) {
 				disabledUntil.set(category, until)
 			}
-		} else if (response.status === 429) {
-			disabledUntil.set('all', time + parseRetryAfter(response.headers.get('retry-after'), time))
+		} else if (retryAfter !== null || response.status === 429) {
+			disabledUntil.set('all', time + parseRetryAfter(retryAfter, time))
 		}
 	}
 
 	const deliver = async (envelope: string): Promise<void> => {
+		try {
+			await post(envelope)
+		} catch (error) {
+			// e.g. a custom fetch that resolved to something other than a Response
+			report(`could not process a delivery: ${error instanceof Error ? error.message : String(error)}`)
+		}
+	}
+
+	const post = async (envelope: string): Promise<void> => {
 		let response: Response
 		try {
 			response = await fetch(url, {

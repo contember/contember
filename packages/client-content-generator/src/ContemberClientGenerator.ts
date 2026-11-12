@@ -1,7 +1,8 @@
 import { Model } from '@contember/schema'
 import { EnumTypeSchemaGenerator } from './EnumTypeSchemaGenerator.js'
-import { EntityTypeSchemaGenerator, GenerateOptions } from './EntityTypeSchemaGenerator.js'
+import { EntityTypeSchemaGenerator } from './EntityTypeSchemaGenerator.js'
 import { NameSchemaGenerator } from './NameSchemaGenerator.js'
+import { GenerateOptions } from './utils.js'
 
 export class ContemberClientGenerator {
 	constructor(
@@ -12,7 +13,7 @@ export class ContemberClientGenerator {
 	}
 
 	generate(model: Model.Schema, options?: GenerateOptions): Record<string, string> {
-		const nameSchema = this.nameSchemaGenerator.generate(model)
+		const nameSchema = this.nameSchemaGenerator.generate(model, options)
 		const enumTypeSchema = this.enumTypeSchemaGenerator.generate(model)
 		const entityTypeSchema = this.entityTypeSchemaGenerator.generate(model, options)
 

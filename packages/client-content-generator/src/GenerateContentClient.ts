@@ -9,17 +9,17 @@ type Args = {
 }
 
 type Options = {
-	['include-deprecated']?: boolean
+	['exclude-deprecated']?: boolean
 }
 
 const usageInfo = `
 Usage:
 
 From file:
-yarn contember-client-generator <schema.json> <out-dir> [--include-deprecated]
+yarn contember-client-generator <schema.json> <out-dir> [--exclude-deprecated]
 
 From stdin:
-yarn run --silent contember project:print-schema --format=schema | yarn contember-client-generator - <out-dir> [--include-deprecated]
+yarn run --silent contember project:print-schema --format=schema | yarn contember-client-generator - <out-dir> [--exclude-deprecated]
 `
 
 export class GenerateContentClient extends Command<Args, Options> {
@@ -29,24 +29,24 @@ export class GenerateContentClient extends Command<Args, Options> {
 		configuration.argument('schema-path').optional().description('Path to the json schema file. Tip: Use "-" to read from stdin.')
 		configuration.argument('out-dir').optional().description('Output directory for generated files.')
 
-		configuration.option('include-deprecated').valueNone().description('Include deprecated entities and fields')
+		configuration.option('exclude-deprecated').valueNone().description('Leave out deprecated entities and fields instead of marking them @deprecated')
 	}
 
 	protected async execute(input: Input<Args, Options>) {
 		const schemaPath = input.getArgument('schema-path')
 		const outDir = input.getArgument('out-dir')
-		const includeDeprecated = input.getOption('include-deprecated')
+		const excludeDeprecated = input.getOption('exclude-deprecated')
 
 		if (!schemaPath || !outDir) {
 			// eslint-disable-next-line no-console
 			console.info(usageInfo)
-			throw 'Missing required arguments <schema.json> and <out-dir>'
+			throw new Error('Missing required arguments <schema.json> and <out-dir>')
 		}
 
 		const sourceData = await (async () => {
 			if (schemaPath === '-') {
 				if (process.stdin.isTTY) {
-					throw 'Cannot read from stdin in TTY mode'
+					throw new Error('Cannot read from stdin in TTY mode')
 				}
 				const buffer = []
 				for await (const chunk of process.stdin) {
@@ -61,7 +61,7 @@ export class GenerateContentClient extends Command<Args, Options> {
 
 		const dir = resolve(process.cwd(), outDir)
 		const generator = new ContemberClientGenerator()
-		const result = generator.generate(source.model, { includeDeprecated })
+		const result = generator.generate(source.model, { excludeDeprecated })
 
 		await fs.mkdir(dir, { recursive: true })
 

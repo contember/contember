@@ -28,13 +28,13 @@ export class EnumTypeSchemaGenerator {
 
 // @public (undocumented)
 export type GenerateOptions = {
-    includeDeprecated?: boolean;
+    excludeDeprecated?: boolean;
 };
 
 // @public (undocumented)
 export class NameSchemaGenerator {
     // (undocumented)
-    generate(model: Model.Schema): SchemaNames;
+    generate(model: Model.Schema, options?: GenerateOptions): SchemaNames;
 }
 
 // (No @packageDocumentation comment for this package)

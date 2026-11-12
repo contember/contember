@@ -18,7 +18,6 @@ const isTypedArray = (value: object): value is TypedArray => ArrayBuffer.isView(
  * DataView (byte-wise), and objects with a custom `valueOf` or `toString` (e.g. Date). Both sides must share a constructor.
  * NaN equals NaN. Only own enumerable string keys of objects are compared.
  */
-
 export const deepEqual = (a: unknown, b: unknown): boolean => {
 	if (a === b) {
 		return true

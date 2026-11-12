@@ -37,7 +37,6 @@
     "@contember/schema": "workspace:*",
     "@contember/schema-utils": "workspace:*",
     "@contember/typesafe": "workspace:*",
-    "@graphql-tools/utils": "catalog:",
     "jose": "catalog:",
     "mustache": "catalog:",
     "nodemailer": "catalog:",

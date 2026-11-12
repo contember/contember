@@ -54,7 +54,7 @@ export function dataAttribute<const T extends string>(value: T): T;
 // @public (undocumented)
 export function dataAttribute(value: boolean | string | number | undefined | null): string | undefined;
 
-// @public
+// @public (undocumented)
 export const deepEqual: (a: unknown, b: unknown) => boolean;
 
 // @internal
@@ -63,8 +63,8 @@ export function deprecate(removal: SemverString, condition: boolean, deprecated:
 // @public (undocumented)
 export const generateUuidV4: () => string;
 
-// @public
-export const generateUuidV7: (now?: number) => string;
+// @public (undocumented)
+export const generateUuidV7: () => string;
 
 // @public
 export const isUuid: (value: string) => boolean;
@@ -83,6 +83,7 @@ export class LRUCache<Key, Value> {
 export interface LRUCacheOptions {
     // (undocumented)
     now?: () => number;
+    // Warning: (tsdoc-malformed-html-name) Invalid HTML element: Expecting an HTML name
     ttl?: number;
 }
 

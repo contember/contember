@@ -32,7 +32,7 @@ export const RepeaterSortable: (input: {
 // @public
 export const RepeaterSortableDragOverlay: (input: {
     children: ReactNode;
-}) => JSX.Element | null;
+}) => React_2.ReactPortal | null;
 
 // @public
 export const RepeaterSortableDropIndicator: (input: {

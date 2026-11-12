@@ -5,6 +5,7 @@
 ```ts
 
 import { ActionDispatch } from 'react';
+import { Component } from 'react';
 import { Context } from 'react';
 import { MutableRefObject } from 'react';
 import { NamedExoticComponent } from 'react';
@@ -46,6 +47,30 @@ export const emptyArray: any[];
 
 // @public (undocumented)
 export const emptyObject: Readonly<{}>;
+
+// @public
+export class ErrorBoundary extends Component<ErrorBoundaryProps, {
+    didCatch: boolean;
+}> {
+    // (undocumented)
+    static getDerivedStateFromError(): {
+        didCatch: boolean;
+    };
+    // (undocumented)
+    render(): ReactNode;
+    // (undocumented)
+    state: {
+        didCatch: boolean;
+    };
+}
+
+// @public (undocumented)
+export interface ErrorBoundaryProps {
+    // (undocumented)
+    children?: ReactNode;
+    // (undocumented)
+    fallback: ReactNode;
+}
 
 // @public
 export function getChildrenAsLabel(node: ReactNode): string | undefined;

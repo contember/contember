@@ -14,6 +14,7 @@ import { DraggableAttributes } from '@dnd-kit/core';
 import { JSX } from 'react/jsx-runtime';
 import { MutableRefObject } from 'react';
 import { Over } from '@dnd-kit/core';
+import { default as React_2 } from 'react';
 import { ReactNode } from 'react';
 import { SortableData } from '@dnd-kit/sortable';
 import { SyntheticListenerMap } from '@dnd-kit/core/dist/hooks/utilities';
@@ -41,7 +42,7 @@ export const BoardSortableActivator: (input: {
 // @public (undocumented)
 export const BoardSortableColumnDragOverlay: (input: {
     children: ReactNode;
-}) => JSX.Element | null;
+}) => React_2.ReactPortal | null;
 
 // @public (undocumented)
 export const BoardSortableColumnDropIndicator: (input: {
@@ -78,7 +79,7 @@ export namespace BoardSortableEachItem {
 // @public (undocumented)
 export const BoardSortableItemDragOverlay: (input: {
     children: ReactNode;
-}) => JSX.Element | null;
+}) => React_2.ReactPortal | null;
 
 // @public (undocumented)
 export const BoardSortableItemDropIndicator: (input: {

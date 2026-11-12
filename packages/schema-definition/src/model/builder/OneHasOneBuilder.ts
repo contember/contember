@@ -1,3 +1,4 @@
+import { DEFAULT_FIELD_DEPRECATION_REASON } from '@contember/schema-utils'
 import { Model } from '@contember/schema'
 import FieldBuilder from './FieldBuilder.js'
 import { AddEntityCallback, EntityConfigurator } from './types.js'
@@ -49,8 +50,8 @@ class OneHasOneBuilder<O extends PartialOptions<never> = PartialOptions<never>> 
 		return this.withOption('description', description)
 	}
 
-	public deprecated(deprecationReason: string): OneHasOneBuilder<O> {
-		return this.withOption('deprecationReason', deprecationReason)
+	public deprecated(deprecationReason?: string): OneHasOneBuilder<O> {
+		return this.withOption('deprecationReason', deprecationReason || DEFAULT_FIELD_DEPRECATION_REASON)
 	}
 
 	public getOption(): O {

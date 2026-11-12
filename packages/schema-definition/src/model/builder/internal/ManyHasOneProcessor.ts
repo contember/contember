@@ -37,8 +37,6 @@ export default class ManyHasOneProcessor implements FieldProcessor<ManyHasOneBui
 			ownedBy: fieldName,
 			target: entityName,
 			type: Model.RelationType.OneHasMany,
-			...(options.description !== undefined ? { description: options.description } : {}),
-			...(options.deprecationReason !== undefined ? { deprecationReason: options.deprecationReason } : {}),
 		}
 	}
 

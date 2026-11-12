@@ -59,7 +59,7 @@ export class ManyHasOneDefinition extends FieldDefinition<ManyHasOneDefinitionOp
 				onDelete: joiningColumn.onDelete || Model.OnDelete.restrict,
 			},
 			...(options.deprecationReason !== undefined ? { deprecationReason: options.deprecationReason } : {}),
-			...(options.description ? { description: options.description } : {}),
+			...(options.description !== undefined ? { description: options.description } : {}),
 		}
 	}
 

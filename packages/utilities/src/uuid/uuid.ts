@@ -20,37 +20,44 @@ export const generateUuidV4 = (): string => {
 	return formatUuid(bytes)
 }
 
-const v7State = { msecs: -Infinity, seq: 0 }
-
 /**
- * RFC 9562 UUIDv7, monotonic within the process: inside one millisecond (or when the clock goes back)
- * a random-seeded 32-bit counter increments; when it wraps, the timestamp moves forward by one millisecond.
+ * RFC 9562 UUIDv7 generator with its own monotonic state: inside one millisecond (or when the clock goes back)
+ * a random-seeded counter increments; when it wraps, the timestamp moves forward by one millisecond.
  */
-export const generateUuidV7 = (now: number = Date.now()): string => {
-	const bytes = randomBytes()
-	if (now > v7State.msecs) {
-		v7State.seq = (bytes[6] << 23) | (bytes[7] << 16) | (bytes[8] << 8) | bytes[9]
-		v7State.msecs = now
-	} else {
-		v7State.seq = (v7State.seq + 1) | 0
-		if (v7State.seq === 0) {
-			v7State.msecs++
+export const createUuidV7Generator = (
+	now: () => number = Date.now,
+	random: () => Uint8Array = randomBytes,
+): () => string => {
+	const state = { msecs: -Infinity, seq: 0 }
+	return () => {
+		const bytes = random()
+		const time = now()
+		if (time > state.msecs) {
+			state.seq = (bytes[6] << 23) | (bytes[7] << 16) | (bytes[8] << 8) | bytes[9]
+			state.msecs = time
+		} else {
+			state.seq = (state.seq + 1) | 0
+			if (state.seq === 0) {
+				state.msecs++
+			}
 		}
+		const { msecs, seq } = state
+		bytes[0] = (msecs / 0x10000000000) & 0xff
+		bytes[1] = (msecs / 0x100000000) & 0xff
+		bytes[2] = (msecs / 0x1000000) & 0xff
+		bytes[3] = (msecs / 0x10000) & 0xff
+		bytes[4] = (msecs / 0x100) & 0xff
+		bytes[5] = msecs & 0xff
+		bytes[6] = 0x70 | ((seq >>> 28) & 0x0f)
+		bytes[7] = (seq >>> 20) & 0xff
+		bytes[8] = 0x80 | ((seq >>> 14) & 0x3f)
+		bytes[9] = (seq >>> 6) & 0xff
+		bytes[10] = ((seq << 2) & 0xff) | (bytes[10] & 0x03)
+		return formatUuid(bytes)
 	}
-	const { msecs, seq } = v7State
-	bytes[0] = (msecs / 0x10000000000) & 0xff
-	bytes[1] = (msecs / 0x100000000) & 0xff
-	bytes[2] = (msecs / 0x1000000) & 0xff
-	bytes[3] = (msecs / 0x10000) & 0xff
-	bytes[4] = (msecs / 0x100) & 0xff
-	bytes[5] = msecs & 0xff
-	bytes[6] = 0x70 | ((seq >>> 28) & 0x0f)
-	bytes[7] = (seq >>> 20) & 0xff
-	bytes[8] = 0x80 | ((seq >>> 14) & 0x3f)
-	bytes[9] = (seq >>> 6) & 0xff
-	bytes[10] = ((seq << 2) & 0xff) | (bytes[10] & 0x03)
-	return formatUuid(bytes)
 }
+
+export const generateUuidV7: () => string = createUuidV7Generator()
 
 const uuidPattern =
 	/^(?:[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$/i

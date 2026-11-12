@@ -1,5 +1,6 @@
 import { afterEach, describe, expect, test } from 'bun:test'
 import { generateUuidV4, generateUuidV7, isUuid } from '../../src/index.js'
+import { createUuidV7Generator } from '../../src/uuid/uuid.js'
 
 const uuidShape = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/
 
@@ -28,27 +29,44 @@ describe('generateUuidV4', () => {
 	})
 })
 
+const timestampOf = (id: string) => Number.parseInt(id.replace(/-/g, '').slice(0, 12), 16)
+
 describe('generateUuidV7', () => {
-	test('encodes the timestamp in the first 48 bits', () => {
-		const now = Date.UTC(2030, 0, 1)
-		const id = generateUuidV7(now)
+	test('produces a version 7, RFC 9562 variant id with the current time', () => {
+		const before = Date.now()
+		const id = generateUuidV7()
 		expect(id).toMatch(uuidShape)
 		expect(id[14]).toBe('7')
 		expect('89ab').toContain(id[19])
-		expect(Number.parseInt(id.replace(/-/g, '').slice(0, 12), 16)).toBe(now)
+		expect(timestampOf(id)).toBeGreaterThanOrEqual(before)
+		expect(timestampOf(id)).toBeLessThanOrEqual(Date.now())
+	})
+
+	test('encodes the timestamp in the first 48 bits', () => {
+		const now = Date.UTC(2030, 0, 1)
+		expect(timestampOf(createUuidV7Generator(() => now)())).toBe(now)
 	})
 
 	test('ids within one millisecond are strictly increasing', () => {
-		const now = Date.UTC(2031, 0, 1)
-		const ids = Array.from({ length: 1000 }, () => generateUuidV7(now))
+		const generate = createUuidV7Generator(() => Date.UTC(2031, 0, 1))
+		const ids = Array.from({ length: 1000 }, () => generate())
 		expect([...ids].sort()).toEqual(ids)
 		expect(new Set(ids).size).toBe(ids.length)
 	})
 
 	test('a clock going backwards does not break ordering', () => {
-		const first = generateUuidV7(Date.UTC(2032, 0, 1))
-		const second = generateUuidV7(Date.UTC(2032, 0, 1) - 5000)
+		let now = Date.UTC(2032, 0, 1)
+		const generate = createUuidV7Generator(() => now)
+		const first = generate()
+		now -= 5000
+		const second = generate()
 		expect(second > first).toBe(true)
+		expect(timestampOf(second)).toBe(Date.UTC(2032, 0, 1))
+	})
+
+	test('separate generators do not share state', () => {
+		createUuidV7Generator(() => Date.UTC(2099, 0, 1))()
+		expect(timestampOf(generateUuidV7())).toBeLessThan(Date.UTC(2099, 0, 1))
 	})
 })
 

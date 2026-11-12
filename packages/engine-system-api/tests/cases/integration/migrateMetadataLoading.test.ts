@@ -8,6 +8,7 @@ import { emptySchema } from '@contember/schema-utils'
 import {
 	Migration,
 	MigrationDescriber,
+	MigrationVersionHelper,
 	ModificationHandlerFactory,
 	SchemaDiffer,
 	SchemaMigrator,
@@ -16,7 +17,7 @@ import {
 	updateFieldNameModification,
 	VERSION_LATEST,
 } from '@contember/schema-migrations'
-import { Connection, DatabaseMetadataResolver, EventManager } from '@contember/database'
+import { Connection, DatabaseMetadataResolver, EventManager, wrapIdentifier } from '@contember/database'
 import { createLogger, NullLoggerHandler } from '@contember/logger'
 import {
 	ContentQueryExecutor,
@@ -35,6 +36,8 @@ import { SchemaMigrationInput } from '../../../src/model/migrations/MigrationInp
 // follows a rename that does not invalidate the cached metadata, deployed together or one migration per call.
 const databaseUrl = process.env.MIGRATION_TEST_DATABASE_URL
 const databaseTest = test.skipIf(!databaseUrl)
+// Each deploy creates a database and runs the system migrations.
+const scenarioTimeoutMs = 30_000
 
 const handlerFactory = new ModificationHandlerFactory(ModificationHandlerFactory.defaultFactoryMap)
 const schemaMigrator = new SchemaMigrator(handlerFactory)
@@ -44,17 +47,32 @@ const noContentQueries: ContentQueryExecutor = {
 	execute: () => Promise.reject(new Error('content migrations are not used here')),
 }
 
-const connectionConfig = (database: string) => {
+const serverUrl = () => {
 	if (!databaseUrl) {
 		throw new Error('Set MIGRATION_TEST_DATABASE_URL to a local PostgreSQL server')
 	}
-	const url = new URL(databaseUrl)
+	return new URL(databaseUrl)
+}
+
+const connectionConfig = (database: string) => {
+	const url = serverUrl()
 	return {
 		host: url.hostname,
 		port: Number(url.port || 5432),
 		user: decodeURIComponent(url.username),
 		password: decodeURIComponent(url.password),
 		database,
+	}
+}
+
+const dropDatabase = async (database: string) => {
+	const maintenance = Connection.createSingle(connectionConfig(serverUrl().pathname.slice(1) || 'postgres'), error => {
+		throw error
+	})
+	try {
+		await maintenance.query('DROP DATABASE IF EXISTS ' + wrapIdentifier(database))
+	} finally {
+		await maintenance.end()
 	}
 }
 
@@ -124,6 +142,7 @@ const deploy = async (label: string, deploys: readonly (readonly SchemaMigration
 		return { sql, catalog: [...indexes.rows, ...constraints.rows].map(it => it.def) }
 	} finally {
 		await connection.end()
+		await dropDatabase(db.database)
 	}
 }
 
@@ -135,18 +154,17 @@ const migration = (modifications: Migration.Modification[]): SchemaMigrationInpu
 
 const apply = (schema: Schema, modifications: Migration.Modification[]) => schemaMigrator.applyModifications(schema, modifications, VERSION_LATEST)
 
+type RenameThenRead = readonly [create: SchemaMigrationInput, rename: SchemaMigrationInput, read: SchemaMigrationInput]
+
 /** Three migrations: create, rename (no metadata invalidation), then a metadata reader on the renamed object. */
-const renameThenRead = (initial: Schema, rename: Migration.Modification, target: (renamed: Schema) => Schema) => {
+const renameThenRead = (initial: Schema, rename: Migration.Modification, target: (renamed: Schema) => Schema): RenameThenRead => {
 	const create = differ.diffSchemas(emptySchema, initial)
 	const renamed = apply(initial, [rename])
 	const read = differ.diffSchemas(renamed, target(renamed))
-	return [migration(create), migration([rename]), migration(read)] as const
+	return [migration(create), migration([rename]), migration(read)]
 }
 
-const deployBothWays = async (
-	label: string,
-	[create, rename, read]: readonly [SchemaMigrationInput, SchemaMigrationInput, SchemaMigrationInput],
-) => ({
+const deployBothWays = async (label: string, [create, rename, read]: RenameThenRead) => ({
 	together: await deploy(`${label}_together`, [[create], [rename, read]]),
 	separately: await deploy(`${label}_separately`, [[create], [rename], [read]]),
 })
@@ -225,7 +243,7 @@ databaseTest('rename a field, then remove its index', async () => {
 	expect(result.together.catalog).toEqual(result.separately.catalog)
 	expect(result.together.sql.flat()).toEqual(result.separately.sql.flat())
 	expect(result).toMatchSnapshot()
-})
+}, scenarioTimeoutMs)
 
 databaseTest('rename a field, then remove its unique constraint', async () => {
 	const result = await deployBothWays(
@@ -239,7 +257,7 @@ databaseTest('rename a field, then remove its unique constraint', async () => {
 	expect(result.together.catalog).toEqual(result.separately.catalog)
 	expect(result.together.sql.flat()).toEqual(result.separately.sql.flat())
 	expect(result).toMatchSnapshot()
-})
+}, scenarioTimeoutMs)
 
 databaseTest('rename a table, then change a relation onDelete', async () => {
 	const result = await deployBothWays(
@@ -253,7 +271,7 @@ databaseTest('rename a table, then change a relation onDelete', async () => {
 	expect(result.together.catalog).toEqual(result.separately.catalog)
 	expect(result.together.sql.flat()).toEqual(result.separately.sql.flat())
 	expect(result).toMatchSnapshot()
-})
+}, scenarioTimeoutMs)
 
 databaseTest('rename a joining column, then change the relation onDelete', async () => {
 	const result = await deployBothWays(
@@ -267,20 +285,30 @@ databaseTest('rename a joining column, then change the relation onDelete', async
 	expect(result.together.catalog).toEqual(result.separately.catalog)
 	expect(result.together.sql.flat()).toEqual(result.separately.sql.flat())
 	expect(result).toMatchSnapshot()
-})
+}, scenarioTimeoutMs)
 
 const playgroundMigrationsDir = join(import.meta.dir, '../../../../playground/api/migrations')
 
+type MigrationFileContent = { formatVersion: number; modifications: Migration.Modification[] }
+
+const isMigrationFileContent = (value: unknown): value is MigrationFileContent =>
+	typeof value === 'object' && value !== null
+	&& 'formatVersion' in value && typeof value.formatVersion === 'number'
+	&& 'modifications' in value && Array.isArray(value.modifications)
+	&& value.modifications.every((it: unknown) => typeof it === 'object' && it !== null && 'modification' in it && typeof it.modification === 'string')
+
+/** Schema migrations only: the content migrations (`.ts`) change data, not the schema or its metadata. */
 const playgroundHistory = (): SchemaMigrationInput[] =>
 	readdirSync(playgroundMigrationsDir)
 		.filter(it => it.endsWith('.json'))
 		.sort()
 		.map(file => {
 			const name = file.slice(0, -'.json'.length)
-			const content: { formatVersion: number; modifications: Migration.Modification[] } = JSON.parse(
-				readFileSync(join(playgroundMigrationsDir, file), 'utf8'),
-			)
-			return { type: 'schema', version: name.slice(0, 17), name, formatVersion: content.formatVersion, modifications: content.modifications }
+			const content: unknown = JSON.parse(readFileSync(join(playgroundMigrationsDir, file), 'utf8'))
+			if (!isMigrationFileContent(content)) {
+				throw new Error(`${file} is not a schema migration`)
+			}
+			return { type: 'schema', version: MigrationVersionHelper.extractVersion(name), name, ...content }
 		})
 
 databaseTest('replaying the playground history in one call or one migration per call', async () => {

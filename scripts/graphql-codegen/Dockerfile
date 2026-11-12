@@ -1,13 +1,13 @@
 FROM oven/bun:1.3.10 AS build
 WORKDIR /src
-COPY package.json /src
-COPY bun.lock /src
-RUN bun install install
-RUN bun add graphql @graphql-codegen/cli @graphql-codegen/typescript @graphql-codegen/typescript-operations @graphql-codegen/typescript-resolvers
 COPY . /src
+RUN bun install --frozen-lockfile
+# Top-level pins only: codegen 8 pulls loaders that need fs.glob withFileTypes (missing in Bun); transitive deps still float.
+RUN bun add --exact @graphql-codegen/cli@7.4.6 @graphql-codegen/typescript@6.1.2 @graphql-codegen/typescript-operations@6.1.10 @graphql-codegen/typescript-resolvers@6.1.1
 ARG PACKAGE
 WORKDIR /src/packages/$PACKAGE
-RUN /src/node_modules/.bin/graphql-codegen-esm --config ./graphql.codegen.yml
+# The typescript condition lets schemas built in code import workspace packages from source.
+RUN bun --conditions=typescript /src/node_modules/@graphql-codegen/cli/esm/bin.js --config ./graphql.codegen.yml
 
 FROM scratch AS export
 ARG PACKAGE

@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { forwardRef, ReactElement, useCallback } from 'react'
 import { Slot } from '@radix-ui/react-slot'
-import { composeEventHandlers } from '@radix-ui/primitive'
+import { composeEventHandlers } from '@contember/utilities'
 import { useDataViewFilter } from '../../../hooks/index.js'
 import { TextFilterArtifacts } from '../../../filterTypes/index.js'
 import { useDataViewFilterName } from '../../../contexts.js'

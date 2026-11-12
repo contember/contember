@@ -35,8 +35,7 @@
     "@contember/react-client": "workspace:*",
     "@contember/react-utils": "workspace:*",
     "@contember/utilities": "workspace:*",
-    "@radix-ui/react-slot": "catalog:",
-    "@radix-ui/primitive": "catalog:"
+    "@radix-ui/react-slot": "catalog:"
   },
   "peerDependencies": {
     "react": "catalog:",

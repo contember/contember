@@ -1,7 +1,7 @@
 import React, { ReactElement, useCallback } from 'react'
 import { useRepeaterCurrentEntity, useRepeaterMethods } from '../../contexts.js'
 import { Slot } from '@radix-ui/react-slot'
-import { composeEventHandlers } from '@radix-ui/primitive'
+import { composeEventHandlers } from '@contember/utilities'
 
 const SlotType = Slot as React.ForwardRefExoticComponent<
 	React.ButtonHTMLAttributes<HTMLButtonElement> & React.RefAttributes<HTMLButtonElement>

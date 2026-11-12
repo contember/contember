@@ -36,7 +36,6 @@
   "dependencies": {
     "@contember/react-binding": "workspace:*",
     "@contember/utilities": "workspace:*",
-    "@radix-ui/primitive": "catalog:",
     "@radix-ui/react-slot": "catalog:",
     "is-hotkey": "catalog:",
     "slate": "catalog:",

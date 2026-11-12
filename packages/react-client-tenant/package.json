@@ -38,7 +38,7 @@
     "@contember/graphql-client-tenant": "workspace:*",
     "@contember/react-client": "workspace:*",
     "@contember/react-utils": "workspace:*",
-    "@radix-ui/primitive": "catalog:",
+    "@contember/utilities": "workspace:*",
     "@radix-ui/react-slot": "catalog:",
     "graphql-ts-client-api": "catalog:"
   },

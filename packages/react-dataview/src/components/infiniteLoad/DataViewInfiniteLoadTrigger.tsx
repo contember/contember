@@ -2,7 +2,7 @@ import * as React from 'react'
 import { forwardRef, ReactElement, useCallback } from 'react'
 import { useDataViewInfiniteLoadTrigger } from '../../contexts.js'
 import { Slot } from '@radix-ui/react-slot'
-import { composeEventHandlers } from '@radix-ui/primitive'
+import { composeEventHandlers } from '@contember/utilities'
 
 const SlotType = Slot as React.ForwardRefExoticComponent<React.ButtonHTMLAttributes<HTMLButtonElement> & React.RefAttributes<HTMLButtonElement>>
 

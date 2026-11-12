@@ -1,8 +1,7 @@
 import * as React from 'react'
 import { forwardRef, ReactElement, useCallback } from 'react'
 import { Slot } from '@radix-ui/react-slot'
-import { composeEventHandlers } from '@radix-ui/primitive'
-import { dataAttribute } from '@contember/utilities'
+import { composeEventHandlers, dataAttribute } from '@contember/utilities'
 import { DataViewEnumFilterCurrent, DataViewSetEnumFilterAction, useDataViewEnumFilter } from '../../../hooks/index.js'
 import { useDataViewFilterName } from '../../../contexts.js'
 

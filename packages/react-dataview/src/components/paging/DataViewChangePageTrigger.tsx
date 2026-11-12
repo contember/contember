@@ -1,8 +1,7 @@
 import { forwardRef, useCallback, useMemo } from 'react'
 import { Slot } from '@radix-ui/react-slot'
 import { useDataViewPagingInfo, useDataViewPagingMethods, useDataViewPagingState } from '../../contexts.js'
-import { dataAttribute } from '@contember/utilities'
-import { composeEventHandlers } from '@radix-ui/primitive'
+import { composeEventHandlers, dataAttribute } from '@contember/utilities'
 
 export interface DataViewChangePageTriggerAttributes {
 	['data-active']?: ''

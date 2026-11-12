@@ -1,4 +1,4 @@
-import { composeEventHandlers } from '@radix-ui/primitive'
+import { composeEventHandlers } from '@contember/utilities'
 import { Slot } from '@radix-ui/react-slot'
 import { MouseEventHandler, ReactElement } from 'react'
 import { Selection } from 'slate'

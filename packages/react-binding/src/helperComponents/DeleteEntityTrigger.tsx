@@ -4,7 +4,7 @@ import { useDecoratedPersist } from './persist/useDecoratedPersist.js'
 import { ErrorPersistResult, SuccessfulPersistResult } from '@contember/binding'
 import { useEntity } from '../accessorPropagation/index.js'
 import { useMutationState } from '../accessorTree/index.js'
-import { composeEventHandlers } from '@radix-ui/primitive'
+import { composeEventHandlers } from '@contember/utilities'
 
 const SlotType = Slot as React.ForwardRefExoticComponent<React.ButtonHTMLAttributes<HTMLButtonElement> & React.RefAttributes<HTMLButtonElement>>
 

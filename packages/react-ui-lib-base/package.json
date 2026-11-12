@@ -29,6 +29,9 @@
     "ae:build": "api-extractor run --local",
     "ae:test": "api-extractor run"
   },
+  "devDependencies": {
+    "@testing-library/react": "catalog:"
+  },
   "repository": {
     "type": "git",
     "url": "https://github.com/contember/interface.git",
@@ -45,16 +48,12 @@
     "@radix-ui/react-collapsible": "catalog:",
     "@radix-ui/react-dialog": "catalog:",
     "@radix-ui/react-dropdown-menu": "catalog:",
-    "@radix-ui/react-label": "catalog:",
     "@radix-ui/react-popover": "catalog:",
-    "@radix-ui/react-progress": "catalog:",
     "@radix-ui/react-scroll-area": "catalog:",
     "@radix-ui/react-select": "catalog:",
-    "@radix-ui/react-separator": "catalog:",
     "@radix-ui/react-slot": "catalog:",
     "@radix-ui/react-switch": "catalog:",
     "@radix-ui/react-toast": "catalog:",
-    "@radix-ui/react-toggle": "catalog:",
     "@radix-ui/react-toggle-group": "catalog:",
     "@radix-ui/react-tooltip": "catalog:",
     "class-variance-authority": "catalog:",

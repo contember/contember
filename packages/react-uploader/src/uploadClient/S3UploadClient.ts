@@ -112,7 +112,8 @@ const xhrAdapter = async (
 			onProgress({
 				totalBytes: e.total,
 				uploadedBytes: e.loaded,
-				progress: e.loaded / e.total,
+				// total is 0 for an empty body or a non-computable length; report 0 instead of NaN.
+				progress: e.total > 0 ? e.loaded / e.total : 0,
 			})
 		})
 

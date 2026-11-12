@@ -39,6 +39,7 @@
     "@contember/schema": "workspace:*",
     "@contember/schema-migrations": "workspace:*",
     "@contember/schema-utils": "workspace:*",
+    "@contember/sentry-client": "workspace:*",
     "@contember/telemetry": "workspace:*",
     "@contember/typesafe": "workspace:*",
     "@contember/utilities": "workspace:*",

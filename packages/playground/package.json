@@ -23,18 +23,13 @@
     "@contember/vite-plugin": "workspace:*",
     "@tailwindcss/vite": "catalog:",
     "@faker-js/faker": "catalog:",
-    "@radix-ui/react-separator": "catalog:",
     "graphql": "catalog:",
     "lucide-react": "catalog:",
     "qrcode-generator": "catalog:",
     "react": "catalog:",
     "react-dom": "catalog:",
     "tailwindcss": "catalog:",
-    "vite": "catalog:",
-    "vite-tsconfig-paths": "catalog:"
-  },
-  "dependencies": {
-    "@sindresorhus/slugify": "catalog:"
+    "vite": "catalog:"
   },
   "exports": {
     ".": {

@@ -366,12 +366,13 @@ export class ProjectMigrator {
 			schema: newSchema,
 		} = this.migrationDescriber.describeModification(schema, modification, { formatVersion })
 		for (const stage of stages) {
-			const databaseMetadata = await metadataStore.getMetadata(stage.schema)
-			const sql = getSql({
-				systemSchema: project.systemSchema,
-				databaseMetadata,
-				invalidateDatabaseMetadata: () => metadataStore.invalidate(stage.schema),
-			})
+			// Metadata is re-read from the catalog only when this modification reads it, not after every invalidation.
+			const sql = await metadataStore.withMetadata(stage.schema, databaseMetadata =>
+				getSql({
+					systemSchema: project.systemSchema,
+					databaseMetadata,
+					invalidateDatabaseMetadata: () => metadataStore.invalidate(stage.schema),
+				}))
 			const processedSql = this.sqlPreprocessor(sql, {
 				project_slug: project.slug,
 				system_schema: project.systemSchema,

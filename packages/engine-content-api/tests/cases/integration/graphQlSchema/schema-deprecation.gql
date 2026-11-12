@@ -51,7 +51,7 @@ scalar UUID
 type Category {
   _meta: CategoryMeta
   id: UUID!
-  name: String @deprecated(reason: "deprecated Category.name")
+  name: String! @deprecated(reason: "deprecated Category.name")
   articles(filter: ArticleWhere, orderBy: [ArticleOrderBy!], offset: Int, limit: Int): [Article!]! @deprecated(reason: "deprecated Category.articles")
   articlesByStats(by: CategoryArticlesByStatsUniqueWhere!, filter: ArticleWhere): Article @deprecated(reason: "deprecated Category.articles")
   articlesBy(by: ArticlesOfCategoryByUniqueWhere!, filter: ArticleWhere): Article @deprecated(reason: "deprecated Category.articles")
@@ -66,10 +66,18 @@ type CategoryMeta {
 
 input ArticleWhere {
   id: UUIDCondition
-  title: StringCondition @deprecated(reason: "deprecated Article.title")
-  category: CategoryWhere @deprecated(reason: "deprecated Article.category")
-  tags: TagWhere @deprecated(reason: "deprecated Article.tags")
-  stats: ArticleStatsWhere @deprecated(reason: "deprecated Article.stats")
+
+  """Deprecated: deprecated Article.title"""
+  title: StringCondition
+
+  """Deprecated: deprecated Article.category"""
+  category: CategoryWhere
+
+  """Deprecated: deprecated Article.tags"""
+  tags: TagWhere
+
+  """Deprecated: deprecated Article.stats"""
+  stats: ArticleStatsWhere
   and: [ArticleWhere]
   or: [ArticleWhere]
   not: ArticleWhere
@@ -117,8 +125,12 @@ input StringCondition {
 
 input CategoryWhere {
   id: UUIDCondition
-  name: StringCondition @deprecated(reason: "deprecated Category.name")
-  articles: ArticleWhere @deprecated(reason: "deprecated Category.articles")
+
+  """Deprecated: deprecated Category.name"""
+  name: StringCondition
+
+  """Deprecated: deprecated Category.articles"""
+  articles: ArticleWhere
   and: [CategoryWhere]
   or: [CategoryWhere]
   not: CategoryWhere
@@ -126,8 +138,12 @@ input CategoryWhere {
 
 input TagWhere {
   id: UUIDCondition
-  name: StringCondition @deprecated(reason: "Field is deprecated")
-  articles: ArticleWhere @deprecated(reason: "Field is deprecated")
+
+  """Deprecated: Field is deprecated"""
+  name: StringCondition
+
+  """Deprecated: Field is deprecated"""
+  articles: ArticleWhere
   and: [TagWhere]
   or: [TagWhere]
   not: TagWhere
@@ -135,7 +151,9 @@ input TagWhere {
 
 input ArticleStatsWhere {
   id: UUIDCondition
-  article: ArticleWhere @deprecated(reason: "deprecated ArticleStats.article")
+
+  """Deprecated: deprecated ArticleStats.article"""
+  article: ArticleWhere
   and: [ArticleStatsWhere]
   or: [ArticleStatsWhere]
   not: ArticleStatsWhere
@@ -145,9 +163,15 @@ input ArticleOrderBy {
   _random: Boolean
   _randomSeeded: Int
   id: OrderDirection
-  title: OrderDirection @deprecated(reason: "deprecated Article.title")
-  category: CategoryOrderBy @deprecated(reason: "deprecated Article.category")
-  stats: ArticleStatsOrderBy @deprecated(reason: "deprecated Article.stats")
+
+  """Deprecated: deprecated Article.title"""
+  title: OrderDirection
+
+  """Deprecated: deprecated Article.category"""
+  category: CategoryOrderBy
+
+  """Deprecated: deprecated Article.stats"""
+  stats: ArticleStatsOrderBy
 }
 
 enum OrderDirection {
@@ -161,26 +185,44 @@ input CategoryOrderBy {
   _random: Boolean
   _randomSeeded: Int
   id: OrderDirection
-  name: OrderDirection @deprecated(reason: "deprecated Category.name")
+
+  """Deprecated: deprecated Category.name"""
+  name: OrderDirection
 }
 
 input ArticleStatsOrderBy {
   _random: Boolean
   _randomSeeded: Int
   id: OrderDirection
+
+  """Deprecated: deprecated ArticleStats.article"""
+  article: ArticleOrderBy
 }
 
 input CategoryArticlesByStatsUniqueWhere {
-  stats: ArticleStatsUniqueWhere @deprecated(reason: "deprecated Article.stats")
+  """Deprecated: deprecated Article.stats"""
+  stats: ArticleStatsUniqueWhere
 }
 
 input ArticleStatsUniqueWhere {
   id: UUID
+
+  """Deprecated: deprecated ArticleStats.article"""
+  article: ArticleUniqueWhere
+}
+
+input ArticleUniqueWhere {
+  id: UUID
+
+  """Deprecated: deprecated Article.stats"""
+  stats: ArticleStatsUniqueWhere
 }
 
 input ArticlesOfCategoryByUniqueWhere {
   id: UUID
-  stats: ArticleStatsUniqueWhere @deprecated(reason: "deprecated Article.stats")
+
+  """Deprecated: deprecated Article.stats"""
+  stats: ArticleStatsUniqueWhere
 }
 
 type ArticleConnection {
@@ -214,14 +256,15 @@ input TagOrderBy {
   _random: Boolean
   _randomSeeded: Int
   id: OrderDirection
-  name: OrderDirection @deprecated(reason: "Field is deprecated")
+
+  """Deprecated: Field is deprecated"""
+  name: OrderDirection
 }
 
 type ArticleStats {
   _meta: ArticleStatsMeta
   id: UUID!
-  article(filter: ArticleWhere, orderBy: [ArticleOrderBy!], offset: Int, limit: Int): [Article!]! @deprecated(reason: "deprecated ArticleStats.article")
-  paginateArticle(filter: ArticleWhere, orderBy: [ArticleOrderBy!], skip: Int, first: Int): ArticleConnection! @deprecated(reason: "deprecated ArticleStats.article")
+  article(filter: ArticleWhere): Article @deprecated(reason: "deprecated ArticleStats.article")
 }
 
 type ArticleStatsMeta {
@@ -236,11 +279,6 @@ type TagConnection {
 
 type TagEdge {
   node: Tag!
-}
-
-input ArticleUniqueWhere {
-  id: UUID
-  stats: ArticleStatsUniqueWhere @deprecated(reason: "deprecated Article.stats")
 }
 
 type _ValidationResult {
@@ -269,10 +307,17 @@ type _ValidationMessage {
 }
 
 input ArticleCreateInput {
-  title: String @deprecated(reason: "deprecated Article.title")
-  category: ArticleCreateCategoryEntityRelationInput @deprecated(reason: "deprecated Article.category")
-  tags: [ArticleCreateTagsEntityRelationInput!] @deprecated(reason: "deprecated Article.tags")
-  stats: ArticleCreateStatsEntityRelationInput @deprecated(reason: "deprecated Article.stats")
+  """Deprecated: deprecated Article.title"""
+  title: String
+
+  """Deprecated: deprecated Article.category"""
+  category: ArticleCreateCategoryEntityRelationInput
+
+  """Deprecated: deprecated Article.tags"""
+  tags: [ArticleCreateTagsEntityRelationInput!]
+
+  """Deprecated: deprecated Article.stats"""
+  stats: ArticleCreateStatsEntityRelationInput
   _dummy_field_: Boolean
 }
 
@@ -284,11 +329,14 @@ input ArticleCreateCategoryEntityRelationInput {
 
 input CategoryUniqueWhere {
   id: UUID
-  articles: ArticleUniqueWhere @deprecated(reason: "deprecated Category.articles")
+
+  """Deprecated: deprecated Category.articles"""
+  articles: ArticleUniqueWhere
 }
 
 input CategoryWithoutArticlesCreateInput {
-  name: String @deprecated(reason: "deprecated Category.name")
+  """Deprecated: deprecated Category.name"""
+  name: String
   _dummy_field_: Boolean
 }
 
@@ -309,7 +357,8 @@ input TagUniqueWhere {
 }
 
 input TagWithoutArticlesCreateInput {
-  name: String @deprecated(reason: "Field is deprecated")
+  """Deprecated: Field is deprecated"""
+  name: String
   _dummy_field_: Boolean
 }
 
@@ -334,10 +383,17 @@ input ArticleConnectOrCreateStatsRelationInput {
 }
 
 input ArticleUpdateInput {
-  title: String @deprecated(reason: "deprecated Article.title")
-  category: ArticleUpdateCategoryEntityRelationInput @deprecated(reason: "deprecated Article.category")
-  tags: [ArticleUpdateTagsEntityRelationInput!] @deprecated(reason: "deprecated Article.tags")
-  stats: ArticleUpdateStatsEntityRelationInput @deprecated(reason: "deprecated Article.stats")
+  """Deprecated: deprecated Article.title"""
+  title: String
+
+  """Deprecated: deprecated Article.category"""
+  category: ArticleUpdateCategoryEntityRelationInput
+
+  """Deprecated: deprecated Article.tags"""
+  tags: [ArticleUpdateTagsEntityRelationInput!]
+
+  """Deprecated: deprecated Article.stats"""
+  stats: ArticleUpdateStatsEntityRelationInput
   _dummy_field_: Boolean
 }
 
@@ -352,7 +408,8 @@ input ArticleUpdateCategoryEntityRelationInput {
 }
 
 input CategoryWithoutArticlesUpdateInput {
-  name: String @deprecated(reason: "deprecated Category.name")
+  """Deprecated: deprecated Category.name"""
+  name: String
   _dummy_field_: Boolean
 }
 
@@ -378,7 +435,8 @@ input ArticleUpdateTagsRelationInput {
 }
 
 input TagWithoutArticlesUpdateInput {
-  name: String @deprecated(reason: "Field is deprecated")
+  """Deprecated: Field is deprecated"""
+  name: String
   _dummy_field_: Boolean
 }
 
@@ -417,7 +475,8 @@ type ArticleStatsEdge {
 }
 
 input ArticleStatsCreateInput {
-  article: [ArticleStatsCreateArticleEntityRelationInput!] @deprecated(reason: "deprecated ArticleStats.article")
+  """Deprecated: deprecated ArticleStats.article"""
+  article: ArticleStatsCreateArticleEntityRelationInput
   _dummy_field_: Boolean
 }
 
@@ -425,13 +484,17 @@ input ArticleStatsCreateArticleEntityRelationInput {
   connect: ArticleUniqueWhere
   create: ArticleWithoutStatsCreateInput
   connectOrCreate: ArticleStatsConnectOrCreateArticleRelationInput
-  alias: String
 }
 
 input ArticleWithoutStatsCreateInput {
-  title: String @deprecated(reason: "deprecated Article.title")
-  category: ArticleCreateCategoryEntityRelationInput @deprecated(reason: "deprecated Article.category")
-  tags: [ArticleCreateTagsEntityRelationInput!] @deprecated(reason: "deprecated Article.tags")
+  """Deprecated: deprecated Article.title"""
+  title: String
+
+  """Deprecated: deprecated Article.category"""
+  category: ArticleCreateCategoryEntityRelationInput
+
+  """Deprecated: deprecated Article.tags"""
+  tags: [ArticleCreateTagsEntityRelationInput!]
   _dummy_field_: Boolean
 }
 
@@ -441,35 +504,34 @@ input ArticleStatsConnectOrCreateArticleRelationInput {
 }
 
 input ArticleStatsUpdateInput {
-  article: [ArticleStatsUpdateArticleEntityRelationInput!] @deprecated(reason: "deprecated ArticleStats.article")
+  """Deprecated: deprecated ArticleStats.article"""
+  article: ArticleStatsUpdateArticleEntityRelationInput
   _dummy_field_: Boolean
 }
 
 input ArticleStatsUpdateArticleEntityRelationInput {
-  create: ArticleWithoutStatsCreateInput
-  update: ArticleStatsUpdateArticleRelationInput
-  upsert: ArticleStatsUpsertArticleRelationInput
   connect: ArticleUniqueWhere
+  create: ArticleWithoutStatsCreateInput
   connectOrCreate: ArticleStatsConnectOrCreateArticleRelationInput
-  disconnect: ArticleUniqueWhere
-  delete: ArticleUniqueWhere
-  alias: String
-}
-
-input ArticleStatsUpdateArticleRelationInput {
-  by: ArticleUniqueWhere!
-  data: ArticleWithoutStatsUpdateInput!
+  update: ArticleWithoutStatsUpdateInput
+  upsert: ArticleStatsUpsertArticleRelationInput
+  disconnect: Boolean
+  delete: Boolean
 }
 
 input ArticleWithoutStatsUpdateInput {
-  title: String @deprecated(reason: "deprecated Article.title")
-  category: ArticleUpdateCategoryEntityRelationInput @deprecated(reason: "deprecated Article.category")
-  tags: [ArticleUpdateTagsEntityRelationInput!] @deprecated(reason: "deprecated Article.tags")
+  """Deprecated: deprecated Article.title"""
+  title: String
+
+  """Deprecated: deprecated Article.category"""
+  category: ArticleUpdateCategoryEntityRelationInput
+
+  """Deprecated: deprecated Article.tags"""
+  tags: [ArticleUpdateTagsEntityRelationInput!]
   _dummy_field_: Boolean
 }
 
 input ArticleStatsUpsertArticleRelationInput {
-  by: ArticleUniqueWhere!
   update: ArticleWithoutStatsUpdateInput!
   create: ArticleWithoutStatsCreateInput!
 }
@@ -484,8 +546,11 @@ type CategoryEdge {
 }
 
 input CategoryCreateInput {
-  name: String @deprecated(reason: "deprecated Category.name")
-  articles: [CategoryCreateArticlesEntityRelationInput!] @deprecated(reason: "deprecated Category.articles")
+  """Deprecated: deprecated Category.name"""
+  name: String
+
+  """Deprecated: deprecated Category.articles"""
+  articles: [CategoryCreateArticlesEntityRelationInput!]
   _dummy_field_: Boolean
 }
 
@@ -497,9 +562,14 @@ input CategoryCreateArticlesEntityRelationInput {
 }
 
 input ArticleWithoutCategoryCreateInput {
-  title: String @deprecated(reason: "deprecated Article.title")
-  tags: [ArticleCreateTagsEntityRelationInput!] @deprecated(reason: "deprecated Article.tags")
-  stats: ArticleCreateStatsEntityRelationInput @deprecated(reason: "deprecated Article.stats")
+  """Deprecated: deprecated Article.title"""
+  title: String
+
+  """Deprecated: deprecated Article.tags"""
+  tags: [ArticleCreateTagsEntityRelationInput!]
+
+  """Deprecated: deprecated Article.stats"""
+  stats: ArticleCreateStatsEntityRelationInput
   _dummy_field_: Boolean
 }
 
@@ -509,8 +579,11 @@ input CategoryConnectOrCreateArticlesRelationInput {
 }
 
 input CategoryUpdateInput {
-  name: String @deprecated(reason: "deprecated Category.name")
-  articles: [CategoryUpdateArticlesEntityRelationInput!] @deprecated(reason: "deprecated Category.articles")
+  """Deprecated: deprecated Category.name"""
+  name: String
+
+  """Deprecated: deprecated Category.articles"""
+  articles: [CategoryUpdateArticlesEntityRelationInput!]
   _dummy_field_: Boolean
 }
 
@@ -531,9 +604,14 @@ input CategoryUpdateArticlesRelationInput {
 }
 
 input ArticleWithoutCategoryUpdateInput {
-  title: String @deprecated(reason: "deprecated Article.title")
-  tags: [ArticleUpdateTagsEntityRelationInput!] @deprecated(reason: "deprecated Article.tags")
-  stats: ArticleUpdateStatsEntityRelationInput @deprecated(reason: "deprecated Article.stats")
+  """Deprecated: deprecated Article.title"""
+  title: String
+
+  """Deprecated: deprecated Article.tags"""
+  tags: [ArticleUpdateTagsEntityRelationInput!]
+
+  """Deprecated: deprecated Article.stats"""
+  stats: ArticleUpdateStatsEntityRelationInput
   _dummy_field_: Boolean
 }
 
@@ -544,8 +622,11 @@ input CategoryUpsertArticlesRelationInput {
 }
 
 input TagCreateInput {
-  name: String @deprecated(reason: "Field is deprecated")
-  articles: [TagCreateArticlesEntityRelationInput!] @deprecated(reason: "Field is deprecated")
+  """Deprecated: Field is deprecated"""
+  name: String
+
+  """Deprecated: Field is deprecated"""
+  articles: [TagCreateArticlesEntityRelationInput!]
   _dummy_field_: Boolean
 }
 
@@ -557,9 +638,14 @@ input TagCreateArticlesEntityRelationInput {
 }
 
 input ArticleWithoutTagsCreateInput {
-  title: String @deprecated(reason: "deprecated Article.title")
-  category: ArticleCreateCategoryEntityRelationInput @deprecated(reason: "deprecated Article.category")
-  stats: ArticleCreateStatsEntityRelationInput @deprecated(reason: "deprecated Article.stats")
+  """Deprecated: deprecated Article.title"""
+  title: String
+
+  """Deprecated: deprecated Article.category"""
+  category: ArticleCreateCategoryEntityRelationInput
+
+  """Deprecated: deprecated Article.stats"""
+  stats: ArticleCreateStatsEntityRelationInput
   _dummy_field_: Boolean
 }
 
@@ -569,8 +655,11 @@ input TagConnectOrCreateArticlesRelationInput {
 }
 
 input TagUpdateInput {
-  name: String @deprecated(reason: "Field is deprecated")
-  articles: [TagUpdateArticlesEntityRelationInput!] @deprecated(reason: "Field is deprecated")
+  """Deprecated: Field is deprecated"""
+  name: String
+
+  """Deprecated: Field is deprecated"""
+  articles: [TagUpdateArticlesEntityRelationInput!]
   _dummy_field_: Boolean
 }
 
@@ -591,9 +680,14 @@ input TagUpdateArticlesRelationInput {
 }
 
 input ArticleWithoutTagsUpdateInput {
-  title: String @deprecated(reason: "deprecated Article.title")
-  category: ArticleUpdateCategoryEntityRelationInput @deprecated(reason: "deprecated Article.category")
-  stats: ArticleUpdateStatsEntityRelationInput @deprecated(reason: "deprecated Article.stats")
+  """Deprecated: deprecated Article.title"""
+  title: String
+
+  """Deprecated: deprecated Article.category"""
+  category: ArticleUpdateCategoryEntityRelationInput
+
+  """Deprecated: deprecated Article.stats"""
+  stats: ArticleUpdateStatsEntityRelationInput
   _dummy_field_: Boolean
 }
 

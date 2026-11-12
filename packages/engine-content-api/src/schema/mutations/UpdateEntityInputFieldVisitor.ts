@@ -1,5 +1,6 @@
 import { GraphQLInputFieldConfig, GraphQLList, GraphQLNonNull } from 'graphql'
 import { Acl, Model } from '@contember/schema'
+import { inputFieldDescription } from '../utils.js'
 import { ColumnTypeResolver } from '../ColumnTypeResolver.js'
 import { UpdateEntityRelationInputProvider } from './UpdateEntityRelationInputProvider.js'
 import { Authorizator } from '../../acl/index.js'
@@ -23,8 +24,7 @@ export class UpdateEntityInputFieldVisitor
 		const [type] = this.columnTypeResolver.getType(column)
 		return {
 			type,
-			deprecationReason: column.deprecationReason,
-			description: column.description,
+			description: inputFieldDescription(column),
 		}
 	}
 
@@ -35,8 +35,7 @@ export class UpdateEntityInputFieldVisitor
 		}
 		return {
 			type,
-			deprecationReason: relation.deprecationReason,
-			description: relation.description,
+			description: inputFieldDescription(relation),
 		}
 	}
 
@@ -47,8 +46,7 @@ export class UpdateEntityInputFieldVisitor
 		}
 		return {
 			type: new GraphQLList(new GraphQLNonNull(type)),
-			deprecationReason: relation.deprecationReason,
-			description: relation.description,
+			description: inputFieldDescription(relation),
 		}
 	}
 }

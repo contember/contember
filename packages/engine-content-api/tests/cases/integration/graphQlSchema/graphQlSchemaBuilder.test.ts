@@ -5,6 +5,7 @@ import * as path from 'node:path'
 import { AllowAllPermissionFactory, c, createSchema, SchemaBuilder, SchemaDefinition, SchemaDefinition as def } from '@contember/schema-definition'
 import { Authorizator, GraphQlSchemaBuilderFactory, PermissionFactory } from '../../../../src/index.js'
 import * as model from './model.js'
+import { SchemaValidator } from '@contember/schema-utils'
 import { describe, expect, it } from 'bun:test'
 import { dirname } from 'node:path'
 import { fileURLToPath } from 'node:url'
@@ -450,6 +451,7 @@ describe('GraphQL schema builder', () => {
 	})
 
 	it('descriptions', async () => {
+		expect(SchemaValidator.validate(createSchema(ModelWithDescriptions))).toEqual([])
 		await testSchema({
 			schema: () => SchemaDefinition.createModel(ModelWithDescriptions),
 			permissions: schema => new AllowAllPermissionFactory().create(schema),
@@ -458,6 +460,7 @@ describe('GraphQL schema builder', () => {
 	})
 
 	it('deprecation', async () => {
+		expect(SchemaValidator.validate(createSchema(ModelWithDeprecation))).toEqual([])
 		await testSchema({
 			schema: () => SchemaDefinition.createModel(ModelWithDeprecation),
 			permissions: schema => new AllowAllPermissionFactory().create(schema),
@@ -594,7 +597,7 @@ namespace ModelWithDescriptions {
 
 	@c.Description('description of entity ArticleStats')
 	export class ArticleStats {
-		article = c.manyHasManyInverse(Article, 'stats').description('description of ArticleStats.article')
+		article = c.oneHasOneInverse(Article, 'stats').description('description of ArticleStats.article')
 	}
 
 	@c.Description('description of entity Category')
@@ -621,12 +624,12 @@ namespace ModelWithDeprecation {
 
 	@c.Deprecated('deprecated entity ArticleStats')
 	export class ArticleStats {
-		article = c.manyHasManyInverse(Article, 'stats').deprecated('deprecated ArticleStats.article')
+		article = c.oneHasOneInverse(Article, 'stats').deprecated('deprecated ArticleStats.article')
 	}
 
 	@c.Deprecated('deprecated entity Category')
 	export class Category {
-		name = c.stringColumn().deprecated('deprecated Category.name')
+		name = c.stringColumn().notNull().deprecated('deprecated Category.name')
 		articles = c.oneHasMany(Article, 'category').deprecated('deprecated Category.articles')
 	}
 

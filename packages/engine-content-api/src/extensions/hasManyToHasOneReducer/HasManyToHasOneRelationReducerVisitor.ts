@@ -115,7 +115,6 @@ export class HasManyToHasOneRelationReducerFieldVisitor implements Model.ColumnV
 				const uniqueWhere: GraphQLInputObjectType = new GraphQLInputObjectType({
 					// todo this can be simplified to ${targetEntity.name}By${fieldName}, but singleton must be used
 					name: GqlTypeName`${entity.name}${relation.name}By${fieldName}UniqueWhere`,
-					description: relation.description,
 					fields: () => {
 						return this.whereTypeProvider.getUniqueWhereFields(targetEntity, [[fieldName]])
 					},

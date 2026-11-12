@@ -383,9 +383,9 @@ export class ProjectMigrator {
 	}
 
 	private async executeOnStage(db: Client, stage: Stage, sql: string, migrationVersion: string) {
-		await db.query('SET LOCAL search_path TO ' + wrapIdentifier(stage.schema))
 		try {
-			await db.query(sql)
+			// One round trip: migration SQL is sent without parameters, so both run as one multi-statement query.
+			await db.query('SET LOCAL search_path TO ' + wrapIdentifier(stage.schema) + ';\n' + sql)
 		} catch (e) {
 			// Not logged here: the statement may still be retried. The resolver logs the migration's final failure.
 			if (e instanceof QueryError) {

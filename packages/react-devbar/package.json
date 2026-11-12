@@ -39,7 +39,8 @@
   "dependencies": {
     "@contember/react-utils": "workspace:*",
     "@contember/utilities": "workspace:*",
-    "buffer": "6.0.3"
+    "buffer": "6.0.3",
+    "stacktracey": "^2.1.8"
   },
   "peerDependencies": {
     "react": "^18 || ^19",

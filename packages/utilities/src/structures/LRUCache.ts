@@ -1,6 +1,6 @@
 // This is heavily inspired by https://stackoverflow.com/a/46432113
 export interface LRUCacheOptions {
-	/** Milliseconds after `set` when an entry stops being returned; reads do not extend it. Missing or <= 0: no expiry. */
+	/** Milliseconds after `set` when an entry stops being returned; reads do not extend it. Missing, zero or negative: no expiry. */
 	ttl?: number
 	now?: () => number
 }

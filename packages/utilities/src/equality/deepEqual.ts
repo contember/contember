@@ -1,8 +1,3 @@
-/**
- * Structural equality of plain data: arrays, plain objects, Map, Set, RegExp, typed arrays (element-wise),
- * DataView (byte-wise), and objects with a custom `valueOf` or `toString` (e.g. Date). Both sides must share a constructor.
- * NaN equals NaN. Only own enumerable string keys of objects are compared.
- */
 type TypedArray =
 	| Int8Array
 	| Uint8Array
@@ -17,6 +12,12 @@ type TypedArray =
 	| BigUint64Array
 
 const isTypedArray = (value: object): value is TypedArray => ArrayBuffer.isView(value) && !(value instanceof DataView)
+
+/**
+ * Structural equality of plain data: arrays, plain objects, Map, Set, RegExp, typed arrays (element-wise),
+ * DataView (byte-wise), and objects with a custom `valueOf` or `toString` (e.g. Date). Both sides must share a constructor.
+ * NaN equals NaN. Only own enumerable string keys of objects are compared.
+ */
 
 export const deepEqual = (a: unknown, b: unknown): boolean => {
 	if (a === b) {

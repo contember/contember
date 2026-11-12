@@ -213,6 +213,9 @@
 			"path": "./packages/schema-utils"
 		},
 		{
+			"path": "./packages/sentry-client"
+		},
+		{
 			"path": "./packages/telemetry"
 		},
 		{

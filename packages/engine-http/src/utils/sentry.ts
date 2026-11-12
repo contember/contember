@@ -1,8 +1,8 @@
-import * as Sentry from '@sentry/node'
 import { LogEntry, LoggerHandler, LogLevel, LogLevelName, LogLevels } from '@contember/logger'
+import { createSentryClient, installProcessHandlers, SentryClient, SeverityLevel } from '@contember/sentry-client'
 import { LoggerRequestBody } from '../application/index.js'
 
-const logLevelMapping: Record<LogLevelName, Sentry.SeverityLevel> = {
+const logLevelMapping: Record<LogLevelName, SeverityLevel> = {
 	crit: 'fatal',
 	error: 'error',
 	warn: 'warning',
@@ -10,9 +10,12 @@ const logLevelMapping: Record<LogLevelName, Sentry.SeverityLevel> = {
 	info: 'info',
 }
 
+const stringAttribute = (value: unknown): string | undefined => typeof value === 'string' ? value : undefined
+
 export class SentryLoggerHandler implements LoggerHandler {
 	constructor(
 		private readonly logLevel: LogLevel,
+		private readonly client: SentryClient,
 	) {
 	}
 
@@ -24,31 +27,17 @@ export class SentryLoggerHandler implements LoggerHandler {
 		if (!entry.error || entry.level.value < this.logLevel.value) {
 			return
 		}
-		Sentry.captureException(entry.error, scope => {
-			scope.setTag('project', entry.loggerAttributes.project ?? entry.ownAttributes.project)
-			scope.setTag('projectGroup', entry.loggerAttributes.projectGroup ?? entry.ownAttributes.projectGroup)
-			scope.setTag('module', entry.loggerAttributes.module ?? entry.ownAttributes.module)
-			scope.setLevel(logLevelMapping[entry.level.name])
-			scope.setUser({
-				id: entry.loggerAttributes.user ?? entry.ownAttributes.user,
-			})
-			scope.setExtra('requestId', entry.loggerAttributes.requestId)
-
-			scope.addEventProcessor(event => {
-				const traceId = entry.loggerAttributes.traceId
-				const spanId = entry.loggerAttributes.spanId
-				return {
-					...event,
-					request: {
-						url: entry.loggerAttributes.url ?? entry.ownAttributes.url,
-						data: entry.loggerAttributes[LoggerRequestBody],
-					},
-					...(typeof traceId === 'string' && typeof spanId === 'string'
-						? { contexts: { ...event.contexts, trace: { trace_id: traceId, span_id: spanId } } }
-						: {}),
-				}
-			})
-			return scope
+		const attribute = (name: string): string | undefined => stringAttribute(entry.loggerAttributes[name] ?? entry.ownAttributes[name])
+		const traceId = stringAttribute(entry.loggerAttributes.traceId)
+		const spanId = stringAttribute(entry.loggerAttributes.spanId)
+		this.client.captureException(entry.error, {
+			level: logLevelMapping[entry.level.name],
+			tags: { project: attribute('project'), projectGroup: attribute('projectGroup'), module: attribute('module') },
+			user: { id: attribute('user') },
+			extra: { requestId: entry.loggerAttributes.requestId },
+			// the request logger sets `uri`, already masked by maskRequestUri
+			request: { url: attribute('uri'), data: entry.loggerAttributes[LoggerRequestBody] },
+			...(traceId !== undefined && spanId !== undefined ? { contexts: { trace: { trace_id: traceId, span_id: spanId } } } : {}),
 		})
 	}
 
@@ -56,20 +45,34 @@ export class SentryLoggerHandler implements LoggerHandler {
 	}
 }
 
-type SentryIntegration = ReturnType<typeof Sentry.getDefaultIntegrations>[number]
+export interface SentryLoggerHandlerOptions {
+	/** Reported as the SDK version; the client is released together with the server, so this is the server version. */
+	readonly version?: string
+}
 
-// Undici (fetch) would record outgoing request URLs, which may carry a webhook credential in the path or query,
-// in breadcrumbs and spans, and add Sentry trace headers to every webhook request.
-export const filterSentryIntegrations = (integrations: SentryIntegration[]): SentryIntegration[] =>
-	integrations.filter(integration => !['Console', 'Http', 'Undici'].includes(integration.name))
-
-export const createSentryLoggerHandler = (dsn?: string): null | LoggerHandler => {
+/**
+ * Reports logged errors (warn and up) and uncaught exceptions and unhandled rejections of the process.
+ * Release, environment and server name come from SENTRY_RELEASE, SENTRY_ENVIRONMENT and SENTRY_NAME (default: the host name). Nothing instruments outgoing requests, whose
+ * URLs may carry a webhook credential.
+ */
+export const createSentryLoggerHandler = (dsn?: string, options: SentryLoggerHandlerOptions = {}): null | LoggerHandler => {
 	if (!dsn) {
 		return null
 	}
-	Sentry.init({
-		dsn: dsn,
-		integrations: filterSentryIntegrations,
-	})
-	return new SentryLoggerHandler(LogLevels.warn)
+	let client: SentryClient
+	try {
+		client = createSentryClient({
+			dsn,
+			release: process.env.SENTRY_RELEASE || undefined,
+			environment: process.env.SENTRY_ENVIRONMENT || undefined,
+			serverName: process.env.SENTRY_NAME || undefined,
+			version: options.version,
+		})
+	} catch (error) {
+		// as before: an invalid DSN turns reporting off instead of keeping the server from starting
+		console.error(`${error instanceof Error ? error.message : String(error)}; errors are not reported to Sentry`)
+		return null
+	}
+	installProcessHandlers(client)
+	return new SentryLoggerHandler(LogLevels.warn, client)
 }

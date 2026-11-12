@@ -8,6 +8,7 @@ const maxLineLength = 1024
 const frameLinePattern = /at (?:async )?(?:(.+?)\s+\()?(?:(.+):(\d+):(\d+)?|([^)]+))\)?/
 const separatorLinePattern = /^\s*[-]{4,}$/
 const errorHeaderPattern = /\S*Error: /
+const webpackErrorPattern = /\(error: (.*)\)/
 
 export type ModuleResolver = (filename: string | undefined) => string | undefined
 
@@ -85,11 +86,18 @@ const parseLine = (line: string, resolveModule: ModuleResolver): StackFrame | un
 	}
 }
 
-/** Frames of a V8 or Bun `error.stack`, oldest first, at most 50 (the innermost 50 calls). */
+/**
+ * Frames of a V8 or Bun `error.stack`, oldest first, at most 50 (the innermost 50 calls). The first line is the
+ * `<name>: <message>` header and is never a frame, whatever the message says.
+ */
 export const parseStack = (stack: string, resolveModule: ModuleResolver): StackFrame[] => {
 	const frames: StackFrame[] = []
-	for (const line of stack.split('\n')) {
-		if (line.length > maxLineLength || errorHeaderPattern.test(line)) {
+	for (const rawLine of stack.split('\n').slice(1)) {
+		if (rawLine.length > maxLineLength) {
+			continue
+		}
+		const line = rawLine.replace(webpackErrorPattern, '$1')
+		if (errorHeaderPattern.test(line)) {
 			continue
 		}
 		const frame = parseLine(line, resolveModule)

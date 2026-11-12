@@ -1,6 +1,6 @@
 import { StackFrame } from '../../../src/types.js'
 
-// Stacks with the frames @sentry/node 7.120.4 parsed from them (createStackParser(nodeStackLineParser(createGetModuleFromFilename('/app/dist')))).
+// Stacks with the frames @sentry/node 7.120.4 reported for them: exceptionFromError(createStackParser(nodeStackLineParser(createGetModuleFromFilename('/app/dist'))), error).
 export const stackVectors: Record<string, { stack: string; frames: StackFrame[] }> = {
 	node: {
 		stack:
@@ -299,6 +299,75 @@ export const stackVectors: Record<string, { stack: string; frames: StackFrame[] 
 				function: 'caller',
 				lineno: 3,
 				colno: 3,
+				in_app: true,
+			},
+		],
+	},
+	lowercaseHeader: {
+		stack:
+			'error: syntax error at or near "x"\n    at Parser.parseErrorMessage (/app/node_modules/pg-protocol/dist/parser.js:283:98)\n    at Client.query (/app/dist/db.js:10:5)',
+		frames: [
+			{
+				filename: '/app/dist/db.js',
+				module: 'db',
+				function: 'Client.query',
+				lineno: 10,
+				colno: 5,
+				in_app: true,
+			},
+			{
+				filename: '/app/node_modules/pg-protocol/dist/parser.js',
+				module: 'pg-protocol.dist:parser',
+				function: 'Parser.parseErrorMessage',
+				lineno: 283,
+				colno: 98,
+				in_app: false,
+			},
+		],
+	},
+	pathInMessage: {
+		stack: 'ConfigProblem: unexpected key at /etc/hostname:1:1\n    at load (/app/dist/config.js:4:11)',
+		frames: [
+			{
+				filename: '/app/dist/config.js',
+				module: 'config',
+				function: 'load',
+				lineno: 4,
+				colno: 11,
+				in_app: true,
+			},
+		],
+	},
+	urlInMessage: {
+		stack: 'FetchFailed: request failed at https://example.com/hook:443:1\n    at send (/app/dist/webhook.js:7:3)',
+		frames: [
+			{
+				filename: '/app/dist/webhook.js',
+				module: 'webhook',
+				function: 'send',
+				lineno: 7,
+				colno: 3,
+				in_app: true,
+			},
+		],
+	},
+	webpackWrapper: {
+		stack: 'Error: wrapped\n    at handler (webpack-internal:///./src/handler.js:3:9)\n    at run (/app/dist/main.js (error: /app/dist/inner.js:5:6))',
+		frames: [
+			{
+				filename: '/app/dist/main.js /app/dist/inner.js',
+				module: 'main.js .app.dist:inner',
+				function: 'run',
+				lineno: 5,
+				colno: 6,
+				in_app: true,
+			},
+			{
+				filename: 'webpack-internal:///./src/handler.js',
+				module: 'handler',
+				function: 'handler',
+				lineno: 3,
+				colno: 9,
 				in_app: true,
 			},
 		],

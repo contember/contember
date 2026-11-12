@@ -583,6 +583,8 @@ export class MutationResolver {
 							}
 						case ConstraintType.uniqueKey:
 							return { path, paths, type: Result.ExecutionErrorType.UniqueConstraintViolation, message: it.message }
+						case ConstraintType.check:
+							return { path, paths, type: Result.ExecutionErrorType.CheckConstraintViolation, message: it.message }
 						default:
 							return assertNever(it.constraint)
 					}

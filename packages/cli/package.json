@@ -5,6 +5,9 @@
   "bin": {
     "contember": "./dist/production/run.js"
   },
+  "engines": {
+    "node": ">=22"
+  },
   "type": "module",
   "exports": {
     ".": {

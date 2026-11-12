@@ -16,7 +16,8 @@ export class FileSystem {
 
 	/**
 	 * Directories under `dir` matching the workspace globs, relative and `/`-separated.
-	 * A `!pattern` excludes matches; the glob base itself (`packages` for `packages/**`) is never returned.
+	 * A `!pattern` removes exactly what it matches (use `!dir/**` for a subtree);
+	 * the glob base itself (`packages` for `packages/**`) is never returned.
 	 */
 	listDirectories = async (dir: string, patterns: string[]): Promise<string[]> => {
 		const include = patterns.filter(it => !it.startsWith('!')).map(it => posix.normalize(it))
@@ -26,10 +27,16 @@ export class FileSystem {
 		}
 		const literals = new Set(include.filter(it => !globCharacters.test(it)))
 		const bases = new Set(include.filter(it => globCharacters.test(it)).map(getGlobBase).filter(it => !literals.has(it)))
+		const excluded = new Set(exclude.length > 0 ? await globPaths(dir, exclude) : [])
+		for (const it of exclude) {
+			// `dir/**` also matches `dir` itself; Node's glob agrees, Bun's does not.
+			if (it.endsWith('/**')) {
+				excluded.add(it.slice(0, -3))
+			}
+		}
 		const result = new Set<string>()
-		for await (const entry of glob(include, { cwd: dir, exclude })) {
-			const path = entry.split(sep).join('/').replace(/^\.\//, '')
-			if (bases.has(path) || result.has(path)) {
+		for (const path of await globPaths(dir, include)) {
+			if (bases.has(path) || excluded.has(path) || result.has(path)) {
 				continue
 			}
 			const stats = await stat(join(dir, path)).catch(() => null)
@@ -39,6 +46,15 @@ export class FileSystem {
 		}
 		return [...result]
 	}
+}
+
+// Only the pattern list and `cwd`: an `exclude` array needs Node 22.14+, and Bun lacks `withFileTypes`.
+const globPaths = async (cwd: string, patterns: string[]): Promise<string[]> => {
+	const paths: string[] = []
+	for await (const entry of glob(patterns, { cwd })) {
+		paths.push(entry.split(sep).join('/').replace(/^\.\//, ''))
+	}
+	return paths
 }
 
 const globCharacters = /[*?[\]{}()!+@]/

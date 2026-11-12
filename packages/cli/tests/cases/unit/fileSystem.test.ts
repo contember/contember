@@ -35,6 +35,11 @@ describe('FileSystem.listDirectories', () => {
 		expect(await list(['packages/*', 'apps/*', 'packages/a', '!packages/b'])).toEqual(['apps/x', 'packages/a', 'packages/c', 'packages/link'])
 	})
 
+	test('a negation removes only what it matches, not the subtree', async () => {
+		expect(await list(['packages/**', '!packages/c'])).toEqual(['packages/a', 'packages/b', 'packages/c/nested', 'packages/link'])
+		expect(await list(['packages/**', '!packages/c/**'])).toEqual(['packages/a', 'packages/b', 'packages/link'])
+	})
+
 	test('a literal pattern returns the base of another globstar pattern', async () => {
 		expect(await list(['packages/**', 'packages'])).toEqual([
 			'packages',

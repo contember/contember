@@ -26,9 +26,6 @@
   "devDependencies": {
     "@types/node": "catalog:"
   },
-  "dependencies": {
-    "chalk": "catalog:"
-  },
   "type": "module",
   "repository": {
     "type": "git",

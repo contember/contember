@@ -1,19 +1,44 @@
-import chalk from 'chalk'
-import { inspect } from 'node:util'
+import { inspect, styleText } from 'node:util'
 import { LogEntry, LoggerAttributes, LoggerHandler, LogLevel } from '../types.js'
 import { LogLevels } from '../levels.js'
+
+export type LogTextStyle = Exclude<Parameters<typeof styleText>[0], readonly unknown[]>
+
+/** Styles `text` with the given styles (outermost first); returns it unchanged when the terminal has no colors. */
+export type LogTextStyler = (styles: LogTextStyle | readonly LogTextStyle[], text: string) => string
 
 export interface PrettyPrintLoggerHandlerOptions {
 	logLevel: LogLevel
 	formatters: {
 		[key: string]: (
-			args: { value: any; formattedValue: string; key: string; chalk: typeof chalk; attributes: LoggerAttributes },
+			args: { value: any; formattedValue: string; key: string; style: LogTextStyler; attributes: LoggerAttributes },
 		) => undefined | string | { line: string }
 	}
 }
 
+// Same detection as in @contember/cli-common colors.ts (logger cannot depend on it); keep them in sync.
+const detectColorSupport = (): boolean => {
+	const forceColor = process.env.FORCE_COLOR
+	if (forceColor !== undefined) {
+		return forceColor !== '0' && forceColor !== 'false'
+	}
+	// hasColors() honours NO_COLOR, NODE_DISABLE_COLORS and TERM=dumb; Bun's non-TTY stdout has no hasColors.
+	const stdout = process.stdout
+	return stdout.isTTY === true && (typeof stdout.hasColors !== 'function' || stdout.hasColors())
+}
+
+const createStyler = (colors: boolean): LogTextStyler => (styles, text) => {
+	if (!colors) {
+		return text
+	}
+	const list: readonly LogTextStyle[] = typeof styles === 'string' ? [styles] : styles
+	// validateStream is off because the decision is ours; Bun ignores the option and Node < 22.13 lacks it.
+	return list.reduceRight((result, current) => styleText(current, result, { validateStream: false }), text)
+}
+
 export class PrettyPrintLoggerHandler implements LoggerHandler {
 	private readonly options: PrettyPrintLoggerHandlerOptions
+	private readonly style: LogTextStyler = createStyler(detectColorSupport())
 
 	constructor(
 		private readonly stream: NodeJS.WritableStream,
@@ -50,13 +75,13 @@ export class PrettyPrintLoggerHandler implements LoggerHandler {
 				depth: 5,
 			}).replaceAll(/\n/g, '\n' + indent)
 			const formattedValue2 = this.options.formatters[key]
-				? (this.options.formatters[key]({ value, key, formattedValue, chalk, attributes: allAttributes }))
+				? (this.options.formatters[key]({ value, key, formattedValue, style: this.style, attributes: allAttributes }))
 				: formattedValue
 			if (formattedValue2 === undefined) {
 				continue
 			}
 			if (typeof formattedValue2 === 'string') {
-				this.stream.write(indent + chalk.dim(`${key}: ${formattedValue2}\n`))
+				this.stream.write(indent + this.style('dim', `${key}: ${formattedValue2}\n`))
 			} else {
 				this.stream.write(indent + formattedValue2.line + '\n')
 			}
@@ -71,22 +96,18 @@ export class PrettyPrintLoggerHandler implements LoggerHandler {
 		if (!result) {
 			return date
 		}
-		return chalk.dim(result[1] + 'T') + result[2] + chalk.dim('.' + result[3] + 'Z')
+		return this.style('dim', result[1] + 'T') + result[2] + this.style('dim', '.' + result[3] + 'Z')
 	}
 
 	private formatLevel(level: LogLevel): string {
 		const levelText = `${level.name}${' '.repeat(5 - level.name.length)}`
-		let color = chalk
 		if (level.value <= 10) {
-			color = color.dim
-		} else if (level.value <= 20) {
-			// nothing
-		} else if (level.value <= 30) {
-			color = color.yellowBright
-		} else {
-			color = color.redBright
+			return this.style('dim', levelText)
 		}
-		return color(levelText)
+		if (level.value <= 20) {
+			return levelText
+		}
+		return this.style(level.value <= 30 ? 'yellowBright' : 'redBright', levelText)
 	}
 
 	close(): void {

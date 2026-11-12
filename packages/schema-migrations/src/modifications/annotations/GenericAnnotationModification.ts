@@ -41,43 +41,31 @@ export function createAnnotationModification<T extends AnnotationField>(config: 
 				updateEntity(
 					entityName,
 					fieldName
-						? updateField(fieldName, ({ field }) => {
-							if (annotationValue !== undefined) {
-								return {
-									...field,
-									[annotationField]: annotationValue,
-								}
-							} else {
-								const { [annotationField]: _, ...fieldWithoutAnnotation } = field as any
-								return fieldWithoutAnnotation
-							}
-						})
-						: (({ entity }) => {
-							if (annotationValue !== undefined) {
-								return {
-									...entity,
-									[annotationField]: annotationValue,
-								}
-							} else {
-								const { [annotationField]: _, ...entityWithoutAnnotation } = entity as any
-								return entityWithoutAnnotation
-							}
-						}),
+						? updateField(fieldName, ({ field }) => withAnnotation(field, annotationValue))
+						: ({ entity }) => withAnnotation(entity, annotationValue),
 				),
 			)
 		}
 
-		describe() {
+		public describe() {
 			const { entityName, fieldName } = this.data
 			const annotationValue = this.data[annotationField]
 			const target = fieldName ? `field ${entityName}.${fieldName}` : `entity ${entityName}`
 
-			return { message: `Set ${displayName} for ${target} "${annotationValue}"` }
+			if (annotationValue === undefined) {
+				return { message: `Remove ${displayName} from ${target}` }
+			}
+			return { message: `Set ${displayName} for ${target} to "${annotationValue}"` }
 		}
 	}
 
+	const withAnnotation = <E extends Model.AnyField | Model.Entity>(target: E, value: string | undefined): E => {
+		const { [annotationField]: _, ...rest } = target
+		return (value === undefined ? rest : { ...rest, [annotationField]: value }) as E
+	}
+
 	class AnnotationDiffer implements Differ {
-		createDiff(originalSchema: Schema, updatedSchema: Schema) {
+		public createDiff(originalSchema: Schema, updatedSchema: Schema) {
 			const modifications: Migration.Modification[] = []
 
 			for (const [entityName, updatedEntity] of Object.entries(updatedSchema.model.entities)) {
@@ -87,14 +75,8 @@ export function createAnnotationModification<T extends AnnotationField>(config: 
 					continue
 				}
 
-				const originalEntityAnnotation = (originalEntity as any)[annotationField]
-				const updatedEntityAnnotation = (updatedEntity as any)[annotationField]
-
-				if (originalEntityAnnotation !== updatedEntityAnnotation) {
-					modifications.push(annotationModification.createModification({
-						entityName,
-						[annotationField]: updatedEntityAnnotation,
-					} as AnnotationModificationData<T>))
+				if (originalEntity[annotationField] !== updatedEntity[annotationField]) {
+					modifications.push(annotationModification.createModification(createData(entityName, undefined, updatedEntity[annotationField])))
 				}
 
 				for (const [fieldName, updatedField] of Object.entries(updatedEntity.fields)) {
@@ -104,20 +86,22 @@ export function createAnnotationModification<T extends AnnotationField>(config: 
 						continue
 					}
 
-					const originalFieldAnnotation = (originalField as any)[annotationField]
-					const updatedFieldAnnotation = (updatedField as any)[annotationField]
-
-					if (originalFieldAnnotation !== updatedFieldAnnotation) {
-						modifications.push(annotationModification.createModification({
-							entityName,
-							fieldName,
-							[annotationField]: updatedFieldAnnotation,
-						} as AnnotationModificationData<T>))
+					if (originalField[annotationField] !== updatedField[annotationField]) {
+						modifications.push(annotationModification.createModification(createData(entityName, fieldName, updatedField[annotationField])))
 					}
 				}
 			}
 
 			return modifications
+		}
+	}
+
+	const createData = (entityName: string, fieldName: string | undefined, value: string | undefined): AnnotationModificationData<T> => {
+		const annotation = (value !== undefined ? { [annotationField]: value } : {}) as { [K in T]?: string }
+		return {
+			entityName,
+			...(fieldName !== undefined ? { fieldName } : {}),
+			...annotation,
 		}
 	}
 

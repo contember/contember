@@ -1,8 +1,9 @@
 import { testMigrations } from '../../src/tests.js'
 import { SQL } from '../../src/tags.js'
 import { c, createSchema } from '@contember/schema-definition'
-import { describe } from 'bun:test'
-import { DEFAULT_ENTITY_DEPRECATION_REASON, DEFAULT_FIELD_DEPRECATION_REASON } from '@contember/schema-utils'
+import { describe, expect, it } from 'bun:test'
+import { DEFAULT_ENTITY_DEPRECATION_REASON, DEFAULT_FIELD_DEPRECATION_REASON, emptySchema } from '@contember/schema-utils'
+import { SetDeprecationReasonModificationHandler, SetDescriptionModificationHandler } from '../../../src/index.js'
 
 namespace MixedAnnotationsOriginalSchema {
 	export class User {
@@ -44,12 +45,12 @@ describe('set both description and deprecation annotations', () =>
 			},
 			{
 				deprecationReason: 'Use Account entity instead',
-				modification: 'setDeprecationMessage',
+				modification: 'setDeprecationReason',
 				entityName: 'User',
 			},
 			{
 				deprecationReason: 'Use loginName instead',
-				modification: 'setDeprecationMessage',
+				modification: 'setDeprecationReason',
 				entityName: 'User',
 				fieldName: 'username',
 			},
@@ -103,13 +104,13 @@ describe('set both description and deprecation on relation fields', () =>
 				description: 'The author who wrote this post',
 			},
 			{
-				modification: 'setDeprecationMessage',
+				modification: 'setDeprecationReason',
 				entityName: 'Author',
 				fieldName: 'posts',
 				deprecationReason: 'Use articles relation instead',
 			},
 			{
-				modification: 'setDeprecationMessage',
+				modification: 'setDeprecationReason',
 				entityName: 'Post',
 				fieldName: 'author',
 				deprecationReason: 'Use writer relation instead',
@@ -165,18 +166,18 @@ describe('update existing combined annotations', () =>
 				description: 'Product price',
 			},
 			{
-				modification: 'setDeprecationMessage',
+				modification: 'setDeprecationReason',
 				entityName: 'Product',
 				deprecationReason: 'New entity deprecation',
 			},
 			{
-				modification: 'setDeprecationMessage',
+				modification: 'setDeprecationReason',
 				entityName: 'Product',
 				fieldName: 'name',
 				deprecationReason: 'New field deprecation',
 			},
 			{
-				modification: 'setDeprecationMessage',
+				modification: 'setDeprecationReason',
 				entityName: 'Product',
 				fieldName: 'price',
 				deprecationReason: 'Use cost field instead',
@@ -209,24 +210,20 @@ describe('remove both description and deprecation annotations', () =>
 			{
 				modification: 'setDescription',
 				entityName: 'Category',
-				description: undefined,
 			},
 			{
 				modification: 'setDescription',
 				entityName: 'Category',
 				fieldName: 'name',
-				description: undefined,
 			},
 			{
-				modification: 'setDeprecationMessage',
+				modification: 'setDeprecationReason',
 				entityName: 'Category',
-				deprecationReason: undefined,
 			},
 			{
-				modification: 'setDeprecationMessage',
+				modification: 'setDeprecationReason',
 				entityName: 'Category',
 				fieldName: 'name',
-				deprecationReason: undefined,
 			},
 		],
 		sql: SQL``,
@@ -275,18 +272,18 @@ describe('set deprecation with default messages and descriptions', () =>
 				description: 'Order identifier',
 			},
 			{
-				modification: 'setDeprecationMessage',
+				modification: 'setDeprecationReason',
 				entityName: 'Order',
 				deprecationReason: DEFAULT_ENTITY_DEPRECATION_REASON,
 			},
 			{
-				modification: 'setDeprecationMessage',
+				modification: 'setDeprecationReason',
 				entityName: 'Order',
 				fieldName: 'items',
 				deprecationReason: DEFAULT_FIELD_DEPRECATION_REASON,
 			},
 			{
-				modification: 'setDeprecationMessage',
+				modification: 'setDeprecationReason',
 				entityName: 'OrderItem',
 				fieldName: 'name',
 				deprecationReason: DEFAULT_FIELD_DEPRECATION_REASON,
@@ -341,24 +338,24 @@ describe('mix default and custom deprecation messages with descriptions', () =>
 				description: 'Customer email',
 			},
 			{
-				modification: 'setDeprecationMessage',
+				modification: 'setDeprecationReason',
 				entityName: 'Customer',
 				deprecationReason: DEFAULT_ENTITY_DEPRECATION_REASON,
 			},
 			{
-				modification: 'setDeprecationMessage',
+				modification: 'setDeprecationReason',
 				entityName: 'Customer',
 				fieldName: 'name',
 				deprecationReason: 'Use fullName instead',
 			},
 			{
-				modification: 'setDeprecationMessage',
+				modification: 'setDeprecationReason',
 				entityName: 'Customer',
 				fieldName: 'email',
 				deprecationReason: DEFAULT_FIELD_DEPRECATION_REASON,
 			},
 			{
-				modification: 'setDeprecationMessage',
+				modification: 'setDeprecationReason',
 				entityName: 'Customer',
 				fieldName: 'phone',
 				deprecationReason: DEFAULT_FIELD_DEPRECATION_REASON,
@@ -396,10 +393,19 @@ describe('add missing annotations to partially annotated entities', () =>
 				description: 'Now field also has description',
 			},
 			{
-				modification: 'setDeprecationMessage',
+				modification: 'setDeprecationReason',
 				entityName: 'Tag',
 				deprecationReason: 'Now entity also has deprecation',
 			},
 		],
 		sql: SQL``,
 	}))
+
+describe('describe annotation modifications', () => {
+	it('describes setting and removing an annotation', () => {
+		expect(new SetDescriptionModificationHandler({ entityName: 'Author', description: 'An author' }, emptySchema).describe())
+			.toEqual({ message: 'Set description for entity Author to "An author"' })
+		expect(new SetDeprecationReasonModificationHandler({ entityName: 'Author', fieldName: 'name' }, emptySchema).describe())
+			.toEqual({ message: 'Remove deprecation reason from field Author.name' })
+	})
+})

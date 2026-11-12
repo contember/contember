@@ -22,7 +22,7 @@ describe('set deprecation on entity', () =>
 		updated: createSchema(SetDeprecatedOnEntityUpdatedSchema),
 		diff: [
 			{
-				modification: 'setDeprecationMessage',
+				modification: 'setDeprecationReason',
 				entityName: 'Author',
 				deprecationReason: 'This entity is deprecated, use User instead',
 			},
@@ -48,7 +48,7 @@ describe('set deprecation on field', () =>
 		updated: createSchema(SetDeprecatedOnFieldUpdatedSchema),
 		diff: [
 			{
-				modification: 'setDeprecationMessage',
+				modification: 'setDeprecationReason',
 				entityName: 'Author',
 				fieldName: 'name',
 				deprecationReason: 'Use fullName field instead',
@@ -77,7 +77,7 @@ describe('update existing entity deprecation', () =>
 		updated: createSchema(UpdateEntityDeprecationUpdatedSchema),
 		diff: [
 			{
-				modification: 'setDeprecationMessage',
+				modification: 'setDeprecationReason',
 				entityName: 'Author',
 				deprecationReason: 'New updated deprecation message',
 			},
@@ -103,7 +103,7 @@ describe('update existing field deprecation', () =>
 		updated: createSchema(UpdateFieldDeprecationUpdatedSchema),
 		diff: [
 			{
-				modification: 'setDeprecationMessage',
+				modification: 'setDeprecationReason',
 				entityName: 'Author',
 				fieldName: 'name',
 				deprecationReason: 'New field deprecation',
@@ -131,9 +131,8 @@ describe('remove entity deprecation', () =>
 		updated: createSchema(RemoveEntityDeprecationUpdatedSchema),
 		diff: [
 			{
-				modification: 'setDeprecationMessage',
+				modification: 'setDeprecationReason',
 				entityName: 'Author',
-				deprecationReason: undefined,
 			},
 		],
 		sql: SQL``,
@@ -157,10 +156,9 @@ describe('remove field deprecation', () =>
 		updated: createSchema(RemoveFieldDeprecationUpdatedSchema),
 		diff: [
 			{
-				modification: 'setDeprecationMessage',
+				modification: 'setDeprecationReason',
 				entityName: 'Author',
 				fieldName: 'name',
-				deprecationReason: undefined,
 			},
 		],
 		sql: SQL``,
@@ -196,13 +194,13 @@ describe('set deprecation on relation field', () =>
 		updated: createSchema(SetDeprecatedOnRelationUpdatedSchema),
 		diff: [
 			{
-				modification: 'setDeprecationMessage',
+				modification: 'setDeprecationReason',
 				entityName: 'Author',
 				fieldName: 'posts',
 				deprecationReason: 'Use articles relation instead',
 			},
 			{
-				modification: 'setDeprecationMessage',
+				modification: 'setDeprecationReason',
 				entityName: 'Post',
 				fieldName: 'author',
 				deprecationReason: 'Use writer relation instead',
@@ -243,35 +241,35 @@ describe('set deprecation on multiple entities and fields', () =>
 		updated: createSchema(MultipleDeprecationsUpdatedSchema),
 		diff: [
 			{
-				modification: 'setDeprecationMessage',
+				modification: 'setDeprecationReason',
 				entityName: 'Author',
 				deprecationReason: 'Author entity is deprecated',
 			},
 			{
-				modification: 'setDeprecationMessage',
+				modification: 'setDeprecationReason',
 				entityName: 'Author',
 				fieldName: 'name',
 				deprecationReason: 'Use displayName instead',
 			},
 			{
-				modification: 'setDeprecationMessage',
+				modification: 'setDeprecationReason',
 				entityName: 'Author',
 				fieldName: 'email',
 				deprecationReason: 'Use contactEmail instead',
 			},
 			{
-				modification: 'setDeprecationMessage',
+				modification: 'setDeprecationReason',
 				entityName: 'Post',
 				deprecationReason: 'Post entity is deprecated',
 			},
 			{
-				modification: 'setDeprecationMessage',
+				modification: 'setDeprecationReason',
 				entityName: 'Post',
 				fieldName: 'title',
 				deprecationReason: 'Use headline instead',
 			},
 			{
-				modification: 'setDeprecationMessage',
+				modification: 'setDeprecationReason',
 				entityName: 'Post',
 				fieldName: 'content',
 				deprecationReason: 'Use body instead',

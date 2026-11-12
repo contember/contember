@@ -14,7 +14,7 @@ import {
 import { updateViewModification } from './entities/UpdateViewModification.js'
 import { createEnumModification, removeEnumModification, updateEnumModification } from './enums/index.js'
 import { removeFieldModification, updateFieldNameModification } from './fields/index.js'
-import { setDeprecatedModification, setDescriptionModification } from './annotations/index.js'
+import { setDeprecationReasonModification, setDescriptionModification } from './annotations/index.js'
 import {
 	convertManyHasManyToJoiningEntityModification,
 	convertOneHasManyToManyHasManyRelationModification,
@@ -78,7 +78,7 @@ namespace ModificationHandlerFactory {
 		removeFieldModification,
 		updateFieldNameModification,
 		setDescriptionModification,
-		setDeprecatedModification,
+		setDeprecationReasonModification,
 		createRelationInverseSideModification,
 		createRelationModification,
 		updateRelationOnDeleteModification,

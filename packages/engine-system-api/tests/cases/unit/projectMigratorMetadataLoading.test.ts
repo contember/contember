@@ -39,7 +39,10 @@ const migration: SchemaMigrationInput = {
 	formatVersion: VERSION_LATEST,
 	modifications,
 }
-const stages: Stage[] = [{ id: crypto.randomUUID(), name: 'live', slug: 'live', schema: 'stage_live' }]
+const stages: Stage[] = [
+	{ id: crypto.randomUUID(), name: 'live', slug: 'live', schema: 'stage_live' },
+	{ id: crypto.randomUUID(), name: 'preview', slug: 'preview', schema: 'stage_preview' },
+]
 const project = { slug: 'test', systemSchema: 'system' }
 
 /** Answers every statement with no rows and keeps the SQL it was sent. */
@@ -83,7 +86,7 @@ const createDb = (connection: RecordingConnection) => new DatabaseContextFactory
 
 const catalogReadsOf = (connection: RecordingConnection) => connection.statements.filter(it => /FROM pg_constraint/.test(it)).length
 
-const stageDdlOf = (connection: RecordingConnection) => connection.statements.filter(it => it.startsWith('SET LOCAL search_path TO "stage_live";'))
+const stageDdlOf = (connection: RecordingConnection) => connection.statements.filter(it => it.startsWith('SET LOCAL search_path TO "stage_'))
 
 test('a snapshot of creates is applied without reading database metadata', async () => {
 	const connection = new RecordingConnection()
@@ -94,7 +97,7 @@ test('a snapshot of creates is applied without reading database metadata', async
 		snapshot: { formatVersion: VERSION_LATEST, modifications },
 		covers: [migration],
 	})
-	expect(stageDdlOf(connection)).toHaveLength(modifications.length)
+	expect(stageDdlOf(connection)).toHaveLength(modifications.length * stages.length)
 	expect(catalogReadsOf(connection)).toBe(0)
 })
 
@@ -108,7 +111,16 @@ test('migrate re-reads database metadata after an invalidation even when the nex
 		migrationsToExecute: [migration],
 		options: {},
 	})
-	expect(stageDdlOf(connection)).toHaveLength(modifications.length)
-	// one read before the first modification, another after each FK / unique / index that is followed by more modifications
-	expect(catalogReadsOf(connection)).toBeGreaterThan(1)
+	expect(modifications.map(it => it.modification)).toEqual([
+		'createEntity',
+		'createEntity',
+		'createColumn',
+		'createColumn',
+		'createRelation',
+		'createUniqueConstraint',
+		'createIndex',
+	])
+	expect(stageDdlOf(connection)).toHaveLength(modifications.length * stages.length)
+	// per stage: before the first modification, after createRelation and after createUniqueConstraint (createIndex is last)
+	expect(catalogReadsOf(connection)).toBe(3 * stages.length)
 })

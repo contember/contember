@@ -16,7 +16,7 @@ import { ImplementationException } from '../../utils/index.js'
 
 /**
  * `beforeEachModification` re-reads stale metadata before every modification, so replaying a history keeps producing the DDL it always has.
- * `onRead` reads the catalog only when a handler reads the metadata; a snapshot holds only creates, which never do.
+ * `onRead` reads the catalog only when a handler reads the metadata; a collapsed snapshot holds creates and non-DDL updates, which never do.
  */
 type MetadataLoading = 'beforeEachModification' | 'onRead'
 

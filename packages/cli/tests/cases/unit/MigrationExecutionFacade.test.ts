@@ -2,7 +2,7 @@ import { afterEach, beforeAll, beforeEach, expect, test } from 'bun:test'
 import * as fs from 'node:fs/promises'
 import * as os from 'node:os'
 import * as path from 'node:path'
-import chalk from 'chalk'
+import { setColorsEnabled } from '@contember/cli-common'
 import { GraphQlClient, GraphQlClientError } from '@contember/graphql-client'
 import {
 	ExecutedMigrationInfo,
@@ -156,7 +156,7 @@ namespace ExecutionModel {
 }
 
 beforeAll(() => {
-	chalk.level = 0
+	setColorsEnabled(false)
 })
 
 beforeEach(async () => {

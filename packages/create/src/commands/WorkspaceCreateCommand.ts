@@ -1,6 +1,5 @@
-import { Command, CommandConfiguration, escapeTerminalText, Input, Output } from '@contember/cli-common'
+import { Command, CommandConfiguration, escapeTerminalText, Input, Output, style } from '@contember/cli-common'
 import { join } from 'node:path'
-import chalk from 'chalk'
 import { TemplateInstaller } from '../lib/TemplateInstaller.js'
 import { getPackageVersion } from '../lib/version.js'
 import { detectPackageManager } from '../lib/packageManagerDetector.js'
@@ -76,29 +75,29 @@ Contember project successfully created in ${safeProjectDirectory}
 Next steps:
 
 1. Navigate to the project directory:
-   $ ${chalk.green(`cd ${safeProjectName}`)}
+   $ ${style('green', `cd ${safeProjectName}`)}
 
 2. Install dependencies:
-   $ ${chalk.green(`${safePackageManager} install`)}
+   $ ${style('green', `${safePackageManager} install`)}
 
 3. Start the Contember stack:
-   $ ${chalk.green(`${safePackageManager} start`)}
+   $ ${style('green', `${safePackageManager} start`)}
 
 Available services:
 
-${chalk.bold('UI & Admin')}
-- Contember Admin         ${chalk.blue('http://localhost:1480')}
+${style('bold', 'UI & Admin')}
+- Contember Admin         ${style('blue', 'http://localhost:1480')}
 
-${chalk.bold('API & Backend')}
-- Contember Engine API    ${chalk.blue('http://localhost:1481')}
+${style('bold', 'API & Backend')}
+- Contember Engine API    ${style('blue', 'http://localhost:1481')}
   Auth token:             0000000000000000000000000000000000000000
 
-${chalk.bold('Development Tools')}
-- PostgreSQL database     ${chalk.blue('http://localhost:1482')}    ${chalk.grey('credentials: contember / contember')}
-- S3 object storage       ${chalk.blue('http://localhost:1483')}    ${chalk.grey('credentials: contember / contember')}
-- Mailpit SMTP testing    ${chalk.blue('http://localhost:1484')}
-- Adminer DB manager      ${chalk.blue('http://localhost:1485')}
+${style('bold', 'Development Tools')}
+- PostgreSQL database     ${style('blue', 'http://localhost:1482')}    ${style('grey', 'credentials: contember / contember')}
+- S3 object storage       ${style('blue', 'http://localhost:1483')}    ${style('grey', 'credentials: contember / contember')}
+- Mailpit SMTP testing    ${style('blue', 'http://localhost:1484')}
+- Adminer DB manager      ${style('blue', 'http://localhost:1485')}
 
-${chalk.bold('Need help?')} Ask the community: https://github.com/orgs/contember/discussions
+${style('bold', 'Need help?')} Ask the community: https://github.com/orgs/contember/discussions
 `
 }

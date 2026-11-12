@@ -5,9 +5,11 @@
   "bin": "dist/production/run.js",
   "dependencies": {
     "@contember/cli-common": "workspace:*",
-    "chalk": "catalog:",
     "degit": "catalog:",
     "js-yaml": "catalog:"
+  },
+  "engines": {
+    "node": ">=20.12"
   },
   "type": "module",
   "scripts": {

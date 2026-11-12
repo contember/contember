@@ -53,8 +53,6 @@
     "@contember/schema-utils": "workspace:*",
     "@contember/typesafe": "workspace:*",
     "@graphql-tools/schema": "catalog:",
-    "chalk": "catalog:",
-    "chalk-table": "catalog:",
     "graphql": "catalog:",
     "graphql-ts-client-api": "catalog:",
     "js-yaml": "catalog:",

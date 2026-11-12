@@ -1,5 +1,5 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
-import chalk from 'chalk'
+import { setColorsEnabled } from '@contember/cli-common'
 import { CliError, ExitCode, Output, OutputStream, renderCliError } from '@contember/cli-common'
 import { GraphQlClient } from '@contember/graphql-client'
 import { RemoteProjectResolver } from '../../../src/lib/project/RemoteProjectResolver.js'
@@ -15,7 +15,7 @@ import { ActionsStopEventCommand } from '../../../src/commands/actions/ActionsSt
 
 beforeAll(() => {
 	// deterministic assertions regardless of the terminal the suite runs in
-	chalk.level = 0
+	setColorsEnabled(false)
 })
 
 // Mirrors packages/cli-common/tests/lib/testOutput.ts — that helper isn't part of the package's

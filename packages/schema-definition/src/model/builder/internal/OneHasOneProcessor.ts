@@ -40,8 +40,6 @@ export default class OneHasOneProcessor implements FieldProcessor<OneHasOneBuild
 			target: entityName,
 			type: Model.RelationType.OneHasOne,
 			nullable: options.inverseNullable === undefined ? true : options.inverseNullable,
-			...(options.description !== undefined ? { description: options.description } : {}),
-			...(options.deprecationReason !== undefined ? { deprecationReason: options.deprecationReason } : {}),
 		}
 	}
 

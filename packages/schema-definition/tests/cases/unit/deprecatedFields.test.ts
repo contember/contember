@@ -91,5 +91,42 @@ describe('Deprecated Fields', () => {
 			expect(entity.fields.tags).toBeDefined()
 			expect(entity.fields.tags.deprecationReason).toBe('Use categories instead')
 		})
+
+		it('uses a default reason when none is given', () => {
+			const model = new SchemaBuilder()
+				.entity('Book', e => e.column('title', c => c.type(Model.ColumnType.String).deprecated()))
+				.buildSchema()
+
+			expect(getEntity(model, 'Book').fields.title.deprecationReason).toBe('Field is deprecated')
+		})
+
+		it('annotates only the declared side of a relation', () => {
+			const model = new SchemaBuilder()
+				.entity('Author', e => e.column('name', c => c.type(Model.ColumnType.String)))
+				.entity('Tag', e => e.column('name', c => c.type(Model.ColumnType.String)))
+				.entity('Profile', e => e.column('bio', c => c.type(Model.ColumnType.String)))
+				.entity('Review', e => e.column('text', c => c.type(Model.ColumnType.String)))
+				.entity('Book', e =>
+					e
+						.manyHasOne('author', r => r.target('Author').inversedBy('books').deprecated('old author').description('the author'))
+						.manyHasMany('tags', r => r.target('Tag').inversedBy('books').deprecated('old tags').description('the tags'))
+						.oneHasOne('profile', r => r.target('Profile').inversedBy('book').deprecated('old profile').description('the profile'))
+						.oneHasMany('reviews', r => r.target('Review').ownedBy('book').deprecated('old reviews').description('the reviews')))
+				.buildSchema()
+
+			const book = getEntity(model, 'Book')
+			expect(book.fields.author.deprecationReason).toBe('old author')
+			expect(book.fields.tags.deprecationReason).toBe('old tags')
+			expect(book.fields.profile.deprecationReason).toBe('old profile')
+			expect(book.fields.reviews.deprecationReason).toBe('old reviews')
+			expect(book.fields.reviews.description).toBe('the reviews')
+
+			for (const [entity, field] of [['Author', 'books'], ['Tag', 'books'], ['Profile', 'book'], ['Review', 'book']]) {
+				const inverse = getEntity(model, entity).fields[field]
+				expect(inverse).toBeDefined()
+				expect(inverse.deprecationReason).toBeUndefined()
+				expect(inverse.description).toBeUndefined()
+			}
+		})
 	})
 })

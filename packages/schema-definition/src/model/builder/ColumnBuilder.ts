@@ -1,3 +1,4 @@
+import { DEFAULT_FIELD_DEPRECATION_REASON } from '@contember/schema-utils'
 import FieldBuilder from './FieldBuilder.js'
 import { Model } from '@contember/schema'
 
@@ -49,8 +50,8 @@ class ColumnBuilder<O extends PartialColumnOptions<never> = PartialColumnOptions
 		return new ColumnBuilder<O>({ ...this.options, description } as O)
 	}
 
-	public deprecated(deprecationReason: string): ColumnBuilder<O> {
-		return new ColumnBuilder<O>({ ...this.options, deprecationReason } as O)
+	public deprecated(deprecationReason?: string): ColumnBuilder<O> {
+		return new ColumnBuilder<O>({ ...this.options, deprecationReason: deprecationReason || DEFAULT_FIELD_DEPRECATION_REASON } as O)
 	}
 
 	public getOption(): O {

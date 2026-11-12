@@ -101,7 +101,7 @@ test('a snapshot of creates is applied without reading database metadata', async
 	expect(catalogReadsOf(connection)).toBe(0)
 })
 
-test('migrate re-reads database metadata after an invalidation even when the next modification does not use it', async () => {
+test('migrate of creates does not read database metadata either', async () => {
 	const connection = new RecordingConnection()
 	await createMigrator().migrate({
 		db: createDb(connection),
@@ -111,16 +111,6 @@ test('migrate re-reads database metadata after an invalidation even when the nex
 		migrationsToExecute: [migration],
 		options: {},
 	})
-	expect(modifications.map(it => it.modification)).toEqual([
-		'createEntity',
-		'createEntity',
-		'createColumn',
-		'createColumn',
-		'createRelation',
-		'createUniqueConstraint',
-		'createIndex',
-	])
 	expect(stageDdlOf(connection)).toHaveLength(modifications.length * stages.length)
-	// per stage: before the first modification, after createRelation and after createUniqueConstraint (createIndex is last)
-	expect(catalogReadsOf(connection)).toBe(3 * stages.length)
+	expect(catalogReadsOf(connection)).toBe(0)
 })

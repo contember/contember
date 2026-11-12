@@ -39,7 +39,6 @@ CREATE CONSTRAINT TRIGGER "log_event_trx"
   "together": {
     "catalog": [
       "CREATE UNIQUE INDEX article_pkey ON stage_live.article USING btree (id)",
-      "CREATE INDEX article_title_idx ON stage_live.article USING btree (headline)",
     ],
     "sql": [
       [
@@ -65,7 +64,7 @@ CREATE CONSTRAINT TRIGGER "log_event_trx"
       ],
       [
         "ALTER TABLE "article" RENAME "title" TO "headline";",
-        "",
+        "DROP INDEX "article_title_idx";",
       ],
     ],
   },
@@ -110,9 +109,7 @@ CREATE CONSTRAINT TRIGGER "log_event_trx"
   },
   "together": {
     "catalog": [
-      "CREATE UNIQUE INDEX article_code_key ON stage_live.article USING btree (slug)",
       "CREATE UNIQUE INDEX article_pkey ON stage_live.article USING btree (id)",
-      "stage_live.article article_code_key UNIQUE (slug)",
     ],
     "sql": [
       [
@@ -138,7 +135,7 @@ CREATE CONSTRAINT TRIGGER "log_event_trx"
       ],
       [
         "ALTER TABLE "article" RENAME "code" TO "slug";",
-        "",
+        "ALTER TABLE "article" DROP CONSTRAINT "article_code_key";",
       ],
     ],
   },
@@ -219,7 +216,6 @@ ALTER TABLE "post"
       "CREATE UNIQUE INDEX author_pkey ON stage_live.author USING btree (id)",
       "CREATE INDEX article_author_id_idx ON stage_live.post USING btree (author_id)",
       "CREATE UNIQUE INDEX article_pkey ON stage_live.post USING btree (id)",
-      "stage_live.post article_author_id_fkey FOREIGN KEY (author_id) REFERENCES stage_live.author(id) DEFERRABLE",
       "stage_live.post post_author_id_fkey FOREIGN KEY (author_id) REFERENCES stage_live.author(id) ON DELETE CASCADE DEFERRABLE",
     ],
     "sql": [
@@ -272,7 +268,8 @@ CREATE INDEX ON "article" ("author_id");"
       [
         "ALTER TABLE "article" RENAME TO "post";",
         
-"ALTER TABLE "post"
+"ALTER TABLE "post" DROP CONSTRAINT "article_author_id_fkey";
+ALTER TABLE "post"
 		ADD FOREIGN KEY ("author_id") 
 		REFERENCES "author"("id") ON DELETE CASCADE DEFERRABLE INITIALLY IMMEDIATE;"
 ,
@@ -356,7 +353,6 @@ ALTER TABLE "article"
       "CREATE INDEX article_author_id_idx ON stage_live.article USING btree (writer_id)",
       "CREATE UNIQUE INDEX article_pkey ON stage_live.article USING btree (id)",
       "CREATE UNIQUE INDEX author_pkey ON stage_live.author USING btree (id)",
-      "stage_live.article article_author_id_fkey FOREIGN KEY (writer_id) REFERENCES stage_live.author(id) DEFERRABLE",
       "stage_live.article article_writer_id_fkey FOREIGN KEY (writer_id) REFERENCES stage_live.author(id) ON DELETE CASCADE DEFERRABLE",
     ],
     "sql": [
@@ -409,7 +405,8 @@ CREATE INDEX ON "article" ("author_id");"
       [
         "ALTER TABLE "article" RENAME "author_id" TO "writer_id";",
         
-"ALTER TABLE "article"
+"ALTER TABLE "article" DROP CONSTRAINT "article_author_id_fkey";
+ALTER TABLE "article"
 		ADD FOREIGN KEY ("writer_id") 
 		REFERENCES "author"("id") ON DELETE CASCADE DEFERRABLE INITIALLY IMMEDIATE;"
 ,

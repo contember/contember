@@ -222,6 +222,8 @@ databaseTest('rename a field, then remove its index', async () => {
 			withoutIndexes('Article'),
 		),
 	)
+	expect(result.together.catalog).toEqual(result.separately.catalog)
+	expect(result.together.sql.flat()).toEqual(result.separately.sql.flat())
 	expect(result).toMatchSnapshot()
 })
 
@@ -234,6 +236,8 @@ databaseTest('rename a field, then remove its unique constraint', async () => {
 			withoutUniques('Article'),
 		),
 	)
+	expect(result.together.catalog).toEqual(result.separately.catalog)
+	expect(result.together.sql.flat()).toEqual(result.separately.sql.flat())
 	expect(result).toMatchSnapshot()
 })
 
@@ -246,6 +250,8 @@ databaseTest('rename a table, then change a relation onDelete', async () => {
 			withCascadingAuthor,
 		),
 	)
+	expect(result.together.catalog).toEqual(result.separately.catalog)
+	expect(result.together.sql.flat()).toEqual(result.separately.sql.flat())
 	expect(result).toMatchSnapshot()
 })
 
@@ -258,6 +264,8 @@ databaseTest('rename a joining column, then change the relation onDelete', async
 			withCascadingAuthor,
 		),
 	)
+	expect(result.together.catalog).toEqual(result.separately.catalog)
+	expect(result.together.sql.flat()).toEqual(result.separately.sql.flat())
 	expect(result).toMatchSnapshot()
 })
 

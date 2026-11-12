@@ -14,12 +14,6 @@ import { SchemaProvider } from './SchemaProvider.js'
 import { SaveSchemaCommand } from '../commands/schema/SaveSchemaCommand.js'
 import { ImplementationException } from '../../utils/index.js'
 
-/**
- * `beforeEachModification` re-reads stale metadata before every modification, so replaying a history keeps producing the DDL it always has.
- * `onRead` reads the catalog only when a handler reads the metadata; a collapsed snapshot holds creates and non-DDL updates, which never do.
- */
-type MetadataLoading = 'beforeEachModification' | 'onRead'
-
 type MigrationVariables = {
 	system_schema: string
 	project_slug: string
@@ -77,7 +71,6 @@ export class ProjectMigrator {
 						migration.version,
 						project,
 						metadataStore,
-						'beforeEachModification',
 					)
 				}
 			} else if (migration.type === 'content') {
@@ -196,7 +189,6 @@ export class ProjectMigrator {
 				latestVersion,
 				project,
 				metadataStore,
-				'onRead',
 			)
 		}
 
@@ -368,22 +360,19 @@ export class ProjectMigrator {
 		migrationVersion: string,
 		project: { slug: string; systemSchema: string },
 		metadataStore: SchemaDatabaseMetadataResolverStore,
-		metadataLoading: MetadataLoading,
 	): Promise<[Schema]> {
 		const {
 			getSql,
 			schema: newSchema,
 		} = this.migrationDescriber.describeModification(schema, modification, { formatVersion })
 		for (const stage of stages) {
-			const createSql = (databaseMetadata: DatabaseMetadata) =>
+			// Read at the modification that uses it, so renames and drops before it in the same call are visible.
+			const sql = await metadataStore.withMetadata(stage.schema, databaseMetadata =>
 				getSql({
 					systemSchema: project.systemSchema,
 					databaseMetadata,
 					invalidateDatabaseMetadata: () => metadataStore.invalidate(stage.schema),
-				})
-			const sql = metadataLoading === 'onRead'
-				? await metadataStore.withMetadata(stage.schema, createSql)
-				: createSql(await metadataStore.getMetadata(stage.schema))
+				}))
 			const processedSql = this.sqlPreprocessor(sql, {
 				project_slug: project.slug,
 				system_schema: project.systemSchema,

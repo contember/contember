@@ -28,7 +28,7 @@
     "@contember/engine-common": "workspace:*",
     "@contember/schema": "workspace:*",
     "@contember/schema-utils": "workspace:*",
-    "fast-deep-equal": "catalog:",
+    "@contember/utilities": "workspace:*",
     "rfc6902": "catalog:"
   },
   "devDependencies": {

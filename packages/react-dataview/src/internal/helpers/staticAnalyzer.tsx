@@ -12,7 +12,7 @@ import { EntityFieldMarkersContainer, EntityListSubTreeMarker, Environment, Fiel
 import { EntityListSubTree, MarkerTreeGenerator } from '@contember/react-binding'
 import { ChildrenAnalyzer, Leaf } from '@contember/react-multipass-rendering'
 import { DataViewFilterHandler, DataViewSelectionLayout } from '../../types/index.js'
-import deepEqual from 'fast-deep-equal'
+import { deepEqual } from '@contember/utilities'
 
 export interface DataViewStaticInfo {
 	filterTypes: Record<string, DataViewFilterHandler<any>>

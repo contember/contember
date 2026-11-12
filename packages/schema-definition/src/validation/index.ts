@@ -1,7 +1,7 @@
 import { tuple } from '../utils/index.js'
 import { SchemaDefinition } from '../model/index.js'
 import { Validation } from '@contember/schema'
-import { filterEntityDefinition } from '../utils/index.js'
+import { createLegacyMetadataRegistry, filterEntityDefinition } from '../utils/index.js'
 
 type MessageOrString = Validation.Message | string
 
@@ -29,6 +29,7 @@ const ArgumentFactory = {
 }
 
 const RuleMetaKey = Symbol('Rule')
+const legacyRules = createLegacyMetadataRegistry<Validation.ValidationRule[]>()
 
 const isLegacyDecorator = (target: any): boolean => typeof target === 'object' && target !== null || typeof target === 'function'
 
@@ -36,9 +37,8 @@ function addRuleToMetadata(target: any, propertyKeyOrContext: any, ...rule: Vali
 	if (isLegacyDecorator(target)) {
 		// Legacy TypeScript decorators: target is prototype, propertyKeyOrContext is property name
 		const propertyKey: string | symbol = propertyKeyOrContext
-		const hasExisting = Reflect.hasMetadata(RuleMetaKey, target, propertyKey)
-		const existing: Validation.ValidationRule[] = hasExisting ? Reflect.getMetadata(RuleMetaKey, target, propertyKey) : []
-		Reflect.defineMetadata(RuleMetaKey, [...rule, ...existing], target, propertyKey)
+		const existing = legacyRules.find(target, propertyKey)?.value ?? []
+		legacyRules.define(target, [...rule, ...existing], propertyKey)
 	} else {
 		// TC39 stage 3 decorators: target is undefined, propertyKeyOrContext is context
 		const context = propertyKeyOrContext as ClassFieldDecoratorContext
@@ -217,7 +217,7 @@ export function parseDefinition(
 				fields
 					.map(field => {
 						const fieldRules: Validation.ValidationRule[] | undefined = tc39Rules?.[field]
-							?? (typeof Reflect.getMetadata === 'function' ? Reflect.getMetadata(RuleMetaKey, target, field) : undefined)
+							?? legacyRules.find(target, field)?.value
 						if (fieldRules === undefined) {
 							return tuple(field, [])
 						}

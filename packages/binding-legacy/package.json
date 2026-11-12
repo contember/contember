@@ -31,8 +31,7 @@
   "dependencies": {
     "@contember/binding-common": "workspace:*",
     "@contember/client": "workspace:*",
-    "@contember/utilities": "workspace:*",
-    "uuid": "catalog:"
+    "@contember/utilities": "workspace:*"
   },
   "repository": {
     "type": "git",

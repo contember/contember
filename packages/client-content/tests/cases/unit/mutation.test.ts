@@ -1,7 +1,7 @@
 import { describe, expect, test } from 'bun:test'
 import { createClient } from '../../lib.js'
 import { queryBuilder } from '../../client/index.js'
-import { expectTypeOf } from 'expect-type'
+import { assertType, Equal } from '../../typeAssertions.js'
 
 const qb = queryBuilder
 describe('mutations in trx', () => {
@@ -557,7 +557,7 @@ describe('mutations without trx', () => {
 		const result = await client.mutateOrThrow(createAuthor)
 		expect(result.ok).toBe(true)
 		const ok = result.ok
-		expectTypeOf(ok).toEqualTypeOf<true>()
+		assertType<Equal<typeof ok, true>>()
 
 		expect(calls).toHaveLength(1)
 		expect(calls[0].query).toMatchSnapshot()

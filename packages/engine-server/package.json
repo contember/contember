@@ -30,8 +30,7 @@
     "@contember/engine-s3-plugin": "workspace:*",
     "@contember/engine-vimeo-plugin": "workspace:*",
     "graphql": "catalog:",
-    "pg": "catalog:",
-    "uuid": "catalog:"
+    "pg": "catalog:"
   },
   "devDependencies": {
     "@types/node": "catalog:"

@@ -32,9 +32,7 @@
     "@contember/client": "workspace:*",
     "@contember/client-content": "workspace:*",
     "@contember/utilities": "workspace:*",
-    "chevrotain": "catalog:",
-    "fast-deep-equal": "catalog:",
-    "uuid": "catalog:"
+    "chevrotain": "catalog:"
   },
   "peerDependencies": {
     "react": "catalog:",

@@ -49,7 +49,7 @@ Conditional: `@when(condition).assertMinLength(3, 'msg')`
 
 ## Metadata Storage
 
-Supports both legacy TypeScript decorators (`reflect-metadata`) and TC39 Stage 3 decorators via `createMetadataStore()`.
+Supports both legacy TypeScript decorators (a `WeakMap` registry with prototype-chain lookup) and TC39 Stage 3 decorators via `createMetadataStore()`.
 
 ## Convenience Export
 

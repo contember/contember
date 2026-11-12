@@ -1,7 +1,7 @@
-import { gql } from 'graphql-tag'
-import { DocumentNode } from 'graphql'
+import { DocumentNode, parse } from 'graphql'
 
-export const schema: DocumentNode = gql`
+export const schema: DocumentNode = parse(
+	/* GraphQL */ `
     scalar DateTime
     scalar Json
     scalar UUID
@@ -114,4 +114,6 @@ export const schema: DocumentNode = gql`
 		ENVIRONMENT
 	}
 
-`
+`,
+	{ noLocation: true },
+)

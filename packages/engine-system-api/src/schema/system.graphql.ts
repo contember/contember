@@ -1,7 +1,7 @@
-import { gql } from 'graphql-tag'
-import { DocumentNode } from 'graphql'
+import { DocumentNode, parse } from 'graphql'
 
-const schema: DocumentNode = gql`
+const schema: DocumentNode = parse(
+	/* GraphQL */ `
 	scalar DateTime
 	scalar Json
 	scalar PrimaryKey
@@ -243,6 +243,8 @@ const schema: DocumentNode = gql`
 		name: String!
 		slug: String!
 	}
-`
+`,
+	{ noLocation: true },
+)
 
 export default schema

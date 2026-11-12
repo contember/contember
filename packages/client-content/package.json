@@ -34,8 +34,7 @@
     "@contember/schema": "workspace:*"
   },
   "devDependencies": {
-    "@contember/client-content-generator": "workspace:*",
-    "expect-type": "^1.1.0"
+    "@contember/client-content-generator": "workspace:*"
   },
   "repository": {
     "type": "git",

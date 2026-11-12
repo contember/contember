@@ -33,7 +33,7 @@
     "@contember/schema": "workspace:*",
     "@contember/schema-definition": "workspace:*",
     "@contember/schema-utils": "workspace:*",
-    "fast-deep-equal": "catalog:"
+    "@contember/utilities": "workspace:*"
   },
   "devDependencies": {
     "@contember/database-tester": "workspace:*",

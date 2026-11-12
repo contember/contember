@@ -1,6 +1,6 @@
 import { Schema } from '@contember/schema'
 import { validateSqlFragment, ValidationError } from '@contember/schema-utils'
-import deepEqual from 'fast-deep-equal'
+import { deepEqual } from '@contember/utilities'
 
 /**
  * Validates the raw SQL that going from `before` to `after` adds: new or changed view bodies and predicates of

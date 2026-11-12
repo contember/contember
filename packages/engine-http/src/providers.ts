@@ -1,9 +1,9 @@
-import { v4 as uuidv4, v7 as uuidv7 } from 'uuid'
+import { generateUuidV4, generateUuidV7 } from '@contember/utilities'
 import bcrypt from 'bcryptjs'
 import crypto, { BinaryLike } from 'node:crypto'
 
 export const createProviders = () => ({
-	uuid: ({ version = 4 }: { version?: 4 | 7 } = {}) => version === 4 ? uuidv4() : uuidv7(),
+	uuid: ({ version = 4 }: { version?: 4 | 7 } = {}) => version === 4 ? generateUuidV4() : generateUuidV7(),
 	now: () => new Date(),
 	bcrypt: async (value: string) => await bcrypt.hash(value, 10),
 	bcryptCompare: (data: any, hash: string) => bcrypt.compare(data, hash),

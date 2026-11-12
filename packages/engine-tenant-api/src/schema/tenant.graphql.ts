@@ -1,7 +1,7 @@
-import { gql } from 'graphql-tag'
-import { DocumentNode } from 'graphql'
+import { DocumentNode, parse } from 'graphql'
 
-const schema: DocumentNode = gql`
+const schema: DocumentNode = parse(
+	/* GraphQL */ `
 	scalar Json
 	scalar DateTime
 	
@@ -2355,6 +2355,8 @@ const schema: DocumentNode = gql`
 		"True when more rows exist past \`offset + limit\`."
 		hasMore: Boolean!
 	}
-`
+`,
+	{ noLocation: true },
+)
 
 export default schema

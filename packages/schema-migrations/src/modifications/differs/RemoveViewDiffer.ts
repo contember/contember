@@ -1,6 +1,6 @@
 import { Differ } from '../ModificationHandler.js'
 import { Schema } from '@contember/schema'
-import deepEqual from 'fast-deep-equal'
+import { deepEqual } from '@contember/utilities'
 import { cascadeRemoveDependantViews, isReplaceableViewChange } from '../utils/viewDependencies.js'
 import { UpdateColumnDefinitionDiffer } from '../columns/index.js'
 

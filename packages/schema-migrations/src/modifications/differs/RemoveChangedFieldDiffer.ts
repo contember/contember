@@ -1,7 +1,7 @@
 import { Differ } from '../ModificationHandler.js'
 import { Model, Schema } from '@contember/schema'
 import { updateFields } from '../utils/diffUtils.js'
-import deepEqual from 'fast-deep-equal'
+import { deepEqual } from '@contember/utilities'
 import { removeFieldModification } from '../fields/index.js'
 
 export class RemoveChangedFieldDiffer implements Differ {

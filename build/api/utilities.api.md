@@ -54,16 +54,36 @@ export function dataAttribute<const T extends string>(value: T): T;
 // @public (undocumented)
 export function dataAttribute(value: boolean | string | number | undefined | null): string | undefined;
 
+// @public
+export const deepEqual: (a: unknown, b: unknown) => boolean;
+
 // @internal
 export function deprecate(removal: SemverString, condition: boolean, deprecated: string, replacement: string | null): void;
 
 // @public (undocumented)
+export const generateUuidV4: () => string;
+
+// @public (undocumented)
+export const generateUuidV7: () => string;
+
+// @public
+export const isUuid: (value: string) => boolean;
+
+// @public (undocumented)
 export class LRUCache<Key, Value> {
-    constructor(maxSize: number);
+    constructor(maxSize: number, options?: LRUCacheOptions);
     // (undocumented)
     get(key: Key): Value | undefined;
+    purgeStale(): void;
     // (undocumented)
     set(key: Key, value: Value): void;
+}
+
+// @public (undocumented)
+export interface LRUCacheOptions {
+    // (undocumented)
+    now?: () => number;
+    ttl?: number;
 }
 
 // @public (undocumented)

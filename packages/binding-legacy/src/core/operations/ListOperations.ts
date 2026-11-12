@@ -1,4 +1,4 @@
-import { validate as uuidValidate } from 'uuid'
+import { isUuid } from '@contember/utilities'
 import type { BatchUpdatesOptions, EntityAccessor, EntityListAccessor, ErrorAccessor } from '@contember/binding-common'
 import {
 	BindingError,
@@ -199,7 +199,7 @@ export class ListOperations {
 	public getChildEntityById(state: EntityListState, id: EntityId) {
 		const realm = state.children.get(id)
 		if (realm === undefined) {
-			const isRuntimeId = typeof id === 'number' || uuidValidate(id) || UnpersistedEntityDummyId.matchesDummyId(id)
+			const isRuntimeId = typeof id === 'number' || isUuid(id) || UnpersistedEntityDummyId.matchesDummyId(id)
 			if (isRuntimeId) {
 				throw new BindingError(`EntityList: cannot retrieve an entity with id '${id}' as it is not on the list.`)
 			}

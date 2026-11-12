@@ -24,8 +24,7 @@
   },
   "devDependencies": {
     "@types/js-yaml": "catalog:",
-    "@types/node": "catalog:",
-    "@types/npm-package-arg": "catalog:"
+    "@types/node": "catalog:"
   },
   "dependencies": {
     "chalk": "catalog:",

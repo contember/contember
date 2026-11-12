@@ -1,5 +1,5 @@
 import { Input, Writable } from '@contember/schema'
-import deepEqual from 'fast-deep-equal'
+import { deepEqual } from '@contember/utilities'
 
 export const replaceWhere = (
 	subject: Input.OptionalWhere,

@@ -1,9 +1,12 @@
 import * as fs from 'node:fs/promises'
-import glob from 'fast-glob'
 ;(async () => {
 	const cwd = process.cwd()
 	const version = process.argv[2]
-	const dirs = [cwd, ...await glob(process.cwd() + '/packages/*', { onlyDirectories: true })]
+	const packagesDir = `${cwd}/packages`
+	const packageDirs = (await fs.readdir(packagesDir, { withFileTypes: true }))
+		.filter(it => it.isDirectory() && !it.name.startsWith('.'))
+		.map(it => `${packagesDir}/${it.name}`)
+	const dirs = [cwd, ...packageDirs]
 
 	await Promise.all(dirs.map(async (dir): Promise<void> => {
 		const packageJsonPath = `${dir}/package.json`

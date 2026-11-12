@@ -1,7 +1,7 @@
-import { gql } from 'graphql-tag'
-import { DocumentNode } from 'graphql'
+import { DocumentNode, parse } from 'graphql'
 
-const schema: DocumentNode = gql`
+const schema: DocumentNode = parse(
+	/* GraphQL */ `
 	schema {
 		mutation: Mutation
 	}
@@ -52,6 +52,8 @@ const schema: DocumentNode = gql`
 		ok: Boolean!
 		error: MigrationDeleteError
 	}
-`
+`,
+	{ noLocation: true },
+)
 
 export default schema

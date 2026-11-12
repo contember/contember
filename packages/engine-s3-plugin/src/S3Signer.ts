@@ -1,6 +1,5 @@
 import { resolveS3Endpoint, S3Config } from './Config.js'
 import { Providers } from '@contember/engine-plugins'
-import qs from 'qs'
 import { BinaryLike, createHash, createHmac } from 'node:crypto'
 
 interface S3Request {
@@ -17,6 +16,10 @@ const methods: Record<S3Request['action'], string> = {
 }
 
 const hmac = (secret: BinaryLike, data: BinaryLike) => createHmac('sha256', secret).update(data).digest()
+
+// SigV4 canonical query encoding (RFC 3986): only A-Z a-z 0-9 - . _ ~ stay unescaped.
+const encodeRfc3986 = (value: string): string =>
+	encodeURIComponent(value).replace(/[!'()*]/g, char => '%' + char.charCodeAt(0).toString(16).toUpperCase())
 
 const hash = (data: BinaryLike) => createHash('sha256').update(data).digest('hex')
 
@@ -77,7 +80,7 @@ export class S3Signer {
 			}
 		}
 		const qsSorted = sortMap(queryString)
-		return qs.stringify(qsSorted)
+		return Object.entries(qsSorted).map(([key, value]) => `${encodeRfc3986(key)}=${encodeRfc3986(value)}`).join('&')
 	}
 
 	private getScope(dateFormatted: string) {

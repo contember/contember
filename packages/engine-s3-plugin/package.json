@@ -27,13 +27,10 @@
     "@contember/graphql-utils": "workspace:*",
     "@contember/typesafe": "workspace:*",
     "mime-types": "catalog:",
-    "picomatch": "catalog:",
-    "qs": "catalog:",
-    "uuid": "catalog:"
+    "picomatch": "catalog:"
   },
   "devDependencies": {
     "@types/mime-types": "catalog:",
-    "@types/qs": "catalog:",
     "graphql": "catalog:"
   },
   "peerDependencies": {

@@ -41,8 +41,7 @@
     "@contember/react-utils": "workspace:*",
     "@contember/utilities": "workspace:*",
     "@radix-ui/primitive": "catalog:",
-    "@radix-ui/react-slot": "catalog:",
-    "fast-deep-equal": "catalog:"
+    "@radix-ui/react-slot": "catalog:"
   },
   "peerDependencies": {
     "react": "catalog:",

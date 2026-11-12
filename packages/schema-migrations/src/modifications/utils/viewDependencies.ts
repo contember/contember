@@ -1,5 +1,5 @@
 import { Model } from '@contember/schema'
-import deepEqual from 'fast-deep-equal'
+import { deepEqual } from '@contember/utilities'
 import { Migration } from '../../Migration.js'
 import { removeEntityModification } from '../entities/index.js'
 

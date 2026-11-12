@@ -1,7 +1,7 @@
 import { Actions, Schema } from '@contember/schema'
 import { SchemaUpdater } from '../utils/schemaUpdateUtils.js'
 import { createModificationType, Differ, ModificationHandler } from '../ModificationHandler.js'
-import deepEqual from 'fast-deep-equal'
+import { deepEqual } from '@contember/utilities'
 import { createPatch } from 'rfc6902'
 import { patchTriggerModification } from './PatchTriggerModification.js'
 

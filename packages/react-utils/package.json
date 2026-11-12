@@ -35,7 +35,7 @@
     "@testing-library/react": "catalog:"
   },
   "dependencies": {
-    "fast-deep-equal": "catalog:"
+    "@contember/utilities": "workspace:*"
   },
   "repository": {
     "type": "git",

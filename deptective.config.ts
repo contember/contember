@@ -7,13 +7,11 @@ export default {
 		'@popperjs/core',
 		'@aws-sdk/signature-v4-crt',
 		'pg',
-		'uuid',
 		'graphql',
 		'graphql-ts-client-api',
 		'react-dom',
 	],
 	allowedDirectoryImports: [
-		'fast-deep-equal/es6/index.js',
 		'react-dom/client',
 		'yawn-yaml/cjs',
 		'nodemailer/lib/mailer',

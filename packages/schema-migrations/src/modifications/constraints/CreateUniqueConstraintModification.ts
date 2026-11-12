@@ -4,7 +4,7 @@ import { SchemaUpdater, updateEntity, updateModel } from '../utils/schemaUpdateU
 import { createModificationType, Differ, ModificationHandler, ModificationHandlerCreateSqlOptions } from '../ModificationHandler.js'
 import { wrapIdentifier } from '../../utils/dbHelpers.js'
 import { getUniqueConstraintColumns } from './utils.js'
-import deepEqual from 'fast-deep-equal'
+import { deepEqual } from '@contember/utilities'
 
 export class CreateUniqueConstraintModificationHandler implements ModificationHandler<CreateUniqueConstraintModificationData> {
 	constructor(private readonly data: CreateUniqueConstraintModificationData, private readonly schema: Schema) {

@@ -1,4 +1,4 @@
-import deepEqual from 'fast-deep-equal'
+import { deepEqual } from '@contember/utilities'
 
 import { Acl, Input, Model, Writable } from '@contember/schema'
 import { PredicateDefinitionProcessor } from '@contember/schema-utils'

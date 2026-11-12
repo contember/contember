@@ -1,7 +1,6 @@
 import { Model } from '@contember/schema'
 import { EnumDefinition } from './EnumDefinition.js'
 import { SchemaBuilder } from './internal/index.js'
-import 'reflect-metadata'
 import { FieldDefinition } from './fieldDefinitions/index.js'
 import { isEntityConstructor } from '../../utils/index.js'
 import { DefaultNamingConventions } from '@contember/schema-utils'

@@ -20,6 +20,7 @@
 		{ "path": "../../schema-utils/src" },
 		{ "path": "../../schema-utils/src" },
 		{ "path": "../../telemetry/src" },
-		{ "path": "../../typesafe/src" }
+		{ "path": "../../typesafe/src" },
+		{ "path": "../../utilities/src" }
 	]
 }

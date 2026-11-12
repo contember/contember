@@ -133,7 +133,6 @@ describe('remove entity description', () =>
 			{
 				modification: 'setDescription',
 				entityName: 'Author',
-				description: undefined,
 			},
 		],
 		sql: SQL``,
@@ -160,7 +159,6 @@ describe('remove field description', () =>
 				modification: 'setDescription',
 				entityName: 'Author',
 				fieldName: 'name',
-				description: undefined,
 			},
 		],
 		sql: SQL``,

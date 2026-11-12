@@ -1,2 +1,2 @@
 export * from './SetDescriptionModification.js'
-export * from './SetDeprecatedModification.js'
+export * from './SetDeprecationReasonModification.js'

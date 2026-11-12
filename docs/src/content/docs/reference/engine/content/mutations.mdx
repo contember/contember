@@ -139,6 +139,8 @@ unique key that includes the owner - `unique(['locale', 'post'])`, the "replace 
 shape - where the old and the new row cannot coexist. A record the list names is never removed
 and re-added: which records are orphans is decided up front, from the collection as it was before
 the mutation, so a record the list creates cannot be an orphan either.
+If deleting an orphan cascades into a record the list names, the mutation fails and rolls back
+instead of creating that record anew.
 
 ```graphql
 mutation {

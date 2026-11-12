@@ -8,11 +8,10 @@ export class BoardTask {
 	description = c.stringColumn().deprecated('Use the content field for rich text descriptions')
 	status = c.enumColumn(BoardTaskStatus)
 	assignee = c.manyHasOne(BoardUser).setNullOnDelete().description('User assigned to complete this task')
-	tags = c.manyHasMany(BoardTag).description('description')
+	tags = c.manyHasMany(BoardTag).description('Tags used to filter tasks on the board')
 	order = c.intColumn()
 }
 
-@c.Deprecated()
 export class BoardUser {
 	name = c.stringColumn().notNull()
 	username = c.stringColumn().unique().notNull()

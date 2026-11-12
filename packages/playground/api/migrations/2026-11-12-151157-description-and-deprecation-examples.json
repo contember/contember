@@ -1,0 +1,39 @@
+{
+	"formatVersion": 6,
+	"modifications": [
+		{
+			"modification": "setDescription",
+			"entityName": "BoardTask",
+			"description": "This entity represents a task on a kanban-style board. Tasks can be assigned to users, tagged, and have different statuses."
+		},
+		{
+			"modification": "setDescription",
+			"entityName": "BoardTask",
+			"fieldName": "assignee",
+			"description": "User assigned to complete this task"
+		},
+		{
+			"modification": "setDescription",
+			"entityName": "BoardTask",
+			"fieldName": "tags",
+			"description": "Tags used to filter tasks on the board"
+		},
+		{
+			"modification": "setDeprecationReason",
+			"entityName": "BoardTag",
+			"deprecationReason": "BoardTag entity is deprecated as of v1.5 and will be removed in v2.0. Use the LabelSystem module instead for better categorization."
+		},
+		{
+			"modification": "setDeprecationReason",
+			"entityName": "BoardTag",
+			"fieldName": "color",
+			"deprecationReason": "Field is deprecated"
+		},
+		{
+			"modification": "setDeprecationReason",
+			"entityName": "BoardTask",
+			"fieldName": "description",
+			"deprecationReason": "Use the content field for rich text descriptions"
+		}
+	]
+}

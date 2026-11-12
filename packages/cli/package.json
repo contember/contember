@@ -52,7 +52,6 @@
     "@graphql-tools/schema": "catalog:",
     "chalk": "catalog:",
     "chalk-table": "catalog:",
-    "fast-glob": "catalog:",
     "graphql": "catalog:",
     "graphql-ts-client-api": "catalog:",
     "js-yaml": "catalog:",

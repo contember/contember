@@ -14,6 +14,12 @@ import { SchemaProvider } from './SchemaProvider.js'
 import { SaveSchemaCommand } from '../commands/schema/SaveSchemaCommand.js'
 import { ImplementationException } from '../../utils/index.js'
 
+/**
+ * `beforeEachModification` re-reads stale metadata before every modification, so replaying a history keeps producing the DDL it always has.
+ * `onRead` reads the catalog only when a handler reads the metadata; a collapsed snapshot holds creates and non-DDL updates, which never do.
+ */
+type MetadataLoading = 'beforeEachModification' | 'onRead'
+
 type MigrationVariables = {
 	system_schema: string
 	project_slug: string
@@ -71,6 +77,7 @@ export class ProjectMigrator {
 						migration.version,
 						project,
 						metadataStore,
+						'beforeEachModification',
 					)
 				}
 			} else if (migration.type === 'content') {
@@ -189,6 +196,7 @@ export class ProjectMigrator {
 				latestVersion,
 				project,
 				metadataStore,
+				'onRead',
 			)
 		}
 
@@ -360,18 +368,22 @@ export class ProjectMigrator {
 		migrationVersion: string,
 		project: { slug: string; systemSchema: string },
 		metadataStore: SchemaDatabaseMetadataResolverStore,
+		metadataLoading: MetadataLoading,
 	): Promise<[Schema]> {
 		const {
 			getSql,
 			schema: newSchema,
 		} = this.migrationDescriber.describeModification(schema, modification, { formatVersion })
 		for (const stage of stages) {
-			const databaseMetadata = await metadataStore.getMetadata(stage.schema)
-			const sql = getSql({
-				systemSchema: project.systemSchema,
-				databaseMetadata,
-				invalidateDatabaseMetadata: () => metadataStore.invalidate(stage.schema),
-			})
+			const createSql = (databaseMetadata: DatabaseMetadata) =>
+				getSql({
+					systemSchema: project.systemSchema,
+					databaseMetadata,
+					invalidateDatabaseMetadata: () => metadataStore.invalidate(stage.schema),
+				})
+			const sql = metadataLoading === 'onRead'
+				? await metadataStore.withMetadata(stage.schema, createSql)
+				: createSql(await metadataStore.getMetadata(stage.schema))
 			const processedSql = this.sqlPreprocessor(sql, {
 				project_slug: project.slug,
 				system_schema: project.systemSchema,
@@ -382,9 +394,9 @@ export class ProjectMigrator {
 	}
 
 	private async executeOnStage(db: Client, stage: Stage, sql: string, migrationVersion: string) {
-		await db.query('SET LOCAL search_path TO ' + wrapIdentifier(stage.schema))
 		try {
-			await db.query(sql)
+			// One round trip: migration SQL is sent without parameters, so both run as one multi-statement query.
+			await db.query('SET LOCAL search_path TO ' + wrapIdentifier(stage.schema) + ';\n' + sql)
 		} catch (e) {
 			// Not logged here: the statement may still be retried. The resolver logs the migration's final failure.
 			if (e instanceof QueryError) {

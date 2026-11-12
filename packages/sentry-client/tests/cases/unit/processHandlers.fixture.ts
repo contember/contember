@@ -1,4 +1,4 @@
-import { createSentryClient, installProcessHandlers } from '../../../src/index.js'
+import { createSentryClient, installProcessHandlers, SentryClient } from '../../../src/index.js'
 
 // Run by processHandlers.test.ts: `bun processHandlers.fixture.ts <mode>` with SENTRY_TEST_DSN pointing at a fake ingest.
 const dsn = process.env.SENTRY_TEST_DSN
@@ -6,10 +6,16 @@ if (!dsn) {
 	throw new Error('SENTRY_TEST_DSN is not set')
 }
 const client = createSentryClient({ dsn, contextLines: 0 })
-installProcessHandlers(client)
-
 const mode = process.argv[2]
-if (mode === 'uncaught') {
+const failingClient: SentryClient = {
+	...client,
+	captureException: () => {
+		throw new Error('capture broke')
+	},
+}
+installProcessHandlers(mode === 'uncaught-capture-throws' ? failingClient : client)
+
+if (mode === 'uncaught' || mode === 'uncaught-capture-throws') {
 	setTimeout(() => {
 		throw new Error('uncaught in fixture')
 	}, 0)

@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, test } from 'bun:test'
 import { join } from 'node:path'
-import { captureConsoleErrors, SentryClient } from '../../../src/index.js'
+import { captureConsoleErrors, createSentryClient, SentryClient } from '../../../src/index.js'
 import { FakeIngest, IngestResponse, startFakeIngest } from './fakeIngest.js'
 
 const fixture = join(import.meta.dir, 'processHandlers.fixture.ts')
@@ -48,12 +48,22 @@ describe('installProcessHandlers', () => {
 		expect(exitDelayMs).toBeLessThan(3500)
 	}, 15_000)
 
-	test('exits at once on a second uncaught exception', async () => {
-		const { exitCode, stderr, exitDelayMs } = await run('uncaught-twice', { delayMs: 10_000 })
+	test('prints a second uncaught exception and still waits for the event of the first', async () => {
+		const { exitCode, stderr, events, exitDelayMs } = await run('uncaught-twice', { delayMs: 10_000 })
 		expect(exitCode).toBe(1)
 		expect(stderr).toContain('first uncaught')
 		expect(stderr).toContain('second uncaught')
-		expect(exitDelayMs).toBeLessThan(1500)
+		expect(events.map(it => it.exception?.values[0].value)).toEqual(['first uncaught'])
+		expect(exitDelayMs).toBeGreaterThan(1500)
+		expect(exitDelayMs).toBeLessThan(3500)
+	}, 15_000)
+
+	test('exits with 1 even when reporting the exception fails', async () => {
+		const { exitCode, stderr, events } = await run('uncaught-capture-throws')
+		expect(exitCode).toBe(1)
+		expect(stderr).toContain('capture broke')
+		expect(stderr).toContain('uncaught in fixture')
+		expect(events).toEqual([])
 	}, 15_000)
 
 	test('reports an unhandled rejection and keeps the process running', async () => {
@@ -143,6 +153,45 @@ describe('captureConsoleErrors', () => {
 			expect(calls).toHaveLength(1)
 			expect(printed).toEqual([['nested'], ['outer']])
 		})
+	})
+
+	test('only prints a console.error made by an asynchronous beforeSend', async () => {
+		const original = console.error
+		const printed: unknown[][] = []
+		console.error = (...args: unknown[]) => printed.push(args)
+		let delivered = 0
+		let hookCalls = 0
+		const client = createSentryClient({
+			dsn: 'https://public@sentry.invalid/1',
+			contextLines: 0,
+			beforeSend: async event => {
+				// bounded, so that a regression fails instead of looping forever
+				if (++hookCalls > 3) {
+					return null
+				}
+				await Promise.resolve()
+				console.error(new Error('logged by beforeSend'))
+				return event
+			},
+			fetch: async () => {
+				delivered++
+				return new Response('{}')
+			},
+		})
+		const restore = captureConsoleErrors(client)
+		try {
+			console.error(new Error('first'))
+			await client.flush(2000)
+			// a looping capture would still be delivering by now
+			await new Promise(resolve => setTimeout(resolve, 50))
+			await client.flush(2000)
+		} finally {
+			restore()
+			console.error = original
+		}
+		expect(hookCalls).toBe(1)
+		expect(delivered).toBe(1)
+		expect(printed.map(([error]) => error instanceof Error ? error.message : error)).toEqual(['first', 'logged by beforeSend'])
 	})
 
 	test('restore puts the previous console.error back', () => {

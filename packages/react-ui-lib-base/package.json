@@ -56,8 +56,6 @@
     "@radix-ui/react-toast": "catalog:",
     "@radix-ui/react-toggle-group": "catalog:",
     "@radix-ui/react-tooltip": "catalog:",
-    "class-variance-authority": "catalog:",
-    "clsx": "catalog:",
     "lucide-react": "catalog:",
     "react": "catalog:",
     "react-dom": "catalog:",

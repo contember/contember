@@ -1,7 +1,7 @@
 import { createRequiredContext } from '@contember/react-utils'
 import { dataAttribute } from '@contember/utilities'
 import { Slot } from '@radix-ui/react-slot'
-import { cva, VariantProps } from 'class-variance-authority'
+import { cva, VariantProps } from '../utils/classNames.js'
 import { PanelLeft } from 'lucide-react'
 import { ComponentProps, CSSProperties, ElementRef, forwardRef, PropsWithChildren, ReactNode, useCallback, useEffect, useMemo, useState } from 'react'
 import { cn, uic } from '../utils/index.js'

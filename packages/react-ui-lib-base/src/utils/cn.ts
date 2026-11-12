@@ -1,8 +1,8 @@
-import { ClassValue, clsx } from 'clsx'
+import { ClassValue, cx } from './classNames.js'
 import { twMerge } from 'tailwind-merge'
 
 /**
- * `cn` is a utility function that combines Tailwind CSS class names using `clsx`
+ * `cn` is a utility function that combines Tailwind CSS class names using `cx` (`clsx` semantics)
  * and merges conflicting classes with `twMerge`.
  *
  * Useful for composing conditional and dynamic className values in React components
@@ -19,4 +19,4 @@ import { twMerge } from 'tailwind-merge'
  * }
  * ```
  */
-export const cn = (...inputs: ClassValue[]) => twMerge(clsx(...inputs))
+export const cn = (...inputs: ClassValue[]) => twMerge(cx(...inputs))

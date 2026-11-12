@@ -1,6 +1,6 @@
 import { Link, type RoleCondition, type RoutingLinkTarget, useCurrentRequest, useProjectUserRoles } from '@contember/interface'
 import { createContext } from '@contember/react-utils'
-import { VariantProps } from 'class-variance-authority'
+import { VariantProps } from '../utils/classNames.js'
 import { ChevronRight } from 'lucide-react'
 import { Children, isValidElement, ReactNode, useMemo } from 'react'
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from './collapsible.js'

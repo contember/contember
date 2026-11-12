@@ -1,0 +1,2812 @@
+// Bun Snapshot v1, https://bun.sh/docs/test/snapshots
+
+exports[`rename a field, then remove its index 1`] = `
+{
+  "separately": {
+    "catalog": [
+      "CREATE UNIQUE INDEX article_pkey ON stage_live.article USING btree (id)",
+    ],
+    "sql": [
+      [
+        
+"CREATE TABLE "article" (
+  "id" uuid PRIMARY KEY NOT NULL
+);
+CREATE TRIGGER "log_event"
+  AFTER INSERT OR UPDATE OR DELETE ON "article"
+  FOR EACH ROW
+  EXECUTE PROCEDURE "system"."trigger_event"($pga$id$pga$);
+CREATE CONSTRAINT TRIGGER "log_event_trx"
+  AFTER INSERT OR UPDATE OR DELETE ON "article"
+  DEFERRABLE INITIALLY DEFERRED
+  FOR EACH ROW
+  EXECUTE PROCEDURE "system"."trigger_event_commit"();"
+,
+        
+"ALTER TABLE "article"
+  ADD "title" text;"
+,
+        "CREATE INDEX ON "article" ("title");",
+      ],
+      [
+        "ALTER TABLE "article" RENAME "title" TO "headline";",
+      ],
+      [
+        "DROP INDEX "article_title_idx";",
+      ],
+    ],
+  },
+  "together": {
+    "catalog": [
+      "CREATE UNIQUE INDEX article_pkey ON stage_live.article USING btree (id)",
+      "CREATE INDEX article_title_idx ON stage_live.article USING btree (headline)",
+    ],
+    "sql": [
+      [
+        
+"CREATE TABLE "article" (
+  "id" uuid PRIMARY KEY NOT NULL
+);
+CREATE TRIGGER "log_event"
+  AFTER INSERT OR UPDATE OR DELETE ON "article"
+  FOR EACH ROW
+  EXECUTE PROCEDURE "system"."trigger_event"($pga$id$pga$);
+CREATE CONSTRAINT TRIGGER "log_event_trx"
+  AFTER INSERT OR UPDATE OR DELETE ON "article"
+  DEFERRABLE INITIALLY DEFERRED
+  FOR EACH ROW
+  EXECUTE PROCEDURE "system"."trigger_event_commit"();"
+,
+        
+"ALTER TABLE "article"
+  ADD "title" text;"
+,
+        "CREATE INDEX ON "article" ("title");",
+      ],
+      [
+        "ALTER TABLE "article" RENAME "title" TO "headline";",
+        "",
+      ],
+    ],
+  },
+}
+`;
+
+exports[`rename a field, then remove its unique constraint 1`] = `
+{
+  "separately": {
+    "catalog": [
+      "CREATE UNIQUE INDEX article_pkey ON stage_live.article USING btree (id)",
+    ],
+    "sql": [
+      [
+        
+"CREATE TABLE "article" (
+  "id" uuid PRIMARY KEY NOT NULL
+);
+CREATE TRIGGER "log_event"
+  AFTER INSERT OR UPDATE OR DELETE ON "article"
+  FOR EACH ROW
+  EXECUTE PROCEDURE "system"."trigger_event"($pga$id$pga$);
+CREATE CONSTRAINT TRIGGER "log_event_trx"
+  AFTER INSERT OR UPDATE OR DELETE ON "article"
+  DEFERRABLE INITIALLY DEFERRED
+  FOR EACH ROW
+  EXECUTE PROCEDURE "system"."trigger_event_commit"();"
+,
+        
+"ALTER TABLE "article"
+  ADD "code" text;"
+,
+        "ALTER TABLE "article" ADD UNIQUE ("code");",
+      ],
+      [
+        "ALTER TABLE "article" RENAME "code" TO "slug";",
+      ],
+      [
+        "ALTER TABLE "article" DROP CONSTRAINT "article_code_key";",
+      ],
+    ],
+  },
+  "together": {
+    "catalog": [
+      "CREATE UNIQUE INDEX article_code_key ON stage_live.article USING btree (slug)",
+      "CREATE UNIQUE INDEX article_pkey ON stage_live.article USING btree (id)",
+      "stage_live.article article_code_key UNIQUE (slug)",
+    ],
+    "sql": [
+      [
+        
+"CREATE TABLE "article" (
+  "id" uuid PRIMARY KEY NOT NULL
+);
+CREATE TRIGGER "log_event"
+  AFTER INSERT OR UPDATE OR DELETE ON "article"
+  FOR EACH ROW
+  EXECUTE PROCEDURE "system"."trigger_event"($pga$id$pga$);
+CREATE CONSTRAINT TRIGGER "log_event_trx"
+  AFTER INSERT OR UPDATE OR DELETE ON "article"
+  DEFERRABLE INITIALLY DEFERRED
+  FOR EACH ROW
+  EXECUTE PROCEDURE "system"."trigger_event_commit"();"
+,
+        
+"ALTER TABLE "article"
+  ADD "code" text;"
+,
+        "ALTER TABLE "article" ADD UNIQUE ("code");",
+      ],
+      [
+        "ALTER TABLE "article" RENAME "code" TO "slug";",
+        "",
+      ],
+    ],
+  },
+}
+`;
+
+exports[`rename a table, then change a relation onDelete 1`] = `
+{
+  "separately": {
+    "catalog": [
+      "CREATE UNIQUE INDEX author_pkey ON stage_live.author USING btree (id)",
+      "CREATE INDEX article_author_id_idx ON stage_live.post USING btree (author_id)",
+      "CREATE UNIQUE INDEX article_pkey ON stage_live.post USING btree (id)",
+      "stage_live.post post_author_id_fkey FOREIGN KEY (author_id) REFERENCES stage_live.author(id) ON DELETE CASCADE DEFERRABLE",
+    ],
+    "sql": [
+      [
+        
+"CREATE TABLE "article" (
+  "id" uuid PRIMARY KEY NOT NULL
+);
+CREATE TRIGGER "log_event"
+  AFTER INSERT OR UPDATE OR DELETE ON "article"
+  FOR EACH ROW
+  EXECUTE PROCEDURE "system"."trigger_event"($pga$id$pga$);
+CREATE CONSTRAINT TRIGGER "log_event_trx"
+  AFTER INSERT OR UPDATE OR DELETE ON "article"
+  DEFERRABLE INITIALLY DEFERRED
+  FOR EACH ROW
+  EXECUTE PROCEDURE "system"."trigger_event_commit"();"
+,
+        
+"CREATE TABLE "author" (
+  "id" uuid PRIMARY KEY NOT NULL
+);
+CREATE TRIGGER "log_event"
+  AFTER INSERT OR UPDATE OR DELETE ON "author"
+  FOR EACH ROW
+  EXECUTE PROCEDURE "system"."trigger_event"($pga$id$pga$);
+CREATE CONSTRAINT TRIGGER "log_event_trx"
+  AFTER INSERT OR UPDATE OR DELETE ON "author"
+  DEFERRABLE INITIALLY DEFERRED
+  FOR EACH ROW
+  EXECUTE PROCEDURE "system"."trigger_event_commit"();"
+,
+        
+"ALTER TABLE "article"
+  ADD "title" text;"
+,
+        
+"ALTER TABLE "author"
+  ADD "name" text;"
+,
+        
+"ALTER TABLE "article"
+  ADD "author_id" uuid;
+ALTER TABLE "article"
+		ADD FOREIGN KEY ("author_id") 
+		REFERENCES "author"("id") ON DELETE NO ACTION DEFERRABLE INITIALLY IMMEDIATE;
+CREATE INDEX ON "article" ("author_id");"
+,
+      ],
+      [
+        "ALTER TABLE "article" RENAME TO "post";",
+      ],
+      [
+        
+"ALTER TABLE "post" DROP CONSTRAINT "article_author_id_fkey";
+ALTER TABLE "post"
+		ADD FOREIGN KEY ("author_id") 
+		REFERENCES "author"("id") ON DELETE CASCADE DEFERRABLE INITIALLY IMMEDIATE;"
+,
+      ],
+    ],
+  },
+  "together": {
+    "catalog": [
+      "CREATE UNIQUE INDEX author_pkey ON stage_live.author USING btree (id)",
+      "CREATE INDEX article_author_id_idx ON stage_live.post USING btree (author_id)",
+      "CREATE UNIQUE INDEX article_pkey ON stage_live.post USING btree (id)",
+      "stage_live.post article_author_id_fkey FOREIGN KEY (author_id) REFERENCES stage_live.author(id) DEFERRABLE",
+      "stage_live.post post_author_id_fkey FOREIGN KEY (author_id) REFERENCES stage_live.author(id) ON DELETE CASCADE DEFERRABLE",
+    ],
+    "sql": [
+      [
+        
+"CREATE TABLE "article" (
+  "id" uuid PRIMARY KEY NOT NULL
+);
+CREATE TRIGGER "log_event"
+  AFTER INSERT OR UPDATE OR DELETE ON "article"
+  FOR EACH ROW
+  EXECUTE PROCEDURE "system"."trigger_event"($pga$id$pga$);
+CREATE CONSTRAINT TRIGGER "log_event_trx"
+  AFTER INSERT OR UPDATE OR DELETE ON "article"
+  DEFERRABLE INITIALLY DEFERRED
+  FOR EACH ROW
+  EXECUTE PROCEDURE "system"."trigger_event_commit"();"
+,
+        
+"CREATE TABLE "author" (
+  "id" uuid PRIMARY KEY NOT NULL
+);
+CREATE TRIGGER "log_event"
+  AFTER INSERT OR UPDATE OR DELETE ON "author"
+  FOR EACH ROW
+  EXECUTE PROCEDURE "system"."trigger_event"($pga$id$pga$);
+CREATE CONSTRAINT TRIGGER "log_event_trx"
+  AFTER INSERT OR UPDATE OR DELETE ON "author"
+  DEFERRABLE INITIALLY DEFERRED
+  FOR EACH ROW
+  EXECUTE PROCEDURE "system"."trigger_event_commit"();"
+,
+        
+"ALTER TABLE "article"
+  ADD "title" text;"
+,
+        
+"ALTER TABLE "author"
+  ADD "name" text;"
+,
+        
+"ALTER TABLE "article"
+  ADD "author_id" uuid;
+ALTER TABLE "article"
+		ADD FOREIGN KEY ("author_id") 
+		REFERENCES "author"("id") ON DELETE NO ACTION DEFERRABLE INITIALLY IMMEDIATE;
+CREATE INDEX ON "article" ("author_id");"
+,
+      ],
+      [
+        "ALTER TABLE "article" RENAME TO "post";",
+        
+"ALTER TABLE "post"
+		ADD FOREIGN KEY ("author_id") 
+		REFERENCES "author"("id") ON DELETE CASCADE DEFERRABLE INITIALLY IMMEDIATE;"
+,
+      ],
+    ],
+  },
+}
+`;
+
+exports[`rename a joining column, then change the relation onDelete 1`] = `
+{
+  "separately": {
+    "catalog": [
+      "CREATE INDEX article_author_id_idx ON stage_live.article USING btree (writer_id)",
+      "CREATE UNIQUE INDEX article_pkey ON stage_live.article USING btree (id)",
+      "CREATE UNIQUE INDEX author_pkey ON stage_live.author USING btree (id)",
+      "stage_live.article article_writer_id_fkey FOREIGN KEY (writer_id) REFERENCES stage_live.author(id) ON DELETE CASCADE DEFERRABLE",
+    ],
+    "sql": [
+      [
+        
+"CREATE TABLE "article" (
+  "id" uuid PRIMARY KEY NOT NULL
+);
+CREATE TRIGGER "log_event"
+  AFTER INSERT OR UPDATE OR DELETE ON "article"
+  FOR EACH ROW
+  EXECUTE PROCEDURE "system"."trigger_event"($pga$id$pga$);
+CREATE CONSTRAINT TRIGGER "log_event_trx"
+  AFTER INSERT OR UPDATE OR DELETE ON "article"
+  DEFERRABLE INITIALLY DEFERRED
+  FOR EACH ROW
+  EXECUTE PROCEDURE "system"."trigger_event_commit"();"
+,
+        
+"CREATE TABLE "author" (
+  "id" uuid PRIMARY KEY NOT NULL
+);
+CREATE TRIGGER "log_event"
+  AFTER INSERT OR UPDATE OR DELETE ON "author"
+  FOR EACH ROW
+  EXECUTE PROCEDURE "system"."trigger_event"($pga$id$pga$);
+CREATE CONSTRAINT TRIGGER "log_event_trx"
+  AFTER INSERT OR UPDATE OR DELETE ON "author"
+  DEFERRABLE INITIALLY DEFERRED
+  FOR EACH ROW
+  EXECUTE PROCEDURE "system"."trigger_event_commit"();"
+,
+        
+"ALTER TABLE "article"
+  ADD "title" text;"
+,
+        
+"ALTER TABLE "author"
+  ADD "name" text;"
+,
+        
+"ALTER TABLE "article"
+  ADD "author_id" uuid;
+ALTER TABLE "article"
+		ADD FOREIGN KEY ("author_id") 
+		REFERENCES "author"("id") ON DELETE NO ACTION DEFERRABLE INITIALLY IMMEDIATE;
+CREATE INDEX ON "article" ("author_id");"
+,
+      ],
+      [
+        "ALTER TABLE "article" RENAME "author_id" TO "writer_id";",
+      ],
+      [
+        
+"ALTER TABLE "article" DROP CONSTRAINT "article_author_id_fkey";
+ALTER TABLE "article"
+		ADD FOREIGN KEY ("writer_id") 
+		REFERENCES "author"("id") ON DELETE CASCADE DEFERRABLE INITIALLY IMMEDIATE;"
+,
+      ],
+    ],
+  },
+  "together": {
+    "catalog": [
+      "CREATE INDEX article_author_id_idx ON stage_live.article USING btree (writer_id)",
+      "CREATE UNIQUE INDEX article_pkey ON stage_live.article USING btree (id)",
+      "CREATE UNIQUE INDEX author_pkey ON stage_live.author USING btree (id)",
+      "stage_live.article article_author_id_fkey FOREIGN KEY (writer_id) REFERENCES stage_live.author(id) DEFERRABLE",
+      "stage_live.article article_writer_id_fkey FOREIGN KEY (writer_id) REFERENCES stage_live.author(id) ON DELETE CASCADE DEFERRABLE",
+    ],
+    "sql": [
+      [
+        
+"CREATE TABLE "article" (
+  "id" uuid PRIMARY KEY NOT NULL
+);
+CREATE TRIGGER "log_event"
+  AFTER INSERT OR UPDATE OR DELETE ON "article"
+  FOR EACH ROW
+  EXECUTE PROCEDURE "system"."trigger_event"($pga$id$pga$);
+CREATE CONSTRAINT TRIGGER "log_event_trx"
+  AFTER INSERT OR UPDATE OR DELETE ON "article"
+  DEFERRABLE INITIALLY DEFERRED
+  FOR EACH ROW
+  EXECUTE PROCEDURE "system"."trigger_event_commit"();"
+,
+        
+"CREATE TABLE "author" (
+  "id" uuid PRIMARY KEY NOT NULL
+);
+CREATE TRIGGER "log_event"
+  AFTER INSERT OR UPDATE OR DELETE ON "author"
+  FOR EACH ROW
+  EXECUTE PROCEDURE "system"."trigger_event"($pga$id$pga$);
+CREATE CONSTRAINT TRIGGER "log_event_trx"
+  AFTER INSERT OR UPDATE OR DELETE ON "author"
+  DEFERRABLE INITIALLY DEFERRED
+  FOR EACH ROW
+  EXECUTE PROCEDURE "system"."trigger_event_commit"();"
+,
+        
+"ALTER TABLE "article"
+  ADD "title" text;"
+,
+        
+"ALTER TABLE "author"
+  ADD "name" text;"
+,
+        
+"ALTER TABLE "article"
+  ADD "author_id" uuid;
+ALTER TABLE "article"
+		ADD FOREIGN KEY ("author_id") 
+		REFERENCES "author"("id") ON DELETE NO ACTION DEFERRABLE INITIALLY IMMEDIATE;
+CREATE INDEX ON "article" ("author_id");"
+,
+      ],
+      [
+        "ALTER TABLE "article" RENAME "author_id" TO "writer_id";",
+        
+"ALTER TABLE "article"
+		ADD FOREIGN KEY ("writer_id") 
+		REFERENCES "author"("id") ON DELETE CASCADE DEFERRABLE INITIALLY IMMEDIATE;"
+,
+      ],
+    ],
+  },
+}
+`;
+
+exports[`replaying the playground history in one call or one migration per call 1`] = `
+{
+  "catalog": [
+    "CREATE UNIQUE INDEX acl_branch_code_key ON stage_live.acl_branch USING btree (code)",
+    "CREATE UNIQUE INDEX acl_branch_pkey ON stage_live.acl_branch USING btree (id)",
+    "CREATE UNIQUE INDEX acl_restricted_value_pkey ON stage_live.acl_restricted_value USING btree (id)",
+    "CREATE UNIQUE INDEX actions_entry_pkey ON stage_live.actions_entry USING btree (id)",
+    "CREATE UNIQUE INDEX block_image_id_key ON stage_live.block USING btree (image_id)",
+    "CREATE INDEX block_list_id_idx ON stage_live.block USING btree (list_id)",
+    "CREATE UNIQUE INDEX block_pkey ON stage_live.block USING btree (id)",
+    "CREATE UNIQUE INDEX block_image_pkey ON stage_live.block_image USING btree (id)",
+    "CREATE UNIQUE INDEX block_list_pkey ON stage_live.block_list USING btree (id)",
+    "CREATE INDEX block_list_primary_block_id_idx ON stage_live.block_list USING btree (primary_block_id)",
+    "CREATE UNIQUE INDEX block_list_unique_key ON stage_live.block_list USING btree ("unique")",
+    "CREATE UNIQUE INDEX board_tag_pkey ON stage_live.board_tag USING btree (id)",
+    "CREATE UNIQUE INDEX board_tag_slug_key ON stage_live.board_tag USING btree (slug)",
+    "CREATE INDEX board_task_assignee_id_idx ON stage_live.board_task USING btree (assignee_id)",
+    "CREATE UNIQUE INDEX board_task_pkey ON stage_live.board_task USING btree (id)",
+    "CREATE UNIQUE INDEX board_task_tags_pkey ON stage_live.board_task_tags USING btree (board_task_id, board_tag_id)",
+    "CREATE UNIQUE INDEX board_user_pkey ON stage_live.board_user USING btree (id)",
+    "CREATE UNIQUE INDEX board_user_username_key ON stage_live.board_user USING btree (username)",
+    "CREATE UNIQUE INDEX dimensions_item_pkey ON stage_live.dimensions_item USING btree (id)",
+    "CREATE UNIQUE INDEX dimensions_item_unique_key ON stage_live.dimensions_item USING btree ("unique")",
+    "CREATE INDEX dimensions_item_locale_item_id_idx ON stage_live.dimensions_item_locale USING btree (item_id)",
+    "CREATE UNIQUE INDEX dimensions_item_locale_item_id_locale_id_key ON stage_live.dimensions_item_locale USING btree (item_id, locale_id)",
+    "CREATE INDEX dimensions_item_locale_locale_id_idx ON stage_live.dimensions_item_locale USING btree (locale_id)",
+    "CREATE UNIQUE INDEX dimensions_item_locale_pkey ON stage_live.dimensions_item_locale USING btree (id)",
+    "CREATE UNIQUE INDEX dimensions_locale_code_key ON stage_live.dimensions_locale USING btree (code)",
+    "CREATE UNIQUE INDEX dimensions_locale_pkey ON stage_live.dimensions_locale USING btree (id)",
+    "CREATE UNIQUE INDEX editor_content_pkey ON stage_live.editor_content USING btree (id)",
+    "CREATE UNIQUE INDEX editor_content_unique_key ON stage_live.editor_content USING btree ("unique")",
+    "CREATE UNIQUE INDEX editor_image_pkey ON stage_live.editor_image USING btree (id)",
+    "CREATE UNIQUE INDEX editor_link_pkey ON stage_live.editor_link USING btree (id)",
+    "CREATE INDEX editor_reference_content_id_idx ON stage_live.editor_reference USING btree (content_id)",
+    "CREATE INDEX editor_reference_image_id_idx ON stage_live.editor_reference USING btree (image_id)",
+    "CREATE INDEX editor_reference_link_id_idx ON stage_live.editor_reference USING btree (link_id)",
+    "CREATE UNIQUE INDEX editor_reference_pkey ON stage_live.editor_reference USING btree (id)",
+    "CREATE UNIQUE INDEX editor_text_area_pkey ON stage_live.editor_text_area USING btree (id)",
+    "CREATE UNIQUE INDEX editor_text_area_unique_key ON stage_live.editor_text_area USING btree ("unique")",
+    "CREATE UNIQUE INDEX extend_tree_many_pkey ON stage_live.extend_tree_many USING btree (id)",
+    "CREATE UNIQUE INDEX extend_tree_single_pkey ON stage_live.extend_tree_single USING btree (id)",
+    "CREATE UNIQUE INDEX extend_tree_single_unique_key ON stage_live.extend_tree_single USING btree ("unique")",
+    "CREATE INDEX folder_parent_id_idx ON stage_live.folder USING btree (parent_id)",
+    "CREATE UNIQUE INDEX folder_pkey ON stage_live.folder USING btree (id)",
+    "CREATE INDEX form_article_author_id_idx ON stage_live.form_article USING btree (author_id)",
+    "CREATE UNIQUE INDEX form_article_pkey ON stage_live.form_article USING btree (id)",
+    "CREATE INDEX form_article_locale_article_id_idx ON stage_live.form_article_locale USING btree (article_id)",
+    "CREATE UNIQUE INDEX form_article_locale_article_id_locale_key ON stage_live.form_article_locale USING btree (article_id, locale)",
+    "CREATE UNIQUE INDEX form_article_locale_pkey ON stage_live.form_article_locale USING btree (id)",
+    "CREATE UNIQUE INDEX form_article_locale_slug_key ON stage_live.form_article_locale USING btree (slug)",
+    "CREATE UNIQUE INDEX form_article_tags_pkey ON stage_live.form_article_tags USING btree (form_article_id, form_tag_id)",
+    "CREATE UNIQUE INDEX form_author_pkey ON stage_live.form_author USING btree (id)",
+    "CREATE UNIQUE INDEX form_author_slug_key ON stage_live.form_author USING btree (slug)",
+    "CREATE INDEX form_note_article_id_idx ON stage_live.form_note USING btree (article_id)",
+    "CREATE UNIQUE INDEX form_note_pkey ON stage_live.form_note USING btree (id)",
+    "CREATE UNIQUE INDEX form_tag_pkey ON stage_live.form_tag USING btree (id)",
+    "CREATE UNIQUE INDEX form_tag_slug_key ON stage_live.form_tag USING btree (slug)",
+    "CREATE INDEX grid_article_author_id_idx ON stage_live.grid_article USING btree (author_id)",
+    "CREATE INDEX grid_article_category_id_idx ON stage_live.grid_article USING btree (category_id)",
+    "CREATE UNIQUE INDEX grid_article_pkey ON stage_live.grid_article USING btree (id)",
+    "CREATE UNIQUE INDEX grid_article_slug_key ON stage_live.grid_article USING btree (slug)",
+    "CREATE INDEX grid_article_comment_article_id_idx ON stage_live.grid_article_comment USING btree (article_id)",
+    "CREATE INDEX grid_article_comment_author_id_idx ON stage_live.grid_article_comment USING btree (author_id)",
+    "CREATE UNIQUE INDEX grid_article_comment_pkey ON stage_live.grid_article_comment USING btree (id)",
+    "CREATE UNIQUE INDEX grid_article_tags_pkey ON stage_live.grid_article_tags USING btree (grid_article_id, grid_tag_id)",
+    "CREATE UNIQUE INDEX grid_author_pkey ON stage_live.grid_author USING btree (id)",
+    "CREATE UNIQUE INDEX grid_author_slug_key ON stage_live.grid_author USING btree (slug)",
+    "CREATE UNIQUE INDEX grid_category_pkey ON stage_live.grid_category USING btree (id)",
+    "CREATE UNIQUE INDEX grid_category_slug_key ON stage_live.grid_category USING btree (slug)",
+    "CREATE UNIQUE INDEX grid_tag_pkey ON stage_live.grid_tag USING btree (id)",
+    "CREATE UNIQUE INDEX grid_tag_slug_key ON stage_live.grid_tag USING btree (slug)",
+    "CREATE UNIQUE INDEX hooks_value_pkey ON stage_live.hooks_value USING btree (id)",
+    "CREATE UNIQUE INDEX input_root_pkey ON stage_live.input_root USING btree (id)",
+    "CREATE UNIQUE INDEX input_root_unique_key ON stage_live.input_root USING btree ("unique")",
+    "CREATE UNIQUE INDEX input_rules_pkey ON stage_live.input_rules USING btree (id)",
+    "CREATE UNIQUE INDEX input_rules_unique_value_key ON stage_live.input_rules USING btree (unique_value)",
+    "CREATE INDEX legacy_editor_block_content_id_idx ON stage_live.legacy_editor_block USING btree (content_id)",
+    "CREATE UNIQUE INDEX legacy_editor_block_pkey ON stage_live.legacy_editor_block USING btree (id)",
+    "CREATE UNIQUE INDEX legacy_editor_content_pkey ON stage_live.legacy_editor_content USING btree (id)",
+    "CREATE UNIQUE INDEX legacy_editor_content_unique_key ON stage_live.legacy_editor_content USING btree ("unique")",
+    "CREATE UNIQUE INDEX legacy_editor_embed_pkey ON stage_live.legacy_editor_embed USING btree (id)",
+    "CREATE UNIQUE INDEX legacy_editor_image_pkey ON stage_live.legacy_editor_image USING btree (id)",
+    "CREATE UNIQUE INDEX legacy_editor_link_pkey ON stage_live.legacy_editor_link USING btree (id)",
+    "CREATE INDEX legacy_editor_reference_block_id_idx ON stage_live.legacy_editor_reference USING btree (block_id)",
+    "CREATE UNIQUE INDEX legacy_editor_reference_embed_id_key ON stage_live.legacy_editor_reference USING btree (embed_id)",
+    "CREATE INDEX legacy_editor_reference_image_id_idx ON stage_live.legacy_editor_reference USING btree (image_id)",
+    "CREATE UNIQUE INDEX legacy_editor_reference_pkey ON stage_live.legacy_editor_reference USING btree (id)",
+    "CREATE UNIQUE INDEX legacy_editor_reference_target_id_key ON stage_live.legacy_editor_reference USING btree (target_id)",
+    "CREATE UNIQUE INDEX plate_editor_content_pkey ON stage_live.plate_editor_content USING btree (id)",
+    "CREATE UNIQUE INDEX plate_editor_content_unique_key ON stage_live.plate_editor_content USING btree ("unique")",
+    "CREATE UNIQUE INDEX repeater_item_pkey ON stage_live.repeater_item USING btree (id)",
+    "CREATE INDEX repeater_item_relation_id_idx ON stage_live.repeater_item USING btree (relation_id)",
+    "CREATE INDEX repeater_item_root_id_idx ON stage_live.repeater_item USING btree (root_id)",
+    "CREATE UNIQUE INDEX repeater_relation_pkey ON stage_live.repeater_relation USING btree (id)",
+    "CREATE UNIQUE INDEX repeater_root_pkey ON stage_live.repeater_root USING btree (id)",
+    "CREATE UNIQUE INDEX repeater_root_unique_key ON stage_live.repeater_root USING btree ("unique")",
+    "CREATE UNIQUE INDEX select_item_pkey ON stage_live.select_item USING btree (id)",
+    "CREATE INDEX select_item_root_id_idx ON stage_live.select_item USING btree (root_id)",
+    "CREATE INDEX select_item_value_id_idx ON stage_live.select_item USING btree (value_id)",
+    "CREATE UNIQUE INDEX select_root_has_one_id_key ON stage_live.select_root USING btree (has_one_id)",
+    "CREATE UNIQUE INDEX select_root_pkey ON stage_live.select_root USING btree (id)",
+    "CREATE UNIQUE INDEX select_root_unique_key ON stage_live.select_root USING btree ("unique")",
+    "CREATE UNIQUE INDEX select_root_has_many_pkey ON stage_live.select_root_has_many USING btree (select_root_id, select_value_id)",
+    "CREATE UNIQUE INDEX select_value_pkey ON stage_live.select_value USING btree (id)",
+    "CREATE UNIQUE INDEX select_value_slug_key ON stage_live.select_value USING btree (slug)",
+    "CREATE INDEX slug_category_id_idx ON stage_live.slug USING btree (category_id)",
+    "CREATE UNIQUE INDEX slug_pkey ON stage_live.slug USING btree (id)",
+    "CREATE UNIQUE INDEX slug_unique_key ON stage_live.slug USING btree ("unique")",
+    "CREATE UNIQUE INDEX slug_category_pkey ON stage_live.slug_category USING btree (id)",
+    "CREATE UNIQUE INDEX upload_audio_meta_id_key ON stage_live.upload_audio USING btree (meta_id)",
+    "CREATE UNIQUE INDEX upload_audio_pkey ON stage_live.upload_audio USING btree (id)",
+    "CREATE UNIQUE INDEX upload_file_meta_id_key ON stage_live.upload_file USING btree (meta_id)",
+    "CREATE UNIQUE INDEX upload_file_pkey ON stage_live.upload_file USING btree (id)",
+    "CREATE UNIQUE INDEX upload_file_metadata_pkey ON stage_live.upload_file_metadata USING btree (id)",
+    "CREATE UNIQUE INDEX upload_gallery_pkey ON stage_live.upload_gallery USING btree (id)",
+    "CREATE UNIQUE INDEX upload_gallery_item_audio_id_key ON stage_live.upload_gallery_item USING btree (audio_id)",
+    "CREATE UNIQUE INDEX upload_gallery_item_file_id_key ON stage_live.upload_gallery_item USING btree (file_id)",
+    "CREATE INDEX upload_gallery_item_gallery_id_idx ON stage_live.upload_gallery_item USING btree (gallery_id)",
+    "CREATE UNIQUE INDEX upload_gallery_item_image_id_key ON stage_live.upload_gallery_item USING btree (image_id)",
+    "CREATE UNIQUE INDEX upload_gallery_item_pkey ON stage_live.upload_gallery_item USING btree (id)",
+    "CREATE UNIQUE INDEX upload_gallery_item_video_id_key ON stage_live.upload_gallery_item USING btree (video_id)",
+    "CREATE UNIQUE INDEX upload_image_meta_id_key ON stage_live.upload_image USING btree (meta_id)",
+    "CREATE UNIQUE INDEX upload_image_pkey ON stage_live.upload_image USING btree (id)",
+    "CREATE UNIQUE INDEX upload_image_list_pkey ON stage_live.upload_image_list USING btree (id)",
+    "CREATE UNIQUE INDEX upload_image_list_item_image_id_key ON stage_live.upload_image_list_item USING btree (image_id)",
+    "CREATE INDEX upload_image_list_item_list_id_idx ON stage_live.upload_image_list_item USING btree (list_id)",
+    "CREATE UNIQUE INDEX upload_image_list_item_pkey ON stage_live.upload_image_list_item USING btree (id)",
+    "CREATE UNIQUE INDEX upload_list_pkey ON stage_live.upload_list USING btree (id)",
+    "CREATE INDEX upload_list_item_item_id_idx ON stage_live.upload_list_item USING btree (item_id)",
+    "CREATE INDEX upload_list_item_list_id_idx ON stage_live.upload_list_item USING btree (list_id)",
+    "CREATE UNIQUE INDEX upload_list_item_pkey ON stage_live.upload_list_item USING btree (id)",
+    "CREATE UNIQUE INDEX upload_medium_audio_id_key ON stage_live.upload_medium USING btree (audio_id)",
+    "CREATE UNIQUE INDEX upload_medium_file_id_key ON stage_live.upload_medium USING btree (file_id)",
+    "CREATE UNIQUE INDEX upload_medium_image_id_key ON stage_live.upload_medium USING btree (image_id)",
+    "CREATE UNIQUE INDEX upload_medium_pkey ON stage_live.upload_medium USING btree (id)",
+    "CREATE UNIQUE INDEX upload_medium_video_id_key ON stage_live.upload_medium USING btree (video_id)",
+    "CREATE UNIQUE INDEX upload_root_audio_id_key ON stage_live.upload_root USING btree (audio_id)",
+    "CREATE UNIQUE INDEX upload_root_file_id_key ON stage_live.upload_root USING btree (file_id)",
+    "CREATE UNIQUE INDEX upload_root_gallery_id_key ON stage_live.upload_root USING btree (gallery_id)",
+    "CREATE UNIQUE INDEX upload_root_image_id_key ON stage_live.upload_root USING btree (image_id)",
+    "CREATE UNIQUE INDEX upload_root_image_list_id_key ON stage_live.upload_root USING btree (image_list_id)",
+    "CREATE UNIQUE INDEX upload_root_image_trivial_id_key ON stage_live.upload_root USING btree (image_trivial_id)",
+    "CREATE UNIQUE INDEX upload_root_list_id_key ON stage_live.upload_root USING btree (list_id)",
+    "CREATE UNIQUE INDEX upload_root_medium_id_key ON stage_live.upload_root USING btree (medium_id)",
+    "CREATE UNIQUE INDEX upload_root_pkey ON stage_live.upload_root USING btree (id)",
+    "CREATE UNIQUE INDEX upload_root_unique_key ON stage_live.upload_root USING btree ("unique")",
+    "CREATE UNIQUE INDEX upload_root_video_id_key ON stage_live.upload_root USING btree (video_id)",
+    "CREATE UNIQUE INDEX upload_video_meta_id_key ON stage_live.upload_video USING btree (meta_id)",
+    "CREATE UNIQUE INDEX upload_video_pkey ON stage_live.upload_video USING btree (id)",
+    "stage_live.acl_branch acl_branch_code_key UNIQUE (code)",
+    "stage_live.block block_image_id_fkey FOREIGN KEY (image_id) REFERENCES stage_live.block_image(id) DEFERRABLE",
+    "stage_live.block block_image_id_key UNIQUE (image_id)",
+    "stage_live.block block_list_id_fkey FOREIGN KEY (list_id) REFERENCES stage_live.block_list(id) DEFERRABLE",
+    "stage_live.block_list block_list_primary_block_id_fkey FOREIGN KEY (primary_block_id) REFERENCES stage_live.block(id) ON DELETE SET NULL DEFERRABLE",
+    "stage_live.block_list block_list_unique_key UNIQUE ("unique")",
+    "stage_live.board_tag board_tag_slug_key UNIQUE (slug)",
+    "stage_live.board_task board_task_assignee_id_fkey FOREIGN KEY (assignee_id) REFERENCES stage_live.board_user(id) ON DELETE SET NULL DEFERRABLE",
+    "stage_live.board_task_tags board_task_tags_board_tag_id_fkey FOREIGN KEY (board_tag_id) REFERENCES stage_live.board_tag(id) ON DELETE CASCADE",
+    "stage_live.board_task_tags board_task_tags_board_task_id_fkey FOREIGN KEY (board_task_id) REFERENCES stage_live.board_task(id) ON DELETE CASCADE",
+    "stage_live.board_user board_user_username_key UNIQUE (username)",
+    "stage_live.dimensions_item dimensions_item_unique_key UNIQUE ("unique")",
+    "stage_live.dimensions_item_locale dimensions_item_locale_item_id_fkey FOREIGN KEY (item_id) REFERENCES stage_live.dimensions_item(id) DEFERRABLE",
+    "stage_live.dimensions_item_locale dimensions_item_locale_item_id_locale_id_key UNIQUE (item_id, locale_id)",
+    "stage_live.dimensions_item_locale dimensions_item_locale_locale_id_fkey FOREIGN KEY (locale_id) REFERENCES stage_live.dimensions_locale(id) DEFERRABLE",
+    "stage_live.dimensions_locale dimensions_locale_code_key UNIQUE (code)",
+    "stage_live.editor_content editor_content_unique_key UNIQUE ("unique")",
+    "stage_live.editor_reference editor_reference_content_id_fkey FOREIGN KEY (content_id) REFERENCES stage_live.editor_content(id) DEFERRABLE",
+    "stage_live.editor_reference editor_reference_image_id_fkey FOREIGN KEY (image_id) REFERENCES stage_live.editor_image(id) DEFERRABLE",
+    "stage_live.editor_reference editor_reference_link_id_fkey FOREIGN KEY (link_id) REFERENCES stage_live.editor_link(id) DEFERRABLE",
+    "stage_live.editor_text_area editor_text_area_unique_key UNIQUE ("unique")",
+    "stage_live.extend_tree_single extend_tree_single_unique_key UNIQUE ("unique")",
+    "stage_live.folder folder_parent_id_fkey FOREIGN KEY (parent_id) REFERENCES stage_live.folder(id) DEFERRABLE",
+    "stage_live.form_article form_article_author_id_fkey FOREIGN KEY (author_id) REFERENCES stage_live.form_author(id) ON DELETE SET NULL DEFERRABLE",
+    "stage_live.form_article_locale form_article_locale_article_id_fkey FOREIGN KEY (article_id) REFERENCES stage_live.form_article(id) ON DELETE CASCADE DEFERRABLE",
+    "stage_live.form_article_locale form_article_locale_article_id_locale_key UNIQUE (article_id, locale)",
+    "stage_live.form_article_locale form_article_locale_slug_key UNIQUE (slug)",
+    "stage_live.form_article_tags form_article_tags_form_article_id_fkey FOREIGN KEY (form_article_id) REFERENCES stage_live.form_article(id) ON DELETE CASCADE",
+    "stage_live.form_article_tags form_article_tags_form_tag_id_fkey FOREIGN KEY (form_tag_id) REFERENCES stage_live.form_tag(id) ON DELETE CASCADE",
+    "stage_live.form_author form_author_slug_key UNIQUE (slug)",
+    "stage_live.form_note form_note_article_id_fkey FOREIGN KEY (article_id) REFERENCES stage_live.form_article(id) ON DELETE CASCADE DEFERRABLE",
+    "stage_live.form_tag form_tag_slug_key UNIQUE (slug)",
+    "stage_live.grid_article grid_article_author_id_fkey FOREIGN KEY (author_id) REFERENCES stage_live.grid_author(id) DEFERRABLE",
+    "stage_live.grid_article grid_article_category_id_fkey FOREIGN KEY (category_id) REFERENCES stage_live.grid_category(id) DEFERRABLE",
+    "stage_live.grid_article grid_article_slug_key UNIQUE (slug)",
+    "stage_live.grid_article_comment grid_article_comment_article_id_fkey FOREIGN KEY (article_id) REFERENCES stage_live.grid_article(id) ON DELETE CASCADE DEFERRABLE",
+    "stage_live.grid_article_comment grid_article_comment_author_id_fkey FOREIGN KEY (author_id) REFERENCES stage_live.grid_author(id) ON DELETE CASCADE DEFERRABLE",
+    "stage_live.grid_article_tags grid_article_tags_grid_article_id_fkey FOREIGN KEY (grid_article_id) REFERENCES stage_live.grid_article(id) ON DELETE CASCADE",
+    "stage_live.grid_article_tags grid_article_tags_grid_tag_id_fkey FOREIGN KEY (grid_tag_id) REFERENCES stage_live.grid_tag(id) ON DELETE CASCADE",
+    "stage_live.grid_author grid_author_slug_key UNIQUE (slug)",
+    "stage_live.grid_category grid_category_slug_key UNIQUE (slug)",
+    "stage_live.grid_tag grid_tag_slug_key UNIQUE (slug)",
+    "stage_live.input_root input_root_unique_key UNIQUE ("unique")",
+    "stage_live.input_rules input_rules_unique_value_key UNIQUE (unique_value)",
+    "stage_live.legacy_editor_block legacy_editor_block_content_id_fkey FOREIGN KEY (content_id) REFERENCES stage_live.legacy_editor_content(id) DEFERRABLE",
+    "stage_live.legacy_editor_content legacy_editor_content_unique_key UNIQUE ("unique")",
+    "stage_live.legacy_editor_reference legacy_editor_reference_block_id_fkey FOREIGN KEY (block_id) REFERENCES stage_live.legacy_editor_block(id) ON DELETE CASCADE DEFERRABLE",
+    "stage_live.legacy_editor_reference legacy_editor_reference_embed_id_fkey FOREIGN KEY (embed_id) REFERENCES stage_live.legacy_editor_embed(id) DEFERRABLE",
+    "stage_live.legacy_editor_reference legacy_editor_reference_embed_id_key UNIQUE (embed_id)",
+    "stage_live.legacy_editor_reference legacy_editor_reference_image_id_fkey FOREIGN KEY (image_id) REFERENCES stage_live.legacy_editor_image(id) ON DELETE SET NULL DEFERRABLE",
+    "stage_live.legacy_editor_reference legacy_editor_reference_target_id_fkey FOREIGN KEY (target_id) REFERENCES stage_live.legacy_editor_link(id) ON DELETE SET NULL DEFERRABLE",
+    "stage_live.legacy_editor_reference legacy_editor_reference_target_id_key UNIQUE (target_id)",
+    "stage_live.plate_editor_content plate_editor_content_unique_key UNIQUE ("unique")",
+    "stage_live.repeater_item repeater_item_relation_id_fkey FOREIGN KEY (relation_id) REFERENCES stage_live.repeater_relation(id) DEFERRABLE",
+    "stage_live.repeater_item repeater_item_root_id_fkey FOREIGN KEY (root_id) REFERENCES stage_live.repeater_root(id) DEFERRABLE",
+    "stage_live.repeater_root repeater_root_unique_key UNIQUE ("unique")",
+    "stage_live.select_item select_item_root_id_fkey FOREIGN KEY (root_id) REFERENCES stage_live.select_root(id) DEFERRABLE",
+    "stage_live.select_item select_item_value_id_fkey FOREIGN KEY (value_id) REFERENCES stage_live.select_value(id) DEFERRABLE",
+    "stage_live.select_root select_root_has_one_id_fkey FOREIGN KEY (has_one_id) REFERENCES stage_live.select_value(id) DEFERRABLE",
+    "stage_live.select_root select_root_has_one_id_key UNIQUE (has_one_id)",
+    "stage_live.select_root select_root_unique_key UNIQUE ("unique")",
+    "stage_live.select_root_has_many select_root_has_many_select_root_id_fkey FOREIGN KEY (select_root_id) REFERENCES stage_live.select_root(id) ON DELETE CASCADE",
+    "stage_live.select_root_has_many select_root_has_many_select_value_id_fkey FOREIGN KEY (select_value_id) REFERENCES stage_live.select_value(id) ON DELETE CASCADE",
+    "stage_live.select_value select_value_slug_key UNIQUE (slug)",
+    "stage_live.slug slug_category_id_fkey FOREIGN KEY (category_id) REFERENCES stage_live.slug_category(id) DEFERRABLE",
+    "stage_live.slug slug_unique_key UNIQUE ("unique")",
+    "stage_live.upload_audio upload_audio_meta_id_fkey FOREIGN KEY (meta_id) REFERENCES stage_live.upload_file_metadata(id) DEFERRABLE",
+    "stage_live.upload_audio upload_audio_meta_id_key UNIQUE (meta_id)",
+    "stage_live.upload_file upload_file_meta_id_fkey FOREIGN KEY (meta_id) REFERENCES stage_live.upload_file_metadata(id) DEFERRABLE",
+    "stage_live.upload_file upload_file_meta_id_key UNIQUE (meta_id)",
+    "stage_live.upload_gallery_item upload_gallery_item_audio_id_fkey FOREIGN KEY (audio_id) REFERENCES stage_live.upload_audio(id) DEFERRABLE",
+    "stage_live.upload_gallery_item upload_gallery_item_audio_id_key UNIQUE (audio_id)",
+    "stage_live.upload_gallery_item upload_gallery_item_file_id_fkey FOREIGN KEY (file_id) REFERENCES stage_live.upload_file(id) DEFERRABLE",
+    "stage_live.upload_gallery_item upload_gallery_item_file_id_key UNIQUE (file_id)",
+    "stage_live.upload_gallery_item upload_gallery_item_gallery_id_fkey FOREIGN KEY (gallery_id) REFERENCES stage_live.upload_gallery(id) DEFERRABLE",
+    "stage_live.upload_gallery_item upload_gallery_item_image_id_fkey FOREIGN KEY (image_id) REFERENCES stage_live.upload_image(id) DEFERRABLE",
+    "stage_live.upload_gallery_item upload_gallery_item_image_id_key UNIQUE (image_id)",
+    "stage_live.upload_gallery_item upload_gallery_item_video_id_fkey FOREIGN KEY (video_id) REFERENCES stage_live.upload_video(id) DEFERRABLE",
+    "stage_live.upload_gallery_item upload_gallery_item_video_id_key UNIQUE (video_id)",
+    "stage_live.upload_image upload_image_meta_id_fkey FOREIGN KEY (meta_id) REFERENCES stage_live.upload_file_metadata(id) DEFERRABLE",
+    "stage_live.upload_image upload_image_meta_id_key UNIQUE (meta_id)",
+    "stage_live.upload_image_list_item upload_image_list_item_image_id_fkey FOREIGN KEY (image_id) REFERENCES stage_live.upload_image(id) DEFERRABLE",
+    "stage_live.upload_image_list_item upload_image_list_item_image_id_key UNIQUE (image_id)",
+    "stage_live.upload_image_list_item upload_image_list_item_list_id_fkey FOREIGN KEY (list_id) REFERENCES stage_live.upload_image_list(id) ON DELETE CASCADE DEFERRABLE",
+    "stage_live.upload_list_item upload_list_item_item_id_fkey FOREIGN KEY (item_id) REFERENCES stage_live.upload_medium(id) ON DELETE CASCADE DEFERRABLE",
+    "stage_live.upload_list_item upload_list_item_list_id_fkey FOREIGN KEY (list_id) REFERENCES stage_live.upload_list(id) ON DELETE CASCADE DEFERRABLE",
+    "stage_live.upload_medium upload_medium_audio_id_fkey FOREIGN KEY (audio_id) REFERENCES stage_live.upload_audio(id) DEFERRABLE",
+    "stage_live.upload_medium upload_medium_audio_id_key UNIQUE (audio_id)",
+    "stage_live.upload_medium upload_medium_file_id_fkey FOREIGN KEY (file_id) REFERENCES stage_live.upload_file(id) DEFERRABLE",
+    "stage_live.upload_medium upload_medium_file_id_key UNIQUE (file_id)",
+    "stage_live.upload_medium upload_medium_image_id_fkey FOREIGN KEY (image_id) REFERENCES stage_live.upload_image(id) DEFERRABLE",
+    "stage_live.upload_medium upload_medium_image_id_key UNIQUE (image_id)",
+    "stage_live.upload_medium upload_medium_video_id_fkey FOREIGN KEY (video_id) REFERENCES stage_live.upload_video(id) DEFERRABLE",
+    "stage_live.upload_medium upload_medium_video_id_key UNIQUE (video_id)",
+    "stage_live.upload_root upload_root_audio_id_fkey FOREIGN KEY (audio_id) REFERENCES stage_live.upload_audio(id) DEFERRABLE",
+    "stage_live.upload_root upload_root_audio_id_key UNIQUE (audio_id)",
+    "stage_live.upload_root upload_root_file_id_fkey FOREIGN KEY (file_id) REFERENCES stage_live.upload_file(id) DEFERRABLE",
+    "stage_live.upload_root upload_root_file_id_key UNIQUE (file_id)",
+    "stage_live.upload_root upload_root_gallery_id_fkey FOREIGN KEY (gallery_id) REFERENCES stage_live.upload_gallery(id) DEFERRABLE",
+    "stage_live.upload_root upload_root_gallery_id_key UNIQUE (gallery_id)",
+    "stage_live.upload_root upload_root_image_id_fkey FOREIGN KEY (image_id) REFERENCES stage_live.upload_image(id) DEFERRABLE",
+    "stage_live.upload_root upload_root_image_id_key UNIQUE (image_id)",
+    "stage_live.upload_root upload_root_image_list_id_fkey FOREIGN KEY (image_list_id) REFERENCES stage_live.upload_image_list(id) DEFERRABLE",
+    "stage_live.upload_root upload_root_image_list_id_key UNIQUE (image_list_id)",
+    "stage_live.upload_root upload_root_image_trivial_id_fkey FOREIGN KEY (image_trivial_id) REFERENCES stage_live.upload_image(id) DEFERRABLE",
+    "stage_live.upload_root upload_root_image_trivial_id_key UNIQUE (image_trivial_id)",
+    "stage_live.upload_root upload_root_list_id_fkey FOREIGN KEY (list_id) REFERENCES stage_live.upload_list(id) DEFERRABLE",
+    "stage_live.upload_root upload_root_list_id_key UNIQUE (list_id)",
+    "stage_live.upload_root upload_root_medium_id_fkey FOREIGN KEY (medium_id) REFERENCES stage_live.upload_medium(id) DEFERRABLE",
+    "stage_live.upload_root upload_root_medium_id_key UNIQUE (medium_id)",
+    "stage_live.upload_root upload_root_unique_key UNIQUE ("unique")",
+    "stage_live.upload_root upload_root_video_id_fkey FOREIGN KEY (video_id) REFERENCES stage_live.upload_video(id) DEFERRABLE",
+    "stage_live.upload_root upload_root_video_id_key UNIQUE (video_id)",
+    "stage_live.upload_video upload_video_meta_id_fkey FOREIGN KEY (meta_id) REFERENCES stage_live.upload_file_metadata(id) DEFERRABLE",
+    "stage_live.upload_video upload_video_meta_id_key UNIQUE (meta_id)",
+  ],
+  "sql": [
+    [
+      "CREATE DOMAIN "BoardTaskStatus" AS text CONSTRAINT "boardtaskstatus_check" CHECK (VALUE IN('backlog','todo','inProgress','done'));",
+      
+"CREATE TABLE "board_tag" (
+  "id" uuid PRIMARY KEY NOT NULL
+);
+CREATE TRIGGER "log_event"
+  AFTER INSERT OR UPDATE OR DELETE ON "board_tag"
+  FOR EACH ROW
+  EXECUTE PROCEDURE "system"."trigger_event"($pga$id$pga$);
+CREATE CONSTRAINT TRIGGER "log_event_trx"
+  AFTER INSERT OR UPDATE OR DELETE ON "board_tag"
+  DEFERRABLE INITIALLY DEFERRED
+  FOR EACH ROW
+  EXECUTE PROCEDURE "system"."trigger_event_commit"();"
+,
+      
+"CREATE TABLE "board_task" (
+  "id" uuid PRIMARY KEY NOT NULL
+);
+CREATE TRIGGER "log_event"
+  AFTER INSERT OR UPDATE OR DELETE ON "board_task"
+  FOR EACH ROW
+  EXECUTE PROCEDURE "system"."trigger_event"($pga$id$pga$);
+CREATE CONSTRAINT TRIGGER "log_event_trx"
+  AFTER INSERT OR UPDATE OR DELETE ON "board_task"
+  DEFERRABLE INITIALLY DEFERRED
+  FOR EACH ROW
+  EXECUTE PROCEDURE "system"."trigger_event_commit"();"
+,
+      
+"CREATE TABLE "board_user" (
+  "id" uuid PRIMARY KEY NOT NULL
+);
+CREATE TRIGGER "log_event"
+  AFTER INSERT OR UPDATE OR DELETE ON "board_user"
+  FOR EACH ROW
+  EXECUTE PROCEDURE "system"."trigger_event"($pga$id$pga$);
+CREATE CONSTRAINT TRIGGER "log_event_trx"
+  AFTER INSERT OR UPDATE OR DELETE ON "board_user"
+  DEFERRABLE INITIALLY DEFERRED
+  FOR EACH ROW
+  EXECUTE PROCEDURE "system"."trigger_event_commit"();"
+,
+      
+"ALTER TABLE "board_tag"
+  ADD "name" text NOT NULL;"
+,
+      
+"ALTER TABLE "board_tag"
+  ADD "color" text;"
+,
+      
+"ALTER TABLE "board_tag"
+  ADD "slug" text NOT NULL;"
+,
+      
+"ALTER TABLE "board_task"
+  ADD "title" text NOT NULL;"
+,
+      
+"ALTER TABLE "board_task"
+  ADD "description" text;"
+,
+      
+"ALTER TABLE "board_task"
+  ADD "status" "BoardTaskStatus";"
+,
+      
+"ALTER TABLE "board_user"
+  ADD "name" text NOT NULL;"
+,
+      
+"ALTER TABLE "board_user"
+  ADD "username" text NOT NULL;"
+,
+      
+"ALTER TABLE "board_task"
+  ADD "assignee_id" uuid;
+ALTER TABLE "board_task"
+		ADD FOREIGN KEY ("assignee_id") 
+		REFERENCES "board_user"("id") ON DELETE SET NULL DEFERRABLE INITIALLY IMMEDIATE;
+CREATE INDEX ON "board_task" ("assignee_id");"
+,
+      
+"CREATE TABLE "board_task_tags" (
+  "board_task_id" uuid NOT NULL REFERENCES "board_task"("id") ON DELETE CASCADE,
+  "board_tag_id" uuid NOT NULL REFERENCES "board_tag"("id") ON DELETE CASCADE
+);
+ALTER TABLE "board_task_tags" ADD PRIMARY KEY ("board_task_id", "board_tag_id");
+CREATE TRIGGER "log_event"
+  AFTER INSERT OR UPDATE OR DELETE ON "board_task_tags"
+  FOR EACH ROW
+  EXECUTE PROCEDURE "system"."trigger_event"($pga$board_task_id$pga$, $pga$board_tag_id$pga$);
+CREATE CONSTRAINT TRIGGER "log_event_trx"
+  AFTER INSERT OR UPDATE OR DELETE ON "board_task_tags"
+  DEFERRABLE INITIALLY DEFERRED
+  FOR EACH ROW
+  EXECUTE PROCEDURE "system"."trigger_event_commit"();"
+,
+      "ALTER TABLE "board_tag" ADD UNIQUE ("slug");",
+      "ALTER TABLE "board_user" ADD UNIQUE ("username");",
+      
+"ALTER TABLE "board_task"
+  ADD "order" integer;"
+,
+      
+"ALTER TABLE "board_user"
+  ADD "order" integer;"
+,
+      
+"CREATE TABLE "repeater_item" (
+  "id" uuid PRIMARY KEY NOT NULL
+);
+CREATE TRIGGER "log_event"
+  AFTER INSERT OR UPDATE OR DELETE ON "repeater_item"
+  FOR EACH ROW
+  EXECUTE PROCEDURE "system"."trigger_event"($pga$id$pga$);
+CREATE CONSTRAINT TRIGGER "log_event_trx"
+  AFTER INSERT OR UPDATE OR DELETE ON "repeater_item"
+  DEFERRABLE INITIALLY DEFERRED
+  FOR EACH ROW
+  EXECUTE PROCEDURE "system"."trigger_event_commit"();"
+,
+      
+"ALTER TABLE "repeater_item"
+  ADD "title" text NOT NULL;"
+,
+      
+"ALTER TABLE "repeater_item"
+  ADD "order" integer;"
+,
+      "CREATE DOMAIN "GridArticleState" AS text CONSTRAINT "gridarticlestate_check" CHECK (VALUE IN('published','draft','archived'));",
+      
+"CREATE TABLE "grid_article" (
+  "id" uuid PRIMARY KEY NOT NULL
+);
+CREATE TRIGGER "log_event"
+  AFTER INSERT OR UPDATE OR DELETE ON "grid_article"
+  FOR EACH ROW
+  EXECUTE PROCEDURE "system"."trigger_event"($pga$id$pga$);
+CREATE CONSTRAINT TRIGGER "log_event_trx"
+  AFTER INSERT OR UPDATE OR DELETE ON "grid_article"
+  DEFERRABLE INITIALLY DEFERRED
+  FOR EACH ROW
+  EXECUTE PROCEDURE "system"."trigger_event_commit"();"
+,
+      
+"CREATE TABLE "grid_author" (
+  "id" uuid PRIMARY KEY NOT NULL
+);
+CREATE TRIGGER "log_event"
+  AFTER INSERT OR UPDATE OR DELETE ON "grid_author"
+  FOR EACH ROW
+  EXECUTE PROCEDURE "system"."trigger_event"($pga$id$pga$);
+CREATE CONSTRAINT TRIGGER "log_event_trx"
+  AFTER INSERT OR UPDATE OR DELETE ON "grid_author"
+  DEFERRABLE INITIALLY DEFERRED
+  FOR EACH ROW
+  EXECUTE PROCEDURE "system"."trigger_event_commit"();"
+,
+      
+"CREATE TABLE "grid_category" (
+  "id" uuid PRIMARY KEY NOT NULL
+);
+CREATE TRIGGER "log_event"
+  AFTER INSERT OR UPDATE OR DELETE ON "grid_category"
+  FOR EACH ROW
+  EXECUTE PROCEDURE "system"."trigger_event"($pga$id$pga$);
+CREATE CONSTRAINT TRIGGER "log_event_trx"
+  AFTER INSERT OR UPDATE OR DELETE ON "grid_category"
+  DEFERRABLE INITIALLY DEFERRED
+  FOR EACH ROW
+  EXECUTE PROCEDURE "system"."trigger_event_commit"();"
+,
+      
+"CREATE TABLE "grid_tag" (
+  "id" uuid PRIMARY KEY NOT NULL
+);
+CREATE TRIGGER "log_event"
+  AFTER INSERT OR UPDATE OR DELETE ON "grid_tag"
+  FOR EACH ROW
+  EXECUTE PROCEDURE "system"."trigger_event"($pga$id$pga$);
+CREATE CONSTRAINT TRIGGER "log_event_trx"
+  AFTER INSERT OR UPDATE OR DELETE ON "grid_tag"
+  DEFERRABLE INITIALLY DEFERRED
+  FOR EACH ROW
+  EXECUTE PROCEDURE "system"."trigger_event_commit"();"
+,
+      
+"ALTER TABLE "grid_article"
+  ADD "title" text NOT NULL;"
+,
+      
+"ALTER TABLE "grid_article"
+  ADD "state" "GridArticleState" NOT NULL;"
+,
+      
+"ALTER TABLE "grid_article"
+  ADD "locked" boolean;
+UPDATE "grid_article"
+				 SET "locked" = false;
+SET CONSTRAINTS ALL IMMEDIATE;
+SET CONSTRAINTS ALL DEFERRED;
+ALTER TABLE "grid_article"
+  ALTER "locked" SET NOT NULL;"
+,
+      
+"ALTER TABLE "grid_article"
+  ADD "published_at" timestamptz;"
+,
+      
+"ALTER TABLE "grid_article"
+  ADD "slug" text NOT NULL;"
+,
+      
+"ALTER TABLE "grid_author"
+  ADD "name" text NOT NULL;"
+,
+      
+"ALTER TABLE "grid_author"
+  ADD "slug" text NOT NULL;"
+,
+      
+"ALTER TABLE "grid_category"
+  ADD "name" text NOT NULL;"
+,
+      
+"ALTER TABLE "grid_category"
+  ADD "slug" text NOT NULL;"
+,
+      
+"ALTER TABLE "grid_tag"
+  ADD "name" text NOT NULL;"
+,
+      
+"ALTER TABLE "grid_tag"
+  ADD "slug" text NOT NULL;"
+,
+      
+"ALTER TABLE "grid_article"
+  ADD "author_id" uuid;
+ALTER TABLE "grid_article"
+		ADD FOREIGN KEY ("author_id") 
+		REFERENCES "grid_author"("id") ON DELETE NO ACTION DEFERRABLE INITIALLY IMMEDIATE;
+CREATE INDEX ON "grid_article" ("author_id");"
+,
+      
+"ALTER TABLE "grid_article"
+  ADD "category_id" uuid;
+ALTER TABLE "grid_article"
+		ADD FOREIGN KEY ("category_id") 
+		REFERENCES "grid_category"("id") ON DELETE NO ACTION DEFERRABLE INITIALLY IMMEDIATE;
+CREATE INDEX ON "grid_article" ("category_id");"
+,
+      
+"CREATE TABLE "grid_article_tags" (
+  "grid_article_id" uuid NOT NULL REFERENCES "grid_article"("id") ON DELETE CASCADE,
+  "grid_tag_id" uuid NOT NULL REFERENCES "grid_tag"("id") ON DELETE CASCADE
+);
+ALTER TABLE "grid_article_tags" ADD PRIMARY KEY ("grid_article_id", "grid_tag_id");
+CREATE TRIGGER "log_event"
+  AFTER INSERT OR UPDATE OR DELETE ON "grid_article_tags"
+  FOR EACH ROW
+  EXECUTE PROCEDURE "system"."trigger_event"($pga$grid_article_id$pga$, $pga$grid_tag_id$pga$);
+CREATE CONSTRAINT TRIGGER "log_event_trx"
+  AFTER INSERT OR UPDATE OR DELETE ON "grid_article_tags"
+  DEFERRABLE INITIALLY DEFERRED
+  FOR EACH ROW
+  EXECUTE PROCEDURE "system"."trigger_event_commit"();"
+,
+      "ALTER TABLE "grid_article" ADD UNIQUE ("slug");",
+      "ALTER TABLE "grid_author" ADD UNIQUE ("slug");",
+      "ALTER TABLE "grid_category" ADD UNIQUE ("slug");",
+      "ALTER TABLE "grid_tag" ADD UNIQUE ("slug");",
+      
+"ALTER TABLE "grid_article"
+  ALTER "title" DROP NOT NULL;"
+,
+      
+"ALTER TABLE "grid_article"
+  ALTER "state" DROP NOT NULL;"
+,
+      
+"ALTER TABLE "grid_article"
+  ALTER "locked" DROP NOT NULL;"
+,
+      
+"ALTER TABLE "grid_article"
+  ADD "views" integer;"
+,
+      
+"ALTER TABLE "grid_article"
+  ADD "publish_date" date;"
+,
+      "CREATE DOMAIN "InputUnique" AS text CONSTRAINT "inputunique_check" CHECK (VALUE IN('unique'));",
+      "CREATE DOMAIN "InputRootEnumValue" AS text CONSTRAINT "inputrootenumvalue_check" CHECK (VALUE IN('a','b','c'));",
+      
+"CREATE TABLE "input_root" (
+  "id" uuid PRIMARY KEY NOT NULL
+);
+CREATE TRIGGER "log_event"
+  AFTER INSERT OR UPDATE OR DELETE ON "input_root"
+  FOR EACH ROW
+  EXECUTE PROCEDURE "system"."trigger_event"($pga$id$pga$);
+CREATE CONSTRAINT TRIGGER "log_event_trx"
+  AFTER INSERT OR UPDATE OR DELETE ON "input_root"
+  DEFERRABLE INITIALLY DEFERRED
+  FOR EACH ROW
+  EXECUTE PROCEDURE "system"."trigger_event_commit"();"
+,
+      
+"CREATE TABLE "input_rules" (
+  "id" uuid PRIMARY KEY NOT NULL
+);
+CREATE TRIGGER "log_event"
+  AFTER INSERT OR UPDATE OR DELETE ON "input_rules"
+  FOR EACH ROW
+  EXECUTE PROCEDURE "system"."trigger_event"($pga$id$pga$);
+CREATE CONSTRAINT TRIGGER "log_event_trx"
+  AFTER INSERT OR UPDATE OR DELETE ON "input_rules"
+  DEFERRABLE INITIALLY DEFERRED
+  FOR EACH ROW
+  EXECUTE PROCEDURE "system"."trigger_event_commit"();"
+,
+      
+"ALTER TABLE "input_root"
+  ADD "unique" "InputUnique" NOT NULL;"
+,
+      
+"ALTER TABLE "input_root"
+  ADD "text_value" text;"
+,
+      
+"ALTER TABLE "input_root"
+  ADD "int_value" integer;"
+,
+      
+"ALTER TABLE "input_root"
+  ADD "float_value" double precision;"
+,
+      
+"ALTER TABLE "input_root"
+  ADD "bool_value" boolean;"
+,
+      
+"ALTER TABLE "input_root"
+  ADD "date_value" date;"
+,
+      
+"ALTER TABLE "input_root"
+  ADD "datetime_value" timestamptz;"
+,
+      
+"ALTER TABLE "input_root"
+  ADD "json_value" jsonb;"
+,
+      
+"ALTER TABLE "input_root"
+  ADD "enum_value" "InputRootEnumValue";"
+,
+      
+"ALTER TABLE "input_root"
+  ADD "uuid_value" uuid;"
+,
+      
+"ALTER TABLE "input_rules"
+  ADD "unique" "InputUnique" NOT NULL;"
+,
+      
+"ALTER TABLE "input_rules"
+  ADD "not_null_value" text NOT NULL;"
+,
+      
+"ALTER TABLE "input_rules"
+  ADD "unique_value" text;"
+,
+      
+"ALTER TABLE "input_rules"
+  ADD "validation_value" text;"
+,
+      "ALTER TABLE "input_root" ADD UNIQUE ("unique");",
+      "ALTER TABLE "input_rules" ADD UNIQUE ("unique");",
+      "ALTER TABLE "input_rules" ADD UNIQUE ("unique_value");",
+      "",
+      "CREATE DOMAIN "SelectUnique" AS text CONSTRAINT "selectunique_check" CHECK (VALUE IN('unique'));",
+      
+"CREATE TABLE "select_item" (
+  "id" uuid PRIMARY KEY NOT NULL
+);
+CREATE TRIGGER "log_event"
+  AFTER INSERT OR UPDATE OR DELETE ON "select_item"
+  FOR EACH ROW
+  EXECUTE PROCEDURE "system"."trigger_event"($pga$id$pga$);
+CREATE CONSTRAINT TRIGGER "log_event_trx"
+  AFTER INSERT OR UPDATE OR DELETE ON "select_item"
+  DEFERRABLE INITIALLY DEFERRED
+  FOR EACH ROW
+  EXECUTE PROCEDURE "system"."trigger_event_commit"();"
+,
+      
+"CREATE TABLE "select_root" (
+  "id" uuid PRIMARY KEY NOT NULL
+);
+CREATE TRIGGER "log_event"
+  AFTER INSERT OR UPDATE OR DELETE ON "select_root"
+  FOR EACH ROW
+  EXECUTE PROCEDURE "system"."trigger_event"($pga$id$pga$);
+CREATE CONSTRAINT TRIGGER "log_event_trx"
+  AFTER INSERT OR UPDATE OR DELETE ON "select_root"
+  DEFERRABLE INITIALLY DEFERRED
+  FOR EACH ROW
+  EXECUTE PROCEDURE "system"."trigger_event_commit"();"
+,
+      
+"CREATE TABLE "select_value" (
+  "id" uuid PRIMARY KEY NOT NULL
+);
+CREATE TRIGGER "log_event"
+  AFTER INSERT OR UPDATE OR DELETE ON "select_value"
+  FOR EACH ROW
+  EXECUTE PROCEDURE "system"."trigger_event"($pga$id$pga$);
+CREATE CONSTRAINT TRIGGER "log_event_trx"
+  AFTER INSERT OR UPDATE OR DELETE ON "select_value"
+  DEFERRABLE INITIALLY DEFERRED
+  FOR EACH ROW
+  EXECUTE PROCEDURE "system"."trigger_event_commit"();"
+,
+      
+"ALTER TABLE "select_item"
+  ADD "order" integer;"
+,
+      
+"ALTER TABLE "select_root"
+  ADD "unique" "SelectUnique" NOT NULL;"
+,
+      
+"ALTER TABLE "select_value"
+  ADD "name" text NOT NULL;"
+,
+      
+"ALTER TABLE "select_value"
+  ADD "slug" text NOT NULL;"
+,
+      
+"ALTER TABLE "select_item"
+  ADD "root_id" uuid NOT NULL;
+ALTER TABLE "select_item"
+		ADD FOREIGN KEY ("root_id") 
+		REFERENCES "select_root"("id") ON DELETE NO ACTION DEFERRABLE INITIALLY IMMEDIATE;
+CREATE INDEX ON "select_item" ("root_id");"
+,
+      
+"ALTER TABLE "select_item"
+  ADD "value_id" uuid NOT NULL;
+ALTER TABLE "select_item"
+		ADD FOREIGN KEY ("value_id") 
+		REFERENCES "select_value"("id") ON DELETE NO ACTION DEFERRABLE INITIALLY IMMEDIATE;
+CREATE INDEX ON "select_item" ("value_id");"
+,
+      
+"ALTER TABLE "select_root"
+  ADD "has_one_id" uuid;
+ALTER TABLE "select_root"
+		ADD FOREIGN KEY ("has_one_id") 
+		REFERENCES "select_value"("id") ON DELETE NO ACTION DEFERRABLE INITIALLY IMMEDIATE;
+ALTER TABLE "select_root" ADD UNIQUE ("has_one_id");"
+,
+      
+"CREATE TABLE "select_root_has_many" (
+  "select_root_id" uuid NOT NULL REFERENCES "select_root"("id") ON DELETE CASCADE,
+  "select_value_id" uuid NOT NULL REFERENCES "select_value"("id") ON DELETE CASCADE
+);
+ALTER TABLE "select_root_has_many" ADD PRIMARY KEY ("select_root_id", "select_value_id");
+CREATE TRIGGER "log_event"
+  AFTER INSERT OR UPDATE OR DELETE ON "select_root_has_many"
+  FOR EACH ROW
+  EXECUTE PROCEDURE "system"."trigger_event"($pga$select_root_id$pga$, $pga$select_value_id$pga$);
+CREATE CONSTRAINT TRIGGER "log_event_trx"
+  AFTER INSERT OR UPDATE OR DELETE ON "select_root_has_many"
+  DEFERRABLE INITIALLY DEFERRED
+  FOR EACH ROW
+  EXECUTE PROCEDURE "system"."trigger_event_commit"();"
+,
+      "ALTER TABLE "select_root" ADD UNIQUE ("unique");",
+      "ALTER TABLE "select_value" ADD UNIQUE ("slug");",
+      "",
+      "",
+      "CREATE DOMAIN "UploadMediaType" AS text CONSTRAINT "uploadmediatype_check" CHECK (VALUE IN('image','video','audio','file'));",
+      "CREATE DOMAIN "UploadOne" AS text CONSTRAINT "uploadone_check" CHECK (VALUE IN('unique'));",
+      
+"CREATE TABLE "upload_audio" (
+  "id" uuid PRIMARY KEY NOT NULL
+);
+CREATE TRIGGER "log_event"
+  AFTER INSERT OR UPDATE OR DELETE ON "upload_audio"
+  FOR EACH ROW
+  EXECUTE PROCEDURE "system"."trigger_event"($pga$id$pga$);
+CREATE CONSTRAINT TRIGGER "log_event_trx"
+  AFTER INSERT OR UPDATE OR DELETE ON "upload_audio"
+  DEFERRABLE INITIALLY DEFERRED
+  FOR EACH ROW
+  EXECUTE PROCEDURE "system"."trigger_event_commit"();"
+,
+      
+"CREATE TABLE "upload_file" (
+  "id" uuid PRIMARY KEY NOT NULL
+);
+CREATE TRIGGER "log_event"
+  AFTER INSERT OR UPDATE OR DELETE ON "upload_file"
+  FOR EACH ROW
+  EXECUTE PROCEDURE "system"."trigger_event"($pga$id$pga$);
+CREATE CONSTRAINT TRIGGER "log_event_trx"
+  AFTER INSERT OR UPDATE OR DELETE ON "upload_file"
+  DEFERRABLE INITIALLY DEFERRED
+  FOR EACH ROW
+  EXECUTE PROCEDURE "system"."trigger_event_commit"();"
+,
+      
+"CREATE TABLE "upload_file_metadata" (
+  "id" uuid PRIMARY KEY NOT NULL
+);
+CREATE TRIGGER "log_event"
+  AFTER INSERT OR UPDATE OR DELETE ON "upload_file_metadata"
+  FOR EACH ROW
+  EXECUTE PROCEDURE "system"."trigger_event"($pga$id$pga$);
+CREATE CONSTRAINT TRIGGER "log_event_trx"
+  AFTER INSERT OR UPDATE OR DELETE ON "upload_file_metadata"
+  DEFERRABLE INITIALLY DEFERRED
+  FOR EACH ROW
+  EXECUTE PROCEDURE "system"."trigger_event_commit"();"
+,
+      
+"CREATE TABLE "upload_gallery" (
+  "id" uuid PRIMARY KEY NOT NULL
+);
+CREATE TRIGGER "log_event"
+  AFTER INSERT OR UPDATE OR DELETE ON "upload_gallery"
+  FOR EACH ROW
+  EXECUTE PROCEDURE "system"."trigger_event"($pga$id$pga$);
+CREATE CONSTRAINT TRIGGER "log_event_trx"
+  AFTER INSERT OR UPDATE OR DELETE ON "upload_gallery"
+  DEFERRABLE INITIALLY DEFERRED
+  FOR EACH ROW
+  EXECUTE PROCEDURE "system"."trigger_event_commit"();"
+,
+      
+"CREATE TABLE "upload_gallery_item" (
+  "id" uuid PRIMARY KEY NOT NULL
+);
+CREATE TRIGGER "log_event"
+  AFTER INSERT OR UPDATE OR DELETE ON "upload_gallery_item"
+  FOR EACH ROW
+  EXECUTE PROCEDURE "system"."trigger_event"($pga$id$pga$);
+CREATE CONSTRAINT TRIGGER "log_event_trx"
+  AFTER INSERT OR UPDATE OR DELETE ON "upload_gallery_item"
+  DEFERRABLE INITIALLY DEFERRED
+  FOR EACH ROW
+  EXECUTE PROCEDURE "system"."trigger_event_commit"();"
+,
+      
+"CREATE TABLE "upload_image" (
+  "id" uuid PRIMARY KEY NOT NULL
+);
+CREATE TRIGGER "log_event"
+  AFTER INSERT OR UPDATE OR DELETE ON "upload_image"
+  FOR EACH ROW
+  EXECUTE PROCEDURE "system"."trigger_event"($pga$id$pga$);
+CREATE CONSTRAINT TRIGGER "log_event_trx"
+  AFTER INSERT OR UPDATE OR DELETE ON "upload_image"
+  DEFERRABLE INITIALLY DEFERRED
+  FOR EACH ROW
+  EXECUTE PROCEDURE "system"."trigger_event_commit"();"
+,
+      
+"CREATE TABLE "upload_image_list" (
+  "id" uuid PRIMARY KEY NOT NULL
+);
+CREATE TRIGGER "log_event"
+  AFTER INSERT OR UPDATE OR DELETE ON "upload_image_list"
+  FOR EACH ROW
+  EXECUTE PROCEDURE "system"."trigger_event"($pga$id$pga$);
+CREATE CONSTRAINT TRIGGER "log_event_trx"
+  AFTER INSERT OR UPDATE OR DELETE ON "upload_image_list"
+  DEFERRABLE INITIALLY DEFERRED
+  FOR EACH ROW
+  EXECUTE PROCEDURE "system"."trigger_event_commit"();"
+,
+      
+"CREATE TABLE "upload_image_list_item" (
+  "id" uuid PRIMARY KEY NOT NULL
+);
+CREATE TRIGGER "log_event"
+  AFTER INSERT OR UPDATE OR DELETE ON "upload_image_list_item"
+  FOR EACH ROW
+  EXECUTE PROCEDURE "system"."trigger_event"($pga$id$pga$);
+CREATE CONSTRAINT TRIGGER "log_event_trx"
+  AFTER INSERT OR UPDATE OR DELETE ON "upload_image_list_item"
+  DEFERRABLE INITIALLY DEFERRED
+  FOR EACH ROW
+  EXECUTE PROCEDURE "system"."trigger_event_commit"();"
+,
+      
+"CREATE TABLE "upload_list" (
+  "id" uuid PRIMARY KEY NOT NULL
+);
+CREATE TRIGGER "log_event"
+  AFTER INSERT OR UPDATE OR DELETE ON "upload_list"
+  FOR EACH ROW
+  EXECUTE PROCEDURE "system"."trigger_event"($pga$id$pga$);
+CREATE CONSTRAINT TRIGGER "log_event_trx"
+  AFTER INSERT OR UPDATE OR DELETE ON "upload_list"
+  DEFERRABLE INITIALLY DEFERRED
+  FOR EACH ROW
+  EXECUTE PROCEDURE "system"."trigger_event_commit"();"
+,
+      
+"CREATE TABLE "upload_list_item" (
+  "id" uuid PRIMARY KEY NOT NULL
+);
+CREATE TRIGGER "log_event"
+  AFTER INSERT OR UPDATE OR DELETE ON "upload_list_item"
+  FOR EACH ROW
+  EXECUTE PROCEDURE "system"."trigger_event"($pga$id$pga$);
+CREATE CONSTRAINT TRIGGER "log_event_trx"
+  AFTER INSERT OR UPDATE OR DELETE ON "upload_list_item"
+  DEFERRABLE INITIALLY DEFERRED
+  FOR EACH ROW
+  EXECUTE PROCEDURE "system"."trigger_event_commit"();"
+,
+      
+"CREATE TABLE "upload_medium" (
+  "id" uuid PRIMARY KEY NOT NULL
+);
+CREATE TRIGGER "log_event"
+  AFTER INSERT OR UPDATE OR DELETE ON "upload_medium"
+  FOR EACH ROW
+  EXECUTE PROCEDURE "system"."trigger_event"($pga$id$pga$);
+CREATE CONSTRAINT TRIGGER "log_event_trx"
+  AFTER INSERT OR UPDATE OR DELETE ON "upload_medium"
+  DEFERRABLE INITIALLY DEFERRED
+  FOR EACH ROW
+  EXECUTE PROCEDURE "system"."trigger_event_commit"();"
+,
+      
+"CREATE TABLE "upload_root" (
+  "id" uuid PRIMARY KEY NOT NULL
+);
+CREATE TRIGGER "log_event"
+  AFTER INSERT OR UPDATE OR DELETE ON "upload_root"
+  FOR EACH ROW
+  EXECUTE PROCEDURE "system"."trigger_event"($pga$id$pga$);
+CREATE CONSTRAINT TRIGGER "log_event_trx"
+  AFTER INSERT OR UPDATE OR DELETE ON "upload_root"
+  DEFERRABLE INITIALLY DEFERRED
+  FOR EACH ROW
+  EXECUTE PROCEDURE "system"."trigger_event_commit"();"
+,
+      
+"CREATE TABLE "upload_video" (
+  "id" uuid PRIMARY KEY NOT NULL
+);
+CREATE TRIGGER "log_event"
+  AFTER INSERT OR UPDATE OR DELETE ON "upload_video"
+  FOR EACH ROW
+  EXECUTE PROCEDURE "system"."trigger_event"($pga$id$pga$);
+CREATE CONSTRAINT TRIGGER "log_event_trx"
+  AFTER INSERT OR UPDATE OR DELETE ON "upload_video"
+  DEFERRABLE INITIALLY DEFERRED
+  FOR EACH ROW
+  EXECUTE PROCEDURE "system"."trigger_event_commit"();"
+,
+      
+"ALTER TABLE "upload_audio"
+  ADD "url" text;"
+,
+      
+"ALTER TABLE "upload_audio"
+  ADD "duration" integer;"
+,
+      
+"ALTER TABLE "upload_file"
+  ADD "url" text;"
+,
+      
+"ALTER TABLE "upload_file"
+  ADD "duration" integer;"
+,
+      
+"ALTER TABLE "upload_file_metadata"
+  ADD "file_name" text;"
+,
+      
+"ALTER TABLE "upload_file_metadata"
+  ADD "last_modified" timestamptz;"
+,
+      
+"ALTER TABLE "upload_file_metadata"
+  ADD "file_size" integer;"
+,
+      
+"ALTER TABLE "upload_file_metadata"
+  ADD "file_type" text;"
+,
+      
+"ALTER TABLE "upload_gallery_item"
+  ADD "type" "UploadMediaType" NOT NULL;"
+,
+      
+"ALTER TABLE "upload_image"
+  ADD "url" text;"
+,
+      
+"ALTER TABLE "upload_image"
+  ADD "width" integer;"
+,
+      
+"ALTER TABLE "upload_image"
+  ADD "height" integer;"
+,
+      
+"ALTER TABLE "upload_image"
+  ADD "alt" text;"
+,
+      
+"ALTER TABLE "upload_image_list_item"
+  ADD "order" integer NOT NULL;"
+,
+      
+"ALTER TABLE "upload_list_item"
+  ADD "order" integer NOT NULL;"
+,
+      
+"ALTER TABLE "upload_medium"
+  ADD "type" "UploadMediaType" NOT NULL;"
+,
+      
+"ALTER TABLE "upload_root"
+  ADD "unique" "UploadOne" NOT NULL;"
+,
+      
+"ALTER TABLE "upload_video"
+  ADD "url" text;"
+,
+      
+"ALTER TABLE "upload_video"
+  ADD "width" integer;"
+,
+      
+"ALTER TABLE "upload_video"
+  ADD "height" integer;"
+,
+      
+"ALTER TABLE "upload_video"
+  ADD "duration" integer;"
+,
+      
+"ALTER TABLE "upload_audio"
+  ADD "meta_id" uuid;
+ALTER TABLE "upload_audio"
+		ADD FOREIGN KEY ("meta_id") 
+		REFERENCES "upload_file_metadata"("id") ON DELETE NO ACTION DEFERRABLE INITIALLY IMMEDIATE;
+ALTER TABLE "upload_audio" ADD UNIQUE ("meta_id");"
+,
+      
+"ALTER TABLE "upload_file"
+  ADD "meta_id" uuid;
+ALTER TABLE "upload_file"
+		ADD FOREIGN KEY ("meta_id") 
+		REFERENCES "upload_file_metadata"("id") ON DELETE NO ACTION DEFERRABLE INITIALLY IMMEDIATE;
+ALTER TABLE "upload_file" ADD UNIQUE ("meta_id");"
+,
+      
+"ALTER TABLE "upload_gallery_item"
+  ADD "gallery_id" uuid;
+ALTER TABLE "upload_gallery_item"
+		ADD FOREIGN KEY ("gallery_id") 
+		REFERENCES "upload_gallery"("id") ON DELETE NO ACTION DEFERRABLE INITIALLY IMMEDIATE;
+CREATE INDEX ON "upload_gallery_item" ("gallery_id");"
+,
+      
+"ALTER TABLE "upload_gallery_item"
+  ADD "image_id" uuid;
+ALTER TABLE "upload_gallery_item"
+		ADD FOREIGN KEY ("image_id") 
+		REFERENCES "upload_image"("id") ON DELETE NO ACTION DEFERRABLE INITIALLY IMMEDIATE;
+ALTER TABLE "upload_gallery_item" ADD UNIQUE ("image_id");"
+,
+      
+"ALTER TABLE "upload_gallery_item"
+  ADD "video_id" uuid;
+ALTER TABLE "upload_gallery_item"
+		ADD FOREIGN KEY ("video_id") 
+		REFERENCES "upload_video"("id") ON DELETE NO ACTION DEFERRABLE INITIALLY IMMEDIATE;
+ALTER TABLE "upload_gallery_item" ADD UNIQUE ("video_id");"
+,
+      
+"ALTER TABLE "upload_gallery_item"
+  ADD "audio_id" uuid;
+ALTER TABLE "upload_gallery_item"
+		ADD FOREIGN KEY ("audio_id") 
+		REFERENCES "upload_audio"("id") ON DELETE NO ACTION DEFERRABLE INITIALLY IMMEDIATE;
+ALTER TABLE "upload_gallery_item" ADD UNIQUE ("audio_id");"
+,
+      
+"ALTER TABLE "upload_gallery_item"
+  ADD "file_id" uuid;
+ALTER TABLE "upload_gallery_item"
+		ADD FOREIGN KEY ("file_id") 
+		REFERENCES "upload_file"("id") ON DELETE NO ACTION DEFERRABLE INITIALLY IMMEDIATE;
+ALTER TABLE "upload_gallery_item" ADD UNIQUE ("file_id");"
+,
+      
+"ALTER TABLE "upload_image"
+  ADD "meta_id" uuid;
+ALTER TABLE "upload_image"
+		ADD FOREIGN KEY ("meta_id") 
+		REFERENCES "upload_file_metadata"("id") ON DELETE NO ACTION DEFERRABLE INITIALLY IMMEDIATE;
+ALTER TABLE "upload_image" ADD UNIQUE ("meta_id");"
+,
+      
+"ALTER TABLE "upload_image_list_item"
+  ADD "list_id" uuid NOT NULL;
+ALTER TABLE "upload_image_list_item"
+		ADD FOREIGN KEY ("list_id") 
+		REFERENCES "upload_image_list"("id") ON DELETE CASCADE DEFERRABLE INITIALLY IMMEDIATE;
+CREATE INDEX ON "upload_image_list_item" ("list_id");"
+,
+      
+"ALTER TABLE "upload_image_list_item"
+  ADD "image_id" uuid NOT NULL;
+ALTER TABLE "upload_image_list_item"
+		ADD FOREIGN KEY ("image_id") 
+		REFERENCES "upload_image"("id") ON DELETE NO ACTION DEFERRABLE INITIALLY IMMEDIATE;
+ALTER TABLE "upload_image_list_item" ADD UNIQUE ("image_id");"
+,
+      
+"ALTER TABLE "upload_list_item"
+  ADD "list_id" uuid NOT NULL;
+ALTER TABLE "upload_list_item"
+		ADD FOREIGN KEY ("list_id") 
+		REFERENCES "upload_list"("id") ON DELETE CASCADE DEFERRABLE INITIALLY IMMEDIATE;
+CREATE INDEX ON "upload_list_item" ("list_id");"
+,
+      
+"ALTER TABLE "upload_list_item"
+  ADD "item_id" uuid NOT NULL;
+ALTER TABLE "upload_list_item"
+		ADD FOREIGN KEY ("item_id") 
+		REFERENCES "upload_medium"("id") ON DELETE CASCADE DEFERRABLE INITIALLY IMMEDIATE;
+CREATE INDEX ON "upload_list_item" ("item_id");"
+,
+      
+"ALTER TABLE "upload_medium"
+  ADD "image_id" uuid;
+ALTER TABLE "upload_medium"
+		ADD FOREIGN KEY ("image_id") 
+		REFERENCES "upload_image"("id") ON DELETE NO ACTION DEFERRABLE INITIALLY IMMEDIATE;
+ALTER TABLE "upload_medium" ADD UNIQUE ("image_id");"
+,
+      
+"ALTER TABLE "upload_medium"
+  ADD "video_id" uuid;
+ALTER TABLE "upload_medium"
+		ADD FOREIGN KEY ("video_id") 
+		REFERENCES "upload_video"("id") ON DELETE NO ACTION DEFERRABLE INITIALLY IMMEDIATE;
+ALTER TABLE "upload_medium" ADD UNIQUE ("video_id");"
+,
+      
+"ALTER TABLE "upload_medium"
+  ADD "audio_id" uuid;
+ALTER TABLE "upload_medium"
+		ADD FOREIGN KEY ("audio_id") 
+		REFERENCES "upload_audio"("id") ON DELETE NO ACTION DEFERRABLE INITIALLY IMMEDIATE;
+ALTER TABLE "upload_medium" ADD UNIQUE ("audio_id");"
+,
+      
+"ALTER TABLE "upload_medium"
+  ADD "file_id" uuid;
+ALTER TABLE "upload_medium"
+		ADD FOREIGN KEY ("file_id") 
+		REFERENCES "upload_file"("id") ON DELETE NO ACTION DEFERRABLE INITIALLY IMMEDIATE;
+ALTER TABLE "upload_medium" ADD UNIQUE ("file_id");"
+,
+      
+"ALTER TABLE "upload_root"
+  ADD "image_id" uuid;
+ALTER TABLE "upload_root"
+		ADD FOREIGN KEY ("image_id") 
+		REFERENCES "upload_image"("id") ON DELETE NO ACTION DEFERRABLE INITIALLY IMMEDIATE;
+ALTER TABLE "upload_root" ADD UNIQUE ("image_id");"
+,
+      
+"ALTER TABLE "upload_root"
+  ADD "audio_id" uuid;
+ALTER TABLE "upload_root"
+		ADD FOREIGN KEY ("audio_id") 
+		REFERENCES "upload_audio"("id") ON DELETE NO ACTION DEFERRABLE INITIALLY IMMEDIATE;
+ALTER TABLE "upload_root" ADD UNIQUE ("audio_id");"
+,
+      
+"ALTER TABLE "upload_root"
+  ADD "video_id" uuid;
+ALTER TABLE "upload_root"
+		ADD FOREIGN KEY ("video_id") 
+		REFERENCES "upload_video"("id") ON DELETE NO ACTION DEFERRABLE INITIALLY IMMEDIATE;
+ALTER TABLE "upload_root" ADD UNIQUE ("video_id");"
+,
+      
+"ALTER TABLE "upload_root"
+  ADD "file_id" uuid;
+ALTER TABLE "upload_root"
+		ADD FOREIGN KEY ("file_id") 
+		REFERENCES "upload_file"("id") ON DELETE NO ACTION DEFERRABLE INITIALLY IMMEDIATE;
+ALTER TABLE "upload_root" ADD UNIQUE ("file_id");"
+,
+      
+"ALTER TABLE "upload_root"
+  ADD "image_trivial_id" uuid;
+ALTER TABLE "upload_root"
+		ADD FOREIGN KEY ("image_trivial_id") 
+		REFERENCES "upload_image"("id") ON DELETE NO ACTION DEFERRABLE INITIALLY IMMEDIATE;
+ALTER TABLE "upload_root" ADD UNIQUE ("image_trivial_id");"
+,
+      
+"ALTER TABLE "upload_root"
+  ADD "medium_id" uuid;
+ALTER TABLE "upload_root"
+		ADD FOREIGN KEY ("medium_id") 
+		REFERENCES "upload_medium"("id") ON DELETE NO ACTION DEFERRABLE INITIALLY IMMEDIATE;
+ALTER TABLE "upload_root" ADD UNIQUE ("medium_id");"
+,
+      
+"ALTER TABLE "upload_root"
+  ADD "gallery_id" uuid;
+ALTER TABLE "upload_root"
+		ADD FOREIGN KEY ("gallery_id") 
+		REFERENCES "upload_gallery"("id") ON DELETE NO ACTION DEFERRABLE INITIALLY IMMEDIATE;
+ALTER TABLE "upload_root" ADD UNIQUE ("gallery_id");"
+,
+      
+"ALTER TABLE "upload_root"
+  ADD "list_id" uuid;
+ALTER TABLE "upload_root"
+		ADD FOREIGN KEY ("list_id") 
+		REFERENCES "upload_list"("id") ON DELETE NO ACTION DEFERRABLE INITIALLY IMMEDIATE;
+ALTER TABLE "upload_root" ADD UNIQUE ("list_id");"
+,
+      
+"ALTER TABLE "upload_root"
+  ADD "image_list_id" uuid;
+ALTER TABLE "upload_root"
+		ADD FOREIGN KEY ("image_list_id") 
+		REFERENCES "upload_image_list"("id") ON DELETE NO ACTION DEFERRABLE INITIALLY IMMEDIATE;
+ALTER TABLE "upload_root" ADD UNIQUE ("image_list_id");"
+,
+      
+"ALTER TABLE "upload_video"
+  ADD "meta_id" uuid;
+ALTER TABLE "upload_video"
+		ADD FOREIGN KEY ("meta_id") 
+		REFERENCES "upload_file_metadata"("id") ON DELETE NO ACTION DEFERRABLE INITIALLY IMMEDIATE;
+ALTER TABLE "upload_video" ADD UNIQUE ("meta_id");"
+,
+      "ALTER TABLE "upload_root" ADD UNIQUE ("unique");",
+      
+"ALTER TABLE "upload_file"
+  DROP "duration";"
+,
+      
+"CREATE TABLE "grid_article_comment" (
+  "id" uuid PRIMARY KEY NOT NULL
+);
+CREATE TRIGGER "log_event"
+  AFTER INSERT OR UPDATE OR DELETE ON "grid_article_comment"
+  FOR EACH ROW
+  EXECUTE PROCEDURE "system"."trigger_event"($pga$id$pga$);
+CREATE CONSTRAINT TRIGGER "log_event_trx"
+  AFTER INSERT OR UPDATE OR DELETE ON "grid_article_comment"
+  DEFERRABLE INITIALLY DEFERRED
+  FOR EACH ROW
+  EXECUTE PROCEDURE "system"."trigger_event_commit"();"
+,
+      
+"ALTER TABLE "grid_article_comment"
+  ADD "content" text;"
+,
+      
+"ALTER TABLE "grid_article_comment"
+  ADD "created_at" timestamptz;"
+,
+      
+"ALTER TABLE "grid_article_comment"
+  ADD "article_id" uuid NOT NULL;
+ALTER TABLE "grid_article_comment"
+		ADD FOREIGN KEY ("article_id") 
+		REFERENCES "grid_article"("id") ON DELETE CASCADE DEFERRABLE INITIALLY IMMEDIATE;
+CREATE INDEX ON "grid_article_comment" ("article_id");"
+,
+      
+"ALTER TABLE "grid_article_comment"
+  ADD "author_id" uuid NOT NULL;
+ALTER TABLE "grid_article_comment"
+		ADD FOREIGN KEY ("author_id") 
+		REFERENCES "grid_author"("id") ON DELETE CASCADE DEFERRABLE INITIALLY IMMEDIATE;
+CREATE INDEX ON "grid_article_comment" ("author_id");"
+,
+      "CREATE DOMAIN "DimensionsItemUnique" AS text CONSTRAINT "dimensionsitemunique_check" CHECK (VALUE IN('unique'));",
+      
+"CREATE TABLE "dimensions_item" (
+  "id" uuid PRIMARY KEY NOT NULL
+);
+CREATE TRIGGER "log_event"
+  AFTER INSERT OR UPDATE OR DELETE ON "dimensions_item"
+  FOR EACH ROW
+  EXECUTE PROCEDURE "system"."trigger_event"($pga$id$pga$);
+CREATE CONSTRAINT TRIGGER "log_event_trx"
+  AFTER INSERT OR UPDATE OR DELETE ON "dimensions_item"
+  DEFERRABLE INITIALLY DEFERRED
+  FOR EACH ROW
+  EXECUTE PROCEDURE "system"."trigger_event_commit"();"
+,
+      
+"CREATE TABLE "dimensions_item_locale" (
+  "id" uuid PRIMARY KEY NOT NULL
+);
+CREATE TRIGGER "log_event"
+  AFTER INSERT OR UPDATE OR DELETE ON "dimensions_item_locale"
+  FOR EACH ROW
+  EXECUTE PROCEDURE "system"."trigger_event"($pga$id$pga$);
+CREATE CONSTRAINT TRIGGER "log_event_trx"
+  AFTER INSERT OR UPDATE OR DELETE ON "dimensions_item_locale"
+  DEFERRABLE INITIALLY DEFERRED
+  FOR EACH ROW
+  EXECUTE PROCEDURE "system"."trigger_event_commit"();"
+,
+      
+"CREATE TABLE "dimensions_locale" (
+  "id" uuid PRIMARY KEY NOT NULL
+);
+CREATE TRIGGER "log_event"
+  AFTER INSERT OR UPDATE OR DELETE ON "dimensions_locale"
+  FOR EACH ROW
+  EXECUTE PROCEDURE "system"."trigger_event"($pga$id$pga$);
+CREATE CONSTRAINT TRIGGER "log_event_trx"
+  AFTER INSERT OR UPDATE OR DELETE ON "dimensions_locale"
+  DEFERRABLE INITIALLY DEFERRED
+  FOR EACH ROW
+  EXECUTE PROCEDURE "system"."trigger_event_commit"();"
+,
+      
+"ALTER TABLE "dimensions_item"
+  ADD "unique" "DimensionsItemUnique";
+UPDATE "dimensions_item"
+				 SET "unique" = $pga$unique$pga$;
+SET CONSTRAINTS ALL IMMEDIATE;
+SET CONSTRAINTS ALL DEFERRED;
+ALTER TABLE "dimensions_item"
+  ALTER "unique" SET NOT NULL;"
+,
+      
+"ALTER TABLE "dimensions_item_locale"
+  ADD "title" text NOT NULL;"
+,
+      
+"ALTER TABLE "dimensions_item_locale"
+  ADD "content" text;"
+,
+      
+"ALTER TABLE "dimensions_locale"
+  ADD "code" text NOT NULL;"
+,
+      
+"ALTER TABLE "dimensions_locale"
+  ADD "label" text NOT NULL;"
+,
+      
+"ALTER TABLE "dimensions_item_locale"
+  ADD "item_id" uuid NOT NULL;
+ALTER TABLE "dimensions_item_locale"
+		ADD FOREIGN KEY ("item_id") 
+		REFERENCES "dimensions_item"("id") ON DELETE NO ACTION DEFERRABLE INITIALLY IMMEDIATE;
+CREATE INDEX ON "dimensions_item_locale" ("item_id");"
+,
+      
+"ALTER TABLE "dimensions_item_locale"
+  ADD "locale_id" uuid NOT NULL;
+ALTER TABLE "dimensions_item_locale"
+		ADD FOREIGN KEY ("locale_id") 
+		REFERENCES "dimensions_locale"("id") ON DELETE NO ACTION DEFERRABLE INITIALLY IMMEDIATE;
+CREATE INDEX ON "dimensions_item_locale" ("locale_id");"
+,
+      "ALTER TABLE "dimensions_item" ADD UNIQUE ("unique");",
+      "ALTER TABLE "dimensions_item_locale" ADD UNIQUE ("item_id", "locale_id");",
+      "ALTER TABLE "dimensions_locale" ADD UNIQUE ("code");",
+      "CREATE DOMAIN "EditorReferenceType" AS text CONSTRAINT "editorreferencetype_check" CHECK (VALUE IN('image','link'));",
+      "CREATE DOMAIN "EditorContentUnique" AS text CONSTRAINT "editorcontentunique_check" CHECK (VALUE IN('unique'));",
+      
+"CREATE TABLE "editor_content" (
+  "id" uuid PRIMARY KEY NOT NULL
+);
+CREATE TRIGGER "log_event"
+  AFTER INSERT OR UPDATE OR DELETE ON "editor_content"
+  FOR EACH ROW
+  EXECUTE PROCEDURE "system"."trigger_event"($pga$id$pga$);
+CREATE CONSTRAINT TRIGGER "log_event_trx"
+  AFTER INSERT OR UPDATE OR DELETE ON "editor_content"
+  DEFERRABLE INITIALLY DEFERRED
+  FOR EACH ROW
+  EXECUTE PROCEDURE "system"."trigger_event_commit"();"
+,
+      
+"CREATE TABLE "editor_image" (
+  "id" uuid PRIMARY KEY NOT NULL
+);
+CREATE TRIGGER "log_event"
+  AFTER INSERT OR UPDATE OR DELETE ON "editor_image"
+  FOR EACH ROW
+  EXECUTE PROCEDURE "system"."trigger_event"($pga$id$pga$);
+CREATE CONSTRAINT TRIGGER "log_event_trx"
+  AFTER INSERT OR UPDATE OR DELETE ON "editor_image"
+  DEFERRABLE INITIALLY DEFERRED
+  FOR EACH ROW
+  EXECUTE PROCEDURE "system"."trigger_event_commit"();"
+,
+      
+"CREATE TABLE "editor_link" (
+  "id" uuid PRIMARY KEY NOT NULL
+);
+CREATE TRIGGER "log_event"
+  AFTER INSERT OR UPDATE OR DELETE ON "editor_link"
+  FOR EACH ROW
+  EXECUTE PROCEDURE "system"."trigger_event"($pga$id$pga$);
+CREATE CONSTRAINT TRIGGER "log_event_trx"
+  AFTER INSERT OR UPDATE OR DELETE ON "editor_link"
+  DEFERRABLE INITIALLY DEFERRED
+  FOR EACH ROW
+  EXECUTE PROCEDURE "system"."trigger_event_commit"();"
+,
+      
+"CREATE TABLE "editor_reference" (
+  "id" uuid PRIMARY KEY NOT NULL
+);
+CREATE TRIGGER "log_event"
+  AFTER INSERT OR UPDATE OR DELETE ON "editor_reference"
+  FOR EACH ROW
+  EXECUTE PROCEDURE "system"."trigger_event"($pga$id$pga$);
+CREATE CONSTRAINT TRIGGER "log_event_trx"
+  AFTER INSERT OR UPDATE OR DELETE ON "editor_reference"
+  DEFERRABLE INITIALLY DEFERRED
+  FOR EACH ROW
+  EXECUTE PROCEDURE "system"."trigger_event_commit"();"
+,
+      
+"ALTER TABLE "editor_content"
+  ADD "unique" "EditorContentUnique";
+UPDATE "editor_content"
+				 SET "unique" = $pga$unique$pga$;
+SET CONSTRAINTS ALL IMMEDIATE;
+SET CONSTRAINTS ALL DEFERRED;
+ALTER TABLE "editor_content"
+  ALTER "unique" SET NOT NULL;"
+,
+      
+"ALTER TABLE "editor_content"
+  ADD "data" jsonb NOT NULL;"
+,
+      
+"ALTER TABLE "editor_image"
+  ADD "url" text NOT NULL;"
+,
+      
+"ALTER TABLE "editor_link"
+  ADD "url" text NOT NULL;"
+,
+      
+"ALTER TABLE "editor_reference"
+  ADD "type" "EditorReferenceType" NOT NULL;"
+,
+      
+"ALTER TABLE "editor_reference"
+  ADD "content_id" uuid NOT NULL;
+ALTER TABLE "editor_reference"
+		ADD FOREIGN KEY ("content_id") 
+		REFERENCES "editor_content"("id") ON DELETE NO ACTION DEFERRABLE INITIALLY IMMEDIATE;
+CREATE INDEX ON "editor_reference" ("content_id");"
+,
+      
+"ALTER TABLE "editor_reference"
+  ADD "image_id" uuid;
+ALTER TABLE "editor_reference"
+		ADD FOREIGN KEY ("image_id") 
+		REFERENCES "editor_image"("id") ON DELETE NO ACTION DEFERRABLE INITIALLY IMMEDIATE;
+CREATE INDEX ON "editor_reference" ("image_id");"
+,
+      
+"ALTER TABLE "editor_reference"
+  ADD "link_id" uuid;
+ALTER TABLE "editor_reference"
+		ADD FOREIGN KEY ("link_id") 
+		REFERENCES "editor_link"("id") ON DELETE NO ACTION DEFERRABLE INITIALLY IMMEDIATE;
+CREATE INDEX ON "editor_reference" ("link_id");"
+,
+      "ALTER TABLE "editor_content" ADD UNIQUE ("unique");",
+      "CREATE DOMAIN "BlockType" AS text CONSTRAINT "blocktype_check" CHECK (VALUE IN('text','image','textWithImage','hero'));",
+      "CREATE DOMAIN "BlockImagePosition" AS text CONSTRAINT "blockimageposition_check" CHECK (VALUE IN('left','right'));",
+      "CREATE DOMAIN "BlockListUnique" AS text CONSTRAINT "blocklistunique_check" CHECK (VALUE IN('unique'));",
+      
+"CREATE TABLE "block" (
+  "id" uuid PRIMARY KEY NOT NULL
+);
+CREATE TRIGGER "log_event"
+  AFTER INSERT OR UPDATE OR DELETE ON "block"
+  FOR EACH ROW
+  EXECUTE PROCEDURE "system"."trigger_event"($pga$id$pga$);
+CREATE CONSTRAINT TRIGGER "log_event_trx"
+  AFTER INSERT OR UPDATE OR DELETE ON "block"
+  DEFERRABLE INITIALLY DEFERRED
+  FOR EACH ROW
+  EXECUTE PROCEDURE "system"."trigger_event_commit"();"
+,
+      
+"CREATE TABLE "block_image" (
+  "id" uuid PRIMARY KEY NOT NULL
+);
+CREATE TRIGGER "log_event"
+  AFTER INSERT OR UPDATE OR DELETE ON "block_image"
+  FOR EACH ROW
+  EXECUTE PROCEDURE "system"."trigger_event"($pga$id$pga$);
+CREATE CONSTRAINT TRIGGER "log_event_trx"
+  AFTER INSERT OR UPDATE OR DELETE ON "block_image"
+  DEFERRABLE INITIALLY DEFERRED
+  FOR EACH ROW
+  EXECUTE PROCEDURE "system"."trigger_event_commit"();"
+,
+      
+"CREATE TABLE "block_list" (
+  "id" uuid PRIMARY KEY NOT NULL
+);
+CREATE TRIGGER "log_event"
+  AFTER INSERT OR UPDATE OR DELETE ON "block_list"
+  FOR EACH ROW
+  EXECUTE PROCEDURE "system"."trigger_event"($pga$id$pga$);
+CREATE CONSTRAINT TRIGGER "log_event_trx"
+  AFTER INSERT OR UPDATE OR DELETE ON "block_list"
+  DEFERRABLE INITIALLY DEFERRED
+  FOR EACH ROW
+  EXECUTE PROCEDURE "system"."trigger_event_commit"();"
+,
+      
+"ALTER TABLE "block"
+  ADD "order" integer NOT NULL;"
+,
+      
+"ALTER TABLE "block"
+  ADD "type" "BlockType" NOT NULL;"
+,
+      
+"ALTER TABLE "block"
+  ADD "title" text NOT NULL;"
+,
+      
+"ALTER TABLE "block"
+  ADD "content" text;"
+,
+      
+"ALTER TABLE "block"
+  ADD "image_position" "BlockImagePosition";"
+,
+      
+"ALTER TABLE "block"
+  ADD "color" text;"
+,
+      
+"ALTER TABLE "block_image"
+  ADD "url" text;"
+,
+      
+"ALTER TABLE "block_list"
+  ADD "unique" "BlockListUnique";
+UPDATE "block_list"
+				 SET "unique" = $pga$unique$pga$;
+SET CONSTRAINTS ALL IMMEDIATE;
+SET CONSTRAINTS ALL DEFERRED;
+ALTER TABLE "block_list"
+  ALTER "unique" SET NOT NULL;"
+,
+      
+"ALTER TABLE "block"
+  ADD "list_id" uuid;
+ALTER TABLE "block"
+		ADD FOREIGN KEY ("list_id") 
+		REFERENCES "block_list"("id") ON DELETE NO ACTION DEFERRABLE INITIALLY IMMEDIATE;
+CREATE INDEX ON "block" ("list_id");"
+,
+      
+"ALTER TABLE "block"
+  ADD "image_id" uuid;
+ALTER TABLE "block"
+		ADD FOREIGN KEY ("image_id") 
+		REFERENCES "block_image"("id") ON DELETE NO ACTION DEFERRABLE INITIALLY IMMEDIATE;
+ALTER TABLE "block" ADD UNIQUE ("image_id");"
+,
+      "ALTER TABLE "block_list" ADD UNIQUE ("unique");",
+      "",
+      "CREATE DOMAIN "LegacyEditorReferenceType" AS text CONSTRAINT "legacyeditorreferencetype_check" CHECK (VALUE IN('link','quote','image','embed'));",
+      "CREATE DOMAIN "LegacyEditorTextAreaUnique" AS text CONSTRAINT "legacyeditortextareaunique_check" CHECK (VALUE IN('unique'));",
+      "CREATE DOMAIN "LegacyEditorContentUnique" AS text CONSTRAINT "legacyeditorcontentunique_check" CHECK (VALUE IN('unique'));",
+      "CREATE DOMAIN "ContentEmbedType" AS text CONSTRAINT "contentembedtype_check" CHECK (VALUE IN('youtube','vimeo'));",
+      
+"CREATE TABLE "legacy_editor_block" (
+  "id" uuid PRIMARY KEY NOT NULL
+);
+CREATE TRIGGER "log_event"
+  AFTER INSERT OR UPDATE OR DELETE ON "legacy_editor_block"
+  FOR EACH ROW
+  EXECUTE PROCEDURE "system"."trigger_event"($pga$id$pga$);
+CREATE CONSTRAINT TRIGGER "log_event_trx"
+  AFTER INSERT OR UPDATE OR DELETE ON "legacy_editor_block"
+  DEFERRABLE INITIALLY DEFERRED
+  FOR EACH ROW
+  EXECUTE PROCEDURE "system"."trigger_event_commit"();"
+,
+      
+"CREATE TABLE "legacy_editor_content" (
+  "id" uuid PRIMARY KEY NOT NULL
+);
+CREATE TRIGGER "log_event"
+  AFTER INSERT OR UPDATE OR DELETE ON "legacy_editor_content"
+  FOR EACH ROW
+  EXECUTE PROCEDURE "system"."trigger_event"($pga$id$pga$);
+CREATE CONSTRAINT TRIGGER "log_event_trx"
+  AFTER INSERT OR UPDATE OR DELETE ON "legacy_editor_content"
+  DEFERRABLE INITIALLY DEFERRED
+  FOR EACH ROW
+  EXECUTE PROCEDURE "system"."trigger_event_commit"();"
+,
+      
+"CREATE TABLE "legacy_editor_reference" (
+  "id" uuid PRIMARY KEY NOT NULL
+);
+CREATE TRIGGER "log_event"
+  AFTER INSERT OR UPDATE OR DELETE ON "legacy_editor_reference"
+  FOR EACH ROW
+  EXECUTE PROCEDURE "system"."trigger_event"($pga$id$pga$);
+CREATE CONSTRAINT TRIGGER "log_event_trx"
+  AFTER INSERT OR UPDATE OR DELETE ON "legacy_editor_reference"
+  DEFERRABLE INITIALLY DEFERRED
+  FOR EACH ROW
+  EXECUTE PROCEDURE "system"."trigger_event_commit"();"
+,
+      
+"CREATE TABLE "legacy_editor_text_area" (
+  "id" uuid PRIMARY KEY NOT NULL
+);
+CREATE TRIGGER "log_event"
+  AFTER INSERT OR UPDATE OR DELETE ON "legacy_editor_text_area"
+  FOR EACH ROW
+  EXECUTE PROCEDURE "system"."trigger_event"($pga$id$pga$);
+CREATE CONSTRAINT TRIGGER "log_event_trx"
+  AFTER INSERT OR UPDATE OR DELETE ON "legacy_editor_text_area"
+  DEFERRABLE INITIALLY DEFERRED
+  FOR EACH ROW
+  EXECUTE PROCEDURE "system"."trigger_event_commit"();"
+,
+      
+"CREATE TABLE "legacy_editor_embed" (
+  "id" uuid PRIMARY KEY NOT NULL
+);
+CREATE TRIGGER "log_event"
+  AFTER INSERT OR UPDATE OR DELETE ON "legacy_editor_embed"
+  FOR EACH ROW
+  EXECUTE PROCEDURE "system"."trigger_event"($pga$id$pga$);
+CREATE CONSTRAINT TRIGGER "log_event_trx"
+  AFTER INSERT OR UPDATE OR DELETE ON "legacy_editor_embed"
+  DEFERRABLE INITIALLY DEFERRED
+  FOR EACH ROW
+  EXECUTE PROCEDURE "system"."trigger_event_commit"();"
+,
+      
+"CREATE TABLE "legacy_editor_image" (
+  "id" uuid PRIMARY KEY NOT NULL
+);
+CREATE TRIGGER "log_event"
+  AFTER INSERT OR UPDATE OR DELETE ON "legacy_editor_image"
+  FOR EACH ROW
+  EXECUTE PROCEDURE "system"."trigger_event"($pga$id$pga$);
+CREATE CONSTRAINT TRIGGER "log_event_trx"
+  AFTER INSERT OR UPDATE OR DELETE ON "legacy_editor_image"
+  DEFERRABLE INITIALLY DEFERRED
+  FOR EACH ROW
+  EXECUTE PROCEDURE "system"."trigger_event_commit"();"
+,
+      
+"CREATE TABLE "legacy_editor_link" (
+  "id" uuid PRIMARY KEY NOT NULL
+);
+CREATE TRIGGER "log_event"
+  AFTER INSERT OR UPDATE OR DELETE ON "legacy_editor_link"
+  FOR EACH ROW
+  EXECUTE PROCEDURE "system"."trigger_event"($pga$id$pga$);
+CREATE CONSTRAINT TRIGGER "log_event_trx"
+  AFTER INSERT OR UPDATE OR DELETE ON "legacy_editor_link"
+  DEFERRABLE INITIALLY DEFERRED
+  FOR EACH ROW
+  EXECUTE PROCEDURE "system"."trigger_event_commit"();"
+,
+      
+"ALTER TABLE "legacy_editor_block"
+  ADD "order" integer NOT NULL;"
+,
+      
+"ALTER TABLE "legacy_editor_block"
+  ADD "data" text NOT NULL;"
+,
+      
+"ALTER TABLE "legacy_editor_content"
+  ADD "unique" "LegacyEditorContentUnique";
+UPDATE "legacy_editor_content"
+				 SET "unique" = $pga$unique$pga$;
+SET CONSTRAINTS ALL IMMEDIATE;
+SET CONSTRAINTS ALL DEFERRED;
+ALTER TABLE "legacy_editor_content"
+  ALTER "unique" SET NOT NULL;"
+,
+      
+"ALTER TABLE "legacy_editor_reference"
+  ADD "type" "LegacyEditorReferenceType" NOT NULL;"
+,
+      
+"ALTER TABLE "legacy_editor_text_area"
+  ADD "unique" "LegacyEditorTextAreaUnique";
+UPDATE "legacy_editor_text_area"
+				 SET "unique" = $pga$unique$pga$;
+SET CONSTRAINTS ALL IMMEDIATE;
+SET CONSTRAINTS ALL DEFERRED;
+ALTER TABLE "legacy_editor_text_area"
+  ALTER "unique" SET NOT NULL;"
+,
+      
+"ALTER TABLE "legacy_editor_text_area"
+  ADD "data" text NOT NULL;"
+,
+      
+"ALTER TABLE "legacy_editor_embed"
+  ADD "type" "ContentEmbedType" NOT NULL;"
+,
+      
+"ALTER TABLE "legacy_editor_embed"
+  ADD "youtube_id" text;"
+,
+      
+"ALTER TABLE "legacy_editor_embed"
+  ADD "vimeo_id" text;"
+,
+      
+"ALTER TABLE "legacy_editor_image"
+  ADD "url" text;"
+,
+      
+"ALTER TABLE "legacy_editor_link"
+  ADD "url" text;"
+,
+      
+"ALTER TABLE "legacy_editor_block"
+  ADD "content_id" uuid;
+ALTER TABLE "legacy_editor_block"
+		ADD FOREIGN KEY ("content_id") 
+		REFERENCES "legacy_editor_content"("id") ON DELETE NO ACTION DEFERRABLE INITIALLY IMMEDIATE;
+CREATE INDEX ON "legacy_editor_block" ("content_id");"
+,
+      
+"ALTER TABLE "legacy_editor_reference"
+  ADD "block_id" uuid NOT NULL;
+ALTER TABLE "legacy_editor_reference"
+		ADD FOREIGN KEY ("block_id") 
+		REFERENCES "legacy_editor_block"("id") ON DELETE CASCADE DEFERRABLE INITIALLY IMMEDIATE;
+CREATE INDEX ON "legacy_editor_reference" ("block_id");"
+,
+      
+"ALTER TABLE "legacy_editor_reference"
+  ADD "target_id" uuid;
+ALTER TABLE "legacy_editor_reference"
+		ADD FOREIGN KEY ("target_id") 
+		REFERENCES "legacy_editor_link"("id") ON DELETE SET NULL DEFERRABLE INITIALLY IMMEDIATE;
+ALTER TABLE "legacy_editor_reference" ADD UNIQUE ("target_id");"
+,
+      
+"ALTER TABLE "legacy_editor_reference"
+  ADD "embed_id" uuid;
+ALTER TABLE "legacy_editor_reference"
+		ADD FOREIGN KEY ("embed_id") 
+		REFERENCES "legacy_editor_embed"("id") ON DELETE NO ACTION DEFERRABLE INITIALLY IMMEDIATE;
+ALTER TABLE "legacy_editor_reference" ADD UNIQUE ("embed_id");"
+,
+      
+"ALTER TABLE "legacy_editor_reference"
+  ADD "image_id" uuid;
+ALTER TABLE "legacy_editor_reference"
+		ADD FOREIGN KEY ("image_id") 
+		REFERENCES "legacy_editor_image"("id") ON DELETE SET NULL DEFERRABLE INITIALLY IMMEDIATE;
+CREATE INDEX ON "legacy_editor_reference" ("image_id");"
+,
+      "ALTER TABLE "legacy_editor_content" ADD UNIQUE ("unique");",
+      "ALTER TABLE "legacy_editor_text_area" ADD UNIQUE ("unique");",
+      "",
+      
+"CREATE TABLE "acl_branch" (
+  "id" uuid PRIMARY KEY NOT NULL
+);
+CREATE TRIGGER "log_event"
+  AFTER INSERT OR UPDATE OR DELETE ON "acl_branch"
+  FOR EACH ROW
+  EXECUTE PROCEDURE "system"."trigger_event"($pga$id$pga$);
+CREATE CONSTRAINT TRIGGER "log_event_trx"
+  AFTER INSERT OR UPDATE OR DELETE ON "acl_branch"
+  DEFERRABLE INITIALLY DEFERRED
+  FOR EACH ROW
+  EXECUTE PROCEDURE "system"."trigger_event_commit"();"
+,
+      
+"ALTER TABLE "acl_branch"
+  ADD "code" text NOT NULL;"
+,
+      "ALTER TABLE "acl_branch" ADD UNIQUE ("code");",
+      "",
+      "DROP TABLE "legacy_editor_text_area";",
+      "CREATE DOMAIN "EditorTextAreaUnique" AS text CONSTRAINT "editortextareaunique_check" CHECK (VALUE IN('unique'));",
+      "CREATE DOMAIN "PlateEditorContentUnique" AS text CONSTRAINT "plateeditorcontentunique_check" CHECK (VALUE IN('unique'));",
+      
+"ALTER DOMAIN "EditorReferenceType"
+				DROP CONSTRAINT editorreferencetype_check;
+
+				ALTER DOMAIN "EditorReferenceType"
+				ADD CONSTRAINT editorreferencetype_check CHECK (VALUE IN('image','link','quote'));"
+,
+      
+"CREATE TABLE "editor_text_area" (
+  "id" uuid PRIMARY KEY NOT NULL
+);
+CREATE TRIGGER "log_event"
+  AFTER INSERT OR UPDATE OR DELETE ON "editor_text_area"
+  FOR EACH ROW
+  EXECUTE PROCEDURE "system"."trigger_event"($pga$id$pga$);
+CREATE CONSTRAINT TRIGGER "log_event_trx"
+  AFTER INSERT OR UPDATE OR DELETE ON "editor_text_area"
+  DEFERRABLE INITIALLY DEFERRED
+  FOR EACH ROW
+  EXECUTE PROCEDURE "system"."trigger_event_commit"();"
+,
+      
+"CREATE TABLE "plate_editor_content" (
+  "id" uuid PRIMARY KEY NOT NULL
+);
+CREATE TRIGGER "log_event"
+  AFTER INSERT OR UPDATE OR DELETE ON "plate_editor_content"
+  FOR EACH ROW
+  EXECUTE PROCEDURE "system"."trigger_event"($pga$id$pga$);
+CREATE CONSTRAINT TRIGGER "log_event_trx"
+  AFTER INSERT OR UPDATE OR DELETE ON "plate_editor_content"
+  DEFERRABLE INITIALLY DEFERRED
+  FOR EACH ROW
+  EXECUTE PROCEDURE "system"."trigger_event_commit"();"
+,
+      
+"ALTER TABLE "editor_text_area"
+  ADD "unique" "EditorTextAreaUnique";
+UPDATE "editor_text_area"
+				 SET "unique" = $pga$unique$pga$;
+SET CONSTRAINTS ALL IMMEDIATE;
+SET CONSTRAINTS ALL DEFERRED;
+ALTER TABLE "editor_text_area"
+  ALTER "unique" SET NOT NULL;"
+,
+      
+"ALTER TABLE "editor_text_area"
+  ADD "data" text NOT NULL;"
+,
+      
+"ALTER TABLE "plate_editor_content"
+  ADD "unique" "PlateEditorContentUnique";
+UPDATE "plate_editor_content"
+				 SET "unique" = $pga$unique$pga$;
+SET CONSTRAINTS ALL IMMEDIATE;
+SET CONSTRAINTS ALL DEFERRED;
+ALTER TABLE "plate_editor_content"
+  ALTER "unique" SET NOT NULL;"
+,
+      
+"ALTER TABLE "plate_editor_content"
+  ADD "data" jsonb NOT NULL;"
+,
+      "ALTER TABLE "editor_text_area" ADD UNIQUE ("unique");",
+      "ALTER TABLE "plate_editor_content" ADD UNIQUE ("unique");",
+      "DROP DOMAIN "LegacyEditorTextAreaUnique";",
+      "",
+      
+"CREATE VIEW "grid_article_detail" AS 
+	SELECT
+		article.id AS id,
+		article.id AS article_id,
+		(SELECT COUNT(*)
+		 FROM "grid_article_comment" comment
+		 WHERE comment.article_id = article.id) AS comments_count
+	FROM "grid_article" article;
+;"
+,
+      "",
+      "",
+      "CREATE DOMAIN "SlugUnique" AS text CONSTRAINT "slugunique_check" CHECK (VALUE IN('unique'));",
+      
+"CREATE TABLE "slug" (
+  "id" uuid PRIMARY KEY NOT NULL
+);
+CREATE TRIGGER "log_event"
+  AFTER INSERT OR UPDATE OR DELETE ON "slug"
+  FOR EACH ROW
+  EXECUTE PROCEDURE "system"."trigger_event"($pga$id$pga$);
+CREATE CONSTRAINT TRIGGER "log_event_trx"
+  AFTER INSERT OR UPDATE OR DELETE ON "slug"
+  DEFERRABLE INITIALLY DEFERRED
+  FOR EACH ROW
+  EXECUTE PROCEDURE "system"."trigger_event_commit"();"
+,
+      
+"CREATE TABLE "slug_category" (
+  "id" uuid PRIMARY KEY NOT NULL
+);
+CREATE TRIGGER "log_event"
+  AFTER INSERT OR UPDATE OR DELETE ON "slug_category"
+  FOR EACH ROW
+  EXECUTE PROCEDURE "system"."trigger_event"($pga$id$pga$);
+CREATE CONSTRAINT TRIGGER "log_event_trx"
+  AFTER INSERT OR UPDATE OR DELETE ON "slug_category"
+  DEFERRABLE INITIALLY DEFERRED
+  FOR EACH ROW
+  EXECUTE PROCEDURE "system"."trigger_event_commit"();"
+,
+      
+"ALTER TABLE "slug"
+  ADD "unique" "SlugUnique";
+UPDATE "slug"
+				 SET "unique" = $pga$unique$pga$;
+SET CONSTRAINTS ALL IMMEDIATE;
+SET CONSTRAINTS ALL DEFERRED;
+ALTER TABLE "slug"
+  ALTER "unique" SET NOT NULL;"
+,
+      
+"ALTER TABLE "slug"
+  ADD "slug" text NOT NULL;"
+,
+      
+"ALTER TABLE "slug"
+  ADD "title" text NOT NULL;"
+,
+      
+"ALTER TABLE "slug_category"
+  ADD "name" text NOT NULL;"
+,
+      
+"ALTER TABLE "slug"
+  ADD "category_id" uuid;
+ALTER TABLE "slug"
+		ADD FOREIGN KEY ("category_id") 
+		REFERENCES "slug_category"("id") ON DELETE NO ACTION DEFERRABLE INITIALLY IMMEDIATE;
+CREATE INDEX ON "slug" ("category_id");"
+,
+      "ALTER TABLE "slug" ADD UNIQUE ("unique");",
+      "",
+      
+"ALTER TABLE "select_root"
+  ADD "dummy" text;"
+,
+      "",
+      
+"ALTER TABLE "input_root"
+  ADD "dummy" text;"
+,
+      "",
+      
+"CREATE TABLE "folder" (
+  "id" uuid PRIMARY KEY NOT NULL
+);
+CREATE TRIGGER "log_event"
+  AFTER INSERT OR UPDATE OR DELETE ON "folder"
+  FOR EACH ROW
+  EXECUTE PROCEDURE "system"."trigger_event"($pga$id$pga$);
+CREATE CONSTRAINT TRIGGER "log_event_trx"
+  AFTER INSERT OR UPDATE OR DELETE ON "folder"
+  DEFERRABLE INITIALLY DEFERRED
+  FOR EACH ROW
+  EXECUTE PROCEDURE "system"."trigger_event_commit"();"
+,
+      
+"ALTER TABLE "folder"
+  ADD "name" text NOT NULL;"
+,
+      
+"ALTER TABLE "folder"
+  ADD "parent_id" uuid;
+ALTER TABLE "folder"
+		ADD FOREIGN KEY ("parent_id") 
+		REFERENCES "folder"("id") ON DELETE NO ACTION DEFERRABLE INITIALLY IMMEDIATE;
+CREATE INDEX ON "folder" ("parent_id");"
+,
+      "",
+      "",
+      "",
+      "CREATE DOMAIN "RepeaterRootUnique" AS text CONSTRAINT "repeaterrootunique_check" CHECK (VALUE IN('unique'));",
+      
+"CREATE TABLE "repeater_relation" (
+  "id" uuid PRIMARY KEY NOT NULL
+);
+CREATE TRIGGER "log_event"
+  AFTER INSERT OR UPDATE OR DELETE ON "repeater_relation"
+  FOR EACH ROW
+  EXECUTE PROCEDURE "system"."trigger_event"($pga$id$pga$);
+CREATE CONSTRAINT TRIGGER "log_event_trx"
+  AFTER INSERT OR UPDATE OR DELETE ON "repeater_relation"
+  DEFERRABLE INITIALLY DEFERRED
+  FOR EACH ROW
+  EXECUTE PROCEDURE "system"."trigger_event_commit"();"
+,
+      
+"CREATE TABLE "repeater_root" (
+  "id" uuid PRIMARY KEY NOT NULL
+);
+CREATE TRIGGER "log_event"
+  AFTER INSERT OR UPDATE OR DELETE ON "repeater_root"
+  FOR EACH ROW
+  EXECUTE PROCEDURE "system"."trigger_event"($pga$id$pga$);
+CREATE CONSTRAINT TRIGGER "log_event_trx"
+  AFTER INSERT OR UPDATE OR DELETE ON "repeater_root"
+  DEFERRABLE INITIALLY DEFERRED
+  FOR EACH ROW
+  EXECUTE PROCEDURE "system"."trigger_event_commit"();"
+,
+      
+"ALTER TABLE "repeater_relation"
+  ADD "name" text NOT NULL;"
+,
+      
+"ALTER TABLE "repeater_root"
+  ADD "unique" "RepeaterRootUnique" NOT NULL;"
+,
+      
+"ALTER TABLE "repeater_item"
+  ADD "relation_id" uuid;
+ALTER TABLE "repeater_item"
+		ADD FOREIGN KEY ("relation_id") 
+		REFERENCES "repeater_relation"("id") ON DELETE NO ACTION DEFERRABLE INITIALLY IMMEDIATE;
+CREATE INDEX ON "repeater_item" ("relation_id");"
+,
+      
+"ALTER TABLE "repeater_item"
+  ADD "root_id" uuid;
+ALTER TABLE "repeater_item"
+		ADD FOREIGN KEY ("root_id") 
+		REFERENCES "repeater_root"("id") ON DELETE NO ACTION DEFERRABLE INITIALLY IMMEDIATE;
+CREATE INDEX ON "repeater_item" ("root_id");"
+,
+      "ALTER TABLE "repeater_root" ADD UNIQUE ("unique");",
+      "",
+      "CREATE DOMAIN "FormArticleState" AS text CONSTRAINT "formarticlestate_check" CHECK (VALUE IN('published','draft','archived'));",
+      "CREATE DOMAIN "FormArticleLocaleLocale" AS text CONSTRAINT "formarticlelocalelocale_check" CHECK (VALUE IN('cs','en'));",
+      
+"CREATE TABLE "form_article" (
+  "id" uuid PRIMARY KEY NOT NULL
+);
+CREATE TRIGGER "log_event"
+  AFTER INSERT OR UPDATE OR DELETE ON "form_article"
+  FOR EACH ROW
+  EXECUTE PROCEDURE "system"."trigger_event"($pga$id$pga$);
+CREATE CONSTRAINT TRIGGER "log_event_trx"
+  AFTER INSERT OR UPDATE OR DELETE ON "form_article"
+  DEFERRABLE INITIALLY DEFERRED
+  FOR EACH ROW
+  EXECUTE PROCEDURE "system"."trigger_event_commit"();"
+,
+      
+"CREATE TABLE "form_article_locale" (
+  "id" uuid PRIMARY KEY NOT NULL
+);
+CREATE TRIGGER "log_event"
+  AFTER INSERT OR UPDATE OR DELETE ON "form_article_locale"
+  FOR EACH ROW
+  EXECUTE PROCEDURE "system"."trigger_event"($pga$id$pga$);
+CREATE CONSTRAINT TRIGGER "log_event_trx"
+  AFTER INSERT OR UPDATE OR DELETE ON "form_article_locale"
+  DEFERRABLE INITIALLY DEFERRED
+  FOR EACH ROW
+  EXECUTE PROCEDURE "system"."trigger_event_commit"();"
+,
+      
+"CREATE TABLE "form_author" (
+  "id" uuid PRIMARY KEY NOT NULL
+);
+CREATE TRIGGER "log_event"
+  AFTER INSERT OR UPDATE OR DELETE ON "form_author"
+  FOR EACH ROW
+  EXECUTE PROCEDURE "system"."trigger_event"($pga$id$pga$);
+CREATE CONSTRAINT TRIGGER "log_event_trx"
+  AFTER INSERT OR UPDATE OR DELETE ON "form_author"
+  DEFERRABLE INITIALLY DEFERRED
+  FOR EACH ROW
+  EXECUTE PROCEDURE "system"."trigger_event_commit"();"
+,
+      
+"CREATE TABLE "form_note" (
+  "id" uuid PRIMARY KEY NOT NULL
+);
+CREATE TRIGGER "log_event"
+  AFTER INSERT OR UPDATE OR DELETE ON "form_note"
+  FOR EACH ROW
+  EXECUTE PROCEDURE "system"."trigger_event"($pga$id$pga$);
+CREATE CONSTRAINT TRIGGER "log_event_trx"
+  AFTER INSERT OR UPDATE OR DELETE ON "form_note"
+  DEFERRABLE INITIALLY DEFERRED
+  FOR EACH ROW
+  EXECUTE PROCEDURE "system"."trigger_event_commit"();"
+,
+      
+"CREATE TABLE "form_tag" (
+  "id" uuid PRIMARY KEY NOT NULL
+);
+CREATE TRIGGER "log_event"
+  AFTER INSERT OR UPDATE OR DELETE ON "form_tag"
+  FOR EACH ROW
+  EXECUTE PROCEDURE "system"."trigger_event"($pga$id$pga$);
+CREATE CONSTRAINT TRIGGER "log_event_trx"
+  AFTER INSERT OR UPDATE OR DELETE ON "form_tag"
+  DEFERRABLE INITIALLY DEFERRED
+  FOR EACH ROW
+  EXECUTE PROCEDURE "system"."trigger_event_commit"();"
+,
+      
+"ALTER TABLE "form_article"
+  ADD "state" "FormArticleState";"
+,
+      
+"ALTER TABLE "form_article"
+  ADD "locked" boolean;
+ALTER TABLE "form_article"
+  ALTER "locked" SET DATA TYPE boolean USING false;"
+,
+      
+"ALTER TABLE "form_article"
+  ADD "published_at" timestamptz;"
+,
+      
+"ALTER TABLE "form_article"
+  ADD "internal_name" text NOT NULL;"
+,
+      
+"ALTER TABLE "form_article_locale"
+  ADD "locale" "FormArticleLocaleLocale" NOT NULL;"
+,
+      
+"ALTER TABLE "form_article_locale"
+  ADD "title" text;"
+,
+      
+"ALTER TABLE "form_article_locale"
+  ADD "content" text;"
+,
+      
+"ALTER TABLE "form_article_locale"
+  ADD "slug" text NOT NULL;"
+,
+      
+"ALTER TABLE "form_author"
+  ADD "name" text NOT NULL;"
+,
+      
+"ALTER TABLE "form_author"
+  ADD "slug" text NOT NULL;"
+,
+      
+"ALTER TABLE "form_note"
+  ADD "text" text NOT NULL;"
+,
+      
+"ALTER TABLE "form_note"
+  ADD "created_at" timestamptz;
+ALTER TABLE "form_note"
+  ALTER "created_at" SET DATA TYPE timestamptz USING $pga$now$pga$,
+  ALTER "created_at" SET NOT NULL;"
+,
+      
+"ALTER TABLE "form_tag"
+  ADD "name" text NOT NULL;"
+,
+      
+"ALTER TABLE "form_tag"
+  ADD "slug" text NOT NULL;"
+,
+      
+"ALTER TABLE "form_article"
+  ADD "author_id" uuid;
+ALTER TABLE "form_article"
+		ADD FOREIGN KEY ("author_id") 
+		REFERENCES "form_author"("id") ON DELETE SET NULL DEFERRABLE INITIALLY IMMEDIATE;
+CREATE INDEX ON "form_article" ("author_id");"
+,
+      
+"CREATE TABLE "form_article_tags" (
+  "form_article_id" uuid NOT NULL REFERENCES "form_article"("id") ON DELETE CASCADE,
+  "form_tag_id" uuid NOT NULL REFERENCES "form_tag"("id") ON DELETE CASCADE
+);
+ALTER TABLE "form_article_tags" ADD PRIMARY KEY ("form_article_id", "form_tag_id");
+CREATE TRIGGER "log_event"
+  AFTER INSERT OR UPDATE OR DELETE ON "form_article_tags"
+  FOR EACH ROW
+  EXECUTE PROCEDURE "system"."trigger_event"($pga$form_article_id$pga$, $pga$form_tag_id$pga$);
+CREATE CONSTRAINT TRIGGER "log_event_trx"
+  AFTER INSERT OR UPDATE OR DELETE ON "form_article_tags"
+  DEFERRABLE INITIALLY DEFERRED
+  FOR EACH ROW
+  EXECUTE PROCEDURE "system"."trigger_event_commit"();"
+,
+      
+"ALTER TABLE "form_article_locale"
+  ADD "article_id" uuid NOT NULL;
+ALTER TABLE "form_article_locale"
+		ADD FOREIGN KEY ("article_id") 
+		REFERENCES "form_article"("id") ON DELETE CASCADE DEFERRABLE INITIALLY IMMEDIATE;
+CREATE INDEX ON "form_article_locale" ("article_id");"
+,
+      
+"ALTER TABLE "form_note"
+  ADD "article_id" uuid NOT NULL;
+ALTER TABLE "form_note"
+		ADD FOREIGN KEY ("article_id") 
+		REFERENCES "form_article"("id") ON DELETE CASCADE DEFERRABLE INITIALLY IMMEDIATE;
+CREATE INDEX ON "form_note" ("article_id");"
+,
+      "ALTER TABLE "form_article_locale" ADD UNIQUE ("slug");",
+      "ALTER TABLE "form_article_locale" ADD UNIQUE ("article_id", "locale");",
+      "ALTER TABLE "form_author" ADD UNIQUE ("slug");",
+      "ALTER TABLE "form_tag" ADD UNIQUE ("slug");",
+      "",
+      "ALTER TABLE "input_rules" DROP CONSTRAINT "input_rules_unique_key";",
+      
+"ALTER TABLE "input_rules"
+  DROP "unique";"
+,
+      "CREATE DOMAIN "ExtendTreeUnique" AS text CONSTRAINT "extendtreeunique_check" CHECK (VALUE IN('unique'));",
+      
+"CREATE TABLE "extend_tree_many" (
+  "id" uuid PRIMARY KEY NOT NULL
+);
+CREATE TRIGGER "log_event"
+  AFTER INSERT OR UPDATE OR DELETE ON "extend_tree_many"
+  FOR EACH ROW
+  EXECUTE PROCEDURE "system"."trigger_event"($pga$id$pga$);
+CREATE CONSTRAINT TRIGGER "log_event_trx"
+  AFTER INSERT OR UPDATE OR DELETE ON "extend_tree_many"
+  DEFERRABLE INITIALLY DEFERRED
+  FOR EACH ROW
+  EXECUTE PROCEDURE "system"."trigger_event_commit"();"
+,
+      
+"CREATE TABLE "extend_tree_single" (
+  "id" uuid PRIMARY KEY NOT NULL
+);
+CREATE TRIGGER "log_event"
+  AFTER INSERT OR UPDATE OR DELETE ON "extend_tree_single"
+  FOR EACH ROW
+  EXECUTE PROCEDURE "system"."trigger_event"($pga$id$pga$);
+CREATE CONSTRAINT TRIGGER "log_event_trx"
+  AFTER INSERT OR UPDATE OR DELETE ON "extend_tree_single"
+  DEFERRABLE INITIALLY DEFERRED
+  FOR EACH ROW
+  EXECUTE PROCEDURE "system"."trigger_event_commit"();"
+,
+      
+"ALTER TABLE "extend_tree_many"
+  ADD "value" text NOT NULL;"
+,
+      
+"ALTER TABLE "extend_tree_single"
+  ADD "unique" "ExtendTreeUnique";
+ALTER TABLE "extend_tree_single"
+  ALTER "unique" SET DATA TYPE "ExtendTreeUnique" USING $pga$unique$pga$,
+  ALTER "unique" SET NOT NULL;"
+,
+      
+"ALTER TABLE "extend_tree_single"
+  ADD "value" text NOT NULL;"
+,
+      "ALTER TABLE "extend_tree_single" ADD UNIQUE ("unique");",
+      "",
+      
+"CREATE TABLE "hooks_value" (
+  "id" uuid PRIMARY KEY NOT NULL
+);
+CREATE TRIGGER "log_event"
+  AFTER INSERT OR UPDATE OR DELETE ON "hooks_value"
+  FOR EACH ROW
+  EXECUTE PROCEDURE "system"."trigger_event"($pga$id$pga$);
+CREATE CONSTRAINT TRIGGER "log_event_trx"
+  AFTER INSERT OR UPDATE OR DELETE ON "hooks_value"
+  DEFERRABLE INITIALLY DEFERRED
+  FOR EACH ROW
+  EXECUTE PROCEDURE "system"."trigger_event_commit"();"
+,
+      
+"ALTER TABLE "hooks_value"
+  ADD "value" integer;
+ALTER TABLE "hooks_value"
+  ALTER "value" SET DATA TYPE integer USING 0,
+  ALTER "value" SET NOT NULL;"
+,
+      
+"ALTER TABLE "hooks_value"
+  ADD "created_at" timestamptz;
+ALTER TABLE "hooks_value"
+  ALTER "created_at" SET DATA TYPE timestamptz USING $pga$now$pga$,
+  ALTER "created_at" SET NOT NULL;"
+,
+      "",
+      
+"CREATE TABLE "acl_restricted_value" (
+  "id" uuid PRIMARY KEY NOT NULL
+);
+CREATE TRIGGER "log_event"
+  AFTER INSERT OR UPDATE OR DELETE ON "acl_restricted_value"
+  FOR EACH ROW
+  EXECUTE PROCEDURE "system"."trigger_event"($pga$id$pga$);
+CREATE CONSTRAINT TRIGGER "log_event_trx"
+  AFTER INSERT OR UPDATE OR DELETE ON "acl_restricted_value"
+  DEFERRABLE INITIALLY DEFERRED
+  FOR EACH ROW
+  EXECUTE PROCEDURE "system"."trigger_event_commit"();"
+,
+      
+"ALTER TABLE "acl_restricted_value"
+  ADD "can_edit" boolean NOT NULL;"
+,
+      
+"ALTER TABLE "acl_restricted_value"
+  ADD "can_read" boolean NOT NULL;"
+,
+      
+"ALTER TABLE "acl_restricted_value"
+  ADD "can_read_secondary" boolean NOT NULL;"
+,
+      
+"ALTER TABLE "acl_restricted_value"
+  ADD "primary_value" text;"
+,
+      
+"ALTER TABLE "acl_restricted_value"
+  ADD "secondary_value" text;"
+,
+      "",
+      "CREATE DOMAIN "InputRootEnumArrayValue" AS text CONSTRAINT "inputrootenumarrayvalue_check" CHECK (VALUE IN('a','b','c'));",
+      
+"ALTER TABLE "input_root"
+  ADD "string_array_value" text[];"
+,
+      
+"ALTER TABLE "input_root"
+  ADD "enum_array_value" "InputRootEnumArrayValue"[];"
+,
+      
+"ALTER TABLE "input_root"
+  ADD "int_array_value" integer[];"
+,
+      "",
+      "CREATE DOMAIN "GridArticleTarget" AS text CONSTRAINT "gridarticletarget_check" CHECK (VALUE IN('a','b','c'));",
+      
+"ALTER TABLE "grid_article"
+  ADD "target" "GridArticleTarget"[];"
+,
+      "",
+      
+"ALTER TABLE "input_root"
+  ADD "time_value" time;"
+,
+      "",
+      "",
+      
+"ALTER TABLE "block_list"
+  ADD "primary_block_id" uuid;
+ALTER TABLE "block_list"
+		ADD FOREIGN KEY ("primary_block_id") 
+		REFERENCES "block"("id") ON DELETE SET NULL DEFERRABLE INITIALLY IMMEDIATE;
+CREATE INDEX ON "block_list" ("primary_block_id");"
+,
+      "",
+      
+"ALTER TABLE "grid_article"
+  ALTER "title" SET DATA TYPE text COLLATE "und-x-icu";"
+,
+      
+"ALTER TABLE "grid_tag"
+  ALTER "name" SET DATA TYPE text COLLATE "cs-x-icu";"
+,
+      
+"CREATE TABLE "actions_entry" (
+  "id" uuid PRIMARY KEY NOT NULL
+);
+CREATE TRIGGER "log_event"
+  AFTER INSERT OR UPDATE OR DELETE ON "actions_entry"
+  FOR EACH ROW
+  EXECUTE PROCEDURE "system"."trigger_event"($pga$id$pga$);
+CREATE CONSTRAINT TRIGGER "log_event_trx"
+  AFTER INSERT OR UPDATE OR DELETE ON "actions_entry"
+  DEFERRABLE INITIALLY DEFERRED
+  FOR EACH ROW
+  EXECUTE PROCEDURE "system"."trigger_event_commit"();"
+,
+      
+"ALTER TABLE "actions_entry"
+  ADD "value" text;"
+,
+      "",
+      "",
+      "",
+    ],
+  ],
+}
+`;

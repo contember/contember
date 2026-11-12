@@ -2,7 +2,7 @@ FROM oven/bun:1.3.10 AS build
 WORKDIR /src
 COPY . /src
 RUN bun install --frozen-lockfile
-# Pinned: codegen 8 pulls loaders that need fs.glob withFileTypes, which Bun lacks, and floating versions change the output.
+# Top-level pins only: codegen 8 pulls loaders that need fs.glob withFileTypes (missing in Bun); transitive deps still float.
 RUN bun add --exact @graphql-codegen/cli@7.4.6 @graphql-codegen/typescript@6.1.2 @graphql-codegen/typescript-operations@6.1.10 @graphql-codegen/typescript-resolvers@6.1.1
 ARG PACKAGE
 WORKDIR /src/packages/$PACKAGE

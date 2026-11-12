@@ -40,7 +40,6 @@ import { TenantClientProvider } from '../../../src/lib/TenantClientProvider.js'
 import { TenantApiTransport } from '../../../src/lib/tenant/TenantApiTransport.js'
 import { TenantCreateProjectDetails, TenantCreateProjectResult, TenantProjectClient } from '../../../src/lib/tenant/clients/TenantProjectClient.js'
 import { createTestOutput } from '../../../../cli-common/tests/lib/testOutput.js'
-import prompts from 'prompts'
 import { Actions, Schema } from '@contember/schema'
 import { UndefinedActionsVariablesChecker } from '../../../src/lib/actions/UndefinedActionsVariablesChecker.js'
 
@@ -173,15 +172,17 @@ const withTargets = (schema: Schema, targets: Actions.Schema['targets']): Schema
 })
 
 const createHarness = async (
-	{ state = false, migration = false, snapshot = false, remoteExecuted = false, remoteMissing = false, stdinTty = false, targets = {} }: {
-		state?: boolean
-		migration?: boolean
-		snapshot?: boolean
-		remoteExecuted?: boolean
-		remoteMissing?: boolean
-		stdinTty?: boolean
-		targets?: Actions.Schema['targets']
-	} = {},
+	{ state = false, migration = false, snapshot = false, remoteExecuted = false, remoteMissing = false, stdinTty = false, answers = [], targets = {} }:
+		{
+			state?: boolean
+			migration?: boolean
+			snapshot?: boolean
+			remoteExecuted?: boolean
+			remoteMissing?: boolean
+			stdinTty?: boolean
+			answers?: readonly string[]
+			targets?: Actions.Schema['targets']
+		} = {},
 ) => {
 	const events: Event[] = []
 	const migrationsDir = path.join(workDir, 'migrations')
@@ -206,7 +207,7 @@ const createHarness = async (
 	}
 	const schemaVersionBuilder = new SchemaVersionBuilder(migrationsResolver, schemaMigrator, stateManager)
 	const snapshotManager = new SnapshotManager(path.join(migrationsDir, 'snapshot.json'))
-	const io = createTestOutput({ stdinTty, stderrTty: stdinTty })
+	const io = createTestOutput({ stdinTty, stderrTty: stdinTty, answers })
 	const snapshotFacade = new RecordingSnapshotFacade(
 		events,
 		migrationsResolver,
@@ -283,8 +284,7 @@ test('non-interactive state-only execution refuses before any mutation or reques
 })
 
 test('declining state-only execution does not create a project or call the executor', async () => {
-	const { facade, events } = await createHarness({ state: true, stdinTty: true })
-	prompts.inject(['no'])
+	const { facade, events } = await createHarness({ state: true, stdinTty: true, answers: ['2'] })
 
 	const error = await facade.execute({ requireConfirmation: true }).then(() => null, (reason: unknown) => reason)
 
@@ -293,9 +293,8 @@ test('declining state-only execution does not create a project or call the execu
 })
 
 test('does not notify confirmation when interactive execution is declined', async () => {
-	const { facade } = await createHarness({ state: true, stdinTty: true })
+	const { facade } = await createHarness({ state: true, stdinTty: true, answers: ['2'] })
 	let confirmations = 0
-	prompts.inject(['no'])
 
 	await facade.execute({
 		requireConfirmation: true,
@@ -340,8 +339,7 @@ test('an already-current project with local migrations returns without prompting
 })
 
 test('declining with a usable snapshot neither builds nor applies it', async () => {
-	const { facade, events } = await createHarness({ migration: true, snapshot: true, stdinTty: true })
-	prompts.inject(['no'])
+	const { facade, events } = await createHarness({ migration: true, snapshot: true, stdinTty: true, answers: ['3'] })
 
 	const error = await facade.execute({ requireConfirmation: true }).then(() => null, (reason: unknown) => reason)
 
@@ -350,8 +348,7 @@ test('declining with a usable snapshot neither builds nor applies it', async () 
 })
 
 test('confirmed snapshot execution creates a tokenless project before building and applying the snapshot', async () => {
-	const { facade, events } = await createHarness({ migration: true, snapshot: true, remoteMissing: true, stdinTty: true })
-	prompts.inject(['yes'])
+	const { facade, events } = await createHarness({ migration: true, snapshot: true, remoteMissing: true, stdinTty: true, answers: ['1'] })
 
 	await facade.execute({ requireConfirmation: true })
 
@@ -367,8 +364,7 @@ test('confirmed snapshot execution creates a tokenless project before building a
 })
 
 test('confirmed state-only execution reaches the executor with schema state', async () => {
-	const { facade, events } = await createHarness({ state: true, stdinTty: true })
-	prompts.inject(['yes'])
+	const { facade, events } = await createHarness({ state: true, stdinTty: true, answers: ['1'] })
 
 	await facade.execute({ requireConfirmation: true })
 
@@ -378,9 +374,8 @@ test('confirmed state-only execution reaches the executor with schema state', as
 })
 
 test('notifies confirmation once after interactive execution is accepted', async () => {
-	const { facade } = await createHarness({ state: true, stdinTty: true })
+	const { facade } = await createHarness({ state: true, stdinTty: true, answers: ['1'] })
 	let confirmations = 0
-	prompts.inject(['yes'])
 
 	await facade.execute({
 		requireConfirmation: true,

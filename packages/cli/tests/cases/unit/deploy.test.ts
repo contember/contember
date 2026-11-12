@@ -1,6 +1,5 @@
 import { afterEach, describe, expect, test } from 'bun:test'
-import { CliError, ExitCode, Input, Output, OutputStream } from '@contember/cli-common'
-import prompts from 'prompts'
+import { CliError, ExitCode, Input } from '@contember/cli-common'
 import { AdminClient } from '../../../src/lib/admin/AdminClient.js'
 import { AdminDeployer } from '../../../src/lib/admin/AdminDeployer.js'
 import { DeployCommand, DeployResult } from '../../../src/commands/deploy/DeployCommand.js'
@@ -16,28 +15,7 @@ import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { emptySchema } from '@contember/schema-utils'
 import { SchemaStateManager } from '@contember/migrations-client'
-
-// Mirrors packages/cli-common/tests/lib/testOutput.ts — that helper isn't part of the package's
-// public exports, so it can't be imported across the package boundary.
-class CapturingStream implements OutputStream {
-	public chunks: string[] = []
-
-	constructor(public readonly isTty: boolean = false, public readonly columns: number = 80) {}
-
-	public write(text: string): void {
-		this.chunks.push(text)
-	}
-
-	public get text(): string {
-		return this.chunks.join('')
-	}
-}
-
-const createTestOutput = ({ stdinTty = false, stderrTty = false }: { stdinTty?: boolean; stderrTty?: boolean } = {}) => {
-	const stdout = new CapturingStream()
-	const stderr = new CapturingStream(stderrTty)
-	return { stdout, stderr, output: new Output({ stdout, stderr, isStdinTty: () => stdinTty }) }
-}
+import { createTestOutput } from '../../../../cli-common/tests/lib/testOutput.js'
 
 // pathExists is the only FileSystem method DeployCommand touches directly.
 class StubFileSystem extends FileSystem {
@@ -334,8 +312,7 @@ describe('DeployCommand', () => {
 			adminDistDir: '/project/admin/dist',
 			facadeResult: false,
 		})
-		const { output } = createTestOutput({ stdinTty: true, stderrTty: true })
-		prompts.inject([true])
+		const { output } = createTestOutput({ stdinTty: true, stderrTty: true, answers: ['y'] })
 
 		const code = await command.execute(new Input({}, { admin: 'https://admin.example.com' }), output)
 
@@ -348,8 +325,7 @@ describe('DeployCommand', () => {
 			adminDistDir: '/project/admin/dist',
 			facadeResult: false,
 		})
-		const { output } = createTestOutput({ stdinTty: true, stderrTty: true })
-		prompts.inject([false])
+		const { output } = createTestOutput({ stdinTty: true, stderrTty: true, answers: ['n'] })
 
 		const code = await command.execute(new Input({}, { admin: 'https://admin.example.com' }), output)
 

@@ -14,7 +14,6 @@ import { RemoteProject } from '../../../src/lib/project/RemoteProject.js'
 import { join } from 'node:path'
 import { tmpdir } from 'node:os'
 import { mkdtemp, rm } from 'node:fs/promises'
-import prompts from 'prompts'
 import { confirmImport } from '../../../src/commands/transfer/utils.js'
 
 const cliEnv = (overrides: Partial<CliEnv> = {}): CliEnv => ({
@@ -687,9 +686,8 @@ describe('data export output', () => {
 
 describe('data transfer confirmation guard', () => {
 	test('maps interactive confirmation through the diagnostic prompt stream', async () => {
-		const { output } = createTestOutput({ stdinTty: true, stderrTty: true })
+		const { output } = createTestOutput({ stdinTty: true, stderrTty: true, answers: ['y', 'n'] })
 		const input = new Input({}, { yes: false })
-		prompts.inject([true, false])
 
 		expect(await confirmImport(input, output)).toBe(true)
 		expect(await confirmImport(input, output)).toBe(false)

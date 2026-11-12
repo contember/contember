@@ -1,4 +1,6 @@
-import { Writable } from 'node:stream'
+import { createInterface, type Interface } from 'node:readline'
+import type { Readable } from 'node:stream'
+import { CliError, ExitCode } from './CliError.js'
 import { setColorsEnabled, style, terminalSupportsColor } from './colors.js'
 import type { GlobalOptionValues } from './GlobalOptions.js'
 import { formatTable } from './table.js'
@@ -12,15 +14,14 @@ export interface OutputStream {
 	onError?(listener: (error: unknown) => void): void
 }
 
+/** Reads one line of the user's answer, or `undefined` when the input is closed. */
+export type PromptLineReader = () => Promise<string | undefined>
+
 export interface OutputOptions {
 	stdout?: OutputStream
 	stderr?: OutputStream
 	isStdinTty?: () => boolean
-}
-
-export interface PromptOutputStream extends Writable {
-	readonly isTTY: boolean
-	readonly columns: number
+	readPromptLine?: PromptLineReader
 }
 
 export type OutputScalar = string | number | boolean | bigint | null | undefined
@@ -67,13 +68,13 @@ export class Output {
 	private readonly stdout: OutputStream
 	private readonly stderr: OutputStream
 	private readonly stdinIsTty: () => boolean
-	private readonly promptStderr: PromptOutputStream
+	private readonly readPromptLine: PromptLineReader
 
 	constructor(options: OutputOptions = {}) {
 		this.stdout = options.stdout ?? createProcessStream(process.stdout)
 		this.stderr = options.stderr ?? createProcessStream(process.stderr)
 		this.stdinIsTty = options.isStdinTty ?? (() => process.stdin.isTTY === true)
-		this.promptStderr = options.stderr === undefined ? process.stderr : createPromptStream(this.stderr)
+		this.readPromptLine = options.readPromptLine ?? readStdinLine
 		this.stdout.onError?.(handleStreamError)
 		this.stderr.onError?.(handleStreamError)
 	}
@@ -187,9 +188,14 @@ export class Output {
 		return this.currentMode === 'human' && this.stdinIsTty() && this.stderr.isTty
 	}
 
-	/** A real Writable suitable for the `stdout` option of interactive prompt libraries. */
-	public get promptOutput(): PromptOutputStream {
-		return this.promptStderr
+	/** Writes `question` to stderr and reads one answer line. */
+	public prompt(question: string): Promise<string | undefined> {
+		if (!this.canPrompt()) {
+			throw new CliError('TTY not available. Pass --yes to confirm.', { code: 'TTY_UNAVAILABLE', exitCode: ExitCode.InputError })
+		}
+		this.clearProgress()
+		writeStream(this.stderr, question)
+		return this.readPromptLine()
 	}
 
 	/**
@@ -230,29 +236,74 @@ const createProcessStream = (stream: NodeJS.WriteStream): OutputStream => ({
 	},
 })
 
-class PromptWritable extends Writable {
-	public readonly isTTY: boolean
-
-	constructor(private readonly stream: OutputStream) {
-		super({ decodeStrings: false })
-		this.isTTY = stream.isTty
-	}
-
-	public get columns(): number {
-		return this.stream.columns ?? 80
-	}
-
-	public override _write(chunk: string | Uint8Array, encoding: BufferEncoding, callback: (error?: Error | null) => void): void {
-		try {
-			writeStream(this.stream, typeof chunk === 'string' ? chunk : Buffer.from(chunk).toString(encoding))
-			callback()
-		} catch (error) {
-			callback(error instanceof Error ? error : new Error(String(error)))
-		}
-	}
+let stdinReader: LineReader | undefined
+const readStdinLine: PromptLineReader = () => {
+	stdinReader ??= new LineReader(process.stdin)
+	return stdinReader.read()
 }
 
-const createPromptStream = (stream: OutputStream): PromptOutputStream => new PromptWritable(stream)
+/**
+ * Reads answer lines from one input for all prompts, so that a line typed or pasted ahead of the next prompt is kept
+ * and an input that already ended reads as closed. Not in readline's terminal mode: the TTY handles line editing and
+ * echo, and Ctrl+C stays a plain SIGINT.
+ */
+export class LineReader {
+	private reader: Interface | undefined
+	private readonly lines: string[] = []
+	private waiting: ((line: string | undefined) => void) | undefined
+	private closed = false
+
+	constructor(private readonly input: Readable) {}
+
+	public read(): Promise<string | undefined> {
+		if (this.waiting) {
+			throw new Error('LineReader: a read is already pending')
+		}
+		const line = this.lines.shift()
+		if (line !== undefined) {
+			return Promise.resolve(line)
+		}
+		// readline never reports `close` for an input that ended before it was attached (Bun does not set readableEnded)
+		if (this.closed || this.input.readableEnded) {
+			this.closed = true
+			return Promise.resolve(undefined)
+		}
+		return new Promise(resolve => {
+			this.waiting = resolve
+			this.open().resume()
+		})
+	}
+
+	private open(): Interface {
+		if (this.reader) {
+			return this.reader
+		}
+		const reader = createInterface({ input: this.input, terminal: false })
+		reader.on('line', line => this.settle(line))
+		reader.on('close', () => {
+			this.closed = true
+			this.settle(undefined)
+		})
+		this.reader = reader
+		return reader
+	}
+
+	private settle(line: string | undefined): void {
+		const waiting = this.waiting
+		if (!waiting) {
+			if (line !== undefined) {
+				this.lines.push(line)
+			}
+			return
+		}
+		this.waiting = undefined
+		if (!this.closed) {
+			// a paused TTY does not keep the process alive between prompts; Node throws when pausing a closed interface
+			this.reader?.pause()
+		}
+		waiting(line)
+	}
+}
 
 const writeStream = (stream: OutputStream, text: string): void => {
 	try {

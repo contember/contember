@@ -49,11 +49,12 @@ describe('LRUCache', () => {
 		expect(cache.get('old')).toBeUndefined()
 	})
 
-	test('without ttl entries never expire', () => {
-		let now = 0
-		const cache = new LRUCache<string, number>(1, { now: () => now })
+	test.each([undefined, 0, -1])('ttl %p means no expiry and no clock reads', ttl => {
+		let reads = 0
+		const cache = new LRUCache<string, number>(1, { ttl, now: () => ++reads })
 		cache.set('a', 1)
-		now = Number.MAX_SAFE_INTEGER
+		cache.purgeStale()
 		expect(cache.get('a')).toBe(1)
+		expect(reads).toBe(0)
 	})
 })

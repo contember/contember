@@ -1,4 +1,4 @@
-import chalk from 'chalk'
+import { style } from './colors.js'
 import { ExitCode, isUnexpectedCliError, toCliError } from './CliError.js'
 import { escapeTerminalText, Output } from './Output.js'
 
@@ -12,9 +12,9 @@ export const renderCliError = (error: unknown, output: Output): ExitCode => {
 		output.writeStderr(serializeError(cliError, isUnexpectedCliError(cliError)))
 		return cliError.exitCode
 	}
-	output.writeStderr(chalk.red(`Error [${escapeTerminalText(cliError.code)}]: ${escapeTerminalText(cliError.message)}`))
+	output.writeStderr(style('red', `Error [${escapeTerminalText(cliError.code)}]: ${escapeTerminalText(cliError.message)}`))
 	if (cliError.exitCode === ExitCode.InternalError && typeof cliError.details === 'string') {
-		output.writeStderr(chalk.gray(escapeTerminalText(cliError.details)))
+		output.writeStderr(style('gray', escapeTerminalText(cliError.details)))
 	}
 	return cliError.exitCode
 }

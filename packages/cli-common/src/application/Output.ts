@@ -1,13 +1,9 @@
-/// <reference path="../../types/chalk-table/index.d.ts" />
-
-import chalk from 'chalk'
-import chalkTable from 'chalk-table'
 import { Writable } from 'node:stream'
+import { setColorsEnabled, style, terminalSupportsColor } from './colors.js'
 import type { GlobalOptionValues } from './GlobalOptions.js'
+import { formatTable } from './table.js'
 
 export type OutputMode = 'human' | 'json' | 'quiet'
-
-let supportedChalkLevel = chalk.level
 
 export interface OutputStream {
 	write(text: string): void
@@ -101,18 +97,7 @@ export class Output {
 
 	public applyGlobalOptions(globals: GlobalOptionValues): void {
 		this.setMode(resolveOutputMode(globals))
-		if (globals.color && this.currentMode === 'human') {
-			if (chalk.level === 0) {
-				chalk.level = supportedChalkLevel
-			} else {
-				supportedChalkLevel = chalk.level
-			}
-		} else {
-			if (chalk.level !== 0) {
-				supportedChalkLevel = chalk.level
-			}
-			chalk.level = 0
-		}
+		setColorsEnabled(globals.color && this.currentMode === 'human' && terminalSupportsColor)
 	}
 
 	// DATA → stdout
@@ -154,14 +139,14 @@ export class Output {
 		if (rows.length === 0) {
 			return
 		}
-		const data: Record<string, string>[] = rows.map(row => {
-			const cells: Record<string, string> = {}
+		const data = rows.map(row => {
+			const cells: Partial<Record<keyof T & string, string>> = {}
 			for (const column of columns) {
 				cells[column.field] = renderTableCell(column, row)
 			}
 			return cells
 		})
-		this.writeStdout(chalkTable<string>({ columns: columns.map(it => ({ field: it.field, name: it.name })) }, data))
+		this.writeStdout(formatTable(columns.map(it => ({ field: it.field, name: it.name })), data))
 	}
 
 	// DIAGNOSTICS → stderr
@@ -171,11 +156,11 @@ export class Output {
 	}
 
 	public warn(message: string): void {
-		this.writeDiagnostic(message, text => chalk.yellow(text))
+		this.writeDiagnostic(message, text => style('yellow', text))
 	}
 
 	public error(message: string): void {
-		this.writeDiagnostic(message, text => chalk.red(text))
+		this.writeDiagnostic(message, text => style('red', text))
 	}
 
 	// PROGRESS → stderr

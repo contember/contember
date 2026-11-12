@@ -1,4 +1,4 @@
-import chalk from 'chalk'
+import { style } from './colors.js'
 import { CommandCatalogEntry, CommandFactory, CommandManager } from './CommandManager.js'
 import { Command } from './Command.js'
 import { InvalidInputError } from './InputParser.js'
@@ -99,7 +99,7 @@ export class Application {
 			const exitCode = renderCliError(e, this.output)
 			if (e instanceof InvalidInputError && command !== undefined && this.output.mode === 'human') {
 				const usage = command.getConfiguration().getUsage({ format: 'line' })
-				this.output.writeStderr(`${showCommandName && entry ? chalk.greenBright(entry.name) + ' ' : ''}${chalk.green(usage)}`)
+				this.output.writeStderr(`${showCommandName && entry ? style('greenBright', entry.name) + ' ' : ''}${style('green', usage)}`)
 			}
 			return exitCode
 		}
@@ -116,11 +116,11 @@ export class Application {
 		const indent = '    '
 		for (const entry of commands) {
 			const configuration = entry.create().getConfiguration()
-			this.output.writeStderr(`${indent}${chalk.greenBright(entry.name.padEnd(maxCommandNameLength))}${indent}${configuration.getDescription()}`)
+			this.output.writeStderr(`${indent}${style('greenBright', entry.name.padEnd(maxCommandNameLength))}${indent}${configuration.getDescription()}`)
 			if (verbose) {
 				const helpIndent = `${indent}${' '.repeat(maxCommandNameLength)}${indent}`
 				const usage = configuration.getUsage({ format: 'multiline', indent: helpIndent })
-				this.output.writeStderr(usage ? chalk.green(usage) : `${helpIndent}${chalk.gray('No options')}`)
+				this.output.writeStderr(usage ? style('green', usage) : `${helpIndent}${style('gray', 'No options')}`)
 			}
 		}
 	}
@@ -131,13 +131,13 @@ export class Application {
 		const indent = '    '
 		for (const entry of [...entries].sort((a, b) => a.name.localeCompare(b.name))) {
 			const configuration = entry.create().getConfiguration()
-			this.output.writeStderr(`${indent}${chalk.greenBright(entry.name.padEnd(maxCommandNameLength))}${indent}${configuration.getDescription()}`)
+			this.output.writeStderr(`${indent}${style('greenBright', entry.name.padEnd(maxCommandNameLength))}${indent}${configuration.getDescription()}`)
 		}
 	}
 
 	private printCommandHelp(name: string, command: ReturnType<CommandFactory>, showCommandName: boolean): void {
 		if (showCommandName) {
-			this.output.writeStderr(chalk.greenBright(name))
+			this.output.writeStderr(style('greenBright', name))
 		}
 		const configuration = command.getConfiguration()
 		const commandDescription = configuration.getDescription()
@@ -147,7 +147,7 @@ export class Application {
 		const shortUsage = configuration.getUsage({ format: 'short' })
 		if (shortUsage) {
 			this.output.writeStderr('\nUsage:')
-			this.output.writeStderr(chalk.green(shortUsage))
+			this.output.writeStderr(style('green', shortUsage))
 			this.output.writeStderr('\nArguments and options:')
 			this.output.writeStderr(configuration.getUsage({ format: 'multiline' }))
 		}

@@ -1,5 +1,5 @@
 import { beforeAll, expect, test } from 'bun:test'
-import chalk from 'chalk'
+import { setColorsEnabled } from '@contember/cli-common'
 import { emptySchema } from '@contember/schema-utils'
 import { MigrationDescriber, ModificationHandlerFactory, SchemaMigrator, VERSION_LATEST } from '@contember/schema-migrations'
 import { Migration } from '@contember/migrations-client'
@@ -8,7 +8,7 @@ import { createTestOutput } from '../../../../cli-common/tests/lib/testOutput.js
 
 beforeAll(() => {
 	// deterministic assertions regardless of the terminal the suite runs in
-	chalk.level = 0
+	setColorsEnabled(false)
 })
 
 // A migration that grants a role on an entity the model does not have — applying it succeeds, but the

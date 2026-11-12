@@ -1,11 +1,11 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
-import chalk from 'chalk'
+import { areColorsEnabled, setColorsEnabled, terminalSupportsColor } from '../../../src/index.js'
 import { escapeTerminalText, Output, OutputStream, OutputTableColumn } from '../../../src/index.js'
 import { CapturingStream, createTestOutput } from '../../lib/testOutput.js'
 
 beforeAll(() => {
 	// deterministic assertions regardless of the terminal the suite runs in
-	chalk.level = 0
+	setColorsEnabled(false)
 })
 
 describe('Output.data', () => {
@@ -375,19 +375,19 @@ describe('Output.applyGlobalOptions', () => {
 		expect(output.mode).toBe('human')
 	})
 
-	test('--no-color turns chalk off', () => {
+	test('--no-color turns colors off', () => {
 		const { output } = createTestOutput()
-		chalk.level = 3
+		setColorsEnabled(true)
 		output.applyGlobalOptions({ json: false, quiet: false, color: false, help: false })
-		expect(chalk.level).toBe(0)
+		expect(areColorsEnabled()).toBe(false)
 	})
 
 	test('restores supported color after a machine execution', () => {
 		const { output } = createTestOutput()
-		chalk.level = 2
+		setColorsEnabled(true)
 		output.applyGlobalOptions({ json: true, quiet: false, color: true, help: false })
-		expect(chalk.level).toBe(0)
+		expect(areColorsEnabled()).toBe(false)
 		output.applyGlobalOptions({ json: false, quiet: false, color: true, help: false })
-		expect(chalk.level).toBe(2)
+		expect(areColorsEnabled()).toBe(terminalSupportsColor)
 	})
 })

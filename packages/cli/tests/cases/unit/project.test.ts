@@ -2,7 +2,7 @@ import { afterEach, beforeAll, describe, expect, test } from 'bun:test'
 import * as fs from 'node:fs/promises'
 import * as os from 'node:os'
 import * as path from 'node:path'
-import chalk from 'chalk'
+import { setColorsEnabled } from '@contember/cli-common'
 import { Model, Schema } from '@contember/schema'
 import { emptySchema } from '@contember/schema-utils'
 import {
@@ -25,7 +25,7 @@ import { ProjectValidateCommand } from '../../../src/commands/project/ProjectVal
 
 beforeAll(() => {
 	// deterministic assertions regardless of the terminal the suite runs in
-	chalk.level = 0
+	setColorsEnabled(false)
 })
 
 class CapturingStream implements OutputStream {

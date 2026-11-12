@@ -17,9 +17,12 @@ export type {
 	OutputTableColumns,
 	ParsedCommandInput,
 	PromptOutputStream,
+	TableColumn,
+	TextStyle,
 } from './application/index.js'
 export {
 	Application,
+	areColorsEnabled,
 	CliError,
 	Command,
 	CommandConfiguration,
@@ -27,6 +30,7 @@ export {
 	escapeTerminalText,
 	ExitCode,
 	exitProcess,
+	formatTable,
 	globalOptions,
 	Input,
 	InvalidConfigurationError,
@@ -36,6 +40,9 @@ export {
 	Output,
 	readGlobalOptionsFromArgs,
 	renderCliError,
+	setColorsEnabled,
+	style,
+	terminalSupportsColor,
 	toCliError,
 } from './application/index.js'
 export * from './npm/index.js'

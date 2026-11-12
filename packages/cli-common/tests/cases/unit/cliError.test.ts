@@ -1,10 +1,10 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
-import chalk from 'chalk'
+import { setColorsEnabled } from '../../../src/index.js'
 import { CliError, ExitCode, InvalidInputError, renderCliError, toCliError } from '../../../src/index.js'
 import { createTestOutput } from '../../lib/testOutput.js'
 
 beforeAll(() => {
-	chalk.level = 0
+	setColorsEnabled(false)
 })
 
 describe('toCliError', () => {

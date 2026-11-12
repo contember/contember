@@ -1,8 +1,5 @@
-/// <reference path="../../../../types/chalk-table/index.d.ts" />
-
-import { Command, CommandConfiguration, Input, Output } from '@contember/cli-common'
+import { Command, CommandConfiguration, formatTable, Input, Output } from '@contember/cli-common'
 import type { AuthLogFilter } from '@contember/graphql-client-tenant'
-import chalkTable from 'chalk-table'
 import { TenantClientProvider } from '../../../lib/TenantClientProvider.js'
 import { TenantAuthLogEntry } from '../../../lib/tenant/clients/index.js'
 import { GRAPHQL_INT_MAX, parsePaginationLimit, parsePaginationOffset } from '../../../lib/tenant/input/index.js'
@@ -120,7 +117,7 @@ const renderHuman = (page: AuthLogPageResult): string => {
 	if (page.entries.length === 0) {
 		return 'No auth log entries match the filter.'
 	}
-	const table = chalkTable({ columns: humanColumns }, page.entries.map(toHumanRow))
+	const table = formatTable(humanColumns, page.entries.map(toHumanRow))
 	return page.hasMore ? `${table}\nMore entries available — rerun with --offset ${page.nextOffset}.` : table
 }
 

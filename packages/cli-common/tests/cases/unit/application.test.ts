@@ -1,5 +1,5 @@
 import { beforeAll, describe, expect, spyOn, test } from 'bun:test'
-import chalk from 'chalk'
+import { setColorsEnabled } from '../../../src/index.js'
 import {
 	Application,
 	CliError,
@@ -18,7 +18,7 @@ import {
 import { createTestOutput, TestOutput } from '../../lib/testOutput.js'
 
 beforeAll(() => {
-	chalk.level = 0
+	setColorsEnabled(false)
 })
 
 type PrintSchemaOptions = {

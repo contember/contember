@@ -50,15 +50,17 @@ export const createDefaultLogger = (): Logger => {
 			formatters: {
 				pid: () => undefined,
 				loggerId: () => undefined,
-				uri: ({ attributes, chalk }) => {
+				uri: ({ attributes, style }) => {
 					const color = attributes.status === undefined
-						? chalk.cyan
+						? 'cyan'
 						: attributes.status < 300
-						? chalk.green
-						: chalk.yellowBright
+						? 'green'
+						: 'yellowBright'
 					const timeInfo = attributes.totalTimeMs !== undefined ? ` ${attributes.totalTimeMs}ms` : ''
 					const statusInfo = attributes.status !== undefined ? ` [${attributes.status}]` : ''
-					return { line: color(`${attributes.method}${statusInfo} ${attributes.uri}${timeInfo} ${chalk.white.dim('#' + attributes.requestId)}`) }
+					return {
+						line: style(color, `${attributes.method}${statusInfo} ${attributes.uri}${timeInfo} ${style(['white', 'dim'], '#' + attributes.requestId)}`),
+					}
 				},
 				method: () => undefined,
 				requestId: () => undefined,

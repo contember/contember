@@ -35,7 +35,6 @@
     "@types/js-yaml": "catalog:",
     "@types/node": "catalog:",
     "@types/prompts": "catalog:",
-    "@types/semver": "catalog:",
     "tailwindcss": "catalog:"
   },
   "dependencies": {
@@ -53,8 +52,6 @@
     "@contember/schema-utils": "workspace:*",
     "@contember/typesafe": "workspace:*",
     "@graphql-tools/schema": "catalog:",
-    "chalk": "catalog:",
-    "chalk-table": "catalog:",
     "graphql": "catalog:",
     "graphql-ts-client-api": "catalog:",
     "js-yaml": "catalog:",
@@ -62,7 +59,6 @@
     "preact": "catalog:",
     "preact-render-to-string": "catalog:",
     "prompts": "catalog:",
-    "semver": "catalog:",
     "yawn-yaml": "catalog:"
   },
   "peerDependencies": {

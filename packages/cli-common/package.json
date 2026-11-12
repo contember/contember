@@ -26,10 +26,6 @@
     "@types/js-yaml": "catalog:",
     "@types/node": "catalog:"
   },
-  "dependencies": {
-    "chalk": "catalog:",
-    "chalk-table": "catalog:"
-  },
   "type": "module",
   "repository": {
     "type": "git",

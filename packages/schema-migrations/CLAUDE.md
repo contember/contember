@@ -21,7 +21,7 @@ Each modification type implements `ModificationHandler<Data>`:
 - `getSchemaUpdater()` — pure function returning updated schema
 - `describe()` — human-readable description with `isDestructive` flag
 
-`createSql` may run twice: the engine first passes metadata that throws on read and, only if the handler reads it, loads it from the catalog and calls `createSql` again (`SchemaDatabaseMetadataResolverStore.withMetadata` in `engine-system-api`). Keep it free of side effects beyond the builder and `invalidateDatabaseMetadata`, and never catch errors around a `databaseMetadata` read. A handler that reads metadata must invalidate it afterwards: that is what keeps every read fresh even after renames and drops, which do not invalidate.
+`createSql` may run twice: the engine first passes metadata that throws on read and, only if the handler reads it, loads it from the catalog and calls `createSql` again (`SchemaDatabaseMetadataResolverStore.withMetadata` in `engine-system-api`). Keep it free of side effects beyond the builder and `invalidateDatabaseMetadata`, and never catch errors around a `databaseMetadata` read. Each read comes from the catalog as of that modification and is never reused by a later one, so renames and drops that do not call `invalidateDatabaseMetadata` are still seen.
 
 40+ modification types covering: entities, columns, relations, enums, constraints, indexes, views, ACL (with RFC 6902 JSON patches), validation, actions, settings.
 

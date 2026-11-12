@@ -41,18 +41,17 @@ export class SchemaDatabaseMetadataResolverStore {
 	}
 
 	/**
-	 * Runs `cb` with the cached metadata, or with a stand-in that throws on any read; only then is the metadata
-	 * resolved and `cb` run again, so it must have no other side effects than the cache invalidation.
-	 * The metadata is then as of the first read, not as of the last invalidation.
+	 * Runs `cb` with a stand-in that throws on any read; only then is the metadata read from the catalog and `cb` run
+	 * again, so it must have no other side effects. Bypasses the cache: renames and drops do not invalidate it.
 	 */
 	public async withMetadata<T>(schema: string, cb: (metadata: DatabaseMetadata) => T): Promise<T> {
 		try {
-			return await cb(this.cache.get(schema) ?? notLoadedDatabaseMetadata)
+			return await cb(notLoadedDatabaseMetadata)
 		} catch (e) {
 			if (!(e instanceof DatabaseMetadataNotLoadedError)) {
 				throw e
 			}
-			return cb(await this.getMetadata(schema))
+			return cb(await this.resolver.resolveMetadata(this.db.client, schema))
 		}
 	}
 

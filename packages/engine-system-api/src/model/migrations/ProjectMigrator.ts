@@ -366,7 +366,7 @@ export class ProjectMigrator {
 			schema: newSchema,
 		} = this.migrationDescriber.describeModification(schema, modification, { formatVersion })
 		for (const stage of stages) {
-			// Every handler that reads metadata invalidates it, so each read sees the catalog as of that modification.
+			// Read at the modification that uses it, so renames and drops before it in the same call are visible.
 			const sql = await metadataStore.withMetadata(stage.schema, databaseMetadata =>
 				getSql({
 					systemSchema: project.systemSchema,

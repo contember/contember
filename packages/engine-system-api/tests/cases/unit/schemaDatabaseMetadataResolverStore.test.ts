@@ -28,31 +28,16 @@ const indexNames = (metadata: DatabaseMetadata) => metadata.indexes.filter({ tab
 test('a callback that does not read metadata never resolves it', async () => {
 	const { resolver, store } = createStore()
 	expect(await store.withMetadata('stage_live', () => 'CREATE TABLE article ()')).toBe('CREATE TABLE article ()')
-	store.invalidate('stage_live')
-	expect(await store.withMetadata('stage_live', () => 'ALTER TABLE article ADD title text')).toBe('ALTER TABLE article ADD title text')
 	expect(resolver.resolvedSchemas).toEqual([])
 })
 
-test('a callback that reads metadata gets it resolved, cached until invalidated', async () => {
+test('every reading callback gets metadata resolved for its schema at that point, without invalidation', async () => {
 	const { resolver, store } = createStore()
 	expect(await store.withMetadata('stage_live', indexNames)).toEqual(['idx_1'])
-	expect(await store.withMetadata('stage_live', indexNames)).toEqual(['idx_1'])
-	expect(resolver.resolvedSchemas).toEqual(['stage_live'])
-
-	store.invalidate('stage_live')
-	await store.withMetadata('stage_live', () => 'no read')
-	expect(resolver.resolvedSchemas).toEqual(['stage_live'])
+	// e.g. a rename ran in between: it does not invalidate, the next read must still see the catalog anew
 	expect(await store.withMetadata('stage_live', indexNames)).toEqual(['idx_2'])
-	expect(resolver.resolvedSchemas).toEqual(['stage_live', 'stage_live'])
-})
-
-test('metadata is cached per schema', async () => {
-	const { resolver, store } = createStore()
-	await store.withMetadata('stage_live', indexNames)
-	await store.withMetadata('stage_preview', indexNames)
-	store.invalidate('stage_preview')
-	await store.withMetadata('stage_live', indexNames)
-	expect(resolver.resolvedSchemas).toEqual(['stage_live', 'stage_preview'])
+	expect(await store.withMetadata('stage_preview', indexNames)).toEqual(['idx_3'])
+	expect(resolver.resolvedSchemas).toEqual(['stage_live', 'stage_live', 'stage_preview'])
 })
 
 test('an error thrown by the callback itself propagates without resolving metadata', async () => {

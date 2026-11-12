@@ -41,6 +41,7 @@
     "@contember/schema-utils": "workspace:*",
     "@contember/telemetry": "workspace:*",
     "@contember/typesafe": "workspace:*",
+    "@contember/utilities": "workspace:*",
     "@graphql-tools/merge": "catalog:",
     "@graphql-tools/schema": "catalog:",
     "@koa/cors": "catalog:",
@@ -53,7 +54,6 @@
     "lru-cache": "catalog:",
     "path-to-regexp": "catalog:",
     "prom-client": "catalog:",
-    "uuid": "catalog:",
     "ws": "catalog:"
   },
   "devDependencies": {

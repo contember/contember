@@ -1,10 +1,10 @@
-import { v4 as uuidV4 } from 'uuid'
+import { generateUuidV4 } from '@contember/utilities'
 import type { FieldAccessor } from '@contember/binding-common'
 import { FieldHelper } from './FieldHelper.js'
 
 class UuidFieldHelper extends FieldHelper<string> {
 	public setToUuid(options?: FieldAccessor.UpdateOptions) {
-		this.getAccessor().updateValue(uuidV4(), options)
+		this.getAccessor().updateValue(generateUuidV4(), options)
 	}
 }
 namespace UuidFieldHelper {

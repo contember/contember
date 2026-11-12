@@ -1,4 +1,4 @@
-import { validate as uuidValidate } from 'uuid'
+import { isUuid } from '@contember/utilities'
 import type { FieldValue } from '@contember/binding-common'
 import {
 	BindingError,
@@ -63,7 +63,7 @@ export class FieldOperations {
 								+ `Once set, it is immutable.`,
 						)
 					}
-					if (typeof newValue !== 'string' || !uuidValidate(newValue)) {
+					if (typeof newValue !== 'string' || !isUuid(newValue)) {
 						throw new BindingError(
 							`Invalid value supplied for the '${PRIMARY_KEY_NAME}' field. `
 								+ `Expecting a valid uuid but '${newValue}' was given.\n`

@@ -28,8 +28,7 @@
     "@contember/typesafe": "workspace:*",
     "mime-types": "catalog:",
     "picomatch": "catalog:",
-    "qs": "catalog:",
-    "uuid": "catalog:"
+    "qs": "catalog:"
   },
   "devDependencies": {
     "@types/mime-types": "catalog:",

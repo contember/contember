@@ -15,4 +15,4 @@ export * from './utils/assertNever.js'
 export * from './utils/createQueryBuilder.js'
 export * from './utils/whereToFilter.js'
 
-export { v4 as generateUuid } from 'uuid'
+export { generateUuidV4 as generateUuid } from '@contember/utilities'

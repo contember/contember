@@ -54,7 +54,7 @@ export function dataAttribute<const T extends string>(value: T): T;
 // @public (undocumented)
 export function dataAttribute(value: boolean | string | number | undefined | null): string | undefined;
 
-// @public (undocumented)
+// @public
 export const deepEqual: (a: unknown, b: unknown) => boolean;
 
 // @internal
@@ -83,7 +83,6 @@ export class LRUCache<Key, Value> {
 export interface LRUCacheOptions {
     // (undocumented)
     now?: () => number;
-    // Warning: (tsdoc-malformed-html-name) Invalid HTML element: Expecting an HTML name
     ttl?: number;
 }
 

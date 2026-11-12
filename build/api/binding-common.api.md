@@ -6,7 +6,7 @@
 
 import { ContentQueryBuilder } from '@contember/client-content';
 import { EmbeddedActionsParser } from 'chevrotain';
-import { v4 as generateUuid } from 'uuid';
+import { generateUuidV4 as generateUuid } from '@contember/utilities';
 import type { GraphQlClient } from '@contember/client';
 import type { GraphQlClientRequestOptions } from '@contember/client';
 import { Input } from '@contember/client';

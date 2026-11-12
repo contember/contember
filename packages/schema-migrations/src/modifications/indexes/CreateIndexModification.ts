@@ -4,7 +4,7 @@ import { SchemaUpdater, updateEntity, updateModel } from '../utils/schemaUpdateU
 import { createModificationType, Differ, ModificationHandler, ModificationHandlerCreateSqlOptions } from '../ModificationHandler.js'
 import { wrapIdentifier } from '../../utils/dbHelpers.js'
 import { getIndexColumns } from './utils.js'
-import deepEqual from 'fast-deep-equal'
+import { deepEqual } from '@contember/utilities'
 
 export class CreateIndexModificationHandler implements ModificationHandler<CreateIndexModificationData> {
 	constructor(private readonly data: CreateIndexModificationData, private readonly schema: Schema) {}

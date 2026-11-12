@@ -5,6 +5,7 @@
 	},
 	"references": [
 		{ "path": "../../schema/src" },
-		{ "path": "../../schema-utils/src" }
+		{ "path": "../../schema-utils/src" },
+		{ "path": "../../utilities/src" }
 	]
 }

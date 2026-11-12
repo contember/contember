@@ -1,7 +1,7 @@
 import { Actions, Schema } from '@contember/schema'
 import { SchemaUpdater } from '../utils/schemaUpdateUtils.js'
 import { createModificationType, Differ, ModificationHandler } from '../ModificationHandler.js'
-import deepEqual from 'fast-deep-equal'
+import { deepEqual } from '@contember/utilities'
 
 export class UpdateTargetModificationHandler implements ModificationHandler<UpdateTargetModificationData> {
 	constructor(private readonly data: UpdateTargetModificationData) {

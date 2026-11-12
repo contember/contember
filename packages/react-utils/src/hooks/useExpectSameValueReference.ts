@@ -1,4 +1,4 @@
-import deepEqual from 'fast-deep-equal/es6/index.js'
+import { deepEqual } from '@contember/utilities'
 import { useRef } from 'react'
 
 /**

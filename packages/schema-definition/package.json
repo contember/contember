@@ -25,8 +25,8 @@
   "dependencies": {
     "@contember/schema": "workspace:*",
     "@contember/schema-utils": "workspace:*",
-    "reflect-metadata": "catalog:",
-    "fast-deep-equal": "catalog:"
+    "@contember/utilities": "workspace:*",
+    "reflect-metadata": "catalog:"
   },
   "devDependencies": {
     "graphql": "catalog:"

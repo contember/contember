@@ -11,6 +11,7 @@
 		{ "path": "../../logger/src" },
 		{ "path": "../../schema/src" },
 		{ "path": "../../schema-definition/src" },
-		{ "path": "../../schema-utils/src" }
+		{ "path": "../../schema-utils/src" },
+		{ "path": "../../utilities/src" }
 	]
 }

@@ -1,6 +1,6 @@
 import { BindingError } from '../BindingError.js'
 import type { Filter } from '../treeParameters/index.js'
-import equal from 'fast-deep-equal/es6/index.js'
+import { deepEqual } from '@contember/utilities'
 import { Schema, SchemaColumn, SchemaEntity, SchemaRelation } from '../schema/index.js'
 
 class Environment<Node extends Environment.AnyNode | undefined = Environment.AnyNode | undefined> {
@@ -143,7 +143,7 @@ class Environment<Node extends Environment.AnyNode | undefined = Environment.Any
 			...this.options.dimensions,
 			...dimensions,
 		}
-		if (equal(newDimensions, this.options.dimensions)) {
+		if (deepEqual(newDimensions, this.options.dimensions)) {
 			return this
 		}
 		return new Environment({ ...this.options, dimensions: newDimensions })
@@ -187,7 +187,7 @@ class Environment<Node extends Environment.AnyNode | undefined = Environment.Any
 		if (other === this) {
 			return this
 		}
-		if (!equal(this.options.node, other.options.node)) {
+		if (!deepEqual(this.options.node, other.options.node)) {
 			throw new BindingError(`Cannot merge two environments with different tree position.`)
 		}
 		if (this.options.parameters !== other.options.parameters) {
@@ -201,11 +201,11 @@ class Environment<Node extends Environment.AnyNode | undefined = Environment.Any
 			throw new BindingError(`Cannot merge two environments with different extensions.`)
 		}
 
-		if (equal(this.options.variables, other.options.variables) && this.options.parent === other.options.parent) {
+		if (deepEqual(this.options.variables, other.options.variables) && this.options.parent === other.options.parent) {
 			return this
 		}
 		for (const key in other.options.variables) {
-			if (key in this.options.variables && !equal(this.options.variables[key], other.options.variables[key])) {
+			if (key in this.options.variables && !deepEqual(this.options.variables[key], other.options.variables[key])) {
 				throw new BindingError(
 					`Cannot merge two environments with different value of variable ${key}:\n`
 						+ JSON.stringify(this.options.variables[key]) + '\n'

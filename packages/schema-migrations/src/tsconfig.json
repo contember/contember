@@ -9,6 +9,7 @@
 		{ "path": "../../database/src" },
 		{ "path": "../../engine-common/src" },
 		{ "path": "../../schema/src" },
-		{ "path": "../../schema-utils/src" }
+		{ "path": "../../schema-utils/src" },
+		{ "path": "../../utilities/src" }
 	]
 }

@@ -9,7 +9,7 @@ import {
 	useDataViewPagingMethods,
 } from '../../contexts.js'
 import { Component, EntityListAccessor, EntityListSubTreeMarker, QualifiedEntityList } from '@contember/react-binding'
-import deepEqual from 'fast-deep-equal'
+import { deepEqual } from '@contember/utilities'
 
 export const DataViewInfiniteLoadProvider = Component(({ children }: {
 	children: ReactNode

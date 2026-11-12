@@ -1,7 +1,7 @@
 import { Model, Schema } from '@contember/schema'
 import { SchemaUpdater, updateEntity, updateField, updateModel } from '../utils/schemaUpdateUtils.js'
 import { createModificationType, Differ, ModificationHandler } from '../ModificationHandler.js'
-import deepEqual from 'fast-deep-equal'
+import { deepEqual } from '@contember/utilities'
 import { updateRelations } from '../utils/diffUtils.js'
 
 export class UpdateRelationOrderByModificationHandler implements ModificationHandler<UpdateRelationOrderByModificationData> {

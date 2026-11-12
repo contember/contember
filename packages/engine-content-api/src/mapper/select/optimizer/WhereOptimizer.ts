@@ -1,7 +1,7 @@
 import { Input, Model, Writable } from '@contember/schema'
 import { ConditionOptimizer } from './ConditionOptimizer.js'
 import { acceptFieldVisitor, getEntity, isRelation } from '@contember/schema-utils'
-import deepEqual from 'fast-deep-equal'
+import { deepEqual } from '@contember/utilities'
 import { optimizeAnd, optimizeNot, optimizeOr } from './helpers.js'
 import { replaceWhere } from './WhereReplacer.js'
 import {

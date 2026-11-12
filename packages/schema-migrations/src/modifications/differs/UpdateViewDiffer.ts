@@ -1,6 +1,6 @@
 import { Differ } from '../ModificationHandler.js'
 import { Model, Schema } from '@contember/schema'
-import deepEqual from 'fast-deep-equal'
+import { deepEqual } from '@contember/utilities'
 import { Migration } from '../../Migration.js'
 import { isReplaceableViewChange } from '../utils/viewDependencies.js'
 import { updateViewModification } from '../entities/UpdateViewModification.js'

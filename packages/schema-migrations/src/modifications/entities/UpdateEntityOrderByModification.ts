@@ -2,7 +2,7 @@ import { MigrationBuilder } from '@contember/database-migrations'
 import { Model, Schema } from '@contember/schema'
 import { SchemaUpdater, updateEntity, updateModel } from '../utils/schemaUpdateUtils.js'
 import { createModificationType, Differ, ModificationHandler } from '../ModificationHandler.js'
-import deepEqual from 'fast-deep-equal'
+import { deepEqual } from '@contember/utilities'
 
 export class UpdateEntityOrderByModificationHandler implements ModificationHandler<UpdateEntityOrderByModificationData> {
 	constructor(private readonly data: UpdateEntityOrderByModificationData, private readonly schema: Schema) {}

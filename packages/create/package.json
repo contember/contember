@@ -5,7 +5,6 @@
   "bin": "dist/production/run.js",
   "dependencies": {
     "@contember/cli-common": "workspace:*",
-    "degit": "catalog:",
     "js-yaml": "catalog:"
   },
   "engines": {
@@ -14,9 +13,6 @@
   "type": "module",
   "scripts": {
     "pre-build": "node ./resources/templates/default/scripts/assemble-ui-lib.mjs --packages-dir .. --target ./resources/templates/default/admin/lib"
-  },
-  "devDependencies": {
-    "@types/degit": "catalog:"
   },
   "repository": {
     "type": "git",

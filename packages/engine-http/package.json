@@ -51,7 +51,6 @@
     "koa": "catalog:",
     "koa-bodyparser": "catalog:",
     "koa-compress": "catalog:",
-    "lru-cache": "catalog:",
     "path-to-regexp": "catalog:",
     "prom-client": "catalog:",
     "ws": "catalog:"

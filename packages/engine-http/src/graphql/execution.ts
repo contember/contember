@@ -10,7 +10,7 @@ import {
 	validate,
 	validateSchema,
 } from 'graphql'
-import { LRUCache } from 'lru-cache'
+import { LRUCache } from '@contember/utilities'
 import { createHash } from 'node:crypto'
 import { Request, Response } from 'koa'
 import { logger } from '@contember/logger'
@@ -58,14 +58,8 @@ export const createGraphQLQueryHandler = <Context>({
 	getMemoryBudget,
 }: FactoryArgs<Context>): GraphQLQueryHandler<Context> => {
 	let schemaValidated = false
-	const hitCache = new LRUCache<string, true>({
-		max: hitCacheMax,
-		ttl: hitCacheMaxAgeSeconds * 1000,
-	})
-	const documentCache = new LRUCache<string, DocumentNode>({
-		max: documentCacheMax,
-		ttl: documentCacheMaxAgeSeconds * 1000,
-	})
+	const hitCache = new LRUCache<string, true>(hitCacheMax, { ttl: hitCacheMaxAgeSeconds * 1000 })
+	const documentCache = new LRUCache<string, DocumentNode>(documentCacheMax, { ttl: documentCacheMaxAgeSeconds * 1000 })
 	let lastPrune = Date.now()
 
 	return async ({ request, response, createContext }) => {

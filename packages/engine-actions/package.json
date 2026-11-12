@@ -38,7 +38,6 @@
     "@contember/telemetry": "workspace:*",
     "@contember/typesafe": "workspace:*",
     "@graphql-tools/schema": "catalog:",
-    "graphql-tag": "catalog:",
     "prom-client": "catalog:"
   },
   "devDependencies": {

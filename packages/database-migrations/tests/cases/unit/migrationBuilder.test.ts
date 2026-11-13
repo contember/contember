@@ -1,0 +1,270 @@
+import { describe, expect, test } from 'bun:test'
+import { createMigrationBuilder, escapeValue, MigrationBuilder } from '../../../src/index.js'
+
+// Engine and content migrations are recorded by name or by their JSON modifications, never by SQL, and their SQL is
+// generated when they run. These pin the exact SQL of every builder helper the engine uses, in the shapes it uses them,
+// so a builder upgrade cannot change what a not-yet-run migration executes on an existing database.
+const lines = (...parts: string[]): string => parts.join('\n')
+
+const sqlOf = (build: (builder: MigrationBuilder) => void): string[] => {
+	const builder = createMigrationBuilder()
+	build(builder)
+	return builder.getSqlSteps()
+}
+
+describe('migration builder SQL', () => {
+	test('sql passes the statement through', () => {
+		expect(sqlOf(b => b.sql('SELECT 1'))).toEqual([
+			'SELECT 1;',
+		])
+	})
+
+	test('getSql joins the steps', () => {
+		const builder = createMigrationBuilder()
+		builder.sql('SELECT 1')
+		builder.sql('SELECT 2')
+		expect(builder.getSql()).toEqual(lines(
+			'SELECT 1;',
+			'SELECT 2;',
+			'',
+		))
+	})
+
+	test('createTable with a primary key', () => {
+		expect(sqlOf(b => b.createTable('article', { id: { primaryKey: true, type: 'uuid', notNull: true } }))).toEqual([
+			lines(
+				'CREATE TABLE "article" (',
+				'  "id" uuid PRIMARY KEY NOT NULL',
+				');',
+			),
+		])
+	})
+
+	test('createTable with references', () => {
+		expect(sqlOf(b =>
+			b.createTable('article_tags', {
+				article_id: { type: 'uuid', notNull: true, references: '"article"("id")', onDelete: 'CASCADE' },
+				tag_id: { type: 'uuid', notNull: true, references: '"tag"("id")', onDelete: 'CASCADE' },
+			})
+		)).toEqual([
+			lines(
+				'CREATE TABLE "article_tags" (',
+				'  "article_id" uuid NOT NULL REFERENCES "article"("id") ON DELETE CASCADE,',
+				'  "tag_id" uuid NOT NULL REFERENCES "tag"("id") ON DELETE CASCADE',
+				');',
+			),
+		])
+	})
+
+	test('createTable with unique columns and a default', () => {
+		expect(sqlOf(b =>
+			b.createTable({ name: 'schema_migration' }, {
+				id: { notNull: true, type: 'SERIAL4' },
+				version: { notNull: true, type: 'varchar(20)', unique: true },
+				migration: { notNull: true, type: 'json' },
+				executed_at: { notNull: true, type: 'timestamp', default: 'now()' },
+			})
+		)).toEqual([
+			lines(
+				'CREATE TABLE "schema_migration" (',
+				'  "id" SERIAL4 NOT NULL,',
+				'  "version" varchar(20) UNIQUE NOT NULL,',
+				'  "migration" json NOT NULL,',
+				'  "executed_at" timestamp DEFAULT $pga$now()$pga$ NOT NULL',
+				');',
+			),
+		])
+	})
+
+	test('createTable in a schema', () => {
+		expect(sqlOf(b => b.createTable({ schema: 'system', name: 'stage' }, { id: { primaryKey: true, type: 'uuid' } }))).toEqual([
+			lines(
+				'CREATE TABLE "system"."stage" (',
+				'  "id" uuid PRIMARY KEY',
+				');',
+			),
+		])
+	})
+
+	test('addColumn', () => {
+		expect(sqlOf(b => {
+			b.addColumn('article', { title: { type: 'text', notNull: false } })
+			b.addColumn('task', { status: { type: '"TaskStatus"', notNull: true } })
+		})).toEqual([
+			lines(
+				'ALTER TABLE "article"',
+				'  ADD "title" text;',
+			),
+			lines(
+				'ALTER TABLE "task"',
+				'  ADD "status" "TaskStatus" NOT NULL;',
+			),
+		])
+	})
+
+	test('alterColumn', () => {
+		expect(sqlOf(b => {
+			b.alterColumn('article', 'locked', { notNull: true })
+			b.alterColumn('article', 'title', { notNull: false })
+			b.alterColumn('article', 'locked', { type: 'boolean', using: 'false' })
+			b.alterColumn('note', 'created_at', { notNull: true, type: 'timestamptz', using: '$pga$now$pga$' })
+			b.alterColumn('article', 'title', { collation: '"und-x-icu"', type: 'text' })
+		})).toEqual([
+			lines(
+				'ALTER TABLE "article"',
+				'  ALTER "locked" SET NOT NULL;',
+			),
+			lines(
+				'ALTER TABLE "article"',
+				'  ALTER "title" DROP NOT NULL;',
+			),
+			lines(
+				'ALTER TABLE "article"',
+				'  ALTER "locked" SET DATA TYPE boolean USING false;',
+			),
+			lines(
+				'ALTER TABLE "note"',
+				'  ALTER "created_at" SET DATA TYPE timestamptz USING $pga$now$pga$,',
+				'  ALTER "created_at" SET NOT NULL;',
+			),
+			lines(
+				'ALTER TABLE "article"',
+				'  ALTER "title" SET DATA TYPE text COLLATE "und-x-icu";',
+			),
+		])
+	})
+
+	test('renameColumn, dropColumn, renameTable and dropTable', () => {
+		expect(sqlOf(b => {
+			b.renameColumn('article', 'title', 'headline')
+			b.dropColumn('file', 'duration')
+			b.renameTable('article', 'post')
+			b.dropTable('legacy')
+		})).toEqual([
+			'ALTER TABLE "article" RENAME "title" TO "headline";',
+			lines(
+				'ALTER TABLE "file"',
+				'  DROP "duration";',
+			),
+			'ALTER TABLE "article" RENAME TO "post";',
+			'DROP TABLE "legacy";',
+		])
+	})
+
+	test('createDomain, renameDomain and dropDomain', () => {
+		expect(sqlOf(b => {
+			b.createDomain('TaskStatus', 'text', { check: `VALUE IN('todo','done')`, constraintName: 'taskstatus_check' })
+			b.renameDomain('TaskStatus', 'TaskStatus__old')
+			b.dropDomain('TaskStatus__old')
+		})).toEqual([
+			'CREATE DOMAIN "TaskStatus" AS text CONSTRAINT "taskstatus_check" CHECK (VALUE IN(\'todo\',\'done\'));',
+			'ALTER DOMAIN "TaskStatus" RENAME TO "TaskStatus__old";',
+			'DROP DOMAIN "TaskStatus__old";',
+		])
+	})
+
+	test('views and materialized views', () => {
+		expect(sqlOf(b => {
+			b.createView('author', {}, `SELECT null as id, 'John' AS name`)
+			b.createView('author', { replace: true }, `SELECT null as id, 'Jack' AS name`)
+			b.renameView('author', 'writer')
+			b.dropView('writer')
+			b.createMaterializedView('mat_author', { data: true }, `SELECT null as id, 'Jack' AS name`)
+			b.dropMaterializedView('mat_author')
+		})).toEqual([
+			'CREATE VIEW "author" AS SELECT null as id, \'John\' AS name;',
+			'CREATE OR REPLACE VIEW "author" AS SELECT null as id, \'Jack\' AS name;',
+			'ALTER VIEW "author" RENAME TO "writer";',
+			'DROP VIEW "writer";',
+			'CREATE MATERIALIZED VIEW "mat_author" AS SELECT null as id, \'Jack\' AS name WITH DATA;',
+			'DROP MATERIALIZED VIEW "mat_author";',
+		])
+	})
+
+	test('createTrigger, dropTrigger and dropFunction', () => {
+		expect(sqlOf(b => {
+			b.createTrigger('article', 'log_event', {
+				when: 'AFTER',
+				operation: ['INSERT', 'UPDATE', 'DELETE'],
+				level: 'ROW',
+				function: { schema: 'system', name: 'trigger_event' },
+				functionParams: ['id'],
+			})
+			b.createTrigger('article', 'log_event_trx', {
+				when: 'AFTER',
+				operation: ['INSERT', 'UPDATE', 'DELETE'],
+				level: 'ROW',
+				constraint: true,
+				deferrable: true,
+				deferred: true,
+				function: { schema: 'system', name: 'trigger_event_commit' },
+			})
+			b.dropTrigger({ schema: 'stage_live', name: 'article' }, 'log_event')
+			b.dropFunction({ name: 'make_diff' }, [{ name: 'old', type: 'jsonb' }, { name: 'new', type: 'jsonb' }])
+		})).toEqual([
+			lines(
+				'CREATE TRIGGER "log_event"',
+				'  AFTER INSERT OR UPDATE OR DELETE ON "article"',
+				'  FOR EACH ROW',
+				'  EXECUTE PROCEDURE "system"."trigger_event"($pga$id$pga$);',
+			),
+			lines(
+				'CREATE CONSTRAINT TRIGGER "log_event_trx"',
+				'  AFTER INSERT OR UPDATE OR DELETE ON "article"',
+				'  DEFERRABLE INITIALLY DEFERRED',
+				'  FOR EACH ROW',
+				'  EXECUTE PROCEDURE "system"."trigger_event_commit"();',
+			),
+			'DROP TRIGGER "log_event" ON "stage_live"."article";',
+			'DROP FUNCTION "make_diff"("old" jsonb, "new" jsonb);',
+		])
+	})
+
+	test('createIndex', () => {
+		expect(sqlOf(b => b.createIndex({ name: 'schema_migration' }, ['version'], { name: 'system_schema_migration_version' }))).toEqual([
+			'CREATE INDEX "system_schema_migration_version" ON "schema_migration" ("version");',
+		])
+	})
+
+	test('dropConstraint and an unnamed primary key constraint', () => {
+		expect(sqlOf(b => {
+			b.dropConstraint({ schema: 'stage_live', name: 'article_tags' }, 'article_tags_uniq_article_id_tag_id')
+			b.addConstraint({ schema: 'stage_live', name: 'article_tags' }, null, { primaryKey: ['article_id', 'tag_id'] })
+		})).toEqual([
+			'ALTER TABLE "stage_live"."article_tags" DROP CONSTRAINT "article_tags_uniq_article_id_tag_id";',
+			lines(
+				'ALTER TABLE "stage_live"."article_tags"',
+				'  ADD CONSTRAINT "article_tags_pkey" PRIMARY KEY ("article_id", "tag_id");',
+			),
+		])
+	})
+})
+
+describe('escapeValue', () => {
+	test('scalars', () => {
+		expect([escapeValue(null), escapeValue(true), escapeValue(false), escapeValue(42), escapeValue(1.5)]).toEqual([
+			'NULL',
+			'true',
+			'false',
+			42,
+			1.5,
+		])
+	})
+
+	test('strings with quotes, backslashes and the dollar-quote tag', () => {
+		expect([escapeValue(`it's`), escapeValue('back\\slash'), escapeValue('a $pga$ b'), escapeValue('{"a":"b"}')]).toEqual([
+			"$pga$it's$pga$",
+			'$pga$back\\slash$pga$',
+			'$pgb$a $pga$ b$pgb$',
+			'$pga${"a":"b"}$pga$',
+		])
+	})
+
+	test('arrays', () => {
+		expect([escapeValue(['a', 'b']), escapeValue([[1, 2], [3]]), escapeValue([])]).toEqual([
+			'ARRAY[$pga$a$pga$,$pga$b$pga$]',
+			'ARRAY[[1,2],[3]]',
+			'ARRAY[]',
+		])
+	})
+})

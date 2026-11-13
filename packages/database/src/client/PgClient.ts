@@ -14,7 +14,8 @@ export interface PgClient {
 	readonly processID: number | null
 	readonly secretKey: number | null
 
-	connect(): Promise<void>
+	// pg resolves with the client itself (typed since @types/pg 8.13); callers only await it.
+	connect(): Promise<unknown>
 
 	query<T extends Submittable>(query: T): T
 

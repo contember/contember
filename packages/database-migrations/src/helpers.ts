@@ -6,9 +6,10 @@ import { Migration, RunMigration } from './Migration.js'
 type BuilderDb = ConstructorParameters<typeof MigrationBuilder>[0]
 
 // The builder only collects SQL; migrations that need the database get a connection through their args.
+const noConnection = () => Promise.reject(new Error('The migration builder has no database connection, use the connection from migration args'))
 const noDatabase: BuilderDb = {
-	query: () => Promise.reject(new Error('The migration builder has no database connection, use the connection from migration args')),
-	select: () => Promise.reject(new Error('The migration builder has no database connection, use the connection from migration args')),
+	query: noConnection,
+	select: noConnection,
 }
 
 export function createMigrationBuilder(): MigrationBuilder {

@@ -1,4 +1,4 @@
-import { MigrationBuilder } from 'node-pg-migrate'
+import type { MigrationBuilder } from 'node-pg-migrate/migrationBuilder'
 import { Connection } from '@contember/database'
 
 export type MigrationExecutor<Args = unknown> = (builder: MigrationBuilder, args: MigrationArgs<Args>) => Promise<void> | void

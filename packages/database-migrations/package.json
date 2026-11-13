@@ -27,6 +27,7 @@
     "node-pg-migrate": "catalog:"
   },
   "devDependencies": {
+    "@types/pg": "catalog:",
     "pg": "catalog:"
   },
   "peerDependencies": {

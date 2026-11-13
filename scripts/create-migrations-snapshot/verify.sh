@@ -49,8 +49,8 @@ command -v createdb >/dev/null || die "createdb not found on PATH (install postg
 #     intentional and functionally equivalent, so we drop the fallback function's
 #     definition and map both names to one token before diffing.
 #   - drop the `pg_attver=<n>` column option: the postgres:16.16 image stores this
-#     per-column counter in attoptions and pg_dump 18 prints it, so it differs
-#     between any two databases. Only that option goes; other attoptions are kept.
+#     per-column counter in attoptions and Ubuntu's pg_dump prints it (Debian's does
+#     not), so it differs between any two databases. Other attoptions are kept.
 normalize() {
 	local schema="$1"
 	sed -E \
@@ -78,6 +78,8 @@ self_check_normalize() {
 	drift_a="$(printf '%s\n' "$col (n_distinct=5, pg_attver=1);" | normalize s)"
 	drift_b="$(printf '%s\n' "$col (n_distinct=7, pg_attver=2);" | normalize s)"
 	[ "$drift_a" != "$drift_b" ] || die "normalize self-check: n_distinct difference was hidden"
+	local other='    "b" text DEFAULT '"'"'x, pg_attver=1'"'"''
+	[ "$(printf '%s\n' "$other" | normalize s)" = "$other" ] || die "normalize self-check: a line other than ALTER COLUMN ... SET was changed"
 }
 
 dump_schema() {

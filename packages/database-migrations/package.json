@@ -27,10 +27,10 @@
   },
   "dependencies": {
     "@contember/database": "workspace:*",
+    "@types/pg": "catalog:",
     "node-pg-migrate": "catalog:"
   },
   "devDependencies": {
-    "@types/pg": "catalog:",
     "pg": "catalog:"
   },
   "peerDependencies": {

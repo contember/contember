@@ -175,11 +175,11 @@
       "version": "2.2.0-alpha.18",
       "dependencies": {
         "@contember/queryable": "workspace:*",
+        "@types/pg": "catalog:",
       },
       "devDependencies": {
         "@contember/database-tester": "workspace:*",
         "@types/node": "catalog:",
-        "@types/pg": "catalog:",
         "pg": "catalog:",
       },
       "peerDependencies": {
@@ -191,10 +191,10 @@
       "version": "2.2.0-alpha.18",
       "dependencies": {
         "@contember/database": "workspace:*",
+        "@types/pg": "catalog:",
         "node-pg-migrate": "catalog:",
       },
       "devDependencies": {
-        "@types/pg": "catalog:",
         "pg": "catalog:",
       },
       "peerDependencies": {

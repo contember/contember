@@ -7,6 +7,8 @@ export default {
 		'@popperjs/core',
 		'@aws-sdk/signature-v4-crt',
 		'pg',
+		// types-only: published declarations import 'pg'
+		'@types/pg',
 		'graphql',
 		'graphql-ts-client-api',
 		'react-dom',
@@ -21,7 +23,5 @@ export default {
 		'nodemailer/lib/ses-transport',
 		'crypto-js/sha256',
 		'crypto-js/enc-hex',
-		'node-pg-migrate/dist/utils.js',
-		'node-pg-migrate/dist/migration-builder.js',
 	],
 } satisfies Partial<DepsLintConfig>

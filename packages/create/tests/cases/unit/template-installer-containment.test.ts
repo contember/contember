@@ -117,6 +117,7 @@ describe('template directives stay inside the project', () => {
 		const fixture = await createFixture('copy:\n  README.md: sub/README.md\n')
 		await writeFile(join(fixture.templateDir, 'sub/README.md'), 'kept')
 		await expect(install(fixture)).rejects.toThrow('Template path "sub/README.md" already exists')
+		expect(await readFile(join(fixture.target, 'sub/README.md'), 'utf8')).toBe('kept')
 	})
 
 	test('still applies directives inside the project, also through a symlink inside it', async () => {

@@ -237,6 +237,7 @@ describe('migration builder SQL', () => {
 				function: { schema: 'system', name: 'trigger_event_commit' },
 			})
 			b.dropTrigger({ schema: 'stage_live', name: 'article' }, 'log_event')
+			b.dropTrigger({ schema: 'stage_live', name: 'article_tags' }, 'log_event_trx', { ifExists: true })
 			b.dropFunction({ name: 'make_diff' }, [{ name: 'old', type: 'jsonb' }, { name: 'new', type: 'jsonb' }])
 		})).toEqual([
 			lines(
@@ -253,6 +254,7 @@ describe('migration builder SQL', () => {
 				'  EXECUTE PROCEDURE "system"."trigger_event_commit"();',
 			),
 			'DROP TRIGGER "log_event" ON "stage_live"."article";',
+			'DROP TRIGGER IF EXISTS "log_event_trx" ON "stage_live"."article_tags";',
 			'DROP FUNCTION "make_diff"("old" jsonb, "new" jsonb);',
 		])
 	})

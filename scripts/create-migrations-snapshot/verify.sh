@@ -48,6 +48,9 @@ command -v createdb >/dev/null || die "createdb not found on PATH (install postg
 #     on modern PG (see snapshot-factory.ts / run.sh UUID_SED). That divergence is
 #     intentional and functionally equivalent, so we drop the fallback function's
 #     definition and map both names to one token before diffing.
+#   - drop the `pg_attver=<n>` column option: the postgres:16.16 image stores this
+#     per-column counter in attoptions and Ubuntu's pg_dump prints it (Debian's does
+#     not), so it differs between any two databases. Other attoptions are kept.
 normalize() {
 	local schema="$1"
 	sed -E \
@@ -59,7 +62,24 @@ normalize() {
 		-e '/^CREATE FUNCTION "uuid_generate_v4"\(\)/,/\$\$;/d' \
 		-e 's/"uuid_generate_v4"/"__random_uuid__"/g' \
 		-e 's/"gen_random_uuid"/"__random_uuid__"/g' \
+		-e '/^ALTER TABLE .* ALTER COLUMN .* SET \(pg_attver=[0-9]+\);$/d' \
+		-e '/^ALTER TABLE .* ALTER COLUMN .* SET \(/{s/, pg_attver=[0-9]+//;s/\(pg_attver=[0-9]+, /(/;}' \
 		-e '/^$/d'
+}
+
+# normalize must hide pg_attver alone and keep every other attoption difference.
+self_check_normalize() {
+	local col='ALTER TABLE ONLY "t" ALTER COLUMN "a" SET'
+	local same_a same_b drift_a drift_b
+	same_a="$(printf '%s\n' "$col (pg_attver=1);" "$col (n_distinct=5, pg_attver=1);" "$col (pg_attver=1, n_distinct=5);" | normalize s)"
+	same_b="$(printf '%s\n' "$col (pg_attver=2);" "$col (n_distinct=5, pg_attver=2);" "$col (pg_attver=2, n_distinct=5);" | normalize s)"
+	[ "$same_a" = "$same_b" ] || die "normalize self-check: pg_attver-only difference was reported"
+	[ "$same_a" = "$(printf '%s\n' "$col (n_distinct=5);" "$col (n_distinct=5);")" ] || die "normalize self-check: other attoptions were not kept"
+	drift_a="$(printf '%s\n' "$col (n_distinct=5, pg_attver=1);" | normalize s)"
+	drift_b="$(printf '%s\n' "$col (n_distinct=7, pg_attver=2);" | normalize s)"
+	[ "$drift_a" != "$drift_b" ] || die "normalize self-check: n_distinct difference was hidden"
+	local other='    "b" text DEFAULT '"'"'x, pg_attver=1'"'"''
+	[ "$(printf '%s\n' "$other" | normalize s)" = "$other" ] || die "normalize self-check: a line other than ALTER COLUMN ... SET was changed"
 }
 
 dump_schema() {
@@ -114,6 +134,8 @@ verify_one() {
 	dropdb --if-exists "$db_snapshot" >/dev/null
 	return 1
 }
+
+self_check_normalize
 
 types=("$@")
 [ ${#types[@]} -eq 0 ] && types=(tenant system)

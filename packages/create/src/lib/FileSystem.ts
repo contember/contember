@@ -9,7 +9,8 @@ export class FileSystem {
 	rename = fs.rename
 	readDir = fs.readdir
 	copy = (source: string, destination: string, options?: { filter?: (source: string, destination: string) => boolean }) =>
-		fs.cp(source, destination, { recursive: true, ...options })
+		// verbatimSymlinks: by default fs.cp rewrites relative links into absolute paths into the source tree
+		fs.cp(source, destination, { recursive: true, verbatimSymlinks: true, ...options })
 	unlink = fs.unlink
 	remove = fs.rm
 	pathExists = async (path: string) => {

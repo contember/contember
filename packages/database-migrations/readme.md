@@ -1,3 +1,3 @@
 # @contember/database-migrations
 
-node-pg-migrate wrapper
+Migration runner and SQL builder for the engine's system and tenant schemas and for content-schema migrations.

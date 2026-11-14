@@ -35,7 +35,14 @@ export type Value = null | boolean | string | number | readonly Value[]
 
 export interface SequenceOptions {
 	precedence: 'ALWAYS' | 'BY DEFAULT'
+	type?: string
+	increment?: number
+	minvalue?: number | null | false
+	maxvalue?: number | null | false
 	start?: number
+	cache?: number
+	cycle?: boolean
+	owner?: string | null | false
 }
 
 export interface ColumnDefinition {
@@ -117,6 +124,10 @@ export const escapeValue = (value: unknown): string | number => {
 	if (Array.isArray(value)) {
 		return `ARRAY[${value.map(escapeValue).join(',').replace(/ARRAY/g, '')}]`
 	}
+	// node-pg-migrate's PgLiteral shape; migration JSON (e.g. a fill value or column default) can carry it.
+	if (typeof value === 'object' && 'literal' in value && value.literal === true && 'value' in value) {
+		return typeof value.value === 'number' ? value.value : `${value.value}`
+	}
 	return ''
 }
 
@@ -143,9 +154,43 @@ const formatLines = (lines: readonly string[], prefix = '  ', separator = ','): 
 		.join(`${separator}\n`)
 		.replace(/^/gm, prefix)
 
+// Sequence options arrive unparsed from migration JSON, so every option node-pg-migrate rendered is kept.
 const sequenceClause = (sequence: SequenceOptions): string => {
-	const options = sequence.start ? ` (START WITH ${sequence.start})` : ''
-	return `GENERATED ${sequence.precedence} AS IDENTITY${options}`
+	const { type, increment, minvalue, maxvalue, start, cache, cycle, owner } = sequence
+	const clauses: string[] = []
+	if (type) {
+		clauses.push(`AS ${resolveType(type)}`)
+	}
+	if (increment) {
+		clauses.push(`INCREMENT BY ${increment}`)
+	}
+	if (minvalue) {
+		clauses.push(`MINVALUE ${minvalue}`)
+	} else if (minvalue === null || minvalue === false) {
+		clauses.push('NO MINVALUE')
+	}
+	if (maxvalue) {
+		clauses.push(`MAXVALUE ${maxvalue}`)
+	} else if (maxvalue === null || maxvalue === false) {
+		clauses.push('NO MAXVALUE')
+	}
+	if (start) {
+		clauses.push(`START WITH ${start}`)
+	}
+	if (cache) {
+		clauses.push(`CACHE ${cache}`)
+	}
+	if (cycle) {
+		clauses.push('CYCLE')
+	} else if (cycle === false) {
+		clauses.push('NO CYCLE')
+	}
+	if (owner) {
+		clauses.push(`OWNED BY ${owner}`)
+	} else if (owner === null || owner === false) {
+		clauses.push('OWNED BY NONE')
+	}
+	return `GENERATED ${sequence.precedence} AS IDENTITY${clauses.length ? ` (${clauses.join(' ')})` : ''}`
 }
 
 const referencesClause = (column: ColumnDefinition & { references: Name }): string => {
@@ -191,7 +236,7 @@ export class MigrationBuilder {
 	private readonly steps: string[] = []
 
 	getSqlSteps(): string[] {
-		return this.steps
+		return [...this.steps]
 	}
 
 	getSql(): string {
@@ -264,12 +309,14 @@ export class MigrationBuilder {
 
 	createIndex(table: Name, columns: readonly string[], options: { name: string }): void {
 		const columnsSql = columns.map(column => /[. ()]/.test(column) ? column : literal(column)).join(', ')
-		this.steps.push(`CREATE INDEX ${literal(options.name)} ON ${literal(table)} (${columnsSql});`)
+		const name = options.name || `${tableNameOf(table)}_${columns.join('_')}_index`
+		this.steps.push(`CREATE INDEX ${literal(name)} ON ${literal(table)} (${columnsSql});`)
 	}
 
 	createDomain(domain: Name, type: string, options: { check: string; constraintName?: string }): void {
 		const constraintName = options.constraintName ? ` CONSTRAINT ${literal(options.constraintName)}` : ''
-		this.steps.push(`CREATE DOMAIN ${literal(domain)} AS ${resolveType(type)}${constraintName} CHECK (${options.check});`)
+		const check = options.check ? `${constraintName} CHECK (${options.check})` : ''
+		this.steps.push(`CREATE DOMAIN ${literal(domain)} AS ${resolveType(type)}${check};`)
 	}
 
 	renameDomain(domain: Name, newName: Name): void {
@@ -305,11 +352,11 @@ export class MigrationBuilder {
 		const { constraint, deferrable, deferred, functionParams = [], level = 'STATEMENT' } = options
 		const when = constraint ? 'AFTER' : options.when
 		const operations = typeof options.operation === 'string' ? options.operation : options.operation.join(' OR ')
-		if (!operations) {
-			throw new Error('"operation" (INSERT/UPDATE[ OF ...]/DELETE/TRUNCATE) have to be specified')
-		}
 		if (!options.function) {
 			throw new Error("Can't determine function name")
+		}
+		if (!operations) {
+			throw new Error('"operation" (INSERT/UPDATE[ OF ...]/DELETE/TRUNCATE) have to be specified')
 		}
 		const defer = constraint ? `${deferrable ? `DEFERRABLE INITIALLY ${deferred ? 'DEFERRED' : 'IMMEDIATE'}` : 'NOT DEFERRABLE'}\n  ` : ''
 		this.steps.push(
@@ -325,7 +372,8 @@ export class MigrationBuilder {
 	}
 
 	dropFunction(fn: Name, params: readonly FunctionParam[]): void {
-		const paramsSql = params.map(param => `${literal(param.name)} ${resolveType(param.type)}`).join(', ')
+		const paramsSql = params.map(param => [param.name ? literal(param.name) : '', param.type ? resolveType(param.type) : ''].filter(Boolean).join(' '))
+			.join(', ')
 		this.steps.push(`DROP FUNCTION ${literal(fn)}(${paramsSql});`)
 	}
 }

@@ -279,6 +279,120 @@ describe('migration builder SQL', () => {
 	})
 })
 
+describe('migration builder edge cases', () => {
+	test('sql does not double a trailing semicolon', () => {
+		expect(sqlOf(b => {
+			b.sql('SELECT 1;')
+			b.sql('SELECT 1; ')
+		})).toEqual([
+			'SELECT 1;',
+			'SELECT 1; ;',
+		])
+	})
+
+	test('alterColumn without actions records an empty step', () => {
+		expect(sqlOf(b => {
+			b.alterColumn('article', 'title', {})
+			b.sql('SELECT 1')
+		})).toEqual([
+			'',
+			'SELECT 1;',
+		])
+	})
+
+	test('line formatting collapses newlines inside a clause', () => {
+		expect(sqlOf(b => b.alterColumn('article', 'title', { type: 'text', using: '$pga$a\nb$pga$' }))).toEqual([
+			lines(
+				'ALTER TABLE "article"',
+				'  ALTER "title" SET DATA TYPE text USING $pga$a b$pga$;',
+			),
+		])
+	})
+
+	test('type aliases and the id shorthand', () => {
+		expect(sqlOf(b => {
+			b.createTable('t', {
+				id: { type: 'id' },
+				a: { type: 'int' },
+				b: { type: 'string' },
+				c: { type: 'float' },
+				d: { type: 'double' },
+				e: { type: 'datetime' },
+				f: { type: 'bool' },
+			})
+			b.alterColumn('t', 'a', { type: 'int' })
+		})).toEqual([
+			lines(
+				'CREATE TABLE "t" (',
+				'  "id" serial PRIMARY KEY,',
+				'  "a" integer,',
+				'  "b" text,',
+				'  "c" real,',
+				'  "d" double precision,',
+				'  "e" timestamp,',
+				'  "f" boolean',
+				');',
+			),
+			lines(
+				'ALTER TABLE "t"',
+				'  ALTER "a" SET DATA TYPE integer;',
+			),
+		])
+	})
+
+	test('every identity sequence option', () => {
+		expect(sqlOf(b =>
+			b.addColumn('t', {
+				id: {
+					type: 'integer',
+					notNull: true,
+					sequenceGenerated: {
+						precedence: 'ALWAYS',
+						type: 'int',
+						increment: 2,
+						minvalue: null,
+						maxvalue: 99,
+						start: 5,
+						cache: 3,
+						cycle: false,
+						owner: null,
+					},
+				},
+			})
+		)).toEqual([
+			lines(
+				'ALTER TABLE "t"',
+				'  ADD "id" integer NOT NULL GENERATED ALWAYS AS IDENTITY (AS integer INCREMENT BY 2 NO MINVALUE MAXVALUE 99 START WITH 5 CACHE 3 NO CYCLE OWNED BY NONE);',
+			),
+		])
+	})
+
+	test('an empty index name or domain check falls back like node-pg-migrate', () => {
+		expect(sqlOf(b => {
+			b.createIndex({ schema: 's', name: 't' }, ['a', 'b'], { name: '' })
+			b.createDomain('d', 'text', { check: '', constraintName: 'c' })
+		})).toEqual([
+			'CREATE INDEX "t_a_b_index" ON "s"."t" ("a", "b");',
+			'CREATE DOMAIN "d" AS text;',
+		])
+	})
+
+	test('createTrigger rejects a missing function before a missing operation', () => {
+		expect(() => sqlOf(b => b.createTrigger('t', 'tr', { when: 'AFTER', operation: [], function: '' }))).toThrow("Can't determine function name")
+		expect(() => sqlOf(b => b.createTrigger('t', 'tr', { when: 'AFTER', operation: [], function: 'f' }))).toThrow(
+			'"operation" (INSERT/UPDATE[ OF ...]/DELETE/TRUNCATE) have to be specified',
+		)
+	})
+
+	test('getSqlSteps returns a snapshot', () => {
+		const builder = createMigrationBuilder()
+		builder.sql('SELECT 1')
+		const steps = builder.getSqlSteps()
+		builder.sql('SELECT 2')
+		expect(steps).toEqual(['SELECT 1;'])
+	})
+})
+
 describe('escapeValue', () => {
 	test('scalars', () => {
 		expect([escapeValue(null), escapeValue(true), escapeValue(false), escapeValue(42), escapeValue(1.5)]).toEqual([
@@ -305,5 +419,21 @@ describe('escapeValue', () => {
 			'ARRAY[[1,2],[3]]',
 			'ARRAY[]',
 		])
+	})
+
+	test('literal objects pass through and other objects become empty', () => {
+		// Migration JSON (fill values, column defaults) reaches escapeValue unparsed.
+		expect([
+			escapeValue({ literal: true, value: 'now()' }),
+			escapeValue({ literal: true, value: 3 }),
+			escapeValue({ literal: false, value: 'x' }),
+			escapeValue({}),
+		])
+			.toEqual([
+				'now()',
+				3,
+				'',
+				'',
+			])
 	})
 })

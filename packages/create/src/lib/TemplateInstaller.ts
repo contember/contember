@@ -1,7 +1,7 @@
 import { join } from 'node:path'
 import jsyaml from 'js-yaml'
 import { FileSystem } from './FileSystem.js'
-import { resolveProjectPath } from './projectPath.js'
+import { resolveNewProjectPath, resolveProjectPath } from './projectPath.js'
 import { downloadTemplate } from './remoteTemplate.js'
 
 interface TemplateInstallerOutput {
@@ -91,7 +91,7 @@ export class TemplateInstaller {
 				await this.fs.rename(await projectPath(source), await projectPath(target))
 			}
 			for (const [source, target] of Object.entries(config.copy || {})) {
-				await this.fs.copy(await projectPath(source), await projectPath(target))
+				await this.fs.copy(await projectPath(source), await resolveNewProjectPath(this.fs, targetDir, target))
 			}
 
 			for (const file of config.replaceVariables || []) {

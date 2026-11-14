@@ -1,5 +1,6 @@
 import { basename, dirname, isAbsolute, join, relative, resolve, sep } from 'node:path'
 import { FileSystem } from './FileSystem.js'
+import { isNotFound } from './fsErrors.js'
 
 /**
  * Resolves a path from a template directive against the project root.
@@ -16,8 +17,23 @@ export const resolveProjectPath = async (fs: FileSystem, root: string, path: str
 	}
 	const realRoot = await fs.realPath(root)
 	const realPath = await resolveExistingPrefix(fs, resolved)
-	if (realPath === undefined || !isStrictlyInside(realRoot, realPath)) {
+	if (realPath === undefined) {
+		throw new Error(`Template path "${path}" passes through a dangling symlink`)
+	}
+	if (!isStrictlyInside(realRoot, realPath)) {
 		throw outside
+	}
+	return resolved
+}
+
+/**
+ * Like resolveProjectPath, and the path must not exist yet. fs.cp into an existing directory writes entries the check
+ * above never saw, and Bun's fs.cp follows symlinks it finds there.
+ */
+export const resolveNewProjectPath = async (fs: FileSystem, root: string, path: string): Promise<string> => {
+	const resolved = await resolveProjectPath(fs, root, path)
+	if (await isPresent(fs, resolved)) {
+		throw new Error(`Template path "${path}" already exists`)
 	}
 	return resolved
 }
@@ -61,5 +77,3 @@ const isPresent = async (fs: FileSystem, path: string): Promise<boolean> => {
 		throw error
 	}
 }
-
-const isNotFound = (error: unknown): boolean => error instanceof Error && 'code' in error && error.code === 'ENOENT'

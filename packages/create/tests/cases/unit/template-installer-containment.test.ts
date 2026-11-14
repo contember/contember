@@ -97,8 +97,26 @@ describe('template directives stay inside the project', () => {
 	test('refuses a copy onto a dangling symlink that leaves the project', async () => {
 		const fixture = await createFixture('copy:\n  README.md: dangling\n')
 		await symlink(join(fixture.outside, 'planted.txt'), join(fixture.templateDir, 'dangling'))
-		await expect(install(fixture)).rejects.toThrow('points outside the project')
+		await expect(install(fixture)).rejects.toThrow('passes through a dangling symlink')
 		await expectOutsideUntouched(fixture.outside)
+	})
+
+	test('refuses a copy into an existing directory, whose entries could be symlinks that leave the project', async () => {
+		const fixture = await createFixture('copy:\n  src: dst\n')
+		await mkdir(join(fixture.templateDir, 'src/vdir'), { recursive: true })
+		await writeFile(join(fixture.templateDir, 'src/vdir/planted.txt'), 'planted')
+		await writeFile(join(fixture.templateDir, 'src/victim.txt'), 'overwritten')
+		await mkdir(join(fixture.templateDir, 'dst'))
+		await symlink(fixture.outside, join(fixture.templateDir, 'dst/vdir'))
+		await symlink(join(fixture.outside, 'victim.txt'), join(fixture.templateDir, 'dst/victim.txt'))
+		await expect(install(fixture)).rejects.toThrow('Template path "dst" already exists')
+		await expectOutsideUntouched(fixture.outside)
+	})
+
+	test('refuses a copy onto an existing file', async () => {
+		const fixture = await createFixture('copy:\n  README.md: sub/README.md\n')
+		await writeFile(join(fixture.templateDir, 'sub/README.md'), 'kept')
+		await expect(install(fixture)).rejects.toThrow('Template path "sub/README.md" already exists')
 	})
 
 	test('still applies directives inside the project, also through a symlink inside it', async () => {

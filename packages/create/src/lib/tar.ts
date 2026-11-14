@@ -1,5 +1,6 @@
 import { lstat, mkdir, symlink, writeFile } from 'node:fs/promises'
 import { join, resolve, sep } from 'node:path'
+import { hasCode, isNotFound } from './fsErrors.js'
 
 export type TarEntry =
 	| { readonly type: 'file'; readonly path: string; readonly mode: number; readonly data: Uint8Array }
@@ -172,9 +173,6 @@ const isContainedLinkTarget = (link: readonly string[], target: string, links: R
 	}
 	return true
 }
-
-const hasCode = (error: unknown, code: string): boolean => error instanceof Error && 'code' in error && error.code === code
-const isNotFound = (error: unknown): boolean => hasCode(error, 'ENOENT')
 
 /**
  * Creates the directories one component at a time and refuses to pass through a symlink. The string checks cannot see

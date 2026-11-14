@@ -1,19 +1,19 @@
-import { MigrationBuilder } from 'node-pg-migrate'
+// The legacy entry points load only the builder; the package root also loads the CLI runner (glob, jiti, pg).
+import { MigrationBuilder } from 'node-pg-migrate/migrationBuilder'
+import { escapeValue as pgEscape } from 'node-pg-migrate/utils/escapeValue'
 import { Migration, RunMigration } from './Migration.js'
-import MigrationBuilderImpl from 'node-pg-migrate/dist/migration-builder.js'
-import { escapeValue as pgEscape } from 'node-pg-migrate/dist/utils.js'
 
-export function createMigrationBuilder(): MigrationBuilder & { getSql: () => string; getSqlSteps: () => string[] } {
-	const impl = 'default' in MigrationBuilderImpl ? (MigrationBuilderImpl as any).default : MigrationBuilderImpl
-	return new impl(
-		{
-			query: null,
-			select: null,
-		} as any,
-		{},
-		false,
-		{} as any,
-	)
+type BuilderDb = ConstructorParameters<typeof MigrationBuilder>[0]
+
+// The builder only collects SQL; migrations that need the database get a connection through their args.
+const noConnection = () => Promise.reject(new Error('The migration builder has no database connection, use the connection from migration args'))
+const noDatabase: BuilderDb = {
+	query: noConnection,
+	select: noConnection,
+}
+
+export function createMigrationBuilder(): MigrationBuilder {
+	return new MigrationBuilder(noDatabase, {}, false, console)
 }
 
 export function escapeValue(value: any): string | number {

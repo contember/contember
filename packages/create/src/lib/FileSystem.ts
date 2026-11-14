@@ -7,6 +7,8 @@ export class FileSystem {
 	readFile = fs.readFile
 	writeFile = fs.writeFile
 	rename = fs.rename
+	realPath = fs.realpath
+	lstat = fs.lstat
 	readDir = fs.readdir
 	copy = (source: string, destination: string, options?: { filter?: (source: string, destination: string) => boolean }) =>
 		// verbatimSymlinks: by default fs.cp rewrites relative links into absolute paths into the source tree

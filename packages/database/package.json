@@ -23,7 +23,8 @@
     }
   },
   "dependencies": {
-    "@contember/queryable": "workspace:*"
+    "@contember/queryable": "workspace:*",
+    "@types/pg": "catalog:"
   },
   "devDependencies": {
     "@contember/database-tester": "workspace:*",

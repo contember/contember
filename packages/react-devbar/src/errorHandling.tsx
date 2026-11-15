@@ -1,4 +1,3 @@
-import { Buffer } from 'buffer'
 import { DevErrorManager, ErrorBus } from './DevErrorManager.js'
 import { ReactElement } from 'react'
 
@@ -19,7 +18,6 @@ const getErrorContainer = () => {
 
 const devErrorHandler = (renderer: ErrorReactRenderer): TryRun => {
 	const errorBus = new ErrorBus()
-	;(window as any).Buffer = Buffer
 	window.addEventListener('error', e => {
 		if (e.message.startsWith('ResizeObserver')) {
 			// Apparently, this can be ignored: https://stackoverflow.com/questions/49384120/resizeobserver-loop-limit-exceeded

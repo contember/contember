@@ -1,20 +1,24 @@
 import { useEffect, useState } from 'react'
 import { ErrorType, ProcessedError } from '../ui/DevError/index.js'
 
-export const parseStacktrace = async (e: Error) => {
-	let StackTracey
+export const parseStacktrace = async (
+	e: Error,
+): Promise<
+	{ filename: string; line: number | undefined; callee: string; thirdParty: boolean; sourceCodeLines: string[] | undefined }[] | undefined
+> => {
 	try {
-		StackTracey = (await import('stacktracey')).default
+		const { resolveStackTrace } = await import('../stackTrace.js')
+		return (await resolveStackTrace(typeof e.stack === 'string' ? e.stack : '')).map(it => ({
+			filename: it.fileShort,
+			line: it.line,
+			callee: it.callee,
+			thirdParty: it.thirdParty,
+			sourceCodeLines: it.sourceLines,
+		}))
 	} catch {
+		// A failed chunk load must not surface as an unhandled rejection the overlay would report as a new error.
 		return undefined
 	}
-	return (await new StackTracey(e).withSourcesAsync()).items.map(it => ({
-		filename: it.fileShort,
-		line: it.line,
-		callee: it.callee,
-		thirdParty: it.thirdParty,
-		sourceCodeLines: it.sourceFile?.lines,
-	}))
 }
 
 const createInitialError = (e: ErrorType): ProcessedError => ({

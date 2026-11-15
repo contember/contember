@@ -1,6 +1,7 @@
 import { join } from 'node:path'
 import jsyaml from 'js-yaml'
 import { FileSystem } from './FileSystem.js'
+import { resolveNewProjectPath, resolveProjectPath } from './projectPath.js'
 import { downloadTemplate } from './remoteTemplate.js'
 
 interface TemplateInstallerOutput {
@@ -84,15 +85,17 @@ export class TemplateInstaller {
 					return JSON.stringify({ scripts, ...json }, null, '  ')
 				})
 			}
+			// The template is untrusted input: every directive path must stay inside the new project.
+			const projectPath = (path: string) => resolveProjectPath(this.fs, targetDir, path)
 			for (const [source, target] of Object.entries(config.rename || {})) {
-				await this.fs.rename(join(targetDir, source), join(targetDir, target))
+				await this.fs.rename(await projectPath(source), await projectPath(target))
 			}
 			for (const [source, target] of Object.entries(config.copy || {})) {
-				await this.fs.copy(join(targetDir, source), join(targetDir, target))
+				await this.fs.copy(await projectPath(source), await resolveNewProjectPath(this.fs, targetDir, target))
 			}
 
 			for (const file of config.replaceVariables || []) {
-				const path = join(targetDir, file)
+				const path = await projectPath(file)
 				if (!(await this.fs.pathExists(path))) {
 					continue
 				}

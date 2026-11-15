@@ -38,9 +38,7 @@
   },
   "dependencies": {
     "@contember/react-utils": "workspace:*",
-    "@contember/utilities": "workspace:*",
-    "buffer": "catalog:",
-    "stacktracey": "catalog:"
+    "@contember/utilities": "workspace:*"
   },
   "peerDependencies": {
     "react": "catalog:",

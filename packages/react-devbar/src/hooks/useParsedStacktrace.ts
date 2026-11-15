@@ -1,21 +1,18 @@
 import { useEffect, useState } from 'react'
 import { ErrorType, ProcessedError } from '../ui/DevError/index.js'
 
-export const parseStacktrace = async (e: Error) => {
-	let StackTracey
-	try {
-		StackTracey = (await import('stacktracey')).default
-	} catch {
-		return undefined
-	}
-	return (await new StackTracey(e).withSourcesAsync()).items.map(it => ({
+export const parseStacktrace = async (
+	e: Error,
+): Promise<
+	{ filename: string; line: number | undefined; callee: string; thirdParty: boolean; sourceCodeLines: string[] | undefined }[] | undefined
+> =>
+	(await (await import('../stackTrace.js')).resolveStackTrace(e.stack || '')).map(it => ({
 		filename: it.fileShort,
 		line: it.line,
 		callee: it.callee,
 		thirdParty: it.thirdParty,
-		sourceCodeLines: it.sourceFile?.lines,
+		sourceCodeLines: it.sourceLines,
 	}))
-}
 
 const createInitialError = (e: ErrorType): ProcessedError => ({
 	error: e,

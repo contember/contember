@@ -1,23 +1,10 @@
-import { MigrationBuilder } from 'node-pg-migrate'
 import { Migration, RunMigration } from './Migration.js'
-import MigrationBuilderImpl from 'node-pg-migrate/dist/migration-builder.js'
-import { escapeValue as pgEscape } from 'node-pg-migrate/dist/utils.js'
+import { MigrationBuilder } from './MigrationBuilder.js'
 
-export function createMigrationBuilder(): MigrationBuilder & { getSql: () => string; getSqlSteps: () => string[] } {
-	const impl = 'default' in MigrationBuilderImpl ? (MigrationBuilderImpl as any).default : MigrationBuilderImpl
-	return new impl(
-		{
-			query: null,
-			select: null,
-		} as any,
-		{},
-		false,
-		{} as any,
-	)
-}
+export { escapeValue } from './MigrationBuilder.js'
 
-export function escapeValue(value: any): string | number {
-	return pgEscape(value)
+export function createMigrationBuilder(): MigrationBuilder {
+	return new MigrationBuilder()
 }
 
 export const timePrefixLength = 'YYYY-MM-DD-XXXXXX'.length

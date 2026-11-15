@@ -23,8 +23,7 @@
     }
   },
   "dependencies": {
-    "@contember/database": "workspace:*",
-    "node-pg-migrate": "catalog:"
+    "@contember/database": "workspace:*"
   },
   "devDependencies": {
     "pg": "catalog:"

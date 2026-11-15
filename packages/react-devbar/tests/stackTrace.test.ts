@@ -99,6 +99,67 @@ describe('resolveStackTrace', () => {
 		expect(frame.sourceLines).toEqual(original.split('\n'))
 	})
 
+	test('uses the 1-based stack column as a 0-based map column, as source-map lookups did', async () => {
+		const url = uniqueUrl('column.js')
+		files[url] = generated('column.js.map')
+		files[`${url}.map`] = map()
+		const [frame] = await resolveStackTrace(`    at boom (${url}:1:16)`)
+		expect(frame.line).toBe(3)
+	})
+
+	test('joins a relative sourceRoot and fetches the source from there', async () => {
+		const url = uniqueUrl('rooted.js')
+		files[url] = generated('rooted.js.map')
+		files[`${url}.map`] = map({ sourceRoot: 'lib', sourcesContent: undefined })
+		files[url.replace('rooted.js', 'lib/boom.ts')] = original
+		const [frame] = await resolveStackTrace(`    at boom (${url}:1:17)`)
+		expect([frame.fileShort, frame.line, frame.sourceLines?.[2]]).toEqual([`t${fileCounter}/lib/boom.ts`, 3, "  throw new Error('x')"])
+	})
+
+	test('keeps an absolute source under an absolute sourceRoot and joins one outside it', async () => {
+		const url = uniqueUrl('absolute.js')
+		files[url] = generated('absolute.js.map')
+		files[`${url}.map`] = JSON.stringify({
+			version: 3,
+			sourceRoot: '/root/',
+			sources: ['/root/pkg/inside.ts', '/other/outside.ts'],
+			sourcesContent: [original, original],
+			mappings: 'AACA,gBCCE',
+		})
+		const frames = await resolveStackTrace(`    at a (${url}:1:5)\n    at b (${url}:1:17)`)
+		expect(frames.map(it => [it.fileShort, it.line])).toEqual([
+			['root/pkg/inside.ts', 2],
+			['root/other/outside.ts', 3],
+		])
+	})
+
+	test('follows the source map of an original source', async () => {
+		const url = uniqueUrl('outer.js')
+		const middle = generated('middle.js.map')
+		files[url] = generated('outer.js.map')
+		files[`${url}.map`] = JSON.stringify({ version: 3, sources: ['middle.js'], sourcesContent: [middle], mappings: 'AAAA,gBAAgB' })
+		files[url.replace('outer.js', 'middle.js.map')] = map()
+		const [frame] = await resolveStackTrace(`    at boom (${url}:1:17)`)
+		expect([frame.fileShort, frame.line]).toEqual([`t${fileCounter}/boom.ts`, 3])
+	})
+
+	test('prefers a mapping with a source over one without at the same column', async () => {
+		const url = uniqueUrl('tie.js')
+		files[url] = generated('tie.js.map')
+		files[`${url}.map`] = JSON.stringify({ version: 3, sources: ['a.ts', 'b.ts', 'c.ts'], sourcesContent: ['a', 'b', 'c'], mappings: 'A,AEAA' })
+		const [frame] = await resolveStackTrace(`    at boom (${url}:1:1)`)
+		expect([frame.fileShort, frame.line, frame.sourceLines]).toEqual([`t${fileCounter}/c.ts`, 1, ['c']])
+	})
+
+	test('stops following a source map that points back at its own file', async () => {
+		const url = uniqueUrl('self.js')
+		const text = generated('self.js.map')
+		files[url] = text
+		files[`${url}.map`] = JSON.stringify({ version: 3, sources: ['self.js'], sourcesContent: [text], mappings: 'AAAA' })
+		const [frame] = await resolveStackTrace(`    at boom (${url}:1:1)`)
+		expect([frame.fileShort, frame.line]).toEqual([`t${fileCounter}/self.js`, 1])
+	})
+
 	test('falls back to the generated file when the map cannot be used', async () => {
 		const missingMap = uniqueUrl('missing-map.js')
 		files[missingMap] = generated('nope.js.map')
@@ -110,6 +171,21 @@ describe('resolveStackTrace', () => {
 			[1, "function boom(){throw new Error('x')}"],
 			[1, "function boom(){throw new Error('x')}"],
 		])
+	})
+
+	test('fetches each file once and marks webpack runtime and page frames like stacktracey', async () => {
+		const url = `${pageUrl}runtime-${++fileCounter}.js`
+		files[url] = 'function __webpack_require__(id) {\n  return modules[id]()\n}\n'
+		files[pageUrl] = `<script>function boom(){throw new Error('x')}</script>\n<script>\n//# sourceMappingURL=/maps/page.js.map\n</script>\n`
+		files[`${origin}/maps/page.js.map`] = map()
+		const frames = await resolveStackTrace(`    at a (${url}:1:1)\n    at b (${url}:2:3)\n    at c (${pageUrl}:1:9)`)
+		// The page frame maps to /maps/boom.ts, which is outside the page path, yet a page frame never counts as third party.
+		expect(frames.map(it => [it.fileShort, it.thirdParty])).toEqual([
+			[`runtime-${fileCounter}.js`, true],
+			[`runtime-${fileCounter}.js`, false],
+			['maps/boom.ts', false],
+		])
+		expect(requested).toEqual([url, pageUrl, `${origin}/maps/page.js.map`])
 	})
 
 	test('keeps the raw frame when its file cannot be fetched, and does not fetch frames without a file', async () => {

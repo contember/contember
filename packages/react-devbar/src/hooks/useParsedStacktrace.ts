@@ -5,14 +5,21 @@ export const parseStacktrace = async (
 	e: Error,
 ): Promise<
 	{ filename: string; line: number | undefined; callee: string; thirdParty: boolean; sourceCodeLines: string[] | undefined }[] | undefined
-> =>
-	(await (await import('../stackTrace.js')).resolveStackTrace(e.stack || '')).map(it => ({
-		filename: it.fileShort,
-		line: it.line,
-		callee: it.callee,
-		thirdParty: it.thirdParty,
-		sourceCodeLines: it.sourceLines,
-	}))
+> => {
+	try {
+		const { resolveStackTrace } = await import('../stackTrace.js')
+		return (await resolveStackTrace(typeof e.stack === 'string' ? e.stack : '')).map(it => ({
+			filename: it.fileShort,
+			line: it.line,
+			callee: it.callee,
+			thirdParty: it.thirdParty,
+			sourceCodeLines: it.sourceLines,
+		}))
+	} catch {
+		// A failed chunk load must not surface as an unhandled rejection the overlay would report as a new error.
+		return undefined
+	}
+}
 
 const createInitialError = (e: ErrorType): ProcessedError => ({
 	error: e,

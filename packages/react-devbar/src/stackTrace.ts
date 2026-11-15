@@ -1,4 +1,4 @@
-/*
+/*!
 The source map decoding, lookup and path normalization in this file are ported from source-map 0.6.1. (https://github.com/mozilla/source-map)
 
 
@@ -167,6 +167,12 @@ const fetchSourceFile = (path: string): Promise<SourceFile> => {
 	return file
 }
 
+// The browser Buffer polyfill get-source relied on read base64 leniently: url-safe digits, no padding, junk skipped.
+const cleanBase64 = (data: string): string => {
+	const cleaned = data.split('=')[0].trim().replace(/[^+/0-9A-Za-z\-_]/g, '').replace(/-/g, '+').replace(/_/g, '/')
+	return cleaned.length < 2 ? '' : cleaned.padEnd(Math.ceil(cleaned.length / 4) * 4, '=')
+}
+
 const decodeDataUri = (uri: string): string => {
 	const normalized = uri.replace(/\r?\n/g, '')
 	const comma = normalized.indexOf(',')
@@ -174,9 +180,11 @@ const decodeDataUri = (uri: string): string => {
 		throw new TypeError('malformed data: URI')
 	}
 	const isBase64 = normalized.substring(5, comma).split(';').slice(1).includes('base64')
-	const data = normalized.substring(comma + 1).replace(/%([0-9A-Fa-f]{2})/g, (_, hex: string) => String.fromCharCode(parseInt(hex, 16)))
-	const binary = isBase64 ? atob(data) : data
-	return new TextDecoder().decode(Uint8Array.from(binary, char => char.charCodeAt(0) & 0xff))
+	const data = normalized.substring(comma + 1).replace(
+		/%u([0-9A-Fa-f]{4})|%([0-9A-Fa-f]{2})/g,
+		(_, unicode: string | undefined, byte: string | undefined) => String.fromCharCode(parseInt(unicode ?? byte ?? '', 16)),
+	)
+	return new TextDecoder().decode(Uint8Array.from(isBase64 ? atob(cleanBase64(data)) : data, char => char.charCodeAt(0) & 0xff))
 }
 
 interface Mapping {
@@ -213,12 +221,15 @@ const decodeSegment = (segment: string): number[] => {
 	return values
 }
 
+// source-map compares sources and names with a missing value last; it decides which of several mappings at one column wins.
+const compareOptional = (a: number | undefined, b: number | undefined): number => a === b ? 0 : a === undefined ? 1 : b === undefined ? -1 : a - b
+
 const compareMappings = (a: Mapping, b: Mapping): number =>
 	a.generatedColumn - b.generatedColumn
-	|| (a.sourceIndex ?? 0) - (b.sourceIndex ?? 0)
+	|| compareOptional(a.sourceIndex, b.sourceIndex)
 	|| (a.originalLine ?? 0) - (b.originalLine ?? 0)
 	|| (a.originalColumn ?? 0) - (b.originalColumn ?? 0)
-	|| (a.nameIndex ?? 0) - (b.nameIndex ?? 0)
+	|| compareOptional(a.nameIndex, b.nameIndex)
 
 const decodeMappings = (mappings: string): Mapping[][] => {
 	let sourceIndex = 0
@@ -259,9 +270,11 @@ const decodeMappings = (mappings: string): Mapping[][] => {
 }
 
 interface SourceMap {
+	// Normalized and, under an absolute root, root-relative, as source-map stores them.
 	sources: string[]
 	sourcesContent: (string | null)[] | null
 	sourceRoot: string | null
+	namesLength: number
 	lines: Mapping[][]
 }
 
@@ -278,10 +291,16 @@ const parseSourceMap = (text: string): SourceMap => {
 	const sourcesContent = Array.isArray(map.sourcesContent)
 		? map.sourcesContent.map(content => typeof content === 'string' ? content : null)
 		: null
+	const sourceRoot = typeof map.sourceRoot === 'string' && map.sourceRoot !== '' ? normalizeSourcePath(map.sourceRoot) : null
+	const sources = map.sources.map(source => {
+		const normalized = normalizeSourcePath(String(source))
+		return sourceRoot !== null && isAbsolutePath(sourceRoot) && isAbsolutePath(normalized) ? relativePath(sourceRoot, normalized) : normalized
+	})
 	return {
-		sources: map.sources.map(String),
+		sources,
 		sourcesContent,
-		sourceRoot: typeof map.sourceRoot === 'string' && map.sourceRoot !== '' ? map.sourceRoot : null,
+		sourceRoot,
+		namesLength: Array.isArray(map.names) ? map.names.length : 0,
 		lines: decodeMappings(map.mappings),
 	}
 }
@@ -299,6 +318,12 @@ const originalPosition = (map: SourceMap, line: number, column: number): { sourc
 	}
 	if (found?.sourceIndex === undefined || found.originalLine === undefined || found.originalColumn === undefined) {
 		return null
+	}
+	if (found.sourceIndex < 0 || found.sourceIndex >= map.sources.length) {
+		throw new Error(`No element indexed by ${found.sourceIndex}`)
+	}
+	if (found.nameIndex !== undefined && (found.nameIndex < 0 || found.nameIndex >= map.namesLength)) {
+		throw new Error(`No element indexed by ${found.nameIndex}`)
 	}
 	return { sourceIndex: found.sourceIndex, line: found.originalLine + 1, column: found.originalColumn }
 }
@@ -322,7 +347,7 @@ const relativePath = (root: string, path: string): string => {
 	return '../'.repeat(level) + path.slice(base.length + 1)
 }
 
-// The path normalization of source-map: collapses repeated slashes and resolves `.` and `..` segments.
+// Ported from source-map, whose output decides the file name shown for a frame.
 const normalizeSourcePath = (input: string): string => {
 	const url = input.match(/^(?:([\w+\-.]+):)?\/\/(?:(\w+:\w+)@)?([\w.-]*)(?::(\d+))?(.*)$/)
 	if (url && !url[5]) {
@@ -357,13 +382,9 @@ const normalizeSourcePath = (input: string): string => {
 
 // source-map stores an absolute source relative to an absolute root and joins them again on lookup.
 const sourceUrl = (map: SourceMap, sourceIndex: number): string => {
-	const root = map.sourceRoot === null ? null : normalizeSourcePath(map.sourceRoot)
-	const rawSource = normalizeSourcePath(map.sources[sourceIndex] ?? '')
-	if (root === null) {
-		return rawSource
-	}
-	const source = isAbsolutePath(root) && isAbsolutePath(rawSource) ? relativePath(root, rawSource) : rawSource
-	return normalizeSourcePath(`${root}${root.endsWith('/') || source.startsWith('/') ? '' : '/'}${source}`)
+	const root = map.sourceRoot
+	const source = map.sources[sourceIndex] ?? ''
+	return root === null ? source : normalizeSourcePath(`${root}${root.endsWith('/') || source.startsWith('/') ? '' : '/'}${source}`)
 }
 
 interface ResolvedLocation {
@@ -374,27 +395,69 @@ interface ResolvedLocation {
 // Original sources can carry a source map of their own; the depth bound stops a map that points back at itself.
 const maxSourceMapDepth = 8
 
+interface MapResolver {
+	map: SourceMap
+	mapFileUrl: string
+	originals: Map<number, Promise<SourceFile>>
+}
+
+// Parsing a large map takes seconds; files are cached, so each file's map is parsed once.
+const resolvers = new WeakMap<SourceFile, Promise<MapResolver | null>>()
+
+const loadResolver = async (file: SourceFile): Promise<MapResolver | null> => {
+	const mapUrl = [...file.text.matchAll(/\u0023 sourceMappingURL=(.+)\n?/g)].at(-1)?.[1]
+	if (!mapUrl) {
+		return null
+	}
+	const mapFile = mapUrl.startsWith('data:')
+		? createSourceFile(file.url, decodeDataUri(mapUrl))
+		: await fetchSourceFile(filePathRelativeTo(file.url, mapUrl))
+	return { map: parseSourceMap(mapFile.text), mapFileUrl: mapFile.url, originals: new Map() }
+}
+
+const resolverFor = (file: SourceFile): Promise<MapResolver | null> => {
+	const cached = resolvers.get(file)
+	if (cached) {
+		return cached
+	}
+	const resolver = loadResolver(file)
+	resolvers.set(file, resolver)
+	return resolver
+}
+
+// source-map looks content up by source URL, so sources with an equal URL share the first one's content.
+const originalFileFor = (resolver: MapResolver, sourceIndex: number): Promise<SourceFile> => {
+	const sourceUrlOf = sourceUrl(resolver.map, sourceIndex)
+	const firstIndex = resolver.map.sources.findIndex((_, index) => sourceUrl(resolver.map, index) === sourceUrlOf)
+	const cached = resolver.originals.get(firstIndex)
+	if (cached) {
+		return cached
+	}
+	const url = filePathRelativeTo(resolver.mapFileUrl, sourceUrl(resolver.map, firstIndex))
+	const content = resolver.map.sourcesContent?.[firstIndex]
+	const file = content ? Promise.resolve(createSourceFile(url, content)) : fetchSourceFile(url)
+	resolver.originals.set(firstIndex, file)
+	return file
+}
+
 const resolveInFile = async (file: SourceFile, line: number | undefined, column: number | undefined, depth: number): Promise<ResolvedLocation> => {
 	const fallback = { file, line }
-	const mapUrl = [...file.text.matchAll(/\u0023 sourceMappingURL=(.+)\n?/g)].at(-1)?.[1]
-	if (!mapUrl || depth >= maxSourceMapDepth) {
+	if (depth >= maxSourceMapDepth) {
 		return fallback
 	}
 	try {
-		const mapFile = mapUrl.startsWith('data:')
-			? createSourceFile(file.url, decodeDataUri(mapUrl))
-			: await fetchSourceFile(filePathRelativeTo(file.url, mapUrl))
-		const map = parseSourceMap(mapFile.text)
+		const resolver = await resolverFor(file)
+		if (resolver === null) {
+			return fallback
+		}
 		if (line === undefined || column === undefined) {
 			throw new Error('A stack frame without a line and column cannot be mapped')
 		}
-		const original = originalPosition(map, line, column)
+		const original = originalPosition(resolver.map, line, column)
 		if (original === null) {
 			return fallback
 		}
-		const url = filePathRelativeTo(mapFile.url, sourceUrl(map, original.sourceIndex))
-		const content = map.sourcesContent?.[original.sourceIndex]
-		const originalFile = content ? createSourceFile(url, content) : await fetchSourceFile(url)
+		const originalFile = await originalFileFor(resolver, original.sourceIndex)
 		return await resolveInFile(originalFile, original.line, original.column + 1, depth + 1)
 	} catch {
 		return fallback

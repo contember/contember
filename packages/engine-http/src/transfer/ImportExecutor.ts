@@ -4,6 +4,7 @@ import * as Typesafe from '@contember/typesafe'
 import { ParseError } from '@contember/typesafe'
 import { Command, CommandArgsMap, CommandName } from './Command.js'
 import { DatabaseContext, StageBySlugQuery } from '@contember/engine-system-api'
+import { isImpossibleCalendarDate } from '@contember/engine-content-api'
 import { DbColumnSchema, TransferMapping, TransferTableMapping } from './TransferMapping.js'
 import { ContentSchemaTransferMappingFactory } from './ContentSchemaTransferMappingFactory.js'
 import { SystemSchemaTransferMappingFactory } from './SystemSchemaTransferMappingFactory.js'
@@ -64,6 +65,15 @@ const listType = <T extends Typesafe.Json>(arrayType: Typesafe.Type<T>): Typesaf
 		}
 		return arrayType(input, path)
 	}
+}
+
+// PostgreSQL would fail the whole batch insert on an impossible date with a server error that names neither column nor row.
+const calendarDate: Typesafe.Type<string> = (input: unknown, path: PropertyKey[] = []) => {
+	const value = Typesafe.string(input, path)
+	if (isImpossibleCalendarDate(value)) {
+		throw new ParseError(path, `${JSON.stringify(value)} is not a valid date`)
+	}
+	return value
 }
 
 type CommandProcessor<T extends CommandName> = (it: CommandIterator<T>) => Promise<CommandIterator | null>
@@ -253,7 +263,14 @@ export class ImportExecutor {
 					insertContext.rows.push(insertContext.rowParser(values))
 				} catch (e) {
 					if (e instanceof ParseError) {
-						throw new ImportError(`Invalid row ${JSON.stringify(values)} for table ${options.table}: ${e.message}`)
+						const rowNumber = insertContext.insertedRowCount + insertContext.rows.length + 1
+						// The row parser is a tuple over the insertBegin columns, so the first path segment is the column index.
+						const [columnIndex, ...valuePath] = e.path
+						const columnName = columnIndex !== undefined ? options.columns[Number(columnIndex)] : undefined
+						const elementLocation = valuePath.length > 0 ? `, element /${valuePath.map(String).join('/')}` : ''
+						const location = columnName !== undefined ? `table ${options.table}, column ${columnName}${elementLocation}` : `table ${options.table}`
+						const reason = columnName !== undefined ? e.reason : e.message
+						throw new ImportError(`Invalid row #${rowNumber} ${JSON.stringify(values)} for ${location}: ${reason}`)
 					} else {
 						throw e
 					}
@@ -443,13 +460,14 @@ export class ImportExecutor {
 			case Model.ColumnType.Uuid:
 			case Model.ColumnType.String:
 			case Model.ColumnType.Enum:
-			case Model.ColumnType.DateTime:
 			case Model.ColumnType.Time:
-			case Model.ColumnType.Date:
 			case Model.ColumnType.Json:
 			// Numeric is transferred as a string to avoid JS float precision loss.
 			case Model.ColumnType.Numeric:
 				return column.list ? listType(Typesafe.array(Typesafe.string)) : Typesafe.string
+			case Model.ColumnType.Date:
+			case Model.ColumnType.DateTime:
+				return column.list ? listType(Typesafe.array(calendarDate)) : calendarDate
 			case Model.ColumnType.Int:
 			case Model.ColumnType.Double:
 				return column.list ? listType(Typesafe.array(Typesafe.number)) : Typesafe.number

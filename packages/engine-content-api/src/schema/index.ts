@@ -1,5 +1,6 @@
 export * from './entities/index.js'
 export * from './mutations/index.js'
+export * from './calendarDate.js'
 export * from './ColumnTypeResolver.js'
 export * from './ConditionTypeProvider.js'
 export * from './CustomTypesProvider.js'

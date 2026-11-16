@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'bun:test'
-import { Kind } from 'graphql'
+import { GraphQLError, Kind } from 'graphql'
 import { CustomTypesProvider } from '../../../src/index.js'
 
 describe('decimal graphql type', () => {
@@ -26,7 +26,7 @@ describe('decimal graphql type', () => {
 	})
 
 	it('rejects an invalid decimal string', () => {
-		expect(() => decimalType.parseValue('abc')).toThrow()
+		expect(() => decimalType.parseValue('abc')).toThrow(GraphQLError)
 		expect(() => decimalType.parseValue('1.2.3')).toThrow()
 		expect(() => decimalType.parseValue('')).toThrow()
 		expect(() => decimalType.parseValue('1,000')).toThrow()

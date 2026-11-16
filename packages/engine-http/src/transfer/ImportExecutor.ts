@@ -265,9 +265,12 @@ export class ImportExecutor {
 					if (e instanceof ParseError) {
 						const rowNumber = insertContext.insertedRowCount + insertContext.rows.length + 1
 						// The row parser is a tuple over the insertBegin columns, so the first path segment is the column index.
-						const columnName = e.path.length > 0 ? options.columns[Number(e.path[0])] : undefined
-						const location = columnName !== undefined ? `table ${options.table}, column ${columnName}` : `table ${options.table}`
-						throw new ImportError(`Invalid row #${rowNumber} ${JSON.stringify(values)} for ${location}: ${e.message}`)
+						const [columnIndex, ...valuePath] = e.path
+						const columnName = columnIndex !== undefined ? options.columns[Number(columnIndex)] : undefined
+						const elementLocation = valuePath.length > 0 ? `, element /${valuePath.map(String).join('/')}` : ''
+						const location = columnName !== undefined ? `table ${options.table}, column ${columnName}${elementLocation}` : `table ${options.table}`
+						const reason = columnName !== undefined ? e.reason : e.message
+						throw new ImportError(`Invalid row #${rowNumber} ${JSON.stringify(values)} for ${location}: ${reason}`)
 					} else {
 						throw e
 					}

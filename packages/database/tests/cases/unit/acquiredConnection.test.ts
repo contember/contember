@@ -167,3 +167,43 @@ for (
 		await expect(connection.query('SELECT 1')).rejects.toThrow(InvalidDataError)
 	})
 }
+
+it('puts the PostgreSQL detail and hint of a failed query into the error message', async () => {
+	const connection = new AcquiredConnection(
+		createPgClientMock(async () => {
+			throw Object.assign(new Error('cannot drop column otp_uri of table person because other objects depend on it'), {
+				code: '2BP01',
+				detail: 'view app.person_otp depends on column otp_uri of table person',
+				hint: 'Use DROP ... CASCADE to drop the dependent objects too.',
+			})
+		}),
+		new EventManager(),
+	)
+
+	const error = await connection.query('ALTER TABLE person DROP COLUMN otp_uri').catch(e => e)
+	if (!(error instanceof QueryError)) {
+		throw error
+	}
+	expect(error.message).toBe(
+		'Database query error: cannot drop column otp_uri of table person because other objects depend on it\n'
+			+ 'Detail: view app.person_otp depends on column otp_uri of table person\n'
+			+ 'Hint: Use DROP ... CASCADE to drop the dependent objects too.\n'
+			+ 'SQL: ALTER TABLE person DROP COLUMN otp_uri\n'
+			+ 'parameters: ',
+	)
+})
+
+it('leaves detail and hint out of the error message when PostgreSQL sends none', async () => {
+	const connection = new AcquiredConnection(
+		createPgClientMock(async () => {
+			throw Object.assign(new Error('relation "missing" does not exist'), { code: '42P01', detail: undefined, hint: undefined })
+		}),
+		new EventManager(),
+	)
+
+	const error = await connection.query('SELECT * FROM missing').catch(e => e)
+	if (!(error instanceof QueryError)) {
+		throw error
+	}
+	expect(error.message).toBe('Database query error: relation "missing" does not exist\nSQL: SELECT * FROM missing\nparameters: ')
+})

@@ -27,15 +27,19 @@ export class ClientError extends DatabaseError {
 	}
 }
 
+// PostgreSQL often puts the actionable part of an error (e.g. which objects block a DROP) into DETAIL and HINT.
+const formatDiagnosticField = (label: string, value: unknown): string => typeof value === 'string' && value !== '' ? `\n${label}: ${value}` : ''
+
 export class QueryError extends DatabaseError {
 	public readonly constraint?: string
 	public readonly table?: string
 
 	constructor(public readonly sql: string, public readonly parameters: any, public override readonly previous: Error | any) {
 		super(
-			`Database query error: ${'message' in previous && previous.message ? previous.message : JSON.stringify(previous)}
-SQL: ${sql}
-parameters: ${parameters}`,
+			('message' in previous && previous.message
+				? `Database query error: ${previous.message}` + formatDiagnosticField('Detail', previous.detail) + formatDiagnosticField('Hint', previous.hint)
+				: `Database query error: ${JSON.stringify(previous)}`)
+				+ `\nSQL: ${sql}\nparameters: ${parameters}`,
 			previous,
 		)
 		this.constraint = previous.constraint

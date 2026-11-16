@@ -42,7 +42,8 @@ function validateTime(value: unknown): string {
 
 const ISO_DATE_PREFIX_REGEX = /^(\d{4})-(\d{1,2})-(\d{1,2})(?!\d)/
 
-const BC_ERA_REGEX = /\bBC\b/i
+// Over-matching only defers a value to PostgreSQL; `2025-02-29BC` has no word boundary before BC.
+const BC_ERA_REGEX = /BC/i
 
 const DAYS_IN_MONTH = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
 

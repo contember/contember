@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'bun:test'
-import { GraphQLScalarType, Kind, StringValueNode } from 'graphql'
+import { GraphQLError, GraphQLScalarType, Kind, StringValueNode } from 'graphql'
 import { CustomTypesProvider } from '../../../src/index.js'
 
 const stringLiteral = (value: string): StringValueNode => ({ kind: Kind.STRING, value })
@@ -33,11 +33,13 @@ describe.each(cases)('%s graphql type', (_, type, valid, impossible) => {
 		for (const value of impossible) {
 			expect(() => type.parseValue(value)).toThrow(`Value is not a valid date: ${value}`)
 			expect(() => type.parseLiteral(stringLiteral(value), undefined)).toThrow(`Value is not a valid date: ${value}`)
+			// engine-http reports only a GraphQLError without an underlying cause as a client error
+			expect(() => type.parseValue(value)).toThrow(GraphQLError)
 		}
 	})
 
 	it('leaves other formats to the database', () => {
-		for (const value of ['now', 'infinity', 'Feb 30 2026', '0001-02-29 BC', '10000-01-01']) {
+		for (const value of ['now', 'infinity', 'Feb 30 2026', '0001-02-29 BC', '2025-02-29BC', '10000-01-01']) {
 			expect(type.parseValue(value)).toEqual(value)
 		}
 	})

@@ -5,6 +5,7 @@
 		"types": ["node"]
 	},
 	"references": [
+		{ "path": "../../cli-common/src" },
 		{ "path": "../../client-content/src" },
 		{ "path": "../../schema/src" },
 		{ "path": "../../schema-utils/src" },

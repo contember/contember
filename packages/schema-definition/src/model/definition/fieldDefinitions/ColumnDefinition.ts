@@ -2,6 +2,7 @@ import { JSONValue, Model } from '@contember/schema'
 import { CreateFieldContext, FieldDefinition } from './FieldDefinition.js'
 import { EnumDefinition } from '../EnumDefinition.js'
 import { resolveDefaultColumnType } from '@contember/schema-utils'
+import { DEFAULT_FIELD_DEPRECATION_REASON } from '@contember/schema-utils'
 
 export class ColumnDefinition extends FieldDefinition<ColumnDefinitionOptions> {
 	type = 'ColumnDefinition' as const
@@ -72,7 +73,15 @@ export class ColumnDefinition extends FieldDefinition<ColumnDefinitionOptions> {
 		return this.withOption('schema', schema)
 	}
 
-	createField({ name, conventions, enumRegistry, entityName, options }: CreateFieldContext): Model.AnyField {
+	public deprecated(deprecationReason?: string): ColumnDefinition {
+		return this.withOption('deprecationReason', deprecationReason || DEFAULT_FIELD_DEPRECATION_REASON)
+	}
+
+	public description(description: string): ColumnDefinition {
+		return this.withOption('description', description)
+	}
+
+	public createField({ name, conventions, enumRegistry, entityName, options }: CreateFieldContext): Model.AnyField {
 		const {
 			type,
 			nullable,
@@ -85,6 +94,8 @@ export class ColumnDefinition extends FieldDefinition<ColumnDefinitionOptions> {
 			list,
 			collation = options.defaultCollation,
 			schema,
+			deprecationReason,
+			description,
 		} = this.options
 		const common = {
 			name: name,
@@ -95,6 +106,8 @@ export class ColumnDefinition extends FieldDefinition<ColumnDefinitionOptions> {
 			...(sequence !== undefined ? { sequence } : {}),
 			...(type === Model.ColumnType.String && collation !== undefined ? { collation } : {}),
 			...(type === Model.ColumnType.Json && schema !== undefined ? { schema } : {}),
+			...(description !== undefined ? { description } : {}),
+			...(deprecationReason !== undefined ? { deprecationReason } : {}),
 		}
 		if (type === Model.ColumnType.Enum) {
 			if (typeAlias) {
@@ -192,6 +205,7 @@ export function uuidColumn(): ColumnDefinition {
 export type ColumnTypeOptions = {
 	enumDefinition?: EnumDefinition
 }
+
 export type ColumnDefinitionOptions = {
 	type: Model.ColumnType
 	columnType?: string
@@ -204,4 +218,6 @@ export type ColumnDefinitionOptions = {
 	sequence?: Model.ColumnTypeDefinition['sequence']
 	collation?: Model.Collation
 	schema?: JSONValue
+	deprecationReason?: string
+	description?: string
 } & ColumnTypeOptions

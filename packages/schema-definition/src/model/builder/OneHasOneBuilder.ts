@@ -1,3 +1,4 @@
+import { DEFAULT_FIELD_DEPRECATION_REASON } from '@contember/schema-utils'
 import { Model } from '@contember/schema'
 import FieldBuilder from './FieldBuilder.js'
 import { AddEntityCallback, EntityConfigurator } from './types.js'
@@ -9,43 +10,51 @@ type PartialOptions<K extends keyof OneHasOneBuilder.Options> =
 class OneHasOneBuilder<O extends PartialOptions<never> = PartialOptions<never>> implements FieldBuilder<O> {
 	constructor(private readonly options: O, private readonly addEntity: AddEntityCallback) {}
 
-	target(target: string, configurator?: EntityConfigurator): OneHasOneBuilder<O & PartialOptions<'target'>> {
+	public target(target: string, configurator?: EntityConfigurator): OneHasOneBuilder<O & PartialOptions<'target'>> {
 		if (configurator) {
 			this.addEntity(target, configurator)
 		}
 		return this.withOption('target', target)
 	}
 
-	inversedBy(inversedBy: string): OneHasOneBuilder<O> {
+	public inversedBy(inversedBy: string): OneHasOneBuilder<O> {
 		return this.withOption('inversedBy', inversedBy)
 	}
 
-	joiningColumn(columnName: string): OneHasOneBuilder<O> {
+	public joiningColumn(columnName: string): OneHasOneBuilder<O> {
 		return this.withOption('joiningColumn', { ...this.joiningColumn, columnName })
 	}
 
-	onDelete(onDelete: Model.OnDelete): OneHasOneBuilder<O> {
+	public onDelete(onDelete: Model.OnDelete): OneHasOneBuilder<O> {
 		return this.withOption('joiningColumn', { ...this.joiningColumn, onDelete })
 	}
 
-	notNull(): OneHasOneBuilder<O> {
+	public notNull(): OneHasOneBuilder<O> {
 		return this.withOption('nullable', false)
 	}
 
-	inverseNotNull(): OneHasOneBuilder<O> {
+	public inverseNotNull(): OneHasOneBuilder<O> {
 		return this.withOption('inverseNullable', false)
 	}
 
 	/** @deprecated use inverseNotNull*/
-	inversedNotNull(): OneHasOneBuilder<O> {
+	public inversedNotNull(): OneHasOneBuilder<O> {
 		return this.withOption('inverseNullable', false)
 	}
 
-	removeOrphan(): OneHasOneBuilder<O> {
+	public removeOrphan(): OneHasOneBuilder<O> {
 		return this.withOption('orphanRemoval', true)
 	}
 
-	getOption(): O {
+	public description(description: string): OneHasOneBuilder<O> {
+		return this.withOption('description', description)
+	}
+
+	public deprecated(deprecationReason?: string): OneHasOneBuilder<O> {
+		return this.withOption('deprecationReason', deprecationReason || DEFAULT_FIELD_DEPRECATION_REASON)
+	}
+
+	public getOption(): O {
 		return this.options
 	}
 
@@ -65,6 +74,8 @@ namespace OneHasOneBuilder {
 		nullable?: boolean
 		inverseNullable?: boolean
 		orphanRemoval?: true
+		description?: string
+		deprecationReason?: string
 	}
 }
 

@@ -2803,6 +2803,12 @@ CREATE CONSTRAINT TRIGGER "log_event_trx"
       "",
       "",
       "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
     ],
   ],
 }

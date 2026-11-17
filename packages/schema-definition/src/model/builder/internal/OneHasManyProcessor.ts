@@ -10,7 +10,7 @@ export default class OneHasManyProcessor implements FieldProcessor<OneHasManyBui
 		this.conventions = conventions
 	}
 
-	process(
+	public process(
 		entityName: string,
 		fieldName: string,
 		options: OneHasManyBuilder.Options,
@@ -34,6 +34,8 @@ export default class OneHasManyProcessor implements FieldProcessor<OneHasManyBui
 			type: Model.RelationType.OneHasMany,
 			target: options.target,
 			...(options.orderBy ? { orderBy: options.orderBy } : {}),
+			...(options.description !== undefined ? { description: options.description } : {}),
+			...(options.deprecationReason !== undefined ? { deprecationReason: options.deprecationReason } : {}),
 		}
 	}
 

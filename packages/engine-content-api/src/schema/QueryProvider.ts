@@ -41,6 +41,7 @@ export class QueryProvider {
 		}
 		return {
 			type: entityType,
+			deprecationReason: entity.deprecationReason,
 			args: {
 				by: {
 					type: new GraphQLNonNull(uniqueWhere),
@@ -67,6 +68,7 @@ export class QueryProvider {
 		const entityType = this.entityTypeProvider.getEntity(entityName)
 		return {
 			type: new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(entityType))),
+			deprecationReason: entity.deprecationReason,
 			args: {
 				filter: {
 					type: this.whereTypeProvider.getEntityWhereType(entityName),
@@ -96,6 +98,7 @@ export class QueryProvider {
 	private getPaginationQuery(entity: Model.Entity): GraphQLFieldConfig<any, Context, Input.ListQueryInput> {
 		return {
 			...this.paginatedFieldConfigFactory.createFieldConfig(entity),
+			deprecationReason: entity.deprecationReason,
 			extensions: { [ExtensionKey]: new OperationMeta(Operation.paginate, entity) },
 			resolve: (parent, args, context, info) => {
 				return context.timer(`GraphQL.query.${info.fieldName}`, () => {

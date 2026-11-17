@@ -1,5 +1,6 @@
 import { GraphQLInputFieldConfig, GraphQLList, GraphQLNonNull } from 'graphql'
 import { Acl, Model } from '@contember/schema'
+import { inputFieldDescription } from '../utils.js'
 import { ColumnTypeResolver } from '../ColumnTypeResolver.js'
 import { CreateEntityRelationInputProvider } from './CreateEntityRelationInputProvider.js'
 import { Authorizator } from '../../acl/index.js'
@@ -22,7 +23,10 @@ export class CreateEntityInputFieldVisitor
 			return undefined
 		}
 		const [type] = this.columnTypeResolver.getType(column)
-		return { type }
+		return {
+			type,
+			description: inputFieldDescription(column),
+		}
 	}
 
 	public visitHasOne({ entity, relation }: Model.AnyHasOneRelationContext): GraphQLInputFieldConfig | undefined {
@@ -30,7 +34,10 @@ export class CreateEntityInputFieldVisitor
 		if (type === undefined) {
 			return undefined
 		}
-		return { type }
+		return {
+			type,
+			description: inputFieldDescription(relation),
+		}
 	}
 
 	public visitHasMany({ entity, relation }: Model.AnyHasManyRelationContext): GraphQLInputFieldConfig | undefined {
@@ -40,6 +47,7 @@ export class CreateEntityInputFieldVisitor
 		}
 		return {
 			type: new GraphQLList(new GraphQLNonNull(type)),
+			description: inputFieldDescription(relation),
 		}
 	}
 }

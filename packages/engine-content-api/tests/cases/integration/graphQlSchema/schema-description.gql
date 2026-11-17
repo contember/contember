@@ -456,6 +456,8 @@ input ArticleUpdateTagsEntityRelationInput {
   connectOrCreate: ArticleConnectOrCreateTagsRelationInput
   disconnect: TagUniqueWhere
   delete: TagUniqueWhere
+  set: [ArticleSetTagsItemRelationInput!]
+  orphanStrategy: OrphanRemovalStrategy
   alias: String
 }
 
@@ -474,6 +476,20 @@ input ArticleUpsertTagsRelationInput {
   by: TagUniqueWhere!
   update: TagWithoutArticlesUpdateInput!
   create: TagWithoutArticlesCreateInput!
+}
+
+input ArticleSetTagsItemRelationInput {
+  create: TagWithoutArticlesCreateInput
+  connect: TagUniqueWhere
+  connectOrCreate: ArticleConnectOrCreateTagsRelationInput
+  update: ArticleUpdateTagsRelationInput
+  upsert: ArticleUpsertTagsRelationInput
+  alias: String
+}
+
+enum OrphanRemovalStrategy {
+  disconnect
+  delete
 }
 
 input ArticleUpdateStatsEntityRelationInput {
@@ -625,6 +641,8 @@ input CategoryUpdateArticlesEntityRelationInput {
   connectOrCreate: CategoryConnectOrCreateArticlesRelationInput
   disconnect: ArticleUniqueWhere
   delete: ArticleUniqueWhere
+  set: [CategorySetArticlesItemRelationInput!]
+  orphanStrategy: OrphanRemovalStrategy
   alias: String
 }
 
@@ -649,6 +667,15 @@ input CategoryUpsertArticlesRelationInput {
   by: ArticleUniqueWhere!
   update: ArticleWithoutCategoryUpdateInput!
   create: ArticleWithoutCategoryCreateInput!
+}
+
+input CategorySetArticlesItemRelationInput {
+  create: ArticleWithoutCategoryCreateInput
+  connect: ArticleUniqueWhere
+  connectOrCreate: CategoryConnectOrCreateArticlesRelationInput
+  update: CategoryUpdateArticlesRelationInput
+  upsert: CategoryUpsertArticlesRelationInput
+  alias: String
 }
 
 input TagCreateInput {
@@ -701,6 +728,8 @@ input TagUpdateArticlesEntityRelationInput {
   connectOrCreate: TagConnectOrCreateArticlesRelationInput
   disconnect: ArticleUniqueWhere
   delete: ArticleUniqueWhere
+  set: [TagSetArticlesItemRelationInput!]
+  orphanStrategy: OrphanRemovalStrategy
   alias: String
 }
 
@@ -725,6 +754,15 @@ input TagUpsertArticlesRelationInput {
   by: ArticleUniqueWhere!
   update: ArticleWithoutTagsUpdateInput!
   create: ArticleWithoutTagsCreateInput!
+}
+
+input TagSetArticlesItemRelationInput {
+  create: ArticleWithoutTagsCreateInput
+  connect: ArticleUniqueWhere
+  connectOrCreate: TagConnectOrCreateArticlesRelationInput
+  update: TagUpdateArticlesRelationInput
+  upsert: TagUpsertArticlesRelationInput
+  alias: String
 }
 
 type QueryTransaction {
@@ -800,6 +838,7 @@ enum _MutationErrorType {
   NotNullConstraintViolation
   UniqueConstraintViolation
   ForeignKeyConstraintViolation
+  CheckConstraintViolation
   NotFoundOrDenied
   NonUniqueWhereInput
   InvalidDataInput

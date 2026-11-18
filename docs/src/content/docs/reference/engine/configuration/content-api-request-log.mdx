@@ -1,0 +1,66 @@
+---
+title: Content API request log
+---
+
+:::note[Available since 2.2]
+:::
+
+The request log records a sample of the Content API requests of selected projects. Its purpose is a replay check before a project switches its [GraphQL engine](/reference/engine/configuration/content-api-engine): the recorded requests run against a copy of the database through both engines, and their responses are compared.
+
+:::danger[The sample contains client data]
+The log records every query with its variables, and variables carry the data clients send: names, e-mails, texts and anything else stored in the project. Treat the file like a database dump:
+
+- Write it to a location only the operators of the check can read, never to shared log storage or stdout.
+- Do not copy it outside the environment where the check runs.
+- Delete it as soon as the check is done.
+:::
+
+The log is off by default. It records only the projects it lists, stops at a hard cap and can also stop after a set time.
+
+## Configuration
+
+```bash
+CONTEMBER_CONTENT_API_REQUEST_LOG_PROJECTS=blog
+CONTEMBER_CONTENT_API_REQUEST_LOG_FILE=/var/lib/contember/request-log/blog.jsonl
+CONTEMBER_CONTENT_API_REQUEST_LOG_MAX_REQUESTS=5000
+CONTEMBER_CONTENT_API_REQUEST_LOG_DURATION_SECONDS=3600
+```
+
+or in the server config:
+
+```yaml
+server:
+  contentApi:
+    requestLog:
+      projects: [blog]
+      file: /var/lib/contember/request-log/blog.jsonl
+      maxRequests: 5000
+      durationSeconds: 3600
+```
+
+| Option | Meaning |
+|---|---|
+| `projects` | Slugs of the projects to record, as a list or a comma-separated string. There is no wildcard. Without projects, the log is off. A slug matches that project in every project group. |
+| `file` | The file the Engine appends to, one JSON object per line. A new file is readable by its owner only. Required when projects are listed. |
+| `maxRequests` | The hard cap: the number of requests recorded per project by one Engine process, at most 100 000. Required when projects are listed. |
+| `durationSeconds` | Optional. Recording stops this many seconds after the Engine process started. |
+
+The cap and the time apply to each Engine process. A cluster of workers can record up to the number of workers times `maxRequests`, and a restart starts both again and appends to the same file. To stop recording, remove the configuration and restart the Engine.
+
+## Recorded entries
+
+```json
+{"time":"2026-01-02T03:04:05.000Z","project":"blog","stage":"live","roles":["editor"],"operationName":"Articles","query":"query Articles($limit: Int) { listArticle(limit: $limit) { id } }","variables":{"limit":10},"status":200}
+```
+
+| Field | Meaning |
+|---|---|
+| `time` | When the request finished. |
+| `project`, `stage` | The project and stage of the request URL. |
+| `roles` | The effective project roles of the identity. The identity itself and the variables of its memberships are not recorded, so a replay with other membership variables can return other rows. |
+| `operationName`, `query`, `variables` | The GraphQL request as the client sent it. |
+| `status` | The HTTP status of the response; a failed request is recorded too. |
+
+Only requests that reach GraphQL execution are recorded. A request refused before it, for example without authentication, for an unknown stage or answered with `304 Not Modified`, is not.
+
+If the file cannot be written, the Engine logs an error and stops recording; requests are not affected.

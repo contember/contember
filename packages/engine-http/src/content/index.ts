@@ -1,6 +1,7 @@
 export * from './ContentApiControllerFactory.js'
 export * from './ContentGraphQLEngine.js'
 export * from './ContentQueryHandlerFactory.js'
+export * from './ContentRequestLog.js'
 export * from './GraphQLSchemaContributor.js'
 export * from './ContentSchemaResolver.js'
 export * from './GraphQlSchemaFactory.js'

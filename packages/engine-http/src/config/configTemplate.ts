@@ -114,6 +114,12 @@ export const configTemplate: any = {
 			forcePrimaryHeader: '%?env.CONTEMBER_CONTENT_API_FORCE_PRIMARY_HEADER::bool%',
 			graphqlEngine: '%?env.CONTEMBER_CONTENT_API_GRAPHQL_ENGINE%',
 			graphqlJsonProjects: '%?env.CONTEMBER_CONTENT_API_GRAPHQL_JSON_PROJECTS%',
+			requestLog: {
+				projects: '%?env.CONTEMBER_CONTENT_API_REQUEST_LOG_PROJECTS%',
+				file: '%?env.CONTEMBER_CONTENT_API_REQUEST_LOG_FILE%',
+				maxRequests: '%?env.CONTEMBER_CONTENT_API_REQUEST_LOG_MAX_REQUESTS::number%',
+				durationSeconds: '%?env.CONTEMBER_CONTENT_API_REQUEST_LOG_DURATION_SECONDS::number%',
+			},
 			whereOptimizer: {
 				disable: '%?env.CONTEMBER_CONTENT_API_WHERE_OPTIMIZER_DISABLE::bool%',
 				maxCrossOptimizationInput: '%?env.CONTEMBER_CONTENT_API_MAX_CROSS_OPTIMIZATION_INPUT::number%',

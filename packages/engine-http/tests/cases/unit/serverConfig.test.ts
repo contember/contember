@@ -219,3 +219,47 @@ test('requestBodySize: a malformed size fails instead of disabling the limit', (
 		expect(() => requestBodySize(value)).toThrow()
 	}
 })
+
+const requestLog = (val: unknown): unknown => serverConfigSchema({ contentApi: { requestLog: val } }).contentApi?.requestLog
+
+test('content request log: off when nothing is configured', async () => {
+	const { serverConfig } = await readConfig()
+	expect(serverConfig.contentApi?.requestLog).toBeUndefined()
+})
+
+test('content request log: off without listed projects, even with a destination', () => {
+	expect(requestLog({ file: '/var/log/requests.jsonl', maxRequests: 100 })).toBeUndefined()
+	expect(requestLog({ projects: '', file: '/var/log/requests.jsonl', maxRequests: 100 })).toBeUndefined()
+})
+
+test('content request log: read from CONTEMBER_CONTENT_API_REQUEST_LOG_*', async () => {
+	process.env.CONTEMBER_CONTENT_API_REQUEST_LOG_PROJECTS = 'blog, shop'
+	process.env.CONTEMBER_CONTENT_API_REQUEST_LOG_FILE = '/var/log/requests.jsonl'
+	process.env.CONTEMBER_CONTENT_API_REQUEST_LOG_MAX_REQUESTS = '500'
+	process.env.CONTEMBER_CONTENT_API_REQUEST_LOG_DURATION_SECONDS = '3600'
+	try {
+		const { serverConfig } = await readConfig()
+		expect(serverConfig.contentApi?.requestLog).toEqual({
+			projects: ['blog', 'shop'],
+			file: '/var/log/requests.jsonl',
+			maxRequests: 500,
+			durationSeconds: 3600,
+		})
+	} finally {
+		delete process.env.CONTEMBER_CONTENT_API_REQUEST_LOG_PROJECTS
+		delete process.env.CONTEMBER_CONTENT_API_REQUEST_LOG_FILE
+		delete process.env.CONTEMBER_CONTENT_API_REQUEST_LOG_MAX_REQUESTS
+		delete process.env.CONTEMBER_CONTENT_API_REQUEST_LOG_DURATION_SECONDS
+	}
+})
+
+test('content request log: listed projects require a destination and a cap', () => {
+	expect(() => requestLog({ projects: ['blog'], maxRequests: 100 })).toThrow(/file/)
+	expect(() => requestLog({ projects: ['blog'], file: '/var/log/requests.jsonl' })).toThrow(/maxRequests/)
+})
+
+test('content request log: the cap is positive and bounded', () => {
+	expect(() => requestLog({ projects: ['blog'], file: '/var/log/requests.jsonl', maxRequests: 0 })).toThrow()
+	expect(() => requestLog({ projects: ['blog'], file: '/var/log/requests.jsonl', maxRequests: 100_001 })).toThrow(/at most 100000/)
+	expect(() => requestLog({ projects: ['blog'], file: '/var/log/requests.jsonl', maxRequests: 10, durationSeconds: 0 })).toThrow()
+})

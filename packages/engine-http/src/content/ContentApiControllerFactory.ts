@@ -9,6 +9,7 @@ import { ContentQueryHandler, ContentQueryHandlerFactory } from './ContentQueryH
 import { GraphQlSchemaFactory } from './GraphQlSchemaFactory.js'
 import { ContentGraphQLSchema } from './ContentGraphQLEngine.js'
 import { NotModifiedChecker } from './NotModifiedChecker.js'
+import { ContentRequestLog } from './ContentRequestLog.js'
 import { TestTransactionService } from '../testing/index.js'
 import { isTruthyHeader } from '../utils/truthyHeader.js'
 
@@ -26,6 +27,7 @@ export class ContentApiControllerFactory {
 		private readonly testTransactionService: TestTransactionService,
 		private readonly forcePrimaryHeaderEnabled: boolean,
 		private readonly memoryBudgetOptions?: RequestMemoryBudgetOptions,
+		private readonly requestLog?: ContentRequestLog,
 	) {
 	}
 
@@ -215,6 +217,15 @@ export class ContentApiControllerFactory {
 						},
 					}))
 				logger.debug('Content query finished')
+			})
+
+			this.requestLog?.record({
+				project: project.slug,
+				stage: stage.slug,
+				roles: projectRoles,
+				// what the GraphQL handler executed: the POST body, or the query string of a GET
+				request: koa.request.method === 'POST' ? koa.request.body : koa.request.query,
+				status: koa.response.status,
 			})
 
 			notModifiedRes?.setResponseHeader(context.response)

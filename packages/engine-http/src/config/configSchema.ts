@@ -5,6 +5,7 @@ import { upperCaseFirst } from '../utils/strings.js'
 import ipaddr from 'ipaddr.js'
 import { EgressError, EgressPolicy } from '@contember/engine-common'
 import { parseByteSize } from '../application/requestBody.js'
+import { contentRequestLogMaxRequestsCeiling, ContentRequestLogOptions } from '../content/ContentRequestLog.js'
 
 const dbConfigRequired = {
 	host: Typesafe.string,
@@ -179,6 +180,44 @@ const egressConfigSchema = Typesafe.transform(
 	},
 )
 
+/** A comma-separated string or a list of project slugs; empty means unset. */
+const projectSlugList = (val: unknown, path: PropertyKey[] = []): string[] | undefined => {
+	if (val === undefined || val === null || val === '') {
+		return undefined
+	}
+	const raw = typeof val === 'string' ? val.split(',') : Typesafe.array(Typesafe.string)(val, path)
+	return raw.map(it => it.trim()).filter(Boolean)
+}
+
+const contentRequestLogSchema = Typesafe.partial({
+	projects: projectSlugList,
+	file: (input: unknown, path: PropertyKey[] = []): string | undefined =>
+		input === undefined || input === '' ? undefined : Typesafe.string(input, path),
+	maxRequests: positiveInteger,
+	durationSeconds: positiveInteger,
+})
+
+/** Off unless projects are listed; then the destination and the cap are required. */
+const contentRequestLog = (input: unknown, path: PropertyKey[] = []): ContentRequestLogOptions | undefined => {
+	if (input === undefined) {
+		return undefined
+	}
+	const { projects, file, maxRequests, durationSeconds } = contentRequestLogSchema(input, path)
+	if (!projects?.length) {
+		return undefined
+	}
+	if (file === undefined) {
+		return Typesafe.fail([...path, 'file'], 'is required when projects are listed (CONTEMBER_CONTENT_API_REQUEST_LOG_FILE)')
+	}
+	if (maxRequests === undefined) {
+		return Typesafe.fail([...path, 'maxRequests'], 'is required when projects are listed (CONTEMBER_CONTENT_API_REQUEST_LOG_MAX_REQUESTS)')
+	}
+	if (maxRequests > contentRequestLogMaxRequestsCeiling) {
+		return Typesafe.fail([...path, 'maxRequests'], `must be at most ${contentRequestLogMaxRequestsCeiling}`)
+	}
+	return { projects, file, maxRequests, durationSeconds }
+}
+
 export const serverConfigSchema = Typesafe.partial({
 	port: Typesafe.number,
 	http: Typesafe.partial({
@@ -305,13 +344,8 @@ export const serverConfigSchema = Typesafe.partial({
 		// an empty variable means unset, as for graphqlJsonProjects
 		graphqlEngine: (val: unknown, path: PropertyKey[] = []): 'graphql-js' | 'graphql-json' | undefined =>
 			val === undefined || val === '' ? undefined : Typesafe.enumeration('graphql-js', 'graphql-json')(val, path),
-		graphqlJsonProjects: (val: unknown, path: PropertyKey[] = []): string[] | undefined => {
-			if (val === undefined || val === null || val === '') {
-				return undefined
-			}
-			const raw = typeof val === 'string' ? val.split(',') : Typesafe.array(Typesafe.string)(val, path)
-			return raw.map(it => it.trim()).filter(Boolean)
-		},
+		graphqlJsonProjects: projectSlugList,
+		requestLog: contentRequestLog,
 		whereOptimizer: Typesafe.partial({
 			disable: Typesafe.boolean,
 			maxCrossOptimizationInput: Typesafe.number,

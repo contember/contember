@@ -27,6 +27,7 @@ import {
 	NotModifiedChecker,
 } from './content/index.js'
 import { ContentApiSpecificCache } from './content/ContentApiSpecificCache.js'
+import { ContentRequestLog } from './content/ContentRequestLog.js'
 import { homepageController } from './misc/index.js'
 import { Plugin } from './plugin/Plugin.js'
 import { ProjectContainerFactoryFactory } from './project/index.js'
@@ -66,6 +67,7 @@ export interface MasterContainer {
 	providers: Providers
 	applicationWorkers: ApplicationWorkerManager
 	monitoringKoa: Koa
+	contentRequestLog: ContentRequestLog | undefined
 }
 
 export interface MasterContainerArgs {
@@ -244,6 +246,10 @@ export class MasterContainerFactory {
 			.addService('notModifiedChecker', () => new NotModifiedChecker())
 			.addService('contentQueryHandlerFactory', ({ debugMode }) => new ContentQueryHandlerFactory(debugMode))
 			.addService('projectContextResolver', () => new ProjectContextResolver())
+			.addService('contentRequestLog', ({ serverConfig, logger }) => {
+				const options = serverConfig.contentApi?.requestLog
+				return options ? new ContentRequestLog(options, logger) : undefined
+			})
 			.addService(
 				'contentApiMiddlewareFactory',
 				(
@@ -255,6 +261,7 @@ export class MasterContainerFactory {
 						graphQlSchemaFactory,
 						testTransactionService,
 						serverConfig,
+						contentRequestLog,
 					},
 				) =>
 					new ContentApiControllerFactory(
@@ -266,6 +273,7 @@ export class MasterContainerFactory {
 						testTransactionService,
 						serverConfig.contentApi?.forcePrimaryHeader ?? false,
 						serverConfig.http?.requestMemoryBudget,
+						contentRequestLog,
 					),
 			)
 			.addService('tenantApiMiddlewareFactory', () => new TenantApiMiddlewareFactory())
@@ -385,6 +393,6 @@ export class MasterContainerFactory {
 
 	create(args: MasterContainerArgs): MasterContainer {
 		const container = this.createBuilder(args).build()
-		return container.pick('initializer', 'application', 'providers', 'applicationWorkers', 'monitoringKoa')
+		return container.pick('initializer', 'application', 'providers', 'applicationWorkers', 'monitoringKoa', 'contentRequestLog')
 	}
 }

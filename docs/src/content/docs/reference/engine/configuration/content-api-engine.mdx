@@ -43,3 +43,5 @@ server:
 The engine applies to the Content API and to the content migrations of the project. A change takes effect after a restart.
 
 To switch a project back to `graphql-js`, remove it from the list. The list only opts projects in: while `graphqlEngine` is `graphql-json`, a single project cannot go back. Keep the default at `graphql-js` and list every switched project until all of them run on `graphql-json`.
+
+Before switching a project, you can record a sample of its requests with the [request log](/reference/engine/configuration/content-api-request-log) and replay them against a copy of its database through both engines.

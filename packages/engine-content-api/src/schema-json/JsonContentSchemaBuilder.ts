@@ -293,6 +293,7 @@ export class JsonContentSchemaBuilder {
 			['get' + entityName]: {
 				type: namedRef(entityType),
 				args: { by: [nonNullRef(uniqueWhere)], filter: [where] },
+				deprecationReason: entity.deprecationReason,
 				extensions: { [ExtensionKey]: new OperationMeta(Operation.get, entity) },
 				resolve: resolvers.get,
 			},
@@ -304,11 +305,13 @@ export class JsonContentSchemaBuilder {
 					offset: [int],
 					limit: [int],
 				},
+				deprecationReason: entity.deprecationReason,
 				extensions: { [ExtensionKey]: new OperationMeta(Operation.list, entity) },
 				resolve: resolvers.list,
 			},
 			['paginate' + entityName]: {
 				...this.entityTypes.createPaginatedField(entityName),
+				deprecationReason: entity.deprecationReason,
 				extensions: { [ExtensionKey]: new OperationMeta(Operation.paginate, entity) },
 				resolve: resolvers.paginate,
 			},
@@ -324,6 +327,7 @@ export class JsonContentSchemaBuilder {
 			fields[`validateCreate${entity.name}`] = {
 				type: validationResult,
 				args: { data: [nonNullRef(createInput)] },
+				deprecationReason: entity.deprecationReason,
 				resolve: resolvers.create,
 			}
 		}
@@ -333,6 +337,7 @@ export class JsonContentSchemaBuilder {
 			fields[`validateUpdate${entity.name}`] = {
 				type: validationResult,
 				args: { by: [nonNullRef(uniqueWhere)], data: [nonNullRef(updateInput)] },
+				deprecationReason: entity.deprecationReason,
 				resolve: resolvers.update,
 			}
 		}
@@ -352,6 +357,7 @@ export class JsonContentSchemaBuilder {
 				mutations[`create${entityName}`] = {
 					type: nonNullRef(this.createResultType(entityName, 'create')),
 					args: { data: [nonNullRef(dataType)] },
+					deprecationReason: entity.deprecationReason,
 					extensions: { [ExtensionKey]: new OperationMeta(Operation.create, entity) },
 					resolve: resolvers.create,
 				}
@@ -366,6 +372,7 @@ export class JsonContentSchemaBuilder {
 					by: [nonNullRef(uniqueWhere)],
 					filter: [namedRef(this.filterTypes.getEntityWhereType(entityName))],
 				},
+				deprecationReason: entity.deprecationReason,
 				extensions: { [ExtensionKey]: new OperationMeta(Operation.delete, entity) },
 				resolve: resolvers.delete,
 			}
@@ -383,6 +390,7 @@ export class JsonContentSchemaBuilder {
 							filter: [namedRef(this.filterTypes.getEntityWhereType(entityName))],
 							data: [nonNullRef(dataType)],
 						},
+						deprecationReason: entity.deprecationReason,
 						extensions: { [ExtensionKey]: new OperationMeta(Operation.update, entity) },
 						resolve: resolvers.update,
 					}
@@ -404,6 +412,7 @@ export class JsonContentSchemaBuilder {
 							update: [nonNullRef(updateInput)],
 							create: [nonNullRef(createInput)],
 						},
+						deprecationReason: entity.deprecationReason,
 						extensions: { [ExtensionKey]: new OperationMeta(Operation.upsert, entity) },
 						resolve: resolvers.upsert,
 					}

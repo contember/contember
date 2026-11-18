@@ -2,7 +2,7 @@ import { Acl, Input, Model } from '@contember/schema'
 import { acceptFieldVisitor, getEntity } from '@contember/schema-utils'
 import { InputField } from '@contember/graphql-json'
 import { Authorizator } from '../acl/index.js'
-import { GqlTypeName } from '../schema/utils.js'
+import { GqlTypeName, inputFieldDescription } from '../schema/utils.js'
 import {
 	CreateEntityRelationAllowedOperationsVisitor,
 	EntityInputType,
@@ -11,7 +11,7 @@ import {
 import { ImplementationException } from '../exception.js'
 import { JsonColumnTypes } from './JsonColumnTypes.js'
 import { JsonFilterTypes } from './JsonFilterTypes.js'
-import { JsonTypeRegistry, listOfNonNullRef, namedRef, nonNullRef } from './JsonTypeRegistry.js'
+import { inputField, JsonTypeRegistry, listOfNonNullRef, namedRef, nonNullRef } from './JsonTypeRegistry.js'
 
 /** JSON counterpart of `EntityInputProvider` and the create/update input visitors in `schema/mutations`. */
 export class JsonInputTypes {
@@ -83,15 +83,15 @@ export class JsonInputTypes {
 				if (this.authorizator.getFieldPermissions(Acl.Operation.create, entity.name, column.name) === 'no') {
 					return undefined
 				}
-				return [this.columnTypes.getType(column).type]
+				return inputField(this.columnTypes.getType(column).type, inputFieldDescription(column))
 			},
 			visitHasOne: context => {
 				const type = this.memoizeRelationInput('create', context, () => this.getCreateRelationInput(context, false))
-				return type === undefined ? undefined : [namedRef(type)]
+				return type === undefined ? undefined : inputField(namedRef(type), inputFieldDescription(context.relation))
 			},
 			visitHasMany: context => {
 				const type = this.memoizeRelationInput('create', context, () => this.getCreateRelationInput(context, true))
-				return type === undefined ? undefined : [listOfNonNullRef(type)]
+				return type === undefined ? undefined : inputField(listOfNonNullRef(type), inputFieldDescription(context.relation))
 			},
 		})
 	}
@@ -105,15 +105,15 @@ export class JsonInputTypes {
 				if (this.authorizator.getFieldPermissions(Acl.Operation.update, entity.name, column.name) === 'no') {
 					return undefined
 				}
-				return [this.columnTypes.getType(column).type]
+				return inputField(this.columnTypes.getType(column).type, inputFieldDescription(column))
 			},
 			visitHasOne: context => {
 				const type = this.memoizeRelationInput('update', context, () => this.getUpdateHasOneRelationInput(context))
-				return type === undefined ? undefined : [namedRef(type)]
+				return type === undefined ? undefined : inputField(namedRef(type), inputFieldDescription(context.relation))
 			},
 			visitHasMany: context => {
 				const type = this.memoizeRelationInput('update', context, () => this.getUpdateHasManyRelationInput(context))
-				return type === undefined ? undefined : [listOfNonNullRef(type)]
+				return type === undefined ? undefined : inputField(listOfNonNullRef(type), inputFieldDescription(context.relation))
 			},
 		})
 	}
@@ -194,32 +194,63 @@ export class JsonInputTypes {
 		const createInput = this.getInput(EntityInputType.create, targetEntity.name, withoutRelation)
 		const updateInput = this.getInput(EntityInputType.update, targetEntity.name, withoutRelation)
 
+		const create: InputField | undefined = createInput ? [namedRef(createInput)] : undefined
+		const update: InputField | undefined = updateInput && whereInput
+			? [namedRef(this.registry.inputObject(GqlTypeName`${entity.name}Update${relation.name}RelationInput`, () => ({
+				by: [nonNullRef(whereInput)],
+				data: [nonNullRef(updateInput)],
+			})))]
+			: undefined
+		const upsert: InputField | undefined = updateInput && createInput && whereInput
+			? [namedRef(this.registry.inputObject(GqlTypeName`${entity.name}Upsert${relation.name}RelationInput`, () => ({
+				by: [nonNullRef(whereInput)],
+				update: [nonNullRef(updateInput)],
+				create: [nonNullRef(createInput)],
+			})))]
+			: undefined
+		const connect: InputField | undefined = whereInput ? [namedRef(whereInput)] : undefined
+		const connectOrCreate: InputField | undefined = createInput && whereInput
+			? [namedRef(this.getConnectOrCreateInput(entity, relation.name))]
+			: undefined
+
 		const fields = this.filterAllowedOperations(entity, relation, {
-			[Input.UpdateRelationOperation.create]: createInput ? [namedRef(createInput)] : undefined,
-			[Input.UpdateRelationOperation.update]: updateInput && whereInput
-				? [namedRef(this.registry.inputObject(GqlTypeName`${entity.name}Update${relation.name}RelationInput`, () => ({
-					by: [nonNullRef(whereInput)],
-					data: [nonNullRef(updateInput)],
-				})))]
-				: undefined,
-			[Input.UpdateRelationOperation.upsert]: updateInput && createInput && whereInput
-				? [namedRef(this.registry.inputObject(GqlTypeName`${entity.name}Upsert${relation.name}RelationInput`, () => ({
-					by: [nonNullRef(whereInput)],
-					update: [nonNullRef(updateInput)],
-					create: [nonNullRef(createInput)],
-				})))]
-				: undefined,
-			[Input.UpdateRelationOperation.connect]: whereInput ? [namedRef(whereInput)] : undefined,
-			[Input.UpdateRelationOperation.connectOrCreate]: createInput && whereInput
-				? [namedRef(this.getConnectOrCreateInput(entity, relation.name))]
-				: undefined,
-			[Input.UpdateRelationOperation.disconnect]: whereInput ? [namedRef(whereInput)] : undefined,
-			[Input.UpdateRelationOperation.delete]: whereInput ? [namedRef(whereInput)] : undefined,
+			[Input.UpdateRelationOperation.create]: create,
+			[Input.UpdateRelationOperation.update]: update,
+			[Input.UpdateRelationOperation.upsert]: upsert,
+			[Input.UpdateRelationOperation.connect]: connect,
+			[Input.UpdateRelationOperation.connectOrCreate]: connectOrCreate,
+			[Input.UpdateRelationOperation.disconnect]: connect,
+			[Input.UpdateRelationOperation.delete]: connect,
 		})
 		if (Object.keys(fields).length === 0) {
 			return undefined
 		}
-		fields.alias = [namedRef(this.columnTypes.getScalar(Model.ColumnType.String))]
+		const string = namedRef(this.columnTypes.getScalar(Model.ColumnType.String))
+
+		// `set` replaces the whole collection with the positive operations; orphans are removed via `orphanStrategy`.
+		const setItemFields = this.filterAllowedOperations(entity, relation, {
+			[Input.UpdateRelationOperation.create]: create,
+			[Input.UpdateRelationOperation.connect]: connect,
+			[Input.UpdateRelationOperation.connectOrCreate]: connectOrCreate,
+			[Input.UpdateRelationOperation.update]: update,
+			[Input.UpdateRelationOperation.upsert]: upsert,
+		})
+		// Orphans are found by diffing the current members read through the target's read predicate, so a role that
+		// cannot read the target would see an empty collection and `set` could only add: it is not offered at all.
+		const canReadTarget = this.authorizator.getEntityPermission(Acl.Operation.read, targetEntity.name) !== 'no'
+		if (canReadTarget && Object.keys(setItemFields).length > 0) {
+			const setItem = this.registry.inputObject(GqlTypeName`${entity.name}Set${relation.name}ItemRelationInput`, () => ({
+				...setItemFields,
+				alias: [string],
+			}))
+			fields[Input.UpdateRelationOperation.set] = [listOfNonNullRef(setItem)]
+			// only offered when the role may delete the target, `disconnect` is the default
+			if (this.getAllowedOperations(entity, relation).includes(Input.UpdateRelationOperation.delete)) {
+				const strategies = [Input.OrphanRemovalStrategy.disconnect, Input.OrphanRemovalStrategy.delete]
+				fields.orphanStrategy = [namedRef(this.registry.enum('OrphanRemovalStrategy', strategies))]
+			}
+		}
+		fields.alias = [string]
 		return this.registry.inputObject(GqlTypeName`${entity.name}Update${relation.name}EntityRelationInput`, () => fields)
 	}
 
@@ -253,12 +284,16 @@ export class JsonInputTypes {
 		return uniqueWhere
 	}
 
+	private getAllowedOperations(entity: Model.Entity, relation: Model.Relation): readonly Input.UpdateRelationOperation[] {
+		return acceptFieldVisitor(this.schema, entity, relation.name, this.updateAllowedOperationsVisitor)
+	}
+
 	private filterAllowedOperations(
 		entity: Model.Entity,
 		relation: Model.Relation,
 		fields: Record<string, InputField | undefined>,
 	): Record<string, InputField> {
-		const allowedOperations: readonly string[] = acceptFieldVisitor(this.schema, entity, relation.name, this.updateAllowedOperationsVisitor)
+		const allowedOperations: readonly string[] = this.getAllowedOperations(entity, relation)
 		const result: Record<string, InputField> = {}
 		for (const [key, value] of Object.entries(fields)) {
 			if (value !== undefined && allowedOperations.includes(key)) {

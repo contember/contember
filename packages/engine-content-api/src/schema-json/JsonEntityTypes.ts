@@ -35,7 +35,8 @@ export class JsonEntityTypes {
 		if (this.authorizator.getEntityPermission(Acl.Operation.read, entityName) === 'no') {
 			throw new ImplementationException()
 		}
-		return this.registry.object(GqlTypeName`${entityName}`, () => this.getEntityFields(entityName))
+		const entity = getEntity(this.schema, entityName)
+		return this.registry.object(GqlTypeName`${entityName}`, () => this.getEntityFields(entity), [], entity.description)
 	}
 
 	public getConnection(entityName: string): string {
@@ -78,8 +79,8 @@ export class JsonEntityTypes {
 		}))
 	}
 
-	private getEntityFields(entityName: string): Record<string, JsonOutputField> {
-		const entity = getEntity(this.schema, entityName)
+	private getEntityFields(entity: Model.Entity): Record<string, JsonOutputField> {
+		const entityName = entity.name
 		const accessVisitor = new FieldAccessVisitor(Acl.Operation.read, this.authorizator)
 		const accessibleFields = Object.values(entity.fields).filter(field => acceptFieldVisitor(this.schema, entity, field.name, accessVisitor))
 
@@ -100,6 +101,8 @@ export class JsonEntityTypes {
 				type: this.getFieldType(entity, field.name),
 				args: this.getFieldArgs(entity, field.name),
 				resolve: aliasAwareResolver,
+				deprecationReason: field.deprecationReason,
+				description: field.description,
 			}
 		}
 		// the field order is part of the published schema: columns and relations, reducers, then paginated relations
@@ -178,8 +181,10 @@ export class JsonEntityTypes {
 
 		const entityType = this.getEntity(targetEntity.name)
 		const extensions = { relationName: relation.name, extensionKey: HasManyToHasOneReducerExecutionHandler.extensionName }
-		const createField = (uniqueWhereName: string, keys: (readonly string[])[]): JsonOutputField => ({
+		const createField = (uniqueWhereName: string, keys: (readonly string[])[], description: string | undefined): JsonOutputField => ({
 			type: namedRef(entityType),
+			deprecationReason: relation.deprecationReason,
+			description,
 			extensions,
 			args: {
 				by: [nonNullRef(this.registry.inputObject(uniqueWhereName, () => this.filterTypes.getUniqueWhereFields(targetEntity, keys)))],
@@ -203,11 +208,13 @@ export class JsonEntityTypes {
 			fields[relation.name + GqlTypeName`By${fieldName}`] = createField(
 				GqlTypeName`${entity.name}${relation.name}By${fieldName}UniqueWhere`,
 				[[fieldName]],
+				relation.description,
 			)
 		}
 		const universalName = relation.name + 'By'
 		if (!(universalName in entity.fields)) {
-			fields[universalName] = createField(GqlTypeName`${relation.name}Of${entity.name}ByUniqueWhere`, uniqueKeys)
+			// deprecated with the relation, but undescribed: the published schema has it so
+			fields[universalName] = createField(GqlTypeName`${relation.name}Of${entity.name}ByUniqueWhere`, uniqueKeys, undefined)
 		}
 		return fields
 	}
@@ -220,6 +227,8 @@ export class JsonEntityTypes {
 		return {
 			[`paginate${capitalizeFirstLetter(field.name)}`]: {
 				...this.createPaginatedField(field.target),
+				deprecationReason: field.deprecationReason,
+				description: field.description,
 				extensions: { relationName: field.name, extensionKey: PaginatedHasManyExecutionHandler.extensionName },
 				resolve: aliasAwareResolver,
 			},

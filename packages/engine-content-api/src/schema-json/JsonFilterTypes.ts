@@ -3,11 +3,11 @@ import { acceptFieldVisitor, getEntity } from '@contember/schema-utils'
 import { InputField } from '@contember/graphql-json'
 import { Authorizator } from '../acl/index.js'
 import { FieldAccessVisitor } from '../schema/FieldAccessVisitor.js'
-import { GqlTypeName } from '../schema/utils.js'
+import { GqlTypeName, inputFieldDescription } from '../schema/utils.js'
 import { capitalizeFirstLetter, getFieldsForUniqueWhere } from '../utils/index.js'
 import { ImplementationException } from '../exception.js'
 import { JsonColumnTypes } from './JsonColumnTypes.js'
-import { JsonTypeRegistry, listOfNonNullRef, listRef, namedRef } from './JsonTypeRegistry.js'
+import { inputField, JsonTypeRegistry, listOfNonNullRef, listRef, namedRef } from './JsonTypeRegistry.js'
 
 /** JSON counterpart of `WhereTypeProvider`, `ConditionTypeProvider` and `OrderByTypeProvider`. */
 export class JsonFilterTypes {
@@ -49,14 +49,14 @@ export class JsonFilterTypes {
 					continue
 				}
 				fields[field] = acceptFieldVisitor<InputField>(this.schema, entity, field, {
-					visitRelation: ({ targetEntity }) => {
+					visitRelation: ({ relation, targetEntity }) => {
 						const uniqueWhere = this.getEntityUniqueWhereType(targetEntity.name)
 						if (!uniqueWhere) {
 							throw new ImplementationException()
 						}
-						return [namedRef(uniqueWhere)]
+						return inputField(namedRef(uniqueWhere), inputFieldDescription(relation))
 					},
-					visitColumn: ({ column }) => [this.columnTypes.getType(column).type],
+					visitColumn: ({ column }) => inputField(this.columnTypes.getType(column).type, inputFieldDescription(column)),
 				})
 			}
 		}
@@ -76,8 +76,8 @@ export class JsonFilterTypes {
 				continue
 			}
 			fields[fieldName] = acceptFieldVisitor<InputField>(this.schema, entityName, fieldName, {
-				visitColumn: ({ column }) => [namedRef(this.getCondition(column))],
-				visitRelation: ({ relation }) => [namedRef(this.getEntityWhereType(relation.target))],
+				visitColumn: ({ column }) => inputField(namedRef(this.getCondition(column)), inputFieldDescription(column)),
+				visitRelation: ({ relation }) => inputField(namedRef(this.getEntityWhereType(relation.target)), inputFieldDescription(relation)),
 			})
 		}
 		fields.and = [listRef(whereName)]
@@ -146,8 +146,8 @@ export class JsonFilterTypes {
 				continue
 			}
 			const field = acceptFieldVisitor<InputField | undefined>(this.schema, entityName, fieldName, {
-				visitColumn: ({ column }) => column.list ? undefined : [namedRef(orderDirection)],
-				visitHasOne: ({ relation }) => [namedRef(this.getEntityOrderByType(relation.target))],
+				visitColumn: ({ column }) => column.list ? undefined : inputField(namedRef(orderDirection), inputFieldDescription(column)),
+				visitHasOne: ({ relation }) => inputField(namedRef(this.getEntityOrderByType(relation.target)), inputFieldDescription(relation)),
 				visitHasMany: () => undefined,
 			})
 			if (field !== undefined) {

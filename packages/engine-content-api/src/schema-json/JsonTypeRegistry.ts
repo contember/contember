@@ -21,6 +21,7 @@ export interface JsonOutputField {
 	args?: Record<string, Argument>
 	resolve?: ResolverFn<unknown, Context>
 	extensions?: FieldExtensions
+	description?: string
 	deprecationReason?: string
 }
 
@@ -45,12 +46,17 @@ export class JsonTypeRegistry {
 		return name in this.types
 	}
 
-	public object(name: string, createFields: () => Record<string, JsonOutputField>, interfaces: string[] = []): string {
+	public object(
+		name: string,
+		createFields: () => Record<string, JsonOutputField>,
+		interfaces: string[] = [],
+		description?: string,
+	): string {
 		if (this.types[name]) {
 			return name
 		}
 		const fields: Record<string, Field> = {}
-		this.types[name] = [TypeKind.OBJECT, fields, interfaces]
+		this.types[name] = description !== undefined ? [TypeKind.OBJECT, fields, interfaces, description] : [TypeKind.OBJECT, fields, interfaces]
 		for (const interfaceName of interfaces) {
 			this.addPossibleType(interfaceName, name)
 		}
@@ -196,7 +202,9 @@ export class JsonTypeRegistry {
 	private addOutputFields(typeName: string, target: Record<string, Field>, fields: Record<string, JsonOutputField>): void {
 		for (const [fieldName, field] of Object.entries(fields)) {
 			target[fieldName] = field.deprecationReason !== undefined
-				? [field.type, field.args ?? null, undefined, field.deprecationReason]
+				? [field.type, field.args ?? null, field.description, field.deprecationReason]
+				: field.description !== undefined
+				? [field.type, field.args ?? null, field.description]
 				: [field.type, field.args ?? null]
 			if (field.resolve) {
 				;(this.resolvers[typeName] ??= {})[fieldName] ??= field.resolve
@@ -243,6 +251,10 @@ const getReferencedTypes = (type: Type): string[] => {
 	}
 	return names
 }
+
+/** An input field without a default value; the description is left out of the tuple when there is none. */
+export const inputField = (type: TypeRef, description: string | undefined): InputField =>
+	description !== undefined ? [type, undefined, description] : [type]
 
 /** Wrap patterns of graphql-json `TypeRef`, named after the SDL they produce. */
 const TypeRefPattern = {

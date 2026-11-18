@@ -5,7 +5,7 @@ Core GraphQL content API. Builds a per-project GraphQL schema from the Contember
 ## Query Flow
 
 ```
-GraphQL query → GraphQlQueryAstFactory (ResolveInfo → ObjectNode AST)
+GraphQL query → GraphQlQueryAstFactory / JsonQueryAstFactory (graphql-js / graphql-json ResolveInfo → ObjectNode AST)
   → ReadResolver.resolveListQuery/resolveGetQuery
   → Mapper.select/selectUnique
     → UniqueWhereExpander (expand unique where)
@@ -51,17 +51,22 @@ Row-level and field-level security via predicate injection into every SQL operat
 
 ## GraphQL Schema Building
 
-`GraphQlSchemaBuilderFactory` → `GraphQlSchemaBuilder`:
-- `QueryProvider` — generates get/list/paginate queries per entity (ACL-filtered)
-- `MutationProvider` — generates create/update/delete/upsert mutations
-- `EntityTypeProvider` — builds output types respecting field-level ACL
-- Schema cached per content schema hash with configurable TTL
+Two builders produce the same schema; `engine-http` picks one per project (`contentApi.graphqlEngine`, `graphqlJsonProjects`):
+
+- `GraphQlSchemaBuilderFactory` (`schema/`, default) builds a graphql-js `GraphQLSchema` from the providers.
+- `JsonContentSchemaBuilder` (`schema-json/`) builds a `@contember/graphql-json` schema: plain JSON (tuples), no graphql-js type instances, from `JsonEntityTypes`, `JsonFilterTypes`, `JsonInputTypes` and `JsonColumnTypes`, registered in `JsonTypeRegistry`.
+
+- **The published schema is a contract, identical on both engines.** Type order, field order, descriptions and deprecations are what clients see in introspection and in `contember project print-schema`. `getReachableTypes` collects types in graphql-js order on purpose. A schema change goes into both builders: the SDL fixtures in `tests/cases/integration/graphQlSchema/*.gql` are checked against both, every request test (`tests/src/test.ts`) runs on both and compares the serialized responses byte for byte, and `engine-http` `contentGraphqlCompat.test.ts` does the same over HTTP. A deliberate difference is declared with `graphqlJsReturn`.
+- Role schemas of one model share a `JsonContentSchemaShared` (resolvers, field extensions, scalars, `SchemaInterner`), so a role costs only the types its permissions change. Resolvers are module-level factories: a closure over the builder would keep it alive in the shared map.
+- Plugin contributions stay graphql-js (`GraphQLSchemaContributor`); `GraphQLJsBridge` converts them and delegates their root fields to graphql-js execution.
+- Schema cached per content schema hash with configurable TTL (`engine-http` `GraphQlSchemaFactory`).
 
 ## Key Directories
 
 - `acl/` — PredicateFactory, PredicatesInjector, VariableInjector, Authorizator
 - `mapper/` — Mapper, SelectBuilder, Inserter, Updater, DeleteExecutor, relation processors
-- `schema/` — GraphQL schema builders and type providers
+- `schema-json/` — the content schema builder for graphql-json
+- `schema/` — the graphql-js content schema builder and its providers, plus helpers shared with the resolvers (operation meta, field access, custom scalars)
 - `resolvers/` — ReadResolver, MutationResolver
 - `inputProcessing/` — CreateInputVisitor, UpdateInputVisitor
 - `input-validation/` — InputPreValidator, EntityRulesResolver

@@ -1,5 +1,11 @@
 import { devTypeDefs, ResolverFactory, SystemResolverContext, typeDefs } from '@contember/engine-system-api'
-import { createDbQueriesListener, createGraphQLQueryHandler, GraphQLListener, GraphQLQueryHandler } from '../graphql/index.js'
+import {
+	createDbQueriesListener,
+	createGraphQLJsExecutor,
+	createGraphQLQueryHandler,
+	GraphQLListener,
+	GraphQLQueryHandler,
+} from '../graphql/index.js'
 import { DocumentNode } from 'graphql'
 import { mergeTypeDefs } from '@graphql-tools/merge'
 import { makeExecutableSchema } from '@graphql-tools/schema'
@@ -38,7 +44,7 @@ export class SystemGraphQLHandlerFactory {
 			listeners.push(createDbQueriesListener(context => context.db.client, this.debugMode))
 		}
 		return createGraphQLQueryHandler<SystemGraphQLContext>({
-			schema,
+			executor: createGraphQLJsExecutor(schema),
 			listeners,
 		})
 	}

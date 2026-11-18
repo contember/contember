@@ -52,11 +52,11 @@ export class QueryProvider {
 			},
 			extensions: { [ExtensionKey]: new OperationMeta(Operation.get, entity) },
 			resolve: (parent, args, context, info) => {
-				return context.timer(`GraphQL.query.${info.fieldName}`, () => {
+				return context.timer(`GraphQL.query.${info.fieldName}`, async () => {
 					if (parent && info.path) {
 						return parent[info.path.key]
 					}
-					return context.executionContainer.readResolver.resolveGetQuery(entity, info)
+					return context.executionContainer.readResolver.resolveGetQuery(entity, context.executionContainer.queryAstFactory.create(info))
 				})
 			},
 		}
@@ -85,11 +85,11 @@ export class QueryProvider {
 			},
 			extensions: { [ExtensionKey]: new OperationMeta(Operation.list, entity) },
 			resolve: (parent, args, context, info) => {
-				return context.timer(`GraphQL.query.${info.fieldName}`, () => {
+				return context.timer(`GraphQL.query.${info.fieldName}`, async () => {
 					if (parent && info.path) {
 						return parent[info.path.key]
 					}
-					return context.executionContainer.readResolver.resolveListQuery(entity, info)
+					return context.executionContainer.readResolver.resolveListQuery(entity, context.executionContainer.queryAstFactory.create(info))
 				})
 			},
 		}
@@ -101,11 +101,11 @@ export class QueryProvider {
 			deprecationReason: entity.deprecationReason,
 			extensions: { [ExtensionKey]: new OperationMeta(Operation.paginate, entity) },
 			resolve: (parent, args, context, info) => {
-				return context.timer(`GraphQL.query.${info.fieldName}`, () => {
+				return context.timer(`GraphQL.query.${info.fieldName}`, async () => {
 					if (parent && info.path) {
 						return parent[info.path.key]
 					}
-					return context.executionContainer.readResolver.resolvePaginationQuery(entity, info)
+					return context.executionContainer.readResolver.resolvePaginationQuery(entity, context.executionContainer.queryAstFactory.create(info))
 				})
 			},
 		}

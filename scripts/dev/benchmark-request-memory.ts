@@ -1,8 +1,9 @@
 import { randomUUID } from 'node:crypto'
 import { performance } from 'node:perf_hooks'
-import { graphql } from 'graphql'
+import { parse } from 'graphql'
+import { execute } from '@contember/graphql-json'
 import { Connection, emptyDatabaseMetadata, EventManager, RequestMemoryBudget, RequestMemoryBudgetExceededError } from '@contember/database'
-import { Authorizator, ExecutionContainerFactory, GraphQlSchemaBuilderFactory } from '@contember/engine-content-api'
+import { Authorizator, ExecutionContainerFactory, JsonContentSchemaBuilder } from '@contember/engine-content-api'
 import { SchemaBuilder } from '@contember/schema-definition'
 import { Model } from '@contember/schema'
 import { AllowAllPermissionFactory, emptySchema } from '@contember/schema-utils'
@@ -85,7 +86,15 @@ const model = new SchemaBuilder()
 	.buildSchema()
 const permissions = new AllowAllPermissionFactory().create(model)
 const authorizator = new Authorizator(permissions, false, false)
-const gqlSchema = new GraphQlSchemaBuilderFactory().create(model, authorizator, authorizator).build()
+const contentSchema = new JsonContentSchemaBuilder(model, authorizator, authorizator).build()
+const graphql = ({ source, contextValue }: { source: string; contextValue: unknown }) =>
+	execute({
+		schema: contentSchema.schema,
+		document: parse(source),
+		resolvers: contentSchema.resolvers,
+		scalars: contentSchema.scalars,
+		contextValue,
+	})
 const factory = new ExecutionContainerFactory({ uuid: () => randomUUID(), now: () => new Date() })
 
 try {
@@ -144,7 +153,7 @@ try {
 		}
 		const runRequest = async () => {
 			const budget = createBudget()
-			const response = await graphql({ schema: gqlSchema, source, contextValue: createContextValue(budget) })
+			const response = await graphql({ source, contextValue: createContextValue(budget) })
 			budget?.check()
 			if (response.errors) {
 				throw response.errors[0]
@@ -177,7 +186,7 @@ try {
 		const budget = createBudget()
 		const contextValue = createContextValue(budget)
 		const db = contextValue.db
-		await graphql({ schema: gqlSchema, source: '{ listItem(limit: 1) { id } }', contextValue })
+		await graphql({ source: '{ listItem(limit: 1) { id } }', contextValue })
 		if (!globalThis.gc) {
 			throw new Error('Run with --expose-gc')
 		}
@@ -200,7 +209,7 @@ try {
 		const start = performance.now()
 		const cpuStart = process.cpuUsage()
 		try {
-			const response = await graphql({ schema: gqlSchema, source, contextValue })
+			const response = await graphql({ source, contextValue })
 			const executionMs = performance.now() - start
 			sample()
 			budget?.check()

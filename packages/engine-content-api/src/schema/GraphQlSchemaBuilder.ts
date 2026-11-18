@@ -16,6 +16,7 @@ import { ValidationQueriesProvider } from './ValidationQueriesProvider.js'
 import { Context } from '../types.js'
 import { ResultSchemaTypeProvider } from './ResultSchemaTypeProvider.js'
 import { RefreshViewMutationProvider } from './RefreshViewMutationProvider.js'
+import { transactionQueryAstFilter } from '../resolvers/MutationResolver.js'
 
 type BuildArgs = {
 	queries?: Map<string, GraphQLFieldConfig<any, Context, any>>
@@ -63,7 +64,10 @@ export class GraphQlSchemaBuilder {
 			queries.set('transaction', {
 				type: queryTransactionType,
 				resolve: async (parent, args, context: Context, info) => {
-					return context.timer(`GraphQL.query.${info.fieldName}`, () => context.executionContainer.readResolver.resolveTransaction(info))
+					return context.timer(
+						`GraphQL.query.${info.fieldName}`,
+						async () => context.executionContainer.readResolver.resolveTransaction(context.executionContainer.queryAstFactory.create(info)),
+					)
 				},
 			})
 		}
@@ -109,16 +113,23 @@ export class GraphQlSchemaBuilder {
 					context: Context,
 					info,
 				) => {
-					return context.timer(`GraphQL.mutation.${info.fieldName}`, () =>
-						context.executionContainer.mutationResolver.resolveTransaction(info, {
-							deferForeignKeyConstraints: args.options?.deferForeignKeyConstraints ?? false,
-							deferUniqueConstraints: args.options?.deferUniqueConstraints ?? false,
-						}))
+					return context.timer(
+						`GraphQL.mutation.${info.fieldName}`,
+						async () =>
+							context.executionContainer.mutationResolver.resolveTransaction(
+								context.executionContainer.queryAstFactory.create(info, transactionQueryAstFilter),
+								{
+									deferForeignKeyConstraints: args.options?.deferForeignKeyConstraints ?? false,
+									deferUniqueConstraints: args.options?.deferUniqueConstraints ?? false,
+								},
+							),
+					)
 				},
 			})
 			mutations.set('query', {
 				type: new GraphQLNonNull(queryObjectType),
-				resolve: (parent, args, context: Context, info) => context.executionContainer.readResolver.resolveQuery(info),
+				resolve: (parent, args, context: Context, info) =>
+					context.executionContainer.readResolver.resolveQuery(context.executionContainer.queryAstFactory.create(info)),
 			})
 		}
 

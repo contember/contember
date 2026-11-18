@@ -105,6 +105,43 @@ test('schemaCacheMaxEntries: zero is refused', () => {
 	expect(() => serverConfigSchema({ contentApi: { schemaCacheMaxEntries: 0 } })).toThrow()
 })
 
+test('graphql engine: unset when no variable is set', async () => {
+	const { serverConfig } = await readConfig()
+	expect(serverConfig.contentApi?.graphqlEngine).toBeUndefined()
+	expect(serverConfig.contentApi?.graphqlJsonProjects).toBeUndefined()
+})
+
+test('graphql engine: read from CONTEMBER_CONTENT_API_GRAPHQL_ENGINE and _GRAPHQL_JSON_PROJECTS', async () => {
+	process.env.CONTEMBER_CONTENT_API_GRAPHQL_ENGINE = 'graphql-json'
+	process.env.CONTEMBER_CONTENT_API_GRAPHQL_JSON_PROJECTS = 'blog, shop,'
+	try {
+		const { serverConfig } = await readConfig()
+		expect(serverConfig.contentApi?.graphqlEngine).toBe('graphql-json')
+		expect(serverConfig.contentApi?.graphqlJsonProjects).toEqual(['blog', 'shop'])
+	} finally {
+		delete process.env.CONTEMBER_CONTENT_API_GRAPHQL_ENGINE
+		delete process.env.CONTEMBER_CONTENT_API_GRAPHQL_JSON_PROJECTS
+	}
+})
+
+test('graphql engine: an unknown engine is refused', () => {
+	expect(() => serverConfigSchema({ contentApi: { graphqlEngine: 'graphql-other' } })).toThrow()
+})
+
+test('graphql engine: an empty value means unset', () => {
+	expect(serverConfigSchema({ contentApi: { graphqlEngine: '', graphqlJsonProjects: '' } }).contentApi).toEqual({})
+})
+
+test('graphql engine: the project list accepts a list of slugs', () => {
+	expect(serverConfigSchema({ contentApi: { graphqlJsonProjects: ['blog', ' shop '] } }).contentApi?.graphqlJsonProjects).toEqual(['blog', 'shop'])
+})
+
+test('graphql engine: a project list that is not a list of slugs is refused', () => {
+	expect(() => serverConfigSchema({ contentApi: { graphqlJsonProjects: { blog: true } } })).toThrow()
+	expect(() => serverConfigSchema({ contentApi: { graphqlJsonProjects: [1] } })).toThrow()
+	expect(() => serverConfigSchema({ contentApi: { graphqlJsonProjects: true } })).toThrow()
+})
+
 test('migration lock options: read from CONTEMBER_SYSTEM_API_MIGRATION_* with defaults for the retry', async () => {
 	process.env.CONTEMBER_SYSTEM_API_MIGRATION_LOCK_TIMEOUT_MS = '2000'
 	try {

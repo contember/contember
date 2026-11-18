@@ -1,5 +1,5 @@
 import { makeExecutableSchema } from '@graphql-tools/schema'
-import { createGraphQLQueryHandler, GraphQLQueryHandler } from '@contember/engine-http'
+import { createGraphQLJsExecutor, createGraphQLQueryHandler, GraphQLQueryHandler } from '@contember/engine-http'
 import { ResolversFactory } from '../resolvers/ResolversFactory.js'
 // biome-ignore lint/correctness/useImportExtensions: .graphql files are resolved by the bundler loader, not as JS modules
 import { schema as graphqlDocument } from '../schema/actions.graphql'
@@ -16,7 +16,7 @@ export class ActionsGraphQLHandlerFactory {
 		})
 
 		return createGraphQLQueryHandler<ActionsContext>({
-			schema,
+			executor: createGraphQLJsExecutor(schema),
 			listeners: [],
 		})
 	}

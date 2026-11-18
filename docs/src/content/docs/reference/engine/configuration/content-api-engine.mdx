@@ -1,0 +1,45 @@
+---
+title: Content API GraphQL engine
+---
+
+:::note[Available since 2.2]
+:::
+
+The Engine can run the Content API on one of two GraphQL engines:
+
+- `graphql-js` (default) builds a graphql-js schema for each combination of roles.
+- `graphql-json` builds a compact JSON schema and executes requests directly against it. A cached schema takes several times less memory, and the build returns to the event loop about every 10 ms, so it does not hold up other requests of the process for its whole duration. Use it when many combinations of roles fill the [schema cache](/reference/engine/configuration/content-schema-cache).
+
+Both engines answer with the same responses, introspection and error messages. One known difference: an alias named like a JavaScript `Object.prototype` member (`toString`, `constructor`, `__proto__`) fails on `graphql-js` and works on `graphql-json`.
+
+## Configuration
+
+Switch single projects first:
+
+```bash
+CONTEMBER_CONTENT_API_GRAPHQL_JSON_PROJECTS=blog,shop
+```
+
+then the default for all projects:
+
+```bash
+CONTEMBER_CONTENT_API_GRAPHQL_ENGINE=graphql-json
+```
+
+or in the server config:
+
+```yaml
+server:
+  contentApi:
+    graphqlEngine: graphql-js
+    graphqlJsonProjects: [blog, shop]
+```
+
+| Option | Meaning |
+|---|---|
+| `graphqlEngine` | The engine of every project that is not listed in `graphqlJsonProjects`: `graphql-js` (default) or `graphql-json`. |
+| `graphqlJsonProjects` | Slugs of the projects that run on `graphql-json`, as a list or a comma-separated string. A slug matches that project in every project group. |
+
+The engine applies to the Content API and to the content migrations of the project. A change takes effect after a restart.
+
+To switch a project back to `graphql-js`, remove it from the list. The list only opts projects in: while `graphqlEngine` is `graphql-json`, a single project cannot go back. Keep the default at `graphql-js` and list every switched project until all of them run on `graphql-json`.

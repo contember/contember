@@ -2,7 +2,21 @@ import { acceptEveryFieldVisitor } from '@contember/schema-utils'
 import { Model } from '@contember/schema'
 
 type SingleUnique = readonly string[]
+
+// depends on the entity alone; schema builds ask for it per relation and role, requests per unique where
+const uniqueWhereFields = new WeakMap<Model.Entity, readonly SingleUnique[]>()
+
 export const getFieldsForUniqueWhere = (schema: Model.Schema, entity: Model.Entity): readonly (SingleUnique)[] => {
+	const cached = uniqueWhereFields.get(entity)
+	if (cached) {
+		return cached
+	}
+	const fields = createFieldsForUniqueWhere(schema, entity)
+	uniqueWhereFields.set(entity, fields)
+	return fields
+}
+
+const createFieldsForUniqueWhere = (schema: Model.Schema, entity: Model.Entity): readonly (SingleUnique)[] => {
 	const relations = Object.values(
 		acceptEveryFieldVisitor<undefined | [string]>(schema, entity, {
 			visitColumn: () => undefined,

@@ -17,7 +17,7 @@ import {
 import { FieldNode, ObjectNode } from '../inputProcessing/index.js'
 import { isDeepStrictEqual } from 'node:util'
 
-type NodeFilter = (node: GraphQlFieldNode, path: string[]) => boolean
+export type NodeFilter = (node: GraphQlFieldNode, path: string[]) => boolean
 type AnyNode = ObjectNode | FieldNode
 
 export class GraphQlQueryAstFactory {
@@ -119,7 +119,7 @@ export class GraphQlQueryAstFactory {
 		return typeof val + ' is not supported'
 	}
 
-	private static mergeFieldList(nodes: AnyNode[]): AnyNode[] {
+	public static mergeFieldList(nodes: AnyNode[]): AnyNode[] {
 		const result: Record<string, AnyNode> = {}
 		for (const node of nodes) {
 			result[node.alias] = result[node.alias] ? GraphQlQueryAstFactory.mergeFields(result[node.alias], node) : node

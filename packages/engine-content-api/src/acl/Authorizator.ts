@@ -23,7 +23,13 @@ export class Authorizator {
 		if (!fieldPermissions) {
 			return 'no'
 		}
-		return Object.values(fieldPermissions).filter(it => !!it).length > 0 ? 'yes' : 'no'
+		// schema builds call this for every relation of every input variant; stop at the first granted field
+		for (const field in fieldPermissions) {
+			if (fieldPermissions[field]) {
+				return 'yes'
+			}
+		}
+		return 'no'
 	}
 
 	getFieldPredicate(operation: Acl.Operation.create | Acl.Operation.read | Acl.Operation.update, entity: string, field: string): Acl.Predicate {
